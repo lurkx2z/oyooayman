@@ -7,14 +7,16 @@ Everything is procedural, so there are no models, images or sound files to downl
 
 | Time | Beat |
 |---|---|
-| 0–1.3 s | Normal sunny street: charcoal-grill cart, a worker on a scissor lift cutting steel (bright spark fan), traffic, birds. Hook title. The O₂ HUD already creeps down from 21.0 % |
-| 1.3–2.4 s | O₂ crashes to 0 %. Grill flames die at about 15 %. Engines misfire and stop while O₂ falls through about 14 → 5 % |
-| 2.4 s | **0 %.** Air pressure drops 23 %, so everyone's ears pop at once: people flinch with hands to their ears, birds scatter, the camera jolts, sound muffles |
-| 2.4–6 s | The grill throws off white smoke (fat still cooks with no flame). The coals still glow (hot, not burning). The vendor tries a lighter: sparks, no flame. The battery grinder still spins, but its sparks turn short and dull. Coasting cars die |
-| 6.2 s | A coasting car rear-ends the stalled car ahead, 14 m in front of you. The alarm and hazard lights keep going on battery |
-| 6.6–8.9 s | **An electric car keeps driving**, overtaking the dead queue on the wrong side and passing the viewer |
-| 9.3 s | **The power grid fails** (about 60 % of electricity comes from burning fuel). Shop lights die and traffic signals switch to battery-backup flashing red |
-| 9.8–15 s | No feeling of suffocation, just dizziness. Tunnel vision and desaturation build, the viewer's knees start to give. From about 12 s (roughly 10 s without O₂) people around you slump and collapse; birds have already dropped |
+| 0–1.3 s | Normal sunny street. You walk toward a charcoal-grill cart (flames). A worker on a scissor lift throws a bright spark fan, there's traffic, birds, and a rooftop LED billboard. Hook title. The O₂ HUD already creeps down from 21.0 % |
+| 1.3–2.4 s | O₂ crashes to 0 %. Ears start popping. Grill flames die at about 15 %. Engines misfire and stop while O₂ is still falling |
+| 2.4 s | **0 %.** Pressure drops 21 % instantly. Everyone (including your own hands) jerks up to their ears, birds dip and scatter, the camera jolts with a colour shock, sound muffles, and you exhale involuntarily |
+| 3.0 s | The HUD swaps to the deadline: **YOU BLACK OUT IN ≈ 00:16** |
+| 3.4–5.3 s | **You click your own lighter**: a blue piezo spark, gas hisses, no flame. Meanwhile the grill gives off white smoke (fat still cooks without a flame) and its coals glow dull red (hot, not burning) |
+| 5.5–6.1 s | The worker's battery grinder still spins, but its sparks are short and dull: hot steel can't burn without O₂ |
+| 6.3 s | **The grid collapses** (60 % of power came from burning fuel). The rooftop billboard flickers and dies, signals switch to battery flashing red, the mains hum cuts out |
+| 6.75 s | A coasting car rear-ends the stalled car 16 m ahead. Its alarm and hazards keep going on battery |
+| 7.3–8.9 s | **A blue electric car keeps driving** through the dead traffic and passes you |
+| 9.5–15 s | "Each breath pulls O₂ out of your blood." Dizziness, hands to heads, tunnel vision and desaturation build, and the countdown turns red and pulses with your heartbeat. The hard-working lift worker passes out first (about 10 s without O₂) and folds over the railing. People stumble, kneel and sit down. Your own trembling hand drifts into view. Phase 1 ends about 4 s before *you* black out |
 
 ---
 
@@ -96,7 +98,7 @@ tools/render-preview.cjs   optional frame-exact MP4 renderer
 These were checked by an independent science review pass; see the review summary in the session.
 
 - Only **molecular O₂** vanishes. Water, rock, concrete and the oxygen inside your body stay where they are. Oceans stay. Buildings stand.
-- The atmosphere loses O₂'s share of its **mass (about 23 %)**, so surface pressure drops about 23 %, like jumping to roughly 2 km altitude in a second. Water would boil at about 93 °C.
+- **Air pressure drops 21 % instantly** (the molecules vanish where they are, p = nkT). It then settles toward −23 % (O₂'s share of the air's mass) over the next minutes as the lighter column re-settles. That's like jumping to roughly 2 km altitude in a second; water would boil at about 93 °C.
   - **Ears pop** (air trapped in the middle ear pushes outward).
   - **There is no boom**: O₂ vanishing everywhere at once creates no pressure wave. The thump is inside your head.
   - The sky gets slightly darker and deeper, since O₂ does part of the Rayleigh scattering.
@@ -107,11 +109,14 @@ These were checked by an independent science review pass; see the review summary
 - **Combustion engines die while O₂ falls through about 14–5 %**. No backfires happen after zero.
 - **Battery-powered things keep working**: brake and hazard lights, the bus LED sign, the car alarm, the electric car, the scissor lift and the cordless grinder.
 - **Grinder sparks**: bright, branching sparks are steel *burning* in air. Without O₂ they become short, dull bits of hot metal.
-- **The power grid fails within seconds** (here about 7 s after zero). About 60 % of electricity comes from burning fuel; gas turbines flame out, and grid frequency collapses into a blackout. Traffic signals with battery backup fall back to flashing red. *To keep mains power on anyway, set `grid: { fail: null }` in `js/scene/script.js`.*
-- **Hypoxia**: breathing O₂-free air pulls oxygen *out* of your blood, and there is **no feeling of suffocation**, because the urge to breathe comes from CO₂, which still leaves normally. People stay functional for roughly 10–15 s, then suddenly slump and lose consciousness at about 15–25 s. Phase 1 starts the first collapses at about 10 s, the fast end of that range.
+- **The power grid fails within seconds** (here about 4 s after zero). About 60 % of electricity comes from burning fuel. Gas turbines flame out and coal boilers lose their fire; frequency collapses faster than load-shedding can react, and the nuclear, hydro and wind plants trip too. Traffic signals with battery backup fall back to flashing red. *To keep mains power on anyway, set `grid: { fail: null }` in `js/scene/script.js`.*
+- **Hypoxia**: breathing O₂-free air pulls oxygen *out* of your blood. There is **no feeling of suffocation**, because the urge to breathe comes from CO₂, which still leaves normally. Resting adults stay functional for roughly 10–15 s and black out at about 15–25 s. Someone working hard (the lift worker) goes first, at about 10 s. The HUD deadline assumes about 17 s for the viewer.
+- **Lighters**: a piezo lighter still makes its electric spark, but the gas can't light. Flint (ferrocerium) sparks only shine by burning, so they go dim.
 
 ## Recommendations for Phase 2 (from the reviews)
 
-- **Put the viewer on the same clock as everyone else.** Planning a POV collapse at about 55 s, while everyone else drops at about 10–20 s, is the most likely "that's fake" comment. The viewer should pass out about 15–20 s after zero (about 18–23 s into the video). Then continue from the viewer's **dropped phone or body camera still recording on the pavement** (battery powered). That angle can show the aircraft, the blackout and the city.
+- **Put the viewer on the same clock as everyone else.** Phase 1 already counts down to the viewer's blackout at about 19.4 s. Planning a POV collapse at about 55 s, while everyone else drops at about 10–25 s, is the most likely "that's fake" comment. Two plausible options:
+  1. The viewer blacks out at about 19 s. The film continues from their **dropped phone, still recording on battery** on the pavement, which can show the aircraft, the city and the global pull-back.
+  2. **The viewer holds their breath.** This is true and surprising: breathing is what drains your blood, so holding your breath keeps you conscious much longer, if the lungs' O₂ didn't vanish too. A "HOLD YOUR BREATH" beat at about 15 s could stretch the POV to about 50–60 s and keep your original structure.
 - **Aircraft:** every engine flames out at once, and the sound goes from a roar to the whine of fans windmilling. A crash within about 30 s only works for a jet just after take-off (below about 500 m). From cruising altitude it takes minutes. **No fireball**, because fuel can't burn: show dust and spilled fuel mist instead. A helicopter dropping fast without power fits the timing better.
 - **Global view:** night-side city lights go out in waves within seconds. No fires anywhere. The sky stays blue. The ozone layer can't be rebuilt, so UV-C reaches the ground within hours.

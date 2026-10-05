@@ -76,16 +76,22 @@ class HUD {
     const sOut = MathX.smooth(t, H.timerSwap, H.timerSwap + 0.16), sIn = MathX.smooth(t, H.timerSwap + 0.16, H.timerSwap + 0.42);
     const compact = sOut >= 1;
     this.el.o2.classList.toggle('compact', compact);
-    this._set('o2tr', this.el.o2, 'transform', compact ? 'translateX(-50%) translateY(-62%) scale(0.38)' : `translateX(-50%) scale(${(1 - sOut * 0.1).toFixed(3)})`);
+    this._set('o2tr', this.el.o2, 'transform', compact ? 'translateX(-50%) translateY(-12%) scale(0.46)' : `translateX(-50%) scale(${(1 - sOut * 0.1).toFixed(3)})`);
     const o2Vis = compact ? sIn : 1 - sOut;
     this._set('o2op', this.el.o2, 'opacity', String((flick * o2Vis).toFixed(3)));
     const tv = sIn;
     this._set('timerop', this.el.timer, 'opacity', tv.toFixed(3));
     this._set('timertr', this.el.timer, 'transform', `translateX(-50%) scale(${(0.85 + 0.15 * tv).toFixed(3)})`);
-    const secs = Math.max(0, t - tl.at('o2_zero'));
+    // countdown to the viewer's own blackout (a deadline, not an open-ended count-up)
+    const secs = Math.max(0, H.blackoutAt - t);
     const tt = `00:${String(Math.floor(secs)).padStart(2, '0')}.${String(Math.floor((secs % 1) * 10))}`;
     if (this._last.tt !== tt) { this.el.timerValue.textContent = tt; this._last.tt = tt; }
-    this.el.timer.classList.toggle('alert', SCRIPT_TRACKS.hypoxia.value(t) > 0.2);
+    const urgent = secs < 6;
+    this.el.timer.classList.toggle('alert', urgent);
+    // pulse with the heartbeat once it gets urgent
+    const bpm = SCRIPT_TRACKS.heartRate.value(t);
+    const beat = urgent ? Math.pow(Math.max(0, Math.sin(t * Math.PI * bpm / 60)), 8) : 0;
+    this._set('timerpulse', this.el.timerValue, 'transform', `scale(${(1 + beat * 0.06).toFixed(3)})`);
 
     // ---- log lines (typewriter in, fade out, newest at the bottom)
     let slot = 0;

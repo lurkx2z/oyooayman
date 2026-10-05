@@ -25,9 +25,9 @@ const PersonGeo = {
     if (this.ready) return;
     this.pelvis = new THREE.RoundedBoxGeometry(0.34, 0.2, 0.21, 2, 0.06);
     this.chest = new THREE.RoundedBoxGeometry(0.37, 0.5, 0.22, 2, 0.08);
-    this.neck = new THREE.CylinderGeometry(0.05, 0.055, 0.1, 8);
+    this.neck = new THREE.CylinderGeometry(0.052, 0.062, 0.16, 10);
     this.head = new THREE.SphereGeometry(0.105, 14, 10); this.head.scale(0.95, 1.12, 1.02);
-    this.hair = new THREE.SphereGeometry(0.112, 14, 8, 0, Math.PI * 2, 0, Math.PI * 0.55); this.hair.scale(0.97, 1.08, 1.06);
+    this.hair = new THREE.SphereGeometry(0.114, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.62); this.hair.scale(1.0, 1.06, 1.1);
     this.hairLong = new THREE.CylinderGeometry(0.1, 0.12, 0.22, 10, 1, true, Math.PI * 0.2, Math.PI * 1.6);
     this.nose = new THREE.BoxGeometry(0.03, 0.04, 0.03);
     this.upperArm = new THREE.CapsuleGeometry(0.05, 0.22, 4, 8);
@@ -271,6 +271,16 @@ const ACTIONS = {
     }
     return p;
   },
+  railSlump(τ, c) {
+    // passes out on his feet and folds over the lift railing
+    const A = basePose(), k = Ease.inQuad(Math.min(1, τ / 0.55));
+    const p = lerpPose(A, Object.assign(basePose(), {
+      hipY: 0.78, lHip: [0.35, 0.08], rHip: [0.3, 0.08], lKnee: 0.65, rKnee: 0.55, spine: 1.15, spineRoll: 0.12,
+      neck: 0.7, headRoll: 0.25, lSh: [0.35, 0.18], rSh: [0.55, 0.12], lEl: 0.15, rEl: 0.25, rootZ: 0.12,
+    }), k);
+    if (τ > 0.55) { const tw = Math.exp(-(τ - 0.55) / 0.4) * Math.sin((τ - 0.55) * 28); p.neck += tw * 0.06; p.rEl += tw * 0.1; }
+    return p;
+  },
   ride(τ, c) {
     const p = basePose();
     p.hipY = 0.86; p.lHip = [1.2, 0.18]; p.rHip = [1.2, 0.18]; p.lKnee = 1.55; p.rKnee = 1.55;
@@ -280,7 +290,7 @@ const ACTIONS = {
     return p;
   },
 };
-const BLEND = { recoil: 0.2, lie: 1.1, kneel: 0.85, sitGround: 1.3, stumble: 0.6, sitSlump: 1.2, lean: 0.8, look: 0.6, handHead: 0.5, walk: 0.5, idle: 0.6, earPop: 0.08, earPopSit: 0.08, flinch: 0.06, collapse: 0.12, lighter: 0.5, phone: 0.5, grind: 0.35 };
+const BLEND = { recoil: 0.2, lie: 1.1, kneel: 0.85, sitGround: 1.3, stumble: 0.6, sitSlump: 1.2, lean: 0.8, look: 0.6, handHead: 0.5, walk: 0.5, idle: 0.6, earPop: 0.08, earPopSit: 0.08, flinch: 0.06, collapse: 0.12, railSlump: 0.1, lighter: 0.5, phone: 0.5, grind: 0.35 };
 
 class Person {
   constructor(spec, scene) {
@@ -320,7 +330,7 @@ class Person {
     if (L.apron) mesh(G.apron, this._mat(L.apron), spine, 0, 0.1, 0.115);
     if (L.bag) mesh(G.bag, this._mat(L.bag), spine, -0.22, 0.05, 0);
     const neck = new THREE.Group(); neck.position.y = 0.52; spine.add(neck);
-    mesh(G.neck, skin, neck, 0, 0.03, 0);
+    mesh(G.neck, skin, neck, 0, 0.0, 0);
     const head = new THREE.Group(); head.position.y = 0.15; neck.add(head);
     mesh(G.head, skin, head, 0, 0, 0);
     mesh(G.nose, skin, head, 0, -0.01, 0.105);
@@ -390,26 +400,30 @@ class Person {
   locate(t) {
     const P = this.pathPts;
     if (P.length === 1 || t <= P[0][0]) {
-      return { x: P[0][1], z: P[0][2], dist: 0, moving: false, dir: this._dirOf(0) };
+      return { x: P[0][1], z: P[0][2], dist: 0, moving: false, dir: this._dirOf(0, t) };
     }
     for (let i = 1; i < P.length; i++) {
       if (t <= P[i][0]) {
         const f = (t - P[i - 1][0]) / (P[i][0] - P[i - 1][0]);
         return {
           x: P[i - 1][1] + (P[i][1] - P[i - 1][1]) * f, z: P[i - 1][2] + (P[i][2] - P[i - 1][2]) * f,
-          dist: this.cumDist[i - 1] + (this.cumDist[i] - this.cumDist[i - 1]) * f, moving: true, dir: this._dirOf(i - 1),
+          dist: this.cumDist[i - 1] + (this.cumDist[i] - this.cumDist[i - 1]) * f, moving: true, dir: this._dirOf(i - 1, t),
         };
       }
     }
     const n = P.length - 1;
-    return { x: P[n][1], z: P[n][2], dist: this.cumDist[n], moving: false, dir: this._dirOf(n - 1) };
+    return { x: P[n][1], z: P[n][2], dist: this.cumDist[n], moving: false, dir: this._dirOf(n - 1, t) };
   }
-  _dirOf(i) {
-    if (this.spec.face !== undefined) return Math.PI + MathX.deg(this.spec.face);
+  _dirOf(i, t = 0) {
+    if (this.spec.face !== undefined && !(this.spec.faceUntil !== undefined && t >= this.spec.faceUntil)) return Math.PI + MathX.deg(this.spec.face);
     const P = this.pathPts;
     if (P.length < 2) return Math.PI;
-    const a = P[Math.max(0, i)], b = P[Math.min(P.length - 1, Math.max(1, i + 1))];
-    return Math.atan2(b[1] - a[1], b[2] - a[2]);
+    for (let k = Math.min(i, P.length - 2); k >= 0; k--) {
+      const a = P[k], b = P[k + 1];
+      if (Math.hypot(b[1] - a[1], b[2] - a[2]) > 1e-3) return Math.atan2(b[1] - a[1], b[2] - a[2]);
+    }
+    for (let k = 0; k < P.length - 1; k++) { const a = P[k], b = P[k + 1]; if (Math.hypot(b[1] - a[1], b[2] - a[2]) > 1e-3) return Math.atan2(b[1] - a[1], b[2] - a[2]); }
+    return Math.PI;
   }
 
   poseAt(t, ctx) {

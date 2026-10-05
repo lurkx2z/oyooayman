@@ -57,6 +57,7 @@ class Environment {
     this._trees();
     this._streetFurniture();
     this._signals();
+    this._billboard();
     this._construction();
     this._cart();
     this._roadWorks();
@@ -90,7 +91,7 @@ class Environment {
       markYellow: new THREE.MeshStandardMaterial({ color: '#e0b628', roughness: 0.65, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, name: 'markYellow' }),
       manhole: new THREE.MeshStandardMaterial({ color: '#2a2a2a', roughness: 0.6, metalness: 0.5, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }),
       bark: Mat.std('#5b4b3e', { roughness: 0.95 }),
-      foliage: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, flatShading: true, name: 'foliage' }),
+      foliage: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, flatShading: false, name: 'foliage' }),
       soil: Mat.std('#3b3027', { roughness: 1 }),
       glass: new THREE.MeshPhysicalMaterial({ color: '#cfe3ea', roughness: 0.05, transmission: 0, transparent: true, opacity: 0.22, depthWrite: false, name: 'glassPanel' }),
       hoarding: new THREE.MeshStandardMaterial({ map: Tex.hoarding(15), roughness: 0.85, name: 'hoarding' }),
@@ -120,7 +121,7 @@ class Environment {
 
   /* ================================================================ */
   _sky() {
-    this.sunDir = new THREE.Vector3(0.55, 0.62, -0.56).normalize();
+    this.sunDir = new THREE.Vector3(-0.66, 0.6, -0.42).normalize();
     const zenith = new THREE.Color('#2a68c2');
     const horizon = new THREE.Color('#bcd3e8');
     this.horizonColor = horizon.clone();
@@ -187,7 +188,7 @@ class Environment {
   }
 
   _lights() {
-    const sun = new THREE.DirectionalLight('#fff0dc', 3.2);
+    const sun = new THREE.DirectionalLight('#ffeed6', 3.6);
     sun.position.copy(this.sunDir).multiplyScalar(160).add(new THREE.Vector3(0, 0, -40));
     sun.target.position.set(0, 0, -40);
     sun.castShadow = CONFIG.render.shadows;
@@ -199,7 +200,7 @@ class Environment {
     sun.shadow.radius = 3;
     this.scene.add(sun, sun.target);
     this.sun = sun;
-    const hemi = new THREE.HemisphereLight('#bcd4f2', '#7a6a58', 1.15);
+    const hemi = new THREE.HemisphereLight('#bcd4f2', '#6e5e4c', 0.95);
     this.scene.add(hemi);
     this.hemi = hemi;
   }
@@ -499,11 +500,12 @@ class Environment {
     const base = new THREE.Color().setHSL(rng.range(0.23, 0.3), rng.range(0.28, 0.4), rng.range(0.19, 0.25));
     for (let i = 0; i < n; i++) {
       const r = rng.range(1.0, 1.55) * scale;
-      const g = new THREE.IcosahedronGeometry(r, 1);
+      const g = new THREE.IcosahedronGeometry(r, 2);
       const pos = g.attributes.position;
       for (let k = 0; k < pos.count; k++) {
         const v = new THREE.Vector3().fromBufferAttribute(pos, k);
-        v.multiplyScalar(1 + (hash1(k * 31 + i * 7 + (x * 13 | 0)) - 0.5) * 0.28);
+        const nrm = v.clone().normalize();
+        v.multiplyScalar(1 + (Math.sin(nrm.x * 7 + i) * Math.sin(nrm.y * 6 + x) * Math.sin(nrm.z * 8 + z)) * 0.16 + (hash1(k * 31 + i * 7 + (x * 13 | 0)) - 0.5) * 0.08);
         pos.setXYZ(k, v.x, v.y * 0.85, v.z);
       }
       const ng = g.index ? g.toNonIndexed() : g;
@@ -800,11 +802,11 @@ class Environment {
       for (let k = 0; k < 5; k++) add(new THREE.BoxGeometry(0.06, 0.05, 0.05), [meat, meat, pepper, meat, onion][(k + i) % 5], gx - 0.2 + k * 0.1, gy + gh + 0.012, sz);
     }
     // umbrella
-    add(new THREE.CylinderGeometry(0.02, 0.02, 2.5, 6), steelM, 0.3, 1.3, -0.55);
+    add(new THREE.CylinderGeometry(0.02, 0.02, 2.1, 6), steelM, 0.3, 1.1, -0.55);
     const um = Tex.canvas(256, 32), ux = um.getContext('2d');
     for (let i = 0; i < 8; i++) { ux.fillStyle = i % 2 ? '#f3efe6' : '#c8302a'; ux.fillRect(i * 32, 0, 32, 32); }
     const umbMat = new THREE.MeshStandardMaterial({ map: Tex.tex(um), side: THREE.DoubleSide, roughness: 0.8 });
-    const canopy = add(new THREE.ConeGeometry(1.35, 0.5, 16, 1, true), umbMat, 0.3, 2.62, -0.55);
+    const canopy = add(new THREE.ConeGeometry(1.3, 0.42, 16, 1, true), umbMat, 0.3, 2.2, -0.55);
     canopy.castShadow = true;
     // condiments, napkins
     add(new THREE.CylinderGeometry(0.03, 0.03, 0.18, 8), Mat.std('#c0261c', { roughness: 0.3 }), 0.25, 1.15, -0.55);
@@ -827,6 +829,22 @@ class Environment {
     this.dynamic.fireLight = fireLight;
   }
 
+  /* rooftop LED billboard at the end of the block, facing the viewer */
+  _billboard() {
+    const B = this.batch, m = this.m;
+    const x = -17, z = -63.5, y0 = 17.5, w = 15, h = 7.5;
+    for (const dx of [-w * 0.35, w * 0.35]) {
+      B.box(0.35, y0 + 0.5, 0.35, x + dx, (y0 + 0.5) / 2, z - 1.2, m.metal);
+      B.box(0.25, 0.25, 2.4, x + dx, y0 - 0.2, z - 0.4, m.metal);
+    }
+    B.box(w + 0.8, h + 0.8, 0.5, x, y0 + h / 2, z - 0.45, m.metal);
+    const mat = new THREE.MeshBasicMaterial({ map: Tex.billboard(), toneMapped: false });
+    const scr = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+    scr.position.set(x, y0 + h / 2, z - 0.18);
+    this.root.add(scr);
+    this.dynamic.billboard = mat;
+  }
+
   /* road works in the curb lane: cones, barricade, steel plate, battery scissor lift, lamp post */
   _roadWorks() {
     const B = this.batch, m = this.m, W = LAYOUT.works, h = LAYOUT.curbH;
@@ -844,8 +862,8 @@ class Environment {
     const stripe = Tex.canvas(256, 32), sx = stripe.getContext('2d');
     for (let i = -2; i < 12; i++) { sx.fillStyle = i % 2 ? '#f3f3ee' : '#e8611a'; sx.beginPath(); sx.moveTo(i * 24, 32); sx.lineTo(i * 24 + 24, 32); sx.lineTo(i * 24 + 40, 0); sx.lineTo(i * 24 + 16, 0); sx.fill(); }
     const stripeMat = new THREE.MeshStandardMaterial({ map: Tex.tex(stripe), roughness: 0.5 });
-    for (const x of [4.3, 6.6]) B.box(0.07, 1.5, 0.07, x, 0.75, -5.2, m.galv);
-    for (const y of [0.55, 0.95, 1.35]) B.box(2.6, 0.2, 0.03, 5.45, y, -5.2, stripeMat);
+    for (const x of [4.3, 6.6]) B.box(0.07, 1.5, 0.07, x, 0.75, -25.2, m.galv);
+    for (const y of [0.55, 0.95, 1.35]) B.box(2.6, 0.2, 0.03, 5.45, y, -25.2, stripeMat);
     // "ROAD WORK" diamond sign
     const rw = Tex.label([['ROAD', 64], ['WORK', 64]], { w: 256, h: 256, bg: '#f08a1c', fg: '#111' });
     const signMat = new THREE.MeshStandardMaterial({ map: rw, roughness: 0.6 });
@@ -919,7 +937,7 @@ class Environment {
     // coals keep glowing (they are hot) but dim once nothing can burn
     // hot coals glow because they are HOT, not because they burn: bright orange → dull red, then they stay red for minutes
     const dim = MathX.smooth(t, tl.at('flames_out'), tl.at('flames_out') + 3.5);
-    this.dynamic.coals.emissiveIntensity = MathX.lerp(2.4, 0.8, dim) * (1 + 0.08 * Math.sin(t * 9.3) * (1 - dim)) - 0.012 * Math.max(0, t - tl.at('flames_out') - 3.5);
+    this.dynamic.coals.emissiveIntensity = MathX.lerp(2.4, 1.35, dim) * (1 + 0.08 * Math.sin(t * 9.3) * (1 - dim)) - 0.01 * Math.max(0, t - tl.at('flames_out') - 3.5);
     this.dynamic.coals.emissive.setRGB(1, MathX.lerp(0.35, 0.16, dim), MathX.lerp(0.08, 0.03, dim));
     // fire light flickers then dies with the flames
     const f = FX_FLAME_LEVEL(t, tl);
@@ -933,6 +951,7 @@ class Environment {
     const gp = this.gridPower(t);
     for (const m of this.shopMats) { m.emissiveIntensity = 0.55 * gp; m.color.setScalar(MathX.lerp(0.78, 1, gp)); }
     if (this.dynamic.ad) this.dynamic.ad.emissiveIntensity = 0.9 * gp;
+    if (this.dynamic.billboard) this.dynamic.billboard.color.setScalar(0.03 + 1.9 * gp * (0.96 + 0.04 * Math.sin(t * 3)));
     this._updateSignals(t, gp);
   }
 

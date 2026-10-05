@@ -99,7 +99,8 @@ const Tex = {
       x.fillStyle = `rgb(${168 + v},${163 + v},${153 + v})`;
       x.fillRect(i * cs + 2, j * cs + 2, cs - 4, cs - 4);
     }
-    Tex.blotches(x, S, S, 40, 8, 60, (r) => `rgba(${r.next() < 0.7 ? '80,75,70' : '220,215,205'},${r.range(0.05, 0.16)})`, rng);
+    Tex.blotches(x, S, S, 70, 8, 70, (r) => `rgba(${r.next() < 0.75 ? '70,64,58' : '225,218,206'},${r.range(0.06, 0.2)})`, rng);
+    Tex.blotches(x, S, S, 12, 30, 110, (r) => `rgba(60,55,50,${r.range(0.05, 0.12)})`, rng);
     // gum spots / stains
     for (let i = 0; i < 26; i++) {
       x.fillStyle = `rgba(60,58,55,${rng.range(0.15, 0.45)})`;
@@ -451,6 +452,26 @@ const Tex = {
     x.fillStyle = '#fff'; x.font = `800 46px ${Tex.fontCond}`; x.textAlign = 'center';
     x.fillText('RUN THE', W / 2, 92); x.fillText('CITY', W / 2, 142);
     x.font = `600 18px ${Tex.fontSans}`; x.fillText('NEW AIRFLOW 2', W / 2, 380);
+    return Tex.tex(c, { repeat: false });
+  },
+
+  // big rooftop LED billboard (mains powered — it dies with the grid)
+  billboard() {
+    const W = 1024, H = 512, c = Tex.canvas(W, H), x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, '#0b1d4a'); g.addColorStop(0.55, '#1c5fd6'); g.addColorStop(1, '#27d4ff');
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    x.fillStyle = 'rgba(255,255,255,0.12)';
+    for (let i = 0; i < 9; i++) { x.beginPath(); x.arc(120 + i * 110, 380 - (i % 3) * 60, 40 + (i % 4) * 22, 0, 7); x.fill(); }
+    x.fillStyle = '#ffffff'; x.textAlign = 'left'; x.textBaseline = 'middle';
+    x.font = `900 120px ${Tex.fontSans}`; x.fillText('BREATHE', 60, 170);
+    x.font = `800 64px ${Tex.fontSans}`; x.fillStyle = '#c8f4ff'; x.fillText('THE CITY AIR', 64, 280);
+    x.font = `700 40px ${Tex.fontSans}`; x.fillStyle = '#ffffff'; x.fillText('SUMMER RUN · SAT 8AM', 66, 360);
+    x.fillStyle = '#ffd23d'; x.fillRect(66, 410, 300, 10);
+    // LED pixel grid
+    x.fillStyle = 'rgba(0,0,0,0.35)';
+    for (let i = 0; i < W; i += 4) x.fillRect(i, 0, 1, H);
+    for (let j = 0; j < H; j += 4) x.fillRect(0, j, W, 1);
     return Tex.tex(c, { repeat: false });
   },
 

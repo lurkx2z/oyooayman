@@ -209,7 +209,8 @@ class BirdFlock {
       const R = 22 + s * 8 + scatter * (6 + s * 10);
       let x = -6 + Math.cos(ang) * R + Math.sin(t * 0.7 + s * 9) * 1.5;
       let z = -62 + Math.sin(ang) * R * 0.6;
-      let y = 30 + Math.sin(t * 0.9 + s * 7) * 1.2 + s * 6 + scatter * 3;
+      const dip = Math.max(0, t - tZ) < 0.9 ? Math.sin(Math.min(1, Math.max(0, t - tZ) / 0.9) * Math.PI) * 1.6 : 0;
+      let y = 30 + Math.sin(t * 0.9 + s * 7) * 1.2 + s * 6 + scatter * 3 - dip;
       // birds burn oxygen fast: they falter first and drop out of the sky
       const fail = MathX.smooth(t, 4.0 + s * 1.5, 5.6 + s * 1.5);
       const fall = Math.max(0, t - (5.2 + s * 2.6));
@@ -228,7 +229,8 @@ class BirdFlock {
 
 /* ===================================================================== */
 class ParticleSystem {
-  constructor(scene, env, traffic, peds) {
+  constructor(scene, env, traffic, peds, hands) {
+    this.hands = hands;
     this.scene = scene;
     this.env = env;
     this.traffic = traffic;
@@ -323,15 +325,23 @@ class ParticleSystem {
       let dx = bx * c - by * s2, dy = bx * s2 + by * c, dz = bz + ph;
       const dl = Math.hypot(dx, dy, dz); dx /= dl; dy /= dl; dz /= dl;
       const vx = dx * sp, vy = dy * sp, vz = dz * sp;
-      const pos = (a) => [o.x + vx * a, o.y + vy * a - 0.5 * g * a * a, o.z + vz * a];
-      const tail = Math.max(0, age - MathX.lerp(0.02, 0.026, f));
-      const [ax, ay, az] = pos(tail), [px, py, pz] = pos(age);
-      if (py < 0.05) continue;
+      // ballistic arc with one bounce off the road surface
+      const tHit = (vy + Math.sqrt(vy * vy + 2 * g * o.y)) / g;
+      const pos = (a) => {
+        if (a < tHit) return [o.x + vx * a, o.y + vy * a - 0.5 * g * a * a, o.z + vz * a];
+        const b = a - tHit, vyh = (vy - g * tHit) * -0.32;
+        return [o.x + vx * tHit + vx * 0.4 * b, Math.max(0.01, vyh * b - 0.5 * g * b * b), o.z + vz * tHit + vz * 0.4 * b];
+      };
+      const trail = MathX.lerp(0.02, 0.03, f);
+      const m = Math.max(0, age - trail * 0.5), tail = Math.max(0, age - trail);
+      const [ax, ay, az] = pos(tail), [mx, my, mz] = pos(m), [px, py, pz] = pos(age);
       const fade = 1 - age / life;
-      // white-yellow when the steel burns, dull orange-red without oxygen
+      // white-yellow when the steel burns, dull orange-red without oxygen; the tail is cooler than the head
       const br = MathX.lerp(4.2, 10, f) * (0.45 + 0.55 * fade);
       const r = br, gg = br * MathX.lerp(0.28, 0.75, f) * (0.6 + 0.4 * fade), b = br * MathX.lerp(0.04, 0.3, f) * fade;
-      S.push(ax, ay, az, px, py, pz, r, gg, b, 1, MathX.lerp(0.013, 0.012, f));
+      const w = MathX.lerp(0.013, 0.012, f);
+      S.push(ax, ay, az, mx, my, mz, r * 0.7, gg * 0.45, b * 0.2, 1, w * 0.8);
+      S.push(mx, my, mz, px, py, pz, r, gg, b, 1, w);
       // carbon "bursts" only happen when there is oxygen to burn the steel
       if (f > 0.6 && h2 > 0.7 && age > life * 0.4) {
         for (let j = 0; j < 4; j++) {
@@ -342,7 +352,26 @@ class ParticleSystem {
     }
     // the vendor's lighter: the flint still sparks, but nothing will catch (pushed into the same streak buffer)
     this._lighterSparks(t, tl);
+    this._piezo(t);
     S.end();
+  }
+
+  // the viewer's piezo lighter: an electric spark still jumps (blue-white), the gas never lights
+  _piezo(t) {
+    if (!this.hands) return;
+    for (const f of SCRIPT.hands.flicks) {
+      const a = t - f;
+      if (a < 0 || a > 0.07) continue;
+      const n = this.hands.nozzleWorld(this._hand);
+      const k = 1 - a / 0.07;
+      let px = n.x, py = n.y, pz = n.z;
+      for (let j = 0; j < 4; j++) {
+        const qx = px + (hash2(j, Math.floor(f * 100)) - 0.5) * 0.014, qy = py + 0.006, qz = pz + (hash2(j + 9, Math.floor(f * 100)) - 0.5) * 0.014;
+        this.sparks.push(px, py, pz, qx, qy, qz, 5 * k, 6.5 * k, 14 * k, 1, 0.0032);
+        px = qx; py = qy; pz = qz;
+      }
+      this.glow.push(n.x, n.y + 0.01, n.z, 0.07, 0, 0.95 * k, 1, 1.6, 2.2, 4.2);
+    }
   }
 
   _lighterSparks(t, tl) {
@@ -381,7 +410,7 @@ class ParticleSystem {
       const after = tb > tOut;
       let strength, keep;
       if (!after) { strength = 0.75; keep = 0.55; }
-      else { const cool = MathX.smooth(tb, tOut + 3, tOut + 12); strength = MathX.lerp(0.85, 0.28, cool); keep = MathX.lerp(0.8, 0.4, cool); }
+      else { const cool = MathX.smooth(tb, tOut + 3, tOut + 12); strength = MathX.lerp(0.6, 0.22, cool); keep = MathX.lerp(0.7, 0.35, cool); }
       if (h1 > keep) continue;
       const rise = (after ? 0.35 : 0.55) + h2 * 0.35;
       const x = g.x + (h1 - 0.5) * 0.4 + 0.55 * age + Math.sin(age * 1.3 + h3 * 6) * 0.12 * age;

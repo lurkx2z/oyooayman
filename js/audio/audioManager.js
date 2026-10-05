@@ -133,6 +133,7 @@ class AudioManager {
     this._body(S, bus, tl);
     this._grid(S, bus, tl);
     this._lighter(S, bus);
+    this._viewerLighter(S, bus);
     this._distant(S, revSend);
   }
 
@@ -343,6 +344,9 @@ class AudioManager {
     // at 0 %: no explosion (nothing moves in the air) — it's INSIDE your head: eardrum thump + pop
     S.thump(tZ, 0.7, bus);
     S.pop(tZ + 0.05, 0.42, bus);
+    // smaller pops while the pressure is already falling, and an involuntary exhale as lung air expands
+    S.pop(1.62, 0.16, bus); S.pop(2.02, 0.2, bus);
+    S.breath(tZ + 0.06, 0.55, 0, 0.13, bus);
     // pressure ringing afterwards
     S.ring(tZ + 0.1, 1.8, 7400, 0.012, bus);
   }
@@ -416,6 +420,14 @@ class AudioManager {
     for (let t = t0 + 0.15; t < t1; t += 0.5) {
       const p = this._spatial(() => pos, t, t + 0.01, 0.01, 3)[0];
       S.click(t, 0.09 * p.gain * 3, p.pan, bus);
+    }
+  }
+
+  _viewerLighter(S, bus) {
+    // the viewer's own piezo lighter: loud click, a short hiss of gas that never lights
+    for (const f of (SCRIPT.hands && SCRIPT.hands.flicks) || []) {
+      S.click(f, 0.32, 0.15, bus);
+      S.hiss(f + 0.02, 0.45, 0.025, 0.15, bus);
     }
   }
 

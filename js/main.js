@@ -26,14 +26,16 @@ class SceneManager {
     Tex.maxAniso = Math.min(8, R.capabilities.getMaxAnisotropy());
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, 9 / 16, 0.08, 3000);
+    this.camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, 9 / 16, 0.05, 3000);
+    this.scene.add(this.camera);           // so the first-person hands (camera children) render
     this.rng = new RNG(CONFIG.seed);
 
     this.env = new Environment(this.scene, R, this.rng);
     this.env.build();
     this.peds = new PedestrianSystem(this.scene);
     this.traffic = new TrafficSystem(this.scene);
-    this.fx = new ParticleSystem(this.scene, this.env, this.traffic, this.peds);
+    this.hands = new ViewerHands(this.camera);
+    this.fx = new ParticleSystem(this.scene, this.env, this.traffic, this.peds, this.hands);
     this.post = new PostProcessing(R);
     this.cam = new CameraController(this.camera, CONFIG.camera);
     this.hud = new HUD(document.getElementById('hud'), this.tl);
@@ -118,6 +120,7 @@ class SceneManager {
     const tl = this.tl;
     tl.t = t;
     this.cam.update(t);
+    this.hands.update(t);
     this.env.update(t, tl);
     this.traffic.update(t, tl);
     this.peds.update(t);
@@ -130,6 +133,7 @@ class SceneManager {
     const [kind, id] = target.split(':');
     if (kind === 'veh') return this.traffic.anchor(id, t);
     if (kind === 'fx') return this.env.anchors[id] || null;
+    if (kind === 'hand') return this.hands.nozzleWorld(new THREE.Vector3());
     if (kind === 'person') { const p = this.peds.byId[id]; return p ? p.root.position.clone().setY(1.9) : null; }
     return null;
   }
