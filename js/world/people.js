@@ -165,7 +165,7 @@ const PersonGeo = {
 function basePose() {
   return {
     hipY: 0.93, pelvisPitch: 0, pelvisYaw: 0, rootRoll: 0, rootX: 0, rootZ: 0,
-    spine: 0.03, spineYaw: 0, spineRoll: 0, neck: 0.04, headYaw: 0, headRoll: 0,
+    spine: 0.03, spineYaw: 0, spineRoll: 0, neck: 0.04, headYaw: 0, headRoll: 0, mouth: 0,
     lSh: [0.05, 0.08], rSh: [0.05, 0.08], lEl: 0.18, rEl: 0.18,
     lHip: [0, 0.03], rHip: [0, 0.03], lKnee: 0.04, rKnee: 0.04, lFoot: 0, rFoot: 0,
   };

@@ -443,6 +443,7 @@ class Child extends Person {
       mesh(KG.brow, browM, head, sx * 0.034, 0.032, 0.094).rotation.z = -sx * 0.08;
     }
     if (L.beard) mesh(facetBall(0.07, 1.1, 0.9, 0.8, 1), M(L.beard, 0.95), head, 0, -0.07, 0.04);
+    if (L.mouth) this.mouth = mesh(new THREE.BoxGeometry(0.034, 0.01, 0.008), M('#3a1e1a', 0.5), head, 0, -0.044, 0.093);   // opt-in: a mouth that opens (pose.mouth)
     const hatT = L.hat && L.hat.type;
     if (!hatT || hatT === 'newsboy' || hatT === 'flat' || hatT === 'boater') mesh(G.hair, hair, head, 0, 0.016, -0.014).rotation.x = -0.85;
     if (L.hairStyle === 'messy') for (const [x, z, r] of [[-0.05, 0.06, 0.4], [0.04, 0.07, -0.3], [0.0, -0.02, 0.1]]) { const tf = mesh(KG.tuft, hair, head, x, 0.105, z); tf.rotation.set(r, 0, -r); }
@@ -567,6 +568,7 @@ class Child extends Person {
 
   apply(P) {
     super.apply(P);
+    if (this.mouth) { const o = MathX.clamp(P.mouth || 0, 0, 1); this.mouth.scale.set(1 + 0.3 * o, 0.5 + 2.8 * o, 1); }
     if (this.skirt) {
       const sw = (P.lHip[0] + P.rHip[0]) * 0.5, spread = Math.abs(P.lHip[0] - P.rHip[0]) + Math.max(P.lHip[0], P.rHip[0], 0) * 0.5;
       this.skirt.rotation.x = -sw * 0.35;

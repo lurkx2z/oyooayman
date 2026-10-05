@@ -109,6 +109,7 @@ class PostProcessing {
       tunnel: 1.2, tunnelSoft: 0.5, tunnelDark: 0.0, edgeBlur: 0.0, chroma: 0.0, grain: 0.022, uneven: 0.04,
       fade: 0.0, flash: 0.0, flashColor: new THREE.Color(0.86, 0.89, 0.88), time: 0,
       ao: 1.0, aoDebug: 0, fogDensity: 0,
+      smear: new THREE.Vector2(0, 0),     // screen-space trail (uv) — the picture lagging behind a head turn
     };
     this.compMat = new THREE.ShaderMaterial({
       uniforms: {
@@ -117,7 +118,7 @@ class PostProcessing {
         uWarmth: { value: 0 }, uVignette: { value: 1 }, uTunnel: { value: 1.2 }, uTunnelSoft: { value: 0.5 }, uTunnelDark: { value: 0 },
         uEdgeBlur: { value: 0 }, uChroma: { value: 0 }, uGrain: { value: 0 }, uFade: { value: 0 }, uFlash: { value: 0 }, uFlashColor: { value: new THREE.Color() }, uTime: { value: 0 },
         uSoft: { value: 0 }, uBlackLift: { value: 0 }, uKeepWarm: { value: 1 },
-        tAO: { value: null }, uAO: { value: 0 }, uAODebug: { value: 0 }, uFogDensity: { value: 0 }, uUneven: { value: 0 },
+        tAO: { value: null }, uSmear: { value: new THREE.Vector2() }, uAO: { value: 0 }, uAODebug: { value: 0 }, uFogDensity: { value: 0 }, uUneven: { value: 0 },
       },
       vertexShader: vs, depthTest: false, depthWrite: false,
       fragmentShader: /* glsl */`
@@ -126,7 +127,7 @@ class PostProcessing {
         uniform float uExposure, uBloom, uBloomThreshold, uSaturation, uContrast, uWarmth, uVignette;
         uniform float uTunnel, uTunnelSoft, uTunnelDark, uEdgeBlur, uChroma, uGrain, uFade, uFlash, uTime;
         uniform vec3 uFlashColor;
-        uniform float uSoft, uBlackLift, uKeepWarm;
+        uniform float uSoft, uBlackLift, uKeepWarm; uniform vec2 uSmear;
         varying vec2 vUv;
         vec3 aces(vec3 x){ const float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14; return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0); }
         vec3 toSRGB(vec3 c){ return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }
@@ -144,6 +145,11 @@ class PostProcessing {
             float ca = uChroma * rt;
             col.r = texture2D(tScene, uv - cc * ca).r;
             col.b = texture2D(tScene, uv + cc * ca).b;
+          }
+          if (dot(uSmear, uSmear) > 1e-8) {   // the image trails where it just was
+            vec3 acc = col; float wsum = 1.0;
+            for (int i = 1; i <= 7; i++) { float k = float(i) / 7.0, w = 1.0 - k * 0.75; acc += min(texture2D(tScene, uv - uSmear * k).rgb, vec3(16.0)) * w; wsum += w; }
+            col = acc / wsum;
           }
           vec3 bq = texture2D(tBlurQ, uv).rgb, be = texture2D(tBlurE, uv).rgb;
           // slight filmic softness everywhere, heavier at the edges when hypoxic
@@ -259,7 +265,7 @@ class PostProcessing {
     u.uTunnel.value = p.tunnel; u.uTunnelSoft.value = p.tunnelSoft; u.uTunnelDark.value = p.tunnelDark;
     u.uEdgeBlur.value = p.edgeBlur; u.uChroma.value = p.chroma; u.uGrain.value = p.grain;
     u.uFade.value = p.fade; u.uFlash.value = p.flash; u.uFlashColor.value.copy(p.flashColor); u.uTime.value = p.time;
-    u.uSoft.value = p.soft; u.uBlackLift.value = p.blackLift; u.uKeepWarm.value = p.keepWarm;
+    u.uSoft.value = p.soft; u.uBlackLift.value = p.blackLift; u.uKeepWarm.value = p.keepWarm; u.uSmear.value.copy(p.smear);
     u.tAO.value = this.ao1.texture; u.uAO.value = p.ao; u.uAODebug.value = p.aoDebug; u.uUneven.value = p.uneven;
     u.uFogDensity.value = scene.fog ? scene.fog.density : 0;
     this._pass(this.compMat, null);

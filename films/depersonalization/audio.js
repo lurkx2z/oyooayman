@@ -56,8 +56,8 @@ class DPAudio extends AudioEngine {
 
   // how far away the world sounds over time: [t, low-pass Hz, level, room send]
   _distance() {
-    return [[0, 16000, 1, 0.08], [2.15, 16000, 1, 0.08], [2.3, 7000, 0.85, 0.2], [2.75, 16000, 1, 0.08],
-      [4.55, 16000, 1, 0.08], [5.1, 1500, 0.55, 0.42], [6.5, 1900, 0.6, 0.38], [9.5, 1300, 0.5, 0.45], [11.0, 1100, 0.48, 0.48], [13, 1200, 0.5, 0.45]];
+    return [[0, 16000, 1, 0.08], [1.1, 16000, 1, 0.08], [1.25, 6000, 0.82, 0.22], [2.25, 6500, 0.85, 0.2], [2.45, 16000, 1, 0.08],
+      [3.0, 16000, 1, 0.08], [3.45, 1500, 0.55, 0.42], [5.0, 1900, 0.6, 0.38], [8.1, 1300, 0.5, 0.45], [9.7, 1100, 0.48, 0.48], [11.6, 1200, 0.5, 0.45]];
   }
 
   /* the flat at night: low room tone, a fridge somewhere, the city through the window */
@@ -106,44 +106,49 @@ class DPAudio extends AudioEngine {
         t += S.rng.range(0.18, 0.45);
       }
     };
-    talk(0.15, 1.4, 128, 0.03, jayPan);
-    S.laugh(1.5, 0.035, jayPan, bus, 210, 6); S.laugh(1.6, 0.02, jayPan, room, 210, 5);
-    S.laugh(2.42, 0.03, miaPan, bus, 400, 5);           // (her laugh lands a beat late: the first thing that's off)
-    talk(2.7, 3.55, 125, 0.03, jayPan);
+    talk(0.1, 0.72, 128, 0.032, jayPan);
+    S.laugh(0.78, 0.036, jayPan, bus, 210, 6); S.laugh(0.85, 0.02, jayPan, room, 210, 5);
+    // Mia's laugh: it starts a beat late, hangs on one note while she freezes, then rushes to catch up
+    S.laugh(1.25, 0.03, miaPan, bus, 400, 3);
+    S.voice(1.62, 400, 0.5, 'a', 0.022, miaPan, bus, 0.98);
+    S.laugh(2.12, 0.026, miaPan, bus, 420, 3);
+    talk(2.35, 2.9, 126, 0.03, jayPan);
     // Jay turns to you: the line starts clear, then the world drops away under it (the world bus does the rest)
-    talk(3.75, 6.2, 135, 0.036, jayPan * 0.6);
-    talk(6.9, 8.4, 122, 0.028, jayPan * 0.6);
-    S.laugh(8.6, 0.025, miaPan, bus, 380, 4);
-    talk(9.3, 11.0, 126, 0.028, jayPan * 0.7);
+    talk(2.95, 4.8, 135, 0.036, jayPan * 0.6);
+    talk(5.5, 7.0, 122, 0.028, jayPan * 0.6);
+    S.laugh(7.3, 0.022, miaPan, bus, 380, 4);
+    talk(8.0, 9.6, 126, 0.028, jayPan * 0.7);
   }
 
   /* you: a short laugh, your breathing coming forward, a faint ringing, the hands, standing up */
   _body(S, you, world) {
-    const ctx = S.ctx, end = CONFIG.duration + 0.5;
-    S.voice(1.62, 170, 0.12, 'e', 0.012, 0, you, 0.9); S.voice(1.78, 165, 0.1, 'e', 0.009, 0, you, 0.9);    // your own laugh, breathy
-    // ringing: two close high tones, slowly in from 4.6 s
+    const ctx = S.ctx, end = CONFIG.duration + 0.5, on = 3.05;
+    S.voice(0.88, 170, 0.12, 'e', 0.012, 0, you, 0.9); S.voice(1.04, 165, 0.1, 'e', 0.009, 0, you, 0.9);    // your own laugh, breathy
+    // the drop: ears seem to close — a soft pressure swell as the room goes away
+    { const n = S.noise('brown', on - 0.1, on + 0.7), lp = S.filter('lowpass', 220, 0.7), g = ctx.createGain(); S.env(g, on - 0.1, 0.25, 0.05, 0.5); n.connect(lp); lp.connect(g); g.connect(you); }
+    // ringing: two close high tones, slowly in once it starts
     for (const [f, v] of [[6850, 0.0024], [7230, 0.0016]]) {
       const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = f;
-      g.gain.setValueAtTime(0, 0); g.gain.setValueAtTime(0, 4.6); g.gain.linearRampToValueAtTime(v * 0.6, 5.4); g.gain.linearRampToValueAtTime(v, 10.5); g.gain.linearRampToValueAtTime(v * 1.15, end);
+      g.gain.setValueAtTime(0, 0); g.gain.setValueAtTime(0, on); g.gain.linearRampToValueAtTime(v * 0.6, on + 0.8); g.gain.linearRampToValueAtTime(v, 9.0); g.gain.linearRampToValueAtTime(v * 1.15, end);
       o.connect(g); g.connect(you); o.start(0); o.stop(end);
     }
     // a soft low pressure under everything once it starts (not music, just weight)
     { const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = 55; o2.frequency.value = 82.6;
-      g.gain.setValueAtTime(0, 0); g.gain.setValueAtTime(0, 4.6); g.gain.linearRampToValueAtTime(0.008, 6.0); g.gain.linearRampToValueAtTime(0.011, end);
+      g.gain.setValueAtTime(0, 0); g.gain.setValueAtTime(0, on); g.gain.linearRampToValueAtTime(0.008, on + 1.4); g.gain.linearRampToValueAtTime(0.011, end);
       o.connect(g); o2.connect(g); g.connect(you); o.start(0); o2.start(0); o.stop(end); o2.stop(end); }
     // breathing: unnoticed at first, then right there in your head
-    for (let t = 0.8, k = 0; t < end - 1; k++) {
-      const v = t < 4.6 ? 0.004 : t < 6 ? 0.01 : 0.014, din = 1.25, dout = 1.5;
+    for (let t = 0.5; t < end - 1;) {
+      const v = t < on ? 0.004 : t < 4.5 ? 0.01 : 0.014, din = 1.2, dout = 1.45;
       S.breath(t, din, true, v, you); S.breath(t + din + 0.1, dout, false, v * 0.9, you);
-      t += din + dout + (t < 4.6 ? 0.9 : 0.55);
+      t += din + dout + (t < on ? 0.8 : 0.5);
     }
-    // the look down: a small sharp inhale; fabric as the hands lift and turn
-    S.breath(5.2, 0.35, true, 0.02, you);
+    // the look down: a small sharp inhale; fabric as the hands lift, turn, flex
+    S.breath(4.15, 0.35, true, 0.02, you);
     const rustle = (t, d, v) => { const n = S.noise('white', t, t + d), bp = S.filter('bandpass', 2600, 0.8), g = ctx.createGain(); S.env(g, t, d * 0.4, v, d * 0.6); n.connect(bp); bp.connect(g); g.connect(you); };
-    rustle(6.15, 0.5, 0.01); rustle(7.85, 0.6, 0.008); rustle(9.0, 0.3, 0.004); rustle(10.2, 0.3, 0.004);
+    rustle(5.0, 0.5, 0.01); rustle(6.45, 0.6, 0.008); rustle(7.5, 0.3, 0.004); rustle(8.1, 0.4, 0.005); rustle(8.85, 0.3, 0.004);
     // standing up: the couch, a creak, then steps on the floorboards
-    { const n = S.noise('pink', 11.55, 12.2), bp = S.filter('bandpass', 380, 2.5), g = ctx.createGain(); bp.frequency.setValueAtTime(300, 11.55); bp.frequency.linearRampToValueAtTime(520, 12.1); S.env(g, 11.55, 0.15, 0.03, 0.5); n.connect(bp); bp.connect(g); g.connect(world); }
-    rustle(11.6, 0.5, 0.012);
-    for (const t of [12.45, 12.95]) S.step(t, 0.05, 0, world);
+    { const n = S.noise('pink', 9.95, 10.6), bp = S.filter('bandpass', 380, 2.5), g = ctx.createGain(); bp.frequency.setValueAtTime(300, 9.95); bp.frequency.linearRampToValueAtTime(520, 10.5); S.env(g, 9.95, 0.15, 0.03, 0.5); n.connect(bp); bp.connect(g); g.connect(world); }
+    rustle(10.0, 0.5, 0.012);
+    for (const t of [10.85, 11.35]) S.step(t, 0.05, 0, world);
   }
 }

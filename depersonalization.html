@@ -7,6 +7,12 @@
   <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
   <link rel="stylesheet" href="fonts/fonts.css">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* this film: captions sit above the hands, a little larger, with a soft shadow; the title rides in the empty top of the frame */
+    #hud .story-caption { top: calc(var(--u) * 1050); font-size: calc(var(--u) * 56);
+      text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.85), 0 calc(var(--u) * 3) calc(var(--u) * 10) rgba(0, 0, 0, 0.75); }
+    #hud .story-title.big { top: calc(var(--u) * 170); }
+  </style>
 </head>
 <body>
   <div id="app">

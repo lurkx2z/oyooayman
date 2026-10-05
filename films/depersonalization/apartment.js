@@ -69,6 +69,12 @@ class Apartment {
     // door casings
     for (const x of [L.x0, H.x0]) for (const z of [APT.door.z0 - 0.03, APT.door.z1 + 0.03]) box(0.14, 2.08, 0.05, x, 1.04, z, trim, 0, false);
     for (const x of [L.x0, H.x0]) box(0.14, 0.06, APT.door.z1 - APT.door.z0 + 0.12, x, 2.08, (APT.door.z0 + APT.door.z1) / 2, trim, 0, false);
+    // the doors, standing open: living room → hall (swung back against the living-room wall), hall → bathroom
+    const doorM = std('#f0ece4', { roughness: 0.55, name: 'door' });
+    const door = (hx, hz, ang) => { const gd = new THREE.Group(); gd.position.set(hx, 0, hz); gd.rotation.y = ang; g.add(gd); const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.04, 2.03, 0.86), doorM); leaf.position.set(0, 1.015, 0.43); leaf.castShadow = true; leaf.receiveShadow = true; gd.add(leaf);
+      const hd = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.12, 8), std('#b8bcc0', { roughness: 0.3, metalness: 0.9 })); hd.rotation.x = Math.PI / 2; hd.position.set(0.04, 1.0, 0.78); gd.add(hd); };
+    door(L.x0 + 0.03, APT.door.z1, -1.35);
+    door(H.x0 - 0.03, APT.door.z0, Math.PI - 1.2);
     // the window (east wall of the living room): the city at night, curtains half drawn
     const city = Tex.canvas(512, 384), cc = city.getContext('2d');
     const sky = cc.createLinearGradient(0, 0, 0, 384); sky.addColorStop(0, '#0b1020'); sky.addColorStop(0.7, '#1c2238'); sky.addColorStop(1, '#2c2a3a'); cc.fillStyle = sky; cc.fillRect(0, 0, 512, 384);
@@ -109,7 +115,7 @@ class Apartment {
     const bb = new THREE.SphereGeometry(0.42, 20, 14), bp = bb.attributes.position;
     for (let i = 0; i < bp.count; i++) { const y = bp.getY(i); bp.setY(i, y < 0 ? y * 0.55 : y * 0.75 - 0.08 * Math.max(0, 1 - Math.hypot(bp.getX(i), bp.getZ(i) + 0.12) / 0.3)); bp.setX(i, bp.getX(i) * (1 + 0.1 * (y < 0 ? 1 : 0))); }
     bb.computeVertexNormals();
-    add(bb, std('#3f5a4c', { roughness: 0.9, name: 'beanbag' }), APT.mia.x + 0.12, 0.24, APT.mia.z + 0.16, 0, MathX.deg(37), 0);
+    add(bb, std('#3f5a4c', { roughness: 0.9, name: 'beanbag' }), APT.mia.x + 0.14, 0.24, APT.mia.z - 0.08, 0, MathX.deg(118), 0);
     // ---- coffee table with the evening on it (cans, snacks, a remote; a grinder and lighter — implied, never featured)
     const T = { x: 0.3, z: 0.85 };
     box(1.15, 0.04, 0.6, T.x, 0.42, T.z, wood);
@@ -135,23 +141,29 @@ class Apartment {
     this._plant(L.x1 - 0.35, 0, L.z1 - 0.4, 0.9);
     this._plant(L.x0 + 0.35, 0, L.z0 + 0.4, 0.75);
     // ---- bookshelf (west wall, north end), posters, fairy lights along the north wall
-    box(0.32, 1.8, 1.0, L.x0 + 0.17, 0.9, -1.6, darkWood);
-    for (let s = 0; s < 4; s++) for (let i = 0; i < 9; i++) if (r.chance(0.8)) box(0.2, r.range(0.18, 0.28), 0.06, L.x0 + 0.2, 0.25 + s * 0.42, -2.0 + i * 0.09, std(r.pick(['#6a3a2a', '#2a4a6a', '#c9a04a', '#3a5a3a', '#7a6a5a', '#a84a3a', '#d8d0c0']), { roughness: 0.8 }));
+    box(0.02, 1.8, 1.0, L.x0 + 0.02, 0.9, -1.6, darkWood);                                       // back
+    for (const dz of [-0.5, 0.5]) box(0.32, 1.8, 0.03, L.x0 + 0.17, 0.9, -1.6 + dz, darkWood);   // sides
+    for (let s = 0; s < 5; s++) box(0.32, 0.025, 1.0, L.x0 + 0.17, 0.02 + s * 0.42, -1.6, darkWood);
+    for (let s = 0; s < 4; s++) { let z = -2.06; while (z < -1.16) { const w = r.range(0.03, 0.055); if (r.chance(0.85)) { const m = box(0.2, r.range(0.2, 0.32), w, L.x0 + 0.15, 0.035 + s * 0.42 + 0.13, z + w / 2, std(r.pick(['#6a3a2a', '#2a4a6a', '#c9a04a', '#3a5a3a', '#7a6a5a', '#a84a3a', '#d8d0c0', '#3a3a44']), { roughness: 0.8 })); m.rotation.x = r.chance(0.15) ? 0.15 : 0; } z += w + 0.004; if (r.chance(0.12)) z += 0.12; } }
     const poster = (w, h, x, y, z, ry, seed) => {
       const cv = Tex.canvas(256, 340), c = cv.getContext('2d'), q = new RNG(seed);
       const bg = c.createLinearGradient(0, 0, 0, 340); bg.addColorStop(0, q.pick(['#e8b468', '#2a4a5a', '#d86a4a'])); bg.addColorStop(1, q.pick(['#3a2a4a', '#e8d8b8', '#1a3a3a'])); c.fillStyle = bg; c.fillRect(0, 0, 256, 340);
-      c.fillStyle = 'rgba(255,255,255,0.75)'; c.beginPath(); c.arc(128, 150, 64, 0, Math.PI * 2); c.fill();
-      c.fillStyle = 'rgba(20,20,30,0.6)'; c.fillRect(0, 230, 256, 6);
+      const motif = seed % 4;
+      if (motif === 0) { c.fillStyle = 'rgba(255,255,255,0.75)'; c.beginPath(); c.arc(128, 150, 64, 0, Math.PI * 2); c.fill(); }
+      if (motif === 1) for (let i = 0; i < 7; i++) { c.fillStyle = `rgba(${q.range(120, 255)},${q.range(80, 200)},${q.range(60, 160)},0.8)`; c.fillRect(20 + i * 32, 60 + q.range(0, 80), 24, 200); }
+      if (motif === 2) { c.fillStyle = 'rgba(30,40,50,0.7)'; c.beginPath(); c.moveTo(0, 260); c.lineTo(80, 140); c.lineTo(140, 210); c.lineTo(200, 110); c.lineTo(256, 200); c.lineTo(256, 340); c.lineTo(0, 340); c.fill(); }
+      if (motif === 3) { c.strokeStyle = 'rgba(255,255,255,0.7)'; c.lineWidth = 6; for (let i = 0; i < 6; i++) { c.beginPath(); for (let x = 0; x <= 256; x += 8) c.lineTo(x, 80 + i * 34 + 12 * Math.sin(x * 0.05 + i)); c.stroke(); } }
+      c.fillStyle = 'rgba(20,20,30,0.6)'; c.fillRect(30, 296, 196, 8);
       box(w + 0.04, h + 0.04, 0.025, x, y, z, std('#1a1a1c'), ry, false);
       add(new THREE.PlaneGeometry(w, h), std('#ffffff', { map: Tex.tex(cv, { repeat: false }), roughness: 0.6 }), x + Math.sin(ry) * 0.014, y, z + Math.cos(ry) * 0.014, 0, ry, 0, false);
     };
     poster(0.5, 0.68, -1.6, 1.6, L.z0 + 0.02, 0, 4);
     poster(0.6, 0.8, L.x0 + 0.02, 1.55, -0.1, Math.PI / 2, 9);
-    poster(0.42, 0.56, 1.95, 1.62, L.z0 + 0.02, 0, 13);
+    poster(0.42, 0.56, 1.95, 1.62, L.z0 + 0.02, 0, 14);
     const wire = []; this.fairy = [];
     const fairyM = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.0, 0.72, 0.4).multiplyScalar(2.4), toneMapped: false, name: 'fairy' });
     for (let i = 0; i <= 28; i++) {
-      const u = i / 28, x = L.x0 + 0.4 + u * 5.2, y = 2.38 - 0.1 * Math.abs(Math.sin(u * Math.PI * 4));
+      const u = i / 28, x = L.x0 + 0.4 + u * 5.2, y = 2.2 - 0.1 * Math.abs(Math.sin(u * Math.PI * 4));
       wire.push(new THREE.Vector3(x, y, L.z0 + 0.03));
       if (i % 1 === 0) { const b = add(new THREE.SphereGeometry(0.012, 6, 4), fairyM, x, y - 0.02, L.z0 + 0.04, 0, 0, 0, false); this.fairy.push(b); }
     }
@@ -184,7 +196,7 @@ class Apartment {
     // ---- hallway: coats on hooks, a framed print, a small ceiling light
     box(0.03, 0.04, 0.8, H.x1 - 1.4, 1.65, H.z1 - 0.03, trim, Math.PI / 2, false);
     for (const [dx, c] of [[-0.25, '#3a4a3a'], [0.05, '#8a7a5a'], [0.3, '#2a2a30']]) { const cg = new THREE.CylinderGeometry(0.11, 0.16, 0.85, 8); add(cg, std(c, { roughness: 0.95 }), H.x1 - 1.4 + dx, 1.22, H.z1 - 0.12); }
-    poster(0.45, 0.6, H.x0 + 1.2, 1.55, H.z0 + 0.02, 0, 21);
+    poster(0.45, 0.6, H.x0 + 1.2, 1.55, H.z0 + 0.02, 0, 23);
     this.hallLight = new THREE.PointLight('#fff0dc', 0, 4, 1.5); this.hallLight.position.set(-4.5, 2.35, 1.1); g.add(this.hallLight);
     add(new THREE.CylinderGeometry(0.14, 0.14, 0.05, 18), std('#f4f0e8', { emissive: '#fff2dc', emissiveIntensity: 0.8 }), -4.5, 2.47, 1.1, 0, 0, 0, false);
     // ---- bathroom: tiles, counter, sink, tap, the mirror frame (the mirror itself: Mirror), towel, cup
@@ -225,7 +237,7 @@ class Apartment {
     this.thighSpot = (side, out) => out.set(S.x + side * 0.11, 0.62, S.z - 0.24);
 
     // a faint haze in the warm air (implied, never shown)
-    this.scene.fog = new THREE.FogExp2(new THREE.Color('#3a342e'), 0.03);
+    this.scene.fog = new THREE.FogExp2(new THREE.Color('#34343a'), 0.016);
   }
 
   _plant(x, y, z, h) {
