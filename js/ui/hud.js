@@ -65,20 +65,25 @@ class HUD {
     // flicker the zero a few times
     const z = t - tl.at('o2_zero');
     const flick = z > 0 && z < 1.2 ? (Math.floor(z * 10) % 3 === 1 ? 0.35 : 1) : 1;
-    this._set('o2op', this.el.o2, 'opacity', String(flick));
 
     // ---- title (hook)
     const ti = MathX.window(t, H.title.in - 0.01, H.title.out, 0.01, 0.35);
     this._set('titleop', this.el.title, 'opacity', ti.toFixed(3));
-    const ts = 1 + (1 - MathX.smooth(t, H.title.out - 0.35, H.title.out)) * 0 + MathX.smooth(t, H.title.out - 0.35, H.title.out) * 0.06;
+    const ts = 1 + MathX.smooth(t, H.title.out - 0.35, H.title.out) * 0.06;   // slight push-in as it fades
     this._set('titletr', this.el.title, 'transform', `translateX(-50%) scale(${ts.toFixed(3)})`);
 
-    // ---- time without oxygen
-    const tv = MathX.smooth(t, H.timerFrom, H.timerFrom + 0.35);
+    // ---- one big number at a time: O₂ shrinks into a small chip, TIME WITHOUT OXYGEN takes over
+    const sOut = MathX.smooth(t, H.timerSwap, H.timerSwap + 0.16), sIn = MathX.smooth(t, H.timerSwap + 0.16, H.timerSwap + 0.42);
+    const compact = sOut >= 1;
+    this.el.o2.classList.toggle('compact', compact);
+    this._set('o2tr', this.el.o2, 'transform', compact ? 'translateX(-50%) translateY(-62%) scale(0.38)' : `translateX(-50%) scale(${(1 - sOut * 0.1).toFixed(3)})`);
+    const o2Vis = compact ? sIn : 1 - sOut;
+    this._set('o2op', this.el.o2, 'opacity', String((flick * o2Vis).toFixed(3)));
+    const tv = sIn;
     this._set('timerop', this.el.timer, 'opacity', tv.toFixed(3));
-    this._set('timertr', this.el.timer, 'transform', `translateY(${((1 - tv) * 12).toFixed(1)}px)`);
+    this._set('timertr', this.el.timer, 'transform', `translateX(-50%) scale(${(0.85 + 0.15 * tv).toFixed(3)})`);
     const secs = Math.max(0, t - tl.at('o2_zero'));
-    const tt = `00:${String(Math.floor(secs)).padStart(2, '0')}`;
+    const tt = `00:${String(Math.floor(secs)).padStart(2, '0')}.${String(Math.floor((secs % 1) * 10))}`;
     if (this._last.tt !== tt) { this.el.timerValue.textContent = tt; this._last.tt = tt; }
     this.el.timer.classList.toggle('alert', SCRIPT_TRACKS.hypoxia.value(t) > 0.2);
 
@@ -88,7 +93,7 @@ class HUD {
       const on = t >= l.t && t < l.until;
       if (!on) { this._set('lg' + l.t, l.el, 'opacity', '0'); continue; }
       const a = MathX.smooth(t, l.t, l.t + 0.15) * (1 - MathX.smooth(t, l.until - 0.4, l.until));
-      const chars = Math.floor((t - l.t) / 0.018);
+      const chars = Math.floor((t - l.t) / 0.011);
       const shownTxt = l.text.slice(0, chars);
       if (l._shown !== shownTxt) { l.el.querySelector('.txt').textContent = shownTxt; l._shown = shownTxt; }
       this._set('lg' + l.t, l.el, 'opacity', a.toFixed(3));
@@ -103,7 +108,8 @@ class HUD {
       const p = resolveAnchor(a.target, t);
       if (!p) continue;
       this._v.copy(p).project(camera);
-      const onScreen = this._v.z < 1 && Math.abs(this._v.x) < 1.15 && Math.abs(this._v.y) < 1.15;
+      // keep tags out of the top HUD band and the bottom caption zone
+      const onScreen = this._v.z < 1 && Math.abs(this._v.x) < 1.05 && this._v.y < 0.42 && this._v.y > -0.6;
       if (!onScreen) { this._set('an' + a.target, a.el, 'opacity', '0'); continue; }
       const x = (this._v.x * 0.5 + 0.5) * 100, y = (-this._v.y * 0.5 + 0.5) * 100;
       const dist = camera.position.distanceTo(p);
@@ -111,7 +117,11 @@ class HUD {
       a.el.style.left = x.toFixed(2) + '%';
       a.el.style.top = y.toFixed(2) + '%';
       a.el.style.setProperty('--s', size.toFixed(2));
-      const flip = x > 58;
+      // flip the tag to the left side if it would run off the right edge
+      const tag = a.el.querySelector('.tag');
+      const stageW = this.root.clientWidth || 1;
+      const tagW = (tag.offsetWidth || 200) / stageW * 100;
+      const flip = x + tagW > 92;
       a.el.classList.toggle('flip', flip);
       const pop = MathX.smooth(t, a.from, a.from + 0.25);
       this._set('an' + a.target, a.el, 'opacity', vis.toFixed(3));

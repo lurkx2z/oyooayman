@@ -17,6 +17,8 @@ class CameraController {
     this.tfov = new Track(C.fov);
     this.startles = C.startles;
     this.shakes = C.shakes;
+    this.tsag = new Track(C.sag || [[0, 0]]);
+    this.troll = new Track(C.roll || [[0, 0]]);
     // distance walked as a function of time (drives step bob)
     this.dt = 1 / 120;
     const n = Math.ceil((CONFIG.duration + 2) / this.dt);
@@ -93,6 +95,10 @@ class CameraController {
       z += noise1(t * 0.42, 35) * 0.05 * hyp;
       y -= 0.05 * h2;
     }
+
+    // late hypoxia: knees start to go, head rolls
+    y -= this.tsag.value(t);
+    roll += D(this.troll.value(t)) * (0.6 + 0.4 * Math.sin(t * 0.8));
 
     cam.position.set(x, y, z);
     cam.rotation.set(pitch, yaw, roll, 'YXZ');

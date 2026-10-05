@@ -63,7 +63,12 @@ class SplinePath {
     return L(B1, B2, t1, t2);
   }
   at(s) {
-    s = Math.max(0, Math.min(this.length, s));
+    if (s < 0) {
+      const a = this.pts[0], b = this.pts[1], l = Math.hypot(b.x - a.x, b.z - a.z) || 1;
+      const hx = (b.x - a.x) / l, hz = (b.z - a.z) / l;
+      return { x: a.x + hx * s, z: a.z + hz * s, hx, hz };
+    }
+    s = Math.min(this.length, s);
     let lo = 0, hi = this.cum.length - 1;
     while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (this.cum[mid] < s) lo = mid; else hi = mid; }
     const f = (s - this.cum[lo]) / (this.cum[hi] - this.cum[lo] || 1);
@@ -84,7 +89,7 @@ class Kinematics {
     this.dt = 1 / 120;
     this.T = CONFIG.duration + 3;
     this.L = VEHICLE_DIMS[spec.type].L;
-    this.sputter = spec.sputter || 1.1;
+    this.sputter = spec.sputter || 0.65;   // engines die while O₂ is still falling (~14 % → ~5 %)
     this.seed = hash1(spec.id.length * 131 + spec.id.charCodeAt(0) * 7 + spec.id.charCodeAt(spec.id.length - 1));
     this.contactT = null;
     this.tStop = Infinity;
@@ -94,6 +99,14 @@ class Kinematics {
       const tr = new Track(spec.speed, 'linear');
       this.vFn = (t) => tr.value(t);
       this.s0 = spec.s0 || 0;
+      if (spec.passAt) {
+        // find the path distance where z = passAt.z, then start so we get there at passAt.t
+        let sTarget = 0;
+        for (let s = 0; s < path.length; s += 0.05) { if (Math.abs(path.at(s).z - spec.passAt.z) < 0.06) { sTarget = s; break; } }
+        let d = 0;
+        for (let t = 0; t < spec.passAt.t; t += 1 / 240) d += tr.value(t) / 240;
+        this.s0 = sTarget - d;
+      }
     } else if (!spec.v0) {
       this.vFn = () => 0;
       this.s0 = spec.s0 || 0;

@@ -201,24 +201,25 @@ class BirdFlock {
     }
   }
   update(t) {
+    const tZ = SCRIPT.events.find((e) => e.id === 'o2_zero').time;
     for (const b of this.birds) {
       const s = b.seed;
-      const ang = t * 0.32 + b.i * 0.28 + s * 0.5;
-      const R = 22 + s * 8;
+      const scatter = MathX.smooth(t, tZ, tZ + 1.2);
+      const ang = t * 0.32 + b.i * 0.28 + s * 0.5 + scatter * (s - 0.5) * 1.5;
+      const R = 22 + s * 8 + scatter * (6 + s * 10);
       let x = -6 + Math.cos(ang) * R + Math.sin(t * 0.7 + s * 9) * 1.5;
       let z = -62 + Math.sin(ang) * R * 0.6;
-      let y = 30 + Math.sin(t * 0.9 + s * 7) * 1.2 + s * 6;
-      // hypoxic birds: erratic flapping, then they drop out of the sky
-      const fail = MathX.smooth(t, 7.8 + s * 1.5, 10.5 + s * 1.5);
-      const fall = Math.max(0, t - (9.0 + s * 1.6));
-      y -= fall * fall * 2.6;
+      let y = 30 + Math.sin(t * 0.9 + s * 7) * 1.2 + s * 6 + scatter * 3;
+      // birds burn oxygen fast: they falter first and drop out of the sky
+      const fail = MathX.smooth(t, 4.0 + s * 1.5, 5.6 + s * 1.5);
+      const fall = Math.max(0, t - (5.2 + s * 2.6));
+      y -= fall * fall * 3.2;
       x += fail * Math.sin(t * 5 + s * 20) * 0.8;
       b.g.position.set(x, y, z);
-      // heading along the circle
       const dx = -Math.sin(ang), dz = Math.cos(ang) * 0.6;
-      b.g.rotation.set(fail * Math.sin(t * 7 + s * 9) * 0.9, Math.atan2(dx, dz), fail * 0.6 * Math.sin(t * 3 + s * 4));
-      const fr = MathX.lerp(9.5, 3 + 6 * Math.abs(noise1(t * 2 + s * 10, 5)), fail);
-      const flap = Math.sin(t * fr + s * 30) * MathX.lerp(0.7, 0.25, fail);
+      b.g.rotation.set(fail * Math.sin(t * 7 + s * 9) * 0.9 + fall * 0.8, Math.atan2(dx, dz), fail * 0.6 * Math.sin(t * 3 + s * 4));
+      const fr = MathX.lerp(9.5 + scatter * 6 * (1 - fail), 3 + 6 * Math.abs(noise1(t * 2 + s * 10, 5)), fail);
+      const flap = Math.sin(t * fr + s * 30) * MathX.lerp(0.75, 0.2, fail) * (fall > 0.6 ? 0.2 : 1);
       b.wl.rotation.z = flap; b.wr.rotation.z = -flap;
       b.g.visible = y > -1;
     }
@@ -227,10 +228,12 @@ class BirdFlock {
 
 /* ===================================================================== */
 class ParticleSystem {
-  constructor(scene, env, traffic) {
+  constructor(scene, env, traffic, peds) {
     this.scene = scene;
     this.env = env;
     this.traffic = traffic;
+    this.peds = peds;
+    this._hand = new THREE.Vector3();
     this.flames = new FlameSystem(scene);
     this.sparks = new StreakSystem(scene, 900);
     this.smoke = new BillboardSystem(scene, 700, false);
@@ -255,13 +258,14 @@ class ParticleSystem {
       const big = v.spec.type === 'bus' || v.spec.type === 'pickup';
       const n = big ? 6 : 4;
       for (let k = 0; k < n; k++) {
-        this.puffs.push({ v, t0: v.spec.fail + 0.12 + k * (0.22 + hash1(k + v.seed * 99) * 0.12), big, k });
+        const t0 = v.spec.fail + 0.06 + k * (0.11 + hash1(k + v.seed * 99) * 0.06);
+        if (t0 < SCRIPT.events.find((e) => e.id === 'o2_zero').time) this.puffs.push({ v, t0, big, k });
       }
     }
     // idling cars at the red light puff a little before they die
     for (const id of ['xw1', 'xw2', 'xe1']) {
       const v = traffic.byId[id];
-      for (let k = 0; k < 8; k++) this.puffs.push({ v, t0: k * 0.38 + hash1(k * 3 + id.length) * 0.2, big: false, idle: true, k });
+      for (let k = 0; k < 6; k++) this.puffs.push({ v, t0: k * 0.3 + hash1(k * 3 + id.length) * 0.15, big: false, idle: true, k });
     }
   }
 
@@ -284,7 +288,7 @@ class ParticleSystem {
     // soft glow sprites around the fire and the grinder contact point
     const g = this.env.anchors.grill;
     const gr = this.env.anchors.grinder;
-    if (t < tl.at('grinder_stop')) {
+    if (t < tl.at('grinder_stop') && !(t > tl.at('o2_zero') && t < tl.at('o2_zero') + 0.45)) {
       const o2 = SCRIPT_TRACKS.oxygen.value(t);
       const f = MathX.smooth(o2, 3, 16);
       const flick = 0.75 + 0.25 * noise1(t * 30, 8);
@@ -295,50 +299,78 @@ class ParticleSystem {
   _sparks(t, tl) {
     const S = this.sparks, o = this.env.anchors.grinder;
     S.begin();
-    const R = 240, Lmax = 1.0, N = Math.ceil(R * Lmax) + 1;
-    const tStop = tl.at('grinder_stop');
+    const R = 300, Lmax = 1.0, N = Math.ceil(R * Lmax) + 1;
+    const tStop = tl.at('grinder_stop'), tZ = tl.at('o2_zero');
     const g = 9.8;
+    // fan: a thin vertical sheet thrown off the disc, toward the street and down (seen side-on by the viewer)
+    const bx = -0.62, by = -0.5, bz = 0.25;
     for (let i = 0; i < N; i++) {
       const k = Math.floor((t * R - i) / N);
       const tb = (k * N + i) / R;
       if (tb < -2 || tb > tStop || tb > t) continue;
+      if (tb > tZ && tb < tZ + 0.42) continue;           // he flinches when his ears pop
       const age = t - tb;
       const h1 = hash2(i, k), h2 = hash2(i + 999, k), h3 = hash2(i + 1999, k), h4 = hash2(i + 2999, k);
       // oxygen at the moment this spark was thrown off
       const o2 = SCRIPT_TRACKS.oxygen.value(tb);
-      const f = MathX.smooth(o2, 2.5, 16);        // 1 = burning iron sparks, 0 = just hot metal
-      const life = MathX.lerp(0.1 + 0.12 * h1, 0.35 + 0.6 * h1, f);
+      const f = MathX.smooth(o2, 2.5, 16);        // 1 = burning steel sparks, 0 = just friction-hot metal
+      const life = MathX.lerp(0.07 + 0.1 * h1, 0.35 + 0.6 * h1, f);
       if (age > life) continue;
-      // emission cone: down, toward the street, fanned toward the viewer
-      const sp = 6 + h2 * 7;
-      let dx = -0.62 + (h3 - 0.5) * 0.7, dy = -0.38 + (h4 - 0.5) * 0.7, dz = 0.66 + (h1 - 0.5) * 0.5;
+      const sp = MathX.lerp(4, 6, f) + h2 * 6.5;
+      const th = (h3 - 0.5) * 1.15, ph = (h4 - 0.5) * 0.22;
+      // rotate the base direction inside the X-Y plane by th, small out-of-plane tilt ph
+      const c = Math.cos(th), s2 = Math.sin(th);
+      let dx = bx * c - by * s2, dy = bx * s2 + by * c, dz = bz + ph;
       const dl = Math.hypot(dx, dy, dz); dx /= dl; dy /= dl; dz /= dl;
       const vx = dx * sp, vy = dy * sp, vz = dz * sp;
       const pos = (a) => [o.x + vx * a, o.y + vy * a - 0.5 * g * a * a, o.z + vz * a];
-      const tail = Math.max(0, age - 0.022);
-      const [ax, ay, az] = pos(tail), [bx, by, bz] = pos(age);
-      if (by < 0.15) continue;
+      const tail = Math.max(0, age - MathX.lerp(0.02, 0.026, f));
+      const [ax, ay, az] = pos(tail), [px, py, pz] = pos(age);
+      if (py < 0.05) continue;
       const fade = 1 - age / life;
-      // colour: white-yellow when burning, dull orange-red without oxygen
-      const br = MathX.lerp(1.4, 9, f) * (0.5 + 0.5 * fade);
-      const r = br, gg = br * MathX.lerp(0.32, 0.72, f) * (0.6 + 0.4 * fade), b = br * MathX.lerp(0.06, 0.28, f) * fade;
-      S.push(ax, ay, az, bx, by, bz, r, gg, b, 1, MathX.lerp(0.006, 0.011, f));
+      // white-yellow when the steel burns, dull orange-red without oxygen
+      const br = MathX.lerp(4.2, 10, f) * (0.45 + 0.55 * fade);
+      const r = br, gg = br * MathX.lerp(0.28, 0.75, f) * (0.6 + 0.4 * fade), b = br * MathX.lerp(0.04, 0.3, f) * fade;
+      S.push(ax, ay, az, px, py, pz, r, gg, b, 1, MathX.lerp(0.013, 0.012, f));
       // carbon "bursts" only happen when there is oxygen to burn the steel
-      if (f > 0.6 && h2 > 0.72 && age > life * 0.45) {
-        for (let j = 0; j < 3; j++) {
-          const a = (j / 3) * Math.PI * 2 + h3 * 6, L = 0.06 + 0.05 * hash2(i * 3 + j, k);
-          S.push(bx, by, bz, bx + Math.cos(a) * L, by + Math.sin(a) * L * 0.8, bz + Math.sin(a + 1.3) * L, r * 0.8, gg * 0.8, b, fade, 0.005);
+      if (f > 0.6 && h2 > 0.7 && age > life * 0.4) {
+        for (let j = 0; j < 4; j++) {
+          const a2 = (j / 4) * Math.PI * 2 + h3 * 6, L = 0.07 + 0.06 * hash2(i * 3 + j, k);
+          S.push(px, py, pz, px + Math.cos(a2) * L, py + Math.sin(a2) * L * 0.8, pz + Math.sin(a2 + 1.3) * L, r * 0.8, gg * 0.8, b, fade, 0.005);
         }
       }
     }
+    // the vendor's lighter: the flint still sparks, but nothing will catch (pushed into the same streak buffer)
+    this._lighterSparks(t, tl);
     S.end();
+  }
+
+  _lighterSparks(t, tl) {
+    const v = this.peds && this.peds.byId.vendor;
+    if (!v) return;
+    const st = v.states.find((s) => s[1] === 'lighter');
+    if (!st) return;
+    const i0 = v.states.indexOf(st), t0 = st[0], t1 = v.states[i0 + 1] ? v.states[i0 + 1][0] : t0 + 2;
+    if (t < t0 + 0.15 || t > t1) return;
+    // flick every 0.5 s (matches the thumb motion in the pose)
+    const ph = (t - t0) / 0.5, n = Math.floor(ph), a = (ph - n) * 0.5;
+    if (a > 0.14 || a < 0.0) return;
+    const hnd = v.handWorld(1, this._hand);
+    for (let j = 0; j < 6; j++) {
+      const h1 = hash2(j, n + 40), h2 = hash2(j + 7, n + 40), h3 = hash2(j + 13, n + 40);
+      const dx = (h1 - 0.5) * 0.6, dy = 0.2 + h2 * 0.5, dz = (h3 - 0.5) * 0.6;
+      const p0 = [hnd.x + dx * a, hnd.y + 0.05 + dy * a, hnd.z + dz * a], p1 = [hnd.x + dx * (a + 0.01), hnd.y + 0.05 + dy * (a + 0.01), hnd.z + dz * (a + 0.01)];
+      const fade = 1 - a / 0.14;
+      this.sparks.push(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], 2.2 * fade, 0.7 * fade, 0.1 * fade, 1, 0.004);
+    }
   }
 
   _grillSmoke(t, tl) {
     const g = this.env.anchors.grill, B = this.smoke;
     const tOut = tl.at('flames_out');
-    // phase 1: thick cooking smoke while flames burn; phase 2: thin wisps (fat still pyrolyses on hot coals)
-    const R = 10, life = 5.5, N = Math.ceil(R * life) + 1;
+    // before: thin grey cooking smoke.  after the flames die: thick WHITE smoke — fat keeps
+    // breaking down on the hot grill without burning — easing off as the grill cools
+    const R = 16, life = 5.5, N = Math.ceil(R * life) + 1;
     for (let i = 0; i < N; i++) {
       const k = Math.floor((t * R - i) / N);
       const tb = (k * N + i) / R;
@@ -346,19 +378,19 @@ class ParticleSystem {
       const age = t - tb;
       if (age > life) continue;
       const h1 = hash2(i + 7, k), h2 = hash2(i + 77, k), h3 = hash2(i + 777, k);
-      let strength = 1;
-      if (tb > tOut) {
-        strength = 0.35 * (1 - MathX.smooth(tb, tOut, tOut + 6));
-        if (h1 > 0.45) continue;
-      }
-      if (strength <= 0.01) continue;
-      const rise = 0.55 + h2 * 0.4;
-      const x = g.x + (h1 - 0.5) * 0.4 + 0.18 * age + Math.sin(age * 1.3 + h3 * 6) * 0.12 * age;
-      const y = g.y + 0.1 + rise * age + 0.05 * age * age;
-      const z = g.z + (h3 - 0.5) * 0.5 + 0.3 * age;
-      const size = 0.22 + age * 0.3;
-      const a = Math.min(1, age * 3) * Math.pow(1 - age / life, 1.5) * 0.2 * strength;
-      B.push(x, y, z, size, h1 * 6 + age * (h2 - 0.5), a, 0.62 + 0.1 * h3, 0.86, 0.82, 0.78);
+      const after = tb > tOut;
+      let strength, keep;
+      if (!after) { strength = 0.75; keep = 0.55; }
+      else { const cool = MathX.smooth(tb, tOut + 3, tOut + 12); strength = MathX.lerp(0.85, 0.28, cool); keep = MathX.lerp(0.8, 0.4, cool); }
+      if (h1 > keep) continue;
+      const rise = (after ? 0.35 : 0.55) + h2 * 0.35;
+      const x = g.x + (h1 - 0.5) * 0.4 + 0.55 * age + Math.sin(age * 1.3 + h3 * 6) * 0.12 * age;
+      const y = g.y + 0.08 + rise * age + 0.03 * age * age;
+      const z = g.z + (h3 - 0.5) * 0.5 + 0.42 * age;
+      const size = (after ? 0.26 : 0.22) + age * (after ? 0.34 : 0.3);
+      const a = Math.min(1, age * 2.5) * Math.pow(1 - age / life, 1.6) * 0.13 * strength;
+      const shade = after ? 0.78 + 0.06 * h3 : 0.62 + 0.1 * h3;
+      B.push(x, y, z, size, h1 * 6 + age * (h2 - 0.5), a, shade, after ? 0.97 : 0.86, after ? 0.97 : 0.82, after ? 0.98 : 0.78);
     }
   }
 

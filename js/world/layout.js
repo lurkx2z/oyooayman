@@ -31,7 +31,10 @@ const LAYOUT = {
   lot: { x0: 12.5, x1: 32, z0: -35.5, z1: -13.5 },
 
   // grill cart
-  cart: { x: 10.95, z: -9.0 },
+  cart: { x: 7.95, z: -3.8 },
+
+  // road works in the curb lane: scissor lift + worker cutting a bracket off a lamp post
+  works: { liftX: 6.15, z: -14.0, poleX: 7.45 },
 
   // bus stop across the street
   busStop: { x: -10.2, z: -21 },

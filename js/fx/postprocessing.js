@@ -161,16 +161,20 @@ class PostProcessing {
     const p = this.params;
     const hyp = SCRIPT_TRACKS.hypoxia.value(t);
     p.time = t;
-    p.tunnel = MathX.lerp(1.15, 0.42, hyp);
-    p.tunnelSoft = MathX.lerp(0.55, 0.45, hyp);
-    p.tunnelDark = MathX.lerp(0.0, 0.96, Math.min(1, hyp * 1.4));
-    p.edgeBlur = Math.min(1, hyp * 1.6);
-    p.saturation = MathX.lerp(1.08, 0.55, hyp);
-    p.warmth = MathX.lerp(0.35, -0.2, Math.min(1, hyp * 1.5));
-    // pressure-drop pulse at 0 % O2
-    const pop = MathX.impulse(t, tl.at('o2_zero') + 0.02, 0.18);
-    p.chroma = 0.004 * pop + hyp * 0.006 + 0.0006;
-    p.exposure = CONFIG.render.exposure * (1 - 0.06 * pop) * (1 - 0.12 * hyp);
-    p.contrast = 1.04 + 0.06 * hyp;
+    const tZ = tl.at('o2_zero');
+    // warm, vivid "before"; the world drains a little the moment the oxygen is gone; hypoxia drains it further
+    const drain = MathX.smooth(t, tZ, tZ + 0.9);
+    p.tunnel = MathX.lerp(1.15, 0.36, hyp);
+    p.tunnelSoft = MathX.lerp(0.55, 0.42, hyp);
+    p.tunnelDark = MathX.lerp(0.0, 0.97, Math.min(1, hyp * 1.5));
+    p.edgeBlur = Math.min(1, hyp * 1.7);
+    p.saturation = MathX.lerp(MathX.lerp(1.16, 0.98, drain), 0.5, hyp);
+    p.warmth = MathX.lerp(MathX.lerp(0.5, 0.15, drain), -0.25, Math.min(1, hyp * 1.5));
+    // the ear-pop instant: a two-frame flash + colour-split shock
+    const pop = MathX.impulse(t, tZ + 0.02, 0.16);
+    p.flash = 0.22 * MathX.impulse(t, tZ + 0.005, 0.045);
+    p.chroma = 0.014 * pop + hyp * 0.007 + 0.0006;
+    p.exposure = CONFIG.render.exposure * (1 - 0.05 * pop) * (1 - 0.14 * hyp);
+    p.contrast = MathX.lerp(1.07, 1.03, drain) + 0.07 * hyp;
   }
 }

@@ -7,8 +7,10 @@
 
    Cues: city ambience, birds, footsteps, car engines with distance /
    pan / Doppler, tyre noise, sputtering, grill sizzle, angle grinder,
-   oxygen-drop ticks + boom, ear pop + muffling, crash, car alarm,
-   electric-car hum, air-brake hiss, breathing, heartbeat, ringing.
+   oxygen-drop ticks, eardrum thump + ear pop + muffling (no 'boom': O₂ vanishing
+   everywhere at once makes no pressure wave), crash, car alarm, mains hum that
+   dies with the grid, lighter clicks, electric-car hum, air-brake hiss,
+   breathing, heartbeat, ringing.
    ===================================================================== */
 
 class AudioManager {
@@ -129,6 +131,8 @@ class AudioManager {
     this._oxygenEvent(S, bus, revSend, tl);
     this._crash(S, bus, revSend, tl);
     this._body(S, bus, tl);
+    this._grid(S, bus, tl);
+    this._lighter(S, bus);
     this._distant(S, revSend);
   }
 
@@ -185,7 +189,7 @@ class AudioManager {
   _birds(S, bus, tZero) {
     const rng = new RNG(CONFIG.seed + 5);
     let t = 0.05;
-    while (t < tZero + 2.6) {
+    while (t < tZero + 0.5) {
       const frantic = t > tZero;
       const n = rng.int(2, frantic ? 6 : 4);
       const base = rng.range(2600, 4600), pan = rng.range(-0.8, 0.8), vol = rng.range(0.012, 0.03) * (frantic ? 0.8 : 1);
@@ -193,7 +197,8 @@ class AudioManager {
       t += frantic ? rng.range(0.25, 0.7) : rng.range(0.18, 0.55);
     }
     // a few panicked wing flaps as birds fall (distant)
-    for (let k = 0; k < 6; k++) S.flap(9.3 + k * 0.45 + rng.range(0, 0.2), rng.range(-0.4, 0.4), 0.02, bus);
+    for (let k = 0; k < 7; k++) S.flap(tZero + 0.1 + k * 0.12, rng.range(-0.6, 0.6), 0.03, bus);        // flock scatters
+    for (let k = 0; k < 6; k++) S.flap(5.2 + k * 0.5 + rng.range(0, 0.2), rng.range(-0.4, 0.4), 0.018, bus);   // faltering
   }
 
   _footsteps(S, bus) {
@@ -264,7 +269,7 @@ class AudioManager {
       while (tt < tDead) {
         const on = rng.next() < 0.55;
         am.gain.setValueAtTime(on ? 1 : 0.08, tt);
-        if (!on && rng.next() < 0.5) S.backfire(tt, 0.12, bus, moto);
+        if (!on && rng.next() < 0.5 && tt < this.tl.at('o2_zero') - 0.05) S.backfire(tt, 0.12, bus, moto);
         tt += rng.range(0.04, 0.14);
       }
       am.gain.setValueAtTime(0, tDead);
@@ -299,7 +304,7 @@ class AudioManager {
 
   _grinder(S, bus, rev, tl) {
     const ctx = S.ctx, tStop = tl.at('grinder_stop');
-    const pos = { x: 13.9, z: -13.4 };
+    const pos = { x: LAYOUT.works.poleX - 0.4, z: LAYOUT.works.z };
     const pts = this._spatial(() => pos, 0, tStop + 2.5, 1 / 15, 5);
     // motor whine (electric — unaffected by oxygen), spins down when released
     const o = ctx.createOscillator(); o.type = 'sawtooth';
@@ -315,7 +320,8 @@ class AudioManager {
     const sg = ctx.createGain(), sp = ctx.createStereoPanner();
     n.connect(b1); n.connect(b2); b1.connect(sg); b2.connect(sg); sg.connect(sp); sp.connect(bus);
     const s2 = ctx.createGain(); s2.gain.value = 0.3; sp.connect(s2); s2.connect(rev);
-    this._applySpatial(pts.filter((q) => q.t <= tStop + 0.05), sg.gain, sp.pan, [], 0.5, (t) => 0.75 + 0.25 * Math.sin(t * 13) * Math.sin(t * 3.1));
+    const tZ = tl.at('o2_zero');
+    this._applySpatial(pts.filter((q) => q.t <= tStop + 0.05), sg.gain, sp.pan, [], 0.5, (t) => (t > tZ && t < tZ + 0.42 ? 0.02 : 0.75 + 0.25 * Math.sin(t * 13) * Math.sin(t * 3.1)));
     sg.gain.setValueAtTime(0.0001, tStop + 0.06);
   }
 
@@ -334,22 +340,22 @@ class AudioManager {
     bp.frequency.setValueAtTime(300, t0); bp.frequency.exponentialRampToValueAtTime(4200, tZ);
     ng.gain.setValueAtTime(0.0001, t0); ng.gain.exponentialRampToValueAtTime(0.09, tZ - 0.03); ng.gain.setValueAtTime(0.0001, tZ);
     n.connect(bp); bp.connect(ng); ng.connect(bus);
-    // impact at 0 %
-    S.boom(tZ, 0.75, bus, rev);
-    // ear pop
-    S.pop(tZ + 0.04, 0.4, bus);
+    // at 0 %: no explosion (nothing moves in the air) — it's INSIDE your head: eardrum thump + pop
+    S.thump(tZ, 0.7, bus);
+    S.pop(tZ + 0.05, 0.42, bus);
     // pressure ringing afterwards
     S.ring(tZ + 0.1, 1.8, 7400, 0.012, bus);
   }
 
   _crash(S, bus, rev, tl) {
     const t = tl.at('car_bump');
-    const v = this.traffic.byId.bumper;
+    const v = this.traffic.vehicles.find((x) => x.spec.contact);
+    if (!v) return;
     const p = this._spatial((tt) => v.kin.pose(tt), t, t + 0.1, 0.05, 10)[0];
-    S.crunch(t, 0.9 * p.gain * 2.2, p.pan, bus, rev);
-    // car alarm (electric — keeps going in the silence)
-    const suv = this.traffic.byId.suv;
-    const pts = this._spatial((tt) => suv.kin.pose(tt), t + 0.35, CONFIG.duration + 1, 1 / 15, 10);
+    S.crunch(t, Math.min(0.9, 0.9 * p.gain * 2.2), p.pan, bus, rev);
+    // car alarm on the car that got hit (battery powered — keeps going in the silence)
+    const hit = this.traffic.byId[v.spec.contact.leader];
+    const pts = this._spatial((tt) => hit.kin.pose(tt), t + 0.35, CONFIG.duration + 1, 1 / 15, 10);
     S.alarm(t + 0.35, CONFIG.duration + 1, pts, bus, rev, this);
   }
 
@@ -361,7 +367,7 @@ class AudioManager {
       const rate = SCRIPT_TRACKS.breathRate.value(t);
       const period = 60 / rate;
       const hyp = SCRIPT_TRACKS.hypoxia.value(t);
-      const vol = 0.05 + 0.2 * Math.min(1, hyp * 2.2);
+      const vol = 0.03 + 0.11 * Math.min(1, hyp * 2.0);   // no gasping: CO₂ still leaves, so there is no urge to breathe
       S.breath(t, period * 0.42, 1, vol, bus);
       S.breath(t + period * 0.45, period * 0.5, 0, vol * 0.85, bus);
       t += period; i++;
@@ -377,6 +383,40 @@ class AudioManager {
     }
     // ringing in the ears as hypoxia deepens
     S.ring(11.2, end - 11.2, 6900, 0.009, bus, true);
+  }
+
+  _grid(S, bus, tl) {
+    // background mains hum (shop fridges, AC, transformers) — gone when the grid collapses
+    const ctx = S.ctx, g = SCRIPT.grid, end = CONFIG.duration + 1;
+    const off = g && g.fail !== null && g.fail !== undefined ? g.fail : null;
+    const hum = ctx.createGain(), lp = S.filter('lowpass', 900, 0.7);
+    for (const [f, a] of [[60, 0.5], [120, 0.35], [180, 0.18], [240, 0.08]]) {
+      const o = ctx.createOscillator(); o.frequency.value = f; const og = ctx.createGain(); og.gain.value = a;
+      o.connect(og); og.connect(lp); o.start(0); o.stop(end);
+    }
+    const fridge = S.noise('brown', 0, end), fb = S.filter('bandpass', 140, 1.5), fg = ctx.createGain(); fg.gain.value = 0.25;
+    fridge.connect(fb); fb.connect(fg); fg.connect(lp);
+    lp.connect(hum); hum.connect(bus);
+    hum.gain.setValueAtTime(0.022, 0);
+    if (off !== null) {
+      // stutter, then silence + a relay clunk
+      for (let k = 0; k < 6; k++) { const tt = off - 0.25 + k * 0.08; hum.gain.setValueAtTime(k % 2 ? 0.022 : 0.006, tt); }
+      hum.gain.setValueAtTime(0.022, off + 0.1);
+      hum.gain.exponentialRampToValueAtTime(0.0001, off + 0.45);
+      S.clunk(off + 0.42, 0.18, 0.3, bus);
+    }
+  }
+
+  _lighter(S, bus) {
+    const v = SCRIPT.people.find((p) => p.id === 'vendor');
+    const st = v && v.states.find((s) => s[1] === 'lighter');
+    if (!st) return;
+    const i0 = v.states.indexOf(st), t0 = st[0], t1 = v.states[i0 + 1] ? v.states[i0 + 1][0] : t0 + 2;
+    const pos = { x: v.path[0][1], z: v.path[0][2] };
+    for (let t = t0 + 0.15; t < t1; t += 0.5) {
+      const p = this._spatial(() => pos, t, t + 0.01, 0.01, 3)[0];
+      S.click(t, 0.09 * p.gain * 3, p.pan, bus);
+    }
   }
 
   _distant(S, rev) {
@@ -533,6 +573,28 @@ class SoundKit {
     const n = this.noise('brown', t, t + 1.2), lp = this.filter('lowpass', 380, 0.6), ng = ctx.createGain();
     this.env(ng, t, 0.005, vol * 0.9, 0.9); n.connect(lp); lp.connect(ng); ng.connect(dest);
     const s = ctx.createGain(); s.gain.value = 0.5; ng.connect(s); s.connect(rev);
+  }
+
+  thump(t, vol, dest) {
+    // eardrum being pushed out: a deep, muffled internal thud
+    const ctx = this.ctx, o = ctx.createOscillator(), g = ctx.createGain(), lp = this.filter('lowpass', 160, 0.7);
+    o.frequency.setValueAtTime(70, t); o.frequency.exponentialRampToValueAtTime(30, t + 0.45);
+    this.env(g, t, 0.006, vol, 0.55); o.connect(lp); lp.connect(g); g.connect(dest); o.start(t); o.stop(t + 0.7);
+    const n = this.noise('brown', t, t + 0.4), nl = this.filter('lowpass', 220, 0.6), ng = ctx.createGain();
+    this.env(ng, t, 0.004, vol * 0.5, 0.3); n.connect(nl); nl.connect(ng); ng.connect(dest);
+  }
+
+  clunk(t, vol, pan, dest) {
+    const ctx = this.ctx, P = this.panned(dest, pan);
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(60, t + 0.08);
+    this.env(g, t, 0.002, vol, 0.12); o.connect(g); g.connect(P); o.start(t); o.stop(t + 0.18);
+    const n = this.noise('white', t, t + 0.06), bp = this.filter('bandpass', 1800, 1.5), ng = ctx.createGain();
+    this.env(ng, t, 0.001, vol * 0.5, 0.03); n.connect(bp); bp.connect(ng); ng.connect(P);
+  }
+
+  click(t, vol, pan, dest) {
+    const n = this.noise('white', t, t + 0.04), bp = this.filter('bandpass', 4200, 2), g = this.ctx.createGain();
+    this.env(g, t, 0.001, vol, 0.018); n.connect(bp); bp.connect(g); g.connect(this.panned(dest, pan));
   }
 
   pop(t, vol, dest) {

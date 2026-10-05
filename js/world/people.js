@@ -49,6 +49,12 @@ const PersonGeo = {
     this.disc = new THREE.CylinderGeometry(0.065, 0.065, 0.012, 16);
     this.tongs = new THREE.BoxGeometry(0.015, 0.015, 0.32);
     this.bag = new THREE.BoxGeometry(0.08, 0.3, 0.32);
+    this.eye = new THREE.SphereGeometry(0.0125, 8, 6);
+    this.brow = new THREE.BoxGeometry(0.034, 0.008, 0.012);
+    this.mouth = new THREE.BoxGeometry(0.036, 0.007, 0.012);
+    this.ear = new THREE.SphereGeometry(0.022, 8, 6); this.ear.scale(0.5, 1, 0.8);
+    this.lighter = new THREE.BoxGeometry(0.022, 0.07, 0.012);
+    this.thumb = new THREE.CapsuleGeometry(0.016, 0.04, 3, 6);
     this.ready = true;
   },
 };
@@ -152,7 +158,7 @@ const ACTIONS = {
     const p = basePose();
     const a = Math.sin(τ * 2.3 + c.seed * 5), b = Math.sin(τ * 3.7 + 1.3);
     p.spine = 0.25 + b * 0.05; p.spineRoll = a * 0.16; p.neck = 0.35 + b * 0.08;
-    p.lSh = [0.4, 0.55 + a * 0.2]; p.lEl = 0.35; p.rSh = [0.5, 0.35 - a * 0.2]; p.rEl = 0.6;
+    p.lSh = [0.35, 0.28 + a * 0.1]; p.lEl = 0.45; p.rSh = [0.45, 0.2 - a * 0.08]; p.rEl = 0.7;
     p.lHip = [0.2 * a, 0.1]; p.rHip = [-0.18 * a, 0.12]; p.lKnee = 0.35; p.rKnee = 0.3;
     p.hipY = 0.86; p.rootX = a * 0.08;
     return p;
@@ -205,6 +211,66 @@ const ACTIONS = {
     p.lSh = [0.9, 0.1]; p.lEl = 0.6; p.rSh = [0.6, 0.1]; p.rEl = 0.4;
     return p;
   },
+  earPop(τ, c) {
+    // ears pop as air pressure drops 23 %: flinch, hands to ears
+    const p = basePose();
+    const k = Math.min(1, τ / 0.18);
+    p.lSh = [1.0 * k + 0.05, 0.55 * k + 0.08]; p.rSh = [1.0 * k + 0.05, 0.55 * k + 0.08];
+    p.lEl = 0.18 + 2.25 * k; p.rEl = 0.18 + 2.25 * k;
+    p.spine = 0.03 + 0.16 * k; p.neck = 0.04 + 0.25 * k; p.headRoll = 0.08 * Math.sin(τ * 7) * k;
+    p.lKnee = 0.04 + 0.22 * k; p.rKnee = 0.04 + 0.22 * k; p.hipY = 0.93 - 0.06 * k;
+    p.headYaw = Math.sin(τ * 2.5 + c.seed * 4) * 0.3 * k;
+    return p;
+  },
+  earPopSit(τ, c) {
+    const p = ACTIONS.sit(τ, c), e = ACTIONS.earPop(τ, c);
+    p.lSh = e.lSh; p.rSh = e.rSh; p.lEl = e.lEl; p.rEl = e.rEl; p.neck = e.neck; p.spine = 0.12; p.headYaw = e.headYaw;
+    return p;
+  },
+  flinch(τ, c) {
+    const p = ACTIONS.grind(τ, c);
+    const k = Math.min(1, τ / 0.12) * Math.exp(-τ / 0.6);
+    p.spine -= 0.12 * k; p.neck = 0.35 - 0.5 * k; p.lSh[0] -= 0.4 * k; p.rSh[0] -= 0.3 * k;
+    return p;
+  },
+  lighter(τ, c) {
+    // tries to relight the grill: left hand at the coals, thumb flicking every ~0.5 s — nothing catches
+    const p = ACTIONS.idle(τ, c);
+    const flick = Math.max(0, Math.sin(τ * Math.PI * 2 / 0.5)) ** 6;
+    p.spine = 0.42; p.neck = 0.55; p.headYaw = 0;
+    p.lSh = [1.05, 0.05]; p.lEl = 0.55 + flick * 0.12;
+    p.rSh = [0.55, 0.18]; p.rEl = 0.85;
+    p.lKnee = 0.18; p.rKnee = 0.18; p.hipY = 0.9;
+    return p;
+  },
+  collapse(τ, c) {
+    // sudden hypoxic collapse: knees buckle, torso folds, lands on the side with a knee bent, brief twitch
+    const A = basePose();
+    A.lSh = [0.15, 0.12]; A.rSh = [0.15, 0.12]; A.lEl = 0.25; A.rEl = 0.25; A.neck = 0.35;
+    const B = Object.assign(basePose(), {
+      hipY: 0.6, lHip: [0.65, 0.08], rHip: [0.55, 0.08], lKnee: 1.25, rKnee: 1.15, spine: 0.45, neck: 0.65,
+      lSh: [0.25, 0.25], rSh: [0.2, 0.2], lEl: 0.2, rEl: 0.15, rootZ: 0.08,
+    });
+    const C = Object.assign(basePose(), {
+      hipY: 0.33, lHip: [0.45, 0.1], rHip: [0.35, 0.1], lKnee: 1.7, rKnee: 1.6, spine: 0.7, spineRoll: 0.25, rootRoll: 0.55,
+      neck: 0.6, lSh: [0.6, 0.35], rSh: [0.35, 0.25], lEl: 0.3, rEl: 0.2, rootZ: 0.2,
+    });
+    const D = Object.assign(basePose(), {
+      hipY: 0.17, rootRoll: 1.42, lHip: [0.95, 0.12], rHip: [0.35, 0.05], lKnee: 1.25, rKnee: 0.55,
+      spine: 0.38, spineRoll: 0.1, neck: 0.35, headRoll: -0.35, headYaw: 0.2,
+      lSh: [1.15, 0.15], lEl: 0.95, rSh: [0.35, 0.1], rEl: 0.35, lFoot: 0.2, rFoot: 0.1, rootZ: 0.35,
+    });
+    let p;
+    if (τ < 0.3) p = lerpPose(A, B, Ease.inQuad(τ / 0.3));
+    else if (τ < 0.65) p = lerpPose(B, C, Ease.inQuad((τ - 0.3) / 0.35));
+    else if (τ < 1.05) p = lerpPose(C, D, Ease.inQuad((τ - 0.65) / 0.4));
+    else {
+      p = Object.assign({}, D, { lSh: D.lSh.slice(), rSh: D.rSh.slice(), lHip: D.lHip.slice(), rHip: D.rHip.slice() });
+      const tw = Math.exp(-(τ - 1.05) / 0.45) * Math.sin((τ - 1.05) * 31);
+      p.lEl += tw * 0.12; p.rKnee += tw * 0.1; p.neck += tw * 0.05; p.lSh[0] += tw * 0.06;
+    }
+    return p;
+  },
   ride(τ, c) {
     const p = basePose();
     p.hipY = 0.86; p.lHip = [1.2, 0.18]; p.rHip = [1.2, 0.18]; p.lKnee = 1.55; p.rKnee = 1.55;
@@ -214,7 +280,7 @@ const ACTIONS = {
     return p;
   },
 };
-const BLEND = { recoil: 0.2, lie: 1.1, kneel: 0.85, sitGround: 1.3, stumble: 0.6, sitSlump: 1.2, lean: 0.8, look: 0.6, handHead: 0.5, walk: 0.5, idle: 0.6 };
+const BLEND = { recoil: 0.2, lie: 1.1, kneel: 0.85, sitGround: 1.3, stumble: 0.6, sitSlump: 1.2, lean: 0.8, look: 0.6, handHead: 0.5, walk: 0.5, idle: 0.6, earPop: 0.08, earPopSit: 0.08, flinch: 0.06, collapse: 0.12, lighter: 0.5, phone: 0.5, grind: 0.35 };
 
 class Person {
   constructor(spec, scene) {
@@ -236,7 +302,9 @@ class Person {
     const G = PersonGeo, L = this.look;
     const skin = this._mat(SKIN[L.skin % SKIN.length], 0.7);
     const shirt = this._mat(L.shirt), pants = this._mat(L.pants), shoes = this._mat(L.shoes, 0.6), hair = this._mat(L.hair, 0.9);
-    const mesh = (g, m, parent, x = 0, y = 0, z = 0) => { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; parent.add(o); return o; };
+    // only the big body parts cast shadows (keeps the shadow pass cheap)
+    const casters = new Set([G.pelvis, G.chest, G.head, G.thigh, G.shin, G.upperArm, G.vest, G.helmet, G.hard]);
+    const mesh = (g, m, parent, x = 0, y = 0, z = 0) => { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.castShadow = casters.has(g); o.receiveShadow = true; parent.add(o); return o; };
     const root = new THREE.Group();
     root.name = 'person:' + (this.spec.id || '');
     const body = new THREE.Group(); body.scale.setScalar(this.scale); root.add(body);
@@ -256,6 +324,13 @@ class Person {
     const head = new THREE.Group(); head.position.y = 0.15; neck.add(head);
     mesh(G.head, skin, head, 0, 0, 0);
     mesh(G.nose, skin, head, 0, -0.01, 0.105);
+    const faceMat = this._mat('#2a1d18', 0.6), browMat = this._mat(L.hair, 0.9), lipMat = this._mat('#7a4438', 0.7);
+    for (const sx of [-1, 1]) {
+      mesh(G.eye, faceMat, head, sx * 0.036, 0.016, 0.093);
+      mesh(G.brow, browMat, head, sx * 0.036, 0.043, 0.098).rotation.z = sx * -0.12;
+      mesh(G.ear, skin, head, sx * 0.1, 0.0, -0.005);
+    }
+    mesh(G.mouth, lipMat, head, 0, -0.05, 0.096);
     if (!L.hat || L.hat.type === 'cap') mesh(G.hair, hair, head, 0, 0.014, -0.012).rotation.x = -0.5;
     if (L.long) mesh(G.hairLong, hair, head, 0, -0.1, -0.02);
     if (L.hat) {
@@ -273,6 +348,7 @@ class Person {
       mesh(G.foreArm, sleeve, el, 0, -0.13, 0);
       const hand = new THREE.Group(); hand.position.y = -0.28; el.add(hand);
       mesh(G.hand, handMat, hand, 0, 0, 0);
+      mesh(G.thumb, handMat, hand, side * 0.028, 0.01, 0.025).rotation.set(0.5, 0, side * 0.5);
       return { sh, el, hand };
     };
     const leg = (side) => {
@@ -294,7 +370,10 @@ class Person {
       ra.hand.add(tool); tool.position.set(0, -0.04, 0); tool.rotation.x = -Math.PI / 2;
       this.tool = tool;
     }
-    if (this.spec.look === 'vendor') { const t = mesh(G.tongs, this._mat('#aab0b6', 0.3), ra.hand, 0, -0.05, 0.1); t.rotation.x = -1.2; }
+    if (this.spec.look === 'vendor') {
+      const t = mesh(G.tongs, this._mat('#aab0b6', 0.3), ra.hand, 0, -0.05, 0.1); t.rotation.x = -1.2;
+      this.lighterMesh = mesh(G.lighter, this._mat('#d22a1e', 0.4), la.hand, 0, -0.045, 0.02);
+    }
     if (this.spec.id === 'customer') { const ph = mesh(G.phone, this._mat('#111418', 0.2), ra.hand, 0, -0.03, 0.04); ph.rotation.x = -0.4; this.phone = ph; }
     this.root = root;
     this.j = { body, hips, spine, neck, head, la, ra, ll, rl };
@@ -370,8 +449,12 @@ class Person {
     this.root.position.set(loc.x, this.spec.y || 0, loc.z);
     this.root.rotation.y = loc.dir;
     this.apply(this.poseAt(t, ctx));
-    if (this.tool) this.tool.visible = true;
+    this.root.updateMatrixWorld(true);
   }
+
+  // world positions used by contact shadows / FX
+  worldOf(part, out) { return this.j[part].getWorldPosition(out); }
+  handWorld(side, out) { return (side < 0 ? this.j.ra : this.j.la).hand.getWorldPosition(out); }
 
   // used by the motorcycle
   setRide(t, footDown, slump) {
@@ -397,6 +480,55 @@ class PedestrianSystem {
     this.people = SCRIPT.people.map((spec) => new Person(spec, scene));
     this.byId = {};
     for (const p of this.people) this.byId[p.spec.id] = p;
+    this.blobs = new BlobShadows(scene, this.people.length * 3);
+    this._v = new THREE.Vector3();
   }
-  update(t) { for (const p of this.people) p.update(t); }
+  update(t) {
+    this.blobs.begin();
+    for (const p of this.people) {
+      p.update(t);
+      // soft contact shadows under pelvis, chest and head (follow the pose, so lying bodies get grounded too)
+      const gy = p.spec.y || 0;
+      for (const [part, r] of [['hips', 0.42], ['neck', 0.34], ['head', 0.22]]) {
+        const w = p.worldOf(part, this._v);
+        const hgt = Math.max(0, w.y - gy);
+        const k = MathX.clamp(1 - hgt / 1.4, 0, 1);
+        if (k > 0.02) this.blobs.push(w.x, gy + 0.012, w.z, r * (1.4 - k * 0.5), 0.5 * k);
+      }
+    }
+    this.blobs.end();
+  }
+}
+
+/* soft dark ground blobs (one instanced draw call) */
+class BlobShadows {
+  constructor(scene, max) {
+    const g = new THREE.PlaneGeometry(1, 1); g.rotateX(-Math.PI / 2);
+    const tex = Tex.softDot();
+    this.uOpacity = new Float32Array(max);
+    const mat = new THREE.MeshBasicMaterial({ map: tex, color: 0x000000, transparent: true, opacity: 1, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 });
+    mat.onBeforeCompile = (sh) => {
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float aOpacity; varying float vOpacity;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvOpacity = aOpacity;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vOpacity;').replace('#include <map_fragment>', 'vec4 sampledDiffuseColor = texture2D( map, vMapUv ); diffuseColor.a *= sampledDiffuseColor.r * vOpacity;');
+    };
+    this.mesh = new THREE.InstancedMesh(g, mat, max);
+    this.attr = new THREE.InstancedBufferAttribute(this.uOpacity, 1).setUsage(THREE.DynamicDrawUsage);
+    this.mesh.geometry.setAttribute('aOpacity', this.attr);
+    this.mesh.frustumCulled = false;
+    this.mesh.renderOrder = 1;
+    scene.add(this.mesh);
+    this.max = max; this.n = 0;
+    this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3();
+    this._e = new THREE.Euler();
+  }
+  begin() { this.n = 0; }
+  push(x, y, z, sx, op, sz = sx, rotY = 0) {
+    if (this.n >= this.max) return;
+    this._q.setFromEuler(this._e.set(0, rotY, 0));
+    this._m.compose(this._p.set(x, y, z), this._q, this._s.set(sx, 1, sz));
+    this.mesh.setMatrixAt(this.n, this._m);
+    this.uOpacity[this.n] = op;
+    this.n++;
+  }
+  end() { this.mesh.count = this.n; this.mesh.instanceMatrix.needsUpdate = true; this.attr.needsUpdate = true; }
 }

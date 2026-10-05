@@ -54,7 +54,7 @@ CAR_PROFILES.taxi = CAR_PROFILES.sedan;
 class VehicleFactory {
   constructor() {
     this.m = {
-      glass: new THREE.MeshStandardMaterial({ color: '#121a22', roughness: 0.06, metalness: 0.35, envMapIntensity: 1.5, name: 'carGlass' }),
+      glass: new THREE.MeshStandardMaterial({ color: '#26323d', roughness: 0.05, metalness: 0.55, envMapIntensity: 1.9, name: 'carGlass' }),
       trim: new THREE.MeshStandardMaterial({ color: '#1c1d1f', roughness: 0.55, metalness: 0.1, name: 'carTrim' }),
       chrome: new THREE.MeshStandardMaterial({ color: '#c9ced3', roughness: 0.18, metalness: 1.0, name: 'chrome' }),
       head: new THREE.MeshStandardMaterial({ color: '#f4f2ea', emissive: new THREE.Color('#fff4e0'), emissiveIntensity: 1.6, roughness: 0.2, name: 'headlight' }),
@@ -217,7 +217,7 @@ class VehicleFactory {
     for (const ax of P.axles) for (const sz of [-1, 1]) {
       const w = new THREE.Mesh(wg, [this.m.tire, this.m.rim, this.m.rim]);
       w.position.set(cx + ax, P.r, sz * (P.W / 2 - 0.16));
-      w.castShadow = true;
+      w.castShadow = false;
       group.add(w);
       wheels.push(w);
     }
@@ -276,7 +276,7 @@ class VehicleFactory {
     for (const ax of P.axles) for (const sz of [-1, 1]) {
       const w = new THREE.Mesh(wg, [this.m.tire, this.m.rim, this.m.rim]);
       w.position.set(-L / 2 + ax, r, sz * (W / 2 - 0.22));
-      w.castShadow = true;
+      w.castShadow = false;
       group.add(w); wheels.push(w);
     }
     return { group, body, wheels, r, tail, hazard, exhaust: new THREE.Vector3(-L / 2 - 0.05, 0.35, -W / 2 + 0.4), L, W, height: H };
@@ -292,7 +292,7 @@ class VehicleFactory {
     const wg = this.wheelGeo(r, 0.13);
     for (const x of [-0.72, 0.72]) {
       const w = new THREE.Mesh(wg, [this.m.tire, this.m.rim, this.m.rim]);
-      w.position.set(x, r, 0); w.castShadow = true; body.add(w); wheels.push(w);
+      w.position.set(x, r, 0); w.castShadow = false; body.add(w); wheels.push(w);
     }
     add(new THREE.BoxGeometry(0.55, 0.32, 0.3), this.m.trim, 0.0, 0.52, 0);              // engine
     add(new THREE.RoundedBoxGeometry(0.58, 0.24, 0.32, 2, 0.08), paint, 0.18, 0.86, 0);    // tank
@@ -409,7 +409,15 @@ class TrafficSystem {
   }
 
   update(t, tl) {
-    for (const v of this.vehicles) v.update(t, tl);
+    if (!this.blobs) this.blobs = new BlobShadows(this.scene, this.vehicles.length);
+    this.blobs.begin();
+    for (const v of this.vehicles) {
+      v.update(t, tl);
+      // soft ambient-occlusion blob under each vehicle
+      const p = v.group.position;
+      this.blobs.push(p.x, 0.011, p.z, v.L * 1.12, v.isMoto ? 0.35 : 0.6, v.W * 1.35, v.group.rotation.y);
+    }
+    this.blobs.end();
   }
 
   // annotation anchor (top of the vehicle)

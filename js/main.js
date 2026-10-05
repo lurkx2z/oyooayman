@@ -15,12 +15,14 @@ class SceneManager {
   }
 
   init() {
+    if (CONFIG.captureMode) document.body.classList.add('capture');
     const R = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: CONFIG.captureMode });
     R.shadowMap.enabled = CONFIG.render.shadows;
     R.shadowMap.type = THREE.PCFShadowMap;
     R.toneMapping = THREE.NoToneMapping;              // tone mapping happens in the post pass
     R.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer = R;
+    R.info.autoReset = false;           // count every pass of a frame (shadows + scene + post)
     Tex.maxAniso = Math.min(8, R.capabilities.getMaxAnisotropy());
 
     this.scene = new THREE.Scene();
@@ -31,7 +33,7 @@ class SceneManager {
     this.env.build();
     this.peds = new PedestrianSystem(this.scene);
     this.traffic = new TrafficSystem(this.scene);
-    this.fx = new ParticleSystem(this.scene, this.env, this.traffic);
+    this.fx = new ParticleSystem(this.scene, this.env, this.traffic, this.peds);
     this.post = new PostProcessing(R);
     this.cam = new CameraController(this.camera, CONFIG.camera);
     this.hud = new HUD(document.getElementById('hud'), this.tl);
@@ -58,7 +60,8 @@ class SceneManager {
     let sw, sh;
     if (CONFIG.captureMode) { sw = CONFIG.captureWidth; sh = CONFIG.captureHeight; }
     else {
-      const W = window.innerWidth, H = window.innerHeight - (this.recording ? 0 : 0);
+      // leave room for the dev bar unless we're recording
+      const W = window.innerWidth, H = window.innerHeight - (this.recording ? 0 : 118);
       sh = Math.min(H, W * 16 / 9); sw = sh * 9 / 16;
     }
     this.stage.style.width = sw + 'px';
@@ -132,6 +135,7 @@ class SceneManager {
   }
 
   renderAt(t) {
+    this.renderer.info.reset();
     this.update(t);
     this.post.render(this.scene, this.camera);
   }

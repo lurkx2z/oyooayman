@@ -59,6 +59,7 @@ class Environment {
     this._signals();
     this._construction();
     this._cart();
+    this._roadWorks();
     this._cafe();
     this.batch.build(this.root, 'env');
     this._environmentMap();
@@ -495,7 +496,7 @@ class Environment {
     }
     // foliage clusters with vertex colour variation
     const n = rng.int(5, 7);
-    const base = new THREE.Color().setHSL(rng.range(0.22, 0.29), rng.range(0.35, 0.5), rng.range(0.26, 0.33));
+    const base = new THREE.Color().setHSL(rng.range(0.23, 0.3), rng.range(0.28, 0.4), rng.range(0.19, 0.25));
     for (let i = 0; i < n; i++) {
       const r = rng.range(1.0, 1.55) * scale;
       const g = new THREE.IcosahedronGeometry(r, 1);
@@ -620,6 +621,7 @@ class Environment {
     // illuminated ad panel (electric — it stays on)
     const ad = new THREE.MeshStandardMaterial({ map: Tex.adPanel(7), emissiveMap: null, emissive: '#ffffff', roughness: 0.3 });
     ad.emissiveMap = ad.map; ad.emissiveIntensity = 0.9;
+    this.dynamic.ad = ad;
     B.box(D - 0.1, 1.8, 0.12, x, h + 1.15, z + L / 2, m.metal);
     B.add(Geo.quad([x - 0.65, h + 0.3, z + L / 2 + 0.07], [x + 0.65, h + 0.3, z + L / 2 + 0.07], [x + 0.65, h + 2.0, z + L / 2 + 0.07], [x - 0.65, h + 2.0, z + L / 2 + 0.07]), ad, null, { noShadow: true });
     // bench inside
@@ -701,8 +703,6 @@ class Environment {
     const ry = levels[0] + 0.16;
     for (let z = zs[0] + 0.3; z >= zs[3] - 0.3; z -= 1.75) B.box(0.05, 1.1, 0.05, xs[0] - 0.36, ry + 0.55, z, m.yellow);
     for (const y of [0.55, 1.08]) B.box(0.05, 0.05, zs[0] - zs[3] + 0.6, xs[0] - 0.36, ry + y, (zs[0] + zs[3]) / 2, m.yellow);
-    // gap in railing where the worker grinds a beam stub
-    B.box(0.9, 0.3, 0.3, xs[0] - 0.55, ry + 0.95, -21.5, m.primer);           // stub being cut
     // material piles
     for (let i = 0; i < 4; i++) B.box(5.5, 0.3, 0.3, 19 + i * 0.05, 0.16 + i * 0.3, -24 + i * 0.32, m.primer);
     B.box(1.2, 1.0, 1.2, 22, 0.5, -18, m.plywood);
@@ -712,7 +712,6 @@ class Environment {
       B.add(new THREE.ConeGeometry(0.18, 0.7, 12), m.orange, Geo.matrix(12.1, h + 0.35, z));
       B.box(0.38, 0.04, 0.38, 12.1, h + 0.02, z, Mat.std('#222'));
     }
-    this.anchors.grinder = new THREE.Vector3(13.45, levels[0] + 1.25, -21.5);
 
     // tower crane
     const cx = 27.5, cz = -27, ch = 40;
@@ -766,7 +765,7 @@ class Environment {
     add(new THREE.BoxGeometry(0.88, 0.06, 1.93), steelM, 0, 0.4, 0);
     // signs on street side and front
     const signMat = new THREE.MeshStandardMaterial({ map: Tex.cartSign(), roughness: 0.5 });
-    const sign1 = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.45), signMat); sign1.position.set(-0.432, 0.74, 0); sign1.rotation.y = -Math.PI / 2; g.add(sign1);
+    const sign1 = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.45), signMat); sign1.position.set(0.432, 0.74, 0); sign1.rotation.y = Math.PI / 2; g.add(sign1);
     const sign2 = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.2), signMat); sign2.position.set(0, 0.86, 0.952); g.add(sign2);
     // wheels & legs
     const wheelG = new THREE.CylinderGeometry(0.3, 0.3, 0.06, 18);
@@ -782,14 +781,15 @@ class Environment {
     add(new THREE.BoxGeometry(gw, gh, 0.03), dark, gx, gy + gh / 2, gz + gd / 2);
     // glowing coals (emissive dims after oxygen is gone)
     const coalMat = new THREE.MeshStandardMaterial({ color: '#2a1a12', emissive: new THREE.Color('#ff5a14'), emissiveIntensity: 2.2, roughness: 0.9 });
-    const coals = new THREE.Group();
-    const cg = new THREE.DodecahedronGeometry(0.045, 0);
+    // coal bed: one merged mesh (70 lumps, 1 draw call)
+    const coalGeos = [];
     for (let i = 0; i < 70; i++) {
-      const c = new THREE.Mesh(cg, coalMat);
-      c.position.set(gx + (hash1(i * 3) - 0.5) * (gw - 0.08), gy + 0.05 + hash1(i * 7) * 0.03, gz + (hash1(i * 11) - 0.5) * (gd - 0.08));
-      c.rotation.set(hash1(i) * 3, hash1(i + 1) * 3, 0);
-      coals.add(c);
+      const c = new THREE.DodecahedronGeometry(0.045, 0);
+      c.applyMatrix4(Geo.matrix(gx + (hash1(i * 3) - 0.5) * (gw - 0.08), gy + 0.05 + hash1(i * 7) * 0.03, gz + (hash1(i * 11) - 0.5) * (gd - 0.08), hash1(i) * 3, hash1(i + 1) * 3, 0));
+      coalGeos.push(Geo.prep(c));
     }
+    const coals = new THREE.Mesh(THREE.mergeGeometries(coalGeos), coalMat);
+    coals.receiveShadow = true;
     g.add(coals);
     // grate + skewers
     for (let i = 0; i < 9; i++) add(new THREE.BoxGeometry(gw - 0.04, 0.012, 0.012), steelM, gx, gy + gh - 0.02, gz - gd / 2 + 0.06 + i * 0.105);
@@ -811,11 +811,11 @@ class Environment {
     add(new THREE.CylinderGeometry(0.03, 0.03, 0.18, 8), Mat.std('#e2b420', { roughness: 0.3 }), 0.33, 1.15, -0.55);
     add(new THREE.BoxGeometry(0.14, 0.1, 0.1), Mat.std('#e8e8e8'), 0.2, 1.11, -0.8);
     // cooler behind
-    add(new THREE.BoxGeometry(0.5, 0.42, 0.7), Mat.std('#2f6fb3', { roughness: 0.5 }), 0.75, 0.21, -0.4);
+    add(new THREE.BoxGeometry(0.5, 0.42, 0.7), Mat.std('#2f6fb3', { roughness: 0.5 }), 0.0, 0.21, -1.35);
     // A-frame menu board facing the viewer
     const menu = Tex.label([['GRILL', 46], ['KEBAB  $9', 30], ['CORN  $4', 30], ['SODA  $2', 30]], { w: 256, h: 320, bg: '#1d1d1d', fg: '#f2efe6' });
     const mb = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.85, 0.03), new THREE.MeshStandardMaterial({ map: menu, roughness: 0.8 }));
-    mb.position.set(-0.75, 0.43, 1.9); mb.rotation.x = -0.18; mb.rotation.y = -0.35; mb.castShadow = true; g.add(mb);
+    mb.position.set(1.9, 0.43, 0.25); mb.rotation.x = -0.18; mb.rotation.y = -0.15; mb.castShadow = true; g.add(mb);
 
     this.dynamic.coals = coalMat;
     this.anchors.grill = new THREE.Vector3(x + gx, h + gy + gh, z + gz);
@@ -825,6 +825,62 @@ class Environment {
     fireLight.position.set(x, h + 1.7, z + gz);
     this.root.add(fireLight);
     this.dynamic.fireLight = fireLight;
+  }
+
+  /* road works in the curb lane: cones, barricade, steel plate, battery scissor lift, lamp post */
+  _roadWorks() {
+    const B = this.batch, m = this.m, W = LAYOUT.works, h = LAYOUT.curbH;
+    const z = W.z;
+    // cones closing the curb lane (+ taper)
+    const coneMat = m.orange, white = Mat.std('#f2f2ee', { roughness: 0.5 });
+    const cone = (x, zz) => {
+      B.add(new THREE.ConeGeometry(0.17, 0.72, 14), coneMat, Geo.matrix(x, 0.36, zz));
+      B.add(new THREE.CylinderGeometry(0.105, 0.125, 0.1, 14), white, Geo.matrix(x, 0.42, zz), { noShadow: true });
+      B.box(0.4, 0.04, 0.4, x, 0.02, zz, Mat.std('#1d1d1d'));
+    };
+    for (let i = 0; i < 4; i++) cone(6.6 - i * 0.95, -2.2 - i * 1.3);
+    for (let zz = -6.2; zz > -26; zz -= 2.4) cone(3.75, zz);
+    // type III barricade across the closed lane
+    const stripe = Tex.canvas(256, 32), sx = stripe.getContext('2d');
+    for (let i = -2; i < 12; i++) { sx.fillStyle = i % 2 ? '#f3f3ee' : '#e8611a'; sx.beginPath(); sx.moveTo(i * 24, 32); sx.lineTo(i * 24 + 24, 32); sx.lineTo(i * 24 + 40, 0); sx.lineTo(i * 24 + 16, 0); sx.fill(); }
+    const stripeMat = new THREE.MeshStandardMaterial({ map: Tex.tex(stripe), roughness: 0.5 });
+    for (const x of [4.3, 6.6]) B.box(0.07, 1.5, 0.07, x, 0.75, -5.2, m.galv);
+    for (const y of [0.55, 0.95, 1.35]) B.box(2.6, 0.2, 0.03, 5.45, y, -5.2, stripeMat);
+    // "ROAD WORK" diamond sign
+    const rw = Tex.label([['ROAD', 64], ['WORK', 64]], { w: 256, h: 256, bg: '#f08a1c', fg: '#111' });
+    const signMat = new THREE.MeshStandardMaterial({ map: rw, roughness: 0.6 });
+    B.add(new THREE.PlaneGeometry(0.85, 0.85), signMat, Geo.matrix(6.4, 1.75, -27.5, 0, 0.25, Math.PI / 4), { noShadow: true });
+    for (const [dx, dz] of [[-0.3, 0.2], [0.3, 0.2], [0, -0.3]]) B.add(new THREE.CylinderGeometry(0.018, 0.018, 1.6, 5), m.metal, Geo.matrix(6.4 + dx * 0.5, 0.75, -27.55 + dz * 0.5, dz * 0.35, 0, -dx * 0.35));
+    // steel road plate + trench edge
+    B.box(2.4, 0.04, 1.6, 5.2, 0.02, -19.5, Mat.std('#3a3c3e', { roughness: 0.45, metalness: 0.7 }));
+    // lamp post the crew is working on, with the bracket being cut
+    const px = W.poleX;
+    B.add(new THREE.CylinderGeometry(0.08, 0.12, 8.0, 8), m.metal, Geo.matrix(px, h + 4.0, z));
+    B.add(new THREE.CylinderGeometry(0.17, 0.21, 0.5, 8), m.metal, Geo.matrix(px, h + 0.25, z));
+    B.add(new THREE.CylinderGeometry(0.045, 0.05, 2.2, 6), m.metal, Geo.matrix(px - 1.0, h + 7.95, z, 0, 0, Math.PI / 2 - 0.12));
+    B.box(0.75, 0.16, 0.36, px - 2.05, h + 7.95, z, m.metal);
+    B.box(0.36, 0.14, 0.14, px - 0.22, 5.3, z, m.primer);  // rusty bracket being cut off
+    // battery scissor lift (electric: keeps working without oxygen)
+    const lx = W.liftX, liftMat = Mat.std('#e8701a', { roughness: 0.55 }), grey = Mat.std('#4a4e54', { roughness: 0.5, metalness: 0.4 });
+    B.box(1.15, 0.5, 2.5, lx, 0.38, z, liftMat);
+    B.box(0.5, 0.35, 0.7, lx, 0.8, z + 0.6, grey);                                // battery pack
+    for (const dx of [-0.5, 0.5]) for (const dz of [-0.95, 0.95]) {
+      const w = new THREE.CylinderGeometry(0.16, 0.16, 0.14, 14); w.rotateZ(Math.PI / 2);
+      B.add(w, Mat.std('#161617', { roughness: 0.9 }), Geo.matrix(lx + dx, 0.16, z + dz));
+    }
+    const levels = 4, top = 4.0, base = 0.66, lh = (top - base) / levels;
+    const span = 2.0, len = Math.hypot(span, lh), ang = Math.atan2(lh, span);
+    for (const dx of [-0.48, 0.48]) for (let i = 0; i < levels; i++) {
+      const y = base + lh * (i + 0.5);
+      for (const sgn of [-1, 1]) B.add(new THREE.BoxGeometry(0.06, 0.09, len), grey, Geo.matrix(lx + dx, y, z, sgn * ang, 0, 0));
+    }
+    B.box(1.2, 0.12, 2.6, lx, top + 0.0, z, liftMat);
+    // platform railings
+    const rail = m.yellow, rt = top + 1.05;
+    for (const dx of [-0.58, 0.58]) { B.box(0.04, 0.04, 2.6, lx + dx, rt, z, rail); B.box(0.04, 0.04, 2.6, lx + dx, top + 0.55, z, rail); }
+    for (const dz of [-1.28, 1.28]) { B.box(1.2, 0.04, 0.04, lx, rt, z + dz, rail); B.box(1.2, 0.04, 0.04, lx, top + 0.55, z + dz, rail); }
+    for (const dx of [-0.58, 0.58]) for (const dz of [-1.28, 0, 1.28]) B.box(0.04, 1.05, 0.04, lx + dx, top + 0.53, z + dz, rail);
+    this.anchors.grinder = new THREE.Vector3(px - 0.42, 5.3, z);
   }
 
   _cafe() {
@@ -861,29 +917,49 @@ class Environment {
     // fog follows the sky colour a little
     this.scene.fog.color.copy(this.horizonColor).multiplyScalar(MathX.lerp(0.93, 1.0, o2));
     // coals keep glowing (they are hot) but dim once nothing can burn
-    const dim = MathX.smooth(t, tl.at('flames_out'), tl.at('flames_out') + 9);
-    this.dynamic.coals.emissiveIntensity = MathX.lerp(2.4, 0.35, dim) * (1 + 0.08 * Math.sin(t * 9.3) * (1 - dim));
+    // hot coals glow because they are HOT, not because they burn: bright orange → dull red, then they stay red for minutes
+    const dim = MathX.smooth(t, tl.at('flames_out'), tl.at('flames_out') + 3.5);
+    this.dynamic.coals.emissiveIntensity = MathX.lerp(2.4, 0.8, dim) * (1 + 0.08 * Math.sin(t * 9.3) * (1 - dim)) - 0.012 * Math.max(0, t - tl.at('flames_out') - 3.5);
+    this.dynamic.coals.emissive.setRGB(1, MathX.lerp(0.35, 0.16, dim), MathX.lerp(0.08, 0.03, dim));
     // fire light flickers then dies with the flames
     const f = FX_FLAME_LEVEL(t, tl);
-    this.dynamic.fireLight.intensity = 5.5 * f * (0.82 + 0.18 * noise1(t * 14, 4)) + 0.25 * (1 - dim);
+    this.dynamic.fireLight.intensity = 5.5 * f * (0.82 + 0.18 * noise1(t * 14, 4)) + 0.35 * (1 - dim * 0.6);
     // crane slewing slowly (electric) — stops when the operator is impaired
     const slew = MathX.smooth(t, 11.5, 13.5);
     const ang = 0.18 + 0.018 * Math.min(t, 11.5) + 0.009 * slew;
     this.dynamic.crane.rotation.y = ang;
     this.dynamic.craneLoad.rotation.y = Math.sin(t * 0.4) * 0.08;
-    // traffic signals (still powered!)
-    this._updateSignals(t);
+    // mains electricity: ~60 % of power comes from burning fuel, so the grid collapses seconds later
+    const gp = this.gridPower(t);
+    for (const m of this.shopMats) { m.emissiveIntensity = 0.55 * gp; m.color.setScalar(MathX.lerp(0.78, 1, gp)); }
+    if (this.dynamic.ad) this.dynamic.ad.emissiveIntensity = 0.9 * gp;
+    this._updateSignals(t, gp);
   }
 
-  _updateSignals(t) {
-    // avenue: green until 7.0, amber 7.0–10.0, red after.  cross street: red, then green at 10.6
-    const av = t < 7.0 ? 2 : t < 10.0 ? 1 : 0;
-    const cr = t < 10.6 ? 0 : 2;
+  // 1 = mains power on, 0 = blackout (with a stuttering failure)
+  gridPower(t) {
+    const g = SCRIPT.grid;
+    if (!g || g.fail === null || g.fail === undefined) return 1;
+    const a = t - g.fail;
+    if (a < -0.25) return 1;
+    if (a > 0.45) return 0;
+    const flick = hash1(Math.floor(t * 24) + 77);
+    return a < 0 ? (flick > 0.35 ? 1 : 0.35) : (flick > 0.7 ? 0.6 : 0.05) * (1 - a / 0.45);
+  }
+
+  _updateSignals(t, gp) {
+    // normal cycle: avenue green until 7.0, amber to 8.5, then red; cross street turns green at 9.0
+    const av = t < 7.0 ? 2 : t < 8.5 ? 1 : 0;
+    const cr = t < 9.0 ? 0 : 2;
+    // after the blackout the signal controllers run on battery backup: flashing red
+    const g = SCRIPT.grid, onBattery = g && g.fail !== null && t > g.fail + 1.0;
+    const flashOn = onBattery && Math.floor((t - g.fail - 1.0) * 1.2) % 2 === 0;
     for (const h of this.signalHeads) {
       const on = h.group === 'avenue' ? av : cr;
       h.lamps.forEach((l, i) => {
-        const lit = i === on;
-        l.mat.color.copy(l.color).multiplyScalar(lit ? 6.0 : 0.06);
+        let lit = i === on ? gp : 0;
+        if (onBattery) lit = i === 0 && flashOn ? 1 : 0;
+        l.mat.color.copy(l.color).multiplyScalar(0.06 + 5.9 * lit);
       });
     }
   }
