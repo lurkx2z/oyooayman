@@ -289,7 +289,7 @@ class PostProcessing {
     const pop = MathX.impulse(t, tPop + 0.02, 0.16);
     p.flash = 0;
     p.chroma = 0;
-    p.exposure = CONFIG.render.exposure * 0.86 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);
+    p.exposure = CONFIG.render.exposure * 0.9 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);
     p.contrast = 1.08 + 0.05 * hyp;
     p.soft = 0.1 + 0.05 * hyp;
   }

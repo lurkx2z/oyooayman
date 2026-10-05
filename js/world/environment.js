@@ -131,10 +131,10 @@ class Environment {
   _sky() {
     // cold overcast morning: the sun is only a soft brighter patch behind the cloud deck
     this.sunDir = new THREE.Vector3(-0.3, 0.8, 0.5).normalize();     // behind-left of the viewer: faces toward us get the key, shadows fall into frame
-    const zenith = new THREE.Color('#47525b');
-    const horizon = new THREE.Color('#858d87');
+    const zenith = new THREE.Color('#525d66');
+    const horizon = new THREE.Color('#98a099');
     this.horizonColor = horizon.clone();
-    this.fogColor = new THREE.Color('#6b746e');      // dirty grey-green haze, darker than the sky behind it
+    this.fogColor = new THREE.Color('#828b84');      // dirty grey-green haze, darker than the sky behind it
     this.skyUniforms = {
       uZenith: { value: zenith },
       uHorizon: { value: horizon },

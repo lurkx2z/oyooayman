@@ -48,7 +48,7 @@ body.recording #app, body.capture #app { inset: 0; }
 /* the number alone changes colour while oxygen falls; at zero it settles to a dark, muted red */
 #o2Readout .value { transition: color 0.25s linear; }
 #o2Readout.alert .value { color: #b9796b; }
-#o2Readout.zero .value { color: #98564b; }
+#o2Readout.zero .value { color: #a6635a; }
 #o2Readout.alert .bar .fill { background: #b9796b; }
 
 #timerReadout { top: calc(var(--u) * 372); opacity: 0; width: calc(var(--u) * 500); }
