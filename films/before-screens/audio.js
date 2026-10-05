@@ -1,5 +1,5 @@
 /* =====================================================================
-   SOUNDTRACK — "How did kids have fun before screens?" (Phase A, 0–15 s)
+   SOUNDTRACK — "How did kids have fun before screens?" (all 90 s; this header describes the opening)
    Synthesised and rendered offline by the shared AudioEngine:
    modern room tone and the phone's tinny video, the low-battery chime,
    power-down, two dull taps and near-silence; children muffled behind the
@@ -60,6 +60,20 @@ class BeforeScreensAudio extends AudioEngine {
     this._games(S, bus, outSend);
     this._evening(S, bus, outSend, music, musSend);
     this._music(S, music, musSend);
+    // phase E: the parlour has its own little room (cut dead at the return to the bedroom), then the bedroom at night (cut dead at the black),
+    // and the last note on a chain of its own
+    const parl = ctx.createGain(); parl.connect(mixIn); parl.gain.setValueAtTime(1, 80.39); parl.gain.linearRampToValueAtTime(0, 80.4);
+    const parlRev = S.reverb(0.8), parlSend = ctx.createGain(); parlSend.gain.value = 0.3; parlSend.connect(parlRev); parlRev.connect(parl);
+    const parlMus = ctx.createGain(); parlMus.gain.value = 0.6; parlMus.connect(parl);
+    const parlMusRev = S.reverb(2.4), parlMusSend = ctx.createGain(); parlMusSend.gain.value = 0.42; parlMusSend.connect(parlMusRev); parlMusRev.connect(parl);
+    const bed = ctx.createGain(); bed.connect(mixIn); bed.gain.setValueAtTime(0, 80.39); bed.gain.linearRampToValueAtTime(1, 80.4); bed.gain.setValueAtTime(1, 88.39); bed.gain.linearRampToValueAtTime(0, 88.4);
+    const bedRev = S.reverb(0.5), bedSend = ctx.createGain(); bedSend.gain.value = 0.25; bedSend.connect(bedRev); bedRev.connect(bed);
+    const endBus = ctx.createGain(); endBus.gain.value = 3.2; endBus.connect(out);
+    const endRev = S.reverb(3.0), endSend = ctx.createGain(); endSend.gain.value = 0.5; endSend.connect(endRev); endRev.connect(endBus);
+    if (end > 67.6) {
+      this._parlour(S, parl, parlSend, parlMus, parlMusSend);
+      this._return(S, bed, bedSend, endBus, endSend);
+    }
   }
 
   /* little sound builders */
@@ -226,7 +240,7 @@ class BeforeScreensAudio extends AudioEngine {
   /* the evening: crickets, a mother calling the kids in, goodbyes, the lamplighter's flame; warm slow music */
   _evening(S, bus, rev, mus, musRev) {
     const ctx = S.ctx;
-    for (let t = 63.0; t < CONFIG.duration + 1; t += 0.11) {
+    for (let t = 63.0; t < Math.min(CONFIG.duration, 67.6); t += 0.11) {
       const k = MathX.clamp((t - 63) / 3, 0, 1);
       if (S.rng.chance(0.55)) S.tone(t, 0.03, 4300 + S.rng.range(-120, 120), 0.003 * k, S.rng.range(-0.8, 0.8), bus, 'sine', 0.006, 0.02);
     }
@@ -239,8 +253,8 @@ class BeforeScreensAudio extends AudioEngine {
     // the lamplighter: the pole clinks on the lantern, the gas catches and hisses
     S.click(65.1, 0.03, 0.5, bus); S.tone(65.12, 0.2, 1900, 0.008, 0.5, bus, 'sine', 0.003, 0.15);
     this._whoosh(S, 65.5, 0.5, 0.05, 0.5, bus, 200, 900);
-    const h = S.noise('white', 65.6, CONFIG.duration + 1), hb = S.filter('bandpass', 3800, 0.8), hg = ctx.createGain();
-    hg.gain.setValueAtTime(0.0001, 65.6); hg.gain.linearRampToValueAtTime(0.004, 66.0);
+    const h = S.noise('white', 65.6, 67.65), hb = S.filter('bandpass', 3800, 0.8), hg = ctx.createGain();
+    hg.gain.setValueAtTime(0.0001, 65.6); hg.gain.linearRampToValueAtTime(0.004, 66.0); hg.gain.setValueAtTime(0.004, 67.58); hg.gain.linearRampToValueAtTime(0.0001, 67.6);
     h.connect(hb); hb.connect(hg); hg.connect(S.panned(bus, 0.5));
     // a far church bell for the evening
     for (const [f, a, d] of [[196, 0.014, 4.0], [392 * 1.19, 0.007, 3.0], [588 * 0.98, 0.005, 2.2]]) S.tone(66.2, d, f, a, -0.4, rev, 'sine', 0.006, d * 0.95);
@@ -251,6 +265,123 @@ class BeforeScreensAudio extends AudioEngine {
       for (const f of c) S.tone(t0, 1.75, f * 2, 0.006, 0, mus, 'triangle', 0.4, 0.8);
       c.forEach((f, j) => S.pluck(t0 + j * 0.3, f * 2, 0.035, -0.25 + j * 0.15, musRev, 2.4, 0.5));
     }
+  }
+
+  /* a voice telling a story: phrases of low syllables with a falling contour, pauses between */
+  _murmur(S, t0, t1, f0, vol, pan, dest) {
+    let t = t0;
+    while (t < t1) {
+      const n = S.rng.int(4, 9), top = f0 * S.rng.range(1.0, 1.2);
+      for (let k = 0; k < n && t < t1; k++) {
+        const d = S.rng.range(0.1, 0.22), f = top * (1 - 0.18 * k / n);
+        S.voice(t, f, d, S.rng.pick(['o', 'a', 'u', 'e', 'o']), vol * S.rng.range(0.7, 1), pan, dest, S.rng.range(0.92, 1.05));
+        t += d + S.rng.range(0.02, 0.07);
+      }
+      t += S.rng.range(0.3, 0.75);
+    }
+  }
+
+  /* the parlour (67.6–80.4): the fire and the clock, checkers and a book, grandfather's story, the warmest music */
+  _parlour(S, bus, rev, mus, musRev) {
+    const ctx = S.ctx, P = PARLOUR, t0 = P.t0, t1 = P.t1;
+    const fireAt = { x: P.fire.x, z: P.z0 + 0.25 }, gpa = { x: P.chair.x, z: P.chair.z }, cl = (x) => MathX.clamp(x, -0.9, 0.9);
+    // fire: a soft roar and the crackle of coal, placed where the hearth is as you look around the room
+    const fire = ctx.createGain(), fpan = ctx.createStereoPanner(); fire.connect(fpan); fpan.connect(bus); fpan.connect(rev);
+    this._applySpatial(this._spatial(() => fireAt, t0, t1, 1 / 10, 2.5), fire.gain, fpan.pan, [], 1);
+    const roar = S.noise('brown', t0, t1 + 0.1), rlp = S.filter('lowpass', 260, 0.6), rg = ctx.createGain(); rg.gain.value = 0.05; roar.connect(rlp); rlp.connect(rg); rg.connect(fire);
+    const cr = ctx.createBufferSource(); cr.buffer = S.crackleBuffer(t1 - t0 + 0.5, 9); const cbp = S.filter('bandpass', 2300, 0.6), cg = ctx.createGain(); cg.gain.value = 0.06;
+    cr.connect(cbp); cbp.connect(cg); cg.connect(fire); cr.start(t0); cr.stop(t1 + 0.1);
+    // the mantel clock: tick, tock
+    for (let t = t0 + 0.12, k = 0; t < t1; t += 0.5, k++) { const R = this._rel(fireAt.x, fireAt.z, t, 2); S.tone(t, 0.02, k % 2 ? 2100 : 2500, 0.006 * R.gain, cl(R.pan), bus, 'sine', 0.006, 0.015); S.click(t, 0.005 * R.gain, cl(R.pan), bus); }
+    // mother's knitting needles
+    for (let t = t0 + 0.05; t < 71.0; t += 0.16 + 0.05 * Math.sin(t * 7)) { const R = this._rel(1.62, 198.42, t, 1.5); S.click(t, 0.004 * R.gain, cl(R.pan), bus); }
+    // grandfather talking (quietly at first, then telling the story); the children's 'ooh' and giggles
+    { const R = this._rel(gpa.x, gpa.z, 69, 2.5); this._murmur(S, 67.9, 73.3, 120, 0.01 * R.gain + 0.004, cl(R.pan), bus); }
+    this._murmur(S, 73.45, 80.3, 128, 0.013, 0, bus);
+    S.voice(75.55, 380, 0.5, 'u', 0.012, -0.3, bus, 1.25); S.voice(75.6, 430, 0.45, 'o', 0.01, 0.3, bus, 1.2);
+    S.laugh(77.4, 0.014, 0.25, bus, 520, 4); S.laugh(77.7, 0.012, -0.25, bus, 480, 3);
+    S.voice(78.95, 400, 0.6, 'a', 0.013, 0.2, bus, 1.3); S.voice(79.0, 460, 0.55, 'o', 0.011, -0.2, bus, 1.25);
+    // checkers: pick up, two hops (clack, clack), your friend's groan
+    S.click(71.32, 0.03, 0.1, bus);
+    const J = P.jump;
+    for (const tj of J.t) { const tl = tj + J.hop; S.clunk(tl, 0.035, 0.05, bus); S.click(tl, 0.04, 0.05, bus); S.tone(tl, 0.05, 1500, 0.01, 0.05, bus, 'sine', 0.006, 0.04); }
+    S.voice(71.66, 330, 0.4, 'o', 0.02, -0.05, bus, 0.7); S.laugh(72.0, 0.012, 0.0, bus, 560, 3);
+    // the book: a page lifted and turned
+    this._rustle(S, 72.55, 0.42, 0.03, 0.05, bus, 3600); this._whoosh(S, 72.6, 0.4, 0.012, 0.05, bus, 900, 2600);
+    this._rustle(S, 72.98, 0.08, 0.035, -0.05, bus, 2600);
+    // music: a gentle music-box tune over a soft string pad (G – Em – C – D), then the story theme swelling to the castle; cut dead at the phone
+    const pad = (ta, tb, freqs, vol, cut = 1400) => {
+      for (const f of freqs) for (const d of [-5, 5]) {
+        const o = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', cut, 0.5);
+        o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = d;
+        g.gain.setValueAtTime(0.0001, ta); g.gain.linearRampToValueAtTime(vol, ta + 0.6); g.gain.setValueAtTime(vol, tb - 0.5); g.gain.linearRampToValueAtTime(0.0001, tb);
+        o.connect(lp); lp.connect(g); g.connect(mus); g.connect(musRev); o.start(ta); o.stop(tb + 0.05);
+      }
+    };
+    const prog = [[98, 196, 246.9, 293.7], [82.4, 164.8, 246.9, 329.6], [65.4, 130.8, 196, 261.6], [73.4, 146.8, 220, 293.7]];
+    for (let k = 0; k < 4; k++) { const ta = 68.6 + k * 1.5; pad(ta, ta + 1.6, prog[k], 0.0022); }
+    const box = [[68.75, 587.3], [69.05, 784], [69.35, 740], [69.65, 659.3], [70.1, 587.3], [70.4, 493.9], [70.7, 523.3], [71.0, 493.9], [71.6, 440], [71.9, 493.9], [72.2, 587.3], [72.6, 659.3], [73.1, 587.3], [73.5, 493.9]];
+    for (const [t, f] of box) { S.pluck(t, f * 2, 0.022, 0.2, musRev, 1.6, 0.85); S.pluck(t, f * 2, 0.016, 0.2, mus, 1.6, 0.85); }
+    // the story: deeper pad, a warm flute line, a harp flourish as each picture appears, a full chord for the castle
+    const story = [[74.6, 76.4, [98, 196, 293.7, 392]], [76.4, 77.9, [82.4, 164.8, 246.9, 392]], [77.9, 78.7, [65.4, 130.8, 261.6, 329.6]], [78.7, 80.45, [73.4, 146.8, 293.7, 370, 440]]];
+    for (const [ta, tb, f] of story) pad(ta, tb + 0.1, f, 0.0032, 1700);
+    const mel = [[74.9, 587.3, 0.6], [75.55, 784, 0.9], [76.5, 740, 0.45], [77.0, 659.3, 0.9], [78.0, 587.3, 0.6], [78.7, 880, 1.6]];
+    for (const [t, f, d] of mel) {
+      const o = ctx.createOscillator(), g = ctx.createGain(), vib = ctx.createOscillator(), vg = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f; vib.frequency.value = 5; vg.gain.value = f * 0.005; vib.connect(vg); vg.connect(o.frequency);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.014, t + 0.1); g.gain.setValueAtTime(0.013, t + d * 0.8); g.gain.linearRampToValueAtTime(0, t + d + 0.12);
+      o.connect(g); g.connect(mus); g.connect(musRev); o.start(t); o.stop(t + d + 0.2); vib.start(t); vib.stop(t + d + 0.2);
+    }
+    for (const [t, root] of [[75.3, 293.7], [77.1, 329.6], [78.7, 293.7]]) [1, 1.26, 1.5, 2, 2.52, 3].forEach((m, k) => S.pluck(t + k * 0.06, root * m, 0.035, -0.4 + k * 0.16, musRev, 2.2, 0.6));
+    for (let k = 0; k < 10; k++) S.tone(78.7 + k * 0.07, 0.25, 55, 0.02 * (k / 10), 0, mus, 'sine', 0.006, 0.2);   // a soft timpani roll into the castle
+    S.tone(79.45, 1.2, 73.4, 0.05, 0, mus, 'sine', 0.008, 1.0);
+  }
+
+  /* back in the bedroom (80.4–88.4): the buzz, the hum, laughter outside, the phone put down, the door; then one warm note */
+  _return(S, bus, rev, endBus, endRev) {
+    const ctx = S.ctx;
+    // the phone buzzing against the duvet: a muffled motor rattle, twice
+    for (const [ta, tb] of [[80.42, 80.62], [80.72, 80.92]]) {
+      const o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = S.filter('lowpass', 700, 0.8), g = ctx.createGain();
+      o.type = 'sawtooth'; o.frequency.value = 168; o2.type = 'square'; o2.frequency.value = 336.5;
+      g.gain.setValueAtTime(0, ta); g.gain.linearRampToValueAtTime(0.07, ta + 0.012); g.gain.setValueAtTime(0.07, tb - 0.015); g.gain.linearRampToValueAtTime(0, tb);
+      const g2 = ctx.createGain(); g2.gain.value = 0.25; o2.connect(g2); g2.connect(lp);
+      o.connect(lp); lp.connect(g); g.connect(S.panned(bus, 0.25)); o.start(ta); o.stop(tb + 0.02); o2.start(ta); o2.stop(tb + 0.02);
+    }
+    // the room at night: a low hum, a faint fridge-like tone somewhere in the house, crickets through the window
+    const hum = S.noise('pink', 80.4, 88.45), hl = S.filter('lowpass', 220, 0.5), hg = ctx.createGain(); hg.gain.value = 0.028; hum.connect(hl); hl.connect(hg); hg.connect(bus);
+    S.tone(80.4, 8.0, 100, 0.0025, -0.2, bus, 'sine', 0.006, 0.05);
+    for (let t = 80.5; t < 88.3; t += 0.12) if (S.rng.chance(0.5)) S.tone(t, 0.03, 4300 + S.rng.range(-100, 100), 0.0018, -0.5, bus, 'sine', 0.006, 0.02);
+    // picking it up: the duvet, a little click; the swipes
+    this._rustle(S, 81.25, 0.25, 0.02, 0.2, bus, 1400); S.click(81.36, 0.012, 0.15, bus);
+    for (const t of [81.9, 82.35]) this._whoosh(S, t, 0.2, 0.006, 0.1, bus, 1800, 3600);
+    // outside: children laughing and running past, muffled by the glass and the curtain
+    const glass = ctx.createGain(), gl = S.filter('lowpass', 750, 0.7); glass.connect(gl); gl.connect(bus); gl.connect(rev);
+    glass.gain.setValueAtTime(0.0001, 82.0); glass.gain.linearRampToValueAtTime(1, 82.5); glass.gain.setValueAtTime(1, 84.4); glass.gain.linearRampToValueAtTime(0.25, 85.4);
+    S.laugh(82.25, 0.05, -0.35, glass, 520, 5); S.chatter(82.4, 85.2, 0.035, -0.3, glass, 470, 6); S.laugh(83.0, 0.045, -0.1, glass, 600, 4); S.voice(83.5, 720, 0.4, 'i', 0.04, 0.1, glass, 1.1); S.laugh(84.0, 0.04, 0.2, glass, 480, 5);
+    for (let t = 82.55; t < 84.8; t += 0.16) S.step(t, 0.05, -0.2 + (t - 82.55) * 0.2, glass);
+    const hoop = S.noise('brown', 82.5, 84.0), hpl = S.filter('lowpass', 300, 0.7), hpg = ctx.createGain(); S.env(hpg, 82.5, 0.5, 0.05, 1.0); hoop.connect(hpl); hpl.connect(hpg); hpg.connect(glass);
+    // the phone goes down on its face: a soft thunk into the duvet
+    S.thump(85.7, 0.09, bus); this._rustle(S, 85.68, 0.15, 0.015, 0.1, bus, 1200);
+    // the light round the door: a faint warm air, and the past behind it — birds, a far laugh — growing as you go to it
+    const past = ctx.createGain(), pl = S.filter('lowpass', 600, 0.6); past.connect(pl); pl.connect(bus);
+    past.gain.setValueAtTime(0.0001, 85.6); past.gain.linearRampToValueAtTime(0.6, 87.0); past.gain.linearRampToValueAtTime(1.0, 87.5);
+    pl.frequency.setValueAtTime(600, 87.45); pl.frequency.exponentialRampToValueAtTime(7000, 88.2);
+    for (let t = 85.8; t < 88.4; t += S.rng.range(0.15, 0.4)) S.chirp(t, S.rng.range(2600, 4400), S.rng.range(0.01, 0.02), S.rng.range(-0.5, 0.5), past, false);
+    S.chatter(86.2, 88.4, 0.025, -0.1, past, 450, 4); S.laugh(87.2, 0.04, 0.0, past, 520, 4);
+    const air = S.noise('pink', 85.6, 88.45), ab = S.filter('bandpass', 600, 0.7), ag = ctx.createGain();
+    ab.frequency.setValueAtTime(500, 87.45); ab.frequency.exponentialRampToValueAtTime(3000, 88.3);
+    ag.gain.setValueAtTime(0.0001, 85.6); ag.gain.linearRampToValueAtTime(0.012, 87.0); ag.gain.linearRampToValueAtTime(0.06, 88.3);
+    air.connect(ab); ab.connect(ag); ag.connect(bus);
+    // stand (the bed creaks), two quick steps, the latch, the hinge
+    { const n = S.noise('pink', 86.4, 86.8), bp = S.filter('bandpass', 300, 3), g = ctx.createGain(); bp.frequency.setValueAtTime(260, 86.4); bp.frequency.linearRampToValueAtTime(520, 86.75); S.env(g, 86.4, 0.05, 0.05, 0.3); n.connect(bp); bp.connect(g); g.connect(bus); }
+    for (const t of [86.95, 87.25]) { S.step(t, 0.05, 0, bus); S.tone(t, 0.09, 120, 0.02, 0, rev, 'sine', 0.006, 0.07); }
+    S.click(87.46, 0.07, 0.1, bus); S.clunk(87.48, 0.05, 0.1, bus);
+    { const o = ctx.createOscillator(), hb = S.filter('bandpass', 1300, 5), g = ctx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(720, 87.52); o.frequency.linearRampToValueAtTime(560, 88.1);
+      g.gain.setValueAtTime(0, 87.52); g.gain.linearRampToValueAtTime(0.01, 87.6); g.gain.setValueAtTime(0.01, 88.0); g.gain.linearRampToValueAtTime(0, 88.3); o.connect(hb); hb.connect(g); g.connect(bus); g.connect(rev); o.start(87.52); o.stop(88.35); }
+    // black. a breath of silence, then one warm chord
+    for (const [f, v] of [[196, 0.05], [246.9, 0.035], [293.7, 0.035], [392, 0.03]]) { S.pluck(88.95, f, v, 0, endBus, 2.6, 0.45); S.pluck(88.95, f, v * 0.8, 0, endRev, 2.6, 0.45); }
+    for (const f of [98, 196, 293.7]) S.tone(88.95, 1.5, f, 0.012, 0, endRev, 'sine', 0.3, 1.0);
   }
 
   /* music for the meadow (big, open, uplifting) and the castle (heroic) */
@@ -371,13 +502,13 @@ class BeforeScreensAudio extends AudioEngine {
 
   /* the past outside: air, birds, a distant cart, a church bell, a playground of voices */
   _outside(S, bus, rev) {
-    const ctx = S.ctx, t0 = 6.0, end = CONFIG.duration + 1;
+    const ctx = S.ctx, t0 = 6.0, end = Math.min(CONFIG.duration + 1, 67.62);     // (outdoors ends at the cut into the parlour)
     const air = S.noise('pink', t0, end), ab = S.filter('bandpass', 700, 0.4), ag = ctx.createGain();
     ag.gain.setValueAtTime(0.0001, t0); ag.gain.linearRampToValueAtTime(0.026, 6.9);
-    for (let t = 7; t < end; t += 1.3) ag.gain.linearRampToValueAtTime(0.02 + 0.012 * (noise1(t * 0.4, 5) * 0.5 + 0.5), t);
+    for (let t = 7; t < end - 0.1; t += 1.3) ag.gain.linearRampToValueAtTime(0.02 + 0.012 * (noise1(t * 0.4, 5) * 0.5 + 0.5), t);
     air.connect(ab); ab.connect(ag); ag.connect(bus);
     // birds: scattered chirps and two-note songs
-    for (let t = 6.3; t < end; t += S.rng.range(0.15, 0.6)) {
+    for (let t = 6.3; t < Math.min(end, 66.0); t += S.rng.range(0.15, 0.6)) {
       const pan = S.rng.range(-0.9, 0.9), f = S.rng.range(2600, 4600), v = S.rng.range(0.005, 0.014);
       S.chirp(t, f, v, pan, bus, false);
       if (S.rng.chance(0.35)) S.chirp(t + 0.11, f * 1.18, v * 0.8, pan, bus, false);
@@ -398,6 +529,8 @@ class BeforeScreensAudio extends AudioEngine {
     const duck = [[34.8, 1], [34.86, 0.35], [42.38, 0.35], [42.42, 0.9], [44.9, 0.9], [45.3, 0.12], [46.0, 0.12], [46.3, 0.3], [50.58, 0.3], [50.62, 1.0]];
     for (const g of [far.gain, cart.gain]) for (const [t, v] of duck) g.linearRampToValueAtTime(v * (g === cart.gain ? 0.5 : 1), t);
     for (const [t, v] of duck) ag.gain.linearRampToValueAtTime(0.024 * (v < 0.5 ? v * 1.5 : 1), t);
+    // the cut indoors: everything outside stops at once (a 20 ms ramp, no click)
+    for (const g of [ag.gain, far.gain, cart.gain]) { g.linearRampToValueAtTime(g === ag.gain ? 0.024 : g === cart.gain ? 0.5 : 1, 67.58); g.linearRampToValueAtTime(0.0001, 67.6); }
   }
 
   /* the children: footsteps from their paths, hoops, the ball game, the rope, calls */
@@ -408,7 +541,7 @@ class BeforeScreensAudio extends AudioEngine {
       const runner = (k.states || []).some((s) => /run|carry/i.test(s[1]));
       if (!runner) continue;
       let prev = null, prevDist = null;
-      for (let t = 5.8; t < CONFIG.duration; t += 1 / 120) {
+      for (let t = 5.8; t < Math.min(CONFIG.duration, 67.6); t += 1 / 120) {
         if (!k.shown(t)) { prev = null; continue; }
         const L = k.locate(t);
         const jump = prevDist !== null && L.dist - prevDist > 0.5; prevDist = L.dist;
@@ -422,11 +555,13 @@ class BeforeScreensAudio extends AudioEngine {
       }
       // hoops: a soft rolling rumble and the stick's taps
       if (k.spec.hoop) {
-        const n = S.noise('brown', 6.0, CONFIG.duration), lp = S.filter('lowpass', 320, 0.7), g = ctx.createGain(), p = ctx.createStereoPanner();
+        const hEnd = Math.min(CONFIG.duration, 67.6);
+        const n = S.noise('brown', 6.0, hEnd), lp = S.filter('lowpass', 320, 0.7), g = ctx.createGain(), p = ctx.createStereoPanner();
         n.connect(lp); lp.connect(g); g.connect(p); p.connect(bus);
-        const pts = this._spatial((t) => { const L = k.locate(t); return { x: L.x, z: L.z }; }, 6.0, CONFIG.duration, 1 / 15, 3);
+        const pts = this._spatial((t) => { const L = k.locate(t); return { x: L.x, z: L.z }; }, 6.0, hEnd - 0.05, 1 / 15, 3);
         this._applySpatial(pts, g.gain, p.pan, [], 0.05);
-        for (let t = 6.1; t < CONFIG.duration; t += 0.24 + 0.05 * Math.sin(t * 3)) { const L = k.locate(t), R = this._rel(L.x, L.z, t, 3); S.click(t, 0.02 * R.gain, R.pan, bus); }
+        g.gain.linearRampToValueAtTime(0.00001, hEnd);
+        for (let t = 6.1; t < hEnd; t += 0.24 + 0.05 * Math.sin(t * 3)) { const L = k.locate(t), R = this._rel(L.x, L.z, t, 3); S.click(t, 0.02 * R.gain, R.pan, bus); }
       }
     }
     // the runner's laugh as he rushes past, a shout and a shriek in the game of tag, a laugh after
@@ -448,7 +583,7 @@ class BeforeScreensAudio extends AudioEngine {
     const rope = this.kids.byId.rope;
     if (rope) for (let k = 0; ; k++) {
       const t = (k + 0.5) * 0.52 - rope.seed;
-      if (t > CONFIG.duration) break;
+      if (t > Math.min(CONFIG.duration, 15.0)) break;      // (her skipping rope belongs to the street race)
       if (t < 6.0) continue;
       const L = rope.locate(t), R = this._rel(L.x, L.z, t, 4);
       S.click(t, 0.04 * R.gain, R.pan, bus); S.tone(t, 0.04, 260, 0.012 * R.gain, R.pan, bus, 'sine', 0.002, 0.03);
@@ -510,7 +645,8 @@ class BeforeScreensAudio extends AudioEngine {
       const o = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', 2400, 0.4);
       o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = S.rng.range(-6, 6);
       g.gain.setValueAtTime(0.0001, 32.8); g.gain.exponentialRampToValueAtTime(0.006, 33.4); g.gain.setValueAtTime(0.006, 34.4); g.gain.exponentialRampToValueAtTime(0.002, 35.5);
-      o.connect(lp); lp.connect(g); g.connect(mus); g.connect(rev); o.start(32.8); o.stop(CONFIG.duration + 1);
+      g.gain.setValueAtTime(0.002, 66.6); g.gain.linearRampToValueAtTime(0.0001, 67.6);
+      o.connect(lp); lp.connect(g); g.connect(mus); g.connect(rev); o.start(32.8); o.stop(Math.min(CONFIG.duration + 1, 67.7));
     }
     [293.7, 370, 440, 587.3, 740, 880, 1174.7].forEach((f, k) => S.pluck(32.86 + k * 0.05, f, 0.05, -0.4 + k * 0.13, rev, 2.4, 0.6));
     S.pluck(32.86, 73.4, 0.12, 0, mus, 2.5, 0.25);

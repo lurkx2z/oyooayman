@@ -12,7 +12,7 @@
    ===================================================================== */
 
 // film-wide settings on top of the shared defaults (js/config.js)
-CONFIG.duration = 67.6;                 // phases A–D built; grows to 90 s when E is built.
+CONFIG.duration = 90;
 CONFIG.seed = 19050611;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.3,       // a ~10-year-old's eye height
@@ -35,6 +35,8 @@ const BS = {
 
 // a child's whole performance from scenes: [from, to, { path | at, act | states, face, y, seat, stride }]
 // → one path (with instant moves between scenes), states, and per-scene facing, height, seat and visibility
+const PARLOUR_SEAT = { x: 2.0, z: 199.95 };   // (the parlour itself: films/before-screens/parlour.js)
+
 function perf(id, look, scenes, extra = {}) {
   const path = [], states = [], faces = [], ys = [], seats = [], show = [], strides = [];
   let stride = 1.32;
@@ -94,21 +96,33 @@ const SCRIPT = {
     { id: 'chase', time: 60.8, label: 'Everyone runs: PLAYERS 12' },
     { id: 'sunset', time: 62.6, label: 'The sun goes down' },
     { id: 'lamplighter', time: 65.55, label: 'The lamplighter' },
-    { id: 'parlour', time: 67.6, label: '(phase E: stories at night)' },
+    { id: 'parlour', time: 67.6, label: 'Match cut: an oil lamp at home' },
+    { id: 'family', time: 68.6, label: 'The parlour: fire, family, a story' },
+    { id: 'checkers', time: 71.0, label: 'Checkers: a double jump' },
+    { id: 'book', time: 72.2, label: 'A picture book' },
+    { id: 'story', time: 73.4, label: 'Grandfather starts a story' },
+    { id: 'shadows', time: 74.6, label: 'Shadow worlds: bird, ship, dragon, castle' },
+    { id: 'return', time: 80.4, label: 'Hard cut: the phone buzzes (night)' },
+    { id: 'pickup', time: 81.3, label: 'Pick it up: 47 notifications' },
+    { id: 'outside', time: 82.6, label: 'Laughter outside: shadows on the curtain' },
+    { id: 'facedown', time: 85.7, label: 'Phone face-down' },
+    { id: 'door2', time: 86.4, label: 'Stand, open the door into the light' },
+    { id: 'end', time: 88.4, label: 'Sometimes boredom became the game.' },
   ],
 
   // keyframed story tracks (linear unless an ease is given)
   tracks: {
     // 0 = the modern room's look, 1 = the sunlit past
-    day: [[0, 0], [6.35, 0], [6.4, 1, 'step']],
+    day: [[0, 0], [6.35, 0], [6.4, 1, 'step'], [80.4, 0, 'step']],
     phoneLight: [[0, 1], [1.95, 1], [2.12, 0]],
     // warm white flood when the door opens, then the eyes adjust
-    flash: [[0, 0], [5.95, 0], [6.45, 0.96, 'inQuad'], [6.75, 0.96], [7.9, 0, 'outQuad']],
+    flash: [[0, 0], [5.95, 0], [6.45, 0.96, 'inQuad'], [6.75, 0.96], [7.9, 0, 'outQuad'], [87.8, 0], [88.32, 0.97, 'inQuad'], [88.4, 0.97], [88.41, 0, 'step']],
+    black: [[0, 0], [88.4, 0], [88.41, 1, 'step']],
     adapt: [[0, 0], [6.4, 0], [6.5, 1, 'step'], [9.0, 0, 'outQuad']],
     // door swing (0 closed → 1 fully open, ~100°)
-    door: [[0, 0], [5.95, 0], [6.15, 0.18, 'inQuad'], [6.9, 1, 'outCubic']],
+    door: [[0, 0], [5.95, 0], [6.15, 0.18, 'inQuad'], [6.9, 1, 'outCubic'], [80.4, 0, 'step'], [87.45, 0], [87.65, 0.2, 'inQuad'], [88.45, 1, 'outCubic']],
     // daylight leaking round the closed door (it brightens as you look at it)
-    leak: [[0, 0.5], [3.2, 0.5], [4.3, 1.0], [5.95, 1.0], [6.3, 0]],
+    leak: [[0, 0.5], [3.2, 0.5], [4.3, 1.0], [5.95, 1.0], [6.3, 0], [85.55, 0], [86.5, 0.85], [87.7, 1.0]],
     // imagination: the colour wash, the castle rising, knight gear, the blade growing; all snap off at the smash cut
     wash: [[0, 0], [45.95, 0], [46.35, 1], [50.58, 1], [50.6, 0, 'step']],
     castle: [[0, 0], [46.05, 0], [47.4, 1, 'linear'], [50.58, 1], [50.6, 0, 'step']],
@@ -131,34 +145,45 @@ const SCRIPT = {
       // C: meadow run west · turn to the kite · back in the street with a stick · the duel
       [34.86, -34.6, 'step'], [35.3, -34.7], [37.0, -37.6, 'inOutSine'], [42.39, -39.4], [42.41, 2.0, 'step'], [48.0, 2.0], [48.2, 2.05], [49.0, 1.95], [53.6, 2.0], [55.0, 2.4],
       // D: the long rope · behind a barrel · hopscotch · catch · the chase · sunset and the lamplighter
-      [56.58, 2.7], [56.6, -6.05, 'step'], [57.2, -5.9], [57.98, -5.92], [58.0, 2.6, 'step'], [59.38, 2.6], [59.4, 2.4, 'step'], [60.8, 2.4], [62.6, 1.8, 'linear'], [63.4, 1.6, 'outQuad'], [67.6, 1.7]],
+      [56.58, 2.7], [56.6, -6.05, 'step'], [57.2, -5.9], [57.98, -5.92], [58.0, 2.6, 'step'], [59.38, 2.6], [59.4, 2.4, 'step'], [60.8, 2.4], [62.6, 1.8, 'linear'], [63.4, 1.6, 'outQuad'], [67.6, 1.7],
+      // E: the lamp · the parlour · checkers · the book · the story and the shadow wall (slow push) · back in the bedroom · the door
+      [67.61, 0.85, 'step'], [68.58, 0.86], [68.6, -0.6, 'step'], [70.98, -0.52], [71.0, -1.3, 'step'], [72.18, -1.3], [72.2, -0.4, 'step'], [74.6, -0.4], [80.38, 0.0],
+      [80.4, BS.seat.x, 'step'], [86.4, BS.seat.x], [86.95, 12.2], [87.45, 10.8, 'linear'], [88.4, 10.45], [90, 10.45]],
     z: [[0, BS.seat.z], [4.6, BS.seat.z], [5.3, 1.4], [6.0, 1.26, 'linear'], [6.9, 1.2, 'linear'], [8.4, 1.15],
       [9.6, 1.05], [12.1, 0.95], [12.6, 0.4, 'inQuad'], [15.0, -8.2, 'linear'],
       [15.01, -9.25, 'step'], [20.34, -9.25], [20.36, -11.55, 'step'], [24.34, -11.6], [24.36, -13.75, 'step'], [26.34, -13.75],
       [26.36, -21.35, 'step'], [27.9, -23.15], [30.84, -23.15], [30.86, -23.22, 'step'], [31.84, -23.22], [31.86, -23.8, 'step'], [32.34, -23.79],
       [32.36, -23.0, 'step'], [32.84, -23.01], [32.86, -23.45, 'step'], [34.84, -23.42],
       [34.86, -23.2, 'step'], [35.3, -23.2], [37.0, -23.5, 'inOutSine'], [42.39, -23.9], [42.41, -30.0, 'step'], [48.0, -30.0], [48.2, -30.25], [49.0, -30.1], [53.6, -30.2], [55.0, -31.4],
-      [56.58, -34.4], [56.6, -54.15, 'step'], [57.98, -54.1], [58.0, -45.1, 'step'], [59.38, -45.2], [59.4, -50.6, 'step'], [60.8, -50.6], [62.6, -57.6, 'linear'], [63.4, -59.2, 'outQuad'], [67.6, -59.4]],
+      [56.58, -34.4], [56.6, -54.15, 'step'], [57.98, -54.1], [58.0, -45.1, 'step'], [59.38, -45.2], [59.4, -50.6, 'step'], [60.8, -50.6], [62.6, -57.6, 'linear'], [63.4, -59.2, 'outQuad'], [67.6, -59.4],
+      [67.61, 200.25, 'step'], [68.58, 200.33], [68.6, 202.0, 'step'], [70.98, 201.95], [71.0, 199.4, 'step'], [72.18, 199.4], [72.2, 199.9, 'step'], [80.38, 199.9],
+      [80.4, BS.seat.z, 'step'], [86.4, BS.seat.z], [86.95, 1.4], [87.45, 1.2, 'linear'], [88.4, 1.12], [90, 1.12]],
     height: [[0, 1.47], [4.6, 1.47], [5.25, 1.85, 'inOutQuad'], [8.45, 1.85], [8.75, 1.7], [9.1, 1.56], [9.45, 1.42], [15.0, 1.42],
       [15.01, 1.36, 'step'], [15.9, 0.66, 'inOutQuad'], [20.34, 0.65], [20.36, 1.42, 'step'], [21.75, 1.36], [22.3, 0.86], [24.34, 0.84],
       [24.36, 1.3, 'step'], [24.9, 0.88], [26.34, 0.88], [26.36, 1.42, 'step'], [30.84, 1.42], [30.86, 1.78, 'step'], [31.84, 1.74],
       [31.86, 1.35, 'step'], [32.34, 1.34], [32.36, 1.25, 'step'], [32.84, 1.24], [32.86, 0.95, 'step'], [34.84, 0.98],
       [34.86, 1.38, 'step'], [42.39, 1.38], [42.41, 0.92, 'step'], [43.2, 0.92], [43.9, 1.42], [47.6, 1.42], [48.2, 1.36], [48.6, 1.42], [55.0, 1.42],
-      [56.58, 1.42], [56.6, 0.86, 'step'], [57.2, 0.92], [57.98, 0.9], [58.0, 1.42, 'step'], [67.6, 1.42]],
+      [56.58, 1.42], [56.6, 0.86, 'step'], [57.2, 0.92], [57.98, 0.9], [58.0, 1.42, 'step'], [67.6, 1.42],
+      [67.61, 0.66, 'step'], [68.58, 0.67], [68.6, 0.85, 'step'], [70.98, 0.85], [71.0, 0.9, 'step'], [72.18, 0.89], [72.2, 0.72, 'step'], [74.6, 0.72], [80.38, 0.8],
+      [80.4, 1.47, 'step'], [86.4, 1.47], [86.95, 1.85, 'inOutQuad'], [90, 1.85]],
     yaw: [[0, 91], [3.3, 91], [4.2, 92], [6.9, 90], [7.5, 82], [8.4, 64], [9.35, 70], [9.6, 76], [9.95, 102], [10.25, 96], [10.85, 38], [11.6, 14], [12.6, 6], [15.0, 2],
       [15.01, 90, 'step'], [17.6, 90], [18.1, 97], [19.4, 92], [20.34, 88], [20.36, 0, 'step'], [24.34, 4], [24.36, 50, 'step'], [26.34, 48],
       [26.36, 92, 'step'], [27.9, 98], [30.84, 96], [30.86, 0, 'step'], [31.84, 2], [31.86, 124, 'step'], [32.34, 125], [32.36, 48, 'step'], [32.84, 48],
       [32.86, 92, 'step'], [34.84, 95],
       [34.86, -88, 'step'], [36.0, -86], [37.5, -84], [40.0, -88], [42.39, -90], [42.41, 0, 'step'], [46.0, 0], [46.6, -24], [47.2, 18], [47.7, 0], [50.6, 0], [53.6, 2], [55.0, 38],
-      [55.6, 46], [56.58, 46], [56.6, 168, 'step'], [57.3, 176], [57.98, 175], [58.0, 0, 'step'], [59.38, 0], [59.4, 12, 'step'], [60.4, 14], [60.8, 6], [62.6, -4], [63.6, 82], [64.4, 84], [65.5, -102], [67.6, -105]],
+      [55.6, 46], [56.58, 46], [56.6, 168, 'step'], [57.3, 176], [57.98, 175], [58.0, 0, 'step'], [59.38, 0], [59.4, 12, 'step'], [60.4, 14], [60.8, 6], [62.6, -4], [63.6, 82], [64.4, 84], [65.5, -102], [67.6, -105],
+      [67.61, 0, 'step'], [68.58, 1], [68.6, -35, 'step'], [70.98, -37], [71.0, 90, 'step'], [72.18, 91], [72.2, -90, 'step'], [74.6, -90], [80.38, -89],
+      [80.4, -30, 'step'], [81.0, -29], [81.4, -27], [81.9, -8], [82.7, -6], [83.5, 30], [84.3, 31], [84.8, -4], [85.0, -6], [85.6, -27], [85.95, -28], [86.55, 88], [86.95, 92], [87.55, 90], [90, 90]],
     pitch: [[0, -27], [2.4, -27], [3.3, -25], [4.25, -2], [5.3, -4], [6.0, -1], [6.9, 1], [8.4, -3], [8.7, -14], [9.4, -9], [9.8, -3], [10.6, -2], [12.6, -4], [14.4, -5], [15.0, -30],
       [15.01, -46, 'step'], [15.9, -58], [17.3, -60], [17.7, -57], [19.3, -56], [20.34, -55], [20.36, -46, 'step'], [21.2, -38], [21.6, -62], [24.34, -62],
       [24.36, -34, 'step'], [24.9, -44], [26.34, -44], [26.36, -4, 'step'], [27.9, -18], [28.4, -34], [30.84, -34], [30.86, -86, 'step'], [31.84, -85],
       [31.86, -39, 'step'], [32.34, -40], [32.36, -43, 'step'], [32.84, -43], [32.86, 20, 'step'], [34.84, 24],
       [34.86, 2, 'step'], [35.3, 4], [36.2, 16], [37.0, 26], [38.5, 38], [40.0, 45], [41.5, 49], [42.39, 50], [42.41, -62, 'step'], [43.2, -55], [43.9, -14], [45.0, -10], [46.0, -8], [46.6, 6], [47.2, 10], [47.7, -2], [50.6, -2], [53.6, -4], [55.0, -6],
-      [56.58, -4], [56.6, -2, 'step'], [57.98, 0], [58.0, -30, 'step'], [59.38, -28], [59.4, -4, 'step'], [60.3, -2], [60.42, -7], [60.8, -6], [62.6, -4], [63.6, 4], [64.4, 6], [65.5, 18], [67.6, 16]],
-    fov: [[0, 62]],
-    startles: [[9.95, 0.5], [17.62, 0.18], [50.62, 0.35], [60.43, 0.3]],     // the boy rushing past; glass on glass; the smash cut
+      [56.58, -4], [56.6, -2, 'step'], [57.98, 0], [58.0, -30, 'step'], [59.38, -28], [59.4, -4, 'step'], [60.3, -2], [60.42, -7], [60.8, -6], [62.6, -4], [63.6, 4], [64.4, 6], [65.5, 18], [67.6, 16],
+      [67.61, 1, 'step'], [68.58, 1], [68.6, -3, 'step'], [70.98, -2], [71.0, -50, 'step'], [72.18, -52], [72.2, -48, 'step'], [73.3, -49], [73.9, 6], [74.6, 7], [77.0, 12], [80.38, 15],
+      [80.4, -38, 'step'], [81.0, -40], [81.4, -38], [81.9, -20], [82.7, -18], [83.5, 9], [84.3, 10], [84.8, -20], [85.0, -22], [85.6, -38], [86.0, -38], [86.55, -6], [86.95, -4], [87.55, -1], [88.4, 1], [90, 1]],
+    fov: [[0, 62], [74.6, 62], [80.38, 52], [80.4, 62, 'step']],     // (the story pulls you in)
+    startles: [[9.95, 0.5], [17.62, 0.18], [50.62, 0.35], [60.43, 0.3], [80.42, 0.28]],     // the boy rushing past; glass on glass; the smash cut
     shakes: [[46.1, 0.3, 0.9], [48.2, 0.7, 0.16], [49.05, 0.55, 0.16], [49.95, 0.4, 0.14]],    // walls rising; the two clashes
     sag: [[0, 0]], roll: [[0, 0], [10.0, 0], [10.3, -2.2], [10.9, 0]],
   },
@@ -174,8 +199,12 @@ const SCRIPT = {
       [46.3, 'swordReady'], [47.75, 'swingBack'], [48.05, 'swingHit'], [48.5, 'swordReady'], [48.85, 'block'], [49.35, 'swordReady'], [49.6, 'swingBack'], [49.85, 'swingHit'], [50.2, 'swordReady'],
       [50.62, 'stickHold', 'step'], [53.8, 'hidden'],
       // D: both hands up for the ball, then hold it
-      [59.42, 'catchReady'], [60.42, 'catchHold'], [60.95, 'hidden']],
-    left: [[0, 'hidden'], [59.42, 'catchReady'], [60.42, 'catchHold'], [60.95, 'hidden']],
+      [59.42, 'catchReady'], [60.42, 'catchHold'], [60.95, 'hidden'],
+      // E: a double jump at checkers; the picture book, a page turned; the phone picked up, then put down on its face; the door again
+      [71.05, 'pinchReady'], [71.3, 'pinch'], [71.95, 'pinchOff'], [72.12, 'hidden'], [72.2, 'bookR'], [72.52, 'bookTurn'], [73.02, 'bookR'], [73.3, 'hidden'],
+      [81.0, 'reachPhone'], [81.3, 'grabPhone'], [81.42, 'phone'], [81.9, 'swipe'], [82.1, 'phone'], [82.35, 'swipe'], [82.55, 'phone'], [82.75, 'lower'], [84.3, 'phone'],
+      [84.95, 'placeDown'], [85.68, 'releasePhone'], [85.95, 'hidden'], [87.0, 'handle'], [87.48, 'push'], [88.4, 'hidden']],
+    left: [[0, 'hidden'], [59.42, 'catchReady'], [60.42, 'catchHold'], [60.95, 'hidden'], [72.2, 'bookL'], [73.3, 'hidden']],
   },
 
   hud: {
@@ -194,7 +223,11 @@ const SCRIPT = {
       { t: 55.3, until: 57.9, text: 'And most games had something else built in…' },
       { t: 59.5, until: 62.1, text: '…other kids.' },
       { t: 64.2, until: 66.9, text: 'When the sun went down…' },
+      { t: 67.85, until: 70.7, text: '…the entertainment changed.' },
+      { t: 75.0, until: 77.7, text: 'A story could build an entire world…' },
+      { t: 78.0, until: 80.3, text: '…without a screen.' },
     ],
+    endLine: { t: 88.75, until: 91, text: 'Sometimes boredom became the game.' },
     readouts: [{ from: 7.6, until: 11.6, label: 'YEAR', value: 'c. 1905', ctx: 'A TOWN STREET' }, { from: 60.9, until: 63.7, label: 'PLAYERS', value: '12', top: 236 }],
   },
 
@@ -278,11 +311,14 @@ const SCRIPT = {
       [0, 15.0, { at: [-6.3, -15.5], face: -56.6, act: 'catchIdle' }],
       [58.0, 59.4, { at: [3.85, -48.6], face: 120, act: 'idle' }],
       [60.8, 62.6, { stride: 1.8, path: [[60.8, -3.6, -49.6], [62.6, -4.2, -56.4]], act: 'run' }],
+      [67.6, 80.4, { at: [0.35, 200.2], face: -95, act: 'listen' }],
     ]),
     perf('catchB', 'braces', [
       [0, 15.0, { at: [-1.6, -18.6], face: 123.4, act: 'catchIdle' }],
       [54.9, 56.7, { at: [0.4, -38.6], face: 90, act: 'turnRope' }],
       [60.8, 62.6, { stride: 2.0, path: [[60.8, 2.0, -52.2], [62.6, 2.6, -59.0]], act: 'run' }],
+      [67.6, 72.2, { at: [-2.22, 199.4], face: -90, states: [[67.6, 'kneelWatch'], [71.62, 'kneelGroan'], [72.05, 'kneelWatch']] }],
+      [72.2, 80.4, { at: [-0.25, 200.95], face: -80, act: 'listen' }],
     ]),
     // the marble game: you can see it from the porch, then you kneel and join it
     perf('marbleA', 'boyStripe', [
@@ -290,6 +326,7 @@ const SCRIPT = {
       [15.0, 20.35, { at: [-4.36, -9.25], face: -90, states: [[15.0, 'kneelWatch'], [19.05, 'kneelShoot'], [19.6, 'kneelWatch'], [19.95, 'kneelGroan'], [20.3, 'kneelWatch']] }],
       [54.9, 56.7, { at: [-3.7, -36.4], face: -150, act: 'cheer' }],
       [60.8, 62.6, { stride: 2.0, path: [[60.8, -0.6, -53.0], [62.6, 0.6, -60.0]], act: 'run' }],
+      [67.6, 80.4, { at: [0.3, 199.62], face: -90, act: 'listen' }],
     ]),
     perf('marbleB', 'girlApron2', [
       [0, 15.0, { at: [-3.55, -10.12], face: 180, act: 'kneelWatch' }],
@@ -298,15 +335,17 @@ const SCRIPT = {
       [56.6, 58.0, { at: [-7.15, -53.4], face: -175, act: 'hide' }],
     ]),
     // jump rope on the far sidewalk; two girls on a bench with a doll; chores: a boy with a bucket
-    perf('rope', 'girlRope', [[0, 15.0, { at: [-6.3, -2.6], face: -90, act: 'jumpRope' }]]),
+    perf('rope', 'girlRope', [[0, 15.0, { at: [-6.3, -2.6], face: -90, act: 'jumpRope' }], [67.6, 80.4, { at: [-0.75, 200.6], face: -70, act: 'listen' }]]),
     perf('step1', 'girlStep1', [[0, 15.0, { at: [-7.12, 5.0], y: 0.12, seat: 0.6, face: -96, act: 'sitStep' }]]),
     perf('step2', 'girlStep2', [[0, 15.0, { at: [-7.12, 5.75], y: 0.12, seat: 0.62, face: -82, act: 'sitStep' }]]),
     perf('bucket', 'boyChores', [[0, 15.0, { stride: 1.15, path: [[0, -6.4, -26.0], [5.6, -6.4, -24.0], [15.0, -6.5, -12.5]], act: 'carry' }]]),
     // grown-ups: a woman hanging washing in a side yard, an old man on a bench watching it all
-    perf('mother', 'mother', [[0, 90, { at: [-13.1, -13.6], face: -90, act: 'hangWash' }]]),
+    perf('mother', 'mother', [[0, 67.6, { at: [-13.1, -13.6], face: -90, act: 'hangWash' }], [67.6, 80.4, { at: [1.62, 198.42], face: 135, seat: 0.46, act: 'knit' }]]),
     perf('neighbour', 'neighbour', [[62.4, 67.6, { at: [8.6, -64.4], y: 0.55, face: 95, states: [[62.4, 'idle'], [63.0, 'callWave']] }]]),
     perf('lamplighter', 'lamplighter', [[62.0, 67.6, { stride: 1.4, path: [[62.0, 6.4, -51.8], [64.3, 6.2, -57.6], [67.6, 6.2, -57.6]], states: [[62.0, 'walk'], [64.3, 'idle'], [64.6, 'lampLight']] }]]),
-    perf('oldman', 'oldMan', [[0, 90, { at: [-7.12, -20.6], y: 0.12, seat: 0.44, face: -90, act: 'sitBench' }]]),
+    perf('oldman', 'oldMan', [[0, 67.6, { at: [-7.12, -20.6], y: 0.12, seat: 0.44, face: -90, act: 'sitBench' }]]),
+    // at home in the evening: grandfather in his armchair by the lamp
+    perf('grandpa', 'grandpa', [[67.6, 80.4, { at: [PARLOUR_SEAT.x, PARLOUR_SEAT.z], face: 90, seat: 0.48, states: [[67.6, 'storyTell'], [73.95, 'shadowPlay']] }]]),
   ],
 
   // ball throws: [t0, from, to, flight seconds]

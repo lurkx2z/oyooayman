@@ -19,6 +19,7 @@ const BS_HAND_POSES = {
   // the door lever: palm down over the handle, then a push
   handle: { p: [0.07, -0.3, -0.42], F: [-0.25, -0.12, -1], N: [0.05, -1, -0.15], curl: [0.95, 1.0, 1.0, 1.05], thumb: [0.55, 0.65] },
   push:   { p: [0.06, -0.27, -0.6], F: [-0.25, -0.1, -1], N: [0.05, -1, -0.15], curl: [0.85, 0.9, 0.95, 1.0], thumb: [0.55, 0.6] },
+  pull:   { p: [0.09, -0.31, -0.3], F: [-0.25, -0.12, -1], N: [0.05, -1, -0.15], curl: [0.95, 1.0, 1.0, 1.05], thumb: [0.55, 0.65] },
 };
 Object.assign(BS_HAND_POSES, {
   // marbles: kneeling, knuckles on the dirt behind your shooter, thumb cocked behind the index finger → flick
@@ -48,8 +49,36 @@ Object.assign(BS_HAND_POSES, {
   catchReady: { p: [0.11, -0.13, -0.42], F: [-0.1, 1, 0.15], N: [-0.25, 0.05, -1], curl: [0.25, 0.25, 0.3, 0.35], thumb: [0.9, 0.1] },
   catchHold:  { p: [0.075, -0.17, -0.38], F: [-0.35, 0.9, 0.1], N: [-0.8, 0.1, -0.5], curl: [0.65, 0.7, 0.75, 0.8], thumb: [0.7, 0.4] },
 });
-const BS_HAND_BLEND = { phone: 0.25, swipe: 0.18, tap: 0.1, lower: 0.5, handle: 0.42, push: 0.4, hidden: 0.45, knuckle: 0.45, flick: 0.06, topHold: 0.3, topWind: 0.32, topThrow: 0.14,
-  stringRun: 0.3, stringHold: 0.6, reachDown: 0.4, grab: 0.15, stickHold: 0.45, swordReady: 0.3, swingBack: 0.22, swingHit: 0.1, block: 0.14, catchReady: 0.3, catchHold: 0.08 };
+Object.assign(BS_HAND_POSES, {
+  // checkers: fingers down onto your piece (p is re-aimed every frame at the piece: see aimHand below)
+  pinchReady:   { p: [0.1, -0.2, -0.45], F: [-0.3, 0.5, -0.82], N: [0.05, -0.85, -0.5], curl: [0.35, 1.1, 1.25, 1.3], thumb: [0.95, 0.25], aim: [0.025, 0.13, 0.08] },
+  pinch:        { p: [0.1, -0.2, -0.45], F: [-0.3, 0.5, -0.82], N: [0.05, -0.85, -0.5], curl: [0.85, 1.25, 1.45, 1.5], thumb: [0.7, 0.85], aim: [0.025, 0.13, 0.045] },
+  pinchOff:     { p: [0.1, -0.2, -0.45], F: [-0.3, 0.6, -0.75], N: [0.05, -0.85, -0.5], curl: [0.35, 1.1, 1.25, 1.3], thumb: [0.95, 0.25], aim: [0.025, 0.13, 0.11] },
+  // the picture book: both hands hold the bottom corners (thumbs on the pages); the right turns a page
+  bookL:        { p: [0.155, -0.268, -0.31], F: [-0.4, 0.78, -0.48], N: [0.12, -0.58, -0.81], curl: [0.45, 0.5, 0.55, 0.6], thumb: [0.25, 0.2], aim: [0.0, 0.11, -0.012] },
+  bookR:        { p: [0.155, -0.268, -0.31], F: [-0.4, 0.78, -0.48], N: [0.12, -0.58, -0.81], curl: [0.45, 0.5, 0.55, 0.6], thumb: [0.25, 0.2], aim: [0.0, 0.11, -0.012] },
+  bookTurn:     { p: [0.155, -0.268, -0.31], F: [-0.55, 0.7, -0.45], N: [0.1, -0.5, -0.86], curl: [0.55, 0.6, 0.7, 0.8], thumb: [0.5, 0.5], aim: [0.0, 0.1, 0.0] },
+  // the phone on the bed: reach down, palm over it, grip; later put it down on its face and let go
+  reachPhone:   { p: [0.08, -0.3, -0.4], F: [-0.2, 0.62, -0.76], N: [0.06, -0.77, -0.64], curl: [0.3, 0.32, 0.36, 0.4], thumb: [1.0, 0.2], aim: [0.034, 0.074, 0.075] },
+  grabPhone:    { p: [0.08, -0.3, -0.4], F: [-0.2, 0.62, -0.76], N: [0.06, -0.77, -0.64], curl: [0.75, 0.8, 0.85, 0.9], thumb: [0.6, 0.6], aim: [0.034, 0.074, 0.03] },
+  placeDown:    { p: [0.08, -0.3, -0.4], F: [-0.2, 0.62, -0.76], N: [0.06, -0.77, -0.64], curl: [0.62, 0.68, 0.72, 0.78], thumb: [0.95, 0.42], aim: [0.034, 0.074, 0.03] },
+  releasePhone: { p: [0.08, -0.3, -0.4], F: [-0.2, 0.62, -0.76], N: [0.06, -0.77, -0.64], curl: [0.25, 0.28, 0.3, 0.34], thumb: [1.0, 0.15], aim: [0.034, 0.074, 0.09] },
+});
+// aim a pose so a point in the hand (hand units, before the hand's scale) lands on a world point, seen from the camera now
+const _aim = { y: new THREE.Vector3(), z: new THREE.Vector3(), x: new THREE.Vector3(), c: new THREE.Vector3() };
+function aimHand(name, camera, world, side = 1, scale = 0.84) {
+  const P = BS_HAND_POSES[name], A = _aim;
+  A.y.set(P.F[0], P.F[1], P.F[2]).normalize();
+  A.z.set(P.N[0], P.N[1], P.N[2]); A.z.addScaledVector(A.y, -A.z.dot(A.y)).normalize();
+  A.x.crossVectors(A.y, A.z);
+  A.c.copy(world).applyMatrix4(camera.matrixWorldInverse);
+  A.c.x *= side;                          // the left hand's poses are written as right-hand poses and mirrored
+  const l = P.aim;
+  for (let i = 0; i < 3; i++) P.p[i] = A.c.getComponent(i) - (A.x.getComponent(i) * l[0] + A.y.getComponent(i) * l[1] + A.z.getComponent(i) * l[2]) * scale;
+}
+const BS_HAND_BLEND = { pull: 0.45, phone: 0.25, swipe: 0.18, tap: 0.1, lower: 0.5, handle: 0.42, push: 0.4, hidden: 0.45, knuckle: 0.45, flick: 0.06, topHold: 0.3, topWind: 0.32, topThrow: 0.14,
+  stringRun: 0.3, stringHold: 0.6, reachDown: 0.4, grab: 0.15, stickHold: 0.45, swordReady: 0.3, swingBack: 0.22, swingHit: 0.1, block: 0.14, catchReady: 0.3, catchHold: 0.08,
+  pinchReady: 0.3, pinch: 0.12, pinchOff: 0.15, bookL: 0.01, bookR: 0.01, bookTurn: 0.12, reachPhone: 0.4, grabPhone: 0.1, placeDown: 0.5, releasePhone: 0.18 };
 
 // where the viewer's head and hands are at any moment (for toys that leave your hand mid-shot)
 class POVProbe {
@@ -80,6 +109,9 @@ const FILM = {
     app.workshop = new KiteWorkshop(scene, app.kids, app.hands);
     app.imagination = new ImaginationSet(scene, app.kids, app.hands);
     app.social = new SocialGames(scene, app.kids, app.hands, app.pov, app.town);
+    app.parlour = new Parlour(scene);
+    app.parlour.build();
+    camera.add(app.parlour.book);
     // the shared material rule: matte environment, glossy glass and metal (no city grime in this film)
     const skip = new Set(); camera.traverse((o) => skip.add(o));
     scene.traverse((o) => { if (o.isMesh && !skip.has(o)) for (const m of [].concat(o.material)) if (m && m.isMeshStandardMaterial && !/person/.test(o.parent && o.parent.name || '')) Look.surface(m, false); });
@@ -88,11 +120,23 @@ const FILM = {
   },
 
   update(app, t, tl) {
-    const day = SCRIPT_TRACKS.day.value(t) > 0.5;
+    const day = SCRIPT_TRACKS.day.value(t) > 0.5, parl = t >= PARLOUR.t0 && t < PARLOUR.t1, night = t >= PARLOUR.t1;
+    // hands that must meet things in the world are re-aimed every frame from the camera as it is now
+    app.camera.updateMatrixWorld();
+    app.parlour.poseBook(t);
+    if (t > 70.9 && t < 72.2) { const m = app.parlour.moverAt(t, app.parlour._v); for (const n of ['pinchReady', 'pinch', 'pinchOff']) aimHand(n, app.camera, m); }
+    if (t > 72.1 && t < 73.4) {
+      const B = app.parlour.book; B.updateMatrixWorld(true);
+      aimHand('bookTurn', app.camera, app.parlour.pageCorner(app.parlour._v));
+      aimHand('bookR', app.camera, B.localToWorld(app.parlour._v.set(0.1, -0.064, 0.006)));
+      aimHand('bookL', app.camera, B.localToWorld(app.parlour._v.set(-0.1, -0.064, 0.006)), -1);
+    }
+    if (night) { const bp = app.room.bedPhoneSpot; for (const n of ['reachPhone', 'grabPhone', 'placeDown', 'releasePhone']) aimHand(n, app.camera, bp); }
     app.hands.update(t);
-    app.room.update(t, t < 9.2);
-    app.town.update(t, app.camera, true);
+    app.room.update(t, t < 9.2 || night);
+    app.town.update(t, app.camera, !parl && !night);
     app.town.setTime(SCRIPT_TRACKS.sunT.value(t), app.camera);
+    app.parlour.update(t, app.camera, parl);
     app.social.update(t);
     app.kids.update(t, t > 5.6);
     app.toys.update(t, t > 5.6 && t < 15.2);
@@ -102,15 +146,18 @@ const FILM = {
     app.jacks.update(t, true);
     app.workshop.update(t, t > 25.5 && t < 35);
     app.imagination.update(t, app.camera);
-    // imagination: a golden, dramatic haze
-    const wash = SCRIPT_TRACKS.wash.value(t);
-    if (day) { app.scene.fog.density = MathX.lerp(0.0042, 0.012, wash); app.scene.fog.color.copy(app.town.fogColor).lerp(new THREE.Color('#d6ae76'), wash); }
-    // light: inside the evening room only the lamp, the dusk window and the phone; outside, the sun and the sky
+    // light: inside the evening room only the lamp, the dusk window and the phone; outside, the sun and the sky;
+    // in the parlour the fire and the oil lamp, with a little warm bounce
     app.town.hemi.intensity = day ? (app.town.hemiBase || 0.72) : 0.3;
     app.scene.environmentIntensity = day ? 0.5 : 0.05;
     app.room.lamp.visible = app.room.dusk.visible = !day;
     app.scene.fog.density = day ? 0.0042 : 0.0;
     if (day) app.scene.fog.color.copy(app.town.fogColor);
+    if (parl) {
+      app.scene.fog.density = 0; app.scene.environmentIntensity = 0.03;
+      app.town.hemi.intensity = 0.22; app.town.hemi.color.set('#7a5a44'); app.town.hemi.groundColor.set('#2a1a10');
+    }
+    if (night) { app.town.hemi.intensity = 0.26; app.town.hemi.color.set('#40507a'); app.town.hemi.groundColor.set('#1a1a22'); }
   },
 
   grade(t, p) {
@@ -119,7 +166,14 @@ const FILM = {
     p.flash = Math.max(SCRIPT_TRACKS.flash.value(t), imag);
     p.flashColor.setRGB(1.0, imag > 0.01 ? 0.86 : 0.95, imag > 0.01 ? 0.6 : 0.84);
     p.fade = 0; p.tunnel = 1.2; p.tunnelSoft = 0.5; p.tunnelDark = 0; p.edgeBlur = 0; p.chroma = 0; p.grain = 0.018;
-    if (day < 0.5) {   // evening bedroom: lamp-warm against dusk blue
+    if (t >= PARLOUR.t0 && t < PARLOUR.t1) {   // the parlour: firelight, deep warm shadows; warmest at the story's height
+      const story = MathX.smooth(t, 74.6, 78.5);
+      p.exposure = 1.32 + 0.08 * story; p.saturation = 1.06 + 0.06 * story; p.warmth = 0.06 + 0.06 * story; p.contrast = 1.1; p.soft = 0.1; p.bloom = 0.34; p.vignette = 1.2 + 0.1 * story;
+    } else if (t >= PARLOUR.t1) {             // back in the bedroom, at night: the phone's cold glow; then the warm light round the door
+      const leak = SCRIPT_TRACKS.leak.value(t);
+      p.exposure = 1.75 + 0.15 * leak; p.saturation = 0.96 + 0.1 * leak; p.warmth = -0.05 + 0.12 * leak; p.contrast = 1.08; p.soft = 0.12; p.bloom = 0.3 + 0.1 * leak; p.vignette = 1.25;
+      p.fade = SCRIPT_TRACKS.black.value(t);
+    } else if (day < 0.5) {   // evening bedroom: lamp-warm against dusk blue
       p.exposure = 1.5; p.saturation = 1.04; p.warmth = 0.02; p.contrast = 1.06; p.soft = 0.12; p.bloom = 0.26; p.vignette = 1.1;
     } else {           // the past: warm late-morning sun; the eyes adjust after the doorway's glare
       p.exposure = 0.98 * (1 + 0.8 * adapt); p.saturation = 1.3; p.warmth = 0.1; p.contrast = 1.12; p.soft = 0.08; p.bloom = 0.24; p.vignette = 0.95;
@@ -132,5 +186,5 @@ const FILM = {
     }
   },
 
-  debug(app, t) { const c = app.camera.position; return `room ${t < 9.2 ? 'on' : 'off'} · kids ${app.kids.people.length}`; },
+  debug(app, t) { return `room ${t < 9.2 || t >= PARLOUR.t1 ? 'on' : 'off'} · parlour ${t >= PARLOUR.t0 && t < PARLOUR.t1 ? 'on' : 'off'} · kids ${app.kids.people.length}`; },
 };

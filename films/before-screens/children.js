@@ -36,6 +36,7 @@ Object.assign(LOOKS, {
   mother:       { adult: true, h: 0.96, skin: 0, build: 'woman', top: '#5a6474', bottom: 'longdress', pinafore: '#ece6da', shoes: '#1c1816', hair: '#4a3020', hairStyle: 'bun' },
   neighbour:    { adult: true, h: 0.95, skin: 2, build: 'woman', top: '#7a5a4a', bottom: 'longdress', pinafore: '#e8e2d4', shoes: '#1c1816', hair: '#2a1a12', hairStyle: 'bun' },
   lamplighter:  { adult: true, h: 0.98, skin: 1, build: 'avg', top: '#3a3c40', jacket: '#2e3034', bottom: 'trousers', bottomColor: '#2a2a2e', shoes: '#141210', hair: '#3a2a1e', hairStyle: 'short', hat: { type: 'flat', color: '#2a2a2c' }, pole: true },
+  grandpa:      { adult: true, h: 0.95, skin: 1, build: 'avg', top: '#d8d0bc', vest: '#5a4636', bottom: 'trousers', bottomColor: '#3a3632', shoes: '#1a1612', hair: '#cfcac0', hairStyle: 'short', beard: '#dcd8d0' },
   oldMan:       { adult: true, h: 0.95, skin: 1, build: 'avg', top: '#d4ccba', vest: '#3e3a36', bottom: 'trousers', bottomColor: '#3a3632', shoes: '#1a1612', hair: '#c8c4bc', hairStyle: 'short', beard: '#d8d4cc', hat: { type: 'bowler', color: '#24211e' } },
 });
 
@@ -288,6 +289,37 @@ Object.assign(ACTIONS, {
     return p;
   },
 });
+/* ---- the parlour: a story by the lamp ---- */
+Object.assign(ACTIONS, {
+  storyTell(τ, c) {        // in the armchair, leaning in, hands opening and turning as he talks
+    const p = ACTIONS.sit(τ, c), g = noise1(τ * 1.3, c.seedI), g2 = noise1(τ * 1.6, c.seedI + 3);
+    p.spine = 0.22 + 0.05 * Math.sin(τ * 0.9); p.neck = 0.02;
+    p.lSh = [1.0 + 0.3 * g, 0.28 + 0.12 * g2]; p.rSh = [1.0 + 0.3 * g2, 0.28 + 0.12 * g]; p.lEl = 1.05 + 0.3 * g2; p.rEl = 1.05 + 0.3 * g;
+    p.headYaw = 0.22 * Math.sin(τ * 0.6);
+    return p;
+  },
+  shadowPlay(τ, c) {       // forearms up in front of his face, hands together: the shadow bird on the wall behind him
+    const p = ACTIONS.sit(τ, c), k = MathX.smooth(τ, 0, 0.6), w = Math.sin(τ * 5.2);
+    p.spine = MathX.lerp(0.22, 0.08, k); p.neck = MathX.lerp(0.02, -0.12, k);
+    p.lSh = [MathX.lerp(1.0, 1.45, k), MathX.lerp(0.28, -0.3, k)]; p.rSh = [MathX.lerp(1.0, 1.45, k), MathX.lerp(0.28, -0.3, k)];
+    p.lEl = MathX.lerp(1.05, 1.25, k) + 0.05 * w; p.rEl = MathX.lerp(1.05, 1.25, k) - 0.05 * w;
+    p.headYaw = 0;
+    return p;
+  },
+  knit(τ, c) {             // knitting in her lap, needles ticking
+    const p = ACTIONS.sit(τ, c), k = Math.sin(τ * 6.5);
+    p.spine = 0.25; p.neck = 0.42; p.lSh = [0.72, 0.18]; p.rSh = [0.72, 0.18]; p.lEl = 1.55 + 0.07 * k; p.rEl = 1.55 - 0.07 * k;
+    p.headYaw = 0.1 * noise1(τ * 0.3, c.seedI);
+    return p;
+  },
+  listen(τ, c) {           // sitting on the rug, arms round the knees, looking up at the storyteller
+    const p = ACTIONS.sitCross(τ, c);
+    p.spine = 0.16 + 0.03 * Math.sin(τ * 0.8 + c.seed * 4); p.neck = -0.14; p.lSh = [0.82, 0.12]; p.rSh = [0.82, 0.12]; p.lEl = 1.2; p.rEl = 1.2;
+    p.headYaw = 0.12 * noise1(τ * 0.35, c.seedI);
+    return p;
+  },
+});
+Object.assign(BLEND, { storyTell: 0.5, shadowPlay: 0.4, knit: 0.5, listen: 0.5 });
 Object.assign(BLEND, { run: 0.3, runLaugh: 0.3, hoopRun: 0.3, reach: 0.15, startle: 0.12, catchIdle: 0.4, jumpRope: 0.3, sitStep: 0.6, carry: 0.5, hangWash: 0.6, sitBench: 0.6,
   jumpLong: 0.2, turnRope: 0.3, countTree: 0.4, hide: 0.35, hop: 0.2, wave: 0.3, callWave: 0.4, lampLight: 0.4,
   launch: 0.15, lookUp: 0.5, duelStance: 0.35, duelSwing: 0.08, duelBlock: 0.12, duelLoop: 0.3, knightCheer: 0.25, laughStand: 0.3,

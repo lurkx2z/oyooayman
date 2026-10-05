@@ -5,7 +5,7 @@ Everything is procedural, so there are no models, images or sound files to downl
 
 **Status: the full 90-second film.**
 
-> **Second film in progress: *How did kids have fun before screens?*** Open `before-screens.html` (Phase A, the first 15 s).
+> **Second film: *How did kids have fun before screens?*** Open `before-screens.html` (the full 90 s).
 > It runs on the same shared engine; its plan and shot list are in [`films/before-screens/PLAN.md`](films/before-screens/PLAN.md).
 
 | Time | Beat |
@@ -135,9 +135,14 @@ films/before-screens/PLAN.md        shot list, assets, reuse map, historical che
 films/before-screens/script.js      ★ timings, camera, hands, HUD text, every child's performance
 films/before-screens/film.js        FILM hooks: builds the sets, lighting switch, colour grade, hand poses
 films/before-screens/town.js        the c. 1905 street (houses, porches, fences, trees, lamps, props)
-films/before-screens/modernRoom.js  the evening bedroom, its door, the phone and its screen
+films/before-screens/modernRoom.js  the bedroom (evening and night), its door, the phone, lock screen, curtain shadows
 films/before-screens/children.js    period kids on the shared rig (clothes, child actions, throw/catch)
 films/before-screens/toys.js        hoops, ball, skipping rope, dust from running feet
+films/before-screens/pocket.js      marbles (a small physics sim), the spinning top, jacks
+films/before-screens/kite.js        the kite workshop and the kite in flight
+films/before-screens/fantasy.js     the imagined castle, knights' gear, the stick sword
+films/before-screens/social.js      the long rope, hopscotch, the ball thrown to you, the lamplighter
+films/before-screens/parlour.js     the evening parlour, the picture book, checkers, the shadow-picture wall
 films/before-screens/audio.js       the film's soundtrack
 ```
 

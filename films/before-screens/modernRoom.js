@@ -14,6 +14,7 @@ class ModernRoom {
     this.root.name = 'modernRoom';
     scene.add(this.root);
     this.R = BS.room;
+    this._v = new THREE.Vector3();
   }
 
   build(hands) {
@@ -99,11 +100,18 @@ class ModernRoom {
     add(new THREE.CylinderGeometry(0.008, 0.008, 0.36, 6), lampM, 11.75, y0 + 0.95, R.z0 + 0.3, 0, 0, 0.25);
     add(new THREE.ConeGeometry(0.09, 0.13, 16, 1, true), lampM, 11.71, y0 + 1.12, R.z0 + 0.3, 0, 0, 0.5);
     const bulb = add(new THREE.SphereGeometry(0.03, 8, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.0, 0.78, 0.5).multiplyScalar(4), toneMapped: false }), 11.69, y0 + 1.08, R.z0 + 0.3, 0, 0, 0, false);
+    this.bulbM = bulb.material;
     this.lamp = new THREE.PointLight('#ffb070', 3.2, 7, 1.6); this.lamp.position.set(11.66, y0 + 1.04, R.z0 + 0.33); g.add(this.lamp);
     // window with drawn curtains, dusk blue glowing through
     const winM = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.32, 0.42, 0.62), name: 'duskWindow' });
     add(new THREE.PlaneGeometry(1.2, 1.25), winM, 11.2, y0 + 1.55, R.z0 + 0.012, 0, 0, 0, false);
+    this.winM = winM;
     const curM = std('#3c4a5e', { roughness: 0.95, emissive: '#16233a', side: THREE.DoubleSide, name: 'curtains' });
+    this.curM = curM;
+    // at night (phase E): light from outside glows through the curtains, and children's shadows run across them
+    this.curtainCv = Tex.canvas(320, 320); this.curtainTex = Tex.tex(this.curtainCv, { repeat: false });
+    this.curtainGlow = add(new THREE.PlaneGeometry(1.5, 1.6), new THREE.MeshBasicMaterial({ map: this.curtainTex, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, name: 'curtainGlow' }), 11.2, y0 + 1.5, R.z0 + 0.11, 0, 0, 0, false);
+    this.curtainGlow.renderOrder = 4;
     for (const s of [-1, 1]) {
       const cg = new THREE.PlaneGeometry(0.72, 1.6, 8, 1), cp = cg.attributes.position;
       for (let i = 0; i < cp.count; i++) cp.setZ(i, 0.03 * Math.sin(cp.getX(i) * 26));
@@ -168,13 +176,97 @@ class ModernRoom {
     legs.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     this.legs = legs;
 
-    // ---- the phone, held in the right hand
+    // ---- the phone, held in the right hand; at the end it also lies on the bed (charging, lighting up)
     this._phone(hands);
+    this._bedPhone();
+  }
+
+  _bedPhone() {
+    const bp = new THREE.Group();
+    bp.add(new THREE.Mesh(this.phone.children[0].geometry, this.phone.children[0].material));
+    this.bedScreen = new THREE.Mesh(this.screen.geometry, this.screenOn); this.bedScreen.position.z = 0.0044; bp.add(this.bedScreen);
+    this.bedGlow = new THREE.PointLight('#cfe0ff', 0, 1.1, 1.5); this.bedGlow.position.set(0, 0, 0.1); bp.add(this.bedGlow);
+    bp.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+    this.bedPhoneSpot = new THREE.Vector3(12.72, BS.room.y + 0.535, 0.95);
+    bp.position.copy(this.bedPhoneSpot);
+    bp.rotation.set(-Math.PI / 2, 0, 0.5);
+    bp.visible = false;
+    this.root.add(bp);
+    this.bedPhone = bp;
+  }
+
+  // lock screen at night: big clock, charging, a growing stack of (generic, logo-free) notifications
+  _drawNotif(t) {
+    const c = this.screenCv.getContext('2d'), W = 270, H = 576;
+    const bg = c.createLinearGradient(0, 0, W, H); bg.addColorStop(0, '#1d2a4a'); bg.addColorStop(1, '#3a2048');
+    c.fillStyle = bg; c.fillRect(0, 0, W, H);
+    const gl = c.createRadialGradient(200, 120, 10, 200, 120, 220); gl.addColorStop(0, 'rgba(120,90,200,0.45)'); gl.addColorStop(1, 'rgba(120,90,200,0)'); c.fillStyle = gl; c.fillRect(0, 0, W, H);
+    c.textBaseline = 'middle';
+    // status bar: signal, battery full and charging
+    c.fillStyle = '#f2f2f2'; for (let j = 0; j < 4; j++) c.fillRect(160 + j * 7, 30 - j * 4, 4, 4 + j * 4);
+    c.strokeStyle = '#f2f2f2'; c.lineWidth = 2; c.strokeRect(200, 16, 36, 16); c.fillRect(237, 21, 3, 6);
+    c.fillStyle = '#4cd964'; c.fillRect(202, 18, 32, 12);
+    c.fillStyle = '#ffffff'; c.beginPath(); c.moveTo(220, 17); c.lineTo(212, 25); c.lineTo(218, 25); c.lineTo(215, 31); c.lineTo(224, 22); c.lineTo(218, 22); c.fill();
+    // the time
+    c.textAlign = 'center'; c.fillStyle = '#ffffff'; c.font = '600 66px Inter, Arial, sans-serif'; c.fillText('10:24', W / 2, 112);
+    c.font = '500 16px Inter, Arial, sans-serif'; c.fillStyle = 'rgba(255,255,255,0.85)'; c.fillText('Friday, 14 June', W / 2, 158);
+    // the stack: a new one slides in with each buzz; a thumb flick scrolls through the rest
+    const count = t < 80.42 ? 45 : t < 80.72 ? 46 : 47;
+    const items = [['#34c759', 'Group chat', '12 new messages'], ['#ff3b30', 'Video app', 'Recommended for you'], ['#af52de', 'Game', 'Your energy is full! Come back'],
+      ['#007aff', 'Messages', 'are you online??'], ['#ff9500', 'Shop', 'Flash sale ends tonight'], ['#5856d6', 'Streaming', 'New episode available'],
+      ['#ff2d55', 'Photos', 'You have a new memory'], ['#30b0c7', 'News', '5 stories you missed'], ['#34c759', 'Group chat', '3 new messages'], ['#ffcc00', 'Game', 'Don’t lose your streak']];
+    const scroll = MathX.smooth(t, 81.9, 82.2) * 150 + MathX.smooth(t, 82.35, 82.65) * 150;
+    const slide = (k) => (k === 0 ? MathX.smooth(t, 80.72, 80.9) : 1);
+    c.fillStyle = 'rgba(255,255,255,0.22)'; c.beginPath(); c.roundRect(70, 186 - scroll, 130, 26, 13); c.fill();
+    c.fillStyle = '#ffffff'; c.font = '600 13px Inter, Arial, sans-serif'; c.fillText(`${count} notifications`, W / 2, 199.5 - scroll);
+    c.textAlign = 'left';
+    items.forEach(([col, app, msg], k) => {
+      const y = 224 + k * 70 - scroll - (1 - slide(k)) * 60;
+      if (y > H || y < -70) return;
+      c.globalAlpha = slide(k);
+      c.fillStyle = 'rgba(245,245,250,0.86)'; c.beginPath(); c.roundRect(12, y, 246, 62, 14); c.fill();
+      c.fillStyle = col; c.beginPath(); c.roundRect(22, y + 13, 36, 36, 9); c.fill();
+      c.fillStyle = '#ffffff'; c.beginPath(); c.arc(40, y + 31, 8, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#1c1c1e'; c.font = '600 14px Inter, Arial, sans-serif'; c.fillText(app, 68, y + 22);
+      c.fillStyle = '#3a3a3c'; c.font = '400 13px Inter, Arial, sans-serif'; c.fillText(msg, 68, y + 42);
+      c.fillStyle = '#8e8e93'; c.font = '400 11px Inter, Arial, sans-serif'; c.fillText(k < 2 ? 'now' : `${k * 3}m ago`, 206, y + 22);
+      c.globalAlpha = 1;
+    });
+    this.screenTex.needsUpdate = true;
+  }
+
+  // light through the curtains from outside, and children running past (three shadows, one with a hoop)
+  _drawCurtain(t) {
+    const c = this.curtainCv.getContext('2d'), W = 320, H = 320;
+    c.globalCompositeOperation = 'source-over'; c.filter = 'none';
+    c.fillStyle = '#000'; c.fillRect(0, 0, W, H);
+    const g = c.createRadialGradient(W * 0.62, H * 0.3, 10, W * 0.55, H * 0.45, W * 0.75);
+    g.addColorStop(0, 'rgba(255,196,120,0.95)'); g.addColorStop(0.5, 'rgba(230,150,80,0.5)'); g.addColorStop(1, 'rgba(120,60,30,0.0)');
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+    c.filter = 'blur(3px)'; c.fillStyle = '#000'; c.strokeStyle = '#000'; c.lineCap = 'round';
+    const kid = (x, base, h, ph, skirt, hoop) => {
+      const sw = Math.sin(ph), head = h * 0.16;
+      c.beginPath(); c.arc(x, base - h + head, head, 0, Math.PI * 2); c.fill();
+      c.lineWidth = h * 0.16; c.beginPath(); c.moveTo(x, base - h + head * 2); c.lineTo(x + 2, base - h * 0.45); c.stroke();
+      if (skirt) { c.beginPath(); c.moveTo(x - 2, base - h * 0.62); c.lineTo(x - h * 0.16, base - h * 0.32); c.lineTo(x + h * 0.18, base - h * 0.32); c.fill(); }
+      c.lineWidth = h * 0.07;
+      c.beginPath(); c.moveTo(x + 2, base - h * 0.45); c.lineTo(x + 2 + sw * h * 0.22, base); c.moveTo(x + 2, base - h * 0.45); c.lineTo(x + 2 - sw * h * 0.22, base); c.stroke();
+      c.beginPath(); c.moveTo(x, base - h * 0.74); c.lineTo(x - sw * h * 0.2, base - h * 0.5); c.moveTo(x, base - h * 0.74); c.lineTo(x + sw * h * 0.2, base - h * 0.48); c.stroke();
+      if (hoop) { c.lineWidth = 3; c.beginPath(); c.arc(x + h * 0.42, base - h * 0.22, h * 0.22, 0, Math.PI * 2); c.stroke(); c.beginPath(); c.moveTo(x + sw * h * 0.2, base - h * 0.48); c.lineTo(x + h * 0.36, base - h * 0.3); c.stroke(); }
+    };
+    // they run left to right across the window (as seen from inside)
+    [[82.55, 150, false, true], [82.95, 134, true, false], [83.35, 142, false, false]].forEach(([t0, h, skirt, hoop], i) => {
+      const u = (t - t0) / 1.25;
+      if (u < -0.1 || u > 1.1) return;
+      kid(-60 + u * (W + 120), H - 18 - i * 4, h, (t - t0) * 15 + i, skirt, hoop);
+    });
+    c.filter = 'none';
+    this.curtainTex.needsUpdate = true;
   }
 
   _phone(hands) {
     const ph = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.RoundedBoxGeometry(0.072, 0.152, 0.0085, 3, 0.008), new THREE.MeshStandardMaterial({ color: '#1b1d20', roughness: 0.35, metalness: 0.6, name: 'phoneBody' }));
+    const body = new THREE.Mesh(new THREE.RoundedBoxGeometry(0.072, 0.152, 0.0085, 3, 0.008), new THREE.MeshStandardMaterial({ color: '#4a4e56', roughness: 0.4, metalness: 0.3, name: 'phoneBody' }));
     ph.add(body);
     this.screenCv = Tex.canvas(270, 576);
     this.screenTex = Tex.tex(this.screenCv, { repeat: false });
@@ -251,20 +343,52 @@ class ModernRoom {
   update(t, visible = true) {
     this.root.visible = visible;
     if (!visible) { this.phone.visible = false; return; }
-    const S = SCRIPT_TRACKS;
-    // phone: live screen until it dies, then dead glass
-    const dead = t >= 2.08;
-    this.screen.material = dead ? this.screenOff : this.screenOn;
-    if (!dead) this._drawScreen(t);
-    this.glow.intensity = 0.16 * S.phoneLight.value(t);
-    this.phone.visible = t < 4.3;
+    const S = SCRIPT_TRACKS, E = t >= PARLOUR.t1;
+    const leak = S.leak.value(t);
     // door
     const open = S.door.value(t);
-    this.doorHinge.rotation.y = -open * MathX.deg(100);
-    const leak = S.leak.value(t);
+    this.doorHinge.rotation.y = open * MathX.deg(100);      // swings outward, away from you
     this.leak.mat.color.setRGB(1.0, 0.86, 0.62).multiplyScalar(3.2 * leak + 0.01);
     this.leak.spill.material.opacity = 0.32 * leak;
     this.legs.visible = false;   // (the lap reads as dark blobs at this angle; the phone is held up instead)
-    this.lamp.intensity = 3.2; this.dusk.intensity = 0.9;
+    if (!E) {
+      // phone: live screen until it dies, then dead glass
+      const dead = t >= 2.08;
+      this.screen.material = dead ? this.screenOff : this.screenOn;
+      if (!dead) this._drawScreen(t);
+      this.glow.intensity = 0.16 * S.phoneLight.value(t);
+      this.phone.visible = t < 4.3;
+      this.bedPhone.visible = false; this.bedGlow.intensity = 0; this.curtainGlow.material.opacity = 0;
+      this.lamp.intensity = 3.2; this.dusk.intensity = 0.9;
+      // (restore the evening look, in case we scrubbed back from the end)
+      this.bulbM.color.setRGB(1.0, 0.78, 0.5).multiplyScalar(4); this.winM.color.setRGB(0.32, 0.42, 0.62); this.curM.emissive.set('#16233a');
+      this.leak.panel.position.x = BS.room.x0 - 0.12; this.leak.panel.scale.set(1, 1, 1);
+      return;
+    }
+    // ---- the end: the same room at night, lamp off; the phone lights up on the bed
+    this.lamp.intensity = 0; this.bulbM.color.setRGB(0.12, 0.1, 0.08);
+    this.dusk.intensity = 0.9; this.winM.color.setRGB(0.12, 0.16, 0.27); this.curM.emissive.set('#0c1424');
+    const grab = 81.38, down = 85.7;
+    const held = t >= grab && t < down;
+    this.phone.visible = held;
+    this.bedPhone.visible = !held;
+    this.screen.material = this.screenOn;
+    if (t < down) this._drawNotif(t);
+    this.glow.intensity = held ? 0.2 : 0;
+    // on the bed: buzzing as the notifications land, then (later) face-down, dark
+    const buzz = (t >= 80.42 && t < 80.62) || (t >= 80.72 && t < 80.92);
+    const faceDown = t >= down;
+    this.bedPhone.position.copy(this.bedPhoneSpot);
+    if (buzz) this.bedPhone.position.add(this._v.set(noise1(t * 90, 1) * 0.0025, 0, noise1(t * 90, 2) * 0.0025));
+    this.bedPhone.rotation.set(faceDown ? Math.PI / 2 : -Math.PI / 2, 0, faceDown ? -0.35 : 0.5 + (buzz ? 0.02 * noise1(t * 80, 3) : 0));
+    if (faceDown) this.bedPhone.position.y += 0.004;
+    this.bedScreen.visible = !faceDown;
+    this.bedGlow.intensity = !held && !faceDown ? 0.28 : 0;
+    // the kids running past outside, as shadows on the backlit curtain
+    const cg = MathX.smooth(t, 82.2, 82.6) * (1 - MathX.smooth(t, 84.6, 85.2));
+    this.curtainGlow.material.opacity = 0.85 * cg;
+    if (cg > 0.001) this._drawCurtain(t);
+    // the doorway: when it opens there is only light beyond it
+    this.leak.panel.position.x = BS.room.x0 - 1.0; this.leak.panel.scale.set(3.2, 1.4, 1);
   }
 }

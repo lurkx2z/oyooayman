@@ -175,10 +175,10 @@ We imply, rather than lecture, that childhood also involved chores: a girl carry
 
 | Phase | Seconds | Content | Status |
 |---|---|---|---|
-| A | 0–15 | Bedroom, phone death, door transition, street reveal, street play | **building now** |
-| B | 15–35 | Marbles, top, jacks, toy building | after A is approved |
-| C | 35–55 | Kite, sky, stick, imagination courtyard | |
-| D | 55–68 | Social games, sunset, lamplighter | |
-| E | 68–90 | Parlour, shadow worlds, return, ending | |
+| A | 0–15 | Bedroom, phone death, door transition, street reveal, street play | done |
+| B | 15–35 | Marbles, top, jacks, toy building | done |
+| C | 35–55 | Kite, sky, stick, imagination courtyard | done |
+| D | 55–68 | Social games, sunset, lamplighter | done |
+| E | 68–90 | Parlour, shadow worlds, return, ending | done (full 90 s cut) |
 
 After each phase: render a preview, run four independent reviews (retention, cinematography / 3D, normal viewer, historical plausibility), fix the major issues, then move on.
