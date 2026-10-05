@@ -171,7 +171,7 @@ window.SIM = SIM;
 SIM.captureFrame = (t) => { SIM.renderAt(t); return true; };
 SIM.audioWavBase64 = async () => {
   const buf = await SIM.audio.prepare();
-  const blob = AudioManager.encodeWav(buf);
+  const blob = AudioEngine.encodeWav(buf);
   const ab = await blob.arrayBuffer();
   let s = ''; const u8 = new Uint8Array(ab);
   for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));

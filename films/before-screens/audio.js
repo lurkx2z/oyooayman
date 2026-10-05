@@ -27,15 +27,18 @@ class BeforeScreensAudio extends AudioEngine {
 
   _build(ctx) {
     const S = new SoundKit(ctx, CONFIG.seed), end = CONFIG.duration;
+    // mix → make-up gain (+15 dB: social-video loudness) → glue compressor → limiter
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3; comp.attack.value = 0.005; comp.release.value = 0.25;
-    const out = ctx.createGain(); comp.connect(out); out.connect(ctx.destination);
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12;
+    const mixIn = ctx.createGain(); mixIn.gain.value = 5.6; mixIn.connect(comp);
+    const out = ctx.createGain(); comp.connect(out); out.connect(lim); lim.connect(ctx.destination);
     out.gain.setValueAtTime(0.0001, 0); out.gain.linearRampToValueAtTime(0.9, 0.06);
     out.gain.setValueAtTime(0.9, end - 0.4); out.gain.linearRampToValueAtTime(0.0001, end + 0.4);
-    const bus = ctx.createGain(); bus.connect(comp);
-    const roomRev = S.reverb(0.5), roomSend = ctx.createGain(); roomSend.gain.value = 0.22; roomSend.connect(roomRev); roomRev.connect(comp);
-    const outRev = S.reverb(1.7), outSend = ctx.createGain(); outSend.gain.value = 0.28; outSend.connect(outRev); outRev.connect(comp);
-    const music = ctx.createGain(); music.gain.value = 0.6; music.connect(comp);
-    const musRev = S.reverb(2.6), musSend = ctx.createGain(); musSend.gain.value = 0.4; musSend.connect(musRev); musRev.connect(comp);
+    const bus = ctx.createGain(); bus.connect(mixIn);
+    const roomRev = S.reverb(0.5), roomSend = ctx.createGain(); roomSend.gain.value = 0.22; roomSend.connect(roomRev); roomRev.connect(mixIn);
+    const outRev = S.reverb(1.7), outSend = ctx.createGain(); outSend.gain.value = 0.28; outSend.connect(outRev); outRev.connect(mixIn);
+    const music = ctx.createGain(); music.gain.value = 0.6; music.connect(mixIn);
+    const musRev = S.reverb(2.6), musSend = ctx.createGain(); musSend.gain.value = 0.4; musSend.connect(musRev); musRev.connect(mixIn);
     this.S = S;
     this._room(S, bus);
     this._phone(S, bus, roomSend);
@@ -95,7 +98,7 @@ class BeforeScreensAudio extends AudioEngine {
     hg.gain.setValueAtTime(0.0001, 6.03); hg.gain.exponentialRampToValueAtTime(0.01, 6.12); hg.gain.setValueAtTime(0.01, 6.45); hg.gain.exponentialRampToValueAtTime(0.0001, 6.7);
     o.connect(hb); hb.connect(hg); hg.connect(bus); hg.connect(roomSend); o.start(6.03); o.stop(6.75);
     // the light: an airy swell that opens into the outdoors
-    const w = S.noise('pink', 5.8, 7.4), wb = S.filter('bandpass', 500, 0.8), wg = ctx.createGain();
+    const w = S.noise('pink', 5.85, 7.4), wb = S.filter('bandpass', 500, 0.8), wg = ctx.createGain();
     wb.frequency.setValueAtTime(400, 5.85); wb.frequency.exponentialRampToValueAtTime(3200, 6.5); wb.frequency.exponentialRampToValueAtTime(900, 7.3);
     wg.gain.setValueAtTime(0.0001, 5.85); wg.gain.exponentialRampToValueAtTime(0.06, 6.42); wg.gain.exponentialRampToValueAtTime(0.0001, 7.4);
     w.connect(wb); wb.connect(wg); wg.connect(bus); wg.connect(outSend);
