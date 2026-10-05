@@ -1,6 +1,6 @@
 # What weed-induced depersonalization can feel like — production plan
 
-A 74-second vertical (9:16, 1080×1920, 30 fps) first-person film on the shared engine.
+A 71-second vertical (9:16, 1080×1920, 30 fps) first-person film on the shared engine.
 **Retention has equal priority to accuracy and look**: the title and the story start together, something new happens
 every 2–3 seconds, and each section ends on an open question that the next one answers.
 
@@ -41,12 +41,12 @@ audio drop-out (22.5), dolly-zoom in the hallway (25), friends' motion going slo
 | 1d | 4.1–8.0 | Sudden look down (the view trails again): your hands resting on your jeans; they lift palms up — one a beat after the other — and turn over. | Small sharp inhale; fabric. | *And your own body starts feeling unfamiliar.* → *You know those are your hands.* · SENSE OF SELF 100 % → 72 % |
 | 1e | 8.0–9.8 | The hands flex and seem to drift away from you; edges soften. | Ringing a little higher, the room thinner. | *They just don't feel like yours.* |
 | 1f | 9.8–11.6 | You stand (the view trails) and face the hallway; the bathroom light at its end. | Couch creak, steps. | *What about your own reflection?* |
-| **2** | **13–22** | **Mirror (≤ 9 s)** | Hallway → bathroom: you step up to the mirror; your reflection (grey hoodie, tired face) is exactly right. You raise a hand; it does too. Pause. Then you turn away. | Bathroom acoustic: close, dry; tap drip; breathing. | *Everything looks right.* → *But it doesn't feel like you.* |
-| **3** | **22–36** | **Derealization, layered** | 22–25 hall: sound drops out; 25–28 the hall stretches (depth wrong); 28–31 back in the living room: friends laughing, but their motion slow and far; 31–34 the room looks flat, like a set; 34–36 you touch the wall. | Audio thins to a distant hum; voices sound "behind glass". | *It can start feeling like a dream…* → *…or weirdly far away.* → *It looks normal. So why does it feel fake?* · REALITY FEEL NORMAL → DISTANT |
-| **4** | **36–46** | **Time** | Phone check: 11:47. Look away (friends, window). Look back: still 11:47. TIME SINCE CHECK 00:12. Jay: "You good?" (subtitle) — his face kind, normal, but far. | His voice clear but distant; your answer is a muffled "yeah". | *Seconds can feel strangely long.* |
-| **5** | **46–56** | **Panic (mid reset, second act)** | Heartbeat enters; checking: hand on chest, touching your face, gripping the counter; camera hesitates; vignette tightens. | Heartbeat, tighter breathing, room nearly gone. | *The feeling isn't always the worst part.* → *The panic can make it stronger.* · ANXIETY ↑ |
-| **6** | **56–66** | **The loop (climax, fastest)** | 0.7–1.5 s cuts: hands / mirror / clock / Jay / phone / wall / hands. | Each cut: a breath, a heartbeat; sound gets more internal. | *Do I feel normal?* → *Why don't I feel normal?* → *Am I stuck like this?* → *The more you check…* → *…the stranger it can feel.* |
-| **7** | **66–74** | **Comedown + note** | You sit on the couch; Mia sits quietly beside you; breathing slows; colour and sound return a little. | Room tone clearer, the music back, a calm low note. | *Nothing around you actually changed.* → *But it felt like everything did.* → small: *If it continues after the high wears off, talk to a healthcare professional.* |
+| **2** | **11.6–18.9** | **Mirror (7 s)** | Into the bathroom; the real planar mirror shows you (grey hoodie, tired face, the hallway behind). You raise your right hand — it does too. Lean in; then the reflection seems to recede (a slow dolly-zoom on the glass). Your hand to your cheek — the reflection's too. You turn away. | Bathroom: fan hum, a drip; laughter through the wall; your breathing close. | *Everything looks right.* → *But it doesn't feel like you.* · SENSE OF SELF 72 → 66 % |
+| **3** | **18.3–31** | **Derealization, layered** | 19–23 hall: sound drops out; 21.4–23 the corridor stretches (wide-angle dolly); 23–26 the friends laughing — slowed, far; 26–29 you back away until the room goes flat through the doorway, like a set (telephoto); 29–31 a palm on the door frame. | Near-silence in the hall, a low sliding tone; voices and music slowed and pitched down "behind glass". | *Then the world starts feeling unreal.* → *It can start to feel like a dream…* → *…or weirdly far away.* → *Even your friends feel distant.* → *It all looks normal…* → *…so why does it feel unreal?* · REALITY FEEL NORMAL → DREAMLIKE → DISTANT → UNREAL |
+| **4** | **31–37.4** | **Time** | Phone: 11:47. Look at Mia, the TV, back: still 11:47 (TIME SINCE CHECK 00:03). Jay leans in: "you good?" (subtitle). | The wall clock starts ticking; his voice clear but distant; your muffled "yeah…". | *Seconds can feel strangely long.* |
+| **5** | **37.5–46.6** | **Panic (mid reset, second act)** | Heartbeat arrives; trembling hands; a hand to your face; cut: gripping the kitchen counter; the clock. Vignette tightens. | Heartbeat racing, short breaths, ticking. | *The feeling isn't always the worst part.* → *The panic can make it stronger.* · ANXIETY LOW → RISING → HIGH |
+| **6** | **46.6–57.4** | **The loop (climax)** | Ten cuts, ~0.8–1.1 s: hands · mirror · clock · Jay · phone · wall · hands · mirror · clock · hands. Then a breath of near-black and near-silence. | A thud and a breath on every cut; ringing at its highest; then nothing. | *Do I feel normal?* → *Why don't I feel normal?* → *Am I stuck like this?* → *The more you check…* → *…the stranger it can feel.* |
+| **7** | **57.4–71.2** | **Comedown + note** | You sink into the couch; Mia comes round and sits beside you: "hey… you're okay."; colour, contrast and sound return; SENSE OF SELF climbs back to 96 %. | Breath slowing, heartbeat fading, the room and the music clearing, a calm low chord. | *Nothing around you actually changed.* → *But it felt like everything did.* → small: *For many people, it fades as the high wears off. If it keeps happening or doesn't go away, talk to a healthcare professional.* |
 
 ## 3. Sets (one apartment, built once; cuts are camera jumps)
 
@@ -90,12 +90,12 @@ Everything is procedural. Optional upgrades (drop-in, not required):
 
 ## 7. Phases and review
 
-| Phase | Seconds (v2 timing; later beats shift ~1.4 s earlier, total ≈ 72 s) | Content | Status |
+| Phase | Seconds | Content | Status |
 |---|---|---|---|
-| 1 | 0–11.6 | hook, title, voice drop-out, hands, open loop to the mirror | v2 built after review |
-| 2 | 11.6–34 | mirror, derealization | next |
-| 3 | 34–54 | time, panic | |
-| 4 | 54–72 | loop, comedown, note | |
+| 1 | 0–11.6 | hook, title, voice drop-out, hands, open loop to the mirror | done (v2 after review) |
+| 2 | 11.6–31 | mirror, derealization | done |
+| 3 | 31–46.6 | time, panic | done |
+| 4 | 46.6–71.2 | loop, comedown, note | done — full cut 71.2 s |
 
 After each preview: a section-by-section retention audit (0–2, 2–5, 5–10, 10–15, 15–25 … end: what's new, what happens,
 what's left open, why keep watching, dead time, could it be shorter), and swipe-away timestamps from independent

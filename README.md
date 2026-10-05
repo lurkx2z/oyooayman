@@ -7,6 +7,9 @@ Everything is procedural, so there are no models, images or sound files to downl
 
 > **Second film: *How did kids have fun before screens?*** Open `before-screens.html` (the full 90 s).
 > It runs on the same shared engine; its plan and shot list are in [`films/before-screens/PLAN.md`](films/before-screens/PLAN.md).
+>
+> **Third film: *What weed-induced depersonalization can feel like*** — open `depersonalization.html` (71 s).
+> Plan, shot list and review log: [`films/depersonalization/PLAN.md`](films/depersonalization/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -68,7 +71,7 @@ No server is needed. Three.js is bundled in `lib/` and the fonts (Inter, Lora, O
 JetBrains Mono — all SIL Open Font License) in `fonts/`, so it works fully offline.
 
 The soundtrack is synthesised by the film's own code. A pre-rendered copy ships next to each film
-(`js/scene/soundtrack.js`, `films/before-screens/soundtrack.js`) so the sound is ready the moment the page opens
+(`js/scene/soundtrack.js`, `films/before-screens/soundtrack.js`, `films/depersonalization/soundtrack.js`) so the sound is ready the moment the page opens
 (the start screen says **SOUND READY**). If you change a film's script or sound code, the page notices that copy is
 out of date and synthesises the sound itself on load, which can take a few minutes; refresh the copy with
 `node tools/bake-soundtrack.cjs --page before-screens.html --out films/before-screens/soundtrack.js`
@@ -151,6 +154,15 @@ films/before-screens/fantasy.js     the imagined castle, knights' gear, the stic
 films/before-screens/social.js      the long rope, hopscotch, the ball thrown to you, the lamplighter
 films/before-screens/parlour.js     the evening parlour, the picture book, checkers, the shadow-picture wall
 films/before-screens/audio.js       the film's soundtrack
+
+Film: *What weed-induced depersonalization can feel like* (`depersonalization.html`):
+films/depersonalization/PLAN.md       shot list, retention plan, review log
+films/depersonalization/script.js     ★ timings, camera, hands, captions, HUD readouts, the friends' clocks
+films/depersonalization/film.js       FILM hooks: hand poses (some aimed at the world), the mirror and your reflection, the grade
+films/depersonalization/apartment.js  the flat: living room, kitchen nook and clock, hallway, bathroom; your legs
+films/depersonalization/cast.js       the friends' looks and actions (on the shared cast rig)
+films/depersonalization/audio.js      the soundtrack (a world bus that drifts away, a close "you" bus)
+js/fx/mirror.js                       planar mirror (shared)
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):
