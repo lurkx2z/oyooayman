@@ -92,6 +92,12 @@ body.recording #app, body.capture #app { inset: 0; }
 /* ---- story HUD (js/ui/storyHud.js): shared by every film; positions can be overridden per film ---- */
 .story-title { position: absolute; left: 50%; top: calc(var(--u) * 300); width: calc(var(--u) * 900); margin-left: calc(var(--u) * -450); text-align: center; opacity: 0; }
 .story-title .main { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 72); line-height: 1.16; color: var(--paper); text-wrap: balance; }
+.story-title.big { top: calc(var(--u) * 250); width: calc(var(--u) * 1000); margin-left: calc(var(--u) * -500); }
+.story-title.big::before { content: ''; position: absolute; left: -12%; right: -12%; top: -40%; bottom: -45%; z-index: -1;
+  background: radial-gradient(closest-side, rgba(6, 7, 10, 0.62), rgba(6, 7, 10, 0.3) 60%, rgba(6, 7, 10, 0)); }
+.story-title.big .main { line-height: 1.08; text-shadow: 0 calc(var(--u) * 3) calc(var(--u) * 22) rgba(0, 0, 0, 0.6); }
+.story-title.big .kick { display: block; font-size: calc(var(--u) * 54); font-weight: 500; letter-spacing: 0.08em; opacity: 0.94; }
+.story-title.big .hero { display: block; font-size: calc(var(--u) * 84); font-weight: 600; letter-spacing: 0.01em; margin: calc(var(--u) * 10) 0; }
 .story-stack { position: absolute; left: 50%; top: calc(var(--u) * 700); transform: translateX(-50%); width: calc(var(--u) * 800); text-align: center; }
 .story-stack .line { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 64); line-height: 1.3; color: var(--paper); }
 .story-caption {
@@ -99,6 +105,16 @@ body.recording #app, body.capture #app { inset: 0; }
   width: calc(var(--u) * 800); text-align: center; opacity: 0;
   font-family: var(--book); font-style: italic; font-weight: 400; font-size: calc(var(--u) * 46); line-height: 1.25;
   color: var(--paper); text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 14) rgba(0, 0, 0, 0.55); text-wrap: balance;
+}
+.story-note {
+  position: absolute; left: 50%; top: calc(var(--u) * 1180); transform: translateX(-50%); width: calc(var(--u) * 760);
+  text-align: center; opacity: 0; font-family: var(--book); font-weight: 400; font-size: calc(var(--u) * 34); line-height: 1.3;
+  color: var(--paper); text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(0, 0, 0, 0.6); text-wrap: balance;
+}
+.story-say {
+  position: absolute; left: 50%; top: calc(var(--u) * 1120); transform: translateX(-50%); padding: calc(var(--u) * 10) calc(var(--u) * 26);
+  opacity: 0; font-family: var(--hud-font); font-weight: 500; font-size: calc(var(--u) * 38); color: #f4f2ee;
+  background: rgba(10, 11, 14, 0.5); border-radius: calc(var(--u) * 14); white-space: nowrap;
 }
 .story-end {
   position: absolute; left: 50%; top: calc(var(--u) * 860); transform: translateX(-50%); width: calc(var(--u) * 860);

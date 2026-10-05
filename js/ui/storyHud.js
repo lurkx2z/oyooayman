@@ -2,12 +2,14 @@
    STORY HUD — the reusable cinematic overlay for any film.
    Everything is driven by SCRIPT.hud and is a pure function of time:
 
-     title:    { in, out, html }                  a quiet serif title
+     title:    { in, out, html, cls, fi, fo }     a serif title (cls adds a style, e.g. 'big'; fi / fo: fade times)
      stack:    [{ t, until, lines: [[t, text]] }] short lines that appear one by one
      captions: [{ t, until, text }]               one narration line at a time
      readouts: [{ from, until, label, value, unit, sub, ctx }]
                                                   the top-left info block (value may be a function of t)
      endLine:  { t, until, text }                 the closing line
+     notes:    [{ t, until, text }]               a small, quiet line (e.g. a closing health note)
+     says:     [{ t, until, text }]               someone in the scene speaking (a dialogue subtitle)
 
    Layout follows the shared style.css (TikTok / Shorts safe zones).
    ===================================================================== */
@@ -18,7 +20,7 @@ class StoryHUD {
     this.tl = tl;
     const H = SCRIPT.hud;
     const mk = (cls, html = '') => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; root.appendChild(d); return d; };
-    this.title = mk('story-title', `<div class="main">${(H.title && H.title.html) || ''}</div>`).firstChild;
+    this.title = mk('story-title' + (H.title && H.title.cls ? ' ' + H.title.cls : ''), `<div class="main">${(H.title && H.title.html) || ''}</div>`);   // (fade the box itself: it starts hidden)
     this.stack = mk('story-stack');
     this.stackLines = [];
     for (const S of H.stack || []) for (const [lt, text] of S.lines) {
@@ -37,6 +39,8 @@ class StoryHUD {
       return { R, el: d, v: d.querySelector('.v') };
     });
     this.endLine = mk('story-end');
+    this.note = mk('story-note');
+    this.say = mk('story-say');
     this._last = {};
   }
 
@@ -52,7 +56,7 @@ class StoryHUD {
   update(t) {
     const H = SCRIPT.hud, W = StoryHUD.win;
     if (H.title) {
-      const a = W(t, H.title.in, H.title.out, 0.6, 0.45);
+      const a = W(t, H.title.in, H.title.out, H.title.fi || 0.6, H.title.fo || 0.45);
       this._set('title', this.title, 'opacity', a.toFixed(3));
       this._set('titley', this.title, 'transform', `translateY(${((1 - MathX.smooth(t, H.title.in, H.title.in + 0.6)) * 8).toFixed(1)}px)`);
     }
@@ -68,6 +72,13 @@ class StoryHUD {
       const v = typeof R.value === 'function' ? R.value(t) : R.value;
       if (this._last['rv' + i] !== v) { r.v.textContent = v; this._last['rv' + i] = v; }
     });
+    for (const [key, el, list] of [['note', this.note, H.notes], ['say', this.say, H.says]]) {
+      const it = (list || []).find((c) => t >= c.t && t < c.until);
+      if (it) {
+        if (this._last[key + 'T'] !== it.text) { el.innerHTML = it.text; this._last[key + 'T'] = it.text; }
+        this._set(key, el, 'opacity', W(t, it.t, it.until, 0.25, 0.35).toFixed(3));
+      } else this._set(key, el, 'opacity', '0');
+    }
     if (H.endLine) {
       const E = H.endLine;
       if (this._last.endText !== E.text) { this.endLine.innerHTML = E.text; this._last.endText = E.text; }

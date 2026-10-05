@@ -403,6 +403,31 @@ const ACTIONS = {
 };
 const BLEND = { recoil: 0.2, lie: 1.1, kneel: 0.85, sitGround: 1.3, stumble: 0.6, sitSlump: 1.2, lean: 0.8, look: 0.6, handHead: 0.5, walk: 0.5, idle: 0.6, earPop: 0.08, earPopSit: 0.08, flinch: 0.06, collapse: 0.12, railSlump: 0.1, lighter: 0.5, phone: 0.5, grind: 0.35, jog: 0.4 };
 
+// a person's whole performance from scenes (used by the films' casts): [from, to, { path | at, act | states, face, y, seat, stride }]
+// → one path (with instant moves between scenes), states, and per-scene facing, height, seat and visibility
+const PARLOUR_SEAT = { x: 2.0, z: 199.95 };   // (the parlour itself: films/before-screens/parlour.js)
+
+function perf(id, look, scenes, extra = {}) {
+  const path = [], states = [], faces = [], ys = [], seats = [], show = [], strides = [];
+  let stride = 1.32;
+  const push = (t, x, z) => { if (path.length && t <= path[path.length - 1][0]) t = path[path.length - 1][0] + 0.001; path.push([t, x, z]); };
+  for (const [t0, t1, S] of scenes) {
+    const P = S.path || [[t0, S.at[0], S.at[1]]];
+    if (P[0][0] > t0) push(t0, P[0][1], P[0][2]);
+    for (const k of P) push(k[0], k[1], k[2]);
+    const last = P[P.length - 1];
+    if (last[0] < t1) push(t1, last[1], last[2]);
+    for (const st of S.states || [[t0, S.act || 'idle']]) states.push(st);
+    faces.push([t0, S.face === undefined ? null : S.face]);
+    ys.push([t0, S.y || 0]); seats.push([t0, S.seat]);
+    show.push([t0, t1]);
+    if (S.stride) stride = S.stride;
+    strides.push([t0, S.stride || 1.32]);
+  }
+  states.sort((a, b) => a[0] - b[0]);
+  return Object.assign({ id, look, path, states, faces, ys, seats, show, stride, strides }, extra);
+}
+
 class Person {
   constructor(spec, scene) {
     PersonGeo.init();
