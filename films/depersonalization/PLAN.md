@@ -34,12 +34,13 @@ audio drop-out (22.5), dolly-zoom in the hallway (25), friends' motion going slo
 
 | # | Time | Shot | What we SEE (works with sound off) | What we HEAR | Caption / HUD |
 |---|---|---|---|---|---|
-| **1** | **0–13** | **Living room → hands** | | | |
-| 1a | 0.0–3.8 | On the couch at night with two friends: Jay in the armchair mid-story, gesturing; Mia on a beanbag laughing at her phone; TV glow, floor lamp, faint haze. At ~2.2 s Jay's gesture lags for half a second — barely noticeable. | Lo-fi music from a speaker, room tone, Jay talking, both laugh; your own short laugh. At 2.2 the laugh trails a fraction late. | **TITLE (big, 0.2–3.8):** WHAT WEED-INDUCED / DEPERSONALIZATION / CAN FEEL LIKE |
-| 1b | 3.9–5.6 | Jay turns to you and says something. You lean in; the room seems to stretch away behind him (dolly-zoom); colour drains a little; Jay's motion goes slightly slow. | His line starts clear, then drops away: muffled, farther, roomier. Faint ringing begins. | *At first, everything feels normal.* |
-| 1c | 5.2–7.6 | Sudden look-down: your hands resting on your jeans. They lift, palms up. | Fabric rustle; your breathing becomes audible. | *Then your own body starts feeling unfamiliar.* · SENSE OF SELF 100 % → 78 % |
-| 1d | 7.7–11.0 | The hands turn over, fingers flex — slightly lagging, edges soft. | Ringing a little higher, room thinner. | *You know those are your hands.* → *They just don't feel like yours.* |
-| 1e | 11.1–13.0 | You look up toward the hallway and stand. | Couch creak, the room muffled. | *So what happens in a mirror?* |
+| **1** | **0–11.6** | **Living room → hands** (built, v2) | | | |
+| 1a | 0.0–1.1 | On the couch at night: Jay mid-story in the armchair, a last wisp of smoke leaving his mouth; Mia on a beanbag with her phone. | Lo-fi from a speaker, room tone, Jay talking, both laugh; your own short laugh. | **TITLE (big, 0–2.85):** WHAT WEED-INDUCED / DEPERSONALIZATION / CAN FEEL LIKE |
+| 1b | 1.1–2.7 | You turn to Mia — the picture trails behind your head for a moment; her laugh **freezes for half a second**, then rushes to catch up. | Her laugh comes late, hangs on one note, catches up. | from 2.0: *At first, everything feels normal.* |
+| 1c | 2.7–4.1 | Back to Jay, now leaning in to say something to you. At 3 s the room recedes behind him (strong lean-in dolly-zoom), colour cools and flattens. | His line starts clear, then the room's sound is pushed away: muffled, quieter, roomier; a faint ringing, a low pressure, your breathing. | *Then his voice sounds far away.* |
+| 1d | 4.1–8.0 | Sudden look down (the view trails again): your hands resting on your jeans; they lift palms up — one a beat after the other — and turn over. | Small sharp inhale; fabric. | *And your own body starts feeling unfamiliar.* → *You know those are your hands.* · SENSE OF SELF 100 % → 72 % |
+| 1e | 8.0–9.8 | The hands flex and seem to drift away from you; edges soften. | Ringing a little higher, the room thinner. | *They just don't feel like yours.* |
+| 1f | 9.8–11.6 | You stand (the view trails) and face the hallway; the bathroom light at its end. | Couch creak, steps. | *What about your own reflection?* |
 | **2** | **13–22** | **Mirror (≤ 9 s)** | Hallway → bathroom: you step up to the mirror; your reflection (grey hoodie, tired face) is exactly right. You raise a hand; it does too. Pause. Then you turn away. | Bathroom acoustic: close, dry; tap drip; breathing. | *Everything looks right.* → *But it doesn't feel like you.* |
 | **3** | **22–36** | **Derealization, layered** | 22–25 hall: sound drops out; 25–28 the hall stretches (depth wrong); 28–31 back in the living room: friends laughing, but their motion slow and far; 31–34 the room looks flat, like a set; 34–36 you touch the wall. | Audio thins to a distant hum; voices sound "behind glass". | *It can start feeling like a dream…* → *…or weirdly far away.* → *It looks normal. So why does it feel fake?* · REALITY FEEL NORMAL → DISTANT |
 | **4** | **36–46** | **Time** | Phone check: 11:47. Look away (friends, window). Look back: still 11:47. TIME SINCE CHECK 00:12. Jay: "You good?" (subtitle) — his face kind, normal, but far. | His voice clear but distant; your answer is a muffled "yeah". | *Seconds can feel strangely long.* |
@@ -89,14 +90,28 @@ Everything is procedural. Optional upgrades (drop-in, not required):
 
 ## 7. Phases and review
 
-| Phase | Seconds | Content | Status |
+| Phase | Seconds (v2 timing; later beats shift ~1.4 s earlier, total ≈ 72 s) | Content | Status |
 |---|---|---|---|
-| 1 | 0–13 | hook, title, voice drop-out, hands, open loop to the mirror | building |
-| 2 | 13–36 | mirror, derealization | |
-| 3 | 36–56 | time, panic | |
-| 4 | 56–74 | loop, comedown, note | |
+| 1 | 0–11.6 | hook, title, voice drop-out, hands, open loop to the mirror | v2 built after review |
+| 2 | 11.6–34 | mirror, derealization | next |
+| 3 | 34–54 | time, panic | |
+| 4 | 54–72 | loop, comedown, note | |
 
 After each preview: a section-by-section retention audit (0–2, 2–5, 5–10, 10–15, 15–25 … end: what's new, what happens,
 what's left open, why keep watching, dead time, could it be shorter), and swipe-away timestamps from independent
 reviewers (normal viewer, retention, mental-health sensitivity, cinematography). Scores are never inflated; low scores
 mean changing the film.
+
+## 8. Review log
+
+**Phase 1 v1 (independent reviewers):** hook 5, first-5-s clarity 5–7, curiosity 6, pacing 5, visual quality 5–5.5,
+POV immersion 4–6, respectfulness 8, emotional accuracy 8. Main swipe risks: 1.2 s (nothing visibly wrong) and 4.0–4.8 s
+(the same shot of Jay three times, onset invisible with sound off); 10.3 s (hands static). Fixed in v2: onset visible by
+1.6 s (lag smear + Mia freeze), voice drop + strong dolly-zoom at 3 s, look-down at 4.2 s, hands drift on "don't feel like
+yours", readout keeps falling, cool/flat grade instead of sepia, AO halos and the thumb "ghosts" gone, talking mouths,
+props and doors, larger captions above the hands, "What about your own reflection?".
+
+Sensitivity notes carried forward: keep the reflection perfectly normal; answer "Am I stuck like this?" in the comedown
+(it often fades as the high wears off); bring SENSE OF SELF visibly back up at the end; say clearly that it doesn't happen
+to everyone; consider "feels unreal" over "feels fake"; ending note wording (the brief's line vs. "If it keeps happening or
+doesn't go away…") to be decided in phase 4.
