@@ -82,24 +82,19 @@ const SCRIPT = {
      HUD
      ------------------------------------------------------------------ */
   hud: {
-    title: { in: 0.0, out: 1.75 },
-    timerSwap: 3.0,            // the big O₂ readout turns into the blackout countdown
-    blackoutAt: 19.4,          // a resting adult blacks out ~15–20 s after O₂ hits zero
+    title: { in: 0.15, out: 1.75 },     // small "WHAT IF…" then "oxygen disappeared?"
+    timerFrom: 9.6,                     // a second, temporary counter appears when it matters
     oxygenRedBelow: 10,
-    logs: [
-      { t: 1.8,  until: 4.1,  text: 'FLAMES — OUT AT 15% O₂', tone: 'bad' },
-      { t: 2.5,  until: 4.8,  text: 'AIR PRESSURE — DOWN 21%', tone: 'info' },
-      { t: 4.8,  until: 6.4,  text: 'EACH BREATH PULLS O₂ OUT OF YOUR BLOOD', tone: 'bad' },
-      { t: 6.45, until: 8.9,  text: '60% OF POWER WAS FIRE → GRID DOWN', tone: 'bad' },
-      { t: 9.7,  until: 12.4, text: 'NO ONE FEELS SHORT OF BREATH', tone: 'info' },
-      { t: 12.5, until: 15.2, text: 'BRAIN OXYGEN — RUNNING OUT', tone: 'bad' },
+    // one restrained caption at a time — the world shows everything else
+    captions: [
+      { t: 1.95, until: 3.85, text: 'The flames went out first.' },
+      { t: 6.15, until: 7.85, text: 'Then the engines. Then the power.' },
+      { t: 8.05, until: 9.75, text: 'Only electric things kept moving.' },
+      { t: 10.3, until: 12.4, text: 'No one felt short of breath.' },
+      { t: 12.9, until: 15.0, text: 'That was the dangerous part.' },
     ],
-    annotations: [
-      { target: 'hand:lighter', from: 3.9,  to: 5.25, title: 'LIGHTER',           status: 'SPARK · NO FLAME',      tone: 'info' },
-      { target: 'fx:grinder',   from: 5.55, to: 6.3,  title: 'BATTERY GRINDER',   status: 'SPARKS DIM — NO O₂',    tone: 'info' },
-      { target: 'veh:stallcar', from: 6.5,  to: 7.25, title: 'GASOLINE CAR',      status: 'ENGINE DEAD',           tone: 'bad' },
-      { target: 'veh:ev',       from: 7.35, to: 8.8,  title: 'ELECTRIC CAR',      status: 'STILL DRIVING',         tone: 'good' },
-    ],
+    // floating object labels (kept available, but the world should tell the story)
+    annotations: [],
   },
 
   /* ------------------------------------------------------------------
@@ -112,19 +107,19 @@ const SCRIPT = {
     { id: 'stallcar', type: 'sedan',  color: '#2b2f36', lane: 'S1', v0: 11,   fail: 1.72, stopS: 16,  decel: 2.2 },
     { id: 's1b',      type: 'hatch',  color: '#c9ccd1', lane: 'S1', v0: 11.5, fail: 1.8,  contact: { leader: 'stallcar', t: 6.75, vc: 2.4 } },
     { id: 's2behind', type: 'suv',    color: '#8a8f94', lane: 'S2', v0: 11,   fail: 1.85, stopS: -12, decel: 2.4 },
-    { id: 'taxi',     type: 'taxi',   color: '#f2b705', lane: 'S2', v0: 11,   fail: 1.8,  stopS: 90,  decel: 2.2 },
+    { id: 'taxi',     type: 'taxi',   color: '#c4a24c', lane: 'S2', v0: 11,   fail: 1.8,  stopS: 90,  decel: 2.2 },
     { id: 'van',      type: 'van',    color: '#e9e9e6', lane: 'S2', v0: 10.5, fail: 1.85, stopS: 120, decel: 2.3 },
-    { id: 'sfar',     type: 'hatch',  color: '#6b1e1e', lane: 'S2', v0: 12,   fail: 1.9,  stopS: 165, decel: 2.0 },
+    { id: 'sfar',     type: 'hatch',  color: '#5a3533', lane: 'S2', v0: 12,   fail: 1.9,  stopS: 165, decel: 2.0 },
 
     // ---- coming toward camera (N lanes, z = s)
-    { id: 'moto',     type: 'moto',   color: '#b3121b', lane: 'N2', v0: 12.5, fail: 1.75, stopS: 32,   decel: 2.6, lateral: 0.55 },
+    { id: 'moto',     type: 'moto',   color: '#7e2c28', lane: 'N2', v0: 12.5, fail: 1.75, stopS: 32,   decel: 2.6, lateral: 0.55 },
     { id: 'n2p',      type: 'hatch',  color: '#4a4f57', lane: 'N2', v0: 11,   fail: 1.85, stopS: 16,   decel: 2.4 },
     { id: 'bus',      type: 'bus',    color: '#f4f4f2', lane: 'N2', v0: 9,    fail: 1.75, stopS: -24,  decel: 1.6 },
     { id: 'n2b',      type: 'suv',    color: '#2b2e33', lane: 'N2', v0: 10.5, fail: 1.85, stopS: -60,  decel: 2.4 },
     { id: 'n2far',    type: 'pickup', color: '#5a4636', lane: 'N2', v0: 12,   fail: 1.9,  stopS: -150, decel: 2.0 },
     { id: 'n1p',      type: 'sedan',  color: '#d8d8d4', lane: 'N1', v0: 12,   fail: 1.8,  stopS: 24,   decel: 2.4 },
     { id: 'n1a',      type: 'suv',    color: '#5d6b78', lane: 'N1', v0: 12,   fail: 1.75, stopS: -55,  decel: 2.6 },
-    { id: 'n1b',      type: 'sedan',  color: '#7b2d26', lane: 'N1', v0: 11.5, fail: 1.85, stopS: -80,  decel: 2.0, swerve: { lat: 0.55, yaw: -7 } },
+    { id: 'n1b',      type: 'sedan',  color: '#6a3a34', lane: 'N1', v0: 11.5, fail: 1.85, stopS: -80,  decel: 2.0, swerve: { lat: 0.55, yaw: -7 } },
     { id: 'n1c',      type: 'hatch',  color: '#3d6e9e', lane: 'N1', v0: 12,   fail: 1.9,  stopS: -110, decel: 2.4 },
     { id: 'n1far',    type: 'van',    color: '#d7d2c4', lane: 'N1', v0: 12,   fail: 1.85, stopS: -170, decel: 2.0 },
 
@@ -135,7 +130,7 @@ const SCRIPT = {
 
     // ---- the electric car: keeps driving, overtaking the dead queue on the wrong side, then passing the viewer
     {
-      id: 'ev', type: 'ev', color: '#1f5fd6', lane: 'PATH', passAt: { z: 2.4, t: 8.6 },
+      id: 'ev', type: 'ev', color: '#456f9c', lane: 'PATH', passAt: { z: 2.4, t: 8.6 },
       path: [[-1.75, -260], [-1.75, -128], [1.45, -119], [1.45, -52], [-1.75, -41], [-1.75, 2], [1.3, 14], [1.3, 140]],
       speed: [[0, 11], [15, 11]],
     },
@@ -154,8 +149,9 @@ const SCRIPT = {
       states: [[0, 'grind'], [1.85, 'flinch'], [2.3, 'grind'], [6.1, 'lowerTool'], [6.6, 'look'], [11.0, 'handHead'], [12.6, 'railSlump']] },
     { id: 'toward',   look: 'casual2', y: 0.15, path: [[0, 10.45, -17.5], [2.42, 10.45, -14.6], [3.4, 10.45, -14.6], [8.6, 10.45, -7.6]],
       states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.4, 'walk'], [8.6, 'look'], [11.5, 'handHead'], [12.8, 'stumble'], [14.1, 'kneel']] },
-    { id: 'away',     look: 'casual3', y: 0.15, path: [[0, 11.45, -1.2], [2.42, 11.45, -4.1], [3.6, 11.45, -4.1], [7.0, 11.45, -8.3]],
-      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.6, 'walk'], [7.0, 'look'], [11.6, 'stumble'], [13.6, 'sitGround']] },
+    // a jogger overtakes you on the right: a foreground silhouette at the edge of frame (works hard → goes early)
+    { id: 'away',     look: 'casual3', y: 0.15, stride: 2.4, path: [[0, 9.95, 6.6], [1.85, 9.95, -0.5], [2.6, 9.95, -0.7], [4.2, 10.7, -2.6], [6.0, 11.25, -5.0]],
+      states: [[0, 'jog'], [1.85, 'earPop'], [2.6, 'walk'], [6.0, 'look'], [11.2, 'stumble'], [12.9, 'collapse']] },
     { id: 'L1',       look: 'casual4', y: 0.15, path: [[0, -8.7, -34], [2.42, -8.7, -31], [3.6, -8.7, -31], [11.5, -8.7, -22]],
       states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.6, 'walk'], [12.4, 'stumble'], [14.2, 'kneel']] },
     { id: 'L2',       look: 'casual5', y: 0.15, path: [[0, -10.7, -4], [2.42, -10.7, -6.9], [3.5, -10.7, -6.9], [10.6, -10.7, -15]],

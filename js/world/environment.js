@@ -3,15 +3,22 @@
    construction site and the charcoal-grill cart.
    ===================================================================== */
 
+// Atmospheric haze: plain exponential fog (three's FogExp2 is squared, which keeps the
+// midground too clear and then slams far objects to a flat wall). Foreground stays crisp,
+// the midground fades a little, the background washes out, far towers dissolve into the sky.
+THREE.ShaderChunk.fog_fragment = THREE.ShaderChunk.fog_fragment.replace(
+  'fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );',
+  'fogFactor = 1.0 - exp( - fogDensity * vFogDepth );');
+
 const FACADE_STYLES = {
-  redbrick:   { kind: 'brick', wall: [148, 76, 58],  frame: '#ebe6dc', sill: [208, 200, 186], winW: 0.5,  winH: 0.58, sillH: 0.24, panes: 3, bayW: 3.0, floorH: 3.3, ac: true },
-  tanbrick:   { kind: 'brick', wall: [184, 148, 110], frame: '#2f3133', sill: [214, 206, 190], winW: 0.56, winH: 0.6,  sillH: 0.22, panes: 2, bayW: 2.8, floorH: 3.2, ac: true },
-  whitebrick: { kind: 'brick', wall: [212, 207, 196], frame: '#3b4248', sill: [190, 186, 178], winW: 0.58, winH: 0.6,  sillH: 0.22, panes: 2, bayW: 3.0, floorH: 3.2 },
-  cream:      { kind: 'stucco', wall: [224, 212, 188], frame: '#f6f3ec', sill: [238, 231, 216], winW: 0.48, winH: 0.6, sillH: 0.22, panes: 3, bayW: 3.2, floorH: 3.4, bands: true, pilasters: true },
-  salmon:     { kind: 'stucco', wall: [212, 146, 118], frame: '#faf7f0', sill: [236, 226, 210], winW: 0.5, winH: 0.58, sillH: 0.24, panes: 3, bayW: 3.0, floorH: 3.2, ac: true },
-  stone:      { kind: 'stone', wall: [178, 173, 163], frame: '#2a2a2a', sill: [196, 191, 180], winW: 0.48, winH: 0.6, sillH: 0.22, panes: 3, bayW: 3.4, floorH: 3.6, arch: true, bands: true },
-  modern:     { kind: 'panel', wall: [96, 102, 108], frame: '#1b1f23', sill: [120, 126, 132], winW: 0.72, winH: 0.64, sillH: 0.2, panes: 2, bayW: 3.0, floorH: 3.3, glass: ['#7f97aa', '#22313d'] },
-  sage:       { kind: 'stucco', wall: [170, 182, 160], frame: '#f2f2ec', sill: [220, 222, 210], winW: 0.5, winH: 0.58, sillH: 0.22, panes: 3, bayW: 3.0, floorH: 3.3, bands: true },
+  redbrick:   { kind: 'brick', wall: [122, 80, 66],  frame: '#ebe6dc', sill: [208, 200, 186], winW: 0.5,  winH: 0.58, sillH: 0.24, panes: 3, bayW: 3.0, floorH: 3.3, ac: true },
+  tanbrick:   { kind: 'brick', wall: [150, 132, 110], frame: '#2f3133', sill: [214, 206, 190], winW: 0.56, winH: 0.6,  sillH: 0.22, panes: 2, bayW: 2.8, floorH: 3.2, ac: true },
+  whitebrick: { kind: 'brick', wall: [178, 174, 166], frame: '#3b4248', sill: [190, 186, 178], winW: 0.58, winH: 0.6,  sillH: 0.22, panes: 2, bayW: 3.0, floorH: 3.2 },
+  cream:      { kind: 'stucco', wall: [190, 184, 168], frame: '#f6f3ec', sill: [238, 231, 216], winW: 0.48, winH: 0.6, sillH: 0.22, panes: 3, bayW: 3.2, floorH: 3.4, bands: true, pilasters: true },
+  salmon:     { kind: 'stucco', wall: [170, 140, 124], frame: '#faf7f0', sill: [236, 226, 210], winW: 0.5, winH: 0.58, sillH: 0.24, panes: 3, bayW: 3.0, floorH: 3.2, ac: true },
+  stone:      { kind: 'stone', wall: [150, 148, 142], frame: '#2a2a2a', sill: [196, 191, 180], winW: 0.48, winH: 0.6, sillH: 0.22, panes: 3, bayW: 3.4, floorH: 3.6, arch: true, bands: true },
+  modern:     { kind: 'panel', wall: [84, 88, 92], frame: '#1b1f23', sill: [120, 126, 132], winW: 0.72, winH: 0.64, sillH: 0.2, panes: 2, bayW: 3.0, floorH: 3.3, glass: ['#7f97aa', '#22313d'] },
+  sage:       { kind: 'stucco', wall: [140, 146, 136], frame: '#f2f2ec', sill: [220, 222, 210], winW: 0.5, winH: 0.58, sillH: 0.22, panes: 3, bayW: 3.0, floorH: 3.3, bands: true },
   glassblue:  { kind: 'curtain', wall: [60, 80, 100], frame: '#c3ccd4', glass: ['#86a9c4', '#24425e'], bayW: 3.0, floorH: 3.8 },
   glassteal:  { kind: 'curtain', wall: [60, 90, 90], frame: '#9aa6aa', glass: ['#94bcb8', '#22504e'], bayW: 3.0, floorH: 3.8 },
 };
@@ -91,7 +98,7 @@ class Environment {
       markYellow: new THREE.MeshStandardMaterial({ color: '#e0b628', roughness: 0.65, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, name: 'markYellow' }),
       manhole: new THREE.MeshStandardMaterial({ color: '#2a2a2a', roughness: 0.6, metalness: 0.5, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }),
       bark: Mat.std('#5b4b3e', { roughness: 0.95 }),
-      foliage: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, flatShading: false, name: 'foliage' }),
+      foliage: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, flatShading: true, name: 'foliage' }),
       soil: Mat.std('#3b3027', { roughness: 1 }),
       glass: new THREE.MeshPhysicalMaterial({ color: '#cfe3ea', roughness: 0.05, transmission: 0, transparent: true, opacity: 0.22, depthWrite: false, name: 'glassPanel' }),
       hoarding: new THREE.MeshStandardMaterial({ map: Tex.hoarding(15), roughness: 0.85, name: 'hoarding' }),
@@ -121,16 +128,17 @@ class Environment {
 
   /* ================================================================ */
   _sky() {
-    this.sunDir = new THREE.Vector3(-0.66, 0.6, -0.42).normalize();
-    const zenith = new THREE.Color('#2a68c2');
-    const horizon = new THREE.Color('#bcd3e8');
+    // cold overcast morning: the sun is only a soft brighter patch behind the cloud deck
+    this.sunDir = new THREE.Vector3(-0.5, 0.72, -0.48).normalize();
+    const zenith = new THREE.Color('#6c7783');
+    const horizon = new THREE.Color('#959ca3');
     this.horizonColor = horizon.clone();
     this.skyUniforms = {
       uZenith: { value: zenith },
       uHorizon: { value: horizon },
-      uGround: { value: new THREE.Color('#9aa3a6') },
+      uGround: { value: new THREE.Color('#6a6c6f') },
       uSunDir: { value: this.sunDir },
-      uSunColor: { value: new THREE.Color('#fff2dc') },
+      uSunColor: { value: new THREE.Color('#e6e2da') },
       uTime: { value: 0 },
       uO2: { value: 1 },
     };
@@ -154,26 +162,28 @@ class Environment {
           vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f);
           return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y);
         }
-        float fbm(vec2 p){ float v = 0.0, a = 0.5; for(int i=0;i<5;i++){ v += a*noise(p); p = p*2.03 + 7.1; a *= 0.5; } return v; }
+        float fbm(vec2 p){ float v = 0.0, a = 0.5; for(int i=0;i<6;i++){ v += a*noise(p); p = p*2.02 + 7.1; a *= 0.5; } return v; }
         void main(){
           vec3 d = normalize(vDir);
           float h = d.y;
-          // O2 is ~21% of the scattering molecules: without it the sky is a bit deeper / darker
-          vec3 zen = mix(uZenith * vec3(0.78, 0.84, 0.92), uZenith, uO2);
-          vec3 col = mix(uHorizon, zen, pow(clamp(h, 0.0, 1.0), 0.5));
+          vec3 col = mix(uHorizon, uZenith, pow(clamp(h, 0.0, 1.0), 0.6));
           col = mix(col, uGround, smoothstep(0.0, -0.06, h));
+          // diffuse glow where the sun hides
           float sd = max(dot(d, uSunDir), 0.0);
-          col += uSunColor * (pow(sd, 5.0) * 0.22 + pow(sd, 60.0) * 0.5 + pow(sd, 1800.0) * 30.0);
-          if (h > 0.0) {
-            vec2 uv = d.xz / (h + 0.18) * 0.75 + vec2(uTime * 0.004, uTime * 0.002);
-            float c = fbm(uv * 1.1);
-            float cov = smoothstep(0.6, 0.82, c) * smoothstep(0.03, 0.3, h);
-            float shade = smoothstep(0.35, 0.85, fbm(uv * 1.1 + vec2(0.06, 0.08)));
-            vec3 cc = mix(vec3(0.78, 0.82, 0.88), vec3(1.08, 1.06, 1.02), 1.0 - shade * 0.7);
-            cc += uSunColor * pow(sd, 8.0) * 0.4;
-            col = mix(col, cc, cov * 0.9);
+          col += uSunColor * (pow(sd, 3.0) * 0.07 + pow(sd, 16.0) * 0.06);
+          // continuous cloud deck: broad soft billows with darker, heavier patches
+          if (h > -0.02) {
+            vec2 uv = d.xz / (h + 0.22) * 0.5 + vec2(uTime * 0.0025, uTime * 0.0012);
+            float c = fbm(uv);
+            float c2 = fbm(uv * 2.6 + 3.7);
+            float dense = smoothstep(0.38, 0.72, c);
+            vec3 lightC = uHorizon * 1.04 + uSunColor * pow(sd, 6.0) * 0.08;
+            vec3 darkC = uZenith * 0.7;
+            vec3 clouds = mix(lightC, darkC, clamp(dense * 0.8 + (c2 - 0.5) * 0.25, 0.0, 1.0));
+            col = mix(col, clouds, 0.88 * smoothstep(-0.02, 0.3, h));
           }
-          col *= mix(0.9, 1.0, uO2);
+          // O2 is ~21% of the molecules that scatter light: the sky deepens slightly without it
+          col *= mix(vec3(0.9, 0.92, 0.95), vec3(1.0), uO2);
           gl_FragColor = vec4(col, 1.0);
         }`,
     });
@@ -183,12 +193,12 @@ class Environment {
     sky.renderOrder = -10;
     this.scene.add(sky);
     this.sky = sky;
-    this.scene.fog = new THREE.FogExp2(horizon.clone(), 0.0017);
+    this.scene.fog = new THREE.FogExp2(horizon.clone(), 0.0046);   // used as plain exponential (see top)
     this.scene.background = horizon.clone();
   }
 
   _lights() {
-    const sun = new THREE.DirectionalLight('#ffeed6', 3.6);
+    const sun = new THREE.DirectionalLight('#e6e9ec', 1.3);
     sun.position.copy(this.sunDir).multiplyScalar(160).add(new THREE.Vector3(0, 0, -40));
     sun.target.position.set(0, 0, -40);
     sun.castShadow = CONFIG.render.shadows;
@@ -197,10 +207,10 @@ class Environment {
     sc.left = -95; sc.right = 95; sc.top = 110; sc.bottom = -110; sc.near = 10; sc.far = 420;
     sun.shadow.bias = -0.00025;
     sun.shadow.normalBias = 0.035;
-    sun.shadow.radius = 3;
+    sun.shadow.radius = 7;          // soft overcast shadow edges
     this.scene.add(sun, sun.target);
     this.sun = sun;
-    const hemi = new THREE.HemisphereLight('#bcd4f2', '#6e5e4c', 0.95);
+    const hemi = new THREE.HemisphereLight('#aab4be', '#43423f', 1.4);
     this.scene.add(hemi);
     this.hemi = hemi;
   }
@@ -223,7 +233,7 @@ class Environment {
     }
     const rt = pm.fromScene(envScene, 0.02, 0.1, 3000);
     this.scene.environment = rt.texture;
-    this.scene.environmentIntensity = 0.85;
+    this.scene.environmentIntensity = 0.55;
     pm.dispose();
   }
 
@@ -486,38 +496,45 @@ class Environment {
   /* ================================================================ */
   _tree(x, z, rng, scale = 1) {
     const B = this.batch, h = LAYOUT.curbH;
-    const th = rng.range(2.6, 3.4) * scale;
-    // pit + grate
+    const th = rng.range(2.3, 3.6) * scale;
+    const lx = rng.range(-0.09, 0.09), lz = rng.range(-0.09, 0.09);       // slight lean
+    const topX = x + lx * th, topZ = z + lz * th;
+    // pit + trunk
     B.box(1.25, 0.02, 1.25, x, h + 0.005, z, this.m.soil, 0, { noShadow: true });
-    B.add(new THREE.CylinderGeometry(0.11 * scale, 0.17 * scale, th, 7), this.m.bark, Geo.matrix(x, h + th / 2, z));
-    // branches
-    for (let i = 0; i < 3; i++) {
-      const a = rng.next() * Math.PI * 2;
-      B.add(new THREE.CylinderGeometry(0.04, 0.07, 1.6 * scale, 5), this.m.bark, Geo.matrix(x + Math.cos(a) * 0.35, h + th + 0.4, z + Math.sin(a) * 0.35, Math.sin(a) * 0.6, 0, -Math.cos(a) * 0.6));
+    B.add(new THREE.CylinderGeometry(0.1 * scale, 0.17 * scale, th, 7), this.m.bark, Geo.matrix((x + topX) / 2, h + th / 2, (z + topZ) / 2, lz, 0, -lx));
+    // a few irregular branches
+    const nb = rng.int(3, 5);
+    for (let i = 0; i < nb; i++) {
+      const a = rng.next() * Math.PI * 2, tilt = rng.range(0.45, 0.9), len = rng.range(1.1, 1.9) * scale;
+      B.add(new THREE.CylinderGeometry(0.03, 0.065, len, 5), this.m.bark, Geo.matrix(topX + Math.cos(a) * 0.3, h + th + rng.range(0.1, 0.7), topZ + Math.sin(a) * 0.3, Math.sin(a) * tilt, 0, -Math.cos(a) * tilt));
     }
-    // foliage clusters with vertex colour variation
-    const n = rng.int(5, 7);
-    const base = new THREE.Color().setHSL(rng.range(0.23, 0.3), rng.range(0.28, 0.4), rng.range(0.19, 0.25));
+    // asymmetric foliage: clusters of different sizes, squash and rotation, biased to one side
+    const n = rng.int(7, 11);
+    const biasA = rng.next() * Math.PI * 2, bias = rng.range(0.2, 0.7) * scale;
+    const base = new THREE.Color().setHSL(rng.range(0.2, 0.27), rng.range(0.14, 0.26), rng.range(0.12, 0.17));
     for (let i = 0; i < n; i++) {
-      const r = rng.range(1.0, 1.55) * scale;
-      const g = new THREE.IcosahedronGeometry(r, 2);
+      const r = rng.range(0.6, 1.45) * scale * (i < 3 ? 1.15 : 1);
+      const g = new THREE.IcosahedronGeometry(r, 1);
       const pos = g.attributes.position;
       for (let k = 0; k < pos.count; k++) {
         const v = new THREE.Vector3().fromBufferAttribute(pos, k);
-        const nrm = v.clone().normalize();
-        v.multiplyScalar(1 + (Math.sin(nrm.x * 7 + i) * Math.sin(nrm.y * 6 + x) * Math.sin(nrm.z * 8 + z)) * 0.16 + (hash1(k * 31 + i * 7 + (x * 13 | 0)) - 0.5) * 0.08);
-        pos.setXYZ(k, v.x, v.y * 0.85, v.z);
+        v.multiplyScalar(1 + (hash1(k * 31 + i * 7 + (x * 13 | 0) + (z * 7 | 0)) - 0.5) * 0.34);
+        pos.setXYZ(k, v.x, v.y, v.z);
       }
       const ng = g.index ? g.toNonIndexed() : g;
+      ng.scale(rng.range(0.8, 1.25), rng.range(0.62, 0.95), rng.range(0.8, 1.25));
       const cols = new Float32Array(ng.attributes.position.count * 3);
       for (let k = 0; k < ng.attributes.position.count; k++) {
         const yv = ng.attributes.position.getY(k) / r;
-        const c = base.clone().offsetHSL((hash1(k + i * 97) - 0.5) * 0.03, 0, (yv * 0.08) + (hash1(k * 3 + i) - 0.5) * 0.05);
+        // darker underneath (self-shadowing), small hue/value variation
+        const c = base.clone().offsetHSL((hash1(k + i * 97) - 0.5) * 0.025, (hash1(k * 5 + i) - 0.5) * 0.05, yv * 0.05 + (hash1(k * 3 + i) - 0.5) * 0.035 - (yv < -0.2 ? 0.035 : 0));
         cols[k * 3] = c.r; cols[k * 3 + 1] = c.g; cols[k * 3 + 2] = c.b;
       }
       ng.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
-      const a = (i / n) * Math.PI * 2 + rng.range(-0.4, 0.4), d = i === 0 ? 0 : rng.range(0.7, 1.3) * scale;
-      B.add(ng, this.m.foliage, Geo.matrix(x + Math.cos(a) * d, h + th + 1.1 * scale + rng.range(-0.3, 0.9) * scale + (i === 0 ? 0.9 * scale : 0), z + Math.sin(a) * d));
+      const a = rng.next() * Math.PI * 2, d = i === 0 ? 0 : rng.range(0.5, 1.6) * scale;
+      const px = topX + Math.cos(a) * d + Math.cos(biasA) * bias, pz = topZ + Math.sin(a) * d + Math.sin(biasA) * bias;
+      const py = h + th + rng.range(0.4, 1.9) * scale + (i === 0 ? 0.8 * scale : 0);
+      B.add(ng, this.m.foliage, Geo.matrix(px, py, pz, rng.range(-0.4, 0.4), rng.next() * 6.28, rng.range(-0.4, 0.4)));
     }
   }
 
@@ -528,13 +545,13 @@ class Environment {
     for (let z = 30; z > -420; z -= 9.5) {
       if (z < cz1 && z > cz0) continue;
       if (Math.abs(z - L.busStop.z) < 4) continue;
-      this._tree(-8.15, z + rng.range(-0.8, 0.8), rng, rng.range(0.9, 1.1));
+      this._tree(-8.15, z + rng.range(-0.8, 0.8), rng, rng.range(0.75, 1.25));
     }
     // right side (kept clear near the viewer so the street stays readable)
     for (let z = 40; z > -420; z -= 9.5) {
       if (z < cz1 && z > cz0) continue;
       if (z < 22 && z > -56) continue;
-      this._tree(8.15, z + rng.range(-0.8, 0.8), rng, rng.range(0.9, 1.1));
+      this._tree(8.15, z + rng.range(-0.8, 0.8), rng, rng.range(0.75, 1.25));
     }
   }
 
@@ -596,6 +613,12 @@ class Environment {
     // no-parking signs
     const np = Tex.label([['NO', 40], ['STOPPING', 44], ['ANY TIME', 30]], { w: 192, h: 256, bg: '#f4f4f0', fg: '#c0392b', border: '#c0392b' });
     const npm = new THREE.MeshStandardMaterial({ map: np, roughness: 0.6 });
+    const npmFg = npm;
+    // foreground pieces the viewer walks past (parallax layer at the left edge)
+    B.add(new THREE.CylinderGeometry(0.035, 0.035, 2.7, 6), m.metal, Geo.matrix(7.75, h + 1.35, 0.9));
+    B.box(0.03, 0.5, 0.42, 7.75, h + 2.35, 0.9, npmFg || m.white, 0, { noShadow: true });
+    B.add(new THREE.CylinderGeometry(0.3, 0.27, 0.95, 12), m.metalGreen, Geo.matrix(8.0, h + 0.475, 2.0));
+    B.add(new THREE.CylinderGeometry(0.33, 0.33, 0.08, 12), m.metalGreen, Geo.matrix(8.0, h + 0.99, 2.0));
     for (const [x, z] of [[7.5, 8], [-7.5, -26]]) {
       B.add(new THREE.CylinderGeometry(0.035, 0.035, 2.6, 6), m.metal, Geo.matrix(x, h + 1.3, z));
       B.box(0.02, 0.6, 0.45, x, h + 2.35, z, npm, 0, { noShadow: true });
@@ -823,7 +846,7 @@ class Environment {
     this.anchors.grill = new THREE.Vector3(x + gx, h + gy + gh, z + gz);
     this.anchors.grillSize = { w: gw, d: gd };
     // warm light from the fire
-    const fireLight = new THREE.PointLight('#ff8a3a', 6, 7, 1.6);
+    const fireLight = new THREE.PointLight('#ff7a2c', 7.5, 7.5, 1.6);
     fireLight.position.set(x, h + 1.7, z + gz);
     this.root.add(fireLight);
     this.dynamic.fireLight = fireLight;
@@ -933,7 +956,7 @@ class Environment {
     const o2 = SCRIPT_TRACKS.skyO2.value(t);
     this.skyUniforms.uO2.value = o2;
     // fog follows the sky colour a little
-    this.scene.fog.color.copy(this.horizonColor).multiplyScalar(MathX.lerp(0.93, 1.0, o2));
+    this.scene.fog.color.copy(this.horizonColor).multiplyScalar(MathX.lerp(0.94, 1.0, o2));
     // coals keep glowing (they are hot) but dim once nothing can burn
     // hot coals glow because they are HOT, not because they burn: bright orange → dull red, then they stay red for minutes
     const dim = MathX.smooth(t, tl.at('flames_out'), tl.at('flames_out') + 3.5);
@@ -941,7 +964,7 @@ class Environment {
     this.dynamic.coals.emissive.setRGB(1, MathX.lerp(0.35, 0.16, dim), MathX.lerp(0.08, 0.03, dim));
     // fire light flickers then dies with the flames
     const f = FX_FLAME_LEVEL(t, tl);
-    this.dynamic.fireLight.intensity = 5.5 * f * (0.82 + 0.18 * noise1(t * 14, 4)) + 0.35 * (1 - dim * 0.6);
+    this.dynamic.fireLight.intensity = 7.5 * f * (0.82 + 0.18 * noise1(t * 14, 4)) + 0.35 * (1 - dim * 0.6);
     // crane slewing slowly (electric) — stops when the operator is impaired
     const slew = MathX.smooth(t, 11.5, 13.5);
     const ang = 0.18 + 0.018 * Math.min(t, 11.5) + 0.009 * slew;
@@ -949,9 +972,9 @@ class Environment {
     this.dynamic.craneLoad.rotation.y = Math.sin(t * 0.4) * 0.08;
     // mains electricity: ~60 % of power comes from burning fuel, so the grid collapses seconds later
     const gp = this.gridPower(t);
-    for (const m of this.shopMats) { m.emissiveIntensity = 0.55 * gp; m.color.setScalar(MathX.lerp(0.78, 1, gp)); }
+    for (const m of this.shopMats) { m.emissiveIntensity = 0.4 * gp; m.color.setScalar(MathX.lerp(0.8, 1, gp)); }
     if (this.dynamic.ad) this.dynamic.ad.emissiveIntensity = 0.9 * gp;
-    if (this.dynamic.billboard) this.dynamic.billboard.color.setScalar(0.03 + 1.9 * gp * (0.96 + 0.04 * Math.sin(t * 3)));
+    if (this.dynamic.billboard) this.dynamic.billboard.color.setScalar(0.03 + 1.15 * gp * (0.96 + 0.04 * Math.sin(t * 3)));
     this._updateSignals(t, gp);
   }
 
@@ -978,7 +1001,7 @@ class Environment {
       h.lamps.forEach((l, i) => {
         let lit = i === on ? gp : 0;
         if (onBattery) lit = i === 0 && flashOn ? 1 : 0;
-        l.mat.color.copy(l.color).multiplyScalar(0.06 + 5.9 * lit);
+        l.mat.color.copy(l.color).multiplyScalar(0.05 + 3.0 * lit);
       });
     }
   }

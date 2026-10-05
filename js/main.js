@@ -193,6 +193,6 @@ const boot = () => {
 };
 // wait for web fonts briefly (signs are drawn with them), then build
 if (document.fonts && document.fonts.load) {
-  const fonts = ['700 40px "Oswald"', '800 40px "Inter"', '600 20px "Inter"', '700 20px "JetBrains Mono"'].map((f) => document.fonts.load(f).catch(() => null));
+  const fonts = ['700 40px "Oswald"', '800 40px "Inter"', '600 20px "Inter"', '300 40px "Inter"', '700 20px "JetBrains Mono"', 'italic 500 40px "Cormorant Garamond"'].map((f) => document.fonts.load(f).catch(() => null));
   Promise.race([Promise.all(fonts), new Promise((r) => setTimeout(r, 2500))]).then(boot);
 } else boot();

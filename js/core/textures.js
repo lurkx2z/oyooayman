@@ -457,19 +457,21 @@ const Tex = {
 
   // big rooftop LED billboard (mains powered — it dies with the grid)
   billboard() {
+    // a muted, image-led ad (minimal text): sea-grey gradient, soft sun disc, horizon line
     const W = 1024, H = 512, c = Tex.canvas(W, H), x = c.getContext('2d');
-    const g = x.createLinearGradient(0, 0, W, H);
-    g.addColorStop(0, '#0b1d4a'); g.addColorStop(0.55, '#1c5fd6'); g.addColorStop(1, '#27d4ff');
+    const g = x.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#2f4a57'); g.addColorStop(0.62, '#7d97a0'); g.addColorStop(0.63, '#4e6872'); g.addColorStop(1, '#22343d');
     x.fillStyle = g; x.fillRect(0, 0, W, H);
-    x.fillStyle = 'rgba(255,255,255,0.12)';
-    for (let i = 0; i < 9; i++) { x.beginPath(); x.arc(120 + i * 110, 380 - (i % 3) * 60, 40 + (i % 4) * 22, 0, 7); x.fill(); }
-    x.fillStyle = '#ffffff'; x.textAlign = 'left'; x.textBaseline = 'middle';
-    x.font = `900 120px ${Tex.fontSans}`; x.fillText('BREATHE', 60, 170);
-    x.font = `800 64px ${Tex.fontSans}`; x.fillStyle = '#c8f4ff'; x.fillText('THE CITY AIR', 64, 280);
-    x.font = `700 40px ${Tex.fontSans}`; x.fillStyle = '#ffffff'; x.fillText('SUMMER RUN · SAT 8AM', 66, 360);
-    x.fillStyle = '#ffd23d'; x.fillRect(66, 410, 300, 10);
-    // LED pixel grid
-    x.fillStyle = 'rgba(0,0,0,0.35)';
+    const sun = x.createRadialGradient(690, 300, 10, 690, 300, 170);
+    sun.addColorStop(0, 'rgba(255,236,206,0.95)'); sun.addColorStop(0.35, 'rgba(255,220,180,0.55)'); sun.addColorStop(1, 'rgba(255,210,170,0)');
+    x.fillStyle = sun; x.fillRect(0, 0, W, H);
+    // a runner silhouette on the shoreline
+    x.fillStyle = 'rgba(15,22,28,0.85)';
+    x.beginPath(); x.ellipse(300, 248, 14, 16, 0, 0, 7); x.fill();
+    x.beginPath(); x.moveTo(292, 264); x.lineTo(312, 264); x.lineTo(320, 318); x.lineTo(346, 348); x.lineTo(336, 356); x.lineTo(306, 328); x.lineTo(284, 360); x.lineTo(272, 352); x.lineTo(290, 318); x.closePath(); x.fill();
+    x.fillStyle = 'rgba(240,235,225,0.85)'; x.font = `500 30px ${Tex.fontSans}`; x.textAlign = 'left'; x.textBaseline = 'middle';
+    x.fillText('AERO', 60, 450); x.font = `400 20px ${Tex.fontSans}`; x.fillStyle = 'rgba(240,235,225,0.6)'; x.fillText('new season', 150, 452);
+    x.fillStyle = 'rgba(0,0,0,0.3)';
     for (let i = 0; i < W; i += 4) x.fillRect(i, 0, 1, H);
     for (let j = 0; j < H; j += 4) x.fillRect(0, j, W, 1);
     return Tex.tex(c, { repeat: false });

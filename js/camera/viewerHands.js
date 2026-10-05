@@ -11,14 +11,14 @@ const HAND_POSES = {
   right: {
     hidden:  { p: [0.22, -0.62, -0.32], r: [0.4, 0, 0.3] },
     ear:     { p: [0.2, 0.02, 0.05], r: [0.2, -0.4, 0.7] },
-    lighter: { p: [0.07, -0.155, -0.43], r: [0.2, -0.6, 0.12] },
+    lighter: { p: [0.095, -0.175, -0.44], r: [0.2, -0.6, 0.12] },
     tremble: { p: [0.06, -0.12, -0.34], r: [-0.2, -0.3, -0.1] },
   },
   left: {
     hidden:  { p: [-0.22, -0.62, -0.32], r: [0.4, 0, -0.3] },
     ear:     { p: [-0.2, 0.02, 0.05], r: [0.2, 0.4, -0.7] },
     lighter: { p: [-0.06, -0.15, -0.35], r: [0.1, 0.4, -0.1] },
-    tremble: { p: [-0.05, -0.115, -0.44], r: [-0.45, 0.7, 0.3] },
+    tremble: { p: [-0.095, -0.165, -0.5], r: [-0.45, 0.7, 0.3] },
   },
 };
 const HAND_BLEND = { hidden: 0.32, ear: 0.13, lighter: 0.3, tremble: 0.7 };
@@ -29,13 +29,13 @@ class ViewerHands {
     this.root = new THREE.Group();
     this.root.name = 'viewerHands';
     camera.add(this.root);
-    const skin = Mat.std('#d39b74', { roughness: 0.62 });
-    const sleeve = Mat.std('#2f3d52', { roughness: 0.85 });
-    const cuff = Mat.std('#26313f', { roughness: 0.85 });
+    const skin = Mat.std('#8f725f', { roughness: 0.78 });
+    const sleeve = Mat.std('#252b33', { roughness: 0.92 });
+    const cuff = Mat.std('#1d2228', { roughness: 0.92 });
     this.right = this._fist(skin, sleeve, cuff, 1);
     this.left = this._open(skin, sleeve, cuff, -1);
-    this.right.g.scale.setScalar(0.86);
-    this.left.g.scale.setScalar(0.86);
+    this.right.g.scale.setScalar(0.8);
+    this.left.g.scale.setScalar(0.8);
     this.root.add(this.right.g, this.left.g);
     this._v = new THREE.Vector3();
     this._q = new THREE.Quaternion();
@@ -77,7 +77,7 @@ class ViewerHands {
     thumb.add(tm);
     // lighter
     const lighter = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.074, 0.014), Mat.std('#1d8fe2', { roughness: 0.35 }));
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.024, 0.074, 0.014), Mat.std('#3f5f78', { roughness: 0.45 }));
     body.position.set(0.004, 0.105, -0.004);
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.018, 0.014), Mat.std('#b9bfc6', { roughness: 0.25, metalness: 0.9 }));
     head.position.set(0.004, 0.151, -0.004);

@@ -102,6 +102,15 @@ const ACTIONS = {
     p.headYaw = noise1(τ * 0.3, c.seedI) * 0.2;
     return p;
   },
+  jog(τ, c) {
+    const p = ACTIONS.walk(τ, c);
+    const φ = c.walkPhase, s = Math.sin(φ), co = Math.cos(φ);
+    p.lHip = [0.62 * s, 0.03]; p.rHip = [-0.62 * s, 0.03];
+    p.lKnee = 0.25 + 1.0 * Math.max(0, co) ** 1.3; p.rKnee = 0.25 + 1.0 * Math.max(0, -co) ** 1.3;
+    p.lSh = [-0.6 * s, 0.1]; p.rSh = [0.6 * s, 0.1]; p.lEl = 1.35; p.rEl = 1.35;
+    p.spine = 0.16; p.hipY = 0.9 + 0.035 * Math.abs(co);
+    return p;
+  },
   grill(τ, c) {
     const p = ACTIONS.idle(τ, c);
     const f = Math.sin(τ * 2.2 + c.seed * 4);
@@ -290,7 +299,7 @@ const ACTIONS = {
     return p;
   },
 };
-const BLEND = { recoil: 0.2, lie: 1.1, kneel: 0.85, sitGround: 1.3, stumble: 0.6, sitSlump: 1.2, lean: 0.8, look: 0.6, handHead: 0.5, walk: 0.5, idle: 0.6, earPop: 0.08, earPopSit: 0.08, flinch: 0.06, collapse: 0.12, railSlump: 0.1, lighter: 0.5, phone: 0.5, grind: 0.35 };
+const BLEND = { recoil: 0.2, lie: 1.1, kneel: 0.85, sitGround: 1.3, stumble: 0.6, sitSlump: 1.2, lean: 0.8, look: 0.6, handHead: 0.5, walk: 0.5, idle: 0.6, earPop: 0.08, earPopSit: 0.08, flinch: 0.06, collapse: 0.12, railSlump: 0.1, lighter: 0.5, phone: 0.5, grind: 0.35, jog: 0.4 };
 
 class Person {
   constructor(spec, scene) {
@@ -459,7 +468,7 @@ class Person {
 
   update(t) {
     const loc = this.locate(t);
-    const ctx = { seed: this.seed, seedI: this.seedI, walkPhase: (loc.dist / 1.32) * Math.PI * 2, seat: this.spec.seat };
+    const ctx = { seed: this.seed, seedI: this.seedI, walkPhase: (loc.dist / (this.spec.stride || 1.32)) * Math.PI * 2, seat: this.spec.seat };
     this.root.position.set(loc.x, this.spec.y || 0, loc.z);
     this.root.rotation.y = loc.dir;
     this.apply(this.poseAt(t, ctx));

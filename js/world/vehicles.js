@@ -54,7 +54,7 @@ CAR_PROFILES.taxi = CAR_PROFILES.sedan;
 class VehicleFactory {
   constructor() {
     this.m = {
-      glass: new THREE.MeshStandardMaterial({ color: '#26323d', roughness: 0.05, metalness: 0.55, envMapIntensity: 1.9, name: 'carGlass' }),
+      glass: new THREE.MeshStandardMaterial({ color: '#26323d', roughness: 0.14, metalness: 0.55, envMapIntensity: 1.9, name: 'carGlass' }),
       trim: new THREE.MeshStandardMaterial({ color: '#1c1d1f', roughness: 0.55, metalness: 0.1, name: 'carTrim' }),
       chrome: new THREE.MeshStandardMaterial({ color: '#c9ced3', roughness: 0.18, metalness: 1.0, name: 'chrome' }),
       head: new THREE.MeshStandardMaterial({ color: '#f4f2ea', emissive: new THREE.Color('#fff4e0'), emissiveIntensity: 1.6, roughness: 0.2, name: 'headlight' }),

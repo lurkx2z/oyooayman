@@ -154,7 +154,7 @@ class BillboardSystem {
         varying vec2 vUv; varying float vAlpha; varying vec3 vTint; varying float vDepth;
         void main(){
           float a = texture2D(uMap, vUv).r * vAlpha;
-          float fog = 1.0 - exp(-uFogDensity * uFogDensity * vDepth * vDepth);
+          float fog = 1.0 - exp(-uFogDensity * vDepth);
           gl_FragColor = vec4(mix(vTint, uFogColor, fog), a);
         }`,
     });
@@ -410,7 +410,7 @@ class ParticleSystem {
       const after = tb > tOut;
       let strength, keep;
       if (!after) { strength = 0.75; keep = 0.55; }
-      else { const cool = MathX.smooth(tb, tOut + 3, tOut + 12); strength = MathX.lerp(0.6, 0.22, cool); keep = MathX.lerp(0.7, 0.35, cool); }
+      else { const cool = MathX.smooth(tb, tOut + 3, tOut + 12); strength = MathX.lerp(0.42, 0.16, cool); keep = MathX.lerp(0.62, 0.32, cool); }
       if (h1 > keep) continue;
       const rise = (after ? 0.35 : 0.55) + h2 * 0.35;
       const x = g.x + (h1 - 0.5) * 0.4 + 0.55 * age + Math.sin(age * 1.3 + h3 * 6) * 0.12 * age;
@@ -418,7 +418,7 @@ class ParticleSystem {
       const z = g.z + (h3 - 0.5) * 0.5 + 0.42 * age;
       const size = (after ? 0.26 : 0.22) + age * (after ? 0.34 : 0.3);
       const a = Math.min(1, age * 2.5) * Math.pow(1 - age / life, 1.6) * 0.13 * strength;
-      const shade = after ? 0.78 + 0.06 * h3 : 0.62 + 0.1 * h3;
+      const shade = after ? 0.68 + 0.06 * h3 : 0.6 + 0.1 * h3;
       B.push(x, y, z, size, h1 * 6 + age * (h2 - 0.5), a, shade, after ? 0.97 : 0.86, after ? 0.97 : 0.82, after ? 0.98 : 0.78);
     }
   }
