@@ -48,23 +48,31 @@ const HAND_POSES = {
 };
 const HAND_BLEND = { hidden: 0.38, ear: 0.13, reach: 0.5, look: 0.55, brace: 0.32 };
 
+// options (all optional): scale (0.85 ≈ a 10-year-old), skin / nail / sleeve / cuff colours, watch (bool),
+// poses / blends (extra or replacement poses for this film), script (the hand keyframes; default SCRIPT.hands).
+// Props can be parented to hands.right.g / hands.left.g (they follow the wrist).
 class ViewerHands {
-  constructor(camera) {
+  constructor(camera, opts = {}) {
     this.camera = camera;
+    this.o = Object.assign({ scale: 1, skin: '#b98a70', nail: '#d6b3a2', sleeve: '#2a3340', cuff: '#1f252d', watch: true, poses: {}, blends: {}, script: null }, opts);
+    this.poses = Object.assign({}, HAND_POSES, this.o.poses);
+    this.blends = Object.assign({}, HAND_BLEND, this.o.blends);
     this.root = new THREE.Group();
     this.root.name = 'viewerHands';
     camera.add(this.root);
+    const o = this.o;
     this.mats = {
-      skin: new THREE.MeshStandardMaterial({ color: '#b98a70', roughness: 0.62, name: 'povSkin' }),
-      nail: new THREE.MeshStandardMaterial({ color: '#d6b3a2', roughness: 0.35, name: 'povNail' }),
-      sleeve: new THREE.MeshStandardMaterial({ color: '#2a3340', roughness: 0.92, name: 'povSleeve' }),
-      cuff: new THREE.MeshStandardMaterial({ color: '#1f252d', roughness: 0.95, name: 'povCuff' }),
+      skin: new THREE.MeshStandardMaterial({ color: o.skin, roughness: 0.62, name: 'povSkin' }),
+      nail: new THREE.MeshStandardMaterial({ color: o.nail, roughness: 0.35, name: 'povNail' }),
+      sleeve: new THREE.MeshStandardMaterial({ color: o.sleeve, roughness: 0.92, name: 'povSleeve' }),
+      cuff: new THREE.MeshStandardMaterial({ color: o.cuff, roughness: 0.95, name: 'povCuff' }),
       band: new THREE.MeshStandardMaterial({ color: '#19191b', roughness: 0.55, name: 'povBand' }),
       bezel: new THREE.MeshStandardMaterial({ color: '#9aa0a6', roughness: 0.3, metalness: 0.9, name: 'povBezel' }),
       face: new THREE.MeshStandardMaterial({ color: '#202428', roughness: 0.2, metalness: 0.2, name: 'povFace' }),
     };
     this.right = this._arm(1);
     this.left = this._arm(-1);
+    for (const h of [this.right, this.left]) h.g.scale.setScalar(o.scale);
     this.root.add(this.right.g, this.left.g);
     this._q = new THREE.Quaternion(); this._q2 = new THREE.Quaternion(); this._m = new THREE.Matrix4();
     this._x = new THREE.Vector3(); this._y = new THREE.Vector3(); this._z = new THREE.Vector3();
@@ -81,7 +89,7 @@ class ViewerHands {
     this._mesh(smoothLoft([[-0.09, 0.031, 0.023], [-0.04, 0.029, 0.021], [0.004, 0.027, 0.0185]], 12), M.skin, g);
     this._mesh(smoothLoft([[-0.42, 0.058, 0.052], [-0.2, 0.051, 0.046], [-0.078, 0.046, 0.041], [-0.074, 0.044, 0.039]], 14, 0.1, 0.1), M.sleeve, g);
     this._mesh(smoothLoft([[-0.078, 0.047, 0.042], [-0.05, 0.046, 0.041], [-0.046, 0.044, 0.039]], 14, 0.1, 0.1), M.cuff, g);
-    if (side < 0) {   // a watch on the left wrist (strap all round, face on the back of the wrist)
+    if (side < 0 && this.o.watch) {   // a watch on the left wrist (strap all round, face on the back of the wrist)
       this._mesh(smoothLoft([[-0.034, 0.0305, 0.0225], [-0.018, 0.0305, 0.0225]], 14, 0.05, 0.05), M.band, g);
       const face = this._mesh(new THREE.CylinderGeometry(0.0165, 0.0165, 0.007, 18), M.bezel, g, 0, -0.026, -0.024);
       face.rotation.x = Math.PI / 2;
@@ -131,13 +139,13 @@ class ViewerHands {
   }
 
   _poseAt(which, t) {
-    const S = SCRIPT.hands[which];
+    const S = (this.o.script || SCRIPT.hands)[which];
     let i = 0;
     while (i + 1 < S.length && S[i + 1][0] <= t) i++;
     const cur = S[i][1], prev = i > 0 ? S[i - 1][1] : cur;
-    const blend = HAND_BLEND[cur] || 0.35;
+    const P = this.poses, blend = this.blends[cur] || 0.35;
     const w = i > 0 ? Ease.inOutSine(MathX.clamp((t - S[i][0]) / blend, 0, 1)) : 1;
-    return { a: HAND_POSES[prev] || HAND_POSES.hidden, b: HAND_POSES[cur] || HAND_POSES.hidden, w, name: cur };
+    return { a: P[prev] || P.hidden, b: P[cur] || P.hidden, w, name: cur };
   }
 
   // quaternion whose +Y follows F and +Z follows the palm normal N (mirrored in X for the left hand)
@@ -150,7 +158,7 @@ class ViewerHands {
   }
 
   update(t) {
-    const hyp = SCRIPT_TRACKS.hypoxia.value(t), pov = SCRIPT_TRACKS.pov.value(t);
+    const hyp = SCRIPT_TRACKS.hypoxia ? SCRIPT_TRACKS.hypoxia.value(t) : 0, pov = SCRIPT_TRACKS.pov ? SCRIPT_TRACKS.pov.value(t) : 1;
     for (const which of ['right', 'left']) {
       const h = this[which], s = h.side, { a, b, w, name } = this._poseAt(which, t);
       const L = (u, v) => u + (v - u) * w;

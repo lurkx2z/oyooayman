@@ -3,31 +3,8 @@
    construction site and the charcoal-grill cart.
    ===================================================================== */
 
-// Atmospheric haze: plain exponential fog (three's FogExp2 is squared, which keeps the
-// midground too clear and then slams far objects to a flat wall). Foreground stays crisp,
-// the midground fades a little, the background washes out. The fog colour sits a little darker
-// than the horizon and never fully covers geometry, so far blocks lose detail before silhouette.
-// The haze is also uneven: denser near the ground and varying in slow banks across the city,
-// instead of one mathematically uniform fog field.
-THREE.ShaderChunk.fog_pars_vertex = THREE.ShaderChunk.fog_pars_vertex.replace(
-  'varying float vFogDepth;', 'varying float vFogDepth;\n\tvarying vec3 vFogWorld;');
-THREE.ShaderChunk.fog_vertex = THREE.ShaderChunk.fog_vertex.replace(
-  'vFogDepth = - mvPosition.z;',
-  // world position from view space (the view matrix is rigid), so instancing / skinning are already included
-  'vFogDepth = - mvPosition.z;\n\tvFogWorld = transpose( mat3( viewMatrix ) ) * ( mvPosition.xyz - viewMatrix[ 3 ].xyz );');
-THREE.ShaderChunk.fog_pars_fragment = THREE.ShaderChunk.fog_pars_fragment.replace(
-  'varying float vFogDepth;',
-  `varying float vFogDepth;
-\tvarying vec3 vFogWorld;
-\tfloat fogHash( vec2 p ) { return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ) * 43758.5453 ); }
-\tfloat fogNoise( vec2 p ) { vec2 i = floor( p ), f = fract( p ); vec2 u = f * f * ( 3.0 - 2.0 * f );
-\t\treturn mix( mix( fogHash( i ), fogHash( i + vec2( 1, 0 ) ), u.x ), mix( fogHash( i + vec2( 0, 1 ) ), fogHash( i + vec2( 1, 1 ) ), u.x ), u.y ); }`);
-THREE.ShaderChunk.fog_fragment = THREE.ShaderChunk.fog_fragment.replace(
-  'fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );',
-  // (the chunk line starts with "float ", so this continues that declaration)
-  `fogBank = 0.72 + 0.56 * fogNoise( vFogWorld.xz * 0.011 + 3.0 );                // slow banks
-\t\tfloat fogLow = 1.0 + 0.75 * exp( - max( vFogWorld.y, 0.0 ) / 4.5 );             // ground haze
-\t\tfloat fogFactor = min( 1.0 - exp( - fogDensity * vFogDepth * fogBank * fogLow ), 0.9 );   // capped: far blocks keep a silhouette`);
+// atmospheric haze (uneven exponential fog): see js/fx/fog.js
+installFog();
 
 const FACADE_STYLES = {
   redbrick:   { kind: 'brick', wall: [122, 80, 66],  frame: '#ebe6dc', sill: [208, 200, 186], winW: 0.5,  winH: 0.58, sillH: 0.24, panes: 3, bayW: 3.0, floorH: 3.3, ac: true },

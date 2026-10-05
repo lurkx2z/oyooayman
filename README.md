@@ -5,6 +5,9 @@ Everything is procedural, so there are no models, images or sound files to downl
 
 **Status: the full 90-second film.**
 
+> **Second film in progress: *How did kids have fun before screens?*** Open `before-screens.html` (Phase A, the first 15 s).
+> It runs on the same shared engine; its plan and shot list are in [`films/before-screens/PLAN.md`](films/before-screens/PLAN.md).
+
 | Time | Beat |
 |---|---|
 | 0–1.3 s | An ordinary overcast street. You walk toward a charcoal-grill cart (flames). A worker on a scissor lift throws a bright spark fan, there's traffic, birds, and a rooftop LED billboard. Title: *WHAT IF… oxygen disappeared?* The O₂ readout already creeps down from 21.0 % |
@@ -105,12 +108,48 @@ node tools/render-preview.cjs --w 1080 --h 1920 --out renders/what-if-oxygen.mp4
 
 ## Project layout
 
+The repo is now **one shared engine plus one folder or set of files per film**. A new film reuses the engine and adds its own script, world, HUD text and soundtrack.
+
+Shared engine (used by every film):
+
+```
+js/main.js                 SceneManager: renderer, clock, playback, recording, capture; calls the film's FILM hooks
+js/config.js               default tunables (a film can override them in its script)
+js/core/                   seeded RNG + noise, Timeline/Track, canvas textures, geometry batching
+js/camera/                 first-person head (path, bob, breathing, sway, startles) + authored first-person arms
+js/fx/postprocessing.js    AO, bloom, tone mapping, vignette, grain, fades; the film supplies the colour grade
+js/fx/fog.js               uneven atmospheric haze (installFog)
+js/fx/look.js              selective-gloss material rule (+ the oxygen film's grime shader)
+js/fx/particles.js         billboard particles (smoke, dust)
+js/world/people.js         low-poly people rig + pose library
+js/audio/audioEngine.js    offline-rendered, sample-synced soundtrack engine + SoundKit synth blocks
+js/ui/storyHud.js          reusable HUD: title, stacked lines, captions, info block, end line
+js/ui/devControls.js       playback / scrub / debug / recording mode
+tools/render-preview.cjs   frame-exact MP4 renderer (--page picks the film)
+```
+
+Film: *How did kids have fun before screens?* (`before-screens.html`):
+
+```
+films/before-screens/PLAN.md        shot list, assets, reuse map, historical checks
+films/before-screens/script.js      ★ timings, camera, hands, HUD text, every child's performance
+films/before-screens/film.js        FILM hooks: builds the sets, lighting switch, colour grade, hand poses
+films/before-screens/town.js        the c. 1905 street (houses, porches, fences, trees, lamps, props)
+films/before-screens/modernRoom.js  the evening bedroom, its door, the phone and its screen
+films/before-screens/children.js    period kids on the shared rig (clothes, child actions, throw/catch)
+films/before-screens/toys.js        hoops, ball, skipping rope, dust from running feet
+films/before-screens/audio.js       the film's soundtrack
+```
+
+Film: *What if oxygen suddenly disappeared?* (`index.html`):
+
 ```
 index.html                 page + HUD markup + script order
 style.css                  9:16 stage, HUD, dev controls
 lib/three.bundle.min.js    Three.js r186 (+ BufferGeometryUtils, RoundedBoxGeometry) as a classic script
 js/config.js               global tunables (camera height, walk speed, bob, fov, render settings…)
 js/scene/script.js         ★ THE DIRECTOR'S SCRIPT — every timing, camera move, HUD text, vehicle and person
+js/scene/film.js           FILM hooks: which systems make up the world, update order, the scene on screen, colour grade
 js/core/                   seeded RNG + noise, Timeline/Track, procedural canvas textures, geometry batching
 js/world/environment.js    sky, sun, street, buildings, shops, trees, props, construction site, grill cart
 js/world/kinematics.js     vehicle motion as pure functions of time ("stop here" → solves start position)

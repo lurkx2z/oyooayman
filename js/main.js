@@ -1,5 +1,12 @@
 /* =====================================================================
-   MAIN — SceneManager: builds everything, runs the loop, owns the clock.
+   MAIN — SceneManager: the shared engine. Owns the renderer, the clock,
+   playback, the first-person camera, post-processing, recording and capture.
+   Everything story-specific comes from the film's FILM object (film.js):
+     FILM.build(app)          create the world, HUD and soundtrack on `app`
+     FILM.update(app, t, tl)  pose every system for time t
+     FILM.view(app, t)        [scene, camera] to show (optional)
+     FILM.grade(t, params)    colour grade for time t (optional)
+     FILM.anchor / FILM.debug optional HUD anchors / debug-panel text
    ===================================================================== */
 
 class SceneManager {
@@ -30,20 +37,9 @@ class SceneManager {
     this.scene.add(this.camera);           // so the first-person hands (camera children) render
     this.rng = new RNG(CONFIG.seed);
 
-    this.env = new Environment(this.scene, R, this.rng);
-    this.env.camera = this.camera;
-    this.env.build();
-    this.peds = new PedestrianSystem(this.scene);
-    this.traffic = new TrafficSystem(this.scene);
-    this.hands = new ViewerHands(this.camera);
-    this.fx = new ParticleSystem(this.scene, this.env, this.traffic, this.peds, this.hands);
-    Look.apply(this.scene, this.camera);     // matte, slightly dirty older-game materials
-    this.aircraft = new AircraftSystem(this.scene);
-    this.earth = new EarthScene();
+    FILM.build(this);                        // world, HUD and soundtrack for this film
     this.post = new PostProcessing(R);
     this.cam = new CameraController(this.camera, CONFIG.camera);
-    this.hud = new HUD(document.getElementById('hud'), this.tl);
-    this.audio = new AudioManager(this.tl, this.traffic);
     if (!CONFIG.captureMode) {
       this.dev = new DevControls(this);
       this.audio.prepare();
@@ -124,31 +120,18 @@ class SceneManager {
     const tl = this.tl;
     tl.t = t;
     this.cam.update(t);
-    this.hands.update(t);
-    this.env.update(t, tl);
-    this.traffic.update(t, tl);
-    this.peds.update(t);
-    this.aircraft.update(t);
-    if (t >= SCRIPT.earth.from) this.earth.update(t);
-    this.fx.update(t, tl, this.camera);
+    FILM.update(this, t, tl);
     this.post.updateFromTimeline(t, tl);
     this.hud.update(t, this.camera, (target, tt) => this.anchor(target, tt));
   }
 
-  anchor(target, t) {
-    const [kind, id] = target.split(':');
-    if (kind === 'veh') return this.traffic.anchor(id, t);
-    if (kind === 'fx') return this.env.anchors[id] || null;
-    if (kind === 'hand') return this.hands.nozzleWorld(new THREE.Vector3());
-    if (kind === 'person') { const p = this.peds.byId[id]; return p ? p.root.position.clone().setY(1.9) : null; }
-    return null;
-  }
+  anchor(target, t) { return FILM.anchor ? FILM.anchor(this, target, t) : null; }
 
   renderAt(t) {
     this.renderer.info.reset();
     this.update(t);
-    if (t >= SCRIPT.earth.from) this.post.render(this.earth.scene, this.earth.camera);
-    else this.post.render(this.scene, this.camera);
+    const [scene, camera] = FILM.view ? FILM.view(this, t) : [this.scene, this.camera];
+    this.post.render(scene, camera);
   }
 
   loop() {
@@ -174,7 +157,7 @@ class SceneManager {
     if (!this.dev || !this.dev.el.debugPanel.classList.contains('show')) return '';
     const i = this.renderer.info;
     const c = this.camera.position;
-    return `O₂ ${SCRIPT_TRACKS.oxygen.value(this.t).toFixed(2)}% · hypoxia ${SCRIPT_TRACKS.hypoxia.value(this.t).toFixed(2)}<br>
+    return `${FILM.debug ? FILM.debug(this, this.t) + '<br>' : ''}
       draw calls ${i.render.calls} · tris ${(i.render.triangles / 1000).toFixed(0)}k<br>
       cam ${c.x.toFixed(2)}, ${c.y.toFixed(2)}, ${c.z.toFixed(2)} · fov ${this.camera.fov.toFixed(1)}<br>
       render ${this.renderer.domElement.width}×${this.renderer.domElement.height} · audio ${this.audio.buffer ? 'ready' : 'rendering…'}`;

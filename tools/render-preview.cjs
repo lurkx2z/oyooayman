@@ -6,6 +6,7 @@
    Needs: Node.js, Playwright (npm i -D playwright) and ffmpeg on PATH.
      node tools/render-preview.cjs --w 1080 --h 1920 --out renders/what-if-oxygen.mp4
      node tools/render-preview.cjs --shots 0,2.5,3.3,6,8.6,12 --w 540 --h 960   (stills only)
+     node tools/render-preview.cjs --page before-screens.html --to 15 --out renders/before-screens.mp4
    ===================================================================== */
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -20,6 +21,7 @@ const W = parseInt(args.w || '540', 10), H = parseInt(args.h || '960', 10);
 const FPS = parseInt(args.fps || '30', 10);
 const FROM = parseFloat(args.from || '0'), TO = parseFloat(args.to || '90');
 const OUT = args.out || 'renders/preview.mp4';
+const PAGE = args.page || 'index.html';   // which film to render, e.g. --page before-screens.html
 const ROOT = path.resolve(__dirname, '..');
 const frameDir = path.resolve(args.frames || path.join(ROOT, 'renders', 'frames'));
 
@@ -31,7 +33,7 @@ const frameDir = path.resolve(args.frames || path.join(ROOT, 'renders', 'frames'
   const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1, ignoreHTTPSErrors: true });
   page.on('console', (m) => { if (['error', 'warning'].includes(m.type())) console.log('[page]', m.type(), m.text()); });
   page.on('pageerror', (e) => console.log('[pageerror]', e.message));
-  const url = 'file://' + path.join(ROOT, 'index.html') + `?capture&w=${W}&h=${H}`;
+  const url = 'file://' + path.join(ROOT, PAGE) + `?capture&w=${W}&h=${H}`;
   await page.goto(url);
   await page.waitForFunction(() => window.SIM_READY === true, null, { timeout: 180000 });
   const stage = await page.$('#stage');

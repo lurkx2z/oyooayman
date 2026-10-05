@@ -22,6 +22,7 @@ class CameraController {
     this.theight = new Track(C.height || [[0, params.cameraHeight]]);
     this.ttilt = new Track(C.tilt || [[0, 0]]);
     this.spasms = C.spasms || [];
+    this.baseY = C.baseY !== undefined ? C.baseY : (typeof LAYOUT !== 'undefined' ? LAYOUT.curbH : 0);   // ground under the feet
     // distance walked as a function of time (drives step bob)
     this.dt = 1 / 120;
     const n = Math.ceil((CONFIG.duration + 2) / this.dt);
@@ -31,6 +32,12 @@ class CameraController {
       const t = i * this.dt, x = this.tx.value(t), z = this.tz.value(t);
       d += Math.hypot(x - px, z - pz); px = x; pz = z;
       this.dist[i] = d;
+    }
+    // step phase: steps per metre fall as you speed up (runStrideGain > 0 lengthens the stride when running)
+    this.stepPh = new Float32Array(n + 1);
+    for (let i = 1; i <= n; i++) {
+      const dd = this.dist[i] - this.dist[i - 1], v = dd / this.dt;
+      this.stepPh[i] = this.stepPh[i - 1] + dd * params.bobFrequency / (1 + Math.max(0, v / params.walkSpeed - 1) * (params.runStrideGain || 0));
     }
     camera.rotation.order = 'YXZ';
   }
@@ -42,18 +49,20 @@ class CameraController {
 
   update(t) {
     const P = this.p, cam = this.camera, D = MathX.deg;
-    const pov = SCRIPT_TRACKS.pov.value(t);               // 0 = cinematic camera: no body motion at all
-    const hyp = SCRIPT_TRACKS.hypoxia.value(t) * pov;
-    const hold = SCRIPT_TRACKS.breathHold.value(t);
+    const tr = (k, d) => (SCRIPT_TRACKS[k] ? SCRIPT_TRACKS[k].value(t) : d);   // optional story tracks
+    const pov = tr('pov', 1);                             // 0 = cinematic camera: no body motion at all
+    const hyp = tr('hypoxia', 0) * pov;
+    const hold = tr('breathHold', 0);
     let x = this.tx.value(t), z = this.tz.value(t);
-    let y = LAYOUT.curbH + this.theight.value(t);
+    let y = this.baseY + this.theight.value(t);
     let yaw = D(this.tyaw.value(t)), pitch = D(this.tpitch.value(t)), roll = D(this.ttilt.value(t));
     const bx = x, by = y, bz = z, byaw = yaw, bpitch = pitch, broll = roll;
 
     // --- walking bob (scaled by current speed)
     const speed = (this.walked(t + 0.05) - this.walked(t - 0.05)) / 0.1;
     const walkAmt = MathX.clamp(speed / P.walkSpeed, 0, 1.3);
-    const ph = this.walked(t) * P.bobFrequency * Math.PI; // one step = half a cycle
+    const fi = MathX.clamp(t / this.dt, 0, this.stepPh.length - 1.001), ii = Math.floor(fi);
+    const ph = (this.stepPh[ii] + (this.stepPh[ii + 1] - this.stepPh[ii]) * (fi - ii)) * Math.PI; // one step = half a cycle
     y += -Math.abs(Math.sin(ph)) * P.bobStrength * walkAmt + P.bobStrength * 0.5 * walkAmt;
     const sway = Math.sin(ph * 0.5) * walkAmt;
     x += sway * 0.018;
@@ -129,7 +138,8 @@ class CameraController {
       const n = Math.ceil((CONFIG.duration + 2) / this.dt);
       this._brTable = new Float32Array(n + 1);
       let ph = 0;
-      for (let i = 0; i <= n; i++) { this._brTable[i] = ph; ph += (SCRIPT_TRACKS.breathRate.value(i * this.dt) / 60) * Math.PI * 2 * this.dt; }
+      const rate = SCRIPT_TRACKS.breathRate || { value: () => this.p.breathRate || 14 };
+      for (let i = 0; i <= n; i++) { this._brTable[i] = ph; ph += (rate.value(i * this.dt) / 60) * Math.PI * 2 * this.dt; }
     }
     const f = MathX.clamp(t / this.dt, 0, this._brTable.length - 1.001), i = Math.floor(f);
     return this._brTable[i] + (this._brTable[i + 1] - this._brTable[i]) * (f - i);

@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>What If Oxygen Disappeared — Simulation</title>
-  <!-- Optional web fonts (the page still works offline with system fonts) -->
+  <title>How Did Kids Have Fun Before Screens?</title>
   <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
   <link rel="stylesheet" href="fonts/fonts.css">
   <link rel="stylesheet" href="style.css">
@@ -13,32 +12,8 @@
   <div id="app">
     <div id="stage">
       <canvas id="gl"></canvas>
-
-      <!-- Cinematic HUD (stays visible in Recording Mode) -->
-      <div id="hud">
-        <!-- one info block, top-left: tiny caps label → serif value → same value in other units → context -->
-        <div class="readout" id="o2Readout">
-          <div class="label">ATMOSPHERIC OXYGEN</div>
-          <div class="value"><span id="o2Value">21.0</span><span class="unit">%</span></div>
-          <div class="sub" id="o2Sub">21.3 kPa</div>
-          <div class="ctx" id="o2Ctx">SEA LEVEL</div>
-        </div>
-        <div class="readout secondary" id="timerReadout">
-          <div class="label">TIME WITHOUT OXYGEN</div>
-          <div class="value" id="timerValue">00:00</div>
-        </div>
-        <div class="readout secondary" id="breathReadout">
-          <div class="label">BREATH HELD</div>
-          <div class="value" id="breathValue">00:00</div>
-        </div>
-        <div id="title">
-          <div class="kicker"></div>
-          <div class="main">What if oxygen<br>suddenly disappeared?</div>
-        </div>
-        <div id="caption"></div>
-        <div id="ending"><div class="line"></div><div class="final"><div class="label">ATMOSPHERIC OXYGEN</div><div class="value">0.0<span class="unit">%</span></div></div></div>
-        <div id="annotations"></div>
-      </div>
+      <!-- Cinematic HUD (built by js/ui/storyHud.js from SCRIPT.hud; stays visible in Recording Mode) -->
+      <div id="hud"></div>
     </div>
   </div>
 
@@ -57,11 +32,11 @@
   </div>
   <div id="debug"></div>
   <div id="startOverlay">
-    <div class="big">What if oxygen suddenly disappeared?</div>
+    <div class="big">How did kids have fun before screens?</div>
     <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
     <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
   </div>
-  <div id="loading">BUILDING THE CITY…</div>
+  <div id="loading">BUILDING THE TOWN…</div>
   <div id="errorBox"></div>
 
   <script>
@@ -73,31 +48,30 @@
   </script>
   <!-- Three.js (bundled locally — no internet or server needed) -->
   <script src="lib/three.bundle.min.js"></script>
-  <!-- Project code (plain scripts, loaded in order) -->
+  <!-- shared engine -->
   <script src="js/config.js"></script>
   <script src="js/core/rng.js"></script>
   <script src="js/core/timeline.js"></script>
   <script src="js/core/textures.js"></script>
   <script src="js/core/geo.js"></script>
-  <script src="js/world/layout.js"></script>
-  <script src="js/scene/script.js"></script>
-  <script src="js/world/kinematics.js"></script>
   <script src="js/fx/fog.js"></script>
-  <script src="js/world/environment.js"></script>
-  <script src="js/world/people.js"></script>
-  <script src="js/world/vehicles.js"></script>
-  <script src="js/fx/particles.js"></script>
   <script src="js/fx/postprocessing.js"></script>
   <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
   <script src="js/camera/cameraController.js"></script>
   <script src="js/camera/viewerHands.js"></script>
-  <script src="js/world/aircraft.js"></script>
-  <script src="js/world/earth.js"></script>
+  <script src="js/world/people.js"></script>
   <script src="js/audio/audioEngine.js"></script>
-  <script src="js/audio/audioManager.js"></script>
-  <script src="js/ui/hud.js"></script>
+  <script src="js/ui/storyHud.js"></script>
   <script src="js/ui/devControls.js"></script>
-  <script src="js/scene/film.js"></script>
+  <!-- this film -->
+  <script src="films/before-screens/script.js"></script>
+  <script src="films/before-screens/children.js"></script>
+  <script src="films/before-screens/town.js"></script>
+  <script src="films/before-screens/modernRoom.js"></script>
+  <script src="films/before-screens/toys.js"></script>
+  <script src="films/before-screens/audio.js"></script>
+  <script src="films/before-screens/film.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

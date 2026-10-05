@@ -107,7 +107,7 @@ class PostProcessing {
       exposure: CONFIG.render.exposure, bloom: CONFIG.render.bloom ? 0.22 : 0, bloomThreshold: 1.6,
       saturation: 1.22, contrast: 1.06, warmth: 0.0, vignette: 1.0, soft: 0.1, blackLift: 0.008, keepWarm: 1.0,
       tunnel: 1.2, tunnelSoft: 0.5, tunnelDark: 0.0, edgeBlur: 0.0, chroma: 0.0, grain: 0.022, uneven: 0.04,
-      fade: 0.0, flash: 0.0, time: 0,
+      fade: 0.0, flash: 0.0, flashColor: new THREE.Color(0.86, 0.89, 0.88), time: 0,
       ao: 1.0, aoDebug: 0, fogDensity: 0,
     };
     this.compMat = new THREE.ShaderMaterial({
@@ -115,7 +115,7 @@ class PostProcessing {
         tScene: { value: null }, tBlurQ: { value: null }, tBlurE: { value: null }, uRes: { value: new THREE.Vector2() },
         uExposure: { value: 1 }, uBloom: { value: 0.5 }, uBloomThreshold: { value: 1.1 }, uSaturation: { value: 1 }, uContrast: { value: 1 },
         uWarmth: { value: 0 }, uVignette: { value: 1 }, uTunnel: { value: 1.2 }, uTunnelSoft: { value: 0.5 }, uTunnelDark: { value: 0 },
-        uEdgeBlur: { value: 0 }, uChroma: { value: 0 }, uGrain: { value: 0 }, uFade: { value: 0 }, uFlash: { value: 0 }, uTime: { value: 0 },
+        uEdgeBlur: { value: 0 }, uChroma: { value: 0 }, uGrain: { value: 0 }, uFade: { value: 0 }, uFlash: { value: 0 }, uFlashColor: { value: new THREE.Color() }, uTime: { value: 0 },
         uSoft: { value: 0 }, uBlackLift: { value: 0 }, uKeepWarm: { value: 1 },
         tAO: { value: null }, uAO: { value: 0 }, uAODebug: { value: 0 }, uFogDensity: { value: 0 }, uUneven: { value: 0 },
       },
@@ -125,6 +125,7 @@ class PostProcessing {
         uniform float uAO, uAODebug, uFogDensity, uUneven;
         uniform float uExposure, uBloom, uBloomThreshold, uSaturation, uContrast, uWarmth, uVignette;
         uniform float uTunnel, uTunnelSoft, uTunnelDark, uEdgeBlur, uChroma, uGrain, uFade, uFlash, uTime;
+        uniform vec3 uFlashColor;
         uniform float uSoft, uBlackLift, uKeepWarm;
         varying vec2 vUv;
         vec3 aces(vec3 x){ const float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14; return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0); }
@@ -188,7 +189,7 @@ class PostProcessing {
           float lg = dot(col, vec3(0.2126, 0.7152, 0.0722));
           float gn = (hash(uv * uRes + fract(uTime * 7.31)) - 0.5) + 0.6 * (hash(floor(uv * uRes * 0.5) + fract(uTime * 3.71)) - 0.5);
           col += gn * uGrain * (0.55 + 0.9 * (1.0 - lg));
-          col = mix(col, vec3(0.86, 0.89, 0.88), uFlash);   // white-out into haze
+          col = mix(col, uFlashColor, uFlash);   // white-out (into haze, or into light through a door)
           col *= 1.0 - uFade;
           gl_FragColor = vec4(col, 1.0);
         }`,
@@ -257,7 +258,7 @@ class PostProcessing {
     u.uSaturation.value = p.saturation; u.uContrast.value = p.contrast; u.uWarmth.value = p.warmth; u.uVignette.value = p.vignette;
     u.uTunnel.value = p.tunnel; u.uTunnelSoft.value = p.tunnelSoft; u.uTunnelDark.value = p.tunnelDark;
     u.uEdgeBlur.value = p.edgeBlur; u.uChroma.value = p.chroma; u.uGrain.value = p.grain;
-    u.uFade.value = p.fade; u.uFlash.value = p.flash; u.uTime.value = p.time;
+    u.uFade.value = p.fade; u.uFlash.value = p.flash; u.uFlashColor.value.copy(p.flashColor); u.uTime.value = p.time;
     u.uSoft.value = p.soft; u.uBlackLift.value = p.blackLift; u.uKeepWarm.value = p.keepWarm;
     u.tAO.value = this.ao1.texture; u.uAO.value = p.ao; u.uAODebug.value = p.aoDebug; u.uUneven.value = p.uneven;
     u.uFogDensity.value = scene.fog ? scene.fog.density : 0;
@@ -273,31 +274,9 @@ class PostProcessing {
     this._pass(this.blurMat, a);
   }
 
-  // per-frame film look driven by the timeline
+  // per-frame look: each film grades its own picture (FILM.grade(t, params, tl), see the film's film.js)
   updateFromTimeline(t, tl) {
-    const p = this.params;
-    const hyp = SCRIPT_TRACKS.hypoxia.value(t);
-    p.time = t;
-    // muted, cold overcast look. While the fire burns it is the only warm thing in frame;
-    // once the flames die the whole image drifts a little colder and greyer.
-    const cold = MathX.smooth(t, tl.at('flames_out'), tl.at('o2_zero') + 1.0);
-    p.tunnel = MathX.lerp(1.15, 0.36, hyp);
-    p.tunnelSoft = MathX.lerp(0.55, 0.42, hyp);
-    p.tunnelDark = 0.97 * MathX.smooth(hyp, 0.2, 0.9);          // mild while you hold your breath, total at the blackout
-    p.edgeBlur = Math.min(1, hyp * 1.5);
-    p.saturation = MathX.lerp(MathX.lerp(1.22, 1.04, cold), 0.62, hyp);
-    p.warmth = MathX.lerp(MathX.lerp(0.05, -0.35, cold), -0.5, Math.min(1, hyp * 1.5));
-    // the big pressure step: a brief exposure dip instead of any flashy effect
-    const tPop = 2.05;
-    const pop = MathX.impulse(t, tPop + 0.02, 0.16);
-    p.chroma = 0;
-    // story fades: black (lost moment, blackout, end) and the white-out through the haze into space
-    p.fade = SCRIPT_TRACKS.fade.value(t);
-    p.flash = 0.92 * SCRIPT_TRACKS.whiteout.value(t);
-    p.exposure = CONFIG.render.exposure * 1.22 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);   // midtones ≈ the references (docs/art-direction.md)
-    p.contrast = 1.06 + 0.05 * hyp;
-    p.soft = 0.1 + 0.05 * hyp;
-    // space: a cleaner, slightly richer grade
-    if (t >= SCRIPT.earth.from) { p.saturation = 1.25; p.warmth = 0; p.contrast = 1.1; p.exposure = CONFIG.render.exposure * 1.15; p.soft = 0.06; }
+    this.params.time = t;
+    if (typeof FILM !== 'undefined' && FILM.grade) FILM.grade(t, this.params, tl);
   }
 }
