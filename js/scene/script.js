@@ -25,7 +25,23 @@ const SCRIPT = {
     { id: 'ev_pass',        time: 8.6,  label: 'Electric car still driving' },
     { id: 'hypoxia_begin',  time: 9.8,  label: 'Dizziness · tunnel vision' },
     { id: 'first_collapse', time: 12.6, label: 'Hard-working worker collapses first (~10 s)' },
-    { id: 'phase1_end',     time: 15.0, label: 'End of Phase 1 (≈4 s before you black out)' },
+    { id: 'realization',    time: 15.4, label: 'Every breath pulls O₂ OUT of your blood' },
+    { id: 'breath_hold',    time: 16.2, label: 'You hold your breath (buys ~30 s)' },
+    { id: 'blink_cut',      time: 21.45, label: 'Lost moment → the intersection' },
+    { id: 'aircraft',       time: 23.0, label: 'Airliner gliding overhead, engines dead since 1.7 s' },
+    { id: 'aircraft_gone',  time: 31.6, label: 'It disappears behind the blocks' },
+    { id: 'impact',         time: 34.4, label: 'Impact: dust, no fireball (nothing can burn)' },
+    { id: 'impact_sound',   time: 35.9, label: 'The sound arrives 1.5 s later (510 m away)' },
+    { id: 'phones',         time: 37.2, label: 'Phones ringing beside people on the ground' },
+    { id: 'co2_burn',       time: 44.6, label: 'CO₂ builds: chest spasms' },
+    { id: 'forced_breath',  time: 49.6, label: 'Your body forces a breath of O₂-free air' },
+    { id: 'kneel',          time: 52.8, label: 'Knees give way' },
+    { id: 'collapse',       time: 55.0, label: 'You collapse' },
+    { id: 'silence',        time: 58.4, label: 'Silence' },
+    { id: 'pullback',       time: 60.1, label: 'Rise above the dead avenue' },
+    { id: 'earth',          time: 67.6, label: 'Earth: the same thing, everywhere' },
+    { id: 'ending',         time: 79.2, label: 'You would only have seconds to react' },
+    { id: 'end',            time: 90.0, label: 'End' },
   ],
 
   // Set to null to keep mains electricity on (not realistic: ~60 % of power comes from burning fuel)
@@ -33,10 +49,11 @@ const SCRIPT = {
 
   // the viewer's own hands (first-person)
   hands: {
-    // first-person hands stay out of Phase 1 until a proper low-poly arm model is available
-    // (the old poses: [1.85, 'ear'], [2.75, 'hidden'], [3.4, 'lighter'], [5.3, 'hidden'])
-    right: [[0, 'hidden']],
-    left: [[0, 'hidden']],
+    // the viewer's own arms (authored model in js/camera/viewerHands.js)
+    // (a hand over the mouth would sit ~55° below the eye line, out of frame, so the breath-hold beat is a hand
+    //  reaching toward the kneeling customer instead)
+    right: [[0, 'hidden'], [1.85, 'ear'], [2.75, 'hidden'], [16.6, 'reach'], [18.9, 'hidden'], [53.2, 'brace'], [55.3, 'hidden']],
+    left: [[0, 'hidden'], [1.85, 'ear'], [2.75, 'hidden'], [44.4, 'look'], [47.6, 'hidden']],
     flicks: [],                      // viewer's piezo clicks (e.g. [3.95, 4.45, 4.95]); the vendor's flint lighter carries this beat
   },
 
@@ -47,9 +64,23 @@ const SCRIPT = {
     // the counter starts creeping down on the very first frame, then crashes
     oxygen: [[0, 21.0], [0.3, 21.0], [1.3, 20.3, 'inQuad'], [1.66, 15.0, 'inQuad'], [1.95, 8.0, 'linear'], [2.2, 3.0, 'linear'], [2.4, 0, 'outQuad']],
     // 0 … 1 : how strongly the viewer is affected (drives visual + audio effects)
-    hypoxia: [[0, 0], [9.8, 0], [12.0, 0.28, 'inQuad'], [15, 0.72, 'linear']],
-    breathRate: [[0, 14], [9.0, 14], [15, 22, 'inQuad']],          // breaths per minute (no gasping: CO₂ still leaves)
-    heartRate: [[0, 72], [9.4, 76], [15, 112, 'inQuad']],          // beats per minute
+    // holding your breath stops the washout: symptoms plateau until the body forces a breath at 49.6 s
+    hypoxia: [[0, 0], [9.8, 0], [12.0, 0.28, 'inQuad'], [15, 0.62, 'linear'], [16.4, 0.64], [19, 0.42], [24, 0.36], [38, 0.38], [44, 0.45],
+      [49.6, 0.55], [50.6, 0.72], [53.0, 0.88], [55.3, 0.98], [60.0, 1.0], [60.1, 0, 'step']],
+    breathRate: [[0, 14], [9.0, 14], [15, 22, 'inQuad'], [49.6, 22], [50.5, 34], [54, 30], [56, 12]],   // breaths per minute (no gasping: CO₂ still leaves)
+    // 1 while the breath is held (no breathing motion or sound)
+    breathHold: [[0, 0], [16.15, 0], [16.2, 1, 'step'], [49.6, 1], [49.65, 0, 'step']],
+    // CO₂ distress during the breath-hold: chest spasms, louder heart (0 … 1)
+    co2: [[0, 0], [38, 0], [44.6, 0.35], [49.5, 1.0, 'inQuad'], [49.7, 0, 'step']],
+    heartRate: [[0, 72], [9.4, 76], [15, 112, 'inQuad'], [30, 104], [44, 118], [49.6, 126], [54, 96], [58, 58], [60, 40]],   // beats per minute
+    // 1 = first-person layers (bob, breathing, hypoxia effects); 0 = cinematic camera (pull-back, Earth)
+    pov: [[0, 1], [60.0, 1], [60.1, 0, 'step']],
+    // black fades: a hypoxic "lost moment" cut, the blackout, the end
+    fade: [[0, 0], [21.3, 0], [21.42, 1], [21.62, 1], [21.95, 0], [57.6, 0], [59.2, 0.86], [59.45, 1], [60.15, 1], [61.1, 0], [88.4, 0], [89.9, 1]],
+    // white-out through the haze into space
+    whiteout: [[0, 0], [66.2, 0], [67.5, 1, 'inQuad'], [67.65, 1], [68.7, 0, 'outQuad']],
+    // night-side city lights still burning on Earth (backup power running out in waves)
+    earthLights: [[0, 1], [68.5, 1], [80, 0.1, 'inOutSine'], [90, 0.06]],
     // sky gets slightly darker: O₂ is ~21 % of the molecules that scatter blue light
     skyO2: [[0, 1], [1.3, 1], [2.4, 0, 'inOutSine']],
   },
@@ -58,28 +89,49 @@ const SCRIPT = {
      First-person camera.  yaw: + = turn LEFT, − = turn RIGHT (degrees)
      ------------------------------------------------------------------ */
   camera: {
-    x: [[0, 9.4], [9.6, 9.4], [10.4, 9.25], [13.6, 9.25], [14.6, 9.45]],
-    z: [[0, 5.2], [1.9, 2.8, 'linear'], [2.6, 2.4, 'outQuad'], [13.6, 2.4], [14.6, 2.65]],
+    // 21.5 s: a hypoxic "lost moment" — the picture blacks out and returns at the intersection corner.
+    // 60.1 s: the camera leaves the body and rises above the avenue (cinematic, pov track = 0).
+    x: [[0, 9.4], [9.6, 9.4], [10.4, 9.25], [13.6, 9.25], [14.6, 9.45], [16.0, 9.5], [21.35, 9.85, 'linear'], [21.5, 14.0, 'step'],
+      [24, 13.9], [36.0, 13.8], [40.8, 11.2], [46, 11.0], [52.8, 10.9], [55.6, 10.8], [60.0, 10.8], [60.1, 12, 'step'], [66.8, 4]],
+    z: [[0, 5.2], [1.9, 2.8, 'linear'], [2.6, 2.4, 'outQuad'], [13.6, 2.4], [14.6, 2.65], [16.0, 2.55], [21.35, 1.0, 'linear'], [21.5, -37.4, 'step'],
+      [24, -37.6], [36.0, -37.7], [40.8, -39.0], [46, -39.6], [52.8, -39.9], [55.6, -40.05], [60.0, -40.05], [60.1, -26, 'step'], [66.8, 40]],
+    // eye height above the pavement: kneel, fall, then the crane up
+    height: [[0, 1.7], [52.8, 1.7], [53.7, 1.02, 'inOutQuad'], [55.0, 0.92], [55.6, 0.2, 'inQuad'], [60.0, 0.2], [60.1, 18, 'step'], [66.8, 130, 'inOutSine']],
+    // fixed roll (deg) for lying on the ground
+    tilt: [[0, 0], [55.0, 0], [55.6, 74, 'inQuad'], [60.0, 74], [60.1, 0, 'step']],
     yaw: [
       [0, 5], [1.3, 5], [1.7, 7], [2.4, 7.5], [3.2, 7], [3.7, 9.5, 'inOutSine'], [5.2, 10.5], [5.75, 9.5], [6.1, 9.5],
       [6.55, 21, 'inOutCubic'], [7.1, 22], [7.3, 30], [7.5, 35], [7.8, 45], [8.0, 52], [8.2, 61], [8.4, 70], [8.6, 77], [8.85, 80, 'outQuad'],
       // after the electric car: look down the avenue — the dead street and the hazy city become the subject,
       // the cart stays as a dark mass at the right edge
       [9.9, 28, 'inOutCubic'], [11.1, 26], [12.0, 17], [13.0, 16], [13.6, 14], [14.5, 11.5], [15, 12],
+      // hold your breath, look at the people on the ground
+      [16.2, 6], [17.4, 2], [18.4, -10], [19.6, -6], [20.6, 12], [21.35, 16],
+      // the intersection; 24.4–31.6 s the head follows the gliding airliner (keys added below from its path)
+      [21.5, 48, 'step'], [23.2, 50], [23.9, 55],
+      [33.4, -84], [34.0, -86], [37.0, -86], [38.8, 16, 'inOutCubic'], [40.0, 15], [42.0, 19], [44.0, 18], [46.5, 16], [49.6, 18], [52.8, 15], [55.6, 15], [60.0, 15],
+      [60.1, 35, 'step'], [66.8, 0],
     ],
     pitch: [
       [0, 4], [1.3, 4], [1.7, 2], [2.4, 1], [3.2, -2], [3.7, -5, 'inOutSine'], [5.2, -4.5], [5.75, 13], [6.1, 12.5],
       [6.55, 3], [7.1, 2.5], [7.5, 0], [8.2, -1.5], [8.85, -2], [9.9, -1.5], [10.8, -2], [11.4, -1.5], [12.0, 10.5],
       [13.0, 9.5], [13.6, -5], [14.5, -7.5], [15, -7],
+      [16.2, -8], [17.4, -10], [18.4, -12], [19.6, -9], [20.6, -1], [21.35, -2],
+      [21.5, -6, 'step'], [23.2, -4], [23.9, 6],
+      [33.4, 6], [34.0, 7], [37.0, 9], [38.8, -6], [40.0, -8], [42, -6], [44, -10], [46.5, -6], [49.6, -2], [52.8, -16], [53.7, -30], [55.0, -38], [55.6, -6], [60, -6],
+      [60.1, -38, 'step'], [66.8, -24],
     ],
-    fov: [[0, 60], [2.03, 60], [2.1, 55.5, 'outQuad'], [2.8, 60, 'inOutSine'], [10, 60], [15, 56.5]],
+    fov: [[0, 60], [2.03, 60], [2.1, 55.5, 'outQuad'], [2.8, 60, 'inOutSine'], [10, 60], [15, 56.5], [16.2, 57], [22, 60], [44, 59], [50, 57], [55, 52], [60, 52],
+      [60.1, 50, 'step'], [66.8, 50]],
     // sudden reactions: t, strength  (small pops while O₂ falls, the big one at 0 %)
     startles: [[1.55, 0.14], [1.82, 0.42], [2.05, 0.75], [6.77, 0.35]],
     // camera shakes: t, amplitude, decay seconds
-    shakes: [[2.05, 0.5, 0.3], [6.77, 0.15, 0.25]],
+    shakes: [[2.05, 0.5, 0.3], [6.77, 0.15, 0.25], [35.95, 0.22, 0.6], [55.55, 0.9, 0.25]],
+    // involuntary diaphragm contractions as CO₂ builds during the breath-hold
+    spasms: [45.2, 46.6, 47.7, 48.6, 49.2],
     // late hypoxia: the viewer's knees start to go (metres lower) and the head rolls (deg)
-    sag: [[0, 0], [12.5, 0], [15, 0.2, 'inQuad']],
-    roll: [[0, 0], [12.5, 0], [15, 4.0, 'inQuad']],
+    sag: [[0, 0], [12.5, 0], [15, 0.2, 'inQuad'], [18, 0.12], [36, 0.1], [44, 0.14], [52.8, 0.16], [53.7, 0]],
+    roll: [[0, 0], [12.5, 0], [15, 4.0, 'inQuad'], [18, 2.5], [44, 3], [52, 5], [55, 5], [55.6, 0]],
   },
 
   /* ------------------------------------------------------------------
@@ -96,7 +148,26 @@ const SCRIPT = {
       { t: 8.05, until: 9.75, text: 'Only electric things kept moving.' },
       { t: 10.3, until: 12.4, text: 'No one felt short of breath.' },
       { t: 12.9, until: 15.0, text: 'That was the dangerous part.' },
+      { t: 15.4, until: 17.9, text: 'Every breath was pulling oxygen out of your blood.' },
+      { t: 18.1, until: 20.6, text: 'So you stopped breathing.' },
+      { t: 25.8, until: 28.6, text: 'Its engines had died twenty seconds earlier.' },
+      { t: 34.9, until: 37.4, text: 'No fireball. Nothing could burn.' },
+      { t: 38.6, until: 41.0, text: 'Phones kept ringing.' },
+      { t: 41.6, until: 44.2, text: 'Only the batteries were still awake.' },
+      { t: 45.0, until: 47.6, text: 'Your chest began to burn.' },
+      { t: 50.0, until: 52.6, text: 'Your body forced a breath.' },
+      { t: 61.6, until: 64.8, text: 'It was happening everywhere at once.' },
+      { t: 69.2, until: 72.8, text: 'No fires. No engines. No breathable air.' },
+      { t: 73.6, until: 77.8, text: 'Eight billion people. The same few seconds.' },
     ],
+    // second counter during the breath-hold
+    breathFrom: 16.2, breathUntil: 49.6, breathAlert: 44.6,
+    // the info block fades for the blackout and returns over the city; context line by time
+    hudVisible: [[0, 1], [55.4, 1], [56.4, 0], [61.2, 0], [62.2, 1], [78.6, 1], [79.2, 0]],
+    timerUntil: 55.4,
+    context: [[0, 'SEA LEVEL'], [67.6, 'EVERYWHERE ON EARTH']],
+    // final payoff
+    ending: { line: { t: 79.2, until: 85.2, text: 'You would only have<br>seconds to react.' }, readout: { t: 85.6, until: 90 } },
     // floating object labels (kept available, but the world should tell the story)
     annotations: [],
   },
@@ -158,25 +229,77 @@ const SCRIPT = {
     { id: 'away',     look: 'casual3', y: 0.15, stride: 2.4, path: [[0, 9.95, 6.6], [1.85, 9.95, -0.5], [2.6, 9.95, -0.7], [4.2, 10.7, -2.6], [6.0, 11.25, -5.0]],
       states: [[0, 'jog'], [1.85, 'earPop'], [2.6, 'walk'], [6.0, 'look'], [11.2, 'stumble'], [12.9, 'collapse']] },
     { id: 'L1',       look: 'casual4', y: 0.15, path: [[0, -8.7, -34], [2.42, -8.7, -31], [3.6, -8.7, -31], [11.5, -8.7, -22]],
-      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.6, 'walk'], [12.4, 'stumble'], [14.2, 'kneel']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.6, 'walk'], [12.4, 'stumble'], [14.2, 'kneel'], [19.5, 'lie']] },
     { id: 'L2',       look: 'casual5', y: 0.15, path: [[0, -10.7, -4], [2.42, -10.7, -6.9], [3.5, -10.7, -6.9], [10.6, -10.7, -15]],
-      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.5, 'walk'], [13.0, 'stumble'], [14.2, 'sitGround']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.5, 'walk'], [13.0, 'stumble'], [14.2, 'sitGround'], [23, 'lie']] },
     { id: 'L3',       look: 'casual6', y: 0.15, path: [[0, -10.72, -21]], face: -90, seat: 0.45,
-      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit']] },
+      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit'], [17.5, 'sitSlump']] },
     { id: 'L4',       look: 'casual7', y: 0.15, path: [[0, -9.9, -63], [2.42, -9.9, -60], [3.6, -9.9, -60], [11, -9.9, -50]],
-      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [12.6, 'stumble']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [12.6, 'stumble'], [15.5, 'kneel'], [21, 'lie']] },
     { id: 'L5',       look: 'casual8', y: 0.15, path: [[0, -10.6, -64.2], [2.42, -10.6, -61.2], [3.6, -10.6, -61.2], [11, -10.6, -51.3]],
-      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [13.2, 'stumble']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [13.2, 'stumble'], [16.0, 'sitGround'], [24, 'lie']] },
     { id: 'C1',       look: 'casual2', y: 0.15, path: [[0, -10.22, -28.0]], face: 90, seat: 0.45,
-      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit']] },
+      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit'], [17.5, 'sitSlump']] },
     { id: 'C2',       look: 'casual5', y: 0.15, path: [[0, -11.58, -28.0]], face: -90, seat: 0.45,
-      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit']] },
+      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit'], [17.5, 'sitSlump']] },
     { id: 'C3',       look: 'casual3', y: 0.15, path: [[0, -10.22, -30.6]], face: 90, seat: 0.45,
-      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit']] },
+      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit'], [17.5, 'sitSlump']] },
     { id: 'R1',       look: 'casual1', y: 0.15, path: [[0, 9.9, -62], [2.42, 9.9, -59], [3.6, 9.9, -59], [11, 9.9, -49]],
-      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [12.8, 'stumble']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [12.8, 'stumble'], [16.4, 'kneel'], [21.5, 'lie']] },
+    // ---- at the intersection (seen after the 21.5 s cut)
+    { id: 'X1', look: 'casual7', y: 0.0, path: [[0, 10.2, -43.4], [1.85, 9.9, -44.6], [3.2, 9.9, -44.6], [4.6, 9.5, -45.4]],
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'walk'], [4.6, 'look'], [11.6, 'stumble'], [13.4, 'kneel'], [16.8, 'lie']] },
+    { id: 'X2', look: 'casual4', y: 0.0, path: [[0, 2.2, -44.6], [2.0, 3.6, -43.4], [3.0, 3.6, -43.4], [5.0, 4.7, -42.6]],
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.0, 'walk'], [5.0, 'look'], [12.2, 'stumble'], [14.4, 'kneel'], [18.2, 'lie']] },
+    { id: 'X3', look: 'casual6', y: 0.15, path: [[0, -9.6, -38.8]], face: -60,
+      states: [[0, 'idle'], [1.85, 'earPop'], [3.2, 'look'], [13.0, 'sitGround'], [22, 'lie']] },
+    { id: 'X4', look: 'casual2', y: 0.15, path: [[0, -10.5, -58.0]], face: 30,
+      states: [[0, 'idle'], [1.85, 'earPop'], [3.3, 'look'], [14.5, 'kneel'], [20.5, 'lie']] },
+    { id: 'X5', look: 'casual8', y: 0.15, path: [[0, 11.6, -57.2]], face: 160,
+      states: [[0, 'idle'], [1.85, 'earPop'], [3.2, 'look'], [12.5, 'handHead'], [14.6, 'sitGround'], [24, 'lie']] },
   ],
+
+  /* ------------------------------------------------------------------
+     The airliner on final approach. Its engines flamed out at ~14 % O₂ (1.7 s);
+     it has been gliding silently ever since. [t, x, y, z] — no contrail, no fire.
+     ------------------------------------------------------------------ */
+  aircraft: {
+    path: [[22.6, -420, 262, -205], [25.0, -230, 232, -200], [27.0, -75, 205, -186], [29.0, 80, 170, -160],
+      [31.0, 232, 124, -125], [32.8, 375, 70, -95], [34.4, 520, 0, -72]],
+    bank: [[22.6, 4], [27, 10], [31, 18], [33.5, 30], [34.4, 35]],
+  },
+  // where it comes down: a dust column, no flash (fuel can't burn), heard 1.4 s later
+  impact: { t: 34.4, x: 520, z: -72 },     // at the far end of the cross street, in line of sight from the corner
+
+  // phones on the pavement next to people who collapsed, still ringing on battery
+  phones: [
+    { x: 10.1, y: 0.01, z: -45.1, t0: 37.2, tune: 0 },
+    { x: 4.95, y: 0.01, z: -42.25, t0: 38.3, tune: 1 },
+    { x: 9.45, y: 0.16, z: -48.55, t0: 39.4, tune: 2 },
+    { x: -9.85, y: 0.16, z: -38.1, t0: 40.6, tune: 1 },
+  ],
+
+  /* Earth (67.6 s →): a stylised planet, Atlantic in view, Europe/Africa on the night side */
+  earth: { from: 67.6 },
 };
 
 // Track objects built from SCRIPT.tracks (used everywhere as SCRIPT_TRACKS.name.value(t))
 const SCRIPT_TRACKS = Object.fromEntries(Object.entries(SCRIPT.tracks).map(([k, v]) => [k, new Track(v, 'linear')]));
+
+// ---- the head follows the gliding airliner (24.4–31.6 s), lagging it slightly like a real glance
+(function followAircraft() {
+  const A = SCRIPT.aircraft.path, C = SCRIPT.camera;
+  const ax = new SmoothTrack(A.map((k) => [k[0], k[1]])), ay = new SmoothTrack(A.map((k) => [k[0], k[2]])), az = new SmoothTrack(A.map((k) => [k[0], k[3]]));
+  const cx = new Track(C.x), cz = new Track(C.z);
+  let prevYaw = null;
+  for (let t = 24.4; t <= 31.61; t += 0.6) {
+    const tp = t - 0.3, dx = ax.value(tp) - cx.value(t), dz = az.value(tp) - cz.value(t), dy = ay.value(tp) - (LAYOUT.curbH + 1.7);
+    let yaw = Math.atan2(-dx, -dz) * 180 / Math.PI;
+    if (prevYaw !== null) while (yaw - prevYaw > 180) yaw -= 360;
+    prevYaw = yaw;
+    const pitch = Math.atan2(dy, Math.hypot(dx, dz)) * 180 / Math.PI;
+    // keep the plane a little above frame centre so the city stays in shot
+    C.yaw.push([t, yaw]);
+    C.pitch.push([t, Math.min(pitch - 6, 40)]);
+  }
+})();

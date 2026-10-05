@@ -10,8 +10,8 @@ const CONFIG = {
   height: 1920,
   fps: 30,
 
-  // Phase 1 covers the first 15 seconds of the ~80 s video.
-  duration: 15.0,
+  // The full film: 90 seconds (see js/scene/script.js for every beat).
+  duration: 90.0,
 
   // One seed drives every "random" choice → identical playback every run.
   seed: 20261005,

@@ -20,6 +20,11 @@ class HUD {
       kicker: root.querySelector('#title .kicker'),
       main: root.querySelector('#title .main'),
       caption: root.querySelector('#caption'),
+      breath: root.querySelector('#breathReadout'),
+      breathValue: root.querySelector('#breathValue'),
+      ctx: root.querySelector('#o2Ctx'),
+      endLine: root.querySelector('#ending .line'),
+      endFinal: root.querySelector('#ending .final'),
       ann: root.querySelector('#annotations'),
     };
     // optional floating labels (empty by default)
@@ -34,6 +39,7 @@ class HUD {
     });
     this._v = new THREE.Vector3();
     this._last = {};
+    this.vis = new Track(SCRIPT.hud.hudVisible || [[0, 1]], 'linear');
   }
 
   _set(key, el, prop, val) {
@@ -60,7 +66,11 @@ class HUD {
     // the zero blinks twice, quietly
     const z = t - tl.at('o2_zero');
     const blink = z > 0 && z < 0.9 ? (Math.floor(z * 6) % 2 === 1 ? 0.4 : 0.88) : 0.88;
-    this._set('o2op', this.el.o2, 'opacity', String(blink));
+    const vis = this.vis.value(t);
+    this._set('o2op', this.el.o2, 'opacity', (blink * vis).toFixed(3));
+    // context line (where this is happening)
+    const ctx = (H.context || []).filter((c) => t >= c[0]).pop();
+    if (ctx && this._last.ctx !== ctx[1]) { this.el.ctx.textContent = ctx[1]; this._last.ctx = ctx[1]; }
 
     // ---- title: small kicker, then the question
     const kIn = MathX.smooth(t, H.title.in, H.title.in + 0.35), mIn = MathX.smooth(t, H.title.in + 0.3, H.title.in + 0.8);
@@ -70,8 +80,24 @@ class HUD {
     this._set('mainy', this.el.main, 'transform', `translateY(${((1 - mIn) * 8).toFixed(1)}px)`);
 
     // ---- secondary counter: time without oxygen (only once it matters)
-    const tv = MathX.smooth(t, H.timerFrom, H.timerFrom + 0.6);
+    const tv = MathX.smooth(t, H.timerFrom, H.timerFrom + 0.6) * (1 - MathX.smooth(t, H.timerUntil || 1e9, (H.timerUntil || 1e9) + 0.8));
     this._set('timerop', this.el.timer, 'opacity', tv.toFixed(3));
+    // breath held: counts while you hold it, freezes and fades when your body forces a breath
+    if (H.breathFrom !== undefined) {
+      const bv = MathX.smooth(t, H.breathFrom + 0.3, H.breathFrom + 0.9) * (1 - MathX.smooth(t, H.breathUntil + 0.5, H.breathUntil + 1.2));
+      this._set('breathop', this.el.breath, 'opacity', bv.toFixed(3));
+      const held = MathX.clamp(t, H.breathFrom, H.breathUntil) - H.breathFrom;
+      const bt = `00:${String(Math.floor(held)).padStart(2, '0')}`;
+      if (this._last.bt !== bt) { this.el.breathValue.textContent = bt; this._last.bt = bt; }
+      this.el.breath.classList.toggle('alert', t >= H.breathAlert);
+    }
+    // ending: the line, then the final readout
+    if (H.ending) {
+      const L = H.ending.line, R = H.ending.readout;
+      if (this._last.endText !== L.text) { this.el.endLine.innerHTML = L.text; this._last.endText = L.text; }
+      this._set('endl', this.el.endLine, 'opacity', (MathX.smooth(t, L.t, L.t + 0.9) * (1 - MathX.smooth(t, L.until - 0.6, L.until))).toFixed(3));
+      this._set('endf', this.el.endFinal, 'opacity', MathX.smooth(t, R.t, R.t + 1.0).toFixed(3));
+    }
     const secs = Math.max(0, t - tl.at('o2_zero'));
     const tt = `00:${String(Math.floor(secs)).padStart(2, '0')}`;
     if (this._last.tt !== tt) { this.el.timerValue.textContent = tt; this._last.tt = tt; }

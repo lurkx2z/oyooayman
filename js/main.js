@@ -38,6 +38,8 @@ class SceneManager {
     this.hands = new ViewerHands(this.camera);
     this.fx = new ParticleSystem(this.scene, this.env, this.traffic, this.peds, this.hands);
     Look.apply(this.scene, this.camera);     // matte, slightly dirty older-game materials
+    this.aircraft = new AircraftSystem(this.scene);
+    this.earth = new EarthScene();
     this.post = new PostProcessing(R);
     this.cam = new CameraController(this.camera, CONFIG.camera);
     this.hud = new HUD(document.getElementById('hud'), this.tl);
@@ -126,6 +128,8 @@ class SceneManager {
     this.env.update(t, tl);
     this.traffic.update(t, tl);
     this.peds.update(t);
+    this.aircraft.update(t);
+    if (t >= SCRIPT.earth.from) this.earth.update(t);
     this.fx.update(t, tl, this.camera);
     this.post.updateFromTimeline(t, tl);
     this.hud.update(t, this.camera, (target, tt) => this.anchor(target, tt));
@@ -143,7 +147,8 @@ class SceneManager {
   renderAt(t) {
     this.renderer.info.reset();
     this.update(t);
-    this.post.render(this.scene, this.camera);
+    if (t >= SCRIPT.earth.from) this.post.render(this.earth.scene, this.earth.camera);
+    else this.post.render(this.scene, this.camera);
   }
 
   loop() {

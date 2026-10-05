@@ -188,7 +188,7 @@ class PostProcessing {
           float lg = dot(col, vec3(0.2126, 0.7152, 0.0722));
           float gn = (hash(uv * uRes + fract(uTime * 7.31)) - 0.5) + 0.6 * (hash(floor(uv * uRes * 0.5) + fract(uTime * 3.71)) - 0.5);
           col += gn * uGrain * (0.55 + 0.9 * (1.0 - lg));
-          col = mix(col, vec3(1.0), uFlash);
+          col = mix(col, vec3(0.86, 0.89, 0.88), uFlash);   // white-out into haze
           col *= 1.0 - uFade;
           gl_FragColor = vec4(col, 1.0);
         }`,
@@ -283,17 +283,21 @@ class PostProcessing {
     const cold = MathX.smooth(t, tl.at('flames_out'), tl.at('o2_zero') + 1.0);
     p.tunnel = MathX.lerp(1.15, 0.36, hyp);
     p.tunnelSoft = MathX.lerp(0.55, 0.42, hyp);
-    p.tunnelDark = MathX.lerp(0.0, 0.97, Math.min(1, hyp * 1.5));
+    p.tunnelDark = 0.97 * MathX.smooth(hyp, 0.2, 0.9);          // mild while you hold your breath, total at the blackout
     p.edgeBlur = Math.min(1, hyp * 1.5);
     p.saturation = MathX.lerp(MathX.lerp(1.22, 1.04, cold), 0.62, hyp);
     p.warmth = MathX.lerp(MathX.lerp(0.05, -0.35, cold), -0.5, Math.min(1, hyp * 1.5));
     // the big pressure step: a brief exposure dip instead of any flashy effect
     const tPop = 2.05;
     const pop = MathX.impulse(t, tPop + 0.02, 0.16);
-    p.flash = 0;
     p.chroma = 0;
+    // story fades: black (lost moment, blackout, end) and the white-out through the haze into space
+    p.fade = SCRIPT_TRACKS.fade.value(t);
+    p.flash = 0.92 * SCRIPT_TRACKS.whiteout.value(t);
     p.exposure = CONFIG.render.exposure * 1.22 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);   // midtones ≈ the references (docs/art-direction.md)
     p.contrast = 1.06 + 0.05 * hyp;
     p.soft = 0.1 + 0.05 * hyp;
+    // space: a cleaner, slightly richer grade
+    if (t >= SCRIPT.earth.from) { p.saturation = 1.25; p.warmth = 0; p.contrast = 1.1; p.exposure = CONFIG.render.exposure * 1.15; p.soft = 0.06; }
   }
 }

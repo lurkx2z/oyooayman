@@ -19,6 +19,9 @@ class CameraController {
     this.shakes = C.shakes;
     this.tsag = new Track(C.sag || [[0, 0]]);
     this.troll = new Track(C.roll || [[0, 0]]);
+    this.theight = new Track(C.height || [[0, params.cameraHeight]]);
+    this.ttilt = new Track(C.tilt || [[0, 0]]);
+    this.spasms = C.spasms || [];
     // distance walked as a function of time (drives step bob)
     this.dt = 1 / 120;
     const n = Math.ceil((CONFIG.duration + 2) / this.dt);
@@ -39,10 +42,13 @@ class CameraController {
 
   update(t) {
     const P = this.p, cam = this.camera, D = MathX.deg;
-    const hyp = SCRIPT_TRACKS.hypoxia.value(t);
+    const pov = SCRIPT_TRACKS.pov.value(t);               // 0 = cinematic camera: no body motion at all
+    const hyp = SCRIPT_TRACKS.hypoxia.value(t) * pov;
+    const hold = SCRIPT_TRACKS.breathHold.value(t);
     let x = this.tx.value(t), z = this.tz.value(t);
-    let y = LAYOUT.curbH + P.cameraHeight;
-    let yaw = D(this.tyaw.value(t)), pitch = D(this.tpitch.value(t)), roll = 0;
+    let y = LAYOUT.curbH + this.theight.value(t);
+    let yaw = D(this.tyaw.value(t)), pitch = D(this.tpitch.value(t)), roll = D(this.ttilt.value(t));
+    const bx = x, by = y, bz = z, byaw = yaw, bpitch = pitch, broll = roll;
 
     // --- walking bob (scaled by current speed)
     const speed = (this.walked(t + 0.05) - this.walked(t - 0.05)) / 0.1;
@@ -54,11 +60,18 @@ class CameraController {
     roll += sway * D(0.6);
     pitch += Math.sin(ph * 2) * D(0.25) * walkAmt;
 
-    // --- breathing (rate rises with hypoxia)
+    // --- breathing (rate rises with hypoxia); a held breath means a still chest
     const br = this._breathPhase(t);
-    const deep = 1 + hyp * 2.2;
+    const deep = (1 + hyp * 2.2) * (1 - hold);
     y += Math.sin(br) * P.breathingStrength * deep;
     pitch += Math.sin(br) * D(0.18) * deep;
+
+    // --- involuntary diaphragm contractions near the breath-hold breaking point
+    for (const ts of this.spasms) {
+      if (t < ts || t > ts + 0.6) continue;
+      const a = t - ts, k = Math.exp(-a / 0.12) * Math.sin(Math.min(a / 0.05, Math.PI));
+      y -= 0.018 * k; pitch -= D(1.4) * k;
+    }
 
     // --- idle head sway (tiny, organic)
     yaw += noise1(t * 0.35, 11) * D(0.6) + noise1(t * 1.3, 12) * D(0.12);
@@ -100,6 +113,8 @@ class CameraController {
     y -= this.tsag.value(t);
     roll += D(this.troll.value(t)) * (0.6 + 0.4 * Math.sin(t * 0.8));
 
+    // cinematic sections drop every body layer
+    if (pov < 1) { x = bx + (x - bx) * pov; y = by + (y - by) * pov; z = bz + (z - bz) * pov; yaw = byaw + (yaw - byaw) * pov; pitch = bpitch + (pitch - bpitch) * pov; roll = broll + (roll - broll) * pov; }
     cam.position.set(x, y, z);
     cam.rotation.set(pitch, yaw, roll, 'YXZ');
     const fov = this.tfov.value(t);

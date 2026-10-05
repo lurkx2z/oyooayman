@@ -85,7 +85,7 @@ class AudioManager {
     const blob = AudioManager.encodeWav(buf);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'what-if-oxygen-phase1-soundtrack.wav';
+    a.download = 'what-if-oxygen-soundtrack.wav';
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
@@ -122,6 +122,17 @@ class AudioManager {
     f.setValueAtTime(9000, 9.8);
     f.exponentialRampToValueAtTime(5200, 12.5);
     f.exponentialRampToValueAtTime(1900, 15.0);
+    // holding your breath: hearing steadies; the lost moment dulls it; CO₂ and then the forced breath close it down
+    f.exponentialRampToValueAtTime(3400, 19.0);
+    f.setValueAtTime(3400, 21.3); f.exponentialRampToValueAtTime(700, 21.45); f.exponentialRampToValueAtTime(3600, 22.4);
+    f.setValueAtTime(3600, 44.6); f.exponentialRampToValueAtTime(2200, 49.5);
+    f.exponentialRampToValueAtTime(1300, 51.5); f.exponentialRampToValueAtTime(650, 54.0); f.exponentialRampToValueAtTime(320, 57.5);
+    // leaving the body: the cinematic sound world opens up
+    f.setValueAtTime(320, 59.9); f.exponentialRampToValueAtTime(14000, 60.4);
+    // ~1 s of complete silence before the camera leaves the body; a fade at the very end
+    out.gain.setValueAtTime(0.9, 58.2); out.gain.linearRampToValueAtTime(0.0001, 58.45);
+    out.gain.setValueAtTime(0.0001, 59.5); out.gain.linearRampToValueAtTime(0.9, 60.4);
+    out.gain.setValueAtTime(0.9, 87.6); out.gain.linearRampToValueAtTime(0.0001, 89.9);
 
     this._city(S, bus, revSend, tZero);
     this._birds(S, bus, tZero);
@@ -136,6 +147,11 @@ class AudioManager {
     this._lighter(S, bus);
     this._viewerLighter(S, bus);
     this._distant(S, revSend);
+    this._breathHold(S, bus);
+    this._aircraft(S, bus, revSend);
+    this._impactSound(S, bus, revSend);
+    this._phones(S, bus, revSend);
+    this._cinematic(S, ctx.destination);
   }
 
   /* listener-relative gain/pan/doppler for a moving source */
@@ -169,7 +185,7 @@ class AudioManager {
 
   /* -------------------- layers -------------------- */
   _city(S, bus, rev, tZero) {
-    const ctx = S.ctx, end = CONFIG.duration + 1.4;
+    const ctx = S.ctx, end = 59.6;
     // broadband city air
     const air = S.noise('pink', 0, end); const lp = S.filter('lowpass', 1100, 0.4); const hp = S.filter('highpass', 70, 0.5);
     const g = ctx.createGain();
@@ -211,7 +227,9 @@ class AudioManager {
     let side = 1;
     for (let t = 0; t < CONFIG.duration; t += 1 / 240) {
       const x = camTx.value(t), z = camTz.value(t);
-      dist += Math.hypot(x - px, z - pz); px = x; pz = z;
+      const dd = Math.hypot(x - px, z - pz);
+      if (dd > 0.2 || t > 53) { px = x; pz = z; last = dist; continue; }   // a cut, or on your knees
+      dist += dd; px = x; pz = z;
       if (dist - last >= stride) { last = dist; S.step(t, 0.06, side * 0.12, bus); side = -side; }
     }
   }
@@ -359,34 +377,117 @@ class AudioManager {
     S.crunch(t, Math.min(0.9, 0.9 * p.gain * 2.2), p.pan, bus, rev);
     // car alarm on the car that got hit (battery powered — keeps going in the silence)
     const hit = this.traffic.byId[v.spec.contact.leader];
-    const pts = this._spatial((tt) => hit.kin.pose(tt), t + 0.35, CONFIG.duration + 1, 1 / 15, 10);
-    S.alarm(t + 0.35, CONFIG.duration + 1, pts, bus, rev, this);
+    const pts = this._spatial((tt) => hit.kin.pose(tt), t + 0.35, 58.3, 1 / 15, 10);
+    S.alarm(t + 0.35, 58.3, pts, bus, rev, this);
   }
 
   _body(S, bus, tl) {
-    const ctx = S.ctx, end = CONFIG.duration + 1;
-    // breathing: driven by the breathRate curve
+    const ctx = S.ctx, end = 58.2;
+    const hold = SCRIPT_TRACKS.breathHold, H = SCRIPT.hud;
+    // breathing: driven by the breathRate curve; nothing while the breath is held
     let t = 9.2, i = 0;
     while (t < end) {
+      if (hold.value(t) > 0.5) { t = H.breathUntil + 0.05; continue; }
       const rate = SCRIPT_TRACKS.breathRate.value(t);
       const period = 60 / rate;
       const hyp = SCRIPT_TRACKS.hypoxia.value(t);
-      const vol = 0.03 + 0.11 * Math.min(1, hyp * 2.0);   // no gasping: CO₂ still leaves, so there is no urge to breathe
+      const after = t > H.breathUntil;            // after the forced breath: fast, shallow, then fading
+      const vol = (0.03 + 0.11 * Math.min(1, hyp * 2.0)) * (after ? MathX.lerp(1.3, 0.25, MathX.smooth(t, 53, 57.5)) : 1);
       S.breath(t, period * 0.42, 1, vol, bus);
-      S.breath(t + period * 0.45, period * 0.5, 0, vol * 0.85, bus);
+      if (hold.value(t + period * 0.45) < 0.5) S.breath(t + period * 0.45, period * 0.5, 0, vol * 0.85, bus);
       t += period; i++;
     }
-    // heartbeat
+    // heartbeat: louder as CO₂ builds, slowing to nothing
     t = 9.8;
     while (t < end) {
       const bpm = SCRIPT_TRACKS.heartRate.value(t);
       const hyp = SCRIPT_TRACKS.hypoxia.value(t);
-      const vol = MathX.smooth(t, 9.8, 11.5) * (0.25 + 0.35 * hyp);
+      const vol = MathX.smooth(t, 9.8, 11.5) * (0.25 + 0.35 * hyp + 0.3 * SCRIPT_TRACKS.co2.value(t)) * (1 - MathX.smooth(t, 55.5, 58.1));
       S.heart(t, vol, bus);
       t += 60 / bpm;
     }
     // ringing in the ears as hypoxia deepens
     S.ring(11.2, end - 11.2, 6900, 0.009, bus, true);
+  }
+
+  // the held breath: a sharp inhale, the throat closes; swallows; diaphragm spasms; the forced gasp
+  _breathHold(S, bus) {
+    const H = SCRIPT.hud, t0 = H.breathFrom, t1 = H.breathUntil;
+    S.breath(t0 - 0.5, 0.5, 1, 0.16, bus);              // one last breath in
+    S.click(t0 + 0.02, 0.06, 0, bus);                   // glottis shuts
+    for (const ts of [26.4, 33.0, 41.2]) { S.click(ts, 0.035, 0, bus); S.thump(ts + 0.05, 0.08, bus); }   // swallows
+    for (const ts of SCRIPT.camera.spasms || []) { S.thump(ts, 0.22, bus); S.click(ts + 0.03, 0.05, 0, bus); }
+    S.gasp(t1, 0.5, bus);                               // the body forces a breath
+  }
+
+  // the gliding airliner: windmilling fans (a thin whistle) and rushing air — no engine roar
+  _aircraft(S, bus, rev) {
+    const A = SCRIPT.aircraft.path, ctx = S.ctx;
+    const ax = new SmoothTrack(A.map((k) => [k[0], k[1]])), ay = new SmoothTrack(A.map((k) => [k[0], k[2]])), az = new SmoothTrack(A.map((k) => [k[0], k[3]]));
+    const t0 = A[0][0] - 1.5, t1 = A[A.length - 1][0];
+    const g = ctx.createGain(), p = ctx.createStereoPanner(), lp = S.filter('lowpass', 2600, 0.6);
+    g.connect(p); p.connect(bus);
+    const s = ctx.createGain(); s.gain.value = 0.35; p.connect(s); s.connect(rev);
+    const air = S.noise('pink', t0, t1), bp = S.filter('bandpass', 700, 0.7); air.connect(bp); bp.connect(lp);
+    const whistles = [1240, 1872].map((f) => { const o = ctx.createOscillator(); o.frequency.value = f; const og = ctx.createGain(); og.gain.value = 0.05; o.connect(og); og.connect(lp); o.start(t0); o.stop(t1); return o; });
+    lp.connect(g);
+    for (let t = t0, i = 0; t <= t1 + 1e-6; t += 1 / 20, i++) {
+      const tt = Math.max(A[0][0], t);
+      const lx = this.cx.value(t), lz = this.cz.value(t), yaw = MathX.deg(this.cyaw.value(t));
+      const dx = ax.value(tt) - lx, dy = ay.value(tt) - 1.85, dz = az.value(tt) - lz, d = Math.hypot(dx, dy, dz);
+      const t2 = Math.min(tt + 0.05, t1), d2 = Math.hypot(ax.value(t2) - lx, ay.value(t2) - 1.85, az.value(t2) - lz);
+      const dop = 343 / (343 + (d2 - d) / 0.05);
+      const rx = Math.cos(yaw), rz = -Math.sin(yaw);
+      const pan = MathX.clamp((dx * rx + dz * rz) / Math.max(1, Math.hypot(dx, dz)), -1, 1) * 0.8;
+      const vol = Math.min(0.5, 60 / (60 + d)) * MathX.smooth(t, t0, t0 + 1.5) * (t > t1 - 0.4 ? 0.3 : 1);
+      const fn = i === 0 ? 'setValueAtTime' : 'linearRampToValueAtTime';
+      g.gain[fn](Math.max(0.0001, vol * 0.5), t); p.pan[fn](pan, t);
+      whistles.forEach((o, k) => o.frequency[fn]([1240, 1872][k] * dop, t));
+      bp.frequency[fn](700 * dop, t);
+    }
+  }
+
+  // the impact, heard 1.5 s after it is seen: a deep thud and a long rolling rumble (no explosion)
+  _impactSound(S, bus, rev) {
+    const I = SCRIPT.impact, ctx = S.ctx;
+    const d = Math.hypot(I.x - this.cx.value(I.t), I.z - this.cz.value(I.t)), t = I.t + d / 343;
+    const lp = S.filter('lowpass', 520, 0.6); lp.connect(bus);
+    const s = ctx.createGain(); s.gain.value = 0.8; lp.connect(s); s.connect(rev);
+    S.boom(t, 0.55, lp, rev);
+    S.farBoom(t + 0.15, 0.4, 0.35, lp);
+    S.farBoom(t + 1.1, 0.22, 0.4, lp);
+    S.crunch(t + 0.05, 0.12, 0.4, lp, rev);
+  }
+
+  // phones on the pavement ringing on battery (three different ringtones)
+  _phones(S, bus, rev) {
+    const tunes = [[[440, 480]], [[784], [659], [523], [659]], [[1400], [0], [1400], [0]]];
+    for (const ph of SCRIPT.phones || []) {
+      const pts = this._spatial(() => ph, ph.t0, 58.2, 1 / 4, 3);
+      const p = pts[0];
+      const mean = pts.reduce((a, q) => a + q.gain, 0) / pts.length;
+      for (let t = ph.t0; t < 58.2; t += 3.0) {
+        const tune = tunes[ph.tune % tunes.length];
+        if (ph.tune === 0) { S.tone(t, 0.9, 440, mean * 0.06, p.pan, bus); S.tone(t, 0.9, 480, mean * 0.06, p.pan, bus); S.tone(t + 1.1, 0.9, 440, mean * 0.06, p.pan, bus); S.tone(t + 1.1, 0.9, 480, mean * 0.06, p.pan, bus); }
+        else tune.forEach((f, k) => { if (f[0]) S.tone(t + k * 0.22, 0.2, f[0], mean * 0.07, p.pan, bus, 'triangle'); });
+      }
+    }
+  }
+
+  // leaving the body: high wind over the avenue, then a low, slow drone for the planet and the last line
+  _cinematic(S, dest) {
+    const ctx = S.ctx, end = CONFIG.duration + 1.4;
+    const wind = S.noise('pink', 59.8, 68.5), wb = S.filter('bandpass', 380, 0.5), wg = ctx.createGain();
+    wg.gain.setValueAtTime(0.0001, 59.8); wg.gain.linearRampToValueAtTime(0.12, 61.2); wg.gain.linearRampToValueAtTime(0.18, 66.5); wg.gain.linearRampToValueAtTime(0.0001, 68.4);
+    wind.connect(wb); wb.connect(wg); wg.connect(dest);
+    const pad = ctx.createGain(); pad.connect(dest);
+    pad.gain.setValueAtTime(0.0001, 60.2); pad.gain.linearRampToValueAtTime(0.05, 64); pad.gain.linearRampToValueAtTime(0.08, 70); pad.gain.setValueAtTime(0.08, 86); pad.gain.linearRampToValueAtTime(0.0001, 89.8);
+    for (const [f, a] of [[55, 0.5], [82.4, 0.32], [110.2, 0.18], [164.8, 0.08]]) {
+      const o = ctx.createOscillator(); o.frequency.value = f; const og = ctx.createGain(); og.gain.value = a;
+      o.connect(og); og.connect(pad); o.start(60.2); o.stop(end);
+    }
+    // a soft struck note for each closing line
+    for (const [t, f] of [[69.2, 330], [73.6, 294], [79.2, 220], [85.6, 110]]) S.tone(t, 5.5, f, 0.045, 0, dest, 'sine', 0.01, 5.2);
   }
 
   _grid(S, bus, tl) {
@@ -436,6 +537,8 @@ class AudioManager {
     S.farBoom(10.3, 0.22, -0.5, rev);
     S.farBoom(12.9, 0.18, 0.6, rev);
     S.farBoom(14.2, 0.14, -0.2, rev);
+    S.farBoom(23.4, 0.12, 0.7, rev);
+    S.farBoom(42.6, 0.1, -0.6, rev);
   }
 
   /* -------------------- WAV encoder -------------------- */
@@ -675,6 +778,24 @@ class SoundKit {
       this.env(g, tt, 0.008, v, 0.14); o.connect(lp); lp.connect(g); g.connect(dest); o.start(tt); o.stop(tt + 0.2);
     };
     beat(t, vol); beat(t + 0.17, vol * 0.65);
+  }
+
+  tone(t, dur, f, vol, pan, dest, type = 'sine', attack = 0.01, release = null) {
+    if (vol <= 0.0005) return;
+    const ctx = this.ctx, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + attack);
+    g.gain.setValueAtTime(vol, t + Math.max(attack, dur - (release || dur * 0.3)));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(this.panned(dest, pan)); o.start(t); o.stop(t + dur + 0.05);
+  }
+
+  gasp(t, vol, dest) {
+    // a sudden, ragged, involuntary inhale
+    const ctx = this.ctx, n = this.noise('pink', t, t + 0.9), bp = this.filter('bandpass', 900, 0.8), g = ctx.createGain();
+    bp.frequency.setValueAtTime(700, t); bp.frequency.linearRampToValueAtTime(2200, t + 0.55);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.12); g.gain.setValueAtTime(vol * 0.8, t + 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
+    n.connect(bp); bp.connect(g); g.connect(dest);
   }
 
   farBoom(t, vol, pan, dest) {

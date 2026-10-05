@@ -241,6 +241,22 @@ class ParticleSystem {
     this.sparks = new StreakSystem(scene, 900);
     this.smoke = new BillboardSystem(scene, 700, false);
     this.glow = new BillboardSystem(scene, 64, true);
+    // the airliner's impact: a dust column (no fire — nothing can burn). Its own, lighter fog so it reads from 470 m away
+    this.plume = new BillboardSystem(scene, 260, false);
+    this.plume.uniforms.uLight.value = 0.72;
+    this._plumeFog = { color: new THREE.Color(), density: 0.001 };
+    // phones on the pavement: a dark slab with a screen that lights up when a call comes in
+    this.phones = (SCRIPT.phones || []).map((ph, i) => {
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.009, 0.155), Mat.std('#141619', { roughness: 0.35 }));
+      const scr = new THREE.MeshBasicMaterial({ color: '#000000', toneMapped: false });
+      const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.142), scr);
+      screen.rotation.x = -Math.PI / 2; screen.position.y = 0.0051;
+      g.add(body, screen);
+      g.position.set(ph.x, ph.y + 0.0045, ph.z); g.rotation.y = hash1(i * 7.7) * 6.28;
+      scene.add(g);
+      return { ...ph, g, scr };
+    });
     this.birds = new BirdFlock(scene, 12);
 
     // grill flames
@@ -282,9 +298,14 @@ class ParticleSystem {
     this._grillSmoke(t, tl);
     this._exhaust(t);
     this._dust(t, camera);
+    this._phones(t);
     this._glows(t, tl, level);
     this.smoke.end();
     this.glow.end();
+    this._plumeFog.color.copy(this.scene.fog.color);
+    this.plume.begin(this._plumeFog);
+    this._impact(t);
+    this.plume.end();
     this.birds.update(t);
   }
 
@@ -397,15 +418,49 @@ class ParticleSystem {
     }
   }
 
+  // dust column from the crash: a fast low skirt, then a rising, slowly drifting core
+  _impact(t) {
+    const I = SCRIPT.impact;
+    if (!I || t < I.t) return;
+    const P = this.plume;
+    for (let i = 0; i < 120; i++) {
+      const h1 = hash1(i * 3.1 + 1), h2 = hash1(i * 5.7 + 2), h3 = hash1(i * 7.3 + 3), h4 = hash1(i * 11.9 + 4);
+      const tb = I.t + (i < 50 ? i * 0.025 : 1.2 + (i - 50) * 0.22);
+      const age = t - tb;
+      if (age < 0) continue;
+      const skirt = i < 50;
+      const a = h1 * Math.PI * 2;
+      const out = skirt ? (30 + 70 * h2) * (1 - Math.exp(-age / 1.1)) : (8 + 22 * h2) * (1 - Math.exp(-age / 6));
+      const rise = skirt ? (6 + 18 * h3) * (1 - Math.exp(-age / 1.6)) : (40 + 200 * h3) * (1 - Math.exp(-age / (2.4 + 3.5 * h4)));
+      const drift = age * 1.4;                        // light wind toward −X
+      const x = I.x + Math.cos(a) * out - drift, z = I.z + Math.sin(a) * out * 0.7, y = 4 + rise;
+      const size = (skirt ? 26 : 34) + age * (skirt ? 9 : 6) + 18 * h4;
+      const alpha = Math.min(1, age * 2.5) * (skirt ? Math.exp(-age / 9) : 1) * (0.55 + 0.3 * h2);
+      const shade = 0.14 + 0.12 * h3;            // dark grey-brown dust and debris, not smoke-white
+      P.push(x, y, z, size, h1 * 6 + age * 0.05 * (h2 - 0.5), alpha, shade, 0.93, 0.86, 0.76);
+    }
+  }
+
+  // phones ringing on battery: the screen pulses with each ring
+  _phones(t) {
+    for (const ph of this.phones) {
+      const a = t - ph.t0;
+      let lit = 0;
+      if (a > 0) { const cyc = (a % 3.0) / 3.0; lit = cyc < 0.62 ? 0.75 + 0.25 * Math.sin(a * 9) : 0.55; }
+      ph.scr.color.setRGB(0.55 * lit + 0.02, 0.75 * lit + 0.02, 1.0 * lit + 0.03);
+      if (lit > 0) this.glow.push(ph.x, ph.y + 0.05, ph.z, 0.38, 0, 0.42 * lit, 1, 0.35, 0.55, 0.9);
+    }
+  }
+
   // airborne grit catching the flat light: tiny, slow, only in the air around the viewer
   _dust(t, camera) {
-    const B = this.smoke, box = [[7.2, 12.2], [0.4, 3.4], [-5.5, 4.5]], cp = camera.position;
+    const cp = camera.position, B = this.smoke, box = [[cp.x - 2.5, cp.x + 2.5], [0.4, 3.4], [cp.z - 8, cp.z + 2]];
     const wrap = (v, [a, b]) => { const f = (((v - a) / (b - a)) % 1 + 1) % 1; return [a + f * (b - a), Math.sin(Math.PI * f)]; };
     for (let i = 0; i < 70; i++) {
       const h1 = hash1(i * 7 + 1), h2 = hash1(i * 13 + 2), h3 = hash1(i * 17 + 3), h4 = hash1(i * 23 + 4);
-      const [x, fx] = wrap(7.2 + h1 * 5 + t * (0.05 + 0.08 * h4) + 0.1 * Math.sin(t * 0.7 + i), box[0]);
+      const [x, fx] = wrap(box[0][0] + h1 * 5 + t * (0.05 + 0.08 * h4) + 0.1 * Math.sin(t * 0.7 + i), box[0]);
       const [y, fy] = wrap(0.4 + h2 * 3 + t * 0.03 * (h3 - 0.4) + 0.08 * Math.sin(t * 0.9 + i * 2), box[1]);
-      const [z, fz] = wrap(-5.5 + h3 * 10 - t * (0.04 + 0.05 * h1), box[2]);
+      const [z, fz] = wrap(box[2][0] + h3 * 10 - t * (0.04 + 0.05 * h1), box[2]);
       const near = MathX.smooth(Math.hypot(x - cp.x, y - cp.y, z - cp.z), 1.2, 3.0);   // nothing right in front of the lens
       const a = (0.05 + 0.08 * h2) * near * Math.min(1, fx * 3) * Math.min(1, fy * 3) * Math.min(1, fz * 3);
       if (a > 0.004) B.push(x, y, z, 0.01 + 0.012 * h4, 0, a, 0.75, 1, 1, 0.97);

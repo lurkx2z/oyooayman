@@ -398,7 +398,7 @@ class Environment {
       let z = 120;
       while (z > -700) {
         const w = rng.range(14, 30), h = rng.range(26, 70) + (z < -200 ? 25 : 0);
-        if (!(z < cz1 + 2 && z - w > cz0 - 2)) {
+        if (!(z - w < cz1 + 2 && z > cz0 - 2)) {   // keep the cross street open all the way to the horizon
           const st = this.facades[rng.pick(far)];
           const x0 = s > 0 ? 40 : -40 - rng.range(16, 26), x1 = s > 0 ? 40 + rng.range(16, 26) : -40;
           this.batch.add(Geo.boxSides(x0, x1, 0, h, z - w, z, st.tileW, st.tileH), st.mat, null);
@@ -588,39 +588,43 @@ class Environment {
     B.box(1.25, 0.02, 1.25, x, h + 0.005, z, this.m.soil, 0, { noShadow: true });
     B.add(new THREE.CylinderGeometry(0.1 * scale, 0.17 * scale, th, 7), this.m.bark, Geo.matrix((x + topX) / 2, h + th / 2, (z + topZ) / 2, lz, 0, -lx));
     // a few irregular branches
-    const nb = rng.int(3, 5);
+    const nb = rng.int(2, 3);
     for (let i = 0; i < nb; i++) {
-      const a = rng.next() * Math.PI * 2, tilt = rng.range(0.45, 0.9), len = rng.range(1.1, 1.9) * scale;
-      B.add(new THREE.CylinderGeometry(0.03, 0.065, len, 5), this.m.bark, Geo.matrix(topX + Math.cos(a) * 0.3, h + th + rng.range(0.1, 0.7), topZ + Math.sin(a) * 0.3, Math.sin(a) * tilt, 0, -Math.cos(a) * tilt));
+      const a = (i / nb) * Math.PI * 2 + rng.next(), tilt = rng.range(0.35, 0.6), len = rng.range(1.0, 1.4) * scale;
+      B.add(new THREE.CylinderGeometry(0.04, 0.08, len, 6), this.m.bark, Geo.matrix(topX + Math.cos(a) * 0.25, h + th + 0.3, topZ + Math.sin(a) * 0.25, Math.sin(a) * tilt, 0, -Math.cos(a) * tilt));
     }
-    // asymmetric foliage: clusters of different sizes, squash and rotation, biased to one side
-    const n = rng.int(7, 11);
-    const biasA = rng.next() * Math.PI * 2, bias = rng.range(0.2, 0.7) * scale;
-    const base = new THREE.Color().setHSL(rng.range(0.2, 0.27), rng.range(0.14, 0.26), rng.range(0.12, 0.17));
-    for (let i = 0; i < n; i++) {
-      const r = rng.range(0.6, 1.45) * scale * (i < 3 ? 1.15 : 1);
+    // crown: a few large, clean faceted puffs (an authored low-poly tree, not random shards).
+    // round street trees get 3–4 overlapping puffs; the columnar variant stacks two narrower ones
+    const columnar = rng.next() < 0.3;
+    const base = new THREE.Color().setHSL(rng.range(0.2, 0.26), rng.range(0.16, 0.26), rng.range(0.13, 0.18));
+    const R = (columnar ? 1.15 : 1.55) * scale;
+    const puffs = columnar
+      ? [[0, 0.9, 0, 1.0, 1.35], [0.12, 2.1, -0.08, 0.82, 1.2]]
+      : [[0, 1.05, 0, 1.0, 0.86], [0.95, 0.65, 0.35, 0.72, 0.82], [-0.85, 0.75, -0.3, 0.76, 0.84], [0.15, 1.75, -0.55, 0.62, 0.86]].slice(0, rng.int(3, 4));
+    const turn = rng.next() * Math.PI * 2;
+    puffs.forEach(([ox, oy, oz, sr, sy], i) => {
+      const r = R * sr * rng.range(0.92, 1.08);
       const g = new THREE.IcosahedronGeometry(r, 1);
       const pos = g.attributes.position;
-      for (let k = 0; k < pos.count; k++) {
-        const v = new THREE.Vector3().fromBufferAttribute(pos, k);
-        v.multiplyScalar(1 + (hash1(k * 31 + i * 7 + (x * 13 | 0) + (z * 7 | 0)) - 0.5) * 0.34);
-        pos.setXYZ(k, v.x, v.y, v.z);
+      for (let k = 0; k < pos.count; k++) {   // very gentle irregularity (a few %), consistent per vertex position
+        const vx = pos.getX(k), vy = pos.getY(k), vz = pos.getZ(k);
+        const j = 1 + (hash2(Math.round(vx * 40 + vz * 17), Math.round(vy * 40) + i * 13) - 0.5) * 0.08;
+        pos.setXYZ(k, vx * j, vy * j * sy, vz * j);
       }
-      const ng = g.index ? g.toNonIndexed() : g;
-      ng.scale(rng.range(0.8, 1.25), rng.range(0.62, 0.95), rng.range(0.8, 1.25));
-      const cols = new Float32Array(ng.attributes.position.count * 3);
-      for (let k = 0; k < ng.attributes.position.count; k++) {
-        const yv = ng.attributes.position.getY(k) / r;
-        // darker underneath (self-shadowing), small hue/value variation
-        const c = base.clone().offsetHSL((hash1(k + i * 97) - 0.5) * 0.025, (hash1(k * 5 + i) - 0.5) * 0.05, yv * 0.05 + (hash1(k * 3 + i) - 0.5) * 0.035 - (yv < -0.2 ? 0.035 : 0));
+      g.computeVertexNormals();
+      const cols = new Float32Array(pos.count * 3);
+      const tint = base.clone().offsetHSL((rng.next() - 0.5) * 0.02, 0, (rng.next() - 0.5) * 0.02);
+      for (let k = 0; k < pos.count; k++) {
+        const yv = pos.getY(k) / (r * sy);
+        // lit crown top, darker underside and inner faces (reads as volume)
+        const c = tint.clone().offsetHSL(0, 0, 0.05 * yv - (yv < -0.3 ? 0.04 : 0));
         cols[k * 3] = c.r; cols[k * 3 + 1] = c.g; cols[k * 3 + 2] = c.b;
       }
-      ng.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
-      const a = rng.next() * Math.PI * 2, d = i === 0 ? 0 : rng.range(0.5, 1.6) * scale;
-      const px = topX + Math.cos(a) * d + Math.cos(biasA) * bias, pz = topZ + Math.sin(a) * d + Math.sin(biasA) * bias;
-      const py = h + th + rng.range(0.4, 1.9) * scale + (i === 0 ? 0.8 * scale : 0);
-      B.add(ng, this.m.foliage, Geo.matrix(px, py, pz, rng.range(-0.4, 0.4), rng.next() * 6.28, rng.range(-0.4, 0.4)));
-    }
+      g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+      const c = Math.cos(turn), s2 = Math.sin(turn);
+      const px = topX + (ox * c - oz * s2) * R, pz = topZ + (ox * s2 + oz * c) * R;
+      B.add(g, this.m.foliage, Geo.matrix(px, h + th + oy * R * 0.75, pz, 0, turn + i, 0));
+    });
   }
 
   _trees() {

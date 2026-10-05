@@ -21,17 +21,22 @@
           <div class="label">ATMOSPHERIC OXYGEN</div>
           <div class="value"><span id="o2Value">21.0</span><span class="unit">%</span></div>
           <div class="sub" id="o2Sub">21.3 kPa</div>
-          <div class="ctx">SEA LEVEL</div>
+          <div class="ctx" id="o2Ctx">SEA LEVEL</div>
         </div>
         <div class="readout secondary" id="timerReadout">
           <div class="label">TIME WITHOUT OXYGEN</div>
           <div class="value" id="timerValue">00:00</div>
+        </div>
+        <div class="readout secondary" id="breathReadout">
+          <div class="label">BREATH HELD</div>
+          <div class="value" id="breathValue">00:00</div>
         </div>
         <div id="title">
           <div class="kicker"></div>
           <div class="main">What if oxygen<br>suddenly disappeared?</div>
         </div>
         <div id="caption"></div>
+        <div id="ending"><div class="line"></div><div class="final"><div class="label">ATMOSPHERIC OXYGEN</div><div class="value">0.0<span class="unit">%</span></div></div></div>
         <div id="annotations"></div>
       </div>
     </div>
@@ -85,6 +90,8 @@
   <script src="js/fx/look.js"></script>
   <script src="js/camera/cameraController.js"></script>
   <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/aircraft.js"></script>
+  <script src="js/world/earth.js"></script>
   <script src="js/audio/audioManager.js"></script>
   <script src="js/ui/hud.js"></script>
   <script src="js/ui/devControls.js"></script>
