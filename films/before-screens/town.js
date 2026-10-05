@@ -337,12 +337,13 @@ class HistoricTown {
     // chimney
     box(0.6, 3.2, 0.6, (r.chance(0.5) ? 1 : -1) * W * 0.28, wallH + 1.2, -D * 0.6, m.chimney);
     // windows: two per floor on the front, the door on one side on the ground floor
-    const doorX = o.home ? (o.side > 0 ? -(BS.room.doorZ) : 0) : (r.chance(0.5) ? -W * 0.26 : W * 0.26);
+    // (local x = world z on the east side, so the viewer's door sits at local x = doorZ)
+    const doorX = o.home ? BS.room.doorZ : (r.chance(0.5) ? -W * 0.26 : W * 0.26);
     const nF = floors === 1.5 ? 1 : 2;
     for (let f = 0; f < nF; f++) {
       const y = 0.55 + f * fh + 1.45;
-      const xs = f === 0 ? [doorX > 0 ? -W * 0.24 : W * 0.24, (doorX > 0 ? -W * 0.24 : W * 0.24) * 0.0 + (doorX > 0 ? -W * 0.24 : W * 0.24) * -0.0] : [-W * 0.26, W * 0.26];
-      for (const wx of f === 0 ? [xs[0]] : xs) this._window(H, wx, y, trim, r, false);
+      const xs = f === 0 ? [doorX > 0 ? -W * 0.24 : W * 0.24] : [-W * 0.26, W * 0.26];   // ground floor: one window beside the door
+      for (const wx of xs) this._window(H, wx, y, trim, r, false);
     }
     // side windows
     for (const sx of [-1, 1]) for (let f = 0; f < nF; f++) {
