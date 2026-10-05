@@ -20,17 +20,26 @@ Everything is procedural, so there are no models, images or sound files to downl
 
 ## Look (art direction)
 
-The target is a dark, older-game cinematic simulation (PS2 / early Source-era simplicity with modern atmospheric composition), not a clean modern low-poly render.
+The full reference calibration and style rules live in **[`docs/art-direction.md`](docs/art-direction.md)**.
+The target is a **polished cinematic low-poly first-person simulation**: about 70 % the "POV What If" look (polish, selective gloss, clean UI, serif narration, optical framing),
+30 % Omaha-style atmosphere (fog depth, dark foregrounds, grounding, irregularity).
 
-- **Value structure:** dark foreground, readable midground, foggy background. The hidden sun sits behind-left of the viewer with a low fill light, so surfaces facing you get the key and shadows fall into frame as shapes. Blacks are deep but never crushed.
-- **Fog:** dirty grey-green haze, darker than the horizon and capped at 90 %, so far blocks lose detail first and keep their silhouette. Distant surfaces are also softened slightly. Overcast sky: darker and cooler at the top, brighter at the horizon, no visible sun.
-- **Grounding:** half-resolution depth-based ambient occlusion (faded out with fog distance) plus soft blob shadows under people and vehicles.
-- **Materials** (`js/fx/look.js`): everything is matte, with weak reflections and low texture anisotropy. A world-space grime shader adds non-repeating patchy dirt to the ground, a darker splash zone at the base of walls, and faint vertical streaks. Pavement is dark and stained, not fresh concrete.
-- **Palette:** muted but not monochrome (grade saturation ~0.84). **Fire is the strongest warm colour on screen**: the grade spares only HDR-bright warm pixels. When the flames die the picture cools and loses colour, and hypoxia drains it further.
-- **Imperfection:** grain that is stronger in the shadows, a faint drifting exposure unevenness, slight softness and a few airborne dust motes. No VHS, scanlines or chromatic aberration.
-- **People:** three faceted body builds (average, broad, slim) with shoulders and waists, open jackets, muted clothing and no painted faces.
-- **No first-person hands in Phase 1.** The procedural hand looked like a blocky object, and the vendor's lighter carries that beat. The code is still in `js/camera/viewerHands.js`; re-enable it in `SCRIPT.hands` once a proper arm model exists.
-- **Text is minimal:** a small oxygen readout (the number turns a muted dark red at 0 %), a second counter that appears late, the title, and **at most one serif caption at a time**, placed above the TikTok/Shorts interface zone. All captions live in `SCRIPT.hud.captions` (`js/scene/script.js`).
+- **Value and colour:** overcast daylight, midtones ≈ 70–85/255, dark foreground shapes, light hazy distance. A muted world with saturated, localised accents (fire, sparks, signals, hazards). The picture turns colder when the fire dies.
+- **Atmosphere:** exponential fog that is denser near the ground and varies in slow banks, capped so far blocks keep their silhouettes, plus a few faint drifting haze layers between blocks.
+- **Grounding:** half-resolution ambient occlusion (faded with fog distance) plus soft blob shadows under people and vehicles.
+- **Materials** (`js/fx/look.js`):
+  - the environment is matte; cars, glass and metal props keep controlled highlights;
+  - a world-space grime shader adds patchy ground, replaced slabs, damp patches, darker wall bases and a slow tone drift between buildings.
+- **People** (`js/world/people.js`): authored low-poly parts, not capsules. Tapered faceted limbs with joint caps, shoes with soles, three body builds, clothing layers (collar, coat, hood) and accessories (backpack, shoulder bag, scarf, beanie, ponytail, bun).
+- **Buildings near the camera** get real window reveals, sills and lintels aligned to the textured windows, plus AC units, fire escapes, drainpipes and blade signs.
+- **Lens:** a moderate rounded-rectangle vignette with soft edges, little grain, a calm camera.
+- **Text:**
+  - top-left info block: tiny caps label, serif value, the same value as a partial pressure in kPa, and context;
+  - a Lora title on the first frame;
+  - one Lora-italic narration line at a time.
+
+  All of it is in `SCRIPT.hud` (`js/scene/script.js`).
+- **No first-person hands yet.** The procedural hand looked like a blocky object. Re-enable `SCRIPT.hands` once an authored low-poly arm model exists.
 
 ---
 
@@ -98,10 +107,11 @@ js/world/vehicles.js       car/bus/motorbike models + TrafficSystem (sputter, co
 js/world/people.js         low-poly people + procedural poses (walk, stumble, kneel, sit, lie…)
 js/fx/particles.js         flames, sparks, smoke, exhaust puffs, birds
 js/fx/postprocessing.js    contact-shading AO, tone mapping, grade (desaturation that spares the fire), vignette, grain, hypoxia tunnel vision
-js/fx/look.js              matte "older-game" material pass + world-space grime shader
+js/fx/look.js              selective-gloss material pass + world-space grime shader
+docs/art-direction.md      reference calibration report + style rules for the rest of the video
 js/camera/cameraController.js   first-person head: path + bob + breathing + sway + startles + shake
 js/audio/audioManager.js   fully synthesised soundtrack, rendered offline and kept in sync
-js/ui/hud.js               O₂ readout, time-without-oxygen counter, title, one caption at a time
+js/ui/hud.js               top-left O₂ block, time-without-oxygen counter, title, one caption at a time
 js/ui/devControls.js       playback / scrub / debug / recording mode
 tools/render-preview.cjs   optional frame-exact MP4 renderer
 ```
