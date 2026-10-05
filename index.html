@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What If Oxygen Disappeared — Simulation</title>
+  <!-- Optional web fonts (the page still works offline with system fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&family=Oswald:wght@600;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+
+      <!-- Cinematic HUD (stays visible in Recording Mode) -->
+      <div id="hud">
+        <div class="readout" id="o2Readout">
+          <div class="label">ATMOSPHERIC OXYGEN</div>
+          <div class="value"><span id="o2Value">20.9</span><span class="unit">%</span></div>
+          <div class="bar"><div class="fill" id="o2Fill"></div></div>
+        </div>
+        <div class="readout" id="timerReadout">
+          <div class="label">TIME WITHOUT OXYGEN</div>
+          <div class="value" id="timerValue">00:00</div>
+        </div>
+        <div id="title">
+          <div class="chip">SIMULATION</div>
+          <div class="l1">What if <em>oxygen</em></div>
+          <div class="l2">suddenly disappeared?</div>
+        </div>
+        <div id="log"></div>
+        <div id="annotations"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Developer controls (hidden in Recording Mode) -->
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What if oxygen suddenly disappeared?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">BUILDING THE CITY…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <!-- Three.js (bundled locally — no internet or server needed) -->
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- Project code (plain scripts, loaded in order) -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/world/layout.js"></script>
+  <script src="js/scene/script.js"></script>
+  <script src="js/world/kinematics.js"></script>
+  <script src="js/world/environment.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/audio/audioManager.js"></script>
+  <script src="js/ui/hud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
