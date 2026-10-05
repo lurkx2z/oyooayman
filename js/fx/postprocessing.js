@@ -105,7 +105,7 @@ class PostProcessing {
     });
     this.params = {
       exposure: CONFIG.render.exposure, bloom: CONFIG.render.bloom ? 0.22 : 0, bloomThreshold: 1.6,
-      saturation: 1.0, contrast: 1.06, warmth: 0.0, vignette: 1.0, soft: 0.1, blackLift: 0.008, keepWarm: 1.0,
+      saturation: 1.22, contrast: 1.06, warmth: 0.0, vignette: 1.0, soft: 0.1, blackLift: 0.008, keepWarm: 1.0,
       tunnel: 1.2, tunnelSoft: 0.5, tunnelDark: 0.0, edgeBlur: 0.0, chroma: 0.0, grain: 0.022, uneven: 0.04,
       fade: 0.0, flash: 0.0, time: 0,
       ao: 1.0, aoDebug: 0, fogDensity: 0,
@@ -167,7 +167,7 @@ class PostProcessing {
           col *= vec3(1.0 + uWarmth * 0.05, 1.0 + uWarmth * 0.01, 1.0 - uWarmth * 0.07);
           col = aces(col);
           float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
-          col = mix(vec3(l), col, mix(uSaturation, 1.12, keep));
+          col = mix(vec3(l), col, mix(uSaturation, 1.35, keep));
           col = toSRGB(clamp(col, 0.0, 1.0));
           // split tone: cool shadows, faintly warm highlights
           float ls = dot(col, vec3(0.2126, 0.7152, 0.0722));
@@ -285,14 +285,14 @@ class PostProcessing {
     p.tunnelSoft = MathX.lerp(0.55, 0.42, hyp);
     p.tunnelDark = MathX.lerp(0.0, 0.97, Math.min(1, hyp * 1.5));
     p.edgeBlur = Math.min(1, hyp * 1.5);
-    p.saturation = MathX.lerp(MathX.lerp(1.0, 0.86, cold), 0.55, hyp);
+    p.saturation = MathX.lerp(MathX.lerp(1.22, 1.04, cold), 0.62, hyp);
     p.warmth = MathX.lerp(MathX.lerp(0.05, -0.35, cold), -0.5, Math.min(1, hyp * 1.5));
     // the big pressure step: a brief exposure dip instead of any flashy effect
     const tPop = 2.05;
     const pop = MathX.impulse(t, tPop + 0.02, 0.16);
     p.flash = 0;
     p.chroma = 0;
-    p.exposure = CONFIG.render.exposure * 1.04 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);
+    p.exposure = CONFIG.render.exposure * 1.22 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);   // midtones ≈ the references (docs/art-direction.md)
     p.contrast = 1.06 + 0.05 * hyp;
     p.soft = 0.1 + 0.05 * hyp;
   }
