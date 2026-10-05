@@ -12,7 +12,7 @@
    ===================================================================== */
 
 // film-wide settings on top of the shared defaults (js/config.js)
-CONFIG.duration = 35.0;                 // phases A–B built; grows to 90 s as C–E are built.
+CONFIG.duration = 55.0;                 // phases A–C built; grows to 90 s as D–E are built.
 CONFIG.seed = 19050611;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.3,       // a ~10-year-old's eye height
@@ -79,7 +79,14 @@ const SCRIPT = {
     { id: 'workshop', time: 26.35, label: 'If you did not own the toy…' },
     { id: 'montage', time: 30.85, label: 'Build: sticks, paper, tail' },
     { id: 'kite_reveal', time: 32.85, label: 'The kite' },
-    { id: 'meadow', time: 34.85, label: '(phase C: the meadow)' },
+    { id: 'meadow', time: 34.85, label: 'The meadow: run with the string' },
+    { id: 'release', time: 35.3, label: 'Your friend lets go: it climbs' },
+    { id: 'sky', time: 37.8, label: 'Look up: the big sky' },
+    { id: 'stick', time: 42.4, label: 'Just a stick' },
+    { id: 'imagine', time: 46.0, label: 'Imagination: the castle rises' },
+    { id: 'clash', time: 48.2, label: 'Swords clash' },
+    { id: 'smash', time: 50.6, label: 'Smash cut: back to the street' },
+    { id: 'social', time: 55.0, label: '(phase D: games with others)' },
   ],
 
   // keyframed story tracks (linear unless an ease is given)
@@ -94,6 +101,12 @@ const SCRIPT = {
     door: [[0, 0], [5.95, 0], [6.15, 0.18, 'inQuad'], [6.9, 1, 'outCubic']],
     // daylight leaking round the closed door (it brightens as you look at it)
     leak: [[0, 0.5], [3.2, 0.5], [4.3, 1.0], [5.95, 1.0], [6.3, 0]],
+    // imagination: the colour wash, the castle rising, knight gear, the blade growing; all snap off at the smash cut
+    wash: [[0, 0], [45.95, 0], [46.35, 1], [50.58, 1], [50.6, 0, 'step']],
+    castle: [[0, 0], [46.05, 0], [47.4, 1, 'linear'], [50.58, 1], [50.6, 0, 'step']],
+    gear: [[0, 0], [46.3, 0], [46.9, 1], [50.58, 1], [50.6, 0, 'step']],
+    sword: [[0, 0], [46.2, 0], [46.75, 1, 'outQuad'], [50.58, 1], [50.6, 0, 'step']],
+    imagFlash: [[0, 0], [45.95, 0], [46.08, 0.42], [46.6, 0]],
   },
 
   camera: {
@@ -104,27 +117,33 @@ const SCRIPT = {
       // B: marble ring (kneel) · top · jacks · workshop · montage close-ups · kite reveal
       [15.01, -2.72, 'step'], [20.34, -2.72], [20.36, -6.3, 'step'], [24.34, -6.3], [24.36, -5.55, 'step'], [26.34, -5.55],
       [26.36, -6.0, 'step'], [27.9, -9.85], [30.84, -9.85], [30.86, -11.2, 'step'], [31.84, -11.2], [31.86, -10.6, 'step'], [32.34, -10.62],
-      [32.36, -10.65, 'step'], [32.84, -10.66], [32.86, -10.15, 'step'], [34.84, -10.32]],
+      [32.36, -10.65, 'step'], [32.84, -10.66], [32.86, -10.15, 'step'], [34.84, -10.32],
+      // C: meadow run west · turn to the kite · back in the street with a stick · the duel
+      [34.86, -34.6, 'step'], [35.3, -34.7], [37.0, -37.6, 'inOutSine'], [42.39, -39.4], [42.41, 2.0, 'step'], [48.0, 2.0], [48.2, 2.05], [49.0, 1.95], [53.6, 2.0], [55.0, 2.4]],
     z: [[0, BS.seat.z], [4.6, BS.seat.z], [5.3, 1.4], [6.0, 1.26, 'linear'], [6.9, 1.2, 'linear'], [8.4, 1.15],
       [9.6, 1.05], [12.1, 0.95], [12.6, 0.4, 'inQuad'], [15.0, -8.2, 'linear'],
       [15.01, -9.25, 'step'], [20.34, -9.25], [20.36, -11.55, 'step'], [24.34, -11.6], [24.36, -13.75, 'step'], [26.34, -13.75],
       [26.36, -21.35, 'step'], [27.9, -23.15], [30.84, -23.15], [30.86, -23.22, 'step'], [31.84, -23.22], [31.86, -23.8, 'step'], [32.34, -23.79],
-      [32.36, -23.0, 'step'], [32.84, -23.01], [32.86, -23.45, 'step'], [34.84, -23.42]],
+      [32.36, -23.0, 'step'], [32.84, -23.01], [32.86, -23.45, 'step'], [34.84, -23.42],
+      [34.86, -23.2, 'step'], [35.3, -23.2], [37.0, -23.5, 'inOutSine'], [42.39, -23.9], [42.41, -30.0, 'step'], [48.0, -30.0], [48.2, -30.25], [49.0, -30.1], [53.6, -30.2], [55.0, -31.4]],
     height: [[0, 1.47], [4.6, 1.47], [5.25, 1.85, 'inOutQuad'], [8.45, 1.85], [8.75, 1.7], [9.1, 1.56], [9.45, 1.42], [15.0, 1.42],
       [15.01, 1.36, 'step'], [15.9, 0.66, 'inOutQuad'], [20.34, 0.65], [20.36, 1.42, 'step'], [21.75, 1.36], [22.3, 0.86], [24.34, 0.84],
       [24.36, 1.3, 'step'], [24.9, 0.88], [26.34, 0.88], [26.36, 1.42, 'step'], [30.84, 1.42], [30.86, 1.78, 'step'], [31.84, 1.74],
-      [31.86, 1.35, 'step'], [32.34, 1.34], [32.36, 1.25, 'step'], [32.84, 1.24], [32.86, 0.95, 'step'], [34.84, 0.98]],
+      [31.86, 1.35, 'step'], [32.34, 1.34], [32.36, 1.25, 'step'], [32.84, 1.24], [32.86, 0.95, 'step'], [34.84, 0.98],
+      [34.86, 1.38, 'step'], [42.39, 1.38], [42.41, 0.92, 'step'], [43.2, 0.92], [43.9, 1.42], [47.6, 1.42], [48.2, 1.36], [48.6, 1.42], [55.0, 1.42]],
     yaw: [[0, 91], [3.3, 91], [4.2, 92], [6.9, 90], [7.5, 82], [8.4, 64], [9.35, 70], [9.6, 76], [9.95, 102], [10.25, 96], [10.85, 38], [11.6, 14], [12.6, 6], [15.0, 2],
       [15.01, 90, 'step'], [17.6, 90], [18.1, 97], [19.4, 92], [20.34, 88], [20.36, 0, 'step'], [24.34, 4], [24.36, 50, 'step'], [26.34, 48],
       [26.36, 92, 'step'], [27.9, 98], [30.84, 96], [30.86, 0, 'step'], [31.84, 2], [31.86, 124, 'step'], [32.34, 125], [32.36, 48, 'step'], [32.84, 48],
-      [32.86, 92, 'step'], [34.84, 95]],
+      [32.86, 92, 'step'], [34.84, 95],
+      [34.86, -88, 'step'], [36.0, -86], [37.5, -84], [40.0, -88], [42.39, -90], [42.41, 0, 'step'], [46.0, 0], [46.6, -24], [47.2, 18], [47.7, 0], [50.6, 0], [53.6, 2], [55.0, 38]],
     pitch: [[0, -27], [2.4, -27], [3.3, -25], [4.25, -2], [5.3, -4], [6.0, -1], [6.9, 1], [8.4, -3], [8.7, -14], [9.4, -9], [9.8, -3], [10.6, -2], [12.6, -4], [14.4, -5], [15.0, -30],
       [15.01, -46, 'step'], [15.9, -58], [17.3, -60], [17.7, -57], [19.3, -56], [20.34, -55], [20.36, -46, 'step'], [21.2, -38], [21.6, -62], [24.34, -62],
       [24.36, -34, 'step'], [24.9, -44], [26.34, -44], [26.36, -4, 'step'], [27.9, -18], [28.4, -34], [30.84, -34], [30.86, -86, 'step'], [31.84, -85],
-      [31.86, -39, 'step'], [32.34, -40], [32.36, -43, 'step'], [32.84, -43], [32.86, 20, 'step'], [34.84, 24]],
+      [31.86, -39, 'step'], [32.34, -40], [32.36, -43, 'step'], [32.84, -43], [32.86, 20, 'step'], [34.84, 24],
+      [34.86, 2, 'step'], [35.3, 4], [36.2, 16], [37.0, 26], [38.5, 38], [40.0, 45], [41.5, 49], [42.39, 50], [42.41, -62, 'step'], [43.2, -55], [43.9, -14], [45.0, -10], [46.0, -8], [46.6, 6], [47.2, 10], [47.7, -2], [50.6, -2], [53.6, -4], [55.0, -6]],
     fov: [[0, 62]],
-    startles: [[9.95, 0.5], [17.62, 0.18]],     // the boy rushing past; the click of glass on glass
-    shakes: [],
+    startles: [[9.95, 0.5], [17.62, 0.18], [50.62, 0.35]],     // the boy rushing past; glass on glass; the smash cut
+    shakes: [[46.1, 0.3, 0.9], [48.2, 0.7, 0.16], [49.05, 0.55, 0.16], [49.95, 0.4, 0.14]],    // walls rising; the two clashes
     sag: [[0, 0]], roll: [[0, 0], [10.0, 0], [10.3, -2.2], [10.9, 0]],
   },
 
@@ -133,7 +152,11 @@ const SCRIPT = {
     right: [[0, 'phone'], [0.42, 'swipe'], [0.62, 'phone'], [1.02, 'swipe'], [1.22, 'phone'], [2.48, 'tap'], [2.6, 'phone'], [2.86, 'tap'], [2.98, 'phone'],
       [3.45, 'lower'], [4.1, 'hidden'], [5.45, 'handle'], [5.98, 'push'], [6.55, 'hidden'],
       // B: knuckle down behind your shooter and flick; hold the top, wind up, throw
-      [15.7, 'knuckle'], [17.33, 'flick'], [17.75, 'hidden'], [20.36, 'topHold', 'step'], [20.95, 'topWind'], [21.3, 'topThrow'], [21.75, 'hidden']],
+      [15.7, 'knuckle'], [17.33, 'flick'], [17.75, 'hidden'], [20.36, 'topHold', 'step'], [20.95, 'topWind'], [21.3, 'topThrow'], [21.75, 'hidden'],
+      // C: the kite string, then the stick: pick it up, look at it, it's a sword: swing, block, swing
+      [34.86, 'stringHold', 'step'], [42.4, 'hidden', 'step'], [42.7, 'reachDown'], [43.15, 'grab'], [43.5, 'stickHold'],
+      [46.3, 'swordReady'], [47.75, 'swingBack'], [48.05, 'swingHit'], [48.5, 'swordReady'], [48.85, 'block'], [49.35, 'swordReady'], [49.6, 'swingBack'], [49.85, 'swingHit'], [50.2, 'swordReady'],
+      [50.62, 'stickHold', 'step'], [53.8, 'hidden']],
     left: [[0, 'hidden']],
   },
 
@@ -148,6 +171,8 @@ const SCRIPT = {
       { t: 21.1, until: 23.8, text: 'A few marbles could become a whole afternoon.' },
       { t: 26.8, until: 29.6, text: 'And if you didn’t own the toy you wanted…' },
       { t: 31.0, until: 33.6, text: '…you could make one.' },
+      { t: 42.8, until: 45.5, text: 'And sometimes, the toy wasn’t really the point.' },
+      { t: 51.0, until: 53.8, text: 'A stick could become anything.' },
     ],
     readouts: [{ from: 7.6, until: 11.6, label: 'YEAR', value: 'c. 1905', ctx: 'A TOWN STREET' }],
   },
@@ -161,6 +186,9 @@ const SCRIPT = {
       [0, 15.0, { stride: 2.25, path: [[0, 6.2, 9.4], [9.45, 6.2, 5.2], [10.25, 5.55, 1.0], [11.6, 5.0, -4.6], [15.0, 3.6, -18.5]], states: [[0, 'run'], [10.1, 'runLaugh']] }],
       [15.0, 20.35, { at: [-3.6, -8.4], face: 0, states: [[15.0, 'kneelWatch'], [17.7, 'kneelCheer'], [18.6, 'kneelWatch']] }],
       [26.35, 34.85, { at: [-11.85, -23.0], face: -90, states: [[26.35, 'benchWork'], [32.85, 'holdKiteUp']] }],
+      [34.85, 42.4, { stride: 2.0, path: [[34.85, -31.6, -23.2], [35.9, -31.6, -23.2], [37.2, -33.2, -21.6], [42.4, -33.3, -21.5]], face: 90, states: [[34.85, 'holdKiteUp'], [35.3, 'launch'], [35.9, 'run'], [37.2, 'lookUp']] }],
+      [42.4, 56, { stride: 1.6, path: [[42.4, 2.25, -33.3], [47.6, 2.25, -33.3], [48.0, 2.2, -32.0], [48.6, 2.3, -32.4], [49.0, 2.2, -31.9], [49.5, 2.3, -32.5], [53.6, 2.3, -32.5], [55.0, -0.6, -37.0]], face: 176,
+        states: [[42.4, 'idle'], [46.0, 'duelStance'], [47.6, 'run'], [47.95, 'duelBlock'], [48.45, 'duelStance'], [48.8, 'duelSwing'], [49.3, 'duelStance'], [49.75, 'duelBlock'], [50.1, 'duelStance'], [50.6, 'laughStand'], [53.6, 'run']] }],
     ]),
     // hoop racers: one rolls past during the reveal, two more pass you after the runner; then the top and the jacks
     perf('hoop1', 'sailor', [
@@ -178,20 +206,28 @@ const SCRIPT = {
     perf('tagIt', 'boyCap', [
       [0, 15.0, { stride: 2.0, path: [[0, -2.6, -4.0], [5.6, -2.6, -4.0], [7.6, -0.2, -6.8], [8.6, 1.8, -4.2], [9.6, -0.6, -2.8], [10.4, 0.6, -6.0], [11.55, 1.6, -9.9], [12.8, 3.0, -13.5], [15.0, 3.6, -20.0]], states: [[0, 'run'], [11.3, 'reach'], [11.75, 'run']] }],
       [20.35, 24.35, { at: [-5.85, -13.0], face: 143, act: 'squatWatch' }],
+      [34.85, 42.4, { stride: 2.0, path: [[34.85, -28.4, -26.4], [36.8, -30.6, -25.6], [42.4, -30.7, -25.5]], states: [[34.85, 'run'], [36.8, 'lookUp']] }],
+      [42.4, 56, { at: [-1.7, -42.3], face: -140, states: [[42.4, 'idle'], [46.9, 'duelLoop'], [50.6, 'laughStand']] }],
     ]),
     perf('tag2', 'girlBlue', [
       [0, 15.0, { stride: 1.9, path: [[0, 1.2, -7.0], [5.6, 1.2, -7.0], [7.8, 2.6, -3.6], [8.8, 0.2, -1.8], [9.8, 1.6, -5.4], [10.8, 2.2, -8.6], [11.6, 2.0, -10.6], [12.0, 2.0, -10.8], [13.4, -0.6, -14.0], [15.0, -2.4, -19.5]], states: [[0, 'run'], [11.6, 'startle'], [12.0, 'run']] }],
       [24.35, 26.35, { at: [-6.6, -14.7], face: -133, act: 'jacks' }],
       [26.35, 34.85, { at: [-11.3, -22.42], face: -6, states: [[26.35, 'benchWork'], [32.85, 'cheer']] }],
+      [34.85, 42.4, { stride: 1.9, path: [[34.85, -30.4, -25.6], [36.6, -32.6, -24.8], [42.4, -32.7, -24.7]], states: [[34.85, 'run'], [36.6, 'lookUp'], [38.6, 'cheer'], [39.6, 'lookUp']] }],
+      [42.4, 56, { at: [-2.4, -35.2], face: 135, states: [[42.4, 'idle'], [46.9, 'knightCheer'], [50.6, 'laughStand']] }],
     ]),
     perf('tag3', 'tallBoy', [
       [0, 15.0, { stride: 2.1, path: [[0, -3.6, -8.6], [5.6, -3.6, -8.6], [8.0, -1.6, -10.8], [9.4, -2.6, -6.6], [10.6, -1.4, -11.4], [12.0, -3.4, -15.6], [15.0, -4.0, -22.0]], states: [[0, 'run'], [12.1, 'runLaugh']] }],
       [15.0, 20.35, { at: [-4.95, -8.6], face: -115, states: [[15.0, 'lookDown'], [17.7, 'cheer'], [18.6, 'lookDown']] }],
       [26.35, 34.85, { at: [-11.1, -24.38], face: 174, states: [[26.35, 'benchWork'], [32.85, 'cheer']] }],
+      [34.85, 42.4, { stride: 2.1, path: [[34.85, -29.0, -20.2], [36.6, -31.0, -22.0], [42.4, -31.1, -22.1]], states: [[34.85, 'run'], [36.6, 'lookUp']] }],
+      [42.4, 56, { at: [-3.1, -41.0], face: 40, states: [[42.4, 'idle'], [46.9, 'duelLoop'], [50.6, 'laughStand']] }],
     ]),
     perf('tag4', 'girlCheck', [
       [0, 15.0, { stride: 1.9, path: [[0, 3.4, -10.2], [5.6, 3.4, -10.2], [8.2, 1.2, -12.4], [9.6, 3.6, -9.6], [11.0, 2.4, -14.0], [13.0, 0.8, -19.0], [15.0, 2.8, -25.0]], act: 'run' }],
       [20.35, 24.35, { at: [-6.85, -12.95], face: -135, act: 'squatWatch' }],
+      [34.85, 42.4, { at: [-29.6, -24.6], face: 100, act: 'lookUp' }],
+      [42.4, 56, { at: [4.4, -37.6], face: -140, states: [[42.4, 'idle'], [46.9, 'knightCheer'], [50.6, 'laughStand']] }],
     ]),
     // a game of catch further up the street
     perf('catchG', 'girlSmall', [[0, 15.0, { at: [-6.3, -15.5], face: -56.6, act: 'catchIdle' }]]),

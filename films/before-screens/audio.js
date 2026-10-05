@@ -54,6 +54,9 @@ class BeforeScreensAudio extends AudioEngine {
     this._povSteps(S, bus, roomSend, outSend);
     this._pocket(S, bus, outSend);
     this._workshop(S, bus, outSend, music);
+    this._meadow(S, bus, outSend);
+    this._imagination(S, bus, outSend, music, musSend);
+    this._musicC(S, music, musSend);
     this._music(S, music, musSend);
   }
 
@@ -135,6 +138,102 @@ class BeforeScreensAudio extends AudioEngine {
       S.tone(t0 + 0.74, 0.05, 300, 0.03, -0.3, bus, 'sine', 0.001, 0.04);
     }
     S.laugh(25.95, 0.025, -0.3, bus, 560, 4);
+  }
+
+  /* the meadow: open-field wind and gusts, grasshoppers, the kite's paper flutter and the string's hum */
+  _meadow(S, bus, rev) {
+    const ctx = S.ctx, t0 = 34.85, t1 = 42.4;
+    const w = S.noise('pink', t0, t1 + 0.1), wb = S.filter('bandpass', 650, 0.5), wg = ctx.createGain();
+    wg.gain.setValueAtTime(0.0001, t0); wg.gain.linearRampToValueAtTime(0.03, t0 + 0.05);
+    for (let t = t0 + 0.4; t < t1; t += 0.5) wg.gain.linearRampToValueAtTime(0.022 + 0.022 * (noise1(t * 0.5, 9) * 0.5 + 0.5), t);
+    wg.gain.linearRampToValueAtTime(0.0001, t1 + 0.02);
+    w.connect(wb); wb.connect(wg); wg.connect(bus);
+    for (let t = t0 + 0.3; t < t1; t += S.rng.range(0.4, 1.1)) { S.chirp(t, S.rng.range(5200, 6800), 0.004, S.rng.range(-0.8, 0.8), bus, true); }
+    S.laugh(35.5, 0.03, 0.25, bus, 520, 5); S.voice(36.3, 620, 0.5, 'e', 0.025, -0.3, bus, 1.25); S.laugh(38.7, 0.025, -0.2, bus, 560, 4);
+    S.chatter(37.0, 42.2, 0.012, 0.1, bus, 480, 3);
+    // the kite: a flutter of paper and a thin hum in the string once it's up
+    this._whoosh(S, 35.25, 0.8, 0.05, 0.15, bus, 400, 2600);
+    const fl = S.noise('white', 35.3, t1), fb = S.filter('bandpass', 2800, 1.2), fg = ctx.createGain(); fg.gain.value = 0.0001;
+    for (let t = 35.3; t < t1; t += 0.05) fg.gain.linearRampToValueAtTime(0.0001 + 0.012 * Math.max(0, Math.sin(t * 37) * 0.5 + 0.5) * (0.4 + 0.6 * (noise1(t * 0.8, 4) * 0.5 + 0.5)) * Math.max(0.3, 1 - (t - 35.3) / 9), t);
+    fl.connect(fb); fb.connect(fg); fg.connect(bus);
+    const hum = ctx.createOscillator(), hg = ctx.createGain(); hum.frequency.value = 880;
+    const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.7; lg.gain.value = 18; lfo.connect(lg); lg.connect(hum.frequency);
+    hg.gain.setValueAtTime(0.0001, 36.0); hg.gain.linearRampToValueAtTime(0.0035, 37.5); hg.gain.setValueAtTime(0.0035, t1 - 0.1); hg.gain.linearRampToValueAtTime(0.0001, t1);
+    hum.connect(hg); hg.connect(bus); hum.start(36.0); hum.stop(t1 + 0.1); lfo.start(36.0); lfo.stop(t1 + 0.1);
+  }
+
+  /* imagination: the swell, stone grinding up out of the ground, the blade's ring, torches, clashes; all cut at the smash */
+  _imagination(S, bus, rev, mus, musRev) {
+    const ctx = S.ctx, ib = ctx.createGain(); ib.connect(bus);
+    ib.gain.setValueAtTime(1, 45.9); ib.gain.setValueAtTime(1, 50.6); ib.gain.linearRampToValueAtTime(0.0001, 50.61);
+    // the stick: grass and grit as you reach, a knock as you pick it up
+    this._rustle(S, 42.8, 0.4, 0.03, 0, bus, 1800); S.clunk(43.15, 0.05, 0.05, bus);
+    // the swell: a breath of air rising into shimmer
+    this._whoosh(S, 45.6, 1.0, 0.08, 0, ib, 300, 5000);
+    const sh = S.noise('white', 45.7, 46.4), shp = S.filter('highpass', 6000, 0.7), shg = ctx.createGain();
+    shg.gain.setValueAtTime(0.0001, 45.7); shg.gain.exponentialRampToValueAtTime(0.03, 46.05); shg.gain.exponentialRampToValueAtTime(0.0001, 46.4);
+    sh.connect(shp); shp.connect(shg); shg.connect(ib);
+    // stone walls grinding up
+    const rum = S.noise('brown', 46.0, 47.8), rl = S.filter('lowpass', 160, 0.7), rg = ctx.createGain();
+    rg.gain.setValueAtTime(0.0001, 46.0); rg.gain.linearRampToValueAtTime(0.09, 46.4); rg.gain.linearRampToValueAtTime(0.0001, 47.7);
+    rum.connect(rl); rl.connect(rg); rg.connect(ib);
+    for (let k = 0; k < 14; k++) S.clunk(46.1 + k * 0.09 + S.rng.range(0, 0.04), 0.03, S.rng.range(-0.8, 0.8), ib);
+    // the blade rings as it grows out of the stick
+    for (const [f, a] of [[1320, 0.02], [1320 * 2.76, 0.01], [1320 * 5.4, 0.005]]) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(f * 0.7, 46.2); o.frequency.exponentialRampToValueAtTime(f, 46.75); g.gain.setValueAtTime(0.0001, 46.2); g.gain.linearRampToValueAtTime(a, 46.3); g.gain.setTargetAtTime(0, 46.75, 0.4); o.connect(g); g.connect(ib); g.connect(rev); o.start(46.2); o.stop(48.5); }
+    // torches catch
+    this._whoosh(S, 47.1, 0.5, 0.04, -0.5, ib, 300, 1200); this._whoosh(S, 47.2, 0.5, 0.04, 0.5, ib, 300, 1200);
+    const cr = ctx.createBufferSource(); cr.buffer = S.crackleBuffer(4, 30); const cg = ctx.createGain(); cg.gain.value = 0.02; cr.connect(cg); cg.connect(ib); cr.start(47.2); cr.stop(50.6);
+    // clashes: bright inharmonic metal with a noise crack; battle cries
+    for (const tc of [48.15, 49.05, 49.95]) {
+      for (const [m, a] of [[1, 0.06], [2.76, 0.035], [5.4, 0.02], [8.93, 0.012]]) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = 610 * m; g.gain.setValueAtTime(0, tc); g.gain.linearRampToValueAtTime(a, tc + 0.004); g.gain.setTargetAtTime(0, tc + 0.004, 0.12); o.connect(g); g.connect(ib); g.connect(rev); o.start(tc); o.stop(tc + 0.9); }
+      S.click(tc, 0.09, 0, ib); S.click(tc + 0.01, 0.06, 0.1, ib);
+    }
+    S.voice(47.9, 560, 0.3, 'a', 0.035, 0, ib, 1.3); S.voice(48.75, 600, 0.3, 'a', 0.035, 0.05, ib, 1.25); S.voice(49.7, 540, 0.25, 'a', 0.03, 0, ib, 1.3);
+    S.chatter(47.0, 50.5, 0.012, -0.3, ib, 500, 5);    // the other knights
+    // the smash cut: silence for a beat, then the two of you laughing in the plain street
+    S.laugh(50.85, 0.045, 0.02, bus, 520, 6); S.laugh(51.05, 0.03, -0.1, bus, 470, 5);
+    for (let k = 0; k < 6; k++) S.step(53.7 + k * 0.27, 0.06 * (1 - k * 0.12), -0.2 - k * 0.08, bus);
+  }
+
+  /* music for the meadow (big, open, uplifting) and the castle (heroic) */
+  _musicC(S, mus, rev) {
+    const ctx = S.ctx;
+    const pad = (t0, t1, freqs, vol, cut = 1800) => {
+      for (const f of freqs) for (const d of [-7, 6]) {
+        const o = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', cut, 0.5);
+        o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = d;
+        g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(vol, t0 + 0.5); g.gain.setValueAtTime(vol, t1 - 0.4); g.gain.linearRampToValueAtTime(0.0001, t1);
+        o.connect(lp); lp.connect(g); g.connect(mus); g.connect(rev); o.start(t0); o.stop(t1 + 0.05);
+      }
+    };
+    // meadow: D – A – Bm – G, each 1.9 s, with a soaring flute-like line and harp arpeggios
+    const prog = [[146.8, 293.7, 370, 440], [110, 277.2, 329.6, 440], [123.5, 293.7, 370, 493.9], [98, 246.9, 293.7, 392]];
+    for (let k = 0; k < 4; k++) { const t0 = 34.85 + k * 1.9; pad(t0, t0 + 1.95, prog[k], 0.0032); prog[k].forEach((f, j) => S.pluck(t0 + j * 0.12, f * 2, 0.04, -0.3 + j * 0.2, rev, 2.0, 0.6)); S.pluck(t0, prog[k][0] / 2, 0.08, 0, mus, 2.2, 0.3); }
+    const mel = [[35.3, 740, 0.5], [35.8, 880, 0.4], [36.2, 987.8, 0.9], [37.2, 880, 0.5], [37.7, 1174.7, 1.2], [39.0, 1108.7, 0.5], [39.5, 880, 0.6], [40.2, 987.8, 0.5], [40.7, 880, 0.4], [41.1, 740, 1.2]];
+    for (const [t, f, d] of mel) {
+      const o = ctx.createOscillator(), g = ctx.createGain(), vib = ctx.createOscillator(), vg = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f; vib.frequency.value = 5.2; vg.gain.value = f * 0.006; vib.connect(vg); vg.connect(o.frequency);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.018, t + 0.08); g.gain.setValueAtTime(0.016, t + d * 0.8); g.gain.linearRampToValueAtTime(0, t + d + 0.1);
+      o.connect(g); g.connect(mus); g.connect(rev); o.start(t); o.stop(t + d + 0.15); vib.start(t); vib.stop(t + d + 0.15);
+    }
+    // the stick: one soft held note, then nothing for the held breath
+    S.tone(42.45, 2.4, 293.7, 0.012, 0, rev, 'triangle', 0.3, 1.2);
+    // the castle: a choir of 'ah' voices, brass-like stabs, timpani — all gone at the smash cut
+    const cm = ctx.createGain(); cm.connect(mus); cm.gain.setValueAtTime(1, 50.6); cm.gain.linearRampToValueAtTime(0.0001, 50.61);
+    for (const f of [146.8, 220, 293.7, 370]) S.voice(46.05, f * (f < 200 ? 1 : 1), 4.5, 'a', 0.014, (f % 3) - 1, cm, 1.0);
+    pad(46.1, 50.6, [73.4, 146.8, 220, 293.7], 0.0045, 1200);
+    for (const [t, c] of [[46.4, [293.7, 370, 440]], [47.6, [293.7, 370, 440]], [48.15, [329.6, 415.3, 493.9]], [49.05, [293.7, 370, 440]], [49.95, [392, 493.9, 587.3]]]) {
+      for (const f of c) { const o = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', 1500, 0.6); o.type = 'sawtooth'; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.012, t + 0.02); g.gain.setTargetAtTime(0, t + 0.15, 0.15); o.connect(lp); lp.connect(g); g.connect(cm); o.start(t); o.stop(t + 1.0); }
+      const k = ctx.createOscillator(), kg = ctx.createGain(); k.frequency.setValueAtTime(90, t); k.frequency.exponentialRampToValueAtTime(48, t + 0.4); kg.gain.setValueAtTime(0, t); kg.gain.linearRampToValueAtTime(0.09, t + 0.008); kg.gain.setTargetAtTime(0, t + 0.01, 0.18); k.connect(kg); kg.connect(cm); k.start(t); k.stop(t + 1.0);
+    }
+    // after the laughter: the light street rhythm comes back, leading into the games
+    const chords = [[146.8, 220, 293.7, 370], [110, 220, 277.2, 329.6]];
+    for (let t = 51.35, i = 0; t < CONFIG.duration + 0.5; t += 0.25, i++) {
+      const c = chords[Math.floor(i / 8) % 2], beat = i % 8, pat = [0, 2, 1, 3, 2, 1, 3, 2][beat];
+      S.pluck(t, c[pat] * 2, 0.04 * Math.min(1, (t - 51.35) / 1.5), beat % 2 ? 0.25 : -0.2, mus, 0.9, 0.62);
+      if (beat === 0 || beat === 4) S.pluck(t, c[0], 0.06, 0, mus, 1.4, 0.3);
+      if (beat % 2 === 1) this._shaker(S, t, 0.4, mus);
+    }
   }
 
   /* the workshop: paper, twine, chatter; the montage cuts land on the beat; the kite reveal */
@@ -238,6 +337,9 @@ class BeforeScreensAudio extends AudioEngine {
     far.gain.setValueAtTime(0.0001, t0); far.gain.linearRampToValueAtTime(1, 6.8);
     for (const [pan, f0] of [[-0.5, 430], [0.4, 470], [0.0, 400], [-0.2, 520]]) S.chatter(6.1, end, 0.012, pan, far, f0, 3);
     for (const [t, pan, v] of [[7.4, -0.4, 0.016], [8.9, 0.3, 0.014], [12.9, 0.25, 0.016], [13.9, -0.35, 0.014]]) S.laugh(t, v, pan, far, S.rng.range(440, 540), S.rng.int(4, 6));
+    const duck = [[34.8, 1], [34.86, 0.35], [42.38, 0.35], [42.42, 0.9], [44.9, 0.9], [45.3, 0.12], [46.0, 0.12], [46.3, 0.3], [50.58, 0.3], [50.62, 1.0]];
+    for (const g of [far.gain, cart.gain]) for (const [t, v] of duck) g.linearRampToValueAtTime(v * (g === cart.gain ? 0.5 : 1), t);
+    for (const [t, v] of duck) ag.gain.linearRampToValueAtTime(0.024 * (v < 0.5 ? v * 1.5 : 1), t);
   }
 
   /* the children: footsteps from their paths, hoops, the ball game, the rope, calls */
@@ -327,7 +429,8 @@ class BeforeScreensAudio extends AudioEngine {
       const o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', 1600, 0.4);
       o.type = 'triangle'; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 1.004;
       g.gain.setValueAtTime(0.0001, 6.0); g.gain.exponentialRampToValueAtTime(0.014, 7.2); g.gain.setValueAtTime(0.014, 9.4); g.gain.exponentialRampToValueAtTime(0.004, 11.0);
-      o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(mus); g.connect(rev); o.start(6.0); o2.start(6.0); o.stop(CONFIG.duration + 1); o2.stop(CONFIG.duration + 1);
+      g.gain.setValueAtTime(0.004, 33.6); g.gain.linearRampToValueAtTime(0.0001, 34.8);
+      o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(mus); g.connect(rev); o.start(6.0); o2.start(6.0); o.stop(34.9); o2.stop(34.9);
     }
     // harp-like arpeggio over the reveal
     const arp = [293.7, 370, 440, 587.3, 659.3, 880, 740, 587.3, 440, 370];

@@ -10,7 +10,9 @@
 const KITE = {
   bench: { x: -11.2, z: -23.4, y: 0.76 },
   stages: [[0, 0], [30.85, 1], [31.85, 2], [32.35, 3], [32.85, 4]],
-  heldBy: 'runner', holdFrom: 32.85, flyFrom: 34.85,
+  heldBy: 'runner', holdFrom: 32.85, flyFrom: 34.85, release: 35.3, flyUntil: 42.4,
+  // the climb in the meadow (world x, y, z); the wind blows from the west, so the kite rises east of you
+  path: [[35.3, -31.6, 2.3, -23.2], [36.0, -31.2, 4.4, -23.3], [37.0, -30.4, 7.6, -23.6], [38.5, -29.2, 11.5, -24.0], [40.0, -28.4, 14.6, -24.6], [41.5, -27.8, 16.8, -25.0], [42.4, -27.5, 17.8, -25.2]],
 };
 
 class Kite {
@@ -115,6 +117,58 @@ class KiteWorkshop {
     add(new THREE.BoxGeometry(0.45, 0.4, 0.4), crate, B.x - 0.5, 0.2, B.z + 1.2, 0.4);
     this.kite = new Kite(scene);
     this._v = new THREE.Vector3(); this._w = new THREE.Vector3(); this._wind = new THREE.Vector3();
+    const P = KITE.path;
+    this.fx = new SmoothTrack(P.map((k) => [k[0], k[1]])); this.fy = new SmoothTrack(P.map((k) => [k[0], k[2]])); this.fz = new SmoothTrack(P.map((k) => [k[0], k[3]]));
+    // the string from your hand to the kite
+    this.string = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: '#efe6cf', name: 'kiteString' }));
+    this.string.frustumCulled = false; scene.add(this.string);
+    // swallows wheeling round the sky
+    const birdM = new THREE.MeshStandardMaterial({ color: '#2a2c34', roughness: 0.6, side: THREE.DoubleSide });
+    this.birds = [0, 1, 2, 3, 4, 5].map((i) => {
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.3, 4), birdM); body.rotation.x = Math.PI / 2; g.add(body);
+      const wing = (s2) => { const w = new THREE.Group(); const tg = new THREE.BufferGeometry(); tg.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -0.06, s2 * 0.4, 0, 0.05, 0, 0, 0.1], 3)); tg.computeVertexNormals(); w.add(new THREE.Mesh(tg, birdM)); g.add(w); return w; };
+      g.userData = { l: wing(-1), r: wing(1), ph: i * 1.3 };
+      scene.add(g); return g;
+    });
+  }
+
+  _fly(t) {
+    const K = this.kite, kid = this.kids.byId[KITE.heldBy];
+    K.root.visible = true; K.setStage(4, t);
+    const hand = this.hands.right.g.getWorldPosition(this._w).clone();
+    // before the release your friend holds it up, then it climbs on the wind
+    let pos;
+    if (t < KITE.release) {
+      const a = kid.handWorld(1, this._v).clone(), b = kid.handWorld(-1, this._v);
+      pos = a.add(b).multiplyScalar(0.5); pos.y += 0.3;
+    } else {
+      const sway = MathX.smooth(t, KITE.release, KITE.release + 1.5);
+      pos = new THREE.Vector3(this.fx.value(t) + sway * 0.9 * noise1(t * 0.5, 81), this.fy.value(t) + sway * 0.7 * noise1(t * 0.6, 82), this.fz.value(t) + sway * 1.2 * noise1(t * 0.45, 83));
+    }
+    K.kite.position.copy(pos);
+    K.kite.lookAt(hand);                                   // the face (and the bridle) toward you
+    K.kite.rotateX(-0.3); K.kite.rotateZ(0.12 * noise1(t * 1.4, 84));
+    K.kite.updateMatrixWorld(true);
+    K._tail(t, this._wind.set(1, -0.15, -0.15).normalize(), t < KITE.release ? 0.8 : 0.3, false);
+    // the string: from your fist to the bridle, sagging under its own weight
+    if (t >= KITE.release - 0.05) {
+      const tow = K.towPoint.clone(); K.kite.localToWorld(tow);
+      const L = hand.distanceTo(tow), sag = 0.06 * L, pts = [];
+      for (let i = 0; i <= 24; i++) { const u = i / 24; pts.push(new THREE.Vector3().lerpVectors(hand, tow, u).add(new THREE.Vector3(0, -4 * sag * u * (1 - u), 0))); }
+      this.string.geometry.dispose();
+      this.string.geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.0025, 3, false);
+      this.string.visible = true;
+    } else this.string.visible = false;
+    // swallows
+    this.birds.forEach((b, i) => {
+      const a = t * (0.5 + i * 0.07) + b.userData.ph, R = 9 + i * 2.2;
+      b.position.set(-28 + Math.cos(a) * R, 12 + i * 1.8 + Math.sin(a * 2) * 2, -25 + Math.sin(a) * R);
+      b.rotation.set(0, -a, Math.sin(a * 2) * 0.3);
+      const f = Math.sin(t * 16 + i) * 0.7;
+      b.userData.l.rotation.z = f; b.userData.r.rotation.z = -f;
+      b.visible = true;
+    });
   }
 
   update(t, visible) {
@@ -122,7 +176,10 @@ class KiteWorkshop {
     const K = this.kite, B = KITE.bench;
     let stage = 0;
     for (const [tt, s] of KITE.stages) if (t >= tt) stage = s;
-    if (!visible || t >= KITE.flyFrom) { if (t < KITE.flyFrom) K.root.visible = false; return; }
+    const flying = t >= KITE.flyFrom && t < KITE.flyUntil;
+    this.string.visible = false; for (const b of this.birds) b.visible = false;
+    if (flying) { this.root.visible = false; this._fly(t); return; }
+    if (!visible || t >= KITE.flyFrom) { K.root.visible = false; return; }
     K.root.visible = true;
     K.setStage(stage, t);
     if (stage < 4) {

@@ -193,7 +193,52 @@ Object.assign(ACTIONS, {
     return p;
   },
 });
+/* ---- the kite, the duel ---- */
+Object.assign(ACTIONS, {
+  launch(τ, c) {           // arms flick up and forward as the kite is let go
+    const p = basePose(), k = MathX.smooth(τ, 0, 0.25);
+    p.lSh = [2.75 - 0.9 * k, 0.2]; p.rSh = [2.75 - 0.9 * k, 0.2]; p.lEl = 0.2; p.rEl = 0.2; p.neck = -0.35; p.spine = -0.05 + 0.1 * k;
+    return p;
+  },
+  lookUp(τ, c) {
+    const p = ACTIONS.idle(τ, c);
+    p.neck = -0.55; p.spine = -0.12; p.headYaw = 0.15 * Math.sin(τ * 0.6 + c.seed * 4);
+    if (c.seed > 0.5) { p.rSh = [2.0, 0.25]; p.rEl = 0.25; }   // some point at it
+    return p;
+  },
+  duelStance(τ, c) {
+    const p = basePose(), b = Math.sin(τ * 3 + c.seed * 5);
+    p.hipY = 0.86; p.lHip = [0.35, 0.18]; p.rHip = [-0.2, 0.12]; p.lKnee = 0.45; p.rKnee = 0.3;
+    p.spine = 0.12; p.spineYaw = -0.25; p.rSh = [1.25 + 0.1 * b, 0.25]; p.rEl = 0.9; p.lSh = [0.9, 0.35]; p.lEl = 1.3;
+    p.hipY += 0.015 * b;
+    return p;
+  },
+  duelSwing(τ, c) {         // a big overhead swing down and across
+    const p = ACTIONS.duelStance(τ, c), k = MathX.smooth(τ, 0, 0.18), r = MathX.smooth(τ, 0.18, 0.4);
+    p.rSh = [MathX.lerp(2.7, 0.7, k), 0.35 - 0.3 * k]; p.rEl = 0.5 - 0.3 * k + 0.4 * r; p.spineYaw = -0.4 + 0.7 * k; p.spine = 0.1 + 0.25 * k;
+    return p;
+  },
+  duelBlock(τ, c) {
+    const p = ACTIONS.duelStance(τ, c);
+    p.rSh = [2.3, 0.6]; p.rEl = 1.3; p.lSh = [1.6, 0.2]; p.lEl = 1.0; p.spine = -0.05;
+    return p;
+  },
+  duelLoop(τ, c) {          // two background knights trading blows
+    const f = ((τ + c.seed * 2) % 1.2) / 1.2;
+    return f < 0.35 ? ACTIONS.duelSwing(f * 1.2, c) : f < 0.6 ? ACTIONS.duelBlock(τ, c) : ACTIONS.duelStance(τ, c);
+  },
+  knightCheer(τ, c) {
+    const p = ACTIONS.cheer(τ, c); p.lSh = [1.6, 0.3]; p.lEl = 1.0;   // shield arm stays up
+    return p;
+  },
+  laughStand(τ, c) {
+    const p = basePose(), b = Math.abs(Math.sin(τ * 8));
+    p.spine = 0.35 + 0.1 * b; p.neck = -0.1; p.lSh = [0.5, 0.15]; p.lEl = 1.4; p.rSh = [0.6, 0.1]; p.rEl = 1.5; p.hipY = 0.9; p.lKnee = p.rKnee = 0.2;
+    return p;
+  },
+});
 Object.assign(BLEND, { run: 0.3, runLaugh: 0.3, hoopRun: 0.3, reach: 0.15, startle: 0.12, catchIdle: 0.4, jumpRope: 0.3, sitStep: 0.6, carry: 0.5, hangWash: 0.6, sitBench: 0.6,
+  launch: 0.15, lookUp: 0.5, duelStance: 0.35, duelSwing: 0.08, duelBlock: 0.12, duelLoop: 0.3, knightCheer: 0.25, laughStand: 0.3,
   kneelWatch: 0.4, kneelShoot: 0.25, kneelGroan: 0.2, kneelCheer: 0.15, lookDown: 0.4, cheer: 0.2, squatWatch: 0.5, sitCross: 0.5, jacks: 0.3, benchWork: 0.5, holdKiteUp: 0.3 });
 
 /* ---- geometry shared by all children ---- */

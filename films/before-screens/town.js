@@ -28,6 +28,7 @@ class HistoricTown {
     this._street();
     this._houses();
     this._yards();
+    this._meadow();
     this._trees();
     this._props();
     this._distant();
@@ -152,10 +153,11 @@ class HistoricTown {
           // fair-weather cumulus: separate soft heaps, brighter tops toward the sun
           if (h > 0.0) {
             vec2 uv = d.xz / (h + 0.12) * 0.55 + vec2(uTime * 0.004, 0.0);
-            float c = fbm(uv * 1.3);
-            float heap = smoothstep(0.47, 0.66, c) * smoothstep(0.02, 0.2, h);
-            vec3 cloud = mix(vec3(0.86, 0.86, 0.88), vec3(1.04, 1.0, 0.95), smoothstep(0.55, 0.85, fbm(uv * 2.6 + 4.0)) * 0.7 + pow(sd, 3.0) * 0.4);
-            col = mix(col, cloud, heap * 0.85);
+            float c = fbm(uv * 1.3) + 0.12 * fbm(uv * 5.0 + 9.0);
+            float heap = smoothstep(0.5, 0.6, c) * smoothstep(0.02, 0.2, h);
+            float lit = smoothstep(0.5, 0.78, c + 0.15 * fbm(uv * 2.6 + 4.0));
+            vec3 cloud = mix(vec3(0.74, 0.76, 0.8), vec3(1.06, 1.03, 0.98), lit) + vec3(0.12, 0.1, 0.06) * pow(sd, 4.0);
+            col = mix(col, cloud, heap * 0.92);
           }
           gl_FragColor = vec4(col, 1.0);
         }`,
@@ -478,6 +480,38 @@ class HistoricTown {
     this.yards.push({ sd, z: zc, gap: L.gap });
   }
 
+  /* ---------------- the meadow behind the west houses (kite flying) ---------------- */
+  _meadow() {
+    const B = this.B, m = this.m, r = new RNG(733);
+    // a brighter, longer-grass field from x = -24 westward
+    const g = Geo.quad([-170, 0.065, 60], [-24, 0.065, 60], [-24, 0.065, -110], [-170, 0.065, -110], -170 / 3, 60 / 3, -24 / 3, -110 / 3);
+    B.add(g, this.m.meadowGrass || (this.m.meadowGrass = new THREE.MeshStandardMaterial({ map: this.m.grass.map, color: '#c8e0a0', roughness: 0.97, name: 'meadowGrass' })), null, { noShadow: true });
+    // long grass and wildflowers (instanced)
+    const blade = new THREE.ConeGeometry(0.028, 0.32, 3, 1); blade.translate(0, 0.16, 0);
+    const N = 7000, im = new THREE.InstancedMesh(blade, new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95, flatShading: true, name: 'longGrass' }), N);
+    const M4 = new THREE.Matrix4(), col = new THREE.Color(), q = new THREE.Quaternion(), e = new THREE.Euler();
+    for (let i = 0; i < N; i++) {
+      const x = r.range(-60, -24.5), z = r.range(-45, 0), s2 = r.range(0.6, 1.4);
+      M4.compose(new THREE.Vector3(x, 0.06, z), q.setFromEuler(e.set(r.range(-0.3, 0.3), r.range(0, 6), r.range(-0.3, 0.3))), new THREE.Vector3(s2, s2 * r.range(0.7, 1.5), s2));
+      im.setMatrixAt(i, M4); im.setColorAt(i, col.setHSL(r.range(0.22, 0.3), r.range(0.35, 0.55), r.range(0.24, 0.38)));
+    }
+    im.receiveShadow = true; this.root.add(im);
+    const fl = new THREE.IcosahedronGeometry(0.035, 0); fl.translate(0, 0.32, 0);
+    const F = 700, fm = new THREE.InstancedMesh(fl, new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.8, name: 'flowers' }), F);
+    const flowerCols = ['#f2e8c0', '#f0d040', '#d8a0e0', '#f4f4f0', '#e88060'];
+    for (let i = 0; i < F; i++) {
+      M4.compose(new THREE.Vector3(r.range(-90, -25), 0.06, r.range(-70, 20)), q.identity(), new THREE.Vector3(1, r.range(0.6, 1.3), 1));
+      fm.setMatrixAt(i, M4); fm.setColorAt(i, col.set(flowerCols[i % flowerCols.length]));
+    }
+    this.root.add(fm);
+    // a split-rail fence across the field, and a few big trees
+    for (let z = -60; z < 15; z += 3.2) {
+      B.box(0.14, 1.2, 0.14, -58, 0.6, z, m.weathered);
+      for (const y of [0.45, 0.95]) B.add(new THREE.CylinderGeometry(0.05, 0.06, 3.3, 5), m.weathered, Geo.matrix(-58, y, z + 1.6, Math.PI / 2, 0, r.range(-0.05, 0.05)));
+    }
+    this.meadowTrees = [[-66, -40, 1.6, 'elm'], [-74, -8, 1.4, 'maple'], [-52, 8, 1.3, 'elm'], [-82, -55, 1.7, 'elm'], [-61, -64, 1.2, 'poplar'], [-48, -52, 1.25, 'maple']];
+  }
+
   /* ---------------- trees ---------------- */
   // irregular canopy masses (3–5 overlapping lumps), a forked trunk, vertex-colour shading
   _tree(x, z, s, kind, r) {
@@ -525,6 +559,7 @@ class HistoricTown {
     for (const y of this.yards || []) spots.push([y.sd * r.range(9.5, 13), y.z + r.range(-0.6, 0.6), r.range(0.95, 1.25)]);
     for (let z = 30; z > -125; z -= r.range(9, 15)) for (const sd of [-1, 1]) if (r.chance(0.45)) spots.push([sd * r.range(17, 26), z, r.range(1.1, 1.5)]);
     for (const [x, z] of [[-5.85, 15], [5.85, -22], [-5.85, -44], [5.85, -61], [-5.85, -84]]) spots.push([x, z, 1.15]);
+    for (const [x, z, s2, kind] of this.meadowTrees || []) this._tree(x, z, s2, kind, r);
     for (const [x, z, s] of spots) {
       if (x > 0 && Math.abs(z) < 5 && x < 14) continue;                          // keep the viewer's porch clear
       this._tree(x, z, s, r.pick(['elm', 'elm', 'maple', 'poplar']), r);
