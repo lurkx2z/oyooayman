@@ -1,8 +1,8 @@
 /* =====================================================================
    POST-PROCESSING — one lightweight custom chain:
-   scene (HDR, MSAA) → small blur pyramid → composite
-   (bloom, tone mapping, grade, vignette, hypoxia tunnel vision,
-    edge blur, chromatic aberration, grain, fades).
+   scene (HDR, MSAA, depth) → contact-shading AO (half res) + small blur pyramid → composite
+   (AO, tone mapping, grade, vignette, hypoxia tunnel vision,
+    edge blur, grain, fades).
    ===================================================================== */
 
 class PostProcessing {
@@ -42,11 +42,73 @@ class PostProcessing {
           gl_FragColor = vec4(c, 1.0);
         }`,
     });
+    // ---- contact shading: scalable ambient obscurance from the depth buffer (half resolution).
+    // Grounds people, cars, the cart and props; darkens recesses. Faded out with fog distance.
+    this.aoMat = new THREE.ShaderMaterial({
+      uniforms: {
+        tDepth: { value: null }, uTexel: { value: new THREE.Vector2() }, uNear: { value: 0.05 }, uFar: { value: 3000 },
+        uTanHalf: { value: 0.75 }, uAspect: { value: 0.5625 }, uRadius: { value: 0.6 }, uIntensity: { value: 1.25 }, uBias: { value: 0.012 },
+      },
+      vertexShader: vs, depthTest: false, depthWrite: false,
+      fragmentShader: /* glsl */`
+        uniform sampler2D tDepth; uniform vec2 uTexel; uniform float uNear, uFar, uTanHalf, uAspect, uRadius, uIntensity, uBias;
+        varying vec2 vUv;
+        #define NS 14
+        float viewZ(float d){ return (uNear * uFar) / ((uFar - uNear) * d - uFar); }
+        vec3 viewPos(vec2 uv, float d){ float z = viewZ(d); return vec3((uv * 2.0 - 1.0) * vec2(uTanHalf * uAspect, uTanHalf) * (-z), z); }
+        vec3 posAt(vec2 uv){ return viewPos(uv, texture2D(tDepth, uv).x); }
+        void main(){
+          float d = texture2D(tDepth, vUv).x;
+          if (d >= 0.99999) { gl_FragColor = vec4(1.0, -10000.0, 0.0, 1.0); return; }
+          vec3 P = viewPos(vUv, d);
+          vec2 tx = uTexel * 2.0;
+          vec3 pr = posAt(vUv + vec2(tx.x, 0.0)), pl = posAt(vUv - vec2(tx.x, 0.0));
+          vec3 pu = posAt(vUv + vec2(0.0, tx.y)), pd = posAt(vUv - vec2(0.0, tx.y));
+          vec3 dx = abs(pr.z - P.z) < abs(P.z - pl.z) ? pr - P : P - pl;
+          vec3 dy = abs(pu.z - P.z) < abs(P.z - pd.z) ? pu - P : P - pd;
+          vec3 N = normalize(cross(dx, dy));
+          if (dot(N, P) > 0.0) N = -N;
+          float radUV = min(uRadius / (-P.z * 2.0 * uTanHalf), 0.12);
+          float rot = 6.2831853 * fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+          float bias = uBias + 0.0015 * (-P.z);
+          float r2 = uRadius * uRadius, sum = 0.0;
+          for (int i = 0; i < NS; i++) {
+            float a = (float(i) + 0.5) / float(NS);
+            float ang = a * 6.2831853 * 7.0 + rot;
+            vec2 o = vec2(cos(ang) / uAspect, sin(ang)) * a * radUV;
+            vec2 suv = vUv + o;
+            if (suv.x < 0.0 || suv.y < 0.0 || suv.x > 1.0 || suv.y > 1.0) continue;
+            vec3 v = posAt(suv) - P;
+            float vv = dot(v, v), vn = dot(v, N);
+            float f = max(r2 - vv, 0.0);
+            sum += f * f * f * max((vn - bias) / (0.01 + vv), 0.0);
+          }
+          float ao = max(0.0, 1.0 - sum * uIntensity / (r2 * r2 * r2) * (5.0 / float(NS)));
+          gl_FragColor = vec4(ao, P.z, 0.0, 1.0);
+        }`,
+    });
+    this.aoBlurMat = new THREE.ShaderMaterial({
+      uniforms: { tSrc: { value: null }, uDir: { value: new THREE.Vector2() } },
+      vertexShader: vs, depthTest: false, depthWrite: false,
+      fragmentShader: /* glsl */`
+        uniform sampler2D tSrc; uniform vec2 uDir; varying vec2 vUv;
+        void main(){
+          vec2 c = texture2D(tSrc, vUv).rg;
+          float tol = 0.04 * -c.y + 0.03, s = 0.0, ws = 0.0;
+          for (int i = -4; i <= 4; i++) {
+            vec2 t = texture2D(tSrc, vUv + uDir * float(i)).rg;
+            float w = exp(-float(i * i) / 10.0) * exp(-abs(t.y - c.y) / tol);
+            s += t.x * w; ws += w;
+          }
+          gl_FragColor = vec4(s / ws, c.y, 0.0, 1.0);
+        }`,
+    });
     this.params = {
       exposure: CONFIG.render.exposure, bloom: CONFIG.render.bloom ? 0.22 : 0, bloomThreshold: 1.6,
-      saturation: 0.74, contrast: 0.96, warmth: 0.0, vignette: 1.25, soft: 0.12, blackLift: 0.014, keepWarm: 1.0,
-      tunnel: 1.2, tunnelSoft: 0.5, tunnelDark: 0.0, edgeBlur: 0.0, chroma: 0.0, grain: 0.03,
+      saturation: 0.84, contrast: 1.08, warmth: 0.0, vignette: 1.25, soft: 0.12, blackLift: 0.006, keepWarm: 1.0,
+      tunnel: 1.2, tunnelSoft: 0.5, tunnelDark: 0.0, edgeBlur: 0.0, chroma: 0.0, grain: 0.036, uneven: 0.07,
       fade: 0.0, flash: 0.0, time: 0,
+      ao: 1.0, aoDebug: 0, fogDensity: 0,
     };
     this.compMat = new THREE.ShaderMaterial({
       uniforms: {
@@ -55,10 +117,12 @@ class PostProcessing {
         uWarmth: { value: 0 }, uVignette: { value: 1 }, uTunnel: { value: 1.2 }, uTunnelSoft: { value: 0.5 }, uTunnelDark: { value: 0 },
         uEdgeBlur: { value: 0 }, uChroma: { value: 0 }, uGrain: { value: 0 }, uFade: { value: 0 }, uFlash: { value: 0 }, uTime: { value: 0 },
         uSoft: { value: 0 }, uBlackLift: { value: 0 }, uKeepWarm: { value: 1 },
+        tAO: { value: null }, uAO: { value: 0 }, uAODebug: { value: 0 }, uFogDensity: { value: 0 }, uUneven: { value: 0 },
       },
       vertexShader: vs, depthTest: false, depthWrite: false,
       fragmentShader: /* glsl */`
-        uniform sampler2D tScene, tBlurQ, tBlurE; uniform vec2 uRes;
+        uniform sampler2D tScene, tBlurQ, tBlurE, tAO; uniform vec2 uRes;
+        uniform float uAO, uAODebug, uFogDensity, uUneven;
         uniform float uExposure, uBloom, uBloomThreshold, uSaturation, uContrast, uWarmth, uVignette;
         uniform float uTunnel, uTunnelSoft, uTunnelDark, uEdgeBlur, uChroma, uGrain, uFade, uFlash, uTime;
         uniform float uSoft, uBlackLift, uKeepWarm;
@@ -66,6 +130,8 @@ class PostProcessing {
         vec3 aces(vec3 x){ const float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14; return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0); }
         vec3 toSRGB(vec3 c){ return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }
         float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+        float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y); }
         void main(){
           vec2 uv = vUv;
           vec2 cc = uv - 0.5;
@@ -84,6 +150,13 @@ class PostProcessing {
           col = mix(col, bq, uSoft);
           float edge = smoothstep(uTunnel * 0.6, uTunnel * 0.6 + 0.45, rt);
           col = mix(col, mix(bq, be, 0.35), clamp(edge * uEdgeBlur, 0.0, 1.0));
+          vec2 aoz = texture2D(tAO, uv).rg;
+          // distance swallows detail before silhouette: far surfaces soften a little
+          col = mix(col, bq, smoothstep(30.0, 150.0, -aoz.y) * 0.35);
+          // contact shading, only on the part of the colour the fog hasn't replaced yet
+          float aoK = (1.0 - aoz.x) * uAO * exp(-uFogDensity * -aoz.y);
+          col *= 1.0 - aoK;
+          if (uAODebug > 0.5) { gl_FragColor = vec4(vec3(1.0 - aoK), 1.0); return; }
           vec3 bloom = max(bq - uBloomThreshold, 0.0) * 0.55 + max(be - uBloomThreshold * 0.9, 0.0) * 0.9;
           col += bloom * uBloom;
           col *= uExposure;
@@ -99,14 +172,19 @@ class PostProcessing {
           // split tone: cool shadows, faintly warm highlights
           float ls = dot(col, vec3(0.2126, 0.7152, 0.0722));
           col += vec3(-0.012, -0.002, 0.016) * (1.0 - ls) + vec3(0.01, 0.004, -0.008) * ls;
-          col = clamp((col - 0.5) * uContrast + 0.5, 0.0, 1.0);
+          col = clamp((col - 0.42) * uContrast + 0.42, 0.0, 1.0);   // pivot low: darks deepen, highlights hold
           col = uBlackLift + col * (1.0 - uBlackLift);   // never fully crushed
+          // recorded footage is never perfectly even: a very slow, faint exposure drift across the frame
+          col *= 1.0 + (vnoise(uv * vec2(1.6, 2.8) + vec2(uTime * 0.021, -uTime * 0.013)) - 0.5) * uUneven;
           // frame vignette
           col *= mix(1.0, 0.7, smoothstep(0.38, 1.05, rv) * uVignette);
           // hypoxia tunnel vision
           float tun = smoothstep(uTunnel, uTunnel + uTunnelSoft, rt);
           col *= 1.0 - tun * uTunnelDark;
-          col += (hash(uv * uRes + fract(uTime * 7.31)) - 0.5) * uGrain;
+          // grain: stronger in the shadows, with a coarser second layer so it doesn't read as digital noise
+          float lg = dot(col, vec3(0.2126, 0.7152, 0.0722));
+          float gn = (hash(uv * uRes + fract(uTime * 7.31)) - 0.5) + 0.6 * (hash(floor(uv * uRes * 0.5) + fract(uTime * 3.71)) - 0.5);
+          col += gn * uGrain * (0.55 + 0.9 * (1.0 - lg));
           col = mix(col, vec3(1.0), uFlash);
           col *= 1.0 - uFade;
           gl_FragColor = vec4(col, 1.0);
@@ -120,7 +198,12 @@ class PostProcessing {
     this.w = w; this.h = h;
     const opts = { type: THREE.HalfFloatType, depthBuffer: false };
     for (const k of ['main', 'half', 'q1', 'q2', 'e1', 'e2']) if (this[k]) this[k].dispose();
-    this.main = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: CONFIG.render.msaa, depthBuffer: true });
+    for (const k of ['ao1', 'ao2']) if (this[k]) this[k].dispose();
+    const depth = new THREE.DepthTexture(w, h);
+    depth.type = THREE.UnsignedIntType;
+    this.main = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: CONFIG.render.msaa, depthBuffer: true, depthTexture: depth });
+    this.ao1 = new THREE.WebGLRenderTarget(Math.ceil(w / 2), Math.ceil(h / 2), opts);
+    this.ao2 = this.ao1.clone();
     this.half = new THREE.WebGLRenderTarget(Math.ceil(w / 2), Math.ceil(h / 2), opts);
     this.q1 = new THREE.WebGLRenderTarget(Math.ceil(w / 4), Math.ceil(h / 4), opts);
     this.q2 = this.q1.clone();
@@ -139,6 +222,19 @@ class PostProcessing {
     const r = this.renderer;
     r.setRenderTarget(this.main);
     r.render(scene, camera);
+    // contact shading
+    const am = this.aoMat.uniforms;
+    am.tDepth.value = this.main.depthTexture;
+    am.uTexel.value.set(1 / this.w, 1 / this.h);
+    am.uNear.value = camera.near; am.uFar.value = camera.far;
+    am.uTanHalf.value = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2); am.uAspect.value = camera.aspect;
+    this._pass(this.aoMat, this.ao1);
+    this.aoBlurMat.uniforms.tSrc.value = this.ao1.texture;
+    this.aoBlurMat.uniforms.uDir.value.set(1 / this.ao1.width, 0);
+    this._pass(this.aoBlurMat, this.ao2);
+    this.aoBlurMat.uniforms.tSrc.value = this.ao2.texture;
+    this.aoBlurMat.uniforms.uDir.value.set(0, 1 / this.ao1.height);
+    this._pass(this.aoBlurMat, this.ao1);
     // pyramid
     this.downMat.uniforms.tSrc.value = this.main.texture;
     this.downMat.uniforms.uTexel.value.set(0.5 / this.w, 0.5 / this.h);
@@ -160,6 +256,8 @@ class PostProcessing {
     u.uEdgeBlur.value = p.edgeBlur; u.uChroma.value = p.chroma; u.uGrain.value = p.grain;
     u.uFade.value = p.fade; u.uFlash.value = p.flash; u.uTime.value = p.time;
     u.uSoft.value = p.soft; u.uBlackLift.value = p.blackLift; u.uKeepWarm.value = p.keepWarm;
+    u.tAO.value = this.ao1.texture; u.uAO.value = p.ao; u.uAODebug.value = p.aoDebug; u.uUneven.value = p.uneven;
+    u.uFogDensity.value = scene.fog ? scene.fog.density : 0;
     this._pass(this.compMat, null);
   }
 
@@ -184,15 +282,15 @@ class PostProcessing {
     p.tunnelSoft = MathX.lerp(0.55, 0.42, hyp);
     p.tunnelDark = MathX.lerp(0.0, 0.97, Math.min(1, hyp * 1.5));
     p.edgeBlur = Math.min(1, hyp * 1.5);
-    p.saturation = MathX.lerp(MathX.lerp(0.74, 0.64, cold), 0.42, hyp);
+    p.saturation = MathX.lerp(MathX.lerp(0.84, 0.74, cold), 0.48, hyp);
     p.warmth = MathX.lerp(MathX.lerp(0.05, -0.35, cold), -0.5, Math.min(1, hyp * 1.5));
     // the big pressure step: a brief exposure dip instead of any flashy effect
     const tPop = 2.05;
     const pop = MathX.impulse(t, tPop + 0.02, 0.16);
     p.flash = 0;
     p.chroma = 0;
-    p.exposure = CONFIG.render.exposure * 0.74 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);
-    p.contrast = 0.96 + 0.05 * hyp;
-    p.soft = 0.07 + 0.05 * hyp;
+    p.exposure = CONFIG.render.exposure * 0.86 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);
+    p.contrast = 1.08 + 0.05 * hyp;
+    p.soft = 0.1 + 0.05 * hyp;
   }
 }

@@ -53,10 +53,11 @@ class HUD {
     const txt = shown.toFixed(1);
     if (this._last.o2txt !== txt) { this.el.o2Value.textContent = txt; this._last.o2txt = txt; }
     this._set('o2fill', this.el.o2Fill, 'transform', `scaleX(${(o2 / 21).toFixed(4)})`);
-    this.el.o2.classList.toggle('alert', o2 < H.oxygenRedBelow);
+    this.el.o2.classList.toggle('alert', o2 < H.oxygenRedBelow && o2 > 0.05);
+    this.el.o2.classList.toggle('zero', o2 <= 0.05);
     // the zero blinks twice, quietly
     const z = t - tl.at('o2_zero');
-    const blink = z > 0 && z < 0.9 ? (Math.floor(z * 6) % 2 === 1 ? 0.45 : 1) : 1;
+    const blink = z > 0 && z < 0.9 ? (Math.floor(z * 6) % 2 === 1 ? 0.4 : 0.88) : 0.88;
     this._set('o2op', this.el.o2, 'opacity', String(blink));
 
     // ---- title: small kicker, then the question

@@ -35,22 +35,25 @@ body.recording #app, body.capture #app { inset: 0; }
 .readout { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
 #o2Readout { top: calc(var(--u) * 200); width: calc(var(--u) * 600); }
 .readout .label {
-  font-family: var(--hud-font); font-weight: 500; letter-spacing: 0.32em;
-  font-size: calc(var(--u) * 21); opacity: 0.78;
+  font-family: var(--hud-font); font-weight: 400; letter-spacing: 0.34em;
+  font-size: calc(var(--u) * 16); opacity: 0.6; color: #cfccc4;
 }
 .readout .value {
-  font-family: var(--hud-font); font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1;
-  font-size: calc(var(--u) * 116); letter-spacing: -0.01em; margin-top: calc(var(--u) * 10);
+  font-family: var(--hud-font); font-weight: 200; font-variant-numeric: tabular-nums; line-height: 1;
+  font-size: calc(var(--u) * 88); letter-spacing: -0.005em; margin-top: calc(var(--u) * 8);
 }
-.readout .value .unit { font-size: 0.38em; font-weight: 300; margin-left: 0.08em; opacity: 0.75; vertical-align: 1.05em; }
-.readout .bar { margin: calc(var(--u) * 16) auto 0; width: calc(var(--u) * 280); height: calc(var(--u) * 2); background: rgba(236, 231, 221, 0.22); overflow: hidden; }
-.readout .bar .fill { height: 100%; width: 100%; background: var(--paper); transform-origin: left center; }
-#o2Readout.alert .value, #o2Readout.alert .label { color: var(--ember); }
-#o2Readout.alert .bar .fill { background: var(--ember); }
+.readout .value .unit { font-size: 0.36em; font-weight: 200; margin-left: 0.08em; opacity: 0.7; vertical-align: 1.05em; }
+.readout .bar { margin: calc(var(--u) * 14) auto 0; width: calc(var(--u) * 200); height: calc(var(--u) * 1.5); background: rgba(236, 231, 221, 0.14); overflow: hidden; }
+.readout .bar .fill { height: 100%; width: 100%; background: rgba(236, 231, 221, 0.7); transform-origin: left center; }
+/* the number alone changes colour while oxygen falls; at zero it settles to a dark, muted red */
+#o2Readout .value { transition: color 0.25s linear; }
+#o2Readout.alert .value { color: #b9796b; }
+#o2Readout.zero .value { color: #98564b; }
+#o2Readout.alert .bar .fill { background: #b9796b; }
 
-#timerReadout { top: calc(var(--u) * 418); opacity: 0; width: calc(var(--u) * 500); }
-#timerReadout .label { font-size: calc(var(--u) * 17); }
-#timerReadout .value { font-size: calc(var(--u) * 50); margin-top: calc(var(--u) * 6); }
+#timerReadout { top: calc(var(--u) * 372); opacity: 0; width: calc(var(--u) * 500); }
+#timerReadout .label { font-size: calc(var(--u) * 13); }
+#timerReadout .value { font-size: calc(var(--u) * 40); margin-top: calc(var(--u) * 6); opacity: 0.85; }
 
 #title {
   position: absolute; left: 50%; top: calc(var(--u) * 470); transform: translateX(-50%);
@@ -66,10 +69,11 @@ body.recording #app, body.capture #app { inset: 0; }
 }
 
 #caption {
-  position: absolute; left: 50%; top: calc(var(--u) * 1405); transform: translateX(-50%);
-  width: calc(var(--u) * 900); text-align: center; opacity: 0;
-  font-family: var(--serif); font-style: italic; font-weight: 500; font-size: calc(var(--u) * 54); line-height: 1.2;
-  color: var(--paper); text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 18) rgba(0, 0, 0, 0.6);
+  /* sits above the TikTok/Shorts caption + button zone (bottom ~22 %, right edge) */
+  position: absolute; left: 50%; top: calc(var(--u) * 1235); transform: translateX(-50%);
+  width: calc(var(--u) * 780); text-align: center; opacity: 0;
+  font-family: var(--serif); font-style: italic; font-weight: 400; font-size: calc(var(--u) * 48); line-height: 1.2;
+  color: var(--paper); letter-spacing: 0.01em; text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 16) rgba(0, 0, 0, 0.55);
 }
 
 /* optional floating labels (unused by default) */

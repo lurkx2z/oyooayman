@@ -134,7 +134,8 @@ class BillboardSystem {
     this.aTint = new THREE.InstancedBufferAttribute(new Float32Array(max * 3), 3).setUsage(THREE.DynamicDrawUsage);
     base.setAttribute('aPos', this.aPos); base.setAttribute('aData', this.aData); base.setAttribute('aTint', this.aTint);
     base.instanceCount = 0;
-    this.uniforms = { uMap: { value: Tex.softDot() }, uFogColor: { value: new THREE.Color() }, uFogDensity: { value: 0 } };
+    // uLight: unlit smoke would glow in the dim overcast street, so its tint is scaled to the ambient light
+    this.uniforms = { uMap: { value: Tex.softDot() }, uFogColor: { value: new THREE.Color() }, uFogDensity: { value: 0 }, uLight: { value: additive ? 1 : 0.6 } };
     const mat = new THREE.ShaderMaterial({
       uniforms: this.uniforms, transparent: true, depthWrite: false,
       blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
@@ -150,12 +151,12 @@ class BillboardSystem {
           vUv = uv; vAlpha = aData.z; vTint = aTint * aData.w; vDepth = -mv.z;
         }`,
       fragmentShader: /* glsl */`
-        uniform sampler2D uMap; uniform vec3 uFogColor; uniform float uFogDensity;
+        uniform sampler2D uMap; uniform vec3 uFogColor; uniform float uFogDensity, uLight;
         varying vec2 vUv; varying float vAlpha; varying vec3 vTint; varying float vDepth;
         void main(){
           float a = texture2D(uMap, vUv).r * vAlpha;
-          float fog = 1.0 - exp(-uFogDensity * vDepth);
-          gl_FragColor = vec4(mix(vTint, uFogColor, fog), a);
+          float fog = min(1.0 - exp(-uFogDensity * vDepth), 0.9);
+          gl_FragColor = vec4(mix(vTint * uLight, uFogColor, fog), a);
         }`,
     });
     this.mesh = new THREE.Mesh(base, mat);
@@ -280,6 +281,7 @@ class ParticleSystem {
     this.glow.begin(null);
     this._grillSmoke(t, tl);
     this._exhaust(t);
+    this._dust(t, camera);
     this._glows(t, tl, level);
     this.smoke.end();
     this.glow.end();
@@ -301,7 +303,7 @@ class ParticleSystem {
   _sparks(t, tl) {
     const S = this.sparks, o = this.env.anchors.grinder;
     S.begin();
-    const R = 300, Lmax = 1.0, N = Math.ceil(R * Lmax) + 1;
+    const R = 170, Lmax = 0.7, N = Math.ceil(R * Lmax) + 1;
     const tStop = tl.at('grinder_stop'), tZ = tl.at('o2_zero');
     const g = 9.8;
     // fan: a thin vertical sheet thrown off the disc, toward the street and down (seen side-on by the viewer)
@@ -316,7 +318,7 @@ class ParticleSystem {
       // oxygen at the moment this spark was thrown off
       const o2 = SCRIPT_TRACKS.oxygen.value(tb);
       const f = MathX.smooth(o2, 3, 19);          // 1 = burning steel sparks, 0 = just friction-hot metal
-      const life = MathX.lerp(0.07 + 0.1 * h1, 0.35 + 0.6 * h1, f);
+      const life = MathX.lerp(0.06 + 0.08 * h1, 0.18 + 0.4 * h1 * h1, f);
       if (age > life) continue;
       const sp = MathX.lerp(4, 6, f) + h2 * 6.5;
       const th = (h3 - 0.5) * 1.15, ph = (h4 - 0.5) * 0.22;
@@ -337,13 +339,14 @@ class ParticleSystem {
       const [ax, ay, az] = pos(tail), [mx, my, mz] = pos(m), [px, py, pz] = pos(age);
       const fade = 1 - age / life;
       // white-yellow when the steel burns, dull orange-red without oxygen; the tail is cooler than the head
-      const br = MathX.lerp(4.2, 10, f) * (0.45 + 0.55 * fade);
+      const h5 = hash2(i + 3999, k);
+      const br = MathX.lerp(3.2, 8, f) * (0.45 + 0.55 * fade) * (0.25 + 0.75 * h5 * h5);   // uneven: a few bright, most dim
       const r = br, gg = br * MathX.lerp(0.28, 0.75, f) * (0.6 + 0.4 * fade), b = br * MathX.lerp(0.04, 0.3, f) * fade;
-      const w = MathX.lerp(0.013, 0.012, f);
+      const w = MathX.lerp(0.0085, 0.0075, f) * (0.7 + 0.5 * h5);
       S.push(ax, ay, az, mx, my, mz, r * 0.7, gg * 0.45, b * 0.2, 1, w * 0.8);
       S.push(mx, my, mz, px, py, pz, r, gg, b, 1, w);
       // carbon "bursts" only happen when there is oxygen to burn the steel
-      if (f > 0.6 && h2 > 0.7 && age > life * 0.4) {
+      if (f > 0.6 && h2 > 0.9 && h5 > 0.5 && age > life * 0.4) {
         for (let j = 0; j < 4; j++) {
           const a2 = (j / 4) * Math.PI * 2 + h3 * 6, L = 0.07 + 0.06 * hash2(i * 3 + j, k);
           S.push(px, py, pz, px + Math.cos(a2) * L, py + Math.sin(a2) * L * 0.8, pz + Math.sin(a2 + 1.3) * L, r * 0.8, gg * 0.8, b, fade, 0.005);
@@ -391,6 +394,21 @@ class ParticleSystem {
       const p0 = [hnd.x + dx * a, hnd.y + 0.05 + dy * a, hnd.z + dz * a], p1 = [hnd.x + dx * (a + 0.01), hnd.y + 0.05 + dy * (a + 0.01), hnd.z + dz * (a + 0.01)];
       const fade = 1 - a / 0.14;
       this.sparks.push(p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], 2.2 * fade, 0.7 * fade, 0.1 * fade, 1, 0.004);
+    }
+  }
+
+  // airborne grit catching the flat light: tiny, slow, only in the air around the viewer
+  _dust(t, camera) {
+    const B = this.smoke, box = [[7.2, 12.2], [0.4, 3.4], [-5.5, 4.5]], cp = camera.position;
+    const wrap = (v, [a, b]) => { const f = (((v - a) / (b - a)) % 1 + 1) % 1; return [a + f * (b - a), Math.sin(Math.PI * f)]; };
+    for (let i = 0; i < 70; i++) {
+      const h1 = hash1(i * 7 + 1), h2 = hash1(i * 13 + 2), h3 = hash1(i * 17 + 3), h4 = hash1(i * 23 + 4);
+      const [x, fx] = wrap(7.2 + h1 * 5 + t * (0.05 + 0.08 * h4) + 0.1 * Math.sin(t * 0.7 + i), box[0]);
+      const [y, fy] = wrap(0.4 + h2 * 3 + t * 0.03 * (h3 - 0.4) + 0.08 * Math.sin(t * 0.9 + i * 2), box[1]);
+      const [z, fz] = wrap(-5.5 + h3 * 10 - t * (0.04 + 0.05 * h1), box[2]);
+      const near = MathX.smooth(Math.hypot(x - cp.x, y - cp.y, z - cp.z), 1.2, 3.0);   // nothing right in front of the lens
+      const a = (0.05 + 0.08 * h2) * near * Math.min(1, fx * 3) * Math.min(1, fy * 3) * Math.min(1, fz * 3);
+      if (a > 0.004) B.push(x, y, z, 0.01 + 0.012 * h4, 0, a, 0.75, 1, 1, 0.97);
     }
   }
 

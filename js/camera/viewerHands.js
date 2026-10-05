@@ -29,7 +29,7 @@ class ViewerHands {
     this.root = new THREE.Group();
     this.root.name = 'viewerHands';
     camera.add(this.root);
-    const skin = Mat.std('#8f725f', { roughness: 0.78 });
+    const skin = Mat.std('#7d6252', { roughness: 0.85 });
     const sleeve = Mat.std('#252b33', { roughness: 0.92 });
     const cuff = Mat.std('#1d2228', { roughness: 0.92 });
     this.right = this._fist(skin, sleeve, cuff, 1);
@@ -49,9 +49,9 @@ class ViewerHands {
   }
 
   _arm(side, sleeve, cuff) {
-    const fa = new THREE.CapsuleGeometry(0.032, 0.3, 4, 10);
+    const fa = new THREE.CapsuleGeometry(0.043, 0.3, 4, 10);       // jacket sleeve, not a bare stick
     fa.applyMatrix4(Geo.matrix(side * 0.075, -0.19, 0.06, -0.35, 0, side * 0.42));
-    const cf = new THREE.CylinderGeometry(0.047, 0.05, 0.07, 14);
+    const cf = new THREE.CylinderGeometry(0.05, 0.054, 0.06, 14);
     cf.applyMatrix4(Geo.matrix(side * 0.022, -0.05, 0.015, -0.35, 0, side * 0.42));
     return [this._merge([fa], sleeve), this._merge([cf], cuff)];
   }

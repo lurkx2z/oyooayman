@@ -55,7 +55,7 @@ const Tex = {
   asphalt(seed) {
     const rng = new RNG(seed);
     const S = 1024, c = Tex.canvas(S, S), x = c.getContext('2d');
-    x.fillStyle = '#3c3e42'; x.fillRect(0, 0, S, S);
+    x.fillStyle = '#323436'; x.fillRect(0, 0, S, S);
     Tex.blotches(x, S, S, 60, 40, 180, (r) => `rgba(${r.next() < 0.5 ? '20,20,22' : '90,90,92'},${r.range(0.05, 0.14)})`, rng);
     // patched repairs
     for (let i = 0; i < 3; i++) {
@@ -91,16 +91,16 @@ const Tex = {
     const rng = new RNG(seed);
     const S = 512, c = Tex.canvas(S, S), x = c.getContext('2d');
     const b = Tex.canvas(S, S), bx = b.getContext('2d');
-    x.fillStyle = '#a8a398'; x.fillRect(0, 0, S, S);
+    x.fillStyle = '#6c6a64'; x.fillRect(0, 0, S, S);
     bx.fillStyle = '#909090'; bx.fillRect(0, 0, S, S);
     const n = 2, cs = S / n;
     for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
       const v = rng.range(-10, 10);
-      x.fillStyle = `rgb(${168 + v},${163 + v},${153 + v})`;
+      x.fillStyle = `rgb(${118 + v},${115 + v},${108 + v})`;
       x.fillRect(i * cs + 2, j * cs + 2, cs - 4, cs - 4);
     }
-    Tex.blotches(x, S, S, 70, 8, 70, (r) => `rgba(${r.next() < 0.75 ? '70,64,58' : '225,218,206'},${r.range(0.06, 0.2)})`, rng);
-    Tex.blotches(x, S, S, 12, 30, 110, (r) => `rgba(60,55,50,${r.range(0.05, 0.12)})`, rng);
+    Tex.blotches(x, S, S, 80, 8, 70, (r) => `rgba(${r.next() < 0.8 ? '42,40,36' : '170,166,156'},${r.range(0.08, 0.24)})`, rng);
+    Tex.blotches(x, S, S, 16, 40, 150, (r) => `rgba(34,32,28,${r.range(0.08, 0.2)})`, rng);
     // gum spots / stains
     for (let i = 0; i < 26; i++) {
       x.fillStyle = `rgba(60,58,55,${rng.range(0.15, 0.45)})`;
@@ -108,7 +108,7 @@ const Tex = {
     }
     Tex.noise(x, S, S, 16, rng);
     // joints
-    x.strokeStyle = 'rgba(70,66,60,0.85)'; x.lineWidth = 3;
+    x.strokeStyle = 'rgba(38,36,33,0.9)'; x.lineWidth = 4;
     bx.strokeStyle = '#202020'; bx.lineWidth = 5;
     for (let i = 0; i <= n; i++) {
       for (const ctx of [x, bx]) {
@@ -479,9 +479,9 @@ const Tex = {
 
   cartSign() {
     const W = 512, H = 128, c = Tex.canvas(W, H), x = c.getContext('2d');
-    x.fillStyle = '#c62f24'; x.fillRect(0, 0, W, H);
-    x.fillStyle = '#ffd34a'; x.fillRect(0, H - 16, W, 16);
-    x.fillStyle = '#fff'; x.font = `800 58px ${Tex.fontCond}`; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#98382e'; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#c4a24e'; x.fillRect(0, H - 16, W, 16);
+    x.fillStyle = '#e4dfd4'; x.font = `800 58px ${Tex.fontCond}`; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillText('CHARCOAL GRILL', W / 2, 52);
     return Tex.tex(c, { repeat: false });
   },

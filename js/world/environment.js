@@ -5,10 +5,11 @@
 
 // Atmospheric haze: plain exponential fog (three's FogExp2 is squared, which keeps the
 // midground too clear and then slams far objects to a flat wall). Foreground stays crisp,
-// the midground fades a little, the background washes out, far towers dissolve into the sky.
+// the midground fades a little, the background washes out. The fog colour sits a little darker
+// than the horizon and never fully covers geometry, so far blocks lose detail before silhouette.
 THREE.ShaderChunk.fog_fragment = THREE.ShaderChunk.fog_fragment.replace(
   'fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );',
-  'fogFactor = 1.0 - exp( - fogDensity * vFogDepth );');
+  'fogFactor = min( 1.0 - exp( - fogDensity * vFogDepth ), 0.9 );');   // capped: far blocks keep a silhouette
 
 const FACADE_STYLES = {
   redbrick:   { kind: 'brick', wall: [122, 80, 66],  frame: '#ebe6dc', sill: [208, 200, 186], winW: 0.5,  winH: 0.58, sillH: 0.24, panes: 3, bayW: 3.0, floorH: 3.3, ac: true },
@@ -81,8 +82,8 @@ class Environment {
     this.m = {
       asphalt: new THREE.MeshStandardMaterial({ map: asph.map, roughnessMap: asph.roughnessMap, bumpMap: asph.bumpMap, bumpScale: 1.2, roughness: 0.95, name: 'asphalt' }),
       sidewalk: new THREE.MeshStandardMaterial({ map: side.map, bumpMap: side.bumpMap, bumpScale: 2.0, roughness: 0.9, name: 'sidewalk' }),
-      curb: new THREE.MeshStandardMaterial({ map: Tex.concrete(13, [190, 186, 178]), roughness: 0.85, name: 'curb' }),
-      concrete: new THREE.MeshStandardMaterial({ map: Tex.concrete(14, [166, 162, 154]), roughness: 0.9, name: 'concrete' }),
+      curb: new THREE.MeshStandardMaterial({ map: Tex.concrete(13, [132, 129, 122]), roughness: 0.85, name: 'curb' }),
+      concrete: new THREE.MeshStandardMaterial({ map: Tex.concrete(14, [124, 121, 114]), roughness: 0.9, name: 'concrete' }),
       dirt: Mat.std('#6e5f4d', { roughness: 1 }),
       roof: Mat.std('#58554f', { roughness: 0.95 }),
       roofLight: Mat.std('#8a8780', { roughness: 0.9 }),
@@ -129,16 +130,17 @@ class Environment {
   /* ================================================================ */
   _sky() {
     // cold overcast morning: the sun is only a soft brighter patch behind the cloud deck
-    this.sunDir = new THREE.Vector3(-0.5, 0.72, -0.48).normalize();
-    const zenith = new THREE.Color('#6c7783');
-    const horizon = new THREE.Color('#959ca3');
+    this.sunDir = new THREE.Vector3(-0.3, 0.8, 0.5).normalize();     // behind-left of the viewer: faces toward us get the key, shadows fall into frame
+    const zenith = new THREE.Color('#47525b');
+    const horizon = new THREE.Color('#858d87');
     this.horizonColor = horizon.clone();
+    this.fogColor = new THREE.Color('#6b746e');      // dirty grey-green haze, darker than the sky behind it
     this.skyUniforms = {
       uZenith: { value: zenith },
       uHorizon: { value: horizon },
-      uGround: { value: new THREE.Color('#6a6c6f') },
+      uGround: { value: new THREE.Color('#4f524f') },
       uSunDir: { value: this.sunDir },
-      uSunColor: { value: new THREE.Color('#e6e2da') },
+      uSunColor: { value: new THREE.Color('#d9dbd4') },
       uTime: { value: 0 },
       uO2: { value: 1 },
     };
@@ -166,7 +168,7 @@ class Environment {
         void main(){
           vec3 d = normalize(vDir);
           float h = d.y;
-          vec3 col = mix(uHorizon, uZenith, pow(clamp(h, 0.0, 1.0), 0.6));
+          vec3 col = mix(uHorizon, uZenith, pow(clamp(h, 0.0, 1.0), 0.42));
           col = mix(col, uGround, smoothstep(0.0, -0.06, h));
           // diffuse glow where the sun hides
           float sd = max(dot(d, uSunDir), 0.0);
@@ -177,8 +179,8 @@ class Environment {
             float c = fbm(uv);
             float c2 = fbm(uv * 2.6 + 3.7);
             float dense = smoothstep(0.38, 0.72, c);
-            vec3 lightC = uHorizon * 1.04 + uSunColor * pow(sd, 6.0) * 0.08;
-            vec3 darkC = uZenith * 0.7;
+            vec3 lightC = mix(uHorizon * 1.03, uZenith * 1.12, smoothstep(0.05, 0.6, h)) + uSunColor * pow(sd, 6.0) * 0.06;
+            vec3 darkC = uZenith * 0.72;
             vec3 clouds = mix(lightC, darkC, clamp(dense * 0.8 + (c2 - 0.5) * 0.25, 0.0, 1.0));
             col = mix(col, clouds, 0.88 * smoothstep(-0.02, 0.3, h));
           }
@@ -193,12 +195,12 @@ class Environment {
     sky.renderOrder = -10;
     this.scene.add(sky);
     this.sky = sky;
-    this.scene.fog = new THREE.FogExp2(horizon.clone(), 0.0046);   // used as plain exponential (see top)
+    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0046);   // used as plain exponential (see top)
     this.scene.background = horizon.clone();
   }
 
   _lights() {
-    const sun = new THREE.DirectionalLight('#e6e9ec', 1.3);
+    const sun = new THREE.DirectionalLight('#e1e4df', 1.6);
     sun.position.copy(this.sunDir).multiplyScalar(160).add(new THREE.Vector3(0, 0, -40));
     sun.target.position.set(0, 0, -40);
     sun.castShadow = CONFIG.render.shadows;
@@ -207,10 +209,10 @@ class Environment {
     sc.left = -95; sc.right = 95; sc.top = 110; sc.bottom = -110; sc.near = 10; sc.far = 420;
     sun.shadow.bias = -0.00025;
     sun.shadow.normalBias = 0.035;
-    sun.shadow.radius = 7;          // soft overcast shadow edges
+    sun.shadow.radius = 4;          // soft but readable shadow shapes
     this.scene.add(sun, sun.target);
     this.sun = sun;
-    const hemi = new THREE.HemisphereLight('#aab4be', '#43423f', 1.4);
+    const hemi = new THREE.HemisphereLight('#94a0a0', '#2f2f2b', 1.15);
     this.scene.add(hemi);
     this.hemi = hemi;
   }
@@ -220,11 +222,11 @@ class Environment {
     const pm = new THREE.PMREMGenerator(this.renderer);
     const envScene = new THREE.Scene();
     envScene.add(this.sky.clone());
-    const ground = new THREE.Mesh(new THREE.CircleGeometry(1500, 32), new THREE.MeshBasicMaterial({ color: '#6d6a64' }));
+    const ground = new THREE.Mesh(new THREE.CircleGeometry(1500, 32), new THREE.MeshBasicMaterial({ color: '#45443f' }));
     ground.rotation.x = -Math.PI / 2; ground.position.y = -2;
     envScene.add(ground);
     // a few "buildings" so reflections are not pure sky
-    const bm = new THREE.MeshBasicMaterial({ color: '#8a8378' });
+    const bm = new THREE.MeshBasicMaterial({ color: '#5a5650' });
     for (let i = 0; i < 16; i++) {
       const a = (i / 16) * Math.PI * 2, h = 30 + (i % 5) * 18;
       const b = new THREE.Mesh(new THREE.BoxGeometry(60, h * 2, 60), bm);
@@ -233,7 +235,7 @@ class Environment {
     }
     const rt = pm.fromScene(envScene, 0.02, 0.1, 3000);
     this.scene.environment = rt.texture;
-    this.scene.environmentIntensity = 0.55;
+    this.scene.environmentIntensity = 0.42;
     pm.dispose();
   }
 
@@ -781,7 +783,7 @@ class Environment {
     const g = new THREE.Group();
     g.position.set(x, h, z);
     this.root.add(g);
-    const red = Mat.std('#c3352a', { roughness: 0.55 });
+    const red = Mat.std('#9c3b31', { roughness: 0.55 });
     const steelM = this.m.steel;
     const add = (geo, mat, px, py, pz, ry = 0) => { const me = new THREE.Mesh(geo, mat); me.position.set(px, py, pz); me.rotation.y = ry; me.castShadow = me.receiveShadow = true; g.add(me); return me; };
     // cabinet
@@ -827,7 +829,7 @@ class Environment {
     // umbrella
     add(new THREE.CylinderGeometry(0.02, 0.02, 2.1, 6), steelM, 0.3, 1.1, -0.55);
     const um = Tex.canvas(256, 32), ux = um.getContext('2d');
-    for (let i = 0; i < 8; i++) { ux.fillStyle = i % 2 ? '#f3efe6' : '#c8302a'; ux.fillRect(i * 32, 0, 32, 32); }
+    for (let i = 0; i < 8; i++) { ux.fillStyle = i % 2 ? '#d6d2c9' : '#9e3b33'; ux.fillRect(i * 32, 0, 32, 32); }
     const umbMat = new THREE.MeshStandardMaterial({ map: Tex.tex(um), side: THREE.DoubleSide, roughness: 0.8 });
     const canopy = add(new THREE.ConeGeometry(1.3, 0.42, 16, 1, true), umbMat, 0.3, 2.2, -0.55);
     canopy.castShadow = true;
@@ -956,7 +958,7 @@ class Environment {
     const o2 = SCRIPT_TRACKS.skyO2.value(t);
     this.skyUniforms.uO2.value = o2;
     // fog follows the sky colour a little
-    this.scene.fog.color.copy(this.horizonColor).multiplyScalar(MathX.lerp(0.94, 1.0, o2));
+    this.scene.fog.color.copy(this.fogColor).multiplyScalar(MathX.lerp(0.93, 1.0, o2));
     // coals keep glowing (they are hot) but dim once nothing can burn
     // hot coals glow because they are HOT, not because they burn: bright orange → dull red, then they stay red for minutes
     const dim = MathX.smooth(t, tl.at('flames_out'), tl.at('flames_out') + 3.5);

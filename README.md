@@ -8,22 +8,29 @@ Everything is procedural, so there are no models, images or sound files to downl
 | Time | Beat |
 |---|---|
 | 0–1.3 s | An ordinary overcast street. You walk toward a charcoal-grill cart (flames). A worker on a scissor lift throws a bright spark fan, there's traffic, birds, and a rooftop LED billboard. Title: *WHAT IF… oxygen disappeared?* The O₂ readout already creeps down from 21.0 % |
-| 1.3–2.4 s | O₂ crashes to 0 % and pressure falls with it: a crackle of ear pops. Grill flames die at about 15 %. Engines misfire and stop while O₂ is still falling. At the big pressure step (about 2.05 s) everyone, including your own hands, jerks up to their ears; birds dip and scatter; the camera jolts with a colour shock; sound muffles; and you exhale involuntarily |
+| 1.3–2.4 s | O₂ crashes to 0 % and pressure falls with it: a crackle of ear pops. Grill flames die at about 15 %. Engines misfire and stop while O₂ is still falling. At the big pressure step (about 2.05 s) everyone jerks their hands up to their ears; birds dip and scatter; the camera jolts; sound muffles; and you exhale involuntarily |
 | 1.95–3.85 s | **0 % at 2.4 s** (air pressure is down 21 %). Caption: *The flames went out first.* |
-| 3.4–5.3 s | **You click your own lighter**: a blue piezo spark, gas hisses, no flame. Meanwhile the grill gives off white smoke (fat still cooks without a flame) and its coals glow dull red (hot, not burning) |
+| 3.4–6.6 s | **The vendor keeps flicking his lighter**: dim flint sparks, no flame. Meanwhile the grill gives off pale smoke (fat still cooks without a flame) and its coals glow dull red (hot, not burning) |
 | 5.5–6.1 s | The worker's battery grinder still spins, but its sparks are short and dull: hot steel can't burn without O₂ |
 | 6.3 s | **The grid collapses** (60 % of power came from burning fuel). The rooftop billboard flickers and dies, signals switch to battery flashing red, the mains hum cuts out. Caption: *Then the engines. Then the power.* |
 | 6.75 s | A coasting car rear-ends the stalled car 16 m ahead. Its alarm and hazards keep going on battery |
 | 7.3–8.9 s | **A blue electric car keeps driving** through the dead traffic and passes you. Caption: *Only electric things kept moving.* |
-| 9.5–15 s | A quiet second counter appears: **TIME WITHOUT OXYGEN 00:07 → 00:12**. Captions: *No one felt short of breath.* / *That was the dangerous part.* Dizziness, hands to heads, tunnel vision and desaturation build. The hard-working lift worker passes out first (about 10 s without O₂) and folds over the railing. Birds start falling from the sky. Standing people stumble, kneel and sit down; seated drivers last longest. Your own trembling hand drifts into view. Phase 1 ends about 4 s before *you* black out |
+| 9.5–15 s | A quiet second counter appears: **TIME WITHOUT OXYGEN 00:07 → 00:12**. Captions: *No one felt short of breath.* / *That was the dangerous part.* Dizziness, hands to heads, tunnel vision and desaturation build. The hard-working lift worker passes out first (about 10 s without O₂) and folds over the railing. Birds start falling from the sky. Standing people stumble, kneel and sit down; seated drivers last longest. Phase 1 ends about 4 s before *you* black out |
 
 
 ## Look (art direction)
 
-- Overcast, pale grey-blue sky with no visible sun, and strong exponential fog in the sky's colour: the foreground is clear, the midground fades, and far buildings become silhouettes.
-- A muted palette (about 25 % desaturated, grey-tinted walls, dark low-poly trees). **Fire is the only saturated thing on screen**: the grade spares warm, bright pixels. When the flames die the picture cools and loses colour, and hypoxia drains it further.
-- Soft directional light with deep but not crushed shadows, ACES tone mapping, a very slight vignette, film grain and softness. No strong bloom, chromatic aberration or neon.
-- Text is minimal: one oxygen readout, a second counter that appears late, the title, and **at most one serif caption at a time**. The world tells the rest. All captions live in `SCRIPT.hud.captions` (`js/scene/script.js`).
+The target is a dark, older-game cinematic simulation (PS2 / early Source-era simplicity with modern atmospheric composition), not a clean modern low-poly render.
+
+- **Value structure:** dark foreground, readable midground, foggy background. The hidden sun sits behind-left of the viewer with a low fill light, so surfaces facing you get the key and shadows fall into frame as shapes. Blacks are deep but never crushed.
+- **Fog:** dirty grey-green haze, darker than the horizon and capped at 90 %, so far blocks lose detail first and keep their silhouette. Distant surfaces are also softened slightly. Overcast sky: darker and cooler at the top, brighter at the horizon, no visible sun.
+- **Grounding:** half-resolution depth-based ambient occlusion (faded out with fog distance) plus soft blob shadows under people and vehicles.
+- **Materials** (`js/fx/look.js`): everything is matte, with weak reflections and low texture anisotropy. A world-space grime shader adds non-repeating patchy dirt to the ground, a darker splash zone at the base of walls, and faint vertical streaks. Pavement is dark and stained, not fresh concrete.
+- **Palette:** muted but not monochrome (grade saturation ~0.84). **Fire is the strongest warm colour on screen**: the grade spares only HDR-bright warm pixels. When the flames die the picture cools and loses colour, and hypoxia drains it further.
+- **Imperfection:** grain that is stronger in the shadows, a faint drifting exposure unevenness, slight softness and a few airborne dust motes. No VHS, scanlines or chromatic aberration.
+- **People:** three faceted body builds (average, broad, slim) with shoulders and waists, open jackets, muted clothing and no painted faces.
+- **No first-person hands in Phase 1.** The procedural hand looked like a blocky object, and the vendor's lighter carries that beat. The code is still in `js/camera/viewerHands.js`; re-enable it in `SCRIPT.hands` once a proper arm model exists.
+- **Text is minimal:** a small oxygen readout (the number turns a muted dark red at 0 %), a second counter that appears late, the title, and **at most one serif caption at a time**, placed above the TikTok/Shorts interface zone. All captions live in `SCRIPT.hud.captions` (`js/scene/script.js`).
 
 ---
 
@@ -90,7 +97,8 @@ js/world/kinematics.js     vehicle motion as pure functions of time ("stop here"
 js/world/vehicles.js       car/bus/motorbike models + TrafficSystem (sputter, coast, brake lights, hazards)
 js/world/people.js         low-poly people + procedural poses (walk, stumble, kneel, sit, lie…)
 js/fx/particles.js         flames, sparks, smoke, exhaust puffs, birds
-js/fx/postprocessing.js    tone mapping, grade (desaturation that spares the fire), vignette, grain, hypoxia tunnel vision
+js/fx/postprocessing.js    contact-shading AO, tone mapping, grade (desaturation that spares the fire), vignette, grain, hypoxia tunnel vision
+js/fx/look.js              matte "older-game" material pass + world-space grime shader
 js/camera/cameraController.js   first-person head: path + bob + breathing + sway + startles + shake
 js/audio/audioManager.js   fully synthesised soundtrack, rendered offline and kept in sync
 js/ui/hud.js               O₂ readout, time-without-oxygen counter, title, one caption at a time

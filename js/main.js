@@ -23,7 +23,7 @@ class SceneManager {
     R.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer = R;
     R.info.autoReset = false;           // count every pass of a frame (shadows + scene + post)
-    Tex.maxAniso = Math.min(8, R.capabilities.getMaxAnisotropy());
+    Tex.maxAniso = Math.min(2, R.capabilities.getMaxAnisotropy());   // low anisotropy: textures soften with distance (older-game look)
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, 9 / 16, 0.05, 3000);
@@ -36,6 +36,7 @@ class SceneManager {
     this.traffic = new TrafficSystem(this.scene);
     this.hands = new ViewerHands(this.camera);
     this.fx = new ParticleSystem(this.scene, this.env, this.traffic, this.peds, this.hands);
+    Look.apply(this.scene, this.camera);     // matte, slightly dirty older-game materials
     this.post = new PostProcessing(R);
     this.cam = new CameraController(this.camera, CONFIG.camera);
     this.hud = new HUD(document.getElementById('hud'), this.tl);
@@ -193,6 +194,6 @@ const boot = () => {
 };
 // wait for web fonts briefly (signs are drawn with them), then build
 if (document.fonts && document.fonts.load) {
-  const fonts = ['700 40px "Oswald"', '800 40px "Inter"', '600 20px "Inter"', '300 40px "Inter"', '700 20px "JetBrains Mono"', 'italic 500 40px "Cormorant Garamond"'].map((f) => document.fonts.load(f).catch(() => null));
+  const fonts = ['700 40px "Oswald"', '800 40px "Inter"', '600 20px "Inter"', '300 40px "Inter"', '200 40px "Inter"', '700 20px "JetBrains Mono"', 'italic 500 40px "Cormorant Garamond"', 'italic 400 40px "Cormorant Garamond"'].map((f) => document.fonts.load(f).catch(() => null));
   Promise.race([Promise.all(fonts), new Promise((r) => setTimeout(r, 2500))]).then(boot);
 } else boot();

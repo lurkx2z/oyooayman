@@ -18,7 +18,7 @@ const SCRIPT = {
     { id: 'engines_sputter',time: 1.72, label: 'Engines misfire (~14% O₂)' },
     { id: 'o2_zero',        time: 2.4,  label: 'O₂ = 0 % · pressure −21 % · ears pop' },
     { id: 'engines_dead',   time: 2.6,  label: 'Every combustion engine stopped' },
-    { id: 'lighter',        time: 3.4,  label: 'Your lighter: spark, no flame' },
+    { id: 'lighter',        time: 3.8,  label: "Vendor's lighter: sparks, no flame" },
     { id: 'grinder_stop',   time: 6.1,  label: 'Worker stops grinding' },
     { id: 'grid_fail',      time: 6.3,  label: 'Power grid collapses (60% of power was fire)' },
     { id: 'car_bump',       time: 6.75, label: 'Coasting car rear-ends the stalled car · alarm' },
@@ -33,9 +33,11 @@ const SCRIPT = {
 
   // the viewer's own hands (first-person)
   hands: {
-    right: [[0, 'hidden'], [1.85, 'ear'], [2.75, 'hidden'], [3.4, 'lighter'], [5.3, 'hidden']],
-    left: [[0, 'hidden'], [1.85, 'ear'], [2.75, 'hidden'], [13.55, 'tremble']],
-    flicks: [3.95, 4.45, 4.95],      // piezo lighter clicks: blue spark, gas, no flame
+    // first-person hands stay out of Phase 1 until a proper low-poly arm model is available
+    // (the old poses: [1.85, 'ear'], [2.75, 'hidden'], [3.4, 'lighter'], [5.3, 'hidden'])
+    right: [[0, 'hidden']],
+    left: [[0, 'hidden']],
+    flicks: [],                      // viewer's piezo clicks (e.g. [3.95, 4.45, 4.95]); the vendor's flint lighter carries this beat
   },
 
   /* ------------------------------------------------------------------
@@ -59,12 +61,12 @@ const SCRIPT = {
     x: [[0, 9.4], [9.6, 9.4], [10.4, 9.25], [13.6, 9.25], [14.6, 9.45]],
     z: [[0, 5.2], [1.9, 2.8, 'linear'], [2.6, 2.4, 'outQuad'], [13.6, 2.4], [14.6, 2.65]],
     yaw: [
-      [0, 5], [1.3, 5], [1.7, 7], [2.4, 7.5], [3.2, 7], [3.55, 5], [5.2, 5], [5.75, 9.5], [6.1, 9.5],
+      [0, 5], [1.3, 5], [1.7, 7], [2.4, 7.5], [3.2, 7], [3.7, 9.5, 'inOutSine'], [5.2, 10.5], [5.75, 9.5], [6.1, 9.5],
       [6.55, 21, 'inOutCubic'], [7.1, 22], [7.3, 30], [7.5, 35], [7.8, 45], [8.0, 52], [8.2, 61], [8.4, 70], [8.6, 77], [8.85, 80, 'outQuad'],
       [9.5, 12, 'inOutCubic'], [10.5, 10], [11.4, 8], [12.0, 9.5], [13.0, 9.5], [13.6, 6], [14.5, 2], [15, 3],
     ],
     pitch: [
-      [0, 4], [1.3, 4], [1.7, 2], [2.4, 1], [3.2, -2], [3.55, -10], [5.2, -9], [5.75, 13], [6.1, 12.5],
+      [0, 4], [1.3, 4], [1.7, 2], [2.4, 1], [3.2, -2], [3.7, -5, 'inOutSine'], [5.2, -4.5], [5.75, 13], [6.1, 12.5],
       [6.55, 3], [7.1, 2.5], [7.5, 0], [8.2, -1.5], [8.85, -2], [9.5, -5], [10.5, -6], [11.4, -5], [12.0, 12.5],
       [13.0, 11.5], [13.6, -7], [14.5, -9], [15, -8],
     ],
@@ -130,7 +132,7 @@ const SCRIPT = {
 
     // ---- the electric car: keeps driving, overtaking the dead queue on the wrong side, then passing the viewer
     {
-      id: 'ev', type: 'ev', color: '#456f9c', lane: 'PATH', passAt: { z: 2.4, t: 8.6 },
+      id: 'ev', type: 'ev', color: '#5a7fa6', lane: 'PATH', passAt: { z: 2.4, t: 8.6 },
       path: [[-1.75, -260], [-1.75, -128], [1.45, -119], [1.45, -52], [-1.75, -41], [-1.75, 2], [1.3, 14], [1.3, 140]],
       speed: [[0, 11], [15, 11]],
     },
@@ -147,8 +149,9 @@ const SCRIPT = {
       states: [[0, 'phone'], [1.85, 'earPop'], [3.1, 'look'], [4.6, 'phone'], [7.0, 'look'], [10.9, 'handHead'], [11.8, 'walk'], [12.4, 'stumble'], [13.4, 'kneel']] },
     { id: 'worker',   look: 'worker',  y: 4.06, path: [[0, 6.3, -14.0]], face: -90,
       states: [[0, 'grind'], [1.85, 'flinch'], [2.3, 'grind'], [6.1, 'lowerTool'], [6.6, 'look'], [11.0, 'handHead'], [12.6, 'railSlump']] },
-    { id: 'toward',   look: 'casual2', y: 0.15, path: [[0, 10.45, -17.5], [2.42, 10.45, -14.6], [3.4, 10.45, -14.6], [8.6, 10.45, -7.6]],
-      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.4, 'walk'], [8.6, 'look'], [11.5, 'handHead'], [12.8, 'stumble'], [14.1, 'kneel']] },
+    // keeps walking toward you, so late in the shot there is a figure in the near-right foreground
+    { id: 'toward',   look: 'casual2', y: 0.15, path: [[0, 10.45, -17.5], [2.42, 10.45, -14.6], [3.4, 10.45, -14.6], [8.6, 10.45, -7.6], [12.2, 10.3, -2.6]],
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.4, 'walk'], [12.2, 'handHead'], [12.9, 'stumble'], [14.1, 'kneel']] },
     // a jogger overtakes you on the right: a foreground silhouette at the edge of frame (works hard → goes early)
     { id: 'away',     look: 'casual3', y: 0.15, stride: 2.4, path: [[0, 9.95, 6.6], [1.85, 9.95, -0.5], [2.6, 9.95, -0.7], [4.2, 10.7, -2.6], [6.0, 11.25, -5.0]],
       states: [[0, 'jog'], [1.85, 'earPop'], [2.6, 'walk'], [6.0, 'look'], [11.2, 'stumble'], [12.9, 'collapse']] },
