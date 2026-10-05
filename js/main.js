@@ -42,7 +42,9 @@ class SceneManager {
     this.cam = new CameraController(this.camera, CONFIG.camera);
     if (!CONFIG.captureMode) {
       this.dev = new DevControls(this);
-      this.audio.prepare();
+      const ss = document.getElementById('soundStatus');
+      if (ss) ss.textContent = 'PREPARING SOUND…';
+      this.audio.prepare().then((b) => { if (ss) ss.textContent = b ? 'SOUND READY' : 'SOUND COULD NOT BE PREPARED'; });
     }
 
     window.addEventListener('resize', () => this.resize());
@@ -169,8 +171,9 @@ const SIM = new SceneManager();
 window.SIM = SIM;
 // capture helpers for tools/render-preview.mjs
 SIM.captureFrame = (t) => { SIM.renderAt(t); return true; };
-SIM.audioWavBase64 = async () => {
-  const buf = await SIM.audio.prepare();
+// live = render the soundtrack fresh (full quality; what the render and bake tools use); false = whatever playback uses
+SIM.audioWavBase64 = async (live = true) => {
+  const buf = live ? await SIM.audio.renderOffline() : await SIM.audio.prepare();
   const blob = AudioEngine.encodeWav(buf);
   const ab = await blob.arrayBuffer();
   let s = ''; const u8 = new Uint8Array(ab);

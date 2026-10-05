@@ -25,9 +25,35 @@ class AudioEngine {
   }
 
   /* -------------------- public API -------------------- */
+  // the soundtrack: the film's pre-rendered copy if it is up to date (instant), otherwise rendered here (can take minutes)
   prepare() {
-    if (!this.rendering) this.rendering = this.renderOffline().then((b) => { this.buffer = b; return b; }).catch((e) => { console.error('audio render failed', e); });
+    if (!this.rendering) this.rendering = this._baked().then((b) => b || this.renderOffline()).then((b) => { this.buffer = b; return b; }).catch((e) => { console.error('audio render failed', e); });
     return this.rendering;
+  }
+
+  // a baked soundtrack (window.FILM_SOUNDTRACK, written by tools/bake-soundtrack.cjs) is used only while its fingerprint
+  // still matches the script and the sound code it was made from
+  async _baked() {
+    const B = window.FILM_SOUNDTRACK;
+    if (!B || !B.b64) return null;
+    if (B.fingerprint !== this.fingerprint()) { console.warn('soundtrack: the baked copy is out of date (script or sound code changed); rendering the sound live instead — run tools/bake-soundtrack.cjs to refresh it'); return null; }
+    try {
+      const bin = atob(B.b64), u8 = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      return await new OfflineAudioContext(2, 1, this.sampleRate).decodeAudioData(u8.buffer);
+    } catch (e) { console.warn('soundtrack: could not decode the baked copy; rendering live', e); return null; }
+  }
+
+  // a hash of everything the soundtrack is built from: timings, the script's data, film constants and the sound code itself
+  fingerprint() {
+    let s = `${CONFIG.duration}|${CONFIG.seed}|${this.sampleRate}|${JSON.stringify(SCRIPT)}|`;
+    try { s += JSON.stringify(this.fingerprintData ? this.fingerprintData() : null); } catch (e) { s += 'x'; }
+    const add = (proto) => { for (const k of Object.getOwnPropertyNames(proto)) { const d = Object.getOwnPropertyDescriptor(proto, k); s += k + String(d.value || d.get || ''); } };
+    for (let p = Object.getPrototypeOf(this); p && p !== Object.prototype; p = Object.getPrototypeOf(p)) add(p);
+    if (typeof SoundKit !== 'undefined') add(SoundKit.prototype);
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return h.toString(16).padStart(8, '0');
   }
 
   ensureContext() {

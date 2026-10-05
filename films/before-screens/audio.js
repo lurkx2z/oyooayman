@@ -19,6 +19,9 @@ class BeforeScreensAudio extends AudioEngine {
     this.wavName = SCRIPT.meta.wav;
   }
 
+  // film constants the soundtrack is built from (part of the baked soundtrack's fingerprint)
+  fingerprintData() { return [PARLOUR, SOCIAL, KITE, POCKET]; }
+
   // listener-relative gain + pan for a point at time t
   _rel(x, z, t, ref = 4) {
     const lx = this.cx.value(t), lz = this.cz.value(t), yaw = MathX.deg(this.cyaw.value(t));

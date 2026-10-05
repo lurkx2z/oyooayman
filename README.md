@@ -67,6 +67,13 @@ The target is a **polished cinematic low-poly first-person simulation**: about 7
 No server is needed. Three.js is bundled in `lib/` and the fonts (Inter, Lora, Oswald,
 JetBrains Mono — all SIL Open Font License) in `fonts/`, so it works fully offline.
 
+The soundtrack is synthesised by the film's own code. A pre-rendered copy ships next to each film
+(`js/scene/soundtrack.js`, `films/before-screens/soundtrack.js`) so the sound is ready the moment the page opens
+(the start screen says **SOUND READY**). If you change a film's script or sound code, the page notices that copy is
+out of date and synthesises the sound itself on load, which can take a few minutes; refresh the copy with
+`node tools/bake-soundtrack.cjs --page before-screens.html --out films/before-screens/soundtrack.js`
+(or `--page index.html --out js/scene/soundtrack.js`).
+
 > If your browser ever refuses to load local files, open a terminal in this folder and run
 > `python -m http.server 8000` (or `npx serve`), then visit <http://localhost:8000>.
 
