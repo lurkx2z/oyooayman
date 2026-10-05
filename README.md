@@ -41,6 +41,7 @@ The target is a **polished cinematic low-poly first-person simulation**: about 7
   - a world-space grime shader adds patchy ground, replaced slabs, damp patches, darker wall bases and a slow tone drift between buildings.
 - **People** (`js/world/people.js`): authored low-poly parts, not capsules. Tapered faceted limbs with joint caps, shoes with soles, three body builds, clothing layers (collar, coat, hood) and accessories (backpack, shoulder bag, scarf, beanie, ponytail, bun).
 - **Buildings near the camera** get real window reveals, sills and lintels aligned to the textured windows, plus AC units, fire escapes, drainpipes and blade signs.
+- **Earth** (`js/world/earth.js`): drawn continents, a fractal cloud cover generated on the sphere (wind-belt streaks, storm tracks, a few spiralling lows), an ocean sun glint, a thin blue limb and night-side city lights. No image files.
 - **Lens:** a moderate rounded-rectangle vignette with soft edges, little grain, a calm camera.
 - **Text:**
   - top-left info block: tiny caps label, serif value, the same value as a partial pressure in kPa, and context;
