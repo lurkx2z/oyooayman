@@ -105,8 +105,8 @@ class PostProcessing {
     });
     this.params = {
       exposure: CONFIG.render.exposure, bloom: CONFIG.render.bloom ? 0.22 : 0, bloomThreshold: 1.6,
-      saturation: 0.84, contrast: 1.08, warmth: 0.0, vignette: 1.25, soft: 0.12, blackLift: 0.006, keepWarm: 1.0,
-      tunnel: 1.2, tunnelSoft: 0.5, tunnelDark: 0.0, edgeBlur: 0.0, chroma: 0.0, grain: 0.036, uneven: 0.07,
+      saturation: 1.0, contrast: 1.06, warmth: 0.0, vignette: 1.0, soft: 0.1, blackLift: 0.008, keepWarm: 1.0,
+      tunnel: 1.2, tunnelSoft: 0.5, tunnelDark: 0.0, edgeBlur: 0.0, chroma: 0.0, grain: 0.022, uneven: 0.04,
       fade: 0.0, flash: 0.0, time: 0,
       ao: 1.0, aoDebug: 0, fogDensity: 0,
     };
@@ -137,7 +137,6 @@ class PostProcessing {
           vec2 cc = uv - 0.5;
           vec2 ct = cc; ct.x *= 0.78;                 // tunnel shape: slightly taller than wide
           float rt = length(ct) * 1.55;
-          float rv = length(cc) * 1.35;               // frame vignette follows the 9:16 frame
           vec3 col = texture2D(tScene, uv).rgb;
           col = (col.r + col.g + col.b < 1e6) ? min(max(col, 0.0), vec3(16.0)) : vec3(0.0);
           if (uChroma > 0.0) {
@@ -150,6 +149,7 @@ class PostProcessing {
           col = mix(col, bq, uSoft);
           float edge = smoothstep(uTunnel * 0.6, uTunnel * 0.6 + 0.45, rt);
           col = mix(col, mix(bq, be, 0.35), clamp(edge * uEdgeBlur, 0.0, 1.0));
+          { vec2 vq0 = abs(cc) * 2.0; col = mix(col, bq, 0.55 * smoothstep(0.8, 1.15, pow(pow(vq0.x, 5.0) + pow(vq0.y, 5.0), 0.2))); }   // soft optical edges
           vec2 aoz = texture2D(tAO, uv).rg;
           // distance swallows detail before silhouette: far surfaces soften a little
           col = mix(col, bq, smoothstep(30.0, 150.0, -aoz.y) * 0.35);
@@ -176,8 +176,11 @@ class PostProcessing {
           col = uBlackLift + col * (1.0 - uBlackLift);   // never fully crushed
           // recorded footage is never perfectly even: a very slow, faint exposure drift across the frame
           col *= 1.0 + (vnoise(uv * vec2(1.6, 2.8) + vec2(uTime * 0.021, -uTime * 0.013)) - 0.5) * uUneven;
-          // frame vignette
-          col *= mix(1.0, 0.7, smoothstep(0.38, 1.05, rv) * uVignette);
+          // optical framing: a rounded-rectangle vignette that follows the 9:16 frame (visor-like, not binoculars)
+          vec2 vq = abs(cc) * 2.0;
+          float sq = pow(pow(vq.x, 5.0) + pow(vq.y, 5.0), 0.2);
+          float vig = smoothstep(0.7, 1.13, sq) * uVignette;
+          col *= 1.0 - 0.62 * vig;
           // hypoxia tunnel vision
           float tun = smoothstep(uTunnel, uTunnel + uTunnelSoft, rt);
           col *= 1.0 - tun * uTunnelDark;
@@ -282,15 +285,15 @@ class PostProcessing {
     p.tunnelSoft = MathX.lerp(0.55, 0.42, hyp);
     p.tunnelDark = MathX.lerp(0.0, 0.97, Math.min(1, hyp * 1.5));
     p.edgeBlur = Math.min(1, hyp * 1.5);
-    p.saturation = MathX.lerp(MathX.lerp(0.84, 0.74, cold), 0.48, hyp);
+    p.saturation = MathX.lerp(MathX.lerp(1.0, 0.86, cold), 0.55, hyp);
     p.warmth = MathX.lerp(MathX.lerp(0.05, -0.35, cold), -0.5, Math.min(1, hyp * 1.5));
     // the big pressure step: a brief exposure dip instead of any flashy effect
     const tPop = 2.05;
     const pop = MathX.impulse(t, tPop + 0.02, 0.16);
     p.flash = 0;
     p.chroma = 0;
-    p.exposure = CONFIG.render.exposure * 0.9 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);
-    p.contrast = 1.08 + 0.05 * hyp;
+    p.exposure = CONFIG.render.exposure * 1.04 * (1 - 0.1 * pop) * (1 - 0.14 * hyp);
+    p.contrast = 1.06 + 0.05 * hyp;
     p.soft = 0.1 + 0.05 * hyp;
   }
 }

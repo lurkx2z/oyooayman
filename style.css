@@ -15,6 +15,7 @@
   --paper: #ebe6dc;         /* off-white for all on-screen text */
   --ember: #d9826f;         /* muted alert red */
   --serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --book: "Lora", Georgia, "Times New Roman", serif;   /* narration, title and HUD values */
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: #050607; color: var(--white); overflow: hidden; font-family: var(--hud-font); }
@@ -32,48 +33,44 @@ body.recording #app, body.capture #app { inset: 0; }
 }
 #hud::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 30%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)); }
 
-.readout { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; }
-#o2Readout { top: calc(var(--u) * 200); width: calc(var(--u) * 600); }
+/* info block, top-left (POV hierarchy): tiny spaced caps label, serif value, small unit line, context caps */
+.readout { position: absolute; left: calc(var(--u) * 66); text-align: left; }
+#o2Readout { top: calc(var(--u) * 236); }
 .readout .label {
-  font-family: var(--hud-font); font-weight: 400; letter-spacing: 0.34em;
-  font-size: calc(var(--u) * 16); opacity: 0.6; color: #cfccc4;
+  font-family: var(--hud-font); font-weight: 500; letter-spacing: 0.24em;
+  font-size: calc(var(--u) * 19); opacity: 0.72; color: #dcd8cf;
 }
 .readout .value {
-  font-family: var(--hud-font); font-weight: 200; font-variant-numeric: tabular-nums; line-height: 1;
-  font-size: calc(var(--u) * 88); letter-spacing: -0.005em; margin-top: calc(var(--u) * 8);
+  font-family: var(--book); font-weight: 400; font-variant-numeric: lining-nums tabular-nums; line-height: 1;
+  font-size: calc(var(--u) * 66); margin-top: calc(var(--u) * 10); color: var(--paper);
 }
-.readout .value .unit { font-size: 0.36em; font-weight: 200; margin-left: 0.08em; opacity: 0.7; vertical-align: 1.05em; }
-.readout .bar { margin: calc(var(--u) * 14) auto 0; width: calc(var(--u) * 200); height: calc(var(--u) * 1.5); background: rgba(236, 231, 221, 0.14); overflow: hidden; }
-.readout .bar .fill { height: 100%; width: 100%; background: rgba(236, 231, 221, 0.7); transform-origin: left center; }
+.readout .value .unit { font-size: 0.62em; margin-left: 0.12em; opacity: 0.9; }
+.readout .sub { font-family: var(--book); font-size: calc(var(--u) * 29); margin-top: calc(var(--u) * 8); opacity: 0.62; }
+.readout .ctx { font-family: var(--hud-font); font-weight: 500; letter-spacing: 0.22em; font-size: calc(var(--u) * 15); margin-top: calc(var(--u) * 10); opacity: 0.5; }
 /* the number alone changes colour while oxygen falls; at zero it settles to a dark, muted red */
 #o2Readout .value { transition: color 0.25s linear; }
-#o2Readout.alert .value { color: #b9796b; }
-#o2Readout.zero .value { color: #a6635a; }
-#o2Readout.alert .bar .fill { background: #b9796b; }
+#o2Readout.alert .value { color: #c08070; }
+#o2Readout.zero .value { color: #b06a5e; }
 
-#timerReadout { top: calc(var(--u) * 372); opacity: 0; width: calc(var(--u) * 500); }
-#timerReadout .label { font-size: calc(var(--u) * 13); }
-#timerReadout .value { font-size: calc(var(--u) * 40); margin-top: calc(var(--u) * 6); opacity: 0.85; }
+#timerReadout { top: calc(var(--u) * 470); opacity: 0; }
+#timerReadout .value { font-size: calc(var(--u) * 46); }
 
 #title {
-  position: absolute; left: 50%; top: calc(var(--u) * 470); transform: translateX(-50%);
+  position: absolute; left: 50%; top: calc(var(--u) * 640); transform: translateX(-50%);
   width: calc(var(--u) * 900); text-align: center;
 }
-#title .kicker {
-  font-family: var(--hud-font); font-weight: 500; letter-spacing: 0.42em; font-size: calc(var(--u) * 28);
-  opacity: 0; color: var(--paper);
-}
+#title .kicker { display: none; }
 #title .main {
-  font-family: var(--serif); font-style: italic; font-weight: 500; font-size: calc(var(--u) * 92); line-height: 1.05;
-  margin-top: calc(var(--u) * 14); opacity: 0; color: var(--paper); letter-spacing: 0.005em;
+  font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 72); line-height: 1.16;
+  opacity: 0; color: var(--paper); letter-spacing: 0;
 }
 
 #caption {
-  /* sits above the TikTok/Shorts caption + button zone (bottom ~22 %, right edge) */
-  position: absolute; left: 50%; top: calc(var(--u) * 1235); transform: translateX(-50%);
-  width: calc(var(--u) * 780); text-align: center; opacity: 0;
-  font-family: var(--serif); font-style: italic; font-weight: 400; font-size: calc(var(--u) * 48); line-height: 1.2;
-  color: var(--paper); letter-spacing: 0.01em; text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 16) rgba(0, 0, 0, 0.55);
+  /* one short italic line, lower-centre, still above the TikTok/Shorts caption + button zone */
+  position: absolute; left: 50%; top: calc(var(--u) * 1300); transform: translateX(-50%);
+  width: calc(var(--u) * 800); text-align: center; opacity: 0;
+  font-family: var(--book); font-style: italic; font-weight: 400; font-size: calc(var(--u) * 46); line-height: 1.25;
+  color: var(--paper); text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 14) rgba(0, 0, 0, 0.55);
 }
 
 /* optional floating labels (unused by default) */

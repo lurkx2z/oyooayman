@@ -63,18 +63,20 @@ const SCRIPT = {
     yaw: [
       [0, 5], [1.3, 5], [1.7, 7], [2.4, 7.5], [3.2, 7], [3.7, 9.5, 'inOutSine'], [5.2, 10.5], [5.75, 9.5], [6.1, 9.5],
       [6.55, 21, 'inOutCubic'], [7.1, 22], [7.3, 30], [7.5, 35], [7.8, 45], [8.0, 52], [8.2, 61], [8.4, 70], [8.6, 77], [8.85, 80, 'outQuad'],
-      [9.5, 12, 'inOutCubic'], [10.5, 10], [11.4, 8], [12.0, 9.5], [13.0, 9.5], [13.6, 6], [14.5, 2], [15, 3],
+      // after the electric car: look down the avenue — the dead street and the hazy city become the subject,
+      // the cart stays as a dark mass at the right edge
+      [9.9, 28, 'inOutCubic'], [11.1, 26], [12.0, 17], [13.0, 16], [13.6, 14], [14.5, 11.5], [15, 12],
     ],
     pitch: [
       [0, 4], [1.3, 4], [1.7, 2], [2.4, 1], [3.2, -2], [3.7, -5, 'inOutSine'], [5.2, -4.5], [5.75, 13], [6.1, 12.5],
-      [6.55, 3], [7.1, 2.5], [7.5, 0], [8.2, -1.5], [8.85, -2], [9.5, -5], [10.5, -6], [11.4, -5], [12.0, 12.5],
-      [13.0, 11.5], [13.6, -7], [14.5, -9], [15, -8],
+      [6.55, 3], [7.1, 2.5], [7.5, 0], [8.2, -1.5], [8.85, -2], [9.9, -1.5], [10.8, -2], [11.4, -1.5], [12.0, 10.5],
+      [13.0, 9.5], [13.6, -5], [14.5, -7.5], [15, -7],
     ],
     fov: [[0, 60], [2.03, 60], [2.1, 55.5, 'outQuad'], [2.8, 60, 'inOutSine'], [10, 60], [15, 56.5]],
     // sudden reactions: t, strength  (small pops while O₂ falls, the big one at 0 %)
-    startles: [[1.55, 0.2], [1.82, 0.6], [2.05, 1.0], [6.77, 0.5]],
+    startles: [[1.55, 0.14], [1.82, 0.42], [2.05, 0.75], [6.77, 0.35]],
     // camera shakes: t, amplitude, decay seconds
-    shakes: [[2.05, 0.85, 0.35], [6.77, 0.24, 0.3]],
+    shakes: [[2.05, 0.5, 0.3], [6.77, 0.15, 0.25]],
     // late hypoxia: the viewer's knees start to go (metres lower) and the head rolls (deg)
     sag: [[0, 0], [12.5, 0], [15, 0.2, 'inQuad']],
     roll: [[0, 0], [12.5, 0], [15, 4.0, 'inQuad']],
@@ -84,7 +86,7 @@ const SCRIPT = {
      HUD
      ------------------------------------------------------------------ */
   hud: {
-    title: { in: 0.15, out: 1.75 },     // small "WHAT IF…" then "oxygen disappeared?"
+    title: { in: -0.8, out: 1.9 },      // the question is already on screen on the first frame (thumbnail), gone before O₂ hits zero
     timerFrom: 9.6,                     // a second, temporary counter appears when it matters
     oxygenRedBelow: 10,
     // one restrained caption at a time — the world shows everything else

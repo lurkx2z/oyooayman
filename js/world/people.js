@@ -5,26 +5,34 @@
    ===================================================================== */
 
 const SKIN = ['#f1c9a5', '#e0ac85', '#c68863', '#8d5b3e', '#5e3b28', '#f6d7bd'];
-// muted, darker clothing; build = body silhouette variant (see BUILDS), jacket = hem over the hips
+// muted clothing; build = body silhouette (see BUILDS). Clothing layers / accessories:
+// jacket (hem over hips), coat (longer hem), collar, hood, backpack, shoulderBag, scarf, hairStyle (short|long|bun|pony)
 const LOOKS = {
-  vendor:  { skin: 2, build: 'broad', shirt: '#d6d0c3', sleeves: 'short', pants: '#2b2b30', shoes: '#1a1a1a', hair: '#1f1611', apron: '#7c3b32', hat: { type: 'cap', color: '#7c3b32' } },
-  worker:  { skin: 1, build: 'avg', shirt: '#3b4a58', sleeves: 'long', pants: '#3a3f46', shoes: '#4a3a2c', hair: '#3a2a1e', vest: '#b8662e', hat: { type: 'hard', color: '#c4a03c' }, gloves: '#5b4e36' },
-  rider:   { skin: 0, build: 'avg', shirt: '#1e2124', sleeves: 'long', pants: '#1d2a3a', shoes: '#111', hair: '#222', hat: { type: 'helmet', color: '#c9c9c4' }, gloves: '#111', jacket: true },
-  casual1: { skin: 0, build: 'avg', shirt: '#30475e', sleeves: 'long', pants: '#2a2f38', shoes: '#bdb8ae', hair: '#4a3220', jacket: true },
-  casual2: { skin: 3, build: 'broad', shirt: '#a8a192', sleeves: 'long', pants: '#47423b', shoes: '#3a2a20', hair: '#141010', bag: '#4e3628', jacket: true },
-  casual3: { skin: 5, build: 'slim', shirt: '#74403a', sleeves: 'long', pants: '#22262c', shoes: '#2a2a2a', hair: '#9c7a4a', long: true },
-  casual4: { skin: 4, build: 'avg', shirt: '#a8934e', sleeves: 'short', pants: '#39435a', shoes: '#cfcac0', hair: '#111' },
-  casual5: { skin: 1, build: 'broad', shirt: '#3f5243', sleeves: 'long', pants: '#857c68', shoes: '#4a3424', hair: '#5b3f28', jacket: true },
-  casual6: { skin: 2, build: 'slim', shirt: '#56465e', sleeves: 'long', pants: '#1f1f24', shoes: '#111', hair: '#2a1a12', long: true },
-  casual7: { skin: 0, build: 'avg', shirt: '#aaa598', sleeves: 'short', pants: '#454d58', shoes: '#c8c3b8', hair: '#7a5c40' },
-  casual8: { skin: 3, build: 'slim', shirt: '#242a38', sleeves: 'long', pants: '#5a5248', shoes: '#2a2018', hair: '#0e0b09', long: true, jacket: true },
+  vendor:  { skin: 2, build: 'broad', shirt: '#d6d0c3', sleeves: 'short', pants: '#2b2b30', shoes: '#1a1a1a', sole: '#3a3a3a', hair: '#1f1611', apron: '#7c3b32', hat: { type: 'cap', color: '#7c3b32' } },
+  worker:  { skin: 1, build: 'avg', shirt: '#3b4a58', sleeves: 'long', pants: '#3a3f46', shoes: '#4a3a2c', sole: '#22201c', hair: '#3a2a1e', vest: '#b8662e', hat: { type: 'hard', color: '#c4a03c' }, gloves: '#5b4e36' },
+  rider:   { skin: 0, build: 'avg', shirt: '#1e2124', sleeves: 'long', pants: '#1d2a3a', shoes: '#111', hair: '#222', hat: { type: 'helmet', color: '#c9c9c4' }, gloves: '#111', jacket: true, collar: true },
+  // commuter: zipped jacket with a collar, backpack
+  casual1: { skin: 0, build: 'avg', shirt: '#30475e', sleeves: 'long', pants: '#2a2f38', shoes: '#3a3633', sole: '#c9c4b8', hair: '#4a3220', jacket: true, collar: true, backpack: '#2b2e30' },
+  // heavy coat, beanie and scarf
+  casual2: { skin: 3, build: 'broad', shirt: '#8f8778', sleeves: 'long', pants: '#3f3a34', shoes: '#2a1f18', sole: '#1a1612', hair: '#141010', coat: true, collar: true, scarf: '#6b2f2a', hat: { type: 'beanie', color: '#3b3f44' } },
+  // runner: fitted top, ponytail
+  casual3: { skin: 5, build: 'slim', shirt: '#74403a', sleeves: 'long', pants: '#22262c', shoes: '#d8d4ca', sole: '#f0ede6', hair: '#9c7a4a', hairStyle: 'pony' },
+  // t-shirt and cap
+  casual4: { skin: 4, build: 'avg', shirt: '#a8934e', sleeves: 'short', pants: '#39435a', shoes: '#cfcac0', sole: '#e8e4dc', hair: '#111', hat: { type: 'cap', color: '#2c3138' } },
+  // hoodie
+  casual5: { skin: 1, build: 'broad', shirt: '#3f5243', sleeves: 'long', pants: '#857c68', shoes: '#4a3424', sole: '#2a1e14', hair: '#5b3f28', jacket: true, hood: true },
+  // fitted jacket, bun, shoulder bag
+  casual6: { skin: 2, build: 'slim', shirt: '#56465e', sleeves: 'long', pants: '#1f1f24', shoes: '#111', sole: '#2a2a2a', hair: '#2a1a12', hairStyle: 'bun', jacket: true, shoulderBag: '#5a3e2c' },
+  casual7: { skin: 0, build: 'avg', shirt: '#aaa598', sleeves: 'short', pants: '#454d58', shoes: '#c8c3b8', sole: '#e6e2da', hair: '#7a5c40', backpack: '#4a3b2e' },
+  // long coat, long hair, scarf
+  casual8: { skin: 3, build: 'slim', shirt: '#242a38', sleeves: 'long', pants: '#5a5248', shoes: '#2a2018', sole: '#14100c', hair: '#0e0b09', hairStyle: 'long', coat: true, collar: true, scarf: '#9a8a6a' },
 };
 
-// body silhouettes: shoulder / chest / waist / hip widths, torso depth, limb thickness, head scale
+// body silhouettes. sh = width across the shoulders INCLUDING the arms (bideltoid), the rest is the torso.
 const BUILDS = {
-  avg:   { sh: 0.45, chest: 0.4, waist: 0.33, hip: 0.35, depth: 0.235, limb: 1.0, head: 0.93 },
-  broad: { sh: 0.52, chest: 0.47, waist: 0.42, hip: 0.39, depth: 0.285, limb: 1.15, head: 0.95 },
-  slim:  { sh: 0.39, chest: 0.35, waist: 0.29, hip: 0.355, depth: 0.205, limb: 0.88, head: 0.92 },
+  avg:   { sh: 0.47, chest: 0.34, waist: 0.3, hip: 0.34, depth: 0.22, limb: 1.0, head: 0.95 },
+  broad: { sh: 0.53, chest: 0.4, waist: 0.38, hip: 0.38, depth: 0.27, limb: 1.14, head: 0.97 },
+  slim:  { sh: 0.41, chest: 0.3, waist: 0.26, hip: 0.35, depth: 0.19, limb: 0.86, head: 0.93 },
 };
 
 // faceted loft through horizontal rings [y, halfWidth, halfDepth, zOffset] (flat-shaded low-poly)
@@ -48,6 +56,21 @@ function loftGeo(rings, sides = 8) {
   return g;
 }
 
+// faceted sphere (flat shading) for heads, joint caps, shoulder caps
+function facetBall(r, sx = 1, sy = 1, sz = 1, detail = 1) {
+  const g = new THREE.IcosahedronGeometry(r, detail);
+  g.scale(sx, sy, sz);
+  g.computeVertexNormals();
+  return g;
+}
+// loft along +Z (toe direction) from rings [z, halfWidth, halfHeight, yOffset] — shoes, hands seen side-on
+function loftZ(rings, sides = 8) {
+  const g = loftGeo(rings.map(([z, hw, hh, yo = 0]) => [z, hw, hh, -yo]), sides);
+  g.rotateX(Math.PI / 2);
+  g.computeVertexNormals();
+  return g;
+}
+
 const PersonGeo = {
   ready: false,
   init() {
@@ -55,10 +78,23 @@ const PersonGeo = {
     this.pelvis = new THREE.RoundedBoxGeometry(0.34, 0.2, 0.21, 2, 0.06);
     this.chest = new THREE.RoundedBoxGeometry(0.37, 0.5, 0.22, 2, 0.08);
     this.neck = new THREE.CylinderGeometry(0.052, 0.062, 0.16, 10);
-    this.head = new THREE.SphereGeometry(0.105, 14, 10); this.head.scale(0.95, 1.12, 1.02);
-    this.hair = new THREE.SphereGeometry(0.114, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.62); this.hair.scale(1.0, 1.06, 1.1);
-    this.hairLong = new THREE.CylinderGeometry(0.1, 0.12, 0.22, 10, 1, true, Math.PI * 0.2, Math.PI * 1.6);
-    this.nose = new THREE.BoxGeometry(0.03, 0.04, 0.03);
+    this.head = facetBall(0.105, 0.9, 1.1, 1.0, 1);
+    this.jaw = facetBall(0.07, 1.05, 0.7, 0.95, 0);
+    this.hair = new THREE.SphereGeometry(0.112, 9, 5, 0, Math.PI * 2, 0, Math.PI * 0.6); this.hair.scale(0.96, 1.06, 1.08); this.hair = this.hair.toNonIndexed(); this.hair.computeVertexNormals();
+    this.bun = facetBall(0.045, 1, 0.9, 1, 0);
+    this.pony = loftGeo([[-0.2, 0.018, 0.016], [-0.08, 0.032, 0.028], [0.0, 0.026, 0.022]], 6);
+    this.hairLong = new THREE.CylinderGeometry(0.1, 0.125, 0.24, 9, 1, true, Math.PI * 0.25, Math.PI * 1.5);
+    this.nose = new THREE.BoxGeometry(0.026, 0.038, 0.03);
+    this.beanie = new THREE.SphereGeometry(0.118, 9, 5, 0, Math.PI * 2, 0, Math.PI * 0.5); this.beanie.scale(1, 1.15, 1.05);
+    this.beanieBand = new THREE.CylinderGeometry(0.121, 0.121, 0.04, 9);
+    this.collar = new THREE.CylinderGeometry(0.078, 0.098, 0.075, 8);
+    this.hood = facetBall(0.1, 1.35, 0.62, 0.85, 1);
+    this.scarf = new THREE.TorusGeometry(0.078, 0.032, 5, 9); this.scarf.rotateX(Math.PI / 2);
+    this.scarfTail = new THREE.BoxGeometry(0.06, 0.22, 0.025);
+    this.pack = loftGeo([[-0.17, 0.13, 0.055], [0.1, 0.14, 0.065], [0.17, 0.11, 0.05], [0.19, 0.06, 0.03]], 8);
+    this.strap = new THREE.BoxGeometry(0.035, 0.3, 0.012);
+    this.sBag = loftGeo([[-0.11, 0.13, 0.04], [0.09, 0.14, 0.045], [0.11, 0.12, 0.035]], 6);
+    this.sBagStrap = new THREE.BoxGeometry(0.03, 0.62, 0.012);
     this.upperArm = new THREE.CapsuleGeometry(0.05, 0.22, 4, 8);
     this.foreArm = new THREE.CapsuleGeometry(0.042, 0.2, 4, 8);
     this.hand = new THREE.SphereGeometry(0.045, 8, 6); this.hand.scale(0.8, 1.15, 0.65);
@@ -87,25 +123,38 @@ const PersonGeo = {
     this.builds = {};
     this.ready = true;
   },
-  // torso, pelvis and limbs for one body build (and jacket hem), cached
-  forBuild(name, jacket) {
-    const key = name + (jacket ? '+j' : '');
+  // authored low-poly parts for one body build + clothing flags, cached
+  forBuild(name, L) {
+    const key = [name, L.jacket ? 'j' : '', L.coat ? 'c' : '', L.sleeves].join('|');
     if (this.builds[key]) return this.builds[key];
-    const B = BUILDS[name] || BUILDS.avg, d = B.depth, L = B.limb;
+    const B = BUILDS[name] || BUILDS.avg, d = B.depth, K = B.limb;
+    // torso: waist → ribcage → shoulder line → trapezius → neck base; a jacket/coat adds a hem over the hips
     const rings = [
-      [-0.03, B.waist * 0.51, d * 0.46], [0.16, B.waist * 0.5, d * 0.45], [0.34, B.chest * 0.5, d * 0.5, 0.008],
-      [0.45, B.sh * 0.48, d * 0.44], [0.515, B.sh * 0.31, d * 0.36], [0.55, 0.075, 0.065],
+      [-0.03, B.waist * 0.5, d * 0.46], [0.15, B.waist * 0.5, d * 0.45], [0.33, B.chest * 0.5, d * 0.5, 0.01],
+      [0.44, B.sh * 0.5 - 0.07 * K, d * 0.45], [0.5, B.sh * 0.5 - 0.115 * K, d * 0.37], [0.545, 0.068, 0.06],
     ];
-    if (jacket) rings.unshift([-0.19, B.hip * 0.54, d * 0.54], [-0.1, B.hip * 0.52, d * 0.5]);
+    if (L.coat) rings.unshift([-0.36, B.hip * 0.6, d * 0.6], [-0.2, B.hip * 0.56, d * 0.56], [-0.08, B.hip * 0.53, d * 0.52]);
+    else if (L.jacket) rings.unshift([-0.18, B.hip * 0.545, d * 0.55], [-0.09, B.hip * 0.52, d * 0.5]);
+    const sleeveLong = L.sleeves !== 'short';
     const o = {
       B,
       torso: loftGeo(rings),
-      pelvis: new THREE.RoundedBoxGeometry(B.hip, 0.2, d * 0.95, 2, 0.06),
-      deltoid: new THREE.SphereGeometry(0.068 * L, 8, 6),
-      upperArm: new THREE.CapsuleGeometry(0.058 * L, 0.21, 3, 7),
-      foreArm: new THREE.CapsuleGeometry(0.047 * L, 0.2, 3, 7),
-      thigh: new THREE.CapsuleGeometry(0.088 * L, 0.3, 3, 7),
-      shin: new THREE.CapsuleGeometry(0.066 * L, 0.33, 3, 7),
+      pelvis: loftGeo([[-0.12, B.hip * 0.44, d * 0.42], [-0.04, B.hip * 0.5, d * 0.5], [0.1, B.waist * 0.5, d * 0.46]]),
+      deltoid: facetBall(0.072 * K, 1, 1, 1, 1),
+      upperArm: loftGeo([[-0.31, 0.05 * K, 0.052 * K], [-0.12, 0.062 * K, 0.064 * K], [0.03, 0.066 * K, 0.07 * K]], 7),
+      elbow: facetBall(0.05 * K, 1, 1, 1, 0),
+      foreArm: sleeveLong
+        ? loftGeo([[-0.25, 0.048 * K, 0.05 * K], [-0.22, 0.044 * K, 0.046 * K], [0.02, 0.052 * K, 0.054 * K]], 7)
+        : loftGeo([[-0.25, 0.031 * K, 0.028 * K], [0.02, 0.043 * K, 0.04 * K]], 7),
+      // hand hangs palm-in: broad side along Z, thumb in front
+      hand: loftGeo([[-0.12, 0.014, 0.03], [-0.085, 0.02, 0.042], [-0.04, 0.022, 0.045], [0.0, 0.02, 0.031]], 6),
+      thumb: loftGeo([[-0.055, 0.011, 0.011], [0.0, 0.015, 0.016]], 5),
+      thigh: loftGeo([[-0.47, 0.059 * K, 0.062 * K], [-0.42, 0.064 * K, 0.068 * K], [-0.2, 0.083 * K, 0.086 * K], [0.04, 0.092 * K, 0.096 * K]], 7),
+      knee: facetBall(0.064 * K, 1, 1, 1, 0),
+      shin: loftGeo([[-0.41, 0.058 * K, 0.06 * K], [-0.37, 0.052 * K, 0.054 * K], [-0.12, 0.058 * K, 0.064 * K], [0.03, 0.062 * K, 0.064 * K]], 7),
+      // shoe: heel → instep → toe, on a separate sole
+      shoe: loftZ([[-0.075, 0.04, 0.032, 0.035], [-0.02, 0.046, 0.044, 0.042], [0.06, 0.05, 0.03, 0.03], [0.14, 0.044, 0.022, 0.022], [0.17, 0.03, 0.014, 0.016]], 8),
+      sole: loftZ([[-0.08, 0.042, 0.009, 0.004], [0.06, 0.052, 0.009, 0.004], [0.16, 0.042, 0.009, 0.004], [0.178, 0.026, 0.007, 0.006]], 8),
     };
     this.builds[key] = o;
     return o;
@@ -371,11 +420,12 @@ class Person {
   _mat(c, rough = 0.85) { return Mat.std(c, { roughness: rough }); }
 
   _build() {
-    const G = PersonGeo, L = this.look, BG = G.forBuild(L.build || 'avg', !!L.jacket), B = BG.B;
+    const G = PersonGeo, L = this.look, BG = G.forBuild(L.build || 'avg', L), B = BG.B, K = B.limb;
     const skin = this._mat(SKIN[L.skin % SKIN.length], 0.7);
-    const shirt = this._mat(L.shirt), pants = this._mat(L.pants), shoes = this._mat(L.shoes, 0.6), hair = this._mat(L.hair, 0.9);
+    const shirt = this._mat(L.shirt), pants = this._mat(L.pants), shoes = this._mat(L.shoes, 0.55), hair = this._mat(L.hair, 0.9);
+    const sole = this._mat(L.sole || '#2a2a2a', 0.8);
     // only the big body parts cast shadows (keeps the shadow pass cheap)
-    const casters = new Set([BG.pelvis, BG.torso, G.head, BG.thigh, BG.shin, BG.upperArm, G.vest, G.helmet, G.hard]);
+    const casters = new Set([BG.pelvis, BG.torso, G.head, BG.thigh, BG.shin, BG.upperArm, G.vest, G.helmet, G.hard, G.pack]);
     const mesh = (g, m, parent, x = 0, y = 0, z = 0) => { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.castShadow = casters.has(g); o.receiveShadow = true; parent.add(o); return o; };
     const root = new THREE.Group();
     root.name = 'person:' + (this.spec.id || '');
@@ -384,53 +434,82 @@ class Person {
     mesh(BG.pelvis, pants, hips, 0, 0, 0);
     const spine = new THREE.Group(); spine.position.y = 0.06; hips.add(spine);
     mesh(BG.torso, shirt, spine, 0, 0.0, 0);
-    if (L.vest) {
-      mesh(G.vest, this._mat(L.vest, 0.6), spine, 0, 0.3, 0).scale.set(B.chest / 0.37 * 1.04, 1, B.depth / 0.22 * 1.04);
-      const st = new THREE.MeshStandardMaterial({ color: '#d8d8d0', emissive: '#555', roughness: 0.3 });
-      mesh(G.stripe, st, spine, 0, 0.22, 0); mesh(G.stripe, st, spine, 0, 0.36, 0);
-    }
-    if (L.jacket) {
-      // open jacket: a strip of the shirt underneath breaks up the block of colour
+    const front = B.depth * 0.5;
+    if (L.jacket || L.coat) {
+      // open front: a strip of the shirt underneath breaks up the block of colour
       const inner = this._mat(L.inner || (new THREE.Color(L.shirt).getHSL({}).l > 0.4 ? '#2a2c30' : '#b9b3a6'), 0.9);
-      mesh(new THREE.BoxGeometry(0.085, 0.4, 0.01), inner, spine, 0, 0.27, B.depth * 0.5 + 0.004);
+      mesh(new THREE.BoxGeometry(0.08, L.coat ? 0.34 : 0.38, 0.01), inner, spine, 0, 0.3, front + 0.004);
+    } else {
+      mesh(new THREE.BoxGeometry(B.waist * 1.02, 0.035, B.depth * 0.95), this._mat('#1d1d1f', 0.6), hips, 0, 0.085, 0);   // belt
     }
-    if (L.apron) mesh(G.apron, this._mat(L.apron), spine, 0, 0.1, B.depth * 0.5 + 0.012).scale.x = B.waist / 0.33;
+    if (L.collar) mesh(G.collar, shirt, spine, 0, 0.555, -0.005);
+    if (L.hood) mesh(G.hood, shirt, spine, 0, 0.53, -0.085);
+    if (L.scarf) {
+      const sm = this._mat(L.scarf, 0.95);
+      mesh(G.scarf, sm, spine, 0, 0.545, 0.0).scale.set(1.0, 1.0, 0.95);
+      mesh(G.scarfTail, sm, spine, 0.045, 0.42, front + 0.02).rotation.z = 0.12;
+    }
+    if (L.backpack) {
+      const pm = this._mat(L.backpack, 0.85);
+      mesh(G.pack, pm, spine, 0, 0.29, -(front + 0.055));
+      for (const sx of [-1, 1]) mesh(G.strap, pm, spine, sx * 0.075, 0.33, front + 0.006).rotation.z = sx * 0.06;
+    }
+    if (L.shoulderBag) {
+      const bm = this._mat(L.shoulderBag, 0.8);
+      mesh(G.sBagStrap, bm, spine, 0.0, 0.27, front + 0.008).rotation.z = 0.62;
+      mesh(G.sBag, bm, spine, -(B.waist * 0.5 + 0.03), -0.02, 0.02);
+    }
+    if (L.vest) {
+      mesh(G.vest, this._mat(L.vest, 0.6), spine, 0, 0.3, 0).scale.set(B.chest / 0.37 * 1.08, 1, B.depth / 0.22 * 1.06);
+      const st = new THREE.MeshStandardMaterial({ color: '#d8d8d0', emissive: '#555', roughness: 0.3 });
+      mesh(G.stripe, st, spine, 0, 0.22, 0).scale.set(B.chest / 0.37 * 1.1, 1, B.depth / 0.22 * 1.08);
+      mesh(G.stripe, st, spine, 0, 0.36, 0).scale.set(B.chest / 0.37 * 1.1, 1, B.depth / 0.22 * 1.08);
+    }
+    if (L.apron) mesh(G.apron, this._mat(L.apron), spine, 0, 0.1, front + 0.012).scale.x = B.waist / 0.33;
     if (L.bag) mesh(G.bag, this._mat(L.bag), spine, -(B.waist * 0.5 + 0.06), 0.05, 0);
     const neck = new THREE.Group(); neck.position.y = 0.52; spine.add(neck);
     mesh(G.neck, skin, neck, 0, 0.0, 0);
     const head = new THREE.Group(); head.position.y = 0.14; head.scale.setScalar(B.head); neck.add(head);
     mesh(G.head, skin, head, 0, 0, 0);
-    mesh(G.nose, skin, head, 0, -0.01, 0.105);
+    mesh(G.jaw, skin, head, 0, -0.055, 0.018);
+    mesh(G.nose, skin, head, 0, -0.012, 0.1);
     // no painted faces: at this style and distance they read as cartoon dots
-    for (const sx of [-1, 1]) mesh(G.ear, skin, head, sx * 0.1, 0.0, -0.005);
-    if (!L.hat || L.hat.type === 'cap') mesh(G.hair, hair, head, 0, 0.016, -0.014).rotation.x = -0.85;   // hairline high enough that a face reads from the front
-    if (L.long) mesh(G.hairLong, hair, head, 0, -0.1, -0.02);
+    for (const sx of [-1, 1]) mesh(G.ear, skin, head, sx * 0.095, -0.005, -0.005);
+    const hatType = L.hat && L.hat.type;
+    if (!hatType || hatType === 'cap' || hatType === 'beanie') mesh(G.hair, hair, head, 0, 0.016, -0.014).rotation.x = -0.85;   // hairline high enough that a face reads from the front
+    if (L.hairStyle === 'long' || L.long) mesh(G.hairLong, hair, head, 0, -0.1, -0.02);
+    if (L.hairStyle === 'bun') mesh(G.bun, hair, head, 0, 0.08, -0.1);
+    if (L.hairStyle === 'pony') { const pn = mesh(G.pony, hair, head, 0, 0.03, -0.11); pn.rotation.x = -0.35; }
     if (L.hat) {
       const hm = this._mat(L.hat.color, 0.5);
-      if (L.hat.type === 'cap') { mesh(G.cap, hm, head, 0, 0.03, 0); mesh(G.brim, hm, head, 0, 0.045, 0.12); }
-      if (L.hat.type === 'hard') { mesh(G.hard, hm, head, 0, 0.04, 0); mesh(G.hardBrim, hm, head, 0, 0.045, 0.01); }
-      if (L.hat.type === 'helmet') { const h = mesh(G.helmet, this._mat(L.hat.color, 0.25), head, 0, 0.02, -0.005); mesh(new THREE.BoxGeometry(0.2, 0.07, 0.02), this._mat('#101418', 0.1), head, 0, 0.01, 0.14); }
+      if (hatType === 'cap') { mesh(G.cap, hm, head, 0, 0.03, 0); mesh(G.brim, hm, head, 0, 0.045, 0.12); }
+      if (hatType === 'beanie') { mesh(G.beanie, this._mat(L.hat.color, 0.95), head, 0, 0.025, -0.005); mesh(G.beanieBand, this._mat(L.hat.color, 0.95), head, 0, 0.03, -0.005); }
+      if (hatType === 'hard') { mesh(G.hard, hm, head, 0, 0.04, 0); mesh(G.hardBrim, hm, head, 0, 0.045, 0.01); }
+      if (hatType === 'helmet') { mesh(G.helmet, this._mat(L.hat.color, 0.25), head, 0, 0.02, -0.005); mesh(new THREE.BoxGeometry(0.2, 0.07, 0.02), this._mat('#101418', 0.1), head, 0, 0.01, 0.14); }
     }
     const sleeve = L.sleeves === 'long' ? shirt : skin;
     const handMat = L.gloves ? this._mat(L.gloves) : skin;
     const arm = (side) => {
-      const sh = new THREE.Group(); sh.position.set(side * (B.sh * 0.5 + 0.02), 0.465, 0); spine.add(sh);
-      mesh(BG.deltoid, shirt, sh, -side * 0.012, 0.0, 0);
-      mesh(BG.upperArm, shirt, sh, 0, -0.15, 0);
+      const sh = new THREE.Group(); sh.position.set(side * (B.sh * 0.5 - 0.062 * K), 0.45, 0); spine.add(sh);
+      mesh(BG.deltoid, shirt, sh, -side * 0.006, 0.0, 0);
+      mesh(BG.upperArm, shirt, sh, 0, 0, 0);
       const el = new THREE.Group(); el.position.y = -0.3; sh.add(el);
-      mesh(BG.foreArm, sleeve, el, 0, -0.13, 0);
-      const hand = new THREE.Group(); hand.position.y = -0.28; el.add(hand);
-      mesh(G.hand, handMat, hand, 0, 0, 0);
-      mesh(G.thumb, handMat, hand, side * 0.028, 0.01, 0.025).rotation.set(0.5, 0, side * 0.5);
+      mesh(BG.elbow, shirt, el, 0, 0, 0);
+      mesh(BG.foreArm, sleeve, el, 0, 0, 0);
+      const hand = new THREE.Group(); hand.position.y = -0.26; el.add(hand);
+      mesh(BG.hand, handMat, hand, 0, 0.0, 0);
+      mesh(BG.thumb, handMat, hand, -side * 0.01, -0.028, 0.036).rotation.set(-0.45, 0, 0);
       return { sh, el, hand };
     };
     const leg = (side) => {
-      const hp = new THREE.Group(); hp.position.set(side * (B.hip * 0.5 - 0.085 * B.limb), -0.04, 0); hips.add(hp);
-      mesh(BG.thigh, pants, hp, 0, -0.225, 0);
+      const hp = new THREE.Group(); hp.position.set(side * (B.hip * 0.5 - 0.085 * K), -0.04, 0); hips.add(hp);
+      mesh(BG.thigh, pants, hp, 0, 0, 0);
       const kn = new THREE.Group(); kn.position.y = -0.45; hp.add(kn);
-      mesh(BG.shin, pants, kn, 0, -0.2, 0);
+      mesh(BG.knee, pants, kn, 0, 0, 0.004);
+      mesh(BG.shin, pants, kn, 0, 0, 0);
       const ft = new THREE.Group(); ft.position.y = -0.43; kn.add(ft);
-      mesh(G.shoe, shoes, ft, 0, -0.005, 0.06);
+      mesh(BG.shoe, shoes, ft, 0, -0.026, 0.03);
+      mesh(BG.sole, sole, ft, 0, -0.03, 0.03);
       return { hp, kn, ft };
     };
     const la = arm(1), ra = arm(-1), ll = leg(1), rl = leg(-1);

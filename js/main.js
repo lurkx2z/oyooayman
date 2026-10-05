@@ -31,6 +31,7 @@ class SceneManager {
     this.rng = new RNG(CONFIG.seed);
 
     this.env = new Environment(this.scene, R, this.rng);
+    this.env.camera = this.camera;
     this.env.build();
     this.peds = new PedestrianSystem(this.scene);
     this.traffic = new TrafficSystem(this.scene);
@@ -194,6 +195,6 @@ const boot = () => {
 };
 // wait for web fonts briefly (signs are drawn with them), then build
 if (document.fonts && document.fonts.load) {
-  const fonts = ['700 40px "Oswald"', '800 40px "Inter"', '600 20px "Inter"', '300 40px "Inter"', '200 40px "Inter"', '700 20px "JetBrains Mono"', 'italic 500 40px "Cormorant Garamond"', 'italic 400 40px "Cormorant Garamond"'].map((f) => document.fonts.load(f).catch(() => null));
+  const fonts = ['700 40px "Oswald"', '800 40px "Inter"', '600 20px "Inter"', '300 40px "Inter"', '200 40px "Inter"', '700 20px "JetBrains Mono"', 'italic 500 40px "Cormorant Garamond"', 'italic 400 40px "Cormorant Garamond"', '400 40px "Lora"', '500 40px "Lora"', 'italic 400 40px "Lora"'].map((f) => document.fonts.load(f).catch(() => null));
   Promise.race([Promise.all(fonts), new Promise((r) => setTimeout(r, 2500))]).then(boot);
 } else boot();

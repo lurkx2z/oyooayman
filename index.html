@@ -6,7 +6,7 @@
   <title>What If Oxygen Disappeared — Simulation</title>
   <!-- Optional web fonts (the page still works offline with system fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&family=Oswald:wght@600;700&family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&family=Oswald:wght@600;700&family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,18 +16,20 @@
 
       <!-- Cinematic HUD (stays visible in Recording Mode) -->
       <div id="hud">
+        <!-- one info block, top-left: tiny caps label → serif value → same value in other units → context -->
         <div class="readout" id="o2Readout">
           <div class="label">ATMOSPHERIC OXYGEN</div>
           <div class="value"><span id="o2Value">21.0</span><span class="unit">%</span></div>
-          <div class="bar"><div class="fill" id="o2Fill"></div></div>
+          <div class="sub" id="o2Sub">21.3 kPa</div>
+          <div class="ctx">SEA LEVEL</div>
         </div>
         <div class="readout secondary" id="timerReadout">
           <div class="label">TIME WITHOUT OXYGEN</div>
           <div class="value" id="timerValue">00:00</div>
         </div>
         <div id="title">
-          <div class="kicker">WHAT IF&hellip;</div>
-          <div class="main">oxygen disappeared?</div>
+          <div class="kicker"></div>
+          <div class="main">What if oxygen<br>suddenly disappeared?</div>
         </div>
         <div id="caption"></div>
         <div id="annotations"></div>

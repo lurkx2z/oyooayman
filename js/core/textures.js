@@ -479,7 +479,7 @@ const Tex = {
 
   cartSign() {
     const W = 512, H = 128, c = Tex.canvas(W, H), x = c.getContext('2d');
-    x.fillStyle = '#98382e'; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#84403a'; x.fillRect(0, 0, W, H);
     x.fillStyle = '#c4a24e'; x.fillRect(0, H - 16, W, 16);
     x.fillStyle = '#e4dfd4'; x.font = `800 58px ${Tex.fontCond}`; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillText('CHARCOAL GRILL', W / 2, 52);

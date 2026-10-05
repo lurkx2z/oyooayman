@@ -21,7 +21,7 @@ const CONFIG = {
     cameraHeight: 1.70,      // eye height above the ground under your feet (m)
     walkSpeed: 1.15,         // m/s, used to scale walking bob
     runSpeed: 4.2,           // m/s (reserved for later phases)
-    bobStrength: 0.032,      // vertical head bob per step (m)
+    bobStrength: 0.016,      // vertical head bob per step (m) — kept small: a stable, intentional camera
     bobFrequency: 1.75,      // steps per metre walked
     breathingStrength: 0.006,// chest-rise head motion (m)
     shakeStrength: 1.0,      // global multiplier for all shakes

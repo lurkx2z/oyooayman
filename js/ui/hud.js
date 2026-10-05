@@ -13,7 +13,7 @@ class HUD {
     this.el = {
       o2: root.querySelector('#o2Readout'),
       o2Value: root.querySelector('#o2Value'),
-      o2Fill: root.querySelector('#o2Fill'),
+      o2Sub: root.querySelector('#o2Sub'),
       timer: root.querySelector('#timerReadout'),
       timerValue: root.querySelector('#timerValue'),
       title: root.querySelector('#title'),
@@ -52,7 +52,9 @@ class HUD {
     if (dropping && o2 > 0.05) shown = Math.max(0, o2 + (hash1(Math.floor(t * 30)) - 0.5) * 0.5);
     const txt = shown.toFixed(1);
     if (this._last.o2txt !== txt) { this.el.o2Value.textContent = txt; this._last.o2txt = txt; }
-    this._set('o2fill', this.el.o2Fill, 'transform', `scaleX(${(o2 / 21).toFixed(4)})`);
+    // the same quantity as a partial pressure (sea level: 101.3 kPa total)
+    const kpa = `${(shown * 1.01325).toFixed(1)} kPa`;
+    if (this._last.kpa !== kpa) { this.el.o2Sub.textContent = kpa; this._last.kpa = kpa; }
     this.el.o2.classList.toggle('alert', o2 < H.oxygenRedBelow && o2 > 0.05);
     this.el.o2.classList.toggle('zero', o2 <= 0.05);
     // the zero blinks twice, quietly
@@ -65,7 +67,7 @@ class HUD {
     const out = 1 - MathX.smooth(t, H.title.out - 0.4, H.title.out);
     this._set('kick', this.el.kicker, 'opacity', (kIn * out).toFixed(3));
     this._set('main', this.el.main, 'opacity', (mIn * out).toFixed(3));
-    this._set('mainy', this.el.main, 'transform', `translateY(${((1 - mIn) * 10).toFixed(1)}px)`);
+    this._set('mainy', this.el.main, 'transform', `translateY(${((1 - mIn) * 8).toFixed(1)}px)`);
 
     // ---- secondary counter: time without oxygen (only once it matters)
     const tv = MathX.smooth(t, H.timerFrom, H.timerFrom + 0.6);

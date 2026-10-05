@@ -7,9 +7,27 @@
 // midground too clear and then slams far objects to a flat wall). Foreground stays crisp,
 // the midground fades a little, the background washes out. The fog colour sits a little darker
 // than the horizon and never fully covers geometry, so far blocks lose detail before silhouette.
+// The haze is also uneven: denser near the ground and varying in slow banks across the city,
+// instead of one mathematically uniform fog field.
+THREE.ShaderChunk.fog_pars_vertex = THREE.ShaderChunk.fog_pars_vertex.replace(
+  'varying float vFogDepth;', 'varying float vFogDepth;\n\tvarying vec3 vFogWorld;');
+THREE.ShaderChunk.fog_vertex = THREE.ShaderChunk.fog_vertex.replace(
+  'vFogDepth = - mvPosition.z;',
+  // world position from view space (the view matrix is rigid), so instancing / skinning are already included
+  'vFogDepth = - mvPosition.z;\n\tvFogWorld = transpose( mat3( viewMatrix ) ) * ( mvPosition.xyz - viewMatrix[ 3 ].xyz );');
+THREE.ShaderChunk.fog_pars_fragment = THREE.ShaderChunk.fog_pars_fragment.replace(
+  'varying float vFogDepth;',
+  `varying float vFogDepth;
+\tvarying vec3 vFogWorld;
+\tfloat fogHash( vec2 p ) { return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ) * 43758.5453 ); }
+\tfloat fogNoise( vec2 p ) { vec2 i = floor( p ), f = fract( p ); vec2 u = f * f * ( 3.0 - 2.0 * f );
+\t\treturn mix( mix( fogHash( i ), fogHash( i + vec2( 1, 0 ) ), u.x ), mix( fogHash( i + vec2( 0, 1 ) ), fogHash( i + vec2( 1, 1 ) ), u.x ), u.y ); }`);
 THREE.ShaderChunk.fog_fragment = THREE.ShaderChunk.fog_fragment.replace(
   'fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );',
-  'fogFactor = min( 1.0 - exp( - fogDensity * vFogDepth ), 0.9 );');   // capped: far blocks keep a silhouette
+  // (the chunk line starts with "float ", so this continues that declaration)
+  `fogBank = 0.72 + 0.56 * fogNoise( vFogWorld.xz * 0.011 + 3.0 );                // slow banks
+\t\tfloat fogLow = 1.0 + 0.75 * exp( - max( vFogWorld.y, 0.0 ) / 4.5 );             // ground haze
+\t\tfloat fogFactor = min( 1.0 - exp( - fogDensity * vFogDepth * fogBank * fogLow ), 0.9 );   // capped: far blocks keep a silhouette`);
 
 const FACADE_STYLES = {
   redbrick:   { kind: 'brick', wall: [122, 80, 66],  frame: '#ebe6dc', sill: [208, 200, 186], winW: 0.5,  winH: 0.58, sillH: 0.24, panes: 3, bayW: 3.0, floorH: 3.3, ac: true },
@@ -70,6 +88,7 @@ class Environment {
     this._cart();
     this._roadWorks();
     this._cafe();
+    this._hazeCards();
     this.batch.build(this.root, 'env');
     this._environmentMap();
   }
@@ -195,7 +214,7 @@ class Environment {
     sky.renderOrder = -10;
     this.scene.add(sky);
     this.sky = sky;
-    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0046);   // used as plain exponential (see top)
+    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0039);   // plain exponential with ground haze + banks (see top): same overall amount as before
     this.scene.background = horizon.clone();
   }
 
@@ -468,6 +487,70 @@ class Environment {
     }
     if (rng.next() < 0.35 && floors <= 8) this._waterTank(cx + side * depth * 0.15, H, cz + rng.range(-2, 2));
     if (rng.next() < 0.5) B.box(3, 2.6, 3.4, cx + side * depth * 0.25, H + 1.3, cz + rng.range(-2, 2), F.wall);
+    // facade dressing only where the camera can read it
+    if (z1 > -150 && z0 < 40) this._dress({ side, fx, z0, z1, gH, H, F, floors, rng });
+  }
+
+  /**
+   * Breaks the procedural look of a facade with real geometry that lines up with the textured windows:
+   * window reveals + sills + lintels (or vertical fins on modern facades), AC units, a fire escape,
+   * a drainpipe and an occasional blade sign. Windows sit on the texture's bay grid (see Tex.facade):
+   * bay centres every bayW from the facade corner, sill at sillH and head at sillH + winH of each floor.
+   */
+  _dress({ side, fx, z0, z1, gH, H, F, floors, rng }) {
+    const B = this.batch, st = F.style, m = this.m;
+    const out = (d) => fx - side * d;                         // d metres in front of the facade
+    const bays = Math.floor((z1 - z0) / st.bayW + 1e-3);
+    const zc = (i) => (side > 0 ? z0 + (i + 0.5) * st.bayW : z1 - (i + 0.5) * st.bayW);
+    const ww = st.winW * st.bayW, wh = st.winH * st.floorH;
+    const metal = Mat.std('#2a2d30', { roughness: 0.5, metalness: 0.5 });
+    const frameM = st.kind === 'brick' || st.kind === 'stucco' ? m.trim : m.trimDark;
+    if (st.kind === 'panel' || st.kind === 'curtain') {
+      // modern: vertical fins between bays + a slab edge every floor
+      for (let i = 0; i <= bays; i++) {
+        const z = side > 0 ? z0 + i * st.bayW : z1 - i * st.bayW;
+        B.box(0.32, H - gH - 0.3, 0.12, out(0.16), (gH + H) / 2, z, metal);
+      }
+      for (let f = 1; f < floors; f++) B.box(0.2, 0.14, z1 - z0, out(0.1), gH + f * st.floorH, (z0 + z1) / 2, m.trimDark);
+    } else {
+      for (let f = 0; f < floors; f++) {
+        const y0 = gH + f * st.floorH, ys = y0 + st.sillH * st.floorH, yh = ys + wh;
+        for (let i = 0; i < bays; i++) {
+          const z = zc(i);
+          B.box(0.16, 0.07, ww + 0.16, out(0.08), ys - 0.035, z, frameM);                  // sill
+          B.box(0.1, 0.13, ww + 0.12, out(0.05), yh + 0.065, z, frameM);                   // lintel
+          for (const sz of [-1, 1]) B.box(0.09, wh, 0.06, out(0.045), ys + wh / 2, z + sz * (ww / 2 + 0.03), frameM);   // reveals → the window reads recessed
+          if (f > 0 && rng.next() < 0.12) B.box(0.48, 0.4, 0.62, out(0.24), ys + 0.22, z + rng.range(-0.08, 0.08), m.roofLight);   // AC unit
+        }
+      }
+      // fire escape on some brick buildings: platforms, railings and zig-zag stairs over two bays
+      if (st.kind === 'brick' && floors >= 3 && bays >= 3 && rng.next() < 0.55) {
+        const i0 = rng.int(0, bays - 2), za = zc(i0), zb = zc(i0 + 1), zm = (za + zb) / 2, span = Math.abs(zb - za) + ww + 0.4;
+        for (let f = 0; f < floors; f++) {
+          const y = gH + f * st.floorH + st.sillH * st.floorH - 0.05;
+          B.box(0.95, 0.05, span, out(0.5), y, zm, metal);                                  // grating
+          B.box(0.035, 0.9, span, out(0.96), y + 0.45, zm, metal);                          // rail
+          B.box(0.035, 0.035, span, out(0.96), y + 0.9, zm, metal);
+          for (const e of [-1, 1]) B.box(0.035, 0.9, 0.035, out(0.96), y + 0.45, zm + e * span / 2, metal);
+          if (f < floors - 1) {
+            const run = st.floorH, ang = Math.atan2(st.floorH, span * 0.7);
+            B.add(new THREE.BoxGeometry(0.5, 0.05, Math.hypot(run, span * 0.7)), metal, Geo.matrix(out(0.62), y + st.floorH / 2, zm, (f % 2 ? 1 : -1) * ang));
+          }
+        }
+        B.box(0.05, 0.05, 0.05, out(0.5), gH, zm, metal);
+      }
+    }
+    // drainpipe at one corner, with brackets
+    const zp = rng.next() < 0.5 ? z0 + 0.22 : z1 - 0.22;
+    B.add(new THREE.CylinderGeometry(0.055, 0.055, H, 6), metal, Geo.matrix(out(0.1), H / 2, zp));
+    for (let y = 1.5; y < H; y += 3.2) B.box(0.12, 0.05, 0.05, out(0.05), y, zp, metal);
+    // blade sign above the shops
+    if (rng.next() < 0.35) {
+      const zs = rng.range(z0 + 1.5, z1 - 1.5), col = rng.pick(['#5a3a32', '#2f4a44', '#3a3f4a', '#6b5a3a']);
+      B.box(0.05, 0.05, 0.9, out(0.45), 5.6, zs, metal, 0, { noShadow: true });
+      B.box(0.9, 1.5, 0.08, out(0.6), 4.95, zs, Mat.std(col, { roughness: 0.6 }));
+      B.box(0.94, 0.06, 0.1, out(0.6), 5.72, zs, metal, 0, { noShadow: true });
+    }
   }
 
   _waterTank(x, y, z) {
@@ -783,7 +866,7 @@ class Environment {
     const g = new THREE.Group();
     g.position.set(x, h, z);
     this.root.add(g);
-    const red = Mat.std('#9c3b31', { roughness: 0.55 });
+    const red = Mat.std('#86413a', { roughness: 0.6 });
     const steelM = this.m.steel;
     const add = (geo, mat, px, py, pz, ry = 0) => { const me = new THREE.Mesh(geo, mat); me.position.set(px, py, pz); me.rotation.y = ry; me.castShadow = me.receiveShadow = true; g.add(me); return me; };
     // cabinet
@@ -829,7 +912,7 @@ class Environment {
     // umbrella
     add(new THREE.CylinderGeometry(0.02, 0.02, 2.1, 6), steelM, 0.3, 1.1, -0.55);
     const um = Tex.canvas(256, 32), ux = um.getContext('2d');
-    for (let i = 0; i < 8; i++) { ux.fillStyle = i % 2 ? '#d6d2c9' : '#9e3b33'; ux.fillRect(i * 32, 0, 32, 32); }
+    for (let i = 0; i < 8; i++) { ux.fillStyle = i % 2 ? '#d2cec5' : '#8c423a'; ux.fillRect(i * 32, 0, 32, 32); }
     const umbMat = new THREE.MeshStandardMaterial({ map: Tex.tex(um), side: THREE.DoubleSide, roughness: 0.8 });
     const canopy = add(new THREE.ConeGeometry(1.3, 0.42, 16, 1, true), umbMat, 0.3, 2.2, -0.55);
     canopy.castShadow = true;
@@ -952,8 +1035,47 @@ class Environment {
     this.anchors.heater = new THREE.Vector3(px, h + 2.12, pz);
   }
 
+  /* a few huge, very faint haze layers drifting between the blocks (local atmospheric depth) */
+  _hazeCards() {
+    const c = Tex.canvas(256, 128), x = c.getContext('2d');
+    x.fillStyle = '#000'; x.fillRect(0, 0, 256, 128);
+    Tex.blotches(x, 256, 128, 26, 18, 60, (q) => `rgba(255,255,255,${q.range(0.18, 0.4)})`, new RNG(77));
+    const tex = Tex.tex(c, { srgb: false });
+    const cards = [[-3, -34, 22, 9], [7, -52, 18, 8], [-8, -68, 22, 12], [2, -88, 26, 12], [9, -104, 18, 10], [-5, -122, 26, 14], [1, -150, 30, 16], [-10, -185, 30, 16], [6, -220, 34, 18], [0, -280, 40, 20]];
+    this.haze = cards.map(([hx, hz, w, h], i) => {
+      const mat = new THREE.ShaderMaterial({
+        uniforms: { uMap: { value: tex }, uColor: { value: new THREE.Color() }, uOpacity: { value: 0.11 + 0.05 * hash1(i * 3.3) }, uOff: { value: new THREE.Vector2(hash1(i), 0) }, uNear: { value: 0 } },
+        transparent: true, depthWrite: false,
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: `uniform sampler2D uMap; uniform vec3 uColor; uniform float uOpacity, uNear; uniform vec2 uOff; varying vec2 vUv;
+          void main(){
+            float n = texture2D(uMap, vUv * vec2(1.0, 1.0) + uOff).r;
+            float edge = smoothstep(0.0, 0.25, vUv.x) * smoothstep(1.0, 0.75, vUv.x);
+            float prof = smoothstep(0.0, 0.12, vUv.y) * (1.0 - smoothstep(0.25, 1.0, vUv.y));   // hugs the ground, fades upward
+            gl_FragColor = vec4(uColor, uOpacity * (0.45 + 0.9 * n) * edge * prof * uNear);
+          }`,
+      });
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+      m.position.set(hx, h / 2, hz);
+      m.renderOrder = 3;
+      m.frustumCulled = false;
+      this.scene.add(m);
+      return { m, mat, drift: 0.004 + 0.004 * hash1(i * 7.1) };
+    });
+  }
+
   /* ================================================================ */
   update(t, tl) {
+    // haze layers: face the viewer (no edge-on lines), drift slowly, fade out when close
+    if (this.haze && this.camera) {
+      const cp = this.camera.position;
+      for (const hz of this.haze) {
+        hz.m.rotation.y = Math.atan2(cp.x - hz.m.position.x, cp.z - hz.m.position.z);
+        hz.mat.uniforms.uOff.value.x = hash1(hz.drift * 1000) + t * hz.drift;
+        hz.mat.uniforms.uColor.value.copy(this.scene.fog.color).multiplyScalar(1.06);
+        hz.mat.uniforms.uNear.value = MathX.smooth(Math.hypot(cp.x - hz.m.position.x, cp.z - hz.m.position.z), 14, 30);
+      }
+    }
     this.skyUniforms.uTime.value = t;
     const o2 = SCRIPT_TRACKS.skyO2.value(t);
     this.skyUniforms.uO2.value = o2;

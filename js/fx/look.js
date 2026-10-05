@@ -1,9 +1,11 @@
 /* =====================================================================
    LOOK — one place for the "older-game cinematic" material treatment.
    Runs once after the world is built:
-   - matte pass: no polished PBR highlights or strong reflections
+   - surfaces: the environment stays matte, while cars, glass and metal props keep
+     readable, controlled highlights (selective gloss, as in the POV reference)
    - grime: low-frequency, non-repeating dirt in world space (patchy ground,
-     darker splash zone at the base of walls, faint vertical streaks)
+     replaced slabs, damp patches, darker splash zone at the base of walls,
+     faint streaks, slow tone drift between neighbouring buildings)
    People and the first-person hands are left alone.
    ===================================================================== */
 
@@ -28,9 +30,17 @@ const Look = {
       float splash = 1.0 - smoothstep(0.02, 0.7, w.y);
       float dirt = ground * (0.14 + 0.3 * patchy)
                  + wall * (0.16 * splash + 0.1 * patchy + 0.08 * smoothstep(0.55, 0.9, n3));
+      // replaced slabs / patched asphalt: whole 1.25 m cells a shade darker or lighter
+      vec2 cell = floor(w.xz / 1.25);
+      float hc = grimeHash(cell + 3.7);
+      dirt += ground * (step(0.88, hc) * 0.12 - step(hc, 0.06) * 0.07);
       dirt *= uGrime;
       float lum = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));
       diffuseColor.rgb = mix(diffuseColor.rgb, vec3(lum) * vec3(0.98, 0.99, 0.93), dirt * 0.6) * (1.0 - dirt);
+      // neighbouring buildings never share exactly the same paint: slow drift in tone and warmth
+      float tint = grimeNoise(w.xz * 0.045 + 31.0) - 0.5;
+      diffuseColor.rgb *= 1.0 + wall * uGrime * vec3(0.16 * tint + 0.03, 0.14 * tint, 0.12 * tint - 0.03);
+      grimeDamp = ground * uGrime * smoothstep(0.66, 0.82, grimeNoise(w.xz * 0.16 + 9.0));
     }
   `,
 
@@ -48,19 +58,28 @@ const Look = {
           float grimeHash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
           float grimeNoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f);
             return mix(mix(grimeHash(i), grimeHash(i + vec2(1, 0)), u.x), mix(grimeHash(i + vec2(0, 1)), grimeHash(i + vec2(1, 1)), u.x), u.y); }`)
-        .replace('#include <color_fragment>', '#include <color_fragment>\n' + Look.GRIME_FS);
+        .replace('#include <color_fragment>', 'float grimeDamp = 0.0;\n#include <color_fragment>\n' + Look.GRIME_FS)
+        // damp patches: a little sheen on the ground (older-game puddle look, very subtle)
+        .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor *= 1.0 - 0.5 * grimeDamp;');
     };
     mat.customProgramCacheKey = () => 'grime' + strength;
     mat.needsUpdate = true;
   },
 
-  matte(mat) {
-    if (mat.userData.matte) return;
-    mat.userData.matte = true;
-    const glass = /glass/i.test(mat.name || '');
-    if (!glass) mat.roughness = Math.max(mat.roughness, mat.metalness > 0.5 ? 0.45 : 0.62);
-    if ('envMapIntensity' in mat) mat.envMapIntensity *= glass ? 0.6 : 0.45;
-    if (mat.isMeshPhysicalMaterial) { mat.clearcoat = 0; mat.sheen = 0; }
+  // environment matte; selected objects keep readable highlights (cars, glass, metal props)
+  surface(mat, vehicle) {
+    if (mat.userData.surface) return;
+    mat.userData.surface = true;
+    const name = mat.name || '';
+    if (/glass/i.test(name)) { mat.roughness = Math.min(mat.roughness, 0.12); mat.envMapIntensity = 1.1; return; }
+    if (mat.metalness > 0.5) { mat.roughness = MathX.clamp(mat.roughness, 0.25, 0.5); return; }   // metal: controlled specular
+    if (vehicle && mat.isMeshPhysicalMaterial) {                                                    // car paint: satin with a thin clearcoat
+      mat.roughness = MathX.clamp(mat.roughness, 0.42, 0.6); mat.clearcoat = 0.3; mat.clearcoatRoughness = 0.35; mat.envMapIntensity = 1.0;
+      return;
+    }
+    if (vehicle) { mat.roughness = Math.max(mat.roughness, 0.5); return; }
+    mat.roughness = Math.max(mat.roughness, 0.75);                                                  // concrete, walls, road, foliage
+    if ('envMapIntensity' in mat) mat.envMapIntensity *= 0.5;
   },
 
   apply(scene, camera) {
@@ -74,7 +93,7 @@ const Look = {
       const vehicle = (() => { let q = o; while (q) { if (q.name && q.name.startsWith('veh:')) return true; q = q.parent; } return false; })();
       for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
         if (!m || !m.isMeshStandardMaterial || m.onBeforeCompile !== THREE.Material.prototype.onBeforeCompile && m.userData.grime === undefined) continue;
-        Look.matte(m);
+        Look.surface(m, vehicle);
         if (!/glass/i.test(m.name || '')) Look.grime(m, vehicle ? 0.55 : 1.0);
       }
     });
