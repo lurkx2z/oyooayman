@@ -103,7 +103,7 @@ class Environment {
       glass: new THREE.MeshPhysicalMaterial({ color: '#cfe3ea', roughness: 0.05, transmission: 0, transparent: true, opacity: 0.22, depthWrite: false, name: 'glassPanel' }),
       hoarding: new THREE.MeshStandardMaterial({ map: Tex.hoarding(15), roughness: 0.85, name: 'hoarding' }),
       plywood: Mat.std('#b8925f', { roughness: 0.9 }),
-      orange: Mat.std('#ef6a1a', { roughness: 0.6 }),
+      orange: Mat.std('#c25a2c', { roughness: 0.6 }),
       yellow: Mat.std('#e8b91c', { roughness: 0.55 }),
       red: Mat.std('#b8231d', { roughness: 0.6 }),
       blueBox: Mat.std('#24508f', { roughness: 0.5 }),
@@ -883,7 +883,7 @@ class Environment {
     for (let zz = -6.2; zz > -26; zz -= 2.4) cone(3.75, zz);
     // type III barricade across the closed lane
     const stripe = Tex.canvas(256, 32), sx = stripe.getContext('2d');
-    for (let i = -2; i < 12; i++) { sx.fillStyle = i % 2 ? '#f3f3ee' : '#e8611a'; sx.beginPath(); sx.moveTo(i * 24, 32); sx.lineTo(i * 24 + 24, 32); sx.lineTo(i * 24 + 40, 0); sx.lineTo(i * 24 + 16, 0); sx.fill(); }
+    for (let i = -2; i < 12; i++) { sx.fillStyle = i % 2 ? '#e2e0da' : '#bf5a2c'; sx.beginPath(); sx.moveTo(i * 24, 32); sx.lineTo(i * 24 + 24, 32); sx.lineTo(i * 24 + 40, 0); sx.lineTo(i * 24 + 16, 0); sx.fill(); }
     const stripeMat = new THREE.MeshStandardMaterial({ map: Tex.tex(stripe), roughness: 0.5 });
     for (const x of [4.3, 6.6]) B.box(0.07, 1.5, 0.07, x, 0.75, -25.2, m.galv);
     for (const y of [0.55, 0.95, 1.35]) B.box(2.6, 0.2, 0.03, 5.45, y, -25.2, stripeMat);
@@ -902,7 +902,7 @@ class Environment {
     B.box(0.75, 0.16, 0.36, px - 2.05, h + 7.95, z, m.metal);
     B.box(0.36, 0.14, 0.14, px - 0.22, 5.3, z, m.primer);  // rusty bracket being cut off
     // battery scissor lift (electric: keeps working without oxygen)
-    const lx = W.liftX, liftMat = Mat.std('#e8701a', { roughness: 0.55 }), grey = Mat.std('#4a4e54', { roughness: 0.5, metalness: 0.4 });
+    const lx = W.liftX, liftMat = Mat.std('#c0652e', { roughness: 0.55 }), grey = Mat.std('#4a4e54', { roughness: 0.5, metalness: 0.4 });
     B.box(1.15, 0.5, 2.5, lx, 0.38, z, liftMat);
     B.box(0.5, 0.35, 0.7, lx, 0.8, z + 0.6, grey);                                // battery pack
     for (const dx of [-0.5, 0.5]) for (const dz of [-0.95, 0.95]) {

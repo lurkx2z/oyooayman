@@ -90,7 +90,7 @@ class PostProcessing {
           // fire stays warm and alive while everything else is muted: protect bright warm pixels
           float mx = max(col.r, max(col.g, col.b));
           float warm = clamp((col.r - col.b) / (mx + 1e-3), 0.0, 1.0);
-          float keep = smoothstep(0.4, 0.85, warm) * smoothstep(0.45, 2.2, mx) * uKeepWarm;
+          float keep = smoothstep(0.4, 0.85, warm) * smoothstep(0.9, 2.6, mx) * uKeepWarm;   // only HDR-bright: flames, coals, sparks
           col *= vec3(1.0 + uWarmth * 0.05, 1.0 + uWarmth * 0.01, 1.0 - uWarmth * 0.07);
           col = aces(col);
           float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
