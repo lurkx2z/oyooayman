@@ -204,16 +204,16 @@ class BirdFlock {
     const tZ = SCRIPT.events.find((e) => e.id === 'o2_zero').time;
     for (const b of this.birds) {
       const s = b.seed;
-      const scatter = MathX.smooth(t, tZ, tZ + 1.2);
+      const scatter = MathX.smooth(t, 1.85, 3.0);
       const ang = t * 0.32 + b.i * 0.28 + s * 0.5 + scatter * (s - 0.5) * 1.5;
       const R = 22 + s * 8 + scatter * (6 + s * 10);
       let x = -6 + Math.cos(ang) * R + Math.sin(t * 0.7 + s * 9) * 1.5;
       let z = -62 + Math.sin(ang) * R * 0.6;
-      const dip = Math.max(0, t - tZ) < 0.9 ? Math.sin(Math.min(1, Math.max(0, t - tZ) / 0.9) * Math.PI) * 1.6 : 0;
+      const tDip = 1.65, dip = t > tDip && t < tDip + 1.1 ? Math.sin(((t - tDip) / 1.1) * Math.PI) * 1.8 : 0;
       let y = 30 + Math.sin(t * 0.9 + s * 7) * 1.2 + s * 6 + scatter * 3 - dip;
       // birds burn oxygen fast: they falter first and drop out of the sky
-      const fail = MathX.smooth(t, 4.0 + s * 1.5, 5.6 + s * 1.5);
-      const fall = Math.max(0, t - (5.2 + s * 2.6));
+      const fail = MathX.smooth(t, 8.4 + s * 1.8, 10.2 + s * 1.8);
+      const fall = Math.max(0, t - (10.4 + s * 3.4));
       y -= fall * fall * 3.2;
       x += fail * Math.sin(t * 5 + s * 20) * 0.8;
       b.g.position.set(x, y, z);
@@ -310,12 +310,12 @@ class ParticleSystem {
       const k = Math.floor((t * R - i) / N);
       const tb = (k * N + i) / R;
       if (tb < -2 || tb > tStop || tb > t) continue;
-      if (tb > tZ && tb < tZ + 0.42) continue;           // he flinches when his ears pop
+      if (tb > 1.85 && tb < 2.27) continue;              // he flinches when his ears pop
       const age = t - tb;
       const h1 = hash2(i, k), h2 = hash2(i + 999, k), h3 = hash2(i + 1999, k), h4 = hash2(i + 2999, k);
       // oxygen at the moment this spark was thrown off
       const o2 = SCRIPT_TRACKS.oxygen.value(tb);
-      const f = MathX.smooth(o2, 2.5, 16);        // 1 = burning steel sparks, 0 = just friction-hot metal
+      const f = MathX.smooth(o2, 3, 19);          // 1 = burning steel sparks, 0 = just friction-hot metal
       const life = MathX.lerp(0.07 + 0.1 * h1, 0.35 + 0.6 * h1, f);
       if (age > life) continue;
       const sp = MathX.lerp(4, 6, f) + h2 * 6.5;

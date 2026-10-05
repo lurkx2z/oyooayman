@@ -171,8 +171,9 @@ class PostProcessing {
     p.saturation = MathX.lerp(MathX.lerp(1.16, 0.98, drain), 0.5, hyp);
     p.warmth = MathX.lerp(MathX.lerp(0.5, 0.15, drain), -0.25, Math.min(1, hyp * 1.5));
     // the ear-pop instant: a two-frame flash + colour-split shock
-    const pop = MathX.impulse(t, tZ + 0.02, 0.16);
-    p.flash = 0.22 * MathX.impulse(t, tZ + 0.005, 0.045);
+    const tPop = 2.05;   // most of the pressure is gone by ~2.1 s (O₂ 15 → 3 %)
+    const pop = MathX.impulse(t, tPop + 0.02, 0.16);
+    p.flash = 0.22 * MathX.impulse(t, tPop + 0.005, 0.045);
     p.chroma = 0.014 * pop + hyp * 0.007 + 0.0006;
     p.exposure = CONFIG.render.exposure * (1 - 0.05 * pop) * (1 - 0.14 * hyp);
     p.contrast = MathX.lerp(1.07, 1.03, drain) + 0.07 * hyp;

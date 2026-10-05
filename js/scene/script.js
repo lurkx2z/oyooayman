@@ -33,8 +33,8 @@ const SCRIPT = {
 
   // the viewer's own hands (first-person)
   hands: {
-    right: [[0, 'hidden'], [2.42, 'ear'], [3.1, 'hidden'], [3.4, 'lighter'], [5.3, 'hidden']],
-    left: [[0, 'hidden'], [2.42, 'ear'], [3.1, 'hidden'], [13.55, 'tremble']],
+    right: [[0, 'hidden'], [1.85, 'ear'], [2.75, 'hidden'], [3.4, 'lighter'], [5.3, 'hidden']],
+    left: [[0, 'hidden'], [1.85, 'ear'], [2.75, 'hidden'], [13.55, 'tremble']],
     flicks: [3.95, 4.45, 4.95],      // piezo lighter clicks: blue spark, gas, no flame
   },
 
@@ -68,11 +68,11 @@ const SCRIPT = {
       [6.55, 3], [7.1, 2.5], [7.5, 0], [8.2, -1.5], [8.85, -2], [9.5, -5], [10.5, -6], [11.4, -5], [12.0, 12.5],
       [13.0, 11.5], [13.6, -7], [14.5, -9], [15, -8],
     ],
-    fov: [[0, 60], [2.4, 60], [2.47, 55.5, 'outQuad'], [3.1, 60, 'inOutSine'], [10, 60], [15, 56.5]],
+    fov: [[0, 60], [2.03, 60], [2.1, 55.5, 'outQuad'], [2.8, 60, 'inOutSine'], [10, 60], [15, 56.5]],
     // sudden reactions: t, strength  (small pops while O₂ falls, the big one at 0 %)
-    startles: [[1.62, 0.18], [2.02, 0.22], [2.42, 1.0], [6.77, 0.5]],
+    startles: [[1.55, 0.2], [1.82, 0.6], [2.05, 1.0], [6.77, 0.5]],
     // camera shakes: t, amplitude, decay seconds
-    shakes: [[2.42, 0.9, 0.35], [6.77, 0.24, 0.3]],
+    shakes: [[2.05, 0.85, 0.35], [6.77, 0.24, 0.3]],
     // late hypoxia: the viewer's knees start to go (metres lower) and the head rolls (deg)
     sag: [[0, 0], [12.5, 0], [15, 0.2, 'inQuad']],
     roll: [[0, 0], [12.5, 0], [15, 4.0, 'inQuad']],
@@ -89,9 +89,9 @@ const SCRIPT = {
     logs: [
       { t: 1.8,  until: 4.1,  text: 'FLAMES — OUT AT 15% O₂', tone: 'bad' },
       { t: 2.5,  until: 4.8,  text: 'AIR PRESSURE — DOWN 21%', tone: 'info' },
-      { t: 4.8,  until: 6.9,  text: 'NO ONE FEELS SHORT OF BREATH', tone: 'info' },
+      { t: 4.8,  until: 6.4,  text: 'EACH BREATH PULLS O₂ OUT OF YOUR BLOOD', tone: 'bad' },
       { t: 6.45, until: 8.9,  text: '60% OF POWER WAS FIRE → GRID DOWN', tone: 'bad' },
-      { t: 9.7,  until: 12.4, text: 'EACH BREATH PULLS O₂ OUT OF YOUR BLOOD', tone: 'bad' },
+      { t: 9.7,  until: 12.4, text: 'NO ONE FEELS SHORT OF BREATH', tone: 'info' },
       { t: 12.5, until: 15.2, text: 'BRAIN OXYGEN — RUNNING OUT', tone: 'bad' },
     ],
     annotations: [
@@ -147,33 +147,33 @@ const SCRIPT = {
      ------------------------------------------------------------------ */
   people: [
     { id: 'vendor',   look: 'vendor',  y: 0.15, path: [[0, 7.3, -3.45]], face: -90,
-      states: [[0, 'grill'], [1.66, 'recoil'], [2.42, 'earPop'], [3.1, 'look'], [3.8, 'lighter'], [6.6, 'look'], [10.4, 'handHead'], [11.4, 'lean'], [12.9, 'sitGround']] },
+      states: [[0, 'grill'], [1.66, 'recoil'], [1.85, 'earPop'], [3.1, 'look'], [3.8, 'lighter'], [6.6, 'look'], [10.4, 'handHead'], [11.4, 'lean'], [12.9, 'sitGround']] },
     { id: 'customer', look: 'casual1', y: 0.15, path: [[0, 8.85, -3.9], [11.8, 8.85, -3.9], [12.4, 9.2, -3.25]], face: 90, faceUntil: 11.8,
-      states: [[0, 'phone'], [2.42, 'earPop'], [3.1, 'look'], [4.6, 'phone'], [7.0, 'look'], [10.9, 'handHead'], [11.8, 'walk'], [12.4, 'stumble'], [13.4, 'kneel']] },
+      states: [[0, 'phone'], [1.85, 'earPop'], [3.1, 'look'], [4.6, 'phone'], [7.0, 'look'], [10.9, 'handHead'], [11.8, 'walk'], [12.4, 'stumble'], [13.4, 'kneel']] },
     { id: 'worker',   look: 'worker',  y: 4.06, path: [[0, 6.3, -14.0]], face: -90,
-      states: [[0, 'grind'], [2.42, 'flinch'], [2.85, 'grind'], [6.1, 'lowerTool'], [6.6, 'look'], [11.0, 'handHead'], [12.6, 'railSlump']] },
+      states: [[0, 'grind'], [1.85, 'flinch'], [2.3, 'grind'], [6.1, 'lowerTool'], [6.6, 'look'], [11.0, 'handHead'], [12.6, 'railSlump']] },
     { id: 'toward',   look: 'casual2', y: 0.15, path: [[0, 10.45, -17.5], [2.42, 10.45, -14.6], [3.4, 10.45, -14.6], [8.6, 10.45, -7.6]],
-      states: [[0, 'walk'], [2.42, 'earPop'], [3.2, 'look'], [3.4, 'walk'], [8.6, 'look'], [11.5, 'handHead'], [12.8, 'stumble'], [14.1, 'kneel']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.4, 'walk'], [8.6, 'look'], [11.5, 'handHead'], [12.8, 'stumble'], [14.1, 'kneel']] },
     { id: 'away',     look: 'casual3', y: 0.15, path: [[0, 11.45, -1.2], [2.42, 11.45, -4.1], [3.6, 11.45, -4.1], [7.0, 11.45, -8.3]],
-      states: [[0, 'walk'], [2.42, 'earPop'], [3.2, 'look'], [3.6, 'walk'], [7.0, 'look'], [11.6, 'stumble'], [13.6, 'sitGround']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.6, 'walk'], [7.0, 'look'], [11.6, 'stumble'], [13.6, 'sitGround']] },
     { id: 'L1',       look: 'casual4', y: 0.15, path: [[0, -8.7, -34], [2.42, -8.7, -31], [3.6, -8.7, -31], [11.5, -8.7, -22]],
-      states: [[0, 'walk'], [2.42, 'earPop'], [3.2, 'look'], [3.6, 'walk'], [12.4, 'stumble'], [14.2, 'kneel']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.6, 'walk'], [12.4, 'stumble'], [14.2, 'kneel']] },
     { id: 'L2',       look: 'casual5', y: 0.15, path: [[0, -10.7, -4], [2.42, -10.7, -6.9], [3.5, -10.7, -6.9], [10.6, -10.7, -15]],
-      states: [[0, 'walk'], [2.42, 'earPop'], [3.2, 'look'], [3.5, 'walk'], [13.0, 'stumble'], [14.2, 'sitGround']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.2, 'look'], [3.5, 'walk'], [13.0, 'stumble'], [14.2, 'sitGround']] },
     { id: 'L3',       look: 'casual6', y: 0.15, path: [[0, -10.72, -21]], face: -90, seat: 0.45,
-      states: [[0, 'sit'], [2.42, 'earPopSit'], [3.3, 'sit']] },
+      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit']] },
     { id: 'L4',       look: 'casual7', y: 0.15, path: [[0, -9.9, -63], [2.42, -9.9, -60], [3.6, -9.9, -60], [11, -9.9, -50]],
-      states: [[0, 'walk'], [2.42, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [12.6, 'stumble']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [12.6, 'stumble']] },
     { id: 'L5',       look: 'casual8', y: 0.15, path: [[0, -10.6, -64.2], [2.42, -10.6, -61.2], [3.6, -10.6, -61.2], [11, -10.6, -51.3]],
-      states: [[0, 'walk'], [2.42, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [13.2, 'stumble']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [13.2, 'stumble']] },
     { id: 'C1',       look: 'casual2', y: 0.15, path: [[0, -10.22, -28.0]], face: 90, seat: 0.45,
-      states: [[0, 'sit'], [2.42, 'earPopSit'], [3.3, 'sit']] },
+      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit']] },
     { id: 'C2',       look: 'casual5', y: 0.15, path: [[0, -11.58, -28.0]], face: -90, seat: 0.45,
-      states: [[0, 'sit'], [2.42, 'earPopSit'], [3.3, 'sit']] },
+      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit']] },
     { id: 'C3',       look: 'casual3', y: 0.15, path: [[0, -10.22, -30.6]], face: 90, seat: 0.45,
-      states: [[0, 'sit'], [2.42, 'earPopSit'], [3.3, 'sit']] },
+      states: [[0, 'sit'], [1.85, 'earPopSit'], [3.3, 'sit']] },
     { id: 'R1',       look: 'casual1', y: 0.15, path: [[0, 9.9, -62], [2.42, 9.9, -59], [3.6, 9.9, -59], [11, 9.9, -49]],
-      states: [[0, 'walk'], [2.42, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [12.8, 'stumble']] },
+      states: [[0, 'walk'], [1.85, 'earPop'], [3.3, 'look'], [3.6, 'walk'], [12.8, 'stumble']] },
   ],
 };
 

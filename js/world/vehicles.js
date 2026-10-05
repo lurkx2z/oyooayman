@@ -327,7 +327,7 @@ class Vehicle {
     this.isMoto = spec.type === 'moto';
     this.seed = hash1(spec.id.length * 977 + spec.id.charCodeAt(0));
     // drivers "let go" of the brake when they lose consciousness
-    this.driverOut = 12.6 + this.seed * 2.2;
+    this.driverOut = 19.5 + this.seed * 6;   // seated drivers outlast standing people (~17–25 s after O₂ = 0)
     this.combustion = !this.isEV;
   }
 

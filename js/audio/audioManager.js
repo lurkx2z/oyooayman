@@ -114,10 +114,11 @@ class AudioManager {
     // ---- hearing: pressure drop pops the ears → muffled, then hypoxia dulls hearing
     const f = muffle.frequency;
     f.setValueAtTime(18000, 0);
-    f.setValueAtTime(18000, tZero + 0.02);
-    f.exponentialRampToValueAtTime(520, tZero + 0.09);
-    f.exponentialRampToValueAtTime(5200, tZero + 1.3);
-    f.exponentialRampToValueAtTime(9000, tZero + 3.0);
+    const tPop = 2.05;   // the big pressure step (O₂ 15 → 3 %)
+    f.setValueAtTime(18000, tPop + 0.02);
+    f.exponentialRampToValueAtTime(520, tPop + 0.09);
+    f.exponentialRampToValueAtTime(5200, tPop + 1.3);
+    f.exponentialRampToValueAtTime(9000, tPop + 3.0);
     f.setValueAtTime(9000, 9.8);
     f.exponentialRampToValueAtTime(5200, 12.5);
     f.exponentialRampToValueAtTime(1900, 15.0);
@@ -198,8 +199,8 @@ class AudioManager {
       t += frantic ? rng.range(0.25, 0.7) : rng.range(0.18, 0.55);
     }
     // a few panicked wing flaps as birds fall (distant)
-    for (let k = 0; k < 7; k++) S.flap(tZero + 0.1 + k * 0.12, rng.range(-0.6, 0.6), 0.03, bus);        // flock scatters
-    for (let k = 0; k < 6; k++) S.flap(5.2 + k * 0.5 + rng.range(0, 0.2), rng.range(-0.4, 0.4), 0.018, bus);   // faltering
+    for (let k = 0; k < 7; k++) S.flap(1.9 + k * 0.12, rng.range(-0.6, 0.6), 0.03, bus);                // flock scatters
+    for (let k = 0; k < 6; k++) S.flap(10.4 + k * 0.5 + rng.range(0, 0.2), rng.range(-0.4, 0.4), 0.018, bus);  // faltering
   }
 
   _footsteps(S, bus) {
@@ -321,8 +322,7 @@ class AudioManager {
     const sg = ctx.createGain(), sp = ctx.createStereoPanner();
     n.connect(b1); n.connect(b2); b1.connect(sg); b2.connect(sg); sg.connect(sp); sp.connect(bus);
     const s2 = ctx.createGain(); s2.gain.value = 0.3; sp.connect(s2); s2.connect(rev);
-    const tZ = tl.at('o2_zero');
-    this._applySpatial(pts.filter((q) => q.t <= tStop + 0.05), sg.gain, sp.pan, [], 0.5, (t) => (t > tZ && t < tZ + 0.42 ? 0.02 : 0.75 + 0.25 * Math.sin(t * 13) * Math.sin(t * 3.1)));
+    this._applySpatial(pts.filter((q) => q.t <= tStop + 0.05), sg.gain, sp.pan, [], 0.5, (t) => (t > 1.85 && t < 2.27 ? 0.02 : 0.75 + 0.25 * Math.sin(t * 13) * Math.sin(t * 3.1)));
     sg.gain.setValueAtTime(0.0001, tStop + 0.06);
   }
 
@@ -342,11 +342,11 @@ class AudioManager {
     ng.gain.setValueAtTime(0.0001, t0); ng.gain.exponentialRampToValueAtTime(0.09, tZ - 0.03); ng.gain.setValueAtTime(0.0001, tZ);
     n.connect(bp); bp.connect(ng); ng.connect(bus);
     // at 0 %: no explosion (nothing moves in the air) — it's INSIDE your head: eardrum thump + pop
-    S.thump(tZ, 0.7, bus);
-    S.pop(tZ + 0.05, 0.42, bus);
-    // smaller pops while the pressure is already falling, and an involuntary exhale as lung air expands
-    S.pop(1.62, 0.16, bus); S.pop(2.02, 0.2, bus);
-    S.breath(tZ + 0.06, 0.55, 0, 0.13, bus);
+    // the middle ear vents every few kPa: a crackle of pops as pressure falls (most of it by ~2.1 s),
+    // one deep thump at the big step, and an involuntary exhale as the air in your lungs expands
+    for (const [tp, v] of [[1.48, 0.12], [1.66, 0.16], [1.8, 0.2], [1.92, 0.24], [2.05, 0.42], [2.2, 0.18], [2.34, 0.12]]) S.pop(tp, v, bus);
+    S.thump(2.03, 0.7, bus);
+    S.breath(2.08, 0.6, 0, 0.13, bus);
     // pressure ringing afterwards
     S.ring(tZ + 0.1, 1.8, 7400, 0.012, bus);
   }

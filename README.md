@@ -8,15 +8,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 | Time | Beat |
 |---|---|
 | 0–1.3 s | Normal sunny street. You walk toward a charcoal-grill cart (flames). A worker on a scissor lift throws a bright spark fan, there's traffic, birds, and a rooftop LED billboard. Hook title. The O₂ HUD already creeps down from 21.0 % |
-| 1.3–2.4 s | O₂ crashes to 0 %. Ears start popping. Grill flames die at about 15 %. Engines misfire and stop while O₂ is still falling |
-| 2.4 s | **0 %.** Pressure drops 21 % instantly. Everyone (including your own hands) jerks up to their ears, birds dip and scatter, the camera jolts with a colour shock, sound muffles, and you exhale involuntarily |
+| 1.3–2.4 s | O₂ crashes to 0 % and pressure falls with it: a crackle of ear pops. Grill flames die at about 15 %. Engines misfire and stop while O₂ is still falling. At the big pressure step (about 2.05 s) everyone, including your own hands, jerks up to their ears; birds dip and scatter; the camera jolts with a colour shock; sound muffles; and you exhale involuntarily |
+| 2.4 s | **0 %.** Air pressure is down 21 % |
 | 3.0 s | The HUD swaps to the deadline: **YOU BLACK OUT IN ≈ 00:16** |
 | 3.4–5.3 s | **You click your own lighter**: a blue piezo spark, gas hisses, no flame. Meanwhile the grill gives off white smoke (fat still cooks without a flame) and its coals glow dull red (hot, not burning) |
 | 5.5–6.1 s | The worker's battery grinder still spins, but its sparks are short and dull: hot steel can't burn without O₂ |
 | 6.3 s | **The grid collapses** (60 % of power came from burning fuel). The rooftop billboard flickers and dies, signals switch to battery flashing red, the mains hum cuts out |
 | 6.75 s | A coasting car rear-ends the stalled car 16 m ahead. Its alarm and hazards keep going on battery |
 | 7.3–8.9 s | **A blue electric car keeps driving** through the dead traffic and passes you |
-| 9.5–15 s | "Each breath pulls O₂ out of your blood." Dizziness, hands to heads, tunnel vision and desaturation build, and the countdown turns red and pulses with your heartbeat. The hard-working lift worker passes out first (about 10 s without O₂) and folds over the railing. People stumble, kneel and sit down. Your own trembling hand drifts into view. Phase 1 ends about 4 s before *you* black out |
+| 9.5–15 s | "Each breath pulls O₂ out of your blood." Dizziness, hands to heads, tunnel vision and desaturation build, and the countdown turns red and pulses with your heartbeat. The hard-working lift worker passes out first (about 10 s without O₂) and folds over the railing. Birds start falling from the sky. Standing people stumble, kneel and sit down; seated drivers last longest. Your own trembling hand drifts into view. Phase 1 ends about 4 s before *you* black out |
 
 ---
 
