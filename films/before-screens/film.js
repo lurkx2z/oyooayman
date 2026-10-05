@@ -20,7 +20,27 @@ const BS_HAND_POSES = {
   handle: { p: [0.07, -0.3, -0.42], F: [-0.25, -0.12, -1], N: [0.05, -1, -0.15], curl: [0.95, 1.0, 1.0, 1.05], thumb: [0.55, 0.65] },
   push:   { p: [0.06, -0.27, -0.6], F: [-0.25, -0.1, -1], N: [0.05, -1, -0.15], curl: [0.85, 0.9, 0.95, 1.0], thumb: [0.55, 0.6] },
 };
-const BS_HAND_BLEND = { phone: 0.25, swipe: 0.18, tap: 0.1, lower: 0.5, handle: 0.42, push: 0.4, hidden: 0.45 };
+Object.assign(BS_HAND_POSES, {
+  // marbles: kneeling, knuckles on the dirt behind your shooter, thumb cocked behind the index finger → flick
+  // (fist on its knuckles, thumb side up, palm facing left; looking down ~60° that is fingers 'up' the frame)
+  knuckle: { p: [0.012, -0.17, -0.6], F: [0.05, 0.85, -0.53], N: [-1, 0.05, 0.05], curl: [1.25, 1.45, 1.5, 1.5], thumb: [0.3, 1.05] },
+  flick:   { p: [0.012, -0.168, -0.602], F: [0.05, 0.85, -0.53], N: [-1, 0.05, 0.05], curl: [1.15, 1.45, 1.5, 1.5], thumb: [0.95, -0.05] },
+  // the top: held point-up in the palm with the string wound, wound back, thrown down hard
+  topHold:  { p: [0.06, -0.15, -0.36], F: [-0.1, 0.35, -1], N: [0.1, 1, 0.25], curl: [0.75, 0.8, 0.85, 0.9], thumb: [0.7, 0.45] },
+  topWind:  { p: [0.13, -0.02, -0.24], F: [0.1, 0.8, -0.6], N: [0.2, 0.4, 0.9], curl: [0.8, 0.85, 0.9, 0.95], thumb: [0.7, 0.45] },
+  topThrow: { p: [0.04, -0.34, -0.5], F: [-0.1, -0.7, -0.75], N: [0.1, -0.6, 0.8], curl: [0.25, 0.3, 0.35, 0.4], thumb: [0.6, 0.15] },
+});
+const BS_HAND_BLEND = { phone: 0.25, swipe: 0.18, tap: 0.1, lower: 0.5, handle: 0.42, push: 0.4, hidden: 0.45, knuckle: 0.45, flick: 0.06, topHold: 0.3, topWind: 0.32, topThrow: 0.14 };
+
+// where the viewer's head and hands are at any moment (for toys that leave your hand mid-shot)
+class POVProbe {
+  constructor() { this.cam = new THREE.PerspectiveCamera(62, 9 / 16, 0.03, 100); this.cc = new CameraController(this.cam, CONFIG.camera); }
+  handWorld(t, pose, side, out) {
+    this.cc.update(t);
+    const P = BS_HAND_POSES[pose] || HAND_POSES[pose] || HAND_POSES.hidden;
+    return out.set(P.p[0] * side, P.p[1], P.p[2]).applyMatrix4(this.cam.matrixWorld);
+  }
+}
 
 const FILM = {
   build(app) {
@@ -29,16 +49,21 @@ const FILM = {
     app.town = new HistoricTown(scene, renderer);
     app.town.build();
     // the viewer's own (modern) hands: a 10-year-old's, grey-blue hoodie sleeves, no watch
-    app.hands = new ViewerHands(camera, { scale: 0.84, skin: '#c9997c', nail: '#e2c2b2', sleeve: '#5d6d7c', cuff: '#4f5d6a', watch: false, poses: BS_HAND_POSES, blends: BS_HAND_BLEND });
+    app.hands = new ViewerHands(camera, { scale: 0.84, skin: '#c9997c', nail: '#e2c2b2', sleeve: '#6b6d72', cuff: '#595b60', watch: false, poses: BS_HAND_POSES, blends: BS_HAND_BLEND });
     app.room = new ModernRoom(scene);
     app.room.build(app.hands);
     app.kids = new ChildrenSystem(scene);
     app.toys = new ToySystem(scene, app.kids);
+    app.pov = new POVProbe();
+    app.marbles = new MarbleGame(scene);
+    app.top = new SpinningTop(scene, app.hands, app.pov);
+    app.jacks = new JacksGame(scene, app.kids);
+    app.workshop = new KiteWorkshop(scene, app.kids, app.hands);
     // the shared material rule: matte environment, glossy glass and metal (no city grime in this film)
     const skip = new Set(); camera.traverse((o) => skip.add(o));
     scene.traverse((o) => { if (o.isMesh && !skip.has(o)) for (const m of [].concat(o.material)) if (m && m.isMeshStandardMaterial && !/person/.test(o.parent && o.parent.name || '')) Look.surface(m, false); });
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
-    app.audio = new BeforeScreensAudio(app.tl, app.kids);
+    app.audio = new BeforeScreensAudio(app.tl, app.kids, app);
   },
 
   update(app, t, tl) {
@@ -47,7 +72,12 @@ const FILM = {
     app.room.update(t, t < 9.2);
     app.town.update(t, app.camera, true);
     app.kids.update(t, t > 5.6);
-    app.toys.update(t, t > 5.6);
+    app.toys.update(t, t > 5.6 && t < 15.2);
+    for (const k of app.kids.people) if (k.stick) k.stick.visible = t < 15.2;    // hoop sticks belong to the street race
+    app.marbles.update(t, t >= 14.9 && t < 20.4);
+    app.top.update(t, t >= 20.3 && t < 24.4);
+    app.jacks.update(t, true);
+    app.workshop.update(t, t > 25.5 && t < 35);
     // light: inside the evening room only the lamp, the dusk window and the phone; outside, the sun and the sky
     app.town.hemi.intensity = day ? 0.72 : 0.3;
     app.scene.environmentIntensity = day ? 0.5 : 0.05;

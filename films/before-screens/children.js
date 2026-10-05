@@ -116,7 +116,85 @@ Object.assign(ACTIONS, {
     return p;
   },
 });
-Object.assign(BLEND, { run: 0.3, runLaugh: 0.3, hoopRun: 0.3, reach: 0.15, startle: 0.12, catchIdle: 0.4, jumpRope: 0.3, sitStep: 0.6, carry: 0.5, hangWash: 0.6, sitBench: 0.6 });
+/* ---- pocket games, workshop, celebrations ---- */
+Object.assign(ACTIONS, {
+  kneelWatch(τ, c) {
+    const p = ACTIONS.kneel(τ, c);
+    p.spine = 0.62 + Math.sin(τ * 1.3 + c.seed * 5) * 0.03; p.neck = 0.55; p.spineRoll = 0;
+    p.lSh = [0.95, 0.16]; p.rSh = [0.95, 0.16]; p.lEl = 0.25; p.rEl = 0.25;     // hands on the ground in front
+    p.headYaw = noise1(τ * 0.4, c.seedI) * 0.15;
+    return p;
+  },
+  kneelShoot(τ, c) {
+    const p = ACTIONS.kneelWatch(τ, c);
+    p.spine = 0.85; p.neck = 0.5; p.rSh = [1.1, 0.05]; p.rEl = 0.1; p.lSh = [0.7, 0.3]; p.lEl = 0.4;
+    return p;
+  },
+  kneelGroan(τ, c) {
+    const p = ACTIONS.kneel(τ, c);
+    const k = MathX.smooth(τ, 0, 0.3);
+    p.spine = 0.1 - 0.25 * k; p.neck = -0.3 * k; p.lSh = [2.6 * k, 0.4]; p.rSh = [2.6 * k, 0.4]; p.lEl = 1.9 * k; p.rEl = 1.9 * k;
+    return p;
+  },
+  kneelCheer(τ, c) {
+    const p = ACTIONS.kneel(τ, c);
+    const b = Math.abs(Math.sin(τ * 7));
+    p.spine = 0.05; p.neck = -0.15; p.lSh = [2.5 + 0.3 * b, 0.35]; p.rSh = [2.5 + 0.3 * b, 0.35]; p.lEl = 0.3; p.rEl = 0.3; p.hipY += 0.04 * b;
+    return p;
+  },
+  lookDown(τ, c) {
+    const p = basePose();
+    p.spine = 0.62; p.neck = 0.42; p.hipY = 0.88; p.lKnee = p.rKnee = 0.32; p.lHip = p.rHip = [0.32, 0.06];
+    p.lSh = [0.75, 0.05]; p.rSh = [0.75, 0.05]; p.lEl = 0.45; p.rEl = 0.45;      // hands on the knees
+    p.headYaw = noise1(τ * 0.4, c.seedI) * 0.2;
+    return p;
+  },
+  cheer(τ, c) {
+    const p = basePose(), b = Math.abs(Math.sin(τ * 7.5 + c.seed));
+    p.hipY = 0.93 + 0.07 * b; p.lKnee = p.rKnee = 0.2 * (1 - b); p.neck = -0.2;
+    p.lSh = [2.7, 0.35 + 0.2 * b]; p.rSh = [2.7, 0.35 + 0.2 * b]; p.lEl = 0.25; p.rEl = 0.25;
+    return p;
+  },
+  squatWatch(τ, c) {
+    const p = basePose();
+    p.hipY = 0.42; p.lHip = [1.95, 0.32]; p.rHip = [1.95, 0.32]; p.lKnee = p.rKnee = 2.35; p.lFoot = p.rFoot = 0.55;
+    p.spine = 0.55; p.neck = 0.35; p.lSh = [0.9, 0.22]; p.rSh = [0.95, 0.22]; p.lEl = 1.0; p.rEl = 0.95;
+    p.headYaw = noise1(τ * 0.5, c.seedI) * 0.12;
+    return p;
+  },
+  sitCross(τ, c) {
+    const p = basePose();
+    p.hipY = 0.14; p.lHip = [1.45, 0.75]; p.rHip = [1.45, 0.75]; p.lKnee = p.rKnee = 2.4; p.lFoot = p.rFoot = 0.4;
+    p.spine = 0.3; p.neck = 0.3; p.lSh = [0.55, 0.2]; p.rSh = [0.55, 0.2]; p.lEl = 0.9; p.rEl = 0.9;
+    p.headYaw = noise1(τ * 0.4, c.seedI) * 0.2;
+    return p;
+  },
+  // jacks: toss the ball, sweep up jacks from the ground, catch it (tosses every 0.8 s from the start)
+  jacks(τ, c) {
+    const p = ACTIONS.sitCross(τ, c);
+    const T = 0.8, f = ((τ + 0.35) % T) / T;
+    const up = 1 - MathX.smooth(f, 0.0, 0.18) + MathX.smooth(f, 0.72, 0.95);
+    const sweep = MathX.smooth(f, 0.18, 0.35) * (1 - MathX.smooth(f, 0.55, 0.72));
+    p.rSh = [0.9 + 0.55 * up - 0.1 * sweep, 0.12]; p.rEl = 0.9 - 0.5 * up - 0.6 * sweep; p.spine = 0.3 + 0.35 * sweep; p.neck = 0.3 - 0.4 * up * (1 - sweep);
+    return p;
+  },
+  benchWork(τ, c) {
+    const p = basePose();
+    const w = noise1(τ * 2.2, c.seedI), w2 = noise1(τ * 2.6, c.seedI + 5);
+    p.spine = 0.42; p.neck = 0.45; p.lKnee = p.rKnee = 0.1;
+    p.lSh = [0.95 + 0.12 * w, 0.06]; p.rSh = [0.95 + 0.12 * w2, 0.06]; p.lEl = 0.75 + 0.2 * w2; p.rEl = 0.75 + 0.2 * w;
+    p.headYaw = 0.12 * w; p.spineYaw = 0.06 * w2;
+    return p;
+  },
+  holdKiteUp(τ, c) {
+    const p = basePose(), lift = MathX.smooth(τ, 0, 0.5);
+    p.lSh = [MathX.lerp(0.9, 2.75, lift), 0.18]; p.rSh = [MathX.lerp(0.9, 2.75, lift), 0.18]; p.lEl = 0.25; p.rEl = 0.25;
+    p.neck = -0.35 * lift; p.spine = -0.08 * lift; p.hipY = 0.93 + 0.02 * Math.sin(τ * 3);
+    return p;
+  },
+});
+Object.assign(BLEND, { run: 0.3, runLaugh: 0.3, hoopRun: 0.3, reach: 0.15, startle: 0.12, catchIdle: 0.4, jumpRope: 0.3, sitStep: 0.6, carry: 0.5, hangWash: 0.6, sitBench: 0.6,
+  kneelWatch: 0.4, kneelShoot: 0.25, kneelGroan: 0.2, kneelCheer: 0.15, lookDown: 0.4, cheer: 0.2, squatWatch: 0.5, sitCross: 0.5, jacks: 0.3, benchWork: 0.5, holdKiteUp: 0.3 });
 
 /* ---- geometry shared by all children ---- */
 const KidGeo = {
@@ -304,6 +382,35 @@ class Child extends Person {
     this.j = { body, hips, spine, neck, head, la, ra, ll, rl };
   }
 
+  // value of a [[t, v], ...] list at time t (last entry at or before t)
+  _seg(list, t, def) { let v = def; if (list) for (const [tt, val] of list) { if (t >= tt) v = val; else break; } return v; }
+
+  _dirOf(i, t = 0) {
+    const f = this._seg(this.spec.faces, t, this.spec.face);
+    if (f !== undefined && f !== null) return Math.PI + MathX.deg(f);
+    const P = this.pathPts;
+    if (P.length < 2) return Math.PI;
+    for (let k = Math.min(i, P.length - 2); k >= 0; k--) {
+      const a = P[k], b = P[k + 1];
+      if (b[0] - a[0] > 0.01 && Math.hypot(b[1] - a[1], b[2] - a[2]) > 1e-3) return Math.atan2(b[1] - a[1], b[2] - a[2]);
+    }
+    return Math.PI;
+  }
+
+  shown(t) { return !this.spec.show || this.spec.show.some(([a, b]) => t >= a && t < b); }
+
+  update(t) {
+    const vis = this.shown(t);
+    this.root.visible = vis;
+    if (!vis) return;
+    const loc = this.locate(t);
+    const ctx = { seed: this.seed, seedI: this.seedI, walkPhase: (loc.dist / (this.spec.stride || 1.32)) * Math.PI * 2, seat: this._seg(this.spec.seats, t, this.spec.seat) };
+    this.root.position.set(loc.x, this._seg(this.spec.ys, t, this.spec.y || 0), loc.z);
+    this.root.rotation.y = loc.dir;
+    this.apply(this.poseAt(t, ctx));
+    this.root.updateMatrixWorld(true);
+  }
+
   // ball games: throws and catches layered over the current action (SCRIPT.throws)
   poseAt(t, ctx) {
     const p = super.poseAt(t, ctx);
@@ -347,10 +454,10 @@ class ChildrenSystem {
   update(t, visible = true) {
     this.blobs.begin();
     for (const p of this.people) {
-      p.root.visible = visible;
-      if (!visible) continue;
+      if (!visible) { p.root.visible = false; continue; }
       p.update(t);
-      const gy = p.spec.y || 0;
+      if (!p.root.visible) continue;
+      const gy = p._seg(p.spec.ys, t, p.spec.y || 0);
       for (const [part, r] of [['hips', 0.34], ['neck', 0.26], ['head', 0.18]]) {
         const w = p.worldOf(part, this._v);
         const k = MathX.clamp(1 - Math.max(0, w.y - gy) / 1.2, 0, 1);

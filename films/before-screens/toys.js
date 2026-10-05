@@ -78,12 +78,13 @@ class ToySystem {
       const run = (k.states || []).some((s) => /run|reach|startle/i.test(s[1]));
       if (!run) continue;
       const stride = k.spec.stride || 1.32;
-      let prevStep = null;
+      let prevStep = null, prevDist = null;
       for (let j = 30; j >= 0; j--) {
         const tt = t - j / 30;
-        if (tt < 0) continue;
+        if (tt < 0 || !k.shown(tt)) { prevStep = null; continue; }
         const L = k.locate(tt);
-        if (!L.moving) { prevStep = null; continue; }
+        const jump = prevDist !== null && L.dist - prevDist > 0.5; prevDist = L.dist;   // a cut between scenes is not a footstep
+        if (!L.moving || jump) { prevStep = null; continue; }
         const step = Math.floor(L.dist / (stride / 2));
         if (prevStep !== null && step !== prevStep) {
           const age = t - tt, side = step % 2 ? 1 : -1;

@@ -12,9 +12,10 @@
    ===================================================================== */
 
 class BeforeScreensAudio extends AudioEngine {
-  constructor(tl, kids) {
+  constructor(tl, kids, app) {
     super(tl);
     this.kids = kids;
+    this.app = app;
     this.wavName = SCRIPT.meta.wav;
   }
 
@@ -27,6 +28,11 @@ class BeforeScreensAudio extends AudioEngine {
 
   _build(ctx) {
     const S = new SoundKit(ctx, CONFIG.seed), end = CONFIG.duration;
+    // Chrome's offline renderer can spike on exponential ramps shorter than one 128-sample block:
+    // this film's envelopes use a linear attack and an exponential (setTarget) decay instead, and tones get a 6 ms minimum attack
+    S.env = (g, t, a, peak, d) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t + Math.max(a, 0.006)); g.gain.setTargetAtTime(0, t + Math.max(a, 0.006), Math.max(0.004, d / 4)); };
+    const tone = S.tone.bind(S);
+    S.tone = (t, dur, f, vol, pan, dest, type = 'sine', attack = 0.01, release = null) => tone(t, dur, f, vol, pan, dest, type, Math.max(attack, 0.006), release);
     // mix → make-up gain (+15 dB: social-video loudness) → glue compressor → limiter
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3; comp.attack.value = 0.005; comp.release.value = 0.25;
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12;
@@ -46,7 +52,106 @@ class BeforeScreensAudio extends AudioEngine {
     this._outside(S, bus, outSend);
     this._kidsSound(S, bus, outSend);
     this._povSteps(S, bus, roomSend, outSend);
+    this._pocket(S, bus, outSend);
+    this._workshop(S, bus, outSend, music);
     this._music(S, music, musSend);
+  }
+
+  /* little sound builders */
+  // a shaker hit: a pre-baked, enveloped burst of high noise (no gain automation)
+  _shaker(S, t, vol, dest) {
+    if (!this._shakeBuf) {
+      const sr = S.ctx.sampleRate, len = Math.floor(sr * 0.06), b = S.ctx.createBuffer(1, len, sr), d = b.getChannelData(0), r = new RNG(5);
+      let prev = 0;
+      for (let i = 0; i < len; i++) { const w = r.next() * 2 - 1, hp = w - prev; prev = w; d[i] = hp * 0.5 * Math.min(1, i / (sr * 0.003)) * Math.exp(-i / (sr * 0.012)); }
+      this._shakeBuf = b;
+    }
+    const s = S.ctx.createBufferSource(), g = S.ctx.createGain(); s.buffer = this._shakeBuf; g.gain.value = vol * 0.02;
+    s.connect(g); g.connect(dest); s.start(t);
+  }
+
+  _glass(S, t, vol, pan, dest) {
+    const f = S.rng.range(2600, 4200);
+    S.tone(t, 0.05, f, vol, pan, dest, 'sine', 0.001, 0.045); S.tone(t, 0.035, f * 2.7, vol * 0.4, pan, dest, 'sine', 0.001, 0.03);
+    S.click(t, vol * 0.8, pan, dest);
+  }
+  _rustle(S, t, dur, vol, pan, dest, f = 3200) {
+    const ctx = S.ctx, n = S.noise('white', t, t + dur), bp = S.filter('bandpass', f, 0.9), g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    for (let k = 0; k < dur / 0.03; k++) g.gain.linearRampToValueAtTime(vol * (0.3 + 0.7 * S.rng.next()), t + k * 0.03 + 0.015);
+    g.gain.linearRampToValueAtTime(0.0001, t + dur);
+    n.connect(bp); bp.connect(g); g.connect(S.panned(dest, pan));
+  }
+  _whoosh(S, t, dur, vol, pan, dest, f0 = 400, f1 = 2400) {
+    const ctx = S.ctx, n = S.noise('pink', t, t + dur), bp = S.filter('bandpass', f0, 1.2), g = ctx.createGain();
+    bp.frequency.setValueAtTime(f0, t); bp.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.6); bp.frequency.exponentialRampToValueAtTime(f0, t + dur);
+    S.env(g, t, dur * 0.5, vol, dur * 0.5); n.connect(bp); bp.connect(g); g.connect(S.panned(dest, pan));
+  }
+
+  /* marbles (from the physics), the top, jacks */
+  _pocket(S, bus, rev) {
+    const ctx = S.ctx, M = this.app && this.app.marbles;
+    // knees on the gravel as you kneel at the ring
+    S.crunch(15.45, 0.05, -0.1, bus, rev); S.crunch(15.75, 0.045, 0.1, bus, rev);
+    if (M) {
+      const C = POCKET.ring;
+      for (const h of M.sim.hits) { const R = this._rel(h.x, h.z, h.t, 0.6); this._glass(S, h.t, Math.min(0.09, 0.03 + 0.05 * h.v) * R.gain * 2, R.pan, bus); }
+      // rolling: a soft grit whose level follows how fast the marbles are moving
+      const n = S.noise('white', 17.3, 21.0), bp = S.filter('bandpass', 2400, 0.7), g = ctx.createGain(); g.gain.value = 0.0001;
+      n.connect(bp); bp.connect(g); g.connect(bus);
+      for (let t = 17.3; t < 21.0; t += 1 / 30) { const st = M.stateAt(t); let v = 0; for (const m of st.a) v += m.v; g.gain.linearRampToValueAtTime(Math.min(0.03, v * 0.018) + 0.0001, t); }
+    }
+    S.click(17.34, 0.04, 0.05, bus);                      // the flick
+    S.click(19.36, 0.025, -0.25, bus);
+    { const a = S.ctx; S.laugh(17.8, 0.03, -0.2, bus, 520, 3); S.voice(17.75, 600, 0.35, 'o', 0.03, 0.2, bus, 1.15); }   // "ooh!" from the others
+    S.voice(19.95, 420, 0.45, 'a', 0.028, -0.3, bus, 0.75);  // your friend groans
+    S.laugh(20.1, 0.02, 0.15, bus, 560, 4);
+    // the top: string zip, landing tap, whirr with a rattle that grows as it wobbles, the clatter as it falls
+    const T = POCKET.top;
+    this._whoosh(S, T.tThrow - 0.05, 0.3, 0.05, 0.05, bus, 900, 4000);
+    S.click(T.tLand, 0.06, 0, bus); S.tone(T.tLand, 0.06, 420, 0.04, 0, bus, 'sine', 0.001, 0.05);
+    const D = T.tFall - T.tLand;
+    const o = ctx.createOscillator(), og = ctx.createGain(), lp = S.filter('lowpass', 900, 0.7);
+    o.type = 'triangle'; o.frequency.setValueAtTime(240, T.tLand); o.frequency.linearRampToValueAtTime(120, T.tFall);
+    og.gain.setValueAtTime(0.0001, T.tLand); og.gain.exponentialRampToValueAtTime(0.022, T.tLand + 0.1);
+    const rat = S.noise('white', T.tLand, T.tFall + 0.1), rb = S.filter('bandpass', 1800, 1.5), rg = ctx.createGain(); rg.gain.value = 0.0001;
+    for (let t = T.tLand; t < T.tFall; t += 0.02) {
+      const s = t - T.tLand, k = s / D, prec = 4 + 14 * k;            // the wobble frequency rises as it slows
+      og.gain.linearRampToValueAtTime(0.022 * (1 - 0.4 * k), t);
+      rg.gain.linearRampToValueAtTime(0.0001 + 0.03 * k * k * (0.5 + 0.5 * Math.sin(2 * Math.PI * prec * s)), t);
+    }
+    og.gain.linearRampToValueAtTime(0.0001, T.tFall + 0.05); rg.gain.linearRampToValueAtTime(0.0001, T.tFall + 0.1);
+    o.connect(lp); lp.connect(og); og.connect(bus); o.start(T.tLand); o.stop(T.tFall + 0.1);
+    rat.connect(rb); rb.connect(rg); rg.connect(bus);
+    for (let k = 0; k < 5; k++) { S.click(T.tFall + 0.04 + k * (0.07 + k * 0.03), 0.05 * (1 - k * 0.15), 0, bus); S.tone(T.tFall + 0.04 + k * 0.09, 0.05, 520 - k * 40, 0.025, 0, bus, 'sine', 0.001, 0.04); }
+    S.laugh(T.tFall + 0.35, 0.022, 0.3, bus, 500, 4);
+    // jacks: each toss — a sweep of metal on wood, the ball back in the hand
+    const J = POCKET.jacks;
+    for (let n = 0; ; n++) {
+      const t0 = J.t0 - 0.35 + n * 0.8;
+      if (t0 > J.t1) break;
+      if (t0 + 0.2 < J.t0) continue;
+      for (let k = 0; k < 4; k++) this._glass(S, t0 + 0.24 + k * 0.035, 0.012, -0.3, bus);
+      S.tone(t0 + 0.74, 0.05, 300, 0.03, -0.3, bus, 'sine', 0.001, 0.04);
+    }
+    S.laugh(25.95, 0.025, -0.3, bus, 560, 4);
+  }
+
+  /* the workshop: paper, twine, chatter; the montage cuts land on the beat; the kite reveal */
+  _workshop(S, bus, rev, mus) {
+    const W = KITE.bench;
+    S.chatter(26.6, 30.6, 0.022, -0.2, bus, 470, 4);
+    for (const t of [27.4, 28.6, 29.5, 30.2]) this._rustle(S, t, 0.35, 0.03, -0.15, bus);
+    for (const t of [28.1, 29.9]) S.voice(t, 300, 0.12, 'i', 0.008, 0.1, bus, 1.4);     // twine squeak
+    // montage: a woody knock on every cut, with the sound of what is being done
+    for (const t of [30.85, 31.85, 32.35]) { S.clunk(t, 0.08, 0, mus); S.tone(t, 0.12, 82, 0.05, 0, mus, 'sine', 0.003, 0.1); }
+    for (let k = 0; k < 6; k++) S.voice(31.0 + k * 0.12, 260 + k * 30, 0.08, 'i', 0.008, 0.1, bus, 1.3);   // twine wound tight
+    this._rustle(S, 31.9, 0.4, 0.05, 0, bus, 2000);    // paste brushed on paper
+    this._rustle(S, 32.4, 0.35, 0.04, 0.1, bus, 4200); // rag bows tied
+    // the reveal: a gust, the tail flutters, the gang cheers
+    this._whoosh(S, 32.75, 1.6, 0.06, 0.2, bus, 300, 1800);
+    for (let k = 0; k < 10; k++) this._rustle(S, 33.0 + k * 0.18, 0.12, 0.012, 0.2, bus, 3500);
+    S.laugh(33.05, 0.03, 0.3, bus, 520, 5); S.voice(32.95, 640, 0.4, 'e', 0.025, -0.25, bus, 1.2);
   }
 
   /* modern room: a low hum of a house at night */
@@ -143,10 +248,12 @@ class BeforeScreensAudio extends AudioEngine {
       const runner = (k.states || []).some((s) => /run|carry/i.test(s[1]));
       if (!runner) continue;
       const stride = k.spec.stride || 1.32;
-      let prev = null;
+      let prev = null, prevDist = null;
       for (let t = 5.8; t < CONFIG.duration; t += 1 / 120) {
+        if (!k.shown(t)) { prev = null; continue; }
         const L = k.locate(t);
-        if (!L.moving) { prev = null; continue; }
+        const jump = prevDist !== null && L.dist - prevDist > 0.5; prevDist = L.dist;
+        if (!L.moving || jump) { prev = null; continue; }
         const step = Math.floor(L.dist / (stride / 2));
         if (prev !== null && step !== prev) {
           const R = this._rel(L.x, L.z, t, 3);
@@ -196,7 +303,7 @@ class BeforeScreensAudio extends AudioEngine {
     // running: the same step rhythm as the camera bob
     const C = SCRIPT.camera, tx = new Track(C.x), tz = new Track(C.z), P = CONFIG.camera;
     let ph = 0, prev = null, px = tx.value(12.0), pz = tz.value(12.0);
-    for (let t = 12.0; t < CONFIG.duration; t += 1 / 120) {
+    for (let t = 12.0; t < 15.0; t += 1 / 120) {
       const x = tx.value(t), z = tz.value(t), dd = Math.hypot(x - px, z - pz), sp = dd * 120;
       ph += dd * P.bobFrequency / (1 + Math.max(0, sp / P.walkSpeed - 1) * (P.runStrideGain || 0));
       const step = Math.floor(ph);
@@ -229,12 +336,22 @@ class BeforeScreensAudio extends AudioEngine {
     // the street: a light rhythm, 120 bpm, D – A – Bm – G
     const bar = 2.0, t0 = 9.85;
     const chords = [[146.8, 220, 293.7, 370], [110, 220, 277.2, 329.6], [123.5, 246.9, 293.7, 370], [98, 196, 246.9, 293.7]];
-    for (let t = t0, i = 0; t < CONFIG.duration + 0.5; t += 0.25, i++) {
+    for (let t = t0, i = 0; t < Math.min(CONFIG.duration + 0.5, 32.85); t += 0.25, i++) {
       const c = chords[Math.floor((t - t0) / bar) % 4], beat = i % 8;
+      if (t > 20.35 && t < 24.35 && beat % 2 === 1) continue;     // sparser while the top spins
       const pat = [0, 2, 1, 3, 2, 1, 3, 2][beat];
       S.pluck(t, c[pat] * 2, 0.045, (beat % 2 ? 0.25 : -0.2), mus, 0.9, 0.62);
       if (beat === 0 || beat === 4) { S.pluck(t, c[0], 0.07, 0, mus, 1.4, 0.3); S.tone(t, 0.12, 62, 0.025, 0, mus, 'sine', 0.003, 0.1); }
-      if (beat % 2 === 1) { const n = S.noise('white', t, t + 0.06), hp = S.filter('highpass', 6500, 0.7), g = ctx.createGain(); S.env(g, t, 0.003, 0.008, 0.045); n.connect(hp); hp.connect(g); g.connect(mus); }
+      if (beat % 2 === 1) this._shaker(S, t, 0.5, mus);
     }
+    // the kite: a bright open chord swells, a harp sweeps up
+    for (const f of [146.8, 220, 293.7, 370, 440, 587.3, 740]) {
+      const o = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', 2400, 0.4);
+      o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = S.rng.range(-6, 6);
+      g.gain.setValueAtTime(0.0001, 32.8); g.gain.exponentialRampToValueAtTime(0.006, 33.4); g.gain.setValueAtTime(0.006, 34.4); g.gain.exponentialRampToValueAtTime(0.002, 35.5);
+      o.connect(lp); lp.connect(g); g.connect(mus); g.connect(rev); o.start(32.8); o.stop(CONFIG.duration + 1);
+    }
+    [293.7, 370, 440, 587.3, 740, 880, 1174.7].forEach((f, k) => S.pluck(32.86 + k * 0.05, f, 0.05, -0.4 + k * 0.13, rev, 2.4, 0.6));
+    S.pluck(32.86, 73.4, 0.12, 0, mus, 2.5, 0.25);
   }
 }

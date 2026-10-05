@@ -27,6 +27,7 @@ class HistoricTown {
     this._lights();
     this._street();
     this._houses();
+    this._yards();
     this._trees();
     this._props();
     this._distant();
@@ -246,6 +247,9 @@ class HistoricTown {
         let cz = z - w / 2;
         // the viewer's house sits exactly at z = 0 on the east side
         if (sd > 0 && cz < 4.6 && cz > -4.6) cz = 0;
+        // west side: two yards are kept open (washing line, kite workshop)
+        const Y = HistoricTown.YARDS;
+        if (sd < 0 && cz - w / 2 < Y.z0 && cz + w / 2 > Y.z1) { z = Y.z1 - 0.3; continue; }
         lots.push({ sd, cz, w, shop, i, gap });
         z = cz - w / 2 - gap; i++;
       }
@@ -266,6 +270,30 @@ class HistoricTown {
       // side yards: fences toward the street, a washing line in one of them
       if (!L.shop && L.gap > 2.2) this._sideYard(L, r);
     }
+  }
+
+  // the open west yards between z1 (south) and z0 (north)
+  static get YARDS() { return { z0: -9.4, z1: -28.6, split: -18.2, back: -20.5, gate: [-22.7, -21.0] }; }
+
+  _yards() {
+    const B = this.B, m = this.m, Y = HistoricTown.YARDS, x = -(BS.street.walk + 0.12);
+    // picket fence along the walk with a gate gap into the workshop yard
+    const run = (za, zb) => { for (let z = za; z <= zb; z += 0.16) B.box(0.025, 0.9, 0.085, x, 0.51, z, m.picket); for (const y of [0.32, 0.75]) B.box(0.04, 0.07, zb - za, x - 0.05, 0.06 + y, (za + zb) / 2, m.picket); };
+    run(Y.z1, Y.gate[0]); run(Y.gate[1], Y.z0);
+    for (const z of Y.gate) B.box(0.1, 1.1, 0.1, x, 0.6, z, m.picket);
+    // weathered board fences: between the yards and along the back
+    const boards = (x0, x1, z0, z1) => { const len = Math.hypot(x1 - x0, z1 - z0), n = Math.floor(len / 0.16), a = Math.atan2(x1 - x0, z1 - z0);
+      for (let i = 0; i <= n; i++) { const f = i / n; B.box(0.15, 1.5 + 0.06 * Math.sin(i * 1.7), 0.025, x0 + (x1 - x0) * f, 0.8, z0 + (z1 - z0) * f, m.weathered, a + Math.PI / 2); } };
+    boards(x - 0.1, Y.back, Y.split, Y.split);
+    boards(Y.back, Y.back, Y.z1, Y.z0);
+    // a small shed at the back of the workshop yard
+    const sx = -18.4, sz = -25.6;
+    B.box(2.4, 2.1, 3.0, sx, 1.05, sz, m.weathered);
+    B.add(new THREE.BoxGeometry(2.8, 0.06, 1.8), m.shingle, Geo.matrix(sx + 0.62, 2.35, sz, 0, 0, 0.42), { color: '#6e6a62' });
+    B.add(new THREE.BoxGeometry(2.8, 0.06, 1.8), m.shingle, Geo.matrix(sx - 0.62, 2.35, sz, 0, 0, -0.42), { color: '#6e6a62' });
+    B.box(0.05, 1.8, 0.9, sx + 1.22, 0.95, sz + 0.5, m.door, 0, { color: '#5a4632' });
+    this._tree(-15.8, -19.6, 1.2, 'elm', new RNG(41));
+    this._tree(-17.5, -12.0, 1.0, 'maple', new RNG(42));
   }
 
   _house(o) {
