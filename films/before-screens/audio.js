@@ -62,13 +62,13 @@ class BeforeScreensAudio extends AudioEngine {
     this._music(S, music, musSend);
     // phase E: the parlour has its own little room (cut dead at the return to the bedroom), then the bedroom at night (cut dead at the black),
     // and the last note on a chain of its own
-    const parl = ctx.createGain(); parl.connect(mixIn); parl.gain.setValueAtTime(1, 80.39); parl.gain.linearRampToValueAtTime(0, 80.4);
+    const parl = ctx.createGain(); parl.connect(mixIn); parl.gain.setValueAtTime(2.0, 0); parl.gain.setValueAtTime(2.0, 80.39); parl.gain.linearRampToValueAtTime(0, 80.4);   // (+6 dB: an intimate room, but not a drop-out)
     const parlRev = S.reverb(0.8), parlSend = ctx.createGain(); parlSend.gain.value = 0.3; parlSend.connect(parlRev); parlRev.connect(parl);
     const parlMus = ctx.createGain(); parlMus.gain.value = 0.6; parlMus.connect(parl);
     const parlMusRev = S.reverb(2.4), parlMusSend = ctx.createGain(); parlMusSend.gain.value = 0.42; parlMusSend.connect(parlMusRev); parlMusRev.connect(parl);
     const bed = ctx.createGain(); bed.connect(mixIn); bed.gain.setValueAtTime(0, 80.39); bed.gain.linearRampToValueAtTime(1, 80.4); bed.gain.setValueAtTime(1, 88.39); bed.gain.linearRampToValueAtTime(0, 88.4);
     const bedRev = S.reverb(0.5), bedSend = ctx.createGain(); bedSend.gain.value = 0.25; bedSend.connect(bedRev); bedRev.connect(bed);
-    const endBus = ctx.createGain(); endBus.gain.value = 3.2; endBus.connect(out);
+    const endBus = ctx.createGain(); endBus.gain.value = 6.0; endBus.connect(out);
     const endRev = S.reverb(3.0), endSend = ctx.createGain(); endSend.gain.value = 0.5; endSend.connect(endRev); endRev.connect(endBus);
     if (end > 67.6) {
       this._parlour(S, parl, parlSend, parlMus, parlMusSend);
@@ -362,7 +362,7 @@ class BeforeScreensAudio extends AudioEngine {
     for (let t = 82.55; t < 84.8; t += 0.16) S.step(t, 0.05, -0.2 + (t - 82.55) * 0.2, glass);
     const hoop = S.noise('brown', 82.5, 84.0), hpl = S.filter('lowpass', 300, 0.7), hpg = ctx.createGain(); S.env(hpg, 82.5, 0.5, 0.05, 1.0); hoop.connect(hpl); hpl.connect(hpg); hpg.connect(glass);
     // the phone goes down on its face: a soft thunk into the duvet
-    S.thump(85.7, 0.09, bus); this._rustle(S, 85.68, 0.15, 0.015, 0.1, bus, 1200);
+    S.thump(85.7, 0.05, bus); this._rustle(S, 85.68, 0.15, 0.015, 0.1, bus, 1200);
     // the light round the door: a faint warm air, and the past behind it — birds, a far laugh — growing as you go to it
     const past = ctx.createGain(), pl = S.filter('lowpass', 600, 0.6); past.connect(pl); pl.connect(bus);
     past.gain.setValueAtTime(0.0001, 85.6); past.gain.linearRampToValueAtTime(0.6, 87.0); past.gain.linearRampToValueAtTime(1.0, 87.5);
