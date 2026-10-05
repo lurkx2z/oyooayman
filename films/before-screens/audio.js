@@ -57,6 +57,8 @@ class BeforeScreensAudio extends AudioEngine {
     this._meadow(S, bus, outSend);
     this._imagination(S, bus, outSend, music, musSend);
     this._musicC(S, music, musSend);
+    this._games(S, bus, outSend);
+    this._evening(S, bus, outSend, music, musSend);
     this._music(S, music, musSend);
   }
 
@@ -195,6 +197,62 @@ class BeforeScreensAudio extends AudioEngine {
     for (let k = 0; k < 6; k++) S.step(53.7 + k * 0.27, 0.06 * (1 - k * 0.12), -0.2 - k * 0.08, bus);
   }
 
+  /* games with others: the long rope and its chant, counting at the tree, hopscotch, the catch, the chase */
+  _games(S, bus, rev) {
+    const ctx = S.ctx, R = SOCIAL.rope;
+    for (let k = 0; ; k++) {
+      const t = R.t0 + (k + 0.5) * R.period;
+      if (t > R.t1) break;
+      if (t < 55.0) continue;
+      S.click(t, 0.05, -0.35, bus); S.tone(t, 0.04, 240, 0.02, -0.35, bus, 'sine', 0.002, 0.03);   // rope slaps the dirt
+      S.voice(t - 0.12, 470 + (k % 2) * 60, 0.16, k % 2 ? 'e' : 'a', 0.016, -0.3, bus, 1.05);   // the skipping chant
+    }
+    // counting at the tree (muffled in his arms), a giggle beside you behind the barrels
+    for (let k = 0; k < 6; k++) S.voice(56.75 + k * 0.2, 420 - k * 6, 0.14, k % 2 ? 'i' : 'u', 0.014, 0.05, bus, 0.95);
+    S.voice(57.95, 470, 0.3, 'e', 0.02, 0.05, bus, 1.2);
+    S.laugh(57.3, 0.012, -0.35, bus, 600, 3);
+    // hopscotch: one-foot landings and the two-foot ones
+    for (let t = 58.0; t < 59.4; t += 0.42) S.step(t + 0.3, 0.05, 0.05, bus);
+    // the catch: a whoosh and the leather slap into both hands
+    this._whoosh(S, 60.0, 0.45, 0.04, 0, bus, 500, 1800);
+    S.clunk(SOCIAL.ball.catch, 0.11, 0, bus); S.click(SOCIAL.ball.catch, 0.06, 0, bus);
+    S.laugh(60.7, 0.03, 0.2, bus, 520, 5);
+    // the chase: your own running steps, shrieks and laughter all round
+    for (let t = 60.85; t < 62.6; t += 0.29) S.step(t, 0.11, (Math.round((t - 60.85) / 0.29) % 2) ? 0.08 : -0.08, bus);
+    S.chatter(60.8, 62.8, 0.02, 0, bus, 520, 7);
+    S.voice(61.2, 720, 0.35, 'i', 0.022, 0.4, bus, 1.1); S.laugh(61.6, 0.025, -0.4, bus, 560, 5); S.laugh(62.1, 0.02, 0.3, bus, 480, 4);
+  }
+
+  /* the evening: crickets, a mother calling the kids in, goodbyes, the lamplighter's flame; warm slow music */
+  _evening(S, bus, rev, mus, musRev) {
+    const ctx = S.ctx;
+    for (let t = 63.0; t < CONFIG.duration + 1; t += 0.11) {
+      const k = MathX.clamp((t - 63) / 3, 0, 1);
+      if (S.rng.chance(0.55)) S.tone(t, 0.03, 4300 + S.rng.range(-120, 120), 0.003 * k, S.rng.range(-0.8, 0.8), bus, 'sine', 0.006, 0.02);
+    }
+    // "come in now!" from the porch: two long calling syllables, falling
+    S.voice(63.1, 380, 0.45, 'o', 0.03, 0.55, rev, 1.15); S.voice(63.6, 430, 0.75, 'i', 0.03, 0.55, rev, 0.75);
+    S.voice(63.1, 380, 0.45, 'o', 0.02, 0.55, bus, 1.15); S.voice(63.6, 430, 0.75, 'i', 0.02, 0.55, bus, 0.75);
+    S.voice(64.5, 520, 0.4, 'a', 0.022, 0.1, bus, 0.85);   // your friend: "bye!"
+    S.laugh(64.9, 0.012, -0.5, bus, 520, 3);
+    for (let k = 0; k < 8; k++) S.step(63.0 + k * 0.5, 0.025 * (1 - k * 0.1), -0.4 + k * 0.1, bus);
+    // the lamplighter: the pole clinks on the lantern, the gas catches and hisses
+    S.click(65.1, 0.03, 0.5, bus); S.tone(65.12, 0.2, 1900, 0.008, 0.5, bus, 'sine', 0.003, 0.15);
+    this._whoosh(S, 65.5, 0.5, 0.05, 0.5, bus, 200, 900);
+    const h = S.noise('white', 65.6, CONFIG.duration + 1), hb = S.filter('bandpass', 3800, 0.8), hg = ctx.createGain();
+    hg.gain.setValueAtTime(0.0001, 65.6); hg.gain.linearRampToValueAtTime(0.004, 66.0);
+    h.connect(hb); hb.connect(hg); hg.connect(S.panned(bus, 0.5));
+    // a far church bell for the evening
+    for (const [f, a, d] of [[196, 0.014, 4.0], [392 * 1.19, 0.007, 3.0], [588 * 0.98, 0.005, 2.2]]) S.tone(66.2, d, f, a, -0.4, rev, 'sine', 0.006, d * 0.95);
+    // music: a slow warm arpeggio over a soft pad (G – D – Em – C)
+    const prog = [[98, 196, 246.9, 293.7], [73.4, 146.8, 220, 293.7], [82.4, 164.8, 246.9, 329.6], [65.4, 130.8, 196, 261.6]];
+    for (let k = 0; k < 4; k++) {
+      const t0 = 62.6 + k * 1.6, c = prog[k];
+      for (const f of c) S.tone(t0, 1.75, f * 2, 0.006, 0, mus, 'triangle', 0.4, 0.8);
+      c.forEach((f, j) => S.pluck(t0 + j * 0.3, f * 2, 0.035, -0.25 + j * 0.15, musRev, 2.4, 0.5));
+    }
+  }
+
   /* music for the meadow (big, open, uplifting) and the castle (heroic) */
   _musicC(S, mus, rev) {
     const ctx = S.ctx;
@@ -228,7 +286,7 @@ class BeforeScreensAudio extends AudioEngine {
     }
     // after the laughter: the light street rhythm comes back, leading into the games
     const chords = [[146.8, 220, 293.7, 370], [110, 220, 277.2, 329.6]];
-    for (let t = 51.35, i = 0; t < CONFIG.duration + 0.5; t += 0.25, i++) {
+    for (let t = 51.35, i = 0; t < Math.min(CONFIG.duration + 0.5, 62.6); t += 0.25, i++) {
       const c = chords[Math.floor(i / 8) % 2], beat = i % 8, pat = [0, 2, 1, 3, 2, 1, 3, 2][beat];
       S.pluck(t, c[pat] * 2, 0.04 * Math.min(1, (t - 51.35) / 1.5), beat % 2 ? 0.25 : -0.2, mus, 0.9, 0.62);
       if (beat === 0 || beat === 4) S.pluck(t, c[0], 0.06, 0, mus, 1.4, 0.3);
@@ -349,14 +407,13 @@ class BeforeScreensAudio extends AudioEngine {
     for (const k of this.kids.people) {
       const runner = (k.states || []).some((s) => /run|carry/i.test(s[1]));
       if (!runner) continue;
-      const stride = k.spec.stride || 1.32;
       let prev = null, prevDist = null;
       for (let t = 5.8; t < CONFIG.duration; t += 1 / 120) {
         if (!k.shown(t)) { prev = null; continue; }
         const L = k.locate(t);
         const jump = prevDist !== null && L.dist - prevDist > 0.5; prevDist = L.dist;
         if (!L.moving || jump) { prev = null; continue; }
-        const step = Math.floor(L.dist / (stride / 2));
+        const step = Math.floor(L.dist / (k.strideAt(t) / 2));
         if (prev !== null && step !== prev) {
           const R = this._rel(L.x, L.z, t, 3);
           S.step(t, 0.11 * R.gain * (k.spec.id === 'runner' ? 1.6 : 1), R.pan, dirt);
@@ -381,6 +438,7 @@ class BeforeScreensAudio extends AudioEngine {
     { const R = at('tag3', 12.3); S.laugh(12.35, 0.022 * R.gain, R.pan, bus, 470, 5); }
     // the ball game: a leather slap at each catch
     for (const [t0, from, to, fl] of SCRIPT.throws || []) {
+      if (!this.kids.byId[from] || !this.kids.byId[to]) continue;
       const tc = t0 + fl, R = at(to, tc), R0 = at(from, t0);
       S.clunk(tc, 0.05 * R.gain, R.pan, bus); S.click(tc, 0.03 * R.gain, R.pan, bus);
       const w = S.noise('pink', t0 - 0.05, t0 + 0.2), wb = S.filter('bandpass', 1200, 1), wg = ctx.createGain();

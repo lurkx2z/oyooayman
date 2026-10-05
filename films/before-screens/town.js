@@ -137,11 +137,11 @@ class HistoricTown {
     this.sunDir = new THREE.Vector3(0.45, 0.62, 0.64).normalize();   // late morning, from the south-east
     this.zenith = new THREE.Color('#6a98c6'); this.horizon = new THREE.Color('#dcd8c8'); this.fogColor = new THREE.Color('#cfc9b6');
     const mat = new THREE.ShaderMaterial({
-      uniforms: { uZenith: { value: this.zenith }, uHorizon: { value: this.horizon }, uSun: { value: this.sunDir }, uTime: { value: 0 } },
+      uniforms: { uZenith: { value: this.zenith }, uHorizon: { value: this.horizon }, uSun: { value: this.sunDir }, uTime: { value: 0 }, uGlow: { value: 0 }, uGlowCol: { value: new THREE.Color('#ff8a40') } },
       side: THREE.BackSide, depthWrite: false, fog: false,
       vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
       fragmentShader: /* glsl */`
-        uniform vec3 uZenith, uHorizon, uSun; uniform float uTime; varying vec3 vD;
+        uniform vec3 uZenith, uHorizon, uSun, uGlowCol; uniform float uTime, uGlow; varying vec3 vD;
         float h2(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float n2(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 * f); return mix(mix(h2(i), h2(i + vec2(1, 0)), u.x), mix(h2(i + vec2(0, 1)), h2(i + vec2(1, 1)), u.x), u.y); }
         float fbm(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { v += a * n2(p); p *= 2.03; a *= 0.5; } return v; }
@@ -150,6 +150,8 @@ class HistoricTown {
           vec3 col = mix(uHorizon, uZenith, pow(smoothstep(-0.02, 0.55, h), 0.75));
           float sd = max(dot(d, uSun), 0.0);
           col += vec3(1.0, 0.9, 0.7) * (pow(sd, 8.0) * 0.18 + pow(sd, 400.0) * 1.5);
+          // sunset: an orange glow round the low sun, strongest along the horizon
+          col = mix(col, uGlowCol, clamp(pow(sd, 2.2) * uGlow * (1.0 - smoothstep(-0.05, 0.45, h)), 0.0, 0.85));
           // fair-weather cumulus: separate soft heaps, brighter tops toward the sun
           if (h > 0.0) {
             vec2 uv = d.xz / (h + 0.12) * 0.55 + vec2(uTime * 0.004, 0.0);
@@ -659,6 +661,31 @@ class HistoricTown {
       g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
       B.add(g, m.leaf, Geo.matrix(Math.sin(a) * d, -2, -Math.abs(Math.cos(a)) * d - 40), { noShadow: true });
     }
+  }
+
+  // time of day: k = 0 late morning … 1 sunset … 1.12 dusk. Moves the sun across the south and down into the west,
+  // and shifts sky, sunlight, fill light and haze with it. The shadow box follows the camera.
+  setTime(k, camera) {
+    if (!this._day) this._day = { zen: this.zenith.clone(), hor: this.horizon.clone(), fog: this.fogColor.clone() };
+    const ph = MathX.clamp(k, 0, 1), dusk = MathX.clamp((k - 1) / 0.12, 0, 1), e = Ease.inOutSine(ph);
+    const az = MathX.deg(MathX.lerp(35, -72, e)), el = MathX.deg(MathX.lerp(38.3, 1.5, Math.pow(ph, 0.85)) - 7 * dusk);
+    this.sunDir.set(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
+    const low = MathX.smooth(ph, 0.55, 1.0);
+    const c = (a, b, t2) => new THREE.Color(a).lerp(new THREE.Color(b), t2);
+    this.sun.color.copy(c('#ffeccc', '#ff8a48', low));
+    this.sun.intensity = MathX.lerp(3.0, 1.6, low) * (1 - dusk);
+    this.zenith.copy(this._day.zen).lerp(new THREE.Color('#4a6496'), low).lerp(new THREE.Color('#232f4e'), dusk);
+    this.horizon.copy(this._day.hor).lerp(new THREE.Color('#f0b47a'), low).lerp(new THREE.Color('#8a6070'), dusk);
+    this.sky.material.uniforms.uGlow.value = low * (1 - 0.6 * dusk);
+    this.hemi.color.copy(c('#c2d6ea', '#d8a888', low)).lerp(new THREE.Color('#4a5878'), dusk);
+    this.hemi.groundColor.copy(c('#7d6c52', '#5a4434', low));
+    this.hemiBase = MathX.lerp(0.72, 0.5, low) * (1 - 0.55 * dusk);
+    this.fogColor.copy(this._day.fog).lerp(new THREE.Color('#e0aa80'), low).lerp(new THREE.Color('#4e5068'), dusk);
+    this.scene.background.copy(this.horizon);
+    const cx = camera ? camera.position.x : 0, cz = camera ? camera.position.z : -10;
+    this.sun.target.position.set(cx, 0, cz - 4);
+    this.sun.position.copy(this.sunDir).multiplyScalar(120).add(this.sun.target.position);
+    this.sun.target.updateMatrixWorld();
   }
 
   update(t, camera, visible = true) {

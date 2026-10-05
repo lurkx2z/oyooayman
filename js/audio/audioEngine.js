@@ -78,7 +78,7 @@ class AudioEngine {
 
   async exportWav() {
     const buf = this.buffer || (await this.prepare());
-    const blob = AudioManager.encodeWav(buf);
+    const blob = AudioEngine.encodeWav(buf);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = this.wavName || 'soundtrack.wav';
@@ -91,7 +91,21 @@ class AudioEngine {
     const dur = CONFIG.duration + 1.5;
     const ctx = new OfflineAudioContext(2, Math.ceil(dur * this.sampleRate), this.sampleRate);
     this._build(ctx);
-    return ctx.startRendering();
+    const buf = await ctx.startRendering();
+    AudioEngine.declick(buf);
+    return buf;
+  }
+
+  // Chrome's offline renderer occasionally emits a lone full-scale sample when gain automation lands
+  // mid-block; repair any single sample that jumps away from two neighbours that agree with each other
+  static declick(buf, thr = 0.3) {
+    for (let c = 0; c < buf.numberOfChannels; c++) {
+      const x = buf.getChannelData(c);
+      for (let i = 1; i < x.length - 1; i++) {
+        const a = x[i - 1], b = x[i + 1], d1 = x[i] - a, d2 = x[i] - b;
+        if (Math.abs(a - b) < thr * 0.35 && Math.abs(d1) > thr && Math.abs(d2) > thr && d1 * d2 > 0) x[i] = (a + b) / 2;
+      }
+    }
   }
 
   // override: schedule the whole soundtrack into the offline context
@@ -420,8 +434,8 @@ class SoundKit {
     o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * glide, t + dur);
     const vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.value = 5.5 + this.rng.next() * 2; vg.gain.value = f0 * 0.02;
     vib.connect(vg); vg.connect(o.frequency); vib.start(t); vib.stop(t + dur + 0.05);
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.03, dur * 0.3));
-    g.gain.setValueAtTime(vol, t + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + Math.max(0.006, Math.min(0.03, dur * 0.3)));
+    g.gain.setValueAtTime(vol, t + dur * 0.6); g.gain.linearRampToValueAtTime(0, t + dur);
     for (let k = 0; k < 3; k++) {
       const bp = this.filter('bandpass', F[k] * (1.08 + 0.06 * this.rng.next()), [6, 9, 12][k]), fg = ctx.createGain();
       fg.gain.value = [1.0, 0.55, 0.25][k];

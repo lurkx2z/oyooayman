@@ -47,7 +47,7 @@ class ToySystem {
       h.m.rotateX(0.06 * Math.sin(t * 2.3 + k.seed * 9));     // a little wobble
     }
     // ---- the ball: in a hand, or in flight on a parabola between hands
-    const T = SCRIPT.throws || [];
+    const T = (SCRIPT.throws || []).filter((th) => this.kids.byId[th[1]] && this.kids.byId[th[2]]);
     let placed = false;
     for (let i = 0; i < T.length && !placed; i++) {
       const [t0, from, to, fl] = T[i];
@@ -77,7 +77,6 @@ class ToySystem {
     for (const k of this.kids.people) {
       const run = (k.states || []).some((s) => /run|reach|startle/i.test(s[1]));
       if (!run) continue;
-      const stride = k.spec.stride || 1.32;
       let prevStep = null, prevDist = null;
       for (let j = 30; j >= 0; j--) {
         const tt = t - j / 30;
@@ -85,7 +84,7 @@ class ToySystem {
         const L = k.locate(tt);
         const jump = prevDist !== null && L.dist - prevDist > 0.5; prevDist = L.dist;   // a cut between scenes is not a footstep
         if (!L.moving || jump) { prevStep = null; continue; }
-        const step = Math.floor(L.dist / (stride / 2));
+        const step = Math.floor(L.dist / (k.strideAt(tt) / 2));
         if (prevStep !== null && step !== prevStep) {
           const age = t - tt, side = step % 2 ? 1 : -1;
           const ox = -Math.cos(L.dir) * 0.09 * side, oz = Math.sin(L.dir) * 0.09 * side;

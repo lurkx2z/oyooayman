@@ -34,6 +34,8 @@ Object.assign(LOOKS, {
   girlApron2:   { kid: true, h: 0.74, skin: 4, build: 'kidSlim', top: '#5a6e86', bottom: 'dress', pinafore: '#e8e0cc', socks: '#2a2624', shoes: '#22190f', hair: '#140e0a', hairStyle: 'braids', bow: '#d8cfb8' },
   // grown-ups
   mother:       { adult: true, h: 0.96, skin: 0, build: 'woman', top: '#5a6474', bottom: 'longdress', pinafore: '#ece6da', shoes: '#1c1816', hair: '#4a3020', hairStyle: 'bun' },
+  neighbour:    { adult: true, h: 0.95, skin: 2, build: 'woman', top: '#7a5a4a', bottom: 'longdress', pinafore: '#e8e2d4', shoes: '#1c1816', hair: '#2a1a12', hairStyle: 'bun' },
+  lamplighter:  { adult: true, h: 0.98, skin: 1, build: 'avg', top: '#3a3c40', jacket: '#2e3034', bottom: 'trousers', bottomColor: '#2a2a2e', shoes: '#141210', hair: '#3a2a1e', hairStyle: 'short', hat: { type: 'flat', color: '#2a2a2c' }, pole: true },
   oldMan:       { adult: true, h: 0.95, skin: 1, build: 'avg', top: '#d4ccba', vest: '#3e3a36', bottom: 'trousers', bottomColor: '#3a3632', shoes: '#1a1612', hair: '#c8c4bc', hairStyle: 'short', beard: '#d8d4cc', hat: { type: 'bowler', color: '#24211e' } },
 });
 
@@ -237,7 +239,57 @@ Object.assign(ACTIONS, {
     return p;
   },
 });
+/* ---- games with others, going home ---- */
+Object.assign(ACTIONS, {
+  turnRope(τ, c) {         // the arm nearest the rope circles at shoulder height
+    const p = basePose(), a = (τ / 0.62) * Math.PI * 2;
+    p.rSh = [1.0 + 0.45 * Math.sin(a), 0.35 + 0.25 * Math.cos(a)]; p.rEl = 0.4; p.lSh = [0.15, 0.12]; p.lEl = 0.3;
+    p.spine = 0.05; p.lKnee = p.rKnee = 0.12; p.hipY = 0.92 + 0.01 * Math.sin(a * 2);
+    return p;
+  },
+  countTree(τ, c) {        // forearm on the trunk, face hidden in it
+    const p = basePose();
+    p.spine = 0.35; p.neck = 0.55; p.rSh = [2.3, 0.1]; p.rEl = 1.9; p.lSh = [2.2, 0.15]; p.lEl = 2.0; p.lKnee = p.rKnee = 0.08;
+    p.spineRoll = 0.02 * Math.sin(τ * 2.2);
+    return p;
+  },
+  jumpLong(τ, c) {         // jumping the long rope: feet highest as it passes under (rope period 0.62 s from the state start)
+    const p = basePose(), f = (τ / 0.62) % 1, air = Math.sin(Math.PI * f);
+    p.hipY = 0.88 + 0.11 * air; p.lKnee = p.rKnee = 0.2 + 0.5 * (1 - air); p.lHip = p.rHip = [0.15 + 0.25 * (1 - air), 0.05]; p.lFoot = p.rFoot = 0.3 * air;
+    p.lSh = [0.3, 0.35]; p.rSh = [0.3, 0.35]; p.lEl = 0.6; p.rEl = 0.6; p.spine = 0.08; p.neck = 0.1;
+    return p;
+  },
+  hide(τ, c) {
+    const p = ACTIONS.squatWatch(τ, c);
+    p.spine = 0.75; p.neck = -0.1; p.headYaw = 0.35 * Math.sin(τ * 0.9 + c.seed * 3);
+    return p;
+  },
+  hop(τ, c) {              // hopscotch: hop forward on one leg, arms out for balance, two feet on the doubles
+    const p = basePose(), f = (τ / 0.42) % 1, air = Math.sin(Math.PI * f), both = Math.floor(τ / 0.42) % 3 === 2;
+    p.hipY = 0.86 + 0.12 * air; p.rHip = [0.25 + 0.3 * air, 0.05]; p.rKnee = 0.35 + 0.4 * (1 - air);
+    p.lHip = both ? [0.25 + 0.3 * air, 0.1] : [0.15, 0.05]; p.lKnee = both ? 0.35 + 0.4 * (1 - air) : 1.5; p.lFoot = both ? 0 : 0.4;
+    p.lSh = [0.4, 0.75]; p.rSh = [0.4, 0.75]; p.lEl = 0.3; p.rEl = 0.3; p.spine = 0.15;
+    return p;
+  },
+  wave(τ, c) {
+    const p = ACTIONS.idle(τ, c);
+    p.rSh = [2.6, 0.35 + 0.25 * Math.sin(τ * 9)]; p.rEl = 0.4 + 0.2 * Math.sin(τ * 9);
+    return p;
+  },
+  callWave(τ, c) {         // hand cupped at the mouth, then a big wave: "time to come in!"
+    const p = ACTIONS.idle(τ, c), k = MathX.smooth(τ, 0.8, 1.1);
+    p.rSh = [MathX.lerp(1.9, 2.7, k), MathX.lerp(0.1, 0.4 + 0.25 * Math.sin(τ * 8), k)]; p.rEl = MathX.lerp(2.2, 0.4, k); p.neck = -0.12 * (1 - k);
+    return p;
+  },
+  lampLight(τ, c) {        // the lamplighter raises his pole to the lamp, holds it there, lowers it
+    const p = basePose(), up = MathX.smooth(τ, 0.2, 0.9) * (1 - MathX.smooth(τ, 2.0, 2.6));
+    p.rSh = [MathX.lerp(0.6, 2.75, up), 0.12]; p.rEl = MathX.lerp(0.8, 0.15, up); p.lSh = [MathX.lerp(0.7, 2.5, up), 0.1]; p.lEl = MathX.lerp(0.9, 0.3, up);
+    p.neck = -0.6 * up; p.spine = -0.1 * up;
+    return p;
+  },
+});
 Object.assign(BLEND, { run: 0.3, runLaugh: 0.3, hoopRun: 0.3, reach: 0.15, startle: 0.12, catchIdle: 0.4, jumpRope: 0.3, sitStep: 0.6, carry: 0.5, hangWash: 0.6, sitBench: 0.6,
+  jumpLong: 0.2, turnRope: 0.3, countTree: 0.4, hide: 0.35, hop: 0.2, wave: 0.3, callWave: 0.4, lampLight: 0.4,
   launch: 0.15, lookUp: 0.5, duelStance: 0.35, duelSwing: 0.08, duelBlock: 0.12, duelLoop: 0.3, knightCheer: 0.25, laughStand: 0.3,
   kneelWatch: 0.4, kneelShoot: 0.25, kneelGroan: 0.2, kneelCheer: 0.15, lookDown: 0.4, cheer: 0.2, squatWatch: 0.5, sitCross: 0.5, jacks: 0.3, benchWork: 0.5, holdKiteUp: 0.3 });
 
@@ -422,6 +474,7 @@ class Child extends Person {
       const water = mesh(new THREE.CircleGeometry(0.1, 12), M('#4a5a62', 0.15), bk, 0, 0.07, 0); water.rotation.x = -Math.PI / 2;
     }
     if (this.spec.look === 'girlRope') { for (const a of [la, ra]) mesh(KG.ropeHandle, M('#9a7a52', 0.7), a.hand, 0, -0.06, 0.02); }
+    if (L.pole) { const pl = mesh(new THREE.CylinderGeometry(0.012, 0.016, 2.6, 6), M('#5a4632', 0.8), ra.hand, 0, -0.04, 0.02); pl.geometry.translate(0, 0.9, 0); pl.rotation.x = -0.5; mesh(new THREE.CylinderGeometry(0.02, 0.012, 0.12, 6), M('#8a7a4a', 0.4), pl, 0, 2.25, 0); this.pole = pl; }
     if (L.doll) { const d = new THREE.Group(); la.hand.add(d); d.position.set(0.02, -0.06, 0.07); mesh(facetBall(0.04, 1, 1.1, 1, 1), M('#f0d8c0', 0.6), d, 0, 0.09, 0); mesh(loftGeo([[-0.09, 0.05, 0.035], [0.05, 0.035, 0.025]], 6), M('#c86a5a', 0.8), d); }
     this.root = root;
     this.j = { body, hips, spine, neck, head, la, ra, ll, rl };
@@ -442,6 +495,8 @@ class Child extends Person {
     return Math.PI;
   }
 
+  strideAt(t) { return this._seg(this.spec.strides, t, this.spec.stride || 1.32); }
+
   shown(t) { return !this.spec.show || this.spec.show.some(([a, b]) => t >= a && t < b); }
 
   update(t) {
@@ -449,7 +504,7 @@ class Child extends Person {
     this.root.visible = vis;
     if (!vis) return;
     const loc = this.locate(t);
-    const ctx = { seed: this.seed, seedI: this.seedI, walkPhase: (loc.dist / (this.spec.stride || 1.32)) * Math.PI * 2, seat: this._seg(this.spec.seats, t, this.spec.seat) };
+    const ctx = { seed: this.seed, seedI: this.seedI, walkPhase: (loc.dist / this.strideAt(t)) * Math.PI * 2, seat: this._seg(this.spec.seats, t, this.spec.seat) };
     this.root.position.set(loc.x, this._seg(this.spec.ys, t, this.spec.y || 0), loc.z);
     this.root.rotation.y = loc.dir;
     this.apply(this.poseAt(t, ctx));
