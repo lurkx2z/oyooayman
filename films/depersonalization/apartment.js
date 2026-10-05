@@ -141,10 +141,10 @@ class Apartment {
     this._plant(L.x1 - 0.35, 0, L.z1 - 0.4, 0.9);
     this._plant(L.x0 + 0.35, 0, L.z0 + 0.4, 0.75);
     // ---- bookshelf (west wall, north end), posters, fairy lights along the north wall
-    box(0.02, 1.8, 1.0, L.x0 + 0.02, 0.9, -1.6, darkWood);                                       // back
-    for (const dz of [-0.5, 0.5]) box(0.32, 1.8, 0.03, L.x0 + 0.17, 0.9, -1.6 + dz, darkWood);   // sides
-    for (let s = 0; s < 5; s++) box(0.32, 0.025, 1.0, L.x0 + 0.17, 0.02 + s * 0.42, -1.6, darkWood);
-    for (let s = 0; s < 4; s++) { let z = -2.06; while (z < -1.16) { const w = r.range(0.03, 0.055); if (r.chance(0.85)) { const m = box(0.2, r.range(0.2, 0.32), w, L.x0 + 0.15, 0.035 + s * 0.42 + 0.13, z + w / 2, std(r.pick(['#6a3a2a', '#2a4a6a', '#c9a04a', '#3a5a3a', '#7a6a5a', '#a84a3a', '#d8d0c0', '#3a3a44']), { roughness: 0.8 })); m.rotation.x = r.chance(0.15) ? 0.15 : 0; } z += w + 0.004; if (r.chance(0.12)) z += 0.12; } }
+    box(0.02, 1.8, 1.0, L.x0 + 0.02, 0.9, -0.8, darkWood);                                       // back
+    for (const dz of [-0.5, 0.5]) box(0.32, 1.8, 0.03, L.x0 + 0.17, 0.9, -0.8 + dz, darkWood);   // sides
+    for (let s = 0; s < 5; s++) box(0.32, 0.025, 1.0, L.x0 + 0.17, 0.02 + s * 0.42, -0.8, darkWood);
+    for (let s = 0; s < 4; s++) { let z = -1.26; while (z < -0.36) { const w = r.range(0.03, 0.055); if (r.chance(0.85)) { const m = box(0.2, r.range(0.2, 0.32), w, L.x0 + 0.15, 0.035 + s * 0.42 + 0.13, z + w / 2, std(r.pick(['#6a3a2a', '#2a4a6a', '#c9a04a', '#3a5a3a', '#7a6a5a', '#a84a3a', '#d8d0c0', '#3a3a44']), { roughness: 0.8 })); m.rotation.x = r.chance(0.15) ? 0.15 : 0; } z += w + 0.004; if (r.chance(0.12)) z += 0.12; } }
     const poster = (w, h, x, y, z, ry, seed) => {
       const cv = Tex.canvas(256, 340), c = cv.getContext('2d'), q = new RNG(seed);
       const bg = c.createLinearGradient(0, 0, 0, 340); bg.addColorStop(0, q.pick(['#e8b468', '#2a4a5a', '#d86a4a'])); bg.addColorStop(1, q.pick(['#3a2a4a', '#e8d8b8', '#1a3a3a'])); c.fillStyle = bg; c.fillRect(0, 0, 256, 340);
@@ -157,8 +157,7 @@ class Apartment {
       box(w + 0.04, h + 0.04, 0.025, x, y, z, std('#1a1a1c'), ry, false);
       add(new THREE.PlaneGeometry(w, h), std('#ffffff', { map: Tex.tex(cv, { repeat: false }), roughness: 0.6 }), x + Math.sin(ry) * 0.014, y, z + Math.cos(ry) * 0.014, 0, ry, 0, false);
     };
-    poster(0.5, 0.68, -1.6, 1.6, L.z0 + 0.02, 0, 4);
-    poster(0.6, 0.8, L.x0 + 0.02, 1.55, -0.1, Math.PI / 2, 9);
+    poster(0.6, 0.8, L.x0 + 0.02, 1.55, 0.22, Math.PI / 2, 9);
     poster(0.42, 0.56, 1.95, 1.62, L.z0 + 0.02, 0, 14);
     const wire = []; this.fairy = [];
     const fairyM = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.0, 0.72, 0.4).multiplyScalar(2.4), toneMapped: false, name: 'fairy' });
@@ -168,6 +167,31 @@ class Apartment {
       if (i % 1 === 0) { const b = add(new THREE.SphereGeometry(0.012, 6, 4), fairyM, x, y - 0.02, L.z0 + 0.04, 0, 0, 0, false); this.fairy.push(b); }
     }
     add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(wire), 80, 0.002, 3, false), std('#222'), 0, 0, 0, 0, 0, 0, false);
+    // ---- kitchen nook (north wall, west end): a counter to grip, a microwave, a kettle, a wall clock
+    const K = this.kitchen = { x0: -2.95, x1: -1.15, z: L.z0 + 0.32, top: 0.92 };
+    const kx = (K.x0 + K.x1) / 2, kw = K.x1 - K.x0;
+    box(kw, 0.86, 0.6, kx, 0.43, K.z, std('#5f6e74', { roughness: 0.6, name: 'cabinets' }));
+    box(kw + 0.04, 0.05, 0.64, kx, 0.885, K.z + 0.02, std('#d8d2c6', { roughness: 0.35, name: 'counter' }));
+    for (let i = 0; i < 3; i++) box(0.02, 0.6, 0.012, K.x0 + 0.3 + i * 0.6, 0.5, K.z + 0.305, metal);
+    box(0.46, 0.28, 0.34, K.x0 + 0.35, 1.05, K.z - 0.05, std('#2a2c30', { roughness: 0.4 }));                  // microwave
+    add(new THREE.PlaneGeometry(0.26, 0.18), std('#101214', { roughness: 0.1, name: 'mwGlass' }), K.x0 + 0.3, 1.05, K.z + 0.121, 0, 0, 0, false);
+    add(new THREE.PlaneGeometry(0.06, 0.02), new THREE.MeshBasicMaterial({ color: new THREE.Color(0.3, 1.0, 0.6).multiplyScalar(1.4), toneMapped: false }), K.x0 + 0.5, 1.1, K.z + 0.122, 0, 0, 0, false);
+    add(new THREE.CylinderGeometry(0.07, 0.085, 0.2, 14), std('#c9ccd0', { roughness: 0.25, metalness: 0.85 }), K.x0 + 0.95, 1.01, K.z - 0.05);   // kettle
+    for (let i = 0; i < 3; i++) add(new THREE.CylinderGeometry(0.04, 0.035, 0.09, 12), std(['#e8e4dc', '#4a6a8a', '#c86a4a'][i], { roughness: 0.5 }), K.x0 + 1.25 + i * 0.12, 0.955, K.z + 0.05);
+    box(0.9, 0.025, 0.2, K.x0 + 0.55, 1.55, L.z0 + 0.1, wood);                                                   // a shelf with jars
+    for (let i = 0; i < 5; i++) add(new THREE.CylinderGeometry(0.05, 0.05, 0.14, 12), std(['#c8b48a', '#8a6a4a', '#d8d0c0', '#6a8a6a', '#b88a5a'][i], { roughness: 0.6 }), K.x0 + 0.2 + i * 0.17, 1.635, L.z0 + 0.1);
+    // the wall clock: a face, three hands (set in update)
+    const cf = Tex.canvas(256, 256), ccx = cf.getContext('2d');
+    ccx.fillStyle = '#f4f1ea'; ccx.beginPath(); ccx.arc(128, 128, 124, 0, Math.PI * 2); ccx.fill();
+    ccx.strokeStyle = '#1a1a1c'; ccx.lineWidth = 10; ccx.stroke();
+    for (let i = 0; i < 60; i++) { const a = i / 60 * Math.PI * 2, r0 = i % 5 ? 104 : 92; ccx.lineWidth = i % 5 ? 3 : 7; ccx.beginPath(); ccx.moveTo(128 + Math.sin(a) * r0, 128 - Math.cos(a) * r0); ccx.lineTo(128 + Math.sin(a) * 114, 128 - Math.cos(a) * 114); ccx.stroke(); }
+    const CL = this.clockPos = new THREE.Vector3(-1.6, 1.85, L.z0 + 0.03);
+    add(new THREE.CylinderGeometry(0.17, 0.17, 0.03, 32), std('#1a1a1c', { roughness: 0.4 }), CL.x, CL.y, CL.z - 0.005, Math.PI / 2, 0, 0, false);
+    add(new THREE.CircleGeometry(0.155, 32), std('#ffffff', { map: Tex.tex(cf, { repeat: false }), roughness: 0.5 }), CL.x, CL.y, CL.z + 0.012, 0, 0, 0, false);
+    const handM = std('#151517', { roughness: 0.5 }), secM = std('#c0392b', { roughness: 0.5 });
+    const hand = (len, w, m, z) => { const gH = new THREE.Group(); gH.position.set(CL.x, CL.y, CL.z + z); g.add(gH); const b = new THREE.Mesh(new THREE.BoxGeometry(w, len, 0.004), m); b.position.y = len * 0.4; gH.add(b); return gH; };
+    this.clockH = hand(0.08, 0.012, handM, 0.016); this.clockM = hand(0.12, 0.008, handM, 0.019); this.clockS = hand(0.13, 0.003, secM, 0.022);
+    this.clockBase = 23 * 3600 + 46 * 60 + 45;      // 11:46:45 pm at t = 0
     // ---- rug
     const rug = Tex.canvas(512, 384), rg = rug.getContext('2d');
     rg.fillStyle = '#c9bca6'; rg.fillRect(0, 0, 512, 384);
@@ -211,11 +235,14 @@ class Apartment {
     add(new THREE.CylinderGeometry(0.012, 0.012, 0.18, 8), std('#c9ccd0', { roughness: 0.2, metalness: 0.9 }), B.x0 + 0.08, 0.98, 1.1);
     add(new THREE.CylinderGeometry(0.01, 0.01, 0.12, 8), std('#c9ccd0', { roughness: 0.2, metalness: 0.9 }), B.x0 + 0.13, 1.07, 1.1, 0, 0, Math.PI / 2);
     add(new THREE.CylinderGeometry(0.035, 0.03, 0.1, 12), std('#7ab0b8', { roughness: 0.4 }), B.x0 + 0.12, 0.94, 1.55);
-    box(0.06, 0.6, 0.4, B.x0 + 0.04, 1.2, 0.35, std('#d8c8a8', { roughness: 0.98 }));          // towel
+    box(0.06, 0.6, 0.4, B.x0 + 0.05, 1.2, 0.35, std('#d8c8a8', { roughness: 0.98 }));          // towel
     this.mirrorRect = { x: B.x0 + 0.015, y: 1.58, z: 1.1, w: 0.78, h: 0.92 };
-    box(0.03, this.mirrorRect.h + 0.05, this.mirrorRect.w + 0.05, B.x0 + 0.01, this.mirrorRect.y, this.mirrorRect.z, std('#2a2a2e', { roughness: 0.4 }), 0, false);
+    // the mirror's frame: a thin border round the glass (nothing may stand behind the glass — it would show in the reflection)
+    { const M = this.mirrorRect, fm = std('#2a2a2e', { roughness: 0.4 }), fx = B.x0 + 0.03;
+      for (const s of [-1, 1]) { box(0.03, M.h + 0.06, 0.03, fx, M.y, M.z + s * (M.w / 2 + 0.015), fm, 0, false); box(0.03, 0.03, M.w + 0.06, fx, M.y + s * (M.h / 2 + 0.015), M.z, fm, 0, false); } }
     this.bathLight = new THREE.PointLight('#f4f6ff', 0, 4.5, 1.4); this.bathLight.position.set(B.x0 + 0.7, 2.25, 1.1); g.add(this.bathLight);
-    box(0.5, 0.05, 0.12, B.x0 + 0.04, this.mirrorRect.y + 0.56, this.mirrorRect.z, std('#f4f2ee', { emissive: '#fff6ea', emissiveIntensity: 0.9 }), 0, false);   // light bar over the mirror
+    this.mirrorLight = new THREE.PointLight('#fff4e8', 0, 2.6, 1.5); this.mirrorLight.position.set(B.x0 + 0.25, 2.08, 1.1); g.add(this.mirrorLight);   // the light over the mirror, on your face
+    box(0.1, 0.05, 0.5, B.x0 + 0.06, this.mirrorRect.y + 0.56, this.mirrorRect.z, std('#f4f2ee', { emissive: '#fff6ea', emissiveIntensity: 0.9 }), 0, false);   // light bar over the mirror
 
     // ---- your legs on the couch (jeans, white socks / sneakers): seen when you look down at your hands
     this.legs = new THREE.Group(); g.add(this.legs);
@@ -265,9 +292,11 @@ class Apartment {
 
   update(t, camera) {
     const tv = this._drawTV(t);
+    const T = this.clockBase + t, hh = T / 3600 % 12, mm = T / 60 % 60, ss = Math.floor(T % 60);
+    this.clockH.rotation.z = -hh / 12 * Math.PI * 2; this.clockM.rotation.z = -mm / 60 * Math.PI * 2; this.clockS.rotation.z = -ss / 60 * Math.PI * 2;
     this.tvLight.intensity = 1.1 * tv;
     this.lampFloor.intensity = 8.5; this.lampGlow.intensity = 1.6; this.lampSide.intensity = 1.8; this.cityLight.intensity = 0.6; this.bounce.intensity = 1.1;
-    this.hallLight.intensity = 1.6; this.bathLight.intensity = 2.0;
+    this.hallLight.intensity = 1.6; this.bathLight.intensity = 2.0; this.mirrorLight.intensity = 1.6;
     this.fairy.forEach((b, i) => b.scale.setScalar(0.85 + 0.15 * Math.sin(t * 1.3 + i * 1.7)));
     this.legs.visible = SCRIPT_TRACKS.legs.value(t) > 0.5;
   }

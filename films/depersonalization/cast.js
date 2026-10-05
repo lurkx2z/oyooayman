@@ -62,13 +62,37 @@ Object.assign(ACTIONS, {
     return p;
   },
 });
-Object.assign(BLEND, { sitTalk: 0.45, sitLaugh: 0.25, sitTalkTo: 0.4, beanbagPhone: 0.5, beanbagLaugh: 0.3 });
+Object.assign(ACTIONS, {
+  // watching you, quietly concerned: leaning forward, forearms on the knees, still
+  sitWatch(τ, c) {
+    const p = ACTIONS.sit(τ, c);
+    p.spine = 0.32 + 0.02 * Math.sin(τ * 0.9); p.neck = -0.08; p.headYaw = 0.04 * Math.sin(τ * 0.5);
+    p.lSh = [0.75, 0.12]; p.rSh = [0.75, 0.12]; p.lEl = 1.35; p.rEl = 1.35;
+    p.mouth = 0.04;
+    return p;
+  },
+  // relaxed again: sunk back into the chair, watching the TV
+  sitCalm(τ, c) {
+    const p = ACTIONS.sit(τ, c);
+    p.spine = -0.05; p.neck = 0.05; p.headYaw = -0.45 + 0.05 * Math.sin(τ * 0.4);
+    p.lSh = [0.45, 0.28]; p.lEl = 1.25; p.rSh = [0.5, 0.2]; p.rEl = 1.4;
+    return p;
+  },
+  // Mia, on her beanbag, looking up from her phone at you
+  beanbagWatch(τ, c) {
+    const p = ACTIONS.beanbagPhone(τ, c);
+    p.neck = 0.1; p.headYaw = -0.2; p.lSh = [0.5, 0.08]; p.rSh = [0.5, 0.08]; p.lEl = 1.6; p.rEl = 1.6;
+    return p;
+  },
+  // Mia beside you on the couch: hands in her lap, turned toward you; she talks for a moment
+  sitBeside(τ, c) {
+    const p = ACTIONS.sit(τ, c);
+    p.spine = 0.12; p.neck = 0.06; p.headYaw = -0.75 + 0.05 * Math.sin(τ * 0.6); p.spineYaw = -0.2;
+    p.lSh = [0.6, 0.1]; p.rSh = [0.6, 0.1]; p.lEl = 1.25; p.rEl = 1.25;
+    p.mouth = τ > 0.4 && τ < 1.8 ? DP_talk(τ, c.seedI + 2) * 0.8 : 0.05;
+    return p;
+  },
+});
+Object.assign(BLEND, { sitTalk: 0.45, sitLaugh: 0.25, sitTalkTo: 0.4, beanbagPhone: 0.5, beanbagLaugh: 0.3, sitWatch: 0.7, sitCalm: 0.9, beanbagWatch: 0.6, sitBeside: 0.6 });
 
-// a person's own clock can lag behind the room's: a stutter (a moment that hangs, then catches up) or a slowdown.
-// warp(t) = the time the person is posed at.
-const DP_WARP = {
-  // 1.6 s: Mia's laugh freezes for half a second (while you're looking right at her), then catches up
-  mia: (t) => (t < 1.6 ? t : t < 2.1 ? 1.6 : t < 2.3 ? 1.6 + (t - 2.1) * 3.5 : t),
-  // 3.05 s: as his voice drops away, Jay goes slightly slow and stays that way
-  jay: (t) => (t < 3.05 ? t : 3.05 + (t - 3.05) * 0.6),
-};
+// (each friend's own clock — the lag, the freeze, the slowness — is DP_SLOW / warpOf() in script.js)

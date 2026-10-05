@@ -164,7 +164,7 @@ class ViewerHands {
       const L = (u, v) => u + (v - u) * w;
       let x = L(a.p[0], b.p[0]) * s, y = L(a.p[1], b.p[1]), z = L(a.p[2], b.p[2]);
       // micro motion + breathing; a strong tremor when you look at your own hand late in the hypoxia
-      const trem = name === 'look' ? 0.004 + hyp * 0.008 : 0.0012;
+      const trem = b.trem !== undefined ? MathX.lerp(a.trem || 0.0012, b.trem, w) : name === 'look' ? 0.004 + hyp * 0.008 : 0.0012;   // (a pose may ask for a tremor)
       const seed = which === 'right' ? 3 : 4;
       x += noise1(t * 9, seed) * trem + Math.sin(t * 1.3 + seed) * 0.0015;
       y += noise1(t * 8, seed + 2) * trem + Math.sin(t * 1.3 + seed + 1) * 0.002;

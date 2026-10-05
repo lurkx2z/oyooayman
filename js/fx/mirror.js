@@ -1,7 +1,6 @@
 /* =====================================================================
    MIRROR — a planar reflection (the classic reflector technique): the
-   scene is rendered from the camera mirrored in the glass, with an oblique
-   near plane at the glass, into a texture that the mirror samples in
+   scene is rendered from the camera mirrored in the glass into a texture that the mirror samples in
    screen-projective space. Rendered explicitly once per frame (render()),
    before the main pass. Output stays linear, so the post pass grades the
    reflection exactly like the room.
@@ -11,12 +10,12 @@
    ===================================================================== */
 
 class Mirror {
-  constructor(width, height, { resolution = 640, tint = '#e6eaec', see = [0, 1], clipBias = 0.003, smudge = 0.06 } = {}) {
+  constructor(width, height, { resolution = 640, tint = '#e6eaec', see = [0, 1], clipBias = 0.003, smudge = 0.06, clip = false } = {}) {
     const rw = Math.round(resolution * Math.min(1, width / height)), rh = Math.round(resolution * Math.min(1, height / width));
-    this.rt = new THREE.WebGLRenderTarget(rw, rh, { type: THREE.HalfFloatType, samples: 4 });
+    this.rt = new THREE.WebGLRenderTarget(rw, rh, { type: THREE.HalfFloatType });
     this.cam = new THREE.PerspectiveCamera();
     this.cam.layers.disableAll(); for (const l of see) this.cam.layers.enable(l);
-    this.clipBias = clipBias;
+    this.clipBias = clipBias; this.clip = clip;      // keep the wall behind a mirror back-facing and empty, and no clipping is needed
     this.textureMatrix = new THREE.Matrix4();
     this.material = new THREE.ShaderMaterial({
       uniforms: { tDiffuse: { value: this.rt.texture }, textureMatrix: { value: this.textureMatrix }, uTint: { value: new THREE.Color(tint) }, uSmudge: { value: smudge }, uDim: { value: 1 } },
@@ -63,21 +62,20 @@ class Mirror {
     vc.projectionMatrix.copy(camera.projectionMatrix);
     this.textureMatrix.set(0.5, 0, 0, 0.5, 0, 0.5, 0, 0.5, 0, 0, 0.5, 0.5, 0, 0, 0, 1)
       .multiply(vc.projectionMatrix).multiply(vc.matrixWorldInverse).multiply(m.matrixWorld);
-    // oblique near plane on the glass, so nothing behind the mirror leaks into the reflection
-    V.plane.setFromNormalAndCoplanarPoint(V.n, V.rp).applyMatrix4(vc.matrixWorldInverse);
-    V.clip.set(V.plane.normal.x, V.plane.normal.y, V.plane.normal.z, V.plane.constant);
-    const P = vc.projectionMatrix.elements;
-    V.q.set((Math.sign(V.clip.x) + P[8]) / P[0], (Math.sign(V.clip.y) + P[9]) / P[5], -1.0, (1.0 + P[10]) / P[14]);
-    V.clip.multiplyScalar(2.0 / V.clip.dot(V.q));
-    P[2] = V.clip.x; P[6] = V.clip.y; P[10] = V.clip.z + 1.0 - this.clipBias; P[14] = V.clip.w;
-    vc.projectionMatrixInverse.copy(vc.projectionMatrix).invert();
+    // nothing behind the glass may leak into the reflection: a world clipping plane at the glass while we render
+    // (more robust than an oblique near plane, which can tilt the far plane through the view)
+    this._clip = this._clip || new THREE.Plane();
+    this._clip.setFromNormalAndCoplanarPoint(V.n, V.rp).constant -= this.clipBias;
     // render
     m.visible = false;
     const prevRT = renderer.getRenderTarget(), prevShadow = renderer.shadowMap.autoUpdate;
     renderer.shadowMap.autoUpdate = false;
+    const prevClip = renderer.clippingPlanes;
+    if (this.clip) renderer.clippingPlanes = [this._clip];      // (only needed if something stands behind the glass)
     renderer.setRenderTarget(this.rt);
     renderer.clear();
     renderer.render(scene, vc);
+    renderer.clippingPlanes = prevClip;
     renderer.shadowMap.autoUpdate = prevShadow;
     renderer.setRenderTarget(prevRT);
     m.visible = true;
