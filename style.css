@@ -61,10 +61,11 @@ body.recording #app, body.capture #app { inset: 0; }
 /* final payoff */
 #ending { position: absolute; inset: 0; pointer-events: none; }
 #ending .line {
-  position: absolute; left: 50%; top: calc(var(--u) * 820); transform: translateX(-50%); width: calc(var(--u) * 900);
+  position: absolute; left: 50%; top: calc(var(--u) * 400); transform: translateX(-50%); width: calc(var(--u) * 900);
   text-align: center; opacity: 0; font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 70); line-height: 1.18; color: var(--paper);
+  text-wrap: balance;
 }
-#ending .final { position: absolute; left: 50%; top: calc(var(--u) * 800); transform: translateX(-50%); text-align: center; opacity: 0; }
+#ending .final { position: absolute; left: 50%; top: calc(var(--u) * 390); transform: translateX(-50%); text-align: center; opacity: 0; }
 #ending .final .label { font-family: var(--hud-font); font-weight: 500; letter-spacing: 0.3em; font-size: calc(var(--u) * 22); opacity: 0.75; color: #dcd8cf; }
 #ending .final .value { font-family: var(--book); font-size: calc(var(--u) * 130); margin-top: calc(var(--u) * 14); color: #b06a5e; line-height: 1; }
 #ending .final .value .unit { font-size: 0.55em; margin-left: 0.08em; }
@@ -85,6 +86,7 @@ body.recording #app, body.capture #app { inset: 0; }
   width: calc(var(--u) * 800); text-align: center; opacity: 0;
   font-family: var(--book); font-style: italic; font-weight: 400; font-size: calc(var(--u) * 46); line-height: 1.25;
   color: var(--paper); text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 14) rgba(0, 0, 0, 0.55);
+  text-wrap: balance;   /* two even lines, never a lone last word */
 }
 
 /* optional floating labels (unused by default) */

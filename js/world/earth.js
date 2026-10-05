@@ -111,19 +111,48 @@ class EarthScene {
       }
     }
     n.globalCompositeOperation = 'destination-in'; landPath(n); n.fillStyle = '#fff'; n.fill();   // lights only on land
-    // ---- clouds
-    const cl = Tex.canvas(1024, 512), c = cl.getContext('2d');
-    c.fillStyle = '#000'; c.fillRect(0, 0, 1024, 512);
-    // clouds follow the wind belts: long, flat streaks of soft puffs (trade winds, storm tracks, ITCZ)
-    const cr = new RNG(99);
-    for (let k = 0; k < 520; k++) {
-      const band = cr.pick([[-45, 10], [-30, 8], [-8, 5], [5, 4], [30, 8], [48, 10], [60, 6]]);
-      const lat = band[0] + (cr.next() - 0.5) * 2 * band[1], lon = cr.range(-180, 180);
-      const x = ((lon + 180) / 360) * 1024, y = ((90 - lat) / 180) * 512, rx = cr.range(10, 42), ry = rx * cr.range(0.18, 0.4);
-      c.save(); c.translate(x, y); c.rotate(cr.range(-0.25, 0.25)); c.scale(1, ry / rx);
-      const g2 = c.createRadialGradient(0, 0, 0, 0, 0, rx); g2.addColorStop(0, `rgba(255,255,255,${cr.range(0.25, 0.55)})`); g2.addColorStop(1, 'rgba(255,255,255,0)');
-      c.fillStyle = g2; c.fillRect(-rx, -rx, rx * 2, rx * 2); c.restore();
+    // ---- clouds: fractal cover sampled in 3-D on the sphere (no seam, no pole pinch),
+    // stretched east-west by the winds, thick in the ITCZ and the storm tracks, clear over
+    // the subtropical highs, with a few mid-latitude lows spiralling (anticlockwise in the north)
+    const CW = 1024, CH = 512;
+    const cl = Tex.canvas(CW, CH), c = cl.getContext('2d');
+    const img = c.createImageData(CW, CH), px = img.data;
+    const noise = EarthScene._noise3(31337);
+    const fbm = (x, y, z, oct) => { let v = 0, a = 0.5, n = 0; for (let o = 0; o < oct; o++) { v += noise(x, y, z) * a; n += a; x = x * 2.03 + 17.1; y = y * 2.03 + 3.7; z = z * 2.03 + 9.3; a *= 0.5; } return v / n; };
+    const lows = [[-34, 53, 7, 2.1], [-6, 60, 5, 1.6], [-24, -48, 8, 2.3], [14, -54, 6, 1.8], [-62, -51, 6, 1.7], [-140, 46, 7, 2.0], [150, 44, 6, 1.8], [80, -48, 7, 2.0]]
+      .map(([lo, la, r, s]) => ({ c: EarthScene.dirFromLonLat(lo, la), r: (r * Math.PI) / 180, s, sg: Math.sign(la) }));
+    const gauss = (v, m, w) => Math.exp(-((v - m) * (v - m)) / (2 * w * w));
+    const smooth = (a, b, v) => { const t = MathX.clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+    for (let j = 0; j < CH; j++) {
+      const lat = 90 - ((j + 0.5) / CH) * 180, al = Math.abs(lat);
+      const cover = 0.36 + 0.3 * gauss(lat, 6, 6) - 0.2 * gauss(al, 24, 8) + 0.26 * gauss(al, 52, 11) + 0.14 * smooth(62, 75, al);
+      for (let i = 0; i < CW; i++) {
+        const lon = ((i + 0.5) / CW) * 360 - 180;
+        const phi = ((lon + 180) * Math.PI) / 180, th = ((90 - lat) * Math.PI) / 180;
+        let x = -Math.cos(phi) * Math.sin(th), y = Math.cos(th), z = Math.sin(phi) * Math.sin(th);
+        let boost = 0;
+        for (const L of lows) {
+          const d = Math.acos(MathX.clamp(x * L.c.x + y * L.c.y + z * L.c.z, -1, 1)) / L.r;
+          if (d > 3.2) continue;
+          const ang = -L.sg * L.s / (1 + d * d * 0.9), ca = Math.cos(ang), sa = Math.sin(ang);   // smooth spiral arms, no smear ring
+          const k = L.c, kd = k.x * x + k.y * y + k.z * z;   // Rodrigues rotation about the low's axis
+          const cx = k.y * z - k.z * y, cy = k.z * x - k.x * z, cz = k.x * y - k.y * x;
+          x = x * ca + cx * sa + k.x * kd * (1 - ca); y = y * ca + cy * sa + k.y * kd * (1 - ca); z = z * ca + cz * sa + k.z * kd * (1 - ca);
+          boost += 0.1 * Math.exp(-d * d * 0.5);
+        }
+        // zonal stretch (the vertical axis gets the higher frequency) + a soft domain warp
+        let qx = x * 2.1, qy = y * 4.2, qz = z * 2.1;
+        const wx = fbm(qx + 5.2, qy, qz, 3), wy = fbm(qx, qy + 8.1, qz, 3), wz = fbm(qx, qy, qz + 2.9, 3);
+        qx += (wx - 0.5) * 1.6; qy += (wy - 0.5) * 1.1; qz += (wz - 0.5) * 1.6;
+        const n = fbm(qx * 1.9, qy * 1.9, qz * 1.9, 6);
+        const cov = MathX.clamp(cover + boost, 0.05, 0.92);
+        let a = smooth(1 - cov - 0.02, 1 - cov + 0.2, n);
+        a *= 0.72 + 0.28 * fbm(x * 40, y * 40, z * 40, 2);      // broken, cellular texture inside the decks
+        const o = (j * CW + i) * 4; const v = Math.round(255 * MathX.clamp(a, 0, 1));
+        px[o] = px[o + 1] = px[o + 2] = v; px[o + 3] = 255;
+      }
     }
+    c.putImageData(img, 0, 0);
 
     const texOpt = { repeat: false };
     const dayT = Tex.tex(day, texOpt), maskT = Tex.tex(mask, { srgb: false, repeat: false }), nightT = Tex.tex(night, texOpt), cloudT = Tex.tex(cl, { srgb: false, repeat: true });
@@ -151,7 +180,7 @@ class EarthScene {
           vec3 col = albedo * (0.025 + 1.15 * max(ndl, 0.0));
           // sun glint on the oceans
           vec3 hv = normalize(uSun + v);
-          col += vec3(1.0, 0.95, 0.85) * pow(max(dot(n, hv), 0.0), 220.0) * 0.55 * (1.0 - land) * step(0.0, ndl);
+          col += vec3(1.0, 0.95, 0.85) * pow(max(dot(n, hv), 0.0), 420.0) * 0.32 * (1.0 - land) * step(0.0, ndl);
           // atmosphere haze toward the limb on the day side
           float rim = pow(1.0 - max(dot(n, v), 0.0), 2.5);
           col = mix(col, vec3(0.45, 0.66, 0.95) * max(ndl + 0.15, 0.0), rim * 0.65);
@@ -171,8 +200,12 @@ class EarthScene {
       transparent: true, depthWrite: false,
       vertexShader: 'varying vec2 vUv; varying vec3 vN; void main(){ vUv = uv; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
       fragmentShader: `uniform sampler2D uMap; uniform vec3 uSun; uniform float uOff; varying vec2 vUv; varying vec3 vN;
-        void main(){ float a = texture2D(uMap, vUv + vec2(uOff, 0.0)).r; float l = max(dot(normalize(vN), uSun), 0.0);
-          gl_FragColor = vec4(vec3(0.03 + 1.05 * l), a * 0.85); }`,
+        void main(){ float a = texture2D(uMap, vUv + vec2(uOff, 0.0)).r; float ndl = dot(normalize(vN), uSun);
+          // a broad, soft day/night ramp (white cloud clips early, so a plain lambert reads as a hard edge);
+          // cloud tops catch the sun slightly past the ground terminator, with a thin warm band
+          float l = smoothstep(-0.07, 0.62, ndl);
+          vec3 col = vec3(0.004 + 0.92 * l) * mix(vec3(1.0, 0.7, 0.5), vec3(1.0), smoothstep(0.0, 0.16, ndl));
+          gl_FragColor = vec4(col * (0.84 + 0.16 * a), a * 0.92); }`,
     });
     this.clouds = new THREE.Mesh(new THREE.SphereGeometry(1.012, 96, 48), cloudMat);
     this.scene.add(this.clouds);
@@ -199,6 +232,24 @@ class EarthScene {
     this.viewDir = EarthScene.dirFromLonLat(-12, 22);
   }
 
+  // seeded 3-D value noise in [0, 1] (smooth, tileable over 256 cells)
+  static _noise3(seed) {
+    const r = new RNG(seed), perm = new Uint8Array(512), val = new Float32Array(256);
+    for (let i = 0; i < 256; i++) { perm[i] = i; val[i] = r.next(); }
+    for (let i = 255; i > 0; i--) { const j = Math.floor(r.next() * (i + 1)); const t = perm[i]; perm[i] = perm[j]; perm[j] = t; }
+    for (let i = 0; i < 256; i++) perm[i + 256] = perm[i];
+    const v = (X, Y, Z) => val[perm[perm[perm[X] + Y] + Z]];
+    return (x, y, z) => {
+      const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+      const fx = x - xi, fy = y - yi, fz = z - zi, X = xi & 255, Y = yi & 255, Z = zi & 255, X1 = (X + 1) & 255, Y1 = (Y + 1) & 255, Z1 = (Z + 1) & 255;
+      const u = fx * fx * (3 - 2 * fx), w = fy * fy * (3 - 2 * fy), q = fz * fz * (3 - 2 * fz);
+      const a0 = v(X, Y, Z) + (v(X1, Y, Z) - v(X, Y, Z)) * u, a1 = v(X, Y1, Z) + (v(X1, Y1, Z) - v(X, Y1, Z)) * u;
+      const b0 = v(X, Y, Z1) + (v(X1, Y, Z1) - v(X, Y, Z1)) * u, b1 = v(X, Y1, Z1) + (v(X1, Y1, Z1) - v(X, Y1, Z1)) * u;
+      const A = a0 + (a1 - a0) * w, B = b0 + (b1 - b0) * w;
+      return A + (B - A) * q;
+    };
+  }
+
   // unit vector on the sphere for a longitude/latitude (matches THREE.SphereGeometry's UV layout)
   static dirFromLonLat(lon, lat) {
     const phi = ((lon + 180) * Math.PI) / 180, th = ((90 - lat) * Math.PI) / 180;
@@ -216,7 +267,9 @@ class EarthScene {
     const side = new THREE.Vector3(0, 1, 0).cross(this.viewDir).normalize();
     const pos = this.viewDir.clone().multiplyScalar(dist).addScaledVector(side, -0.3 + T * 0.02).add(new THREE.Vector3(0, 0.2, 0));
     this.camera.position.copy(pos);
-    this.camera.lookAt(0, 0.05, 0);
+    // before the last line the camera tilts up: the planet settles low in frame, black space above for the words
+    const lift = Ease.inOutSine(MathX.clamp((T - 10.4) / 2.0, 0, 1));
+    this.camera.lookAt(0, 0.05 + 0.6 * lift, 0);
     this.camera.updateMatrixWorld(true);
   }
 }
