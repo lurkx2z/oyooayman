@@ -850,7 +850,7 @@ class Environment {
     cab.position.set(1.6, -1.0, -0.6);
     const apex = new THREE.Mesh(new THREE.BoxGeometry(1.2, 6, 1.2), m.lattice);
     apex.position.set(0, 3.8, 0);
-    const trolleyZ = -30;
+    const trolleyZ = -8;   // load kept over the lot, not swinging above the street
     const cable = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 16, 4), m.metal);
     cable.position.set(0, -8, trolleyZ);
     const load = new THREE.Group();
