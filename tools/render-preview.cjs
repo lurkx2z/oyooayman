@@ -4,7 +4,7 @@
    with the HUD included, plus the synced soundtrack, into an MP4.
 
    Needs: Node.js, Playwright (npm i -D playwright) and ffmpeg on PATH.
-     node tools/render-preview.cjs --w 1080 --h 1920 --out renders/phase1.mp4
+     node tools/render-preview.cjs --w 1080 --h 1920 --out renders/what-if-oxygen.mp4
      node tools/render-preview.cjs --shots 0,2.5,3.3,6,8.6,12 --w 540 --h 960   (stills only)
    ===================================================================== */
 const { chromium } = require('playwright');
@@ -18,7 +18,7 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) =>
 }, []));
 const W = parseInt(args.w || '540', 10), H = parseInt(args.h || '960', 10);
 const FPS = parseInt(args.fps || '30', 10);
-const FROM = parseFloat(args.from || '0'), TO = parseFloat(args.to || '15');
+const FROM = parseFloat(args.from || '0'), TO = parseFloat(args.to || '90');
 const OUT = args.out || 'renders/preview.mp4';
 const ROOT = path.resolve(__dirname, '..');
 const frameDir = path.resolve(args.frames || path.join(ROOT, 'renders', 'frames'));

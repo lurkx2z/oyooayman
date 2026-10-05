@@ -14,7 +14,7 @@
   --panel: rgba(14, 16, 20, 0.86);
   --paper: #ebe6dc;         /* off-white for all on-screen text */
   --ember: #d9826f;         /* muted alert red */
-  --serif: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --serif: "Lora", Georgia, "Times New Roman", serif;
   --book: "Lora", Georgia, "Times New Roman", serif;   /* narration, title and HUD values */
 }
 * { box-sizing: border-box; }
