@@ -18,6 +18,9 @@ class DPAudio extends AudioEngine {
 
   fingerprintData() { return [APT, POS, DP_SLOW]; }
 
+  // a second, finer pass of the lone-sample repair (this soundtrack is quiet enough for small clicks to show)
+  async renderOffline() { const buf = await super.renderOffline(); AudioEngine.declick(buf, 0.15); return buf; }
+
   _build(ctx) {
     const S = new SoundKit(ctx, CONFIG.seed), end = CONFIG.duration;
     // offline-render safe envelopes (no sub-block exponential ramps)
