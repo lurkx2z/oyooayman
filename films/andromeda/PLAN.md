@@ -107,4 +107,18 @@ andromeda.html               the page
 
 ## 8. Review log
 
-See the end of this file (filled in after each render).
+**v1 (80.0 s, 1080×1920, 30 fps, −16.7 LUFS).** Fixes made from test stills before the full render:
+
+- Late sky washed out to grey haze → per-galaxy gain tracks drop as the galaxies come close (0.12 at the end), the
+  air-scattered galaxy glow cut from ×7 to ×2.2, stars passing close to you treated as single stars (`m31Near`, `mwNear`).
+- Andromeda still looked like a pristine spiral after the first pass → density-wave arms eased off after it (`armsM31`).
+- A bright line along the horizon (sky showing between the terrain's edge and the mountains) → mountain skirts lowered.
+- The camera looked at the ground whenever its target set → the separation holds a fixed point above the southern
+  horizon; the merger is watched around our own core, which never moves in the sky.
+- Title overflowed the frame → three lines, middle line sized to fit; the question sits below Andromeda.
+- Trees blocked the view along the railing; the pointing hand was off-frame; the eye-shield hand covered the HUD; the
+  lawn read as daylight; the world lights were too strong → all fixed.
+- Sound: the score was inaudible early (−56 dB) and the sub drone, which phones can't play, filled the louder parts → pads
+  and glass notes raised, the sub cut, voices up, master to −16.7 LUFS.
+
+Escalation stills (5/15/25/35/45/55/65/75 s) each show a different sky, as listed in §4.
