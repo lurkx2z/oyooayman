@@ -18,7 +18,7 @@ const FILM = {
     this.fireEv = [[W(XB.shot), 'A0', 0.6], [W(XB.fire1), 'T2', 3], [W(XB.fire2), 'T3', 3], [W(XB.fire3), 'T7', 3], [W(XB.push), 'T8', 3], [W(XB.push + 0.6), 'T9', 3],
       ...[0, 1, 2, 3].map((i) => [W(XB.barrage + i * 0.15), 'G' + i, 3.5])];
     this.mflash = new XBill(scene, { n: this.fireEv.length, seed: 41, kind: 'flash', color: '#ffd59a', additive: true, alpha: 1, fadeIn: 0.01, fadeOut: 0.3,
-      spawn: (i) => ({ p: new THREE.Vector3(), v: new THREE.Vector3(), t0: this.fireEv[i][0], life: i === 0 ? 0.03 : 0.12, s0: this.fireEv[i][2], s1: this.fireEv[i][2] * 1.6, rot: i }) });
+      spawn: (i) => ({ p: new THREE.Vector3(), v: new THREE.Vector3(), t0: this.fireEv[i][0], life: i === 0 ? 0.13 : 0.12, s0: this.fireEv[i][2], s1: this.fireEv[i][2] * 1.6, rot: i }) });
     this.trail = new XRibbon(scene, 200, '#ffe2b0');
     // glass shards for the windows that burst in the transformation
     const near = app.world.windows.filter((p) => Math.hypot(p.position.x + 2, p.position.z + 23) < 30); this.burst = near;
@@ -26,7 +26,7 @@ const FILM = {
     this.shards = new XDebris(scene, near.length * 10, glass, 61, (i, r) => { const p = near[Math.floor(i / 10)].position, dir = new THREE.Vector3(p.x + 2, 0, p.z + 23).normalize();
       return { p: p.clone().add(new THREE.Vector3(r.range(-0.5, 0.5), r.range(-0.4, 0.4), r.range(-0.5, 0.5))), v: dir.multiplyScalar(r.range(4, 9)).add(new THREE.Vector3(0, r.range(1, 4), 0)), t0: W(XB.ring) + Math.hypot(p.x + 2, p.z + 23) / 40, size: r.range(0.08, 0.2), flat: 0.05, spin: new THREE.Vector3(r.range(-9, 9), r.range(-9, 9), r.range(-9, 9)) }; });
     // concrete and wall chunks (the bunker, the falling wall, the break)
-    const rubble = (n, seed, c, tf, rad) => new XDebris(scene, n, app.world.mConcrete, seed, (i, r) => ({ p: new THREE.Vector3(c[0] + r.range(-rad, rad), c[1] + r.range(0, 2.5), c[2] + r.range(-rad, rad)), v: new THREE.Vector3(r.range(-6, 6), r.range(3, 11), r.range(-6, 6)), t0: W(tf), size: r.range(0.3, 1.1), spin: new THREE.Vector3(r.range(-4, 4), r.range(-4, 4), r.range(-4, 4)) }));
+    const rubble = (n, seed, c, tf, rad) => new XDebris(scene, n, app.world.mConcrete, seed, (i, r) => ({ p: new THREE.Vector3(c[0] + r.range(-rad, rad), c[1] + r.range(0, 2.5), c[2] + r.range(-rad, rad)), v: new THREE.Vector3(r.range(-3.5, 3.5), r.range(3, 10), r.range(-3.5, 3.5)), t0: W(tf), size: r.range(0.3, 1.1), spin: new THREE.Vector3(r.range(-4, 4), r.range(-4, 4), r.range(-4, 4)) }));
     this.rubble = [rubble(26, 71, [16, 1, -84], 43.4, 3.5), rubble(18, 73, [-8.5, 3, 0], 44.5, 3), rubble(22, 79, [-8, 0.5, -100], XB.break, 2.5), rubble(16, 83, [5, 0.4, -60], XB.stomp, 2), rubble(14, 89, [6, 0.3, -66], 41.5, 2.5)];
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     const hud = document.getElementById('hud'), mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; d.style.opacity = '0'; hud.appendChild(d); return d; };
@@ -37,13 +37,15 @@ const FILM = {
   },
 
   _camera(app, t) {
-    const S = xShotAt(t), u = MathX.clamp((t - S.t[0]) / (S.t[1] - S.t[0]), 0, 1), C = S.cam(t, u, app.act), cam = app.camera;
+    const S = xShotAt(t), u = MathX.clamp((t - S.t[0]) / (S.t[1] - S.t[0]), 0, 1), cam = app.camera;
+    const C = window.XO_CAM ? { p: new THREE.Vector3(...window.XO_CAM.p), l: new THREE.Vector3(...window.XO_CAM.l), fov: window.XO_CAM.fov || 40 } : S.cam(t, u, app.act);
     cam.position.copy(C.p);
     // handheld + impact shakes (film time, so slow motion keeps the hand alive but heavier)
     let sh = 0; for (const [a, k, d] of S.shake || []) if (t >= a) sh += k * Math.exp(-(t - a) / d);
     const hand = (S.hand || 0), D = MathX.deg;
     cam.position.x += noise1(t * 1.3, 3) * 0.04 * hand + noise1(t * 21, 4) * 0.05 * sh;
     cam.position.y += noise1(t * 1.1, 5) * 0.03 * hand + noise1(t * 23, 6) * 0.06 * sh;
+    cam.position.y = Math.max(cam.position.y, xGround(cam.position.x, cam.position.z) + 0.25);   // never under the ground
     cam.lookAt(C.l);
     cam.rotateZ(D((C.roll || 0) + noise1(t * 0.9, 7) * 0.6 * hand + noise1(t * 19, 8) * 1.4 * sh));
     cam.rotateX(D(noise1(t * 1.4, 9) * 0.5 * hand + noise1(t * 25, 10) * 1.2 * sh)); cam.rotateY(D(noise1(t * 1.2, 11) * 0.5 * hand + noise1(t * 22, 12) * 1.2 * sh));
@@ -55,8 +57,10 @@ const FILM = {
   },
 
   update(app, t) {
-    this._camera(app, t);
     const cam = app.camera, A = app.act, w = xW(t);
+    // a camera that follows someone needs them where they are now: pose the action once, then aim, then pose again for the lens
+    if (xShotAt(t).cam.length >= 3) { this._camera(app, t); A.update(t, cam); }
+    this._camera(app, t);
     A.update(t, cam);
     // muzzle flashes and the bullet / shells
     this.fireEv.forEach(([w0, who], i) => {
@@ -66,7 +70,7 @@ const FILM = {
     this.mflash.update(w);
     this.trail.begin(cam);
     // the bullet: slow enough to be seen crossing the empty spot in the slow motion
-    { const w0 = W(XB.shot), u = w - w0; if (u > 0 && u < 0.2) { const a = A.A[0].muzzle(new THREE.Vector3()), b = new THREE.Vector3(0.9, 1.25, -22), d = b.clone().sub(a).normalize(), p = a.clone().addScaledVector(d, 120 * u); this.trail.seg(p.clone().addScaledVector(d, -0.9), p, 0.035, 1); } }
+    { const w0 = W(XB.shot), u = w - w0; if (u > 0 && u < 0.4) { const a = A.A[0].muzzle(new THREE.Vector3()), b = new THREE.Vector3(0.9, 1.25, -22), d = b.clone().sub(a).normalize(), p = a.clone().addScaledVector(d, 75 * u); this.trail.seg(p.clone().addScaledVector(d, -1.6), p, 0.05, 1); } }
     // shells: tank fire toward the titan, the column's shot at Killua, the barrage
     for (const [w0, who] of this.fireEv) {
       if (who === 'A0') continue; const u = w - w0; if (u < 0 || u > 0.3) continue;
@@ -76,25 +80,30 @@ const FILM = {
       this.trail.seg(p.clone().addScaledVector(d, -3), p, 0.12, 0.9);
     }
     this.trail.end();
+    // a lens inside a head: that head is not drawn
+    A.A[0].j.head.visible = !(this.shot && this.shot.noHead);
     // windows burst with the shockwave; shards fly; rubble
     for (const p of this.burst) p.visible = w < W(XB.ring) + Math.hypot(p.position.x + 2, p.position.z + 23) / 40;
     this.shards.update(w); for (const r of this.rubble) r.update(w);
     // light flashes: warm for explosions and the bolt, cold for Killua
     this._lights(app, w, t);
     this._overlays(t);
+    if (window.XO_HIDE) for (const k of window.XO_HIDE) { const o = A[k] || this[k]; if (o) (o.mesh || o.root || o).visible = false; }
   },
 
   _lights(app, w, t) {
     const Wd = app.world, A = app.act;
     let best = 0, at = null;
     for (const b of A.booms) { const u = w - b.w; if (u < 0 || u > 0.8) continue; const k = Math.exp(-u / 0.2); if (k > best) { best = k; at = A.fire.P[A.booms.indexOf(b) * 6].p; } }
-    const bolt = w - W(XB.bolt); if (bolt > 0 && bolt < 1.5) { const k = Math.exp(-bolt / 0.35) * 2.5; if (k > best) { best = k; at = new THREE.Vector3(-2, 6, -23); } }
+    const bolt = w - W(XB.bolt); if (bolt > 0 && bolt < 0.6) { const k = Math.exp(-bolt / 0.1) * 2.5; if (k > best) { best = k; at = new THREE.Vector3(-2, 6, -23); } }
+    // the end: a fire glow behind the titan rims him for the final frame
+    if (t > XB.final - 0.5 && best < 0.25) { best = 0.25 * MathX.smooth(t, XB.final - 0.5, XB.final + 1.0); at = A.titan.root.position.clone().add(new THREE.Vector3(0, 9, 7)); }
     Wd.warm.intensity = 900 * best; if (at) Wd.warm.position.copy(at);
-    // cold: Killua's cracks
-    let ck = 0, cp = null; const K = A.killua.p.root;
-    for (const ev of A.ev) { if (ev[1] !== 'zap') continue; const u = w - ev[0]; if (u < 0 || u > 0.3) continue; const k = Math.exp(-u / 0.06) * ev[5]; if (k > ck) { ck = k; cp = K.position.clone().add(new THREE.Vector3(0, 1.2, 0)); } }
-    if (A.killua.p.root.visible) { const base = 0.6 + 0.4 * Math.sin(t * 40); if (base * 0.4 > ck) { ck = base * 0.4; cp = K.position.clone().add(new THREE.Vector3(0, 1.1, 0.3)); } }
-    Wd.cold.intensity = 60 * ck; if (cp) Wd.cold.position.copy(cp);
+    // cold: Killua's cracks (a hard blue-white flash between him and the lens) and a faint flicker on him while he is seen
+    let ck = 0, cp = null; const K = A.killua.p.root, kc = K.position.clone().add(new THREE.Vector3(0, 1.1, 0)), toCam = app.camera.position.clone().sub(kc).normalize();
+    for (const ev of A.ev) { if (ev[1] !== 'zap') continue; const u = w - ev[0]; if (u < 0 || u > 0.3) continue; const k = Math.exp(-u / 0.06) * ev[5] * 14; if (k > ck) { ck = k; cp = kc.clone().addScaledVector(toCam, 2.0); } }
+    if (K.visible && app.camera.position.distanceTo(kc) < 6) { const base = 1.3 * (0.6 + 0.4 * Math.sin(t * 40)); if (base > ck) { ck = base; cp = kc.clone().addScaledVector(toCam, 1.2); } }
+    Wd.cold.intensity = ck; if (cp) Wd.cold.position.copy(cp);
   },
 
   _overlays(t) {

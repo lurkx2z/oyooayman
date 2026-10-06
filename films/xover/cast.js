@@ -11,11 +11,11 @@
               are thrown by blasts.
    ===================================================================== */
 
-LOOKS.xKillua = { skin: 5, build: 'slim', shirt: '#ebe9e4', sleeves: 'short', pants: '#232838', shoes: '#ece9f2', sole: '#7a5aa6', hair: '#e9eaf0', collar: false };
-LOOKS.xEren = { skin: 1, build: 'avg', shirt: '#6e4a30', sleeves: 'long', pants: '#d6d0c2', shoes: '#33251a', sole: '#1c140e', hair: '#2a1c13', jacket: true, collar: true, inner: '#e6e2d8' };
+LOOKS.xKillua = { skin: 5, build: 'slim', shirt: '#cfd0cf', sleeves: 'short', pants: '#232838', shoes: '#ece9f2', sole: '#7a5aa6', hair: '#e9eaf0', collar: false };
+LOOKS.xEren = { skin: 1, build: 'avg', shirt: '#6e4a30', sleeves: 'long', pants: '#d6d0c2', shoes: '#33251a', sole: '#1c140e', hair: '#2a1c13', jacket: true, collar: false, inner: '#b9b2a4' };
 LOOKS.xSoldier = { skin: 1, build: 'avg', shirt: '#59604e', sleeves: 'long', pants: '#4f5546', shoes: '#2a2620', sole: '#1a1714', hair: '#3a2a1e', jacket: true, collar: true, inner: '#4a503f' };
 LOOKS.xSoldier2 = { skin: 2, build: 'broad', shirt: '#565c4b', sleeves: 'long', pants: '#4c5243', shoes: '#28241e', sole: '#181512', hair: '#221810', jacket: true, collar: true, inner: '#474c3d' };
-LOOKS.xOfficer = { skin: 0, build: 'avg', shirt: '#4d5345', sleeves: 'long', pants: '#454b3e', shoes: '#1e1b17', sole: '#121010', hair: '#5a4630', coat: true, collar: true };
+LOOKS.xOfficer = { skin: 0, build: 'avg', shirt: '#4d5345', sleeves: 'long', pants: '#454b3e', shoes: '#1e1b17', sole: '#121010', hair: '#5a4630', coat: true, collar: true, inner: '#585d4e' };
 
 // a generic steel helmet (rounded dome, short flared rim) and a rifle
 const XGEO = {
@@ -63,21 +63,29 @@ class XKillua extends HeroActor {
       arm.el.children.forEach((o) => { if (o.isMesh) o.material = navy; });
     }
     for (const leg of [this.j.ll, this.j.rl]) leg.kn.children.forEach((o, i) => { if (o.isMesh && i < 2) o.material = skin; });
-    // the hair: a mop of white spikes over the hero head's cap
-    const hm = new THREE.MeshStandardMaterial({ color: '#e7e8ee', roughness: 0.6, flatShading: true, name: 'killuaHair' }), r = new RNG(77), H = this.j.head;
-    for (let i = 0; i < 46; i++) {
-      const u = r.next(), v = r.range(0.0, 0.85), th = u * Math.PI * 2, ph = v * Math.PI * 0.62;
+    this.j.head.scale.setScalar(1.12);
+    // the hair: a big mop of soft white spikes over the hero head's cap, flaring up and out
+    const hm = new THREE.MeshStandardMaterial({ color: '#cfd2da', roughness: 0.9, flatShading: true, name: 'killuaHair' }), r = new RNG(77), H = this.j.head;
+    for (let i = 0; i < 34; i++) {
+      const u = r.next(), v = r.range(0.0, 0.9), th = u * Math.PI * 2, ph = v * Math.PI * 0.6;
       const dir = new THREE.Vector3(Math.sin(ph) * Math.sin(th), Math.cos(ph), Math.sin(ph) * Math.cos(th) * (Math.cos(th) > 0 ? 0.6 : 1));
-      if (dir.z > 0.55 && dir.y < 0.45) continue;                                                     // keep the face clear
-      const len = r.range(0.07, 0.13) * (dir.z > 0.3 ? 0.75 : 1), g = new THREE.ConeGeometry(r.range(0.018, 0.03), len, 4); g.translate(0, len / 2, 0);
-      const m = new THREE.Mesh(g, hm); m.position.copy(dir.clone().multiplyScalar(0.085)).add(new THREE.Vector3(0, 0.03, -0.012));
-      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().add(new THREE.Vector3(r.range(-0.3, 0.3), 0.25, r.range(-0.3, 0.1))).normalize());
+      if (dir.z > 0.5 && dir.y < 0.5) continue;                                                       // keep the face clear
+      const len = r.range(0.1, 0.17) * (dir.z > 0.3 ? 0.7 : 1), g = new THREE.ConeGeometry(r.range(0.032, 0.048), len, 5); g.translate(0, len / 2, 0);
+      const m = new THREE.Mesh(g, hm); m.position.copy(dir.clone().multiplyScalar(0.075)).add(new THREE.Vector3(0, 0.035, -0.012));
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().add(new THREE.Vector3(r.range(-0.35, 0.35), 0.35, r.range(-0.3, 0.05))).normalize());
       m.castShadow = true; H.add(m);
     }
     // a fringe over the forehead
-    for (let i = 0; i < 9; i++) { const L = r.range(0.04, 0.075), g = new THREE.ConeGeometry(r.range(0.012, 0.02), L, 4); g.translate(0, -L / 2, 0); const m = new THREE.Mesh(g, hm);
+    for (let i = 0; i < 9; i++) { const L = r.range(0.045, 0.08), g = new THREE.ConeGeometry(r.range(0.016, 0.026), L, 4); g.translate(0, -L / 2, 0); const m = new THREE.Mesh(g, hm);
       m.position.set((i - 4) * 0.019 + r.range(-0.006, 0.006), 0.085 + r.range(-0.008, 0.01), 0.068); m.rotation.set(-r.range(0.6, 1.2), r.range(-0.3, 0.3), (i - 4) * 0.14 + r.range(-0.25, 0.25)); m.castShadow = true; H.add(m); }
     this.layer(1);
+  }
+  // hands in the pockets: the wrists IK'd to the front pockets, the hands hidden inside
+  pockets(w = 1) {
+    if (w <= 0) { this.j.la.hand.visible = this.j.ra.hand.visible = true; return; }
+    for (const side of [1, -1]) { const P = this.j.hips.localToWorld(new THREE.Vector3(side * 0.125, -0.02, 0.075)); this._reach(side, P, w); }
+    this.p.root.updateMatrixWorld(true);
+    this.j.la.hand.visible = this.j.ra.hand.visible = w < 0.6;
   }
 }
 
@@ -91,11 +99,13 @@ class XEren extends HeroActor {
     const hm = heroHairMat('#2a1c13', 31), r = new RNG(29);
     for (let i = 0; i < 12; i++) { const L = r.range(0.05, 0.09), g = new THREE.ConeGeometry(r.range(0.014, 0.022), L, 4); g.translate(0, -L / 2, 0); const m = new THREE.Mesh(g, hm);
       const a = (i - 5.5) / 5.5; m.position.set(a * 0.065, 0.092 - Math.abs(a) * 0.02, 0.06 - Math.abs(a) * 0.02); m.rotation.set(-r.range(0.35, 0.8), a * 0.5, a * 0.35 + r.range(-0.15, 0.15)); m.castShadow = true; this.j.head.add(m); }
+    for (let i = 0; i < 16; i++) { const side = i < 8 ? 1 : -1, k = (i % 8) / 7, L = r.range(0.07, 0.11), g = new THREE.ConeGeometry(r.range(0.02, 0.03), L, 4); g.translate(0, -L / 2, 0); const m = new THREE.Mesh(g, hm);
+      const a = -0.25 + k * 2.2; m.position.set(side * Math.cos(a) * 0.088, 0.075 - k * 0.012, Math.sin(-a) * 0.06 - 0.01); m.rotation.set(r.range(-0.2, 0.25) + k * 0.35, 0, side * r.range(0.15, 0.35)); m.castShadow = true; this.j.head.add(m); }
     // harness: two straps over the chest, a belt
     for (const s of [-1, 1]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.5, 0.012), strap); b.position.set(s * 0.09, 0.25, front + 0.01); b.rotation.z = s * 0.12; S.add(b); }
     const belt = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.035, 0.24), strap); belt.position.set(0, -0.02, 0); S.add(belt);
     // the cloak: from the shoulders down the back, slightly flared
-    const cg = new THREE.CylinderGeometry(0.22, 0.4, 1.0, 12, 4, true, Math.PI * 0.62, Math.PI * 1.76); cg.translate(0, -0.5, 0);
+    const cg = new THREE.CylinderGeometry(0.22, 0.4, 1.0, 12, 4, true, Math.PI * 0.42, Math.PI * 1.16); cg.translate(0, -0.5, 0);
     const cl = new THREE.Mesh(cg, cloakM); cl.position.set(0, 0.52, -0.02); cl.castShadow = true; S.add(cl); this.cloak = cl;
     const hood = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 6, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.45), cloakM); hood.position.set(0, 0.5, -0.12); hood.scale.set(1.1, 0.8, 0.8); S.add(hood);
     this.layer(1);
@@ -106,7 +116,7 @@ class XEren extends HeroActor {
 // a soldier's stances: where the rifle sits relative to the chest, and where the hands grip it
 const X_STANCE = {
   aim:  { p: [-0.05, 0.42, 0.12], dir: [0, 0, 1], up: [0, 1, 0] },          // shouldered, pointing forward
-  port: { p: [0.0, 0.25, 0.2], dir: [0.55, 0.75, 0.25], up: [0, 0, 1] },     // across the chest (running)
+  port: { p: [0.02, 0.1, 0.22], dir: [0.62, 0.52, 0.32], up: [0, 0, 1] },     // across the chest (running)
   low:  { p: [-0.12, 0.05, 0.2], dir: [0.15, -0.55, 0.8], up: [0, 1, 0] },   // lowered
   hip:  { p: [-0.12, 0.12, 0.22], dir: [0, -0.05, 1], up: [0, 1, 0] },       // from the hip
 };
@@ -133,6 +143,8 @@ class XSoldier extends XPerson {
     super(scene, id, look);
     const steel = Mat.std('#4b5045', { roughness: 0.55, metalness: 0.3 }), H = this.j.head;
     for (const c of H.children) if (c.geometry === PersonGeo.hair) c.visible = false;
+    // the officer is seen close: a real face under the helmet
+    if (look === 'xOfficer') this.face = new HeroFace(H, { skin: SKIN[0], hair: '#5a4630', brow: '#3a2a1e', iris: [95, 80, 60], seed: 8, jaw: 0.3, nose: 0.022, lip: '#a86a5e' });
     const h = new THREE.Mesh(XGEO.helmet, steel); h.position.set(0, 0.03, -0.006); h.castShadow = true; H.add(h);
     const rim = new THREE.Mesh(XGEO.rim, steel); rim.position.set(0, 0.026, -0.006); H.add(rim);
     this.rifle = XGEO.rifle.clone(); scene.add(this.rifle);
@@ -141,7 +153,7 @@ class XSoldier extends XPerson {
   // stance: aim | port | low | hip | none; w: how firmly the hands are on it
   update(t, keys, stance = 'aim', aimAt = null) {
     const p = this.p, K = keys || this.keys, L = K.at(t), V = this.v;
-    p.root.position.set(L.x, 0, L.z); p.root.rotation.set(0, K.yaw.value(t), 0);
+    p.root.position.set(L.x, xGround(L.x, L.z), L.z); p.root.rotation.set(0, K.yaw.value(t), 0);
     p.apply(K.pose(t, { seed: p.seed, seedI: p.seedI, walkPhase: (L.dist / 1.3) * Math.PI * 2 })); p.root.updateMatrixWorld(true);
     const st = X_STANCE[stance];
     this.rifle.visible = !!st;

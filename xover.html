@@ -7,7 +7,20 @@
   <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
   <link rel="stylesheet" href="fonts/fonts.css">
   <link rel="stylesheet" href="style.css">
-  <style>#hud::before{display:none}</style>
+  <style>
+    #hud::before { display: none; }
+    #hud > div { position: absolute; }
+    /* the title: three stacked lines, condensed, white with a hard shadow */
+    #hud .xo-title { left: 0; right: 0; top: calc(var(--u) * 300); text-align: center; font-family: 'Oswald', sans-serif; color: #ffffff; text-transform: uppercase;
+      text-shadow: 0 calc(var(--u) * 4) calc(var(--u) * 18) rgba(0, 0, 0, 0.75), 0 0 calc(var(--u) * 60) rgba(0, 0, 0, 0.35); }
+    #hud .xo-title span { display: block; line-height: 1.0; }
+    #hud .xo-title .a { font-weight: 500; font-size: calc(var(--u) * 58); letter-spacing: 0.42em; opacity: 0.9; }
+    #hud .xo-title .b { margin-top: calc(var(--u) * 14); font-weight: 700; font-size: calc(var(--u) * 116); letter-spacing: 0.02em; }
+    #hud .xo-title .c { margin-top: calc(var(--u) * 10); font-weight: 600; font-size: calc(var(--u) * 70); letter-spacing: 0.12em; color: #e8dccb; }
+    /* the last line, above the bottom safe zone */
+    #hud .xo-cap { left: 0; right: 0; top: calc(var(--u) * 1318); text-align: center; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: calc(var(--u) * 70);
+      line-height: 1.08; letter-spacing: 0.06em; color: #ffffff; text-shadow: 0 calc(var(--u) * 4) calc(var(--u) * 20) rgba(0, 0, 0, 0.85), 0 0 calc(var(--u) * 50) rgba(0, 0, 0, 0.5); }
+  </style>
 </head>
 <body>
   <div id="app">
@@ -68,7 +81,12 @@
   <script src="films/xover/titan.js"></script>
   <script src="films/xover/cast.js"></script>
   <script src="films/xover/tank.js"></script>
-  <script src="films/xover/lineup.js"></script>
+  <script src="films/xover/script.js"></script>
+  <script src="films/xover/world.js"></script>
+  <script src="films/xover/fx.js"></script>
+  <script src="films/xover/action.js"></script>
+  <script src="films/xover/shots.js"></script>
+  <script src="films/xover/film.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

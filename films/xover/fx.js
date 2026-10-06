@@ -21,6 +21,10 @@ const XSPR = {
     const S = 128, c = Tex.canvas(S, S), x = c.getContext('2d'), r = new RNG(kind.length * 31);
     if (kind === 'soft') {
       for (let i = 0; i < 18; i++) { const px = S / 2 + r.range(-22, 22), py = S / 2 + r.range(-22, 22), rr = r.range(20, 44), g = x.createRadialGradient(px, py, 0, px, py, rr); g.addColorStop(0, 'rgba(255,255,255,0.32)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, S, S); }
+    } else if (kind === 'glow') {
+      // a fireball / flash without rays: a hot core and a soft, slightly lumpy falloff
+      for (let i = 0; i < 10; i++) { const px = S / 2 + r.range(-14, 14), py = S / 2 + r.range(-14, 14), rr = r.range(30, 56), g = x.createRadialGradient(px, py, 0, px, py, rr); g.addColorStop(0, 'rgba(255,255,255,0.42)'); g.addColorStop(0.5, 'rgba(255,255,255,0.14)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, S, S); }
+      const g = x.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S * 0.3); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, S, S);
     } else {
       const g = x.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.15, 'rgba(255,255,255,0.8)'); g.addColorStop(0.45, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, S, S);
       x.strokeStyle = 'rgba(255,255,255,0.5)'; x.lineWidth = 3; for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.3; x.beginPath(); x.moveTo(S / 2, S / 2); x.lineTo(S / 2 + Math.cos(a) * S * 0.48, S / 2 + Math.sin(a) * S * 0.48); x.stroke(); }
@@ -41,12 +45,12 @@ class XBill {
     this.u = Object.assign(THREE.UniformsUtils.clone(THREE.UniformsLib.fog), { tMap: { value: XSPR.get(spec.kind || 'soft') }, uColor: { value: new THREE.Color(spec.color || '#ffffff') } });
     this.mesh.material = new THREE.ShaderMaterial({
       uniforms: this.u, transparent: true, depthWrite: false, blending: spec.additive ? THREE.AdditiveBlending : THREE.NormalBlending, fog: !spec.additive,
-      vertexShader: `attribute float aA, aR; varying float vA; varying vec2 vUv; ${THREE.ShaderChunk.fog_pars_vertex}
+      vertexShader: `attribute float aA, aR; varying float vA; varying vec2 vUv; \n${THREE.ShaderChunk.fog_pars_vertex}\n
         void main(){ vUv = uv; vA = aA; vec3 c = vec3(instanceMatrix[3]); float s = length(vec3(instanceMatrix[0]));
           vec4 mvPosition = modelViewMatrix * vec4(c, 1.0); float cr = cos(aR), sr = sin(aR); vec2 q = vec2(position.x * cr - position.y * sr, position.x * sr + position.y * cr);
-          mvPosition.xy += q * s; gl_Position = projectionMatrix * mvPosition; ${THREE.ShaderChunk.fog_vertex} }`,
-      fragmentShader: `uniform sampler2D tMap; uniform vec3 uColor; varying float vA; varying vec2 vUv; ${THREE.ShaderChunk.fog_pars_fragment}
-        void main(){ vec4 t = texture2D(tMap, vUv); float a = t.a * vA; if (a < 0.002) discard; gl_FragColor = vec4(uColor * (${spec.additive ? 'a' : '1.0'}), a); ${spec.additive ? '' : THREE.ShaderChunk.fog_fragment} }`,
+          mvPosition.xy += q * s; gl_Position = projectionMatrix * mvPosition; \n${THREE.ShaderChunk.fog_vertex}\n }`,
+      fragmentShader: `uniform sampler2D tMap; uniform vec3 uColor; varying float vA; varying vec2 vUv; \n${THREE.ShaderChunk.fog_pars_fragment}\n
+        void main(){ vec4 t = texture2D(tMap, vUv); float a = t.a * vA; if (a < 0.002) discard; gl_FragColor = vec4(uColor * (${spec.additive ? 'a' : '1.0'}), a); \n${spec.additive ? '' : THREE.ShaderChunk.fog_fragment}\n }`,
     });
     if (!spec.additive) this.mesh.material.fog = true;
     scene.add(this.mesh);
@@ -55,14 +59,14 @@ class XBill {
   update(t) {
     const S = this.s, g = S.g || 0, dr = S.drag || 0; let any = false;
     this.P.forEach((o, i) => {
-      const u = t - o.t0;
+      let u = t - o.t0; if (o.loop) u = ((u % o.loop) + o.loop) % o.loop;
       if (u < 0 || u > o.life) { this.aA[i] = 0; this._m.makeScale(0, 0, 0); this.mesh.setMatrixAt(i, this._m); return; }
       any = true;
       const d = dr > 0 ? (1 - Math.exp(-dr * u)) / dr : u, k = u / o.life;
       this._v.set(o.p.x + o.v.x * d, o.p.y + o.v.y * d - 0.5 * g * u * u + (o.rise || 0) * u, o.p.z + o.v.z * d);
       const sz = MathX.lerp(o.s0, o.s1, 1 - Math.pow(1 - k, 2));
       this._m.compose(this._v, this._q, this._s.set(sz, sz, sz)); this.mesh.setMatrixAt(i, this._m);
-      this.aA[i] = (o.a ?? S.alpha ?? 1) * MathX.smooth(k, 0, S.fadeIn ?? 0.08) * (1 - MathX.smooth(k, S.fadeOut ?? 0.5, 1)) * (S.flicker ? 0.7 + 0.3 * Math.sin(u * 37 + i) : 1);
+      this.aA[i] = (S.mod ? S.mod(o, this._v) : 1) * (o.a ?? S.alpha ?? 1) * MathX.smooth(k, 0, S.fadeIn ?? 0.08) * (1 - MathX.smooth(k, S.fadeOut ?? 0.5, 1)) * (S.flicker ? 0.7 + 0.3 * Math.sin(u * 37 + i) : 1);
       this.aR[i] = (o.rot || 0) + (o.spin || 0) * u;
     });
     this.mesh.visible = any;
@@ -78,7 +82,7 @@ class XRibbon {
     this.pos = new Float32Array(maxPts * 6 * 3); this.al = new Float32Array(maxPts * 6);
     g.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage));
     g.setAttribute('aA', new THREE.BufferAttribute(this.al, 1).setUsage(THREE.DynamicDrawUsage));
-    this.mat = new THREE.ShaderMaterial({ uniforms: { uColor: { value: new THREE.Color(color) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    this.mat = new THREE.ShaderMaterial({ uniforms: { uColor: { value: new THREE.Color(color) } }, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
       vertexShader: 'attribute float aA; varying float vA; void main(){ vA = aA; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
       fragmentShader: 'uniform vec3 uColor; varying float vA; void main(){ gl_FragColor = vec4(uColor * vA, vA); }' });
     this.mesh = new THREE.Mesh(g, this.mat); this.mesh.frustumCulled = false; this.mesh.renderOrder = 9; scene.add(this.mesh);

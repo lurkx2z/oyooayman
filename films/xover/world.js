@@ -13,7 +13,7 @@ installFog({ bankScale: 0.02, bankAmount: 0.5, lowHeight: 6, lowAmount: 0.9, cap
 const XW = {
   road: { x: 0, w: 7 },
   village: { z0: -20, z1: 30 },
-  trench: { z: -80 }, ridge: { z: -108, h: 7 }, battery: { z: -126 },
+  trench: { z: -80 }, ridge: { z: -152, h: 6 }, battery: { z: -126 },
   bunker: [16, -84], mg: [[-14, -79], [30, -81]],
   eren: [-22, -42],                                   // where he transforms
 };
@@ -53,7 +53,7 @@ class XWorld {
     this._lights();
     this.batch.build(this.root, 'xw');
     this._envMap();
-    this.scene.fog = new THREE.FogExp2('#8d8578', 0.0085);
+    this.scene.fog = new THREE.FogExp2('#7a7268', 0.0032);
   }
 
   _materials() {

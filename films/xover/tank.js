@@ -97,7 +97,7 @@ class XTank {
   //      crush (0..1), roll (rad, overturned), pitch, lift (m), spin (rad), broken (bool) }
   set(s) {
     const r = this.root;
-    r.position.set(s.x, s.lift || 0, s.z); r.rotation.set(0, s.yaw || 0, 0);
+    r.position.set(s.x, (s.lift || 0) + xGround(s.x, s.z), s.z); r.rotation.set(0, s.yaw || 0, 0);
     const b = this.body;
     b.rotation.set(s.pitch || 0, s.spin || 0, s.roll || 0, 'YXZ');
     b.position.y = (s.roll ? Math.abs(Math.sin(s.roll)) * 1.4 : 0);
@@ -115,7 +115,8 @@ class XTank {
     this.loose.visible = !!s.broken;
   }
   // world points: the muzzle, the hatch, the deck (for someone to stand on)
-  muzzle(out) { this.barrel.updateMatrixWorld(true); return out.set(0, 0, 3.55).applyMatrix4(this.barrel.matrixWorld); }
-  deck(out, dx = 0, dz = 0) { this.body.updateMatrixWorld(true); return out.set(dx, 2.0, dz).applyMatrix4(this.body.matrixWorld); }
-  turretTop(out) { this.turret.updateMatrixWorld(true); return out.set(0.25, 0.85, 0.1).applyMatrix4(this.turret.matrixWorld); }
+  // (the whole tank's matrices are refreshed first: set() moved the root since the last render)
+  muzzle(out) { this.root.updateMatrixWorld(true); return out.set(0, 0, 3.55).applyMatrix4(this.barrel.matrixWorld); }
+  deck(out, dx = 0, dz = 0) { this.root.updateMatrixWorld(true); return out.set(dx, 2.0, dz).applyMatrix4(this.body.matrixWorld); }
+  turretTop(out) { this.root.updateMatrixWorld(true); return out.set(0.25, 0.85, 0.1).applyMatrix4(this.turret.matrixWorld); }
 }

@@ -20,7 +20,7 @@ function xLimb(len, rings, sides = 9) {
 class XTitan {
   constructor(scene, opts = {}) {
     this.scene = scene;
-    const skinC = opts.skin || '#a8745a';
+    const skinC = opts.skin || '#9c6650';
     this.mSkin = new THREE.MeshStandardMaterial({ color: skinC, roughness: 0.72, flatShading: true, name: 'titanSkin' });
     this.mSkinDk = new THREE.MeshStandardMaterial({ color: new THREE.Color(skinC).multiplyScalar(0.72), roughness: 0.8, flatShading: true, name: 'titanSkinDk' });
     this.mHair = new THREE.MeshStandardMaterial({ color: '#1f1712', roughness: 0.85, flatShading: true, name: 'titanHair' });
@@ -159,7 +159,12 @@ class XTitan {
     j.ll.ft.rotation.x = P.lFoot; j.rl.ft.rotation.x = P.rFoot;
     this.jaw.rotation.x = 0.55 * jawOpen;
   }
-  setHeat(k) { this.heat = k; for (const m of [this.mSkin, this.mSkinDk]) m.emissiveIntensity = 0.9 * k; this.mEye.emissiveIntensity = 2.2 + 3 * k; }
+  setHeat(k) { this.heat = k; for (const m of [this.mSkin, this.mSkinDk]) m.emissiveIntensity = 0.14 * k; this.mEye.emissiveIntensity = 2.2 + 3 * k; }
+  // shade 0..1: the body darkened toward a silhouette (inside the steam), the eyes still burning
+  setShade(k) {
+    if (!this._base) this._base = [this.mSkin.color.clone(), this.mSkinDk.color.clone()];
+    [this.mSkin, this.mSkinDk].forEach((m, i) => m.color.copy(this._base[i]).multiplyScalar(1 - 0.82 * k));
+  }
   worldOf(part, out) { return (this.j[part] || part).getWorldPosition(out); }
 }
 
