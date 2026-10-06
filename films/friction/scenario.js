@@ -30,7 +30,7 @@ const FR_STATIC = (() => {
     if (!(zl < -14 && zl > -60) && !(zl < -1 && zl > -12)) S.treesL.push(zl + ((Math.round(z * 3) % 5) - 2) * 0.2);
   }
   S.masts = [[7.9, -38.2], [-7.9, -21.8], [-9.1, -37.5], [9.1, -22.5]];
-  S.bench = { x: 12.0, z: -4.0 };
+  S.bench = { x: 8.15, z: -10.5 };
   S.shelter = { x: -10.2, z: -7.5 };
   return S;
 })();
@@ -48,7 +48,7 @@ function frLane(x, z, yawDeg, v0, a = 0, tStart = 0, vx = 0) {
 // a car: [id, type, colour, x, z, yawDeg, v0, { a, tStart, actions, steer, horns, vx, kicks, lights }]
 const FR_CARS = [
   // the queue at the light beside you: K never gets going — its wheels spin in place from 3.5 s
-  ['K', 'hatch', '#2f7f86', 5.25, -18.9 + 2.06, 0, 0, { actions: [[0, 'roll'], [3.55, 'gas'], [8.6, 'coast'], [10.2, 'gas'], [13.0, 'coast'], [21.6, 'gas'], [24.4, 'coast'], [25.0, 'gas'], [29.2, 'coast'], [64, 'brake']], horns: [[26.2, 1.4], [29.6, 0.5]] }],
+  ['K', 'hatch', '#2f7f86', 5.25, -18.45, 0, 0, { actions: [[0, 'roll'], [3.55, 'gas'], [8.6, 'coast'], [10.2, 'gas'], [13.0, 'coast'], [21.6, 'gas'], [24.4, 'coast'], [25.0, 'gas'], [29.2, 'coast'], [64, 'brake']], horns: [[26.2, 1.4], [29.6, 0.5]] }],
   // the red sedan: comes up behind you at 9 m/s, brakes from 9.5 s (wheels locked) and slides past at 12.6 s, through the junction and up the hill
   ['B1', 'sedan', '#b3261e', 1.75, -16.2 + 9 * 12.6, 0, 9, { actions: [[0, 'roll'], [9.5, 'brake'], [64, 'brake']], horns: [[11.3, 0.9]], steer: [[0, 0], [12.2, 0], [12.8, -0.3], [15, -0.3], [16, 0]] }],
   // the SUV rolling down the hill: brakes and steers hard right from 9 s, goes straight
@@ -56,7 +56,7 @@ const FR_CARS = [
   // the taxi on the cross street: was slowing for its red, slides through it
   ['C1', 'taxi', '#e8b419', -85.3, -28.25, -90, 6, { actions: [[0, 'roll'], [3.4, 'brake'], [64, 'brake']], steer: [[0, 0], [12.5, 0], [13.2, -0.5], [20, -0.5]] }],
   // the box truck: just through the junction at 0 s, climbing at 15 m/s with a slight drift right (lane change)
-  ['T', 'truck', '#d9d6cc', 2.1, -35, 0, 15, { vx: 0.13, actions: [[0, 'roll'], [3.5, 'brake'], [64, 'brake']], horns: [[14.8, 1.2]] }],
+  ['T', 'truck', '#d9d6cc', 2.1, -35, 0, 17, { vx: 0.13, actions: [[0, 'roll'], [3.5, 'brake'], [64, 'brake']], horns: [[14.8, 1.2]] }],
   // a car from behind in the inside lane, coasting at 8 m/s since 3 s: glides past stuck K at ~25 s
   ['B4', 'ev', '#5b6f8f', 1.75, -16.8 + 8 * 22, 0, 8, { actions: [[0, 'roll'], [3.6, 'coast'], [20.5, 'brake'], [64, 'brake']], horns: [[23.6, 0.8]] }],
 ];
@@ -93,6 +93,7 @@ const FR_PROPS = [
   ['bn1', 'bin', 7.95, -70.3], ['bn2', 'bin', 7.95, -88.3], ['bn3', 'bin', -7.95, -60.3],
   ['pp1', 'pipe', 10.6, -78.4], ['pp2', 'pipe', 11.25, -78.4], ['pp3', 'pipe', 10.92, -78.9],
   // cargo inside the truck (behind its roll-up door)
+  ['rc1', 'cage', 0, 0, { cargo: [-2.6, 0.2], kick: [0.9, 0.6] }],
   ['bx1', 'box', 0, 0, { cargo: [-2.0, -0.55] }], ['bx2', 'box', 0, 0, { cargo: [-2.0, 0.55] }], ['bx3', 'box', 0, 0, { cargo: [-2.85, -0.5] }], ['bx4', 'box', 0, 0, { cargo: [-2.85, 0.5] }], ['bx5', 'box', 0, 0, { cargo: [-1.15, 0.0] }],
   // your phone: in your left hand until 3.05 s
   ['phone', 'phone', 0, 0],
@@ -105,7 +106,26 @@ const FR_PROP_SPEC = {
   pipe: { m: 70, circles: [[1.6, 0, 0.16], [0.55, 0, 0.16], [-0.55, 0, 0.16], [-1.6, 0, 0.16]], CdA: 0.3, e: 0.15 },
   box: { m: 22, r: 0.36, CdA: 0.36, e: 0.12 },
   phone: { m: 0.2, r: 0.07, CdA: 0.006, e: 0.3 },
+  cage: { m: 95, r: 0.42, CdA: 0.6, e: 0.15 },
 };
+
+// what the truck's hit at ~31 s shakes loose on the hill sidewalk: id → [time, dvx, dvz, dw]
+const FR_RELEASE = {
+  ca2: [31.55, -0.2, 0.9, 0.4], ca3: [31.7, 0.1, 0.7, -0.3], ca4: [31.62, -0.4, 1.1, 0.6], ca5: [31.85, -0.1, 0.8, 0.2],
+  bk1: [31.5, -0.3, 0.6, 0.8], bk2: [31.65, -0.2, 0.5, -0.6], bk3: [31.8, -0.4, 0.7, 0.5],
+  pp1: [31.75, -0.2, 0.5, 0.1], pp2: [31.9, -0.1, 0.4, -0.08], pp3: [32.05, -0.3, 0.6, 0.15],
+  bn1: [31.6, -0.6, 0.4, 0.3], bn2: [32.2, -0.5, 0.5, -0.2], bn3: [32.6, 0.6, 0.5, 0.2],
+};
+// the hero cart that knocks you loose: [t, x, z, vx, vz] waypoints (Hermite), released at the end into the simulation
+const FR_KNOCK = { id: 'ca1', path: [
+  [31.4, 10.9, -57.6, -0.3, 1.2], [35.3, 9.7, -44.0, -0.35, 5.2], [37.9, 9.0, -30.0, -0.28, 5.6],
+  [39.15, 8.62, -23.1, -0.22, 5.4], [39.25, 8.58, -22.62, -0.25, 4.3], [40.7, 7.93, -16.6, 0.1, 4.2]] };
+function frPathAt(P, t, yaw0) {
+  let i = 0; while (i < P.length - 2 && t > P[i + 1][0]) i++;
+  const a = P[i], b = P[i + 1], T = b[0] - a[0], u = Math.max(0, Math.min(1, (t - a[0]) / T)), u2 = u * u, u3 = u2 * u;
+  const h = (p, q, vp, vq) => (2 * u3 - 3 * u2 + 1) * p + (u3 - 2 * u2 + u) * T * vp + (-2 * u3 + 3 * u2) * q + (u3 - u2) * T * vq;
+  return { x: h(a[1], b[1], a[3], b[3]), z: h(a[2], b[2], a[4], b[4]), yaw: yaw0 + 0.55 * (t - P[0][0]) };
+}
 
 /* --------------------------------------------------------------------- */
 function frBuildWorld() {
@@ -133,7 +153,7 @@ function frBuildWorld() {
     W.wall('bollards' + s, s * 4.62, -48.45, s * 7.0, -48.45, s > 0 ? { breakIf: (w, t) => w.byId.T.bigHit + 0.2 <= t } : {});
   }
   // the bench behind you, the bus shelter across the road, newspaper boxes (bolted)
-  { const b = FR_STATIC.bench; W.wall('bench', b.x - 0.25, b.z - 0.95, b.x - 0.25, b.z + 0.95, { cars: false }); W.wall('benchB', b.x - 0.25, b.z + 0.95, b.x + 0.25, b.z + 0.95, { cars: false }); W.wall('benchF', b.x + 0.25, b.z - 0.95, b.x - 0.25, b.z - 0.95, { cars: false }); }
+  { const b = FR_STATIC.bench, o = { cars: false, e: 0 }; W.wall('bench', b.x - 0.25, b.z - 0.95, b.x - 0.25, b.z + 0.95, o); W.wall('benchB', b.x - 0.25, b.z + 0.95, b.x + 0.25, b.z + 0.95, o); W.wall('benchF', b.x + 0.25, b.z - 0.95, b.x - 0.25, b.z - 0.95, o); W.wall('benchR', b.x + 0.25, b.z + 0.95, b.x + 0.25, b.z - 0.95, o); }
 
   // ---- cars ----
   const car = (id, ty, x, z, yawDeg, v0, o = {}) => {
@@ -155,7 +175,7 @@ function frBuildWorld() {
   W.byId.W1.kicks.push([3.15, 0, 0.15]);
   W.byId.W2.kicks.push([3.4, 0, -0.32]);
   W.byId.J.kicks.push([3.3, 0.15, 0.25]);
-  W.byId.W3.hold.push([6.2, 80, () => ({ x: 9.62, z: -22.05, yaw: 49 * Math.PI / 180 })]);
+  W.byId.W3.hold.push([6.2, 80, () => ({ x: 9.62, z: -22.05, yaw: 49 * Math.PI / 180 }), { breakJ: 300 }]);
   W.byId.W6.hold.push([3.4, 80, () => ({ x: -8.45, z: -22.0, yaw: -110 * Math.PI / 180 })]);
 
   // ---- you ----
@@ -164,10 +184,11 @@ function frBuildWorld() {
   // 5.2 s: your arm hooks the lamp post — a short swing round it, then you hold on
   const p0 = { x: FR_WALK.x, z: FR_WALK.z0 - FR_WALK.v * 3 - 1.25 * 2.2 }, v0 = { x: 0, z: -1.25 };
   const herm = (a, b, va, vb, T, u) => { const u2 = u * u, u3 = u2 * u; return (2 * u3 - 3 * u2 + 1) * a + (u3 - 2 * u2 + u) * T * va + (-2 * u3 + 3 * u2) * b + (u3 - u2) * T * vb; };
-  me.hold.push([5.2, 40.1, (t) => {
+  // (your grip holds against bumps; a real hit tears you loose)
+  me.hold.push([5.2, 80, (t) => {
     const u = Math.min(1, (t - 5.2) / 0.8);
     return { x: herm(p0.x, FR_HOLD.x, v0.x, 0, 0.8, u), z: herm(p0.z, FR_HOLD.z, v0.z, 0, 0.8, u), yaw: 0 };
-  }]);
+  }, { breakJ: 60 }]);
 
   // ---- props ----
   const T = W.byId.T;
@@ -180,13 +201,26 @@ function frBuildWorld() {
       const [lx, lz] = o.cargo;
       spec.drive = null; spec.ride = { body: 'T', lx, lz };
       spec.hold = [[0, 80, (t) => { const s = frTruckAt(W, t); return { x: s.x - Math.sin(s.yaw) * lx + Math.cos(s.yaw) * lz, z: s.z - Math.cos(s.yaw) * lx - Math.sin(s.yaw) * lz, yaw: s.yaw }; },
-        { until: (w, t) => w.byId.T.bigHit + 0.12 <= t }]];
+        { until: (w, t) => w.byId.T.bigHit + 0.12 <= t, kick: o.kick }]];
       // inside the truck they touch nothing; once the door bursts they slide out the back
-      spec.ghost = (t, other) => { const h = W.byId.T.bigHit; return !(h + 0.12 <= t) ? true : (other.id === 'T' && t < h + 1.6) || (other.id.startsWith('bx') && t < h + 0.5); };
+      spec.ghost = (t, other) => { const h = W.byId.T.bigHit; return !(h + 0.12 <= t) ? true : (other.id === 'T' && t < h + 1.6) || ((other.id.startsWith('bx') || other.id === 'rc1') && t < h + 0.5); };
     }
     // chained, racked, corralled or fenced: held in place until something hits them hard enough
     const tether = { bin: 1500, bike: 1100, cart: 1400, pipe: 4500 }[kind];
-    if (tether) spec.hold = [[0, 80, () => ({ x, z, yaw: spec.yaw }), { breakJ: tether }]];
+    if (tether) {
+      // held until the truck's hit shakes the hill loose (the corral rail, the rack, the chains, the fence give way), or something hits them
+      const rel = FR_RELEASE[id];
+      spec.hold = [[0, rel ? rel[0] : 80, () => ({ x, z, yaw: spec.yaw }), { breakJ: tether }]];
+      if (rel) spec.kicks = [[rel[0], rel[1], rel[2], rel[3] || 0]];
+    }
+    if (id === FR_KNOCK.id) {
+      // the hero cart: out of the corral, down the hill sidewalk, across the junction, over your kerb and into you —
+      // a scripted path (it touches nothing else on the way), then the simulation takes over for the hit
+      const K = FR_KNOCK;
+      spec.hold = [[0, K.path[0][0], () => ({ x, z, yaw: spec.yaw })], [K.path[0][0], K.path[K.path.length - 1][0], (t) => frPathAt(K.path, t, spec.yaw)]];
+      spec.kicks = [];
+      spec.ghost = (t, other) => t > K.path[0][0] - 0.01 && t < K.path[K.path.length - 1][0] && other.id !== 'me';
+    }
     if (kind === 'phone') {
       // in your hand until 3.05 s, then it squirts forward out of your grip
       spec.drive = (t) => (t < 3.05 ? { x: FR_WALK.x - 0.22, z: FR_WALK.z0 - FR_WALK.v * t - 0.35, yaw: 0, vx: 0, vz: -FR_WALK.v, w: 0 } : null);
@@ -202,4 +236,4 @@ function frBuildWorld() {
 // where the truck is (used by its cargo while the door is shut): the simulation's own current state
 function frTruckAt(W, t) { const b = W.byId.T; return { x: b.x, z: b.z, yaw: b.yaw }; }
 
-if (typeof module !== 'undefined') module.exports = { FR_STATIC, FR_DIMS, FR_CARS, FR_PARKED, FR_PEOPLE, FR_PROPS, FR_PROP_SPEC, FR_POLE, FR_HOLD, FR_WALK, frBuildWorld, frLane };
+if (typeof module !== 'undefined') module.exports = { FR_KNOCK, FR_RELEASE, FR_STATIC, FR_DIMS, FR_CARS, FR_PARKED, FR_PEOPLE, FR_PROPS, FR_PROP_SPEC, FR_POLE, FR_HOLD, FR_WALK, frBuildWorld, frLane };

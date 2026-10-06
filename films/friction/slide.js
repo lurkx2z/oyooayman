@@ -123,7 +123,8 @@ class SlideWorld {
       }
       for (const H of b.hold) {
         const [t0, t1, fn, o] = H;
-        if (!(t >= t0 && t < t1) || (o && (H.broken <= t || (o.until && o.until(this, t))))) continue;
+        if (o && o.until && !H.done && o.until(this, t)) { H.done = true; if (o.kick) { b.vx += o.kick[0]; b.vz += o.kick[1]; b.w += o.kick[2] || 0; } }
+        if (!(t >= t0 && t < t1) || (o && (H.broken <= t || H.done))) continue;
         b.holdEntry = H;
         const s = fn(t), s2 = fn(Math.min(t1 - 1e-6, t + dt));
         b.vx = (s2.x - s.x) / dt; b.vz = (s2.z - s.z) / dt; b.w = (s2.yaw - s.yaw) / dt;
@@ -288,14 +289,14 @@ class SlideWorld {
     let j = -(1 + (Math.abs(vn) < 0.3 ? 0 : e)) * vn / k;                 // resting contacts don't bounce
     const jMax = 14 / k;                                                   // clamp: no contact changes a velocity by more than ~14 m/s
     if (j > jMax) j = jMax;
+    // a hard enough hit tears a held thing loose first (a chain, a rack, your grip): then it takes the hit as a free body
+    for (const q of [a, c]) if (q && q.held && q.holdEntry && q.holdEntry[3] && q.holdEntry[3].breakJ && j > q.holdEntry[3].breakJ && !(q.holdEntry.broken <= t)) {
+      q.holdEntry.broken = t; q.held = false; this.breaks.push({ t, id: q.id + ':hold', by: q === a ? (c ? c.id : 'static') : a.id });
+      return this._resolve(a, c, cx, cz, nx, nz, 0, e, t, log);
+    }
     a.vx -= nx * j * ima; a.vz -= nz * j * ima; a.w -= rna * j * iia;
     if (c) { c.vx += nx * j * imc; c.vz += nz * j * imc; c.w += rnc * j * iic; }
-    // a hard enough hit tears a held thing loose (a chain, a rack, a corral rail) or marks a big hit on a body
-    for (const q of [a, c]) {
-      if (!q) continue;
-      if (q.held && q.holdEntry && q.holdEntry[3] && q.holdEntry[3].breakJ && j > q.holdEntry[3].breakJ) { q.holdEntry.broken = t; this.breaks.push({ t, id: q.id + ':hold', by: q === a ? (c ? c.id : 'static') : a.id }); }
-      if (q.bigHitJ && j > q.bigHitJ && !(q.bigHit <= t)) q.bigHit = t;
-    }
+    for (const q of [a, c]) if (q && q.bigHitJ && j > q.bigHitJ && !(q.bigHit <= t)) q.bigHit = t;
     if (log && -vn > 0.6) {
       const last = this._lastEv || (this._lastEv = {}), key = a.id + '|' + (c ? c.id : 'static');
       if (!(last[key] > t - 0.3)) { last[key] = t; this.events.push({ t, a: a.id, b: c ? c.id : null, dv: -vn, x: cx, z: cz, j }); }
@@ -342,6 +343,12 @@ class SlideWorld {
       if (W.oneWay && !b.box && side < 0) continue;                         // dropping off a kerb is free
       let j = 0;
       const pts = b.box ? this._corners(b).map((q) => [q[0], q[1], 0]) : b.circles.map((q) => { const w = this._wp(b, q[0], q[1]); return [w[0], w[1], q[2]]; });
+      // something hitting a kerb hard enough hops over it (a car sliding into it sideways, a cart, a bin)
+      if (W.oneWay && side > 0) {
+        let vMax = 0;
+        for (const [px, pz] of pts) { const vx = b.vx + b.w * (pz - b.z), vz = b.vz - b.w * (px - b.x); vMax = Math.max(vMax, -(vx * W.nx + vz * W.nz)); }
+        if (vMax > (b.box ? 2.4 : 2.2)) { if (!b.hops) b.hops = []; if (!b.hops.length || t - b.hops[b.hops.length - 1] > 0.5) b.hops.push(t); continue; }
+      }
       const nx = -W.nx * side, nz = -W.nz * side;
       let mx = 0, mz = 0, mn = 0, mp = 0;
       for (const [px, pz, r] of pts) {
