@@ -214,11 +214,11 @@ class FrMontage {
       Object.assign(cam, { x: cx, y: cy, z: cz, yaw: Math.atan2(-(tw.x - cx), -(tw.z - cz)) * 180 / Math.PI, pitch: Math.atan2(tw.y - 0.15 - cy, Math.hypot(tw.x - cx, tw.z - cz)) * 180 / Math.PI, fov: 52 });
     } else if (S.id === 'ambulance') {
       this.amb.group.visible = true;
-      const x = 46 - 8.5 * u, z = -28.8 + u * 0.4, yaw = 0.9 + u * 1.1, flash = Math.floor(t * 7) % 2;
+      const x = 76 - 8.5 * u, z = -28.8 + u * 0.4, yaw = 0.9 + u * 1.1, flash = Math.floor(t * 7) % 2;
       this.amb.group.position.set(x, 0, z); this.amb.group.rotation.y = yaw;
       for (const w of this.amb.wheels) w.rotation.z = -t * 12;
       this.lightR.color.set(flash ? '#ff3030' : '#3a0a0a'); this.lightB.color.set(flash ? '#0a1a3a' : '#3a7bff');
-      Object.assign(cam, { x: 33.5, y: 1.5, z: -21.0, yaw: -72 + u * 22, pitch: -3, fov: 60 });
+      Object.assign(cam, { x: 63.5, y: 1.5, z: -21.0, yaw: -72 + u * 22, pitch: -3, fov: 60 });   // (further down the street than the taxi that slid this way)
     }
     this.glints.end(); this.dust.end();
     return cam;
