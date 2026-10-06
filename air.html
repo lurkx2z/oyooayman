@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What If Air Became 10× Denser?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #hud .story-title.big.center { top: calc(var(--u) * 760); }
+    #hud .story-title.big::before { background: radial-gradient(closest-side, rgba(6, 7, 10, 0.6), rgba(6, 7, 10, 0.25) 62%, rgba(6, 7, 10, 0)); }
+    #hud .ar-title .kick, #hud .ar-title .hero { display: block; }
+    #hud .ar-title .kick { font-size: calc(var(--u) * 74); font-weight: 600; letter-spacing: 0.04em; }
+    #hud .ar-title .hero { font-size: calc(var(--u) * 88); }
+    #hud .story-caption { font-size: calc(var(--u) * 54); top: calc(var(--u) * 1300); padding: calc(var(--u) * 14) calc(var(--u) * 30); border-radius: calc(var(--u) * 18);
+      background: rgba(6, 7, 10, 0.45); text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.9); }
+    #hud .story-note { top: calc(var(--u) * 1540); font-size: calc(var(--u) * 28); opacity: 0.85; }
+    #hud .story-readout { left: calc(var(--u) * 40); padding: calc(var(--u) * 12) calc(var(--u) * 22); border-radius: calc(var(--u) * 18); background: rgba(8, 10, 14, 0.4); }
+    #hud .story-readout .label { font-size: calc(var(--u) * 32); letter-spacing: 0.14em; color: #fff; text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9); }
+    #hud .story-readout .value { font-size: calc(var(--u) * 92); margin-top: calc(var(--u) * 4); text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.75); }
+    #hud .ar-dens { top: calc(var(--u) * 200); }
+    #hud .ar-wind { top: calc(var(--u) * 400); }
+    #hud .ar-dens.small .value { font-size: calc(var(--u) * 60); }
+    #hud .ar-rewind { position: absolute; left: 0; right: 0; top: calc(var(--u) * 860); text-align: center; font-family: var(--book); font-size: calc(var(--u) * 64); font-weight: 600; letter-spacing: 0.06em;
+      color: #fff; text-shadow: 0 0 calc(var(--u) * 24) rgba(0, 0, 0, 0.8); }
+    #hud .ar-tag { position: absolute; transform: translate(-50%, -100%); white-space: nowrap; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 34); letter-spacing: 0.06em;
+      color: #fff; background: rgba(10, 12, 16, 0.62); padding: calc(var(--u) * 8) calc(var(--u) * 16); border-radius: calc(var(--u) * 10); }
+    #hud .ar-tag b { font-size: 1.25em; }
+    #hud .ar-tag.left { transform: translate(-100%, -50%); }
+    #hud .ar-tag.right { transform: translate(8%, -50%); }
+    #hud .ar-tag.ghost { background: rgba(255, 255, 255, 0.18); border: calc(var(--u) * 2) dashed rgba(255, 255, 255, 0.8); font-weight: 500; }
+    #hud .ar-line { position: absolute; left: 0; right: 0; top: calc(var(--u) * 1150); text-align: center; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 36); letter-spacing: 0.08em; color: #fff;
+      text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.9); }
+    #hud .ar-force { position: absolute; left: calc(var(--u) * 40); top: calc(var(--u) * 610); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 30); letter-spacing: 0.08em; color: #fff;
+      background: rgba(8, 10, 14, 0.4); padding: calc(var(--u) * 12) calc(var(--u) * 20); border-radius: calc(var(--u) * 14); line-height: 1.35; }
+    #hud .ar-force span { font-weight: 400; font-size: 0.85em; opacity: 0.9; }
+    #hud .ar-big { position: absolute; left: 0; right: 0; top: calc(var(--u) * 700); text-align: center; color: #fff; text-shadow: 0 0 calc(var(--u) * 22) rgba(0, 0, 0, 0.85); }
+    #hud .ar-big .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 36); letter-spacing: 0.16em; }
+    #hud .ar-big .v { font-family: var(--book); font-weight: 600; font-size: calc(var(--u) * 150); line-height: 1.05; color: #ffd7a0; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <!-- Cinematic HUD (built by js/ui/storyHud.js from SCRIPT.hud; stays visible in Recording Mode) -->
+      <div id="hud"></div>
+    </div>
+  </div>
+
+  <!-- Developer controls (hidden in Recording Mode) -->
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What if air became 10× denser?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">LOADING THE STREET…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <!-- Three.js (bundled locally — no internet or server needed) -->
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/world/environment.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (plan: films/air/PLAN.md) -->
+  <script src="films/air/script.js"></script>
+  <script src="films/air/physics.js"></script>
+  <script src="films/air/city.js"></script>
+  <script src="films/air/actors.js"></script>
+  <script src="films/air/wind.js"></script>
+  <script src="films/air/audio.js"></script>
+  <script src="films/air/film.js"></script>
+  <script src="films/air/soundtrack.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -33,6 +33,11 @@ Everything is procedural, so there are no models, images or sound files to downl
 > backwards), breaks (wireframe, debug labels, a frozen car, a missing texture), and one man in it realizes that someone
 > is watching — you. He reads the captions, taps the lens (the whole picture ripples), hits the screen (the video
 > cracks over a wireframe void) and is reset. The reset fails. Plan and beat sheet: [`films/sim/PLAN.md`](films/sim/PLAN.md).
+>
+> **Eighth film: *What if air became 10× denser?*** — open `air.html` (48.6 s). One invisible change with many
+> consequences: a throw dies in the air, a cyclist can't pass 17 km/h, a car sheds speed, a plywood sheet floats down
+> while a steel clamp drops — and then a 60 km/h wind hits like 190 km/h and the street comes apart. Every hero motion is
+> integrated from ½ρC_dAv². Plan, model and numbers: [`films/air/PLAN.md`](films/air/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -235,6 +240,19 @@ films/moon/cast.js       the people (curiosity → panic), new sky-watching and 
 films/moon/fx.js         cracks, glass, collapses, dust, fires, the impact
 films/moon/audio.js      the soundtrack (Earth sounds and the score kept apart; space is silent)
 films/moon/film.js       FILM hooks: places the Moon, lights the world by it, shakes the ground, your hands, the grade
+```
+
+Film: *What if air became 10× denser?* (`air.html`):
+
+```
+films/air/PLAN.md        the hypothetical, the aerodynamic model and its numbers, shot list, hero events, retention review
+films/air/script.js      ★ the story clock (cold open, rewind), every beat time, camera, hands, captions
+films/air/physics.js     drag and wind pressure; the throw, the cyclist, the car, the falls, integrated into tables
+films/air/city.js        the avenue: café, scaffold, building site, the corner building's billboard; trees that bend
+films/air/wind.js        the wind: debris, fabric, the hero failures (bin, umbrella, signs, branch, roof sheet, billboard)
+films/air/actors.js      people, the ball, two cyclists, traffic, the coasting car, the swerving car
+films/air/audio.js       wind that follows the push, every event's sound, restrained music
+films/air/film.js        FILM hooks: story clock, HUD (density, wind, live speeds, the 190 km/h comparison), grade
 ```
 
 Film: *What if you realized you were in a simulation?* (`sim.html`):
