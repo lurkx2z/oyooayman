@@ -172,6 +172,8 @@ class SxAware {
     const f = new THREE.Mesh(new THREE.CapsuleGeometry(0.0085, 0.05, 3, 8), Mat.std(SKIN[1], { roughness: 0.6 }));
     f.geometry.translate(0, -0.034, 0); f.position.set(0, -0.115, 0.012); f.castShadow = true;
     this.j.la.hand.add(f); this.finger = f;
+    const nail = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), Mat.std('#e3b8a6', { roughness: 0.3 }));
+    nail.scale.set(0.0072, 0.002, 0.011); nail.rotation.x = Math.PI / 2; nail.position.set(0, -0.058, 0.0075); f.add(nail);
   }
 
   /* ---------------- aiming ---------------- */
@@ -302,7 +304,7 @@ class SxAware {
       // the taps: the fingertip to the lens (the cup stays in the right hand)
       const tapW = (t0) => MathX.smooth(t, t0 - 0.55, t0) * (1 - MathX.smooth(t, t0 + 0.05, t0 + 0.38));
       const tw = Math.max(tapW(SX.tap), tapW(SX.tap2) * (t < SX.pause[0] + 0.25 ? 1 : 1 - MathX.smooth(t, SX.pause[0] + 0.25, SX.pause[0] + 0.55)));
-      if (tw > 0) { S.reach = { side: 1, p: this.screenPoint(cam, SX_TAP_NDC.x, SX_TAP_NDC.y, 0.028, V.c), tip: 0.1825, w: tw }; S.finger = tw; }
+      if (tw > 0) { S.reach = { side: 1, p: this.screenPoint(cam, SX_TAP_NDC.x, SX_TAP_NDC.y, 0.05, V.c), tip: 0.1825, w: tw }; S.finger = tw; }
       if (t > SX.tap + 0.4 && t < 58.3) { S.gaze = V.d.copy(lens); S.gazeFinger = true; S.head = 0.4; }   // looks at his finger
       // the pause: only he moves — he looks around at the stopped world
       const P = SX.pause;

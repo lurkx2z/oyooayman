@@ -128,12 +128,12 @@ const FILM = {
     // the title: line by line; after the reset it starts again — and stops
     const L = U.lines, R = SX.restart;
     if (t < R) {
-      [0.15, 0.45, 0.75].forEach((t0, i) => set(L[i], 'opacity', (W(t, t0, 3.85, 0.3, 0.45)).toFixed(3)));
+      [0, 0.35, 0.7].forEach((t0, i) => set(L[i], 'opacity', (i ? W(t, t0, 3.85, 0.3, 0.45) : 1 - MathX.smooth(t, 3.4, 3.85)).toFixed(3)));
       if (L[1]._t !== 'a') { L[1].textContent = 'YOU WERE IN'; L[1]._t = 'a'; }
       set(U.title, 'opacity', t < 4.0 ? '1' : '0');
     } else {
       const cut = t >= R + 2.05;
-      [0.15, 0.45].forEach((t0, i) => set(L[i], 'opacity', cut ? '0' : MathX.smooth(t, R + t0, R + t0 + 0.3).toFixed(3)));
+      [0, 0.35].forEach((t0, i) => set(L[i], 'opacity', cut ? '0' : (i ? MathX.smooth(t, R + t0, R + t0 + 0.3) : 1).toFixed(3)));
       set(L[2], 'opacity', '0');
       if (L[1]._t !== 'b') { L[1].textContent = 'YOU WERE IN—'; L[1]._t = 'b'; }
       set(U.title, 'opacity', cut ? '0' : '1');

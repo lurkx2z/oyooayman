@@ -51,7 +51,7 @@ class SxWire {
     for (const [t0, big] of [[A.touch, 1], [A.again, 0.55]]) {
       const u = t - t0;
       if (u < 0 || u > 0.6) continue;
-      r = Math.max(r, (0.5 + 11 * u) * big); a = Math.max(a, MathX.smooth(u, 0, 0.03) * (1 - MathX.smooth(u, 0.3, 0.55)));
+      r = Math.max(r, (0.4 + 26 * u * u + 6 * u) * big); a = Math.max(a, MathX.smooth(u, 0, 0.03) * (1 - MathX.smooth(u, 0.42, 0.6)));
     }
     this.m.visible = a > 0.001;
     // plane-local coordinates: x runs along −z (after the turn), y up from the plane's centre
@@ -183,10 +183,15 @@ class SxRipple {
     svg.innerHTML = `<filter id="sxRipple" x="0" y="0" width="1" height="1" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
       <feFlood flood-color="rgb(128,128,128)" result="n"/>
       <feImage id="sxRippleImg" preserveAspectRatio="none" result="w"/>
-      <feMerge result="map"><feMergeNode in="n"/><feMergeNode in="w"/></feMerge>
+      <feMerge result="m0"><feMergeNode in="n"/><feMergeNode in="w"/></feMerge>
+      <feImage id="sxRippleMask" x="0" y="0" preserveAspectRatio="none" result="k"/>
+      <feComposite in="m0" in2="k" operator="arithmetic" k1="1" k2="0" k3="-0.5" k4="0.5" result="map"/>
       <feDisplacementMap id="sxRippleDisp" in="SourceGraphic" in2="map" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter>`;
     document.body.appendChild(svg);
-    this.img = svg.querySelector('#sxRippleImg'); this.disp = svg.querySelector('#sxRippleDisp');
+    this.img = svg.querySelector('#sxRippleImg'); this.disp = svg.querySelector('#sxRippleDisp'); this.mask = svg.querySelector('#sxRippleMask');
+    const mc = Tex.canvas(128, 228), mx = mc.getContext('2d'), mi = mx.createImageData(128, 228);
+    for (let j = 0; j < 228; j++) for (let i = 0; i < 128; i++) { const e = Math.min(i, 127 - i, Math.min(j, 227 - j) * 0.5625), v = 255 * MathX.smooth(e, 1, 9), k = (j * 128 + i) * 4; mi.data[k] = mi.data[k + 1] = mi.data[k + 2] = v; mi.data[k + 3] = 255; }
+    mx.putImageData(mi, 0, 0); this.mask.setAttribute('href', mc.toDataURL('image/png'));
     this.url = c.toDataURL('image/png');
     this.img.setAttribute('href', this.url);
     this.ready = new Promise((res) => { const im = new Image(); im.onload = res; im.onerror = res; im.src = this.url; });
@@ -200,12 +205,13 @@ class SxRipple {
     const W = this.stage.clientWidth, H = this.stage.clientHeight, U = H / 1920;
     const cx = W * (SX_TAP_NDC.x + 1) / 2, cy = H * (1 - SX_TAP_NDC.y) / 2;
     const R = (50 + 1900 * Ease.outCubic(MathX.clamp(u / 1.6, 0, 1))) * U;
+    this.mask.setAttribute('width', W); this.mask.setAttribute('height', H);
     this.img.setAttribute('x', (cx - R).toFixed(1)); this.img.setAttribute('y', (cy - R).toFixed(1));
     this.img.setAttribute('width', (2 * R).toFixed(1)); this.img.setAttribute('height', (2 * R).toFixed(1));
     this.disp.setAttribute('scale', (U * 170 * Math.exp(-u / 0.75) * MathX.smooth(u, 0, 0.04)).toFixed(2));
   }
 }
-const SX_TAP_NDC = { x: 0.24, y: -0.2 };
+const SX_TAP_NDC = { x: 0.42, y: -0.42 };
 
 /* ---------------- the void behind the picture ---------------- */
 class SxVoid {

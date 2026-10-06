@@ -68,11 +68,18 @@ class SxAudio extends AudioEngine {
     const mctx = new OfflineAudioContext(2, n, sr), src = mctx.createBufferSource(); src.buffer = mix;
     const comp = mctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 2.5; comp.attack.value = 0.01; comp.release.value = 0.25;
     const lim = mctx.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.1;
-    const g = mctx.createGain(); g.gain.value = 2.5;
+    const g = mctx.createGain(); g.gain.value = 3.0;
     src.connect(g); g.connect(comp); comp.connect(lim); lim.connect(mctx.destination); src.start(0);
     const out = await mctx.startRendering();
-    // (the pause and the cut are exactly silent after the compressor too)
-    for (let c = 0; c < 2; c++) { const o = out.getChannelData(c); for (let i = 0; i < n; i++) { const t = i / sr; if ((t >= SX.pause[0] && t < SX.pause[1]) || t >= SX.black) o[i] = 0; } }
+    // (the pause and the cut are exactly silent after the compressor too; a soft ceiling just under full scale)
+    for (let c = 0; c < 2; c++) {
+      const o = out.getChannelData(c);
+      for (let i = 0; i < n; i++) {
+        const t = i / sr, x = o[i], ax = Math.abs(x);
+        if ((t >= SX.pause[0] && t < SX.pause[1]) || t >= SX.black) { o[i] = 0; continue; }
+        if (ax > 0.7) o[i] = Math.sign(x) * (0.7 + 0.17 * Math.tanh((ax - 0.7) / 0.17));
+      }
+    }
     AudioEngine.declick(out, 0.15);
     return out;
   }

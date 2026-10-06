@@ -27,6 +27,12 @@ Everything is procedural, so there are no models, images or sound files to downl
 > grows, the tides go wrong in stages (the harbour drains, surges, the streets flood), the ground shakes, and the end is
 > shown by implication. The Moon is a procedural hero asset (real maria and craters, terminator shadows), drawn
 > camera-relative so it never parallaxes. Plan, physics notes and beat sheet: [`films/moon/PLAN.md`](films/moon/PLAN.md).
+>
+> **Seventh film: *What if you realized you were in a simulation?*** — open `sim.html` (80 s). It starts like any other
+> video on the channel: a sunny street, the title. Then the world repeats itself (a man passes twice, a ball bounces
+> backwards), breaks (wireframe, debug labels, a frozen car, a missing texture), and one man in it realizes that someone
+> is watching — you. He reads the captions, taps the lens (the whole picture ripples), hits the screen (the video
+> cracks over a wireframe void) and is reset. The reset fails. Plan and beat sheet: [`films/sim/PLAN.md`](films/sim/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -229,6 +235,19 @@ films/moon/cast.js       the people (curiosity → panic), new sky-watching and 
 films/moon/fx.js         cracks, glass, collapses, dust, fires, the impact
 films/moon/audio.js      the soundtrack (Earth sounds and the score kept apart; space is silent)
 films/moon/film.js       FILM hooks: places the Moon, lights the world by it, shakes the ground, your hands, the grade
+```
+
+Film: *What if you realized you were in a simulation?* (`sim.html`):
+
+```
+films/sim/PLAN.md        the fourth-wall levels, the three visual languages, the clocks, beat sheet, systems
+films/sim/script.js      ★ every beat time, the world's clocks (repeat, pause, rewind, restart), camera, hands, captions
+films/sim/city.js        the sunny avenue: shops, the café and its awning, the stone wall, trees, the bus stop
+films/sim/actors.js      traffic (the red sedan that freezes), the bus, the cyclist, people, the dog, pigeons, the ball, the cloud
+films/sim/aware.js       NPC_AWARE_01: the hero head (eyes that aim at the lens, lids, brows, lips), arm IK, his performance
+films/sim/glitch.js      wireframe, debug labels, LOD pop, flat tree, checker, the ripple, the crack and the void
+films/sim/audio.js       the world's sound on its own clock (repeated, paused, reversed, replayed) + the film's sounds
+films/sim/film.js        FILM hooks: the fake pause, the exact replay of the opening, the composite, the interface, the grade
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):

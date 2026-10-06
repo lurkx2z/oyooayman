@@ -45,7 +45,7 @@ everything that belongs to the film's time (your steps, him, the interface, the 
 
 | Time | Beat | Picture | Text |
 |---|---|---|---|
-| 0–4.2 | Normal | Walking down a sunny avenue; café ahead; a man in a dark-green jacket with a coffee stands ahead | Title 0.15–3.8; "At first, you probably wouldn't." |
+| 0–4.2 | Normal | Walking down a sunny avenue; café ahead; a man in a dark-green jacket with a coffee stands ahead | Title from frame one (line by line) to 3.85; "At first, you probably wouldn't." |
 | 4.2–7.2 | Déjà vu | He walks toward you and passes; your head follows him | REALITY STATUS · NORMAL (from 4.4) |
 | 7.0–10.0 | …again | Your head comes back: he is standing ahead again, sips, walks, passes — identical | |
 | 10.0–11.6 | Look back | Over your shoulder: one of him, walking away | "You'd probably blame your memory." |
