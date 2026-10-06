@@ -56,7 +56,7 @@ class Overlook {
       x = sx * k; z = sz; p.setX(i, x); p.setZ(i, z);
       const y = ovH(x, z); p.setY(i, y);
       const v = 0.75 + 0.25 * rng.next(), town = z < -130 && Math.abs(x) < 560 ? 1 : 0;
-      col.set(town ? [0.2 * v, 0.2 * v, 0.19 * v] : [0.13 * v, 0.17 * v, 0.12 * v], i * 3);
+      col.set(town ? [0.09 * v, 0.09 * v, 0.085 * v] : [0.06 * v, 0.085 * v, 0.055 * v], i * 3);
     }
     g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
     const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
@@ -163,7 +163,7 @@ class Overlook {
     { const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.55), new THREE.MeshStandardMaterial({ map: Tex.label([['RIDGE VIEW', 46], ['LOOKOUT', 40]], { w: 256, h: 128, bg: '#3b2a1c', fg: '#e8dcc2' }) }));
       sign.position.set(-6.0, 0.95, OV.railZ + 0.1); sign.rotation.y = 0; this.root.add(sign); B.box(0.05, 0.7, 0.05, -6.0, 0.35, OV.railZ + 0.08, metal); }
     // the path down to the parking lot
-    B.add(Geo.flat(-1.2, 1.2, 5.3, 24, -0.0, 2), Mat.std('#4d4a44', { roughness: 1 }), Geo.matrix(0, 0, 0), { noShadow: true });
+    B.add(Geo.flat(-1.2, 1.2, 5.3, 24, -0.0, 2), Mat.std('#34322e', { roughness: 1 }), Geo.matrix(0, 0, 0), { noShadow: true });
   }
 
   // pines framing the view, broad trees in the park behind
@@ -173,7 +173,7 @@ class Overlook {
       for (let k = 0; k < 4; k++) { const r = h * (0.32 - k * 0.06), hh = h * 0.36; B.add(new THREE.ConeGeometry(r, hh, 7), pine, Geo.matrix(x, y + h * (0.32 + k * 0.17), z, 0, rng.range(0, 3), 0)); } };
     const broadAt = (x, z, h) => { const y = ovH(x, z); B.add(new THREE.CylinderGeometry(0.16, 0.26, h * 0.5, 6), bark, Geo.matrix(x, y + h * 0.25, z));
       for (let k = 0; k < 3; k++) B.add(new THREE.IcosahedronGeometry(h * rng.range(0.22, 0.3), 0), leaf, Geo.matrix(x + rng.range(-0.8, 0.8), y + h * (0.62 + k * 0.1), z + rng.range(-0.8, 0.8), rng.range(0, 3), rng.range(0, 3), 0)); };
-    for (const [x, z, h] of [[-9.6, -1.6, 9], [-12.4, 2.8, 11], [-10.8, 7.5, 8], [10.2, -1.0, 10], [13.0, 3.6, 12], [11.5, 9.0, 8.5], [-16, -5, 9], [17, -4, 10]]) pineAt(x, z, h);
+    for (const [x, z, h] of [[-11.5, 4.5, 9], [-14.5, 9.0, 11], [-10.8, 12.5, 8], [12.0, 5.0, 10], [14.5, 9.6, 12], [11.5, 13.0, 8.5], [-19, 6, 9], [19, 7, 10]]) pineAt(x, z, h);
     for (const [x, z, h] of [[-7, 13, 7], [7.5, 15, 7.5], [-15, 18, 8], [16, 20, 8], [-3, 46, 7], [12, 47, 8], [-20, 32, 9], [22, 33, 8]]) broadAt(x, z, h);
     for (let k = 0; k < 40; k++) { const a = rng.range(Math.PI * 0.62, Math.PI * 1.38), r = rng.range(28, 80); pineAt(Math.sin(a) * r, -Math.cos(a) * r, rng.range(7, 12)); }
   }

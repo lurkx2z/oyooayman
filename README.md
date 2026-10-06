@@ -15,6 +15,12 @@ Everything is procedural, so there are no models, images or sound files to downl
 > and comes back 60 seconds later; everything that slides comes from a deterministic simulation computed when the page loads,
 > and the film is an edited cut of that one continuous take (`CONFIG.edit`).
 > Plan, physics rules, shot list and review log: [`films/friction/PLAN.md`](films/friction/PLAN.md).
+>
+> **Fifth film: *What if Andromeda collided with the Milky Way overnight?*** — open `andromeda.html` (80 s). From a
+> hilltop lookout over a small town, one night stands in for billions of years: Andromeda grows, passes overhead, swings
+> away, comes back and merges with our galaxy. The sky is drawn from a deterministic gravity simulation (82 000 stars, gas
+> and dust in two galaxies) computed when the page loads. Plan, science rules and beat sheet:
+> [`films/andromeda/PLAN.md`](films/andromeda/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -185,6 +191,22 @@ films/friction/props.js       carts, bins, bikes, pipes, cargo, the phone, bolla
 films/friction/cast.js        people on the shared rig (slips, splits, sliding poses, tumbles)
 films/friction/montage.js     the MEANWHILE shots: conveyor, bike, crane, tray, ambulance
 films/friction/audio.js       the soundtrack (near-silent sliding; impacts, engines and voices from the simulation)
+```
+
+Film: *What if Andromeda collided with the Milky Way overnight?* (`andromeda.html`):
+
+```
+films/andromeda/PLAN.md       science rules, time compression, the simulation, the sky, beat sheet, sound, review log
+films/andromeda/merger.js     the gravity simulation: two galaxies (halo, disc, bulge) on a decaying orbit, 82 000 test
+                              particles; run once at load, deterministic checkpoints, sampled by time
+films/andromeda/sky.js        the sky: near light in an all-sky map (3 distance shells + dust), far light as GPU gaussians,
+                              the analytic Milky Way band that warps, density-wave arms, star field, haze and extinction
+films/andromeda/script.js     ★ the night ↔ simulation time map (AM_TIME), sky tracks, eye-lines (AM_LOOK), camera, hands,
+                              captions, HUD readouts
+films/andromeda/film.js       FILM hooks: builds everything, aims your eyes and hands, lights the world by the sky, the grade
+films/andromeda/overlook.js   the lookout, the park and lot, the valley town, the mountains
+films/andromeda/cast.js       the people at the lookout and their sky-watching actions
+films/andromeda/audio.js      the soundtrack (Earth sounds and the score kept apart; space is silent)
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):

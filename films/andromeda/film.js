@@ -9,11 +9,11 @@
 const AM_HAND_POSES = {
   railL:  { p: [0.2, -0.3, -0.4], F: [0, 0, -1], N: [0, -1, 0], curl: [1.15, 1.2, 1.25, 1.25], thumb: [0.2, 0.7], aim: [0, 0.06, 0.03] },
   railR:  { p: [0.2, -0.3, -0.4], F: [0, 0, -1], N: [0, -1, 0], curl: [1.1, 1.18, 1.22, 1.25], thumb: [0.2, 0.7], aim: [0, 0.06, 0.03] },
-  pointR: { p: [0.2, -0.17, -0.42], F: [0, 0.3, -1], N: [0, -1, 0], curl: [0.02, 1.35, 1.4, 1.4], thumb: [0.35, 0.65] },
-  shieldR:{ p: [0.07, 0.11, -0.2], F: [-1, 0.05, -0.25], N: [0, -1, -0.3], curl: [0.12, 0.1, 0.12, 0.16], thumb: [0.3, 0.1] },
-  phoneL: { p: [0.09, -0.15, -0.34], F: [-0.45, 0.8, -0.4], N: [0.05, 0.4, 0.92], curl: [1.05, 1.12, 1.18, 1.22], thumb: [0.25, 0.25] },
-  aweL:   { p: [0.15, -0.3, -0.42], F: [-0.25, 0.45, -0.86], N: [0.12, 0.9, 0.4], curl: [0.32, 0.38, 0.44, 0.5], thumb: [0.5, 0.2] },
-  aweR:   { p: [0.16, -0.29, -0.43], F: [-0.25, 0.47, -0.85], N: [0.12, 0.9, 0.4], curl: [0.3, 0.36, 0.42, 0.48], thumb: [0.5, 0.2] },
+  pointR: { p: [0.08, -0.15, -0.42], F: [0, 0.3, -1], N: [0, -1, 0], curl: [0.02, 1.35, 1.4, 1.4], thumb: [0.35, 0.65] },
+  shieldR:{ p: [0.17, 0.21, -0.36], F: [-0.92, 0.12, -0.36], N: [0.05, -0.97, 0.22], curl: [0.18, 0.16, 0.2, 0.26], thumb: [0.45, 0.25] },
+  phoneL: { p: [0.07, -0.14, -0.4], F: [-0.45, 0.8, -0.4], N: [0.05, 0.4, 0.92], curl: [1.05, 1.12, 1.18, 1.22], thumb: [0.25, 0.25] },
+  aweL:   { p: [0.15, -0.33, -0.44], F: [-0.18, 0.2, -0.96], N: [0.1, 0.96, 0.22], curl: [0.38, 0.44, 0.5, 0.58], thumb: [0.55, 0.2] },
+  aweR:   { p: [0.15, -0.32, -0.45], F: [-0.16, 0.22, -0.96], N: [0.1, 0.96, 0.22], curl: [0.34, 0.4, 0.46, 0.54], thumb: [0.55, 0.2] },
 };
 const AM_HAND_BLEND = { railL: 0.5, railR: 0.5, pointR: 0.45, shieldR: 0.35, phoneL: 0.55, aweL: 0.8, aweR: 0.8, hidden: 0.6 };
 const _amAim = { y: new THREE.Vector3(), z: new THREE.Vector3(), x: new THREE.Vector3(), c: new THREE.Vector3(), q: new THREE.Quaternion() };
@@ -107,7 +107,7 @@ const FILM = {
     sky.render(cam);
     // the world lit by the sky: brighter, cooler-white fill; a warm key from the brightest core
     const sl = AM_SKYLIGHT.value(t);
-    app.hemi.intensity = 0.4 + 0.55 * sl; app.hemi.color.setRGB(0.23 + 0.4 * sl, 0.3 + 0.36 * sl, 0.44 + 0.3 * sl);
+    app.hemi.intensity = 0.36 + 0.3 * sl; app.hemi.color.setRGB(0.23 + 0.4 * sl, 0.3 + 0.36 * sl, 0.44 + 0.3 * sl);
     const kd = this._skyDir(app, t < 48 || (t > 59 && t < 65) ? 'm31' : 'gc', st, FILM._kd || (FILM._kd = new THREE.Vector3()));
     app.galLight.intensity = 0.5 * sl * MathX.smooth(kd.y, -0.05, 0.25);
     app.galLight.position.copy(cam.position).addScaledVector(kd, 100); app.galLight.target.position.copy(cam.position); app.galLight.target.updateMatrixWorld();

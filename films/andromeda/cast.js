@@ -9,17 +9,17 @@
 
 // [id, look, path [[t, x, z], …] (or a fixed spot), facing (deg, 0 = north), states [[t, action], …]]
 const AM_PEOPLE = [
-  ['A', 'casual6', [[0, -4.2, -2.45]], 4, [[0, 'idle'], [5.6, 'lookUp'], [7.6, 'pointUp'], [11.0, 'lookUp'], [15.8, 'phoneUp'], [26.0, 'lookUp'], [42.0, 'handMouth'], [47.5, 'lookUp'], [56.5, 'lookUp'], [66.0, 'hugSelf'], [73.0, 'lookUp']]],
+  ['A', 'casual6', [[0, -4.2, -2.45]], 4, [[0, 'idle'], [5.6, 'lookUp'], [7.6, 'pointUp'], [11.0, 'lookUp'], [15.8, 'phoneUp'], [30.2, 'lookUp'], [42.0, 'handMouth'], [47.5, 'lookUp'], [56.5, 'lookUp'], [66.0, 'hugSelf'], [73.0, 'lookUp']]],
   ['B', 'casual1', [[0, -3.4, -2.5]], -6, [[0, 'idle'], [6.6, 'lookUp'], [16.6, 'phoneUp'], [29.0, 'lookUp'], [42.6, 'handHead'], [49.0, 'lookUp'], [66.0, 'handHead'], [72.0, 'lookUp']]],
   ['C', 'casual5', [[0, 4.95, -1.25]], 12, [[0, 'phone'], [8.8, 'lookUp'], [14.0, 'lookUp'], [36.0, 'lookUp'], [43.0, 'recoil'], [44.4, 'lookUp']]],
-  ['D', 'casual2', [[0, -2.7, 1.25]], -10, [[0, 'idle'], [10.5, 'lookUp'], [44.0, 'handMouth'], [50.0, 'lookUp'], [74.0, 'awe']]],
+  ['D', 'casual2', [[0, -2.2, 1.7]], 170, [[0, 'idle'], [10.5, 'lookUp'], [44.0, 'handMouth'], [50.0, 'lookUp'], [74.0, 'awe']]],
   // a jogger stops on the path; two come up from the parking lot; more later
   ['E', 'casual3', [[0, 9.0, 6.5], [9.5, 3.0, 2.6], [11.2, 2.2, 1.7]], null, [[0, 'jog'], [9.5, 'walk'], [11.2, 'lookUp'], [17.0, 'phoneUp'], [24.0, 'lookUp'], [43.0, 'handHead'], [48.0, 'lookUp']], 'face:6@11.2'],
-  ['F', 'casual8', [[0, -0.6, 23.0], [22.0, -0.6, 23.0], [31.0, -0.9, 5.4], [33.5, -1.6, 2.6]], null, [[0, 'lookUp'], [22.0, 'walk'], [33.5, 'lookUp'], [44.0, 'handMouth'], [52.0, 'lookUp'], [74.0, 'awe']], 'face:170@33.5'],
-  ['G', 'casual4', [[0, 1.2, 24.5], [23.5, 1.2, 24.5], [32.0, 0.9, 6.0], [34.5, 2.6, 3.4]], null, [[0, 'phone'], [23.5, 'walk'], [34.5, 'phoneUp'], [44.0, 'recoil'], [45.5, 'lookUp'], [66.0, 'pointUp'], [69.0, 'lookUp']], 'face:190@34.5'],
+  ['F', 'casual8', [[0, -0.6, 23.0], [22.0, -0.6, 23.0], [31.0, -0.9, 5.4], [33.5, -0.9, 3.1]], null, [[0, 'lookUp'], [22.0, 'walk'], [33.5, 'lookUp'], [44.0, 'handMouth'], [52.0, 'lookUp'], [74.0, 'awe']], 'face:170@33.5'],
+  ['G', 'casual4', [[0, 1.2, 24.5], [23.5, 1.2, 24.5], [32.0, 0.9, 6.0], [34.5, 1.5, 3.9]], null, [[0, 'phone'], [23.5, 'walk'], [34.5, 'phoneUp'], [44.0, 'recoil'], [45.5, 'lookUp'], [66.0, 'pointUp'], [69.0, 'lookUp']], 'face:190@34.5'],
   // in the park behind you, under the galactic centre (seen when you turn south)
-  ['H', 'casual7', [[0, -6.4, 11.5]], 175, [[0, 'lookUp'], [41.0, 'handHead'], [46.0, 'lookUp'], [52.0, 'pointUp'], [55.5, 'lookUp'], [74.0, 'awe']]],
-  ['I', 'casual6', [[0, 5.6, 13.0]], 190, [[0, 'lookUp'], [42.0, 'hugSelf'], [58.0, 'lookUp']]],
+  ['H', 'casual7', [[0, -3.4, 9.5]], 175, [[0, 'lookUp'], [41.0, 'handHead'], [46.0, 'lookUp'], [52.0, 'pointUp'], [55.5, 'lookUp'], [74.0, 'awe']]],
+  ['I', 'casual6', [[0, 3.6, 11.0]], 190, [[0, 'lookUp'], [42.0, 'hugSelf'], [58.0, 'lookUp']]],
 ];
 
 (() => {

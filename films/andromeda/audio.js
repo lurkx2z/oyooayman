@@ -44,7 +44,7 @@ class AmAudio extends AudioEngine {
     this.wavName = SCRIPT.meta.wav;
   }
 
-  fingerprintData() { return [AM_TIME, AM_SKYK, AM_LOOK, AM_PEOPLE, AM_CHORDS, AM_SIM]; }
+  fingerprintData() { return [AM_PEOPLE, AM_CHORDS]; }   // (the sound depends on the people and the score, not on the sky)
 
   async renderOffline() { const buf = await super.renderOffline(); AudioEngine.declick(buf, 0.15); return buf; }
 
@@ -69,7 +69,7 @@ class AmAudio extends AudioEngine {
     // mix → make-up gain → glue compressor → limiter
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 2.5; comp.attack.value = 0.01; comp.release.value = 0.3;
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12;
-    const mixIn = ctx.createGain(); mixIn.gain.value = 4.0; mixIn.connect(comp);
+    const mixIn = ctx.createGain(); mixIn.gain.value = 11.0; mixIn.connect(comp);
     const out = ctx.createGain(); comp.connect(out); out.connect(lim); lim.connect(ctx.destination);
     out.gain.setValueAtTime(0.0001, 0); out.gain.linearRampToValueAtTime(0.9, 0.08);
     out.gain.setValueAtTime(0.9, end - 0.6); out.gain.linearRampToValueAtTime(0.0001, end);
@@ -82,7 +82,9 @@ class AmAudio extends AudioEngine {
     this.S = S; this.air = air; this.hall = hall;
     this._night(S, earth, air);
     this._town(S, earth, air);
-    this._people(S, earth, air);
+    const ppl = ctx.createGain(); ppl.gain.value = 2.5; ppl.connect(earth);      // (voices sit up in the mix)
+    this._people(S, ppl, air);
+    you.gain.value = 1.5;
     this._you(S, you);
     this._score(S, score, hall);
   }
@@ -276,8 +278,8 @@ class AmAudio extends AudioEngine {
     const send = ctx.createGain(); send.gain.value = 0.7; send.connect(hall);
     const dry = ctx.createGain(); dry.gain.value = 0.55; dry.connect(bus);
     // overall shape of the score: [t, level]
-    const shape = [[0, 0.0], [0.6, 0.5], [10, 0.6], [30, 0.8], [39, 0.95], [44, 1.05], [49, 0.9], [51, 0.35], [59, 0.35], [62, 0.7], [70, 1.15], [73.6, 1.25], [75, 0.75], [79.5, 0.45], [80.3, 0]];
-    const lvl = ctx.createGain(); lvl.gain.setValueAtTime(0, 0); for (const [t, v] of shape) lvl.gain.linearRampToValueAtTime(v * 0.022, t);
+    const shape = [[0, 0.0], [0.6, 1.2], [10, 1.3], [30, 1.4], [39, 1.5], [44, 1.6], [49, 1.4], [51, 0.7], [59, 0.7], [62, 1.2], [70, 1.8], [73.6, 2.0], [75, 1.3], [79.5, 0.9], [80.3, 0]];
+    const lvl = ctx.createGain(); lvl.gain.setValueAtTime(0, 0); for (const [t, v] of shape) lvl.gain.linearRampToValueAtTime(v * 0.09, t);
     lvl.connect(dry); lvl.connect(send);
     // pads: each chord's notes as three detuned saws through a low-pass that opens with the chord, with long cross-fades
     for (const [t0, t1, notes, v, fc] of AM_CHORDS) {
@@ -308,7 +310,7 @@ class AmAudio extends AudioEngine {
     const sub = [[0, 0], [26, 0], [32, 0.6], [39.5, 1.0], [45, 1.2], [49.5, 0.8], [52, 0.0], [60, 0.0], [64, 0.6], [70, 1.1], [73.8, 1.25], [76, 0.35], [80.3, 0]];
     for (const [f, v] of [[36.71, 1.0], [73.42, 0.4]]) {
       const g = ctx.createGain();
-      g.gain.setValueAtTime(0, 0); for (const [t, k] of sub) g.gain.linearRampToValueAtTime(k * v * 0.55, t);
+      g.gain.setValueAtTime(0, 0); for (const [t, k] of sub) g.gain.linearRampToValueAtTime(k * v * 0.08, t);
       // (it moves down to B for the first passage, up to G after it, to A into the merger, and home to D)
       for (const det of [1, 1.004]) {
         const o = ctx.createOscillator(), F = o.frequency; o.type = 'sine';
@@ -319,7 +321,7 @@ class AmAudio extends AudioEngine {
       g.connect(lvl);
     }
     // a slow pulse under the return and the merger (like a held breath, quickening)
-    for (let t = 60.5; t < 73.6; ) { const k = MathX.smooth(t, 60.5, 73); S.tone(t, 0.5, 73.4, 0.5 * (0.4 + 0.6 * k), 0, lvl, 'sine', 0.02, 0.45); t += MathX.lerp(1.05, 0.55, k); }
+    for (let t = 60.5; t < 73.6; ) { const k = MathX.smooth(t, 60.5, 73); S.tone(t, 0.5, 73.4, 0.12 * (0.4 + 0.6 * k), 0, lvl, 'sine', 0.02, 0.45); S.tone(t, 0.4, 146.8, 0.07 * (0.4 + 0.6 * k), 0, lvl, 'sine', 0.02, 0.35); t += MathX.lerp(1.05, 0.55, k); }
     // a high, held string for the separation (the quiet after the passage)
     { const o = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', 2200, 0.5); o.type = 'triangle'; o.frequency.value = amHz('A5');
       const vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.value = 4.8; vg.gain.value = 3; vib.connect(vg); vg.connect(o.frequency);
