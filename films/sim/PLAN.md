@@ -86,3 +86,15 @@ everything that belongs to the film's time (your steps, him, the interface, the 
   displacement on the whole stage), the crack (in the picture and over the interface), the void and the composite.
 - `audio.js` — see §2.
 - `film.js` — wiring, the fake pause (your breathing and hands stop too), the rewind, the grade.
+
+## 5. Review log
+
+Fixes after the first stills and the low-resolution run-through: his walk-by was too close for the head to follow him (wider
+line, the head leads him); the café conversation was too far away to see his eyes (moved to the front of the café, a long
+lens for the stare); his subtitles covered his face (lower); the first hero head read as a mask (rebuilt: a flatter face,
+sockets under a brow ridge, a modelled nose, thinner lips, higher hairline, lids at rest on the iris); the arm IK bent
+in the wrong plane and aimed at last frame's head (the elbow now bends toward the target; the lips are found after the
+head is posed); "Not you." looked behind him (now down at your body); in the pause he turned his head right round (now
+side to side); the alarm's colour fringing was far too strong; the ripple was too weak and left black edges (stronger,
+faded out at the frame's borders, his "You." stays up so the subtitle ripples too); the tap's finger covered his face
+(it comes in low on the right); the wall beat was flat (the grid now climbs the building and you look up after it).
