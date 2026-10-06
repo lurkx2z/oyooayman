@@ -392,6 +392,9 @@ class GmAware extends GmActor {
   constructor(scene) {
     super(scene, 'aware', 'gmAware', { skin: SKIN[2], hair: '#1c140f', brow: '#22180f', iris: [88, 62, 38], seed: 41, stubble: true, nose: 0.021 });
     this.j.body.scale.setScalar(1.02);
+    // the jacket's zip, either side of the open front
+    const front = BUILDS.avg.depth * 0.5, zm = Mat.std('#a9a49a', { roughness: 0.35, metalness: 0.6 });
+    for (const sx of [-1, 1]) { const z = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.37, 0.006), zm); z.position.set(sx * 0.046, 0.3, front + 0.008); this.j.spine.add(z); }
     this.layer(1);
   }
 

@@ -38,6 +38,14 @@ Everything is procedural, so there are no models, images or sound files to downl
 > consequences: a throw dies in the air, a cyclist can't pass 17 km/h, a car sheds speed, a plywood sheet floats down
 > while a steel clamp drops — and then a 60 km/h wind hits like 190 km/h and the street comes apart. Every hero motion is
 > integrated from ½ρC_dAv². Plan, model and numbers: [`films/air/PLAN.md`](films/air/PLAN.md).
+>
+> **Ninth film: *POV: This video is a game. Don't die.*** — open `game.html` (51.6 s). A fake-interactive RPG short. A man
+> trapped in a facility sees *you*: he asks you to put your finger on his hand (the glass lights up exactly under your
+> fingertip), to tilt your phone to choose a door, to hold a pad to open a blast door, and to tap to stop an item
+> roulette (a tap pauses the video, so your item is really yours). The system detects you, he looks at the edges of your
+> screen, presses his palm on it (the whole frame ripples), cracks it, and your fingertip cancels the reset. You keep your
+> own score of three hearts. Add `?safe` to the address to see the platform safe zones and every touch target. Plan,
+> safe zones, targets and beat sheet: [`films/game/PLAN.md`](films/game/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -240,6 +248,20 @@ films/moon/cast.js       the people (curiosity → panic), new sky-watching and 
 films/moon/fx.js         cracks, glass, collapses, dust, fires, the impact
 films/moon/audio.js      the soundtrack (Earth sounds and the score kept apart; space is silent)
 films/moon/film.js       FILM hooks: places the Moon, lights the world by it, shakes the ground, your hands, the grade
+```
+
+Film: *POV: This video is a game. Don't die.* (`game.html`):
+
+```
+films/game/PLAN.md       rules, safe zones and touch targets, the score, beat sheet, the fourth-wall levels
+films/game/script.js     ★ every beat time, the facility's coordinates, the touch targets, the camera, stillness, speech
+films/game/facility.js   the cell and its lifting glass, the two doors, the corridor, the blast door, the core hall, lights
+films/game/npc.js        the hero face and five-finger hands, arm IK onto screen points, NPC_AWARE_01 and the technician
+films/game/fx.js         world effects: the glass touch, the steam blast, the security drone
+films/game/screen.js     screen effects: the full-frame ripple, the crack fixed to the frame, the void, the safe-zone overlay
+films/game/hud.js        the game HUD (hearts, rings, choice, hold, roulette, table, score) and the system HUD
+films/game/audio.js      ambience, interface and system tones, events, dialogue blips, restrained music
+films/game/film.js       FILM hooks: the world clock for RESET—, the composite, the ripples, the grade
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):
