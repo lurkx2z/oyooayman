@@ -451,7 +451,9 @@ class Facility {
     this.pView.intensity = 0.8 * (1 - 0.6 * al) + 3 * al * red; this.pView.color.set(al > 0.01 ? '#ff3a24' : '#dfe6ee');
     this.pCell.intensity = 1.1 * (1 - 0.5 * al) + 3 * al * red; this.pCell.color.set(al > 0.01 ? '#ff4a30' : '#e8eef6');
     this.pRoute.intensity = t > GM.doors[0] ? 2.0 + 1.5 * red + 20 * MathX.impulse(t, GM.choice.blast, 0.25) * (t > GM.choice.blast ? 1 : 0) : 0;
-    this.pB.intensity = t > GM.doors[0] && t < GM.roul.ui + 1 ? 1.8 * (1 - 0.3 * al) + 1.5 * al * red : 0;
+    const rl = t >= GM.hold.open[1] && t < GM.sys.flicker + 0.3;                  // (in the hall it lights his face from the open case)
+    if (rl) { this.pB.position.set(GF.caseP[0], 1.3, GF.caseP[1] - 0.05); this.pB.color.set('#cfefff'); } else { this.pB.position.set(GF.corrB.ax, 2.6, -8.4); this.pB.color.set('#e8f0ff'); }
+    this.pB.intensity = rl ? (t > GM.roul.ui ? 0.9 + 0.5 * (t < GM.roul.land ? Math.floor(t * 5) % 2 : 1) : 0) : t > GM.doors[0] && t < GM.roul.ui + 1 ? 1.8 * (1 - 0.3 * al) + 1.5 * al * red : 0;
     this.pHall.intensity = t > GM.hold.open[0] ? 3.0 * (1 - 0.5 * sys) * this.flicker(t + 0.71) : 0;
     this.pCore.intensity = t > GM.hold.open[0] ? (2.2 + 0.3 * Math.sin(t * 2.1)) * (1 - 0.6 * sys) : 0;
     this.mCore.emissiveIntensity = (1.6 + 0.25 * Math.sin(t * 2.1)) * (1 - 0.5 * sys);

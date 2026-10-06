@@ -105,10 +105,9 @@ class GmFace {
     const surf = (x, y) => { let best = 1e9, bz = 0; for (let i = 0; i < P.count; i++) { const z = P.getZ(i); if (z <= 0) continue; const d = (P.getX(i) - x) ** 2 + (P.getY(i) - y) ** 2; if (d < best) { best = d; bz = z; } } return bz; };
     for (const s of [-1, 1]) add(PersonGeo.ear, skinF, s * 0.074, -0.006, -0.006).scale.set(0.75, 0.9, 0.95);
     // hair: a cap set back from the forehead; short: a little volume on top; bun: a knot at the back
-    const hg = new THREE.SphereGeometry(0.1, 48, 20, 0, Math.PI * 2, 0, Math.PI * 0.53); hg.scale(0.84, 1.1, 1.0);
+    const hg = new THREE.SphereGeometry(0.1, 48, 20, 0, Math.PI * 2, 0, Math.PI * 0.5); hg.scale(0.79, 1.1, 1.0);
     const hm = add(hg, hair, 0, 0.004, -0.004); hm.rotation.x = -0.72; hm.scale.setScalar(1.06);
     if (o.hairStyle === 'bun') { add(new THREE.SphereGeometry(0.034, 16, 12), hair, 0, 0.07, -0.085); const hb = add(hg, hair, 0, 0.0, -0.006); hb.rotation.x = -1.05; hb.scale.setScalar(1.075); }
-    else { const top = add(new THREE.SphereGeometry(0.075, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.5), hair, 0, 0.052, 0.0); top.scale.set(1.0, 0.55, 1.02); top.rotation.x = -0.25; }
     for (const s of [-1, 1]) add(new THREE.BoxGeometry(0.008, 0.03, 0.014), hair, s * 0.076, 0.01, 0.018);
     // eyes
     const R = 0.0128, ex = 0.031, ey = 0.012, ez = surf(ex, ey) - 0.0045;
@@ -172,7 +171,7 @@ class GmFace {
   set(F) {
     for (const E of this.eyes) {
       const look = E.pitch || 0, bl = MathX.clamp(F.blink || 0, 0, 1), wide = MathX.clamp(F.wide || 0, 0, 1), sq = MathX.clamp(F.smile || 0, 0, 1) * 0.25;
-      E.up.rotation.x = MathX.lerp(-0.38 - 0.24 * wide + 0.1 * sq + look * 0.75, 0.2, bl);
+      E.up.rotation.x = MathX.lerp(-0.38 - 0.24 * wide + 0.1 * sq + look * 0.5, 0.2, bl);
       E.lo.rotation.x = MathX.lerp(0.42 + 0.12 * wide - 0.12 * sq + look * 0.25, 0.3, bl * 0.7);
     }
     const br = F.brow || 0, fr = F.frown || 0, wo = F.worry || 0;
@@ -185,7 +184,7 @@ class GmFace {
       this._smile = sm;
       [this.lipU, this.lipL].forEach((L, k) => {
         const A = L.geometry.attributes.position, a0 = this.lip0[k], w = k ? 0.0185 : 0.0205;
-        for (let i = 0; i < A.count; i++) { const x = a0[i * 3]; A.array[i * 3 + 1] = a0[i * 3 + 1] + sm * 0.0042 * (x / w) ** 2; }
+        for (let i = 0; i < A.count; i++) { const x = a0[i * 3]; A.array[i * 3 + 1] = a0[i * 3 + 1] + sm * 0.0065 * (x / w) ** 2 - sm * 0.0008; }
         A.needsUpdate = true; L.geometry.computeVertexNormals();
       });
     }
@@ -195,7 +194,7 @@ class GmFace {
 /* ---------------- the hero hand ---------------- */
 const GM_HAND = {
   relax: { curl: [0.35, 0.45, 0.52, 0.6], spread: 0.08, thumb: [0.3, 0.35] },
-  flat: { curl: [0.06, 0.03, 0.06, 0.1], spread: 0.3, thumb: [0.2, 0.22] },
+  flat: { curl: [0.06, 0.03, 0.06, 0.1], spread: 0.3, thumb: [0.0, 0.35] },
   point: { curl: [0.0, 1.35, 1.42, 1.48], spread: 0.0, thumb: [0.95, 0.25] },
   fist: { curl: [1.45, 1.5, 1.52, 1.52], spread: 0.0, thumb: [1.15, 0.15] },
   reach: { curl: [0.0, 0.75, 0.9, 1.05], spread: 0.08, thumb: [0.55, 0.35] },
@@ -241,7 +240,7 @@ class GmHand {
       f.k[0].rotation.set(sp, 0, -s * c * 0.85); f.k[1].rotation.set(0, 0, -s * c * 1.1); f.k[2].rotation.set(0, 0, -s * c * 0.7);
     });
     const tc = L(A.thumb[0], B.thumb[0]), ta = L(A.thumb[1], B.thumb[1]);
-    this.thumb[0].rotation.set(-0.35 - 0.55 * ta, 0, -s * (0.45 + 0.5 * tc));
+    this.thumb[0].rotation.set(-0.3 - 0.6 * ta, 0, -s * (0.05 + 0.8 * tc));
     this.thumb[1].rotation.set(0, 0, -s * 0.6 * tc); this.thumb[2].rotation.set(0, 0, -s * 0.5 * tc);
   }
   // world point of the index fingertip
@@ -379,7 +378,7 @@ const GA = (() => {
   const pos = [[0, -0.05, -2.05], [3.3, -0.05, -2.05], [4.25, 0.08, -1.27], [8.3, 0.08, -1.27], [8.95, -0.22, -1.6], [12.45, -0.22, -1.6], [13.35, 0.0, -4.45], [15.3, 0.0, -4.45],
     [15.65, 0.62, -5.3], [16.25, 0.86, -7.6], [16.6, 0.85, -9.6], [17.12, 0.72, -11.95], [21.95, 0.72, -11.95], [22.8, 1.85, -15.8], [27.6, 1.85, -15.8], [28.25, 1.0, -14.95],
     [29.2, 1.0, -14.95], [29.6, 1.0, -15.12], [33.9, 1.0, -15.12], [34.6, 1.04, -14.7], [R.run, 1.04, -14.7], [38.55, 1.12, -14.12], [41.3, 1.12, -14.12], [41.7, 1.05, -14.5], [42.05, 1.05, -14.3], [42.4, 1.05, -14.35],
-    [43.45, 1.05, -14.35], [44.0, 1.05, -14.25], [GM.end.cut, 1.05, -14.25], [GM.end.cut + 0.001, 1.04, -14.32], [60, 1.04, -14.32]];
+    [43.45, 1.05, -14.35], [44.0, 1.06, -14.1], [GM.end.cut, 1.06, -14.1], [GM.end.cut + 0.001, 1.04, -14.32], [60, 1.04, -14.32]];
   const yaw = [[0, 0], [3.3, 0], [4.25, 0.05], [8.3, 0.05], [8.95, 0.5], [9.6, 0.15], [11.8, 0.15], [12.45, 3.08], [13.35, 3.08], [13.6, 0.05], [15.3, 0.05], [15.55, 2.45], [16.25, 2.9], [16.6, 3.25], [17.12, 3.3], [17.5, 0.25],
     [21.95, 0.25], [22.1, 2.9], [22.65, 2.9], [22.85, -0.33], [27.6, -0.33], [27.75, -1.2], [28.25, 0.05], [33.9, 0.05], [34.1, 3.0], [34.9, 3.0], [35.3, 0.1], [36.4, 0.1], [36.7, 2.9], [37.4, 2.9], [37.7, 0.05], [60, 0.05]];
   const acts = [[0, 'gmTense'], [3.3, 'walk'], [4.25, 'gmTense'], [8.3, 'walk'], [8.95, 'gmTense'], [11.8, 'gmTense'], [12.45, 'gmRun'], [13.35, 'gmTense'], [15.3, 'gmRun'], [17.12, 'gmTense'],
@@ -405,6 +404,7 @@ class GmAware extends GmActor {
     const ctx = { seed: p.seed, seedI: p.seedI, walkPhase: (L.dist / 1.3) * Math.PI * 2 };
     const Ed0 = GM.edge, Rc0 = GM.reach, tp = t >= Ed0.right && t < GM.drone.drop ? Ed0.right : t >= Rc0.glitch[0] && t < Rc0.cancelled ? Rc0.glitch[0] : t;
     const pose = GA.pose(tp, ctx);
+    p.apply(pose); p.root.updateMatrixWorld(true);                 // (this frame's shoulders, for the reaches below)
     // a breath and a weight shift in the still moments
     pose.spine += 0.012 * Math.sin(tp * 1.9); pose.headRoll = (pose.headRoll || 0);
     const F = { blink: 0, brow: 0, frown: 0, worry: 0, wide: 0, mouth: 0, pucker: 0, smile: 0 };
@@ -473,9 +473,9 @@ class GmAware extends GmActor {
       if (k > 0) {
         const P = sp(GM_TARGETS.screen.x, GM_TARGETS.screen.y, 0.5);
         const N = V.d.copy(lens).sub(P).normalize().clone();
-        place.push(['R', 'palm', P, new THREE.Vector3(0.1, 1, 0).applyQuaternion(cam.quaternion).normalize(), N, k]); hands.R = ['flat', 'flinch', MathX.impulse(t, Re.press, 0.12) * (t > Re.press ? 0.6 : 0)];
+        place.push(['R', 'palm', P, new THREE.Vector3(-0.42, 1, 0.05).applyQuaternion(cam.quaternion).normalize(), N, k]); hands.R = ['flat', 'flinch', MathX.impulse(t, Re.press, 0.12) * (t > Re.press ? 0.6 : 0)];
       }
-      if (t > Re.hand[0] && t < Re.hand[1]) { gaze = sp(GM_TARGETS.screen.x, GM_TARGETS.screen.y, 0.5); head = 0.5; F.wide = 1; }
+      if (t > Re.hand[0] && t < Re.hand[1]) { gaze = sp(GM_TARGETS.screen.x, GM_TARGETS.screen.y - 120, 0.5); head = 0.8; eyes = 0.7; F.wide = 1; F.brow = 1; F.worry = 0.4; }
       if (t >= Re.hand[1]) { gaze = lens; F.brow = 1; F.worry = 0.3; F.smile = 0.1 * MathX.smooth(t, Re.real[0], Re.real[1]); }
       if (t > Re.wind) { F.frown = 0.8; F.worry = 0.6; F.brow = 0; hands.R = ['fist']; const k2 = MathX.smooth(t, Re.wind, Re.wind + 0.3);
         const sh = this.j.ra.sh.getWorldPosition(new THREE.Vector3()); place.push(['R', 'fist', sh.clone().add(new THREE.Vector3(0.05, -0.1, 0.12)), lens.clone().sub(sh).normalize(), new THREE.Vector3(0, -1, 0), k2]); }
@@ -488,15 +488,16 @@ class GmAware extends GmActor {
       F.worry = 0.9; F.wide = 0.7; F.brow = 0.5;
       const k = MathX.smooth(t, Rc.start, Rc.start + 0.6) * (1 - MathX.smooth(t, Rc.cancelled + 0.2, Rc.cancelled + 0.8));
       if (k > 0) {
-        const P = sp(GM_TARGETS.finger.x, GM_TARGETS.finger.y, 0.14);
-        const sh = this.j.ra.sh.getWorldPosition(new THREE.Vector3()), dir = P.clone().sub(sh).normalize();
-        place.push(['R', 'tip', P, dir, new THREE.Vector3(0, -1, 0), k]); hands.R = ['reach'];
+        // the index points up toward your screen, its pad facing you (a fingertip pressed on glass from the other side)
+        const P = sp(GM_TARGETS.finger.x, GM_TARGETS.finger.y, 0.15);
+        const Fd = new THREE.Vector3(-0.08, 0.86, -0.5).normalize().applyQuaternion(cam.quaternion), Nd = new THREE.Vector3(0, -0.25, 1).normalize().applyQuaternion(cam.quaternion);
+        place.push(['R', 'tip', P, Fd, Nd, k]); hands.R = ['reach'];
       }
       if (t > Rc.contact) { F.wide = 1; F.brow = 1; F.worry = 0.4; }
       if (t > Rc.glitch[0] && t < Rc.cancelled) still = true;
       if (t > Rc.cancelled) { F.wide = 0.2; F.brow = 0.3; F.worry = 0; F.smile = 0.25 * MathX.smooth(t, Rc.cancelled + 0.2, Rc.cancelled + 0.7); F.blink = MathX.smooth(t, Rc.cancelled + 0.15, Rc.cancelled + 0.3) * (1 - MathX.smooth(t, Rc.cancelled + 0.55, Rc.cancelled + 0.75)); }
     } else {                                                        // the end: calm, a small smile
-      F.smile = 0.4 * MathX.smooth(t, GM.end.cut + 0.1, GM.end.come[0] + 0.2); F.brow = 0.2; head = 0.95;
+      F.smile = 0.75 * MathX.smooth(t, GM.end.cut + 0.1, GM.end.come[0] + 0.2); F.brow = 0.25; F.worry = 0.15; head = 0.95;
     }
     // speech
     F.mouth = Math.max(F.mouth, this.talkAt(t, 'A'));
