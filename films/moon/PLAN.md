@@ -84,3 +84,5 @@ plane; foam everywhere → only thin edges, fronts and fast water, finer; the li
 the camera under the surge → lower surge in the streets; the hill view blocked → steeper hill, lower central waterfront,
 open hilltop; a drained harbour that read as water → textured mud with puddles; the normal Moon a dim dot → brilliant while
 small.
+
+Delivered: the full 80 s render (1080×1920, 30 fps; the soundtrack at −17 LUFS), with a share copy under 30 MB.
