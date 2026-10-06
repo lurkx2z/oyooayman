@@ -375,14 +375,14 @@ const GmScreen = {
 /* ---------------- NPC_AWARE_01 ---------------- */
 const GA = (() => {
   const H = GM.hold, R = GM.reset;
-  const pos = [[0, -0.05, -2.05], [3.3, -0.05, -2.05], [4.25, 0.08, -1.27], [8.3, 0.08, -1.27], [8.95, -0.22, -1.6], [12.45, -0.22, -1.6], [13.35, 0.0, -4.45], [15.3, 0.0, -4.45],
+  const pos = [[0, -0.05, -2.05], [3.3, -0.05, -2.05], [4.25, 0.08, -1.27], [8.3, 0.08, -1.27], [8.95, -0.12, -1.6], [12.45, -0.12, -1.6], [13.35, 0.0, -4.45], [15.3, 0.0, -4.45],
     [15.65, 0.62, -5.3], [16.25, 0.86, -7.6], [16.6, 0.85, -9.6], [17.12, 0.72, -11.95], [21.95, 0.72, -11.95], [22.8, 1.85, -15.8], [27.6, 1.85, -15.8], [28.25, 1.0, -14.95],
-    [29.2, 1.0, -14.95], [29.6, 1.0, -15.12], [33.9, 1.0, -15.12], [34.6, 1.04, -14.7], [R.run, 1.04, -14.7], [38.55, 1.12, -14.12], [41.3, 1.12, -14.12], [41.7, 1.05, -14.5], [42.05, 1.05, -14.3], [42.4, 1.05, -14.35],
+    [29.2, 1.0, -14.95], [29.6, 1.0, -15.12], [33.9, 1.0, -15.12], [34.6, 1.02, -15.1], [R.run, 1.02, -15.1], [38.55, 1.12, -14.12], [41.3, 1.12, -14.12], [41.7, 1.05, -14.5], [42.05, 1.05, -14.3], [42.4, 1.05, -14.35],
     [43.45, 1.05, -14.35], [44.0, 1.06, -14.1], [GM.end.cut, 1.06, -14.1], [GM.end.cut + 0.001, 1.04, -14.32], [60, 1.04, -14.32]];
   const yaw = [[0, 0], [3.3, 0], [4.25, 0.05], [8.3, 0.05], [8.95, 0.5], [9.6, 0.15], [11.8, 0.15], [12.45, 3.08], [13.35, 3.08], [13.6, 0.05], [15.3, 0.05], [15.55, 2.45], [16.25, 2.9], [16.6, 3.25], [17.12, 3.3], [17.5, 0.25],
-    [21.95, 0.25], [22.1, 2.9], [22.65, 2.9], [22.85, -0.33], [27.6, -0.33], [27.75, -1.2], [28.25, 0.05], [33.9, 0.05], [34.1, 3.0], [34.9, 3.0], [35.3, 0.1], [36.4, 0.1], [36.7, 2.9], [37.4, 2.9], [37.7, 0.05], [60, 0.05]];
+    [21.95, 0.25], [22.1, 2.9], [22.65, 2.9], [22.85, -0.33], [27.6, -0.33], [27.75, -1.2], [28.25, 0.05], [33.9, 0.05], [34.2, 0.55], [34.9, 0.45], [35.3, 0.05], [36.4, 0.05], [36.7, 0.5], [37.4, 0.35], [37.7, 0.05], [60, 0.05]];
   const acts = [[0, 'gmTense'], [3.3, 'walk'], [4.25, 'gmTense'], [8.3, 'walk'], [8.95, 'gmTense'], [11.8, 'gmTense'], [12.45, 'gmRun'], [13.35, 'gmTense'], [15.3, 'gmRun'], [17.12, 'gmTense'],
-    [21.95, 'gmRun'], [22.8, 'gmPeer'], [26.0, 'gmStand'], [27.6, 'walk'], [28.25, 'gmTense'], [33.9, 'gmTense'], [34.1, 'walk'], [34.6, 'gmTense'], [37.35, 'gmDuck'], [37.8, 'gmRun'], [38.55, 'gmTense'],
+    [21.95, 'gmRun'], [22.8, 'gmTense'], [26.0, 'gmStand'], [27.6, 'walk'], [28.25, 'gmTense'], [33.9, 'gmTense'], [34.1, 'walk'], [34.6, 'gmTense'], [37.35, 'flinch'], [37.8, 'gmRun'], [38.55, 'gmTense'],
     [41.3, 'walk'], [41.7, 'gmTense'], [43.45, 'walk'], [44.0, 'gmTense'], [GM.reach.cancelled, 'gmRelief'], [GM.end.cut, 'gmStand']];
   return new GmKeys(pos, yaw, acts);
 })();
@@ -413,9 +413,9 @@ class GmAware extends GmActor {
     const T = GM.touch, Tc = GM.tech, Ho = GM.hold, Ro = GM.roul, Sy = GM.sys, Ed = GM.edge, Dr = GM.drone, Re = GM.reset, Rc = GM.reach;
     const sp = (px, py, d) => GmScreen.at(cam, px, py, d, new THREE.Vector3());
     if (t < T.step[0]) {                                            // the hook: confused, then he realises
-      F.frown = 0.45 * MathX.smooth(t, 0.4, 0.7) * (1 - MathX.smooth(t, 1.4, 1.7)); F.brow = MathX.smooth(t, 1.4, 1.8) * 0.8; F.wide = MathX.smooth(t, 1.3, 1.7) * 0.6;
-      F.worry = MathX.smooth(t, 2.5, 2.8) * 0.8; pose.headRoll = 0.08 * MathX.smooth(t, 0.5, 0.9) * (1 - MathX.smooth(t, 1.5, 1.9));
-      pose.spine += 0.06 * MathX.smooth(t, 1.4, 2.2);
+      F.frown = 0.45 * MathX.smooth(t, 0.3, 0.5) * (1 - MathX.smooth(t, 0.95, 1.15)); F.brow = MathX.smooth(t, 0.95, 1.3) * 0.8; F.wide = MathX.smooth(t, 0.95, 1.3) * 0.6;
+      F.worry = MathX.smooth(t, 1.8, 2.1) * 0.8; pose.headRoll = 0.08 * MathX.smooth(t, 0.35, 0.6) * (1 - MathX.smooth(t, 1.0, 1.3));
+      pose.spine += 0.06 * MathX.smooth(t, 1.0, 1.8);
     } else if (t < Tc.door) {                                       // the touch
       F.worry = 0.5; F.wide = 0.3;
       const on = MathX.smooth(t, T.palm - 0.45, T.palm), rec = MathX.impulse(t, T.contact, 0.18) * (t > T.contact ? 1 : 0);
@@ -471,7 +471,8 @@ class GmAware extends GmActor {
       F.wide = 1; F.worry = 1; F.brow = 0.6;
       const k = MathX.smooth(t, Re.press - 0.3, Re.press) * (1 - MathX.smooth(t, Re.real[1] - 0.15, Re.wind));
       if (k > 0) {
-        const P = sp(GM_TARGETS.screen.x, GM_TARGETS.screen.y, 0.5);
+        const pat = Math.sin(MathX.clamp((t - Re.pat + 0.22) / 0.22, 0, 1) * Math.PI);
+        const P = sp(GM_TARGETS.screen.x, GM_TARGETS.screen.y, 0.5 + 0.035 * pat);
         const N = V.d.copy(lens).sub(P).normalize().clone();
         place.push(['R', 'palm', P, new THREE.Vector3(-0.42, 1, 0.05).applyQuaternion(cam.quaternion).normalize(), N, k]); hands.R = ['flat', 'flinch', MathX.impulse(t, Re.press, 0.12) * (t > Re.press ? 0.6 : 0)];
       }
@@ -489,8 +490,8 @@ class GmAware extends GmActor {
       const k = MathX.smooth(t, Rc.start, Rc.start + 0.6) * (1 - MathX.smooth(t, Rc.cancelled + 0.2, Rc.cancelled + 0.8));
       if (k > 0) {
         // the index points up toward your screen, its pad facing you (a fingertip pressed on glass from the other side)
-        const P = sp(GM_TARGETS.finger.x, GM_TARGETS.finger.y, 0.15);
-        const Fd = new THREE.Vector3(-0.08, 0.86, -0.5).normalize().applyQuaternion(cam.quaternion), Nd = new THREE.Vector3(0, -0.25, 1).normalize().applyQuaternion(cam.quaternion);
+        const P = sp(GM_TARGETS.finger.x, GM_TARGETS.finger.y, 0.16);
+        const Fd = new THREE.Vector3(-0.05, 0.6, 0.8).normalize().applyQuaternion(cam.quaternion), Nd = new THREE.Vector3(0, -0.8, 0.6).normalize().applyQuaternion(cam.quaternion);
         place.push(['R', 'tip', P, Fd, Nd, k]); hands.R = ['reach'];
       }
       if (t > Rc.contact) { F.wide = 1; F.brow = 1; F.worry = 0.4; }
@@ -520,7 +521,7 @@ class GmAware extends GmActor {
 /* ---------------- the technician ---------------- */
 const GT = (() => {
   const T = GM.tech;
-  const pos = [[0, 0.72, -6.6], [T.door, 0.72, -6.6], [T.enter[0], 0.72, -5.7], [T.enter[1], 0.52, -1.95], [10.2, 0.52, -1.95], [10.9, 0.42, -1.55], [12.45, 0.42, -1.55], [12.95, 1.25, -0.6], [13.5, 2.5, 0.6], [14.2, 2.9, 2.4]];
+  const pos = [[0, 0.72, -6.6], [T.door, 0.72, -6.6], [T.enter[0], 0.72, -5.7], [T.enter[1], 0.4, -2.0], [10.2, 0.4, -2.0], [10.9, 0.32, -1.62], [12.45, 0.32, -1.62], [12.95, 1.25, -0.6], [13.5, 2.5, 0.6], [14.2, 2.9, 2.4]];
   const yaw = [[0, -0.05], [T.enter[1] - 0.2, -0.05], [T.enter[1] + 0.3, -1.1], [10.2, -1.0], [10.6, -0.3], [12.45, -0.3], [12.6, 0.75], [14.2, 0.4]];
   const acts = [[0, 'gmWalkTab'], [T.enter[1], 'gmTablet'], [10.25, 'gmWalkTab'], [10.9, 'gmPeer'], [11.75, 'gmTablet'], [12.45, 'gmRun']];
   return new GmKeys(pos, yaw, acts);
@@ -549,7 +550,8 @@ class GmTech extends GmActor {
     // she looks where he points — through the lens, focused a metre and a half beyond it: there is no one there
     if (t >= T.look && t < GM.alarm) {
       const hd = this.j.head.getWorldPosition(new THREE.Vector3()), dir = lens.clone().sub(hd).normalize();
-      gaze = lens.clone().addScaledVector(dir, 1.6).add(new THREE.Vector3(0.35 * Math.sin((t - T.look) * 2.4), 0.1, 0)); head = 0.75;
+      const side = new THREE.Vector3(dir.z, 0, -dir.x).normalize();
+      gaze = lens.clone().addScaledVector(dir, 1.6).addScaledVector(side, 0.55 + 0.3 * Math.sin((t - T.look) * 2.2)).add(new THREE.Vector3(0, 0.15, 0)); head = 0.75;
       F.frown = 0.5; F.brow = 0.15;
       if (t > T.nobody[0] + 0.3) { pose.headYaw = 0.12 * Math.sin((t - T.nobody[0]) * 9) * Math.exp(-(t - T.nobody[0] - 0.3) * 1.5); }
     }

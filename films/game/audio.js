@@ -167,6 +167,8 @@ class GmAudio extends AudioEngine {
     memG.gain.setValueAtTime(0, p0); memG.gain.linearRampToValueAtTime(0.12, p0 + 0.05); memG.gain.linearRampToValueAtTime(0, p0 + 1.9);
     mem.connect(memF); memF.connect(memG); memG.connect(fx);
     S.ping(p0, 410, 0.06, 1.0, fx); S.ping(p0, 617, 0.03, 0.8, fx);
+    S.thud(GM.reset.pat, 44, 0.45, 0.8, fx); S.ping(GM.reset.pat, 410, 0.04, 0.8, fx);                      // the second pat
+    S.ping(D.fire + 0.15, 1760, 0.1, 0.5, fx); S.ping(D.fire + 0.15, 2637, 0.06, 0.4, fx); S.burst(D.fire + 0.15, 0.5, 5000, 0.8, 0.12, fx, 'bandpass', 'white', 0, 0.005, 1500);   // the shield takes it
     // the wind-up and the crack: a sharp glass hit, bass, the crack running, shards falling
     S.burst(GM.reset.wind, 0.35, 700, 0.6, 0.05, fx, 'bandpass', 'pink', 0, 0.2, 1400);
     const h0 = GM.reset.hit;

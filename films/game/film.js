@@ -53,7 +53,8 @@ const FILM = {
     const T = GM_TARGETS;
     app.rippleW.update(t, [{ t0: GM.touch.contact, x: T.palm.x, y: T.palm.y, R: 520, amp: 46, dur: 1.4 }]);
     app.rippleS.update(t, [
-      { t0: GM.reset.press, x: T.screen.x, y: T.screen.y, R: 2100, amp: 170, dur: 1.9 },
+      { t0: GM.reset.press, x: T.screen.x, y: T.screen.y, R: 2100, amp: 150, dur: 1.9 },
+      { t0: GM.reset.pat, x: T.screen.x, y: T.screen.y, R: 1300, amp: 55, dur: 1.1 },
       { t0: GM.reset.hit, x: T.crack.x, y: T.crack.y, R: 900, amp: 70, dur: 0.5 },
       { t0: GM.reach.contact, x: T.finger.x, y: T.finger.y, R: 1500, amp: 90, dur: 1.2 },
     ]);
@@ -81,7 +82,7 @@ const FILM = {
     // the first touch, the blast, the shot, the palm on your screen, the hit, the contact, the cancel
     p.flash += 0.07 * MathX.impulse(t, GM.touch.contact, 0.25) * (t >= GM.touch.contact ? 1 : 0);
     const shot = t >= GM.drone.fire + 0.14 ? MathX.impulse(t, GM.drone.fire + 0.14, 0.18) : 0;
-    if (shot > 0.01) { p.flash = Math.max(p.flash, 0.55 * shot); p.flashColor.setRGB(1, 0.32, 0.25); }
+    if (shot > 0.01) { p.flash = Math.max(p.flash, 0.45 * shot); p.flashColor.setRGB(0.6, 0.85, 1.0); }
     p.chroma += 0.05 * (t >= GM.reset.press ? MathX.impulse(t, GM.reset.press, 0.2) : 0);
     p.chroma += 0.16 * (t >= GM.reset.hit ? MathX.impulse(t, GM.reset.hit, 0.16) : 0);
     p.flash += 0.3 * (t >= GM.reset.hit ? MathX.impulse(t, GM.reset.hit, 0.06) : 0);

@@ -27,9 +27,10 @@ class GmHud {
     this.el = {
       slitT: mk('gm-slit top'), slitB: mk('gm-slit bot'), boot: mk('gm-boot', 'LOADING WORLD <b>100%</b>'),
       detected: mk('gm-detected', '<span class="ln"></span>PLAYER DETECTED<span class="ln"></span>'),
-      hearts: mk('gm-hearts', `<div class="row">${[0, 1, 2].map((i) => `<span class="h h${i}">${gmSvg('heart')}<i>?</i></span>`).join('')}</div><div class="lab">3 LIVES</div>`),
+      hearts: mk('gm-hearts', `<div class="row">${[0, 1, 2].map((i) => `<span class="h h${i}">${gmSvg('heart')}</span>`).join('')}</div><div class="lab">3 LIVES</div>`),
+      callout: mk('gm-callout'),
       item: mk('gm-itemslot', '<span class="lab">ITEM</span><span class="box">?</span>'),
-      dont: mk('gm-dont', 'DON’T LET ME DIE.'),
+      dont: mk('gm-dont', 'DON’T LET<br>ME DIE.'),
       prompt: mk('gm-prompt'),
       choose: mk('gm-choose', 'CHOOSE!'),
       left: mk('gm-opt left', '◀ LEFT'), right: mk('gm-opt right', 'RIGHT ▶'),
@@ -38,7 +39,7 @@ class GmHud {
       roulTitle: mk('gm-roul-title', 'TAP TO STOP<br>ON YOUR ITEM'),
       card: mk('gm-card', '<div class="icon"></div><div class="name"></div>'),
       strip: mk('gm-strip', GM_ITEMS.map((it, i) => `<span class="s s${i}">${gmSvg(it.id)}</span>`).join('')),
-      remember: mk('gm-remember', 'REMEMBER YOUR ITEM.<div class="sub">didn’t tap? you got the SHIELD</div>'),
+      remember: mk('gm-remember', 'YOUR ITEM = WHERE YOU STOPPED<div class="sub">didn’t tap? → ' + gmSvg('shield') + ' SHIELD</div>'),
       sys: mk('gm-sys'),
       count: mk('gm-count'),
       dim: mk('gm-dim'),
@@ -77,19 +78,19 @@ class GmHud {
     const flick = (a) => !(t - a >= 0 && t - a < 0.1 && fr % 2 === 1);              // a two-frame flicker as a line arrives
     const sysOn = t >= GM.sys.flicker && t < GM.end.cut;
     // the boot: a slit opens outward from his eyes
-    const B = GM.boot, k = Ease.outCubic(MathX.clamp((t - B[0]) / (B[1] - B[0]), 0, 1)), eye = 800, half = MathX.lerp(118, 1100, k);
+    const B = GM.boot, k = Ease.outCubic(MathX.clamp((t - B[0] - 0.15) / (B[1] - B[0] - 0.05), 0, 1)), eye = 800, half = MathX.lerp(118, 1100, k);   // (the first frames: only his eyes)
     this._set(E.slitT, 'height', `calc(var(--u) * ${Math.max(0, eye - half).toFixed(1)})`); this._set(E.slitB, 'top', `calc(var(--u) * ${(eye + half).toFixed(1)})`);
-    op(E.slitT, t < B[1] + 0.05 ? 1 : 0); op(E.slitB, t < B[1] + 0.05 ? 1 : 0); op(E.boot, t < 0.3 ? 1 - MathX.smooth(t, 0.2, 0.3) : 0);
+    op(E.slitT, t < B[1] + 0.2 ? 1 : 0); op(E.slitB, t < B[1] + 0.2 ? 1 : 0); op(E.boot, t < 0.2 ? 1 - MathX.smooth(t, 0.12, 0.18) : 0);
     // PLAYER DETECTED, the hearts (centred, then a compact widget top-left)
     op(E.detected, t >= GM.detected && t < 3.5 && flick(GM.detected) ? 1 - MathX.smooth(t, 3.2, 3.5) : 0);
     const hm = MathX.smooth(t, 3.3, 3.75), hOn = t >= GM.hearts && t < GM.end.cut && !(t > GM.reset.hit && t < GM.reach.cancelled + 0.4 && fr % 7 < 2);
     op(E.hearts, hOn ? MathX.smooth(t, GM.hearts, GM.hearts + 0.12) * (t > GM.reset.hit && t < GM.reach.cancelled ? 0.55 : 1) : 0);
-    this._set(E.hearts, 'transform', `translate(calc(var(--u) * ${MathX.lerp(0, -380, hm).toFixed(1)}), calc(var(--u) * ${MathX.lerp(0, -106, hm).toFixed(1)})) scale(${MathX.lerp(1, 0.62, hm).toFixed(3)})`);
+    this._set(E.hearts, 'transform', `translate(calc(var(--u) * ${MathX.lerp(0, -380, hm).toFixed(1)}), calc(var(--u) * ${MathX.lerp(0, -106, hm).toFixed(1)})) scale(${MathX.lerp(1, 0.8, hm).toFixed(3)})`);
     E.hearts.classList.toggle('compact', hm > 0.5);
-    // the third heart turns uncertain at the choice (it depends on you); the second at the shot
-    const q3 = t >= GM.choice.result[0], q2 = t >= GM.drone.fire;
-    E.hearts.classList.toggle('q3', q3); E.hearts.classList.toggle('q2', q2);
-    E.hearts.classList.toggle('hit', (t >= GM.choice.blast && t < GM.choice.blast + 0.5) || (t >= GM.drone.fire && t < GM.drone.fire + 0.5));
+    // the game never takes a heart itself (it can't know what you chose): a callout beside them says when to count one
+    E.hearts.classList.toggle('hit', (t >= GM.choice.result[0] && t < GM.choice.result[0] + 0.4) || (t >= GM.drone.fire + 0.15 && t < GM.drone.fire + 0.55));
+    const co = t >= GM.choice.result[0] && t < GM.choice.result[1] ? 'WENT LEFT? −1 ' + gmSvg('heart') : t >= GM.drone.fire + 0.15 && t < GM.reset.press ? 'LIGHT? −1 ' + gmSvg('heart') + '&nbsp; MEDKIT? +1 ' + gmSvg('heart') : '';
+    this._html(E.callout, co); op(E.callout, co ? 1 : 0);
     op(E.item, t >= GM.roul.remember[0] && t < GM.end.cut && hOn ? 1 : 0);
     E.item.classList.toggle('pulse', t > GM.drone.table[0] && t < GM.drone.table[1]);
     // DON'T LET ME DIE.
@@ -104,7 +105,7 @@ class GmHud {
       this._arc(q.querySelector('.arc'), 96, pre ? (t - T.prompt) / (T.contact - T.prompt) : 1);
       q.querySelector('.pulse').setAttribute('r', (pre ? 100 + 40 * pu : 96).toFixed(1)); q.querySelector('.pulse').style.opacity = pre ? (1 - pu).toFixed(3) : '0';
       const bu = MathX.clamp((t - T.contact) / 0.6, 0, 1);
-      q.querySelector('.burst').setAttribute('r', (96 + 220 * Ease.outCubic(bu)).toFixed(1)); q.querySelector('.burst').style.opacity = !pre ? (1 - bu).toFixed(3) : '0';
+      q.querySelector('.burst').style.opacity = '0';                        // (the reaction is in the glass, not in the interface)
       q.querySelector('.glow').style.opacity = pre ? '0.15' : (1 - MathX.smooth(t, T.contact + 0.1, T.contact + 0.7)).toFixed(3);
       q.querySelector('.base').style.opacity = pre ? '1' : '0';
     }
@@ -114,9 +115,9 @@ class GmHud {
     const H = GM.hold;
     if (t >= H.ui && t < H.open[0]) { pr = 'HOLD HERE'; po = MathX.smooth(t, H.ui, H.ui + 0.15) * (t > H.steps[4] ? 1 - MathX.smooth(t, H.steps[4], H.open[0]) : 1); }
     const R = GM.reach;
-    if (t >= R.target[0] && t < R.contact + 0.1) { pr = 'TOUCH'; po = MathX.smooth(t, R.target[0], R.target[0] + 0.2); }
+    if (t >= R.target[0] && t < R.contact + 0.1) { pr = 'TOUCH HERE'; po = MathX.smooth(t, R.target[0], R.target[0] + 0.2); }
     this._html(E.prompt, pr); op(E.prompt, po);
-    E.prompt.className = 'gm-prompt' + (pr === 'HOLD HERE' ? ' hold' : pr === 'TOUCH' ? ' finger' : '');
+    E.prompt.className = 'gm-prompt' + (pr === 'HOLD HERE' ? ' hold' : pr === 'TOUCH HERE' ? ' finger' : '');
     // CHOOSE: the 3-2-1 ring, the doors' labels, the tilt instruction; the result
     const C = GM.choice, cOn = t >= C.ui && t < C.zero + 0.35;
     op(E.choose, cOn && flick(C.ui) ? (t < C.zero ? 1 : 1 - MathX.smooth(t, C.zero, C.zero + 0.3)) : 0);
@@ -153,8 +154,9 @@ class GmHud {
     op(E.card, rOn ? MathX.smooth(t, Ro.ui, Ro.ui + 0.15) * (1 - MathX.smooth(t, Ro.remember[1] - 0.3, Ro.remember[1])) : 0);
     op(E.strip, rOn && t < Ro.land + 0.4 ? 0.9 * (1 - MathX.smooth(t, Ro.land, Ro.land + 0.4)) : 0);
     if (rOn) {
-      const i = t < Ro.spin[0] ? 1 : gmItemAt(t), it = GM_ITEMS[i];
-      this._html(E.card.querySelector('.icon'), gmSvg(it.id)); this._html(E.card.querySelector('.name'), it.name);
+      // it spins, slows, and ends on a question mark: your item is the one you stopped on (no tap: the SHIELD)
+      const i = t < Ro.spin[0] ? 1 : gmItemAt(t), it = GM_ITEMS[i], end = t >= Ro.land;
+      this._html(E.card.querySelector('.icon'), end ? '<b class="q">?</b>' : gmSvg(it.id)); this._html(E.card.querySelector('.name'), end ? 'YOUR ITEM' : it.name);
       E.card.classList.toggle('landed', t >= Ro.land); E.card.classList.toggle('tick', t >= Ro.spin[0] && t < Ro.land && fr % 6 === 0);
       [...E.strip.children].forEach((s, j) => s.classList.toggle('on', j === i));
     }
@@ -171,11 +173,12 @@ class GmHud {
       sys += line(S.observer, S.end, 'OBSERVER CONNECTION <b>ACTIVE</b>', 'b');
       const Rc = GM.reach;
       if (t >= Rc.glitch[0] && t < Rc.override) { const g = 'RESET—', s = g.split('').map((ch, i) => (hash2(i, fr) < 0.3 ? '▓░▒█'.charAt(Math.floor(hash2(i + 9, fr) * 4)) : ch)).join(''); sys += `<div class="l big">${t < Rc.glitch[0] + 0.25 ? g : s}</div>`; }
-      sys += line(Rc.override, GM.end.cut - 0.1, 'EXTERNAL PLAYER OVERRIDE', 'b');
-      sys += line(Rc.cancelled, GM.end.cut - 0.1, 'RESET <b>CANCELLED</b>', 'ok');
+      sys += line(Rc.override, Rc.cancelled, 'EXTERNAL PLAYER OVERRIDE', 'b');
+      if (t >= Rc.cancelled && t < GM.end.cut - 0.05 && flick(Rc.cancelled)) sys += '<div class="l big ok">RESET<br><b>CANCELLED</b></div>';
     }
     this._html(E.sys, sys); op(E.sys, sys ? 1 : 0);
     E.sys.classList.toggle('low', t >= GM.reach.glitch[0]);
+    E.table.querySelector('.r1').classList.toggle('hit', t >= GM.drone.fire + 0.15 && t < GM.drone.table[1]);
     // RESET IN 5 · 4 · 3 · 2 · 1
     const Re = GM.reset; let n = 0;
     if (t >= Re.n5 && t < GM.reach.glitch[0]) n = t < Re.n4 ? 5 : t < Re.n3 ? 4 : t < Re.hit ? 3 : t < GM.reach.n1 ? 2 : 1;

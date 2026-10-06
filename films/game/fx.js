@@ -141,13 +141,30 @@ class GmDrone {
     this.boltGlow = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1, 12), new THREE.MeshBasicMaterial({ color: '#ff3a24', transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
     this.boltGlow.geometry.rotateX(Math.PI / 2); this.boltGlow.frustumCulled = false; app.scene.add(this.boltGlow);
     this.p = new THREE.Vector3(); this._a = new THREE.Vector3(); this._b = new THREE.Vector3();
+    // the default item at work: a hex shield flares in front of you and takes the shot
+    this.uS = { uT: { value: -1 }, uP: { value: new THREE.Vector2(0.06, -0.02) } };
+    const sm = new THREE.ShaderMaterial({ uniforms: this.uS, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, fog: false,
+      vertexShader: 'varying vec2 vP; void main(){ vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: `uniform float uT; uniform vec2 uP; varying vec2 vP;
+        float hexd(vec2 p){ p = abs(p); return max(dot(p, vec2(0.866, 0.5)), p.y); }
+        void main(){
+          if (uT < 0.0) discard;
+          vec2 q = vP * 9.0, a = mod(q, vec2(1.732, 1.0)) - vec2(0.866, 0.5), b = mod(q - vec2(0.866, 0.5), vec2(1.732, 1.0)) - vec2(0.866, 0.5);
+          vec2 c = dot(a, a) < dot(b, b) ? a : b; float e = smoothstep(0.42, 0.5, hexd(c));
+          float r = length(vP - uP), wave = exp(-pow((r - uT * 1.2) / 0.05, 2.0)), core = exp(-r * r / 0.004) * exp(-uT * 9.0);
+          float fade = exp(-uT * 5.0) * smoothstep(0.55, 0.05, r);
+          float k = (e * (0.18 + 0.9 * wave) + core * 1.2 + wave * 0.25) * fade;
+          gl_FragColor = vec4(vec3(0.55, 0.85, 1.0) * k, k);
+        }` });
+    this.shield = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.6), sm); this.shield.position.set(0, 0, -0.6); this.shield.renderOrder = 20; this.shield.frustumCulled = false;
+    app.camera.add(this.shield);
   }
   update(t, cam, aware) {
     const D = GM.drone, dock = GF.dock, show = t > D.drop - 0.1 && t < GM.reset.n5 + 0.6;
     this.g.visible = show; this.coneP.visible = show;
-    if (!show) { this.bolt.visible = this.boltGlow.visible = false; this.glow.update(-1, cam, this.app.renderer); return; }
+    if (!show) { this.bolt.visible = this.boltGlow.visible = false; this.shield.visible = false; this.uS.uT.value = -1; this.glow.update(-1, cam, this.app.renderer); return; }
     const k = Ease.outCubic(MathX.clamp((t - D.drop) / 0.8, 0, 1)), bob = Math.sin(t * 3.1) * 0.03 + Math.sin(t * 5.3) * 0.012;
-    const hover = [1.45, 2.85, -16.2];
+    const hover = [1.5, 2.45, -16.9];
     this.g.position.set(MathX.lerp(dock[0], hover[0], k), MathX.lerp(dock[1] - 0.25, hover[1], k) + bob - 0.12 * Math.sin(k * Math.PI), MathX.lerp(dock[2], hover[2], k));
     const lens = this._a.setFromMatrixPosition(cam.matrixWorld);
     // it watches him, then you
@@ -158,7 +175,7 @@ class GmDrone {
     this.p.copy(this.g.position);
     // the scan cone sweeps him, then you
     this.coneP.position.copy(this.eye.getWorldPosition(this._b));
-    const sweep = t < 35.0 ? aware.headWorld(new THREE.Vector3()).add(new THREE.Vector3(0.3 * Math.sin(t * 6), -0.6 + 0.6 * Math.sin(t * 2.5), 0)) : lens.clone().add(new THREE.Vector3(0.25 * Math.sin(t * 5), 0.15 * Math.cos(t * 4), 0));
+    const sweep = aware.headWorld(new THREE.Vector3()).add(new THREE.Vector3(0.3 * Math.sin(t * 6), -0.7 + 0.7 * Math.sin(t * 2.5), 0));
     this.coneP.lookAt(sweep);
     this.cone.material.opacity = (t > D.drop + 0.8 && t < D.fire) ? 0.06 + 0.03 * Math.sin(t * 30) : 0;
     // charge, fire
@@ -166,6 +183,7 @@ class GmDrone {
     this.mEye.emissiveIntensity = 1.2 + 6 * ch + 2 * ch * Math.sin(t * 40);
     this.glow.P[0].p.copy(this.coneP.position); this.glow.s.size = [0.2 + 0.6 * ch, 0.2 + 0.6 * ch]; this.glow.P[0].size = 0.15 + 0.7 * ch;
     this.glow.update(t, cam, this.app.renderer);
+    const su = t - (D.fire + 0.15); this.uS.uT.value = su >= 0 && su < 0.7 ? su : -1; this.shield.visible = su >= 0 && su < 0.7;
     const u = (t - D.fire) / 0.16;
     this.bolt.visible = this.boltGlow.visible = u >= 0 && u < 1.25;
     if (this.bolt.visible) {

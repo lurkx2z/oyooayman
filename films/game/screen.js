@@ -191,8 +191,8 @@ class GmCrack {
       for (let k = b1.k - 1; k >= b0.k; k--) poly.push([rb[k][0], rb[k][1]]); poly.push(b0.p); if (R0) poly.push(mid[(ri - 1) + ':' + i]);
       const c = poly.reduce((s, p) => [s[0] + p[0] / poly.length, s[1] + p[1] / poly.length], [0, 0]);
       // the middle falls away (a hole round the impact), the outside stays cracked
-      const falls = ri <= 4 || (ri === 5 && rng.next() < 0.45);
-      const fall = Re.shatter[0] + (ri / 5) * (Re.shatter[1] - Re.shatter[0] - 0.35) + rng.range(-0.08, 0.12);
+      const falls = ri <= 3 || (ri === 4 && rng.next() < 0.5);
+      const fall = Re.shatter[0] + (ri / 4) * (Re.shatter[1] - Re.shatter[0] - 0.35) + rng.range(-0.08, 0.12);
       this.shards.push({ poly, c, ri, falls, fall, spin: rng.range(-2.4, 2.4), drift: rng.range(-140, 140), shift: [rng.range(-1.8, 1.8) / 1080, rng.range(-1.8, 1.8) / 1920] });
     }
   }
@@ -224,7 +224,7 @@ class GmCrack {
     if (g <= 0) return;
     const draw = (pts, w) => { x.beginPath(); let st = false; for (const p of pts) { const r = Math.hypot(p[0] - C.x, p[1] - C.y); if (r > g) break; if (!st) { x.moveTo(p[0], p[1]); st = true; } else x.lineTo(p[0], p[1]); } x.lineWidth = w; x.stroke(); };
     const fade = 1 - MathX.smooth(t, GM.reset.shatter[1] - 0.1, GM.reset.shatter[1] + 0.5) * 0.6;
-    for (const [col, w] of [['rgba(8,10,12,0.6)', 4.4], ['rgba(236,243,250,0.92)', 1.6]]) {
+    for (const [col, w] of [['rgba(8,10,12,0.65)', 7.5], ['rgba(236,243,250,0.95)', 2.8]]) {
       x.strokeStyle = col; x.globalAlpha = fade;
       for (const ray of this.rays) draw(ray, w);
       for (const s of this.ringSegs) if (s.show && s.R < g) draw(s.pts, w * 0.8);

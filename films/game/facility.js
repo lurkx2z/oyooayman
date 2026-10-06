@@ -245,6 +245,9 @@ class Facility {
     const cam = new THREE.Mesh(new THREE.SphereGeometry(0.08, 14, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), Mat.std('#1a1c20', { roughness: 0.2, metalness: 0.4 })); cam.position.set(C.x1 - 0.2, h - 0.02, C.z0 + 0.2); this.root.add(cam);
     const drain = new THREE.Mesh(new THREE.CircleGeometry(0.11, 16), Mat.std('#1d1f22', { roughness: 0.5, metalness: 0.6 })); drain.rotation.x = -Math.PI / 2; drain.position.set(0.9, 0.004, -3.6); this.root.add(drain);
     this._decal(this._sign('07', { w: 256, h: 256, font: 210, fg: 'rgba(30,32,36,0.8)' }), 0.9, 0.9, 1.75, 1.85, C.z0 + 0.012, 0);
+    // a cold light strip on the wall between the doors: a rim behind him in the opening shot
+    this.mStrip = new THREE.MeshStandardMaterial({ color: '#081314', emissive: '#58d8ca', emissiveIntensity: 1.8, roughness: 0.3, name: 'cellStrip' });
+    this._box(0.07, 1.7, 0.03, 0, 1.2, C.z0 + 0.02, this.mStrip, 0, { noShadow: true }); this._box(0.16, 1.78, 0.02, 0, 1.2, C.z0 + 0.008, this.mDark, 0, { noShadow: true });
     this._decal(this._sign(['SUBJECT', 'HOLDING'], { w: 512, h: 256, font: 72, fg: 'rgba(30,32,36,0.65)' }), 0.9, 0.45, -1.7, 2.3, C.z0 + 0.012, 0);
     // door frames (steel, with edge lights that change at the choice) and the doors that slide into the wall
     this.doors = {};
@@ -446,9 +449,12 @@ class Facility {
     const calm = t >= GM.end.cut ? 1 : 0;
     this.hemi.intensity = (0.32 - 0.1 * al) * (1 - 0.45 * sys) + 0.05 * calm;
     this.hemi.color.set(al > 0.01 ? '#c9a9a4' : '#c2ccd6');
-    this.key.intensity *= (1 - 0.2 * al) * (1 - 0.35 * sys) * this.flicker(t);
+    this.key.intensity *= (1 - 0.2 * al) * (1 - 0.1 * sys) * this.flicker(t);
     this.top.intensity *= (1 - 0.35 * al) * (1 - 0.5 * sys) * this.flicker(t + 0.37);
     this.pView.intensity = 0.8 * (1 - 0.6 * al) + 3 * al * red; this.pView.color.set(al > 0.01 ? '#ff3a24' : '#dfe6ee');
+    // from the reset on it is a soft light just beside you (faces and hands that come close to the screen stay readable)
+    if (t >= GM.reset.n5 - 0.3) { this.pView.position.set(GF.corrB.ax + 0.35, 1.95, -13.2); this.pView.color.set(t < GM.reach.cancelled && al > 0.01 && red > 0.7 ? '#ffb0a0' : '#ffe6d2'); this.pView.intensity = 0.55; }
+    else this.pView.position.set(0, 2.7, 1.8);
     this.pCell.intensity = 1.1 * (1 - 0.5 * al) + 3 * al * red; this.pCell.color.set(al > 0.01 ? '#ff4a30' : '#e8eef6');
     this.pRoute.intensity = t > GM.doors[0] ? 2.0 + 1.5 * red + 20 * MathX.impulse(t, GM.choice.blast, 0.25) * (t > GM.choice.blast ? 1 : 0) : 0;
     const rl = t >= GM.hold.open[1] && t < GM.sys.flicker + 0.3;                  // (in the hall it lights his face from the open case)
@@ -463,7 +469,7 @@ class Facility {
     const gk = Ease.inOutCubic(MathX.clamp((t - GM.glass[0]) / (GM.glass[1] - GM.glass[0]), 0, 1));
     this.glass.position.y = 3.05 * gk; this.glass.visible = gk < 0.995;
     const dk = Ease.inOutCubic(MathX.clamp((t - GM.doors[0]) / (GM.doors[1] - GM.doors[0]), 0, 1));
-    const ch = t >= GM.choice.ui && t < GM.choice.zero + 0.6 ? 1 : 0;
+    const ch = t >= GM.choice.ui && t < GM.choice.zero + 0.15 ? 1 : 0;
     const techDoor = MathX.smooth(t, GM.tech.door - 0.05, GM.tech.door + 0.25) * (1 - MathX.smooth(t, GM.tech.enter[0] + 1.2, GM.tech.enter[0] + 1.6));
     for (const k of ['L', 'R']) {
       const D = this.doors[k];
@@ -483,7 +489,8 @@ class Facility {
     // the supply case
     const R = GM.roul, lid = Ease.outBack(MathX.clamp((t - (R.ui - 0.15)) / 0.4, 0, 1));
     this.caseLid.rotation.x = -1.9 * lid;
-    this.mCaseGlow.opacity = t > R.ui ? (t < R.land ? 0.55 + 0.45 * (Math.floor(t * 5) % 2) : 0.5) * (t < GM.sys.flicker ? 1 : 0.4) : 0;
+    let tick = -9; for (const [t0] of GM_SPIN) if (t0 <= t && t0 < R.land) tick = t0;                 // a pulse with every item the card shows
+    this.mCaseGlow.opacity = t > R.ui ? (t < R.land ? 0.35 + 0.6 * Math.exp(-(t - tick) / 0.07) : 0.5) * (t < GM.sys.flicker ? 1 : 0.4) : 0;
   }
 
   // 0..1: the alarm (from the alarm until the hall door opens; again for the reset)
