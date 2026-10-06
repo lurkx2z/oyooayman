@@ -30,7 +30,7 @@ class Facility {
     this._lights();
     this.batch.build(this.root, 'fac');
     this._envMap();
-    this.scene.fog = new THREE.FogExp2('#101317', 0.018);
+    this.scene.fog = new THREE.FogExp2('#0d1014', 0.009);
   }
 
   /* ---------------- materials ---------------- */
@@ -38,10 +38,10 @@ class Facility {
     const r = this.r, std = (c, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.8 }, o));
     // wall panels: a 2.4 m tile of four 1.2 m panels with seams, rivets and a little wear
     const W = 512, wc = Tex.canvas(W, W), w = wc.getContext('2d'), wb = Tex.canvas(W, W), b = wb.getContext('2d');
-    w.fillStyle = '#b8bab6'; w.fillRect(0, 0, W, W); b.fillStyle = '#808080'; b.fillRect(0, 0, W, W);
+    w.fillStyle = '#8f9396'; w.fillRect(0, 0, W, W); b.fillStyle = '#808080'; b.fillRect(0, 0, W, W);
     for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) {
       const x = i * 256, y = j * 256, v = r.range(-7, 7);
-      const g = w.createLinearGradient(x, y, x, y + 256); g.addColorStop(0, `rgb(${190 + v},${192 + v},${188 + v})`); g.addColorStop(1, `rgb(${176 + v},${178 + v},${174 + v})`);
+      const g = w.createLinearGradient(x, y, x, y + 256); g.addColorStop(0, `rgb(${150 + v},${155 + v},${158 + v})`); g.addColorStop(1, `rgb(${136 + v},${141 + v},${145 + v})`);
       w.fillStyle = g; w.fillRect(x + 3, y + 3, 250, 250);
       w.fillStyle = 'rgba(40,44,48,0.85)'; w.fillRect(x, y, 256, 3); w.fillRect(x, y, 3, 256);
       w.fillStyle = 'rgba(255,255,255,0.35)'; w.fillRect(x + 3, y + 3, 250, 1.5); w.fillRect(x + 3, y + 3, 1.5, 250);
@@ -60,7 +60,7 @@ class Facility {
     this.mWall = std('#ffffff', { map: wallT, bumpMap: wallB, bumpScale: 1.6, roughness: 0.72, name: 'wallPanel' });
     // floor: dark sealed concrete, 1 m slabs, scuffs, a few drips
     const fc = Tex.canvas(W, W), f = fc.getContext('2d');
-    f.fillStyle = '#3f4246'; f.fillRect(0, 0, W, W);
+    f.fillStyle = '#34373b'; f.fillRect(0, 0, W, W);
     for (let i = 0; i < 260; i++) { f.fillStyle = `rgba(${r.chance(0.5) ? '90,92,94' : '20,22,24'},${r.range(0.03, 0.08)})`; f.beginPath(); f.arc(r.range(0, W), r.range(0, W), r.range(4, 50), 0, 7); f.fill(); }
     for (let i = 0; i < 120; i++) { f.strokeStyle = `rgba(16,16,18,${r.range(0.08, 0.2)})`; f.lineWidth = r.range(0.6, 2); f.beginPath(); const x = r.range(0, W), y = r.range(0, W); f.moveTo(x, y); f.lineTo(x + r.range(-40, 40), y + r.range(-8, 8)); f.stroke(); }
     f.fillStyle = 'rgba(14,15,16,0.7)'; f.fillRect(0, 0, W, 2); f.fillRect(0, 256, W, 2); f.fillRect(0, 0, 2, W); f.fillRect(256, 0, 2, W);
@@ -217,8 +217,8 @@ class Facility {
     const sg = s.createLinearGradient(0, 0, 256, 256); sg.addColorStop(0.3, 'rgba(255,255,255,0)'); sg.addColorStop(0.45, 'rgba(255,255,255,0.12)'); sg.addColorStop(0.52, 'rgba(255,255,255,0)'); sg.addColorStop(0.62, 'rgba(255,255,255,0.07)'); sg.addColorStop(0.7, 'rgba(255,255,255,0)');
     s.fillStyle = sg; s.fillRect(0, 0, 256, 256);
     const smT = Tex.tex(sm, { srgb: false, repeat: false });
-    this.mGlass = new THREE.MeshStandardMaterial({ color: '#d8e8ee', transparent: true, opacity: 0.09, roughness: 0.04, metalness: 0.1, envMapIntensity: 2.2, depthWrite: false, name: 'glass' });
-    this.mSheen = new THREE.MeshBasicMaterial({ color: '#ffffff', map: smT, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, name: 'glassSheen' });
+    this.mGlass = new THREE.MeshStandardMaterial({ color: '#d8e8ee', transparent: true, opacity: 0.035, roughness: 0.05, metalness: 0.0, envMapIntensity: 0.7, depthWrite: false, name: 'glass' });
+    this.mSheen = new THREE.MeshBasicMaterial({ color: '#ffffff', map: smT, transparent: true, opacity: 0.14, blending: THREE.AdditiveBlending, depthWrite: false, name: 'glassSheen' });
     for (const [x0, x1] of [[-2.6, -1.3], [-1.3, 1.3], [1.3, 2.6]]) {
       const pw = x1 - x0 - 0.06, p = new THREE.Mesh(new THREE.PlaneGeometry(pw, 2.92), this.mGlass); p.position.set((x0 + x1) / 2, 1.5, 0); p.renderOrder = 3; gl.add(p);
       const sh = new THREE.Mesh(new THREE.PlaneGeometry(pw, 2.92), this.mSheen); sh.position.set((x0 + x1) / 2, 1.5, 0.004); sh.renderOrder = 4; gl.add(sh);
@@ -226,8 +226,6 @@ class Facility {
     const ml = (w, h2, d, x, y) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h2, d), this.mSteel); m.position.set(x, y, 0); m.castShadow = true; m.receiveShadow = true; gl.add(m); };
     for (const x of [-2.6, -1.3, 1.3, 2.6]) ml(0.07, 2.96, 0.09, x, 1.5);
     ml(5.27, 0.07, 0.1, 0, 0.035); ml(5.27, 0.06, 0.1, 0, 2.95);
-    // a speaking grille and a pass-through slot in the centre pane
-    const gr = new THREE.Mesh(new THREE.CircleGeometry(0.07, 24), Mat.std('#5a6068', { roughness: 0.5, metalness: 0.6 })); gr.position.set(0, 1.42, 0.005); gl.add(gr);
   }
 
   /* ---------------- the cell ---------------- */
@@ -396,7 +394,7 @@ class Facility {
   /* ---------------- lights ---------------- */
   _lights() {
     const s = this.scene;
-    this.hemi = new THREE.HemisphereLight('#c2ccd6', '#2b2826', 0.55); s.add(this.hemi);
+    this.hemi = new THREE.HemisphereLight('#aeb9c6', '#262321', 0.32); s.add(this.hemi);
     const spot = (c, i, ang, pen, dist) => { const l = new THREE.SpotLight(c, i, dist, ang, pen, 1.6); l.castShadow = true; l.shadow.mapSize.set(2048, 2048); l.shadow.bias = -0.0006; l.shadow.normalBias = 0.02; l.shadow.camera.near = 0.2; s.add(l); s.add(l.target); return l; };
     this.key = spot('#fff2e4', 30, 0.62, 0.55, 14);
     this.top = spot('#e8f0ff', 26, 1.0, 0.65, 12);
@@ -414,7 +412,7 @@ class Facility {
     for (const [x, z] of [[0, 0], [4, -3], [-4, 3], [3, 4], [-3, -4]]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 3), lamp); p.rotation.x = Math.PI / 2; p.position.set(x, 4.9, z); es.add(p); }
     const fl = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshBasicMaterial({ color: '#1a1c1f' })); fl.rotation.x = -Math.PI / 2; fl.position.y = -0.9; es.add(fl);
     const rt = pm.fromScene(es, 0.03, 0.1, 100);
-    this.scene.environment = rt.texture; this.scene.environmentIntensity = 0.5;
+    this.scene.environment = rt.texture; this.scene.environmentIntensity = 0.3;
     pm.dispose();
   }
 
@@ -424,17 +422,17 @@ class Facility {
     const K = this.key, T = this.top;
     const set = (L, p, q, i, ang) => { L.position.set(...p); L.target.position.set(...q); L.intensity = i; if (ang) L.angle = ang; L.target.updateMatrixWorld(); };
     if (t < GM.hold.arrive - 0.6) {
-      set(K, [0.7, 2.95, 0.5], [-0.05, 1.45, -1.8], 34, 0.6);              // through the glass, onto his face
-      set(T, [0.1, 2.95, -3.1], [0, 0, -3.4], 30, 1.05);                    // the cell's ceiling panel
+      set(K, [-0.9, 2.9, 0.6], [0.05, 1.5, -1.8], 13, 0.55);               // through the glass, onto his face, from the left
+      set(T, [0.2, 2.95, -3.6], [0, 0, -2.6], 9, 1.0);                      // the cell's ceiling panel (a rim from behind)
     } else if (t < GM.hold.open[1] + 0.3) {
-      set(K, [GF.corrB.ax + 0.2, 2.85, -10.6], [0.55, 0.9, -12.1], 30, 0.7);
-      set(T, [GF.corrB.ax, 2.85, -7.4], [GF.corrB.ax, 0, -8.0], 22, 1.0);
+      set(K, [GF.corrB.ax + 0.5, 2.85, -10.4], [0.55, 1.0, -12.1], 12, 0.7);
+      set(T, [GF.corrB.ax, 2.85, -7.4], [GF.corrB.ax, 0, -8.0], 8, 1.0);
     } else if (t < GM.end.cut) {
-      set(K, [2.6, 4.95, -13.0], [1.2, 1.3, -15.2], 46, 0.55);
-      set(T, [1.07, 5.1, -18.2], [1.07, 0, -18.6], 30, 1.0);
+      set(K, [2.4, 4.6, -12.9], [1.1, 1.4, -15.0], 20, 0.5);
+      set(T, [1.07, 5.1, -18.2], [1.07, 0, -18.6], 14, 1.0);
     } else {
-      set(K, [2.2, 3.6, -12.4], [1.07, 1.5, -14.6], 40, 0.5);
-      set(T, [1.07, 5.1, -18.2], [1.07, 0, -18.6], 18, 1.0);
+      set(K, [1.9, 3.3, -12.6], [1.07, 1.55, -14.4], 14, 0.5);
+      set(T, [1.07, 5.1, -18.2], [1.07, 0, -18.6], 10, 1.0);
     }
   }
 
@@ -446,16 +444,16 @@ class Facility {
     for (const B of this.beacons || []) { B.piv.rotation.y = t * 6.5 + B.ph; B.cone.material.opacity = 0.11 * al; B.cone.visible = al > 0.01; }
     const sys = this.sysDim(t);
     const calm = t >= GM.end.cut ? 1 : 0;
-    this.hemi.intensity = (0.55 - 0.18 * al) * (1 - 0.45 * sys) + 0.1 * calm;
+    this.hemi.intensity = (0.32 - 0.1 * al) * (1 - 0.45 * sys) + 0.05 * calm;
     this.hemi.color.set(al > 0.01 ? '#c9a9a4' : '#c2ccd6');
     this.key.intensity *= (1 - 0.2 * al) * (1 - 0.35 * sys) * this.flicker(t);
     this.top.intensity *= (1 - 0.35 * al) * (1 - 0.5 * sys) * this.flicker(t + 0.37);
-    this.pView.intensity = 2.2 * (1 - 0.6 * al) + 6 * al * red; this.pView.color.set(al > 0.01 ? '#ff3a24' : '#dfe6ee');
-    this.pCell.intensity = 3.0 * (1 - 0.5 * al) + 5 * al * red; this.pCell.color.set(al > 0.01 ? '#ff4a30' : '#e8eef6');
-    this.pRoute.intensity = t > GM.doors[0] ? 3.5 + 2.5 * red + 30 * MathX.impulse(t, GM.choice.blast, 0.25) : 0;
-    this.pB.intensity = t > GM.doors[0] && t < GM.roul.ui + 1 ? 4.5 * (1 - 0.3 * al) + 3 * al * red : 0;
-    this.pHall.intensity = t > GM.hold.open[0] ? 6.5 * (1 - 0.5 * sys) * this.flicker(t + 0.71) : 0;
-    this.pCore.intensity = t > GM.hold.open[0] ? (3.2 + 0.4 * Math.sin(t * 2.1)) * (1 - 0.6 * sys) : 0;
+    this.pView.intensity = 0.8 * (1 - 0.6 * al) + 3 * al * red; this.pView.color.set(al > 0.01 ? '#ff3a24' : '#dfe6ee');
+    this.pCell.intensity = 1.1 * (1 - 0.5 * al) + 3 * al * red; this.pCell.color.set(al > 0.01 ? '#ff4a30' : '#e8eef6');
+    this.pRoute.intensity = t > GM.doors[0] ? 2.0 + 1.5 * red + 20 * MathX.impulse(t, GM.choice.blast, 0.25) * (t > GM.choice.blast ? 1 : 0) : 0;
+    this.pB.intensity = t > GM.doors[0] && t < GM.roul.ui + 1 ? 1.8 * (1 - 0.3 * al) + 1.5 * al * red : 0;
+    this.pHall.intensity = t > GM.hold.open[0] ? 3.0 * (1 - 0.5 * sys) * this.flicker(t + 0.71) : 0;
+    this.pCore.intensity = t > GM.hold.open[0] ? (2.2 + 0.3 * Math.sin(t * 2.1)) * (1 - 0.6 * sys) : 0;
     this.mCore.emissiveIntensity = (1.6 + 0.25 * Math.sin(t * 2.1)) * (1 - 0.5 * sys);
     this.mLamp.emissiveIntensity = 2.4 * this.flicker(t) * (1 - 0.45 * sys);
     for (const b of this.blink) b.m.emissiveIntensity = b.base * (0.25 + 0.75 * (Math.sin(t * b.rate * 6.283 + b.ph) > -0.2 ? 1 : 0)) * (1 - 0.6 * sys);
@@ -464,9 +462,10 @@ class Facility {
     this.glass.position.y = 3.05 * gk; this.glass.visible = gk < 0.995;
     const dk = Ease.inOutCubic(MathX.clamp((t - GM.doors[0]) / (GM.doors[1] - GM.doors[0]), 0, 1));
     const ch = t >= GM.choice.ui && t < GM.choice.zero + 0.6 ? 1 : 0;
+    const techDoor = MathX.smooth(t, GM.tech.door - 0.05, GM.tech.door + 0.25) * (1 - MathX.smooth(t, GM.tech.enter[0] + 1.2, GM.tech.enter[0] + 1.6));
     for (const k of ['L', 'R']) {
       const D = this.doors[k];
-      D.leaf.position.x = D.D.x + D.dir * (GF.doorL.w + 0.04) * dk;
+      D.leaf.position.x = D.D.x + D.dir * (GF.doorL.w + 0.04) * (k === 'R' ? Math.max(dk, Ease.inOutSine(techDoor)) : dk);
       D.em.emissive.set(k === 'L' ? (ch ? '#ff6a4a' : '#e9eef2') : (ch ? '#bff5df' : '#e9eef2'));
       D.em.emissiveIntensity = ch ? 1.4 + 0.8 * Math.sin(t * 9) : 0.25 + 0.4 * dk;
     }

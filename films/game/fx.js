@@ -67,9 +67,9 @@ class GmGlassTouch {
           // three ring fronts, each a thin bright edge with a soft wake
           for (int i = 0; i < 3; i++) {
             float u = uT - float(i) * 0.12; if (u < 0.0) continue;
-            float R = 0.03 + 0.95 * (1.0 - exp(-u * 2.6)), w = 0.006 + 0.02 * u;
+            float R = 0.03 + 0.42 * (1.0 - exp(-u * 2.6)), w = 0.004 + 0.012 * u;
             float edge = exp(-pow((r - R) / w, 2.0)), wake = smoothstep(R, R - 0.12, r) * step(r, R) * 0.18;
-            a += (edge + wake) * exp(-u * 1.9) * (1.0 - float(i) * 0.25);
+            a += (edge * 0.6 + wake) * exp(-u * 2.4) * (1.0 - float(i) * 0.3);
           }
           float glow = exp(-r * r / 0.0035) * (0.6 + 0.4 * exp(-uT * 1.4)) * smoothstep(0.0, 0.06, uT) + exp(-r * r / 0.03) * 0.25 * exp(-uT * 1.2);
           float c = (a + glow * 1.6) * uA;

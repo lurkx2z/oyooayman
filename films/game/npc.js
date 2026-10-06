@@ -12,7 +12,7 @@
    performances are keyed on film time below.
    ===================================================================== */
 
-LOOKS.gmAware = { skin: 2, build: 'avg', shirt: '#a24e2c', sleeves: 'long', pants: '#2c3035', shoes: '#e4e0d8', sole: '#f2efe8', hair: '#1c140f', jacket: true, collar: true, inner: '#8b8e90' };
+LOOKS.gmAware = { skin: 2, build: 'avg', shirt: '#8a4328', sleeves: 'long', pants: '#2a2d31', shoes: '#d9d5cc', sole: '#ecE8e0', hair: '#1c140f', jacket: true, collar: true, inner: '#34373b' };
 LOOKS.gmTech = { skin: 0, build: 'slim', shirt: '#59636d', sleeves: 'long', pants: '#4b535c', shoes: '#1d1e20', sole: '#2a2a2a', hair: '#4a3222', hairStyle: 'bun', collar: true };
 
 (() => {
@@ -49,6 +49,19 @@ function gmIrisTex(base, seed) {
   const t = Tex.tex(c, { repeat: false }); t.wrapS = THREE.RepeatWrapping; return t;
 }
 
+// hair: short strands as a texture and a bump, so a cap of hair never reads as a beanie
+function gmHairMat(color, seed) {
+  const S = 256, c = Tex.canvas(S, S), x = c.getContext('2d'), b = Tex.canvas(S, S), y = b.getContext('2d'), r = new RNG(seed + 300), base = new THREE.Color(color);
+  x.fillStyle = '#' + base.getHexString(); x.fillRect(0, 0, S, S); y.fillStyle = '#808080'; y.fillRect(0, 0, S, S);
+  for (let i = 0; i < 2600; i++) {
+    const px = r.range(0, S), py = r.range(0, S), a = r.range(-0.5, 0.5) + Math.PI / 2, L = r.range(5, 16), l = r.range(-0.12, 0.2);
+    x.strokeStyle = `rgba(${l > 0 ? '255,235,215' : '0,0,0'},${Math.abs(l) * 0.5})`; x.lineWidth = r.range(0.6, 1.4); x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * L, py + Math.sin(a) * L); x.stroke();
+    y.strokeStyle = l > 0 ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'; y.lineWidth = 1; y.beginPath(); y.moveTo(px, py); y.lineTo(px + Math.cos(a) * L, py + Math.sin(a) * L); y.stroke();
+  }
+  const m = new THREE.MeshStandardMaterial({ color: '#ffffff', map: Tex.tex(c), bumpMap: Tex.tex(b, { srgb: false }), bumpScale: 2.5, roughness: 0.78 });
+  m.map.repeat.set(3, 3); m.bumpMap.repeat.set(3, 3); return m;
+}
+
 /* ---------------- the hero face ---------------- */
 class GmFace {
   constructor(head, o) {
@@ -57,7 +70,7 @@ class GmFace {
     const skinC = new THREE.Color(o.skin);
     const skin = new THREE.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, roughness: 0.58 }), skinF = new THREE.MeshStandardMaterial({ color: o.skin, roughness: 0.58 });
     this.skinMat = skinF;
-    const lip = Mat.std(o.lip || '#a6665a', { roughness: 0.45 }), hair = Mat.std(o.hair, { roughness: 0.9 }), browM = Mat.std(o.brow || '#2a1f18', { roughness: 0.95 });
+    const lip = Mat.std(o.lip || '#a6665a', { roughness: 0.45 }), hair = gmHairMat(o.hair, o.seed || 5), browM = Mat.std(o.brow || '#2a1f18', { roughness: 0.95 });
     const add = (g, m, x = 0, y = 0, z = 0, p = head) => { const m2 = new THREE.Mesh(g, m); m2.position.set(x, y, z); m2.castShadow = true; m2.receiveShadow = true; p.add(m2); return m2; };
     // skull and face: one dense sphere shaped into a head (flatter face, eye sockets under a brow ridge, nose, mouth, chin, cheekbones)
     const g = new THREE.SphereGeometry(0.1, 96, 64), P = g.attributes.position, col = new Float32Array(P.count * 3);
@@ -90,7 +103,7 @@ class GmFace {
     g.computeVertexNormals();
     add(g, skin);
     const surf = (x, y) => { let best = 1e9, bz = 0; for (let i = 0; i < P.count; i++) { const z = P.getZ(i); if (z <= 0) continue; const d = (P.getX(i) - x) ** 2 + (P.getY(i) - y) ** 2; if (d < best) { best = d; bz = z; } } return bz; };
-    for (const s of [-1, 1]) add(PersonGeo.ear, skinF, s * 0.077, -0.006, -0.006).scale.set(1, 1.1, 1.15);
+    for (const s of [-1, 1]) add(PersonGeo.ear, skinF, s * 0.074, -0.006, -0.006).scale.set(0.75, 0.9, 0.95);
     // hair: a cap set back from the forehead; short: a little volume on top; bun: a knot at the back
     const hg = new THREE.SphereGeometry(0.1, 48, 20, 0, Math.PI * 2, 0, Math.PI * 0.53); hg.scale(0.84, 1.1, 1.0);
     const hm = add(hg, hair, 0, 0.004, -0.004); hm.rotation.x = -0.72; hm.scale.setScalar(1.06);
@@ -163,7 +176,7 @@ class GmFace {
       E.lo.rotation.x = MathX.lerp(0.42 + 0.12 * wide - 0.12 * sq + look * 0.25, 0.3, bl * 0.7);
     }
     const br = F.brow || 0, fr = F.frown || 0, wo = F.worry || 0;
-    for (const B of this.brows) { B.b.position.y = B.y0 + 0.0045 * br - 0.002 * fr + 0.002 * wo; B.b.rotation.z = B.s * (-0.2 * fr + 0.24 * wo + 0.08 * Math.max(0, br)); }
+    for (const B of this.brows) { B.b.position.y = B.y0 + 0.0045 * br - 0.002 * fr + 0.002 * wo; B.b.rotation.z = B.s * (0.2 * fr - 0.24 * wo + 0.08 * Math.max(0, br)); }
     const o = MathX.clamp(F.mouth || 0, 0, 1), pk = MathX.clamp(F.pucker || 0, 0, 1), z = this.mz, sm = MathX.clamp(F.smile || 0, 0, 1);
     this.lipL.position.y = -0.0528 - 0.009 * o; this.lipU.position.y = -0.0465 + 0.0015 * o;
     this.lipU.scale.x = this.lipL.scale.x = (1 - 0.38 * pk) * (1 + 0.08 * sm); this.lipU.position.z = z - 0.0005 + 0.005 * pk; this.lipL.position.z = z - 0.001 + 0.005 * pk;
@@ -182,7 +195,7 @@ class GmFace {
 /* ---------------- the hero hand ---------------- */
 const GM_HAND = {
   relax: { curl: [0.35, 0.45, 0.52, 0.6], spread: 0.08, thumb: [0.3, 0.35] },
-  flat: { curl: [0.03, 0.0, 0.03, 0.06], spread: 0.32, thumb: [0.08, 0.85] },
+  flat: { curl: [0.06, 0.03, 0.06, 0.1], spread: 0.3, thumb: [0.2, 0.22] },
   point: { curl: [0.0, 1.35, 1.42, 1.48], spread: 0.0, thumb: [0.95, 0.25] },
   fist: { curl: [1.45, 1.5, 1.52, 1.52], spread: 0.0, thumb: [1.15, 0.15] },
   reach: { curl: [0.0, 0.75, 0.9, 1.05], spread: 0.08, thumb: [0.55, 0.35] },
@@ -228,7 +241,7 @@ class GmHand {
       f.k[0].rotation.set(sp, 0, -s * c * 0.85); f.k[1].rotation.set(0, 0, -s * c * 1.1); f.k[2].rotation.set(0, 0, -s * c * 0.7);
     });
     const tc = L(A.thumb[0], B.thumb[0]), ta = L(A.thumb[1], B.thumb[1]);
-    this.thumb[0].rotation.set(-0.5 - 0.6 * ta, 0, -s * (0.35 + 0.5 * tc));
+    this.thumb[0].rotation.set(-0.35 - 0.55 * ta, 0, -s * (0.45 + 0.5 * tc));
     this.thumb[1].rotation.set(0, 0, -s * 0.6 * tc); this.thumb[2].rotation.set(0, 0, -s * 0.5 * tc);
   }
   // world point of the index fingertip
@@ -252,6 +265,11 @@ class GmActor {
   _aimHead(target, w) {
     if (w <= 0) return;
     const V = this.v;
+    // a neck turns about 75° each way and nods about 35°: keep the target inside that cone (in the body's frame)
+    this.j.spine.updateMatrixWorld(true);
+    const loc = this.j.spine.worldToLocal(V.e.copy(target)), hp = this.j.neck.position, dx = loc.x - hp.x, dy = loc.y - hp.y - 0.14, dz = loc.z - hp.z, hd = Math.hypot(dx, dz);
+    let yaw = Math.atan2(dx, dz), pit = Math.atan2(dy, hd);
+    if (Math.abs(yaw) > 1.3 || Math.abs(pit) > 0.75) { yaw = MathX.clamp(yaw, -1.3, 1.3); pit = MathX.clamp(pit, -0.75, 0.6); const r = Math.hypot(hd, dy); target = this.j.spine.localToWorld(new THREE.Vector3(hp.x + Math.sin(yaw) * Math.cos(pit) * r, hp.y + 0.14 + Math.sin(pit) * r, hp.z + Math.cos(yaw) * Math.cos(pit) * r)); }
     for (const [o, k] of [[this.j.neck, 0.35], [this.j.head, 1]]) {
       V.q.copy(o.quaternion); o.updateMatrixWorld(true); o.lookAt(target); V.q2.copy(o.quaternion);
       o.quaternion.copy(V.q).slerp(V.q2, w * k); o.updateMatrixWorld(true);
@@ -295,7 +313,7 @@ class GmActor {
     const s = this.j.body.scale.x;
     if (kind === 'palm') W.copy(P).addScaledVector(n, -0.016 * s).addScaledVector(f, -0.052 * s);
     else if (kind === 'fist') W.copy(P).addScaledVector(f, -0.105 * s);
-    else W.copy(P).addScaledVector(f, -0.19 * s);
+    else { const Zh = new THREE.Vector3().crossVectors(n.clone().multiplyScalar(-side), f.clone().negate()); W.copy(P).addScaledVector(f, -0.19 * s).addScaledVector(Zh, -0.031 * s); }   // (the index sits 3 cm off the hand's centre line)
     this._reach(side, W, w);
     this.p.root.updateMatrixWorld(true);
     this._orient(side, f, n, w);
@@ -358,14 +376,14 @@ const GmScreen = {
 /* ---------------- NPC_AWARE_01 ---------------- */
 const GA = (() => {
   const H = GM.hold, R = GM.reset;
-  const pos = [[0, -0.05, -2.05], [3.3, -0.05, -2.05], [4.25, 0.08, -1.27], [8.3, 0.08, -1.27], [8.95, -0.15, -1.62], [12.45, -0.15, -1.62], [13.35, 0.0, -4.45], [15.3, 0.0, -4.45],
-    [15.65, 0.62, -5.3], [16.25, 0.86, -7.6], [16.6, 0.82, -9.6], [17.12, 0.5, -11.95], [21.8, 0.5, -11.95], [22.65, 1.82, -14.45], [27.6, 1.82, -14.45], [28.25, 1.0, -14.95],
+  const pos = [[0, -0.05, -2.05], [3.3, -0.05, -2.05], [4.25, 0.08, -1.27], [8.3, 0.08, -1.27], [8.95, -0.22, -1.6], [12.45, -0.22, -1.6], [13.35, 0.0, -4.45], [15.3, 0.0, -4.45],
+    [15.65, 0.62, -5.3], [16.25, 0.86, -7.6], [16.6, 0.85, -9.6], [17.12, 0.72, -11.95], [21.95, 0.72, -11.95], [22.8, 1.85, -15.8], [27.6, 1.85, -15.8], [28.25, 1.0, -14.95],
     [29.2, 1.0, -14.95], [29.6, 1.0, -15.12], [33.9, 1.0, -15.12], [34.6, 1.04, -14.7], [R.run, 1.04, -14.7], [38.55, 1.12, -14.12], [41.3, 1.12, -14.12], [41.7, 1.05, -14.5], [42.05, 1.05, -14.3], [42.4, 1.05, -14.35],
     [43.45, 1.05, -14.35], [44.0, 1.05, -14.25], [GM.end.cut, 1.05, -14.25], [GM.end.cut + 0.001, 1.04, -14.32], [60, 1.04, -14.32]];
-  const yaw = [[0, 0], [3.3, 0], [4.25, 0.05], [8.3, 0.05], [8.95, 0.6], [9.6, 0.3], [11.8, 0.25], [12.45, 3.08], [13.35, 3.08], [13.6, 0.05], [15.3, 0.05], [15.55, 2.45], [16.25, 2.9], [16.6, 3.25], [17.12, 3.3], [17.5, 0.25],
-    [21.8, 0.25], [22.0, 2.2], [22.65, 2.5], [22.9, 2.75], [23.3, 2.45], [27.6, 2.45], [27.9, 0.6], [28.25, 0.05], [33.9, 0.05], [34.1, 3.0], [34.9, 3.0], [35.3, 0.1], [36.4, 0.1], [36.7, 2.9], [37.4, 2.9], [37.7, 0.05], [60, 0.05]];
+  const yaw = [[0, 0], [3.3, 0], [4.25, 0.05], [8.3, 0.05], [8.95, 0.5], [9.6, 0.15], [11.8, 0.15], [12.45, 3.08], [13.35, 3.08], [13.6, 0.05], [15.3, 0.05], [15.55, 2.45], [16.25, 2.9], [16.6, 3.25], [17.12, 3.3], [17.5, 0.25],
+    [21.95, 0.25], [22.1, 2.9], [22.65, 2.9], [22.85, -0.33], [27.6, -0.33], [27.75, -1.2], [28.25, 0.05], [33.9, 0.05], [34.1, 3.0], [34.9, 3.0], [35.3, 0.1], [36.4, 0.1], [36.7, 2.9], [37.4, 2.9], [37.7, 0.05], [60, 0.05]];
   const acts = [[0, 'gmTense'], [3.3, 'walk'], [4.25, 'gmTense'], [8.3, 'walk'], [8.95, 'gmTense'], [11.8, 'gmTense'], [12.45, 'gmRun'], [13.35, 'gmTense'], [15.3, 'gmRun'], [17.12, 'gmTense'],
-    [21.8, 'walk'], [22.65, 'gmPeer'], [26.0, 'gmStand'], [27.6, 'walk'], [28.25, 'gmTense'], [33.9, 'gmTense'], [34.1, 'walk'], [34.6, 'gmTense'], [37.35, 'gmDuck'], [37.8, 'gmRun'], [38.55, 'gmTense'],
+    [21.95, 'gmRun'], [22.8, 'gmPeer'], [26.0, 'gmStand'], [27.6, 'walk'], [28.25, 'gmTense'], [33.9, 'gmTense'], [34.1, 'walk'], [34.6, 'gmTense'], [37.35, 'gmDuck'], [37.8, 'gmRun'], [38.55, 'gmTense'],
     [41.3, 'walk'], [41.7, 'gmTense'], [43.45, 'walk'], [44.0, 'gmTense'], [GM.reach.cancelled, 'gmRelief'], [GM.end.cut, 'gmStand']];
   return new GmKeys(pos, yaw, acts);
 })();
@@ -412,7 +430,7 @@ class GmAware extends GmActor {
       else if (t < Tc.look + 0.4) { gaze = lens; F.brow = 0.6; F.wide = 0.5;
         const k = MathX.smooth(t, Tc.point, Tc.point + 0.3) * (1 - MathX.smooth(t, Tc.them[1] + 0.2, Tc.them[1] + 0.6));
         if (k > 0) { const sh = this.j.ra.sh.getWorldPosition(new THREE.Vector3()), dir = lens.clone().sub(sh).normalize(); place.push(['R', 'tip', sh.clone().addScaledVector(dir, 0.6), dir, new THREE.Vector3(0, -1, 0), k]); hands.R = ['point']; }
-      } else { gaze = t < 11.1 ? tech : lens; head = 0.8; F.frown = 0.25; F.worry = 0.5; F.brow = t > 11.1 ? 0.5 : 0; }
+      } else { gaze = t < 10.9 ? tech : lens; head = 0.8; F.frown = 0.15; F.worry = 0.6; F.brow = t > 10.9 ? 0.5 : 0; }
     } else if (t < GM.choice.zero) {                                // alarm, the doors, CHOOSE
       F.wide = 0.9; F.worry = 0.9;
       if (t < 12.4) { gaze = V.c.set(-0.8, 3.0, -0.4).clone(); head = 0.7; }
@@ -432,10 +450,10 @@ class GmAware extends GmActor {
       gaze = t < 23.4 || (t > Ro.spin[0] + 0.5 && t < Ro.land) ? V.c.set(GF.caseP[0], 1.15, GF.caseP[1]).clone() : lens; head = 0.85;
       if (t > Ro.land + 0.1) { F.brow = 0.5; F.smile = 0.15; }
       const k = MathX.smooth(t, Ro.ui, Ro.ui + 0.4) * (1 - MathX.smooth(t, Ro.land + 0.2, Ro.land + 0.6));
-      if (k > 0) { place.push(['L', 'palm', new THREE.Vector3(GF.caseP[0] - 0.05, 1.12, GF.caseP[1] + 0.02), new THREE.Vector3(0.3, 0, -1), new THREE.Vector3(0, -1, 0), k]); hands.L = ['flat']; }
+      if (k > 0) for (const [sd, dx] of [['L', 0.13], ['R', -0.13]]) { place.push([sd, 'palm', new THREE.Vector3(GF.caseP[0] + dx, 1.13, GF.caseP[1] - 0.05), new THREE.Vector3(dx * 1.5, 0, 1).normalize(), new THREE.Vector3(0, -1, 0), k]); hands[sd] = ['flat']; }
     } else if (t < Ed.right) {                                      // the system notices
       F.wide = 0.4 + 0.6 * MathX.smooth(t, Sy.observer, Sy.observer + 0.3); F.worry = MathX.smooth(t, Sy.input, Sy.input + 0.5);
-      if (t > Sy.input + 0.15 && t < Sy.knows[0] - 0.1) { const k = MathX.clamp((t - Sy.input - 0.2) / 1.2, 0, 1); gaze = sp(MathX.lerp(330, 750, k), t < Sy.observer ? 600 : 700, 1.2); head = 0.55; }   // he reads it
+      if (t > Sy.input + 0.15 && t < Sy.knows[0] - 0.1) { const k = MathX.clamp((t - Sy.input - 0.2) / 1.2, 0, 1); gaze = sp(MathX.lerp(300, 780, k), t < Sy.observer ? 410 : 490, 1.2); head = 0.55; }   // he reads it
       else gaze = lens;
       if (t > Sy.knows[0]) { F.mouth = 0; head = 0.95; }
     } else if (t < Dr.drop) {                                       // the frame: the right edge, the bottom, back to you
@@ -498,9 +516,9 @@ class GmAware extends GmActor {
 /* ---------------- the technician ---------------- */
 const GT = (() => {
   const T = GM.tech;
-  const pos = [[0, 0.72, -6.6], [T.door + 0.15, 0.72, -6.6], [T.enter[1], 0.45, -2.45], [10.2, 0.45, -2.45], [10.9, 0.38, -2.15], [12.45, 0.38, -2.15], [12.95, 1.25, -0.9], [13.5, 2.5, 0.6], [14.2, 2.9, 2.4]];
-  const yaw = [[0, 3.3], [T.enter[0], 3.3], [T.enter[0] + 0.01, -0.12], [T.enter[1], -0.2], [9.3, -0.65], [10.2, -0.5], [10.9, -0.12], [12.45, -0.12], [12.6, 0.75], [14.2, 0.4]];
-  const acts = [[0, 'gmTablet'], [T.enter[0], 'gmWalkTab'], [T.enter[1], 'gmTablet'], [10.25, 'gmWalkTab'], [10.9, 'gmPeer'], [11.75, 'gmTablet'], [12.45, 'gmRun']];
+  const pos = [[0, 0.72, -6.6], [T.door, 0.72, -6.6], [T.enter[0], 0.72, -5.7], [T.enter[1], 0.52, -1.95], [10.2, 0.52, -1.95], [10.9, 0.42, -1.55], [12.45, 0.42, -1.55], [12.95, 1.25, -0.6], [13.5, 2.5, 0.6], [14.2, 2.9, 2.4]];
+  const yaw = [[0, -0.05], [T.enter[1] - 0.2, -0.05], [T.enter[1] + 0.3, -1.1], [10.2, -1.0], [10.6, -0.3], [12.45, -0.3], [12.6, 0.75], [14.2, 0.4]];
+  const acts = [[0, 'gmWalkTab'], [T.enter[1], 'gmTablet'], [10.25, 'gmWalkTab'], [10.9, 'gmPeer'], [11.75, 'gmTablet'], [12.45, 'gmRun']];
   return new GmKeys(pos, yaw, acts);
 })();
 class GmTech extends GmActor {
@@ -514,7 +532,7 @@ class GmTech extends GmActor {
   }
   update(t, cam, aware) {
     const p = this.p, V = this.v, T = GM.tech;
-    const show = t >= T.door && t < 14.2;
+    const show = t >= T.door + 0.05 && t < 14.2;
     p.root.visible = show; this.blob.mesh.visible = show;
     if (!show) return;
     const L = GT.at(t), lens = V.a.setFromMatrixPosition(cam.matrixWorld).clone();
@@ -522,7 +540,7 @@ class GmTech extends GmActor {
     const pose = GT.pose(t, { seed: p.seed, seedI: p.seedI, walkPhase: (L.dist / 1.2) * Math.PI * 2 });
     const F = { blink: this.blinkAt(t, 9, 2.9), brow: 0, frown: 0, worry: 0, wide: 0, mouth: this.talkAt(t, 'T'), pucker: 0, smile: 0 };
     let gaze = aware.headWorld(new THREE.Vector3()), head = 0.85;
-    if (t < T.enter[1] - 0.3) { gaze = null; }
+    if (t < T.enter[1] - 0.6) { gaze = null; }
     if (t > T.point + 0.15 && t < T.look) { const tip = aware.indexTip(new THREE.Vector3()); gaze = tip; head = 0.6; F.frown = 0.4; }
     // she looks where he points — through the lens, focused a metre and a half beyond it: there is no one there
     if (t >= T.look && t < GM.alarm) {

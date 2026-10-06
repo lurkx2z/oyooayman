@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>POV: This Video Is a Game. Don't Die.</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #hud::before { display: none; }
+    #hud { --game: #f4f6f8; --ice: #cfe6ff; text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 12) rgba(0, 0, 0, 0.55); }
+    #hud > div { position: absolute; }
+    #hud .ic { width: 1em; height: 1em; fill: currentColor; stroke: currentColor; vertical-align: -0.12em; overflow: visible; }
+    /* the boot: two black bars open outward from his eyes */
+    #hud .gm-slit { left: 0; right: 0; background: #000; }
+    #hud .gm-slit.top { top: 0; box-shadow: 0 calc(var(--u) * 3) 0 rgba(220, 240, 255, 0.55); }
+    #hud .gm-slit.bot { bottom: 0; box-shadow: 0 calc(var(--u) * -3) 0 rgba(220, 240, 255, 0.55); }
+    #hud .gm-boot { left: 0; right: 0; top: calc(var(--u) * 660); text-align: center; font-family: var(--mono); font-size: calc(var(--u) * 26); letter-spacing: 0.3em; color: var(--ice); }
+    /* PLAYER DETECTED and the hearts */
+    #hud .gm-detected { left: 0; right: 0; top: calc(var(--u) * 262); text-align: center; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 44); letter-spacing: 0.32em; color: var(--game); }
+    #hud .gm-detected .ln { display: inline-block; width: calc(var(--u) * 70); height: calc(var(--u) * 3); background: rgba(244, 246, 248, 0.75); vertical-align: middle; margin: 0 calc(var(--u) * 22); }
+    #hud .gm-hearts { left: 0; right: 0; top: calc(var(--u) * 330); text-align: center; color: #ff4f5e; transform-origin: 50% 0; }
+    #hud .gm-hearts .row { font-size: calc(var(--u) * 78); line-height: 1; }
+    #hud .gm-hearts .h { position: relative; display: inline-block; margin: 0 calc(var(--u) * 8); filter: drop-shadow(0 0 calc(var(--u) * 10) rgba(255, 60, 80, 0.45)); }
+    #hud .gm-hearts .h .ic { stroke: #ffffff; stroke-width: 0.9; }
+    #hud .gm-hearts .h i { position: absolute; left: 0; right: 0; top: 18%; font-style: normal; font-family: var(--hud-font); font-weight: 800; font-size: 0.42em; color: #fff; opacity: 0; }
+    #hud .gm-hearts.q3 .h2, #hud .gm-hearts.q2 .h1 { color: rgba(255, 79, 94, 0.25); }
+    #hud .gm-hearts.q3 .h2 i, #hud .gm-hearts.q2 .h1 i { opacity: 1; }
+    #hud .gm-hearts.hit .h { color: #ffffff; }
+    #hud .gm-hearts .lab { margin-top: calc(var(--u) * 16); font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 30); letter-spacing: 0.34em; color: var(--game); }
+    #hud .gm-itemslot { left: calc(var(--u) * 70); top: calc(var(--u) * 340); font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 24); letter-spacing: 0.28em; color: var(--game); }
+    #hud .gm-itemslot .box { display: inline-block; margin-left: calc(var(--u) * 14); width: calc(var(--u) * 54); height: calc(var(--u) * 54); line-height: calc(var(--u) * 50); text-align: center; letter-spacing: 0;
+      border: calc(var(--u) * 3) solid rgba(244, 246, 248, 0.85); border-radius: calc(var(--u) * 10); font-size: calc(var(--u) * 30); background: rgba(8, 10, 12, 0.35); }
+    #hud .gm-itemslot.pulse .box { border-color: #ffd36a; color: #ffd36a; box-shadow: 0 0 calc(var(--u) * 18) rgba(255, 211, 106, 0.6); }
+    /* DON'T LET ME DIE. */
+    #hud .gm-dont { left: 50%; top: calc(var(--u) * 1180); white-space: nowrap; font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 96); letter-spacing: 0.02em; color: #ffffff;
+      text-shadow: 0 0 calc(var(--u) * 30) rgba(0, 0, 0, 0.7), 0 calc(var(--u) * 4) calc(var(--u) * 16) rgba(0, 0, 0, 0.6); }
+    /* prompts under the touch targets */
+    #hud .gm-prompt { left: 0; right: 0; top: calc(var(--u) * 1285); text-align: center; font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 52); line-height: 1.12; letter-spacing: 0.06em; color: var(--game); }
+    #hud .gm-prompt.hold { top: calc(var(--u) * 1310); }
+    #hud .gm-prompt.finger { top: calc(var(--u) * 1180); font-size: calc(var(--u) * 40); letter-spacing: 0.3em; }
+    /* the rings */
+    #hud .gm-rings { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    #hud .gm-rings g { opacity: 0; }
+    #hud .gm-rings .pct { font-family: var(--hud-font); font-weight: 800; font-size: 44px; fill: #ffffff; }
+    #hud .gm-rings #gmTimer .n { font-family: var(--hud-font); font-weight: 800; font-size: 92px; fill: #ffffff; }
+    #hud .gm-rings .ray { stroke: #9ff0ff; stroke-width: 3; stroke-dasharray: 24 40; }
+    /* CHOOSE */
+    #hud .gm-choose { left: 0; right: 0; top: calc(var(--u) * 360); text-align: center; font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 92); letter-spacing: 0.08em; color: #ffffff; }
+    #hud .gm-opt { top: calc(var(--u) * 700); width: calc(var(--u) * 300); margin-left: calc(var(--u) * -150); text-align: center; font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 50); letter-spacing: 0.08em; color: var(--game);
+      padding: calc(var(--u) * 14) 0; border: calc(var(--u) * 3) solid rgba(244, 246, 248, 0.7); border-radius: calc(var(--u) * 16); background: rgba(8, 10, 12, 0.4); }
+    #hud .gm-opt.left { left: calc(var(--u) * 290); } #hud .gm-opt.right { left: calc(var(--u) * 770); }
+    #hud .gm-opt.nudge { border-color: #ffffff; background: rgba(8, 10, 12, 0.55); }
+    #hud .gm-opt.picked { border-color: #a8f7c8; color: #a8f7c8; background: rgba(10, 40, 26, 0.55); }
+    #hud .gm-tilt { left: 0; right: 0; top: calc(var(--u) * 1240); text-align: center; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 36); line-height: 1.2; letter-spacing: 0.16em; color: var(--game); }
+    #hud .gm-tilt .ph { display: block; margin: 0 auto calc(var(--u) * 14); font-size: calc(var(--u) * 92); stroke-width: 1.8; fill: none; }
+    #hud .gm-result { left: 0; right: 0; top: calc(var(--u) * 470); text-align: center; font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 58); letter-spacing: 0.05em; }
+    #hud .gm-result .r { display: block; margin: calc(var(--u) * 10) auto; }
+    #hud .gm-result .ok { color: #a8f7c8; } #hud .gm-result .ok .ic { fill: none; }
+    #hud .gm-result .bad { color: #ff6b74; }
+    #hud .gm-result .own { margin-top: calc(var(--u) * 18); font-weight: 600; font-size: calc(var(--u) * 30); letter-spacing: 0.3em; text-transform: uppercase; color: var(--game); opacity: 0.85; }
+    /* the roulette */
+    #hud .gm-roul-title { left: 0; right: 0; top: calc(var(--u) * 420); text-align: center; font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 60); line-height: 1.1; letter-spacing: 0.06em; color: #ffffff; }
+    #hud .gm-card { left: 50%; top: calc(var(--u) * 880); width: calc(var(--u) * 400); margin-left: calc(var(--u) * -200); padding: calc(var(--u) * 30) 0 calc(var(--u) * 26); text-align: center; color: #ffffff;
+      border: calc(var(--u) * 4) solid rgba(244, 246, 248, 0.85); border-radius: calc(var(--u) * 26); background: rgba(8, 10, 12, 0.62); }
+    #hud .gm-card .icon { font-size: calc(var(--u) * 170); line-height: 1; } #hud .gm-card .icon .ic { fill: none; stroke-width: 2; }
+    #hud .gm-card .name { margin-top: calc(var(--u) * 16); font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 60); letter-spacing: 0.14em; }
+    #hud .gm-card.tick { border-color: #ffffff; }
+    #hud .gm-card.landed { border-color: #ffd36a; color: #ffd36a; box-shadow: 0 0 calc(var(--u) * 40) rgba(255, 211, 106, 0.45); }
+    #hud .gm-strip { left: 0; right: 0; top: calc(var(--u) * 1270); text-align: center; color: rgba(244, 246, 248, 0.55); font-size: calc(var(--u) * 54); }
+    #hud .gm-strip .s { display: inline-block; margin: 0 calc(var(--u) * 16); } #hud .gm-strip .ic { fill: none; }
+    #hud .gm-strip .s.on { color: #ffffff; }
+    #hud .gm-remember { left: 0; right: 0; top: calc(var(--u) * 1270); text-align: center; font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 56); letter-spacing: 0.05em; color: #ffffff; }
+    #hud .gm-remember .sub { margin-top: calc(var(--u) * 14); font-weight: 600; font-size: calc(var(--u) * 32); letter-spacing: 0.12em; opacity: 0.85; }
+    /* the item table */
+    #hud .gm-table { left: 50%; top: calc(var(--u) * 950); width: calc(var(--u) * 820); margin-left: calc(var(--u) * -410); padding: calc(var(--u) * 26) calc(var(--u) * 36); color: var(--game);
+      border-radius: calc(var(--u) * 24); background: rgba(8, 10, 12, 0.72); border: calc(var(--u) * 3) solid rgba(255, 211, 106, 0.8); }
+    #hud .gm-table .t { text-align: center; font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 50); letter-spacing: 0.06em; color: #ffd36a; margin-bottom: calc(var(--u) * 14); }
+    #hud .gm-table .row { display: flex; align-items: center; gap: calc(var(--u) * 16); font-family: var(--hud-font); font-size: calc(var(--u) * 35); padding: calc(var(--u) * 9) 0; border-top: calc(var(--u) * 2) solid rgba(244, 246, 248, 0.12); }
+    #hud .gm-table .row > .ic { font-size: calc(var(--u) * 44); fill: none; stroke-width: 2; }
+    #hud .gm-table .n { font-weight: 800; letter-spacing: 0.08em; width: calc(var(--u) * 170); }
+    #hud .gm-table .arr { opacity: 0.6; } #hud .gm-table .res { flex: 1; font-weight: 500; }
+    #hud .gm-table .m { font-weight: 800; } #hud .gm-table .m.ok { color: #a8f7c8; } #hud .gm-table .m.ok .ic { fill: none; } #hud .gm-table .m.bad { color: #ff6b74; }
+    #hud .gm-table .r2 .m { color: #ff9aa3; }
+    /* the system: mono, ice-blue, bracketed; it cuts in */
+    #hud .gm-sys { left: 0; right: 0; top: calc(var(--u) * 360); text-align: center; font-family: var(--mono); color: var(--ice); text-shadow: 0 0 calc(var(--u) * 14) rgba(120, 180, 255, 0.35), 0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(0, 0, 0, 0.8); }
+    #hud .gm-sys .l { font-size: calc(var(--u) * 40); font-weight: 600; letter-spacing: 0.16em; margin: calc(var(--u) * 26) 0; }
+    #hud .gm-sys .l.b { font-size: calc(var(--u) * 34); font-weight: 500; }
+    #hud .gm-sys .l b { color: #ffffff; font-weight: 700; }
+    #hud .gm-sys .l.big { font-size: calc(var(--u) * 92); font-weight: 700; letter-spacing: 0.1em; color: #ffffff; }
+    #hud .gm-sys .l.ok b { color: #a8f7c8; }
+    #hud .gm-sys .br { opacity: 0.55; margin: 0 calc(var(--u) * 14); font-weight: 400; }
+    #hud .gm-sys.low { top: calc(var(--u) * 470); }
+    #hud .gm-count { left: 0; right: 0; top: calc(var(--u) * 250); text-align: center; font-family: var(--mono); color: #ffffff; text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.85); }
+    #hud .gm-count .l { font-size: calc(var(--u) * 40); font-weight: 600; letter-spacing: 0.3em; color: #ffffff; }
+    #hud .gm-count .n { font-size: calc(var(--u) * 150); font-weight: 700; line-height: 1.05; }
+    /* speech */
+    #hud .gm-say { left: 50%; transform: translateX(-50%); top: calc(var(--u) * 1336); padding: calc(var(--u) * 12) calc(var(--u) * 30); white-space: nowrap; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 50); color: #f6f4f0;
+      background: rgba(10, 11, 14, 0.6); border-radius: calc(var(--u) * 14); }
+    #hud .gm-say.tech { background: rgba(28, 44, 60, 0.72); color: #dbe9f6; }
+    #hud .gm-say.quiet { font-weight: 500; font-style: italic; font-size: calc(var(--u) * 44); background: rgba(10, 11, 14, 0.45); }
+    /* the end */
+    #hud .gm-dim { inset: 0; background: #05070a; }
+    #hud .gm-score { left: 50%; top: calc(var(--u) * 330); width: calc(var(--u) * 820); margin-left: calc(var(--u) * -410); text-align: center; color: var(--game); font-family: var(--hud-font); }
+    #hud .gm-score .t { font-weight: 800; font-size: calc(var(--u) * 64); line-height: 1.12; letter-spacing: 0.04em; color: #ffffff; margin-bottom: calc(var(--u) * 34); }
+    #hud .gm-score { text-shadow: 0 0 calc(var(--u) * 20) rgba(0, 0, 0, 0.9); }
+    #hud .gm-score .row { display: flex; align-items: center; justify-content: center; gap: calc(var(--u) * 24); font-size: calc(var(--u) * 46); margin: calc(var(--u) * 18) 0; }
+    #hud .gm-score .hs { width: calc(var(--u) * 230); text-align: right; color: #ff4f5e; font-size: calc(var(--u) * 54); }
+    #hud .gm-score .hs b { color: #ffffff; font-size: calc(var(--u) * 50); }
+    #hud .gm-score .eq { opacity: 0.6; } #hud .gm-score .w { width: calc(var(--u) * 260); text-align: left; font-weight: 800; letter-spacing: 0.08em; }
+    #hud .gm-score .q { margin-top: calc(var(--u) * 70); font-weight: 800; font-size: calc(var(--u) * 54); letter-spacing: 0.04em; color: #ffd36a; }
+    #hud .gm-score .its { margin-top: calc(var(--u) * 26); display: flex; justify-content: center; gap: calc(var(--u) * 40); }
+    #hud .gm-score .its span { display: flex; flex-direction: column; align-items: center; font-size: calc(var(--u) * 76); }
+    #hud .gm-score .its .ic { fill: none; stroke-width: 2; }
+    #hud .gm-score .its em { font-style: normal; font-weight: 700; font-size: calc(var(--u) * 24); letter-spacing: 0.2em; margin-top: calc(var(--u) * 10); }
+    /* the crack, over everything */
+    #stage .gm-crack { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; display: none; }
+    /* ?safe */
+    #hud .gm-safe { inset: 0; } #hud .gm-safe svg { width: 100%; height: 100%; }
+    #hud .gm-safe .z { fill: rgba(255, 40, 60, 0.28); } #hud .gm-safe .ok { fill: none; stroke: rgba(80, 255, 160, 0.8); stroke-width: 3; stroke-dasharray: 16 10; }
+    #hud .gm-safe .t { fill: none; stroke: #ffe14a; stroke-width: 4; } #hud .gm-safe .l { fill: #ffe14a; font: 600 26px monospace; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="hud"></div>
+    </div>
+  </div>
+
+  <!-- Developer controls (hidden in Recording Mode) -->
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">POV: This video is a game. Don't die.</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step · add ?safe to the address to see the safe zones</div>
+  </div>
+  <div id="loading">LOADING THE FACILITY…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <!-- Three.js (bundled locally — no internet or server needed) -->
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (shot plan: films/game/PLAN.md) -->
+  <script src="films/game/script.js"></script>
+  <script src="films/game/facility.js"></script>
+  <script src="films/game/npc.js"></script>
+  <script src="films/game/fx.js"></script>
+  <script src="films/game/screen.js"></script>
+  <script src="films/game/hud.js"></script>
+  <script src="films/game/audio.js"></script>
+  <script src="films/game/film.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
