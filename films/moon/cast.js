@@ -36,15 +36,17 @@ const MN_PEOPLE = [
   ['R3', 'casual1', [33.4, 39.2], [[33.4, 1.5, -4], [39.2, 2.6, 34]], null, [[33.4, 'jog'], [35.4, 'wade']]],
   ['R4', 'casual8', [33.4, 39.2], [[33.4, -3.5, 2], [39.2, -4.5, 38]], null, [[33.4, 'jog']]],
   // up the street: someone filming from a van roof against the Moon; others fleeing uphill; the tremor
-  ['U1', 'casual3', [39, 55.2], [[0, -4.0, 86.5]], 0, [[39, 'phoneUp'], [48.3, 'stumble'], [49.6, 'brace'], [52, 'lookUp']], { y: 2.3 }],
+  ['U1', 'casual3', [39, 55.2], [[0, 1.2, 95.6]], 8, [[39, 'phoneUp'], [48.3, 'stumble'], [49.6, 'brace'], [52, 'lookUp']], { y: 2.36 }],
   ['U2', 'casual6', [39, 55.2], [[0, 4.8, 90]], 5, [[39, 'lookUp'], [43, 'handMouth'], [48.2, 'stumble'], [49.5, 'brace'], [52.5, 'jog']]],
   ['U3', 'casual7', [39, 55.2], [[39, -2.0, 72], [47, -0.5, 104], [55.2, 0.5, 132]], null, [[39, 'jog'], [48.2, 'stumble'], [49.4, 'jog']]],
   ['U4', 'casual4', [39, 55.2], [[39, 6.5, 66], [48, 5.5, 101], [55.2, 4.5, 128]], null, [[39, 'jog'], [48.4, 'stumble'], [49.6, 'jog']]],
   ['U5', 'casual1', [39, 55.2], [[0, 9.6, 95]], 20, [[39, 'lookUp'], [48.3, 'brace']]],
   // the climb: people running uphill ahead of you
-  ['H1', 'casual5', [55, 63.2], [[55, 2.0, 170], [63.2, 2.5, 238]], null, [[55, 'jog']]],
-  ['H2', 'casual8', [55, 63.2], [[55, -3.5, 176], [63.2, -4.0, 236]], null, [[55, 'jog']]],
-  ['H3', 'casual2', [55, 63.2], [[55, 5.5, 182], [63.2, 5.0, 246]], null, [[55, 'jog']]],
+  ['H1', 'casual5', [55, 63.2], [[55, 2.5, 128], [63.2, 2.5, 196]], null, [[55, 'jog']]],
+  ['H2', 'casual8', [55, 63.2], [[55, -4.5, 120], [63.2, -4.0, 186]], null, [[55, 'jog']]],
+  ['H3', 'casual2', [55, 63.2], [[55, 5.5, 112], [63.2, 5.0, 182]], null, [[55, 'jog']]],
+  ['H4', 'casual7', [55, 63.2], [[55, 0.5, 104], [63.2, 1.0, 176]], null, [[55, 'jog']]],
+  ['H5', 'casual1', [55, 63.2], [[0, 7.8, 140]], 10, [[55, 'lookUp'], [57.2, 'handHead']]],
   // the hilltop: silhouettes at the railing, looking out at it; they brace as the light comes
   ['T1', 'casual1', [63, 80], [[0, -3.2, 335.2]], 0, [[63, 'lookUp'], [67, 'phoneUp'], [72.6, 'brace']]],
   ['T2', 'casual6', [63, 80], [[0, 2.6, 335.1]], -6, [[63, 'lookUp'], [69, 'handMouth'], [72.8, 'brace']]],

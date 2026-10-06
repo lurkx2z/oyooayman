@@ -70,15 +70,16 @@ class MnFx {
     if (T) this.plumes.push({ s0: MN_FX.tower.s0 + 0.3, x: T.x, y: mnGround(T.x, T.z), z: T.z, n: 260, R: 70, H: 55, life: 8, seed: 2 });
     for (const [x, z, s0] of MN_FX.fires) this.plumes.push({ s0: s0 + 0.5, x, y: mnGround(x, z) + 10, z, n: 40, R: 14, H: 50, life: 12, seed: 3 + x, smoke: true });
     // --- fires: flickering orange glows (and a warm light on the nearest)
-    const fg = new THREE.BufferGeometry(), F = MN_FX.fires;
-    fg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(F.length * 3), 3));
-    fg.setAttribute('aS', new THREE.BufferAttribute(new Float32Array(F.length), 1));
-    F.forEach(([x, z], i) => fg.attributes.position.setXYZ(i, x, mnGround(x, z) + 6, z));
+    const fg = new THREE.BufferGeometry(), F = MN_FX.fires, K = 7;
+    fg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(F.length * K * 3), 3));
+    fg.setAttribute('aS', new THREE.BufferAttribute(new Float32Array(F.length * K), 1));
+    F.forEach(([x, z], i) => { for (let k = 0; k < K; k++) fg.attributes.position.setXYZ(i * K + k, x + rng.range(-5, 5), mnGround(x, z) + rng.range(3, 10), z + rng.range(-4, 4)); });
+    this.fireK = K;
     this.fireMat = new THREE.ShaderMaterial({
       uniforms: { uPx: { value: 1 }, uTime: { value: 0 } },
       vertexShader: /* glsl */`attribute float aS; uniform float uPx, uTime; varying float vS;
-        void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; vS = aS * (0.75 + 0.25 * sin(uTime * 13.0 + position.x) * sin(uTime * 7.3 + position.z));
-          gl_PointSize = aS > 0.0 ? clamp(26.0 * uPx * 300.0 / -mv.z, 3.0, 300.0) : 0.0; }`,
+        void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; vS = aS * (0.55 + 0.45 * sin(uTime * 13.0 + position.x * 3.1) * sin(uTime * 7.3 + position.z * 2.3 + position.y));
+          gl_PointSize = aS > 0.0 ? clamp(9.0 * uPx * 300.0 / -mv.z, 2.0, 120.0) : 0.0; }`,
       fragmentShader: /* glsl */`varying float vS; void main(){ vec2 q = gl_PointCoord * 2.0 - 1.0; float r2 = dot(q, q); if (r2 > 1.0) discard; gl_FragColor = vec4(vec3(1.0, 0.45, 0.12) * vS * (exp(-r2 * 3.0) * 1.2 + exp(-r2 * 14.0) * 2.0), 1.0); }`,
       transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
     });
@@ -167,7 +168,7 @@ class MnFx {
     this.dustMat.uniforms.uPx.value = px; this.fireMat.uniforms.uPx.value = px; this.fireMat.uniforms.uTime.value = t;
     // fires
     const fa = this.fires.geometry.attributes.aS;
-    MN_FX.fires.forEach(([x, z, s0], i) => fa.setX(i, MathX.smooth(S, s0, s0 + 2) * (S < MN.impact + 2 ? 1 : 0)));
+    MN_FX.fires.forEach(([x, z, s0], i) => { for (let k = 0; k < this.fireK; k++) fa.setX(i * this.fireK + k, MathX.smooth(S, s0 + k * 0.3, s0 + 2 + k * 0.3) * (S < MN.impact + 2 ? 1 : 0)); });
     fa.needsUpdate = true;
     // the impact
     const it = MathX.clamp((S - MN.impact) / 1.8, 0, 1);

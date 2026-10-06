@@ -21,6 +21,12 @@ Everything is procedural, so there are no models, images or sound files to downl
 > away, comes back and merges with our galaxy. The sky is drawn from a deterministic gravity simulation (82 000 stars, gas
 > and dust in two galaxies) computed when the page loads. Plan, science rules and beat sheet:
 > [`films/andromeda/PLAN.md`](films/andromeda/PLAN.md).
+>
+> **Sixth film: *What if the Moon crashed into Earth?*** — open `moon.html` (80 s). A cold open on the money shot (an
+> enormous Moon over a flooded coastal street), a rewind to 24 hours earlier, then the day through to impact: the Moon
+> grows, the tides go wrong in stages (the harbour drains, surges, the streets flood), the ground shakes, and the end is
+> shown by implication. The Moon is a procedural hero asset (real maria and craters, terminator shadows), drawn
+> camera-relative so it never parallaxes. Plan, physics notes and beat sheet: [`films/moon/PLAN.md`](films/moon/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -207,6 +213,22 @@ films/andromeda/film.js       FILM hooks: builds everything, aims your eyes and 
 films/andromeda/overlook.js   the lookout, the park and lot, the valley town, the mountains
 films/andromeda/cast.js       the people at the lookout and their sky-watching actions
 films/andromeda/audio.js      the soundtrack (Earth sounds and the score kept apart; space is silent)
+```
+
+Film: *What if the Moon crashed into Earth?* (`moon.html`):
+
+```
+films/moon/PLAN.md       physics honesty, story clock, beat sheet, systems, review log
+films/moon/script.js     ★ the story clock (cold open, rewind), the Moon's distance and place, the sea level, surges,
+                         tremor, power, camera, hands, captions, HUD
+films/moon/moon.js       the hero Moon (procedural map baked on the GPU, detail craters, terminator shadows) and the night sky
+films/moon/city.js       the coastal city: harbour, quay, promenade, the hill street, the overlook, night facades, lamps
+films/moon/water.js      the sea / flood surface: waves, surge fronts, reflections, murk, foam
+films/moon/world.js      boats, cars, debris, emergency lights; what the water carries
+films/moon/cast.js       the people (curiosity → panic), new sky-watching and flood actions
+films/moon/fx.js         cracks, glass, collapses, dust, fires, the impact
+films/moon/audio.js      the soundtrack (Earth sounds and the score kept apart; space is silent)
+films/moon/film.js       FILM hooks: places the Moon, lights the world by it, shakes the ground, your hands, the grade
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):

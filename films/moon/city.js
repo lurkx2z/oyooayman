@@ -93,7 +93,7 @@ class MnCity {
       walk: new THREE.MeshStandardMaterial({ map: side.map, bumpMap: side.bumpMap, bumpScale: 1.5, roughness: 0.8, color: '#a8a49c', name: 'mnWalk' }),
       stone: new THREE.MeshStandardMaterial({ map: Tex.concrete(33, [128, 124, 116]), roughness: 0.85, name: 'mnStone' }),
       quay: new THREE.MeshStandardMaterial({ map: Tex.concrete(34, [96, 94, 88]), roughness: 0.9, name: 'mnQuay' }),
-      mud: new THREE.MeshStandardMaterial({ map: Tex.concrete(35, [70, 62, 52]), color: '#6a6258', roughness: 0.62, metalness: 0.0, name: 'mnMud' }),
+      mud: new THREE.MeshStandardMaterial({ color: '#4a4136', roughness: 0.7, metalness: 0.0, name: 'mnMud' }),
       ground: Mat.std('#24262a', { roughness: 1 }),
       grass: Mat.std('#1e2a1c', { roughness: 1 }),
       metal: Mat.std('#2a2e33', { roughness: 0.45, metalness: 0.6 }),
@@ -109,7 +109,6 @@ class MnCity {
       markY: new THREE.MeshStandardMaterial({ color: '#d0a828', roughness: 0.7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
     };
     this.m.asphalt.map.repeat.set(1, 1);
-    this.m.mud.map = this.m.mud.map.clone(); this.m.mud.map.repeat.set(400, 900); this.m.mud.map.needsUpdate = true;
   }
 
   /* a strip x0..x1 along z0..z1 (z0 < z1) following the ground (+ yOff), UVs in metres / tile */
@@ -141,6 +140,19 @@ class MnCity {
       q.setX(i, x); q.setZ(i, z); q.setY(i, mnBed(z) + (z > -300 ? 0.25 * Math.sin(x * 0.11) * Math.sin(z * 0.07) : 0));
     }
     sb.computeVertexNormals();
+    this.m.mud.onBeforeCompile = (sh) => {
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vMudW;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvMudW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
+        varying vec3 vMudW;
+        float mh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float mn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(mh(i), mh(i + vec2(1, 0)), f.x), mix(mh(i + vec2(0, 1)), mh(i + vec2(1, 1)), f.x), f.y); }`)
+        .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+        float mA = mn(vMudW.xz * 0.12) * 0.6 + mn(vMudW.xz * 0.5) * 0.3 + mn(vMudW.xz * 2.1) * 0.1;
+        float ripple = 0.5 + 0.5 * sin(vMudW.z * 2.6 + mn(vMudW.xz * 0.3) * 6.0);
+        float puddle = smoothstep(0.6, 0.66, mA);
+        roughnessFactor = mix(0.8 - 0.25 * ripple, 0.06, puddle);
+        diffuseColor.rgb *= mix(0.6 + 0.6 * mA + 0.12 * ripple, 0.25, puddle);`);
+    };
     const bed = new THREE.Mesh(sb, this.m.mud); bed.receiveShadow = true; this.root.add(bed); this.bed = bed;
     // the quay wall: concrete from the quay top down to the mud, with a dark tide line
     this.B.add(Geo.quad([1200, -4, MN_CITY.quayZ], [-1200, -4, MN_CITY.quayZ], [-1200, MN_CITY.quayY, MN_CITY.quayZ], [1200, MN_CITY.quayY, MN_CITY.quayZ], 0, 0, 600, 3), this.m.quay, null);
@@ -167,9 +179,9 @@ class MnCity {
     // gaps in the railing where the piers start
     for (const px of C.piers) B.box(3.6, 0.05, 0.3, px, C.quayY + 0.01, C.quayZ + 0.3, this.m.stone);
     // promenade lamps and palms
-    for (let x = -580; x <= 580; x += 24) { this._lamp(x, C.quayY, C.promZ[1] - 1.2, 0.0, 5.5); if (Math.abs(x) < 300) this._palm(x + 12, C.promZ[1] - 4.5); }
+    for (let x = -588; x <= 588; x += 24) { this._lamp(x, C.quayY, C.promZ[1] - 1.2, 0.0, 5.5); if (Math.abs(x) < 300) this._palm(x + 12, C.promZ[1] - 4.5); }
     // coast-road lamps on the building side
-    for (let x = -588; x <= 588; x += 28) this._lamp(x, C.quayY + 0.14, C.walkZ[0] + 0.7, Math.PI, 7.5);
+    for (let x = -574; x <= 574; x += 28) this._lamp(x, C.quayY + 0.14, C.walkZ[0] + 0.7, Math.PI, 7.5);
   }
 
   _harbour() {
@@ -498,7 +510,7 @@ class MnCity {
         float h(vec3 p){ p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
         void main(){ vQ = position.xz * 2.0; vec4 w = modelMatrix * instanceMatrix * vec4(position, 1.0);
           vOn = step(h(vec3(floor(w.xz / 150.0), 7.0)), uPower * 1.02); gl_Position = projectionMatrix * viewMatrix * w; }`,
-      fragmentShader: /* glsl */`varying vec2 vQ; varying float vOn; void main(){ float r = length(vQ); if (r > 1.0) discard; gl_FragColor = vec4(vec3(1.0, 0.72, 0.42) * 0.16 * vOn * pow(1.0 - r, 1.6), 1.0); }`,
+      fragmentShader: /* glsl */`varying vec2 vQ; varying float vOn; void main(){ float r = length(vQ); if (r > 1.0) discard; gl_FragColor = vec4(vec3(1.0, 0.72, 0.42) * 0.26 * vOn * pow(1.0 - r, 1.6), 1.0); }`,
       transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
     });
     const pools = new THREE.InstancedMesh(pool, this.poolMat, this.lamps.length);

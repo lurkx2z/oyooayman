@@ -128,6 +128,8 @@ class MnWorld {
     };
     // parked along both sides of the main street (facing along the street), on the flat and up the hill
     for (const s of [-1, 1]) for (let z = 20; z < 300; z += rng.range(5.6, 9)) if (rng.chance(0.78) && !(z > 158 && z < 174)) add({ x: s * 5.65, z, yaw: s > 0 ? -Math.PI / 2 : Math.PI / 2, parked: true });
+    // a van stopped in the middle of the street up the hill (someone climbs on it to film)
+    this.van = add({ type: 'van', col: '#e6e4de', x: 1.2, z: 95.9, yaw: -Math.PI / 2 + 0.14, parked: true });
     // parked along the coast road, building side
     for (let x = -120; x < 120; x += rng.range(5.4, 8)) if (Math.abs(x) > 12 && rng.chance(0.8)) add({ x, z: C.roadZ[1] - 1.2, yaw: 0, parked: true });
     // traffic on the coast road both ways: they slow and stop as people stare (20–28), then are abandoned

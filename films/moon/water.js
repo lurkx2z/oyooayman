@@ -112,16 +112,20 @@ class MnWater {
           // foam: thin water against the ground, the surge fronts, streaks in fast water
           // foam: a lip where the water runs out against the ground, the surge fronts, patches in fast water
           float spd = length(fl);
-          vec2 fq = p * 0.7 - fl * uTime * 0.8;
-          float cells = fb(fq * 1.3) * fb(fq * 4.1 + 7.0);
+          vec2 fq = p * 1.4 - fl * uTime * 1.2;
+          float cells = fb(fq * 1.6) * fb(fq * 5.3 + 7.0) * 1.15;
           float lip = 1.0 - smoothstep(0.0, 0.14, depth);
           float streak = smoothstep(0.42, 0.7, fb(vec2(dot(p, normalize(fl + 1e-4)) * 0.35, dot(p, normalize(vec2(-fl.y, fl.x) + 1e-4)) * 2.2) - vec2(spd * uTime * 0.25, 0.0)));
-          float turb = smoothstep(0.5, 0.78, cells * 1.6) * smoothstep(0.8, 3.0, spd);
-          float foam = clamp(lip * (0.4 + 0.6 * cells) + vFront * smoothstep(0.25, 0.6, cells + 0.25 * vFront) + streak * smoothstep(1.0, 4.0, spd) * 0.3 + turb * 0.5 + uChop * 0.25 * smoothstep(0.62, 0.8, a2), 0.0, 1.0);
+          float turb = smoothstep(0.62, 0.85, cells * 1.6) * smoothstep(1.2, 4.0, spd);
+          // (foam as lace: bright threads where the noise crosses its middle, filled in where it is thickest)
+          float lace = 1.0 - abs(fb(fq * 0.9 + 3.0) * 2.0 - 1.0), lace2 = 1.0 - abs(fb(fq * 2.7 + 9.0) * 2.0 - 1.0);
+          float threads = smoothstep(0.82, 0.95, lace) * 0.8 + smoothstep(0.86, 0.97, lace2) * 0.5;
+          float cover = clamp(lip * 0.8 + vFront * 0.9 + streak * smoothstep(1.0, 4.0, spd) * 0.3 + turb * 0.3 + uChop * 0.15 * smoothstep(0.62, 0.8, a2), 0.0, 1.0);
+          float foam = clamp(cover * (threads + smoothstep(0.55, 0.9, cells) * cover * 0.9), 0.0, 1.0);
           foam *= smoothstep(-0.05, 0.05, depth + vFront);
           vec3 fcol = uLight * 1.5 + vec3(0.02);
           vec3 col = mix(body, refl, fres);
-          col = mix(col, fcol, foam * 0.85);
+          col = mix(col, fcol, foam * 0.75);
           // fog
           col = mix(uFogCol, col, exp(-dist * uFog));
           // shallow water is see-through: the ground shows (murky)

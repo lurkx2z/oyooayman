@@ -103,7 +103,7 @@ const FILM = {
     M.skyMat.uniforms.uMoonLight.value = ml * ml * ml * 0.6;
     M.moonMat.uniforms.uHaze.value.set(0.05, 0.075, 0.12).multiplyScalar(ml * ml * ml * 0.6 * 0.5);   // (the lit air in front of the Moon)
     M.starMat.uniforms.uFade.value = 1 - 0.85 * ml;
-    M.moonMat.uniforms.uBright.value = 2.2;
+    M.moonMat.uniforms.uBright.value = 2.2 + 7.0 * (1 - MathX.smooth(M.radius * 57.3, 0.5, 2.6));   // (brilliant while small; tamed as it fills the sky)
     if (app.world) {
       app.world.update(t, S);
       app.fx.update(t, S, cam);
