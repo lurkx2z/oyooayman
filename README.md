@@ -11,8 +11,9 @@ Everything is procedural, so there are no models, images or sound files to downl
 > **Third film: *What weed-induced depersonalization can feel like*** — open `depersonalization.html` (71 s).
 > Plan, shot list and review log: [`films/depersonalization/PLAN.md`](films/depersonalization/PLAN.md).
 >
-> **Fourth film: *What if friction disappeared for 60 seconds?*** — open `friction.html` (75.5 s). Friction goes at 1.5 s
-> and comes back at 61.5 s; everything that slides comes from a deterministic simulation computed when the page loads.
+> **Fourth film: *What if friction disappeared for 60 seconds?*** — open `friction.html` (70.3 s). Friction goes at 1.5 s
+> and comes back 60 seconds later; everything that slides comes from a deterministic simulation computed when the page loads,
+> and the film is an edited cut of that one continuous take (`CONFIG.edit`).
 > Plan, physics rules, shot list and review log: [`films/friction/PLAN.md`](films/friction/PLAN.md).
 
 | Time | Beat |
@@ -129,7 +130,7 @@ Shared engine (used by every film):
 ```
 js/main.js                 SceneManager: renderer, clock, playback, recording, capture; calls the film's FILM hooks
 js/config.js               default tunables (a film can override them in its script)
-js/core/                   seeded RNG + noise, Timeline/Track, canvas textures, geometry batching
+js/core/                   seeded RNG + noise, Timeline/Track, Edit (optional cut of one continuous take), canvas textures, geometry batching
 js/camera/                 first-person head (path, bob, breathing, sway, startles) + authored first-person arms
 js/fx/postprocessing.js    AO, bloom, tone mapping, vignette, grain, fades; the film supplies the colour grade
 js/fx/fog.js               uneven atmospheric haze (installFog)

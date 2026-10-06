@@ -1,9 +1,15 @@
 # What if friction disappeared for 60 seconds? — production plan
 
-A 75.5-second vertical (9:16, rendered 540×960, 30 fps) first-person film on the shared engine. 70 % POV what-if, 30 %
+A 70.3-second vertical (9:16, rendered 540×960, 30 fps) first-person film on the shared engine. 70 % POV what-if, 30 %
 spectacle: polished low-poly city, serif captions, a minimal top-left HUD. Friction drains from 1.0 to 0.0 under the
-title and is gone at **1.5 s**; it comes back at **61.5 s** — exactly 60 seconds — and the return is the biggest payoff
-(in 3× slow motion, 61.6–64.6 s).
+title and is gone at **1.5 s**; it comes back **60 seconds later** (story 61.5 s) and the return is the biggest payoff
+(6 s of 4× slow motion).
+
+**Story clock and the cut.** Everything (camera, script, simulation, sound) runs on one continuous 74.6 s story clock —
+the times in this plan are story times. `CONFIG.edit` cuts that take into the film: story 20.6–24.6 (the slow start of the
+truck's slide) and 53.0–54.5 (the montage's tail) are dropped, and 39.3–39.9 (the knock) plays at a third of real speed.
+Film time = story time up to 20.6; story − 4 from 24.6 to 39.3; the knock fills film 35.3–37.1; story − 2.8 from 39.9 to
+53.0; story − 4.3 from 54.5 to the end (film 70.3). The HUD clock keeps story time, so it jumps at the two cuts.
 
 ## 1. Physics rules (deterministic, `films/friction/slide.js`)
 
@@ -45,15 +51,15 @@ You walk down the right-hand sidewalk toward the junction, slip at 1.5 s, glide 
 | **2** | **3.6–7.5** | **Walking is impossible.** Arms round the pole, foot against the kerb. You try a step: the foot slides away, your hands slip down the pole. At the corner a man holding a signal mast does the splits. | Strained breath, a grunt, a soft ring as your hands stop; "no no no". | *You couldn't even take a normal step.* |
 | **3** | **7.6–9.7** | **Wheels spin, the car doesn't.** The electric car beside you floors it: front wheel a blur, car not moving. | An EV motor whining up, no tyre noise at all. | TIRE GRIP 0 % · WHEELS n km/h · CAR 0 km/h |
 | **4** | **9.8–16.4** | **No brakes, no steering.** Horn: the red sedan coming at you, brakes on, 30+ km/h. The taxi clips the steering SUV in the junction and the sedan slams in (11.96 / 12.27). The SUV slides past you, still turning nothing, and snaps a lamp post (14.95). | Horn, crunch, glass; the lamp post's crack, the long fall, the clang. | RED CAR · BRAKES ON · km/h · *Brakes and steering depend on friction too.* · *Things only stop when they hit something.* |
-| **5** | **16.6–22.5** | **The hill.** A long squint up the hill: the box truck has stopped near the top… and starts sliding back. The EV still spinning its wheels; a coasting car glides past and hits the taxi. | Distant horns, alarms; the EV whine. | *Up the hill, the truck had stopped…* / *…and started sliding back.* / *The wheels spin. The car doesn't move.* |
-| **6** | **22.7–29.5** | **Even a small hill.** The truck, backwards, gaining speed, telephoto narrowing as it comes. | The rumble growing. | *Even a small hill becomes dangerous.* · SLOPE 7° · DOWNHILL PULL 1.2 m/s² |
-| **7** | **29.4–34** | **Everything comes loose.** The truck smashes the parked cars at the foot of the hill; the bollards give way (29.6); its roll-up door bursts and the cargo slides out; carts, bins, bikes, pipes and cars start down. A spinning car slides straight at you and clips the car beside you (33.75). | A boom, metal, glass, then the whole street sliding. | SURFACE FRICTION 0.0 |
-| **8** | **34–42.5** | **Now you're part of it.** The truck reaches the junction, smashes through two cars (36.6) and comes out spinning — at you. The car beside you nudges you and your grip slides (35.7); a runaway cart rings off your pole (39.27); the truck hits the car beside you (39.53) and its nose knocks you off the pole (39.67). You sit down hard and slide backwards across the sidewalk into a shopfront (42.03), then along it. | Your shout, the thud, a pane wobbling. A warning yell. | FRICTION RETURNS IN 00:24 (from 37.5) · *Now you're part of it.* |
-| **9** | **46.5–54.5** | **Meanwhile.** Conveyor belt running under groceries that don't move · a cyclist sliding, falling and sliding on · a crane's hoist brake slipping, the load dropping · glasses sliding off a tilted tray · an ambulance sliding sideways through a junction, lights on. | Each its own bite; the world bus drops away. | MEANWHILE / CONVEYOR BELTS · BIKES · CRANE BRAKES · GRIP · AMBULANCES |
-| **10** | **54.5–58.4** | **Realisation.** Back with you, sitting against the shopfront, still drifting; across the street the truck still slides. A tracking shot with the spinning car still flying down the avenue. | The world low-passes and narrows; a rising tone; the clock. | *And then you realize…* → *…it's coming back.* |
-| **11** | **58.5–61.5** | **3 · 2 · 1.** Big numbers, the frame tunnelling in, heartbeat vignette. | Heartbeat, booms, a held breath. | 3 · 2 · 1 |
-| **12** | **61.5–64.6** | **Friction returns** (flash, then 3× slow motion). Drone: the truck across from you trips onto two wheels; the spinning car caught sideways barrel-rolls end over end with smoke and sparks. | One hit: boom, a screech chord pitched down, landings, glass, ringing. | FRICTION 100 % · EVERYTHING GRIPS AT ONCE |
-| **13** | **64.6–75.5** | **Aftermath.** Back in your eyes, the street settling. You stand (67.6–69.6), look down and take one step — the sole grips with a squeak. Fade to black. | Ringing, a long shaky breath, one crisp step; the final chord. | *You'd never notice friction…* → *…until it was gone.* · SURFACE FRICTION NORMAL |
+| **5** | **16.6–20.6** | **The hill.** A squint up the hill (the hill's right-hand trees slimmed, the low signal head removed so the line is clear): the box truck has stopped near the top. A drone rides behind it as it starts to slide back, the whole street below. — *cut* — | Distant horns, alarms. | *Up the hill, the truck had stopped…* / *…and started sliding back.* · SLOPE 7° · TRUCK SLIDING BACK · n km/h |
+| **6** | **24.6–29.0** | **Even a small hill.** Back in your eyes: the truck coming down backwards at 40–57 km/h, telephoto widening as it comes. | The rumble growing. | *Even a small hill becomes dangerous.* |
+| **7** | **29.0–34** | **Everything comes loose.** Cutaway, low in the lane beside the parked cars (tagged HELD ONLY BY THE BOLLARDS): the truck slams into the last of them at 59 km/h (29.4); the stack shunts, the bollards give (29.6), the roll-up door bursts. Back in your eyes, the hill pours down; a spinning car slides straight at you and clips the car beside you (33.75). | A boom, metal, glass, then the whole street sliding. | SLOPE 7° · NOTHING ON THE HILL CAN HOLD |
+| **8** | **34–42.5** | **Now you're part of it.** The truck reaches the junction, smashes through two cars (36.6) and comes out spinning — at you. The car beside you nudges you and your grip slides (35.7); a runaway cart rings off your pole (39.27); in slow motion (39.3–39.9) the truck hits the car beside you (39.53) and its nose knocks you off the pole (39.67). You sit down hard and slide backwards across the sidewalk into a shopfront (42.03), then along it, your legs out in front. | Your shout, the thud (deep, slowed), a pane wobbling. A warning yell. | FRICTION RETURNS IN 00:24 (from 37.5) · *Now you're part of it.* |
+| **9** | **46.5–53.0** | **Meanwhile** (1.3 s each, a reason under each label). Conveyor belt under groceries that don't move · a cyclist sliding, falling and sliding on · a crane's hoist brake letting go, the load dropping at nearly g · glasses sliding off a tilted tray · an ambulance seen from above, pointing one way and sliding another. — *cut* — | Each its own bite. | MEANWHILE / CONVEYOR BELTS — *The belt moves. The groceries don't.* · BIKES — *No grip to steer — so no way to balance.* · CRANE BRAKES — *Brake pads can't grip the drum.* · GRIP — *Tilt anything and it slides off.* · AMBULANCES — *Sirens on. No way to steer or stop.* |
+| **10** | **54.5–58.4** | **Realisation.** Back with you, sitting against the shopfront, still drifting; cars slide past; across the street the truck still slides. A ride-along with the spinning car down the avenue (tagged NO GRIP · SPINNING · n km/h). | The world low-passes and narrows; a rising tone; the clock. | *And then you realize…* → *…it's coming back.* |
+| **11** | **58.5–61.5** | **3 · 2 · 1.** A slow push-in on the truck across the street (tagged STILL SLIDING SIDEWAYS · n km/h); big numbers, the frame tunnelling in, heartbeat vignette. | Heartbeat, booms, a held breath. | 3 · 2 · 1 |
+| **12** | **61.5–67.6** | **Friction returns.** A 2-frame flash and your jolt as you stop; the truck starts to lift. 4× slow motion: high over the street — the truck rocks onto two wheels, every skidding car smokes and lays black marks, carts and boxes tip. Then the same moment down the avenue: the spinning car, sliding sideways, catches the end kerb of a bus island and barrel-rolls over it, sparks and dust on each landing. | One hit: boom, a screech chord pitched down, groans of tyres biting, the kerb bang, landings, glass. | FRICTION 100 % · EVERYTHING GRIPS AT ONCE |
+| **13** | **67.6–74.6** | **Aftermath.** Back in your eyes: tyre smoke hanging over the stopped cars, the truck back on its wheels. You stand (69.6–71.0), look down and take one step — the sole grips with a squeak (71.5). Fade to black. | Ringing, a long shaky breath, one crisp step; the final chord. | *You'd never notice friction…* → *…until it was gone.* · SURFACE FRICTION NORMAL |
 
 ## 4. Hero events (from the simulation; film clock)
 
@@ -71,7 +77,8 @@ You walk down the right-hand sidewalk toward the junction, slip at 1.5 s, glide 
 | 36.5–36.9 | T smashes P4/P5 at the junction and spins out toward you |
 | 39.27 / 39.53 / 39.67 | The hero cart hits your pole; T hits K; K's nose knocks you loose at 2.1 m/s |
 | 42.03 | You hit the shopfront (x 12.5) and slide along it at ~0.7 m/s |
-| 61.5 | Friction returns: B4 (7.3 m/s sideways) rolls 3 quarter turns; P6, P7 roll; P1, P2 skid; T (1.4 m/s sideways) lurches onto two wheels; you stop at (12.2, −2.2) |
+| 61.5 | Friction returns: every slider skids (P1, P2, P6, P7, Q3–Q5…); T (1.4 m/s sideways) lurches onto two wheels; you stop at (12.2, −2.2) |
+| 61.7 | B4, still sliding sideways at 6 m/s, trips on the bus island's end kerb at z 193.6 and rolls 3 quarter turns (shown on the second angle, story 63.6–67.6) |
 
 ## 5. Assets (all procedural)
 
@@ -118,7 +125,22 @@ of the preview reviews:
 - **Readability** → spoke decals so a spinning wheel reads, a telephoto squint on the crash, the shop-window shot cut,
   longer and slimmer sleeves, less motion smear.
 
-**Full cut.** The second half was rebuilt around a new chain (spinning car → the truck through the junction → the car
+**Full cut v1 (75.5 s).** Retention: HOOK 5 · FIRST 5 SEC 6 · PHYSICS 6 · PACING 4 · DESTRUCTION 4 · POV 6 · VISUAL 5 ·
+ESCALATION 4 · FINAL PAYOFF 4 · RETENTION 4. Physics: 5 · 6 · 4 · 4 · 4 · 5 · 5 · 5 · 5 · 4. Cinematography: 5 · 5 · 4 · 3 · 4 ·
+4 · 5 · 4 · 4 · 3. Normal viewer: 5 · 6 · 5 · 3 · 3 · 5 · 5 · 4 · 5 · 4. They agreed on: a 13 s hill stretch where the truck
+hides behind trees and a signal; the 29.4 s hit and the lamp post too far away to see; montage labels missing (a bug: the
+label code was handed the camera instead of the shot) and the montage too quiet; a static lull before 3-2-1; a return
+that was only two vehicles for 3 s, with see-through smoke discs; an 11 s aftermath of a clean street; a placeholder
+shoe; captions washing out on light ground; a sedan rolling from tyre grip alone (not physical at μ 0.8 — needs a trip).
+The retention reviewer suggested 55–60 s; the brief asks for 70–78 s, so the cut is 70.3 s.
+
+**v2 (70.3 s)** addresses those: the edit (cuts + slowed knock), the hill drone and the impact cutaway, slimmer hill trees
+and no low signal head in the sightline, the sideways lamp-post fall seen through a squint, the rebuilt 6 s return with
+a physical roll (bus-island kerb trip) and rocking instead of rolling elsewhere, skid marks and hanging smoke, tags on
+the things that matter, a 7 s aftermath, a real trainer, montage labels with reasons, a near-g crane drop, set dressing,
+the ambulance from above, caption plates and a HUD backing.
+
+**Full cut v1 notes.** The second half was rebuilt around a new chain (spinning car → the truck through the junction → the car
 beside you → you), a shopfront instead of the cross street, the slow-motion drone shots for the return, and fixes found in
 test frames: a tree hiding the falling lamp post (removed), a frozen pedestrian and a pipe ending up in your face for the
 finale (moved / parked while the montage is on), the bike shot's camera looking the wrong way, the waiter's tray placed
