@@ -33,8 +33,8 @@ const KBPS = parseInt(args.kbps || '160', 10);
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const page = await browser.newPage({ viewport: { width: 270, height: 480 } });
   page.on('pageerror', (e) => console.log('[pageerror]', e.message));
-  await page.goto('file://' + path.join(ROOT, PAGE) + '?capture&w=270&h=480');
-  await page.waitForFunction(() => window.SIM_READY === true, null, { timeout: 180000 });
+  await page.goto('file://' + path.join(ROOT, PAGE) + '?capture&w=270&h=480', { timeout: 300000 });   // (a long simulation can hold up the load event)
+  await page.waitForFunction(() => window.SIM_READY === true, null, { timeout: 600000 });
   const fingerprint = await page.evaluate(() => window.SIM.audio.fingerprint());
   console.log('fingerprint', fingerprint);
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'bake-'));

@@ -61,8 +61,11 @@ class FRAudio extends AudioEngine {
     this._city(S, world, rev);
     this._steps(S, world);
     this._body(S, you, world);
-    this._voices(S, world, rev);
-    this._engines(S, world, rev);
+    // (sub-mixes: the engine bed sits low so the quiet of a frictionless street comes through; people's shouts sit up front)
+    const vox = ctx.createGain(); vox.gain.value = 3.0; vox.connect(world);
+    const eng = ctx.createGain(); eng.gain.value = 0.4; eng.connect(world);
+    this._voices(S, vox, rev);
+    this._engines(S, eng, rev);
     this._impacts(S, world, rev);
     this._montage(S, world, rev);
     this._return(S, world, you, rev);
@@ -86,9 +89,10 @@ class FRAudio extends AudioEngine {
   _city(S, bus, rev) {
     const ctx = S.ctx, end = CONFIG.duration + 0.5, T0 = FR.tLoss;
     const air = S.noise('pink', 0, end), lp = S.filter('lowpass', 1300, 0.4), hp = S.filter('highpass', 70, 0.5), g = ctx.createGain();
-    g.gain.setValueAtTime(0.11, 0); air.connect(hp); hp.connect(lp); lp.connect(g); g.connect(bus);
+    g.gain.setValueAtTime(0.05, 0); air.connect(hp); hp.connect(lp); lp.connect(g); g.connect(bus);
     const rum = S.noise('brown', 0, end), rl = S.filter('lowpass', 240, 0.7), rg = ctx.createGain();
-    rg.gain.setValueAtTime(0.26, 0); rg.gain.setValueAtTime(0.26, T0); rg.gain.linearRampToValueAtTime(0.12, T0 + 3); rum.connect(rl); rl.connect(rg); rg.connect(bus);
+    // (tyre roar is friction: once it's gone the traffic rumble drops away and the street goes eerily quiet)
+    rg.gain.setValueAtTime(0.07, 0); rg.gain.setValueAtTime(0.07, T0); rg.gain.linearRampToValueAtTime(0.018, T0 + 2); rum.connect(rl); rl.connect(rg); rg.connect(bus);
     const rng = new RNG(CONFIG.seed + 5);
     for (let t = 0.1; t < end; t += rng.range(0.25, 0.9)) { const n = rng.int(2, 4), base = rng.range(2700, 4500), pan = rng.range(-0.8, 0.8), v = rng.range(0.006, 0.014) * (t < T0 ? 1 : 0.6); for (let k = 0; k < n; k++) S.chirp(t + k * rng.range(0.07, 0.12), base * rng.range(0.92, 1.12), v, pan, bus, t > T0 && t < T0 + 3); }
     S.horn(0.5, 392, 466, 0.006, -0.6, rev);
