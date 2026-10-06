@@ -249,12 +249,59 @@ class FrictionCity extends Environment {
 
   _trees() {
     const rng = this.rng.fork(3);
-    for (const z of FR_STATIC.treesR) this._lift(FrGround.road(z), () => this._tree(8.15, z, rng, rng.range(0.8, 1.2)));
+    // (the right-hand trees up the hill are kept slim, so the view up the hill to the truck stays clear)
+    for (const z of FR_STATIC.treesR) { const sc = rng.range(0.8, 1.2); this._lift(FrGround.road(z), () => this._tree(8.15, z, rng, z < -62 && z > -170 ? sc * 0.6 : sc)); }
     for (const z of FR_STATIC.treesL) this._lift(FrGround.road(z), () => this._tree(-8.15, z, rng, rng.range(0.8, 1.2)));
+  }
+
+  // the shared signals, except that the near-side head low on the far-right mast is left off (it sat right in your line of
+  // sight up the hill)
+  _signals() {
+    const L = LAYOUT, h = L.curbH, m = this.m, B = this.batch, cz0 = L.crossZ - L.crossHalf, cz1 = L.crossZ + L.crossHalf;
+    this.signalHeads = [];
+    const headGeo = new THREE.BoxGeometry(0.36, 1.0, 0.3), lampGeo = new THREE.CircleGeometry(0.1, 14), housing = Mat.std('#1d2124', { roughness: 0.5 });
+    const mkHead = (x, y, z, ry, group) => {
+      B.add(headGeo, housing, Geo.matrix(x, y, z, 0, ry, 0));
+      B.add(new THREE.BoxGeometry(0.55, 1.2, 0.03), housing, Geo.matrix(x - Math.sin(ry) * 0.17, y, z - Math.cos(ry) * 0.17, 0, ry, 0));
+      const lamps = [];
+      ['#ff2a1a', '#ffb000', '#22e07a'].forEach((c, i) => {
+        const mat = new THREE.MeshBasicMaterial({ color: c, toneMapped: false }), mesh = new THREE.Mesh(lampGeo, mat);
+        mesh.position.set(x + Math.sin(ry) * 0.155, y + 0.3 - i * 0.3, z + Math.cos(ry) * 0.155); mesh.rotation.y = ry; this.root.add(mesh);
+        lamps.push({ mesh, mat, color: new THREE.Color(c) });
+        B.add(new THREE.CylinderGeometry(0.13, 0.13, 0.16, 10, 1, true, -Math.PI / 2, Math.PI), housing, Geo.matrix(x + Math.sin(ry) * 0.23, y + 0.3 - i * 0.3 + 0.02, z + Math.cos(ry) * 0.23, Math.PI / 2, ry, 0));
+      });
+      this.signalHeads.push({ group, lamps });
+    };
+    const mast = (px, pz, armDir, armLen, ry, group, heads, low = true) => {
+      B.add(new THREE.CylinderGeometry(0.14, 0.19, 7.2, 10), m.metal, Geo.matrix(px, h + 3.6, pz));
+      if (armDir === 'x') B.add(new THREE.CylinderGeometry(0.07, 0.1, armLen, 8), m.metal, Geo.matrix(px - Math.sign(px) * armLen / 2, h + 6.6, pz, 0, 0, Math.PI / 2));
+      else B.add(new THREE.CylinderGeometry(0.07, 0.1, armLen, 8), m.metal, Geo.matrix(px, h + 6.6, pz - Math.sign(pz - L.crossZ) * armLen / 2, Math.PI / 2, 0, 0));
+      for (const [hx, hz] of heads) mkHead(hx, h + 5.9, hz, ry, group);
+      if (low) mkHead(px + Math.sin(ry) * 0.3, h + 3.2, pz + Math.cos(ry) * 0.3, ry, group);
+    };
+    mast(7.9, cz0 - 1.2, 'x', 7.5, 0, 'avenue', [[4.0, cz0 - 1.2], [1.3, cz0 - 1.2]], false);
+    mast(-7.9, cz1 + 1.2, 'x', 7.5, Math.PI, 'avenue', [[-4.0, cz1 + 1.2], [-1.3, cz1 + 1.2]]);
+    mast(-7.9 - 1.2, cz0 - 0.5, 'z', 7.0, Math.PI / 2, 'cross', [[-9.1, cz0 + 3.8], [-9.1, cz0 + 1.5]]);
+    mast(7.9 + 1.2, cz1 + 0.5, 'z', 7.0, -Math.PI / 2, 'cross', [[9.1, cz1 - 3.8], [9.1, cz1 - 1.5]]);
+  }
+
+  // down the avenue: a bus boarding island in the right lane (a raised, kerbed platform). When friction returns the spinning
+  // car, sliding sideways, catches its end kerb (FR_TRIP) and rolls over it.
+  _busIsland() {
+    const B = this.batch, m = this.m, x0 = 3.0, x1 = 6.4, z0 = 193.62, z1 = 205.0, H = 0.22, y = FrGround.road(z0);
+    B.box(x1 - x0, H, z1 - z0, (x0 + x1) / 2, y + H / 2, (z0 + z1) / 2, m.sidewalk || Mat.std('#b9b4aa', { roughness: 0.9 }));
+    const yel = Mat.std('#e8c21c', { roughness: 0.6 });
+    B.box(x1 - x0, 0.012, 0.3, (x0 + x1) / 2, y + H + 0.006, z0 + 0.15, yel);
+    B.box(0.3, 0.012, z1 - z0, x0 + 0.15, y + H + 0.006, (z0 + z1) / 2, yel);
+    B.box(0.06, 2.6, 0.06, 5.6, y + H + 1.3, 197.0, m.metal);
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.5), new THREE.MeshStandardMaterial({ map: Tex.label([['BUS', 48], ['STOP', 40]], { w: 128, h: 128, bg: '#1f5fa8' }), side: THREE.DoubleSide }));
+    sign.position.set(5.6, y + H + 2.5, 197.0); this.root.add(sign);
+    for (const z of [194.2, 196.0]) B.box(0.18, 0.9, 0.18, x0 + 0.35, y + H + 0.45, z, m.metal);
   }
 
   _streetFurniture() {
     const B = this.batch, m = this.m, h = LAYOUT.curbH, G = FrGround;
+    this._busIsland();
     // (lamp posts on your block are props — they can be knocked down)
     for (const z of FR_STATIC.lampsR) if (z <= -40) this._lift(G.road(z), () => this._streetLight(7.45, z, 1));
     for (const z of FR_STATIC.lampsL) if (z <= -40) this._lift(G.road(z), () => this._streetLight(-7.45, z, -1));

@@ -12,7 +12,13 @@
    ===================================================================== */
 
 // film time of a simulation-time moment (inverse of frSimT: the 3× slow-motion window)
-function frFilmT(s) { const S = FR_SLOW, s1 = S.t0 + (S.t1 - S.t0) / S.k; return s < S.t0 ? s : s < s1 ? S.t0 + (s - S.t0) * S.k : S.t1 + (s - s1); }
+function frFilmT(s) {
+  if (s < FR_SEGS[0][2]) return s;
+  for (const [a, b, c, d] of FR_SEGS) if (s >= c && s < d) return a + (s - c) * (b - a) / (d - c);   // (its first showing)
+  return s < FR_AFTER.sim ? FR_AFTER.story : FR_AFTER.story + (s - FR_AFTER.sim);
+}
+// …and on the second angle (down the avenue), where the spinning car's roll is seen
+function frReplayT(s) { const [a, b, c, d] = FR_SEGS[1]; return a + (s - c) * (b - a) / (d - c); }
 
 class FRAudio extends AudioEngine {
   constructor(tl, app) {
@@ -26,7 +32,7 @@ class FRAudio extends AudioEngine {
   }
 
   fingerprintData() {
-    return [FR_CARS, FR_PARKED, FR_PEOPLE, FR_PROPS, FR_STATES, FR_STATIC, FR_WALK, FR_POLE, FR_HOLD, FR, FR_SLOW, FR_MONTAGE, FR_KNOCK, FR_RELEASE,
+    return [FR_CARS, FR_PARKED, FR_PEOPLE, FR_PROPS, FR_STATES, FR_STATIC, FR_WALK, FR_POLE, FR_HOLD, FR, FR_SLOW, FR_SEGS, FR_AFTER, FR_TRIP, FR_MONTAGE, FR_CRANE, FR_KNOCK, FR_RELEASE,
       String(frBuildWorld), Object.getOwnPropertyNames(SlideWorld.prototype).map((k) => String(SlideWorld.prototype[k])).join('')];
   }
 
@@ -74,8 +80,8 @@ class FRAudio extends AudioEngine {
 
   // the world bus over time: [t, low-pass Hz, level]. Montage shots are their own places; the countdown closes it down to you.
   _narrow() {
-    return [[0, 18000, 1], [46.45, 18000, 1], [46.5, 18000, 0.25], [54.45, 18000, 0.25], [54.5, 9000, 0.9], [56.0, 4000, 0.8], [58.5, 1400, 0.55], [61.45, 500, 0.35],
-      [61.5, 18000, 1.0], [64.6, 14000, 0.95], [66.0, 6000, 0.55], [68.0, 9000, 0.6], [75.5, 12000, 0.7]];
+    return [[0, 18000, 1], [46.45, 18000, 1], [46.5, 18000, 0.4], [54.45, 18000, 0.4], [54.5, 9000, 0.9], [56.0, 4000, 0.8], [58.5, 1400, 0.55], [61.45, 500, 0.35],
+      [61.5, 18000, 1.0], [67.4, 14000, 0.95], [68.4, 6000, 0.6], [70.0, 9000, 0.65], [74.6, 12000, 0.7]];
   }
 
   // distance gain and pan of a world point at (film) time t, as heard from your body
@@ -145,19 +151,19 @@ class FRAudio extends AudioEngine {
     for (const [f, d, a] of [[95, 0.5, 1], [190, 0.35, 0.4]]) S.tone(42.03, d, f, 0.035 * a, 0.3, world, 'sine', 0.004, d * 0.8);
     // breathing: calm while walking, fast and shallow for the minute, held through 3-2-1, then long and shaky after
     for (let t = 0.5; t < end - 1;) {
-      const fast = t > 1.5 && t < 58.3, after = t > 63, held = t > 58.3 && t < 61.6;
+      const fast = t > 1.5 && t < 58.3, after = t > 67.6, held = t > 58.3 && t < 67.6;   // (held through 3-2-1 and the slow motion)
       const v = fast ? 0.013 : after ? 0.014 : 0.004, din = fast ? 0.48 : after ? 1.1 : 1.2, dout = fast ? 0.52 : after ? 1.6 : 1.4;
       if (!held && !(t > 3.45 && t < 3.8) && !(t > 4.3 && t < 4.9) && !(t > 46.4 && t < 54.6)) { S.breath(t, din, true, v, you); S.breath(t + din + 0.05, dout, false, v * 0.9, you); }
       t += din + dout + (fast ? 0.1 : 0.6);
     }
     S.breath(58.15, 0.5, true, 0.03, you);                                                              // the breath you hold
-    S.breath(64.8, 2.2, false, 0.03, you);                                                              // …and let go
+    S.breath(67.8, 2.2, false, 0.03, you);                                                              // …and let go
     // standing up, then one step — and the sole grips: a little squeak, the first friction sound you've noticed in your life
-    rustle(67.6, 1.4, 0.022, 1300); S.voice(68.3, 140, 0.25, 'u', 0.02, 0, you, 0.8);
-    S.step(70.85, 0.12, 0.05, world);
-    { const o = ctx.createOscillator(), g = ctx.createGain(), bp = S.filter('bandpass', 2200, 6); o.type = 'sawtooth'; o.frequency.setValueAtTime(1900, 70.86); o.frequency.linearRampToValueAtTime(2500, 70.95);
-      g.gain.setValueAtTime(0, 70.86); g.gain.linearRampToValueAtTime(0.03, 70.88); g.gain.linearRampToValueAtTime(0, 70.98); o.connect(bp); bp.connect(g); g.connect(world); o.start(70.86); o.stop(71.0); }
-    S.step(71.7, 0.08, -0.05, world);
+    rustle(69.6, 1.3, 0.022, 1300); S.voice(70.1, 140, 0.25, 'u', 0.02, 0, you, 0.8);
+    S.step(71.5, 0.12, 0.05, world);
+    { const o = ctx.createOscillator(), g = ctx.createGain(), bp = S.filter('bandpass', 2200, 6); o.type = 'sawtooth'; o.frequency.setValueAtTime(1900, 71.51); o.frequency.linearRampToValueAtTime(2500, 71.6);
+      g.gain.setValueAtTime(0, 71.51); g.gain.linearRampToValueAtTime(0.035, 71.53); g.gain.linearRampToValueAtTime(0, 71.63); o.connect(bp); bp.connect(g); g.connect(world); o.start(71.51); o.stop(71.65); }
+    S.step(72.3, 0.08, -0.05, world);
   }
 
   /* people: yelps as they go down, shouts, a nervous laugh (times on the film clock) */
@@ -269,7 +275,7 @@ class FRAudio extends AudioEngine {
   _montage(S, bus, rev) {
     // (the world bus is turned down during the montage, so these go straight to the mix at full level through their own gain)
     const ctx = S.ctx, M = Object.fromEntries(FR_MONTAGE.map((m) => [m.id, m]));
-    const out = ctx.createGain(); out.gain.value = 4.0; out.connect(bus);
+    const out = ctx.createGain(); out.gain.value = 6.0; out.connect(bus);
     // conveyor: a store's hum, the belt motor, a scanner beep that nobody triggers
     { const m = M.conveyor; const n = S.noise('pink', m.t0, m.t1), bp = S.filter('bandpass', 180, 2), g = ctx.createGain(); g.gain.setValueAtTime(0, m.t0); g.gain.linearRampToValueAtTime(0.25, m.t0 + 0.05); g.gain.setValueAtTime(0.25, m.t1 - 0.05); g.gain.linearRampToValueAtTime(0, m.t1); n.connect(bp); bp.connect(g); g.connect(out);
       S.tone(m.t0, m.t1 - m.t0, 100, 0.04, 0, out, 'sawtooth', 0.02, 0.05); S.voice(m.t0 + 0.7, 260, 0.35, 'e', 0.05, 0.3, out, 1.15); }
@@ -277,9 +283,9 @@ class FRAudio extends AudioEngine {
     { const m = M.bike; for (let t = m.t0; t < m.t1; t += 0.035) S.click(t, 0.035, -0.2, out); S.voice(m.t0 + 0.5, 200, 0.3, 'o', 0.06, -0.2, out, 0.8);
       for (let k = 0; k < 6; k++) S.click(m.t0 + 0.95 + k * 0.03, 0.12, -0.1, out); S.clunk(m.t0 + 0.95, 0.25, -0.1, out); }
     // crane: no brake squeal (the brake can't grip) — only the cable whizzing off the drum, a shout, then the load hits the ground
-    { const m = M.crane; const n = S.noise('white', m.t0 + 0.25, m.t0 + 1.4), bp = S.filter('bandpass', 900, 3), g = ctx.createGain(); bp.frequency.setValueAtTime(600, m.t0 + 0.25); bp.frequency.linearRampToValueAtTime(2400, m.t0 + 1.35);
-      g.gain.setValueAtTime(0, m.t0 + 0.25); g.gain.linearRampToValueAtTime(0.12, m.t0 + 1.3); g.gain.linearRampToValueAtTime(0, m.t0 + 1.42); n.connect(bp); bp.connect(g); g.connect(out);
-      S.voice(m.t0 + 0.55, 180, 0.4, 'e', 0.07, 0.3, out, 0.85); const hit = m.t0 + 0.25 + Math.sqrt(2 * 9 / 8); S.boom(hit, 0.5, out, this.rev); S.crunch(hit, 0.6, 0, out, this.rev); }
+    { const m = M.crane, C = FR_CRANE, t0 = m.t0 + C.let, hit = t0 + Math.sqrt(2 * C.yTop / C.a); const n = S.noise('white', t0, hit + 0.05), bp = S.filter('bandpass', 900, 3), g = ctx.createGain(); bp.frequency.setValueAtTime(600, t0); bp.frequency.linearRampToValueAtTime(2600, hit);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(0.13, hit - 0.03); g.gain.linearRampToValueAtTime(0, hit + 0.03); n.connect(bp); bp.connect(g); g.connect(out);
+      S.voice(t0 + 0.25, 180, 0.4, 'e', 0.07, 0.3, out, 0.85); S.boom(hit, 0.5, out, this.rev); S.crunch(hit, 0.6, 0, out, this.rev); }
     // grip: four glasses sliding off a tray, smashing one after another
     { const m = M.grip; for (let i = 0; i < 4; i++) { const t = m.t0 + 0.55 + i * 0.16; for (let k = 0; k < 10; k++) S.tone(t + k * 0.012 + S.rng.range(0, 0.03), 0.08, S.rng.range(2500, 7500), 0.05, S.rng.range(-0.4, 0.4), out, 'sine', 0.006, 0.07); S.click(t, 0.15, 0, out); }
       S.voice(m.t0 + 0.45, 230, 0.3, 'o', 0.05, 0, out, 0.75); }
@@ -303,17 +309,23 @@ class FRAudio extends AudioEngine {
       p.pan.value = S.rng.range(-0.8, 0.8); o.connect(bp); n.connect(bp); bp.connect(g); g.connect(p); p.connect(bus); o.start(T); o.stop(slow.t1 + 0.5);
     }
     // rollovers and tips in slow motion: each landing a deep crunch; metal scraping; glass
+    // the wide view (story 61.9–63.6): tyres biting all round you — low skid groans, the truck's lurch and slam, carts and boxes going over
+    for (let k = 0; k < 8; k++) { const t = 61.95 + k * 0.2 + S.rng.range(0, 0.15); S.crunch(t, S.rng.range(0.05, 0.12), S.rng.range(-0.8, 0.8), bus, rev); }
+    S.boom(63.2, 0.2, bus, rev); S.thump(63.25, 0.12, bus);
+    // the second angle: the spinning car trips on the island kerb (a deep metal bang) and rolls — each landing a crunch, metal scraping
     for (const c of this.app.traffic.cars) {
       const R = c.ret; if (!R || !R.roll) continue;
-      for (const [tl, str] of R.lands) { const t = frFilmT(tl); S.crunch(t, 0.35 * str, S.rng.range(-0.6, 0.6), bus, rev); S.boom(t, 0.15 * str, bus, rev); }
-      const t0 = frFilmT(T + 0.1), t1 = frFilmT(T + R.dur + 0.4), n = S.noise('white', t0, t1), bp = S.filter('bandpass', 1200, 1.5), g = ctx.createGain();
-      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(0.05, t0 + 0.2); g.gain.linearRampToValueAtTime(0, t1); n.connect(bp); bp.connect(g); g.connect(S.panned(bus, S.rng.range(-0.5, 0.5)));
+      const map = c.id === FR_TRIP.id ? frReplayT : frFilmT, tr = map(R.t0);
+      S.boom(tr, 0.3, bus, rev); S.crunch(tr, 0.4, 0, bus, rev);
+      for (const [tl, str] of R.lands) { const t = map(tl); if (t > FR_SLOW.t1) continue; S.crunch(t, 0.45 * str, S.rng.range(-0.4, 0.4), bus, rev); S.boom(t, 0.2 * str, bus, rev); for (let k = 0; k < 6; k++) S.tone(t + 0.04 + k * 0.05, 0.1, S.rng.range(2600, 5800), 0.02 * str, S.rng.range(-0.6, 0.6), bus, 'sine', 0.006, 0.08); }
+      const t0 = tr + 0.2, t1 = Math.min(FR_SLOW.t1, map(R.t0 + R.dur + 0.3)), n = S.noise('white', t0, t1), bp = S.filter('bandpass', 700, 1.5), g = ctx.createGain();
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(0.06, t0 + 0.3); g.gain.linearRampToValueAtTime(0, t1); n.connect(bp); bp.connect(g); g.connect(S.panned(bus, S.rng.range(-0.5, 0.5)));
     }
-    for (let k = 0; k < 30; k++) { const t = T + 0.2 + S.rng.range(0, 4.5); S.tone(t, 0.08, S.rng.range(2500, 6500), 0.012, S.rng.range(-0.8, 0.8), bus, 'sine', 0.006, 0.07); }
+    for (let k = 0; k < 30; k++) { const t = T + 0.2 + S.rng.range(0, 5.8); S.tone(t, 0.08, S.rng.range(2500, 6500), 0.012, S.rng.range(-0.8, 0.8), bus, 'sine', 0.006, 0.07); }
     // after: ringing in your ears, debris settling, a distant alarm, the wind
-    S.ring(64.6, 6.0, 5200, 0.006, you);
-    for (let k = 0; k < 14; k++) { const t = 64.8 + S.rng.range(0, 5); S.click(t, S.rng.range(0.01, 0.03), S.rng.range(-0.8, 0.8), bus); }
-    { const n = S.noise('pink', 64.6, CONFIG.duration), bp = S.filter('bandpass', 380, 0.6), g = ctx.createGain(); g.gain.setValueAtTime(0, 64.6); g.gain.linearRampToValueAtTime(0.03, 67); n.connect(bp); bp.connect(g); g.connect(bus); }
+    S.ring(67.6, 5.5, 5200, 0.006, you);
+    for (let k = 0; k < 14; k++) { const t = 67.8 + S.rng.range(0, 4.5); S.click(t, S.rng.range(0.01, 0.03), S.rng.range(-0.8, 0.8), bus); }
+    { const n = S.noise('pink', 67.6, CONFIG.duration), bp = S.filter('bandpass', 380, 0.6), g = ctx.createGain(); g.gain.setValueAtTime(0, 67.6); g.gain.linearRampToValueAtTime(0.03, 69.5); n.connect(bp); bp.connect(g); g.connect(bus); }
   }
 
   /* a subtle bed: a low pulse from the moment friction goes, tightening through the hill; the countdown's clock and heartbeat;
@@ -339,8 +351,8 @@ class FRAudio extends AudioEngine {
     // a warm chord to end on
     for (const [f, v] of [[110, 0.01], [164.8, 0.008], [220, 0.006], [277.2, 0.004]]) {
       const o = ctx.createOscillator(), g = ctx.createGain(), l2 = S.filter('lowpass', 900, 0.5); o.type = 'triangle'; o.frequency.value = f;
-      g.gain.setValueAtTime(0, 69.4); g.gain.linearRampToValueAtTime(v, 71.5); g.gain.setValueAtTime(v, 74.4); g.gain.linearRampToValueAtTime(0, end);
-      o.connect(l2); l2.connect(g); g.connect(dest); o.start(69.4); o.stop(end + 0.1);
+      g.gain.setValueAtTime(0, 69.8); g.gain.linearRampToValueAtTime(v, 71.6); g.gain.setValueAtTime(v, 73.6); g.gain.linearRampToValueAtTime(0, end);
+      o.connect(l2); l2.connect(g); g.connect(dest); o.start(69.8); o.stop(end + 0.1);
     }
   }
 }

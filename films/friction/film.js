@@ -52,12 +52,22 @@ function frAimHand(name, camera, world, Fw, Nw, side = 1) {
 
 // "drone" shots (the 30 % spectacle): film-time windows where the camera leaves you to show the sliding pack down the avenue
 const FR_DRONE = [
-  // the spinning car still sliding down the avenue, nobody steering (riding along with it)
+  // up the hill: riding behind the truck as it starts to slide back down, the whole street below it
+  { t0: 18.9, t1: 20.6, ids: ['T'], follow: true, off: [-3.4, 3.4, -11], look: [0, 1.0, 14], fov: 56 },
+  // halfway down the parked cars, low in the next lane: the truck comes down backwards into the last of them
+  { t0: 29.0, t1: 30.6, pos: [1.4, 2.0, -61.5], at: [5.8, 2.2, -84], fov: 56, drift: [0, 0, 1.5], shakeAt: 29.4 },
+  // the spinning car still sliding down the avenue (riding along with it)
   { t0: 56.6, t1: 58.4, ids: ['B4'], follow: true, off: [3.6, 1.9, 9.5], look: [0, 0.8, 0], fov: 50 },
-  // friction back, slow motion: the truck across from you trips onto two wheels (seen from in front of its cab)…
-  { t0: 61.65, t1: 63.05, ids: ['T'], follow: false, off: [10.5, 2.6, 9.0], look: [0, 1.3, 0], fov: 46 },
-  // …and the spinning car, caught sideways, barrel-rolls (seen end-on)
-  { t0: 63.05, t1: 64.6, ids: ['B4'], follow: false, off: [-8.2, 2.0, 3.6], look: [0, 0.9, 0], fov: 54 },
+  // friction back, 4× slow motion: high over the street around you — the truck, the cars, the carts, all biting at once
+  { t0: 61.9, t1: 63.6, pos: [9.0, 11.5, -9.0], at: [-3.0, 0.5, 8.5], fov: 62, drift: [0, 0, 0.5] },
+  // the same moment again, down the avenue: the spinning car trips on the kerb build-out and rolls (seen end-on)
+  { t0: 63.6, t1: 67.6, ids: ['B4'], follow: false, off: [-8.6, 1.9, 4.2], look: [0, 0.9, 1.2], fov: 52 },
+];
+// labels pinned to things in the world: [t0, t1, body id (or a point), height above it, text(t)]
+const FR_TAGS = [
+  { t0: 29.0, t1: 29.42, id: 'P6', up: 1.9, text: () => 'PARKED · HELD ONLY BY THE BOLLARDS DOWNHILL' },
+  { t0: 56.8, t1: 58.3, id: 'B4', up: 1.8, text: (t) => `NO GRIP · SPINNING · ${frSpeed('B4', t)} km/h` },
+  { t0: 58.6, t1: 61.45, id: 'T', up: 3.9, text: (t) => `STILL SLIDING SIDEWAYS · ${frSpeed('T', t)} km/h` },
 ];
 
 const FILM = {
@@ -94,7 +104,7 @@ const FILM = {
     app.glints = new StreakSystem(scene, 700);
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     const mk = (cls) => { const d = document.createElement('div'); d.className = cls; d.style.opacity = '0'; document.getElementById('hud').appendChild(d); return d; };
-    app.chyron = mk('fr-chyron'); app.count = mk('fr-count');
+    app.chyron = mk('fr-chyron'); app.count = mk('fr-count'); app.tag = mk('fr-tag');
     app.audio = new FRAudio(app.tl, app);
     // the big hits between cars (glass and debris)
     app.hits = app.world.events.filter((e) => e.dv > 3 && app.traffic.byId[e.a] && (e.b === null || app.traffic.byId[e.b]));
@@ -154,7 +164,7 @@ const FILM = {
     app.cast.update(st);
     app.props.update(st);
     this._fx(app, st, t);
-    this._overlays(app, t, shot);
+    this._overlays(app, t, shot ? app.montage.shotAt(t) : null);   // (the montage returns its camera; the label needs the shot)
   },
 
   // the sun's shadow box follows what you're looking at
@@ -170,12 +180,18 @@ const FILM = {
   _drone(app, t) {
     const D = FR_DRONE.find((d) => t >= d.t0 && t < d.t1);
     if (!D) return null;
+    if (D.pos) {
+      // a fixed camera (drifting a little), aimed at a fixed point
+      const u = t - D.t0, dr = D.drift || [0, 0, 0], x = D.pos[0] + dr[0] * u, z = D.pos[2] + dr[2] * u, y = FrGround.h(x, z) + D.pos[1] + dr[1] * u;
+      const lx = D.at[0], lz = D.at[2], ly = FrGround.h(lx, lz) + D.at[1], sh = t > 61.5 && t < 63.6 ? Math.exp(-(t - 61.9) / 0.5) : D.shakeAt && t > D.shakeAt ? 2.2 * Math.exp(-(t - D.shakeAt) / 0.35) : 0;
+      return { x, y, z, yaw: Math.atan2(-(lx - x), -(lz - z)) * 180 / Math.PI + sh * Math.sin(t * 40) * 0.5, pitch: Math.atan2(ly - y, Math.hypot(lx - x, lz - z)) * 180 / Math.PI + sh * Math.sin(t * 47) * 0.5, fov: D.fov };
+    }
     const W = app.world, ref = D.follow ? frSimT(t) : frSimT(D.t0), c = { x: 0, z: 0 }, s = {};
     for (const id of D.ids) { W.sample(id, ref, s); c.x += s.x / D.ids.length; c.z += s.z / D.ids.length; }
     const u = t - D.t0, x = c.x + D.off[0] - u * 0.3, z = c.z + D.off[2] + (D.follow ? 0 : -u * 0.6), y = FrGround.h(x, z) + D.off[1];
     const lx = c.x + D.look[0], lz = c.z + D.look[2], ly = FrGround.h(lx, lz) + D.look[1];
     const yaw = Math.atan2(-(lx - x), -(lz - z)) * 180 / Math.PI, pitch = Math.atan2(ly - y, Math.hypot(lx - x, lz - z)) * 180 / Math.PI;
-    const sh = t > 61.5 ? Math.exp(-(t - 61.65) / 0.6) : 0;
+    const sh = t > 61.5 ? Math.exp(-(t - D.t0) / 0.6) * 0.6 : 0;
     return { x, y, z, yaw: yaw + sh * Math.sin(t * 40) * 0.6, pitch: pitch + sh * Math.sin(t * 47) * 0.6, fov: D.fov };
   },
 
@@ -207,8 +223,18 @@ const FILM = {
   // the montage label and the 3-2-1
   _overlays(app, t, shot) {
     const ch = app.chyron, k = shot ? StoryHUD.win(t, shot.t0, shot.t1, 0.12, 0.15) : 0;
-    if (shot && ch._id !== shot.id) { ch.innerHTML = `<span class="mw">MEANWHILE</span><span class="mt">${shot.label}</span>`; ch._id = shot.id; }
+    if (shot && ch._id !== shot.id) { ch.innerHTML = `<span class="mw">MEANWHILE</span><span class="mt">${shot.label}</span><span class="mr">${shot.why || ''}</span>`; ch._id = shot.id; }
     ch.style.opacity = k.toFixed(3);
+    // a label pinned to something in the world
+    const tg = app.tag, T = FR_TAGS.find((g) => t >= g.t0 && t < g.t1), v = FILM._tv || (FILM._tv = new THREE.Vector3());
+    if (T) {
+      if (T.id) { const b = app.world.sample(T.id, frSimT(t)); v.set(b.x, FrGround.h(b.x, b.z) + T.up, b.z); } else v.set(...T.p);
+      v.project(app.camera);
+      const vis = v.z < 1 && Math.abs(v.x) < 0.92 && v.y < 0.95 && v.y > -0.9;
+      const txt = T.text(t); if (tg._t !== txt) { tg.textContent = txt; tg._t = txt; }
+      tg.style.left = `${((v.x + 1) / 2 * 100).toFixed(2)}%`; tg.style.top = `${((1 - v.y) / 2 * 100).toFixed(2)}%`;
+      tg.style.opacity = vis ? StoryHUD.win(t, T.t0, T.t1, 0.15, 0.15).toFixed(3) : '0';
+    } else tg.style.opacity = '0';
     const n = t >= 58.5 && t < 61.5 ? 3 - Math.floor(t - 58.5) : 0, c = app.count;
     if (n) { if (c._n !== n) { c.textContent = String(n); c._n = n; } const u = (t - 58.5) % 1; c.style.opacity = (Math.min(1, u / 0.08) * (1 - MathX.smooth(u, 0.75, 1))).toFixed(3); c.style.transform = `translate(-50%, -50%) scale(${(1.25 - 0.25 * Math.min(1, u / 0.25)).toFixed(3)})`; }
     else c.style.opacity = '0';
@@ -235,12 +261,15 @@ const FILM = {
       const R = c.ret; if (!R) continue;
       const a = st - FR.tBack;
       W.sample(c.id, st, s);
-      if (R.skid && a < R.skid) for (let i = 0; i < 4; i++) { const h = hash1(i * 13 + c.id.charCodeAt(0) * 7 + Math.floor(st * 20)), ss = Math.sin(s.yaw), cs = Math.cos(s.yaw), lx = (i < 2 ? 1 : -1) * c.v.L * 0.3, lz = (i % 2 ? 1 : -1) * c.v.W * 0.45;
-        P.push(s.x - ss * lx + cs * lz + (h - 0.5) * 0.4, FrGround.h(s.x, s.z) + 0.2 + h * 0.4, s.z - cs * lx - ss * lz, 0.6 + a * 1.2, h * 6, 0.32 * (1 - a / R.skid), 0.92, 0.9, 0.9, 0.92); }
-      if (R.roll && a < R.dur + 0.4 && s.speed > 0.6) for (let i = 0; i < 10; i++) { const h1 = hash1(i * 7 + c.id.length * 31 + Math.floor(st * 30)), h2 = hash1(i * 3 + 5 + Math.floor(st * 30)), dir = Math.atan2(-s.vx, -s.vz) + (h1 - 0.5) * 1.2, len = 0.3 + 0.5 * h2;
+      if (R.skid && !R.roll && a < R.skid && s.speed > 0.3) for (let i = 0; i < 8; i++) { const w = i % 4, h = hash1(i * 13 + c.id.charCodeAt(0) * 7 + Math.floor(st * 24)), ss = Math.sin(s.yaw), cs = Math.cos(s.yaw), lx = (w < 2 ? 1 : -1) * c.v.L * 0.3, lz = (w % 2 ? 1 : -1) * c.v.W * 0.45;
+        P.push(s.x - ss * lx + cs * lz + (h - 0.5) * 0.5 - s.vx * 0.06 * h, FrGround.h(s.x, s.z) + 0.1 + h * 0.35, s.z - cs * lx - ss * lz - s.vz * 0.06 * h, 0.35 + a * 1.5 + h * 0.3, h * 6, 0.24 * (1 - 0.7 * a / R.skid), 0.8, 0.8, 0.82, 0.85); }
+      // …and the tyre smoke hangs where it stopped, drifting and thinning for a few seconds
+      if (R.skid && !R.roll && a > R.skid * 0.6 && a < R.skid + 6) for (let i = 0; i < 4; i++) { const h = hash1(i * 31 + c.id.charCodeAt(0) * 3), k = (a - R.skid * 0.6) / (R.skid * 0.4 + 6);
+        P.push(s.x + (h - 0.5) * 3 + k * 2.5, FrGround.h(s.x, s.z) + 0.5 + k * 1.8 + h * 0.4, s.z + (hash1(i * 7 + 2) - 0.5) * 3 + k * 1.2, 1.4 + k * 3.5, h * 6, 0.14 * (1 - k), 0.82, 0.82, 0.84, 0.8); }
+      if (R.roll && st > R.t0 && st - R.t0 < R.dur + 0.4 && s.speed > 0.3) for (let i = 0; i < 10; i++) { const h1 = hash1(i * 7 + c.id.length * 31 + Math.floor(st * 30)), h2 = hash1(i * 3 + 5 + Math.floor(st * 30)), dir = Math.atan2(-s.vx, -s.vz) + (h1 - 0.5) * 1.2, len = 0.3 + 0.5 * h2;
         const x = s.x + (h2 - 0.5) * c.v.L * 0.6, z = s.z + (h1 - 0.5) * c.v.L * 0.6, y = FrGround.h(x, z) + 0.05;
         G.push(x, y, z, x + Math.sin(dir) * -len, y + 0.15 * h1, z + Math.cos(dir) * -len, 1, 0.75, 0.35, 0.9, 0.018); }
-      if (R.roll) for (const [tl, str] of R.lands) { const age = st - tl; if (age < 0 || age > 1.8) continue; for (let i = 0; i < 6; i++) { const h = hash1(i * 5 + Math.floor(tl * 50)); P.push(s.x + (h - 0.5) * 2.2, FrGround.h(s.x, s.z) + 0.3 + age * 0.5, s.z + (hash1(i * 9) - 0.5) * 2.2, 1.0 + age * 2.2 * str, h * 6, 0.35 * str * (1 - age / 1.8), 0.8, 0.86, 0.8, 0.72); } }
+      if (R.roll) for (const [tl, str] of R.lands) { const age = st - tl; if (age < 0 || age > 1.8) continue; for (let i = 0; i < 14; i++) { const h = hash1(i * 5 + Math.floor(tl * 50)), a2 = h * 6.283, r = (0.6 + 1.6 * hash1(i * 9)) * (1 - Math.exp(-age / 0.3)); P.push(s.x + Math.cos(a2) * r * 1.4, FrGround.h(s.x, s.z) + 0.15 + age * 0.35 * hash1(i * 3), s.z + Math.sin(a2) * r, 0.35 + age * 1.1 * str, h * 6, 0.22 * str * (1 - age / 1.8), 0.6, 0.6, 0.57, 0.72); } }
     }
     P.end(); G.end();
   },
@@ -257,11 +286,11 @@ const FILM = {
     const cd = MathX.smooth(t, 54.6, 61.4) * (1 - MathX.smooth(t, 61.5, 61.7));
     p.vignette += 0.7 * cd; p.tunnel = 1.25 - 0.45 * cd; p.tunnelDark = 0.35 * cd; p.edgeBlur = 0.35 * cd; p.saturation -= 0.3 * cd;
     if (t >= 58.5 && t < 61.5) { const u = (t - 58.5) % 1; p.vignette += 0.25 * Math.exp(-u / 0.15); }   // a heartbeat on each number
-    p.flash = 0.55 * MathX.impulse(t, 61.5, 0.12);
+    p.flash = 0.5 * MathX.impulse(t, 61.5, 0.05);                       // two or three frames, not a whiteout
     const slow = t > FR_SLOW.t0 && t < FR_SLOW.t1 ? 1 : 0;
     p.saturation -= 0.12 * slow; p.contrast += 0.08 * slow;
     // the aftermath: a little haze of settling dust, then a warm, quiet end; black at the very end
-    p.fade = MathX.smooth(t, 74.6, 75.4);
+    p.fade = MathX.smooth(t, 73.7, 74.5);
     // whip pans drag a little (camera-lag trail)
     const app = FILM._app;
     if (app && app.cam) {
@@ -291,9 +320,14 @@ class FrLegs {
       const knee = new THREE.Group(); knee.position.y = -0.46; hip.add(knee);
       const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.058, 0.05, 0.44, 10), jeans); sh.position.y = -0.22; knee.add(sh);
       const ank = new THREE.Group(); ank.position.y = -0.44; knee.add(ank);
-      const s1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.075, 0.27), shoe); s1.position.set(0, -0.03, -0.07); ank.add(s1);
-      const s2 = new THREE.Mesh(new THREE.BoxGeometry(0.105, 0.025, 0.28), sole); s2.position.set(0, -0.075, -0.07); ank.add(s2);
-      for (const m of [th, sh, s1, s2]) { m.castShadow = true; m.receiveShadow = true; }
+      // a trainer: upper, rounded toe box, a thick grey sole with a darker tread line, laces and a blue side stripe
+      const s1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.075, 0.2), shoe); s1.position.set(0, -0.03, -0.035); ank.add(s1);
+      const toe = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 8), shoe); toe.scale.set(1.0, 0.75, 1.25); toe.position.set(0, -0.042, -0.135); ank.add(toe);
+      const s2 = new THREE.Mesh(new THREE.BoxGeometry(0.108, 0.03, 0.29), sole); s2.position.set(0, -0.078, -0.07); ank.add(s2);
+      const tread = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.008, 0.292), Mat.std('#55524c', { roughness: 0.9 })); tread.position.set(0, -0.09, -0.07); ank.add(tread);
+      const lace = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.008, 0.09), Mat.std('#2b3446', { roughness: 0.8 })); lace.position.set(0, 0.009, -0.07); ank.add(lace);
+      for (const sx of [-1, 1]) { const st = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.022, 0.12), Mat.std('#2a6bd1', { roughness: 0.5 })); st.position.set(sx * 0.051, -0.035, -0.05); st.rotation.x = 0.25; ank.add(st); }
+      for (const m of [th, sh, s1, toe, s2]) { m.castShadow = true; m.receiveShadow = true; }
       return { hip, knee, ank };
     };
     this.L = leg(-1); this.R = leg(1);
@@ -305,13 +339,13 @@ class FrLegs {
     if (t < FR.tLoss) { const ph = t * 1.72 * 1.35 * Math.PI; return { L: walk(ph, 0.35), R: walk(ph + Math.PI, 0.35), sit: 0 }; }
     if (t < 3.56) { const k = MathX.smooth(t, 1.5, 1.66) * (1 - MathX.smooth(t, 2.0, 2.6)); return { L: [-0.15 * k, 0.15, 0], R: [1.1 * k, 0.1, -0.3 * k], sit: 0 }; }   // the right foot shoots forward
     if (t < 39.67) { const k = MathX.smooth(t, 4.5, 4.62) * (1 - MathX.smooth(t, 4.9, 5.5)); return { L: [0.05 - 0.2 * k, 0.12, 0], R: [0.15 + 0.7 * k, 0.1, 0], sit: 0 }; }
-    if (t < 67.4) { const w = 0.05 * Math.sin(t * 1.3); return { L: [1.45 + w, 0.15, 0.2], R: [1.35 - w, 0.5, 0.25], sit: 1 }; }                                     // sitting, legs out in front
-    const up = MathX.smooth(t, 67.6, 69.6), step = MathX.smooth(t, 70.4, 70.9) * (1 - MathX.smooth(t, 71.6, 72.4));
-    return { L: [MathX.lerp(1.45, 0.0, up), MathX.lerp(0.15, 0.05, up) + 1.4 * Math.sin(up * Math.PI) * 0.6, 0], R: [MathX.lerp(1.35, 0.0, up) + 0.8 * step, MathX.lerp(0.5, 0.05, up) + 0.9 * Math.sin(up * Math.PI) * 0.6 + 0.2 * step, -0.2 * step], sit: 1 - up };
+    if (t < 69.6) { const w = 0.05 * Math.sin(t * 1.3); return { L: [1.45 + w, 0.15, 0.2], R: [1.35 - w, 0.5, 0.25], sit: 1 }; }                                     // sitting, legs out in front
+    const up = MathX.smooth(t, 69.6, 71.0), step = MathX.smooth(t, 71.0, 71.45) * (1 - MathX.smooth(t, 72.6, 73.4)), lift = Math.sin(Math.PI * MathX.smooth(t, 71.0, 71.45));
+    return { L: [MathX.lerp(1.45, 0.0, up), MathX.lerp(0.15, 0.05, up) + 1.4 * Math.sin(up * Math.PI) * 0.6, 0], R: [MathX.lerp(1.35, 0.0, up) + 0.8 * step, MathX.lerp(0.5, 0.05, up) + 0.9 * Math.sin(up * Math.PI) * 0.6 + 0.2 * step + 0.5 * lift, -0.2 * step], sit: 1 - up };
   }
 
   update(t, cam, show) {
-    this.root.visible = show && t < 74.9;
+    this.root.visible = show && t < 74.2;
     if (!this.root.visible) return;
     const P = this._pose(t), yaw = cam.rotation.y, eye = cam.position.y, ground = FrGround.h(cam.position.x, cam.position.z) - 0.0;
     // the hips sit under and a little behind your eyes (on the ground when you sit)

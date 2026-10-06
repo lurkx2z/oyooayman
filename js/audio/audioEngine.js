@@ -47,6 +47,7 @@ class AudioEngine {
   // a hash of everything the soundtrack is built from: timings, the script's data, film constants and the sound code itself
   fingerprint() {
     let s = `${CONFIG.duration}|${CONFIG.seed}|${this.sampleRate}|${JSON.stringify(SCRIPT)}|`;
+    if (CONFIG.edit) s += JSON.stringify(CONFIG.edit) + '|';
     try { s += JSON.stringify(this.fingerprintData ? this.fingerprintData() : null); } catch (e) { s += 'x'; }
     const add = (proto) => { for (const k of Object.getOwnPropertyNames(proto)) { const d = Object.getOwnPropertyDescriptor(proto, k); s += k + String(d.value || d.get || ''); } };
     for (let p = Object.getPrototypeOf(this); p && p !== Object.prototype; p = Object.getPrototypeOf(p)) add(p);
@@ -119,7 +120,7 @@ class AudioEngine {
     this._build(ctx);
     const buf = await ctx.startRendering();
     AudioEngine.declick(buf);
-    return buf;
+    return Edit.spliceAudio(buf);   // (cut to the film when the film has an edit — see Edit in core/timeline.js)
   }
 
   // Chrome's offline renderer occasionally emits a lone full-scale sample when gain automation lands

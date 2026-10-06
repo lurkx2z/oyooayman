@@ -158,7 +158,8 @@ class FrProps {
       g.add(parts);
       const id = (side > 0 ? 'lampR' : 'lampL') + z, br = this.world.breaks.find((b) => b.id === id);
       let dir = null;
-      if (br) { const s = this.world.sample(br.by, br.t); const sp = Math.hypot(s.vx, s.vz) || 1; dir = [s.vx / sp, s.vz / sp]; }
+      // (it goes over away from the car, and outward — toward the shops — as a post hit off-centre does; seen side-on from the pole)
+      if (br) { const s = this.world.sample(br.by, br.t), v = Math.hypot(s.vx, s.vz) || 1, ox = s.vx + side * v * 1.1, sp = Math.hypot(ox, s.vz) || 1; dir = [ox / sp, s.vz / sp]; }
       this.lamps.push({ g, t: br ? br.t : Infinity, dir });
     }
   }

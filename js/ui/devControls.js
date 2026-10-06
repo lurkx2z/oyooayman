@@ -16,7 +16,7 @@ class DevControls {
     E.scrub.max = String(tl.duration);
     for (const ev of tl.events) {
       const i = document.createElement('i');
-      i.style.left = `${(ev.time / tl.duration) * 100}%`;
+      i.style.left = `${(Edit.film(ev.time) / tl.duration) * 100}%`;   // (event times are story times)
       i.title = `${ev.time.toFixed(2)}s  ${ev.label}`;
       E.markers.appendChild(i);
     }

@@ -13,8 +13,9 @@ class SceneManager {
   constructor() {
     this.canvas = document.getElementById('gl');
     this.stage = document.getElementById('stage');
-    this.tl = new Timeline(CONFIG.duration, SCRIPT.events);
-    this.t = MathX.clamp(CONFIG.startTime, 0, CONFIG.duration);
+    // (with an edit, the timeline runs on film time; everything below update() gets story time — see Edit)
+    this.tl = new Timeline(Edit.duration(), SCRIPT.events);
+    this.t = MathX.clamp(CONFIG.startTime, 0, this.tl.duration);
     this.playing = false;
     this.recording = false;
     this.fps = 0;
@@ -119,12 +120,12 @@ class SceneManager {
 
   /* ---------------- frame ---------------- */
   update(t) {
-    const tl = this.tl;
-    tl.t = t;
-    this.cam.update(t);
-    FILM.update(this, t, tl);
-    this.post.updateFromTimeline(t, tl);
-    this.hud.update(t, this.camera, (target, tt) => this.anchor(target, tt));
+    const tl = this.tl, s = Edit.story(t);
+    tl.t = s;
+    this.cam.update(s);
+    FILM.update(this, s, tl);
+    this.post.updateFromTimeline(s, tl);
+    this.hud.update(s, this.camera, (target, tt) => this.anchor(target, tt));
   }
 
   anchor(target, t) { return FILM.anchor ? FILM.anchor(this, target, t) : null; }
@@ -132,7 +133,7 @@ class SceneManager {
   renderAt(t) {
     this.renderer.info.reset();
     this.update(t);
-    const [scene, camera] = FILM.view ? FILM.view(this, t) : [this.scene, this.camera];
+    const [scene, camera] = FILM.view ? FILM.view(this, Edit.story(t)) : [this.scene, this.camera];
     this.post.render(scene, camera);
   }
 

@@ -101,19 +101,32 @@ class FrTraffic {
     // each car's hits (for body jolts and the sound)
     for (const e of world.events) for (const id of [e.a, e.b]) if (this.byId[id] && e.dv > 1.2) this.byId[id].hits.push(e);
     this.blobs = new BlobShadows(scene, this.cars.length);
-    // friction returns: a car sliding sideways trips on its tyres and rolls (whole quarter turns: on its side, roof, or back on its
-    // wheels); one sliding along its heading skids to a stop with smoking tyres
+    // friction returns (μ 0.8): every sliding tyre bites. A car can't roll from tyre grip alone on flat road (μ is below its
+    // stability factor, ~1.3 for a car) — it skids to a stop with smoking tyres, lurching on its springs; a tall box truck (factor
+    // ~0.8) going sideways rocks up onto two wheels. A car only rolls when its sliding side is tripped — the spinning car,
+    // sideways, hits the kerb of a build-out down the avenue (FR_TRIP) and barrel-rolls over it.
     for (const c of this.cars) {
       const s = world.sample(c.id, FR.tBack - 0.01), hx = -Math.sin(s.yaw), hz = -Math.cos(s.yaw);
       const lon = s.vx * hx + s.vz * hz, lat = s.vx * Math.cos(s.yaw) - s.vz * Math.sin(s.yaw);
       if (s.speed < 0.8) continue;
-      const R = { lat, lon, skid: Math.min(2.4, Math.abs(lon) / 7 + 0.3) };
-      const rollV = c.type === 'truck' ? 2.2 : 2.8;
-      if (Math.abs(lat) > 0.7 && Math.abs(lat) <= rollV) Object.assign(R, { rock: Math.min(0.5, 0.06 + lat * lat * 0.1) * Math.sign(lat), rockDur: 0.5 + Math.abs(lat) * 0.25 });
-      if (Math.abs(lat) > rollV) {
-        const q = Math.max(1, Math.min(5, Math.round(Math.abs(lat) / 2.4)));
-        Object.assign(R, { roll: q * Math.PI / 2 * Math.sign(lat), dur: 0.3 + q * 0.32, lands: [] });
-        for (let i = 1; i <= q; i++) R.lands.push([FR.tBack + 0.12 + (i / q) * (R.dur - 0.12), Math.min(1, Math.abs(lat) / 6)]);
+      const R = { lat, lon, t0: FR.tBack, skid: Math.min(2.4, s.speed / 7 + 0.3) }, tall = c.type === 'truck' || c.type === 'van' || c.type === 'suv';
+      if (c.id === FR_TRIP.id) {
+        const q = FR_TRIP.q, vt = world.sample(c.id, FR_TRIP.t).speed;
+        Object.assign(R, { t0: FR_TRIP.t, roll: q * Math.PI / 2 * Math.sign(lat), dur: 0.3 + q * 0.32, lands: [] });
+        for (let i = 1; i <= q; i++) R.lands.push([R.t0 + 0.12 + (i / q) * (R.dur - 0.12), Math.min(1, vt / 6)]);
+      } else if (Math.abs(lat) > 0.7) {
+        Object.assign(R, { rock: (tall ? Math.min(0.5, 0.06 + lat * lat * 0.1) : Math.min(0.16, 0.04 + lat * lat * 0.03)) * Math.sign(lat), rockDur: 0.5 + Math.abs(lat) * 0.25 });
+      }
+      // black skid marks: each tyre's track from where it bit to where it stopped
+      if (!R.roll) {
+        const e = world.sample(c.id, FR.tBack + 2.5), ss = Math.sin(s.yaw), cs = Math.cos(s.yaw);
+        R.marks = [0, 1, 2, 3].map((w) => {
+          const lx = (w < 2 ? 1 : -1) * c.v.L * 0.3, lz = (w % 2 ? 1 : -1) * c.v.W * 0.42;
+          const m = new THREE.Mesh(this._markGeo || (this._markGeo = new THREE.PlaneGeometry(1, 1)), this._markMat || (this._markMat = new THREE.MeshBasicMaterial({ color: '#141414', transparent: true, opacity: 0.6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 })));
+          m.rotation.order = 'YXZ'; m.visible = false; scene.add(m);
+          return { m, lx, lz };
+        });
+        R.markEnd = e;
       }
       c.ret = R;
     }
@@ -165,10 +178,22 @@ class FrTraffic {
       v.body.rotation.set(roll, 0, pitch);
       v.body.position.y = bounce;
       // rolling over when friction returns: quarter turns about the car's length, lifting it off its wheels as it goes
-      if (c.ret && c.ret.roll && t > FR.tBack) {
-        const R = c.ret, u = MathX.clamp((t - FR.tBack - 0.06) / R.dur, 0, 1), e = 1 - (1 - u) * (1 - u), phi = R.roll * e;
+      if (c.ret && c.ret.roll && t > c.ret.t0) {
+        const R = c.ret, u = MathX.clamp((t - R.t0 - 0.03) / R.dur, 0, 1), e = 1 - (1 - u) * (1 - u), phi = R.roll * e;
         v.group.rotateX(phi);
-        v.group.position.y += (v.W / 2) * Math.abs(Math.sin(phi)) * 0.95 + Math.max(0, Math.sin(u * Math.PI)) * 0.35 * Math.min(1, Math.abs(R.lat) / 6);
+        v.group.position.y += (v.W / 2) * Math.abs(Math.sin(phi)) * 0.95 + Math.max(0, Math.sin(u * Math.PI)) * 0.45 + 0.22 * MathX.smooth(u, 0.2, 0.5);   // (up and over the kerb)
+      }
+      // skid marks growing behind each tyre
+      if (c.ret && c.ret.marks) {
+        const R = c.ret, on = t > FR.tBack + 0.02, a = R.markStart || (R.markStart = W.sample(c.id, FR.tBack, {}));
+        const b = W.sample(c.id, Math.min(t, FR.tBack + 2.5), {}), sa = Math.sin(a.yaw), ca = Math.cos(a.yaw), sb = Math.sin(b.yaw), cb = Math.cos(b.yaw);
+        for (const M of R.marks) {
+          M.m.visible = on; if (!on) continue;
+          const x0 = a.x - sa * M.lx + ca * M.lz, z0 = a.z - ca * M.lx - sa * M.lz, x1 = b.x - sb * M.lx + cb * M.lz, z1 = b.z - cb * M.lx - sb * M.lz;
+          const len = Math.max(0.05, Math.hypot(x1 - x0, z1 - z0)), wide = Math.abs(R.lat) > 0.7 ? 0.32 : 0.2;
+          M.m.position.set((x0 + x1) / 2, FrGround.road((z0 + z1) / 2) + 0.012, (z0 + z1) / 2);
+          M.m.rotation.set(-Math.PI / 2, Math.atan2(-(x1 - x0), -(z1 - z0)), 0); M.m.scale.set(wide, len, 1);
+        }
       }
       // …or lurching up onto two wheels and slamming back down
       if (c.ret && c.ret.rock && t > FR.tBack) {

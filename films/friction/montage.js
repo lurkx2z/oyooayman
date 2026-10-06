@@ -11,12 +11,14 @@
    ===================================================================== */
 
 const FR_MONTAGE = [
-  { id: 'conveyor', t0: 46.5, t1: 48.1, label: 'CONVEYOR BELTS' },
-  { id: 'bike', t0: 48.1, t1: 49.7, label: 'BIKES' },
-  { id: 'crane', t0: 49.7, t1: 51.4, label: 'CRANE BRAKES' },
-  { id: 'grip', t0: 51.4, t1: 52.95, label: 'GRIP' },
-  { id: 'ambulance', t0: 52.95, t1: 54.5, label: 'AMBULANCES' },
+  { id: 'conveyor', t0: 46.5, t1: 47.8, label: 'CONVEYOR BELTS', why: 'The belt moves. The groceries don’t.' },
+  { id: 'bike', t0: 47.8, t1: 49.1, label: 'BIKES', why: 'No grip to steer — so no way to balance.' },
+  { id: 'crane', t0: 49.1, t1: 50.4, label: 'CRANE BRAKES', why: 'Brake pads can’t grip the drum.' },
+  { id: 'grip', t0: 50.4, t1: 51.7, label: 'GRIP', why: 'Tilt anything and it slides off.' },
+  { id: 'ambulance', t0: 51.7, t1: 53.0, label: 'AMBULANCES', why: 'Sirens on. No way to steer or stop.' },
 ];
+// the crane's load: the hoist brake lets go 0.1 s into the shot and the load falls from 5.5 m at nearly g (the drum spins up too)
+const FR_CRANE = { let: 0.1, yTop: 5.5, a: 9.0 };
 
 class FrMontage {
   constructor(scene, factory) {
@@ -110,6 +112,11 @@ class FrMontage {
     this._add(new THREE.BoxGeometry(1.3, 0.12, 1.1), Mat.std('#9c7a4a'), 0, 0.06, 0, this.load);
     for (let i = 0; i < 4; i++) this._add(new THREE.BoxGeometry(1.2, 0.18, 1.0), Mat.std(i % 2 ? '#a5432e' : '#b04a33', { roughness: 0.9 }), 0, 0.21 + i * 0.19, 0, this.load);
     for (const [x, z] of [[-0.6, -0.5], [0.6, -0.5], [-0.6, 0.5], [0.6, 0.5]]) this._add(new THREE.CylinderGeometry(0.012, 0.012, 1.4, 4), Mat.std('#2a2a2a'), x * 0.5, 1.4, z * 0.5, this.load, z * 0.4, 0, -x * 0.4);
+    // the site hoarding all round and a couple of cabins, so the yard has edges
+    const ply = Mat.std('#b89a6a', { roughness: 0.9 }), cab = Mat.std('#e2e0d8', { roughness: 0.7 }), cabB = Mat.std('#2f5f8a', { roughness: 0.6 });
+    for (let k = 0; k < 28; k++) { const a = (k / 28) * Math.PI * 2, r = 24; A(new THREE.BoxGeometry(5.6, 3.0, 0.12), ply, 4 + Math.cos(a) * r, 1.5, -6 + Math.sin(a) * r, 0, -a + Math.PI / 2, 0); }
+    for (const [x, z, ry, m] of [[-9, -2, 0.2, cab], [-9.5, 1.2, 0.2, cabB], [16, -2, -0.4, cab]]) { A(new THREE.BoxGeometry(6, 2.6, 2.4), m, x, 1.3, z, 0, ry, 0); }
+    for (let i = 0; i < 5; i++) A(new THREE.BoxGeometry(1.2, 0.7, 1.0), Mat.std(i % 2 ? '#a5432e' : '#b04a33', { roughness: 0.9 }), 13 + i * 1.3, 0.35, 2.5, 0, 0.1 * i, 0);
     this.workers = [0, 1].map((i) => { const p = new Person({ id: 'worker' + i, look: 'worker' }, null); g.add(p.root); p.root.position.set(this.trolleyX - 3.5 + i * 6.5, 0, -6 - i * 2); p.root.rotation.y = i ? 2.4 : -0.6; return p; });
   }
 
@@ -117,7 +124,10 @@ class FrMontage {
   _grip() {
     const g = new THREE.Group(); g.position.set(760, 0, 330); this.root.add(g); this.gripG = g;
     const A = (geo, mat, x, y, z, rx, ry, rz) => this._add(geo, mat, x, y, z, g, rx, ry, rz);
-    A(new THREE.BoxGeometry(14, 0.1, 10), Mat.std('#b9b0a2', { roughness: 0.8 }), 0, -0.05, 0);
+    A(new THREE.BoxGeometry(14, 0.1, 10), Mat.std('#6e5038', { roughness: 0.7 }), 0, -0.05, 0);   // a dark wooden café floor
+    for (let i = -6; i <= 6; i++) A(new THREE.BoxGeometry(0.02, 0.005, 10), Mat.std('#5a402c'), i * 0.9, 0.002, 0);
+    for (const [x, z] of [[-1.4, 1.6], [1.5, 2.2], [-3.4, 0.4]]) { A(new THREE.CylinderGeometry(0.36, 0.36, 0.03, 16), Mat.std('#e4e0d6'), x, 0.74, z); A(new THREE.CylinderGeometry(0.03, 0.03, 0.72, 6), Mat.std('#2c3034'), x, 0.37, z);
+      const ch = FrPropKit.chair(); ch.position.set(x + 0.55, 0, z + 0.2); ch.rotation.y = -1.2; g.add(ch); }
     const wall = Tex.storefront(SHOPS[0], 901);
     A(new THREE.PlaneGeometry(8, 4.2), new THREE.MeshStandardMaterial({ map: wall.map, emissiveMap: wall.emissiveMap, emissive: '#ffffff', emissiveIntensity: 0.5, roughness: 1 }), 0, 2.1, -2.5);
     for (const x of [-2.7, 2.4]) { A(new THREE.CylinderGeometry(0.36, 0.36, 0.03, 16), Mat.std('#e4e0d6'), x, 0.74, -1.2); A(new THREE.CylinderGeometry(0.03, 0.03, 0.72, 6), Mat.std('#2c3034'), x, 0.37, -1.2); }
@@ -163,7 +173,7 @@ class FrMontage {
       this.beltTex.offset.y = -t * 1.4;                                              // the belt runs at ~0.55 m/s
       const P = basePose(); P.lSh = [1.3, 0.5]; P.rSh = [1.2, 0.6]; P.lEl = 1.4; P.rEl = 1.5; P.neck = 0.35; P.spine = 0.1; P.headYaw = -0.4 + 0.15 * Math.sin(u * 3);
       this.cashier.apply(P); this.cashier.root.updateMatrixWorld(true);
-      Object.assign(cam, { x: 700 - 0.5, y: 1.62, z: 300 + 1.15, yaw: 8 + u * 3, pitch: -42, fov: 62 });
+      Object.assign(cam, { x: 700 - 0.35, y: 1.38, z: 300 + 0.78, yaw: 10 + u * 3, pitch: -34, fov: 54 });
     } else if (S.id === 'bike') {
       this.bikeG.visible = true;
       // gliding west along the cross street at 5 m/s; it can't steer to stay up, so it leans over and goes down, still sliding
@@ -181,15 +191,17 @@ class FrMontage {
       Object.assign(cam, { x: -50.5, y: 1.25, z: -27.5, yaw: Math.atan2(-(x + 50.5), -(z0 + 27.5)) * 180 / Math.PI + 4, pitch: -7, fov: 58 });
     } else if (S.id === 'crane') {
       this.craneG.visible = true;
-      // the brake lets go at 0.25 s: the load falls (≈ 0.8 g — the drum spins up too) and hits at ~1.4 s
-      const yTop = 9.0, a = 8.0, uf = Math.max(0, u - 0.25), y = Math.max(0, yTop - 0.5 * a * uf * uf), hitU = 0.25 + Math.sqrt(2 * yTop / a);
+      // the brake lets go (FR_CRANE.let): the load falls at nearly g — the drum just spins up — and hits within the shot
+      const C = FR_CRANE, yTop = C.yTop, a = C.a, uf = Math.max(0, u - C.let), y = Math.max(0, yTop - 0.5 * a * uf * uf), hitU = C.let + Math.sqrt(2 * yTop / a);
       this.load.position.set(this.trolleyX, y, -10);
       this.load.rotation.set(0, 0.3 + uf * 0.4, u > hitU ? 0.08 : 0);
       const top = 33.6, bot = y + 2.4; this.cable.position.set(this.trolleyX, (top + bot) / 2, -10); this.cable.scale.y = top - bot;
       this.workers.forEach((w, i) => { const P = u > 0.55 ? ACTIONS.recoil(u - 0.55, { seed: i }) : ACTIONS.look(u, { seed: i, seedI: i }); w.apply(P); w.root.updateMatrixWorld(true); });
       if (u > hitU) for (let i = 0; i < 26; i++) { const h = hash1(i * 7 + 3), age = u - hitU, a2 = h * Math.PI * 2, r = (1 + 3 * hash1(i * 3)) * (1 - Math.exp(-age / 0.4)); this.dust.push(860 + this.trolleyX + Math.cos(a2) * r, 0.3 + age * 1.2 * hash1(i), 290 + Math.sin(a2) * r, 1 + age * 3, h * 6, 0.45 * Math.exp(-age / 0.8), 0.7, 0.84, 0.76, 0.64); }
       const shake = u > hitU ? Math.exp(-(u - hitU) / 0.25) : 0;
-      Object.assign(cam, { x: 860 + this.trolleyX - 1, y: 1.6, z: 300 + 3.5, yaw: 6 + shake * Math.sin(u * 70) * 1.5, pitch: 38 - Math.min(1, uf / 1.1) * 30 + shake * Math.sin(u * 60) * 1.5, fov: 64 });
+      // (the head follows the load down, a beat late)
+      const yl = Math.max(0.6, yTop - 0.5 * a * Math.max(0, uf - 0.08) ** 2) + 0.6;
+      Object.assign(cam, { x: 860 + this.trolleyX - 1, y: 1.6, z: 300 + 3.5, yaw: 4 + shake * Math.sin(u * 70) * 1.5, pitch: Math.atan2(yl - 1.6, 13.5) * 180 / Math.PI + shake * Math.sin(u * 60) * 1.5, fov: 54 });
     } else if (S.id === 'grip') {
       this.gripG.visible = true;
       // the tray tilts a few degrees as he flinches; on a frictionless tray that's all it takes
@@ -218,7 +230,9 @@ class FrMontage {
       this.amb.group.position.set(x, 0, z); this.amb.group.rotation.y = yaw;
       for (const w of this.amb.wheels) w.rotation.z = -t * 12;
       this.lightR.color.set(flash ? '#ff3030' : '#3a0a0a'); this.lightB.color.set(flash ? '#0a1a3a' : '#3a7bff');
-      Object.assign(cam, { x: 63.5, y: 1.5, z: -21.0, yaw: -72 + u * 22, pitch: -3, fov: 60 });   // (further down the street than the taxi that slid this way)
+      // (from a first-floor window, further down the street than the taxi that slid this way: the van points one way and goes another)
+      const cx = 66 - 3.5 * u, cy = 6.2, cz = -19.6, ax = x, az = z;
+      Object.assign(cam, { x: cx, y: cy, z: cz, yaw: Math.atan2(-(ax - cx), -(az - cz)) * 180 / Math.PI, pitch: Math.atan2(1.0 - cy, Math.hypot(ax - cx, az - cz)) * 180 / Math.PI, fov: 54 });
     }
     this.glints.end(); this.dust.end();
     return cam;

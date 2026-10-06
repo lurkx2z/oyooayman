@@ -69,6 +69,64 @@ class SmoothTrack {
 /**
  * Timeline: the clock plus the list of named story events.
  */
+/**
+ * Edit — an optional cut of one continuous take (CONFIG.edit). A film is authored on a single continuous story
+ * clock (camera, script, simulation, sound); CONFIG.edit lists the story intervals that are kept, in order, as
+ * [from, to, speed = 1] — speed below 1 plays that stretch in slow motion. Playback, recording and the soundtrack
+ * follow the cut; nothing else needs to know. Without CONFIG.edit film time and story time are the same.
+ */
+const Edit = {
+  _segs() {
+    const E = CONFIG.edit;
+    if (!E || !E.length) return null;
+    if (this._src !== E) {
+      let f = 0;
+      this._list = E.map(([s0, s1, k = 1]) => { const g = { s0, s1, k, f0: f, f1: f + (s1 - s0) / k }; f = g.f1; return g; });
+      this._src = E;
+    }
+    return this._list;
+  },
+  on() { return !!this._segs(); },
+  // length of the cut film (the story's length when there is no edit)
+  duration() { const L = this._segs(); return L ? L[L.length - 1].f1 : CONFIG.duration; },
+  // film time → story time
+  story(t) {
+    const L = this._segs();
+    if (!L) return t;
+    for (const g of L) if (t < g.f1) return g.s0 + Math.max(0, t - g.f0) * g.k;
+    const g = L[L.length - 1]; return g.s1 + (t - g.f1);
+  },
+  // story time → film time (a moment inside a cut maps to the cut)
+  film(s) {
+    const L = this._segs();
+    if (!L) return s;
+    for (const g of L) { if (s < g.s0) return g.f0; if (s < g.s1) return g.f0 + (s - g.s0) / g.k; }
+    const g = L[L.length - 1]; return g.f1 + (s - g.s1);
+  },
+  // the soundtrack, rendered on the story clock, cut to the film: slow stretches are resampled (so they drop in pitch,
+  // like slowed film sound) and every join is crossfaded over 25 ms
+  spliceAudio(buf) {
+    const L = this._segs();
+    if (!L) return buf;
+    const sr = buf.sampleRate, n = Math.ceil((this.duration() + 1.5) * sr), X = Math.round(0.025 * sr);
+    const out = new AudioBuffer({ numberOfChannels: buf.numberOfChannels, length: n, sampleRate: sr });
+    for (let c = 0; c < buf.numberOfChannels; c++) {
+      const src = buf.getChannelData(c), dst = out.getChannelData(c);
+      const at = (p) => { const i = Math.floor(p), u = p - i; return i < 0 || i + 1 >= src.length ? 0 : src[i] * (1 - u) + src[i + 1] * u; };
+      L.forEach((g, j) => {
+        const i0 = Math.round(g.f0 * sr), i1 = j === L.length - 1 ? n : Math.round(g.f1 * sr), prev = L[j - 1];
+        for (let i = i0; i < i1; i++) {
+          const tf = i / sr - g.f0;
+          let v = at((g.s0 + tf * g.k) * sr);
+          if (prev && i - i0 < X) { const w = (i - i0) / X; v = v * w + at((prev.s1 + tf * prev.k) * sr) * (1 - w); }
+          dst[i] = v;
+        }
+      });
+    }
+    return out;
+  },
+};
+
 class Timeline {
   constructor(duration, events) {
     this.duration = duration;
