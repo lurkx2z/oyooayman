@@ -32,9 +32,9 @@
 // the people: [id, look, path [[N, x, z]…] on the people clock sxN, states [[N, action]…], opts { face (deg, direction they face when still), seat }]
 const SX_PEOPLE = [
   ['A1', 'casual3', [[0, 10.3, -4.0], [60, 10.3, -76]], [[0, 'walk']]],
-  ['A3', 'casual2', [[0, 11.35, -23.94]], [[0, 'sit']], { face: 180, seat: 0.45 }],
-  ['A4', 'casual8', [[0, 11.35, -27.26]], [[0, 'sit']], { face: 0, seat: 0.45 }],
-  ['A5', 'casual6', [[0, 11.95, -20.3]], [[0, 'talk']], { face: -116 }],
+  ['A3', 'casual2', [[0, 11.35, -23.94]], [[0, 'sit']], { face: 0, seat: 0.45 }],
+  ['A4', 'casual8', [[0, 11.35, -27.26]], [[0, 'sit']], { face: 180, seat: 0.45 }],
+  ['A5', 'casual6', [[0, 11.3, -17.1]], [[0, 'talk']], { face: 43.4 }],
   ['B1', 'casual1', [[0, -9.6, -46], [22, -9.6, -19], [28, -9.6, -19], [50, -9.6, -45], [56, -9.6, -45], [80, -9.6, -16]], [[0, 'walk'], [22, 'look'], [28, 'walk'], [50, 'phone'], [56, 'walk']]],
   ['B2', 'casual4', [[0, -10.4, -4], [30, -10.4, -35.5]], [[0, 'walk'], [30, 'phone']], { face: 90 }],
   ['B3', 'casual5', [[0, -9.3, -80], [70, -9.3, -10]], [[0, 'walk']]],
@@ -298,7 +298,7 @@ class SxPigeons {
 
 /* ---------------- the ball: rolls off the awning, bounces twice, then runs exactly backwards ---------------- */
 const SX_BALL = (() => {
-  const A = SX_CITY.awning, r = 0.11, g = 9.81, e = 0.62, z = -16.6;
+  const A = SX_CITY.awning, r = 0.11, g = 9.81, e = 0.62, z = -19.4;
   const roll = 0.4, xs = 11.55, xe = A.x0 + 0.02, vx = -0.9;
   const ye = A.y0 + r + 0.02, yg = LAYOUT.curbH + r, tf = Math.sqrt(2 * (ye - yg) / g), v1 = g * tf * e, tb = 2 * v1 / g;
   const tImp1 = roll + tf, tImp2 = tImp1 + tb;

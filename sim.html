@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What If You Realized You Were in a Simulation?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* the channel's title: centred, line by line */
+    #hud .sx-title { top: calc(var(--u) * 470); }
+    #hud .sx-title::before { background: radial-gradient(closest-side, rgba(6, 7, 10, 0.62), rgba(6, 7, 10, 0.28) 62%, rgba(6, 7, 10, 0)); }
+    #hud .sx-title .kick, #hud .sx-title .hero { display: block; }
+    #hud .sx-title .kick { font-size: calc(var(--u) * 60); }
+    #hud .sx-title .hero { font-size: calc(var(--u) * 92); }
+    #hud .story-caption { font-size: calc(var(--u) * 54); top: calc(var(--u) * 1290); padding: calc(var(--u) * 14) calc(var(--u) * 30); border-radius: calc(var(--u) * 18);
+      background: rgba(6, 7, 10, 0.45); text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.9); }
+    #hud .sx-cap.turned { font-style: normal; letter-spacing: 0.02em; }
+    #hud .sx-cap.loud { font-weight: 600; letter-spacing: 0.06em; text-shadow: calc(var(--u) * -3) 0 rgba(255, 40, 60, 0.6), calc(var(--u) * 3) 0 rgba(40, 200, 255, 0.6), 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.9); }
+    /* the house readout */
+    #hud .sx-status { top: calc(var(--u) * 220); left: calc(var(--u) * 40); padding: calc(var(--u) * 14) calc(var(--u) * 24); border-radius: calc(var(--u) * 20); background: rgba(8, 10, 14, 0.34); }
+    #hud .sx-status .label { font-size: calc(var(--u) * 34); letter-spacing: 0.14em; color: #fff; text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9); }
+    #hud .sx-status .value { font-size: calc(var(--u) * 84); margin-top: calc(var(--u) * 6); text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.75); }
+    #hud .sx-status.red .value { color: #ff4a3d; }
+    /* his words */
+    #hud .story-say { top: calc(var(--u) * 1470); font-size: calc(var(--u) * 50); font-weight: 600; padding: calc(var(--u) * 12) calc(var(--u) * 30);
+      background: rgba(10, 11, 14, 0.62); border-radius: calc(var(--u) * 14); letter-spacing: 0.01em; }
+    /* the system: monospace, small, letter-spaced, camera-locked */
+    #hud .sx-sys { position: absolute; left: 0; right: 0; top: calc(var(--u) * 820); text-align: center; font-family: 'JetBrains Mono', monospace; color: #f2f4f6; }
+    #hud .sx-sys .a { font-size: calc(var(--u) * 58); font-weight: 600; letter-spacing: 0.24em; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.85); }
+    #hud .sx-sys .b { font-size: calc(var(--u) * 36); letter-spacing: 0.26em; margin-top: calc(var(--u) * 26); opacity: 0.92; text-shadow: 0 0 calc(var(--u) * 12) rgba(0, 0, 0, 0.85); }
+    #hud .sx-sys.session { top: calc(var(--u) * 250); }
+    #hud .sx-sys .alarm { display: inline-block; font-size: calc(var(--u) * 40); font-weight: 600; letter-spacing: 0.16em; color: #fff; background: rgba(200, 24, 32, 0.86);
+      padding: calc(var(--u) * 18) calc(var(--u) * 28); border: calc(var(--u) * 3) solid rgba(255, 255, 255, 0.85); }
+    #hud .sx-count { position: absolute; left: 0; right: 0; top: calc(var(--u) * 300); text-align: center; font-family: 'JetBrains Mono', monospace; color: #fff; text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.85); }
+    #hud .sx-count .l { font-size: calc(var(--u) * 40); letter-spacing: 0.3em; }
+    #hud .sx-count .n { font-size: calc(var(--u) * 180); font-weight: 600; line-height: 1.1; }
+    #hud .sx-play { position: absolute; left: calc(var(--u) * 40); top: calc(var(--u) * 220); font-family: 'JetBrains Mono', monospace; color: #f2f4f6;
+      padding: calc(var(--u) * 14) calc(var(--u) * 22); border: calc(var(--u) * 2) solid rgba(255, 255, 255, 0.7); background: rgba(6, 8, 10, 0.45); }
+    #hud .sx-play .l { font-size: calc(var(--u) * 28); letter-spacing: 0.24em; }
+    #hud .sx-play .v { font-size: calc(var(--u) * 76); font-weight: 600; letter-spacing: 0.04em; margin-top: calc(var(--u) * 6); font-variant-numeric: tabular-nums; }
+    /* engine debug labels */
+    #hud .sx-dbg { position: absolute; inset: 0; display: none; }
+    #hud .sx-dbg svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #hud .sx-dbg path { fill: none; stroke: #ffd84a; stroke-width: 2.6; vector-effect: non-scaling-stroke; }
+    #hud .sx-tag { position: absolute; font-family: 'JetBrains Mono', monospace; background: rgba(255, 216, 74, 0.94); color: #111; padding: calc(var(--u) * 5) calc(var(--u) * 10); white-space: nowrap; }
+    #hud .sx-tag b { display: block; font-size: calc(var(--u) * 28); font-weight: 600; }
+    #hud .sx-tag span { display: block; font-size: calc(var(--u) * 19); opacity: 0.8; }
+    /* the crack, over everything */
+    #stage .sx-crack { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; display: none; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <!-- Cinematic HUD (built by js/ui/storyHud.js from SCRIPT.hud; stays visible in Recording Mode) -->
+      <div id="hud"></div>
+    </div>
+  </div>
+
+  <!-- Developer controls (hidden in Recording Mode) -->
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What if you realized you were in a simulation?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">LOADING THE STREET…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <!-- Three.js (bundled locally — no internet or server needed) -->
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/world/environment.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (shot plan: films/sim/PLAN.md) -->
+  <script src="films/sim/script.js"></script>
+  <script src="films/sim/city.js"></script>
+  <script src="films/sim/actors.js"></script>
+  <script src="films/sim/aware.js"></script>
+  <script src="films/sim/glitch.js"></script>
+  <script src="films/sim/audio.js"></script>
+  <script src="films/sim/film.js"></script>
+  <script src="films/sim/soundtrack.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

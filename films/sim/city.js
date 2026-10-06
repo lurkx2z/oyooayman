@@ -204,7 +204,7 @@ class SimCity extends Environment {
       B.add(new THREE.SphereGeometry(0.14, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), m.red, Geo.matrix(x, h + 0.6, z));
       B.add(new THREE.CylinderGeometry(0.05, 0.05, 0.42, 6), m.red, Geo.matrix(x, h + 0.42, z, 0, 0, Math.PI / 2));
     }
-    for (const [x, z] of [[7.75, 2.5], [-7.8, -3], [7.75, -33]]) {
+    for (const [x, z] of [[7.75, 9.5], [-7.8, -3], [7.75, -33]]) {
       B.add(new THREE.CylinderGeometry(0.3, 0.27, 0.95, 12), m.metalGreen, Geo.matrix(x, h + 0.475, z));
       B.add(new THREE.CylinderGeometry(0.33, 0.33, 0.08, 12), m.metalGreen, Geo.matrix(x, h + 0.99, z));
     }
@@ -265,8 +265,8 @@ class SimCity extends Environment {
     // A-board and two planters
     const ab = Tex.label([['CAFÉ', 46], ['AROMA', 46], ['coffee · cake', 26]], { w: 192, h: 256, bg: '#1f2a24', fg: '#f3e9d2', border: '#f3e9d2' });
     const abm = new THREE.MeshStandardMaterial({ map: ab, roughness: 0.7 });
-    for (const s of [-1, 1]) B.add(new THREE.PlaneGeometry(0.55, 0.8), abm, Geo.matrix(10.25 + s * 0.11, h + 0.4, -16.2, 0, s > 0 ? Math.PI / 2 : -Math.PI / 2, 0, 1, 1, 1).multiply(new THREE.Matrix4().makeRotationX(-0.14)));
-    for (const z of [-16.9, -27.8]) {
+    for (const s of [-1, 1]) B.add(new THREE.PlaneGeometry(0.55, 0.8), abm, Geo.matrix(10.2 + s * 0.11, h + 0.4, -15.6, 0, s > 0 ? Math.PI / 2 : -Math.PI / 2, 0, 1, 1, 1).multiply(new THREE.Matrix4().makeRotationX(-0.14)));
+    for (const z of [-27.8]) {
       B.add(new THREE.CylinderGeometry(0.32, 0.26, 0.55, 10), Mat.std('#6b5a4a', { roughness: 0.9 }), Geo.matrix(12.0, h + 0.28, z));
       B.add(new THREE.IcosahedronGeometry(0.42, 1), this.m.foliage, Geo.matrix(12.0, h + 0.85, z), { color: '#3f5a2c' });
     }
