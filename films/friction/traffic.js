@@ -67,14 +67,22 @@ class FrTraffic {
     bx.fillStyle = gr; bx.beginPath(); bx.arc(64, 64, 64, 0, Math.PI * 2); bx.fill();
     for (let a = 0; a < 12; a++) { bx.strokeStyle = 'rgba(200,200,205,0.18)'; bx.lineWidth = 3; bx.beginPath(); bx.arc(64, 64, 22 + a * 3, a, a + 2.2); bx.stroke(); }
     const blurTex = Tex.tex(bc, { repeat: false });
+    // a high-contrast five-spoke wheel face, so a spinning wheel and a still one look different
+    const sc = Tex.canvas(128, 128), sx = sc.getContext('2d');
+    sx.fillStyle = '#18181a'; sx.beginPath(); sx.arc(64, 64, 64, 0, Math.PI * 2); sx.fill();
+    sx.fillStyle = '#d9dde0'; sx.beginPath(); sx.arc(64, 64, 44, 0, Math.PI * 2); sx.fill();
+    sx.fillStyle = '#2a2c30'; for (let k = 0; k < 5; k++) { const a = k * Math.PI * 2 / 5 + 0.3; sx.beginPath(); sx.moveTo(64, 64); sx.arc(64, 64, 40, a, a + 0.55); sx.closePath(); sx.fill(); }
+    sx.fillStyle = '#9aa0a6'; sx.beginPath(); sx.arc(64, 64, 9, 0, Math.PI * 2); sx.fill();
+    const spokeTex = Tex.tex(sc, { repeat: false });
     const all = FR_CARS.map(([id, type, color, , , , , o]) => ({ id, type, color, o: o || {} })).concat(FR_PARKED.map(([id, type, color]) => ({ id, type, color, o: { actions: [[0, 'brake']] }, parked: true })));
     for (const c of all) {
       const v = c.type === 'truck' ? frBuildTruck(this.factory, c.color) : this.factory.build(c.type, c.color);
       v.group.name = 'veh:' + c.id;
       scene.add(v.group);
       c.v = v;
-      c.steer = new Track(c.o.steer || [[0, 0]], 'linear');
-      c.actions = c.o.actions || [[0, 'roll']];
+      // (driver inputs are authored on the scenario clock: shift them onto the film's)
+      c.steer = new Track((c.o.steer || [[0, 0]]).map(([t, v]) => [t - FR.shift, v]), 'linear');
+      c.actions = (c.o.actions || [[0, 'roll']]).map(([t, a]) => [t - FR.shift, a]);
       // blur discs on both faces of every wheel (outer face only needed, but cars get turned around)
       c.blur = v.wheels.map((w) => {
         const m = new THREE.Mesh(new THREE.CircleGeometry(v.r * 0.98, 20), new THREE.MeshBasicMaterial({ map: blurTex, transparent: true, depthWrite: false, opacity: 0, side: THREE.DoubleSide }));
@@ -82,6 +90,10 @@ class FrTraffic {
         w.add(m);
         return m;
       });
+      for (const w of v.wheels) {
+        const m = new THREE.Mesh(new THREE.CircleGeometry(v.r * 0.97, 24), new THREE.MeshStandardMaterial({ map: spokeTex, roughness: 0.5, metalness: 0.3, side: THREE.DoubleSide }));
+        m.position.z = w.position.z > 0 ? 0.118 : -0.118; w.add(m);
+      }
       c.hits = [];
       this.cars.push(c);
     }
@@ -89,6 +101,22 @@ class FrTraffic {
     // each car's hits (for body jolts and the sound)
     for (const e of world.events) for (const id of [e.a, e.b]) if (this.byId[id] && e.dv > 1.2) this.byId[id].hits.push(e);
     this.blobs = new BlobShadows(scene, this.cars.length);
+    // friction returns: a car sliding sideways trips on its tyres and rolls (whole quarter turns: on its side, roof, or back on its
+    // wheels); one sliding along its heading skids to a stop with smoking tyres
+    for (const c of this.cars) {
+      const s = world.sample(c.id, FR.tBack - 0.01), hx = -Math.sin(s.yaw), hz = -Math.cos(s.yaw);
+      const lon = s.vx * hx + s.vz * hz, lat = s.vx * Math.cos(s.yaw) - s.vz * Math.sin(s.yaw);
+      if (s.speed < 0.8) continue;
+      const R = { lat, lon, skid: Math.min(2.4, Math.abs(lon) / 7 + 0.3) };
+      const rollV = c.type === 'truck' ? 2.2 : 2.8;
+      if (Math.abs(lat) > 0.7 && Math.abs(lat) <= rollV) Object.assign(R, { rock: Math.min(0.5, 0.06 + lat * lat * 0.1) * Math.sign(lat), rockDur: 0.5 + Math.abs(lat) * 0.25 });
+      if (Math.abs(lat) > rollV) {
+        const q = Math.max(1, Math.min(5, Math.round(Math.abs(lat) / 2.4)));
+        Object.assign(R, { roll: q * Math.PI / 2 * Math.sign(lat), dur: 0.3 + q * 0.32, lands: [] });
+        for (let i = 1; i <= q; i++) R.lands.push([FR.tBack + 0.12 + (i / q) * (R.dur - 0.12), Math.min(1, Math.abs(lat) / 6)]);
+      }
+      c.ret = R;
+    }
     this._q = new THREE.Quaternion(); this._q2 = new THREE.Quaternion(); this._x = new THREE.Vector3(1, 0, 0); this._y = new THREE.Vector3(0, 1, 0); this._s = {};
   }
 
@@ -136,6 +164,17 @@ class FrTraffic {
       if (act === 'gas' && t > FR.tLoss) bounce += Math.sin(t * 70 + c.id.length) * 0.004;
       v.body.rotation.set(roll, 0, pitch);
       v.body.position.y = bounce;
+      // rolling over when friction returns: quarter turns about the car's length, lifting it off its wheels as it goes
+      if (c.ret && c.ret.roll && t > FR.tBack) {
+        const R = c.ret, u = MathX.clamp((t - FR.tBack - 0.06) / R.dur, 0, 1), e = 1 - (1 - u) * (1 - u), phi = R.roll * e;
+        v.group.rotateX(phi);
+        v.group.position.y += (v.W / 2) * Math.abs(Math.sin(phi)) * 0.95 + Math.max(0, Math.sin(u * Math.PI)) * 0.35 * Math.min(1, Math.abs(R.lat) / 6);
+      }
+      // …or lurching up onto two wheels and slamming back down
+      if (c.ret && c.ret.rock && t > FR.tBack) {
+        const R = c.ret, u = MathX.clamp((t - FR.tBack) / R.rockDur, 0, 1), k = Math.sin(Math.PI * Math.min(1, u * 1.15)) * (u < 1 ? 1 : 0) + (u >= 0.87 ? Math.exp(-(t - FR.tBack - R.rockDur * 0.87) / 0.08) * Math.sin((t - FR.tBack - R.rockDur * 0.87) * 40) * 0.08 : 0);
+        v.group.rotateX(R.rock * Math.max(0, k)); v.group.position.y += (v.W / 2) * Math.abs(Math.sin(R.rock * Math.max(0, k))) * 0.5;
+      }
       // the truck's roll-up door flies up on its big hit
       if (v.door) {
         const h = W.byId.T.bigHit, open = h !== undefined ? MathX.smooth(t, h + 0.05, h + 0.35) : 0;

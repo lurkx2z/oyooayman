@@ -5,7 +5,7 @@
      title:    { in, out, html, cls, fi, fo }     a serif title (cls adds a style, e.g. 'big'; fi / fo: fade times)
      stack:    [{ t, until, lines: [[t, text]] }] short lines that appear one by one
      captions: [{ t, until, text }]               one narration line at a time
-     readouts: [{ from, until, label, value, unit, sub, ctx }]
+     readouts: [{ from, until, label, value, unit, sub, ctx }]   (value, sub and ctx may be functions of t)
                                                   the top-left info block (value may be a function of t)
      endLine:  { t, until, text }                 the closing line
      notes:    [{ t, until, text }]               a small, quiet line (e.g. a closing health note)
@@ -33,10 +33,10 @@ class StoryHUD {
       d.style.top = `calc(var(--u) * ${R.top || 236 + i * 230})`;
       d.querySelector('.label').textContent = R.label || '';
       d.querySelector('.unit').textContent = R.unit || '';
-      d.querySelector('.sub').textContent = R.sub || '';
-      d.querySelector('.ctx').textContent = R.ctx || '';
+      d.querySelector('.sub').textContent = typeof R.sub === 'function' ? '' : R.sub || '';
+      d.querySelector('.ctx').textContent = typeof R.ctx === 'function' ? '' : R.ctx || '';
       d.style.opacity = '0';
-      return { R, el: d, v: d.querySelector('.v') };
+      return { R, el: d, v: d.querySelector('.v'), sub: d.querySelector('.sub'), ctx: d.querySelector('.ctx') };
     });
     this.endLine = mk('story-end');
     this.note = mk('story-note');
@@ -71,6 +71,8 @@ class StoryHUD {
       this._set('ro' + i, r.el, 'opacity', W(t, R.from, R.until, 0.6, 0.6).toFixed(3));
       const v = typeof R.value === 'function' ? R.value(t) : R.value;
       if (this._last['rv' + i] !== v) { r.v.textContent = v; this._last['rv' + i] = v; }
+      // (sub and ctx lines may also be functions of t)
+      for (const k of ['sub', 'ctx']) if (typeof R[k] === 'function') { const s = R[k](t); if (this._last[k + i] !== s) { r[k].textContent = s; this._last[k + i] = s; } }
     });
     for (const [key, el, list] of [['note', this.note, H.notes], ['say', this.say, H.says]]) {
       const it = (list || []).find((c) => t >= c.t && t < c.until);

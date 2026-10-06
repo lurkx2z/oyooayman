@@ -48,7 +48,8 @@ const HAND_POSES = {
 };
 const HAND_BLEND = { hidden: 0.38, ear: 0.13, reach: 0.5, look: 0.55, brace: 0.32 };
 
-// options (all optional): scale (0.85 ≈ a 10-year-old), skin / nail / sleeve / cuff colours, watch (bool),
+// options (all optional): scale (0.85 ≈ a 10-year-old), skin / nail / sleeve / cuff colours, watch (bool), sleeveLen (m, default 0.42),
+// sleeveFit (sleeve girth multiplier, default 1),
 // poses / blends (extra or replacement poses for this film), script (the hand keyframes; default SCRIPT.hands).
 // Props can be parented to hands.right.g / hands.left.g (they follow the wrist).
 class ViewerHands {
@@ -87,7 +88,8 @@ class ViewerHands {
     const M = this.mats, g = new THREE.Group();
     // forearm skin above the cuff, sleeve and cuff
     this._mesh(smoothLoft([[-0.09, 0.031, 0.023], [-0.04, 0.029, 0.021], [0.004, 0.027, 0.0185]], 12), M.skin, g);
-    this._mesh(smoothLoft([[-0.42, 0.058, 0.052], [-0.2, 0.051, 0.046], [-0.078, 0.046, 0.041], [-0.074, 0.044, 0.039]], 14, 0.1, 0.1), M.sleeve, g);
+    { const L = this.o.sleeveLen || 0.42, f = this.o.sleeveFit || 1;   // a longer sleeve runs out of frame instead of showing its end
+      this._mesh(smoothLoft([[-L, 0.058 * f, 0.052 * f], [-0.2, 0.051 * f, 0.046 * f], [-0.078, 0.046 * Math.min(1, f + 0.08), 0.041 * Math.min(1, f + 0.08)], [-0.074, 0.044 * Math.min(1, f + 0.08), 0.039 * Math.min(1, f + 0.08)]], 14, 0.1, 0.1), M.sleeve, g); }
     this._mesh(smoothLoft([[-0.078, 0.047, 0.042], [-0.05, 0.046, 0.041], [-0.046, 0.044, 0.039]], 14, 0.1, 0.1), M.cuff, g);
     if (side < 0 && this.o.watch) {   // a watch on the left wrist (strap all round, face on the back of the wrist)
       this._mesh(smoothLoft([[-0.034, 0.0305, 0.0225], [-0.018, 0.0305, 0.0225]], 14, 0.05, 0.05), M.band, g);

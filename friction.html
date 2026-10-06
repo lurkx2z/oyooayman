@@ -12,10 +12,28 @@
     #hud .story-title.big.center { top: calc(var(--u) * 770); }
     #hud .story-title.big.center::before { background: radial-gradient(closest-side, rgba(6, 7, 10, 0.5), rgba(6, 7, 10, 0.22) 62%, rgba(6, 7, 10, 0)); }
     #hud .story-title.big.center .hero { font-size: calc(var(--u) * 92); }
-    #hud .story-caption { top: calc(var(--u) * 1210); font-size: calc(var(--u) * 54);
-      text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.8), 0 calc(var(--u) * 3) calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
-    #hud .story-readout .value { text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 12) rgba(0, 0, 0, 0.55); }
-    #hud .story-readout .label { text-shadow: 0 calc(var(--u) * 1) calc(var(--u) * 8) rgba(0, 0, 0, 0.6); }
+    #hud .story-caption { font-size: calc(var(--u) * 56);
+      text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 3) calc(var(--u) * 10) rgba(0, 0, 0, 0.8); }
+    /* a HUD that reads on a phone: bigger label and number, a dark halo behind both */
+    #hud .story-readout { left: calc(var(--u) * 58); }
+    #hud .story-readout .label { font-size: calc(var(--u) * 38); letter-spacing: 0.14em; opacity: 0.95; color: #ffffff;
+      text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.8); }
+    #hud .story-readout .value { font-size: calc(var(--u) * 104); margin-top: calc(var(--u) * 4);
+      text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 3) calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
+    #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 28); letter-spacing: 0.08em; opacity: 0.95; margin-top: calc(var(--u) * 6);
+      text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9); }
+    #hud .story-readout .ctx { font-size: calc(var(--u) * 30); letter-spacing: 0.16em; opacity: 0.9; color: #ffd9a8; margin-top: calc(var(--u) * 12);
+      text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9); }
+    /* captions low in the frame with a soft scrim, clear of the action */
+    #hud .story-caption { top: calc(var(--u) * 1400); padding: calc(var(--u) * 10) calc(var(--u) * 26); border-radius: calc(var(--u) * 18);
+      background: radial-gradient(closest-side, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0)); }
+    /* the montage label and the 3 · 2 · 1 */
+    #hud .fr-chyron { position: absolute; left: 50%; top: calc(var(--u) * 330); transform: translateX(-50%); text-align: center; width: calc(var(--u) * 900); }
+    #hud .fr-chyron .mw { display: block; font-family: var(--hud-font); font-size: calc(var(--u) * 28); letter-spacing: 0.4em; opacity: 0.85; }
+    #hud .fr-chyron .mt { display: block; font-family: var(--book); font-size: calc(var(--u) * 78); font-weight: 600; letter-spacing: 0.04em; margin-top: calc(var(--u) * 6);
+      text-shadow: 0 0 calc(var(--u) * 20) rgba(0, 0, 0, 0.8); }
+    #hud .fr-count { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); font-family: var(--book); font-weight: 600;
+      font-size: calc(var(--u) * 420); line-height: 1; color: #ffffff; text-shadow: 0 0 calc(var(--u) * 40) rgba(0, 0, 0, 0.7); }
   </style>
 </head>
 <body>
@@ -85,6 +103,7 @@
   <script src="films/friction/traffic.js"></script>
   <script src="films/friction/props.js"></script>
   <script src="films/friction/cast.js"></script>
+  <script src="films/friction/montage.js"></script>
   <script src="films/friction/audio.js"></script>
   <script src="films/friction/film.js"></script>
   <script src="js/main.js"></script>

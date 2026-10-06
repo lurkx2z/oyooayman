@@ -87,9 +87,9 @@ class FrictionCity extends Environment {
 
   /* ---------------- sky: clear late afternoon, a few soft clouds ---------------- */
   _sky() {
-    this.sunDir = new THREE.Vector3(-0.36, 0.8, 0.48).normalize();      // high, behind-left of you: your side of the street and the hill in sun
-    const zenith = new THREE.Color('#3f74b4'), horizon = new THREE.Color('#bcd3e2');
-    this.fogColor = new THREE.Color('#c4d4de');
+    this.sunDir = new THREE.Vector3(-0.16, 0.62, 0.77).normalize();      // behind you, ~38° up: shadows run along the street, the hill faces the sun
+    const zenith = new THREE.Color('#4a90d9'), horizon = new THREE.Color('#c4dcf0');
+    this.fogColor = new THREE.Color('#cfdbe2');
     this.skyUniforms = {
       uZenith: { value: zenith }, uHorizon: { value: horizon }, uGround: { value: new THREE.Color('#8d9590') },
       uSunDir: { value: this.sunDir }, uSunColor: { value: new THREE.Color('#ffe2b4') }, uTime: { value: 0 },
@@ -124,12 +124,12 @@ class FrictionCity extends Environment {
     const sky = new THREE.Mesh(new THREE.SphereGeometry(2000, 48, 24), mat);
     sky.name = 'sky'; sky.frustumCulled = false; sky.renderOrder = -10;
     this.scene.add(sky); this.sky = sky;
-    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0013);
+    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0008);
     this.scene.background = horizon.clone();
   }
 
   _lights() {
-    const sun = new THREE.DirectionalLight('#fff1dd', 3.4);
+    const sun = new THREE.DirectionalLight('#ffe4bc', 4.4);
     const tgt = new THREE.Vector3(0, 6, -55);
     sun.position.copy(this.sunDir).multiplyScalar(170).add(tgt);
     sun.target.position.copy(tgt);
@@ -140,7 +140,7 @@ class FrictionCity extends Environment {
     sun.shadow.bias = -0.0003; sun.shadow.normalBias = 0.04; sun.shadow.radius = 3;
     this.scene.add(sun, sun.target);
     this.sun = sun;
-    this.hemi = new THREE.HemisphereLight('#bcd2e8', '#857a6c', 1.7);
+    this.hemi = new THREE.HemisphereLight('#b8d0ec', '#7d6e5e', 1.45);
     this.scene.add(this.hemi);
   }
 
@@ -255,8 +255,9 @@ class FrictionCity extends Environment {
 
   _streetFurniture() {
     const B = this.batch, m = this.m, h = LAYOUT.curbH, G = FrGround;
-    for (const z of FR_STATIC.lampsR) this._lift(G.road(z), () => this._streetLight(7.45, z, 1));
-    for (const z of FR_STATIC.lampsL) this._lift(G.road(z), () => this._streetLight(-7.45, z, -1));
+    // (lamp posts on your block are props — they can be knocked down)
+    for (const z of FR_STATIC.lampsR) if (z <= -40) this._lift(G.road(z), () => this._streetLight(7.45, z, 1));
+    for (const z of FR_STATIC.lampsL) if (z <= -40) this._lift(G.road(z), () => this._streetLight(-7.45, z, -1));
     // hydrants, fixed bins, a mailbox and newspaper boxes (all bolted down)
     for (const [x, z] of [[7.7, 6], [-7.7, -12], [7.7, -66], [-7.7, 18]]) this._lift(G.road(z), () => {
       this.batch.add(new THREE.CylinderGeometry(0.13, 0.15, 0.6, 10), m.red, Geo.matrix(x, h + 0.3, z));

@@ -15,7 +15,9 @@
    like the camera; right = (cos yaw, −sin yaw).
    ===================================================================== */
 
-const FR = { g: 9.81, rho: 1.2, tLoss: 3.0, tBack: 64.0, mu: 0.8, end: 78 };
+// friction is gone from tLoss to tBack (exactly 60 s). The scenario is authored on a clock where it goes at tLoss0;
+// the film runs `shift` seconds earlier (frBuildWorld re-times everything).
+const FR = { g: 9.81, rho: 1.2, shift: 1.5, tLoss0: 3.0, tLoss: 1.5, tBack: 61.5, mu: 0.8, end: 76.5 };
 
 // the street surface: flat, then a 7° hill climbing toward −Z (smoothed over `ramp` metres); kerbs are 0.15 m
 // (the hill rounds over into a level crest after `crest` metres, ≈ 36 m up)
@@ -200,7 +202,8 @@ class SlideWorld {
     const act = this._action(b, t);
     let target, tau;
     if (mu > 0 && act !== 'brake') { target = lon / W.r; tau = 0.03; }                 // gripping: wheels roll with the road
-    else if (act === 'brake') { target = 0; tau = 0.06; }                              // locked
+    else if (act === 'brake' && mu > 0) { target = 0; tau = 0.06; }                    // locked (only when brake pads can grip)
+    else if (act === 'brake') { target = 0; tau = 14; }                                 // no friction: the pads slide on the disc, the wheel keeps turning
     else if (act === 'gas') { target = (W.gasRate || 50) * (W.dir || 1); tau = 0.7; }  // floored: the wheels spin up, the car doesn't move
     else { target = 0; tau = 9; }                                                      // coasting: the spin dies slowly
     b.wheelRate += (target - b.wheelRate) * (1 - Math.exp(-dt / tau));
@@ -344,7 +347,7 @@ class SlideWorld {
       let j = 0;
       const pts = b.box ? this._corners(b).map((q) => [q[0], q[1], 0]) : b.circles.map((q) => { const w = this._wp(b, q[0], q[1]); return [w[0], w[1], q[2]]; });
       // something hitting a kerb hard enough hops over it (a car sliding into it sideways, a cart, a bin)
-      if (W.oneWay && side > 0) {
+      if (W.oneWay && side > 0 && b.kind !== 'person') {
         let vMax = 0;
         for (const [px, pz] of pts) { const vx = b.vx + b.w * (pz - b.z), vz = b.vz - b.w * (px - b.x); vMax = Math.max(vMax, -(vx * W.nx + vz * W.nz)); }
         if (vMax > (b.box ? 2.4 : 2.2)) { if (!b.hops) b.hops = []; if (!b.hops.length || t - b.hops[b.hops.length - 1] > 0.5) b.hops.push(t); continue; }

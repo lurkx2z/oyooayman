@@ -46,7 +46,7 @@ const FR_STATES = {
       p.lKnee = 0.25 * (1 - e) + 0.35 * e; p.rKnee = 0.45 * (1 - e) + 0.5 * e;
       p.hipY = MathX.lerp(0.93, 0.14, e); p.pelvisPitch = -1.45 * e;
       p.spine = 0.25 * Math.sin(k * Math.PI) + 0.35 * e; p.neck = 0.2 + 0.35 * e;
-      arms(p, [1.3 + 1.2 * Math.sin(k * 3) * (1 - e) + 0.4 * e, 0.6 + 0.4 * e], [1.5 + 0.9 * Math.sin(k * 3 + 1) * (1 - e) + 0.4 * e, 0.7 + 0.4 * e], 0.4, 0.5);
+      arms(p, [0.45 + 0.35 * Math.sin(k * 5) * (1 - e) + 0.15 * e, 1.05 + 0.25 * e], [0.35 + 0.35 * Math.sin(k * 5 + 1) * (1 - e) + 0.15 * e, 1.1 + 0.25 * e], 0.35, 0.4);   // arms flung out to the sides, bracing
       if (τ > 0.62) { const b = Math.exp(-(τ - 0.62) / 0.12) * Math.sin((τ - 0.62) * 30); p.spine += 0.1 * b; p.neck += 0.15 * b; }
       return p;
     },
@@ -78,7 +78,7 @@ const FR_STATES = {
     // on hands and knees, sliding: hands splayed, looking ahead
     crawlSlide(τ, c) {
       const p = P0(), a = Math.sin(τ * 1.8 + c.seed * 4);
-      p.hipY = 0.5; p.lHip = [0.05, 0.16]; p.rHip = [0.02, 0.16]; p.lKnee = p.rKnee = 1.62; p.lFoot = p.rFoot = 0.5;
+      p.hipY = 0.57; p.lHip = [0.12, 0.16]; p.rHip = [0.1, 0.16]; p.lKnee = p.rKnee = 1.5; p.lFoot = p.rFoot = 0.5;
       p.spine = 1.05 + 0.04 * a; p.neck = -0.5; p.headYaw = noise1(τ * 0.5, c.seedI) * 0.5;
       arms(p, [1.15 + 0.08 * a, 0.35], [1.15 - 0.08 * a, 0.35], 0.1, 0.12);
       return p;
@@ -132,7 +132,7 @@ class FrictionCast {
   constructor(scene, world) {
     this.world = world;
     this.people = FR_PEOPLE.map(([id, look, , , , speed]) => {
-      const p = new Person({ id, look, states: FR_STATES[id] || [[0, 'idle']] }, scene);
+      const p = new Person({ id, look, states: (FR_STATES[id] || [[0, 'idle']]).map(([t, a]) => [Math.max(0, t - FR.shift), a]) }, scene);   // (authored on the scenario clock)
       p.speed = speed;
       if (id === 'W3' || id === 'W7') { const ph = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.145, 0.009), Mat.std('#1a1c20', { roughness: 0.3 })); ph.position.set(0, -0.06, 0.04); ph.rotation.x = -0.4; p.j.ra.hand.add(ph); }
       return p;
@@ -151,8 +151,15 @@ class FrictionCast {
       p.root.position.set(s.x, y, s.z);
       p.root.rotation.set(0, Math.PI + s.yaw, 0);
       // walking / jogging stride from the distance covered before the fall
-      const ctx = { seed: p.seed, seedI: p.seedI, walkPhase: (p.speed * Math.min(t, 3.4) / (p.speed > 2 ? 2.4 : 1.32)) * Math.PI * 2 };
+      const ctx = { seed: p.seed, seedI: p.seedI, walkPhase: (p.speed * Math.min(t + FR.shift, 3.4) / (p.speed > 2 ? 2.4 : 1.32)) * Math.PI * 2 };
       p.apply(p.poseAt(t, ctx));
+      // friction returns: still sliding, they catch on the ground and tumble over once the way they were going
+      if (t > FR.tBack) {
+        if (p.tumble === undefined) { const s0 = W.sample(p.spec.id, FR.tBack - 0.01); p.tumble = s0.speed > 0.8 ? { dir: Math.atan2(s0.vx, s0.vz), v: s0.speed } : null; }
+        if (p.tumble) { const u = MathX.clamp((t - FR.tBack) / 0.7, 0, 1), a = (u < 1 ? 1 - (1 - u) * (1 - u) : 1) * Math.PI * 2 * Math.min(1, p.tumble.v / 2.2);
+          this._ax = this._ax || new THREE.Vector3(); this._ax.set(Math.cos(p.tumble.dir), 0, -Math.sin(p.tumble.dir));
+          p.root.position.y += 0.35 * Math.sin(Math.min(1, u) * Math.PI); p.root.rotateOnWorldAxis(this._ax, a); }
+      }
       p.root.updateMatrixWorld(true);
       for (const [part, r] of [['hips', 0.42], ['neck', 0.34], ['head', 0.22]]) {
         const w = p.worldOf(part, this._v), k = MathX.clamp(1 - (w.y - y) / 1.4, 0, 1);
