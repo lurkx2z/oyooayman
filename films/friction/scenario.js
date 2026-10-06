@@ -25,7 +25,7 @@ const FR_STATIC = (() => {
   for (let z = 40; z > -430; z -= 30) if (z < -40 || z > 0) S.lampsR.push(z);
   for (let z = 25; z > -430; z -= 30) if (z < -40 || z > -26) S.lampsL.push(z);
   for (let z = 52; z > -430; z -= 9.5) {
-    if (!(z < -12 && z > -62) && !(z < 26 && z > -2)) S.treesR.push(z + ((Math.round(z * 7) % 5) - 2) * 0.25);
+    if (!(z < -12 && z > -62) && !(z < 26 && z > -8)) S.treesR.push(z + ((Math.round(z * 7) % 5) - 2) * 0.25);
     const zl = z + 3;
     if (!(zl < -14 && zl > -60) && !(zl < -1 && zl > -12)) S.treesL.push(zl + ((Math.round(z * 3) % 5) - 2) * 0.2);
   }
@@ -80,7 +80,7 @@ const FR_PEOPLE = [
   ['J', 'casual3', -10.15, -2.0, 0, 3.1],         // jogging across the road; goes down at 3.3 and slides into the junction
   ['W5', 'casual1', -11.7, -15.4, 0, 0],          // standing across the road by the shops; tries to walk at 9.0
   ['W6', 'casual8', -8.45, -22.0, -110, 0],       // the far corner, holding the signal mast
-  ['W7', 'casual7', 11.2, -1.5, 180, 0],          // behind you near the shops (seen later)
+  ['W7', 'casual7', 11.85, 4.2, 160, 0],          // behind you near the shops, frozen with a phone (clear of where you end up)
 ];
 
 // loose things: [id, kind, x, z, opts]
@@ -241,6 +241,9 @@ function frBuildWorld() {
     }
     W.add(spec);
   }
+  // one pipe would otherwise ride along the shopfront with you and finish in your lap, hiding the ending: while the camera
+  // is away in the montage it comes to rest against the shop wall behind you (a pause of 0.05 s with no speed)
+  W.byId.pp3.hold.push([48.1, 48.15, () => ({ x: 12.22, z: -14.6, yaw: -2.6 })]);
   void T;
   // everything above is written on the authoring clock (friction gone at FR.tLoss0); the film runs FR.shift earlier
   const SH = FR.shift;

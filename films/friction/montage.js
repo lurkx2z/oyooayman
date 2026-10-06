@@ -120,7 +120,7 @@ class FrMontage {
     A(new THREE.BoxGeometry(14, 0.1, 10), Mat.std('#b9b0a2', { roughness: 0.8 }), 0, -0.05, 0);
     const wall = Tex.storefront(SHOPS[0], 901);
     A(new THREE.PlaneGeometry(8, 4.2), new THREE.MeshStandardMaterial({ map: wall.map, emissiveMap: wall.emissiveMap, emissive: '#ffffff', emissiveIntensity: 0.5, roughness: 1 }), 0, 2.1, -2.5);
-    for (const x of [-1.6, 1.8]) { A(new THREE.CylinderGeometry(0.36, 0.36, 0.03, 16), Mat.std('#e4e0d6'), x, 0.74, -1.2); A(new THREE.CylinderGeometry(0.03, 0.03, 0.72, 6), Mat.std('#2c3034'), x, 0.37, -1.2); }
+    for (const x of [-2.7, 2.4]) { A(new THREE.CylinderGeometry(0.36, 0.36, 0.03, 16), Mat.std('#e4e0d6'), x, 0.74, -1.2); A(new THREE.CylinderGeometry(0.03, 0.03, 0.72, 6), Mat.std('#2c3034'), x, 0.37, -1.2); }
     this.waiter = new Person({ id: 'waiter', look: 'casual7' }, null); g.add(this.waiter.root);
     this.waiter.root.position.set(0, 0, 0); this.waiter.root.rotation.y = 0.15;
     this.tray = new THREE.Group(); g.add(this.tray);
@@ -177,7 +177,8 @@ class FrMontage {
       P.hipY = 0.9; P.lHip = [1.0 + 0.45 * Math.sin(c), 0.12]; P.rHip = [1.0 - 0.45 * Math.sin(c), 0.12]; P.lKnee = 1.1 + 0.5 * Math.cos(c); P.rKnee = 1.1 - 0.5 * Math.cos(c);
       P.spine = 0.5; P.neck = -0.2; if (u > 0.7) { const k = Math.min(1, (u - 0.7) / 0.4); P.lSh = [1.25 + 0.8 * k, 0.22 + 0.6 * k]; P.headYaw = 0.6 * k; }
       this.rider.apply(P); this.rider.root.position.y = 0.0; this.rider.root.updateMatrixWorld(true);
-      Object.assign(cam, { x: -50.5, y: 1.25, z: -27.5, yaw: 72 - u * 18, pitch: -7, fov: 58 });
+      // (the camera stands on the corner and pans with it as it comes)
+      Object.assign(cam, { x: -50.5, y: 1.25, z: -27.5, yaw: Math.atan2(-(x + 50.5), -(z0 + 27.5)) * 180 / Math.PI + 4, pitch: -7, fov: 58 });
     } else if (S.id === 'crane') {
       this.craneG.visible = true;
       // the brake lets go at 0.25 s: the load falls (≈ 0.8 g — the drum spins up too) and hits at ~1.4 s
@@ -195,8 +196,8 @@ class FrMontage {
       const tilt = 0.05 + 0.06 * Math.min(1, u / 0.6);
       const P = basePose(); P.rSh = [1.05, 0.15]; P.rEl = 1.35; P.lSh = [0.95 + 0.4 * Math.min(1, Math.max(0, u - 0.6) / 0.3), 0.3]; P.lEl = 0.9; P.neck = 0.3; P.spine = 0.05;
       this.waiter.apply(P); this.waiter.root.updateMatrixWorld(true);
-      const hand = this.waiter.handWorld(-1, new THREE.Vector3());
-      this.tray.position.copy(hand).add(new THREE.Vector3(0, 0.05, 0.08)); this.tray.rotation.set(tilt, 0, -tilt * 0.6);
+      const hand = this.gripG.worldToLocal(this.waiter.handWorld(-1, new THREE.Vector3()));
+      this.tray.position.copy(hand).add(new THREE.Vector3(0, 0.09, 0.1)); this.tray.rotation.set(tilt, 0, -tilt * 0.6);
       for (const gl of this.glasses) {
         const a = Math.max(0, u - gl.t * 0.6), slide = 0.5 * 9.81 * Math.sin(tilt) * a * a;
         let x = gl.x - slide * 0.5, z = gl.z + slide * 0.86, y = 0.008;
@@ -208,7 +209,9 @@ class FrMontage {
         if (gl.hitU && u >= gl.hitU) { const age = u - gl.hitU; for (let i = 0; i < 12; i++) { const h1 = hash1(i * 13 + gl.x * 100), a2 = h1 * 6.28, sp = 0.8 + 1.5 * hash1(i * 5), tt = Math.min(age, 0.6), wp = this.gripG.localToWorld(new THREE.Vector3(x, 0, z)); const px = wp.x + Math.cos(a2) * sp * tt, pz = wp.z + Math.sin(a2) * sp * tt, py = Math.max(0.01, 0.4 * hash1(i * 7) * tt * 6 - 4.9 * tt * tt); this.glints.push(px, py, pz, px + 0.03, py + 0.01, pz + 0.02, 1, 1, 1, 0.9 * (1 - age / 1.2), 0.01); } }
       }
       if (u < 0.05) for (const gl of this.glasses) gl.hitU = 0;
-      Object.assign(cam, { x: 760 + 0.35, y: 1.45, z: 330 + 1.25, yaw: 12, pitch: -14, fov: 60 });
+      // (looking down at the tray over his shoulder)
+      const tw = this.gripG.localToWorld(this.tray.position.clone()), cx = tw.x + 0.8, cy = tw.y + 0.42, cz = tw.z + 1.0;
+      Object.assign(cam, { x: cx, y: cy, z: cz, yaw: Math.atan2(-(tw.x - cx), -(tw.z - cz)) * 180 / Math.PI, pitch: Math.atan2(tw.y - 0.15 - cy, Math.hypot(tw.x - cx, tw.z - cz)) * 180 / Math.PI, fov: 52 });
     } else if (S.id === 'ambulance') {
       this.amb.group.visible = true;
       const x = 46 - 8.5 * u, z = -28.8 + u * 0.4, yaw = 0.9 + u * 1.1, flash = Math.floor(t * 7) % 2;

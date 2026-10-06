@@ -52,9 +52,12 @@ function frAimHand(name, camera, world, Fw, Nw, side = 1) {
 
 // "drone" shots (the 30 % spectacle): film-time windows where the camera leaves you to show the sliding pack down the avenue
 const FR_DRONE = [
-  { t0: 56.6, t1: 58.4, ids: ['P1', 'P2', 'B4'], follow: true, off: [5.5, 2.2, 17], look: [0, 0.9, -2], fov: 52 },   // …it's coming back: everything still sliding at speed
-  { t0: 61.65, t1: 63.1, ids: ['T'], follow: false, off: [-6, 2.4, 11], look: [0, 1.2, 0], fov: 50 },                // friction returns (slow motion): the truck lurches
-  { t0: 63.1, t1: 64.6, ids: ['B4', 'P1', 'P2'], follow: false, off: [7.5, 3.0, 14], look: [0, 0.8, 4], fov: 56 },    // …a sliding car trips and rolls
+  // the spinning car still sliding down the avenue, nobody steering (riding along with it)
+  { t0: 56.6, t1: 58.4, ids: ['B4'], follow: true, off: [3.6, 1.9, 9.5], look: [0, 0.8, 0], fov: 50 },
+  // friction back, slow motion: the truck across from you trips onto two wheels (seen from in front of its cab)…
+  { t0: 61.65, t1: 63.05, ids: ['T'], follow: false, off: [10.5, 2.6, 9.0], look: [0, 1.3, 0], fov: 46 },
+  // …and the spinning car, caught sideways, barrel-rolls (seen end-on)
+  { t0: 63.05, t1: 64.6, ids: ['B4'], follow: false, off: [-8.2, 2.0, 3.6], look: [0, 0.9, 0], fov: 54 },
 ];
 
 const FILM = {
@@ -249,7 +252,7 @@ const FILM = {
     p.vignette = 0.45; p.soft = 0.015; p.bloom = 0.24; p.bloomThreshold = 1.4; p.grain = 0.02;
     p.tunnel = 1.25; p.tunnelSoft = 0.5; p.tunnelDark = 0; p.edgeBlur = 0;
     // jolts of chroma at the slip and the hits on you
-    p.chroma = 0.006 * MathX.impulse(t, 1.5, 0.25) + 0.004 * MathX.impulse(t, 3.56, 0.2) + 0.006 * MathX.impulse(t, 34.0, 0.3) + 0.004 * MathX.impulse(t, 40.5, 0.25);
+    p.chroma = 0.006 * MathX.impulse(t, 1.5, 0.25) + 0.004 * MathX.impulse(t, 3.56, 0.2) + 0.006 * MathX.impulse(t, 39.67, 0.3) + 0.004 * MathX.impulse(t, 42.03, 0.25);
     // the countdown closes in: the edges darken and blur, colour drains a little; the return is a white flash and a hit of contrast
     const cd = MathX.smooth(t, 54.6, 61.4) * (1 - MathX.smooth(t, 61.5, 61.7));
     p.vignette += 0.7 * cd; p.tunnel = 1.25 - 0.45 * cd; p.tunnelDark = 0.35 * cd; p.edgeBlur = 0.35 * cd; p.saturation -= 0.3 * cd;
@@ -301,10 +304,10 @@ class FrLegs {
     const walk = (ph, a) => [Math.sin(ph) * a, Math.max(0, -Math.cos(ph)) * a * 1.4, 0];
     if (t < FR.tLoss) { const ph = t * 1.72 * 1.35 * Math.PI; return { L: walk(ph, 0.35), R: walk(ph + Math.PI, 0.35), sit: 0 }; }
     if (t < 3.56) { const k = MathX.smooth(t, 1.5, 1.66) * (1 - MathX.smooth(t, 2.0, 2.6)); return { L: [-0.15 * k, 0.15, 0], R: [1.1 * k, 0.1, -0.3 * k], sit: 0 }; }   // the right foot shoots forward
-    if (t < 34.0) { const k = MathX.smooth(t, 4.5, 4.62) * (1 - MathX.smooth(t, 4.9, 5.5)); return { L: [0.05 - 0.2 * k, 0.12, 0], R: [0.15 + 0.7 * k, 0.1, 0], sit: 0 }; }
+    if (t < 39.67) { const k = MathX.smooth(t, 4.5, 4.62) * (1 - MathX.smooth(t, 4.9, 5.5)); return { L: [0.05 - 0.2 * k, 0.12, 0], R: [0.15 + 0.7 * k, 0.1, 0], sit: 0 }; }
     if (t < 67.4) { const w = 0.05 * Math.sin(t * 1.3); return { L: [1.45 + w, 0.15, 0.2], R: [1.35 - w, 0.5, 0.25], sit: 1 }; }                                     // sitting, legs out in front
     const up = MathX.smooth(t, 67.6, 69.6), step = MathX.smooth(t, 70.4, 70.9) * (1 - MathX.smooth(t, 71.6, 72.4));
-    return { L: [MathX.lerp(1.45, 0.0, up), MathX.lerp(0.15, 0.05, up) + 1.4 * Math.sin(up * Math.PI) * 0.6, 0], R: [MathX.lerp(1.35, 0.0, up) + 0.45 * step, MathX.lerp(0.5, 0.05, up) + 0.9 * Math.sin(up * Math.PI) * 0.6 + 0.2 * step, -0.2 * step], sit: 1 - up };
+    return { L: [MathX.lerp(1.45, 0.0, up), MathX.lerp(0.15, 0.05, up) + 1.4 * Math.sin(up * Math.PI) * 0.6, 0], R: [MathX.lerp(1.35, 0.0, up) + 0.8 * step, MathX.lerp(0.5, 0.05, up) + 0.9 * Math.sin(up * Math.PI) * 0.6 + 0.2 * step, -0.2 * step], sit: 1 - up };
   }
 
   update(t, cam, show) {
@@ -312,8 +315,8 @@ class FrLegs {
     if (!this.root.visible) return;
     const P = this._pose(t), yaw = cam.rotation.y, eye = cam.position.y, ground = FrGround.h(cam.position.x, cam.position.z) - 0.0;
     // the hips sit under and a little behind your eyes (on the ground when you sit)
-    const hipY = MathX.lerp(ground + 0.92, ground + 0.12, P.sit);
-    this.root.position.set(cam.position.x + Math.sin(yaw) * 0.12, Math.min(hipY, eye - 0.55), cam.position.z + Math.cos(yaw) * 0.12);
+    const hipY = MathX.lerp(ground + 0.92, ground + 0.12, P.sit), back = 0.12;
+    this.root.position.set(cam.position.x + Math.sin(yaw) * back, Math.min(hipY, eye - 0.55), cam.position.z + Math.cos(yaw) * back);
     this.root.rotation.set(0, yaw, 0);
     for (const [leg, a] of [[this.L, P.L], [this.R, P.R]]) { leg.hip.rotation.x = a[0]; leg.knee.rotation.x = -a[1]; leg.ank.rotation.x = a[2]; }
     // (keep the legs out of the very near plane)

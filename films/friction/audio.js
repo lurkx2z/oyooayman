@@ -129,12 +129,16 @@ class FRAudio extends AudioEngine {
     S.clunk(4.28, 0.04, 0.3, world);                                                                  // shoe against the kerb face
     // trying to step: a strained breath, a grunt as your feet go, your hands sliding down the pole (silently) — a soft ring as they stop
     S.breath(4.35, 0.35, true, 0.03, you); S.voice(4.58, 150, 0.25, 'a', 0.03, 0, you, 0.75); rustle(4.55, 0.6, 0.016, 1600); clang(5.05, 0.01);
+    // the car beside you nudges you: your grip slides an inch (a squeak of skin on paint, a sharp breath)
+    rustle(35.68, 0.4, 0.018, 1800); S.breath(35.72, 0.25, true, 0.028, you);
+    // the runaway cart hits your pole: it rings in your arms
+    clang(39.28, 0.03);
     // knocked off the pole: the hit, your shout, sitting down hard
-    S.thump(34.0, 0.18, you); S.voice(34.05, 165, 0.3, 'o', 0.05, 0, you, 0.7); rustle(34.0, 0.7, 0.03, 1200);
-    { const n = S.noise('pink', 34.45, 34.8), lp = S.filter('lowpass', 400, 0.7), g = ctx.createGain(); S.env(g, 34.45, 0.01, 0.06, 0.25); n.connect(lp); lp.connect(g); g.connect(you); }
-    S.thump(40.5, 0.1, you); S.voice(40.55, 175, 0.18, 'e', 0.035, 0, you, 0.8); rustle(40.5, 0.5, 0.02, 1400);
-    S.thump(44.3, 0.08, you);                                                                           // off the kerb into the road
-    S.thump(50.6, 0.07, you);                                                                           // the far kerb
+    S.thump(39.67, 0.18, you); S.voice(39.72, 165, 0.3, 'o', 0.05, 0, you, 0.7); rustle(39.67, 0.7, 0.03, 1200);
+    { const n = S.noise('pink', 40.1, 40.45), lp = S.filter('lowpass', 400, 0.7), g = ctx.createGain(); S.env(g, 40.1, 0.01, 0.06, 0.25); n.connect(lp); lp.connect(g); g.connect(you); }
+    // backwards into the shopfront: your back hits the glass (a deep thud and a wobble of the pane), then the cart bumps your leg
+    S.thump(42.03, 0.14, you); S.voice(42.06, 175, 0.18, 'e', 0.035, 0, you, 0.8); rustle(42.03, 0.5, 0.02, 1400);
+    for (const [f, d, a] of [[95, 0.5, 1], [190, 0.35, 0.4]]) S.tone(42.03, d, f, 0.035 * a, 0.3, world, 'sine', 0.004, d * 0.8);
     // breathing: calm while walking, fast and shallow for the minute, held through 3-2-1, then long and shaky after
     for (let t = 0.5; t < end - 1;) {
       const fast = t > 1.5 && t < 58.3, after = t > 63, held = t > 58.3 && t < 61.6;
@@ -169,6 +173,7 @@ class FRAudio extends AudioEngine {
     yell('W6', 10.7, 340, [['e', 0.14], ['o', 0.3]], 0.03, 0.85);
     yell('W1', 16.4, 410, [['a', 0.16]], 0.04, 0.8);
     yell('W3', 33.8, 180, [['o', 0.3]], 0.06, 0.8);
+    yell('W3', 38.5, 200, [['e', 0.14], ['i', 0.32]], 0.06, 1.1);           // "look out!" as the truck spins at you
   }
 
   /* motors and horns, from the simulation. K is electric: floored, its motor whines up as the wheels spin in the air of no-friction */

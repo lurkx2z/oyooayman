@@ -10,6 +10,10 @@ Everything is procedural, so there are no models, images or sound files to downl
 >
 > **Third film: *What weed-induced depersonalization can feel like*** — open `depersonalization.html` (71 s).
 > Plan, shot list and review log: [`films/depersonalization/PLAN.md`](films/depersonalization/PLAN.md).
+>
+> **Fourth film: *What if friction disappeared for 60 seconds?*** — open `friction.html` (75.5 s). Friction goes at 1.5 s
+> and comes back at 61.5 s; everything that slides comes from a deterministic simulation computed when the page loads.
+> Plan, physics rules, shot list and review log: [`films/friction/PLAN.md`](films/friction/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -163,6 +167,23 @@ films/depersonalization/apartment.js  the flat: living room, kitchen nook and cl
 films/depersonalization/cast.js       the friends' looks and actions (on the shared cast rig)
 films/depersonalization/audio.js      the soundtrack (a world bus that drifts away, a close "you" bus)
 js/fx/mirror.js                       planar mirror (shared)
+```
+
+Film: *What if friction disappeared for 60 seconds?* (`friction.html`):
+
+```
+films/friction/PLAN.md        physics rules, shot list, hero events, review log
+films/friction/slide.js       the slide simulation: oriented-box cars, round props, impulse contacts, kerbs, breakable holds,
+                              free-spinning wheels; 240 Hz, run once at load, sampled by time (+ the hill ground and the clocks)
+films/friction/scenario.js    who is where and doing what when friction goes: cars, parked cars, people, props, holds, kicks
+films/friction/script.js      ★ timings, camera, where your eyes lock on (FR_LOOK), hands, captions, HUD readouts, slow motion
+films/friction/film.js        FILM hooks: hand poses aimed at the pole, the drone shots, effects, the grade, your legs
+films/friction/city.js        the avenue, the hill and its stepped rowhouses, the junction, street furniture
+films/friction/traffic.js     cars and the box truck on the simulation (spinning wheels, jolts, roll-overs when friction returns)
+films/friction/props.js       carts, bins, bikes, pipes, cargo, the phone, bollards, rails, falling lamp posts
+films/friction/cast.js        people on the shared rig (slips, splits, sliding poses, tumbles)
+films/friction/montage.js     the MEANWHILE shots: conveyor, bike, crane, tray, ambulance
+films/friction/audio.js       the soundtrack (near-silent sliding; impacts, engines and voices from the simulation)
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):
