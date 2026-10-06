@@ -18,7 +18,7 @@ class AirAudio extends AudioEngine {
   // a soft ceiling just under full scale, and nothing at all after the cut
   async renderOffline() {
     const buf = await super.renderOffline(), sr = buf.sampleRate;
-    for (let c = 0; c < buf.numberOfChannels; c++) { const o = buf.getChannelData(c); for (let i = 0; i < o.length; i++) { const x = o[i], ax = Math.abs(x); if (i / sr >= AR.black) o[i] = 0; else if (ax > 0.6) o[i] = Math.sign(x) * (0.6 + 0.2 * Math.tanh((ax - 0.6) / 0.2)); } }
+    for (let c = 0; c < buf.numberOfChannels; c++) { const o = buf.getChannelData(c); for (let i = 0; i < o.length; i++) { const x = o[i], ax = Math.abs(x); if (i / sr >= AR.black) o[i] = 0; else if (i / sr > AR.black - 0.004) o[i] *= (AR.black - i / sr) / 0.004; else if (ax > 0.6) o[i] = Math.sign(x) * (0.6 + 0.2 * Math.tanh((ax - 0.6) / 0.2)); } }
     return buf;
   }
 
@@ -42,7 +42,7 @@ class AirAudio extends AudioEngine {
     this.S = S;
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 2.6; comp.attack.value = 0.01; comp.release.value = 0.25;
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.1;
-    const mix = ctx.createGain(); mix.gain.value = 2.2; mix.connect(comp);
+    const mix = ctx.createGain(); mix.gain.value = 2.0; mix.connect(comp);
     const out = ctx.createGain(); comp.connect(out); out.connect(lim); lim.connect(ctx.destination);
     out.gain.setValueAtTime(0, 0); out.gain.linearRampToValueAtTime(0.9, 0.03); out.gain.setValueAtTime(0.9, AR.black - 0.01); out.gain.linearRampToValueAtTime(0, AR.black);
     const rev = S.reverb(1.6), rs = ctx.createGain(); rs.gain.value = 0.3; rev.connect(rs); rs.connect(mix);
