@@ -91,3 +91,36 @@ overlay) · `hud.js` (game HUD and system HUD) · `audio.js` · `film.js`.
 
 Before sign-off, play the preview on a real phone in the vertical player: touch the palm, tilt at zero, tap during
 the roulette, keep score. Desktop preview is not enough (see section 2 for where each target must land).
+
+## 9. Review log
+
+**Independent review 1** (retention + normal viewer, on the 15 fps preview). Hook 5 · interaction clarity 7 ·
+fourth-wall 6 · retention 5 · scoring clarity 3 · visual quality 4. Swipe risk at 9 s (back of his head, small
+captions); scoring broken (the HUD faded hearts, so everyone read 1 life); the roulette landed on a gold SHIELD that
+overwrote a tapper's item; the final fingertip read as "shh"; RESET CANCELLED too small to read.
+
+**Independent review 2** (cinematography + game design). Visual 5 · UI clarity 6 · safe-zone compliance 6 · game-design
+clarity 5. UI over his face (loading text, crack centre, fingertip ring, system text); DON'T LET ME DIE, RIGHT ▶ and
+the item table into the right rail; drone in the top bar; the steam blast never in frame; the void filled the whole
+screen instead of reading as a hole.
+
+**Fixed after the reviews**
+- Hearts: the game never takes one; a callout beside them says when to count (WENT LEFT? −1 · LIGHT? −1 · MEDKIT? +1).
+- Roulette: card above his head, away from the pause icon; ends on "?" — YOUR ITEM = WHERE YOU STOPPED — with the
+  fallback (didn't tap → SHIELD) on a dark plate.
+- Safe zones: DON'T LET ME DIE on two lines, the door labels and the item table inside x 90–890, the drone lowered.
+- Item payoff: he faces you, the table sits under his chin, the shot is caught by a hex shield (the default item).
+- Hook: lines tightened (DON'T LET ME DIE by 1.9 s), a push-in, a cold light behind him, the loading text in the bar.
+- Witness: closer two-shot, the point at the lens, the technician's eyes search a metre past the lens, off to the side.
+- Choice: the left door erupts while it is still in frame; the swing right follows.
+- First touch: 1.3 s window; the reaction lives in the glass only (no HUD burst), so the later screen ripple reads as
+  the screen.
+- Screen: a second pat so the subtitle visibly bends; the crack lands on his chest (a smaller hole with him in the
+  void, the cracked picture around it, bolder lines); the fingertip reaches up from below his chin, pad to the glass;
+  RESET CANCELLED large, above his head, held 1.1 s.
+
+**Current honest ratings (self, after fixes):** hook 7 · interaction clarity 8 · fourth-wall 7.5 · retention 7 ·
+scoring clarity 8 · visual quality 6.5. The main gap left is the characters' low-poly bodies in close-ups.
+
+**Still to do by a person:** play it on a real phone in the vertical player and physically touch, tilt, tap the
+roulette and keep score (section 8).
