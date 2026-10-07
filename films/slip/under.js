@@ -97,12 +97,12 @@ class SlUnder {
           } else if (y > b6) {                  // weathered rock: blocks with dark joints
             vec3 c = ucell(q * vec2(0.55, 0.9)); col = vec3(0.42, 0.39, 0.36) * (0.75 + 0.4 * c.z) * (0.8 + 0.3 * un(q * 9.0)); edge = 0.6 + 0.4 * smoothstep(0.0, 0.05, c.y - c.x);
           } else {                              // granite: grey with pink feldspar, white quartz and black mica, down to the millimetre
-            vec3 c1 = ucell(q * 1.6), c2 = ucell(q * 160.0), c3 = ucell(q * 520.0);
-            col = vec3(0.5, 0.48, 0.47) * (0.85 + 0.2 * c1.z);
-            col = mix(col, vec3(0.62, 0.48, 0.44), step(0.62, c2.z) * 0.8);
-            col = mix(col, vec3(0.78, 0.77, 0.75), step(c2.z, 0.2) * 0.85);
+            vec3 c1 = ucell(q * 1.6), c2 = ucell(q * 300.0), c3 = ucell(q * 520.0);
+            col = vec3(0.5, 0.48, 0.47) * (0.88 + 0.14 * c1.z);
+            col = mix(col, vec3(0.58, 0.5, 0.47), step(0.64, c2.z) * 0.6);
+            col = mix(col, vec3(0.7, 0.69, 0.67), step(c2.z, 0.22) * 0.6);
             col *= 0.86 + 0.22 * smoothstep(0.0, 0.45, c2.x) * (0.5 + c2.z);      // each crystal catches the light a little differently
-            col = mix(col, vec3(0.09, 0.09, 0.1), step(0.9, ucell(q * 900.0).z) * 0.9);
+            col = mix(col, vec3(0.14, 0.14, 0.15), step(0.93, ucell(q * 1500.0).z) * 0.7);
             col *= 0.9 + 0.15 * un(q * 1400.0);
             edge = smoothstep(0.0, 0.03, c1.y - c1.x) * 0.5 + 0.5;
           }
@@ -113,9 +113,11 @@ class SlUnder {
           float seam = 1.0; for (int i = 0; i < 1; i++) {}
           col *= edge * (0.95 - 0.25 * smoothstep(0.0, -45.0, y));
           // the crack in the granite: a hair-thin dark line through the pebble's spot, wider below
-          float cx = x - uPeb.x - (y - uPeb.y) * 0.18 - 0.0016 * sin(y * 260.0) - 0.0007 * sin(y * 1100.0) - 0.002 * (ufbm(vec2(y * 80.0, 2.0)) - 0.5);
+          float cx = x - uPeb.x - (y - uPeb.y) * 0.18 - 0.0024 * (ufbm(vec2(y * 140.0, 2.0)) - 0.5) - 0.0008 * (un(vec2(y * 900.0, 5.0)) - 0.5);
           float cw = 0.0008 + max(0.0, uPeb.y - y) * 0.003 + 0.0026 * exp(-pow((y - uPeb.y - 0.0035) / 0.004, 2.0)) + uDrop * 0.0014 * smoothstep(0.03, -0.01, y - uPeb.y);
-          if (y < -24.0) col *= mix(0.04, 1.0, smoothstep(cw * 0.6, cw, abs(cx)));
+          if (y < -24.0) { col *= mix(0.03, 1.0, smoothstep(cw * 0.55, cw, abs(cx)));
+            col *= 1.0 - 0.35 * exp(-pow((abs(cx) - cw) / (cw * 0.9), 2.0)) * step(cx, 0.0);      // the shaded lip on one side
+            col += 0.06 * exp(-pow((abs(cx) - cw) / (cw * 0.6), 2.0)) * step(0.0, cx); }          // the lit lip on the other
           // the vibration: a pale ring (and two fainter ones behind it), plus a soft glow where it started
           col *= 0.6;
           float w = 0.03 + uRingR * 0.008, A = uRingA / (1.0 + 0.25 * uRingR);
@@ -159,7 +161,13 @@ class SlUnder {
     x.textAlign = 'left'; x.fillText('mm', 112 + 800 + 30, 150);
     const RW = 0.02 * 1024 / 800;
     this.ruler = new THREE.Mesh(new THREE.PlaneGeometry(RW, RW * 192 / 1024), new THREE.MeshBasicMaterial({ map: Tex.tex(rc, { repeat: false }), transparent: true, depthWrite: false, toneMapped: false }));
-    this.ruler.position.set(SL_PEB.x + 0.0012 - 0.02 * 112 / 800 + RW / 2 - 0.01, SL_PEB.y - 0.0125, 0.0006); this.scene.add(this.ruler);
+    this.ruler.position.set(SL_PEB.x + 0.0012 - 0.02 * 112 / 800 + RW / 2 - 0.006, SL_PEB.y + 0.0135, 0.0006); this.scene.add(this.ruler);
+    // the move, measured: a bracket from the pebble's old centre to its new one, under the scale
+    const bm = new THREE.MeshBasicMaterial({ color: '#ffd9a0', transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+    this.bracket = new THREE.Group();
+    for (const dx of [0, 0.0014]) { const b = new THREE.Mesh(new THREE.PlaneGeometry(0.00016, 0.0042), bm); b.position.set(dx, 0, 0); this.bracket.add(b); }
+    const bh = new THREE.Mesh(new THREE.PlaneGeometry(0.0014 + 0.00016, 0.00016), bm); bh.position.set(0.0007, 0.0021, 0); this.bracket.add(bh);
+    this.bracket.position.set(SL_PEB.x + 0.0012, SL_PEB.y + 0.0042 + 0.0068, 0.0065); this.bracketMat = bm; this.scene.add(this.bracket);
     // where the pebble was: a faint outline left behind after it moves
     const og = new THREE.RingGeometry(0.0044, 0.00465, 40);
     this.ghost = new THREE.Mesh(og, new THREE.MeshBasicMaterial({ color: '#dff2ff', transparent: true, opacity: 0, depthWrite: false })); this.ghost.scale.set(1, 0.8, 1);
@@ -168,7 +176,7 @@ class SlUnder {
     this.grit = new XBill(this.scene, { n: 40, kind: 'soft', color: '#8f877d', seed: 72, alpha: 0.8, fadeIn: 0.05, fadeOut: 0.6, g: 0.25,
       spawn: (i, rr) => ({ p: new THREE.Vector3(SL_PEB.x + rr.range(-0.003, 0.003), SL_PEB.y + rr.range(-0.002, 0.003), 0.003), v: new THREE.Vector3(rr.range(-0.003, 0.003), rr.range(-0.02, 0), 0), t0: SL.drop + rr.next() * 0.5, life: rr.range(0.6, 1.2), s0: 0.0005, s1: 0.0008 }) });
     this.orbit = new SlOrbit([
-      [SL.under, 0.25, -0.55, 0, 3.3, 12, -15, 54],
+      [SL.under, 0.05, -0.2, 0, 2.6, 10, -20, 54],
       [8.6, 0.1, -1.5, 0, 6.0, 6, -8, 54],
       [10.0, 0.7, -10.5, 0, 27, 0, 0, 52],
       [11.25, SL_PEB.x, SL_PEB.y + 1.2, 0, 6.5, -3, 2, 48],
@@ -185,7 +193,7 @@ class SlUnder {
   pebbleAt(t, out) {
     const sh = MathX.smooth(t, 12.55, 12.8) * (1 - MathX.smooth(t, 13.1, 13.5));
     const mv = MathX.smooth(t, SL.nudge, SL.nudge + 0.22);
-    out.set(SL_PEB.x + 0.0012 + 0.0004 * mv + sh * 0.00025 * Math.sin(t * 140), SL_PEB.y + 0.0042 - 0.0013 * mv + sh * 0.0002 * Math.cos(t * 120), 0.0025);
+    out.set(SL_PEB.x + 0.0012 + 0.0014 * mv + sh * 0.00025 * Math.sin(t * 140), SL_PEB.y + 0.0042 - 0.0003 * mv + sh * 0.0002 * Math.cos(t * 120), 0.0025);
     const u = Math.max(0, t - SL.drop);
     if (u > 0) { const f = Math.min(u, 0.25) * 0.004 + Math.max(0, u - 0.25) * Math.max(0, u - 0.25) * 0.09; out.y -= f; out.x -= f * 0.18; out.z -= Math.min(0.006, f * 0.6); }
     return out;
@@ -202,6 +210,7 @@ class SlUnder {
     this.pebLight.position.set(p.x - 0.01, p.y + 0.015, 0.03); this.pebLight.intensity = 0.04 * MathX.smooth(t, 11.6, 12.0);
     this.ruler.material.opacity = 0.95 * MathX.smooth(t, 12.0, 12.4) * (1 - MathX.smooth(t, 16.8, 17.2));
     this.ghost.material.opacity = 0.55 * MathX.smooth(t, SL.nudge + 0.15, SL.nudge + 0.4) * (1 - MathX.smooth(t, 15.6, 16.1));
+    this.bracketMat.opacity = 0.95 * MathX.smooth(t, SL.nudge + 0.2, SL.nudge + 0.45) * (1 - MathX.smooth(t, 15.8, 16.2));
     this.grit.update(t);
     if (this.you) this.you.update(4);
     this.orbit.apply(this.camera, t);
@@ -241,23 +250,23 @@ class SlFault {
           vec2 q = p - (nn > 0.0 ? -uDir * uSlip : vec2(0.0));
           float y = q.y + 0.25 * (ufbm(vec2(q.x * 0.15, 1.0)) - 0.5);
           vec3 col;
-          if (y > -1.6) col = mix(vec3(0.55, 0.47, 0.36), vec3(0.42, 0.37, 0.3), smoothstep(-0.2, -1.5, y)) * (0.9 + 0.15 * sin(y * 30.0 + ufbm(q * 2.0) * 4.0));
-          else if (y > -3.4) col = vec3(0.4, 0.37, 0.33) * (0.9 + 0.15 * sin(y * 14.0 + ufbm(q) * 3.0));
+          if (y > -1.6) col = mix(vec3(0.55, 0.47, 0.36), vec3(0.42, 0.37, 0.3), smoothstep(-0.2, -1.5, y)) * (0.92 + 0.1 * sin(y * 7.0 + ufbm(q * 0.8) * 3.0));
+          else if (y > -3.4) col = vec3(0.4, 0.37, 0.33) * (0.92 + 0.1 * sin(y * 5.0 + ufbm(q * 0.6) * 3.0));
           else if (y > -14.0) { vec3 c = ucell(q * 0.9); col = vec3(0.43, 0.4, 0.4) * (0.85 + 0.25 * c.z) * (0.9 + 0.1 * smoothstep(0.0, 0.08, c.y - c.x)); }
           else col = vec3(0.3, 0.27, 0.28) * (0.85 + 0.2 * ufbm(q * 0.6));
           col *= 0.55 * (0.95 - 0.35 * smoothstep(0.0, -22.0, p.y));
           // stress: strain lines bunched around the locked patch, and its glow (red → hot)
           float lock = exp(-pow(length(p - uHypo) / 3.6, 2.0));
-          float strain = 0.5 + 0.5 * sin((nn * 4.0 + lock * 2.5 * sign(nn)) * 6.2831);
-          col = mix(col, col * (0.75 + 0.5 * strain), 0.35 * uStress * smoothstep(5.0, 0.0, abs(nn)));
+          float strain = 0.5 + 0.5 * sin((nn * 1.6 + lock * 1.5 * sign(nn)) * 6.2831);
+          col = mix(col, col * (0.85 + 0.3 * strain), 0.25 * uStress * smoothstep(4.0, 0.0, abs(nn)));
           col += vec3(1.0, 0.22, 0.06) * lock * uStress * 0.75 * (0.85 + 0.15 * sin(uTime * 7.0)) * smoothstep(1.4, 0.0, abs(nn));
           // the fault itself: a dark seam
-          float seam = smoothstep(0.06, 0.0, abs(nn)) * step(s, 15.5) * step(-0.2, s);
+          float seam = smoothstep(0.12, 0.0, abs(nn)) * step(s, 15.5) * step(-0.2, s);
           col = mix(col, vec3(0.05, 0.04, 0.04), seam * 0.85);
           // the rupture: from the tip down the fault, a white-hot front with an orange wake
           float front = uRup * 16.0, along = clamp(s, 0.0, 16.0);
           float lit = step(along, front) * step(-0.2, s) * step(s, 15.5);
-          float glowW = smoothstep(0.35, 0.0, abs(nn));
+          float glowW = smoothstep(0.6, 0.0, abs(nn));
           col += lit * glowW * (vec3(1.0, 0.55, 0.2) * 0.9 * exp(-(front - along) * 0.25) + vec3(1.0, 0.95, 0.85) * 2.2 * exp(-pow((front - along) / 0.5, 2.0)));
           // seismic rings from the hypocentre
           float d = length(p - uHypo), R = uRing;
@@ -283,27 +292,43 @@ class SlFault {
       city.box(0.05 + rr.next() * 0.08, h, 0.05 + rr.next() * 0.08, x, h / 2, z, rr.pick(cm));
     }
     const cg = new THREE.Group(); city.build(cg, 'city'); this.scene.add(cg); this.city = cg;
+    // where you are: a pin on the surface above the fault's tip; and the depth of the locked patch
+    const lab = (txt, w, h, size, col) => { const c = Tex.canvas(w, h), x = c.getContext('2d'); x.font = `700 ${size}px "Inter", sans-serif`; x.fillStyle = col; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, w / 2, h / 2); return new THREE.MeshBasicMaterial({ map: Tex.tex(c, { repeat: false }), transparent: true, depthWrite: false, toneMapped: false }); };
+    this.pin = new THREE.Group();
+    const pm = new THREE.MeshBasicMaterial({ color: '#ff4a3a', toneMapped: false });
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.32, 12), pm); cone.rotation.x = Math.PI; cone.position.y = 0.16; this.pin.add(cone);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 10), pm); ball.position.y = 0.38; this.pin.add(ball);
+    const you = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.42), lab('YOU', 256, 96, 72, '#ffffff')); you.position.y = 0.85; this.pin.add(you); this.pinLabel = you;
+    this.pin.position.set(SL_FAULT.tip.x, 0, 0.05); this.scene.add(this.pin);
+    const dl = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.9), lab('≈ 10 KM DOWN', 512, 128, 64, '#ffd2b0')); dl.position.set(SL_FAULT.hypo.x + 3.6, SL_FAULT.hypo.y - 1.0, 0.02); this.scene.add(dl); this.depthLabel = dl;
+    this.dust = new XBill(this.scene, { n: 70, kind: 'soft', color: '#a49884', seed: 74, alpha: 0.5, fadeIn: 0.1, fadeOut: 0.6,
+      spawn: (i, r) => ({ p: new THREE.Vector3(r.range(-4, 7), 0.05, r.range(-3, 0.2)), v: new THREE.Vector3(r.range(-0.2, 0.2), r.range(0.3, 0.9), 0), t0: 22.6 + r.next() * 1.6, life: r.range(1.2, 2.0), s0: 0.3, s1: 1.4 }) });
     // the far side and the bottom of the block
     const side = new THREE.Mesh(new THREE.PlaneGeometry(40, 24).rotateY(Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#221d19', roughness: 1 })); side.position.set(26, -12, -20); this.scene.add(side);
     this.orbit = new SlOrbit([
       [SL.fault, SL_FAULT.tip.x - 0.3, SL_FAULT.tip.y - 0.4, 0, 2.6, 4, -12, 46],
       [18.6, SL_FAULT.tip.x - 1.5, -2.2, 0, 9.0, 8, -16, 46, 'outCubic'],
-      [19.8, -2.0, -6.2, 0, 27, 12, -20, 46],
-      [21.8, -2.5, -7.0, 0, 26, 16, -22, 44],
-      [23.6, -0.5, -4.0, 0, 19, 20, -26, 44],
+      [19.8, 0.0, -5.6, 0, 27, 12, -20, 46],
+      [21.8, -0.5, -6.0, 0, 26, 16, -22, 44],
+      [23.6, 0.5, -3.6, 0, 19, 20, -26, 44],
       [24.6, 1.5, -0.4, -1.5, 6.0, 24, -34, 50, 'inCubic'],
     ]);
   }
   update(t) {
     this.U.uTime.value = t;
     this.U.uStress.value = MathX.smooth(t, SL.fault + 0.2, 18.2) * (1 - 0.5 * MathX.smooth(t, 22.5, 24.0));
-    this.U.uSlip.value = 0.05 * MathX.smooth(t, SL.slip, SL.slip + 0.3) + 0.55 * MathX.smooth(t, SL.rupture + 0.3, 23.6);
+    this.U.uSlip.value = 0.05 * MathX.smooth(t, SL.slip, SL.slip + 0.3) + 1.1 * MathX.smooth(t, SL.rupture + 0.3, 23.6);
     this.U.uRup.value = Math.pow(MathX.clamp((t - SL.rupture) / 3.2, 0, 1), 0.85);
     this.U.uRing.value = Math.max(0, t - 20.9) * 6.0;
     this.U.uRingA.value = MathX.smooth(t, 20.9, 21.3) * (1 - MathX.smooth(t, 24.0, 24.6)) * 1.4;
-    // the surface shudders when the waves arrive
-    const sh = MathX.smooth(t, 22.4, 23.0) * 0.012;
+    // the surface shudders when the waves arrive; dust; the camera shakes with it
+    const sh = MathX.smooth(t, 22.4, 23.0) * 0.03;
     this.city.position.set(sh * Math.sin(t * 61), sh * Math.cos(t * 47), 0);
+    this.pin.position.y = sh * 0.6 * Math.abs(Math.sin(t * 40));
+    this.pinLabel.lookAt(this.camera.position); this.depthLabel.material.opacity = MathX.smooth(t, 19.0, 19.6) * (1 - MathX.smooth(t, 23.6, 24.2));
+    this.dust.update(t);
     this.orbit.apply(this.camera, t);
+    const k = MathX.smooth(t, 22.6, 23.2), D = this.camera.position.distanceTo(this.orbit._t);
+    if (k > 0) { this.camera.position.x += noise1(t * 17, 81) * 0.006 * D * k; this.camera.position.y += noise1(t * 19, 82) * 0.006 * D * k; this.camera.updateMatrixWorld(true); }
   }
 }

@@ -63,6 +63,7 @@ function slWetMain(kind) {
     // (the big puddle around the steel plate)
     float dp = length((P - vec2(${SL_PLATE.x.toFixed(2)}, ${SL_PLATE.z.toFixed(2)})) * vec2(0.85, 0.6));
     pud = max(pud, smoothstep(1.35, 1.05, dp + 0.18 * slN(P * 3.0)));
+    pud = max(pud, smoothstep(0.75, 0.5, length(P - vec2(10.35, 1.97)) + 0.1 * slN(P * 4.0)));   // (the puddle by your hand)
     vec2 rip = slRipple(P, uSlTime) * (0.25 + 0.75 * pud) * (1.0 + 2.0 * uSlQuake);
     // the ring from your fall (x, z, radius, strength): a few crests spreading through the puddle
     vec2 rd = P - uSlRing.xy; float rl = length(rd);
@@ -347,17 +348,17 @@ class SlStreet extends Environment {
   _quakeProps() {
     const h = LAYOUT.curbH;
     // the shop window on your right that bursts
-    this.glass = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 2.5), new THREE.MeshPhysicalMaterial({ color: '#c7d7dc', roughness: 0.04, metalness: 0.2, transparent: true, opacity: 0.32, envMapIntensity: 1.6 }));
-    this.glass.position.set(12.42, h + 1.55, -3.4); this.glass.rotation.y = -Math.PI / 2; this.scene.add(this.glass);
+    this.glass = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 3.0), new THREE.MeshPhysicalMaterial({ color: '#c7d7dc', roughness: 0.04, metalness: 0.2, transparent: true, opacity: 0.32, envMapIntensity: 1.6 }));
+    this.glass.position.set(12.42, h + 1.7, -3.4); this.glass.rotation.y = -Math.PI / 2; this.scene.add(this.glass);
     const shardMat = new THREE.MeshStandardMaterial({ color: '#dfeaee', roughness: 0.05, metalness: 0.4, transparent: true, opacity: 0.75, side: THREE.DoubleSide });
-    this.shards = new SlChunks(this.scene, 70, shardMat, 61, (i, r) => ({ p: new THREE.Vector3(12.35, h + 0.4 + r.next() * 2.3, -3.4 + r.range(-1.6, 1.6)), v: new THREE.Vector3(r.range(-3.5, -0.8), r.range(-0.5, 2.0), r.range(-1.2, 1.2)), t0: 27.05 + r.next() * 0.12, size: r.range(0.06, 0.28), flat: 0.06, spin: new THREE.Vector3(r.range(-12, 12), r.range(-12, 12), r.range(-12, 12)) }));
+    this.shards = new SlChunks(this.scene, 140, shardMat, 61, (i, r) => ({ p: new THREE.Vector3(12.35, h + 0.3 + r.next() * 2.9, -3.4 + r.range(-2.2, 2.2)), v: new THREE.Vector3(r.range(-5.5, -1.0), r.range(-0.5, 2.6), r.range(-0.6, 2.4)), t0: 27.05 + r.next() * 0.12, size: r.range(0.06, 0.28), flat: 0.06, spin: new THREE.Vector3(r.range(-12, 12), r.range(-12, 12), r.range(-12, 12)) }));
     // a cornice breaking off across the street and a chunk near you
     const stone = Mat.std('#9b958a', { roughness: 0.9 });
     this.cornice = new SlChunks(this.scene, 34, stone, 62, (i, r) => {
       const near = i < 8;
       return { p: near ? new THREE.Vector3(12.0 + r.range(-0.3, 0.3), 9.5 + r.next(), -7.5 + r.range(-1.5, 1.5)) : new THREE.Vector3(-12.6, 14 + r.next() * 2, -12 + r.range(-3, 3)),
         v: near ? new THREE.Vector3(r.range(-2.5, -0.5), r.range(0, 1.5), r.range(-1, 1)) : new THREE.Vector3(r.range(0.5, 3.0), r.range(0, 2), r.range(-1, 1)),
-        t0: (near ? 29.3 : 28.2) + r.next() * 0.3, size: r.range(0.12, near ? 0.45 : 0.7), flat: 0.6, spin: new THREE.Vector3(r.range(-5, 5), r.range(-5, 5), r.range(-5, 5)) };
+        t0: (near ? 27.45 : 28.75) + r.next() * 0.3, size: r.range(0.12, near ? 0.45 : 0.7), flat: 0.6, spin: new THREE.Vector3(r.range(-5, 5), r.range(-5, 5), r.range(-5, 5)) };
     });
     // a bracket sign over the sidewalk (it swings) and the lamp post by the curb (it sways)
     const sg = Tex.label([['PHARMACY', 46]], { w: 384, h: 128, bg: '#1b7a4e', fg: '#ffffff' });
@@ -384,7 +385,7 @@ class SlStreet extends Environment {
     this.crack.position.set(9.9, LAYOUT.curbH + 0.012, -4.0); this.crack.rotation.y = Math.PI / 2 + 0.1; this.crack.scale.set(11, 1, 0.16);
     this.crack.visible = false; this.scene.add(this.crack);
     // dust shaken off the facades
-    this.dust = new XBill(this.scene, { n: 90, kind: 'soft', color: '#b9b2a6', seed: 63, alpha: 0.32, fadeIn: 0.15, fadeOut: 0.4,
+    this.dust = new XBill(this.scene, { n: 90, kind: 'soft', color: '#7f786d', seed: 63, alpha: 0.26, fadeIn: 0.15, fadeOut: 0.4,
       spawn: (i, r) => { const side = r.next() < 0.5 ? -1 : 1; return { p: new THREE.Vector3(side * 12.4, r.range(4, 16), r.range(-40, 6)), v: new THREE.Vector3(-side * r.range(0.3, 1.2), r.range(-1.6, -0.4), r.range(-0.3, 0.3)), t0: 25.4 + r.next() * 6, life: r.range(2.0, 3.5), s0: 1.2, s1: 4.5 }; } });
   }
 

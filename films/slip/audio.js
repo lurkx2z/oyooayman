@@ -137,7 +137,7 @@ class SlAudio extends AudioEngine {
     for (let t = 25.6; t < 31.6; t += 1.0) { taiko(t, 0.8); taiko(t + 0.5, 0.45); }
     alarm(25.5, 31.9, 1.0, -0.6); alarm(26.3, 31.9, 0.6, 0.5);
     glass(27.05, 22, 1.2);
-    stone(28.25, 0.8, -0.4); stone(28.5, 0.6, -0.3); stone(29.35, 1.0, 0.4); stone(29.6, 0.7, 0.5);
+    stone(28.75, 0.8, -0.4); stone(29.0, 0.6, -0.3); stone(27.45, 1.0, 0.4); stone(27.7, 0.7, 0.5);
     for (let i = 0; i < 6; i++) S.voice(25.0 + i * 0.9 + S.rng.range(0, 0.3), S.rng.range(260, 420), 0.35, i % 2 ? 'a' : 'o', 0.08, S.rng.range(-0.7, 0.7), fx, 0.8);
     pad(28.0, 32.0, [26, 33, 38, 41], 0.04, 800, 1800);
     whoosh(31.5, 0.6, 1.4, 200, 5000);
@@ -148,11 +148,11 @@ class SlAudio extends AudioEngine {
     tick(T.tick, 1.6); sub(T.tick + 0.02, 55, 30, 0.6, 1.4, mus);
     strings(T.shift, 39.2, [38, 45, 50, 53], 0.03, true); riser(38.3, 39.18, 0.15); whoosh(38.7, 0.5, 1.1, 4000, 300);
     /* ---------------- 39.2–52.6 the coast ---------------- */
-    { const w = noiseBed(39.2, 52.6, 'lowpass', 500, 0.6, 0.32, amb, 'pink', 0.5, 0.5); w.g.gain.setValueAtTime(0.32, 41.0); w.g.gain.linearRampToValueAtTime(0.04, 45.6); }   // the surf, fading as the sea leaves
-    { const h = noiseBed(40.0, 46.4, 'bandpass', 900, 0.8, 0.16, fx, 'pink', 1.5, 1.0); h.b.frequency.setValueAtTime(1400, 40); h.b.frequency.exponentialRampToValueAtTime(500, 46.4); }  // the water draining away
-    creak(42.4, 1.4, 1.3, 75, -0.5); creak(43.5, 1.2, 1.0, 68, -0.3); creak(44.6, 1.0, 1.2, 82, -0.6);
-    S.chatter(40.0, 46.5, 0.05, 0.1, fx, 300, 2.5);
-    pad(39.2, 46.0, [26, 33, 38], 0.05, 480);
+    { const w = noiseBed(39.2, 52.6, 'lowpass', 500, 0.6, 0.32, amb, 'pink', 0.5, 0.5); w.g.gain.setValueAtTime(0.32, 40.0); w.g.gain.linearRampToValueAtTime(0.04, 42.6); }   // the surf, fading as the sea leaves
+    { const h = noiseBed(39.7, 43.2, 'bandpass', 900, 0.8, 0.18, fx, 'pink', 0.6, 0.4); h.b.frequency.setValueAtTime(1400, 39.7); h.b.frequency.exponentialRampToValueAtTime(500, 43.2); h.g.gain.setValueAtTime(0, 46.2); }  // the water draining away
+    creak(40.5, 1.2, 1.3, 75, -0.5); creak(41.3, 1.0, 1.0, 68, -0.3); creak(42.1, 0.8, 1.2, 82, -0.6);
+    S.chatter(39.4, 43.0, 0.05, 0.1, fx, 300, 2.5);
+    pad(39.2, 43.0, [26, 33, 38], 0.05, 480);
     { let t = 41.0, dt = 0.62; while (t < 52.5) { tick(t, 0.8); t += dt; dt = Math.max(0.24, dt * 0.975); } }
     // the line: a distant rumble that grows; sirens; a hit on every new height
     rumble(T.line, 52.6, 0.45, fx, 80);
@@ -175,6 +175,6 @@ class SlAudio extends AudioEngine {
     // the impact: one hit — then nothing
     sub(T.impact, 90, 26, 1.1, 0.4, fx); noiseHit(T.impact, 0.12, 'lowpass', 2500, 0.6, 1.0, fx, 'brown');
     /* ---------------- the end card: silence, and one drop of rain under the meta line ---------------- */
-    { const t = T.meta[0] + 0.05, o = osc('sine', 1900, t, t + 0.12), g = ctx.createGain(); o.frequency.exponentialRampToValueAtTime(900, t + 0.08); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.05, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.1); o.connect(g); g.connect(comp); }
+    { const t = T.punch + 0.05, o = osc('sine', 1900, t, t + 0.12), g = ctx.createGain(); o.frequency.exponentialRampToValueAtTime(900, t + 0.08); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.05, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.1); o.connect(g); g.connect(comp); }
   }
 }

@@ -48,12 +48,27 @@ const FILM = {
     app.under = new SlUnder(app);
     app.fault = new SlFault();
     if (typeof SlEarth !== 'undefined') app.globe = new SlEarth();
-    app.hands = new ViewerHands(camera, { scale: 1.02, skin: '#c99a7c', nail: '#dcbcae', sleeve: '#2b3038', cuff: '#20242b', watch: true, sleeveLen: 1.1, sleeveFit: 0.85, poses: SL_HAND_POSES, blends: SL_HAND_BLEND });
+    app.hands = new ViewerHands(camera, { scale: 1.02, skin: '#c99a7c', nail: '#dcbcae', sleeve: '#2b3038', cuff: '#20242b', watch: false, sleeveLen: 1.1, sleeveFit: 0.85, poses: SL_HAND_POSES, blends: SL_HAND_BLEND });
     camera.layers.enable(2); for (const h of [app.hands.left, app.hands.right]) h.g.traverse((o) => o.layers.set(2));   // (never in the reflections)
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; document.getElementById('hud').appendChild(d); return d; };
-    app.card = mk('sl-card', '<div class="k">CAUSE OF GLOBAL CATASTROPHE:</div><div class="v">SLIPPED ON WET SIDEWALK</div>');
-    app.meta = mk('sl-meta', '<div class="m">yes. somehow it became a tsunami again.</div><div class="n">SATIRICAL SIMULATION · NO, SLIPPING CANNOT ACTUALLY CAUSE THIS.</div>');
+    app.card = mk('sl-card', '<div class="k">CAUSE OF GLOBAL CATASTROPHE:</div><div class="v">SLIPPED ON<br>WET SIDEWALK</div>');
+    app.punch = mk('sl-punch', 'yes. somehow it became<br>a tsunami again.');
+    app.meta = mk('sl-meta', 'SATIRICAL SIMULATION<br>NO, SLIPPING CANNOT ACTUALLY CAUSE THIS.');
+    // the rotation readout (its own element so the changed digit can flash)
+    app.rot = mk('readout story-readout sl-rot', '<div class="label">EARTH ROTATION SPEED</div><div class="value"><span class="v">1,674.4<b>0</b> KM/H</span></div><div class="sub sl-rotc">ROTATION CHANGE <span>+0.0006 %</span></div>');
+    app.rot.style.top = 'calc(var(--u) * 230)'; app.rotB = app.rot.querySelector('b'); app.rotC = app.rot.querySelector('.sl-rotc');
+    // the ring from your fall in the puddle: its own glowing ripples (the reflections ripple with it too)
+    app.ringU = { uR: { value: 0 }, uA: { value: 0 } };
+    app.ring = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4).rotateX(-Math.PI / 2), new THREE.ShaderMaterial({
+      uniforms: app.ringU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: 'varying vec2 vP; void main(){ vP = position.xz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: `uniform float uR, uA; varying vec2 vP;
+        void main(){ float d = length(vP), a = 0.0;
+          for (int i = 0; i < 3; i++) { float r = uR - float(i) * 0.16; if (r <= 0.0) continue; float w = 0.012 + 0.01 * r; a += exp(-pow((d - r) / w, 2.0)) * (1.0 - float(i) * 0.3) / (1.0 + r * 1.5); }
+          a *= uA * smoothstep(1.2, 0.8, d); gl_FragColor = vec4(vec3(0.75, 0.88, 1.0) * a, a); }`,
+    }));
+    app.ring.position.set(SL_RING.x, LAYOUT.curbH + 0.016, SL_RING.z); app.ring.renderOrder = 4; scene.add(app.ring);
     app.audio = typeof SlAudio !== 'undefined' ? new SlAudio(app.tl, app) : new AudioEngine(app.tl);
     app._Q = new THREE.Vector3();
   },
@@ -82,7 +97,7 @@ const FILM = {
       const D = MathX.deg, k = q;
       Q.set(noise1(t * 9, 61) * 0.05 * k, noise1(t * 11, 62) * 0.03 * k, noise1(t * 8, 63) * 0.05 * k);
       cam.position.add(Q);
-      cam.rotation.x += noise1(t * 19, 64) * D(2.2) * k; cam.rotation.y += noise1(t * 17, 65) * D(1.8) * k; cam.rotation.z += noise1(t * 21, 66) * D(2.6) * k;
+      cam.rotation.x += noise1(t * 19, 64) * D(2.2) * k; cam.rotation.y += noise1(t * 17, 65) * D(1.8) * k; cam.rotation.z += noise1(t * 21, 66) * D(2.6) * k + Math.sin(t * 7.5) * D(3.5) * k + noise1(t * 2.3, 67) * D(4) * k;
     }
     cam.updateMatrixWorld(true);
     if (seg === 'street' || seg === 'coast') {
@@ -90,7 +105,9 @@ const FILM = {
       if (app.sea) app.sea.update(t, cam);
       if (app.cast) app.cast.update(t, q);
       // the ring from your fall spreading through the puddle in front of you
-      SL_WET_U.uSlRing.value.set(9.27, 1.47, 0.05 + Math.max(0, t - 6.2) * 0.42, 0.6 * MathX.smooth(t, 6.2, 6.5) * (t < SL.under ? 1 : 0));
+      const rr = 0.04 + Math.max(0, t - 6.35) * 0.55, ron = MathX.smooth(t, 6.3, 6.45) * (t < SL.under ? 1 : 0);
+      SL_WET_U.uSlRing.value.set(SL_RING.x, SL_RING.z, rr, 0.6 * ron);
+      app.ringU.uR.value = rr; app.ringU.uA.value = 2.2 * ron; app.ring.visible = ron > 0;
       app.legs.update(app, t, t < 6.35);
       this._hands(app, t);
       app.street.renderMirror(app.renderer, cam);
@@ -109,9 +126,10 @@ const FILM = {
     // (the hands stay where your body is, facing down the street, wherever you turn your head)
     const fx = 0, fz = -1, rx = 1, rz = 0;
     // on the ground: beside your knees while you sit, under your shoulders on hands and knees (riding the quake)
-    const gy = LAYOUT.curbH + 0.01, sit = t < SL.under, fwd = sit ? 0.5 : 0.18, wide = sit ? 0.36 : 0.27;
+    const gy = LAYOUT.curbH + 0.01, sit = t < SL.under, fwd = 0.18, wide = 0.27;
     for (const [name, side] of [['groundL', -1], ['groundR', 1]]) {
-      V.w.set(cam.position.x + fx * fwd + rx * wide * side, gy, cam.position.z + fz * fwd + rz * wide * side).add(app._Q);
+      if (sit) V.w.set(side < 0 ? 9.2 : SL_RING.x - 0.16, gy, side < 0 ? 1.8 : SL_RING.z - 0.1);
+      else V.w.set(cam.position.x + fx * fwd + rx * wide * side, gy, cam.position.z + fz * fwd + rz * wide * side).add(app._Q);
       V.f.set(fx + rx * 0.25 * side, 0, fz + rz * 0.25 * side); V.n.set(0, -1, 0);
       slAimHand(name, cam, V.w, V.f, V.n, side);
     }
@@ -128,8 +146,16 @@ const FILM = {
   },
 
   _overlays(app, t) {
-    app.card.style.opacity = StoryHUD.win(t, SL.card[0], SL.end + 1, 0.5, 0.01).toFixed(3);
+    app.card.style.opacity = StoryHUD.win(t, SL.card[0], SL.end + 1, 0.35, 0.01).toFixed(3);
+    app.punch.style.opacity = StoryHUD.win(t, SL.punch, SL.end + 1, 0.3, 0.01).toFixed(3);
     app.meta.style.opacity = StoryHUD.win(t, SL.meta[0], SL.end + 1, 0.4, 0.01).toFixed(3);
+    // the rotation readout: 1,674.40 → 1,674.41 (the changed digit flashes), then the change itself, large
+    app.rot.style.opacity = StoryHUD.win(t, 32.9, 39.1, 0.5, 0.5).toFixed(3);
+    app.rotB.textContent = t < SL.tick ? '0' : '1';
+    const fl = Math.exp(-Math.max(0, t - SL.tick) * 1.6) * (t >= SL.tick ? 1 : 0);
+    app.rotB.style.color = fl > 0.02 ? `rgb(255, ${Math.round(255 - 120 * fl)}, ${Math.round(255 - 200 * fl)})` : '';
+    app.rotB.style.fontSize = (1 + 0.35 * fl).toFixed(3) + 'em';
+    app.rotC.style.opacity = MathX.smooth(t, SL.shift, SL.shift + 0.3).toFixed(3);
   },
 
   grade(t, p) {

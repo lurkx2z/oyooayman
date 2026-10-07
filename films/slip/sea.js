@@ -28,8 +28,8 @@ const SL_BED_GLSL = /* glsl */`
     float d = ${(SL_FRONT.wallZ - 0.5).toFixed(2)} - z;
     float b = d < 12.0 ? -2.6 - d / 12.0 : (d < 1100.0 ? -3.6 - (d - 12.0) * 0.07 : -79.76 - (d - 1100.0) * 0.012);
     b = max(b, -130.0);
-    b += 0.45 * sin(d * 0.09) * slSmooth(15.0, 60.0, d);
-    b += (1.3 * sin(0.013 * x + 0.7) * sin(0.011 * z + 1.3) + 0.8 * sin(0.031 * x - 0.021 * z + 2.1) + 0.4 * sin(0.05 * x + 0.043 * z)) * slSmooth(20.0, 120.0, d);
+    b += 0.45 * sin(d * 0.09 + 0.021 * x + 1.6 * sin(x * 0.011)) * slSmooth(15.0, 60.0, d);
+    b += (1.3 * sin(0.013 * x + 0.7) * sin(0.011 * z + 1.3) + 0.8 * sin(0.031 * x - 0.021 * z + 2.1) + 0.4 * sin(0.05 * x + 0.043 * z)) * slSmooth(6.0, 90.0, d);
     b -= 3.5 * slSmooth(-90.0, -80.0, x) * (1.0 - slSmooth(-26.0, -16.0, x)) * slSmooth(10.0, 40.0, d) * (1.0 - slSmooth(300.0, 340.0, d));
     return b;
   }`;
@@ -38,8 +38,8 @@ function slSeabedY(x, z) {
   const d = SL_FRONT.wallZ - 0.5 - z;
   let b = d < 12 ? -2.6 - d / 12 : (d < 1100 ? -3.6 - (d - 12) * 0.07 : -79.76 - (d - 1100) * 0.012);
   b = Math.max(b, -130);
-  b += 0.45 * Math.sin(d * 0.09) * slSmoothJ(15, 60, d);
-  b += (1.3 * Math.sin(0.013 * x + 0.7) * Math.sin(0.011 * z + 1.3) + 0.8 * Math.sin(0.031 * x - 0.021 * z + 2.1) + 0.4 * Math.sin(0.05 * x + 0.043 * z)) * slSmoothJ(20, 120, d);
+  b += 0.45 * Math.sin(d * 0.09 + 0.021 * x + 1.6 * Math.sin(x * 0.011)) * slSmoothJ(15, 60, d);
+  b += (1.3 * Math.sin(0.013 * x + 0.7) * Math.sin(0.011 * z + 1.3) + 0.8 * Math.sin(0.031 * x - 0.021 * z + 2.1) + 0.4 * Math.sin(0.05 * x + 0.043 * z)) * slSmoothJ(6, 90, d);
   b -= 3.5 * slSmoothJ(-90, -80, x) * (1 - slSmoothJ(-26, -16, x)) * slSmoothJ(10, 40, d) * (1 - slSmoothJ(300, 340, d));
   return b;
 }
@@ -61,12 +61,18 @@ const SL_WAVE_GLSL = /* glsl */`
   float slVar(float x, float k){ return 0.45 * sin(x * 0.0021 * k + 1.3) + 0.25 * sin(x * 0.0057 * k + 0.4) + 0.18 * sin(x * 0.013 * k + 2.2) + 0.12 * sin(x * 0.031 * k + 0.9); }
   float slHx(float x, float H){ return H * (0.88 + 0.2 * slVar(x, 1.0)); }
   float slCx(float x, float c){ return clamp(c + 0.35 * slVar(x + 900.0, 1.6), 0.0, 1.0); }
-  float slZx(float x, float zf){ return zf + 0.00002 * x * x + 26.0 * slVar(x + 300.0, 0.8); }`;
+  float slZx(float x, float zf){ return zf + 0.00005 * x * x + 26.0 * slVar(x + 300.0, 0.8); }`;
 const slWVar = (x, k) => 0.45 * Math.sin(x * 0.0021 * k + 1.3) + 0.25 * Math.sin(x * 0.0057 * k + 0.4) + 0.18 * Math.sin(x * 0.013 * k + 2.2) + 0.12 * Math.sin(x * 0.031 * k + 0.9);
 const slBodyY = (s) => (s < 0 ? 0.36 + 0.06 * Math.exp(s * 0.05) + 0.58 * Math.exp(-Math.pow(s / 1.35, 2)) : Math.pow(Math.max(0, 1 - s / 0.62), 2));
 const slHx = (x, H) => H * (0.88 + 0.2 * slWVar(x, 1));
 const slCx = (x, c) => MathX.clamp(c + 0.35 * slWVar(x + 900, 1.6), 0, 1);
-const slZx = (x, zf) => zf + 0.00002 * x * x + 26 * slWVar(x + 300, 0.8);
+const slZx = (x, zf) => zf + 0.00005 * x * x + 26 * slWVar(x + 300, 0.8);
+// the tip of the curling lip at x (same formula as the lip mesh)
+function slLipTip(t, x, out) {
+  const H = slHx(x, slWaveH(t)), c = slCx(x, slWaveCurl(t)), R = 0.13 + 0.07 * c, ph = Math.PI / 2 - (0.2 + 0.72 * c) * Math.PI;
+  const qx = 0.1 * c + Math.cos(ph) * R * 1.4, qy = 1 - R + Math.sin(ph) * R + 0.03 * Math.sin(x * 0.071 + 1.7);
+  return out.set(x, slSeaLevel(t) + qy * H, slZx(x, slWaveZ(t)) + qx * H);
+}
 // world point on the wave's face at x, s̃ (for debris, boats, the ship)
 function slWavePoint(t, x, s, out) {
   const H = slHx(x, slWaveH(t)), base = slSeaLevel(t);
@@ -101,7 +107,7 @@ class SlSea {
     for (let j = 0; j < NZ; j++) for (let i = 0; i < NX; i++) { const a = j * (NX + 1) + i, b = a + 1, cc = a + NX + 1, dd = cc + 1; idx.push(a, b, cc, b, dd, cc); }   // (z runs toward −Z: this winding faces up)
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
     const sb = Tex.sidewalk(17);
-    this.bedMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.42, metalness: 0.0, bumpMap: sb.bumpMap, bumpScale: 0.6, envMapIntensity: 1.6 });
+    this.bedMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.26, metalness: 0.0, bumpMap: sb.bumpMap, bumpScale: 0.6, envMapIntensity: 1.6 });
     // the exposed seabed: sand ripples, darker weed, and pools of water left in the hollows (dark, glossy, reflecting the sky)
     this.bedMat.onBeforeCompile = (sh) => {
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vBW;').replace('#include <project_vertex>', '#include <project_vertex>\nvBW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
@@ -121,7 +127,7 @@ class SlSea {
         diffuseColor.rgb *= 1.0 - beach * 0.25 * smoothstep(0.55, 0.75, bn(vBW.xz * 3.0));
         float weed = smoothstep(0.58, 0.72, bf(vBW.xz * 0.045 + 11.0)) * smoothstep(25.0, 80.0, bd);
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.13, 0.16, 0.1), weed * 0.75);
-        float pool = smoothstep(0.6, 0.66, bf(vBW.xz * 0.03 + 4.0) + 0.06 * bn(vBW.xz * 0.6)) * smoothstep(14.0, 40.0, bd);
+        float pool = smoothstep(0.68, 0.72, bf(vBW.xz * 0.012 + 4.0) + 0.05 * bn(vBW.xz * 0.3)) * smoothstep(14.0, 40.0, bd);
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.05, 0.07, 0.075), pool * 0.85);`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
         roughnessFactor = mix(roughnessFactor, 0.04, pool);`);
@@ -236,24 +242,37 @@ class SlSea {
     B.add(new THREE.ConeGeometry(1.6, 1.5, 12), red, Geo.matrix(lx, ly + 23.6, lz));
     this.light = { x: lx, z: lz, y: ly };
     const hg = new THREE.Group(); B.build(hg, 'harbour'); scene.add(hg); this.harbourGroup = hg;
+    this.siren = new THREE.Group(); this.siren.position.set(-6.5, LAYOUT.curbH, SL_FRONT.promZ[1] - 1.6);
+    const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 4.2, 8), Mat.std('#3a3d40', { roughness: 0.5 })); sp.position.y = 2.1; this.siren.add(sp);
+    this.sirenR = new THREE.MeshBasicMaterial({ color: '#ff2a1a', toneMapped: false }); this.sirenB = new THREE.MeshBasicMaterial({ color: '#2a5aff', toneMapped: false });
+    const s1 = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.sirenR); s1.position.set(-0.25, 4.35, 0); this.siren.add(s1);
+    const s2 = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.sirenB); s2.position.set(0.25, 4.35, 0); this.siren.add(s2);
+    this.sirenLight = new THREE.PointLight('#ff3020', 0, 30, 1.6); this.sirenLight.position.set(0, 4.3, 0); this.siren.add(this.sirenLight);
+    scene.add(this.siren);
     // boats moored in the basin (and a few outside): they float, then settle on the mud and tip as the sea leaves
     const hull = (L, W, col) => {
-      const s = new THREE.Shape(); s.moveTo(-L / 2, -W / 2); s.lineTo(L * 0.25, -W / 2); s.quadraticCurveTo(L * 0.48, -W * 0.3, L / 2, 0); s.quadraticCurveTo(L * 0.48, W * 0.3, L * 0.25, W / 2); s.lineTo(-L / 2, W / 2); s.closePath();
-      const g = new THREE.ExtrudeGeometry(s, { depth: W * 0.55, bevelEnabled: false }); g.rotateX(-Math.PI / 2); g.translate(0, -W * 0.25, 0);
-      const grp = new THREE.Group(); grp.add(new THREE.Mesh(g, Mat.std(col, { roughness: 0.5 })));
-      const cab = new THREE.Mesh(new THREE.BoxGeometry(L * 0.3, W * 0.45, W * 0.7), Mat.std('#e8e6e0', { roughness: 0.6 })); cab.position.set(-L * 0.05, W * 0.5, 0); grp.add(cab);
+      // a rounded hull: the lower half of a stretched sphere with a fuller stern, a deck, a rubbing strake, a cabin
+      const g = new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), pa = g.attributes.position;
+      for (let i = 0; i < pa.count; i++) { let x = pa.getX(i), y = pa.getY(i), z = pa.getZ(i); const st = x < 0 ? 1 - 0.35 * x * x : 1; pa.setXYZ(i, x * L / 2, y * W * 0.42 * (x > 0 ? 1 - 0.3 * x : 1), z * W / 2 * Math.max(st, 0.55) * (x > 0.6 ? 1 - (x - 0.6) * 1.6 : 1)); }
+      g.computeVertexNormals();
+      const grp = new THREE.Group(), pm = Mat.std(col, { roughness: 0.45 });
+      grp.add(new THREE.Mesh(g, pm));
+      const deck = new THREE.Mesh(new THREE.CircleGeometry(1, 20).rotateX(-Math.PI / 2), Mat.std('#cfc8b6', { roughness: 0.8 })); deck.scale.set(L / 2 * 0.98, 1, W / 2 * 0.95); deck.position.y = 0.01; grp.add(deck);
+      const rail = new THREE.Mesh(new THREE.TorusGeometry(1, 0.035, 4, 24).rotateX(Math.PI / 2), Mat.std('#2a2c2e')); rail.scale.set(L / 2, 1, W / 2); rail.position.y = 0.02; grp.add(rail);
+      const cab = new THREE.Mesh(new THREE.BoxGeometry(L * 0.28, W * 0.5, W * 0.62), Mat.std('#ece9e1', { roughness: 0.6 })); cab.position.set(-L * 0.08, W * 0.25, 0); grp.add(cab);
+      const win = new THREE.Mesh(new THREE.BoxGeometry(L * 0.285, W * 0.14, W * 0.63), Mat.std('#26313a', { roughness: 0.2 })); win.position.set(-L * 0.08, W * 0.38, 0); grp.add(win);
       return grp;
     };
     const rb = new RNG(85), cols = ['#f2f0ea', '#2a4a6a', '#a8302a', '#e8e4d8', '#3a5a3a', '#d8c070'];
     this.boats = [];
-    const near = [[-9, 30, 7.5], [13, 46, 9], [-24, 66, 6.5], [4, 88, 10]];
+    const near = [[-9, 30, 7.5], [16, 46, 9], [-24, 66, 6.5], [-34, 92, 10]];
     for (let i = 0; i < 20; i++) {
       const inside = i < 12, nr = i >= 16 ? near[i - 16] : null, L = nr ? nr[2] : rb.range(6, 12), W = L * 0.34;
       const x = nr ? nr[0] : inside ? rb.range(-84, -26) : rb.range(-40, 160), d = nr ? nr[1] : inside ? rb.range(40, 290) : rb.range(320, 700), z = SL_FRONT.wallZ - d;
       const g = hull(L, W, rb.pick(cols)); g.rotation.y = rb.range(-0.4, 0.4) + (inside ? Math.PI / 2 : rb.range(0, 6));
       if (rb.next() < 0.5) { const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, L * 1.1, 5), Mat.std('#cfcfca')); mast.position.set(L * 0.05, L * 0.55, 0); g.add(mast); }
       g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
-      scene.add(g); this.boats.push({ g, x, z, draft: W * 0.25, roll: (rb.next() < 0.5 ? -1 : 1) * rb.range(0.3, 0.55), ry: g.rotation.y, seed: rb.next() * 10 });
+      scene.add(g); this.boats.push({ g, x, z, draft: W * 0.3, roll: (rb.next() < 0.5 ? -1 : 1) * rb.range(0.6, 0.95), ry: g.rotation.y, seed: rb.next() * 10 });
     }
     // the container ship on the horizon
     const ship = new THREE.Group(), hullM = Mat.std('#2a2e33', { roughness: 0.6 }), redM = Mat.std('#7a2a22', { roughness: 0.7 });
@@ -262,7 +281,7 @@ class SlSea {
     const cc = ['#a8402a', '#2a5a8a', '#d8a030', '#3a7a4a', '#8a8a86', '#c8c4b8'];
     for (let i = 0; i < 22; i++) for (let k = 0; k < 3; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(7, 2.6, 26), Mat.std(cc[(i * 3 + k * 5) % cc.length], { roughness: 0.7 })); b.position.set(-78 + i * 7.3, 10.3 + k * 2.6, 0); ship.add(b); }
     const br = new THREE.Mesh(new THREE.BoxGeometry(12, 16, 28), Mat.std('#e8e6e0', { roughness: 0.6 })); br.position.set(84, 17, 0); ship.add(br);
-    ship.rotation.y = 0.25; scene.add(ship); this.ship = { g: ship, x: 420, z: -3600 };
+    ship.rotation.y = 0.25; scene.add(ship); this.ship = { g: ship, x: 110, z: -3400 };
   }
 
   update(t, cam) {
@@ -278,7 +297,7 @@ class SlSea {
         slWavePoint(t, b.x, -0.25 + 0.2 * u, V); b.g.position.set(V.x, V.y + 1, V.z);
         b.g.rotation.set(u * 3 * b.roll, b.ry + u * 2, u * 4); continue;
       }
-      const float = lvl - b.draft, rest = bed + b.draft * 0.6, on = lvl < bed + b.draft * 1.4;
+      const float = lvl + b.draft * 0.4, rest = bed + b.draft * 0.9, on = lvl < bed + b.draft * 1.4;
       const k = MathX.clamp((bed + b.draft * 1.4 - lvl) / (b.draft * 1.6), 0, 1);
       b.g.position.set(b.x, Math.max(float, rest) + (on ? 0 : 0.12 * Math.sin(t * 1.3 + b.seed)), b.z);
       b.g.rotation.set(b.roll * Ease.inOutSine(k), b.ry, (on ? 0 : 0.03 * Math.sin(t * 1.1 + b.seed)));
@@ -287,6 +306,11 @@ class SlSea {
     const S = this.ship, swz = slZx(S.x, slWaveZ(t));
     if (t > SL.line && swz > S.z - 200) { const u = MathX.clamp((swz - S.z + 200) / 400, 0, 1); slWavePoint(t, S.x, -0.15 + 0.35 * u, V); S.g.position.set(V.x, V.y - 2, V.z); S.g.rotation.set(0.35 * u, 0.25 + u * 0.4, -0.25 * u); }
     else { S.g.position.set(S.x, lvl - 4, S.z); S.g.rotation.set(0.01 * Math.sin(t * 0.6), 0.25, 0.01 * Math.sin(t * 0.5)); }
+    // the siren: alternating red and blue from when it starts wailing
+    const on = t > 48.4 && t < SL.black, ph = Math.floor(t * 3.2) % 2;
+    this.sirenR.color.setScalar(0).setRGB(on && ph === 0 ? 3 : 0.25, on && ph === 0 ? 0.25 : 0.05, 0.05);
+    this.sirenB.color.setRGB(0.05, on && ph === 1 ? 0.5 : 0.08, on && ph === 1 ? 3 : 0.3);
+    this.sirenLight.intensity = on ? 14 : 0; this.sirenLight.color.set(ph === 0 ? '#ff3020' : '#3060ff');
     W.update(t, cam);
   }
 }
@@ -317,9 +341,9 @@ class SlWave {
           return vec3(x, uBase + y * H, zf + s * H);
         }
         // the lip: an arc from the crest, thrown forward and down; it grows with the curl
-        float R = 0.1 + 0.05 * c, ext = (0.12 + 0.62 * c) * 3.14159;
+        float R = 0.13 + 0.07 * c, ext = (0.2 + 0.72 * c) * 3.14159;
         float ph = 1.5708 - v * ext;
-        vec2 C = vec2(0.07 * c * smoothstep(0.0, 0.35, v), 1.0 - R);
+        vec2 C = vec2(0.1 * c * smoothstep(0.0, 0.35, v), 1.0 - R);
         vec2 q = C + vec2(cos(ph) * R * 1.4, sin(ph) * R) + vec2(0.0, 0.03 * sin(x * 0.071 + 1.7) + 0.018 * sin(x * 0.19 + uTime * 0.7));
         return vec3(x, uBase + q.y * H, zf + q.x * H);
       }
@@ -352,15 +376,17 @@ class SlWave {
         // the body: near-black at the foot (carrying mud), dark bottle green up the face, translucent green where it thins
         // toward the crest and in the lip; the sky in it at grazing angles; it is darker than the sky behind it
         float h = clamp(vY, 0.0, 1.3), face = step(-0.05, vS);
-        vec3 col = mix(SR(vec3(0.045, 0.07, 0.066)), SR(vec3(0.1, 0.17, 0.16)), smoothstep(0.0, 0.9, h)) * (0.75 + 0.35 * clamp(abs(n.y), 0.0, 1.0));
-        float trans = uLip > 0.5 ? 0.9 * (1.0 - vV) : 0.85 * smoothstep(0.84, 1.0, h) * smoothstep(0.3, 0.0, vS) * face;
-        col = mix(col, SR(vec3(0.22, 0.46, 0.4)), trans * (0.45 + 0.55 * pow(1.0 - abs(dot(n, V)), 1.2)));
+        vec3 col = mix(SR(vec3(0.05, 0.1, 0.12)), SR(vec3(0.11, 0.25, 0.27)), smoothstep(0.0, 0.85, h)) * (0.78 + 0.3 * clamp(abs(n.y), 0.0, 1.0));
+        col *= 0.84 + 0.16 * sin(vY * 15.0 - uTime * 1.8 + fb(vec2(vW.x * 0.008, 0.0)) * 6.0);           // bands climbing the face
+        col *= 1.0 - (uLip > 0.5 ? 0.0 : 0.5 * smoothstep(0.5, 0.78, h) * smoothstep(0.96, 0.8, h) * smoothstep(0.2, 0.6, uC) * face);   // the shadow under the lip
+        float trans = uLip > 0.5 ? 0.95 * (1.0 - 0.8 * vV) : 0.85 * smoothstep(0.84, 1.0, h) * smoothstep(0.3, 0.0, vS) * face;
+        col = mix(col, SR(vec3(0.32, 0.6, 0.55)), trans * (0.45 + 0.55 * pow(1.0 - abs(dot(n, V)), 1.2)));
         // big foam blotches and the churned surface give the face scale
         float blot = smoothstep(0.6, 0.78, fb(vec2(vW.x * 0.008, vW.y * 0.012 + uTime * 0.08)));
         col = mix(col, col * 1.8 + 0.006, blot * face * 0.5);
         col = mix(col, SR(vec3(0.2, 0.18, 0.13)), smoothstep(0.22, 0.0, h) * face * 0.65);
         if (uLip > 0.5 && !gl_FrontFacing) col *= 0.45;          // (inside the curl: in its own shadow)
-        col = mix(col, sky * 0.55, fres * 0.5);
+        col = mix(col, sky * 0.6, fres * 0.55);
         // foam: lacing pulled down the face, streaks, whitewater along the crest and the lip's edge, patches behind, churn at the foot
         float lace = fb(vec2(vW.x * 0.035, vW.y * 0.011 + uTime * 0.45)) * 0.6 + fb(vec2(vW.x * 0.11, vW.y * 0.035 + uTime * 0.9)) * 0.4;
         float streak = smoothstep(0.54, 0.74, lace) * face * (0.3 + 0.55 * smoothstep(0.1, 0.95, h));
@@ -402,12 +428,15 @@ class SlWave {
       spawn: (i, r) => ({ p: new THREE.Vector3(r.range(-90, 90), SL_FRONT.beachY + r.range(0, 6), SL_FRONT.wallZ - r.range(0, 12)), v: new THREE.Vector3(r.range(-8, 8), r.range(30, 75), r.range(4, 26)), t0: 59.2 + r.next() * 0.35, life: r.range(1.6, 2.6), s0: r.range(8, 16), s1: r.range(26, 48), rot: r.next() * 6, spin: r.range(-0.6, 0.6) }) });
     this.engulf = new XBill(scene, { n: 90, kind: 'soft', color: '#d9e6e3', seed: 96, alpha: 0.95, fadeIn: 0.12, fadeOut: 0.7, order: 8,
       spawn: (i, r) => ({ off: new THREE.Vector3(r.range(-14, 14), r.range(-3, 16), r.range(-60, -25)), sp: r.range(55, 90), p: new THREE.Vector3(), v: new THREE.Vector3(), t0: 59.55 + r.next() * 0.3, life: 1.4, s0: r.range(5, 9), s1: r.range(12, 22), rot: r.next() * 6, spin: r.range(-1, 1) }) });
-    for (const b of [this.spray, this.mist, this.foot]) slThinFog(b.mesh.material, 0.3);
+    // a thick, broken band of whitewater riding the lip's edge
+    this.lipFoam = new XBill(scene, { n: cap ? 260 : 170, kind: 'soft', color: '#f0f4f2', seed: 97, alpha: 0.75, fadeIn: 0.1, fadeOut: 0.5, order: 6,
+      spawn: (i, r) => ({ ux: r.range(-0.5, 0.5), p: new THREE.Vector3(), v: new THREE.Vector3(), t0: 0, life: 9, s0: 1, s1: 1, rot: r.next() * 6, spin: r.range(-0.8, 0.8), loop: 0, ph: r.next(), hk: r.range(0.4, 1.2) }) });
+    for (const b of [this.spray, this.mist, this.foot, this.lipFoam]) slThinFog(b.mesh.material, 0.3);
     // debris carried up the face: boat hulls, cars, timber, containers
     const dm = [Mat.std('#e8e6e0', { roughness: 0.5 }), Mat.std('#2a4a6a', { roughness: 0.5 }), Mat.std('#5a4a3a', { roughness: 0.9 }), Mat.std('#a8402a', { roughness: 0.6 }), Mat.std('#3a3d40', { roughness: 0.5 })];
     this.debris = dm.map((mat, k) => { const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mat, 30); im.frustumCulled = false; scene.add(im); return im; });
     const r = new RNG(94); this.D = [];
-    for (let i = 0; i < 150; i++) this.D.push({ k: i % 5, x: r.range(-900, 900) * (i < 60 ? 0.35 : 1), s: r.range(-0.3, 0.3), sz: [r.range(4, 9), r.range(1.2, 2.4), r.range(1.6, 3)], spin: [r.range(-1, 1), r.range(-1, 1), r.range(-1, 1)], ph: r.next() });
+    for (let i = 0; i < 150; i++) this.D.push({ k: i % 5, x: r.range(-900, 900) * (i < 60 ? 0.3 : 1), s: r.range(-0.3, 0.3), sz: [r.range(6, 14), r.range(2, 4), r.range(2.5, 5)], spin: [r.range(-1, 1), r.range(-1, 1), r.range(-1, 1)], ph: r.next() });
     this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3();
   }
 
@@ -415,7 +444,7 @@ class SlWave {
     const on = t >= SL.line - 0.2 && t < SL.black, U = this.U;
     this.body.visible = this.lip.visible = on;
     for (const im of this.debris) im.visible = on && t > 53;
-    if (!on) { this.spray.update(-1e9); this.mist.update(-1e9); this.foot.update(-1e9); this.burst.update(-1e9); this.engulf.update(-1e9); return; }
+    if (!on) { this.spray.update(-1e9); this.mist.update(-1e9); this.foot.update(-1e9); this.burst.update(-1e9); this.engulf.update(-1e9); this.lipFoam.update(-1e9); return; }
     const H = slWaveH(t), zf = slWaveZ(t), c = slWaveCurl(t), base = slSeaLevel(t);
     U.uZ.value = zf; U.uH.value = H; U.uC.value = c; U.uBase.value = base; U.uTime.value = t;
     // billboards follow the front: each one has a place along it (ux) and a phase
@@ -430,6 +459,9 @@ class SlWave {
     for (const o of this.foot.P) { const x = o.ux * 4000, Hx = slHx(x, H); slWavePoint(t, x, 0.45 + 0.3 * slCx(x, c) + 0.15 * Math.sin(t * 2 + o.ph * 6), P); o.p.set(P.x, base + Hx * o.hk * 0.7 + 2, P.z + Hx * 0.06); o.t0 = t - 1; o.s0 = o.s1 = Hx * (0.12 + 0.22 * o.hk) + 4; }
     const far = 1 - MathX.smooth(t, 51.5, 54); this.spray.s.alpha = 0.6 * MathX.smooth(H, 3, 20); this.mist.s.alpha = 0.14 + 0.36 * far; this.foot.s.alpha = 0.55 + 0.3 * far;
     this.spray.update(t); this.mist.update(t); this.foot.update(t);
+    for (const o of this.lipFoam.P) { const x = o.ux * 3600, Hx = slHx(x, H); slLipTip(t, x, P); const w = Math.sin(t * 1.7 + o.ph * 6.28); o.p.set(P.x, P.y + Hx * 0.02 * w, P.z + Hx * 0.02 * w); o.t0 = t - 1; o.s0 = o.s1 = Hx * 0.07 * o.hk + 3; }
+    this.lipFoam.s.alpha = 0.75 * MathX.smooth(slWaveCurl(t), 0.15, 0.4);
+    this.lipFoam.update(t);
     this.burst.update(t);
     for (const o of this.engulf.P) { const u = Math.max(0, t - o.t0); o.p.set(cam.position.x + o.off.x, cam.position.y + o.off.y, cam.position.z + o.off.z + o.sp * u); o.v.set(0, 0, 0); }
     this.engulf.update(t);
