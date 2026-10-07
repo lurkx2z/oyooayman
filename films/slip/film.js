@@ -48,7 +48,7 @@ const FILM = {
     app.under = new SlUnder(app);
     app.fault = new SlFault();
     if (typeof SlEarth !== 'undefined') app.globe = new SlEarth();
-    app.hands = new ViewerHands(camera, { scale: 1.02, skin: '#c99a7c', nail: '#dcbcae', sleeve: '#2b3038', cuff: '#20242b', watch: false, sleeveLen: 1.1, sleeveFit: 0.85, poses: SL_HAND_POSES, blends: SL_HAND_BLEND });
+    app.hands = new ViewerHands(camera, { scale: 1.02, skin: '#c99a7c', nail: '#c99c84', sleeve: '#2b3038', cuff: '#20242b', watch: false, sleeveLen: 1.1, sleeveFit: 0.85, poses: SL_HAND_POSES, blends: SL_HAND_BLEND });
     camera.layers.enable(2); for (const h of [app.hands.left, app.hands.right]) h.g.traverse((o) => o.layers.set(2));   // (never in the reflections)
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; document.getElementById('hud').appendChild(d); return d; };

@@ -350,7 +350,12 @@ class SlStreet extends Environment {
     // the shop window on your right that bursts
     this.glass = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 3.0), new THREE.MeshPhysicalMaterial({ color: '#c7d7dc', roughness: 0.04, metalness: 0.2, transparent: true, opacity: 0.32, envMapIntensity: 1.6 }));
     this.glass.position.set(12.42, h + 1.7, -3.4); this.glass.rotation.y = -Math.PI / 2; this.scene.add(this.glass);
-    const shardMat = new THREE.MeshStandardMaterial({ color: '#dfeaee', roughness: 0.05, metalness: 0.4, transparent: true, opacity: 0.75, side: THREE.DoubleSide });
+    { const shop = new THREE.Group(), dark = Mat.std('#2a2724', { roughness: 0.9 }), wood = Mat.std('#6b5440', { roughness: 0.8 }), rg = new RNG(66);
+      const back = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 3.0), dark); back.rotation.y = -Math.PI / 2; back.position.set(12.47, h + 1.7, -3.4); shop.add(back);
+      for (const y of [0.55, 1.15, 1.75, 2.35]) { const sh = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.03, 4.2), wood); sh.position.set(12.44, h + y, -3.4); shop.add(sh);
+        for (let i = 0; i < 16; i++) { const w = rg.range(0.12, 0.24), hh = rg.range(0.16, 0.36), b = new THREE.Mesh(new THREE.BoxGeometry(0.05, hh, w), Mat.std(rg.pick(['#d9d2c0', '#2f73b8', '#c63a2a', '#e0b23a', '#7ac4a4', '#f2f2ee']), { roughness: 0.6 })); b.position.set(12.43, h + y + hh / 2 + 0.015, -5.4 + i * 0.26 + rg.range(-0.04, 0.04)); shop.add(b); } }
+      this.scene.add(shop); }
+    const shardMat = new THREE.MeshStandardMaterial({ color: '#a9bcc4', roughness: 0.06, metalness: 0.7, transparent: true, opacity: 0.55, side: THREE.DoubleSide, envMapIntensity: 2.2 });
     this.shards = new SlChunks(this.scene, 140, shardMat, 61, (i, r) => ({ p: new THREE.Vector3(12.35, h + 0.3 + r.next() * 2.9, -3.4 + r.range(-2.2, 2.2)), v: new THREE.Vector3(r.range(-5.5, -1.0), r.range(-0.5, 2.6), r.range(-0.6, 2.4)), t0: 27.05 + r.next() * 0.12, size: r.range(0.06, 0.28), flat: 0.06, spin: new THREE.Vector3(r.range(-12, 12), r.range(-12, 12), r.range(-12, 12)) }));
     // a cornice breaking off across the street and a chunk near you
     const stone = Mat.std('#9b958a', { roughness: 0.9 });
@@ -409,11 +414,11 @@ class SlStreet extends Environment {
           vec3 dir = normalize(vel);
           vec4 a = viewMatrix * vec4(p, 1.0), b = viewMatrix * vec4(p + dir * len, 1.0);
           vec2 sd = normalize(vec2(-(b.y - a.y), b.x - a.x) + 1e-5);
-          vec4 q = mix(a, b, position.y); q.xy += sd * position.x * 0.006 * (0.6 - q.z * 0.03);
+          vec4 q = mix(a, b, position.y); q.xy += sd * position.x * 0.008 * (0.6 - q.z * 0.03);
           float dist = -q.z; vA = smoothstep(0.25, 1.2, dist) * (1.0 - smoothstep(6.0, 11.0, dist)); vU = position.y;
           gl_Position = projectionMatrix * q;
         }`,
-      fragmentShader: 'uniform vec3 uCol; uniform float uAmt; varying float vA; varying float vU; void main(){ gl_FragColor = vec4(uCol, vA * uAmt * 0.55 * sin(vU * 3.1416)); }',
+      fragmentShader: 'uniform vec3 uCol; uniform float uAmt; varying float vA; varying float vU; void main(){ gl_FragColor = vec4(uCol, vA * uAmt * 0.85 * sin(vU * 3.1416)); }',
     }));
     this.rain.frustumCulled = false; this.rain.renderOrder = 8; this.scene.add(this.rain);
   }

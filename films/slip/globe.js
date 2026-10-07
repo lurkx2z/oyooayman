@@ -28,7 +28,7 @@ class SlEarth extends EarthScene {
           float r = exp(-pow((a - uR) / 0.006, 2.0)) + 0.45 * exp(-pow((a - uR + 0.05) / 0.008, 2.0)) + 0.2 * exp(-pow((a - uR + 0.11) / 0.011, 2.0));
           vec3 col = vec3(0.6, 0.88, 1.0) * r * uA;
           // the city's pulse
-          col += vec3(1.0, 0.85, 0.6) * exp(-a * 140.0) * (0.6 + 0.4 * uPulse) * 1.4 * step(0.0001, uA + uA2 + 0.01);
+          col += vec3(1.0, 0.8, 0.5) * (exp(-a * 110.0) * 1.2 + exp(-pow((a - 0.035 - 0.01 * uPulse) / 0.006, 2.0)) * 0.9) * step(0.0001, uA + uA2 + 0.01);
           // after the rotation changes: a broad swell running across the oceans only
           float ocean = 1.0 - texture2D(uMask, vUv).r;
           float sw = exp(-pow((a - uR2) / 0.12, 2.0)) * (0.75 + 0.25 * sin(a * 50.0)) * step(0.02, uR2);
@@ -42,46 +42,53 @@ class SlEarth extends EarthScene {
     // soften the hard edge of the arctic cap in the day texture
     { const cv = this.uniforms.uDay.value.image, x = cv.getContext('2d'), H = cv.height, y0 = (90 - 86) / 180 * H, y1 = (90 - 74) / 180 * H, g = x.createLinearGradient(0, y0, 0, y1);
       g.addColorStop(0, 'rgba(222,228,234,0.95)'); g.addColorStop(1, 'rgba(222,228,234,0)'); x.fillStyle = g; x.fillRect(0, 0, cv.width, y1); this.uniforms.uDay.value.needsUpdate = true; }
-    // a thin arrow around the planet showing which way it turns
-    const am = new THREE.MeshBasicMaterial({ color: '#e8f2ff', transparent: true, opacity: 0, depthWrite: false });
-    this.arrow = new THREE.Group();
-    const arc = new THREE.Mesh(new THREE.TorusGeometry(1.32, 0.006, 6, 80, 1.5), am); arc.rotation.x = -Math.PI / 2; this.arrow.add(arc);
-    const head = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.1, 10), am);
-    head.position.set(1.32 * Math.cos(1.5), 0, -1.32 * Math.sin(1.5)); head.rotation.set(0, 0, 0); head.lookAt(new THREE.Vector3(1.32 * Math.cos(1.6), 0, -1.32 * Math.sin(1.6))); head.rotateX(Math.PI / 2); this.arrow.add(head);
-    this.arrowMat = am; this.scene.add(this.arrow);
+    // a bold arrow drawn on the planet (below the city, along a parallel) showing which way it turns; it stays put
+    // while the planet turns under it
+    const am = new THREE.MeshBasicMaterial({ color: '#ffc24a', transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+    const pts = []; for (let i = 0; i <= 24; i++) pts.push(EarthScene.dirFromLonLat(SL_CITY_LL[0] - 38 + i * 2.9, 24 + 3 * Math.sin(i / 24 * Math.PI)).multiplyScalar(1.03));
+    const curve = new THREE.CatmullRomCurve3(pts);
+    this.arrow = new THREE.Group(); this.arrowPivot = new THREE.Group(); this.arrowPivot.add(this.arrow); this.scene.add(this.arrowPivot);
+    this.arrow.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 48, 0.02, 6, false), am));
+    const tip = curve.getPoint(1), dir = curve.getTangent(1), head = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.15, 12), am);
+    head.position.copy(tip).addScaledVector(dir, 0.06); head.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); this.arrow.add(head);
+    this.arrowMat = am;
     this._w = new THREE.Vector3(); this._side = new THREE.Vector3(); this._up = new THREE.Vector3(0, 1, 0);
+  }
+
+  spinAt(t) {
+    const T = t - SL.earth, k = Math.max(0, t - SL.tick);
+    return 2.15 + T * 0.15 + MathX.smooth(t, SL.tick, SL.tick + 0.25) * 0.02 + 0.004 * Math.sin(k * 18) * Math.exp(-k * 3) * (t > SL.tick ? 1 : 0);
   }
 
   update(t) {
     const T = t - SL.earth;
-    // the planet turns (sped up so you can see it), a tiny lurch when the rotation ticks up
-    const tick = MathX.smooth(t, SL.tick, SL.tick + 0.25);
-    const spin = 2.15 + T * 0.11 + tick * 0.02 + 0.004 * Math.sin(Math.max(0, t - SL.tick) * 18) * Math.exp(-Math.max(0, t - SL.tick) * 3) * (t > SL.tick ? 1 : 0);
+    // the planet turns under a still camera (about 9° a second, so you can see it), with a tiny lurch at the tick
+    const spin = this.spinAt(t);
     this.earth.rotation.y = spin; this.clouds.rotation.y = spin * 1.02 + 0.02;
-    // the sun turns with the view so the city stays in the morning light (the sun is fixed relative to the city here)
-    this.uniforms.uSun.value.copy(this.sunDir).applyAxisAngle(this._up, spin);
     this.clouds.material.uniforms.uOff.value = T * 0.0005;
-    // rings out from the city; after the shift a swell over the oceans
+    this.uniforms.uSun.value.copy(this.sunDir).applyAxisAngle(this._up, this.spinAt(SL.tick));   // (morning light on the city's half)
+    // rings out from the city; after the shift a swell running in across the ocean toward the city's coast
     this.RU.uR.value = 0.02 + Math.max(0, T) * 0.32;
     this.RU.uA.value = 0.9 * MathX.smooth(T, 0.0, 0.4) * (1 - MathX.smooth(T, 5.6, 6.6));
-    this.RU.uR2.value = Math.max(0, t - SL.shift) * 0.55;
-    this.RU.uA2.value = 1.5 * MathX.smooth(t, SL.shift, SL.shift + 0.4);
+    this.RU.uR2.value = Math.max(0.0, 0.62 - Math.max(0, t - SL.shift) * 0.42);
+    this.RU.uA2.value = 1.6 * MathX.smooth(t, SL.shift, SL.shift + 0.3);
     this.RU.uPulse.value = 0.5 + 0.5 * Math.sin(t * 7);
-    // the camera: rushes out from above the city, drifts, then dives back in toward the coast
+    // the camera: out from above the city to a still view (the city drifts across it), then back in to the city
     this.earth.updateMatrixWorld(true);
     const epi = this._w.copy(this.epiL).applyMatrix4(this.earth.matrixWorld).normalize();
+    const still = (this._still = this._still || new THREE.Vector3()).copy(this.epiL).applyAxisAngle(this._up, this.spinAt(SL.tick)).normalize();
+    const kIn = 1 - Ease.inOutSine(MathX.clamp(T / 2.0, 0, 1)), kOut = Ease.inCubic(MathX.clamp((t - SL.shift - 0.6) / (SL.coast - SL.shift - 0.6), 0, 1));
+    const dirC = (this._dc = this._dc || new THREE.Vector3()).copy(still).lerp(epi, Math.max(kIn, kOut)).normalize();
     const dist = T < 2.0 ? Math.exp(MathX.lerp(Math.log(1.15), Math.log(6.3), Ease.outCubic(MathX.clamp(T / 2.0, 0, 1))))
       : t < SL.shift + 0.6 ? 6.3 + 0.35 * MathX.smooth(T, 2.0, 5.5)
-      : Math.exp(MathX.lerp(Math.log(6.65), Math.log(1.06), Ease.inCubic(MathX.clamp((t - SL.shift - 0.6) / (SL.coast - SL.shift - 0.6), 0, 1))));
-    const side = this._side.crossVectors(this._up, epi).normalize();
-    const off = 0.35 * MathX.smooth(T, 0.5, 2.5) * (1 - MathX.smooth(t, SL.shift + 0.6, SL.coast));
-    this.camera.position.copy(epi).multiplyScalar(dist).addScaledVector(side, off).addScaledVector(this._up, off * 0.6);
+      : Math.exp(MathX.lerp(Math.log(6.65), Math.log(1.06), kOut));
+    this.camera.position.copy(dirC).multiplyScalar(dist).addScaledVector(this._up, -0.25 * (1 - Math.max(kIn, kOut)));
     this.camera.up.set(0, 1, 0);
-    this.camera.lookAt(epi.x * 0.02, epi.y * 0.02 - 0.08 * MathX.smooth(T, 0.8, 2.5) * (1 - MathX.smooth(t, SL.shift + 0.6, SL.coast)), epi.z * 0.02);
+    this.camera.lookAt(dirC.x * 0.02, dirC.y * 0.02 - 0.12 * (1 - Math.max(kIn, kOut)), dirC.z * 0.02);
     this.camera.fov = 38; this.camera.updateProjectionMatrix();
-    // the arrow sits around the equator on the side facing you, turning with the planet a little
-    this.arrow.rotation.set(0.32, Math.atan2(this.camera.position.x, this.camera.position.z) - 0.75 + T * 0.11, 0);
-    this.arrowMat.opacity = 0.65 * MathX.smooth(T, 1.6, 2.2) * (1 - MathX.smooth(t, SL.shift + 0.6, SL.shift + 1.2));
+    // the arrow stays where the city is at the tick; the planet turns under it
+    this.arrowPivot.rotation.y = this.spinAt(SL.tick);
+    this.arrowMat.opacity = 0.9 * MathX.smooth(T, 1.4, 2.0) * (1 - MathX.smooth(t, SL.shift + 0.4, SL.shift + 0.9));
     this.camera.updateMatrixWorld(true);
   }
 }

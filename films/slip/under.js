@@ -163,10 +163,10 @@ class SlUnder {
     this.ruler = new THREE.Mesh(new THREE.PlaneGeometry(RW, RW * 192 / 1024), new THREE.MeshBasicMaterial({ map: Tex.tex(rc, { repeat: false }), transparent: true, depthWrite: false, toneMapped: false }));
     this.ruler.position.set(SL_PEB.x + 0.0012 - 0.02 * 112 / 800 + RW / 2 - 0.006, SL_PEB.y + 0.0135, 0.0006); this.scene.add(this.ruler);
     // the move, measured: a bracket from the pebble's old centre to its new one, under the scale
-    const bm = new THREE.MeshBasicMaterial({ color: '#ffd9a0', transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+    const bm = new THREE.MeshBasicMaterial({ color: '#ffc85a', transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
     this.bracket = new THREE.Group();
-    for (const dx of [0, 0.0014]) { const b = new THREE.Mesh(new THREE.PlaneGeometry(0.00016, 0.0042), bm); b.position.set(dx, 0, 0); this.bracket.add(b); }
-    const bh = new THREE.Mesh(new THREE.PlaneGeometry(0.0014 + 0.00016, 0.00016), bm); bh.position.set(0.0007, 0.0021, 0); this.bracket.add(bh);
+    for (const dx of [0, 0.0014]) { const b = new THREE.Mesh(new THREE.PlaneGeometry(0.0003, 0.0046), bm); b.position.set(dx, 0, 0); this.bracket.add(b); }
+    const bh = new THREE.Mesh(new THREE.PlaneGeometry(0.0014 + 0.0003, 0.0003), bm); bh.position.set(0.0007, 0.0023, 0); this.bracket.add(bh);
     this.bracket.position.set(SL_PEB.x + 0.0012, SL_PEB.y + 0.0042 + 0.0068, 0.0065); this.bracketMat = bm; this.scene.add(this.bracket);
     // where the pebble was: a faint outline left behind after it moves
     const og = new THREE.RingGeometry(0.0044, 0.00465, 40);
@@ -210,7 +210,8 @@ class SlUnder {
     this.pebLight.position.set(p.x - 0.01, p.y + 0.015, 0.03); this.pebLight.intensity = 0.04 * MathX.smooth(t, 11.6, 12.0);
     this.ruler.material.opacity = 0.95 * MathX.smooth(t, 12.0, 12.4) * (1 - MathX.smooth(t, 16.8, 17.2));
     this.ghost.material.opacity = 0.55 * MathX.smooth(t, SL.nudge + 0.15, SL.nudge + 0.4) * (1 - MathX.smooth(t, 15.6, 16.1));
-    this.bracketMat.opacity = 0.95 * MathX.smooth(t, SL.nudge + 0.2, SL.nudge + 0.45) * (1 - MathX.smooth(t, 15.8, 16.2));
+    this.bracketMat.opacity = 0.98 * MathX.smooth(t, SL.nudge - 0.05, SL.nudge + 0.05) * (1 - MathX.smooth(t, 15.8, 16.2));
+    this.bracket.scale.x = Math.max(0.02, MathX.smooth(t, SL.nudge, SL.nudge + 0.22));      // (it grows with the move)
     this.grit.update(t);
     if (this.you) this.you.update(4);
     this.orbit.apply(this.camera, t);
@@ -259,7 +260,7 @@ class SlFault {
           float lock = exp(-pow(length(p - uHypo) / 3.6, 2.0));
           float strain = 0.5 + 0.5 * sin((nn * 1.6 + lock * 1.5 * sign(nn)) * 6.2831);
           col = mix(col, col * (0.85 + 0.3 * strain), 0.25 * uStress * smoothstep(4.0, 0.0, abs(nn)));
-          col += vec3(1.0, 0.22, 0.06) * lock * uStress * 0.75 * (0.85 + 0.15 * sin(uTime * 7.0)) * smoothstep(1.4, 0.0, abs(nn));
+          col += vec3(1.0, 0.22, 0.06) * lock * uStress * 0.8 * (0.65 + 0.35 * sin(uTime * 6.0)) * smoothstep(1.6, 0.0, abs(nn));
           // the fault itself: a dark seam
           float seam = smoothstep(0.12, 0.0, abs(nn)) * step(s, 15.5) * step(-0.2, s);
           col = mix(col, vec3(0.05, 0.04, 0.04), seam * 0.85);
@@ -298,16 +299,21 @@ class SlFault {
     const pm = new THREE.MeshBasicMaterial({ color: '#ff4a3a', toneMapped: false });
     const cone = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.32, 12), pm); cone.rotation.x = Math.PI; cone.position.y = 0.16; this.pin.add(cone);
     const ball = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 10), pm); ball.position.y = 0.38; this.pin.add(ball);
-    const you = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.42), lab('YOU', 256, 96, 72, '#ffffff')); you.position.y = 0.85; this.pin.add(you); this.pinLabel = you;
+    const you = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.34), lab('YOU', 256, 96, 72, '#ffffff')); you.position.y = 0.66; this.pin.add(you); this.pinLabel = you;
     this.pin.position.set(SL_FAULT.tip.x, 0, 0.05); this.scene.add(this.pin);
-    const dl = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.9), lab('≈ 10 KM DOWN', 512, 128, 64, '#ffd2b0')); dl.position.set(SL_FAULT.hypo.x + 3.6, SL_FAULT.hypo.y - 1.0, 0.02); this.scene.add(dl); this.depthLabel = dl;
+    const boxed = (txt) => { const c = Tex.canvas(640, 168), x = c.getContext('2d'); x.fillStyle = 'rgba(6,8,12,0.78)'; x.beginPath(); x.roundRect(4, 4, 632, 160, 30); x.fill();
+      x.font = '700 76px "Inter", sans-serif'; x.fillStyle = '#ffd2b0'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, 320, 88); return new THREE.MeshBasicMaterial({ map: Tex.tex(c, { repeat: false }), transparent: true, depthWrite: false, toneMapped: false }); };
+    const dl = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 1.2), boxed('≈ 10 KM DOWN')); dl.position.set(SL_FAULT.tip.x - 2.5, SL_FAULT.hypo.y * 0.5, 0.03); this.scene.add(dl); this.depthLabel = dl;
+    // a dashed depth line: straight down from you, then across to the locked patch
+    const lg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(SL_FAULT.tip.x, -0.1, 0.02), new THREE.Vector3(SL_FAULT.tip.x, SL_FAULT.hypo.y, 0.02), new THREE.Vector3(SL_FAULT.hypo.x + 0.4, SL_FAULT.hypo.y, 0.02)]);
+    this.depthLine = new THREE.Line(lg, new THREE.LineDashedMaterial({ color: '#ffd2b0', dashSize: 0.35, gapSize: 0.22, transparent: true, opacity: 0 })); this.depthLine.computeLineDistances(); this.scene.add(this.depthLine);
     this.dust = new XBill(this.scene, { n: 70, kind: 'soft', color: '#a49884', seed: 74, alpha: 0.5, fadeIn: 0.1, fadeOut: 0.6,
       spawn: (i, r) => ({ p: new THREE.Vector3(r.range(-4, 7), 0.05, r.range(-3, 0.2)), v: new THREE.Vector3(r.range(-0.2, 0.2), r.range(0.3, 0.9), 0), t0: 22.6 + r.next() * 1.6, life: r.range(1.2, 2.0), s0: 0.3, s1: 1.4 }) });
     // the far side and the bottom of the block
     const side = new THREE.Mesh(new THREE.PlaneGeometry(40, 24).rotateY(Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#221d19', roughness: 1 })); side.position.set(26, -12, -20); this.scene.add(side);
     this.orbit = new SlOrbit([
-      [SL.fault, SL_FAULT.tip.x - 0.6, SL_FAULT.tip.y - 0.9, 0, 5.5, 6, -14, 46],
-      [18.6, SL_FAULT.tip.x - 1.5, -2.2, 0, 9.0, 8, -16, 46, 'outCubic'],
+      [SL.fault, SL_FAULT.tip.x - 0.4, 0.2, 0, 5.5, 6, -12, 46],
+      [18.6, SL_FAULT.tip.x - 0.8, -1.2, 0, 9.0, 8, -16, 46, 'outCubic'],
       [19.8, 0.0, -5.6, 0, 27, 12, -20, 46],
       [21.8, -0.5, -6.0, 0, 26, 16, -22, 44],
       [23.6, 0.5, -3.6, 0, 19, 20, -26, 44],
@@ -325,7 +331,7 @@ class SlFault {
     const sh = MathX.smooth(t, 22.4, 23.0) * 0.03;
     this.city.position.set(sh * Math.sin(t * 61), sh * Math.cos(t * 47), 0);
     this.pin.position.y = sh * 0.6 * Math.abs(Math.sin(t * 40));
-    this.pinLabel.lookAt(this.camera.position); this.depthLabel.material.opacity = MathX.smooth(t, 19.0, 19.6) * (1 - MathX.smooth(t, 23.6, 24.2));
+    this.pinLabel.lookAt(this.camera.position); this.depthLabel.material.opacity = MathX.smooth(t, 19.4, 19.9) * (1 - MathX.smooth(t, 23.6, 24.2)); this.depthLine.material.opacity = 0.9 * this.depthLabel.material.opacity;
     this.dust.update(t);
     this.orbit.apply(this.camera, t);
     const k = MathX.smooth(t, 22.6, 23.2), D = this.camera.position.distanceTo(this.orbit._t);

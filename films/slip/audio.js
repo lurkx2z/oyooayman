@@ -115,7 +115,7 @@ class SlAudio extends AudioEngine {
     noiseBed(11.8, 17.4, 'highpass', 5000, 0.5, 0.012, fx, 'white', 0.5, 0.3);       // the macro's air
     crackle(12.5, 13.3, 0.25, 30, fx, 4000);
     { const t = T.nudge; noiseHit(t, 0.012, 'highpass', 4500, 0.7, 0.35, fx, 'white', 0.05, 0.001); const o = osc('triangle', 3100, t, t + 0.05), g = env(t, 0.001, 0.05, 0.03); o.connect(g); g.connect(fx); }
-    pad(13.4, 16.2, [38, 45, 50], 0.022, 500); piano(15.3, 41, 0.9, 2.6);
+    pad(13.0, 16.2, [38, 45, 50], 0.038, 560); piano(15.3, 41, 0.9, 2.6);
     { const t = T.drop; for (let i = 0; i < 5; i++) noiseHit(t + i * 0.09 + i * i * 0.02, 0.015, 'highpass', 3500 - i * 400, 0.7, 0.25 - i * 0.04, fx, 'white', 0, 0.001); crackle(t, t + 0.9, 0.3, 40, fx, 2500); sub(t + 0.75, 50, 28, 0.6, 1.4, fx); noiseHit(t + 0.75, 1.5, 'lowpass', 300, 0.7, 0.4, fx, 'brown'); }
     riser(16.6, 17.38, 0.14);
     /* ---------------- 17.4–24.6 the fault ---------------- */
@@ -143,8 +143,8 @@ class SlAudio extends AudioEngine {
     whoosh(31.5, 0.6, 1.4, 200, 5000);
     /* ---------------- 32–39.2 the planet ---------------- */
     rumble(32.0, 34.5, 0.18, fx, 70);
-    pad(32.0, 39.2, [26, 38, 45, 50, 57], 0.03, 600, 1200);
-    for (const [t, m] of [[32.6, 62], [33.8, 65], [35.0, 69], [36.2, 67], [37.4, 65]]) piano(t, m, 0.6, 2.4);
+    pad(32.0, 39.2, [26, 38, 45, 50, 57], 0.05, 650, 1400);
+    for (const [t, m] of [[32.6, 62], [33.8, 65], [35.0, 69], [36.2, 67], [37.4, 65]]) piano(t, m, 0.95, 2.4);
     tick(T.tick, 1.6); sub(T.tick + 0.02, 55, 30, 0.6, 1.4, mus);
     strings(T.shift, 39.2, [38, 45, 50, 53], 0.03, true); riser(38.3, 39.18, 0.15); whoosh(38.7, 0.5, 1.1, 4000, 300);
     /* ---------------- 39.2–52.6 the coast ---------------- */

@@ -6,7 +6,7 @@
    Shot plan: films/slip/PLAN.md
    ===================================================================== */
 
-CONFIG.duration = 66.6;
+CONFIG.duration = 67.4;
 CONFIG.seed = 20261207;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.62,
@@ -23,13 +23,13 @@ CONFIG.render.shadowMapSize = 2048;
 // THE CUT (story seconds kept, in order; a third number plays that stretch slower): the walk starts closer, the shoe
 // shoots forward at half speed, the sky hold, the descent's grey middle, the pebble's wait, two moments of the quake,
 // a stretch of the planet and the sea's slow retreat are taken out — about 57 s of film from 66.6 s of story.
-CONFIG.edit = [[1.3, 3.3], [3.3, 3.62, 0.5], [3.62, 4.25], [4.75, 10.4], [11.6, 14.2], [15.2, 25.9], [26.6, 30.6], [31.2, 36.2], [37.4, 43.0], [46.2, 66.6]];
+CONFIG.edit = [[1.29, 3.3], [3.3, 3.62, 0.5], [3.62, 4.25], [4.75, 10.4], [11.6, 13.95], [15.2, 18.9], [19.4, 25.9], [26.6, 30.6], [31.2, 36.2], [37.4, 43.0], [46.2, 67.4]];
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE BEATS (film seconds)
 // ---------------------------------------------------------------------------------------------------------------------
 const SL = {
-  title: [1.29, 3.75],
+  title: [1.2, 3.75],
   step: 3.3,            // the right shoe lands on the wet plate
   slide: 3.34,          // …and shoots forward
   thud: 3.8,            // you hit the ground
@@ -57,11 +57,11 @@ const SL = {
   back2: [58.3, 59.6],  // look back: the lip overhead
   impact: 59.6,
   black: 60.6,
-  recap: [60.95, 62.6], // the chain, line by line
-  card: [62.75, 66.6],
-  punch: 63.9,
-  meta: [65.1, 66.6],
-  end: 66.6,
+  recap: [60.9, 63.25],  // the chain, line by line
+  card: [63.4, 67.4],
+  punch: 64.55,
+  meta: [65.8, 67.4],
+  end: 67.4,
 };
 // which world each moment shows
 function slSeg(t) {
@@ -158,11 +158,11 @@ const SCRIPT = {
       [6.8, -62], [6.95, -64], [7.4, -88],
       [24.6, -30, 'step'], [25.8, -26], [26.6, -10], [28.0, -6], [29.8, -2], [30.4, 30, 'inOutQuad'], [31.4, 38], [32, 70],
       [39.2, -6, 'step'], [40.2, -10], [42.6, -7], [43.0, -6], [46.2, -1, 'step'], [46.6, 0.3], [51.8, 0.8], [52.0, -1], [52.4, -3], [53.0, 2], [55.0, 4], [55.4, 9], [56.6, 10],
-      [57.0, 0], [58.2, 0], [58.6, 30], [59.6, 46], [60.6, 52]],
+      [57.0, 0], [58.2, 0], [58.6, 22], [59.1, 30], [59.6, 46], [60.6, 52]],
     tilt: [[0, 0], [3.3, 0], [3.5, -6], [3.8, 8], [3.9, 5], [4.7, 3], [5.9, 0], [24.6, 0], [32, 0], [39.2, 0], [52.4, 0], [53.0, 6], [55.0, 2], [56.6, -4], [58.3, 3], [59.6, -6], [60.6, -12]],
     fov: [[0, 68], [3.3, 68], [3.8, 74], [4.7, 72], [5.9, 66], [6.3, 66], [7.4, 60],
       [24.6, 74, 'step'], [32, 74],
-      [39.2, 62, 'step'], [43.0, 62], [46.2, 60, 'step'], [46.6, 14, 'inOutQuad'], [51.9, 13], [52.2, 60, 'inOutQuad'], [52.4, 66], [53.0, 78], [55.0, 78], [55.4, 50, 'inOutQuad'], [56.6, 50],
+      [39.2, 62, 'step'], [43.0, 62], [46.2, 60, 'step'], [46.6, 15, 'inOutQuad'], [51.9, 10.5, 'linear'], [52.2, 60, 'inOutQuad'], [52.4, 66], [53.0, 78], [55.0, 78], [55.4, 50, 'inOutQuad'], [56.6, 50],
       [57.0, 78, 'inOutQuad'], [58.2, 80], [59.6, 82], [60.6, 86]],
     startles: [[SL.thud, 1.8], [46.6, 0.25], [51.7, 0.4]],
     // shakes: [t, amplitude, decay] (the quake's own shaking is added in film.js)
@@ -185,9 +185,9 @@ const SCRIPT = {
       { t: 4.8, until: 6.3, text: 'Normally… you’d just get back up.' },
       { t: 6.45, until: 7.6, text: 'But not this time.' },
       { t: 8.1, until: 10.4, text: 'A tiny part of the impact becomes vibration.' },
-      { t: 13.0, until: 14.2, text: 'Usually, this would mean nothing.' },
+      { t: 12.95, until: 13.95, text: 'Usually, this would mean nothing.' },
       { t: 15.25, until: 16.8, text: 'Unfortunately…' },
-      { t: 18.1, until: 20.0, text: 'You fell in exactly the wrong place.' },
+      { t: 18.0, until: 20.0, text: 'You fell in exactly the wrong place.' },
       { t: 32.6, until: 35.9, text: 'The earthquake transferred momentum into Earth’s rotation.' },
       { t: 37.45, until: 39.15, text: 'But even a tiny change… can have consequences.' },
     ],
@@ -204,7 +204,7 @@ const SCRIPT = {
       { from: 46.25, until: 59.5, top: 230, label: 'DISTANT WATER MASS DETECTED', value: (t) => (t < 46.9 ? '—' : 'WAVE HEIGHT ' + slStep(SL_WAVE_STEPS, t) + ' M'), sub: '' },
     ],
     // after the black: the chain, line by line, then the card
-    stack: [{ t: SL.recap[0], until: SL.recap[1], lines: [[60.95, 'SLIP · 1.7 kN'], [61.17, 'GROUND · 0.07 J'], [61.39, 'PEBBLE · 1.4 MM'], [61.61, 'FAULT · M8.7'], [61.83, 'EARTH · +0.01 KM/H'], [62.05, 'SEA · −38 M'], [62.27, 'WAVE · 146 M']] }],
+    stack: [{ t: SL.recap[0], until: SL.recap[1], lines: [[60.9, 'SLIP · 1.7 kN'], [61.18, 'GROUND · 0.07 J'], [61.46, 'PEBBLE · 1.4 MM'], [61.74, 'FAULT · M8.7'], [62.02, 'EARTH · +0.01 KM/H'], [62.3, 'SEA · −38 M'], [62.62, 'WAVE · 146 M']] }],
   },
 
   tracks: { hypoxia: [[0, 0]], pov: [[0, 1]] },

@@ -335,7 +335,7 @@ class SlWave {
         float H = slHx(x, uH), c = slCx(x, uC), zf = slZx(x, uZ);
         if (uLip < 0.5) {
           float s = v < 0.55 ? -45.0 * pow(1.0 - v / 0.55, 2.6) : (v - 0.55) / 0.45 * 0.66;
-          float y = slBodyY(s) + (0.03 * sin(x * 0.071 + 1.7) + 0.018 * sin(x * 0.19 + uTime * 0.7)) * exp(-pow(s / 0.22, 2.0));   // (a ragged crest)
+          float y = slBodyY(s) + (0.03 * sin(x * 0.071 + 1.7) + 0.014 * sin(x * 0.113 + uTime * 0.7)) * exp(-pow(s / 0.22, 2.0));   // (a ragged crest)
           // the face leans forward as the lip forms
           s += 0.12 * c * smoothstep(0.0, 0.62, 0.62 - s) * step(0.0, s) * y;
           return vec3(x, uBase + y * H, zf + s * H);
@@ -344,7 +344,7 @@ class SlWave {
         float R = 0.13 + 0.07 * c, ext = (0.2 + 0.72 * c) * 3.14159;
         float ph = 1.5708 - v * ext;
         vec2 C = vec2(0.1 * c * smoothstep(0.0, 0.35, v), 1.0 - R);
-        vec2 q = C + vec2(cos(ph) * R * 1.4, sin(ph) * R) + vec2(0.0, 0.03 * sin(x * 0.071 + 1.7) + 0.018 * sin(x * 0.19 + uTime * 0.7));
+        vec2 q = C + vec2(cos(ph) * R * 1.4, sin(ph) * R) + vec2(0.0, 0.03 * sin(x * 0.071 + 1.7) + 0.014 * sin(x * 0.113 + uTime * 0.7));
         return vec3(x, uBase + q.y * H, zf + q.x * H);
       }
       void main(){
@@ -376,10 +376,10 @@ class SlWave {
         // the body: near-black at the foot (carrying mud), dark bottle green up the face, translucent green where it thins
         // toward the crest and in the lip; the sky in it at grazing angles; it is darker than the sky behind it
         float h = clamp(vY, 0.0, 1.3), face = step(-0.05, vS);
-        vec3 col = mix(SR(vec3(0.05, 0.1, 0.12)), SR(vec3(0.11, 0.25, 0.27)), smoothstep(0.0, 0.85, h)) * (0.78 + 0.3 * clamp(abs(n.y), 0.0, 1.0));
+        vec3 col = mix(SR(vec3(0.04, 0.085, 0.1)), SR(vec3(0.12, 0.3, 0.33)), smoothstep(0.0, 0.8, h)) * (0.78 + 0.3 * clamp(abs(n.y), 0.0, 1.0));
         col *= 0.84 + 0.16 * sin(vY * 15.0 - uTime * 1.8 + fb(vec2(vW.x * 0.008, 0.0)) * 6.0);           // bands climbing the face
         col *= 1.0 - (uLip > 0.5 ? 0.0 : 0.5 * smoothstep(0.5, 0.78, h) * smoothstep(0.96, 0.8, h) * smoothstep(0.2, 0.6, uC) * face);   // the shadow under the lip
-        float trans = uLip > 0.5 ? 0.95 * (1.0 - 0.8 * vV) : 0.85 * smoothstep(0.84, 1.0, h) * smoothstep(0.3, 0.0, vS) * face;
+        float trans = uLip > 0.5 ? 0.95 * (1.0 - 0.8 * vV) : 0.9 * smoothstep(0.78, 0.98, h) * smoothstep(0.35, 0.0, vS) * face;
         col = mix(col, SR(vec3(0.32, 0.6, 0.55)), trans * (0.45 + 0.55 * pow(1.0 - abs(dot(n, V)), 1.2)));
         // big foam blotches and the churned surface give the face scale
         float blot = smoothstep(0.6, 0.78, fb(vec2(vW.x * 0.008, vW.y * 0.012 + uTime * 0.08)));
@@ -397,7 +397,7 @@ class SlWave {
         float pour = uLip > 0.5 ? 0.0 : smoothstep(0.4, 0.9, uC) * smoothstep(0.45, 0.8, h) * face * smoothstep(0.45, 0.75, fb(vec2(vW.x * 0.01, vW.y * 0.004 + uTime * 0.25)));
         toe += pour * 0.8;
         float foam = clamp(streak + crest + back + lipFoam + toe, 0.0, 1.0);
-        col = mix(col, SR(vec3(0.86, 0.89, 0.88)) * (0.75 + 0.25 * h), foam * 0.93);
+        col = mix(col, mix(SR(vec3(0.6, 0.68, 0.71)), SR(vec3(0.95, 0.97, 0.97)), smoothstep(-0.2, 0.6, n.y)) * (0.8 + 0.2 * h), foam * 0.93);
         gl_FragColor = vec4(col, 1.0);
         ${THREE.ShaderChunk.fog_fragment}
       }`;
@@ -421,11 +421,11 @@ class SlWave {
       spawn: (i, r) => ({ ux: r.range(-0.5, 0.5), p: new THREE.Vector3(), v: new THREE.Vector3(), t0: 0, life: r.range(1.2, 2.4), s0: 0.08, s1: 0.32, rot: r.next() * 6, spin: r.range(-0.4, 0.4), loop: r.range(1.2, 2.4), ph: r.next(), kind: r.next() < 0.55 ? 0 : 1 }) });
     this.mist = new XBill(scene, { n: cap ? 90 : 60, kind: 'soft', color: '#cfd6d6', seed: 92, alpha: 0.18, fadeIn: 0.2, fadeOut: 0.6, order: 5,
       spawn: (i, r) => ({ ux: r.range(-0.5, 0.5), p: new THREE.Vector3(), v: new THREE.Vector3(), t0: 0, life: 9, s0: 1, s1: 1, rot: r.next() * 6, spin: r.range(-0.05, 0.05), loop: 0, ph: r.next(), hk: r.range(0.6, 1.25) }) });
-    this.foot = new XBill(scene, { n: cap ? 260 : 160, kind: 'soft', color: '#e9eeec', seed: 93, alpha: 0.7, fadeIn: 0.1, fadeOut: 0.5, order: 6,
+    this.foot = new XBill(scene, { n: cap ? 520 : 320, kind: 'soft', color: '#e9eeec', seed: 93, alpha: 0.4, fadeIn: 0.1, fadeOut: 0.5, order: 6,
       spawn: (i, r) => ({ ux: r.range(-0.5, 0.5), p: new THREE.Vector3(), v: new THREE.Vector3(), t0: 0, life: 9, s0: 1, s1: 1, rot: r.next() * 6, spin: r.range(-0.3, 0.3), loop: 0, ph: r.next(), hk: r.range(0.05, 0.3) }) });
     // the front hits the sea wall: whitewater thrown up the face of the city; then foam rushing past you
     this.burst = new XBill(scene, { n: cap ? 180 : 120, kind: 'soft', color: '#eef2f0', seed: 95, alpha: 0.85, fadeIn: 0.05, fadeOut: 0.6, g: 9.8, drag: 0.6, order: 7,
-      spawn: (i, r) => ({ p: new THREE.Vector3(r.range(-90, 90), SL_FRONT.beachY + r.range(0, 6), SL_FRONT.wallZ - r.range(0, 12)), v: new THREE.Vector3(r.range(-8, 8), r.range(30, 75), r.range(4, 26)), t0: 59.2 + r.next() * 0.35, life: r.range(1.6, 2.6), s0: r.range(8, 16), s1: r.range(26, 48), rot: r.next() * 6, spin: r.range(-0.6, 0.6) }) });
+      spawn: (i, r) => ({ p: new THREE.Vector3(r.range(-70, 70), r.range(0, 5), SL_FRONT.wallZ + r.range(0, 4)), v: new THREE.Vector3(r.range(-8, 8), r.range(30, 75), r.range(6, 26)), t0: 59.3 + r.next() * 0.25, life: r.range(1.6, 2.6), s0: r.range(10, 20), s1: r.range(34, 64), rot: r.next() * 6, spin: r.range(-0.6, 0.6) }) });
     this.engulf = new XBill(scene, { n: 90, kind: 'soft', color: '#d9e6e3', seed: 96, alpha: 0.95, fadeIn: 0.12, fadeOut: 0.7, order: 8,
       spawn: (i, r) => ({ off: new THREE.Vector3(r.range(-14, 14), r.range(-3, 16), r.range(-60, -25)), sp: r.range(55, 90), p: new THREE.Vector3(), v: new THREE.Vector3(), t0: 59.55 + r.next() * 0.3, life: 1.4, s0: r.range(5, 9), s1: r.range(12, 22), rot: r.next() * 6, spin: r.range(-1, 1) }) });
     // a thick, broken band of whitewater riding the lip's edge
@@ -436,7 +436,7 @@ class SlWave {
     const dm = [Mat.std('#e8e6e0', { roughness: 0.5 }), Mat.std('#2a4a6a', { roughness: 0.5 }), Mat.std('#5a4a3a', { roughness: 0.9 }), Mat.std('#a8402a', { roughness: 0.6 }), Mat.std('#3a3d40', { roughness: 0.5 })];
     this.debris = dm.map((mat, k) => { const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mat, 30); im.frustumCulled = false; scene.add(im); return im; });
     const r = new RNG(94); this.D = [];
-    for (let i = 0; i < 150; i++) this.D.push({ k: i % 5, x: r.range(-900, 900) * (i < 60 ? 0.3 : 1), s: r.range(-0.3, 0.3), sz: [r.range(6, 14), r.range(2, 4), r.range(2.5, 5)], spin: [r.range(-1, 1), r.range(-1, 1), r.range(-1, 1)], ph: r.next() });
+    for (let i = 0; i < 150; i++) this.D.push({ k: i % 5, x: r.range(-900, 900) * (i < 80 ? 0.22 : 1), s: r.range(-0.3, 0.3), sz: [r.range(10, 22), r.range(3, 6), r.range(4, 8)], spin: [r.range(-1, 1), r.range(-1, 1), r.range(-1, 1)], ph: r.next() });
     this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3();
   }
 
@@ -447,6 +447,10 @@ class SlWave {
     if (!on) { this.spray.update(-1e9); this.mist.update(-1e9); this.foot.update(-1e9); this.burst.update(-1e9); this.engulf.update(-1e9); this.lipFoam.update(-1e9); return; }
     const H = slWaveH(t), zf = slWaveZ(t), c = slWaveCurl(t), base = slSeaLevel(t);
     U.uZ.value = zf; U.uH.value = H; U.uC.value = c; U.uBase.value = base; U.uTime.value = t;
+    // the telephoto: thin the fog much more on the wave so the far line reads as a dark band under a bright edge
+    const tele = MathX.smooth(t, 46.4, 46.8) * (1 - MathX.smooth(t, 51.9, 52.3));
+    for (const m of [this.body, this.lip]) m.material.uniforms.uFogMul.value = 0.45 - 0.35 * tele;
+    for (const b of [this.spray, this.mist, this.foot, this.lipFoam]) b.mesh.material.uniforms.uFogMul.value = 0.3 - 0.24 * tele;
     // billboards follow the front: each one has a place along it (ux) and a phase
     const P = this._p;
     const place = (o, s, hk) => { const x = o.ux * 3800 + cam.position.x * 0.0; slWavePoint(t, x, s, P); return P; };
@@ -455,9 +459,9 @@ class SlWave {
       const q = place(o, o.kind ? 0.1 + 0.25 * slCx(x, c) : -0.05, 0);
       o.p.set(q.x, q.y + Hx * (0.03 + 0.3 * ph), q.z - Hx * 0.3 * ph); o.v.set(0, 0, 0); o.t0 = t - ph * o.life; o.s0 = Hx * 0.07; o.s1 = Hx * 0.26; o.loop = 0;
     }
-    for (const o of this.mist.P) { const x = o.ux * 4200, Hx = slHx(x, H), q = place(o, 0.05, 0); o.p.set(q.x, q.y + Hx * (0.05 + 0.1 * o.hk) + 8, q.z - Hx * 0.6 * o.hk); o.t0 = t - 1; o.s0 = o.s1 = Hx * 0.5 * o.hk + 10 + 26 * (1 - MathX.smooth(t, 51.5, 54)); }
-    for (const o of this.foot.P) { const x = o.ux * 4000, Hx = slHx(x, H); slWavePoint(t, x, 0.45 + 0.3 * slCx(x, c) + 0.15 * Math.sin(t * 2 + o.ph * 6), P); o.p.set(P.x, base + Hx * o.hk * 0.7 + 2, P.z + Hx * 0.06); o.t0 = t - 1; o.s0 = o.s1 = Hx * (0.12 + 0.22 * o.hk) + 4; }
-    const far = 1 - MathX.smooth(t, 51.5, 54); this.spray.s.alpha = 0.6 * MathX.smooth(H, 3, 20); this.mist.s.alpha = 0.14 + 0.36 * far; this.foot.s.alpha = 0.55 + 0.3 * far;
+    for (const o of this.mist.P) { const x = o.ux * 4200, Hx = slHx(x, H), q = place(o, 0.05, 0); o.p.set(q.x, q.y + Hx * (0.05 + 0.16 * o.hk) + 8, q.z - Hx * (0.6 * o.hk - 0.35)); o.t0 = t - 1; o.s0 = o.s1 = Hx * 0.5 * o.hk + 10 + 26 * (1 - MathX.smooth(t, 51.5, 54)); }
+    for (const o of this.foot.P) { const x = o.ux * 4000, Hx = slHx(x, H); slWavePoint(t, x, 0.45 + 0.3 * slCx(x, c) + 0.15 * Math.sin(t * 2 + o.ph * 6), P); o.p.set(P.x + Hx * 0.1 * Math.sin(o.ph * 40.0), base + Hx * o.hk * 0.6 + 1.5, P.z + Hx * (0.03 + 0.06 * Math.sin(o.ph * 17.0))); o.t0 = t - 1; o.s0 = o.s1 = Hx * (0.05 + 0.2 * o.hk * o.hk * 3) + 3; }
+    const far = 1 - MathX.smooth(t, 51.5, 54); this.spray.s.alpha = 0.6 * MathX.smooth(H, 3, 20); this.mist.s.alpha = 0.14 + 0.36 * far; this.foot.s.alpha = 0.32 + 0.2 * far;
     this.spray.update(t); this.mist.update(t); this.foot.update(t);
     for (const o of this.lipFoam.P) { const x = o.ux * 3600, Hx = slHx(x, H); slLipTip(t, x, P); const w = Math.sin(t * 1.7 + o.ph * 6.28); o.p.set(P.x, P.y + Hx * 0.02 * w, P.z + Hx * 0.02 * w); o.t0 = t - 1; o.s0 = o.s1 = Hx * 0.07 * o.hk + 3; }
     this.lipFoam.s.alpha = 0.75 * MathX.smooth(slWaveCurl(t), 0.15, 0.4);

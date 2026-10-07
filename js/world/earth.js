@@ -134,7 +134,8 @@ class EarthScene {
         for (const L of lows) {
           const d = Math.acos(MathX.clamp(x * L.c.x + y * L.c.y + z * L.c.z, -1, 1)) / L.r;
           if (d > 3.2) continue;
-          const ang = -L.sg * L.s / (1 + d * d * 0.9), ca = Math.cos(ang), sa = Math.sin(ang);   // smooth spiral arms, no smear ring
+          const fade = d < 2.0 ? 1 : 1 - smooth(2.0, 3.2, d);   // (the twist must reach zero at the edge, or the clouds tear along a circle)
+          const ang = -L.sg * L.s / (1 + d * d * 0.9) * fade, ca = Math.cos(ang), sa = Math.sin(ang);   // smooth spiral arms, no smear ring
           const k = L.c, kd = k.x * x + k.y * y + k.z * z;   // Rodrigues rotation about the low's axis
           const cx = k.y * z - k.z * y, cy = k.z * x - k.x * z, cz = k.x * y - k.y * x;
           x = x * ca + cx * sa + k.x * kd * (1 - ca); y = y * ca + cy * sa + k.y * kd * (1 - ca); z = z * ca + cz * sa + k.z * kd * (1 - ca);
