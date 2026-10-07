@@ -30,8 +30,12 @@ const FILM = {
     this.rubble = [rubble(26, 71, [16, 1, -84], 43.4, 3.5), rubble(18, 73, [-8.5, 3, 0], 44.5, 3), rubble(22, 79, [-8, 0.5, -100], XB.break, 2.5), rubble(16, 83, [5, 0.4, -60], XB.stomp, 2), rubble(14, 89, [6, 0.3, -66], 41.5, 2.5)];
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     const hud = document.getElementById('hud'), mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; d.style.opacity = '0'; hud.appendChild(d); return d; };
-    this.title = mk('xo-title', '<span class="a">WHAT IF</span><span class="b">KILLUA &amp; EREN</span><span class="c">FOUGHT IN WWII?</span>');
-    this.caption = mk('xo-cap', 'THE BATTLEFIELD<br>NEVER STOOD A CHANCE.');
+    this.title = mk('xo-title', '<span class="a">WHAT IF KILLUA AND EREN</span><span class="b">SPAWNED IN</span><span class="c">WORLD WAR II?</span>');
+    this.subs = XCAPS.map(([a, b, txt]) => [a, b, mk('xo-sub', txt)]);
+    this.caption = mk('xo-cap', 'NO ARMY ON EARTH<br>COULD STOP THIS.');
+    // tracer fire across the field before they arrive (both ways), deterministic
+    this.tracers = []; for (let i = 0; i < 70; i++) { const h = (k) => hash1(i * 13 + k), north = h(1) < 0.6, x0 = (h(2) - 0.5) * 80, z0 = north ? -82 + h(3) * 6 : 12 + h(3) * 10, x1 = x0 + (h(4) - 0.5) * 30, z1 = north ? 10 + h(5) * 20 : -70 - h(5) * 15;
+      this.tracers.push({ t0: 0.1 + i * 0.16 + h(6) * 0.12, dur: 0.45 + h(7) * 0.3, a: new THREE.Vector3(x0, 1.0 + h(8) * 1.5, z0), b: new THREE.Vector3(x1, 1.2 + h(9) * 3, z1) }); }
     app.audio = typeof XAudio !== 'undefined' ? new XAudio(app.tl, app) : new AudioEngine(app.tl);
     this._prev = new THREE.Vector3(); this._dir = new THREE.Vector3();
   },
@@ -79,6 +83,7 @@ const FILM = {
       const p = m.clone().lerp(tgt, Math.min(1, u / 0.25)), d = tgt.clone().sub(m).normalize(); if (who[0] === 'G') p.y += Math.sin(Math.min(1, u / 0.25) * Math.PI) * 18;
       this.trail.seg(p.clone().addScaledVector(d, -3), p, 0.12, 0.9);
     }
+    for (const r of this.tracers) { const u = (w - r.t0) / r.dur; if (u < 0 || u > 1 || r.t0 > XB.hush0[0] - 0.4) continue; const p = r.a.clone().lerp(r.b, u), d = r.b.clone().sub(r.a).normalize(); this.trail.seg(p.clone().addScaledVector(d, -5), p, 0.09, 0.85); }
     this.trail.end();
     // a lens inside a head: that head is not drawn
     A.A[0].j.head.visible = !(this.shot && this.shot.noHead);
@@ -95,6 +100,7 @@ const FILM = {
     const Wd = app.world, A = app.act;
     let best = 0, at = null;
     for (const b of A.booms) { const u = w - b.w; if (u < 0 || u > 0.8) continue; const k = Math.exp(-u / 0.2); if (k > best) { best = k; at = A.fire.P[A.booms.indexOf(b) * 6].p; } }
+    { const u = w - W(XB.arrive); if (u > 0 && u < 0.4) { const k = Math.exp(-u / 0.08) * 1.2; if (k > best) { best = k; at = new THREE.Vector3(-0.9, 3, -22); } } }
     const bolt = w - W(XB.bolt); if (bolt > 0 && bolt < 0.6) { const k = Math.exp(-bolt / 0.1) * 2.5; if (k > best) { best = k; at = new THREE.Vector3(-2, 6, -23); } }
     // the end: a fire glow behind the titan rims him for the final frame
     if (t > XB.final - 0.5 && best < 0.25) { best = 0.25 * MathX.smooth(t, XB.final - 0.5, XB.final + 1.0); at = A.titan.root.position.clone().add(new THREE.Vector3(0, 9, 7)); }
@@ -109,6 +115,7 @@ const FILM = {
   _overlays(t) {
     const W2 = StoryHUD.win, T = XB.title, set = (el, v) => { const s = v.toFixed(3); if (el._o !== s) { el.style.opacity = s; el._o = s; } };
     set(this.title, W2(t, T[0], T[1], 0.25, 0.35));
+    for (const [a, b, el] of this.subs) set(el, W2(t, a, b, 0.15, 0.2));
     set(this.caption, W2(t, XB.caption, XB.black, 0.5, 0.15));
   },
 
@@ -122,6 +129,8 @@ const FILM = {
     p.tunnel = 1.25; p.tunnelSoft = 0.5; p.tunnelDark = 0; p.edgeBlur = 0; p.smear.set(0, 0);
     // slow motion reads a little heavier
     const slow = xSlow(t) < 1 ? 1 : 0; p.contrast += 0.04 * slow; p.vignette += 0.1 * slow;
+    // the arrival: a pale flash
+    if (t >= XB.arrive && t < XB.arrive + 0.5) { p.flash = Math.max(p.flash, 0.7 * Math.exp(-(t - XB.arrive) / 0.1)); p.flashColor.setRGB(0.95, 0.93, 1.0); }
     // the drop: the muzzle flash
     if (t >= XB.shot && t < XB.shot + 0.1) { p.flash = 0.35; p.flashColor.setRGB(1, 0.85, 0.6); }
     // the bolt: white-out, warm

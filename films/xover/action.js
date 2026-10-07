@@ -50,6 +50,11 @@ class XAction {
     // the muzzle flash (the shot at Killua), the casing; the T1 hit; Killua's cracks
     E.push([W(XB.shot), 'muzzle', 0, 0, 0, 1]);
     E.push([W(XB.onTank - 0.05), 'zap', 0, 0, 0, 1], [W(XB.cut[0]), 'zap', 0, 0, 0, 1.5], [W(XB.gone), 'zap', 0, 0, 0, 1]);
+    // the arrival: two strikes in the road, smoke that parts on two figures
+    this.arrB = new XRibbon(S, 600, '#d6eeff'); this.arrW = new XRibbon(S, 600, '#ffcf98');
+    this.arrFlash = new XBill(S, { n: 2, seed: 43, kind: 'glow', color: '#f4ecff', additive: true, alpha: 1, fadeIn: 0.02, fadeOut: 0.15, spawn: (i) => ({ p: new THREE.Vector3(i ? -0.9 : 0.9, 1.2, -22), v: new THREE.Vector3(), t0: W(XB.arrive), life: 0.5, s0: 9, s1: 14, rot: i }) });
+    this.arrSmoke = new XBill(S, { n: 46, seed: 47, kind: 'soft', color: '#5a5248', alpha: 0.8, drag: 1.6, fadeIn: 0.04, fadeOut: 0.35, spawn: (i, r) => { const a = r.range(0, 6.28), rr = r.range(0, 1.2); return { p: new THREE.Vector3(Math.cos(a) * rr, r.range(0.2, 2.2), -22 + Math.sin(a) * rr), v: new THREE.Vector3(Math.cos(a) * r.range(3, 7), r.range(0.3, 1.5), Math.sin(a) * r.range(3, 7)), rise: 0.4, t0: W(XB.arrive) + r.range(0, 0.08), life: r.range(1.6, 2.6), s0: r.range(1.5, 2.5), s1: r.range(4, 6.5), rot: r.range(0, 6) }; } });
+    E.push([W(XB.arrive), 'zap', 0.9, 1.2, -22, 3], [W(XB.arrive), 'arrive', -0.9, 1.2, -22, 2]);
     // the transformation: lightning, ring, steam
     const TX = -2, TZ = -23;
     E.push([W(XB.bolt), 'bolt', TX, 0, TZ, 3]);
@@ -65,7 +70,8 @@ class XAction {
     // explosions: shells on the titan, the thrown tank, the stomp, the aura-walk blast, the barrage, the final break
     const booms = [[XB.fire1 + 0.25, 'chest'], [XB.fire2 + 0.25, 'shoulder'], [XB.throw + 0.9, [-34, 0.5, -66]], [XB.stomp, [5, 0.4, -60]], [XB.auraBlast, [-3.2, 0.6, -80]],
       [XB.barrage + 0.5, 'chest'], [XB.barrage + 0.7, 'shoulder'], [XB.barrage + 0.9, [-8, 0.2, -86]], [XB.barrage + 1.1, 'head'], [XB.barrage + 1.3, [2, 0.2, -82]], [XB.barrage + 1.6, 'chest'], [XB.barrage + 1.9, [-12, 0.2, -88]],
-      [XB.push + 0.3, 'chest'], [XB.push + 0.9, 'shoulder'], [XB.break, [-8, 0.6, -100]], [XB.break + 0.25, [3, 0.8, -108.5]], [43.4, [16, 1, -84]]];
+      [XB.push + 0.3, 'chest'], [XB.push + 0.9, 'shoulder'], [XB.break, [-8, 0.6, -100]], [XB.break + 0.25, [3, 0.8, -108.5]], [43.4, [16, 1, -84]], [XB.crush, [-6, 0.4, -79.5]],
+      [1.15, [-34, 0.3, -96]], [2.3, [28, 0.3, -112]], [3.35, [-46, 0.3, -64]], [4.1, [40, 0.3, -82]], [7.0, [-38, 0.3, -118]], [9.0, [36, 0.3, -104]]];
     this.booms = booms.map(([tf, at]) => ({ w: W(tf), at }));
     this.fire = new XBill(S, { n: booms.length * 6, seed: 11, kind: 'glow', color: '#ff9a3a', additive: true, alpha: 0.9, fadeIn: 0.02, fadeOut: 0.3, spawn: (i, r) => ({ p: new THREE.Vector3(), v: new THREE.Vector3(r.range(-3, 3), r.range(1, 6), r.range(-3, 3)), t0: 1e9, life: r.range(0.35, 0.7), s0: r.range(2, 4), s1: r.range(5, 9), rot: r.range(0, 6), b: Math.floor(i / 6) }) });
     this.smoke = new XBill(S, { n: booms.length * 8, seed: 13, kind: 'soft', color: '#3c3833', alpha: 0.85, drag: 0.8, fadeOut: 0.6, spawn: (i, r) => ({ p: new THREE.Vector3(), v: new THREE.Vector3(r.range(-2, 2), r.range(2, 6), r.range(-2, 2)), rise: 0.6, t0: 1e9, life: r.range(2.5, 4.5), s0: r.range(3, 5), s1: r.range(9, 14), rot: r.range(0, 6), b: Math.floor(i / 8) }) });
@@ -95,15 +101,15 @@ class XAction {
         if (w < W(XB.throw)) { S.T2.lift = lift + 2; S.T2.pitch = -0.4 * MathX.smooth(w, W(XB.grab + 0.45), W(XB.throw)); }
         else { const T = 0.55, f = Math.min(1, u / T); S.T2.x = R(-4, -34, f); S.T2.z = R(-57.5, -66, f); S.T2.lift = Math.max(0, 5 + 16 * f - 21 * f * f); S.T2.roll = 3.1 * Ease.outCubic(f); S.T2.spin = 0.8 * f; S.T2.pitch = -0.4 + 0.3 * f; S.T2.broken = f >= 1; }
       } }
-    { const k = k01(W(22), W(30.2)), back = k01(W(31.6), W(XB.stomp)); S.T3 = { x: 5, z: R(-86, -61, k) - 2.5 * Ease.outQuad(back), yaw: 0.05, dist: 25 * k - 2.5 * back, turret: 0.2, elev: 0.1, recoil: Math.exp(-Math.max(0, w - W(XB.fire2)) * 6) * (w > W(XB.fire2) ? 1 : 0), crush: MathX.smooth(w, W(XB.stomp), W(XB.stomp) + 0.12) }; }
-    { const k = k01(W(23), W(32.5)); S.T4 = { x: -3.2, z: R(-96, -79.5, k), yaw: 0.0, dist: 18 * k, turret: -0.3, elev: 0.15, hatch: MathX.smooth(w, W(XB.stare - 0.3), W(XB.stare + 0.1)), commander: w > W(XB.stare - 0.2) && w < W(XB.auraBlast), cmUp: 1, cmLook: [-0.55, 0.3] };
+    { const k = k01(W(22), W(XB.grab + 0.4)), back = k01(W(XB.stomp - 0.9), W(XB.stomp)); S.T3 = { x: 5, z: R(-86, -61, k) - 2.5 * Ease.outQuad(back), yaw: 0.05, dist: 25 * k - 2.5 * back, turret: 0.2, elev: 0.1, recoil: Math.exp(-Math.max(0, w - W(XB.fire2)) * 6) * (w > W(XB.fire2) ? 1 : 0), crush: MathX.smooth(w, W(XB.stomp), W(XB.stomp) + 0.12) }; }
+    { const k = k01(W(23), W(XB.stare - 1.0)); S.T4 = { x: -3.2, z: R(-96, -79.5, k), yaw: 0.0, dist: 18 * k, turret: -0.3, elev: 0.15, hatch: MathX.smooth(w, W(XB.stare - 0.3), W(XB.stare + 0.1)), commander: w > W(XB.stare - 0.2) && w < W(XB.auraBlast), cmUp: 1, cmLook: [-0.55, 0.3] };
       if (w > W(XB.auraBlast)) { const f = MathX.clamp((w - W(XB.auraBlast)) / 0.8, 0, 1); S.T4.lift = Math.max(0, 9 * f - 9 * f * f); S.T4.roll = 2.0 * Ease.outCubic(f); S.T4.z -= 4 * f; S.T4.broken = true; S.T4.hatch = 1; } }
     // T5–T7: the column heading south through the village at 5 m/s
-    { const t0 = W(32.5), v = 5, stop1 = W(XB.stop), base = (dz, stopAt) => { const ws = Math.min(w, stopAt); return -34 + v * Math.max(0, ws - t0) + dz; };
+    { const t0 = W(XB.run - 1.4), v = 5, stop1 = W(XB.stop), base = (dz, stopAt) => { const ws = Math.min(w, stopAt); return -34 + v * Math.max(0, ws - t0) + dz; };
       const d1 = (stopAt) => v * Math.max(0, Math.min(w, stopAt) - t0);
       S.T5 = { x: 0.5, z: base(0, stop1), yaw: 0, dist: d1(stop1), turret: 0, lights: w < W(XB.touch) ? 1.2 : (Math.floor(w * 20) % 3 ? 0.2 : 1.4) * (w < W(XB.touch + 0.8) ? 1 : 0) };
       S.T6 = { x: 0.5, z: base(-12, W(XB.stop + 0.6)), yaw: 0, dist: d1(W(XB.stop + 0.6)), turret: w < W(XB.stop) ? 0.3 * Math.sin(w * 1.5) : 0.3 * Math.sin(W(XB.stop) * 1.5), lights: w < W(XB.leap) ? 1.2 : 0 };
-      S.T7 = { x: 0.5, z: base(-24, W(XB.fire3)), yaw: 0, dist: d1(W(XB.fire3)), turret: MathX.lerp(0, 0.06, MathX.smooth(w, W(36.3), W(36.7))), elev: 0.04, recoil: w > W(XB.fire3) ? Math.exp(-(w - W(XB.fire3)) * 6) : 0, hatch: 0 }; }
+      S.T7 = { x: 0.5, z: base(-24, W(XB.fire3)), yaw: 0, dist: d1(W(XB.fire3)), turret: MathX.lerp(0, 0.06, MathX.smooth(w, W(XB.fire3 - 0.5), W(XB.fire3 - 0.1))), elev: 0.04, recoil: w > W(XB.fire3) ? Math.exp(-(w - W(XB.fire3)) * 6) : 0, hatch: 0 }; }
     // T8–T9: the last push from the ridge; smashed at the break; T8's wreck is Killua's stage at the end
     { const k = k01(W(55), W(XB.break)); S.T8 = { x: 3, z: R(-121, -109, k), yaw: 0.02, dist: 12 * k, turret: -0.15, elev: 0.18, recoil: w > W(XB.push) ? Math.exp(-(w - W(XB.push)) * 6) : 0 };
       S.T9 = { x: -8, z: R(-115, -100, k), yaw: -0.05, dist: 15 * k, turret: 0.1, elev: 0.2, recoil: w > W(XB.push + 0.6) ? Math.exp(-(w - W(XB.push + 0.6)) * 6) : 0 };
@@ -114,11 +120,11 @@ class XAction {
   // the titan: [w, x, z, yaw] path and actions
   _titanKeys() {
     if (this._tk) return this._tk;
-    const pos = [[W(XB.bolt), -2, -23], [W(26.5), -2, -23], [W(XB.grab), -4, -53], [W(XB.stomp), 2, -56], [W(34), 2, -57], [W(42.8), 10, -80], [W(44.3), 18, -88], [W(45.2), 10, -84], [W(46.4), -1.5, -87],
+    const pos = [[W(XB.bolt), -2, -23], [W(26.0), -2, -23], [W(XB.grab), -4, -53], [W(XB.stomp), 2, -56], [W(XB.stare + 0.2), 2, -57], [W(XB.crush), -6, -78.5], [W(XB.crush + 0.6), -5.5, -79], [W(42.8), 10, -80], [W(44.3), 18, -88], [W(45.2), 10, -84], [W(46.4), -1.5, -87],
       [W(XB.auraBlast), -1.8, -85.5], [W(49), -6, -78], [W(XB.barrage), -4, -84], [W(57), -6, -88], [W(XB.push), -6, -90], [W(XB.break), -6, -96], [W(61.6), -6, -95], [W(63.5), -4.5, -90], [W(XB.final), -4.2, -92], [W(XB.titanUp), -3.8, -95], [W(72), -3.6, -96]];
-    const yaw = [[0, Math.PI], [W(XB.reveal), Math.PI], [W(XB.roar), Math.PI + 0.25], [W(26.5), Math.PI], [W(XB.grab), Math.PI], [W(XB.throw), Math.PI + 0.9], [W(31.5), Math.PI - 0.4], [W(XB.stomp), Math.PI - 0.3], [W(34), Math.PI - 0.5],
+    const yaw = [[0, Math.PI], [W(XB.reveal), Math.PI], [W(XB.roar), Math.PI + 0.25], [W(26.0), Math.PI], [W(XB.grab), Math.PI], [W(XB.throw), Math.PI + 0.9], [W(XB.throw + 0.5), Math.PI - 0.4], [W(XB.stomp), Math.PI - 0.3], [W(XB.stare + 0.3), Math.PI + 0.35], [W(XB.crush + 0.5), Math.PI + 0.35], [W(XB.crush + 1.4), Math.PI - 1.4], [W(42.8), Math.PI - 1.5],
       [W(44.3), Math.PI - 0.6], [W(45.2), Math.PI + 0.6], [W(46.4), 0.25], [W(XB.auraBlast), 0.05], [W(49), Math.PI], [W(XB.break), Math.PI], [W(62), Math.PI], [W(XB.final), Math.PI], [W(72), Math.PI - 0.05]];
-    const acts = [[0, 'tStand'], [W(XB.roar), 'tRoar'], [W(26.3), 'tWalk'], [W(XB.grab), 'tGrab'], [W(XB.throw), 'tThrow'], [W(31.6), 'tStand'], [W(XB.stomp - 0.6), 'tStomp'], [W(33.2), 'tStand'], [W(34), 'tWalk'],
+    const acts = [[0, 'tStand'], [W(XB.roar), 'tRoar'], [W(26.0), 'tWalk'], [W(XB.grab), 'tGrab'], [W(XB.throw), 'tThrow'], [W(XB.throw + 0.6), 'tStand'], [W(XB.stomp - 0.6), 'tStomp'], [W(XB.stomp + 0.35), 'tStand'], [W(XB.stare + 0.25), 'tWalk'], [W(XB.crush - 0.6), 'tStomp'], [W(XB.crush + 0.25), 'tWalk'],
       [W(45.2), 'tRoar'], [W(46.2), 'tWalk'], [W(XB.auraBlast - 0.5), 'tPunch'], [W(48.6), 'tWalk'], [W(57), 'tStand'], [W(XB.push), 'tWalk'], [W(XB.break - 0.5), 'tPunch'], [W(61.5), 'tStand'], [W(XB.final), 'tWalk'], [W(XB.titanUp + 0.6), 'tRoar'], [W(70.5), 'tStand']];
     return (this._tk = new HeroKeys(pos, yaw, acts));
   }
@@ -127,11 +133,12 @@ class XAction {
   _killua(w) {
     const K = { show: true, x: 0.9, y: 0, z: -22, yaw: Math.PI, act: 'kPockets', τ: w, gaze: null, crawl: 0.15, streak: null };
     const at = (tf) => W(tf), T = this.tankS;
+    if (w < at(XB.appear)) { K.show = false; return K; }
     if (w < at(XB.shot) + 0.012) { if (w > at(XB.spark - 0.2) && w < at(XB.spark + 1.0)) K.crawl = 0.8; return K; }
     if (w < at(XB.onTank - 0.05)) { K.show = false; K.streak = [[0.9, 1.1, -22], [1.6, 1.3, -26], [3.5, 2.6, -36], [1.0, 2.9, -46]]; K.streakK = 1 - MathX.smooth(w, at(XB.shot) + 0.06, at(XB.shot) + 0.3); K.residue = 1 - MathX.smooth(w, at(XB.shot) + 0.1, at(XB.shot) + 0.35); return K; }
     if (w < at(XB.cut[0])) { const p = this.tanks.T1.deck(this._v, 0.0, -1.4); Object.assign(K, { x: p.x, y: p.y, z: p.z, yaw: 0.05, act: 'kCrouch', τ: 0, crawl: 1 }); return K; }
     if (w < at(XB.gone)) { const p = this.tanks.T1.turretTop(this._v); Object.assign(K, { x: p.x, y: p.y, z: p.z, yaw: 0.1, act: 'kPockets', τ: w, crawl: 0.35 }); K.headYaw = w > at(16.6) ? -0.5 * MathX.smooth(w, at(16.6), at(17.4)) : 0; return K; }
-    if (w < at(XB.column)) { K.show = false; return K; }
+    if (w < at(XB.run)) { K.show = false; return K; }
     // the column: alongside T5, a hand on the hull; the leap to T6; behind T7
     if (w < at(XB.leap)) { const t5 = T.T5, run = w < at(XB.touch); Object.assign(K, { x: -1.55, z: t5.z + 0.6, yaw: 0, act: 'kRun', τ: w, crawl: run ? 0.5 : 1, run: true }); if (!run) K.touch = true; return K; }
     if (w < at(XB.stop + 0.3)) { const p = this.tanks.T6.deck(this._v, 0, 0.4); Object.assign(K, { x: p.x, y: p.y, z: p.z, yaw: 0.2, act: 'kCrouch', τ: 0, crawl: 1, flashIn: at(XB.leap) }); return K; }
@@ -162,18 +169,19 @@ class XAction {
   }
 
   update(t, cam) {
-    const w = xW(t), app = this.app;
+    const w = xW(t), app = this.app, at0 = (tf) => W(tf);
     this.w = w;
     // tanks
     const TS = this.tankS = this._tankStates(w);
     for (const id in this.tanks) this.tanks[id].set(TS[id]);
-    for (const id of ['T5', 'T6', 'T7']) this.tanks[id].root.visible = w > W(XB.column - 0.6);
+    for (const id of ['T5', 'T6', 'T7']) this.tanks[id].root.visible = w > W(XB.run - 0.6);
     // killua
     const K = this._killua(w), kp = this.killua.p;
     kp.root.visible = K.show;
+    kp.root.position.set(K.x, K.y || xGround(K.x, K.z), K.z);   // (kept where he is even unseen: his light flashes follow it)
     this.sparks.begin(cam);
     if (K.show) {
-      kp.root.position.set(K.x, K.y || xGround(K.x, K.z), K.z); kp.root.rotation.set(0, K.yaw, 0);
+      kp.root.rotation.set(0, K.yaw, 0);
       const pose = (ACTIONS[K.act] || ACTIONS.kPockets)(K.τ, { seed: kp.seed, seedI: kp.seedI, walkPhase: ((K.walkD ?? w * (K.run ? 5.5 : 1.2)) / 1.0) * Math.PI * 2 });
       if (K.headYaw) pose.headYaw = K.headYaw;
       kp.apply(pose); kp.root.updateMatrixWorld(true);
@@ -199,7 +207,13 @@ class XAction {
     this._soldiers(w, t, cam);
     this.sparks.end();
     // effects
-    for (const b of [this.steam, this.ring, this.flash, this.columns, this.fires, this.embers, this.wall]) b.update(w);
+    for (const b of [this.steam, this.ring, this.flash, this.columns, this.fires, this.embers, this.wall, this.arrFlash, this.arrSmoke]) b.update(w);
+    // the two strikes: re-struck every couple of frames for a quarter of a second
+    this.arrB.begin(cam); this.arrW.begin(cam);
+    { const u = w - at0(XB.arrive); if (u > 0 && u < 0.26) { const fr = Math.floor(u * 45), k = (fr % 3 === 2 ? 0.45 : 1) * (1 - MathX.smooth(u, 0.16, 0.26));
+      for (const pl of xBolt(new THREE.Vector3(0.9 + hash1(fr) * 4 - 2, 70, -26), new THREE.Vector3(0.9, 0.2, -22), fr * 5 + 1, 0.09, 3)) { this.arrB.poly(pl, 0.9, 0.9 * k); }
+      for (const pl of xBolt(new THREE.Vector3(-0.9 + hash1(fr + 9) * 4 - 2, 70, -18), new THREE.Vector3(-0.9, 0.2, -22), fr * 7 + 2, 0.09, 3)) { this.arrW.poly(pl, 0.9, 0.9 * k); } } }
+    this.arrB.end(); this.arrW.end();
     this._booms(w);
     this._titanSteam(w);
   }
@@ -207,7 +221,7 @@ class XAction {
   _eren(w, t, cam) {
     const E = this.eren, ep = E.p, T = this.titan, at = (tf) => W(tf);
     // eren on the road until the bolt; the hand to his mouth for the bite
-    ep.root.visible = w < at(XB.bolt);
+    ep.root.visible = w < at(XB.bolt) && w >= at(XB.appear);
     if (ep.root.visible) {
       ep.root.position.set(-0.9, 0, -22); ep.root.rotation.set(0, Math.PI, 0);
       const pose = ACTIONS.idle(w, { seed: ep.seed, seedI: ep.seedI }); pose.lSh = [0.05, 0.1]; pose.rSh = [0.05, 0.1]; ep.apply(pose); ep.root.updateMatrixWorld(true);
@@ -272,6 +286,10 @@ class XAction {
       if (!show(s, w < at(30))) return;
       const lane = (i % 3 - 1) * 1.5 + (i % 2 ? 0.3 : -0.3), row = Math.floor(i / 3), x = lane, z0 = -46 - row * 2.2, z1 = -36 - row * 2.2;
       const k = Ease.outQuad(MathX.clamp(w / at(XB.halt), 0, 1)), z = z0 + (z1 - z0) * k;
+      const di = i - 3, dropped = di >= 0 && di < 3 && w > at(XB.drop[di]);
+      if (dropped) { s.keys = new HeroKeys([[0, x, z1]], [[0, 0.3 * (di - 1)]], [[0, 'idle'], [at(XB.drop[di]), 'xCollapse']]); s.update(w, null, null); s.rifle.visible = false;
+        if (w - at(XB.drop[di]) < 0.1) { const c = s.p.j.spine.getWorldPosition(new THREE.Vector3()); for (let k = 0; k < 4; k++) this.sparks.arc(c, c.clone().add(new THREE.Vector3(hash1(k * 3 + di) - 0.5, hash1(k * 5 + di) - 0.3, hash1(k * 7 + di) - 0.5).multiplyScalar(1.4)), t, 1, 0.03, k + 51 + di * 7, 2); }
+        return; }
       const thrown = w > at(XB.ring) + 0.05 && row === 0, fleeing = w > at(XB.reveal);
       let pos = [[0, x, z0], [at(XB.halt), x, z1]], yaw = [[0, 0]], acts = [[0, 'walk'], [at(XB.halt), 'idle'], [at(XB.order + 0.3 + i * 0.07), 'xAim']];
       if (i === 0) acts.push([at(XB.shot), 'xRecoil'], [at(XB.shot) + 0.3, 'xAim']);
@@ -284,7 +302,7 @@ class XAction {
       if (thrown) { const f = MathX.clamp((w - at(XB.ring)) / 0.6, 0, 1); s.p.root.position.y += Math.max(0, 2.2 * f - 2.2 * f * f) * 2; }
     });
     // the officer: halts the squad, orders fire, tries the radio
-    { const s = this.officer; if (show(s, w < at(XB.reveal + 3))) { s.keys = new HeroKeys([[0, -2.6, -42], [at(XB.halt), -2.6, -34]], [[0, 0]], [[0, 'walk'], [at(XB.halt), 'idle'], [at(XB.order), 'xRadio'], [at(XB.order + 0.8), 'idle'], [at(XB.ring), 'xThrown']]); s.update(w, null, null);
+    { const s = this.officer; if (show(s, w < at(XB.reveal + 3))) { s.keys = new HeroKeys([[0, -2.6, -42], [at(XB.halt), -2.6, -34]], [[0, 0]], [[0, 'walk'], [at(XB.halt - 0.2), 'xHalt'], [at(XB.halt + 0.9), 'idle'], [at(XB.order - 0.15), 'xPoint'], [at(XB.order + 1.1), 'idle'], [at(XB.ring), 'xThrown']]); s.update(w, null, null);
       if (s.face) { const shout = (w > at(XB.halt - 0.3) && w < at(XB.halt + 0.5)) || (w > at(XB.order - 0.1) && w < at(XB.order + 0.7)); s.face.aimEyes(new THREE.Vector3(0, 1.3, -22), 1);
         s.face.set({ blink: 0, brow: -0.3, frown: 0.7, wide: 0.25, mouth: shout ? 0.55 + 0.25 * Math.abs(Math.sin(w * 13)) : 0.05, smile: 0 }); } } }
     // the field: soldiers around T2–T4 who scatter from the titan
@@ -293,23 +311,26 @@ class XAction {
         s.keys = new HeroKeys([[at(XB.size - 0.5), x0, z], [at(XB.silent + 0.2), x0 + d * 16, z + 3]], [[0, d > 0 ? Math.PI / 2 - 0.2 : -Math.PI / 2 + 0.2]], [[0, i === 4 ? 'xTrip' : 'xFlee']]); s.update(w, null, 'port'); return; }
       if (!show(s, w > at(26) && w < at(34))) return;
       const x0 = -14 + i * 5, z0 = -66 - (i % 2) * 4;
-      s.keys = new HeroKeys([[0, x0, z0], [at(28), x0, z0 + 2], [at(34), x0 + (i % 2 ? 8 : -8), z0 - 16]], [[0, 0], [at(28.2), 0], [at(28.6), i % 2 ? Math.PI - 0.6 : Math.PI + 0.6]], [[0, 'xAim'], [at(28.4 + i * 0.1), i === 2 ? 'xTrip' : 'xFlee']]);
-      s.update(w, null, w < at(28.4 + i * 0.1) ? 'aim' : 'port', new THREE.Vector3(-2, 8, -40));
+      const fl = XB.fire2 + 0.5 + i * 0.1; s.keys = new HeroKeys([[0, x0, z0], [at(fl - 0.2), x0, z0 + 2], [at(fl + 5.5), x0 + (i % 2 ? 8 : -8), z0 - 16]], [[0, 0], [at(fl - 0.2), 0], [at(fl + 0.2), i % 2 ? Math.PI - 0.6 : Math.PI + 0.6]], [[0, 'xAim'], [at(fl), i === 2 ? 'xTrip' : 'xFlee']]);
+      s.update(w, null, w < at(fl) ? 'aim' : 'port', new THREE.Vector3(-2, 8, -40));
     });
     // the machine-gun crew: the gunner swings the gun, the rifleman lowers his rifle
     const mg = this.app.world.mgs[0];
     this.M.forEach((s, i) => {
-      if (!show(s, w > at(37.0) && w < at(41.5))) return;
+      if (!show(s, w > at(XB.mg - 0.7) && w < at(XB.trench + 0.6))) return;
       const x = mg.x + (i ? 1.4 : 0), z = mg.z + 0.2;
-      s.keys = new HeroKeys([[0, x, z]], [[0, 0.0], [at(38.0), -0.5], [at(38.3), 0.6]], i ? [[0, 'xAim'], [at(XB.lower), 'xLower']] : [[0, 'xCrouch']]);
+      s.keys = new HeroKeys([[0, x, z]], [[0, 0.0], [at(XB.mg + 0.2), -0.5], [at(XB.mg + 0.5), 0.6]], i ? [[0, 'xAim'], [at(XB.lower), 'xLower']] : [[0, 'xCrouch'], [at(XB.mg + 0.95), 'xCollapse']]);
       s.update(w, null, i ? (w < at(XB.lower) ? 'aim' : 'low') : null, new THREE.Vector3(x + 3, 1.2, z + 20));
-      if (!i) { mg.gun.rotation.y = w < at(38.0) ? 0 : -0.5 * MathX.smooth(w, at(38.0), at(38.25)) + 1.1 * MathX.smooth(w, at(38.25), at(38.5)); }
+      if (!i) { mg.gun.rotation.y = w < at(XB.mg + 0.2) ? 0 : -0.5 * MathX.smooth(w, at(XB.mg + 0.2), at(XB.mg + 0.45)) + 1.1 * MathX.smooth(w, at(XB.mg + 0.45), at(XB.mg + 0.7)); if (w > at(XB.mg + 0.95) && w - at(XB.mg + 0.95) < 0.1) { const c = s.p.j.spine.getWorldPosition(new THREE.Vector3()); for (let k = 0; k < 4; k++) this.sparks.arc(c, c.clone().add(new THREE.Vector3(hash1(k * 3) - 0.5, hash1(k * 5) - 0.3, hash1(k * 7) - 0.5).multiplyScalar(1.4)), t, 1, 0.03, k + 71, 2); } }
     });
     // the trench: they drop as the flash runs past
     this.R.forEach((s, i) => {
-      if (!show(s, w > at(39.4) && w < at(43))) return;
-      const x = -32 + i * 9, z = XW.trench.z + 0.4, hit = this.trenchW[0] + (x + 40) / 80 * 0.5;
-      s.keys = new HeroKeys([[0, x, z]], [[0, 0]], [[0, 'xCrouch'], [hit, 'xThrown']]);
+      if (!show(s, w > at(XB.crush - 1.0) && w < at(XB.trench + 2.6))) return;
+      const x = -32 + i * 9, z = XW.trench.z + 0.4, hit = this.trenchW[0] + (x + 40) / 80 * 0.5, near = Math.abs(x + 6) < 9.5;
+      if (near) {   // the titan's foot comes down on the trench: they are thrown out of it
+        const d = Math.sign(x + 6) || 1, tc = at(XB.crush); s.keys = new HeroKeys([[0, x, z], [tc, x, z], [tc + 0.7, x + d * 6, z + 3]], [[0, 0]], [[0, 'xCrouch'], [tc, 'xThrown']]);
+        s.update(w, null, w < tc ? 'hip' : null, null); const f = MathX.clamp((w - tc) / 0.7, 0, 1); s.p.root.position.y = xGround(s.p.root.position.x, s.p.root.position.z) - 0.1 + Math.max(0, 3 * f - 3 * f * f) * 2; return; }
+      s.keys = new HeroKeys([[0, x, z]], [[0, 0]], [[0, 'xCrouch'], [hit, 'xCollapse']]);
       s.update(w, null, w < hit ? 'hip' : null, null);
       s.p.root.position.y = xGround(x, z) - 0.1;
     });
@@ -317,7 +338,7 @@ class XAction {
     this.Bt.forEach((s, i) => {
       if (!show(s, w > at(49.5) && w < at(59.5))) return;
       const g = this.app.world.guns[i % 4], x = g.x + (i < 4 ? 1.4 : -1.4), z = g.z - 1.2, down = at(XB.silent) + (i % 4) * 0.4 + 0.1;
-      s.keys = new HeroKeys([[0, x, z]], [[0, 0]], [[0, 'idle'], [at(XB.battery), 'xCrouch'], [down, 'xThrown']]);
+      s.keys = new HeroKeys([[0, x, z]], [[0, 0]], [[0, 'idle'], [at(XB.battery), 'xCrouch'], [down, 'xCollapse']]);
       s.update(w, null, null); s.p.root.position.y = g.y;
     });
     for (const g of this.app.world.guns) { const k = w > at(XB.barrage) && w < at(XB.silent) ? Math.exp(-((w - at(XB.barrage)) % 1.2) * 5) : 0; g.brl.position.z = 0.1 - 0.4 * k; }

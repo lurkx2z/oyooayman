@@ -133,9 +133,14 @@ const X_STANCE = {
     // thrown back by a blast: a short arc, flat on the back (the root's motion is keyed by the caller)
     xThrown(τ, c) { const p = P(), k = MathX.smooth(τ, 0, 0.5); p.spine = -0.4 * k; p.neck = -0.3 * k; p.lSh = [1.6, 0.6]; p.rSh = [1.4, 0.7]; p.lEl = 0.3; p.rEl = 0.5; p.lHip = [0.7 * k, 0.2]; p.rHip = [0.4 * k, 0.15]; p.lKnee = 0.6; p.rKnee = 0.9; p.hipY = 0.93 - 0.75 * k; p.pelvisPitch = -1.25 * k; return p; },
     xRadio(τ, c) { const p = ACTIONS.idle(τ, c); p.lSh = [0.4, 0.55]; p.lEl = 2.3; p.neck = 0.05; return p; },
+    xHalt(τ, c) { const p = ACTIONS.idle(τ, c), k = MathX.smooth(τ, 0, 0.25); p.lSh = [2.6 * k, 0.25]; p.lEl = 0.25; p.neck = 0.04; p.spine = -0.04; return p; },
+    xPoint(τ, c) { const p = ACTIONS.idle(τ, c), k = MathX.smooth(τ, 0, 0.2); p.rSh = [1.55 * k, 0.12]; p.rEl = 0.08; p.spine = 0.08 * k; p.spineYaw = -0.12 * k; p.lKnee = 0.12; return p; },
+    // knocked out: the knees go, the body folds and drops to the side
+    xCollapse(τ, c) { const p = P(), k = MathX.smooth(τ, 0, 0.55), f = MathX.smooth(τ, 0.25, 0.75); p.lKnee = 1.6 * k; p.rKnee = 1.3 * k; p.lHip = [1.1 * k, 0.1]; p.rHip = [0.8 * k, 0.15]; p.hipY = 0.93 - 0.72 * k;
+      p.spine = 0.5 * k - 0.2 * f; p.neck = 0.4 * k; p.lSh = [0.3, 0.25 + 0.5 * f]; p.rSh = [0.2, 0.3 + 0.4 * f]; p.lEl = 0.4; p.rEl = 0.6; p.pelvisPitch = -1.2 * f; p.rootRoll = 0.4 * f; return p; },
     xFlee(τ, c) { const p = ACTIONS.jog(τ, c); p.spine = 0.3; p.lSh = [-0.4 + 0.3 * Math.sin(c.walkPhase), 0.2]; return p; },
   });
-  Object.assign(BLEND, { xAim: 0.3, xRecoil: 0.02, xRun: 0.3, xStare: 0.5, xLower: 0.3, xCrouch: 0.4, xTrip: 0.15, xThrown: 0.05, xRadio: 0.4, xFlee: 0.3 });
+  Object.assign(BLEND, { xHalt: 0.25, xPoint: 0.2, xCollapse: 0.06, xAim: 0.3, xRecoil: 0.02, xRun: 0.3, xStare: 0.5, xLower: 0.3, xCrouch: 0.4, xTrip: 0.15, xThrown: 0.05, xRadio: 0.4, xFlee: 0.3 });
 })();
 
 class XSoldier extends XPerson {
