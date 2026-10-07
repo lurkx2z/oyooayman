@@ -83,7 +83,7 @@ const FILM = {
       const p = m.clone().lerp(tgt, Math.min(1, u / 0.25)), d = tgt.clone().sub(m).normalize(); if (who[0] === 'G') p.y += Math.sin(Math.min(1, u / 0.25) * Math.PI) * 18;
       this.trail.seg(p.clone().addScaledVector(d, -3), p, 0.12, 0.9);
     }
-    for (const r of this.tracers) { const u = (w - r.t0) / r.dur; if (u < 0 || u > 1 || r.t0 > XB.hush0[0] - 0.4) continue; const p = r.a.clone().lerp(r.b, u), d = r.b.clone().sub(r.a).normalize(); this.trail.seg(p.clone().addScaledVector(d, -5), p, 0.09, 0.85); }
+    for (const r of this.tracers) { const u = (w - r.t0) / r.dur; if (u < 0 || u > 1 || r.t0 > XB.hush0[0] - 0.4) continue; const p = r.a.clone().lerp(r.b, u), d = r.b.clone().sub(r.a).normalize(); this.trail.seg(p.clone().addScaledVector(d, -7), p, 0.22, 0.95); }
     this.trail.end();
     // a lens inside a head: that head is not drawn
     A.A[0].j.head.visible = !(this.shot && this.shot.noHead);
@@ -104,11 +104,12 @@ const FILM = {
     const bolt = w - W(XB.bolt); if (bolt > 0 && bolt < 0.6) { const k = Math.exp(-bolt / 0.1) * 2.5; if (k > best) { best = k; at = new THREE.Vector3(-2, 6, -23); } }
     // the end: a fire glow behind the titan rims him for the final frame
     if (t > XB.final - 0.5 && best < 0.25) { best = 0.25 * MathX.smooth(t, XB.final - 0.5, XB.final + 1.0); at = A.titan.root.position.clone().add(new THREE.Vector3(0, 9, 7)); }
-    Wd.warm.intensity = 900 * best; if (at) Wd.warm.position.copy(at);
+    Wd.warm.intensity = 300 * Math.min(best, 0.45 + 0.55 * Math.min(1, (at ? at.distanceTo(app.camera.position) : 99) / 30)); if (at) Wd.warm.position.copy(at);
     // cold: Killua's cracks (a hard blue-white flash between him and the lens) and a faint flicker on him while he is seen
     let ck = 0, cp = null; const K = A.killua.p.root, kc = K.position.clone().add(new THREE.Vector3(0, 1.1, 0)), toCam = app.camera.position.clone().sub(kc).normalize();
     for (const ev of A.ev) { if (ev[1] !== 'zap') continue; const u = w - ev[0]; if (u < 0 || u > 0.3) continue; const k = Math.exp(-u / 0.06) * ev[5] * 14; if (k > ck) { ck = k; cp = kc.clone().addScaledVector(toCam, 2.0); } }
     if (K.visible && app.camera.position.distanceTo(kc) < 6) { const base = 1.3 * (0.6 + 0.4 * Math.sin(t * 40)); if (base > ck) { ck = base; cp = kc.clone().addScaledVector(toCam, 1.2); } }
+    if (A.trenchAt) { ck = Math.max(ck, 40); cp = A.trenchAt.clone().add(new THREE.Vector3(0, 2, 2)); }
     Wd.cold.intensity = ck; if (cp) Wd.cold.position.copy(cp);
   },
 

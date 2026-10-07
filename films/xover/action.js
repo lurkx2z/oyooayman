@@ -53,7 +53,7 @@ class XAction {
     // the arrival: two strikes in the road, smoke that parts on two figures
     this.arrB = new XRibbon(S, 600, '#d6eeff'); this.arrW = new XRibbon(S, 600, '#ffcf98');
     this.arrFlash = new XBill(S, { n: 2, seed: 43, kind: 'glow', color: '#f4ecff', additive: true, alpha: 1, fadeIn: 0.02, fadeOut: 0.15, spawn: (i) => ({ p: new THREE.Vector3(i ? -0.9 : 0.9, 1.2, -22), v: new THREE.Vector3(), t0: W(XB.arrive), life: 0.5, s0: 9, s1: 14, rot: i }) });
-    this.arrSmoke = new XBill(S, { n: 46, seed: 47, kind: 'soft', color: '#5a5248', alpha: 0.8, drag: 1.6, fadeIn: 0.04, fadeOut: 0.35, spawn: (i, r) => { const a = r.range(0, 6.28), rr = r.range(0, 1.2); return { p: new THREE.Vector3(Math.cos(a) * rr, r.range(0.2, 2.2), -22 + Math.sin(a) * rr), v: new THREE.Vector3(Math.cos(a) * r.range(3, 7), r.range(0.3, 1.5), Math.sin(a) * r.range(3, 7)), rise: 0.4, t0: W(XB.arrive) + r.range(0, 0.08), life: r.range(1.6, 2.6), s0: r.range(1.5, 2.5), s1: r.range(4, 6.5), rot: r.range(0, 6) }; } });
+    this.arrSmoke = new XBill(S, { n: 70, seed: 47, kind: 'soft', color: '#8a7e70', alpha: 0.85, drag: 1.4, fadeIn: 0.04, fadeOut: 0.45, spawn: (i, r) => { const a = r.range(0, 6.28), rr = r.range(0, 1.2); return { p: new THREE.Vector3(Math.cos(a) * rr, r.range(0.2, 2.2), -22 + Math.sin(a) * rr), v: new THREE.Vector3(Math.cos(a) * r.range(3, 7), r.range(0.3, 1.5), Math.sin(a) * r.range(3, 7)), rise: 0.4, t0: W(XB.arrive) + r.range(0, 0.08), life: r.range(2.0, 3.4), s0: r.range(1.5, 2.5), s1: r.range(4.5, 7.5), rot: r.range(0, 6) }; } });
     E.push([W(XB.arrive), 'zap', 0.9, 1.2, -22, 3], [W(XB.arrive), 'arrive', -0.9, 1.2, -22, 2]);
     // the transformation: lightning, ring, steam
     const TX = -2, TZ = -23;
@@ -71,17 +71,17 @@ class XAction {
     const booms = [[XB.fire1 + 0.25, 'chest'], [XB.fire2 + 0.25, 'shoulder'], [XB.throw + 0.9, [-34, 0.5, -66]], [XB.stomp, [5, 0.4, -60]], [XB.auraBlast, [-3.2, 0.6, -80]],
       [XB.barrage + 0.5, 'chest'], [XB.barrage + 0.7, 'shoulder'], [XB.barrage + 0.9, [-8, 0.2, -86]], [XB.barrage + 1.1, 'head'], [XB.barrage + 1.3, [2, 0.2, -82]], [XB.barrage + 1.6, 'chest'], [XB.barrage + 1.9, [-12, 0.2, -88]],
       [XB.push + 0.3, 'chest'], [XB.push + 0.9, 'shoulder'], [XB.break, [-8, 0.6, -100]], [XB.break + 0.25, [3, 0.8, -108.5]], [43.4, [16, 1, -84]], [XB.crush, [-6, 0.4, -79.5]],
-      [1.15, [-34, 0.3, -96]], [2.3, [28, 0.3, -112]], [3.35, [-46, 0.3, -64]], [4.1, [40, 0.3, -82]], [7.0, [-38, 0.3, -118]], [9.0, [36, 0.3, -104]]];
+      [0.55, [-14, 0.3, -61]], [1.3, [17, 0.3, -53]], [1.95, [-23, 0.3, -76]], [2.7, [13, 0.3, -90]], [3.4, [-11, 0.3, -12]], [4.1, [9, 0.3, -6]], [7.0, [-38, 0.3, -118]], [9.0, [36, 0.3, -104]]];
     this.booms = booms.map(([tf, at]) => ({ w: W(tf), at }));
-    this.fire = new XBill(S, { n: booms.length * 6, seed: 11, kind: 'glow', color: '#ff9a3a', additive: true, alpha: 0.9, fadeIn: 0.02, fadeOut: 0.3, spawn: (i, r) => ({ p: new THREE.Vector3(), v: new THREE.Vector3(r.range(-3, 3), r.range(1, 6), r.range(-3, 3)), t0: 1e9, life: r.range(0.35, 0.7), s0: r.range(2, 4), s1: r.range(5, 9), rot: r.range(0, 6), b: Math.floor(i / 6) }) });
+    this.fire = new XBill(S, { n: booms.length * 6, seed: 11, kind: 'glow', color: '#ff9a3a', additive: true, alpha: 0.9, mod: (o, p) => MathX.clamp(p.distanceTo(this.app.camera.position) / 28, 0.3, 1), fadeIn: 0.02, fadeOut: 0.3, spawn: (i, r) => ({ p: new THREE.Vector3(), v: new THREE.Vector3(r.range(-3, 3), r.range(1, 6), r.range(-3, 3)), t0: 1e9, life: r.range(0.35, 0.7), s0: r.range(2, 4), s1: r.range(5, 9), rot: r.range(0, 6), b: Math.floor(i / 6) }) });
     this.smoke = new XBill(S, { n: booms.length * 8, seed: 13, kind: 'soft', color: '#3c3833', alpha: 0.85, drag: 0.8, fadeOut: 0.6, spawn: (i, r) => ({ p: new THREE.Vector3(), v: new THREE.Vector3(r.range(-2, 2), r.range(2, 6), r.range(-2, 2)), rise: 0.6, t0: 1e9, life: r.range(2.5, 4.5), s0: r.range(3, 5), s1: r.range(9, 14), rot: r.range(0, 6), b: Math.floor(i / 8) }) });
     // the final smoke wall after the break
     this.wall = new XBill(S, { n: 60, seed: 17, kind: 'soft', color: '#4a4540', alpha: 0.9, mod: (o, p) => { const dt = this._titanCamD; if (!dt) return 1; return 0.22 + 0.78 * MathX.smooth(p.distanceTo(this.app.camera.position) - dt, -6, 1); }, drag: 0.3, fadeIn: 0.1, fadeOut: 0.85, spawn: (i, r) => ({ p: new THREE.Vector3(r.range(-28, 22), r.range(1, 8), r.range(-101, -86)), v: new THREE.Vector3(r.range(-1, 1), r.range(0.5, 2), r.range(-1, 1)), rise: 0.3, t0: W(XB.break) + r.range(0, 0.6), life: 14, s0: r.range(6, 10), s1: r.range(14, 22), rot: r.range(0, 6) }) });
     // battlefield atmosphere: smoke columns, fires, embers, foreground motes
-    const cols = [[-40, -60], [35, -95], [-60, -120], [55, -40], [-25, 10], [20, -140], [70, -80], [-75, -30]];
+    const cols = [[-40, -60], [35, -95], [-60, -120], [55, -40], [-25, 10], [20, -140], [70, -80], [-75, -30], [-19, -66], [22, -60], [-30, -32], [12, -100]];
     this.columns = new XBill(S, { n: cols.length * 14, seed: 19, kind: 'soft', color: '#2e2b28', alpha: 0.75, drag: 0, fadeIn: 0.1, fadeOut: 0.5,
       spawn: (i, r) => { const c = cols[i % cols.length]; return { p: new THREE.Vector3(c[0] + r.range(-2, 2), 2, c[1] + r.range(-2, 2)), v: new THREE.Vector3(1.2, 2.6, 0.4), rise: 0, t0: -14 + (Math.floor(i / cols.length)) * 1.0 + r.range(0, 0.8), life: 14, s0: 5, s1: 22, rot: r.range(0, 6), loop: 14 }; } });
-    const fires = [[-25, 10], [55, -40], [35, -95], [-6, 14], [-5.6, 12.5], [18, -55]];
+    const fires = [[-25, 10], [55, -40], [35, -95], [-6, 14], [-5.6, 12.5], [18, -55], [-19, -66], [22, -60], [9, 4], [-12, -2]];
     this.fires = new XBill(S, { n: fires.length * 8, seed: 23, kind: 'glow', color: '#ff7a24', additive: true, alpha: 0.8, flicker: true, fadeIn: 0.15, fadeOut: 0.5,
       spawn: (i, r) => { const f = fires[i % fires.length]; return { p: new THREE.Vector3(f[0] + r.range(-1, 1), xGround(f[0], f[1]) + 0.4, f[1] + r.range(-1, 1)), v: new THREE.Vector3(0, r.range(1.2, 2.4), 0), t0: -2 + (Math.floor(i / fires.length)) * 0.13, life: 1.0, s0: r.range(1.2, 2), s1: 0.6, rot: r.range(0, 6), loop: 1.0 }; } });
     this.embers = new XBill(S, { n: 160, seed: 29, kind: 'flash', color: '#ffab55', additive: true, alpha: 0.9, flicker: true, fadeOut: 0.6,
@@ -201,7 +201,7 @@ class XAction {
     if (K.streak) this.sparks.streak(K.streak.map((a) => new THREE.Vector3(...a)), K.streakK ?? 1, K.streakW || 0.16);
     if (K.zapAt) { const c = new THREE.Vector3(...K.zapAt); for (let i = 0; i < 5; i++) this.sparks.arc(c, c.clone().add(new THREE.Vector3(hash1(i * 3 + Math.floor(t * 30)) - 0.5, hash1(i * 5) * 0.8, hash1(i * 7 + 1) - 0.5).multiplyScalar(3)), t, 1, 0.05, i + 21, 2); }
     // the trench flash: a bolt running along the trench line
-    if (w > this.trenchW[0] && w < this.trenchW[1] + 0.15) { const f = MathX.clamp((w - this.trenchW[0]) / 0.5, 0, 1), x = -40 + 80 * f, z = XW.trench.z; this.sparks.arc(new THREE.Vector3(x - 7, 1.0, z), new THREE.Vector3(x, 1.3, z), t, 1, 0.22, 31, 3); }
+    if (w > this.trenchW[0] && w < this.trenchW[1] + 0.15) { const f = MathX.clamp((w - this.trenchW[0]) / 0.5, 0, 1), x = -40 + 80 * f, z = XW.trench.z; for (let k = 0; k < 3; k++) this.sparks.arc(new THREE.Vector3(x - 9 + k * 2, 1.0, z), new THREE.Vector3(x + k * 0.5, 1.4, z), t, 1, 0.55 - k * 0.12, 31 + k, 3); this.trenchAt = new THREE.Vector3(x, 1.4, z); } else this.trenchAt = null;
     // the shot's lightning (the transformation): a warm bolt from the clouds
     this._eren(w, t, cam);
     this._soldiers(w, t, cam);

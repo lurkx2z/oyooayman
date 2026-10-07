@@ -1,52 +1,104 @@
-# Killua × Eren in WWII — production plan
+# What if Killua and Eren spawned in World War II? — production plan
 
-A 72-second vertical (9:16, 1080×1920, 30 fps) cinematic crossover edit on the shared engine. Two forces on the same
-side walk into a WWII battlefield (a generic WWII-era army, no real insignia, no gore). Killua is speed compression —
-calm, tiny, impossible to track. Eren is impact expansion — after a transformation that is an event, the war's scale
-changes around him. Every 5–7 s the power, scale or danger goes up; music beats, camera moves, actions and VFX land
-together on edit points.
+A 72-second vertical (9:16, 1080×1920, 30 fps) cinematic crossover on the shared engine. A generic 1944 European
+battlefield (no real insignia, no gore). Killua and Eren appear out of nowhere on the **same side**; to the soldiers they
+are unknown horrors. **Two separate disasters on one battlefield**: Killua takes apart *people and crews* (silent,
+impossibly fast, surgical, electric, close range); Eren takes apart *armour and structure* (huge, loud, heavy, steam,
+battlefield scale). Serious, not a meme. Oxygen / Friction structure: centred question, normal setup, clear early
+reveal, a new escalation every 5–8 s, a big payoff at the end.
 
-## 1. Rules of the action
+## 1. Rules
 
-- **Killua:** normal speed → a cut-short burst → a 0.25 s slow-motion consequence → he is already somewhere else. The
-  camera is close, low, fast; it whips, loses him, finds a flash elsewhere. Electricity is blue-white, thin, local.
-- **Eren / the Titan:** wind-up → impact → a brief slow-motion debris moment → aftermath. The camera is low, wide, slow
-  and heavy; it shakes only on footsteps and impacts. His colour is warm: orange-white flash, steam, dust, embers.
-- **World:** mud brown, charcoal, grey, desaturated green, steel. Particles at three depths (foreground motes, midground
-  smoke and dust, background plumes and columns).
-- **Slow motion only** for: the bullet miss, the transformation, the tank throw, one Killua strike, the final break.
-- **Silence** twice: before the first shot at Killua, and before the transformation.
-- **No gore.** Impacts, ragdolls, smoke, debris, electricity, vehicles, the environment.
+- **Killua** — normal speed → a burst too short to see → a cold blue-white crack → he is already somewhere else. Close,
+  low, fast camera that whips and loses him. Electricity only when needed. Sound: dry cracks, air cuts, zips that pan,
+  a short silence after his strikes. Never bass.
+- **Eren / the Titan** — wind-up → impact → a brief slow-motion debris moment → aftermath. Low, wide, slow, heavy camera
+  that shakes only on footsteps and impacts. Warm: orange-white lightning, steam, dust, embers. Sound: thunder, sub,
+  steam, footsteps, bending metal, roars.
+- **World** — mud brown, charcoal, grey, desaturated green, steel; the powers are the only saturated colours.
+- **Soldiers** — confusion → fear → panic. Rifles lift uncertainly, an officer halts and points, a commander stares up,
+  a gunner lowers his rifle, crews collapse, lines break, they retreat; one trips.
+- **Slow motion** only for: the bullet through empty air, the bolt, the tank throw, the stomp, the trench flash, the break.
+- **Silence** three times: before the arrival, before the shot at Killua, before the bolt (and a hush before the end).
+- **Words on screen**: the centred question; three short captions; the last line. No technical HUD.
 
 ## 2. The map (metres, north = −Z)
 
-Road along x = 0 · ruined village z +30…−20 (church tower at (−13, −8)) · fields z −20…−75 (tank road) · trench line
-z ≈ −80 with a bunker (16, −84) and machine-gun nests (−14, −79), (30, −81) · ridge z ≈ −108 · artillery battery
-z ≈ −126 (four guns). Eren transforms by the road at the village edge (−10, −26).
+Road along x = 0 · ruined village z +30…−20 (church tower at (−13, −8), houses with windows, a burnt truck) · fields
+z −20…−75 (the tank road; craters, wire, steel hedgehogs, burnt trees, a wreck) · zigzag trench line z ≈ −80 with a
+concrete bunker (16, −84) and machine-gun nests (−14, −79), (30, −81) · artillery battery z ≈ −126 (four guns) · a low
+rise behind it. The pair appears in the road at (±0.9, −22). The squad (9 men, an officer, a tank) advances south down
+the road toward them. Smoke columns, fires and embers at three depths.
 
-## 3. Beat sheet (film seconds; 120 BPM, a beat every 0.5 s)
+## 3. Shot list (film seconds; 120 BPM, a beat every 0.5 s)
 
-| Time | Section | Shots |
+| Time | Beat | Shot |
 |---|---|---|
-| 0–5 | Arrival | Wide: the burning valley, a squad and a tank advancing (title). Ground: two small figures stand in the road ahead. |
-| 5–12 | The reaction | A soldier squints; the officer halts the squad; Killua, hands in pockets, a spark at his fingertips; Eren's cloak moves. The officer orders fire; a rifle comes up on Killua. Near-silence. |
-| 12–19 | **Killua reveal** | Trigger, MUZZLE FLASH (drop) — he is gone; 0.25 s slow-mo: the bullet through empty air, a casing falling, an electric trace. Whip pan: nothing. The tank commander turns — crack — Killua crouched on the tank behind him, calm. Black. The tank dead; Killua looks north; gone. |
-| 19–27 | **Transformation** | Eren raises his hand, bites. Silence. A soldier notices. LIGHTNING (orange-white) — white-out, bass; a dust ring, soldiers thrown, the tank rocks, windows burst, steam. The camera struggles upward: a silhouette in the steam. Reveal: tiny soldiers and a tank in front, smoke, the Titan's head near the top of frame. Roar. |
-| 27–34 | Eren vs armour | Three tanks fire; a shell bursts on his chest (steam, scorch); he walks on. He grabs one and throws it (slow-mo debris); another reverses and is stomped flat; a commander opens his hatch and stares up. |
-| 34–41 | Killua vs the tank column | He runs alongside a moving tank in the village, touches the hull — electricity crawls over it; he leaps to the second (flashes only); the first rolls to a stop, the second turret freezes; the third fires at him — he is behind it. A machine gun cannot track him; he is behind the gunner, who lowers his rifle. A flash races down the trench. |
-| 41–49 | Parallel destruction | Cuts of 0.8–1.8 s: a tank thrown · Killua behind the MG · the Titan through the bunker · Killua across a falling wall · the roar through smoke · **AURA WALK**: Killua walks toward us, hands in pockets; behind him the Titan smashes an armoured position, a huge blast; he does not turn. |
-| 49–57 | The army adapts | Radio; the battery loads; four guns fire on Eren — explosions all over him, not enough. The barrage on Eren is Killua's opening: flashes cross the field untouched. **SIZE CONTRAST**: Killua at the bottom, wrecks and fleeing soldiers in the middle, the Titan at the top. |
-| 57–65 | It fails | The guns go silent one by one through electric flashes. The last armoured push fires; the Titan breaks through; a huge smoke wall. Silence. Soldiers retreat; one trips. |
-| 65–72 | **Final poster** | Killua standing on a destroyed tank; the camera reframes; the Titan emerges behind him through the smoke; soldiers retreat in the foreground. *The battlefield never stood a chance.* |
+| 0.0–2.4 | **Question** | High wide over the burning valley: tracers both ways, artillery bursts, smoke. Centred: *WHAT IF KILLUA AND EREN / SPAWNED IN / WORLD WAR II?* (0.3–4.1) |
+| 2.4–4.6 | Normal battle | Over the helmets of the advancing squad; their tank behind; the road ahead is empty |
+| 4.6–6.2 | **Arrival** ★1 | Over a soldier's shoulder: everything drops silent — two strikes hit the road (one cold, one warm) — the smoke parts on two figures |
+| 6.2–7.2 | Confusion | The officer throws up a hand: halt (close, shouting) |
+| 7.2–8.1 | Standoff | Low between the two, their shoulders framing the squad and the tank |
+| 8.1–8.9 | Who? | Killua, hands in pockets, a spark at his fingers |
+| 8.9–9.7 | Who? | Eren's eyes, the cloak moving |
+| 9.7–10.6 | Fear | The officer points; the line of rifles comes up |
+| 10.6–12.0 | Near-silence | Over the rifle: Killua in the sights |
+| 12.0–12.12 | **The shot** | Muzzle flash — he is gone |
+| 12.12–12.72 | slow | The bullet comes through empty air where he stood; the electric trace |
+| 12.72–13.6 | Too late | The soldier whips round: men drop one after another with blue cracks |
+| 13.6–15.0 | **Killua on the tank** ★2 | The commander turns — crack — Killua crouched on the deck behind him |
+| 15.0–15.25 | | Black. One blue snap |
+| 15.25–17.0 | | The tank is dead; Killua on the turret, hands in pockets · *KILLUA WOULD BE IMPOSSIBLE TO TRACK.* |
+| 17.0–18.7 | | Close: he looks north. Gone |
+| 18.7–19.9 | Eren | He bites his hand |
+| 19.9–20.7 | Silence | The officer notices |
+| 20.7–21.5 | **The bolt** ★3 | Orange-white lightning, white-out (slow) |
+| 21.5–22.6 | | Dust ring, soldiers thrown, windows burst, steam |
+| 22.6–24.3 | | The camera climbs: a dark giant inside bright steam |
+| 24.3–27.0 | **Reveal** | Soldiers and a tank tiny in front, the Titan's head near the top of frame; the roar · *EREN WOULD CHANGE THE SCALE OF THE WAR.* |
+| 27.0–28.4 | Eren | The tanks fire; shells burst on his chest; he walks on |
+| 28.4–29.8 | Killua | Running alongside a moving tank, a hand on the hull: electricity crawls over it |
+| 29.8–30.8 | Eren | He grabs a tank |
+| 30.8–31.9 | Eren | The throw: the tank flies at the lens and lands just short (slow) |
+| 31.9–32.9 | Killua | The leap to the second tank; the first rolls to a stop, dead |
+| 32.9–33.7 | Eren | The stomp: a tank crushed flat (slow) |
+| 33.7–34.6 | Killua | The third tank fires at him — he is behind it |
+| 34.6–35.4 | Reaction | A commander opens his hatch and stares up |
+| 35.4–37.0 | Killua | The machine gun cannot find him; he is behind the gunner; the gunner drops, the rifleman lowers his rifle |
+| 37.0–38.4 | Eren | His foot comes down on the trench line; men thrown out of it |
+| 38.4–41.0 | **Both** | Along the trench: a flash races down it, men dropping, while the giant walks it |
+| 41.0–46.4 | Parallel | 1-second cuts: the giant striding · Killua behind the second gun · the bunker smashed · Killua across a falling wall · the roar |
+| 46.4–49.0 | **Aura walk** ★4 | Killua walks toward us, hands in pockets; behind him the Titan smashes a tank; he does not turn |
+| 49.0–50.4 | Collapse | Radio; the battery is ordered to fire |
+| 50.4–52.5 | | Four guns fire on Eren; explosions all over him — not enough |
+| 52.5–54.0 | | The barrage is Killua's opening: flashes cross the field |
+| 54.0–57.0 | **Size contrast** | Killua at the bottom, fleeing soldiers in the middle, the Titan at the top · *AN ARMY COULD SURVIVE ONE. / NOT BOTH.* |
+| 57.0–58.6 | | The guns go silent one by one in blue flashes (Killua gets the crews before they reload) |
+| 58.6–60.6 | Last push | Tanks fire; the giant comes on through the fire |
+| 60.6–62.2 | **Break** | He smashes through the last armour (slow); a smoke wall |
+| 62.2–63.0 | Hush | Silence |
+| 63.0–65.0 | Retreat | Soldiers run past the lens; one trips |
+| 65.0–72.0 | **Poster** ★5 | Killua on a wrecked tank, calm; the Titan rises behind him through the smoke and roars · *NO ARMY ON EARTH COULD STOP THIS.* · black at 71.6 |
 
-## 4. Quality gate
+## 4. Hero shots (screenshot-worthy)
 
-At least 3 edit-worthy Killua shots (the reveal on the tank, the run alongside the column, the aura walk) and 3 Eren
-shots (the reveal through steam, the tank throw, the break through the barrage); 2+ shots with both (the aura walk, the
-size contrast, the poster); one transformation; one speed reveal; one poster frame (also the cover).
+1. **Arrival** (5.8): two figures in parting smoke, a soldier's rifle in the foreground.
+2. **Killua on the tank** (14.4 / 16.0): crouched behind the turning commander; then standing on the dead tank.
+3. **The bolt and the giant in the steam** (21.0, 23.6).
+4. **Aura walk** (47.7): Killua foreground, the Titan's blast behind him.
+5. **Poster / cover** (66.0–68.5): Killua perched on the wreck, the Titan towering behind, eyes burning.
 
-## 5. Systems
+Also strong: the size contrast (55.5), the tank thrown at the lens (31.4), the reveal (25.0).
 
-`script.js` (beats, the world clock with slow-motion, the shot list) · `world.js` (the battlefield) · `titan.js` · `cast.js`
-(Killua, Eren, soldiers) · `tank.js` · `fx.js` (billboards, ribbons, sparks, debris) · `action.js` (who is where, doing
-what, at every world time; events that spawn effects) · `shots.js` (the camera of every shot) · `audio.js` · `film.js`.
+## 5. Quality gate
+
+At least 3 edit-worthy Killua shots (the tank, the run alongside the column, behind the third tank, the aura walk) and
+3 Eren shots (the reveal, the throw, the stomp, the break); 2+ shots with both (the trench, the aura walk, the size
+contrast, the poster); one transformation; one speed reveal; one poster frame.
+
+## 6. Systems
+
+`script.js` (beats, captions, the world clock with slow motion) · `world.js` (the battlefield) · `titan.js` · `cast.js`
+(Killua, Eren, soldiers and their actions) · `tank.js` · `fx.js` (billboards, ribbons, sparks, debris) · `action.js` (who
+is where, doing what, at every world time) · `shots.js` (the camera of every shot) · `audio.js` (the score and the
+sound) · `film.js` (camera, flashes, bullets, tracers, lights, words, grade). Page: `xover.html`.

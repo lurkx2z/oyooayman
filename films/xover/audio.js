@@ -146,7 +146,7 @@ class XAudio extends AudioEngine {
 
     // 0–4.5 the battle: a drone and a taiko under the question; far guns, machine guns, shouts, the squad's tank
     pad(0.2, 4.6, [26, 33, 38], 0.05, 500); taiko(0.3, 0.9); whoosh(0.0, 0.6, 0.6, 200, 1600); taiko(2.4, 0.6); taiko(3.9, 0.5); engine(0, 9.2, 0.8);
-    for (const [t, pan] of [[1.15, -0.6], [2.3, 0.5], [3.35, -0.8], [4.1, 0.7], [7.0, -0.6], [9.0, 0.6]]) blast(t, 0.45, pan);
+    for (const [t, pan, v] of [[0.55, -0.5, 0.5], [1.3, 0.5, 0.5], [1.95, -0.6, 0.45], [2.7, 0.4, 0.4], [3.4, -0.6, 0.7], [4.1, 0.5, 0.75], [7.0, -0.6, 0.35], [9.0, 0.6, 0.35]]) blast(t, v, pan);
     mg(0.6, 1.4, 0.18, 0.6); mg(2.0, 2.6, 0.15, -0.5); mg(3.0, 3.9, 0.16, 0.4); for (const t of [0.9, 1.7, 2.8, 3.1, 3.7, 4.2]) rifle(t, 0.22, S.rng.range(-0.8, 0.8));
     shout(1.0, [[0.25, 'a', 200], [0.3, 'o', 185]], 0.5, 0.5); shout(3.2, [[0.4, 'a', 220]], 0.45, -0.4);
     // 4.55–5 everything drops out; 5.0 two strikes in the road (one cold, one warm); the smoke parts on two figures

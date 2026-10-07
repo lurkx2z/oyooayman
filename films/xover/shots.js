@@ -18,7 +18,7 @@ const XSHOTS = [
   // behind the squad, over the helmets: the road ahead is empty
   { t: [2.4, 4.6], hand: 0.5, focus: [0, -36], cam: (t, u) => ({ p: L3([0.1, 2.55, -48.8], [0.0, 2.45, -47.0], u), l: v3(0.0, 1.0, -22), fov: 30 }) },
   // 4.6–6.2 the arrival: low between the soldiers; silence; two strikes in the road; the smoke parts on two figures
-  { t: [4.6, 6.2], hand: 0.3, focus: [0, -30], shake: [[5.0, 0.5, 0.3]], cam: (t, u) => ({ p: L3([0.75, 1.22, -40.3], [0.75, 1.25, -39.6], u), l: v3(0.0, 1.35, -22), fov: 30 }) },
+  { t: [4.6, 6.2], hand: 0.3, focus: [0, -30], shake: [[5.0, 0.5, 0.3]], cam: (t, u, A) => { const h = A.A[2].j.head.getWorldPosition(v3()); return { p: h.clone().add(v3(0.5, 0.04, -0.6)), l: v3(0.0, 1.25, -22), fov: 30 }; } },
   // 6.2–12 the reaction
   // the officer halts the squad, a hand up (close; the squad and the tank behind)
   { t: [6.2, 7.2], hand: 0.5, focus: [0, -34], cam: (t, u, A) => { const o = A.officer.j.head.getWorldPosition(v3()); return { p: v3(o.x + 0.55, o.y - 0.12, o.z + L3([1.7], [1.4], u).x), l: o.clone().add(v3(0.12, -0.08, 0)), fov: 36 }; } },
@@ -70,16 +70,16 @@ const XSHOTS = [
   // [Killua] the third tank fires at him — he is behind it
   { t: [33.7, 34.6], hand: 0.4, focus: [0, -14], shake: [[33.9, 0.5, 0.2]], cam: (t, u, A) => { const z = A.tankS.T7.z; return { p: v3(-4.6, 1.15, z - 9.5), l: v3(0.7, 1.4, z - 4.0), fov: 44 }; } },
   // [reaction] a commander opens his hatch and stares up
-  { t: [34.6, 35.4], hand: 0.3, focus: [-6, -68], cam: (t, u, A) => { const c = A.tanks.T4.turretTop(v3()), h = A.titan.j.head.getWorldPosition(v3()), d = h.clone().sub(c).setY(0).normalize(); const sd = v3(-d.z, 0, d.x); return { p: c.clone().addScaledVector(d, -3.0).addScaledVector(sd, 0.9).add(v3(0, -0.9, 0)), l: c.clone().lerp(h, 0.5), fov: 54 }; } },
+  { t: [34.6, 35.4], hand: 0.3, focus: [-6, -68], cam: (t, u, A) => { const c = A.tanks.T4.turretTop(v3()), h = A.titan.j.head.getWorldPosition(v3()), d = h.clone().sub(c).setY(0).normalize(); const sd = v3(-d.z, 0, d.x); return { p: c.clone().addScaledVector(d, -3.4).addScaledVector(sd, 1.6).add(v3(0, -0.3, 0)), l: c.clone().lerp(h, 0.55), fov: 58 }; } },
   // [Killua] the machine gun cannot find him: he is behind the gunner
   { t: [35.4, 37.0], hand: 0.5, focus: [-14, -79], cam: (t, u) => { const m = XW.mg[0]; return { p: v3(m[0] + 3.6, 2.5, m[1] + 5.0), l: v3(m[0] + 0.3, 0.7, m[1] - 1.2), fov: 44 }; } },
   // [Eren] his foot comes down on the trench line
   { t: [37.0, 38.4], hand: 0.3, focus: [-8, -79], shake: [[37.42, 1.3, 0.5]], cam: (t, u) => ({ p: L3([-17, 0.9, -73.5], [-16.6, 0.9, -73.8], u), l: v3(-6.5, 5.0, -79), fov: 52 }) },
   // [both] the flash races down the trench while the giant walks it
-  { t: [38.4, 41.0], hand: 0.3, focus: [0, -80, 50], shake: [[38.6, 0.4, 0.3]], cam: (t, u) => ({ p: L3([-24, 9, -62], [-22, 8.5, -63], u), l: v3(1, 2, -80), fov: 54 }) },
+  { t: [38.4, 41.0], hand: 0.3, focus: [0, -80, 50], shake: [[38.6, 0.4, 0.3]], cam: (t, u) => ({ p: L3([-46, 3.2, -75], [-45, 3.0, -75.5], u), l: v3(6, 2.5, -80), fov: 38 }) },
   // 41–49 parallel destruction, the aura walk
   { t: [41.0, 42.0], hand: 0.3, focus: [6, -66], shake: [[41.5, 1.0, 0.4]], cam: (t, u, A) => { const T = A.titan.root.position; return { p: v3(T.x + 9, 0.5, T.z + 14), l: v3(T.x, 6, T.z), fov: 50 }; } },
-  { t: [42.0, 43.0], hand: 0.6, focus: [30, -81], cam: (t, u) => { const m = XW.mg[1]; return { p: v3(m[0] - 3.2, 1.0, m[1] + 3.5), l: v3(m[0] - 0.2, 1.1, m[1] - 1.4), fov: 38 }; } },
+  { t: [42.0, 43.0], hand: 0.6, focus: [30, -81], cam: (t, u) => { const m = XW.mg[1]; return { p: v3(m[0] - 3.4, 2.3, m[1] + 3.8), l: v3(m[0] - 0.3, 0.0, m[1] - 1.6), fov: 40 }; } },
   { t: [43.0, 44.2], hand: 0.4, focus: [16, -84], shake: [[43.4, 1.0, 0.5]], cam: (t, u) => ({ p: L3([30, 1.0, -70], [29, 1.0, -71], u), l: v3(16, 6, -85), fov: 48 }) },
   { t: [44.2, 45.2], hand: 0.8, focus: [-8, 0], cam: (t, u) => ({ p: v3(-4.5, 2.2, 1), l: v3(-8.5, 3.0, 6 - 12 * u), fov: 46 }) },
   { t: [45.2, 46.4], hand: 0.3, focus: [10, -84], shake: [[45.4, 0.7, 0.8]], cam: (t, u, A) => { const H = A.titan.j.head, h = H.getWorldPosition(v3()), f = v3(0, 0, 1).applyQuaternion(A.titan.root.quaternion).setY(0).normalize(), sd = v3(-f.z, 0, f.x); return { p: h.clone().addScaledVector(f, 12).addScaledVector(sd, 4).add(v3(0, -7, 0)), l: h, fov: 40 }; } },
