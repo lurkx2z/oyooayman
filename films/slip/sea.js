@@ -44,6 +44,12 @@ function slSeabedY(x, z) {
   return b;
 }
 const slSeaLevel = (t) => SL_SEA0 + slDrain(t);
+// thin the shared fog inside one material (three rewrites fogDensity every frame, so scale it in the shader)
+function slThinFog(mat, k) {
+  mat.uniforms.uFogMul = { value: k };
+  mat.fragmentShader = 'uniform float uFogMul;\n' + mat.fragmentShader.replace('- fogDensity * vFogDepth', '- fogDensity * uFogMul * vFogDepth');
+  mat.needsUpdate = true;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE WAVE'S PROFILE (in units of its height H, relative to the drained sea): s̃ = distance toward the shore from the
@@ -108,6 +114,11 @@ class SlSea {
         float bd = ${(SL_FRONT.wallZ - 0.5).toFixed(2)} - vBW.z;
         float rip = 0.5 + 0.5 * sin(vBW.x * 1.7 + bf(vBW.xz * 0.15) * 9.0);
         diffuseColor.rgb *= 0.86 + 0.2 * rip * smoothstep(2.0, 12.0, bd) * (1.0 - smoothstep(200.0, 500.0, bd));
+        // the beach: drier and paler up by the wall, footprints and kelp lines, darker wet sand toward the water
+        float beach = 1.0 - smoothstep(9.0, 13.0, bd);
+        diffuseColor.rgb *= mix(1.0, 1.1 + 0.18 * bf(vBW.xz * 0.6) - 0.22 * smoothstep(6.0, 11.0, bd), beach);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.16, 0.15, 0.1), beach * smoothstep(0.72, 0.8, bf(vBW.xz * vec2(0.08, 1.4) + 2.0)) * 0.7);
+        diffuseColor.rgb *= 1.0 - beach * 0.25 * smoothstep(0.55, 0.75, bn(vBW.xz * 3.0));
         float weed = smoothstep(0.58, 0.72, bf(vBW.xz * 0.045 + 11.0)) * smoothstep(25.0, 80.0, bd);
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.13, 0.16, 0.1), weed * 0.75);
         float pool = smoothstep(0.6, 0.66, bf(vBW.xz * 0.03 + 4.0) + 0.06 * bn(vBW.xz * 0.6)) * smoothstep(14.0, 40.0, bd);
@@ -185,7 +196,7 @@ class SlSea {
           // whitecaps far out
           col = mix(col, vec3(0.8, 0.83, 0.82), smoothstep(0.82, 0.92, wn(P * 0.09 + vec2(uTime * 0.3, 0.0)) * wind) * smoothstep(20.0, 80.0, vD) * 0.6);
           // foam at the waterline (more of it while the sea is draining: a churned, muddy edge)
-          float fl = smoothstep(0.55 + 0.6 * uDrainK, 0.0, vD) * (0.55 + 0.45 * wn(P * 0.35 + vec2(0.0, uTime * 0.4)));
+          float fl = smoothstep(0.22 + 0.5 * uDrainK, 0.0, vD) * (0.45 + 0.55 * wn(P * 0.5 + vec2(0.0, uTime * 0.6)));
           col = mix(col, vec3(0.82, 0.84, 0.82), fl * 0.75);
           gl_FragColor = vec4(col, 1.0);
           ${THREE.ShaderChunk.fog_fragment}
@@ -378,6 +389,7 @@ class SlWave {
     };
     this.body = mk(0, cap ? 520 : 300, cap ? 130 : 90);
     this.lip = mk(1, cap ? 520 : 300, cap ? 36 : 24);
+    for (const m of [this.body, this.lip]) slThinFog(m.material, 0.45);
     // spray off the crest, blown back; mist over the whole front; whitewater rolling at the foot
     this.spray = new XBill(scene, { n: cap ? 300 : 180, kind: 'soft', color: '#e6ebea', seed: 91, alpha: 0.4, fadeIn: 0.15, fadeOut: 0.55, order: 6,
       spawn: (i, r) => ({ ux: r.range(-0.5, 0.5), p: new THREE.Vector3(), v: new THREE.Vector3(), t0: 0, life: r.range(1.2, 2.4), s0: 0.08, s1: 0.32, rot: r.next() * 6, spin: r.range(-0.4, 0.4), loop: r.range(1.2, 2.4), ph: r.next(), kind: r.next() < 0.55 ? 0 : 1 }) });
@@ -390,6 +402,7 @@ class SlWave {
       spawn: (i, r) => ({ p: new THREE.Vector3(r.range(-90, 90), SL_FRONT.beachY + r.range(0, 6), SL_FRONT.wallZ - r.range(0, 12)), v: new THREE.Vector3(r.range(-8, 8), r.range(30, 75), r.range(4, 26)), t0: 59.2 + r.next() * 0.35, life: r.range(1.6, 2.6), s0: r.range(8, 16), s1: r.range(26, 48), rot: r.next() * 6, spin: r.range(-0.6, 0.6) }) });
     this.engulf = new XBill(scene, { n: 90, kind: 'soft', color: '#d9e6e3', seed: 96, alpha: 0.95, fadeIn: 0.12, fadeOut: 0.7, order: 8,
       spawn: (i, r) => ({ off: new THREE.Vector3(r.range(-14, 14), r.range(-3, 16), r.range(-60, -25)), sp: r.range(55, 90), p: new THREE.Vector3(), v: new THREE.Vector3(), t0: 59.55 + r.next() * 0.3, life: 1.4, s0: r.range(5, 9), s1: r.range(12, 22), rot: r.next() * 6, spin: r.range(-1, 1) }) });
+    for (const b of [this.spray, this.mist, this.foot]) slThinFog(b.mesh.material, 0.3);
     // debris carried up the face: boat hulls, cars, timber, containers
     const dm = [Mat.std('#e8e6e0', { roughness: 0.5 }), Mat.std('#2a4a6a', { roughness: 0.5 }), Mat.std('#5a4a3a', { roughness: 0.9 }), Mat.std('#a8402a', { roughness: 0.6 }), Mat.std('#3a3d40', { roughness: 0.5 })];
     this.debris = dm.map((mat, k) => { const im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mat, 30); im.frustumCulled = false; scene.add(im); return im; });
@@ -405,7 +418,6 @@ class SlWave {
     if (!on) { this.spray.update(-1e9); this.mist.update(-1e9); this.foot.update(-1e9); this.burst.update(-1e9); this.engulf.update(-1e9); return; }
     const H = slWaveH(t), zf = slWaveZ(t), c = slWaveCurl(t), base = slSeaLevel(t);
     U.uZ.value = zf; U.uH.value = H; U.uC.value = c; U.uBase.value = base; U.uTime.value = t;
-    const fog = FILM._app.scene.fog; U.fogColor.value.copy(fog.color); U.fogDensity.value = fog.density;
     // billboards follow the front: each one has a place along it (ux) and a phase
     const P = this._p;
     const place = (o, s, hk) => { const x = o.ux * 3800 + cam.position.x * 0.0; slWavePoint(t, x, s, P); return P; };

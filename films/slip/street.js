@@ -66,7 +66,7 @@ function slWetMain(kind) {
     vec2 rip = slRipple(P, uSlTime) * (0.25 + 0.75 * pud) * (1.0 + 2.0 * uSlQuake);
     // the ring from your fall (x, z, radius, strength): a few crests spreading through the puddle
     vec2 rd = P - uSlRing.xy; float rl = length(rd);
-    float crest = sin((rl - uSlRing.z) * 26.0) * exp(-abs(rl - uSlRing.z) * 5.0);
+    float crest = sin((rl - uSlRing.z) * 38.0) * exp(-abs(rl - uSlRing.z) * 9.0);
     rip += rd / (rl + 1e-3) * uSlRing.w * crest * smoothstep(0.0, 0.15, rl);
     vec3 V = normalize(cameraPosition - vSlW);
     float fres = 0.04 + 0.96 * pow(1.0 - clamp(V.y, 0.0, 1.0), 5.0);
@@ -79,7 +79,7 @@ function slWetMain(kind) {
       + texture2DProj(tSlRefl, rp + vec4(0.0, -sm, 0.0, 0.0)).rgb * 0.2 + texture2DProj(tSlRefl, rp + vec4(0.0, 2.2 * sm, 0.0, 0.0)).rgb * 0.15;
     float k = uSlWet * mix(0.12 + 0.55 * fres, 0.42 + 0.58 * fres, pud) * ${kind === 2 ? '0.7' : '1.0'};
     gl_FragColor.rgb = mix(gl_FragColor.rgb * mix(0.78, ${kind === 2 ? '0.8' : '0.45'}, pud * uSlWet), refl, clamp(k, 0.0, 0.94));
-    gl_FragColor.rgb += vec3(0.75, 0.85, 0.95) * max(crest, 0.0) * uSlRing.w * 0.07 * pud;   // (the ring's crests catch the sky)
+    gl_FragColor.rgb += vec3(0.75, 0.85, 0.95) * pow(max(crest, 0.0), 3.0) * uSlRing.w * 0.32 * pud;   // (the ring's crests catch the sky)
   }`;
 }
 function slWet(mat, kind) {

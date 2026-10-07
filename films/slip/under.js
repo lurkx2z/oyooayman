@@ -174,8 +174,8 @@ class SlUnder {
       [11.25, SL_PEB.x, SL_PEB.y + 1.2, 0, 6.5, -3, 2, 48],
       [11.8, SL_PEB.x, SL_PEB.y - 0.0012, 0, 0.11, -4, 1, 40, 'outCubic'],
       [12.9, SL_PEB.x + 0.0004, SL_PEB.y - 0.0016, 0, 0.095, -3, 1, 40],
-      [15.3, SL_PEB.x + 0.0008, SL_PEB.y - 0.002, 0, 0.078, -1, 0, 40],
-      [16.2, SL_PEB.x + 0.0008, SL_PEB.y - 0.0025, 0, 0.075, 0, 0, 40],
+      [15.3, SL_PEB.x + 0.0008, SL_PEB.y - 0.002, 0, 0.088, -1, 0, 40],
+      [16.2, SL_PEB.x + 0.0008, SL_PEB.y - 0.0025, 0, 0.086, 0, 0, 40],
       [16.9, SL_PEB.x + 0.0004, SL_PEB.y - 0.006, 0, 0.09, 1, -2, 40],
       [17.4, SL_PEB.x, SL_PEB.y - 0.01, 0, 0.6, 2, -3, 46, 'inExpo'],
     ]);
@@ -286,7 +286,7 @@ class SlFault {
     // the far side and the bottom of the block
     const side = new THREE.Mesh(new THREE.PlaneGeometry(40, 24).rotateY(Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#221d19', roughness: 1 })); side.position.set(26, -12, -20); this.scene.add(side);
     this.orbit = new SlOrbit([
-      [SL.fault, SL_FAULT.tip.x, SL_FAULT.tip.y - 0.05, 0, 0.9, 4, -10, 46],
+      [SL.fault, SL_FAULT.tip.x - 0.3, SL_FAULT.tip.y - 0.4, 0, 2.6, 4, -12, 46],
       [18.6, SL_FAULT.tip.x - 1.5, -2.2, 0, 9.0, 8, -16, 46, 'outCubic'],
       [19.8, -2.0, -6.2, 0, 27, 12, -20, 46],
       [21.8, -2.5, -7.0, 0, 26, 16, -22, 44],
