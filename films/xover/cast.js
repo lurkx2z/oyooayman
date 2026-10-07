@@ -102,7 +102,7 @@ class XEren extends HeroActor {
     for (let i = 0; i < 16; i++) { const side = i < 8 ? 1 : -1, k = (i % 8) / 7, L = r.range(0.07, 0.11), g = new THREE.ConeGeometry(r.range(0.02, 0.03), L, 4); g.translate(0, -L / 2, 0); const m = new THREE.Mesh(g, hm);
       const a = -0.25 + k * 2.2; m.position.set(side * Math.cos(a) * 0.088, 0.075 - k * 0.012, Math.sin(-a) * 0.06 - 0.01); m.rotation.set(r.range(-0.2, 0.25) + k * 0.35, 0, side * r.range(0.15, 0.35)); m.castShadow = true; this.j.head.add(m); }
     for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2, L = r.range(0.06, 0.1), g = new THREE.ConeGeometry(r.range(0.022, 0.032), L, 5); g.translate(0, L / 2, 0); const m = new THREE.Mesh(g, hm);
-      const back = Math.cos(a) < 0.3; if (!back) continue; m.position.set(Math.sin(a) * 0.07, 0.1, Math.cos(a) * 0.07 - 0.02); m.rotation.set(Math.cos(a) * 0.9 - 0.2, 0, -Math.sin(a) * 0.9); m.castShadow = true; this.j.head.add(m); }
+      const back = Math.cos(a) < -0.2; if (!back) continue; m.position.set(Math.sin(a) * 0.075, 0.05, Math.cos(a) * 0.07 - 0.03); m.rotation.set(-2.3 + Math.cos(a) * 0.3, 0, -Math.sin(a) * 0.5); m.castShadow = true; this.j.head.add(m); }   // (messy locks at the back, pointing down)
     // harness: two straps over the chest, a belt
     for (const s of [-1, 1]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.5, 0.012), strap); b.position.set(s * 0.09, 0.25, front + 0.01); b.rotation.z = s * 0.12; S.add(b); }
     const belt = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.035, 0.24), strap); belt.position.set(0, -0.02, 0); S.add(belt);

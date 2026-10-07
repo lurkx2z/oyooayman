@@ -75,18 +75,18 @@ const XSHOTS = [
   // [Killua] the machine gun cannot find him: he is behind the gunner
   { t: [35.4, 37.0], hand: 0.5, exp: 1.35, focus: [-14, -79], cam: (t, u) => { const m = XW.mg[0]; return { p: v3(m[0] + 3.0, 2.2, m[1] + 4.2), l: v3(m[0] + 0.3, 0.6, m[1] - 1.4), fov: 42 }; } },
   // [Eren] his foot comes down on the trench line
-  { t: [37.0, 38.4], hand: 0.3, focus: [-8, -79], shake: [[37.42, 1.3, 0.5]], cam: (t, u) => ({ p: L3([-17, 0.9, -73.5], [-16.6, 0.9, -73.8], u), l: v3(-6.5, 5.0, -79), fov: 52 }) },
+  { t: [37.0, 38.4], hand: 0.3, focus: [-8, -79], shake: [[37.42, 1.3, 0.5]], cam: (t, u) => ({ p: L3([-14.5, 6.2, -70.5], [-14.2, 6.0, -70.8], u), l: v3(-6, 0.4, -79.5), fov: 32 }) },
   // [both] the flash races down the trench while the giant walks it
   { t: [38.4, 41.0], hand: 0.3, focus: [0, -80, 50], shake: [[38.6, 0.4, 0.3]], cam: (t, u) => ({ p: L3([-46, 3.2, -75], [-45, 3.0, -75.5], u), l: v3(6, 2.5, -80), fov: 38 }) },
   // 41–49 parallel destruction, the aura walk
   { t: [41.0, 42.0], hand: 0.3, focus: [6, -66], shake: [[41.5, 1.0, 0.4]], cam: (t, u, A) => { const T = A.titan.root.position; return { p: v3(T.x + 9, 0.5, T.z + 14), l: v3(T.x, 6, T.z), fov: 50 }; } },
-  { t: [42.0, 43.0], hand: 0.6, exp: 1.35, focus: [30, -81], cam: (t, u) => { const m = XW.mg[1]; return { p: v3(m[0] - 2.3, 1.5, m[1] + 2.4), l: v3(m[0] - 0.5, -0.5, m[1] - 2.2), fov: 44 }; } },
+  { t: [42.0, 43.0], hand: 0.6, exp: 1.35, focus: [30, -81], cam: (t, u) => { const m = XW.mg[1]; return { p: v3(m[0] + 1.0, 1.0, m[1] + 6.4), l: v3(m[0] - 0.6, 1.0, m[1] + 2.2), fov: 40 }; } },
   { t: [43.0, 44.2], hand: 0.4, focus: [16, -84], shake: [[43.4, 1.0, 0.5]], cam: (t, u) => ({ p: L3([30, 1.0, -70], [29, 1.0, -71], u), l: v3(16, 6, -85), fov: 48 }) },
   { t: [44.2, 45.2], hand: 0.8, focus: [-8, 0], cam: (t, u) => ({ p: v3(-4.5, 2.2, 1), l: v3(-8.5, 3.0, 6 - 12 * u), fov: 46 }) },
   { t: [45.2, 46.4], hand: 0.3, focus: [10, -84], shake: [[45.4, 0.7, 0.8]], cam: (t, u, A) => { const H = A.titan.j.head, h = H.getWorldPosition(v3()), f = v3(0, 0, 1).applyQuaternion(A.titan.root.quaternion).setY(0).normalize(), sd = v3(-f.z, 0, f.x); return { p: h.clone().addScaledVector(f, 12).addScaledVector(sd, 4).add(v3(0, -7, 0)), l: h, fov: 40 }; } },
   { t: [46.4, 49.0], hand: 0.12, focus: [-1, -70, 45], shake: [[47.6, 0.35, 0.6]], cam: (t, u) => ({ p: L3([1.05, 0.5, -57.8], [1.0, 0.5, -57.5], u), l: v3(-0.4, 5.6, -80), fov: 44 }) },
   // 49–57 the army adapts
-  { t: [49.0, 50.4], hand: 0.35, focus: [-8, -126], cam: (t, u, A) => { const H = A.Bt[0].j.head, h = H.getWorldPosition(v3()), f = v3(0, 0, 1).applyQuaternion(H.getWorldQuaternion(new THREE.Quaternion())).setY(0).normalize(), sd = v3(-f.z, 0, f.x); return { p: h.clone().addScaledVector(f, 1.5 - 0.2 * u).addScaledVector(sd, 0.7).add(v3(0, -0.1, 0)), l: h.clone().addScaledVector(f, -0.6).add(v3(0, -0.2, 0)), fov: 40 }; } },
+  { t: [49.0, 50.4], hand: 0.35, focus: [-8, -126], cam: (t, u, A) => { const H = A.Bt[0].j.head, h = H.getWorldPosition(v3()), ry = A.Bt[0].p.root.rotation.y, f = v3(Math.sin(ry), 0, Math.cos(ry)), sd = v3(-f.z, 0, f.x); return { p: h.clone().addScaledVector(f, 1.5 - 0.2 * u).addScaledVector(sd, 0.7).add(v3(0, -0.1, 0)), l: h.clone().addScaledVector(f, -0.6).add(v3(0, -0.2, 0)), fov: 40 }; } },
   { t: [50.4, 52.5], hand: 0.4, focus: [0, -110, 50], shake: [[51.0, 0.6, 0.3], [51.15, 0.4, 0.3], [51.3, 0.4, 0.3]], cam: (t, u) => ({ p: L3([-2, 1.4, -134], [-3, 2.0, -112], eio(u)), l: v3(-4, 9, -84), fov: L3([40], [46], u).x }) },
   { t: [52.5, 54.0], hand: 0.3, focus: [0, -90, 50], cam: (t, u) => ({ p: L3([16, 1.6, -79], [14.5, 1.6, -80], u), l: v3(-6, 2.5, -93), fov: 50 }) },
   { t: [54.0, 57.0], hand: 0.15, focus: [-2, -72, 50], cam: (t, u) => ({ p: L3([1.25, 0.35, -48.4], [1.2, 0.36, -49.2], u), l: v3(-0.2, 4.2, -68), fov: 33 }) },

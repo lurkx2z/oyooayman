@@ -83,9 +83,16 @@ class XTank {
     // a crewman's head and shoulders for the open hatch (the commander)
     const cm = new THREE.Group(); cm.position.set(0, 0.0, 0); cup.add(cm); this.commander = cm;
     const uni = Mat.std('#4f5546', { roughness: 0.85 }), skn = Mat.std(SKIN[1], { roughness: 0.65 }), cap = Mat.std('#3f4438', { roughness: 0.8 });
-    add(new THREE.CylinderGeometry(0.22, 0.2, 0.42, 8), uni, cm, 0, 0.3, 0);
-    const hd = add(new THREE.SphereGeometry(0.12, 10, 8), skn, cm, 0, 0.62, 0.02); this.cmHead = hd;
-    add(new THREE.SphereGeometry(0.13, 10, 6, 0, Math.PI * 2, 0, Math.PI * 0.5), cap, hd, 0, 0.02, -0.01);
+    add(new THREE.CylinderGeometry(0.2, 0.19, 0.42, 10), uni, cm, 0, 0.3, 0);
+    for (const sd of [-1, 1]) { add(new THREE.SphereGeometry(0.1, 10, 8), uni, cm, sd * 0.2, 0.47, 0.0);                        // shoulders
+      const arm = add(new THREE.BoxGeometry(0.09, 0.09, 0.34), uni, cm, sd * 0.24, 0.42, 0.16); arm.rotation.x = 0.35;              // forearms on the hatch rim
+      add(new THREE.SphereGeometry(0.05, 8, 6), skn, cm, sd * 0.24, 0.36, 0.32); }                                                // hands
+    const hd = add(new THREE.SphereGeometry(0.11, 14, 10), skn, cm, 0, 0.64, 0.02); this.cmHead = hd; hd.scale.set(0.9, 1.05, 0.95);
+    for (const sd of [-1, 1]) { const e = add(new THREE.SphereGeometry(0.016, 6, 5), Mat.std('#1a1410', { roughness: 0.4 }), hd, sd * 0.038, 0.012, 0.095); e.castShadow = false;
+      add(new THREE.SphereGeometry(0.025, 6, 5), skn, hd, sd * 0.1, 0.0, 0.0); }                                                  // eyes, ears
+    add(new THREE.ConeGeometry(0.018, 0.05, 5), skn, hd, 0, -0.02, 0.11).rotation.x = Math.PI / 2;                               // nose
+    if (typeof XGEO !== 'undefined') { XGEO.init(); const hm = add(XGEO.helmet, cap, hd, 0, 0.03, -0.006); hm.scale.setScalar(1.05); add(XGEO.rim, cap, hd, 0, 0.026, -0.006).scale.setScalar(1.05); }
+    else add(new THREE.SphereGeometry(0.13, 10, 6, 0, Math.PI * 2, 0, Math.PI * 0.5), cap, hd, 0, 0.02, -0.01);
     cm.visible = false;
     this.root = root; this.L = L; this.W = W;
     this.dist = 0; this.mud = 0;

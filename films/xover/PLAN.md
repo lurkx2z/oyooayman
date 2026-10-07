@@ -1,6 +1,6 @@
 # What if Killua and Eren spawned in World War II? — production plan
 
-A 72-second vertical (9:16, 1080×1920, 30 fps) cinematic crossover on the shared engine. A generic 1944 European
+A 68-second vertical (9:16, 1080×1920, 30 fps) cinematic crossover on the shared engine. A generic 1944 European
 battlefield (no real insignia, no gore). Killua and Eren appear out of nowhere on the **same side**; to the soldiers they
 are unknown horrors. **Two separate disasters on one battlefield**: Killua takes apart *people and crews* (silent,
 impossibly fast, surgical, electric, close range); Eren takes apart *armour and structure* (huge, loud, heavy, steam,
@@ -30,7 +30,12 @@ concrete bunker (16, −84) and machine-gun nests (−14, −79), (30, −81) ·
 rise behind it. The pair appears in the road at (±0.9, −22). The squad (9 men, an officer, a tank) advances south down
 the road toward them. Smoke columns, fires and embers at three depths.
 
-## 3. Shot list (film seconds; 120 BPM, a beat every 0.5 s)
+## 3. Shot list (story seconds; 120 BPM, a beat every 0.5 s)
+
+The film is authored on one continuous 72-second story clock and cut to 68 s (`CONFIG.edit`): story 16–18 (Killua standing
+on the dead tank, the empty look north) and story 52–54 (the end of the barrage, the crossing) are removed — each cut is
+exactly one bar of the score, so the music stays in step. After the first cut, film time = story time − 2; after the second,
+story time − 4.
 
 | Time | Beat | Shot |
 |---|---|---|
@@ -45,11 +50,11 @@ the road toward them. Smoke columns, fires and embers at three depths.
 | 10.6–12.0 | Near-silence | Over the rifle: Killua in the sights |
 | 12.0–12.12 | **The shot** | Muzzle flash — he is gone |
 | 12.12–12.72 | slow | The bullet comes through empty air where he stood; the electric trace |
-| 12.72–13.6 | Too late | The soldier whips round: men drop one after another with blue cracks |
+| 12.72–13.6 | Too late | From the front of the squad: Killua flickers in beside three men, one after another — a strike, a blue crack, the man drops |
 | 13.6–15.0 | **Killua on the tank** ★2 | The commander turns — crack — Killua crouched on the deck behind him |
 | 15.0–15.25 | | Black. One blue snap |
-| 15.25–17.0 | | The tank is dead; Killua on the turret, hands in pockets · *KILLUA WOULD BE IMPOSSIBLE TO TRACK.* |
-| 17.0–18.7 | | Close: he looks north. Gone |
+| 15.25–17.0 | | The tank is dead and smoking; Killua on the turret, hands in pockets · *KILLUA WOULD BE IMPOSSIBLE TO TRACK.* (cut at 16.0) |
+| 17.0–18.7 | | Close: he looks north. Gone, an afterimage left behind (kept from 18.0) |
 | 18.7–19.9 | Eren | He bites his hand |
 | 19.9–20.7 | Silence | The officer notices |
 | 20.7–21.5 | **The bolt** ★3 | Orange-white lightning, white-out (slow) |
@@ -71,9 +76,9 @@ the road toward them. Smoke columns, fires and embers at three depths.
 | 46.4–49.0 | **Aura walk** ★4 | Killua walks toward us, hands in pockets; behind him the Titan smashes a tank; he does not turn |
 | 49.0–50.4 | Collapse | Radio; the battery is ordered to fire |
 | 50.4–52.5 | | Four guns fire on Eren; explosions all over him — not enough |
-| 52.5–54.0 | | The barrage is Killua's opening: flashes cross the field |
+| 52.5–54.0 | | (cut) |
 | 54.0–57.0 | **Size contrast** | Killua at the bottom, fleeing soldiers in the middle, the Titan at the top · *AN ARMY COULD SURVIVE ONE. / NOT BOTH.* |
-| 57.0–58.6 | | The guns go silent one by one in blue flashes (Killua gets the crews before they reload) |
+| 57.0–58.6 | | Tracking along the battery: at each gun Killua flickers in, strikes the crew, is gone; the guns go silent |
 | 58.6–60.6 | Last push | Tanks fire; the giant comes on through the fire |
 | 60.6–62.2 | **Break** | He smashes through the last armour (slow); a smoke wall |
 | 62.2–63.0 | Hush | Silence |
@@ -90,13 +95,40 @@ the road toward them. Smoke columns, fires and embers at three depths.
 
 Also strong: the size contrast (55.5), the tank thrown at the lens (31.4), the reveal (25.0).
 
-## 5. Quality gate
+## 5. Review log
+
+**Round 1** (two independent reviewers, preview at 15 fps): overall 4.5 and 4 / 10. Their main points and what changed:
+- *Killua poses instead of moving; you never see a hit* → he now appears for three frames in a strike beside each man
+  who drops (the squad, the machine-gun crew, every gun crew), leaves a pale-blue afterimage where he was, a streak
+  between strikes, a trail while he runs, a blue arc for the leap.
+- *Dead stretches 15.3–20.7 and 49–54* → two one-bar cuts; the bolt now lands at film 18.7.
+- *Opening static* → a shell bursts in the village under the title, thick tracers, smoke columns and fires in frame,
+  the squad's tank rolls past the lens.
+- *Arrival milky* → the smoke now billows behind the two (dark figures against it), one blue and one orange strike,
+  the white flash cut to a quarter.
+- *Bolt white mush, the giant framed at the groin* → white-out ≤ 3 frames, one thick bolt straight down the middle,
+  thinner steam with the steam in front of him faded, the climb ends on his face and green eyes within half a second.
+- *Steam over the Titan's groin* → the skin steam rises from shoulders and arms only; the explosion on his chest sits on
+  the chest; the end's smoke wall stays low and thins in front of him.
+- *Titan reads as an orange golem* → lean deltoids, a thick dark mane framing the face, bigger green eyes that glow
+  green, not white.
+- *Killua's hair = ice shards; Eren generic* → soft warm-white clumps; Eren gets tufts that break the bowl outline, a
+  scowl and the wings on his cloak.
+- *They never acknowledge each other* → Killua glances at Eren in his close-up and Eren looks back; the Titan looks
+  down at Killua in the size shot.
+- *Throw goes sideways* → the tank flies straight at the lens and slams down just short.
+- *Dead shots* (camera inside the bunker, the gun wheel, dark trenches) → cut or reframed; dark shots lifted.
+- *Poster: grey mud, Killua small* → closer and lower, Killua against the giant's chest, smoke cleared off him, a fire
+  glow behind him, a blue rim on Killua; the roar under the last line.
+- *A hard-edged band in the sky* → the smoke sprites now fade to nothing before their square edge.
+
+## 6. Quality gate
 
 At least 3 edit-worthy Killua shots (the tank, the run alongside the column, behind the third tank, the aura walk) and
 3 Eren shots (the reveal, the throw, the stomp, the break); 2+ shots with both (the trench, the aura walk, the size
 contrast, the poster); one transformation; one speed reveal; one poster frame.
 
-## 6. Systems
+## 7. Systems
 
 `script.js` (beats, captions, the world clock with slow motion) · `world.js` (the battlefield) · `titan.js` · `cast.js`
 (Killua, Eren, soldiers and their actions) · `tank.js` · `fx.js` (billboards, ribbons, sparks, debris) · `action.js` (who

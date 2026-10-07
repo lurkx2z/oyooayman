@@ -33,7 +33,7 @@ class XAction {
     this.app = app; const S = app.scene;
     this.killua = new XKillua(S); this.eren = new XEren(S); this.titan = new XTitan(S);
     // Killua's afterimage: a second rig drawn in pale additive blue where he just was
-    this.ghost = new XKillua(S); this.ghostMat = new THREE.MeshBasicMaterial({ color: '#a9dcff', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+    this.ghost = new XKillua(S); this.ghostMat = new THREE.MeshBasicMaterial({ color: '#9ed4ff', transparent: true, opacity: 0, depthWrite: false });
     this.ghost.p.root.traverse((o) => { if (o.isMesh) { o.material = this.ghostMat; o.castShadow = false; } }); this.ghost.p.root.visible = false;
     this.titan.root.traverse((o) => o.layers.enable(1));
     // tanks
@@ -61,7 +61,7 @@ class XAction {
     this.arrFlashW = new XBill(S, { n: 1, seed: 44, kind: 'glow', color: '#ffb46a', additive: true, alpha: 0.9, fadeIn: 0.02, fadeOut: 0.15, spawn: () => ({ p: new THREE.Vector3(-0.9, 1.4, -22), v: new THREE.Vector3(), t0: W(XB.arrive), life: 0.45, s0: 5, s1: 8, rot: 1 }) });
     this.arrSmoke = new XBill(S, { n: 70, seed: 47, kind: 'soft', color: '#b9ae9e', alpha: 0.7, drag: 1.4, fadeIn: 0.04, fadeOut: 0.45, spawn: (i, r) => { const a = r.range(-0.3, Math.PI + 0.3), rr = r.range(0.6, 1.6); return { p: new THREE.Vector3(Math.cos(a) * rr * 1.6, r.range(0.2, 2.6), -21.2 + Math.sin(a) * rr), v: new THREE.Vector3(Math.cos(a) * r.range(3, 7), r.range(0.3, 1.5), Math.sin(a) * r.range(2, 5)), rise: 0.4, t0: W(XB.arrive) + r.range(0, 0.08), life: r.range(2.0, 3.4), s0: r.range(1.5, 2.5), s1: r.range(4.5, 7.5), rot: r.range(0, 6) }; } });
     E.push([W(XB.arrive), 'zap', 0.9, 1.2, -22, 3], [W(XB.arrive), 'arrive', -0.9, 1.2, -22, 2]);
-    this.deadSmoke = new XBill(S, { n: 30, seed: 53, kind: 'soft', color: '#2c2926', alpha: 0.7, drag: 0.2, fadeIn: 0.1, fadeOut: 0.5, spawn: (i, r) => ({ p: new THREE.Vector3(0.4 + r.range(-0.5, 0.5), 2.6, -45 + r.range(-0.6, 0.6)), v: new THREE.Vector3(0.8, r.range(1.2, 2.2), 0.3), t0: W(XB.dead) + 0.2 + i * 0.12, life: 3.6, s0: 1.0, s1: 5.5, rot: r.range(0, 6), loop: 3.6 }) });
+    this.deadSmoke = new XBill(S, { n: 30, seed: 53, kind: 'soft', color: '#2c2926', alpha: 0.7, drag: 0.2, fadeIn: 0.1, fadeOut: 0.5, spawn: (i, r) => ({ p: new THREE.Vector3(0.4 + r.range(-0.4, 0.4), 2.2, -47.6 + r.range(-0.4, 0.4)), v: new THREE.Vector3(0.6, r.range(1.0, 1.8), -1.4), t0: W(XB.dead) + 0.2 + i * 0.12, life: 3.6, s0: 1.0, s1: 5.5, rot: r.range(0, 6), loop: 3.6 }) });
     // the transformation: lightning, ring, steam
     const TX = -2, TZ = -23;
     E.push([W(XB.bolt), 'bolt', TX, 0, TZ, 3]);
@@ -150,7 +150,7 @@ class XAction {
       K.show = false; K.streak = [[0.9, 1.1, -22], [1.6, 1.3, -26], [3.5, 2.6, -36], [1.0, 2.9, -46]]; K.streakK = 1 - MathX.smooth(w, at(XB.shot) + 0.06, at(XB.shot) + 0.3); K.residue = 1 - MathX.smooth(w, at(XB.shot) + 0.1, at(XB.shot) + 0.35); return K; }
     if (w < at(XB.cut[0])) { const p = this.tanks.T1.deck(this._v, 0.0, -1.4); Object.assign(K, { x: p.x, y: p.y, z: p.z, yaw: 0.05, act: 'kCrouch', τ: 0, crawl: 1 }); return K; }
     if (w < at(XB.gone)) { const p = this.tanks.T1.turretTop(this._v); Object.assign(K, { x: p.x, y: p.y, z: p.z, yaw: 0.1, act: 'kPockets', τ: w, crawl: 0.35 }); K.headYaw = w > at(16.6) ? -0.5 * MathX.smooth(w, at(16.6), at(17.4)) : 0; return K; }
-    if (w < at(XB.run)) { K.show = false; return K; }
+    if (w < at(XB.run)) { K.show = false; const p = this.tanks.T1.turretTop(this._v); Object.assign(K, { x: p.x, y: p.y, z: p.z }); return K; }   // (unseen, but the close-up's lens stays where he was)
     // the column: alongside T5, a hand on the hull; the leap to T6; behind T7
     if (w < at(XB.leap)) { const t5 = T.T5, run = w < at(XB.touch); Object.assign(K, { x: -1.55, z: t5.z + 0.6, yaw: 0, act: 'kRun', τ: w, crawl: run ? 0.5 : 1, run: true }); if (!run) K.touch = true; return K; }
     if (w < at(XB.stop + 0.3)) { const p = this.tanks.T6.deck(this._v, 0, 0.4); Object.assign(K, { x: p.x, y: p.y, z: p.z, yaw: 0.2, act: 'kCrouch', τ: 0, crawl: 1, flashIn: at(XB.leap) });
@@ -163,7 +163,7 @@ class XAction {
     if (w < at(XB.trench) + 0.5) { K.show = false; const f = (w - at(XB.trench)) / 0.5, x = -40 + 80 * f; K.streak = [[x - 10, 1.0, XW.trench.z], [x - 5, 1.1, XW.trench.z + 1], [x, 1.2, XW.trench.z]]; K.streakK = 1; K.streakW = 0.4; return K; }
     // montage: behind the MG again (42–43), across the falling wall (44.2–45.2)
     if (w < at(42.0)) { K.show = false; return K; }
-    if (w < at(43.0)) { const m = XW.mg[1]; Object.assign(K, { x: m[0] - 0.5, z: m[1] - 2.2, yaw: 0.3, act: 'kPockets', τ: w, crawl: 0.5, flashIn: at(42.0) }); return K; }
+    if (w < at(43.0)) { const m = XW.mg[1]; Object.assign(K, { x: m[0] - 0.6, z: m[1] + 2.6, yaw: 0.15, act: 'kPockets', τ: w, crawl: 0.6, flashIn: at(42.0) }); return K; }
     if (w < at(44.2)) { K.show = false; return K; }
     if (w < at(45.2)) { const f = (w - at(44.2)) / (at(45.2) - at(44.2)); Object.assign(K, { x: -9 + 1.5 * f, y: 3.2, z: 6 - 12 * f, yaw: Math.PI, act: 'kRun', τ: w, crawl: 0.6, run: true }); return K; }
     // the aura walk: toward the camera down the road, hands in pockets
@@ -189,7 +189,7 @@ class XAction {
     const G = this.ghost, gp = G.p; let ve = null; for (const v of this._vanishes()) if (w - v > 0 && w - v < 0.3) ve = v;
     if (ve === null) { gp.root.visible = false; return; }
     const K = this._killua(ve - 0.003); if (!K.show) { gp.root.visible = false; return; }
-    const f = (w - ve) / 0.3; gp.root.visible = true; this.ghostMat.opacity = 0.75 * (1 - f) * (1 - f);
+    const f = (w - ve) / 0.3; gp.root.visible = true; this.ghostMat.opacity = 0.8 * Math.pow(1 - f, 1.5);
     gp.root.position.set(K.x, K.y || xGround(K.x, K.z), K.z); gp.root.rotation.set(0, K.yaw, 0); gp.root.scale.setScalar(1 + 0.12 * f);
     gp.apply((ACTIONS[K.act] || ACTIONS.kPockets)(K.τ, { seed: gp.seed, seedI: gp.seedI, walkPhase: ((K.walkD ?? ve * (K.run ? 5.5 : 1.2)) / 1.0) * Math.PI * 2 })); gp.root.updateMatrixWorld(true);
     G.pockets(/^k(Pockets|Walk|Stand)$/.test(K.act) ? 1 : 0);
@@ -208,11 +208,12 @@ class XAction {
     kp.root.visible = K.show;
     kp.root.position.set(K.x, K.y || xGround(K.x, K.z), K.z);   // (kept where he is even unseen: his light flashes follow it)
     this.sparks.begin(cam);
-    if (K.show) {
-      kp.root.rotation.set(0, K.yaw, 0);
-      const pose = (ACTIONS[K.act] || ACTIONS.kPockets)(K.τ, { seed: kp.seed, seedI: kp.seedI, walkPhase: ((K.walkD ?? w * (K.run ? 5.5 : 1.2)) / 1.0) * Math.PI * 2 });
+    // posed even when unseen (a lens that follows his head needs it where it would be)
+    kp.root.rotation.set(0, K.yaw, 0);
+    { const pose = (ACTIONS[K.act] || ACTIONS.kPockets)(K.τ, { seed: kp.seed, seedI: kp.seedI, walkPhase: ((K.walkD ?? w * (K.run ? 5.5 : 1.2)) / 1.0) * Math.PI * 2 });
       if (K.headYaw) pose.headYaw = K.headYaw;
-      kp.apply(pose); kp.root.updateMatrixWorld(true);
+      kp.apply(pose); kp.root.updateMatrixWorld(true); }
+    if (K.show) {
       const look = K.gaze || cam.position;
       this.killua._aimHead(look, K.act === 'kPockets' ? 0.35 : 0.2); kp.root.updateMatrixWorld(true);
       this.killua.pockets(/^k(Pockets|Walk|Stand)$/.test(K.act) && !K.touch ? 1 : 0);
@@ -369,7 +370,7 @@ class XAction {
     });
     // the battery crews: load, fire; fall as the guns go silent
     this.Bt.forEach((s, i) => {
-      if (!show(s, w > at(49.5) && w < at(59.5))) return;
+      if (!show(s, w > at(XB.radio - 0.6) && w < at(59.5))) return;
       const g = this.app.world.guns[i % 4], x = g.x + (i < 4 ? 1.4 : -1.4), z = g.z - 1.2, down = at(XB.silent) + (i % 4) * 0.4 + 0.1;
       s.keys = new HeroKeys([[0, x, z]], [[0, 0]], i === 0 ? [[0, 'idle'], [at(XB.radio - 0.3), 'xRadio'], [at(XB.battery + 0.2), 'xCrouch'], [down, 'xCollapse']] : [[0, 'idle'], [at(XB.battery), 'xCrouch'], [down, 'xCollapse']]);
       s.update(w, null, null); s.p.root.position.y = g.y;

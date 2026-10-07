@@ -46,6 +46,14 @@ Everything is procedural, so there are no models, images or sound files to downl
 > screen, presses his palm on it (the whole frame ripples), cracks it, and your fingertip cancels the reset. You keep your
 > own score of three hearts. Add `?safe` to the address to see the platform safe zones and every touch target. Plan,
 > safe zones, targets and beat sheet: [`films/game/PLAN.md`](films/game/PLAN.md).
+>
+> **Tenth film: *What if Killua and Eren spawned in World War II?*** — open `xover.html` (68 s). A serious anime-crossover
+> war short: on a muddy 1944 battlefield, two strikes hit the road in front of an advancing squad and two figures are
+> standing in the smoke. Killua (silent, impossibly fast, electric) takes apart the soldiers and crews; Eren bites his
+> hand, a bolt comes down and the Attack Titan rises out of the steam to take apart the tanks, the trench and the guns.
+> Two disasters on one battlefield, intercut, until the last push breaks and the army runs — Killua on a wrecked tank,
+> the Titan behind him. Generic army, no insignia, no gore. Shot list, map, hero shots and review log:
+> [`films/xover/PLAN.md`](films/xover/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -262,6 +270,22 @@ films/game/screen.js     screen effects: the full-frame ripple, the crack fixed 
 films/game/hud.js        the game HUD (hearts, rings, choice, hold, roulette, table, score) and the system HUD
 films/game/audio.js      ambience, interface and system tones, events, dialogue blips, restrained music
 films/game/film.js       FILM hooks: the world clock for RESET—, the composite, the ripples, the grade
+```
+
+Film: *What if Killua and Eren spawned in World War II?* (`xover.html`):
+
+```
+films/xover/PLAN.md      rules, the map, the shot list (story clock and the cut), hero shots, review log, quality gate
+films/xover/script.js    ★ every beat time, the captions, the slow-motion world clock, the cut (CONFIG.edit)
+films/xover/world.js     the battlefield: terrain, road, ruined village, fields, trench and bunker, the battery, sky, light
+films/xover/titan.js     the Attack Titan: muscle forms on the human rig, the head, mane, teeth and jaw, its movements
+films/xover/cast.js      Killua, Eren, the soldiers (helmets, rifles held by two-hand IK) and their actions
+films/xover/tank.js      a generic WWII tank: treads, turret, gun, hatch and commander, damage poses
+films/xover/fx.js        billboards (smoke, steam, fire, flashes), ribbons (lightning, tracers), sparks, debris
+films/xover/action.js    who is where, doing what, at every world time; Killua's strikes and afterimage; every effect
+films/xover/shots.js     the camera of every shot (Killua's close, fast, whipping; the Titan's low, wide, heavy)
+films/xover/audio.js     the 120 BPM score, the silences, Killua's dry cracks, Eren's thunder, steam, metal and roars, the war
+films/xover/film.js      FILM hooks: camera and shakes, bullets and tracers, light flashes, the words, the grade
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):
