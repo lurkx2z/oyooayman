@@ -54,6 +54,13 @@ Everything is procedural, so there are no models, images or sound files to downl
 > Two disasters on one battlefield, intercut, until the last push breaks and the army runs — Killua on a wrecked tank,
 > the Titan behind him. Generic army, no insignia, no gore. Shot list, map, hero shots and review log:
 > [`films/xover/PLAN.md`](films/xover/PLAN.md).
+>
+> **Eleventh film: *What happens if you slip and fall?*** — open `slip.html` (66 s). A dead-serious first-person
+> physics parody: you slip on a wet sidewalk in the rain, and the camera follows the energy — a ring in a puddle, a
+> 0.07 J vibration through the ground, a pebble that moves 1.4 mm, a fault at 99.999 % stress, an M8.7 earthquake on
+> your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
+> coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
+> after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -286,6 +293,21 @@ films/xover/action.js    who is where, doing what, at every world time; Killua's
 films/xover/shots.js     the camera of every shot (Killua's close, fast, whipping; the Titan's low, wide, heavy)
 films/xover/audio.js     the 120 BPM score, the silences, Killua's dry cracks, Eren's thunder, steam, metal and roars, the war
 films/xover/film.js      FILM hooks: camera and shakes, bullets and tracers, light flashes, the words, the grade
+```
+
+Film: *What happens if you slip and fall?* (`slip.html`):
+
+```
+films/slip/PLAN.md       rules, the places, the shot list, the causal chain, hero shots, escalation, sound, review log
+films/slip/script.js     ★ every beat time, the captions and readouts, the camera, your hands, the sea level, the wave
+films/slip/street.js     the rainy avenue to the sea: wet reflections (planar mirror + puddle mask), rain, cars, quake damage
+films/slip/body.js       your legs and shoes (walking, the slip, sitting up)
+films/slip/under.js      the underground cut-away (layers, the ring, the pebble and its scale) and the fault (km scale)
+films/slip/globe.js      the planet: rings from the city, the rotation tick, the ocean swell
+films/slip/sea.js        the seabed (one analytic height field in JS and GLSL), the water, the harbour, the 146 m wave
+films/slip/cast.js       people with umbrellas, in the quake, at the seafront, running inland
+films/slip/audio.js      rain, the squeak and the thud, the underground pulses, the rupture, the quake, sirens, the roar
+films/slip/film.js       FILM hooks: which scene, hands, the quake shake, reflections, the cuts, the grade, the end card
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):

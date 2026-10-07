@@ -245,12 +245,12 @@ class SlFault {
           else if (y > -3.4) col = vec3(0.4, 0.37, 0.33) * (0.9 + 0.15 * sin(y * 14.0 + ufbm(q) * 3.0));
           else if (y > -14.0) { vec3 c = ucell(q * 0.9); col = vec3(0.43, 0.4, 0.4) * (0.85 + 0.25 * c.z) * (0.9 + 0.1 * smoothstep(0.0, 0.08, c.y - c.x)); }
           else col = vec3(0.3, 0.27, 0.28) * (0.85 + 0.2 * ufbm(q * 0.6));
-          col *= 0.95 - 0.35 * smoothstep(0.0, -22.0, p.y);
+          col *= 0.55 * (0.95 - 0.35 * smoothstep(0.0, -22.0, p.y));
           // stress: strain lines bunched around the locked patch, and its glow (red → hot)
           float lock = exp(-pow(length(p - uHypo) / 3.6, 2.0));
           float strain = 0.5 + 0.5 * sin((nn * 4.0 + lock * 2.5 * sign(nn)) * 6.2831);
           col = mix(col, col * (0.75 + 0.5 * strain), 0.35 * uStress * smoothstep(5.0, 0.0, abs(nn)));
-          col += vec3(1.0, 0.25, 0.08) * lock * uStress * 0.55 * (0.85 + 0.15 * sin(uTime * 7.0)) * smoothstep(1.4, 0.0, abs(nn));
+          col += vec3(1.0, 0.22, 0.06) * lock * uStress * 0.75 * (0.85 + 0.15 * sin(uTime * 7.0)) * smoothstep(1.4, 0.0, abs(nn));
           // the fault itself: a dark seam
           float seam = smoothstep(0.06, 0.0, abs(nn)) * step(s, 15.5) * step(-0.2, s);
           col = mix(col, vec3(0.05, 0.04, 0.04), seam * 0.85);
@@ -261,10 +261,11 @@ class SlFault {
           col += lit * glowW * (vec3(1.0, 0.55, 0.2) * 0.9 * exp(-(front - along) * 0.25) + vec3(1.0, 0.95, 0.85) * 2.2 * exp(-pow((front - along) / 0.5, 2.0)));
           // seismic rings from the hypocentre
           float d = length(p - uHypo), R = uRing;
-          float ring = exp(-pow((d - R) / 0.35, 2.0)) + 0.5 * exp(-pow((d - R + 2.2) / 0.5, 2.0)) + 0.25 * exp(-pow((d - R + 4.6) / 0.7, 2.0));
-          col += vec3(0.6, 0.85, 1.0) * ring * uRingA * step(d, R + 1.0);
+          float ring = exp(-pow((d - R) / 0.09, 2.0)) + 0.45 * exp(-pow((d - R + 1.6) / 0.12, 2.0)) + 0.2 * exp(-pow((d - R + 3.4) / 0.16, 2.0));
+          col += vec3(0.55, 0.85, 1.0) * (ring * 0.9 + 0.15 * exp(-abs(d - R) * 1.5) * step(d, R)) * uRingA;
           // the tip, where the pebble was: a tiny bright point before the slip
-          col += vec3(0.7, 0.9, 1.0) * exp(-length(p - uTip) * 60.0) * 1.5 * (1.0 - uRup);
+          float dt = length(p - uTip);
+          col += vec3(0.7, 0.9, 1.0) * (exp(-dt * 40.0) * 1.6 + exp(-pow((dt - 0.25 - 0.08 * sin(uTime * 6.0)) / 0.025, 2.0)) * 0.8) * (1.0 - uRup);
           gl_FragColor = vec4(col, 1.0);
         }`,
     }));
@@ -285,12 +286,12 @@ class SlFault {
     // the far side and the bottom of the block
     const side = new THREE.Mesh(new THREE.PlaneGeometry(40, 24).rotateY(Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#221d19', roughness: 1 })); side.position.set(26, -12, -20); this.scene.add(side);
     this.orbit = new SlOrbit([
-      [SL.fault, SL_FAULT.tip.x, SL_FAULT.tip.y - 0.002, 0, 0.012, 2, -2, 46],
-      [18.4, SL_FAULT.tip.x - 0.4, -0.8, 0, 3.2, 4, -6, 46, 'outCubic'],
-      [19.6, -1.5, -6.5, 0, 26, 8, -8, 46],
-      [21.8, -2.5, -7.5, 0, 24, 14, -10, 44],
-      [23.6, -1.0, -4.0, 0, 18, 18, -16, 44],
-      [24.6, 0.5, -0.5, -1.5, 5.5, 22, -30, 50, 'inCubic'],
+      [SL.fault, SL_FAULT.tip.x, SL_FAULT.tip.y - 0.05, 0, 0.9, 4, -10, 46],
+      [18.6, SL_FAULT.tip.x - 1.5, -2.2, 0, 9.0, 8, -16, 46, 'outCubic'],
+      [19.8, -2.0, -6.2, 0, 27, 12, -20, 46],
+      [21.8, -2.5, -7.0, 0, 26, 16, -22, 44],
+      [23.6, -0.5, -4.0, 0, 19, 20, -26, 44],
+      [24.6, 1.5, -0.4, -1.5, 6.0, 24, -34, 50, 'inCubic'],
     ]);
   }
   update(t) {

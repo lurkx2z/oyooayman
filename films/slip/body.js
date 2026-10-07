@@ -73,8 +73,7 @@ class SlLegs {
   update(app, t, on) {
     this.root.visible = on; if (!on) return;
     const cam = app.camera, P = this._pose(app, t);
-    this._yaw.setFromQuaternion(cam.quaternion, 'YXZ');
-    const yaw = this._yaw.y, c = Math.cos(yaw), s = Math.sin(yaw);
+    const yaw = 0, c = 1, s = 0;      // (your body faces down the street; your head turns on its own)
     this.root.position.set(cam.position.x + s * P.hipZ, LAYOUT.curbH + P.hipY, cam.position.z + c * P.hipZ);
     this.root.rotation.set(0, yaw, 0);
     this.pelvis.rotation.set(P.lean, 0, 0);

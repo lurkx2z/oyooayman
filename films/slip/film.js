@@ -68,6 +68,7 @@ const FILM = {
 
   update(app, t) {
     const seg = slSeg(t), cam = app.camera;
+    app.scene.fog.density = seg === 'coast' ? 0.00042 : 0.0026;
     // (look-dev: window.SL_LOOK = { x, y, z, yaw, pitch, fov } overrides the street camera)
     const LK = window.SL_LOOK;
     if (LK) {
@@ -89,8 +90,8 @@ const FILM = {
       if (app.sea) app.sea.update(t, cam);
       if (app.cast) app.cast.update(t, q);
       // the ring from your fall spreading through the puddle in front of you
-      SL_WET_U.uSlRing.value.set(9.7, 1.2, 0.05 + Math.max(0, t - 6.2) * 0.42, 0.9 * MathX.smooth(t, 6.2, 6.5) * (t < SL.under ? 1 : 0));
-      app.legs.update(app, t, t < SL.under);
+      SL_WET_U.uSlRing.value.set(9.27, 1.47, 0.05 + Math.max(0, t - 6.2) * 0.42, 0.6 * MathX.smooth(t, 6.2, 6.5) * (t < SL.under ? 1 : 0));
+      app.legs.update(app, t, t < 6.35);
       this._hands(app, t);
       app.street.renderMirror(app.renderer, cam);
     } else {
@@ -105,8 +106,8 @@ const FILM = {
 
   _hands(app, t) {
     const cam = app.camera, V = FILM._hv || (FILM._hv = { w: new THREE.Vector3(), f: new THREE.Vector3(), n: new THREE.Vector3(), e: new THREE.Euler() });
-    V.e.setFromQuaternion(cam.quaternion, 'YXZ');
-    const yaw = V.e.y, fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
+    // (the hands stay where your body is, facing down the street, wherever you turn your head)
+    const fx = 0, fz = -1, rx = 1, rz = 0;
     // on the ground: beside your knees while you sit, under your shoulders on hands and knees (riding the quake)
     const gy = LAYOUT.curbH + 0.01, sit = t < SL.under, fwd = sit ? 0.5 : 0.18, wide = sit ? 0.36 : 0.27;
     for (const [name, side] of [['groundL', -1], ['groundR', 1]]) {

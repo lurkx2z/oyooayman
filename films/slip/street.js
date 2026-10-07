@@ -79,7 +79,7 @@ function slWetMain(kind) {
       + texture2DProj(tSlRefl, rp + vec4(0.0, -sm, 0.0, 0.0)).rgb * 0.2 + texture2DProj(tSlRefl, rp + vec4(0.0, 2.2 * sm, 0.0, 0.0)).rgb * 0.15;
     float k = uSlWet * mix(0.12 + 0.55 * fres, 0.42 + 0.58 * fres, pud) * ${kind === 2 ? '0.7' : '1.0'};
     gl_FragColor.rgb = mix(gl_FragColor.rgb * mix(0.78, ${kind === 2 ? '0.8' : '0.45'}, pud * uSlWet), refl, clamp(k, 0.0, 0.94));
-    gl_FragColor.rgb += vec3(0.75, 0.85, 0.95) * max(crest, 0.0) * uSlRing.w * 0.22 * pud;   // (the ring's crests catch the sky)
+    gl_FragColor.rgb += vec3(0.75, 0.85, 0.95) * max(crest, 0.0) * uSlRing.w * 0.07 * pud;   // (the ring's crests catch the sky)
   }`;
 }
 function slWet(mat, kind) {
@@ -427,7 +427,7 @@ class SlStreet extends Environment {
   renderMirror(renderer, camera) {
     const keep = this.rain.visible; this.rain.visible = false;
     // (the wet ground must not sample its own reflection while the reflection renders)
-    if (!this._black) { this._black = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1); this._black.needsUpdate = true; }
+    if (!this._black) { const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType }), cc = renderer.getClearColor(new THREE.Color()), ca = renderer.getClearAlpha(); renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 1); renderer.clear(); renderer.setClearColor(cc, ca); renderer.setRenderTarget(null); this._black = rt.texture; }
     SL_WET_U.tSlRefl.value = this._black; SL_WET_U.uSlWet.value = 0;
     this.mirror.render(renderer, this.scene, camera);
     SL_WET_U.tSlRefl.value = this.mirror.rt.texture; SL_WET_U.uSlWet.value = 1;
