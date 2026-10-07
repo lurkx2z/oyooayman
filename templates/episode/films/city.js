@@ -43,6 +43,8 @@ class __Tag__City extends Environment {
     }
     this.skyUniforms.uTime.value = t;
     if (this.skyUniforms.uO2) this.skyUniforms.uO2.value = 1;     // (the base sky has an Oxygen-film darkening uniform)
-    this._updateSignals(t, 1);                                    // normal signal cycle, mains power on
+    // signals: the base _updateSignals is Oxygen's one-shot sequence (avenue green → amber 7 s → red 8.5 s; cross
+    // street green from 9 s); feeding it time modulo 18 s turns that into a repeating normal cycle, mains power on
+    this._updateSignals(t % 18, 1);
   }
 }

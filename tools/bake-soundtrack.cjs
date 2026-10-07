@@ -25,8 +25,10 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) =>
   return acc;
 }, []));
 const ROOT = path.resolve(__dirname, '..');
-const PAGE = args.page || 'before-screens.html';
-const OUT = path.resolve(args.out || path.join(ROOT, 'films', 'before-screens', 'soundtrack.js'));
+// both are required: a default once made it easy to overwrite another film's committed soundtrack
+if (!args.page || !args.out) { console.log('usage: node tools/bake-soundtrack.cjs --page <slug>.html --out films/<slug>/soundtrack.js [--wav file.wav] [--kbps 160]'); process.exit(1); }
+const PAGE = args.page;
+const OUT = path.resolve(args.out);
 const KBPS = parseInt(args.kbps || '160', 10);
 
 (async () => {

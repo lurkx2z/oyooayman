@@ -29,6 +29,21 @@ cinematic."*
 - What still separates us from the references is **authored silhouettes and composition**, not post-processing.
 - **Muted, not monochrome.**
 
+## 2b. Choosing the lighting: overcast or sunny (both are approved)
+
+The two benchmarks differ: **Oxygen is overcast and muted; Friction is sunny** with brighter, more saturated cars.
+Both are on-style. Choose per brief:
+
+| Use | When | Examples |
+|---|---|---|
+| **Overcast / rain / dusk** (muted, `blackLift` ≈ 0.01, fog 0.0026–0.0039) | disaster/doom tone; the rule makes the world colder or darker; you need fire, lights or water to pop as accents | Oxygen, Slip, Crossover |
+| **Sunny clear afternoon** (warm key behind you, low fog 0.0008–0.0012, saturation up to ≈ 1.26, `blackLift` 0) | a pleasant ordinary baseline that the rule breaks; physics demos where motion must read crisply at distance | Friction, Sim, Air |
+| **Night** (dark world lit by the event) | the event is in the sky or makes its own light | Andromeda, Moon |
+
+If the brief says nothing, default to **overcast** for catastrophes and **sunny** for "an ordinary day goes physically
+wrong". Even in sunny films, buildings stay muted. Saturated colour is reserved for a few hero objects (Friction's red
+sedan and taxi are deliberate tracking aids).
+
 ## 3. Value structure
 
 - **Overcast daylight default:** midtones ≈ 70–85 / 255, foreground shadows 15–35, haze and sky 140–170.
@@ -75,8 +90,8 @@ cinematic."*
 - `installFog` options per film: `bankScale, bankAmount, lowHeight, lowAmount, cap` (Before Screens
   `{0.018, 0.3, 7, 0.45, 0.82}`, Crossover `{0.02, 0.5, 6, 0.9, 0.92}`).
   **Gotcha:** `installFog` runs once per page and the first call wins. `js/world/environment.js` calls `installFog()`
-  with defaults when it loads, so a film that loads environment.js gets the defaults unless it calls `installFog(...)`
-  before environment.js in the page.
+  with defaults when it loads, so a film that loads environment.js gets the defaults unless the page calls
+  `<script>installFog({...})</script>` between the `js/fx/fog.js` and `js/world/environment.js` script tags.
 - Local structure helps more than more density: haze cards between blocks (`Environment._hazeCards`), smoke columns,
   dust motes, rain streaks.
 - Telephoto shots see through less air. Slip thinned the fog in the wave's own shaders (a `uFogMul` injected in shader
@@ -170,7 +185,9 @@ Each film overrides them in `FILM.grade(t, p)`, which runs every frame. Real val
   three-segment fingers with nails, two-joint thumb, optional watch) posed by wrist position + finger direction +
   palm normal + curls. Keep them **muted, darker, well shaded, not dominant**.
 - Legs and shoes are per-film (Friction `FrLegs`, Slip `SlLegs`). Only show them when the camera looks down.
-- Skin-tone nails (`#c99c84`-ish). Pale nails read as fake.
+- Skin-tone nails (`nail: '#c99c84'`). Pale nails read as fake. The engine default `#d6b3a2` is still pale, and older
+  films (Friction's reference frame) show it; the template sets the skin tone. Long, slim sleeves
+  (`sleeveLen: 1.1, sleeveFit: 0.78`) avoid the floating-hand look.
 
 ## 12. Trees, vehicles, props
 

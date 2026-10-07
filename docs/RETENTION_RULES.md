@@ -1,6 +1,8 @@
 # Retention rules — what we learned from real uploads
 
-> Only numbers and observations **supplied by the owner** are listed as facts. Nothing here is invented. Where the
+> Only numbers and observations **supplied by the owner** are listed as facts. The quotes can be checked in `docs/briefs/`
+> (07 = the 22.4 s stat, 10 = the 45.9 % stat, 12 = "best-performing so far", 16 = the tsunami joke, 17 = the latest
+> observations). Nothing here is invented. Where the
 > owner has not reported a result, it says **UNKNOWN**.
 
 ## 1. Real performance data (owner-supplied)

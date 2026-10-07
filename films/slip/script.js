@@ -2,7 +2,7 @@
    SCRIPT — "What happens if you slip and fall?"
    ★ The one file to edit: the beats, the words, the readouts, your head
    (camera), your hands and legs, the sea level and the wave. Everything is
-   a pure function of film time; a 'step' key is a cut.
+   a pure function of story time (CONFIG.edit cuts it into the film); a 'step' key is a cut.
    Shot plan: films/slip/PLAN.md
    ===================================================================== */
 
@@ -26,7 +26,7 @@ CONFIG.render.shadowMapSize = 2048;
 CONFIG.edit = [[1.29, 3.3], [3.3, 3.62, 0.5], [3.62, 4.25], [4.75, 10.4], [11.6, 13.95], [15.2, 18.9], [19.4, 25.9], [26.6, 30.6], [31.2, 36.2], [37.4, 43.0], [46.2, 67.4]];
 
 // ---------------------------------------------------------------------------------------------------------------------
-// THE BEATS (film seconds)
+// THE BEATS (story seconds; CONFIG.edit above cuts them into the ~57 s film)
 // ---------------------------------------------------------------------------------------------------------------------
 const SL = {
   title: [1.2, 3.75],

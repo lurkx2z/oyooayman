@@ -10,7 +10,7 @@
 "what if" question ("What if oxygen suddenly disappeared?", "What if friction disappeared for 60 seconds?").
 
 - **Platforms:** TikTok, YouTube Shorts, Instagram Reels.
-- **Format:** 9:16, designed natively at **1080 × 1920, 30 fps**. Typical length now **57–72 s** (see `VIDEO_FORMAT.md`).
+- **Format:** 9:16, designed natively at **1080 × 1920, 30 fps**. Target length **≈ 60–72 s** (shipped cuts range 57–90 s; see `VIDEO_FORMAT.md`).
 - **Look:** polished, cinematic, low/mid-poly, atmospheric. Serif captions, a minimal HUD. It must look like a
   deliberately art-directed game or simulation cinematic, **not** a coding demo, not Roblox, not a mobile game,
   not photoreal (see `STYLE_BIBLE.md`).
@@ -97,6 +97,7 @@ CLAUDE.md                 bootloader for any Claude instance (read first)
 docs/                     this handoff: start at docs/NEW_DEVELOPER_BOOTSTRAP.md
 docs/reference/           frames from the shipped episodes (what "on-style" looks like)
 docs/art-direction.md     the measured calibration against the two external references (Omaha, POV What If)
+docs/briefs/              the owner's original briefs and feedback, verbatim (source of every quote in docs/)
 index.html                episode 1: Oxygen (older wiring: js/scene/*, js/ui/hud.js)
 <slug>.html               one page per later episode (before-screens, depersonalization, friction, andromeda, moon,
                           sim, air, game, xover, slip)

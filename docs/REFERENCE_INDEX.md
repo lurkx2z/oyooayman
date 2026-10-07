@@ -59,8 +59,8 @@ time for some Slip frames). Contact sheets in `docs/reference/sheets/` show each
 | `frames/oxygen_00.6_title_fire.jpg` | **The approved V4 look:** overcast muted city, the fire as the only warm accent, foreground cart and people, hazy distance, the top-left O₂ block, the serif title |
 | `frames/oxygen_07.0_engines_power.jpg`, `oxygen_35.5_no_fireball.jpg` | the cold grade after the fire dies; captions; the haze layering of a dead street |
 | `frames/oxygen_70.0_earth.jpg` | the procedural Earth (night lights going out), the ending composition |
-| `frames/friction_01.0_title_hud_hands.jpg` | **The benchmark opening:** the centred `big center` title over a moving street, SURFACE FRICTION draining, first-person hand + phone, the hill visible from frame 1 |
-| `frames/friction_12.0_no_brakes.jpg` | a consequence framed big and close (no empty bottom third), caption on a plate |
+| `frames/friction_01.0_title_hud_hands.jpg` | **The benchmark opening:** the centred `big center` title over a moving street, SURFACE FRICTION draining, first-person hand + phone, the hill visible from frame 1 (the nails are the old pale default: use skin tone now) |
+| `frames/friction_12.0_no_brakes.jpg` | a consequence framed big and close (no empty bottom third), the caption in the lower-middle band |
 | `frames/friction_44.0_montage_label.jpg` | the MEANWHILE montage label + one-line reason (mid-film reset) |
 | `frames/friction_63.0_return_rollover.jpg` | the payoff: a third-person drone angle, slow-motion rollover |
 | `sheets/friction.jpg` | the whole benchmark at a glance (including the aftermath line and the gripping step) |

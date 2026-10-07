@@ -7,6 +7,13 @@
      debug(app, t)     optional: text for the D debug panel
    ===================================================================== */
 
+// first-person hands: the shared poses (hidden · ear · reach · look · brace) + film poses you add here, each with a
+// '!' snap twin (a 0.02 s blend) for use on hard cuts. Camera-space pose = { p, F, N, curl[4], thumb[2], trem? }.
+// To aim a hand at a world point every frame (grip a pole, press glass), copy frAimHand from films/friction/film.js.
+const __TAG___HAND_POSES = Object.assign({}, HAND_POSES, {});
+const __TAG___HAND_BLEND = Object.assign({}, HAND_BLEND, {});
+for (const k of Object.keys(__TAG___HAND_POSES)) { __TAG___HAND_POSES[k + '!'] = __TAG___HAND_POSES[k]; __TAG___HAND_BLEND[k + '!'] = 0.02; }
+
 const FILM = {
   build(app) {
     FILM._app = app;
@@ -14,7 +21,9 @@ const FILM = {
     app.env.camera = app.camera;                       // (haze cards need it before build)
     app.env.build();
     app.cast = new __Tag__Cast(app);
-    app.hands = new ViewerHands(app.camera, { scale: 1.04, sleeve: '#2f3a46' });
+    // muted sleeve, skin-tone nails (pale nails read as fake), long slim sleeves (docs/STYLE_BIBLE.md § 11)
+    app.hands = new ViewerHands(app.camera, { scale: 1.04, sleeve: '#2f3a46', nail: '#c99c84', sleeveLen: 1.1, sleeveFit: 0.78,
+      poses: __TAG___HAND_POSES, blends: __TAG___HAND_BLEND });
     Look.apply(app.scene, app.camera);                 // selective gloss + world-space grime (after the world is built)
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     app.audio = new __Tag__Audio(app.tl, app);

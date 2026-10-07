@@ -56,13 +56,16 @@ const SCRIPT = {
     yaw: [[0, 4], [4.2, 4], [4.8, 22, 'inOutCubic'], [9.5, 18], [10.2, -14, 'inOutCubic'], [15.0, -10], [15.6, 6], [30, 4]],
     pitch: [[0, -3], [4.2, -3], [4.8, -12], [9.5, -8], [15.6, 6], [21, 2], [30, -2]],
     fov: [[0, 66], [30, 66]],
-    startles: [[__TAG__.rule[0] + 0.2, 0.8], [__TAG__.payoff, 1.0]],     // [t, strength]
-    shakes: [[__TAG__.payoff, 0.8, 0.5]],                                 // [t, amp, decay]: a decaying impulse, never continuous
+    startles: [[__TAG__.rule[0] + 0.2, 0.8], [__TAG__.payoff, 1.0]],     // REQUIRED (use [] if none): [t, strength]
+    shakes: [[__TAG__.payoff, 0.8, 0.5]],                                 // REQUIRED (use [] if none): [t, amp, decay], a decaying impulse, never continuous
   },
 
-  // your hands (camera space poses from js/camera/viewerHands.js: hidden · ear · reach · look · brace)
+  // your hands (camera-space poses: hidden · ear · reach · look · brace + film poses in film.js; 'name!' = snap on a cut).
+  // Show a hand only when it DOES something (brace, grip, reach toward someone, shield, hold a prop), keep it clear of
+  // the caption band and the HUD, and aim it at its contact point. A bad hand is worse than no hand. Example:
+  //   right: [[0, 'hidden'], [4.6, 'reach'], [6.4, 'hidden']],
   hands: {
-    right: [[0, 'hidden'], [4.6, 'reach'], [7.0, 'hidden']],
+    right: [[0, 'hidden']],
     left: [[0, 'hidden']],
   },
 

@@ -53,7 +53,8 @@ Copy the structure of `films/slip/PLAN.md` or `films/friction/PLAN.md`:
 
 ```bash
 git checkout -b episode/<slug>            # or the branch your session was assigned (see GITHUB_WORKFLOW.md)
-tools/new-episode.sh <slug> "WHAT IF …?"  # copies templates/episode/ → films/<slug>/ + <slug>.html (prefix TPL → your tag)
+tools/new-episode.sh <slug> <TAG> "WHAT IF … / … / …?"   # templates/episode/ → films/<slug>/ + <slug>.html;
+#   TAG = 2–4 capitals, your global prefix (placeholders __TAG__/__Tag__/__tag__ become GV/Gv/gv); " / " splits title lines
 NODE_PATH=$(npm root -g) node tools/check-page.cjs <slug>.html   # must boot with no errors
 ```
 
@@ -89,12 +90,14 @@ tools/render-parallel.sh <slug>.html /tmp/<slug>_prev 270 480 4 15
 NODE_PATH=$(npm root -g) node tools/render-wav.cjs <slug>.html /tmp/<slug>_prev.wav
 ffmpeg -y -framerate 15 -i /tmp/<slug>_prev/f_%05d.jpg -i /tmp/<slug>_prev.wav -c:v libx264 -pix_fmt yuv420p -crf 23 \
   -c:a aac -b:a 128k -shortest /tmp/<slug>_prev.mp4
-# contact sheets: 1 frame per second, ~11 per sheet
+tools/preview-sheets.sh /tmp/<slug>_prev 15 /tmp/<slug>_rev/sheet      # 1 frame per second, 11 per sheet → sheet_0.jpg …
 ```
 
 ## 6. Independent reviews
 
 The owner asks for reviewers on every episode. Launch 2–4 `general-purpose` agents **in the background, in parallel**.
+**If your environment has no agent-spawning tool:** do the reviews yourself as separate passes, one role at a time, looking only at
+the sheets and frames with the same prompt, and tell the owner they were self-reviews, not independent ones.
 They are read-only and must not modify project files. Give them:
 - a **review brief file**: the intended timeline per second, what the sound does (they can't hear it), the style target
   (template: the brief in § 6.1);
@@ -207,7 +210,9 @@ tools/encode-final.sh /tmp/<slug>_full /tmp/<slug>_final.wav <film_seconds> /tmp
 ```
 
 - `<film_seconds>` = `Edit.duration()` (`render-parallel.sh` prints it).
-- **Deliver ONE MP4 under 30 MiB** with `SendUserFile`. Never split into parts.
+- **Deliver ONE MP4 under 30 MiB** with the session's file-sending tool (`SendUserFile` in the owner's Claude Code
+  sessions). Never split into parts. If there is no file-sending tool, put the MP4 (and ZIP) in a folder the owner can open
+  (the primary working directory's ignored `renders/`, or the scratchpad), give the exact path, and **don't commit them**.
 - **"Run on computer" ZIP:** the page + `style.css` + `fonts/` + `lib/` + `js/` + `films/<slug>/` + any cross-film file
   the page loads (e.g. `films/xover/fx.js` for Slip) + a `HOW TO RUN.txt`. Test it before sending:
 

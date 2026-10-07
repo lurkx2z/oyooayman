@@ -33,6 +33,24 @@ git fetch origin <trunk>         # trunk = the repo's default branch (today: cla
 git checkout -b episode/<slug> origin/<trunk>
 ```
 
+### Branch decision tree (do this before your first edit)
+
+```
+Does your session's instructions name a branch?
+├─ yes, and it is NOT the trunk/main  → use it (create it from the trunk if it doesn't exist). Done.
+├─ yes, and it IS the trunk (e.g. claude/intelligent-archimedes-dgu7zi) → you were not given an episode branch.
+│     Ask the owner once: "May I work on episode/<slug>?" If you can't ask / they said "just build it":
+│     create episode/<slug> and test-push it (below). Never commit episode work on the trunk.
+└─ no                                   → git checkout -b episode/<slug> origin/<trunk>, then test-push.
+
+Test-push (right after creating the branch, before real work):
+    git commit --allow-empty -m "episode/<slug>: start" && git push -u origin episode/<slug>
+  • succeeds → work there.
+  • rejected (403 / "not allowed" / proxy policy) → the session may only push to its designated branch. Stop and tell the
+    owner exactly what was refused; ask which branch to use. (In Claude Code cloud sessions, read the environment's
+    GitHub-access documentation tool if available.) Don't force anything and don't fall back to the trunk silently.
+```
+
 - Never develop directly on the trunk (or on `main`, if it appears).
 - Never force-push a branch someone else uses. Never rewrite trunk history.
 - Never create a pull request unless the owner asks for one. Never merge without the owner's authorisation.

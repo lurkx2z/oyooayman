@@ -17,7 +17,8 @@
 10. `docs/PHYSICS_EPISODE_RULES.md`: how to define the rule and stay credible.
 11. `docs/LESSONS_LEARNED.md`: the mistakes not to repeat.
 12. As needed: `docs/CAMERA_GUIDE.md`, `docs/SOUND_GUIDE.md`, `docs/ASSET_GUIDE.md`, `docs/GITHUB_WORKFLOW.md`,
-    `docs/EPISODE_HISTORY.md`, `docs/REFERENCE_INDEX.md`.
+    `docs/EPISODE_HISTORY.md`, `docs/REFERENCE_INDEX.md`, and `docs/briefs/` (the owner's verbatim briefs: read the
+    Friction one, `08_friction_master_prompt.md`, to see what a brief looks like).
 
 ## Step 2 — Inspect the benchmark episodes
 
@@ -62,7 +63,9 @@ NODE_PATH=$(npm root -g) node tools/check-page.cjs friction.html    # proves the
 
 ## Step 6 — Report before implementing
 
-Post a short report to the owner (or the coordinating instance) containing:
+Post a short report to the owner (or the coordinating instance), **in your own words and specific to this episode**
+(which lighting family, which consequences, which engine pieces). The bullets below say what to cover; they are not text
+to paste:
 
 1. **Style summary** (3–5 lines): polished low-poly POV, the 70/30 hybrid, muted world + few accents, uneven grey-green
    fog, selective gloss, serif title/captions, top-left label/value HUD, rounded vignette, authored silhouettes, no bad

@@ -4,6 +4,11 @@
 > `claude/intelligent-archimedes-dgu7zi`, in this order. Reviewer scores are from independent reviewer agents and are
 > out of 10 (first round → later round). "Audience" is only what the owner reported; otherwise **UNKNOWN**.
 > Representative frames: `docs/reference/sheets/<episode>.jpg`.
+> **Delivery resolution:** Oxygen, Before Screens, Depersonalization and Friction were delivered as **540×960** renders
+> (the early tool's default; their PLANs say so). From Andromeda on, finals were rendered at **1080×1920**. Re-render the
+> early ones at 1080×1920 if they are ever re-uploaded.
+> **Lengths:** the films' own lengths are listed. The owner quoted Oxygen as "91 s": the page is 90 s plus the audio tail /
+> upload padding; treat 90/91 as the same video.
 
 ---
 
@@ -185,7 +190,7 @@
 
 ### 11. What happens if you slip and fall?  ★ parody, top performer
 - **Page / folder:** `slip.html` · `films/slip/` (loads `films/xover/fx.js`, `js/world/earth.js`, `js/fx/mirror.js`)
-- **Duration:** 57.3 s film (66.6 s story; `CONFIG.edit` incl. a half-speed slip)
+- **Duration:** 57.3 s film (67.4 s story; `CONFIG.edit` incl. a half-speed slip)
 - **Built:**
   - a rainy street with wet reflections (planar mirror through a puddle mask, rain ripples, instanced rain streaks);
   - legs/shoes; an underground cut-away (strata, ring, pebble with a mm scale and a growing bracket);

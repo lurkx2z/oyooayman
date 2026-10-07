@@ -14,7 +14,7 @@
 | Hard maximum | whatever the brief says (usually 68–78 s) |
 | Never | "force 90 seconds". The owner: *"Your oxygen video got 22.4s average watch time on 91s … I'd rather make a tight 72-second banger"* |
 
-Write the story long, then **cut it with `CONFIG.edit`** (see `ENGINE_ARCHITECTURE.md` § Edit). Slip went from a 66.6 s
+Write the story long, then **cut it with `CONFIG.edit`** (see `ENGINE_ARCHITECTURE.md` § Edit). Slip went from a 67.4 s
 story to a 57 s film; Friction from 74.6 s to 70.3 s.
 
 ## 2. The structure
@@ -30,6 +30,23 @@ ESCALATION of scale: personal → street → city → planet
 DESTRUCTION PAYOFF: the single biggest event, near the end   (last 15–20 %)
 SHORT AFTERMATH + one ending line (+ a tiny honesty note if needed) → black
 ```
+
+### 2.0 When the rule has its own duration ("for 60 seconds", "for 30 seconds")
+
+The rule's duration is a **story fact**. The HUD clock (`… RETURNS IN 00:24`) counts story time and must be honest. The
+film around it can still hit 60–72 s:
+- **Friction:** 60 s of μ = 0 (story 1.5 → 61.5) inside a 70.3 s film. The cuts removed 4 + 1.5 story seconds (the HUD
+  clock visibly jumps at those cuts, which is acceptable), the knock plays at ⅓ speed, and the return is shown twice in
+  4× slow motion. Montage shots are "meanwhile", the same clock.
+- **A shorter rule (e.g. 30 s) in a ~65 s film:**
+  - spend ~2–3 s of normal world first (under the title);
+  - run the 30 s of consequences;
+  - make the return the payoff, stretched with slow motion and several angles (≈ 6–10 s of film for ~2 s of story);
+  - follow with ~8–10 s of aftermath (the consequences of the return are new beats too: things that were held up now
+    fall, things stretched now snap back);
+  - and/or show "meanwhile" shots elsewhere at the same story time.
+- Never fake the clock (a "30 s" countdown that takes 50 s of film without visible slow motion). Pedantic commenters time
+  it.
 
 ### 2.1 Centred title (non-negotiable)
 

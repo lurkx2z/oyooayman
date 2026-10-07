@@ -1,6 +1,6 @@
 # Engine architecture — technical map
 
-> Every API below was checked against the source (Oct 2026). Paths are relative to the repo root. "Stable" means
+> APIs below were checked against the source (Oct 2026) and corrected after an independent fresh-reader review. Paths are relative to the repo root. "Stable" means
 > shipped in 5+ episodes without changes to its public behaviour. For the reuse/rewrite rules see `LOCKED_SYSTEMS.md`.
 
 ## 0. The big picture
@@ -8,6 +8,7 @@
 ```
 <slug>.html  ── loads, in order:  lib/three.bundle.min.js → js/config.js → js/core/* → js/fx/* → js/camera/* → js/world/*
                                    → js/audio/audioEngine.js → js/ui/storyHud.js → js/ui/devControls.js
+                                   → [any file script.js depends on, e.g. a simulation or another film's fx.js]
                                    → films/<slug>/script.js → films/<slug>/*.js → films/<slug>/film.js
                                    → films/<slug>/soundtrack.js → js/main.js   (main.js LAST: it boots)
 ```
@@ -86,7 +87,7 @@ const age = t - born; if (age < 0 || age > life) return;   // pure function of t
     in pitch).
   - **Everything in a film is authored on STORY time.** Only the final video and the dev bar use film time.
 ```js
-CONFIG.edit = [[1.29, 3.3], [3.3, 3.62, 0.5], [3.62, 4.25], [4.75, 10.4], /* … */ [46.2, 67.4]];   // slip: 66.6 s story → 57.3 s film
+CONFIG.edit = [[1.29, 3.3], [3.3, 3.62, 0.5], [3.62, 4.25], [4.75, 10.4], /* … */ [46.2, 67.4]];   // slip: 67.4 s story (CONFIG.duration) → 57.3 s film
 ```
 
 ### `js/core/textures.js` — Tex · stable
@@ -112,12 +113,13 @@ The viewer's head. Keyframed path plus procedural layers, all pure functions of 
 | `SCRIPT.camera` key | Meaning |
 |---|---|
 | `x`, `z`, `yaw`, `pitch`, `fov` | **required** Track keys (degrees for angles; yaw 0 faces −Z, positive yaw turns left) |
+| `startles`, `shakes` | **required arrays** (the controller loops over them unguarded; use `[]` if none) |
 | `height` | eye height above `baseY` (default `cameraHeight`) |
 | `baseY` | ground under the feet (default `LAYOUT.curbH` if `LAYOUT` exists, else 0) |
 | `tilt` | roll track in degrees |
 | `sag`, `roll` | late-hypoxia knee sag and head roll |
-| `startles: [[t, strength]]` | a quick dip + flinch |
-| `shakes: [[t, amp, decay]]` | a decaying impulse of noise shake (not a sustained tremor) |
+| `startles: [[t, strength]]` | a quick dip + flinch (required; `[]` if none) |
+| `shakes: [[t, amp, decay]]` | a decaying impulse of noise shake, not a sustained tremor (required; `[]` if none) |
 | `spasms: [t…]` | breath-hold diaphragm jolts |
 
 - Optional `SCRIPT_TRACKS`:
@@ -134,7 +136,9 @@ The viewer's head. Keyframed path plus procedural layers, all pure functions of 
 - **Pose** = `{ p:[x,y,z] wrist in camera space (right hand; mirrored for the left), F: finger direction, N: palm
   normal, curl:[index,middle,ring,little], thumb:[spread,curl], trem? }`. Built-in poses: `hidden ear reach look brace`.
 - Script: `SCRIPT.hands = { right: [[t,'pose'],…], left: [[t,'pose'],…] }`. Blends with `blends[pose]` seconds.
-  Convention: `'name!'` aliases with a 0.02 s blend for snaps at cuts.
+  **An unknown pose name silently falls back to `hidden`.** Snap poses for hard cuts are a *per-film convention*, not
+  an engine feature: the film adds `'name!'` twins with a 0.02 s blend (Friction: `for (const k of Object.keys(FR_HAND_POSES))
+  { FR_HAND_POSES[k + '!'] = FR_HAND_POSES[k]; FR_HAND_BLEND[k + '!'] = 0.02; }`; the template does the same).
 - **Aimed poses:** a pose with `aim` is re-solved every frame in `FILM.update` so a palm point lands on a world point
   (`frAimHand` in films/friction/film.js, `slAimHand` in films/slip/film.js, `amAimHand`, `mnAimHand`; copy the pattern).
 - Props: parent them to `hands.right.g` / `hands.left.g`. A fist holds along the thumb axis X = F × N.
@@ -144,7 +148,7 @@ The viewer's head. Keyframed path plus procedural layers, all pure functions of 
 app.hands = new ViewerHands(app.camera, { scale: 1.08, sleeve: '#3d5a7a', sleeveLen: 1.1, sleeveFit: 0.78,
   poses: FR_HAND_POSES, blends: FR_HAND_BLEND });
 // films/friction/script.js
-hands: { right: [[0, 'hidden'], [1.5, 'flailR'], [3.25, 'reachR'], [3.56, 'gripR!'], /* … */], left: [/* … */] },
+hands: { right: [[0, 'hidden'], [1.5, 'flailR'], [1.95, 'balanceR'], [3.25, 'reachR'], [3.56, 'gripR'], /* … */ [46.5, 'hidden!'], /* … */], left: [/* … */] },
 ```
 
 ### Legs (per film, not shared)
@@ -182,6 +186,9 @@ grade(t, p) {
   - ground haze;
   - capped cover.
 - It runs once per page. **The first call wins**, and `js/world/environment.js` calls it with defaults when it loads.
+  To customise fog on a page that loads environment.js, put an inline call between the two script tags:
+  `<script src="js/fx/fog.js"></script>` → `<script>installFog({ bankScale: 0.02, lowAmount: 0.9 });</script>` → … →
+  `<script src="js/world/environment.js"></script>`. (Films that customised fog so far simply didn't load environment.js.)
 - Then set `scene.fog = new THREE.FogExp2(color, density)`. The density is used *linearly* by the patched chunk.
 - A custom `ShaderMaterial` gets fog only with `fog: true` plus the fog chunks (see `XBill`). Three overwrites
   `fogDensity` every frame, so to scale fog per material inject your own uniform multiplier into the shader text
@@ -209,7 +216,8 @@ already have their own `onBeforeCompile`. Name glass materials `…glass…` and
 
 ### `films/xover/fx.js` — XBill, XRibbon, xBolt, XSpark, XDebris, XSPR, XCOL · stable-in-practice · **lives in a film folder** (Slip loads it too)
 - `new XBill(scene, { n, kind:'soft'|'flash'|'glow', color, additive, seed, spawn(i, rng) → {p, v, t0, life, s0, s1,
-  rot, a}, g, drag, fadeIn, fadeOut, alpha, loop?, order })`, then `update(t)` (`t <= -1e8` hides it). Instanced
+  rot, a, loop?}, g, drag, fadeIn, fadeOut, alpha, order })`, then `update(t)` (`t <= -1e8` hides it). `loop` is a
+  **per-particle** period returned by `spawn`, not a spec option. Instanced
   camera-facing billboards with fog: smoke, steam, dust, flashes, mist.
 - `new XRibbon(scene, maxPts, color)`: `begin(cam)`, `seg(p,q,w,a)`, `poly(pts,w,a,taper)`, `end()`. Camera-facing
   ribbons (lightning, tracers, arcs). Needs DoubleSide (already set).
@@ -252,8 +260,9 @@ already have their own `onBeforeCompile`. Name glass materials `…glass…` and
   (`lookUp pointUp phoneUp handMouth hugSelf brace walkUmb…`, friction's `slipBack windmill splits…`) with
   `Object.assign(ACTIONS, …)` and `BLEND` entries.
 - `perf(id, look, scenes, extra)` builds one performance from scenes `[t0, t1, {path|at, act|states, face, y, seat, stride}]`
-  (teleports between scenes). The Before Screens `Child`/`ChildrenSystem` (films/before-screens/children.js) extends
-  Person with per-scene visibility and strides; Depersonalization loads that file too.
+  (teleports between scenes). **The base `Person` only uses `path`, `states`, `stride`, `y` from it**; the per-scene
+  `faces/ys/seats/show/strides` arrays are consumed by `Child`/`ChildrenSystem` (films/before-screens/children.js,
+  which Depersonalization also loads). Use `Child` if you need per-scene facing/visibility.
 - `new BlobShadows(scene, max)`: `begin()`, `push(x,y,z,sx,opacity,sz,rotY)`, `end()`. Soft contact shadows under
   people and props (pair them with AO).
 ```js
@@ -380,7 +389,8 @@ class SlAudio extends AudioEngine {
 | Tool | Use |
 |---|---|
 | `stills.cjs` | single frames for look-dev and review (`--page --t --story --w --h --eval --nohud`) |
-| `contact-sheet.sh` | tile stills into one labelled image (reviewer input) |
+| `contact-sheet.sh` | tile stills (`t_*.jpg`) into one labelled image |
+| `preview-sheets.sh` | 1-frame-per-second sheets from a rendered frame folder (`f_*.jpg`); the reviewer input |
 | `check-page.cjs` | boot test: errors + whether the baked sound is current |
 | `render-parallel.sh` / `render-frames.cjs` | the final frame render (N workers, resumable) |
 | `render-wav.cjs` | the soundtrack WAV from the current code |

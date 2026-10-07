@@ -163,7 +163,9 @@ Playback is deterministic, so every take is identical. Picture is locked to the 
 
 ### Optional: frame-perfect MP4 export
 
-For an exact 30 fps render with no dropped frames (HUD and soundtrack included), you need Node.js and ffmpeg:
+For an exact 30 fps render with no dropped frames (HUD and soundtrack included), you need Node.js and ffmpeg.
+The commands below are for **your own computer**. In the Claude cloud container Playwright is already installed globally;
+developers there should use the parallel tools in `docs/PRODUCTION_WORKFLOW.md` instead:
 
 ```bash
 npm i -D playwright
@@ -194,6 +196,7 @@ tools/stills.cjs           single frames for look-dev / review       tools/conta
 tools/render-parallel.sh   final render with N resumable workers      tools/render-frames.cjs one worker
 tools/render-wav.cjs       the soundtrack as a WAV                    tools/encode-final.sh   one MP4 under a size budget
 tools/check-page.cjs       boot + sound check                         tools/bake-soundtrack.cjs  bake the sound into the film
+tools/preview-sheets.sh    1 fps contact sheets from rendered frames
 tools/new-episode.sh       start a new episode from templates/episode/
 ```
 

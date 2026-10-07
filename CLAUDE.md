@@ -8,8 +8,8 @@ per episode on a shared engine. **Before working, read `docs/NEW_DEVELOPER_BOOTS
 - **The repository is the source of truth.** Docs in `docs/`, per-episode plans in `films/<slug>/PLAN.md`. If something
   you know conflicts with the docs, the latest owner instruction wins; then update the docs.
 - **Never develop directly on the trunk** (the default branch, today `claude/intelligent-archimedes-dgu7zi`) **or on
-  `main`.** One episode = one branch: the branch your session assigns, else `episode/<slug>`. Push only to your
-  branch. No pull requests and no merges unless the owner asks.
+  `main`.** One episode = one branch: the branch your session assigns, else `episode/<slug>` (follow the decision
+  tree in `docs/GITHUB_WORKFLOW.md` § 2 if your session put you on the trunk). Push only to your branch. No pull requests and no merges unless the owner asks.
 - **Reuse the engine** (`js/`): camera, hands, StoryHUD, post, fog, people, vehicles, Environment (subclass), AudioEngine
   (subclass), Edit, tools. See `docs/LOCKED_SYSTEMS.md`. Don't fork or rewrite them. Engine changes must be additive,
   separate (`engine:` commits) and coordinated. **Never edit `js/audio/audioEngine.js`** (it would invalidate every

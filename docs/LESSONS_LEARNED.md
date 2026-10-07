@@ -16,7 +16,7 @@
    Air's drag tables, Andromeda's N-body, Before Screens' marbles. Real physics where viewers can judge it, steering
    only where cinema needs it.
 5. **The edit layer (`CONFIG.edit`).** Author one continuous take, then cut dead time and add slow motion. The
-   soundtrack follows automatically. Friction 74.6 → 70.3 s, Slip 66.6 → 57.3 s.
+   soundtrack follows automatically. Friction 74.6 → 70.3 s, Slip 67.4 → 57.3 s.
 6. **Baked soundtracks.** After *"the web version doesn't have sound"* (the live render took minutes), every page plays
    sound instantly, and a fingerprint catches stale bakes.
 7. **The centred serif title over an active scene, on frame 1.** Every later brief demanded it, and it works as a
