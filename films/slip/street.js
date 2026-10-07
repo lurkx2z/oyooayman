@@ -408,11 +408,11 @@ class SlStreet extends Environment {
           vec3 dir = normalize(vel);
           vec4 a = viewMatrix * vec4(p, 1.0), b = viewMatrix * vec4(p + dir * len, 1.0);
           vec2 sd = normalize(vec2(-(b.y - a.y), b.x - a.x) + 1e-5);
-          vec4 q = mix(a, b, position.y); q.xy += sd * position.x * 0.0045 * (0.6 - q.z * 0.03);
+          vec4 q = mix(a, b, position.y); q.xy += sd * position.x * 0.006 * (0.6 - q.z * 0.03);
           float dist = -q.z; vA = smoothstep(0.25, 1.2, dist) * (1.0 - smoothstep(6.0, 11.0, dist)); vU = position.y;
           gl_Position = projectionMatrix * q;
         }`,
-      fragmentShader: 'uniform vec3 uCol; uniform float uAmt; varying float vA; varying float vU; void main(){ gl_FragColor = vec4(uCol, vA * uAmt * 0.32 * sin(vU * 3.1416)); }',
+      fragmentShader: 'uniform vec3 uCol; uniform float uAmt; varying float vA; varying float vU; void main(){ gl_FragColor = vec4(uCol, vA * uAmt * 0.55 * sin(vU * 3.1416)); }',
     }));
     this.rain.frustumCulled = false; this.rain.renderOrder = 8; this.scene.add(this.rain);
   }
