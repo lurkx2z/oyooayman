@@ -127,7 +127,7 @@ class SlSea {
         diffuseColor.rgb *= 1.0 - beach * 0.25 * smoothstep(0.55, 0.75, bn(vBW.xz * 3.0));
         float weed = smoothstep(0.58, 0.72, bf(vBW.xz * 0.045 + 11.0)) * smoothstep(25.0, 80.0, bd);
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.13, 0.16, 0.1), weed * 0.75);
-        float pool = smoothstep(0.68, 0.72, bf(vBW.xz * 0.012 + 4.0) + 0.05 * bn(vBW.xz * 0.3)) * smoothstep(14.0, 40.0, bd);
+        float pool = smoothstep(0.745, 0.79, bf(vBW.xz * 0.009 + 4.0) + 0.04 * bn(vBW.xz * 0.25)) * smoothstep(14.0, 40.0, bd);
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.05, 0.07, 0.075), pool * 0.85);`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
         roughnessFactor = mix(roughnessFactor, 0.04, pool);`);

@@ -306,7 +306,7 @@ class SlFault {
     // the far side and the bottom of the block
     const side = new THREE.Mesh(new THREE.PlaneGeometry(40, 24).rotateY(Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#221d19', roughness: 1 })); side.position.set(26, -12, -20); this.scene.add(side);
     this.orbit = new SlOrbit([
-      [SL.fault, SL_FAULT.tip.x - 0.3, SL_FAULT.tip.y - 0.4, 0, 2.6, 4, -12, 46],
+      [SL.fault, SL_FAULT.tip.x - 0.6, SL_FAULT.tip.y - 0.9, 0, 5.5, 6, -14, 46],
       [18.6, SL_FAULT.tip.x - 1.5, -2.2, 0, 9.0, 8, -16, 46, 'outCubic'],
       [19.8, 0.0, -5.6, 0, 27, 12, -20, 46],
       [21.8, -0.5, -6.0, 0, 26, 16, -22, 44],

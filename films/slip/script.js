@@ -29,7 +29,7 @@ CONFIG.edit = [[1.3, 3.3], [3.3, 3.62, 0.5], [3.62, 4.25], [4.75, 10.4], [11.6, 
 // THE BEATS (film seconds)
 // ---------------------------------------------------------------------------------------------------------------------
 const SL = {
-  title: [1.3, 3.75],
+  title: [1.29, 3.75],
   step: 3.3,            // the right shoe lands on the wet plate
   slide: 3.34,          // …and shoots forward
   thud: 3.8,            // you hit the ground
