@@ -26,7 +26,7 @@ class XTitan {
     this.mHair = new THREE.MeshStandardMaterial({ color: '#1f1712', roughness: 0.85, flatShading: true, name: 'titanHair' });
     this.mTeeth = new THREE.MeshStandardMaterial({ color: '#e6dcc4', roughness: 0.45, name: 'titanTeeth' });
     this.mGum = new THREE.MeshStandardMaterial({ color: '#4a1a16', roughness: 0.7, name: 'titanGum' });
-    this.mEye = new THREE.MeshStandardMaterial({ color: '#0b1a10', emissive: '#7dffa8', emissiveIntensity: 2.2, roughness: 0.2, name: 'titanEye' });
+    this.mEye = new THREE.MeshStandardMaterial({ color: '#0b2a14', emissive: '#28ff6a', emissiveIntensity: 1.1, roughness: 0.2, name: 'titanEye' });
     this.mNail = new THREE.MeshStandardMaterial({ color: '#c9a48c', roughness: 0.5, flatShading: true });
     // the heat of the transformation: a warm glow in the skin that fades
     this.heat = 0;
@@ -67,7 +67,7 @@ class XTitan {
     // arms: deltoid, biceps, triceps on the upper arm; a heavy forearm; a huge hand
     const arm = (side) => {
       const sh = new THREE.Group(); sh.position.set(side * 1.95, 3.85, -0.05); spine.add(sh);
-      add(xBall(0.78, 0.72, 0.72, 1), S, sh, side * 0.12, 0.05, 0);                                 // deltoid
+      add(xBall(0.6, 0.66, 0.56, 1), S, sh, side * 0.06, -0.05, 0);                                  // deltoid (lean, not a pauldron)
       add(xLimb(3.1, [[0, 0.55, 0.58], [0.45, 0.6, 0.62], [1, 0.42, 0.44]]), S, sh);
       add(xBall(0.42, 0.95, 0.4), S, sh, 0, -1.4, 0.32);                                             // biceps
       add(xBall(0.42, 1.0, 0.42), D, sh, 0, -1.25, -0.3);                                            // triceps
@@ -108,7 +108,7 @@ class XTitan {
     add(xBall(0.6, 0.16, 0.28), D, head, 0, 0.43, 0.48, -0.25);                                       // brow ridge
     for (const s of [-1, 1]) {
       add(xBall(0.2, 0.12, 0.12), D, head, s * 0.24, 0.2, 0.55);                                       // eye socket shadow
-      const eye = add(new THREE.SphereGeometry(0.075, 14, 10), this.mEye, head, s * 0.24, 0.21, 0.6); eye.castShadow = false;
+      const eye = add(new THREE.SphereGeometry(0.1, 14, 10), this.mEye, head, s * 0.24, 0.21, 0.585); eye.castShadow = false;
       add(xBall(0.13, 0.1, 0.14), S, head, s * 0.38, -0.02, 0.42, 0, s * 0.3);                        // cheekbones (gaunt)
       add(xBall(0.1, 0.24, 0.16), D, head, s * 0.34, -0.3, 0.28, 0, s * 0.25);                        // hollow cheeks
       add(new THREE.ConeGeometry(0.12, 0.42, 4), S, head, s * 0.6, 0.22, -0.05, 0, 0, -s * 1.15);    // pointed ears
@@ -133,9 +133,9 @@ class XTitan {
     // hair: a dark cap and a long ragged mane to the shoulders, strands in front of the ears
     const cap = add(xBall(0.62, 0.52, 0.66, 1), this.mHair, head, 0, 0.66, -0.2); cap.rotation.x = -0.35;
     const rng = new RNG(1717);
-    for (let i = 0; i < 64; i++) {
-      // ragged strands from the crown round the back and sides, falling past the jaw to the shoulders; none over the face
-      const a = Math.PI * (0.42 + 1.16 * rng.next()) * (rng.chance(0.5) ? 1 : -1), len = rng.range(1.1, 2.0), w = rng.range(0.07, 0.13);
+    for (let i = 0; i < 70; i++) {
+      // ragged locks from the crown round the back and sides, falling past the jaw to the shoulders; the first ones frame the face
+      const front = i < 10, a = front ? (i % 2 ? 1 : -1) * Math.PI * (0.3 + 0.04 * (i >> 1)) : Math.PI * (0.42 + 1.16 * rng.next()) * (rng.chance(0.5) ? 1 : -1), len = front ? rng.range(1.3, 1.8) : rng.range(1.5, 2.5), w = rng.range(0.15, 0.25);
       const g = new THREE.ConeGeometry(w, len, 4); g.translate(0, -len / 2, 0);
       const st = add(g, this.mHair, head, Math.sin(a) * rng.range(0.5, 0.62), rng.range(0.55, 0.85), Math.cos(a) * rng.range(0.5, 0.62) - 0.18);
       st.rotation.set(Math.cos(a) * rng.range(0.1, 0.35) + 0.1, a, -Math.sin(a) * rng.range(0.1, 0.3));
@@ -159,7 +159,7 @@ class XTitan {
     j.ll.ft.rotation.x = P.lFoot; j.rl.ft.rotation.x = P.rFoot;
     this.jaw.rotation.x = 0.55 * jawOpen;
   }
-  setHeat(k) { this.heat = k; for (const m of [this.mSkin, this.mSkinDk]) m.emissiveIntensity = 0.14 * k; this.mEye.emissiveIntensity = 2.2 + 3 * k; }
+  setHeat(k) { this.heat = k; for (const m of [this.mSkin, this.mSkinDk]) m.emissiveIntensity = 0.14 * k; this.mEye.emissiveIntensity = 1.1 + 0.8 * k; }
   // shade 0..1: the body darkened toward a silhouette (inside the steam), the eyes still burning
   setShade(k) {
     if (!this._base) this._base = [this.mSkin.color.clone(), this.mSkinDk.color.clone()];

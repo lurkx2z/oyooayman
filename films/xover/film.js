@@ -109,6 +109,7 @@ const FILM = {
     let ck = 0, cp = null; const K = A.killua.p.root, kc = K.position.clone().add(new THREE.Vector3(0, 1.1, 0)), toCam = app.camera.position.clone().sub(kc).normalize();
     for (const ev of A.ev) { if (ev[1] !== 'zap') continue; const u = w - ev[0]; if (u < 0 || u > 0.3) continue; const k = Math.exp(-u / 0.06) * ev[5] * 14; if (k > ck) { ck = k; cp = kc.clone().addScaledVector(toCam, 2.0); } }
     if (K.visible && app.camera.position.distanceTo(kc) < 6) { const base = 1.3 * (0.6 + 0.4 * Math.sin(t * 40)); if (base > ck) { ck = base; cp = kc.clone().addScaledVector(toCam, 1.2); } }
+    if (t > XB.final && K.visible) { ck = Math.max(ck, 7); cp = K.position.clone().add(new THREE.Vector3(-0.8, 2.0, 1.6)); }
     if (A.trenchAt) { ck = Math.max(ck, 40); cp = A.trenchAt.clone().add(new THREE.Vector3(0, 2, 2)); }
     Wd.cold.intensity = ck; if (cp) Wd.cold.position.copy(cp);
   },
@@ -131,15 +132,17 @@ const FILM = {
     // slow motion reads a little heavier
     const slow = xSlow(t) < 1 ? 1 : 0; p.contrast += 0.04 * slow; p.vignette += 0.1 * slow;
     // the arrival: a pale flash
-    if (t >= XB.arrive && t < XB.arrive + 0.5) { p.flash = Math.max(p.flash, 0.7 * Math.exp(-(t - XB.arrive) / 0.1)); p.flashColor.setRGB(0.95, 0.93, 1.0); }
+    if (t >= XB.arrive && t < XB.arrive + 0.5) { p.flash = Math.max(p.flash, 0.28 * Math.exp(-(t - XB.arrive) / 0.08)); p.flashColor.setRGB(0.95, 0.93, 1.0); }
     // the drop: the muzzle flash
     if (t >= XB.shot && t < XB.shot + 0.1) { p.flash = 0.35; p.flashColor.setRGB(1, 0.85, 0.6); }
     // the bolt: white-out, warm
-    if (t >= XB.bolt && t < XB.bolt + 1.0) { const k = t < XB.bolt + 0.08 ? 1 : Math.exp(-(t - XB.bolt - 0.08) / 0.18); p.flash = Math.max(p.flash, k); p.flashColor.setRGB(1, 0.86, 0.66); }
+    if (t >= XB.bolt && t < XB.bolt + 1.0) { const k = t < XB.bolt + 0.05 ? 0.95 : 0.95 * Math.exp(-(t - XB.bolt - 0.05) / 0.07); p.flash = Math.max(p.flash, k); p.flashColor.setRGB(1, 0.86, 0.66); }
     // the black cut on the tank: black, a blue-white crack across it
     if (t >= XB.cut[0] && t < XB.cut[1]) { p.fade = 1; if (t >= XB.cut[0] + 0.06 && t < XB.cut[0] + 0.13) { p.fade = 0; p.flash = 0.85; p.flashColor.setRGB(0.6, 0.85, 1.0); } }
     // whip pans smear
     if (FILM.shot && FILM.shot.whip) p.smear.set(0.018 * Math.sin(MathX.clamp((t - FILM.shot.t[0]) / 0.25, 0, 1) * Math.PI), 0);
+    // dark shots lifted
+    if (FILM.shot && FILM.shot.exp) p.exposure *= FILM.shot.exp;
     // impacts: a touch of fringing
     p.chroma += 0.04 * Math.min(1, FILM.shake || 0);
     // the hush before the end, the final black

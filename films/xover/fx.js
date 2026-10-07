@@ -29,6 +29,8 @@ const XSPR = {
       const g = x.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.15, 'rgba(255,255,255,0.8)'); g.addColorStop(0.45, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, S, S);
       x.strokeStyle = 'rgba(255,255,255,0.5)'; x.lineWidth = 3; for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.3; x.beginPath(); x.moveTo(S / 2, S / 2); x.lineTo(S / 2 + Math.cos(a) * S * 0.48, S / 2 + Math.sin(a) * S * 0.48); x.stroke(); }
     }
+    // every sprite fades to nothing before its square edge (no visible rectangle on a huge puff)
+    x.globalCompositeOperation = 'destination-in'; const m = x.createRadialGradient(S / 2, S / 2, S * 0.3, S / 2, S / 2, S * 0.5); m.addColorStop(0, 'rgba(0,0,0,1)'); m.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = m; x.fillRect(0, 0, S, S); x.globalCompositeOperation = 'source-over';
     this[kind] = Tex.tex(c, { repeat: false }); return this[kind];
   },
 };
@@ -57,6 +59,7 @@ class XBill {
     this._m = new THREE.Matrix4(); this._v = new THREE.Vector3(); this._q = new THREE.Quaternion(); this._s = new THREE.Vector3();
   }
   update(t) {
+    if (t <= -1e8) { this.mesh.visible = false; return; }   // (switched off, looping particles too)
     const S = this.s, g = S.g || 0, dr = S.drag || 0; let any = false;
     this.P.forEach((o, i) => {
       let u = t - o.t0; if (o.loop) u = ((u % o.loop) + o.loop) % o.loop;

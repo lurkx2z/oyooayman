@@ -232,7 +232,7 @@ class XWorld {
 
   _lights() {
     const s = this.scene;
-    this.hemi = new THREE.HemisphereLight('#b5ada0', '#4a3e30', 0.75); s.add(this.hemi);
+    this.hemi = new THREE.HemisphereLight('#b8b0a3', '#5a4c3c', 1.0); s.add(this.hemi);
     const sun = new THREE.DirectionalLight('#ffd9b0', 2.4); sun.position.set(-60, 28, -10); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
     Object.assign(sun.shadow.camera, { left: -40, right: 40, top: 40, bottom: -40, near: 1, far: 260 }); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.04;
     s.add(sun); s.add(sun.target); this.sun = sun;

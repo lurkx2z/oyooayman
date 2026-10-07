@@ -6,14 +6,14 @@
    the camera of every shot is shots.js. Plan: films/xover/PLAN.md
    ===================================================================== */
 
-CONFIG.duration = 72;
+CONFIG.duration = 72;   // the story clock; the film is cut from it (CONFIG.edit) to 68 s
 CONFIG.seed = 20261015;
 Object.assign(CONFIG.camera, { cameraHeight: 1.6, fov: 50 });
 CONFIG.render.shadowMapSize = 4096;
 
 // the beats (film seconds)
 const XB = {
-  title: [0.3, 4.1],
+  title: [0.25, 4.5],
   hush0: [4.55, 5.0], arrive: 5.0, appear: 5.4,             // an unnatural silence; two strikes in the road; the smoke parts on two figures
   halt: 6.2, spark: 8.1, order: 9.7, aim: 10.6, silence: [11.0, 12.0],
   shot: 12.0,                                                // the trigger: muzzle flash, he is gone (the drop)
@@ -28,8 +28,12 @@ const XB = {
   final: 65.0, titanUp: 67.0, caption: 68.2, black: 71.6,
 };
 // the few words on screen: [from, to, text]
-const XCAPS = [[15.6, 17.8, 'KILLUA WOULD BE<br>IMPOSSIBLE TO TRACK.'], [25.9, 28.2, 'EREN WOULD CHANGE<br>THE SCALE OF THE WAR.'], [54.4, 55.9, 'AN ARMY COULD SURVIVE ONE.'], [55.9, 57.0, 'NOT BOTH.']];
-// slow motion: [film from, film to, speed]
+const XCAPS = [[14.4, 18.65, 'KILLUA WOULD BE<br>IMPOSSIBLE TO TRACK.'], [25.9, 28.2, 'EREN WOULD CHANGE<br>THE SCALE OF THE WAR.'], [54.4, 55.9, 'AN ARMY COULD SURVIVE ONE.'], [55.9, 57.0, 'NOT BOTH.']];
+// the cut: story intervals kept (each cut is one bar of the 120 BPM score, so the music stays in step)
+//   16–18 Killua standing on the dead tank / looking north (kept: the first and last moments)
+//   52–54 the end of the barrage and the crossing
+CONFIG.edit = [[0, 16.0], [18.0, 52.0], [54.0, 72.0]];
+// slow motion: [story from, story to, speed]
 const XSLOW = [[12.12, 12.72, 0.2], [20.7, 21.5, 0.25], [30.8, 31.3, 0.3], [32.9, 33.3, 0.3], [38.6, 39.0, 0.25], [60.6, 61.4, 0.25]];
 // film time → world time, and back
 function xW(t) { let w = t; for (const [a, b, k] of XSLOW) { if (t <= a) break; w -= (Math.min(t, b) - a) * (1 - k); } return w; }

@@ -65,12 +65,12 @@ class XKillua extends HeroActor {
     for (const leg of [this.j.ll, this.j.rl]) leg.kn.children.forEach((o, i) => { if (o.isMesh && i < 2) o.material = skin; });
     this.j.head.scale.setScalar(1.12);
     // the hair: a big mop of soft white spikes over the hero head's cap, flaring up and out
-    const hm = new THREE.MeshStandardMaterial({ color: '#cfd2da', roughness: 0.9, flatShading: true, name: 'killuaHair' }), r = new RNG(77), H = this.j.head;
+    const hm = new THREE.MeshStandardMaterial({ color: '#e2e1e3', roughness: 1.0, name: 'killuaHair' }), r = new RNG(77), H = this.j.head;
     for (let i = 0; i < 34; i++) {
       const u = r.next(), v = r.range(0.0, 0.9), th = u * Math.PI * 2, ph = v * Math.PI * 0.6;
       const dir = new THREE.Vector3(Math.sin(ph) * Math.sin(th), Math.cos(ph), Math.sin(ph) * Math.cos(th) * (Math.cos(th) > 0 ? 0.6 : 1));
       if (dir.z > 0.5 && dir.y < 0.5) continue;                                                       // keep the face clear
-      const len = r.range(0.1, 0.17) * (dir.z > 0.3 ? 0.7 : 1), g = new THREE.ConeGeometry(r.range(0.032, 0.048), len, 5); g.translate(0, len / 2, 0);
+      const len = r.range(0.09, 0.15) * (dir.z > 0.3 ? 0.7 : 1), g = new THREE.ConeGeometry(r.range(0.04, 0.056), len, 8, 2); g.translate(0, len / 2, 0);
       const m = new THREE.Mesh(g, hm); m.position.copy(dir.clone().multiplyScalar(0.075)).add(new THREE.Vector3(0, 0.035, -0.012));
       m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().add(new THREE.Vector3(r.range(-0.35, 0.35), 0.35, r.range(-0.3, 0.05))).normalize());
       m.castShadow = true; H.add(m);
@@ -101,6 +101,8 @@ class XEren extends HeroActor {
       const a = (i - 5.5) / 5.5; m.position.set(a * 0.065, 0.092 - Math.abs(a) * 0.02, 0.06 - Math.abs(a) * 0.02); m.rotation.set(-r.range(0.35, 0.8), a * 0.5, a * 0.35 + r.range(-0.15, 0.15)); m.castShadow = true; this.j.head.add(m); }
     for (let i = 0; i < 16; i++) { const side = i < 8 ? 1 : -1, k = (i % 8) / 7, L = r.range(0.07, 0.11), g = new THREE.ConeGeometry(r.range(0.02, 0.03), L, 4); g.translate(0, -L / 2, 0); const m = new THREE.Mesh(g, hm);
       const a = -0.25 + k * 2.2; m.position.set(side * Math.cos(a) * 0.088, 0.075 - k * 0.012, Math.sin(-a) * 0.06 - 0.01); m.rotation.set(r.range(-0.2, 0.25) + k * 0.35, 0, side * r.range(0.15, 0.35)); m.castShadow = true; this.j.head.add(m); }
+    for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2, L = r.range(0.06, 0.1), g = new THREE.ConeGeometry(r.range(0.022, 0.032), L, 5); g.translate(0, L / 2, 0); const m = new THREE.Mesh(g, hm);
+      const back = Math.cos(a) < 0.3; if (!back) continue; m.position.set(Math.sin(a) * 0.07, 0.1, Math.cos(a) * 0.07 - 0.02); m.rotation.set(Math.cos(a) * 0.9 - 0.2, 0, -Math.sin(a) * 0.9); m.castShadow = true; this.j.head.add(m); }
     // harness: two straps over the chest, a belt
     for (const s of [-1, 1]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.5, 0.012), strap); b.position.set(s * 0.09, 0.25, front + 0.01); b.rotation.z = s * 0.12; S.add(b); }
     const belt = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.035, 0.24), strap); belt.position.set(0, -0.02, 0); S.add(belt);
@@ -108,6 +110,12 @@ class XEren extends HeroActor {
     const cg = new THREE.CylinderGeometry(0.22, 0.4, 1.0, 12, 4, true, Math.PI * 0.42, Math.PI * 1.16); cg.translate(0, -0.5, 0);
     const cl = new THREE.Mesh(cg, cloakM); cl.position.set(0, 0.52, -0.02); cl.castShadow = true; S.add(cl); this.cloak = cl;
     const hood = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 6, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.45), cloakM); hood.position.set(0, 0.5, -0.12); hood.scale.set(1.1, 0.8, 0.8); S.add(hood);
+    // the wings on the cloak's back (white over blue)
+    { const c = Tex.canvas(128, 128), x = c.getContext('2d');
+      const wing = (dir, col) => { x.save(); x.translate(64 + dir * 6, 70); x.scale(dir, 1); x.fillStyle = col; for (let k = 0; k < 5; k++) { x.beginPath(); x.moveTo(0, -30 + k * 8); x.quadraticCurveTo(26 + k * 4, -40 + k * 10, 50 - k * 4, -14 + k * 12); x.quadraticCurveTo(28, -2 + k * 9, 0, 6 + k * 7); x.closePath(); x.fill(); } x.restore(); };
+      wing(1, '#2e4f9a'); wing(-1, '#eceae4');
+      const em = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3), new THREE.MeshStandardMaterial({ map: Tex.tex(c, { repeat: false }), transparent: true, alphaTest: 0.3, roughness: 0.9, side: THREE.DoubleSide }));
+      em.position.set(0, 0.16, -0.318); em.rotation.set(-0.17, Math.PI, 0); S.add(em); }
     this.layer(1);
   }
 }
