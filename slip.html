@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What Happens If You Slip and Fall?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* this film: a serious documentary — serif title and captions, a plain small HUD, the end card on black */
+    #hud .story-title.big.center { top: calc(var(--u) * 760); width: calc(var(--u) * 1000); margin-left: calc(var(--u) * -500); }
+    #hud .story-title.big.center::before { background: radial-gradient(closest-side, rgba(4, 6, 8, 0.5), rgba(4, 6, 8, 0.2) 62%, rgba(4, 6, 8, 0)); }
+    #hud .story-title.big.center .hero { font-family: var(--book); font-size: calc(var(--u) * 92); font-weight: 700; line-height: 1.08; letter-spacing: 0.015em; }
+    #hud .story-title.big.center .main { text-shadow: 0 0 calc(var(--u) * 28) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.7); }
+    #hud .story-caption { top: calc(var(--u) * 1330); font-family: var(--book); font-size: calc(var(--u) * 52); font-weight: 500; line-height: 1.22; padding: calc(var(--u) * 14) calc(var(--u) * 30);
+      border-radius: calc(var(--u) * 14); background: rgba(4, 6, 9, 0.38); max-width: calc(var(--u) * 900);
+      text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 3) calc(var(--u) * 10) rgba(0, 0, 0, 0.8); }
+    #hud .story-readout { left: calc(var(--u) * 44); padding: calc(var(--u) * 14) calc(var(--u) * 24); border-radius: calc(var(--u) * 14); background: rgba(4, 6, 10, 0.4); }
+    #hud .story-readout .label { font-size: calc(var(--u) * 28); letter-spacing: 0.16em; opacity: 0.92; color: #ffffff; text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9); }
+    #hud .story-readout .value { font-size: calc(var(--u) * 84); margin-top: calc(var(--u) * 6); text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.75); }
+    #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; opacity: 0.9; margin-top: calc(var(--u) * 8); color: #ffd7a8; text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9); }
+    #hud .sl-card { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); width: calc(var(--u) * 960); text-align: center; color: #fff; }
+    #hud .sl-card .k { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 34); letter-spacing: 0.2em; opacity: 0.85; }
+    #hud .sl-card .v { font-family: var(--book); font-weight: 700; font-size: calc(var(--u) * 78); line-height: 1.12; margin-top: calc(var(--u) * 26); letter-spacing: 0.02em; }
+    #hud .sl-meta { position: absolute; left: 50%; top: 58%; transform: translate(-50%, 0); width: calc(var(--u) * 940); text-align: center; color: #fff; }
+    #hud .sl-meta .m { font-family: var(--book); font-style: italic; font-size: calc(var(--u) * 46); opacity: 0.92; }
+    #hud .sl-meta .n { font-family: var(--hud-font); font-size: calc(var(--u) * 22); letter-spacing: 0.16em; opacity: 0.6; margin-top: calc(var(--u) * 60); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <!-- Cinematic HUD (built by js/ui/storyHud.js from SCRIPT.hud; stays visible in Recording Mode) -->
+      <div id="hud"></div>
+    </div>
+  </div>
+
+  <!-- Developer controls (hidden in Recording Mode) -->
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What happens if you slip and fall?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">BUILDING THE STREET…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <!-- Three.js (bundled locally — no internet or server needed) -->
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/fx/mirror.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/world/environment.js"></script>
+  <script src="js/world/earth.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <script src="films/xover/fx.js"></script>
+  <!-- this film (shot plan: films/slip/PLAN.md) -->
+  <script src="films/slip/script.js"></script>
+  <script src="films/slip/street.js"></script>
+  <script src="films/slip/sea.js"></script>
+  <script src="films/slip/cast.js"></script>
+  <script src="films/slip/body.js"></script>
+  <script src="films/slip/under.js"></script>
+  <script src="films/slip/globe.js"></script>
+  <script src="films/slip/audio.js"></script>
+  <script src="films/slip/film.js"></script>
+  <script src="films/slip/soundtrack.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
