@@ -1,6 +1,6 @@
 # What happens if you slip and fall? — production plan
 
-A 66-second vertical (9:16, 1080×1920, 30 fps) first-person physics parody on the shared engine. It plays dead
+A 57-second vertical (9:16, 1080×1920, 30 fps) first-person physics parody on the shared engine. It plays dead
 serious, like a disaster documentary, until the last card. One continuous chain of cause and effect: a slip on a wet
 sidewalk → a vibration → a pebble → a fault → an earthquake → Earth's rotation → the sea → a 146 m tsunami. Every link
 is shown, and the numbers are honest about how small the start is. Only after the punchline does a small note say it is
@@ -38,28 +38,31 @@ satire.
   boats lying on their sides); the wave: a long curling wall with a translucent face, foam streaks, a whitewater lip,
   spray mist, debris in the face, varying along its length (not a flat wall).
 
-## 3. Shot list (film seconds)
+## 3. Shot list
 
-| Time | Beat | Shot |
+Authored on one 66.6 s story clock and cut to 57.2 s of film (`CONFIG.edit` in `script.js`): the walk starts closer, the
+shoe shoots forward at half speed, and the sky hold, the descent's grey middle, the pebble's wait, two moments of the
+quake, a stretch of the planet and the sea's slow retreat are taken out. Film seconds (story seconds in brackets):
+
+| Film | Beat | Shot |
 |---|---|---|
-| 0.0–3.3 | **Question** | POV walking in the rain down the wet avenue; shop light in the puddles; the sea at the end of the street. Centred: *WHAT HAPPENS / IF YOU SLIP / AND FALL?* (0.2–3.4) |
-| 3.3–3.8 | **The slip** | Looking down: your right shoe lands on a wet steel plate and shoots forward; the view tips back; your hands fly up |
-| 3.8 | THUD | The camera slams down; a jolt |
-| 3.8–4.7 | Silence | On your back, rain falling at you from a grey sky · IMPACT FORCE ≈ 1.7 kN |
-| 4.7–6.3 | Setup | You sit up, hands on the wet paving · *Normally… you'd just get back up.* |
-| 6.3–7.4 | Turn | You look down between your hands: a ring spreads in the puddle · *But not this time.* · the camera follows it into the ground |
-| 7.4–11.8 | **Underground** | Down through the layers; the ring spreads and fades · ENERGY TRANSFERRED TO THE GROUND 0.07 J · *A tiny part of the impact becomes vibration.* |
-| 11.8–17.4 | **The pebble** | Macro: a pebble in a crack, a millimetre scale; it moves · ROCK DISPLACEMENT 1.4 MM · *Usually, this would mean nothing.* · *Unfortunately…* · it slips and drops into the crack |
-| 17.4–24.6 | **The fault** | Pull back to kilometre scale: a locked fault under the city · FAULT STRESS 99.999 % · *You fell in exactly the wrong place.* · FAULT SLIP 0.2 MM · the rupture races along the fault · MAGNITUDE M2.1 → M8.7 · waves race up to the city |
-| 24.6–32.0 | **Earthquake** | POV on hands and knees on the sidewalk: the street heaves, puddles jump, a shop window bursts, a car rocks with its hazards flashing, a signal swings, a cornice falls, people stumble, a crack runs past your hand · MAGNITUDE 8.7 |
-| 32.0–39.2 | **Earth** | Rush out to the planet; rings spread from the city · EARTH ROTATION 1,674.40 KM/H → 1,674.41 · *The earthquake transferred momentum into Earth's rotation.* · *But even a tiny change… can have consequences.* · ROTATION CHANGE +0.0006 % · the oceans shift; dive to the coast |
-| 39.2–46.0 | **The sea leaves** | At the seafront railing: the sea draws back · SEA LEVEL 0 / −2 / −9 / −21 / −38 M · boats tip over on the mud; people walk out onto the seabed |
-| 46.0–52.6 | **The line** | DISTANT WATER MASS DETECTED · a white line on the horizon · WAVE HEIGHT 3 / 7 / 16 / 34 / 78 M · sirens; people run |
-| 52.6–59.6 | **Run** | You run up the avenue; look back: 146 M over the rooftops, the lighthouse gone, debris and mist; last look back: the lip overhead |
-| 59.6–60.6 | **Impact** | The whitewater takes the street and you; black |
-| 60.6–61.2 | | Black, silence |
-| 61.2–63.6 | **Payoff** | *CAUSE OF GLOBAL CATASTROPHE:* / *SLIPPED ON WET SIDEWALK* |
-| 63.8–66.0 | **Meta** | *yes. somehow it became a tsunami again.* · small: *SATIRICAL SIMULATION · NO, SLIPPING CANNOT ACTUALLY CAUSE THIS.* |
+| 0.0–2.0 (1.3–3.3) | **Question** | POV walking in the rain; the steel plate ahead in a puddle. Title from frame 0: *WHAT HAPPENS / IF YOU SLIP / AND FALL?* |
+| 2.0–2.8 | **The slip** (half speed) | SURFACE WET STEEL · FRICTION μ ≈ 0.1 — the shoe shoots forward; hands fly up |
+| 2.8 (3.8) | THUD | the camera slams down; IMPACT FORCE ≈ 1.7 kN |
+| 2.8–3.3 | Silence | on your back: the facades, the rain |
+| 3.3–4.8 (4.75–6.3) | Setup | you sit up · *Normally… you'd just get back up.* |
+| 4.8–5.9 (6.3–7.4) | Turn | a glowing ring spreads in the puddle by your hand · *But not this time.* · down into the ground |
+| 5.9–8.9 (7.4–10.4) | **Underground** | the same ring, under the street; ENERGY TRANSFERRED TO THE GROUND 0.07 J · *A tiny part of the impact becomes vibration.* |
+| 8.9–13.7 | **The pebble** | macro with a 0–20 mm scale; it moves 1.4 mm along the scale (a bracket measures it) · *Usually, this would mean nothing.* · *Unfortunately…* · it slips into the crack |
+| 13.7–20.9 (17.4–24.6) | **The fault** | pull back to a fault under a YOU pin · FAULT STRESS 99.999 % · *You fell in exactly the wrong place.* · SLIP 0.2 MM · ≈ 10 KM DOWN · the rupture · M2.1 → M8.7 · the blocks lurch, dust |
+| 20.9–27.0 | **Earthquake** | on hands and knees; a shop window bursts in front of you, cars rock, stone falls, people fall · M8.7 · GROUND ACCELERATION 0.9 G |
+| 27.0–33.0 (32.0–39.2) | **Earth** | rush out; rings from the city; the planet spins (an arrow) · 1,674.40 → 1,674.4**1** KM/H (the digit flashes) · ROTATION CHANGE +0.0006 % · a swell runs out across the ocean · dive |
+| 33.0–36.8 (39.2–43.0) | **The sea leaves** | SEA LEVEL 0 / −2 / −9 / −21 / −38 M; boats tip onto the mud; two people walk out |
+| 36.8–43.2 (46.2–52.6) | **The line** | telephoto on the horizon: the line grows with each number, 3 / 7 / 16 / 34 / 78 M; sirens |
+| 43.2–50.2 | **Run** | up the avenue; look back (telephoto): 146 M, the crest lobed and pitching, spray; last look back: the lip overhead |
+| 50.2–51.2 | **Impact** | whitewater bursts up the sea wall, foam rushes past you, white; silence |
+| 51.6–53.2 | Recap | on black, line by line: SLIP · 1.7 kN / GROUND · 0.07 J / PEBBLE · 1.4 MM / FAULT · M8.7 / EARTH · +0.01 KM/H / SEA · −38 M / WAVE · 146 M |
+| 53.4–57.2 | **Payoff** | *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON / WET SIDEWALK* → (54.5) *yes. somehow it became a tsunami again.* → (55.7) the small satire note |
 
 ## 4. Hero shots
 
@@ -98,4 +101,27 @@ the seafront, rain, reflections, quake damage) · `under.js` (the cut-away and t
 
 ## 8. Review log
 
-(filled in as reviews come back)
+**Round 1** (two independent reviewers on a 15 fps preview of the 66 s first cut): visual 5.5 / 10, retention and
+comedy 5 / 10. What they found and what changed:
+- *Slow stretches (the walk, the sky hold, the pebble's wait, the static globe, 12 s of mud at the coast)* → cut to
+  57 s with the edit layer; the slip lands at 2 s (at half speed); the coast drains in 3 s; the globe spins visibly.
+- *The puddle ring is invisible; a dark bar crosses the frame* → a glowing ring of its own in a puddle by your hand,
+  match-cut to the ring underground; the hands leave before the dive.
+- *The 1.4 mm move can't be seen; the scale sits under the captions; camouflage rock; a one-frame glitch* → the
+  pebble moves along the scale, a bracket and a ghost outline measure it, the scale sits above it; finer, calmer
+  granite; a jagged crack with shaded lips.
+- *The fault doesn't connect to you; hairline fault; nothing happens at M8.7; readouts overlap* → a YOU pin, ≈ 10 KM
+  DOWN, a thicker glowing seam, a bigger lurch with dust and a shudder; STRESS and SLIP share one readout (hard cut).
+- *The quake's window bursts off-centre; the umbrella floats through a car; cotton-ball dust; static people* → a
+  bigger burst in the middle of the frame, a short skid for the umbrella, darker dust, a person who falls, a rolling
+  shake, GROUND ACCELERATION 0.9 G.
+- *Globe: no visible spin, the changed digit isn't marked, a hard polar cap, polygonal rings* → spin, an arrow, the
+  digit flashes, the change is large, the cap edge is blended, rings drawn per pixel.
+- *Coast: a flat olive slab, a ruler-straight waterline, box boats, a 20 px wave* → the horizon higher, glossy mud
+  with pools, curving bars, rounded hulls tipping 35–55°, a siren; a telephoto on the line that grows with each number.
+- *Tsunami: a flat wall, no lip, thin foam, no scale* → a bigger pitching lip with a foam band along its edge and a
+  shadow under it, a lobed crest, a vertical colour ramp and climbing bands, bigger debris, the ship on the face, a
+  telephoto look-back that fills the frame, people running toward you.
+- *The punchline is small and late; the note steps on it; bad line breaks* → a recap of the chain on black, the card,
+  the punchline 1.2 s later and larger, the note 1.2 s after that; "SLIPPED ON / WET SIDEWALK".
+- *Captions too small, too close to the right-hand buttons* → larger, on a 70 % box, kept inside the safe zone.

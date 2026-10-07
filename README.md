@@ -55,7 +55,7 @@ Everything is procedural, so there are no models, images or sound files to downl
 > the Titan behind him. Generic army, no insignia, no gore. Shot list, map, hero shots and review log:
 > [`films/xover/PLAN.md`](films/xover/PLAN.md).
 >
-> **Eleventh film: *What happens if you slip and fall?*** — open `slip.html` (66 s). A dead-serious first-person
+> **Eleventh film: *What happens if you slip and fall?*** — open `slip.html` (57 s). A dead-serious first-person
 > physics parody: you slip on a wet sidewalk in the rain, and the camera follows the energy — a ring in a puddle, a
 > 0.07 J vibration through the ground, a pebble that moves 1.4 mm, a fault at 99.999 % stress, an M8.7 earthquake on
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
