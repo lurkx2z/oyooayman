@@ -1,66 +1,34 @@
-# What If Oxygen Suddenly Disappeared? — 3D first-person simulation
+# What If…? film studio — procedural 3D vertical shorts
 
-A vertical (9:16, 1080×1920, 30 fps) Three.js "What If?" cinematic built for TikTok / Shorts / Reels.
-Everything is procedural, so there are no models, images or sound files to download.
+A studio of vertical (9:16, 1080×1920, 30 fps) Three.js "What If?" cinematics built for TikTok / Shorts / Reels.
+Every film runs on one shared engine in `js/`, and everything is procedural, so there are no models, images or sound
+files to download.
 
-**Status: the full 90-second film.**
+**Status: eleven finished films.** Open a film's page in Chrome to play it.
 
-> **Second film: *How did kids have fun before screens?*** Open `before-screens.html` (the full 90 s).
-> It runs on the same shared engine; its plan and shot list are in [`films/before-screens/PLAN.md`](films/before-screens/PLAN.md).
->
-> **Third film: *What weed-induced depersonalization can feel like*** — open `depersonalization.html` (71 s).
-> Plan, shot list and review log: [`films/depersonalization/PLAN.md`](films/depersonalization/PLAN.md).
->
-> **Fourth film: *What if friction disappeared for 60 seconds?*** — open `friction.html` (70.3 s). Friction goes at 1.5 s
-> and comes back 60 seconds later; everything that slides comes from a deterministic simulation computed when the page loads,
-> and the film is an edited cut of that one continuous take (`CONFIG.edit`).
-> Plan, physics rules, shot list and review log: [`films/friction/PLAN.md`](films/friction/PLAN.md).
->
-> **Fifth film: *What if Andromeda collided with the Milky Way overnight?*** — open `andromeda.html` (80 s). From a
-> hilltop lookout over a small town, one night stands in for billions of years: Andromeda grows, passes overhead, swings
-> away, comes back and merges with our galaxy. The sky is drawn from a deterministic gravity simulation (82 000 stars, gas
-> and dust in two galaxies) computed when the page loads. Plan, science rules and beat sheet:
-> [`films/andromeda/PLAN.md`](films/andromeda/PLAN.md).
->
-> **Sixth film: *What if the Moon crashed into Earth?*** — open `moon.html` (80 s). A cold open on the money shot (an
-> enormous Moon over a flooded coastal street), a rewind to 24 hours earlier, then the day through to impact: the Moon
-> grows, the tides go wrong in stages (the harbour drains, surges, the streets flood), the ground shakes, and the end is
-> shown by implication. The Moon is a procedural hero asset (real maria and craters, terminator shadows), drawn
-> camera-relative so it never parallaxes. Plan, physics notes and beat sheet: [`films/moon/PLAN.md`](films/moon/PLAN.md).
->
-> **Seventh film: *What if you realized you were in a simulation?*** — open `sim.html` (80 s). It starts like any other
-> video on the channel: a sunny street, the title. Then the world repeats itself (a man passes twice, a ball bounces
-> backwards), breaks (wireframe, debug labels, a frozen car, a missing texture), and one man in it realizes that someone
-> is watching — you. He reads the captions, taps the lens (the whole picture ripples), hits the screen (the video
-> cracks over a wireframe void) and is reset. The reset fails. Plan and beat sheet: [`films/sim/PLAN.md`](films/sim/PLAN.md).
->
-> **Eighth film: *What if air became 10× denser?*** — open `air.html` (48.6 s). One invisible change with many
-> consequences: a throw dies in the air, a cyclist can't pass 17 km/h, a car sheds speed, a plywood sheet floats down
-> while a steel clamp drops — and then a 60 km/h wind hits like 190 km/h and the street comes apart. Every hero motion is
-> integrated from ½ρC_dAv². Plan, model and numbers: [`films/air/PLAN.md`](films/air/PLAN.md).
->
-> **Ninth film: *POV: This video is a game. Don't die.*** — open `game.html` (51.6 s). A fake-interactive RPG short. A man
-> trapped in a facility sees *you*: he asks you to put your finger on his hand (the glass lights up exactly under your
-> fingertip), to tilt your phone to choose a door, to hold a pad to open a blast door, and to tap to stop an item
-> roulette (a tap pauses the video, so your item is really yours). The system detects you, he looks at the edges of your
-> screen, presses his palm on it (the whole frame ripples), cracks it, and your fingertip cancels the reset. You keep your
-> own score of three hearts. Add `?safe` to the address to see the platform safe zones and every touch target. Plan,
-> safe zones, targets and beat sheet: [`films/game/PLAN.md`](films/game/PLAN.md).
->
-> **Tenth film: *What if Killua and Eren spawned in World War II?*** — open `xover.html` (68 s). A serious anime-crossover
-> war short: on a muddy 1944 battlefield, two strikes hit the road in front of an advancing squad and two figures are
-> standing in the smoke. Killua (silent, impossibly fast, electric) takes apart the soldiers and crews; Eren bites his
-> hand, a bolt comes down and the Attack Titan rises out of the steam to take apart the tanks, the trench and the guns.
-> Two disasters on one battlefield, intercut, until the last push breaks and the army runs — Killua on a wrecked tank,
-> the Titan behind him. Generic army, no insignia, no gore. Shot list, map, hero shots and review log:
-> [`films/xover/PLAN.md`](films/xover/PLAN.md).
->
-> **Eleventh film: *What happens if you slip and fall?*** — open `slip.html` (57 s). A dead-serious first-person
-> physics parody: you slip on a wet sidewalk in the rain, and the camera follows the energy — a ring in a puddle, a
-> 0.07 J vibration through the ground, a pebble that moves 1.4 mm, a fault at 99.999 % stress, an M8.7 earthquake on
-> your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
-> coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
-> after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+| # | Film | Page | Length | Plan |
+|---|---|---|---|---|
+| 1 | *What if oxygen suddenly disappeared?* | [`index.html`](index.html) | 90 s | [beat sheet below](#1-what-if-oxygen-suddenly-disappeared) |
+| 2 | *How did kids have fun before screens?* | [`before-screens.html`](before-screens.html) | 90 s | [`films/before-screens/PLAN.md`](films/before-screens/PLAN.md) |
+| 3 | *What weed-induced depersonalization can feel like* | [`depersonalization.html`](depersonalization.html) | 71 s | [`films/depersonalization/PLAN.md`](films/depersonalization/PLAN.md) |
+| 4 | *What if friction disappeared for 60 seconds?* | [`friction.html`](friction.html) | 70.3 s | [`films/friction/PLAN.md`](films/friction/PLAN.md) |
+| 5 | *What if Andromeda collided with the Milky Way overnight?* | [`andromeda.html`](andromeda.html) | 80 s | [`films/andromeda/PLAN.md`](films/andromeda/PLAN.md) |
+| 6 | *What if the Moon crashed into Earth?* | [`moon.html`](moon.html) | 80 s | [`films/moon/PLAN.md`](films/moon/PLAN.md) |
+| 7 | *What if you realized you were in a simulation?* | [`sim.html`](sim.html) | 80 s | [`films/sim/PLAN.md`](films/sim/PLAN.md) |
+| 8 | *What if air became 10× denser?* | [`air.html`](air.html) | 48.6 s | [`films/air/PLAN.md`](films/air/PLAN.md) |
+| 9 | *POV: This video is a game. Don't die.* | [`game.html`](game.html) | 51.6 s | [`films/game/PLAN.md`](films/game/PLAN.md) |
+| 10 | *What if Killua and Eren spawned in World War II?* | [`xover.html`](xover.html) | 68 s | [`films/xover/PLAN.md`](films/xover/PLAN.md) |
+| 11 | *What happens if you slip and fall?* | [`slip.html`](slip.html) | 57 s | [`films/slip/PLAN.md`](films/slip/PLAN.md) |
+
+The controls, recording steps and MP4 export below work the same for every film; swap `index.html` for the film's page.
+
+## The films
+
+### 1. *What if oxygen suddenly disappeared?*
+
+Open `index.html` (90 s). The first film: every molecule of O₂ vanishes on an ordinary city street, and you live through
+the next minute and a half. Its plan is this README: the beat sheet is below, and the science notes and follow-ups are
+further down.
 
 | Time | Beat |
 |---|---|
@@ -83,6 +51,81 @@ Everything is procedural, so there are no models, images or sound files to downl
 | 60–67.6 s | The camera leaves the body and rises over the dead avenue into the haze. Caption: *It was happening everywhere at once.* |
 | 67.6–90 s | A stylised Earth: no fires anywhere, the sky still blue, the last night-side city lights going out in waves as backup power runs down. *No fires. No engines. No breathable air.* / *Eight billion people. The same few seconds.* Then **You would only have seconds to react.** and the final **ATMOSPHERIC OXYGEN 0.0%** |
 
+### 2. *How did kids have fun before screens?*
+
+Open `before-screens.html` (90 s). Plan and shot list: [`films/before-screens/PLAN.md`](films/before-screens/PLAN.md).
+
+### 3. *What weed-induced depersonalization can feel like*
+
+Open `depersonalization.html` (71 s).
+Plan, shot list and review log: [`films/depersonalization/PLAN.md`](films/depersonalization/PLAN.md).
+
+### 4. *What if friction disappeared for 60 seconds?*
+
+Open `friction.html` (70.3 s). Friction goes at 1.5 s
+and comes back 60 seconds later; everything that slides comes from a deterministic simulation computed when the page loads,
+and the film is an edited cut of that one continuous take (`CONFIG.edit`).
+Plan, physics rules, shot list and review log: [`films/friction/PLAN.md`](films/friction/PLAN.md).
+
+### 5. *What if Andromeda collided with the Milky Way overnight?*
+
+Open `andromeda.html` (80 s). From a
+hilltop lookout over a small town, one night stands in for billions of years: Andromeda grows, passes overhead, swings
+away, comes back and merges with our galaxy. The sky is drawn from a deterministic gravity simulation (82 000 stars, gas
+and dust in two galaxies) computed when the page loads. Plan, science rules and beat sheet:
+[`films/andromeda/PLAN.md`](films/andromeda/PLAN.md).
+
+### 6. *What if the Moon crashed into Earth?*
+
+Open `moon.html` (80 s). A cold open on the money shot (an
+enormous Moon over a flooded coastal street), a rewind to 24 hours earlier, then the day through to impact: the Moon
+grows, the tides go wrong in stages (the harbour drains, surges, the streets flood), the ground shakes, and the end is
+shown by implication. The Moon is a procedural hero asset (real maria and craters, terminator shadows), drawn
+camera-relative so it never parallaxes. Plan, physics notes and beat sheet: [`films/moon/PLAN.md`](films/moon/PLAN.md).
+
+### 7. *What if you realized you were in a simulation?*
+
+Open `sim.html` (80 s). It starts like any other
+video on the channel: a sunny street, the title. Then the world repeats itself (a man passes twice, a ball bounces
+backwards), breaks (wireframe, debug labels, a frozen car, a missing texture), and one man in it realizes that someone
+is watching — you. He reads the captions, taps the lens (the whole picture ripples), hits the screen (the video
+cracks over a wireframe void) and is reset. The reset fails. Plan and beat sheet: [`films/sim/PLAN.md`](films/sim/PLAN.md).
+
+### 8. *What if air became 10× denser?*
+
+Open `air.html` (48.6 s). One invisible change with many
+consequences: a throw dies in the air, a cyclist can't pass 17 km/h, a car sheds speed, a plywood sheet floats down
+while a steel clamp drops — and then a 60 km/h wind hits like 190 km/h and the street comes apart. Every hero motion is
+integrated from ½ρC_dAv². Plan, model and numbers: [`films/air/PLAN.md`](films/air/PLAN.md).
+
+### 9. *POV: This video is a game. Don't die.*
+
+Open `game.html` (51.6 s). A fake-interactive RPG short. A man
+trapped in a facility sees *you*: he asks you to put your finger on his hand (the glass lights up exactly under your
+fingertip), to tilt your phone to choose a door, to hold a pad to open a blast door, and to tap to stop an item
+roulette (a tap pauses the video, so your item is really yours). The system detects you, he looks at the edges of your
+screen, presses his palm on it (the whole frame ripples), cracks it, and your fingertip cancels the reset. You keep your
+own score of three hearts. Add `?safe` to the address to see the platform safe zones and every touch target. Plan,
+safe zones, targets and beat sheet: [`films/game/PLAN.md`](films/game/PLAN.md).
+
+### 10. *What if Killua and Eren spawned in World War II?*
+
+Open `xover.html` (68 s). A serious anime-crossover
+war short: on a muddy 1944 battlefield, two strikes hit the road in front of an advancing squad and two figures are
+standing in the smoke. Killua (silent, impossibly fast, electric) takes apart the soldiers and crews; Eren bites his
+hand, a bolt comes down and the Attack Titan rises out of the steam to take apart the tanks, the trench and the guns.
+Two disasters on one battlefield, intercut, until the last push breaks and the army runs — Killua on a wrecked tank,
+the Titan behind him. Generic army, no insignia, no gore. Shot list, map, hero shots and review log:
+[`films/xover/PLAN.md`](films/xover/PLAN.md).
+
+### 11. *What happens if you slip and fall?*
+
+Open `slip.html` (57 s). A dead-serious first-person
+physics parody: you slip on a wet sidewalk in the rain, and the camera follows the energy — a ring in a puddle, a
+0.07 J vibration through the ground, a pebble that moves 1.4 mm, a fault at 99.999 % stress, an M8.7 earthquake on
+your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
+coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
+after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
 
 ## Look (art direction)
 
@@ -114,7 +157,7 @@ The target is a **polished cinematic low-poly first-person simulation**: about 7
 ## How to run it (no install needed)
 
 1. Download or clone this folder.
-2. **Double-click `index.html`.** It opens in Chrome.
+2. **Double-click the film's page** (for example `index.html` or `slip.html`). It opens in Chrome.
    (If it opens in another browser, right-click → *Open with* → Google Chrome.)
 3. Click the screen or press **Space** to play. The click also turns on the sound.
 
@@ -122,7 +165,7 @@ No server is needed. Three.js is bundled in `lib/` and the fonts (Inter, Lora, O
 JetBrains Mono — all SIL Open Font License) in `fonts/`, so it works fully offline.
 
 The soundtrack is synthesised by the film's own code. A pre-rendered copy ships next to each film
-(`js/scene/soundtrack.js`, `films/before-screens/soundtrack.js`, `films/depersonalization/soundtrack.js`) so the sound is ready the moment the page opens
+(`js/scene/soundtrack.js` for the oxygen film, `films/<name>/soundtrack.js` for the others) so the sound is ready the moment the page opens
 (the start screen says **SOUND READY**). If you change a film's script or sound code, the page notices that copy is
 out of date and synthesises the sound itself on load, which can take a few minutes; refresh the copy with
 `node tools/bake-soundtrack.cjs --page before-screens.html --out films/before-screens/soundtrack.js`
@@ -365,7 +408,7 @@ tools/render-preview.cjs   optional frame-exact MP4 renderer
 
 **To retime or restage anything, edit `js/scene/script.js`.** Each vehicle there says where it should end up (`stopS`) and how hard it brakes. The code works out where it has to start. A built-in check warns in the console if two cars would overlap.
 
-## Science notes (what the simulation assumes)
+## Oxygen film: science notes (what the simulation assumes)
 
 These were checked by an independent science review pass; see the review summary in the session.
 
@@ -388,7 +431,7 @@ These were checked by an independent science review pass; see the review summary
 - **Phones, signals, alarms** keep working on batteries. **City lights** on Earth's night side go out in waves as grids collapse; some backup lasts a little longer. **The sky stays blue**: nitrogen still scatters blue light.
 - **Lighters**: a piezo lighter still makes its electric spark, but the gas can't light. Flint (ferrocerium) sparks only shine by burning, so they go dim.
 
-## Possible follow-ups
+## Oxygen film: possible follow-ups
 
 - **Part 2 hook:** the ozone layer can't be rebuilt without O₂, so UV-C reaches the ground within hours.
 - **Alternative ending** (fiction, from the original brief): back on the collapsed POV, the O₂ readout flickers 0.0 → 0.1 → 0.3 % and you hear a sudden breath — "Why is oxygen coming back?"
