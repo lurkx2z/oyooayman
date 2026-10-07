@@ -1,5 +1,8 @@
 # What If Oxygen Suddenly Disappeared? — 3D first-person simulation
 
+> **Developers (human or Claude): start with [`CLAUDE.md`](CLAUDE.md) and [`docs/NEW_DEVELOPER_BOOTSTRAP.md`](docs/NEW_DEVELOPER_BOOTSTRAP.md).**
+> The `docs/` folder is the project's handoff: style bible, video format, retention lessons, engine map, workflow, episode history.
+
 A vertical (9:16, 1080×1920, 30 fps) Three.js "What If?" cinematic built for TikTok / Shorts / Reels.
 Everything is procedural, so there are no models, images or sound files to download.
 
@@ -187,6 +190,11 @@ js/audio/audioEngine.js    offline-rendered, sample-synced soundtrack engine + S
 js/ui/storyHud.js          reusable HUD: title, stacked lines, captions, info block, end line
 js/ui/devControls.js       playback / scrub / debug / recording mode
 tools/render-preview.cjs   frame-exact MP4 renderer (--page picks the film)
+tools/stills.cjs           single frames for look-dev / review       tools/contact-sheet.sh  tile stills into one sheet
+tools/render-parallel.sh   final render with N resumable workers      tools/render-frames.cjs one worker
+tools/render-wav.cjs       the soundtrack as a WAV                    tools/encode-final.sh   one MP4 under a size budget
+tools/check-page.cjs       boot + sound check                         tools/bake-soundtrack.cjs  bake the sound into the film
+tools/new-episode.sh       start a new episode from templates/episode/
 ```
 
 Film: *How did kids have fun before screens?* (`before-screens.html`):

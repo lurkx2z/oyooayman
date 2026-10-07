@@ -118,7 +118,7 @@ Then **fix the top issues**, re-preview, optionally re-review (Slip went 5 / 5.5
 round in PLAN.md § Review log: scores as given, what changed. Report scores to the owner honestly, including "not
 re-scored after the last fixes".
 
-### 6.1 Review brief template (from `sl_review_brief.md`)
+### 6.1 Review brief template (the one used for Slip)
 
 ```
 # Review brief — "<title>" (<length> s vertical short, 9:16)
