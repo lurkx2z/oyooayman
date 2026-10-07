@@ -125,3 +125,22 @@ comedy 5 / 10. What they found and what changed:
 - *The punchline is small and late; the note steps on it; bad line breaks* → a recap of the chain on black, the card,
   the punchline 1.2 s later and larger, the note 1.2 s after that; "SLIPPED ON / WET SIDEWALK".
 - *Captions too small, too close to the right-hand buttons* → larger, on a 70 % box, kept inside the safe zone.
+
+**Round 2** (the same reviewers on the 57 s v2 preview): visual 6.5 / 10 (from 5.5), retention and comedy 6.5 / 10
+(from 5). What they still found and what changed for v3:
+- *The globe barely turns (the camera followed the city); the arrow is a hairline off the edge; the swell has no
+  direction; a seam tears the clouds* → a still camera with the planet turning under it, a bold amber arrow drawn on the
+  globe, the swell converging on the city's coast, and the shared Earth's storm spirals now fade to nothing at their edge
+  (they used to stop at a fixed radius, which tore the cloud layer along a circle).
+- *The telephoto's first numbers climb over grey haze* → far less fog on the wave in that shot, a slow push-in, the two
+  people on the mud in front of it turning to run.
+- *The recap reads like end credits* → centred, white, each line a little larger, ending on a large WAVE · 146 M.
+- *The YOU pin sits under the app's icons; the depth label is tiny* → framed lower, a dashed depth line from you to the
+  locked patch with a boxed ≈ 10 KM DOWN; the patch pulses; half a second of the stress hold cut.
+- *The 1.4 mm move is still subtle* → the bracket is thicker, brighter, and grows with the move, in time with the click.
+- *The crest is a flat paper cutout; base foam is a row of identical discs; confetti debris; a dead teal frame* → two-tone
+  whitewater (lit tops, grey undersides), haze over the crest, a smoother crest line, clustered foam of varied sizes,
+  larger debris near the middle, the last look-back tilted up, the burst up the sea wall in view.
+- *Details* → title on the first frame, shelves of goods behind the shop window, glinting blue-grey glass, visible rain,
+  skin-tone fingernails, quiet stretches a little louder.
+
