@@ -1,6 +1,6 @@
 /* =====================================================================
    KITCHEN — the opening set: an ordinary kitchen counter under a north window, a sink, the tap, a brimming
-   glass, beads of water, a pothos with beaded leaves, a bowl of water, a paperclip, a paper towel, a sponge.
+   glass, beads of water, a pothos with beaded leaves, a bowl of water, a paperclip, a sealed bottle of sparkling water.
    The back wall's inner face is at z = 0.2 (the garden is outside it, z < 0). Counter top at y = 0.92.
    Every moving thing is a pure function of time; the water reads nstSigma / nstGone (script.js).
    ===================================================================== */
@@ -15,7 +15,16 @@ const NST_K = {
   sink: { x0: 0.0, x1: 0.62, z0: 0.33, z1: 0.75, depth: 0.2 },
   tap: { x: 0.31, z: 0.27, spout: [0.31, 1.205, 0.5], lever: [0.37, 1.02, 0.27] },
   roll: { x: -1.38, z: 0.4 },
+  soda: { x: -0.4, z: 0.63, fill: 0.186, after: 0.056, neck: 0.212 },   // a 0.5 L bottle; water level (m above the counter) before / after
 };
+
+// the outer radius of the sparkling-water bottle at height y above the counter (body, rounded shoulder, neck)
+function nstBottleR(y) {
+  if (y < 0.004) return 0.0295 + 0.003 * Math.sqrt(Math.max(0, y) / 0.004);
+  if (y < 0.142) return 0.0325;
+  if (y < 0.192) { const k = (y - 0.142) / 0.05; return 0.0325 - 0.0198 * (0.5 - 0.5 * Math.cos(k * Math.PI)); }
+  return 0.0127;
+}
 
 // a hand-shaped "Gem" paperclip path (metres, in its own XZ plane), scaled up 1.25× so it reads on a phone
 function nstClipCurve() {
@@ -197,8 +206,7 @@ class NstKitchen {
     this._beads();
     this._plant();
     this._bowl();
-    this._towel();
-    this._sponge();
+    this._soda();
 
     // ---------- light: soft north window light (cool), a warm room fill, sky ambience
     const key = new THREE.DirectionalLight('#e8eef2', 2.6);
@@ -366,46 +374,95 @@ class NstKitchen {
     this.clip.castShadow = true; g.add(this.clip);
   }
 
-  // the paper towel strip held by its top corner, dipped into the bowl
-  _towel() {
-    const cv = Tex.canvas(128, 256), c = cv.getContext('2d');
-    c.fillStyle = '#f4f1ea'; c.fillRect(0, 0, 128, 256);
-    for (let y = 0; y < 256; y += 8) for (let x = 0; x < 128; x += 8) { c.fillStyle = `rgba(200,195,185,${0.25 + 0.2 * ((x + y) % 16 ? 1 : 0)})`; c.beginPath(); c.arc(x + 4, y + 4, 2, 0, 6.28); c.fill(); }
-    const tex = Tex.tex(cv);
-    const m = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, side: THREE.DoubleSide, name: 'nstTowel' });
-    m.userData.wet = { value: 0 };
-    m.onBeforeCompile = (sh) => {
-      sh.uniforms.uWetY = m.userData.wet;
-      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vUvT;').replace('#include <uv_vertex>', '#include <uv_vertex>\nvUvT = uv;');
-      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 vUvT; uniform float uWetY;')
-        .replace('#include <color_fragment>', `#include <color_fragment>
-          float edge = uWetY + 0.012 * sin(vUvT.x * 40.0) ;
-          float wet = 1.0 - smoothstep(edge - 0.01, edge + 0.01, vUvT.y);
-          diffuseColor.rgb *= mix(1.0, 0.62, wet);
-          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.92, 0.97, 1.02), wet);`);
+  // ---------------------------------------------------------------- a sealed bottle of sparkling water
+  // Sealed, it is clear: the gas stays dissolved because the gas above it is at the same high pressure. Opened, the
+  // pressure drops and the whole bottle is suddenly over-full of gas. A new bubble normally has to push against surface
+  // tension to get started (so fizz only starts at a few scratches); with none, bubbles start everywhere at once: it goes
+  // white and the gas throws most of the water out. Nothing is left as foam (foam needs surface tension): a wet counter.
+  _soda() {
+    const g = this.root, top = NST_K.top, D = NST_K.soda;
+    const b = new THREE.Group(); b.position.set(D.x, top, D.z); g.add(b); this.bottle = b;
+    const lathe = (inset, y0, y1, n = 48) => { const pts = []; for (let i = 0; i <= n; i++) { const y = MathX.lerp(y0, y1, i / n); pts.push(new THREE.Vector2(Math.max(0.0005, nstBottleR(y) - inset), y)); } return new THREE.LatheGeometry(pts, 44); };
+    // the glass (one thin shell, both faces; a disc for the base)
+    const gm = nstWaterMat({ color: '#d9ecee', opacity: 0.05, fres: 0.62, rough: 0.03, env: 0.9, side: THREE.DoubleSide, name: 'nstBottleGlass' });
+    const shell = new THREE.Mesh(lathe(0, 0, D.neck), gm); shell.renderOrder = 5; b.add(shell);
+    const base = new THREE.Mesh(new THREE.CircleGeometry(0.0296, 40), gm); base.rotation.x = -Math.PI / 2; base.position.y = 0.0015; base.renderOrder = 5; b.add(base);
+    const lip = new THREE.Mesh(new THREE.TorusGeometry(0.0134, 0.0013, 6, 32), gm); lip.rotation.x = Math.PI / 2; lip.position.y = D.neck - 0.0015; lip.renderOrder = 5; b.add(lip);
+    // the water inside (cut at its level in the shader) and its flat top
+    const level = { value: D.fill }; this.sodaLevel = level;
+    const cut = (m, key) => {
+      const ob = m.onBeforeCompile;
+      m.onBeforeCompile = (sh) => {
+        if (ob) ob(sh);
+        sh.uniforms.uLevel = level;
+        sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying float vLy;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvLy = position.y;');
+        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vLy; uniform float uLevel;').replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\nif (vLy > uLevel) discard;');
+      };
+      m.customProgramCacheKey = () => key;
+      return m;
     };
-    m.customProgramCacheKey = () => 'nstTowel';
-    this.towelMat = m;
-    const geo = new THREE.PlaneGeometry(0.06, 0.21, 4, 12);
-    geo.translate(0, -0.105, 0);                                  // the origin is the top edge (where the fingers hold it)
-    const p = geo.attributes.position;
-    for (let i = 0; i < p.count; i++) { const y = p.getY(i), x = p.getX(i); p.setZ(i, 0.003 * Math.sin(y * 60 + x * 30) + 0.004 * (x / 0.03) * (x / 0.03)); }
-    geo.computeVertexNormals();
-    this.towel = new THREE.Mesh(geo, m); this.towel.castShadow = true; this.root.add(this.towel);
-  }
-
-  _sponge() {
-    const cv = Tex.canvas(128, 64), c = cv.getContext('2d');
-    c.fillStyle = '#d9b43c'; c.fillRect(0, 0, 128, 64);
-    for (let i = 0; i < 700; i++) { c.fillStyle = `rgba(120,90,20,${0.15 + 0.3 * hash1(i)})`; c.beginPath(); c.arc(hash1(i * 3) * 128, hash1(i * 7) * 64, 0.6 + hash1(i * 11) * 1.6, 0, 6.28); c.fill(); }
-    const m = new THREE.MeshStandardMaterial({ map: Tex.tex(cv), roughness: 0.9, name: 'nstSponge' });
-    this.spongeMat = m;
-    const sp = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.RoundedBoxGeometry(0.11, 0.032, 0.072, 2, 0.006), m); body.castShadow = true; sp.add(body);
-    const scrub = new THREE.Mesh(new THREE.RoundedBoxGeometry(0.11, 0.009, 0.072, 2, 0.003), this.std('#2f6a3c', { roughness: 0.95 })); scrub.position.y = 0.0205; sp.add(scrub);
-    this.root.add(sp); this.sponge = sp;
-    const sm = nstWaterMat({ color: '#8fa9b0', opacity: 0.34, fres: 0.75 });
-    this.spongeStreams = [[-0.036, 0.008, 12], [0.0, -0.01, 13], [0.034, 0.012, 14], [-0.012, 0.02, 15], [0.02, -0.022, 16]].map(([dx, dz, sd]) => ({ dx, dz, s: new NstStream(this.root, sm, { a: new THREE.Vector3(0, 1, 0), v0: new THREE.Vector3(dx * 1.5, -0.15, dz * 1.5), r0: 0.0085, yEnd: 0.75, seed: sd, spread: 0.6 }) }));
+    const lm = cut(nstWaterMat({ color: '#9fc0c6', opacity: 0.1, fres: 0.32, env: 0.7 }), 'nstSodaLiquid');
+    const liq = new THREE.Mesh(lathe(0.0011, 0.003, 0.205), lm); liq.renderOrder = 3; b.add(liq);
+    this.sodaTop = new THREE.Mesh(new THREE.CircleGeometry(1, 40), nstWaterMat({ color: '#b9d2d6', opacity: 0.16, fres: 0.6, env: 1.0 }));
+    this.sodaTop.rotation.x = -Math.PI / 2; this.sodaTop.renderOrder = 4; b.add(this.sodaTop);
+    // the white-out: the whole body of water fills with gas at once (a milky, churning cloud), then clears from the
+    // bottom up as the gas rises out, leaving thin ragged threads of gas (no round bubbles: nothing makes them round)
+    this.milkU = { uMilk: { value: 0 }, uFront: { value: 0 }, uTop: { value: D.fill }, uT: { value: 0 }, uStreak: { value: 0 } };
+    const mm = new THREE.ShaderMaterial({
+      uniforms: this.milkU, transparent: true, depthWrite: false,
+      vertexShader: /* glsl */`
+        varying vec3 vP; varying vec3 vN; varying vec3 vV;
+        void main(){ vP = position; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = -mv.xyz; gl_Position = projectionMatrix * mv; }`,
+      fragmentShader: /* glsl */`
+        uniform float uMilk, uFront, uTop, uT, uStreak;
+        varying vec3 vP; varying vec3 vN; varying vec3 vV;
+        float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h1(i), h1(i + vec2(1, 0)), f.x), mix(h1(i + vec2(0, 1)), h1(i + vec2(1, 1)), f.x), f.y); }
+        void main(){
+          if (vP.y > uTop) discard;
+          float an = atan(vP.z, vP.x);
+          vec2 q = vec2(an * 5.0, vP.y * 80.0 - uT * 6.0);
+          float n = 0.55 * n2(q) + 0.3 * n2(q * 2.3 + 4.1) + 0.15 * n2(q * 5.1 + 1.7);
+          float body = uMilk * smoothstep(uFront - 0.014, uFront + 0.014, vP.y);
+          float st = uStreak * smoothstep(0.66, 0.86, n2(vec2(an * 7.0 + 0.6 * n2(vec2(an * 3.0, vP.y * 30.0)), vP.y * 9.0 - uT * 5.0)));
+          float a = clamp(body * (0.7 + 0.45 * n) + st * 0.42, 0.0, 0.96);
+          if (a < 0.004) discard;
+          float fr = abs(dot(normalize(vN), normalize(vV)));
+          vec3 col = mix(vec3(0.7, 0.75, 0.78), vec3(0.98, 0.99, 1.0), n) * (0.8 + 0.2 * fr);
+          gl_FragColor = vec4(col, a * (0.72 + 0.28 * fr));
+        }`,
+    });
+    const milk = new THREE.Mesh(lathe(0.0017, 0.004, 0.205), mm); milk.renderOrder = 4; b.add(milk); this.milk = milk;
+    // a wet film on the outside once the water has poured down it
+    this.sodaWetMat = nstWaterMat({ color: '#a8c4c9', opacity: 0, fres: 0.5, env: 1.0 });
+    const wet = new THREE.Mesh(lathe(-0.0007, 0.002, D.neck - 0.004), this.sodaWetMat); wet.renderOrder = 6; b.add(wet); this.sodaWet = wet;
+    // a plain blue label (no brand)
+    const cv = Tex.canvas(512, 96), c = cv.getContext('2d');
+    c.fillStyle = '#1f5fae'; c.fillRect(0, 0, 512, 96);
+    c.fillStyle = '#e8f1fb'; c.fillRect(0, 14, 512, 3); c.fillRect(0, 79, 512, 3);
+    c.font = 'bold 30px Georgia, serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    for (const x of [128, 384]) { c.fillText('SPARKLING', x, 42); c.font = '15px Georgia, serif'; c.fillText('NATURAL MINERAL WATER', x, 64); c.font = 'bold 30px Georgia, serif'; }
+    const lt = Tex.tex(cv);
+    const lab = new THREE.Mesh(new THREE.CylinderGeometry(0.0331, 0.0331, 0.054, 48, 1, true), new THREE.MeshStandardMaterial({ map: lt, roughness: 0.35, name: 'nstLabel' }));
+    lab.position.y = 0.116; lab.rotation.y = Math.PI / 2; b.add(lab);
+    this.sodaLabel = lab;
+    // the cap (ridged) and the tamper ring that stays on the neck
+    const capM = new THREE.MeshStandardMaterial({ color: '#2a63c4', roughness: 0.4, flatShading: true, name: 'nstCap' });
+    const cap = new THREE.Group(); g.add(cap); this.cap = cap;
+    const cm = new THREE.Mesh(new THREE.CylinderGeometry(0.0148, 0.0148, 0.018, 30), capM); cm.castShadow = true; cap.add(cm);
+    const ct = new THREE.Mesh(new THREE.CircleGeometry(0.0146, 30), new THREE.MeshStandardMaterial({ color: '#3a76d6', roughness: 0.35 })); ct.rotation.x = -Math.PI / 2; ct.position.y = 0.0091; cap.add(ct);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.0146, 0.0146, 0.004, 30, 1, true), capM); ring.position.y = D.neck - 0.006; b.add(ring);
+    // the eruption: a white column out of the neck that frays as it rises and rains back down, spray, torn shreds
+    const jm = nstWaterMat({ color: '#f4f7f8', opacity: 0.86, fres: 0.4, env: 0.3, rough: 0.5 });
+    this.jets = [[0.0, 3.3, 0.0, 0.011], [0.13, 3.05, 0.04, 0.0072], [-0.12, 3.1, -0.05, 0.0072], [0.04, 2.7, 0.14, 0.006], [-0.08, 2.85, 0.11, 0.0062], [0.07, 2.95, -0.12, 0.0058]].map(([vx, vy, vz, r0], i) => ({
+      V: new THREE.Vector3(vx, vy, vz), r0,
+      s: new NstStream(g, jm, { a: new THREE.Vector3(D.x, top + D.neck + 0.002, D.z), v0: new THREE.Vector3(vx, vy, vz), r0, yEnd: top + D.neck + 0.2, ns: 72, nrad: 10, seed: 80 + i * 7, spread: 0.9 }),     // (each arc ends in mid-air on its way down: what falls back is spray and shreds)
+    }));
+    this.sodaSpray = new NstSpray(this.scene, 900);
+    this.shreds = new StreakSystem(this.scene, 520);
+    // what lands: a spreading wet patch on the counter (water only: no foam stays behind)
+    this.sodaSpill = new NstPuddle(g, nstWaterMat({ color: '#56717a', opacity: 0.26, fres: 0.45, rough: 0.02, env: 1.2 }), { na: 64, nr: 7, seed: 17 });
+    this.sodaSpill.group.position.set(D.x, top + 0.00035, D.z);
   }
 
   // ---------------------------------------------------------------- per-frame
@@ -421,17 +478,17 @@ class NstKitchen {
     const glide = 0.006 * Math.sin(u * 9) * Math.exp(-u * 1.6) * (depth < B.water - 0.0076 ? 1 : 0);
     return out.set(B.x + 0.012 + 0.01 * Math.min(1, u * 2.5) + glide, ys + 0.004 - depth - 0.004 * Math.min(1, u * 10), B.z + 0.004 - 0.022 * Math.min(1, u * 2.5));
   }
-  towelTop(t, out) {
-    const B = NST_K.bowl, top = NST_K.top, T = NST;
-    const k = Ease.inOutSine(MathX.clamp((t - T.towel) / (T.towelIn - T.towel), 0, 1));
-    return out.set(B.x - 0.01, MathX.lerp(top + B.water + 0.27, top + B.water + 0.21 - 0.035, k), B.z - 0.005);
+  // the cap: twisted a quarter turn (the seal cracks), then blown up off the neck and carried away by the hand
+  capTwist(t) { return 1.5 * Ease.inOutSine(MathX.clamp((t - (NST.sodaOpen - 0.8)) / 0.72, 0, 1)); }
+  capPos(t, out) {
+    const D = NST_K.soda, top = NST_K.top, u = t - NST.sodaOpen;
+    if (u <= 0) return out.set(D.x, top + D.neck + 0.006 + 0.0012 * MathX.smooth(t, NST.sodaOpen - 0.3, NST.sodaOpen), D.z);
+    const up = 0.045 * MathX.smooth(u, 0, 0.07) + 0.3 * MathX.smooth(u, 0.06, 0.75), side = 0.24 * MathX.smooth(u, 0.08, 0.8);
+    return out.set(D.x + side, top + D.neck + 0.0072 + up, D.z + 0.06 * MathX.smooth(u, 0.1, 0.8));
   }
-  spongePos(t, out) {
-    const S = NST_K.sink, top = NST_K.top, T = NST;
-    const x = 0.24, z = 0.58, y0 = top - S.depth + 0.022;
-    const k = Ease.inOutSine(MathX.clamp((t - T.spongeUp) / 0.9, 0, 1));
-    return out.set(x + 0.02 * k, MathX.lerp(y0, top + 0.08, k), z - 0.03 * k);
-  }
+  // the strength of the gas rushing out (0 → 1 → 0) and the water level
+  sodaGas(t) { const T = NST; return MathX.smooth(t, T.sodaOpen - 0.12, T.sodaOpen + 0.04) * (1 - 0.45 * MathX.smooth(t, T.sodaOpen + 0.9, T.sodaOpen + 1.8)) * (1 - MathX.smooth(t, T.sodaOpen + 1.6, T.sodaOpen + 3.6)); }
+  sodaLevelAt(t) { const D = NST_K.soda, u = t - NST.sodaOpen; return u <= 0 ? D.fill : MathX.lerp(D.fill, D.after, 1 - Math.exp(-u / 0.8) * (1 + u / 0.8)); }
 
   // the frayed stream: shreds peel off its lower half; where it hits the basin it throws up a fine, slow mist
   _tapMist(t, on, level) {
@@ -498,50 +555,96 @@ class NstKitchen {
 
     // the tap: the lever lifts a little, a trickle starts; it never pinches into drops
     const on = MathX.smooth(t, T.tapOn, T.tapOn + 0.35) * (1 - MathX.smooth(t, T.clip - 0.05, T.clip));
-    this.lever.rotation.z = -0.3 * on;                 // barely open: a trickle
-    this.stream.update(t, on, gone);
+    const more = MathX.smooth(t, T.tapMore, T.tapMore + 0.7);      // … then opened further: a wide, twisting, fraying veil
+    this.lever.rotation.z = -(0.3 + 0.5 * more) * on;
+    this.stream.spread = 1 + 0.6 * more; this.stream.frayLen = 0.17 - 0.04 * more;
+    this.stream.update(t, on * (1 + 0.75 * more), gone);
     const level = top - NST_K.sink.depth + 0.012 + 0.07 * MathX.clamp((Math.min(t, T.clip) - T.tapOn) / 12, 0, 1);
     this.basinW.position.y = level;
     this.stream.yEnd = level;
-    this._tapMist(t, on, level);
+    this._tapMist(t, on * (1 + 0.2 * more), level);
 
     // the paperclip: in your fingers, set on the water, straight through, onto the bottom
     this.clipPos(t, this.v);
     this.clip.position.copy(this.v);
     const u = Math.max(0, t - T.clipLet);
     this.clip.rotation.set(0.9 * (1 - Math.exp(-u * 5)) * Math.sin(u * 6) * Math.exp(-u * 1.5) + (u > 0.5 ? 0.04 : 0), 0.4 + 0.5 * Math.min(1, u * 2), 0.6 * Math.min(1, u * 3) * Math.exp(-u * 2.5));
-    this.clip.visible = t > T.clip - 0.1 && t < T.sponge;
-    const ga = 0.3 * MathX.smooth(t, T.clipLet + 0.25, T.clipLet + 0.7) * (1 - MathX.smooth(t, T.towel - 0.4, T.towel));
+    this.clip.visible = t > T.clip - 0.1;
+    const ga = 0.3 * MathX.smooth(t, T.clipLet + 0.25, T.clipLet + 0.7) * (1 - MathX.smooth(t, T.soda - 0.4, T.soda));
     this.clipGhost.visible = ga > 0.003; this.clipGhost.material.opacity = ga;
     if (ga > 0.003) { const B = NST_K.bowl; this.clipGhost.position.set(B.x + 0.012, top + B.water + 0.0012, B.z + 0.004); this.clipGhost.rotation.set(0, 0.4, 0); }
     const ru = t - T.clipLet;
     if (ru > 0 && ru < 1.4) { const s = 0.006 + ru * 0.07; this.ring.scale.set(s, s, 1); this.ring.material.opacity = 0.55 * (1 - ru / 1.4) * MathX.smooth(ru, 0, 0.05); this.ring.visible = s < this.bowlWaterR; }
     else this.ring.visible = false;
 
-    // the towel strip: lowered into the bowl; only what is under water gets wet (+ a thin film creeping a few mm)
-    this.towelTop(t, this.v);
-    this.towel.position.copy(this.v);
-    this.towel.rotation.set(0.05, 0.25, 0.04 * Math.sin(t * 1.3));
-    this.towel.visible = t > T.towel - 0.25 && t < T.sponge;
-    const surfY = top + NST_K.bowl.water, bottomY = this.v.y - 0.21;
-    const sub = Math.max(0, surfY - bottomY) / 0.21;
-    const creep = 0.004 * MathX.clamp((t - T.towelIn) / 3, 0, 1) / 0.21;
-    this.towelMat.userData.wet.value = sub > 0 ? sub + creep : 0;
+    this._sodaUpdate(t);
+  }
 
-    // the sponge: soaked on the bottom of the sink, lifted; every drop pours straight out of it
-    this.spongePos(t, this.v);
-    this.sponge.position.copy(this.v);
-    this.sponge.rotation.set(0, 0.35, 0.05 * MathX.smooth(t, T.spongeUp, T.spongeUp + 0.9));
-    const lift = t - T.spongeUp;
-    const drain = lift > 0.1 ? MathX.smooth(lift, 0.1, 0.22) * Math.exp(-Math.max(0, lift - 0.25) / 1.5) : 0;
-    this.spongeMat.color.setScalar(MathX.lerp(0.62, 1.0, MathX.smooth(lift, 0.3, 1.6)));
-    const cy = Math.cos(0.35), sy = Math.sin(0.35);
-    for (const { dx, dz, s } of this.spongeStreams) {
-      s.a.set(this.v.x + dx * cy + dz * sy, this.v.y - 0.017, this.v.z - dx * sy + dz * cy);
-      s.yEnd = level;
-      const dy = s.a.y - level, vy = s.v0.y;
-      s.T = (vy + Math.sqrt(vy * vy + 2 * 9.81 * Math.max(dy, 0.005))) / 9.81;
-      s.update(t, lift > 0.1 ? Math.max(drain, 0.22 * Math.exp(-(lift - 0.15) / 2.5)) : 0, 1);
+  _sodaUpdate(t) {
+    const T = NST, D = NST_K.soda, top = NST_K.top, u = t - T.sodaOpen, gas = this.sodaGas(t);
+    const show = t > T.soda - 0.5 && t < T.pond;
+    this.bottle.visible = show; this.cap.visible = show; this.sodaSpill.mesh.visible = show && u > 0.25;
+    const sp = this.sodaSpray, sh = this.shreds;
+    sp.begin(this.scene.fog); sh.begin();
+    if (!show) { for (const j of this.jets) j.s.update(t, 0, 1); sp.end(); sh.end(); return; }
+    // the cap
+    this.capPos(t, this.v); this.cap.position.copy(this.v);
+    this.cap.rotation.set(u > 0 ? 0.9 * MathX.smooth(u, 0.02, 0.5) : 0, this.capTwist(t), u > 0 ? -0.5 * MathX.smooth(u, 0.05, 0.6) : 0);
+    // the water level, the white-out and its clearing
+    const lev = this.sodaLevelAt(t);
+    this.sodaLevel.value = lev;
+    const milk = MathX.smooth(t, T.sodaOpen - 0.12, T.sodaOpen + 0.03);
+    const M = this.milkU;
+    M.uMilk.value = milk; M.uT.value = t;
+    M.uTop.value = MathX.lerp(lev, 0.205, MathX.smooth(gas, 0.15, 0.6));                 // the gassy mix fills the bottle to the neck while it erupts
+    M.uFront.value = u > 0 ? MathX.lerp(-0.02, lev + 0.02, MathX.smooth(u, 1.2, 3.4)) : -0.02;   // the gas leaves from the bottom up
+    M.uStreak.value = u > 0 ? MathX.smooth(u, 1.8, 2.8) * (1 - MathX.smooth(u, 4.0, 5.4)) : 0;
+    this.milk.visible = milk > 0.001;
+    this.sodaTop.visible = M.uMilk.value * (1 - MathX.smooth(u, 2.0, 3.0)) < 0.5 || u < -0.1;
+    const rt = nstBottleR(lev) - 0.0011; this.sodaTop.scale.set(rt, rt, 1); this.sodaTop.position.y = lev;
+    // a jolt in the hand as it goes
+    this.bottle.position.set(D.x + 0.0015 * Math.sin(u * 70) * MathX.impulse(t, T.sodaOpen, 0.35), top, D.z);
+    this.sodaWetMat.opacity = 0.035 * MathX.smooth(u, 0.15, 0.8);
+    // the jets: their fronts climb out of the neck at their launch speed; then the gas runs out and the fountain sinks
+    const neck = this.v2.set(D.x, top + D.neck + 0.002, D.z);
+    for (const j of this.jets) {
+      const s = j.s;
+      if (u <= 0 || gas < 0.01) { s.update(t, 0, 1); continue; }
+      const k = 0.35 + 0.65 * gas;                                   // launch speed falls with the gas pressure
+      s.v0.copy(j.V).multiplyScalar(k); s.a.copy(neck);
+      const vy = s.v0.y, Tf = (vy + Math.sqrt(vy * vy + 2 * 9.81 * (s.a.y - s.yEnd))) / 9.81;
+      s.T = Math.min(Tf, u, 0.86 * vy / 9.81);                  // drawn only on the way up: at the top it is all spray
+      s.r0 = j.r0 * (0.55 + 0.45 * gas);
+      s.update(t, 1, 1);
     }
+    // spray: a dense white plume torn off the jets (no round drops: soft mist and ragged shreds)
+    const tOpen = T.sodaOpen;
+    sp.emit(t, 620, 0.8, tOpen, tOpen + 3.2, (i, cyc, h) => {
+      const born = tOpen + hash1(i * 13.7 + 3) * 0.8 + cyc * 0.8, g0 = this.sodaGas(born);
+      const a = hash1(i * 5.1 + cyc) * 6.283, sv = 0.12 + 0.55 * hash1(i * 2.3 + cyc * 1.1), up = (1.2 + 2.4 * h) * (0.35 + 0.65 * g0);
+      return { p: [neck.x, neck.y, neck.z], v: [Math.cos(a) * sv, up, Math.sin(a) * sv], life: 0.55 + 0.4 * hash1(i * 3.3 + cyc), size0: 0.005, size1: 0.018 + 0.014 * h, a: 0.12 * g0, g: 7.5, floor: top + 0.002 };
+    }, 1.0, [0.95, 0.97, 0.98]);
+    // and a hiss of fine spray off the column at the moment it goes
+    sp.emit(t, 200, 0.5, tOpen - 0.02, tOpen + 0.9, (i, cyc, h) => {
+      const a = hash1(i * 7.7 + cyc) * 6.283, sv = 0.4 + 0.9 * h;
+      return { p: [neck.x, neck.y + 0.01, neck.z], v: [Math.cos(a) * sv, 0.6 + 1.2 * hash1(i * 1.9 + cyc), Math.sin(a) * sv], life: 0.45, size0: 0.012, size1: 0.045, a: 0.07 * this.sodaGas(t), g: 2.0 };
+    }, 1.0, [0.93, 0.95, 0.96]);
+    sp.end();
+    // torn shreds of water flung out of the column (drawn as short motion streaks)
+    if (u > 0) for (let i = 0; i < 520; i++) {
+      const born = tOpen + 2.4 * Math.pow(hash1(i * 3.71 + 2), 1.6), age = t - born;
+      if (age < 0 || age > 1.2) continue;
+      const g0 = this.sodaGas(born); if (g0 < 0.05) continue;
+      const a = hash1(i * 9.13) * 6.283, sv = (0.15 + 0.75 * hash1(i * 4.7)) * (0.5 + 0.5 * g0), vy = (1.0 + 2.6 * hash1(i * 2.9)) * (0.35 + 0.65 * g0);
+      const h0 = 0.02 + 0.25 * hash1(i * 6.1) * g0;
+      const px = (tt) => neck.x + Math.cos(a) * sv * tt, py = (tt) => neck.y + h0 + vy * tt - 4.9 * tt * tt, pz = (tt) => neck.z + Math.sin(a) * sv * tt;
+      const y1 = py(age); if (y1 < top + 0.002) continue;
+      const t0 = Math.max(0, age - 0.022);
+      const al = 0.55 * g0 * Math.min(1, age * 12) * (1 - age / 1.2);
+      sh.push(px(t0), py(t0), pz(t0), px(age), y1, pz(age), 0.82, 0.86, 0.88, al, 0.0011 + 0.0012 * hash1(i * 8.3));
+    }
+    sh.end();
+    // the spill spreads out over the counter (it keeps arriving for ~2 s)
+    if (u > 0.25) { const V = 2.2e-4 * MathX.smooth(u, 0.25, 2.4), R = 0.036 + nstSpreadR(V, u - 0.25) * 0.95; this.sodaSpill.set(R, V / (Math.PI * R * R * 0.85), 1, 0.16 * Math.min(1, (u - 0.25) * 2), [1.15, 0.9]); const sm = this.sodaSpill.mesh.material; nstWetLook(sm, 1); sm.userData.fres.value = 0.16; sm.opacity = 0.42; }
   }
 }

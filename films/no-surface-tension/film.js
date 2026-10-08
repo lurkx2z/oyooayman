@@ -1,9 +1,9 @@
 /* =====================================================================
    FILM — "What if water lost all surface tension?" (see js/main.js for the hook order)
      build: the kitchen + the garden in one scene (you walk out the back door), hands, props, HUD, soundtrack
-     update: the active set, your hands (aimed at the lever, the clip, the towel, the sponge, the can, the umbrella),
-             world tags, the payoff's rising camera
-     grade: a bright ordinary morning → the time-lapse → the storm
+     update: the active set, your hands (aimed at the lever, the clip, the bottle and its cap, the can), a world tag,
+             the lens at the waterline (the duck shot), the payoff's dive down to one leaf
+     grade: a bright ordinary morning → the time-lapse → the rain
    ===================================================================== */
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -14,12 +14,14 @@ const NST_HAND_POSES = {
   tapTurn: { p: [0.12, -0.2, -0.42], F: [0, -0.3, -1], N: [-1, 0, 0], curl: [0.75, 0.95, 1.05, 1.1], thumb: [0.35, 0.45], aim: [0.0, 0.07, 0.025] },
   clipHold: { p: [0.08, -0.2, -0.4], F: [0, -0.6, -0.8], N: [0, -0.8, 0.6], curl: [0.55, 0.95, 1.15, 1.25], thumb: [0.25, 0.55], aim: [0.012, 0.085, 0.012] },
   clipOpen: { p: [0.08, -0.2, -0.4], F: [0, -0.6, -0.8], N: [0, -0.8, 0.6], curl: [0.2, 0.45, 0.6, 0.7], thumb: [0.55, 0.2], aim: [0.012, 0.085, 0.012] },
-  towelHold: { p: [0.08, -0.2, -0.4], F: [0, -0.2, -1], N: [-1, 0, 0], curl: [0.65, 1.0, 1.15, 1.25], thumb: [0.2, 0.5], aim: [0.0, 0.08, 0.012] },
-  spongeGrab: { p: [0.08, -0.2, -0.4], F: [0, -0.3, -1], N: [0, -1, 0], curl: [0.75, 0.8, 0.85, 0.9], thumb: [0.3, 0.4], aim: [0.0, 0.065, 0.028] },
+  tapPush: { p: [0.12, -0.2, -0.42], F: [0, -0.3, -1], N: [-1, 0, 0], curl: [0.85, 1.05, 1.15, 1.2], thumb: [0.3, 0.5], aim: [0.0, 0.07, 0.025] },
+  capHold: { p: [0.06, -0.15, -0.35], F: [0, -0.5, -0.8], N: [0, -1, 0], curl: [0.95, 1.05, 1.1, 1.15], thumb: [0.5, 0.6], aim: [0.004, 0.068, 0.03] },
+  capTwist: { p: [0.06, -0.15, -0.35], F: [0, -0.5, -0.8], N: [0, -1, 0], curl: [1.05, 1.15, 1.2, 1.25], thumb: [0.45, 0.7], aim: [0.004, 0.068, 0.03] },
+  capOff: { p: [0.06, -0.15, -0.35], F: [0, -0.5, -0.8], N: [0, -1, 0], curl: [1.0, 1.1, 1.15, 1.2], thumb: [0.45, 0.65], aim: [0.004, 0.068, 0.03] },
+  bottleHold: { p: [0.1, -0.2, -0.4], F: [0, 0, -1], N: [-1, 0, 0], curl: [1.0, 1.1, 1.15, 1.2], thumb: [0.55, 0.6], aim: [0.0, 0.06, 0.016] },     // (left hand)
   canHold: { p: [0.18, -0.3, -0.42], F: [0, 0, -1], N: [-1, 0, 0], curl: [1.25, 1.3, 1.35, 1.35], thumb: [0.15, 0.75], aim: [0.0, 0.05, 0.03] },
-  umbHold: { p: [0.1, -0.32, -0.32], F: [-1, 0, 0], N: [0, 0, 1], curl: [1.3, 1.35, 1.4, 1.4], thumb: [0.12, 0.8], aim: [0.0, 0.05, 0.028] },
 };
-const NST_HAND_BLEND = { tapReach: 0.4, tapTurn: 0.25, clipHold: 0.4, clipOpen: 0.12, towelHold: 0.35, spongeGrab: 0.25, canHold: 0.35, umbHold: 0.4, hidden: 0.4 };
+const NST_HAND_BLEND = { tapReach: 0.4, tapTurn: 0.25, tapPush: 0.35, clipHold: 0.4, clipOpen: 0.12, capHold: 0.3, capTwist: 0.4, capOff: 0.1, bottleHold: 0.3, canHold: 0.35, hidden: 0.4 };
 for (const k of Object.keys(NST_HAND_POSES)) { NST_HAND_POSES[k + '!'] = NST_HAND_POSES[k]; NST_HAND_BLEND[k + '!'] = 0.02; }
 NST_HAND_POSES['hidden!'] = HAND_POSES.hidden; NST_HAND_BLEND['hidden!'] = 0.02;
 
@@ -41,10 +43,6 @@ function nstSeg(t) { return t < NST.pond ? 'kitchen' : t < NST.bench ? 'pond' : 
 const NST_TAGS = [
   // the trickle: where ordinary water would have pinched off into drops (a point on the stream, 12 cm below the spout, + 3 cm to screen-right)
   { t0: 6.3, t1: 9.3, at: (t, o) => { const S = NST_K.tap.spout; return o.set(S[0] + 0.454 * 0.012, S[1] - 0.085, S[2] + 0.01 - 0.891 * 0.012); }, text: 'NORMAL WATER<br>WOULD BREAK<br>INTO DROPS HERE', line: true },
-  // the paperclip: where normal water would have held it up (its pale ghost floats there)
-  { t0: 11.5, t1: 14.4, at: (t, o) => o.set(NST_K.bowl.x + 0.012 + 0.022, NST_K.top + NST_K.bowl.water + 0.002, NST_K.bowl.z + 0.004), text: 'NORMAL WATER<br>WOULD HOLD IT<br>UP HERE', line: false },
-  { t0: 16.1, t1: 18.3, at: (t, o) => o.set(NST_K.bowl.x - 0.01 + 0.033, NST_K.top + NST_K.bowl.water + 0.075, NST_K.bowl.z - 0.005), text: 'NORMAL WATER<br>WOULD CLIMB<br>TO HERE', line: true },
-  { t0: 34.5, t1: 37.2, at: (t, o) => o.set(NST_G.potB.x + 0.012, NST_G.bench.top + 0.1, NST_G.potB.z), text: 'DRY ABOVE<br>THE WATER LINE', line: false },
 ];
 
 const FILM = {
@@ -70,7 +68,7 @@ const FILM = {
     this._v = new THREE.Vector3(); this._w = new THREE.Vector3(); this._f = new THREE.Vector3(); this._n = new THREE.Vector3(); this._q = new THREE.Quaternion();
   },
 
-  // the watering can and the umbrella (world props, held by the aimed right hand)
+  // the watering can (held by the aimed right hand) and the waterline lens
   _props(app) {
     const g = new THREE.Group(); app.scene.add(g);
     const green = new THREE.MeshStandardMaterial({ color: '#4f6e5a', roughness: 0.45, metalness: 0.4, name: 'nstCan' });
@@ -83,63 +81,64 @@ const FILM = {
     const handle = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.011, 8, 18, Math.PI * 1.1), green); handle.position.set(-0.05, 0.1, 0); handle.rotation.z = 0.3; g.add(handle);
     this.can = g;
     this.canStream = new NstStream(app.scene, nstWaterMat({ color: '#c8dade', opacity: 0.38, fres: 0.75 }), { a: new THREE.Vector3(), v0: new THREE.Vector3(), r0: 0.006, yEnd: 0, seed: 71 });
-    // the umbrella: 8 gores, dark navy, ribs; its underside soaks through in the rain (shader: wet spreading from the apex)
-    const u = new THREE.Group(); app.scene.add(u);
-    const cm = new THREE.MeshStandardMaterial({ color: '#d9b84e', roughness: 0.6, side: THREE.DoubleSide, name: 'nstUmbrella' });
-    cm.userData.wet = { value: 0 };
-    cm.onBeforeCompile = (sh) => {
-      sh.uniforms.uWet = cm.userData.wet;
-      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vLocU;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvLocU = position;');
-      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vLocU; uniform float uWet;\nfloat nstVn(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f); float a = fract(sin(dot(i, vec2(12.9, 78.2))) * 43758.5), b = fract(sin(dot(i + vec2(1, 0), vec2(12.9, 78.2))) * 43758.5), c = fract(sin(dot(i + vec2(0, 1), vec2(12.9, 78.2))) * 43758.5), d = fract(sin(dot(i + vec2(1, 1), vec2(12.9, 78.2))) * 43758.5); return mix(mix(a, b, f.x), mix(c, d, f.x), f.y); }')
-        .replace('#include <color_fragment>', `#include <color_fragment>
-          float rr = length(vLocU.xz) / 0.52;
-          float an = atan(vLocU.z, vLocU.x);
-          float seam = pow(abs(cos(an * 4.0)), 18.0);
-          float n = fract(sin(dot(floor(vec2(an * 9.0, rr * 14.0)), vec2(12.9, 78.2))) * 43758.5);
-          // soaking through: the fine spray wets the fabric evenly, and where the falling shreds hit it darkens in
-          // ragged streaks that run down the slope of each panel (gravity, not wicking: nothing spreads sideways)
-          float gn = 0.65 * nstVn(vec2(an * 15.0 + 2.0 * nstVn(vec2(an * 5.0, rr * 3.0)), rr * 2.6 - uWet * 0.7)) + 0.35 * nstVn(vec2(an * 37.0, rr * 6.0 - uWet * 1.4));
-          float streak = smoothstep(0.5, 0.82, gn + 0.22 * rr - 0.3 * (1.0 - uWet));
-          float wet = clamp(0.55 * uWet * (0.5 + 0.5 * rr) + 0.45 * streak * smoothstep(0.05, 0.4, uWet), 0.0, 0.9);
-          diffuseColor.rgb *= mix(vec3(1.0), vec3(0.6, 0.5, 0.32), wet);     // soaked: a deeper, more saturated ochre
-          diffuseColor.rgb += seam * 0.03;`)
-        .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-          { // thin fabric glows with the daylight behind it (seen from underneath); soaked patches go dark
-            float rr3 = length(vLocU.xz) / 0.52;
-            float wet3 = wet;          // (declared in the colour chunk above, same scope)
-            totalEmissiveRadiance += diffuseColor.rgb * (0.55 - 0.15 * wet3) * (gl_FrontFacing ? 0.0 : 1.0); }`)
-        .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-          roughnessFactor = mix(roughnessFactor, 0.22, wet);`);
-    };
-    cm.customProgramCacheKey = () => 'nstUmb';
-    const canopy = new THREE.Mesh(new THREE.ConeGeometry(0.55, 0.22, 8, 4, true), cm); canopy.position.y = 0.11; u.add(canopy);
-    const rib = new THREE.MeshStandardMaterial({ color: '#2a2a2c', roughness: 0.4, metalness: 0.6 });
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 + Math.PI / 8, rm = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.6, 4), rib);
-      rm.position.set(Math.cos(a) * 0.27, 0.105, Math.sin(a) * 0.27); rm.rotation.set(0, -a, Math.PI / 2 - 0.38); u.add(rm);
-    }
-    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.95, 8), rib); shaft.position.y = -0.255; u.add(shaft);
-    const hdl = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.12, 10), new THREE.MeshStandardMaterial({ color: '#3a2a20', roughness: 0.5 })); hdl.position.y = -0.68; u.add(hdl);
-    this.umb = u; this.umbMat = cm;
-    this.umbDrip = new StreakSystem(app.scene, 500);       // what soaks through falls off the fabric as fine torn strands
+    // the lens at the waterline (the duck shot): below the line you look into the pond's murky green
+    const pm = new THREE.ShaderMaterial({
+      uniforms: { uH: { value: 0 }, uOn: { value: 0 }, uT: { value: 0 } }, transparent: true, depthTest: false, depthWrite: false,
+      vertexShader: /* glsl */`varying vec2 vS; void main(){ vS = position.xy; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+      fragmentShader: /* glsl */`
+        uniform float uH, uOn, uT; varying vec2 vS;
+        void main(){
+          float d = uH - vS.y;
+          if (d < 0.0 || uOn < 0.001) discard;
+          float k = smoothstep(0.0, 1.15, d);
+          vec3 c = mix(vec3(0.17, 0.31, 0.27), vec3(0.03, 0.075, 0.07), k);
+          float a = mix(0.4, 0.78, k);
+          // daylight coming down through the surface: soft moving bands just under the line
+          float sh = 0.5 + 0.5 * sin(vS.x * 9.0 + uT * 1.3 + sin(vS.x * 3.0 - uT) * 2.0);
+          c += vec3(0.05, 0.08, 0.06) * sh * (1.0 - smoothstep(0.0, 0.5, d));
+          // the waterline on the glass: one thin straight line (water with no surface tension doesn't climb the glass)
+          float line = exp(-d * 190.0);
+          c = mix(c, vec3(0.62, 0.74, 0.72), line * 0.7); a = max(a, line * 0.55);
+          gl_FragColor = vec4(c, a * uOn);
+        }`,
+    });
+    this.port = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), pm); this.port.frustumCulled = false; this.port.renderOrder = 1000; app.scene.add(this.port);
+  },
+
+  // the payoff: from high over the garden straight down to one wilted sunflower leaf, its tip letting the rain go
+  _divePath(app) {
+    const G = app.garden, T = NST, tip = new THREE.Vector3(), base = new THREE.Vector3();
+    G._updateSunflower(T.dive); G.sunflowerTip(tip, base);
+    const d = new THREE.Vector3(tip.x - base.x, 0, tip.z - base.z).normalize(), sd = new THREE.Vector3(-d.z, 0, d.x);
+    const V = (x, y, z) => new THREE.Vector3(x, y, z);
+    // you look past the tip toward the pond (the leaf runs in from the left of frame); the thread falls out of the bottom
+    const P0 = NST_G.pond, v = new THREE.Vector3(P0.x - tip.x, 0, P0.z - tip.z).normalize();
+    const cf = tip.clone().addScaledVector(v, -0.42).add(V(0, 0.2, 0));        // above and behind the leaf: its wet upper face, the tip, the thread, the pond beyond
+    const lf = tip.clone().addScaledVector(v, 0.5).add(V(0, -0.28, 0));
+    const push = cf.clone().lerp(tip, 0.3);
+    const P = [[T.dive, tip.clone().add(V(-3.5, 21, 8))], [T.dive + 1.8, tip.clone().add(V(-2.0, 8.5, 3.4))], [T.dive + 3.5, tip.clone().addScaledVector(v, -1.1).add(V(-0.2, 2.2, 0))], [T.land - 0.6, cf.clone().addScaledVector(v, -0.3).add(V(0, 0.32, 0))], [T.land, cf], [T.end, push]];
+    const L = [[T.dive, V(-1.2, 0, -7.5)], [T.dive + 1.8, V(P0.x, 0, P0.z)], [T.dive + 3.5, tip.clone().addScaledVector(v, 1.2).add(V(0, -0.6, 0))], [T.land - 0.6, tip.clone().add(V(0, -0.06, 0))], [T.land, lf], [T.end, lf.clone().add(V(0, -0.02, 0))]];
+    const tr = (keys) => ['x', 'y', 'z'].map((c) => new SmoothTrack(keys.map(([t, v]) => [t, v[c]])));
+    this._dive = { p: tr(P), l: tr(L), fov: new Track([[T.dive, 62], [T.dive + 2.5, 54], [T.land - 0.8, 44], [T.land, 40], [T.end, 36]]) };
   },
 
   update(app, t) {
     const cam = app.camera, K = app.kitchen, G = app.garden, seg = nstSeg(t), T = NST;
-    // the payoff: a rising camera over the garden, the park and the city in the storm (no body motion)
-    if (t >= T.drone) {
-      const k = Ease.inOutSine(MathX.clamp((t - T.drone) / (T.end - T.drone), 0, 1)), k2 = MathX.smooth(t, T.drone, T.drone + 6);
-      cam.position.set(MathX.lerp(-2.0, -0.6, k), MathX.lerp(2.0, 24, k), MathX.lerp(-1.0, 6.5, k));
-      this._v.set(MathX.lerp(-1.1, -0.8, k2), MathX.lerp(1.2, 0.0, k2), MathX.lerp(-9.0, -100, k));
+    // the payoff: the dive (no body motion)
+    if (t >= T.dive) {
+      if (!this._dive) this._divePath(app);
+      const D = this._dive;
+      cam.position.set(D.p[0].value(t), D.p[1].value(t), D.p[2].value(t));
+      this._v.set(D.l[0].value(t), D.l[1].value(t), D.l[2].value(t));
       cam.up.set(0, 1, 0); cam.lookAt(this._v);
-      cam.fov = MathX.lerp(62, 54, k); cam.updateProjectionMatrix();
+      cam.fov = D.fov.value(t); cam.updateProjectionMatrix();
     }
     cam.updateMatrixWorld(true);
 
     // sets: the kitchen's own window light only while you are inside; the sun's shadow box follows the action
     for (const l of K.lights) l.visible = seg === 'kitchen';
     const F = G.focus, sc = G.sun.shadow.camera;
-    const box = seg === 'pond' ? [-0.6, -5.5, 2.5] : seg === 'bench' ? [2.4, -0.6, 2.6] : seg === 'kitchen' ? [0.3, -2, 4] : [-0.8, -7.5, 15];
+    const box = seg === 'pond' ? [-0.6, -5.5, 2.5] : seg === 'bench' ? [2.4, -0.6, 2.6] : seg === 'kitchen' ? [0.3, -2, 4] : t >= T.duck ? [-1.2, -5.6, 4] : [-0.8, -7.5, 15];
     F.set(box[0], 0, box[1]);
     if (sc.right !== box[2]) { sc.left = -box[2]; sc.right = box[2]; sc.top = box[2]; sc.bottom = -box[2]; sc.updateProjectionMatrix(); }
     G.update(t, cam);
@@ -151,10 +150,10 @@ const FILM = {
 
     // hands: aim the active pose at its contact point
     const V = this._v, Fw = this._f, Nw = this._n;
-    if (t >= T.tap && t < T.tapOn + 1.3) {
+    if (t >= T.tap && t < T.clip) {
       K.lever.updateMatrixWorld(true); V.set(0, 0.088, 0).applyMatrix4(K.lever.matrixWorld);
       Fw.set(-0.85, -0.1, -0.5); Nw.set(0.1, -0.9, -0.3);            // from your right, palm down on the lever
-      for (const n of ['tapReach', 'tapTurn']) nstAimHand(n, cam, V, Fw, Nw);
+      for (const n of ['tapReach', 'tapTurn', 'tapPush']) nstAimHand(n, cam, V, Fw, Nw);
     }
     if (t >= T.clip - 0.5 && t < T.clipLet + 1.0) {
       K.clipPos(Math.min(t, T.clipLet), V); V.x += 0.017; V.y += 0.04; V.z -= 0.007;     // pinching its right-hand end, fingertips above the water
@@ -162,15 +161,16 @@ const FILM = {
       Fw.set(-0.8, -0.55, -0.15); Nw.set(0.05, -0.35, -0.95);       // from the right, side-on: the bowl stays in view
       for (const n of ['clipHold', 'clipOpen']) nstAimHand(n, cam, V, Fw, Nw);
     }
-    if (t >= T.towel - 0.5 && t < T.sponge + 0.2) {
-      K.towelTop(t, V); V.x += 0.02; V.y += 0.004;
-      Fw.set(-0.25, -0.15, -1); Nw.set(-1, 0.05, 0.2);
-      nstAimHand('towelHold', cam, V, Fw, Nw);
-    }
-    if (t >= T.sponge - 0.4 && t < 22.2) {
-      K.spongePos(t, V); V.y += 0.03;
-      Fw.set(-0.2, -0.25, -1); Nw.set(0, -1, 0.1);
-      nstAimHand('spongeGrab', cam, V, Fw, Nw);
+    // the bottle: your right hand twists the cap off (and is thrown up with it), your left holds the bottle and lets go
+    if (t >= T.soda - 0.5 && t < T.pond) {
+      const Y = this._Y || (this._Y = new THREE.Vector3(0, 1, 0)), tw = K.capTwist(t) * 0.8;
+      K.capPos(t, V);
+      Fw.set(-0.35, -0.5, -0.8).applyAxisAngle(Y, tw); Nw.set(-0.1, -0.97, 0.2).applyAxisAngle(Y, tw);
+      for (const n of ['capHold', 'capTwist', 'capOff']) nstAimHand(n, cam, V, Fw, Nw);
+      const S = NST_K.soda, u = t - T.sodaOpen, off = u > 0 ? MathX.smooth(u, 0.12, 0.8) : 0;
+      V.set(S.x - 0.034 - 0.14 * off, NST_K.top + 0.08 - 0.06 * off, S.z + 0.008 + 0.06 * off);
+      Fw.set(0.55, 0.12, -0.83); Nw.set(0.95, 0.0, -0.3);
+      nstAimHand('bottleHold', cam, V, Fw, Nw, -1);
     }
     // the watering can: held in front of you, tilted to pour into pot A, then levelled
     const showCan = t >= T.bench && t < T.wick;
@@ -198,37 +198,10 @@ const FILM = {
       this.canStream.update(t, flow, 1);
     } else this.canStream.update(t, 0, 1);
 
-    // the umbrella: held over your head from when the clouds come; its underside soaks; spray falls through onto you
-    const showU = t >= T.clouds + 0.6 && t < T.drone;
-    this.umb.visible = showU;
-    this.umbDrip.begin();
-    if (showU) {
-      const c = cam.position, yaw = MathX.deg(SCRIPT_TRACKS.pov ? 0 : 0);
-      const hx = Math.sin(0) * 0, fwx = -Math.sin(cam.rotation.y), fwz = -Math.cos(cam.rotation.y);
-      const rx = -fwz, rz = fwx;                                   // your right, on the ground plane
-      this.umb.position.set(c.x + rx * 0.08 + fwx * 0.05, c.y + 0.33, c.z + rz * 0.08 + fwz * 0.05);
-      this.umb.rotation.set(0.05 * Math.sin(t * 0.9), 0, -0.1 + 0.03 * Math.sin(t * 0.7));
-      this.umb.updateMatrixWorld(true);
-      V.set(0, -0.6, 0).applyMatrix4(this.umb.matrixWorld);
-      Fw.set(-1, 0, 0.2); Nw.set(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cam.rotation.y); Fw.set(-1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cam.rotation.y);
-      nstAimHand('umbHold', cam, V, Fw, Nw);
-      const wet = MathX.smooth(t, T.umb + 0.4, T.umb + 4.0);
-      this.umbMat.userData.wet.value = wet;
-      // water that soaks through can't hang as drops under the fabric: it falls straight off as fine torn strands,
-      // slowly (spray, not drops), from the soaked patches; nothing is drawn near the lens
-      const ux = this.umb.position.x, uy = this.umb.position.y, uz = this.umb.position.z, cp = cam.position;
-      for (let i = 0; i < 380; i++) {
-        const per = 0.9 + 0.5 * hash1(i * 1.7), ph = hash1(i * 2.3) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc, tt = age * per;
-        const a = hash1(i * 3.1 + cyc) * 6.28, rr = (0.12 + 0.4 * Math.sqrt(hash1(i * 7.3 + cyc * 1.7))) * Math.min(1, wet * 1.3);
-        const k = MathX.clamp((wet * 1.25 - rr / 0.52) * 3, 0, 1); if (k <= 0) continue;
-        const vf = 1.2 + 0.8 * hash1(i * 5.1 + cyc);
-        const x = ux + Math.cos(a) * rr + 0.25 * tt, y = uy + 0.11 - rr * 0.42 - vf * tt, z = uz + Math.sin(a) * rr;
-        const d = Math.hypot(x - cp.x, y - cp.y, z - cp.z); if (d < 0.3) continue;
-        const L = 0.03 + 0.04 * hash1(i + cyc), al = 0.8 * k * Math.min(1, age * 6) * (1 - age) * MathX.smooth(d, 0.3, 0.45);
-        this.umbDrip.push(x, y, z, x + 0.004, y - L, z, 0.85, 0.88, 0.9, al, 0.0022);
-      }
-    }
-    this.umbDrip.end();
+    // the lens at the waterline: the line sits on the horizon (the camera is exactly at the water's surface)
+    const pu = this.port.material.uniforms, onP = t >= T.duck && t < T.dive ? 1 : 0;
+    pu.uOn.value = onP; pu.uT.value = t;
+    if (onP) { cam.getWorldDirection(this._w); pu.uH.value = -Math.tan(Math.asin(this._w.y)) / Math.tan(MathX.deg(cam.fov / 2)) - 0.004; }
 
     app.hands.update(t);
 
@@ -253,6 +226,7 @@ const FILM = {
     if (seg === 'kitchen') { p.ao = 0.45; p.edgeBlur = 0.35; p.warmth = 0.06; p.exposure = 1.14; }
     if (seg === 'pond') { p.edgeBlur = 0.45; p.ao = 0.4; }
     if (seg === 'bench') { p.ao = 0.5; p.edgeBlur = 0.2; p.exposure = 1.22; p.warmth = 0.08; }
+    if (t >= T.duck && t < T.dive) { p.edgeBlur = 0.3; p.ao = 0.4; p.exposure += 0.08; }
     // the rule change: a soft cooling pulse under the title
     p.saturation -= 0.06 * MathX.impulse(t, T.drop, 0.6);
     // the time-lapse / the wilting: a touch warmer and drier, then the storm: cold, flatter, darker
@@ -261,11 +235,8 @@ const FILM = {
     p.vignette += 0.12 * storm;
     // nights in the time-lapse: lifted so they read as moonlight, not black frames
     if (t > T.lapse && t < T.clouds) p.exposure += 0.5 * (1 - nstDaylight(nstDay(t)));
-    // the rise: a little clearer
-    p.exposure += 0.08 * MathX.smooth(t, T.drone, T.drone + 2); p.saturation += 0.08 * MathX.smooth(t, T.drone, T.drone + 2);
-    // lightning (the sky does most of it; a whisper of flash in the grade)
-    p.flash = 0.4 * nstFlash(t);
-    p.flashColor.setRGB(0.85, 0.9, 1.0);
+    // the dive: a little clearer
+    p.exposure += 0.22 * MathX.smooth(t, T.dive, T.dive + 0.5); p.saturation += 0.1 * MathX.smooth(t, T.dive, T.dive + 0.5);
     // black at the end
     p.fade = MathX.smooth(t, T.end - 0.7, T.end);
   },

@@ -1,8 +1,8 @@
 /* =====================================================================
    GARDEN — outside the kitchen: the back of the house (z = 0 wall), a stone patio, a lawn, a small pond with
-   lily pads and water striders, a potting bench under the kitchen window, a flower bed, trees, board fences;
-   beyond the back fence a park and the city. A subclass of the shared city (js/world/environment.js) so the
-   art-directed trees, benches, materials and the PMREM sky reflections are reused.
+   lily pads, water striders and a duck, a potting bench under the kitchen window, a flower bed, a sunflower, trees,
+   board fences; beyond the back fence a park, then fields, woods and hills. A subclass of the shared city
+   (js/world/environment.js) so the art-directed trees, benches, materials and the PMREM sky reflections are reused.
    Time of day (the time-lapse), wilting, the storm and the rain are all pure functions of story time.
    ===================================================================== */
 
@@ -16,6 +16,8 @@ const NST_G = {
   potA: { x: 2.2, z: -0.43 },
   potB: { x: 2.86, z: -0.42 },
   fence: { x0: -7.0, x1: 5.0, z: -17.0, h: 1.8 },
+  sunflower: { x: -2.63, z: -5.98 },      // among the pond's rim stones; its big leaf reaches out over the water
+  duck: { from: [-0.66, -6.55], to: [-1.04, -6.22], drift: [-1.2, -6.08] },   // (x, z) at NST.duck, NST.dive, NST.end
 };
 
 // the sun for a given garden day (1.0 = 10:00 on the morning of the change)
@@ -42,10 +44,12 @@ class NstGarden extends Environment {
     this._beds();
     this._gardenTrees();
     this._park();
+    this._hills();
+    this._sunflower();
     this.batch.build(this.root, 'env');
     this._environmentMap();
     this._rainSystems();
-    this._people();
+    this._duck();
   }
 
   // ---------------------------------------------------------------- sky: day → night cycle (time-lapse) + storm deck
@@ -414,7 +418,7 @@ class NstGarden extends Environment {
     this._tree(3.6, -15.2, r, 1.15);
   }
 
-  // ---------------------------------------------------------------- the park beyond the fence, neighbours' roofs, the city
+  // ---------------------------------------------------------------- the park beyond the fence, neighbours' roofs
   _park() {
     const B = this.batch, r = this.rng.fork(25), m = this.m;
     // park trees
@@ -427,16 +431,139 @@ class NstGarden extends Environment {
     // neighbours' houses either side (roofs over the fences)
     const nh = (x, z, w, d, h, c) => { B.box(w, h, d, x, h / 2, z, Mat.std(c, { roughness: 0.9 })); B.add(new THREE.BoxGeometry(w + 0.4, 0.15, d * 0.62), Mat.std('#4d4743', { roughness: 0.85 }), Geo.matrix(x, h + 0.9, z - d * 0.23, 0.55, 0, 0)); B.add(new THREE.BoxGeometry(w + 0.4, 0.15, d * 0.62), Mat.std('#4d4743', { roughness: 0.85 }), Geo.matrix(x, h + 0.9, z + d * 0.23, -0.55, 0, 0)); };
     nh(-12.5, 3.0, 8, 7, 5.5, '#bfb6a6'); nh(10.5, 3.2, 8, 7, 5.2, '#a89580'); nh(-13, -24, 7, 6, 5.0, '#b3a894');
-    // the city behind the park (muted blocks with facade textures, lost in haze)
-    const styles = Object.keys(this.facades);
-    for (let i = 0; i < 40; i++) {
-      const x = r.range(-220, 220), z = -150 - r.range(0, 260), w = r.range(18, 34), d = r.range(18, 30), h = r.range(18, 70) * (1 - Math.abs(x) / 400);
-      const F = this.facades[styles[i % styles.length]];
-      const geo = new THREE.BoxGeometry(w, h, d);
-      const uv = geo.attributes.uv, pos = geo.attributes.position, nrm = geo.attributes.normal;
-      for (let k = 0; k < uv.count; k++) { const nx = Math.abs(nrm.getX(k)), u = nx > 0.5 ? pos.getZ(k) : pos.getX(k); uv.setXY(k, (u + 50) / F.tileW, (pos.getY(k) + h / 2) / F.tileH); }
-      B.add(geo, F.mat, Geo.matrix(x, h / 2, z), { noShadow: true });
+  }
+
+  // ---------------------------------------------------------------- beyond the park: fields, woods and low hills
+  // (they dry out with everything else: their grass and woods share the lawn's and the trees' wilting colours)
+  _hills() {
+    const B = this.batch, r = this.rng.fork(26), C = { x: 0, z: -60 };
+    const hgt = (R, a) => Math.max(0, MathX.smooth(R, 200, 430) * (26 + 16 * Math.sin(a * 3 + 1.3) + 11 * Math.sin(a * 7 + R / 90) + 7 * Math.sin(R / 55 + a * 5)) + 9 * MathX.smooth(R, 260, 600) * Math.sin(a * 11 + R / 140)) - 0.08;
+    this._hillH = (x, z) => { const R = Math.hypot(x - C.x, z - C.z), a = Math.atan2(z - C.z, x - C.x); return hgt(R, a); };
+    const NA = 120, NR = 30, pos = [], idx = [];
+    const Rs = Array.from({ length: NR }, (_, k) => 185 * Math.pow(1100 / 185, k / (NR - 1)));
+    for (let i = 0; i < NA; i++) for (let k = 0; k < NR; k++) { const a = (i / NA) * Math.PI * 2, R = Rs[k]; pos.push(C.x + Math.cos(a) * R, hgt(R, a), C.z + Math.sin(a) * R); }
+    for (let i = 0; i < NA; i++) { const j = (i + 1) % NA; for (let k = 0; k < NR - 1; k++) { const a = i * NR + k, b = j * NR + k; idx.push(a, b, b + 1, a, b + 1, a + 1); } }
+    // a patchwork of fields (flat-shaded: each triangle one colour)
+    let geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx);
+    geo = geo.toNonIndexed(); geo.computeVertexNormals();
+    if (geo.attributes.normal.getY(0) < 0) { const P = geo.attributes.position; for (let i = 0; i < P.count; i += 3) for (let c = 0; c < 3; c++) { const t = P.getComponent(i + 1, c); P.setComponent(i + 1, c, P.getComponent(i + 2, c)); P.setComponent(i + 2, c, t); } geo.computeVertexNormals(); }
+    const pal = ['#6f8a4b', '#7c9450', '#9a9d58', '#5f7a40', '#86904f', '#a7a35f'].map((c) => new THREE.Color(c));
+    const P = geo.attributes.position, col = new Float32Array(P.count * 3);
+    for (let i = 0; i < P.count; i += 3) {
+      const x = (P.getX(i) + P.getX(i + 1) + P.getX(i + 2)) / 3, z = (P.getZ(i) + P.getZ(i + 1) + P.getZ(i + 2)) / 3;
+      const c = pal[Math.floor(hash2(Math.floor(x / 70), Math.floor(z / 55)) * pal.length)], sh = 0.92 + 0.12 * hash1(i * 0.37);
+      for (let v = 0; v < 3; v++) col.set([c.r * sh, c.g * sh, c.b * sh], (i + v) * 3);
     }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    this.hillMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1, name: 'nstHills' });
+    this.hillMat.userData.grime = 0;
+    const hills = new THREE.Mesh(geo, this.hillMat); hills.receiveShadow = false; hills.name = 'hills'; this.root.add(hills);
+    // woods: clumps of low-poly crowns on the slopes and along the field edges
+    for (let i = 0; i < 300; i++) {
+      const a = r.range(0, Math.PI * 2), R = r.range(215, 720), x = C.x + Math.cos(a) * R, z = C.z + Math.sin(a) * R;
+      if (z > -15 && Math.abs(x) < 60) continue;
+      const s = r.range(5, 11) * (R / 400 + 0.5), g = new THREE.IcosahedronGeometry(s, 0);
+      const cols = new Float32Array(g.attributes.position.count * 3), base = new THREE.Color().setHSL(r.range(0.22, 0.3), 0.32, r.range(0.13, 0.19));
+      for (let k = 0; k < g.attributes.position.count; k++) { const c = base.clone().offsetHSL(0, 0, 0.04 * g.attributes.position.getY(k) / s); cols.set([c.r, c.g, c.b], k * 3); }
+      g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+      B.add(g, this.m.foliage, Geo.matrix(x, hgt(R, a) + s * 0.55, z, 0, r.next() * 3, 0, 1, 0.75, 1), { noShadow: true });
+    }
+  }
+
+  // ---------------------------------------------------------------- the sunflower by the lawn (the plant you see wilt; the payoff's leaf)
+  // a stem of jointed segments (it bows from each joint), big heart-shaped leaves, a heavy head
+  _sunflower() {
+    const S = NST_G.sunflower, g = new THREE.Group(); g.position.set(S.x, 0, S.z); g.rotation.y = 0.55; this.root.add(g);
+    const stemM = new THREE.MeshStandardMaterial({ color: '#557a35', roughness: 0.6, name: 'nstSunStem' });
+    // leaves: a vein texture (midrib, side veins, a paler edge) so the big hero leaf reads up close
+    const lcv = Tex.canvas(256, 256), lc = lcv.getContext('2d');
+    lc.fillStyle = '#dcdcdc'; lc.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 400; i++) { lc.fillStyle = `rgba(${hash1(i) > 0.5 ? '255,255,255' : '60,60,60'},${0.04 + 0.05 * hash1(i * 3)})`; lc.beginPath(); lc.arc(hash1(i * 7) * 256, hash1(i * 11) * 256, 2 + 6 * hash1(i * 13), 0, 6.28); lc.fill(); }
+    lc.strokeStyle = 'rgba(255,255,235,0.75)'; lc.lineWidth = 4; lc.beginPath(); lc.moveTo(128, 0); lc.lineTo(128, 256); lc.stroke();
+    lc.lineWidth = 2;
+    for (let k = 0; k < 9; k++) { const y = 20 + k * 26; for (const sd of [1, -1]) { lc.beginPath(); lc.moveTo(128, y); lc.quadraticCurveTo(128 + sd * 50, y + 14, 128 + sd * 118, y + 46); lc.stroke(); } }
+    const leafT = Tex.tex(lcv);
+    const leafM = new THREE.MeshStandardMaterial({ color: '#5a8a3c', map: leafT, roughness: 0.45, side: THREE.DoubleSide, name: 'nstSunLeaf' });
+    const petalM = new THREE.MeshStandardMaterial({ color: '#f0bf2a', roughness: 0.55, side: THREE.DoubleSide, name: 'nstSunPetal' });
+    const discM = new THREE.MeshStandardMaterial({ color: '#3a2615', roughness: 0.9, flatShading: true, name: 'nstSunDisc' });
+    this.sunMats = { stem: stemM, leaf: leafM, petal: petalM };
+    this.sunBase = { stem: stemM.color.clone(), leaf: leafM.color.clone(), petal: petalM.color.clone() };
+    const leafGeo = (L, W) => {
+      const sh = new THREE.Shape(); sh.moveTo(0, 0);
+      sh.bezierCurveTo(W * 0.62, L * 0.02, W * 0.6, L * 0.6, 0, L); sh.bezierCurveTo(-W * 0.6, L * 0.6, -W * 0.62, L * 0.02, 0, 0);
+      const geo = new THREE.ShapeGeometry(sh, 12), P = geo.attributes.position, UV = geo.attributes.uv;
+      for (let i = 0; i < P.count; i++) { UV.setXY(i, 0.5 + P.getX(i) / W, P.getY(i) / L); }
+      for (let i = 0; i < P.count; i++) { const x = P.getX(i), y = P.getY(i); P.setZ(i, Math.abs(x) * 0.22 - 0.06 * Math.sin(x * 40) * (y / L) * 0.1 + 0.25 * (y / L) * (y / L) * L * -0.6); }
+      geo.computeVertexNormals();
+      return geo;
+    };
+    // the leaf shape lies in its XY plane along +Y (normal +Z): turn it so it runs along +X with its face up
+    this._leafQ = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3(0, 0, 1), new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0)));
+    const segs = [], leaves = [], N = 6, H = 1.68;
+    let parent = g;
+    for (let k = 0; k < N; k++) {
+      const sg = new THREE.Group(); sg.position.y = k === 0 ? 0 : H / N; parent.add(sg);
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(0.0115 - 0.0008 * k, 0.0125 - 0.0008 * k, H / N + 0.004, 7), stemM); m.position.y = H / (2 * N); m.castShadow = true; sg.add(m);
+      if (k >= 1) for (const side of k === 3 ? [1, -1] : [k % 2 ? 1 : -1]) {
+        const L = k === 3 && side > 0 ? 0.31 : 0.22 - 0.015 * Math.abs(k - 3), node = new THREE.Group();
+        const hero = k === 3 && side > 0;
+        node.position.y = H / N * 0.7; node.rotation.y = hero ? -0.22 : side > 0 ? 0.1 * k + 1.1 : Math.PI + 0.15 * k + 1.1; sg.add(node);     // (the hero leaf points out over the pond)
+        const pet = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.005, 0.08, 5), stemM); pet.rotation.z = -Math.PI / 2 + 0.6; pet.position.set(0.032, 0.022, 0); node.add(pet);
+        const piv = new THREE.Group(); piv.position.set(0.066, 0.045, 0); node.add(piv);
+        const lf = new THREE.Mesh(leafGeo(L, L * 0.9), leafM); lf.quaternion.copy(this._leafQ); lf.castShadow = true;
+        const tilt = new THREE.Group(); tilt.add(lf); piv.add(tilt);
+        leaves.push({ tilt, base: -0.35 + 0.08 * k, k, hero, L });
+      }
+      segs.push(sg); parent = sg;
+    }
+    // the head: a seed disc, two rings of petals, green bracts behind
+    const head = new THREE.Group(); head.position.y = H / N; parent.add(head);
+    const face = new THREE.Group(); face.rotation.x = 1.25; head.add(face);     // facing out, toward the house
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.085, 0.035, 24), discM); face.add(disc);
+    const back = new THREE.Mesh(new THREE.SphereGeometry(0.085, 14, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), stemM); back.position.y = -0.005; face.add(back);
+    for (let k = 0; k < 30; k++) {
+      const a = k / 30 * Math.PI * 2 + (k % 2) * 0.1, pm = new THREE.Mesh(new THREE.PlaneGeometry(0.034, 0.085), petalM);
+      const pg = new THREE.Group(); pg.rotation.y = -a; face.add(pg);
+      pm.position.set(0, 0.012 - 0.004 * (k % 2), 0.115 + 0.006 * (k % 2)); pm.rotation.x = -Math.PI / 2 + 0.12 + 0.1 * (k % 2); pg.add(pm);
+      this._sunPetals = this._sunPetals || []; this._sunPetals.push(pm);
+    }
+    this.sunflower = { g, segs, leaves, head, face, hero: leaves.find((l) => l.hero) };
+    // the thread of rain water running off the hero leaf's tip (no drop can form there)
+    this.tipThread = new NstStream(this.root, nstWaterMat({ color: '#d4e2e5', opacity: 0.55, fres: 0.85, env: 1.2 }), { a: new THREE.Vector3(), v0: new THREE.Vector3(0, -0.06, 0), r0: 0.0016, yEnd: 0.0, ns: 60, nrad: 7, seed: 91, spread: 0.35, frayLen: 0.4 });
+    this.leafFilmMat = nstWaterMat({ color: '#9db8bd', opacity: 0, fres: 0.7, env: 1.3, side: THREE.DoubleSide, rough: 0.02 });
+    const hl = this.sunflower.hero;
+    const film = new THREE.Mesh(leafGeo(hl.L * 0.985, hl.L * 0.88), this.leafFilmMat); film.quaternion.copy(this._leafQ); film.position.y = 0.0012; film.renderOrder = 4; hl.tilt.add(film);
+    this._tipW = new THREE.Vector3(); this._baseW = new THREE.Vector3();
+  }
+
+  // the hero leaf's tip in world space (the payoff camera and the thread use it)
+  sunflowerTip(out, base = null) {
+    const hl = this.sunflower.hero, lf = hl.tilt.children[0];
+    this.sunflower.g.updateMatrixWorld(true);
+    if (base) base.set(0, 0, 0).applyMatrix4(lf.matrixWorld);
+    return out.set(0, hl.L * 0.999, -0.15 * hl.L).applyMatrix4(lf.matrixWorld);
+  }
+
+  _updateSunflower(t) {
+    const F = this.sunflower, w = nstWilt(t), rain = nstRain(t);
+    // the stem bows from each joint, more toward the top; the head hangs; leaves droop from the petiole
+    const bend = [0.0, 0.05, 0.1, 0.17, 0.28, 0.42];        // it bows sideways (seen from the lawn the bend reads), most near the top
+    F.segs.forEach((s, k) => { s.rotation.z = bend[k] * w; s.rotation.x = 0.03 * k * w; });
+    F.face.rotation.x = 1.25 + 1.45 * w;
+    // a gust on the closing line: the leaf dips and springs back, a surge of water runs down it and off the tip (still no drop)
+    const gu = t - (NST.line2 + 0.1), gust = gu > 0 ? Math.exp(-gu / 0.8) * Math.sin(gu * 8.5) : 0, surge = gu > 0 ? MathX.smooth(gu, 0.2, 0.55) * Math.exp(-gu / 1.6) : 0;
+    for (const l of F.leaves) l.tilt.rotation.set(0, 0, l.base - (l.hero ? 0.38 : 1.15 * (0.7 + 0.1 * l.k)) * w - (l.hero ? 0.16 : 0.08) * gust);     // (the hero leaf arches; the rest hang)
+    // green → olive → brown; petals curl brown
+    const S = this.sunMats, B = this.sunBase, dry = this._sunDry || (this._sunDry = { leaf: new THREE.Color('#7a6a36'), petal: new THREE.Color('#8a6a2a'), stem: new THREE.Color('#6d6a38') });
+    S.leaf.color.copy(B.leaf).lerp(dry.leaf, 0.85 * w); S.petal.color.copy(B.petal).lerp(dry.petal, 0.9 * w); S.stem.color.copy(B.stem).lerp(dry.stem, 0.7 * w);
+    S.leaf.emissive.copy(S.leaf.color).multiplyScalar(0.22 * MathX.smooth(t, NST.dive + 3, NST.land));      // (a little fill on the hero leaf for the close-up in the grey rain)
+    // wet in the rain: glossy, a film of water over the hero leaf; the tip lets it go as a thread, never a drop
+    S.leaf.roughness = MathX.lerp(0.45, 0.18, rain);
+    this.leafFilmMat.opacity = (0.16 + 0.14 * surge) * rain;
+    this.sunflowerTip(this._tipW);
+    const th = this.tipThread;
+    th.a.copy(this._tipW); th.yEnd = NST_G.pond.y; th.T = (th.v0.y + Math.sqrt(th.v0.y * th.v0.y + 2 * 9.81 * Math.max(0.02, th.a.y - th.yEnd))) / 9.81;     // (into the pond: no drop, no splash, no ring)
+    th.update(t, MathX.smooth(t, NST.rain + 0.5, NST.rain + 2.0) * (0.8 + 0.2 * Math.sin(t * 2.3)) * (1 + 2.2 * surge), 1);
   }
 
   // ---------------------------------------------------------------- rain (torn spray), mist veils
@@ -447,33 +574,54 @@ class NstGarden extends Environment {
     this.mist.uniforms.uLight.value = 1.0;
   }
 
-  // ---------------------------------------------------------------- people in the park (umbrellas that don't keep them dry)
-  _people() {
-    Object.assign(ACTIONS, {
-      nstWalkUmb(τ, c) { const p = ACTIONS.walk(τ, c); p.rSh = [0.75, 0.2]; p.rEl = 1.55; return p; },
-      nstHunch(τ, c) { const p = ACTIONS.walk(τ, c); p.spine = 0.18; p.neck = 0.25; p.rSh = [0.75, 0.2]; p.rEl = 1.55; return p; },
+  // ---------------------------------------------------------------- a mallard drake on the pond, soaked through
+  // A duck stays dry because water would have to squeeze into the tiny gaps between its feather barbs, and surface
+  // tension won't let it. With none, water soaks in, the air trapped in the plumage is gone and it rides low, dark and
+  // spiky-wet, paddling hard to stay up (the same thing happens to water birds caught in a detergent spill).
+  _duck() {
+    const wetK = 0.92;
+    const paint = (geo, fn) => { const P = geo.attributes.position, col = new Float32Array(P.count * 3), c = new THREE.Color(); for (let i = 0; i < P.count; i++) { fn(P.getX(i), P.getY(i), P.getZ(i), c); col.set([c.r * wetK, c.g * wetK, c.b * wetK], i * 3); } geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); return geo; };
+    const fm = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.3, envMapIntensity: 1.3, name: 'nstDuck' });
+    fm.userData.grime = 0;
+    const C = (h) => new THREE.Color(h);
+    const cols = { tail: C('#1b1b1c'), tailW: C('#d6d4cc'), breast: C('#5a3323'), back: C('#776f63'), flank: C('#9b968c'), spec: C('#2b4f9e'), green: C('#1d5a39'), white: C('#e2e0d8') };
+    const d = new THREE.Group(); this.root.add(d); this.duck = d;
+    const body = new THREE.Group(); d.add(body); this.duckBody = body;
+    // body: an egg with a raised, pointed tail; the wet feathers clump (vertices jittered in and out, the same at the seams)
+    const bg = new THREE.SphereGeometry(1, 18, 12);
+    paint(bg, (x, y, z, c) => {
+      if (z > 0.78) c.copy(cols.tail); else if (z > 0.66) c.copy(cols.tailW);
+      else if (z < -0.42 && y < 0.62) c.copy(cols.breast);
+      else if (Math.abs(x) > 0.72 && z > 0.02 && z < 0.4 && y > 0.0 && y < 0.42) c.copy(cols.spec);
+      else if (y > 0.38) c.copy(cols.back); else c.copy(cols.flank);
     });
-    Object.assign(BLEND, { nstWalkUmb: 0.4, nstHunch: 0.5 });
-    const S = [
-      ['N1', 'casual8', [[0, -6, -30], [70, 14, -30.5]], '#1d2a3a'],
-      ['N2', 'casual1', [[0, 9, -35], [70, -12, -34]], '#6a2622'],
-      ['N3', 'casual6', [[0, 0.2, -70], [70, -0.6, -22]], '#2c463a'],
-      ['N4', 'casual2', [[0, -1.2, -24], [70, -0.2, -80]], null],
-      ['N5', 'casual4', [[0, 18, -33.5], [70, -4, -33.2]], '#202224'],
-    ];
-    this.people = S.map(([id, look, path, umb], i) => {
-      const p = new Person({ id, look, path, states: [[0, umb ? 'nstWalkUmb' : 'walk'], [NST.rain + 0.5 + i * 0.3, umb ? 'nstHunch' : 'jog']] }, this.scene);
-      p.root.traverse((o) => { if (o.isMesh) o.castShadow = true; });
-      let u = null;
-      if (umb) {
-        u = new THREE.Group();
-        const can = new THREE.Mesh(new THREE.ConeGeometry(0.56, 0.24, 10, 1, true), new THREE.MeshStandardMaterial({ color: umb, roughness: 0.35, side: THREE.DoubleSide })); can.position.y = 0.1; u.add(can);
-        const sh = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.85, 5), Mat.std('#222', { roughness: 0.4 })); sh.position.y = -0.3; u.add(sh);
-        this.scene.add(u);
-      }
-      return { p, u, umbOn: (t) => (umb ? 1 : 0) };
+    { const P = bg.attributes.position; for (let i = 0; i < P.count; i++) {
+      const x = P.getX(i), y = P.getY(i), z = P.getZ(i), tail = Math.max(0, z - 0.45);
+      const j = 1 + 0.16 * (hash1(Math.round(x * 40) * 7.13 + Math.round(y * 40) * 131.7 + Math.round(z * 40) * 17.9) - 0.5);
+      P.setXYZ(i, x * 0.118 * (1 - 0.55 * tail) * j, (y * 0.082 + 0.1 * tail * tail) * j, z * 0.2);
+    } bg.computeVertexNormals(); }
+    const bm = new THREE.Mesh(bg, fm); bm.castShadow = true; body.add(bm);
+    // neck and head (green, a white collar), yellow bill, black eyes
+    const neck = new THREE.Group(); neck.position.set(0, 0.04, -0.15); body.add(neck); this.duckNeck = neck;
+    const ng = paint(new THREE.CylinderGeometry(0.028, 0.042, 0.066, 10), (x, y, z, c) => c.copy(y < -0.016 ? cols.breast : y < -0.004 ? cols.white : cols.green));
+    const nm = new THREE.Mesh(ng, fm); nm.position.y = 0.028; nm.rotation.x = -0.3; neck.add(nm);
+    const hg = paint(new THREE.SphereGeometry(0.047, 12, 9), (x, y, z, c) => c.copy(cols.green));
+    const head = new THREE.Mesh(hg, fm); head.scale.set(0.86, 0.95, 1.16); head.position.set(0, 0.074, -0.026); neck.add(head);
+    const bill = new THREE.Mesh(new THREE.CylinderGeometry(0.0088, 0.0145, 0.058, 7), new THREE.MeshStandardMaterial({ color: '#cfa935', roughness: 0.45, flatShading: true, name: 'nstBill' }));
+    bill.rotation.x = -Math.PI / 2; bill.scale.set(1, 1, 0.45); bill.position.set(0, 0.063, -0.084); neck.add(bill);
+    for (const sd of [1, -1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(0.0055, 6, 5), new THREE.MeshStandardMaterial({ color: '#050505', roughness: 0.2 })); e.position.set(sd * 0.03, 0.083, -0.044); neck.add(e); }
+    // legs and webbed feet (under water: paddling)
+    const legM = new THREE.MeshStandardMaterial({ color: '#f07a26', roughness: 0.5, side: THREE.DoubleSide, emissive: '#5a2008', name: 'nstDuckFoot' });
+    const web = new THREE.Shape(); web.moveTo(0, 0); web.lineTo(-0.038, 0.06); web.lineTo(-0.014, 0.054); web.lineTo(0, 0.074); web.lineTo(0.014, 0.054); web.lineTo(0.038, 0.06); web.lineTo(0, 0);
+    const wg = new THREE.ShapeGeometry(web);
+    this.duckLegs = [1, -1].map((sd) => {
+      const hip = new THREE.Group(); hip.position.set(sd * 0.045, -0.05, 0.04); body.add(hip);
+      const shin = new THREE.Mesh(new THREE.CylinderGeometry(0.0055, 0.0065, 0.075, 6), legM); shin.position.y = -0.0375; hip.add(shin);
+      const foot = new THREE.Group(); foot.position.y = -0.075; hip.add(foot);
+      const fw = new THREE.Mesh(wg, legM); fw.rotation.x = -Math.PI / 2; foot.add(fw);
+      return { hip, foot, sd };
     });
-    this.blobs = new BlobShadows(this.scene, 8);
+    d.visible = false;
   }
 
   // ---------------------------------------------------------------- per frame
@@ -492,7 +640,7 @@ class NstGarden extends Environment {
     const low = 1 - MathX.smooth(this.sunDir.y, 0.05, 0.35);
     hor.lerp(new THREE.Color('#e0a97c'), 0.45 * low * dl * (1 - storm));
     this.scene.background.copy(hor);
-    this.scene.fog.density = MathX.lerp(0.0032, 0.012, storm) * (1 + 0.45 * rain) * (1 - 0.82 * MathX.smooth(t, NST.drone, NST.drone + 3));   // thinner for the rise: you see the landscape
+    this.scene.fog.density = MathX.lerp(0.0032, 0.012, storm) * (1 + 0.45 * rain) * (1 - 0.78 * (cam ? MathX.smooth(cam.position.y, 2.5, 14) : 0));   // thinner high up: you see the land
     // lightning: two flashes during the payoff
     const fl = nstFlash(t);
     U.uFlash.value = fl;
@@ -501,7 +649,7 @@ class NstGarden extends Environment {
     this.sun.position.copy(this.sunDir).multiplyScalar(60).add(f); this.sun.target.position.copy(f);
     this.sun.intensity = 3.2 * MathX.smooth(this.sunDir.y, -0.02, 0.18) * (1 - storm);      // (lightning lights the sky dome, not the sun: sun-cast flashes threw hard house shadows on the lawn)
     this.sun.color.setRGB(1, 0.93 - 0.18 * low, 0.84 - 0.3 * low);
-    this.hemi.intensity = (0.8 + 0.45 * dl) * (1 - 0.35 * storm) + 4.0 * fl + 0.35 * MathX.smooth(t, NST.drone, NST.drone + 2);      // (moonlit nights, not black)
+    this.hemi.intensity = (0.8 + 0.45 * dl) * (1 - 0.35 * storm) + 4.0 * fl + 0.45 * MathX.smooth(t, NST.duck, NST.duck + 0.5);      // (moonlit nights, not black)
     this.hemi.color.copy(zen).lerp(new THREE.Color('#b9cfe0'), 0.5);
     this.scene.environmentIntensity = (0.18 + 0.24 * dl) * (1 - 0.3 * storm);
 
@@ -509,6 +657,7 @@ class NstGarden extends Environment {
     // (pushed further toward straw under the storm light, which otherwise turns dry grass back to olive green)
     this.lawnMat.color.setRGB(0.85 + (0.8 + 0.45 * storm) * wilt, 0.85 + (0.12 + 0.06 * storm) * wilt, 0.85 - (0.25 + 0.2 * storm) * wilt);      // (linear multipliers: green → dry straw)
     this.m.foliage.color.setRGB(1 + 0.3 * wilt, 1 - 0.3 * wilt, 1 - 0.45 * wilt);         // (dull olive-brown, not autumn gold)
+    this.hillMat.color.setRGB(0.92 + (0.75 + 0.35 * storm) * wilt, 0.92 + 0.1 * wilt, 0.92 - 0.32 * wilt);
     for (const fw of this.flowers) {
       const w = MathX.clamp(wilt * 1.25 - fw.lag, 0, 1);
       fw.segs.forEach((s, k) => { s.rotation.x = (k === 0 ? 0.08 : 0.2 * k * k) * w * 2.2; s.rotation.z = fw.dir * 0.15 * w; });
@@ -543,19 +692,33 @@ class NstGarden extends Environment {
     const ed = MathX.smooth(t, T.pour + 2.3, T.pour + 2.8) * (1 - MathX.smooth(t, T.pourEnd + 1.2, T.pourEnd + 3.2));
     this.edgeDrips.forEach((d, i) => d.update(t, ed * (0.7 - i * 0.18), 1));
 
-    // people in the park
-    this.blobs.begin();
-    for (const o of this.people) {
-      o.p.update(t);
-      const q = o.p.root.position;
-      o.p.root.updateMatrixWorld(true);
-      if (o.u) { const ry = o.p.root.rotation.y; o.u.position.set(q.x + Math.cos(ry) * 0.18 + Math.sin(ry) * 0.12, 2.02, q.z - Math.sin(ry) * 0.18 + Math.cos(ry) * 0.12); o.u.rotation.set(0.08 * Math.sin(t * 1.3 + q.x), 0, 0.1 + 0.05 * Math.sin(t * 1.1 + q.z)); }
-      this.blobs.push(q.x, 0.02, q.z, 0.5, 0.45);
-    }
-    this.blobs.end();
+    this._updateSunflower(t);
+    this._updateDuck(t);
 
     // rain: torn streaks (falling water that can't hold drop shape breaks into ligaments) + drifting mist veils
     this._updateRain(t, rain, cam);
+  }
+
+  _updateDuck(t) {
+    const T = NST, D = NST_G.duck, P = NST_G.pond, d = this.duck;
+    d.visible = t > T.duck - 1.0;
+    if (!d.visible) return;
+    const k1 = MathX.clamp((t - T.duck) / (T.dive - T.duck), 0, 1), k2 = MathX.clamp((t - T.dive) / (T.end - T.dive), 0, 1);
+    const ph = (t - T.duck) * Math.PI * 2 * 1.7;                   // paddling hard: ~1.7 strokes a second
+    let x = t < T.dive ? MathX.lerp(D.from[0], D.to[0], k1) : MathX.lerp(D.to[0], D.drift[0], k2);
+    let z = t < T.dive ? MathX.lerp(D.from[1], D.to[1], k1) : MathX.lerp(D.to[1], D.drift[1], k2);
+    const dx = D.to[0] - D.from[0], dz = D.to[1] - D.from[1], L = Math.hypot(dx, dz);
+    x += (dx / L) * 0.006 * Math.sin(ph); z += (dz / L) * 0.006 * Math.sin(ph);       // a surge with each stroke
+    d.position.set(x, P.y - 0.034 + 0.005 * Math.sin(ph * 2 + 0.6), z);               // riding low: only its back and head clear the water
+    d.rotation.set(0, Math.atan2(-dx, -dz) + 0.12 * Math.sin(t * 0.7), 0);
+    this.duckBody.rotation.set(0.07 + 0.03 * Math.sin(ph * 2), 0, 0.05 * Math.sin(ph));
+    this.duckNeck.rotation.set(-0.12 + 0.1 * Math.sin(ph * 2 + 1.2), 0.35 * Math.sin(t * 0.9 + 0.5), 0);
+    for (const l of this.duckLegs) {
+      const p = ph + (l.sd > 0 ? 0 : Math.PI), sw = Math.sin(p), back = Math.cos(p) < 0;      // the backward stroke pushes with the web spread
+      l.hip.rotation.x = 0.15 + 0.7 * sw;
+      l.foot.rotation.x = back ? 0.9 : -0.5;
+      l.foot.scale.x = back ? 1 : 0.4;
+    }
   }
 
   _droop(plant, w) {
@@ -611,7 +774,7 @@ class NstGarden extends Environment {
       // without surface tension falling water can't stay as drops: it falls as slow, wavy torn ribbons (like the tap's
       // stream) that twist and fray (≈1.5–3 m/s, not the 9 m/s of big raindrops) and drift on the wind. Each slot is
       // one ribbon drawn as a short twisting polyline; nothing is drawn right at the lens (up close they read as scratches).
-      const N = Math.floor(950 * rain), box = 8, P = this._rp || (this._rp = new Float32Array(18));
+      const N = Math.floor(950 * rain), box = 8, P = this._rp || (this._rp = new Float32Array(18)), WY = NST_G.pond.y;
       for (let i = 0; i < N; i++) {
         const vf = 1.5 + 1.5 * hash1(i * 1.3), per = H / vf;
         const ph = hash1(i * 2.7 + 1) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc, tt = age * per;
@@ -619,11 +782,11 @@ class NstGarden extends Environment {
         const wind = 2.0 + 0.8 * Math.sin(t * 0.7 + hx * 3);
         const x0 = cp.x + (hx - 0.5) * 2 * box - wind * per * 0.5, z0 = cp.z + (hz - 0.5) * 2 * box, y = cp.y + 5 - vf * tt;
         const x = x0 + wind * tt + 0.15 * Math.sin(tt * 3 + i), z = z0 + 0.12 * Math.sin(tt * 2.3 + i * 1.7);
-        const d = Math.hypot(x - cp.x, y - cp.y, z - cp.z), dn = t > NST.drone ? 2.6 : 1.3; if (d < dn) continue;
+        const d = Math.hypot(x - cp.x, y - cp.y, z - cp.z), dn = cp.y > 1.8 ? 2.6 : t > NST.dive ? 1.5 : 1.0; if (d < dn) continue;
         const near = MathX.smooth(d, dn, dn * 1.85);
         // the ribbon trails up-wind of its head: length 0.2–0.6 m, a helical twist that travels along it
         const L = 0.2 + 0.4 * sz, hyp = Math.hypot(wind, vf), dx = -wind / hyp, dy = vf / hyp;
-        const A = 0.018 + 0.03 * sz, ph0 = hash1(i * 9.1 + cyc) * 6.283, gap = Math.floor(hash1(i * 4.4 + cyc) * 7);
+        const A = (0.018 + 0.03 * sz) * (1 - 0.7 * MathX.smooth(cp.y, 2, 6)), ph0 = hash1(i * 9.1 + cyc) * 6.283, gap = Math.floor(hash1(i * 4.4 + cyc) * 7);     // (seen from above, the twist reads as squiggles)
         const a = 0.2 * rain * (0.55 + 0.45 * sz) * Math.min(1, age * 8) * Math.min(1, (1 - age) * 8) * near;
         for (let k = 0; k < 6; k++) {
           const u = k / 5, w = A * (0.35 + 0.65 * u), q = ph0 + u * 7.5 - tt * 5;
@@ -633,6 +796,10 @@ class NstGarden extends Environment {
         }
         for (let k = 0; k < 5; k++) {
           if (k === gap) continue;                                 // torn: one link missing on most ribbons
+          // (water that reaches the pond just joins it: no splash, no ring. Nothing is drawn below its surface)
+          const ya = P[k * 3 + 1], yb = P[k * 3 + 4];
+          if (ya < WY && yb < WY) continue;
+          if (ya < WY || yb < WY) { const f = (WY - ya) / (yb - ya), lo = ya < WY ? 0 : 3; for (let c = 0; c < 3; c++) P[k * 3 + lo + c] = P[k * 3 + c] + (P[k * 3 + 3 + c] - P[k * 3 + c]) * f; }
           const u = k / 5, ak = a * (1 - 0.55 * u), wk = (0.011 + 0.012 * sz) * (1 - 0.45 * u);     // (wide translucent strips: thin lines read as scratches)
           // the streak quad overhangs its ends by its width: pull the ends in so links don't overlap into bright beads
           const ex = P[k * 3 + 3] - P[k * 3], ey = P[k * 3 + 4] - P[k * 3 + 1], ez = P[k * 3 + 5] - P[k * 3 + 2], el = Math.hypot(ex, ey, ez) || 1, f = wk / el;
@@ -641,13 +808,23 @@ class NstGarden extends Environment {
       }
       // mist: the falling water shreds into fine spray that drifts with the wind: a few huge, faint sheets far off
       // (never close to the lens: up close, soft billboards read as cotton balls)
-      const NV = t < NST.drone + 1.6 ? Math.floor(70 * rain) : 0;
+      const NV = cp.y < 2.5 ? Math.floor(70 * rain) : 0;
       for (let i = 0; i < NV; i++) {
         const per = 5 + 3 * hash1(i * 3.1), ph = hash1(i * 1.9 + 4) * per, cyc = Math.floor((t + ph) / per), age = ((t + ph) / per - cyc);
         const R = 9 + 32 * hash1(i * 5.3 + cyc), an = hash2(i, cyc + 9) * 6.283;
         const x = cp.x + Math.cos(an) * R + (age - 0.5) * 10, z = cp.z + Math.sin(an) * R, y = 1.5 + 6 * hash1(i * 7.7 + cyc) - age * 2;
-        const a = 0.035 * rain * Math.sin(age * Math.PI) * (1 - MathX.smooth(t, NST.drone, NST.drone + 1.5));   // (big sheets seen from above cut the ground in wedges)
+        const a = 0.035 * rain * Math.sin(age * Math.PI) * (1 - MathX.smooth(cp.y, 1.8, 2.5));   // (big sheets seen from above cut the ground in wedges)
         M.push(x, y, z, 12 + 10 * hash1(i * 9 + cyc), age * 0.3 + i, a, 1.0, 0.7, 0.74, 0.76);
+      }
+      // low over the pond: the rain arriving as mist, a soft grey hiss lying on the water (seen from the waterline)
+      if (t > NST.duck - 0.5 && t < NST.dive) {
+        const W = NST_G.pond;
+        for (let i = 0; i < 34; i++) {
+          const per = 4 + 3 * hash1(i * 2.3), ph = hash1(i * 5.9 + 2) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc;
+          const x = W.x + (hash2(i, cyc + 3) - 0.5) * 3.4 + (age - 0.5) * 1.2, z = W.z + (hash2(i + 40, cyc) - 0.6) * 3.0;
+          const a = 0.05 * rain * Math.sin(age * Math.PI);
+          M.push(x, W.y + 0.06 + 0.3 * hash1(i * 3.3 + cyc), z, 1.1 + 1.6 * hash1(i * 7.1 + cyc), age * 0.4 + i, a, 1.0, 0.72, 0.76, 0.78);
+        }
       }
     }
     S.end(); M.end();

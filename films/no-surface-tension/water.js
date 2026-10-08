@@ -160,7 +160,7 @@ class NstStream {
       const u = s / ns, tau = u * T;
       this.at(tau, c);
       const v = Math.hypot(this.v0.x, this.v0.y - g * tau, this.v0.z) + 0.05;
-      let r = this.r0 * Math.sqrt(v0 / v) * Math.sqrt(Math.max(flow, 0.05));     // continuity: the column thins as it speeds up
+      let r = this.r0 * Math.min(1.5, Math.sqrt(v0 / v)) * Math.sqrt(Math.max(flow, 0.05));     // continuity: the column thins as it speeds up (and fattens, up to 1.5×, as a rising jet slows)
       const uf = this.frayLen > 0 ? MathX.clamp((this.a.y - c.y) / this.frayLen, 0, 1.4) : u;    // how far the fraying has got
       r *= 1 + this.spread * fray * 2.6 * uf * uf;
       // travelling disturbance (moves with the water): the phase follows the parcel, not the screen

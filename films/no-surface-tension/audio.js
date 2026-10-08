@@ -4,10 +4,11 @@
    the patter of rain, the gurgle of a tap are drops snapping shut and
    bubbles popping, all held together by surface tension. When it goes
    (1.2 s, a taut string goes slack) water loses its voice: the tap
-   only hisses, the sponge pours in silence, the rain arrives as one
-   soft roar of mist with no patter at all. Around it: a quiet kitchen,
-   a garden full of birds that thins out over the accelerated days, the
-   storm, and a slow chord for the closing line.
+   only hisses, a fizzy drink goes off in one roar and then is silent
+   (no fizz, no foam crackle), the rain arrives as one soft roar of
+   mist with no patter and no plinks on the pond. Around it: a quiet
+   kitchen, a garden full of birds that thins out over the accelerated
+   days, a soaked duck, and a slow chord for the closing line.
    Buses: ROOM (kitchen / outdoors, switched at the cuts), WATER, MUSIC.
    ===================================================================== */
 
@@ -129,14 +130,31 @@ class NstAudio extends AudioEngine {
     });
     this._band(S, bus, 'white', [2600, 1.0], T.drop, T.drop + 1.6, (u) => 0.045 * MathX.smooth(u, T.drop, T.drop + 0.15) * (1 - MathX.smooth(u, T.drop + 0.5, T.drop + 1.55)), 0.15, 0.02);
     // the tap (a trickle): no plinking drips, no gurgle — a soft, smooth hiss, like poured sand; off at the cut
-    const on = (t) => MathX.smooth(t, T.tapOn, T.tapOn + 0.35) * (1 - MathX.smooth(t, T.clip - 0.03, T.clip));
+    const on = (t) => MathX.smooth(t, T.tapOn, T.tapOn + 0.35) * (1 - MathX.smooth(t, T.clip - 0.03, T.clip)) * (1 + 0.7 * MathX.smooth(t, T.tapMore, T.tapMore + 0.7));
     this._band(S, bus, 'white', [4800, 0.8], T.tapOn - 0.05, T.clip + 0.05, (t) => 0.06 * on(t) * (0.9 + 0.1 * Math.sin(t * 9.1)), 0.15, 0.03);
     this._band(S, bus, 'pink', [600, 0.9], T.tapOn - 0.05, T.clip + 0.05, (t) => 0.035 * on(t), 0.1, 0.05);
-    // the sponge: lifted out, and the water just pours off it — in a hush
-    this._band(S, bus, 'white', [3800, 0.9], T.spongeUp, T.pond, (t) => 0.04 * MathX.smooth(t, T.spongeUp + 0.1, T.spongeUp + 0.4) * (1 - MathX.smooth(t, T.spongeUp + 1.8, T.pond - 0.1)), 0.3, 0.03);
+    this._soda(S, bus);
     // the watering can: a hiss into the soil, and run-off sheeting off the bench without a single drip
     this._band(S, bus, 'white', [3300, 0.8], T.pour, T.pourEnd + 0.5, (t) => 0.05 * MathX.smooth(t, T.pour + 0.2, T.pour + 0.5) * (1 - MathX.smooth(t, T.pourEnd - 0.2, T.pourEnd + 0.15)), -0.1, 0.03);
     this._band(S, bus, 'pink', [900, 1.4], T.pour + 0.8, T.wick, (t) => 0.03 * MathX.smooth(t, T.pour + 0.9, T.pour + 1.6) * (1 - MathX.smooth(t, T.wick - 0.05, T.wick)), 0.2, 0.05);
+  }
+
+  /* the sparkling water: the cap's ratchet, the seal's hiss, then one whoomph and a roar of spray; afterwards nothing:
+     no fizz, no crackle of foam (bubbles that can't hold together don't pop) */
+  _soda(S, bus) {
+    const T = NST, o = T.sodaOpen;
+    const gas = (t) => MathX.smooth(t, o - 0.12, o + 0.04) * (1 - 0.45 * MathX.smooth(t, o + 0.9, o + 1.8)) * (1 - MathX.smooth(t, o + 1.6, o + 3.6));
+    for (let k = 0; k < 9; k++) S.click(o - 0.75 + k * 0.075 + 0.01 * Math.sin(k * 3.1), 0.03 + 0.004 * k, -0.05, bus);
+    // the seal cracks: a sharp rising hiss
+    this._band(S, bus, 'white', [6000, 0.9], o - 0.16, o + 0.1, (t) => 0.07 * MathX.smooth(t, o - 0.15, o - 0.05) * (1 - MathX.smooth(t, o, o + 0.08)), 0, 0.01);
+    // it goes: a deep whoomph and a broadband roar of gas and spray that dies with the pressure
+    S.whump(o + 0.01, 0.16, 0, bus); S.thump(o + 0.02, 0.12, bus);
+    this._band(S, bus, 'pink', [250, 7000], o - 0.12, o + 3.8, (t) => 0.11 * gas(t), 0, 0.02);
+    this._band(S, bus, 'white', [3800, 0.8], o - 0.12, o + 3.8, (t) => 0.06 * Math.pow(gas(t), 1.4), 0.1, 0.02);
+    // the spray landing on the counter and on your hand: a soft spatter-hiss (no plinks)
+    this._band(S, bus, 'pink', [2400, 0.8], o + 0.3, o + 3.0, (t) => 0.045 * MathX.smooth(t, o + 0.35, o + 0.6) * (1 - MathX.smooth(t, o + 1.2, o + 2.9)), -0.15, 0.03);
+    // the cap knocked against the back splash somewhere off to the right
+    S.clunk(o + 0.62, 0.03, 0.6, bus); S.click(o + 0.7, 0.02, 0.65, bus);
   }
 
   /* things you touch */
@@ -145,22 +163,24 @@ class NstAudio extends AudioEngine {
     S.click(T.tapOn, 0.06, 0.2, bus); S.click(T.tapOn + 0.06, 0.03, 0.2, bus);
     // the paperclip touches the water (nothing holds it), then a glass tink on the bottom of the dish
     S.pluck(T.clipLet + 0.36, 3150, 0.05, 0.05, bus, 0.5, 0.9); S.pluck(T.clipLet + 0.38, 5200, 0.02, 0.05, bus, 0.3, 0.9);
-    // the paper towel: a dry rustle as it comes down
-    this._band(S, bus, 'white', [3000, 0.6], T.towel, T.towelIn + 0.2, (t) => 0.02 * MathX.smooth(t, T.towel, T.towel + 0.1) * (0.5 + 0.5 * Math.abs(Math.sin(t * 23))) * (1 - MathX.smooth(t, T.towelIn - 0.1, T.towelIn + 0.15)), 0.1, 0.02);
-    // the sponge: a squeeze
-    this._band(S, bus, 'pink', [700, 1.5], T.sponge + 0.05, T.sponge + 0.5, (t) => 0.06 * MathX.smooth(t, T.sponge + 0.05, T.sponge + 0.1) * (1 - MathX.smooth(t, T.sponge + 0.12, T.sponge + 0.45)), 0.2, 0.01);
+    // the lever pushed further open
+    S.click(T.tapMore + 0.2, 0.04, 0.2, bus);
     // the strider: no plip as it goes under — just a tiny soft fizz
     this._band(S, bus, 'white', [6500, 1.2], T.strider + 0.1, T.strider + 0.6, (t) => 0.012 * MathX.smooth(t, T.strider + 0.1, T.strider + 0.15) * (1 - MathX.smooth(t, T.strider + 0.2, T.strider + 0.55)), 0, 0.01);
     // the watering can lifted: a slosh
     this._band(S, bus, 'pink', [450, 1.2], T.bench + 0.2, T.bench + 1.2, (t) => 0.03 * Math.max(0, Math.sin((t - T.bench - 0.2) * Math.PI)), -0.2, 0.02);
-    // the umbrella: opened over you
-    this._band(S, bus, 'white', [1800, 0.8], T.umb - 0.5, T.umb + 0.1, (t) => 0.04 * MathX.smooth(t, T.umb - 0.5, T.umb - 0.1) * (1 - MathX.smooth(t, T.umb - 0.05, T.umb + 0.08)), 0.3, 0.01);
-    S.click(T.umb + 0.05, 0.05, 0.3, bus);
     // the cuts outside: a soft air shift
-    for (const t of [T.pond, T.bench, T.lapse]) this._band(S, bus, 'pink', [400, 3000], t - 0.25, t + 0.3, (u) => 0.03 * MathX.smooth(u, t - 0.25, t) * (1 - MathX.smooth(u, t, t + 0.3)), 0, 0.02);
+    for (const t of [T.pond, T.bench, T.lapse, T.duck]) this._band(S, bus, 'pink', [400, 3000], t - 0.25, t + 0.3, (u) => 0.03 * MathX.smooth(u, t - 0.25, t) * (1 - MathX.smooth(u, t, t + 0.3)), 0, 0.02);
+    // the gust on the closing line (the leaf dips; a surge of water runs off its tip)
+    this._band(S, bus, 'pink', [700, 0.6], T.line2 - 0.4, T.line2 + 2.2, (t) => 0.05 * MathX.smooth(t, T.line2 - 0.3, T.line2 + 0.2) * (1 - MathX.smooth(t, T.line2 + 0.4, T.line2 + 2.1)), -0.3, 0.03);
+    // the duck: hard, muffled paddling under the waterline (a low swish each stroke) and a few hoarse, tired quacks
+    for (let t = T.duck + 0.05; t < T.dive; t += 1 / 1.7) {
+      for (const [dt, pan] of [[0, -0.1], [0.5 / 1.7, 0.1]]) this._band(S, bus, 'brown', [90, 600], t + dt, t + dt + 0.3, (u) => 0.05 * Math.sin(MathX.clamp((u - t - dt) / 0.28, 0, 1) * Math.PI), pan, 0.01);
+    }
+    for (const [t, n] of [[T.duck + 1.1, 3], [T.duck + 3.6, 2], [T.duck + 5.6, 4]]) for (let k = 0; k < n; k++) S.voice(t + k * 0.19, 470 - 25 * k, 0.13, 'a', 0.018, -0.1, bus, 0.72);
   }
 
-  /* the time-lapse days, the clouds, the rain (a roar of mist with no patter), the hiss on the umbrella, thunder */
+  /* the time-lapse days, the clouds, the rain (a roar of mist with no patter), far thunder */
   _storm(S, bus, water) {
     const ctx = S.ctx, T = NST, end = CONFIG.duration + 0.3;
     // each passing day: a long airy whoosh, centred on midday
@@ -172,10 +192,12 @@ class NstAudio extends AudioEngine {
     }
     // wind rising with the clouds
     this._band(S, bus, 'brown', [60, 700], T.clouds - 1, end, (t) => 0.05 * MathX.smooth(t, T.clouds - 1, T.rain + 1) * (0.75 + 0.25 * Math.sin(t * 0.5)), 0, 0.1);
-    // rain: one smooth, soft roar (no drops, no patter); brighter and closer under the umbrella
-    const R = (t) => nstRain(t);
-    this._band(S, water, 'pink', [500, 7000], T.rain - 0.6, end, (t) => 0.048 * R(t) * (t > T.drone ? 1.1 : 1), 0, 0.05);
-    this._band(S, water, 'white', [5200, 0.7], T.rain - 0.6, end, (t) => 0.018 * R(t) * (1 + 1.4 * MathX.smooth(t, T.umb - 0.3, T.umb + 1.5) * (1 - MathX.smooth(t, T.drone - 0.1, T.drone + 0.6))), 0.2, 0.05);
+    // rain: one smooth, soft roar (no drops, no patter, no plinks on the pond: a drop hitting water rings because it
+    // traps a tiny bubble, and with no surface tension there is no bubble to ring); at the waterline it is half muffled
+    const R = (t) => nstRain(t), wl = (t) => (t >= T.duck && t < T.dive ? 1 : 0);
+    this._band(S, water, 'pink', [500, 7000], T.rain - 0.6, end, (t) => 0.048 * R(t) * (1 - 0.35 * wl(t)) * (t > T.dive ? 1.1 : 1), 0, 0.05);
+    this._band(S, water, 'pink', [80, 500], T.rain - 0.6, end, (t) => 0.05 * R(t) * wl(t), 0, 0.05);
+    this._band(S, water, 'white', [5200, 0.7], T.rain - 0.6, end, (t) => 0.018 * R(t) * (1 - 0.5 * wl(t)), 0.2, 0.05);
     // thunder: far before the rain, then with the lightning
     S.farBoom(T.clouds + 0.7, 0.12, -0.5, this.revBig);
     for (const [t, k] of NST.flashes) { const v = 0.14 * k; S.boom(t + 0.35, v, bus, this.revBig); S.farBoom(t + 0.2, v * 0.8, -0.3, this.revBig); }
@@ -199,7 +221,7 @@ class NstAudio extends AudioEngine {
       S.thump(T.drop + 0.02, 0.14, bus);
     }
     // a soft two-note pulse under the kitchen beats (D–A, very quiet), a new note at each new consequence
-    const beats = [T.tap, T.clip, T.towel, T.sponge, T.pond, T.bench];
+    const beats = [T.tap, T.clip, T.soda, T.pond, T.bench];
     for (let t = T.zero + 0.6; t < T.lapse - 0.2; t += 0.75) {
       const k = beats.filter((b) => b <= t).length, f = [146.8, 164.8, 174.6, 196, 220, 196, 174.6, 164.8][k % 8];
       S.tone(t, 0.5, f, 0.02, 0, lp, 'triangle', 0.02, 0.45);
@@ -220,8 +242,8 @@ class NstAudio extends AudioEngine {
     // the storm: a held low D with a slow beating fifth
     for (const [f, v] of [[73.4, 0.02], [110.4, 0.01], [146.8, 0.006]]) {
       const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f;
-      this._curve(g.gain, (t) => v * MathX.smooth(t, T.rain, T.rain + 3) * (1 - MathX.smooth(t, T.drone, T.drone + 1)), T.rain, T.drone + 1.1, 0.1);
-      o.connect(g); g.connect(lp); o.start(T.rain); o.stop(T.drone + 1.3);
+      this._curve(g.gain, (t) => v * MathX.smooth(t, T.rain, T.rain + 3) * (1 - MathX.smooth(t, T.dive, T.dive + 1)), T.rain, T.dive + 1.1, 0.1);
+      o.connect(g); g.connect(lp); o.start(T.rain); o.stop(T.dive + 1.3);
     }
     // the closing chord (D minor add9 → D with the third on the last line), rising under the payoff
     const chord = (t0, t1, notes, v) => {
@@ -233,7 +255,7 @@ class NstAudio extends AudioEngine {
         }
       }
     };
-    chord(T.drone, T.line2 + 0.3, [[73.4, 1.2], [146.8, 1], [220, 0.8], [329.6, 0.5], [349.2, 0.6]], 0.009);
+    chord(T.dive, T.line2 + 0.3, [[73.4, 1.2], [146.8, 1], [220, 0.8], [329.6, 0.5], [349.2, 0.6]], 0.009);
     chord(T.line2, end, [[73.4, 1.2], [146.8, 1], [220, 0.8], [293.7, 0.6], [370, 0.6], [440, 0.4]], 0.01);
   }
 }

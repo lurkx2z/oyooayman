@@ -1,7 +1,9 @@
 # WHAT IF WATER LOST ALL SURFACE TENSION? — production plan
 
-> Rules: `docs/VIDEO_FORMAT.md`, `docs/PHYSICS_EPISODE_RULES.md`, `docs/RETENTION_RULES.md`. Brief: `docs/briefs/` (Developer 4).
-> Page `no-surface-tension.html` · code `films/no-surface-tension/` · 60.3 s film (68.6 s of story time, cut by `CONFIG.edit`) · 1080×1920 · 30 fps.
+> Rules: `docs/VIDEO_FORMAT.md`, `docs/PHYSICS_EPISODE_RULES.md`, `docs/RETENTION_RULES.md`. Brief: `docs/briefs/` (Developer 4),
+> then the owner's creative-direction override of 2026-10-08 ("beautiful, strange microscopic physics … don't force
+> unrelated city destruction"). Page `no-surface-tension.html` · code `films/no-surface-tension/` · 60.3 s film (69.6 s of
+> story time, cut by `CONFIG.edit`) · 1080×1920 · 30 fps. Version 2 (the redesign); version 1 is in git history (commit 7f52dbf).
 
 ## 1. Rules
 
@@ -9,54 +11,113 @@
 |---|---|
 | Exact fictional rule | At 1.2 s the surface tension of liquid water (water–air, 72 mN/m at 20 °C) starts to fall; it is 0 by 1.6 s and stays there. |
 | Held constant | Everything else: water's density, viscosity, chemistry; how strongly water sticks to solids (adhesion); every other liquid; gravity; air. Only water is changed (HUD: "WATER ONLY · EVERYTHING ELSE NORMAL"). |
-| Changed | No surface "skin": no Laplace pressure, no capillary rise, no meniscus that can hold a pressure difference, nothing that rounds water into drops. |
-| Real consequences (one per beat) | Beads and the dome on a brimming glass slump into thin films (no restoring tension, adhesion kept → spreading). A tap stream no longer pinches into drops (Rayleigh–Plateau needs tension); it tears into shreds and mist. A paperclip can't float (it was held by the surface). A paper towel doesn't wick (capillary rise h = 2γcosθ/ρgr → 0). A sponge can't hold water (capillary retention). Water striders fall through. Soil can't hold water against gravity (matric suction is capillary) — it runs straight through. A wick stays dry above the water line (built, then cut from the film for pace). Plants: the xylem's water column is pulled by tension held at menisci in the leaf's cell-wall pores; with no tension that pull fails → wilting over days. Rain: drops are stabilised by tension against air drag (Weber number); without it, falling water shreds into spray. Fabric: water-repellent fabric stops water because tension can't push through tiny pores (entry pressure ∝ γ) → umbrellas let it through. |
-| Simplifications | Adhesion kept (so water spreads as films rather than doing something stranger). Time compressed in the time-lapse (on-screen note). Wilting shown as droop + colour, over ~3 days. Spreading uses Huppert's gravity–viscous film law R ≈ 0.55 (gV³t/ν)^⅛. |
+| Changed | No surface "skin": no Laplace pressure, no capillary rise, no meniscus that can hold a pressure difference, nothing that rounds water into drops, no barrier to starting a bubble. |
+| Real consequences (one per beat) | Beads and the dome on a brimming glass slump into thin films. A tap stream no longer pinches into drops (Rayleigh–Plateau needs tension); it tears into shreds and mist. A paperclip can't float. **Sparkling water erupts when opened:** a new bubble must overcome the barrier ΔG* = 16πσ³/(3ΔP²); with σ = 0 bubbles nucleate everywhere at once, the dissolved CO₂ (about 3 volumes of gas per volume of water) comes out in one go and throws most of the water out; no foam is left because foam needs surface tension; then it is flat. Water striders fall through. Soil can't hold water (matric suction is capillary). Plants: the xylem's water column is held under tension by menisci in the leaf's cell-wall pores; with no tension, air seeds in and the pull fails → wilting over days. Rain: drops are held together against air drag by tension (Weber number); without it falling water shreds into ligaments and mist; it joins a pond with no splash crown, no capillary rings and no "plink" (that sound is a bubble trapped by the drop). **Ducks soak through:** water is kept out of the plumage because surface tension can't be pushed into the gaps between feather barbs (entry pressure ∝ σ); with none it soaks in, the trapped air is lost and the bird rides low (the detergent-duck effect). At a leaf tip water can't gather into a drop: it leaves as a thin continuous thread. |
+| Simplifications | Adhesion kept (so water spreads as films rather than doing something stranger). Time compressed in the time-lapse (on-screen note). Wilting shown as droop + colour over ~3 days. Spreading uses Huppert's gravity–viscous film law R ≈ 0.55 (gV³t/ν)^⅛. The eruption is drawn as a white column, spray and torn shreds; its height (≈0.6 m) is conservative. Gas still leaving the clearing water is drawn as thin ragged threads, not round bubbles. |
 | Misconceptions to avoid | Water doesn't "disappear", oceans don't drain, nothing explodes. No tsunamis, no collapsing lungs, no dissolving people, no building collapses (brief). |
-| Formulas / numbers used | σ = 72 mN/m → 0; capillary rise 0 mm; Huppert spreading; ballistic streams (flight time from v₀ and drop height); a flat paperclip settling at roughly 0.1 m/s. |
-| Must NOT claim | That this could happen; exact wilting times; anything about soap, bubbles, tears, ink, lungs — left open for the comments. |
+| Formulas / numbers used | σ = 72 mN/m → 0; ΔG* ∝ σ³; capillary rise 0 mm; Huppert spreading; ballistic streams (flight time from v₀ and drop height); a flat paperclip settling at roughly 0.1 m/s; jets launched at ≈3 m/s from the bottle neck. |
+| Must NOT claim | That this could happen; exact wilting times; anything about soap films, tears, ink or lungs (left open for the comments). |
 
 ## 2. The places
-One scene, two sets, and the kitchen window looks out onto the same garden.
-- **Kitchen** (inside the house wall at z 0.2, you face −Z): counter top y 0.92, glass of water at (−0.56, 0.52), beads in front of it, clear glass dish at (−0.2, 0.61), sink x 0…0.62 / z 0.33…0.75 with a gooseneck tap (spout (0.31, 1.205, 0.5)), pothos, paper-towel roll. Own lights + an indoor reflection map; the garden sun/sky are dimmed while you are inside.
-- **Garden** (z < 0): lawn, patio and stepping stones, pond centred (−0.9, −6.6) r 1.62 with pads and striders, potting bench against the wall at x 1.7–3.3 (pot A to water, pot B = wick pot), flower bed along the left fence, trees, park and city beyond.
+One scene, two sets, and the kitchen window looks out onto the same garden. No streets, no cars, no city.
+- **Kitchen** (inside the house wall at z 0.2, you face −Z): counter top y 0.92, glass of water at (−0.56, 0.52), beads
+  in front of it, clear glass dish at (−0.2, 0.61), a 0.5 L bottle of sparkling water at (−0.4, 0.63), sink x 0…0.62 /
+  z 0.33…0.75 with a gooseneck tap (spout (0.31, 1.205, 0.5)), pothos, paper-towel roll.
+- **Garden** (z < 0): lawn, patio and stepping stones, pond centred (−0.9, −6.6) r 1.62 with pads, striders and a
+  mallard, a sunflower at (−2.9, −4.2), potting bench against the wall at x 1.7–3.3, flower bed along the left fence,
+  trees, then a park, fields, woods and low hills that dry out with everything else.
 
-## 3. Shot list (film seconds)
+## 3. Redesign (the 2026-10-08 creative override)
 
-Everything is authored in story time (`script.js`); `CONFIG.edit = [[0, 27.8], [29.0, 33.7], [37.45, 44.95], [48.3, 68.6]]`
-keeps four stretches, so film = story for 0–27.8, story − 1.2 for the bench, story − 4.95 for the time-lapse and
-story − 8.3 from the storm on. The self-watering wick shot (story 33.7–37.4) was built and then cut for pace.
+**Identity**
+- *What can this show that no previous video has?* Physics at the scale of a fingertip, all within 20 m of one kitchen:
+  water that can't make a drop, a bottle that erupts the instant it is opened, an insect falling through the surface, a
+  duck soaking through. Every other episode ends up in streets or a city; this one never leaves the house and garden.
+- *Most surprising consequence:* opening a fizzy drink makes it erupt, and seconds later it is flat.
+- *Most visually unusual:* the waterline shot, half under the pond: rain that doesn't splash, a soaked duck riding low,
+  its feet paddling under the line.
+- *Strongest scene:* the bottle eruption.
+- *Distinguishable with the HUD removed?* Yes: kitchen macro, a pond seen from the waterline, an ending on one leaf.
+
+**Consequences considered (ranked; ✓ = in the film)**
+1. ✓ Fizzy drinks erupt when opened, then go flat (nucleation barrier ∝ σ³ → 0).
+2. ✓ Water birds soak through and ride low (feather entry pressure ∝ σ).
+3. ✓ Water striders fall through the surface.
+4. ✓ Water can't form drops (the tap's stream frays; beads and the glass's dome slump).
+5. ✓ Plants wilt even in the rain (the xylem's pull fails at the leaf's menisci).
+6. ✓ Rain falls as shreds and mist; on a pond no splash crown, no rings, no plink.
+7. ✓ Soil can't hold water.
+8. ✓ A paperclip can't float (kept short).
+9. ✗ Paper towels and sponges stop wicking (cut: the weakest picture, it shows an absence).
+10. ✗ Umbrellas and woven fabric let rain through (cut: the "look up at the umbrella" beat is recycled).
+11. ✗ Soap bubbles can't exist (only implied: the eruption leaves no foam).
+
+**Signature moments**
+- **A, first surprise (0–9.6 s):** under the title the brimming glass's dome collapses and the beads slump; then the tap
+  that can't make a drop, opened wider at 6.9 s into a twisting, fraying veil.
+- **B, impossible-looking physics (15.5 s):** the cap cracks, the clear bottle turns white all at once and throws a
+  white column out of the neck; it clears from the bottom up and is left flat.
+- **C, a payoff unlike the other endings (39.0–60.3 s):** the waterline shot with the soaked duck, then a dive from the
+  sky over the browned garden down to one wilted sunflower leaf whose tip can't make a drop. The film ends on the
+  smallest thing in it instead of rising over a city.
+
+**What was wrong with version 1 (independent differentiation review: distinctiveness 7, keep-watching 5)**
+- Most repetitive sequences: the ending (a drone rise over garden, park and city with lightning, 48.7–60.3 s), the
+  run of tabletop "hand test" beats (towel 14.6 s, sponge 18.3 s after the paperclip), and the "NORMAL WATER WOULD…"
+  tags on three beats in a row.
+- Most boring timestamps: 15–17 s (the towel: nothing happens by design), 44.3–48.7 s (the umbrella), 50.5–60.3 s (the
+  rise, no new event). Also 4.9–9.6 s (one event for the whole tap shot).
+- Weakest demonstration: the paper towel. Weakest part of the ending: a generic rise over a city; "ecosystem" was told,
+  not shown.
+
+**Revised shot list (version 1 → version 2)**
+
+| Original shot | Why it feels repetitive | Replacement | Why it is more interesting |
+|---|---|---|---|
+| Tap, 4.4–9.6 s: one trickle for 5 s | One event held too long | The lever is pushed further at 6.9 s: the trickle widens into a twisting, fraying veil; the camera drifts down | A second event inside the shot; the stream visibly changes |
+| Paper towel, 14.6–18.3 s | Shows an absence (nothing climbs); third tabletop test in a row; a third tag | A sealed bottle of sparkling water: the cap is twisted, the bottle turns white and erupts | The most surprising consequence; sudden motion and sound |
+| Sponge, 18.3–22.2 s | Fourth "hand + object" test | The same bottle clearing from the bottom up, left flat | Follow-through of the eruption: no foam, flat in seconds |
+| Storm wide + umbrella soaking through, 40.0–48.7 s | "Look up at the umbrella in the rain" is a stock beat; the soak was a shader effect | Half under the pond at the waterline: rain as shreds and mist with no splashes, a soaked duck riding low, its feet paddling under the line | A frame the channel has never shown; a living animal; small-scale physics |
+| Drone rise over garden, park and city with lightning, 48.7–60.3 s | The same rise-and-reveal ending as Oxygen, Friction and the sibling episodes; 10 s with no new event | A dive from the sky down to one wilted sunflower leaf; its tip lets the rain go as a thread, never a drop; the fixed lines play over it | Ends on the smallest scale; ties back to the opening drop |
+| The city behind the park | Unrelated city; reads as "city episode" | Fields, woods and low hills that brown with the garden | Keeps the film in the natural world it is about |
+| Three "NORMAL WATER WOULD…" tags | A repeated device | One tag (the tap) | Less repetition |
+| Time-lapse lawn only | Wilting read late | A sunflower in the middle of the frame bows and browns from the first hours | Shows the cause in one plant, early |
+
+## 4. Shot list (film seconds)
+
+Everything is authored in story time (`script.js`); `CONFIG.edit = [[0, 14.4], [14.6, 21.4], [22.2, 27.8], [29.0, 33.7], [37.45, 44.95], [48.3, 69.6]]`.
 
 | # | Film time | What we SEE | What we HEAR | Caption / HUD |
 |---|---|---|---|---|
-| 1 | 0–4.4 | Macro on the counter: a brimming glass with a domed top, round beads. At 1.2–1.6 s the dome collapses and overflows, the beads slump into dark, glossy wet films. | Kitchen tone, birds through the glass, a tap dripping (plip … plip) that stops. A taut string goes slack with the readout; a low thud. | TITLE centred (to 3.9) · SURFACE TENSION 72 → 0 mN/m |
-| 2 | 4.4–9.6 | Cut: eye level with the tap. Your hand turns the lever; the stream never pinches into drops, it twists and frays into a thin haze. | Click; a smooth hiss, no gurgle, no splash. | Tag "NORMAL WATER WOULD BREAK INTO DROPS HERE" · "Water would stop forming drops." (5.6) |
-| 3 | 9.6–14.6 | A glass bowl. Your fingers lay a paperclip flat on the water, let go: it glides down to the bottom. A faint outline stays where it would have floated. | A small glass tink. | Tag "NORMAL WATER WOULD HOLD IT UP HERE" · "A paperclip used to float on it." (11.6) |
-| 4 | 14.6–18.3 | A paper-towel strip dipped in: only the part under water is wet. | Paper rustle. | Tag "NORMAL WATER WOULD CLIMB TO HERE" · "Paper towels can't pull it up anymore." (16.2) |
-| 5 | 18.3–22.2 | A soaked sponge lifted out of the steel sink: the water pours straight out. | Squeeze, a hush of pouring. | "A sponge can't hold water anymore." (19.2) |
-| 6 | 22.2–27.8 | Cut outside, close on the pond: a water strider steps off a lily pad (23.8) and falls through; faint ripple rings. | Garden air, birds, insects, a tiny fizz. | 0 mN/m · NO SURFACE SKIN TO STAND ON · "Insects that walk on water fall through." (22.9) |
-| 7 | 27.8–32.5 | Potting bench: you water a pot; it runs straight through the soil, fills the saucer and spills off the bench. | Can slosh, hiss into soil, run-off. | CAPILLARY RISE 0 mm · TINY PORES CAN'T HOLD WATER NOW · "Soil can't hold water either." (29.4) |
-| 8 | 32.5–40.0 | Time-lapse over the garden, 3 days: sun arcs, two nights pass, lawn yellows to straw, flowers droop and brown, trees brown. | Ticks speeding up, a warm pad that sours, crickets at night, birds thinning. | TIME SINCE THE CHANGE (hours → DAY 3) · PLANTS WILTING % · "Leaves pull water up through hair-thin tubes." (33.45) · "Without surface tension, air leaks in and the pull breaks." (36.65) |
-| 9 | 40.0–44.3 | Clouds roll in, storm. Rain falls as torn, twisting strands and mist, no drops. | Wind, distant thunder, rain as one soft roar, no patter. | ROUND DROPS 0 · IT FALLS AS SHREDS AND MIST · "Rain can't hold itself together." (40.7) |
-| 10 | 44.3–48.7 | You look up at your yellow umbrella: the fabric darkens evenly with soaked streaks running down each panel; fine spray falls through. | Hiss on the fabric. | "And woven fabric can't keep it out." (45.6) |
-| 11 | 48.7–60.3 | Payoff: the camera rises over the wilted garden, the park and the city in the storm; three lightning flashes (50.0, 52.25, 55.05). | Thunder with each flash, the closing chord. | 0 mN/m · SAME WATER · NO DROPS · "It looks like a tiny force…" (52.3) / "…until an entire ecosystem depends on it." (55.1) · note FICTIONAL RULE: ONLY WATER'S SURFACE TENSION CHANGED / TIME COMPRESSED (58.3) · fade to black |
-
-## 4. Hero shots
-The beads slumping under the title (1.2–2.2 s); the strider falling through (24–26 s); the time-lapse garden on day 3 (39 s, cover candidate, doesn't spoil the payoff); the stormy rise with lightning (50–55 s).
+| 1 | 0–4.4 | Macro on the counter: a brimming glass with a domed top, round beads. At 1.2–1.6 s the dome collapses and overflows, the beads slump into glossy wet films. | Kitchen tone, birds through the glass, a dripping tap that stops. A taut string goes slack; a low thud. | TITLE (to 3.9) · SURFACE TENSION 72 → 0 mN/m |
+| 2 | 4.4–9.6 | Side-on at the tap. Your hand lifts the lever: the trickle never pinches into drops. At 6.9 s you push it further: a wide, twisting, fraying veil. | Click; a smooth hiss that grows; no gurgle. | Tag "NORMAL WATER WOULD BREAK INTO DROPS HERE" · "Water would stop forming drops." |
+| 3 | 9.6–14.4 | A glass dish: your fingers lay a paperclip on the water and let go; it glides to the bottom; a faint outline stays where it would have floated. | A glass tink. | "A paperclip used to float on it." |
+| 4 | 14.4–21.2 | A sealed bottle of sparkling water, clear. You twist the cap: the seal cracks, the whole bottle turns white and a white column erupts out of the neck, the cap flies off with your hand, spray and shreds rain down. It clears from the bottom up, half empty and flat, on a wet counter. | Ratchet clicks, a sharp hiss, a whoomph and a roar of spray; then silence (no fizz). | NOTHING HOLDS NEW BUBBLES BACK · "Every fizzy drink would erupt when opened." · "All its bubbles form at once. Then it's flat." |
+| 5 | 21.2–26.8 | Close on the pond: a water strider steps off a lily pad and falls through. | Garden air, birds, insects, a tiny fizz. | NO SURFACE SKIN TO STAND ON · "Insects that walk on water fall through." |
+| 6 | 26.8–31.5 | Potting bench: water poured into a pot runs straight through and off the bench. | Can slosh, hiss into soil. | CAPILLARY RISE 0 mm · "Soil can't hold water either." |
+| 7 | 31.5–39.0 | Time-lapse, three days: the sunflower in the middle of the frame bows and browns, the lawn yellows to straw, trees and hills brown. | Ticks speeding up, a souring pad, crickets, fewer birds. | TIME SINCE THE CHANGE · PLANTS WILTING % · two captions on the xylem |
+| 8 | 39.0–46.5 | The waterline, half under the pond: rain arrives as shreds and mist, no splashes or rings; a soaked mallard rides low and paddles hard, its feet under the line. | Rain's roar half muffled, low swishes of paddling, tired quacks; no plinks. | ROUND DROPS 0 → DUCK'S FEATHERS SOAKED · "Rain can't hold itself together." · "And feathers can't keep it out." |
+| 9 | 46.5–51.7 | The dive: from high over the browned garden and pond, down past the bowed sunflower to one leaf. | The closing chord begins. | SAME WATER · NO DROPS · "Even the rain can't save the garden." |
+| 10 | 51.7–60.3 | Macro on the leaf: its tip lets the rain water go as a thin unbroken thread; the pond and the duck behind. A gust at 55.2 s sends a surge down the leaf; still no drop. | Rain, the chord, then quiet. | "It looks like a tiny force…" (52.3) / "…until an entire ecosystem depends on it." (55.1) · note (58.3) · fade |
 
 ## 5. Escalation check
-Kitchen micro (drops → stream → clip → towel → sponge) every 4–5 s → living things (strider) → the garden's water supply (soil) → plants over days → the weather → the whole landscape. Every shot moves (slow push-ins, falling water, time-lapse); nothing static for 3 s.
+Kitchen micro (a drop → a stream → a clip → a bottle) → a living insect → the garden's soil → plants over days → the
+weather and a bird → the whole garden from the sky → back down to one leaf. Every shot has a new event within 4–5 s.
 
 ## 6. Sound
-See the header of `audio.js`. Idea: water's voice is drops (drips, patter, gurgle); without surface tension water only hisses. Buses: room, water, music; glue compressor + limiter + a fixed trim after the limiter; measured on the baked soundtrack of the 60.3 s cut: −17.0 LUFS integrated, true peak −2.1 dBFS, LRA 6.8 LU.
+See the header of `audio.js`. Water's voice is drops (drips, patter, plinks, fizz); without surface tension water only
+hisses or roars. Buses: room, water, music; glue compressor + limiter + a fixed trim after the limiter.
 
 ## 7. Systems / files
-- Reused: CameraController, ViewerHands, StoryHUD, post/Look, fog, Environment (subclassed as `NstGarden`), AudioEngine (subclassed as `NstAudio`), BillboardSystem, StreakSystem, Person rig, batch.
-- New (film-local, `nst`-prefixed): `water.js` (Fresnel water material, NstPuddle spreading drop/film, NstStream fraying stream, NstSpray mist, nstWetLook, nstSpreadR), `kitchen.js` (NstKitchen set + room reflection map), `garden.js` (NstGarden: sky with day/night/storm, pond, striders, bench, wick pot, beds, park, rain), `film.js` (hands, props, tags, grade), `audio.js`.
+- Reused: CameraController, ViewerHands, StoryHUD, post/Look, fog, Environment (subclassed as `NstGarden`), AudioEngine
+  (subclassed as `NstAudio`), BillboardSystem, StreakSystem, batch, SmoothTrack.
+- New (film-local, `nst`-prefixed): `water.js` (Fresnel water, NstPuddle, NstStream, NstSpray, nstWetLook, nstSpreadR),
+  `kitchen.js` (NstKitchen: glass, beads, tap, dish and paperclip, the sparkling-water bottle and its eruption),
+  `garden.js` (NstGarden: sky by day/night/rain, pond, striders, the duck, the sunflower and its leaf thread, bench,
+  beds, park, hills, rain), `film.js` (hands, can, the waterline lens, the dive, the tag, the grade), `audio.js`.
 
 ## 8. Review log
-Each round: five independent reviewers (retention, normal viewer, visual, cinematography, physics) looking at preview
-frames every 0.5 s. Scores out of 10, as given.
+Version 1 (three rounds of five independent reviewers on frames every 0.5 s; scores out of 10, as given):
 
 | Round | Cut | Retention | Normal viewer | Visual | Cinematography | Physics |
 |---|---|---|---|---|---|---|
@@ -64,19 +125,5 @@ frames every 0.5 s. Scores out of 10, as given.
 | 2 | 61.0 s | 5 | 6 | 5 | 5 | 7 |
 | 3 | 60.3 s | 6 | 5 | 6 | 6 | 8 |
 
-- **Round 1 → 2:** cut from 68.6 to 61.0 s (wick shot and slow tails out); the sink basin opened up (a cabinet top was
-  capping it); a close top-down strider shot; wilting starts within hours, straw lawn by day 3; rain as slow torn
-  strands; less fog in the payoff; towel tag and framing; the watering can aims into the pot; sound trimmed below −1 dBTP.
-- **Round 2 → 3:** rain as twisting torn ribbons with a drop-count readout; the umbrella soaks where water lands, with no
-  sideways spreading (that would be wicking); wilting reads as drying, not autumn; the potting bench was being built
-  three times (a method name clashed with the engine's park bench); no street grime on the lawn; tighter time-lapse cut;
-  higher payoff rise with lightning on the sky; the glass overflow drains away; a pale "normal water" paperclip outline
-  with a tag; softer tap mist; bigger world tags; wording fixes from the physics review. Cut 60.3 s.
-- **Round 3 → final (not re-reviewed):** payoff lawns straw-coloured under the storm grade; rain strands wider, twisting,
-  with a drop-count readout; umbrella soak as even darkening plus downhill streaks; paperclip sinks slower with a fainter
-  "would float here" outline; no round mist specks at the tap; brighter nights; glossier spill on the counter; lapse
-  framing moved so the readout covers less of the tree.
-- **Still weak (honest):** the hand's skin tone shifts between the kitchen and the garden lighting; the dome and spill
-  on the dark counter read best on a phone at full brightness; the towel beat has no visible "wet band" to show what is
-  missing; the umbrella shot shows no shaft or hand; the time-lapse readout still overlaps the top-left of the tree;
-  the bench shot's lower third is empty. No reviewer listened to the sound (it was only level-measured).
+Version 1 differentiation review (against Oxygen, Friction and the four sibling episodes): distinctiveness 7,
+keep-watching 5. Version 2 rounds are logged below as they happen.
