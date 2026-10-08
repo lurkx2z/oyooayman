@@ -25,10 +25,12 @@ class NstAudio extends AudioEngine {
     // mix → make-up gain → glue compressor → limiter, a fade in and out
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3; comp.attack.value = 0.006; comp.release.value = 0.25;
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12;
-    const mixIn = ctx.createGain(); mixIn.gain.value = 4.8; mixIn.connect(comp);
-    const out = ctx.createGain(); comp.connect(out); out.connect(lim); lim.connect(ctx.destination);
-    out.gain.setValueAtTime(0, 0); out.gain.linearRampToValueAtTime(0.9, 0.08);
-    out.gain.setValueAtTime(0.9, end - 1.6); out.gain.linearRampToValueAtTime(0, end);
+    const mixIn = ctx.createGain(); mixIn.gain.value = 5.6; mixIn.connect(comp);
+    // (the limiter's own make-up gain lets peaks reach ≈ −0.7 dBFS: a fixed trim after it keeps true peaks under −1 dB)
+    const trim = ctx.createGain(); trim.gain.value = 0.84;
+    const out = ctx.createGain(); comp.connect(out); out.connect(lim); lim.connect(trim); trim.connect(ctx.destination);
+    out.gain.setValueAtTime(0, 0); out.gain.linearRampToValueAtTime(0.86, 0.08);
+    out.gain.setValueAtTime(0.86, end - 1.6); out.gain.linearRampToValueAtTime(0, end);
     this.S = S;
     this.rev = S.reverb(1.1); const rs = ctx.createGain(); rs.gain.value = 0.3; this.rev.connect(rs); rs.connect(mixIn);
     this.revBig = S.reverb(3.2); const rb = ctx.createGain(); rb.gain.value = 0.35; this.revBig.connect(rb); rb.connect(mixIn);
@@ -176,7 +178,7 @@ class NstAudio extends AudioEngine {
     this._band(S, water, 'white', [5200, 0.7], T.rain - 0.6, end, (t) => 0.018 * R(t) * (1 + 1.4 * MathX.smooth(t, T.umb - 0.3, T.umb + 1.5) * (1 - MathX.smooth(t, T.drone - 0.1, T.drone + 0.6))), 0.2, 0.05);
     // thunder: far before the rain, then with the lightning
     S.farBoom(T.clouds + 0.7, 0.12, -0.5, this.revBig);
-    for (const [t, k] of NST.flashes) { const v = 0.21 * k; S.boom(t + 0.35, v, bus, this.revBig); S.farBoom(t + 0.2, v * 0.8, -0.3, this.revBig); }
+    for (const [t, k] of NST.flashes) { const v = 0.14 * k; S.boom(t + 0.35, v, bus, this.revBig); S.farBoom(t + 0.2, v * 0.8, -0.3, this.revBig); }
   }
 
   /* music: the slack string at the change, a soft pulse for the kitchen, a warm pad that sours as the plants wilt,
@@ -194,7 +196,7 @@ class NstAudio extends AudioEngine {
       g.gain.setValueAtTime(0.018, T.drop); g.gain.linearRampToValueAtTime(0.03, T.drop + 0.05); g.gain.setTargetAtTime(0, T.drop + 0.1, 0.35);
       o.connect(f); f.connect(g); g.connect(lp); o.start(0.35); o.stop(T.zero + 2.5);
       // and a low thud as it lets go
-      S.thump(T.drop + 0.02, 0.22, bus);
+      S.thump(T.drop + 0.02, 0.14, bus);
     }
     // a soft two-note pulse under the kitchen beats (D–A, very quiet), a new note at each new consequence
     const beats = [T.tap, T.clip, T.towel, T.sponge, T.pond, T.bench];

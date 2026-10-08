@@ -41,7 +41,7 @@ function nstSeg(t) { return t < NST.pond ? 'kitchen' : t < NST.bench ? 'pond' : 
 const NST_TAGS = [
   // the trickle: where ordinary water would have pinched off into drops (a point on the stream, 12 cm below the spout, + 3 cm to screen-right)
   { t0: 6.3, t1: 9.3, at: (t, o) => { const S = NST_K.tap.spout; return o.set(S[0] + 0.454 * 0.03, S[1] - 0.085, S[2] + 0.01 - 0.891 * 0.03); }, text: 'NORMAL WATER<br>WOULD BREAK<br>INTO DROPS HERE', line: true },
-  { t0: 16.1, t1: 18.3, at: (t, o) => o.set(NST_K.bowl.x - 0.01 + 0.033, NST_K.top + NST_K.bowl.water + 0.045, NST_K.bowl.z - 0.005), text: 'NORMAL WATER<br>WOULD CLIMB<br>TO HERE', line: true },
+  { t0: 16.1, t1: 18.3, at: (t, o) => o.set(NST_K.bowl.x - 0.01 + 0.033, NST_K.top + NST_K.bowl.water + 0.075, NST_K.bowl.z - 0.005), text: 'NORMAL WATER<br>WOULD CLIMB<br>TO HERE', line: true },
   { t0: 34.5, t1: 37.2, at: (t, o) => o.set(NST_G.potB.x + 0.012, NST_G.bench.top + 0.1, NST_G.potB.z), text: 'DRY ABOVE<br>THE WATER LINE', line: false },
 ];
 
@@ -181,7 +181,7 @@ const FILM = {
       const A = NST_G.potA;
       this.can.position.set(A.x + 0.36 + 0.12 * away, NST_G.bench.top + 0.42 - 0.06 * tilt - 0.55 * away, A.z - 0.22 - 0.25 * away);
       // local +X (the spout) points at the pot (toward −X world, slightly +Z); tilt pitches the spout down
-      this.can.rotation.set(0, Math.PI - 0.35, 0.55 * tilt - 0.08, 'YXZ');
+      this.can.rotation.set(0, Math.PI + 0.55, 0.55 * tilt - 0.08, 'YXZ');
       this.can.updateMatrixWorld(true);
       V.set(-0.05, 0.14, 0).applyMatrix4(this.can.matrixWorld);               // the top of the handle
       this._q.setFromRotationMatrix(this.can.matrixWorld);
