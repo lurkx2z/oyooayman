@@ -16,12 +16,13 @@ const NE_HAND_BLEND = Object.assign({}, HAND_BLEND, { bandIn: 0.5, bandOut: 0.5 
 for (const k of Object.keys(NE_HAND_POSES)) { if (k.endsWith('!')) continue; NE_HAND_POSES[k + '!'] = NE_HAND_POSES[k]; NE_HAND_BLEND[k + '!'] = 0.02; }
 
 // the cinematic shots: camera position / look-at / fov as functions of story time (null fields keep your own view)
+const NE_BALL_A0 = 76;   // where the ball inserts look from (degrees round the ball): mostly clear of his legs
 const NE_SHOTS = [
   // low on the paving beside the dead ball: a dashed ring shows its round shape; the flat spot keeps it lower, and when
   // his hand presses on it nothing changes back
   { id: 'ball', t0: NE.ballShot[0], t1: NE.ballShot[1],
-    cam: (t, app) => { const [bx, bz] = app.ball.spot(app.cast), u = Ease.inOutSine((t - NE.ballShot[0]) / (NE.ballShot[1] - NE.ballShot[0])), d = 1.0 - 0.14 * u, a = MathX.deg(112 - 14 * u);
-      return { p: [bx + Math.cos(a) * d, NE_BALL.ground + 0.06, bz + Math.sin(a) * d], at: [bx, NE_BALL.ground + 0.07, bz], fov: 40, focus: [bx, bz, 4] }; } },
+    cam: (t, app) => { const [bx, bz] = app.ball.spot(app.cast), u = Ease.inOutSine((t - NE.ballShot[0]) / (NE.ballShot[1] - NE.ballShot[0])), d = 1.0 - 0.14 * u, a = MathX.deg(NE_BALL_A0 - 14 * u);
+      return { p: [bx + Math.cos(a) * d, NE_BALL.ground + 0.06, bz + Math.sin(a) * d], at: [bx, NE_BALL.ground + 0.1, bz], fov: 40, focus: [bx, bz, 4] }; } },
   { id: 'racket', t0: NE.mont[0][0], t1: NE.mont[0][1], label: 'TENNIS RACKETS', line: 'The strings stretch… and stay stretched.',
     cam: (t) => { const R = NE_RACKET.p, u = t - NE.mont[0][0]; return { p: [R[0] - 0.62 + 0.03 * u, R[1] + 0.07, R[2] + 0.58 - 0.03 * u], at: [R[0], R[1] - 0.01, R[2]], fov: 36, focus: [R[0], R[2], 6] }; } },
   { id: 'shoe', t0: NE.mont[1][0], t1: NE.mont[1][1], label: 'RUNNING SHOES', line: 'The foam gets crushed… and mostly stays crushed.',
@@ -47,23 +48,21 @@ const NE_SHOTS = [
   // sedan's flank, they lock and slide off as one; the camera pans with them. 1/3 speed
   { id: 'crash', t0: NE.crashShot[0], t1: NE.crashShot[1],
     cam: (t) => { const u = (t - NE.crashShot[0]) / (NE.crashShot[1] - NE.crashShot[0]), k = MathX.smooth(t, NE.crash, NE_CRASH.tv + 0.4);
-      return { p: [-8.5 + 0.3 * u, 5.5, -55.0 + 0.4 * u], at: [-1.7 + 1.4 * k, 0.4, -46.0 + 1.8 * k], fov: 40, focus: [-1.0, -46, 14] }; } },
+      return { p: [-8.5 + 0.3 * u, 5.5, -55.0 + 0.4 * u], at: [-1.1 + 1.4 * k, 0.4, -45.8 + 1.8 * k], fov: 40, focus: [-1.0, -46, 14] }; } },
   // the locked wreck: a slow, high arc round it, starting from the side the van comes in (all three stay jammed together)
   { id: 'wreck', t0: NE.wreckShot[0], t1: NE.wreckShot[1],
-    cam: (t) => { const c = [0.05, -44.4], u = Ease.inOutSine((t - NE.wreckShot[0]) / (NE.wreckShot[1] - NE.wreckShot[0])), a = MathX.deg(-70 + 90 * u), r = 11.5 - 0.5 * u;
-      return { p: [c[0] + Math.sin(a) * r, 5.6 + 0.5 * u, c[1] + Math.cos(a) * r], at: [c[0], 0.4, c[1] - 0.4], fov: 40, focus: [c[0], c[1], 12] }; } },
+    cam: (t) => { const c = [0.05, -44.4], u = Ease.inOutSine((t - NE.wreckShot[0]) / (NE.wreckShot[1] - NE.wreckShot[0])), a = MathX.deg(-70 + 90 * u), r = 13.5 - 0.5 * u;
+      return { p: [c[0] + Math.sin(a) * r, 7.0 + 0.4 * u, c[1] + Math.cos(a) * r], at: [c[0] - 0.4, 0.4, c[1] - 1.0], fov: 40, focus: [c[0], c[1], 12] }; } },
   // the tap, side-on at the van's tail: the late hatch comes up the lane, brakes, meets the van at walking pace, backs off;
   // the camera pushes in on the bumper that stays pushed in (a dashed line where its front was)
   { id: 'tap', t0: NE.tapShot[0], t1: NE.tapShot[1],
     cam: (t, app) => { const T = NE_TAP, f = T.zc + CAR_PROFILES.hatch.L / 2, ps = app.traffic.q1.spec.pose(t), qf = ps ? ps.z + CAR_PROFILES.hatch.L / 2 : f - 9;
-      const k = MathX.smooth(t, NE.tapBack[0], NE.tapBack[1] + 0.4), az = MathX.clamp(qf + 0.4, f - 6.5, f + 0.15) * (1 - k) + (f - 0.55) * k;
+      const k = MathX.smooth(t, NE.tapBack[0], NE.tapBack[1] + 0.4), az = MathX.clamp(qf, f - 6.5, f - 0.1) * (1 - k) + (f - 0.55) * k;
       return { p: [5.2 - 3.7 * k, 1.5 - 0.75 * k, f - 1.2 + 0.8 * k], at: [T.x + 0.2, 0.62 - 0.12 * k, az], fov: 46 - 15 * k, focus: [T.x, f, 8] }; } },
-  // the end: low beside the flat ball, the teenager sitting behind it facing you, the trampoline's funnel beyond (the
-  // opening shot, looped); a slow push
+  // the end: the opening insert again (the loop), low beside the flat ball, its old top drawn over it; a slow push
   { id: 'end', t0: NE.endShot, t1: NE.end + 1,
-    cam: (t, app) => { const [bx, bz] = app.ball.spot(app.cast), u = Ease.outSine(MathX.clamp((t - NE.endShot) / (NE.end - NE.endShot), 0, 1)),
-        dx = NE_TRAMP.x - bx, dz = NE_TRAMP.z - bz, L = Math.hypot(dx, dz), fx = dx / L, fz = dz / L, rx = -fz, rz = fx, back = 0.95 - 0.15 * u, side = -0.35;
-      return { p: [bx - fx * back + rx * side, NE_BALL.ground + 0.08, bz - fz * back + rz * side], at: [bx + fx * 0.3, NE_BALL.ground + 0.12, bz + fz * 0.3], fov: 44, focus: [bx + fx * 3, bz + fz * 3, 10] }; } },
+    cam: (t, app) => { const [bx, bz] = app.ball.spot(app.cast), u = Ease.outSine(MathX.clamp((t - NE.endShot) / (NE.end - NE.endShot), 0, 1)), d = 1.0 - 0.14 * u, a = MathX.deg(NE_BALL_A0 - 14);
+      return { p: [bx + Math.cos(a) * d, NE_BALL.ground + 0.06, bz + Math.sin(a) * d], at: [bx, NE_BALL.ground + 0.1, bz], fov: 40, focus: [bx, bz, 4] }; } },
 ];
 
 // labels pinned to things in the world: [t0, t1, point(t, app) → [x, y, z], text]
@@ -71,7 +70,7 @@ const NE_TAGS = [
   { t0: 3.55, t1: 5.45, at: (t, app) => { const [bx, bz] = app.ball.spot(app.cast); return [bx, NE_BALL.ground + 2 * NE_BALL.r + 0.004, bz]; }, text: 'WHERE ITS TOP USED TO BE', cls: 'ne-tag line' },
   { t0: 16.15, t1: 17.35, at: () => [NE_TRAMP.x - 1.2, 1.35, NE_TRAMP.z + 1.2], text: 'SPRINGS STRETCHED · MAT STAYS DOWN' },
   { t0: 23.9, t1: 25.4, at: (t, app) => { const w = app.heroWheel(t); return [w.x + 0.15, 0.62, w.z - 0.75]; }, text: 'WHERE THE BODY USED TO SIT', cls: 'ne-tag line' },
-  { t0: 25.8, t1: 26.85, at: (t, app) => { const w = app.heroWheel(t); return [w.x, 0.98, w.z]; }, text: 'SPRING STAYS SQUASHED' },
+  { t0: 25.8, t1: 26.85, at: (t, app) => { const w = app.heroWheel(t); return [w.x, 0.98, w.z]; }, text: 'SPRING STAYS SQUASHED', cls: 'ne-tag line' },
   { t0: 36.7, t1: 37.9, at: (t, app) => [2.95, 1.25, app.truckRear(t) - 0.6], text: 'WHERE THE BOX USED TO SIT', cls: 'ne-tag line' },
   { t0: 38.95, t1: 39.6, at: (t, app) => [2.9, 0.98, app.truckRear(t)], text: 'REAR SPRINGS · ON THE STOPS' },
   { t0: NE.bridge[0] + 0.3, t1: 45.6, at: () => [-6.5, NE_CITY.bridge.deck - 0.05, NE_CITY.bridge.z + NE_CITY.bridge.w / 2 + 0.35], text: 'WHERE THE DECK WAS', cls: 'ne-tag line' },
@@ -224,7 +223,7 @@ const FILM = {
       if (el._t !== T.text) { el.textContent = T.text; el._t = T.text; el.className = T.cls || 'ne-tag'; }
       // keep the whole label on screen and clear of the readout (the tick still points at the thing)
       const W = el.parentNode.clientWidth, Hh = el.parentNode.clientHeight, u = W / 1080, hw = el.offsetWidth / 2;
-      const x = (v.x + 1) / 2 * W, y = (1 - v.y) / 2 * Hh, cx = MathX.clamp(x, hw + 24 * u, 0.86 * W - hw), cy = Math.max(y, 430 * u + el.offsetHeight + 26 * u);
+      const x = (v.x + 1) / 2 * W, y = (1 - v.y) / 2 * Hh, cx = MathX.clamp(x, hw + 44 * u, 0.86 * W - hw), cy = Math.max(y, 430 * u + el.offsetHeight + 26 * u);
       el.style.left = `${cx.toFixed(1)}px`; el.style.top = `${cy.toFixed(1)}px`; el.style.setProperty('--tick', `${(x - cx).toFixed(1)}px`);
       el.style.opacity = vis ? StoryHUD.win(t, T.t0, T.t1, 0.15, 0.15).toFixed(3) : '0';
     });

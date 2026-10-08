@@ -48,7 +48,7 @@ const NE = {
   tapBack: [61.8, 62.6],
   tapShot: [59.4, 63.4],
   line: [64.0, 70.2],
-  endShot: 66.5,              // low beside the flat ball and the teenager sitting by it (the opening, looped)
+  endShot: 65.3,              // low beside the flat ball and the teenager sitting by it (the opening, looped)
   note: [70.3, 73.4],
   end: 73.6,
 };
@@ -141,17 +141,17 @@ const SCRIPT = {
     captions: [
       { t: 1.8, until: 3.3, text: 'A solid rubber ball hits…<br>and doesn’t come back up.' },
       { t: 3.45, until: 5.5, text: 'It squashes.<br>It stays squashed.' },
-      { t: 13.55, until: 15.4, text: 'Bouncing is only the beginning.' },
+      { t: 13.55, until: 15.4, text: 'Even things built<br>to bounce back…' },
       { t: 16.1, until: 18.2, text: 'Bodies are fine. Their gear isn’t.' },
       { t: 23.45, until: 25.0, text: 'Suspension is mostly springs…' },
       { t: 25.15, until: 26.9, text: '…so every bump<br>leaves it lower.' },
-      { t: 33.75, until: 35.45, text: 'A few bumps later,<br>they scrape on every one.' },
-      { t: 35.6, until: 39.5, text: 'A loaded truck<br>sinks even faster.' },
+      { t: 33.75, until: 35.25, text: 'A few bumps later,<br>they scrape on every one.' },
+      { t: 35.5, until: 39.5, text: 'A loaded truck runs out<br>of travel even sooner.' },
       { t: 42.4, until: 44.6, text: 'Bridges flex a little, all day…' },
       { t: 44.8, until: 47.5, text: '…now each one keeps<br>the shape of its worst day.' },
       { t: 53.38, until: 54.1, text: 'Crashed cars normally<br>rebound a little…' },
-      { t: 54.2, until: 55.35, text: '…these don’t.<br>They stay locked.' },
-      { t: 55.6, until: 58.6, text: 'Three cars. One wreck.' },
+      { t: 54.2, until: 55.35, text: '…these don’t.<br>They stay jammed together.' },
+      { t: 57.0, until: 59.3, text: 'Three cars. One wreck.' },
       { t: 60.2, until: 63.3, text: 'Now even a tap<br>leaves a dent.' },
       { t: NE.line[0], until: 66.3, text: 'Without elasticity…' },
       { t: 66.6, until: NE.line[1], text: '…almost nothing gets a second chance<br>to return to shape.' },
@@ -165,7 +165,7 @@ const SCRIPT = {
       { from: NE.tapShot[0], until: NE.tapShot[1], top: 210, label: 'IMPACT SPEED', value: '5 km/h', sub: 'NORMALLY: IT SPRINGS BACK' },
       { from: 64.0, until: NE.note[1], top: 210, label: 'SHAPE RECOVERY', value: '0%', sub: '' },
     ],
-    notes: [{ t: NE.note[0], until: NE.note[1], text: 'FICTIONAL RULE: SOLIDS RESIST, BUT NEVER SPRING BACK.<br>BODIES, AIR AND WATER UNCHANGED. ENGINES SPARED.' }],
+    notes: [{ t: NE.note[0], until: NE.note[1], text: 'Fictional rule: solids never spring back.<br>People, air, water and engines work as normal.' }],
   },
 };
 

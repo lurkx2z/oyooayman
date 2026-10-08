@@ -5,8 +5,8 @@
      NODE_PATH=$(npm root -g) node tools/bake-soundtrack.cjs --page no-elasticity.html --out films/no-elasticity/soundtrack.js
    The idea of the mix: the sounds of things springing back go missing. The ball's ring, the racket's ping, the
    trampoline's boing, a rubber band's snap, a car's bounce: each one is replaced by a dull, final thud. What is
-   left is thudding (springs that stay down), scraping (cars on their bump stops), dull settling (no creaks, no groans:
-   those are solids ringing) and, at the end, one crash that doesn't rebound.
+   left is thudding (springs that stay down), scraping (cars on their bump stops), dull whumps (no creaks, no groans:
+   those are solids springing back) and, at the end, one crash that doesn't rebound.
    ===================================================================== */
 
 class NeAudio extends AudioEngine {
@@ -58,11 +58,11 @@ class NeAudio extends AudioEngine {
       env(g, t, 0.003, vol, len); o.connect(g); g.connect(pan(dest, p)); o.start(t); o.stop(t + len * 3 + 0.05);
       burst(t, len * 0.6, 'pink', 420, 0.8, vol * 0.6, p, dest, 0.002);
     };
-    // a dull settling sound where a creak or groan would be: a short swell of low rumble, no pitch, no ring (a groan is a
-    // solid vibrating and springing back; nothing does now)
+    // one dull "whump" where a creak or groan would be: low, no pitch, dead at once (a creak or a groan is a solid storing
+    // energy and springing back; nothing does now)
     const groan = (t, dur, f, vol, p, dest) => {
-      const d = Math.min(dur, 0.9), n = S.noise('brown', t, t + d + 0.2), lp = S.filter('lowpass', f * 2.2, 0.6), g = ctx.createGain();
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol * 2, t + d * 0.2); g.gain.linearRampToValueAtTime(0, t + d);
+      const d = Math.min(dur, 0.3), n = S.noise('brown', t, t + d + 0.2), lp = S.filter('lowpass', f * 2.2, 0.6), g = ctx.createGain();
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol * 2.4, t + 0.02); g.gain.linearRampToValueAtTime(0, t + d);
       n.connect(lp); lp.connect(g); g.connect(pan(dest, p));
     };
 
@@ -115,14 +115,13 @@ class NeAudio extends AudioEngine {
       thud(NE_SHOE.strike, 0.6, 0, fx, 140, 60, 0.09);
       burst(NE_SHOE.strike + 0.03, 0.2, 'white', 3200, 1.0, 0.035, 0, fx, 0.04);
       burst(NE_SHOE.off - 0.05, 0.12, 'white', 1800, 1.2, 0.05, 0.1, fx, 0.01);
-      // cushion: standing up (cloth, a creak of the bench) — and no "whoof" of foam refilling
+      // cushion: standing up (cloth, a dull knock of the bench) — and no "whoof" of foam refilling
       burst(9.6, 0.45, 'pink', 900, 0.6, 0.06, 0.1, fx, 0.08);
       S.clunk(9.7, 0.08, 0.15, fx);
-      // rubber band: it creaks as it stretches… and then nothing. No snap.
-      { const t0 = 11.8, t1 = 12.32, n2 = S.noise('white', t0, t1 + 0.1), b2 = S.filter('bandpass', 1400, 6), g2 = ctx.createGain();
-        b2.frequency.setValueAtTime(900, t0); b2.frequency.linearRampToValueAtTime(2200, t1); g2.gain.setValueAtTime(0, t0); g2.gain.linearRampToValueAtTime(0.06, t0 + 0.1); g2.gain.linearRampToValueAtTime(0.0, t1 + 0.05);
-        n2.connect(b2); b2.connect(g2); g2.connect(fx);
-        for (let t = t0 + 0.03; t < t1; t += R(0.03, 0.07)) S.click(t, 0.015, R(-0.2, 0.2), fx); }
+      // rubber band: a soft rubbery rustle against the fingers as it stretches… and then nothing. No snap, no creak.
+      { const t0 = 11.8, t1 = 12.32, n2 = S.noise('pink', t0, t1 + 0.1), b2 = S.filter('bandpass', 900, 1.2), g2 = ctx.createGain();
+        b2.frequency.setValueAtTime(600, t0); b2.frequency.linearRampToValueAtTime(1200, t1); g2.gain.setValueAtTime(0, t0); g2.gain.linearRampToValueAtTime(0.05, t0 + 0.1); g2.gain.linearRampToValueAtTime(0.0, t1 + 0.05);
+        n2.connect(b2); b2.connect(g2); g2.connect(fx); }
     }
 
     // 6. the plaza again: the trampoline. The mat sinks with a dull rumble… and the "boing" never comes.
@@ -173,8 +172,8 @@ class NeAudio extends AudioEngine {
     // the bus's air brakes at the stop
     { const ps = TR.bus.spec.pose(45.5), P = place(ps.x, ps.z, 45.5, 8); S.hiss(45.5, 0.6, 0.06 * P.g * 2, P.pan, cars); }
 
-    // 9. the footbridge: a low rumble as the running club reaches midspan and the deck settles to a new low (no ringing steel)
-    groan(44.0, 3.4, 56, 0.075, -0.05, fx, 0.7); burst(44.4, 2.6, 'brown', 220, 0.6, 0.05, 0, fx, 0.6); groan(48.9, 1.0, 70, 0.03, 0.1, fx, 0.85);
+    // 9. the footbridge: one dull whump as the running club reaches midspan and the deck settles to a new low (no ringing steel)
+    groan(44.0, 3.4, 56, 0.075, -0.05, fx, 0.7);
     // footsteps on the steel deck: dull, dead thumps (a deck that can't ring), heavier for the runners
     for (const w of NE_WALKERS) { const step = (w.run ? 2.3 : 1.2) / w.v / 2; for (let t = Math.max(w.t0, NE.bridge[0]) + (w.v * 7.3) % step; t < Math.min(w.t1, NE.bridge[1]); t += step) { const x = neWalkerX(w, t); if (x === null || Math.abs(x) > NE_CITY.bridge.half) continue; const pn = MathX.clamp(x / 14, -0.6, 0.6); burst(t, 0.05, 'brown', -240, 0.7, w.run ? 0.05 : 0.02, pn, fx, 0.003); if (w.run) thud(t, 0.03, pn, fx, 95, 50, 0.04); } }
     groan(44.0, 1.4, 180, 0.025, 0.25, fx, 0.8); groan(47.4, 1.2, 160, 0.022, 0.3, fx, 0.75);
