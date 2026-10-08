@@ -85,7 +85,7 @@ class NeBall {
 // the park trampoline: a raised steel frame, springs all round, a black mat. The first landing stretches it for good.
 // ---------------------------------------------------------------------------------------------------------------------
 const NE_TRAMP = { x: 17.0, z: -12.5, hx: 1.7, hz: 1.3, inset: 0.3, top: 1.0, depth: 0.74 };
-function neMatDepth(t) { return NE_TRAMP.depth * Ease.outCubic(MathX.clamp((t - NE.land) / 0.3, 0, 1)) + 0.04 * MathX.smooth(t, NE.jump2, NE.jump2 + 0.3); }
+function neMatDepth(t) { return NE_TRAMP.depth * Ease.outCubic(MathX.clamp((t - NE.land) / 0.3, 0, 1)) + 0.04 * MathX.smooth(t, NE.land2, NE.land2 + 0.15); }
 
 class NeTramp {
   constructor(scene) {
@@ -270,18 +270,19 @@ class NeShoe {
     const S = NE_SHOE, vis = t > 7.3 && t < 9.8; this.g.visible = vis; if (!vis) return;
     const f = this.foam(t);
     this.mid.scale.y = f; this.up.position.y = -0.034 * (1 - f);
-    // the step (slow motion): swing in from the right, heel strike, roll flat, heel lift, toe off, swing out to the left
+    // the step (slow motion): swing in toe-first from the left, heel strike, roll flat, heel lift, toe off, swing out to the right
     const F = this.foot, heelX = 0.0;
     let px, py, pitch;
-    if (t < S.strike) { const k = (S.strike - t); px = heelX + 0.9 * k; py = 0.6 * k * k + 0.12 * k; pitch = 0.32 + 0.4 * k; F.position.set(px, py, 0); F.rotation.z = pitch; }
+    if (t < S.strike) { const k = (S.strike - t); px = heelX - 0.9 * k; py = 0.6 * k * k + 0.12 * k; pitch = 0.32 + 0.4 * k; F.position.set(px, py, 0); F.rotation.z = pitch; }
     else if (t < S.flat) { const k = MathX.smooth(t, S.strike, S.flat); F.position.set(heelX, 0, 0); F.rotation.z = 0.32 * (1 - k); }
     else if (t < S.lift) { F.position.set(heelX, 0, 0); F.rotation.z = 0; }
     else if (t < S.off) {   // rotate about the toe (x = 0.27)
       const k = MathX.smooth(t, S.lift, S.off), a = -0.62 * k, tx = 0.27;
       F.rotation.z = a; F.position.set(heelX + tx - tx * Math.cos(a), -tx * Math.sin(a), 0);
-    } else { const k = t - S.off, a = -0.62 - 1.2 * k; F.rotation.z = a; F.position.set(heelX + 0.27 - 0.27 * Math.cos(a) - 0.7 * k, -0.27 * Math.sin(a) + 0.8 * k * k + 0.25 * k, 0); }
-    // the shin leans with the stride
-    this.leg.rotation.z = -0.25 - 0.4 * MathX.smooth(t, S.flat, S.off) + 0.2 * MathX.smooth(t, S.strike - 0.4, S.strike) - F.rotation.z;
+    } else { const k = t - S.off, a = -0.62 - 1.2 * k; F.rotation.z = a; F.position.set(heelX + 0.27 - 0.27 * Math.cos(a) + 0.7 * k, -0.27 * Math.sin(a) + 0.8 * k * k + 0.25 * k, 0); }
+    // the shin: leaning back at heel strike (knee behind the ankle), forward over the toe at push-off, then swinging away
+    const tilt = 0.3 * MathX.smooth(t, S.strike - 0.5, S.strike) - 0.75 * MathX.smooth(t, S.strike, S.off) - 0.3 * MathX.smooth(t, S.off, S.off + 0.4);
+    this.leg.rotation.z = tilt - F.rotation.z;
   }
 }
 
@@ -301,7 +302,7 @@ class NeCushions {
     for (const dz of [-0.52, 0.52]) {
       const g = new THREE.RoundedBoxGeometry(C.w, C.h, C.d, 6, 0.035);
       // densify isn't possible on a rounded box; displace the top face vertices that exist (6 segments per side)
-      const m = new THREE.Mesh(g, mat); m.position.set(N.x - 0.02, C.seat - C.h / 2 + 0.005, N.z + dz); m.castShadow = true; m.receiveShadow = true;
+      const m = new THREE.Mesh(g, mat); m.position.set(N.x - 0.02, LAYOUT.curbH + 0.41 + C.h / 2, N.z + dz); m.castShadow = true; m.receiveShadow = true;
       scene.add(m);
       this.list.push(m);
     }
@@ -345,7 +346,7 @@ class NeBand {
     const A = this.tip(this.hands.left, this._a), B = this.tip(this.hands.right, this._b);
     const D = A.distanceTo(B), rf = 0.011;
     // the loop's length: its rest length, or the longest it has ever been stretched (it never comes back)
-    const rest = 0.085;
+    const rest = 0.06;
     let Lh = rest;
     for (let s = NE.mont[3][0]; s <= t + 1e-6; s += 1 / 60) { const pa = this._probe(s); if (pa > Lh) Lh = pa; }
     // one strand on each side of the fingers; slack strands hang in a parabola (arc length ≈ D + 8s²/3D)
@@ -365,6 +366,6 @@ class NeBand {
     this.mesh.geometry.dispose();
     this.mesh.geometry = new THREE.TubeGeometry(curve, 90, 0.0024, 5, true);
   }
-  // the gap between your fingertips at time s, from the scripted hand poses (bandIn → bandOut → bandIn)
-  _probe(s) { const k = MathX.smooth(s, 11.8, 12.3) - MathX.smooth(s, 12.5, 13.0); return 0.085 + 0.25 * Math.max(0, k); }
+  // the gap between your fingertips at time s, from the scripted hand poses (bandIn 6 cm → bandOut 24 cm → bandIn)
+  _probe(s) { const k = MathX.smooth(s, 11.8, 12.3) - MathX.smooth(s, 12.5, 13.0); return 0.06 + 0.18 * Math.max(0, k); }
 }

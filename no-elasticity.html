@@ -22,6 +22,17 @@
     #hud .story-readout .label { font-size: calc(var(--u) * 28); letter-spacing: 0.16em; opacity: 0.92; color: #ffffff; }
     #hud .story-readout .value { font-size: calc(var(--u) * 88); margin-top: calc(var(--u) * 6); }
     #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; opacity: 0.9; margin-top: calc(var(--u) * 8); color: #ffd7a8; }
+    /* the montage label: what you're looking at, and what happened to it */
+    #hud .ne-chyron { position: absolute; left: 50%; top: calc(var(--u) * 330); transform: translateX(-50%); text-align: center; width: calc(var(--u) * 900);
+      background: rgba(6, 7, 10, 0.42); padding: calc(var(--u) * 18) 0; border-radius: calc(var(--u) * 22); }
+    #hud .ne-chyron .mt { display: block; font-family: var(--book); font-size: calc(var(--u) * 72); font-weight: 600; letter-spacing: 0.05em; text-shadow: 0 0 calc(var(--u) * 20) rgba(0, 0, 0, 0.8); }
+    #hud .ne-chyron .mr { display: block; font-family: var(--book); font-style: italic; font-size: calc(var(--u) * 44); margin-top: calc(var(--u) * 10); opacity: 0.95; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.9); }
+    /* a label pinned to something in the world, with a tick down to it */
+    #hud .ne-tag { position: absolute; transform: translate(-50%, calc(-100% - var(--u) * 26)); white-space: nowrap; font-family: var(--hud-font); font-size: calc(var(--u) * 32);
+      letter-spacing: 0.08em; color: #fff; background: rgba(200, 40, 30, 0.84); padding: calc(var(--u) * 8) calc(var(--u) * 16); border-radius: calc(var(--u) * 10); }
+    #hud .ne-tag::after { content: ''; position: absolute; left: 50%; top: 100%; width: calc(var(--u) * 3); height: calc(var(--u) * 26); background: rgba(255, 255, 255, 0.85); transform: translateX(-50%); }
+    #hud .ne-tag.line { background: rgba(30, 26, 6, 0.78); color: #ffd23e; }
+    #hud .ne-tag.line::after { background: #ffd23e; }
     #hud .story-end { top: calc(var(--u) * 820); font-size: calc(var(--u) * 66); }
   </style>
 </head>
@@ -87,6 +98,8 @@
   <!-- this film (plan: films/no-elasticity/PLAN.md) -->
   <script src="films/no-elasticity/script.js"></script>
   <script src="films/no-elasticity/city.js"></script>
+  <script src="films/no-elasticity/props.js"></script>
+  <script src="films/no-elasticity/cars.js"></script>
   <script src="films/no-elasticity/cast.js"></script>
   <script src="films/no-elasticity/audio.js"></script>
   <script src="films/no-elasticity/film.js"></script>
