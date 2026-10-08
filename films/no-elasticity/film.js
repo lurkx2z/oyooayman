@@ -16,7 +16,7 @@ const NE_HAND_POSES = Object.assign({}, HAND_POSES, {
 // the bow (left fist round the grip, arm out toward the target; right fingers hooked on the string, drawn to the jaw)
 Object.assign(NE_HAND_POSES, {
   bowHold: { p: [0.07, -0.05, -0.7], F: [-0.25, 0.1, -0.96], N: [-0.97, 0, 0.25], curl: [1.25, 1.35, 1.42, 1.5], thumb: [0.35, 0.95] },
-  bowShow: { p: [0.06, -0.06, -0.78], F: [-0.22, 0.1, -0.97], N: [-0.97, 0, 0.22], curl: [1.25, 1.35, 1.42, 1.5], thumb: [0.35, 0.95] },
+  bowShow: { p: [0.06, -0.08, -0.74], F: [-0.8, 0.1, -0.59], N: [-0.59, 0, 0.8], curl: [1.25, 1.35, 1.42, 1.5], thumb: [0.35, 0.95] },
   bowLow:  { p: [0.3, -0.64, -0.36], F: [-0.45, 0.3, -0.84], N: [-0.85, -0.2, 0.4], curl: [1.25, 1.35, 1.42, 1.5], thumb: [0.35, 0.95] },
   nock:    { p: [0.05, 0.02, -0.52], F: [-0.6, -0.07, -0.8], N: [-0.8, 0, 0.6], curl: [1.1, 1.25, 1.2, 1.45], thumb: [0.15, 0.7] },
   drawn:   { p: [0.07, -0.2, -0.19], F: [-0.6, -0.07, -0.8], N: [-0.8, 0, 0.6], curl: [1.1, 1.25, 1.2, 1.45], thumb: [0.15, 0.7], trem: 0.003 },
@@ -87,12 +87,10 @@ const NE_SHOTS = [
       return { p: [bx + Math.cos(a) * d, NE_BALL.ground + 0.06, bz + Math.sin(a) * d], at: [bx, NE_BALL.ground + 0.1, bz], fov: 40, focus: [bx, bz, 4] }; } },
   // low on the paving behind the arrow that just dropped, looking along it at the target 14 m away: untouched
   { id: 'arrow', t0: NE.bow.shot[0], t1: NE.bow.shot[1],
-    cam: (t, app) => { const L = app.bow.arrow.lying(app) || { x: NE_ARCH.x, z: NE_ARCH.z - 0.8, yaw: 0 }, u = Ease.inOutSine((t - NE.bow.shot[0]) / (NE.bow.shot[1] - NE.bow.shot[0])), [tx, tz] = NE_ARCH.target;
-      // low beside it and a little behind: the arrow lies across the frame, its fletching near you, the target it never reached
-      // high in the frame beyond it
-      // (the 9:16 frame is narrow: just behind the nock and barely to its right, so the arrow recedes up the frame)
-      const fx = -Math.sin(L.yaw), fz = -Math.cos(L.yaw), rx = -fz, rz = fx, back = 0.47 - 0.06 * u, side = 0.08;
-      return { p: [L.x - fx * back + rx * side, 0.32 - 0.02 * u, L.z - fz * back + rz * side], at: [tx, -2.18, tz], fov: 50, focus: [L.x + fx * 0.5, L.z + fz * 0.5, 3] }; } },
+    cam: (t, app) => { const L = app.bow.arrow.lying(app, t), u = Ease.inOutSine((t - NE.bow.shot[0]) / (NE.bow.shot[1] - NE.bow.shot[0])), [tx, tz] = NE_ARCH.target;
+      // low, behind it and to its right: the arrow lies diagonally across the middle of the frame, above the caption
+      const fx = -Math.sin(L.yaw), fz = -Math.cos(L.yaw), rx = -fz, rz = fx, mx = L.x + fx * 0.35, mz = L.z + fz * 0.35, back = 0.9 - 0.1 * u, side = 0.72 - 0.08 * u;
+      return { p: [mx - fx * back + rx * side, 0.62 - 0.04 * u, mz - fz * back + rz * side], at: [mx + fx * 0.08, 0.17, mz + fz * 0.08], fov: 42, focus: [mx, mz, 1.1] }; } },
   // inside your watch (the macro set): the dial lifts away, down past the gears to the quartz crystal
   { id: 'quartz', t0: NE.quartz[0], t1: NE.quartz[1], cam: (t, app) => app.quartz.shot(t) },
   // the plaza clock face, frozen; the camera rises and pulls back over the plaza into the time-lapse
@@ -106,12 +104,18 @@ const NE_SHOTS = [
     cam: (t) => { const u = Ease.inOutSine((t - NE.ins.tree[0]) / (NE.ins.tree[1] - NE.ins.tree[0])), [tx, tz] = NE_CITY.trees[NE_LEAN_TREE], sx = -NE_WIND[1], sz = NE_WIND[0];
       // (side-on to the wind, from the pavement: the lean is across the frame, to the right)
       const d = 8.6 - 0.6 * u;
-      return { p: [tx + sx * d, 1.45, tz + sz * d], at: [tx + NE_WIND[0] * 0.7, 3.5, tz + NE_WIND[1] * 0.7], fov: 50, focus: [tx, tz, d] }; } },
-  { id: 'lapse', t0: NE.lapse[0], t1: NE.night, cam: (t) => neLapseCam(t) },
-  // night: close on the plaza clock, its dial lit, still at 3:41
-  { id: 'night', t0: NE.night, t1: NE.end + 1,
-    cam: (t) => { const C = NE_CLOCK, n = [Math.sin(C.ry), Math.cos(C.ry)], x = [n[1], -n[0]], u = Ease.outSine(MathX.clamp((t - NE.night) / (NE.end - NE.night), 0, 1)), d = 3.6 - 1.0 * u, o = 0.7 - 0.35 * u;
-      return { p: [C.x + n[0] * d + x[0] * o, C.h - 0.95 + 0.25 * u, C.z + n[1] * d + x[1] * o], at: [C.x + x[0] * 0.18, C.h + 0.1, C.z + x[1] * 0.18], fov: 42, focus: [C.x, C.z, d + 2] }; } },
+      return { p: [tx + sx * d, 1.45, tz + sz * d], at: [tx + NE_WIND[0] * 0.7, 3.05, tz + NE_WIND[1] * 0.7], fov: 55, focus: [tx, tz, d] }; } },
+  { id: 'lapse', t0: NE.lapse[0], t1: NE.push, cam: (t) => neLapseCam(t) },
+  // dusk into night: one continuous push from the wide into the plaza clock's lit dial, still at 3:41
+  { id: 'push', t0: NE.push, t1: NE.loop,
+    cam: (t) => { const C = NE_CLOCK, n = [Math.sin(C.ry), Math.cos(C.ry)], x = [n[1], -n[0]], W = neLapseCam(NE.push), u = Ease.inOutSine(MathX.clamp((t - NE.push) / (NE.loop - NE.push), 0, 1)), q = (a, b) => a.map((v, i) => v + (b[i] - v) * u);
+      // (the aim settles on the clock early, so it stays in frame while the camera swings round to face it)
+      const p1 = [C.x + n[0] * 2.6 + x[0] * 0.15, C.h - 0.12, C.z + n[1] * 2.6 + x[1] * 0.15], a1 = [C.x + x[0] * 0.03, C.h + 0.02, C.z + x[1] * 0.03], k = Ease.inOutSine(MathX.clamp((t - NE.push) / 2.6, 0, 1));
+      return { p: q(W.p, p1), at: W.at.map((v, i) => v + (a1[i] - v) * k), fov: W.fov + (42 - W.fov) * u, focus: [C.x, C.z, 2.6 + 12 * (1 - u)] }; } },
+  // the loop: back on the café table, the desk clock that stopped one second into the video
+  { id: 'loop', t0: NE.loop, t1: NE.end + 1,
+    cam: (t) => { const D = NE_DESK, f = [Math.sin(D.ry), Math.cos(D.ry)], u = Ease.outSine(MathX.clamp((t - NE.loop) / (NE.end - NE.loop), 0, 1)), d = 0.44 - 0.05 * u, cy = NE_CRADLE.y0 + 0.074;
+      return { p: [D.x + f[0] * d, cy + 0.035, D.z + f[1] * d], at: [D.x, cy - 0.004, D.z], fov: 40, focus: [D.x, D.z, d] }; } },
 ].filter((s) => NE_STREET || !s.street);
 
 // the clock shot and the time-lapse: one continuous camera (face-on to the clock, then up and back over the plaza; then a
@@ -119,12 +123,12 @@ const NE_SHOTS = [
 const NE_LAPSE_CAM = { p0: [10.3, 4.0, -6.7], p1: [10.95, 3.8, -7.2], at0: [18.8, 2.3, -13.7], at1: [18.8, 2.2, -13.7], fov: 56 };
 function neLapseCam(t) {
   const C = NE_CLOCK, n = [Math.sin(C.ry), Math.cos(C.ry)], head = [C.x, C.h, C.z], L = NE_LAPSE_CAM;
-  const lap = Ease.inOutSine(MathX.clamp((t - NE.lapse[0]) / (NE.night - NE.lapse[0]), 0, 1)), q = (a, b, u) => a.map((v, i) => v + (b[i] - v) * u);
+  const lap = Ease.inOutSine(MathX.clamp((t - NE.lapse[0]) / (NE.push - NE.lapse[0]), 0, 1)), q = (a, b, u) => a.map((v, i) => v + (b[i] - v) * u);
   const pL = q(L.p0, L.p1, lap), aL = q(L.at0, L.at1, lap);
   if (t >= NE.lapse[0]) return { p: pL, at: aL, fov: L.fov, focus: [17, -11.5, 16] };
   // the clock shot: face-on, a little below the dial; then (from 38.9) up and back to the time-lapse framing
   const u = (t - NE.clockShot[0]) / (NE.lapse[0] - NE.clockShot[0]), k = Ease.inOutSine(MathX.clamp((t - 38.6) / (NE.lapse[0] - 38.6), 0, 1));
-  const pC = [head[0] + n[0] * (2.5 - 0.25 * u) + 0.25, head[1] - 0.32, head[2] + n[1] * (2.5 - 0.25 * u)], aC = [head[0], head[1] - 0.04, head[2]];
+  const pC = [head[0] + n[0] * (3.3 - 0.25 * u) + 0.25, head[1] - 0.32, head[2] + n[1] * (3.3 - 0.25 * u)], aC = [head[0], head[1] - 0.15, head[2]];
   return { p: q(pC, L.p0, k), at: q(aC, L.at0, Ease.inOutSine(MathX.clamp((t - 38.9) / (NE.lapse[0] - 38.9), 0, 1))), fov: 34 + (L.fov - 34) * k, focus: [C.x + 3 * k, C.z - 3 * k, 10 + 14 * k] };
 }
 
@@ -134,7 +138,7 @@ const NE_TAGS = [
   { t0: 25.4, t1: 27.1, at: (t, app) => app.fork.tipWorld(t), text: 'STAYS BENT · DRAWN 10× BIGGER', cls: 'ne-tag line' },
   { t0: 32.0, t1: 33.5, at: () => neQ(NE_Q.can[0] + 0.6, NE_Q.can[1] + 0.4, NE_Q.can[2]), text: 'THE QUARTZ CRYSTAL' },
   { t0: 33.85, t1: 35.75, at: () => neQ(NE_Q.can[0] + 1.6, NE_Q.can[1] + 0.4, NE_Q.can[2] + 0.9), text: 'NORMALLY', cls: 'ne-tag line' },
-  { t0: NE.ins.tramp[0] + 0.25, t1: NE.ins.tramp[1] - 0.1, at: () => [NE_TRAMP.x, 0.95, NE_TRAMP.z], text: 'DEEPER ONLY WHEN SOMEONE HEAVIER LANDS' },
+  { t0: NE.ins.tramp[0] + 0.25, t1: NE.ins.tramp[1] - 0.1, at: () => [NE_TRAMP.x, 0.95, NE_TRAMP.z], text: 'DEEPER ONLY AFTER A HARDER LANDING' },
   { t0: NE.ins.tree[0] + 0.25, t1: NE.ins.tree[1] - 0.1, at: () => [NE_CITY.trees[NE_LEAN_TREE][0], 5.4, NE_CITY.trees[NE_LEAN_TREE][1]], text: 'EACH STRONGER GUST BENDS IT FURTHER' },
   // (the first cut)
   { t0: 3.45, t1: NE.cradleIns[1] - 0.1, at: (t, app) => { const g = app.cradle.ghostWorld(); g[1] += NE_CRADLE.r + 0.004; return g; }, text: 'NORMALLY, THIS ONE FLIES OUT', cls: 'ne-tag line' },
@@ -270,6 +274,7 @@ const FILM = {
     if (app.traffic) app.traffic.update(t, cam, app.scene.fog);
     app.cast.update(t);
     app.ball.update(t, app.cast);
+    app.ball.m.visible = NE_STREET;                 // (the v1 opening's ball; v2 opens on the cradle)
     app.tramp.update(t);
     app.racket.update(t);
     app.shoe.update(t);

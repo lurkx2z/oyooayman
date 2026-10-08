@@ -17,7 +17,7 @@ const NE_CRADLE = {
   hits: [0.15, 0.62, 1.09], dead: 1.56,            // the clacks while things still spring back; the first hit after the rule
   tau: 3.5,                                        // the lump's slow die-away (s)
 };
-const NE_DESK = { x: 11.66, z: 5.6, ry: -1.76 };   // the desk clock, turned to face your seat
+const NE_DESK = { x: 11.1, z: 5.47, ry: -1.687 };  // the desk clock, in front of the cradle and turned to face your seat
 
 // each ball's swing angle (radians, + toward +Z) at time t
 function neCradleAngles(t) {
@@ -66,6 +66,8 @@ class NeCradle {
       for (let y = 0.012; y < Lv - C.r - 0.004; y += 0.016) { const d = new THREE.Mesh(new THREE.BoxGeometry(0.0024, 0.008, 0.0024), gm); d.position.set(0, -y, 0); ring.add(d); }
       gh.visible = false; this.ghost = gh; }
     this.desk = new NeDeskClock(scene);
+    // the café's lamp over the table, for the last shot (night by then)
+    const lamp = new THREE.PointLight('#ffcf9a', 0, 3, 2); lamp.position.set(10.85, 1.4, 5.25); scene.add(lamp); this.lamp = lamp;
   }
   // where the ghost ball sits (for its label)
   ghostWorld() { const C = NE_CRADLE, a = C.amp; return [C.x, C.y0 + C.bar + 0.01 - C.L * Math.cos(a), C.z - 2 * C.r * 2 - C.L * Math.sin(a)]; }
@@ -73,8 +75,11 @@ class NeCradle {
     const a = neCradleAngles(t);
     this.piv.forEach((p, i) => { p.rotation.x = -a[i]; });
     this.ghost.visible = t >= 3.3 && t < NE.cradleIns[1];                   // with the second line, after the title
-    // only in the opening (later beats at this table are framed for other things)
-    this.g.visible = this.desk.g.visible = t < NE.cradleIns[1];
+    // only in the opening and the last shot (later beats at this table are framed for other things); the desk clock sits
+    // between you and the cradle, so it stays out of the low insert
+    this.g.visible = t < NE.cradleIns[1] || t >= NE.loop;
+    this.desk.g.visible = t < NE.cradleIns[0] || t >= NE.loop;
+    this.lamp.intensity = t >= NE.loop ? 0.8 : 0;
     this.desk.update(t);
   }
 }
@@ -88,13 +93,15 @@ class NeDeskClock {
     add(new THREE.CylinderGeometry(R + 0.008, R + 0.008, 0.034, 32), body, 0, cy, 0, Math.PI / 2);
     for (const sx of [-1, 1]) add(new THREE.BoxGeometry(0.012, 0.03, 0.03), dark, sx * 0.03, 0.015, 0);
     const f = new THREE.Group(); f.position.set(0, cy, 0.0175); g.add(f); this.f = f;
-    add(new THREE.CircleGeometry(R, 40), new THREE.MeshStandardMaterial({ map: Tex.tex(neClockDial()), roughness: 0.4, name: 'neDeskDial' }), 0, 0, 0.0005, 0, 0, 0, f).castShadow = false;
+    const dt = Tex.tex(neClockDial()); this.dialMat = new THREE.MeshStandardMaterial({ map: dt, emissiveMap: dt, emissive: new THREE.Color('#fff1d8'), emissiveIntensity: 0, roughness: 0.4, name: 'neDeskDial' });
+    add(new THREE.CircleGeometry(R, 40), this.dialMat, 0, 0, 0.0005, 0, 0, 0, f).castShadow = false;
     const hand = (len, w, mat, z, tail = 0) => { const h = new THREE.Group(); h.position.z = z; f.add(h); add(new THREE.BoxGeometry(w, len + tail, 0.0012), mat, 0, (len - tail) / 2, 0, 0, 0, 0, h); return h; };
     this.hr = hand(0.028, 0.0045, dark, 0.002); this.min = hand(0.042, 0.003, dark, 0.0033); this.sec = hand(0.046, 0.0015, red, 0.0046, 0.011);
     add(new THREE.CylinderGeometry(0.0025, 0.0025, 0.002, 10), red, 0, 0, 0.0055, Math.PI / 2, 0, 0, f);
     this._s = -1;
   }
   update(t) {
+    this.dialMat.emissiveIntensity = t >= NE.loop ? 0.12 : 0;
     const s = neClockSec(t);
     if (s !== this._s) { this._s = s; const a = neHandAngles(s); this.hr.rotation.z = a.h; this.min.rotation.z = a.m; this.sec.rotation.z = a.s; }
   }

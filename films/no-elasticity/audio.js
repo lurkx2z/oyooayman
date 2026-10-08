@@ -213,7 +213,7 @@ class NeAudio extends AudioEngine {
         g.gain.setValueAtTime(0, tg - 0.1); g.gain.linearRampToValueAtTime(0.025 + 0.035 * sv, tg + 0.12); g.gain.linearRampToValueAtTime(0, tg + 1.1);
         n.connect(lp); lp.connect(g); g.connect(pan(amb, -0.15)); }
       for (const [tp] of NE_PIT) { thud(tp, 0.26, 0.35, fx, 95, 42, 0.16); groan(tp + 0.02, 0.4, 130, 0.025, 0.35, fx); }
-      for (let t = 53.4; t < NE.end; t += R(0.45, 0.9)) { const f = R(4100, 4500), p = R(-0.6, 0.6); for (let k = 0; k < 3; k++) S.tone(t + k * 0.045, 0.025, f, 0.005, p, amb, 'sine', 0.006, 0.015); }
+      for (let t = 53.4; t < NE.loop - 0.05; t += R(0.45, 0.9)) { const f = R(4100, 4500), p = R(-0.6, 0.6); for (let k = 0; k < 3; k++) S.tone(t + k * 0.045, 0.025, f, 0.005, p, amb, 'sine', 0.006, 0.015); }
     }
     }
 

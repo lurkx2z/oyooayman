@@ -186,7 +186,11 @@ class NeArrow {
     void inLapse;
   }
   // where it lies (world), for the low shot and the time-lapse pile
-  lying(app) { return this._rel ? { x: this.g.position.x, z: this.g.position.z, yaw: this._rel.yaw } : null; }
+  // (computed from the release, not from the last frame drawn, so the first frame of a render that starts here agrees)
+  lying(app, t) {
+    const R = this._rel || this._release(app, app.bow, t), c = this._fall(R.com0, R.f, R.land), y = R.yaw + 0.06;
+    return { x: c.x + Math.sin(y) * NE_BOW.com, z: c.z + Math.cos(y) * NE_BOW.com, yaw: R.yaw };
+  }
 }
 
 // the archery booth at the far end of the plaza: an easel with an 80 cm target face on a straw boss, a bale backstop

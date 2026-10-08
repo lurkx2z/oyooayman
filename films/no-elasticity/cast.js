@@ -152,8 +152,8 @@ function neBridgeWalker(w) {
 function neCastSpecs() {
   const K = NE, TR = NE_TRAMP;
   return [
-    // the teenager with the ball (stands still; the ball is beside the right hand)
-    { id: 'teen', look: 'neTeen', y: 0.15, show: (t) => t < NE.lapse[0], path: [[0, NE_TEEN.x, NE_TEEN.z], [5.7, NE_TEEN.x, NE_TEEN.z], [7.4, ...NE_TEEN.aside], [60, ...NE_TEEN.aside], [60.05, ...NE_TEEN.end]], face: NE_TEEN.face,
+    // the teenager with the ball (stands still; the ball is beside the right hand). v1 only: v2 opens on the cradle
+    { id: 'teen', look: 'neTeen', y: 0.15, show: (t) => NE_STREET && t < NE.lapse[0], path: [[0, NE_TEEN.x, NE_TEEN.z], [5.7, NE_TEEN.x, NE_TEEN.z], [7.4, ...NE_TEEN.aside], [60, ...NE_TEEN.aside], [60.05, ...NE_TEEN.end]], face: NE_TEEN.face,
       faceAt: (t) => (t < 5.7 ? NE_TEEN.face : t < 60 ? NE_TEEN.asideFace : NE_TEEN.endFace),
       states: [[-5, 'neDribble'], [1.15, 'neReach'], [1.7, 'neStare'], [2.6, 'neCrouch'], [K.poke, 'nePoke'], [4.5, 'neCrouch'], [5.7, 'walk'], [7.4, 'neCrouch'], [14.6, 'neStare'], [19.0, 'sitGround']] },
     // the kid: beside the trampoline with a parent, then up on its frame, the jump, the landing, a second try, sitting in the pit

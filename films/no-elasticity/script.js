@@ -42,7 +42,7 @@ const NE = {
   // the trampoline
   jump: 15.45, land: 15.98, jump2: 16.6, land2: 17.0,
   // the bow, first person at the archery booth: nock, draw, aim, let go… the arrow drops; a low look along it at the target
-  bow: { t0: 18.2, draw: [18.45, 19.4], release: 20.2, low: 20.75, shot: [21.2, 23.4] },
+  bow: { t0: 18.2, draw: [18.45, 19.4], release: 20.2, low: 20.75, shot: [21.8, 23.4] },
   // the tuning fork at the café table: lift, strike the table edge, bring it up to your face (the prong stays pushed in)
   fork: { t0: 23.4, strike: 24.32, up: [24.45, 25.05], t1: 27.3 },
   // your watch (left wrist): it stopped at 3:41:52, one second into the video
@@ -56,9 +56,11 @@ const NE = {
   lapse: [40.9, 60.6],
   ins: { tramp: [44.9, 47.3], tree: [47.3, 49.6] },
   line: [49.8, 55.5],
+  push: 49.6,                  // from the dusk wide, one slow push into the stopped clock as the lamps come on…
   night: 55.6,
-  note: [55.8, 58.3],
-  rewatch: [58.5, 60.45],
+  note: [55.7, 57.9],
+  loop: 58.0,                  // …then a cut back to the desk clock on the café table, still at 3:41:52 (the loop)
+  rewatch: [58.15, 60.45],
   end: 60.6,
   // (the cut street beats — only used by the kept code when NE_STREET is on)
   car: { t0: 19.0, z0: 30.5 }, carLook: 21.6, wheelShot: [23.3, 26.9], traffic: [33.6, 40.8], truckShot: [36.5, 39.6],
@@ -114,17 +116,17 @@ const SCRIPT = {
     height: [[0, 1.22], [5.55, 1.22], [5.6, 1.68, 'step'], [23.35, 1.68], [23.4, 1.22, 'step'], [75, 1.22]],
     yaw: [[0, -90], [5.55, -90], [5.6, -31, 'step'],
       [13.4, -27, 'step'], [14.6, -39], [15.2, -40.4], [18.15, -40],
-      // the bow: aim at the target (straight down the plaza); after the release, hold on the bent bow and the slack string
-      [18.2, 1.2, 'step'], [20.2, 0.6], [21.2, 1.5],
+      // the bow: the target clear to the right of the grip; after the release, hold on the bent bow and the slack string
+      [18.2, 9.5, 'step'], [20.2, 8.9], [21.8, 9.8],
       // the café table: the fork, then your watch
       [23.4, -88, 'step'], [24.3, -90], [25.1, -92], [27.3, -92], [28.1, -95], [30.9, -95.5], [75, -95.5]],
     pitch: [[0, -16], [1.75, -16.5], [5.55, -16.5], [5.6, -18, 'step'], [NE.mont[3][0], -34, 'step'],
       [13.4, -9, 'step'], [14.6, -5], [18.15, -5],
-      [18.2, -1.5, 'step'], [20.2, -1.2], [21.2, -4],
+      [18.2, -1.5, 'step'], [20.2, -1.2], [21.8, -4],
       [23.4, -26, 'step'], [24.05, -38], [24.45, -38], [25.15, -8, 'outQuad'], [27.3, -7], [28.1, -9], [30.9, -10], [75, -10]],
     fov: [[0, 50], [1.75, 46], [5.55, 46], [5.6, 38, 'step'], [NE.mont[3][0], 64, 'step'],
       [13.4, 42, 'step'], [14.6, 32], [15.2, 30], [18.15, 30],
-      [18.2, 72, 'step'], [20.2, 70], [20.9, 80], [21.2, 80],
+      [18.2, 72, 'step'], [20.2, 70], [20.9, 80], [21.8, 80],
       [23.4, 52, 'step'], [24.0, 40], [24.5, 40], [25.4, 44], [27.3, 42], [28.1, 34], [30.9, 32], [75, 32]],
     startles: [[NE.bow.release + 0.02, 0.25]],
     shakes: [],
@@ -158,17 +160,17 @@ const SCRIPT = {
       { t: 20.3, until: 21.85, text: '…and nothing<br>bends it back.' },
       { t: 22.0, until: 23.3, text: 'The arrow just falls.' },
       { t: 23.5, until: 24.38, text: 'Tuning forks ring<br>by springing back.' },
-      { t: 24.5, until: 27.2, text: 'This one just goes “tk”.' },
+      { t: 24.5, until: 25.75, text: 'This one just goes “tk”.' },
       { t: 28.1, until: 29.5, text: 'Your watch stopped too…' },
       { t: 29.6, until: 30.85, text: '…one second<br>into this video.' },
       { t: 31.2, until: 33.5, text: 'Inside it: a quartz tuning fork,<br>smaller than a grain of rice.' },
-      { t: 33.65, until: 35.75, text: 'It keeps time by springing back<br>32,768 times a second.' },
-      { t: 35.9, until: 37.2, text: 'No spring-back. No tick.' },
+      { t: 33.65, until: 35.6, text: 'It keeps time by springing back<br>32,768 times a second.' },
+      { t: 35.7, until: 37.25, text: 'No spring-back. No tick.' },
       { t: 37.5, until: 39.3, text: 'Every quartz clock on Earth<br>stopped at the same instant.' },
-      { t: 39.45, until: 40.85, text: 'So did every phone<br>and computer.' },
-      { t: 41.3, until: 43.9, text: 'The clocks stay at 3:41.<br>The day doesn’t.' },
+      { t: 39.4, until: 41.25, text: 'So did the clock<br>in your phone.' },
+      { t: 41.4, until: 43.9, text: 'The clocks stay at 3:41.<br>The day doesn’t.' },
       { t: 44.2, until: 47.2, text: 'And everything people use<br>keeps the shape they leave it in.' },
-      { t: 47.45, until: 49.5, text: 'The trees keep every gust.' },
+      { t: 47.45, until: 49.5, text: 'A trunk is mostly dead wood.<br>It keeps every gust.' },
       { t: NE.line[0], until: 52.3, text: 'Without elasticity…' },
       { t: 52.6, until: NE.line[1], text: '…almost nothing gets a second chance<br>to return to shape.' },
       { t: NE.rewatch[0], until: NE.rewatch[1], text: 'Now watch the clock<br>in the first second.' },
