@@ -64,6 +64,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Twelfth film: *What if air resistance suddenly disappeared?*** — open `no-air-resistance.html` (69.5 s). At 2.0 s
+> solid objects stop feeling any aerodynamic force (drag 0, lift 0) while the air itself, its pressure and sound stay.
+> The flag drops dead in a 40 km/h breeze; a sheet of paper and a tennis ball land together; a skydiver's canopy spills
+> out and changes nothing; a coasting car keeps 86 km/h and the leaflets thrown from it keep pace; pigeons can't take
+> off; an airliner that lost its lift at 2 s falls for 48 s, supersonic, and comes down 2.1 km away; a 100 km/h wind
+> moves nothing; the debris arrives at about 700 km/h and knocks a sign board onto the spot you just left. *The air would
+> still be there. It just couldn't catch you.* Physics, shot list and review log:
+> [`films/no-air-resistance/PLAN.md`](films/no-air-resistance/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -332,6 +341,20 @@ films/air/wind.js        the wind: debris, fabric, the hero failures (bin, umbre
 films/air/actors.js      people, the ball, two cyclists, traffic, the coasting car, the swerving car
 films/air/audio.js       wind that follows the push, every event's sound, restrained music
 films/air/film.js        FILM hooks: story clock, HUD (density, wind, live speeds, the 190 km/h comparison), grade
+```
+
+Film: *What if air resistance suddenly disappeared?* (`no-air-resistance.html`):
+
+```
+films/no-air-resistance/PLAN.md     the rule, its numbers, the shot list as built, review log
+films/no-air-resistance/script.js   ★ every beat time (NR), the edit, camera, hands, captions
+films/no-air-resistance/physics.js  the rule as formulas: wind and load, the drop, the jump, the car, the plane, debris, board
+films/no-air-resistance/city.js     the avenue (from the Air film, owned here): trees that ring down, racing clouds, skyline gap
+films/no-air-resistance/wind.js     what the breeze moves until the change: flags, awning, umbrellas, sign, bins, litter, steam
+films/no-air-resistance/actors.js   people, pigeons, traffic, the coasting car and its normal-air ghost, leaflets, the balloon
+films/no-air-resistance/sky.js      the falling airliner, its impact, the debris, the sign board, the skydiver cut-away
+films/no-air-resistance/audio.js    the air's rush without anything flapping, sonic boom, delayed impact, hits by distance
+films/no-air-resistance/film.js     FILM hooks: props, hands, HUD tags, the cut to the sky, the grade
 ```
 
 Film: *What if you realized you were in a simulation?* (`sim.html`):
