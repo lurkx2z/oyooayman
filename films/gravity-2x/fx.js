@@ -5,8 +5,26 @@
      the pallet bursting on the pickup's cab · the coupe's sparks on the crossing ·
      the truck's spring · the outrigger punching through the road · the scaffold folding ·
      the awning and its sign · the water tank bursting over the cornice ·
-     the 12 t load hitting the flatbed · the boom landing on the junction
+     the 12 t load hitting the flatbed (beams thrown off it)
    ===================================================================== */
+
+// a lumpy, soft puff for the dust (a few overlapping soft blobs, faded to nothing at the edge; deterministic)
+function gvPuffTex() {
+  const S = 128, c = Tex.canvas(S, S), x = c.getContext('2d');
+  x.fillStyle = '#000'; x.fillRect(0, 0, S, S);
+  x.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 14; i++) {
+    const a = hash1(i * 3.7 + 1) * Math.PI * 2, r = 22 * Math.sqrt(hash1(i * 5.3 + 2)), cx = 64 + Math.cos(a) * r, cy = 64 + Math.sin(a) * r, R = 16 + 16 * hash1(i * 7.1 + 3);
+    const g = x.createRadialGradient(cx, cy, 0, cx, cy, R);
+    g.addColorStop(0, 'rgba(255,255,255,0.3)'); g.addColorStop(0.55, 'rgba(255,255,255,0.12)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g; x.fillRect(0, 0, S, S);
+  }
+  x.globalCompositeOperation = 'multiply';
+  const m = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+  m.addColorStop(0, '#fff'); m.addColorStop(0.6, '#fff'); m.addColorStop(1, '#000');
+  x.fillStyle = m; x.fillRect(0, 0, S, S);
+  return Tex.tex(c, { srgb: false, repeat: false });
+}
 
 // small solid debris (bricks, asphalt, splinters): one instanced draw call
 class GvChunks {
@@ -44,11 +62,11 @@ class GvFx {
   constructor(app) {
     const scene = app.scene;
     this.app = app;
-    this.dust = new BillboardSystem(scene, 1700, false); this.dust.uniforms.uLight.value = 0.85;
+    this.dust = new BillboardSystem(scene, 1700, false); this.dust.uniforms.uLight.value = 0.85; this.dust.uniforms.uMap.value = gvPuffTex();
     this.glint = new StreakSystem(scene, 900);
     this.chunks = new GvChunks(scene, 700);
     this.C = { brick: new THREE.Color('#9c4a32'), brick2: new THREE.Color('#7e3a26'), mortar: new THREE.Color('#b9b2a4'), asphalt: new THREE.Color('#3a3a3c'), asphalt2: new THREE.Color('#55534f'),
-      wood: new THREE.Color('#8f6a44'), board: new THREE.Color('#a8834f'), steel: new THREE.Color('#5a5e62'), tube: new THREE.Color('#a9afb3'), sign: new THREE.Color('#2a3a2c'), glass: new THREE.Color('#9fb3bb') };
+      beam: new THREE.Color('#7b4a33'), wood: new THREE.Color('#8f6a44'), board: new THREE.Color('#a8834f'), steel: new THREE.Color('#5a5e62'), tube: new THREE.Color('#a9afb3'), sign: new THREE.Color('#2a3a2c'), glass: new THREE.Color('#9fb3bb') };
     this.o = { x: 0, y: 0, z: 0, landed: 0, tl: 0 };
     // the impact points
     const Bay = GV_CITY.bay, P = GV_FALL.pallet;
@@ -132,7 +150,6 @@ class GvFx {
     if (age < 0 || age > 3) return;
     const c = tr.truck, z = c.zt.value(ts) - c.ax[0];
     for (let i = 0; i < 6; i++) { const h = hash1(i * 6.1 + 70); gvThrow(age, c.x + 0.62, 0.6, z, 1 + 2 * h, 1.5 * h, 2 + 3 * hash1(i * 2.2), o); K.push(o.x, o.y + 0.02, o.z, 0.12, 0.03, 0.05, 0, h * 6, age * 8, C.steel); }
-    this._puffs(D, age, 10, 77, c.x + 0.7, 0.3, z + 1.5, 1.2, 0.25, 2.0, 0.7, 0.25, [0.75, 0.73, 0.7]);
   }
 
   // the outrigger pad punching into the patched trench
@@ -157,13 +174,13 @@ class GvFx {
     for (let i = 0; i < 22; i++) {
       const h1 = hash1(i * 3.9 + 120), h2 = hash1(i * 6.7 + 121), h3 = hash1(i * 1.7 + 122);
       const born = h3 * 0.7, a = age - born; if (a < 0) continue;
-      gvThrow(a, S.x0 - 1.0 - 3 * h1, 4 + 8 * h2, -21.5 + 7.6 * h3, -1.5 - 3 * h1, 0.5 + 1.5 * h2, (h2 - 0.5) * 1.5, o);
+      gvThrow(a, S.x0 - 1.0 - 3 * h1, 3 + 6 * h2, -21.5 + 7.6 * h3, -1.5 - 3 * h1, -0.5 - 1.5 * h2, (h2 - 0.5) * 1.5, o);
       const board = i % 3 !== 0, spin = o.landed ? o.tl : a;
       K.push(o.x, o.y + 0.03, o.z, board ? 0.22 : 0.05, board ? 0.04 : 0.05, board ? 2.4 : 2.0, o.landed ? 0 : spin * 4 * (h1 - 0.5), h2 * 3, o.landed ? Math.PI / 2 : spin * 5 * (h3 - 0.5) + Math.PI / 2 * (board ? 0 : 1), board ? C.board : C.tube);
     }
     for (let i = 0; i < 30; i++) {                                    // bricks off the top lift
       const h1 = hash1(i * 2.9 + 130), h2 = hash1(i * 5.3 + 131), born = 0.2 + 0.6 * h1, a = age - born; if (a < 0) continue;
-      gvThrow(a, S.x0 - 2 - 2.5 * h1, 7 + 4 * h2, -20.5 + 6 * hash1(i * 8.8 + 132), -2 - 2 * h2, 1 * h1, (h1 - 0.5) * 2, o);
+      gvThrow(a, S.x0 - 2 - 2.5 * h1, 3 + 6 * h2, -20.5 + 6 * hash1(i * 8.8 + 132), -2 - 2 * h2, -1 * h1, (h1 - 0.5) * 2, o);
       K.push(o.x, o.y + 0.04, o.z, 0.21, 0.065, 0.1, a * 5 * (h1 - 0.5), h2 * 6, o.landed ? 0 : a * 6, C.brick);
     }
     const land = t - (F + 1.05);
@@ -214,7 +231,7 @@ class GvFx {
     if (age < 3) for (let i = 0; i < 12; i++) { const h = hash1(i * 6.6 + 230), a = (h - 0.5) * 2.4; gvThrow(age, -16.0, roof + 1.5, T.z + (h - 0.5) * 2, 3 + 4 * h, 2 + 2 * hash1(i * 3.1), Math.sin(a) * 3, o); if (o.y > roof + 0.05 || o.x > edge) K.push(o.x, o.y + 0.02, o.z, 0.06, 0.4, 0.03, age * 5, a, age * 7 * (h - 0.5), C.wood); }
   }
 
-  // the 12 t load hitting the flatbed at 109 km/h; the boom landing on the junction behind
+  // the 12 t load hitting the flatbed at 105 km/h: debris, beams thrown off the bundle, a blast of dust that settles fast at 2 G
   _load(t, D, G, K, C, o) {
     const cr = this.app.site.crane, F = GV_FALL.load, age = t - F.hit, x = cr._fallXZ[0], z = cr._fallXZ[1];
     // the dust that hangs over the street to the end (the sky goes hazy with it)
@@ -226,21 +243,22 @@ class GvFx {
         const s = 0.1 + 0.3 * h2 * h2, col = i % 4 === 0 ? C.board : i % 4 === 1 ? C.steel : i % 2 ? C.asphalt : C.asphalt2, spin = o.landed ? o.tl : age;
         K.push(o.x, o.y + s * 0.2, o.z, s * (i % 4 === 0 ? 3 : 1), s * 0.4, s * 0.8, spin * 6 * (h1 - 0.5), a, o.landed ? 0 : spin * 5 * (h3 - 0.5), col);
       }
-      // the blast of dust along the ground, then a slow, rising, spreading cloud
-      this._puffs(D, age, 80, 310, x, 0.3, z, 11, 0.25, 7.5, 2.6, 0.38, [0.78, 0.7, 0.6], 0.6, 1.2, 1.0);
-      this._puffs(D, age - 0.15, 60, 320, x, 1.0, z, 8, 1.4, 8.5, 4.2, 0.28, [0.82, 0.75, 0.65], 2.5);
+      // four beams kicked out off the ends of the bundle: they fly low and land flat a few metres away
+      const ry = cr.load.rotation.y, ax = Math.cos(ry), az = -Math.sin(ry);
+      for (let i = 0; i < 4; i++) {
+        const h1 = hash1(i * 9.1 + 360), h2 = hash1(i * 4.3 + 361), sd = i % 2 ? 1 : -1, sp = 2 + 3 * h2;
+        gvThrow(age, x + ax * sd * 2.5, 1.6 + 0.3 * h1, z + az * sd * 2.5, ax * sd * sp + (h1 - 0.5) * 1.5, 4 + 3 * h1, az * sd * sp + (h2 - 0.5) * 1.5, o);
+        const fr = Math.min(1, (o.landed ? o.tl : age) / o.tl);
+        K.push(o.x, o.y + 0.13, o.z, 5.0, 0.26, 0.2, 0, ry + (h1 - 0.5) * 1.2 * fr, sd * (0.4 + 0.3 * h2) * Math.sin(Math.PI * fr), C.beam);
+      }
+      // the blast of dust along the ground, then a rising cloud (both settle faster than at 1 G)
+      this._puffs(D, age, 80, 310, x, 0.3, z, 11, 0.25, 5.5, 2.6, 0.4, [0.78, 0.7, 0.6], 0.6, 1.2, 1.0);
+      this._puffs(D, age - 0.15, 60, 320, x, 1.0, z, 8, 0.8, 6.0, 4.2, 0.24, [0.82, 0.75, 0.65], 2.5);
       if (age < 0.7) for (let i = 0; i < 60; i++) {                     // glass and metal glints
         const h1 = hash1(i * 6.3 + 330), h2 = hash1(i * 2.9 + 331), a = h1 * 6.28, s = 4 + 8 * h2;
         gvThrow(age, x, 0.8, z, Math.cos(a) * s, 2 + 4 * h2, Math.sin(a) * s, o);
         G.push(o.x, o.y, o.z, o.x + Math.cos(a) * 0.06, o.y + 0.04, o.z + Math.sin(a) * 0.06, 1, 0.95, 0.85, 0.9 * (1 - age / 0.7), 0.014);
       }
-    }
-    // the boom: a line of dust where it slams down across the junction
-    const bl = t - cr.boomLand;
-    if (bl >= 0 && cr.boomLand < 90) {
-      const C0 = GV_CITY.crane, dx = -Math.sin(cr.slew), dz = -Math.cos(cr.slew);
-      for (let j = 0; j < 6; j++) { const d = 6 + j * 6; this._puffs(D, bl - j * 0.03, 12, 340 + j, C0.x + dx * d, 0.3, C0.z + dz * d, 3.8, 0.4, 7, 2.2, 0.45, [0.8, 0.75, 0.67], 0.6); }
-      for (let i = 0; i < 30; i++) { const h1 = hash1(i * 3.1 + 350), h2 = hash1(i * 7.7 + 351), d = 6 + 32 * h1, a = h2 * 6.28; gvThrow(bl, C0.x + dx * d, 0.3, C0.z + dz * d, Math.cos(a) * 3, 2 + 3 * h2, Math.sin(a) * 3, o); K.push(o.x, o.y + 0.04, o.z, 0.15, 0.06, 0.12, bl * 5, a, 0, i % 2 ? C.asphalt : C.asphalt2); }
     }
   }
 }

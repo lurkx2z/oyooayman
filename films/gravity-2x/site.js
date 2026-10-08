@@ -2,8 +2,8 @@
    SITE — the things that carry weight and give way, each a pure function of story time:
      GvCrane     the mobile crane in the far lanes lifting a 12 t bundle of steel beams off a flatbed:
                  the load sinks and swings when gravity doubles, the front outrigger punches into a patched
-                 trench (30 s), the hoist brake slips (60 s) and lets go (62.6 s): the load falls 23 m at 2 G,
-                 the unloaded boom whips back past vertical and falls backwards onto the junction.
+                 trench (30 s), the brake creeps and slips (60 s) and lets go (62.6 s): the load falls 21.7 m at 2 G
+                 onto the flatbed, and the suddenly unloaded boom recoils up and shudders.
      GvScaffold  the scaffold on your side: its cantilevered loading bay sags and breaks (15 s, the pallet falls
                  onto the builders' pickup), then the middle of the scaffold buckles and folds into the street (35 s).
      GvAwning    the old shop canopy: its tie rods let go (38 s) and it swings down against the window.
@@ -36,6 +36,9 @@ function gvStep(t, t0, f = 1.2, z = 0.3) { return gvSpring(t, f, z, t0); }
 // a quick decaying wobble after t0 (for jolts)
 function gvJolt(t, t0, f = 3, decay = 0.35) { return t < t0 ? 0 : Math.sin((t - t0) * f * Math.PI * 2) * Math.exp(-(t - t0) / decay); }
 
+// the flatbed's deck caving in under the load (0 → 1 just after it lands)
+function gvCrush(t) { const F = GV_FALL.load; return MathX.smooth(t, F.hit - 0.01, F.hit + 0.14); }
+
 // an I-beam along local X (flanges top and bottom)
 function gvIBeam(L, mat, parent, x, y, z) {
   const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g);
@@ -46,7 +49,7 @@ function gvIBeam(L, mat, parent, x, y, z) {
 /* ===================================================================== */
 class GvCrane {
   constructor(scene) {
-    const C = GV_CITY.crane, F = GV_CITY.flatbed;
+    const C = GV_CITY.crane, F = GV_CITY.boomAim;
     this.scene = scene;
     this.root = new THREE.Group(); this.root.name = 'crane'; this.root.position.set(C.x, 0, C.z); scene.add(this.root);
     // the slew: the boom points at the flatbed
@@ -55,9 +58,14 @@ class GvCrane {
     const r = Math.hypot(F.x - C.x, F.z - C.z) - this.pivot.z;
     this.phi0 = Math.acos(r / this.boomL);                         // luffing angle (from horizontal) that puts the tip over the flatbed
     this._build();
-    this._simBoom();
+    this.boomLand = 99;                                            // (it doesn't fall: unloaded, it only recoils)
     this._v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
-    this._fallXZ = this._hookXZAt(GV_FALL.load.t0 - 1e-3);       // where the hook was when the brake let go
+    // pay out just enough rope that the load's underside is exactly base + h above the road when the brake lets go
+    const L = GV_FALL.load; this.ropeOff = 0;
+    this.ropeOff = this._headAt(L.t0 - 1e-3).y - 3.1 - (L.base + L.h) - this.ropeLen(L.t0 - 1e-3);
+    this._fallXZ = this._hookXZAt(L.t0 - 1e-3);                   // where the hook was when the brake let go
+    // the bundle hangs (and lands) broadside to where you will be standing
+    this.load.rotation.y = Math.atan2(this._fallXZ[0] - GV_ME.x, this._fallXZ[1] - GV_ME.zTrip);
   }
 
   _build() {
@@ -118,46 +126,33 @@ class GvCrane {
     const beamM = Mat.std('#7b4a33', { roughness: 0.65, metalness: 0.35 });
     for (let i = 0; i < 8; i++) gvIBeam(10.0, beamM, this.load, 0, 0.15 + Math.floor(i / 4) * 0.3, -0.33 + (i % 4) * 0.22);
     for (const x of [-3.2, 3.2]) gvBox(0.08, 0.68, 0.98, Mat.std('#2a2a2a', { roughness: 0.6 }), this.load, x, 0.32, 0.0, 0, 0, 0, false);   // banding straps
-    this.load.rotation.y = this.slew + Math.PI / 2;                  // beams lie along the boom's direction (the flatbed's length)
   }
 
-  // the boom after the load lets go: it whips back past vertical and falls backwards (rigid rod about its foot, 2 G)
-  _simBoom() {
-    const g = GV_G, L = this.boomL, dt = 1 / 600, out = [];
-    let phi = this.phi0 + this._luff(GV.drop - 1e-3), w = 0.46, t = GV.drop;
-    while (t < GV.end + 1) {
-      out.push(phi);
-      const alpha = -(3 * g / (2 * L)) * Math.cos(phi);
-      w += alpha * dt; phi += w * dt; t += dt;
-      if (phi > Math.PI + 0.06) { phi = Math.PI + 0.06; w = 0; }                       // lying on the road behind
-    }
-    this.boomTab = out; this.boomDt = dt;
-    let k = out.findIndex((p) => p >= Math.PI + 0.059); this.boomLand = GV.drop + (k < 0 ? 99 : k * dt);
-  }
-  _boomFall(t) { const i = MathX.clamp((t - GV.drop) / this.boomDt, 0, this.boomTab.length - 1); return this.boomTab[Math.floor(i)]; }
+  // the boom after the load lets go: bent down by 12 t at 2 G, it springs back up and shudders (it does not fall)
+  _recoil(t) { if (t < GV.drop) return 0; const a = t - GV.drop; return MathX.deg(1.4) * (1 - Math.exp(-a / 0.8) * Math.cos(2 * Math.PI * 1.1 * a)); }
 
   // luffing angle change: the boom bends down a little under the doubled load (and after the outrigger sinks)
   _luff(t) { return -MathX.deg(0.55) * gvStep(t, GV.g0 + 0.05, 0.8, 0.25) - MathX.deg(1.2) * gvStep(t, GV.outrigger, 0.9, 0.3); }
   // how far the front-right pad has punched into the road
   sink(t) { return 0.3 * gvStep(t, GV.outrigger, 1.4, 0.45) + 0.02 * gvJolt(t, GV.outrigger + 0.1, 5, 0.2); }
   // the load's underside height below the boom head (rope paid out): hoisting at first, the stretch at 2 G, the slips
+  // (after the change the overloaded brake creeps, 2 cm a second, then slips in three jerks)
   ropeLen(t) {
-    let L = 12.6 + 1.5 * (1 - MathX.ramp(t, -0.5, GV.g0)) + 0.5 * gvStep(t, GV.g0 + 0.02, 0.9, 0.22);
-    const S = GV.slips, d = [0.15, 0.2, 0.25];
-    S.forEach((ts, i) => { L += d[i] * MathX.smooth(t, ts, ts + 0.12) + 0.06 * gvJolt(t, ts + 0.12, 2.2, 0.25); });
+    let L = (this.ropeOff || 0) + 12.6 + 1.5 * (1 - MathX.ramp(t, -0.5, GV.g0)) + 0.5 * gvStep(t, GV.g0 + 0.02, 0.9, 0.22) + 0.02 * MathX.clamp(t - GV.g0, 0, GV.drop - GV.g0);
+    const S = GV.slips, d = [0.5, 0.7, 0.9];
+    S.forEach((ts, i) => { L += d[i] * MathX.smooth(t, ts, ts + 0.14) + 0.1 * gvJolt(t, ts + 0.14, 2.2, 0.25); });
     return L;
   }
 
   update(t) {
     const R = this.root, sink = this.sink(t);
     // the whole crane tilts toward the sinking front-right pad (and rocks back when the load lets go)
-    const rock = t > GV.drop ? -0.035 * Math.sin(Math.min((t - GV.drop) / 0.9, 1) * Math.PI) : 0;
+    const rock = t > GV.drop ? -0.018 * Math.sin(Math.min((t - GV.drop) / 0.9, 1) * Math.PI) : 0;
     R.rotation.set(sink / 2 / 5.3 + rock, 0, -(sink / 2 / 3.6), 'XYZ');
     for (const P of this.pads) if (P.sx > 0 && P.sz > 0) { P.pad.position.y = 0.04 - sink * 0.0; }
     R.updateMatrixWorld(true);
     // boom angle
-    let phi = this.phi0 + this._luff(t);
-    if (t >= GV.drop) phi = this._boomFall(t);
+    const phi = this.phi0 + this._luff(Math.min(t, GV.drop)) + this._recoil(t);
     this.boom.rotation.x = Math.PI / 2 - phi;
     this.boom.updateMatrixWorld(true);
     // the luffing ram: from the superstructure to 9 m up the boom
@@ -183,13 +178,13 @@ class GvCrane {
       // free fall from where the swing had the hook at the drop moment (the slack rope pays out with it);
       // after the hit the bundle lies on the crushed flatbed with a short bounce
       const tau = t - F.t0;
-      this.loadY = t < F.hit ? Math.max(F.h - 0.5 * GV_G * tau * tau, 0) : 0.55 + 0.25 * Math.exp(-(t - F.hit) / 0.12) * Math.abs(Math.sin((t - F.hit) * 14));
+      this.loadY = t < F.hit ? F.base + F.h - 0.5 * GV_G * tau * tau : F.base - 0.95 * gvCrush(t) + 0.22 * Math.exp(-(t - F.hit) / 0.12) * Math.abs(Math.sin((t - F.hit) * 14));
       hy = this.loadY + 3.1; hx = this._fallXZ[0]; hz = this._fallXZ[1];
     }
     this.hook.position.set(hx, hy, hz);
-    this.hook.rotation.y = this.slew;
+    this.hook.rotation.set(0, this.slew, 0);
     this.load.position.set(hx, this.loadY, hz);
-    this.load.rotation.z = falling && t > F.hit ? 0.06 * MathX.smooth(t, F.hit, F.hit + 0.2) : 0;
+    this.load.rotation.z = falling && t > F.hit ? 0.09 * MathX.smooth(t, F.hit, F.hit + 0.2) : 0;
     this.load.rotation.x = falling ? 0.04 * MathX.smooth(t, F.t0, F.hit) : 0.02 * Math.sin(t * 0.7);
     // ropes: two pairs of falls from the head sheaves to the hook (slack and falling after the drop)
     const ropeVis = !(t > F.hit + 0.3);
@@ -208,12 +203,16 @@ class GvCrane {
     });
     if (t > F.hit) { this.hook.position.y = 1.1; this.hook.rotation.z = 1.3; }
   }
-  _hookXZAt(t) {
-    // re-evaluate the swing at a fixed time (no state)
+  // the boom head at a fixed time, before the drop (no state)
+  _headAt(t) {
     const R = this.root, sink = this.sink(t);
     R.rotation.set(sink / 2 / 5.3, 0, -(sink / 2 / 3.6), 'XYZ'); R.updateMatrixWorld(true);
     this.boom.rotation.x = Math.PI / 2 - (this.phi0 + this._luff(t)); this.boom.updateMatrixWorld(true);
-    const head = this.boom.localToWorld(new THREE.Vector3(0, this.boomL + 0.3, 0.55));
+    return this.boom.localToWorld(new THREE.Vector3(0, this.boomL + 0.3, 0.55));
+  }
+  _hookXZAt(t) {
+    // re-evaluate the swing at a fixed time (no state)
+    const head = this._headAt(t);
     const Lp = this.ropeLen(t) + 2.2, w = Math.sqrt(GV_G / Lp);
     const swing = (t0, amp, ph = 0) => (t < t0 ? 0 : amp * Math.sin(w * (t - t0) + ph) * Math.exp(-(t - t0) / 9));
     const dir = new THREE.Vector3(Math.sin(this.slew), 0, Math.cos(this.slew)), side = new THREE.Vector3(dir.z, 0, -dir.x);
@@ -245,16 +244,18 @@ class GvFlatbed {
       for (let i = 0; i < 4; i++) gvBox(0.08, 0.5, 0.08, dark, h, (i % 2 ? 1 : -1) * 1.2, 0.3, s * (1.2 + Math.floor(i / 2) * 3.4));
       return { h, s };
     });
-    for (const z of [-3.6, -4.9]) for (const s of [-1, 1]) { const w = gvMesh(new THREE.CylinderGeometry(0.48, 0.48, 0.42, 16), tire, this.root, s * 1.05, 0.48, z, 0, 0, Math.PI / 2); gvMesh(new THREE.CylinderGeometry(0.28, 0.28, 0.44, 10), rim, w, 0, 0, 0, 0, 0, 0, false); }
+    this.wheels = [];
+    for (const z of [-3.6, -4.9]) for (const s of [-1, 1]) { const w = gvMesh(new THREE.CylinderGeometry(0.48, 0.48, 0.42, 16), tire, this.root, s * 1.05, 0.48, z, 0, 0, Math.PI / 2); gvMesh(new THREE.CylinderGeometry(0.28, 0.28, 0.44, 10), rim, w, 0, 0, 0, 0, 0, 0, false); this.wheels.push(w); }
     // what's left on the trailer: a few beams on dunnage
     const beamM = Mat.std('#7b4a33', { roughness: 0.65, metalness: 0.35 });
     this.cargo = new THREE.Group(); this.halves[0].h.add(this.cargo);
     for (let i = 0; i < 3; i++) { const b = gvIBeam(5.0, beamM, this.cargo, 0, 0.27, -2.6); b.rotation.y = Math.PI / 2; b.position.x = -0.5 + i * 0.5; }
   }
   update(t) {
-    const F = GV_FALL.load, k = MathX.smooth(t, F.hit - 0.02, F.hit + 0.18);
-    for (const H of this.halves) { H.h.rotation.x = -H.s * 0.2 * k; H.h.position.y = 1.35 - 0.75 * k; }
-    this.root.rotation.z = 0.03 * k * Math.sin(Math.min((t - F.hit) * 9, Math.PI)) * (t > F.hit ? 1 : 0);
+    const F = GV_FALL.load, k = gvCrush(t);
+    for (const H of this.halves) { H.h.rotation.x = -H.s * 0.32 * k; H.h.position.y = 1.35 - 0.95 * k; }
+    for (const w of this.wheels) { w.scale.x = 1 - 0.35 * k; w.position.y = 0.48 - 0.17 * k; }   // the tyres burst flat
+    this.root.rotation.z = 0.05 * k * Math.sin(Math.min((t - F.hit) * 9, Math.PI)) * (t > F.hit ? 1 : 0);
   }
 }
 
@@ -377,11 +378,10 @@ class GvScaffold {
       const tau = t - P.t0, x0 = Bay.x0 + 0.95, z0 = (Bay.z0 + Bay.z1) / 2 + 0.15;
       const yHit = 1.92, yTop = yHit + P.h;                      // the pallet's base when it leaves the tilted bay
       const hitT = Math.sqrt(2 * (yTop - yHit) / GV_G);
-      if (tau < hitT) {
-        this.pallet.position.set(x0 - 0.35 * tau, yTop - 0.5 * GV_G * tau * tau, z0);
-        this.pallet.rotation.set(0.1 * tau, 0, 1.1 * tau);
-        this.pallet.visible = true;
-      } else this.pallet.visible = false;            // it bursts on the cab (fx.js scatters the bricks)
+      const tf = Math.min(tau, hitT);                           // (placed even after the hit: the look follows it, and every frame must stand alone)
+      this.pallet.position.set(x0 - 0.35 * tf, yTop - 0.5 * GV_G * tf * tf, z0);
+      this.pallet.rotation.set(0.1 * tf, 0, 1.1 * tf);
+      this.pallet.visible = tau < hitT;              // it bursts on the cab (fx.js scatters the bricks)
       // the 1 G ghost, falling beside it
       const gy = yTop - 0.5 * GV_G0 * tau * tau;
       this.ghost.visible = t < P.hit + 0.45 && gy > yHit - 0.2;

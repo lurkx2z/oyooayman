@@ -20,11 +20,11 @@ CONFIG.render.shadowMapSize = 2048;
 // THE BEATS (story seconds). Every other file keys off these.
 // ---------------------------------------------------------------------------------------------------------------------
 const GV = {
-  title: [-0.6, 3.7],
+  title: [-0.6, 3.1],
   g0: 1.6, g1: 1.85,            // gravity 1 G → 2 G
   bagDown: [4.3, 5.4],          // you put the bag down
   kidJump: 7.1,                 // the kid tries again (he hopped twice before the change)
-  oldMan: [10.0, 13.6],         // the man on the bench tries to stand
+  oldMan: [9.2, 12.0],          // the man on the bench tries to stand
   bay: { creak: 14.2, crack: 15.15, drop: 15.55 },   // the loading bay gives; the pallet falls 10.2 m
   coupe: 23.2,                  // the low coupe passes you; scrapes on the raised crossing
   truck: 26.2,                  // the loaded box truck; its rear spring snaps on the crossing
@@ -43,9 +43,10 @@ const GV = {
   end: 73.2,
 };
 
-// the cut (story intervals kept): four invisible trims where the picture barely moves or the head whips round
-// (the wreck hold, the swing up to the roar, the airliner far down the avenue, your hands on the pavement). 73.2 s → 69.7 s.
-CONFIG.edit = [[0, 20.5], [21.7, 43.3], [43.8, 50.6], [51.8, 56.7], [57.3, GV.end]];
+// the cut (story intervals kept): five invisible trims where the picture barely moves or the head whips round
+// (the bay before it creaks, the wreck hold, the swing up to the roar, the airliner far away, your hands on the pavement).
+// 73.2 s story → 68.7 s film.
+CONFIG.edit = [[0, 12.6], [13.6, 20.5], [21.7, 43.3], [43.8, 50.6], [51.8, 55.8], [56.4, GV.end]];
 
 const GV_G0 = 9.81;
 // gravity in g (1 → 2)
@@ -60,9 +61,9 @@ function gvSpring(t, f = 1.3, z = 0.28, t0 = GV.g0 + 0.05) {
 // the falling pallet (from the loading bay) and the crane load: a free fall at 2 G
 const GV_FALL = {
   pallet: { t0: GV.bay.drop, h: 9.0 },         // off the tipped bay (≈ 10.9 m) onto the pickup's cab roof (1.9 m)
-  load: { t0: GV.drop, h: 23.2 },               // the load's underside 23.2 m above the road
+  load: { t0: GV.drop, h: 21.7, base: 1.5 },    // the load's underside 23.2 m above the road: 21.7 m down to the trailer deck (1.5 m)
 };
-for (const k in GV_FALL) { const F = GV_FALL[k]; F.T2 = Math.sqrt(2 * F.h / (2 * GV_G0)); F.T1 = Math.sqrt(2 * F.h / GV_G0); F.v2 = 2 * GV_G0 * F.T2; F.v1 = GV_G0 * F.T1; F.hit = F.t0 + F.T2; }
+for (const k in GV_FALL) { const F = GV_FALL[k]; F.base = F.base || 0; F.T2 = Math.sqrt(2 * F.h / (2 * GV_G0)); F.T1 = Math.sqrt(2 * F.h / GV_G0); F.v2 = 2 * GV_G0 * F.T2; F.v1 = GV_G0 * F.T1; F.hit = F.t0 + F.T2; }
 
 // where you stand (story): walking in, stopping when the weight hits, the trip at the end
 const GV_ME = { x: 9.35, z0: 3.6, z1: 1.3, zTrip: -0.4 };
@@ -107,8 +108,8 @@ const SCRIPT = {
     pitch: [[0, 0], [75, 0]],
     tilt: [[0, 0], [GV.g0 + 0.1, 0], [GV.g0 + 0.35, -2.2], [GV.g0 + 1.4, 0], [GV.trip, 0], [GV.trip + 0.35, 6], [GV.up[0], 4], [GV.up[1], 0], [75, 0]],
     fov: [[0, 66], [75, 66]],
-    startles: [[GV.g0 + 0.05, 1.2], [GV.bay.crack, 0.5], [GV_FALL.pallet.hit, 1.3], [GV.truck + 1.2, 0.7], [GV.outrigger, 0.8], [GV.scaffold.fold + 0.4, 1.0], [GV.awning, 0.9], [GV.tank + 0.4, 0.6], [GV.trip + 0.33, 1.4], [GV.drop + 0.05, 0.6], [GV_FALL.load.hit, 1.6]],
-    shakes: [[GV_FALL.pallet.hit, 0.7, 0.35], [GV.outrigger, 0.35, 0.4], [GV.scaffold.fold + 0.5, 0.6, 0.45], [GV.trip + 0.33, 0.8, 0.25], [GV_FALL.load.hit, 1.6, 0.7], [GV_FALL.load.hit + 2.1, 0.6, 0.6]],
+    startles: [[GV.g0 + 0.05, 1.2], [GV.bay.crack, 0.5], [GV_FALL.pallet.hit, 1.3], [GV.truck + 1.2, 0.7], [GV.outrigger, 0.8], [GV.scaffold.fold + 0.4, 1.0], [GV.awning, 0.9], [GV.tank + 0.4, 0.6], [GV.trip + 0.33, 1.4], [GV.slips[0], 0.35], [GV.slips[1], 0.45], [GV.slips[2], 0.55], [GV.drop + 0.05, 0.7], [GV_FALL.load.hit, 2.0]],
+    shakes: [[GV_FALL.pallet.hit, 0.7, 0.35], [GV.outrigger, 0.35, 0.4], [GV.scaffold.fold + 0.5, 0.6, 0.45], [GV.trip + 0.33, 0.8, 0.25], [GV.slips[0], 0.25, 0.3], [GV.slips[1], 0.3, 0.3], [GV.slips[2], 0.35, 0.3], [GV_FALL.load.hit, 2.6, 0.9]],
   },
 
   // your hands (camera-space poses in film.js; 'name!' = snap)
@@ -128,33 +129,34 @@ const SCRIPT = {
     title: { in: GV.title[0], out: GV.title[1], fi: 0.2, fo: 0.45, cls: 'big center', html: '<span class="kick">WHAT IF GRAVITY</span><span class="hero">BECAME TWICE</span><span class="kick">AS STRONG?</span>' },
     captions: [
       { t: 4.2, until: 7.0, text: 'Everything you lift feels twice as heavy.' },
-      { t: 10.6, until: 13.3, text: 'Standing up becomes hard work.' },
+      { t: 9.5, until: 11.9, text: 'Standing up becomes hard work.' },
       { t: 17.4, until: 20.1, text: 'And falling things hit twice as hard.' },
-      { t: 24.6, until: 27.0, text: 'Cars still drive. Their springs give up.' },
-      { t: 30.8, until: 33.4, text: 'Every machine was rated for 1 G.' },
+      { t: 24.6, until: 27.0, text: 'Cars still drive. Their springs sag twice as far.' },
+      { t: 30.8, until: 33.4, text: 'Every machine was built for 1 G. Some with thin margins.' },
       { t: 36.4, until: 39.2, text: 'Most buildings hold. The weak spots don’t.' },
       { t: 46.0, until: 49.0, text: 'Its wings now carry twice the weight.' },
       { t: 57.3, until: 59.6, text: 'Getting up is like lifting a second you.' },
     ],
     readouts: [
       { from: -0.6, until: 9.8, top: 210, label: 'GRAVITY', value: (t) => `${gvFmt(gvG(t))} G`, sub: (t) => (t >= GV.g1 ? '19.6 m/s²' : '9.8 m/s²') },
-      { from: 4.6, until: 9.8, top: 470, label: '70 KG PERSON · WEIGHT', value: (t) => (t < 5.2 ? '687 N' : '1,373 N'), sub: 'MASS STILL 70 KG' },
-      { from: GV.bay.drop - 0.1, until: 20.1, top: 210, label: (''), value: (t) => gvFallValue(t), sub: (t) => gvFallSub(t) },
+      { from: 4.6, until: 7.0, top: 470, label: '70 KG PERSON · WEIGHT', value: '1,373 N', sub: 'AT 1 G: 687 N · MASS STILL 70 KG' },
+      { from: 7.0, until: 9.6, top: 470, label: 'KID’S JUMP · SAME LEGS', value: '6 cm', sub: 'AT 1 G: 30 cm' },
+      { from: GV.bay.drop - 0.1, until: 20.1, top: 210, label: 'FALLING PALLET', value: (t) => gvFallValue(t), sub: (t) => gvFallSub(t) },
       { from: GV.outrigger + 0.5, until: 33.4, top: 210, label: 'CRANE LOAD · MASS 12 t', value: 'PULLS LIKE 24 t', sub: 'OUTRIGGER PAD: 2× PRESSURE' },
-      { from: 44.6, until: 51.8, top: 210, label: 'AIRLINER ON APPROACH', value: 'LIFT ×2', sub: 'SAME WINGS · NEEDS 41% MORE SPEED' },
-      { from: GV.slips[0] - 0.3, until: GV.drop + 0.2, top: 210, label: 'HOIST BRAKE', value: (t) => `${gvFmt(gvG(t) * 100 / 1.25, 0)} %`, sub: 'OF RATED HOLDING LOAD' },
-      { from: GV.drop + 0.05, until: GV_FALL.load.hit + 2.6, top: 210, label: 'FREE FALL · 23 m', value: (t) => gvLoadValue(t), sub: (t) => gvLoadSub(t) },
+      { from: 44.6, until: 51.8, top: 210, label: 'AIRLINER ON APPROACH', value: 'NEEDS 2× LIFT', sub: 'STALL SPEED NOW 41% HIGHER' },
+      { from: GV.slips[0] - 0.3, until: GV.drop + 0.2, top: 210, label: 'HOIST BRAKE · OVERLOADED', value: (t) => `${gvFmt(gvG(t) * 100 / 1.25, 0)} %`, sub: 'OF WHAT IT CAN HOLD · SLIPPING' },
+      { from: GV.drop + 0.05, until: GV_FALL.load.hit + 2.6, top: 210, label: `FREE FALL · ${GV_FALL.load.h} m`, value: (t) => gvLoadValue(t), sub: (t) => gvLoadSub(t) },
       { from: GV.hudBack, until: GV.end - 0.4, top: 210, label: 'GRAVITY', value: '2.0 G', sub: 'MASS UNCHANGED' },
     ],
-    notes: [{ t: GV.note[0], until: GV.note[1], text: 'FICTIONAL INSTANT GRAVITY CHANGE · MASSES UNCHANGED' }],
+    notes: [{ t: GV.note[0], until: GV.note[1], text: 'FICTIONAL INSTANT GRAVITY CHANGE · MASSES UNCHANGED · AIR PRESSURE CHANGES NOT SHOWN' }],
     // the closing lines, one after the other
     stack: [{ until: GV.end - 0.6, lines: [[GV.lineA[0], 'Nothing became more massive.'], [GV.lineB[0], 'Everything just became twice as heavy.']] }],
   },
 
   // the airliner on approach (AircraftSystem spline: [t, x, y, z]): it comes over you from behind at full power, nose high,
-  // and keeps sinking down the line of the avenue (≈ 78 m/s, descending ≈ 7 m/s: twice a normal approach's sink rate)
+  // and sinks ever faster down the line of the avenue, below the rooftops before it is gone (it does not drop like a stone)
   aircraft: {
-    path: [[GV.plane[0] - 0.4, 12, 150, 180], [44.6, 8, 130, 25], [47.4, -2, 112, -195], [50.0, -10, 94, -400], [52.6, -17, 74, -605], [56.0, -26, 46, -870]],
+    path: [[GV.plane[0] - 0.4, 12, 150, 180], [44.6, 8, 128, 25], [47.4, -2, 100, -195], [50.0, -10, 62, -400], [52.6, -17, 18, -605], [56.0, -26, -40, -870]],
     bank: [[GV.plane[0], 0], [56, 0]],
   },
 };
@@ -168,7 +170,7 @@ function gvFallValue(t) {
 function gvFallSub(t) {
   const F = GV_FALL.pallet;
   if (t < F.hit) return `FALL 9 m · AT 1 G: ${gvFmt(F.T1, 2)} s`;
-  return `IMPACT · AT 1 G: ${Math.round(F.v1 * 3.6)} km/h · ENERGY ×2`;
+  return `IN ${gvFmt(F.T2, 2)} s · AT 1 G: ${Math.round(F.v1 * 3.6)} km/h · ENERGY ×2`;
 }
 function gvLoadValue(t) {
   const F = GV_FALL.load;
@@ -180,6 +182,5 @@ function gvLoadSub(t) {
   if (t < F.hit) return `AT 1 G: ${gvFmt(F.T1, 2)} s`;
   return `AT 1 G: ${Math.round(F.v1 * 3.6)} km/h · 12 t`;
 }
-SCRIPT.hud.readouts[2].label = 'FALLING PALLET';
 
 const SCRIPT_TRACKS = Object.fromEntries(Object.entries(SCRIPT.tracks).map(([k, v]) => [k, new Track(v, 'linear')]));

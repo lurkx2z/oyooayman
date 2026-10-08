@@ -51,11 +51,15 @@ class GvAudio extends AudioEngine {
     // mix → glue compressor → limiter
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.22;
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12;
-    const mixIn = ctx.createGain(); mixIn.gain.value = 4.0; mixIn.connect(comp);
-    const out = ctx.createGain(); comp.connect(out); out.connect(lim); lim.connect(ctx.destination);
+    const mixIn = ctx.createGain(); mixIn.gain.value = 1.9; mixIn.connect(comp);
+    // (the limiter's built-in makeup gain pushes peaks to 0 dBFS: a trim after it keeps true peaks under −1 dBTP)
+    const out = ctx.createGain(), trim = ctx.createGain(); trim.gain.value = 0.8; comp.connect(out); out.connect(lim); lim.connect(trim); trim.connect(ctx.destination);
     out.gain.setValueAtTime(0.0001, 0); out.gain.linearRampToValueAtTime(0.9, 0.08);
     out.gain.setValueAtTime(0.9, END - 0.8); out.gain.linearRampToValueAtTime(0.0001, END);
     const world = ctx.createGain(); world.connect(mixIn);
+    // the load's fall: the street drops away to a hush (the rope screaming and the air rushing stay up), then the hit
+    { const P = GV_FALL.load; world.gain.setValueAtTime(1, T.drop + 0.05); world.gain.linearRampToValueAtTime(0.18, T.drop + 0.3); world.gain.setValueAtTime(0.18, P.hit - 0.04); world.gain.linearRampToValueAtTime(1, P.hit - 0.005); }
+    this.fallBus = ctx.createGain(); this.fallBus.connect(mixIn);
     const rev = S.reverb(1.8), rs = ctx.createGain(); rs.gain.value = 0.3; rev.connect(rs); rs.connect(world);
     const you = ctx.createGain(); you.gain.value = 1; you.connect(mixIn);
     const mus = ctx.createGain(); mus.gain.value = 0.6; mus.connect(mixIn);
@@ -244,7 +248,7 @@ class GvAudio extends AudioEngine {
     this.engine(pos(M), 44, CONFIG.duration, 44, 0.1, world);
   }
 
-  /* ---- the crane: the outrigger, the overload alarm, the brake, the load, the boom ---- */
+  /* ---- the crane: the outrigger, the overload alarm, the brake, the load, the boom's recoil ---- */
   _crane(S, ctx, world, rev) {
     const T = GV, cr = this.app.site.crane, P = GV_FALL.load;
     const pad = this.at(-0.8, -28.2, T.outrigger);
@@ -258,17 +262,16 @@ class GvAudio extends AudioEngine {
     for (const ts of T.slips) { const a = this.at(-4.4, -33.5, ts, 12); S.clunk(ts, 0.5 * a.g + 0.1, a.pan, world); S.ring(ts + 0.01, 0.35, 1600, 0.02, world); this.scrape(ts + 0.02, 0.14, 4200, 0.12 * a.g, a.pan, world); this.creak(ts + 0.1, 0.8, 55, 0.1 * a.g, a.pan, world); }
     // the brake lets go: a bang, the rope screaming off the drum, the air
     { const a = this.at(-4.4, -33.5, T.drop, 12); S.backfire(T.drop, 0.6 * a.g + 0.15, world, true); S.ring(T.drop, 0.6, 1100, 0.03, world);
-      this.scrape(T.drop + 0.03, P.T2, 5200, 0.15 * a.g + 0.03, a.pan, world);
+      this.scrape(T.drop + 0.03, P.T2, 5200, 0.15 * a.g + 0.03, a.pan, this.fallBus);
       const n = S.noise('pink', T.drop, P.hit), bp = S.filter('bandpass', 400, 0.8), g = ctx.createGain();
-      bp.frequency.setValueAtTime(300, T.drop); bp.frequency.linearRampToValueAtTime(1400, P.hit); g.gain.setValueAtTime(0, T.drop); g.gain.linearRampToValueAtTime(0.06, P.hit - 0.02); g.gain.linearRampToValueAtTime(0, P.hit);
-      n.connect(bp); bp.connect(g); g.connect(world); }
+      bp.frequency.setValueAtTime(300, T.drop); bp.frequency.linearRampToValueAtTime(1400, P.hit); g.gain.setValueAtTime(0, T.drop); g.gain.linearRampToValueAtTime(0.14, P.hit - 0.02); g.gain.linearRampToValueAtTime(0, P.hit);
+      n.connect(bp); bp.connect(g); g.connect(this.fallBus); }
     // the hit: the biggest sound of the film
     { const a = this.at(cr._fallXZ[0], cr._fallXZ[1], P.hit); this.crash(P.hit, 1.0, a.pan, world, rev, 18, 1.6); S.boom(P.hit + 0.03, 0.8, world, rev); S.thump(P.hit + 0.02, 1.0, world);
       S.farBoom(P.hit + 0.1, 0.5, a.pan, world);
       for (let k = 0; k < 30; k++) S.click(P.hit + 0.4 + 1.6 * Math.pow(S.rng.next(), 1.5), 0.1, S.rng.range(-0.6, 0.6), world); }
-    // the boom whipping back, groaning, then landing across the junction
-    { const a = this.at(-6, -45, P.hit); this.creak(T.drop + 0.2, Math.max(0.5, cr.boomLand - T.drop - 0.2), 40, 0.14, a.pan, world);
-      if (cr.boomLand < CONFIG.duration) { const b = this.at(-8, -52, cr.boomLand); this.crash(cr.boomLand, 0.75, b.pan, world, rev, 14, 1.2); S.farBoom(cr.boomLand + 0.05, 0.5, b.pan, world); } }
+    // the unloaded boom springing back up: a long groan and a low steel shudder
+    { const a = this.at(-4.4, -33.5, T.drop, 12); this.creak(T.drop + 0.15, 2.6, 40, 0.14, a.pan, world); S.ring(T.drop + 0.1, 1.4, 150, 0.03, world); }
     // car alarms all down the street afterwards
     for (const [x, z, dt] of [[5.6, -42, 0.8], [-5.6, -50.5, 1.3], [5.6, -52, 2.1]]) { const pts = this._spatial(() => ({ x, z }), P.hit + dt, CONFIG.duration, 1 / 5, 10); S.alarm(P.hit + dt, CONFIG.duration, pts, world, rev, this); }
   }

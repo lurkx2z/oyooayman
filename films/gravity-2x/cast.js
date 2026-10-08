@@ -162,10 +162,10 @@ const GV_PEOPLE = [
     states: [[0, 'gvBags'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 1.1, 'gvLoaded'], [5.0, 'gvSetDown'], [7.6, 'gvHeavy'], [GV_FALL.pallet.hit, 'recoil'], [GV_FALL.pallet.hit + 0.6, 'gvTrudge'], [GV_FALL.pallet.hit + 6.4, 'gvHeavy'], [GV.limit + 0.4, 'gvHandsKnees']] },
   // the old man on the bench
   { id: 'old', look: 'gvOld', y: GV_SW, seat: 0.43, path: [[0, GV_CITY.bench.x + 0.12, GV_CITY.bench.z + 0.3]], face: 90,
-    states: [[0, 'sit'], [GV.g0 + 0.03, 'gvBenchSit'], [GV.oldMan[0], 'gvBenchTry'], [GV.oldMan[0] + 3.8, 'gvBenchSlump']] },
+    states: [[0, 'sit'], [GV.g0 + 0.03, 'gvBenchSit'], [GV.oldMan[0], 'gvBenchTry'], [GV.oldMan[0] + 3.0, 'gvBenchSlump']] },
   // a man walking away down your sidewalk: stumbles, slows to a trudge, stops, bent over
-  { id: 'walker', look: 'casual1', y: GV_SW, path: [[0, 7.75, -4.6], [GV.g0, 7.75, -6.75], [GV.g0 + 7.5, 7.75, -10.6], [70, 7.75, -10.6]],
-    states: [[0, 'walk'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 0.9, 'gvTrudge'], [GV.g0 + 7.5, 'gvHandsKnees'], [GV_FALL.pallet.hit, 'recoil'], [GV_FALL.pallet.hit + 0.5, 'gvHeavy'], [GV.limit, 'gvHandsKnees']] },
+  { id: 'walker', look: 'casual1', y: GV_SW, path: [[0, 7.75, -4.6], [GV.g0, 7.75, -6.75], [GV.g0 + 6.5, 7.4, -9.4], [70, 7.4, -9.4]],
+    states: [[0, 'walk'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 0.9, 'gvTrudge'], [GV.g0 + 6.5, 'gvHandsKnees'], [GV_FALL.pallet.hit, 'recoil'], [GV_FALL.pallet.hit + 0.5, 'gvHeavy'], [GV.limit, 'gvHandsKnees']] },
   // a jogger on the far sidewalk: can't keep running
   { id: 'jogger', look: 'casual3', y: GV_SW, stride: 2.1, path: [[0, -8.7, 0.5], [GV.g0, -8.7, -4.0], [GV.g0 + 1.2, -8.7, -5.6], [GV.g0 + 4.0, -8.7, -7.0], [70, -8.7, -7.0]],
     states: [[0, 'jog'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 1.2, 'gvTrudge'], [GV.g0 + 4.0, 'gvHandsKnees'], [22, 'gvHeavy'], [GV.limit, 'gvHandsKnees']] },
@@ -184,11 +184,11 @@ const GV_PEOPLE = [
     states: [[0, 'gvHeavy'], [GV.outrigger, 'recoil'], [GV.outrigger + 0.3, 'gvTrudge'], [GV.outrigger + 3.4, 'gvLookUp'], [GV.slips[1], 'jog'], [GV.slips[1] + 3.4, 'gvHeavy']] },
   // the hardware shop's owner comes out to look at his creaking canopy, then backs off
   { id: 'shop', look: 'gvShop', y: GV_SW, show: [GV.awning - 1.8, 99], path: [[GV.awning - 1.8, 12.3, -6.6], [GV.awning - 0.9, 11.25, -6.3], [GV.awning - 0.25, 11.25, -6.3], [GV.awning + 0.45, 11.15, -3.85], [99, 11.15, -3.85]], face: 80, faceUntil: GV.awning - 0.25,
-    states: [[0, 'walk'], [GV.awning - 0.9, 'gvLookUp'], [GV.awning - 0.25, 'recoil'], [GV.awning + 0.5, 'gvHeavy'], [GV.awning + 1.4, 'handHead']] },
+    states: [[0, 'gvTrudge'], [GV.awning - 0.9, 'gvLookUp'], [GV.awning - 0.25, 'recoil'], [GV.awning + 0.5, 'gvHeavy'], [GV.awning + 1.4, 'handHead']] },
   // the paramedics from the ambulance, carrying their kit across: every bag weighs twice as much
-  { id: 'medA', look: 'gvMedic', y: 0, show: [50.6, 99], path: [[50.6, 3.1, -6.6], [GV.limit + 2.6, 5.6, -5.9], [GV.drop + 0.5, 7.6, -5.4], [99, 7.6, -5.4]], carry: 'kit',
-    states: [[0, 'gvCarry'], [GV.drop + 0.5, 'gvLookUp']] },
-  { id: 'medB', look: 'gvMedic2', y: 0, show: [50.9, 99], path: [[50.9, 2.9, -8.6], [GV.limit + 1.3, 3.6, -7.4], [99, 3.6, -7.4]], carry: 'case',
+  { id: 'medA', look: 'gvMedic', y: 0, kerb: true, show: [50.6, 99], putDown: GV.drop + 0.5, path: [[50.6, 3.1, -6.6], [GV.limit + 2.6, 5.6, -5.9], [GV.drop + 0.5, 8.3, -5.0], [GV_FALL.load.hit, 8.3, -5.0], [GV_FALL.load.hit + 0.7, 8.55, -4.4], [99, 8.55, -4.4]], carry: 'kit',
+    states: [[0, 'gvCarry'], [GV.drop + 0.5, 'gvLookUp'], [GV_FALL.load.hit, 'recoil'], [GV_FALL.load.hit + 0.7, 'gvHeavy'], [GV_FALL.load.hit + 2.0, 'kneel']] },
+  { id: 'medB', look: 'gvMedic2', y: 0, kerb: true, show: [50.9, 99], putDown: GV.limit + 1.3, path: [[50.9, 2.9, -8.6], [GV.limit + 1.3, 3.6, -7.4], [99, 3.6, -7.4]], carry: 'case',
     states: [[0, 'gvCarry'], [GV.limit + 1.3, 'gvHandsKnees'], [GV.drop + 0.4, 'gvLookUp']] },
 ];
 
@@ -217,6 +217,8 @@ class GvCast {
     this.case = new THREE.Group(); scene.add(this.case); gvBox(0.42, 0.34, 0.16, case_, this.case, 0, -0.22, 0);
     // where the mum put her bags down (her hands at the bottom of the squat)
     const mum = this.byId.mum; mum.update(5.65); this._bagDown = [0, 1].map((i) => { const w = mum.handWorld(i ? 1 : -1, new THREE.Vector3()); w.y = GV_SW + 0.32; return w; });
+    // where the paramedics put their kit down (their right hands just before they stop)
+    for (const [id, g] of [['medA', this.kit], ['medB', this.case]]) { const p = this.byId[id]; p.update(p.spec.putDown - 0.02); const r = p.handWorld(-1, new THREE.Vector3()), up = Math.abs(p.root.position.x) > LAYOUT.roadHalf ? GV_SW : 0; r.y += up; g.userData.rest = r; g.userData.floor = (Math.abs(r.x) > LAYOUT.roadHalf ? GV_SW : 0); }
   }
 
   // the kid: hops (crouch, launch, land) layered on his pose; height added to his root
@@ -243,8 +245,9 @@ class GvCast {
       if (!vis) continue;
       p.update(t);
       if (S.kid) this._kid(p, t);
+      if (S.kerb) { p.root.position.y = GV_SW * MathX.smooth(Math.abs(p.root.position.x), LAYOUT.roadHalf - 0.05, LAYOUT.roadHalf + 0.15); p.root.updateMatrixWorld(true); }   // stepping up onto the sidewalk
       // soft contact shadows under pelvis, chest and head
-      const gy = S.y || 0;
+      const gy = S.kerb ? p.root.position.y : S.y || 0;
       for (const [part, r] of [['hips', 0.4], ['neck', 0.3], ['head', 0.2]]) {
         const w = p.worldOf(part, this._v), k = MathX.clamp(1 - (w.y - gy) / 1.4, 0, 1);
         if (k > 0.02) this.shadows.push(w.x, gy + 0.012, w.z, r * (1.4 - k * 0.5) * (S.kid ? 0.7 : 1), 0.5 * k);
@@ -257,10 +260,15 @@ class GvCast {
       if (t < 5.65) { mum.handWorld(i ? 1 : -1, b.position); b.position.y -= 0.02; b.rotation.set(0, mum.root.rotation.y, 0); }
       else { b.position.copy(this._bagDown[i]); b.rotation.set(0, mum.root.rotation.y + 0.3 * (i - 0.5), 0); }
     });
-    // the paramedics' kit hangs from their right hands
-    for (const [id, g] of [['medA', this.kit], ['medB', this.case]]) {
-      const p = this.byId[id]; g.visible = p.root.visible;
-      if (g.visible) { p.handWorld(-1, g.position); g.rotation.set(0, p.root.rotation.y, 0); }
+    // the paramedics' kit hangs from their right hands until they stop and put it down
+    for (const [id, g, h] of [['medA', this.kit, 0.35], ['medB', this.case, 0.39]]) {
+      const p = this.byId[id], T0 = p.spec.putDown; g.visible = p.root.visible;
+      if (!g.visible) continue;
+      if (t < T0) { p.handWorld(-1, g.position); g.rotation.set(0, p.root.rotation.y, 0); }
+      else {                                                                 // let go: it drops (at 2 G) and stays
+        const R = g.userData.rest, a = t - T0;
+        g.position.set(R.x, Math.max(g.userData.floor + h, R.y - 0.5 * GV_G * a * a), R.z); g.rotation.set(0, p.root.rotation.y + 0.2 * MathX.smooth(a, 0, 0.3), 0);
+      }
     }
   }
 }

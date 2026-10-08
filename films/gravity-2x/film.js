@@ -25,7 +25,7 @@ const GV_HAND_POSES = Object.assign({}, HAND_POSES, {
   kneeR:    { p: [0.1, -0.36, -0.26], F: [-0.1, -0.85, -0.5], N: [-0.2, -0.45, 0.87], curl: [0.4, 0.45, 0.5, 0.55], thumb: [0.5, 0.2], trem: 0.003 },
 });
 for (const k of ['catch', 'plant', 'push']) GV_HAND_POSES[k + 'L'] = Object.assign({}, GV_HAND_POSES[k + 'R'], { p: GV_HAND_POSES[k + 'R'].p.slice(), F: GV_HAND_POSES[k + 'R'].F.slice(), N: GV_HAND_POSES[k + 'R'].N.slice() });
-const GV_HAND_BLEND = Object.assign({}, HAND_BLEND, { bagR: 0.4, bagDropR: 0.12, bagLowR: 0.6, catchR: 0.14, catchL: 0.14, plantR: 0.12, plantL: 0.12, pushR: 0.5, pushL: 0.5, kneeR: 0.5 });
+const GV_HAND_BLEND = Object.assign({}, HAND_BLEND, { bagR: 0.4, bagDropR: 0.22, bagLowR: 0.6, catchR: 0.14, catchL: 0.14, plantR: 0.12, plantL: 0.12, pushR: 0.5, pushL: 0.5, kneeR: 0.5 });
 for (const k of Object.keys(GV_HAND_POSES)) { if (k.endsWith('!')) continue; GV_HAND_POSES[k + '!'] = GV_HAND_POSES[k]; GV_HAND_BLEND[k + '!'] = 0.02; }
 
 const _gvAim = { y: new THREE.Vector3(), z: new THREE.Vector3(), x: new THREE.Vector3(), c: new THREE.Vector3(), q: new THREE.Quaternion() };
@@ -53,11 +53,11 @@ const GV_PLANT = { x: GV_ME.x, z: GV_ME.zTrip - 0.46, w: 0.24 };
 // (moving things are followed); fov null = the default 66°.
 const GV_LOOK = [
   [-1, -1, [6.2, 4.2, -40], null],                                                      // down the avenue: the crane, the scaffold, the kid
-  [GV.g0 + 0.15, GV.g0 + 0.7, [8.6, 0.6, -14], null],                                   // the weight hits: your eyes drop
+  [GV.g0 + 0.15, GV.g0 + 0.7, [10.2, 0.9, -6.7], 50],                                   // the weight hits: the kid and his mum buckle
   [GV.bagDown[0] - 0.5, GV.bagDown[0] + 0.3, [GV_BAG.x - 0.02, 0.05, GV_BAG.z - 0.25], null],   // the bag, to the pavement
   [GV.bagDown[1] + 0.15, GV.bagDown[1] + 1.0, [9.75, 0.55, -6.3], 44],                  // the kid, trying again
-  [GV.kidJump + 1.2, GV.kidJump + 2.0, [11.7, 0.95, -2.0], 52],                         // the old man on the bench
-  [GV.oldMan[1] - 0.2, GV.bay.creak - 0.1, [9.8, 11.5, -15.2], 52],                     // up: the loading bay creaks
+  [GV.kidJump + 1.2, GV.kidJump + 2.0, [11.7, 0.95, -2.0], 44],                         // the old man on the bench
+  [GV.oldMan[1] - 0.2, GV.oldMan[1] + 0.5, [9.8, 11.5, -15.2], 52],                     // up: the loading bay creaks
   [GV.bay.drop + 0.05, GV.bay.drop + 0.35, (t, a) => { const p = a.site.scaffold.pallet; p.updateWorldMatrix(true, false); const v = p.getWorldPosition(_gvTmp); return [v.x, Math.max(v.y, 1.6), v.z]; }, 58],
   [GV_FALL.pallet.hit + 0.5, GV_FALL.pallet.hit + 1.3, [9.1, 1.2, -15.3], 54],           // the wreck
   [GV.coupe - 1.4, GV.coupe - 0.7, (t, a) => { const c = a.traffic.coupe; return [c.x, 0.5, Math.min(c.zt.value(t) - 1.5, -2)]; }, 60],
@@ -75,10 +75,12 @@ const GV_LOOK = [
   [GV.limit - 0.4, GV.limit + 0.4, (t, a) => { const p = a.cast.byId.medA.root.position; return [p.x - 0.6, 0.95, p.z - 1.2]; }, 54],   // the paramedics
   [GV.trip - 0.1, GV.trip + 0.38, [GV_PLANT.x, 0.0, GV_PLANT.z - 0.35], 66],            // you go down
   [GV.up[0] + 1.2, GV.up[1] - 0.2, [7.0, 2.5, -16], 62],                                 // getting up, eyes up the street
-  [GV.slips[0] - 0.7, GV.slips[0] - 0.1, (t, a) => { const l = a.site.crane.load.position; return [l.x, l.y + 1.5, l.z]; }, 44],   // the load: the brake slips
-  [GV.drop + 0.02, GV.drop + 0.3, (t, a) => { const l = a.site.crane.load.position; return [l.x, Math.max(l.y + 0.5, 1.0), l.z]; }, 56],
-  [GV_FALL.load.hit + 0.5, GV_FALL.load.hit + 1.3, (t, a) => { const v = a.site.crane.tip(_gvTmp); return [v.x * 0.55 + -1.6 * 0.45, Math.max(4, v.y * 0.6), v.z * 0.55 - 19.5 * 0.45]; }, 62],
-  [GV.hudBack - 0.6, GV.hudBack + 0.8, [3.5, 3.0, -26], 62],                              // the dust settling over the street
+  // the load, held still in frame so you see each slip of the brake drop it; then wide and locked for the fall: the load at
+  // the top of the frame, the flatbed at the bottom; then down to the wreck, and the dust over the street
+  [GV.slips[0] - 0.7, GV.slips[0] - 0.1, (t, a) => { const f = a.site.crane._fallXZ; return [f[0], GV_FALL.load.base + GV_FALL.load.h + 0.4, f[1]]; }, 36],
+  [GV.drop - 0.05, GV.drop + 0.35, (t, a) => { const f = a.site.crane._fallXZ; return [f[0], 10, f[1]]; }, 66],
+  [GV_FALL.load.hit + 1.3, GV_FALL.load.hit + 2.3, (t, a) => { const f = a.site.crane._fallXZ; return [f[0], 2.5, f[1]]; }, 58],
+  [GV.hudBack + 0.4, GV.hudBack + 2.6, [3.5, 3.0, -26], 62],                              // the dust settling over the street
 ];
 const _gvTmp = new THREE.Vector3();
 
@@ -98,6 +100,7 @@ const FILM = {
     app.fx = new GvFx(app);
     app.bag = this._bag(scene);
     // you: muted sleeves, skin-tone nails (docs/STYLE_BIBLE.md § 11)
+    app.handShadows = new BlobShadows(scene, 4);       // your palms on the pavement
     app.hands = new ViewerHands(camera, { scale: 1.04, sleeve: '#3a4552', cuff: '#2c343e', nail: '#c99c84', sleeveLen: 1.1, sleeveFit: 0.78, poses: GV_HAND_POSES, blends: GV_HAND_BLEND });
     Look.apply(scene, camera);                          // selective gloss + world-space grime (after the world is built)
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
@@ -143,6 +146,7 @@ const FILM = {
     app.hands.update(t);
     this._handVisibility(app);
     this._bagUpdate(app, t);
+    this._handShadows(app, t);
     app.fx.update(t);
     this._shadowFocus(app);
     // the dust of the last impact hangs over the street: hazier sky and air
@@ -189,6 +193,14 @@ const FILM = {
     }
   },
 
+  // soft contact shadows under your palms while they are flat on the pavement
+  _handShadows(app, t) {
+    const S = app.handShadows, k = MathX.smooth(t, GV.trip + 0.3, GV.trip + 0.45) * (1 - MathX.smooth(t, GV.up[0] + 1.2, GV.up[0] + 1.6));
+    S.begin();
+    if (k > 0.01) for (const side of [1, -1]) S.push(GV_PLANT.x + side * GV_PLANT.w, LAYOUT.curbH + 0.004, GV_PLANT.z - 0.02, 0.15, 0.3 * k, 0.2);
+    S.end();
+  },
+
   // the bag: hangs from your fingers (swinging a little as you walk), then rests where you put it
   _bagUpdate(app, t) {
     const g = app.bag, h = app.hands.right.g, cam = app.camera;
@@ -224,7 +236,7 @@ const FILM = {
     const changed = MathX.smooth(t, T.g0, T.g0 + 2);
     p.saturation -= 0.06 * changed; p.contrast += 0.03 * changed;
     // the hits: two or three frames of white
-    p.flash = 0.22 * MathX.impulse(t, PH, 0.05) + 0.45 * MathX.impulse(t, LH, 0.06);
+    p.flash = 0.22 * MathX.impulse(t, PH, 0.05) + (t >= LH ? 0.8 * (1 - MathX.smooth(t, LH + 0.04, LH + 0.13)) : 0);
     // down on the pavement: the edges close in while you get your breath
     const down = MathX.smooth(t, T.trip + 0.2, T.trip + 0.8) * (1 - MathX.smooth(t, T.up[1] - 0.5, T.up[1] + 0.8));
     p.vignette += 0.3 * down; p.tunnel -= 0.25 * down; p.tunnelDark = 0.25 * down; p.edgeBlur = 0.2 * down;
@@ -236,6 +248,6 @@ const FILM = {
     p.fade = MathX.smooth(t, T.end - 0.6, T.end);
   },
 
-  debug(app, t) { return `g ${gvG(t).toFixed(2)} · pallet hit ${GV_FALL.pallet.hit.toFixed(2)} · load hit ${GV_FALL.load.hit.toFixed(2)} · boom lands ${app.site.crane.boomLand.toFixed(2)}`; },
+  debug(app, t) { return `g ${gvG(t).toFixed(2)} · pallet hit ${GV_FALL.pallet.hit.toFixed(2)} · load hit ${GV_FALL.load.hit.toFixed(2)}`; },
 };
 const _gvDustCol = new THREE.Color('#cbbfa8');

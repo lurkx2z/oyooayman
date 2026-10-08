@@ -33,7 +33,8 @@ const GV_CITY = {
   site: { x0: -36, x1: -12.5, z0: -48, z1: -11.0 },
   frame: { xs: [-16.5, -22.5, -28.5], zs: [-15.5, -22.5, -29.5, -36.5, -43.5], levels: [4.2, 8.2, 12.2, 16.2, 20.2] },
   crane: { x: -4.4, z: -33.5 },                                     // the mobile crane's slewing centre (far lanes)
-  flatbed: { x: -1.6, z: -19.5 },
+  boomAim: { x: -2.0, z: -19.5 },                                  // where the boom points (over the flatbed's deck)
+  flatbed: { x: -0.75, z: -16.5 },                                  // (its deck's middle sits under where the load will fall)
   table: { z0: -8.6, z1: -5.4, ramp: 1.1, h: 0.1 },                 // the raised crossing (speed table)
   treesR: [16, 6.5, -56, -74, -84, -94],
   treesL: [24, 14.5, -52, -72, -82, -92],
