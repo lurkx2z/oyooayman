@@ -17,12 +17,36 @@
     /* captions: one short line, on a dark plate, inside the safe zone (left of the right-hand button rail) */
     #hud .story-caption { top: calc(var(--u) * 1320); left: 45%; font-family: var(--book); font-size: calc(var(--u) * 58); font-weight: 600; line-height: 1.2;
       padding: calc(var(--u) * 14) calc(var(--u) * 30); border-radius: calc(var(--u) * 14); background: rgba(4, 6, 9, 0.62); max-width: calc(var(--u) * 790); width: max-content; }
-    /* the top-left readout: big enough for a phone */
-    #hud .story-readout { left: calc(var(--u) * 44); padding: calc(var(--u) * 14) calc(var(--u) * 24); border-radius: calc(var(--u) * 14); background: rgba(4, 6, 10, 0.4); }
-    #hud .story-readout .label { font-size: calc(var(--u) * 28); letter-spacing: 0.16em; opacity: 0.92; color: #ffffff; }
-    #hud .story-readout .value { font-size: calc(var(--u) * 88); margin-top: calc(var(--u) * 6); }
-    #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; opacity: 0.9; margin-top: calc(var(--u) * 8); color: #ffd7a8; }
-    #hud .story-end { top: calc(var(--u) * 820); font-size: calc(var(--u) * 66); }
+    /* the top-left readouts: big enough for a phone */
+    #hud .story-readout { left: calc(var(--u) * 44); padding: calc(var(--u) * 14) calc(var(--u) * 24); border-radius: calc(var(--u) * 14); background: rgba(4, 6, 10, 0.42); }
+    #hud .story-readout .label { font-size: calc(var(--u) * 30); letter-spacing: 0.14em; opacity: 0.95; color: #ffffff; text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.8); }
+    #hud .story-readout .value { font-size: calc(var(--u) * 92); margin-top: calc(var(--u) * 4); text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.7); }
+    #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 25); letter-spacing: 0.12em; opacity: 0.9; margin-top: calc(var(--u) * 6); color: #ffd7a8; }
+    #hud .nr-aero { top: calc(var(--u) * 200); }
+    #hud .nr-aero.zero .value { color: #ff8a6a; }
+    #hud .nr-aero.small { top: calc(var(--u) * 170); }
+    #hud .nr-aero.small .label { font-size: calc(var(--u) * 24); }
+    #hud .nr-aero.small .value { font-size: calc(var(--u) * 54); }
+    #hud .nr-aero.small .sub { display: none; }
+    #hud .nr-wind { top: calc(var(--u) * 455); }
+    #hud .nr-speed { top: calc(var(--u) * 200); }
+    #hud .nr-alt { top: calc(var(--u) * 455); }
+    #hud .nr-alt .value { font-size: calc(var(--u) * 64); }
+    #hud .nr-tag { position: absolute; transform: translate(-50%, -100%); white-space: nowrap; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 34); letter-spacing: 0.05em;
+      color: #fff; background: rgba(10, 12, 16, 0.62); padding: calc(var(--u) * 8) calc(var(--u) * 16); border-radius: calc(var(--u) * 10); }
+    #hud .nr-tag b { font-size: 1.25em; color: #ffd7a0; }
+    #hud .nr-tag.left { transform: translate(-104%, -50%); }
+    #hud .nr-tag.right { transform: translate(4%, -50%); }
+    #hud .nr-tag.ghost { background: rgba(255, 255, 255, 0.16); border: calc(var(--u) * 2) dashed rgba(255, 255, 255, 0.85); font-weight: 500; }
+    #hud .nr-line { position: absolute; left: 0; right: 0; top: calc(var(--u) * 1180); text-align: center; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 34); letter-spacing: 0.06em; color: #fff;
+      text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.95), 0 0 calc(var(--u) * 4) rgba(0, 0, 0, 0.9); }
+    #hud .nr-line b { color: #ffd7a0; }
+    #hud .nr-meanwhile { position: absolute; left: 0; right: 0; top: calc(var(--u) * 640); text-align: center; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 40); letter-spacing: 0.14em; color: #fff;
+      text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.8); }
+    /* the closing lines: centred, large */
+    #hud .story-stack { top: calc(var(--u) * 820); width: calc(var(--u) * 940); }
+    #hud .story-stack .line { font-size: calc(var(--u) * 70); font-weight: 600; text-shadow: 0 0 calc(var(--u) * 40) rgba(0, 0, 0, 0.8), 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.6), 0 calc(var(--u) * 3) calc(var(--u) * 8) rgba(0, 0, 0, 0.7); }
+    #hud .story-note { top: calc(var(--u) * 1110); font-size: calc(var(--u) * 30); opacity: 0.9; }
   </style>
 </head>
 <body>
@@ -80,14 +104,18 @@
   <script src="js/camera/viewerHands.js"></script>
   <script src="js/world/people.js"></script>
   <script src="js/world/vehicles.js"></script>
+  <script src="js/world/aircraft.js"></script>
   <script src="js/world/environment.js"></script>
   <script src="js/audio/audioEngine.js"></script>
   <script src="js/ui/storyHud.js"></script>
   <script src="js/ui/devControls.js"></script>
   <!-- this film (plan: films/no-air-resistance/PLAN.md) -->
   <script src="films/no-air-resistance/script.js"></script>
+  <script src="films/no-air-resistance/physics.js"></script>
   <script src="films/no-air-resistance/city.js"></script>
-  <script src="films/no-air-resistance/cast.js"></script>
+  <script src="films/no-air-resistance/wind.js"></script>
+  <script src="films/no-air-resistance/actors.js"></script>
+  <script src="films/no-air-resistance/sky.js"></script>
   <script src="films/no-air-resistance/audio.js"></script>
   <script src="films/no-air-resistance/film.js"></script>
   <script src="films/no-air-resistance/soundtrack.js"></script>

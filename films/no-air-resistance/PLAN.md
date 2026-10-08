@@ -25,7 +25,7 @@ Branch: `episode/no-air-resistance-y6gxpi` (the branch this session was assigned
 |---|---|---|
 | Paper vs ball | free fall from 1.3 m, no drag | both land in **0.52 s** (normal-air paper ghost: ~2.4 s, fluttering) |
 | Skydiver | in freefall at 55 m/s (normal top speed ≈ 200 km/h) at 3,100 m when the rule changes; v = 55 + g·t | 569 km/h at story 12.5 → canopy out at 1,250 m and **714 km/h** → 850 km/h at 400 m (cut) |
-| Car | 1,500 kg, C_dA 0.65 m², rolling 0.012; coasting from 90 km/h for 10 s | **83 km/h** now vs **77 km/h** in normal air (≈ 8 m behind) |
+| Car | 1,500 kg, C_dA 0.65 m², rolling 0.012; coasting from 90 km/h for 10 s | **86 km/h** now vs **80 km/h** in normal air (≈ 8 m behind) |
 | Paper cup thrown from that car | keeps the car's speed; falls 1.1 m in 0.47 s, skids on the road (μ ≈ 0.5) | skids for ~60 m (normal air: whipped back in a second) |
 | Airliner | 11,400 m, 240 m/s, level, zero lift from 2.0 s; y = H − ½gt² | 6,377 m at story 34 · 1,423 km/h; impact at **story 50.2** at ≈ 1,900 km/h, 11.6 km downrange |
 | Balloon | 30 cm, helium; net buoyancy ÷ mass | **≈ 2 g up**, ~60 m/s after 3 s |
