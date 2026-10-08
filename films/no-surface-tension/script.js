@@ -36,7 +36,7 @@ const NST = {
 };
 
 // the cut (story intervals kept): the pond's tail, the wick pot, the end of the time-lapse → ≈ 61 s
-CONFIG.edit = [[0, 27.8], [29.0, 33.7], [37.4, 45.2], [47.9, 68.6]];
+CONFIG.edit = [[0, 27.8], [29.0, 33.7], [37.45, 44.95], [48.3, 68.6]];
 
 // surface tension of water (mN/m) — the one track the HUD, the water, the grade and the sound all read
 function nstSigma(t) { return 72 * (1 - MathX.smooth(t, NST.drop, NST.zero)); }
@@ -89,7 +89,7 @@ const SCRIPT = {
   // Garden: outside the same wall (z < 0). Pond around (−1.2, −7); potting bench against the wall at x 1.7–3.3.
   camera: {
     baseY: 0,
-    x: [[0, -0.54], [4.4, -0.54], [4.4, 0.68, 'step'], [9.6, 0.67], [9.6, -0.19, 'step'], [14.6, -0.19], [14.6, -0.2, 'step'], [18.3, -0.2], [18.3, 0.2, 'step'], [22.2, 0.2],
+    x: [[0, -0.54], [4.4, -0.54], [4.4, 0.68, 'step'], [9.6, 0.67], [9.6, -0.175, 'step'], [14.6, -0.175], [14.6, -0.2, 'step'], [18.3, -0.2], [18.3, 0.2, 'step'], [22.2, 0.2],
       [22.2, -0.62, 'step'], [29.0, -0.62],
       [29.0, 2.3, 'step'], [33.7, 2.31], [33.7, 2.7, 'step'], [37.4, 2.71],
       [37.4, -2.2, 'step'], [57.0, -2.2]],
@@ -105,10 +105,10 @@ const SCRIPT = {
       [22.2, 2, 'step'], [23.7, 1], [24.5, 0, 'inOutSine'], [29.0, -1],
       [29.0, 186, 'step'], [33.7, 187], [33.7, 200, 'step'], [37.4, 199],
       [37.4, 6, 'step'], [44.0, 3], [45.2, 3], [47.9, 3], [50.6, 10], [52.6, 6], [53.4, 4], [57.0, 2]],
-    pitch: [[0, -20], [4.4, -20.5], [4.4, 5, 'step'], [9.6, 4], [9.6, -19, 'step'], [10.9, -21], [11.6, -25, 'inOutSine'], [14.6, -26], [14.6, -12, 'step'], [18.3, -12.5], [18.3, -46, 'step'], [18.5, -46], [19.6, -38, 'inOutSine'], [22.2, -37],
+    pitch: [[0, -20], [4.4, -20.5], [4.4, 5, 'step'], [9.6, 4], [9.6, -19, 'step'], [10.9, -21], [11.6, -25, 'inOutSine'], [14.6, -26], [14.6, -15.5, 'step'], [18.3, -16], [18.3, -46, 'step'], [18.5, -46], [19.6, -38, 'inOutSine'], [22.2, -37],
       [22.2, -65, 'step'], [24.4, -66], [29.0, -66.5],
       [29.0, -27, 'step'], [33.7, -28], [33.7, -6, 'step'], [37.4, -7],
-      [37.4, -8, 'step'], [45.2, -7], [47.9, -6], [50.0, -2], [52.6, -3], [53.5, 62, 'inOutCubic'], [56.2, 64], [57.0, 60]],
+      [37.4, -8, 'step'], [45.2, -7], [47.9, -6], [50.0, -2], [52.6, -3], [53.5, 52, 'inOutCubic'], [56.2, 55], [57.0, 52]],
     fov: [[0, 36], [4.4, 35], [4.4, 46, 'step'], [9.6, 44], [9.6, 30, 'step'], [14.6, 29], [14.6, 38, 'step'], [18.3, 38], [18.3, 38, 'step'], [22.2, 37],
       [22.2, 24, 'step'], [24.4, 17, 'inOutSine'], [29.0, 16],
       [29.0, 54, 'step'], [33.7, 54], [33.7, 37, 'step'], [37.4, 35],
@@ -138,23 +138,24 @@ const SCRIPT = {
     captions: [
       { t: 5.6, until: 9.3, text: 'Water would stop forming drops.' },
       { t: 11.6, until: 14.4, text: 'A paperclip used to float on it.' },
-      { t: 16.2, until: 18.25, text: 'Tiny tubes depend on it too.' },
+      { t: 16.2, until: 18.25, text: 'Paper can’t soak it up anymore.' },
       { t: 19.2, until: 21.95, text: 'A sponge can’t hold water anymore.' },
       { t: 22.9, until: 27.75, text: 'Insects that walk on water fall through.' },
       { t: 30.6, until: 33.65, text: 'Soil can’t hold water either.' },
       { t: 38.4, until: 41.3, text: 'Leaves pull water up from the roots.' },
-      { t: 41.6, until: 45.15, text: 'Without surface tension, that pull breaks.' },
+      { t: 41.6, until: 44.9, text: 'Without surface tension, air leaks in and the pull breaks.' },
       { t: 50.0, until: 52.9, text: 'Rain can’t hold itself together.' },
-      { t: 53.9, until: 56.8, text: 'And fabric can’t keep it out.' },
+      { t: 53.9, until: 56.8, text: 'And woven fabric can’t keep it out.' },
       { t: NST.line1, until: NST.line2 - 0.25, text: 'It looks like a tiny force…' },
       { t: NST.line2, until: NST.note - 0.1, text: '…until an entire ecosystem depends on it.' },
     ],
     readouts: [
       { from: -0.6, until: 21.95, top: 220, label: 'SURFACE TENSION', value: (t) => `${Math.round(nstSigma(t))} mN/m`, sub: (t) => (t < NST.drop ? 'LIQUID WATER · 20 °C' : 'WATER ONLY · EVERYTHING ELSE NORMAL') },
-      { from: 22.5, until: 27.75, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'THE SURFACE CAN’T CARRY ANY WEIGHT' },
+      { from: 22.5, until: 27.75, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'NO SURFACE SKIN TO STAND ON' },
       { from: 29.9, until: 33.65, top: 220, label: 'CAPILLARY RISE', value: () => '0 mm', sub: 'TINY PORES CAN’T HOLD WATER NOW' },
       { from: 37.9, until: 48.6, top: 220, label: 'TIME SINCE THE CHANGE', value: (t) => nstDayText(t), sub: (t) => `PLANTS WILTING · ${Math.round(nstWilt(t) * 100)} %` },
-      { from: 59.2, until: 66.4, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'SAME WATER · SAME AMOUNT · NO DROPS' },
+      { from: 49.7, until: 52.9, top: 220, label: 'RAINDROPS', value: () => '0', sub: 'IT FALLS AS TORN RIBBONS AND MIST' },
+      { from: 57.2, until: 66.4, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'SAME WATER · NO DROPS' },
     ],
     notes: [
       { t: NST.note, until: NST.end + 0.2, text: 'FICTIONAL RULE: ONLY WATER’S SURFACE TENSION CHANGED · TIME COMPRESSED' },

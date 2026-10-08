@@ -40,7 +40,9 @@ function nstSeg(t) { return t < NST.pond ? 'kitchen' : t < NST.bench ? 'pond' : 
 // labels pinned to points in the world: [t0, t1, point fn(t, out), text]
 const NST_TAGS = [
   // the trickle: where ordinary water would have pinched off into drops (a point on the stream, 12 cm below the spout, + 3 cm to screen-right)
-  { t0: 6.3, t1: 9.3, at: (t, o) => { const S = NST_K.tap.spout; return o.set(S[0] + 0.454 * 0.03, S[1] - 0.085, S[2] + 0.01 - 0.891 * 0.03); }, text: 'NORMAL WATER<br>WOULD BREAK<br>INTO DROPS HERE', line: true },
+  { t0: 6.3, t1: 9.3, at: (t, o) => { const S = NST_K.tap.spout; return o.set(S[0] + 0.454 * 0.012, S[1] - 0.085, S[2] + 0.01 - 0.891 * 0.012); }, text: 'NORMAL WATER<br>WOULD BREAK<br>INTO DROPS HERE', line: true },
+  // the paperclip: where normal water would have held it up (its pale ghost floats there)
+  { t0: 11.5, t1: 14.4, at: (t, o) => o.set(NST_K.bowl.x + 0.012 + 0.022, NST_K.top + NST_K.bowl.water + 0.002, NST_K.bowl.z + 0.004), text: 'NORMAL WATER<br>WOULD HOLD IT<br>UP HERE', line: false },
   { t0: 16.1, t1: 18.3, at: (t, o) => o.set(NST_K.bowl.x - 0.01 + 0.033, NST_K.top + NST_K.bowl.water + 0.075, NST_K.bowl.z - 0.005), text: 'NORMAL WATER<br>WOULD CLIMB<br>TO HERE', line: true },
   { t0: 34.5, t1: 37.2, at: (t, o) => o.set(NST_G.potB.x + 0.012, NST_G.bench.top + 0.1, NST_G.potB.z), text: 'DRY ABOVE<br>THE WATER LINE', line: false },
 ];
@@ -94,22 +96,29 @@ const FILM = {
           float an = atan(vLocU.z, vLocU.x);
           float seam = pow(abs(cos(an * 4.0)), 18.0);
           float n = fract(sin(dot(floor(vec2(an * 9.0, rr * 14.0)), vec2(12.9, 78.2))) * 43758.5);
-          // soaked patches: blotches that grow and join (value noise over the canopy), a little ahead near the top
-          vec2 bq = vec2(an * 2.6, rr * 5.0); vec2 bi = floor(bq), bf = fract(bq); bf = bf * bf * (3.0 - 2.0 * bf);
-          float h00 = fract(sin(dot(bi, vec2(12.9, 78.2))) * 43758.5), h10 = fract(sin(dot(bi + vec2(1, 0), vec2(12.9, 78.2))) * 43758.5);
-          float h01 = fract(sin(dot(bi + vec2(0, 1), vec2(12.9, 78.2))) * 43758.5), h11 = fract(sin(dot(bi + vec2(1, 1), vec2(12.9, 78.2))) * 43758.5);
-          float blot = mix(mix(h00, h10, bf.x), mix(h01, h11, bf.x), bf.y);
-          float wet = smoothstep(0.0, 0.08, uWet * 1.35 - (0.3 * rr + 0.7 * blot));
-          float streak = wet * smoothstep(0.6, 1.0, abs(sin(an * 28.0 + rr * 3.0))) * 0.5;
-          diffuseColor.rgb *= 1.0 - 0.6 * wet - 0.2 * streak;
+          // soaked spots: water soaks in only where it lands (no wicking sideways now): spots that each appear in place,
+          // darken and stay, until most of the canopy is spotted (a few dry gaps remain)
+          vec2 sp = vLocU.xz / 0.07; vec2 si = floor(sp); float wet = 0.0;
+          for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
+            vec2 c = si + vec2(float(i), float(j));
+            float h1 = fract(sin(dot(c, vec2(12.9, 78.2))) * 43758.5), h2 = fract(sin(dot(c, vec2(39.3, 11.7))) * 24634.6), h3 = fract(sin(dot(c, vec2(73.1, 52.9))) * 31718.9);
+            vec2 ctr = c + 0.5 + 0.6 * (vec2(h1, h2) - 0.5);
+            vec2 dv = sp - ctr; float ang2 = atan(dv.y, dv.x);
+            float rad = (0.22 + 0.55 * h3 * h3) * (1.0 + 0.09 * sin(ang2 * 2.0 + h2 * 20.0) + 0.04 * sin(ang2 * 5.0 + h1 * 31.0));
+            float on = smoothstep(h1 * 0.9, h1 * 0.9 + 0.12, uWet * (1.0 + 0.25 * (1.0 - rr)));
+            wet = max(wet, on * (1.0 - smoothstep(rad * 0.6, rad, length(dv))));
+          }
+          wet *= 0.92;
+          float streak = 0.0;
+          diffuseColor.rgb *= mix(vec3(1.0), vec3(0.6, 0.5, 0.32), wet);     // soaked: a deeper, more saturated ochre
           diffuseColor.rgb += seam * 0.03;`)
         .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
           { // thin fabric glows with the daylight behind it (seen from underneath); soaked patches go dark
             float rr3 = length(vLocU.xz) / 0.52;
             float wet3 = wet;          // (declared in the colour chunk above, same scope)
-            totalEmissiveRadiance += diffuseColor.rgb * (0.55 - 0.35 * wet3) * (gl_FrontFacing ? 0.0 : 1.0); }`)
+            totalEmissiveRadiance += diffuseColor.rgb * (0.55 - 0.15 * wet3) * (gl_FrontFacing ? 0.0 : 1.0); }`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-          roughnessFactor = mix(roughnessFactor, 0.15, wet);`);
+          roughnessFactor = mix(roughnessFactor, 0.22, wet);`);
     };
     cm.customProgramCacheKey = () => 'nstUmb';
     const canopy = new THREE.Mesh(new THREE.ConeGeometry(0.55, 0.22, 8, 4, true), cm); canopy.position.y = 0.11; u.add(canopy);
@@ -129,8 +138,8 @@ const FILM = {
     // the payoff: a rising camera over the garden, the park and the city in the storm (no body motion)
     if (t >= T.drone) {
       const k = Ease.inOutSine(MathX.clamp((t - T.drone) / (T.end - T.drone), 0, 1)), k2 = MathX.smooth(t, T.drone, T.drone + 6);
-      cam.position.set(MathX.lerp(-2.0, -0.6, k), MathX.lerp(2.0, 16.5, k), MathX.lerp(-1.0, 5.5, k));
-      this._v.set(MathX.lerp(-1.1, -0.8, k2), MathX.lerp(1.2, 0.0, k2), MathX.lerp(-9.0, -34, k));
+      cam.position.set(MathX.lerp(-2.0, -0.6, k), MathX.lerp(2.0, 24, k), MathX.lerp(-1.0, 6.5, k));
+      this._v.set(MathX.lerp(-1.1, -0.8, k2), MathX.lerp(1.2, 0.0, k2), MathX.lerp(-9.0, -52, k));
       cam.up.set(0, 1, 0); cam.lookAt(this._v);
       cam.fov = MathX.lerp(62, 54, k); cam.updateProjectionMatrix();
     }
@@ -157,7 +166,7 @@ const FILM = {
       for (const n of ['tapReach', 'tapTurn']) nstAimHand(n, cam, V, Fw, Nw);
     }
     if (t >= T.clip - 0.5 && t < T.clipLet + 1.0) {
-      K.clipPos(Math.min(t, T.clipLet), V); V.x += 0.017; V.y += 0.016; V.z -= 0.007;     // pinching its right-hand end, fingertips above the water
+      K.clipPos(Math.min(t, T.clipLet), V); V.x += 0.017; V.y += 0.031; V.z -= 0.007;     // pinching its right-hand end, fingertips above the water
       if (t > T.clipLet) V.y += 0.09 * MathX.smooth(t, T.clipLet - 0.02, T.clipLet + 0.35) + 0.3 * MathX.smooth(t, T.clipLet + 0.35, T.clipLet + 0.95);   // and away, up out of frame
       Fw.set(-0.8, -0.55, -0.15); Nw.set(0.05, -0.35, -0.95);       // from the right, side-on: the bowl stays in view
       for (const n of ['clipHold', 'clipOpen']) nstAimHand(n, cam, V, Fw, Nw);
@@ -264,11 +273,10 @@ const FILM = {
     // the rise: a little clearer
     p.exposure += 0.08 * MathX.smooth(t, T.drone, T.drone + 2); p.saturation += 0.08 * MathX.smooth(t, T.drone, T.drone + 2);
     // lightning (the sky does most of it; a whisper of flash in the grade)
-    p.flash = 0.22 * nstFlash(t);
+    p.flash = 0.4 * nstFlash(t);
     p.flashColor.setRGB(0.85, 0.9, 1.0);
-    // dips at the bigger jumps (out to the pond, into the time-lapse), black at the end
-    p.fade = Math.max(1 - MathX.smooth(t, T.lapse, T.lapse + 0.3), 0) * (t >= T.lapse ? 1 : 0) * 0.8;
-    p.fade = Math.max(p.fade, MathX.smooth(t, T.end - 0.7, T.end));
+    // black at the end
+    p.fade = MathX.smooth(t, T.end - 0.7, T.end);
   },
 
   debug(app, t) { return `seg ${nstSeg(t)} · σ ${nstSigma(t).toFixed(1)} mN/m · day ${nstDay(t).toFixed(2)} · wilt ${nstWilt(t).toFixed(2)} · rain ${nstRain(t).toFixed(2)}`; },

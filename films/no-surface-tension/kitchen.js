@@ -7,9 +7,9 @@
 
 const NST_K = {
   top: 0.92,
-  domeH: 0.0042,                    // the water heaped above the rim of a brimming glass (exaggerated a little)
+  domeH: 0.0055,                    // the water heaped above the rim of a brimming glass (exaggerated a little)
   glass: { x: -0.56, z: 0.52, r: 0.036, rb: 0.031, h: 0.112, wall: 0.0028 },
-  beads: [[-0.625, 0.6, 0.7], [-0.49, 0.615, 0.45], [-0.585, 0.665, 0.3], [-0.515, 0.68, 0.22], [-0.64, 0.548, 0.15]],   // x, z, ml (around the glass's foot)
+  beads: [[-0.65, 0.555, 1.0], [-0.47, 0.565, 0.8], [-0.625, 0.615, 0.45], [-0.5, 0.62, 0.35], [-0.67, 0.49, 0.25]],   // x, z, ml (around the glass's foot)
   leafBeads: [[0.0, 0.006, 0.08], [-0.012, -0.012, 0.05], [0.014, -0.01, 0.04]],   // offsets on the hero leaf, ml
   bowl: { x: -0.2, z: 0.61, r: 0.072, h: 0.098, water: 0.074 },      // a clear glass dish: you see the clip sink from the side
   sink: { x0: 0.0, x1: 0.62, z0: 0.33, z1: 0.75, depth: 0.2 },
@@ -139,16 +139,16 @@ class NstKitchen {
     box(0.01, sd, sl, S.x0, top - sd / 2, cz, mSteel); box(0.01, sd, sl, S.x1, top - sd / 2, cz, mSteel);
     add(new THREE.CylinderGeometry(0.03, 0.03, 0.006, 16), std('#2a2d30', { roughness: 0.4, metalness: 0.7 }), cx, top - sd + 0.008, cz, 0, 0, 0, false);
     // the water in the basin (rises while the tap runs)
-    this.basinW = add(new THREE.PlaneGeometry(sw - 0.012, sl - 0.012), nstWaterMat({ color: '#3a5057', opacity: 0.3, fres: 0.5, env: 0.3 }), cx, top - sd + 0.02, cz, -Math.PI / 2, 0, 0, false);
+    this.basinW = add(new THREE.PlaneGeometry(sw - 0.012, sl - 0.012), nstWaterMat({ color: '#3a5057', opacity: 0.38, fres: 0.5, env: 0.45 }), cx, top - sd + 0.02, cz, -Math.PI / 2, 0, 0, false);
     this.basinW.renderOrder = 3;
 
     // ---------- the tap: a gooseneck mixer with a side lever
     const T = K.tap;
-    add(new THREE.CylinderGeometry(0.026, 0.03, 0.06, 20), mSteel, T.x, top + 0.03, T.z);
+    add(new THREE.CylinderGeometry(0.0158, 0.03, 0.06, 20), mSteel, T.x, top + 0.03, T.z);     // (tapered: a flat steel ring on top caught the window light like a glowing halo)
     add(new THREE.CylinderGeometry(0.014, 0.016, 0.2, 16), mSteel, T.x, top + 0.16, T.z);
     const neck = new THREE.CatmullRomCurve3([new THREE.Vector3(T.x, top + 0.25, T.z), new THREE.Vector3(T.x, top + 0.33, T.z + 0.04), new THREE.Vector3(T.x, top + 0.34, T.z + 0.15), new THREE.Vector3(T.x, top + 0.31, T.z + 0.225), new THREE.Vector3(T.x, top + 0.29, T.z + 0.23)]);
     add(new THREE.TubeGeometry(neck, 32, 0.0125, 14), mSteel, 0, 0, 0);
-    add(new THREE.CylinderGeometry(0.0135, 0.0125, 0.03, 16), mSteelDark, T.spout[0], T.spout[1] + 0.012, T.spout[2]);
+    add(new THREE.CylinderGeometry(0.0122, 0.0125, 0.03, 16), mSteelDark, T.spout[0], T.spout[1] + 0.012, T.spout[2]);
     this.lever = new THREE.Group(); this.lever.position.set(T.x + 0.028, top + 0.1, T.z); g.add(this.lever);
     const lv = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.006, 0.09, 10), mSteel); lv.position.set(0.0, 0.045, 0); lv.castShadow = true; this.lever.add(lv);
     const lvk = new THREE.Mesh(new THREE.SphereGeometry(0.009, 12, 8), mSteel); lvk.position.set(0, 0.09, 0); this.lever.add(lvk);
@@ -256,7 +256,7 @@ class NstKitchen {
     this.dome = new NstPuddle(g, nstWaterMat({ color: '#6f8c95', opacity: 0.24, fres: 0.7, rough: 0.02, env: 1.4 }), { na: 48, nr: 8, seed: 2 });
     this.dome.group.position.set(G.x, top + G.h - 0.0006, G.z);
     // the overflow: a film running down the outside of the glass (shader-masked, with a few faster rivulets)
-    const fm = nstWaterMat({ color: '#2c3d44', opacity: 0.1, fres: 0.9, env: 0.9 });
+    const fm = nstWaterMat({ color: '#2c3d44', opacity: 0.1, fres: 0.45, env: 0.9 });
     fm.userData.prog = { value: 0 };
     const ob = fm.onBeforeCompile;
     fm.onBeforeCompile = (sh) => {
@@ -271,7 +271,7 @@ class NstKitchen {
           if (vUvN.y < front) discard;`);
     };
     fm.customProgramCacheKey = () => 'nstOverflow';
-    this.overflow = new THREE.Mesh(new THREE.CylinderGeometry(G.r + 0.0012, G.rb + 0.0016, G.h - 0.002, 48, 1, true), fm);
+    this.overflow = new THREE.Mesh(new THREE.CylinderGeometry(G.r + 0.0005, G.rb + 0.0006, G.h - 0.002, 48, 1, true), fm);
     this.overflow.position.set(G.x, top + G.h / 2, G.z); this.overflow.renderOrder = 5; g.add(this.overflow);
     this.overflowMat = fm;
     // the spill spreading out around the foot of the glass
@@ -360,6 +360,9 @@ class NstKitchen {
     this.ring.rotation.x = -Math.PI / 2; this.ring.position.set(B.x, top + B.water + 0.0006, B.z); this.ring.renderOrder = 4; g.add(this.ring);
     // the paperclip (steel wire)
     this.clip = new THREE.Mesh(new THREE.TubeGeometry(nstClipCurve(), 160, 0.00062, 6), this.std('#c9cdd0', { roughness: 0.25, metalness: 0.95, envMapIntensity: 1.3 }));
+    // a pale "ghost" of the clip floating where normal water would have held it (it fades in once the real one sinks)
+    this.clipGhost = new THREE.Mesh(this.clip.geometry, new THREE.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: 0, depthWrite: false }));
+    this.clipGhost.renderOrder = 6; g.add(this.clipGhost);
     this.clip.castShadow = true; g.add(this.clip);
   }
 
@@ -413,8 +416,10 @@ class NstKitchen {
     if (t < T.clipLet) { const k = Ease.inOutSine(MathX.clamp((t - T.clip - 0.3) / (T.clipLet - T.clip - 0.3), 0, 1)); return out.set(B.x + 0.012, MathX.lerp(ys + 0.075, ys + 0.004, k), B.z + 0.004); }
     const u = t - T.clipLet;
     // it sinks through water: quick at first, slowed by the water (terminal ≈ 0.18 m/s for a flat clip), tumbling
-    const depth = Math.min(B.water - 0.0075, 0.18 * u + 0.004 * (1 - Math.exp(-u * 8)));
-    return out.set(B.x + 0.012 + 0.01 * Math.min(1, u * 2.5), ys + 0.004 - depth - 0.004 * Math.min(1, u * 10), B.z + 0.004 - 0.022 * Math.min(1, u * 2.5));
+    // (a flat clip glides and wobbles side to side on the way down)
+    const depth = Math.min(B.water - 0.0075, 0.12 * u + 0.004 * (1 - Math.exp(-u * 8)));
+    const glide = 0.006 * Math.sin(u * 9) * Math.exp(-u * 1.6) * (depth < B.water - 0.0076 ? 1 : 0);
+    return out.set(B.x + 0.012 + 0.01 * Math.min(1, u * 2.5) + glide, ys + 0.004 - depth - 0.004 * Math.min(1, u * 10), B.z + 0.004 - 0.022 * Math.min(1, u * 2.5));
   }
   towelTop(t, out) {
     const B = NST_K.bowl, top = NST_K.top, T = NST;
@@ -441,13 +446,13 @@ class NstKitchen {
         st.at(tau, c);
         const a = hash1(i * 5.3 + cyc) * 6.28, off = 0.003 + 0.012 * u * hash1(i * 2.9 + cyc * 0.7);
         const vy = st.v0.y - 9.81 * tau;
-        return { p: [c.x + Math.cos(a) * off, c.y, c.z + Math.sin(a) * off], v: [Math.cos(a) * 0.09 * u, vy * 0.8, Math.sin(a) * 0.09 * u], life: 0.32, size0: 0.0015, size1: 0.0045, a: 0.5 * on * Math.min(1, u), g: 9.81, floor: level };
+        return { p: [c.x + Math.cos(a) * off, c.y, c.z + Math.sin(a) * off], v: [Math.cos(a) * 0.09 * u, vy * 0.8, Math.sin(a) * 0.09 * u], life: 0.32, size0: 0.006, size1: 0.02, a: 0.09 * on * Math.min(1, u), g: 9.81, floor: level };     // (soft wisps, not specks: specks read as drops)
       }, 1.0, [0.9, 0.94, 0.96]);
       st.at(st.T, c);
       const cx = c.x, cz = c.z;
       sp.emit(t, 300, 0.9, T0 + 0.1, T.clip, (i, cyc, h) => {
         const a = hash1(i * 3.7 + cyc) * 6.28, rr = 0.006 + 0.025 * h, sv = 0.12 + 0.35 * hash1(i * 1.3 + cyc * 2.1);
-        return { p: [cx + Math.cos(a) * rr, level + 0.004, cz + Math.sin(a) * rr], v: [Math.cos(a) * sv, 0.12 + 0.35 * hash1(i * 4.1 + cyc), Math.sin(a) * sv], life: 0.8, size0: 0.004, size1: 0.018, a: 0.28 * on, g: 1.5 };
+        return { p: [cx + Math.cos(a) * rr, level + 0.004, cz + Math.sin(a) * rr], v: [Math.cos(a) * sv, 0.12 + 0.35 * hash1(i * 4.1 + cyc), Math.sin(a) * sv], life: 0.8, size0: 0.016, size1: 0.05, a: 0.06 * on, g: 1.5 };
       }, 1.0, [0.84, 0.88, 0.9]);
     }
     sp.end();
@@ -475,6 +480,8 @@ class NstKitchen {
       this.dome.set(wIn, MathX.lerp(NST_K.domeH, 0.0005, k), k, 0);
       this.overflow.visible = true;
       this.overflowMat.userData.prog.value = MathX.clamp(Math.pow(dtG / 0.55, 0.8), 0, 1);
+      // the running film drains off into the spill and thins away (left standing it reads as a second glass)
+      this.overflow.visible = dtG < 1.5; this.overflowMat.opacity = 0.1 * (1 - MathX.smooth(dtG, 0.6, 1.5));
       const ds = dtG - 0.45;
       this.spill.mesh.visible = ds > 0;
       if (ds > 0) { const V = 9e-6, R = G.rb + 0.003 + nstSpreadR(V, ds) * 0.9; this.spill.set(R, V / (Math.PI * R * R * 0.85), 1, 0.12 * Math.min(1, ds * 3)); nstWetLook(this.spill.mesh.material, 1); }
@@ -503,7 +510,10 @@ class NstKitchen {
     this.clip.position.copy(this.v);
     const u = Math.max(0, t - T.clipLet);
     this.clip.rotation.set(0.9 * (1 - Math.exp(-u * 5)) * Math.sin(u * 6) * Math.exp(-u * 1.5) + (u > 0.5 ? 0.04 : 0), 0.4 + 0.5 * Math.min(1, u * 2), 0.6 * Math.min(1, u * 3) * Math.exp(-u * 2.5));
-    this.clip.visible = t > T.clip - 0.1 && t < T.towel + 3.0;
+    this.clip.visible = t > T.clip - 0.1 && t < T.sponge;
+    const ga = 0.55 * MathX.smooth(t, T.clipLet + 0.25, T.clipLet + 0.7) * (1 - MathX.smooth(t, T.towel - 0.4, T.towel));
+    this.clipGhost.visible = ga > 0.003; this.clipGhost.material.opacity = ga;
+    if (ga > 0.003) { const B = NST_K.bowl; this.clipGhost.position.set(B.x + 0.012, top + B.water + 0.0012, B.z + 0.004); this.clipGhost.rotation.set(0, 0.4, 0); }
     const ru = t - T.clipLet;
     if (ru > 0 && ru < 1.4) { const s = 0.006 + ru * 0.07; this.ring.scale.set(s, s, 1); this.ring.material.opacity = 0.55 * (1 - ru / 1.4) * MathX.smooth(ru, 0, 0.05); this.ring.visible = s < this.bowlWaterR; }
     else this.ring.visible = false;
@@ -523,7 +533,7 @@ class NstKitchen {
     this.sponge.position.copy(this.v);
     this.sponge.rotation.set(0, 0.35, 0.05 * MathX.smooth(t, T.spongeUp, T.spongeUp + 0.9));
     const lift = t - T.spongeUp;
-    const drain = lift > 0.1 ? MathX.smooth(lift, 0.1, 0.22) * Math.exp(-Math.max(0, lift - 0.25) / 0.8) : 0;
+    const drain = lift > 0.1 ? MathX.smooth(lift, 0.1, 0.22) * Math.exp(-Math.max(0, lift - 0.25) / 1.5) : 0;
     this.spongeMat.color.setScalar(MathX.lerp(0.62, 1.0, MathX.smooth(lift, 0.3, 1.6)));
     const cy = Math.cos(0.35), sy = Math.sin(0.35);
     for (const { dx, dz, s } of this.spongeStreams) {
@@ -531,7 +541,7 @@ class NstKitchen {
       s.yEnd = level;
       const dy = s.a.y - level, vy = s.v0.y;
       s.T = (vy + Math.sqrt(vy * vy + 2 * 9.81 * Math.max(dy, 0.005))) / 9.81;
-      s.update(t, lift > 0.1 ? Math.max(drain, 0.12 * Math.exp(-(lift - 0.15) / 2.5)) : 0, 1);
+      s.update(t, lift > 0.1 ? Math.max(drain, 0.22 * Math.exp(-(lift - 0.15) / 2.5)) : 0, 1);
     }
   }
 }

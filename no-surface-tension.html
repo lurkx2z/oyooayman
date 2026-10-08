@@ -11,6 +11,8 @@
     /* this film's HUD styling (page-level only: never edit the shared story classes in style.css for one film) */
     #hud .story-title.big.center { top: calc(var(--u) * 760); width: calc(var(--u) * 1000); margin-left: calc(var(--u) * -500); }
     #hud .story-title.big.center::before { background: radial-gradient(closest-side, rgba(4, 6, 8, 0.5), rgba(4, 6, 8, 0.2) 62%, rgba(4, 6, 8, 0)); }
+    /* the closing note sits on a plate (it lands over busy trees) */
+    #hud .story-note { width: fit-content; max-width: calc(var(--u) * 760); padding: calc(var(--u) * 10) calc(var(--u) * 22); border-radius: calc(var(--u) * 10); background: rgba(4, 6, 10, 0.5); }
     #hud .story-title.big.center .kick { font-family: var(--book); font-size: calc(var(--u) * 58); font-weight: 600; letter-spacing: 0.04em; }
     #hud .story-title.big.center .hero { font-family: var(--book); font-size: calc(var(--u) * 96); font-weight: 700; line-height: 1.08; }
     #hud .story-title.big.center .main { text-shadow: 0 0 calc(var(--u) * 28) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.7); }
@@ -27,8 +29,8 @@
     #hud .story-title.big.center .hero { font-size: calc(var(--u) * 92); white-space: nowrap; }
     /* world tags pinned to points (the towel's "would climb to here" line, the wick) */
     #hud .nst-tag { position: absolute; transform: translate(0, -50%); opacity: 0; pointer-events: none; white-space: nowrap; }
-    #hud .nst-tag span { display: inline-block; margin-left: calc(var(--u) * 18); font-family: var(--hud-font); font-size: calc(var(--u) * 25); font-weight: 600; letter-spacing: 0.12em; line-height: 1.25; color: #ffd7a8;
-      padding: calc(var(--u) * 7) calc(var(--u) * 14); border-radius: calc(var(--u) * 8); background: rgba(4, 6, 10, 0.55); }
+    #hud .nst-tag span { display: inline-block; margin-left: calc(var(--u) * 18); font-family: var(--hud-font); font-size: calc(var(--u) * 34); font-weight: 600; letter-spacing: 0.1em; line-height: 1.22; color: #ffd7a8;
+      padding: calc(var(--u) * 10) calc(var(--u) * 18); border-radius: calc(var(--u) * 8); background: rgba(4, 6, 10, 0.62); }
     #hud .nst-tag.left { transform: translate(-100%, -50%); text-align: right; }
     #hud .nst-tag.left span { margin-left: 0; margin-right: calc(var(--u) * 18); line-height: 1.25; }
     #hud .nst-tag.left.line::before { right: auto; left: 100%; margin-right: 0; margin-left: calc(var(--u) * -18); width: calc(var(--u) * 120); }

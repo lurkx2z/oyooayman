@@ -38,7 +38,7 @@ class NstGarden extends Environment {
     this._grounds();
     this._house();
     this._pond();
-    this._bench();
+    this._pottingBench();
     this._beds();
     this._gardenTrees();
     this._park();
@@ -119,9 +119,14 @@ class NstGarden extends Environment {
     const cv = Tex.canvas(512, 512), c = cv.getContext('2d');
     c.fillStyle = '#6c8050'; c.fillRect(0, 0, 512, 512);
     for (let i = 0; i < 26000; i++) { const v = r.range(-1, 1); c.fillStyle = `rgba(${v > 0 ? '150,170,90' : '40,60,25'},${Math.abs(v) * 0.22})`; c.fillRect(r.range(0, 512), r.range(0, 512), 1.2, r.range(2, 5)); }
-    for (let i = 0; i < 60; i++) { c.fillStyle = `rgba(60,80,35,${r.range(0.05, 0.14)})`; c.beginPath(); c.arc(r.range(0, 512), r.range(0, 512), r.range(10, 40), 0, 6.28); c.fill(); }
+    // (blotches wrap around the tile edges: cut-off blotches made the repeats show as light and dark rectangles)
+    for (let i = 0; i < 60; i++) {
+      c.fillStyle = `rgba(60,80,35,${r.range(0.05, 0.14)})`; const bx = r.range(0, 512), by = r.range(0, 512), br = r.range(10, 40);
+      for (const ox of [-512, 0, 512]) for (const oy of [-512, 0, 512]) { c.beginPath(); c.arc(bx + ox, by + oy, br, 0, 6.28); c.fill(); }
+    }
     const lt = Tex.tex(cv); lt.repeat.set(9, 9);
     this.lawnMat = new THREE.MeshStandardMaterial({ map: lt, roughness: 0.95, name: 'nstLawn' });
+    this.lawnMat.userData.grime = 0;      // (no street grime: its 1.25 m "replaced slab" cells showed on the lawn as dark rectangles)
     // the lawn has a hole where the pond is (a ring of quads around an irregular rim)
     const P = NST_G.pond, rim = (a) => P.r * (1 + 0.1 * Math.sin(a * 3 + 1) + 0.06 * Math.sin(a * 5 + 2));
     this.pondRim = rim;
@@ -211,7 +216,8 @@ class NstGarden extends Environment {
       B.add(new THREE.DodecahedronGeometry(s, 0), Mat.std(['#8a857a', '#77736a', '#9a948a'][i % 3], { roughness: 0.9 }), Geo.matrix(P.x + Math.cos(a) * R, s * 0.25, P.z + Math.sin(a) * R, r.next(), r.next() * 3, 0, 1.3, 0.55, 1.1));
     }
     // reeds at the far side
-    for (let i = 0; i < 70; i++) { const a = r.range(3.6, 5.6), R = rim(a) - r.range(0.0, 0.25), h = r.range(0.5, 1.1); B.add(new THREE.ConeGeometry(0.012, h, 4), Mat.std('#5c7038', { roughness: 0.8 }), Geo.matrix(P.x + Math.cos(a) * R, h / 2 - 0.05, P.z + Math.sin(a) * R, r.range(-0.15, 0.15), 0, r.range(-0.15, 0.15)), { noShadow: true }); }
+    this.reedMat = new THREE.MeshStandardMaterial({ color: '#5c7038', roughness: 0.8, name: 'nstReed' });     // (they dry out too: standing in water doesn't help without the pull)
+    for (let i = 0; i < 70; i++) { const a = r.range(3.6, 5.6), R = rim(a) - r.range(0.0, 0.25), h = r.range(0.5, 1.1); B.add(new THREE.ConeGeometry(0.012, h, 4), this.reedMat, Geo.matrix(P.x + Math.cos(a) * R, h / 2 - 0.05, P.z + Math.sin(a) * R, r.range(-0.15, 0.15), 0, r.range(-0.15, 0.15)), { noShadow: true }); }
     // the water surface (reflective, slightly see-through; rain makes it misty, not ringed)
     const sg = new THREE.ShapeGeometry(new THREE.Shape(Array.from({ length: 72 }, (_, i) => { const a = (i / 72) * Math.PI * 2, R = rim(a) + 0.02; return new THREE.Vector2(Math.cos(a) * R, -Math.sin(a) * R); })));
     this.pondMat = nstWaterMat({ color: '#3d5a58', opacity: 0.5, fres: 0.35, rough: 0.06, env: 1.3 });
@@ -278,7 +284,7 @@ class NstGarden extends Environment {
   }
 
   // ---------------------------------------------------------------- the potting bench, pots, the wick pot, the watering can
-  _bench() {
+  _pottingBench() {
     const N = NST_G.bench, B = this.batch, wood = Mat.std('#8a6a48', { roughness: 0.85 }), wood2 = Mat.std('#6e5238', { roughness: 0.9 });
     for (let i = 0; i < 6; i++) B.box(N.x1 - N.x0, 0.03, 0.09, (N.x0 + N.x1) / 2, N.top - 0.015, N.z0 + 0.05 + i * 0.1, wood);
     for (const x of [N.x0 + 0.05, N.x1 - 0.05]) for (const z of [N.z0 + 0.05, N.z1 - 0.05]) B.box(0.06, N.top - 0.03, 0.06, x, (N.top - 0.03) / 2, z, wood2);
@@ -435,7 +441,7 @@ class NstGarden extends Environment {
 
   // ---------------------------------------------------------------- rain (torn spray), mist veils
   _rainSystems() {
-    this.streaks = new StreakSystem(this.scene, 2600);
+    this.streaks = new StreakSystem(this.scene, 7600);
     this.mist = new BillboardSystem(this.scene, 900, false);
     this.mist.mesh.renderOrder = 6;
     this.mist.uniforms.uLight.value = 1.0;
@@ -493,15 +499,15 @@ class NstGarden extends Environment {
     // sun + sky light
     const f = this.focus;
     this.sun.position.copy(this.sunDir).multiplyScalar(60).add(f); this.sun.target.position.copy(f);
-    this.sun.intensity = 3.2 * MathX.smooth(this.sunDir.y, -0.02, 0.18) * (1 - 0.92 * storm) + 4 * fl;
+    this.sun.intensity = 3.2 * MathX.smooth(this.sunDir.y, -0.02, 0.18) * (1 - storm);      // (lightning lights the sky dome, not the sun: sun-cast flashes threw hard house shadows on the lawn)
     this.sun.color.setRGB(1, 0.93 - 0.18 * low, 0.84 - 0.3 * low);
-    this.hemi.intensity = (0.8 + 0.45 * dl) * (1 - 0.35 * storm) + 2.5 * fl + 0.35 * MathX.smooth(t, NST.drone, NST.drone + 2);      // (moonlit nights, not black)
+    this.hemi.intensity = (0.8 + 0.45 * dl) * (1 - 0.35 * storm) + 4.0 * fl + 0.35 * MathX.smooth(t, NST.drone, NST.drone + 2);      // (moonlit nights, not black)
     this.hemi.color.copy(zen).lerp(new THREE.Color('#b9cfe0'), 0.5);
     this.scene.environmentIntensity = (0.18 + 0.24 * dl) * (1 - 0.3 * storm);
 
     // wilting: lawn toward straw, leaves toward olive, flowers bow, potted leaves droop
-    this.lawnMat.color.setRGB(1 + 1.5 * wilt, 1 + 0.35 * wilt, 1 - 0.15 * wilt);      // (linear multipliers: green → straw)
-    this.m.foliage.color.setRGB(1 + 0.85 * wilt, 1 - 0.04 * wilt, 1 - 0.6 * wilt);
+    this.lawnMat.color.setRGB(0.85 + 0.8 * wilt, 0.85 + 0.12 * wilt, 0.85 - 0.25 * wilt);      // (linear multipliers: green → dry straw)
+    this.m.foliage.color.setRGB(1 + 0.3 * wilt, 1 - 0.3 * wilt, 1 - 0.45 * wilt);         // (dull olive-brown, not autumn gold)
     for (const fw of this.flowers) {
       const w = MathX.clamp(wilt * 1.25 - fw.lag, 0, 1);
       fw.segs.forEach((s, k) => { s.rotation.x = (k === 0 ? 0.08 : 0.2 * k * k) * w * 2.2; s.rotation.z = fw.dir * 0.15 * w; });
@@ -509,7 +515,8 @@ class NstGarden extends Environment {
     }
     if (!this._bedBase) this._bedBase = this.bedMats.map((mm) => mm.color.clone());
     const brown = this._brown || (this._brown = new THREE.Color('#7a5c3a'));
-    this.bedMats.forEach((mm, i) => mm.color.copy(this._bedBase[i]).lerp(brown, (i < 3 ? 0.55 : 0.45) * wilt));
+    this.bedMats.forEach((mm, i) => mm.color.copy(this._bedBase[i]).lerp(brown, (i < 3 ? 0.8 : 0.7) * wilt));
+    this.reedMat.color.set('#5c7038').lerp(this._reedDry || (this._reedDry = new THREE.Color('#857a4c')), 0.85 * wilt);
     this._droop(this.potPlantA, t < NST.lapse ? 0 : wilt);
     this._droop(this.potPlantB, t < NST.lapse ? 0.25 * MathX.smooth(t, NST.wick - 2, NST.wick + 3) : Math.min(1, wilt * 1.3));
     this._droop(this.bigPlant, wilt);
@@ -551,9 +558,10 @@ class NstGarden extends Environment {
   }
 
   _droop(plant, w) {
-    for (const L of plant.userData.leaves) { L.leaf.rotation.x = L.base + 1.7 * w * (0.8 + 0.2 * L.k); L.sm.rotation.z = 0.12 + 0.5 * w; }
-    plant.userData.mats[0].color.set('#46713a').lerp(new THREE.Color('#7a7a3c'), 0.55 * w);
-    plant.userData.mats[1].color.set('#5a8642').lerp(new THREE.Color('#8c8442'), 0.55 * w);
+    for (const L of plant.userData.leaves) { L.leaf.rotation.x = L.base + 2.2 * w * (0.8 + 0.2 * L.k); L.sm.rotation.z = 0.12 + 0.75 * w; }
+    // limp, then dry: dull olive → brown
+    plant.userData.mats[0].color.set('#46713a').lerp(this._dryA || (this._dryA = new THREE.Color('#6b5530')), 0.85 * w);
+    plant.userData.mats[1].color.set('#5a8642').lerp(this._dryB || (this._dryB = new THREE.Color('#7d6a3c')), 0.85 * w);
   }
 
   _updateStriders(t) {
@@ -599,20 +607,36 @@ class NstGarden extends Environment {
     S.begin(); M.begin(this.scene.fog);
     if (rain > 0.01 && cam) {
       const cp = cam.position, H = 10;
-      // without surface tension falling water can't stay as drops: it shreds into fine spray that falls slowly
-      // (≈1.5–3 m/s, not the 9 m/s of big raindrops) and drifts on the wind. Each slot is a short torn strand.
-      const N = Math.floor(2400 * rain), box = 8;
+      // without surface tension falling water can't stay as drops: it falls as slow, wavy torn ribbons (like the tap's
+      // stream) that twist and fray (≈1.5–3 m/s, not the 9 m/s of big raindrops) and drift on the wind. Each slot is
+      // one ribbon drawn as a short twisting polyline; nothing is drawn right at the lens (up close they read as scratches).
+      const N = Math.floor(1500 * rain), box = 8, P = this._rp || (this._rp = new Float32Array(18));
       for (let i = 0; i < N; i++) {
         const vf = 1.5 + 1.5 * hash1(i * 1.3), per = H / vf;
         const ph = hash1(i * 2.7 + 1) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc, tt = age * per;
         const hx = hash2(i, cyc), hz = hash2(i + 77, cyc), sz = 0.35 + hash1(i * 5 + cyc) * 0.65;
-        const wind = 2.2 + 0.8 * Math.sin(t * 0.7 + hx * 3);
+        const wind = 2.0 + 0.8 * Math.sin(t * 0.7 + hx * 3);
         const x0 = cp.x + (hx - 0.5) * 2 * box - wind * per * 0.5, z0 = cp.z + (hz - 0.5) * 2 * box, y = cp.y + 5 - vf * tt;
         const x = x0 + wind * tt + 0.15 * Math.sin(tt * 3 + i), z = z0 + 0.12 * Math.sin(tt * 2.3 + i * 1.7);
-        // a strand along the motion (wind + fall), broken in two, with a little curl
-        const L = 0.06 + 0.12 * sz, dx = wind / Math.hypot(wind, vf), dy = -vf / Math.hypot(wind, vf), a = 0.2 * rain * (0.5 + 0.5 * sz) * Math.min(1, age * 8) * Math.min(1, (1 - age) * 8);
-        S.push(x, y, z, x + dx * L, y + dy * L, z + 0.01, 0.8, 0.84, 0.87, a, 0.0022 + 0.002 * sz);
-        S.push(x + dx * L * 1.35, y + dy * L * 1.35, z + 0.015, x + dx * L * 1.9 + 0.01, y + dy * L * 1.9, z + 0.02, 0.78, 0.82, 0.85, a * 0.55, 0.0018);
+        const d = Math.hypot(x - cp.x, y - cp.y, z - cp.z), dn = t > NST.drone ? 2.6 : 1.3; if (d < dn) continue;
+        const near = MathX.smooth(d, dn, dn * 1.85);
+        // the ribbon trails up-wind of its head: length 0.2–0.6 m, a helical twist that travels along it
+        const L = 0.2 + 0.4 * sz, hyp = Math.hypot(wind, vf), dx = -wind / hyp, dy = vf / hyp;
+        const A = 0.018 + 0.03 * sz, ph0 = hash1(i * 9.1 + cyc) * 6.283, gap = Math.floor(hash1(i * 4.4 + cyc) * 7);
+        const a = 0.34 * rain * (0.55 + 0.45 * sz) * Math.min(1, age * 8) * Math.min(1, (1 - age) * 8) * near;
+        for (let k = 0; k < 6; k++) {
+          const u = k / 5, w = A * (0.35 + 0.65 * u), q = ph0 + u * 7.5 - tt * 5;
+          P[k * 3] = x + dx * L * u - dy * w * Math.sin(q);
+          P[k * 3 + 1] = y + dy * L * u + dx * w * Math.sin(q);
+          P[k * 3 + 2] = z + w * 0.8 * Math.cos(q);
+        }
+        for (let k = 0; k < 5; k++) {
+          if (k === gap) continue;                                 // torn: one link missing on most ribbons
+          const u = k / 5, ak = a * (1 - 0.55 * u), wk = (0.0045 + 0.004 * sz) * (1 - 0.5 * u);
+          // the streak quad overhangs its ends by its width: pull the ends in so links don't overlap into bright beads
+          const ex = P[k * 3 + 3] - P[k * 3], ey = P[k * 3 + 4] - P[k * 3 + 1], ez = P[k * 3 + 5] - P[k * 3 + 2], el = Math.hypot(ex, ey, ez) || 1, f = wk / el;
+          S.push(P[k * 3] + ex * f, P[k * 3 + 1] + ey * f, P[k * 3 + 2] + ez * f, P[k * 3 + 3] - ex * f, P[k * 3 + 4] - ey * f, P[k * 3 + 5] - ez * f, 0.82, 0.86, 0.89, ak, wk);
+        }
       }
       // mist: the falling water shreds into fine spray that drifts with the wind: a few huge, faint sheets far off
       // (never close to the lens: up close, soft billboards read as cotton balls)
