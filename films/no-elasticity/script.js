@@ -7,7 +7,7 @@
    Air, water and living tissue are unchanged.
    ===================================================================== */
 
-CONFIG.duration = 72.4;
+CONFIG.duration = 73.6;
 CONFIG.seed = 20261008;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.68, walkSpeed: 1.3, bobStrength: 0.014, bobFrequency: 1.72,
@@ -38,20 +38,21 @@ const NE = {
   traffic: [33.6, 40.8],
   truckShot: [36.5, 39.6],
   // the footbridge: a running club crosses; the deck keeps the dip (insert)
-  bridge: [41.8, 48.6],
+  bridge: [42.2, 47.6],
   crash: 53.6,                 // the SUV hits the crossing sedan
-  crashShot: [52.8, 55.4],     // side-on; 53.35–55.0 (the hit and the van's) plays at 1/3 speed
+  crashShot: [52.8, 54.7],     // high behind the SUV; 53.35–55.0 (the hit and the van’s) plays at 1/3 speed
   crashSlow: [53.35, 55.0],
-  wreckShot: [56.9, 59.4],
+  wreckShot: [54.7, 59.4],    // the slow high arc, from the side where the van comes in
   // the late hatch taps the wreck at walking pace, then backs off: the bumper stays pushed in
   tap: 60.9,
   tapBack: [61.8, 62.6],
   tapShot: [59.4, 63.4],
   line: [64.0, 70.2],
-  note: [70.3, 72.2],
-  end: 72.4,
+  endShot: 66.5,              // low beside the flat ball and the teenager sitting by it (the opening, looped)
+  note: [70.3, 73.4],
+  end: 73.6,
 };
-// the cut: no waiting. Story 18.2–21.6, 26.9–33.6, 40.8–41.8 and 48.6–52.8 are dropped; the crash is slowed. Film ≈ 60.4 s
+// the cut: no waiting. Story 18.2–21.6, 26.9–33.6, 40.8–42.2 and 47.6–52.8 are dropped; the crash is slowed. Film ≈ 60.2 s
 CONFIG.edit = [[0, 18.2], [NE.carLook, NE.wheelShot[1]], [NE.traffic[0], NE.traffic[1]], [NE.bridge[0], NE.bridge[1]],
   [NE.crashShot[0], NE.crashSlow[0]], [NE.crashSlow[0], NE.crashSlow[1], 1 / 3], [NE.crashSlow[1], NE.end]];
 
@@ -93,30 +94,30 @@ const SCRIPT = {
   // (the jumps in x / z / yaw at 18.3 and 28.0 are inside the cut, so you never see them)
   camera: {
     baseY: 0.15,
-    x: [[0, 10.9], [2.0, NE_YOU.x, 'outQuad'], [28.0, NE_YOU.x], [28.1, NE_KERB.x, 'step'], [64.6, NE_KERB.x], [66.4, NE_END.x, 'inOutSine'], [73, NE_END.x]],
-    z: [[0, -1.6], [2.0, NE_YOU.z, 'outQuad'], [28.0, NE_YOU.z], [28.1, NE_KERB.z, 'step'], [64.6, NE_KERB.z], [66.4, NE_END.z, 'inOutSine'], [73, NE_END.z]],
-    height: [[0, 1.68], [1.45, 1.68], [1.58, 1.63], [1.95, 1.68], [73, 1.68]],
+    x: [[0, 10.9], [2.0, NE_YOU.x, 'outQuad'], [28.0, NE_YOU.x], [28.1, NE_KERB.x, 'step'], [64.6, NE_KERB.x], [66.4, NE_END.x, 'inOutSine'], [75, NE_END.x]],
+    z: [[0, -1.6], [2.0, NE_YOU.z, 'outQuad'], [28.0, NE_YOU.z], [28.1, NE_KERB.z, 'step'], [64.6, NE_KERB.z], [66.4, NE_END.z, 'inOutSine'], [75, NE_END.z]],
+    height: [[0, 1.68], [1.45, 1.68], [1.58, 1.63], [1.95, 1.68], [75, 1.68]],
     yaw: [[0, -28], [2.0, -31], [3.4, -30.5], [5.5, -31],
-      [13.4, -22, 'step'], [14.6, -36], [15.2, -38.4], [18.2, -38],
+      [13.4, -27, 'step'], [14.6, -39], [15.2, -40.4], [18.2, -40],
       [18.3, 104, 'step'], [NE.carLook, 100], [22.4, 84], [23.3, 68],
-      [28.1, 38, 'step'], [NE.traffic[0], 38], [35.0, 41], [35.6, 50], [36.5, 40],
+      [28.1, 43, 'step'], [NE.traffic[0], 43], [35.0, 44], [35.6, 50], [36.5, 40],
       [39.6, 16, 'step'], [40.8, 12],
       [55.4, 13, 'step'], [56.9, 14],
-      [63.4, 8, 'step'], [64.6, 4], [65.6, -18], [66.4, -27], [73, -29]],
+      [63.4, 8, 'step'], [64.6, 4], [65.6, -18], [66.4, -27], [75, -29]],
     pitch: [[0, -8], [1.2, -13], [1.6, -20], [2.4, -22], [3.4, -23], [4.6, -17, 'step'], [5.5, -18], [NE.mont[3][0], -34, 'step'],
       [13.4, -9, 'step'], [14.6, -5], [18.2, -5],
       [18.3, -5, 'step'], [23.3, -5],
       [28.1, -5, 'step'], [35.6, -4], [36.5, -4],
       [39.6, -2, 'step'], [40.8, -1.5],
       [55.4, -1, 'step'], [56.9, -1],
-      [63.4, -2, 'step'], [64.6, -3], [65.6, -12], [66.4, -21], [73, -23]],
+      [63.4, -2, 'step'], [64.6, -3], [65.6, -12], [66.4, -21], [75, -23]],
     fov: [[0, 52], [1.2, 48], [1.6, 44], [3.4, 36], [4.6, 40, 'step'], [5.5, 38], [NE.mont[3][0], 64, 'step'],
       [13.4, 42, 'step'], [14.6, 32], [15.2, 30], [18.2, 30],
-      [18.3, 44, 'step'], [23.3, 40],
-      [28.1, 40, 'step'], [35.0, 40], [35.6, 46], [36.5, 44],
+      [18.3, 54, 'step'], [23.3, 48],
+      [28.1, 32, 'step'], [35.0, 32], [35.6, 46], [36.5, 44],
       [39.6, 34, 'step'], [40.8, 32],
       [55.4, 20, 'step'], [56.9, 22],
-      [63.4, 38, 'step'], [64.6, 40], [65.6, 44], [66.4, 46], [73, 45]],
+      [63.4, 38, 'step'], [64.6, 40], [65.6, 44], [66.4, 46], [75, 45]],
     startles: [[1.47, 0.35]],
     shakes: [],
   },
@@ -131,25 +132,26 @@ const SCRIPT = {
     // 0 = a cinematic shot with no body motion (the montage inserts, the wheel, the truck, the bridge, the crash, the wreck, the tap)
     pov: [[0, 1], [NE.ballShot[0], 0, 'step'], [11.45, 1, 'step'],
       [NE.wheelShot[0], 0, 'step'], [NE.wheelShot[1], 1, 'step'], [NE.truckShot[0], 0, 'step'], [NE.truckShot[1], 1, 'step'],
-      [NE.bridge[0], 0, 'step'], [NE.bridge[1], 1, 'step'], [NE.crashShot[0], 0, 'step'], [NE.crashShot[1], 1, 'step'],
-      [NE.wreckShot[0], 0, 'step'], [NE.tapShot[1], 1, 'step'], [NE.end, 1]],
+      [NE.bridge[0], 0, 'step'], [NE.bridge[1], 1, 'step'], [NE.crashShot[0], 0, 'step'],
+      [NE.tapShot[1], 1, 'step'], [NE.endShot, 0, 'step'], [NE.end, 0]],
   },
 
   hud: {
     title: { in: NE.title[0], out: NE.title[1], fi: 0.2, fo: 0.4, cls: 'big center', html: '<span class="kick">WHAT IF EVERYTHING</span><span class="kick">LOST ITS</span><span class="hero">ELASTICITY?</span>' },
     captions: [
-      { t: 1.8, until: 3.3, text: 'It hits… and doesn’t come back up.' },
+      { t: 1.8, until: 3.3, text: 'A solid rubber ball hits…<br>and doesn’t come back up.' },
       { t: 3.45, until: 5.5, text: 'It squashes.<br>It stays squashed.' },
       { t: 13.55, until: 15.4, text: 'Bouncing is only the beginning.' },
       { t: 16.1, until: 18.2, text: 'Bodies are fine. Their gear isn’t.' },
       { t: 23.45, until: 25.0, text: 'Suspension is mostly springs…' },
       { t: 25.15, until: 26.9, text: '…so every bump<br>leaves it lower.' },
-      { t: 33.75, until: 36.4, text: 'A few bumps later,<br>cars scrape on everything.' },
-      { t: 36.65, until: 39.5, text: 'A loaded truck<br>sinks even faster.' },
-      { t: 42.2, until: 44.9, text: 'Bridges flex a little, all day…' },
-      { t: 45.1, until: 48.4, text: '…now the deepest flex<br>stays forever.' },
-      { t: 53.42, until: 54.95, text: 'Crashed cars normally<br>rebound a little…' },
-      { t: 55.5, until: 58.6, text: 'These don’t.<br>Not even a little.' },
+      { t: 33.75, until: 35.45, text: 'A few bumps later,<br>they scrape on every one.' },
+      { t: 35.6, until: 39.5, text: 'A loaded truck<br>sinks even faster.' },
+      { t: 42.4, until: 44.6, text: 'Bridges flex a little, all day…' },
+      { t: 44.8, until: 47.5, text: '…now each one keeps<br>the shape of its worst day.' },
+      { t: 53.38, until: 54.1, text: 'Crashed cars normally<br>rebound a little…' },
+      { t: 54.2, until: 55.35, text: '…these don’t.<br>They stay locked.' },
+      { t: 55.6, until: 58.6, text: 'Three cars. One wreck.' },
       { t: 60.2, until: 63.3, text: 'Now even a tap<br>leaves a dent.' },
       { t: NE.line[0], until: 66.3, text: 'Without elasticity…' },
       { t: 66.6, until: NE.line[1], text: '…almost nothing gets a second chance<br>to return to shape.' },
@@ -159,7 +161,7 @@ const SCRIPT = {
       { from: NE.wheelShot[0], until: NE.wheelShot[1], top: 210, label: 'RIDE HEIGHT LOST', value: (t) => neRideText(t), sub: (t) => (t < 26.55 ? 'SPRINGS DON’T RETURN' : 'NEARLY ON ITS BUMP STOPS') },
       { from: NE.truckShot[0], until: NE.truckShot[1] + 0.8, top: 210, label: 'TRUCK’S REAR DROP', value: (t) => neTruckText(t), sub: (t) => (t < 38.9 ? 'EACH BUMP PUSHES IT DOWN' : 'NOW ON ITS BUMP STOPS') },
       { from: NE.bridge[0], until: NE.bridge[1], top: 210, label: 'FOOTBRIDGE SAG', value: (t) => neSagText(t), sub: 'IT KEEPS ITS DEEPEST DIP' },
-      { from: NE.crashShot[1], until: NE.wreckShot[1], top: 210, label: 'REBOUND SPEED', value: '0 m/s', sub: 'NORMALLY ABOUT 1 m/s' },
+      { from: NE.wreckShot[0], until: NE.wreckShot[1], top: 210, label: 'SEPARATION SPEED', value: '0 m/s', sub: 'NORMALLY ABOUT 1 m/s' },
       { from: NE.tapShot[0], until: NE.tapShot[1], top: 210, label: 'IMPACT SPEED', value: '5 km/h', sub: 'NORMALLY: IT SPRINGS BACK' },
       { from: 64.0, until: NE.note[1], top: 210, label: 'SHAPE RECOVERY', value: '0%', sub: '' },
     ],

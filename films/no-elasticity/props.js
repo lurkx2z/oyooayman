@@ -55,8 +55,9 @@ class NeBall {
     this._key = '';
     this._dead = neBallTimes().tc4;
     // a dashed yellow ring: the ball's round outline before it died (the low insert turns it to face the camera)
-    { const lm = new THREE.MeshBasicMaterial({ color: '#ffd23e', fog: false }), g = new THREE.Group(), n = 28, R = NE_BALL.r + 0.003;
-      for (let i = 0; i < n; i++) { const a0 = (i + 0.25) / n * Math.PI * 2; const d = new THREE.Mesh(new THREE.BoxGeometry(0.009, 0.0022, 0.0015), lm); d.position.set(Math.cos(a0) * R, Math.sin(a0) * R, 0); d.rotation.z = a0 + Math.PI / 2; g.add(d); }
+    // only over the top (the sides bulge out a little: rubber keeps its volume, so a flat bottom pushes the middle out)
+    { const lm = new THREE.MeshBasicMaterial({ color: '#ffd23e', fog: false }), g = new THREE.Group(), n = 13, R = NE_BALL.r + 0.004;
+      for (let i = 0; i < n; i++) { const a0 = MathX.deg(18 + 144 * (i + 0.5) / n); const d = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.0045, 0.002), lm); d.position.set(Math.cos(a0) * R, Math.sin(a0) * R, 0); d.rotation.z = a0 + Math.PI / 2; g.add(d); }
       g.visible = false; scene.add(g); this.ring = g; }
   }
 

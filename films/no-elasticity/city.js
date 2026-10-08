@@ -39,7 +39,7 @@ function neRoadY(z) {
 
 // the footbridge's permanent midspan sag. The deck keeps the deepest deflection any load has given it so far: the running
 // maximum of the walkers' and runners' load (cast.js). Real values are fractions of a millimetre per person; the picture draws them ×NE_SAG_DRAW.
-const NE_SAG_DRAW = 150;
+const NE_SAG_DRAW = 300;
 const NE_SAG = { t0: 30.0, t1: 52.0, dt: 1 / 60, tab: null };
 function neSagReal(t) {
   const S = NE_SAG;

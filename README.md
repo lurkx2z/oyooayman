@@ -64,6 +64,14 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Episode: *What if everything lost its elasticity?*** — open `no-elasticity.html` (60.4 s). Solids still resist being
+> deformed but never spring back. A solid rubber ball lands and stays down with a flat spot; racket strings, a shoe's foam,
+> a cushion and a rubber band keep every stretch and dent; a trampoline becomes a funnel; a red car rides 8 cm lower after
+> one speed table; a loaded truck's rear springs end on their bump stops; a footbridge keeps the deepest dip a running club
+> gave it; a crash doesn't rebound at all (the cars crumple, lock and slide off as one); and a 5 km/h tap leaves a bumper
+> pushed in. Air, water and living tissue are unchanged (so tyres stay round). Plan, rules, shot list and review log:
+> [`films/no-elasticity/PLAN.md`](films/no-elasticity/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -319,6 +327,19 @@ films/slip/sea.js        the seabed (one analytic height field in JS and GLSL), 
 films/slip/cast.js       people with umbrellas, in the quake, at the seafront, running inland
 films/slip/audio.js      rain, the squeak and the thud, the underground pulses, the rupture, the quake, sirens, the roar
 films/slip/film.js       FILM hooks: which scene, hands, the quake shake, reflections, the cuts, the grade, the end card
+```
+
+Film: *What if everything lost its elasticity?* (`no-elasticity.html`):
+
+```
+films/no-elasticity/PLAN.md     the rule (resist, never spring back), the place, shot list, sound, review log
+films/no-elasticity/script.js   ★ every beat time (NE), camera, your hands for the rubber band, captions, readouts, the cut
+films/no-elasticity/city.js     the sunny avenue, the speed table, the plaza, the footbridge that keeps its sag, the signal masts
+films/no-elasticity/props.js    the ball, the round trampoline (its mat funnels), the racket, the shoe, the cushions, the band
+films/no-elasticity/cars.js     cars whose springs take a permanent set at each bump, the truck, the inelastic crash, the tap
+films/no-elasticity/cast.js     the teenager, the kid, the café sitter, the walkers and runners on the bridge (its load)
+films/no-elasticity/film.js     FILM hooks: the inserts and cinematic shots, labels pinned to the world, the grade
+films/no-elasticity/audio.js    the soundtrack (every "boing" replaced by a dead thud; no horns; scrapes, dull groans, one crash)
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):

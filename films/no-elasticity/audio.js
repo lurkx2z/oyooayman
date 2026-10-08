@@ -5,8 +5,8 @@
      NODE_PATH=$(npm root -g) node tools/bake-soundtrack.cjs --page no-elasticity.html --out films/no-elasticity/soundtrack.js
    The idea of the mix: the sounds of things springing back go missing. The ball's ring, the racket's ping, the
    trampoline's boing, a rubber band's snap, a car's bounce: each one is replaced by a dull, final thud. What is
-   left is thudding (springs that stay down), scraping (cars on their bump stops), groaning steel and, at the end,
-   one crash that doesn't rebound.
+   left is thudding (springs that stay down), scraping (cars on their bump stops), dull settling (no creaks, no groans:
+   those are solids ringing) and, at the end, one crash that doesn't rebound.
    ===================================================================== */
 
 class NeAudio extends AudioEngine {
@@ -58,13 +58,12 @@ class NeAudio extends AudioEngine {
       env(g, t, 0.003, vol, len); o.connect(g); g.connect(pan(dest, p)); o.start(t); o.stop(t + len * 3 + 0.05);
       burst(t, len * 0.6, 'pink', 420, 0.8, vol * 0.6, p, dest, 0.002);
     };
-    // a creak / groan: a slow pitch-sagging tone through a wide, dull band (steel and springs giving way; nothing rings)
-    const groan = (t, dur, f, vol, p, dest, drop = 0.7) => {
-      const o = ctx.createOscillator(), o2 = ctx.createOscillator(), bp = S.filter('bandpass', f * 3, 0.8), g = ctx.createGain();
-      o.type = 'sawtooth'; o2.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f * drop, t + dur); o2.frequency.setValueAtTime(f * 1.013, t); o2.frequency.linearRampToValueAtTime(f * drop * 1.02, t + dur);
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + dur * 0.25); g.gain.linearRampToValueAtTime(vol * 0.7, t + dur * 0.7); g.gain.linearRampToValueAtTime(0, t + dur);
-      o.connect(bp); o2.connect(bp); bp.connect(g); g.connect(pan(dest, p)); o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05);
-      const s = ctx.createGain(); s.gain.value = 0.4; g.connect(s); s.connect(rev);
+    // a dull settling sound where a creak or groan would be: a short swell of low rumble, no pitch, no ring (a groan is a
+    // solid vibrating and springing back; nothing does now)
+    const groan = (t, dur, f, vol, p, dest) => {
+      const d = Math.min(dur, 0.9), n = S.noise('brown', t, t + d + 0.2), lp = S.filter('lowpass', f * 2.2, 0.6), g = ctx.createGain();
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol * 2, t + d * 0.2); g.gain.linearRampToValueAtTime(0, t + d);
+      n.connect(lp); lp.connect(g); g.connect(pan(dest, p));
     };
 
     // 1. a sunny afternoon: the city bed, a few birds in the plaza trees; it thins out as the street gives up
@@ -126,7 +125,7 @@ class NeAudio extends AudioEngine {
         for (let t = t0 + 0.03; t < t1; t += R(0.03, 0.07)) S.click(t, 0.015, R(-0.2, 0.2), fx); }
     }
 
-    // 6. the plaza again: the trampoline. The springs groan as they stretch… and the "boing" never comes.
+    // 6. the plaza again: the trampoline. The mat sinks with a dull rumble… and the "boing" never comes.
     { const P = place(NE_TRAMP.x, NE_TRAMP.z, T.land, 6);
       burst(T.jump, 0.12, 'pink', 600, 0.8, 0.05 * P.g * 2, P.pan, fx, 0.01);
       thud(T.land, 0.55 * P.g * 2.4, P.pan, fx, 95, 42, 0.18);
@@ -174,8 +173,7 @@ class NeAudio extends AudioEngine {
     // the bus's air brakes at the stop
     { const ps = TR.bus.spec.pose(45.5), P = place(ps.x, ps.z, 45.5, 8); S.hiss(45.5, 0.6, 0.06 * P.g * 2, P.pan, cars); }
 
-    // 9. structures: the footbridge groans at each step of its sag; the signal arm and the lamp posts creak as they give
-    // (a long groan of steel as the running club reaches midspan and the deck settles to a new low; a creak when it's gone)
+    // 9. the footbridge: a low rumble as the running club reaches midspan and the deck settles to a new low (no ringing steel)
     groan(44.0, 3.4, 56, 0.075, -0.05, fx, 0.7); burst(44.4, 2.6, 'brown', 220, 0.6, 0.05, 0, fx, 0.6); groan(48.9, 1.0, 70, 0.03, 0.1, fx, 0.85);
     // footsteps on the steel deck: dull, dead thumps (a deck that can't ring), heavier for the runners
     for (const w of NE_WALKERS) { const step = (w.run ? 2.3 : 1.2) / w.v / 2; for (let t = Math.max(w.t0, NE.bridge[0]) + (w.v * 7.3) % step; t < Math.min(w.t1, NE.bridge[1]); t += step) { const x = neWalkerX(w, t); if (x === null || Math.abs(x) > NE_CITY.bridge.half) continue; const pn = MathX.clamp(x / 14, -0.6, 0.6); burst(t, 0.05, 'brown', -240, 0.7, w.run ? 0.05 : 0.02, pn, fx, 0.003); if (w.run) thud(t, 0.03, pn, fx, 95, 50, 0.04); } }
@@ -185,7 +183,7 @@ class NeAudio extends AudioEngine {
     // 10. the crash. Brakes too late, the hit (biggest sound of the film), glass, the van, then a long settle with no rebound.
     { const C = NE_CRASH, ps = neCrashPose('suv', C.ti), P = place(ps.x, ps.z, C.ti, 10);
       // the SUV's tyres scrubbing as it brakes (no horn: a horn is a vibrating spring plate, and it no longer vibrates)
-      burst(C.ti - 0.32, 0.36, 'white', 1100, 0.7, 0.07, P.pan - 0.1, cars, 0.03);
+      burst(C.ti - 0.32, 0.36, 'pink', 600, 0.6, 0.08, P.pan - 0.1, cars, 0.03);   // a dry scrub, not a squeal
       // the hit
       S.crunch(C.ti, 0.95, P.pan, fx, rev); S.boom(C.ti, 0.75, fx, rev); thud(C.ti, 0.9, P.pan, fx, 70, 30, 0.35);
       for (let i = 0; i < 26; i++) { const t = C.ti + 0.05 + R(0, 1.4) * R(0.2, 1); S.click(t, R(0.02, 0.05), P.pan + R(-0.3, 0.3), fx); }   // glass: dry ticks, no ring
@@ -193,7 +191,7 @@ class NeAudio extends AudioEngine {
       { const n = S.noise('white', C.ti + 0.05, C.ti + 1.6), b = S.filter('bandpass', 1500, 1.0), g = ctx.createGain();
         g.gain.setValueAtTime(0, C.ti + 0.05); g.gain.linearRampToValueAtTime(0.1, C.ti + 0.12); g.gain.linearRampToValueAtTime(0.0, C.ti + 1.3); n.connect(b); b.connect(g); g.connect(pan(fx, P.pan)); }
       // the van can't stop: tyres, then the second hit
-      burst(C.tb, C.tv - C.tb, 'white', 900, 0.8, 0.08, P.pan, cars, 0.05);
+      burst(C.tb, C.tv - C.tb, 'pink', 550, 0.6, 0.09, P.pan, cars, 0.05);
       S.crunch(C.tv, 0.8, P.pan, fx, rev); thud(C.tv, 0.75, P.pan, fx, 65, 30, 0.3);
       // no stuck horn (see above): a hiss of steam, glass settling
       S.hiss(C.tv + 0.6, 4.5, 0.025, P.pan, fx);
@@ -203,7 +201,7 @@ class NeAudio extends AudioEngine {
 
     // 10b. the tap: the late hatch's tyres as it brakes, then a small, dull plastic crunch (no rebound knock)
     { const T = NE_TAP, P = { pan: 0.1 };
-      burst(T.tb, NE.tap - T.tb, 'white', 1000, 0.8, 0.05, P.pan, cars, 0.05);
+      burst(T.tb, NE.tap - T.tb, 'pink', 600, 0.6, 0.06, P.pan, cars, 0.05);
       thud(NE.tap, 0.55, P.pan, fx, 140, 60, 0.1);
       burst(NE.tap, 0.16, 'white', 2600, 1.4, 0.06, P.pan, fx, 0.002);
       for (let i = 0; i < 6; i++) S.click(NE.tap + 0.02 + i * R(0.015, 0.04), 0.02, P.pan + R(-0.1, 0.1), fx);

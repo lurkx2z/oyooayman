@@ -20,43 +20,50 @@ const NE_SHOTS = [
   // low on the paving beside the dead ball: a dashed ring shows its round shape; the flat spot keeps it lower, and when
   // his hand presses on it nothing changes back
   { id: 'ball', t0: NE.ballShot[0], t1: NE.ballShot[1],
-    cam: (t, app) => { const [bx, bz] = app.ball.spot(app.cast), u = Ease.inOutSine((t - NE.ballShot[0]) / (NE.ballShot[1] - NE.ballShot[0])), d = 1.02 - 0.16 * u, a = MathX.deg(115 + 14 * u);
-      return { p: [bx + Math.cos(a) * d, 0.14, bz + Math.sin(a) * d], at: [bx, 0.27, bz], fov: 40, focus: [bx, bz, 4] }; } },
+    cam: (t, app) => { const [bx, bz] = app.ball.spot(app.cast), u = Ease.inOutSine((t - NE.ballShot[0]) / (NE.ballShot[1] - NE.ballShot[0])), d = 1.0 - 0.14 * u, a = MathX.deg(112 - 14 * u);
+      return { p: [bx + Math.cos(a) * d, NE_BALL.ground + 0.06, bz + Math.sin(a) * d], at: [bx, NE_BALL.ground + 0.07, bz], fov: 40, focus: [bx, bz, 4] }; } },
   { id: 'racket', t0: NE.mont[0][0], t1: NE.mont[0][1], label: 'TENNIS RACKETS', line: 'The strings stretch… and stay stretched.',
     cam: (t) => { const R = NE_RACKET.p, u = t - NE.mont[0][0]; return { p: [R[0] - 0.62 + 0.03 * u, R[1] + 0.07, R[2] + 0.58 - 0.03 * u], at: [R[0], R[1] - 0.01, R[2]], fov: 36, focus: [R[0], R[2], 6] }; } },
-  { id: 'shoe', t0: NE.mont[1][0], t1: NE.mont[1][1], label: 'RUNNING SHOES', line: 'The foam gets crushed… and stays crushed.',
+  { id: 'shoe', t0: NE.mont[1][0], t1: NE.mont[1][1], label: 'RUNNING SHOES', line: 'The foam gets crushed… and mostly stays crushed.',
     cam: (t) => { const S = NE_SHOE.p, u = t - NE.mont[1][0]; return { p: [S[0] + 0.14, S[1] + 0.09, S[2] + 1.0 - 0.04 * u], at: [S[0] + 0.14, S[1] + 0.06, S[2]], fov: 36, focus: [S[0], S[2], 5] }; } },
   { id: 'cushion', t0: NE.mont[2][0], t1: NE.mont[2][1], label: 'CUSHIONS', line: 'Sit down once. The dent stays.',
-    cam: (t) => { const B = NE_CITY.bench, u = t - NE.mont[2][0]; return { p: [B.x - 1.78 + 0.05 * u, 1.05, B.z - 1.75 + 0.04 * u], at: [B.x - 0.06, 0.62, B.z - 0.52], fov: 34, focus: [B.x, B.z, 6] }; } },
+    cam: (t) => { const B = NE_CITY.bench, u = t - NE.mont[2][0]; return { p: [B.x - 1.6 + 0.05 * u, 1.5, B.z - 1.55 + 0.04 * u], at: [B.x - 0.06, 0.58, B.z - 0.52], fov: 34, focus: [B.x, B.z, 6] }; } },
   { id: 'band', t0: NE.mont[3][0], t1: NE.mont[3][1], label: 'RUBBER BANDS', line: 'Stretch it once. It stays stretched.', cam: null },
   // low beside the red hatch, rolling along with its front wheel over the speed table (front axle, then rear, up and
   // down): the dashed line on its side is where the lower edge of its paint rode before the rule
   { id: 'wheel', t0: NE.wheelShot[0], t1: NE.wheelShot[1],
     cam: (t, app) => { const w = app.heroWheel(t), u = (t - NE.wheelShot[0]) / (NE.wheelShot[1] - NE.wheelShot[0]);
-      return { p: [w.x + 4.2 - 0.2 * u, 0.5, w.z + 0.5], at: [w.x, 0.5, w.z - 0.2], fov: 44, focus: [w.x, w.z, 7] }; } },
+      return { p: [w.x + 4.2 - 0.2 * u, 0.5, w.z + 0.5], at: [w.x, 0.62, w.z - 0.2], fov: 44, focus: [w.x, w.z, 7] }; } },
   // side-on and low beside the box truck's rear axle as it crosses the table: the gap between the tyres and the box closes
   { id: 'truck', t0: NE.truckShot[0], t1: NE.truckShot[1],
     cam: (t, app) => { const zr = app.truckRear(t), u = (t - NE.truckShot[0]) / (NE.truckShot[1] - NE.truckShot[0]);
       return { p: [8.6, 0.78, zr + 2.4 - 0.5 * u], at: [1.75, 0.95, zr - 0.7], fov: 46, focus: [1.75, zr, 9] }; } },
-  // the footbridge, from high over the avenue (clear of the street trees): a running club crosses, the deck keeps the dip (drawn ×NE_SAG_DRAW)
+  // the footbridge, face-on from high over the avenue (over the street trees): the whole span and both stair towers in
+  // frame, so the dip has its ends to compare against; a running club crosses, the deck keeps the dip (drawn ×NE_SAG_DRAW)
   { id: 'bridge', t0: NE.bridge[0], t1: NE.bridge[1],
     cam: (t) => { const u = Ease.inOutSine((t - NE.bridge[0]) / (NE.bridge[1] - NE.bridge[0])), B = NE_CITY.bridge;
-      return { p: [7.2 - 0.6 * u, 8.0 - 0.3 * u, B.z + 17 - 2.0 * u], at: [-0.8, B.deck - 0.4, B.z], fov: 54, focus: [0, B.z, 16] }; } },
-  // the crash side-on and low, from the cross street: the SUV comes in from the left, runs the red and meets the crossing
-  // sedan's flank; the camera pans with the locked pair as it slides off; the van comes in from the left too. 1/3 speed
+      return { p: [1.5 - 0.5 * u, 12.5 - 1.0 * u, B.z + 38 - 4.0 * u], at: [0, B.deck - 4.2, B.z], fov: 54, focus: [0, B.z, 22] }; } },
+  // the crash from high behind the SUV (5.5 m up, looking down on the T-bone): the SUV runs the red into the crossing
+  // sedan's flank, they lock and slide off as one; the camera pans with them. 1/3 speed
   { id: 'crash', t0: NE.crashShot[0], t1: NE.crashShot[1],
     cam: (t) => { const u = (t - NE.crashShot[0]) / (NE.crashShot[1] - NE.crashShot[0]), k = MathX.smooth(t, NE.crash, NE_CRASH.tv + 0.4);
-      return { p: [-11.5 + 0.4 * u, 2.3, -50.0 + 0.6 * u], at: [-2.0 + 2.9 * k, 0.6, -46.4 + 3.6 * k], fov: 40, focus: [-1.0, -45, 14] }; } },
-  // the locked wreck: a slow, high arc round it (all three cars stay jammed together)
+      return { p: [-8.5 + 0.3 * u, 5.5, -55.0 + 0.4 * u], at: [-1.7 + 1.4 * k, 0.4, -46.0 + 1.8 * k], fov: 40, focus: [-1.0, -46, 14] }; } },
+  // the locked wreck: a slow, high arc round it, starting from the side the van comes in (all three stay jammed together)
   { id: 'wreck', t0: NE.wreckShot[0], t1: NE.wreckShot[1],
-    cam: (t) => { const c = [0.05, -44.4], u = Ease.inOutSine((t - NE.wreckShot[0]) / (NE.wreckShot[1] - NE.wreckShot[0])), a = MathX.deg(-5 + 40 * u), r = 11.5 - 0.5 * u;
+    cam: (t) => { const c = [0.05, -44.4], u = Ease.inOutSine((t - NE.wreckShot[0]) / (NE.wreckShot[1] - NE.wreckShot[0])), a = MathX.deg(-70 + 90 * u), r = 11.5 - 0.5 * u;
       return { p: [c[0] + Math.sin(a) * r, 5.6 + 0.5 * u, c[1] + Math.cos(a) * r], at: [c[0], 0.4, c[1] - 0.4], fov: 40, focus: [c[0], c[1], 12] }; } },
   // the tap, side-on at the van's tail: the late hatch comes up the lane, brakes, meets the van at walking pace, backs off;
   // the camera pushes in on the bumper that stays pushed in (a dashed line where its front was)
   { id: 'tap', t0: NE.tapShot[0], t1: NE.tapShot[1],
     cam: (t, app) => { const T = NE_TAP, f = T.zc + CAR_PROFILES.hatch.L / 2, ps = app.traffic.q1.spec.pose(t), qf = ps ? ps.z + CAR_PROFILES.hatch.L / 2 : f - 9;
-      const k = MathX.smooth(t, NE.tapBack[0], NE.tapBack[1] + 0.4), az = MathX.clamp(qf + 0.4, f - 6.5, f + 0.15) * (1 - k) + (f - 0.2) * k;
-      return { p: [3.9 - 2.4 * k, 1.05 - 0.3 * k, f - 0.8 + 0.4 * k], at: [T.x + 0.2, 0.58 - 0.08 * k, az], fov: 40 - 9 * k, focus: [T.x, f, 8] }; } },
+      const k = MathX.smooth(t, NE.tapBack[0], NE.tapBack[1] + 0.4), az = MathX.clamp(qf + 0.4, f - 6.5, f + 0.15) * (1 - k) + (f - 0.55) * k;
+      return { p: [5.2 - 3.7 * k, 1.5 - 0.75 * k, f - 1.2 + 0.8 * k], at: [T.x + 0.2, 0.62 - 0.12 * k, az], fov: 46 - 15 * k, focus: [T.x, f, 8] }; } },
+  // the end: low beside the flat ball, the teenager sitting behind it facing you, the trampoline's funnel beyond (the
+  // opening shot, looped); a slow push
+  { id: 'end', t0: NE.endShot, t1: NE.end + 1,
+    cam: (t, app) => { const [bx, bz] = app.ball.spot(app.cast), u = Ease.outSine(MathX.clamp((t - NE.endShot) / (NE.end - NE.endShot), 0, 1)),
+        dx = NE_TRAMP.x - bx, dz = NE_TRAMP.z - bz, L = Math.hypot(dx, dz), fx = dx / L, fz = dz / L, rx = -fz, rz = fx, back = 0.95 - 0.15 * u, side = -0.35;
+      return { p: [bx - fx * back + rx * side, NE_BALL.ground + 0.08, bz - fz * back + rz * side], at: [bx + fx * 0.3, NE_BALL.ground + 0.12, bz + fz * 0.3], fov: 44, focus: [bx + fx * 3, bz + fz * 3, 10] }; } },
 ];
 
 // labels pinned to things in the world: [t0, t1, point(t, app) → [x, y, z], text]
@@ -188,7 +195,7 @@ const FILM = {
     app.deckLine.visible = t > NE.bridge[0] - 0.5 && t < NE.bridge[1];
     app.noseLine.visible = !!(shot && shot.id === 'tap') && t > NE.tap + 0.15;
     // the ball's old outline, turned to the low camera
-    { const on = !!(shot && shot.id === 'ball'), R = app.ball.ring; R.visible = on;
+    { const on = !!(shot && (shot.id === 'ball' || shot.id === 'end')), R = app.ball.ring; R.visible = on;
       if (on) { const [bx, bz] = app.ball.spot(app.cast); R.position.set(bx, NE_BALL.ground + NE_BALL.r, bz); R.lookAt(app.camera.position.x, NE_BALL.ground + NE_BALL.r, app.camera.position.z); } }
     // the line sits at the healthy height of the red paint's lower edge (0.46 m above the road under the car)
     { const H = app.traffic.H, ps = H.spec.pose(t), on = shot && shot.id === 'wheel';
@@ -234,10 +241,11 @@ const FILM = {
     p.saturation -= 0.12 * tired; p.warmth -= 0.06 * tired; p.contrast -= 0.03 * tired;
     // the rule bites: a small jolt of chroma under the title
     p.chroma += 0.004 * MathX.impulse(t, NE.rule[0] + 0.15, 0.3);
-    // the crash: two or three frames of white, a hit of chroma; the slow motion is a touch harder
-    p.flash = 0.45 * MathX.impulse(t, NE.crash, 0.03) + 0.3 * MathX.impulse(t, NE_CRASH.tv, 0.03);
+    // the crash: a hit of chroma (no white flash: it hid the contact); the slow motion is a touch harder
     p.chroma += 0.007 * MathX.impulse(t, NE.crash, 0.12) + 0.005 * MathX.impulse(t, NE_CRASH.tv, 0.2);
     if (t > NE.crashSlow[0] && t < NE.crashSlow[1]) { p.contrast += 0.06; p.saturation -= 0.08; p.vignette += 0.15; }
+    // the footbridge sits in the avenue's deep shade: lift it so it doesn't drop out of the film's look
+    if (t >= NE.bridge[0] && t < NE.bridge[1]) p.exposure += 0.14;
     p.fade = MathX.smooth(t, NE.end - 0.45, NE.end);
     // whip pans drag a little (camera-lag trail)
     const app = FILM._app;

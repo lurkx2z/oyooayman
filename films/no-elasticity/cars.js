@@ -409,18 +409,18 @@ class NeTraffic {
       const c = s.c, ps = c.spec.pose(t); if (!ps) continue;
       const hx = -Math.sin(ps.yaw), hz = -Math.cos(ps.yaw), off = s.end * (c.L / 2 - 0.1);
       const bx = ps.x + hx * off, bz = ps.z + hz * off, by = neRoadY(bz) + 0.02;
-      const n = s.drag ? 7 : 16;
+      const n = s.drag ? 7 : 22;
       for (let i = 0; i < n; i++) {
         const k = s.seed * 31 + i * 7 + Math.floor(t * 30) * 113, life = 0.25 + 0.2 * hash1(k);
         const age = ((t * 30 + i * 0.37) % 9) / 30 * (s.drag ? 1 : 0.6) + (s.drag ? 0 : a * 0.3);
         if (age > life) continue;
-        const sx = (hash1(k + 1) - 0.5) * 1.6, sp = 3 + 4 * hash1(k + 2);
+        const sx = (hash1(k + 1) - 0.5) * (s.drag ? 1.6 : 4.4), sp = 3 + 4 * hash1(k + 2);   // wide: they spray out from under the sides
         const vx = -hx * sp + -hz * sx, vz = -hz * sp + hx * sx, vy = 1.2 + 2.2 * hash1(k + 3);
         const px = bx + (hash1(k + 4) - 0.5) * c.W * 0.7 * hz, pz = bz + (hash1(k + 4) - 0.5) * c.W * 0.7 * -hx;
         const x1 = px + vx * age, y1 = by + vy * age - 4.9 * age * age, z1 = pz + vz * age;
         if (y1 < 0) continue;
         const fade = (1 - age / life) * (s.drag ? 0.8 : 1) * (1 - MathX.smooth(a, s.dur * 0.6, s.dur));
-        S.push(x1, y1, z1, x1 - vx * 0.03, y1 - (vy - 9.8 * age) * 0.03, z1 - vz * 0.03, 1.0, 0.62, 0.22, fade, 0.012);
+        S.push(x1, y1, z1, x1 - vx * 0.05, y1 - (vy - 9.8 * age) * 0.05, z1 - vz * 0.05, 1.0, 0.66, 0.25, fade, 0.03);   // thick enough to read from the kerb
       }
     }
     S.end();
