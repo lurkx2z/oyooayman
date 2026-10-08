@@ -12,7 +12,7 @@
    ===================================================================== */
 
 const NR_WIND_DIR = new THREE.Vector3(-0.86, 0, -0.5).normalize();
-const NR_STEAM = { x: 4.6, z: -16.0 };   // a manhole in the empty curb lane: in view in the hook, the car shot and the storm
+const NR_STEAM = { x: 7.75, z: -11.5 };  // a steam grate in the pavement by the kerb, in front of you: in the hook, the storm and the last shot
 
 class NrWind {
   constructor(app) {
@@ -122,9 +122,10 @@ class NrWind {
       (x) => { x.fillStyle = '#e8e2d4'; x.fillRect(0, 0, 160, 100); x.fillStyle = '#2b5f8a'; x.fillRect(0, 0, 160, 34); x.fillRect(0, 66, 160, 34); },
     ];
     this.flags = [];
-    // three on the café's wall poles, one on the corner building, and a big one on a pole at the kerb in front of you
+    // three on the café's wall poles, one on the corner building, and a big one on a tall pole on the pavement in front of you
+    // (against open sky, above the title: the first thing you see drop)
     const spots = NR_CITY.flags.map(([x, y, z]) => ({ x, y, z, type: 'wall', Lf: 2.1, Hf: 1.3 }))
-      .concat([{ x: 11.4, y: 12.85, z: -35.5, type: 'corner', Lf: 2.1, Hf: 1.3 }, { x: 10.6, y: 6.3, z: -6.0, type: 'ground', Lf: 2.7, Hf: 1.7 }]);
+      .concat([{ x: 11.4, y: 12.85, z: -35.5, type: 'corner', Lf: 2.1, Hf: 1.3 }, { x: 7.9, y: 7.0, z: -7.0, type: 'ground', Lf: 3.0, Hf: 1.9 }]);
     spots.forEach((sp, i) => {
       const { Lf, Hf } = sp, g = new THREE.PlaneGeometry(Lf, Hf, 22, 8); g.translate(Lf / 2, -Hf / 2, 0);
       const U = { uLoad: { value: 0 }, uLimp: { value: 0 }, uRip: { value: 0 }, uT: { value: 0 }, uPh: { value: i * 1.7 } };
@@ -135,8 +136,10 @@ class NrWind {
           // flying: out along +x, drooping a little at low push; a travelling ripple
           float droop = mix(0.55, 0.06, clamp(uLoad, 0.0, 1.0));
           vec3 fly = vec3(position.x, position.y - u * droop, sin(position.x * 4.2 - uT * (6.0 + 6.0 * sqrt(uLoad)) + uPh) * 0.13 * u * uRip + sin(position.x * 9.0 - uT * 15.0) * 0.03 * u * uRip);
-          // limp: hanging against the pole in loose vertical folds, the fly end lowest
-          vec3 limp = vec3(0.05 + 0.06 * u + 0.05 * sin(u * 11.0 + v * 2.0) * u, -v * ${Hf.toFixed(2)} * (1.0 - 0.25 * u) - u * ${(Lf * 0.62).toFixed(2)}, 0.09 * sin(u * 8.5 + v * 3.0 + uPh) * u);
+          // limp: hanging down the pole in loose folds, the fly end lowest and swung out a little, across the street (world −x:
+          // local (0.86, −0.5) for a flag turned to this wind), so it reads from the pavement
+          float sp = 0.06 + 0.5 * u + 0.08 * sin(u * 9.0 + v * 2.2) * u, fo = 0.15 * sin(u * 7.5 + v * 3.0 + uPh) * u + 0.05 * sin(v * 9.0) * u;
+          vec3 limp = vec3(0.864 * sp + 0.503 * fo, -v * ${Hf.toFixed(2)} * (1.0 - 0.25 * u) - u * ${(Lf * 0.62).toFixed(2)}, -0.503 * sp + 0.864 * fo);
           transformed = mix(fly, limp, uLimp); }`); };
       mat.customProgramCacheKey = () => `nrFlag${Lf}x${Hf}`;
       const fl = new THREE.Mesh(g, mat); fl.position.set(sp.x, sp.y, sp.z); fl.rotation.y = Math.atan2(-NR_WIND_DIR.z, NR_WIND_DIR.x);
@@ -191,8 +194,11 @@ class NrWind {
   _steam() {
     this.steam = new BillboardSystem(this.app.scene, 420, false);
     this.steam.uniforms.uLight.value = 0.95;
-    // the manhole and its rim
-    const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.02, 16), this.m.dark); rim.position.set(NR_STEAM.x, 0.012, NR_STEAM.z); rim.receiveShadow = true; this.app.scene.add(rim);
+    // the grate: a dark frame with slats, flush with the pavement
+    const gr = new THREE.Group(); gr.position.set(NR_STEAM.x, LAYOUT.curbH + 0.006, NR_STEAM.z);
+    const fr = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.012, 1.0), Mat.std('#1c1e20', { roughness: 0.7, metalness: 0.4 })); fr.receiveShadow = true; gr.add(fr);
+    for (let i = 0; i < 7; i++) { const sl = new THREE.Mesh(new THREE.BoxGeometry(0.54, 0.014, 0.05), this.m.steel); sl.position.set(0, 0.004, -0.4 + i * 0.133); gr.add(sl); }
+    this.app.scene.add(gr);
   }
 
   /* ---------------- per frame ---------------- */
@@ -243,7 +249,7 @@ class NrWind {
     }
     this.litM.count = n; this.litM.instanceMatrix.needsUpdate = true;
     // steam: puffs born at the manhole, carried off at the wind's speed (it never stopped)
-    const St = this.steam, Uw = nrWindKmh(S) / 3.6, life = 2.6, rate = 40;
+    const St = this.steam, Uw = nrWindKmh(S) / 3.6, life = 1.9, rate = 75;
     St.begin(this.app.scene.fog);
     const i0 = Math.floor((S - life) * rate), i1 = Math.floor(S * rate);
     for (let i = i0; i <= i1; i++) {
@@ -252,9 +258,9 @@ class NrWind {
       const k = age / life, drift = nrWindDist(S) - nrWindDist(born);
       const x = NR_STEAM.x + D.x * drift * 0.92 + (hash1(i * 3 + 2) - 0.5) * (0.3 + 1.6 * k);
       const z = NR_STEAM.z + D.z * drift * 0.92 + (hash1(i * 7 + 5) - 0.5) * (0.3 + 1.6 * k);
-      const y = 0.15 + 0.9 * age + 0.5 * k * k + 0.4 * Math.sin(age * 2.1 + i);
-      const size = 0.35 + 1.5 * Math.sqrt(k) + Uw * 0.012 * k;
-      St.push(x, y, z, size, i * 1.3 + age * 0.4, 0.3 * (1 - k) * Math.min(1, age * 6), 1.0, 0.93, 0.94, 0.95);
+      const y = LAYOUT.curbH + 0.1 + (1.1 * age + 0.6 * k * k) * (11.1 / Math.max(11.1, Uw)) ** 0.5 + 0.25 * Math.sin(age * 2.1 + i) * k;
+      const size = 0.4 + 1.9 * Math.sqrt(k) + Uw * 0.02 * k;
+      St.push(x, y, z, size, i * 1.3 + age * 0.4, 0.38 * (1 - k) * Math.min(1, age * 8), 1.0, 0.95, 0.96, 0.97);
     }
     St.end();
   }

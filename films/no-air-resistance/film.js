@@ -31,6 +31,8 @@ const FILM = {
     app.wind = new NrWind(app);
     app.board = new NrBoard(scene);
     Look.apply(scene, camera);
+    // a faint fill from below, so awning and balcony undersides aren't pure black when you look up
+    const fill = new THREE.DirectionalLight('#c9d2da', 0.45); fill.position.set(0.2, -1, 0.35); scene.add(fill, fill.target);
     app.plane = new NrPlane(scene);
     app.impact = new NrImpact(scene);
     app.debris = new NrDebris(scene, app);
@@ -48,8 +50,31 @@ const FILM = {
       tagA: mk('nr-tag'), tagB: mk('nr-tag'), tagC: mk('nr-tag ghost'), tagD: mk('nr-tag ghost'),
       line: mk('nr-line'),
       meanwhile: mk('nr-meanwhile', 'MEANWHILE, 2 KM ABOVE THE CITY'),
+      count: mk('nr-count', '<div class="lab">ITS SOUND ARRIVES IN</div><div class="num">6</div>'),
+      inset: mk('nr-inset', FILM._insetSvg()),
     };
+    app.ui.countNum = app.ui.count.querySelector('.num'); app.ui.dot = app.ui.inset.querySelector('.dot'); app.ui.ring = app.ui.inset.querySelector('.ring'); app.ui.done = app.ui.inset.querySelector('.done');
     app.audio = typeof NrAudio !== 'undefined' ? new NrAudio(app.tl, app) : new AudioEngine(app.tl);
+  },
+
+  // a side view of the airliner's fall: level at 11,400 m until the air lets go, then a ballistic arc towards you
+  _insetXY(S) { const p = NR_PLANE.pos(S, this._iv || (this._iv = new THREE.Vector3())), zL = NR_PLANE.pos(NR.loss, new THREE.Vector3()).z; return [40 + (p.z - zL) / (NR_CAM.z - zL) * 320, 178 - p.y / 11400 * 132]; },
+  _insetSvg() {
+    const pts = []; let len = 0, prev = null; this._insetLen = [];
+    for (let S = NR.loss; S <= NR.impact + 1e-6; S += 0.5) { const q = this._insetXY(Math.min(S, NR.impact)); if (prev) len += Math.hypot(q[0] - prev[0], q[1] - prev[1]); this._insetLen.push([S, len]); pts.push(q.map((v) => v.toFixed(1)).join(',')); prev = q; }
+    this._insetTotal = len;
+    const [ix, iy] = this._insetXY(NR.impact), you = this._insetXY(-9).map(() => 0);
+    return `<svg viewBox="0 0 400 214" xmlns="http://www.w3.org/2000/svg">
+      <text x="10" y="22" class="t">SIDE VIEW</text>
+      <line x1="6" y1="178" x2="394" y2="178" class="ground"/>
+      <line x1="8" y1="46" x2="40" y2="46" class="level"/>
+      <polyline points="${pts.join(' ')}" class="path"/>
+      <polyline points="${pts.join(' ')}" class="done" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/>
+      <text x="56" y="43" class="s">AIR LETS GO · 11,400 M</text>
+      <circle cx="${ix.toFixed(1)}" cy="178" r="4" class="imp"/><text x="${(ix - 6).toFixed(1)}" y="200" class="s" text-anchor="end">IMPACT</text>
+      <rect x="356" y="160" width="7" height="18" rx="3" class="you"/><text x="388" y="200" class="s" text-anchor="end">YOU</text>
+      <circle cx="40" cy="46" r="11" class="ring"/><circle cx="40" cy="46" r="5.5" class="dot"/>
+    </svg>`;
   },
 
   // the sheet of paper (right hand) and the tennis ball (left hand); free copies take over at the release
@@ -110,16 +135,19 @@ const FILM = {
     // the drop
     const P = app.props, u = S - NR.drop.rel;
     P.heldP.visible = u < 0 && S > NR.drop.up - 0.2; P.heldB.visible = P.heldP.visible;
-    P.freeP.visible = P.freeB.visible = u >= 0 && S < 12.4; P.ghost.visible = u >= 0 && S < 12.4;
-    if (u >= 0 && S < 12.4) {
+    // (the paper and the ball stay where they fell: the sign board lands on them at the end)
+    const late = S > 50;
+    P.freeP.visible = P.freeB.visible = u >= 0 && (S < 12.4 || late); P.ghost.visible = u >= 0 && S < 12.4;
+    if (late && !app.board.aimed) { const fresh = !P.rel, r = this._release(app); if (fresh) { app.cam.update(S); app.hands.update(S); } app.board.aim(r.p.x, r.p.z + 0.05); }
+    if (u >= 0 && (S < 12.4 || late)) {
       const fresh = !P.rel, r = this._release(app), floor = LAYOUT.curbH + 0.004, tl = Math.sqrt(2 * (r.p.y - floor) / NR_G);
       if (fresh) app.cam.update(S);
       P.freeP.position.set(r.p.x, Math.max(floor, r.p.y - NR_DROP.fall(u)), r.p.z);
       if (u < tl) P.freeP.quaternion.copy(r.q); else P.freeP.rotation.set(-Math.PI / 2, 0, r.yaw, 'YXZ');
       const b = this._ball(u, r.b.y, this._bv || (this._bv = new THREE.Vector3()));
       P.freeB.position.set(r.b.x + b.z * 0.4, b.y, r.b.z - b.z); P.freeB.rotation.set(-b.z / 0.033, 0, 0);
-      const gh = NR_DROP.ghost(u), ga = 0.3 * MathX.smooth(u, 0.05, 0.3) * (1 - MathX.smooth(S, 10.4, 10.9));
-      P.ghost.position.set(r.p.x - 0.1 * Math.min(u * 2, 1) + gh[1], Math.max(floor + 0.002, r.p.y - gh[0]), r.p.z - 0.03); P.ghost.quaternion.copy(r.q); P.ghost.rotateX(gh[2]); P.ghost.rotateZ(0.4 * gh[2]);
+      const gh = NR_DROP.ghost(u), ga = 0.45 * MathX.smooth(u, 0.0, 0.12);
+      P.ghost.position.set(r.p.x - 0.24 * Math.min(u * 3, 1) + gh[1], Math.max(floor + 0.002, r.p.y - gh[0]), r.p.z - 0.03); P.ghost.quaternion.copy(r.q); P.ghost.rotateX(gh[2]); P.ghost.rotateZ(0.4 * gh[2]);
       P.ghost.material.opacity = ga; P.ge.material.opacity = Math.min(1, ga * 3);
     }
     app.hands.update(S);
@@ -130,13 +158,16 @@ const FILM = {
 
   // a screen position (design px) for a world point; null if behind the camera
   _proj(cam, p) { const v = this._pv || (this._pv = new THREE.Vector3()); v.copy(p).project(cam); if (v.z > 1) return null; return [(v.x + 1) * 540, (1 - v.y) * 960]; },
+  // a tag pinned to a thing: hidden when the thing is off screen; kept inside the safe area (8 % in from the left, clear of
+  // the button rail on the right (18 %), above the description zone (75 % down))
   _tag(el, xy, html, on, side = '') {
     if (el._side !== side) { el.classList.toggle('left', side === 'left'); el.classList.toggle('right', side === 'right'); el._side = side; }
-    if (!on || !xy || xy[0] < 40 || xy[0] > 1040 || xy[1] < 290 || xy[1] > 1700) { if (el._o !== '0') { el.style.opacity = '0'; el._o = '0'; } return; }
+    if (!on || !xy || xy[0] < 10 || xy[0] > 1070 || xy[1] < 120 || xy[1] > 1700) { if (el._o !== '0') { el.style.opacity = '0'; el._o = '0'; } return; }
     if (el._h !== html) { el.innerHTML = html; el._h = html; }
     el.style.opacity = '1'; el._o = '1';
-    const [x0, x1] = side === 'right' ? [40, 620] : side === 'left' ? [460, 1040] : [150, 930];
-    el.style.left = `calc(var(--u) * ${MathX.clamp(xy[0], x0, x1).toFixed(1)})`; el.style.top = `calc(var(--u) * ${MathX.clamp(xy[1], 240, 1680).toFixed(1)})`;
+    const w = el.offsetWidth / (parseFloat(document.documentElement.style.getPropertyValue('--u')) || 0.5) || 420;   // its width (design px)
+    const [x0, x1] = side === 'right' ? [86, 886 - w * 1.04] : side === 'left' ? [86 + w * 1.04, 886] : [86 + w / 2, 886 - w / 2];
+    el.style.left = `calc(var(--u) * ${MathX.clamp(xy[0], x0, Math.max(x0, x1)).toFixed(1)})`; el.style.top = `calc(var(--u) * ${MathX.clamp(xy[1], 250, 1440).toFixed(1)})`;
   },
 
   _overlays(app, S) {
@@ -144,51 +175,64 @@ const FILM = {
     const sky = S >= NR.sky[0] && S < NR.sky[1], end = S >= NR.look + 0.4, cam = sky ? app.aerial.cam : app.camera;
     // AERODYNAMIC FORCE 100 % → 0 % (and, at the end, AIR RESISTANCE 0 %)
     const a = Math.round(nrAero(S) * 100);
-    set(U.aero, 'opacity', (sky ? 0 : end ? W(S, NR.look + 0.4, NR.black, 0.5, 0.05) : S < 10.9 ? 1 : W(S, 20.6, NR.look, 0.4, 0.3) * 0.85).toFixed(3));
+    set(U.aero, 'opacity', (sky ? 0 : end ? W(S, NR.look + 0.4, NR.black, 0.5, 0.05) : S < NR.cut0 ? 1 : W(S, 20.6, NR.look, 0.4, 0.3) * 0.85).toFixed(3));
     html(U.aero.querySelector('.label'), end ? 'AIR RESISTANCE' : 'AERODYNAMIC FORCE');
     html(U.aero.querySelector('.v'), `${a}%`);
     set(U.aero.querySelector('.sub'), 'opacity', (end ? 0 : MathX.smooth(S, NR.loss + 0.3, NR.loss + 0.7)).toFixed(2));
-    U.aero.classList.toggle('small', S > 10.9 && !end);
+    U.aero.classList.toggle('small', S > NR.cut0 && !end);
     U.aero.classList.toggle('zero', S > NR.loss + 0.2);
     // WIND: once it has been shown to still blow, and when it rises
-    set(U.wind, 'opacity', (W(S, 3.0, 10.9, 0.4, 0.05) + W(S, 40.2, 44.5, 0.4, 0.3)).toFixed(3));
+    set(U.wind, 'opacity', (W(S, 3.4, NR.drop.up, 0.4, 0.3) + W(S, 39.1, NR.stormCut[0], 0.3, 0.05)).toFixed(3));
     html(U.wind.querySelector('.v'), `${Math.round(nrWindKmh(S) / 5) * 5} KM/H`);
     // the sky: his speed and height
     set(U.speed, 'opacity', (sky ? MathX.smooth(S, 12.6, 13.0) : 0).toFixed(3)); set(U.alt, 'opacity', (sky ? MathX.smooth(S, 12.7, 13.1) : 0).toFixed(3));
     html(U.speed.querySelector('.v'), `${Math.round(NR_JUMP.speed(S) * 3.6)} KM/H`);
     html(U.alt.querySelector('.v'), `${(Math.round(NR_JUMP.alt(S) / 10) * 10).toLocaleString('en-US')} M`);
     set(U.meanwhile, 'opacity', W(S, NR.sky[0], 14.4, 0.05, 0.4).toFixed(3));
+    // the airliner's fall, side on (while you watch it, and in the plunge)
+    const ins = W(S, 34.1, 38.2, 0.3, 0.2);
+    set(U.inset, 'opacity', ins.toFixed(3));
+    if (ins > 0) {
+      const [x, y] = this._insetXY(S), sp = Math.min(S, NR.impact), L = this._insetLen, k = MathX.clamp(Math.floor((sp - NR.loss) / 0.5), 0, L.length - 2), f = ((sp - NR.loss) / 0.5) - k;
+      const len = L[k][1] + (L[k + 1][1] - L[k][1]) * f;
+      for (const c of [U.dot, U.ring]) { c.setAttribute('cx', x.toFixed(1)); c.setAttribute('cy', y.toFixed(1)); }
+      U.done.setAttribute('stroke-dashoffset', (1 - len / this._insetTotal).toFixed(4));
+    }
+    // ITS SOUND ARRIVES IN 5… 4… (the impact is 2.1 km away: you see it at once; its sound takes 6 s)
+    const cnt = S > NR.impact + 0.9 && S < NR.boom - 0.02;
+    set(U.count, 'opacity', cnt ? '1' : '0');
+    if (cnt) html(U.countNum, `${Math.ceil(NR.boom - S)}`);
     // tags pinned to things
     const V = this._tv || (this._tv = new THREE.Vector3()), P = app.props;
     let A = null, B = null, C = null, D = null, line = '';
-    if (S > NR.drop.rel + 0.55 && S < 10.6 && P.rel) A = [this._proj(cam, V.copy(P.rel.b).setY(0.5)), 'BOTH LAND IN <b>0.52 S</b>'];
-    if (S > NR.drop.rel + 0.15 && S < 10.5 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: 0.05, y: 0.25, z: 0 })), 'NORMAL AIR'];
+    if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.6)), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
+    if (S > NR.drop.rel + 0.1 && S < NR.cut0 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: -0.1, y: 0.12, z: 0 })), 'NORMAL AIR', 'left'];
     if (sky) {
-      if (S > 12.7 && S < 14.4) A = [this._proj(cam, app.aerial.plane.position), 'AIRLINER · 10.8 KM UP'];
-      if (S > NR.deploy + 1.1 && S < 20.3) B = [this._proj(cam, V.copy(app.aerial.canopy.position).add({ x: 0, y: 1.2, z: 0 })), 'DRAG <b>0 N</b>'];
+      const Ae = app.aerial;
+      if (S > NR.deploy + 1.0 && S < 20.3) B = [this._proj(cam, V.copy(Ae.wad.m.position).add({ x: 0.3, y: 0.7, z: 0 })), 'DRAG <b>0 N</b>', 'right'];
+      if (S > NR.deploy + 0.5 && S < NR.deploy + 1.9 && Ae.ghost.g.visible) C = [this._proj(cam, V.copy(Ae.ghost.g.position).add({ x: 0, y: 1.0, z: 0 })), 'NORMAL AIR'];
     }
     if (!sky && S > 20.5 && S < 28.2) {
       const T = app.traffic, hz = T.heroZ(S), gz = T.ghostZ(S);
-      A = [this._proj(cam, V.set(1.75, S > 24 ? 1.0 : 2.0, hz)), `COASTING · <b>${Math.round(NR_CAR.speed(S) * 3.6)}</b> KM/H`, S > 24 ? 'right' : ''];
-      if (S > 23.0) D = [this._proj(cam, V.set(-1.75, 1.0, gz)), `NORMAL AIR · ${Math.round(NR_CAR.speed(S, true) * 3.6)} KM/H`, 'left'];
+      A = [this._proj(cam, V.set(1.75, S > 24 ? 4.0 : 2.0, hz)), `COASTING <b>${Math.round(NR_CAR.speed(S) * 3.6)}</b> KM/H`, S > 24 ? 'right' : ''];
+      if (S > 23.0) D = [this._proj(cam, V.set(-1.75, S > 24 ? 2.0 : 1.0, gz)), `NORMAL AIR ${Math.round(NR_CAR.speed(S, true) * 3.6)} KM/H`, 'left'];
       if (S > NR.car.toss + 0.05 && S < 23.2) { const s0 = T.sheets[4].m.position; C = [this._proj(cam, V.copy(s0).add({ x: 0, y: 0.5, z: 0 })), `LEAFLETS · ${Math.round(NR_CAR.speed(NR.car.toss) * 3.6)} KM/H`]; }
-      if (S > 24.8) line = 'COASTING FROM 90 KM/H: <b>2.7 KM</b> · NORMAL AIR 1.7 KM';
+      if (S > 24.2) line = 'ROLLS <b>2.7 KM</b> · NORMAL AIR 1.7 KM';
     }
-    if (S > NR.ledge + 0.05 && S < NR.ledge + 1.2) B = [this._proj(cam, V.copy(app.pigeons.ledge.g.position).add({ x: 0, y: 0.35, z: 0 })), 'LIFT <b>0 N</b>'];
-    if (S > 35.3 && S < 40.3) { const p = app.plane.g.position; A = [this._proj(cam, V.copy(p).add({ x: 0, y: 60, z: 0 })), `LIFT 0 N · <b>${(Math.round(NR_PLANE.alt(S) / 10) * 10).toLocaleString('en-US')} M</b> · ${Math.round(NR_PLANE.kmh(S) / 10) * 10} KM/H`]; }
-    if (S > 36.0 && S < 40.3) line = 'FALLING SINCE THE AIR LET GO';
+    if (S > NR.ledge + 0.05 && S < NR.ledge + 1.2) B = [this._proj(cam, V.copy(app.pigeons.ledge.g.position).add({ x: 0, y: 0.3, z: 0 })), 'LIFT <b>0 N</b>', 'right'];
+    if (S > NR.plane - 0.15 && S < 38.25) { const p = app.plane.g.position; A = [this._proj(cam, V.copy(p).add({ x: 0, y: 70, z: 0 })), `LIFT 0 N · <b>${(Math.round(NR_PLANE.alt(S) / 10) * 10).toLocaleString('en-US')} M</b> · ${Math.round(NR_PLANE.kmh(S) / 10) * 10} KM/H`]; }
+    if (S > 39.3 && S < NR.stormCut[0]) C = [this._proj(cam, V.set(NR_STEAM.x - 3.0, LAYOUT.curbH + 2.8, NR_STEAM.z - 1.6)), 'STEAM IS WATER · STILL BLOWN', 'left'];
     if (S > NR.balloon + 0.3 && S < 46.7) B = [this._proj(cam, V.copy(app.balloon.b.position).add({ x: 0, y: 0.5, z: 0 })), `BUOYANCY, NO DRAG · <b>${Math.round(app.balloon.speed(S) * 3.6)}</b> KM/H`];
-    if (S > 48.1 && S < 49.3) A = [this._proj(cam, V.copy(app.plane.g.position).add({ x: 0, y: 70, z: 0 })), `LIFT 0 N · <b>${(Math.round(NR_PLANE.kmh(S) / 10) * 10).toLocaleString('en-US')}</b> KM/H`];
-    // the impact is 2.1 km away: you see it at once, its sound takes 6 s (the air still carries sound)
-    if (S > NR.impact + 0.6 && S < NR.boom - 0.2) B = [this._proj(cam, V.set(NR.planeImp[0] - 60, 520, NR.planeImp[1])), `IMPACT · ${(NR.impactDist / 1000).toFixed(1)} KM AWAY`];
-    if (S > NR.impact + 0.9 && S < NR.boom) line = `ITS SOUND ARRIVES IN <b>${Math.ceil(NR.boom - S)} S</b>`;
-    if (S > 58.9 && S < 60.3) { const k = this._debrisKmh || (this._debrisKmh = Math.round(app.debris.list.filter((d) => d.near).reduce((a, d) => a + d.P.kmh, 0) / app.debris.list.filter((d) => d.near).length / 10) * 10); line = `THROWN ${(NR.impactDist / 1000).toFixed(1)} KM · ARRIVING AT <b>≈ ${k} KM/H</b>`; }
-    if (S > NR.board + 0.1 && S < app.board.landT + 0.4) {
-      A = [this._proj(cam, V.copy(app.board.g.position).add({ x: 0, y: 1.1, z: 0 })), `SIGN BOARD · NO DRAG · <b>${Math.round(app.board.speed(S) * 3.6)}</b> KM/H`, 'right'];
-      if (app.board.ghost.visible && S > NR.board + 0.7) D = [this._proj(cam, V.copy(app.board.ghost.position).add({ x: 0, y: 1.1, z: 0 })), 'NORMAL AIR', 'left'];
-    }
+    if (S > NR.plunge && S < 49.65) A = [this._proj(cam, V.copy(app.plane.g.position).add({ x: 0, y: 32, z: 0 })), `LIFT 0 N · <b>${(Math.round(NR_PLANE.kmh(S) / 10) * 10).toLocaleString('en-US')}</b> KM/H`];
+    if (S > NR.slow[0] && S < NR.slow[1]) line = 'SLOW MOTION ×¼';
+    if (S > NR.impact + 0.6 && S < NR.boom - 0.2) B = [this._proj(cam, V.set(NR.planeImp[0] - 80, 640, NR.planeImp[1])), `IMPACT · ${(NR.impactDist / 1000).toFixed(1)} KM AWAY`];
+    if (S > 59.0 && S < 60.0) { const k = this._debrisKmh || (this._debrisKmh = Math.round(app.debris.list.filter((d) => d.near).reduce((a, d) => a + d.P.kmh, 0) / app.debris.list.filter((d) => d.near).length / 10) * 10); line = `THROWN ${(NR.impactDist / 1000).toFixed(1)} KM · <b>≈ ${k} KM/H</b>`; }
+    if (S > NR.board + 0.1 && S < app.board.landT + 0.4) A = [this._proj(cam, V.copy(app.board.g.position).add({ x: 0, y: 1.0, z: 0 })), `SIGN BOARD · NO DRAG · <b>${Math.round(app.board.speed(S) * 3.6)}</b> KM/H`, 'left'];
     for (const [el, T] of [[U.tagA, A], [U.tagB, B], [U.tagC, C], [U.tagD, D]]) this._tag(el, T && T[0], T && T[1], !!T, (T && T[2]) || '');
-    html(U.line, line); set(U.line, 'opacity', line ? '1' : '0');
+    html(U.line, line ? `<span>${line}</span>` : ''); set(U.line, 'opacity', line ? '1' : '0');
+    // during the paper drop the caption moves up, clear of where the paper and ball land
+    const cap = this._cap || (this._cap = document.querySelector('#hud .story-caption'));
+    if (cap) set(cap, 'top', S > NR.drop.rel && S < NR.cut0 ? 'calc(var(--u) * 470)' : '');
   },
 
   grade(S, p) {
@@ -204,8 +248,8 @@ const FILM = {
       const yr = (C.tyaw.value(S) - C.tyaw.value(S - dt)) / dt, pr = (C.tpitch.value(S) - C.tpitch.value(S - dt)) / dt;
       p.smear.set(MathX.clamp(yr / hfov * 0.005, -0.02, 0.02), MathX.clamp(-pr / vf * 0.005, -0.02, 0.02));
     }
-    // the impact (far away): a pale flash; the sign board hitting the pavement near you
-    p.flash = 0.18 * MathX.impulse(S, NR.impact, 0.25);
+    // the impact: two or three frames of white (seen down a long lens), then a fading glare; the sign board hitting the pavement
+    const ui = S - NR.impact; p.flash = ui >= 0 ? 0.9 * Math.exp(-ui / 0.06) + 0.12 * Math.exp(-ui / 0.6) : 0;
     if (app && app.board) p.flash += 0.12 * MathX.impulse(S, app.board.landT, 0.08);
     // the last look up: a touch darker so the closing lines read against the sky
     const endK = MathX.smooth(S, NR.look, NR.line[0] + 0.4); p.exposure -= 0.14 * endK; p.vignette += 0.22 * endK; p.contrast += 0.03 * endK;

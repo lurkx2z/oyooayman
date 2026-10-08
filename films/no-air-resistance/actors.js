@@ -11,13 +11,15 @@
     // a child holding a balloon's string up; the slip; looking up after it
     holdUp(τ, c) { const p = ACTIONS.idle(τ, c); p.rSh = [2.5, 0.12]; p.rEl = 0.35; p.neck = -0.1; p.headYaw = 0.1 * Math.sin(τ * 0.7); return p; },
     reachUp(τ, c) { const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.35); p.rSh = [2.5 + 0.35 * k, 0.12]; p.rEl = 0.35 - 0.3 * k; p.lSh = [2.4 * k, 0.1]; p.lEl = 0.2; p.neck = -0.6 * k; p.spine = -0.08 * k; p.hipY = 0.93 + 0.02 * k; return p; },
+    // turn, look up and point high up the avenue
+    pointUp(τ, c) { const p = ACTIONS.idle(τ, c), k = MathX.smooth(τ, 0.1, 0.55); p.neck = -0.6 * k; p.spine = -0.06 * k; p.headYaw = 0; p.rSh = [2.45 * k, 0.12]; p.rEl = 0.12 * k; p.lSh = [0.2 * k, 0.1]; return p; },
     lookUp(τ, c) { const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.5); p.neck = -0.75 * k; p.spine = -0.06 * k; p.headYaw = 0; p.rSh = [0.35 * k, 0.1]; p.rEl = 0.9 * k; return p; },
     // flinch away, then crouch with the arms over the head
     duck(τ, c) { const p = basePose(), w = Math.sin(τ * 2.2 + c.seed * 4) * 0.02, k = Math.min(1, τ / 0.35); p.spine = 0.7 * k + w; p.neck = 0.45 * k; p.lSh = [2.2 * k, 0.3]; p.rSh = [2.2 * k, 0.3]; p.lEl = 2.2 * k; p.rEl = 2.2 * k;
       p.lHip = [0.9 * k, 0.15]; p.rHip = [0.9 * k, 0.15]; p.lKnee = 1.5 * k; p.rKnee = 1.5 * k; p.hipY = 0.93 - 0.36 * k; return p; },
     sitDuck(τ, c) { const p = ACTIONS.sit(τ, c), k = Math.min(1, τ / 0.3); p.spine = 0.85 * k; p.neck = 0.5 * k; p.lSh = [2.2 * k, 0.3]; p.rSh = [2.2 * k, 0.3]; p.lEl = 2.1 * k; p.rEl = 2.1 * k; return p; },
   });
-  Object.assign(BLEND, { holdUp: 0.4, reachUp: 0.12, lookUp: 0.5, duck: 0.15, sitDuck: 0.15 });
+  Object.assign(BLEND, { holdUp: 0.4, reachUp: 0.12, lookUp: 0.5, pointUp: 0.25, duck: 0.15, sitDuck: 0.15 });
   LOOKS.nrChild = { skin: 1, build: 'slim', shirt: '#e2a33a', sleeves: 'short', pants: '#3d5a80', shoes: '#e8e4dc', sole: '#f0ede6', hair: '#5a3a22', hairStyle: 'pony' };
   LOOKS.nrMum = { skin: 1, build: 'slim', shirt: '#6d4b5e', sleeves: 'long', pants: '#22262c', shoes: '#2a2a2a', sole: '#3a3a3a', hair: '#3a2416', hairStyle: 'long', jacket: true, shoulderBag: '#8a6a44' };
 })();
@@ -28,7 +30,7 @@ const NR_PEOPLE = [
   ['K2', 'casual2', [[0, 11.1, -15.4]], [[0, 'sit'], [59.85, 'sitDuck']], { face: 180, seat: 0.45 }],
   ['K3', 'casual8', [[0, 11.1, -18.6]], [[0, 'sit'], [60.0, 'sitDuck']], { face: 0, seat: 0.45 }],
   // the man who walks through the pigeons (and past you)
-  ['P', 'casual4', [[0, 9.7, -36], [27.6, 9.7, -5.4], [29.6, 9.85, -3.1], [33.8, 9.85, -3.1], [62, 9.6, -40]], [[0, 'walk'], [29.5, 'look'], [30.3, 'idle'], [33.8, 'walk']], {}],
+  ['P', 'casual4', [[0, 9.7, -36], [27.6, 9.7, -5.4], [29.6, 9.85, -3.1], [34.2, 9.85, -3.1], [62, 9.6, -40]], [[0, 'walk'], [29.5, 'look'], [30.3, 'idle'], [NR.point - 0.15, 'pointUp'], [34.2, 'walk']], { faceAfter: [NR.point - 0.25, 0] }],
   // the child with the balloon and her mother: out of the shop at 38 s; they stop beside you
   ['C', 'nrChild', [[0, 12.2, -6.6], [38.0, 12.2, -6.6], [43.4, 11.25, -3.0]], [[0, 'holdUp'], [38.0, 'walk'], [43.4, 'holdUp'], [NR.balloon, 'reachUp'], [45.4, 'lookUp'], [59.7, 'duck']], { from: 38.0, scale: 0.62, stride: 0.9, faceAfter: [43.4, 120] }],
   ['M', 'nrMum', [[0, 12.4, -7.4], [38.0, 12.4, -7.4], [43.6, 11.95, -3.7]], [[0, 'idle'], [38.0, 'walk'], [43.6, 'idle'], [NR.balloon + 0.25, 'lookUp'], [59.6, 'duck']], { from: 38.0, faceAfter: [43.6, 135] }],
@@ -73,12 +75,23 @@ class NrPeople {
 // six on the pavement ahead of you (startled at NR.startle: they flap hard and only hop), one on a window ledge that steps off
 const NR_PIGEONS = [[9.6, -2.4, 0.4], [10.1, -3.1, 2.2], [10.6, -2.2, 4.0], [9.95, -1.8, 1.1], [10.8, -3.4, 5.1], [9.35, -3.6, 3.3], [10.35, -4.0, 6.2]];
 const NR_LEDGE = { x: 12.24, y: 3.62, z: -3.0 };
+// five flying up the street towards you when the air lets go: [x, y, z at NR.loss, vx, vz (m/s), seed]. With no lift
+// (and wings that can't push) each keeps its speed and falls ½gt² onto the pavement, skids, lies stunned, gets up
+const NR_FLYERS = [[9.5, 5.3, -6.6, 0.3, 3.5, 1.3], [8.7, 5.8, -7.6, 0.5, 3.8, 2.9], [10.3, 5.0, -6.0, -0.2, 3.2, 4.4], [9.1, 6.2, -8.4, 0.4, 3.9, 5.7], [10.0, 5.6, -7.2, -0.1, 3.6, 0.6]];
+function nrFlyerAt(F, S, out) {     // → out { x, y, z, phase: 0 flying | 1 falling | 2 skidding | 3 down, w (s since landing), tf }
+  const [x0, y0, z0, vx, vz, s] = F, u = S - NR.loss, yG = LAYOUT.curbH + 0.075, tf = Math.sqrt(2 * (y0 - yG) / NR_G);
+  out.tf = tf;
+  if (u < 0) { out.x = x0 + vx * u; out.z = z0 + vz * u; out.y = y0 + 0.18 * Math.sin(S * 2.3 + s * 4) - 0.05 * u; out.phase = 0; out.w = 0; return out; }
+  if (u < tf) { out.x = x0 + vx * u; out.z = z0 + vz * u; out.y = y0 - 0.5 * NR_G * u * u; out.phase = 1; out.w = 0; return out; }
+  const w = u - tf, v = Math.hypot(vx, vz), a = 0.9 * NR_G, ts = v / a, ww = Math.min(w, ts), d = v * ww - 0.5 * a * ww * ww;
+  out.x = x0 + vx * tf + vx / v * d; out.z = z0 + vz * tf + vz / v * d; out.y = yG; out.phase = w < ts ? 2 : 3; out.w = w; return out;
+}
 
 class NrPigeons {
   constructor(scene) {
     const grey = Mat.std('#8a8f99', { roughness: 0.85 }), dark = Mat.std('#4d525b', { roughness: 0.85 }), neck = Mat.std('#5f7a6e', { roughness: 0.6, metalness: 0.2 }),
       pink = Mat.std('#c27a74', { roughness: 0.8 }), beak = Mat.std('#3a3530', { roughness: 0.6 });
-    const wingMat = new THREE.MeshStandardMaterial({ color: '#8f949e', roughness: 0.85, side: THREE.DoubleSide });
+    const wingMat = new THREE.MeshStandardMaterial({ color: '#6c717c', roughness: 0.92, side: THREE.DoubleSide });
     const wingG = new THREE.BufferGeometry();
     // one wing: a fan from the shoulder (x 0) out to the tip (x 0.3), chord along z, with dark bars
     wingG.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -0.06, 0.3, 0, 0.04, 0, 0, 0.07, 0, 0, -0.06, 0.18, 0, -0.05, 0.3, 0, 0.04], 3));
@@ -101,6 +114,7 @@ class NrPigeons {
     };
     this.birds = NR_PIGEONS.map(([x, z, s], i) => Object.assign(mk(), { x, z, s, i, t0: NR.startle + 0.06 * i + 0.04 * Math.sin(s * 5), dir: Math.atan2((x - 9.85) * 2.2, 1.0 + 0.2 * Math.sin(s)) }));
     this.ledge = Object.assign(mk(), { s: 7.7 });
+    this.flyers = NR_FLYERS.map((F) => { const B = Object.assign(mk(), { F, s: F[5] }); B.g.scale.setScalar(1.3); return B; }); this._fo = {};
     // the ledge (a stone window sill) it stands on
     const sill = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.1, 1.5), Mat.std('#d6cebd', { roughness: 0.8 })); sill.position.set(NR_LEDGE.x + 0.09, NR_LEDGE.y - 0.05, NR_LEDGE.z);
     sill.castShadow = true; sill.receiveShadow = true; scene.add(sill);
@@ -111,6 +125,19 @@ class NrPigeons {
   update(S) {
     const vis = (S > 27.5 && S < 34.5) || S < 12.4 || S > 40.5, h = LAYOUT.curbH + 0.085;
     this.blobs.begin();
+    // the flyers (the opening only)
+    for (const B of this.flyers) {
+      B.g.visible = S < NR.cut0; if (!B.g.visible) continue;
+      const o = nrFlyerAt(B.F, S, this._fo), s = B.s, yaw = Math.atan2(B.F[3], B.F[4]);
+      let pitch = 0.1, roll = 0;
+      if (o.phase === 0) this._flap(B, S, 5.2, 0.9, 0.05);
+      else if (o.phase === 1) { const u = S - NR.loss; this._flap(B, S, 11 + Math.sin(s), 1.15, 0.25); pitch = 0.1 + 0.9 * u + 0.15 * Math.sin(S * 19 + s); roll = 0.5 * Math.sin(u * 5 + s); }
+      else if (o.phase === 2) { this._flap(B, S, 6, 0.6, 0.9); pitch = 0.2; roll = 1.2 * Math.sin(o.w * 14 + s) * Math.exp(-o.w * 2); }
+      else { const w = o.w; if (w < 1.6) { this._flap(B, S, 3, 0.35 * Math.max(0, 1 - w / 1.6), 1.0); roll = 1.15 * (1 - MathX.smooth(w, 1.2, 1.9)); } else { this._fold(B, 0.5 * Math.max(0, 1 - (w - 1.6))); roll = 1.15 * (1 - MathX.smooth(w, 1.2, 1.9)); } pitch = -0.1 * Math.sin(w * 2 + s); }
+      B.head.position.set(0, 0.11, 0.1);
+      B.g.position.set(o.x, o.y + (o.phase >= 2 ? 0.04 * Math.abs(roll) : 0), o.z); B.g.rotation.set(0, yaw, roll); B.body.rotation.set(-pitch, 0, 0);
+      this.blobs.push(o.x, LAYOUT.curbH + 0.01, o.z, 0.26, 0.5 * (1 - MathX.clamp((o.y - h) / 3, 0, 0.9)));
+    }
     for (const B of this.birds) {
       B.g.visible = vis; if (!vis) continue;
       const u = S - B.t0, s = B.s;
@@ -173,16 +200,17 @@ class NrTraffic {
     const arm = new THREE.Group(), sk = Mat.std('#c99a7c', { roughness: 0.7 }), sl = Mat.std('#2f4f6e', { roughness: 0.9 });
     const fa = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.42), sl); fa.position.set(0, 0, -0.1); arm.add(fa);
     const hd = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.05, 0.11), sk); hd.position.set(0, 0.0, 0.16); arm.add(hd);
-    this.stack = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.03, 0.16), Mat.std('#f2efe6', { roughness: 0.9 })); this.stack.position.set(0, 0.04, 0.2); arm.add(this.stack);
+    this.stack = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.05, 0.3), Mat.std('#f2d23a', { roughness: 0.9 })); this.stack.position.set(0, 0.05, 0.24); arm.add(this.stack);
     arm.position.set(0.35, 1.18, 0.95);    // car space: +x forward, +z its right side
     this.arm = arm; this.hero.group.add(arm);
     // the leaflets
-    const lr = new RNG(612), sheetG = new THREE.PlaneGeometry(0.21, 0.15); sheetG.rotateX(-Math.PI / 2);
-    const sm = new THREE.MeshStandardMaterial({ color: '#f4f1e8', roughness: 0.9, side: THREE.DoubleSide });
+    // (big, bright A3 posters, so they read at a glance next to the car)
+    const lr = new RNG(612), sheetG = new THREE.PlaneGeometry(0.42, 0.3); sheetG.rotateX(-Math.PI / 2);
+    const sms = ['#f2d23a', '#ef6f9f', '#f4f1e8', '#6fc3ef'].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, side: THREE.DoubleSide }));
     this.sheets = [];
-    for (let i = 0; i < 12; i++) {
-      const m = new THREE.Mesh(sheetG, sm); m.castShadow = true; scene.add(m);
-      this.sheets.push({ m, vx: lr.range(1.3, 2.6), vy: lr.range(0.2, 1.6), dv: lr.range(-0.6, 0.4), dz: lr.range(-0.1, 0.1), sx: lr.range(-9, 9), sy: lr.range(-6, 6), sz: lr.range(-9, 9) });
+    for (let i = 0; i < 16; i++) {
+      const m = new THREE.Mesh(sheetG, sms[i % 4]); m.castShadow = true; scene.add(m);
+      this.sheets.push({ m, vx: lr.range(1.3, 2.8), vy: lr.range(0.7, 2.1), dv: lr.range(-0.6, 0.4), dz: lr.range(-0.15, 0.15), sx: lr.range(-9, 9), sy: lr.range(-6, 6), sz: lr.range(-9, 9) });
     }
     this._so = {};
     // parked cars on the far side

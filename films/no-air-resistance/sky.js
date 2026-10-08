@@ -1,11 +1,12 @@
 /* =====================================================================
    SKY — the airliner (cruising at 11.4 km when the air lets go; with no
    lift it falls on a ballistic arc for 48 s, flying up the avenue towards
-   you, and comes down in the river 2.1 km away), its impact (a flash and a
-   column of spray: water still rides the wind), the debris it throws (no
-   drag: it flies 2 km and arrives at ~800 km/h), the sign board knocked off the
-   building beside you, and the skydiver cut-away (its own scene, shown
-   through FILM.view): a jumper in freefall whose canopy can't inflate.
+   you, and comes down in the river 2.1 km away), its impact (a fireball, a
+   column of spray that water still lets the wind carry, and a fan of dark
+   debris), the debris it throws (no drag: it flies 2 km and arrives at
+   ~700 km/h), the sign board knocked off the building beside you, and the
+   skydiver cut-away (its own scene, shown through FILM.view): a jumper in
+   freefall whose parachute can't even open.
    ===================================================================== */
 
 // an airliner from the shared model (js/world/aircraft.js), without its landing gear; fog off (it is seen from kilometres away)
@@ -25,61 +26,66 @@ class NrPlane {
     this.g = nrAirliner(); this.g.rotation.y = Math.atan2(-NR_PLANE.dir[0], -NR_PLANE.dir[1]);   // nose the way it flies; it stays level (nothing can pitch it now)
     this.g.scale.setScalar(1.0); scene.add(this.g);
     this.haze = new THREE.Color('#bccbd8');
-    // its path since the air let go: a faint dotted arc (drawn while you watch it)
-    const pts = [];
-    for (let s = NR.loss; s <= NR.impact; s += 0.25) { const p = NR_PLANE.pos(s, new THREE.Vector3()); pts.push(p.x, p.y, p.z); }
-    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-    this.trail = new THREE.Points(geo, new THREE.PointsMaterial({ color: '#ffffff', size: 3.2, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false, fog: false }));
-    this.trail.frustumCulled = false; scene.add(this.trail);
-    this.nTrail = pts.length / 3;
-    this._v = new THREE.Vector3();
   }
   update(S, cam) {
     const g = this.g, on = S > 30 && S < NR.impact;
-    g.visible = on; this.trail.visible = on;
+    g.visible = on;
     if (!on) return;
     NR_PLANE.pos(S, g.position);
     const d = g.position.distanceTo(cam.position);
-    nrHaze(g, this.haze, MathX.clamp(d / 22000, 0.05, 0.4));
-    const n = Math.max(0, Math.min(this.nTrail, Math.floor((S - NR.loss) / 0.25)));
-    this.trail.geometry.setDrawRange(0, n);
-    this.trail.material.opacity = 0.75 * (StoryHUD.win(S, 35.2, 40.4, 0.6, 0.4) + StoryHUD.win(S, 48.0, NR.impact, 0.4, 0.05));
+    nrHaze(g, this.haze, MathX.clamp(d / 26000, 0.03, 0.3));
   }
 }
 
-/* ---------------- the impact: a flash, then a column of spray that drifts with the wind ---------------- */
+/* ---------------- the impact: a fireball, a tall column of spray (water: the wind still carries it), dark debris thrown out ---------------- */
 class NrImpact {
   constructor(scene) {
     this.glow = new BillboardSystem(scene, 8, true);
-    this.spray = new BillboardSystem(scene, 760, false);
+    this.spray = new BillboardSystem(scene, 900, false);
     this.spray.uniforms.uLight.value = 1.0;
+    // (the fan of debris: dark chunks, each stretched along its flight like a motion blur)
+    this.fan = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: '#1e1b18' }), 320); this.fan.frustumCulled = false; this.fan.count = 0; scene.add(this.fan);
+    this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3(); this._d = new THREE.Vector3(); this._up = new THREE.Vector3(1, 0, 0);
     this.fog = { color: new THREE.Color('#c9d4dc'), density: 0.00009 };
     this.P = NR_PLANE.imp;
+    this.sun = new THREE.Vector2(-0.3, 0.72).normalize();      // the sun's bearing (city.js): that side of the column is lit
   }
   update(S) {
-    const I = this.P, u = S - NR.impact, G = this.glow, Sp = this.spray, D = NR_WIND_DIR;
-    G.begin(); Sp.begin(this.fog);
+    const I = this.P, u = S - NR.impact, G = this.glow, Sp = this.spray, F = this.fan, D = NR_WIND_DIR;
+    G.begin(); Sp.begin(this.fog); let nf = 0;
     if (u >= 0) {
-      const f = Math.exp(-u / 0.35);
-      if (f > 0.01) { G.push(I[0], 120 + 90 * u, I[1], 1100 * (0.5 + u), 0, f, 1, 1.0, 0.92, 0.75); G.push(I[0], 60, I[1], 420, 0, f, 1, 1.0, 0.8, 0.55); }
-      // the column: puffs shot up from the impact, slowing as they climb (spray is water: it still feels the air), then drifting off with the wind
-      for (let i = 0; i < 420; i++) {
-        const born = (hash1(i * 3 + 1) ** 2) * 1.4, a = u - born;
+      // the flash and the fireball (burning fuel: a gas, so it is not thrown about like the debris)
+      const f = Math.exp(-u / 0.12), fb = Math.exp(-u / 0.9) * MathX.smooth(u, 0, 0.06);
+      if (f > 0.01) G.push(I[0], 120 + 60 * u, I[1], 700 * (0.4 + u), 0, f, 1, 1.0, 0.95, 0.85);
+      if (fb > 0.01) { G.push(I[0], 45 + 45 * u, I[1], 300 * (0.6 + 0.6 * u), 0, 0.8 * fb, 1, 1.0, 0.55, 0.22); G.push(I[0], 22, I[1], 150, 0, fb, 1, 1.0, 0.78, 0.45); }
+      // the column: spray shot straight up, narrow and tall, slowing as it climbs, then leaning off with the wind
+      for (let i = 0; i < 560; i++) {
+        const born = (hash1(i * 3 + 1) ** 2) * 1.0, a = u - born;
         if (a < 0) continue;
-        const v0 = 80 + 200 * hash1(i * 5 + 2), tau = 1.8 + 1.4 * hash1(i * 7 + 3), h = v0 * tau * (1 - Math.exp(-a / tau)) - 6 * a * a * 0.5;
-        const sp = 10 + 40 * hash1(i * 11 + 4), ang = hash1(i * 13 + 5) * 6.283, r = sp * tau * (1 - Math.exp(-a / tau)) * (0.3 + 0.7 * hash1(i * 17 + 6));
-        const drift = nrWindDist(S) - nrWindDist(NR.impact + born);
-        const x = I[0] + Math.cos(ang) * r + D.x * drift * 0.9, z = I[1] + Math.sin(ang) * r + D.z * drift * 0.9, y = Math.max(5, h);
-        const k = MathX.clamp(a / 9, 0, 1), size = 35 + 70 * hash1(i * 19 + 7) + 140 * k;
-        // sunlit on top, grey underneath, so it stands out against the pale horizon
-        const shade = 0.5 + 0.55 * MathX.clamp(y / 650, 0, 1) + 0.14 * hash1(i * 23 + 8);
-        Sp.push(x, y, z, size, i * 1.7, 0.92 * Math.min(1, a * 3) * (1 - 0.5 * k), shade, 0.98, 0.98, 1.0);
+        const v0 = 120 + 210 * hash1(i * 5 + 2), tau = 2.0 + 1.4 * hash1(i * 7 + 3), h = v0 * tau * (1 - Math.exp(-a / tau)) - 3 * a * a;
+        const sp = 3 + 17 * hash1(i * 11 + 4), ang = hash1(i * 13 + 5) * 6.283, r = sp * tau * (1 - Math.exp(-a / tau)) * (0.3 + 0.7 * hash1(i * 17 + 6)) + 5 * a;
+        const drift = nrWindDist(S) - nrWindDist(NR.impact + born), lean = MathX.clamp(h / 500, 0, 1);
+        const x = I[0] + Math.cos(ang) * r + D.x * drift * 0.9 * lean, z = I[1] + Math.sin(ang) * r + D.z * drift * 0.9 * lean, y = Math.max(8, h);
+        const k = MathX.clamp(a / 9, 0, 1), size = 40 + 60 * hash1(i * 19 + 7) + 110 * k;
+        // river silt, dust and smoke: dark and dirty low down, greyer on top; the sun side lighter, the far side darker (it has to read on a pale sky)
+        const side = (Math.cos(ang) * this.sun.x + Math.sin(ang) * this.sun.y) * r / (r + 25);
+        const shade = 0.2 + 0.32 * MathX.clamp(y / 900, 0, 1) + 0.07 * hash1(i * 23 + 8) + 0.2 * side, low = 1 - MathX.clamp(y / 260, 0, 1);
+        Sp.push(x, y, z, size, i * 1.7, Math.min(1, a * 3) * (1 - 0.25 * k), shade, 1.0 - 0.1 * low, 0.94 - 0.12 * low, 0.88 - 0.16 * low);
       }
-      // a low skirt of spray rolling out along the river
-      for (let i = 0; i < 90; i++) { const a = u - 0.2 * hash1(i + 400); if (a < 0) continue; const ang = (i / 90) * 6.283, r = 220 * (1 - Math.exp(-a / 1.5)) + 40;
-        Sp.push(I[0] + Math.cos(ang) * r, 18 + 25 * hash1(i + 500), I[1] + Math.sin(ang) * r, 70 + 60 * Math.min(1, a / 4), i, 0.7 * Math.min(1, a * 2) * (1 - MathX.clamp(a / 12, 0, 0.7)), 0.62, 0.94, 0.96, 1.0); }
+      // the base surge rolling out along the river
+      for (let i = 0; i < 90; i++) { const a = u - 0.2 * hash1(i + 400); if (a < 0) continue; const ang = (i / 90) * 6.283, r = 200 * (1 - Math.exp(-a / 1.5)) + 30;
+        Sp.push(I[0] + Math.cos(ang) * r, 14 + 18 * hash1(i + 500), I[1] + Math.sin(ang) * r, 60 + 50 * Math.min(1, a / 4), i, 0.7 * Math.min(1, a * 2) * (1 - MathX.clamp(a / 12, 0, 0.7)), 0.5, 0.92, 0.92, 0.94); }
+      // the fan of dark debris thrown out low and wide (solid: plain ballistic arcs, nothing slows them)
+      for (let i = 0; i < 320; i++) {
+        const a = u - 0.12 * hash1(i * 29 + 1); if (a < 0) continue;
+        const sp = 60 + 170 * hash1(i * 31 + 2), el = MathX.deg(18 + 50 * hash1(i * 37 + 3)), az = hash1(i * 41 + 4) * 6.283, vh = sp * Math.cos(el), vy = sp * Math.sin(el);
+        const y = vy * a - 4.905 * a * a; if (y < 0) continue;
+        this._p.set(I[0] + Math.cos(az) * vh * a, y, I[1] + Math.sin(az) * vh * a); this._d.set(Math.cos(az) * vh, vy - NR_G * a, Math.sin(az) * vh).normalize();
+        const sz = 4 + 6 * hash1(i * 43 + 5); this._q.setFromUnitVectors(this._up, this._d); this._s.set(sz * 3, sz * 0.6, sz * 0.6);
+        this._m.compose(this._p, this._q, this._s); this.fan.setMatrixAt(nf++, this._m);
+      }
     }
-    G.end(); Sp.end();
+    G.end(); Sp.end(); this.fan.count = nf; this.fan.instanceMatrix.needsUpdate = true;
   }
 }
 
@@ -112,13 +118,13 @@ class NrDebris {
     const mat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.55, metalness: 0.5, fog: false });
     this.kinds = geos.map((g) => { const m = new THREE.InstancedMesh(g, mat, NR_DEBRIS_SPEC.length); m.frustumCulled = false; m.castShadow = true; m.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(NR_DEBRIS_SPEC.length * 3), 3); scene.add(m); return m; });
     this.list = NR_DEBRIS_SPEC.map(([x, y, z, T, size, kind], i) => {
-      const P = nrDebrisPiece(x, y, z, T), c = new THREE.Color().setHSL(0.58, 0.04, 0.2 + 0.45 * hash1(i * 3.3));
+      const P = nrDebrisPiece(x, y, z, T), c = new THREE.Color().setHSL(0.07, 0.08, 0.08 + 0.24 * hash1(i * 3.3) ** 2);   // charred and torn metal
       return { P, size, kind, i, c, land: NR.impact + T, x, y, z, spin: [hash1(i + 1) * 14 - 7, hash1(i + 2) * 14 - 7, hash1(i + 3) * 14 - 7], near: Math.abs(z) < 300 && Math.abs(x) < 20 };
     });
     // what an impact throws up: sparks and grit (grit is solid too: it flies out and falls straight back, no dust cloud hangs)
     this.sparks = new StreakSystem(scene, 900);
     const chipG = new THREE.BoxGeometry(0.06, 0.04, 0.05);
-    this.chips = new THREE.InstancedMesh(chipG, new THREE.MeshStandardMaterial({ color: '#77736c', roughness: 0.9 }), 1600); this.chips.frustumCulled = false; scene.add(this.chips);
+    this.chips = new THREE.InstancedMesh(chipG, new THREE.MeshStandardMaterial({ color: '#a59f94', roughness: 0.9 }), 2600); this.chips.frustumCulled = false; scene.add(this.chips);
     this.marks = new BlobShadows(scene, 140);
     this.haze = new THREE.Color('#c3cfd8');
     this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3(); this._c = new THREE.Color();
@@ -152,14 +158,14 @@ class NrDebris {
           const y0 = d.y + up * t0 - 4.9 * t0 * t0, y1 = d.y + up * t1 - 4.9 * t1 * t1;
           if (y0 > -0.1) Sp.push(d.x + vx * t1, y1, d.z + vz * t1, d.x + vx * t0, y0, d.z + vz * t0, 1.0, 0.82, 0.5, 1.4 * (1 - w / 0.45), 0.025);
         }
-        if (w < 2.6) for (let k = 0; k < 12 && nc < 1600; k++) {
+        if (w < 2.6) for (let k = 0; k < 18 && nc < 2600; k++) {
           const a = hash1(d.i * 53 + k) * 6.283, sp = 3 + 18 * hash1(d.i * 59 + k), up = 2 + 8 * hash1(d.i * 61 + k);
           const vx = Math.cos(a) * sp * 0.6 + d.P.dir[0] * sp, vz = Math.sin(a) * sp * 0.6 + d.P.dir[1] * sp, tl = (up + Math.sqrt(up * up + 2 * 9.81 * Math.max(0, d.y - 0.15))) / 9.81, ww = Math.min(w, tl);
           this._p.set(d.x + vx * ww, Math.max(0.17, d.y + up * ww - 4.905 * ww * ww), d.z + vz * ww);
-          this._e.set(ww * 9 + k, ww * 7, ww * 5); this._q.setFromEuler(this._e); this._s.setScalar(1 + 3 * hash1(d.i * 67 + k));
+          this._e.set(ww * 9 + k, ww * 7, ww * 5); this._q.setFromEuler(this._e); this._s.setScalar(1.5 + 4 * hash1(d.i * 67 + k));
           this._m.compose(this._p, this._q, this._s); this.chips.setMatrixAt(nc++, this._m);
         }
-        if (d.y < 0.5) this.marks.push(d.x + d.P.dir[0] * 0.8, (Math.abs(d.x) < 7 ? 0 : LAYOUT.curbH) + 0.014, d.z + d.P.dir[1] * 0.8, 0.9 + d.size, 0.75 * Math.min(1, w * 20), 2.4 + 2 * d.size, Math.atan2(d.P.dir[0], d.P.dir[1]));
+        if (d.y < 0.5) this.marks.push(d.x + d.P.dir[0] * 0.8, (Math.abs(d.x) < 7 ? 0 : LAYOUT.curbH) + 0.014, d.z + d.P.dir[1] * 0.8, 0.45 + 0.5 * d.size, 0.4 * Math.min(1, w * 20), 1.5 + 1.1 * d.size, Math.atan2(d.P.dir[0], d.P.dir[1]));
       }
     }
     this.kinds.forEach((M, k) => { M.count = cnt[k]; M.instanceMatrix.needsUpdate = true; if (M.instanceColor) M.instanceColor.needsUpdate = true; });
@@ -169,27 +175,30 @@ class NrDebris {
 }
 
 /* ---------------- the sign board on the building beside you (12 m up) ---------------- */
+// knocked off by a piece of debris, it drops 12 m in 1.6 s and lands flat on the spot where you stood (on your paper and ball)
 class NrBoard {
   constructor(scene) {
     const c = Tex.canvas(512, 300), x = c.getContext('2d');
     x.fillStyle = '#f3efe4'; x.fillRect(0, 0, 512, 300); x.fillStyle = '#1f4e79'; x.fillRect(0, 0, 512, 92);
     x.fillStyle = '#ffffff'; x.font = `700 64px ${Tex.fontCond}`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('OFFICES', 256, 48);
     x.fillStyle = '#1f4e79'; x.font = `700 92px ${Tex.fontCond}`; x.fillText('TO LET', 256, 170); x.font = `500 30px ${Tex.fontSans}`; x.fillText('1,200 sq ft · 3rd floor', 256, 255);
-    const face = new THREE.MeshStandardMaterial({ map: Tex.tex(c, { repeat: false }), roughness: 0.6 }), edge = Mat.std('#d8d6d0', { roughness: 0.5, metalness: 0.3 });
-    const g = new THREE.Group(), b = new THREE.Mesh(new THREE.BoxGeometry(0.03, 1.5, 2.6), [edge, face, edge, edge, edge, edge]); g.add(b);
+    const face = new THREE.MeshStandardMaterial({ map: Tex.tex(c, { repeat: false }), roughness: 0.6 }), edge = Mat.std('#8a8d90', { roughness: 0.5, metalness: 0.4 });
+    // printed on both faces (so it reads whichever way it tumbles), on a 6 cm aluminium-framed panel
+    const g = new THREE.Group(), b = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.5, 2.6), [face, face, edge, edge, edge, edge]); g.add(b);
     b.castShadow = true; b.receiveShadow = true;
     this.g = g; scene.add(g);
     this.home = new THREE.Vector3(12.43, NR_BOARD.y0, 1.6);
     // its brackets stay on the wall
     for (const dz of [-0.9, 0.9]) { const br = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.06), Mat.std('#3a3d40', { roughness: 0.5 })); br.position.set(12.47, NR_BOARD.y0 + 0.5, 1.6 + dz); scene.add(br); }
-    // the normal-air ghost: the same board, sailing down slowly
-    const gm = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false });
-    this.ghost = new THREE.Mesh(new THREE.BoxGeometry(0.03, 1.5, 2.6), gm); scene.add(this.ghost);
-    this.ghostEdge = new THREE.LineSegments(new THREE.EdgesGeometry(this.ghost.geometry), new THREE.LineBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0 })); this.ghost.add(this.ghostEdge);
-    this.v0 = [-1.4, 0.6, 1.2]; this.w0 = [0.6, 1.1, 1.5];
+    this.v0 = [-1.75, 0.6, -0.2]; this.w0 = [0.6, 1.1, 1.5];
     const y0 = NR_BOARD.y0, yG = LAYOUT.curbH + 0.03; this.tf = (this.v0[1] + Math.sqrt(this.v0[1] ** 2 + 2 * NR_G * (y0 - yG))) / NR_G;
     this.landT = NR.board + this.tf;
+    // the grit it throws up when it lands (solid: out and straight back down)
+    this.chips = new THREE.InstancedMesh(new THREE.BoxGeometry(0.05, 0.03, 0.04), new THREE.MeshStandardMaterial({ color: '#b4ada2', roughness: 0.9 }), 40); this.chips.frustumCulled = false; scene.add(this.chips);
+    this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3(1, 1, 1);
   }
+  // aim it so it lands on (x, z) (the fall time depends only on the height and the upward kick)
+  aim(x, z) { this.v0[0] = (x - this.home.x) / this.tf; this.v0[2] = (z - this.home.z) / this.tf; this.aimed = true; }
   pos(S, out) { const u = Math.max(0, Math.min(S - NR.board, this.tf)); return out.set(this.home.x + this.v0[0] * u, this.home.y + this.v0[1] * u - 0.5 * NR_G * u * u, this.home.z + this.v0[2] * u); }
   speed(S) { const u = MathX.clamp(S - NR.board, 0, this.tf); return Math.hypot(this.v0[0], this.v0[1] - NR_G * u, this.v0[2]); }
   update(S) {
@@ -198,10 +207,14 @@ class NrBoard {
     if (u < 0) g.rotation.set(0, 0, 0);
     else if (u < this.tf) g.rotation.set(this.w0[0] * u, this.w0[1] * u, this.w0[2] * u);
     else { const w = S - this.landT, k = Math.exp(-w * 8); g.position.y = LAYOUT.curbH + 0.03 + 0.12 * Math.abs(Math.sin(Math.min(w, 0.4) * 8)) * k; g.rotation.set(0, this.w0[1] * this.tf + 0.15 * k, Math.PI / 2); }
-    // the ghost: from the same spot, sailing and rocking down (≈ 4 m/s); it fades once the real one has landed
-    const gh = NR_BOARD.ghost(u), vis = u > 0.05 && S < this.landT + 1.4, a = vis ? 0.22 * MathX.smooth(u, 0.05, 0.35) * (1 - MathX.smooth(S, this.landT + 0.6, this.landT + 1.4)) : 0;
-    this.ghost.visible = vis; this.ghost.material.opacity = a; this.ghostEdge.material.opacity = a * 3.5;
-    this.ghost.position.set(this.home.x - 0.6 * Math.min(u, 1) + gh[1] * 0.4, this.home.y - gh[0], this.home.z + gh[1]); this.ghost.rotation.set(gh[2], 0.2 * gh[1], 0.35 * gh[2]);
+    const w = S - this.landT; let n = 0;
+    if (w > 0 && w < 1.2) for (let i = 0; i < 40; i++) {
+      const a = hash1(i * 7 + 3) * 6.283, sp = 1.5 + 4 * hash1(i * 11 + 5), up = 1.5 + 3.5 * hash1(i * 13 + 7), tl = 2 * up / NR_G, ww = Math.min(w, tl), r = 1.0 + 0.3 * hash1(i * 17);
+      this._p.set(g.position.x + Math.cos(a) * (r + sp * ww), LAYOUT.curbH + 0.02 + up * ww - 4.905 * ww * ww, g.position.z + Math.sin(a) * (r * 1.3 + sp * ww));
+      this._e.set(ww * 9 + i, ww * 7, 0); this._q.setFromEuler(this._e); this._s.setScalar(1 + 2 * hash1(i * 19));
+      this._m.compose(this._p, this._q, this._s); this.chips.setMatrixAt(n++, this._m);
+    }
+    this.chips.count = n; this.chips.instanceMatrix.needsUpdate = true;
   }
 }
 
@@ -287,24 +300,45 @@ class NrAerial {
     }
   }
 
-  // the canopy: a ram-air wing that never fills — a loose sheet that spills out and floats beside him (everything falls together)
-  _canopy() {
+  // a crumpled sheet of red-and-white canopy fabric (the wad, and the pilot chute that can't fill)
+  _rag(w, h, cells, key) {
     const c = Tex.canvas(256, 64), x = c.getContext('2d');
     for (let i = 0; i < 9; i++) { x.fillStyle = i % 3 === 1 ? '#f4f1ea' : '#d8402c'; x.fillRect(i * 256 / 9, 0, 256 / 9 + 1, 64); }
-    this.cU = { uK: { value: 1 }, uT: { value: 0 } };
-    const mat = new THREE.MeshStandardMaterial({ map: Tex.tex(c, { repeat: false }), roughness: 0.75, side: THREE.DoubleSide }), U = this.cU;
+    const U = { uK: { value: 1 }, uT: { value: 0 } };
+    const mat = new THREE.MeshStandardMaterial({ map: Tex.tex(c, { repeat: false }), roughness: 0.75, side: THREE.DoubleSide });
     mat.onBeforeCompile = (sh) => { Object.assign(sh.uniforms, U); sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uK, uT;').replace('#include <begin_vertex>', `#include <begin_vertex>
       { vec3 p = position; float a = p.x * 0.9 + uT * 0.35, b = p.y * 1.7 - uT * 0.25;
         vec3 n = vec3(sin(a * 1.3 + p.y * 2.1) + 0.5 * sin(b * 2.7 + p.x * 3.3), sin(b * 1.1 + p.x * 1.9) * 0.6 + 0.4 * sin(a * 3.1 + uT * 0.4), sin(a * 1.7 + b * 1.3) + 0.6 * sin(p.x * 4.1 - p.y * 2.3));
-        transformed = mix(p, p * 0.32, uK * 0.8) + n * (0.25 + 0.55 * uK); }`); };
-    mat.customProgramCacheKey = () => 'nrCanopy';
-    this.canopy = new THREE.Mesh(new THREE.PlaneGeometry(8.0, 3.0, 28, 10), mat); this.scene.add(this.canopy);
-    this.pc = new THREE.Mesh(new THREE.SphereGeometry(0.42, 10, 6, 0, Math.PI * 2, 0, Math.PI * 0.55), new THREE.MeshStandardMaterial({ color: '#2a2d33', roughness: 0.8, side: THREE.DoubleSide })); this.scene.add(this.pc);
-    this.bag = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.18, 0.3), Mat.std('#1d2026')); this.scene.add(this.bag);
-    // the lines: 12 suspension lines + the bridle, as polylines (weightless: they float in loose curves)
+        transformed = mix(p, p * 0.32, uK * 0.8) + n * (0.25 + 0.55 * uK) * ${(h / 3).toFixed(3)}; }`); };
+    mat.customProgramCacheKey = () => key;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h, cells[0], cells[1]), mat); this.scene.add(m);
+    return { m, U };
+  }
+
+  // the parachute: with no drag the pilot chute can't fill and can't pull the canopy out. It is thrown out at the pull and
+  // just drifts off at the speed it was given, on a slack bridle; the canopy spills half out of the container as a loose
+  // wad on slack lines. Beside them, a "normal air" ghost of the canopy opening (and falling away above him, as it would)
+  _canopy() {
+    this.wad = this._rag(4.2, 1.6, [20, 8], 'nrWad');
+    this.pc = this._rag(1.1, 0.9, [8, 6], 'nrPilot');
+    // the lines: 12 suspension lines + the bridle, as polylines (weightless: they float in loose loops)
     this.nL = 13; this.seg = 18;
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(this.nL * this.seg * 2 * 3), 3));
     this.lines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: '#efe9de', transparent: true, opacity: 0.9 })); this.lines.frustumCulled = false; this.scene.add(this.lines);
+    // the ghost: an open ram-air canopy (span arched down at the tips), see-through with dark edges and ribs (it reads on the pale sky), and its lines
+    const cg = new THREE.PlaneGeometry(8, 3, 16, 3); cg.rotateX(-Math.PI / 2);
+    const pa = cg.attributes.position; for (let i = 0; i < pa.count; i++) { const x = pa.getX(i); pa.setY(i, -x * x / 14); }
+    cg.computeVertexNormals();
+    const gm = new THREE.MeshBasicMaterial({ color: '#1d2b3c', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, fog: false });
+    const ghost = new THREE.Group(), body = new THREE.Mesh(cg, gm); ghost.add(body);
+    const lp = [];
+    for (let k = 0; k <= 8; k++) { const x = -4 + k, y = -x * x / 14; lp.push(x, y, -1.5, x, y, 1.5); }
+    for (const z of [-1.5, 1.5]) for (let k = 0; k < 16; k++) { const x0 = -4 + k * 0.5, x1 = x0 + 0.5; lp.push(x0, -x0 * x0 / 14, z, x1, -x1 * x1 / 14, z); }
+    for (let k = 0; k <= 8; k += 2) { const x = -4 + k; lp.push(x, -x * x / 14, 0, 0, -3.4, 0); }
+    const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3));
+    const em = new THREE.LineBasicMaterial({ color: '#1a2636', transparent: true, opacity: 0, fog: false });
+    ghost.add(new THREE.LineSegments(lg, em)); this.scene.add(ghost);
+    this.ghost = { g: ghost, fill: gm, edge: em };
   }
 
   // the arch: face down, arms out and up, legs bent; the right hand goes back to pull at NR.deploy
@@ -319,38 +353,42 @@ class NrAerial {
     const alt = NR_JUMP.alt(S), J = this.p, u = S - NR.deploy;
     J.root.position.set(0, alt, 0); J.root.rotation.set(Math.PI / 2 + 0.06 * Math.sin(S * 0.9), 0.15 * Math.sin(S * 0.37), 0.05 * Math.sin(S * 1.3), 'YXZ');
     J.apply(this._pose(S)); J.root.updateMatrixWorld(true);
-    // the canopy and its parts: thrown out at the pull, drifting off at the speed they were given (nothing slows them)
-    const back = J.j.spine.localToWorld(this._v.set(0, 0.3, -0.22)), vis = u > 0;
-    this.pc.visible = this.bag.visible = this.canopy.visible = this.lines.visible = vis;
+    // the parachute: the pilot chute thrown out at the pull drifts off at its throw speed; the canopy spills half out
+    const back = J.j.spine.localToWorld(this._v.set(0, 0.3, -0.22)).clone(), vis = u > 0;
+    this.pc.m.visible = this.lines.visible = vis; this.wad.m.visible = u > 0.7;
     if (vis) {
-      const pcO = this._w.set(-0.25 + 0.4 * u, 0.6 + 2.6 * Math.min(u, 0.9) + 0.9 * Math.max(0, u - 0.9), 0.4 + 0.6 * u).add(back);
-      this.pc.position.copy(pcO); this.pc.rotation.set(0.6 * Math.sin(u * 1.3), u * 0.8, 0.4 * Math.sin(u * 0.9));
-      const ub = Math.max(0, u - 0.85), bag = this._t.set(-0.1 + 0.35 * ub, 0.1 + 1.6 * ub, 0.1 + 0.3 * ub).add(back);
-      this.bag.position.copy(bag); this.bag.rotation.set(ub * 1.2, ub * 0.7, 0);
-      const k = MathX.smooth(u, 0.95, 2.6);
-      this.canopy.visible = u > 0.95;
-      this.canopy.position.set(bag.x + 0.4 * k + 0.25 * ub, bag.y + 0.9 * k + 0.5 * ub, bag.z + 0.6 * k);
-      this.canopy.scale.setScalar(0.12 + 0.88 * k); this.canopy.rotation.set(-0.9 + 0.3 * Math.sin(u * 0.5), 0.6 + 0.15 * u, 0.2 * Math.sin(u * 0.7));
-      this.cU.uK.value = 1 - 0.55 * k; this.cU.uT.value = u;
-      // lines: from his shoulders (risers) to the canopy's lower edge; the bridle from his back to the pilot chute
+      const pc = this.pc.m.position.set(-0.3 - 0.45 * u, 0.5 + 1.25 * u, 0.25 + 0.35 * u).add(back);
+      this.pc.m.rotation.set(0.7 * Math.sin(u * 1.1), u * 0.6, 0.5 * Math.sin(u * 0.8)); this.pc.m.scale.setScalar(MathX.smooth(u, 0, 0.25)); this.pc.U.uT.value = u + 3;
+      const ub = Math.max(0, u - 0.7), sw = MathX.smooth(ub, 0, 1.4);
+      const wad = this.wad.m.position.set(0.35 * sw + 0.18 * ub, 0.25 + 0.55 * sw + 0.12 * ub, -0.05 + 0.4 * sw).add(back);
+      this.wad.m.rotation.set(-1.2 + 0.25 * Math.sin(ub * 0.6), 0.5 + 0.12 * ub, 0.25 * Math.sin(ub * 0.7)); this.wad.m.scale.setScalar(0.25 + 0.3 * sw); this.wad.U.uT.value = ub;
+      // lines: from his shoulders (risers) to the wad, 3 m long but slack (nothing pulls them); the bridle to the pilot chute
       const P = this.lines.geometry.attributes.position.array, sh = [J.j.la.sh, J.j.ra.sh].map((q) => q.getWorldPosition(new THREE.Vector3()));
-      this.canopy.updateMatrixWorld(true);
+      this.wad.m.updateMatrixWorld(true);
       let o = 0;
       const line = (a, b, slack, seed) => {
         let px = a.x, py = a.y, pz = a.z;
         for (let s = 1; s <= this.seg; s++) {
           const f = s / this.seg, bend = Math.sin(f * Math.PI) * slack;
-          const x = a.x + (b.x - a.x) * f + bend * Math.sin(seed * 3 + u * 0.4 + f * 2), y = a.y + (b.y - a.y) * f + bend * 0.5 * Math.sin(seed * 5 + u * 0.3), z = a.z + (b.z - a.z) * f + bend * Math.cos(seed * 4 + u * 0.35 + f * 1.5);
+          const x = a.x + (b.x - a.x) * f + bend * Math.sin(seed * 3 + u * 0.4 + f * 4), y = a.y + (b.y - a.y) * f + bend * 0.6 * Math.sin(seed * 5 + u * 0.3 + f * 3), z = a.z + (b.z - a.z) * f + bend * Math.cos(seed * 4 + u * 0.35 + f * 3.5);
           P.set([px, py, pz, x, y, z], o); o += 6; px = x; py = y; pz = z;
         }
       };
       for (let i = 0; i < 12; i++) {
-        const e = this.canopy.localToWorld(this._v.set(-3.6 + (i % 6) * 1.44, -1.3 + (i >= 6 ? 1.5 : 0), 0));
-        const a = sh[i % 2], dist = a.distanceTo(e), L = Math.max(dist, 3.2 * k + 0.6);
-        line(a, e, Math.sqrt(Math.max(0, L * L - dist * dist)) * 0.45 + 0.08, i * 1.7);
+        const e = u > 0.7 ? this.wad.m.localToWorld(this._t.set(-1.8 + (i % 6) * 0.72, -0.7 + (i >= 6 ? 0.9 : 0), 0)) : this._t.copy(back);
+        const a = sh[i % 2], d = a.distanceTo(e);
+        line(a, e, Math.sqrt(Math.max(0, 9 - d * d)) * 0.5 * MathX.smooth(u, 0.7, 1.3) + 0.06, i * 1.7);
       }
-      line(back, this.pc.position, 0.25, 9.1);
+      const dp = back.distanceTo(pc); line(back, pc, Math.sqrt(Math.max(0, 6.25 - dp * dp)) * 0.5 + 0.1, 9.1);
       this.lines.geometry.attributes.position.needsUpdate = true;
+    }
+    // the ghost: in normal air the canopy would open above him (and he and it would slow: from here it falls away upwards)
+    const gw = S - (NR.deploy + 0.35), Gh = this.ghost, ga = gw > 0 ? MathX.smooth(gw, 0, 0.3) * (1 - MathX.smooth(gw, 1.4, 1.9)) : 0;
+    Gh.g.visible = ga > 0.001;
+    if (Gh.g.visible) {
+      const open = MathX.smooth(gw, 0, 0.45), up = 2.6 + 9 * Math.max(0, gw - 0.5) ** 2;
+      Gh.g.position.set(J.root.position.x + 0.6, alt + up, J.root.position.z + 0.3); Gh.g.scale.set(0.3 + 0.7 * open, 0.5 + 0.5 * open, 0.4 + 0.6 * open); Gh.g.rotation.set(0, 0.5, 0.05);
+      Gh.fill.opacity = 0.2 * ga; Gh.edge.opacity = 0.85 * ga;
     }
     // clouds rush up past
     this.puffs.begin(this.scene.fog);
@@ -365,14 +403,15 @@ class NrAerial {
   // the camera falls with him: beside and below him (the sky, the airliner), above him (the city), close on the pull, then wide
   _camera(S, alt) {
     const C = this.cam;
+    // (always above or beside him, never swinging under: the city stays below)
     if (!this._k) this._k = {
-      x: [[12.4, 3.0], [13.9, 3.4], [14.9, 1.6], [16.0, 1.8], [16.5, 2.6], [17.7, 3.0], [18.6, 8.0], [20.4, 7.0]],
-      y: [[12.4, -4.4], [13.9, -4.6], [14.9, 4.6], [16.0, 4.2], [16.5, 1.0], [17.7, 1.6], [18.6, 3.0], [20.4, 2.6]],
-      z: [[12.4, 1.8], [13.9, 1.4], [14.9, 2.6], [16.0, 2.2], [16.5, -1.8], [17.7, -2.6], [18.6, 4.4], [20.4, 3.8]],
-      lx: [[12.4, -0.6], [13.9, -0.8], [14.9, 0], [16.0, 0], [16.5, 0], [17.7, 0.2], [18.6, 0.5], [20.4, 0.5]],
-      ly: [[12.4, 3.0], [13.9, 3.4], [14.9, -6.0], [16.0, -6.0], [16.5, 0.6], [17.7, 1.6], [18.6, 1.9], [20.4, 1.9]],
-      lz: [[12.4, -1.4], [13.9, -1.6], [14.9, -1.5], [16.0, -1.5], [16.5, 0.2], [17.7, 0.4], [18.6, 0.4], [20.4, 0.4]],
-      fov: [[12.4, 62], [13.9, 64], [14.9, 70], [16.0, 70], [16.5, 64], [17.7, 66], [18.6, 62], [20.4, 58]],
+      x: [[12.4, 3.2], [14.0, 3.6], [15.2, 2.2], [16.2, 2.4], [16.8, 4.4], [17.8, 5.0], [18.8, 5.0], [20.4, 4.6]],
+      y: [[12.4, 2.4], [14.0, 2.8], [15.2, 4.2], [16.2, 3.8], [16.8, 0.4], [17.8, 0.2], [18.8, 1.0], [20.4, 1.0]],
+      z: [[12.4, 2.6], [14.0, 2.4], [15.2, 2.4], [16.2, 2.0], [16.8, -2.6], [17.8, -3.4], [18.8, 2.8], [20.4, 2.6]],
+      lx: [[12.4, 0], [14.0, 0], [15.2, 0], [16.2, 0], [16.8, 0], [17.8, 0.2], [18.8, 0.4], [20.4, 0.4]],
+      ly: [[12.4, -1.2], [14.0, -1.4], [15.2, -5.0], [16.2, -5.0], [16.8, 1.6], [17.8, 2.2], [18.8, 1.2], [20.4, 1.1]],
+      lz: [[12.4, -0.8], [14.0, -0.8], [15.2, -1.5], [16.2, -1.5], [16.8, 0.2], [17.8, 0.4], [18.8, 0.4], [20.4, 0.4]],
+      fov: [[12.4, 60], [14.0, 62], [15.2, 66], [16.2, 66], [16.8, 66], [17.8, 68], [18.8, 62], [20.4, 58]],
     };
     const k = this._k, tr = (n) => (this['_t' + n] || (this['_t' + n] = new Track(k[n], 'inOutSine'))).value(S);
     C.position.set(tr('x'), alt + tr('y'), tr('z'));
