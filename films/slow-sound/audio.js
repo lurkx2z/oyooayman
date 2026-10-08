@@ -298,9 +298,9 @@ class SndAudio extends AudioEngine {
       mg.gain.setValueAtTime(0, tT); mg.gain.linearRampToValueAtTime(0.5, tT + 0.03); mg.gain.setTargetAtTime(0.05, tT + 0.2, 0.8);
       // (it keeps rolling, within ~3 dB, to the end: real thunder rolls 5–20 s; here ten times longer)
       const peaks = [[0.9, 1.25], [2.1, 1.05], [3.4, 1.15], [4.9, 0.95], [6.3, 1.05], [7.8, 0.92], [9.1, 1.0]];
-      rg.gain.setTargetAtTime(0.55, tT + 0.1, 0.35);
-      for (const [dt, a] of peaks) { const t0 = tT + dt; if (t0 > END - 0.5) break; rg.gain.setTargetAtTime(a, t0 - 0.3, 0.12); rg.gain.setTargetAtTime(a * 0.55, t0 + 0.2, 0.4); }
-      rg.gain.setTargetAtTime(0, END - 0.6, 0.15); mg.gain.setTargetAtTime(0, END - 0.6, 0.15);
+      rg.gain.setTargetAtTime(0.4, tT + 0.1, 0.35);
+      for (const [dt, a0] of peaks) { const t0 = tT + dt, a = 0.62 * a0; if (t0 > T.black - 0.8) break; rg.gain.setTargetAtTime(a, t0 - 0.3, 0.12); rg.gain.setTargetAtTime(a * 0.55, t0 + 0.2, 0.4); }
+      rg.gain.setTargetAtTime(0, T.black - 0.5, 0.25); mg.gain.setTargetAtTime(0, T.black - 0.5, 0.25);   // (it fades with the picture)
     }
 
     // 11. the score: almost nothing — a low swell under the wait for the thunder, silence just before it,
