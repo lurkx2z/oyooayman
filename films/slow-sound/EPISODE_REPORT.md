@@ -70,6 +70,10 @@ None. All geometry is procedural, all sound is synthesised, fonts are the repo's
 - Several whip pans remain (10.5–11.4, 23.4–24.3, 38.0–38.6, 43.7–44.5, 48.4–49.4, 58.6–59.0; up to 5.7 frame-widths/s).
 - The physics simplifications listed under PHYSICS RULE.
 - No one has listened to the sound; it has only been measured (−16.1 LUFS integrated, true peak −1.6 dBTP).
+- Two fresh renders of the soundtrack are bit-identical up to the airliner's boom (54 s) and then differ slightly
+  (25–49 dB below the signal, same loudness). The cause is probably the engine's convolution reverb running part of its
+  work on a background thread (inferred, not proven). The MP4 uses the WAV that was measured; the page's baked track is
+  another render of the same mix.
 - The final cut has not been through a third review round.
 
 ## FINAL PREVIEW PATH
