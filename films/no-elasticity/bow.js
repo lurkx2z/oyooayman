@@ -15,7 +15,7 @@ const NE_BOW = {
   arrow: 0.70, com: 0.42,                          // arrow length, its balance point from the nock
   drawMax: 0.5,                                    // the nock's distance behind the grip at full draw
   toe: 0.25,                                       // the bow turned left in the fist (radians) so the arrow points ahead
-  cant: -0.2,                                      // and canted a little (top to the right), as many archers hold it
+  cant: -0.44,                                     // and canted (top to the right, about 25°), as many archers hold it
 };
 
 // the limb's centre line at s ∈ [0, 1] (root → tip), for a limb bend b ∈ [0, 1]; sign = +1 upper, −1 lower
@@ -93,7 +93,7 @@ class NeBow {
     }
     this.string.geometry.dispose();
     this.string.geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), 40, 0.0016, 4, false);
-    this.restLine.visible = t > B.release + 0.35;
+    this.restLine.visible = false;   // (the slack string says it; a dashed rest line along the bow read as a road marking)
   }
 
   _limbs(bend) {

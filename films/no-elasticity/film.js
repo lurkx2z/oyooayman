@@ -16,6 +16,7 @@ const NE_HAND_POSES = Object.assign({}, HAND_POSES, {
 // the bow (left fist round the grip, arm out toward the target; right fingers hooked on the string, drawn to the jaw)
 Object.assign(NE_HAND_POSES, {
   bowHold: { p: [0.07, -0.05, -0.7], F: [-0.25, 0.1, -0.96], N: [-0.97, 0, 0.25], curl: [1.25, 1.35, 1.42, 1.5], thumb: [0.35, 0.95] },
+  bowShow: { p: [0.06, -0.06, -0.78], F: [-0.22, 0.1, -0.97], N: [-0.97, 0, 0.22], curl: [1.25, 1.35, 1.42, 1.5], thumb: [0.35, 0.95] },
   bowLow:  { p: [0.3, -0.64, -0.36], F: [-0.45, 0.3, -0.84], N: [-0.85, -0.2, 0.4], curl: [1.25, 1.35, 1.42, 1.5], thumb: [0.35, 0.95] },
   nock:    { p: [0.05, 0.02, -0.52], F: [-0.6, -0.07, -0.8], N: [-0.8, 0, 0.6], curl: [1.1, 1.25, 1.2, 1.45], thumb: [0.15, 0.7] },
   drawn:   { p: [0.07, -0.2, -0.19], F: [-0.6, -0.07, -0.8], N: [-0.8, 0, 0.6], curl: [1.1, 1.25, 1.2, 1.45], thumb: [0.15, 0.7], trem: 0.003 },
@@ -23,22 +24,25 @@ Object.assign(NE_HAND_POSES, {
   // the tuning fork (right fist round the stem, the prongs up); the strike on the table; up in front of your eyes
   forkUp:   { p: [0.08, -0.17, -0.42], F: [-0.08, 0.06, -1], N: [-1, 0, 0.08], curl: [1.45, 1.5, 1.55, 1.6], thumb: [0.3, 0.9] },
   // the strike: palm down over the table, the fork flat out of the thumb side; its lower prong slaps the table top
-  forkAim:  { p: [0.1305, 0.0507, -0.6243], F: [-0.3582, 0.3529, -0.8644], N: [0.2795, -0.8429, -0.4599], curl: [1.45, 1.5, 1.55, 1.6], thumb: [0.3, 0.9] },
-  forkHit:  { p: [0.1305, -0.0259, -0.6715], F: [-0.3582, 0.3529, -0.8644], N: [0.2795, -0.8429, -0.4599], curl: [1.45, 1.5, 1.55, 1.6], thumb: [0.3, 0.9] },
-  forkShow: { p: [0.012, -0.12, -0.25], F: [-0.04, 0.0, -1], N: [-1, 0, 0.04], curl: [1.45, 1.5, 1.55, 1.6], thumb: [0.3, 0.9], trem: 0.0018 },
+  forkAim:  { p: [0.1205, 0.0699, -0.5519], F: [-0.3582, 0.446, -0.8202], N: [0.2795, -0.787, -0.55], curl: [1.45, 1.5, 1.55, 1.6], thumb: [0.3, 0.9] },
+  forkHit:  { p: [0.1205, -0.001, -0.6073], F: [-0.3582, 0.446, -0.8202], N: [0.2795, -0.787, -0.55], curl: [1.45, 1.5, 1.55, 1.6], thumb: [0.3, 0.9] },
+  forkShow: { p: [0.012, -0.15, -0.31], F: [-0.04, 0.0, -1], N: [-1, 0, 0.04], curl: [1.45, 1.5, 1.55, 1.6], thumb: [0.3, 0.9], trem: 0.0018 },
   // your watch: left forearm across in front of you, the dial turned up toward your eyes
   watchUp:  { p: [-0.025, -0.005, -0.3], F: [-0.95, 0.1, -0.3], N: [0, -0.6, -0.8], curl: [0.55, 0.65, 0.75, 0.85], thumb: [0.4, 0.35], trem: 0.0016 },
 });
-const NE_HAND_BLEND = Object.assign({}, HAND_BLEND, { bandIn: 0.5, bandOut: 0.5, bowHold: 0.3, bowLow: 0.55, nock: 0.25, drawn: 0.95, loose: 0.07,
+const NE_HAND_BLEND = Object.assign({}, HAND_BLEND, { bandIn: 0.5, bandOut: 0.5, bowHold: 0.3, bowShow: 0.6, bowLow: 0.55, nock: 0.25, drawn: 0.95, loose: 0.07,
   forkUp: 0.3, forkAim: 0.4, forkHit: 0.11, forkShow: 0.55, watchUp: 0.62 });
 for (const k of Object.keys(NE_HAND_POSES)) { if (k.endsWith('!')) continue; NE_HAND_POSES[k + '!'] = NE_HAND_POSES[k]; NE_HAND_BLEND[k + '!'] = 0.02; }
 
 // the cinematic shots: camera position / look-at / fov as functions of story time (null fields keep your own view)
 const NE_BALL_A0 = 76;   // where the ball inserts look from (degrees round the ball): mostly clear of his legs
 const NE_SHOTS = [
-  // low on the paving beside the dead ball: a dashed ring shows its round shape; the flat spot keeps it lower, and when
-  // his hand presses on it nothing changes back
-  { id: 'ball', t0: NE.ballShot[0], t1: NE.ballShot[1],
+  // low beside the cradle at the height of its balls: the row stuck together, swinging a little as one; a dashed ghost
+  // where the end ball would normally have flown
+  { id: 'cradle', t0: NE.cradleIns[0], t1: NE.cradleIns[1],
+    cam: (t) => { const C = NE_CRADLE, u = Ease.inOutSine((t - NE.cradleIns[0]) / (NE.cradleIns[1] - NE.cradleIns[0])), by = C.y0 + C.bar + 0.01 - C.L, zc = C.z - 0.056;
+      return { p: [C.x - 1.02 + 0.03 * u, by + 0.07 - 0.01 * u, zc + 0.02], at: [C.x, by + 0.03, zc], fov: 37, focus: [C.x, C.z, 0.95] }; } },
+  { id: 'ball', street: true, t0: NE.ballShot[0], t1: NE.ballShot[1],
     cam: (t, app) => { const [bx, bz] = app.ball.spot(app.cast), u = Ease.inOutSine((t - NE.ballShot[0]) / (NE.ballShot[1] - NE.ballShot[0])), d = 1.0 - 0.14 * u, a = MathX.deg(NE_BALL_A0 - 14 * u);
       return { p: [bx + Math.cos(a) * d, NE_BALL.ground + 0.06, bz + Math.sin(a) * d], at: [bx, NE_BALL.ground + 0.1, bz], fov: 40, focus: [bx, bz, 4] }; } },
   { id: 'racket', t0: NE.mont[0][0], t1: NE.mont[0][1], label: 'TENNIS RACKETS', line: 'The strings stretch… and stay stretched.',
@@ -84,24 +88,40 @@ const NE_SHOTS = [
   // low on the paving behind the arrow that just dropped, looking along it at the target 14 m away: untouched
   { id: 'arrow', t0: NE.bow.shot[0], t1: NE.bow.shot[1],
     cam: (t, app) => { const L = app.bow.arrow.lying(app) || { x: NE_ARCH.x, z: NE_ARCH.z - 0.8, yaw: 0 }, u = Ease.inOutSine((t - NE.bow.shot[0]) / (NE.bow.shot[1] - NE.bow.shot[0])), [tx, tz] = NE_ARCH.target;
-      // right behind it and a little above, looking down the plaza: the arrow on the paving points at the target it never reached
-      const fx = -Math.sin(L.yaw), fz = -Math.cos(L.yaw), back = 0.62 - 0.14 * u;
-      return { p: [L.x - fx * back + 0.04, 0.78 - 0.06 * u, L.z - fz * back], at: [tx, -3.2, tz], fov: 56, focus: [NE_ARCH.x, (NE_ARCH.z + tz) / 2, 12] }; } },
+      // low beside it and a little behind: the arrow lies across the frame, its fletching near you, the target it never reached
+      // high in the frame beyond it
+      // (the 9:16 frame is narrow: just behind the nock and barely to its right, so the arrow recedes up the frame)
+      const fx = -Math.sin(L.yaw), fz = -Math.cos(L.yaw), rx = -fz, rz = fx, back = 0.47 - 0.06 * u, side = 0.08;
+      return { p: [L.x - fx * back + rx * side, 0.32 - 0.02 * u, L.z - fz * back + rz * side], at: [tx, -2.18, tz], fov: 50, focus: [L.x + fx * 0.5, L.z + fz * 0.5, 3] }; } },
   // inside your watch (the macro set): the dial lifts away, down past the gears to the quartz crystal
   { id: 'quartz', t0: NE.quartz[0], t1: NE.quartz[1], cam: (t, app) => app.quartz.shot(t) },
   // the plaza clock face, frozen; the camera rises and pulls back over the plaza into the time-lapse
   { id: 'clock', t0: NE.clockShot[0], t1: NE.lapse[0], cam: (t) => neLapseCam(t) },
-  { id: 'lapse', t0: NE.lapse[0], t1: NE.end + 1, cam: (t) => neLapseCam(t) },
+  // time-lapse inserts: low beside the trampoline (a light kid lands: nothing; a heavier adult: deeper), then a plaza tree
+  // side-on to the wind, its old upright trunk dashed in
+  { id: 'trampIns', t0: NE.ins.tramp[0], t1: NE.ins.tramp[1],
+    cam: (t) => { const u = Ease.inOutSine((t - NE.ins.tramp[0]) / (NE.ins.tramp[1] - NE.ins.tramp[0])), T = NE_TRAMP;
+      return { p: [T.x + 5.6 - 0.5 * u, 1.75 - 0.1 * u, T.z + 4.6 - 0.4 * u], at: [T.x - 0.2, 0.55, T.z], fov: 44, focus: [T.x, T.z, 7.5] }; } },
+  { id: 'treeIns', t0: NE.ins.tree[0], t1: NE.ins.tree[1],
+    cam: (t) => { const u = Ease.inOutSine((t - NE.ins.tree[0]) / (NE.ins.tree[1] - NE.ins.tree[0])), [tx, tz] = NE_CITY.trees[NE_LEAN_TREE], sx = -NE_WIND[1], sz = NE_WIND[0];
+      // (side-on to the wind, from the pavement: the lean is across the frame, to the right)
+      const d = 8.6 - 0.6 * u;
+      return { p: [tx + sx * d, 1.45, tz + sz * d], at: [tx + NE_WIND[0] * 0.7, 3.5, tz + NE_WIND[1] * 0.7], fov: 50, focus: [tx, tz, d] }; } },
+  { id: 'lapse', t0: NE.lapse[0], t1: NE.night, cam: (t) => neLapseCam(t) },
+  // night: close on the plaza clock, its dial lit, still at 3:41
+  { id: 'night', t0: NE.night, t1: NE.end + 1,
+    cam: (t) => { const C = NE_CLOCK, n = [Math.sin(C.ry), Math.cos(C.ry)], x = [n[1], -n[0]], u = Ease.outSine(MathX.clamp((t - NE.night) / (NE.end - NE.night), 0, 1)), d = 3.6 - 1.0 * u, o = 0.7 - 0.35 * u;
+      return { p: [C.x + n[0] * d + x[0] * o, C.h - 0.95 + 0.25 * u, C.z + n[1] * d + x[1] * o], at: [C.x + x[0] * 0.18, C.h + 0.1, C.z + x[1] * 0.18], fov: 42, focus: [C.x, C.z, d + 2] }; } },
 ].filter((s) => NE_STREET || !s.street);
 
 // the clock shot and the time-lapse: one continuous camera (face-on to the clock, then up and back over the plaza; then a
 // slow drift through the afternoon)
-const NE_LAPSE_CAM = { p0: [10.45, 4.85, -5.3], p1: [10.95, 4.7, -5.75], at0: [21.2, 0.4, -18.2], at1: [21.0, 0.4, -18.4], fov: 48 };
+const NE_LAPSE_CAM = { p0: [10.3, 4.0, -6.7], p1: [10.95, 3.8, -7.2], at0: [18.8, 2.3, -13.7], at1: [18.8, 2.2, -13.7], fov: 56 };
 function neLapseCam(t) {
   const C = NE_CLOCK, n = [Math.sin(C.ry), Math.cos(C.ry)], head = [C.x, C.h, C.z], L = NE_LAPSE_CAM;
-  const lap = MathX.clamp((t - NE.lapse[0]) / (NE.end - NE.lapse[0]), 0, 1), q = (a, b, u) => a.map((v, i) => v + (b[i] - v) * u);
+  const lap = Ease.inOutSine(MathX.clamp((t - NE.lapse[0]) / (NE.night - NE.lapse[0]), 0, 1)), q = (a, b, u) => a.map((v, i) => v + (b[i] - v) * u);
   const pL = q(L.p0, L.p1, lap), aL = q(L.at0, L.at1, lap);
-  if (t >= NE.lapse[0]) return { p: pL, at: aL, fov: L.fov, focus: [20.5, -17, 24] };
+  if (t >= NE.lapse[0]) return { p: pL, at: aL, fov: L.fov, focus: [17, -11.5, 16] };
   // the clock shot: face-on, a little below the dial; then (from 38.9) up and back to the time-lapse framing
   const u = (t - NE.clockShot[0]) / (NE.lapse[0] - NE.clockShot[0]), k = Ease.inOutSine(MathX.clamp((t - 38.6) / (NE.lapse[0] - 38.6), 0, 1));
   const pC = [head[0] + n[0] * (2.5 - 0.25 * u) + 0.25, head[1] - 0.32, head[2] + n[1] * (2.5 - 0.25 * u)], aC = [head[0], head[1] - 0.04, head[2]];
@@ -111,13 +131,14 @@ function neLapseCam(t) {
 // labels pinned to things in the world: [t0, t1, point(t, app) → [x, y, z], text]
 const NE_TAGS = [
   // (new beats)
-  { t0: 25.4, t1: 27.1, at: (t, app) => app.fork.tipWorld(t), text: 'PUSHED IN · STAYS IN', cls: 'ne-tag line' },
+  { t0: 25.4, t1: 27.1, at: (t, app) => app.fork.tipWorld(t), text: 'STAYS BENT · DRAWN 10× BIGGER', cls: 'ne-tag line' },
   { t0: 32.0, t1: 33.5, at: () => neQ(NE_Q.can[0] + 0.6, NE_Q.can[1] + 0.4, NE_Q.can[2]), text: 'THE QUARTZ CRYSTAL' },
   { t0: 33.85, t1: 35.75, at: () => neQ(NE_Q.can[0] + 1.6, NE_Q.can[1] + 0.4, NE_Q.can[2] + 0.9), text: 'NORMALLY', cls: 'ne-tag line' },
-  { t0: 44.6, t1: 46.9, at: () => [NE_TRAMP.x, 0.95, NE_TRAMP.z], text: 'DEEPER AFTER EVERY JUMP' },
-  { t0: 47.0, t1: 49.2, at: () => [NE_CITY.trees[2][0] + 0.8, 5.6, NE_CITY.trees[2][1]], text: 'EVERY GUST BENDS THEM FURTHER' },
+  { t0: NE.ins.tramp[0] + 0.25, t1: NE.ins.tramp[1] - 0.1, at: () => [NE_TRAMP.x, 0.95, NE_TRAMP.z], text: 'DEEPER ONLY WHEN SOMEONE HEAVIER LANDS' },
+  { t0: NE.ins.tree[0] + 0.25, t1: NE.ins.tree[1] - 0.1, at: () => [NE_CITY.trees[NE_LEAN_TREE][0], 5.4, NE_CITY.trees[NE_LEAN_TREE][1]], text: 'EACH STRONGER GUST BENDS IT FURTHER' },
   // (the first cut)
-  { t0: 3.55, t1: 5.45, at: (t, app) => { const [bx, bz] = app.ball.spot(app.cast); return [bx, NE_BALL.ground + 2 * NE_BALL.r + 0.004, bz]; }, text: 'WHERE ITS TOP USED TO BE', cls: 'ne-tag line' },
+  { t0: 3.45, t1: NE.cradleIns[1] - 0.1, at: (t, app) => { const g = app.cradle.ghostWorld(); g[1] += NE_CRADLE.r + 0.004; return g; }, text: 'NORMALLY, THIS ONE FLIES OUT', cls: 'ne-tag line' },
+  { street: true, t0: 3.55, t1: 5.45, at: (t, app) => { const [bx, bz] = app.ball.spot(app.cast); return [bx, NE_BALL.ground + 2 * NE_BALL.r + 0.004, bz]; }, text: 'WHERE ITS TOP USED TO BE', cls: 'ne-tag line' },
   { t0: 16.15, t1: 17.35, at: () => [NE_TRAMP.x - 1.2, 1.35, NE_TRAMP.z + 1.2], text: 'SPRINGS STRETCHED · MAT STAYS DOWN' },
   { street: true, t0: 23.9, t1: 25.4, at: (t, app) => { const w = app.heroWheel(t); return [w.x + 0.15, 0.62, w.z - 0.75]; }, text: 'WHERE THE BODY USED TO SIT', cls: 'ne-tag line' },
   { street: true, t0: 25.8, t1: 26.85, at: (t, app) => { const w = app.heroWheel(t); return [w.x, 0.98, w.z]; }, text: 'SPRING STAYS SQUASHED', cls: 'ne-tag line' },
@@ -144,6 +165,7 @@ const FILM = {
     app.cushions = new NeCushions(scene);
     app.target = new NeTarget(scene);
     app.clock = new NeClock(scene);
+    app.cradle = new NeCradle(scene);
     app.quartz = new NeQuartz(scene);
     app.lapse = new NeLapse(app);
     app.cast = new NeCast(app);
@@ -258,6 +280,7 @@ const FILM = {
     app.bow.update(t, app);
     app.fork.update(t);
     app.clock.update(t);
+    app.cradle.update(t);
     app.quartz.update(t);
     app.lapse.update(t);
     // the ball's old outline, turned to the low camera

@@ -15,7 +15,7 @@ const NE_ARROW_LAND = 0.68;
 class NeAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
   // anything the sound depends on that is not inside SCRIPT (so a stale baked copy is detected)
-  fingerprintData() { return [NE, NE_WALKERS.map((w) => [w.tm, w.v, w.dz]), NE_CRASH.tv, NE_TAP, NE_BALL, NE_RACKET, NE_SHOE, NE_STREET, NE_PIT, NE_GUSTS, NE_CLOCK, NE_ARROW_LAND]; }
+  fingerprintData() { return [NE, NE_WALKERS.map((w) => [w.tm, w.v, w.dz]), NE_CRASH.tv, NE_TAP, NE_BALL, NE_RACKET, NE_SHOE, NE_STREET, NE_PIT, NE_GUSTS, NE_CLOCK, NE_ARROW_LAND, NE_CRADLE]; }
 
   _build(ctx) {
     const S = new SoundKit(ctx, CONFIG.seed), T = NE, END = CONFIG.duration + 1.4, app = this.app, TR = app.traffic;
@@ -39,7 +39,7 @@ class NeAudio extends AudioEngine {
     const amb = bus(0.75), you = bus(0.8), mus = bus(0.42), fx = bus(1.0), cars = bus(0.9);
     // a short dip of the bed and the music just before each dead hit, so the thud lands in a small silence
     { const dk = ctx.createGain(); dk.connect(mix); for (const b of [amb, mus]) { b.disconnect(); b.connect(dk); }
-      const hits = (ST ? [[neBallTimes().tc4, 0.75], [T.land, 0.6], [38.85, 0.55], [NE.tap, 0.6]] : [[neBallTimes().tc4, 0.75], [T.land, 0.6], [NE.bow.release, 0.7], [NE.fork.strike, 0.6]]).sort((a, b) => a[0] - b[0]);
+      const hits = (ST ? [[neBallTimes().tc4, 0.75], [T.land, 0.6], [38.85, 0.55], [NE.tap, 0.6]] : [[NE_CRADLE.dead, 0.6], [T.land, 0.6], [NE.bow.release, 0.7], [NE.fork.strike, 0.6]]).sort((a, b) => a[0] - b[0]);
       dk.gain.setValueAtTime(1, 0);
       for (const [t, d] of hits) { dk.gain.setValueAtTime(1, t - 0.35); dk.gain.linearRampToValueAtTime(1 - d, t - 0.03); dk.gain.setValueAtTime(1 - d, t + 0.08); dk.gain.linearRampToValueAtTime(1, t + 0.6); } }
     const R = (a, b) => S.rng.range(a, b);
@@ -75,13 +75,13 @@ class NeAudio extends AudioEngine {
     bed('brown', 300, 0.7, 0.16); bed('pink', 1600, 0.5, 0.06);
     if (ST) { amb.gain.setValueAtTime(0.75, 0); amb.gain.linearRampToValueAtTime(0.75, 52.4); amb.gain.linearRampToValueAtTime(0.12, 53.1); amb.gain.setValueAtTime(0.12, T.crash); amb.gain.linearRampToValueAtTime(0.35, T.crash + 0.3);   // a held breath before the hit
     amb.gain.setValueAtTime(0.35, 57); amb.gain.linearRampToValueAtTime(0.5, 60); amb.gain.linearRampToValueAtTime(0.0, T.end + 0.3); }
-    if (!ST) {   // the plaza; a quieter room at the café table; almost nothing inside the watch; the plaza again, into the evening
-      amb.gain.setValueAtTime(0.75, 0); amb.gain.setValueAtTime(0.75, NE.fork.t0 - 0.05); amb.gain.linearRampToValueAtTime(0.42, NE.fork.t0 + 0.05);
+    if (!ST) {   // a quiet room at the café table; the plaza; the café again; almost nothing inside the watch; the plaza, into the evening
+      amb.gain.setValueAtTime(0.42, 0); amb.gain.setValueAtTime(0.42, NE.cradleIns[1] - 0.05); amb.gain.linearRampToValueAtTime(0.75, NE.cradleIns[1] + 0.05); amb.gain.setValueAtTime(0.75, NE.fork.t0 - 0.05); amb.gain.linearRampToValueAtTime(0.42, NE.fork.t0 + 0.05);
       amb.gain.setValueAtTime(0.42, NE.quartz[0]); amb.gain.linearRampToValueAtTime(0.1, NE.quartz[0] + 0.4);
       amb.gain.setValueAtTime(0.1, NE.clockShot[0] - 0.05); amb.gain.linearRampToValueAtTime(0.75, NE.clockShot[0] + 0.1);
       amb.gain.setValueAtTime(0.75, 50); amb.gain.linearRampToValueAtTime(0.5, 56); amb.gain.linearRampToValueAtTime(0.0, NE.end + 0.3);
     }
-    for (let t = 0.6; t < (ST ? 50 : 52); t += R(1.6, 4.2)) { if (!ST && t > NE.fork.t0 - 0.3 && t < NE.clockShot[0] + 0.3) continue; S.chirp(t, R(2600, 4200), R(0.012, 0.025), R(0.1, 0.6), amb, false); }
+    for (let t = 0.6; t < (ST ? 50 : 52); t += R(1.6, 4.2)) { if (!ST && (t < NE.cradleIns[1] || (t > NE.fork.t0 - 0.3 && t < NE.clockShot[0] + 0.3))) continue; S.chirp(t, R(2600, 4200), R(0.012, 0.025), R(0.1, 0.6), amb, false); }
 
     // 2. your footsteps (from the camera's walk)
     { const xT = new Track(SCRIPT.camera.x), zT = new Track(SCRIPT.camera.z);
@@ -92,7 +92,7 @@ class NeAudio extends AudioEngine {
       } }
 
     // 3. the dribble: a solid rubber ball's bright "thock" (it rings a little: elastic), then the bounce that dies, then the dead thud
-    { const tb = NE_TEEN, D = T.dribble;
+    if (ST) { const tb = NE_TEEN, D = T.dribble;
       for (let k = 0; k < 4; k++) {
         const tc = D.t0 + (k + 0.5) * D.P, weak = k === 3; if (tc < 0.02) continue; const P = place(tb.x, tb.z, tc, 5);
         thud(tc, (weak ? 0.5 : 0.75) * P.g * 2.2, P.pan, fx, weak ? 150 : 210, 70, 0.08);
@@ -105,7 +105,7 @@ class NeAudio extends AudioEngine {
     }
 
     // 4. the rule bites: a low hit and a sound like a string going slack (a falling, de-tuning tone)
-    S.thump(T.rule[0] + 0.12, 0.45, fx);
+    S.thump(T.rule[0] + (ST ? 0.12 : 0.02), ST ? 0.45 : 0.3, fx);
     for (const [f, v] of [[196, 0.06], [293.7, 0.04], [392, 0.025]]) {
       const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(f, T.rule[0]); o.frequency.exponentialRampToValueAtTime(f * 0.5, T.rule[1] + 0.4);
       g.gain.setValueAtTime(0, T.rule[0]); g.gain.linearRampToValueAtTime(v, T.rule[0] + 0.25); g.gain.linearRampToValueAtTime(0, T.rule[1] + 0.6);
@@ -119,7 +119,7 @@ class NeAudio extends AudioEngine {
       bp.frequency.setValueAtTime(500, NE_RACKET.hit - 0.35); bp.frequency.linearRampToValueAtTime(1600, NE_RACKET.hit); n.connect(bp); bp.connect(g); g.connect(fx);
       thud(NE_RACKET.hit, 0.55, 0.05, fx, 260, 110, 0.07);
       burst(NE_RACKET.hit, 0.25, 'white', 2400, 3, 0.03, 0.05, fx, 0.004);            // the strings creaking as they stretch
-      thud(NE_RACKET.hit + 0.32 + Math.sqrt(2 * 1.1 / NE_G), 0.35, 0.15, fx, 180, 80, 0.06);
+      thud(NE_RACKET.hit + 0.14 + Math.sqrt(2 * 1.1 / NE_G), 0.35, 0.15, fx, 180, 80, 0.06);
       // shoe: the swing (cloth), the heel strike, the foam flattening (a soft hiss), the toe-off scuff
       burst(NE_SHOE.strike - 0.3, 0.3, 'pink', 700, 0.7, 0.04, 0, fx, 0.15);
       thud(NE_SHOE.strike, 0.6, 0, fx, 140, 60, 0.09);
@@ -147,8 +147,17 @@ class NeAudio extends AudioEngine {
 
     if (!ST) {
     // 7. the new cut's beats
-    // 7a. the plaza clock: two quiet quartz ticks… and the second one (one second in) is its last
-    for (const tk of [0.0, NE.stop]) { const P = place(NE_CLOCK.x, NE_CLOCK.z, tk, 6); S.tick(tk + 0.01, 2900, 0.05 * P.g * 2, pan(fx, P.pan)); S.click(tk + 0.012, 0.03 * P.g * 2, P.pan, fx); }
+    // 7a. the café: far voices. The desk clock: two quartz ticks… and the second one (one second in) is its last
+    S.chatter(0.1, NE.cradleIns[1] - 0.1, 0.006, -0.25, amb, 360, 2.6);
+    for (const tk of [0.0, NE.stop]) { S.tick(tk + 0.01, 2900, 0.06, pan(fx, 0.35)); S.click(tk + 0.012, 0.035, 0.35, fx); }
+    // the Newton's cradle: three bright steel clacks (the hit passed along by springing back)… then one dead "tock" and
+    // the row swinging as one, in silence
+    NE_CRADLE.hits.forEach((tc, i) => { const p = i % 2 ? 0.08 : -0.08;
+      burst(tc, 0.025, 'white', 5200, 1.6, 0.09, p, fx, 0.001); S.click(tc, 0.07, p, fx);
+      S.tone(tc, 0.16, 2650, 0.045, p, fx, 'sine', 0.001, 0.14); S.tone(tc, 0.1, 4310, 0.022, p, fx, 'sine', 0.001, 0.08); S.tone(tc, 0.07, 6890, 0.01, p, fx, 'sine', 0.001, 0.05); });
+    thud(NE_CRADLE.dead, 0.55, 0.05, fx, 340, 140, 0.04); burst(NE_CRADLE.dead, 0.06, 'pink', 900, 0.9, 0.05, 0.05, fx, 0.002);
+    // the rewatch line: one last quiet tick (the clock you will now go back and watch)
+    S.tick(NE.rewatch[0] + 0.15, 2900, 0.035, pan(rev, 0.2));
     // 7b. the bow: the arrow nocks, the limbs bend (a soft, dead creasing, like bending lead: no creak), a held breath; at the
     //     release the string just goes slack (a soft "fwup", no twang) and the arrow clatters once at your feet
     { const B = NE.bow;

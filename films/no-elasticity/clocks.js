@@ -121,7 +121,7 @@ class NeQuartz {
       add(new THREE.BoxGeometry(1.3, 0.3, 11), steel, 5.4, 1.78, -5.2, 0, 0.62, 0); }
     // the step motor: a copper coil on its core, the stator, the rotor (a small magnet)
     add(new THREE.CylinderGeometry(1.7, 1.7, 7.5, 24), copper, -7.4, 2.2, -3.4, 0, 0, Math.PI / 2);
-    for (const dx of [-3.95, 3.95]) add(new THREE.CylinderGeometry(2.1, 2.1, 0.4, 24), dark, -7.4 + dx, 2.2, -3.4, 0, 0, Math.PI / 2);
+    for (const dx of [-3.95, 3.95]) add(new THREE.CylinderGeometry(1.9, 1.9, 0.4, 24), dark, -7.4 + dx, 2.2, -3.4, 0, 0, Math.PI / 2);
     add(new THREE.BoxGeometry(12, 0.6, 1.6), steel, -5.6, 0.3, -3.4);
     add(new THREE.BoxGeometry(1.6, 0.6, 4.2), steel, 0.5, 0.3, -2.4);
     add(new THREE.CylinderGeometry(1.25, 1.25, 1.0, 20), Mat.std('#3b4655', { roughness: 0.35, metalness: 0.6 }), -0.6, 0.8, -1.4);
@@ -211,16 +211,22 @@ class NeQuartz {
 // the time-lapse dressing
 // ---------------------------------------------------------------------------------------------------------------------
 // the trampoline: each heavier jumper stretches the mat further, and it stays (until the middle rests on the ground)
-const NE_PIT = [[42.7, 0.45], [44.6, 0.53], [47.0, 0.6], [49.4, 0.66], [51.8, 0.71], [54.3, 0.75]];
+// [time, the mat's new depth (m), who]: it only goes deeper when someone heavier than every jumper before lands (a lighter
+// kid changes nothing); the last, heaviest landing takes the mat down to the paving
+const NE_PIT = [[42.7, 0.45, 12], [44.2, 0.56, 13], [45.5, 0.56, 15], [46.55, 0.66, 2], [51.2, 0.72, 6], [53.9, 0.79, 9]];
 function neTrampLapse(t) { let d = 0; for (const [ts, dd] of NE_PIT) { if (t < ts) break; d += (dd - d) * Ease.outCubic(MathX.clamp((t - ts) / 0.12, 0, 1)); } return d; }
 // the trees: every gust bends them a little further and they stay bent (the running maximum of the gusts so far)
-const NE_GUSTS = (() => { const r = new RNG(707), out = []; let s = 0; for (let t = 41.9; t < 57.6; t += r.range(1.2, 2.3)) { s += r.range(0.06, 0.16); out.push([t, Math.min(1, s)]); } return out; })();
+// the gusts [time, the lean they leave (0..1)]: each one only adds when it is stronger than every gust before it; the two
+// strongest land while the tree insert watches (47.3–49.6)
+const NE_GUSTS = [[42.3, 0.12], [43.6, 0.22], [45.0, 0.33], [46.4, 0.45], [47.75, 0.62], [48.75, 0.8], [50.6, 0.86], [52.4, 0.92], [54.2, 0.96], [56.0, 1.0]];
 function neTreeLean(t) {
   let l = 0;
   for (const [tg, s] of NE_GUSTS) { if (t < tg) break; const k = MathX.smooth(t, tg, tg + 0.14), over = 0.12 * Math.sin(Math.PI * MathX.clamp((t - tg) / 0.3, 0, 1)); l = Math.max(l, (s + over) * k + l * (1 - k)); }
   return l;
 }
 // the plaza lamps (they come on at dusk)
+// the tree the time-lapse insert watches lean (an index into NE_CITY.trees; the pavement side of it is open)
+const NE_LEAN_TREE = 0;
 const NE_LAMPS = [[14.0, -14.0], [23.0, -8.2], [21.2, -24.6], [14.3, -23.2]];
 // facing toward a point (a person's face angle, degrees, for the cast's faceAt)
 const neFaceTo = (x, z, tx, tz) => Math.atan2(tx - x, tz - z) * 180 / Math.PI - 180;
@@ -258,10 +264,15 @@ class NeLapse {
       arrows.forEach((a, i) => { q.setFromEuler(e.set(0, a.yaw, 0)); m.compose(new THREE.Vector3(a.x, 0.152 + 0.004 * (i % 3), a.z), q, new THREE.Vector3(1, 1, 1)); this.shafts.setMatrixAt(i, m); this.vanes.setMatrixAt(i, m); this.vanes.setColorAt(i, c.set(a.col)); });
       for (const o of [this.shafts, this.vanes]) { o.count = 0; o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false; scene.add(o); }
     }
+    // the tree insert: a dashed line up the trunk where it stood (straight up from the planter)
+    { const lm = new THREE.MeshBasicMaterial({ color: '#ffd23e', fog: false }), lg = new THREE.Group(), [tx, tz] = NE_CITY.trees[NE_LEAN_TREE];
+      for (let y = 0.85; y < 5.6; y += 0.28) { const d = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.15, 0.05), lm); d.position.set(tx, y, tz); lg.add(d); }
+      lg.visible = false; scene.add(lg); this.trunkLine = lg; }
     this._t = -1;
   }
 
   update(t) {
+    this.trunkLine.visible = t >= NE.ins.tree[0] && t < NE.ins.tree[1];
     const k = neDusk(t);
     this.lantern.emissiveIntensity = 2.6 * k; this.poolMat.opacity = 0.5 * k;
     let n = 0; while (n < this.arrows.length && this.arrows[n].t <= t) n++;
@@ -275,9 +286,11 @@ function neLapseVisits() {
   const r = new RNG(1508), out = [], L0 = NE.lapse[0] + 0.25, L1 = NE.note[1] - 0.3, T = NE_TRAMP, C = NE_CLOCK;
   const cn = [Math.sin(C.ry), Math.cos(C.ry)];                      // the clock's front face direction
   const spot = {
-    clock: () => { const s = r.next() < 0.75 ? 1 : -1, a = r.range(-0.7, 0.7), d = r.range(1.3, 2.6), x = C.x + s * (cn[0] * Math.cos(a) + cn[1] * Math.sin(a)) * d, z = C.z + s * (cn[1] * Math.cos(a) - cn[0] * Math.sin(a)) * d;
+    // (people at the clock stand behind it, looking at its back face: the camera is in front)
+    clock: () => { const s = -1, a = r.range(-0.7, 0.7), d = r.range(1.6, 3.0), x = C.x + s * (cn[0] * Math.cos(a) + cn[1] * Math.sin(a)) * d, z = C.z + s * (cn[1] * Math.cos(a) - cn[0] * Math.sin(a)) * d;
       return { x, z, face: neFaceTo(x, z, C.x, C.z), act: r.pick(['look', 'handHead', 'idle']) }; },
-    rim: () => { const a = r.range(0, Math.PI * 2), d = r.range(2.2, 2.6), x = T.x + Math.cos(a) * d, z = T.z + Math.sin(a) * d; return { x, z, face: neFaceTo(x, z, T.x, T.z), act: r.pick(['idle', 'look', 'handHead']) }; },
+    // (never on the side the trampoline insert looks from)
+    rim: () => { const a = 0.68 + 1.05 + r.range(0, 4.2), d = r.range(2.2, 2.6), x = T.x + Math.cos(a) * d, z = T.z + Math.sin(a) * d; return { x, z, face: neFaceTo(x, z, T.x, T.z), act: r.pick(['idle', 'look', 'handHead']) }; },
     arch: () => { const x = NE_ARCH.x + r.range(-1.3, 1.3), z = NE_ARCH.z + 0.1; return { x, z, face: r.range(-8, 8), act: 'idle', kind: 'arch' }; },
     bench: () => { const b = r.next() < 0.5, x = (b ? 20.8 : 24.0) + r.pick([-0.5, 0.5]) + r.range(-0.08, 0.08), z = b ? -6.0 + 0.05 : -27.8 - 0.05; return { x, z, face: b ? 0 : 180, act: 'sit', seat: 0.47 }; },
     planter: () => { const [px, pz] = r.pick(NE_CITY.trees), a = r.int(0, 3), ox = [1.28, 0, -1.28, 0][a], oz = [0, 1.28, 0, -1.28][a], x = px + ox + (oz ? r.range(-0.6, 0.6) : 0), z = pz + oz + (ox ? r.range(-0.6, 0.6) : 0);
@@ -288,12 +301,12 @@ function neLapseVisits() {
   // the trampoline jumpers come first (they set the mat's new depths), then everyone else fills the gaps
   const busy = Array.from({ length: ppl }, () => []);
   const free = (i, a, b) => busy[i].every(([c, d]) => b <= c - 0.15 || a >= d + 0.15);
-  NE_PIT.forEach(([ts], j) => { const i = [12, 2, 15, 6, 13, 9][j], v = { who: i, t0: ts - 0.12, t1: ts + 0.75, kind: 'pit', x: T.x + r.range(-0.25, 0.25), z: T.z + r.range(-0.25, 0.25), face: r.range(-180, 180), act: 'neKidLand' }; out.push(v); busy[i].push([v.t0, v.t1]); });
+  NE_PIT.forEach(([ts, , i]) => { const v = { who: i, t0: ts - 0.12, t1: ts + 0.75, kind: 'pit', x: T.x + r.range(-0.25, 0.25), z: T.z + r.range(-0.25, 0.25), face: r.range(-180, 180), act: 'neKidLand' }; out.push(v); busy[i].push([v.t0, v.t1]); });
   for (let i = 0; i < ppl; i++) {
     let t = L0 + r.range(0, 1.6);
     while (t < L1) {
       const u = (t - L0) / (L1 - L0), dur = r.range(0.7, 2.6) * (u > 0.75 ? 1.8 : 1);
-      const w = u < 0.55 ? [['clock', 3], ['rim', 2], ['arch', 3], ['bench', 1], ['planter', 1], ['court', 2], ['walk', 3]] : [['clock', 2], ['rim', 1], ['arch', 1], ['bench', 3], ['planter', 3], ['court', 1], ['walk', 2]];
+      const w = u < 0.55 ? [['clock', 3], ['rim', 2], ['arch', 3], ['bench', 1], ['planter', 1], ['court', 2], ['walk', 1]] : [['clock', 2], ['rim', 1], ['arch', 1], ['bench', 3], ['planter', 3], ['court', 1], ['walk', 1]];
       let kind = 'walk', sum = w.reduce((s, x) => s + x[1], 0), pick = r.range(0, sum); for (const [k, ww] of w) { if ((pick -= ww) <= 0) { kind = k; break; } }
       if (kind === 'walk') {
         const d = r.range(0.22, 0.5), a = [r.range(12.8, 31), r.pick([-2.4, -33.0])], b = [r.range(12.8, 31), a[1] < -10 ? -2.4 : -33.0];
@@ -306,8 +319,8 @@ function neLapseVisits() {
     }
   }
   // at dusk a few stay on: two kids sitting in the pit, a couple under the lamp by the clock
-  out.push({ who: 12, t0: 55.2, t1: 60, kind: 'pit', x: T.x + 0.2, z: T.z - 0.1, face: 120, act: 'sitGround' });
-  out.push({ who: 15, t0: 55.6, t1: 60, kind: 'pit', x: T.x - 0.25, z: T.z + 0.2, face: -60, act: 'sitGround' });
+  out.push({ who: 12, t0: 55.2, t1: 61, kind: 'pit', x: T.x + 0.2, z: T.z - 0.1, face: 120, act: 'sitGround' });
+  out.push({ who: 15, t0: 55.6, t1: 61, kind: 'pit', x: T.x - 0.25, z: T.z + 0.2, face: -60, act: 'sitGround' });
   for (const v of out) v.looks = looks[v.who];
   return { list: out, looks, n: ppl };
 }

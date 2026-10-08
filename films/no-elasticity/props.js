@@ -120,8 +120,8 @@ class NeTramp {
     // the mat: a polar grid (deformed every frame), black with a white border ring
     this.matGeo = new THREE.RingGeometry(0.0, T.mat, 64, 20); this.matGeo.rotateX(-Math.PI / 2);
     this.matBase = this.matGeo.attributes.position.array.slice();
-    const mc = Tex.canvas(256, 256), mx = mc.getContext('2d'); mx.fillStyle = '#151618'; mx.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 256; i += 4) { mx.fillStyle = 'rgba(255,255,255,0.045)'; mx.fillRect(i, 0, 1, 256); mx.fillRect(0, i, 256, 1); }
+    const mc = Tex.canvas(256, 256), mx = mc.getContext('2d'); mx.fillStyle = '#34373c'; mx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 256; i += 8) { mx.fillStyle = 'rgba(255,255,255,0.16)'; mx.fillRect(i, 0, 1, 256); mx.fillRect(0, i, 256, 1); }
     mx.strokeStyle = '#d8d2c2'; mx.lineWidth = 5; mx.beginPath(); mx.arc(128, 128, 120, 0, Math.PI * 2); mx.stroke();
     mx.lineWidth = 3; mx.beginPath(); mx.arc(128, 128, 22, 0, Math.PI * 2); mx.stroke();
     this.mat = new THREE.Mesh(this.matGeo, new THREE.MeshStandardMaterial({ map: Tex.tex(mc), roughness: 0.85, side: THREE.DoubleSide, name: 'neMat' }));
@@ -168,7 +168,8 @@ class NeTramp {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// montage insert 1: a tennis racket. The ball pockets the strings, sits there, rolls out and drops; the pocket stays.
+// montage insert 1: a tennis racket. The ball pockets the strings; only the air inside it pushes back, so it barely
+// leaves the strings and drops; the pocket stays.
 // ---------------------------------------------------------------------------------------------------------------------
 const NE_RACKET = { p: [22.0, 1.25, -6.0], hit: 6.25, a: 0.165, b: 0.128, pocket: 0.05 };
 class NeRacket {
@@ -230,11 +231,12 @@ class NeRacket {
     this.g.updateMatrixWorld(true);
     const L = this._v, τ = t - R.hit;
     if (τ < 0) L.set(-0.12 * τ * 3, 0.015 - 0.4 * τ, 0.034 - 22 * τ);
-    else if (τ < 0.32) L.set(0, 0.015 - 0.01 * MathX.smooth(τ, 0.05, 0.32), 0.034 - pk - 0.006 * MathX.smooth(τ, 0, 0.05));
-    else { const k = τ - 0.32; L.set(0.02 * k, 0.005 - 0.3 * k - 0.5 * NE_G * k * k, 0.034 - pk + 0.25 * k); }
+    else if (τ < 0.14) L.set(0, 0.015 - 0.01 * MathX.smooth(τ, 0.05, 0.14), 0.034 - pk - 0.006 * MathX.smooth(τ, 0, 0.05) + 0.006 * MathX.smooth(τ, 0.05, 0.14));
+    else { const k = τ - 0.14; L.set(0.02 * k, 0.005 - 0.2 * k - 0.5 * NE_G * k * k, 0.034 - pk + 0.6 * k); }
     this.ball.position.copy(L.applyMatrix4(this.g.matrixWorld));
-    const sq = τ > 0 ? 0.82 : 1;
-    this.ball.scale.set(1.04, 1.04, sq); this.ball.quaternion.copy(this.g.quaternion);
+    // squashed by the hit; its air rounds it out again (air is unchanged)
+    const sq = τ > 0 ? 0.8 + 0.17 * MathX.smooth(τ, 0.04, 0.2) : 1;
+    this.ball.scale.set(1 + (1 - sq) * 0.22, 1 + (1 - sq) * 0.22, sq); this.ball.quaternion.copy(this.g.quaternion);
     this.ball.rotateX(t * 6);
   }
 }

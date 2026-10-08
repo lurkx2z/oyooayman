@@ -100,7 +100,7 @@ class NeCity extends Environment {
       Object.assign(sh.uniforms, U);
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uLean;')
         .replace('#include <begin_vertex>', `#include <begin_vertex>
-          { float hh = max(0.0, transformed.y - 0.45), d = uLean * 0.022 * hh * hh; transformed.xz += vec2(${W[0].toFixed(4)}, ${W[1].toFixed(4)}) * d; transformed.y -= 0.5 * d * d / max(hh, 0.5); }`);
+          { float hh = max(0.0, transformed.y - 0.45), d = uLean * 0.06 * hh * hh; transformed.xz += vec2(${W[0].toFixed(4)}, ${W[1].toFixed(4)}) * d; transformed.y -= 0.5 * d * d / max(hh, 0.5); }`);
     };
     for (const m of [this.m.bark, this.m.foliage]) {
       Look.surface(m, false); Look.grime(m, 0.5);
