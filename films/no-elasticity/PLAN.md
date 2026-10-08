@@ -1,11 +1,19 @@
 # WHAT IF EVERYTHING LOST ITS ELASTICITY? — production plan
 
-A 60.2-second vertical (9:16, 1080×1920, 30 fps) first-person film on the shared engine, in the Oxygen/Friction format:
-centred serif title over a moving scene, a top-left readout, short serif captions, a new consequence every 5–8 s,
-small human things → machines → infrastructure → the payoff. Brief: `docs/briefs/` (Developer 3, 2026-10-07).
+A 60.6-second vertical (9:16, 1080×1920, 30 fps) first-person film on the shared engine, in the Oxygen/Friction format:
+centred serif title over a moving scene, a top-left readout, short serif captions, a new consequence every 5–8 s.
+Brief: `docs/briefs/` (Developer 3, 2026-10-07).
 
-**Status (2026-10-08):** delivered. Final 1080×1920 MP4 (60.2 s, 26.5 MiB) and a tested runnable ZIP are outside the
-repo (see `EPISODE_REPORT.md`). Four review rounds; the last polish was not re-scored (§8).
+**v2 (2026-10-08, the owner's creative direction override):** the street, car, truck, footbridge and crash beats are gone.
+The film now runs: a Newton's cradle that stops passing the hit along → everyday things that keep every dent → the
+trampoline → a bow whose arrow drops → a tuning fork that goes "tk" → your watch stopped one second into the video → inside
+it, the quartz tuning fork is still → every quartz clock stopped → a time-lapse of the plaza that keeps the shape of the
+whole day while its clock never moves → night on the stopped clock. Why and how: `REDESIGN.md`. The v2 shot list is §3b;
+§2–§7 below describe the v1 cut (its code is still in the repository, switched off by `NE_STREET`). Film time = story
+time in v2 (no `CONFIG.edit`).
+
+**Status (2026-10-08):** v1 delivered in the morning (60.2 s). v2 redesign built, reviewed (§8, round 5) and rendered;
+delivery details in `EPISODE_REPORT.md`.
 
 **Story clock and the cut.** Camera, script, props, cars and sound all run on one 73.6 s story clock (the times in this
 plan are story times unless marked "film"). `CONFIG.edit` drops the waits (story 18.2–21.6, 26.9–33.6, 40.8–42.2,
@@ -38,7 +46,7 @@ front with a cushioned bench at (12.08, 3.2).
 You stand by the plaza at (11.4, −2.9) for the ball, the montage and the trampoline; at the kerb (8.3, −2.1) for the traffic
 (the move is inside a cut), then step back toward the plaza (9.7, −1.5) for the ending.
 
-## 3. Shot list (as built in the final cut; story seconds, film seconds in brackets)
+## 3. v1 shot list (the first delivered cut; story seconds, film seconds in brackets)
 
 | # | Time | What we SEE | What we HEAR | Caption / HUD |
 |---|---|---|---|---|
@@ -51,6 +59,23 @@ You stand by the plaza at (11.4, −2.9) for the ball, the montage and the tramp
 | 7 | 52.8–59.4 [36.1–46.0] | **Payoff: the crash**, from 5.5 m up behind the SUV: it runs the red into the sedan's flank (1/3 speed, film 36.65–41.6), they crumple, lock and slide off as one. At the van's hit (54.7) cut to a slow high arc round the wreck from the side the van comes in. | Dry tyre scrub (no horn), slowed crunch, dry glass, the van's hit, steam. | *Crashed cars normally rebound a little…* / *…these don't. They stay jammed together.* · SEPARATION SPEED 0 m/s · NORMALLY ABOUT 1 m/s · *Three cars. One wreck.* (on the arc) |
 | 8 | 59.4–63.4 [46.0–50.0] | **The tap.** Wider at first: a late hatch brakes behind the wreck and touches the van at 5 km/h, backs off; the camera pushes in, centred on its nose, a dashed line where its front was. | Tyre scrub, a small dull crunch. | IMPACT SPEED 5 km/h · NORMALLY: IT SPRINGS BACK · tag BUMPER PUSHED IN · STAYS IN · *Now even a tap leaves a dent.* |
 | 9 | 63.4–73.6 [50.0–60.2] | **The tired street** for a beat, then low beside the flat ball again (65.3 [51.9]), the same pose as the opening insert, its dashed arc back, slowly pushing in to the end (the opening, looped). | Quiet air, the closing chord. | SHAPE RECOVERY 0 % · *Without elasticity…* / *…almost nothing gets a second chance to return to shape.* · note *Fictional rule: solids never spring back. People, air, water and engines work as normal.* |
+
+## 3b. v2 shot list (as built; film seconds)
+
+| # | Time | What we SEE | What we HEAR | Caption / HUD |
+|---|---|---|---|---|
+| 1 | 0–1.75 | **Hook.** Seated at a café table under the title: a Newton's cradle clacks (0.15, 0.62, 1.09); a red quartz desk clock beside it takes its last step at 1.0 (3:41:51 → 3:41:52). At 1.56 the end ball swings back and nothing flies out: the row shoves along together. | Three bright clacks, two ticks (the second the last), a low hit and a slack, falling tone as the rule bites, then one dead "tock". | **TITLE** (to 3.5) · SHAPE RECOVERY 100 % → 0 % (1.0–1.45) · NOTHING SPRINGS BACK |
+| 2 | 1.75–5.6 | Low insert beside the cradle: the five balls swing a little as one; from 3.3 a yellow ghost ball and dashed string where the far ball should have flown. | Café room tone. | *A Newton's cradle passes the hit along by springing back…* · *…so now the balls just shove together.* · tag NORMALLY, THIS ONE FLIES OUT |
+| 3 | 5.6–13.4 | **Everyday things** (four close inserts): racket strings stay stretched (the ball barely leaves them); shoe foam stays crushed; a cushion keeps the dent; your hands stretch a rubber band once. | Thup, foam, bench, rubber rustle (no snap). | A label plate on each. |
+| 4 | 13.4–18.2 | **Trampoline.** A kid lands; the mat stays down in a funnel. | One dull whump, no boing; "oh?". | *Even things built to bounce back…* · *Bodies are fine. Their gear isn't.* |
+| 5 | 18.2–21.2 | **The bow**, first person at eye level: nock, draw, aim at a target 14 m away, let go. The string goes limp, the limbs stay bent, the arrow falls off the bow. | A soft creasing (no creak), a held breath, a soft "fwup" (no twang), one dry clatter. | *A bow is a spring you bend by hand…* / *…and nothing bends it back.* · LAUNCH SPEED 0 km/h · NORMALLY ABOUT 200 km/h |
+| 6 | 21.2–23.4 | Low, just behind the fallen arrow's nock, along it to the untouched target. | A breath of wind. | *The arrow just falls.* |
+| 7 | 23.4–27.3 | **The tuning fork**, at the café table: you slap its prong flat on the table top; bring it up: the prong stays bent in, a dashed line where it was. | Far voices; one dead "tk"; nothing. | *Tuning forks ring by springing back.* / *This one just goes “tk”.* · TUNING FORK 440 Hz → SILENT · tag STAYS BENT · DRAWN 10× BIGGER |
+| 8 | 27.3–30.9 | **Your watch**: you raise your left wrist; it says 3:41:52. | The sleeve; no tick. | *Your watch stopped too…* / *…one second into this video.* |
+| 9 | 30.9–37.3 | **Inside the watch** (macro): the dial lifts away; past the gears down to the quartz crystal in its can, cut open; yellow ghost prongs show its normal vibration, then stop. | A whoosh down, a low drone, a thin fast whine for the ghost that stops dead, a soft thump. | *Inside it: a quartz tuning fork, smaller than a grain of rice.* / *It keeps time by springing back 32,768 times a second.* · QUARTZ CRYSTAL 32,768 Hz → 0 Hz · *No spring-back. No tick.* |
+| 10 | 37.3–40.9 | **The plaza clock** face-on, stopped at 3:41:52; the camera rises. | A low boom. | EVERY QUARTZ CLOCK 3:41:52 · *Every quartz clock on Earth stopped at the same instant.* · *So did every phone and computer.* |
+| 11 | 40.9–55.6 | **Time-lapse** from above the plaza, the stopped clock in front: shadows sweep, people stream through. Inserts: the trampoline (44.9–47.3) sinks deeper only when someone heavier lands; a tree (47.3–49.6) leans further with each stronger gust, a dashed line where its trunk stood. Dusk: lamps and the clock's dial light up. | A rush into fast time, sped-up voices, gusts, dull landings, a pulse of plucked notes that climbs and slows at dusk, crickets. | THE CLOCKS SAY 3:41 PM · THE REAL TIME 3:42 → 9:05 PM · *The clocks stay at 3:41. The day doesn't.* · *And everything people use keeps the shape they leave it in.* · *The trees keep every gust.* · *Without elasticity…* / *…almost nothing gets a second chance to return to shape.* |
+| 12 | 55.6–60.6 | **Night** on the lit plaza clock, still at 3:41:52, drifting in; fade at 60.6. | Crickets, the closing chord, one last quiet tick. | Note (fictional rule) · *Now watch the clock in the first second.* |
 
 ## 4. Hero shots
 

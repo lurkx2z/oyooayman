@@ -65,12 +65,13 @@ Everything is procedural, so there are no models, images or sound files to downl
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
 >
-> **Episode: *What if everything lost its elasticity?*** — open `no-elasticity.html` (60.2 s). Solids still resist being
-> deformed but never spring back. A solid rubber ball lands and stays down with a flat spot; racket strings, a shoe's foam,
-> a cushion and a rubber band keep every stretch and dent; a trampoline becomes a funnel; a red car rides 8 cm lower after
-> one speed table; a loaded truck's rear springs end on their bump stops; a footbridge keeps the deepest dip a running club
-> gave it; a crash doesn't rebound at all (the cars crumple, lock and slide off as one); and a 5 km/h tap leaves a bumper
-> pushed in. Air, water and living tissue are unchanged (so tyres stay round). Plan, rules, shot list and review log:
+> **Episode: *What if everything lost its elasticity?*** — open `no-elasticity.html` (60.6 s, v2 redesign). Solids still
+> resist being deformed but never spring back. A Newton's cradle stops passing the hit along (the row just shoves together);
+> racket strings, a shoe's foam, a cushion and a rubber band keep every stretch and dent; a trampoline becomes a funnel; you
+> draw a bow and the arrow just drops; a tuning fork goes "tk" and stays bent; your watch stopped one second into the video,
+> because the quartz crystal inside it is a tiny tuning fork; so did every clock on Earth; and a time-lapse of the plaza
+> keeps the shape of the whole day while its clock never moves. Air, water and living tissue are unchanged. Redesign notes:
+> [`films/no-elasticity/REDESIGN.md`](films/no-elasticity/REDESIGN.md); plan and review log:
 > [`films/no-elasticity/PLAN.md`](films/no-elasticity/PLAN.md); delivery report:
 > [`films/no-elasticity/EPISODE_REPORT.md`](films/no-elasticity/EPISODE_REPORT.md).
 
@@ -334,13 +335,17 @@ Film: *What if everything lost its elasticity?* (`no-elasticity.html`):
 
 ```
 films/no-elasticity/PLAN.md     the rule (resist, never spring back), the place, shot list, sound, review log
-films/no-elasticity/script.js   ★ every beat time (NE), camera, your hands for the rubber band, captions, readouts, the cut
+films/no-elasticity/REDESIGN.md the v2 redesign: ranked consequences, signature moments, shot list before/after
+films/no-elasticity/script.js   ★ every beat time (NE), camera, your hands, captions, readouts (NE_STREET: the v1 street beats, off)
 films/no-elasticity/city.js     the sunny avenue, the speed table, the plaza, the footbridge that keeps its sag, the signal masts
 films/no-elasticity/props.js    the ball, the round trampoline (its mat funnels), the racket, the shoe, the cushions, the band
 films/no-elasticity/cars.js     cars whose springs take a permanent set at each bump, the truck, the inelastic crash, the tap
 films/no-elasticity/cast.js     the teenager, the kid, the café sitter, the walkers and runners on the bridge (its load)
+films/no-elasticity/cradle.js   the opening: a Newton's cradle that stops passing the hit along, the quartz desk clock
+films/no-elasticity/bow.js      the bow whose arrow drops, the tuning fork that stays bent, your watch
+films/no-elasticity/clocks.js   the plaza's quartz clock, the macro inside the watch, the time-lapse (dents, gusts, dusk)
 films/no-elasticity/film.js     FILM hooks: the inserts and cinematic shots, labels pinned to the world, the grade
-films/no-elasticity/audio.js    the soundtrack (every "boing" replaced by a dead thud; no horns; scrapes, dull whumps, one crash)
+films/no-elasticity/audio.js    the soundtrack (clacks that turn into a dead tock, no twang, no ring, no tick; the day running on)
 films/no-elasticity/soundtrack.js  the baked soundtrack (regenerate with tools/bake-soundtrack.cjs after any sound change)
 films/no-elasticity/EPISODE_REPORT.md  the delivery report: timings, systems, limitations, review scores
 ```
