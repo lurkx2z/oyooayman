@@ -210,3 +210,30 @@
 - **Audience:** **performed extremely strongly** (handoff).
 - **Lessons:** self-aware parody + full production seriousness; use the edit layer aggressively; every link of a chain
   needs its own visible proof.
+
+### 12. What if the speed of sound became 10× slower?  (2026-10-07 batch, Developer 5; redesigned 2026-10-08)
+- **Page / folder:** `slow-sound.html` · `films/slow-sound/` (adds the shared helper `js/audio/soundArrival.js`)
+- **Duration:** 61.4 s, six shots (hard cuts) in one football stadium
+- **First version (city avenue, 69.8 s, one take, up to commit `e2e3ae3`):** a friend's late claps, a pile driver, an
+  ambulance, a supersonic car, a drone, a silent airliner and its shock, a police car breaking shop windows. Reviews:
+  round 1 retention 4, viewer 5, visual 4.5, physics 7 → round 2 5 / 6 / 5 / 7.5. Didn't work: a slow middle, a weak
+  first boom, and it followed the shared template (person → car → machinery → airplane → destruction).
+- **Redesign (owner's creative override):** audio is the mechanic, no cars, planes, cranes, streets or explosions.
+  - a stadium with ~9,000 instanced fans, each posed from its own arrival times; a storm beyond the far stand;
+  - every sound front drawn (rings on the grass, domes in the air; the thunder as a line and glow on everything it
+    crosses);
+  - beats: the start line peeling off runner by runner; a friend's late, blurred shout; one announcement heard three
+    times; a whistle 10× lower; a Mach 1.17 free kick heard after the goal; claps rippling out from a drum; the opening
+    flash's thunder coming back 50 s later (birds off the roofs, the far stand ducking, the front crossing the pitch).
+- **Reviews:** first stadium preview retention 5.5, viewer 5.5, visual 5.5, physics 7.5, differentiation 7 (audio 8);
+  second preview viewer 6, retention 5.5, visual 6, physics 8.5; final (1080×1920) retention 6, viewer 6, production 6,
+  differentiation 6.5. Most memorable: the start-line peel, then the supersonic kick. Swipe points: ~16 s (a still big
+  screen) and ~40–48 s (the wait for the thunder). The audit's top three fixes (the thunder's approach drawn on the
+  world, the climax reframed, a two-frame jump at every cut) were made after the scores; details in
+  `films/slow-sound/EPISODE_REPORT.md`.
+- **Audience:** UNKNOWN (not yet posted).
+- **Lessons:** a one-take sound-delay film can't be tightened with cuts, so the beats must be short in the plan; make
+  every invisible effect visible (rings, counters, fronts) before polishing it; a setup paid off at the end (the silent
+  flash under the title) carries a film better than a list of separate consequences; a front that comes straight at you
+  is invisible as a surface (draw where it meets the world, and what it has just passed); the engine camera's step
+  sway fires at a cut's jump in position (turn walking off in films without walking).
