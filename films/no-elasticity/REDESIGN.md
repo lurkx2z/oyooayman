@@ -95,7 +95,11 @@ physics 8) and ranked three problems. What changed:
 | The loop payoff couldn't be checked: the desk clock left the frame at 1.75 s, before it could miss a tick | The opening wide holds to 2.6 s and leans in toward the clock; its seconds hand is thicker; the last line says what to look for ("Rewatch the red clock: one tick, then never again.") |
 | Six glitch frames (10.13, 13.40, 18.17–18.20, 23.40, 33.47) | Snap hand poses finish on the cut frame; no blur trail across a cut; the café sitter turns instead of snapping round; the quartz macro's small settle eases out instead of jumping |
 
-The slow time-lapse start, the montage's header plates and the small HUD sub-labels were noted and left as they are.
+A second fresh reviewer re-checked the result (viewer 6, retention 6, cinematography and phone clarity 6, physics 8) and
+caught one new problem: the two landings at dusk were people appearing already in the mat. They now walk up, climb onto
+the frame and jump in. The opening also leans in further on the desk clock, and the end no longer fades to black, so the
+loop is seamless. The slow time-lapse start, the montage's header plates and the small HUD sub-labels were noted and left
+as they are.
 
 ## Physics notes for the new beats
 

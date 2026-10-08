@@ -75,9 +75,9 @@ You stand by the plaza at (11.4, −2.9) for the ball, the montage and the tramp
 | 9 | 30.9–37.3 | **Inside the watch** (macro): the dial lifts away; past the gears down to the quartz crystal in its can, cut open; yellow ghost prongs show its normal vibration, then stop. | A whoosh down, a low drone, a thin fast whine for the ghost that stops dead, a soft thump. | *Inside it: a quartz tuning fork, smaller than a grain of rice.* / *It keeps time by springing back 32,768 times a second.* · QUARTZ CRYSTAL 32,768 Hz → 0 Hz · *No spring-back. No tick.* |
 | 10 | 37.3–40.9 | **The plaza clock** face-on, stopped at 3:41:52; the camera rises. | A low boom. | EVERY QUARTZ CLOCK 3:41:52 · *Every quartz clock on Earth stopped at the same instant.* · *So did the clock in your phone.* |
 | 11 | 40.9–49.6 | **Time-lapse** from above the plaza, the stopped clock in front: shadows sweep, people stream through. Inserts: the trampoline (44.9–47.3) sinks deeper only after a harder landing; a tree (47.3–49.6) leans further with each stronger gust, a dashed line where its trunk stood. | A rush into fast time, sped-up voices, gusts, dull landings, a pulse of plucked notes that climbs through the afternoon. | THE CLOCKS SAY 3:41 PM · THE REAL TIME 3:42 PM → · *The clocks stay at 3:41. The day doesn't.* · *And everything people use keeps the shape they leave it in.* · *A trunk is mostly dead wood. It keeps every gust.* |
-| 12 | 49.6–54.4 | **Dusk at the trampoline**: back on the wide, the camera comes down to the trampoline's level. One landing (51.2) takes the mat deeper; the day's hardest (52.6) takes it down flat onto the paving, where it stays. | Gusts, two dull landings, the pulse slowing. | *Without elasticity…* / *…almost nothing gets a second chance to return to shape.* · tag MAT ON THE GROUND · IT STAYS THERE |
+| 12 | 49.6–54.4 | **Dusk at the trampoline**: back on the wide, the camera comes down to the trampoline's level. Two people in turn climb onto the frame and jump in: the first landing (51.2) takes the mat deeper; the day's hardest (52.6) takes it down flat onto the paving, where it stays. | Gusts, two dull landings, the pulse slowing. | *Without elasticity…* / *…almost nothing gets a second chance to return to shape.* · tag MAT ON THE GROUND · IT STAYS THERE |
 | 13 | 54.4–58.0 | **Night** on the plaza clock, still at 3:41:52: a push in on its lit dial as the lamps come on behind it. | Crickets, the closing chord. | Note (fictional rule) |
-| 14 | 58.0–60.6 | **The loop**: back on the café table, now lamp-lit; the red desk clock still at 3:41:52; fade at 60.6. | One last quiet tick. | *Rewatch the red clock: one tick, then never again.* |
+| 14 | 58.0–60.6 | **The loop**: back on the café table, now lamp-lit; the red desk clock still at 3:41:52; no fade, so the film loops straight back to the same clock. | One last quiet tick. | *Rewatch the red clock: one tick, then never again.* |
 
 ## 4. Hero shots
 
@@ -194,3 +194,12 @@ cradle clacks are about 6 dB louder. Not changed (noted by the audit): the monta
 system; the watch dial on black at 30.9 is the only shot in a void; the time-lapse's first stretch (41.5–44.9) has little
 motion; the HUD sub-labels are small on a phone. The audit also asked why the lamp posts don't lean like the tree: under this
 rule they do, but a steel post only flexes a few millimetres in a gust, so it keeps a few millimetres.
+
+**v2, re-check of the fixed final** (a second fresh reviewer, same material): viewer 6, retention 6 (was 5), cinematography
+and phone clarity 6 (was 5), physics 8. Problems 1 and 3 fixed (one turn at 10.13 now takes two frames instead of one),
+problem 2 fixed but still small on a phone. New problem it found and we fixed: the two landings in the dusk wide were
+people appearing already in the mat; now each jumper walks up, climbs onto the frame and jumps in. Also from its list: the
+opening leans in further on the desk clock (it is about a third of the frame width by 2.0 s) and there is no fade to
+black at the end, so the loop has no black gap. Not changed: the HUD plates pass over the plaza clock at 50.2–51.4, the
+first closing line covers a bystander's head at 51.0–51.5, tags and HUD sub-labels are small, the mix is −18.3 LUFS
+(the guide says about −16 to −17), and the last six seconds are two quiet clock shots.
