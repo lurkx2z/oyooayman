@@ -210,3 +210,21 @@
 - **Audience:** **performed extremely strongly** (handoff).
 - **Lessons:** self-aware parody + full production seriousness; use the edit layer aggressively; every link of a chain
   needs its own visible proof.
+
+### 12. What if the speed of sound became 10× slower?  (2026-10-07 batch, Developer 5)
+- **Page / folder:** `slow-sound.html` · `films/slow-sound/` (adds the shared helper `js/audio/soundArrival.js`)
+- **Duration:** 69.8 s, one continuous take, no cuts
+- **Built:**
+  - a sunny avenue with a parking lot, a construction site, an elevated highway and shopfronts with per-pane glass;
+  - every sound timed by `eventTime + distance / 34.3 m/s`, moving sources through exact delay curves (Doppler, the
+    supersonic squeeze, the reversed branch after a pass), N-wave booms;
+  - ground sound rings, a live SOUND DELAY counter, shock countdowns, a dust wall carrying the airliner's shock up the street.
+- **Worked (per reviews):** the airliner's shock coming up the street with the countdown and pigeons; the police car's
+  shock and the broken shopfront; the friend's late shout bubble.
+- **Didn't:** a slow middle (pile driver 8 s, sports car 14 s); the first boom is weak on screen; the police car is
+  seen only briefly.
+- **Reviews:** round 1: retention 4, viewer 5, visual 4.5, physics 7 → round 2: 5 / 6 / 5 / 7.5. Round-2 fixes applied,
+  not re-scored.
+- **Audience:** UNKNOWN (not yet posted).
+- **Lessons:** a one-take sound-delay film can't be tightened with cuts, so the beats must be short in the plan; make
+  every invisible effect visible (rings, counters, dust fronts) before polishing it.

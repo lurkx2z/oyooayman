@@ -64,6 +64,17 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Twelfth film: *What if the speed of sound became 10× slower?*** — open `slow-sound.html` (69.8 s). One continuous
+> first-person take on a sunny avenue: under the title the speed of sound drops from 343 to 34.3 m/s (1,235 → 123 km/h).
+> You still see everything on time, but every sound arrives late by distance ÷ 34.3 m/s: a friend's claps and shout
+> 0.88 s late at 30 m, a pile driver's bangs 2.9 s late at 100 m (still arriving after it stops), an ambulance siren
+> dropping more than an octave as it passes. A car on the highway passes Mach 1 at 126 km/h and its boom arrives only
+> after it has gone by; drone propellers go supersonic; a landing airliner is Mach 2.1 and silent until its shock comes up
+> the street; a police car at Mach 1.3 is never heard coming and its shock breaks only the weakest shop windows. Every
+> sound in the film is timed from its source's position. Shot list, physics and review log:
+> [`films/slow-sound/PLAN.md`](films/slow-sound/PLAN.md); production report:
+> [`films/slow-sound/EPISODE_REPORT.md`](films/slow-sound/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
@@ -189,6 +200,7 @@ js/fx/look.js              selective-gloss material rule (+ the oxygen film's gr
 js/fx/particles.js         billboard particles (smoke, dust)
 js/world/people.js         low-poly people rig + pose library
 js/audio/audioEngine.js    offline-rendered, sample-synced soundtrack engine + SoundKit synth blocks
+js/audio/soundArrival.js   when a sound reaches a listener (event time + distance ÷ sound speed), Doppler delay curves, Mach, boom delay
 js/ui/storyHud.js          reusable HUD: title, stacked lines, captions, info block, end line
 js/ui/devControls.js       playback / scrub / debug / recording mode
 tools/render-preview.cjs   frame-exact MP4 renderer (--page picks the film)
@@ -319,6 +331,20 @@ films/slip/sea.js        the seabed (one analytic height field in JS and GLSL), 
 films/slip/cast.js       people with umbrellas, in the quake, at the seafront, running inland
 films/slip/audio.js      rain, the squeak and the thud, the underground pulses, the rupture, the quake, sirens, the roar
 films/slip/film.js       FILM hooks: which scene, hands, the quake shake, reflections, the cuts, the grade, the end card
+```
+
+Film: *What if the speed of sound became 10× slower?* (`slow-sound.html`):
+
+```
+films/slow-sound/PLAN.md          the rule, the numbers, layout, shot list, hero shots, escalation check, review log
+films/slow-sound/EPISODE_REPORT.md  production report: systems, timestamps, limitations, reviewer scores
+films/slow-sound/script.js        ★ the numbers, every source's path, camera and zoom, captions, live HUD; computes the boom times
+films/slow-sound/city.js          the avenue, the parking lot, the construction site, the elevated highway, the shopfronts
+films/slow-sound/cast.js          the friend, people, traffic, the sports car, the police car, the pile driver, the drone, pigeons
+films/slow-sound/waves.js         sound rings on the ground, dust, the airliner's shock and smoke, the windows and their glass
+films/slow-sound/audio.js         every sound timed by its arrival (delay lines for moving sources, N-wave booms, reversed branches)
+films/slow-sound/film.js          FILM hooks: build, update, hands, the grade
+films/slow-sound/soundtrack.js    the baked soundtrack
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):
