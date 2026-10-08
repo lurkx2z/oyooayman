@@ -91,10 +91,21 @@ None. Everything is procedural (geometry, textures, sound). The soundtrack is ba
 - The skyline and the river beyond it are never seen close; the impact is a long-lens view over the far blocks.
 
 ## FINAL PREVIEW PATH
-FINAL_PREVIEW_PLACEHOLDER
+Final MP4 (not committed; the repo keeps no renders): `no-air-resistance.mp4`, delivered in the project's files at
+`/mnt/project-files/no-air-resistance/no-air-resistance.mp4` with the runnable ZIP `no-air-resistance_film.zip`
+beside it. 62.2 s, 1080×1920, 30 fps, H.264 + AAC 160k, 26.6 MiB (one file, not split). Audio −17.0 LUFS, peak
+−2.0 dBFS. To rebuild it: `tools/render-parallel.sh no-air-resistance.html <dir> 1080 1920 4 30`, then
+`tools/render-wav.cjs` and `tools/encode-final.sh <dir> <wav> 62.2 <out>.mp4 27`.
 
 ## PERFORMANCE / FPS
-PERFORMANCE_PLACEHOLDER
+- Final render: 1,867 frames at 1080×1920 in about 1 h 50 min with 4 software-WebGL workers in the cloud container
+  (≈ 10 s per frame per worker for most shots; the debris ending is the heaviest at ≈ 15–35 s per frame, so its frames were
+  shared out across all four workers once the others finished).
+- Scene load (three.js `renderer.info`, one frame): street shots ≈ 1,100–2,000 draw calls and ≈ 210–260 k triangles;
+  the sky cut-away ≈ 70 calls and 44 k triangles. Boot ≈ 12 s in a headless browser; no console errors.
+- Live playback FPS on a real graphics card was not measured (this container has software WebGL only). The page
+  plays as a pure function of time, so a slow machine drops frames but never changes the film; the MP4 is
+  frame-exact.
 
 ## REVIEW NOTES (scores as given, four independent reviewers per round)
 | Round | Retention | Normal viewer | Visual | Physics |
