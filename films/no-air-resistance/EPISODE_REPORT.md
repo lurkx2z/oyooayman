@@ -34,7 +34,7 @@ stone 440 → 490 km/h · balloons ≈ 2 g (21.6 m/s²) · the first ice lands 3
 | 10.2–18.2 skydiver cut-away, canopy can't open, speed and altitude panels | 11.7–17.9 9 km up beside one hailstone; the cloud streams up past it; lightning; one tag |
 | 18.2–23.2 coasting car and its ghost, leaflets | 17.9–21.5 confetti cannon (lands as one clump), toy paratrooper whose canopy can't open |
 | 23.2–27.4 pigeons can't take off | 21.5–27.4 the gale: rain sideways, washing barely moves, ghost sheet thrashing |
-| 27.4–51.3 airliner found by a bystander, telephoto, plunge, fireball, countdown to the boom | 27.4–36.15 balloons rocket up at 2 g; a clock to the cloud's ice; the first stones in slow motion |
+| 27.4–51.3 airliner found by a bystander, telephoto, plunge, fireball, countdown to the boom | 27.4–36.15 balloons rocket up at 2 g; the mum and the girl run past you for the stair door; the clock runs out over the empty party; the first stones in slow motion |
 | 51.3–56.4 debris and a falling sign board | 36.15–51.9 the cloud's ice breaks the party one thing at a time, then comes through the roof over you |
 | 56.4–62.0 look back at the limp flag | 51.9–60.8 silence; a white roof; a lace sheet barely moving in the wind; closing lines |
 
@@ -42,7 +42,7 @@ stone 440 → 490 km/h · balloons ≈ 2 g (21.6 m/s²) · the first ice lands 3
 - **Before (v1):** a street film whose middle was a car and pigeons and whose climax was a distant airliner and a
   fireball; it read as the channel template ("what feels recycled": 2/10).
 - **After (v2):** a rooftop film with no car, plane, explosion or falling person; the climax is a consequence built from
-  the rule (drag holds a storm's ice up); "what feels recycled": 6/10 before the last fix round, final score below.
+  the rule (drag holds a storm's ice up); "what feels recycled": 6.5/10 on the final output.
 
 ## REUSED SYSTEMS (engine, not edited)
 ViewerHands · StoryHUD · Post / Look · fog · Environment (subclassed as NrCity) · People · particles (BillboardSystem,
@@ -64,15 +64,57 @@ kept: the rule, the HUD readouts, the hands, the drop props, the ghost-object id
 | v1 round 2 (63 s avenue cut) | — / 2 | 5 | 5 | 5 | 7.5 |
 | v2 round 1 (first rooftop preview) | 6 / 2 | 4.5 | 5 | 5 | 7 |
 | v2 round 2 (61.1 s preview) | 6 / 2 | 5.6 | 5.6 | 6.0 (cinematography 5.5) | 7 |
-| Final audit (1080×1920 output) | FINAL_DIFF | FINAL_RET | FINAL_VIEW | FINAL_VIS | — |
+| v2 round 3 (60.8 s preview) | 6 / 2 | 6 | 6.5 | — | — |
+| Final audit (1080×1920 output, before the top-3 fixes) | 6.5 / 2 | 6 | 6 | 6.5 | 7 |
 
-FINAL_AUDIT_NOTES
+Final audit sub-scores (on the real 1080×1920 MP4): style consistency 7, pacing 6, physics 7, phone clarity 6,
+escalation 6.5, continuity/technical 7 (1,824 frames at 30/1 fps, 60.800 s, no dropped, duplicated or black frames
+outside the intended fade; the first impact and the table landing in sync with their sounds; −14.8 LUFS, −1.2 dBTP).
+Retention sub-scores: hook 6, middle 5.5, clarity 6, escalation 6.5, payoff 6. Normal viewer: hook 6, understanding 6,
+wow 6.5, ending 5, rewatch/share 5.5. Still recycled (reviewer): the 100 → 0 % opener panel and the wind panel; the
+clock; the climbing km/h readout and "faster than sound"; the NORMAL AIR ghosts; the paper-and-ball demo; the quiet
+wreckage plus moral lines ending. No banned shot.
+
+**Top 3 fixed after the audit** (not re-scored):
+1. **The climax lands.** The roar ducks for a moment under each hero breakage (bottles, cake, chimney pot, table) and
+   those hits are louder (each now 2.5–3.5 dB over the roar around it); a second, tighter snap-in, a camera kick and a
+   white flicker as the table top lands; the sound now fades out with the picture instead of cutting dead at 60.5.
+2. **The lull before the ice (28.4–34.6).** The mum and the girl run past you for the stair door (you go too), then you
+   turn back to the empty party under the dark cloud as the clock runs out: a new image, people at stake, and the
+   reason the roof is empty. The balloons' caption lands as they go; the storm is already half dark when you come back
+   from the cloud, so "All of it lands here in 16 seconds" is said under a dark sky.
+3. **Legibility and glitches.** The kite's tag marks where its string goes over the parapet (KITE · FELL INTO THE
+   STREET) instead of empty air; the camera eases in on the falling kite under the title; the confetti and parachute
+   tags sit beside their objects; the ghost-toy tag shows only while the ghost is in frame; the confetti and balloons
+   are framed clear of the clock; the ice readout goes with the last ice; the note is one line; the doorway flicker
+   (43.2–45.7 and 50.9–53.7) is gone (two faces z-fighting under the door head, and screen-space AO banding on the
+   ceiling a hand's breadth from the camera).
 
 ## REMAINING WEAKNESSES
-REMAINING
+- The middle is still a row of curiosities (confetti, gust, balloons) before the stakes arrive; only the clock and the
+  run for the door build towards the ice.
+- The cloud cut-away (11.7–17.9) is hard to read on a phone: mostly white then grey, until the lightning.
+- The payoff reads as a heavy hailstorm rather than supersonic ice: the damage (puffs, polka-dot holes, a table that
+  stands for 15 s) is gentler than 1,300–1,800 km/h would do, and the roof holes only start at 45.2 although stones land
+  from 37.
+- The ending (51.9–60.8) is a static view; only text changes.
+- The stairwell objects are dots until the landing snap-in; the balloons leave the frame in about half a second.
+- The timeline behind the numbers is compressed: "falling for 31 seconds" and the cut-away's 440 km/h assume more fall
+  time than the story has shown (the countdown itself is honest).
+- Recycled channel devices remain by design of the format: the 100 → 0 % opener, the clock, the km/h readout, the
+  NORMAL AIR ghosts, closing moral lines.
+- Sound has only been level-measured, not listened to.
 
 ## FINAL CREATIVE-QUALITY ASSESSMENT
-ASSESSMENT
+A clear step away from the template: one place (a rooftop party), no car, plane, crane, explosion or falling person,
+and a climax that is a real consequence of the rule (without drag a storm cloud's ice lands faster than sound) instead
+of an airliner. The reviewers rate it 6.5/10 for freshness against 2/10 for the old cut, but only 6/10 for retention and
+for a normal viewer: the new ideas are good and specific, yet several are small or quick on a phone, and the film peaks
+at the first stone (34.6) rather than at its end. The last fixes target exactly those weak points (the run for the
+door, a bigger table moment, audible breakages, a clean doorway), so the final should land a little above the audited
+scores, but it is a solid 6–6.5, not a Friction-level 8. The strongest images are the paper and ball landing together,
+the rain flying sideways past washing that barely moves, the first stone in slow motion and the ice coming through the
+roof over you.
 
 ## FINAL OUTPUT
 `no-air-resistance_v2.mp4` in the project files (`/mnt/project-files/no-air-resistance/`), with the runnable ZIP
