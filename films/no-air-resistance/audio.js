@@ -213,30 +213,30 @@ class NrAudio extends AudioEngine {
     S.burst(NR.car.toss, 0.35, 2600, 0.6, 0.05 * tp2.gain * 3, tp2.pan, dest, 'white', 0.02);
   }
 
-  // the pigeons: cooing; startled, they clap their wings and hop but can't lift off; one steps off a ledge
+  // the pigeons: cooing; startled, they clap their wings (no whoosh: the wings push no air) and hop; one steps off a ledge
   _pigeons(S, dest, rng) {
     const coo = (t, v, p) => { S.voice(t, 300, 0.22, 'u', v, p, dest, 0.8); S.voice(t + 0.3, 260, 0.35, 'u', v * 0.8, p, dest, 0.9); };
-    for (let t = 0.8; t < NR.startle; t += rng.range(1.2, 2.8)) { if (t >= NR.cut0 && t < NR.sky[1]) continue; coo(t, 0.008, rng.range(-0.1, 0.4)); }
+    for (let t = NR.car.cut[1] + 0.3; t < NR.startle; t += rng.range(1.2, 2.8)) coo(t, 0.008, rng.range(-0.1, 0.4));
     NR_PIGEONS.forEach((p, i) => {
-      for (let t = NR.startle + 0.06 * i; t < NR.ledge - 0.2; t += rng.range(0.32, 0.6)) { S.flap(t, (p[0] - 9.9) * 0.4, 0.05 * (1 - (t - NR.startle) / 3), dest); S.click(t + 0.36, 0.01, 0, dest); }
+      for (let t = NR.startle + 0.06 * i; t < NR.ledge - 0.2; t += rng.range(0.32, 0.6)) { const pn = (p[0] - 9.9) * 0.4, v = 1 - (t - NR.startle) / 3; S.click(t, 0.016 * v, pn, dest); S.click(t + 0.08, 0.012 * v, pn, dest); S.click(t + 0.36, 0.01, 0, dest); }
     });
     const L = NR.ledge, land = L + Math.sqrt(2 * (NR_LEDGE.y - 0.15) / NR_G);
-    S.flap(L + 0.05, 0.35, 0.05, dest); S.flap(L + 0.4, 0.35, 0.05, dest);
-    S.whump(land, 0.03, 0.35, dest); S.click(land, 0.02, 0.35, dest); S.flap(land + 0.15, 0.35, 0.03, dest);
+    for (let t = L + 0.05; t < land - 0.05; t += 0.12) S.click(t, 0.014, 0.35, dest);
+    S.whump(land, 0.03, 0.35, dest); S.click(land, 0.02, 0.35, dest); S.click(land + 0.15, 0.01, 0.35, dest);
     coo(land + 0.7, 0.012, 0.3);
   }
 
-  // the five pigeons flying up the street in the hook: wingbeats, then at the loss frantic flapping that lifts nothing,
-  // a thump as each hits the pavement (½gt² later), a scrape as it skids, a ruffle as it picks itself up
+  // the five pigeons flying up the street in the hook: wingbeats; at the loss their wings push no air, so the frantic
+  // flapping makes only the claps of wing on wing; a thump as each hits the pavement (½gt² later), a scrape as it skids
   _flyers(S, dest) {
     const o = {};
     NR_FLYERS.forEach((F, i) => {
       const pan = MathX.clamp((F[0] - NR_CAM.x) * 0.25, -0.5, 0.5);
       for (let t = 0.35 + 0.11 * i; t < NR.loss; t += 0.36 + 0.03 * (i % 3)) S.flap(t, pan, 0.012, dest);
       nrFlyerAt(F, NR.loss + 0.5, o); const land = NR.loss + o.tf;
-      for (let t = NR.loss + 0.04 * i; t < land - 0.05; t += 0.17) S.flap(t, pan, 0.03, dest);
+      for (let t = NR.loss + 0.04 * i; t < land - 0.05; t += 0.17) S.click(t, 0.014, pan, dest);
       S.thump(land, 0.05, dest); S.click(land, 0.025, pan, dest); S.burst(land + 0.01, 0.22, 2600, 0.7, 0.012, pan, dest, 'white', 0.01);
-      S.flap(land + 0.9 + 0.2 * i, pan, 0.02, dest);
+      S.click(land + 0.9 + 0.2 * i, 0.01, pan, dest); S.click(land + 0.97 + 0.2 * i, 0.008, pan, dest);
     });
   }
 
