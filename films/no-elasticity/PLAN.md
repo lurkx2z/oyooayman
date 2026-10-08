@@ -4,6 +4,9 @@ A 60.2-second vertical (9:16, 1080×1920, 30 fps) first-person film on the share
 centred serif title over a moving scene, a top-left readout, short serif captions, a new consequence every 5–8 s,
 small human things → machines → infrastructure → the payoff. Brief: `docs/briefs/` (Developer 3, 2026-10-07).
 
+**Status (2026-10-08):** delivered. Final 1080×1920 MP4 (60.2 s, 26.5 MiB) and a tested runnable ZIP are outside the
+repo (see `EPISODE_REPORT.md`). Four review rounds; the last polish was not re-scored (§8).
+
 **Story clock and the cut.** Camera, script, props, cars and sound all run on one 73.6 s story clock (the times in this
 plan are story times unless marked "film"). `CONFIG.edit` drops the waits (story 18.2–21.6, 26.9–33.6, 40.8–42.2,
 47.6–52.8) and plays the crash, story 53.35–55.0, at a third of real speed. Film length 60.2 s. Film time = story time up

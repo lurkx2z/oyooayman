@@ -82,8 +82,8 @@ None (`git diff` on `js/` is empty; `js/audio/audioEngine.js` untouched).
 - The fixes after the fourth review were not re-scored.
 
 **FINAL PREVIEW PATH**
-- MP4 (1080 × 1920, 30 fps, H.264 + AAC, one file under 30 MiB): `/mnt/project-files/no-elasticity/no-elasticity.mp4`
-  (not committed).
+- MP4: `/mnt/project-files/no-elasticity/no-elasticity.mp4` (not committed). 1080 × 1920, 30 fps, 60.2 s, 1806 frames,
+  H.264 (two-pass, about 3.5 Mbit/s) + AAC 160k stereo, 26.5 MiB, one file.
 - Runnable ZIP (unzip, open `no-elasticity.html`, press Space): `/mnt/project-files/no-elasticity/no-elasticity_film.zip`
   (tested unzipped with `check-page`: boots, "SOUND READY after 0s", no console errors).
 - In the repo: open `no-elasticity.html` (the baked soundtrack is in `films/no-elasticity/soundtrack.js`).
@@ -92,8 +92,11 @@ None (`git diff` on `js/` is empty; `js/audio/audioEngine.js` untouched).
 - Scene cost per frame (probe): 182–759 draw calls, 204K–285K triangles.
 - Software WebGL (headless SwiftShader, 432 × 768) frame times after warm-up: 14–45 ms for most sampled
   frames, one at 522 ms. Real-time FPS on a GPU browser was not measured here.
-- Final render: about 13 s per 1080 × 1920 frame per worker in software WebGL, 4 workers, roughly 1 h 40 min for the film.
-- Sound: mixed to about −17 LUFS integrated, true peak about −1.5 dBTP (measured on the preview bake).
+- Final render: about 13 s per 1080 × 1920 frame per worker in software WebGL; 4 workers took 97–99 min for the 1807
+  frames.
+- Sound: −17.2 LUFS integrated, loudness range 8.8 LU. The WAV peaks at −1.5 dBTP, but the AAC encode overshot to
+  −0.3 dBTP, so the audio was re-encoded through a −2.5 dB peak limiter (`alimiter=limit=0.75`); the delivered MP4
+  measures −17.2 LUFS and −2.4 dBTP. The video stream was copied unchanged.
 
 **REVIEW NOTES** (four independent reviewers per round, scores out of 10, exactly as given)
 | Round | Cut | Retention | Normal viewer | Cinematography | Physics |
