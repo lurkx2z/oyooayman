@@ -81,6 +81,8 @@ class NrAudio extends AudioEngine {
     roof.gain.setValueAtTime(1, NR.walk[1] - 0.01); roof.gain.linearRampToValueAtTime(0.3, NR.walk[1] + 0.02);
     for (const b of [roof, fx]) { const g0 = b === roof ? 0.3 : 1; b.gain.setValueAtTime(g0, k0 - 0.01); b.gain.linearRampToValueAtTime(0, k0); b.gain.setValueAtTime(0, k1 - 0.01); b.gain.linearRampToValueAtTime(1, k1); }
     sky.gain.setValueAtTime(0, 0); sky.gain.setValueAtTime(0, k0 - 0.01); sky.gain.linearRampToValueAtTime(1, k0); sky.gain.setValueAtTime(1, k1 - 0.01); sky.gain.linearRampToValueAtTime(0, k1);
+    // a held breath before the first stone: the roof's sounds (the rain, the city, the party) pulled down, back with the hit
+    { const F = NR_ICE.first; roof.gain.setValueAtTime(1, F - 0.7); roof.gain.linearRampToValueAtTime(0.15, F - 0.45); roof.gain.setValueAtTime(0.15, F - 0.01); roof.gain.linearRampToValueAtTime(1, F); }
     this.rev = rev;
     this._air(S, roof, end);
     this._things(S, roof);
@@ -277,7 +279,7 @@ class NrAudio extends AudioEngine {
     const dr = ctx.createBufferSource(), dl = S.filter('lowpass', 700, 0.7), dg = ctx.createGain(); dr.buffer = S.crackleBuffer(3.0, 2600); dr.loop = true; dr.connect(dl); dl.connect(dg); dg.connect(dest); dr.start(F); dr.stop(q + 0.02);
     for (const g of [roar, hg, rg, dg]) g.gain.setValueAtTime(0, F);
     for (let t = F; t <= q; t += 1 / 30) {
-      const f = NR_ICE.flux(t), sp = NR_ICE.v(t) / 343, w = Math.pow(f, 0.7) * (0.8 + 0.2 * sp * sp), inside = MathX.smooth(this.cx.value(t), NR_ROOF.hut.x0 + 0.2, NR_ROOF.hut.x0 + 1.2);
+      const f = NR_ICE.flux(t), sp = NR_ICE.v(t) / 343, w = Math.max(Math.pow(f, 0.7) * (0.8 + 0.2 * sp * sp), 0.32 * MathX.smooth(t, F + 0.3, F + 1.0)), inside = MathX.smooth(this.cx.value(t), NR_ROOF.hut.x0 + 0.2, NR_ROOF.hut.x0 + 1.2);
       roar.gain.linearRampToValueAtTime(0.32 * w * (1 - 0.35 * inside), t); hg.gain.linearRampToValueAtTime(0.035 * w, t); rg.gain.linearRampToValueAtTime(0.32 * w, t); dg.gain.linearRampToValueAtTime(0.5 * w * inside, t);
     }
     for (const g of [roar, hg, rg, dg]) { g.gain.setValueAtTime(g.gain.value, q); g.gain.linearRampToValueAtTime(0, q + 0.015); }
@@ -298,12 +300,12 @@ class NrAudio extends AudioEngine {
     // the chairs: hit, then a clatter of aluminium as each goes over
     for (const C of Rf.chairs) { const c = C.g.position, p = P(C.t, c.x, c.z); S.crack(C.t, 0.05, p, dest, 2300); S.ping(C.t + 0.5, 900 + 200 * C.dir, 0.02, p, dest, 0.3); S.clunk(C.t + 0.5, 0.05, p, dest); S.click(C.t + 0.58, 0.02, p, dest); }
     // the table: its legs shot through, the top comes down on the deck with everything left on it
-    { const t = H.table, T = NR_ROOF.table, p = P(t, T.x, T.z), tl = Math.sqrt(2 * 0.68 / NR_G); S.crack(t, 0.07, p, dest, 1400); S.crunch(t + tl, 0.1, p, dest, this.rev); S.whump(t + tl, 0.08, p, dest); for (let k = 0; k < 6; k++) S.click(t + tl + 0.05 + k * 0.05, 0.015, p, dest); }
+    { const t = H.table, T = NR_ROOF.table, p = P(t, T.x, T.z), tl = Math.sqrt(2 * 0.68 / NR_G); S.crack(t, 0.07, p, dest, 1400); S.crunch(t + tl, 0.16, p, dest, this.rev); S.whump(t + tl, 0.1, p, dest); S.boom(t + tl, 0.14, dest, this.rev); for (let k = 0; k < 6; k++) S.click(t + tl + 0.05 + k * 0.05, 0.015, p, dest); }
     // the stair housing's roof over your head: each stone that punches through it, a hard knock and a splinter
     for (const [x, z, t] of NR_HUT_HOLES) { if (t >= q) continue; const p = P(t, x, z), v = t < NR.roofHit + 0.6 ? 0.12 : 0.05; S.crack(t, v, p, dest, 1100); S.burst(t + 0.005, 0.12, 2400, 0.8, v * 0.35, p, dest, 'white', 0.002); }
     // the first stones: each one a crack you feel (the very first the loudest thing in the film so far)
-    NR_ROOF_HITS.first.forEach(([t, x, z], k) => { const p = P(t, x, z), v = k === 0 ? 0.42 : 0.16; S.crack(t, v, p, dest, 1800); S.boom(t, k === 0 ? 0.2 : 0.05, dest, this.rev); S.burst(t + 0.01, 0.5, 1200, 0.6, v * 0.25, p, dest, 'pink', 0.004); });
-    { const t = H.pot, C = NR_ROOF.chimney, p = P(t, C.x, C.z); S.crunch(t, 0.12, p, dest, this.rev); S.crack(t, 0.1, p, dest, 1500); }
+    NR_ROOF_HITS.first.forEach(([t, x, z], k) => { const p = P(t, x, z), v = k === 0 ? 0.42 : 0.16; S.crack(t, v, p, dest, 1800); S.boom(t, k === 0 ? 0.35 : 0.05, dest, this.rev); if (k === 0) S.thump(t, 0.3, dest); S.burst(t + 0.01, 0.5, 1200, 0.6, v * 0.25, p, dest, 'pink', 0.004); });
+    { const t = H.pot, C = NR_ROOF.chimney, p = P(t, C.x, C.z); S.crunch(t, 0.14, p, dest, this.rev); S.crack(t, 0.1, p, dest, 1500); S.boom(t, 0.1, dest, this.rev); }
   }
 
   // you: a gasp at the first stone, fast breathing in the doorway, a long breath out in the silence
@@ -332,14 +334,14 @@ class NrAudio extends AudioEngine {
     // the roof again: a light pulse; it grows when the storm comes
     for (let t = NR.sky[1] + 0.2, k = 0; t < NR.cloud; t += 0.6 - 0.1 * MathX.smooth(t, NR.gale[0], NR.cloud), k++) S.tone(t, 0.16, k % 4 === 0 ? 65.4 : 55, 0.03 + 0.03 * MathX.smooth(t, NR.gale[0], NR.cloud), 0, out, 'triangle', 0.004, 0.14);
     for (let i = 0; i < 4; i++) S.pluck(NR.balloon + 0.2 + i * 0.13, [440, 523.3, 659.3, 880][i], 0.02, 0.1, out, 1.2, 0.7);
-    // the cloud: a low hit and a drone that tightens; the count (one tick a second); cut dead at the first ice
+    // the cloud: a low hit and a drone that tightens; the count (one tick a second); cut just before the first ice (a hush)
     const F = NR_ICE.first;
     S.thump(NR.cloud, 0.16, out); S.tone(NR.cloud + 0.4, 2.0, 1318.5, 0.005, 0.2, out, 'sine', 0.05, 1.6);
     const dr = ctx.createGain(); dr.connect(out); dr.gain.setValueAtTime(0, NR.cloud);
-    for (const [t, v] of [[NR.cloud + 1.5, 0.02], [F - 0.4, 0.05], [F - 0.02, 0.055], [F, 0]]) dr.gain.linearRampToValueAtTime(v, t);
+    for (const [t, v] of [[NR.cloud + 1.5, 0.02], [F - 0.9, 0.05], [F - 0.6, 0]]) dr.gain.linearRampToValueAtTime(v, t);
     for (const f of [55, 82.4, 116.5]) { const o = ctx.createOscillator(); o.type = f > 100 ? 'triangle' : 'sine'; o.frequency.value = f; o.connect(dr); o.start(NR.cloud); o.stop(F + 0.05); }
     for (let k = 3; k >= 1; k--) S.tick(F - k, 1500, 0.02, out);
-    for (let t = F - 3, k = 0; t < F - 0.05; t += 0.5, k++) S.heart(t, 0.05 + 0.01 * k, out);
+    for (let t = F - 3, k = 0; t < F - 0.6; t += 0.5, k++) S.heart(t, 0.05 + 0.01 * k, out);
     // the end: one held chord under the lines
     for (const f of [110, 164.8, 220, 246.9, 261.6]) S.tone(NR.line[0] - 0.2, NR.black - NR.line[0] + 0.2, f, 0.016, 0, out, 'triangle', 1.6, 0.05);
   }

@@ -175,7 +175,7 @@ const FILM = {
     let A = null, B = null, C = null, D = null, line = '';
     if (S > 3.7 && S < NR.walk[1] - 0.1) A = [this._proj(cam, V.set(NR_ROOF.x0 + 0.3, NR_ROOF.y + 2.3, 2.3)), 'KITE · <b>NO LIFT</b>', 'right'];
     if (S > NR.walk[1] + 0.15 && S < NR.drop.rel - 0.1) A = [[600, 1330], 'GROUND FLOOR · <b>22 M DOWN</b>'];
-    if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8).add({ x: 0.9, y: 0, z: 0.3 })), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
+    if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8).add({ x: 0.4, y: 0, z: 0.15 })), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
     if (S > NR.drop.rel + 0.1 && S < NR.cut0 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: 0, y: 0.3, z: 0 })), 'NORMAL AIR', 'left'];
     if (sky) {
       // the piece of ice you are falling with; the cloud (water: it stays up with the air) streaming up past
@@ -188,11 +188,11 @@ const FILM = {
     if (S > NR.pop + 1.3 && S < NR.pop + 2.8 && St.toy.visible) B = [this._proj(cam, St.toyAt(S, V).add({ x: 0, y: 0.45, z: 0 })), 'PARACHUTE · <b>CAN’T OPEN</b>', 'left'];
     if (S > NR.pop + 0.45 && S < NR.pop + 1.9) D = [this._proj(cam, St.toyGhostAt(S, V).add({ x: 0, y: 0.9, z: 0 })), 'NORMAL AIR', 'left'];
     // the storm: the rain (water) is still blown; the sheets aren't; soot falls while steam blows
-    if (S > NR.gale[0] + 0.7 && S < 27.4) B = [this._proj(cam, V.set(0.5, 0.1, -3).applyMatrix4(cam.matrixWorld)), 'RAIN IS WATER · <b>STILL BLOWN</b>'];
-    if (S > NR.gale[0] + 1.3 && S < 27.9 && app.roof.ghostSheet.m.visible) D = [this._proj(cam, V.copy(app.roof.sheets[0].m.position).add({ x: -0.4, y: 0.25, z: -1.0 })), 'NORMAL AIR', 'left'];
+    if (S > NR.gale[0] + 0.7 && S < 25.9) B = [this._proj(cam, V.set(0.5, 0.1, -3).applyMatrix4(cam.matrixWorld)), 'RAIN IS WATER · <b>STILL BLOWN</b>'];
+    if (S > 26.0 && S < 27.9 && app.roof.ghostSheet.m.visible) D = [this._proj(cam, V.copy(app.roof.sheets[0].m.position).add({ x: -0.4, y: 0.25, z: -1.0 })), 'NORMAL AIR', 'left'];
     // after the ice: the one sheet left hangs dead still in the storm, shot to lace, while the rain flies past it
     if (S > NR.out + 0.2 && S < NR.line[0] - 0.1) { const Lt = app.roof.lineT; A = [this._proj(cam, V.copy(app.roof.sheets[2].m.position).add({ x: Lt[0] * 0.9, y: 0.3, z: Lt[1] * 0.9 })), 'IN A 110 KM/H WIND · <b>BARELY MOVES</b>', 'right']; }
-    if (S > NR.balloon + 0.3 && S < NR.cloud - 0.2) B = [this._proj(cam, app.balloons.centre(S, V).add({ x: 0, y: 0.6, z: 0 })), `BUOYANCY, NO DRAG · <b>${Math.round(app.balloons.speed(S) * 3.6)}</b> KM/H`];
+    if (S > NR.balloon + 0.12 && S < NR.balloon + 1.2) B = [this._proj(cam, app.balloons.centre(S, V).add({ x: 0, y: 0.6, z: 0 })), `BUOYANCY, NO DRAG · <b>${Math.round(app.balloons.speed(S) * 3.6)}</b> KM/H`];
     if (S > NR.drop.rel - 0.05 && S < NR.drop.rel + 2.2) line = 'SLOW MOTION ×0.6';
     if (S > NR.slow[0] && S < NR.slow[1]) line = 'SLOW MOTION ×0.5';
     if (S > NR.inDoor - 1.0 && S < 40.0) line = 'ICE: <b>STRAIGHT DOWN</b> · RAIN: BLOWN';

@@ -67,7 +67,7 @@ debris raining down.
    6.2 s instead of 8.0, no panels, one live tag on the stone, a plain place label ("9 KM ABOVE THE PARTY"), droplet
    streaks rushing up past the still stone, lightning; no glow disc or bokeh.
 2. **Tilt-ups to tiny things in an empty sky** (confetti, balloons). The confetti's whole arc now fits one level frame;
-   the balloon release is framed tight on the girl's hand and the tilt stops at ~25° while they leave the top of frame.
+   the balloon release is framed tight on the girl's hand at eye level, with no tilt-up: they leave the top of frame.
 3. **The boxed 3-2-1 countdown** (used in the moon, slow-sound, Andromeda and v1 cuts). Replaced by a small top-left
    clock from the moment you are back on the roof ("THE CLOUD'S ICE LANDS IN 16 S"), which hands over to the ice
    readout at the first stone.
@@ -111,19 +111,20 @@ the cloud); the first stones play at 0.5× (story 36.85–37.75). Story 62.4 →
 | Film s | What we SEE | Caption / HUD |
 |---|---|---|
 | 0–3.4 | The windy party from the stair door: sheets, bunting, the kite high up; at 2.0 everything drops | TITLE · AERODYNAMIC FORCE 100 % → 0 % |
-| 3.4–6.3 | Zoom to the kite's flyer at the front corner, the kite falling past the parapet | *The wind is still blowing at 50 km/h…* / *…but the kite dropped like a brick.* · KITE · NO LIFT |
-| 6.3–11.7 (6.3–10.1) | Over the stairwell rail: paper and ball let go together, 22 m down, slow motion; the NORMAL AIR ghost flutters near the top | GROUND FLOOR · 22 M DOWN · BOTH LAND IN 2.14 S · SLOW MOTION ×0.6 · *Paper now falls as fast as a ball.* |
+| 0–3.4 (detail) | From 2.15 the camera follows the kite down as it falls | — |
+| 3.4–6.3 | Zoom to the kite's flyer at the front corner, the kite fallen past the parapet | *The kite just dropped like a brick…* / *…but the wind is still blowing at 50 km/h.* · KITE · NO LIFT |
+| 6.3–11.7 (6.3–10.1) | Over the stairwell rail: paper and ball let go together, 22 m down, slow motion; the NORMAL AIR ghost flutters near the top; a snap-in (FOV 44 → 16) as they land | GROUND FLOOR · 22 M DOWN · BOTH LAND IN 2.14 S · SLOW MOTION ×0.6 · *Paper now falls as fast as a ball.* |
 | 11.7–17.9 (14.2–20.4) | 9 km up beside one hailstone against blue sky and the storm's wall; down into the cloud; droplets stream up past the still stone; lightning | 9 KM ABOVE THE PARTY · THIS ICE · km/h · CLOUD DROPLETS · STILL HELD UP · *Up in the storm, all of its ice is falling…* / *…and the air can't slow it down.* |
-| 17.9–21.5 (20.4–24.0) | Back on the roof, the confetti cannon: one clump goes up and comes down like gravel; the toy paratrooper's canopy can't open; its ghost drifts off | clock THE CLOUD'S ICE LANDS IN 16 S · CONFETTI · NO DRAG · PARACHUTE · CAN'T OPEN · NORMAL AIR · *So a parachute is useless.* |
-| 21.5–27.4 (24.0–29.9) | The gust front: 110 km/h, rain sideways, a ghost sheet thrashing, the real sheets barely moving | WIND 110 KM/H · RAIN IS WATER · STILL BLOWN · *The rain flies sideways…* / *…but the washing barely moves.* |
+| 17.9–21.5 (20.4–24.0) | Back on the roof, the confetti cannon: one clump goes up and comes down like gravel; the toy paratrooper's canopy can't open; its ghost drifts off (one level frame) | clock THE CLOUD'S ICE LANDS IN 16 S · *All of it lands here in 16 seconds.* · CONFETTI · NO DRAG · PARACHUTE · CAN'T OPEN · NORMAL AIR · *So a parachute is useless.* |
+| 21.5–27.4 (24.0–29.9) | The gust front: 110 km/h, rain sideways, a ghost sheet thrashing, the real sheets barely moving; a slow push in on the washing | WIND 110 KM/H · RAIN IS WATER · STILL BLOWN · *The rain flies sideways…* / *…but the washing barely moves.* |
 | 27.4–30.5 (29.9–33.0) | Snap to the girl: she lets go; the balloons shoot up out of frame | BUOYANCY, NO DRAG · km/h · *Balloons now rocket up at 2 g.* |
-| 30.5–34.35 (33.0–36.85) | Look up at the dark cloud; back down to the party; the clock runs out | *That cloud's ice has been falling for 31 seconds…* / *…and the first of it is about to land.* |
+| 30.5–34.35 (33.0–36.85) | Back to the party under the dark cloud; the clock runs out; a hush | *That cloud's ice has been falling for 31 seconds…* / *…and the first of it is about to land.* |
 | 34.35–36.15 (36.85–37.75) | The first stones, slow motion: a stone into the confetti, chips skimming flat across the deck | ICE LANDING NOW 1,235 KM/H · SLOW MOTION ×0.5 |
 | 36.15–43.6 (37.75–45.2) | Back to the stair door; snap-ins as the bottles and the cake go; the fairy lights | ICE: STRAIGHT DOWN · RAIN: BLOWN · *It's landing faster than sound.* |
 | 43.6–46.2 (45.2–47.8) | Holes punched through the roof over you; look up | *And now it's coming through the roof.* |
-| 46.2–51.9 (47.8–53.5) | Crouched at the top of the stairs: a sheet drops, the chairs go over, the chimney pot and the table in one frame | *Now faster than a pistol bullet.* |
+| 46.2–51.9 (47.8–53.5) | Crouched at the top of the stairs: a sheet drops, the chairs go over, the chimney pot goes, then a snap-in as the table comes down | *Now faster than a pistol bullet.* |
 | 51.9–54.4 (53.5–56.0) | Silence. You step out: a white roof, a sheet shot to lace barely moving in the wind | IN A 110 KM/H WIND · BARELY MOVES |
-| 54.4–60.5 (56.0–62.1) | Closing lines over the roof (top third) | *Every storm cloud / is full of ice.* · *Only the air holds it up.* · note |
+| 54.4–60.5 (56.0–62.1) | Closing lines over the roof (top third); a slow walk out towards the lace sheet, eye line raised | *Every storm cloud / is full of ice.* · *Only the air holds it up.* · note |
 | 60.5–60.8 | black | — |
 
 ## 4. Systems / files
@@ -156,4 +157,17 @@ dark rims on the roof holes and less bloom under them; the balloon release frame
 back from the cloud; stairwell zoom reduced; the landing tag moved off the landing; tags kept clear of the readouts;
 closing lines moved to the top third; present-tense captions; the physics wording (the note says the ice loses no
 speed to droplets or rain; "the air can't slow it"; the last sheet keeps the rain's lean and is tagged BARELY MOVES).
-Final scores: see `EPISODE_REPORT.md`.
+
+**v2 round 3 / review round 5** (60.8 s preview): differentiation 6/10 (old cut 2/10); retention 6 (hook 6.5, middle 5,
+clarity 6, escalation 6.5, payoff 6); normal viewer 6.5 (hook 7, understanding 6, wow 6.5, ending 6, rewatch/share 6).
+Recycled (strongest first): the gust's wind panel + ghost sheet + "RAIN IS WATER" tag; the paper/ball drop; the balloon
+tilt-up; the toy parachute; the clock; the km/h counter. Stretches over 4 s without a new event: 23.0–27.4,
+29.0–34.35, 49.8–60.5. The first ice crack only ~2.5 dB over the drone; the table and chimney had no sound peak.
+
+**Fixes after round 5:** the confetti and the balloons in level frames (no tilt-ups); the camera follows the kite down
+and the kite captions now say what you see first; a snap-in on the stairwell landing; a caption ties the clock to the
+ice ("All of it lands here in 16 seconds."); the rain and ghost-sheet tags no longer overlap; a slow push in on the
+washing through the gust; a snap-in as the table comes down; the end walks out towards the lace sheet with a raised
+eye line; sound: a hush before the first stone (the roof's sounds pulled down, the drone and heartbeat stop 0.6 s
+before), a bigger first hit with a low thud, the roar held up after the first stones, a boom under the chimney pot and
+the table. Final scores: see `EPISODE_REPORT.md`.
