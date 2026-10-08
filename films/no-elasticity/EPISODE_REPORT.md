@@ -1,4 +1,4 @@
-# Episode report — WHAT IF EVERYTHING LOST ITS ELASTICITY?
+# Episode report — WHAT IF EVERYTHING LOST ITS ELASTICITY? (v2)
 
 **TITLE**
 WHAT IF EVERYTHING LOST ITS ELASTICITY? (slug `no-elasticity`, page `no-elasticity.html`)
@@ -6,108 +6,89 @@ WHAT IF EVERYTHING LOST ITS ELASTICITY? (slug `no-elasticity`, page `no-elastici
 **BRANCH**
 `episode/no-elasticity-w25koa` (PR #1 was opened from the UI; nothing merged).
 
+**VERSION**
+v2, the redesign under the owner's creative direction override of 2026-10-08 ("stop making repetitive videos"). v1
+(60.2 s, street beats) was delivered that morning; its code is still in the repository, switched off by `NE_STREET`.
+Why and how: `REDESIGN.md`. Shot list: `PLAN.md` §3b. Review log: `PLAN.md` §8.
+
 **DURATION**
-60.2 s film (1807 frames at 30 fps, 1080 × 1920). It is cut from a 73.6 s story clock with `CONFIG.edit`: four waits are
-dropped and the crash (story 53.35–55.0) plays at 1/3 speed. See `PLAN.md` for the mapping.
+60.6 s (1819 frames at 30 fps, 1080 × 1920). Film time = story time (no `CONFIG.edit`).
 
 **PHYSICS RULE**
 Solids lose elastic recovery. They still resist being deformed (stiffness and strength are unchanged), but once deformed
-they never spring back: every solid behaves as perfectly plastic, and its deformation is the running maximum of what it has
-taken. Held constant: gravity, mass, momentum, air and other gases (tyres stay round), water, living tissue (people are
-fine), engines (spared by fiat; the closing note says so). Collisions are perfectly inelastic (e = 0). The closing note:
-"Fictional rule: solids never spring back. People, air, water and engines work as normal." Full rules, numbers and
-simplifications: `PLAN.md` §1.
+they never spring back: every solid behaves as perfectly plastic and keeps the running maximum of what it has taken.
+Collisions are perfectly inelastic. Unchanged: gravity, mass, momentum, air and water, living tissue (people are fine).
+Closing note: "Fictional rule: solids never spring back. People, air and water are unchanged."
 
-**REUSED SYSTEMS** (engine `js/`, unchanged)
-`CameraController` (first-person head, cinematic shots via the pov track), `ViewerHands` (the rubber band), `People` /
-`Person` (teenager, kid, walkers, the running club), `VehicleFactory` (car bodies and profiles), `Environment` (subclassed
-as `NeCity`), `AudioEngine` (subclassed as `NeAudio`), `StoryHUD` (title, captions, readouts, closing note), `Edit`
-(the cut and the slow motion), post-processing, fog, `Look`, particles, timeline tracks, seeded RNG, textures, geometry
-helpers, the dev controls. Tools: `check-page`, `stills`, `contact-sheet`, `preview-sheets`, `render-parallel`,
-`render-wav`, `bake-soundtrack`, `encode-final`.
+## What changed from v1 (the exact scenes)
 
-**NEW SYSTEMS** (all in `films/no-elasticity/`, all prefixed `Ne` / `NE` / `ne`)
-- `city.js`: `NeCity`: the avenue, a raised brick speed table, the junction and signal masts, a plaza, a café with a
-  cushioned bench, a steel footbridge. Vertex-shader bending (`neSag`, `neDroop`, `neLean`) shows the footbridge's kept
-  dip, drawn 300× deeper and labelled so (`NE_SAG_DRAW`).
-- `props.js`: `NeBall` (a solid rubber ball whose flat spot stays; a dashed arc over its old top), `NeTramp` (round
-  trampoline whose springs stay stretched and whose mat stays down in a funnel), `NeRacket`, `NeShoe`, `NeCushions`,
-  `NeBand` (the rubber band your hands stretch once).
-- `cars.js`: `NeCar` (permanent spring set per axle event, capped at the bump stops; coils that shorten; crush),
-  `neBuildTruck`, `neLane`, `NE_CRASH` (a perfectly inelastic three-car crash solver: momentum and angular momentum
-  conserved, tyre scrub, the van piling in), `NE_TAP` (the 5 km/h tap and back-off), `NeTraffic`, scrape sparks.
-- `cast.js`: `NeCast` (people, the running club and its load on the footbridge, film actions and shadows).
-- `film.js`: the cinematic inserts (`NE_SHOTS`), world-pinned tags (`NE_TAGS`), the dashed "where it used to be" lines,
-  hand poses, the grade.
-- `audio.js` / `soundtrack.js`: `NeAudio` and its bake (sounds that obey the rule: no boings, no ringing, no horns).
-
-**ASSETS ADDED**
-None. Everything is procedural (geometry, textures and sound are generated in code). No third-party media.
-
-**ENGINE CHANGES**
-None (`git diff` on `js/` is empty; `js/audio/audioEngine.js` untouched).
-
-**MAJOR TIMESTAMPS** (film seconds)
-| Time | Beat |
+| v1 (delivered 2026-10-08 morning) | v2 |
 |---|---|
-| 0.0 | Title over the plaza; a teenager dribbling a solid rubber ball; SHAPE RECOVERY 100 % → 0 % (0.35–1.25). |
-| 1.45 | The ball lands and stays down. |
-| 1.75 | Low close-up of the flat ball, a dashed arc over its old top (WHERE ITS TOP USED TO BE). |
-| 5.6 / 7.55 / 9.5 / 11.45 | Montage: racket strings, shoe foam, cushion dent, rubber band. |
-| 13.4 | "Even things built to bounce back…" |
-| 15.98 | The trampoline mat stays down; "Bodies are fine. Their gear isn't." |
-| 18.2 | A red hatch heads for the speed table. |
-| 19.9 | Beside its front wheel: the body settles below a dashed line, RIDE HEIGHT LOST 0 → 8 cm. |
-| 23.5 | Two low cars scrape over the table. |
-| 26.4 | Beside a loaded truck's rear axle: its springs end on their stops (0 → 11 cm). |
-| 30.7 | The footbridge: a running club crosses; the deck keeps its deepest dip (7.2 mm, drawn 300×). |
-| 36.1 | The payoff: an SUV runs the red into a sedan. 1/3 slow motion 36.65–41.6, contact at 37.4. |
-| 40.7 | High arc round the wreck; the van piles in at 41.2; "Three cars. One wreck." (43.6). |
-| 46.0 | A late hatch taps the wreck at 5 km/h (47.5), backs off: the bumper stays pushed in. |
-| 50.6 | "Without elasticity…" |
-| 51.9 | Back low beside the flat ball (the opening, looped); "…almost nothing gets a second chance to return to shape." (53.2) |
-| 56.9 | Closing note; fade to 60.2. |
+| 0–5.6 a teenager dribbles a solid rubber ball in the plaza; low close-up of its flat spot | **0–5.6 a Newton's cradle and a quartz desk clock on a café table.** Three clacks under the title; the clock takes its last step at 1.0 s; at 1.56 the end ball swings back and nothing flies out: the row just shoves along together ("tock", not "clack"). Low insert with a ghost of the ball that should have flown out |
+| 5.6–13.4 montage; 13.4–18.2 trampoline | Kept (bigger label lines; the tennis ball now barely leaves the strings, since its air still pushes back) |
+| 18.2–23.5 a red hatch over a speed table, low wheel shot | **18.2–21.8 the bow**, first person: draw, aim (target beside the grip), let go. The arrow falls off the bow; the bow turns side-on with its limbs still bent. **21.8–23.4** a low 3/4 shot of the arrow lying on the paving |
+| 23.5–30.7 cars scraping over the table; a truck on its bump stops | **23.4–27.3 the tuning fork** at the café table: it goes "tk" and the struck prong stays bent. **27.3–30.9 your watch** stopped at 3:41:52, "one second into this video" |
+| 30.7–36.1 the footbridge's 7 mm sag | **30.9–37.3 inside the watch** (macro): the quartz crystal, a tuning fork that should spring back 32,768 times a second, is still |
+| 36.1–46.0 a three-car crash at an intersection | **37.3–40.9 the plaza clock**, stopped at the same instant; "So did the clock in your phone." |
+| 46.0–50.0 a 5 km/h tap dents a bumper | **40.9–49.6 time-lapse** of the rest of the day: THE CLOCKS SAY 3:41 PM vs THE REAL TIME 3:42 → 9:05 PM; inserts of the trampoline (deeper only after a harder landing) and a tree whose lean grows with each stronger gust |
+| 50.0–60.2 an empty street, then back to the ball close-up | **49.6–58.0** one push from the dusk wide into the lit, stopped clock, the closing lines and the note; **58.0–60.6** cut back to the desk clock on the café table: "Now watch the clock in the first second." (the loop) |
 
-**KNOWN LIMITATIONS**
-- The ball's flat spot (10 % of its diameter, physically right) is subtle at phone size; the ball can still read as round.
-- The footbridge is thin in the frame and its runners are small.
-- The scraping cars' sparks are barely visible, and sparks at crawling speed are physically debatable.
-- The montage reads as a list of four label plates.
-- The rubber-band hands look odd.
-- The van's tail is a blank slab (no lights or bumper detail).
-- The late hatch brakes without a braking dive (under the rule its front springs would set a little too).
-- An 18 cm solid rubber ball would be heavy (several kg) to dribble.
-- The car and truck beats feel alike.
-- The sound has only been level-measured, never listened to.
-- The fixes after the fourth review were not re-scored.
+### The v1 problems this answers (the owner's "fix the existing video" list)
 
-**FINAL PREVIEW PATH**
-- MP4: `/mnt/project-files/no-elasticity/no-elasticity.mp4` (not committed). 1080 × 1920, 30 fps, 60.2 s, 1806 frames,
-  H.264 (two-pass, about 3.5 Mbit/s) + AAC 160k stereo, 26.5 MiB, one file.
-- Runnable ZIP (unzip, open `no-elasticity.html`, press Space): `/mnt/project-files/no-elasticity/no-elasticity_film.zip`
-  (tested unzipped with `check-page`: boots, "SOUND READY after 0s", no console errors).
-- In the repo: open `no-elasticity.html` (the baked soundtrack is in `films/no-elasticity/soundtrack.js`).
+- **Three most repetitive sequences (v1):** the car over the speed table and its wheel close-up (18.2–23.5); the scraping
+  cars and the truck on the same avenue (23.5–30.7); the three-car crash and the arc round the wreck (36.1–46.0). All three
+  are gone.
+- **Three most boring stretches (v1):** the footbridge (30.7–36.1, a 7 mm sag that had to be drawn 300× to see); the 5 km/h
+  tap (46.0–50.0); the empty street before the loop (50.0–51.9). All gone.
+- **Weakest visual demonstration (v1):** the footbridge sag. Replaced by the bow (the arrow drops) and the stopped quartz
+  crystal.
+- **Weakest part of the ending (v1):** a quiet return to the opening ball close-up after the crash. v2 ends on its biggest
+  idea instead: the whole day passes while every clock says 3:41, and the loop back to the desk clock invites a rewatch.
 
-**PERFORMANCE / FPS**
-- Scene cost per frame (probe): 182–759 draw calls, 204K–285K triangles.
-- Software WebGL (headless SwiftShader, 432 × 768) frame times after warm-up: 14–45 ms for most sampled
-  frames, one at 522 ms. Real-time FPS on a GPU browser was not measured here.
-- Final render: about 13 s per 1080 × 1920 frame per worker in software WebGL; 4 workers took 97–99 min for the 1807
-  frames.
-- Sound: −17.2 LUFS integrated, loudness range 8.8 LU. The WAV peaks at −1.5 dBTP, but the AAC encode overshot to
-  −0.3 dBTP, so the audio was re-encoded through a −2.5 dB peak limiter (`alimiter=limit=0.75`); the delivered MP4
-  measures −17.2 LUFS and −2.4 dBTP. The video stream was copied unchanged.
+## Systems
 
-**REVIEW NOTES** (four independent reviewers per round, scores out of 10, exactly as given)
-| Round | Cut | Retention | Normal viewer | Cinematography | Physics |
-|---|---|---|---|---|---|
-| 1 | 71.6 s | 4.5 | 5 | 5 | 5 |
-| 2 | 60.8 s | 5.5 | 5.5 | 5 | 7 |
-| 3 | 60.4 s | 5.5 | 5 | 5.5 | 8 |
-| 4 | 60.2 s | 6 | 5 | 6 | 8 |
+**REUSED** (engine `js/`, unchanged): `CameraController` (first person and cinematic shots via the pov track),
+`ViewerHands` (the rubber band, the bow, the fork, the watch), `People` / `Person`, `Environment` (subclassed as `NeCity`),
+`AudioEngine` (subclassed as `NeAudio`), `StoryHUD`, post-processing, fog, `Look`, timeline tracks, seeded RNG, textures,
+the dev controls. Tools: `check-page`, `stills`, `contact-sheet`, `preview-sheets`, `render-parallel`, `render-wav`,
+`bake-soundtrack`, `encode-final`.
 
-Round 4's main notes and what was done about them are in `PLAN.md` §8. In short: the end now loops back to the opening
-ball close-up, the dead-air street was cut short, captions were rewritten in plainer words, "Three cars. One wreck." moved
-onto the arc, the crash and wreck cameras and the tap framing were adjusted, tags stay inside the frame, creaks and long
-rumbles became short dull whumps, and the closing note is in plain words. Those fixes were not re-scored. The weaknesses
-listed above are what the reviewers still flagged or what is still open.
+**NEW in v2** (all in `films/no-elasticity/`, prefixed `Ne` / `NE` / `ne`):
+- `cradle.js`: `NeCradle` (five steel balls on V-strings; elastic clacks, then one perfectly inelastic hit that moves the
+  whole row as one lump; the ghost ball), `NeDeskClock` (stops at 1.0 s), the café lamp for the last shot.
+- `bow.js`: `NeBow` (limbs that bend on the draw and keep the bend; a limp string after the release), `NeArrow` (falls
+  off the bow; its resting pose is computed from the release, so any frame can start a render), `NeTarget`, `NeFork`
+  (the struck prong stays bent), `NeWatch` (the dial on your wrist, stopped at 3:41:52).
+- `clocks.js`: `NeClock` (the plaza clock, lit at dusk), `NeQuartz` (the macro set inside the watch: gears, step motor,
+  circuit, the quartz crystal in its can and its ghost vibration), `NeLapse` (the time-lapse: shadows, people, the
+  trampoline's running-max depth `NE_PIT`, gust-by-gust tree lean `NE_GUSTS`, dusk lamps, the trunk line).
+- `film.js` / `script.js`: the v2 shots, tags, hand poses, captions and readouts.
+- `audio.js` / `soundtrack.js`: the v2 sound (below).
+
+**ASSETS ADDED:** none. Everything is procedural. No third-party media.
+
+**ENGINE CHANGES:** none (`git diff` on `js/` is empty; `js/audio/audioEngine.js` untouched).
+
+## Sound
+
+Every sound of something springing back is missing. Three bright cradle clacks, then one dead "tock"; the desk clock's
+two ticks, the second its last; the bow's soft creasing, no twang, a slack "fwup" and one clatter; the fork's single "tk";
+the watch's silence; inside the watch a thin whine for the normal vibration that stops dead; a low boom on the plaza
+clock; the time-lapse's rush, sped-up voices, gusts and dull landings, a plucked pulse that climbs through the afternoon
+and slows at dusk; crickets; one last quiet tick under the rewatch line. The bed and music dip for half a second before
+each dead hit. WAV: −18.3 LUFS integrated, −1.9 dBFS sample peak. The sound has been level-measured, never listened to.
+
+## Reviews (scores out of 10, exactly as given)
+
+| Round | Cut | Viewer | Retention | Cinematography | Physics | Differentiation |
+|---|---|---|---|---|---|---|
+| v1 final (round 4) | 60.2 s street cut | 5 | 6 | 6 | 8 | 4 (scored in round 5) |
+| v2 round 5 | 59.6 s first redesign preview | 6.5 | 6 | 6 | 7 | 7 |
+| v2 round 6 | 60.6 s second preview | 6 | 5 | 6 (with phone clarity) | — | 7 |
+
+Round 6's fixes (the ending, the desk clock, the bow, the caption pass) went into the final render and were not
+re-scored by a reviewer; the final audit below is mine.
+
+## Final production audit
+
+Pending: the final 1080 × 1920 render is in progress.

@@ -158,3 +158,23 @@ Still weak (honest): the ball's flat spot is subtle at phone size; the footbridg
 sparks are barely visible (and debatable at crawling speed); the montage reads as a list; the rubber-band hands look odd;
 the van's tail is a blank slab; the late hatch shows no braking dive; an 18 cm solid rubber ball is heavy to dribble; the
 car and truck beats feel alike. The sound has only been level-measured, never listened to.
+
+**v2, round 5** (the redesign's first full preview, 59.6 s; five independent reviewers on contact sheets + the brief,
+scores out of 10 as given): normal viewer 6.5, retention 6, cinematography 6, physics 7, differentiation 7 (the v1 cut:
+4). Main findings: the plaza opening, the look-down at the arrow and the one wide crowded plaza still felt recycled; the
+opening clock was hidden behind the readout; the bow's draw and release didn't read edge-on; the time-lapse was one
+locked shot for 19 s with labels on things too small to see; the stray dashes on the watch dial at 31 s. Physics: the
+recovery ramp must wait for the clock's last step; "no time", "same second", "arrow speed" and "the sun says" overclaimed;
+the tags contradicted the running-max model; a pressurised tennis ball keeps its air; phones and computers run on quartz
+too. Fixed in round 6: the Newton's cradle opening, the arrow seen low from behind its nock, two close inserts in the
+time-lapse, a night ending, and every wording fix listed in `REDESIGN.md`.
+
+**v2, round 6** (60.6 s preview; two fresh reviewers): normal viewer 6, retention 5, differentiation 7, cinematography /
+phone clarity 6. Main findings: the desk clock's last step was too small to check on a phone; the ending wound down for
+11 s (a locked dusk wide, then a static night clock with a small note); the target hid behind the bow hand and the arrow
+read end-on; the fallen arrow looked upright; captions sat on the fork's prongs, the clock dial and the tree trunk; the
+montage lines were too small; "No tick" was on screen under a second; the v1 orange ball and teenager were still in the
+plaza. Physics: "trees keep every gust" vs living tissue (trunks are mostly dead wood); "every phone and computer" while
+the plaza carries on (now "the clock in your phone"); "heavier lands" (it is the harder landing). All fixed before the
+final render (see `EPISODE_REPORT.md`). Their bigger structural idea (move the bow into the first ten seconds) was not
+taken: it would break the escalation from bouncing to time, and the film would need new material to stay over 60 s.
