@@ -1,6 +1,6 @@
 # WHAT IF THE SPEED OF SOUND BECAME 10× SLOWER? — production plan
 
-A 71-second vertical (9:16, 1080×1920, 30 fps) first-person film on the shared engine. One place, one continuous take, no
+A 69.8-second vertical (9:16, 1080×1920, 30 fps) first-person film on the shared engine. One place, one continuous take, no
 cuts: you stand on the kerb at the corner of a parking lot on a sunny avenue, with a construction site and an elevated
 highway beyond the lot. Under the centred title the speed of sound falls from 343 m/s to **34.3 m/s** (1,235 → 123 km/h)
 at 1.35–2.45 s. From then on every sound in the film reaches you late, by exactly its distance ÷ 34.3 m/s, and anything
@@ -13,8 +13,8 @@ faster than 123 km/h outruns its own sound.
 | Exact fictional rule | The speed of sound in air is 34.3 m/s instead of 343 m/s. Nothing else is changed. |
 | Held constant | Light, air density and pressure, gravity, materials, engines, people, the speeds things normally move at. |
 | Changed | Every sound arrives 10× later (2.9 ms per metre). Every speed is 10× closer to Mach 1: 50 km/h is Mach 0.40, 110 km/h Mach 0.89, 126 km/h Mach 1.02, 160 km/h Mach 1.30, a landing airliner Mach 2.1, a cruising one Mach 8 (236 m/s against the colder air's 29.5 m/s at 11 km). |
-| Real consequences (one per beat) | 30 m: a clap and a shout arrive 0.88 s after you see them. 100 m: a pile driver's bangs arrive 2.94 s late and keep coming after it stops. A 50 km/h siren is pitched +68 % coming and −29 % going (more than an octave apart). A car at 110 km/h is at Mach 0.89; speeding up to 126 km/h it passes Mach 1 and drags a shock cone: what it emitted after that arrives squeezed together, and its boom reaches you only after it has run p / √(M²−1) ≈ 240 m supersonic. Propeller tips go supersonic and crackle. A landing airliner flies silently overhead; its shock reaches the street ~5.7 s later, cracks a few weak panes, sets off car alarms and the pigeons. A police car at Mach 1.3, 11 m away, is never heard coming; its shock bursts the weakest windows along the street; after it has passed, the siren it sounded while approaching arrives in reverse. |
-| Simplifications | Sound is a single wave speed with no wind, no temperature layering and no absorption change. Shock strength is not simulated as a pressure field: which panes give way is chosen per pane from a seeded hash (about 12 % burst on the near side, 5 % across), and on the stretch of shopfront you watch the fates are set by hand (two weak panes burst, one cracks, the rest hold) so it reads. Hearing a 34 m/s world: the same air, the same ear, the same loudness at the source. |
+| Real consequences (one per beat) | 30 m: a clap and a shout arrive 0.88 s after you see them. 100 m: a pile driver's bangs arrive 2.94 s late and keep coming after it stops. A 50 km/h siren is pitched +68 % coming and −29 % going (more than an octave apart). A car at 110 km/h is at Mach 0.89; speeding up to 126 km/h it passes Mach 1 and drags a shock cone: what it emitted after that arrives squeezed together, and its boom reaches you only after it has run p / √(M²−1) ≈ 240 m supersonic. Propeller tips go supersonic and crackle. A landing airliner flies silently overhead; its shock comes up the street toward you at about 80 m/s (290 km/h: on a 3° glide the ground footprint runs 1/(1 − M·tan 3°) ≈ 1.11× faster than the plane) and reaches you ~5.7 s later, sets off car alarms and the pigeons; after it, the sound the airliner made while it approached arrives in reverse. A police car at Mach 1.3, 11 m away, is never heard coming; its shock bursts the weakest windows along the street; after it has passed, the siren it sounded while approaching arrives in reverse. |
+| Simplifications | Sound is a single wave speed with no wind, no temperature layering and no absorption change. Shock strength is not simulated as a pressure field: which panes give way is chosen per pane from a seeded hash (about 12 % burst on the near side, 5 % across), and on the stretch of shopfront you watch the fates are set by hand (two weak panes burst, one cracks, the rest hold) so it reads. Hearing a 34 m/s world: the same air, the same ear, the same loudness at the source. Absorption (which grows roughly as 1/c³, so about 1,000× here) is **not** modelled: distant sounds would really be duller and fainter. A voice's pitch stays but its formants would scale with c (deep, hollow); the shout is muffled with a low resonance rather than modelled exactly. The car's Mach 1.02 has a thin margin: it needs still air at about 20 °C (a 30 °C day or a 2 m/s headwind would keep it subsonic). "A normal road car" ignores transonic drag and the engine breathing the same slow air, which would both make 126 km/h harder to reach. |
 | Misconceptions to avoid | A sonic boom is not a one-off "bang when you break the barrier": it is a cone dragged behind for as long as the thing is supersonic, heard when the cone sweeps over you. You never hear a supersonic thing coming; you hear it after it has passed. Light is unaffected: you still see everything on time. |
 | Formulas / numbers used | `soundArrivalTime = eventTime + distance / soundSpeed` (`js/audio/soundArrival.js`). Mach = v / 34.3. Cone half-angle = asin(1/M). A shock reaches a listener at perpendicular distance p only after the source has been supersonic for p / √(M²−1) of track. Doppler: the received sound is the emitted sound replayed through a delay line whose delay is the exact arrival time, so pitch and loudness change by dte/dt. Arrival of a supersonic source is a fold of A(te) = te + d(te)/c; its minimum is the boom. |
 | Must NOT claim | That this could happen; exact window-breaking overpressures; that the airliner would survive (it is shown shuddering, flames surging, smoke pouring); any specific real place or vehicle model. |
@@ -27,11 +27,12 @@ faster than 123 km/h outruns its own sound.
   and later as the speed drops), waves, claps three more times, shouts "Hey! Over here!".
 - **The parking lot and plaza** to your right (x 13…52), cars parked in rows; three of them have alarms.
 - **The construction site**: a pile driver at (40, −95), 100.8 m away, hitting every 1.3 s until 16.15 s.
-- **The elevated highway** at x 62 (deck 6 m, open galvanised rails): the yellow sports car comes toward you on it from
+- **The elevated highway** at x 62 (deck 6 m, open galvanised rails): the orange-red sports car comes toward you on it from
   ~400 m at 110 km/h, passes Mach 1 at 28.7 s and passes you at x 57.2, 48 m away. Nothing stands in the long-lens line to it
   (the cross street's buildings on your side start beyond the highway).
 - **The drone** in the lot at (15.6, −4.8); its pilot at (18.8, −8.2).
 - **The airliner**: on a 3° glide at 72 m/s, 220 m up, passing over x 24 at 48.6 s, flying toward you and over you.
+- **Light**: the sun is behind you and to the right, so the avenue, the friend and the far shopfronts are front-lit.
 - **The police car** in the near lane (x −1.75) at 44.4 m/s, passing you at 59.2 s, 11 m away.
 
 ## 3. Shot list (story seconds = film seconds, no cuts)
@@ -42,19 +43,19 @@ faster than 123 km/h outruns its own sound.
 | 2 | 4.2–11.0 | Zoom to the friend: a wave, three claps, a shout; rings spread from each sound | each clap 0.88 s after the hands meet; "Hey! Over here!" late | SOUND DELAY live counter 0.00 → 0.88 S · bubble "“ … ”" then "“Hey! Over here!”" on arrival · "You'd see people speak before you heard them." |
 | 3 | 11.0–19.1 | Zoom to the pile driver at 100 m, a dust puff each blow; it stops at 16.15 | bangs 2.94 s late; three more after it has stopped | SOUND DELAY 2.9 S · N BANGS STILL ON THE WAY · "A hundred metres away: three seconds late." · "It had already stopped…" / "…but the bangs kept coming." |
 | 4 | 19.0–24.0 | An ambulance at 50 km/h passes in the avenue | its two-tone siren high coming, more than an octave lower going | AMBULANCE · 50 KM/H MACH 0.40 · SIREN PITCH +68 % → −29 % · "Passing sirens would drop more than an octave." |
-| 5 | 24.0–37.9 | Long lens on a yellow sports car on the highway at 110 km/h; it speeds up past 123 km/h, dust off the deck behind it; the lens widens as it passes | a squeezed high whine, then (supersonic) its squeezed approach building into the boom (36.48), rattling windows, its engine low | LOCAL MACH 0.89 → 1.02 · SUPERSONIC · "ITS SHOCK WAVE REACHES YOU IN x S" · "Highway speed is now almost the speed of sound." · "A normal road car could break the sound barrier." · "It's outrunning its own sound." |
-| 6 | 38.3–44.2 | The drone takes off, its props crackling, and drops | a tearing buzz-saw crackle, then the crash 0.25 s late | DRONE PROPELLER TIPS MACH 2.6 · "Small propellers would go supersonic too…" / "…and couldn't keep it in the air." |
+| 5 | 24.0–37.9 | Long lens on an orange-red sports car on the highway at 110 km/h; it speeds up past 123 km/h, dust off the deck behind it; the lens widens as it passes | a squeezed high whine, then (supersonic) its squeezed approach building into the boom (36.48), rattling windows, its engine low | LOCAL MACH 0.89 → 1.02 · SUPERSONIC · "ITS SHOCK WAVE REACHES YOU IN x S" · "Highway speed is now almost the speed of sound." · "A normal road car could break the sound barrier." · "It's outrunning its own sound." |
+| 6 | 38.3–44.2 | The drone takes off, its props crackling, and drops | a tearing buzz-saw crackle, then the crash 0.28 s late (9.5 m) | DRONE PROPELLER TIPS MACH 2.6 · "Small propellers would go supersonic too…" / "…and couldn't keep it in the air." |
 | 7 | 44.2–49.1 | A landing airliner overhead, shuddering, flames surging, smoke, a cone of shocked air, in silence | nothing from it | AIRLINER · 260 KM/H MACH 2.1 / AT CRUISE ALTITUDE MACH 8 · "Even a landing airliner would be supersonic." · "And you can't hear it. Not yet." |
-| 8 | 49.3–54.4 | Look down the avenue: a low wall of dust comes up the street, pigeons burst off the roofs flock by flock, cars brake | the bed thins; then the long double boom (54.36), rumble, car alarms, wings | ITS SHOCK WAVE 355 M → 0 M · COMING UP THE STREET · 260 KM/H · "You'd see its shock wave before you heard it." |
+| 8 | 49.3–54.4 | Look down the avenue: a low wall of dust comes up the street, pigeons burst off the roofs flock by flock, a sedan in the near lane brakes to a stop | the bed thins; then the long double boom (54.36), rumble, car alarms, wings, then the airliner's own approach arriving in reverse | ITS SHOCK WAVE 355 M → 0 M · COMING UP THE STREET · 290 KM/H · "You'd see it hit the street before you heard it." |
 | 9 | 55.0–59.5 | A police car at 160 km/h comes straight up the near lane, lights flashing, silent; its shock (59.41): your fingers fly up into the frame, windows burst | silence (the quietest bed of the film), then the hardest crack, thump and rumble; glass pane by pane; its siren reversed, then low | POLICE CAR · 160 KM/H MACH 1.30 · countdown · "A police car you'd never hear coming." |
 | 10 | 60.0–63.2 | Hold on the shopfronts: two panes gone with glitter on the pavement, one cracked, most intact, a man cowering | glass still falling, alarms | "Only the weakest windows gave way." |
-| 11 | 63.2–71.0 | Aftermath: back to the friend across the avenue, stopped cars with brake lights and hazards | alarms falling away, a low chord | SPEED OF SOUND 123 KM/H / 34.3 M/S · "You wouldn't need a fighter jet…" / "…to break the sound barrier." · FICTIONAL SIMULATION note · fade 70.35–70.75 |
+| 11 | 63.2–69.8 | Aftermath: back to the friend across the avenue, stopped cars with brake lights and hazards | alarms falling away, a low chord | SPEED OF SOUND 123 KM/H / 34.3 M/S · "You wouldn't need a fighter jet…" (63.9) / "…to break the sound barrier." (66.3) · two-line FICTIONAL SIMULATION note (68.1) · fade to black 69.55–69.8 |
 
 ## 4. Hero shots (screenshot-worthy; cover candidate that doesn't spoil the payoff)
 
 - **Cover candidate (~46 s)**: the airliner overhead, shuddering in its own cone of shocked air, flames at the engines,
   with "MACH 2.1" on screen. It spoils nothing about the street payoff.
-- The yellow sports car on the highway, dust lifting off the deck behind it, "SUPERSONIC" on screen (~34 s).
+- The orange-red sports car on the highway, dust lifting off the deck behind it, "SUPERSONIC" on screen (~34 s).
 - The pigeon wave and dust sweeping up the avenue ahead of the airliner's boom (~53 s).
 - The shopfronts after the police car: glitter carpets in front of a few burst windows (~61 s).
 
@@ -73,11 +74,13 @@ infrastructure, then the street.
 by `SoundArrival`: one-shots are scheduled at their arrival time; moving sources (ambulance, highway cars, drone, airliner,
 police car, the avenue's own cars) are played through a delay line whose delay follows `SoundArrival.delayCurve`, which
 gives the late arrival, the Doppler pitch and the "everything at once" compression of a supersonic approach exactly. The
-booms are N-waves at least as long as the body ÷ the speed of sound (car 0.15 s, police car 0.13 s, airliner 0.9 s),
+booms are N-waves whose near-field length is about the body's length ÷ its speed, L / v (car 0.13 s, police car 0.11 s,
+airliner ~1.0 s; the film uses 0.15, 0.13 and 0.9 s),
 high-passed so the infrasonic ramp between the cracks doesn't pump the limiter, with a thump, rumble and window rattle.
 After the police car has passed, the siren it sounded while approaching arrives in reverse (the early branch of the
 arrival curve, `movingEarly`). Glass is placed pane by pane at the time each pane's breaking is heard. The mix measures
-−16.2 LUFS integrated, true peak −1.4 dBTP (an oversampled soft clip after the limiter). Licence-safe: everything is
+−16.1 LUFS integrated, true peak −1.6 dBTP (an oversampled soft clip after the limiter). The airliner's engines
+also arrive through `movingEarly` after its boom (reversed, fading under the police beat). Licence-safe: everything is
 synthesised.
 
 One deliberate liberty: at 400–1,100 m the supersonic car's squeezed approach would be faint; the film puts a rising floor
@@ -98,4 +101,17 @@ under it (never louder than the boom) so you hear it build.
 
 ## 8. Review log (scores as given, swipe timestamps, what changed — never inflated)
 
-See `EPISODE_REPORT.md` for the reviewer scores, swipe points and what was changed after the reviews.
+Two rounds of four independent reviews (retention, a normal viewer, visual/cinematography, physics). Full notes, swipe
+points and what changed are in `EPISODE_REPORT.md`.
+
+| Round | Previewed | Retention | Normal viewer | Visual | Physics |
+|---|---|---|---|---|---|
+| 1 | fe8fbab + plan | 4/10 | 5/10 | 4.5/10 | 7/10 |
+| 2 | c183492 | 5/10 | 6/10 | 5/10 | 7.5/10 |
+
+After round 2 (no third round was run): thin crisp ripple rings instead of glare bands, lighter dust with a near-camera
+fade and a taller billow under the airliner's shock, the shock-front view cleared of the lamp post and bin, the near-lane
+sedan brakes to a stop at the airliner boom so it doesn't cross the window payoff, parked cars rock on each boom, the sun
+moved behind you, the shout muffled, the airliner's reversed approach added, 290 km/h and L / v corrected, the ending
+tightened to 69.8 s with a two-line disclaimer plate. Not done: cutting ~9 s from 11–38 s (a cut breaks the continuous
+sound-delay take), a closer police pass.
