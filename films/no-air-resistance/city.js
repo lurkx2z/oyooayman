@@ -1,12 +1,16 @@
 /* =====================================================================
-   NR CITY — the avenue (copied from the Air film's street and owned here):
-   your side has a shop with a hanging sign, a café with an awning and
-   umbrellas, a scaffold, a building site, the corner building with its
-   rooftop billboard, three flags over the café; across the street, shops,
-   trees, a bus shelter. A sunny, windy afternoon.
-   The trees bend in the wind in their shaders (shadows too); when the air
-   stops pushing (NR.loss) they spring upright and ring down. The clouds
-   (water droplets) keep running with the wind. Subclasses Environment.
+   NR CITY — the avenue round the roof (copied from the Air film's street
+   and owned here). The party's building is a five-storey block on your
+   side (x 12.5–30.5, z −21.6…3.0); its deck, parapets and everything on it
+   are built in roof.js. Below: a café with an awning and umbrellas, a
+   building site, the corner building with its rooftop billboard; across
+   the street, shops, trees, a bus shelter. A bright, windy afternoon under
+   the edge of a storm cloud: the sun is low on the clear side (over the
+   street), the cloud's dark base covers the sky above the roof, and its
+   edge moves out as the storm arrives (the light goes). The trees bend in
+   the wind in their shaders (shadows too); when the air stops pushing
+   (NR.loss) they spring upright and ring down. The clouds (water droplets)
+   keep running with the wind. Subclasses Environment.
    ===================================================================== */
 
 const LAYOUT = {
@@ -18,18 +22,13 @@ const LAYOUT = {
 };
 
 const NR_CITY = {
-  blade: { z0: 3.0, z1: -6.0, sign: [11.75, 3.55, -7.4] },
-  stone: { z0: -13.0, z1: -6.0 },
   cafe: { z0: -21.6, z1: -13.0 },
-  scaffold: { x0: 11.2, x1: 12.45, z0: -12.0, z1: -8.5, top: 12.0 },
   lot: { z0: -34, z1: -21.6 },
   corner: { z0: -49.5, z1: -34, floors: 4, style: 'redbrick' },
   billboard: { x: 13.9, z: -41.5, w: 14, h: 5, base: 19.2, yaw: 0.6 },   // panel centre x, z; bottom edge height; turned toward you
   hut: { x: 17.5, z: -27.5, w: 6, d: 2.6, h: 5.6 },
   treesR: [-81.5, -91, -100.5],
   treesL: [12, 2.5, -7, -29.5, -38.5, -54, -72, -81.5, -91, -100.5],
-  flags: [[11.0, 5.75, -14.6], [11.0, 5.75, -17.1], [11.0, 5.75, -19.6]],   // on short poles out from the café's first floor
-  branchTree: [8.15, -16.0],
 };
 
 class NrCity extends Environment {
@@ -78,35 +77,21 @@ class NrCity extends Environment {
     this.root.traverse((o) => { if (o.isMesh && o.material === this.m.bark) o.customDepthMaterial = db; if (o.isMesh && o.material === this.m.foliage) o.customDepthMaterial = df; });
   }
 
-  // the far towers (as the shared skyline), but keeping a wider gap down the line of the avenue: the airliner comes down
-  // in the river 2.1 km away, and you see it fall through that gap
-  _skyline() {
-    const rng = this.rng.fork(2), B = this.batch;
-    const styles = ['glassblue', 'glassteal', 'modern', 'stone', 'glassblue'];
-    for (let i = 0; i < 70; i++) {
-      const z = rng.range(-520, -1150);
-      let x = rng.range(-260, 260);
-      if (Math.abs(x) < 70) x += Math.sign(x || 1) * 75;
-      const w = rng.range(22, 48), d = rng.range(22, 44), h = rng.range(50, 230) * (Math.abs(x) < 120 ? 1 : 0.7);
-      const st = this.facades[rng.pick(styles)];
-      B.add(Geo.boxSides(x - w / 2, x + w / 2, 0, h, z - d / 2, z + d / 2, st.tileW, st.tileH), st.mat, null, { noShadow: true });
-      B.add(Geo.flat(x - w / 2, x + w / 2, z - d / 2, z + d / 2, h, 5), this.m.roof, null, { noShadow: true });
-      if (rng.next() < 0.3) B.box(w * 0.6, h * 0.15, d * 0.6, x, h + h * 0.075, z, st.mat, 0, { noShadow: true });
-      if (rng.next() < 0.25) B.add(new THREE.CylinderGeometry(0.4, 0.6, 18, 6), this.m.metal, Geo.matrix(x, h + 9, z), { noShadow: true });
-    }
-  }
-
-  /* ---------------- sky: a bright, breezy afternoon; the clouds run with the wind ---------------- */
+  /* ---------------- sky: a storm cloud's dark base over the roof; clear and sunny beyond its edge ---------------- */
+  // The cloud base is drawn as a layer 1.6 km up whose edge runs along the avenue; the clear side is over the street (−x),
+  // where the sun is. uEdge (km, along −x) moves out as the storm arrives, taking the sun with it. The cloud is water
+  // droplets: it rides the wind (uTime ∝ how far the air has moved).
   _sky() {
-    this.sunDir = new THREE.Vector3(-0.3, 0.62, 0.72).normalize();
-    const zenith = new THREE.Color('#4f8fd2'), horizon = new THREE.Color('#c8dbea');
-    this.fogColor = new THREE.Color('#cfd9e0');
-    this.skyUniforms = { uZenith: { value: zenith }, uHorizon: { value: horizon }, uGround: { value: new THREE.Color('#8d9590') }, uSunDir: { value: this.sunDir }, uSunColor: { value: new THREE.Color('#ffe4b8') }, uTime: { value: 0 }, uCover: { value: 0 } };
+    this.sunDir = new THREE.Vector3(-0.45, 0.5, 0.74).normalize();
+    const zenith = new THREE.Color('#4a86c8'), horizon = new THREE.Color('#c9d8e4');
+    this.fogColor = new THREE.Color('#c3ccd3');
+    this.skyUniforms = { uZenith: { value: zenith }, uHorizon: { value: horizon }, uGround: { value: new THREE.Color('#8d9590') }, uSunDir: { value: this.sunDir }, uSunColor: { value: new THREE.Color('#ffe2b0') },
+      uTime: { value: 0 }, uEdge: { value: 0.5 }, uDark: { value: 0 }, uIceLo: { value: 99 }, uIceHi: { value: 0 } };
     const mat = new THREE.ShaderMaterial({
       uniforms: this.skyUniforms, side: THREE.BackSide, depthWrite: false,
       vertexShader: /* glsl */`varying vec3 vDir; void main(){ vDir = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }`,
       fragmentShader: /* glsl */`
-        uniform vec3 uZenith, uHorizon, uGround, uSunDir, uSunColor; uniform float uTime, uCover; varying vec3 vDir;
+        uniform vec3 uZenith, uHorizon, uGround, uSunDir, uSunColor; uniform float uTime, uEdge, uDark, uIceLo, uIceHi; varying vec3 vDir;
         float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float noise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f);
           return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y); }
@@ -116,15 +101,38 @@ class NrCity extends Environment {
           vec3 col = mix(uHorizon, uZenith, pow(clamp(h, 0.0, 1.0), 0.55));
           col = mix(col, uGround, smoothstep(0.0, -0.08, h));
           float sd = max(dot(d, uSunDir), 0.0);
-          col += uSunColor * (pow(sd, 4.0) * 0.16 + pow(sd, 40.0) * 0.25);
+          col += uSunColor * (pow(sd, 4.0) * 0.16 + pow(sd, 40.0) * 0.3 + pow(sd, 900.0) * 1.5) * (1.0 - 0.8 * uDark);
           col = mix(col, uHorizon * 1.04, 0.25 * (1.0 - smoothstep(0.0, 0.18, abs(h))));
           if (h > 0.0) {
-            vec2 uv = d.xz / (h + 0.18) * 1.1 + vec2(uTime * 0.05, uTime * 0.01);
-            float c = fbm(uv * 1.3);
-            float cov = smoothstep(0.6 - 0.1 * uCover, 0.82 - 0.1 * uCover, c) * smoothstep(0.0, 0.12, h);
+            // fair-weather cumulus on the clear side
+            vec2 uv = d.xz / (h + 0.18) * 1.1 + vec2(uTime * 0.05, uTime * 0.03);
+            float c = fbm(uv * 1.3), cov = smoothstep(0.62, 0.84, c) * smoothstep(0.0, 0.12, h);
             vec3 lit = mix(vec3(1.0, 0.98, 0.95), uSunColor, 0.25) * 1.05, shade = mix(uHorizon, uZenith, 0.35) * 0.92;
-            vec3 cl = mix(shade, lit, smoothstep(0.45, 0.9, fbm(uv * 1.3 + uSunDir.xz * 0.15)));
-            col = mix(col, cl, cov * 0.82);
+            col = mix(col, mix(shade, lit, smoothstep(0.45, 0.9, fbm(uv * 1.3 + uSunDir.xz * 0.15))), cov * 0.8);
+            // the storm's base: a layer 1.6 km up; p in km
+            vec2 p = d.xz / max(h, 0.02) * 1.6, q = p + vec2(uTime * 0.012, uTime * 0.007);
+            float edge = (p.x + uEdge) + 0.55 * (fbm(q * 0.9) - 0.5) + 0.25 * (fbm(q * 3.1 + 4.0) - 0.5);
+            float base = smoothstep(-0.05, 0.35, edge);
+            float lump = fbm(q * 1.7 + 2.0), bump = fbm(q * 5.2 - 3.0);
+            vec3 dark = mix(vec3(0.17, 0.19, 0.23), vec3(0.33, 0.35, 0.39), lump) * (0.85 + 0.3 * bump);
+            // mammatus pouches near the edge, lit from below on the sun side; a bright rim where the sun catches the edge
+            float pouch = pow(max(0.0, sin(q.x * 9.0 + fbm(q * 2.0) * 4.0) * sin(q.y * 9.0 + fbm(q * 2.3) * 4.0)), 2.0);
+            dark += vec3(0.07, 0.06, 0.05) * pouch * smoothstep(1.4, 0.2, edge);
+            float rim = smoothstep(0.32, 0.0, abs(edge - 0.12)) * (1.0 - uDark);
+            dark = mix(dark, vec3(0.78, 0.74, 0.68), rim * 0.55);
+            dark *= 1.0 - 0.35 * uDark;
+            // towards the horizon the base thickens into a grey wall
+            dark = mix(dark, mix(uHorizon, vec3(0.42, 0.45, 0.5), 0.7) * (1.0 - 0.3 * uDark), 0.65 * (1.0 - smoothstep(0.0, 0.22, h)));
+            col = mix(col, dark, base);
+            // the cloud's ice once it has fallen out of the base: a grey veil between uIceLo and uIceHi (km), only under the
+            // cloud (x > −uEdge). Seen from under it, its lower edge comes down the sky towards the horizon
+            float lo = max(uIceLo, 0.0), hi = uIceHi;
+            if (hi > lo + 0.001) {
+              float hiE = d.x < 0.0 ? min(hi, -uEdge * h / d.x) : hi;
+              float L = max(0.0, hiE - lo) / max(h, 0.03);
+              float st = 0.7 + 0.3 * noise(vec2(atan(d.z, d.x) * 160.0, 0.5));
+              col = mix(col, vec3(0.6, 0.64, 0.69) * (1.0 - 0.35 * uDark), (1.0 - exp(-0.6 * L)) * st * 0.9);
+            }
           }
           gl_FragColor = vec4(col, 1.0);
         }`,
@@ -132,19 +140,21 @@ class NrCity extends Environment {
     const sky = new THREE.Mesh(new THREE.SphereGeometry(2000, 48, 24), mat);
     sky.name = 'sky'; sky.frustumCulled = false; sky.renderOrder = -10;
     this.scene.add(sky); this.sky = sky;
-    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.001);
+    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0011);
     this.scene.background = horizon.clone();
   }
 
+  // the sun low over the street, under the cloud's edge; its shadows sized to the roof
   _lights() {
-    const sun = new THREE.DirectionalLight('#ffe6c4', 4.2), tgt = new THREE.Vector3(2, 4, -22);
-    sun.position.copy(this.sunDir).multiplyScalar(160).add(tgt); sun.target.position.copy(tgt);
+    const sun = new THREE.DirectionalLight('#ffe2bc', 4.4), tgt = new THREE.Vector3(21.5, NR_ROOF.y, -9);
+    sun.position.copy(this.sunDir).multiplyScalar(140).add(tgt); sun.target.position.copy(tgt);
     sun.castShadow = CONFIG.render.shadows;
     sun.shadow.mapSize.set(CONFIG.render.shadowMapSize, CONFIG.render.shadowMapSize);
-    const sc = sun.shadow.camera; sc.left = -48; sc.right = 48; sc.top = 72; sc.bottom = -72; sc.near = 20; sc.far = 380;
-    sun.shadow.bias = -0.0003; sun.shadow.normalBias = 0.035; sun.shadow.radius = 3;
+    const sc = sun.shadow.camera; sc.left = -34; sc.right = 34; sc.top = 40; sc.bottom = -40; sc.near = 40; sc.far = 300;
+    sun.shadow.bias = -0.0003; sun.shadow.normalBias = 0.03; sun.shadow.radius = 3;
     this.scene.add(sun, sun.target); this.sun = sun;
-    this.hemi = new THREE.HemisphereLight('#bcd2ec', '#7d6e5e', 1.45); this.scene.add(this.hemi);
+    this.hemi = new THREE.HemisphereLight('#a9bdd2', '#7d6e5e', 1.5); this.scene.add(this.hemi);
+    this._hemiSky = this.hemi.color.clone(); this._hemiStorm = new THREE.Color('#7e8a98');
   }
 
   _markings() {
@@ -175,10 +185,10 @@ class NrCity extends Environment {
         z -= w;
       }
     };
-    row(1, L.zNear, C.blade.z0, { fMin: 3, fMax: 6 });
-    this._building({ side: 1, z0: C.blade.z1, z1: C.blade.z0, depth: 18, style: 'tanbrick', floors: 4, shops: true, nextShop, rng });
-    this._building({ side: 1, z0: C.stone.z0, z1: C.stone.z1, depth: 18, style: 'stone', floors: 5, shops: true, nextShop, rng });
-    this._building({ side: 1, z0: C.cafe.z0, z1: C.cafe.z1, depth: 18, style: 'cream', floors: 4, shops: false, nextShop, rng });
+    row(1, L.zNear, NR_ROOF.z1 + 9.5, { fMin: 3, fMax: 6 });
+    // the party's neighbour: a lower block (its roof 3.6 m below yours), then the party's own building
+    this._building({ side: 1, z0: NR_ROOF.z1, z1: NR_ROOF.z1 + 9.5, depth: 17, style: 'redbrick', floors: 4, shops: true, nextShop, rng });
+    this._partyBuilding(nextShop, rng);
     this._building({ side: 1, z0: C.corner.z0, z1: C.corner.z1, depth: 18, style: C.corner.style, floors: C.corner.floors, shops: true, nextShop, rng });
     row(1, cz0, -380, { fMin: 4, fMax: 9 }); row(1, -380, -760, { fMin: 6, fMax: 14 });
     row(-1, L.zNear, cz1, { fMin: 3, fMax: 7 }); row(-1, cz0, -380, { fMin: 4, fMax: 10 }); row(-1, -380, -760, { fMin: 6, fMax: 14 });
@@ -200,6 +210,21 @@ class NrCity extends Environment {
     this.batch.add(Geo.quad([xf, 0, F.z0 + 0.4], [xf, 0, F.z1 - 0.4], [xf, 4.2, F.z1 - 0.4], [xf, 4.2, F.z0 + 0.4]), this.shopMats[0], null, { noShadow: true });
   }
 
+  // the party's building: a cream block, five storeys (deck at NR_ROOF.y), shops and the café on the ground floor. No
+  // random rooftop clutter: the roof and everything on it are built in roof.js
+  _partyBuilding(nextShop, rng) {
+    const B = this.batch, m = this.m, F = this.facades.cream, st = F.style, R = NR_ROOF, gH = 4.4, H = R.y, fx = R.x0, x1 = R.x1, z0 = R.z0, z1 = R.z1;
+    B.add(Geo.boxSides(fx, x1, 0, gH, z0, z1, 3, gH), F.wall, null);
+    B.add(Geo.boxSides(fx, x1, gH, H, z0, z1, F.tileW, F.tileH), F.mat, null);
+    // two shop units in front of z −13…3 (the café's glass front is below the awning, further on)
+    for (const [za, zb] of [[-12.6, -5.2], [-4.8, 2.6]]) { const shop = nextShop(), si = SHOPS.indexOf(shop); B.add(Geo.quad([fx - 0.03, 0, za], [fx - 0.03, 0, zb], [fx - 0.03, 4.2, zb], [fx - 0.03, 4.2, za]), this.shopMats[si], null, { noShadow: true }); }
+    // (shallow trims: what's dropped over the parapet falls clear of them)
+    B.box(0.12, 0.24, z1 - z0, fx - 0.06, gH - 0.1, (z0 + z1) / 2, m.trim);
+    B.box(0.14, 0.55, z1 - z0 + 0.3, fx - 0.06, H - 0.15, (z0 + z1) / 2, m.trim);
+    B.box(0.1, 0.25, z1 - z0 + 0.2, fx - 0.04, H - 0.62, (z0 + z1) / 2, m.trimDark);
+    this._dress({ side: 1, fx, z0, z1, gH, H, F, floors: 5, rng });
+  }
+
   _trees() {
     const rng = this.rng.fork(3);
     for (const z of NR_CITY.treesR) this._tree(8.15, z, rng, rng.range(0.9, 1.15));
@@ -216,9 +241,6 @@ class NrCity extends Environment {
     }
     this._bench(-12.0, -3, Math.PI / 2);
     this._busShelter(LAYOUT.busStop.x, LAYOUT.busStop.z);
-    // the cordon round the scaffold's foot: plastic barriers on your side of it
-    const bar = Mat.std('#e8e4da', { roughness: 0.6 }), red = Mat.std('#c0392b', { roughness: 0.6 }), S = NR_CITY.scaffold;
-    for (let z = S.z1 + 0.6; z > S.z0 - 0.8; z -= 1.9) { B.box(0.12, 0.9, 1.7, 10.0, h + 0.45, z - 0.85, bar); B.box(0.13, 0.12, 1.72, 10.0, h + 0.82, z - 0.85, red); B.box(0.13, 0.12, 1.72, 10.0, h + 0.4, z - 0.85, red); }
     const nameA = Tex.label(['OAK AVE'], { w: 512, h: 112, font: 70, bg: '#1d6b3c', border: '#ffffff' }), sa = new THREE.MeshStandardMaterial({ map: nameA, roughness: 0.5 });
     for (const [x, z] of [[8.0, -49.2], [-8.0, -74.8]]) { B.add(new THREE.CylinderGeometry(0.04, 0.04, 3.3, 6), m.metal, Geo.matrix(x, h + 1.65, z)); B.box(1.2, 0.26, 0.02, x, h + 3.15, z, sa); }
   }
@@ -240,14 +262,20 @@ class NrCity extends Environment {
     for (let i = 0; i < 3; i++) B.box(0.04, 0.9, 1.0, H.x - H.w / 2 - 0.01, 3.0, H.z - 0.8 + i * 0.8, Mat.std('#5f7a8c', { roughness: 0.2, metalness: 0.4 }));
   }
 
+  // the storm's darkness (0 → 1): the cloud's edge moves out over the street with the gust front, and the sun goes in
+  storm(S) { return MathX.smooth(S, NR.gale[0] - 0.6, NR.gale[1] + 1.6); }
+
   update(t, S) {
     // the clouds are water droplets: they keep running with the wind (∫ wind speed dt)
     this.skyUniforms.uTime.value = nrWindDist(S) / 11.1 * 2.2;
-    const st = NR.storm;
-    this.skyUniforms.uCover.value = 0.25 + 0.5 * MathX.smooth(S, st[0], st[1] + 2);
+    const k = this.storm(S);
+    this.skyUniforms.uEdge.value = 0.55 + 2.6 * k; this.skyUniforms.uDark.value = k;
+    const hk = NR_ICE.h(S) / 1000; this.skyUniforms.uIceLo.value = NR_ICE.base / 1000 - hk; this.skyUniforms.uIceHi.value = Math.min(1.6, NR_ICE.top / 1000 - hk);
+    this.sun.intensity = 4.4 * (1 - 0.86 * k);
+    this.hemi.color.copy(this._hemiSky).lerp(this._hemiStorm, k); this.hemi.intensity = 1.5 - 0.35 * k;
     for (const hd of this.signalHeads || []) { const on = hd.group === 'avenue' ? 2 : 0; hd.lamps.forEach((l, i) => l.mat.color.copy(l.color).multiplyScalar(i === on ? 3.0 : 0.05)); }
     if (this.dynamic.ad) this.dynamic.ad.emissiveIntensity = 0.6;
-    // the trees: lean with the push (40 km/h: a clear lean, leaves fluttering); at the change they spring upright and ring down
+    // the trees: lean with the push (50 km/h: a clear lean, leaves fluttering); at the change they spring upright and ring down
     const L = nrLoad(S), a = nrAero(S);
     this.windU.uBend.value = 0.62 * L; this.windU.uFlutter.value = (0.15 + 1.1 * Math.sqrt(L)) * a; this.windU.uTime.value = S;
     this.windU.uRing.value = 0.62 * nrLoadAtLoss() * (1 - a); this.windU.uU.value = S >= NR.loss ? S - NR.loss : -1;

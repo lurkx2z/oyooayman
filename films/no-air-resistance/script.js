@@ -1,11 +1,12 @@
 /* =====================================================================
    SCRIPT — "WHAT IF AIR RESISTANCE SUDDENLY DISAPPEARED?"
    ★ The one file to edit for timing: the beats, the words, the readouts, your head (camera), your hands.
-   Everything is a pure function of STORY time; CONFIG.edit plays the plane's plunge in slow motion.
-   The physics (drag, lift, the plane's arc) lives in physics.js. Plan: films/no-air-resistance/PLAN.md
+   Everything is a pure function of STORY time; CONFIG.edit plays the paper drop in slow motion and cuts to the sky.
+   A rooftop party under a storm cloud. The physics (the drop, the balloons, the cloud's ice) lives in physics.js.
+   Plan: films/no-air-resistance/PLAN.md
    ===================================================================== */
 
-CONFIG.duration = 68.0;
+CONFIG.duration = 61.4;
 CONFIG.seed = 20261019;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.68, walkSpeed: 1.2, bobStrength: 0.013, bobFrequency: 1.72, runStrideGain: 0.55,
@@ -18,129 +19,127 @@ CONFIG.render.shadowMapSize = 4096;
 // ---------------------------------------------------------------------------------------------------------------------
 const NR = {
   title: [-0.5, 3.4],
-  loss: 2.0,                                   // the air stops pushing on solids: the flag drops, the pigeons in the air fall
-  drop: { up: 5.5, rel: 6.9 },                 // your hands come up; paper and ball released together (the fall plays at 0.4×)
-  cut0: 9.3,                                   // the opening take ends here (straight to the sky)
+  loss: 2.0,                                   // the air stops pushing on solids: the laundry drops, the kite falls
+  walk: [3.9, 6.3],                            // the cut to the front parapet; you lean over it
+  drop: { up: 6.35, rel: 7.4 },                // hands out over the edge; paper and ball let go together (the fall plays at 0.6×)
+  cut0: 10.4,                                  // the drop ends here (straight to the sky)
   sky: [12.4, 20.4], deploy: 16.6,             // the skydiver cut-away; he pulls
-  car: { coast: 12.4, toss: 21.95, pass: 22.4, cut: [25.4, 28.2] },   // throttle off (off screen); leaflets out of the window; it passes you
-  birds: 28.6, startle: 29.5, ledge: 31.2,     // pigeons on the pavement; one steps off a ledge
-  point: 32.45, plane: 33.6,                   // a man turns and points up ("Look!"); you find the plane (it makes no sound)
-  storm: [40.6, 42.2], stormCut: [42.6, 43.8], balloon: 44.6,   // the wind rises to 100 km/h; the balloon slips
-  plunge: 47.9, slow: [48.6, 49.0],            // the plunge (a quarter speed in the middle); it drops behind the skyline; impact at NR.impact
-  planeImp: [-40, -2100],                      // where it comes down: 2.1 km away, in the river beyond the end of the avenue
-  run: 56.9, runCut: [57.55, 58.35],          // you run (the middle of the run is cut);
-  land: [59.4, 61.6], board: 59.95,            // the debris lands; the sign board is knocked off above where you stood
-  look: 62.2, line: [63.0, 67.7], black: 67.8,
+  pop: 21.15,                                  // the confetti cannon, fired straight up
+  gale: [24.0, 25.4],                          // the gust front: the wind rises 50 → 110 km/h; the rain arrives with it
+  balloon: 30.4,                               // the child lets go of the balloons
+  cloud: 33.0,                                 // you look up into the cloud: its ice is falling
+  ice0: 36.98,                                 // the first of the cloud's ice lands (NR_ICE.first: the lowest ice, 6 km up, falls for 35 s)
+  run: 37.35,                                  // you back into the stair door
+  inDoor: 39.9,                                // you're inside the doorway, looking out
+  quiet: 53.48,                                // the last of the cloud's ice lands (NR_ICE.last); silence
+  line: [54.6, 61.0], black: 61.2,
 };
-NR.impact = 2.0 + Math.sqrt(2 * 11400 / 9.81);                  // = NR_PLANE.tImpact() (50.21)
-NR.impactDist = Math.hypot(NR.planeImp[0] - 9.4, NR.planeImp[1] - 1.6);
-NR.boom = NR.impact + NR.impactDist / 343;                        // sound from the impact reaches you (≈ 6.1 s)
-NR.flashCut = NR.impact + 1.1;                                    // the telephoto holds on the fireball, then cuts to the street (as the countdown starts)
-NR.impPitch = 2.9;                                                // where the telephoto settles: the far end of the avenue along the bottom of the frame
 
-// the cuts: the opening take (its paper drop at 0.4×), the sky, the street (less 2 s of the car rolling away and 1.2 s
-// of the storm), the plunge at a quarter speed in its middle, and 0.8 s from the middle of your run
-CONFIG.edit = [[0, NR.drop.rel - 0.05], [NR.drop.rel - 0.05, NR.drop.rel + 0.55, 0.4], [NR.drop.rel + 0.55, NR.cut0],
-  [NR.sky[0], NR.car.cut[0]], [NR.car.cut[1], NR.stormCut[0]], [NR.stormCut[1], NR.slow[0]], [NR.slow[0], NR.slow[1], 0.25], [NR.slow[1], NR.runCut[0]], [NR.runCut[1], CONFIG.duration]];
+// the roof: a five-storey building on your side of the avenue (x 12.5–30.5, z −21.6…3.0), its deck 21.4 m up. Everything is
+// laid out round the view from the stair door (looking −x, across the roof to the street): the table, the skylight, the
+// washing line (across the wind), the chimney, the kite flown from the front corner
+const NR_ROOF = {
+  y: 21.4, x0: 12.5, x1: 30.5, z0: -21.6, z1: 3.0, par: 1.05, parT: 0.3,
+  hut: { x0: 26.6, x1: 30.2, z0: -3.2, z1: 1.6, h: 2.9, door: -0.8, doorW: 1.05, doorH: 2.15 },   // the stair housing; its door faces −x
+  line: [[13.8, 1.6], [18.6, -3.2]],                    // the washing line (across the wind)
+  table: { x: 21.2, z: -0.2, len: 2.2, w: 0.95 },       // (its long side along x)
+  chimney: { x: 16.8, z: 1.9, w: 0.9, h: 3.0 },
+  skylight: { x: 23.9, z: -1.6, w: 1.5, d: 2.2, h: 0.5 },
+  platform: { x: 20.55, z: 0.0, w: 4.9, d: 4.4 },        // the timber platform under the party
+  flyer: [13.9, 2.3],                                    // the kite flyer, at the front corner
+};
 
-// where you stand
-const NR_CAM = { x: 9.4, z0: 4.2, z: 1.6, zRun: 9.6 };
+// what the ice breaks while you watch from the doorway (story s)
+const NR_ROOF_HITS = { panes: [40.35, 42.9], bunting: [41.6, 48.8], lights: 44.2, line: 46.5, pot: 50.6 };
 
-// your head on the falling airliner: [yaw, pitch] towards it (same arc as NR_PLANE in physics.js: up the avenue, towards you)
-function nrPlaneLook(S) {
-  const T = Math.sqrt(2 * 11400 / 9.81), t = Math.max(0, S - NR.loss), z = NR.planeImp[1] - 240 * (T - Math.min(t, T)), y = Math.max(0, 11400 - 4.905 * t * t);
-  const dx = NR.planeImp[0] - NR_CAM.x, dz = z - NR_CAM.z;
-  return [Math.atan2(-dx, -dz) * 180 / Math.PI, Math.atan2(y - 1.7, Math.hypot(dx, dz)) * 180 / Math.PI];
-}
-// the plunge: your head follows it, a little late, so it sinks through the frame (from 0.9° above the centre to 0.7° below)
-const NR_PLUNGE = (() => { const Y = [], P = []; for (let s = 47.9; s <= 49.7 + 1e-6; s += 0.1) { const [y, p] = nrPlaneLook(s), k = (s - 47.9) / 1.8; Y.push([+s.toFixed(2), y, 'linear']); P.push([+s.toFixed(2), p - 0.9 + 1.6 * k, 'linear']); } return [Y, P]; })();
-// the telephoto hold on the plane (story 34.0–38.2): the head stays still and it sinks from the top of the frame
-// the telephoto on the airliner (story 34–38.2): your eye follows it, a little right of centre (clear of the side view on the
-// left), letting it sink slowly through the frame as it drops through the cloud deck
-const NR_TELE = (() => { const Y = [], P = []; for (let s = 34.0; s <= 38.2 + 1e-6; s += 0.2) { const [y, p] = nrPlaneLook(s), k = (s - 34.0) / 4.2; Y.push([+s.toFixed(2), y + 0.15, 'linear']); P.push([+s.toFixed(2), p - 0.35 + 0.55 * k, 'linear']); } P[0][2] = 'inOutSine'; return [Y, P]; })();
+// the cuts: the opening take, the drop (at 0.6×), the sky, the roof
+CONFIG.edit = [[0, NR.drop.rel - 0.05], [NR.drop.rel - 0.05, NR.drop.rel + 2.55, 0.6], [NR.drop.rel + 2.55, NR.cut0], [NR.sky[0], CONFIG.duration]];
+
+// where you stand: the stair door (the opening), leaning over the front parapet (the drop), the confetti, the storm, the
+// spot by the door where the ice finds you, inside the doorway
+const NR_CAM = { x0: 26.1, z0: -0.75, xP: 12.45, zP: -2.4, xC: 25.8, zC: -6.3, xG: 25.2, zG: -2.9, xD: 25.6, zD: -1.9, xIn: 28.25, zIn: -0.8 };
 
 const SCRIPT = {
   meta: { title: 'WHAT IF AIR RESISTANCE SUDDENLY DISAPPEARED?', wav: 'no-air-resistance-soundtrack.wav' },
 
   events: [
-    { id: 'start', time: 0.0, label: 'A windy afternoon; the title' },
-    { id: 'loss', time: NR.loss, label: 'Aerodynamic force 100 % → 0 %: the flag drops, the pigeons fall' },
-    { id: 'drop', time: NR.drop.up, label: 'Paper and ball land together' },
+    { id: 'start', time: 0.0, label: 'A windy rooftop party; the title' },
+    { id: 'loss', time: NR.loss, label: 'Aerodynamic force 100 % → 0 %: the laundry drops, the kite falls' },
+    { id: 'drop', time: NR.walk[0], label: 'Paper and ball dropped off the roof land together' },
     { id: 'sky', time: NR.sky[0], label: 'The skydiver: the parachute can’t open' },
-    { id: 'car', time: 20.4, label: 'The coasting car; the leaflets keep up' },
-    { id: 'birds', time: 28.4, label: 'Pigeons can’t take off' },
-    { id: 'plane', time: NR.point, label: '“Look!” The airliner has been falling since 2 s, in silence' },
-    { id: 'storm', time: 39.0, label: 'A 100 km/h wind moves nothing' },
-    { id: 'balloon', time: NR.stormCut[1], label: 'The balloon: buoyancy, no drag' },
-    { id: 'plunge', time: NR.plunge - 0.4, label: 'The plunge' },
-    { id: 'impact', time: NR.impact, label: 'Impact; the sound arrives 6 s later' },
-    { id: 'debris', time: NR.run, label: 'Debris thrown 2 km; you run' },
-    { id: 'line', time: NR.look, label: 'The air would still be there' },
+    { id: 'pop', time: 20.4, label: 'Confetti falls like gravel' },
+    { id: 'gale', time: NR.gale[0], label: '110 km/h: rain flies sideways, nothing solid moves, soot pours down' },
+    { id: 'balloon', time: NR.balloon - 0.3, label: 'The balloons shoot up into the cloud' },
+    { id: 'cloud', time: NR.cloud, label: 'The cloud’s ice is falling' },
+    { id: 'ice', time: NR.run - 0.4, label: 'The first ice lands at 1,235 km/h' },
+    { id: 'roar', time: NR.inDoor, label: 'The whole cloud’s ice arrives, faster and faster' },
+    { id: 'quiet', time: NR.quiet, label: 'The last ice; silence' },
+    { id: 'line', time: NR.line[0], label: 'The air would still be there' },
   ],
 
-  // your head (story time). yaw: + turns left, 0 = down the avenue (−Z). pitch: + up.
+  // your head (story time). yaw: + turns left, 0 = down the avenue (−Z), 90 = facing the street (−X). pitch: + up.
   camera: {
-    baseY: 0.15,
-    x: [[0, NR_CAM.x], [56.9, NR_CAM.x], [57.6, NR_CAM.x + 0.3], [59.2, NR_CAM.x + 0.6], [68.0, NR_CAM.x + 0.6]],
-    z: [[0, NR_CAM.z0], [5.0, NR_CAM.z, 'linear'], [56.9, NR_CAM.z], [57.6, NR_CAM.z + 1.6, 'inQuad'], [59.2, NR_CAM.zRun, 'linear'], [59.8, NR_CAM.zRun + 0.5, 'outQuad'], [68.0, NR_CAM.zRun + 0.5]],
-    height: [[0, 1.68], [59.6, 1.68], [60.0, 1.3, 'inQuad'], [62.0, 1.3], [62.8, 1.68, 'inOutSine'], [68.0, 1.68]],
-    yaw: [[0, 11.5], [5.0, 11], [5.9, 3, 'inOutSine'], [NR.cut0, 2.5],
+    baseY: NR_ROOF.y,
+    x: [[0, NR_CAM.x0], [NR.walk[0] - 0.001, NR_CAM.x0 - 0.5], [NR.walk[0], NR_CAM.xP + 0.25, 'step'], [5.2, NR_CAM.xP, 'inOutSine'], [NR.cut0, NR_CAM.xP],
+      [20.4, NR_CAM.xC, 'step'], [24.2, NR_CAM.xC], [26.4, NR_CAM.xG, 'inOutSine'], [32.6, NR_CAM.xG], [34.0, NR_CAM.xD, 'inOutSine'], [NR.ice0 + 0.25, NR_CAM.xD],
+      [37.9, 26.3, 'inOutSine'], [38.9, NR_CAM.xIn, 'inOutSine'], [44.0, NR_CAM.xIn], [48.0, NR_CAM.xIn - 0.45, 'inOutSine'], [NR.quiet + 0.5, NR_CAM.xIn - 0.45],
+      [NR.quiet + 2.2, 27.0, 'inOutSine'], [NR.quiet + 4.6, 25.9, 'inOutSine'], [61.4, 25.8]],
+    z: [[0, NR_CAM.z0], [NR.walk[0] - 0.001, NR_CAM.z0], [NR.walk[0], NR_CAM.zP, 'step'], [NR.cut0, NR_CAM.zP],
+      [20.4, NR_CAM.zC, 'step'], [24.2, NR_CAM.zC], [26.4, NR_CAM.zG, 'inOutSine'], [32.6, NR_CAM.zG], [34.0, NR_CAM.zD, 'inOutSine'], [NR.ice0 + 0.25, NR_CAM.zD],
+      [37.9, -0.85, 'inOutSine'], [38.9, NR_CAM.zIn, 'inOutSine'], [61.4, NR_CAM.zIn]],
+    height: [[0, 1.68], [NR.walk[0] - 0.001, 1.68], [NR.walk[0], 1.5, 'step'], [NR.cut0, 1.45], [20.4, 1.68, 'step'], [61.4, 1.68]],
+    yaw: [[0, 88], [NR.loss, 87], [2.6, 83, 'inOutSine'], [3.3, 85], [NR.walk[0] - 0.001, 86],
+      [NR.walk[0], 62, 'step'], [5.0, 64], [6.1, 90, 'inOutSine'], [NR.cut0, 90],
       // (12.4–20.4: the sky cut-away has its own camera)
-      [20.4, 160, 'step'], [21.5, 152], [21.95, 146, 'inOutSine'], [22.4, 96, 'inOutSine'], [22.8, 42, 'inOutSine'], [23.6, 16], [24.6, 8.5], [NR.car.cut[0], 8],
-      [NR.car.cut[1], -10, 'step'], [30.6, -12], [31.0, -33, 'inOutCubic'], [31.3, -33], [32.05, -31, 'inQuad'], [32.3, -31], [32.75, -6, 'inOutCubic'], [33.0, -5],
-      [33.6, NR_TELE[0][0][1], 'inOutCubic'], ...NR_TELE[0], [39.0, 13, 'inOutCubic'], [42.6, 13.6],
-      [NR.stormCut[1], -22, 'step'], [46.6, -22], [47.6, NR_PLUNGE[0][0][1], 'inOutCubic'], [47.9, NR_PLUNGE[0][0][1]], ...NR_PLUNGE[0], [NR.flashCut - 0.02, NR_PLUNGE[0].at(-1)[1]], [NR.flashCut, 1.9, 'step'],
-      [53.0, 2.4], [56.3, 2.6], [57.0, 178, 'inOutCubic'], [58.6, 176], [59.0, 16, 'inOutCubic'], [59.5, 4], [59.95, -14, 'inOutCubic'], [60.3, -14], [61.55, -3, 'inOutSine'], [62.0, 1], [62.8, 6.2, 'inOutSine'], [68.0, 6.8]],
-    pitch: [[0, 2], [4.8, 2], [5.9, -44, 'inOutSine'], [NR.drop.rel, -44], [NR.drop.rel + 0.6, -55, 'inOutSine'], [NR.cut0, -54],
-      [20.4, 2, 'step'], [21.5, 1], [22.4, -3], [23.6, -1.5], [24.6, -1.2], [NR.car.cut[0], -1.1],
-      [NR.car.cut[1], -22, 'step'], [30.6, -20], [31.0, 19, 'inOutCubic'], [31.3, 19], [32.05, -12, 'inQuad'], [32.3, -11], [32.75, 9, 'inOutCubic'], [33.0, 10],
-      [33.6, 46.6, 'inOutCubic'], ...NR_TELE[1], [39.0, 20, 'inOutCubic'], [41.2, 21], [42.6, 23, 'inOutSine'],
-      [NR.stormCut[1], -4, 'step'], [44.4, -4], [44.9, 2], [45.5, 58, 'inOutCubic'], [46.6, 60], [47.6, NR_PLUNGE[1][0][1], 'inOutCubic'], [47.9, NR_PLUNGE[1][0][1]], ...NR_PLUNGE[1], [50.2, NR.impPitch, 'inOutSine'], [NR.flashCut - 0.02, NR.impPitch],
-      [NR.flashCut, 5.0, 'step'], [56.3, 5.4], [57.0, -4], [58.6, -2], [59.0, 6], [59.5, 14], [59.95, 46, 'inOutCubic'], [60.3, 46], [61.55, -10, 'inQuad'], [62.0, -2], [62.8, 3.0, 'inOutSine'], [68.0, 3.6]],
-    fov: [[0, 66], [NR.cut0, 66], [20.4, 66], [22.8, 64], [24.4, 32], [NR.car.cut[0], 30], [NR.car.cut[1], 64, 'step'], [30.6, 64], [31.0, 30, 'inOutCubic'], [32.05, 30], [32.3, 32], [32.75, 50, 'inOutCubic'],
-      [33.6, 40, 'inOutSine'], [34.0, 2.4, 'inOutCubic'], [38.2, 1.8, 'linear'], [39.0, 62, 'inOutCubic'], [42.6, 60],
-      [NR.stormCut[1], 60, 'step'], [46.6, 60], [47.6, 8, 'inOutCubic'], [47.9, 6], [NR.flashCut - 0.02, 6], [NR.flashCut, 28, 'step'], [56.3, 21, 'inOutSine'], [57.0, 66], [62.0, 66], [62.8, 52, 'inOutSine'], [68.0, 49]],
-    tilt: [[0, 0], [57.0, 0], [57.6, -4], [59.2, 3], [60.0, -6], [61.0, 0], [68.0, 0]],
-    startles: [[NR.loss + 0.15, 0.35], [22.35, 0.25], [29.5, 0.25], [NR.impact + 0.05, 0.3], [NR.boom, 0.8], [NR.board, 0.6], [61.1, 0.5], [NR.board + 1.61, 1.0]],
-    shakes: [[NR.boom, 0.6, 0.6], [NR.board, 0.35, 0.3], [61.1, 0.4, 0.25], [NR.board + 1.61, 0.9, 0.35]],
+      [20.4, 127, 'step'], [24.2, 126], [26.4, 110, 'inOutSine'], [28.6, 106], [29.8, 118, 'inOutSine'], [30.4, 124], [32.6, 122],
+      [34.2, 92, 'inOutSine'], [NR.ice0, 90], [37.3, 86, 'inOutSine'], [37.9, 92], [38.9, 90, 'inOutSine'],
+      [40.1, 90], [40.5, 85, 'inOutSine'], [41.5, 87], [41.9, 92, 'inOutSine'], [43.0, 86, 'inOutSine'], [44.0, 90], [46.3, 91], [46.7, 94, 'inOutSine'], [48.6, 92], [50.4, 94], [50.9, 99, 'inOutSine'], [52.5, 95],
+      [NR.quiet + 0.5, 92], [NR.quiet + 4.6, 97, 'inOutSine'], [61.4, 98]],
+    pitch: [[0, 6], [NR.loss, 6], [2.7, 3, 'inOutSine'], [NR.walk[0] - 0.001, 4],
+      [NR.walk[0], -60, 'step'], [5.0, -58], [6.1, -48, 'inOutSine'], [NR.drop.rel, -50], [NR.drop.rel + 0.9, -62, 'inOutSine'], [NR.cut0, -63],
+      [20.4, 10, 'step'], [21.0, 10], [21.7, 30, 'inOutSine'], [22.5, 31], [23.3, -6, 'inOutCubic'], [24.2, -4], [26.4, 2, 'inOutSine'], [30.4, 3], [30.7, 8], [32.0, 52, 'inOutCubic'], [33.0, 62], [33.5, 62],
+      [34.4, 14, 'inOutSine'], [NR.ice0 - 0.1, 12], [37.25, -14, 'inOutCubic'], [37.9, -8], [38.9, 2, 'inOutSine'],
+      [44.0, 3], [44.4, 8, 'inOutSine'], [45.4, 7], [46.0, 3, 'inOutSine'], [NR.quiet, 2], [NR.quiet + 4.6, -6, 'inOutSine'], [61.4, -6]],
+    fov: [[0, 72], [NR.walk[0] - 0.001, 72], [NR.walk[0], 66, 'step'], [NR.drop.rel + 0.3, 66], [NR.drop.rel + 2.1, 46, 'inOutSine'], [NR.cut0, 45],
+      [20.4, 66, 'step'], [34.4, 66], [35.2, 70, 'inOutSine'], [37.9, 70], [38.9, 68], [61.4, 68]],
+    tilt: [[0, 0], [61.4, 0]],
+    startles: [[NR.loss + 0.15, 0.35], [NR.pop, 0.25], [NR.ice0 + 0.02, 0.7], [37.45, 0.45], [NR_ROOF_HITS.panes[0], 0.35], [NR_ROOF_HITS.panes[1], 0.3], [NR_ROOF_HITS.line, 0.25], [NR_ROOF_HITS.pot, 0.3]],
+    shakes: [[NR.ice0, 0.3, 0.5], [40.0, 0.08, 13.4]],
   },
 
-  // your hands: a sheet of paper (right) and a tennis ball (left), held out and released together; later, running
+  // your hands: a sheet of paper (right) and a tennis ball (left), held out over the parapet and let go together
   hands: {
-    right: [[0, 'hidden'], [NR.drop.up + 0.1, 'holdPaperR'], [NR.drop.rel, 'openR'], [NR.cut0, 'hidden'], [56.9, 'hidden'], [57.5, 'runR'], [59.4, 'hidden'], [61.25, 'shieldR'], [62.2, 'hidden']],
-    left: [[0, 'hidden'], [NR.drop.up, 'holdBallL'], [NR.drop.rel, 'openL'], [NR.cut0, 'hidden'], [56.9, 'hidden'], [57.45, 'runL'], [59.4, 'hidden']],
+    right: [[0, 'hidden'], [NR.drop.up + 0.1, 'holdPaperR'], [NR.drop.rel, 'openR'], [NR.cut0, 'hidden'], [NR.ice0 + 0.05, 'hidden'], [NR.ice0 + 0.3, 'shieldR'], [38.7, 'hidden']],
+    left: [[0, 'hidden'], [NR.drop.up, 'holdBallL'], [NR.drop.rel, 'openL'], [NR.cut0, 'hidden']],
   },
 
   tracks: {
-    pov: [[0, 1], [NR.sky[0] - 0.001, 1], [NR.sky[0], 0, 'step'], [NR.sky[1] - 0.001, 0], [NR.sky[1], 1, 'step'], [33.5, 1], [34.0, 0.08], [38.2, 0.08], [38.9, 1],
-      [47.4, 1], [47.8, 0.3], [NR.flashCut - 0.02, 0.3], [NR.flashCut, 1, 'step'], [68.0, 1]],
+    pov: [[0, 1], [NR.sky[0] - 0.001, 1], [NR.sky[0], 0, 'step'], [NR.sky[1] - 0.001, 0], [NR.sky[1], 1, 'step'], [61.4, 1]],
   },
 
   hud: {
     title: { in: -0.5, out: NR.title[1], fi: 0.2, fo: 0.45, cls: 'big center', html: '<span class="kick">WHAT IF AIR RESISTANCE</span><span class="hero">SUDDENLY DISAPPEARED?</span>' },
     captions: [
-      { t: 3.7, until: 5.2, text: 'The wind still blows…' },
-      { t: 5.25, until: NR.drop.rel - 0.05, text: '…it just can’t push anything.' },
-      { t: NR.drop.rel + 0.35, until: NR.cut0, text: 'Nothing would be slowed by the air.' },
+      { t: 3.7, until: 5.15, text: 'The wind still blows…' },
+      { t: 5.2, until: NR.drop.rel - 0.05, text: '…it just can’t push anything.' },
+      { t: NR.drop.rel + 1.0, until: NR.cut0, text: 'Paper would fall like a stone.' },
       { t: 14.6, until: 16.4, text: 'His speed just keeps climbing.' },
       { t: 16.8, until: 18.4, text: 'He pulls the parachute…' },
       { t: 18.5, until: 20.3, text: '…but it can’t even open.' },
-      { t: 22.2, until: 23.7, text: 'Thrown things keep their speed…' },
-      { t: 23.8, until: NR.car.cut[0], text: '…and cars coast much further.' },
-      { t: 29.7, until: 31.15, text: 'Birds couldn’t get off the ground.' },
-      { t: 34.4, until: 36.2, text: 'Its wings stopped lifting it…' },
-      { t: 36.3, until: 38.2, text: '…the moment the air let go.' },
-      { t: 39.6, until: 41.1, text: 'Storm-force wind…' },
-      { t: 41.2, until: NR.stormCut[0], text: '…and nothing solid moves.' },
-      { t: NR.stormCut[1] + 0.15, until: 45.4, text: 'Floating still works…' },
-      { t: 45.45, until: 46.6, text: '…nothing holds it back.' },
-      { t: 56.6, until: 58.9, text: 'Everything it threw is still flying…' },
-      { t: 59.2, until: 60.9, text: '…and nothing slows it down.' },
+      { t: 22.0, until: 23.95, text: 'Confetti would fall like gravel.' },
+      { t: 25.6, until: 27.4, text: 'Storm-force wind…' },
+      { t: 27.5, until: 29.9, text: '…and nothing solid moves.' },
+      { t: 30.9, until: 32.9, text: 'Floating still works.' },
+      { t: 33.3, until: 35.0, text: 'That cloud is full of ice…' },
+      { t: 35.1, until: 36.9, text: '…and nothing holds it up now.' },
+      { t: 40.6, until: 42.6, text: 'It fell 6 km without slowing down.' },
+      { t: 45.2, until: 47.4, text: 'And it keeps coming faster.' },
+      { t: 49.4, until: 51.8, text: 'Now faster than a pistol bullet.' },
     ],
-    says: [{ t: NR.point + 0.1, until: 33.6, text: '“Look… up there!”' }],
-    stack: [{ t: NR.line[0], until: NR.line[1], lines: [[NR.line[0], 'The air would still be there.'], [65.0, 'It just couldn’t catch you.']] }],
+    says: [],
+    stack: [{ t: NR.line[0], until: NR.line[1], lines: [[NR.line[0], 'The air would still be there.'], [57.0, 'It just couldn’t hold anything up.']] }],
     readouts: [],
-    notes: [{ t: 65.5, until: NR.line[1], text: 'Fictional physics: only solids lose air resistance (water droplets still ride the wind) · sound and breathing kept' }],
+    notes: [{ t: 58.4, until: NR.line[1], text: 'Fictional physics: only solids lose air resistance (rain and steam still ride the wind) · sound and breathing kept' }],
   },
 };
 
