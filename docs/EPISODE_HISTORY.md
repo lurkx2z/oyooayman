@@ -210,3 +210,27 @@
 - **Audience:** **performed extremely strongly** (handoff).
 - **Lessons:** self-aware parody + full production seriousness; use the edit layer aggressively; every link of a chain
   needs its own visible proof.
+
+### What if water lost all surface tension?  (2026-10-08 batch, built on its own branch)
+- **Page / folder:** `no-surface-tension.html` · `films/no-surface-tension/` (no cross-film files)
+- **Duration:** 60.3 s film (68.6 s story; `CONFIG.edit` keeps four stretches, the wick shot was cut)
+- **Built:**
+  - a Fresnel water material, spreading drop/film puddles (Huppert's gravity–viscous law), a fraying tap stream,
+    soft mist, a wet look for counters;
+  - a kitchen (glass with a domed top and beads, gooseneck tap and steel sink, glass bowl, paperclip, paper towel,
+    sponge) with its own reflection map;
+  - a garden `Environment` subclass: sky by day, night and storm; pond with pads and striders; potting bench; flower
+    bed; three-day wilting (droop and colour); torn-strand rain; the park and city beyond;
+  - the watering can, a soaking umbrella shader, world tags ("NORMAL WATER WOULD …"), a drone rise with lightning;
+  - a sound design where water's voice is drops, so after the change it only hisses.
+- **Worked (per reviewers):** the tap ribbon was the best water in the film; tap, paperclip, sponge, strider and soil
+  beats were clear to a normal viewer; physics reviewers rated the mechanisms right (7 → 8).
+- **Didn't:** the first cut was too long (68.6 s) with a dead stretch in the time-lapse; rain read as normal rain and
+  the umbrella's spots as raindrop impacts until rebuilt; an engine method name clash (`_bench`) built the potting bench
+  three times; the Look grime pass painted dark slabs on the lawn (`userData.grime = 0` fixes it).
+- **Reviews:** three rounds of five reviewers (retention / normal viewer / visual / cinematography / physics):
+  5 / 5 / 5.5 / 5 / 7 → 5 / 6 / 5 / 5 / 7 → 6 / 5 / 6 / 6 / 8. Round-3 fixes applied, not re-scored.
+- **Audience:** UNKNOWN.
+- **Lessons:** in a subclass of `Environment`, prefix private method names (the base class has `_bench`, `_tree` …);
+  soft round sprites always read as drops, so "no drops" water needs streaks, ribbons or haze; show what is missing
+  (a ghost outline or a "would be here" tag), because an absent effect is invisible on its own.

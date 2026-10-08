@@ -64,6 +64,14 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Film: *What if water lost all surface tension?*** — open `no-surface-tension.html` (60.3 s). Under the title,
+> water's surface tension falls from 72 mN/m to 0 and stays there; nothing else changes. Water stops forming drops: a
+> brimming glass and its beads slump into films, a tap stream frays instead of dripping, a paperclip sinks, a paper towel
+> and a sponge can't hold water, a water strider falls through the pond, soil lets the watering can run straight out,
+> the garden wilts over three days, rain falls as torn strands and mist and soaks through your umbrella, and the camera
+> rises over the storm: *"It looks like a tiny force… until an entire ecosystem depends on it."* Physics rules, shot list
+> and review log: [`films/no-surface-tension/PLAN.md`](films/no-surface-tension/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -345,6 +353,19 @@ films/sim/aware.js       NPC_AWARE_01: the hero head (eyes that aim at the lens,
 films/sim/glitch.js      wireframe, debug labels, LOD pop, flat tree, checker, the ripple, the crack and the void
 films/sim/audio.js       the world's sound on its own clock (repeated, paused, reversed, replayed) + the film's sounds
 films/sim/film.js        FILM hooks: the fake pause, the exact replay of the opening, the composite, the interface, the grade
+```
+
+Film: *What if water lost all surface tension?* (`no-surface-tension.html`):
+
+```
+films/no-surface-tension/PLAN.md        the rule, what's held constant, the places, the shot list, sound, review log
+films/no-surface-tension/script.js      ★ every beat time, the cut (CONFIG.edit), captions, readouts, camera, hands
+films/no-surface-tension/water.js       water material, spreading drops and films, the fraying stream, mist, the wet look
+films/no-surface-tension/kitchen.js     the kitchen: glass and beads, tap and sink, glass bowl, paperclip, towel, sponge
+films/no-surface-tension/garden.js      the garden (Environment subclass): sky by day/night/storm, pond, striders, bench, wilting, rain
+films/no-surface-tension/film.js        FILM hooks: hand poses, the watering can, the umbrella, world tags, the drone rise, the grade
+films/no-surface-tension/audio.js       drips that stop, the hiss, birds that thin out, a souring pad, rain with no patter, thunder
+films/no-surface-tension/soundtrack.js  the baked soundtrack (regenerate with tools/bake-soundtrack.cjs after any sound change)
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):

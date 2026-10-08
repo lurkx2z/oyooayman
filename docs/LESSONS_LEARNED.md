@@ -141,6 +141,11 @@
   before.
 - `installFog` runs once; the first call wins (environment.js calls it with defaults).
 - `Environment.update` is Oxygen-specific. Override it in every subclass.
+- In an `Environment` subclass, give your own helper methods a film prefix. The base class already has `_bench`,
+  `_tree`, `_trees`, `_cafe` …; a subclass `_bench()` silently replaces the park-bench builder and gets called from the
+  base layout code too (No Surface Tension built its potting bench three times this way).
+- The Look grime shader paints any large `MeshStandardMaterial` with 1.25 m "replaced slab" cells: on a lawn they show
+  as dark rectangles. Opt a material out with `mat.userData.grime = 0`.
 - A test page inside `films/<slug>/` breaks relative paths. Test pages go in the root as `zz_*.html` and are deleted
   before committing.
 - Google Fonts fail in headless and from `file://` (proxy/cert). Fonts are bundled.
