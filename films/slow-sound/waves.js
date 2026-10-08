@@ -27,9 +27,11 @@ class SndRipples {
     // [x, z, te, height of the source above the ground, strength, life]
     const E = [], F = SND.friend;
     // (the claps, the shout and the bangs are the ones you are meant to watch travel: bright and long-lived)
-    for (const t of F.claps) E.push([F.x, F.z, t, 1.1, 2.6, 1.6]);
-    E.push([F.x, F.z, F.shout, 1.5, 3.0, 1.7]);
-    for (const t of SND_PILE_HITS) E.push([SND.pile.x, SND.pile.z, t, 0.4, 3.2, 3.4]);
+    // (each lives just long enough to reach you, ~0.9 s for the friend; the pile driver's stay out by the site,
+    //  so they don't sweep through the other shots as stray bands)
+    for (const t of F.claps) E.push([F.x, F.z, t, 1.1, 2.6, 1.25]);
+    E.push([F.x, F.z, F.shout, 1.5, 3.0, 1.3]);
+    for (const t of SND_PILE_HITS) E.push([SND.pile.x, SND.pile.z, t, 0.4, 3.2, 2.2]);
     for (let t = 17.5; t < 25.4; t += 0.3) { const q = sndAmb(t); E.push([q.x, q.z, t, 1.5, 0.9, 1.9]); }
     for (let t = 23.5; t < 37.2; t += 0.22) { const q = sndSport(t); E.push([q.x, q.z, t, q.y - 0.15, 0.5, 3.0]); }
     for (let t = 54.6; t < 60.4; t += 0.16) { const q = sndPolice(t); E.push([q.x, q.z, t, 1.25, 0.45, 1.4]); }
@@ -62,7 +64,8 @@ class SndRipples {
         uniform vec4 uPol, uPla, uPla2, uSpo, uSpo2; uniform vec3 uK, uFront;
         uniform vec3 uFogColor; uniform float uFogDensity;
         varying vec3 vW; varying float vDepth;
-        float ripple(float x){ return exp(-x * x) + 0.38 * exp(-(x + 2.3) * (x + 2.3)) + 0.14 * exp(-(x + 4.6) * (x + 4.6)); }
+        // a crisp ring line (at least ~1.5 px wide; thinner than that on screen it dims instead of smearing into a glare band)
+        float ring(float x, float w, float aa){ float W = max(w, aa * 1.5), k = min(1.0, 1.6 * w / W); return k * (exp(-(x / W) * (x / W)) + 0.25 * exp(-((x + 3.0 * W) / W) * ((x + 3.0 * W) / W))); }
         // a shock wake: how far (metres of sound travel) the front has gone past this point; bright at the front
         float wake(float tb, float w){ float f = (uT - tb) * uC; return f < -3.0 * w ? 0.0 : (f < 0.0 ? exp(-(f / w) * (f / w)) : exp(-f / (w * 2.5)) * 0.9 + 0.1 * exp(-f / 12.0)); }
         void main(){
@@ -71,7 +74,7 @@ class SndRipples {
             if (i >= uN) break;
             vec4 e = uE[i];
             float d = length(vW.xz - e.xy);
-            a += uS[i] * ripple((d - e.z) / e.w);
+            a += uS[i] * ring(d - e.z, e.w, fwidth(d));
           }
           float h = vW.y + 1.2;
           // police car (straight, level): tb = tc + (z−1)/v + perp·k/v
@@ -101,7 +104,7 @@ class SndRipples {
       const r = SND_RUN(e[2], t), rg2 = r * r - e[3] * e[3];
       if (rg2 <= 0) continue;
       const fade = MathX.smooth(age, 0, 0.12) * (1 - MathX.smooth(age, e[5] * 0.6, e[5]));
-      A.push([e[0], e[1], Math.sqrt(rg2), 0.45 + 0.012 * r, e[4] * fade]);
+      A.push([e[0], e[1], Math.sqrt(rg2), 0.08 + 0.0015 * r, e[4] * fade]);
     }
     A.sort((a, b) => b[4] - a[4]);
     const n = Math.min(this.MAX, A.length);
@@ -113,7 +116,7 @@ class SndRipples {
     U.uFront.value.set(
       MathX.window(t, 54.0, 62.5, 0.4, 1.5) * 0.22,
       MathX.window(t, 50.0, 57.0, 0.5, 1.5) * 0.2,
-      MathX.window(t, 33.0, 39.0, 0.5, 1.2) * 0.15);
+      MathX.window(t, 33.0, 39.0, 0.5, 1.2) * 0.3);
     if (fog) { U.uFogColor.value.copy(fog.color); U.uFogDensity.value = fog.density; }
   }
 }
@@ -128,21 +131,26 @@ class SndDust {
     // [x, y, z, t0, size, alpha, life, seed, kind] kind 0 dust, 1 glass glitter
     let s = 1;
     // the car's shock across the lot (light: it is only just supersonic)
-    for (let x = 14; x <= 52; x += 4.8) for (let z = -90; z <= 30; z += 4.8) {
+    for (let x = 14; x <= 52; x += 3.6) for (let z = -90; z <= 30; z += 3.6) {
       const jx = x + (hash1(s * 3) - 0.5) * 2.4, jz = z + (hash1(s * 5) - 0.5) * 2.4, tb = sndSportBoomAt(jx, jz, 0.3);
-      if (tb !== null && tb > 33) P.push([jx, h, jz, tb, 1.7, 0.06, 1.8, s, 0]);
+      if (tb !== null && tb > 33) P.push([jx, h, jz, tb, 1.5, 0.15, 0.8, s, 0]);   // (short-lived: a band that races across, not a fog)
       s++;
     }
     // the car's wake on the highway deck (grit off the road behind it)
     for (let z = -330; z <= 60; z += 2.4) {
       const S = SND.sport, tz = (() => { let lo = 20, hi = 42; for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (sndSport(m).z < z) lo = m; else hi = m; } return lo; })();
-      P.push([S.x + (hash1(s * 3) - 0.5) * 2.6, SND_CITY.hwy.top, z, tz + 0.05, 1.7, 0.16, 1.8, s, 0]); s++;
+      P.push([S.x + (hash1(s * 3) - 0.5) * 2.6, SND_CITY.hwy.top, z, tz + 0.05, 2.6, 0.24, 2.2, s, 0]); s++;
     }
     // the airliner's shock: a low wall of dust that comes up the avenue (gutters and pavements dirtiest), the lot lighter
     for (let x = -12; x <= 12; x += 3.0) for (let z = -330; z <= 40; z += 3.0) {
       const jx = x + (hash1(s * 3) - 0.5) * 2.0, jz = z + (hash1(s * 5) - 0.5) * 2.6, edge = Math.abs(Math.abs(jx) - 7) < 1.6 || Math.abs(jx) > 8.5;
       P.push([jx, Math.abs(jx) < LAYOUT.roadHalf ? 0 : h, jz, sndPlaneBoomAt(jx, jz, 0.3), edge ? 3.4 : 2.6, edge ? 0.22 : 0.1, 2.1, s, 0]);
       s++;
+    }
+    // ... and above it, a taller, fainter billow (so the wall reads from 300 m away)
+    for (let x = -10; x <= 10; x += 4.8) for (let z = -330; z <= 0; z += 6.0) {
+      const jx = x + (hash1(s * 3) - 0.5) * 3, jz = z + (hash1(s * 5) - 0.5) * 4;
+      P.push([jx, 1.6 + hash1(s * 9) * 1.4, jz, sndPlaneBoomAt(jx, jz, 2.5) + 0.05, 5.2, 0.075, 2.0, s, 0]); s++;
     }
     for (let x = 15; x <= 50; x += 6) for (let z = -120; z <= 30; z += 6) {
       const jx = x + (hash1(s * 3) - 0.5) * 4, jz = z + (hash1(s * 5) - 0.5) * 4;
@@ -154,8 +162,8 @@ class SndDust {
       P.push([x + (hash1(s * 7) - 0.5), Math.abs(x) < LAYOUT.roadHalf ? 0 : h, jz, sndPoliceBoomAt(x, jz, 0.3), gutter ? 2.0 : 1.5, gutter ? 0.13 : 0.06, 1.9, s, 0]);
       s++;
     }
-    // the pile driver: a puff at the base of the pile with every blow
-    for (const t of SND_PILE_HITS) for (let k = 0; k < 7; k++) P.push([SND.pile.x - 0.75 + (hash1(s) - 0.5) * 2.4, h + 0.2, SND.pile.z + (hash1(s * 3) - 0.5) * 2.4, t + 0.01 + k * 0.02, 2.6, 0.42, 2.0, s++, 0]);
+    // the pile driver: a diesel hammer coughs a puff of exhaust and grit where it strikes (above the hoarding) with every blow
+    for (const t of SND_PILE_HITS) for (let k = 0; k < 7; k++) P.push([SND.pile.x - 0.75 + (hash1(s) - 0.5) * 2.0, h + 3.6 + hash1(s * 7) * 1.0, SND.pile.z + (hash1(s * 3) - 0.5) * 2.0, t + 0.01 + k * 0.02, 3.2, 0.5, 2.0, s++, 0]);
     // the drone hits the ground
     for (let k = 0; k < 8; k++) P.push([SND.drone.x + 1.1 + (hash1(s) - 0.5) * 0.9, h - 0.15, SND.drone.z + (hash1(s * 3) - 0.5) * 0.9, SND.drone.down + 0.02 + k * 0.015, 0.45, 0.16, 1.2, s++, 0]);
     this.P = P.sort((a, b) => a[3] - b[3]);
@@ -172,7 +180,7 @@ class SndDust {
       if (p[8] === 0) {
         const grow = 1 - Math.exp(-u * 2.2), size = p[4] * (0.35 + 1.1 * grow);
         // dust right at your face would only fog the lens: it thins out within a few metres of you
-        const a = p[5] * MathX.smooth(u, 0, 0.12) * (1 - k) * (1 - k) * MathX.smooth(Math.hypot(p[0] - E.x, p[2] - E.z), 2.5, 9);
+        const a = p[5] * MathX.smooth(u, 0, 0.12) * (1 - k) * (1 - k) * MathX.smooth(Math.hypot(p[0] - E.x, p[2] - E.z), 4, 14);
         B.push(p[0] + (hash1(sd * 11) - 0.5) * u * 1.4, p[1] + 0.15 + size * 0.28 + u * (0.35 + 0.4 * hash1(sd * 3)), p[2] + u * 0.6, size, hash1(sd) * 6.28 + u * 0.4 * (hash1(sd * 5) - 0.5), a, 1, 0.66, 0.61, 0.54);
       } else {
         const a = p[5] * (1 - k) * (0.5 + 0.5 * Math.sin(u * 40 + sd));

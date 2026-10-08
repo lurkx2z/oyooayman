@@ -8,11 +8,8 @@
      debug(app, t)     text for the D debug panel
    ===================================================================== */
 
-// 'shield': both hands flung up as the police car's shock hits (only the fingers rise into the bottom corners, so the glass stays in view)
-const SND_HAND_POSES = Object.assign({}, HAND_POSES, {
-  shield: { p: [0.15, -0.27, -0.4], F: [-0.4, 1, 0.25], N: [0.25, 0.1, -1], curl: [0.2, 0.22, 0.28, 0.34], thumb: [0.7, 0.12] },
-});
-const SND_HAND_BLEND = Object.assign({}, HAND_BLEND, { ear: 0.12, shield: 0.07 });
+const SND_HAND_POSES = Object.assign({}, HAND_POSES);
+const SND_HAND_BLEND = Object.assign({}, HAND_BLEND, { ear: 0.12 });
 for (const k of Object.keys(SND_HAND_POSES)) { SND_HAND_POSES[k + '!'] = SND_HAND_POSES[k]; SND_HAND_BLEND[k + '!'] = 0.02; }
 
 const FILM = {

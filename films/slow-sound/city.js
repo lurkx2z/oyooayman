@@ -54,7 +54,7 @@ class SndCity extends Environment {
 
   /* ---------------- sky: a clear, warm afternoon (copy-then-own of the Air film's sunny sky) ---------------- */
   _sky() {
-    this.sunDir = new THREE.Vector3(-0.42, 0.6, 0.68).normalize();
+    this.sunDir = new THREE.Vector3(0.45, 0.62, 0.64).normalize();   // behind-right of you: the shopfronts across the avenue, the highway and the street ahead are all front-lit
     const zenith = new THREE.Color('#6a8fb6'), horizon = new THREE.Color('#c8d5df');
     this.fogColor = new THREE.Color('#cdd6dc');
     this.skyUniforms = { uZenith: { value: zenith }, uHorizon: { value: horizon }, uGround: { value: new THREE.Color('#8d9590') }, uSunDir: { value: this.sunDir }, uSunColor: { value: new THREE.Color('#ffe2b4') }, uTime: { value: 0 } };
@@ -207,13 +207,13 @@ class SndCity extends Environment {
 
   _streetFurniture() {
     const B = this.batch, m = this.m, h = LAYOUT.curbH;
-    for (const z of [30, -40, -100, -160, -220]) this._streetLight(7.45, z, 1);
+    for (const z of [30, -100, -160, -220]) this._streetLight(7.45, z, 1);   // none at -40: it framed the shock front
     for (const z of [12, -18, -78, -138, -198]) this._streetLight(-7.45, z, -1);
     for (const [x, z] of [[7.7, -16], [-7.7, -8], [-7.7, -58]]) {
       B.add(new THREE.CylinderGeometry(0.13, 0.15, 0.6, 10), m.red, Geo.matrix(x, h + 0.3, z));
       B.add(new THREE.SphereGeometry(0.14, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), m.red, Geo.matrix(x, h + 0.6, z));
     }
-    for (const [x, z] of [[-7.8, -30], [-7.8, 4], [8.0, -27]]) {
+    for (const [x, z] of [[-7.8, -30], [-7.8, 4], [-7.8, -62]]) {
       B.add(new THREE.CylinderGeometry(0.3, 0.27, 0.95, 12), m.metalGreen, Geo.matrix(x, h + 0.475, z));
       B.add(new THREE.CylinderGeometry(0.33, 0.33, 0.08, 12), m.metalGreen, Geo.matrix(x, h + 0.99, z));
     }
@@ -297,7 +297,7 @@ class SndCity extends Environment {
     const leader = add(new THREE.BoxGeometry(0.7, 19, 0.7), yel, 0, 9.9, 0);                                                         // the mast
     add(new THREE.BoxGeometry(3.4, 0.25, 0.25), dark, 1.7, 15.0, 0).rotation.z = -0.62;                                             // back stay
     add(new THREE.BoxGeometry(0.9, 0.5, 0.9), dark, 0, 19.6, 0);
-    this.pileHammer = add(new THREE.BoxGeometry(1.0, 2.4, 1.0), dark, -0.75, 6, 0);
+    this.pileHammer = add(new THREE.BoxGeometry(1.0, 2.4, 1.0), Mat.std('#c4361c', { roughness: 0.5 }), -0.75, 6, 0);   // red: it has to read against the yellow mast at 100 m
     this.pilePile = add(new THREE.CylinderGeometry(0.3, 0.3, 4, 12), steel, -0.75, 2, 0);
     g.position.set(P.x + 0.75, y0, P.z);
     g.rotation.y = -0.35;

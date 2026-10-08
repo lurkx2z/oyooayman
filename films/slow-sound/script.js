@@ -7,7 +7,7 @@
    Plan: films/slow-sound/PLAN.md
    ===================================================================== */
 
-CONFIG.duration = 71.0;          // story length (no cut: film = story)
+CONFIG.duration = 69.8;          // story length (no cut: film = story)
 CONFIG.seed = 20261008;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.68, walkSpeed: 1.3, bobStrength: 0.013, bobFrequency: 1.72,
@@ -34,7 +34,7 @@ const SND = {
   pilot: { x: 18.8, z: -8.2 },
   plane: { x: 24, v: 72.2, tc: 48.6, h: 220, glide: 0.0524 },  // 260 km/h on approach (Mach 2.1), 220 m up, 3° glide
   police: { x: -1.75, y: 1.4, v: 44.44, tc: 59.2 },            // 160 km/h (Mach 1.30): the street payoff
-  lineA: [64.3, 66.9], lineB: [67.1, 69.7], note: [69.3, 70.6], black: 70.75, end: 71.0,
+  lineA: [63.9, 66.1], lineB: [66.3, 68.5], note: [68.1, 69.4], black: 69.55, end: 69.8,
   boom: {},                                                    // when each shock reaches YOU (computed below)
 };
 (() => { const S = SND.sport; S.tA = S.t0 + (S.v1 - S.v0) / S.a; S.zA = 1 - S.v1 * (S.tc - S.tA); const u = S.tA - S.t0; S.z0 = S.zA - (S.v0 * u + 0.5 * S.a * u * u); S.tM = S.t0 + (SND.C1 - S.v0) / S.a; })();
@@ -121,29 +121,29 @@ const SND_PILE_HITS = (() => { const P = SND.pile, a = []; for (let t = P.t0; t 
 const SND_CAM_X = [[0, 9.4], [71, 9.4]];
 const SND_CAM_Z = [[0, 7.2], [4.6, 1.0, 'linear'], [71, 1.0]];
 // base yaw / pitch (degrees; yaw 0 = down the avenue, + = left) used outside the look windows
-const SND_BASE_YAW = [[0, 30], [11.0, 30], [11.8, -16], [19.0, -16], [19.4, 20], [23.3, 75], [24.4, -2], [37.0, -118], [37.6, -112], [38.4, -50],
+const SND_BASE_YAW = [[0, 30], [10.6, 30], [11.9, -16], [19.0, -16], [19.4, 20], [23.0, 70], [24.8, -2], [37.0, -118], [37.7, -110], [39.0, -50],
   [44.0, -20], [49.2, 8], [54.3, 10], [54.6, 13], [55.2, 8], [59.9, 60], [62.7, 58], [64.2, 36.5], [71, 35.5]];
 const SND_BASE_PITCH = [[0, 3], [11.0, 2], [37.0, 1], [38.4, -4], [44, 8], [49.4, 2], [54.3, 1], [54.5, -1.5], [55.0, 0.5], [59.9, 1], [71, 0.5]];
 // [from, to, target(t) → {x,y,z}, blend in s, blend out s, lag s, pitch cap °]
 const SND_LOOKS = [
   // the friend: from the first frame (aimed above their head under the title, so they sit below it), then close up
-  [-1.0, 11.0, (t) => SND_P(SND.friend.x, 1.25 + 3.1 * (1 - MathX.smooth(t, 3.3, 4.7)), SND.friend.z), 0.9, 0.55, 0],
-  [11.0, 19.1, () => SND_P(SND.pile.x - 0.75, 4.6, SND.pile.z), 0.7, 0.6, 0],
+  [-1.0, 11.0, (t) => SND_P(SND.friend.x, 1.25 + 3.1 * (1 - MathX.smooth(t, 3.3, 4.7)), SND.friend.z), 0.9, 1.1, 0],
+  [11.0, 19.1, () => SND_P(SND.pile.x - 0.75, 4.6, SND.pile.z), 1.1, 0.6, 0],
   // the ambulance: followed until it is level with you (not round behind you), then a pan through the front
-  [19.0, 23.6, (t) => { const q = sndAmb(t); return SND_P(q.x, q.y, Math.min(q.z, SND_CZ.value(t) - 1.5)); }, 0.7, 0.7, 0.16],
+  [19.0, 23.4, (t) => { const q = sndAmb(t); return SND_P(q.x, q.y, Math.min(q.z, SND_CZ.value(t) - 1.5)); }, 0.7, 1.1, 0.16],
   // the car on the highway: 110 km/h, through the barrier, past you; your head follows it a little after the boom
-  [24.0, 37.4, (t) => SND_P(SND.sport.x, 6.5, sndSport(t).z), 0.9, 0.8, 0.12],
-  [38.3, 44.2, (t) => { const d = sndDrone(t); return SND_P(d.x, d.y + 0.2, d.z); }, 0.7, 0.6, 0.12],
-  [44.2, 48.6, (t) => sndPlane(t), 0.75, 1.0, 0.2, 56],
+  [24.2, 37.4, (t) => SND_P(SND.sport.x, 6.5, sndSport(t).z), 1.3, 0.8, 0.12],
+  [38.5, 44.0, (t) => { const d = sndDrone(t); return SND_P(d.x, d.y + 0.2, d.z); }, 1.1, 1.0, 0.12],
+  [44.4, 48.9, (t) => sndPlane(t), 1.2, 1.2, 0.2, 56],
   // the airliner's shock front coming up the avenue (you follow it in)
-  [49.3, 54.35, (t) => SND_P(0.5, 3.0, sndPlaneFront(t) - 4), 0.9, 0.3, 0.1],
+  [49.6, 54.35, (t) => SND_P(-4.0, 3.0, sndPlaneFront(t) - 4), 1.2, 0.3, 0.1],
   // the police car, from far down the avenue — then the shopfronts across the street as it goes by them
-  [55.0, 58.75, (t) => { const p = sndPolice(t); return SND_P(p.x, 1.0, p.z); }, 0.6, 0.45, 0.1],
-  [58.55, 63.0, (t) => SND_P(-12.5, 2.3, -12.0 + 3.0 * MathX.smooth(t, 60.4, 62.8)), 0.45, 0.9, 0],
+  [55.0, 58.95, (t) => { const p = sndPolice(t); return SND_P(p.x, 1.0, p.z); }, 0.6, 0.5, 0.1],
+  [58.85, 63.0, (t) => SND_P(-12.5, 2.3, -12.0 + 3.0 * MathX.smooth(t, 60.4, 62.8)), 0.6, 0.9, 0],
 ];
-const SND_FOV = [[0, 40], [3.3, 38], [4.6, 22], [5.4, 15], [10.6, 15], [11.6, 13], [12.4, 10.5], [18.6, 10.5], [19.4, 46], [24.0, 46], [25.2, 6], [27.5, 6],
-  [29.5, 7.5], [31.5, 10], [33.0, 13.5], [34.2, 19], [35.2, 28], [35.9, 40], [36.4, 50], [37.4, 52], [38.4, 46], [39.4, 34], [44.0, 36], [44.6, 50],
-  [48.8, 56], [49.6, 14], [51.0, 15], [52.0, 19], [53.0, 28], [53.7, 42], [54.3, 54], [54.6, 50], [55.4, 22], [56.4, 16], [57.5, 18], [58.2, 30],
+const SND_FOV = [[0, 40], [3.3, 38], [4.6, 22], [5.4, 15], [10.5, 15], [11.0, 24], [11.6, 22], [12.4, 10.5], [18.6, 10.5], [19.4, 46], [24.0, 46], [25.3, 3.6], [28.0, 4.1],
+  [30.0, 4.6], [32.0, 5.6], [33.5, 6.6], [34.5, 8.0], [35.2, 13], [35.9, 26], [36.4, 42], [37.4, 52], [38.4, 46], [39.4, 34], [44.0, 36], [44.6, 50],
+  [48.9, 56], [50.0, 14], [51.0, 15], [52.0, 19], [53.0, 28], [53.7, 42], [54.3, 54], [54.6, 50], [55.4, 22], [56.4, 16], [57.5, 18], [58.2, 30],
   [58.7, 50], [60.4, 50], [62.6, 38], [63.2, 36], [64.4, 30], [71, 28]];
 
 const SCRIPT = {
@@ -196,7 +196,7 @@ const SCRIPT = {
       { t: 42.0, until: 43.9, text: '…and couldn’t keep it in the air.' },
       { t: 45.4, until: 47.9, text: 'Even a landing airliner would be supersonic.' },
       { t: 48.2, until: 50.4, text: 'And you can’t hear it. Not yet.' },
-      { t: 50.7, until: 53.6, text: 'You’d see its shock wave before you heard it.' },
+      { t: 50.7, until: 53.6, text: 'You’d see it hit the street before you heard it.' },
       { t: 56.0, until: 58.4, text: 'A police car you’d never hear coming.' },
       { t: 60.8, until: 63.2, text: 'Only the weakest windows gave way.' },
       { t: SND.lineA[0], until: SND.lineA[1], text: 'You wouldn’t need a fighter jet…' },
@@ -217,13 +217,13 @@ const SCRIPT = {
       { from: 39.2, until: 44.0, top: 200, label: 'DRONE PROPELLER TIPS', value: 'MACH 2.6', sub: '≈ 90 M/S' },
       { from: 44.8, until: 48.9, top: 200, label: 'AIRLINER · 260 KM/H', value: `MACH ${(SND.plane.v / SND.C1).toFixed(1)}`, sub: 'AT CRUISE ALTITUDE: MACH 8' },
       { from: 49.6, until: 54.9, top: 200, label: 'ITS SHOCK WAVE', value: (t) => `${Math.max(0, Math.round((SND_CZ.value(t) - sndPlaneFront(t)) / 5) * 5)} M`,
-        sub: (t) => (t < SND.boom.plane ? 'COMING UP THE STREET · 260 KM/H' : 'HEARD') },
+        sub: (t) => (t < SND.boom.plane ? 'COMING UP THE STREET · 290 KM/H' : 'HEARD') },
       { from: 55.4, until: 59.5, top: 200, label: 'POLICE CAR · 160 KM/H', value: `MACH ${(SND.police.v / SND.C1).toFixed(2)}`,
         sub: (t) => (t < SND.boom.police ? `ITS SHOCK WAVE REACHES YOU IN ${(SND.boom.police - t).toFixed(1)} S` : 'HEARD') },
-      { from: 63.8, until: 70.2, top: 200, label: 'SPEED OF SOUND', value: '123 KM/H', sub: '34.3 M/S' },
+      { from: 63.6, until: 69.0, top: 200, label: 'SPEED OF SOUND', value: '123 KM/H', sub: '34.3 M/S' },
     ],
     says: [],                          // "Hey!" is placed at the moment the shout ARRIVES (filled in below)
-    notes: [{ t: SND.note[0], until: SND.note[1], text: 'FICTIONAL SIMULATION · ONLY THE SPEED OF SOUND IN AIR WAS CHANGED' }],
+    notes: [{ t: SND.note[0], until: SND.note[1], text: 'FICTIONAL SIMULATION<br>ONLY THE SPEED OF SOUND IN AIR WAS CHANGED' }],
   },
 };
 
@@ -251,14 +251,14 @@ function sndInFlight(list, t) { let q = null; for (const p of list) if (p[0] <= 
   C.height = [[0, 1.68], [tP, 1.68], [tP + 0.3, 1.5, 'outQuad'], [tP + 2.65, 1.66], [71, 1.68]];
   C.tilt = [[0, 0], [tP - 0.05, 0], [tP + 0.25, -3.5], [tP + 1.85, 0], [71, 0]];
   // (up in front of you first — you see them — then over your ears)
-  SCRIPT.hands.right = [[0, 'hidden'], [tP + 0.04, 'shield'], [tP + 0.6, 'ear'], [tP + 1.95, 'ear'], [tP + 2.65, 'hidden']];
-  SCRIPT.hands.left = [[0, 'hidden'], [tP + 0.07, 'shield'], [tP + 0.65, 'ear'], [tP + 1.85, 'ear'], [tP + 2.55, 'hidden']];
+  SCRIPT.hands.right = [[0, 'hidden'], [tP + 0.04, 'ear'], [tP + 1.95, 'ear'], [tP + 2.65, 'hidden']];   // (up to your ears, out of frame: the duck and the shake carry it)
+  SCRIPT.hands.left = [[0, 'hidden'], [tP + 0.07, 'ear'], [tP + 1.85, 'ear'], [tP + 2.55, 'hidden']];
   // for the readouts: when each of the friend's sounds and each bang is made and heard; when the siren's pitch flips
   SND.friendArr = [...SND.friend.claps.filter((t) => t > 4), SND.friend.shout].map((t) => [t, sndArriveFixed(t, SND.friend)]);
   SND.pileArr = SND_PILE_HITS.map((t) => [t, sndArriveFixed(t, SND.pile)]);
   SND.ambFlip = SND.amb.tc + SoundArrival.dist(sndAmb(SND.amb.tc), sndEar(SND.amb.tc)) / c;
   // sample the head: base keys blended toward each look window's target
-  const by = new Track(SND_BASE_YAW), bp = new Track(SND_BASE_PITCH);
+  const by = new Track(SND_BASE_YAW), bp = new Track(SND_BASE_PITCH), fv = new Track(SND_FOV);
   const yaw = [], pitch = [];
   let prevYaw = null;
   for (let i = 0; i <= Math.round(CONFIG.duration * 30); i++) {
@@ -272,6 +272,9 @@ function sndInFlight(list, t) { let q = null; for (const p of list) if (p[0] <= 
       while (ly - y > 180) ly -= 360; while (ly - y < -180) ly += 360;
       y += (ly - y) * w; p += (lp - p) * w;
     }
+    // through a long lens you brace: the controller's idle head sway is cancelled out (fully below 6° of view)
+    const st = 1 - MathX.smooth(fv.value(t), 6, 24);
+    y -= st * (noise1(t * 0.35, 11) * 0.6 + noise1(t * 1.3, 12) * 0.12); p -= st * (noise1(t * 0.3, 13) * 0.45 + noise1(t * 1.1, 14) * 0.1);
     if (prevYaw !== null) { while (y - prevYaw > 180) y -= 360; while (y - prevYaw < -180) y += 360; }
     prevYaw = y;
     yaw.push([+t.toFixed(4), +y.toFixed(3), 'linear']); pitch.push([+t.toFixed(4), +p.toFixed(3), 'linear']);
