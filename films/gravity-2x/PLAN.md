@@ -1,6 +1,6 @@
 # WHAT IF GRAVITY BECAME TWICE AS STRONG? — production plan (v3, the leisure centre)
 
-A vertical (9:16, 1080×1920, 30 fps) first-person "what if" on the shared engine, about 60–64 s. One continuous take
+A vertical (9:16, 1080×1920, 30 fps) first-person "what if" on the shared engine, 60.3 s. One continuous take
 from your eyes (trimmed invisibly by `CONFIG.edit`) through a leisure centre: a gym, a sports hall seen through glass,
 an open stair down into a pool hall, the pool itself and, at the end, under the water. Gravity doubles at 1.6 s and
 stays doubled. Nothing gets more massive: everything just weighs twice as much. The film is about how weight FEELS:
@@ -62,8 +62,9 @@ walk → the surprise that the water doesn't care → the payoff that uses both 
   140.0. "You didn't gain a gram."
 - **B, impossible-looking consequence (≈ 30–40 s):** in the pool hall everyone on the deck is flattened, while the
   swimmers float and swim as if gravity never changed; then a man tries to climb out and can't.
-- **C, final payoff (≈ 45–56 s):** you float at the deep end; the diver on the 10 m tower steps off; 1.01 s, 71 km/h;
-  you duck under and watch her plume drive deep and her float back up.
+- **C, final payoff (story ≈ 45–60 s):** you float at the deep end; the diver on the 10 m tower steps off with a 1 G
+  ghost beside her; 1.01 s, 71 km/h; you duck under and watch her plume drive deep and her float back up. Then you try
+  to climb out yourself and can't: the water was the only place gravity didn't win.
 
 ### 0.4 What was wrong with v2 (from the override's checklist)
 
@@ -113,36 +114,49 @@ systems (now splashes and bubbles), the look list, the sound engine set-up.
 
 `centre.js` (GvCentre, subclassing `Environment`): one leisure centre, sun from the left (−X), −Z is "ahead".
 - **Gym (upper level, floor y 0)**: x −7 … 6, z 5 … −6, ceiling 3.4. Left wall: floor-to-ceiling windows (sun shafts
-  on the floor). Right wall: glass onto the sports hall. Ahead (z −6): a glass balustrade over the pool hall and the
-  head of the open stair. The scale at (0.5, 1.5); treadmills along the windows; the bench-press rack by the right glass.
-- **Sports hall (same level)**: x 6 … 24, z 10 … −6, ceiling 7.5; a basket on the far end wall (rim centre x 14,
-  z −4.8, 3.05 m); the free-throw shooter at z −0.85.
-- **Pool hall (lower level, deck y −3.2)**: x −14 … 14, z −6 … −36, roof at y 13; glazed left wall. The open stair
-  (x 2.9 … 4.7) runs from the gym (z −6.05) down 16 risers to the deck (z −10.5). The pool: x −12 … 2, z −8 … −30;
-  lanes 1.6 m deep to z −19, then a slope to the 5 m diving area; the tower stands on the deck beyond the far end,
-  its 10 m platform reaching out over the deep water. The ladder at (2, −14). You slide in at (2, −19.5).
+  on the floor). Right wall (x 6): glass onto the sports hall, posts at z −6, −3.0, 0.6, 5 (clear of the free throw's
+  line of sight). Ahead (z −6): a glass balustrade over the pool hall and the head of the open stair. The body-scan
+  scale at (0.6, 0.66) facing +Z, you on its platform at z 1.8; the treadmills along the windows (x −6.55 / −4.45);
+  the bench-press rack at x 2.4, bar at z −2.4, the lifter's feet toward +Z (you look along the bench from his feet).
+- **Sports hall (same level)**: x 6 … 24, z 10 … −6, ceiling 7.5; a basket on the far end wall (rim x 13, z −4.8,
+  3.05 m); the shooter at z −0.55. You watch from the glass at (3.6, −0.6).
+- **Pull-up bar (gym, by the court glass)**: a free-standing frame at (4.75, 0.6), bar 2.25 m up, running along Z.
+- **Pool hall (lower level, deck y −3.2)**: x −14 … 14, z −6 … −38, roof at y 13; glazed left wall; the outside lawn
+  only round the building (it used to run under the pool). The open stair (x 2.9 … 4.7) runs from the gym (z −6.0)
+  down 16 risers to the deck (z −10.5); you hug the right rail (x 4.45), the seated man is on the left (x 3.3, z −8.4).
+  The pool: x −12 … 2, z −8 … −30, water at y −3.32; 1.6 m deep to z −19, sloping to 5 m by z −21.5. The tower
+  (x −7.4 … −1.6, z −34.6 … −30.6) stands beyond the far end; its 10 m platform edge at z −28.6, the diver at x −4.5.
+  The lifeguard chair at (2.75, −16.6) facing −X; the ladder at (2.0, −22.6); you walk the deck at x 4.6 and slide in
+  at (1.15, −20.6) (trimmed), float, duck under at (0.95, −20.9), surface near (0.6, −27.4), swim to the deep-end
+  wall at (1.3, −29.48) and try to press out; a man kneels on the deck at (1.55, −32.5). The 5 m platform is
+  cantilevered (its column was removed so it doesn't block the press-out).
 - **Camera**: always your eyes. Height drops under the doubled weight; each stair step jolts; in the water your head
   rides the waves, then goes under.
 
-## 3. Shot list (story seconds; film seconds after the trims are in § 3b once timed)
+## 3. Shot list (story seconds → film seconds after the trims)
 
-| # | Story | What we SEE | What we HEAR | Caption / HUD |
-|---|---|---|---|---|
-| 1 | 0–3.2 | Looking down at the scale's display between your hands: 70.0 kg; the gym beyond. 1.6: gravity doubles; it runs to 140.0, your hands squeeze, knees dip | gym music, a treadmill, plates; at 1.6 a deep whump, every weight in the room clangs down, a whistle downstairs | TITLE · GRAVITY 1.0 G → 2.0 G |
-| 2 | 3.4–6.4 | The display at 140.0, your hands shaking on the grips | your breath | THE SCALE 140.0 kg · YOUR MASS: STILL 70 kg · "You didn't gain a gram." |
-| 3 | 6.4–10.6 | Left, by the windows: the runner hanging on the treadmill rails, legs dragged; she loses her grip, is carried off the back and sits down hard | belt whine, her effort, a thud | "Every stride lifts twice the weight." |
-| 4 | 10.6–15.4 | Right: the lifter and his spotter heave the bar off the safety arms; it rises a few cm and crashes back | effort voices, steel clang | BARBELL 80 kg · LIFTS LIKE 160 kg · "Every weight in the gym doubled." |
-| 5 | 15.4–21.0 | Through the glass, on the court: a free throw peaks below the rim and lands short, bouncing low and fast; the dotted 1 G ghost arc drops in | the ball's thuds through glass, a groan | SAME FREE THROW · PEAK 2.90 m · RIM 3.05 m · "Every throw falls short." |
-| 6 | 21–24 | To the head of the stair; the pool hall opens below (tower, pool) | the gym fades, the pool hall's echo grows | — |
-| 7 | 24–31 | Down the open stair, every step a jolt; a man halfway up sits on the steps gripping the rail | heavy steps, his breath | ONE FLOOR UP · THE WORK OF TWO · "Every flight of stairs is now two." |
-| 8 | 31–36 | Over the pool: the lifeguard slumped in her chair, a dad on the floor with his toddler, but the swimmers float and swim as before | splashes, voices, echo | SWIMMERS · WEIGHT ×2 · BUOYANCY ×2 · "But in the water, nothing changed." |
-| 9 | 36–40.5 | At the ladder: a man climbs out; as he leaves the water he slows, shakes, and drops back in | effort, splash | "Until you try to get out." |
-| 10 | 40.5–45 | You sit on the edge of the deep end and slide in; for a moment under; then floating, breathing slows | splash, muffled, then surface | YOU, FLOATING · WEIGHT 1,373 N · BUOYANCY 1,373 N |
-| 11 | 45–48.5 | Up at the 10 m tower: the diver at the edge, looking back at the stairs, then down | the hall's echo | 10 m PLATFORM · CLIMBING DOWN: LIKE 20 m · "She can't face the stairs down." |
-| 12 | 48.5–49.5 | She steps off: 10 m in 1.01 s | the hall hushes, air | FALL 10 m · clock · AT 1 G: 1.43 s |
-| 13 | 49.5–51 | Entry: a huge splash; the wave rocks you | the hit, the hall's echo | 71 km/h · LIKE A 20 m DIVE AT 1 G |
-| 14 | 51–56 | You duck under: her bubble plume drives deep; she slows and floats back up past the light | muffled roar, bubbles, your heartbeat | DEPTH 3 m · PRESSURE LIKE 6 m |
-| 15 | 56–63 | You surface beside her; she floats on her back; the pool settles | lapping water, a soft chord | "Nothing became more massive." → "Everything just became twice as heavy." → "Even the water." · end note · fade |
+`CONFIG.edit = [[0, 21.75], [23.45, 31.3], [34.0, 40.05], [42.85, 67.5]]`: three invisible trims (the walk to the
+stair, the walk along the deck, the slide into the water) take the 67.5 s story to a 60.3 s film. Film = story up to
+21.75, story − 1.7 to 31.3, story − 4.4 to 40.05, story − 7.2 after.
+
+| # | Story | Film | What we SEE | What we HEAR | Caption / HUD |
+|---|---|---|---|---|---|
+| 1 | 0–3.3 | 0–3.3 | Looking down at the scale between your hands: 70.0 kg; a woman curling dumbbells ahead. 1.6: gravity doubles, your knees dip, her dumbbells hit the floor, the scale runs to 140.0 | gym music, a treadmill; at 1.6 a deep whump, every weight in the room clangs down, gasps | TITLE · GRAVITY 1.0 → 2.0 G (live m/s²) |
+| 2 | 3.3–6.3 | 3.3–6.3 | The display at 140.0, "HOLD STILL…" | scale beeps, your breath | THE SCALE 140.0 kg · YOUR MASS: STILL 70 kg · "You didn't gain a gram." |
+| 3 | 6.0–9.3 | 6.0–9.3 | The runner clinging to the treadmill rails; she slips at 7.5, is carried off the back and sits down hard | belt whine, her effort, a thud | TREADMILL · 2× THE LOAD · "Every stride lifts twice the weight." |
+| 4 | 9.3–15.4 | 9.3–15.4 | Along the bench from the lifter's feet: he and his spotter heave the 80 kg bar off the safety arms (11.0); it drops back with a clang and chalk (12.55) | strain voices, the bar trembling, the crash | BARBELL 80 kg · LIFTS LIKE 160 kg · AT 1 G 785 N · NOW 1,570 N · "Every weight in the gym just doubled." |
+| 5 | 15.4–17.3 | 15.4–17.3 | Through the glass: a free throw peaks below the rim and lands short; the dotted 1 G ghost arc scores | the ball's thuds through glass, a groan | PEAK 2.90 m · RIM 3.05 m · AT 1 G 3.68 m · "The same throw falls short." |
+| 6 | 17.3–21.75 | 17.3–21.75 | **New: the pull-up bar.** You reach up and hang (18.55): the camera sinks under your doubled weight, your arms shake as you try to pull up (19.55), your left hand peels off the chrome (20.55), you drop and land hard (21.05) | hands on chrome, the frame creaking, a long strain, the slip, the landing thud | DEAD HANG · YOUR GRIP HOLDS 140 kg · AT 1 G: 70 kg · "Just hanging on is like holding two of you." |
+| 7 | 23.45–28.3 | 21.75–26.6 | Down the open stair, a man sat halfway with his hand on the rail; at 25.9 your knee gives on a step | heavy steps, the treads ringing, his breath | HIS CLIMB · ONE FLOOR · WORK OF TWO · 4,400 J · AT 1 G 2,200 J · "Every step down lands twice as hard." |
+| 8 | 28.3–31.3 | 26.6–29.6 | From the stair foot: swimmers lying on the water exactly as before; everyone on the deck is flattened | the hall's echo, lapping water | FLOATING · SAME AS BEFORE · "But in the water, you float exactly as before." |
+| 9 | 34.0–40.05 | 29.6–35.65 | Close (fov 40) on the ladder: a man climbs; slower and slower as he leaves the water; he stalls shaking at the top, his grip goes and he drops back in | his strain, water pouring off, the splash | LEAVING THE WATER · BUOYANCY GONE · HE LIFTS HIS FULL 2× WEIGHT · "Until you try to get out." |
+| 10 | 42.85–44.6 | 35.65–37.4 | You're floating at the deep end (you've just slid in) | water off your face, a gasp | YOU, FLOATING · FEELS WEIGHTLESS · BUOYANCY = WEIGHT = 1,373 N |
+| 11 | 44.6–47.9 | 37.4–40.7 | Up at the 10 m platform: the diver gets up off her knees, looks back at the stairs, walks to the edge | a low drone and a riser | "She climbed up before the change." · "So she jumps." |
+| 12 | 47.9–48.91 | 40.7–41.71 | She steps off; a pale 1 G "ghost" diver falls beside her and is only halfway (5.0 m) when she hits | the hall hushes, air | FALL · 10 m · GHOST: 1 G · clock to 1.01 s · AT 1 G 1.43 s |
+| 13 | 48.91–49.45 | 41.71–42.25 | Entry: a crown splash and white water; the wave rocks you | a heavy slap, the roar, the hall answering | 71 km/h · LIKE A 20 m DIVE AT 1 G · AT 1 G 50 km/h |
+| 14 | 49.45–54.3 | 42.25–47.1 | You duck under: her bubble plume drives deep, then she floats back up through it | muffled roar, bubbles, your heartbeat | HER DEPTH 3 m · WATER PRESSURE ×2 · LIKE 6 m AT 1 G |
+| 15 | 54.3–60.5 | 47.1–53.3 | **New ending: you try to get out.** You surface, swim to the deep-end wall, put both hands on the deck and press: you rise, shaking, a man kneeling on the deck ahead; at 59.15 your arms give and you drop back under, then up with a gasp | strokes, a rising strain, water pouring off you, the splash, muffled, the gasp | ON YOUR ARMS 0 → 98 kg (live) · AT 1 G: half |
+| 16 | 60.5–67.5 | 53.3–60.3 | Floating again; you turn to her floating on her back; the hall, the windows | lapping water, a soft chord, plucks | "You didn't gain a gram." → "Everything just weighs twice as much." → "Even the water." · end note · GRAVITY 2.0 G · MASS UNCHANGED · fade |
 
 ## 4. Hero shots
 - The scale at 140.0 between your hands (≈ 2.5).
@@ -151,16 +165,22 @@ systems (now splashes and bubbles), the look list, the sound engine set-up.
 - The diver in mid-fall against the tower, the water below (≈ 49; cover candidate).
 - Under water: her plume and her rising toward the light (≈ 53).
 
-## 5. Escalation check (a new event every 4–8 s)
-Planned: 1.6 change · 6.4 treadmill · 8 carried off · 11.5 bar heave · 13.5 clang · 17 throw · 21 hall reveal ·
-25–30 stair + seated man · 31 swimmers · 37 ladder · 41 you slide in · 45 the diver · 48.5 she steps off · 49.5 entry ·
-51 under water · 56 surface · 58–63 lines.
+## 5. Escalation check (a new event every 4–8 s; film seconds)
+1.6 the change · 2.4 the scale at 140.0 · 7.5 the runner is carried off · 11.0 the heave · 12.6 the crash · 15.6 the
+throw falls short · 18.6 you hang · 20.6 your hand peels · 21.2 you land · 22.4 the stair · 24.2 your knee gives ·
+26.7 the floaters · 30.6 the ladder climb · 34.6 he drops back · 35.65 you float · 37.4 the diver · 40.7 she steps off ·
+41.7 the hit · 42.3 under water · 47.1 surface · 49.7 you press · 52.0 your arms give · 53.4 the closing lines.
+Longest gap between new events: 3.9 s (26.7 → 30.6).
 
 ## 6. Sound
 `audio.js` (GvAudio, subclassing the locked AudioEngine; `audioEngine.js` untouched). Gym: music from ceiling
 speakers, a treadmill belt, plates; at the change a deep whump and every weight hitting the floor. The court through
-glass (muffled thuds). The pool hall: long reverb, water lapping, voices, a lifeguard's whistle. Under water: a
-low-passed world, the plume's roar, bubbles, your heartbeat. Closing: lapping water and one soft chord.
+glass (muffled thuds). Your efforts: hands on the chrome bar, the frame creaking, a long strain, the slip and the
+landing; the knee giving on the stair; the press-out (a rising strain, water pouring off you, the give, the splash,
+a muffled half-second under, the gasp). The pool hall: long reverb, water lapping, voices, a lifeguard's whistle.
+Under water: a low-passed world, the plume's roar, bubbles, your heartbeat. A drone and riser while the diver walks
+to the edge, cut dead as she steps off. Closing: lapping water, one soft chord, plucks on the lines. Measured on the
+spliced film mix: −16.5 LUFS integrated, true peak −1.3 dBFS, LRA 6.1 LU.
 
 ## 7. Systems / files
 
@@ -178,7 +198,29 @@ Dropped from the page (kept in git at `99692f2`): `city.js`, `site.js`, `traffic
 (`gvMesh`, `gvBox`, …) moved to `props.js`.
 
 ## 8. Review log (scores as given — never inflated)
-(v3 rounds are added here as they happen.)
+**v3 round 1** (low-res preview of the first v3 cut, 62.8 s; five independent reviewers; scores as given):
+- Retention: pacing 5 · escalation 4 · payoff 4 · overall **5**/10. Weakest: the dead walk to the stair, the slide in,
+  a static text-only ending reusing v2's lines.
+- Cinematography: composition 5 · camera motion 5 · lighting/grade 6 · VFX 5 · character animation 4 · phone
+  readability 6 · overall visual **5**/10. Weakest: the hook, the bench and the basket hard to read on a phone.
+- Normal viewer: keep watching 6 · understood 7 · would share 4 · overall **6**/10. Most likely swipe: 19–25 s.
+- Physics: **8**/10 physics, 7/10 clarity of science (fixes: the floaters must lie passively, "weight ≈ 0" →
+  "feels weightless", "pressure ×2" → "water pressure ×2", stair wording, the free throw is "the same throw").
+- Creative differentiation vs Oxygen, Friction and the four sibling episodes: distinctiveness **6**/10, keep-watching
+  5/10. Nothing recycled from the banned template; closest echoes were the v2 closing lines and a "walk + look" rhythm.
+
+**Top 3 problems and the fixes (v3 final):**
+1. *Dead stretches and a static ending* → three trims (`CONFIG.edit`, −7.2 s: the walk to the stair, the deck walk,
+   the slide in); a new first-person ending where you try to press yourself out of the pool and fail (live "ON YOUR
+   ARMS" readout 0 → 98 kg); new closing lines ("You didn't gain a gram." / "Everything just weighs twice as much." /
+   "Even the water.").
+2. *Key gym beats unreadable on a phone* → the hook reframed (the scale display larger and fully in frame),
+   the bench rack simplified and the viewpoint moved, the hoop kept in frame (fov 62), "LIFTS LIKE 160 kg".
+3. *A small climax and no "suspended load"* → a new first-person dead hang on a pull-up bar (your grip holds 140 kg,
+   your hand peels, you drop); the dive pushed in with a 1 G ghost diver falling alongside (she hits while the ghost
+   is halfway) and a bigger crown splash.
+Plus the physics wording fixes above. The final was not re-scored by the reviewers after these fixes.
+
 
 ## 9. v2 (superseded): the street film
 Full v2 plan, shot list and review log: `git show 99692f2:films/gravity-2x/PLAN.md`. Round-1 scores of the v2

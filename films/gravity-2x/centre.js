@@ -22,6 +22,7 @@ const GV_C = {
   kiosk: { x: 0.6, z: 0.66 },
   treadX: [-6.55, -4.45], treadZ: [-0.55, -2.15, -3.75],
   bench: { x: 2.4, barZ: -2.4, feet: 1 },     // the lifter's feet point +Z (toward the scale)
+  pullup: { x: 4.75, z: 0.6, y: 2.25, grip: 0.16 },   // a free-standing pull-up bar by the glass (the bar runs along Z: you hang facing the court)
   outside: -3.2,
 };
 // (the shared Environment's trees sit on LAYOUT.curbH: here, the lawn outside)
@@ -402,7 +403,7 @@ class GvCentre extends Environment {
     }
   }
 
-  // the diving tower: a concrete pylon on the far deck, platforms at 3, 5, 7.5 and 10 m, blue edges, rails, stairs behind
+  // the diving tower: a concrete pylon on the far deck, platforms at 3, 5 (cantilevered), 7.5 and 10 m, blue edges, rails, stairs behind
   _tower() {
     const B = this.batch, m = this.m, T = GV_C.tower, L = GV_LOW;
     B.box(T.x1 - T.x0, T.top + 1.1, T.z1 - T.z0, (T.x0 + T.x1) / 2, L + (T.top + 1.1) / 2, (T.z0 + T.z1) / 2, m.towerC);
@@ -419,7 +420,7 @@ class GvCentre extends Environment {
     plat(T.x0 - 2.2, T.x0 + 0.4, 7.5, T.edge + 0.6);
     plat(T.x1 - 0.4, T.x1 + 2.0, 5.0, T.edge + 0.9);
     plat(T.x0 - 2.0, T.x0 + 0.2, 3.0, T.edge + 1.1);
-    for (const [x, h] of [[T.x0 - 2.1, 7.5], [T.x1 + 1.9, 5.0], [T.x0 - 1.9, 3.0]]) B.box(0.35, h, 0.35, x, L + h / 2, T.z1 - 0.3, m.towerC);
+    for (const [x, h] of [[T.x0 - 2.1, 7.5], [T.x0 - 1.9, 3.0]]) B.box(0.35, h, 0.35, x, L + h / 2, T.z1 - 0.3, m.towerC);
     // the steel stair tower behind (zig-zag flights inside a cage)
     const sx = (T.x0 + T.x1) / 2, sz = T.z0 - 1.2;
     for (let k = 0; k < 8; k++) { const y0 = L + k * 1.3; B.add(new THREE.BoxGeometry(2.2, 0.08, 1.9), m.frame, Geo.matrix(sx + (k % 2 ? 0.6 : -0.6), y0 + 0.65, sz, 0, 0, (k % 2 ? 1 : -1) * 0.53)); }

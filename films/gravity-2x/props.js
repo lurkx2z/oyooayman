@@ -135,6 +135,26 @@ class GvTreadmills {
 }
 
 /* ---------------------------------------------------------------------
+   the pull-up bar: a free-standing frame, the bar along X
+   --------------------------------------------------------------------- */
+class GvPullUp {
+  constructor(scene) {
+    const B = GV_C.pullup, g = new THREE.Group(); g.name = 'pullup'; g.position.set(B.x, 0, B.z); g.rotation.y = -Math.PI / 2; scene.add(g);   // (local X → world Z)
+    const frame = Mat.std('#2b2f34', { roughness: 0.45, metalness: 0.55 }), chrome = Mat.std('#c4c9ce', { roughness: 0.22, metalness: 0.9 }), foam = Mat.std('#1d1f22', { roughness: 0.85 });
+    for (const s of [-1, 1]) {
+      gvBox(0.07, B.y + 0.12, 0.07, frame, g, s * 0.68, (B.y + 0.12) / 2, 0);
+      gvBox(0.07, 0.05, 1.1, frame, g, s * 0.68, 0.025, 0);                                   // feet
+      gvBox(0.05, 0.05, 0.55, frame, g, s * 0.68, 0.75, -0.24, 0.9, 0, 0);                    // braces (away from you)
+      gvMesh(new THREE.CylinderGeometry(0.02, 0.02, 0.2, 10), foam, g, s * 0.5, B.y, 0, 0, 0, Math.PI / 2);   // grip foam
+    }
+    gvMesh(new THREE.CylinderGeometry(0.016, 0.016, 1.42, 12), chrome, g, 0, B.y, 0, 0, 0, Math.PI / 2);
+    gvBox(1.43, 0.06, 0.06, frame, g, 0, B.y + 0.12, 0);
+    // a rubber mat under it
+    gvBox(1.5, 0.02, 1.3, foam, g, 0, 0.01, 0.2, 0, 0, 0, false);
+  }
+}
+
+/* ---------------------------------------------------------------------
    the bench-press rack: a bench along −Z, two uprights at its head, safety arms, the 80 kg bar
    --------------------------------------------------------------------- */
 // the bar's height: on its hooks at 1 G (pressed), down onto the safety arms at the change, the heave and the drop
@@ -147,8 +167,8 @@ function gvBarY(t) {
   const fall = 0.5 * GV_G * 0.55 * a * a;                                                   // (he resists a little: 0.55 of free fall)
   if (y0 - fall > A.arms) return y0 - fall;
   if (t < B.heave) return A.arms + 0.012 * Math.max(0, gvJolt(t, GV.g0 + 0.04 + Math.sqrt(2 * (y0 - A.arms) / (GV_G * 0.55)), 6, 0.08));
-  if (t < B.drop) return A.arms + 0.065 * MathX.smooth(t, B.heave + 0.25, B.heave + 1.2) + 0.004 * Math.sin(t * 37) * MathX.smooth(t, B.heave + 0.3, B.heave + 0.6);
-  const h = 0.065 + 0.004, d = t - B.drop, T = Math.sqrt(2 * h / GV_G);
+  if (t < B.drop) return A.arms + 0.11 * MathX.smooth(t, B.heave + 0.25, B.heave + 1.2) + 0.004 * Math.sin(t * 37) * MathX.smooth(t, B.heave + 0.3, B.heave + 0.6);
+  const h = 0.11 + 0.004, d = t - B.drop, T = Math.sqrt(2 * h / GV_G);
   if (d < T) return A.arms + h - 0.5 * GV_G * d * d;
   return A.arms + 0.01 * Math.max(0, gvJolt(t, B.drop + T, 7, 0.06));
 }
@@ -159,14 +179,14 @@ class GvBench {
     // (offsets d run from the bar toward the lifter's feet)
     gvBox(0.3, 0.09, 1.45, pad, g, 0, 0.42, Z(0.475));
     for (const d of [-0.1, 1.05]) { gvBox(0.08, 0.38, 0.08, frame, g, 0, 0.19, Z(d)); gvBox(0.5, 0.05, 0.08, frame, g, 0, 0.03, Z(d)); }
+    // a bench rack: two uprights at the head end with J-hooks and short safety arms (nothing between you and the lifter)
     for (const s of [-1, 1]) {
-      gvBox(0.075, 1.75, 0.075, frame, g, s * 0.62, 0.875, Z(-0.12));                    // uprights
-      gvBox(0.075, 1.75, 0.075, frame, g, s * 0.62, 0.875, Z(0.95));
-      gvBox(0.07, 0.07, 1.25, frame, g, s * 0.62, GV_BAR.arms - 0.055, Z(0.42));         // safety arms
+      gvBox(0.075, 1.45, 0.075, frame, g, s * 0.62, 0.725, Z(-0.12));                    // uprights
+      gvBox(0.07, 0.07, 0.5, frame, g, s * 0.62, GV_BAR.arms - 0.055, Z(0.1));           // safety arms
       gvBox(0.1, 0.06, 0.1, frame, g, s * 0.62, GV_BAR.rack - 0.05, Z(-0.07));           // J-hooks
-      gvBox(0.075, 0.075, 1.15, frame, g, s * 0.62, 1.75, Z(0.42));
+      gvBox(0.08, 0.05, 0.6, frame, g, s * 0.62, 0.025, Z(-0.12));                        // feet
     }
-    for (const d of [-0.12, 0.95]) gvBox(1.32, 0.06, 0.06, frame, g, 0, 0.03, Z(d));
+    gvBox(1.32, 0.06, 0.06, frame, g, 0, 0.03, Z(-0.12));
     // the bar: 20 kg bar + 2 × 30 kg
     this.bar = new THREE.Group(); this.bar.position.set(0, GV_BAR.lock, B.barZ); g.add(this.bar);
     gvMesh(new THREE.CylinderGeometry(0.0145, 0.0145, 1.32, 10), chrome, this.bar, 0, 0, 0, 0, 0, Math.PI / 2);

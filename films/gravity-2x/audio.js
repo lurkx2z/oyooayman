@@ -58,7 +58,7 @@ class GvAudio extends AudioEngine {
     out.gain.setValueAtTime(0.9, END - 0.8); out.gain.linearRampToValueAtTime(0.0001, END);
     // the world, heard through water when you're under: a low-pass that closes when you go in and opens when you surface
     const muff = S.filter('lowpass', 18000, 0.7); muff.connect(mixIn);
-    const wet = [[T.slide + 0.18, T.slide + 0.85], [T.under + 0.12, T.surface + 0.02]];
+    const wet = [[T.slide + 0.18, T.slide + 0.85], [T.under + 0.12, T.surface + 0.02], [T.out.give + 0.26, T.out.give + 0.76]];
     muff.frequency.setValueAtTime(18000, 0);
     for (const [a, b] of wet) { muff.frequency.setValueAtTime(18000, a); muff.frequency.exponentialRampToValueAtTime(420, a + 0.08); muff.frequency.setValueAtTime(420, b - 0.06); muff.frequency.exponentialRampToValueAtTime(18000, b + 0.05); }
     const world = ctx.createGain(); world.connect(muff);
@@ -79,6 +79,7 @@ class GvAudio extends AudioEngine {
     this._hall(S, ctx, world, hallRev);
     this._you(S, ctx, you, world, hallRev);
     this._ladder(S, ctx, world, hallRev);
+    this._effort(S, ctx, you, world, gymRev, hallRev);
     this._dive(S, ctx, world, hallRev, uw);
     this._under(S, ctx, uw, you);
     this._end(S, ctx, world, mus);
@@ -292,6 +293,43 @@ class GvAudio extends AudioEngine {
     S.voice(L.splash + 0.9, 140, 0.5, 'o', 0.04 * a.g, a.pan, world, 0.8);
   }
 
+  /* ---- your own efforts: hanging from the bar, the knee giving on the stair, the cut into the water, pressing out ---- */
+  _effort(S, ctx, you, world, gymRev, hallRev) {
+    const H = GV.hang, O = GV.out, P = GV_C.pullup;
+    // the bar: hands slapping onto the chrome, the frame creaking under twice your weight, the left hand peeling, the landing
+    { const a = this.at(P.x, P.z, H.grab, 3);
+      S.click(H.grab, 0.08, 0.1, you); S.click(H.grab + 0.03, 0.07, -0.1, you); this.clang(H.grab + 0.01, 880, 0.02, a.pan, world, 0.35);
+      S.voice(H.lift + 0.05, 128, H.peel - H.lift - 0.1, 'u', 0.07, 0, you, 0.86);
+      S.voice(H.pull + 0.05, 150, 0.8, 'e', 0.07, 0, you, 1.1);
+      for (let t = H.lift + 0.15; t < H.drop; t += S.rng.range(0.32, 0.55)) S.chirp(t, 360 + 60 * S.rng.next(), 0.01, a.pan, world, false);
+      S.tone(H.lift, H.drop - H.lift, 62, 0.04, a.pan, world, 'sawtooth', 0.2, 0.15);
+      S.chirp(H.peel + 0.02, 1650, 0.02, -0.25, you, false); S.chirp(H.drop - 0.02, 1500, 0.025, -0.3, you, false);
+      S.voice(H.drop + 0.02, 175, 0.25, 'a', 0.06, 0, you, 0.8);
+      S.thump(H.drop + 0.17, 0.7, you); S.step(H.drop + 0.17, 0.45, 0.1, you); S.step(H.drop + 0.2, 0.35, -0.1, you); S.boom(H.drop + 0.18, 0.06, you, gymRev);
+      this.clang(H.drop + 0.04, 520, 0.03, a.pan, world, 0.7);
+      for (let k = 0; k < 3; k++) S.breath(H.drop + 0.5 + k * 0.42, 0.3, k % 2 === 0, 0.07, you); }
+    // the knee giving on a step: a heavy thud, the tread ringing, a grunt
+    { const t = 25.92; S.thump(t, 0.45, you); this.clang(t + 0.01, 128, 0.05, 0, you, 0.5); S.voice(t + 0.02, 120, 0.22, 'u', 0.05, 0, you, 0.8); }
+    // the cut straight into the water: you've just slid in (water streaming off, a gasp)
+    { const t = 42.86; S.hiss(t, 0.5, 0.03, 0, you); S.gasp(t + 0.05, 0.05, you); for (let k = 0; k < 6; k++) this.drip(t + 0.08 + 0.5 * S.rng.next(), 0.03, S.rng.range(-0.4, 0.4), you); }
+    // swimming to the wall: a few strokes
+    for (let t = O.turn + 0.3; t < O.wall - 0.3; t += 0.62) { S.hiss(t, 0.22, 0.02, 0, you); this.drip(t + 0.12, 0.03, S.rng.range(-0.3, 0.3), you); }
+    // hands onto the wet deck; the press: a long rising strain, water pouring off you, the shaking at the top, the give
+    S.step(O.wall - 0.28, 0.25, 0.2, you); S.step(O.wall - 0.22, 0.25, -0.2, you); S.hiss(O.wall - 0.25, 0.15, 0.02, 0, you);
+    S.voice(O.push + 0.05, 118, O.top - O.push + 0.1, 'u', 0.075, 0, you, 0.9);
+    S.voice(O.top + 0.1, 142, O.give - O.top - 0.05, 'e', 0.075, 0, you, 1.08);
+    { const n = S.noise('white', O.push + 0.15, O.give + 0.2), bp = S.filter('bandpass', 2200, 0.7), g = ctx.createGain();
+      g.gain.setValueAtTime(0, O.push + 0.15); g.gain.linearRampToValueAtTime(0.05, O.push + 0.5); g.gain.linearRampToValueAtTime(0.02, O.give); g.gain.linearRampToValueAtTime(0, O.give + 0.15);
+      n.connect(bp); bp.connect(g); g.connect(you); }
+    for (let t = O.push + 0.2; t < O.give + 0.2; t += 0.07) this.drip(t + 0.05 * S.rng.next(), 0.025, S.rng.range(-0.5, 0.5), you);
+    S.heart(O.top - 0.3, 0.14, you); S.heart(O.top + 0.15, 0.16, you);
+    S.voice(O.give, 190, 0.22, 'a', 0.07, 0, you, 0.75);
+    S.thump(O.give + 0.22, 0.6, you); this.splash(O.give + 0.22, 0.45, 0, you, hallRev, 1.4);
+    { const a = this.at(1.55, -32.5, O.give, 4); S.voice(O.give + 0.35, 135, 0.4, 'o', 0.04 * a.g, a.pan, world, 0.85); }
+    for (let k = 0; k < 8; k++) this.drip(O.give + 0.3 + 0.4 * S.rng.next(), 0.03, S.rng.range(-0.4, 0.4), you, S.rng.range(300, 800));
+    S.gasp(O.give + 0.8, 0.075, you); S.hiss(O.give + 0.85, 0.6, 0.025, 0, you);
+  }
+
   /* ---- the dive: the hush, the air, the hit, the hall's echo ---- */
   _dive(S, ctx, world, rev, uw) {
     const T = GV.diver, F = GV_FALL, E = GV_ENTRY;
@@ -314,7 +352,7 @@ class GvAudio extends AudioEngine {
   /* ---- under water: a muffled roar, her bubbles, your heartbeat ---- */
   _under(S, ctx, uw, you) {
     const T = GV, t0 = T.under + 0.1, t1 = T.surface + 0.05;
-    for (const [a, b, v] of [[T.slide + 0.2, T.slide + 0.85, 0.5], [t0, t1, 1]]) {
+    for (const [a, b, v] of [[T.slide + 0.2, T.slide + 0.85, 0.5], [t0, t1, 1], [T.out.give + 0.27, T.out.give + 0.76, 0.6]]) {
       const n = S.noise('brown', a, b + 0.1), lp = S.filter('lowpass', 300, 0.7), g = ctx.createGain();
       g.gain.setValueAtTime(0, a); g.gain.linearRampToValueAtTime(0.4 * v, a + 0.06); g.gain.setValueAtTime(0.4 * v, b - 0.08); g.gain.linearRampToValueAtTime(0, b);
       n.connect(lp); lp.connect(g); g.connect(uw);

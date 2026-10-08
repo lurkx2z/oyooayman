@@ -11,7 +11,7 @@
 Object.assign(LOOKS, {
   // the gym and the court
   gvRunner: { skin: 1, build: 'slim', shirt: '#d8426a', sleeves: 'short', pants: '#1d1f24', shoes: '#f2f0ea', sole: '#e8e4dc', hair: '#3a2416', hairStyle: 'pony' },
-  gvLifter: { skin: 3, build: 'broad', shirt: '#2a2d33', sleeves: 'short', pants: '#3a3f46', shoes: '#1a1a1a', sole: '#e8e4dc', hair: '#111' },
+  gvLifter: { skin: 3, build: 'broad', shirt: '#d9822b', sleeves: 'short', pants: '#3a3f46', shoes: '#1a1a1a', sole: '#e8e4dc', hair: '#111' },
   gvSpotter: { skin: 0, build: 'broad', shirt: '#3d6b8a', sleeves: 'short', pants: '#22252a', shoes: '#2a2a2a', sole: '#e8e4dc', hair: '#5a3a22' },
   gvBell: { skin: 2, build: 'slim', shirt: '#5a8a6a', sleeves: 'short', pants: '#2a2c34', shoes: '#ececec', sole: '#e0e0e0', hair: '#1c120c', hairStyle: 'bun' },
   gvBaller: { skin: 4, build: 'avg', shirt: '#e8e6e0', sleeves: 'short', pants: '#c8321e', shoes: '#f2f0ea', sole: '#e8e4dc', hair: '#0e0b09' },
@@ -180,6 +180,12 @@ Object.assign(ACTIONS, {
     p.rSh = [-0.5, 0.35]; p.rEl = 0.1; p.lSh = [0.6, 0.2]; p.lEl = 0.8;
     return p;
   },
+  // kneeling on the deck, hands on his thighs, chest heaving, watching you
+  gvDeckKneel(τ, c) {
+    const p = ACTIONS.kneel(τ, c), br = Math.sin(τ * 3.3);
+    p.spine = 0.62 + 0.04 * br; p.neck = -0.5; p.lSh = [1.0, 0.14]; p.rSh = [1.0, 0.14]; p.lEl = 0.1; p.rEl = 0.1; p.headYaw = 0;
+    return p;
+  },
   // a toddler sitting on the floor, slapping the tiles
   gvTotSit(τ, c) {
     const p = ACTIONS.sitGround(τ + 3, c), sl = Math.max(0, Math.sin(τ * 3.1));
@@ -202,7 +208,7 @@ Object.assign(ACTIONS, {
     const p = basePose(), s = Math.sin(τ * 1.6 + c.seed * 5);
     p.pelvisPitch = -Math.PI / 2 + 0.22; p.hipY = 0.93;
     p.lHip = [0.08, 0.22]; p.rHip = [0.04, 0.2]; p.lKnee = 0.25; p.rKnee = 0.2; p.lFoot = -0.5; p.rFoot = -0.5;
-    p.lSh = [0.1, 1.25 + 0.12 * s]; p.rSh = [0.1, 1.25 - 0.12 * s]; p.lEl = 0.35; p.rEl = 0.35;
+    p.lSh = [-0.05, 1.2 + 0.12 * s]; p.rSh = [-0.05, 1.2 - 0.12 * s]; p.lEl = 0.08; p.rEl = 0.08;
     p.neck = -0.25; p.spine = -0.05; p.headYaw = 0;
     return p;
   },
@@ -286,7 +292,7 @@ Object.assign(ACTIONS, {
 });
 Object.assign(BLEND, {
   gvBuckle: 0.08, gvHeavy: 0.7, gvHandsKnees: 0.8, gvCurl: 0.4, gvRun: 0.3, gvCling: 0.18, gvOffBelt: 0.1, gvFloorSit: 0.35,
-  gvPress: 0.3, gvSpot: 0.3, gvHold: 0.5, gvShoot: 0.35, gvHandsHead: 0.5, gvStairSit: 0.5, gvGuardSlump: 0.8, gvDeckSit: 0.8, gvTotSit: 0.6,
+  gvPress: 0.3, gvSpot: 0.3, gvHold: 0.5, gvShoot: 0.35, gvHandsHead: 0.5, gvStairSit: 0.5, gvGuardSlump: 0.8, gvDeckSit: 0.8, gvDeckKneel: 0.6, gvTotSit: 0.6,
   gvTread: 0.6, gvFloat: 0.9, gvBreast: 0.6, gvClimb: 0.5, gvSlipBack: 0.08, gvPlatKneel: 0.5, gvPlatStand: 0.2, gvLookBack: 0.4, gvEdge: 0.6,
   gvPencil: 0.12, gvRise: 0.5,
 });
@@ -308,6 +314,9 @@ function gvDiverAt(t, out) {
   const dep = D.deep * (1 - Math.exp(-b * F.v2 / D.deep)), up = MathX.smooth(b, 0.9, 4.2);
   out.y = MathX.lerp(y0 - dep, GV_WATER - 1.38, up);
   out.z = zEnt + 0.35 * (1 - Math.exp(-b / 0.5)) + 0.08 * Math.max(0, b - 3);
+  // floating on her back, she sculls slowly out toward the middle of the deep end
+  const f = Math.max(0, t - GV.surface);
+  out.x += 2.6 * (1 - Math.exp(-f / 6)); out.z += 1.3 * (1 - Math.exp(-f / 6));
   out.mode = t < GV.surface - 0.3 ? 2 : 3;
   return out;
 }
@@ -322,14 +331,14 @@ const GV_PEOPLE = [
   // the gym
   { id: 'runner', look: 'gvRunner', fn: '_runner', show: GV_GYM, path: [[0, -5.45, GV_C.treadZ[1]]],
     states: [[0, 'gvRun'], [GV.g0 + 0.02, 'gvCling'], [GV.tread.slip, 'gvOffBelt'], [GV.tread.sit, 'gvFloorSit']] },
-  { id: 'bell', look: 'gvBell', show: GV_GYM, path: [[0, -0.55, -3.7]], face: 165,
+  { id: 'bell', look: 'gvBell', show: GV_GYM, path: [[0, 1.3, -4.2]], face: 175,
     states: [[0, 'gvCurl'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 1.3, 'gvHeavy'], [7.5, 'gvHandsKnees']] },
   { id: 'lifter', look: 'gvLifter', fn: '_lifter', show: GV_GYM, floor: 0, path: [[0, GV_C.bench.x, GV_C.bench.barZ + 0.52 * GV_C.bench.feet]], states: [[0, 'gvPress']] },
   { id: 'spotter', look: 'gvSpotter', fn: '_spotter', show: GV_GYM, path: [[0, GV_C.bench.x, GV_C.bench.barZ - 0.66 * GV_C.bench.feet]], states: [[0, 'gvSpot']] },
   // the court
   { id: 'shooter', look: 'gvBaller', show: GV_GYM, path: [[0, GV_C.court.hoop.x + 0.05, GV_C.court.hoop.z + GV_THROW.d + 0.3]], face: 0,
     states: [[0, 'gvHold'], [GV.shot - 1.1, 'gvShoot'], [GV.shot + 1.5, 'gvHandsHead'], [GV.shot + 4.2, 'gvHeavy']] },
-  { id: 'mate', look: 'gvMate', show: GV_GYM, path: [[0, GV_C.court.hoop.x - 2.6, GV_C.court.hoop.z + 2.6]], face: 35,
+  { id: 'mate', look: 'gvMate', show: GV_GYM, path: [[0, GV_C.court.hoop.x - 1.1, GV_C.court.hoop.z + 6.4]], face: 15,
     states: [[0, 'gvHeavy'], [GV.shot + 1.0, 'handHead'], [GV.shot + 3.5, 'gvHandsKnees']] },
   // the stair
   { id: 'stairman', look: 'gvStair', fn: '_stairman', seat: 0.42, show: [15, 40], path: [[0, 3.3, -8.4]], states: [[0, 'gvStairSit']] },
@@ -337,16 +346,19 @@ const GV_PEOPLE = [
   { id: 'guard', look: 'gvGuard', bare: 'shorts', fn: '_guard', seat: 0.45, show: GV_POOLV, path: [[0, GV_C.chair.x, GV_C.chair.z]], states: [[0, 'gvGuardSlump']] },
   { id: 'dad', look: 'gvDad', bare: 'trunks', y: GV_LOW, show: GV_POOLV, path: [[0, 6.4, -13.6]], face: 120, states: [[0, 'gvDeckSit']] },
   { id: 'tot', look: 'gvTot', bare: 'trunks', kid: 0.42, y: GV_LOW, show: GV_POOLV, path: [[0, 5.75, -13.95]], face: -55, states: [[0, 'gvTotSit']] },
-  { id: 'deckman', look: 'gvDeck', bare: 'trunks', y: GV_LOW, show: GV_POOLV, path: [[0, 9.2, -26.5]], face: 150, states: [[0, 'gvHandsKnees']] },
+  { id: 'deckman', look: 'gvDeck', bare: 'trunks', y: GV_LOW, show: GV_POOLV, path: [[0, 1.55, -32.5]], face: 180, states: [[0, 'gvDeckKneel']] },
   // in the water
   { id: 'floatA', look: 'gvSwimA', bare: 'suit', fn: '_floatA', water: true, show: GV_POOLV, path: [[0, -0.9, -19.6]], states: [[0, 'gvFloat']] },
-  { id: 'treadB', look: 'gvSwimB', bare: 'trunks', fn: '_tread', water: true, show: GV_POOLV, path: [[0, -4.2, -13.2]], states: [[0, 'gvTread']] },
+  { id: 'treadB', look: 'gvSwimB', bare: 'trunks', fn: '_floatA', water: true, show: GV_POOLV, path: [[0, -3.6, -13.6]], states: [[0, 'gvFloat']] },
   { id: 'kid', look: 'gvKidSwim', bare: 'trunks', kid: 0.62, fn: '_tread', water: true, show: GV_POOLV, path: [[0, -1.0, -10.6]], states: [[0, 'gvTread']] },
   { id: 'swimC', look: 'gvSwimC', bare: 'suit', fn: '_breast', water: true, show: GV_POOLV, path: [[0, -9.1, -18.6]], states: [[0, 'gvBreast'], [31.6, 'gvTread']] },
   { id: 'ladder', look: 'gvLadder', bare: 'trunks', fn: '_ladder', water: true, show: GV_POOLV, path: [[0, GV_C.ladder.x - 0.42, GV_C.ladder.z]],
     states: [[0, 'gvClimb'], [GV.ladder.slip, 'gvSlipBack'], [GV.ladder.splash + 0.45, 'gvTread']] },
   { id: 'diver', look: 'gvDiver', bare: 'suit', fn: '_diver', water: true, show: GV_POOLV, path: [[0, GV_DIVER.x, GV_DIVER.z0]],
     states: [[0, 'gvPlatKneel'], [GV.diver.stand, 'gvPlatStand'], [GV.diver.look, 'gvLookBack'], [GV.diver.edge, 'gvEdge'], [GV.diver.step, 'gvPencil'], [GV_FALL.hit + 0.5, 'gvRise'], [GV.surface - 0.3, 'gvFloat']] },
+  // her 1 G ghost: the same step off, falling at 9.81 m/s² (only halfway down when she hits the water)
+  { id: 'ghost', look: 'gvDiver', bare: 'suit', fn: '_ghost', ghost: true, show: [GV.diver.step, GV_FALL.hit + 0.5], path: [[0, GV_DIVER.x, GV_DIVER.ze]],
+    states: [[0, 'gvEdge'], [GV.diver.step, 'gvPencil']] },
 ];
 
 // under the water line, bodies take the water's colour and the light dancing on them (seen from above and below)
@@ -379,6 +391,10 @@ class GvCast {
       return p;
     });
     this.byId = {}; for (const p of this.people) this.byId[p.spec.id] = p;
+    // the ghost: see-through, unlit, no shadow
+    this.ghostMat = new THREE.MeshBasicMaterial({ color: '#e8f6ff', transparent: true, opacity: 0.45, depthWrite: false, name: 'gvGhost' });
+    this.ghostMat.userData.grime = 0;
+    for (const p of this.people) if (p.spec.ghost) p.root.traverse((o) => { if (o.isMesh) { o.material = this.ghostMat; o.castShadow = false; o.renderOrder = 5; } });
     this.shadows = new BlobShadows(scene, 60);
     this._v = new THREE.Vector3(); this._w = new THREE.Vector3(); this._d = { x: 0, y: 0, z: 0, mode: 0 };
     this.hands = new THREE.Vector3();          // the shooter's hands (the ball sits in them until the release)
@@ -476,13 +492,13 @@ class GvCast {
 
   // floating on her back in the lanes, drifting and turning slowly
   _floatA(p, t) {
-    const sc = this._sc(p), y = GV_WATER + 0.02 - 0.93 * sc + 0.012 * Math.sin(t * 1.3);
-    this._place(p, t, -0.9 + 0.25 * Math.sin(t * 0.05), y, -19.6 + 0.012 * t, 0.4 + 0.012 * t);
+    const sc = this._sc(p), P = p.spec.path[0], y = GV_WATER + 0.02 - 0.93 * sc + 0.012 * Math.sin(t * 1.3 + p.seed * 4);
+    this._place(p, t, P[1] + 0.25 * Math.sin(t * 0.05 + p.seed), y, P[2] + 0.012 * t, 0.4 + p.seed * 2 + 0.012 * t);
   }
 
   // treading water (the kid nearer the shallow end)
   _tread(p, t) {
-    const sc = this._sc(p), P = p.spec.path[0], y = GV_WATER - 1.38 * sc + 0.025 * Math.sin(t * 2.4 + p.seed * 6);
+    const sc = this._sc(p), P = p.spec.path[0], y = GV_WATER - 1.47 * sc + 0.02 * Math.sin(t * 2.4 + p.seed * 6);   // (water at the chin: holding more of you out would take force)
     this._place(p, t, P[1] + 0.1 * Math.sin(t * 0.21 + p.seed * 4), y, P[2] + 0.08 * Math.sin(t * 0.17 + p.seed), 2.4 + 0.3 * Math.sin(t * 0.09 + p.seed * 3));
   }
 
@@ -513,8 +529,15 @@ class GvCast {
   _diver(p, t) {
     const d = gvDiverAt(t, this._d), sc = this._sc(p);
     let y = d.y;
-    if (t > GV.surface - 0.3) y = MathX.lerp(GV_WATER - 1.38 * sc, GV_WATER - 0.05 - 0.93 * sc, MathX.smooth(t, GV.surface - 0.3, GV.surface + 0.7)) + 0.012 * Math.sin(t * 1.3);
+    if (t > GV.surface - 0.3) y = MathX.lerp(GV_WATER - 1.38 * sc, GV_WATER + 0.02 - 0.93 * sc, MathX.smooth(t, GV.surface - 0.3, GV.surface + 0.7)) + 0.012 * Math.sin(t * 1.3);
     this._place(p, t, d.x, y, d.z, MathX.lerp(0, -0.6, MathX.smooth(t, GV.surface - 0.3, GV.surface + 2.5)));
+  }
+
+  // the ghost (1 G): steps off with her, falls at 9.81 m/s²; fades once she has hit the water
+  _ghost(p, t) {
+    const D = GV_DIVER, F = GV_FALL, a = Math.max(0, t - F.t0);
+    this._place(p, t, D.x + 0.3, GV_TOWER_TOP - 0.5 * GV_G0 * a * a, D.ze + D.vz * a, 0);
+    this.ghostMat.opacity = 0.5 * MathX.smooth(t, F.t0, F.t0 + 0.15) * (1 - MathX.smooth(t, F.hit + 0.15, F.hit + 0.45));
   }
 
   update(t) {
@@ -525,6 +548,7 @@ class GvCast {
       p.root.visible = vis;
       if (!vis) continue;
       if (S.fn) this[S.fn](p, t); else p.update(t);
+      if (S.ghost) continue;
       if (S.water) {
         const n = p.worldOf('neck', this._v);
         if (this.bobs.length < GV_BOBS && Math.abs(n.y - GV_WATER) < 0.5) this.bobs.push([n.x, n.z, 0.008, p.seed * 6]);

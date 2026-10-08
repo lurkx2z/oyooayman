@@ -27,7 +27,7 @@ function gvBubbleTex() {
   const S = 64, c = Tex.canvas(S, S), x = c.getContext('2d');
   x.fillStyle = '#000'; x.fillRect(0, 0, S, S);
   const g = x.createRadialGradient(32, 32, 0, 32, 32, 30);
-  g.addColorStop(0, 'rgb(60,60,60)'); g.addColorStop(0.72, 'rgb(90,90,90)'); g.addColorStop(0.86, 'rgb(255,255,255)'); g.addColorStop(1, 'rgb(0,0,0)');
+  g.addColorStop(0, 'rgb(150,150,150)'); g.addColorStop(0.6, 'rgb(170,170,170)'); g.addColorStop(0.88, 'rgb(225,225,225)'); g.addColorStop(1, 'rgb(0,0,0)');   // (silvery, a soft rim)
   x.fillStyle = g; x.beginPath(); x.arc(32, 32, 30, 0, Math.PI * 2); x.fill();
   x.fillStyle = 'rgb(255,255,255)'; x.beginPath(); x.arc(24, 22, 5, 0, Math.PI * 2); x.fill();
   return Tex.tex(c, { srgb: false, repeat: false });
@@ -43,7 +43,7 @@ class GvFx {
     this.app = app;
     this.mist = new BillboardSystem(scene, 700, false); this.mist.uniforms.uLight.value = 1.0; this.mist.uniforms.uMap.value = gvPuffTex();
     this.bub = new BillboardSystem(scene, 1400, false); this.bub.uniforms.uLight.value = 1.0; this.bub.uniforms.uMap.value = gvBubbleTex();
-    this.drops = new StreakSystem(scene, 1100);
+    this.drops = new StreakSystem(scene, 1500);
     this.rays = new StreakSystem(scene, 120);
     this.foam = null;                                         // [x, z, radius, amount] for the water shader
     this.under = 0;
@@ -102,14 +102,14 @@ class GvFx {
     if (a < 8) this.foam = [E.x, E.z, 0.6 + 2.2 * (1 - Math.exp(-a / 0.9)), 0.85 * (1 - MathX.smooth(a, 1.0, 8.0))];
     if (a > 3.2) return;
     // the crown: a thin sheet thrown up and out, breaking into drops
-    for (let i = 0; i < 520; i++) {
+    for (let i = 0; i < 760; i++) {
       const h = (j) => hash1(i * 7.13 + j * 2.71 + 911), ang = h(1) * Math.PI * 2, r0 = 0.2 + 0.25 * h(2);
       const vr = 1.2 + 3.0 * h(3) ** 1.5, vy = 2.5 + 5.0 * h(4) ** 0.8, ag = a - 0.04 * h(5);
       if (ag < 0) continue;
       const y = w + vy * ag - 0.5 * GV_G * ag * ag;
       if (y < w - 0.05) continue;
       const ca = Math.cos(ang), sa = Math.sin(ang), r = r0 + vr * ag, ag2 = Math.max(0, ag - 0.03), y2 = w + vy * ag2 - 0.5 * GV_G * ag2 * ag2, r2 = r0 + vr * ag2;
-      D.push(E.x + ca * r2, y2, E.z + sa * r2, E.x + ca * r, y, E.z + sa * r, 0.95, 0.98, 1.0, 0.75, 0.012 + 0.016 * h(6));
+      D.push(E.x + ca * r2, y2, E.z + sa * r2, E.x + ca * r, y, E.z + sa * r, 0.95, 0.98, 1.0, 0.8, 0.016 + 0.02 * h(6));
     }
     // the jet: a column of water and spray climbing out of the collapsing hole (from 0.25 s)
     for (let i = 0; i < 260; i++) {
@@ -122,14 +122,14 @@ class GvFx {
       D.push(E.x + ca * r2, y2, E.z + sa * r2, E.x + ca * r, y, E.z + sa * r, 0.95, 0.98, 1.0, 0.7, 0.014 + 0.02 * h(5));
     }
     // white water: the crown's body and the jet's mass (soft, opaque-ish), then the mist drifting
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 130; i++) {
       const h = (j) => hash1(i * 11.7 + j * 4.3 + 53), ang = h(1) * 6.283, jet = i < 40;
       const ag = a - (jet ? 0.25 + 0.15 * h(2) : 0.02 * h(2));
       if (ag < 0) continue;
       const vy = jet ? 3.0 + 3.5 * h(3) : 1.6 + 3.2 * h(3), vr = jet ? 0.2 * h(4) : 0.8 + 1.8 * h(4);
       const yb = w + vy * ag - 0.5 * GV_G * ag * ag, y = Math.max(w + 0.05, yb), r = 0.15 + vr * ag;
       const life = 1 - MathX.smooth(ag, 0.2, jet ? 1.1 : 0.9) * (yb < w ? 1 : 0.6);
-      this.mist.push(E.x + Math.cos(ang) * r, y, E.z + Math.sin(ang) * r, (jet ? 0.32 : 0.4) + 0.5 * ag, h(5) * 6, 0.85 * life, 1.0, 0.95, 0.98, 1.0);
+      this.mist.push(E.x + Math.cos(ang) * r, y, E.z + Math.sin(ang) * r, (jet ? 0.4 : 0.52) + 0.6 * ag, h(5) * 6, 0.9 * life, 1.0, 0.95, 0.98, 1.0);
     }
     for (let i = 0; i < 40; i++) {
       const h = (j) => hash1(i * 6.1 + j * 8.3 + 77), ang = h(1) * 6.283, ag = a - 0.1 * h(2), r = 0.4 + (0.8 + 1.2 * h(3)) * (1 - Math.exp(-ag / 0.8));
