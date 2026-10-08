@@ -85,14 +85,15 @@ No third-party media.
 ## FINAL PREVIEW PATH
 - Runnable ZIP (tested from a fresh unzip, boots with sound): `/mnt/project-files/gravity-2x/gravity-2x_film.zip`
   (project files; not committed).
-- Final MP4 (1080×1920, 30 fps): rendering; its path and size are added here when it is encoded.
+- Final MP4 (1080×1920, 30 fps, H.264 3,076 kbps + AAC 160 kbps, 68.7 s, 26.5 MiB, one file):
+  `/mnt/project-files/gravity-2x/gravity-2x.mp4` (project files; not committed). Audio −17.1 LUFS, −1.7 dBTP.
 
 ## PERFORMANCE / FPS
 Measured in headless Chromium with software rendering (SwiftShader, 4 cores), so these are not GPU numbers:
 - Boot (scene build plus the soundtrack): 13 s with nothing else running.
 - Per frame: 1,220–1,660 draw calls, 203k–220k triangles, about 1,150 geometries and 103 textures (sampled at film
   1, 15.6, 33, 45, 59.7 and 66 s).
-- Final render speed: about 16 frames a minute with 4 workers at 1080×1920.
+- Final render: 2,062 frames at 1080×1920 in about 2 h with 4 workers (about 17 frames a minute).
 - Real-time playback fps on a GPU was not measured here.
 
 ## REVIEW NOTES
