@@ -118,6 +118,7 @@ roof over you.
 
 ## FINAL OUTPUT
 `no-air-resistance_v2.mp4` in the project files (`/mnt/project-files/no-air-resistance/`), with the runnable ZIP
-`no-air-resistance_film.zip` (unzip, open `no-air-resistance.html`, press Space). 60.8 s, 1080×1920, H.264 at 30 fps (1,824 frames), AAC 160 kbps 48 kHz stereo, 26.7 MiB, −16.3 LUFS, −1.4 dBTP. Renders are not
+`no-air-resistance_film.zip` (unzip, open `no-air-resistance.html`, press Space) and a before/after sheet
+`no-air-resistance_before_after.jpg` (v1 top, v2 bottom). 60.8 s, 1080×1920, H.264 at 30 fps (1,824 frames), AAC 160 kbps 48 kHz stereo, 26.7 MiB, −16.3 LUFS, −1.4 dBTP. Renders are not
 committed. To rebuild: `tools/render-parallel.sh no-air-resistance.html <dir> 1080 1920 4 30`, then
 `tools/render-wav.cjs` and `tools/encode-final.sh <dir> <wav> 60.8 <out>.mp4 27`.
