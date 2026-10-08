@@ -248,19 +248,19 @@ class NrWind {
       this._m4.compose(this._p, this._q, this._s); this.litM.setMatrixAt(n++, this._m4);
     }
     this.litM.count = n; this.litM.instanceMatrix.needsUpdate = true;
-    // steam: puffs born at the manhole, carried off at the wind's speed (it never stopped)
-    const St = this.steam, Uw = nrWindKmh(S) / 3.6, life = 1.9, rate = 75;
+    // steam: wisps born at the grate, carried off at the wind's speed (it never stopped), torn apart and thinning as they go
+    const St = this.steam, Uw = nrWindKmh(S) / 3.6, life = 1.6, rate = 44;
     St.begin(this.app.scene.fog);
     const i0 = Math.floor((S - life) * rate), i1 = Math.floor(S * rate);
     for (let i = i0; i <= i1; i++) {
       const born = i / rate + hash1(i * 3 + 1) * 0.03, age = S - born;
       if (age < 0 || age > life) continue;
       const k = age / life, drift = nrWindDist(S) - nrWindDist(born);
-      const x = NR_STEAM.x + D.x * drift * 0.92 + (hash1(i * 3 + 2) - 0.5) * (0.3 + 1.6 * k);
-      const z = NR_STEAM.z + D.z * drift * 0.92 + (hash1(i * 7 + 5) - 0.5) * (0.3 + 1.6 * k);
-      const y = LAYOUT.curbH + 0.1 + (1.1 * age + 0.6 * k * k) * (11.1 / Math.max(11.1, Uw)) ** 0.5 + 0.25 * Math.sin(age * 2.1 + i) * k;
-      const size = 0.4 + 1.9 * Math.sqrt(k) + Uw * 0.02 * k;
-      St.push(x, y, z, size, i * 1.3 + age * 0.4, 0.38 * (1 - k) * Math.min(1, age * 8), 1.0, 0.95, 0.96, 0.97);
+      const x = NR_STEAM.x + D.x * drift * 0.92 + (hash1(i * 3 + 2) - 0.5) * (0.3 + 3.2 * k);
+      const z = NR_STEAM.z + D.z * drift * 0.92 + (hash1(i * 7 + 5) - 0.5) * (0.3 + 3.2 * k);
+      const y = LAYOUT.curbH + 0.1 + (1.4 * age + 0.8 * k * k) * (11.1 / Math.max(11.1, Uw)) ** 0.5 + (hash1(i * 11 + 3) - 0.5) * (0.1 + 1.6 * k) + 0.25 * Math.sin(age * 2.1 + i) * k;
+      const size = 0.45 + 2.5 * Math.sqrt(k) + Uw * 0.02 * k;
+      St.push(x, Math.max(LAYOUT.curbH + 0.1, y), z, size, i * 1.3 + age * 0.4, 0.22 * (1 - k) ** 1.5 * Math.min(1, age * 6), 1.0, 0.95, 0.96, 0.97);
     }
     St.end();
   }
