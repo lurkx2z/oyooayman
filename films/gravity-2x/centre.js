@@ -22,7 +22,7 @@ const GV_C = {
   kiosk: { x: 0.6, z: 0.66 },
   treadX: [-6.55, -4.45], treadZ: [-0.55, -2.15, -3.75],
   bench: { x: 2.4, barZ: -2.4, feet: 1 },     // the lifter's feet point +Z (toward the scale)
-  pullup: { x: 4.75, z: 0.6, y: 2.25, grip: 0.16 },   // a free-standing pull-up bar by the glass (the bar runs along Z: you hang facing the court)
+  pullup: { x: 4.75, z: 0.6, y: 2.25, grip: 0.2 },   // a free-standing pull-up bar by the glass (the bar runs along Z: you hang facing the court)
   outside: -3.2,
 };
 // (the shared Environment's trees sit on LAYOUT.curbH: here, the lawn outside)
@@ -228,7 +228,7 @@ class GvCentre extends Environment {
     B.box(0.3, -GV_C.outside, D, xw - 0.15, GV_C.outside / 2, cz, m.wallG);
     // the right wall: interior glass onto the sports hall, a solid strip at the top
     const xr = G.x1;
-    for (const z of [G.z0, -3.0, 0.6, G.z1]) B.box(0.1, H, 0.1, xr, H / 2, z, m.frame);        // (posts kept clear of the free throw's line of sight)
+    for (const z of [G.z0, -3.0, 1.7, G.z1]) B.box(0.1, H, 0.1, xr, H / 2, z, m.frame);        // (posts kept clear of the free throw's line of sight and the pull-up bar's view)
     B.box(0.1, 0.08, D, xr, 0.04, cz, m.frame); B.box(0.1, 0.08, D, xr, 3.05, cz, m.frame); B.box(0.2, 0.32, D, xr, 3.24, cz, m.wallW);
     B.add(Geo.quad([xr, 0.06, G.z1], [xr, 0.06, G.z0], [xr, 3.02, G.z0], [xr, 3.02, G.z1]), m.glass, null, { noShadow: true });
     // the front: a glass balustrade over the pool hall, with the opening for the stair

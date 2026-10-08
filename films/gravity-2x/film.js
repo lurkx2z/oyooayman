@@ -70,13 +70,13 @@ const gvDiverP = (dy) => (t) => { const d = gvDiverAt(t, _gvDv); return [d.x, d.
 // (moving things are followed); fov null = the default.
 const GV_LOOK = [
   [-1, -1, [0.6, 0.6, -1.3], 66],                                                        // the scale's screen low in the frame, the gym beyond
-  [GV.g0, GV.g0 + 0.3, [0.6, 1.0, -1.2], 62],                                            // the weight hits: knees give; the screen stays under the title
+  [GV.g0, GV.g0 + 0.3, [0.6, 1.2, -1.2], 62],                                            // the weight hits: knees give; the screen stays under the title
   [GV.title[1] - 0.3, GV.title[1] + 0.4, [0.6, 1.0, 0.75], 56],                         // the title's gone: the screen fills the frame
   [GV.scale[1] - 0.6, GV.tread.look + 0.1, (t, a) => { const p = a.cast.byId.runner.root.position; return [p.x + 0.2, 0.75, p.z]; }, 40],   // the runner
   [GV.offScale + 0.3, GV.bench.look + 0.4, [GV_C.bench.x - 0.05, 0.72, GV_C.bench.barZ + 0.2], 46],    // the bench, from beside the lifter's feet
   [GV.bench.drop + 0.9, GV.bench.drop + 1.9, [GV_C.court.hoop.x, 2.1, GV_C.court.hoop.z + 2.0], 62],    // through the glass: the court
   [GV.hang.go + 0.1, GV.hang.go + 0.9, [GV_C.pullup.x + 0.6, 1.9, GV_C.pullup.z], 64],           // the pull-up bar (the court behind it)
-  [GV.hang.at - 0.1, GV.hang.grab + 0.35, [GV_C.pullup.x + 1.6, 2.75, GV_C.pullup.z], 74],       // up at your hands on it, the court beyond
+  [GV.hang.at - 0.1, GV.hang.grab + 0.35, [GV_C.pullup.x + 1.4, 2.95, GV_C.pullup.z], 74],       // up at your hands on it, the court beyond
   [GV.hang.drop - 0.02, GV.hang.drop + 0.35, [GV_C.pullup.x + 1.6, 0.35, GV_C.pullup.z], 66],    // you drop
   [22.0, 23.0, [3.6, -3.4, -14.5], 64],                                                   // (cut) down the stair
   [GV.stair[0] + 1.3, GV.stair[0] + 2.1, [3.3, -1.5, -8.4], 54],                          // the man resting halfway up
@@ -91,7 +91,7 @@ const GV_LOOK = [
   [GV.out.turn, GV.out.turn + 0.9, [GV_ME.wall[0], -2.9, -32.0], 64],                     // turn to the wall
   [GV.out.wall - 0.3, GV.out.push + 0.2, (t, a) => [GV_ME.wall[0], a.camera.position.y - 0.3 - 0.8 * gvOutK(t), -31.6], 72],   // hands on the deck: press
   [GV.out.give + 0.02, GV.out.give + 0.3, [GV_ME.wall[0] + 0.25, GV_LOW + 0.85, -32.5], 70],   // sinking back: the edge (and him) rise away
-  [GV.out.give + 0.6, GV.out.give + 1.9, (t) => { const d = gvDiverAt(t, _gvDv); return [d.x - 0.6, GV_WATER + 0.55, d.z + 1.4]; }, 60],   // back in, floating: her, the pool
+  [GV.out.give + 0.6, GV.out.give + 1.9, (t) => { const d = gvDiverAt(t, _gvDv); return [d.x - 0.6, GV_WATER + 1.4, d.z + 1.4]; }, 60],   // back in, floating: her, the pool
 ];
 
 const FILM = {
@@ -207,7 +207,7 @@ const FILM = {
     const B = GV_C.pullup;
     for (const [side, name] of [[1, 'barR'], [-1, 'barL'], [-1, 'barSlipL']]) {
       const slip = name === 'barSlipL' ? 0.035 : 0;
-      V.w.set(B.x - 0.004 - slip * 0.5, B.y - slip, B.z + side * B.grip); V.f.set(0.12, 1, side * 0.12); V.n.set(1, 0, 0);
+      V.w.set(B.x - 0.004 - slip * 0.5, B.y - slip, B.z + side * B.grip); V.f.set(0.25, 1, side * 0.1); V.n.set(1, -0.25, 0);
       gvAimHand(name, cam, V.w, V.f, V.n, side);
     }
     // palms on the deck at the end of the pool
