@@ -32,13 +32,16 @@ function nstWaterMat({ color = '#a9c3cc', opacity = 0.32, fres = 0.6, rough = 0.
 }
 
 // a bead (glossy see-through lens) → a thin wet film (reads as a darker, glossy wet patch on the surface), k 0..1
-const NST_WET = { color: new THREE.Color('#141b1f'), opacity: 0.42, fres: 0.7 };
+// (a dim reflection: a thin film on a counter mirrors the window as a faint sheen, not as a white sheet)
+const NST_WET = { color: new THREE.Color('#0b0f11'), opacity: 0.5, fres: 0.3, env: 0.18, rough: 0.1 };
 function nstWetLook(m, k) {
   const u = m.userData;
-  if (!u.base) u.base = { color: m.color.clone(), opacity: m.opacity, fres: u.fres.value };
+  if (!u.base) u.base = { color: m.color.clone(), opacity: m.opacity, fres: u.fres.value, env: m.envMapIntensity, rough: m.roughness };
   m.color.copy(u.base.color).lerp(NST_WET.color, k);
   m.opacity = MathX.lerp(u.base.opacity, NST_WET.opacity, k);
   u.fres.value = MathX.lerp(u.base.fres, NST_WET.fres, k);
+  m.envMapIntensity = MathX.lerp(u.base.env, NST_WET.env, k);
+  m.roughness = MathX.lerp(u.base.rough, NST_WET.rough, k);
 }
 
 // radius (m) of a thin film of volume V (m³) spreading under gravity against viscosity, dt seconds after it was let go
@@ -116,8 +119,10 @@ class NstPuddle {
 // pinches into drops near the bottom) → 1 (no surface tension: ragged, splitting into ligaments and spray).
 // ---------------------------------------------------------------------------------------------------------------------
 class NstStream {
-  constructor(parent, mat, { a, v0, r0 = 0.004, yEnd = 0, ns = 44, nrad = 9, seed = 3 } = {}) {
+  constructor(parent, mat, { a, v0, r0 = 0.004, yEnd = 0, ns = 44, nrad = 9, seed = 3, spread = 0, frayLen = 0 } = {}) {
     this.a = a.clone(); this.v0 = v0.clone(); this.r0 = r0; this.yEnd = yEnd; this.ns = ns; this.nrad = nrad; this.seed = seed;
+    this.spread = spread;      // > 0: with no surface tension the column also loosens and widens into a ragged rope as it falls
+    this.frayLen = frayLen;    // > 0: the fraying develops over this fall height (m) instead of over the whole stream
     // flight time to the end plane: a.y + v0y τ − g τ²/2 = yEnd
     const g = 9.81, dy = this.a.y - yEnd, vy = this.v0.y;
     this.T = (vy + Math.sqrt(vy * vy + 2 * g * dy)) / g;
@@ -156,14 +161,16 @@ class NstStream {
       this.at(tau, c);
       const v = Math.hypot(this.v0.x, this.v0.y - g * tau, this.v0.z) + 0.05;
       let r = this.r0 * Math.sqrt(v0 / v) * Math.sqrt(Math.max(flow, 0.05));     // continuity: the column thins as it speeds up
+      const uf = this.frayLen > 0 ? MathX.clamp((this.a.y - c.y) / this.frayLen, 0, 1.4) : u;    // how far the fraying has got
+      r *= 1 + this.spread * fray * 2.6 * uf * uf;
       // travelling disturbance (moves with the water): the phase follows the parcel, not the screen
       const ph = tau * 26 - t * 0.0 + (t - tau) * 0.0;
       const parcel = t - tau;                                  // when this parcel left the tap
       // normal: a smooth glassy column whose bottom pinches into drops (Rayleigh–Plateau, driven by surface tension)
       const pinch = (1 - fray) * MathX.smooth(u, 0.62, 0.8) * (0.5 + 0.5 * Math.sin(parcel * 95 + sd));
       // no surface tension: nothing smooths the surface, so ripples grow; the column splits and frays toward the bottom
-      const rag = fray * (0.25 + 1.6 * u * u);
-      const brk = fray * MathX.smooth(u, 0.35, 0.95);
+      const rag = fray * (0.25 + 1.6 * uf * uf);
+      const brk = fray * MathX.smooth(uf, 0.35, 0.95);
       for (let k = 0; k < nr; k++) {
         const th = (k / nr) * Math.PI * 2;
         let rr = r * (1 - 0.85 * pinch);
@@ -176,7 +183,7 @@ class NstStream {
           rr = Math.max(rr, 0.00005);
         }
         // the ragged column also wanders sideways a little
-        const wob = fray * r * 2.2 * u * u;
+        const wob = fray * (r * 2.2 + this.spread * 0.009) * uf * uf;
         const ox = Math.cos(th) * rr + wob * Math.sin(parcel * 13 + sd), oz = Math.sin(th) * rr + wob * Math.cos(parcel * 11 + sd);
         const i = (s * nr + k) * 3;
         P[i] = c.x + ox; P[i + 1] = c.y; P[i + 2] = c.z + oz;

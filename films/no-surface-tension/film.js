@@ -39,6 +39,8 @@ function nstSeg(t) { return t < NST.pond ? 'kitchen' : t < NST.bench ? 'pond' : 
 
 // labels pinned to points in the world: [t0, t1, point fn(t, out), text]
 const NST_TAGS = [
+  // the trickle: where ordinary water would have pinched off into drops (a point on the stream, 12 cm below the spout, + 3 cm to screen-right)
+  { t0: 6.3, t1: 9.3, at: (t, o) => { const S = NST_K.tap.spout; return o.set(S[0] + 0.454 * 0.03, S[1] - 0.085, S[2] + 0.01 - 0.891 * 0.03); }, text: 'NORMAL WATER<br>WOULD BREAK<br>INTO DROPS HERE', line: true },
   { t0: 16.1, t1: 18.3, at: (t, o) => o.set(NST_K.bowl.x - 0.01 + 0.033, NST_K.top + NST_K.bowl.water + 0.045, NST_K.bowl.z - 0.005), text: 'NORMAL WATER<br>WOULD CLIMB<br>TO HERE', line: true },
   { t0: 34.5, t1: 37.2, at: (t, o) => o.set(NST_G.potB.x + 0.012, NST_G.bench.top + 0.1, NST_G.potB.z), text: 'DRY ABOVE<br>THE WATER LINE', line: false },
 ];
@@ -150,7 +152,7 @@ const FILM = {
       for (const n of ['tapReach', 'tapTurn']) nstAimHand(n, cam, V, Fw, Nw);
     }
     if (t >= T.clip - 0.5 && t < T.clipLet + 1.0) {
-      K.clipPos(Math.min(t, T.clipLet), V); V.y += 0.007;
+      K.clipPos(Math.min(t, T.clipLet), V); V.x += 0.017; V.y += 0.016; V.z -= 0.007;     // pinching its right-hand end, fingertips above the water
       if (t > T.clipLet) V.y += 0.09 * MathX.smooth(t, T.clipLet - 0.02, T.clipLet + 0.35) + 0.3 * MathX.smooth(t, T.clipLet + 0.35, T.clipLet + 0.95);   // and away, up out of frame
       Fw.set(-0.8, -0.55, -0.15); Nw.set(0.05, -0.35, -0.95);       // from the right, side-on: the bowl stays in view
       for (const n of ['clipHold', 'clipOpen']) nstAimHand(n, cam, V, Fw, Nw);
