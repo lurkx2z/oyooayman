@@ -2,8 +2,8 @@
    CAST — people on the shared rig (js/world/people.js). Bodies are
    unchanged by the rule (living tissue keeps its elasticity): it is their
    things that fail. The teenager's ball dies; the kid's trampoline mat
-   stays stretched; the jogger's soles go flat; the café sitter's cushion
-   keeps the dent; walkers on the footbridge each leave it lower.
+   stays stretched; the café sitter's cushion keeps the dent; a running
+   club on the footbridge leaves it lower.
    A spec may carry y(t) (feet height) and at(t) (an [x, z] override) for
    people who ride on something that moves (the trampoline mat, the
    sagging footbridge). Every film action is prefixed ne….
@@ -90,16 +90,6 @@ Object.assign(LOOKS, {
       const p = ACTIONS.sitGround(τ + 4, c); p.neck = 0.35 + 0.05 * Math.sin(τ * 0.9); p.headYaw = 0.3 * Math.sin(τ * 0.5);
       return p;
     },
-    // the jogger stops, lifts her right foot and presses the sole
-    neCheckShoe(τ, c) {
-      const p = P0(), k = MathX.smooth(τ, 0, 0.35), w = Math.sin(τ * 2.0);
-      p.rHip = [0.85 * k, 0.05 + 0.35 * k]; p.rKnee = 1.55 * k; p.rFoot = -0.3 * k; p.lKnee = 0.18 * k; p.hipY = 0.93 - 0.03 * k;
-      p.spine = 0.45 * k; p.neck = 0.55 * k; p.spineRoll = -0.08 * k; p.headYaw = -0.15 * k;
-      arms(p, [0.35, 0.55 + 0.05 * w], [0.95 * k, 0.05], 0.4, 0.55 + 0.2 * Math.max(0, Math.sin(τ * 6)) * k);
-      return p;
-    },
-    // a heavier, flat-footed jog (no spring left in the soles)
-    neJogFlat(τ, c) { const p = ACTIONS.jog(τ, c); p.hipY -= 0.015; p.lFoot *= 0.3; p.rFoot *= 0.3; return p; },
     // standing up from the café bench
     neStandUp(τ, c) {
       const k = MathX.smooth(τ, 0, 0.6), p = lerpPose(ACTIONS.sit(0, c), P0(), k), f = Math.sin(Math.PI * k);
@@ -114,7 +104,7 @@ Object.assign(LOOKS, {
     },
   });
   Object.assign(BLEND, { neDribble: 0.2, neReach: 0.15, neStare: 0.5, neCrouch: 0.6, nePoke: 0.12, neKidReady: 0.4, neKidPrep: 0.12, neKidAir: 0.06, neKidLand: 0.05, neKidSit: 0.8,
-    neCheckShoe: 0.35, neJogFlat: 0.3, neStandUp: 0.1, neFlinch: 0.06 });
+    neStandUp: 0.1, neFlinch: 0.06 });
 })();
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -124,11 +114,33 @@ Object.assign(LOOKS, {
 const NE_TEEN = { x: 13.2, z: -5.9, face: 135, aside: [11.75, -6.25], asideFace: -114 };
 const NE_KID = { pad: [1.7, 0.2], mid: [0.05, -0.03] };        // trampoline-local stand points (on the pad → the middle)
 
-// a walker crossing the footbridge (dir ±1) who reaches midspan at time tm
-function neBridgeWalker(id, look, dir, tm, dz, v = 1.35, dx = 0) {
-  const B = NE_CITY.bridge, x0 = -dir * (B.half + 1.2), x1 = dir * (B.half + 1.2), ta = tm - (B.half + 1.2) / v, tb = tm + (B.half + 1.2) / v;
-  return { id, look, path: [[ta, x0 + dx, B.z + dz], [tb, x1 + dx, B.z + dz]], states: [[0, 'walk']], stride: 1.25,
-    y: (t, p) => B.deck - neSag(t) * (1 - Math.min(1, (p.x / B.half) ** 2)), show: (t, p) => Math.abs(p.x) < B.half + 0.3 };
+// the footbridge: a few people walking across, then a running club (16 runners in one bunch) crosses from the left tower
+// to the right one at 3.6–4.0 m/s and is gone before the insert ends. A runner's footfalls load the deck harder than
+// walking does (taken here as 1.8× their weight on average). Everyone keeps right; paths are straight, speeds constant.
+const NE_WALKERS = (() => {
+  const B = NE_CITY.bridge, rng = new RNG(4242), out = [], L = B.half + 1.2, T0 = NE.bridge[0];
+  const push = (id, look, dir, v, dz, tm, run) => out.push({ id, look, dir, v, dz, tm, t0: tm - L / v, t1: tm + L / v, run, f: run ? 1.8 : 1 });
+  // walkers: where they are along the deck when the insert starts
+  [[-6.5, 1, 1.25], [3.5, -1, 1.35], [8.0, -1, 1.2], [-9.5, -1, 1.3]].forEach(([x0, dir, v], i) => push(`W${i}`, `casual${1 + i * 3}`, dir, v, dir > 0 ? 0.75 : -0.75, T0 - x0 / (dir * v), false));
+  // the runners: in at the left tower between T0 and T0 + 1.1, left to right
+  for (let i = 0; i < 16; i++) {
+    const te = T0 + 1.1 * (i / 15) + rng.range(-0.08, 0.08), v = rng.range(3.6, 4.0), dz = rng.range(-0.95, 0.95);
+    push(`R${i}`, `casual${1 + (i * 5) % 8}`, 1, v, dz, te + L / v, true);
+  }
+  return out;
+})();
+// where walker w is along the deck at time t (x), or null when off it
+function neWalkerX(w, t) { if (t < w.t0 || t > w.t1) return null; return w.dir * (t - w.tm) * w.v; }
+// the load on the deck as midspan deflection (m, real, unexaggerated): about 0.23 mm per person standing at midspan
+function neBridgeLoad(t) {
+  const H = NE_CITY.bridge.half; let d = 0;
+  for (const w of NE_WALKERS) { const x = neWalkerX(w, t); if (x !== null && Math.abs(x) < H) d += 0.00023 * w.f * (1 - (x / H) ** 2); }
+  return d;
+}
+function neBridgeWalker(w) {
+  const B = NE_CITY.bridge, L = B.half + 1.2;
+  return { id: w.id, look: w.look, path: [[w.t0, -w.dir * L, B.z + w.dz], [w.t1, w.dir * L, B.z + w.dz]], states: [[0, w.run ? 'jog' : 'walk']], stride: w.run ? 2.3 : 1.2 + 0.3 * (w.v - 1.2),
+    y: (t, p) => B.deck - neSag(t) * (1 - Math.min(1, (p.x / B.half) ** 2)), show: (t, p) => t > w.t0 && t < w.t1 && Math.abs(p.x) < B.half + 0.3 };
 }
 
 function neCastSpecs() {
@@ -137,7 +149,7 @@ function neCastSpecs() {
     // the teenager with the ball (stands still; the ball is beside the right hand)
     { id: 'teen', look: 'neTeen', y: 0.15, path: [[0, NE_TEEN.x, NE_TEEN.z], [5.7, NE_TEEN.x, NE_TEEN.z], [7.4, ...NE_TEEN.aside]], face: NE_TEEN.face,
       faceAt: (t) => (t < 5.7 ? NE_TEEN.face : NE_TEEN.asideFace),
-      states: [[-5, 'neDribble'], [1.9, 'neReach'], [2.45, 'neStare'], [3.75, 'neCrouch'], [K.poke, 'nePoke'], [5.4, 'neCrouch'], [5.7, 'walk'], [7.4, 'neCrouch'], [14.6, 'neStare'], [21.0, 'sitGround']] },
+      states: [[-5, 'neDribble'], [1.15, 'neReach'], [1.7, 'neStare'], [2.6, 'neCrouch'], [K.poke, 'nePoke'], [4.5, 'neCrouch'], [5.7, 'walk'], [7.4, 'neCrouch'], [14.6, 'neStare'], [19.0, 'sitGround']] },
     // the kid: beside the trampoline with a parent, then up on its frame, the jump, the landing, a second try, sitting in the pit
     { id: 'kid', look: 'neKid', scale: 0.7, y: 0.15, path: [[0, TR.x + 2.1, TR.z + 1.9]], face: 52,
       states: [[0, 'idle'], [13.0, 'neKidReady'], [K.jump - 0.3, 'neKidPrep'], [K.jump, 'neKidAir'], [K.land, 'neKidLand'], [16.35, 'neKidPrep'], [K.jump2, 'neKidAir'], [K.land2, 'neKidLand'], [17.45, 'neKidSit']],
@@ -159,17 +171,11 @@ function neCastSpecs() {
     // the parent watching from beside the frame
     { id: 'parent', look: 'casual6', y: 0.15, path: [[0, TR.x + 2.6, TR.z + 2.0]], face: 52,
       states: [[0, 'idle'], [16.05, 'neFlinch'], [17.4, 'handHead'], [19.5, 'look']] },
-    // the jogger: comes up the sidewalk toward you, stops to check her shoe, then goes past you on your left
-    { id: 'jog', look: 'casual3', y: 0.15, stride: 2.1, path: [[0, 8.5, -61], [17.6, 8.5, -9.0], [19.05, 8.5, -4.6], [19.5, 8.5, -3.4], [20.35, 8.5, -3.4], [21.25, 8.5, -0.8], [27, 8.5, 14]],
-      states: [[0, 'jog'], [K.rule[1], 'neJogFlat'], [19.05, 'walk'], [19.5, 'neCheckShoe'], [20.3, 'walk'], [20.7, 'neJogFlat']] },
     // the café sitter: sits on the left cushion, gets up during the insert, walks off along the café front
     { id: 'cafe', look: 'neCafe', y: 0.15, seat: 0.47, face: 90, faceUntil: 10.4, path: [[0, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [9.85, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [10.4, NE_CITY.bench.x - 0.42, NE_CITY.bench.z - 0.52], [11.2, 11.2, 3.5], [20, 11.0, 15]],
       states: [[0, 'sit'], [9.85, 'neStandUp'], [10.4, 'walk']] },
-    // the footbridge: four groups, each reaching midspan when the sag takes its next step
-    neBridgeWalker('A1', 'casual1', 1, NE_SAG_STEPS[1][0], -0.45), neBridgeWalker('A2', 'casual7', 1, NE_SAG_STEPS[1][0] + 0.5, 0.45),
-    neBridgeWalker('B1', 'casual2', -1, NE_SAG_STEPS[2][0], 0.2, 1.4),
-    neBridgeWalker('C1', 'casual5', 1, NE_SAG_STEPS[3][0], -0.4, 1.3), neBridgeWalker('C2', 'casual8', 1, NE_SAG_STEPS[3][0] + 0.4, 0.4, 1.3),
-    neBridgeWalker('D1', 'casual4', -1, NE_SAG_STEPS[4][0] - 0.3, -0.45, 1.25), neBridgeWalker('D2', 'casual6', -1, NE_SAG_STEPS[4][0], 0.4, 1.25), neBridgeWalker('D3', 'casual1', -1, NE_SAG_STEPS[4][0] + 0.5, -0.05, 1.25),
+    // the footbridge walkers and runners
+    ...NE_WALKERS.map(neBridgeWalker),
     // life around: the far sidewalk, the bus stop, the corners of the junction (they flinch at the crash)
     { id: 'E1', look: 'casual5', y: 0.15, path: [[0, 26.6, -32], [40, 26.6, -3]], states: [[0, 'walk']] },
     { id: 'E2', look: 'casual8', y: 0.15, path: [[0, -9.4, -4], [60, -9.4, -80]], states: [[0, 'walk']] },

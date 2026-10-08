@@ -23,8 +23,9 @@ function neBuildTruck(factory, color) {
   const tail = new THREE.MeshStandardMaterial({ color: '#5a0d0d', emissive: new THREE.Color('#ff1a0e'), emissiveIntensity: 0.6, roughness: 0.3 });
   const hazard = new THREE.MeshStandardMaterial({ color: '#7a4a10', emissive: new THREE.Color('#ff9a1a'), emissiveIntensity: 0, roughness: 0.3 });
   const add = (geo, mat, x, y, z, parent = body) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; };
-  const x0 = -L / 2, boxL = 5.45, boxX = x0 + boxL / 2, floorY = 1.0, boxH = 2.55;
-  add(new THREE.BoxGeometry(L - 0.4, 0.25, 1.1), M.trim, 0, 0.72, 0);
+  const x0 = -L / 2, boxL = 5.45, boxX = x0 + boxL / 2, floorY = 1.22, boxH = 2.45;
+  add(new THREE.BoxGeometry(L - 0.4, 0.25, 1.1), M.trim, 0, 0.78, 0);
+  for (const sz of [-1, 1]) add(new THREE.BoxGeometry(boxL - 0.3, floorY - 0.84, 0.1), M.trim, boxX, (floorY + 0.84) / 2, sz * 0.5);   // the subframe under the box
   add(new THREE.BoxGeometry(boxL, boxH, W), paint, boxX, floorY + boxH / 2, 0, box);
   add(new THREE.BoxGeometry(boxL + 0.04, 0.12, W + 0.04), M.trim, boxX, floorY + 0.06, 0, box);
   const logo = Tex.label([['NORTHSIDE', 64], ['BUILDING SUPPLY', 32]], { w: 1024, h: 256, bg: '#efece4', fg: '#7a2f2a' });
@@ -42,9 +43,9 @@ function neBuildTruck(factory, color) {
   add(new THREE.BoxGeometry(0.2, 0.3, W), M.trim, cabX + 1.02, 0.72, 0);
   for (const sz of [-1, 1]) {
     add(new THREE.BoxGeometry(0.06, 0.18, 0.32), M.head, cabX + 1.02, 1.0, sz * (W / 2 - 0.3));
-    add(new THREE.BoxGeometry(0.05, 0.22, 0.14), tail, x0 - 0.03, 1.2, sz * (W / 2 - 0.16), box);
+    add(new THREE.BoxGeometry(0.05, 0.22, 0.14), tail, x0 - 0.03, floorY + 0.2, sz * (W / 2 - 0.16), box);
     add(new THREE.BoxGeometry(0.06, 0.08, 0.14), hazard, cabX + 1.02, 0.82, sz * (W / 2 - 0.12));
-    add(new THREE.BoxGeometry(0.06, 0.08, 0.14), hazard, x0 - 0.03, 0.95, sz * (W / 2 - 0.12), box);
+    add(new THREE.BoxGeometry(0.06, 0.08, 0.14), hazard, x0 - 0.03, floorY - 0.04, sz * (W / 2 - 0.12), box);
     add(new THREE.BoxGeometry(0.08, 0.32, 0.06), M.trim, cabX + 0.45, 2.45, sz * (W / 2 + 0.22));
   }
   const wheels = [];
@@ -63,7 +64,7 @@ function neCoilGeo() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // one car on the rig
-//   spec: { id, type, color, pose(t) → {x, z, yaw, dist}, k: [front, rear] load multipliers, preset: [cf, cr] spring set
+//   spec: { id, type, color, pose(t) → {x, z, yaw, dist}, k: [rear, front] load multipliers (axle 0 is the rear), preset: [rear, front] spring set
 //           already taken before the film, coils, low (scrapes), hazardFrom, brake(t),
 //           crush(t) → {front, rear, left, right, xc} }
 // ---------------------------------------------------------------------------------------------------------------------
@@ -316,6 +317,27 @@ function neCrashPose(who, t) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+// the tap (story time): a hatch arriving late behind the wreck brakes from 36 km/h but still meets the van's rear at
+// 5 km/h (1.4 m/s): a speed bumpers normally shrug off. It stops dead against the wreck (perfectly inelastic: the
+// wreck is braked and five times heavier, so they move on together by about a centimetre). Its bumper stays pushed in.
+// ---------------------------------------------------------------------------------------------------------------------
+const NE_TAP = (() => {
+  const VN = CAR_PROFILES.van, HB = CAR_PROFILES.hatch, v = neCrashPose('van', NE.tap), back = v.z - Math.cos(v.yaw - Math.PI) * VN.L / 2;
+  const vc = 1.4, v0 = 10, a = 6, zc = back - HB.L / 2 + 0.02, tb = NE.tap - (v0 - vc) / a, zb = zc - (v0 * v0 - vc * vc) / (2 * a);
+  return { vc, v0, a, zc, tb, zb, x: -1.75, dent: 0.075, dentVan: 0.03 };
+})();
+function neTapPose(t) {
+  const T = NE_TAP;
+  if (t < 44) return null;
+  let z, d;
+  if (t < T.tb) { z = T.zb - T.v0 * (T.tb - t); }
+  else if (t < NE.tap) { const k = t - T.tb; z = T.zb + T.v0 * k - 0.5 * T.a * k * k; }
+  else z = T.zc + T.dent * 0.6 * MathX.smooth(t, NE.tap, NE.tap + 0.12);   // (the crush takes up most of the last bit)
+  d = z + 400;
+  return { x: T.x, z, yaw: Math.PI, dist: d };
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // all the traffic
 // ---------------------------------------------------------------------------------------------------------------------
 class NeTraffic {
@@ -324,37 +346,37 @@ class NeTraffic {
     const T = NE.car;
     const cars = [];
     const add = (spec) => { const c = new NeCar(scene, F, spec); cars.push(c); return c; };
-    // H — the red hatch that crosses the speed table in front of you (coil springs visible in its arches)
+    // H — the red hatch that crosses the speed table in front of you (coil springs visible in its arches), then drives on
     this.H = add({ id: 'H', type: 'hatch', color: '#9a2e26', coils: true, lift: 0.07, stop: 0.2, preset: [0.012, 0.01],
-      pose: neLane(5.25, -1, T.t0, 10.2, [[T.t0, 4.2], [23.3, 4.2], [23.7, 3.4], [29.5, 3.4], [31.5, 0.0]]), hazardFrom: 31.0, brake: (t) => MathX.window(t, 29.6, 31.6, 0.2, 0.3) });
+      pose: neLane(5.25, -1, T.t0, 10.2, [[T.t0, 4.2], [23.3, 4.2], [23.7, 3.4], [26.8, 3.4], [29.5, 8.0], [75, 8.0]]) });
     // background life during the opening (they cross the table before the rule bites, or far away)
     add({ id: 'B1', type: 'sedan', color: '#6c7a86', pose: neLane(1.75, -1, 0, 6, [[0, 9.0]], { until: 12 }) });
     add({ id: 'B2', type: 'suv', color: '#3d4a44', pose: neLane(-5.25, 1, 0, -60, [[0, 8.0]], { until: 14 }) });
     add({ id: 'B3', type: 'taxi', color: '#c9a64a', pose: neLane(-1.75, 1, 0, -120, [[0, 10.0]], { until: 16 }) });
-    // the traffic beat. The box truck comes past you (lane 1.75, away from you) and over the table: its rear springs flatten
-    // on the landing, the box tips back and its rear bar drags. Oncoming cars already ride on their bump stops and scrape.
-    this.truck = add({ id: 'TR', type: 'truck', color: '#e9e5da', low: true, k: [0.8, 3.4], stop: 0.3, preset: [0.04, 0.08], pose: neLane(1.75, -1, 28, 30, [[28, 7], [32.5, 4.0], [41, 4.0], [45, 5.5]]) });
+    // the traffic beat. The loaded box truck comes past you (lane 1.75, away from you) and over the table: the heavy rear
+    // axle's leaf springs take most of the set and end on their bump stops (≈ 12 cm), so it sits tail-down. Oncoming cars
+    // already ride low and scrape on the table.
+    this.truck = add({ id: 'TR', type: 'truck', color: '#e9e5da', k: [1.45, 0.35], stop: 0.125, preset: [0.015, 0.012], pose: neLane(1.75, -1, 28, 30, [[28, 7], [32.5, 4.0], [75, 4.0]]) });
     this.c1 = add({ id: 'C1', type: 'sedan', color: '#55606b', low: true, preset: [0.1, 0.11], pose: neLane(-1.75, 1, 27, -70, [[27, 9], [31.0, 5.2], [36, 5.2]]), brake: (t) => MathX.window(t, 30.4, 31.6, 0.2, 0.2) });
     add({ id: 'C2', type: 'suv', color: '#4a5546', low: true, preset: [0.09, 0.1], pose: neLane(-5.25, 1, 28, -72, [[28, 8], [32.4, 4.8], [40, 4.8]]) });
     // the bus pulls in at the stop on the far side (air suspension: air is unchanged, so it rides normally)
     this.bus = add({ id: 'BUS', type: 'bus', color: '#d8d4c6', pose: neLane(-5.25, 1, 30, -95, [[30, 6], [37.5, 4.6], [43.0, 4.6], [45.5, 0]]) });
-    add({ id: 'C5', type: 'hatch', color: '#6e5a48', low: true, preset: [0.1, 0.1], pose: neLane(1.75, -1, 37, 30, [[37, 6.0]], { until: 60 }) });
-    // traffic held up by the wreck: one behind the van, one at the red on the far lane
-    add({ id: 'Q1', type: 'sedan', color: '#3c4650', preset: [0.05, 0.05], pose: neLane(-1.75, 1, 44, -176, [[44, 10], [54.0, 10], [55.43, 0]]), brake: (t) => (t > 54.0 ? 1 : 0) });
+    add({ id: 'C5', type: 'hatch', color: '#6e5a48', low: true, preset: [0.1, 0.1], pose: neLane(1.75, -1, 37, 30, [[37, 6.0]], { until: 56 }) });
+    // traffic held up by the wreck: one that arrives late and taps the van (see NE_TAP), one at the red on the far lane
+    this.q1 = add({ id: 'Q1', type: 'hatch', color: '#3f8a8c', preset: [0.03, 0.03], pose: neTapPose, brake: (t) => (t > NE_TAP.tb ? 1 : 0), crush: (t) => ({ front: NE_TAP.dent * MathX.smooth(t, NE.tap, NE.tap + 0.12), rear: 0, left: 0, right: 0, xc: 0 }) });
     add({ id: 'Q2', type: 'van', color: '#8a8f96', preset: [0.05, 0.06], pose: neLane(-5.25, 1, 44, -150, [[44, 9], [53.5, 9], [55.5, 0]]), brake: (t) => (t > 53.5 ? 1 : 0) });
     // the crash cars
     const crushOf = (who) => (t) => {
       const C = NE_CRASH, a = MathX.smooth(t, C.ti, C.ti + 0.09), b = MathX.smooth(t, C.tv, C.tv + 0.08);
-      if (who === 'suv') return { front: 0.48 * a, rear: 0.3 * b, left: 0, right: 0, xc: 0 };
-      if (who === 'sedan') return { front: 0, rear: 0, left: 0.0, right: 0.42 * a, xc: 0.15 };
-      return { front: 0.36 * b, rear: 0, left: 0, right: 0, xc: 0 };
+      if (who === 'suv') return { front: 0.6 * a, rear: 0.38 * b, left: 0, right: 0, xc: 0 };
+      if (who === 'sedan') return { front: 0, rear: 0, left: 0.55 * a, right: 0, xc: 0.15 };
+      return { front: 0.42 * b, rear: NE_TAP.dentVan * MathX.smooth(t, NE.tap, NE.tap + 0.12), left: 0, right: 0, xc: 0 };
     };
-    this.suv = add({ id: 'X1', type: 'suv', color: '#2f3f36', preset: [0.07, 0.06], pose: (t) => (t < 44 ? null : neCrashPose('suv', t)), crush: crushOf('suv'), brake: (t) => (t > NE.crash - 0.32 ? 1 : 0) });
+    this.suv = add({ id: 'X1', type: 'suv', color: '#c98a2b', preset: [0.07, 0.06], pose: (t) => (t < 44 ? null : neCrashPose('suv', t)), crush: crushOf('suv'), brake: (t) => (t > NE.crash - 0.32 ? 1 : 0) });
     this.sedan = add({ id: 'X2', type: 'sedan', color: '#8b9aa8', preset: [0.05, 0.05], pose: (t) => (t < 44 ? null : neCrashPose('sedan', t)), crush: crushOf('sedan') });
     this.van = add({ id: 'X3', type: 'van', color: '#dcd8ce', preset: [0.05, 0.07], pose: (t) => (t < 44 ? null : neCrashPose('van', t)), crush: crushOf('van'), brake: (t) => (t > NE_CRASH.tb ? 1 : 0), hazardFrom: 57 });
     this.cars = cars;
-    // the truck's box tips back as its rear springs collapse
-    this.truck.spec.boxTilt = (t) => 0.035 * MathX.smooth(this.truck.set(t, 0), 0.1, 0.3);
+    this.truck.spec.boxTilt = null;
     // sparks (scraping bump stops / the truck's dragging bar) and crash debris
     this.sparks = new StreakSystem(scene, 400);
     this.dust = new BillboardSystem(scene, 260);
@@ -363,16 +385,13 @@ class NeTraffic {
     this._v = new THREE.Vector3();
   }
 
-  // every "scrape": a low car's bumper meeting the table; the truck's bar dragging after its rear springs collapse
+  // every "scrape": a low car's bumper meeting the table
   _sparkSources() {
     const out = [];
     for (const c of this.cars) {
       if (!c.spec.low) continue;
       for (const e of c.events) out.push({ c, t0: e.t + (e.kind === 'climb' ? -0.05 : 0.02), dur: 0.35, end: e.kind === 'climb' ? (e.axle ? 1 : -1) : (e.axle ? 1 : -1), seed: out.length * 7 + 1 });
     }
-    // the truck: after its rear landing the bar drags for ~4 s
-    const tr = this.truck, land = tr.events.filter((e) => e.kind === 'land' && e.axle === 0)[0];
-    if (land) out.push({ c: tr, t0: land.t, dur: 4.2, end: -1, seed: 999, drag: true });
     return out;
   }
 
@@ -413,8 +432,8 @@ class NeTraffic {
         const k = i * 13 + (who === 'van' ? 500 : 0), life = 1.8 + 1.6 * hash1(k);
         if (a < life) {
           const ang = hash1(k + 1) * 6.283, sp = 0.6 + 2.0 * hash1(k + 2), sl = Math.min(a, 1.2);
-          const x = ps.x + Math.cos(ang) * (0.8 + sp * sl), z = ps.z + Math.sin(ang) * (0.8 + sp * sl), y = 0.25 + 0.9 * hash1(k + 3) + 0.4 * sl;
-          if (i % 2 === 0) D.push(x, y, z, 0.7 + 1.2 * sl, hash1(k + 4) * 6, 0.14 * (1 - a / life), 0.9, 0.74, 0.72, 0.68);
+          const x = ps.x + Math.cos(ang) * (0.5 + sp * sl), z = ps.z + Math.sin(ang) * (0.5 + sp * sl), y = 0.12 + 0.5 * hash1(k + 3) + 0.3 * sl;
+          if (i % 3 === 0) D.push(x, y, z, 0.45 + 0.7 * sl, hash1(k + 4) * 6, 0.075 * (1 - a / life), 0.9, 0.74, 0.72, 0.68);
         }
         // glass: ballistic, then lying on the road (bright little chips)
         const g0 = k + 9, vx = (hash1(g0) - 0.5) * 5, vz = (hash1(g0 + 1) - 0.2) * 5, vy = 1 + 2.5 * hash1(g0 + 2), tl = (vy + Math.sqrt(vy * vy + 2 * 9.8 * 1.0)) / 9.8, aa = Math.min(a, tl);
@@ -426,4 +445,6 @@ class NeTraffic {
   }
 }
 
-const neRideText = (t) => { const n = FILM._app && FILM._app.traffic ? FILM._app.traffic.heroRide(t) : 0; return n > 0 ? `THE RED CAR SITS ${n} CM LOWER` : 'SPRINGS DON’T PUSH BACK'; };
+// HUD values: how much lower the red hatch sits than before the rule (average of its axles), and the truck's rear
+const neRideText = (t) => `${FILM._app && FILM._app.traffic ? FILM._app.traffic.heroRide(t) : 0} cm`;
+const neTruckText = (t) => { const T = FILM._app && FILM._app.traffic ? FILM._app.traffic.truck : null; return `${T ? Math.max(0, Math.round((T.set(t, 0) - T.spec.preset[0]) * 100)) : 0} cm`; };

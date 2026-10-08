@@ -12,7 +12,7 @@
 class NeAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
   // anything the sound depends on that is not inside SCRIPT (so a stale baked copy is detected)
-  fingerprintData() { return [NE, NE_SAG_STEPS, NE_CRASH.tv, NE_BALL, NE_RACKET, NE_SHOE]; }
+  fingerprintData() { return [NE, NE_WALKERS.map((w) => [w.tm, w.v, w.dz]), NE_CRASH.tv, NE_TAP, NE_BALL, NE_RACKET, NE_SHOE]; }
 
   _build(ctx) {
     const S = new SoundKit(ctx, CONFIG.seed), T = NE, END = CONFIG.duration + 1.4, app = this.app, TR = app.traffic;
@@ -22,13 +22,22 @@ class NeAudio extends AudioEngine {
     S.tone = (t, dur, f, vol, pan, dest, type = 'sine', attack = 0.01, release = null) => tone(t, dur, f, vol, pan, dest, type, Math.max(attack, 0.006), release);
 
     // mix chain: buses → compressor → out → limiter
-    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12; lim.connect(ctx.destination);
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12;
+    // a soft clip after the limiter (it lets the crash's first milliseconds through): nothing above ≈ −1.3 dBFS
+    { const sc = ctx.createWaveShaper(), N = 2049, c = new Float32Array(N);
+      for (let i = 0; i < N; i++) { const x = i / (N - 1) * 2 - 1, a = Math.abs(x); c[i] = a < 0.6 ? x : Math.sign(x) * (0.6 + 0.26 * Math.tanh((a - 0.6) / 0.26)); }
+      sc.curve = c; lim.connect(sc); sc.connect(ctx.destination); }
     const out = ctx.createGain(); out.gain.value = 1.0; out.connect(lim);
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -15; comp.knee.value = 8; comp.ratio.value = 3.5; comp.connect(out);
     const mix = ctx.createGain(); mix.gain.value = 2.3; mix.connect(comp);
     const rev = S.reverb(2.2), revG = ctx.createGain(); revG.gain.value = 0.22; rev.connect(revG); revG.connect(mix);
     const bus = (g) => { const b = ctx.createGain(); b.gain.value = g; b.connect(mix); return b; };
     const amb = bus(0.75), you = bus(0.8), mus = bus(0.42), fx = bus(1.0), cars = bus(0.9);
+    // a short dip of the bed and the music just before each dead hit, so the thud lands in a small silence
+    { const dk = ctx.createGain(); dk.connect(mix); for (const b of [amb, mus]) { b.disconnect(); b.connect(dk); }
+      const hits = [[neBallTimes().tc4, 0.75], [T.land, 0.6], [38.85, 0.55], [NE.tap, 0.6]].sort((a, b) => a[0] - b[0]);
+      dk.gain.setValueAtTime(1, 0);
+      for (const [t, d] of hits) { dk.gain.setValueAtTime(1, t - 0.35); dk.gain.linearRampToValueAtTime(1 - d, t - 0.03); dk.gain.setValueAtTime(1 - d, t + 0.08); dk.gain.linearRampToValueAtTime(1, t + 0.6); } }
     const R = (a, b) => S.rng.range(a, b);
     const env = (g, t, a, peak, d) => S.env(g, t, a, peak, d);
     const pan = (dest, p) => S.panned(dest, MathX.clamp(p, -0.95, 0.95));
@@ -60,8 +69,8 @@ class NeAudio extends AudioEngine {
 
     // 1. a sunny afternoon: the city bed, a few birds in the plaza trees; it thins out as the street gives up
     const bed = (type, f, q, vol) => { const n = S.noise(type, 0, END), b = S.filter('lowpass', f, q), g = ctx.createGain(); g.gain.value = vol; n.connect(b); b.connect(g); g.connect(amb); };
-    bed('brown', 300, 0.7, 0.32); bed('pink', 1600, 0.5, 0.05);
-    amb.gain.setValueAtTime(0.75, 0); amb.gain.linearRampToValueAtTime(0.75, 52.6); amb.gain.linearRampToValueAtTime(0.35, 53.5);
+    bed('brown', 300, 0.7, 0.16); bed('pink', 1600, 0.5, 0.06);
+    amb.gain.setValueAtTime(0.75, 0); amb.gain.linearRampToValueAtTime(0.75, 52.4); amb.gain.linearRampToValueAtTime(0.12, 53.1); amb.gain.setValueAtTime(0.12, T.crash); amb.gain.linearRampToValueAtTime(0.35, T.crash + 0.3);   // a held breath before the hit
     amb.gain.setValueAtTime(0.35, 57); amb.gain.linearRampToValueAtTime(0.5, 60); amb.gain.linearRampToValueAtTime(0.0, T.end + 0.3);
     for (let t = 0.6; t < 50; t += R(1.6, 4.2)) S.chirp(t, R(2600, 4200), R(0.012, 0.025), R(0.1, 0.6), amb, false);
 
@@ -73,17 +82,17 @@ class NeAudio extends AudioEngine {
         if (walked >= next) { S.step(t, 0.18, (Math.round(next / 0.66) % 2 ? 0.12 : -0.12), you); next += 0.66; }
       } }
 
-    // 3. the dribble: a basketball's bright "pong" (it rings: elastic), then the bounce that dies, then the dead thud
+    // 3. the dribble: a solid rubber ball's bright "thock" (it rings a little: elastic), then the bounce that dies, then the dead thud
     { const tb = NE_TEEN, D = T.dribble;
       for (let k = 0; k < 4; k++) {
-        const tc = D.t0 + (k + 0.5) * D.P, P = place(tb.x, tb.z, tc, 5), weak = k === 3;
+        const tc = D.t0 + (k + 0.5) * D.P, weak = k === 3; if (tc < 0.02) continue; const P = place(tb.x, tb.z, tc, 5);
         thud(tc, (weak ? 0.5 : 0.75) * P.g * 2.2, P.pan, fx, weak ? 150 : 210, 70, 0.08);
         if (!weak) { S.tone(tc, 0.35, 640, 0.05 * P.g * 2, P.pan, fx, 'sine', 0.002, 0.3); S.tone(tc, 0.25, 1190, 0.025 * P.g * 2, P.pan, fx, 'sine', 0.002, 0.2); }
       }
       // the landing that doesn't bounce (≈ 2.23): flat, short, final
-      const tl = D.t0 + 3.5 * D.P + 2 * NE_BALL.e3 * (4 * (NE_BALL.top - NE_BALL.ground - NE_BALL.r) / D.P) / NE_G, P = place(tb.x, tb.z, tl, 5);
+      const tl = neBallTimes().tc4, P = place(tb.x, tb.z, tl, 5);
       thud(tl, 0.9 * P.g * 2.2, P.pan, fx, 110, 48, 0.1);
-      burst(T.poke + 0.2, 0.18, 'pink', 380, 1.2, 0.05, P.pan, fx, 0.02);            // the finger pressing in (a soft squeak of rubber)
+      burst(T.poke + 0.2, 0.18, 'pink', 380, 1.2, 0.05, P.pan, fx, 0.02);            // the hand pressing on it (a soft squeak of rubber)
     }
 
     // 4. the rule bites: a low hit and a sound like a string going slack (a falling, de-tuning tone)
@@ -128,14 +137,6 @@ class NeAudio extends AudioEngine {
       S.voice(16.1, 330, 0.35, 'a', 0.02 * P.g * 2, P.pan + 0.1, fx, 1.1);        // the parent
     }
 
-    // 7. the jogger: flat, slapping steps (no spring left in the soles)
-    { const J = app.cast.byId.jog;
-      let last = -1;
-      for (let t = 15; t < 23.5; t += 1 / 60) {
-        const L = J.locate(t), ph = Math.floor(L.dist / (J.spec.stride / 2));
-        if (ph !== last && L.moving) { last = ph; const P = place(L.x, L.z, t, 4); burst(t, 0.07, 'white', 1500, 0.8, 0.09 * P.g * 2, P.pan, fx, 0.002); thud(t, 0.12 * P.g * 2, P.pan, fx, 120, 60, 0.05); }
-      } }
-
     // 8. traffic: engines and tyres (spatialised from each car's path), the table's climbs and landings, scrapes
     const engine = (car, t0, t1, f, vol) => {
       const pos = (t) => { const p = car.spec.pose(t); return p ? { x: p.x, z: p.z } : { x: 1e4, z: 1e4 }; };
@@ -151,7 +152,7 @@ class NeAudio extends AudioEngine {
     };
     for (const c of TR.cars) {
       const id = c.spec.id;
-      const span = { H: [18.5, 32], B1: [0, 12], B2: [0, 14], B3: [0, 16], C1: [27, 45], C2: [28, 45], TR: [28, 50], BUS: [30, 47], C5: [36, 56], Q1: [44, 56], Q2: [44, 56], X1: [46, 53.7], X2: [48, 53.7], X3: [48, 55.0] }[id];
+      const span = { H: [18.5, 30], B1: [0, 12], B2: [0, 14], B3: [0, 16], C1: [27, 45], C2: [28, 45], TR: [28, 52], BUS: [30, 47], C5: [36, 55.5], Q1: [56.5, 62.4], Q2: [44, 56], X1: [46, 53.7], X2: [48, 53.7], X3: [48, 55.0] }[id];
       if (!span) continue;
       const big = id === 'TR' || id === 'BUS';
       engine(c, span[0], span[1], big ? 31 : id === 'H' ? 44 : R(40, 52), big ? 0.32 : 0.16);
@@ -174,7 +175,10 @@ class NeAudio extends AudioEngine {
     { const ps = TR.bus.spec.pose(45.5), P = place(ps.x, ps.z, 45.5, 8); S.hiss(45.5, 0.6, 0.06 * P.g * 2, P.pan, cars); }
 
     // 9. structures: the footbridge groans at each step of its sag; the signal arm and the lamp posts creak as they give
-    for (let i = 1; i < NE_SAG_STEPS.length; i++) { const t = NE_SAG_STEPS[i][0] - 0.3; groan(t, 1.0, 62 + i * 3, 0.05 + 0.012 * i, -0.05, fx, 0.75); burst(t + 0.2, 0.5, 'brown', 260, 0.6, 0.05, 0, fx, 0.1); }
+    // (a long groan of steel as the running club reaches midspan and the deck settles to a new low; a creak when it's gone)
+    groan(44.0, 3.4, 56, 0.075, -0.05, fx, 0.7); burst(44.4, 2.6, 'brown', 220, 0.6, 0.05, 0, fx, 0.6); groan(48.9, 1.0, 70, 0.03, 0.1, fx, 0.85);
+    // footsteps on the steel deck: soft ticks for the walkers, a drumming patter for the runners
+    for (const w of NE_WALKERS) { const step = (w.run ? 2.3 : 1.2) / w.v / 2; for (let t = Math.max(w.t0, NE.bridge[0]) + (w.v * 7.3) % step; t < Math.min(w.t1, NE.bridge[1]); t += step) { const x = neWalkerX(w, t); if (x === null || Math.abs(x) > NE_CITY.bridge.half) continue; S.click(t, w.run ? 0.016 : 0.006, MathX.clamp(x / 14, -0.6, 0.6), fx); if (w.run) thud(t, 0.03, MathX.clamp(x / 14, -0.6, 0.6), fx, 110, 60, 0.04); } }
     groan(44.0, 1.4, 180, 0.025, 0.25, fx, 0.8); groan(47.4, 1.2, 160, 0.022, 0.3, fx, 0.75);
     groan(45.2, 1.3, 120, 0.02, -0.3, fx, 0.7);
 
@@ -200,6 +204,14 @@ class NeAudio extends AudioEngine {
       S.hiss(C.tv + 0.6, 4.5, 0.025, P.pan, fx);
       for (let i = 0; i < 10; i++) S.tone(C.tv + 0.8 + i * R(0.2, 0.6), 0.05, R(3000, 6000), 0.008, P.pan + R(-0.2, 0.2), fx, 'sine', 0.001, 0.04);
       S.voice(C.tv + 1.2, 300, 0.6, 'o', 0.03, P.pan + 0.3, fx, 0.9); S.voice(C.tv + 1.9, 410, 0.5, 'e', 0.025, P.pan - 0.3, fx, 0.95);
+    }
+
+    // 10b. the tap: the late hatch's tyres as it brakes, then a small, dull plastic crunch (no rebound knock)
+    { const T = NE_TAP, P = { pan: 0.1 };
+      burst(T.tb, NE.tap - T.tb, 'white', 1000, 0.8, 0.05, P.pan, cars, 0.05);
+      thud(NE.tap, 0.55, P.pan, fx, 140, 60, 0.1);
+      burst(NE.tap, 0.16, 'white', 2600, 1.4, 0.06, P.pan, fx, 0.002);
+      for (let i = 0; i < 6; i++) S.click(NE.tap + 0.02 + i * R(0.015, 0.04), 0.02, P.pan + R(-0.1, 0.1), fx);
     }
 
     // 11. music: a quiet pad whose pitch slowly sags (nothing holds its tension); silence before the crash; a closing chord

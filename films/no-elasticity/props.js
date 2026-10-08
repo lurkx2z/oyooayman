@@ -2,7 +2,7 @@
    PROPS — the things that keep their dents. Every shape here is a pure
    function of time: the deformation is recomputed from the rest shape
    each frame (no state carried between frames).
-     NeBall      the dribbled basketball (bounces → lands flat at 2.23 s)
+     NeBall      the bounced solid rubber ball (lands dead at ≈ 1.45 s with a flat spot)
      NeTramp     the park trampoline (first landing stretches the mat for good)
      NeRacket    montage insert: the ball pockets the strings, the pocket stays
      NeShoe      montage insert: a running shoe's foam squashes and stays thin
@@ -13,65 +13,72 @@
 const NE_G = 9.81;
 
 // ---------------------------------------------------------------------------------------------------------------------
-// the basketball
+// the ball: SOLID rubber (no air inside, so nothing but the rubber itself could push it back into shape)
 // ---------------------------------------------------------------------------------------------------------------------
-const NE_BALL = { r: 0.12, ground: 0.15, top: 1.02, last: 1.87, e3: 0.35 };
-// height of the ball's centre and how flat it is, at time t (the dribble, the weak bounce, the dead landing)
+const NE_BALL = { r: 0.09, ground: 0.15, top: 1.02, e3: 0.35, flat: 0.2 };   // flat: the dead flat spot's depth / r (10 % of the diameter)
+// the contact where the rule bites, and the dead landing after the weak bounce (story s)
+function neBallTimes() {
+  const D = NE.dribble, B = NE_BALL, A = B.top - B.ground - B.r, tc3 = D.t0 + 3.5 * D.P, vin = 4 * A / D.P, v0 = B.e3 * vin;
+  return { tc3, tc4: tc3 + 2 * v0 / NE_G, v0, A };
+}
+// height of the ball's centre and how flat it is, at time t (the bounce, the weak bounce, the dead landing)
 function neBallY(t) {
-  const D = NE.dribble, B = NE_BALL, g0 = B.ground + B.r, A = B.top - g0;
-  const tc3 = D.t0 + 3.5 * D.P;                                           // the contact where the rule bites (≈ 1.87)
+  const D = NE.dribble, B = NE_BALL, g0 = B.ground + B.r, { tc3, tc4, v0, A } = neBallTimes();
   if (t < tc3) {
     const u = ((t - D.t0) / D.P) % 1, s = Math.abs(2 * u - 1), y = g0 + A * (1 - (1 - s) * (1 - s));
-    const kc = Math.round((t - D.t0) / D.P - 0.5), tc = D.t0 + (kc + 0.5) * D.P, sq = Math.max(0, 1 - Math.abs(t - tc) / 0.035) * 0.14;
-    return { y: y - sq * B.r * 0.5, flat: 0, squash: sq };
+    const kc = Math.round((t - D.t0) / D.P - 0.5), tc = D.t0 + (kc + 0.5) * D.P, sq = Math.max(0, 1 - Math.abs(t - tc) / 0.035) * 0.2;
+    return { y: y - sq * B.r * 0.4, flat: 0, squash: sq };
   }
-  // the weak bounce (rebound speed = e × impact speed), then the dead landing
-  const vin = 4 * A / D.P, v0 = B.e3 * vin, tf = 2 * v0 / NE_G, tc4 = tc3 + tf;
-  if (t < tc4) { const τ = t - tc3; return { y: g0 + v0 * τ - 0.5 * NE_G * τ * τ, flat: 0.25 * MathX.smooth(τ, 0, 0.04), squash: 0 }; }
-  const f = 0.25 + 0.75 * MathX.smooth(t, tc4, tc4 + 0.05);
-  return { y: g0 - f * B.r * 0.42, flat: f, squash: 0 };
+  // the weak bounce (rebound speed = e × impact speed) keeps part of its squash; the dead landing keeps all of it
+  if (t < tc4) { const τ = t - tc3; return { y: g0 + v0 * τ - 0.5 * NE_G * τ * τ, flat: 0.4 * MathX.smooth(τ, 0, 0.03), squash: 0 }; }
+  const f = 0.4 + 0.6 * MathX.smooth(t, tc4, tc4 + 0.04);
+  return { y: g0 - f * B.flat * B.r, flat: f, squash: 0 };
 }
 
 class NeBall {
   constructor(scene) {
+    // a bright marbled rubber ball (the kind sold as a "super ball"), no seams
     const c = Tex.canvas(512, 256), x = c.getContext('2d'), rng = new RNG(31);
-    x.fillStyle = '#b8582a'; x.fillRect(0, 0, 512, 256);
-    for (let i = 0; i < 2600; i++) { x.fillStyle = `rgba(${rng.next() < 0.5 ? '255,190,140' : '70,25,10'},${rng.range(0.05, 0.14)})`; x.fillRect(rng.range(0, 512), rng.range(0, 256), 2, 2); }
-    x.strokeStyle = '#1b1310'; x.lineWidth = 5;
-    for (const u of [0, 128, 256, 384, 512]) { x.beginPath(); x.moveTo(u, 0); x.lineTo(u, 256); x.stroke(); }
-    x.beginPath(); x.moveTo(0, 128); x.lineTo(512, 128); x.stroke();
-    for (const s of [-1, 1]) { x.beginPath(); for (let u = 0; u <= 512; u += 4) { const v = 128 + s * (58 + 44 * Math.cos(u / 512 * Math.PI * 4)); u === 0 ? x.moveTo(u, v) : x.lineTo(u, v); } x.stroke(); }
+    x.fillStyle = '#d8401f'; x.fillRect(0, 0, 512, 256);
+    for (let i = 0; i < 22; i++) {
+      x.strokeStyle = ['#f2a22a', '#b02818', '#f7d046', '#e8622b'][i % 4]; x.lineWidth = rng.range(6, 18); x.globalAlpha = rng.range(0.35, 0.7);
+      x.beginPath(); const y0 = rng.range(0, 256), ph = rng.range(0, 6.3), am = rng.range(10, 40), fr = rng.range(1, 3);
+      for (let u = 0; u <= 512; u += 8) { const v = y0 + am * Math.sin(u / 512 * Math.PI * 2 * fr + ph); u === 0 ? x.moveTo(u, v) : x.lineTo(u, v); }
+      x.stroke();
+    }
+    x.globalAlpha = 1;
     this.geo = new THREE.SphereGeometry(NE_BALL.r, 36, 22);
     this.base = this.geo.attributes.position.array.slice();
-    this.m = new THREE.Mesh(this.geo, new THREE.MeshStandardMaterial({ map: Tex.tex(c), roughness: 0.62, name: 'neBall' }));
+    this.m = new THREE.Mesh(this.geo, new THREE.MeshStandardMaterial({ map: Tex.tex(c), roughness: 0.38, name: 'neBall' }));
     this.m.castShadow = true; this.m.receiveShadow = true;
     scene.add(this.m);
     this._key = '';
+    this._dead = neBallTimes().tc4;
+  }
+
+  // where the ball is (beside the teenager's right hand, where it died)
+  spot(cast) {
+    const T = cast.teen, th = MathX.deg(T.spec.face), fx = -Math.sin(th), fz = -Math.cos(th), rx = -fz, rz = fx;
+    return [T.spec.path[0][1] + fx * 0.38 + rx * 0.24, T.spec.path[0][2] + fz * 0.38 + rz * 0.24];
   }
 
   update(t, cast) {
-    const st = neBallY(t), T = cast.teen, B = NE_BALL;
-    // the ball sits beside the teenager's right hand
-    const th = MathX.deg(T.spec.face), fx = -Math.sin(th), fz = -Math.cos(th), rx = -fz, rz = fx;
-    const bx = T.spec.path[0][1] + fx * 0.38 + rx * 0.24, bz = T.spec.path[0][2] + fz * 0.38 + rz * 0.24;
+    const st = neBallY(t), B = NE_BALL, [bx, bz] = this.spot(cast);
     this.m.position.set(bx, st.y, bz);
-    this.m.rotation.set(0.3, 0.7 + (t < 2.3 ? t * 0.8 : 1.84), 0.2);
-    // deformation: a flat bottom on the ground (permanent), bulging sides; a finger dent on top after the poke
-    const poke = MathX.smooth(t, NE.poke + 0.15, NE.poke + 0.35);
-    const key = `${st.flat.toFixed(3)}_${st.squash.toFixed(3)}_${poke.toFixed(3)}`;
+    const spin = 0.7 + Math.min(t, this._dead) * 0.8;
+    this.m.rotation.set(0.3, spin, 0.2);
+    // deformation: the squash at each contact; after the rule, a flat spot on the ground that stays, the sides bulging a little
+    const key = `${st.flat.toFixed(3)}_${st.squash.toFixed(3)}_${spin.toFixed(3)}`;
     if (key !== this._key) {
       this._key = key;
       const p = this.geo.attributes.position.array, b = this.base, r = B.r, f = st.flat, sq = st.squash;
-      const d = r * (0.42 * f + 0.5 * sq), floor = -r + d;
-      const e = new THREE.Euler(0.3, 0.7 + (t < 2.3 ? t * 0.8 : 1.84), 0.2), q = new THREE.Quaternion().setFromEuler(e), qi = q.clone().invert(), v = new THREE.Vector3();
+      const d = r * (B.flat * f + 0.4 * sq), floor = -r + d;
+      const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.3, spin, 0.2)), qi = q.clone().invert(), v = new THREE.Vector3();
       for (let i = 0; i < p.length; i += 3) {
         v.set(b[i], b[i + 1], b[i + 2]).applyQuaternion(q);            // into world orientation (the flat is always at the bottom)
-        const yy = v.y, side = 1 + (0.16 * f + 0.2 * sq) * Math.max(0, 1 - Math.abs(yy + r * 0.35) / r);
+        const yy = v.y, side = 1 + (0.06 * f + 0.12 * sq) * Math.max(0, 1 - Math.abs(yy + r * 0.45) / r);
         v.x *= side; v.z *= side;
-        if (v.y < floor) v.y = floor + (v.y - floor) * 0.04;
-        v.y += d * 0.1 * Math.max(0, yy / r);
-        // the poke: a shallow dent near the top
-        if (poke > 0) { const k = Math.max(0, (v.y / r - 0.55) / 0.45); v.multiplyScalar(1 - 0.12 * poke * k * k); }
+        if (v.y < floor) v.y = floor + (v.y - floor) * 0.03;
         v.applyQuaternion(qi);
         p[i] = v.x; p[i + 1] = v.y; p[i + 2] = v.z;
       }

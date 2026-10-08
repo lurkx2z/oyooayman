@@ -3,10 +3,10 @@
    side a small paved plaza (the dribbler, the trampoline, a hoop, trees),
    a café front with a cushioned bench, a raised speed table across the
    avenue right in front of you, the intersection where the crash
-   happens, and a steel footbridge beyond it. Three structures bend in
-   their vertex shaders (pure functions of time): the footbridge sags
-   (each crossing adds more), the signal mast arm droops, two lamp posts
-   lean. Environment.update is Oxygen-only, so this class has its own.
+   happens, and a steel footbridge beyond it. Structures bend in their
+   vertex shaders (pure functions of time): the footbridge sags (it keeps
+   the deepest dip any load gave it, drawn ×150), the signal mast arm
+   droops a little. Environment.update is Oxygen-only, so this class has its own.
    ===================================================================== */
 
 const LAYOUT = {
@@ -37,17 +37,22 @@ function neRoadY(z) {
   return T.h * (z - T.zD) / (T.zC - T.zD);
 }
 
-// the footbridge's permanent midspan sag (m) — it ratchets down a step each time a group crosses (see cast.js)
-const NE_SAG_STEPS = [[0, 0.012], [43.2, 0.07], [45.6, 0.17], [48.0, 0.31], [50.3, 0.48]];
-function neSag(t) {
-  let s = NE_SAG_STEPS[0][1];
-  for (let i = 1; i < NE_SAG_STEPS.length; i++) { const [tt, v] = NE_SAG_STEPS[i]; s += (v - NE_SAG_STEPS[i - 1][1]) * MathX.smooth(t, tt - 0.6, tt + 0.35); }
-  return s;
+// the footbridge's permanent midspan sag. The deck keeps the deepest deflection any load has given it so far: the running
+// maximum of the walkers' and runners' load (cast.js). Real values are fractions of a millimetre per person; the picture draws them ×NE_SAG_DRAW.
+const NE_SAG_DRAW = 150;
+const NE_SAG = { t0: 30.0, t1: 52.0, dt: 1 / 60, tab: null };
+function neSagReal(t) {
+  const S = NE_SAG;
+  if (!S.tab) { S.tab = []; let m = 0; for (let x = S.t0; x <= S.t1 + 1e-9; x += S.dt) { m = Math.max(m, neBridgeLoad(x)); S.tab.push(m); } }
+  if (t <= S.t0) return 0;
+  const f = Math.min((t - S.t0) / S.dt, S.tab.length - 1.001), i = Math.floor(f);
+  return S.tab[i] + (S.tab[i + 1] - S.tab[i]) * (f - i);
 }
-const neSagText = (t) => `${Math.max(1, Math.round(neSag(t) * 100))} cm`;
-// the signal arm's droop at its tip (m) and the lamp posts' lean (m at the top): small gusts, each one permanent
-function neDroop(t) { return 0.03 + 0.62 * MathX.smooth(t, 43.0, 51.0) + 0.03 * Math.max(0, Math.sin(t * 1.3)) * MathX.smooth(t, 42, 44) + 0.12 * MathX.smooth(t, 51, 62); }
-function neLean(t) { return 0.04 + 0.5 * MathX.smooth(t, 44.5, 52.0) + 0.14 * MathX.smooth(t, 52, 64); }
+function neSag(t) { return neSagReal(t) * NE_SAG_DRAW; }
+const neSagText = (t) => `${(neSagReal(t) * 1000).toFixed(1)} mm`;
+// the signal arm's droop at its tip (m): small and slow (a gust's push stays); the lamp posts no longer lean
+function neDroop(t) { return 0.02 + 0.08 * MathX.smooth(t, 43.0, 51.0); }
+function neLean(t) { return 0; }
 
 class NeCity extends Environment {
   build() {
@@ -312,7 +317,7 @@ class NeCity extends Environment {
       const zl = z - 15;
       if (!(zl < cz1 && zl > cz0) && Math.abs(zl - NE_CITY.lamps[0][1]) > 3 && Math.abs(zl - NE_CITY.bridge.z) > 4) this._streetLight(-7.45, zl, -1);
     }
-    for (const [x, z] of [[7.7, -7.6], [-7.7, -33], [7.7, -63], [-7.7, 14]]) {          // (none beside the wheel shot's path)
+    for (const [x, z] of [[7.7, 17.5], [-7.7, -33], [7.7, -63], [-7.7, 14]]) {          // (none in the jogger's or the wheel shot's way)
       B.add(new THREE.CylinderGeometry(0.13, 0.15, 0.6, 10), m.red, Geo.matrix(x, h + 0.3, z));
       B.add(new THREE.SphereGeometry(0.14, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), m.red, Geo.matrix(x, h + 0.6, z));
     }
