@@ -41,8 +41,12 @@ class SndAudio extends AudioEngine {
     const mix = ctx.createGain(), mixHp = S.filter('highpass', 26, 0.7); mix.gain.value = 1.5; mix.connect(mixHp); mixHp.connect(ears);
     // the stadium's reverb: long (echoes take ten times longer to die away in this air)
     const rev = S.reverb(4.2), revG = ctx.createGain(); revG.gain.value = 0.3; rev.connect(revG); revG.connect(mix);
-    const bus = (g) => { const b = ctx.createGain(); b.gain.value = g; b.connect(mix); return b; };
-    const amb = bus(0.4), src = bus(1.0), fx = bus(1.15), mus = bus(0.5), crowd = bus(1.0);
+    // (window.SND_SOLO = 'amb' etc. renders one bus alone, for checking the mix; never set in the film)
+    const solo = typeof window !== 'undefined' ? window.SND_SOLO : null;
+    // (each bus: its own gain, which may be automated, then a fixed trim that sets the balance)
+    const bus = (name, g, trim) => { const b = ctx.createGain(), m = ctx.createGain(); b.gain.value = g; m.gain.value = solo && solo !== name ? 0 : trim; b.connect(m); m.connect(mix); return b; };
+    const amb = bus('amb', 0.4, 0.2), src = bus('src', 1.0, 0.45), fx = bus('fx', 1.15, 1.0), mus = bus('mus', 0.5, 1.0), crowd = bus('crowd', 1.0, 0.35), voices = bus('voices', 1.0, 0.26);
+    if (solo) revG.gain.value = 0;
     const send = (node, amt) => { const g = ctx.createGain(); g.gain.value = amt; node.connect(g); g.connect(rev); };
     send(crowd, 0.35);
 
@@ -76,10 +80,10 @@ class SndAudio extends AudioEngine {
     };
 
     // --- small sounds mixed in JavaScript: thousands of grains, each placed by its own arrival ---------------------
-    const NS = Math.ceil(END * SR), G = [new Float32Array(NS), new Float32Array(NS)];
-    const grain = (arr, t, g, pan) => {
+    const NS = Math.ceil(END * SR), G = [new Float32Array(NS), new Float32Array(NS)], VG = [new Float32Array(NS), new Float32Array(NS)];
+    const grain = (arr, t, g, pan, into = G) => {
       if (!(t < END) || g <= 0) return;
-      const i0 = Math.round(t * SR), a = Math.cos((pan + 1) * Math.PI / 4) * g, b = Math.sin((pan + 1) * Math.PI / 4) * g, L = G[0], R = G[1];
+      const i0 = Math.round(t * SR), a = Math.cos((pan + 1) * Math.PI / 4) * g, b = Math.sin((pan + 1) * Math.PI / 4) * g, L = into[0], R = into[1];
       for (let i = 0, n = Math.min(arr.length, NS - i0); i < n; i++) { const v = arr[i]; L[i0 + i] += v * a; R[i0 + i] += v * b; }
     };
     const noiseArr = (n, seed) => { const r = new RNG(seed), a = new Float32Array(n); for (let i = 0; i < n; i++) a[i] = r.next() * 2 - 1; return a; };
@@ -135,7 +139,7 @@ class SndAudio extends AudioEngine {
       A.setValueAtTime(0.4, 0);
       A.setValueAtTime(0.4, SND.cuts[2]); A.linearRampToValueAtTime(0.26, K.t - 1.2); A.linearRampToValueAtTime(0.18, K.t);
       A.setValueAtTime(0.18, SND.cuts[3] - 0.05); A.linearRampToValueAtTime(0.32, SND.cuts[3]);
-      A.setValueAtTime(0.32, SND.cuts[4] - 0.05); A.linearRampToValueAtTime(0.4, SND.cuts[4]); A.linearRampToValueAtTime(0.4, 53.0); A.linearRampToValueAtTime(0.22, 57.0);
+      A.setValueAtTime(0.32, SND.cuts[4] - 0.05); A.linearRampToValueAtTime(0.4, SND.cuts[4]); A.linearRampToValueAtTime(0.4, tT - 5.0); A.linearRampToValueAtTime(0.22, tT - 2.0);
       A.setValueAtTime(0.22, tT); A.linearRampToValueAtTime(0.34, tT + 3.5); A.linearRampToValueAtTime(0.12, T.lineB[0]); A.linearRampToValueAtTime(0.0, END - 0.3);
     }
 
@@ -154,7 +158,7 @@ class SndAudio extends AudioEngine {
     // 3. the start: "Set!" (in normal air: a clear voice, on time), then the gun, heard 2.2 s late, and the stadium's
     //    echoes 2 s after that; the runners' feet, each set from where that runner is
     const G0 = SND_P(T.gun.x, T.gun.y, T.gun.z);
-    at(T.gun.set, SND_P(T.gun.x + 0.35, 1.65, T.gun.z), 9, (tr, g, pn) => S.voice(tr, 175, 0.34, 'e', 3.2 * g, pn, src, 0.92));
+    at(T.gun.set, SND_P(T.gun.x + 0.35, 1.65, T.gun.z), 9, (tr, g, pn) => S.voice(tr, 175, 0.34, 'e', 6.4 * g, pn, src, 0.92));
     const bang = (tr, g, pn, bright) => {
       const P = S.panned(fx, pn);
       const n = S.noise('white', tr, tr + 0.3), hp = S.filter(bright ? 'highpass' : 'lowpass', bright ? 700 : 1400, 0.7), ng = ctx.createGain();
@@ -162,8 +166,8 @@ class SndAudio extends AudioEngine {
       const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.setValueAtTime(170, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25);
       S.env(og, tr, 0.002, g * 1.1, 0.3); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.45);
     };
-    at(T.gun.bang, G0, 12, (tr, g, pn) => bang(tr, 6.5 * g, pn, true));
-    echoes(T.gun.bang, G0, 12, (tr, g, pn) => bang(tr, 6.5 * g, pn, false));
+    at(T.gun.bang, G0, 12, (tr, g, pn) => bang(tr, 4.0 * g, pn, true));
+    echoes(T.gun.bang, G0, 12, (tr, g, pn) => bang(tr, 4.0 * g, pn, false));
     SND_RUNNERS.forEach((R) => {
       let k = 1;
       for (let t = R.go; t < SND.cuts[0] + 1.5; t += 1 / 240) {
@@ -174,11 +178,15 @@ class SndAudio extends AudioEngine {
       }
     });
 
-    // 4. your friend: "Hey! Up here!" — 0.8 s late, and hollow
+    // 4. your friend: "Hey! Up here!" and "Over here!" — 0.8 s late, and hollow
     const FM = SND_FRIEND_MOUTH;
     at(T.friend.shout, FM, 9, (tr, g, pn) => {
       const v = 4.4 * g;
-      for (const [dt, dur, f0, f1, sd] of [[0, 0.3, 270, 250, 1], [0.42, 0.13, 240, 236, 2], [0.57, 0.42, 280, 228, 3]]) grain(hollowArr(dur, f0, f1, 800 + sd, 0.02, 0.12), tr + dt, v, pn);
+      for (const [dt, dur, f0, f1, sd] of [[0, 0.3, 270, 250, 1], [0.42, 0.13, 240, 236, 2], [0.57, 0.42, 280, 228, 3]]) grain(hollowArr(dur, f0, f1, 800 + sd, 0.02, 0.12), tr + dt, v, pn, VG);
+    });
+    at(T.friend.shout2, FM, 9, (tr, g, pn) => {     // "Over here!"
+      const v = 4.6 * g;
+      for (const [dt, dur, f0, f1, sd] of [[0, 0.24, 262, 248, 4], [0.27, 0.12, 250, 244, 5], [0.42, 0.36, 284, 226, 6]]) grain(hollowArr(dur, f0, f1, 800 + sd, 0.02, 0.12), tr + dt, v, pn, VG);
     });
 
     // 5. the announcer, through five loudspeakers: each copy arrives from its own speaker (three arrivals here)
@@ -186,7 +194,7 @@ class SndAudio extends AudioEngine {
       const syl = [[0, 0.16, 135, 130], [0.17, 0.21, 128, 124], [0.42, 0.14, 132, 128], [0.6, 0.17, 142, 136], [0.78, 0.13, 132, 128], [0.93, 0.38, 124, 108]];
       const words = syl.map(([, dur, f0, f1], i) => { const x = hollowArr(dur, f0, f1, 900 + i, 0.015, 0.06); return x; });
       T.pa.speakers.forEach((P, si) => at(T.pa.speak, P, 26, (tr, g, pn) => {
-        syl.forEach(([dt], i) => grain(words[i], tr + dt, 2.6 * g, pn));
+        syl.forEach(([dt], i) => grain(words[i], tr + dt, 2.6 * g, pn, VG));
         // the loudspeaker's own horn ring (a little brightness the voice no longer has)
         const n = S.noise('pink', tr, tr + 1.4), bp = S.filter('bandpass', 1300, 3), gg = ctx.createGain();
         gg.gain.setValueAtTime(0, tr); gg.gain.linearRampToValueAtTime(0.05 * g * 2.6, tr + 0.03); gg.gain.setValueAtTime(0.05 * g * 2.6, tr + 1.25); gg.gain.linearRampToValueAtTime(0, tr + 1.4);
@@ -206,8 +214,8 @@ class SndAudio extends AudioEngine {
       o.connect(og); og.connect(P); send(og, 0.5);
       for (const x of [o, o2, am]) { x.start(tr); x.stop(tr + 1.05); }
     };
-    at(T.whistle.t, WP, 10, (tr, g, pn) => hoot(tr, 3.2 * g, pn));
-    echoes(T.whistle.t, WP, 10, (tr, g, pn) => hoot(tr, 2.4 * g, pn));
+    at(T.whistle.t, WP, 10, (tr, g, pn) => hoot(tr, 2.2 * g, pn));
+    echoes(T.whistle.t, WP, 10, (tr, g, pn) => hoot(tr, 1.7 * g, pn));
 
     // 7. the shot: the ball outruns its own sound — a crack (its shock, as it drops through Mach 1), the kick's deep
     //    "dum" (the ball's air rings ten times lower), the net
@@ -236,13 +244,13 @@ class SndAudio extends AudioEngine {
     fans.forEach((f, i) => {
       if (i % 17 === 0 && f.tGoal < 1e5) {
         const tr = arrive(f.tGoal + 0.08, f.head);
-        grain(CHEERS[i % 5], tr, 0.55 * lvl(f.head, tr, 10), panOf(f.head, tr));
+        grain(CHEERS[i % 5], tr, 0.38 * lvl(f.head, tr, 10), panOf(f.head, tr));
       }
       if (i % 13 === 0 && f.clapper) {
         for (let k = 0; k < T.drum.n; k++) {
           const te = T.drum.t0 + k * T.drum.period + f.tDrum + 0.09, tr = arrive(te, f.head);
           if (tr > END - 0.5) break;
-          grain(CLAPS[(i + k) % 6], tr, 0.5 * lvl(f.head, tr, 5), panOf(f.head, tr));
+          grain(CLAPS[(i + k) % 6], tr, 1.1 * lvl(f.head, tr, 5), panOf(f.head, tr));
         }
       }
       if (i % 19 === 0) {
@@ -254,17 +262,19 @@ class SndAudio extends AudioEngine {
     // 9. the drum: a deep bass drum, every beat heard from where it is
     for (let k = 0; k < T.drum.n; k++) at(T.drum.t0 + k * T.drum.period, SND_DRUM, 12, (tr, g, pn) => {
       const P = S.panned(src, pn), o = ctx.createOscillator(), og = ctx.createGain();
-      o.frequency.setValueAtTime(78, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25); S.env(og, tr, 0.003, 5.5 * g, 0.4); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.6); send(og, 0.45);
+      o.frequency.setValueAtTime(78, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25); S.env(og, tr, 0.003, 7.7 * g, 0.4); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.6); send(og, 0.45);
       const n = S.noise('pink', tr, tr + 0.08), lp = S.filter('lowpass', 500, 0.7), ng = ctx.createGain(); S.env(ng, tr, 0.001, 2.2 * g, 0.05); n.connect(lp); lp.connect(ng); ng.connect(P);
     });
 
     // the grains, played
     {
-      const buf = ctx.createBuffer(2, NS, SR); buf.copyToChannel(G[0], 0); buf.copyToChannel(G[1], 1);
-      const s = ctx.createBufferSource(); s.buffer = buf; s.connect(crowd); s.start(0);
+      for (const [B, to] of [[G, crowd], [VG, voices]]) {
+        const buf = ctx.createBuffer(2, NS, SR); buf.copyToChannel(B[0], 0); buf.copyToChannel(B[1], 1);
+        const s = ctx.createBufferSource(); s.buffer = buf; s.connect(to); s.start(0);
+      }
     }
 
-    // 10. the thunder (the flash under the title, 1.94 km away): a crack, then a roll that would go on for a minute
+    // 10. the thunder (the flash under the title, 1.71 km away): a crack, then a roll that would go on for a minute
     {
       const pn = panOf(SND_BOLT, tT);
       // the crack: a sharp tearing front, then the first heavy boom
@@ -279,18 +289,17 @@ class SndAudio extends AudioEngine {
       mid.connect(ml); ml.connect(mg); mg.connect(S.panned(fx, pn * 0.4));
       rg.gain.setValueAtTime(0, tT); rg.gain.linearRampToValueAtTime(1.5, tT + 0.06);
       mg.gain.setValueAtTime(0, tT); mg.gain.linearRampToValueAtTime(0.5, tT + 0.03); mg.gain.setTargetAtTime(0.05, tT + 0.2, 0.8);
-      const peaks = [[0.9, 1.25], [2.1, 1.0], [3.4, 1.15], [5.2, 0.8], [6.9, 0.9], [8.6, 0.6]];
-      let lv = 1.5;
+      const peaks = [[0.9, 1.25], [2.1, 1.0], [3.4, 1.0], [5.2, 0.55], [6.9, 0.5], [8.6, 0.32]];
       rg.gain.setTargetAtTime(0.55, tT + 0.1, 0.35);
-      for (const [dt, a] of peaks) { const t0 = tT + dt; if (t0 > END - 0.5) break; rg.gain.setTargetAtTime(a, t0 - 0.3, 0.12); rg.gain.setTargetAtTime(a * 0.45, t0 + 0.2, 0.4); lv = a; }
+      for (const [dt, a] of peaks) { const t0 = tT + dt; if (t0 > END - 0.5) break; rg.gain.setTargetAtTime(a, t0 - 0.3, 0.12); rg.gain.setTargetAtTime(a * 0.45, t0 + 0.2, 0.4); }
       rg.gain.setTargetAtTime(0, END - 0.6, 0.15); mg.gain.setTargetAtTime(0, END - 0.6, 0.15);
     }
 
     // 11. the score: almost nothing — a low swell under the wait for the thunder, silence just before it,
     //     a quiet chord under the closing line
     const pad = (t0, t1, notes, vol) => { for (const f of notes) S.tone(t0, t1 - t0, f, vol, 0, mus, 'sine', (t1 - t0) * 0.45, (t1 - t0) * 0.35); };
-    pad(44.2, 52.5, [55, 82.4], 0.05);
-    pad(51.5, tT - 0.45, [58.3, 87.3, 116.5], 0.05);
+    pad(SND.cuts[4] + 0.6, tT - 4.2, [55, 82.4], 0.05);
+    pad(tT - 5.2, tT - 0.45, [58.3, 87.3, 116.5], 0.05);
     for (const f of [110, 164.8, 220, 277.2]) S.tone(T.lineA[0] - 0.3, 6.8, f, 0.03, 0, mus, 'sine', 1.4, 2.6);
   }
 }

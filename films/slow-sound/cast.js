@@ -119,7 +119,7 @@ Object.assign(BLEND, { sndSet: 0.6, sndSprint: 0.14, sndStarter: 0.5, sndWave: 0
     sndAway2: { skin: 3, build: 'broad', shirt: '#c23a30', sleeves: 'short', pants: '#efeee8', shoes: '#111', sole: '#222', hair: '#151515' },
     sndRef: { skin: 1, build: 'avg', shirt: '#151719', sleeves: 'short', pants: '#151719', shoes: '#111', sole: '#222', hair: '#3a2a1e' },
     sndKeeperL: { skin: 5, build: 'broad', shirt: '#3fae5a', sleeves: 'long', pants: '#1d2026', shoes: '#111', sole: '#222', hair: '#6b4a2c', gloves: '#f2f0e8' },
-    sndFriend: { skin: 1, build: 'avg', shirt: '#e2b82e', sleeves: 'long', pants: '#2c3440', shoes: '#d8d4ca', sole: '#f0ede6', hair: '#2a1a12', jacket: true, collar: true, inner: '#1f2f52', scarf: '#1f2f52' },
+    sndFriend: { skin: 1, build: 'avg', shirt: '#f2621a', sleeves: 'long', pants: '#2c3440', shoes: '#d8d4ca', sole: '#f0ede6', hair: '#2a1a12', jacket: true, collar: true, inner: '#f4f1ea', scarf: '#f4f1ea' },
     sndStarterL: { skin: 3, build: 'broad', shirt: '#f2f0e8', sleeves: 'long', pants: '#1d2026', shoes: '#111', sole: '#222', hair: '#151515', hat: { type: 'cap', color: '#c4362e' } },
     sndFanA: { skin: 0, build: 'avg', shirt: '#e2b82e', sleeves: 'long', pants: '#2a2f38', shoes: '#3a3633', sole: '#c9c4b8', hair: '#4a3220', jacket: true, collar: true, scarf: '#1f2f52' },
     sndFanB: { skin: 2, build: 'slim', shirt: '#1f2f52', sleeves: 'long', pants: '#1f1f24', shoes: '#111', sole: '#2a2a2a', hair: '#2a1a12', hairStyle: 'long', scarf: '#e2b82e' },
@@ -150,9 +150,9 @@ class SndCast {
     { const gun = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.12, 0.2), Mat.std('#16181a', { roughness: 0.4, metalness: 0.5 })); gun.position.set(0, -0.08, 0.06); this.starter.j.ra.hand.add(gun); }
 
     // 2. your friend (row 11), and the people round them
-    const F = SND.friend, fy = sndSideSeat(1, F.row, 0).y, faceF = sndFace(F.x, F.z, E[1].x, E[1].z);
-    this.friend = add({ id: 'friend', look: 'sndFriend', y: fy, path: [[0, F.x, F.z - 0.1]], states: [[0, 'idle'], [F.wave[0], 'sndWave'], [F.shout, 'sndShout'], [F.shout + 0.95, 'sndWave'], [F.wave[1], 'sndWatch']], face: faceF }, [1]);
-    const nb = [['nb1', 'sndFanB', 10, -22.6], ['nb2', 'sndFanC', 10, -21.4], ['nb3', 'sndFanD', 11, -23.15], ['nb4', 'sndFanE', 11, -20.85], ['nb5', 'sndFanA', 12, -22.5], ['nb6', 'sndFanD', 12, -21.3]];
+    const F = SND.friend, fy = F.y, faceF = sndFace(F.x, F.z, E[1].x, E[1].z);
+    this.friend = add({ id: 'friend', look: 'sndFriend', y: fy, path: [[0, F.x, F.z - 0.1]], states: [[0, 'idle'], [F.wave[0], 'sndWave'], [F.shout, 'sndShout'], [F.shout + 0.95, 'sndWave'], [F.shout2, 'sndShout'], [F.shout2 + 0.75, 'sndWave'], [F.wave[1], 'sndWatch']], face: faceF }, [1]);
+    const nb = [['nb1', 'sndFanB', 10, -22.6], ['nb2', 'sndFanC', 10, -21.4], ['nb3', 'sndFanD', 11, -23.15], ['nb4', 'sndFanC', 11, -20.85], ['nb5', 'sndFanB', 12, -22.5], ['nb6', 'sndFanD', 12, -21.3]];
     for (const [id, look, r, x] of nb) { const q = sndSideSeat(1, r, x); add({ id, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch']], face: sndFace(x, q.z, x * 0.6, 0) + (hash1(x * 3) - 0.5) * 30 }, [1]); }
 
     // 4. the free kick: referee, taker, wall, keeper, two more players
@@ -179,7 +179,8 @@ class SndCast {
       this.flag = this._flag(scene, SND.drum.x + 1.9, q.y + 1.5, q.z + 0.2); }
 
     // 6. your neighbours in the stand (rows 10–12), and the players on the pitch
-    for (const [r, x, look] of [[11, 4.6, 'sndFanA'], [11, 5.2, 'sndFanC'], [11, 5.8, 'sndFanB'], [10, 4.4, 'sndFanD'], [10, 5.0, 'sndFanE'], [10, 5.6, 'sndFanA'], [10, 6.2, 'sndFanC'], [12, 5.35, 'sndFanD'], [12, 4.75, 'sndFanB']]) {
+    // (the view runs out over x ≈ 5.9 in rows 10–11: nobody stands right on it, the nearest heads frame its lower corners)
+    for (const [r, x, look] of [[11, 4.55, 'sndFanA'], [11, 5.25, 'sndFanC'], [11, 6.6, 'sndFanE'], [11, 7.35, 'sndFanD'], [10, 4.4, 'sndFanD'], [10, 5.2, 'sndFanE'], [10, 6.6, 'sndFanA'], [10, 7.4, 'sndFanC'], [12, 4.9, 'sndFanD'], [12, 7.1, 'sndFanB']]) {
       const q = sndSideSeat(1, r, x), tT = sndThunderAt({ x, y: q.y + 1.6, z: q.z }) + 0.04 + hash1(x * 31) * 0.05;
       add({ id: 'me' + r + '_' + x, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch'], [tT, 'sndDuck']], face: sndFace(x, q.z, x * 0.3, -10) + (hash1(x * 7) - 0.5) * 24 }, [5]);
     }

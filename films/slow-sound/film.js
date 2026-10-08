@@ -24,6 +24,7 @@ const FILM = {
     app.crowd = new SndCrowd(scene);
     app.cast = new SndCast(app);
     app.ripples = new SndRipples(scene);
+    app.shells = new SndShells(scene);
     app.puffs = new SndPuffs(scene);
     // muted sleeve, skin-tone nails, long slim sleeves (docs/STYLE_BIBLE.md § 11)
     app.hands = new ViewerHands(camera, { scale: 1.04, sleeve: '#3a4652', nail: '#c99c84', sleeveLen: 1.1, sleeveFit: 0.78,
@@ -40,6 +41,7 @@ const FILM = {
     app.crowd.update(t);
     app.cast.update(t);
     app.ripples.update(t, fog);
+    app.shells.update(t, fog);
     app.puffs.update(t, fog);
     app.hands.update(t);
   },

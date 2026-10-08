@@ -27,6 +27,7 @@ function sndCrowdSeats() {
   const free = (stand, r, x) => {
     if (stand === 'main' && r >= 10 && r <= 12 && Math.abs(x - SND.friend.x) < 1.5) return false;   // the friend and their neighbours (rigs)
     if (stand === 'main' && r >= 10 && r <= 13 && Math.abs(x - 6.0) < 2.1) return false;             // your rows at the end (rigs)
+    if (stand === 'main' && r >= 6 && r <= 9 && Math.abs(x - 6.6) < 0.95) return false;              // your place at the start
     if (stand === 'far' && r >= 12 && r <= 14 && Math.abs(x - SND.drum.x) < 1.2) return false;       // the drummer
     return true;
   };

@@ -81,7 +81,7 @@ class SndStadium extends Environment {
           // how far round from the storm (radians), and an angle along the horizon for the cloud texture
           vec2 hz = normalize(d.xz + vec2(1e-5));
           float ang = acos(clamp(dot(hz, uStorm), -1.0, 1.0));
-          float az = atan(hz.x, hz.y);
+          float az = atan(hz.x * uStorm.y - hz.y * uStorm.x, dot(hz, uStorm));     // (measured from the storm: its seam is behind you)
           // fair-weather clouds (thinning toward the storm)
           if (h > 0.0) {
             vec2 uv = d.xz / (h + 0.18) * 1.1 + vec2(uTime * 0.006, uTime * 0.002);
@@ -93,22 +93,23 @@ class SndStadium extends Environment {
           // the storm: a cloud wall whose base hangs ~25° up in the middle, lower toward its sides; rain under it
           float wob = fbm(vec2(az * 5.0, 2.3)) - 0.5;
           float side = 1.0 - smoothstep(0.55, 1.05, ang + wob * 0.25);
-          float eb = 0.07 + 0.36 * (1.0 - smoothstep(0.0, 1.05, ang)) + wob * 0.05;      // the cloud base (elevation)
+          float eb = 0.06 + 0.2 * (1.0 - smoothstep(0.0, 1.05, ang)) + wob * 0.05;       // the cloud base (elevation)
           float et = 0.5 + 0.8 * (1.0 - smoothstep(0.0, 1.1, ang)) + (fbm(vec2(az * 3.0, el * 2.0 + 4.0)) - 0.5) * 0.35;   // the top of the wall
           float wall = side * (1.0 - smoothstep(et - 0.06, et + 0.02, el)) * smoothstep(-0.05, 0.0, h);
           if (wall > 0.001) {
             // the face: sunlit, lumpy towers; darker and bluer toward the base
             float b1 = fbm(vec2(az * 9.0, el * 7.0 - uTime * 0.004)), b2 = fbm(vec2(az * 22.0, el * 18.0) + 3.0);
             float up = smoothstep(eb, eb + 0.45, el);
-            vec3 face = mix(vec3(0.36, 0.41, 0.48), vec3(0.88, 0.87, 0.84), up * (0.55 + 0.6 * b1));
+            vec3 face = mix(vec3(0.075, 0.09, 0.115), vec3(0.62, 0.62, 0.63), pow(clamp(up * (0.45 + 0.6 * b1), 0.0, 1.0), 1.6));
             face *= 0.82 + 0.3 * b2;
             face += uSunColor * pow(max(dot(d, uSunDir) * -1.0 + 0.2, 0.0), 2.0) * 0.0;
             // the base and the rain below it: dark slate, a lighter band at the horizon, streaks of rain
             float rain = fbm(vec2(az * 60.0, el * 1.5));
-            vec3 under = mix(vec3(0.33, 0.37, 0.43), vec3(0.18, 0.21, 0.26), smoothstep(0.0, eb, el));
-            under *= 0.86 + 0.28 * rain;
+            vec3 under = mix(vec3(0.07, 0.08, 0.10), vec3(0.03, 0.036, 0.048), smoothstep(0.0, eb, el));
+            under *= 0.7 + 0.6 * rain;
             float below = 1.0 - smoothstep(eb - 0.012, eb + 0.012, el);
             vec3 storm = mix(face, under, below);
+            storm += vec3(0.05, 0.055, 0.06) * exp(-pow((el - eb) / 0.012, 2.0)) * (0.5 + b2);   // the shelf's lip
             // lightning: the cloud base lights up around the strike, the whole storm a little
             float fl = uFlash * (0.25 + 1.8 * exp(-pow(acos(clamp(dot(hz, uFlashDir), -1.0, 1.0)) / 0.18, 2.0)) * (0.4 + below));
             storm += vec3(0.78, 0.8, 1.0) * fl * (0.5 + 0.5 * b2);
@@ -435,10 +436,10 @@ class SndStadium extends Environment {
 
   _nets() {
     const c = Tex.canvas(64, 64), x = c.getContext('2d');
-    x.clearRect(0, 0, 64, 64); x.fillStyle = '#ffffff'; x.fillRect(0, 0, 64, 7); x.fillRect(0, 0, 7, 64);
+    x.clearRect(0, 0, 64, 64); x.fillStyle = '#ffffff'; x.fillRect(0, 0, 64, 4); x.fillRect(0, 0, 4, 64);
     const tex = Tex.tex(c, { srgb: true, repeat: true });
     const mk = () => new THREE.MeshStandardMaterial({ map: tex.clone(), alphaTest: 0.35, transparent: false, side: THREE.DoubleSide, roughness: 0.8, color: '#f4f4f0', name: 'net' });
-    const cell = 0.14;
+    const cell = 0.12;
     this.nets = [];
     for (const s of [-1, 1]) {
       const gx = 52.5 * s, D = 2.0;
