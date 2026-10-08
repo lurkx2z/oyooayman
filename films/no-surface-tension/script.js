@@ -33,7 +33,7 @@ const NST = {
   lapse: 39.2, lapse0: 39.3, lapse1: 43.4,  // days pass: the sunflower wilts and bows over the pond
   clouds: 44.2, rain: 45.0,        // (off screen, in the cut) the clouds come; it rains: torn shreds and mist, no drops
   fin: 47.0,                       // the rain on one bowed leaf: its tip can't make a drop, it lets the water go as a thread
-  desc: 50.8, wl: 53.2,            // down the thread to the pond, settling at the waterline: a soaked duck rides low
+  desc: 50.8, wl: 52.4,            // down the thread to the pond, settling at the waterline: a soaked duck rides low
   sink: 55.6,                      // … and sinks lower, paddling hard
   line1: 57.4, line2: 60.3, note: 63.5, end: 65.7,
   flashes: [],                     // (no lightning: the rain is a quiet grey roar)
@@ -52,7 +52,7 @@ function nstDay(t) {
   return 3.25 + (t - NST.lapse1) * 0.0015;
 }
 // how wilted the garden is (0 fresh → 1 badly wilted): soft plants start within hours, by day 3 it is straw
-function nstWilt(t) { return Math.pow(MathX.clamp((nstDay(t) - 1.02) / 2.1, 0, 1), 0.75); }
+function nstWilt(t) { return Math.pow(MathX.clamp((nstDay(t) - 1.01) / 1.25, 0, 1), 0.6); }      // (with its vessels failed it droops within hours, like a cut stem)
 // lightning: each flash flickers and holds for ~5 frames
 function nstFlash(t) {
   let f = 0;
@@ -91,47 +91,47 @@ const SCRIPT = {
   // Garden: outside the same wall (z < 0). Pond around (−1.2, −7); potting bench against the wall at x 1.7–3.3.
   camera: {
     baseY: 0,
-    x: [[0, -0.54], [4.4, -0.54], [4.4, 0.68, 'step'], [9.6, 0.67], [9.6, -0.175, 'step'], [14.6, -0.175],
+    x: [[0, -0.54], [4.39, -0.54], [4.4, 0.68, 'step'], [9.59, 0.67], [9.6, -0.175, 'step'], [14.59, -0.175],
       [14.6, -0.4, 'step'], [21.4, -0.4],
-      [22.2, -0.62, 'step'], [29.0, -0.62],
-      [29.0, 2.312, 'step'], [33.7, 2.308],
-      [33.7, 60.0, 'step'], [39.2, 60.0],
-      [39.2, -2.2, 'step'], [43.6, -2.2],
+      [22.2, -0.62, 'step'], [28.99, -0.62],
+      [29.0, 2.312, 'step'], [33.69, 2.308],
+      [33.7, 60.0, 'step'], [39.19, 60.0],
+      [39.2, -2.2, 'step'], [43.59, -2.2],
       [43.6, -0.9, 'step'], [65.7, -0.9]],
-    z: [[0, 1.07], [4.4, 1.01, 'linear'], [4.4, 0.68, 'step'], [9.6, 0.68], [9.6, 0.98, 'step'], [14.6, 0.96],
+    z: [[0, 1.07], [4.39, 1.01, 'linear'], [4.4, 0.68, 'step'], [9.59, 0.68], [9.6, 0.98, 'step'], [14.59, 0.96],
       [14.6, 1.09, 'step'], [15.7, 1.075], [16.25, 1.24, 'outCubic'], [17.4, 1.21], [18.6, 1.15], [21.4, 1.0],
-      [22.2, -5.14, 'step'], [29.0, -5.14],
-      [29.0, -0.9, 'step'], [33.7, -0.88],
-      [33.7, 60.82, 'step'], [39.2, 60.66],
-      [39.2, -4.2, 'step'], [43.6, -4.32],
+      [22.2, -5.14, 'step'], [28.99, -5.14],
+      [29.0, -0.9, 'step'], [33.69, -0.88],
+      [33.7, 60.82, 'step'], [39.19, 60.66],
+      [39.2, -4.2, 'step'], [43.59, -4.32],
       [43.6, -5.4, 'step'], [65.7, -5.4]],
-    height: [[0, 1.25], [4.4, 1.22], [4.4, 1.1, 'step'], [9.6, 1.1], [9.6, 1.13, 'step'], [14.6, 1.13],
+    height: [[0, 1.25], [4.39, 1.22], [4.4, 1.1, 'step'], [9.59, 1.1], [9.6, 1.13, 'step'], [14.59, 1.13],
       [14.6, 1.2, 'step'], [15.7, 1.2], [16.25, 1.26, 'outCubic'], [17.4, 1.24], [21.4, 1.17],
-      [22.2, 0.6, 'step'], [29.0, 0.56],
-      [29.0, 1.03, 'step'], [33.7, 1.03],
-      [33.7, -39.98, 'step'], [39.2, -40.0],
-      [39.2, 0.6, 'step'], [43.6, 0.6],
+      [22.2, 0.6, 'step'], [28.99, 0.56],
+      [29.0, 1.03, 'step'], [33.69, 1.03],
+      [33.7, -39.98, 'step'], [39.19, -40.0],
+      [39.2, 0.6, 'step'], [43.59, 0.6],
       [43.6, 1.0, 'step'], [65.7, 1.0]],      // (from the rain on: the camera is flown by film.js)
-    yaw: [[0, 0], [4.4, 0], [4.4, 63, 'step'], [9.6, 64], [9.6, 0, 'step'], [14.6, 0],
+    yaw: [[0, 0], [4.39, 0], [4.4, 63, 'step'], [9.59, 64], [9.6, 0, 'step'], [14.59, 0],
       [14.6, 0, 'step'], [21.4, 0],
-      [22.2, 2, 'step'], [23.7, 1], [24.5, 0, 'inOutSine'], [29.0, -1],
-      [29.0, 180, 'step'], [33.7, 180.5],
-      [33.7, 0, 'step'], [39.2, 0],
-      [39.2, 0, 'step'], [43.6, 0],
+      [22.2, 2, 'step'], [23.7, 1], [24.5, 0, 'inOutSine'], [28.99, -1],
+      [29.0, 180, 'step'], [33.69, 180.5],
+      [33.7, 0, 'step'], [39.19, 0],
+      [39.2, 0, 'step'], [43.59, 0],
       [43.6, 0, 'step'], [65.7, 0]],
-    pitch: [[0, -20], [4.4, -20.5], [4.4, 5, 'step'], [6.9, 4], [9.6, -1], [9.6, -19, 'step'], [10.9, -21], [11.6, -25, 'inOutSine'], [14.6, -26],
+    pitch: [[0, -20], [4.39, -20.5], [4.4, 5, 'step'], [6.9, 4], [9.59, -1], [9.6, -19, 'step'], [10.9, -21], [11.6, -25, 'inOutSine'], [14.59, -26],
       [14.6, -18, 'step'], [15.7, -18.5], [16.25, 4, 'outCubic'], [16.9, 4], [17.7, -8], [18.7, -17], [21.4, -19],
-      [22.2, -65, 'step'], [24.4, -66], [29.0, -66.5],
-      [29.0, -10, 'step'], [33.7, -10],
-      [33.7, 0, 'step'], [39.2, 0],
-      [39.2, 18, 'step'], [43.6, 17],
+      [22.2, -65, 'step'], [24.4, -66], [28.99, -66.5],
+      [29.0, -10, 'step'], [33.69, -10],
+      [33.7, 0, 'step'], [39.19, 0],
+      [39.2, 18, 'step'], [43.59, 17],
       [43.6, 0, 'step'], [65.7, 0]],
-    fov: [[0, 36], [4.4, 35], [4.4, 46, 'step'], [9.6, 42], [9.6, 30, 'step'], [14.6, 29],
+    fov: [[0, 36], [4.39, 35], [4.4, 46, 'step'], [9.59, 42], [9.6, 30, 'step'], [14.59, 29],
       [14.6, 42, 'step'], [15.7, 40], [16.25, 54, 'outCubic'], [17.4, 52], [18.7, 45], [21.4, 37],
-      [22.2, 24, 'step'], [24.4, 17, 'inOutSine'], [29.0, 16],
-      [29.0, 36.5, 'step'], [33.7, 35],
-      [33.7, 46, 'step'], [39.2, 41],
-      [39.2, 56, 'step'], [43.6, 54],
+      [22.2, 24, 'step'], [24.4, 17, 'inOutSine'], [28.99, 16],
+      [29.0, 36.5, 'step'], [33.69, 35],
+      [33.7, 46, 'step'], [39.19, 41],
+      [39.2, 56, 'step'], [43.59, 54],
       [43.6, 50, 'step'], [65.7, 50]],
     tilt: [[0, 0], [65.7, 0]],
     startles: [[NST.drop + 0.15, 0.35], [NST.sodaOpen + 0.04, 0.9], [NST.strider + 0.4, 0.25], [NST.snap + 0.02, 0.5], [NST.snap + 1.17, 0.25]],
@@ -164,9 +164,9 @@ const SCRIPT = {
       { t: 22.9, until: 27.75, text: 'Insects that walk on water fall through.' },
       { t: 30.3, until: 33.65, text: 'Water can’t climb thin tubes anymore.' },
       { t: 34.05, until: 36.25, text: 'Plants pull water up through hair-thin tubes.' },
-      { t: 36.45, until: 39.15, text: 'Without surface tension, air leaks in and the pull breaks.' },
+      { t: 36.45, until: 39.15, text: 'Without surface tension, the leaves can’t pull and air gets in.' },
       { t: 47.4, until: 50.7, text: 'Rain can’t hold itself together.' },
-      { t: 53.4, until: 57.0, text: 'And feathers can’t keep it out.' },
+      { t: 53.0, until: 57.0, text: 'And feathers can’t keep it out.' },
       { t: NST.line1, until: NST.line2 - 0.25, text: 'It looks like a tiny force…' },
       { t: NST.line2, until: NST.note - 0.1, text: '…until an entire ecosystem depends on it.' },
     ],
@@ -174,11 +174,11 @@ const SCRIPT = {
       { from: -0.6, until: 21.3, top: 220, label: 'SURFACE TENSION', value: (t) => `${Math.round(nstSigma(t))} mN/m`, sub: (t) => (t < NST.drop ? 'LIQUID WATER · 20 °C' : t < NST.soda ? 'WATER ONLY · EVERYTHING ELSE NORMAL' : 'NOTHING HOLDS NEW BUBBLES BACK') },
       { from: 22.5, until: 27.75, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'NO SURFACE SKIN TO STAND ON' },
       { from: 29.9, until: 33.65, top: 220, label: 'CAPILLARY RISE', value: () => '0 mm', sub: 'IT USED TO CLIMB HIGHER IN THINNER TUBES' },
-      { from: 33.9, until: 39.15, top: 220, label: 'WATER IN THE STEM', value: (t) => (t < NST.snap ? 'HOLDING' : 'BROKEN'), sub: (t) => (t < NST.snap ? 'PULLED UP BY THE LEAVES' : 'AIR GOT IN THROUGH A PORE') },
+      { from: 33.9, until: 39.15, top: 220, label: 'WATER IN THE STEM', value: (t) => (t < NST.snap ? 'HOLDING' : 'BROKEN'), sub: (t) => (t < NST.snap ? 'THE INSTANT OF THE CHANGE' : 'AIR GOT IN THROUGH A PORE') },
       { from: 39.4, until: 43.55, top: 220, label: 'TIME SINCE THE CHANGE', value: (t) => nstDayText(t), sub: 'THE PLANTS ARE WILTING' },
       { from: 47.3, until: 50.75, top: 220, label: 'ROUND DROPS', value: () => '0', sub: 'NOT EVEN ON A LEAF TIP' },
-      { from: 53.3, until: 57.05, top: 220, label: 'DUCK’S FEATHERS', value: () => 'SOAKED', sub: 'NO TRAPPED AIR · IT RIDES LOW' },
-      { from: 57.25, until: 63.3, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'SAME WATER · NO DROPS' },
+      { from: 52.9, until: 57.05, top: 220, label: 'DUCK’S FEATHERS', value: () => 'SOAKED', sub: 'NO TRAPPED AIR · IT RIDES LOW' },
+      { from: 57.25, until: 60.55, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'SAME WATER · NO DROPS' },      // (off before the tilt-up brings the sunflower's head into its corner)
     ],
     notes: [
       { t: NST.note, until: NST.end + 0.2, text: 'FICTIONAL RULE: ONLY WATER’S SURFACE TENSION CHANGED<br>TIME COMPRESSED' },

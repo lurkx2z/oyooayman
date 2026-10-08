@@ -45,7 +45,7 @@ const NST_FIN = {
   a0: [0.3, 0.02, 0.1], la0: [0.0, -0.04, 0.0], a1: [0.27, 0.01, 0.09], la1: [0.0, -0.05, 0.0], fov0: 40, fov1: 37,
   bc: [0.75, -0.45, -0.55], lbc: [0.0, -0.5, 0.0],
   c0: [0.5, 0, -1.5], lc0: [0.0, -0.61, 0.0], c1: [0.47, 0, -1.42], lc1: [0.0, -0.6, 0.0], fovC: 54,
-  lc2: [-0.05, -0.17, 0.0], fovE: 64,
+  lc2: [-0.05, -0.04, 0.0], fovE: 64,
 };
 
 const FILM = {
@@ -200,7 +200,7 @@ const FILM = {
     } else this.canStream.update(t, 0, 1);
 
     // the lens at the waterline: the line sits on the horizon (the camera is exactly at the water's surface)
-    const pu = this.port.material.uniforms, onP = MathX.smooth(t, T.wl - 0.05, T.wl + 0.15);
+    const pu = this.port.material.uniforms, onP = t < T.desc ? 0 : Math.max(MathX.smooth(t, T.wl - 0.05, T.wl + 0.15), 1 - MathX.smooth(cam.position.y, NST_G.pond.y + 0.004, NST_G.pond.y + 0.05));     // (on as the camera reaches the surface: no grazing grey slab)
     pu.uOn.value = onP; pu.uT.value = t;
     if (onP > 0) { cam.getWorldDirection(this._w); pu.uH.value = -Math.tan(Math.asin(this._w.y)) / Math.tan(MathX.deg(cam.fov / 2)) - 0.004; }
 
@@ -228,7 +228,7 @@ const FILM = {
     // nights in the time-lapse: lifted so they read as moonlight, not black frames
     if (t > T.lapse && t < T.clouds) p.exposure += 0.5 * (1 - nstDaylight(nstDay(t)));
     // the finale: a little clearer than the storm grade (the rain is grey, the subject mustn't be)
-    p.exposure += 0.1 * MathX.smooth(t, T.fin - 0.1, T.fin); p.saturation += 0.08 * MathX.smooth(t, T.fin - 0.1, T.fin);
+    p.exposure += 0.45 * MathX.smooth(t, T.fin - 0.1, T.fin) + 0.3 * MathX.smooth(t, T.fin - 0.1, T.fin) * (1 - MathX.smooth(t, T.desc, T.wl)); p.saturation += 0.12 * MathX.smooth(t, T.fin - 0.1, T.fin);      // (the finale was too dark to read on a phone)
     // black at the end
     p.fade = MathX.smooth(t, T.end - 0.7, T.end);
   },

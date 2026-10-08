@@ -38,12 +38,12 @@ class NstStem {
     c.fillStyle = '#4f6b3a'; c.fillRect(0, 0, 512, 512);
     const pts = []; for (let i = 0; i < 70; i++) pts.push([hash1(i * 3.1) * 512, hash1(i * 7.7 + 1) * 512]);
     const img = c.getImageData(0, 0, 512, 512), D = img.data;
-    for (let y = 0; y < 512; y += 2) for (let x = 0; x < 512; x += 2) {
+    for (let y = 0; y < 512; y++) for (let x = 0; x < 512; x++) {
       // distance to the nearest and second-nearest cell centre (wrapped): walls where they are nearly equal
       let d1 = 1e9, d2 = 1e9;
       for (const [px, py] of pts) { let dx = Math.abs(x - px), dy = Math.abs(y - py); dx = Math.min(dx, 512 - dx); dy = Math.min(dy, 512 - dy); const d = dx * dx + dy * dy; if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d; }
-      const w = Math.sqrt(d2) - Math.sqrt(d1), k = w < 3 ? 0.45 : w < 7 ? 0.8 : 1.0, sh = 0.9 + 0.2 * (Math.sqrt(d1) / 40);
-      for (const [ox, oy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) { const i = ((y + oy) * 512 + x + ox) * 4; D[i] = 120 * k * sh; D[i + 1] = 156 * k * sh; D[i + 2] = 92 * k * sh; }
+      const w = Math.sqrt(d2) - Math.sqrt(d1), k = 0.45 + 0.35 * MathX.smooth(w, 1.5, 4) + 0.2 * MathX.smooth(w, 5, 9), sh = 0.9 + 0.2 * (Math.sqrt(d1) / 40);
+      const i = (y * 512 + x) * 4; D[i] = 120 * k * sh; D[i + 1] = 150 * k * sh; D[i + 2] = 100 * k * sh;
     }
     c.putImageData(img, 0, 0);
     const ct = Tex.tex(cv); ct.repeat.set(5, 3);
@@ -136,7 +136,7 @@ class NstStem {
         if (yy > y1 && yy < y2) continue;
         if (yy < -hH || yy > hH) continue;
         const x = o.x + T.tg.position.x + Math.cos(a) * rr, z = o.z + Math.sin(a) * rr, yw = o.y + yy;
-        F.push(x, yw, z, x, yw + 0.022, z, 0.8, 0.92, 1.0, 0.7, 0.0026);
+        F.push(x, yw, z, x, yw + 0.008, z, 0.85, 0.94, 1.0, 0.75, 0.004);
       }
     }
     // the air tongue: it pokes through the pit (left wall of the middle tube) just before the snap, then is the gap

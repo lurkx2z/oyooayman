@@ -19,8 +19,8 @@ const NST_G = {
   sunflower: { x: -2.49, z: -6.04 },      // among the pond's rim stones; its big leaf reaches out over the water
   // the soaked duck in the finale, (x, z) at NST.desc, wl, sink, line1, line2, end: in front of the waterline camera,
   // a little to the right of the leaf's thread, slowing as it sinks
-  duck: [[-1.468, -6.382], [-1.738, -6.524], [-1.848, -6.603], [-1.88, -6.635], [-1.895, -6.651], [-1.902, -6.663]],
-  duckFloat: 0.022, duckSoaked: -0.034, duckSunk: -0.066,     // body height above the pond's surface: normal / soaked / sinking
+  duck: [[-1.58, -6.366], [-1.886, -6.553], [-1.969, -6.622], [-1.994, -6.641], [-2.01, -6.657], [-2.016, -6.67]],
+  duckFloat: 0.036, duckSoaked: -0.03, duckSunk: -0.052,     // body height above the pond's surface: normal / soaked / sinking
 };
 
 // the sun for a given garden day (1.0 = 10:00 on the morning of the change)
@@ -104,7 +104,7 @@ class NstGarden extends Environment {
     this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0035);
     this.scene.background = new THREE.Color('#c3d3dc');
     this.dayCols = { zen: new THREE.Color('#5d86b3'), hor: new THREE.Color('#c6d4da'), fog: new THREE.Color('#aab6b5') };
-    this.nightCols = { zen: new THREE.Color('#1b2944'), hor: new THREE.Color('#3d4b6a'), fog: new THREE.Color('#2c3850') };
+    this.nightCols = { zen: new THREE.Color('#1f2633'), hor: new THREE.Color('#414a5a'), fog: new THREE.Color('#303845') };      // (a grey-blue night, not royal blue)
     this.stormCols = { zen: new THREE.Color('#3b4248'), hor: new THREE.Color('#6d767a'), fog: new THREE.Color('#5f686b') };
   }
 
@@ -240,7 +240,7 @@ class NstGarden extends Environment {
     const gr = vc.createRadialGradient(128, 128, 60, 128, 128, 128); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(0.85, 'rgba(0,0,0,0.05)'); gr.addColorStop(1, 'rgba(60,40,0,0.45)');
     vc.fillStyle = gr; vc.fillRect(0, 0, 256, 256);
     const vt = Tex.tex(vcv);
-    const padM = new THREE.MeshStandardMaterial({ color: '#36612a', map: vt, roughness: 0.4, name: 'nstPad', side: THREE.DoubleSide }), padM2 = new THREE.MeshStandardMaterial({ color: '#416d30', map: vt, roughness: 0.45, name: 'nstPad2', side: THREE.DoubleSide });
+    const padM = new THREE.MeshStandardMaterial({ color: '#46593a', map: vt, roughness: 0.4, name: 'nstPad', side: THREE.DoubleSide }), padM2 = new THREE.MeshStandardMaterial({ color: '#4f6340', map: vt, roughness: 0.45, name: 'nstPad2', side: THREE.DoubleSide });
     this.pads = NST_G.pads.map(([x, z, rr, ry], i) => {
       const g = new THREE.CircleGeometry(rr, 28, 0.25, Math.PI * 2 - 0.5);
       const p = g.attributes.position; for (let k = 0; k < p.count; k++) { const px = p.getX(k), py = p.getY(k); p.setZ(k, 0.004 * (px * px + py * py) / (rr * rr)); } g.computeVertexNormals();
@@ -336,7 +336,7 @@ class NstGarden extends Environment {
     // the plant in pot B (wilts more: it depends on the wick)
     this.potPlantB = this._leafyPlant(Bp.x, top + 0.265, Bp.z, 0.7, 5);
     // a big potted plant on the patio (a dark foreground shape in the time-lapse; it droops)
-    const bp = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.2, 0.45, 20), Mat.std('#4a4d50', { roughness: 0.7 })); bp.position.set(-2.75, 0.225, -2.15); bp.castShadow = true; bp.receiveShadow = true; this.root.add(bp);
+    const bp = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.2, 0.45, 20), Mat.std('#4a4d50', { roughness: 0.7 })); bp.position.set(-2.75, 0.225, -2.15); bp.castShadow = true; bp.receiveShadow = true; this.root.add(bp); this.bigPot = bp;
     this.bigPlant = this._leafyPlant(-2.75, 0.44, -2.15, 3.0, 9);
   }
 
@@ -555,7 +555,8 @@ class NstGarden extends Environment {
     // green → olive → brown; petals curl brown
     const S = this.sunMats, B = this.sunBase, dry = this._sunDry || (this._sunDry = { leaf: new THREE.Color('#7a6a36'), petal: new THREE.Color('#8a6a2a'), stem: new THREE.Color('#6d6a38') });
     S.leaf.color.copy(B.leaf).lerp(dry.leaf, 0.85 * w); S.petal.color.copy(B.petal).lerp(dry.petal, 0.9 * w); S.stem.color.copy(B.stem).lerp(dry.stem, 0.7 * w);
-    S.leaf.emissive.copy(S.leaf.color).multiplyScalar(0.12 * MathX.smooth(t, NST.fin - 0.5, NST.fin));      // (a little fill on the hero leaf for the close-up in the grey rain)
+    S.leaf.emissive.copy(S.leaf.color).multiplyScalar(0.22 * MathX.smooth(t, NST.fin - 0.5, NST.fin));
+    S.petal.emissive.copy(S.petal.color).multiplyScalar(0.55 * MathX.smooth(t, NST.fin - 0.5, NST.fin));      // (the petals stay yellow against the grey sky in the finale)      // (a little fill on the hero leaf for the close-up in the grey rain)
     // wet in the rain: glossy, a film of water over the hero leaf; the tip lets it go as a thread, never a drop
     S.leaf.roughness = MathX.lerp(0.45, 0.18, rain);
     this.leafFilmMat.opacity = (0.1 + 0.14 * surge) * rain;
@@ -641,8 +642,8 @@ class NstGarden extends Environment {
     });
     // a pale ghost of the duck floating where it would ride with dry feathers (the same ghost look as the paperclip and
     // the tubes); it copies the real duck's pose each frame, wings folded
-    this.duckGhostMat = nstGlassy('#f4fbff', 0.015, 0.34, { side: THREE.FrontSide });
-    const gd = d.clone(true); gd.traverse((o) => { if (o.isMesh) { o.material = this.duckGhostMat; o.castShadow = false; o.renderOrder = 7; } });
+    this.duckGhostMat = nstGlassy('#f4fbff', 0.0, 0.26, { side: THREE.FrontSide });
+    const gd = d.clone(true); gd.traverse((o) => { if (o.isMesh) { o.material = this.duckGhostMat; o.castShadow = false; o.renderOrder = 7; if (o.geometry.parameters && o.geometry.parameters.radius < 0.01) o.visible = false; } });      // (an outline only: no eyes)
     this.root.add(gd); this.duckGhost = gd; gd.visible = false;
     this._dNodes = []; this._gNodes = []; d.traverse((o) => this._dNodes.push(o)); gd.traverse((o) => this._gNodes.push(o));
     d.visible = false;
@@ -694,6 +695,7 @@ class NstGarden extends Environment {
     this._droop(this.potPlantA, t < NST.lapse ? 0 : wilt);
     this._droop(this.potPlantB, t < NST.lapse ? 0.25 * MathX.smooth(t, NST.wick - 2, NST.wick + 3) : Math.min(1, wilt * 1.3));
     this._droop(this.bigPlant, wilt);
+    this.bigPlant.visible = this.bigPot.visible = t < NST.fin;      // (out of the finale: its silhouette sat right behind the duck)
 
     // the pond: striders. Before the change they would stand in dimples; now: crowded on a pad, one steps off and falls through
     this._updateStriders(t);
@@ -715,7 +717,7 @@ class NstGarden extends Environment {
 
   _updateDuck(t) {
     const T = NST, G = NST_G, P = G.pond, d = this.duck, gd = this.duckGhost;
-    d.visible = t > T.desc - 0.5;
+    d.visible = t > T.wl - 0.5;      // (it paddles in from the right as the camera reaches the water)
     if (!d.visible) { gd.visible = false; return; }
     const ph = (t - T.desc) * Math.PI * 2 * 1.7;                   // paddling hard: ~1.7 strokes a second
     // it paddles into the waterline shot from the right, toward the leaf's thread, and slows as it settles lower
@@ -746,7 +748,7 @@ class NstGarden extends Environment {
       w.pv.rotation.set(0, w.sd * 1.1 * bout, w.sd * bout * (0.05 + 0.6 * beat));
     }
     // the ghost: where it would float with dry, air-filled feathers
-    const ga = MathX.smooth(t, T.wl + 0.8, T.wl + 1.4) * (1 - MathX.smooth(t, T.line1 - 0.4, T.line1 + 0.2));     // (gone for the closing lines)
+    const ga = MathX.smooth(t, T.wl + 0.8, T.wl + 1.4) * (1 - MathX.smooth(t, T.line2, T.line2 + 0.6));     // (gone as the camera tilts up)
     gd.visible = ga > 0.003; this.duckGhostMat.uniforms.uK.value = ga;
     if (gd.visible) {
       for (let i = 1; i < this._dNodes.length; i++) {
@@ -819,7 +821,7 @@ class NstGarden extends Environment {
         // the ribbon trails up-wind of its head: length 0.2–0.6 m, a helical twist that travels along it
         const L = 0.2 + 0.4 * sz, hyp = Math.hypot(wind, vf), dx = -wind / hyp, dy = vf / hyp;
         const A = (0.018 + 0.03 * sz) * (1 - 0.7 * MathX.smooth(cp.y, 2, 6)), ph0 = hash1(i * 9.1 + cyc) * 6.283, gap = Math.floor(hash1(i * 4.4 + cyc) * 7);     // (seen from above, the twist reads as squiggles)
-        const a = 0.2 * rain * (0.55 + 0.45 * sz) * Math.min(1, age * 8) * Math.min(1, (1 - age) * 8) * near;
+        const a = 0.15 * rain * (0.55 + 0.45 * sz) * Math.min(1, age * 8) * Math.min(1, (1 - age) * 8) * near;
         for (let k = 0; k < 6; k++) {
           const u = k / 5, w = A * (0.35 + 0.65 * u), q = ph0 + u * 7.5 - tt * 5;
           P[k * 3] = x + dx * L * u - dy * w * Math.sin(q);
@@ -832,7 +834,7 @@ class NstGarden extends Environment {
           const ya = P[k * 3 + 1], yb = P[k * 3 + 4];
           if (ya < WY && yb < WY) continue;
           if (ya < WY || yb < WY) { const f = (WY - ya) / (yb - ya), lo = ya < WY ? 0 : 3; for (let c = 0; c < 3; c++) P[k * 3 + lo + c] = P[k * 3 + c] + (P[k * 3 + 3 + c] - P[k * 3 + c]) * f; }
-          const u = k / 5, ak = a * (1 - 0.55 * u), wk = (0.011 + 0.012 * sz) * (1 - 0.45 * u);     // (wide translucent strips: thin lines read as scratches)
+          const u = k / 5, ak = a * (1 - 0.55 * u), wk = (0.008 + 0.009 * sz) * (1 - 0.45 * u);     // (wide translucent strips: thin lines read as scratches)
           // the streak quad overhangs its ends by its width: pull the ends in so links don't overlap into bright beads
           const ex = P[k * 3 + 3] - P[k * 3], ey = P[k * 3 + 4] - P[k * 3 + 1], ez = P[k * 3 + 5] - P[k * 3 + 2], el = Math.hypot(ex, ey, ez) || 1, f = wk / el;
           S.push(P[k * 3] + ex * f, P[k * 3 + 1] + ey * f, P[k * 3 + 2] + ez * f, P[k * 3 + 3] - ex * f, P[k * 3 + 4] - ey * f, P[k * 3 + 5] - ez * f, 0.72, 0.82, 0.92, ak, wk);

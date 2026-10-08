@@ -11,7 +11,7 @@ const NST_TB = {
   dish: { x: 2.3, z: -0.4, r: 0.07, h: 0.022 },     // on the bench top (NST_G.bench.top)
   fill: 0.011,                                      // how deep the water in the dish ends up (m)
   // tubes left → right on screen (the camera faces +Z, so screen-left is +X): thick → thin
-  dx: [0.027, 0.009, -0.009, -0.027], ro: [0.0034, 0.0029, 0.0024, 0.0019], rb: [0.0016, 0.0011, 0.0008, 0.0005],
+  dx: [0.027, 0.009, -0.009, -0.027], ro: [0.0045, 0.0033, 0.0024, 0.0017], rb: [0.0024, 0.0014, 0.0008, 0.0005],
   hN: [0.025, 0.043, 0.068, 0.099],                 // normal capillary rise (m) above the dish level
   zt: -0.006,                                       // tube row, relative to the dish centre (the card is behind, +Z)
 };
@@ -31,7 +31,7 @@ class NstTubes {
     const lip = new THREE.Mesh(new THREE.TorusGeometry(D.r, 0.0012, 5, 48), nstGlassy('#f4fbfc', 0.25, 0.5)); lip.rotation.x = Math.PI / 2; lip.position.set(D.x, top + D.h, D.z); lip.renderOrder = 5; g.add(lip);
     const base = new THREE.Mesh(new THREE.CircleGeometry(D.r, 40), nstGlassy('#dfeef0', 0.12, 0.3)); base.rotation.x = -Math.PI / 2; base.position.set(D.x, top + 0.0012, D.z); base.renderOrder = 4; g.add(base);
     // the water in the dish (blue from a few drops of ink): its height is set per frame
-    this.dishWaterMat = nstGlassy('#2a6f9f', 0.5, 0.3, { side: THREE.FrontSide });
+    this.dishWaterMat = nstGlassy('#33658a', 0.5, 0.3, { side: THREE.FrontSide });
     this.dishWater = new THREE.Mesh(new THREE.CylinderGeometry(D.r - 0.0012, D.r - 0.0012, 1, 40), this.dishWaterMat);
     this.dishWater.position.set(D.x, this.y0, D.z); this.dishWater.renderOrder = 6; g.add(this.dishWater);
     // the ink before the pour: a dark blue blot on the dish's floor
@@ -39,7 +39,7 @@ class NstTubes {
     this.ink.rotation.x = -Math.PI / 2; this.ink.position.set(D.x + 0.02, top + 0.0016, D.z - 0.03); this.ink.renderOrder = 5; g.add(this.ink);
 
     // the card behind the tubes, ruled every centimetre, numbered every 2 cm (canvas left = screen left = +X)
-    const W = 0.112, Hc = 0.122, cy = zero - 0.006 + Hc / 2, cz = D.z + 0.022, cx = D.x + 0.004;
+    const W = 0.112, Hc = 0.122, cy = zero - 0.006 + Hc / 2, cz = D.z + NST_TB.zt + 0.0055, cx = D.x + 0.004;     // (flush behind the tubes: no parallax against the scale)
     const cv = Tex.canvas(448, 488), c = cv.getContext('2d'), px = 448 / W;
     c.fillStyle = '#2b3237'; c.fillRect(0, 0, 448, 488);
     const yPx = (h) => 488 - (h + 0.006) * px;                    // h: metres above the zero line
@@ -58,10 +58,9 @@ class NstTubes {
     // the card's wooden stand: two posts and a foot
     const wood = Mat.std('#7a5a3c', { roughness: 0.85 });
     for (const sx of [-1, 1]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.008, Hc + 0.02, 0.008), wood); p.position.set(cx + sx * (W / 2 + 0.004), top + (Hc + 0.02) / 2 + 0.004, cz + 0.002); p.castShadow = true; g.add(p); }
-    const foot = new THREE.Mesh(new THREE.BoxGeometry(W + 0.03, 0.008, 0.03), wood); foot.position.set(cx, top + 0.004, cz + 0.01); g.add(foot);
 
     // the tubes: thick glass walls, a narrow bore; the real water and the ghost of normal water inside the bore
-    const tubeH = 0.124, ty = top + 0.004;
+    const tubeH = 0.118, ty = top + 0.004;
     this.cols = []; this.ghosts = []; this.caps = [];
     const colMat = nstGlassy('#2b78b4', 0.85, 0.15, { side: THREE.FrontSide });
     const ghostMat = new THREE.MeshBasicMaterial({ color: '#f4fbff', transparent: true, opacity: 0, depthWrite: false });

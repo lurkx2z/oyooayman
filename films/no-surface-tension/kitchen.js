@@ -167,6 +167,9 @@ class NstKitchen {
     const wm = nstWaterMat({ color: '#6f8a93', opacity: 0.5, fres: 0.8 });
     this.stream = new NstStream(g, wm, { a: new THREE.Vector3(T.spout[0], T.spout[1] - 0.004, T.spout[2]), v0: new THREE.Vector3(0, -0.28, 0.012), r0: 0.0036, yEnd: top - sd + 0.02, seed: 4, spread: 0.2, frayLen: 0.17, ns: 60, nrad: 12 });
     this.spray = new NstSpray(this.scene, 900);      // a stream with nothing smoothing it sheds shreds and mist, not drops
+    // ghosts of the drops a normal stream would pinch into below the break-up point (the film's "normal water" ghost)
+    this.tapGhostMat = nstGlassy('#f4fbff', 0.04, 0.95, { side: THREE.FrontSide });
+    this.tapGhosts = [0, 1, 2, 3, 4, 5, 6].map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), this.tapGhostMat); m.renderOrder = 9; m.visible = false; g.add(m); return m; });
 
     // ---------- upper cabinets, a fridge edge, a shelf: the room around the counter
     for (const [x0, x1] of [[-1.75, -0.45], [1.05, 1.5]]) {
@@ -564,6 +567,18 @@ class NstKitchen {
     this.basinW.position.y = level;
     this.stream.yEnd = level;
     this._tapMist(t, on * (1 + 0.2 * more), level);
+    // the ghost drops: a chain of beads drifting down the lower part of the stream (Rayleigh–Plateau: one drop per
+    // ~9 stream radii, each about twice as wide as the stream), where normal water would have broken up
+    const gk = MathX.smooth(t, T.tapOn + 1.3, T.tapOn + 1.8) * (1 - MathX.smooth(t, T.clip - 0.45, T.clip - 0.1)), n = this.tapGhosts.length;
+    this.tapGhostMat.uniforms.uK.value = gk;
+    for (let i = 0; i < n; i++) {
+      const m = this.tapGhosts[i], u = 0.36 + 0.64 * ((i + ((t * 0.9) % 1)) / n);
+      m.visible = gk > 0.003 && u < 0.985;
+      if (!m.visible) continue;
+      this.stream.at(u * this.stream.T, this.v2);
+      const R = 0.0058 * (1 + 0.35 * more) * MathX.smooth(u, 0.36, 0.46), e = 1 - MathX.smooth(u, 0.4, 0.6);
+      m.position.copy(this.v2); m.scale.set(R * (1 - 0.25 * e), Math.max(R, 1e-4) * (1 + 0.6 * e), R * (1 - 0.25 * e));
+    }
 
     // the paperclip: in your fingers, set on the water, straight through, onto the bottom
     this.clipPos(t, this.v);
