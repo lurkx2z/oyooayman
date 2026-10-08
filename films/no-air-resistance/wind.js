@@ -131,7 +131,7 @@ class NrWind {
       const U = { uLoad: { value: 0 }, uLimp: { value: 0 }, uRip: { value: 0 }, uT: { value: 0 }, uPh: { value: i * 1.7 } };
       const c = Tex.canvas(160, 100), x = c.getContext('2d'); designs[i % designs.length](x);
       const mat = new THREE.MeshStandardMaterial({ map: Tex.tex(c, { repeat: false }), roughness: 0.8, side: THREE.DoubleSide });
-      mat.onBeforeCompile = (sh) => { Object.assign(sh.uniforms, U); sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uLoad, uLimp, uRip, uT, uPh;').replace('#include <begin_vertex>', `#include <begin_vertex>
+      const patch = (U) => (sh) => { Object.assign(sh.uniforms, U); sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uLoad, uLimp, uRip, uT, uPh;').replace('#include <begin_vertex>', `#include <begin_vertex>
         { float u = position.x / ${Lf.toFixed(2)}, v = -position.y / ${Hf.toFixed(2)};
           // flying: out along +x, drooping a little at low push; a travelling ripple
           float droop = mix(0.55, 0.06, clamp(uLoad, 0.0, 1.0));
@@ -141,10 +141,17 @@ class NrWind {
           float sp = 0.06 + 0.5 * u + 0.08 * sin(u * 9.0 + v * 2.2) * u, fo = 0.15 * sin(u * 7.5 + v * 3.0 + uPh) * u + 0.05 * sin(v * 9.0) * u;
           vec3 limp = vec3(0.864 * sp + 0.503 * fo, -v * ${Hf.toFixed(2)} * (1.0 - 0.25 * u) - u * ${(Lf * 0.62).toFixed(2)}, -0.503 * sp + 0.864 * fo);
           transformed = mix(fly, limp, uLimp); }`); };
+      mat.onBeforeCompile = patch(U);
       mat.customProgramCacheKey = () => `nrFlag${Lf}x${Hf}`;
       const fl = new THREE.Mesh(g, mat); fl.position.set(sp.x, sp.y, sp.z); fl.rotation.y = Math.atan2(-NR_WIND_DIR.z, NR_WIND_DIR.x);
       fl.castShadow = true; this.app.scene.add(fl);
       if (sp.type === 'ground') {
+        // its "normal air" ghost for the storm: the same flag as it would fly in a 100 km/h wind, see-through
+        const GU = { uLoad: { value: 0 }, uLimp: { value: 0 }, uRip: { value: 1 }, uT: { value: 0 }, uPh: { value: 0.6 } };
+        const gm = new THREE.MeshBasicMaterial({ map: mat.map, color: '#5f7fb2', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
+        gm.onBeforeCompile = patch(GU); gm.customProgramCacheKey = () => `nrFlagGhost${Lf}x${Hf}`;
+        const gf = new THREE.Mesh(g, gm); gf.position.copy(fl.position); gf.rotation.copy(fl.rotation); gf.visible = false; this.app.scene.add(gf);
+        this.ghostFlag = { fl: gf, U: GU, mat: gm, tip: new THREE.Vector3(sp.x + NR_WIND_DIR.x * Lf * 0.75, sp.y - 0.3, sp.z + NR_WIND_DIR.z * Lf * 0.75) };
         // a tall pole on the pavement; the flag flies from its top
         const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.06, sp.y + 0.05 - LAYOUT.curbH, 8), this.m.galv); pole.position.set(sp.x - 0.04, (sp.y + 0.05 + LAYOUT.curbH) / 2, sp.z); pole.castShadow = true; this.add(pole);
         const knob = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), this.m.galv); knob.position.set(sp.x - 0.04, sp.y + 0.1, sp.z); this.add(knob);
@@ -222,6 +229,10 @@ class NrWind {
       F.U.uRip.value = after ? Math.exp(-3.5 * u) : 1;
       F.U.uLimp.value = after ? MathX.clamp(1 - Math.exp(-3.2 * u) * Math.cos(4.6 * u + 0.15 * F.i), 0, 1.12) : 0;
     }
+    // the ghost flag: what a 100 km/h wind would do to it, shown beside the real one during the storm
+    const GF = this.ghostFlag, ga = MathX.smooth(S, 39.4, 39.9) * (1 - MathX.smooth(S, 42.35, 42.6));
+    GF.fl.visible = ga > 0.001;
+    if (GF.fl.visible) { const U = nrWindKmh(S) / 40 * nrGust(S, -7); GF.U.uLoad.value = Math.min(1.2, U * U); GF.U.uT.value = S; GF.mat.opacity = 0.62 * ga; }
     // the hanging sign: pushed out at an angle by the breeze; then it swings back like a pendulum
     const H = this.blade.hang, th0 = -D.z * 0.55;
     if (!after) H.rotation.set(th0 * Math.min(1, L) + 0.15 * q * Math.sin(S * 4.1), 0, 0);
@@ -260,7 +271,7 @@ class NrWind {
       const z = NR_STEAM.z + D.z * drift * 0.92 + (hash1(i * 7 + 5) - 0.5) * (0.3 + 3.2 * k);
       const y = LAYOUT.curbH + 0.1 + (1.4 * age + 0.8 * k * k) * (11.1 / Math.max(11.1, Uw)) ** 0.5 + (hash1(i * 11 + 3) - 0.5) * (0.1 + 1.6 * k) + 0.25 * Math.sin(age * 2.1 + i) * k;
       const size = 0.45 + 2.5 * Math.sqrt(k) + Uw * 0.02 * k;
-      St.push(x, Math.max(LAYOUT.curbH + 0.1, y), z, size, i * 1.3 + age * 0.4, 0.22 * (1 - k) ** 1.5 * Math.min(1, age * 6), 1.0, 0.95, 0.96, 0.97);
+      St.push(x, Math.max(LAYOUT.curbH + 0.1, y), z, size, i * 1.3 + age * 0.4, 0.16 * (1 - k) ** 1.5 * Math.min(1, age * 6), 1.0, 0.95, 0.96, 0.97);
     }
     St.end();
   }

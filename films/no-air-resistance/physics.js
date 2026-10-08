@@ -37,7 +37,7 @@ function nrSpring(S, z, freq = 0.55, damp = 0.12) {
 
 // integrate dv/dt with a 1 ms step; store every 1/60 s
 function nrTable(T, step, init) {
-  const dt = 0.001, every = Math.round(1 / 60 / dt), rows = [];
+  const dt = 1 / 960, every = 16, rows = [];   // a row every 1/60 s exactly
   let s = init(), i = 0;
   for (let t = 0; t <= T + 1e-9; t += dt, i++) { if (i % every === 0) rows.push(Object.assign({ t }, s)); s = step(s, dt, t); }
   return { rows, at(t) { const f = MathX.clamp(t * 60, 0, rows.length - 1.001), k = Math.floor(f), u = f - k, a = rows[k], b = rows[k + 1] || a, o = {}; for (const key in a) o[key] = a[key] + (b[key] - a[key]) * u; return o; } };

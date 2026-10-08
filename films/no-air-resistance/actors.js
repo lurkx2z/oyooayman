@@ -77,7 +77,8 @@ const NR_PIGEONS = [[9.6, -2.4, 0.4], [10.1, -3.1, 2.2], [10.6, -2.2, 4.0], [9.9
 const NR_LEDGE = { x: 12.24, y: 3.62, z: -3.0 };
 // five flying up the street towards you when the air lets go: [x, y, z at NR.loss, vx, vz (m/s), seed]. With no lift
 // (and wings that can't push) each keeps its speed and falls ½gt² onto the pavement, skids, lies stunned, gets up
-const NR_FLYERS = [[9.5, 5.3, -6.6, 0.3, 3.5, 1.3], [8.7, 5.8, -7.6, 0.5, 3.8, 2.9], [10.3, 5.0, -6.0, -0.2, 3.2, 4.4], [9.1, 6.2, -8.4, 0.4, 3.9, 5.7], [10.0, 5.6, -7.2, -0.1, 3.6, 0.6]];
+// (they come in above the title, left of the flag pole, and land apart in the foreground, below the captions)
+const NR_FLYERS = [[7.5, 4.4, -4.88, 0, 3.0, 1.3], [8.3, 4.9, -4.3, 0, 3.2, 2.9], [9.1, 4.6, -4.88, 0, 2.8, 4.4], [9.8, 5.2, -4.98, -0.1, 3.4, 5.7], [8.6, 5.6, -6.25, 0, 3.0, 0.6]];
 function nrFlyerAt(F, S, out) {     // → out { x, y, z, phase: 0 flying | 1 falling | 2 skidding | 3 down, w (s since landing), tf }
   const [x0, y0, z0, vx, vz, s] = F, u = S - NR.loss, yG = LAYOUT.curbH + 0.075, tf = Math.sqrt(2 * (y0 - yG) / NR_G);
   out.tf = tf;
@@ -123,7 +124,7 @@ class NrPigeons {
   _flap(B, S, rate, amp, open) { const f = Math.sin(S * rate * 6.283 + B.s * 9); B.wl.rotation.z = open + amp * f; B.wr.rotation.z = -(open + amp * f); B.wl.rotation.y = -0.2 * amp; B.wr.rotation.y = 0.2 * amp; }
   _fold(B, k = 0) { B.wl.rotation.set(0, 1.35 - 0.6 * k, 0.15 + 0.4 * k); B.wr.rotation.set(0, -(1.35 - 0.6 * k), -(0.15 + 0.4 * k)); }
   update(S) {
-    const vis = (S > 27.5 && S < 34.5) || S < 12.4 || S > 40.5, h = LAYOUT.curbH + 0.085;
+    const vis = (S > 27.5 && S < 34.5) || S > 40.5, h = LAYOUT.curbH + 0.085;   // (not in the opening: there the fallen flyers have the pavement to themselves)
     this.blobs.begin();
     // the flyers (the opening only)
     for (const B of this.flyers) {

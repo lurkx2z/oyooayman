@@ -28,17 +28,20 @@ const NR = {
   storm: [40.6, 42.2], stormCut: [42.6, 43.8], balloon: 44.6,   // the wind rises to 100 km/h; the balloon slips
   plunge: 47.9, slow: [48.6, 49.0],            // the plunge (a quarter speed in the middle); it drops behind the skyline; impact at NR.impact
   planeImp: [-40, -2100],                      // where it comes down: 2.1 km away, in the river beyond the end of the avenue
-  run: 56.9, land: [59.4, 61.6], board: 59.95, // you run; the debris lands; the sign board is knocked off above where you stood
+  run: 56.9, runCut: [57.55, 58.35],          // you run (the middle of the run is cut);
+  land: [59.4, 61.6], board: 59.95,            // the debris lands; the sign board is knocked off above where you stood
   look: 62.2, line: [63.0, 67.7], black: 67.8,
 };
 NR.impact = 2.0 + Math.sqrt(2 * 11400 / 9.81);                  // = NR_PLANE.tImpact() (50.21)
 NR.impactDist = Math.hypot(NR.planeImp[0] - 9.4, NR.planeImp[1] - 1.6);
 NR.boom = NR.impact + NR.impactDist / 343;                        // sound from the impact reaches you (≈ 6.1 s)
+NR.flashCut = NR.impact + 1.1;                                    // the telephoto holds on the fireball, then cuts to the street (as the countdown starts)
+NR.impPitch = 2.9;                                                // where the telephoto settles: the far end of the avenue along the bottom of the frame
 
 // the cuts: the opening take (its paper drop at 0.4×), the sky, the street (less 2 s of the car rolling away and 1.2 s
-// of the storm), the plunge at a quarter speed in its middle
+// of the storm), the plunge at a quarter speed in its middle, and 0.8 s from the middle of your run
 CONFIG.edit = [[0, NR.drop.rel - 0.05], [NR.drop.rel - 0.05, NR.drop.rel + 0.55, 0.4], [NR.drop.rel + 0.55, NR.cut0],
-  [NR.sky[0], NR.car.cut[0]], [NR.car.cut[1], NR.stormCut[0]], [NR.stormCut[1], NR.slow[0]], [NR.slow[0], NR.slow[1], 0.25], [NR.slow[1], CONFIG.duration]];
+  [NR.sky[0], NR.car.cut[0]], [NR.car.cut[1], NR.stormCut[0]], [NR.stormCut[1], NR.slow[0]], [NR.slow[0], NR.slow[1], 0.25], [NR.slow[1], NR.runCut[0]], [NR.runCut[1], CONFIG.duration]];
 
 // where you stand
 const NR_CAM = { x: 9.4, z0: 4.2, z: 1.6, zRun: 9.6 };
@@ -52,7 +55,9 @@ function nrPlaneLook(S) {
 // the plunge: your head follows it, a little late, so it sinks through the frame (from 0.9° above the centre to 0.7° below)
 const NR_PLUNGE = (() => { const Y = [], P = []; for (let s = 47.9; s <= 49.7 + 1e-6; s += 0.1) { const [y, p] = nrPlaneLook(s), k = (s - 47.9) / 1.8; Y.push([+s.toFixed(2), y, 'linear']); P.push([+s.toFixed(2), p - 0.9 + 1.6 * k, 'linear']); } return [Y, P]; })();
 // the telephoto hold on the plane (story 34.0–38.2): the head stays still and it sinks from the top of the frame
-const NR_HOLD = { yaw: 0.86, pitch: 45.4 };   // (the plane a little right of centre, clear of the side view on the left)
+// the telephoto on the airliner (story 34–38.2): your eye follows it, a little right of centre (clear of the side view on the
+// left), letting it sink slowly through the frame as it drops through the cloud deck
+const NR_TELE = (() => { const Y = [], P = []; for (let s = 34.0; s <= 38.2 + 1e-6; s += 0.2) { const [y, p] = nrPlaneLook(s), k = (s - 34.0) / 4.2; Y.push([+s.toFixed(2), y + 0.15, 'linear']); P.push([+s.toFixed(2), p - 0.35 + 0.55 * k, 'linear']); } P[0][2] = 'inOutSine'; return [Y, P]; })();
 
 const SCRIPT = {
   meta: { title: 'WHAT IF AIR RESISTANCE SUDDENLY DISAPPEARED?', wav: 'no-air-resistance-soundtrack.wav' },
@@ -83,18 +88,18 @@ const SCRIPT = {
       // (12.4–20.4: the sky cut-away has its own camera)
       [20.4, 160, 'step'], [21.5, 152], [21.95, 146, 'inOutSine'], [22.4, 96, 'inOutSine'], [22.8, 42, 'inOutSine'], [23.6, 16], [24.6, 8.5], [NR.car.cut[0], 8],
       [NR.car.cut[1], -10, 'step'], [30.6, -12], [31.0, -33, 'inOutCubic'], [31.3, -33], [32.05, -31, 'inQuad'], [32.3, -31], [32.75, -6, 'inOutCubic'], [33.0, -5],
-      [33.6, NR_HOLD.yaw, 'inOutCubic'], [34.0, NR_HOLD.yaw], [38.2, NR_HOLD.yaw], [39.0, 9, 'inOutCubic'], [42.6, 10],
-      [NR.stormCut[1], -22, 'step'], [46.6, -22], [47.6, NR_PLUNGE[0][0][1], 'inOutCubic'], [47.9, NR_PLUNGE[0][0][1]], ...NR_PLUNGE[0], [50.5, 1.3], [51.6, 1.9, 'inOutCubic'],
+      [33.6, NR_TELE[0][0][1], 'inOutCubic'], ...NR_TELE[0], [39.0, 13, 'inOutCubic'], [42.6, 13.6],
+      [NR.stormCut[1], -22, 'step'], [46.6, -22], [47.6, NR_PLUNGE[0][0][1], 'inOutCubic'], [47.9, NR_PLUNGE[0][0][1]], ...NR_PLUNGE[0], [NR.flashCut - 0.02, NR_PLUNGE[0].at(-1)[1]], [NR.flashCut, 1.9, 'step'],
       [53.0, 2.4], [56.3, 2.6], [57.0, 178, 'inOutCubic'], [58.6, 176], [59.0, 16, 'inOutCubic'], [59.5, 4], [59.95, -14, 'inOutCubic'], [60.3, -14], [61.55, -3, 'inOutSine'], [62.0, 1], [62.8, 6.2, 'inOutSine'], [68.0, 6.8]],
     pitch: [[0, 2], [4.8, 2], [5.9, -44, 'inOutSine'], [NR.drop.rel, -44], [NR.drop.rel + 0.6, -55, 'inOutSine'], [NR.cut0, -54],
       [20.4, 2, 'step'], [21.5, 1], [22.4, -3], [23.6, -1.5], [24.6, -1.2], [NR.car.cut[0], -1.1],
       [NR.car.cut[1], -22, 'step'], [30.6, -20], [31.0, 19, 'inOutCubic'], [31.3, 19], [32.05, -12, 'inQuad'], [32.3, -11], [32.75, 9, 'inOutCubic'], [33.0, 10],
-      [33.6, 46.6, 'inOutCubic'], [34.0, NR_HOLD.pitch, 'inOutSine'], [38.2, NR_HOLD.pitch], [39.0, 7, 'inOutCubic'], [41.2, 8], [42.6, 11, 'inOutSine'],
-      [NR.stormCut[1], -4, 'step'], [44.4, -4], [44.9, 2], [45.5, 58, 'inOutCubic'], [46.6, 60], [47.6, NR_PLUNGE[1][0][1], 'inOutCubic'], [47.9, NR_PLUNGE[1][0][1]], ...NR_PLUNGE[1], [49.85, 9.0, 'inOutSine'], [50.5, 9.0],
-      [51.6, 5.0, 'inOutCubic'], [56.3, 5.4], [57.0, -4], [58.6, -2], [59.0, 6], [59.5, 14], [59.95, 46, 'inOutCubic'], [60.3, 46], [61.55, -10, 'inQuad'], [62.0, -2], [62.8, 3.0, 'inOutSine'], [68.0, 3.6]],
+      [33.6, 46.6, 'inOutCubic'], ...NR_TELE[1], [39.0, 20, 'inOutCubic'], [41.2, 21], [42.6, 23, 'inOutSine'],
+      [NR.stormCut[1], -4, 'step'], [44.4, -4], [44.9, 2], [45.5, 58, 'inOutCubic'], [46.6, 60], [47.6, NR_PLUNGE[1][0][1], 'inOutCubic'], [47.9, NR_PLUNGE[1][0][1]], ...NR_PLUNGE[1], [50.2, NR.impPitch, 'inOutSine'], [NR.flashCut - 0.02, NR.impPitch],
+      [NR.flashCut, 5.0, 'step'], [56.3, 5.4], [57.0, -4], [58.6, -2], [59.0, 6], [59.5, 14], [59.95, 46, 'inOutCubic'], [60.3, 46], [61.55, -10, 'inQuad'], [62.0, -2], [62.8, 3.0, 'inOutSine'], [68.0, 3.6]],
     fov: [[0, 66], [NR.cut0, 66], [20.4, 66], [22.8, 64], [24.4, 32], [NR.car.cut[0], 30], [NR.car.cut[1], 64, 'step'], [30.6, 64], [31.0, 30, 'inOutCubic'], [32.05, 30], [32.3, 32], [32.75, 50, 'inOutCubic'],
-      [33.6, 40, 'inOutSine'], [34.0, 5.0, 'inOutCubic'], [38.2, 3.7, 'linear'], [39.0, 62, 'inOutCubic'], [42.6, 60],
-      [NR.stormCut[1], 60, 'step'], [46.6, 60], [47.6, 8, 'inOutCubic'], [47.9, 6], [49.85, 6], [50.5, 6], [51.6, 28, 'inOutCubic'], [56.3, 21, 'inOutSine'], [57.0, 66], [62.0, 66], [62.8, 52, 'inOutSine'], [68.0, 49]],
+      [33.6, 40, 'inOutSine'], [34.0, 2.4, 'inOutCubic'], [38.2, 1.8, 'linear'], [39.0, 62, 'inOutCubic'], [42.6, 60],
+      [NR.stormCut[1], 60, 'step'], [46.6, 60], [47.6, 8, 'inOutCubic'], [47.9, 6], [NR.flashCut - 0.02, 6], [NR.flashCut, 28, 'step'], [56.3, 21, 'inOutSine'], [57.0, 66], [62.0, 66], [62.8, 52, 'inOutSine'], [68.0, 49]],
     tilt: [[0, 0], [57.0, 0], [57.6, -4], [59.2, 3], [60.0, -6], [61.0, 0], [68.0, 0]],
     startles: [[NR.loss + 0.15, 0.35], [22.35, 0.25], [29.5, 0.25], [NR.impact + 0.05, 0.3], [NR.boom, 0.8], [NR.board, 0.6], [61.1, 0.5], [NR.board + 1.61, 1.0]],
     shakes: [[NR.boom, 0.6, 0.6], [NR.board, 0.35, 0.3], [61.1, 0.4, 0.25], [NR.board + 1.61, 0.9, 0.35]],
@@ -107,8 +112,8 @@ const SCRIPT = {
   },
 
   tracks: {
-    pov: [[0, 1], [NR.sky[0] - 0.001, 1], [NR.sky[0], 0, 'step'], [NR.sky[1] - 0.001, 0], [NR.sky[1], 1, 'step'], [33.5, 1], [34.0, 0.25], [38.2, 0.25], [38.9, 1],
-      [47.4, 1], [47.8, 0.3], [50.5, 0.3], [51.6, 1], [68.0, 1]],
+    pov: [[0, 1], [NR.sky[0] - 0.001, 1], [NR.sky[0], 0, 'step'], [NR.sky[1] - 0.001, 0], [NR.sky[1], 1, 'step'], [33.5, 1], [34.0, 0.08], [38.2, 0.08], [38.9, 1],
+      [47.4, 1], [47.8, 0.3], [NR.flashCut - 0.02, 0.3], [NR.flashCut, 1, 'step'], [68.0, 1]],
   },
 
   hud: {
@@ -126,10 +131,10 @@ const SCRIPT = {
       { t: 34.4, until: 36.2, text: 'Its wings stopped lifting it…' },
       { t: 36.3, until: 38.2, text: '…the moment the air let go.' },
       { t: 39.6, until: 41.1, text: 'Storm-force wind…' },
-      { t: 41.2, until: NR.stormCut[0], text: '…and nothing moves.' },
+      { t: 41.2, until: NR.stormCut[0], text: '…and nothing solid moves.' },
       { t: NR.stormCut[1] + 0.15, until: 45.4, text: 'Floating still works…' },
       { t: 45.45, until: 46.6, text: '…nothing holds it back.' },
-      { t: 57.1, until: 58.9, text: 'Everything it threw is still flying…' },
+      { t: 56.6, until: 58.9, text: 'Everything it threw is still flying…' },
       { t: 59.2, until: 60.9, text: '…and nothing slows it down.' },
     ],
     says: [{ t: NR.point + 0.1, until: 33.6, text: '“Look… up there!”' }],

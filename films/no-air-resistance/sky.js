@@ -37,29 +37,73 @@ class NrPlane {
   }
 }
 
+/* ---------------- a broken cloud deck at ~5.5 km (water: it drifts with the wind); the airliner drops through it ---------------- */
+// Only built where your line of sight to the plane crosses 5.5 km during the telephoto (story 34–38.2), with a clear
+// gap where you first find it; after ≈ 36.7 it is below the deck and the clouds are behind it
+class NrCloudDeck {
+  constructor(scene) {
+    this.bb = new BillboardSystem(scene, 720, false); this.bb.uniforms.uLight.value = 1.0;
+    this.fog = { color: new THREE.Color('#b9cfe4'), density: 0.00003 };
+    const r = new RNG(4242), P = new THREE.Vector3(), D = NR_WIND_DIR, base = 5450;
+    const hit = (s) => { NR_PLANE.pos(s, P); const k = (base + 60 - 1.7) / Math.max(1, P.y - 1.7); return [NR_CAM.x + (P.x - NR_CAM.x) * k, NR_CAM.z + (P.z - NR_CAM.z) * k]; };
+    this.puffs = []; this.w0 = nrWindDist(36.0);   // (positions are where the clouds are at story 36; they drift from there)
+    for (let gx = -220; gx <= 140; gx += 72) for (let gz = -5900; gz <= -4850; gz += 72) {
+      if (r.next() < 0.42) continue;
+      const cx = gx + r.range(-25, 25), cz = gz + r.range(-25, 25);
+      // keep the gap open while you find it (34.0–35.0)
+      let clear = true;
+      for (let s = 33.9; s <= 35.05; s += 0.05) { const [hx, hz] = hit(s), w = nrWindDist(s) - this.w0; if (Math.hypot(cx + D.x * w - hx, cz + D.z * w - hz) < 95) { clear = false; break; } }
+      if (!clear) continue;
+      const rad = r.range(30, 62), th = r.range(30, 95), n = 10 + r.int(0, 6);
+      for (let i = 0; i < n; i++) {
+        const a = r.range(0, 6.283), d = rad * Math.sqrt(r.next()), h = th * (1 - d / rad) * r.range(0.3, 1.0);
+        this.puffs.push([cx + Math.cos(a) * d, base + r.range(0, 12) + h, cz + Math.sin(a) * d * 0.8, r.range(24, 50) * (1 - 0.35 * d / rad), r.range(0, 6.283), h / th]);
+      }
+    }
+  }
+  update(S) {
+    const B = this.bb, D = NR_WIND_DIR; B.begin(this.fog);
+    if (S > 33.3 && S < 39.3) {
+      const w = nrWindDist(S) - this.w0;
+      for (const [x, y, z, size, rot, up] of this.puffs) B.push(x + D.x * w, y, z + D.z * w, size, rot, 0.88, 0.62 + 0.36 * up, 0.93, 0.96, 1.0);
+    }
+    B.end();
+  }
+}
+
 /* ---------------- the impact: a fireball, a tall column of spray (water: the wind still carries it), dark debris thrown out ---------------- */
 class NrImpact {
   constructor(scene) {
-    this.glow = new BillboardSystem(scene, 8, true);
-    this.spray = new BillboardSystem(scene, 900, false);
+    this.glow = new BillboardSystem(scene, 24, true);
+    this.spray = new BillboardSystem(scene, 1000, false);
     this.spray.uniforms.uLight.value = 1.0;
+    // the fireball: drawn opaque over the smoke (additive orange would just wash out to white against the pale sky)
+    this.fire = new BillboardSystem(scene, 40, false);
+    this.fire.uniforms.uLight.value = 1.0;
     // (the fan of debris: dark chunks, each stretched along its flight like a motion blur)
-    this.fan = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: '#1e1b18' }), 320); this.fan.frustumCulled = false; this.fan.count = 0; scene.add(this.fan);
+    this.fan = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: '#2a2622', fog: false }), 320); this.fan.frustumCulled = false; this.fan.count = 0; scene.add(this.fan);
     this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3(); this._d = new THREE.Vector3(); this._up = new THREE.Vector3(1, 0, 0);
-    this.fog = { color: new THREE.Color('#c9d4dc'), density: 0.00009 };
+    this.fog = { color: new THREE.Color('#c9d4dc'), density: 0.00005 };
     this.P = NR_PLANE.imp;
     this.sun = new THREE.Vector2(-0.3, 0.72).normalize();      // the sun's bearing (city.js): that side of the column is lit
   }
   update(S) {
-    const I = this.P, u = S - NR.impact, G = this.glow, Sp = this.spray, F = this.fan, D = NR_WIND_DIR;
-    G.begin(); Sp.begin(this.fog); let nf = 0;
+    const I = this.P, u = S - NR.impact, G = this.glow, Sp = this.spray, Fi = this.fire, F = this.fan, D = NR_WIND_DIR;
+    G.begin(); Sp.begin(this.fog); Fi.begin(); let nf = 0;
     if (u >= 0) {
       // the flash and the fireball (burning fuel: a gas, so it is not thrown about like the debris)
-      const f = Math.exp(-u / 0.12), fb = Math.exp(-u / 0.9) * MathX.smooth(u, 0, 0.06);
-      if (f > 0.01) G.push(I[0], 120 + 60 * u, I[1], 700 * (0.4 + u), 0, f, 1, 1.0, 0.95, 0.85);
-      if (fb > 0.01) { G.push(I[0], 45 + 45 * u, I[1], 300 * (0.6 + 0.6 * u), 0, 0.8 * fb, 1, 1.0, 0.55, 0.22); G.push(I[0], 22, I[1], 150, 0, fb, 1, 1.0, 0.78, 0.45); }
+      const f = Math.exp(-u / 0.08);
+      if (f > 0.01) G.push(I[0], 60 + 60 * u, I[1], 420 * (0.3 + u), 0, f, 1, 1.0, 0.95, 0.85);
+      // the fireball: a dome of burning fuel that swells, then (hot gas, still buoyant) lifts, cools and darkens into smoke
+      const R = 85 * (1 - Math.exp(-u / 0.3)), lift = 25 * Math.max(0, u - 0.4) ** 1.6, fade = Math.exp(-Math.max(0, u - 0.8) / 1.6) * MathX.smooth(u, 0, 0.05), cool = MathX.smooth(u, 0.5, 2.6);
+      if (fade > 0.01) for (let k = 0; k < 30; k++) {
+        const th = hash1(k * 7 + 1) * 6.283, ph = hash1(k * 3 + 2) * 1.45, e = 1 - k / 30, rr = R * (0.15 + 0.85 * e);
+        const x = I[0] + Math.cos(th) * Math.cos(ph) * rr, z = I[1] + Math.sin(th) * Math.cos(ph) * rr * 0.6, y = R * 0.15 + Math.sin(ph) * rr * 0.9 + lift;
+        const r = MathX.lerp(MathX.lerp(1.0, 0.7, e), 0.09, cool), g = MathX.lerp(MathX.lerp(0.5, 0.13, e), 0.075, cool), bl = MathX.lerp(MathX.lerp(0.16, 0.03, e), 0.065, cool);
+        Fi.push(x, y, z, R * (0.4 + 0.35 * hash1(k * 5 + 3)), k, 0.92 * fade, 1 - 0.3 * e * hash1(k * 11 + 4), r, g, bl);
+      }
       // the column: spray shot straight up, narrow and tall, slowing as it climbs, then leaning off with the wind
-      for (let i = 0; i < 560; i++) {
+      for (let i = 0; i < 760; i++) {
         const born = (hash1(i * 3 + 1) ** 2) * 1.0, a = u - born;
         if (a < 0) continue;
         const v0 = 120 + 210 * hash1(i * 5 + 2), tau = 2.0 + 1.4 * hash1(i * 7 + 3), h = v0 * tau * (1 - Math.exp(-a / tau)) - 3 * a * a;
@@ -69,8 +113,8 @@ class NrImpact {
         const k = MathX.clamp(a / 9, 0, 1), size = 40 + 60 * hash1(i * 19 + 7) + 110 * k;
         // river silt, dust and smoke: dark and dirty low down, greyer on top; the sun side lighter, the far side darker (it has to read on a pale sky)
         const side = (Math.cos(ang) * this.sun.x + Math.sin(ang) * this.sun.y) * r / (r + 25);
-        const shade = 0.2 + 0.32 * MathX.clamp(y / 900, 0, 1) + 0.07 * hash1(i * 23 + 8) + 0.2 * side, low = 1 - MathX.clamp(y / 260, 0, 1);
-        Sp.push(x, y, z, size, i * 1.7, Math.min(1, a * 3) * (1 - 0.25 * k), shade, 1.0 - 0.1 * low, 0.94 - 0.12 * low, 0.88 - 0.16 * low);
+        const shade = 0.07 + 0.2 * MathX.clamp(y / 900, 0, 1) + 0.04 * hash1(i * 23 + 8) + 0.12 * side, low = 1 - MathX.clamp(y / 260, 0, 1);
+        Sp.push(x, y, z, size, i * 1.7, MathX.smooth(a, 0.05, 0.6) * (1 - 0.2 * k), shade, 1.0 - 0.1 * low, 0.94 - 0.12 * low, 0.88 - 0.16 * low);
       }
       // the base surge rolling out along the river
       for (let i = 0; i < 90; i++) { const a = u - 0.2 * hash1(i + 400); if (a < 0) continue; const ang = (i / 90) * 6.283, r = 200 * (1 - Math.exp(-a / 1.5)) + 30;
@@ -81,11 +125,11 @@ class NrImpact {
         const sp = 60 + 170 * hash1(i * 31 + 2), el = MathX.deg(18 + 50 * hash1(i * 37 + 3)), az = hash1(i * 41 + 4) * 6.283, vh = sp * Math.cos(el), vy = sp * Math.sin(el);
         const y = vy * a - 4.905 * a * a; if (y < 0) continue;
         this._p.set(I[0] + Math.cos(az) * vh * a, y, I[1] + Math.sin(az) * vh * a); this._d.set(Math.cos(az) * vh, vy - NR_G * a, Math.sin(az) * vh).normalize();
-        const sz = 4 + 6 * hash1(i * 43 + 5); this._q.setFromUnitVectors(this._up, this._d); this._s.set(sz * 3, sz * 0.6, sz * 0.6);
+        const sz = 1.5 + 2.5 * hash1(i * 43 + 5); this._q.setFromUnitVectors(this._up, this._d); this._s.set(sz * 3, sz * 0.5, sz * 0.5);
         this._m.compose(this._p, this._q, this._s); this.fan.setMatrixAt(nf++, this._m);
       }
     }
-    G.end(); Sp.end(); this.fan.count = nf; this.fan.instanceMatrix.needsUpdate = true;
+    G.end(); Sp.end(); Fi.end(); this.fan.count = nf; this.fan.instanceMatrix.needsUpdate = true;
   }
 }
 
@@ -290,12 +334,13 @@ class NrAerial {
 
   // clouds (water droplets) at different heights near the fall line: they rush up past you
   _clouds() {
-    this.puffs = new BillboardSystem(this.scene, 500, false); this.puffs.uniforms.uLight.value = 1.05;
+    this.puffs = new BillboardSystem(this.scene, 900, false); this.puffs.uniforms.uLight.value = 1.05;
     const r = new RNG(77); this.cl = [];
     for (const [alt, n, spread] of [[2350, 7, 700], [1750, 9, 420], [1300, 9, 340], [900, 8, 300]]) {
       for (let c = 0; c < n; c++) {
         const a0 = r.range(0, 6.28), d0 = r.range(70, spread), cx = Math.cos(a0) * d0, cz = Math.sin(a0) * d0, R = r.range(30, 70);
-        for (let i = 0; i < 16; i++) { const a = r.range(0, 6.28), d = Math.sqrt(r.next()) * R; this.cl.push([cx + Math.cos(a) * d, alt + r.range(-0.4, 0.5) * R * 0.6, cz + Math.sin(a) * d * 0.8, r.range(22, 48), r.range(0, 6.28), r.range(0.86, 1.0)]); }
+        // a heap of smaller puffs: flat underneath, domed on top, shadowed low down (so it reads as a cloud, not a disc)
+        for (let i = 0; i < 24; i++) { const a = r.range(0, 6.28), d = Math.sqrt(r.next()) * R, h = (1 - d / R) * R * 0.7 * r.range(0.2, 1); this.cl.push([cx + Math.cos(a) * d, alt - 0.1 * R + h, cz + Math.sin(a) * d * 0.8, r.range(14, 34) * (1 - 0.3 * d / R), r.range(0, 6.28), 0.7 + 0.3 * h / (0.7 * R)]); }
       }
     }
   }
@@ -324,17 +369,20 @@ class NrAerial {
     // the lines: 12 suspension lines + the bridle, as polylines (weightless: they float in loose loops)
     this.nL = 13; this.seg = 18;
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(this.nL * this.seg * 2 * 3), 3));
-    this.lines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: '#efe9de', transparent: true, opacity: 0.9 })); this.lines.frustumCulled = false; this.scene.add(this.lines);
-    // the ghost: an open ram-air canopy (span arched down at the tips), see-through with dark edges and ribs (it reads on the pale sky), and its lines
-    const cg = new THREE.PlaneGeometry(8, 3, 16, 3); cg.rotateX(-Math.PI / 2);
-    const pa = cg.attributes.position; for (let i = 0; i < pa.count; i++) { const x = pa.getX(i); pa.setY(i, -x * x / 14); }
-    cg.computeVertexNormals();
+    this.lines = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: '#d9d2c4', transparent: true, opacity: 0.55 })); this.lines.frustumCulled = false; this.scene.add(this.lines);
+    // the ghost: an open round canopy (a dome everyone reads as a parachute), see-through and dark-edged (it reads on the
+    // pale sky), its gores and lines running down to where his harness is
+    const R = 3.8, cap = Math.PI * 0.42, rimY = R * Math.cos(cap) * 0.7, rimR = R * Math.sin(cap);
+    const cg = new THREE.SphereGeometry(R, 24, 6, 0, Math.PI * 2, 0, cap); cg.scale(1, 0.7, 1); cg.translate(0, -rimY, 0);
     const gm = new THREE.MeshBasicMaterial({ color: '#1d2b3c', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, fog: false });
     const ghost = new THREE.Group(), body = new THREE.Mesh(cg, gm); ghost.add(body);
-    const lp = [];
-    for (let k = 0; k <= 8; k++) { const x = -4 + k, y = -x * x / 14; lp.push(x, y, -1.5, x, y, 1.5); }
-    for (const z of [-1.5, 1.5]) for (let k = 0; k < 16; k++) { const x0 = -4 + k * 0.5, x1 = x0 + 0.5; lp.push(x0, -x0 * x0 / 14, z, x1, -x1 * x1 / 14, z); }
-    for (let k = 0; k <= 8; k += 2) { const x = -4 + k; lp.push(x, -x * x / 14, 0, 0, -3.4, 0); }
+    const lp = [], top = (R * 0.7) - rimY;
+    for (let k = 0; k < 12; k++) {
+      const a = k / 12 * Math.PI * 2, a1 = (k + 1) / 12 * Math.PI * 2;
+      for (let j = 0; j < 6; j++) { const p0 = j / 6 * cap, p1 = (j + 1) / 6 * cap; lp.push(Math.cos(a) * R * Math.sin(p0), R * Math.cos(p0) * 0.7 - rimY, Math.sin(a) * R * Math.sin(p0), Math.cos(a) * R * Math.sin(p1), R * Math.cos(p1) * 0.7 - rimY, Math.sin(a) * R * Math.sin(p1)); }
+      lp.push(Math.cos(a) * rimR, 0, Math.sin(a) * rimR, Math.cos(a1) * rimR, 0, Math.sin(a1) * rimR);
+      lp.push(Math.cos(a) * rimR, 0, Math.sin(a) * rimR, 0, -2.6, 0);
+    }
     const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3));
     const em = new THREE.LineBasicMaterial({ color: '#1a2636', transparent: true, opacity: 0, fog: false });
     ghost.add(new THREE.LineSegments(lg, em)); this.scene.add(ghost);
@@ -387,12 +435,12 @@ class NrAerial {
     Gh.g.visible = ga > 0.001;
     if (Gh.g.visible) {
       const open = MathX.smooth(gw, 0, 0.45), up = 2.6 + 9 * Math.max(0, gw - 0.5) ** 2;
-      Gh.g.position.set(J.root.position.x + 0.6, alt + up, J.root.position.z + 0.3); Gh.g.scale.set(0.3 + 0.7 * open, 0.5 + 0.5 * open, 0.4 + 0.6 * open); Gh.g.rotation.set(0, 0.5, 0.05);
-      Gh.fill.opacity = 0.2 * ga; Gh.edge.opacity = 0.85 * ga;
+      Gh.g.position.set(J.root.position.x + 0.15, alt + up, J.root.position.z + 0.1); Gh.g.scale.set(0.25 + 0.75 * open, 0.6 + 0.4 * open, 0.25 + 0.75 * open); Gh.g.rotation.set(0, 0.5, 0.05);
+      Gh.fill.opacity = 0.3 * ga; Gh.edge.opacity = 0.85 * ga;
     }
     // clouds rush up past
     this.puffs.begin(this.scene.fog);
-    for (const [x, y, z, s, r, sh] of this.cl) { if (Math.abs(y - alt) > 900) continue; this.puffs.push(x, y, z, s, r, 0.42, sh, 1, 1, 1); }
+    for (const [x, y, z, s, r, sh] of this.cl) { if (Math.abs(y - alt) > 900) continue; this.puffs.push(x, y, z, s, r, 0.72, sh, 1, 1, 1); }
     this.puffs.end();
     // the airliner, far above
     this.plane.position.set(-2200 + NR_PLANE.v * (S - NR.sky[0]), NR_PLANE.alt(S), -4200);
@@ -409,8 +457,8 @@ class NrAerial {
       y: [[12.4, 2.4], [14.0, 2.8], [15.2, 4.2], [16.2, 3.8], [16.8, 0.4], [17.8, 0.2], [18.8, 1.0], [20.4, 1.0]],
       z: [[12.4, 2.6], [14.0, 2.4], [15.2, 2.4], [16.2, 2.0], [16.8, -2.6], [17.8, -3.4], [18.8, 2.8], [20.4, 2.6]],
       lx: [[12.4, 0], [14.0, 0], [15.2, 0], [16.2, 0], [16.8, 0], [17.8, 0.2], [18.8, 0.4], [20.4, 0.4]],
-      ly: [[12.4, -1.2], [14.0, -1.4], [15.2, -5.0], [16.2, -5.0], [16.8, 1.6], [17.8, 2.2], [18.8, 1.2], [20.4, 1.1]],
-      lz: [[12.4, -0.8], [14.0, -0.8], [15.2, -1.5], [16.2, -1.5], [16.8, 0.2], [17.8, 0.4], [18.8, 0.4], [20.4, 0.4]],
+      ly: [[12.4, 0.3], [14.0, 0.1], [15.2, -2.2], [16.2, -2.4], [16.8, 1.6], [17.8, 2.2], [18.8, 1.2], [20.4, 1.1]],
+      lz: [[12.4, -0.25], [14.0, -0.3], [15.2, -1.5], [16.2, -1.5], [16.8, 0.2], [17.8, 0.4], [18.8, 0.4], [20.4, 0.4]],
       fov: [[12.4, 60], [14.0, 62], [15.2, 66], [16.2, 66], [16.8, 66], [17.8, 68], [18.8, 62], [20.4, 58]],
     };
     const k = this._k, tr = (n) => (this['_t' + n] || (this['_t' + n] = new Track(k[n], 'inOutSine'))).value(S);
