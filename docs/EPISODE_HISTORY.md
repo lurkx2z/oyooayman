@@ -211,20 +211,22 @@
 - **Lessons:** self-aware parody + full production seriousness; use the edit layer aggressively; every link of a chain
   needs its own visible proof.
 
-### 12. What if the speed of sound became 10× slower?  (2026-10-07 batch, Developer 5)
+### 12. What if the speed of sound became 10× slower?  (2026-10-07 batch, Developer 5; redesigned 2026-10-08)
 - **Page / folder:** `slow-sound.html` · `films/slow-sound/` (adds the shared helper `js/audio/soundArrival.js`)
-- **Duration:** 69.8 s, one continuous take, no cuts
-- **Built:**
-  - a sunny avenue with a parking lot, a construction site, an elevated highway and shopfronts with per-pane glass;
-  - every sound timed by `eventTime + distance / 34.3 m/s`, moving sources through exact delay curves (Doppler, the
-    supersonic squeeze, the reversed branch after a pass), N-wave booms;
-  - ground sound rings, a live SOUND DELAY counter, shock countdowns, a dust wall carrying the airliner's shock up the street.
-- **Worked (per reviews):** the airliner's shock coming up the street with the countdown and pigeons; the police car's
-  shock and the broken shopfront; the friend's late shout bubble.
-- **Didn't:** a slow middle (pile driver 8 s, sports car 14 s); the first boom is weak on screen; the police car is
-  seen only briefly.
-- **Reviews:** round 1: retention 4, viewer 5, visual 4.5, physics 7 → round 2: 5 / 6 / 5 / 7.5. Round-2 fixes applied,
-  not re-scored.
+- **Duration:** 61.4 s, six shots (hard cuts) in one football stadium
+- **First version (city avenue, 69.8 s, one take, up to commit `e2e3ae3`):** a friend's late claps, a pile driver, an
+  ambulance, a supersonic car, a drone, a silent airliner and its shock, a police car breaking shop windows. Reviews:
+  round 1 retention 4, viewer 5, visual 4.5, physics 7 → round 2 5 / 6 / 5 / 7.5. Didn't work: a slow middle, a weak
+  first boom, and it followed the shared template (person → car → machinery → airplane → destruction).
+- **Redesign (owner's creative override):** audio is the mechanic, no cars, planes, cranes, streets or explosions.
+  - a stadium with ~9,000 instanced fans, each posed from its own arrival times; a storm beyond the far stand;
+  - every sound front drawn (rings on the grass, domes in the air, the thunder as a curtain);
+  - beats: the start line peeling off runner by runner; a friend's late, blurred shout; one announcement heard three
+    times; a whistle 10× lower; a Mach 1.17 free kick heard after the goal; claps rippling out from a drum; the opening
+    flash's thunder coming back 50 s later (birds off the roofs, the far stand ducking, the front crossing the pitch).
+- **Reviews (first stadium preview):** retention 5.5, viewer 5.5, visual 5.5, physics 7.5, differentiation 7 (audio 8).
+  Most memorable: the start-line peel. Fixes applied; final scores in `films/slow-sound/EPISODE_REPORT.md`.
 - **Audience:** UNKNOWN (not yet posted).
 - **Lessons:** a one-take sound-delay film can't be tightened with cuts, so the beats must be short in the plan; make
-  every invisible effect visible (rings, counters, dust fronts) before polishing it.
+  every invisible effect visible (rings, counters, fronts) before polishing it; a setup paid off at the end (the silent
+  flash under the title) carries a film better than a list of separate consequences.
