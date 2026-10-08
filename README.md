@@ -65,7 +65,7 @@ Everything is procedural, so there are no models, images or sound files to downl
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
 >
-> **Episode: *What if everything lost its elasticity?*** — open `no-elasticity.html` (60.4 s). Solids still resist being
+> **Episode: *What if everything lost its elasticity?*** — open `no-elasticity.html` (60.2 s). Solids still resist being
 > deformed but never spring back. A solid rubber ball lands and stays down with a flat spot; racket strings, a shoe's foam,
 > a cushion and a rubber band keep every stretch and dent; a trampoline becomes a funnel; a red car rides 8 cm lower after
 > one speed table; a loaded truck's rear springs end on their bump stops; a footbridge keeps the deepest dip a running club
