@@ -83,8 +83,8 @@ wreckage plus moral lines ending. No banned shot.
    turn back to the empty party under the dark cloud as the clock runs out: a new image, people at stake, and the
    reason the roof is empty. The balloons' caption lands as they go; the storm is already half dark when you come back
    from the cloud, so "All of it lands here in 16 seconds" is said under a dark sky.
-3. **Legibility and glitches.** The kite's tag marks where its string goes over the parapet (KITE · FELL INTO THE
-   STREET) instead of empty air; the camera eases in on the falling kite under the title; the confetti and parachute
+3. **Legibility and glitches.** The kite's tag sits on its flyer, still holding the string (KITE · FELL INTO THE
+   STREET), instead of on empty air; the camera eases in on the falling kite under the title; the confetti and parachute
    tags sit beside their objects; the ghost-toy tag shows only while the ghost is in frame; the confetti and balloons
    are framed clear of the clock; the ice readout goes with the last ice; the note is one line; the doorway flicker
    (43.2–45.7 and 50.9–53.7) is gone (two faces z-fighting under the door head, and screen-space AO banding on the
@@ -111,13 +111,13 @@ and a climax that is a real consequence of the rule (without drag a storm cloud'
 of an airliner. The reviewers rate it 6.5/10 for freshness against 2/10 for the old cut, but only 6/10 for retention and
 for a normal viewer: the new ideas are good and specific, yet several are small or quick on a phone, and the film peaks
 at the first stone (34.6) rather than at its end. The last fixes target exactly those weak points (the run for the
-door, a bigger table moment, audible breakages, a clean doorway), so the final should land a little above the audited
-scores, but it is a solid 6–6.5, not a Friction-level 8. The strongest images are the paper and ball landing together,
+door, a bigger table moment, audible breakages, a clean doorway), and were not re-scored; my own estimate (not a reviewer's) is a
+small gain, a solid 6–6.5, not a Friction-level 8. The strongest images are the paper and ball landing together,
 the rain flying sideways past washing that barely moves, the first stone in slow motion and the ice coming through the
 roof over you.
 
 ## FINAL OUTPUT
 `no-air-resistance_v2.mp4` in the project files (`/mnt/project-files/no-air-resistance/`), with the runnable ZIP
-`no-air-resistance_film.zip` (unzip, open `no-air-resistance.html`, press Space). FINAL_SPECS. Renders are not
+`no-air-resistance_film.zip` (unzip, open `no-air-resistance.html`, press Space). 60.8 s, 1080×1920, H.264 at 30 fps (1,824 frames), AAC 160 kbps 48 kHz stereo, 26.7 MiB, −16.3 LUFS, −1.4 dBTP. Renders are not
 committed. To rebuild: `tools/render-parallel.sh no-air-resistance.html <dir> 1080 1920 4 30`, then
 `tools/render-wav.cjs` and `tools/encode-final.sh <dir> <wav> 60.8 <out>.mp4 27`.

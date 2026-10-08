@@ -173,8 +173,8 @@ const FILM = {
     // tags pinned to things
     const V = this._tv || (this._tv = new THREE.Vector3()), P = app.props, St = app.storm;
     let A = null, B = null, C = null, D = null, line = '';
-    // (the kite has gone over the edge: the tag is where its string drapes over the parapet)
-    if (S > 3.7 && S < NR.walk[1] - 0.1 && app.roof._kh0) { const h = app.roof._kh0, k = app.roof._kp, s = MathX.clamp((NR_ROOF.x0 + 0.1 - h.x) / ((k.x - h.x) || 1), 0, 1); A = [this._proj(cam, V.set(NR_ROOF.x0 + 0.1, NR_ROOF.y + NR_ROOF.par + 0.1, h.z + (k.z - h.z) * s)), 'KITE · <b>FELL INTO THE STREET</b>', 'right']; }
+    // (the kite has gone over the edge into the street: the tag is on its flyer's hands, still holding the string)
+    if (S > 3.7 && S < NR.walk[1] - 0.1 && app.people && app.people.byId.K) A = [this._proj(cam, app.people.byId.K.handWorld(-1, V).add({ x: 0, y: 0.2, z: 0 })), 'KITE · <b>FELL INTO THE STREET</b>', 'left'];
     if (S > NR.walk[1] + 0.15 && S < NR.drop.rel - 0.1) A = [[600, 1330], 'GROUND FLOOR · <b>22 M DOWN</b>'];
     if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8).add({ x: 0.4, y: 0, z: 0.15 })), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
     if (S > NR.drop.rel + 0.1 && S < NR.cut0 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: 0, y: 0.3, z: 0 })), 'NORMAL AIR', 'left'];

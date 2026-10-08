@@ -70,8 +70,8 @@ Everything is procedural, so there are no models, images or sound files to downl
 > A rooftop party under the edge of a storm: the sheets and bunting drop and the kite falls in a 50 km/h wind; paper
 > and a ball dropped down the building's 22 m stairwell land together; 9 km up, the storm cloud's ice hangs still while
 > the cloud streams up past it; confetti lands like gravel and a toy paratrooper's canopy can't open; in a 110 km/h
-> gale the rain flies sideways and the washing barely moves; balloons rocket up at 2 g; then a clock runs out and the
-> whole cloud's ice arrives, faster than sound and then faster than a bullet, breaking the party and coming through the
+> gale the rain flies sideways and the washing barely moves; balloons rocket up at 2 g and the last guests run for the
+> stair door; then a clock runs out and the whole cloud's ice arrives, faster than sound and then faster than a bullet, breaking the party and coming through the
 > roof over you. *Every storm cloud is full of ice. Only the air holds it up.* Physics, shot list and review log:
 > [`films/no-air-resistance/PLAN.md`](films/no-air-resistance/PLAN.md).
 

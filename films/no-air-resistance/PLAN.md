@@ -112,7 +112,7 @@ the cloud); the first stones play at 0.5× (story 36.85–37.75). Story 62.4 →
 |---|---|---|
 | 0–3.4 | The windy party from the stair door: sheets, bunting, the kite high up; at 2.0 everything drops | TITLE · AERODYNAMIC FORCE 100 % → 0 % |
 | 0–3.4 (detail) | From 2.1 the camera eases in on the kite and follows it down as it falls | — |
-| 3.4–6.3 | Zoom to the kite's flyer at the front corner, the kite fallen past the parapet | *The kite just dropped like a brick…* / *…but the wind is still blowing at 50 km/h.* · KITE · FELL INTO THE STREET (where its string goes over the parapet) |
+| 3.4–6.3 | Zoom to the kite's flyer at the front corner, the kite fallen past the parapet | *The kite just dropped like a brick…* / *…but the wind is still blowing at 50 km/h.* · KITE · FELL INTO THE STREET (on the flyer, still holding the string) |
 | 6.3–11.7 (6.3–10.1) | Over the stairwell rail: paper and ball let go together, 22 m down, slow motion; the NORMAL AIR ghost flutters near the top; a snap-in (FOV 44 → 16) as they land | GROUND FLOOR · 22 M DOWN · BOTH LAND IN 2.14 S · SLOW MOTION ×0.6 · *Paper now falls as fast as a ball.* |
 | 11.7–17.9 (14.2–20.4) | 9 km up beside one hailstone against blue sky and the storm's wall; down into the cloud; droplets stream up past the still stone; lightning | 9 KM ABOVE THE PARTY · THIS ICE · km/h · CLOUD DROPLETS · STILL HELD UP · *Up in the storm, all of its ice is falling…* / *…and the air can't slow it down.* |
 | 17.9–21.5 (20.4–24.0) | Back on the roof, the confetti cannon: one clump goes up and comes down like gravel; the toy paratrooper's canopy can't open; its ghost drifts off (one level frame) | clock THE CLOUD'S ICE LANDS IN 16 S · *All of it lands here in 16 seconds.* · CONFETTI · NO DRAG · PARACHUTE · CAN'T OPEN · NORMAL AIR · *So a parachute is useless.* |
@@ -181,8 +181,8 @@ escalation 6.5, continuity/technical 7, overall visual 6.5. Stretches over 4 s: 
 a second snap-in and a white flicker as the table top lands; the sound now fades with the picture instead of cutting
 dead at 60.5. (2) The lull before the ice: the mum and the girl run past you for the stair door (a new image, people at
 stake, and the reason the roof is empty), then you turn back to the party; the balloons' caption lands as they go;
-the storm is already half dark when you come back from the cloud. (3) Legibility and glitches: the kite's tag now marks
-where its string goes over the parapet (FELL INTO THE STREET); the confetti and parachute tags sit beside their objects
+the storm is already half dark when you come back from the cloud. (3) Legibility and glitches: the kite's tag now sits
+on its flyer, still holding the string (FELL INTO THE STREET); the confetti and parachute tags sit beside their objects
 and the ghost-toy tag shows only while the ghost is in frame; the confetti and balloons framed clear of the clock; the
 ice readout goes with the last ice; a one-line note; the doorway flicker fixed (two faces z-fighting under the door
 head, and screen-space AO banding on the ceiling a hand's breadth away). These fixes were not re-scored.
