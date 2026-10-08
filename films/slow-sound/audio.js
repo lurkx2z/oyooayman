@@ -36,9 +36,10 @@ class SndAudio extends AudioEngine {
     const out = ctx.createGain(); out.gain.value = 0.9; out.connect(lim);
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 8; comp.ratio.value = 3.5; comp.attack.value = 0.004; comp.release.value = 0.25; comp.connect(out);
     const ears = S.filter('lowpass', 20000, 0.7); ears.connect(comp);
-    // (a moment only: 1.7 km away the thunder is a loud clap, not a blast that deafens you)
-    ears.frequency.setValueAtTime(20000, 0); ears.frequency.setValueAtTime(20000, tT + 0.12); ears.frequency.exponentialRampToValueAtTime(1100, tT + 0.25);
-    ears.frequency.setValueAtTime(1100, tT + 0.5); ears.frequency.exponentialRampToValueAtTime(20000, tT + 1.05);
+    // (1.7 km away the thunder is a loud clap, not a blast that deafens you: the hit reaches you open-eared, then your own
+    //  hands are over your ears from ~0.5 s to 1.7 s after it, as in the picture)
+    ears.frequency.setValueAtTime(20000, 0); ears.frequency.setValueAtTime(20000, tT + 0.3); ears.frequency.exponentialRampToValueAtTime(1100, tT + 0.58);
+    ears.frequency.setValueAtTime(1100, tT + 1.7); ears.frequency.exponentialRampToValueAtTime(20000, tT + 2.2);
     const mix = ctx.createGain(), mixHp = S.filter('highpass', 26, 0.7); mix.gain.value = 1.5; mix.connect(mixHp); mixHp.connect(ears);
     // the stadium's reverb: long (echoes take ten times longer to die away in this air)
     const rev = S.reverb(4.2), revG = ctx.createGain(); revG.gain.value = 0.3; rev.connect(revG); revG.connect(mix);

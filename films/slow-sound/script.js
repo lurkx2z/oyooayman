@@ -11,8 +11,10 @@
 
 CONFIG.duration = 61.4;          // story length (no Edit: film = story; the cuts are camera cuts)
 CONFIG.seed = 20261008;
+// (you never walk: a huge walkSpeed turns the controller's step sway off, which otherwise read each cut's jump in
+//  position as a sprint and tipped the view for the two frames either side of it)
 Object.assign(CONFIG.camera, {
-  cameraHeight: 1.66, walkSpeed: 1.3, bobStrength: 0.0, bobFrequency: 1.72,
+  cameraHeight: 1.66, walkSpeed: 1e6, bobStrength: 0.0, bobFrequency: 1.72,
   breathingStrength: 0.004, breathRate: 15, fov: 50, shakeStrength: 1.0,
 });
 CONFIG.render.shadowMapSize = 2048;
@@ -221,18 +223,28 @@ const SND_SHOTS = [
   [SND.cuts[3], SND.cuts[4], (t) => SND_EYE[4],
     (t) => SND_MIX(SND_P(SND.drum.x + 0.1, SND.drum.y + 1.5, SND.drum.z + 0.3), SND_P(-12, 5.0, -48), MathX.smooth(t, 31.0, 32.3)),
     (t) => 11 + 35 * MathX.smooth(t, 31.0, 32.3)],
-  // (the storm; down to the city and the far stand as the thunder's front comes over the city (birds lift off as it
-  //  reaches them); the lens closes on the far stand as the front reaches it, then follows the front across the pitch
-  //  toward you; afterwards up to the sky for the next flash)
+  // (the storm; then a long lens on the city's roofs as the thunder's front comes over them (birds lift off as it
+  //  reaches them: the first roofs, then two nearer ones); the far stand, where pigeons sit on the back wall; the stand
+  //  ducks; the front across the pitch; then wide and down over the rows in front of you as it climbs them to you;
+  //  afterwards up to the sky for the next flash)
   [SND.cuts[4], 99, (t) => SND_EYE[5],
     (t) => {
       const zf = SND_EYE[5].z - Math.max(0, sndThunderAt(SND_EYE[5]) - t) * SND.C1;    // (where the front is, on the pitch)
-      const s0 = MathX.smooth(t, 38.6, 41.6), s1 = MathX.smooth(t, 46.8, 50.2);        // (slow drifts: the view is never still)
-      const U = SND_P(2 - 4 * s0, 17 - 2 * s0, -42), C = SND_P(-4, 7.5, -42), Fs = SND_P(-6 + 1.5 * s1, 8.2 - 2.4 * s1, -50), Fr = SND_P(-1, 0.6, Math.min(22, zf - 3)), W = SND_P(-3, 2.5, -30), Sk = SND_P(-6, 15, -42);
-      const a = MathX.smooth(t, 40.6, 43.0), b = MathX.smooth(t, 44.2, 46.8), c = MathX.smooth(t, 50.2, 50.9), w = MathX.smooth(t, 53.2, 54.6), d = MathX.smooth(t, 54.4, 56.9);
-      return SND_MIX(SND_MIX(SND_MIX(SND_MIX(SND_MIX(U, C, a), Fs, b), Fr, c), W, w), Sk, d);
+      const s0 = MathX.smooth(t, 38.6, 41.6), s1 = MathX.smooth(t, 47.6, 50.2);        // (slow drifts: the view is never still)
+      const U = SND_P(2 - 4 * s0, 17 - 2 * s0, -42), R1 = SND_P(-64, 33, -314), R2 = SND_P(-14, 24, -212);
+      const Fs = SND_P(-6 + 1.5 * s1, 8.2 - 2.4 * s1, -50), Fr = SND_P(-1, 0.6, Math.min(22, zf - 3)), Hn = SND_P(5, -1.9, 21);
+      const W = SND_P(-3, 2.5, -30), Sk = SND_P(-6, 15, -42);
+      const S = (a, b) => MathX.smooth(t, a, b);
+      let q = SND_MIX(U, R1, S(40.5, 41.9));
+      q = SND_MIX(q, R2, S(43.8, 44.9)); q = SND_MIX(q, Fs, S(46.1, 47.6)); q = SND_MIX(q, Fr, S(50.2, 50.9));
+      q = SND_MIX(q, Hn, S(51.6, 52.25)); q = SND_MIX(q, W, S(53.9, 55.0));
+      return SND_MIX(q, Sk, S(54.6, 56.9));
     },
-    (t) => 57 - 3 * MathX.smooth(t, 38.6, 41.6) - 4 * MathX.smooth(t, 40.6, 43.0) - 16 * MathX.smooth(t, 44.2, 46.8) - 4 * MathX.smooth(t, 46.8, 50.2) + 26 * MathX.smooth(t, 50.2, 50.9) + 4 * MathX.smooth(t, 54.4, 56.9)],
+    (t) => {
+      const S = (a, b) => MathX.smooth(t, a, b);
+      return 57 - 3 * S(38.6, 41.6) - 34 * S(40.7, 41.9) + 4 * S(43.8, 44.9) + 6 * S(46.1, 47.6) - 2 * S(47.6, 50.2) + 8 * S(50.2, 50.9) +
+        18 * S(51.6, 52.25) + 2 * S(53.9, 55.0) + 4 * S(54.4, 56.9);
+    }],
 ];
 function sndShotAt(t) { let k = 0; for (let i = 0; i < SND.cuts.length; i++) if (t >= SND.cuts[i]) k = i + 1; return k; }
 // true when a cut falls between t0 and t1 (no whip smear across a cut)
@@ -330,9 +342,10 @@ function sndKmh(t) { const k = sndC(t) * 3.6; return k >= 1000 ? `${Math.floor(k
   const tT = H.thunder;
   C.startles = [[H.gun + 0.02, 0.35], [H.kick + 0.02, 0.5], [tT + 0.02, 2.0]];
   C.shakes = [[H.kick + 0.01, 0.3, 0.25], [tT + 0.02, 0.4, 0.9]];
-  C.tilt = [[0, 0], [tT, 0], [tT + 0.2, -1.8], [tT + 1.3, 0], [70, 0]];
-  SCRIPT.hands.right = [[0, 'hidden'], [tT + 0.04, 'ear'], [tT + 1.0, 'ear'], [tT + 1.6, 'hidden']];
-  SCRIPT.hands.left = [[0, 'hidden'], [tT + 0.07, 'ear'], [tT + 0.95, 'ear'], [tT + 1.55, 'hidden']];
+  C.tilt = [[0, 0], [tT, 0], [tT + 0.2, -1.8], [tT + 1.5, -1.6], [tT + 2.2, 0], [70, 0]];
+  // your hands jerk up in front of your face, then over your ears, and stay there a second and a half
+  SCRIPT.hands.right = [[0, 'hidden'], [tT + 0.03, 'flinch'], [tT + 0.42, 'ear'], [tT + 1.7, 'ear'], [tT + 2.2, 'hidden']];
+  SCRIPT.hands.left = [[0, 'hidden'], [tT + 0.06, 'flinch'], [tT + 0.46, 'ear'], [tT + 1.65, 'ear'], [tT + 2.15, 'hidden']];
 
   // 4. the readouts (top-left); the small "thunder" tag under them (tag: true) keeps the opening flash in mind
   const R = SCRIPT.hud.readouts, top = 200, tagTop = 470;

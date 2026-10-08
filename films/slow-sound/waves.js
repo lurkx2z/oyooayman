@@ -2,11 +2,14 @@
    WAVES — what the slower sound does that you can SEE (pure functions of story time):
      · SndRipples  thin rings on the grass where each sound front is: the gun's bang running down the start line,
                    the five loudspeakers, the whistle, the kick, the supersonic ball (its rings pile up into a V:
-                   the Mach cone), every drum beat, and the thunder's front crossing the whole stadium
+                   the Mach cone), every drum beat
+     · SndFrontLine the thunder's front where it meets the world: a thin bright line on the ground, the roofs and
+                   the steps, and a brief glow on everything it has just passed (buildings, the far stand, the fans)
      · SndShells   the same fronts in the air: faint, glassy spheres growing at 34.3 m/s from each source (a bright
                    rim where you look along the shell), so you can watch a bang travel down the line, over the stand,
-                   or the thunder's front come across the stadium toward you
+                   or the thunder's front (a sheet of glass with a crisp top edge) come over the city toward you
      · SndPuffs    the starting gun's smoke
+     · SndBirds    flocks on the city's roofs and pigeons on the far stand, lifting off as the thunder reaches them
    Every time comes from script.js: the picture and the sound agree by construction.
    ===================================================================== */
 
@@ -24,7 +27,6 @@ class SndRipples {
     for (let te = P.kick.t + 0.005; te < SND_BALL.tGoal; te += 0.03) { const b = sndBall(te); E.push([b.x, b.z, te, b.y, te < SND_BALL.tMach1 ? 2.4 : 1.2, 0.6, 0.12, 3]); }
     for (let k = 0; k < P.drum.n; k++) E.push([P.drum.x, P.drum.z, P.drum.t0 + k * P.drum.period, P.drum.y + 0.8, k % 4 ? 0.6 : 2.0, 4.4, 0.3, 4]);   // (the accented beats bright)
     this.E = E;
-    this.thunder = [SND_BOLT.x, SND_BOLT.z, P.flash.t];
     const U = this.uniforms = {
       uE: { value: Array.from({ length: MAX }, () => new THREE.Vector4()) },     // x, z, ground radius, width
       uS: { value: new Float32Array(MAX) },                                       // strength
@@ -72,15 +74,58 @@ class SndRipples {
       const fade = MathX.smooth(age, 0, 0.1) * (1 - MathX.smooth(age, e[5] * 0.65, e[5]));
       A.push([e[0], e[1], Math.sqrt(rg2), e[6] + 0.004 * r, e[4] * fade]);
     }
-    // the thunder's front: a ring 1.7 km across, so on the pitch it is an almost straight line sweeping toward you
-    // (bold: a bright leading line with a broad glow behind it)
-    { const [x, z, te] = this.thunder, k = MathX.window(t, SND.heard.thunder - 3.8, SND.heard.thunder + 0.8, 0.6, 0.5);
-      if (k > 0) { const r = SND_RUN(te, t); A.push([x, z, r, 0.9, 7.0 * k]); A.push([x, z, r - 2.2, 2.4, 2.2 * k]); A.push([x, z, r - 7.0, 5.0, 0.8 * k]); } }
+    // (the thunder's front on the grass is drawn by SndFrontLine, with everything else it crosses)
     A.sort((a, b) => b[4] - a[4]);
     const n = Math.min(this.MAX, A.length);
     for (let i = 0; i < n; i++) { U.uE.value[i].set(A[i][0], A[i][1], A[i][2], A[i][3]); U.uS.value[i] = A[i][4]; }
     U.uN.value = n;
     if (fog) { U.uFogColor.value.copy(fog.color); U.uFogDensity.value = fog.density; }
+  }
+}
+
+/* the thunder's front where it meets the world: a thin bright line where it cuts the ground, the roofs and the treads
+   (a few pixels wide at any distance and any lens), and a brief glow on everything it has just passed (walls, faces,
+   fans), so you can watch it come over the city building by building, down the far stand, across the pitch and up the
+   rows to you. The uniforms are shared by every patched material (the stadium's, below, and the crowd's, crowd.js). */
+const SND_TH = { uThO: { value: new THREE.Vector3(SND_BOLT.x, 0, SND_BOLT.z) }, uThR: { value: 0 }, uThK: { value: 0 }, uThPx: { value: 0.001 } };
+const SND_TH_GLSL = {
+  decl: 'uniform vec3 uThO; uniform float uThR, uThK, uThPx;',
+  // (w: the world position; up: how much the surface faces up (its line is widened against foreshortening); glow: the
+  //  glow's strength on what the front has just passed, an expression that may use the distance from the eye, thD)
+  frag: (w, up, glow) => `if (uThK > 0.0) {
+      vec3 thV = cameraPosition - ${w}; float thD = length(thV), thF = max(0.1, mix(1.0, abs(thV.y) / thD, ${up}));
+      float thW = max(0.05, thD * uThPx / thF), thE = length(${w} - uThO) - uThR;
+      float thL = exp(-thE * thE / (thW * thW)), thB = step(thE, 0.0) * exp(min(thE, 0.0) / 16.0);
+      totalEmissiveRadiance += uThK * vec3(0.8, 0.9, 1.0) * (1.4 * thL + (${glow}) * thB);
+    }`,
+};
+class SndFrontLine {
+  constructor(scene) {
+    // every material Look gave its world-space grime (so it already carries the world position, vGrimeW)
+    this.n = 0;
+    scene.traverse((o) => {
+      if (!o.isMesh) return;
+      for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+        if (!m || m.userData.grime === undefined || m.userData.sndTh) continue;
+        m.userData.sndTh = true; this.n++;
+        const prev = m.onBeforeCompile, key = m.customProgramCacheKey;
+        m.onBeforeCompile = (sh, r) => {
+          prev.call(m, sh, r);
+          Object.assign(sh.uniforms, SND_TH);
+          sh.fragmentShader = sh.fragmentShader
+            .replace('#include <common>', '#include <common>\n' + SND_TH_GLSL.decl)
+            .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + SND_TH_GLSL.frag('vGrimeW', 'vGrimeUp', '0.5 * (1.0 - 0.75 * vGrimeUp) * smoothstep(6.0, 40.0, thD)'));
+        };
+        m.customProgramCacheKey = () => key.call(m) + '|sndTh';
+        m.needsUpdate = true;
+      }
+    });
+  }
+  update(t, camera) {
+    // through the whole last shot, until the front is past you
+    SND_TH.uThK.value = MathX.window(t, SND.cuts[4] + 0.6, SND.heard.thunder + 1.0, 1.6, 0.6);
+    SND_TH.uThR.value = SND_RUN(SND.flash.t, t);
+    SND_TH.uThPx.value = 2 * Math.tan(MathX.deg(camera.fov) / 2) * (2.6 / 1920);   // (a half-width of ~2.6 px on 1080×1920)
   }
 }
 
@@ -133,17 +178,18 @@ class SndShells {
     this.mesh.frustumCulled = false; this.mesh.renderOrder = 4; this.mesh.count = 0;
     scene.add(this.mesh);
     // the thunder's front: a curtain of air, brightest near the ground, with a bright rim where you look along it
-    this.thunderMat = new THREE.ShaderMaterial({ uniforms: { uFogDensity: U.uFogDensity, uK: { value: 1 } }, vertexShader: vs,
+    this.thunderMat = new THREE.ShaderMaterial({ uniforms: { uFogDensity: U.uFogDensity, uK: { value: 1 }, uThPx: SND_TH.uThPx }, vertexShader: vs,
       fragmentShader: /* glsl */`
-        uniform float uFogDensity, uK; varying vec3 vW, vC; varying float vS, vDepth;
+        uniform float uFogDensity, uK, uThPx; varying vec3 vW, vC; varying float vS, vDepth;
         void main(){
           if (vW.y < 0.02) discard;
           vec3 N = normalize(vW - vC), V = normalize(cameraPosition - vW);
           float f = 1.0 - abs(dot(N, V));
-          // drawn as a wall 45 m tall moving toward you: a faint glassy body, a bright top edge, a bright foot
-          float y = vW.y, body = 1.0 - smoothstep(36.0, 46.0, y);
-          float edge = exp(-pow((y - 44.5) / 1.8, 2.0)), foot = exp(-y / 1.4);
-          float a = uK * (0.06 * body + 0.34 * edge + 0.3 * foot + 0.5 * pow(f, 5.0) * body);
+          // drawn as a sheet of glass 45 m tall moving toward you: a very faint body brightening up to a crisp top edge
+          // (a few pixels wide at any distance); where it meets the ground and the buildings, SndFrontLine draws the line
+          float y = vW.y, body = 1.0 - smoothstep(43.0, 44.6, y), hw = max(0.08, vDepth * uThPx);
+          float edge = exp(-pow((y - 44.6) / hw, 2.0)), glow = body * exp((y - 44.6) / 7.0);
+          float a = uK * (0.018 * body + 0.06 * glow + 0.7 * edge + 0.35 * pow(f, 5.0) * body);
           a *= exp(-uFogDensity * vDepth * 0.5) * smoothstep(3.0, 14.0, vDepth);
           gl_FragColor = vec4(vec3(0.86, 0.92, 1.0) * a, 1.0);
         }`,
@@ -225,9 +271,19 @@ class SndBirds {
       for (let i = 0; i < n; i++) {
         const sd = fi * 100 + i, a = hash1(sd) * 6.28;
         this.B.push({ x: b.x + (hash1(sd * 3) - 0.5) * b.w * 0.8, z: b.z + (hash1(sd * 5) - 0.5) * b.d * 0.8, y: b.h + 0.4, tl: tl + hash1(sd * 7) * 0.25,
-          vx: Math.cos(a) * (3 + 3 * hash1(sd * 11)), vz: Math.sin(a) * (3 + 3 * hash1(sd * 11)) + 2.5, vy: 5 + 4 * hash1(sd * 13), ph: hash1(sd * 17) * 6.28, sz: 2.6 + 1.5 * hash1(sd * 19) });   // drawn ~3× a gull: 200–400 m away they must read on a phone
+          vx: Math.cos(a) * (3 + 3 * hash1(sd * 11)), vz: Math.sin(a) * (3 + 3 * hash1(sd * 11)) + 2.5, vy: 5 + 4 * hash1(sd * 13), ph: hash1(sd * 17) * 6.28, sz: 4.2 + 2.4 * hash1(sd * 19) });   // drawn ~5× a gull: 200–400 m away they must read on a phone
       }
     });
+    // pigeons sitting along the top of the far stand's back wall, in clumps: they go up as the front reaches them, just
+    // before the back rows duck (110 m away, in the frame while the lens is on the far stand)
+    for (let c = 0; c < 7; c++) {
+      const cx = -25 + c * 6.5 + (hash1(c * 41) - 0.5) * 3, n = 4 + Math.floor(hash1(c * 43) * 6);
+      for (let i = 0; i < n; i++) {
+        const sd = 9000 + c * 20 + i, P = { x: cx + (hash1(sd) - 0.5) * 2.4, y: 12.52, z: -59.42 }, a = hash1(sd * 3) * 6.28;
+        this.B.push({ x: P.x, y: P.y, z: P.z, tl: sndThunderAt(P) + 0.06 + hash1(sd * 7) * 0.22, vx: Math.cos(a) * 2.2, vz: -1.2 - 2.2 * hash1(sd * 11), vy: 3.2 + 2.6 * hash1(sd * 13),
+          ph: hash1(sd * 17) * 6.28, sz: 1.0 + 0.3 * hash1(sd * 19), sit: 0.62 });
+      }
+    }
   }
   static tex(up) {
     const c = document.createElement('canvas'); c.width = c.height = 64;
@@ -248,7 +304,7 @@ class SndBirds {
     U.uniforms.uFogDensity.value *= 0.35; D.uniforms.uFogDensity.value *= 0.35;   // (dark silhouettes, 200–400 m away)
     if (sndShotAt(t) === 5) for (const b of this.B) {
       const u = t - b.tl;
-      if (u < 0) { D.push(b.x, b.y, b.z, b.sz * 0.5, 0, 0.8, 1.0, 0.14, 0.14, 0.15); continue; }
+      if (u < 0) { D.push(b.x, b.y + (b.sit ? b.sz * 0.12 : 0), b.z, b.sz * (b.sit || 0.5), 0, 0.8, 1.0, 0.14, 0.14, 0.15); continue; }
       if (u > 9) continue;
       const k = 1 - Math.exp(-u / 1.4), S = Math.sin(u * 14 + b.ph) > 0 ? U : D;
       S.push(b.x + b.vx * 1.6 * k + b.vx * 0.3 * u, b.y + b.vy * 1.6 * k + 0.8 * u, b.z + b.vz * 1.6 * k + b.vz * 0.3 * u, b.sz, 0, 0.95, 1.0, 0.12, 0.12, 0.13);

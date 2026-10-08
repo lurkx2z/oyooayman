@@ -8,8 +8,9 @@
      debug(app, t)     text for the D debug panel
    ===================================================================== */
 
-const SND_HAND_POSES = Object.assign({}, HAND_POSES);
-const SND_HAND_BLEND = Object.assign({}, HAND_BLEND, { ear: 0.12 });
+// flinch: both hands thrown up in front of your face, palms out (the thunder's hit)
+const SND_HAND_POSES = Object.assign({}, HAND_POSES, { flinch: { p: [0.09, -0.19, -0.36], F: [0.2, 1, -0.25], N: [0.1, 0.2, -1], curl: [0.3, 0.34, 0.4, 0.46], thumb: [0.35, 0.3] } });
+const SND_HAND_BLEND = Object.assign({}, HAND_BLEND, { ear: 0.2, flinch: 0.08 });
 // where the sun's shadow map is aimed in each shot [centre x, centre z, half-size] (sharp where you look)
 const SND_SHADOW = [[3, 0, 46], [-15, 43, 24], [-34, 12, 50], [43, 2, 26], [-10, -42, 46], [0, 0, 74]];
 
@@ -31,6 +32,7 @@ const FILM = {
     app.hands = new ViewerHands(camera, { scale: 1.04, sleeve: '#3a4652', nail: '#c99c84', sleeveLen: 1.1, sleeveFit: 0.78,
       poses: SND_HAND_POSES, blends: SND_HAND_BLEND });
     Look.apply(scene, camera);                         // selective gloss + world-space grime (after the world is built)
+    app.front = new SndFrontLine(scene);               // (the thunder's front drawn where it meets the world: after Look)
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     app.hud.readouts.forEach((r) => { if (r.R.tag) r.el.classList.add('snd-tag'); });   // (the small thunder tag: page CSS)
     app.audio = new SndAudio(app.tl, app);
@@ -46,6 +48,7 @@ const FILM = {
     app.shells.update(t, fog);
     app.puffs.update(t, fog);
     app.birds.update(t, fog);
+    app.front.update(t, app.camera);
     app.hands.update(t);
   },
 
@@ -73,7 +76,7 @@ const FILM = {
     if (fl > 0) { p.flash = 0.06 * fl; p.flashColor.setRGB(0.82, 0.86, 1.0); }
     // the kick's crack, then the thunder: a startle — a brief jolt, the world dulled for a moment (your hands fly to
     // your ears; 1.7 km away it is a loud clap, not a blast)
-    const tT = H.thunder, muf = MathX.smooth(t, tT + 0.05, tT + 0.15) * (1 - MathX.smooth(t, tT + 0.4, tT + 0.9));
+    const tT = H.thunder, muf = MathX.smooth(t, tT + 0.05, tT + 0.15) * (1 - MathX.smooth(t, tT + 1.4, tT + 2.1));   // (your hands over your ears)
     p.chroma = 0.003 * I(t, H.kick, 0.15) + 0.016 * I(t, tT, 0.45);
     p.edgeBlur = 0.55 * I(t, tT, 0.7) + 0.3 * muf;
     if (t >= tT && t < tT + 0.15) { p.flash = Math.max(p.flash, 0.35 * Math.exp(-(t - tT) / 0.06)); p.flashColor.setRGB(1, 1, 1); }

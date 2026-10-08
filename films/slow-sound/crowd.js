@@ -59,6 +59,22 @@ function sndCrowdSeats() {
       }
     }
   }
+  // the rows below your seat in the last shot: empty in shot 1 (you stand among them there), they come in at the last
+  // cut (their own RNG, appended after everyone else, so no other fan changes)
+  { const rng2 = new RNG(4402), aisles = [-49, -35, -21, -7, 7, 21, 35, 49];
+    for (let r = 2; r <= 9; r++) {
+      for (let x = S.x0 + 0.45; x < S.x1 - 0.4; x += 0.56) {
+        if (x < 1.4 || x > 12.1 || aisles.some((a) => Math.abs(x - a) < 0.75)) continue;
+        const occ = 0.9 - 0.25 * MathX.smooth(sndNoise2(x * 0.07 + 9, r * 0.25), 0.62, 0.8);
+        if (rng2.next() > occ) continue;
+        const xx = x + rng2.range(-0.07, 0.07);
+        if (!(xx > 2.0 && xx < 11.5 && !(r >= 8 && Math.abs(xx - 6.6) > 0.95))) continue;   // (only the seats left empty above)
+        if (r >= 5 && Math.abs(xx - 6.1) < 1.15) continue;                                  // (your view down the steps stays open)
+        const q = sndSideSeat(1, r, xx);
+        out.push({ x: xx, y: q.y, z: q.z - 0.1, yaw: Math.PI + rng2.range(-0.22, 0.22), stand: 'main', r, seed: rng2.next(), away: false, late: SND.cuts[4] });
+      }
+    }
+  }
   return out;
 }
 
@@ -74,6 +90,7 @@ class SndCrowd {
       f.tGoal = !f.away && s2 > 0.18 ? SND_BALL.tGoal + 0.22 + 0.4 * h : 1e6;       // it SEES the goal: it jumps
       f.scarf = !f.away && s3 > 0.2;
       f.clapper = !f.away && h > 0.07;
+      if (f.late) { f.tGoal = 1e6; f.scarf = false; f.clapper = false; }     // (not there yet at the goal or the drum)
       f.h = h; f.s2 = s2; f.s3 = s3;
     }
     this.uniforms = { uT: { value: 0 }, uDrum: { value: new THREE.Vector4(SND.drum.t0, SND.drum.period, SND.drum.n, 0) } };
@@ -94,7 +111,7 @@ class SndCrowd {
       list.forEach((f, i) => {
         mesh.setMatrixAt(i, m4.compose(p.set(f.x, f.y, f.z), q.setFromEuler(e.set(0, f.yaw, 0)), sc.setScalar(0.93 + 0.14 * f.s2)));
         A.set([f.seed, f.tDrum, f.tThunder, f.tGoal], i * 4);
-        Bt.set([f.scarf ? 1 : 0, 0, 0, f.clapper ? 1 : 0], i * 4);
+        Bt.set([f.scarf ? 1 : 0, f.late || 0, 0, f.clapper ? 1 : 0], i * 4);
         const col = (arr, k) => new THREE.Color(arr[Math.floor(k * arr.length) % arr.length]);
         const shirt = f.away ? col(SND_CROWD_AWAY, f.s2) : f.s3 < 0.55 ? col(SND_CROWD_HOME, f.h) : col(SND_CROWD_CASUAL, f.s2);
         const skin = col(SND_CROWD_SKIN, hash1(f.seed * 1000 + 43)), hair = col(SND_CROWD_HAIR, hash1(f.seed * 1000 + 57));
@@ -145,12 +162,12 @@ class SndCrowd {
     const mat = new THREE.MeshLambertMaterial({ color: '#ffffff', flatShading: true, name: 'crowdFan' });
     const U = this.uniforms;
     mat.onBeforeCompile = (sh) => {
-      sh.uniforms.uT = U.uT; sh.uniforms.uDrum = U.uDrum;
+      sh.uniforms.uT = U.uT; sh.uniforms.uDrum = U.uDrum; Object.assign(sh.uniforms, SND_TH);   // (the thunder's line: waves.js)
       sh.vertexShader = sh.vertexShader
         .replace('#include <common>', /* glsl */`#include <common>
           attribute float aPart; attribute vec4 aA; attribute vec4 aB; attribute vec3 aShirt; attribute vec3 aSkin; attribute vec3 aHair;
           uniform float uT; uniform vec4 uDrum;
-          varying vec3 vCrowdCol; varying float vScarf;
+          varying vec3 vCrowdCol; varying float vScarf; varying vec3 vCrowdW;
           vec3 rotTo(vec3 v, vec3 b){                       // rotate v by the rotation taking (0,−1,0) to b
             vec3 ax = vec3(-b.z, 0.0, b.x); float s = length(ax), c = -b.y;
             if (s < 1e-4) return c > 0.0 ? v : vec3(v.x, -v.y, -v.z);
@@ -212,17 +229,19 @@ class SndCrowd {
             }
             p.y *= 1.0 - 0.24 * duck;
             p.y += jump;
-            transformed = p;
+            transformed = uT < aB.y ? vec3(0.0, -60.0, 0.0) : p;          // (a fan who only comes in at a later cut)
+            vCrowdW = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;
             vec3 pants = mix(vec3(0.05, 0.06, 0.09), vec3(0.09, 0.13, 0.22), step(0.5, fract(seed * 7.31)));
             vCrowdCol = part < 0.5 ? pants : (part < 1.5 || part == 4.0 || part == 5.0) ? aShirt : (part == 3.0 ? aHair : aSkin);
           }`);
       sh.fragmentShader = sh.fragmentShader
-        .replace('#include <common>', '#include <common>\nvarying vec3 vCrowdCol; varying float vScarf;')
+        .replace('#include <common>', '#include <common>\nvarying vec3 vCrowdCol; varying float vScarf; varying vec3 vCrowdW;\n' + SND_TH_GLSL.decl)
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + SND_TH_GLSL.frag('vCrowdW', '0.0', '0.45 * smoothstep(6.0, 40.0, thD)'))
         .replace('#include <color_fragment>', `#include <color_fragment>
           diffuseColor.rgb = vCrowdCol;
           if (vScarf >= 0.0) diffuseColor.rgb = mix(vec3(0.96, 0.95, 0.9), vec3(0.85, 0.62, 0.06), step(0.72, fract(vScarf * 3.0 + 0.25)));`);
     };
-    mat.customProgramCacheKey = () => 'sndCrowd3';
+    mat.customProgramCacheKey = () => 'sndCrowd4';
     return mat;
   }
 
