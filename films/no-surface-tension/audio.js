@@ -178,6 +178,9 @@ class NstAudio extends AudioEngine {
       for (const [dt, pan] of [[0, -0.1], [0.5 / 1.7, 0.1]]) this._band(S, bus, 'brown', [90, 600], t + dt, t + dt + 0.3, (u) => 0.05 * Math.sin(MathX.clamp((u - t - dt) / 0.28, 0, 1) * Math.PI), pan, 0.01);
     }
     for (const [t, n] of [[T.duck + 1.1, 3], [T.duck + 3.6, 2], [T.duck + 5.6, 4]]) for (let k = 0; k < n; k++) S.voice(t + k * 0.19, 470 - 25 * k, 0.13, 'a', 0.018, -0.1, bus, 0.72);
+    // it paddles under the leaf in the close-up: soft strokes on the surface (no plips), two tired quacks
+    for (let t = T.land + 0.6; t < T.line2 + 1.2; t += 1 / 1.7) this._band(S, bus, 'pink', [500, 1.0], t, t + 0.25, (u) => 0.018 * Math.sin(MathX.clamp((u - t) / 0.24, 0, 1) * Math.PI), 0.15, 0.01);
+    for (let k = 0; k < 2; k++) S.voice(T.line1 + 1.4 + k * 0.2, 450 - 25 * k, 0.13, 'a', 0.012, 0.15, bus, 0.72);
   }
 
   /* the time-lapse days, the clouds, the rain (a roar of mist with no patter), far thunder */

@@ -16,8 +16,8 @@ const NST_G = {
   potA: { x: 2.2, z: -0.43 },
   potB: { x: 2.86, z: -0.42 },
   fence: { x0: -7.0, x1: 5.0, z: -17.0, h: 1.8 },
-  sunflower: { x: -2.63, z: -5.98 },      // among the pond's rim stones; its big leaf reaches out over the water
-  duck: { from: [-0.66, -6.55], to: [-1.04, -6.22], drift: [-1.2, -6.08] },   // (x, z) at NST.duck, NST.dive, NST.end
+  sunflower: { x: -2.49, z: -6.04 },      // among the pond's rim stones; its big leaf reaches out over the water
+  duck: { from: [-0.66, -6.55], to: [-1.04, -6.22], drift: [[-1.38, -6.2], [-1.98, -6.76], [-2.25, -7.0]] },   // (x, z) at NST.duck, NST.dive, then at NST.land, NST.line2, NST.end
 };
 
 // the sun for a given garden day (1.0 = 10:00 on the morning of the change)
@@ -529,7 +529,7 @@ class NstGarden extends Environment {
     }
     this.sunflower = { g, segs, leaves, head, face, hero: leaves.find((l) => l.hero) };
     // the thread of rain water running off the hero leaf's tip (no drop can form there)
-    this.tipThread = new NstStream(this.root, nstWaterMat({ color: '#d4e2e5', opacity: 0.55, fres: 0.85, env: 1.2 }), { a: new THREE.Vector3(), v0: new THREE.Vector3(0, -0.06, 0), r0: 0.0016, yEnd: 0.0, ns: 60, nrad: 7, seed: 91, spread: 0.35, frayLen: 0.4 });
+    this.tipThread = new NstStream(this.root, nstWaterMat({ color: '#dce9ec', opacity: 0.62, fres: 0.85, env: 1.2 }), { a: new THREE.Vector3(), v0: new THREE.Vector3(0, -0.06, 0), r0: 0.0021, yEnd: 0.0, ns: 60, nrad: 7, seed: 91, spread: 0.35, frayLen: 0.4 });
     this.leafFilmMat = nstWaterMat({ color: '#9db8bd', opacity: 0, fres: 0.7, env: 1.3, side: THREE.DoubleSide, rough: 0.02 });
     const hl = this.sunflower.hero;
     const film = new THREE.Mesh(leafGeo(hl.L * 0.985, hl.L * 0.88), this.leafFilmMat); film.quaternion.copy(this._leafQ); film.position.y = 0.0012; film.renderOrder = 4; hl.tilt.add(film);
@@ -547,8 +547,8 @@ class NstGarden extends Environment {
   _updateSunflower(t) {
     const F = this.sunflower, w = nstWilt(t), rain = nstRain(t);
     // the stem bows from each joint, more toward the top; the head hangs; leaves droop from the petiole
-    const bend = [0.0, 0.05, 0.1, 0.17, 0.28, 0.42];        // it bows sideways (seen from the lawn the bend reads), most near the top
-    F.segs.forEach((s, k) => { s.rotation.z = bend[k] * w; s.rotation.x = 0.03 * k * w; });
+    const bend = [0.0, 0.05, 0.1, 0.17, 0.28, 0.42];        // most near the top; seen from the lawn it bows sideways, toward the water
+    F.segs.forEach((s, k) => { s.rotation.z = -bend[k] * w; s.rotation.x = 0.03 * k * w; });     // (it bows out over the pond)
     F.face.rotation.x = 1.25 + 1.45 * w;
     // a gust on the closing line: the leaf dips and springs back, a surge of water runs down it and off the tip (still no drop)
     const gu = t - (NST.line2 + 0.1), gust = gu > 0 ? Math.exp(-gu / 0.8) * Math.sin(gu * 8.5) : 0, surge = gu > 0 ? MathX.smooth(gu, 0.2, 0.55) * Math.exp(-gu / 1.6) : 0;
@@ -556,10 +556,10 @@ class NstGarden extends Environment {
     // green → olive → brown; petals curl brown
     const S = this.sunMats, B = this.sunBase, dry = this._sunDry || (this._sunDry = { leaf: new THREE.Color('#7a6a36'), petal: new THREE.Color('#8a6a2a'), stem: new THREE.Color('#6d6a38') });
     S.leaf.color.copy(B.leaf).lerp(dry.leaf, 0.85 * w); S.petal.color.copy(B.petal).lerp(dry.petal, 0.9 * w); S.stem.color.copy(B.stem).lerp(dry.stem, 0.7 * w);
-    S.leaf.emissive.copy(S.leaf.color).multiplyScalar(0.22 * MathX.smooth(t, NST.dive + 3, NST.land));      // (a little fill on the hero leaf for the close-up in the grey rain)
+    S.leaf.emissive.copy(S.leaf.color).multiplyScalar(0.12 * MathX.smooth(t, NST.dive + 3, NST.land));      // (a little fill on the hero leaf for the close-up in the grey rain)
     // wet in the rain: glossy, a film of water over the hero leaf; the tip lets it go as a thread, never a drop
     S.leaf.roughness = MathX.lerp(0.45, 0.18, rain);
-    this.leafFilmMat.opacity = (0.16 + 0.14 * surge) * rain;
+    this.leafFilmMat.opacity = (0.1 + 0.14 * surge) * rain;
     this.sunflowerTip(this._tipW);
     const th = this.tipThread;
     th.a.copy(this._tipW); th.yEnd = NST_G.pond.y; th.T = (th.v0.y + Math.sqrt(th.v0.y * th.v0.y + 2 * 9.81 * Math.max(0.02, th.a.y - th.yEnd))) / 9.81;     // (into the pond: no drop, no splash, no ring)
@@ -703,11 +703,14 @@ class NstGarden extends Environment {
     const T = NST, D = NST_G.duck, P = NST_G.pond, d = this.duck;
     d.visible = t > T.duck - 1.0;
     if (!d.visible) return;
-    const k1 = MathX.clamp((t - T.duck) / (T.dive - T.duck), 0, 1), k2 = MathX.clamp((t - T.dive) / (T.end - T.dive), 0, 1);
     const ph = (t - T.duck) * Math.PI * 2 * 1.7;                   // paddling hard: ~1.7 strokes a second
-    let x = t < T.dive ? MathX.lerp(D.from[0], D.to[0], k1) : MathX.lerp(D.to[0], D.drift[0], k2);
-    let z = t < T.dive ? MathX.lerp(D.from[1], D.to[1], k1) : MathX.lerp(D.to[1], D.drift[1], k2);
-    const dx = D.to[0] - D.from[0], dz = D.to[1] - D.from[1], L = Math.hypot(dx, dz);
+    // past the camera at the waterline; later it paddles under the sunflower's leaf, through the close-up
+    if (!this._duckPath) { const K = [[T.dive, D.to], [T.land, D.drift[0]], [T.line2, D.drift[1]], [T.end, D.drift[2]]]; this._duckPath = [0, 1].map((c) => new SmoothTrack(K.map(([tt, v]) => [tt, v[c]]))); }
+    const at = (u) => u < T.dive ? [MathX.lerp(D.from[0], D.to[0], MathX.clamp((u - T.duck) / (T.dive - T.duck), 0, 1)), MathX.lerp(D.from[1], D.to[1], MathX.clamp((u - T.duck) / (T.dive - T.duck), 0, 1))] : [this._duckPath[0].value(u), this._duckPath[1].value(u)];
+    let [x, z] = at(t);
+    const nx = at(t < T.dive ? Math.min(t + 0.05, T.dive - 0.001) : t + 0.05), px = at(t < T.dive ? Math.min(t, T.dive - 0.051) : Math.max(t - 0.05, T.dive));
+    let dx = nx[0] - px[0], dz = nx[1] - px[1]; if (Math.hypot(dx, dz) < 1e-5) { dx = D.to[0] - D.from[0]; dz = D.to[1] - D.from[1]; }
+    const L = Math.hypot(dx, dz);
     x += (dx / L) * 0.006 * Math.sin(ph); z += (dz / L) * 0.006 * Math.sin(ph);       // a surge with each stroke
     d.position.set(x, P.y - 0.034 + 0.005 * Math.sin(ph * 2 + 0.6), z);               // riding low: only its back and head clear the water
     d.rotation.set(0, Math.atan2(-dx, -dz) + 0.12 * Math.sin(t * 0.7), 0);

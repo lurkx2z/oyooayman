@@ -109,17 +109,23 @@ const FILM = {
   _divePath(app) {
     const G = app.garden, T = NST, tip = new THREE.Vector3(), base = new THREE.Vector3();
     G._updateSunflower(T.dive); G.sunflowerTip(tip, base);
-    const d = new THREE.Vector3(tip.x - base.x, 0, tip.z - base.z).normalize(), sd = new THREE.Vector3(-d.z, 0, d.x);
-    const V = (x, y, z) => new THREE.Vector3(x, y, z);
-    // you look past the tip toward the pond (the leaf runs in from the left of frame); the thread falls out of the bottom
+    const V = (x, y, z) => new THREE.Vector3(x, y, z), at = (x, y, z) => tip.clone().add(V(x, y, z));
     const P0 = NST_G.pond, v = new THREE.Vector3(P0.x - tip.x, 0, P0.z - tip.z).normalize();
-    const cf = tip.clone().addScaledVector(v, -0.42).add(V(0, 0.2, 0));        // above and behind the leaf: its wet upper face, the tip, the thread, the pond beyond
-    const lf = tip.clone().addScaledVector(v, 0.5).add(V(0, -0.28, 0));
-    const push = cf.clone().lerp(tip, 0.3);
-    const P = [[T.dive, tip.clone().add(V(-3.5, 21, 8))], [T.dive + 1.8, tip.clone().add(V(-2.0, 8.5, 3.4))], [T.dive + 3.5, tip.clone().addScaledVector(v, -1.1).add(V(-0.2, 2.2, 0))], [T.land - 0.6, cf.clone().addScaledVector(v, -0.3).add(V(0, 0.32, 0))], [T.land, cf], [T.end, push]];
-    const L = [[T.dive, V(-1.2, 0, -7.5)], [T.dive + 1.8, V(P0.x, 0, P0.z)], [T.dive + 3.5, tip.clone().addScaledVector(v, 1.2).add(V(0, -0.6, 0))], [T.land - 0.6, tip.clone().add(V(0, -0.06, 0))], [T.land, lf], [T.end, lf.clone().add(V(0, -0.02, 0))]];
+    // (it comes down on the leaf from the same side as the close-up, clear of the stem and the hanging head)
+    // the close-up: above and to one side of the bowed leaf, its tip high in frame, the thread falling down the frame
+    // against the dark pond; then, on the last line, back out to the whole sunflower bowed over the pond in the rain
+    const mc = at(-0.165, 0.3, 0.274), ml = at(0.141, -0.25, -0.052);
+    const wc = at(-1.073, -0.077, -0.853), wl = at(0.027, 0.073, 0.047);
+    const app0 = mc.clone().add(mc.clone().sub(tip).multiplyScalar(0.9));
+    const pull = T.line2 + 1.0, held = pull + 2.6;
+    const P = [[T.dive, tip.clone().add(V(-3.5, 21, 8))], [T.dive + 1.8, tip.clone().add(V(-2.0, 8.5, 3.4))], [T.dive + 3.5, at(-1.0, 2.2, 1.7)],
+      [T.land - 0.6, app0], [T.land, mc], [pull, mc.clone().lerp(tip, 0.12)]];
+    const L = [[T.dive, V(-1.2, 0, -7.5)], [T.dive + 1.8, V(P0.x, 0, P0.z)], [T.dive + 3.5, at(0.1, -0.35, -0.05)],
+      [T.land - 0.6, ml.clone().add(V(0, -0.1, 0))], [T.land, ml], [pull, ml.clone().add(V(0, -0.02, 0))]];
     const tr = (keys) => ['x', 'y', 'z'].map((c) => new SmoothTrack(keys.map(([t, v]) => [t, v[c]])));
-    this._dive = { p: tr(P), l: tr(L), fov: new Track([[T.dive, 62], [T.dive + 2.5, 54], [T.land - 0.8, 44], [T.land, 40], [T.end, 36]]) };
+    // (the pull-back is its own eased move, so the close-up's slow push-in doesn't swing back through it)
+    const out = { pull, held, c0: P[P.length - 1][1], l0: L[L.length - 1][1], c1: wc, l1: wl, c2: wc.clone().lerp(wl, -0.06) };
+    this._dive = { p: tr(P), l: tr(L), out, fov: new Track([[T.dive, 62], [T.dive + 2.5, 54], [T.land - 0.8, 46], [T.land, 42], [pull, 40], [held, 55, 'inOutSine'], [T.end, 53]]) };
   },
 
   update(app, t) {
@@ -128,8 +134,15 @@ const FILM = {
     if (t >= T.dive) {
       if (!this._dive) this._divePath(app);
       const D = this._dive;
-      cam.position.set(D.p[0].value(t), D.p[1].value(t), D.p[2].value(t));
-      this._v.set(D.l[0].value(t), D.l[1].value(t), D.l[2].value(t));
+      const O = D.out;
+      if (t < O.pull) {
+        cam.position.set(D.p[0].value(t), D.p[1].value(t), D.p[2].value(t));
+        this._v.set(D.l[0].value(t), D.l[1].value(t), D.l[2].value(t));
+      } else {
+        const k = Ease.inOutSine(MathX.clamp((t - O.pull) / (O.held - O.pull), 0, 1)), k2 = MathX.smooth(t, O.held, T.end + 0.5);
+        cam.position.copy(O.c0).lerp(O.c1, k).lerp(O.c2, k2);
+        this._v.copy(O.l0).lerp(O.l1, k);
+      }
       cam.up.set(0, 1, 0); cam.lookAt(this._v);
       cam.fov = D.fov.value(t); cam.updateProjectionMatrix();
     }
