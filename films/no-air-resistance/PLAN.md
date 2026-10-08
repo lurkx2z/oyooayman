@@ -111,18 +111,18 @@ the cloud); the first stones play at 0.5× (story 36.85–37.75). Story 62.4 →
 | Film s | What we SEE | Caption / HUD |
 |---|---|---|
 | 0–3.4 | The windy party from the stair door: sheets, bunting, the kite high up; at 2.0 everything drops | TITLE · AERODYNAMIC FORCE 100 % → 0 % |
-| 0–3.4 (detail) | From 2.15 the camera follows the kite down as it falls | — |
-| 3.4–6.3 | Zoom to the kite's flyer at the front corner, the kite fallen past the parapet | *The kite just dropped like a brick…* / *…but the wind is still blowing at 50 km/h.* · KITE · NO LIFT |
+| 0–3.4 (detail) | From 2.1 the camera eases in on the kite and follows it down as it falls | — |
+| 3.4–6.3 | Zoom to the kite's flyer at the front corner, the kite fallen past the parapet | *The kite just dropped like a brick…* / *…but the wind is still blowing at 50 km/h.* · KITE · FELL INTO THE STREET (where its string goes over the parapet) |
 | 6.3–11.7 (6.3–10.1) | Over the stairwell rail: paper and ball let go together, 22 m down, slow motion; the NORMAL AIR ghost flutters near the top; a snap-in (FOV 44 → 16) as they land | GROUND FLOOR · 22 M DOWN · BOTH LAND IN 2.14 S · SLOW MOTION ×0.6 · *Paper now falls as fast as a ball.* |
 | 11.7–17.9 (14.2–20.4) | 9 km up beside one hailstone against blue sky and the storm's wall; down into the cloud; droplets stream up past the still stone; lightning | 9 KM ABOVE THE PARTY · THIS ICE · km/h · CLOUD DROPLETS · STILL HELD UP · *Up in the storm, all of its ice is falling…* / *…and the air can't slow it down.* |
 | 17.9–21.5 (20.4–24.0) | Back on the roof, the confetti cannon: one clump goes up and comes down like gravel; the toy paratrooper's canopy can't open; its ghost drifts off (one level frame) | clock THE CLOUD'S ICE LANDS IN 16 S · *All of it lands here in 16 seconds.* · CONFETTI · NO DRAG · PARACHUTE · CAN'T OPEN · NORMAL AIR · *So a parachute is useless.* |
 | 21.5–27.4 (24.0–29.9) | The gust front: 110 km/h, rain sideways, a ghost sheet thrashing, the real sheets barely moving; a slow push in on the washing | WIND 110 KM/H · RAIN IS WATER · STILL BLOWN · *The rain flies sideways…* / *…but the washing barely moves.* |
 | 27.4–30.5 (29.9–33.0) | Snap to the girl: she lets go; the balloons shoot up out of frame | BUOYANCY, NO DRAG · km/h · *Balloons now rocket up at 2 g.* |
-| 30.5–34.35 (33.0–36.85) | Back to the party under the dark cloud; the clock runs out; a hush | *That cloud's ice has been falling for 31 seconds…* / *…and the first of it is about to land.* |
+| 29.2–34.35 (31.7–36.85) | The mum and the girl run past you for the stair door (you go too); you turn back to the empty party under the dark cloud; the clock runs out; a hush | *That cloud's ice has been falling for 31 seconds…* / *…and the first of it is about to land.* |
 | 34.35–36.15 (36.85–37.75) | The first stones, slow motion: a stone into the confetti, chips skimming flat across the deck | ICE LANDING NOW 1,235 KM/H · SLOW MOTION ×0.5 |
 | 36.15–43.6 (37.75–45.2) | Back to the stair door; snap-ins as the bottles and the cake go; the fairy lights | ICE: STRAIGHT DOWN · RAIN: BLOWN · *It's landing faster than sound.* |
 | 43.6–46.2 (45.2–47.8) | Holes punched through the roof over you; look up | *And now it's coming through the roof.* |
-| 46.2–51.9 (47.8–53.5) | Crouched at the top of the stairs: a sheet drops, the chairs go over, the chimney pot goes, then a snap-in as the table comes down | *Now faster than a pistol bullet.* |
+| 46.2–51.9 (47.8–53.5) | Crouched at the top of the stairs: a sheet drops, the chairs go over, the chimney pot goes, then a snap-in as the table comes down and a second, tighter one as its top lands | *Now faster than a pistol bullet.* |
 | 51.9–54.4 (53.5–56.0) | Silence. You step out: a white roof, a sheet shot to lace barely moving in the wind | IN A 110 KM/H WIND · BARELY MOVES |
 | 54.4–60.5 (56.0–62.1) | Closing lines over the roof (top third); a slow walk out towards the lace sheet, eye line raised | *Every storm cloud / is full of ice.* · *Only the air holds it up.* · note |
 | 60.5–60.8 | black | — |
@@ -170,4 +170,20 @@ ice ("All of it lands here in 16 seconds."); the rain and ghost-sheet tags no lo
 washing through the gust; a snap-in as the table comes down; the end walks out towards the lace sheet with a raised
 eye line; sound: a hush before the first stone (the roof's sounds pulled down, the drone and heartbeat stop 0.6 s
 before), a bigger first hit with a low thud, the roar held up after the first stones, a boom under the chimney pot and
-the table. Final scores: see `EPISODE_REPORT.md`.
+the table.
+
+**Final production audit and viewer review** (on the real 1080×1920 output, before the last fixes): differentiation
+6.5/10 (old cut 2/10); retention 6 (hook 6, middle 5.5, clarity 6, escalation 6.5, payoff 6); normal viewer 6 (hook 6,
+understanding 6, wow 6.5, ending 5, rewatch/share 5.5); audit: style 7, pacing 6, physics 7, phone clarity 6,
+escalation 6.5, continuity/technical 7, overall visual 6.5. Stretches over 4 s: 23.0–27.4, 28.4–34.6, 54.4–60.5.
+
+**Top-3 fixes after the audit:** (1) the climax: the roar ducks under each hero breakage and the breakages are louder;
+a second snap-in and a white flicker as the table top lands; the sound now fades with the picture instead of cutting
+dead at 60.5. (2) The lull before the ice: the mum and the girl run past you for the stair door (a new image, people at
+stake, and the reason the roof is empty), then you turn back to the party; the balloons' caption lands as they go;
+the storm is already half dark when you come back from the cloud. (3) Legibility and glitches: the kite's tag now marks
+where its string goes over the parapet (FELL INTO THE STREET); the confetti and parachute tags sit beside their objects
+and the ghost-toy tag shows only while the ghost is in frame; the confetti and balloons framed clear of the clock; the
+ice readout goes with the last ice; a one-line note; the doorway flicker fixed (two faces z-fighting under the door
+head, and screen-space AO banding on the ceiling a hand's breadth away). These fixes were not re-scored.
+

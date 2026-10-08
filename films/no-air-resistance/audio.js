@@ -83,6 +83,8 @@ class NrAudio extends AudioEngine {
     sky.gain.setValueAtTime(0, 0); sky.gain.setValueAtTime(0, k0 - 0.01); sky.gain.linearRampToValueAtTime(1, k0); sky.gain.setValueAtTime(1, k1 - 0.01); sky.gain.linearRampToValueAtTime(0, k1);
     // a held breath before the first stone: the roof's sounds (the rain, the city, the party) pulled down, back with the hit
     { const F = NR_ICE.first; roof.gain.setValueAtTime(1, F - 0.7); roof.gain.linearRampToValueAtTime(0.15, F - 0.45); roof.gain.setValueAtTime(0.15, F - 0.01); roof.gain.linearRampToValueAtTime(1, F); }
+    // the end: the sound fades out with the picture
+    out.gain.setValueAtTime(0.9, NR.fade[0]); out.gain.linearRampToValueAtTime(0, NR.black);
     this.rev = rev;
     this._air(S, roof, end);
     this._things(S, roof);
@@ -278,16 +280,18 @@ class NrAudio extends AudioEngine {
     // the hut's roof over your head (once you're inside): heavy drumming
     const dr = ctx.createBufferSource(), dl = S.filter('lowpass', 700, 0.7), dg = ctx.createGain(); dr.buffer = S.crackleBuffer(3.0, 2600); dr.loop = true; dr.connect(dl); dl.connect(dg); dg.connect(dest); dr.start(F); dr.stop(q + 0.02);
     for (const g of [roar, hg, rg, dg]) g.gain.setValueAtTime(0, F);
+    // (it ducks for a moment under each hero breakage, so each one is heard over it)
+    const H0 = NR_ROOF_HITS, ducks = [H0.bottles, H0.cake, H0.pot, H0.table + 0.37], duck = (t) => { let d = 1; for (const b of ducks) d = Math.min(d, 1 - 0.6 * Math.exp(-Math.pow((t - b - 0.08) / 0.13, 2))); return d; };
     for (let t = F; t <= q; t += 1 / 30) {
       const f = NR_ICE.flux(t), sp = NR_ICE.v(t) / 343, w = Math.max(Math.pow(f, 0.7) * (0.8 + 0.2 * sp * sp), 0.32 * MathX.smooth(t, F + 0.3, F + 1.0)), inside = MathX.smooth(this.cx.value(t), NR_ROOF.hut.x0 + 0.2, NR_ROOF.hut.x0 + 1.2);
-      roar.gain.linearRampToValueAtTime(0.32 * w * (1 - 0.35 * inside), t); hg.gain.linearRampToValueAtTime(0.035 * w, t); rg.gain.linearRampToValueAtTime(0.32 * w, t); dg.gain.linearRampToValueAtTime(0.5 * w * inside, t);
+      const dk = duck(t); roar.gain.linearRampToValueAtTime(0.32 * w * (1 - 0.35 * inside) * dk, t); hg.gain.linearRampToValueAtTime(0.035 * w * dk, t); rg.gain.linearRampToValueAtTime(0.32 * w * dk, t); dg.gain.linearRampToValueAtTime(0.5 * w * inside, t);
     }
     for (const g of [roar, hg, rg, dg]) { g.gain.setValueAtTime(g.gain.value, q); g.gain.linearRampToValueAtTime(0, q + 0.015); }
     // the breakages (from the doorway)
     const P = (t, x, z) => this._pan(t, x, z), K = NR_ROOF.skylight, H = NR_ROOF_HITS;
     for (const t of H.panes) { S.glass(t, 0.06, P(t, K.x, K.z), dest); S.crack(t, 0.05, P(t, K.x, K.z), dest, 3200); }      // (the skylight, off to your left)
-    { const t = H.bottles, T = NR_ROOF.table, p = P(t, T.x - 0.3, T.z); S.glass(t, 0.1, p, dest); S.crack(t, 0.07, p, dest, 4200); S.glass(t + 0.07, 0.05, p, dest); }
-    { const t = H.cake, T = NR_ROOF.table, p = P(t, T.x + 0.1, T.z); S.whump(t, 0.07, p, dest); S.crack(t, 0.05, p, dest, 1800); S.burst(t + 0.02, 0.18, 900, 0.7, 0.03, p, dest, 'pink', 0.01); }
+    { const t = H.bottles, T = NR_ROOF.table, p = P(t, T.x - 0.3, T.z); S.glass(t, 0.22, p, dest); S.crack(t, 0.14, p, dest, 4200); S.glass(t + 0.07, 0.12, p, dest); S.boom(t, 0.08, dest, this.rev); }
+    { const t = H.cake, T = NR_ROOF.table, p = P(t, T.x + 0.1, T.z); S.whump(t, 0.16, p, dest); S.crack(t, 0.13, p, dest, 1800); S.boom(t, 0.1, dest, this.rev); S.burst(t + 0.02, 0.18, 900, 0.7, 0.07, p, dest, 'pink', 0.01); }
     H.bunting.forEach((t, r) => { const p = P(t, 22, r ? -1.8 : 1.2); S.ping(t, 1800, 0.03, p, dest, 0.25); for (let k = 0; k < 8; k++) S.click(t + 0.6 + k * 0.04, 0.012, p, dest); });
     this.app.roof.bulbs.forEach((b, k) => { const p = P(b.t, b.p[0], b.p[2]); S.click(b.t, 0.02, p, dest); S.tone(b.t + 0.01, 0.05, 3400 + (k * 377) % 1800, 0.008, p, dest, 'sine', 0.001, 0.04); });
     // the sheets: their pegs shot away (two clicks), then the sheet lands on the deck (a soft slap)
@@ -300,12 +304,12 @@ class NrAudio extends AudioEngine {
     // the chairs: hit, then a clatter of aluminium as each goes over
     for (const C of Rf.chairs) { const c = C.g.position, p = P(C.t, c.x, c.z); S.crack(C.t, 0.05, p, dest, 2300); S.ping(C.t + 0.5, 900 + 200 * C.dir, 0.02, p, dest, 0.3); S.clunk(C.t + 0.5, 0.05, p, dest); S.click(C.t + 0.58, 0.02, p, dest); }
     // the table: its legs shot through, the top comes down on the deck with everything left on it
-    { const t = H.table, T = NR_ROOF.table, p = P(t, T.x, T.z), tl = Math.sqrt(2 * 0.68 / NR_G); S.crack(t, 0.07, p, dest, 1400); S.crunch(t + tl, 0.16, p, dest, this.rev); S.whump(t + tl, 0.1, p, dest); S.boom(t + tl, 0.14, dest, this.rev); for (let k = 0; k < 6; k++) S.click(t + tl + 0.05 + k * 0.05, 0.015, p, dest); }
+    { const t = H.table, T = NR_ROOF.table, p = P(t, T.x, T.z), tl = Math.sqrt(2 * 0.68 / NR_G); S.crack(t, 0.07, p, dest, 1400); S.crunch(t + tl, 0.22, p, dest, this.rev); S.whump(t + tl, 0.14, p, dest); S.boom(t + tl, 0.18, dest, this.rev); for (let k = 0; k < 6; k++) S.click(t + tl + 0.05 + k * 0.05, 0.015, p, dest); }
     // the stair housing's roof over your head: each stone that punches through it, a hard knock and a splinter
     for (const [x, z, t] of NR_HUT_HOLES) { if (t >= q) continue; const p = P(t, x, z), v = t < NR.roofHit + 0.6 ? 0.12 : 0.05; S.crack(t, v, p, dest, 1100); S.burst(t + 0.005, 0.12, 2400, 0.8, v * 0.35, p, dest, 'white', 0.002); }
     // the first stones: each one a crack you feel (the very first the loudest thing in the film so far)
     NR_ROOF_HITS.first.forEach(([t, x, z], k) => { const p = P(t, x, z), v = k === 0 ? 0.42 : 0.16; S.crack(t, v, p, dest, 1800); S.boom(t, k === 0 ? 0.35 : 0.05, dest, this.rev); if (k === 0) S.thump(t, 0.3, dest); S.burst(t + 0.01, 0.5, 1200, 0.6, v * 0.25, p, dest, 'pink', 0.004); });
-    { const t = H.pot, C = NR_ROOF.chimney, p = P(t, C.x, C.z); S.crunch(t, 0.14, p, dest, this.rev); S.crack(t, 0.1, p, dest, 1500); S.boom(t, 0.1, dest, this.rev); }
+    { const t = H.pot, C = NR_ROOF.chimney, p = P(t, C.x, C.z); S.crunch(t, 0.2, p, dest, this.rev); S.crack(t, 0.13, p, dest, 1500); S.boom(t, 0.13, dest, this.rev); }
   }
 
   // you: a gasp at the first stone, fast breathing in the doorway, a long breath out in the silence

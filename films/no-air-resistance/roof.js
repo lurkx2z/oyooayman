@@ -199,7 +199,7 @@ class NrRoof {
     B.box(t, h - H.doorH, H.doorW, H.x0 + t / 2, y + H.doorH + (h - H.doorH) / 2, H.door, this.m.hutWall);
     // the door frame and the door, swung right round flat against the outside wall (hinged on the left)
     for (const z of [dz0, dz1]) B.box(t + 0.06, H.doorH, 0.07, H.x0 + t / 2, y + H.doorH / 2, z, this.m.dark);
-    B.box(t + 0.06, 0.08, H.doorW + 0.1, H.x0 + t / 2, y + H.doorH + 0.04, H.door, this.m.dark);
+    B.box(t + 0.06, 0.09, H.doorW + 0.1, H.x0 + t / 2, y + H.doorH + 0.035, H.door, this.m.dark);      // (1 cm below the wall and the lintel: they shared its underside and z-fought)
     B.box(t + 0.1, 0.1, H.doorW + 0.16, H.x0 + t / 2, y + H.doorH + 0.05, H.door, this.m.hutWall);      // (the lintel, closing the corner)
     B.add(new THREE.BoxGeometry(0.05, H.doorH - 0.04, H.doorW - 0.06), this.m.dark, Geo.matrix(H.x0 - 0.04, y + H.doorH / 2, dz1 + (H.doorW - 0.06) / 2 + 0.04));
     // the roof (felt on timber) and the ceiling under it: separate, so the ice can punch holes through them

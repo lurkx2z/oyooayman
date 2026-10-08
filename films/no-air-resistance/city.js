@@ -267,7 +267,7 @@ class NrCity extends Environment {
   }
 
   // the storm's darkness (0 → 1): the cloud's edge moves out over the street with the gust front, and the sun goes in
-  storm(S) { return MathX.smooth(S, NR.sky[1] - 0.2, NR.gale[1] + 1.2); }      // (it starts to darken as you come back from the cloud)
+  storm(S) { return Math.max(MathX.smooth(S, NR.sky[1] - 0.2, NR.gale[1] + 1.2), 0.45 * MathX.smooth(S, NR.sky[0], NR.sky[1])); }      // (already half dark when you come back from the cloud; full dark with the gust front)
 
   update(t, S) {
     // the clouds are water droplets: they keep running with the wind (∫ wind speed dt)

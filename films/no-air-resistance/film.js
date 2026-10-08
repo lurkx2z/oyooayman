@@ -167,13 +167,14 @@ const FILM = {
     set(U.meanwhile, 'opacity', W(S, NR.sky[0], NR.sky[0] + 1.7, 0.05, 0.35).toFixed(3));
     // the ice: how fast what is landing now is going, and how far it fell
     const ip = MathX.clamp(S, NR_ICE.first, NR_ICE.last);
-    set(U.ice, 'opacity', W(S, NR_ICE.first - 0.05, NR.quiet + 1.0, 0.15, 0.6).toFixed(3));
+    set(U.ice, 'opacity', W(S, NR_ICE.first - 0.05, NR.quiet + 0.15, 0.15, 0.35).toFixed(3));
     html(U.ice.querySelector('.v'), `${Math.round(NR_ICE.kmh(ip)).toLocaleString('en-US')} KM/H`);
     html(U.ice.querySelector('.sub'), `FELL ${(NR_ICE.h(ip) / 1000).toFixed(1)} KM · THE AIR DIDN’T SLOW IT`);
     // tags pinned to things
     const V = this._tv || (this._tv = new THREE.Vector3()), P = app.props, St = app.storm;
     let A = null, B = null, C = null, D = null, line = '';
-    if (S > 3.7 && S < NR.walk[1] - 0.1) A = [this._proj(cam, V.set(NR_ROOF.x0 + 0.3, NR_ROOF.y + 2.3, 2.3)), 'KITE · <b>NO LIFT</b>', 'right'];
+    // (the kite has gone over the edge: the tag is where its string drapes over the parapet)
+    if (S > 3.7 && S < NR.walk[1] - 0.1 && app.roof._kh0) { const h = app.roof._kh0, k = app.roof._kp, s = MathX.clamp((NR_ROOF.x0 + 0.1 - h.x) / ((k.x - h.x) || 1), 0, 1); A = [this._proj(cam, V.set(NR_ROOF.x0 + 0.1, NR_ROOF.y + NR_ROOF.par + 0.1, h.z + (k.z - h.z) * s)), 'KITE · <b>FELL INTO THE STREET</b>', 'right']; }
     if (S > NR.walk[1] + 0.15 && S < NR.drop.rel - 0.1) A = [[600, 1330], 'GROUND FLOOR · <b>22 M DOWN</b>'];
     if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8).add({ x: 0.4, y: 0, z: 0.15 })), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
     if (S > NR.drop.rel + 0.1 && S < NR.cut0 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: 0, y: 0.3, z: 0 })), 'NORMAL AIR', 'left'];
@@ -184,9 +185,9 @@ const FILM = {
     }
     // the confetti: one clump (and its normal-air ghost blowing away)
     // the confetti (one clump) and the toy paratrooper fired with it (its canopy can't open), and the toy's normal-air ghost
-    if (S > NR.pop + 0.3 && S < NR.pop + 1.2) A = [this._proj(cam, St.clump(S, V).add({ x: 0, y: 0.5, z: 0 })), 'CONFETTI · <b>NO DRAG</b>', 'right'];
-    if (S > NR.pop + 1.3 && S < NR.pop + 2.8 && St.toy.visible) B = [this._proj(cam, St.toyAt(S, V).add({ x: 0, y: 0.45, z: 0 })), 'PARACHUTE · <b>CAN’T OPEN</b>', 'left'];
-    if (S > NR.pop + 0.45 && S < NR.pop + 1.9) D = [this._proj(cam, St.toyGhostAt(S, V).add({ x: 0, y: 0.9, z: 0 })), 'NORMAL AIR', 'left'];
+    if (S > NR.pop + 0.3 && S < NR.pop + 1.2) { const q = this._proj(cam, St.clump(S, V)); if (q) A = [[q[0] + 70, q[1] - 20], 'CONFETTI · <b>NO DRAG</b>', 'right']; }     // (beside the clump, not over it)
+    if (S > NR.pop + 1.3 && S < NR.pop + 2.8 && St.toy.visible) { const q = this._proj(cam, St.toyAt(S, V)); if (q) B = [[q[0] - 70, q[1] + 40], 'PARACHUTE · <b>CAN’T OPEN</b>', 'left']; }
+    if (S > NR.pop + 0.45 && S < NR.pop + 1.9) { const q = this._proj(cam, St.toyGhostAt(S, V).add({ x: 0, y: 0.9, z: 0 })); if (q && q[1] > 430 && q[0] > 60 && q[0] < 1020) D = [q, 'NORMAL AIR', 'left']; }     // (only while the ghost is in frame)
     // the storm: the rain (water) is still blown; the sheets aren't; soot falls while steam blows
     if (S > NR.gale[0] + 0.7 && S < 25.9) B = [this._proj(cam, V.set(0.5, 0.1, -3).applyMatrix4(cam.matrixWorld)), 'RAIN IS WATER · <b>STILL BLOWN</b>'];
     if (S > 26.0 && S < 27.9 && app.roof.ghostSheet.m.visible) D = [this._proj(cam, V.copy(app.roof.sheets[0].m.position).add({ x: -0.4, y: 0.25, z: -1.0 })), 'NORMAL AIR', 'left'];
@@ -220,11 +221,15 @@ const FILM = {
     }
     // a flicker of white when something breaks near you
     for (const t of [NR_ROOF_HITS.bottles, NR_ROOF_HITS.cake, NR_ROOF_HITS.pot, NR_ROOF_HITS.table]) p.flash += 0.05 * MathX.impulse(S, t, 0.05);
+    p.flash += 0.07 * MathX.impulse(S, NR_ROOF_HITS.table + 0.37, 0.06);     // (the table top landing)
     NR_ROOF_HITS.first.forEach(([t], k) => { p.flash += (k === 0 ? 0.14 : 0.05) * MathX.impulse(S, t, 0.06); });
     p.flash += 0.08 * MathX.impulse(S, NR.roofHit, 0.06);
     // under the holed roof: less bloom, so the holes stay holes (not glowing puffs)
     const hutK = MathX.smooth(S, NR.roofHit - 0.3, NR.roofHit + 0.3) * (1 - MathX.smooth(S, NR.out - 0.3, NR.out + 0.6));
     p.bloom *= 1 - 0.65 * hutK; p.bloomThreshold += 0.35 * hutK;
+    // (deep in the doorway the lintel and the ceiling are a hand's breadth from your eyes: the screen-space AO bands and
+    // flickers on them, so it is faded out in there)
+    if (app && app.camera) p.ao *= 1 - MathX.smooth(app.camera.position.x, 26.9, 27.6);
     // the end: a touch darker so the closing lines read
     const endK = MathX.smooth(S, NR.line[0] - 0.4, NR.line[0] + 0.6); p.exposure -= 0.12 * endK; p.vignette += 0.2 * endK;
     p.fade = S >= NR.black ? 1 : MathX.smooth(S, NR.fade[0], NR.fade[1]);
