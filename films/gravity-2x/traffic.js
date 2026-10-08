@@ -119,7 +119,7 @@ class GvTraffic {
     add('sedanB', 'sedan', '#5d6670', { x: 1.75, z: [[0, 150], [GV.truck - 3, 40], [GV.truck + 2, -30], [GV.truck + 7, -95]], sag: 0.075 });
     add('vanB', 'van', '#c9c4b8', { x: 1.75, z: [[0, 190], [38, 30], [44, -26], [50, -90]], sag: 0.1 });
     // the ambulance: comes up behind you, stops by the wreck, lights going
-    this.amb = add('amb', 'van', '#f0eee8', { x: 1.75, z: [[0, 300], [46.0, 60], [50.2, -11.5, 'outQuad'], [80, -11.5]], sag: 0.1 });
+    this.amb = add('amb', 'van', '#f0eee8', { x: 1.75, z: [[0, 300], [46.0, 60], [50.2, -7.5, 'outQuad'], [80, -7.5]], sag: 0.1 });
     this._ambDress(this.amb);
     // parked: the left kerb (near you), far down both kerbs
     for (const [id, type, col, x, z] of [['pL1', 'sedan', '#6f6a62', -5.6, 3.5], ['pL2', 'suv', '#2f3b46', -5.6, 9.8], ['pL3', 'hatch', '#9a8f7a', -5.6, 16.2], ['pL4', 'ev', '#4a5a58', -5.6, 22.6],

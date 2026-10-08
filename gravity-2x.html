@@ -27,11 +27,12 @@
     #hud .story-stack { top: calc(var(--u) * 780); width: calc(var(--u) * 920); }
     #hud .story-stack .line { position: relative; }
     #hud .story-stack .line::before { content: ''; position: absolute; left: -8%; right: -8%; top: -35%; bottom: -35%; z-index: -1;
-      background: radial-gradient(closest-side, rgba(4, 6, 8, 0.42), rgba(4, 6, 8, 0.14) 65%, rgba(4, 6, 8, 0)); }
+      background: radial-gradient(closest-side, rgba(4, 6, 8, 0.62), rgba(4, 6, 8, 0.3) 62%, rgba(4, 6, 8, 0)); }
     #hud .story-stack .line { font-size: calc(var(--u) * 64); font-weight: 600; line-height: 1.22; margin-bottom: calc(var(--u) * 26);
       text-shadow: 0 0 calc(var(--u) * 24) rgba(0, 0, 0, 0.7), 0 calc(var(--u) * 3) calc(var(--u) * 10) rgba(0, 0, 0, 0.6); }
-    #hud .story-stack .line:first-child { font-style: italic; font-weight: 500; font-size: calc(var(--u) * 58); }
-    #hud .story-note { top: calc(var(--u) * 1150); font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; opacity: 0.85; }
+    #hud .story-stack .line:first-child { font-style: italic; font-weight: 600; font-size: calc(var(--u) * 60); }
+    #hud .story-note { top: calc(var(--u) * 1420); font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; padding: calc(var(--u) * 10) calc(var(--u) * 18);
+      border-radius: calc(var(--u) * 12); background: rgba(4, 6, 10, 0.45); width: calc(var(--u) * 640); line-height: 1.45; }
   </style>
 </head>
 <body>

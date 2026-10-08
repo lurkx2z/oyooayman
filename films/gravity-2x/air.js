@@ -12,6 +12,8 @@ class GvAirliner extends AircraftSystem {
     super(scene);
     // nose attitude above the flight path (degrees): a normal approach (≈ 3°), then hauled up toward the stall
     this.pitch = new Track([[GV.plane[0] - 0.4, 5], [44.6, 8], [47.0, 12], [50.0, 15], [56, 16]], 'inOutSine');
+    // it is under 150 m up: no distance haze on it (the sky fog would turn it into a pale ghost)
+    this.group.traverse((o) => { if (o.material) o.material.fog = false; });
   }
   update(t) {
     super.update(t);

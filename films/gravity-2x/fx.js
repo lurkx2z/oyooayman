@@ -59,6 +59,7 @@ class GvFx {
     // the wet patch the tank leaves on the far sidewalk and road
     this.wet = gvMesh(new THREE.PlaneGeometry(9, 12), new THREE.MeshStandardMaterial({ color: '#1c2226', roughness: 0.15, metalness: 0.2, transparent: true, opacity: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), scene, -10.0, 0.17, -3.0, -Math.PI / 2, 0, 0, false);
     this.wet.material.userData.grime = 0; this.hole.material.userData.grime = 0;
+    this.wet.material.userData.surface = true; this.hole.material.userData.surface = true;   // (keep the wet sheen: Look.surface would make them matte)
   }
 
   update(t) {
@@ -111,15 +112,15 @@ class GvFx {
     const tr = this.app.traffic, c = tr.coupe;
     for (let s = 0; s < 2; s++) {
       const t0 = tr.scrapeT(s), dur = s ? 0.3 : 0.42;
-      if (t < t0 - 0.05 || t > t0 + dur + 0.4) continue;
-      for (let i = 0; i < 70; i++) {
-        const born = t0 + (i / 70) * dur, age = t - born;
-        if (age < 0 || age > 0.35) continue;
+      if (t < t0 - 0.05 || t > t0 + dur + 0.5) continue;
+      for (let i = 0; i < 130; i++) {
+        const born = t0 + (i / 130) * dur, age = t - born;
+        if (age < 0 || age > 0.45) continue;
         const z = c.zt.value(born) - (s ? c.ax[0] - 0.4 : c.ax[1] + 0.55), h1 = hash1(i * 3.7 + s * 50), h2 = hash1(i * 8.1 + s * 30);
-        const x0 = c.x + (h1 - 0.5) * 1.3, vx = (h1 - 0.5) * 4, vz = 6 + 5 * h2, vy = 1 + 2.5 * h2;
+        const x0 = c.x + (h1 - 0.5) * 1.3, vx = (h1 - 0.5) * 4, vz = 6 + 6 * h2, vy = 1 + 2.5 * h2;
         const x = x0 + vx * age, z1 = z + vz * age, y = Math.max(0.02, 0.06 + vy * age - 0.5 * GV_G * age * age);
-        const k = 1 - age / 0.35;
-        G.push(x, y, z1, x - vx * 0.02, y + 0.01, z1 - vz * 0.025, 1.0, 0.62 * k + 0.2, 0.25 * k, 0.95 * k, 0.012);
+        const k = 1 - age / 0.45;
+        G.push(x, y, z1, x - vx * 0.04, y + 0.02, z1 - vz * 0.045, 1.0, 0.7 * k + 0.25, 0.3 * k, k, 0.02 + 0.012 * h2);
       }
       this._puffs(D, t - t0, 6, 40 + s, c.x, 0.1, c.zt.value(t0) - 2, 0.8, 0.3, 1.2, 0.5, 0.2, [0.7, 0.7, 0.72]);
     }
@@ -185,25 +186,30 @@ class GvFx {
     this.wet.material.opacity = 0.55 * MathX.smooth(t, tb + 0.9, tb + 3.5);
     if (age < 0 || age > 7) return;
     const flow = Math.exp(-age / 1.6);                                 // the tank empties
-    // the burst: a ball of water leaving the tank toward the street
-    if (age < 1.2) for (let i = 0; i < 70; i++) {
+    // the burst: water leaving the tank toward the street (bright streaks, a thin mist around them)
+    if (age < 1.2) for (let i = 0; i < 90; i++) {
       const h1 = hash1(i * 3.3 + 200), h2 = hash1(i * 7.1 + 201), h3 = hash1(i * 1.9 + 202), a = (h1 - 0.5) * 2.4;
-      const sp = 3 + 5 * h2, x = -16.4 + Math.cos(a) * sp * age, z = T.z + Math.sin(a) * sp * age * 1.2, y = roof + 1.4 + (1 + 3 * h3) * age - 0.5 * GV_G * age * age;
+      const sp = 3 + 5 * h2, vx = Math.cos(a) * sp, vz = Math.sin(a) * sp * 1.2, vy = 1 + 3 * h3 - GV_G * age;
+      const x = -16.4 + vx * age, z = T.z + vz * age, y = roof + 1.4 + (1 + 3 * h3) * age - 0.5 * GV_G * age * age;
       if (y < roof + 0.1 && x < edge) continue;
-      D.push(x, y, z, 0.6 + 1.6 * age, h1 * 6, 0.55 * (1 - age / 1.2), 1.0, 0.86, 0.92, 0.98);
+      const k = 1 - age / 1.2;
+      G.push(x, y, z, x - vx * 0.06, y - vy * 0.06, z - vz * 0.06, 0.8, 0.88, 1.0, 0.75 * k, 0.05 + 0.04 * h2);
+      if (i % 3 === 0) D.push(x, y, z, 1.0 + 2.4 * age, h1 * 6, 0.08 * k, 1.0, 0.86, 0.92, 0.98);
     }
-    // the sheet over the cornice: water leaving the roof edge at ~2.5 m/s, falling 17.6 m at 2 G (1.34 s)
-    for (let i = 0; i < 260; i++) {
-      const born = (i / 260) * 6.0, a = age - born; if (a < 0 || a > 1.6) continue;
+    // the sheet over the cornice: water leaving the roof edge at ~2.5 m/s, falling 17.6 m at 2 G (1.34 s).
+    // Each drop is a streak as long as its fall over 1/15 s (that's how falling water reads); a faint mist goes with it.
+    for (let i = 0; i < 420; i++) {
+      const born = (i / 420) * 6.0, a = age - born; if (a < 0 || a > 1.6) continue;
       const h1 = hash1(i * 2.1 + 210), h2 = hash1(i * 5.9 + 211), z = T.z + (h1 - 0.5) * 6.5 * (0.7 + 0.3 * h2);
       const str = Math.exp(-born / 1.6); if (h2 > str * 1.4) continue;
-      const vx = 1.6 + 2.2 * str * h2, y = roof + 0.2 - 0.5 * GV_G * a * a, x = edge + 0.1 + vx * a;
-      if (y < 0.2) { const sa = a - Math.sqrt(2 * roof / GV_G); D.push(x + sa * 2, 0.25 + sa * 1.5, z, 0.7 + 1.5 * sa, h1 * 6, 0.35 * (1 - sa / 0.3), 1.0, 0.9, 0.94, 0.98); continue; }
-      D.push(x, y, z, 0.35 + 0.5 * a, h1 * 6, 0.45 * str + 0.1, 0.95, 0.82, 0.9, 0.97);
-      if (i % 3 === 0) G.push(x, y, z, x + vx * 0.02, y + 0.35 + GV_G * a * 0.04, z, 0.9, 0.95, 1.0, 0.35 * str, 0.02);
+      const vx = 1.6 + 2.2 * str * h2, vy = GV_G * a, y = roof + 0.2 - 0.5 * GV_G * a * a, x = edge + 0.1 + vx * a;
+      if (y < 0.2) { const sa = a - Math.sqrt(2 * roof / GV_G); if (i % 2 === 0) D.push(x + sa * 2, 0.25 + sa * 1.5, z, 0.9 + 1.8 * sa, h1 * 6, 0.16 * (1 - sa / 0.3), 1.0, 0.9, 0.94, 0.98); continue; }
+      const L = Math.min(0.067, a + 0.02);
+      G.push(x, y, z, x - vx * L, y + vy * L + 0.12, z, 0.78, 0.87, 1.0, 0.42 * str + 0.16, 0.035 + 0.035 * h2);
+      if (i % 6 === 0) D.push(x, y, z, 0.9 + 1.2 * a, h1 * 6, 0.035 * str + 0.015, 0.95, 0.82, 0.9, 0.97);
     }
     // spray rising off the pavement where it lands
-    this._puffs(D, age - 1.3, 30, 220, edge + 2.2, 0.3, T.z, 4.5, 0.6, 5.5, 1.3, 0.3 * (0.4 + flow), [0.88, 0.92, 0.96], 0.6, 0.8, 1.6);
+    this._puffs(D, age - 1.3, 30, 220, edge + 2.2, 0.3, T.z, 4.5, 0.6, 5.5, 1.5, 0.2 * (0.4 + flow), [0.88, 0.92, 0.96], 0.6, 0.8, 1.6);
     // the staves' splinters
     if (age < 3) for (let i = 0; i < 12; i++) { const h = hash1(i * 6.6 + 230), a = (h - 0.5) * 2.4; gvThrow(age, -16.0, roof + 1.5, T.z + (h - 0.5) * 2, 3 + 4 * h, 2 + 2 * hash1(i * 3.1), Math.sin(a) * 3, o); if (o.y > roof + 0.05 || o.x > edge) K.push(o.x, o.y + 0.02, o.z, 0.06, 0.4, 0.03, age * 5, a, age * 7 * (h - 0.5), C.wood); }
   }
@@ -221,8 +227,8 @@ class GvFx {
         K.push(o.x, o.y + s * 0.2, o.z, s * (i % 4 === 0 ? 3 : 1), s * 0.4, s * 0.8, spin * 6 * (h1 - 0.5), a, o.landed ? 0 : spin * 5 * (h3 - 0.5), col);
       }
       // the blast of dust along the ground, then a slow, rising, spreading cloud
-      this._puffs(D, age, 90, 310, x, 0.3, z, 13, 0.25, 11, 2.6, 0.38, [0.78, 0.7, 0.6], 0.6, 1.2, 1.0);
-      this._puffs(D, age - 0.15, 70, 320, x, 1.0, z, 8, 1.4, 11, 4.2, 0.3, [0.82, 0.75, 0.65], 2.5);
+      this._puffs(D, age, 80, 310, x, 0.3, z, 11, 0.25, 7.5, 2.6, 0.38, [0.78, 0.7, 0.6], 0.6, 1.2, 1.0);
+      this._puffs(D, age - 0.15, 60, 320, x, 1.0, z, 8, 1.4, 8.5, 4.2, 0.28, [0.82, 0.75, 0.65], 2.5);
       if (age < 0.7) for (let i = 0; i < 60; i++) {                     // glass and metal glints
         const h1 = hash1(i * 6.3 + 330), h2 = hash1(i * 2.9 + 331), a = h1 * 6.28, s = 4 + 8 * h2;
         gvThrow(age, x, 0.8, z, Math.cos(a) * s, 2 + 4 * h2, Math.sin(a) * s, o);

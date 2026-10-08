@@ -11,7 +11,7 @@
 // in the palm lands on a point in the world (gvAimHand).
 const GV_HAND_POSES = Object.assign({}, HAND_POSES, {
   // the shopping bag hooked on your fingers, forearm forward (the bag hangs below the frame, its top just in view)
-  bagR:     { p: [0.105, -0.175, -0.4], F: [-0.12, -0.2, -0.97], N: [-0.25, -0.95, 0.1], curl: [1.45, 1.5, 1.5, 1.45], thumb: [0.25, 0.45] },
+  bagR:     { p: [0.095, -0.15, -0.42], F: [-0.12, -0.2, -0.97], N: [-0.25, -0.95, 0.1], curl: [1.45, 1.5, 1.5, 1.45], thumb: [0.25, 0.45] },
   // gravity doubles: the bag yanks your hand down
   bagDropR: { p: [0.13, -0.42, -0.34], F: [-0.05, -0.75, -0.65], N: [-0.4, -0.6, 0.6], curl: [1.5, 1.55, 1.55, 1.5], thumb: [0.2, 0.5], trem: 0.004 },
   // lowering it to the pavement (aimed at the handles of the bag where it will rest)
@@ -105,15 +105,25 @@ const FILM = {
     this._look = GV_LOOK.map((L) => ({ t0: L[0], t1: L[1], at: L[2], fov: L[3] }));
   },
 
-  // a paper grocery bag: baguette and leeks poking out of the top (origin at the top of its handles)
+  // a paper grocery bag: open at the top, a baguette and leeks poking out (origin at the top of its handles)
   _bag(scene) {
     const g = new THREE.Group(); g.name = 'bag'; scene.add(g);
-    const paper = Mat.std('#b8905e', { roughness: 0.92 }), H = GV_BAG.h;
-    gvBox(0.28, H, 0.16, paper, g, 0, -0.06 - H / 2, 0);
-    gvBox(0.285, 0.03, 0.165, Mat.std('#a47e50', { roughness: 0.92 }), g, 0, -0.075, 0, 0, 0, 0, false);
-    for (let i = 0; i < 3; i++) gvMesh(new THREE.CylinderGeometry(0.011, 0.013, 0.16, 6), Mat.std('#6f9a3e', { roughness: 0.8 }), g, 0.06 + i * 0.02, -0.1, -0.03 + i * 0.022, -0.2 + i * 0.12, 0, -0.25 + i * 0.1, false);
-    gvBox(0.1, 0.07, 0.07, Mat.std('#c23a2a', { roughness: 0.6 }), g, -0.06, -0.1, 0.02, 0, 0.3, 0, false);
-    gvBox(0.09, 0.05, 0.09, Mat.std('#e8e0cc', { roughness: 0.7 }), g, -0.02, -0.11, -0.03, 0, -0.2, 0.1, false);
+    const paper = Mat.std('#c39a64', { roughness: 0.92 }), inner = Mat.std('#8d6a40', { roughness: 0.95 }), H = GV_BAG.h, W = 0.28, D = 0.16, y0 = -0.06 - H / 2;
+    for (const s of [-1, 1]) {                                                 // the walls (outside paper, darker inside), the bottom
+      gvBox(W, H, 0.006, paper, g, 0, y0, s * D / 2); gvBox(W - 0.01, H - 0.01, 0.004, inner, g, 0, y0 + 0.005, s * (D / 2 - 0.005), 0, 0, 0, false);
+      gvBox(0.006, H, D, paper, g, s * W / 2, y0, 0); gvBox(0.004, H - 0.01, D - 0.01, inner, g, s * (W / 2 - 0.005), y0 + 0.005, 0, 0, 0, false);
+    }
+    gvBox(W, 0.006, D, inner, g, 0, -0.06 - H + 0.003, 0, 0, 0, 0, false);
+    for (const s of [-1, 1]) { gvBox(W + 0.008, 0.028, 0.01, Mat.std('#b08552', { roughness: 0.92 }), g, 0, -0.074, s * (D / 2 + 0.002), 0, 0, 0, false); }
+    // a baguette leaning out at the far end, three leeks, a red packet and a carton just showing
+    gvMesh(new THREE.CapsuleGeometry(0.028, 0.3, 4, 8), Mat.std('#d39a52', { roughness: 0.8 }), g, -0.085, -0.12, 0.02, 0, 0, 0.5, false);
+    for (let i = 0; i < 3; i++) {                                              // (leaning away from your hand)
+      const x = 0.075 + i * 0.02, z = -0.035 + i * 0.03, r = -0.22 - i * 0.07, ax = -Math.sin(r), ay = Math.cos(r);
+      gvMesh(new THREE.CylinderGeometry(0.012, 0.014, 0.3, 6), Mat.std('#e6ead2', { roughness: 0.8 }), g, x, -0.16, z, 0, 0, r, false);
+      gvMesh(new THREE.CylinderGeometry(0.022, 0.012, 0.16, 6), Mat.std('#4f7a2e', { roughness: 0.8 }), g, x + ax * 0.22, -0.16 + ay * 0.22, z, 0, 0, r, false);
+    }
+    gvBox(0.1, 0.11, 0.07, Mat.std('#c23a2a', { roughness: 0.6 }), g, -0.0, -0.1, 0.03, 0, 0.3, 0, false);
+    gvBox(0.08, 0.13, 0.08, Mat.std('#ece6d4', { roughness: 0.7 }), g, 0.02, -0.11, -0.035, 0, -0.2, 0.06, false);
     for (const s of [-1, 1]) gvMesh(new THREE.TorusGeometry(0.045, 0.006, 4, 10, Math.PI), Mat.std('#a47e50', { roughness: 0.9 }), g, 0, -0.055, s * 0.05, 0, 0, 0, false);
     return g;
   },
@@ -221,6 +231,7 @@ const FILM = {
     // the dust after the last impact: lower contrast, warmer
     const dust = MathX.smooth(t, LH, LH + 2.5);
     p.contrast -= 0.06 * dust; p.warmth += 0.04 * dust; p.saturation -= 0.08 * dust;
+    p.exposure -= 0.1 * dust; p.vignette += 0.12 * dust;           // (a little darker, so the closing lines read over the dust)
     // black at the very end
     p.fade = MathX.smooth(t, T.end - 0.6, T.end);
   },

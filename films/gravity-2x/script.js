@@ -8,7 +8,7 @@
    Mass and inertia do NOT change: weight (m·g) doubles, falls are faster, springs sag twice as far.
    ===================================================================== */
 
-CONFIG.duration = 75.0;
+CONFIG.duration = 73.2;
 CONFIG.seed = 20261107;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.7, walkSpeed: 1.25, bobStrength: 0.016, bobFrequency: 1.72, runStrideGain: 0.3,
@@ -38,10 +38,15 @@ const GV = {
   up: [56.4, 59.4],             // getting back up
   slips: [60.1, 60.95, 61.55],  // the crane's hoist brake slips
   drop: 62.6,                   // the brake gives
-  hudBack: 66.8,
-  lineA: [67.3, 70.0], lineB: [70.0, 73.2], note: [72.0, 74.2],
-  end: 75.0,
+  hudBack: 66.6,
+  lineA: [67.0, 68.8], lineB: [68.8, 72.0], note: [70.8, 72.6],
+  end: 73.2,
 };
+
+// the cut (story intervals kept): four invisible trims where the picture barely moves or the head whips round
+// (the wreck hold, the swing up to the roar, the airliner far down the avenue, your hands on the pavement). 73.2 s → 69.7 s.
+CONFIG.edit = [[0, 20.5], [21.7, 43.3], [43.8, 50.6], [51.8, 56.7], [57.3, GV.end]];
+
 const GV_G0 = 9.81;
 // gravity in g (1 → 2)
 function gvG(t) { return 1 + MathX.smooth(t, GV.g0, GV.g1); }
@@ -124,22 +129,22 @@ const SCRIPT = {
     captions: [
       { t: 4.2, until: 7.0, text: 'Everything you lift feels twice as heavy.' },
       { t: 10.6, until: 13.3, text: 'Standing up becomes hard work.' },
-      { t: 17.4, until: 20.4, text: 'And falling things hit twice as hard.' },
+      { t: 17.4, until: 20.1, text: 'And falling things hit twice as hard.' },
       { t: 24.6, until: 27.0, text: 'Cars still drive. Their springs give up.' },
       { t: 30.8, until: 33.4, text: 'Every machine was rated for 1 G.' },
       { t: 36.4, until: 39.2, text: 'Most buildings hold. The weak spots don’t.' },
       { t: 46.0, until: 49.0, text: 'Its wings now carry twice the weight.' },
-      { t: 57.0, until: 59.6, text: 'Getting up is like lifting a second you.' },
+      { t: 57.3, until: 59.6, text: 'Getting up is like lifting a second you.' },
     ],
     readouts: [
       { from: -0.6, until: 9.8, top: 210, label: 'GRAVITY', value: (t) => `${gvFmt(gvG(t))} G`, sub: (t) => (t >= GV.g1 ? '19.6 m/s²' : '9.8 m/s²') },
       { from: 4.6, until: 9.8, top: 470, label: '70 KG PERSON · WEIGHT', value: (t) => (t < 5.2 ? '687 N' : '1,373 N'), sub: 'MASS STILL 70 KG' },
-      { from: GV.bay.drop - 0.1, until: 21.4, top: 210, label: (''), value: (t) => gvFallValue(t), sub: (t) => gvFallSub(t) },
-      { from: GV.outrigger + 0.5, until: 33.4, top: 210, label: 'CRANE LOAD · 12 t', value: 'WEIGHS 24 t', sub: 'OUTRIGGER PAD: 2× PRESSURE' },
+      { from: GV.bay.drop - 0.1, until: 20.1, top: 210, label: (''), value: (t) => gvFallValue(t), sub: (t) => gvFallSub(t) },
+      { from: GV.outrigger + 0.5, until: 33.4, top: 210, label: 'CRANE LOAD · MASS 12 t', value: 'PULLS LIKE 24 t', sub: 'OUTRIGGER PAD: 2× PRESSURE' },
       { from: 44.6, until: 51.8, top: 210, label: 'AIRLINER ON APPROACH', value: 'LIFT ×2', sub: 'SAME WINGS · NEEDS 41% MORE SPEED' },
       { from: GV.slips[0] - 0.3, until: GV.drop + 0.2, top: 210, label: 'HOIST BRAKE', value: (t) => `${gvFmt(gvG(t) * 100 / 1.25, 0)} %`, sub: 'OF RATED HOLDING LOAD' },
       { from: GV.drop + 0.05, until: GV_FALL.load.hit + 2.6, top: 210, label: 'FREE FALL · 23 m', value: (t) => gvLoadValue(t), sub: (t) => gvLoadSub(t) },
-      { from: GV.hudBack, until: 74.6, top: 210, label: 'GRAVITY', value: '2.0 G', sub: 'MASS UNCHANGED' },
+      { from: GV.hudBack, until: GV.end - 0.4, top: 210, label: 'GRAVITY', value: '2.0 G', sub: 'MASS UNCHANGED' },
     ],
     notes: [{ t: GV.note[0], until: GV.note[1], text: 'FICTIONAL INSTANT GRAVITY CHANGE · MASSES UNCHANGED' }],
     // the closing lines, one after the other
@@ -147,9 +152,9 @@ const SCRIPT = {
   },
 
   // the airliner on approach (AircraftSystem spline: [t, x, y, z]): it comes over you from behind at full power, nose high,
-  // and keeps sinking down the line of the avenue (≈ 83 m/s, descending ≈ 14 m/s)
+  // and keeps sinking down the line of the avenue (≈ 78 m/s, descending ≈ 7 m/s: twice a normal approach's sink rate)
   aircraft: {
-    path: [[GV.plane[0] - 0.4, 14, 262, 175], [44.6, 8, 228, 10], [47.4, -2, 188, -225], [50.0, -10, 152, -440], [52.6, -17, 118, -650], [56.0, -26, 80, -925]],
+    path: [[GV.plane[0] - 0.4, 12, 150, 180], [44.6, 8, 130, 25], [47.4, -2, 112, -195], [50.0, -10, 94, -400], [52.6, -17, 74, -605], [56.0, -26, 46, -870]],
     bank: [[GV.plane[0], 0], [56, 0]],
   },
 };

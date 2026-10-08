@@ -155,11 +155,11 @@ Object.assign(BLEND, { gvBuckle: 0.08, gvHeavy: 0.7, gvLoaded: 0.6, gvBags: 0.5,
    --------------------------------------------------------------------- */
 const GV_SW = LAYOUT.curbH;
 const GV_PEOPLE = [
-  // the kid by the shop, hopping while he waits; his mum with the shopping. They back off after the pallet lands.
-  { id: 'kid', look: 'gvKid', y: GV_SW, kid: true, path: [[0, 9.75, -6.3], [GV_FALL.pallet.hit + 0.4, 9.75, -6.3], [GV_FALL.pallet.hit + 4.4, 10.1, -3.5]], face: 90, faceUntil: GV_FALL.pallet.hit + 0.4,
-    states: [[0, 'idle'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 1.3, 'gvHeavy'], [GV_FALL.pallet.hit, 'recoil'], [GV_FALL.pallet.hit + 0.4, 'gvTrudge'], [GV_FALL.pallet.hit + 4.4, 'gvHeavy']] },
-  { id: 'mum', look: 'gvMum', y: GV_SW, path: [[0, 10.55, -7.1], [GV_FALL.pallet.hit + 0.6, 10.55, -7.1], [GV_FALL.pallet.hit + 4.8, 10.7, -3.0]], face: 125, faceUntil: GV_FALL.pallet.hit + 0.6,
-    states: [[0, 'gvBags'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 1.1, 'gvLoaded'], [5.0, 'gvSetDown'], [7.6, 'gvHeavy'], [GV_FALL.pallet.hit, 'recoil'], [GV_FALL.pallet.hit + 0.6, 'gvTrudge'], [GV_FALL.pallet.hit + 4.8, 'gvHeavy'], [GV.limit + 0.4, 'gvHandsKnees']] },
+  // the kid by the shop, hopping while he waits; his mum with the shopping. They back off toward the bench after the pallet lands.
+  { id: 'kid', look: 'gvKid', y: GV_SW, kid: true, path: [[0, 9.75, -6.3], [GV_FALL.pallet.hit + 0.4, 9.75, -6.3], [GV_FALL.pallet.hit + 6.0, 10.95, -1.35]], face: 90, faceUntil: GV_FALL.pallet.hit + 0.4,
+    states: [[0, 'idle'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 1.3, 'gvHeavy'], [GV_FALL.pallet.hit, 'recoil'], [GV_FALL.pallet.hit + 0.4, 'gvTrudge'], [GV_FALL.pallet.hit + 6.0, 'gvHeavy']] },
+  { id: 'mum', look: 'gvMum', y: GV_SW, path: [[0, 10.55, -7.1], [GV_FALL.pallet.hit + 0.6, 10.55, -7.1], [GV_FALL.pallet.hit + 6.4, 11.45, -0.95]], face: 125, faceUntil: GV_FALL.pallet.hit + 0.6,
+    states: [[0, 'gvBags'], [GV.g0 + 0.02, 'gvBuckle'], [GV.g0 + 1.1, 'gvLoaded'], [5.0, 'gvSetDown'], [7.6, 'gvHeavy'], [GV_FALL.pallet.hit, 'recoil'], [GV_FALL.pallet.hit + 0.6, 'gvTrudge'], [GV_FALL.pallet.hit + 6.4, 'gvHeavy'], [GV.limit + 0.4, 'gvHandsKnees']] },
   // the old man on the bench
   { id: 'old', look: 'gvOld', y: GV_SW, seat: 0.43, path: [[0, GV_CITY.bench.x + 0.12, GV_CITY.bench.z + 0.3]], face: 90,
     states: [[0, 'sit'], [GV.g0 + 0.03, 'gvBenchSit'], [GV.oldMan[0], 'gvBenchTry'], [GV.oldMan[0] + 3.8, 'gvBenchSlump']] },
@@ -186,9 +186,9 @@ const GV_PEOPLE = [
   { id: 'shop', look: 'gvShop', y: GV_SW, show: [GV.awning - 1.8, 99], path: [[GV.awning - 1.8, 12.3, -6.6], [GV.awning - 0.9, 11.25, -6.3], [GV.awning - 0.25, 11.25, -6.3], [GV.awning + 0.45, 11.15, -3.85], [99, 11.15, -3.85]], face: 80, faceUntil: GV.awning - 0.25,
     states: [[0, 'walk'], [GV.awning - 0.9, 'gvLookUp'], [GV.awning - 0.25, 'recoil'], [GV.awning + 0.5, 'gvHeavy'], [GV.awning + 1.4, 'handHead']] },
   // the paramedics from the ambulance, carrying their kit across: every bag weighs twice as much
-  { id: 'medA', look: 'gvMedic', y: 0, show: [50.6, 99], path: [[50.6, 3.1, -10.6], [GV.limit + 2.6, 5.9, -7.4], [GV.drop + 0.5, 7.6, -5.4], [99, 7.6, -5.4]], carry: 'kit',
+  { id: 'medA', look: 'gvMedic', y: 0, show: [50.6, 99], path: [[50.6, 3.1, -6.6], [GV.limit + 2.6, 5.6, -5.9], [GV.drop + 0.5, 7.6, -5.4], [99, 7.6, -5.4]], carry: 'kit',
     states: [[0, 'gvCarry'], [GV.drop + 0.5, 'gvLookUp']] },
-  { id: 'medB', look: 'gvMedic2', y: 0, show: [50.9, 99], path: [[50.9, 2.9, -12.6], [GV.limit + 1.3, 4.5, -10.6], [99, 4.5, -10.6]], carry: 'case',
+  { id: 'medB', look: 'gvMedic2', y: 0, show: [50.9, 99], path: [[50.9, 2.9, -8.6], [GV.limit + 1.3, 3.6, -7.4], [99, 3.6, -7.4]], carry: 'case',
     states: [[0, 'gvCarry'], [GV.limit + 1.3, 'gvHandsKnees'], [GV.drop + 0.4, 'gvLookUp']] },
 ];
 
