@@ -203,7 +203,9 @@ class SndPuffs {
    (they hear it), so you can watch the front come over the city toward the stadium */
 class SndBirds {
   constructor(scene, city) {
-    this.sys = new BillboardSystem(scene, 640);
+    // two sprite sheets of a bird's silhouette (wings up / wings down): a flap is a swap between them
+    this.up = new BillboardSystem(scene, 640); this.dn = new BillboardSystem(scene, 640);
+    this.up.uniforms.uMap.value = SndBirds.tex(true); this.dn.uniforms.uMap.value = SndBirds.tex(false);
     const E = SND_EYE[5], wallEl = Math.atan2(12.4 - E.y, E.z + 60.5);
     const view = Math.atan2(-4 - E.x, -(-42 - E.z));
     const roofs = (city || []).filter((b) => {
@@ -221,16 +223,29 @@ class SndBirds {
       }
     });
   }
+  static tex(up) {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const g = c.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, 64, 64);
+    g.strokeStyle = g.fillStyle = '#fff'; g.lineWidth = 6; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath();
+    if (up) { g.moveTo(5, 16); g.quadraticCurveTo(20, 20, 32, 36); g.quadraticCurveTo(44, 20, 59, 16); }
+    else { g.moveTo(5, 44); g.quadraticCurveTo(18, 30, 32, 35); g.quadraticCurveTo(46, 30, 59, 44); }
+    g.stroke();
+    g.beginPath(); g.ellipse(32, 35, 5, 4, 0, 0, 6.283); g.fill();
+    const tx = new THREE.CanvasTexture(c); tx.needsUpdate = true;
+    return tx;
+  }
   update(t, fog) {
-    const S = this.sys;
-    S.begin(fog);
+    const U = this.up, D = this.dn;
+    U.begin(fog); D.begin(fog);
     if (sndShotAt(t) === 5) for (const b of this.B) {
       const u = t - b.tl;
-      if (u < 0) { S.push(b.x, b.y, b.z, b.sz * 0.6, 0, 0.8, 1.0, 0.14, 0.14, 0.15); continue; }
+      if (u < 0) { D.push(b.x, b.y, b.z, b.sz * 0.5, 0, 0.8, 1.0, 0.14, 0.14, 0.15); continue; }
       if (u > 9) continue;
-      const k = 1 - Math.exp(-u / 1.4), flap = 0.7 + 0.3 * Math.abs(Math.sin(u * 14 + b.ph));
-      S.push(b.x + b.vx * 1.6 * k + b.vx * 0.3 * u, b.y + b.vy * 1.6 * k + 0.8 * u, b.z + b.vz * 1.6 * k + b.vz * 0.3 * u, b.sz * flap, 0, 0.92, 1.0, 0.12, 0.12, 0.13);
+      const k = 1 - Math.exp(-u / 1.4), S = Math.sin(u * 14 + b.ph) > 0 ? U : D;
+      S.push(b.x + b.vx * 1.6 * k + b.vx * 0.3 * u, b.y + b.vy * 1.6 * k + 0.8 * u, b.z + b.vz * 1.6 * k + b.vz * 0.3 * u, b.sz, 0, 0.95, 1.0, 0.12, 0.12, 0.13);
     }
-    S.end();
+    U.end(); D.end();
   }
 }
