@@ -165,11 +165,16 @@ class SndCrowd {
             float gu = t - aA.w, jOn = step(0.0, gu) * (1.0 - smoothstep(2.4, 3.2, gu));
             float jump = jOn * pow(max(0.0, sin(gu * 6.6 * (0.9 + 0.2 * fract(seed * 13.0)))), 1.5) * 0.24;
             // the drum: this fan's own clock (the beat reaches it aA.y after it is struck)
+            // every beat: a quick clap in front of the chest; every 4th beat (the accent): scarves up overhead for ~0.6 s,
+            // so each accent shows as one band of raised scarves spreading out from the drum (62 m apart, 20 m wide)
             float ph = (t - uDrum.x - aA.y) / uDrum.y;
             float k = clamp(floor(ph + 0.25), 0.0, uDrum.z - 1.0);
             float cu = (ph - k) * uDrum.y;
-            float up = aB.w * smoothstep(-0.05, 0.05, cu) * (1.0 - smoothstep(0.3, 0.5, cu));
-            float meet = 1.0 - smoothstep(0.0, 0.05, abs(cu - 0.09));
+            float clap = aB.w * step(-0.25, ph) * (1.0 - smoothstep(0.05, 0.16, abs(cu - 0.09)));
+            float ka = clamp(floor((ph + 0.25) / 4.0), 0.0, floor((uDrum.z - 1.0) / 4.0));
+            float ca = (ph - 4.0 * ka) * uDrum.y;
+            float up = aB.w * smoothstep(-0.04, 0.06, ca) * (1.0 - smoothstep(0.5, 0.75, ca));
+            float meet = 1.0 - smoothstep(0.0, 0.06, abs(ca - 0.09));
             float sway = sin(t * (0.7 + 0.5 * fract(seed * 7.0)) + seed * 40.0);
             vec3 p = transformed;
             vec3 hand[2];
@@ -180,7 +185,8 @@ class SndCrowd {
               vec3 dUp = normalize(vec3(sx * 0.45, 1.0, 0.16));
               vec3 dMeet = normalize(vec3(-sx * 0.28, 1.0, 0.32));
               vec3 dDuck = normalize(vec3(-sx * 0.3, 0.8, 0.5));
-              vec3 d = normalize(mix(dRest, mix(dUp, dMeet, meet), up));
+              vec3 dClap = normalize(vec3(-sx * 0.55, 0.25, 0.8));
+              vec3 d = normalize(mix(mix(dRest, dClap, clap), mix(dUp, dMeet, meet), up));
               d = normalize(mix(d, dUp, jOn * smoothstep(0.0, 0.12, gu) * (1.0 - smoothstep(2.2, 3.0, gu))));
               d = normalize(mix(d, dDuck, duck));
               hand[i] = sh + d * 0.6;
@@ -216,7 +222,7 @@ class SndCrowd {
           diffuseColor.rgb = vCrowdCol;
           if (vScarf >= 0.0) diffuseColor.rgb = mix(vec3(0.96, 0.95, 0.9), vec3(0.85, 0.62, 0.06), step(0.72, fract(vScarf * 3.0 + 0.25)));`);
     };
-    mat.customProgramCacheKey = () => 'sndCrowd2';
+    mat.customProgramCacheKey = () => 'sndCrowd3';
     return mat;
   }
 

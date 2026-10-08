@@ -333,7 +333,8 @@ class SndStadium extends Environment {
       const W = 1024, H = 96, c = Tex.canvas(W, H), x = c.getContext('2d'), [bg, fg] = cols[i % cols.length];
       x.fillStyle = bg; x.fillRect(0, 0, W, H); x.fillStyle = fg; x.font = `700 64px ${Tex.fontCond}`; x.textAlign = 'center'; x.textBaseline = 'middle';
       x.fillText(t, W / 2, H / 2 + 3);   // (no LED pixel lines: at a distance they shimmer)
-      return new THREE.MeshBasicMaterial({ map: Tex.tex(c, { repeat: false }), color: new THREE.Color(0.86, 0.86, 0.86), name: 'ledBoard' });
+      return new THREE.MeshBasicMaterial({ map: Tex.tex(c, { repeat: false }), color: new THREE.Color(0.86, 0.86, 0.86), name: 'ledBoard',
+        polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });   // (no z-fighting with the box behind at 100 m)
     });
     const back = Mat.std('#22262b', { roughness: 0.7 });
     const L = 10, h = 0.9;
@@ -342,12 +343,12 @@ class SndStadium extends Environment {
     for (const s of [-1, 1]) for (let x = -50; x < 50; x += L) {
       const z = s * 37.4, M = mats[k++ % mats.length];
       B.add(s > 0 ? Geo.quad([x + L, 0.05, z], [x, 0.05, z], [x, 0.05 + h, z], [x + L, 0.05 + h, z]) : Geo.quad([x, 0.05, z], [x + L, 0.05, z], [x + L, 0.05 + h, z], [x, 0.05 + h, z]), M, null, { noShadow: true });
-      B.box(L, h, 0.2, x + L / 2, 0.05 + h / 2, z + s * 0.11, back, 0, { noShadow: true });
+      B.box(L, h, 0.2, x + L / 2, 0.05 + h / 2, z + s * 0.17, back, 0, { noShadow: true });
     }
     for (const s of [-1, 1]) for (const [z0, z1] of [[-30, -10], [-10, -5], [5, 10], [10, 30]]) {
       const x = s * 57.6, M = mats[k++ % mats.length];
       B.add(s > 0 ? Geo.quad([x, 0.05, z0], [x, 0.05, z1], [x, 0.05 + h, z1], [x, 0.05 + h, z0]) : Geo.quad([x, 0.05, z1], [x, 0.05, z0], [x, 0.05 + h, z0], [x, 0.05 + h, z1]), M, null, { noShadow: true });
-      B.box(0.2, h, z1 - z0, x + s * 0.11, 0.05 + h / 2, (z0 + z1) / 2, back, 0, { noShadow: true });
+      B.box(0.2, h, z1 - z0, x + s * 0.17, 0.05 + h / 2, (z0 + z1) / 2, back, 0, { noShadow: true });
     }
   }
 
@@ -494,8 +495,9 @@ class SndStadium extends Environment {
       const core = new THREE.MeshBasicMaterial({ color: '#f4f1ff', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide });
       const glow = new THREE.MeshBasicMaterial({ color: '#8f95ff', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide });
       const grp = new THREE.Group();
-      grp.add(new THREE.Mesh(ribbon(pts, 4.2), core), new THREE.Mesh(ribbon(pts, 15), glow));
-      for (const b of branches) grp.add(new THREE.Mesh(ribbon(b, 2.2), core), new THREE.Mesh(ribbon(b, 8), glow));
+      const W = F.w || 1;
+      grp.add(new THREE.Mesh(ribbon(pts, 4.2 * W), core), new THREE.Mesh(ribbon(pts, 15 * W), glow));
+      for (const b of branches) grp.add(new THREE.Mesh(ribbon(b, 2.2 * W), core), new THREE.Mesh(ribbon(b, 8 * W), glow));
       grp.position.set(F.x, 0, F.z);
       grp.rotation.y = Math.atan2(-F.x, -F.z);           // face the stadium
       grp.traverse((o) => { if (o.isMesh) { o.frustumCulled = false; o.renderOrder = -5; } });

@@ -58,6 +58,8 @@ const FILM = {
     // shot 2 looks up into the shade under the main stand's roof: open it up so it matches the sunny shots
     const sh = sndShotAt(t);
     if (sh === 1) { p.exposure = 1.42; p.blackLift = 0.02; p.contrast = 1.04; }
+    // shot 3 looks west into a bright sky: pull it down toward the storm-side shots
+    if (sh === 2) { p.exposure = 0.94; p.contrast = 1.14; p.saturation = 1.08; }
     p.tunnel = 1.25; p.tunnelSoft = 0.5; p.tunnelDark = 0; p.smear.set(0, 0);
     // a smear when your head turns fast (never across a cut)
     const app = FILM._app, dt = 1 / 30;
@@ -69,12 +71,12 @@ const FILM = {
     // the lightning: a cold flicker over everything (it is 2 km away: the sky carries most of it)
     const fl = Math.max(sndFlashLevel(t, SND.flash.t), sndFlashLevel(t, SND.flash2.t));
     if (fl > 0) { p.flash = 0.06 * fl; p.flashColor.setRGB(0.82, 0.86, 1.0); }
-    // the kick's crack, then the thunder: a pressure hit you feel — a white jolt, then two muffled seconds
-    // (your hands up; the world dulls with the sound, see audio.js)
-    const tT = H.thunder, muf = MathX.smooth(t, tT + 0.05, tT + 0.3) * (1 - MathX.smooth(t, tT + 2.3, tT + 3.2));
+    // the kick's crack, then the thunder: a startle — a brief jolt, the world dulled for a moment (your hands fly to
+    // your ears; 1.7 km away it is a loud clap, not a blast)
+    const tT = H.thunder, muf = MathX.smooth(t, tT + 0.05, tT + 0.15) * (1 - MathX.smooth(t, tT + 0.4, tT + 0.9));
     p.chroma = 0.003 * I(t, H.kick, 0.15) + 0.016 * I(t, tT, 0.45);
     p.edgeBlur = 0.55 * I(t, tT, 0.7) + 0.3 * muf;
-    if (t >= tT && t < tT + 0.2) { p.flash = Math.max(p.flash, 0.42 * Math.exp(-(t - tT) / 0.05)); p.flashColor.setRGB(1, 1, 1); }
+    if (t >= tT && t < tT + 0.15) { p.flash = Math.max(p.flash, 0.35 * Math.exp(-(t - tT) / 0.06)); p.flashColor.setRGB(1, 1, 1); }
     p.vignette += 0.18 * I(t, tT, 1.5) + 0.25 * muf;
     p.saturation -= 0.3 * muf; p.contrast -= 0.06 * muf;
     p.fade = MathX.smooth(t, SND.black - 0.4, SND.black);

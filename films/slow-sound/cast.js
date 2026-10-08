@@ -55,6 +55,11 @@ Object.assign(ACTIONS, {
     p.rSh = [1.45 * k, 0.05]; p.rEl = 0.1; p.headYaw = 0.1;
     return p;
   },
+  sndPointUp(τ, c) {      // pointing up over the far stand (at the birds), then the arm comes down
+    const p = ACTIONS.idle(τ, c), k = MathX.smooth(τ, 0, 0.35) * (1 - MathX.smooth(τ, 1.9, 2.4));
+    p.rSh = [2.15 * k, 0.12 * k]; p.rEl = 0.12; p.headYaw = 0.05; p.neck = -0.15 * k;
+    return p;
+  },
   sndKick(τ, c) {         // the strike lands at τ = 0.1
     const p = basePose(), a = MathX.smooth(τ, 0, 0.1), b = MathX.smooth(τ, 0.1, 0.32), r = MathX.smooth(τ, 0.45, 1.0);
     p.rHip = [(-0.85 + 1.3 * a + 0.9 * b) * (1 - r), 0.05]; p.rKnee = (1.5 - 1.25 * a) * (1 - r) + 0.05;
@@ -111,7 +116,7 @@ Object.assign(ACTIONS, {
   },
 });
 Object.assign(BLEND, { sndSet: 0.6, sndSprint: 0.14, sndStarter: 0.5, sndWave: 0.3, sndShout: 0.16, sndWhistle: 0.15, sndPoint: 0.3, sndKick: 0.08, sndCelebrate: 0.4,
-  sndWall: 0.4, sndKeeper: 0.4, sndDive: 0.08, sndDrum: 0.4, sndDuck: 0.06, sndWatch: 0.6, sndCheer: 0.12 });
+  sndWall: 0.4, sndKeeper: 0.4, sndDive: 0.08, sndDrum: 0.4, sndDuck: 0.06, sndWatch: 0.6, sndCheer: 0.12, sndPointUp: 0.3 });
 
 // looks: runners in bright tops, two kits, the referee, the keeper, the friend, fans
 (() => {
@@ -162,7 +167,7 @@ class SndCast {
     this.friend = add({ id: 'friend', look: 'sndFriend', y: fy, path: [[0, F.x, F.z - 0.1]], states: [[0, 'idle'], [F.wave[0], 'sndWave'], [F.shout, 'sndShout'], [F.shout + 0.95, 'sndWave'], [F.shout2, 'sndShout'], [F.shout2 + 0.75, 'sndWave'], [F.wave[1], 'sndWatch']], face: faceF }, [1]);
     const nb = [['nb1', 'sndFanB', 10, -23.4], ['nb2', 'sndFanC', 10, -20.3], ['nb3', 'sndFanD', 11, -25.2], ['nb4', 'sndFanC', 11, -19.6], ['nb5', 'sndFanB', 12, -22.6], ['nb6', 'sndFanD', 13, -18.4],
       ['nb7', 'sndFanA', 8, -26.4], ['nb8', 'sndFanE', 7, -21.0], ['nb9', 'sndFanA', 14, -24.8], ['nb10', 'sndFanE', 15, -20.2], ['nb11', 'sndFanC', 9, -17.5], ['nb12', 'sndFanD', 13, -27.1]];
-    for (const [id, look, r, x] of nb) { const q = sndSideSeat(1, r, x); add({ id, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch']], face: sndFace(x, q.z, x * 0.6, 0) + (hash1(x * 3) - 0.5) * 30 }, [1]); }
+    for (const [id, look, r, x] of nb) { const q = sndSideSeat(1, r, x); add({ id, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'idle']], face: sndFace(x, q.z, x * 0.6, 0) + (hash1(x * 3) - 0.5) * 30 }, [1]); }
 
     // 4. the free kick: referee, taker, wall, keeper, two more players
     const K = SND.kick, W = SND.whistle;
@@ -199,9 +204,10 @@ class SndCast {
 
     // 6. your neighbours in the stand (rows 10–12), and the players on the pitch
     // (the view runs out over x ≈ 5.9 in rows 10–11: nobody stands right on it, the nearest heads frame its lower corners)
-    for (const [r, x, look] of [[11, 4.55, 'sndFanA'], [11, 5.25, 'sndFanC'], [11, 6.6, 'sndFanE'], [11, 7.35, 'sndFanD'], [10, 4.4, 'sndFanD'], [10, 5.2, 'sndFanE'], [10, 6.6, 'sndFanA'], [10, 7.4, 'sndFanC'], [12, 4.9, 'sndFanD'], [12, 7.1, 'sndFanB']]) {
+    for (const [r, x, look, pt] of [[11, 4.45, 'sndFanA', 45.3], [11, 7.5, 'sndFanD', 0], [10, 4.4, 'sndFanD', 0], [10, 5.2, 'sndFanE', 0], [10, 6.6, 'sndFanA', 0], [10, 7.4, 'sndFanC', 46.4], [12, 4.9, 'sndFanD', 0], [12, 7.1, 'sndFanB', 0]]) {
       const q = sndSideSeat(1, r, x), tT = sndThunderAt({ x, y: q.y + 1.6, z: q.z }) + 0.04 + hash1(x * 31) * 0.05;
-      add({ id: 'me' + r + '_' + x, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch'], [tT, 'sndDuck']], face: sndFace(x, q.z, x * 0.3, -10) + (hash1(x * 7) - 0.5) * 24 }, [5]);
+      const states = pt ? [[0, 'sndWatch'], [pt, 'sndPointUp'], [pt + 2.5, 'sndWatch'], [tT, 'sndDuck']] : [[0, 'sndWatch'], [tT, 'sndDuck']];
+      add({ id: 'me' + r + '_' + x, look, y: q.y, path: [[0, x, q.z - 0.1]], states, face: sndFace(x, q.z, x * 0.3, -10) + (hash1(x * 7) - 0.5) * 24 }, [5]);
     }
     // stewards along the near touchline, facing the crowd: the last people the front passes before it reaches you
     for (const [id, look, x] of [['s1', 'sndSteward', -15.5], ['s2', 'sndSteward2', -4.5], ['s3', 'sndSteward', 3.0], ['s4', 'sndSteward2', 12.5]]) {
@@ -220,7 +226,11 @@ class SndCast {
       for (let i = 0; i < n; i += 3) { const dark = hash1(i * 7 + 3) < 0.22; for (let k = 0; k < 3; k++) col.set(dark ? [0.05, 0.05, 0.06] : [0.92, 0.92, 0.9], (i + k) * 3); }
       g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
       this.ball = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true }));
-      this.ball.castShadow = true; scene.add(this.ball); }
+      this.ball.castShadow = true; scene.add(this.ball);
+      // its motion streak while it flies (a camera's blur of the last 1/20 s: 2 m at 144 km/h), so the shot reads
+      const sg = new THREE.CylinderGeometry(0.1, 0.03, 1, 10, 1, true); sg.rotateX(Math.PI / 2); sg.translate(0, 0, 0.5);
+      this.streak = new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide }));
+      this.streak.visible = false; scene.add(this.streak); }
     this.shadows = new BlobShadows(scene, 96);
   }
 
@@ -253,6 +263,12 @@ class SndCast {
       const b = sndBall(t), sp = sndBallV(t); this.ball.position.set(b.x, b.y, b.z);
       this.ball.rotation.set(t * 3.1, t * 17 * (sp > 0 ? 1 : 0), 0.4);
       B.push(b.x, 0.012, b.z, 0.32, 0.5 * MathX.clamp(1 - b.y / 3, 0, 1));
+    }
+    const K = SND.kick, fly = shot === 3 && t > K.t + 0.01 && t < SND_NET.tN;
+    this.streak.visible = fly;
+    if (fly) {
+      const b = sndBall(t), a = sndBall(Math.max(K.t, t - 0.05)), L = Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z);
+      this.streak.position.set(b.x, b.y, b.z); this.streak.lookAt(a.x, a.y, a.z); this.streak.scale.set(1, 1, Math.max(0.01, L));
     }
     B.end();
     this.drum.visible = this.flag.g.visible = shot === 4;

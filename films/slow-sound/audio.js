@@ -3,7 +3,7 @@
    Every sound reaches you when SoundArrival's rule says (arrival = event + distance / 34.3 m/s), from where it was
    made, to where YOUR ear is at that moment (the ear jumps at each cut). What changes in this air, besides timing:
      · voices: the vocal folds keep their pitch, but the throat and mouth resonances scale with the speed of
-       sound (10× lower): every voice comes out deep, hollow and muffled
+       sound (10× lower): every voice comes out hollow and muffled (same pitch, the words blur)
      · anything whose note is set by an air cavity drops ~10×: the referee's whistle hoots, claps become soft thumps
        (the cupped palms), the ball's ping becomes a deep "dum"
      · echoes come back seconds later; one announcement from five loudspeakers arrives three times
@@ -36,8 +36,9 @@ class SndAudio extends AudioEngine {
     const out = ctx.createGain(); out.gain.value = 0.9; out.connect(lim);
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 8; comp.ratio.value = 3.5; comp.attack.value = 0.004; comp.release.value = 0.25; comp.connect(out);
     const ears = S.filter('lowpass', 20000, 0.7); ears.connect(comp);
-    ears.frequency.setValueAtTime(20000, 0); ears.frequency.setValueAtTime(20000, tT + 0.12); ears.frequency.exponentialRampToValueAtTime(650, tT + 0.3);
-    ears.frequency.setValueAtTime(650, tT + 2.55); ears.frequency.exponentialRampToValueAtTime(20000, tT + 3.3);
+    // (a moment only: 1.7 km away the thunder is a loud clap, not a blast that deafens you)
+    ears.frequency.setValueAtTime(20000, 0); ears.frequency.setValueAtTime(20000, tT + 0.12); ears.frequency.exponentialRampToValueAtTime(1100, tT + 0.25);
+    ears.frequency.setValueAtTime(1100, tT + 0.5); ears.frequency.exponentialRampToValueAtTime(20000, tT + 1.05);
     const mix = ctx.createGain(), mixHp = S.filter('highpass', 26, 0.7); mix.gain.value = 1.5; mix.connect(mixHp); mixHp.connect(ears);
     // the stadium's reverb: long (echoes take ten times longer to die away in this air)
     const rev = S.reverb(4.2), revG = ctx.createGain(); revG.gain.value = 0.3; rev.connect(revG); revG.connect(mix);
@@ -221,8 +222,9 @@ class SndAudio extends AudioEngine {
     at(T.whistle.t, WP, 10, (tr, g, pn) => hoot(tr, 2.2 * g, pn));
     echoes(T.whistle.t, WP, 10, (tr, g, pn) => hoot(tr, 1.7 * g, pn));
 
-    // 7. the shot: the ball outruns its own sound — a crack (its shock, as it drops through Mach 1), the kick's deep
-    //    "dum" (the ball's air rings ten times lower), the net
+    // 7. the shot: the kick's crack and its deep "dum" (the ball's air rings ten times lower), then the net. (The ball
+    //    outruns its own sound for its first 3 m, but its shock cone points at the goal, not at you: from your seat its
+    //    first sound is the kick itself, 0.79 s after the goal)
     {
       const K = T.kick, KP = SND_P(K.x, 0.15, K.z), N = SND_NET, NP = SND_P(N.back, N.y, N.z);
       const crack = (tr, g, pn) => {
@@ -264,8 +266,8 @@ class SndAudio extends AudioEngine {
     });
 
     // 9. the drum: a deep bass drum, every beat heard from where it is
-    for (let k = 0; k < T.drum.n; k++) at(T.drum.t0 + k * T.drum.period, SND_DRUM, 12, (tr, g, pn) => {
-      const P = S.panned(src, pn), o = ctx.createOscillator(), og = ctx.createGain();
+    for (let k = 0; k < T.drum.n; k++) at(T.drum.t0 + k * T.drum.period, SND_DRUM, 12, (tr, g0, pn) => {
+      const g = g0 * (k % 4 ? 0.8 : 1.35), P = S.panned(src, pn), o = ctx.createOscillator(), og = ctx.createGain();
       o.frequency.setValueAtTime(78, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25); S.env(og, tr, 0.003, 4.2 * g, 0.32); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.6); send(og, 0.45);
       const n = S.noise('pink', tr, tr + 0.08), lp = S.filter('lowpass', 500, 0.7), ng = ctx.createGain(); S.env(ng, tr, 0.001, 1.3 * g, 0.05); n.connect(lp); lp.connect(ng); ng.connect(P);
     });
@@ -294,9 +296,10 @@ class SndAudio extends AudioEngine {
       mid.connect(ml); ml.connect(mg); mg.connect(S.panned(fx, pn * 0.4));
       rg.gain.setValueAtTime(0, tT); rg.gain.linearRampToValueAtTime(1.5, tT + 0.06);
       mg.gain.setValueAtTime(0, tT); mg.gain.linearRampToValueAtTime(0.5, tT + 0.03); mg.gain.setTargetAtTime(0.05, tT + 0.2, 0.8);
-      const peaks = [[0.9, 1.25], [2.1, 1.0], [3.4, 1.0], [5.2, 0.55], [6.9, 0.5], [8.6, 0.32]];
+      // (it keeps rolling, within ~3 dB, to the end: real thunder rolls 5–20 s; here ten times longer)
+      const peaks = [[0.9, 1.25], [2.1, 1.05], [3.4, 1.15], [4.9, 0.95], [6.3, 1.05], [7.8, 0.92], [9.1, 1.0]];
       rg.gain.setTargetAtTime(0.55, tT + 0.1, 0.35);
-      for (const [dt, a] of peaks) { const t0 = tT + dt; if (t0 > END - 0.5) break; rg.gain.setTargetAtTime(a, t0 - 0.3, 0.12); rg.gain.setTargetAtTime(a * 0.45, t0 + 0.2, 0.4); }
+      for (const [dt, a] of peaks) { const t0 = tT + dt; if (t0 > END - 0.5) break; rg.gain.setTargetAtTime(a, t0 - 0.3, 0.12); rg.gain.setTargetAtTime(a * 0.55, t0 + 0.2, 0.4); }
       rg.gain.setTargetAtTime(0, END - 0.6, 0.15); mg.gain.setTargetAtTime(0, END - 0.6, 0.15);
     }
 

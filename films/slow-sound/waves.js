@@ -22,7 +22,7 @@ class SndRipples {
     E.push([P.whistle.x, P.whistle.z, P.whistle.t, P.whistle.y, 3.2, 2.4, 0.3, 3]);
     E.push([P.kick.x, P.kick.z, P.kick.t, 0.15, 3.4, 1.6, 0.25, 3]);
     for (let te = P.kick.t + 0.005; te < SND_BALL.tGoal; te += 0.03) { const b = sndBall(te); E.push([b.x, b.z, te, b.y, te < SND_BALL.tMach1 ? 2.4 : 1.2, 0.6, 0.12, 3]); }
-    for (let k = 0; k < P.drum.n; k++) E.push([P.drum.x, P.drum.z, P.drum.t0 + k * P.drum.period, P.drum.y + 0.8, 1.5, 4.4, 0.3, 4]);
+    for (let k = 0; k < P.drum.n; k++) E.push([P.drum.x, P.drum.z, P.drum.t0 + k * P.drum.period, P.drum.y + 0.8, k % 4 ? 0.6 : 2.0, 4.4, 0.3, 4]);   // (the accented beats bright)
     this.E = E;
     this.thunder = [SND_BOLT.x, SND_BOLT.z, P.flash.t];
     const U = this.uniforms = {
@@ -94,8 +94,8 @@ class SndShells {
     for (const s of P.pa.speakers) E.push([s.x, s.y, s.z, P.pa.speak, 0.55, 3.6, 2]);
     E.push([P.whistle.x, P.whistle.y + 0.1, P.whistle.z, P.whistle.t, 0.9, 2.2, 3]);
     E.push([P.kick.x, 0.15, P.kick.z, P.kick.t, 0.9, 1.4, 3]);
-    for (let te = P.kick.t + 0.02; te < SND_BALL.tGoal; te += 0.06) { const b = sndBall(te); E.push([b.x, b.y, b.z, te, te < SND_BALL.tMach1 + 0.03 ? 0.6 : 0.3, 0.6, 3]); }
-    for (let k = 0; k < P.drum.n; k++) E.push([P.drum.x, P.drum.y + 1.0, P.drum.z, P.drum.t0 + k * P.drum.period, 0.42, 3.3, 4]);
+    for (let te = P.kick.t + 0.02; te < SND_BALL.tGoal; te += 0.1) { const b = sndBall(te); E.push([b.x, b.y, b.z, te, te < SND_BALL.tMach1 + 0.03 ? 0.5 : 0.2, 0.6, 3]); }
+    for (let k = 0; k < P.drum.n; k++) E.push([P.drum.x, P.drum.y + 1.0, P.drum.z, P.drum.t0 + k * P.drum.period, k % 4 ? 0.14 : 0.5, 3.3, 4]);
     this.E = E;
     this.MAX = 12;
     const U = this.uniforms = { uFogDensity: { value: 0 } };
@@ -120,7 +120,7 @@ class SndShells {
         if (vW.y < 0.02) discard;
         vec3 N = normalize(vW - vC), V = normalize(cameraPosition - vW);
         float f = 1.0 - abs(dot(N, V));
-        float a = vS * uK * (0.06 + 1.0 * pow(f, 5.0));   // (one face now, so twice the old two-face strength)
+        float a = vS * uK * (0.03 + 1.0 * pow(f, 5.0));   // (one face; a faint body, the rim carries the dome)
         a *= exp(-uFogDensity * vDepth) * smoothstep(1.0, 9.0, vDepth);
         gl_FragColor = vec4(vec3(0.88, 0.94, 1.0) * a, 1.0);
       }`;
@@ -140,9 +140,11 @@ class SndShells {
           if (vW.y < 0.02) discard;
           vec3 N = normalize(vW - vC), V = normalize(cameraPosition - vW);
           float f = 1.0 - abs(dot(N, V));
-          float wall = exp(-vW.y / 24.0) * (0.8 + 0.2 * sin(vW.y * 0.7 + dot(vW.xz, vec2(0.21, 0.13))));
-          float a = uK * (0.2 * wall + 0.06 + 0.9 * pow(f, 5.0));
-          a *= exp(-uFogDensity * vDepth) * smoothstep(3.0, 14.0, vDepth);
+          // drawn as a wall 45 m tall moving toward you: a faint glassy body, a bright top edge, a bright foot
+          float y = vW.y, body = 1.0 - smoothstep(36.0, 46.0, y);
+          float edge = exp(-pow((y - 44.5) / 1.8, 2.0)), foot = exp(-y / 1.4);
+          float a = uK * (0.06 * body + 0.34 * edge + 0.3 * foot + 0.5 * pow(f, 5.0) * body);
+          a *= exp(-uFogDensity * vDepth * 0.5) * smoothstep(3.0, 14.0, vDepth);
           gl_FragColor = vec4(vec3(0.86, 0.92, 1.0) * a, 1.0);
         }`,
       transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.FrontSide });
@@ -170,8 +172,8 @@ class SndShells {
       this.mesh.setMatrixAt(i, this._m); this.aS.array[i] = s;
     }
     this.mesh.count = n; this.mesh.instanceMatrix.needsUpdate = true; this.aS.needsUpdate = true;
-    // the thunder's front: from a little before it reaches the far stand until it is past you
-    const k = MathX.window(t, SND.heard.thunder - 9.5, SND.heard.thunder + 1.0, 1.5, 0.6);
+    // the thunder's front: through the whole last shot (over the city, the far stand, the pitch) until it is past you
+    const k = MathX.window(t, SND.cuts[4] + 0.6, SND.heard.thunder + 1.0, 1.6, 0.6);
     this.thunder.visible = k > 0.001;
     if (k > 0) { const r = SND_RUN(SND.flash.t, t); this.thunder.scale.set(r, r, r); this.thunderMat.uniforms.uK.value = 1.15 * k; }
     if (fog) this.uniforms.uFogDensity.value = fog.density;
@@ -204,22 +206,26 @@ class SndPuffs {
 class SndBirds {
   constructor(scene, city) {
     // two sprite sheets of a bird's silhouette (wings up / wings down): a flap is a swap between them
-    this.up = new BillboardSystem(scene, 640); this.dn = new BillboardSystem(scene, 640);
+    this.up = new BillboardSystem(scene, 700); this.dn = new BillboardSystem(scene, 700);
     this.up.uniforms.uMap.value = SndBirds.tex(true); this.dn.uniforms.uMap.value = SndBirds.tex(false);
+    this.up.mesh.renderOrder = this.dn.mesh.renderOrder = 5;          // (after the thunder's curtain: dark against it)
     const E = SND_EYE[5], wallEl = Math.atan2(12.4 - E.y, E.z + 60.5);
     const view = Math.atan2(-4 - E.x, -(-42 - E.z));
+    // (a roof counts only if its flock, 10 m up, shows over the far stand AND over every nearer block)
+    const az = (b) => Math.atan2(b.x - E.x, -(b.z - E.z)), dist = (b) => Math.hypot(b.x - E.x, b.z - E.z);
+    const hidden = (b, el) => (city || []).some((c) => c !== b && dist(c) < dist(b) - 2 && Math.abs(az(c) - az(b)) < Math.atan2(0.6 * Math.max(c.w, c.d), dist(c)) && Math.atan2(c.h - E.y, dist(c)) > el - 0.002);
     const roofs = (city || []).filter((b) => {
       if (b.z > -140) return false;
-      const az = Math.atan2(b.x - E.x, -(b.z - E.z)), el = Math.atan2(b.h + 4 - E.y, Math.hypot(b.x - E.x, b.z - E.z));
-      return Math.abs(az - view) < 0.24 && el > wallEl + 0.006 && sndThunderAt(b) > SND.cuts[4] + 2.5;
-    }).sort((a, b) => sndThunderAt(a) - sndThunderAt(b)).slice(0, 9);
+      const el = Math.atan2(b.h + 10 - E.y, dist(b));
+      return Math.abs(az(b) - view) < 0.26 && el > wallEl + 0.006 && sndThunderAt(b) > SND.cuts[4] + 1.6 && !hidden(b, el);
+    }).sort((a, b) => sndThunderAt(a) - sndThunderAt(b)).slice(0, 14);
     this.B = [];
     roofs.forEach((b, fi) => {
-      const tl = sndThunderAt(b) + 0.15, n = 46 + Math.floor(hash1(fi * 7) * 22);
+      const tl = sndThunderAt(b) + 0.15, n = 30 + Math.floor(hash1(fi * 7) * 16);
       for (let i = 0; i < n; i++) {
         const sd = fi * 100 + i, a = hash1(sd) * 6.28;
         this.B.push({ x: b.x + (hash1(sd * 3) - 0.5) * b.w * 0.8, z: b.z + (hash1(sd * 5) - 0.5) * b.d * 0.8, y: b.h + 0.4, tl: tl + hash1(sd * 7) * 0.25,
-          vx: Math.cos(a) * (3 + 3 * hash1(sd * 11)), vz: Math.sin(a) * (3 + 3 * hash1(sd * 11)) + 2.5, vy: 5 + 4 * hash1(sd * 13), ph: hash1(sd * 17) * 6.28, sz: 1.5 + 0.9 * hash1(sd * 19) });   // drawn ~2× a real bird so the flocks read on a phone
+          vx: Math.cos(a) * (3 + 3 * hash1(sd * 11)), vz: Math.sin(a) * (3 + 3 * hash1(sd * 11)) + 2.5, vy: 5 + 4 * hash1(sd * 13), ph: hash1(sd * 17) * 6.28, sz: 2.6 + 1.5 * hash1(sd * 19) });   // drawn ~3× a gull: 200–400 m away they must read on a phone
       }
     });
   }
@@ -239,6 +245,7 @@ class SndBirds {
   update(t, fog) {
     const U = this.up, D = this.dn;
     U.begin(fog); D.begin(fog);
+    U.uniforms.uFogDensity.value *= 0.35; D.uniforms.uFogDensity.value *= 0.35;   // (dark silhouettes, 200–400 m away)
     if (sndShotAt(t) === 5) for (const b of this.B) {
       const u = t - b.tl;
       if (u < 0) { D.push(b.x, b.y, b.z, b.sz * 0.5, 0, 0.8, 1.0, 0.14, 0.14, 0.15); continue; }

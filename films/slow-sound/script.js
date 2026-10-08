@@ -47,7 +47,7 @@ const SND = {
   line: { x: 0, z0: -31, z1: 31, n: 30 },
   // the lightning under the title (1.71 km from your seat at the end, beyond the far stand): its thunder is the last scene
   flash: { t: 2.7, x: 30, z: -1662, base: 1100 },
-  flash2: { t: 58.7, x: -40, z: -1500, base: 1100 },
+  flash2: { t: 57.2, x: -190, z: -1500, base: 1100, w: 1.7 },   // (a new flash as the last line begins, centred in the last view)
   // 2. your friend, standing in row 11 of the main stand, waves and shouts (twice)
   friend: { x: -22, row: 11, shout: 10.35, shout2: 12.9, wave: [9.75, 14.6] },
   // 3. the announcer (on the big screen) — one voice, played by four loudspeaker clusters and the roof speaker
@@ -220,18 +220,19 @@ const SND_SHOTS = [
   //  wide and still, so the clapping can be seen spreading out from the drum along the stand)
   [SND.cuts[3], SND.cuts[4], (t) => SND_EYE[4],
     (t) => SND_MIX(SND_P(SND.drum.x + 0.1, SND.drum.y + 1.5, SND.drum.z + 0.3), SND_P(-12, 5.0, -48), MathX.smooth(t, 31.0, 32.3)),
-    (t) => 11 + 41 * MathX.smooth(t, 31.0, 32.3)],
+    (t) => 11 + 35 * MathX.smooth(t, 31.0, 32.3)],
   // (the storm; down to the city and the far stand as the thunder's front comes over the city (birds lift off as it
   //  reaches them); the lens closes on the far stand as the front reaches it, then follows the front across the pitch
   //  toward you; afterwards up to the sky for the next flash)
   [SND.cuts[4], 99, (t) => SND_EYE[5],
     (t) => {
       const zf = SND_EYE[5].z - Math.max(0, sndThunderAt(SND_EYE[5]) - t) * SND.C1;    // (where the front is, on the pitch)
-      const U = SND_P(-2, 17, -42), C = SND_P(-4, 7.5, -42), Fs = SND_P(-6, 7.0, -50), Fr = SND_P(-1, 0.6, Math.min(22, zf - 3)), W = SND_P(-3, 2.5, -30), Sk = SND_P(-6, 15, -42);
-      const a = MathX.smooth(t, 42.4, 45.0), b = MathX.smooth(t, 46.6, 48.3), c = MathX.smooth(t, 50.2, 50.9), w = MathX.smooth(t, 53.6, 55.4), d = MathX.smooth(t, 55.8, 58.2);
+      const s0 = MathX.smooth(t, 38.6, 41.6), s1 = MathX.smooth(t, 46.8, 50.2);        // (slow drifts: the view is never still)
+      const U = SND_P(2 - 4 * s0, 17 - 2 * s0, -42), C = SND_P(-4, 7.5, -42), Fs = SND_P(-6 + 1.5 * s1, 8.2 - 2.4 * s1, -50), Fr = SND_P(-1, 0.6, Math.min(22, zf - 3)), W = SND_P(-3, 2.5, -30), Sk = SND_P(-6, 15, -42);
+      const a = MathX.smooth(t, 40.6, 43.0), b = MathX.smooth(t, 44.2, 46.8), c = MathX.smooth(t, 50.2, 50.9), w = MathX.smooth(t, 53.2, 54.6), d = MathX.smooth(t, 54.4, 56.9);
       return SND_MIX(SND_MIX(SND_MIX(SND_MIX(SND_MIX(U, C, a), Fs, b), Fr, c), W, w), Sk, d);
     },
-    (t) => 57 - 7 * MathX.smooth(t, 42.4, 45.0) - 16 * MathX.smooth(t, 46.6, 48.3) + 22 * MathX.smooth(t, 50.2, 50.9) + 4 * MathX.smooth(t, 55.8, 58.2)],
+    (t) => 57 - 3 * MathX.smooth(t, 38.6, 41.6) - 4 * MathX.smooth(t, 40.6, 43.0) - 16 * MathX.smooth(t, 44.2, 46.8) - 4 * MathX.smooth(t, 46.8, 50.2) + 26 * MathX.smooth(t, 50.2, 50.9) + 4 * MathX.smooth(t, 54.4, 56.9)],
 ];
 function sndShotAt(t) { let k = 0; for (let i = 0; i < SND.cuts.length; i++) if (t >= SND.cuts[i]) k = i + 1; return k; }
 // true when a cut falls between t0 and t1 (no whip smear across a cut)
@@ -328,10 +329,10 @@ function sndKmh(t) { const k = sndC(t) * 3.6; return k >= 1000 ? `${Math.floor(k
   // 3. what that does to you: jolts, the thunder's shake, your hands flying up
   const tT = H.thunder;
   C.startles = [[H.gun + 0.02, 0.35], [H.kick + 0.02, 0.5], [tT + 0.02, 2.0]];
-  C.shakes = [[H.kick + 0.01, 0.3, 0.25], [tT + 0.02, 1.15, 1.9]];
-  C.tilt = [[0, 0], [tT, 0], [tT + 0.2, -3.5], [tT + 2.5, 0], [70, 0]];
-  SCRIPT.hands.right = [[0, 'hidden'], [tT + 0.05, 'brace'], [tT + 1.7, 'brace'], [tT + 2.5, 'hidden']];
-  SCRIPT.hands.left = [[0, 'hidden'], [tT + 0.08, 'brace'], [tT + 1.6, 'brace'], [tT + 2.4, 'hidden']];
+  C.shakes = [[H.kick + 0.01, 0.3, 0.25], [tT + 0.02, 0.4, 0.9]];
+  C.tilt = [[0, 0], [tT, 0], [tT + 0.2, -1.8], [tT + 1.3, 0], [70, 0]];
+  SCRIPT.hands.right = [[0, 'hidden'], [tT + 0.04, 'ear'], [tT + 1.0, 'ear'], [tT + 1.6, 'hidden']];
+  SCRIPT.hands.left = [[0, 'hidden'], [tT + 0.07, 'ear'], [tT + 0.95, 'ear'], [tT + 1.55, 'hidden']];
 
   // 4. the readouts (top-left); the small "thunder" tag under them (tag: true) keeps the opening flash in mind
   const R = SCRIPT.hud.readouts, top = 200, tagTop = 470;
@@ -339,25 +340,25 @@ function sndKmh(t) { const k = sndC(t) * 3.6; return k >= 1000 ? `${Math.floor(k
   R.push({ from: 0.0, until: 3.65, top, label: 'SPEED OF SOUND', value: (t) => sndKmh(t), sub: (t) => `${sndC(t) >= 100 ? Math.round(sndC(t)) : sndC(t).toFixed(1)} M/S` });
   R.push({ from: A.gun.bang, until: 9.5, top, label: 'THE STARTING GUN', value: (t) => `${Math.min(t, H.gun) - A.gun.bang >= 0 ? (Math.min(t, H.gun) - A.gun.bang).toFixed(2) : '0.00'} S`,
     sub: (t) => (t < H.gun ? 'ITS BANG IS ON ITS WAY TO YOU…' : `HEARD · ${Math.round(dGun)} M AWAY`),
-    ctx: (t) => (t < H.gun ? '' : `THE RUNNER NEAREST YOU HEARD IT ${(SND_RUNNERS[29].go - SND_RUNNERS[0].go).toFixed(1)} S AFTER THE FIRST`) });
+    ctx: (t) => (t < H.gun ? '' : `THE LAST RUNNER STARTED ${(SND_RUNNERS[29].go - SND_RUNNERS[0].go).toFixed(1)} S AFTER THE FIRST`) });
   const tagIn = (t) => `IN ${Math.max(0, Math.round(sndThunderAt(sndEar(t)) - t))} S`;
-  for (const [a, b] of [[2.95, 5.9], [SND.cuts[0] + 0.2, SND.cuts[0] + 2.6], [SND.cuts[1] + 0.2, SND.cuts[1] + 2.6], [SND.cuts[2] + 0.2, SND.cuts[2] + 2.4], [SND.cuts[3] + 0.2, SND.cuts[3] + 2.4]])
+  for (const [a, b] of [[3.75, 6.2], [SND.cuts[0] + 0.2, SND.cuts[0] + 2.6], [SND.cuts[1] + 0.2, SND.cuts[1] + 2.6], [SND.cuts[2] + 0.2, SND.cuts[2] + 2.4], [SND.cuts[3] + 0.2, SND.cuts[3] + 2.4]])
     R.push({ tag: true, from: a, until: b, top: tagTop, label: 'THE FLASH’S THUNDER', value: tagIn });
   const dF = SoundArrival.dist(SND_FRIEND_MOUTH, sndEar(10.5));
   R.push({ from: 10.0, until: 15.5, top, label: 'SOUND DELAY', value: (t) => (t < A.friend.shout ? '0.00 S' : `${(Math.min(t, H.shout) - A.friend.shout).toFixed(2)} S`),
     sub: (t) => (t >= A.friend.shout && t < H.shout ? 'ON ITS WAY TO YOU…' : `DISTANCE ${Math.round(dF)} M`),
-    ctx: (t) => (t < 13.45 ? '' : 'VOICE RESONANCES 10× LOWER') });
+    ctx: (t) => (t < 13.45 ? '' : 'IT ARRIVES HOLLOW AND MUFFLED') });
   // (the five copies come in three bunches: count the bunches)
   const paG = []; for (const x of H.pa) if (!paG.length || x - paG[paG.length - 1][0] > 0.3) paG.push([x]); else paG[paG.length - 1].push(x);
   R.push({ from: 16.0, until: SND.cuts[2] - 0.1, top, label: 'ONE ANNOUNCEMENT', value: (t) => { const n = paG.filter((g) => g[0] <= t).length; return n ? `HEARD ${n}×` : 'NOT YET'; },
     sub: () => `FROM 5 LOUDSPEAKERS · ${paG.map((g) => (g[0] - A.pa.speak).toFixed(1)).join(' · ')} S LATE` });
   const dW = SoundArrival.dist(SND_P(A.whistle.x, A.whistle.y, A.whistle.z), SND_EYE[3]);
   R.push({ from: A.whistle.t - 0.1, until: A.kick.t - 0.15, top, label: 'THE REFEREE’S WHISTLE', value: (t) => `${Math.max(0, Math.min(t, H.whistle) - A.whistle.t).toFixed(2)} S`,
-    sub: (t) => (t < H.whistle ? `ON ITS WAY · ${Math.round(dW)} M` : 'AND ABOUT 10× LOWER'), ctx: (t) => (t < H.whistle ? '' : 'ITS NOTE IS SET BY ITS AIR CHAMBER') });
+    sub: (t) => (t < H.whistle ? `ON ITS WAY · ${Math.round(dW)} M` : 'AND ABOUT 10× LOWER'), ctx: (t) => (t < H.whistle ? '' : 'ITS NOTE DEPENDS ON THE SPEED OF SOUND') });
   const B = SND_BALL;
   R.push({ from: A.kick.t, until: SND.cuts[3] - 0.1, top, label: 'THE SHOT · 144 KM/H', value: `MACH ${(A.kick.v0 / A.C1).toFixed(2)}`,
     sub: (t) => (t < B.tGoal ? `SUPERSONIC FOR ITS FIRST ${Math.round(B.dMach1)} M` : t < H.kick ? 'GOAL · THE KICK IS STILL ON ITS WAY…' : `THE KICK: HEARD ${(H.kick - B.tGoal).toFixed(1)} S AFTER THE GOAL`),
-    ctx: (t) => (t < A.kick.t + 0.25 ? '' : 'THEN THE AIR BRAKES IT HARD') });
+    ctx: (t) => (t < A.kick.t + 0.25 ? '' : 'THEN THE AIR SLOWS IT DOWN FAST') });
   const dD = SoundArrival.dist(SND_DRUM, SND_EYE[4]);
   R.push({ from: SND.cuts[3] + 0.2, until: SND.cuts[4] - 0.1, top, label: 'THE DRUM', value: `${H.drum.toFixed(1)} S LATE`, sub: `${Math.round(dD)} M AWAY`,
     ctx: 'EACH FAN CLAPS WHEN THEY HEAR IT' });
@@ -368,9 +369,9 @@ function sndKmh(t) { const k = sndC(t) * 3.6; return k >= 1000 ? `${Math.floor(k
   const e2 = sndEar(A.flash2.t), tT2 = sndHeardAt(A.flash2.t, SND_P(A.flash2.x, 0, A.flash2.z), { x: e2.x, y: 0, z: e2.z });   // (the next flash's thunder: long after the film)
   R.push({ from: A.flash2.t + 0.15, until: A.note[1] + 0.05, top, label: 'THAT FLASH', value: (t) => `${Math.round(tT2 - t)} S`, sub: 'UNTIL YOU HEAR IT' });
 
-  // 5. the words, shown when they ARRIVE (the second shout: what actually reaches you)
+  // 5. the words, shown when they ARRIVE (what actually reaches you: blurred)
   const S = SCRIPT.hud.says;
-  S.push({ t: +H.shout.toFixed(3), until: +(H.shout + 1.6).toFixed(3), text: '“Hey! Up here!”' });
+  S.push({ t: +H.shout.toFixed(3), until: +(H.shout + 1.6).toFixed(3), text: '“Hhey… uhh hheehh!”' });
   S.push({ t: +H.shout2.toFixed(3), until: +(H.shout2 + 1.5).toFixed(3), text: '“Uvvh… hhrrh!”' });
   H.pa.forEach((tr, i) => S.push({ t: +tr.toFixed(3), until: +(i + 1 < H.pa.length ? Math.min(H.pa[i + 1], tr + 1.1) : tr + 1.3).toFixed(3), text: '“Ladies and gentlemen…”' }));
 })();
