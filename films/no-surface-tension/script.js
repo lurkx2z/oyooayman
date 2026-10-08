@@ -5,7 +5,8 @@
    Structure (docs/VIDEO_FORMAT.md): centred title over a normal kitchen → the rule changes under the title →
    no drops (tap) → nothing floats (paperclip) → a bottle of sparkling water erupts → insects fall through → water
    can't climb thin tubes → inside a stem: air gets in and the water column snaps → days: the sunflower bows over the
-   pond → rain: one leaf tip can't make a drop; down its thread to the waterline, where a soaked duck rides low.
+   pond → rain: one leaf tip can't make a drop; down its thread to the waterline, where a soaked duck rides low;
+   the rain stops and a low sun comes out on the closing line, and the duck still rides low.
    ===================================================================== */
 
 CONFIG.duration = 65.7;
@@ -65,9 +66,11 @@ function nstFlash(t) {
   return f;
 }
 // rain amount 0..1
-function nstRain(t) { return MathX.smooth(t, NST.rain - 0.4, NST.rain + 1.6); }
+function nstRain(t) { return MathX.smooth(t, NST.rain - 0.4, NST.rain + 1.6) * (1 - MathX.smooth(t, NST.line2 + 0.3, NST.line2 + 2.6)); }      // (it stops on the closing line)
 // the storm darkness 0..1
-function nstStorm(t) { return MathX.smooth(t, NST.clouds, NST.rain + 1.2); }
+function nstStorm(t) { return MathX.smooth(t, NST.clouds, NST.rain + 1.2) * (1 - 0.7 * nstClear(t)); }      // (then the clouds thin and a low sun comes through)
+// after the rain, on the closing line: the clouds break 0..1
+function nstClear(t) { return MathX.smooth(t, NST.line2 + 0.8, NST.line2 + 3.0); }
 
 const SCRIPT = {
   meta: { title: 'WHAT IF WATER LOST ALL SURFACE TENSION?', wav: 'no-surface-tension-soundtrack.wav' },
@@ -141,12 +144,12 @@ const SCRIPT = {
   // your hands (camera-space poses in film.js; 'name!' = snap on a cut). Aimed poses are re-solved every frame.
   hands: {
     right: [[0, 'hidden'], [NST.tap + 0.1, 'tapReach'], [NST.tapOn + 0.45, 'tapTurn'], [NST.tapMore - 0.3, 'tapTurn'], [NST.tapMore + 0.25, 'tapPush'], [NST.tapMore + 1.0, 'hidden'],
-      [NST.clip, 'clipHold!'], [NST.clipLet, 'clipOpen'], [NST.clipLet + 0.95, 'hidden!'],
-      [NST.soda, 'capHold!'], [NST.sodaOpen - 0.05, 'capTwist'], [NST.sodaOpen + 0.12, 'capOff'], [NST.sodaOpen + 0.75, 'hidden'],
-      [NST.pond, 'hidden!'],
-      [NST.bench, 'canHold!'], [NST.pourEnd + 0.3, 'canHold'], [NST.wick, 'hidden!'],
-      [NST.lapse, 'hidden!']],
-    left: [[0, 'hidden'], [NST.soda, 'bottleHold!'], [NST.sodaOpen + 0.1, 'bottleHold'], [NST.sodaOpen + 0.8, 'hidden'], [NST.pond, 'hidden!']],
+      [NST.clip - 0.01, 'clipHold!'], [NST.clipLet, 'clipOpen'], [NST.clipLet + 0.95, 'hidden!'],
+      [NST.soda - 0.01, 'capHold!'], [NST.sodaOpen - 0.05, 'capTwist'], [NST.sodaOpen + 0.12, 'capOff'], [NST.sodaOpen + 0.75, 'hidden'],
+      [NST.pond - 0.01, 'hidden!'],
+      [NST.bench - 0.01, 'canHold!'], [NST.pourEnd + 0.3, 'canHold'], [NST.wick - 0.01, 'hidden!'],
+      [NST.lapse - 0.01, 'hidden!']],
+    left: [[0, 'hidden'], [NST.soda - 0.01, 'bottleHold!'], [NST.sodaOpen + 0.1, 'bottleHold'], [NST.sodaOpen + 0.8, 'hidden'], [NST.pond - 0.01, 'hidden!']],
   },
 
   tracks: {
@@ -171,14 +174,14 @@ const SCRIPT = {
       { t: NST.line2, until: NST.note - 0.1, text: '…until an entire ecosystem depends on it.' },
     ],
     readouts: [
-      { from: -0.6, until: 21.3, top: 220, label: 'SURFACE TENSION', value: (t) => `${Math.round(nstSigma(t))} mN/m`, sub: (t) => (t < NST.drop ? 'LIQUID WATER · 20 °C' : t < NST.soda ? 'WATER ONLY · EVERYTHING ELSE NORMAL' : 'NOTHING HOLDS NEW BUBBLES BACK') },
+      { from: -0.6, until: 21.3, top: 220, label: 'SURFACE TENSION', value: (t) => `${Math.round(nstSigma(t))} mN/m`, sub: (t) => (t < NST.drop ? 'LIQUID WATER · 20 °C' : t < NST.tapOn + 1.25 ? 'WATER ONLY · EVERYTHING ELSE NORMAL' : t < NST.clip ? 'WHITE = WHAT NORMAL WATER WOULD DO' : t < NST.soda ? 'WATER ONLY · EVERYTHING ELSE NORMAL' : 'NOTHING HOLDS NEW BUBBLES BACK') },
       { from: 22.5, until: 27.75, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'NO SURFACE SKIN TO STAND ON' },
-      { from: 29.9, until: 33.65, top: 220, label: 'CAPILLARY RISE', value: () => '0 mm', sub: 'IT USED TO CLIMB HIGHER IN THINNER TUBES' },
-      { from: 33.9, until: 39.15, top: 220, label: 'WATER IN THE STEM', value: (t) => (t < NST.snap ? 'HOLDING' : 'BROKEN'), sub: (t) => (t < NST.snap ? 'THE INSTANT OF THE CHANGE' : 'AIR GOT IN THROUGH A PORE') },
+      { from: 29.9, until: 33.65, top: 220, label: 'CAPILLARY RISE', value: () => '0 mm', sub: (t) => (t < NST.pourEnd + 0.1 ? 'IT USED TO CLIMB HIGHER IN THINNER TUBES' : 'WHITE = WHERE NORMAL WATER WOULD CLIMB') },
+      { from: 33.9, until: 39.15, top: 220, label: 'WATER IN THE STEM', value: (t) => (t < NST.snap ? 'HOLDING' : 'BROKEN'), sub: (t) => (t < NST.snap ? 'THE INSTANT OF THE CHANGE · SLOWED DOWN' : 'AIR GOT IN THROUGH A PORE') },
       { from: 39.4, until: 43.55, top: 220, label: 'TIME SINCE THE CHANGE', value: (t) => nstDayText(t), sub: 'THE PLANTS ARE WILTING' },
       { from: 47.3, until: 50.75, top: 220, label: 'ROUND DROPS', value: () => '0', sub: 'NOT EVEN ON A LEAF TIP' },
       { from: 52.9, until: 57.05, top: 220, label: 'DUCK’S FEATHERS', value: () => 'SOAKED', sub: 'NO TRAPPED AIR · IT RIDES LOW' },
-      { from: 57.25, until: 60.55, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'SAME WATER · NO DROPS' },      // (off before the tilt-up brings the sunflower's head into its corner)
+      { from: 57.25, until: 60.55, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'SAME WATER · NO DROPS' },      // (off before the rain stops: the last shot stays clean)
     ],
     notes: [
       { t: NST.note, until: NST.end + 0.2, text: 'FICTIONAL RULE: ONLY WATER’S SURFACE TENSION CHANGED<br>TIME COMPRESSED' },

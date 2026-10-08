@@ -20,7 +20,7 @@ const NST_G = {
   // the soaked duck in the finale, (x, z) at NST.desc, wl, sink, line1, line2, end: in front of the waterline camera,
   // a little to the right of the leaf's thread, slowing as it sinks
   duck: [[-1.58, -6.366], [-1.848, -6.54], [-1.862, -6.545], [-1.872, -6.548], [-1.876, -6.549], [-1.881, -6.551]],     // (after the waterline it paddles hard and gets nowhere: it stays in the middle of the frame)
-  duckFloat: 0.036, duckSoaked: -0.03, duckSunk: -0.052,     // body height above the pond's surface: normal / soaked / sinking
+  duckFloat: 0.02, duckSoaked: -0.03, duckSunk: -0.052,     // body centre above the pond's surface: dry (about 40 % of the body under water) / soaked / sinking
 };
 
 // the sun for a given garden day (1.0 = 10:00 on the morning of the change)
@@ -33,6 +33,21 @@ function nstSunDir(day, out) {
 function nstDaylight(day) {
   const h = 10 + (day - 1) * 24, ph = ((h - 6) / 12) * Math.PI;
   return MathX.smooth(Math.sin(ph), -0.12, 0.22);       // 0 night → 1 day
+}
+// the light at story time t: daylight (0 night → 1 day) and how strong the sun is. In the time-lapse both are averaged
+// over half a second of story time: each dawn and dusk otherwise flipped from night to day in two frames (a strobe)
+const _nstLightOut = { dl: 1, sun: 1 }, _nstLightV = new THREE.Vector3();
+let _nstLightT = NaN;
+function nstLight(t) {
+  if (t === _nstLightT) return _nstLightOut;
+  const n = t > NST.lapse - 0.4 && t < NST.lapse1 + 0.4 ? 11 : 1, w = 0.5;
+  let dl = 0, su = 0;
+  for (let i = 0; i < n; i++) {
+    const d = nstDay(t + (n > 1 ? (i / (n - 1) - 0.5) * w : 0));
+    dl += nstDaylight(d); su += MathX.smooth(nstSunDir(d, _nstLightV).y, 0.02, 0.4);      // (a low sun is weak: at full strength it flashed the leaves white at each sunrise)
+  }
+  _nstLightOut.dl = dl / n; _nstLightOut.sun = su / n; _nstLightT = t;
+  return _nstLightOut;
 }
 
 class NstGarden extends Environment {
@@ -553,7 +568,7 @@ class NstGarden extends Environment {
     const gu = t - (NST.line2 + 0.1), gust = gu > 0 ? Math.exp(-gu / 0.8) * Math.sin(gu * 8.5) : 0, surge = gu > 0 ? MathX.smooth(gu, 0.2, 0.55) * Math.exp(-gu / 1.6) : 0;
     for (const l of F.leaves) l.tilt.rotation.set(0, 0, l.base - (l.hero ? 0.38 : 1.15 * (0.7 + 0.1 * l.k)) * w - (l.hero ? 0.16 : 0.08) * gust);     // (the hero leaf arches; the rest hang)
     // green → olive → brown; petals curl brown
-    const S = this.sunMats, B = this.sunBase, dry = this._sunDry || (this._sunDry = { leaf: new THREE.Color('#7a6a36'), petal: new THREE.Color('#8a6a2a'), stem: new THREE.Color('#6d6a38') });
+    const S = this.sunMats, B = this.sunBase, dry = this._sunDry || (this._sunDry = { leaf: new THREE.Color('#7a6a36'), petal: new THREE.Color('#6e5226'), stem: new THREE.Color('#6d6a38') });
     S.leaf.color.copy(B.leaf).lerp(dry.leaf, 0.85 * w); S.petal.color.copy(B.petal).lerp(dry.petal, 0.9 * w); S.stem.color.copy(B.stem).lerp(dry.stem, 0.7 * w);
     S.leaf.emissive.copy(S.leaf.color).multiplyScalar(0.22 * MathX.smooth(t, NST.fin - 0.5, NST.fin));
     S.petal.emissive.copy(S.petal.color).multiplyScalar(0.55 * MathX.smooth(t, NST.fin - 0.5, NST.fin));      // (the petals stay yellow against the grey sky in the finale)      // (a little fill on the hero leaf for the close-up in the grey rain)
@@ -563,7 +578,7 @@ class NstGarden extends Environment {
     this.sunflowerTip(this._tipW);
     const th = this.tipThread;
     th.a.copy(this._tipW); th.yEnd = NST_G.pond.y; th.T = (th.v0.y + Math.sqrt(th.v0.y * th.v0.y + 2 * 9.81 * Math.max(0.02, th.a.y - th.yEnd))) / 9.81;     // (into the pond: no drop, no splash, no ring)
-    th.update(t, MathX.smooth(t, NST.rain + 0.5, NST.rain + 2.0) * (0.8 + 0.2 * Math.sin(t * 2.3)) * (1 + 2.2 * surge), 1);
+    th.update(t, MathX.smooth(t, NST.rain + 0.5, NST.rain + 2.0) * (0.8 + 0.2 * Math.sin(t * 2.3)) * (1 + 2.2 * surge) * (1 - 0.6 * MathX.smooth(t, NST.line2 + 2.0, NST.line2 + 5.0)), 1);      // (it thins once the rain has stopped)
     // the ghost drop (only in the close-up): every 0.95 s a pendant drop swells at the tip, lets go and falls, fading
     const ga = MathX.smooth(t, NST.fin + 0.5, NST.fin + 1.0) * (1 - MathX.smooth(t, NST.desc - 0.3, NST.desc + 0.2)), g = this.tipGhost;
     g.visible = ga > 0.003;
@@ -642,11 +657,13 @@ class NstGarden extends Environment {
     });
     // a pale ghost of the duck floating where it would ride with dry feathers (the same ghost look as the paperclip and
     // the tubes); it copies the real duck's pose each frame, wings folded
-    this.duckGhostMat = nstGlassy('#f4fbff', 0.0, 0.26, { side: THREE.FrontSide });
+    this.duckGhostMat = nstGlassy('#f4fbff', 0.0, 0.17, { side: THREE.FrontSide });      // (faint: the real duck is the subject)
     const gd = d.clone(true); gd.traverse((o) => { if (o.isMesh) { o.material = this.duckGhostMat; o.castShadow = false; o.renderOrder = 7; if (o.geometry.parameters && o.geometry.parameters.radius < 0.01) o.visible = false; } });      // (an outline only: no eyes)
     this.root.add(gd); this.duckGhost = gd; gd.visible = false;
     this._dNodes = []; this._gNodes = []; d.traverse((o) => this._dNodes.push(o)); gd.traverse((o) => this._gNodes.push(o));
     d.visible = false;
+    // a soft light from the camera's side in the finale: the dark, wet duck otherwise melted into the dark rocks behind it
+    this.duckLight = new THREE.PointLight('#e6eef8', 0, 1.3, 2); this.root.add(this.duckLight);
   }
 
   // ---------------------------------------------------------------- per frame
@@ -654,7 +671,9 @@ class NstGarden extends Environment {
     const day = nstDay(t), wilt = nstWilt(t), storm = nstStorm(t), rain = nstRain(t), U = this.skyUniforms;
     // time of day (only moves in the time-lapse), storm deck
     nstSunDir(day, this.sunDir);
-    const dl = nstDaylight(day);
+    if (t >= NST.fin) this.sunDir.set(0.6, 0.35, -0.8).normalize();      // (the finale: when the clouds break, a low sun from behind you lights the house, the rocks and the duck)
+    const clear = nstClear(t);
+    const L = nstLight(t), dl = L.dl;
     U.uTime.value = t + Math.max(0, Math.min(t, NST.lapse1) - NST.lapse0) * 60;
     U.uNight.value = 1 - dl; U.uStorm.value = storm; U.uCloud.value = 0.32 + 0.2 * MathX.smooth(t, NST.lapse0, NST.lapse1);
     const zen = U.uZenith.value, hor = U.uHorizon.value, fogC = this.scene.fog.color;
@@ -672,8 +691,8 @@ class NstGarden extends Environment {
     // sun + sky light
     const f = this.focus;
     this.sun.position.copy(this.sunDir).multiplyScalar(60).add(f); this.sun.target.position.copy(f);
-    this.sun.intensity = 3.2 * MathX.smooth(this.sunDir.y, -0.02, 0.18) * (1 - storm);      // (lightning lights the sky dome, not the sun: sun-cast flashes threw hard house shadows on the lawn)
-    this.sun.color.setRGB(1, 0.93 - 0.18 * low, 0.84 - 0.3 * low);
+    this.sun.intensity = 3.2 * L.sun * (1 - storm);      // (lightning lights the sky dome, not the sun: sun-cast flashes threw hard house shadows on the lawn)
+    this.sun.color.setRGB(1, 0.93 - 0.18 * low - 0.1 * clear, 0.84 - 0.3 * low - 0.2 * clear);
     this.hemi.intensity = (0.8 + 0.45 * dl) * (1 - 0.35 * storm) + 4.0 * fl + 0.25 * MathX.smooth(t, NST.desc, NST.wl);      // (moonlit nights, not black; a little more fill low on the water in the finale)
     this.hemi.color.copy(zen).lerp(new THREE.Color('#b9cfe0'), 0.5);
     this.scene.environmentIntensity = (0.18 + 0.24 * dl) * (1 - 0.3 * storm);
@@ -721,7 +740,8 @@ class NstGarden extends Environment {
     // undersides drew a dark slab across the shot)
     const flat = t >= T.wl - 0.1;
     for (const m of this.pads) { m.scale.z = flat ? 0.0001 : 1; m.position.y = P.y + (flat ? -0.0003 : 0.002); }
-    d.visible = t > T.wl - 0.5;      // (it paddles in from the right as the camera reaches the water)
+    d.visible = t > T.fin;      // (on the pond from the start of the finale: it used to pop in as the camera came down)
+    this.duckLight.intensity = 0;
     if (!d.visible) { gd.visible = false; return; }
     const ph = (t - T.desc) * Math.PI * 2 * 1.7;                   // paddling hard: ~1.7 strokes a second
     // it paddles into the waterline shot from the right, toward the leaf's thread, and slows as it settles lower
@@ -729,7 +749,7 @@ class NstGarden extends Environment {
     const at = (u) => [this._duckPath[0].value(u), this._duckPath[1].value(u)];
     let [x, z] = at(t);
     const nx = at(t + 0.05), px = at(t - 0.05);
-    let dx = nx[0] - px[0], dz = nx[1] - px[1]; if (Math.hypot(dx, dz) < 1e-5) { dx = 0.28; dz = 0.37; }
+    let dx = nx[0] - px[0], dz = nx[1] - px[1]; if (Math.hypot(dx, dz) < 1e-5) { dx = G.duck[1][0] - G.duck[0][0]; dz = G.duck[1][1] - G.duck[0][1]; }
     // from the waterline on it barely moves (paddling and getting nowhere), so it keeps the heading it came in on
     { const D0 = G.duck[0], D1 = G.duck[1], hx = D1[0] - D0[0], hz = D1[1] - D0[1], hl = Math.hypot(hx, hz), b = MathX.smooth(t, T.wl - 0.45, T.wl - 0.05), l0 = Math.hypot(dx, dz);
       dx = MathX.lerp(dx / l0, hx / hl, b); dz = MathX.lerp(dz / l0, hz / hl, b); }
@@ -755,7 +775,7 @@ class NstGarden extends Environment {
       w.pv.rotation.set(0, w.sd * 1.1 * bout, w.sd * bout * (0.05 + 0.6 * beat));
     }
     // the ghost: where it would float with dry, air-filled feathers
-    const ga = MathX.smooth(t, T.wl + 0.8, T.wl + 1.4) * (1 - MathX.smooth(t, T.line2, T.line2 + 0.6));     // (gone as the camera tilts up)
+    const ga = MathX.smooth(t, T.wl + 0.8, T.wl + 1.4) * (1 - MathX.smooth(t, T.note, T.note + 1.0));     // (it stays through the closing lines)
     gd.visible = ga > 0.003; this.duckGhostMat.uniforms.uK.value = ga;
     if (gd.visible) {
       for (let i = 1; i < this._dNodes.length; i++) {
@@ -766,6 +786,10 @@ class NstGarden extends Environment {
       gd.position.set(x, P.y + G.duckFloat, z); gd.rotation.copy(d.rotation);
       this.duckGhost.children[0].rotation.set(0.07, 0, 0);
     }
+    // the light: in front of the duck, on the camera's side, a little above
+    const lx = 0.217, lz = -0.976;
+    this.duckLight.position.set(x + lx * 0.45, P.y + 0.22, z + lz * 0.45);
+    this.duckLight.intensity = 0.55 * MathX.smooth(t, T.desc, T.wl) * (1 - 0.5 * MathX.smooth(t, T.line2 + 0.8, T.line2 + 3.2));
   }
 
   _droop(plant, w) {

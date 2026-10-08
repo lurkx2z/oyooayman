@@ -33,7 +33,7 @@ function nstWaterMat({ color = '#a9c3cc', opacity = 0.32, fres = 0.6, rough = 0.
 
 // a bead (glossy see-through lens) → a thin wet film (reads as a darker, glossy wet patch on the surface), k 0..1
 // (a dim reflection: a thin film on a counter mirrors the window as a faint sheen, not as a white sheet)
-const NST_WET = { color: new THREE.Color('#0b0f11'), opacity: 0.5, fres: 0.42, env: 0.36, rough: 0.06 };
+const NST_WET = { color: new THREE.Color('#0e1518'), opacity: 0.42, fres: 0.7, env: 1.1, rough: 0.03 };     // (a glossy film; darker read as stains on the counter)
 function nstWetLook(m, k) {
   const u = m.userData;
   if (!u.base) u.base = { color: m.color.clone(), opacity: m.opacity, fres: u.fres.value, env: m.envMapIntensity, rough: m.roughness };
@@ -123,6 +123,7 @@ class NstStream {
     this.a = a.clone(); this.v0 = v0.clone(); this.r0 = r0; this.yEnd = yEnd; this.ns = ns; this.nrad = nrad; this.seed = seed;
     this.spread = spread;      // > 0: with no surface tension the column also loosens and widens into a ragged rope as it falls
     this.frayLen = frayLen;    // > 0: the fraying develops over this fall height (m) instead of over the whole stream
+    this.lowModes = 1;         // < 1: weaker low-order fluting (a fine fibrous surface instead of a twisted rope)
     // flight time to the end plane: a.y + v0y τ − g τ²/2 = yEnd
     const g = 9.81, dy = this.a.y - yEnd, vy = this.v0.y;
     this.T = (vy + Math.sqrt(vy * vy + 2 * g * dy)) / g;
@@ -176,7 +177,7 @@ class NstStream {
         let rr = r * (1 - 0.85 * pinch);
         if (rag > 0) {
           // fine fluted ridges that change parcel by parcel (nothing smooths them): fibrous, not a twisting ribbon
-          const n1 = Math.sin(th * 5 + parcel * 31 + sd) * 0.32 + Math.sin(th * 7 - parcel * 47 + sd * 2) * 0.28 + Math.sin(th * 11 + parcel * 73) * 0.22 + Math.sin(th * 3 + parcel * 19 + sd * 0.7) * 0.14;
+          const lm = this.lowModes, n1 = (Math.sin(th * 5 + parcel * 31 + sd) * 0.32 + Math.sin(th * 3 + parcel * 19 + sd * 0.7) * 0.14) * lm + Math.sin(th * 7 - parcel * 47 + sd * 2) * 0.28 + Math.sin(th * 11 + parcel * 73) * 0.22;
           rr *= 1 + rag * n1;
           // gaps: the column tears into ligaments (radius falls to ~0 in places)
           const gap = 0.5 + 0.5 * Math.sin(parcel * 57 + th * 1.0 + sd * 1.3) * Math.sin(parcel * 23 + sd);

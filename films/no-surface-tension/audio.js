@@ -109,6 +109,8 @@ class NstAudio extends AudioEngine {
       const n = r.int(2, 5), f = r.range(2600, 4600), pan = r.range(-0.8, 0.8);
       for (let k = 0; k < n; k++) S.chirp(t + k * r.range(0.07, 0.12), f * r.range(0.9, 1.12), v * r.range(0.5, 1), pan, k % 2 ? this.rev : bus);
     }
+    // the rain stops on the closing line: one bird, far off
+    for (const [tb, f, pan] of [[T.line2 + 2.5, 3300, -0.5], [T.line2 + 3.7, 3500, -0.4], [T.note + 0.7, 3150, -0.5]]) for (let k = 0; k < 3; k++) S.chirp(tb + k * 0.1, f * (1 + 0.06 * k), 0.013 * (1 - 0.25 * k), pan, this.rev);
     // insects over the pond: a buzzing whine that comes and goes (pond + bench)
     const o = ctx.createOscillator(), og = ctx.createGain(), ol = S.filter('bandpass', 520, 3); o.type = 'sawtooth';
     this._curve(o.frequency, (t) => 230 + 18 * Math.sin(t * 7.3) + 9 * Math.sin(t * 13.1), t0, T.lapse, 0.05);
@@ -262,7 +264,7 @@ class NstAudio extends AudioEngine {
       S.tone(t + 0.375, 0.35, f * 1.5, 0.01, 0.2, lp, 'sine', 0.02, 0.3);
     }
     // the ghosts of normal water (the tubes climbing one by one, the duck floating high): a soft glassy note for each
-    NST_TB.hN.forEach((h, i) => S.tone(T.pourEnd + 0.45 + 0.22 * i, 0.9, [587, 740, 880, 1175][i], 0.006, 0.1 * i - 0.15, lp, 'sine', 0.02, 0.8));
+    NST_TB.hN.forEach((h, i) => S.tone(T.pourEnd + 0.15 + 0.2 * i, 0.9, [587, 740, 880, 1175][i], 0.006, 0.1 * i - 0.15, lp, 'sine', 0.02, 0.8));
     S.tone(T.wl + 0.85, 1.4, 880, 0.006, 0.1, lp, 'sine', 0.05, 1.2); S.tone(T.wl + 0.95, 1.4, 1318.5, 0.004, 0.15, lp, 'sine', 0.05, 1.2);
     // a hit on each cut to a new consequence
     for (const t of beats) S.tone(t, 1.2, 73.4, 0.05, 0, lp, 'sine', 0.008, 1.1);

@@ -168,7 +168,7 @@ class NstKitchen {
     this.stream = new NstStream(g, wm, { a: new THREE.Vector3(T.spout[0], T.spout[1] - 0.004, T.spout[2]), v0: new THREE.Vector3(0, -0.28, 0.012), r0: 0.0036, yEnd: top - sd + 0.02, seed: 4, spread: 0.2, frayLen: 0.17, ns: 60, nrad: 12 });
     this.spray = new NstSpray(this.scene, 900);      // a stream with nothing smoothing it sheds shreds and mist, not drops
     // ghosts of the drops a normal stream would pinch into below the break-up point (the film's "normal water" ghost)
-    this.tapGhostMat = nstGlassy('#f4fbff', 0.04, 0.95, { side: THREE.FrontSide });
+    this.tapGhostMat = nstGlassy('#f4fbff', 0.02, 0.7, { side: THREE.FrontSide });
     this.tapGhosts = [0, 1, 2, 3, 4, 5, 6].map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), this.tapGhostMat); m.renderOrder = 9; m.visible = false; g.add(m); return m; });
 
     // ---------- upper cabinets, a fridge edge, a shelf: the room around the counter
@@ -562,7 +562,7 @@ class NstKitchen {
     const on = MathX.smooth(t, T.tapOn, T.tapOn + 0.35) * (1 - MathX.smooth(t, T.clip - 0.05, T.clip));
     const more = MathX.smooth(t, T.tapMore, T.tapMore + 0.7);      // … then opened further: a thicker, rougher rope (still one piece: no drops)
     this.lever.rotation.z = -(0.3 + 0.5 * more) * on;
-    this.stream.spread = 0.05 + 0.05 * more; this.stream.frayLen = 0.17 - 0.03 * more;      // (it thins as it speeds up; it only roughens)
+    this.stream.spread = 0; this.stream.frayLen = 0.3 - 0.04 * more; this.stream.lowModes = 0.3;      // (it thins as it speeds up; it only roughens into fine fibres)
     this.stream.update(t, on * (1 + 0.75 * more), gone);
     const level = top - NST_K.sink.depth + 0.012 + 0.07 * MathX.clamp((Math.min(t, T.clip) - T.tapOn) / 12, 0, 1);
     this.basinW.position.y = level;
@@ -573,11 +573,11 @@ class NstKitchen {
     const gk = MathX.smooth(t, T.tapOn + 1.3, T.tapOn + 1.8) * (1 - MathX.smooth(t, T.clip - 0.45, T.clip - 0.1)), n = this.tapGhosts.length;
     this.tapGhostMat.uniforms.uK.value = gk;
     for (let i = 0; i < n; i++) {
-      const m = this.tapGhosts[i], u = 0.36 + 0.64 * ((i + ((t * 0.9) % 1)) / n);
+      const m = this.tapGhosts[i], u = 0.36 + 0.64 * ((i + ((t * 9) % 1)) / n);      // (falling fast, a few frames apart)
       m.visible = gk > 0.003 && u < 0.985;
       if (!m.visible) continue;
       this.stream.at(u * this.stream.T, this.v2);
-      const R = 0.0058 * (1 + 0.35 * more) * MathX.smooth(u, 0.36, 0.46), e = 1 - MathX.smooth(u, 0.4, 0.6);
+      const R = 0.0042 * (1 + 0.35 * more) * MathX.smooth(u, 0.36, 0.385), e = 1 - MathX.smooth(u, 0.38, 0.5);      // (full size as it pinches off, a little stretched at first)
       m.position.copy(this.v2); m.scale.set(R * (1 - 0.25 * e), Math.max(R, 1e-4) * (1 + 0.6 * e), R * (1 - 0.25 * e));
     }
 
@@ -587,7 +587,7 @@ class NstKitchen {
     const u = Math.max(0, t - T.clipLet);
     this.clip.rotation.set(0.9 * (1 - Math.exp(-u * 5)) * Math.sin(u * 6) * Math.exp(-u * 1.5) + (u > 0.5 ? 0.04 : 0), 0.4 + 0.5 * Math.min(1, u * 2), 0.6 * Math.min(1, u * 3) * Math.exp(-u * 2.5));
     this.clip.visible = t > T.clip - 0.1;
-    const ga = 0.3 * MathX.smooth(t, T.clipLet + 0.25, T.clipLet + 0.7) * (1 - MathX.smooth(t, T.soda - 0.4, T.soda));
+    const ga = 0;      // (no ghost clip: on a phone it read as a second clip that floats; the caption carries it)
     this.clipGhost.visible = ga > 0.003; this.clipGhost.material.opacity = ga;
     if (ga > 0.003) { const B = NST_K.bowl; this.clipGhost.position.set(B.x + 0.012, top + B.water + 0.0012, B.z + 0.004); this.clipGhost.rotation.set(0, 0.4, 0); }
     const ru = t - T.clipLet;
@@ -628,7 +628,7 @@ class NstKitchen {
       if (u <= 0 || gas < 0.01) { s.update(t, 0, 1); continue; }
       const k = 0.35 + 0.65 * gas;                                   // launch speed falls with the gas pressure
       s.v0.copy(j.V).multiplyScalar(k); s.a.copy(neck);
-      const vy = s.v0.y, Tf = (vy + Math.sqrt(vy * vy + 2 * 9.81 * (s.a.y - s.yEnd))) / 9.81;
+      const vy = s.v0.y, dd = vy * vy + 2 * 9.81 * (s.a.y - s.yEnd), Tf = dd > 0 ? (vy + Math.sqrt(dd)) / 9.81 : Infinity;     // (too slow to reach yEnd: it only rises and falls back)
       s.T = Math.min(Tf, u, 0.86 * vy / 9.81);                  // drawn only on the way up: at the top it is all spray
       s.r0 = j.r0 * (0.55 + 0.45 * gas);
       s.update(t, 1, 1);

@@ -1,7 +1,8 @@
 /* =====================================================================
    TUBES — the capillary demo on the potting bench: four thin glass tubes standing in a shallow glass dish, clipped to
    a white card ruled in centimetres. You pour water (with a little blue ink in the dish) into the dish. Normally water
-   climbs a thin tube by itself, higher the thinner the tube (h = 2σ/(ρgr): about 25, 43, 68 and 99 mm for these bores).
+   climbs a thin tube by itself, higher the thinner the tube (h = 2σ/(ρgr): 25, 43, 68 and 99 mm for bores of radius
+   0.6, 0.35, 0.22 and 0.15 mm; the bores are drawn wider than that so they can be seen on a phone).
    With no surface tension it climbs none of them: the water in every tube stays flat at the dish's level. After the
    pour, pale "ghost" columns rise in each tube to where normal water would have stood (the same ghost style as the
    paperclip in the kitchen). Pure function of story time.
@@ -99,10 +100,10 @@ class NstTubes {
     const ty = top + 0.004, wl = this.y0 + L;
     this.cols.forEach((c) => { const h = Math.max(0.0001, wl - ty); c.visible = wl > ty + 0.0003; c.scale.y = h; c.position.y = ty + h / 2; });
     // the ghosts of normal water: each climbs its tube after the pour, thinner tubes higher
-    const ga = MathX.smooth(t, T.pourEnd + 0.35, T.pourEnd + 0.7);
+    const ga = MathX.smooth(t, T.pourEnd + 0.05, T.pourEnd + 0.4);
     this.ghostMat.opacity = 0.7 * ga; this.capMat.opacity = 1.0 * ga;
     NST_TB.hN.forEach((hN, i) => {
-      const u = MathX.clamp((t - (T.pourEnd + 0.4 + 0.22 * i)) / 0.75, 0, 1), h = hN * (1 - Math.pow(1 - u, 3));
+      const u = MathX.clamp((t - (T.pourEnd + 0.1 + 0.2 * i)) / 0.75, 0, 1), h = hN * (1 - Math.pow(1 - u, 3));      // (all four stand for ~1 s before the cut)
       const gh = this.ghosts[i], cap = this.caps[i];
       gh.visible = cap.visible = ga > 0.003 && h > 0.0005;
       gh.scale.y = Math.max(h, 0.0001); gh.position.y = this.zero + h / 2; cap.position.y = this.zero + h;

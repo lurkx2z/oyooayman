@@ -93,7 +93,11 @@ class NstStem {
       this.tubes.push({ tg, lo, hi, air, x, e1, e2 });
     }
     // the air pushing through the pit into the middle tube: a pale tongue that blows up into the gap
-    this.tongue = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), nstGlassy('#ffffff', 0.03, 0.95)); this.tongue.renderOrder = 6; g.add(this.tongue);
+    // (ragged: with no surface tension nothing rounds it into a bubble; it smears along the wall)
+    const tgeo = new THREE.SphereGeometry(1, 28, 18), tp = tgeo.attributes.position;      // (indexed: smooth normals, a soft lumpy blob rather than a crystal)
+    for (let k = 0; k < tp.count; k++) { const x = tp.getX(k), y = tp.getY(k), z = tp.getZ(k), n = 1 + 0.24 * Math.sin(x * 4.1 + y * 2.3) * Math.sin(y * 3.7 - z * 2.9) + 0.14 * Math.sin(z * 5.3 + x * 1.7) + 0.08 * Math.sin(y * 9.0 + x * 3.0); tp.setXYZ(k, x * n, y * n, z * n); }
+    tgeo.computeVertexNormals();
+    this.tongue = new THREE.Mesh(tgeo, nstGlassy('#ffffff', 0.05, 0.8)); this.tongue.renderOrder = 6; g.add(this.tongue);
     // flow markers: specks drifting up with the water (drawn as short vertical dashes)
     this.flow = new StreakSystem(this.scene, 600);
   }
@@ -103,7 +107,7 @@ class NstStem {
     if (i === 0) return 9;
     const t0 = i === 1 ? NST.snap : NST.snap + 1.15, u = t - t0;
     if (u <= 0) return 0;
-    return 0.004 + 0.4 * (1 - Math.exp(-u / 0.5)) + 0.1 * u;     // it bangs open (the two ends race apart across the frame), then keeps emptying
+    return 0.004 + 0.22 * (1 - Math.exp(-u / 0.12)) + 0.09 * u;     // it bangs open (the stretched water recoils both ways), then keeps spreading
   }
 
   update(t, cam) {
@@ -116,13 +120,21 @@ class NstStem {
     const yE = [0, S.y0, S.y0 - 0.05];
     for (let i = 0; i < 3; i++) {
       const T = this.tubes[i], e = this.gapAt(i, t), y = yE[i];
-      const y1 = Math.max(-hH, y - e * 0.8), y2 = Math.min(hH, y + e);          // (the upper part is yanked up harder: the leaves are still pulling)
+      const y1 = Math.max(-hH, y - e), y2 = Math.min(hH, y + e);          // (symmetric: nothing pulls from above any more)
       const loL = y1 + hH, hiL = hH - y2;
       T.lo.visible = loL > 0.002; T.lo.scale.set(1, Math.max(loL, 1e-4), 1); T.lo.position.y = -hH + loL / 2;
       T.hi.visible = hiL > 0.002; T.hi.scale.set(1, Math.max(hiL, 1e-4), 1); T.hi.position.y = hH - hiL / 2;
       const aL = y2 - y1; T.air.visible = aL > 0.002; T.air.scale.set(1, Math.max(aL, 1e-4), 1); T.air.position.y = (y1 + y2) / 2;
-      T.e1.visible = i > 0 && aL > 0.002 && y1 > -hH; T.e1.position.y = y1;
-      T.e2.visible = i > 0 && aL > 0.002 && y2 < hH; T.e2.position.y = y2;
+      T.e1.visible = T.e2.visible = false;      // (no bright menisci at the broken ends: with no surface tension there is nothing to curve them)
+      // the water above the gap can't hang over air: it runs down the walls in thin streaks into the gap
+      if (i > 0 && aL > 0.01) for (let k = 0; k < 22; k++) {
+        const a = hash1(k * 4.1 + i * 9) * 6.283, sp = 0.18 + 0.25 * hash1(k * 2.7 + i), L = 0.03 + 0.05 * hash1(k * 6.3 + i * 2);
+        const tS = i === 1 ? NST.snap : NST.snap + 1.15, ph = hash1(k * 1.9 + i * 5) * 0.6;
+        const yy = y2 - ((Math.max(0, t - tS - 0.05) * sp + ph) % Math.max(0.05, aL));
+        if (yy - L < y1) continue;
+        const x = o.x + T.x + Math.cos(a) * S.R * 0.9, z = o.z + Math.sin(a) * S.R * 0.9;
+        F.push(x, o.y + yy, z, x, o.y + yy - L, z, 0.55, 0.78, 0.98, 0.55, 0.003);
+      }
       // the water: a little jolt sideways when its tube snaps
       const j = i > 0 ? MathX.impulse(t, i === 1 ? NST.snap : NST.snap + 1.15, 0.25) : 0;
       T.tg.position.x = T.x + 0.002 * j * Math.sin(t * 90);
@@ -132,7 +144,7 @@ class NstStem {
         const tS = i === 1 ? NST.snap : NST.snap + 1.15, tm = Math.min(t, tS);         // (their clock freezes at the snap)
         const v = 0.2 * (1 - 0.7 * Math.pow(rr / S.R, 2));                              // faster in the middle of the tube
         let yy = -hH + ((ph * S.H + v * (tm - NST.stem)) % S.H);
-        if (t > tS) { const eg = this.gapAt(i, t); yy += yy > y ? eg : -0.8 * eg; }     // carried away from the gap with the water
+        if (t > tS) { const eg = this.gapAt(i, t); yy += yy > y ? eg : -eg; }     // carried away from the gap with the water
         if (yy > y1 && yy < y2) continue;
         if (yy < -hH || yy > hH) continue;
         const x = o.x + T.tg.position.x + Math.cos(a) * rr, z = o.z + Math.sin(a) * rr, yw = o.y + yy;
@@ -142,7 +154,7 @@ class NstStem {
     // the air tongue: it pokes through the pit (left wall of the middle tube) just before the snap, then is the gap
     const u = t - NST.seed, s = MathX.smooth(t, NST.seed, NST.snap + 0.02) * (1 - MathX.smooth(t, NST.snap + 0.05, NST.snap + 0.3));
     this.tongue.visible = s > 0.01;
-    if (this.tongue.visible) { const r = 0.004 + 0.03 * s; this.tongue.scale.set(r * 1.1, r * (1 + 0.6 * s), r); this.tongue.position.set(-S.R + r * 0.9, S.y0, 0); }
+    if (this.tongue.visible) { const r = 0.004 + 0.03 * s; this.tongue.scale.set(r * 0.55, r * (1.2 + 1.4 * s), r * 0.9); this.tongue.position.set(-S.R + r * 0.45, S.y0, 0); this.tongue.rotation.set(0.3 * s, u * 2.0, 0.15); }      // (flat against the wall, smearing up and down it)
     F.end();
   }
 }

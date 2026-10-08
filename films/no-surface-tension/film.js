@@ -3,7 +3,7 @@
      build: the kitchen + the garden in one scene (you walk out the back door), hands, props, HUD, soundtrack
      update: the active set, your hands (aimed at the lever, the clip, the bottle and its cap, the can), the finale's
              flown camera (one leaf → down its thread → the waterline), the lens at the waterline
-     grade: a bright ordinary morning → inside the stem → the time-lapse → the rain
+     grade: a bright ordinary morning → inside the stem → the time-lapse → the rain → a low sun after it
    ===================================================================== */
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -22,8 +22,9 @@ const NST_HAND_POSES = {
   canHold: { p: [0.18, -0.3, -0.42], F: [0, 0, -1], N: [-1, 0, 0], curl: [1.25, 1.3, 1.35, 1.35], thumb: [0.15, 0.75], aim: [0.0, 0.05, 0.03] },
 };
 const NST_HAND_BLEND = { tapReach: 0.4, tapTurn: 0.25, tapPush: 0.35, clipHold: 0.4, clipOpen: 0.12, capHold: 0.3, capTwist: 0.4, capOff: 0.1, bottleHold: 0.3, canHold: 0.35, hidden: 0.4 };
-for (const k of Object.keys(NST_HAND_POSES)) { NST_HAND_POSES[k + '!'] = NST_HAND_POSES[k]; NST_HAND_BLEND[k + '!'] = 0.02; }
-NST_HAND_POSES['hidden!'] = HAND_POSES.hidden; NST_HAND_BLEND['hidden!'] = 0.02;
+// ('name!' snaps on a cut: its key sits 0.01 s before the cut and blends in 0.008 s, so the cut frame shows the new pose)
+for (const k of Object.keys(NST_HAND_POSES)) { NST_HAND_POSES[k + '!'] = NST_HAND_POSES[k]; NST_HAND_BLEND[k + '!'] = 0.008; }
+NST_HAND_POSES['hidden!'] = HAND_POSES.hidden; NST_HAND_BLEND['hidden!'] = 0.008;
 
 const _nstAim = { y: new THREE.Vector3(), z: new THREE.Vector3(), x: new THREE.Vector3(), c: new THREE.Vector3(), q: new THREE.Quaternion() };
 function nstAimHand(name, camera, world, Fw, Nw, side = 1) {
@@ -40,12 +41,13 @@ function nstAimHand(name, camera, world, Fw, Nw, side = 1) {
 function nstSeg(t) { return t < NST.pond ? 'kitchen' : t < NST.bench ? 'pond' : t < NST.stem ? 'bench' : t < NST.lapse ? 'stem' : 'garden'; }
 
 // the finale's camera, relative to the bowed leaf's tip (x, y, z offsets in metres; the waterline keys are snapped to the
-// pond's surface): the close-up → down the thread → at the waterline → on the last line, a tilt up to the sunflower
+// pond's surface): the close-up → down the thread → at the waterline, then one slow push-in on the duck to the end
+// (level with the water, the line just above the middle of the frame, the thread on the left, the duck in the middle)
 const NST_FIN = {
   a0: [0.3, 0.02, 0.1], la0: [0.0, -0.04, 0.0], a1: [0.27, 0.01, 0.09], la1: [0.0, -0.05, 0.0], fov0: 40, fov1: 37,
   bc: [0.75, -0.45, -0.55], lbc: [0.0, -0.5, 0.0],
-  c0: [0.5, 0, -1.5], lc0: [0.0, -0.61, 0.0], c1: [0.47, 0, -1.42], lc1: [0.0, -0.6, 0.0], fovC: 54,
-  lc2: [-0.05, -0.04, 0.0], fovE: 64,
+  c0: [0.526, 0, -1.633], c1: [0.5, 0, -1.5], lk: [0.21, 0, -0.32], fovC: 54, fovD: 50,      // (the push-in: 1.26 → 1.13 m from the duck)
+  uH: 0.1,                   // where the waterline sits on screen (0 = the middle, 1 = the top): just above the middle
 };
 
 const FILM = {
@@ -113,16 +115,22 @@ const FILM = {
     G._updateSunflower(T.fin); G.sunflowerTip(tip, base);
     const at = (o, water = false) => { const v = tip.clone().add(new THREE.Vector3(o[0], o[1], o[2])); if (water) v.y = wy; return v; };
     this._fin = { tip, a0: at(F.a0), la0: at(F.la0), a1: at(F.a1), la1: at(F.la1), bc: at(F.bc), lbc: at(F.lbc),
-      c0: at(F.c0, true), lc0: at(F.lc0), c1: at(F.c1, true), lc1: at(F.lc1), lc2: at(F.lc2), lc3: at(F.lc2).add(new THREE.Vector3(0, 0.03, 0)) };
+      c0: at(F.c0, true), c1: at(F.c1, true), lk: at(F.lk, true), lc0: new THREE.Vector3() };
+    this._wlLook(this._fin.c0, F.fovC, this._fin.lc0);
+  },
+  // at the waterline: look level toward the duck, tipped down just enough to keep the line at NST_FIN.uH on screen
+  _wlLook(pos, fov, out) {
+    const P = this._fin, dx = P.lk.x - pos.x, dz = P.lk.z - pos.z, h = Math.hypot(dx, dz);
+    return out.set(pos.x + dx / h, pos.y - (NST_FIN.uH + 0.004) * Math.tan(MathX.deg(fov / 2)), pos.z + dz / h);
   },
   _finCam(t, pos, look) {
     const T = NST, P = this._fin, F = NST_FIN, E = Ease.inOutSine, k = (a, b) => MathX.clamp((t - a) / (b - a), 0, 1);
     const bez = (out, a, c, b, u) => out.set(0, 0, 0).addScaledVector(a, (1 - u) * (1 - u)).addScaledVector(c, 2 * u * (1 - u)).addScaledVector(b, u * u);
     if (t < T.desc) { const u = E(k(T.fin, T.desc)); pos.copy(P.a0).lerp(P.a1, u); look.copy(P.la0).lerp(P.la1, u); return MathX.lerp(F.fov0, F.fov1, u); }
     if (t < T.wl) { const u = E(k(T.desc, T.wl)); bez(pos, P.a1, P.bc, P.c0, u); const lu = Ease.inOutSine(k(T.desc + 0.15, T.wl)); bez(look, P.la1, P.lbc, P.lc0, lu); return MathX.lerp(F.fov1, F.fovC, u); }
-    const tu = T.line2 + 0.35, te = tu + 2.6;
-    if (t < tu) { const u = E(k(T.wl, tu)); pos.copy(P.c0).lerp(P.c1, u); look.copy(P.lc0).lerp(P.lc1, u); return F.fovC; }
-    const u = E(k(tu, te)); pos.copy(P.c1); look.copy(P.lc1).lerp(P.lc2, u).lerp(P.lc3, MathX.smooth(t, te, T.end)); return MathX.lerp(F.fovC, F.fovE, u);
+    // (no tilt up at the end: the camera stays on the duck as the rain stops and the sun comes out)
+    const u = MathX.smooth(t, T.wl, T.end + 1.5), fov = MathX.lerp(F.fovC, F.fovD, u);
+    pos.copy(P.c0).lerp(P.c1, u); this._wlLook(pos, fov, look); return fov;
   },
 
   update(app, t) {
@@ -142,7 +150,7 @@ const FILM = {
     F.set(box[0], 0, box[1]);
     if (sc.right !== box[2]) { sc.left = -box[2]; sc.right = box[2]; sc.top = box[2]; sc.bottom = -box[2]; sc.updateProjectionMatrix(); }
     G.update(t, cam);
-    NST_RIM.value = seg === 'kitchen' ? 1 : (0.15 + 0.85 * nstDaylight(nstDay(t))) * (1 - 0.65 * nstStorm(t));
+    NST_RIM.value = seg === 'kitchen' ? 1 : (0.15 + 0.85 * nstLight(t).dl) * (1 - 0.65 * nstStorm(t));
     // inside, the garden's sun and sky would light the room through its walls: keep only a little of them (the window light is the kitchen's own)
     if (seg === 'kitchen') { app.scene.fog.density *= 0.3; G.sun.castShadow = false; G.sun.intensity *= 0.25; G.hemi.intensity *= 0.4; } else G.sun.castShadow = true;
     if (seg === 'bench') G.hemi.intensity *= 1.5;     // the bench is in the house's shade: more sky fill
@@ -226,9 +234,11 @@ const FILM = {
     p.saturation -= 0.26 * storm; p.exposure -= 0.1 * storm; p.contrast += 0.04 * storm; p.warmth -= 0.1 * storm; p.blackLift += 0.006 * storm;
     p.vignette += 0.12 * storm;
     // nights in the time-lapse: lifted so they read as moonlight, not black frames
-    if (t > T.lapse && t < T.clouds) p.exposure += 0.5 * (1 - nstDaylight(nstDay(t)));
+    if (t > T.lapse && t < T.clouds) p.exposure += 0.5 * (1 - nstLight(t).dl);
     // the finale: a little clearer than the storm grade (the rain is grey, the subject mustn't be)
     p.exposure += 0.45 * MathX.smooth(t, T.fin - 0.1, T.fin) + 0.3 * MathX.smooth(t, T.fin - 0.1, T.fin) * (1 - MathX.smooth(t, T.desc, T.wl)); p.saturation += 0.12 * MathX.smooth(t, T.fin - 0.1, T.fin);      // (the finale was too dark to read on a phone)
+    // after the rain: the low sun is out, a touch warmer (the extra exposure for the grey rain comes back down)
+    const clear = nstClear(t); p.exposure -= 0.22 * clear; p.warmth += 0.07 * clear; p.saturation += 0.08 * clear;
     // black at the end
     p.fade = MathX.smooth(t, T.end - 0.7, T.end);
   },
