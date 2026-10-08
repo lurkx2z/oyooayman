@@ -135,15 +135,15 @@ no dropped or frozen frames, no z-fighting or flicker. Its three highest-impact 
 - The three fixes above were checked on stills and the re-rendered frames, not re-scored by a full review round.
 
 ## FINAL PREVIEW PATH
-- Final MP4 (1080×1920, 30 fps, 61.4 s, H.264 + AAC 160 kbps, {{SIZE}}):
+- Final MP4 (1080×1920, 30 fps, 61.4 s, H.264 + AAC 160 kbps, 26.8 MiB):
   `/mnt/project-files/slow-sound/slow-sound_final_1080x1920.mp4` (project files; MP4s are not committed). Audio
-  {{LOUD}}.
+  measures −14.7 LUFS integrated, true peak −2.5 dBTP (passed through a limiter before the AAC encode).
 - Runnable ZIP: `/mnt/project-files/slow-sound/slow-sound_film.zip` (unzip, double-click `slow-sound.html`, press Space).
 - Before/after: `/mnt/project-files/slow-sound/before_after.jpg`.
 
 ## PERFORMANCE/FPS
 - Rendering here is software-only (SwiftShader, no GPU): about 8 s per 1080×1920 frame per worker; 2 workers (4 cores).
-  The full render of 1,843 frames took 1 h 57 min; the fix pass re-rendered 606 frames in {{FIXTIME}}.
+  The full render of 1,843 frames took 1 h 57 min; the fix pass re-rendered 606 frames in 37.5 min.
 - Boot about 14 s; with the baked soundtrack the sound is ready immediately.
 - Real-time frame rate on a GPU machine was not measured.
 
