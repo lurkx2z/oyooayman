@@ -58,9 +58,9 @@ class NeAudio extends AudioEngine {
       env(g, t, 0.003, vol, len); o.connect(g); g.connect(pan(dest, p)); o.start(t); o.stop(t + len * 3 + 0.05);
       burst(t, len * 0.6, 'pink', 420, 0.8, vol * 0.6, p, dest, 0.002);
     };
-    // a creak / groan: a slow pitch-sagging tone through a resonant band (steel and springs giving way)
+    // a creak / groan: a slow pitch-sagging tone through a wide, dull band (steel and springs giving way; nothing rings)
     const groan = (t, dur, f, vol, p, dest, drop = 0.7) => {
-      const o = ctx.createOscillator(), o2 = ctx.createOscillator(), bp = S.filter('bandpass', f * 3, 2.5), g = ctx.createGain();
+      const o = ctx.createOscillator(), o2 = ctx.createOscillator(), bp = S.filter('bandpass', f * 3, 0.8), g = ctx.createGain();
       o.type = 'sawtooth'; o2.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f * drop, t + dur); o2.frequency.setValueAtTime(f * 1.013, t); o2.frequency.linearRampToValueAtTime(f * drop * 1.02, t + dur);
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + dur * 0.25); g.gain.linearRampToValueAtTime(vol * 0.7, t + dur * 0.7); g.gain.linearRampToValueAtTime(0, t + dur);
       o.connect(bp); o2.connect(bp); bp.connect(g); g.connect(pan(dest, p)); o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05);
@@ -117,8 +117,8 @@ class NeAudio extends AudioEngine {
       burst(NE_SHOE.strike + 0.03, 0.2, 'white', 3200, 1.0, 0.035, 0, fx, 0.04);
       burst(NE_SHOE.off - 0.05, 0.12, 'white', 1800, 1.2, 0.05, 0.1, fx, 0.01);
       // cushion: standing up (cloth, a creak of the bench) — and no "whoof" of foam refilling
-      burst(9.85, 0.45, 'pink', 900, 0.6, 0.06, 0.1, fx, 0.08);
-      S.clunk(9.95, 0.08, 0.15, fx);
+      burst(9.6, 0.45, 'pink', 900, 0.6, 0.06, 0.1, fx, 0.08);
+      S.clunk(9.7, 0.08, 0.15, fx);
       // rubber band: it creaks as it stretches… and then nothing. No snap.
       { const t0 = 11.8, t1 = 12.32, n2 = S.noise('white', t0, t1 + 0.1), b2 = S.filter('bandpass', 1400, 6), g2 = ctx.createGain();
         b2.frequency.setValueAtTime(900, t0); b2.frequency.linearRampToValueAtTime(2200, t1); g2.gain.setValueAtTime(0, t0); g2.gain.linearRampToValueAtTime(0.06, t0 + 0.1); g2.gain.linearRampToValueAtTime(0.0, t1 + 0.05);
@@ -177,32 +177,27 @@ class NeAudio extends AudioEngine {
     // 9. structures: the footbridge groans at each step of its sag; the signal arm and the lamp posts creak as they give
     // (a long groan of steel as the running club reaches midspan and the deck settles to a new low; a creak when it's gone)
     groan(44.0, 3.4, 56, 0.075, -0.05, fx, 0.7); burst(44.4, 2.6, 'brown', 220, 0.6, 0.05, 0, fx, 0.6); groan(48.9, 1.0, 70, 0.03, 0.1, fx, 0.85);
-    // footsteps on the steel deck: soft ticks for the walkers, a drumming patter for the runners
-    for (const w of NE_WALKERS) { const step = (w.run ? 2.3 : 1.2) / w.v / 2; for (let t = Math.max(w.t0, NE.bridge[0]) + (w.v * 7.3) % step; t < Math.min(w.t1, NE.bridge[1]); t += step) { const x = neWalkerX(w, t); if (x === null || Math.abs(x) > NE_CITY.bridge.half) continue; S.click(t, w.run ? 0.016 : 0.006, MathX.clamp(x / 14, -0.6, 0.6), fx); if (w.run) thud(t, 0.03, MathX.clamp(x / 14, -0.6, 0.6), fx, 110, 60, 0.04); } }
+    // footsteps on the steel deck: dull, dead thumps (a deck that can't ring), heavier for the runners
+    for (const w of NE_WALKERS) { const step = (w.run ? 2.3 : 1.2) / w.v / 2; for (let t = Math.max(w.t0, NE.bridge[0]) + (w.v * 7.3) % step; t < Math.min(w.t1, NE.bridge[1]); t += step) { const x = neWalkerX(w, t); if (x === null || Math.abs(x) > NE_CITY.bridge.half) continue; const pn = MathX.clamp(x / 14, -0.6, 0.6); burst(t, 0.05, 'brown', -240, 0.7, w.run ? 0.05 : 0.02, pn, fx, 0.003); if (w.run) thud(t, 0.03, pn, fx, 95, 50, 0.04); } }
     groan(44.0, 1.4, 180, 0.025, 0.25, fx, 0.8); groan(47.4, 1.2, 160, 0.022, 0.3, fx, 0.75);
     groan(45.2, 1.3, 120, 0.02, -0.3, fx, 0.7);
 
     // 10. the crash. Brakes too late, the hit (biggest sound of the film), glass, the van, then a long settle with no rebound.
     { const C = NE_CRASH, ps = neCrashPose('suv', C.ti), P = place(ps.x, ps.z, C.ti, 10);
-      // the SUV's tyres scrubbing as it brakes, and a horn too late
+      // the SUV's tyres scrubbing as it brakes (no horn: a horn is a vibrating spring plate, and it no longer vibrates)
       burst(C.ti - 0.32, 0.36, 'white', 1100, 0.7, 0.07, P.pan - 0.1, cars, 0.03);
-      S.horn(C.ti - 0.55, 392, 466, 0.05, P.pan - 0.15, cars);
       // the hit
       S.crunch(C.ti, 0.95, P.pan, fx, rev); S.boom(C.ti, 0.75, fx, rev); thud(C.ti, 0.9, P.pan, fx, 70, 30, 0.35);
-      for (let i = 0; i < 26; i++) { const t = C.ti + 0.05 + R(0, 1.4) * R(0.2, 1); S.tone(t, 0.06, R(2800, 6400), R(0.01, 0.03), P.pan + R(-0.3, 0.3), fx, 'sine', 0.001, 0.05); }   // glass
+      for (let i = 0; i < 26; i++) { const t = C.ti + 0.05 + R(0, 1.4) * R(0.2, 1); S.click(t, R(0.02, 0.05), P.pan + R(-0.3, 0.3), fx); }   // glass: dry ticks, no ring
       // the wreck scraping along as one, slowing
       { const n = S.noise('white', C.ti + 0.05, C.ti + 1.6), b = S.filter('bandpass', 1500, 1.0), g = ctx.createGain();
         g.gain.setValueAtTime(0, C.ti + 0.05); g.gain.linearRampToValueAtTime(0.1, C.ti + 0.12); g.gain.linearRampToValueAtTime(0.0, C.ti + 1.3); n.connect(b); b.connect(g); g.connect(pan(fx, P.pan)); }
       // the van can't stop: tyres, then the second hit
       burst(C.tb, C.tv - C.tb, 'white', 900, 0.8, 0.08, P.pan, cars, 0.05);
       S.crunch(C.tv, 0.8, P.pan, fx, rev); thud(C.tv, 0.75, P.pan, fx, 65, 30, 0.3);
-      // the stuck horn of the wreck (a long, sagging note), a hiss of steam, glass ticking down
-      { const o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = S.filter('lowpass', 1500, 0.7), g = ctx.createGain(); o.type = 'square'; o2.type = 'square';
-        o.frequency.setValueAtTime(415, C.tv + 0.4); o2.frequency.setValueAtTime(494, C.tv + 0.4); o.frequency.linearRampToValueAtTime(380, 61); o2.frequency.linearRampToValueAtTime(455, 61);
-        g.gain.setValueAtTime(0, C.tv + 0.4); g.gain.linearRampToValueAtTime(0.035, C.tv + 0.5); g.gain.setValueAtTime(0.035, 58.6); g.gain.linearRampToValueAtTime(0, 61.2);
-        o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(pan(cars, P.pan)); o.start(C.tv + 0.4); o2.start(C.tv + 0.4); o.stop(61.3); o2.stop(61.3); }
+      // no stuck horn (see above): a hiss of steam, glass settling
       S.hiss(C.tv + 0.6, 4.5, 0.025, P.pan, fx);
-      for (let i = 0; i < 10; i++) S.tone(C.tv + 0.8 + i * R(0.2, 0.6), 0.05, R(3000, 6000), 0.008, P.pan + R(-0.2, 0.2), fx, 'sine', 0.001, 0.04);
+      for (let i = 0; i < 10; i++) S.click(C.tv + 0.8 + i * R(0.2, 0.6), 0.012, P.pan + R(-0.2, 0.2), fx);
       S.voice(C.tv + 1.2, 300, 0.6, 'o', 0.03, P.pan + 0.3, fx, 0.9); S.voice(C.tv + 1.9, 410, 0.5, 'e', 0.025, P.pan - 0.3, fx, 0.95);
     }
 
@@ -224,7 +219,7 @@ class NeAudio extends AudioEngine {
         }
       };
       pad(13.4, 31.5, [110, 164.8, 220], 0.03, 0.97);
-      pad(31.0, 52.6, [98, 146.8, 196, 246.9], 0.032, 0.955);
+      pad(31.0, 48.9, [98, 146.8, 196, 246.9], 0.032, 0.955);
       // a low pulse that tightens toward the crash (music supports, sound effects dominate)
       for (let t = 46.0; t < T.crash - 0.4;) { const k = MathX.ramp(t, 46, T.crash); S.tone(t, 0.25, 55, 0.05 + 0.07 * k, 0, mus, 'sine', 0.01, 0.2); t += MathX.lerp(0.9, 0.42, k); }
       // the closing chord under the line, unresolved, and a last sag at the very end

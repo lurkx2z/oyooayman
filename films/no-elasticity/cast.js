@@ -111,12 +111,14 @@ Object.assign(LOOKS, {
 // who is where
 // ---------------------------------------------------------------------------------------------------------------------
 // the teenager dribbles at x, z (the ball stays where it died); during the montage they move aside to `aside`, facing the ball
-const NE_TEEN = { x: 13.2, z: -5.9, face: 135, aside: [11.75, -6.25], asideFace: -114 };
+// (for the last shot, while the plaza is off screen, they sit just behind the ball, facing you)
+const NE_TEEN = { x: 13.2, z: -5.9, face: 135, aside: [11.75, -6.25], asideFace: -114, end: [13.42, -6.6], endFace: 153 };
 const NE_KID = { pad: [1.7, 0.2], mid: [0.05, -0.03] };        // trampoline-local stand points (on the pad → the middle)
 
 // the footbridge: a few people walking across, then a running club (16 runners in one bunch) crosses from the left tower
 // to the right one at 3.6–4.0 m/s and is gone before the insert ends. A runner's footfalls load the deck harder than
 // walking does (taken here as 1.8× their weight on average). Everyone keeps right; paths are straight, speeds constant.
+const NE_RUN_IN = 41.2;      // the first runner steps onto the deck (the insert opens just after)
 const NE_WALKERS = (() => {
   const B = NE_CITY.bridge, rng = new RNG(4242), out = [], L = B.half + 1.2, T0 = NE.bridge[0];
   const push = (id, look, dir, v, dz, tm, run) => out.push({ id, look, dir, v, dz, tm, t0: tm - L / v, t1: tm + L / v, run, f: run ? 1.8 : 1 });
@@ -124,7 +126,7 @@ const NE_WALKERS = (() => {
   [[-6.5, 1, 1.25], [3.5, -1, 1.35], [8.0, -1, 1.2], [-9.5, -1, 1.3]].forEach(([x0, dir, v], i) => push(`W${i}`, `casual${1 + i * 3}`, dir, v, dir > 0 ? 0.75 : -0.75, T0 - x0 / (dir * v), false));
   // the runners: in at the left tower between T0 and T0 + 1.1, left to right
   for (let i = 0; i < 16; i++) {
-    const te = T0 + 1.1 * (i / 15) + rng.range(-0.08, 0.08), v = rng.range(3.6, 4.0), dz = rng.range(-0.95, 0.95);
+    const te = NE_RUN_IN + 1.1 * (i / 15) + rng.range(-0.08, 0.08), v = rng.range(3.6, 4.0), dz = rng.range(-0.95, 0.95);
     push(`R${i}`, `casual${1 + (i * 5) % 8}`, 1, v, dz, te + L / v, true);
   }
   return out;
@@ -147,8 +149,8 @@ function neCastSpecs() {
   const K = NE, TR = NE_TRAMP;
   return [
     // the teenager with the ball (stands still; the ball is beside the right hand)
-    { id: 'teen', look: 'neTeen', y: 0.15, path: [[0, NE_TEEN.x, NE_TEEN.z], [5.7, NE_TEEN.x, NE_TEEN.z], [7.4, ...NE_TEEN.aside]], face: NE_TEEN.face,
-      faceAt: (t) => (t < 5.7 ? NE_TEEN.face : NE_TEEN.asideFace),
+    { id: 'teen', look: 'neTeen', y: 0.15, path: [[0, NE_TEEN.x, NE_TEEN.z], [5.7, NE_TEEN.x, NE_TEEN.z], [7.4, ...NE_TEEN.aside], [60, ...NE_TEEN.aside], [60.05, ...NE_TEEN.end]], face: NE_TEEN.face,
+      faceAt: (t) => (t < 5.7 ? NE_TEEN.face : t < 60 ? NE_TEEN.asideFace : NE_TEEN.endFace),
       states: [[-5, 'neDribble'], [1.15, 'neReach'], [1.7, 'neStare'], [2.6, 'neCrouch'], [K.poke, 'nePoke'], [4.5, 'neCrouch'], [5.7, 'walk'], [7.4, 'neCrouch'], [14.6, 'neStare'], [19.0, 'sitGround']] },
     // the kid: beside the trampoline with a parent, then up on its frame, the jump, the landing, a second try, sitting in the pit
     { id: 'kid', look: 'neKid', scale: 0.7, y: 0.15, path: [[0, TR.x + 2.1, TR.z + 1.9]], face: 52,
@@ -172,8 +174,8 @@ function neCastSpecs() {
     { id: 'parent', look: 'casual6', y: 0.15, path: [[0, TR.x + 2.6, TR.z + 2.0]], face: 52,
       states: [[0, 'idle'], [16.05, 'neFlinch'], [17.4, 'handHead'], [19.5, 'look']] },
     // the café sitter: sits on the left cushion, gets up during the insert, walks off along the café front
-    { id: 'cafe', look: 'neCafe', y: 0.15, seat: 0.47, face: 90, faceUntil: 10.4, path: [[0, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [9.85, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [10.4, NE_CITY.bench.x - 0.42, NE_CITY.bench.z - 0.52], [11.2, 11.2, 3.5], [20, 11.0, 15]],
-      states: [[0, 'sit'], [9.85, 'neStandUp'], [10.4, 'walk']] },
+    { id: 'cafe', look: 'neCafe', y: 0.15, seat: 0.47, face: 90, faceUntil: 10.1, path: [[0, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [9.6, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [10.1, NE_CITY.bench.x - 0.42, NE_CITY.bench.z - 0.52], [10.9, 11.2, 3.5], [19.7, 11.0, 15]],
+      states: [[0, 'sit'], [9.6, 'neStandUp'], [10.1, 'walk']] },
     // the footbridge walkers and runners
     ...NE_WALKERS.map(neBridgeWalker),
     // life around: the far sidewalk, the bus stop, the corners of the junction (they flinch at the crash)

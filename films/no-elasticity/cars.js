@@ -289,6 +289,9 @@ const NE_CRASH = (() => {
   return { ti, tv, pS, pD, vS, vD, c1, V1, w1, rS, rD, c2, V2, w2, rW, rV, pV, w2s, vanZ, slide, rot, zv0, v0, tb, S, D, VN };
 })();
 
+// crash dust puffs (off: as billboards they read as hard grey discs)
+const NE_CRASH_DUST = false;
+
 // pose of crash car `who` ('suv' | 'sedan' | 'van') at time t
 function neCrashPose(who, t) {
   const C = NE_CRASH, rot = C.rot;
@@ -318,13 +321,13 @@ function neCrashPose(who, t) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // the tap (story time): a hatch arriving late behind the wreck brakes from 36 km/h but still meets the van's rear at
-// 5 km/h (1.4 m/s): a speed bumpers normally shrug off. It stops dead against the wreck (perfectly inelastic: the
+// 5 km/h (1.4 m/s): a speed bumpers are built to spring back from. It stops dead against the wreck (perfectly inelastic: the
 // wreck is braked and five times heavier, so they move on together by about a centimetre). Its bumper stays pushed in.
 // ---------------------------------------------------------------------------------------------------------------------
 const NE_TAP = (() => {
   const VN = CAR_PROFILES.van, HB = CAR_PROFILES.hatch, v = neCrashPose('van', NE.tap), back = v.z - Math.cos(v.yaw - Math.PI) * VN.L / 2;
   const vc = 1.4, v0 = 10, a = 6, zc = back - HB.L / 2 + 0.02, tb = NE.tap - (v0 - vc) / a, zb = zc - (v0 * v0 - vc * vc) / (2 * a);
-  return { vc, v0, a, zc, tb, zb, x: -1.75, dent: 0.075, dentVan: 0.03 };
+  return { vc, v0, a, zc, tb, zb, x: -1.75, dent: 0.05, dentVan: 0.02, back: 0.45 };
 })();
 function neTapPose(t) {
   const T = NE_TAP;
@@ -332,7 +335,7 @@ function neTapPose(t) {
   let z, d;
   if (t < T.tb) { z = T.zb - T.v0 * (T.tb - t); }
   else if (t < NE.tap) { const k = t - T.tb; z = T.zb + T.v0 * k - 0.5 * T.a * k * k; }
-  else z = T.zc + T.dent * 0.6 * MathX.smooth(t, NE.tap, NE.tap + 0.12);   // (the crush takes up most of the last bit)
+  else z = T.zc + T.dent * 0.6 * MathX.smooth(t, NE.tap, NE.tap + 0.12) - T.back * MathX.smooth(t, NE.tapBack[0], NE.tapBack[1]);   // (the crush takes up most of the last bit; then the driver backs off)
   d = z + 400;
   return { x: T.x, z, yaw: Math.PI, dist: d };
 }
@@ -347,7 +350,7 @@ class NeTraffic {
     const cars = [];
     const add = (spec) => { const c = new NeCar(scene, F, spec); cars.push(c); return c; };
     // H — the red hatch that crosses the speed table in front of you (coil springs visible in its arches), then drives on
-    this.H = add({ id: 'H', type: 'hatch', color: '#9a2e26', coils: true, lift: 0.07, stop: 0.2, preset: [0.012, 0.01],
+    this.H = add({ id: 'H', type: 'hatch', color: '#9a2e26', coils: true, lift: 0.07, stop: 0.1, preset: [0.012, 0.01],
       pose: neLane(5.25, -1, T.t0, 10.2, [[T.t0, 4.2], [23.3, 4.2], [23.7, 3.4], [26.8, 3.4], [29.5, 8.0], [75, 8.0]]) });
     // background life during the opening (they cross the table before the rule bites, or far away)
     add({ id: 'B1', type: 'sedan', color: '#6c7a86', pose: neLane(1.75, -1, 0, 6, [[0, 9.0]], { until: 12 }) });
@@ -357,8 +360,8 @@ class NeTraffic {
     // axle's leaf springs take most of the set and end on their bump stops (≈ 12 cm), so it sits tail-down. Oncoming cars
     // already ride low and scrape on the table.
     this.truck = add({ id: 'TR', type: 'truck', color: '#e9e5da', k: [1.45, 0.35], stop: 0.125, preset: [0.015, 0.012], pose: neLane(1.75, -1, 28, 30, [[28, 7], [32.5, 4.0], [75, 4.0]]) });
-    this.c1 = add({ id: 'C1', type: 'sedan', color: '#55606b', low: true, preset: [0.1, 0.11], pose: neLane(-1.75, 1, 27, -70, [[27, 9], [31.0, 5.2], [36, 5.2]]), brake: (t) => MathX.window(t, 30.4, 31.6, 0.2, 0.2) });
-    add({ id: 'C2', type: 'suv', color: '#4a5546', low: true, preset: [0.09, 0.1], pose: neLane(-5.25, 1, 28, -72, [[28, 8], [32.4, 4.8], [40, 4.8]]) });
+    this.c1 = add({ id: 'C1', type: 'sedan', color: '#55606b', low: true, preset: [0.1, 0.11], pose: neLane(-1.75, 1, 25.6, -70, [[25.6, 9], [29.6, 5.2], [34.6, 5.2]]), brake: (t) => MathX.window(t, 29.0, 30.2, 0.2, 0.2) });
+    add({ id: 'C2', type: 'suv', color: '#4a5546', low: true, preset: [0.09, 0.1], pose: neLane(-5.25, 1, 24.7, -72, [[24.7, 8], [29.1, 4.8], [40, 4.8]]) });
     // the bus pulls in at the stop on the far side (air suspension: air is unchanged, so it rides normally)
     this.bus = add({ id: 'BUS', type: 'bus', color: '#d8d4c6', pose: neLane(-5.25, 1, 30, -95, [[30, 6], [37.5, 4.6], [43.0, 4.6], [45.5, 0]]) });
     add({ id: 'C5', type: 'hatch', color: '#6e5a48', low: true, preset: [0.1, 0.1], pose: neLane(1.75, -1, 37, 30, [[37, 6.0]], { until: 56 }) });
@@ -433,7 +436,7 @@ class NeTraffic {
         if (a < life) {
           const ang = hash1(k + 1) * 6.283, sp = 0.6 + 2.0 * hash1(k + 2), sl = Math.min(a, 1.2);
           const x = ps.x + Math.cos(ang) * (0.5 + sp * sl), z = ps.z + Math.sin(ang) * (0.5 + sp * sl), y = 0.12 + 0.5 * hash1(k + 3) + 0.3 * sl;
-          if (i % 3 === 0) D.push(x, y, z, 0.45 + 0.7 * sl, hash1(k + 4) * 6, 0.075 * (1 - a / life), 0.9, 0.74, 0.72, 0.68);
+          if (i % 3 === 0 && NE_CRASH_DUST) D.push(x, y, z, 0.45 + 0.7 * sl, hash1(k + 4) * 6, 0.075 * (1 - a / life), 0.9, 0.74, 0.72, 0.68);
         }
         // glass: ballistic, then lying on the road (bright little chips)
         const g0 = k + 9, vx = (hash1(g0) - 0.5) * 5, vz = (hash1(g0 + 1) - 0.2) * 5, vy = 1 + 2.5 * hash1(g0 + 2), tl = (vy + Math.sqrt(vy * vy + 2 * 9.8 * 1.0)) / 9.8, aa = Math.min(a, tl);

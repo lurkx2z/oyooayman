@@ -54,6 +54,10 @@ class NeBall {
     scene.add(this.m);
     this._key = '';
     this._dead = neBallTimes().tc4;
+    // a dashed yellow ring: the ball's round outline before it died (the low insert turns it to face the camera)
+    { const lm = new THREE.MeshBasicMaterial({ color: '#ffd23e', fog: false }), g = new THREE.Group(), n = 28, R = NE_BALL.r + 0.003;
+      for (let i = 0; i < n; i++) { const a0 = (i + 0.25) / n * Math.PI * 2; const d = new THREE.Mesh(new THREE.BoxGeometry(0.009, 0.0022, 0.0015), lm); d.position.set(Math.cos(a0) * R, Math.sin(a0) * R, 0); d.rotation.z = a0 + Math.PI / 2; g.add(d); }
+      g.visible = false; scene.add(g); this.ring = g; }
   }
 
   // where the ball is (beside the teenager's right hand, where it died)
@@ -92,7 +96,7 @@ class NeBall {
 // the plaza trampoline (round, 3.6 m): steel ring on U-legs, springs all round under a narrow blue pad, a black mat.
 // The first landing stretches the mat for good: it stays a funnel.
 // ---------------------------------------------------------------------------------------------------------------------
-const NE_TRAMP = { x: 19.0, z: -12.5, R: 1.8, mat: 1.46, top: 0.95, depth: 0.7 };
+const NE_TRAMP = { x: 19.0, z: -12.5, R: 1.8, mat: 1.46, top: 0.95, depth: 0.36 };
 function neMatDepth(t) { return NE_TRAMP.depth * Ease.outCubic(MathX.clamp((t - NE.land) / 0.3, 0, 1)) + 0.04 * MathX.smooth(t, NE.land2, NE.land2 + 0.15); }
 
 class NeTramp {
@@ -236,7 +240,7 @@ class NeRacket {
 // ---------------------------------------------------------------------------------------------------------------------
 // montage insert 2: a running shoe striking the paving. The midsole foam squashes under the load and stays squashed.
 // ---------------------------------------------------------------------------------------------------------------------
-const NE_SHOE = { p: [16.0, 0.15, -24.0], strike: 8.05, flat: 8.2, lift: 8.6, off: 8.82 };
+const NE_SHOE = { p: [16.0, 0.15, -24.0], strike: 7.85, flat: 8.0, lift: 8.35, off: 8.55 };
 class NeShoe {
   constructor(scene) {
     const g = new THREE.Group(); scene.add(g); this.g = g;
@@ -272,6 +276,10 @@ class NeShoe {
     // ankle sock + the leg in dark running tights (rises out of frame)
     const sk = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.04, 0.05, 12), sock); sk.position.set(0.055, 0.105, 0); up.add(sk);
     const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.037, 0.5, 12), tights); leg.geometry.translate(0, 0.25, 0); leg.position.set(0.055, 0.12, 0); leg.castShadow = true; up.add(leg); this.leg = leg;
+    // a dashed yellow line on the near side where the top of the foam was (it rides with the foot)
+    { const lm = new THREE.MeshBasicMaterial({ color: '#ffd23e', fog: false }), lg = new THREE.Group();
+      for (let x = 0.01; x < 0.27; x += 0.03) { const d = new THREE.Mesh(new THREE.BoxGeometry(0.016, 0.0025, 0.002), lm); d.position.set(x + 0.008, 0.041, 0.064); lg.add(d); }
+      lg.visible = false; foot.add(lg); this.line = lg; }
     this.g.position.set(...NE_SHOE.p);
   }
 
@@ -282,7 +290,8 @@ class NeShoe {
     const S = NE_SHOE, vis = t > 7.3 && t < 9.8; this.g.visible = vis; if (!vis) return;
     const f = this.foam(t);
     this.mid.scale.y = f; this.up.position.y = 0.036 - 0.034 * (1 - f);
-    // the step (slow motion): swing in toe-first from the left, heel strike, roll flat, heel lift, toe off, swing out to the right
+    // the step (slow motion): swing in toe-first from the left, heel strike, roll flat, heel lift, toe off, then the foot
+    // hangs just off the ground (unloaded: the foam would spring back now; it doesn't)
     const F = this.foot, heelX = 0.0;
     let px, py, pitch;
     if (t < S.strike) { const k = (S.strike - t); px = heelX - 0.9 * k; py = 0.6 * k * k + 0.12 * k; pitch = 0.32 + 0.4 * k; F.position.set(px, py, 0); F.rotation.z = pitch; }
@@ -291,9 +300,10 @@ class NeShoe {
     else if (t < S.off) {   // rotate about the toe (x = 0.27)
       const k = MathX.smooth(t, S.lift, S.off), a = -0.62 * k, tx = 0.27;
       F.rotation.z = a; F.position.set(heelX + tx - tx * Math.cos(a), -tx * Math.sin(a), 0);
-    } else { const k = t - S.off, a = -0.62 - 1.2 * k; F.rotation.z = a; F.position.set(heelX + 0.27 - 0.27 * Math.cos(a) + 0.7 * k, -0.27 * Math.sin(a) + 0.8 * k * k + 0.25 * k, 0); }
+    } else { const k = MathX.smooth(t, S.off, S.off + 0.4), a = -0.62 + 0.52 * k; F.rotation.z = a; F.position.set(heelX + 0.0497 - 0.02 * k, 0.157 - 0.067 * k, 0); }
     // the shin: leaning back at heel strike (knee behind the ankle), forward over the toe at push-off, then swinging away
-    const tilt = 0.3 * MathX.smooth(t, S.strike - 0.5, S.strike) - 0.75 * MathX.smooth(t, S.strike, S.off) - 0.3 * MathX.smooth(t, S.off, S.off + 0.4);
+    const tilt = 0.3 * MathX.smooth(t, S.strike - 0.5, S.strike) - 0.75 * MathX.smooth(t, S.strike, S.off) + 0.5 * MathX.smooth(t, S.off, S.off + 0.4);
+    this.line.visible = t > S.flat + 0.05;
     this.leg.rotation.z = tilt - F.rotation.z;
   }
 }
