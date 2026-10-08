@@ -269,7 +269,8 @@ class NrCity extends Environment {
     // the clouds are water droplets: they keep running with the wind (∫ wind speed dt)
     this.skyUniforms.uTime.value = nrWindDist(S) / 11.1 * 2.2;
     const k = this.storm(S);
-    this.skyUniforms.uEdge.value = 0.55 + 2.6 * k; this.skyUniforms.uDark.value = k;
+    // (the edge starts 1.3 km out, so the storm's dark base already hangs over the party in the opening; it spreads on out after the gust front)
+    this.skyUniforms.uEdge.value = 1.3 + 1.85 * k + 4.5 * MathX.smooth(S, NR.gale[1] + 1.6, NR.ice0 + 6); this.skyUniforms.uDark.value = k;
     const hk = NR_ICE.h(S) / 1000; this.skyUniforms.uIceLo.value = NR_ICE.base / 1000 - hk; this.skyUniforms.uIceHi.value = Math.min(1.6, NR_ICE.top / 1000 - hk);
     this.sun.intensity = 4.4 * (1 - 0.86 * k);
     this.hemi.color.copy(this._hemiSky).lerp(this._hemiStorm, k); this.hemi.intensity = 1.5 - 0.35 * k;

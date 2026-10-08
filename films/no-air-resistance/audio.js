@@ -276,10 +276,12 @@ class NrAudio extends AudioEngine {
     for (const g of [roar, hg, rg, dg]) { g.gain.setValueAtTime(g.gain.value, q); g.gain.linearRampToValueAtTime(0, q + 0.015); }
     // the breakages (from the doorway)
     const P = (t, x, z) => this._pan(t, x, z), K = NR_ROOF.skylight, H = NR_ROOF_HITS;
-    for (const t of H.panes) { S.glass(t, 0.09, P(t, K.x, K.z), dest); S.crack(t, 0.08, P(t, K.x, K.z), dest, 3200); }
+    for (const t of H.panes) { S.glass(t, 0.06, P(t, K.x, K.z), dest); S.crack(t, 0.05, P(t, K.x, K.z), dest, 3200); }      // (the skylight, off to your left)
+    { const t = H.bottles, T = NR_ROOF.table, p = P(t, T.x - 0.3, T.z); S.glass(t, 0.1, p, dest); S.crack(t, 0.07, p, dest, 4200); S.glass(t + 0.07, 0.05, p, dest); }
+    { const t = H.cake, T = NR_ROOF.table, p = P(t, T.x + 0.1, T.z); S.whump(t, 0.07, p, dest); S.crack(t, 0.05, p, dest, 1800); S.burst(t + 0.02, 0.18, 900, 0.7, 0.03, p, dest, 'pink', 0.01); }
     H.bunting.forEach((t, r) => { const p = P(t, 22, r ? -1.8 : 1.2); S.ping(t, 1800, 0.03, p, dest, 0.25); for (let k = 0; k < 8; k++) S.click(t + 0.6 + k * 0.04, 0.012, p, dest); });
     this.app.roof.bulbs.forEach((b, k) => { const p = P(b.t, b.p[0], b.p[2]); S.click(b.t, 0.02, p, dest); S.tone(b.t + 0.01, 0.05, 3400 + (k * 377) % 1800, 0.008, p, dest, 'sine', 0.001, 0.04); });
-    { const t = H.line, p = P(t, 16.2, -0.8); S.ping(t, 640, 0.04, p, dest, 0.6); S.whump(t + 0.62, 0.06, p, dest); S.burst(t + 0.6, 0.35, 600, 0.6, 0.04, p, dest, 'pink', 0.02); }
+    { const t = H.line, p = P(t, 16.2, -0.8); S.click(t, 0.03, p, dest); S.click(t + 0.05, 0.025, p, dest); S.whump(t + 0.62, 0.06, p, dest); S.burst(t + 0.6, 0.35, 600, 0.6, 0.04, p, dest, 'pink', 0.02); }
     { const t = H.pot, C = NR_ROOF.chimney, p = P(t, C.x, C.z); S.crunch(t, 0.12, p, dest, this.rev); S.crack(t, 0.1, p, dest, 1500); }
   }
 

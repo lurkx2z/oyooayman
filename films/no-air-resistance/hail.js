@@ -61,10 +61,11 @@ const NR_HAIL = {
 class NrStorm {
   constructor(app) {
     this.app = app; const sc = app.scene;
-    this.rain = new StreakSystem(sc, 2600);
+    this.rain = new StreakSystem(sc, 3400);
     this.ice = new StreakSystem(sc, 5200);
     this.flash = new BillboardSystem(sc, 1600, true);
-    this.chips = new BillboardSystem(sc, 3200, false); this.chips.uniforms.uLight.value = 1.15;
+    this.spray = new StreakSystem(sc, 7000); this.spray.mesh.material.blending = THREE.NormalBlending;     // chips: white over the grey deck
+    this.puff = new BillboardSystem(sc, 1800, false); this.puff.uniforms.uLight.value = 1.1;
     this.mist = new BillboardSystem(sc, 700, false); this.mist.uniforms.uLight.value = 1.0;
     this.bits = new BillboardSystem(sc, 900, false); this.bits.uniforms.uLight.value = 1.0;
     this._o = {};
@@ -74,8 +75,8 @@ class NrStorm {
 
   /* ---------------- the confetti cannon's load (and its normal-air ghost) ---------------- */
   _confetti() {
-    const g = new THREE.PlaneGeometry(0.04, 0.026), n = 440, rng = new RNG(4401);
-    const m = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ roughness: 0.55, metalness: 0.15, side: THREE.DoubleSide }), n);
+    const g = new THREE.PlaneGeometry(0.06, 0.04), n = 720, rng = new RNG(4401);
+    const m = new THREE.InstancedMesh(g, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }), n);
     const pal = ['#f2c14e', '#e8577e', '#4fb3e8', '#f4f1e8', '#62c46d', '#e34234', '#b07be0'], c = new THREE.Color();
     this.flakes = [];
     for (let i = 0; i < n; i++) {
@@ -85,7 +86,7 @@ class NrStorm {
     }
     m.frustumCulled = false; m.castShadow = false; m.visible = false; this.app.scene.add(m); this.confetti = m;
     // the ghost: the same flakes in normal air (they stop within a metre, then the 50 km/h wind takes them)
-    const gn = 110, gm = new THREE.InstancedMesh(g, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.6, depthWrite: false, side: THREE.DoubleSide }), gn);
+    const gn = 260, gm = new THREE.InstancedMesh(g, new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide }), gn);
     this.ghosts = [];
     for (let i = 0; i < gn; i++) { const a = rng.range(0, Math.PI * 2), r = Math.sqrt(rng.next()) * 0.85; this.ghosts.push({ dx: Math.cos(a) * r, dz: Math.sin(a) * r, vk: rng.range(0.7, 1.1), tw: rng.range(0.22, 0.45), sink: rng.range(0.3, 0.7), ph: rng.range(0, 6.3) }); }
     gm.frustumCulled = false; gm.visible = false; gm.renderOrder = 7; this.app.scene.add(gm); this.ghostC = gm;
@@ -128,7 +129,7 @@ class NrStorm {
         this._e.set(u * 9 + G.ph, u * 6, u * 11); this._q.setFromEuler(this._e); this._m4.compose(o, this._q, this._s); this.ghostC.setMatrixAt(i, this._m4);
       });
       this.ghostC.instanceMatrix.needsUpdate = true;
-      this.ghostC.material.opacity = 0.65 * MathX.smooth(u, 0, 0.1) * (1 - MathX.smooth(u, 1.5, 2.2));
+      this.ghostC.material.opacity = 0.9 * MathX.smooth(u, 0, 0.1) * (1 - MathX.smooth(u, 1.5, 2.2));
     }
   }
 
@@ -161,26 +162,28 @@ class NrStorm {
     R.begin();
     if (k > 0) {
       const U = nrWindKmh(S) / 3.6, D = NR_WIND_DIR, vx = D.x * U, vz = D.z * U, vy = -6.5, H = NR_ROOF.hut, Y = NR_ROOF.y, c = cam.position;
-      const bx = 34, by = 22, bz = 34, x0 = c.x - bx / 2, y0 = c.y - 8, z0 = c.z - bz / 2, n = Math.floor(2400 * k), sh = 1 / 55;
+      const bx = 30, by = 18, bz = 30, x0 = c.x - bx / 2, y0 = c.y - 7, z0 = c.z - bz / 2, n = Math.floor(3300 * k), sh = 1 / 30;
       const wrap = (v, s) => v - s * Math.floor(v / s);
       for (let i = 0; i < n; i++) {
         const gs = 0.85 + 0.3 * hash1(i * 7 + 3);
         const x = x0 + wrap(hash1(i * 7 + 1) * 977 + vx * gs * S - x0, bx), y = y0 + wrap(hash1(i * 7 + 2) * 977 + vy * S - y0, by), z = z0 + wrap(hash1(i * 7 + 4) * 977 + vz * gs * S - z0, bz);
         if (x > H.x0 - 0.05 && x < H.x1 && z > H.z0 && z < H.z1 && y < Y + H.h + 0.3) continue;
         const f = nrFloorAt(x, z); if (f !== null && y < f) continue;
-        const a = (0.16 + 0.14 * hash1(i * 7 + 5)) * k;
-        R.push(x, y, z, x - vx * gs * sh, y - vy * sh, z - vz * gs * sh, 0.72, 0.78, 0.86, a, 0.0045);
+        const ddx = x - c.x, ddy = y - c.y, ddz = z - c.z; if (ddx * ddx + ddy * ddy + ddz * ddz < 1.4) continue;
+        const a = (0.3 + 0.25 * hash1(i * 7 + 5)) * k;
+        R.push(x, y, z, x - vx * gs * sh, y - vy * sh, z - vz * gs * sh, 0.8, 0.85, 0.94, a, 0.009 + 0.004 * hash1(i * 7 + 6));
       }
     }
     R.end();
   }
 
   _iceUpdate(S, cam) {
-    const I = this.ice, Fl = this.flash, Ch = this.chips, Mi = this.mist, o = this._o, c = cam.position;
-    I.begin(); Fl.begin(null); Ch.begin(this.app.scene.fog); Mi.begin(this.app.scene.fog);
+    const I = this.ice, Fl = this.flash, Sp = this.spray, Pu = this.puff, Mi = this.mist, o = this._o, c = cam.position;
+    I.begin(); Fl.begin(null); Sp.begin(); Pu.begin(this.app.scene.fog); Mi.begin(this.app.scene.fog);
+    const fw = this._fw || (this._fw = new THREE.Vector3()); cam.getWorldDirection(fw); const fl = Math.hypot(fw.x, fw.z) || 1, fx = fw.x / fl, fz = fw.z / fl;
     const sky = S >= NR.sky[0] && S < NR.sky[1];
     if (!sky && S > NR_ICE.first - 0.2 && S < NR_ICE.last + 0.6) {
-      const sh = 1 / 100, D = NR_ICE.drift, j0 = Math.max(0, Math.floor((S - 0.5 - NR_ICE.first) * NR_HAIL.R)), j1 = Math.floor((S + 0.14 - NR_ICE.first) * NR_HAIL.R);
+      const sh = 1 / 100, D = NR_ICE.drift, j0 = Math.max(0, Math.floor((S - 0.9 - NR_ICE.first) * NR_HAIL.R)), j1 = Math.floor((S + 0.14 - NR_ICE.first) * NR_HAIL.R);
       for (let j = j1; j >= j0; j--) {
         NR_HAIL.at(j, o); if (!o.on) continue;
         const age = S - o.t, f = nrFloorAt(o.x, o.z), fy = f === null ? 0 : f;
@@ -192,15 +195,20 @@ class NrStorm {
           I.push(xa, fy + ha, za, xb, fy + hb, zb, 0.86, 0.93, 1.0, 0.5 + 0.4 * Math.min(1, o.k), 0.006 + 0.012 * o.k);
         }
         if (f === null || age < 0) continue;
-        const dx = o.x - c.x, dz = o.z - c.z, d2 = dx * dx + dz * dz;
-        // the spark where it lands
-        if (age < 0.07 && d2 < 1600) Fl.push(o.x, fy + 0.06, o.z, (0.2 + 0.55 * o.k) * (1 + 1.5 * age / 0.07), hash1(j) * 6.3, 0.85 * (1 - age / 0.07), 1, 0.95, 0.98, 1.0);
-        // chips of ice thrown up: they fall straight back (nothing holds them up)
-        if (d2 < 500 && hash1(j * 5 + 6) < 0.4) {
-          for (let q = 0; q < 2; q++) {
-            const h = hash1(j * 11 + q), a = hash1(j * 13 + q) * 6.283, vh = (0.8 + 2.4 * h) * (0.6 + o.k), vy = (1.5 + 3.5 * hash1(j * 17 + q)) * (0.6 + 0.8 * o.k);
+        const dx = o.x - c.x, dz = o.z - c.z, d2 = dx * dx + dz * dz, d = Math.sqrt(d2);
+        if (dx * fx + dz * fz < 0.25 * d - 1.0) continue;                 // behind you: nothing drawn
+        // the spark where it lands (small: it's a flash of ice turning to powder)
+        if (age < 0.05 && d2 < 1600) { const sz = (0.07 + 0.18 * o.k) * (1 + 1.2 * age / 0.05); Fl.push(o.x, fy + 0.5 * sz, o.z, sz, hash1(j) * 6.3, 0.7 * (1 - age / 0.05), 1, 0.95, 0.98, 1.0); }
+        // a brief puff of ice powder, low over the spot (a solid: it falls straight back, no dust hangs in the air)
+        if (age < 0.16 && d2 < 520 && d2 > 12) { const w = age / 0.16, sz = (0.08 + 0.2 * o.k) * (0.7 + 1.3 * w); Pu.push(o.x, fy + 0.5 * sz, o.z, sz, hash1(j * 3) * 6.3, 0.3 * (1 - w) ** 1.5, 1.0, 0.93, 0.95, 0.98); }
+        // a splash of chips: thrown out fast and low, falling straight back down (drawn with a 1/50 s blur)
+        if (d2 < 520 && age < 0.9 && hash1(j * 5 + 6) < 0.7) {
+          const nq = o.k > 0.6 ? 7 : 5, sb = Math.min(age, 1 / 50), lw = 0.005 + 0.007 * o.k;
+          for (let q = 0; q < nq; q++) {
+            const h = hash1(j * 11 + q), a = hash1(j * 13 + q) * 6.283, vh = (2.0 + 6.0 * h) * (0.6 + o.k), vy = (0.6 + 2.4 * hash1(j * 17 + q)) * (0.6 + 0.8 * o.k);
             const y = fy + vy * age - 0.5 * NR_G * age * age; if (y < fy) continue;
-            Ch.push(o.x + Math.cos(a) * vh * age, y, o.z + Math.sin(a) * vh * age, 0.035 + 0.05 * o.k, a, 0.95, 1.0, 0.9, 0.94, 1.0);
+            const ca = Math.cos(a) * vh, sa = Math.sin(a) * vh, ta = age - sb, yb = fy + vy * ta - 0.5 * NR_G * ta * ta;
+            Sp.push(o.x + ca * ta, yb, o.z + sa * ta, o.x + ca * age, y, o.z + sa * age, 0.93, 0.96, 1.0, 0.9 * (1 - age / 0.9), lw);
           }
         }
       }
@@ -212,10 +220,12 @@ class NrStorm {
         if (hash1(m * 3 + 1) > NR_ICE.flux(t)) continue;
         const x = c.x - 26 + 44 * hash1(m * 3 + 2), z = c.z - 22 + 44 * hash1(m * 3 + 3), f = nrFloorAt(x, z); if (f === null) continue;
         const k = age / 1.4, gx = x + Dw.x * U * age * 0.85, gz = z + Dw.z * U * age * 0.85;
-        Mi.push(gx, f + 0.3 + 1.2 * k, gz, 0.8 + 3.2 * k, m * 0.7, 0.16 * Math.sin(Math.PI * Math.min(1, k * 1.15)), 1.0, 0.92, 0.94, 0.97);
+        if ((gx - c.x) ** 2 + (gz - c.z) ** 2 < 25) continue;
+        const ms = 0.6 + 2.0 * k;
+        Mi.push(gx, f + 0.5 * ms + 0.8 * k, gz, ms, m * 0.7, 0.1 * Math.sin(Math.PI * Math.min(1, k * 1.15)), 1.0, 0.92, 0.94, 0.97);
       }
     }
-    I.end(); Fl.end(); Ch.end(); Mi.end();
+    I.end(); Fl.end(); Sp.end(); Pu.end(); Mi.end();
   }
 
   // shards of something broken (glass, terracotta): thrown out of a box at t0, falling ½gt² until floorY. A small pool shared by

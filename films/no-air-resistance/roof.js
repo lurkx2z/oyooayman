@@ -15,8 +15,9 @@
    From NR_ICE.first the cloud's ice lands: holes punched in the sheets and
    the tablecloth (more and bigger as more of the ice lands), the deck
    whitening with ice powder, and one thing after another broken while
-   you watch from the doorway (NR_ROOF_HITS): the skylight's panes, the
-   bunting's strings, the fairy lights, the washing line, the chimney pot.
+   you watch from the doorway (NR_ROOF_HITS): the bottles, the bunting's
+   strings, the cake, the fairy lights, a sheet's pegs, the chimney pot
+   (and, off to your left as you get in, the skylight's panes).
    ===================================================================== */
 
 // how much ice powder lies on upward faces (0..1); set per frame
@@ -186,10 +187,11 @@ class NrRoof {
     B.box(K.w + 0.2, K.h, 0.1, K.x, y + K.h / 2, K.z - K.d / 2, this.m.dark); B.box(K.w + 0.2, K.h, 0.1, K.x, y + K.h / 2, K.z + K.d / 2, this.m.dark);
     B.box(0.1, K.h, K.d, K.x - K.w / 2, y + K.h / 2, K.z, this.m.dark); B.box(0.1, K.h, K.d, K.x + K.w / 2, y + K.h / 2, K.z, this.m.dark);
     B.box(K.w, 0.06, 0.06, K.x, y + K.h, K.z, this.m.dark);
-    // the stairwell under it: a dark floor 3 m down and the shaft's walls
-    B.add(Geo.flat(K.x - K.w / 2, K.x + K.w / 2, K.z - K.d / 2, K.z + K.d / 2, y - 3.0, 1), this.m.inside, null, { noShadow: true });
-    for (const s of [-1, 1]) { B.box(K.w, 3.0, 0.04, K.x, y - 1.5, K.z + s * K.d / 2, this.m.inside, 0, { noShadow: true }); B.box(0.04, 3.0, K.d, K.x + s * K.w / 2, y - 1.5, K.z, this.m.inside, 0, { noShadow: true }); }
-    const gm = new THREE.MeshStandardMaterial({ color: '#9fb6c4', roughness: 0.08, metalness: 0.3, transparent: true, opacity: 0.55 });
+    // the stairwell under it: a lit landing 3 m down and the shaft's pale walls (the lights are on in the flat below)
+    const lit = new THREE.MeshStandardMaterial({ color: '#d8ccb6', emissive: '#7a6548', emissiveIntensity: 0.55, roughness: 0.9 });
+    B.add(Geo.flat(K.x - K.w / 2, K.x + K.w / 2, K.z - K.d / 2, K.z + K.d / 2, y - 3.0, 1), lit, null, { noShadow: true });
+    for (const s of [-1, 1]) { B.box(K.w, 3.0, 0.04, K.x, y - 1.5, K.z + s * K.d / 2, lit, 0, { noShadow: true }); B.box(0.04, 3.0, K.d, K.x + s * K.w / 2, y - 1.5, K.z, lit, 0, { noShadow: true }); }
+    const gm = new THREE.MeshStandardMaterial({ color: '#c4d6e2', roughness: 0.06, metalness: 0.25, transparent: true, opacity: 0.42 });
     this.panes = [-1, 1].map((s, i) => { const p = new THREE.Mesh(new THREE.BoxGeometry(K.w - 0.1, 0.02, K.d / 2 - 0.08), gm); p.position.set(K.x, y + K.h + 0.01, K.z + s * K.d / 4); this.app.scene.add(p); return { p, s, i }; });
   }
   // the party table (its long side along x), a cake, plates, cups, bottles, a speaker; four folding chairs
@@ -200,12 +202,18 @@ class NrRoof {
     this.tableTop = top + 0.012;
     const red = nrIcy(new THREE.MeshStandardMaterial({ color: '#c8352b', roughness: 0.5 })), green = nrIcy(new THREE.MeshStandardMaterial({ color: '#2f6b46', roughness: 0.25, metalness: 0.2 })), icing = this.m.white;
     const yt = this.tableTop;
-    B.add(new THREE.CylinderGeometry(0.17, 0.17, 0.12, 20), new THREE.MeshStandardMaterial({ color: '#f3e3cf', roughness: 0.6 }), Geo.matrix(T.x + 0.1, yt + 0.06, T.z - 0.05));
-    B.add(new THREE.CylinderGeometry(0.175, 0.175, 0.03, 20), icing, Geo.matrix(T.x + 0.1, yt + 0.135, T.z - 0.05));
-    for (let k = 0; k < 5; k++) B.add(new THREE.CylinderGeometry(0.006, 0.006, 0.07, 5), new THREE.MeshStandardMaterial({ color: ['#e8c34a', '#6fb6e0', '#e86f9f'][k % 3] }), Geo.matrix(T.x + 0.1 + 0.1 * Math.cos(k * 1.26), yt + 0.18, T.z - 0.05 + 0.1 * Math.sin(k * 1.26)));
+    const cake = new THREE.Group(), cm = (g, m, x, yy, z) => { const q = new THREE.Mesh(g, m); q.position.set(x, yy, z); q.castShadow = true; cake.add(q); };
+    cm(new THREE.CylinderGeometry(0.17, 0.17, 0.12, 20), new THREE.MeshStandardMaterial({ color: '#f3e3cf', roughness: 0.6 }), T.x + 0.1, yt + 0.06, T.z - 0.05);
+    cm(new THREE.CylinderGeometry(0.175, 0.175, 0.03, 20), icing, T.x + 0.1, yt + 0.135, T.z - 0.05);
+    for (let k = 0; k < 5; k++) cm(new THREE.CylinderGeometry(0.006, 0.006, 0.07, 5), new THREE.MeshStandardMaterial({ color: ['#e8c34a', '#6fb6e0', '#e86f9f'][k % 3] }), T.x + 0.1 + 0.1 * Math.cos(k * 1.26), yt + 0.18, T.z - 0.05 + 0.1 * Math.sin(k * 1.26));
+    this.app.scene.add(cake); this.cake = cake; this.cakeAt = [T.x + 0.1, yt, T.z - 0.05];
+    // what's left of it once the ice has been through: a flattened smear
+    this.cakeMess = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 0.025, 14), new THREE.MeshStandardMaterial({ color: '#efe2cf', roughness: 0.8 })); this.cakeMess.position.set(T.x + 0.1, yt + 0.0125, T.z - 0.05); this.cakeMess.visible = false; this.app.scene.add(this.cakeMess);
     B.add(new THREE.CylinderGeometry(0.12, 0.1, 0.06, 16), icing, Geo.matrix(T.x - 0.6, yt + 0.03, T.z + 0.2));
     for (const [dx, dz] of [[-0.75, -0.3], [-0.95, -0.2], [0.75, 0.3], [0.9, 0.12], [0.85, -0.3], [-0.2, 0.3]]) B.add(new THREE.CylinderGeometry(0.045, 0.035, 0.12, 12), red, Geo.matrix(T.x + dx, yt + 0.06, T.z + dz));
-    for (const [dx, dz] of [[-0.25, 0.05], [-0.32, 0.15]]) { B.add(new THREE.CylinderGeometry(0.04, 0.04, 0.24, 10), green, Geo.matrix(T.x + dx, yt + 0.12, T.z + dz)); B.add(new THREE.CylinderGeometry(0.015, 0.02, 0.08, 8), green, Geo.matrix(T.x + dx, yt + 0.28, T.z + dz)); }
+    this.bottles = new THREE.Group();
+    for (const [dx, dz] of [[-0.25, 0.05], [-0.32, 0.15]]) for (const [g, h] of [[new THREE.CylinderGeometry(0.04, 0.04, 0.24, 10), 0.12], [new THREE.CylinderGeometry(0.015, 0.02, 0.08, 8), 0.28]]) { const q = new THREE.Mesh(g, green); q.position.set(T.x + dx, yt + h, T.z + dz); q.castShadow = true; this.bottles.add(q); }
+    this.app.scene.add(this.bottles); this.bottlesAt = [T.x - 0.285, yt, T.z + 0.1];
     B.box(0.12, 0.24, 0.16, T.x + 0.5, yt + 0.12, T.z + 0.25, this.m.dark);
     // four folding chairs (white), on the long sides
     for (const [dx, dz, ry] of [[-0.55, -0.85, 0], [0.5, -0.85, 0], [-0.4, 0.85, Math.PI], [0.6, 0.85, Math.PI]]) {
@@ -338,12 +346,13 @@ class NrRoof {
     });
     const im = new THREE.InstancedMesh(tri, pm, this.flags.length); const c = new THREE.Color();
     this.flags.forEach((f, i) => im.setColorAt(i, c.set(f.col))); im.castShadow = true; im.frustumCulled = false; this.app.scene.add(im); this.flagM = im;
-    // fairy lights: a string of warm bulbs from over the door to the middle of the washing line
-    const fa = [H.x0 - 0.05, y + 2.5, H.door], fb = [(A[0] + Bp[0]) / 2, y + 2.1, (A[1] + Bp[1]) / 2], fl = Math.hypot(fb[0] - fa[0], fb[2] - fa[2]), bm = new THREE.MeshStandardMaterial({ color: '#fff1c8', emissive: '#ffcc77', emissiveIntensity: 2.2 });
-    const fpt = (f) => [fa[0] + (fb[0] - fa[0]) * f, fa[1] + (fb[1] - fa[1]) * f - 4 * 0.45 * f * (1 - f), fa[2] + (fb[2] - fa[2]) * f], fs = [];
+    // fairy lights: a string of warm bulbs from a pole at the front of the party, over the table, to the washing line's near post
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 2.6, 8), this.m.galv); pole.position.set(22.4, y + 1.3, 2.45); pole.castShadow = true; this.app.scene.add(pole);
+    const fa = [22.4, y + 2.55, 2.45], fb = [Bp[0], y + 2.1, Bp[1]], fl = Math.hypot(fb[0] - fa[0], fb[2] - fa[2]), bm = new THREE.MeshStandardMaterial({ color: '#fff1c8', emissive: '#ffcc77', emissiveIntensity: 1.5 });
+    const fpt = (f) => [fa[0] + (fb[0] - fa[0]) * f, fa[1] + (fb[1] - fa[1]) * f - 4 * 0.4 * f * (1 - f), fa[2] + (fb[2] - fa[2]) * f], fs = [];
     for (let s = 0; s < 30; s++) fs.push(...fpt(s / 30), ...fpt((s + 1) / 30));
     this.app.scene.add(new THREE.LineSegments(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(fs, 3)), new THREE.LineBasicMaterial({ color: '#2a2a2a' })));
-    const bg = new THREE.SphereGeometry(0.035, 8, 6), nb = Math.floor(fl / 0.5), bi = new THREE.InstancedMesh(bg, bm, nb), M = new THREE.Matrix4();
+    const bg = new THREE.SphereGeometry(0.03, 8, 6), nb = Math.floor(fl / 0.42), bi = new THREE.InstancedMesh(bg, bm, nb), M = new THREE.Matrix4();
     this.bulbs = [];
     for (let i = 0; i < nb; i++) { const p = fpt((i + 0.5) / nb); M.makeTranslation(p[0], p[1] - 0.05, p[2]); bi.setMatrixAt(i, M); this.bulbs.push({ p: [p[0], p[1] - 0.05, p[2]], t: NR_ROOF_HITS.lights + 1.6 * hash1(i * 17 + 5) ** 1.3 }); }
     bi.frustumCulled = false; this.app.scene.add(bi); this.bulbM = bi;
@@ -391,16 +400,15 @@ class NrRoof {
       Sh.U.uTheta.value = th; Sh.U.uRip.value = after ? Math.exp(-3.0 * u) : 0.7 + 0.3 * q;
       Sh.U.uT.value = after ? NR.loss + (1 - Math.exp(-3 * u)) / 3 : S; Sh.U.uLimp.value = after ? MathX.smooth(u, 0.2, 2.0) : 0;
       Sh.U.uLanded.value = landed;
-      // the line is cut: the sheet drops straight down and folds up on the deck
-      const ul = S - NR_ROOF_HITS.line, top = this.lineY - (ul > 0 ? 0.5 * NR_G * ul * ul : 0), yt = Math.max(Y + 0.08, top);
+      // the middle sheet's pegs are shot away: it drops straight down and folds up on the deck (the others hang on, shot to lace)
+      const ul = Sh.i === 1 ? S - NR_ROOF_HITS.line : -1, top = this.lineY - (ul > 0 ? 0.5 * NR_G * ul * ul : 0), yt = Math.max(Y + 0.08, top);
       Sh.m.position.y = yt; Sh.m.scale.y = MathX.clamp((yt - Y - 0.03) / 1.7, 0.04, 1);
     }
-    this.lineM.visible = S < NR_ROOF_HITS.line;
-    for (const p of this.pegs) { const ul = S - NR_ROOF_HITS.line; p.position.y = Math.max(Y + 0.06, this.lineY - 0.02 - (ul > 0 ? 0.5 * NR_G * ul * ul : 0)); }
+    this.pegs.forEach((p, k) => { const ul = k >> 1 === 1 ? S - NR_ROOF_HITS.line : -1; p.position.y = Math.max(Y + 0.06, this.lineY - 0.02 - (ul > 0 ? 0.5 * NR_G * ul * ul : 0)); });
     // the ghost sheet: what the 110 km/h storm would do to the first sheet in normal air
     const G = this.ghostSheet, ga = MathX.smooth(S, NR.gale[0] + 0.9, NR.gale[0] + 1.5) * (1 - MathX.smooth(S, 29.4, 29.9));
     G.m.visible = ga > 0.001;
-    if (G.m.visible) { const U = nrWindKmh(S) / 50 * nrGust(S, 2); G.U.uTheta.value = Math.min(1.5, 1.05 * U * U * 0.45 + 0.4); G.U.uRip.value = 1.5; G.U.uT.value = S * 1.4; G.mat.opacity = 0.42 * ga; G.edge.opacity = 0.5 * ga; }
+    if (G.m.visible) { const U = nrWindKmh(S) / 50 * nrGust(S, 2); G.U.uTheta.value = Math.min(1.5, 1.05 * U * U * 0.45 + 0.4); G.U.uRip.value = 1.5; G.U.uT.value = S * 1.4; G.mat.opacity = 0.55 * ga; G.edge.opacity = 0.85 * ga; }
     // the tablecloth's skirts flap until the change
     this.cloth.U.uFlap.value = after ? 0.6 * Math.exp(-2.5 * u) * Math.cos(6 * u) : Math.min(1.2, L); this.cloth.U.uT.value = Math.min(S, NR.loss + 1); this.cloth.U.uLanded.value = landed;
     // bunting: each pennant lifted by the wind (and fluttering); at the change they swing down and ring to a stop
@@ -427,7 +435,7 @@ class NrRoof {
     this.bulbs.forEach((b, k) => {
       const out = S >= b.t; if (out) nOut++;
       this._m4.makeScale(out ? 0.001 : 1, out ? 0.001 : 1, out ? 0.001 : 1).setPosition(b.p[0], b.p[1], b.p[2]); this.bulbM.setMatrixAt(k, this._m4);
-      const w = S - b.t; if (w >= 0 && w < 0.12) this.pops.push(b.p[0], b.p[1], b.p[2], 0.35 + 1.2 * w, k, 0.9 * (1 - w / 0.12), 1, 1.0, 0.86, 0.6);
+      const w = S - b.t; if (w >= 0 && w < 0.12) this.pops.push(b.p[0], b.p[1], b.p[2], 0.12 + 0.6 * w, k, 0.9 * (1 - w / 0.12), 1, 1.0, 0.86, 0.6);
     });
     this.bulbM.instanceMatrix.needsUpdate = true;
     this.pops.end();
@@ -441,12 +449,18 @@ class NrRoof {
         St.shards(S, t0, [K.x - K.w / 2 + 0.1, K.x + K.w / 2 - 0.1, z0 - K.d / 4 + 0.05, z0 + K.d / 4 - 0.05, Y + K.h], 60, 11 + P.i, Y - 3.0, gl, [-7, 1.0], [0.05, 0.5]);
         St.shards(S, t0, [K.x - K.w / 2 + 0.1, K.x + K.w / 2 - 0.1, z0 - K.d / 4 + 0.05, z0 + K.d / 4 - 0.05, Y + K.h], 26, 21 + P.i, Y + 0.004, gl, [0.5, 3.5], [0.8, 2.6]);
       }
+      const ba = this.bottlesAt, ca = this.cakeAt, tb = NR_ROOF.table, ty = this.tableTop;
+      St.shards(S, NR_ROOF_HITS.bottles, [ba[0] - 0.06, ba[0] + 0.06, ba[2] - 0.08, ba[2] + 0.08, ty + 0.15], 46, 41, ty + 0.004, [0.22, 0.48, 0.3], [-1, 3.0], [0.4, 2.2], [0.02, 0.055]);
+      St.shards(S, NR_ROOF_HITS.bottles, [ba[0] - 0.06, ba[0] + 0.06, ba[2] - 0.08, ba[2] + 0.08, ty + 0.15], 24, 42, Y + 0.044, [0.22, 0.48, 0.3], [0, 2.6], [1.4, 2.6], [0.02, 0.05]);
+      St.shards(S, NR_ROOF_HITS.cake, [ca[0] - 0.12, ca[0] + 0.12, ca[2] - 0.12, ca[2] + 0.12, ty + 0.12], 50, 43, ty + 0.004, [0.95, 0.9, 0.82], [0.2, 2.6], [0.3, 1.6], [0.03, 0.07]);
+      St.shards(S, NR_ROOF_HITS.cake, [ca[0] - 0.12, ca[0] + 0.12, ca[2] - 0.12, ca[2] + 0.12, ty + 0.12], 16, 44, Y + 0.044, [0.95, 0.9, 0.82], [0.5, 2.2], [1.2, 2.0], [0.03, 0.07]);
       const C = NR_ROOF.chimney;
       St.shards(S, NR_ROOF_HITS.pot, [C.x - 0.15, C.x + 0.15, C.z - 0.15, C.z + 0.15, Y + C.h + 0.4], 40, 31, Y + C.h + 0.13, [0.62, 0.34, 0.22], [-1, 3.5], [0.6, 2.4], [0.04, 0.1]);
       St.shards(S, NR_ROOF_HITS.pot, [C.x - 0.15, C.x + 0.15, C.z - 0.15, C.z + 0.15, Y + C.h + 0.4], 30, 32, Y + 0.004, [0.62, 0.34, 0.22], [0, 3.0], [1.4, 3.2], [0.04, 0.1]);
       St.endBits();
     }
     this.potM.visible = S < NR_ROOF_HITS.pot;
+    this.bottles.visible = S < NR_ROOF_HITS.bottles; this.cake.visible = S < NR_ROOF_HITS.cake; this.cakeMess.visible = !this.cake.visible;
     // the kite (its flyer's hand comes from the people; the kite, its tail and its string fall together after the change)
     this._kiteUpdate(S, u, after);
     // the skylight's panes break when the ice gets to them
@@ -505,7 +519,7 @@ class NrRoof {
   // the smoke: puffs leave the flue at ~1.5 m/s and ride the wind. Steam always rides it. Soot rides it only until the
   // change: then what is out keeps the velocity it had and falls, and what comes out next arcs back down onto the roof
   _smokeUpdate(S, after, u) {
-    const St = this.steam, So = this.soot, F = this.flue, D = NR_WIND_DIR, rate = 38, life = 3.2, Y = NR_ROOF.y, storm = MathX.smooth(S, NR.gale[0], NR.gale[1]);
+    const St = this.steam, So = this.soot, F = this.flue, D = NR_WIND_DIR, rate = 140, life = 3.2, Y = NR_ROOF.y, storm = MathX.smooth(S, NR.gale[0], NR.gale[1]);
     St.begin(this.app.scene.fog); So.begin(this.app.scene.fog);
     const i0 = Math.floor((S - life) * rate), i1 = Math.floor(S * rate);
     for (let i = i0; i <= i1; i++) {
@@ -514,8 +528,8 @@ class NrRoof {
       const k = age / life, h1 = hash1(i * 7 + 5), h2 = hash1(i * 11 + 3), h3 = hash1(i * 13 + 9);
       // steam: always carried
       const drift = nrWindDist(S) - nrWindDist(born), rise = (1.5 * age + 0.6 * k) * (14 / Math.max(14, nrWindKmh(S) / 3.6)) ** 0.5;
-      const sx = F.x + D.x * drift * 0.9 + (h1 - 0.5) * (0.2 + 2.2 * k), sz = F.z + D.z * drift * 0.9 + (h2 - 0.5) * (0.2 + 2.2 * k), sy = F.y + rise + (h3 - 0.5) * (0.1 + 1.0 * k);
-      St.push(sx, sy, sz, 0.35 + 1.9 * Math.sqrt(k), i * 1.3 + age * 0.4, 0.26 * (1 - k) ** 1.4 * Math.min(1, age * 5), 1.0, 0.93, 0.93, 0.94);
+      const sx = F.x + D.x * drift * (0.82 + 0.16 * h3) + (h1 - 0.5) * (0.3 + 4.0 * k), sz = F.z + D.z * drift * (0.82 + 0.16 * h3) + (h2 - 0.5) * (0.3 + 4.0 * k), sy = F.y + rise + (h3 - 0.5) * (0.2 + 2.2 * k);
+      St.push(sx, sy, sz, 0.22 + 1.25 * Math.sqrt(k), i * 1.3 + age * 0.4, 0.09 * (1 - 0.45 * storm) * (1 - k) ** 1.2 * Math.min(1, age * 5), 1.0, 0.93, 0.93, 0.94);
       // soot: a grey-brown haze in the plume before the change
       if (born < NR.loss) {
         if (!after) { So.push(sx + 0.1, sy - 0.05, sz, 0.3 + 1.5 * Math.sqrt(k), i * 0.7, 0.3 * (1 - k) ** 1.3 * Math.min(1, age * 5), 1.0, 0.24, 0.22, 0.2); continue; }

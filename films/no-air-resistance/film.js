@@ -58,13 +58,13 @@ const FILM = {
   },
 
   // a side view of the storm cloud: its ice (6–13 km up) falling as one block since the change
-  _iy(km) { return 262 - km / 14 * 226; },
+  _iy(km) { return 262 - km / 14 * 196; },
   _insetSvg() {
     const y = (k) => this._iy(k).toFixed(1), base = y(1.6), top = y(13);
     return `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
       <defs><pattern id="nrDots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" class="ice"/><circle cx="6.5" cy="6.5" r="1.6" class="ice"/></pattern>
         <clipPath id="nrClip"><rect x="0" y="0" width="400" height="262"/></clipPath></defs>
-      <text x="10" y="24" class="t">SIDE VIEW</text><text x="390" y="24" class="s" text-anchor="end">ALL ITS ICE FALLS TOGETHER</text>
+      <text x="10" y="24" class="t">THE CLOUD’S ICE, SIDE VIEW</text><text x="10" y="50" class="s">IT ALL FALLS AT ONCE</text>
       <path d="M118,${base} L118,${y(9)} Q140,${y(12.6)} 180,${top} L372,${top} Q392,${y(12.4)} 352,${y(11.6)} L352,${base} Z" class="cloud"/>
       <rect x="150" y="${y(13)}" width="170" height="${(this._iy(6) - this._iy(13)).toFixed(1)}" class="was"/>
       <text x="146" y="${y(6.2)}" class="s" text-anchor="end">ICE · 6–13 KM</text>
@@ -177,13 +177,13 @@ const FILM = {
     const sky = S >= NR.sky[0] && S < NR.sky[1], cam = sky ? app.aerial.cam : app.camera;
     // AERODYNAMIC FORCE 100 % → 0 % (big in the opening, small in the corner later)
     const a = Math.round(nrAero(S) * 100);
-    set(U.aero, 'opacity', (sky ? 0 : S < NR.cut0 ? W(S, NR.title[1] - 1.9, NR.cut0, 0.3, 0.05) : W(S, 20.6, NR.line[0], 0.4, 0.4) * 0.85).toFixed(3));
+    set(U.aero, 'opacity', (sky ? 0 : S < NR.cut0 ? W(S, NR.title[1] - 1.9, NR.cut0, 0.3, 0.05) : W(S, 20.6, NR_ICE.first - 0.1, 0.4, 0.15) * 0.85).toFixed(3));   // (the ice readout takes its place)
     html(U.aero.querySelector('.v'), `${a}%`);
     set(U.aero.querySelector('.sub'), 'opacity', MathX.smooth(S, NR.loss + 0.3, NR.loss + 0.7).toFixed(2));
     U.aero.classList.toggle('small', S > NR.cut0);
     U.aero.classList.toggle('zero', S > NR.loss + 0.2);
     // WIND: once it has been shown to still blow, and when the storm brings more of it
-    set(U.wind, 'opacity', (W(S, NR.title[1], NR.drop.up, 0.4, 0.3) + W(S, NR.gale[0] - 0.2, 30.0, 0.3, 0.4)).toFixed(3));
+    set(U.wind, 'opacity', (W(S, NR.title[1], NR.drop.up, 0.4, 0.3) + W(S, NR.gale[0] - 0.2, 27.4, 0.3, 0.3)).toFixed(3));
     html(U.wind.querySelector('.v'), `${Math.round(nrWindKmh(S) / 5) * 5} KM/H`);
     // the sky: his speed and height
     set(U.speed, 'opacity', (sky ? MathX.smooth(S, 12.6, 13.0) : 0).toFixed(3)); set(U.alt, 'opacity', (sky ? MathX.smooth(S, 12.7, 13.1) : 0).toFixed(3));
@@ -209,6 +209,7 @@ const FILM = {
     // tags pinned to things
     const V = this._tv || (this._tv = new THREE.Vector3()), P = app.props, St = app.storm;
     let A = null, B = null, C = null, D = null, line = '';
+    if (S > NR.walk[0] + 0.05 && S < 5.4 && app.roof.kiteG.visible) A = [this._proj(cam, V.copy(app.roof.kiteG.position).add({ x: 0, y: 0.5, z: 0 })), 'KITE · <b>NO LIFT</b>', 'right'];
     if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8)), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
     if (S > NR.drop.rel + 0.1 && S < NR.cut0 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: 0, y: 0.3, z: 0 })), 'NORMAL AIR', 'left'];
     if (sky) {
@@ -221,10 +222,11 @@ const FILM = {
     if (S > NR.pop + 0.3 && S < NR.pop + 1.5) C = [this._proj(cam, St.ghostAt(S, V).add({ x: 0, y: 0.4, z: 0 })), 'NORMAL AIR', 'left'];
     // the storm: the rain (water) is still blown; the sheets aren't; soot falls while steam blows
     if (S > NR.gale[0] + 0.7 && S < 27.4) B = [this._proj(cam, V.set(cam.position.x - 3.2, cam.position.y + 0.3, cam.position.z - 1.4)), 'RAIN IS WATER · <b>STILL BLOWN</b>'];
-    if (S > NR.gale[0] + 1.3 && S < 29.4 && app.roof.ghostSheet.m.visible) D = [this._proj(cam, V.copy(app.roof.sheets[0].m.position).add({ x: -0.4, y: 0.25, z: -1.0 })), 'NORMAL AIR', 'left'];
+    if (S > NR.gale[0] + 1.3 && S < 27.9 && app.roof.ghostSheet.m.visible) D = [this._proj(cam, V.copy(app.roof.sheets[0].m.position).add({ x: -0.4, y: 0.25, z: -1.0 })), 'NORMAL AIR', 'left'];
     if (S > 27.5 && S < 29.9) A = [this._proj(cam, V.copy(app.roof.flue).add({ x: 0, y: 0.6, z: 0 })), 'SOOT FALLS · <b>STEAM BLOWS</b>', 'right'];
     if (S > NR.balloon + 0.3 && S < NR.cloud - 0.2) B = [this._proj(cam, app.balloons.centre(S, V).add({ x: 0, y: 0.6, z: 0 })), `BUOYANCY, NO DRAG · <b>${Math.round(app.balloons.speed(S) * 3.6)}</b> KM/H`];
     if (S > NR.drop.rel - 0.05 && S < NR.drop.rel + 0.55) line = 'SLOW MOTION ×0.6';
+    if (S > NR.inDoor - 1.0 && S < 40.45) line = 'ICE: <b>STRAIGHT DOWN</b> · RAIN: BLOWN';
     for (const [el, T] of [[U.tagA, A], [U.tagB, B], [U.tagC, C], [U.tagD, D]]) this._tag(el, T && T[0], T && T[1], !!T, (T && T[2]) || '');
     html(U.line, line ? `<span>${line}</span>` : ''); set(U.line, 'opacity', line ? '1' : '0');
     set(U.line, 'top', S > NR.drop.up && S < NR.cut0 ? 'calc(var(--u) * 1720)' : '');   // (in the drop: low, below the ball)
@@ -244,7 +246,7 @@ const FILM = {
       p.smear.set(MathX.clamp(yr / hfov * 0.005, -0.02, 0.02), MathX.clamp(-pr / vf * 0.005, -0.02, 0.02));
     }
     // a flicker of white when something breaks near you
-    for (const t of [...NR_ROOF_HITS.panes, NR_ROOF_HITS.pot]) p.flash += 0.06 * MathX.impulse(S, t, 0.05);
+    for (const t of [NR_ROOF_HITS.bottles, NR_ROOF_HITS.cake, NR_ROOF_HITS.pot]) p.flash += 0.05 * MathX.impulse(S, t, 0.05);
     // the end: a touch darker so the closing lines read
     const endK = MathX.smooth(S, NR.line[0] - 0.4, NR.line[0] + 0.6); p.exposure -= 0.12 * endK; p.vignette += 0.2 * endK;
     if (S >= NR.black) p.fade = 1;

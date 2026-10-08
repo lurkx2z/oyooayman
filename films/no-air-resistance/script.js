@@ -36,7 +36,7 @@ const NR = {
 };
 
 // the roof: a five-storey building on your side of the avenue (x 12.5–30.5, z −21.6…3.0), its deck 21.4 m up. Everything is
-// laid out round the view from the stair door (looking −x, across the roof to the street): the table, the skylight, the
+// laid out round the view from the stair door (looking −x, across the roof to the street): the table, the
 // washing line (across the wind), the chimney, the kite flown from the front corner
 const NR_ROOF = {
   y: 21.4, x0: 12.5, x1: 30.5, z0: -21.6, z1: 3.0, par: 1.05, parT: 0.3,
@@ -44,20 +44,21 @@ const NR_ROOF = {
   line: [[13.8, 1.6], [18.6, -3.2]],                    // the washing line (across the wind)
   table: { x: 21.2, z: -0.2, len: 2.2, w: 0.95 },       // (its long side along x)
   chimney: { x: 16.8, z: 1.9, w: 0.9, h: 3.0 },
-  skylight: { x: 23.9, z: -1.6, w: 1.5, d: 2.2, h: 0.5 },
+  skylight: { x: 24.0, z: -4.9, w: 1.5, d: 2.2, h: 0.4 },     // (off to the left of the door's view)
   platform: { x: 20.55, z: 0.0, w: 4.9, d: 4.4 },        // the timber platform under the party
   flyer: [13.9, 2.3],                                    // the kite flyer, at the front corner
 };
 
 // what the ice breaks while you watch from the doorway (story s)
-const NR_ROOF_HITS = { panes: [40.35, 42.9], bunting: [41.6, 48.8], lights: 44.2, line: 46.5, pot: 50.6 };
+// (the skylight's panes go while you're getting into the doorway: heard, off to your left)
+const NR_ROOF_HITS = { panes: [38.25, 39.05], bottles: 40.35, cake: 42.9, bunting: [41.6, 48.8], lights: 44.2, line: 46.5, pot: 50.6 };
 
 // the cuts: the opening take, the drop (at 0.6×), the sky, the roof
 CONFIG.edit = [[0, NR.drop.rel - 0.05], [NR.drop.rel - 0.05, NR.drop.rel + 2.55, 0.6], [NR.drop.rel + 2.55, NR.cut0], [NR.sky[0], CONFIG.duration]];
 
-// where you stand: the stair door (the opening), leaning over the front parapet (the drop), the confetti, the storm, the
+// where you stand: the stair door (the opening), leaning out over the front parapet (the drop), the confetti, the storm, the
 // spot by the door where the ice finds you, inside the doorway
-const NR_CAM = { x0: 26.1, z0: -0.75, xP: 12.45, zP: -2.4, xC: 25.8, zC: -6.3, xG: 25.2, zG: -2.9, xD: 25.6, zD: -1.9, xIn: 28.25, zIn: -0.8 };
+const NR_CAM = { x0: 26.1, z0: -0.75, xP: 12.3, zP: -2.4, xC: 25.8, zC: -6.3, xG: 25.0, zG: -3.75, xD: 25.6, zD: -1.9, xIn: 28.25, zIn: -0.8 };
 
 const SCRIPT = {
   meta: { title: 'WHAT IF AIR RESISTANCE SUDDENLY DISAPPEARED?', wav: 'no-air-resistance-soundtrack.wav' },
@@ -80,7 +81,7 @@ const SCRIPT = {
   // your head (story time). yaw: + turns left, 0 = down the avenue (−Z), 90 = facing the street (−X). pitch: + up.
   camera: {
     baseY: NR_ROOF.y,
-    x: [[0, NR_CAM.x0], [NR.walk[0] - 0.001, NR_CAM.x0 - 0.5], [NR.walk[0], NR_CAM.xP + 0.25, 'step'], [5.2, NR_CAM.xP, 'inOutSine'], [NR.cut0, NR_CAM.xP],
+    x: [[0, NR_CAM.x0], [NR.walk[0] - 0.001, NR_CAM.x0 - 0.5], [NR.walk[0], NR_CAM.xP + 0.05, 'step'], [5.2, NR_CAM.xP, 'inOutSine'], [NR.drop.up, NR_CAM.xP - 0.08, 'inOutSine'], [NR.cut0, NR_CAM.xP - 0.08],
       [20.4, NR_CAM.xC, 'step'], [24.2, NR_CAM.xC], [26.4, NR_CAM.xG, 'inOutSine'], [32.6, NR_CAM.xG], [34.0, NR_CAM.xD, 'inOutSine'], [NR.ice0 + 0.25, NR_CAM.xD],
       [37.9, 26.3, 'inOutSine'], [38.9, NR_CAM.xIn, 'inOutSine'], [44.0, NR_CAM.xIn], [48.0, NR_CAM.xIn - 0.45, 'inOutSine'], [NR.quiet + 0.5, NR_CAM.xIn - 0.45],
       [NR.quiet + 2.2, 27.0, 'inOutSine'], [NR.quiet + 4.6, 25.9, 'inOutSine'], [61.4, 25.8]],
@@ -89,28 +90,28 @@ const SCRIPT = {
       [37.9, -0.85, 'inOutSine'], [38.9, NR_CAM.zIn, 'inOutSine'], [61.4, NR_CAM.zIn]],
     height: [[0, 1.68], [NR.walk[0] - 0.001, 1.68], [NR.walk[0], 1.5, 'step'], [NR.cut0, 1.45], [20.4, 1.68, 'step'], [61.4, 1.68]],
     yaw: [[0, 88], [NR.loss, 87], [2.6, 83, 'inOutSine'], [3.3, 85], [NR.walk[0] - 0.001, 86],
-      [NR.walk[0], 62, 'step'], [5.0, 64], [6.1, 90, 'inOutSine'], [NR.cut0, 90],
+      [NR.walk[0], 59, 'step'], [5.0, 61], [6.1, 90, 'inOutSine'], [NR.cut0, 90],
       // (12.4–20.4: the sky cut-away has its own camera)
-      [20.4, 127, 'step'], [24.2, 126], [26.4, 110, 'inOutSine'], [28.6, 106], [29.8, 118, 'inOutSine'], [30.4, 124], [32.6, 122],
+      [20.4, 127, 'step'], [24.2, 126], [26.4, 99, 'inOutSine'], [27.4, 98], [28.4, 115, 'inOutSine'], [29.8, 118], [30.4, 124, 'inOutSine'], [32.6, 122],
       [34.2, 92, 'inOutSine'], [NR.ice0, 90], [37.3, 86, 'inOutSine'], [37.9, 92], [38.9, 90, 'inOutSine'],
       [40.1, 90], [40.5, 85, 'inOutSine'], [41.5, 87], [41.9, 92, 'inOutSine'], [43.0, 86, 'inOutSine'], [44.0, 90], [46.3, 91], [46.7, 94, 'inOutSine'], [48.6, 92], [50.4, 94], [50.9, 99, 'inOutSine'], [52.5, 95],
-      [NR.quiet + 0.5, 92], [NR.quiet + 4.6, 97, 'inOutSine'], [61.4, 98]],
-    pitch: [[0, 6], [NR.loss, 6], [2.7, 3, 'inOutSine'], [NR.walk[0] - 0.001, 4],
-      [NR.walk[0], -60, 'step'], [5.0, -58], [6.1, -48, 'inOutSine'], [NR.drop.rel, -50], [NR.drop.rel + 0.9, -62, 'inOutSine'], [NR.cut0, -63],
+      [NR.quiet + 0.5, 92], [NR.quiet + 4.6, 87, 'inOutSine'], [61.4, 81, 'inOutSine']],
+    pitch: [[0, 15], [1.8, 6, 'inOutSine'], [NR.loss, 6], [2.7, 3, 'inOutSine'], [NR.walk[0] - 0.001, 4],
+      [NR.walk[0], -75, 'step'], [5.0, -73], [6.1, -50, 'inOutSine'], [NR.drop.rel, -52], [NR.drop.rel + 1.3, -85, 'inOutSine'], [NR.cut0, -86],
       [20.4, 10, 'step'], [21.0, 10], [21.7, 30, 'inOutSine'], [22.5, 31], [23.3, -6, 'inOutCubic'], [24.2, -4], [26.4, 2, 'inOutSine'], [30.4, 3], [30.7, 8], [32.0, 52, 'inOutCubic'], [33.0, 62], [33.5, 62],
       [34.4, 14, 'inOutSine'], [NR.ice0 - 0.1, 12], [37.25, -14, 'inOutCubic'], [37.9, -8], [38.9, 2, 'inOutSine'],
-      [44.0, 3], [44.4, 8, 'inOutSine'], [45.4, 7], [46.0, 3, 'inOutSine'], [NR.quiet, 2], [NR.quiet + 4.6, -6, 'inOutSine'], [61.4, -6]],
-    fov: [[0, 72], [NR.walk[0] - 0.001, 72], [NR.walk[0], 66, 'step'], [NR.drop.rel + 0.3, 66], [NR.drop.rel + 2.1, 46, 'inOutSine'], [NR.cut0, 45],
+      [44.0, 3], [44.4, 8, 'inOutSine'], [45.4, 7], [46.0, 3, 'inOutSine'], [NR.quiet, 2], [NR.quiet + 4.6, -3, 'inOutSine'], [61.4, -1, 'inOutSine']],
+    fov: [[0, 72], [NR.walk[0] - 0.001, 72], [NR.walk[0], 66, 'step'], [NR.drop.rel + 0.3, 66], [NR.drop.rel + 2.1, 42, 'inOutSine'], [NR.cut0, 41],
       [20.4, 66, 'step'], [34.4, 66], [35.2, 70, 'inOutSine'], [37.9, 70], [38.9, 68], [61.4, 68]],
     tilt: [[0, 0], [61.4, 0]],
-    startles: [[NR.loss + 0.15, 0.35], [NR.pop, 0.25], [NR.ice0 + 0.02, 0.7], [37.45, 0.45], [NR_ROOF_HITS.panes[0], 0.35], [NR_ROOF_HITS.panes[1], 0.3], [NR_ROOF_HITS.line, 0.25], [NR_ROOF_HITS.pot, 0.3]],
+    startles: [[NR.loss + 0.15, 0.35], [NR.pop, 0.25], [NR.ice0 + 0.02, 0.7], [37.45, 0.45], [NR_ROOF_HITS.panes[0], 0.2], [NR_ROOF_HITS.bottles, 0.35], [NR_ROOF_HITS.cake, 0.3], [NR_ROOF_HITS.line, 0.25], [NR_ROOF_HITS.pot, 0.3]],
     shakes: [[NR.ice0, 0.3, 0.5], [40.0, 0.08, 13.4]],
   },
 
   // your hands: a sheet of paper (right) and a tennis ball (left), held out over the parapet and let go together
   hands: {
-    right: [[0, 'hidden'], [NR.drop.up + 0.1, 'holdPaperR'], [NR.drop.rel, 'openR'], [NR.cut0, 'hidden'], [NR.ice0 + 0.05, 'hidden'], [NR.ice0 + 0.3, 'shieldR'], [38.7, 'hidden']],
-    left: [[0, 'hidden'], [NR.drop.up, 'holdBallL'], [NR.drop.rel, 'openL'], [NR.cut0, 'hidden']],
+    right: [[0, 'hidden'], [NR.drop.up + 0.1, 'holdPaperR'], [NR.drop.rel, 'openR'], [NR.drop.rel + 0.4, 'hidden'], [NR.ice0 + 0.05, 'hidden'], [NR.ice0 + 0.3, 'shieldR'], [38.7, 'hidden']],
+    left: [[0, 'hidden'], [NR.drop.up, 'holdBallL'], [NR.drop.rel, 'openL'], [NR.drop.rel + 0.4, 'hidden']],
   },
 
   tracks: {
