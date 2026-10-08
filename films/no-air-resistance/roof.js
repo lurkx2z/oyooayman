@@ -10,14 +10,17 @@
    down and hang, the kite drops into the street (it, its tail and its
    string all fall together, keeping their shape), and the soot in the
    smoke can't ride the air any more: what is already out falls out of the
-   plume, what comes out next pours back down round the chimney, while the
-   steam (water droplets) keeps streaming with the wind.
+   plume and no more can be lifted up the flue, while the steam (water
+   droplets) keeps streaming with the wind: the smoke turns white.
    From NR_ICE.first the cloud's ice lands: holes punched in the sheets and
-   the tablecloth (more and bigger as more of the ice lands), the deck
-   whitening with ice powder, and one thing after another broken while
-   you watch from the doorway (NR_ROOF_HITS): the bottles, the bunting's
-   strings, the cake, the fairy lights, a sheet's pegs, the chimney pot
-   (and, off to your left as you get in, the skylight's panes).
+   the tablecloth (more and bigger as more of the ice lands, until they are
+   rags), the deck whitening with ice powder, and one thing after another
+   broken while you watch from the doorway (NR_ROOF_HITS): the cups, the
+   bottles, the bunting's strings, the cake, the fairy lights, the sheets'
+   pegs, the chairs, the chimney pot, the table (and, off to your left as
+   you get in, the skylight's panes). From NR.roofHit the stair housing's
+   timber roof over you is punched through: holes, light coming through
+   them, ice and splinters falling inside.
    ===================================================================== */
 
 // how much ice powder lies on upward faces (0..1); set per frame
@@ -55,7 +58,7 @@ const NR_HOLES_GLSL = `
       float t = nrH(cc);
       if (t < uLanded * 0.95) {
         vec2 o = vec2(nrH(cc + 3.1), nrH(cc + 7.7));
-        float r = (0.12 + 0.2 * nrH(cc + 11.3)) * (0.7 + 0.75 * uLanded), d = length(vec2(float(i), float(j)) + o - f);
+        float r = (0.12 + 0.2 * nrH(cc + 11.3)) * (0.7 + 1.25 * uLanded), d = length(vec2(float(i), float(j)) + o - f);
         m = max(m, 1.0 - smoothstep(r * 0.82, r, d)); ring = max(ring, 1.0 - smoothstep(r, r * 1.5, d));
       }
     }
@@ -66,6 +69,45 @@ const NR_HOLES_GLSL = `
       m = max(m, 1.0 - smoothstep(r * 0.8, r, d)); ring = max(ring, 1.0 - smoothstep(r, r * 1.6, d)); }
     return m;
   }`;
+
+// the stair housing's roof (felt on timber) punched through by the ice: [x, z, time, radius]. They come faster and faster
+// (the flux and the speed are both rising); none right over where you stand
+const NR_HUT_HOLES = (() => {
+  const H = NR_ROOF.hut, out = [], r = new RNG(6161), n = 60;
+  for (let i = 0; out.length < n && i < 2000; i++) {
+    const x = r.range(H.x0 + 0.3, H.x1 - 0.3), z = r.range(H.z0 + 0.3, H.z1 - 0.3);
+    if (Math.hypot(x - 27.0, z + 0.8) < 0.45 || Math.hypot(x - 28.0, z + 0.8) < 0.55) continue;
+    if (out.some((h) => Math.hypot(h[0] - x, h[1] - z) < 0.22)) continue;
+    const k = out.length / n, t = NR.roofHit + (NR.quiet - 0.1 - NR.roofHit) * Math.pow(k, 0.72);
+    out.push([x, z, t, r.range(0.05, 0.11)]);
+  }
+  // the first ones just in front of you (you have backed in to x ≈ 27.9, facing the door), so you see them come through
+  out[0] = [27.3, -0.62, NR.roofHit, 0.1]; out[1] = [27.1, -1.08, NR.roofHit + 0.3, 0.09]; out[2] = [27.5, -1.18, NR.roofHit + 0.55, 0.085]; out[3] = [26.95, -0.45, NR.roofHit + 0.85, 0.08];
+  return out;
+})();
+const NR_HOLES_ROOF_GLSL = `
+  uniform vec4 uHoles[${60}]; uniform float uS;
+  float nrRoofHole(vec2 p, out float rim) {
+    float m = 0.0; rim = 0.0;
+    for (int i = 0; i < ${60}; i++) { vec4 h = uHoles[i]; if (uS < h.z) continue;
+      float r = h.w * (0.6 + 0.4 * smoothstep(h.z, h.z + 0.08, uS)), d = length(p - h.xy);
+      float th = atan(p.y - h.y, p.x - h.x), jag = 0.8 + 0.1 * sin(th * 3.0 + h.z * 17.0) + 0.07 * sin(th * 5.0 + h.x * 23.0) + 0.05 * sin(th * 11.0 + h.y * 31.0);
+      m = max(m, 1.0 - step(r * jag, d)); rim = max(rim, 1.0 - smoothstep(r * jag, r * jag * 1.9, d)); }
+    return m; }`;
+// patch a material so the hut roof's holes cut through it (world xz)
+function nrHoley(mat, key) {
+  const U = { uHoles: { value: NR_HUT_HOLES.map((h) => new THREE.Vector4(h[0], h[1], h[2], h[3])) }, uS: { value: 0 } };
+  mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, U);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;').replace('#include <project_vertex>', '#include <project_vertex>\nvHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;' + NR_HOLES_ROOF_GLSL)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        { float rim; if (nrRoofHole(vHoleW.xz, rim) > 0.5) discard; diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.3, 0.24, 0.18), rim * 0.85); }`);
+  };
+  mat.customProgramCacheKey = () => key;
+  mat.userData.holes = U;
+  return mat;
+}
 
 class NrRoof {
   constructor(app) {
@@ -141,17 +183,21 @@ class NrRoof {
     B.box(t, h, dz0 - H.z0, H.x0 + t / 2, y + h / 2, (H.z0 + dz0) / 2, this.m.hutWall);
     B.box(t, h, H.z1 - dz1, H.x0 + t / 2, y + h / 2, (H.z1 + dz1) / 2, this.m.hutWall);
     B.box(t, h - H.doorH, H.doorW, H.x0 + t / 2, y + H.doorH + (h - H.doorH) / 2, H.door, this.m.hutWall);
-    // the door frame and the door, swung open against the wall (hinged on the near side)
+    // the door frame and the door, swung right round flat against the outside wall (hinged on the left)
     for (const z of [dz0, dz1]) B.box(t + 0.06, H.doorH, 0.07, H.x0 + t / 2, y + H.doorH / 2, z, this.m.dark);
     B.box(t + 0.06, 0.08, H.doorW + 0.1, H.x0 + t / 2, y + H.doorH + 0.04, H.door, this.m.dark);
-    B.add(new THREE.BoxGeometry(0.05, H.doorH - 0.04, H.doorW - 0.06), this.m.dark, Geo.matrix(H.x0 - (H.doorW - 0.06) / 2 * Math.sin(1.45), y + H.doorH / 2, dz1 + (H.doorW - 0.06) / 2 * Math.cos(1.45), 0, 1.45, 0));
-    // roof slab
-    B.box(H.x1 - H.x0 + 0.3, 0.18, H.z1 - H.z0 + 0.3, (H.x0 + H.x1) / 2 - 0.1, y + h + 0.09, zc, this.m.hutRoof);
+    B.box(t + 0.1, 0.1, H.doorW + 0.16, H.x0 + t / 2, y + H.doorH + 0.05, H.door, this.m.hutWall);      // (the lintel, closing the corner)
+    B.add(new THREE.BoxGeometry(0.05, H.doorH - 0.04, H.doorW - 0.06), this.m.dark, Geo.matrix(H.x0 - 0.04, y + H.doorH / 2, dz1 + (H.doorW - 0.06) / 2 + 0.04));
+    // the roof (felt on timber) and the ceiling under it: separate, so the ice can punch holes through them
+    const slab = new THREE.Mesh(new THREE.BoxGeometry(H.x1 - H.x0 + 0.3, 0.18, H.z1 - H.z0 + 0.3), nrHoley(new THREE.MeshStandardMaterial({ color: '#4d4a46', roughness: 0.9 }), 'nrHoleSlab'));
+    slab.position.set((H.x0 + H.x1) / 2 - 0.1, y + h + 0.09, zc); slab.castShadow = true; slab.receiveShadow = true; this.app.scene.add(slab);
+    const ceil = new THREE.Mesh(new THREE.BoxGeometry(H.x1 - H.x0 - 2 * t, 0.02, H.z1 - H.z0 - 2 * t), nrHoley(new THREE.MeshStandardMaterial({ color: '#a89c88', roughness: 0.95 }), 'nrHoleCeil'));
+    ceil.position.set((H.x0 + H.x1) / 2, y + h - 0.01, zc); this.app.scene.add(ceil);
+    this.holeU = [slab.material.userData.holes, ceil.material.userData.holes];
     // inside: a dim stairwell (floor, inner walls, the first steps down)
     B.add(Geo.flat(H.x0 + t, H.x1 - t, H.z0 + t, H.z1 - t, y + 0.01, 1), this.m.inside, null, { noShadow: true });
     B.box(0.02, h - 0.02, H.z1 - H.z0 - 2 * t, H.x1 - t - 0.01, y + h / 2, zc, this.m.inside, 0, { noShadow: true });
     for (const z of [H.z0 + t + 0.01, H.z1 - t - 0.01]) B.box(H.x1 - H.x0 - 2 * t, h - 0.02, 0.02, (H.x0 + H.x1) / 2, y + h / 2, z, this.m.inside, 0, { noShadow: true });
-    B.box(H.x1 - H.x0 - 2 * t, 0.02, H.z1 - H.z0 - 2 * t, (H.x0 + H.x1) / 2, y + h - 0.01, zc, this.m.inside, 0, { noShadow: true });
     // the lamp over the door (a warm bulkhead light)
     const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.26), new THREE.MeshStandardMaterial({ color: '#ffe3b0', emissive: '#ffcf87', emissiveIntensity: 1.6 }));
     lamp.position.set(H.x0 - 0.06, y + H.doorH + 0.32, H.door); this.app.scene.add(lamp);
@@ -176,10 +222,6 @@ class NrRoof {
     B.box(C.w + 0.14, 0.12, C.w + 0.14, C.x, y + C.h + 0.06, C.z, this.m.coping);
     this.potM = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.17, 0.42, 12), this.m.pot); this.potM.position.set(C.x, y + C.h + 0.33, C.z); this.potM.castShadow = true; this.app.scene.add(this.potM);
     this.flue = new THREE.Vector3(C.x, y + C.h + 0.56, C.z);
-    // the soot that pours back down (a black heap that grows round the chimney's foot)
-    const pm = new THREE.MeshStandardMaterial({ color: '#141210', roughness: 1 });
-    this.pile = new THREE.Mesh(new THREE.ConeGeometry(1, 1, 20, 1, true), pm); this.pile.position.set(C.x, y, C.z); this.pile.visible = false; this.pile.receiveShadow = true; this.app.scene.add(this.pile);
-    this.cap = new THREE.Mesh(new THREE.BoxGeometry(C.w + 0.16, 0.02, C.w + 0.16), pm); this.cap.position.set(C.x, y + C.h + 0.125, C.z); this.cap.visible = false; this.app.scene.add(this.cap);
   }
   // the skylight over the stairs below: a low frame with two glass panes (they break when the ice gets to them)
   _skylightBuild() {
@@ -194,34 +236,49 @@ class NrRoof {
     const gm = new THREE.MeshStandardMaterial({ color: '#c4d6e2', roughness: 0.06, metalness: 0.25, transparent: true, opacity: 0.42 });
     this.panes = [-1, 1].map((s, i) => { const p = new THREE.Mesh(new THREE.BoxGeometry(K.w - 0.1, 0.02, K.d / 2 - 0.08), gm); p.position.set(K.x, y + K.h + 0.01, K.z + s * K.d / 4); this.app.scene.add(p); return { p, s, i }; });
   }
-  // the party table (its long side along x), a cake, plates, cups, bottles, a speaker; four folding chairs
+  // the party table (its long side along x), a cake, plates, cups, bottles, a speaker; four folding chairs. The table and
+  // the chairs are groups of their own (the ice brings them down); the cups are loose (it knocks them off)
   _tableBuild() {
-    const T = NR_ROOF.table, y = NR_ROOF.y + 0.04, B = this.B, top = y + 0.74, hl = T.len / 2, hw = T.w / 2;
-    for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) B.box(0.05, 0.72, 0.05, T.x + dx * (hl - 0.1), y + 0.36, T.z + dz * (hw - 0.08), this.m.dark);
-    B.box(T.len, 0.03, T.w, T.x, top - 0.015, T.z, this.m.wood);
+    const T = NR_ROOF.table, y = NR_ROOF.y + 0.04, top = y + 0.74, hl = T.len / 2, hw = T.w / 2;
     this.tableTop = top + 0.012;
+    const tg = new THREE.Group(); tg.position.set(T.x, y, T.z); this.app.scene.add(tg); this.tableG = tg;
+    const legs = new THREE.Group(); tg.add(legs); this.legsG = legs;
+    const lb = new Batcher(), tb = new Batcher();
+    for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) lb.box(0.05, 0.72, 0.05, dx * (hl - 0.1), 0.36, dz * (hw - 0.08), this.m.dark);
+    lb.build(legs, 'tableLegs');
+    tb.box(T.len, 0.03, T.w, 0, 0.725, 0, this.m.wood);
     const red = nrIcy(new THREE.MeshStandardMaterial({ color: '#c8352b', roughness: 0.5 })), green = nrIcy(new THREE.MeshStandardMaterial({ color: '#2f6b46', roughness: 0.25, metalness: 0.2 })), icing = this.m.white;
-    const yt = this.tableTop;
+    const yt = this.tableTop, ly = yt - y;      // (local height of the table's top surface)
     const cake = new THREE.Group(), cm = (g, m, x, yy, z) => { const q = new THREE.Mesh(g, m); q.position.set(x, yy, z); q.castShadow = true; cake.add(q); };
     cm(new THREE.CylinderGeometry(0.17, 0.17, 0.12, 20), new THREE.MeshStandardMaterial({ color: '#f3e3cf', roughness: 0.6 }), T.x + 0.1, yt + 0.06, T.z - 0.05);
     cm(new THREE.CylinderGeometry(0.175, 0.175, 0.03, 20), icing, T.x + 0.1, yt + 0.135, T.z - 0.05);
     for (let k = 0; k < 5; k++) cm(new THREE.CylinderGeometry(0.006, 0.006, 0.07, 5), new THREE.MeshStandardMaterial({ color: ['#e8c34a', '#6fb6e0', '#e86f9f'][k % 3] }), T.x + 0.1 + 0.1 * Math.cos(k * 1.26), yt + 0.18, T.z - 0.05 + 0.1 * Math.sin(k * 1.26));
     this.app.scene.add(cake); this.cake = cake; this.cakeAt = [T.x + 0.1, yt, T.z - 0.05];
-    // what's left of it once the ice has been through: a flattened smear
-    this.cakeMess = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 0.025, 14), new THREE.MeshStandardMaterial({ color: '#efe2cf', roughness: 0.8 })); this.cakeMess.position.set(T.x + 0.1, yt + 0.0125, T.z - 0.05); this.cakeMess.visible = false; this.app.scene.add(this.cakeMess);
-    B.add(new THREE.CylinderGeometry(0.12, 0.1, 0.06, 16), icing, Geo.matrix(T.x - 0.6, yt + 0.03, T.z + 0.2));
-    for (const [dx, dz] of [[-0.75, -0.3], [-0.95, -0.2], [0.75, 0.3], [0.9, 0.12], [0.85, -0.3], [-0.2, 0.3]]) B.add(new THREE.CylinderGeometry(0.045, 0.035, 0.12, 12), red, Geo.matrix(T.x + dx, yt + 0.06, T.z + dz));
+    // what's left of it once the ice has been through: a flattened smear (on the table, so it goes down with it)
+    this.cakeMess = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 0.025, 14), new THREE.MeshStandardMaterial({ color: '#efe2cf', roughness: 0.8 })); this.cakeMess.position.set(0.1, ly + 0.0125, -0.05); this.cakeMess.visible = false; tg.add(this.cakeMess);
+    tb.add(new THREE.CylinderGeometry(0.12, 0.1, 0.06, 16), icing, Geo.matrix(-0.6, ly + 0.03, 0.2));
+    tb.box(0.12, 0.24, 0.16, 0.5, ly + 0.12, 0.25, this.m.dark);
+    tb.build(tg, 'table');
+    // the cups: knocked off one by one (each flies off the way the stone sent it and lands on the deck)
+    const cg = new THREE.CylinderGeometry(0.045, 0.035, 0.12, 12);
+    this.cups = [[-0.75, -0.3], [-0.95, -0.2], [0.75, 0.3], [0.9, 0.12], [0.85, -0.3], [-0.2, 0.3]].map(([dx, dz], i) => {
+      const m = new THREE.Mesh(cg, red); m.position.set(T.x + dx, yt + 0.06, T.z + dz); m.castShadow = true; this.app.scene.add(m);
+      const [c0, c1] = NR_ROOF_HITS.cups, h = (k) => hash1(i * 31 + k);
+      return { m, p0: m.position.clone(), t: c0 + (c1 - c0) * (i + 0.3 * h(1)) / 6, a: h(2) * 6.283, v: 2.2 + 2.5 * h(3), vy: 1.5 + 2.0 * h(4), w: 8 + 10 * h(5) };
+    });
     this.bottles = new THREE.Group();
     for (const [dx, dz] of [[-0.25, 0.05], [-0.32, 0.15]]) for (const [g, h] of [[new THREE.CylinderGeometry(0.04, 0.04, 0.24, 10), 0.12], [new THREE.CylinderGeometry(0.015, 0.02, 0.08, 8), 0.28]]) { const q = new THREE.Mesh(g, green); q.position.set(T.x + dx, yt + h, T.z + dz); q.castShadow = true; this.bottles.add(q); }
     this.app.scene.add(this.bottles); this.bottlesAt = [T.x - 0.285, yt, T.z + 0.1];
-    B.box(0.12, 0.24, 0.16, T.x + 0.5, yt + 0.12, T.z + 0.25, this.m.dark);
-    // four folding chairs (white), on the long sides
-    for (const [dx, dz, ry] of [[-0.55, -0.85, 0], [0.5, -0.85, 0], [-0.4, 0.85, Math.PI], [0.6, 0.85, Math.PI]]) {
-      const cx = T.x + dx, cz = T.z + dz;
-      B.box(0.42, 0.04, 0.42, cx, y + 0.45, cz, this.m.white, ry);
-      B.add(new THREE.BoxGeometry(0.42, 0.42, 0.04), this.m.white, Geo.matrix(cx, y + 0.68, cz + (ry ? 0.2 : -0.2), 0, ry, 0));
-      for (const [lx, lz] of [[-0.18, -0.18], [0.18, -0.18], [-0.18, 0.18], [0.18, 0.18]]) B.box(0.03, 0.45, 0.03, cx + lx, y + 0.225, cz + lz, this.m.galv);
-    }
+    // four folding chairs (white), on the long sides; each pivots on its back feet when it goes over
+    this.chairs = [[-0.55, -0.85, 0], [0.5, -0.85, 0], [-0.4, 0.85, Math.PI], [0.6, 0.85, Math.PI]].map(([dx, dz, ry], i) => {
+      const g = new THREE.Group(), inner = new THREE.Group(), cb = new Batcher(), back = -0.21;
+      g.rotation.order = 'YXZ'; g.rotation.y = ry; g.position.set(T.x + dx + Math.sin(ry) * back, y, T.z + dz + Math.cos(ry) * back); inner.position.z = -back; g.add(inner);
+      cb.box(0.42, 0.04, 0.42, 0, 0.45, 0, this.m.white);
+      cb.add(new THREE.BoxGeometry(0.42, 0.42, 0.04), this.m.white, Geo.matrix(0, 0.68, -0.2));
+      for (const [lx, lz] of [[-0.18, -0.18], [0.18, -0.18], [-0.18, 0.18], [0.18, 0.18]]) cb.box(0.03, 0.45, 0.03, lx, 0.225, lz, this.m.galv);
+      cb.build(inner, 'chair'); this.app.scene.add(g);
+      return { g, t: NR_ROOF_HITS.chairs[i], dir: i % 2 ? 1 : -1 };
+    });
   }
 
   /* ---------------- cloth: the sheets and the tablecloth ---------------- */
@@ -274,8 +331,9 @@ class NrRoof {
       const U = { uTheta: { value: 1 }, uRip: { value: 1 }, uT: { value: 0 }, uPh: { value: i * 2.1 }, uLimp: { value: 0 }, uLanded: { value: 0 }, uSeed: { value: i + 1 }, map: tex(bg, st) };
       const m = new THREE.Mesh(geo, this._sheetMat(W, H, U, false)); m.quaternion.setFromRotationMatrix(basis); m.position.set(ax + tx * s0, this.lineY, az + tz * s0);
       m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; this.app.scene.add(m);
+      const q0 = m.quaternion.clone();
       for (const f of [0.06, 0.94]) { const peg = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.08, 0.03), this.m.wood); peg.position.set(ax + tx * (s0 + f * W), this.lineY - 0.02, az + tz * (s0 + f * W)); this.app.scene.add(peg); this.pegs.push(peg); }
-      return { m, U, i, s0 };
+      return { m, U, i, s0, q0 };
     });
     const GU = { uTheta: { value: 1.5 }, uRip: { value: 1.6 }, uT: { value: 0 }, uPh: { value: 0.7 }, uLimp: { value: 0 } };
     const gm = this._sheetMat(W, H, GU, true), ghost = new THREE.Mesh(geo, gm); ghost.quaternion.copy(this.sheets[0].m.quaternion); ghost.position.copy(this.sheets[0].m.position); ghost.visible = false; ghost.frustumCulled = false; ghost.renderOrder = 7;
@@ -321,7 +379,8 @@ class NrRoof {
           { float ring; float hole = nrHoles(vUvM, ring); if (hole > 0.5) discard; diffuseColor.rgb *= 1.0 - 0.45 * ring; }`);
     };
     mat.customProgramCacheKey = () => 'nrCloth';
-    const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; this.app.scene.add(m);
+    const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false;
+    m.position.copy(this.tableG.position).negate(); this.tableG.add(m);      // (built in world space; it goes down with the table)
     this.cloth = { m, U };
   }
 
@@ -357,6 +416,7 @@ class NrRoof {
     for (let i = 0; i < nb; i++) { const p = fpt((i + 0.5) / nb); M.makeTranslation(p[0], p[1] - 0.05, p[2]); bi.setMatrixAt(i, M); this.bulbs.push({ p: [p[0], p[1] - 0.05, p[2]], t: NR_ROOF_HITS.lights + 1.6 * hash1(i * 17 + 5) ** 1.3 }); }
     bi.frustumCulled = false; this.app.scene.add(bi); this.bulbM = bi;
     this._q = new THREE.Quaternion(); this._m4 = new THREE.Matrix4(); this._v = new THREE.Vector3(); this._s1 = new THREE.Vector3(1, 1, 1);
+    this._qf = new THREE.Quaternion(); this._xA = new THREE.Vector3(1, 0, 0);
   }
 
   /* ---------------- the kite: flown from the far end of the roof; at the change it drops into the street ---------------- */
@@ -366,7 +426,7 @@ class NrRoof {
     const kg = new THREE.BufferGeometry(); kg.setAttribute('position', new THREE.Float32BufferAttribute([0, 0.5, 0, -0.42, 0.1, 0, 0, -0.75, 0, 0, 0.5, 0, 0, -0.75, 0, 0.42, 0.1, 0], 3));
     kg.setAttribute('uv', new THREE.Float32BufferAttribute([0.5, 1, 0, 0.7, 0.5, 0, 0.5, 1, 0.5, 0, 1, 0.7], 2)); kg.computeVertexNormals();
     const k = new THREE.Mesh(kg, new THREE.MeshStandardMaterial({ map: Tex.tex(c, { repeat: false }), roughness: 0.7, side: THREE.DoubleSide })); g.add(k);
-    this.app.scene.add(g); this.kiteG = g;
+    g.scale.setScalar(1.7); this.app.scene.add(g); this.kiteG = g;      // (a big box kite-sized diamond: it has to read from five storeys up)
     // its tail: bows on a ribbon; and the string (both as line pieces, positions set per frame)
     this.tailN = 10; this.tail = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.16, 0.08), new THREE.MeshStandardMaterial({ color: '#3d8fd9', side: THREE.DoubleSide, roughness: 0.8 }), this.tailN); this.tail.frustumCulled = false; this.app.scene.add(this.tail);
     const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(41 * 3), 3));
@@ -385,6 +445,8 @@ class NrRoof {
     this.pops = new BillboardSystem(this.app.scene, 64, true);
     this.steam = new BillboardSystem(this.app.scene, 520, false); this.steam.uniforms.uLight.value = 0.9;
     this.soot = new BillboardSystem(this.app.scene, 900, false); this.soot.uniforms.uLight.value = 1.0;
+    this.beams = new StreakSystem(this.app.scene, 1600);
+    this.hutFlash = new BillboardSystem(this.app.scene, 160, true);
   }
 
   /* ---------------- per frame ---------------- */
@@ -393,18 +455,21 @@ class NrRoof {
     const landed = NR_ICE.landed(S);
     NR_ICY.uIce.value = Math.min(1, landed * 1.6);
     // the sheets: lifted ~65° by the 50 km/h wind and flapping; at the change they swing down and back (a pendulum with
-    // nothing to damp it but the cloth) and then hang dead still, whatever the wind does
+    // nothing to damp it but the cloth) and then hang still, whatever the wind does. In the storm the rain (water: still
+    // blown at 110 km/h) drums on them: a lean of ~12° and a shiver. Then the ice shoots their pegs away: each drops
+    // straight down and folds over onto the deck
+    const rk = MathX.smooth(S, NR.gale[0] + 0.4, NR.gale[0] + 1.8) * (1 - MathX.smooth(landed, 0.05, 0.4));
     for (const Sh of this.sheets) {
       const lz = nrLoad(Math.min(S, NR.loss), Sh.i * 3), th0 = 1.05 * Math.min(1.25, lz) + 0.1 * noise1(Math.min(S, NR.loss) * 1.3 + Sh.i, 7);
-      const th = after ? th0 * Math.exp(-0.75 * u) * Math.cos(2.9 * u) : th0;
-      Sh.U.uTheta.value = th; Sh.U.uRip.value = after ? Math.exp(-3.0 * u) : 0.7 + 0.3 * q;
-      Sh.U.uT.value = after ? NR.loss + (1 - Math.exp(-3 * u)) / 3 : S; Sh.U.uLimp.value = after ? MathX.smooth(u, 0.2, 2.0) : 0;
+      const th = after ? th0 * Math.exp(-0.75 * u) * Math.cos(2.9 * u) + rk * (0.21 + 0.035 * noise1(S * 2.3 + Sh.i * 5, 13)) : th0;
+      Sh.U.uTheta.value = th; Sh.U.uRip.value = after ? Math.max(Math.exp(-3.0 * u), 0.075 * rk) : 0.7 + 0.3 * q;
+      Sh.U.uT.value = after ? NR.loss + (1 - Math.exp(-3 * u)) / 3 + 0.55 * Math.max(0, S - NR.gale[0]) : S; Sh.U.uLimp.value = after ? MathX.smooth(u, 0.2, 2.0) : 0;
       Sh.U.uLanded.value = landed;
-      // the middle sheet's pegs are shot away: it drops straight down and folds up on the deck (the others hang on, shot to lace)
-      const ul = Sh.i === 1 ? S - NR_ROOF_HITS.line : -1, top = this.lineY - (ul > 0 ? 0.5 * NR_G * ul * ul : 0), yt = Math.max(Y + 0.08, top);
-      Sh.m.position.y = yt; Sh.m.scale.y = MathX.clamp((yt - Y - 0.03) / 1.7, 0.04, 1);
+      const ul = S - NR_ROOF_HITS.sheets[Sh.i], top = this.lineY - (ul > 0 ? 0.5 * NR_G * ul * ul : 0), fold = MathX.clamp((Y + 1.72 - top) / 1.67);
+      Sh.m.position.y = Math.max(Y + 0.05, top);
+      Sh.m.quaternion.copy(Sh.q0); if (fold > 0) { Sh.m.quaternion.multiply(this._qf.setFromAxisAngle(this._xA, -Math.PI / 2 * fold * fold)); Sh.U.uTheta.value *= 1 - fold; Sh.U.uLimp.value = 1 + 1.5 * fold; }
     }
-    this.pegs.forEach((p, k) => { const ul = k >> 1 === 1 ? S - NR_ROOF_HITS.line : -1; p.position.y = Math.max(Y + 0.06, this.lineY - 0.02 - (ul > 0 ? 0.5 * NR_G * ul * ul : 0)); });
+    this.pegs.forEach((p, k) => { const ul = S - NR_ROOF_HITS.sheets[k >> 1]; p.position.y = Math.max(Y + 0.03, this.lineY - 0.02 - (ul > 0 ? 0.5 * NR_G * ul * ul : 0)); });
     // the ghost sheet: what the 110 km/h storm would do to the first sheet in normal air
     const G = this.ghostSheet, ga = MathX.smooth(S, NR.gale[0] + 0.9, NR.gale[0] + 1.5) * (1 - MathX.smooth(S, 29.4, 29.9));
     G.m.visible = ga > 0.001;
@@ -449,7 +514,7 @@ class NrRoof {
         St.shards(S, t0, [K.x - K.w / 2 + 0.1, K.x + K.w / 2 - 0.1, z0 - K.d / 4 + 0.05, z0 + K.d / 4 - 0.05, Y + K.h], 60, 11 + P.i, Y - 3.0, gl, [-7, 1.0], [0.05, 0.5]);
         St.shards(S, t0, [K.x - K.w / 2 + 0.1, K.x + K.w / 2 - 0.1, z0 - K.d / 4 + 0.05, z0 + K.d / 4 - 0.05, Y + K.h], 26, 21 + P.i, Y + 0.004, gl, [0.5, 3.5], [0.8, 2.6]);
       }
-      const ba = this.bottlesAt, ca = this.cakeAt, tb = NR_ROOF.table, ty = this.tableTop;
+      const ba = this.bottlesAt, ca = this.cakeAt, tb = NR_ROOF.table, tw = S - NR_ROOF_HITS.table, ty = this.tableTop - (tw > 0 ? Math.min(0.68, 0.5 * NR_G * tw * tw) : 0);
       St.shards(S, NR_ROOF_HITS.bottles, [ba[0] - 0.06, ba[0] + 0.06, ba[2] - 0.08, ba[2] + 0.08, ty + 0.15], 46, 41, ty + 0.004, [0.22, 0.48, 0.3], [-1, 3.0], [0.4, 2.2], [0.02, 0.055]);
       St.shards(S, NR_ROOF_HITS.bottles, [ba[0] - 0.06, ba[0] + 0.06, ba[2] - 0.08, ba[2] + 0.08, ty + 0.15], 24, 42, Y + 0.044, [0.22, 0.48, 0.3], [0, 2.6], [1.4, 2.6], [0.02, 0.05]);
       St.shards(S, NR_ROOF_HITS.cake, [ca[0] - 0.12, ca[0] + 0.12, ca[2] - 0.12, ca[2] + 0.12, ty + 0.12], 50, 43, ty + 0.004, [0.95, 0.9, 0.82], [0.2, 2.6], [0.3, 1.6], [0.03, 0.07]);
@@ -457,19 +522,78 @@ class NrRoof {
       const C = NR_ROOF.chimney;
       St.shards(S, NR_ROOF_HITS.pot, [C.x - 0.15, C.x + 0.15, C.z - 0.15, C.z + 0.15, Y + C.h + 0.4], 40, 31, Y + C.h + 0.13, [0.62, 0.34, 0.22], [-1, 3.5], [0.6, 2.4], [0.04, 0.1]);
       St.shards(S, NR_ROOF_HITS.pot, [C.x - 0.15, C.x + 0.15, C.z - 0.15, C.z + 0.15, Y + C.h + 0.4], 30, 32, Y + 0.004, [0.62, 0.34, 0.22], [0, 3.0], [1.4, 3.2], [0.04, 0.1]);
-      St.endBits();
     }
     this.potM.visible = S < NR_ROOF_HITS.pot;
+    this._wreckUpdate(S);
+    this._hutUpdate(S, cam);
+    if (St) St.endBits();      // (the shards' pool: begun above, the hut's splinters added in _hutUpdate)
     this.bottles.visible = S < NR_ROOF_HITS.bottles; this.cake.visible = S < NR_ROOF_HITS.cake; this.cakeMess.visible = !this.cake.visible;
     // the kite (its flyer's hand comes from the people; the kite, its tail and its string fall together after the change)
     this._kiteUpdate(S, u, after);
     // the skylight's panes break when the ice gets to them
     for (const P of this.panes) P.p.visible = S < NR_ROOF_HITS.panes[P.i];
-    // soot: the heap round the chimney's foot (grows with the time it has been pouring back down)
-    const sp = after ? Math.min(1, u / 30) : 0;
-    this.pile.visible = this.cap.visible = after && u > 0.6;
-    if (this.pile.visible) { const r = 0.62 + 0.75 * Math.sqrt(sp), h = 0.05 + 0.32 * Math.sqrt(sp); this.pile.scale.set(r, h, r); this.pile.position.y = Y + h / 2; }
     this._smokeUpdate(S, after, u);
+  }
+
+  // the cups knocked off, the chairs going over, the table giving way (its legs shot through: the top drops and tilts)
+  _wreckUpdate(S) {
+    const Y = NR_ROOF.y;
+    for (const c of this.cups) {
+      const w = S - c.t;
+      if (w <= 0) { c.m.position.copy(c.p0); c.m.rotation.set(0, 0, 0); continue; }
+      const y = c.p0.y + c.vy * w - 0.5 * NR_G * w * w, fl = Y + 0.05, tl = (c.vy + Math.sqrt(c.vy * c.vy + 2 * NR_G * (c.p0.y - fl))) / NR_G, ww = Math.min(w, tl);
+      c.m.position.set(c.p0.x + Math.cos(c.a) * c.v * ww + (w > tl ? Math.cos(c.a) * 0.6 * Math.min(w - tl, 0.5) : 0), Math.max(fl, y), c.p0.z + Math.sin(c.a) * c.v * ww);
+      if (w < tl) c.m.rotation.set(c.w * w, 0, c.w * 0.6 * w); else c.m.rotation.set(Math.PI / 2, c.a, 0);
+    }
+    for (const C of this.chairs) {
+      const w = S - C.t, a = w <= 0 ? 0 : Math.min(1, (w / 0.5) ** 2), bounce = w > 0.5 ? 0.06 * Math.exp(-(w - 0.5) * 9) * Math.abs(Math.sin((w - 0.5) * 22)) : 0;
+      C.g.rotation.x = C.dir * (Math.PI / 2 * a - bounce);
+    }
+    const w = S - NR_ROOF_HITS.table, tg = this.tableG, y0 = NR_ROOF.y + 0.04;
+    this.legsG.visible = w < 0.02;
+    if (w <= 0) { tg.position.y = y0; tg.rotation.set(0, 0, 0); }
+    else { const d = Math.min(0.68, 0.5 * NR_G * w * w), k = d / 0.68; tg.position.y = y0 - d; tg.rotation.set(0.11 * k, 0, -0.06 * k); }
+  }
+
+  // the stair housing's roof: holes (set in its shader), the light coming through them (seen in the melt-water mist), the
+  // splinters and ice falling inside, and more ice coming in through the holes once they're open
+  _hutUpdate(S, cam) {
+    for (const U of this.holeU) U.uS.value = S;
+    const St = this.app.storm; if (!St) return;
+    const Bm = this.beams, H = NR_ROOF.hut, Y = NR_ROOF.y, top = Y + H.h - 0.02;
+    Bm.begin();
+    if (S > NR.roofHit - 0.1 && S < NR.out + 6) {
+      const fade = 1 - MathX.smooth(S, NR.quiet + 1.5, NR.out + 5);
+      for (const [x, z, t, r] of NR_HUT_HOLES) {
+        const w = S - t; if (w < 0) continue;
+        const a = (0.05 + 0.03 * hash1(Math.floor(t * 977))) * MathX.smooth(w, 0, 0.25) * fade;
+        Bm.push(x, top, z, x + 0.05, Y + 0.02, z - 0.03, 0.78, 0.83, 0.9, a, r * 1.1);
+        Bm.push(x, top, z, x + 0.05, Y + 0.6, z - 0.03, 0.85, 0.88, 0.95, a * 0.6, r * 0.5);
+      }
+    }
+    // and the ice that keeps coming in through each hole once it's open: a streak to the floor (1/100 s: longer than the
+    // room is high), a spark, chips thrown up off the stairwell floor; the hole's own splinters falling first
+    const Fh = this.hutFlash; Fh.begin(null);
+    if (S > NR.roofHit - 0.1 && S < NR.quiet + 1.0) {
+      for (let i = 0; i < NR_HUT_HOLES.length; i++) {
+        const [x, z, t] = NR_HUT_HOLES[i]; if (S < t) continue;
+        for (let k = 0; ; k++) {
+          const tk = t + k * (0.16 + 0.22 * hash1(i * 101 + k)) / (0.5 + 1.5 * NR_ICE.flux(t)); if (tk > S || tk >= NR.quiet) break;
+          const age = S - tk; if (age > 0.6) continue;
+          const xs = x + 0.06 * (hash1(i * 131 + k) - 0.5), zs = z + 0.06 * (hash1(i * 137 + k) - 0.5);
+          if (age < 0.012) Bm.push(xs, top + 0.3, zs, xs, Y + 0.02, zs, 0.9, 0.95, 1.0, 0.55, 0.012);
+          if (age < 0.06) Fh.push(xs, Y + 0.05, zs, 0.12 + 0.6 * age, hash1(k) * 6.3, 0.8 * (1 - age / 0.06), 1, 0.95, 0.98, 1.0);
+          for (let q = 0; q < 5; q++) {
+            const a = hash1(i * 17 + k * 5 + q) * 6.283, vh = 1.2 + 3.0 * hash1(i * 19 + k * 7 + q), vy = 1.0 + 2.5 * hash1(i * 23 + k * 3 + q), sb = Math.min(age, 1 / 50), ta = age - sb;
+            const y = Y + vy * age - 0.5 * NR_G * age * age; if (y < Y) continue;
+            Bm.push(xs + Math.cos(a) * vh * ta, Y + vy * ta - 0.5 * NR_G * ta * ta, zs + Math.sin(a) * vh * ta, xs + Math.cos(a) * vh * age, y, zs + Math.sin(a) * vh * age, 0.92, 0.95, 1.0, 0.8 * (1 - age / 0.6), 0.006);
+          }
+        }
+      }
+    }
+    Fh.end();
+    Bm.end();
+    NR_HUT_HOLES.forEach(([x, z, t, r], i) => { if (S > t && S < t + 1.0) St.shards(S, t, [x - r, x + r, z - r, z + r, top], 10, 300 + i, Y + 0.01, [0.6, 0.48, 0.34], [-2.5, 0.5], [0.2, 1.4], [0.02, 0.05]); });
   }
 
   _kiteUpdate(S, u, after) {
@@ -497,7 +621,7 @@ class NrRoof {
       }
     }
     this.tg.attributes.position.needsUpdate = true;
-    for (let k = 0; k < this.tailN; k++) { this._m4.makeRotationY(k * 0.7).setPosition(tp[k * 6], tp[k * 6 + 1], tp[k * 6 + 2]); this.tail.setMatrixAt(k, this._m4); }
+    for (let k = 0; k < this.tailN; k++) { this._m4.makeRotationY(k * 0.7).scale(this._ts || (this._ts = new THREE.Vector3(1.6, 1.6, 1.6))).setPosition(tp[k * 6], tp[k * 6 + 1], tp[k * 6 + 2]); this.tail.setMatrixAt(k, this._m4); }
     this.tail.instanceMatrix.needsUpdate = true;
     // the string: a shallow sag from the hand to the kite; after the change every point of it falls ½gt² too, until it
     // drapes over the parapet (the hand still holds its end)
@@ -517,7 +641,7 @@ class NrRoof {
   }
 
   // the smoke: puffs leave the flue at ~1.5 m/s and ride the wind. Steam always rides it. Soot rides it only until the
-  // change: then what is out keeps the velocity it had and falls, and what comes out next arcs back down onto the roof
+  // change: then what is out keeps the velocity it had and falls; no new soot can be lifted, so the smoke turns white
   _smokeUpdate(S, after, u) {
     const St = this.steam, So = this.soot, F = this.flue, D = NR_WIND_DIR, rate = 140, life = 3.2, Y = NR_ROOF.y, storm = MathX.smooth(S, NR.gale[0], NR.gale[1]);
     St.begin(this.app.scene.fog); So.begin(this.app.scene.fog);
@@ -544,19 +668,6 @@ class NrRoof {
           So.push(cx, cy, cz, 0.12 + 0.1 * hash1(i + c), c, 0.75, 1.0, 0.1, 0.09, 0.08);
         }
         continue;
-      }
-    }
-    // soot coming out after the change: thrown up out of the flue at ~2 m/s, it arcs back down onto the roof (≈ 0.8 s)
-    if (after) {
-      const rs = 70, tf = 1.0;
-      for (let j = Math.floor((S - tf) * rs); j <= Math.floor(S * rs); j++) {
-        const born = j / rs; if (born < NR.loss) continue;
-        const w = S - born; if (w < 0) continue;
-        const v0 = NR_SOOT.v0 * (0.7 + 0.6 * hash1(j * 3 + 2)), ang = hash1(j * 7 + 1) * 6.283, sp = 0.35 + 0.5 * hash1(j * 11);
-        const x = F.x + Math.cos(ang) * sp * w, z = F.z + Math.sin(ang) * sp * w, y = F.y + v0 * w - 0.5 * NR_G * w * w;
-        const onCap = Math.abs(x - F.x) < NR_ROOF.chimney.w / 2 + 0.07 && Math.abs(z - F.z) < NR_ROOF.chimney.w / 2 + 0.07;
-        if (y < (onCap ? F.y - 0.43 : Y)) continue;
-        So.push(x, y, z, 0.1 + 0.08 * hash1(j), j, 0.85, 1.0, 0.09, 0.08, 0.07);
       }
     }
     St.end(); So.end();

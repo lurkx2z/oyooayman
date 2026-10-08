@@ -51,16 +51,21 @@ const NR_DROP = {
 /* ---------------- the kite: 12 m above the roof when its lift goes; it falls ½gt² into the street (33 m, 2.6 s) ---------------- */
 const NR_KITE = { fall(u) { return u <= 0 ? 0 : 0.5 * NR_G * u * u; } };
 
-/* ---------------- the skydiver: freefall at 55 m/s (normal top speed) when the air lets go at 3,100 m ---------------- */
-const NR_JUMP = {
-  A0: 3100, v0: 55,
-  alt(S) { const t = Math.max(0, S - NR.loss); return this.A0 - this.v0 * t - 0.5 * NR_G * t * t; },
-  speed(S) { return this.v0 + NR_G * Math.max(0, S - NR.loss); },
+/* ---------------- one piece of the cloud's ice: the cut-away rides down beside it ---------------- */
+// A 4 cm hailstone held up 9.5 km high in the storm's updraft. At the change it falls from rest like everything else
+// solid (½gt²); the cloud's droplets (water) stay up with the air, so the cloud streams up past it. It lands on the roof
+// √(2h/g) = 44 s after the change (story NR_STONE.lands), at 432 m/s. Normal air would hold it to ≈ 30 m/s (≈ 100 km/h).
+const NR_STONE = {
+  H0: 9500,
+  alt(S) { const t = Math.max(0, S - NR.loss); return this.H0 - 0.5 * NR_G * t * t; },
+  speed(S) { return NR_G * Math.max(0, S - NR.loss); },
+  get lands() { return NR.loss + Math.sqrt(2 * this.H0 / NR_G); },
 };
 
-/* ---------------- the confetti cannon: fired straight up at 11 m/s ---------------- */
+/* ---------------- the confetti cannon: spring-loaded (a compressed-air one couldn't push anything now), fired straight up at 11 m/s ---------------- */
 // no drag: every flake flies the same parabola as a pebble would (6.2 m up, back in 2.2 s), so the cloud stays a clump
-// and lands like a handful of gravel. In normal air it would stop within a metre and blow away on the wind.
+// and lands like a handful of gravel. In normal air it would stop within a metre and blow away on the wind. A toy
+// paratrooper rides out with it: its canopy can't fill, so it flies the same parabola and lands with the confetti.
 const NR_CONFETTI = {
   v0: 11.0,
   at(u, d, p0, out) {      // d: { dx, dz (spread, m/s), vk (speed factor) }; → out { x, y, z, air }
@@ -81,18 +86,21 @@ const NR_BALLOON = (() => {
 // In a thunderstorm, updrafts (drag) hold the ice up. With no drag every piece of ice in the cloud falls from rest at the
 // same moment, so the whole column of ice drops as one block, ½gt²: the lowest ice (6 km) lands first, 35 s after the
 // change, at √(2gh) = 343 m/s (1,235 km/h); ice from higher up lands later and faster; the last (13 km, the cloud top)
-// lands 51.5 s after the change at 505 m/s (1,817 km/h). Nothing slows it: it pushes no air, so no sonic boom either.
-// Ice per cubic metre peaks at ~9 km (the profile below), so the flux peaks ~43 s after the change. The column holds
-// ~5.5 kg of ice over every square metre (1.5 g/m³ at the peak). The surface wind can't push the ice either: it falls
-// almost straight down (upper winds of ~20 m/s tilt it by ~3°).
+// lands 51.5 s after the change at 505 m/s (1,818 km/h). Nothing slows it: it pushes no air, so no sonic boom either.
+// (6 km is roughly where a summer storm's air reaches −10 °C: below it most of the cloud is liquid water, which stays up;
+// above it the ice, from small hail to snow, is what the updrafts hold.) Ice per cubic metre peaks at ~10.5 km (the
+// profile below), and the flux (∝ ice content × speed) peaks ~46 s after the change. The column holds ~5.5 kg of ice over
+// every square metre (1.5 g/m³ at the peak): landing at 340–505 m/s that is ~50 J on every square centimetre, enough to
+// shred cloth and timber. The surface wind can't push the ice either: it falls almost straight down (upper winds of
+// ~20 m/s tilt it by ~3°).
 const NR_ICE = (() => {
   const I = {
-    base: 6000, top: 13000, peak: 9200,
+    base: 6000, top: 13000, peak: 10500,
     tOf(h) { return NR.loss + Math.sqrt(2 * h / NR_G); },          // when ice from height h lands
     h(S) { const t = Math.max(0, S - NR.loss); return 0.5 * NR_G * t * t; },   // where the ice landing now fell from
     v(S) { return NR_G * Math.max(0, S - NR.loss); },
     kmh(S) { return this.v(S) * 3.6; },
-    // ice content (relative, 0..1) at height h: a few big stones low down, the bulk at ~9 km, thinning to the top
+    // ice content (relative, 0..1) at height h: a few big stones low down, the bulk at ~10.5 km, thinning to the top
     iwc(h) {
       if (h < this.base || h > this.top) return 0;
       if (h < this.peak) return 0.1 + 0.9 * MathX.smooth(h, this.base, this.peak);
@@ -113,8 +121,7 @@ const NR_ICE = (() => {
 })();
 // (script.js keys its beats to these two moments)
 if (Math.abs(NR_ICE.first - NR.ice0) > 0.02 || Math.abs(NR_ICE.last - NR.quiet) > 0.02) console.warn(`NR: the ice lands ${NR_ICE.first.toFixed(2)}–${NR_ICE.last.toFixed(2)}; script.js says ${NR.ice0}–${NR.quiet}`);
-// (script.js keys its beats to these two moments)
-if (Math.abs(NR_ICE.first - NR.ice0) > 0.02 || Math.abs(NR_ICE.last - NR.quiet) > 0.02) console.warn(`NR: the ice lands ${NR_ICE.first.toFixed(2)}–${NR_ICE.last.toFixed(2)}; script.js says ${NR.ice0}–${NR.quiet}`);
 
-/* ---------------- soot from the chimney: a solid; out of the flue at ~2 m/s, it falls back on the roof (0.8 s) ---------------- */
-const NR_SOOT = { v0: 2.0 };
+/* ---------------- soot from the chimney ---------------- */
+// Soot is a solid: only the hot gas's drag carries it up the flue. After the change the gas still rises (and the steam
+// with it), but no new soot can be lifted: the smoke turns white. Soot already out in the plume falls out of it.

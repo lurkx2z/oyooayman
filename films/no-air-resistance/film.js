@@ -2,10 +2,10 @@
    FILM — "What if air resistance suddenly disappeared?"
    Builds the avenue, the party's roof and its guests, the traffic, the
    storm (rain, confetti, the cloud's ice), the balloons, and the
-   skydiver's separate scene (shown through view()); your hands with the
-   sheet of paper and the ball; the HUD (aerodynamic force, wind, the ice's
-   speed, a side view of the cloud's ice, live tags pinned to things) and
-   the grade.
+   cut-away's separate scene up in the storm cloud (shown through view());
+   your hands with the sheet of paper and the ball; the HUD (aerodynamic
+   force, wind, the ice's speed and height, live tags pinned to things)
+   and the grade.
    ===================================================================== */
 
 // camera space, right hand (mirrored for the left). Held out over the parapet while you look down at the pavement
@@ -43,37 +43,16 @@ const FILM = {
     app.ui = {
       aero: mk('readout story-readout nr-aero', '<div class="label">AERODYNAMIC FORCE</div><div class="value"><span class="v">100%</span></div><div class="sub">NO DRAG · NO LIFT · ON ANY SOLID</div>'),
       wind: mk('readout story-readout nr-wind', '<div class="label">WIND</div><div class="value"><span class="v">50 KM/H</span></div><div class="sub">THE AIR IS STILL MOVING</div>'),
-      speed: mk('readout story-readout nr-speed', '<div class="label">HIS SPEED</div><div class="value"><span class="v">0 KM/H</span></div><div class="sub">NORMAL TOP SPEED ≈ 200 KM/H</div>'),
-      alt: mk('readout story-readout nr-alt', '<div class="label">ALTITUDE</div><div class="value"><span class="v">0 M</span></div>'),
+      speed: mk('readout story-readout nr-speed', '<div class="label">THIS ICE IS FALLING AT</div><div class="value"><span class="v">0 KM/H</span></div><div class="sub">IN NORMAL AIR: ≈ 100 KM/H</div>'),
+      alt: mk('readout story-readout nr-alt', '<div class="label">ALTITUDE</div><div class="value"><span class="v">0 M</span></div><div class="sub">HITS THE ROOF IN 34 S</div>'),
       ice: mk('readout story-readout nr-ice', '<div class="label">ICE LANDING NOW</div><div class="value"><span class="v">0 KM/H</span></div><div class="sub">FELL 6.0 KM</div>'),
       tagA: mk('nr-tag'), tagB: mk('nr-tag'), tagC: mk('nr-tag ghost'), tagD: mk('nr-tag ghost'),
       line: mk('nr-line'),
-      meanwhile: mk('nr-meanwhile', 'MEANWHILE, 3 KM UP'),
+      meanwhile: mk('nr-meanwhile', 'MEANWHILE, 9 KM UP'),
       count: mk('nr-count', '<div class="lab">THE FIRST ICE LANDS IN</div><div class="num">3</div>'),
-      inset: mk('nr-inset', FILM._insetSvg()),
     };
     app.ui.countNum = app.ui.count.querySelector('.num');
-    app.ui.block = app.ui.inset.querySelector('.block'); app.ui.blockT = app.ui.inset.querySelector('.bt'); app.ui.blockB = app.ui.inset.querySelector('.bb');
     app.audio = typeof NrAudio !== 'undefined' ? new NrAudio(app.tl, app) : new AudioEngine(app.tl);
-  },
-
-  // a side view of the storm cloud: its ice (6–13 km up) falling as one block since the change
-  _iy(km) { return 262 - km / 14 * 196; },
-  _insetSvg() {
-    const y = (k) => this._iy(k).toFixed(1), base = y(1.6), top = y(13);
-    return `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-      <defs><pattern id="nrDots" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" class="ice"/><circle cx="6.5" cy="6.5" r="1.6" class="ice"/></pattern>
-        <clipPath id="nrClip"><rect x="0" y="0" width="400" height="262"/></clipPath></defs>
-      <text x="10" y="24" class="t">THE CLOUD’S ICE, SIDE VIEW</text><text x="10" y="50" class="s">IT ALL FALLS AT ONCE</text>
-      <path d="M118,${base} L118,${y(9)} Q140,${y(12.6)} 180,${top} L372,${top} Q392,${y(12.4)} 352,${y(11.6)} L352,${base} Z" class="cloud"/>
-      <rect x="150" y="${y(13)}" width="170" height="${(this._iy(6) - this._iy(13)).toFixed(1)}" class="was"/>
-      <text x="146" y="${y(6.2)}" class="s" text-anchor="end">ICE · 6–13 KM</text>
-      <g clip-path="url(#nrClip)"><rect x="150" y="0" width="170" height="10" class="block" fill="url(#nrDots)"/></g>
-      <line x1="150" y1="0" x2="320" y2="0" class="bb"/><line x1="150" y1="0" x2="320" y2="0" class="bt"/>
-      <line x1="6" y1="262" x2="394" y2="262" class="ground"/>
-      <rect x="226" y="246" width="7" height="16" rx="3" class="you"/><text x="242" y="284" class="s">YOU</text>
-      <text x="10" y="${(+base + 6).toFixed(1)}" class="s">CLOUD BASE 1.6 KM</text>
-    </svg>`;
   },
 
   // the sheet of paper (right hand) and the tennis ball (left hand); free copies take over at the release
@@ -121,7 +100,7 @@ const FILM = {
   _fog(app, S) {
     const f = app.scene.fog, k = app.env.storm(S), w = MathX.smooth(NR_ICE.flux(S), 0.05, 0.9);
     f.density = 0.0011 + 0.0007 * k + 0.012 * w;
-    f.color.copy(app.env.fogColor).lerp(this._fogStorm || (this._fogStorm = new THREE.Color('#9aa3ab')), k).lerp(this._fogIce || (this._fogIce = new THREE.Color('#c7ced5')), w);
+    f.color.copy(app.env.fogColor).lerp(this._fogStorm || (this._fogStorm = new THREE.Color('#8f979f')), k).lerp(this._fogIce || (this._fogIce = new THREE.Color('#aab2b9')), w);
   },
 
   update(app, S) {
@@ -185,24 +164,18 @@ const FILM = {
     // WIND: once it has been shown to still blow, and when the storm brings more of it
     set(U.wind, 'opacity', (W(S, NR.title[1], NR.drop.up, 0.4, 0.3) + W(S, NR.gale[0] - 0.2, 27.4, 0.3, 0.3)).toFixed(3));
     html(U.wind.querySelector('.v'), `${Math.round(nrWindKmh(S) / 5) * 5} KM/H`);
-    // the sky: his speed and height
-    set(U.speed, 'opacity', (sky ? MathX.smooth(S, 12.6, 13.0) : 0).toFixed(3)); set(U.alt, 'opacity', (sky ? MathX.smooth(S, 12.7, 13.1) : 0).toFixed(3));
-    html(U.speed.querySelector('.v'), `${Math.round(NR_JUMP.speed(S) * 3.6)} KM/H`);
-    html(U.alt.querySelector('.v'), `${(Math.round(NR_JUMP.alt(S) / 10) * 10).toLocaleString('en-US')} M`);
+    // the cut-away: this piece of ice's speed and height, and when it lands on the roof
+    set(U.speed, 'opacity', (sky ? MathX.smooth(S, 12.55, 12.9) : 0).toFixed(3)); set(U.alt, 'opacity', (sky ? MathX.smooth(S, 12.7, 13.05) : 0).toFixed(3));
+    html(U.speed.querySelector('.v'), `${Math.round(NR_STONE.speed(S) * 3.6)} KM/H`);
+    html(U.alt.querySelector('.v'), `${(Math.round(NR_STONE.alt(S) / 10) * 10).toLocaleString('en-US')} M`);
+    html(U.alt.querySelector('.sub'), `HITS THE ROOF IN ${Math.ceil(NR_STONE.lands - S)} S`);
     set(U.meanwhile, 'opacity', W(S, NR.sky[0], 14.4, 0.05, 0.4).toFixed(3));
     // the ice: how fast what is landing now is going, and how far it fell
     const ip = MathX.clamp(S, NR_ICE.first, NR_ICE.last);
     set(U.ice, 'opacity', W(S, NR_ICE.first - 0.05, NR.quiet + 1.0, 0.15, 0.6).toFixed(3));
     html(U.ice.querySelector('.v'), `${Math.round(NR_ICE.kmh(ip)).toLocaleString('en-US')} KM/H`);
     html(U.ice.querySelector('.sub'), `FELL ${(NR_ICE.h(ip) / 1000).toFixed(1)} KM · NOTHING SLOWED IT`);
-    // the side view of the cloud's ice, and the count to the first of it
-    const ins = W(S, NR.cloud + 0.5, NR_ICE.first, 0.3, 0.2);
-    set(U.inset, 'opacity', ins.toFixed(3));
-    if (ins > 0) {
-      const hk = NR_ICE.h(S) / 1000, yb = this._iy(NR_ICE.base / 1000 - hk), yt = this._iy(NR_ICE.top / 1000 - hk);
-      U.block.setAttribute('y', yt.toFixed(1)); U.block.setAttribute('height', Math.max(0, yb - yt).toFixed(1));
-      for (const [el, yy] of [[U.blockT, yt], [U.blockB, Math.min(262, yb)]]) { el.setAttribute('y1', yy.toFixed(1)); el.setAttribute('y2', yy.toFixed(1)); }
-    }
+    // the count to the first of the cloud's ice
     const cnt = S > NR_ICE.first - 3 && S < NR_ICE.first - 0.02;
     set(U.count, 'opacity', cnt ? '1' : '0');
     if (cnt) html(U.countNum, `${Math.ceil(NR_ICE.first - S)}`);
@@ -213,19 +186,22 @@ const FILM = {
     if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8)), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
     if (S > NR.drop.rel + 0.1 && S < NR.cut0 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: 0, y: 0.3, z: 0 })), 'NORMAL AIR', 'left'];
     if (sky) {
-      const Ae = app.aerial;
-      if (S > NR.deploy + 1.0 && S < 20.3) B = [this._proj(cam, V.copy(Ae.wad.m.position).add({ x: 0.3, y: 0.7, z: 0 })), '<b>NO DRAG</b>', 'right'];
-      if (S > NR.deploy + 0.5 && S < NR.deploy + 1.9 && Ae.ghost.g.visible) C = [this._proj(cam, V.copy(Ae.ghost.g.position).add({ x: 0, y: 1.0, z: 0 })), 'NORMAL AIR'];
+      // the piece of ice you are falling with; the cloud (water: it stays up with the air) streaming up past
+      if (S > 13.1 && S < 14.9) A = [this._proj(cam, V.set(0, 0.03, 0)), 'THIS PIECE OF ICE · <b>NO DRAG</b>', 'right'];
+      if (S > 14.5 && S < 16.3) B = [this._proj(cam, V.set(NR_SKY.wallX + 4, cam.position.y - 14, -110)), 'CLOUD = WATER · <b>STAYS UP</b>', 'left'];
     }
     // the confetti: one clump (and its normal-air ghost blowing away)
-    if (S > NR.pop + 0.35 && S < NR.pop + 2.6) A = [this._proj(cam, St.clump(S, V).add({ x: 0, y: 0.5, z: 0 })), '<b>NO DRAG</b> · ONE CLUMP', 'right'];
-    if (S > NR.pop + 0.3 && S < NR.pop + 1.5) C = [this._proj(cam, St.ghostAt(S, V).add({ x: 0, y: 0.4, z: 0 })), 'NORMAL AIR', 'left'];
+    // the confetti (one clump) and the toy paratrooper fired with it (its canopy can't open), and the toy's normal-air ghost
+    if (S > NR.pop + 0.3 && S < NR.pop + 1.2) A = [this._proj(cam, St.clump(S, V).add({ x: 0, y: 0.5, z: 0 })), 'CONFETTI · <b>NO DRAG</b>', 'right'];
+    if (S > NR.pop + 1.3 && S < NR.pop + 2.8 && St.toy.visible) B = [this._proj(cam, St.toyAt(S, V).add({ x: 0, y: 0.45, z: 0 })), 'PARACHUTE · <b>CAN’T OPEN</b>', 'left'];
+    if (S > NR.pop + 0.45 && S < NR.pop + 1.9) D = [this._proj(cam, St.toyGhostAt(S, V).add({ x: 0, y: 0.9, z: 0 })), 'NORMAL AIR', 'left'];
     // the storm: the rain (water) is still blown; the sheets aren't; soot falls while steam blows
     if (S > NR.gale[0] + 0.7 && S < 27.4) B = [this._proj(cam, V.set(cam.position.x - 3.2, cam.position.y + 0.3, cam.position.z - 1.4)), 'RAIN IS WATER · <b>STILL BLOWN</b>'];
     if (S > NR.gale[0] + 1.3 && S < 27.9 && app.roof.ghostSheet.m.visible) D = [this._proj(cam, V.copy(app.roof.sheets[0].m.position).add({ x: -0.4, y: 0.25, z: -1.0 })), 'NORMAL AIR', 'left'];
-    if (S > 27.5 && S < 29.9) A = [this._proj(cam, V.copy(app.roof.flue).add({ x: 0, y: 0.6, z: 0 })), 'SOOT FALLS · <b>STEAM BLOWS</b>', 'right'];
+    // after the ice: the one sheet left hangs dead still in the storm, shot to lace, while the rain flies past it
+    if (S > NR.out + 0.2 && S < NR.line[0] - 0.1) { const Lt = app.roof.lineT; A = [this._proj(cam, V.copy(app.roof.sheets[2].m.position).add({ x: Lt[0] * 0.9, y: 0.3, z: Lt[1] * 0.9 })), 'RAIN: BLOWN · <b>SHEET: STILL</b>', 'right']; }
     if (S > NR.balloon + 0.3 && S < NR.cloud - 0.2) B = [this._proj(cam, app.balloons.centre(S, V).add({ x: 0, y: 0.6, z: 0 })), `BUOYANCY, NO DRAG · <b>${Math.round(app.balloons.speed(S) * 3.6)}</b> KM/H`];
-    if (S > NR.drop.rel - 0.05 && S < NR.drop.rel + 0.55) line = 'SLOW MOTION ×0.6';
+    if (S > NR.drop.rel - 0.05 && S < NR.drop.rel + 2.2) line = 'SLOW MOTION ×0.6';
     if (S > NR.inDoor - 1.0 && S < 40.45) line = 'ICE: <b>STRAIGHT DOWN</b> · RAIN: BLOWN';
     for (const [el, T] of [[U.tagA, A], [U.tagB, B], [U.tagC, C], [U.tagD, D]]) this._tag(el, T && T[0], T && T[1], !!T, (T && T[2]) || '');
     html(U.line, line ? `<span>${line}</span>` : ''); set(U.line, 'opacity', line ? '1' : '0');
@@ -238,7 +214,11 @@ const FILM = {
     p.exposure = 1.12 - 0.1 * storm + 0.04 * ice; p.saturation = 1.12 - 0.14 * storm - 0.1 * ice; p.contrast = 1.07 + 0.05 * storm; p.warmth = 0.04 - 0.07 * storm; p.blackLift = 0.01 + 0.01 * ice;
     p.vignette = 0.5 + 0.12 * storm; p.soft = 0.04; p.bloom = 0.16 + 0.12 * ice; p.bloomThreshold = 1.3 - 0.25 * ice; p.grain = 0.022;
     p.tunnel = 1.25; p.tunnelSoft = 0.5; p.tunnelDark = 0; p.edgeBlur = 0; p.smear.set(0, 0);
-    if (sky) { p.exposure = 1.08; p.saturation = 1.0; p.contrast = 1.04; p.warmth = 0.02; p.vignette = 0.55; p.ao = 0.4; p.bloom = 0.16; p.bloomThreshold = 1.3; p.blackLift = 0.01; }
+    if (sky) {
+      const inK = MathX.smooth(app.aerial.depth(S), -12, 30), bolt = app.aerial.bolt || 0;
+      p.exposure = 1.06 - 0.06 * inK; p.saturation = 1.08 - 0.25 * inK; p.contrast = 1.08 - 0.04 * inK; p.warmth = 0.03 - 0.06 * inK; p.vignette = 0.5 + 0.1 * inK; p.ao = 0.4; p.bloom = 0.18 + 0.2 * bolt; p.bloomThreshold = 1.25; p.blackLift = 0.01;
+      p.flash = 0.12 * bolt * inK; p.flashColor.setRGB(0.9, 0.94, 1.0);
+    }
     // a motion smear when your head turns fast
     if (app && app.cam && !sky) {
       const C = app.cam, dt = 1 / 30, vf = C.tfov.value(S), hfov = 2 * Math.atan(Math.tan(MathX.deg(vf) / 2) * 9 / 16) * 180 / Math.PI;

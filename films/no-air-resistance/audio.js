@@ -19,7 +19,7 @@
 class NrAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
   // anything the sound depends on that is not inside SCRIPT (so a stale baked copy is detected)
-  fingerprintData() { return [NR, NR_CAM, NR_PEOPLE, NR_ROOF, NR_ROOF_HITS, NR_HAIL.R, NR_HAIL.x0, NR_HAIL.z1, NR_ICE.base, NR_ICE.top]; }
+  fingerprintData() { return [NR, NR_CAM, NR_PEOPLE, NR_ROOF, NR_ROOF_HITS, NR_HUT_HOLES, NR_SKY, NR_STONE.H0, NR_HAIL.R, NR_HAIL.x0, NR_HAIL.z1, NR_ICE.base, NR_ICE.top, NR_ICE.peak]; }
 
   // a soft ceiling just under full scale, and true silence after the cut to black
   async renderOffline() {
@@ -201,21 +201,19 @@ class NrAudio extends AudioEngine {
     }
   }
 
-  // the sky: almost silent (he falls through still air that makes no sound on him); his altimeter beeps; the canopy opens without a sound
+  // the cut-away: almost silent. The air rushing up past you at 400–650 km/h makes no sound on things it no longer
+  // touches; only a faint high hush, thunder rolling round the storm, and inside the cloud the crack of a stroke near you
   _sky(S, dest) {
     const ctx = S.ctx, [a, b] = NR.sky;
-    const n = S.noise('pink', a, b), lp = S.filter('lowpass', 500, 0.6), g = ctx.createGain(); g.gain.value = 0.02; n.connect(lp); lp.connect(g); g.connect(dest);
-    const when = (alt) => { for (let s = a; s < b; s += 0.01) if (NR_JUMP.alt(s) <= alt) return s; return null; };
-    const beep = (t, n2, gap, f, v) => { for (let k = 0; k < n2; k++) S.tone(t + k * gap, gap * 0.55, f, v, 0.1, dest, 'triangle', 0.004, 0.02); };
-    const t1 = when(1500), t2 = when(1200), t3 = when(900);
-    if (t1) beep(t1, 3, 0.22, 2400, 0.02);
-    if (t2) beep(t2, 8, 0.11, 2900, 0.02);
-    if (t3) beep(t3, Math.floor((b - t3) / 0.06), 0.06, 3300, 0.016);
-    // the pull: the container's velcro rips, the bag and lines spill out; no crack of a canopy filling
-    const d = NR.deploy;
-    const v = ctx.createBufferSource(), vh = S.filter('highpass', 1500, 0.7), vg = ctx.createGain(); v.buffer = S.crackleBuffer(0.4, 3000); vg.gain.value = 0.1; v.connect(vh); vh.connect(vg); vg.connect(S.panned(dest, 0.2)); v.start(d);
-    S.burst(d + 0.25, 0.9, 1100, 0.7, 0.03, 0.1, dest, 'pink', 0.2);
-    for (let k = 0; k < 5; k++) S.burst(d + 1.4 + k * 0.6, 0.4, 900 + 120 * k, 0.8, 0.008, -0.2 + 0.1 * k, dest, 'pink', 0.15);
+    const n = S.noise('pink', a, b + 0.05), lp = S.filter('lowpass', 1400, 0.5), g = ctx.createGain(); n.connect(lp); lp.connect(g); g.connect(dest);
+    g.gain.setValueAtTime(0, a); g.gain.linearRampToValueAtTime(0.012, a + 0.4); g.gain.setValueAtTime(0.012, b - 0.1); g.gain.linearRampToValueAtTime(0, b);
+    // far thunder (a low roll), then in the cloud a close stroke: a crack, a tearing rumble
+    const roll = (t, dur, vol, pan) => { const r = S.noise('brown', t, t + dur + 0.1), rl = S.filter('lowpass', 160, 0.7), rg = ctx.createGain(); r.connect(rl); rl.connect(rg); rg.connect(S.panned(dest, pan));
+      rg.gain.setValueAtTime(0, t); rg.gain.linearRampToValueAtTime(vol, t + dur * 0.25); rg.gain.setTargetAtTime(0, t + dur * 0.35, dur * 0.25); };
+    roll(13.3, 2.6, 0.09, -0.5); roll(15.8, 2.2, 0.06, 0.4);
+    const t0 = NR_SKY.bolt[0] + 0.25;
+    S.burst(t0, 0.09, 2200, 0.6, 0.16, 0.35, dest, 'white', 0.001); S.burst(t0 + 0.01, 0.4, 700, 0.6, 0.12, 0.35, dest, 'pink', 0.003);
+    roll(t0 + 0.05, 1.6, 0.3, 0.3); roll(NR_SKY.bolt[2] + 0.4, 0.9, 0.12, -0.2);
   }
 
   // the confetti cannon: a pop and a hiss of air; then the whole load lands at once, a rattle like a handful of gravel
@@ -281,7 +279,21 @@ class NrAudio extends AudioEngine {
     { const t = H.cake, T = NR_ROOF.table, p = P(t, T.x + 0.1, T.z); S.whump(t, 0.07, p, dest); S.crack(t, 0.05, p, dest, 1800); S.burst(t + 0.02, 0.18, 900, 0.7, 0.03, p, dest, 'pink', 0.01); }
     H.bunting.forEach((t, r) => { const p = P(t, 22, r ? -1.8 : 1.2); S.ping(t, 1800, 0.03, p, dest, 0.25); for (let k = 0; k < 8; k++) S.click(t + 0.6 + k * 0.04, 0.012, p, dest); });
     this.app.roof.bulbs.forEach((b, k) => { const p = P(b.t, b.p[0], b.p[2]); S.click(b.t, 0.02, p, dest); S.tone(b.t + 0.01, 0.05, 3400 + (k * 377) % 1800, 0.008, p, dest, 'sine', 0.001, 0.04); });
-    { const t = H.line, p = P(t, 16.2, -0.8); S.click(t, 0.03, p, dest); S.click(t + 0.05, 0.025, p, dest); S.whump(t + 0.62, 0.06, p, dest); S.burst(t + 0.6, 0.35, 600, 0.6, 0.04, p, dest, 'pink', 0.02); }
+    // the sheets: their pegs shot away (two clicks), then the sheet lands on the deck (a soft slap)
+    const Rf = this.app.roof, Yd = NR_ROOF.y;
+    Rf.sheets.forEach((Sh) => { const t = H.sheets[Sh.i]; if (t > NR.quiet) return; const c = Sh.m.position, p = P(t, c.x, c.z), tl = Math.sqrt(2 * Math.max(0.1, Rf.lineY - (Yd + 1.72)) / NR_G);
+      S.click(t, 0.03, p, dest); S.click(t + 0.05, 0.025, p, dest); S.whump(t + tl, 0.05, p, dest); S.burst(t + tl, 0.3, 600, 0.6, 0.035, p, dest, 'pink', 0.02); });
+    // the cups: a knock as each is hit, a plastic clatter where it lands
+    for (const c of Rf.cups) { const p = P(c.t, c.p0.x, c.p0.z), tl = (c.vy + Math.sqrt(c.vy * c.vy + 2 * NR_G * (c.p0.y - Yd - 0.05))) / NR_G;
+      S.crack(c.t, 0.04, p, dest, 1700); S.click(c.t + tl, 0.02, p, dest); S.click(c.t + tl + 0.07, 0.012, p, dest); }
+    // the chairs: hit, then a clatter of aluminium as each goes over
+    for (const C of Rf.chairs) { const c = C.g.position, p = P(C.t, c.x, c.z); S.crack(C.t, 0.05, p, dest, 2300); S.ping(C.t + 0.5, 900 + 200 * C.dir, 0.02, p, dest, 0.3); S.clunk(C.t + 0.5, 0.05, p, dest); S.click(C.t + 0.58, 0.02, p, dest); }
+    // the table: its legs shot through, the top comes down on the deck with everything left on it
+    { const t = H.table, T = NR_ROOF.table, p = P(t, T.x, T.z), tl = Math.sqrt(2 * 0.68 / NR_G); S.crack(t, 0.07, p, dest, 1400); S.crunch(t + tl, 0.1, p, dest, this.rev); S.whump(t + tl, 0.08, p, dest); for (let k = 0; k < 6; k++) S.click(t + tl + 0.05 + k * 0.05, 0.015, p, dest); }
+    // the stair housing's roof over your head: each stone that punches through it, a hard knock and a splinter
+    for (const [x, z, t] of NR_HUT_HOLES) { if (t >= q) continue; const p = P(t, x, z), v = t < NR.roofHit + 0.6 ? 0.12 : 0.05; S.crack(t, v, p, dest, 1100); S.burst(t + 0.005, 0.12, 2400, 0.8, v * 0.35, p, dest, 'white', 0.002); }
+    // the first stones: each one a crack you feel (the very first the loudest thing in the film so far)
+    NR_ROOF_HITS.first.forEach(([t, x, z], k) => { const p = P(t, x, z), v = k === 0 ? 0.3 : 0.16; S.crack(t, v, p, dest, 1800); S.boom(t, k === 0 ? 0.12 : 0.05, dest, this.rev); S.burst(t + 0.01, 0.5, 1200, 0.6, v * 0.25, p, dest, 'pink', 0.004); });
     { const t = H.pot, C = NR_ROOF.chimney, p = P(t, C.x, C.z); S.crunch(t, 0.12, p, dest, this.rev); S.crack(t, 0.1, p, dest, 1500); }
   }
 
@@ -301,13 +313,13 @@ class NrAudio extends AudioEngine {
     S.thump(NR.loss, 0.22, out); S.tone(NR.loss, 2.6, 55, 0.05, 0, out, 'sine', 0.01, 2.0); S.tone(NR.loss, 2.0, 1760, 0.006, 0, out, 'sine', 0.005, 1.8);
     const low = [220, 261.6, 329.6, 293.7, 261.6, 220, 196, 220];
     for (let t = NR.title[1] + 0.3, k = 0; t < NR.cut0 - 0.3; t += 0.55, k++) S.pluck(t, low[k % low.length], 0.016, k % 2 ? 0.25 : -0.25, out, 1.0, 0.5);
-    // into the cut: a riser; the sky: a hit, a drone, a pulse; hope at the pull, then it falls
+    // into the cut: a riser; the sky: a hit, a drone, a pulse that quickens as you fall into the cloud
     const c0 = NR.cut0, ri = S.burst(c0 - 1.0, 1.0, 400, 0.8, 0.0, 0, out, 'pink', 0.9); ri.g.gain.cancelScheduledValues(c0 - 1.0); ri.g.gain.setValueAtTime(0, c0 - 1.0); ri.g.gain.linearRampToValueAtTime(0.05, c0 - 0.02); ri.g.gain.linearRampToValueAtTime(0, c0); ri.b.frequency.exponentialRampToValueAtTime(3000, c0);
     S.thump(NR.sky[0], 0.18, out);
     for (const f of [55, 82.4]) S.tone(NR.sky[0], NR.sky[1] - NR.sky[0], f, 0.03, 0, out, 'sine', 0.3, 0.3);
     for (let t = NR.sky[0] + 0.3, k = 0; t < NR.sky[1] - 0.1; t += 0.62 - 0.12 * MathX.smooth(t, NR.sky[0], NR.sky[1]), k++) S.tone(t, 0.16, k % 2 ? 61.7 : 55, 0.05, 0, out, 'triangle', 0.004, 0.14);
-    for (const f of [261.6, 329.6, 392]) S.tone(NR.deploy + 0.3, 2.0, f, 0.011, 0, out, 'triangle', 0.4, 0.6);
-    for (const f of [220, 261.6, 311.1]) S.tone(18.7, 1.7, f, 0.011, 0, out, 'triangle', 0.1, 0.8);
+    for (const f of [220, 261.6, 329.6]) S.tone(13.0, 3.2, f, 0.008, 0, out, 'triangle', 0.8, 1.2);
+    for (const f of [207.7, 246.9, 311.1]) S.tone(16.6, 3.6, f, 0.01, 0, out, 'triangle', 0.3, 1.4);
     // the roof again: a light pulse; it grows when the storm comes
     for (let t = NR.sky[1] + 0.2, k = 0; t < NR.cloud; t += 0.6 - 0.1 * MathX.smooth(t, NR.gale[0], NR.cloud), k++) S.tone(t, 0.16, k % 4 === 0 ? 65.4 : 55, 0.03 + 0.03 * MathX.smooth(t, NR.gale[0], NR.cloud), 0, out, 'triangle', 0.004, 0.14);
     for (let i = 0; i < 4; i++) S.pluck(NR.balloon + 0.2 + i * 0.13, [440, 523.3, 659.3, 880][i], 0.02, 0.1, out, 1.2, 0.7);
