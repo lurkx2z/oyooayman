@@ -463,6 +463,7 @@ class NstKitchen {
       s: new NstStream(g, jm, { a: new THREE.Vector3(D.x, top + D.neck + 0.002, D.z), v0: new THREE.Vector3(vx, vy, vz), r0, yEnd: top + D.neck + 0.2, ns: 72, nrad: 10, seed: 80 + i * 7, spread: 0.9 }),     // (each arc ends in mid-air on its way down: what falls back is spray and shreds)
     }));
     this.sodaSpray = new NstSpray(this.scene, 900);
+    this.sodaSpray.sys.uniforms.uMap.value = nstWispTex();         // (round soft dots read as bubbles beside the hand)
     this.shreds = new StreakSystem(this.scene, 520);
     // what lands: a spreading wet patch on the counter (water only: no foam stays behind)
     this.sodaSpill = new NstPuddle(g, nstWaterMat({ color: '#56717a', opacity: 0.26, fres: 0.45, rough: 0.02, env: 1.2 }), { na: 64, nr: 7, seed: 17 });

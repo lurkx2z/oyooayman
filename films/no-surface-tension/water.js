@@ -199,6 +199,22 @@ class NstStream {
 // Spray / mist: soft billboards. Each emitter is a function spawn(i, k) → { p:[x,y,z], v:[vx,vy,vz], life, size0, size1, a, g }
 // evaluated for "slots" i whose hashed birth times cycle with period `period`. Pure function of t.
 // ---------------------------------------------------------------------------------------------------------------------
+// a ragged wisp instead of the engine's round soft dot: a few seeded gaussian puffs strung along a bent stroke, so a
+// spray of them reads as torn mist, not as round drops or bubbles (made once; deterministic)
+let _nstWisp = null;
+function nstWispTex() {
+  if (_nstWisp) return _nstWisp;
+  const S = 128, cv = Tex.canvas(S, S), c = cv.getContext('2d');
+  c.globalCompositeOperation = 'lighter';
+  for (let k = 0; k < 11; k++) {
+    const u = k / 10 - 0.5, x = 64 + u * 70 + (hash1(k * 3.1 + 7) - 0.5) * 14, y = 64 + 18 * (u * u * 4 - 0.33) + (hash1(k * 5.7 + 2) - 0.5) * 16;
+    const r = 9 + 11 * hash1(k * 2.3 + 1) * (1 - Math.abs(u)), g = c.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, 'rgba(255,255,255,0.32)'); g.addColorStop(0.5, 'rgba(255,255,255,0.12)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.fillRect(0, 0, S, S);
+  }
+  return (_nstWisp = Tex.tex(cv, { srgb: false, repeat: false }));
+}
+
 class NstSpray {
   constructor(scene, max = 900) {
     this.sys = new BillboardSystem(scene, max, false);
