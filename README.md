@@ -65,14 +65,14 @@ Everything is procedural, so there are no models, images or sound files to downl
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
 >
-> **Twelfth film: *What if air resistance suddenly disappeared?*** — open `no-air-resistance.html` (62 s). At 2.0 s
+> **Twelfth film: *What if air resistance suddenly disappeared?*** — open `no-air-resistance.html` (61 s). At 2.0 s
 > solid objects stop feeling any aerodynamic force (drag 0, lift 0) while the air itself, its pressure and sound stay.
-> The flag drops dead in a 40 km/h breeze and pigeons fall out of the air; a sheet of paper and a tennis ball land
-> together; a skydiver's parachute can't even open; a coasting car keeps 86 km/h and the leaflets thrown from it keep
-> pace; pigeons can't take off; an airliner that lost its lift at 2 s falls for 48 s in total silence and comes down
-> 2.1 km away in a fireball and a column of river spray, its boom arriving 6 s later; a 100 km/h wind moves nothing
-solid; the debris arrives at about 700 km/h and knocks a sign board onto the spot
-> you just left. *The air would still be there. It just couldn't catch you.* Physics, shot list and review log:
+> A rooftop party under the edge of a storm: the sheets and bunting drop and the kite falls in a 50 km/h wind; paper
+> and a ball dropped down the building's 22 m stairwell land together; 9 km up, the storm cloud's ice hangs still while
+> the cloud streams up past it; confetti lands like gravel and a toy paratrooper's canopy can't open; in a 110 km/h
+> gale the rain flies sideways and the washing barely moves; balloons rocket up at 2 g; then a clock runs out and the
+> whole cloud's ice arrives, faster than sound and then faster than a bullet, breaking the party and coming through the
+> roof over you. *Every storm cloud is full of ice. Only the air holds it up.* Physics, shot list and review log:
 > [`films/no-air-resistance/PLAN.md`](films/no-air-resistance/PLAN.md).
 
 | Time | Beat |
@@ -349,13 +349,15 @@ Film: *What if air resistance suddenly disappeared?* (`no-air-resistance.html`):
 ```
 films/no-air-resistance/PLAN.md     the rule, its numbers, the shot list as built, review log
 films/no-air-resistance/script.js   ★ every beat time (NR), the edit, camera, hands, captions
-films/no-air-resistance/physics.js  the rule as formulas: wind and load, the drop, the jump, the car, the plane, debris, board
-films/no-air-resistance/city.js     the avenue (from the Air film, owned here): trees that ring down, racing clouds, skyline gap
-films/no-air-resistance/wind.js     what the breeze moves until the change: flags (and the normal-air ghost flag), awning, umbrellas, sign, bins, litter, steam
-films/no-air-resistance/actors.js   people, pigeons, traffic, the coasting car and its normal-air ghost, leaflets, the balloon
-films/no-air-resistance/sky.js      the falling airliner, its cloud deck, its impact, the debris, the sign board, the skydiver cut-away
-films/no-air-resistance/audio.js    wind heard only through what it moves (then a faint hiss), a silent plane, delayed impact, hits by distance
-films/no-air-resistance/film.js     FILM hooks: props, hands, HUD tags, the cut to the sky, the grade
+films/no-air-resistance/physics.js  the rule as formulas: wind and load, the stairwell drop, the kite, the stone, confetti, balloons, the cloud's ice
+films/no-air-resistance/city.js     the city round the roof and the storm sky that darkens over it
+films/no-air-resistance/roof.js     the roof, the party, laundry, bunting, kite, the stair housing (and the holes the ice punches in it), the stairwell
+films/no-air-resistance/hail.js     rain, the confetti and toy paratrooper, the cloud's ice, impacts, chips and craters
+films/no-air-resistance/wind.js     what the breeze moves until the change
+films/no-air-resistance/actors.js   the guests and the balloons
+films/no-air-resistance/sky.js      the cut-away 9 km up in the storm cloud, beside one falling hailstone
+films/no-air-resistance/audio.js    wind heard only through what it moves, the rain, each thing the ice breaks, the roar and the silence
+films/no-air-resistance/film.js     FILM hooks: props, hands, HUD tags, the clock, the cut to the sky, the grade
 films/no-air-resistance/soundtrack.js  the baked soundtrack (re-bake after changing audio.js, SCRIPT or the edit)
 films/no-air-resistance/EPISODE_REPORT.md  delivery report: timestamps, systems, reviews, known limitations
 ```

@@ -223,7 +223,7 @@ class NrAudio extends AudioEngine {
     roll(t0 + 0.05, 1.6, 0.3, 0.3); roll(NR_SKY.bolt[2] + 0.4, 0.9, 0.12, -0.2);
   }
 
-  // the confetti cannon (a spring): a clack and a twang; then the whole load lands at once, a rattle like a handful of gravel
+  // the confetti cannon (a spring): a clack and a twang; then the whole load lands at once: a soft patter, all in a moment (each flake carries ~0.01 J)
   _confetti(S, dest) {
     const t = NR.pop, pan = this._pan(t, 19.0, -1.4), m = this.app.storm.muzzle(), fl = nrFloorAt(m.x, m.z), v = NR_CONFETTI.v0;
     S.burst(t, 0.05, 1400, 0.8, 0.1, pan, dest, 'white', 0.001); S.clunk(t, 0.08, pan, dest); S.ping(t + 0.005, 310, 0.03, pan, dest, 0.7); S.ping(t + 0.01, 470, 0.015, pan, dest, 0.5);

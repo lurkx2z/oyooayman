@@ -1,138 +1,159 @@
-# What if air resistance suddenly disappeared? — production plan
+# What if air resistance suddenly disappeared? — production plan (v2, rooftop cut)
 
-A 62-second vertical (9:16, 1080×1920, 30 fps) first-person physics film on the shared engine, in the Oxygen/Friction
-format: a centred serif question over a normal, windy, sunny avenue; the rule changes under the title at 2.0 s; then a
-new, different consequence every 5–8 s; an open loop planted early (a plane far overhead) that pays off as the biggest
-event at the end. (Shot list as built in § 3; § 1 numbers match the code.)
+A 60.8-second vertical (9:16, 1080×1920, 30 fps) first-person physics film on the shared engine, in the Oxygen/Friction
+format: a centred serif question over a windy rooftop party; the rule changes under the title at 2.0 s; a new
+consequence every 4–7 s; an open loop (the storm cloud overhead) that pays off as the biggest event at the end.
 
-Branch: `episode/no-air-resistance-y6gxpi` (the branch this session was assigned). Prefix `NR` / `Nr` / `nr`.
+Branch: `episode/no-air-resistance-y6gxpi`. Prefix `NR` / `Nr` / `nr`. This replaces the 62.2 s avenue/airliner cut
+(v1, delivered 2026-10-08), which followed the shared template the owner asked us to stop using.
+
+## 0. Creative direction override (2026-10-08): what changed and why
+
+The override asked every episode to stop following the shared template (person → car → machinery → airplane →
+destruction), to avoid automatic airplanes, cars, cranes, generic city streets, explosions and falling pedestrians,
+and to put surprise ahead of scale. The brief's line for this episode: bizarre motion (paper falling like a dense
+object, objects travelling without drag, useless parachutes, a world where wind no longer pushes objects), and not an
+airplane episode. v1 was the template: an avenue, pigeons, a coasting car, an airliner on a telephoto, its impact,
+debris raining down.
+
+### The five identity questions
+
+| Question | Answer for this episode |
+|---|---|
+| What is the one image only this episode can have? | A party's washing **barely moving in a 110 km/h storm** while the rain flies past it sideways, then the storm cloud's ice arriving all at once, faster than sound, then faster than a bullet. |
+| Where does it happen? | **On one rooftop**, a party on a five-storey block under the edge of a storm, plus the building's own stairwell and one ride inside the storm cloud. No street-level shots. |
+| What does the viewer feel? | Delight first (a party behaving wrongly: the kite drops, confetti lands like gravel, balloons rocket away), then dread (a clock to the cloud's ice), then awe and relief (the roar, the silence). |
+| What is the surprise nobody predicts? | That drag is what holds a storm's ice up. Without it **all of it falls at once** and lands 35–51 s later at 1,235 → 1,818 km/h. |
+| Without the HUD, could someone tell it from our other episodes? | Yes: a rooftop party, laundry, bunting, a kite, a stairwell, confetti, balloons, and a hail of ice seen from a stair door. No car, no plane, no explosion, nobody falls. (Round-4 reviewer: distinguishable from ~36 s; this round reworked 6–33 s.) |
+
+### Ten consequences, ranked (7 used)
+
+| # | Consequence | Why it ranks here | Used |
+|---|---|---|---|
+| 1 | A storm cloud's ice all falls at once and lands at 1,235–1,818 km/h | the biggest surprise and a true chain from the rule | ✓ payoff (C) |
+| 2 | A storm-force wind pushes nothing solid (rain flies sideways past still washing) | impossible-looking; proves the air still moves | ✓ (B) |
+| 3 | Paper falls like a ball | the cleanest demonstration; done down a 22 m stairwell | ✓ |
+| 4 | A parachute is useless | the brief asks for it; done with a toy paratrooper, not a skydiver | ✓ |
+| 5 | Balloons shoot up at 2 g (buoyancy kept, drag gone) | the one thing that goes up; leads the eye to the cloud | ✓ |
+| 6 | Confetti lands like a handful of gravel | a party moment turned wrong | ✓ |
+| 7 | A kite drops out of the sky; laundry and bunting swing down | the first surprise, under the title | ✓ (A) |
+| 8 | Soot falls out of chimney smoke while the steam keeps blowing | true but subtle; cut for time | — |
+| 9 | Fans, sails and wind turbines push nothing | needs machinery; left for comments | — |
+| 10 | Cars coast further | v1 material, template | — |
+
+### Signature moments
+- **A, the first surprise (0–6.3 s):** under the title the sheets, bunting and kite fly in the wind; at 2.0 s they all
+  drop. The wind is still blowing at 50 km/h, but the kite falls like a brick.
+- **B, the impossible-looking consequence (film 21.5–27.4):** the gust front brings 110 km/h and rain; the rain streaks
+  past sideways, a NORMAL AIR ghost sheet thrashes, the real sheets barely move.
+- **C, the payoff (film 30.5–52.8):** a clock runs out; the first stones land faster than sound (in slow motion); from
+  the stair door the cloud's ice breaks the party one thing at a time, then comes through the roof over you; silence.
+
+### Revised shot table (v1 → this cut)
+
+| Original shot (v1, film s) | Why it was repetitive | Replacement (this cut, film s) | Why it is more interesting |
+|---|---|---|---|
+| Windy avenue, flag over the title, pigeons fly up the street (0–5.5) | the street-level avenue opening of Oxygen, Friction and Air 10× | Rooftop party under the title: sheets, bunting, a kite; at 2.0 everything drops; the kite falls into the street (0–6.3) | a new place; several surprises in one frame |
+| Paper vs ball from hand height, filmed from straight above (5.5–10.2) | small, filmed like a lab test | Paper and ball dropped down the building's 22 m stairwell; both land in 2.14 s while the normal-air ghost sheet is still near the top (6.3–11.7) | a real height and a vertigo shot; the same proof made huge |
+| Skydiver cut-away: MEANWHILE, speed and altitude panels, a canopy that can't open (10.2–18.2) | the same cut-away template as other episodes | 9 km up, falling beside one hailstone as the cloud streams up past it; lightning; no panels, one live tag (11.7–17.9) | shows where the payoff comes from; the cloud moving up while the ice hangs still is a new image |
+| Coasting red car with a ghost car; leaflets (18.2–23.2) | the car beat every episode has | Confetti cannon fired straight up: the load comes down as one clump; a toy paratrooper's canopy can't open; its normal-air ghost drifts off (18.65–21.5) | a party moment; the parachute idea kept, as a toy |
+| Pigeons that can't take off (23.2–27.4) | animals on the same street | The gale (B): rain sideways, the washing barely moves, a ghost sheet thrashing (21.5–27.4) | the film's impossible-looking image |
+| A man points up; the airliner on a telephoto, its plunge, flash, countdown (27.4–51.3) | the airplane → impact template the owner banned | Balloons let go shoot up at 2 g toward the cloud; a clock to the cloud's ice; the first stones in slow motion (27.9–36.15) | dread from a clock and a cloud overhead, not a distant speck |
+| Debris and a falling sign board (51.3–56.4) | destruction raining down | From the stair door: bottles, cake, lights, sheets, chairs, chimney pot and table broken one at a time with a snap-in on each; then holes punched through the roof over you (37.3–51.9) | close, loud and specific; escalates in speed (1,300 → 1,800 km/h) |
+| Look back at the limp flag (56.4–62.0) | a quiet return to the opening | Silence; you step out onto a roof white with ice; a sheet shot to lace barely moves in the 110 km/h wind; closing lines (51.9–60.8) | the payoff's aftermath restates the rule |
+
+### The three most repeated beats (round-4 "what feels recycled" review) and what replaced them
+1. **The cloud cut-away copied the v1 skydiver's template** (MEANWHILE, speed panel, "in normal air", altitude). Now
+   6.2 s instead of 8.0, no panels, one live tag on the stone, a plain place label ("9 KM ABOVE THE PARTY"), droplet
+   streaks rushing up past the still stone, lightning; no glow disc or bokeh.
+2. **Tilt-ups to tiny things in an empty sky** (confetti, balloons). The confetti's whole arc now fits one level frame;
+   the balloon release is framed tight on the girl's hand and the tilt stops at ~25° while they leave the top of frame.
+3. **The boxed 3-2-1 countdown** (used in the moon, slow-sound, Andromeda and v1 cuts). Replaced by a small top-left
+   clock from the moment you are back on the roof ("THE CLOUD'S ICE LANDS IN 16 S"), which hands over to the ice
+   readout at the first stone.
 
 ## 1. The rule (defined once, here)
 
 | Item | This film |
 |---|---|
-| **Exact fictional rule** | From story 2.0 s, **solid objects feel zero aerodynamic force from relative motion through air**: drag = 0 and aerodynamic lift = 0, for every solid (paper, people, birds, wings, canopies, debris, cars, leaves, dust). |
-| **Artificially preserved** | atmospheric pressure, breathable air, temperature, ordinary gas behaviour, **sound** (generation and propagation), buoyancy (it comes from static pressure, not from relative motion). |
-| **Not covered by the rule** | liquids: water droplets (clouds, steam, spray) still move with the air. Stated on screen once in the storm (STEAM IS WATER · STILL BLOWN) and in the closing note. This is what lets the film *show* that the air is still moving. |
-| **Real consequences of the rule** (each one a beat) | the wind stops pushing things (flags fall limp, bent trees spring upright, flying paper and leaves drop, pigeons in flight fall out of the air); a sheet of paper falls exactly like a ball; a skydiver never reaches a top speed and an opened canopy can't inflate or slow him; a coasting car loses speed only to its tyres; anything thrown from a car keeps the car's speed; birds can't take off; a cruising airliner has no lift from the moment of the change and falls on a ballistic arc for 48 s; a 100 km/h wind moves nothing solid; a helium balloon (buoyancy kept, drag gone) accelerates upward at ~2 g; debris from the airliner's impact flies more than a kilometre and lands at hundreds of km/h. |
-| **Artistic overrides** | sound kept (the brief). Followed through, the rule also means solids push no air: so after the change nothing solid flaps, rustles or whooshes, the wind leaves only a faint hiss and the 100 km/h storm is silent, and the airliner falls **without a sound** (supersonic from story ≈ 20.5, but it pushes no air aside: no roar, no sonic boom). A bystander's "Look… up there!" is what makes you look up. Mix choices: the street is held back between the flash and the boom (the countdown and your heartbeat stay clear). The plane's attitude stays nose-level (no aerodynamic moments, so nothing can pitch it); hero timings are scripted from the formulas, not simulated live. |
-| **Misconceptions avoided** | "everything floats away" (no: gravity is unchanged); "cars go infinitely fast" (no: a coasting car still slows on its tyres); "the plane glides down" (no: with zero lift it is a thrown object); "the parachute pops open but doesn't work" (an unpressurised canopy can't inflate: it spills out and floats beside him). |
-| **What we do not claim** | that this could happen; exact crash dynamics; what happens to weather, helicopters, fans, sails, jet engines (left open for comments). |
+| **Exact fictional rule** | From story 2.0 s, **solid objects feel zero aerodynamic force**: drag 0, lift 0, on every solid. |
+| **Kept on purpose** | pressure, breathable air, temperature, buoyancy (static pressure), **sound**. |
+| **Not covered** | liquids: rain, steam and cloud droplets still ride the wind. Said on screen (RAIN IS WATER · STILL BLOWN; CLOUD DROPLETS · STILL HELD UP) and in the closing note. This is how the film shows the air still moves. |
+| **Simplifications (said in the note or here)** | the falling ice loses no speed to cloud droplets or rain (with them, 4 cm hail would land at ~290–420 m/s and snow minutes late); all the cloud's ice starts from rest at the change (small ice in an updraft was rising at 10–30 m/s); the ice starts at 6 km (a summer freezing level of 4–4.5 km would make the first ice land ~30 s after the change at ~1,050 km/h). |
+| **Misconceptions avoided** | "things float away" (gravity is unchanged); "the wind stops" (it doesn't: the rain proves it); impact flashes kept small (ice at these speeds doesn't glow). |
 
-### Numbers used (computed in `physics.js`, checked by hand)
+### Numbers (computed in `physics.js`; checked by the physics reviewer)
 
-| Beat | Model | Numbers on screen |
+| Beat | Model | On screen |
 |---|---|---|
-| Paper vs ball | free fall from ≈ 1.38 m, no drag | both land in **0.53 s** (normal-air paper ghost: ~0.55 m/s, fluttering) |
-| Skydiver | in freefall at 55 m/s (normal top speed ≈ 200 km/h) at 3,100 m when the rule changes; v = 55 + g·t | ≈ 565 km/h at 2,000 m (story 12.4) → canopy out at 1,250 m and **714 km/h** → ≈ 850 km/h at 430 m (cut) |
-| Car | 1,500 kg, C_dA 0.65 m², rolling 0.012·g; throttle off at 90 km/h at story 12.4 (off screen) | passes you at **86 km/h** vs **80 km/h** in normal air (the ghost reads 79–78 km/h a second later); coasting from 90 km/h: **2.65 km** vs 1.66 km (shown as 2.7 vs 1.7) |
-| Leaflets thrown from that car | keep the car's speed; fall from the window; slide on the road (μ 0.4) | keep pace with the car, then skid along the lane |
-| Pigeons in flight (hook) | at 3.2–3.9 m/s, 5.0–6.2 m up when the air lets go; no lift, wings can't push: they keep their speed and fall ½gt² (≈ 1.0 s), skid (μ 0.9), lie stunned, get up | — |
-| Pigeons on the pavement | wings make no lift; legs only (≈ 2 m/s jump, ~20 cm); the ledge pigeon falls 3.5 m in 0.84 s | NO LIFT |
-| Airliner | 11,400 m, 240 m/s, level, zero lift from 2.0 s; y = H − ½gt²; flies up the line of the avenue towards you | supersonic from story ≈ 20.5 (speed of sound ≈ 300 m/s up there), heard never (it pushes no air); found by eye at story 33.6 (≈ 6,500 m · 1,410 km/h) and followed on a telephoto to story 38.2 (≈ 5,000 m · 1,540 km/h) as it sinks through a cloud deck at ≈ 5,500 m (story ≈ 36.7), with a side-view inset of its arc (height drawn at half scale, labelled); impact at **story 50.21** in the river **2.1 km** away at ≈ 1,910 km/h, ~63° down |
-| Balloon | 30 cm, helium; net buoyancy ÷ mass | **≈ 2 g up** (21 m/s²), ≈ 125 km/h after 1.6 s |
-| Wind | air moving at 40, then 100 km/h | force on solids: 0 N; steam, clouds and the impact's spray (water) still ride it; a NORMAL AIR ghost flag shows what the wind would do |
-| Impact sound | 2.1 km at 343 m/s | the boom arrives **6.1 s** after the flash (countdown on screen) |
-| Impact debris | thrown from the impact point, no drag; aimed to land along the avenue 9.7–12 s later | horizontal 140–216 m/s, peaks ≈ 115–340 m, arrives at **≈ 710 km/h** on average (584–795) |
-| Sign board | knocked off 12.0 m up by a piece of debris (a 0.6 m/s kick); no drag | falls in **1.61 s**, hits at **≈ 55 km/h** where you stood |
+| Kite | 12 m above the roof when lift goes, ½gt² | falls 33 m into the street in 2.6 s |
+| Stairwell drop | 22.4 m, no drag | BOTH LAND IN **2.14 S** (normal-air ghost: ~1 m/s, still near the top) |
+| The cut-away stone | 4 cm hail at 9,500 m, from rest at 2.0 s | THIS ICE 440 → 490 km/h; enters the cloud top (8,455 m) at story 16.6; lands at story 46.0 at 432 m/s |
+| Confetti and toy | fired up at 11 m/s, no drag | 6.2 m up, back in 2.24 s, as one clump |
+| Balloons | 30 cm helium; buoyancy kept | 21.6 m/s² ≈ 2.2 g (captioned "2 g"), BUOYANCY, NO DRAG · km/h |
+| Wind | 50 → 110 km/h | rain falls ~12° below horizontal; sheets lean ~12° from the rain only |
+| The cloud's ice | ½gt² from 6–13 km | first lands 34.98 s after the change at **1,235 km/h** (≈ Mach 1); last at 51.5 s, **1,818 km/h**; "falling for 31 seconds" at story 33.3 |
+| Pistol bullet | 9 mm ≈ 370 m/s | the ice at that caption is at 465–489 m/s |
+| Energy | 5.6 kg of ice over every m² | ~53 J/cm²; flux peaks at story 46.4 |
 
 ## 2. The place
-
-The Air film's avenue (copied and owned here, not shared): a 14 m avenue with shops, a café terrace with umbrellas and
-an awning, street trees, flags, a bus shelter, traffic. Sunny breezy afternoon (Friction/Air lighting family), wind
-40 km/h at the start. You stand on the right-hand sidewalk. The avenue runs straight to a far skyline; beyond it (out of
-sight) a river, where the plane comes down. A separate aerial scene (`FILM.view`) for the skydiver: sky, a city grid
-1–3 km below.
+A five-storey block's roof (deck 21.4 m up): a timber platform with the party table, chairs, cake, bottles and cups,
+bunting and fairy lights, a washing line with three sheets, a chimney, a kite flown from the front corner, a skylight,
+and the stair housing whose door is your viewpoint for the payoff. Under it, the building's stairwell (22 m to the
+checkered ground floor). Sunny edge of a storm; the cloud darkens the roof from film 17.9. A separate scene (`FILM.view`)
+for the ride 9 km up in the storm cloud.
 
 ## 3. Shot list (as built; film seconds, story in brackets where they differ)
 
-The edit (`CONFIG.edit`): the paper drop plays at 0.4× (story 6.85–7.45); story 9.3–12.4 is cut (straight from the drop
-to the sky); story 25.4–28.2 (the car rolling away), 42.6–43.8 (the end of the storm) and 57.55–58.35 (the middle of
-the run) are cut; story 48.6–49.0 (the plunge) plays at 0.25×. Story 68.0 → film **62.2 s**.
+The edit (`CONFIG.edit`): the stairwell drop plays at 0.6× (story 7.35–9.75); story 10.1–14.2 is cut (straight to
+the cloud); the first stones play at 0.5× (story 36.85–37.75). Story 62.4 → film **60.8 s**.
 
-| Film s | What we SEE | What we HEAR | Caption / HUD |
-|---|---|---|---|
-| 0–2.0 | **Hook.** The windy avenue: a big flag above the title flying, trees leaning, awning, litter, umbrellas; five pigeons flying up the street towards you | the breeze through what it moves (flag cracks, awning, litter), wingbeats, city, café | TITLE (frame 1 → 3.4) · AERODYNAMIC FORCE 100 % |
-| 2.0–5.5 | 0 %: the flag drops limp mid-flap, the pigeons fall out of the air and skid on the pavement, litter drops, trees spring upright; steam from a grate keeps streaming | everything that flapped stops dead (a low hit); the pigeons' wings only clap, five thumps; a faint hiss of air is left | 0 % · NO DRAG · NO LIFT · ON ANY SOLID · WIND 40 KM/H · *The wind still blows…* / *…it just can't push anything.* |
-| 5.5–10.2 (5.5–9.3) | **Paper vs ball** in your hands; released 6.97, land together 8.3 (SLOW MOTION ×0.4 on screen); a NORMAL AIR ghost sheet flutters | one slap+thud, the ball bounces on | BOTH LAND IN 0.53 S · *Nothing would be slowed by the air.* |
-| 10.2–18.2 (12.4–20.4) | **Parachute.** MEANWHILE, 2 KM ABOVE THE CITY: the skydiver over a puff-cloud deck; speed climbs; he pulls at 14.4 (16.6): the bag and pilot chute spill out on slack lines; a NORMAL AIR ghost dome canopy opens and falls away above him | near silence, altimeter beeps, a velcro rip and rustle, no inflation crack | HIS SPEED · ALTITUDE · NO DRAG · *His speed just keeps climbing.* · *He pulls the parachute…* / *…but it can't even open.* |
-| 18.2–23.2 (20.4–25.4) | **Car.** The red car coasts past at 86 km/h, the NORMAL AIR ghost car behind; leaflets thrown out of the window keep pace | tyres and idle only, the leaflets' riffle | COASTING 86→85 KM/H vs NORMAL AIR 79 KM/H · LEAFLETS 86 KM/H · *Thrown things keep their speed…* / *…and cars coast much further.* · ROLLS 2.7 KM · NORMAL AIR 1.7 KM |
-| 23.2–27.4 (28.2–32.4) | **Birds.** Pigeons startled: they flap, hop, can't lift; one steps off a ledge and drops 3.5 m | wing claps (no whoosh), a thump, an indignant coo | *Birds couldn't get off the ground.* · NO LIFT |
-| 27.4–33.2 (32.4–38.2) | **The plane.** A man turns and points up; you look: a crash zoom to an extreme telephoto: the airliner, nose level, sinking through a cloud deck; side-view inset of its arc | "Look… up there!", a low hit and a glint (the plane makes no sound) | NO LIFT · altitude · km/h · SUPERSONIC · NO SOUND · SIDE VIEW · *Its wings stopped lifting it…* / *…the moment the air let go.* |
-| 33.2–37.6 (38.2–42.6) | **Wind does nothing.** Back at the kerb: WIND 40 → 100 KM/H: the steam streams flat; a NORMAL AIR ghost flag snaps beside the real one, which hangs; trees still, people unbothered | near silence: the faint hiss, no pulse | WIND 100 KM/H · STEAM IS WATER · STILL BLOWN · NORMAL AIR · *Storm-force wind…* / *…and nothing solid moves.* |
-| 37.6–41.7 (43.8–47.9) | A child's balloon slips and shoots straight up | a string squeak, the child's "oh!" | BUOYANCY, NO DRAG · km/h · *Floating still works…* / *…nothing holds it back.* |
-| 41.7–45.2 (47.9–50.2) | **The plunge.** Telephoto down the avenue: the airliner sinks through the frame towards the far blocks (slow motion ×¼, 42.4–44.0) and drops to the ground behind them | the pulse doubling, a riser, two octaves down in the slow motion | NO LIFT · km/h · SLOW MOTION ×¼ |
-| 45.2–46.3 (50.2–51.3) | A white flash, an orange fireball, a column of river spray rising over the far blocks (held on the telephoto) | the music cuts; a gasp | — |
-| 46.3–51.3 (51.3–56.3) | Cut to the street: people stop and stare; the column rises and drifts with the wind | the street held back; a heartbeat, a tick a second | IMPACT · 2.1 KM AWAY · ITS SOUND ARRIVES IN 5…1 S |
-| 51.3–56.4 (56.3–62.2) | **Falling danger.** The boom; you run (the middle of the run is cut); debris lands along the avenue; a piece knocks a sign board off the building above where you stood: it drops in 1.61 s and slams down there, beside the paper and ball | the boom, car alarms, breath and steps, the hits (each delayed by distance), the board's slam, a ringing ear | *Everything it threw is still flying…* / *…and nothing slows it down.* · THROWN 2.1 KM · ≈ 710 KM/H · SIGN BOARD · NO DRAG · km/h → HIT AT 55 KM/H |
-| 56.4–62.0 (62.2–67.8) | You look back at the limp flag, the streaming steam and the board on the pavement (the opening shot again) | faint hiss, far alarms, one held chord | AIR RESISTANCE 0 % · *The air would still be there.* / *It just couldn't catch you.* · note: Fictional physics: only solids lose air resistance (water droplets still ride the wind) · sound and breathing kept |
-| 62.0–62.2 | black | true silence | — |
+| Film s | What we SEE | Caption / HUD |
+|---|---|---|
+| 0–3.4 | The windy party from the stair door: sheets, bunting, the kite high up; at 2.0 everything drops | TITLE · AERODYNAMIC FORCE 100 % → 0 % |
+| 3.4–6.3 | Zoom to the kite's flyer at the front corner, the kite falling past the parapet | *The wind is still blowing at 50 km/h…* / *…but the kite dropped like a brick.* · KITE · NO LIFT |
+| 6.3–11.7 (6.3–10.1) | Over the stairwell rail: paper and ball let go together, 22 m down, slow motion; the NORMAL AIR ghost flutters near the top | GROUND FLOOR · 22 M DOWN · BOTH LAND IN 2.14 S · SLOW MOTION ×0.6 · *Paper now falls as fast as a ball.* |
+| 11.7–17.9 (14.2–20.4) | 9 km up beside one hailstone against blue sky and the storm's wall; down into the cloud; droplets stream up past the still stone; lightning | 9 KM ABOVE THE PARTY · THIS ICE · km/h · CLOUD DROPLETS · STILL HELD UP · *Up in the storm, all of its ice is falling…* / *…and the air can't slow it down.* |
+| 17.9–21.5 (20.4–24.0) | Back on the roof, the confetti cannon: one clump goes up and comes down like gravel; the toy paratrooper's canopy can't open; its ghost drifts off | clock THE CLOUD'S ICE LANDS IN 16 S · CONFETTI · NO DRAG · PARACHUTE · CAN'T OPEN · NORMAL AIR · *So a parachute is useless.* |
+| 21.5–27.4 (24.0–29.9) | The gust front: 110 km/h, rain sideways, a ghost sheet thrashing, the real sheets barely moving | WIND 110 KM/H · RAIN IS WATER · STILL BLOWN · *The rain flies sideways…* / *…but the washing barely moves.* |
+| 27.4–30.5 (29.9–33.0) | Snap to the girl: she lets go; the balloons shoot up out of frame | BUOYANCY, NO DRAG · km/h · *Balloons now rocket up at 2 g.* |
+| 30.5–34.35 (33.0–36.85) | Look up at the dark cloud; back down to the party; the clock runs out | *That cloud's ice has been falling for 31 seconds…* / *…and the first of it is about to land.* |
+| 34.35–36.15 (36.85–37.75) | The first stones, slow motion: a stone into the confetti, chips skimming flat across the deck | ICE LANDING NOW 1,235 KM/H · SLOW MOTION ×0.5 |
+| 36.15–43.6 (37.75–45.2) | Back to the stair door; snap-ins as the bottles and the cake go; the fairy lights | ICE: STRAIGHT DOWN · RAIN: BLOWN · *It's landing faster than sound.* |
+| 43.6–46.2 (45.2–47.8) | Holes punched through the roof over you; look up | *And now it's coming through the roof.* |
+| 46.2–51.9 (47.8–53.5) | Crouched at the top of the stairs: a sheet drops, the chairs go over, the chimney pot and the table in one frame | *Now faster than a pistol bullet.* |
+| 51.9–54.4 (53.5–56.0) | Silence. You step out: a white roof, a sheet shot to lace barely moving in the wind | IN A 110 KM/H WIND · BARELY MOVES |
+| 54.4–60.5 (56.0–62.1) | Closing lines over the roof (top third) | *Every storm cloud / is full of ice.* · *Only the air holds it up.* · note |
+| 60.5–60.8 | black | — |
 
-## 4. Hero shots
-Paper and ball hitting together (cover candidate: the flag hanging dead in a 40 km/h wind under the title) · the canopy
-floating uselessly · pigeons that can't lift off · the airliner nose-level in a steep fall · steam streaking past a
-limp flag · the balloon rocketing up · the impact column over the skyline · debris raining in.
+## 4. Systems / files
+`script.js` (beats, camera, captions) · `physics.js` (the rule as formulas) · `city.js` (the city and storm sky around
+the roof) · `roof.js` (the roof, party, laundry, kite, stair housing and its holes, the stairwell) · `hail.js` (rain,
+confetti, toy paratrooper, the cloud's ice, impacts, craters) · `actors.js` (guests, balloons) · `wind.js` · `sky.js`
+(the cut-away in the storm cloud) · `film.js` (props, HUD tags, clock, grade) · `audio.js`. Engine: unchanged.
 
-## 5. Escalation check
-Wind → objects → a person in the sky → vehicles → animals → aircraft (reset) → the weather itself → the payoff that ties
-back to frame 12. Each beat is a different mechanism (drag on light things, terminal velocity, rolling vs air
-resistance, lift, wind load, buoyancy, ballistic range).
+## 5. Review log (scores as given)
 
-## 6. Comment questions left open
-Helicopters? Bullets? Skydiving suits? Weather? Fans? Could cars go faster? Sailing boats? Jet engines?
+v1 (avenue/airliner) rounds 1–2: retention 4.5 → 5, viewer 5 → 5, visual 5.5 → 5, physics 6.5 → 7.5 (details in git
+history of this file).
 
-## 7. Systems / files
-`script.js` (beats, camera, hands, HUD) · `physics.js` (the formulas and tables) · `city.js` (the avenue, copied from the
-Air film and owned here; a wider gap in the far skyline down the avenue) · `wind.js` (flags, awning, umbrellas, blade sign,
-bins, litter, steam) · `actors.js` (people, pigeons, traffic and the coasting car with its ghost, leaflets, the balloon) ·
-`sky.js` (the airliner, the cloud deck it sinks through, its impact (flash, fireball, river-spray column), the debris, the sign board, the aerial skydiver scene) · `audio.js` · `film.js`
-(props, hands, HUD tags, grade). Engine: unchanged.
+**v2 round 1** (first rooftop preview): viewer 5, retention 4.5, visual 5, physics 7; differentiation ("what feels
+recycled") new cut 6/10, old cut 2/10.
 
-## 8. Review log
+**v2 round 2 / review round 4** (61.1 s preview, 270×480):
+- Differentiation 6/10 (old cut 2/10). Recycled: the 100 → 0 % opener and wind panel; the cut-away as a template copy
+  of the old skydiver; the boxed countdown; tilt-ups to tiny objects in the sky; centred end lines. No banned shot.
+- Retention 5.6 (hook 6.0, middle 4.8, clarity 5.3, escalation 5.8, payoff 6.2). Normal viewer 5.6 (hook 6.0,
+  understanding 5.5, wow 5.5, ending 6.5, rewatch/share 5.0).
+- Visual 6.0 (image 6.5, composition 6.0, camera 6.0, phone readability 6.0, hero visuals 5.0); cinematography 5.5.
+- Physics 7 (consequences 7, numbers 9, consistency with the rule 6, misconceptions avoided 7.5). All numbers check out.
 
-**Round 1** (69.5 s preview at 270×480, four independent reviewers; scores as given):
-- Retention 4.5/10 (hook 5, middle 4, clarity 5, escalation 4, payoff 4). Main notes: the limp flag was a sliver at the
-  edge under the title; the middle sagged (car, pigeons); the airliner climax read as a distant speck and then a cloud;
-  the last 5 s were a static sky.
-- Normal viewer 5/10 (hook 5, understanding 6, wow 5, ending 4, rewatch/share 3).
-- Visual 5.5/10 (image 6.5, composition 5.5, camera 6, phone readability 5, hero visuals 4.5). Notes: pure-black
-  objects, heavy haze over the plunge, blob clouds in the sky dive, small text.
-- Physics 6.5/10 (consequences 7, numbers 9, consistency with the rule 5, misconceptions 7). Numbers recomputed and
-  right; main flag: a plane that pushes no air cannot make a sonic boom or roar, and a wind that can't touch solids
-  shouldn't roar either; liquids exemption should be said on screen.
-
-**Fixes after round 1:** re-cut to 63 s (car roll-away and storm tail cut, paper drop in 0.4× slow motion); pigeons
-fall out of the air in the hook; flag moved above the title; a bystander points up and the plane falls silently (sonic
-boom and rumble removed, near-silent wind, silent storm); telephoto hold on the plane with a side-view inset;
-the plunge framed tighter with a SLOW MOTION ×¼ label; flash, fireball and a dark column that reads on the pale sky;
-a big countdown; street ducked until the boom; NORMAL AIR ghost canopy; HUD tags kept inside the safe area; the end
-looks back at the limp flag and steam (loops to the opening) with the paper and ball beside the board; liquids
-exemption on screen.
-
-**Round 2** (the 63 s preview at 540×960, four new independent reviewers; scores as given):
-- Retention 5/10 (hook 6, middle 4, clarity 5, escalation 4, payoff 5). Notes: the airliner never got big; "LIFT 0 N" /
-  "DRAG 0 N" read as LIFT ON / DRAG ON; the storm looked like the opening shot again; blank pale frames at the impact;
-  a static countdown with a faint column; storm and balloon after the plane lose height (suggested reordering them).
-- Normal viewer 5/10 (hook 6, understanding 6, wow 5, ending 5, rewatch/share 4). Cheapest-looking: the impact (flat
-  white and a stack of grey circles), disc clouds in the sky dive, a pile of clipping pigeons, beige cube debris.
-- Visual 5/10 (image 6, composition 5, camera 6, phone readability 6, hero visuals 4). Strongest: the debris and the
-  board at the end, the flag drop. Weakest: the impact, the telephoto speck, the wireframe ghost canopy, the skydiver
-  half out of frame, the storm identical to the hook.
-- Physics 7.5/10 (consequences 8, numbers 9, consistency 7, misconceptions 8). Numbers right except COASTING 84 (should
-  be 85) and the countdown opening on 6; contradictions: the 0.4× slow motion unlabelled, pigeon wing whooshes after the
-  change, the impact column shaded as dust/smoke (solids), "nothing moves" while the steam moves.
-
-**Fixes after round 2:** the impact rebuilt (the telephoto holds as the plane drops past the far blocks to the ground:
-a flash, an orange fireball that cools to grey, a column of river spray, then the cut; street furniture and haze kept
-out of the long lens); the plane twice as big on a tracked telephoto that sinks through a cloud deck, with a
-SUPERSONIC · NO SOUND tag and a bigger side-view inset; NO LIFT / NO DRAG tags (sub-line NO DRAG · NO LIFT · ON ANY
-SOLID); a round ghost canopy; the skydiver centred over puff clouds; the hook pigeons fall apart from each other; the
-storm gets a NORMAL AIR ghost flag snapping beside the limp real one and its caption says *nothing solid moves*;
-SLOW MOTION ×0.4 labelled; wings only clap after the change; the countdown starts on 5; COASTING 85; the middle of
-the run cut (0.8 s). Re-cut to **62.2 s**. Not re-scored after these fixes.
-
-**Still weak (known):** the middle (car, birds) is the softest stretch and storm and balloon still come after the plane;
-the drop is filmed from straight above; the balloon leaves frame for about a second; the countdown shot is mostly
-static; the outro is a held shot; the impact column is billboard puffs (soft round edges show); viewer hands are
-simple; debris pieces are plain boxes; the canopy spilling out of its bag is a mild cheat (with no drag on the pilot
-chute, nothing would pull it out; only the spring-launched pilot chute and the bag would leave the container).
+**Fixes after round 4:** cut-away 8.0 → 6.2 s with no panels, no glow or bokeh, sculpted cloud, droplet streaks,
+rim-lit stone; snap-ins (FOV 72 → 44–50) on each hero break; the camera no longer retreats deep into the stair
+housing; slow motion on the first stones; the clock replaces the 3-2-1 box; ice streaks shorter, thicker and brighter
+than the thinner, dimmer rain; chips leave fast and flat (no air to stop them); darker, less dense ice haze; ragged
+dark rims on the roof holes and less bloom under them; the balloon release framed; storm darkness starts as you come
+back from the cloud; stairwell zoom reduced; the landing tag moved off the landing; tags kept clear of the readouts;
+closing lines moved to the top third; present-tense captions; the physics wording (the note says the ice loses no
+speed to droplets or rain; "the air can't slow it"; the last sheet keeps the rain's lean and is tagged BARELY MOVES).
+Final scores: see `EPISODE_REPORT.md`.

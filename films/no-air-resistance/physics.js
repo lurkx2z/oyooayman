@@ -64,7 +64,7 @@ const NR_STONE = {
 
 /* ---------------- the confetti cannon: a spring-loaded toy, fired straight up at 11 m/s ---------------- */
 // no drag: every flake flies the same parabola as a pebble would (6.2 m up, back in 2.2 s), so the cloud stays a clump
-// and lands like a handful of gravel. In normal air it would stop within a metre and blow away on the wind. A toy
+// and lands all at once, like a thrown handful of grit (a soft patter: each flake carries ~0.01 J). In normal air it would stop within a metre and blow away on the wind. A toy
 // paratrooper rides out with it: its canopy can't fill, so it flies the same parabola and lands with the confetti.
 const NR_CONFETTI = {
   v0: 11.0,
