@@ -1,11 +1,11 @@
 /* =====================================================================
-   AUDIO — the soundtrack of "What if gravity became twice as strong?", synthesised
-   and rendered offline (js/audio/audioEngine.js); every cue at its story time and place
-   (distance and pan from where you stand and where you are looking).
-   The sound idea: an ordinary sunny street (traffic, birds, a hammer on the scaffold),
-   then one deep WHUMP and everything that carries weight starts to complain at once:
-   creaks, groans, suspension clunks, your own breath. Each failure is its own hit;
-   music stays out of the way (a low pulse late on, one chord under the closing lines).
+   AUDIO — the soundtrack of "What if gravity became twice as strong?" (v3: the leisure centre), synthesised and
+   rendered offline (js/audio/audioEngine.js); every cue at its story time and place (distance and pan from where
+   you stand and where you are looking).
+   The sound idea: a busy gym (music from the ceiling speakers, a treadmill, plates), then one deep WHUMP and every
+   weight in the room hits the floor at once; the music doesn't care. Down the stair into the pool hall's long echo:
+   water lapping, voices. Under water the world goes muffled (your heartbeat, the diver's bubbles); the surface
+   brings it back; one soft chord under the closing lines.
    Bake when final:
      NODE_PATH=$(npm root -g) node tools/bake-soundtrack.cjs --page gravity-2x.html --out films/gravity-2x/soundtrack.js
    ===================================================================== */
@@ -13,7 +13,7 @@
 class GvAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
   // anything the sound depends on that is not inside SCRIPT (so a stale baked copy is detected)
-  fingerprintData() { return [GV, GV_FALL, GV_CITY, GV_ME, GV_HOPS, GV_LOOK.map((L) => [L[0], L[1], Array.isArray(L[2]) ? L[2] : String(L[2])])]; }
+  fingerprintData() { return [GV, GV_FALL, GV_THROW, GV_C, GV_ME, GV_LOOK.map((L) => [L[0], L[1], Array.isArray(L[2]) ? L[2] : String(L[2])])]; }
 
   async renderOffline() { const buf = await super.renderOffline(); AudioEngine.declick(buf, 0.15); return buf; }
 
@@ -51,276 +51,296 @@ class GvAudio extends AudioEngine {
     // mix → glue compressor → limiter
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.22;
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12;
-    const mixIn = ctx.createGain(); mixIn.gain.value = 1.9; mixIn.connect(comp);
+    const mixIn = ctx.createGain(); mixIn.gain.value = 2.7; mixIn.connect(comp);
     // (the limiter's built-in makeup gain pushes peaks to 0 dBFS: a trim after it keeps true peaks under −1 dBTP)
     const out = ctx.createGain(), trim = ctx.createGain(); trim.gain.value = 0.8; comp.connect(out); out.connect(lim); lim.connect(trim); trim.connect(ctx.destination);
     out.gain.setValueAtTime(0.0001, 0); out.gain.linearRampToValueAtTime(0.9, 0.08);
     out.gain.setValueAtTime(0.9, END - 0.8); out.gain.linearRampToValueAtTime(0.0001, END);
-    const world = ctx.createGain(); world.connect(mixIn);
-    // the load's fall: the street drops away to a hush (the rope screaming and the air rushing stay up), then the hit
-    { const P = GV_FALL.load; world.gain.setValueAtTime(1, T.drop + 0.05); world.gain.linearRampToValueAtTime(0.18, T.drop + 0.3); world.gain.setValueAtTime(0.18, P.hit - 0.04); world.gain.linearRampToValueAtTime(1, P.hit - 0.005); }
-    this.fallBus = ctx.createGain(); this.fallBus.connect(mixIn);
-    const rev = S.reverb(1.8), rs = ctx.createGain(); rs.gain.value = 0.3; rev.connect(rs); rs.connect(world);
+    // the world, heard through water when you're under: a low-pass that closes when you go in and opens when you surface
+    const muff = S.filter('lowpass', 18000, 0.7); muff.connect(mixIn);
+    const wet = [[T.slide + 0.18, T.slide + 0.85], [T.under + 0.12, T.surface + 0.02]];
+    muff.frequency.setValueAtTime(18000, 0);
+    for (const [a, b] of wet) { muff.frequency.setValueAtTime(18000, a); muff.frequency.exponentialRampToValueAtTime(420, a + 0.08); muff.frequency.setValueAtTime(420, b - 0.06); muff.frequency.exponentialRampToValueAtTime(18000, b + 0.05); }
+    const world = ctx.createGain(); world.connect(muff);
+    // the diver's fall: the hall hushes for a second, then the hit
+    world.gain.setValueAtTime(1, T.diver.step + 0.1); world.gain.linearRampToValueAtTime(0.35, T.diver.step + 0.45); world.gain.setValueAtTime(0.35, GV_FALL.hit - 0.03); world.gain.linearRampToValueAtTime(1, GV_FALL.hit);
+    // two rooms: the gym (short, dry) and the pool hall (long, bright tiles and water)
+    const gymRev = S.reverb(0.9), gr = ctx.createGain(); gr.gain.value = 0.22; gymRev.connect(gr); gr.connect(world);
+    const hallRev = S.reverb(3.6), hr = ctx.createGain(); hr.gain.value = 0.42; hallRev.connect(hr); hr.connect(world);
     const you = ctx.createGain(); you.gain.value = 1; you.connect(mixIn);
+    const uw = ctx.createGain(); uw.gain.value = 1; uw.connect(mixIn);           // under-water sounds (not muffled again)
     const mus = ctx.createGain(); mus.gain.value = 0.6; mus.connect(mixIn);
-    this.rev = rev;
-    this._bed(S, ctx, world);
-    this._you(S, ctx, you);
-    this._change(S, ctx, world, rev);
-    this._people(S, ctx, world);
-    this._pallet(S, ctx, world, rev);
-    this._cars(S, ctx, world, rev);
-    this._crane(S, ctx, world, rev);
-    this._failures(S, ctx, world, rev);
-    this._plane(S, ctx, world, rev);
-    this._end(S, ctx, world, you, mus, rev);
+    this.gymRev = gymRev; this.hallRev = hallRev;
+    this._gym(S, ctx, world, gymRev);
+    this._change(S, ctx, world, gymRev);
+    this._treadmill(S, ctx, world, gymRev);
+    this._bench(S, ctx, world, gymRev);
+    this._court(S, ctx, world);
+    this._hall(S, ctx, world, hallRev);
+    this._you(S, ctx, you, world, hallRev);
+    this._ladder(S, ctx, world, hallRev);
+    this._dive(S, ctx, world, hallRev, uw);
+    this._under(S, ctx, uw, you);
+    this._end(S, ctx, world, mus);
   }
 
   /* ---- little synth pieces ---- */
-  // a structure under load: a slow, rough groan (sawtooth through a resonant band, wobbling)
-  creak(t, dur, f, vol, pan, dest) {
-    const ctx = this.S.ctx, o = ctx.createOscillator(), bp = this.S.filter('bandpass', f * 3, 4), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
-    o.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f * 0.86, t + dur);
-    lfo.frequency.value = 7 + 5 * this.S.rng.next(); lg.gain.value = f * 0.06; lfo.connect(lg); lg.connect(o.frequency);
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + dur * 0.3); g.gain.linearRampToValueAtTime(vol * 0.6, t + dur * 0.7); g.gain.linearRampToValueAtTime(0, t + dur);
-    o.connect(bp); bp.connect(g); g.connect(this.S.panned(dest, pan));
-    o.start(t); o.stop(t + dur + 0.05); lfo.start(t); lfo.stop(t + dur + 0.05);
+  // steel on steel: a struck bar or plate (inharmonic partials, a fast decay)
+  clang(t, f, vol, pan, dest, dur = 0.9) {
+    const S = this.S, ctx = S.ctx;
+    for (const [k, a] of [[1, 1], [2.76, 0.6], [5.4, 0.35], [8.9, 0.2]]) S.tone(t, dur / Math.sqrt(k), f * k, vol * a, pan, dest, 'sine', 0.002, dur / Math.sqrt(k) * 0.8);
+    S.click(t, vol * 1.5, pan, dest);
   }
-  // metal on asphalt / metal on metal
-  scrape(t, dur, f, vol, pan, dest) {
-    const S = this.S, ctx = S.ctx, n = S.noise('white', t, t + dur + 0.05), bp = S.filter('bandpass', f, 2.5), g = ctx.createGain();
-    for (let k = 0; k <= 8; k++) bp.frequency.setValueAtTime(f * (0.8 + 0.5 * S.rng.next()), t + (k / 8) * dur);
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.02); g.gain.setValueAtTime(vol * 0.8, t + dur * 0.7); g.gain.linearRampToValueAtTime(0, t + dur);
+  // water: a splash (a noise burst through a falling band), droplets pattering after it
+  splash(t, vol, pan, dest, rev, size = 1) {
+    const S = this.S, ctx = S.ctx, dur = 0.35 + 0.5 * size;
+    const n = S.noise('white', t, t + dur + 0.2), bp = S.filter('bandpass', 2400, 0.6), g = ctx.createGain();
+    bp.frequency.setValueAtTime(900 + 600 * size, t); bp.frequency.exponentialRampToValueAtTime(3200, t + 0.08); bp.frequency.exponentialRampToValueAtTime(1800, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.012); g.gain.setTargetAtTime(0, t + 0.04, dur / 3.5);
+    n.connect(bp); bp.connect(g); g.connect(S.panned(dest, pan));
+    if (rev) { const r = ctx.createGain(); r.gain.value = 0.6; g.connect(r); r.connect(rev); }
+    const lo = S.noise('pink', t, t + 0.5), lp = S.filter('lowpass', 380, 0.8), lg = ctx.createGain();
+    lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(vol * 1.2 * size, t + 0.01); lg.gain.setTargetAtTime(0, t + 0.03, 0.08);
+    lo.connect(lp); lp.connect(lg); lg.connect(S.panned(dest, pan));
+    for (let k = 0; k < 10 * size; k++) { const tt = t + 0.15 + (0.3 + 0.7 * size) * Math.pow(S.rng.next(), 1.4); this.drip(tt, vol * S.rng.range(0.08, 0.2), MathX.clamp(pan + S.rng.range(-0.3, 0.3), -1, 1), dest); }
+  }
+  // a single drop or a bubble: a short upward sine chirp
+  drip(t, vol, pan, dest, f = null) {
+    const S = this.S, ctx = S.ctx, o = ctx.createOscillator(), g = ctx.createGain(), f0 = f || S.rng.range(700, 1500);
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * 2.1, t + 0.035);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.004); g.gain.setTargetAtTime(0, t + 0.01, 0.012);
+    o.connect(g); g.connect(S.panned(dest, pan)); o.start(t); o.stop(t + 0.08);
+  }
+  // water lapping at the pool's edge: gentle, irregular, filtered noise
+  lapping(t0, t1, vol, pan, dest, rate = 1.6) {
+    const S = this.S, ctx = S.ctx, n = S.noise('pink', t0, t1), bp = S.filter('bandpass', 700, 0.9), g = ctx.createGain();
+    g.gain.setValueAtTime(0, t0);
+    for (let t = t0; t < t1; t += 0.08) g.gain.linearRampToValueAtTime(vol * (0.35 + 0.65 * Math.max(0, Math.sin(t * rate * Math.PI * 2 + Math.sin(t * 0.7) * 2)) ** 2), t);
     n.connect(bp); bp.connect(g); g.connect(S.panned(dest, pan));
   }
-  // a big structural crash: low boom, crunch, a scatter of clatter after it
-  crash(t, vol, pan, dest, rev, clatter = 8, spread = 0.9) {
-    const S = this.S;
-    S.boom(t, vol * 0.8, S.panned(dest, pan), rev);
-    S.crunch(t + 0.01, vol, pan, dest, rev);
-    S.thump(t, vol * 0.7, dest);
-    for (let k = 0; k < clatter; k++) S.clunk(t + 0.08 + spread * Math.pow(S.rng.next(), 1.6), vol * S.rng.range(0.15, 0.4), MathX.clamp(pan + S.rng.range(-0.3, 0.3), -1, 1), dest);
-  }
-  // running water: a roar (low) and a hiss (high), shaped by `shape(t)` 0..1
-  water(t0, t1, vol, pan, dest, shape) {
-    const S = this.S, ctx = S.ctx;
-    for (const [type, f, q, k] of [['pink', 700, 0.6, 1.0], ['white', 3200, 0.5, 0.35]]) {
-      const n = S.noise(type, t0, t1), bp = S.filter(type === 'pink' ? 'lowpass' : 'bandpass', f, q), g = ctx.createGain();
-      g.gain.setValueAtTime(0, t0);
-      for (let t = t0; t <= t1; t += 0.1) g.gain.linearRampToValueAtTime(vol * k * shape(t), t);
-      n.connect(bp); bp.connect(g); g.connect(S.panned(dest, pan));
+  // straining: a long, rough voiced effort (glides down)
+  strain(t, dur, f, vol, pan, dest) { this.S.voice(t, f, dur, 'u', vol, pan, dest, 0.82); this.S.breath(t + dur, 0.5, false, vol * 0.7, dest); }
+
+  /* ---- the gym: music from the ceiling speakers, the room, people ---- */
+  _gym(S, ctx, world, rev) {
+    const T = GV, bpm = 118, beat = 60 / bpm, end = T.stair[0] + 6;
+    // the speakers: a band-limited bus that fades as you go down the stair (and is gone in the pool hall)
+    const spk = ctx.createGain(), bp = S.filter('bandpass', 1100, 0.45), hp = S.filter('highpass', 140, 0.7);
+    spk.connect(hp); hp.connect(bp); bp.connect(world); const sr = ctx.createGain(); sr.gain.value = 0.5; bp.connect(sr); sr.connect(rev);
+    spk.gain.setValueAtTime(0.9, 0); spk.gain.setValueAtTime(0.9, T.stair[0]); spk.gain.linearRampToValueAtTime(0.25, T.stair[0] + 2.5); spk.gain.linearRampToValueAtTime(0.0001, end);
+    const bass = [55, 55, 65.4, 73.4, 55, 55, 82.4, 73.4];
+    for (let i = 0, t = 0.05; t < end; i++, t += beat) {
+      S.thump(t, 0.32, spk);
+      S.tick(t + beat / 2, 7800, 0.05, spk);
+      if (i % 2) S.hiss(t, 0.08, 0.025, 0.1, spk);
+      const f = bass[Math.floor(i / 2) % bass.length];
+      S.tone(t + beat / 2, beat * 0.45, f * 2, 0.07, 0, spk, 'sawtooth', 0.008, 0.05);
+      if (i % 8 === 0) for (const k of [1, 1.26, 1.5]) S.tone(t, beat * 7.5, 220 * k * (Math.floor(i / 8) % 2 ? 0.89 : 1), 0.012, 0, spk, 'triangle', 0.3, 1.0);
     }
-  }
-  // a moving engine (sawtooth hum + rumble), spatialised along posFn
-  engine(posFn, t0, t1, f, vol, dest, ref = 6) {
-    const S = this.S, ctx = S.ctx, pts = this._spatial(posFn, t0, t1, 1 / 20, ref);
-    const o = ctx.createOscillator(), lp = S.filter('lowpass', f * 6, 0.8), n = S.noise('brown', t0, t1), nl = S.filter('lowpass', 260, 0.7), g = ctx.createGain(), p = ctx.createStereoPanner();
-    o.type = 'sawtooth'; o.connect(lp); lp.connect(g); n.connect(nl); nl.connect(g); g.connect(p); p.connect(dest);
-    this._applySpatial(pts, g.gain, p.pan, [[o.frequency, f]], vol);
-    o.start(t0); o.stop(t1);
+    // the room: air handling, a little murmur
+    { const n = S.noise('brown', 0, end), lp = S.filter('lowpass', 260, 0.7), g = ctx.createGain(); g.gain.setValueAtTime(0.18, 0); g.gain.setValueAtTime(0.18, T.stair[0]); g.gain.linearRampToValueAtTime(0.0001, end); n.connect(lp); lp.connect(g); g.connect(world); }
+    // plates and dumbbells being put down, before the change
+    for (const [t, x, z] of [[0.35, -2.6, 4.2], [1.05, 5.2, 1.4]]) { const a = this.at(x, z, t); this.clang(t, 410 + 90 * S.rng.next(), 0.04 * a.g, a.pan, world, 0.5); }
+    // the scale: a soft beep when it has your weight; then fast beeps while it re-measures after the change
+    S.tone(0.25, 0.09, 1760, 0.035, 0, world, 'sine', 0.006, 0.05);
+    for (let k = 0; k < 6; k++) S.tone(T.g0 + 0.3 + k * 0.16, 0.07, 2093, 0.03, 0, world, 'sine', 0.006, 0.04);
+    S.tone(T.scale[0] + 0.05, 0.3, 1568, 0.03, 0, world, 'sine', 0.006, 0.2);
   }
 
-  /* ---- the street ---- */
-  _bed(S, ctx, world) {
-    const END = CONFIG.duration, T = GV;
-    // city traffic hum and distant life
-    for (const [type, f, q, v] of [['brown', 320, 0.7, 0.32], ['pink', 1600, 0.5, 0.05]]) {
-      const n = S.noise(type, 0, END), b = S.filter('lowpass', f, q), g = ctx.createGain();
-      g.gain.setValueAtTime(v, 0); g.gain.setValueAtTime(v, GV_FALL.load.hit - 0.2); g.gain.linearRampToValueAtTime(v * 0.25, GV_FALL.load.hit + 1.0); g.gain.linearRampToValueAtTime(v * 0.12, END);
-      n.connect(b); b.connect(g); g.connect(world);
-    }
-    // birds in the trees — until the change (they drop out of the trees and go quiet)
-    for (let t = 0.1; t < T.g0 + 0.2; t += S.rng.range(0.18, 0.5)) S.chirp(t, S.rng.range(2600, 4200), 0.05, S.rng.range(-0.8, 0.8), world, false);
-    for (let k = 0; k < 6; k++) S.flap(T.g0 + 0.15 + k * 0.09, S.rng.range(-0.8, 0.8), 0.05, world);
-    for (let t = 9; t < 52; t += S.rng.range(2.5, 6)) S.chirp(t, S.rng.range(2400, 3600), 0.018, S.rng.range(-0.9, 0.9), world, true);
-    // a hammer on the scaffold before the change
-    for (let t = 0.15; t < T.g0; t += 0.42) { const a = this.at(11.7, -12.5, t, 10); S.click(t, 0.12 * a.g, a.pan, world); S.clunk(t, 0.06 * a.g, a.pan, world); }
-    // the crane's diesel: always there, under everything, until the load lets go
-    { const a = this.at(-4.4, -33.5, 0, 12), o = ctx.createOscillator(), lp = S.filter('lowpass', 220, 0.9), g = ctx.createGain(), p = S.panned(world, a.pan * 0.5);
-      o.type = 'sawtooth'; o.frequency.setValueAtTime(46, 0); o.frequency.setValueAtTime(46, T.g0); o.frequency.linearRampToValueAtTime(41, T.g0 + 0.6); o.frequency.linearRampToValueAtTime(52, T.g0 + 2.5);
-      g.gain.setValueAtTime(0.09 * a.g, 0); g.gain.setValueAtTime(0.09 * a.g, T.drop + 1.0); g.gain.linearRampToValueAtTime(0.0, T.drop + 3);
-      o.connect(lp); lp.connect(g); g.connect(p); o.start(0); o.stop(T.drop + 3.2); }
-  }
-
-  /* ---- you: steps, the bag, breathing, the fall, getting up ---- */
-  _you(S, ctx, you) {
-    const T = GV, C = SCRIPT.camera, zT = new Track(C.z);
-    let walked = 0, next = 0.66, pz = zT.value(0);
-    for (let t = 0; t < CONFIG.duration; t += 1 / 60) {
-      const z = zT.value(t); walked += Math.abs(z - pz); pz = z;
-      if (walked >= next) { S.step(t, t < T.g0 ? 0.2 : 0.3, (Math.round(next / 0.66) % 2 ? 0.15 : -0.15), you); next += 0.66; }
-    }
-    // the bag: paper rustle as it swings, the yank, the set-down
-    for (let t = 0.3; t < T.g0; t += 0.66) S.hiss(t, 0.12, 0.012, 0.3, you);
-    S.hiss(T.g0 + 0.05, 0.25, 0.05, 0.3, you); S.clunk(T.g0 + 0.12, 0.12, 0.3, you);
-    S.hiss(T.bagDown[0] + 0.1, 0.5, 0.03, 0.3, you);
-    S.thump(T.bagDown[0] + 0.62, 0.35, you); S.clunk(T.bagDown[0] + 0.62, 0.1, 0.3, you); S.hiss(T.bagDown[1], 0.3, 0.035, 0.3, you);
-    // breathing: calm, then laboured under the weight (rate from the breathRate track), panting after the fall
-    const BR = SCRIPT_TRACKS.breathRate;
-    for (let t = 0.4; t < GV_FALL.load.hit - 0.3; ) {
-      const rate = BR.value(t), per = 60 / rate, hard = MathX.smooth(t, T.g0, T.g0 + 1.5);
-      const loud = 0.025 + 0.06 * hard + 0.08 * MathX.window(t, T.trip, T.up[1] + 1.5, 0.3, 1.5);
-      S.breath(t, per * 0.42, true, loud, you); S.breath(t + per * 0.45, per * 0.5, false, loud * 1.15, you);
-      t += per;
-    }
-    // the change: the air pushed out of you; effort grunts while you lower the bag and get up
-    S.voice(T.g0 + 0.08, 118, 0.22, 'u', 0.05, 0, you, 0.8);
-    S.voice(T.bagDown[0] + 0.5, 112, 0.35, 'u', 0.035, 0, you, 0.85);
-    // the trip: a scuff, knees and hands on the pavement, the breath knocked out
-    S.hiss(T.trip, 0.2, 0.05, 0.1, you);
-    S.thump(T.trip + 0.33, 0.9, you); S.clunk(T.trip + 0.34, 0.25, -0.1, you);
-    S.click(T.trip + 0.43, 0.2, 0.3, you); S.click(T.trip + 0.45, 0.2, -0.3, you); S.thump(T.trip + 0.44, 0.35, you);
-    S.voice(T.trip + 0.36, 104, 0.3, 'o', 0.07, 0, you, 0.7);
-    for (let k = 0; k < 10; k++) S.heart(T.trip + 0.6 + k * 0.52, 0.22 * (1 - k / 12), you);
-    S.voice(T.up[0] + 0.7, 110, 0.55, 'u', 0.045, 0, you, 0.9); S.voice(T.up[0] + 2.1, 114, 0.6, 'a', 0.045, 0, you, 0.85);
-    S.hiss(T.up[0] + 0.6, 0.4, 0.02, 0, you); S.hiss(T.up[0] + 2.2, 0.5, 0.02, 0, you);
-  }
-
-  /* ---- the change: one deep hit, then everything that carries weight complains ---- */
+  /* ---- the change: one deep hit, and every weight in the room hits the floor ---- */
   _change(S, ctx, world, rev) {
     const t = GV.g0;
     S.whump(t, 0.9, 0, world);
-    S.boom(t + 0.02, 0.35, world, rev);
-    // a sub swell under it (the feel of the floor pushing up at you)
-    S.tone(t, 1.6, 34, 0.35, 0, world, 'sine', 0.05, 1.3);
-    // creaks all round: scaffold, awning, crane, the bench, the street furniture
-    const src = [[11.6, -15, 64, 0.11], [11.4, -6.7, 92, 0.07], [-4.4, -33.5, 52, 0.09], [11.8, -2.4, 140, 0.05], [-16.5, -3, 70, 0.06], [-22, -30, 58, 0.06]];
-    src.forEach(([x, z, f, v], i) => { const a = this.at(x, z, t + 0.1); this.creak(t + 0.08 + i * 0.06, 1.6 + 0.4 * S.rng.next(), f, v * (0.5 + a.g), a.pan, world); });
-    // every car on the street drops on its springs: a ripple of suspension clunks
-    for (const c of [[5.6, 36], [-5.6, 3.5], [-5.6, 9.8], [-5.6, 16.2], [-5.6, 22.6], [1.75, 2], [5.25, 0], [9.25, -15.6], [5.6, -42], [5.6, -52]]) {
-      const a = this.at(c[0], c[1], t); S.clunk(t + 0.05 + S.rng.range(0, 0.12), 0.35 * a.g, a.pan, world);
+    S.boom(t + 0.02, 0.32, world, rev);
+    S.tone(t, 1.6, 34, 0.35, 0, world, 'sine', 0.05, 1.3);              // a sub swell (the floor pushing up at you)
+    // the dumbbells she was curling, the bar onto the safety arms, plates sliding on the racks, a kettlebell
+    { const a = this.at(-0.55, -3.7, t); S.thump(t + 0.36, 0.35 * a.g + 0.1, world); this.clang(t + 0.37, 330, 0.06 * a.g, a.pan, world, 0.4); this.clang(t + 0.39, 360, 0.05 * a.g, a.pan, world, 0.4); }
+    { const a = this.at(GV_C.bench.x, GV_C.bench.barZ, t); this.clang(t + 0.3, 260, 0.1 * a.g, a.pan, world, 1.0); S.clunk(t + 0.3, 0.3 * a.g, a.pan, world); }
+    for (const [x, z, dt] of [[-2.6, 4.2, 0.12], [-0.6, 4.2, 0.18], [5.2, 1.4, 0.22], [-4.6, -4.9, 0.27], [1.6, 3.0, 0.33]]) { const a = this.at(x, z, t); S.clunk(t + dt, 0.25 * a.g, a.pan, world); this.clang(t + dt + 0.01, 380 + 200 * S.rng.next(), 0.035 * a.g, a.pan, world, 0.6); }
+    // gasps across the room
+    for (const [x, z, f, dt] of [[-5.45, -2.15, 240, 0.12], [-0.55, -3.7, 230, 0.2], [3.75, -1.4, 130, 0.25]]) { const a = this.at(x, z, t); S.voice(t + dt, f, 0.3, 'a', 0.045 * a.g, a.pan, world, 0.8); }
+    // the building takes the load: a long low groan
+    S.tone(t + 0.1, 2.2, 47, 0.06, 0, world, 'sawtooth', 0.2, 1.5);
+  }
+
+  /* ---- the treadmill: the motor, her stride, the change, off the back ---- */
+  _treadmill(S, ctx, world, rev) {
+    const T = GV.tread, x = -5.45, z = GV_C.treadZ[1], end = GV.stair[0];
+    { const a = this.at(x, z, 0, 6), o = ctx.createOscillator(), lp = S.filter('lowpass', 900, 1.5), g = ctx.createGain(), p = S.panned(world, a.pan);
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(92, 0); o.frequency.setValueAtTime(92, GV.g0); o.frequency.linearRampToValueAtTime(84, GV.g0 + 0.4); o.frequency.linearRampToValueAtTime(92, GV.g0 + 1.2);
+      g.gain.setValueAtTime(0.03, 0); g.gain.setValueAtTime(0.03, T.look); g.gain.linearRampToValueAtTime(0.05, T.look + 0.6); g.gain.setValueAtTime(0.05, GV.offScale + 1); g.gain.linearRampToValueAtTime(0.012, GV.offScale + 3); g.gain.linearRampToValueAtTime(0.0001, end);
+      o.connect(lp); lp.connect(g); g.connect(p); o.start(0); o.stop(end + 0.1); }
+    // her footfalls on the belt: even at 1 G; scuffing and slapping once she's hanging on
+    for (let t = 0.1; t < GV.g0; t += 0.5 / GV_RUN_HZ) { const a = this.at(x, z, t, 6); S.step(t, 0.12 * a.g, a.pan, world); }
+    for (let t = GV.g0 + 0.15; t < T.slip; t += S.rng.range(0.18, 0.32)) { const a = this.at(x, z, t, 6); S.step(t, 0.07 * a.g, a.pan, world); S.hiss(t, 0.12, 0.012 * a.g, a.pan, world); }
+    { const a = this.at(x, z, T.slip, 6);
+      S.voice(GV.g0 + 0.1, 260, 0.35, 'a', 0.06 * a.g, a.pan, world, 0.85);
+      for (let t = GV.g0 + 1.5; t < T.slip; t += 0.9) S.voice(t, 250, 0.4, 'u', 0.035 * a.g, a.pan, world, 0.9);
+      S.voice(T.slip + 0.02, 300, 0.45, 'e', 0.08 * a.g, a.pan, world, 1.15);
+      S.thump(T.slip + 0.2, 0.3 * a.g + 0.05, world); this.clang(T.slip + 0.05, 520, 0.03 * a.g, a.pan, world, 0.4);
+      const off = T.slip + (GV_C.treadX[1] + 0.02 - (-5.45 + 0.32)) / GV_BELT + 0.13;
+      S.thump(off, 0.45 * a.g + 0.08, world); S.clunk(off, 0.2 * a.g, a.pan, world); S.voice(off + 0.05, 230, 0.3, 'o', 0.07 * a.g, a.pan, world, 0.75);
+      for (let k = 0; k < 4; k++) S.breath(T.sit + 0.3 + k * 0.7, 0.32, k % 2 === 0, 0.03 * a.g, world); }
+  }
+
+  /* ---- the bench: the heave, the strain, the rattle, the crash ---- */
+  _bench(S, ctx, world, rev) {
+    const B = GV.bench, x = GV_C.bench.x, z = GV_C.bench.barZ, a = this.at(x, z, B.heave);
+    S.voice(B.look + 0.3, 140, 0.3, 'e', 0.04 * a.g, a.pan, world, 1.0);                         // "three, two…"
+    S.voice(B.look + 0.75, 135, 0.25, 'o', 0.04 * a.g, a.pan, world, 0.95);
+    this.strain(B.heave, B.drop - B.heave - 0.05, 112, 0.09 * a.g + 0.02, a.pan, world);
+    this.strain(B.heave + 0.08, B.drop - B.heave - 0.1, 150, 0.06 * a.g + 0.01, MathX.clamp(a.pan - 0.1, -1, 1), world);
+    // the bar trembling in their hands
+    for (let t = B.heave + 0.3; t < B.drop; t += 0.045) S.click(t, 0.035 * a.g * (0.6 + 0.4 * S.rng.next()), a.pan, world);
+    // the crash onto the safety arms
+    const tc = B.drop + Math.sqrt(2 * 0.069 / GV_G);
+    this.clang(tc, 240, 0.16 * a.g + 0.03, a.pan, world, 1.4); this.clang(tc + 0.005, 310, 0.1 * a.g, a.pan, world, 1.1);
+    S.clunk(tc, 0.5 * a.g + 0.1, a.pan, world); S.thump(tc, 0.35, world); S.boom(tc, 0.12, world, rev);
+    S.voice(tc + 0.35, 120, 0.7, 'a', 0.06 * a.g, a.pan, world, 0.75);                          // a long breath out
+    S.breath(tc + 1.2, 0.8, false, 0.04 * a.g, world);
+  }
+
+  /* ---- the court, through the glass: the ball's thuds, shoes, a groan ---- */
+  _court(S, ctx, world) {
+    const glass = S.filter('lowpass', 950, 0.7), g = ctx.createGain(); g.gain.value = 0.9; glass.connect(g); g.connect(world);
+    const T = GV_THROW, H = GV_C.court.hoop, o = { x: 0, y: 0, z: 0, vis: 1 };
+    // the bounces (from the ball's own flight): find each landing
+    let py = 1, pv = 0;
+    for (let t = T.t0 + 0.02; t < T.t0 + 4.0; t += 1 / 240) {
+      gvBall(t, GV_G, o); const v = o.y - py;
+      if (pv < 0 && v >= 0 && o.y < 0.14) { const a = this.at(o.x, o.z, t, 10); S.thump(t, 0.5 * a.g + 0.05, glass); S.step(t, 0.25 * a.g, a.pan, glass); }
+      pv = v; py = o.y;
     }
-    // scaffold couplers ticking as the joints take up the slack
-    for (let k = 0; k < 14; k++) { const tt = t + 0.1 + S.rng.range(0, 1.4), a = this.at(11.6, -18, tt); S.click(tt, 0.12 * a.g, a.pan, world); }
+    const a = this.at(H.x, H.z + 3, T.t0);
+    S.voice(T.t0 + 0.9, 150, 0.6, 'o', 0.08 * a.g + 0.02, a.pan, glass, 0.8);
+    S.voice(T.t0 + 1.1, 190, 0.5, 'a', 0.06 * a.g + 0.02, a.pan, glass, 0.85);
+    for (let k = 0; k < 4; k++) S.chirp(T.t0 - 1.0 + k * 0.7 + S.rng.range(0, 0.3), 2400, 0.012, a.pan, glass, false);   // shoe squeaks
   }
 
-  /* ---- people ---- */
-  _people(S, ctx, world) {
+  /* ---- the pool hall: the room, water lapping, voices, the swimmers ---- */
+  _hall(S, ctx, world, rev) {
+    const T = GV, t0 = T.toStair, END = CONFIG.duration;
+    const hall = ctx.createGain(); hall.connect(world); const hs = ctx.createGain(); hs.gain.value = 0.7; hall.connect(hs); hs.connect(rev);
+    hall.gain.setValueAtTime(0.0001, 0); hall.gain.setValueAtTime(0.0001, t0); hall.gain.linearRampToValueAtTime(0.45, T.stair[0]); hall.gain.linearRampToValueAtTime(1, T.stair[1]);
+    // the room tone: the hall's air handling, a wash of water
+    { const n = S.noise('pink', t0, END), lp = S.filter('lowpass', 1500, 0.5), g = ctx.createGain(); g.gain.value = 0.12; n.connect(lp); lp.connect(g); g.connect(hall); }
+    this.lapping(t0, END, 0.09, -0.3, hall, 1.3); this.lapping(t0, END, 0.07, 0.4, hall, 1.9);
+    // distant voices and children; a whistle at the change heard from downstairs
+    S.chatter(t0, END - 3, 0.022, -0.2, hall, 380, 2.5);
+    S.chatter(t0, END - 3, 0.014, 0.4, hall, 620, 1.6);
+    { const w = (t, d) => { S.tone(t, d, 2950, 0.02, 0.3, rev, 'square', 0.01, 0.05); S.tone(t, d, 3100, 0.012, 0.3, rev, 'sine', 0.01, 0.05); }; w(GV.g0 + 0.6, 0.35); }
+    // the swimmers: her breaststroke (a splash with each stroke), the kid's paddling
+    for (let t = 24; t < 31.6; t += 1.45) { const a = this.at(-9.1, -18.6 + 0.82 * (t - 20), t, 6); S.hiss(t + 0.55, 0.25, 0.02 * a.g, a.pan, hall); this.drip(t + 0.6, 0.02 * a.g, a.pan, hall); }
+    for (let t = 25; t < END - 3; t += S.rng.range(0.5, 1.3)) { const a = this.at(-1.0, -10.6, t, 6); this.drip(t, 0.015 * a.g, a.pan, hall); }
+    // the lifeguard's heavy breathing as you pass the chair
+    { const a = this.at(GV_C.chair.x, GV_C.chair.z, T.deck + 2.0, 4); for (let k = 0; k < 4; k++) S.breath(T.deck + 1.6 + k * 0.8, 0.4, k % 2 === 0, 0.03 * a.g, hall); }
+    // the stair man's breath
+    { const a = this.at(3.3, -8.4, T.stair[0] + 3.5, 4); for (let k = 0; k < 6; k++) S.breath(T.stair[0] + 2.6 + k * 0.62, 0.3, k % 2 === 0, 0.04 * a.g, world); }
+  }
+
+  /* ---- you: footsteps (rubber, steel treads, wet tiles), breathing ---- */
+  _you(S, ctx, you, world, rev) {
+    const T = GV, xT = new Track(SCRIPT.camera.x), zT = new Track(SCRIPT.camera.z), St = GV_C.stair;
+    let walked = 0, next = 0.62, px = xT.value(0), pz = zT.value(0), lastTread = 0;
+    for (let t = 0; t < T.sit; t += 1 / 60) {
+      const x = xT.value(t), z = zT.value(t); walked += Math.hypot(x - px, z - pz); px = x; pz = z;
+      const onStair = z < St.z0 && z > St.z0 - St.n * St.run - 0.1 && t > T.stair[0] - 0.3 && t < T.stair[1] + 0.3;
+      if (onStair) {
+        const u = (St.z0 - z) / St.run, k = Math.floor(u - 0.5);
+        if (k > lastTread) { lastTread = k; S.step(t, 0.34, (k % 2 ? 0.15 : -0.15), you); this.clang(t + 0.005, 140 + 10 * (k % 3), 0.035, 0, you, 0.35); S.thump(t, 0.18, you); }
+        walked = 0; next = 0.62;
+      } else if (walked >= next) {
+        const deck = t > T.stair[1];
+        S.step(t, t < T.g0 ? 0.18 : 0.28, (Math.round(next / 0.62) % 2 ? 0.15 : -0.15), you);
+        if (deck) S.hiss(t + 0.01, 0.07, 0.025, 0, you);
+        next += 0.62;
+      }
+    }
+    // the rail squeaking under your hand on the way down
+    for (let t = T.stair[0] + 0.4; t < T.stair[1] - 0.3; t += S.rng.range(0.6, 1.1)) S.chirp(t, 1900, 0.006, 0.4, you, false);
+    // stepping off the scale; the knees giving at the change; sitting down on the edge
+    S.voice(T.g0 + 0.08, 118, 0.22, 'u', 0.05, 0, you, 0.8);
+    S.thump(T.g0 + 0.1, 0.4, you);
+    S.thump(T.sit + 0.85, 0.3, you); S.hiss(T.sit + 0.9, 0.3, 0.02, 0, you);
+    // breathing: calm, then laboured under the weight (rate from the breathRate track); held under water
+    const BR = SCRIPT_TRACKS.breathRate, HOLD = SCRIPT_TRACKS.breathHold;
+    for (let t = 0.4; t < T.lineA[0] + 2; ) {
+      const rate = BR.value(t), per = 60 / rate, hard = MathX.smooth(t, T.g0, T.g0 + 1.5) * (1 - 0.6 * MathX.smooth(t, T.float, T.float + 2));
+      const loud = 0.022 + 0.055 * hard + 0.03 * MathX.window(t, T.stair[0] + 2, T.stair[1] + 2, 1, 2);
+      const inWater = (t > T.slide + 0.1 && t < T.slide + 0.9);
+      if (HOLD.value(t) < 0.3 && HOLD.value(t + per) < 0.3 && !inWater) { S.breath(t, per * 0.42, true, loud, you); S.breath(t + per * 0.45, per * 0.5, false, loud * 1.15, you); }
+      t += per;
+    }
+    // the slide in: the splash, a moment under, up with a gasp; floating: water at your ears
+    S.hiss(T.slide, 0.4, 0.02, 0, you);
+    this.splash(T.slide + 0.32, 0.25, 0.1, you, rev, 0.8);
+    S.gasp(T.slide + 0.95, 0.06, you);
+    this.lapping(T.float - 0.3, CONFIG.duration, 0.09, 0, you, 0.9);
+    // surfacing beside her: a gasp, water running off your face
+    S.gasp(T.surface + 0.05, 0.07, you); S.hiss(T.surface + 0.1, 0.6, 0.02, 0, you);
+    for (let k = 0; k < 8; k++) this.drip(T.surface + 0.15 + 0.6 * S.rng.next(), 0.03, S.rng.range(-0.4, 0.4), you);
+  }
+
+  /* ---- the man on the ladder ---- */
+  _ladder(S, ctx, world, rev) {
+    const L = GV.ladder, a = this.at(GV_C.ladder.x, GV_C.ladder.z, L.up);
+    this.strain(L.up + 0.1, L.top - L.up + 0.6, 125, 0.06 * a.g + 0.015, a.pan, world);
+    for (let t = L.up; t < L.slip; t += 0.25) this.drip(t + 0.1 * S.rng.next(), 0.03 * a.g, a.pan, world);        // water pouring off him
+    S.hiss(L.up + 0.1, 1.2, 0.025 * a.g, a.pan, world);
+    S.voice(L.slip + 0.02, 160, 0.3, 'a', 0.07 * a.g, a.pan, world, 1.2);
+    this.splash(L.splash, 0.3 * a.g + 0.06, a.pan, world, rev, 1.0);
+    S.voice(L.splash + 0.9, 140, 0.5, 'o', 0.04 * a.g, a.pan, world, 0.8);
+  }
+
+  /* ---- the dive: the hush, the air, the hit, the hall's echo ---- */
+  _dive(S, ctx, world, rev, uw) {
+    const T = GV.diver, F = GV_FALL, E = GV_ENTRY;
+    const a = this.at(E.x, E.z, F.hit, 10);
+    // a gasp from someone on the deck as she steps off; the air around her as she falls
+    S.voice(T.step + 0.12, 380, 0.4, 'o', 0.03 * a.g, a.pan, world, 0.95);
+    { const n = S.noise('pink', T.step, F.hit + 0.02), bp = S.filter('bandpass', 500, 0.7), g = ctx.createGain();
+      bp.frequency.setValueAtTime(400, T.step); bp.frequency.linearRampToValueAtTime(1500, F.hit); g.gain.setValueAtTime(0, T.step); g.gain.linearRampToValueAtTime(0.09, F.hit - 0.01); g.gain.linearRampToValueAtTime(0, F.hit + 0.01);
+      n.connect(bp); bp.connect(g); g.connect(S.panned(uw, a.pan * 0.5)); }
+    // the hit: a deep slap, the crown of water, the jet falling back, the hall answering
+    S.thump(F.hit, 0.9, world); S.boom(F.hit + 0.01, 0.5, world, rev); S.whump(F.hit, 0.5, a.pan, world);
+    this.splash(F.hit, 0.65, a.pan, world, rev, 2.0);
+    this.splash(F.hit + 0.42, 0.3, a.pan, world, rev, 1.2);
+    // the wave reaching the edges, lapping harder for a while
+    this.lapping(F.hit + 2.6, F.hit + 9, 0.08, -0.2, world, 2.6);
+    // the people on the deck
+    S.voice(F.hit + 0.6, 300, 0.5, 'o', 0.03, -0.3, world, 0.8); S.voice(F.hit + 0.8, 420, 0.4, 'e', 0.02, 0.4, world, 0.9);
+  }
+
+  /* ---- under water: a muffled roar, her bubbles, your heartbeat ---- */
+  _under(S, ctx, uw, you) {
+    const T = GV, t0 = T.under + 0.1, t1 = T.surface + 0.05;
+    for (const [a, b, v] of [[T.slide + 0.2, T.slide + 0.85, 0.5], [t0, t1, 1]]) {
+      const n = S.noise('brown', a, b + 0.1), lp = S.filter('lowpass', 300, 0.7), g = ctx.createGain();
+      g.gain.setValueAtTime(0, a); g.gain.linearRampToValueAtTime(0.4 * v, a + 0.06); g.gain.setValueAtTime(0.4 * v, b - 0.08); g.gain.linearRampToValueAtTime(0, b);
+      n.connect(lp); lp.connect(g); g.connect(uw);
+    }
+    // her plume: a rushing roar that fades, and bubbles popping and rising
+    { const n = S.noise('pink', t0, t0 + 3), bp = S.filter('bandpass', 600, 0.6), g = ctx.createGain();
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(0.18, t0 + 0.05); g.gain.setTargetAtTime(0, t0 + 0.2, 0.7); n.connect(bp); bp.connect(g); g.connect(uw); }
+    for (let k = 0; k < 70; k++) { const t = t0 + 3.8 * Math.pow(S.rng.next(), 1.6); this.drip(t, 0.03 * (1 - (t - t0) / 4.5), S.rng.range(-0.5, 0.2), uw, S.rng.range(300, 900)); }
+    for (let k = 0; k < 14; k++) this.drip(T.slide + 0.3 + 0.5 * S.rng.next(), 0.03, S.rng.range(-0.4, 0.4), uw, S.rng.range(300, 800));
+    // your nose bubbles
+    for (const tb of [T.under + 1.8, T.under + 3.1]) for (let k = 0; k < 5; k++) this.drip(tb + k * 0.05, 0.035, 0, uw, 500 + 80 * k);
+    // your heartbeat
+    for (let t = t0 + 0.3; t < t1 - 0.2; t += 0.72) S.heart(t, 0.22, uw);
+  }
+
+  /* ---- after: the pool settling, the closing chord ---- */
+  _end(S, ctx, world, mus) {
     const T = GV;
-    // the kid's hops: the two happy landings, a giggle; then the tiny hop at 2 G
-    for (const H of GV_HOPS) { const a = this.at(9.75, -6.3, H.t + H.T); S.step(H.t + H.T, 0.14 * a.g * (H.g > GV_G0 ? 0.6 : 1), a.pan, world); }
-    { const a = this.at(9.75, -6.3, 0.4); S.laugh(0.42, 0.04 * a.g, a.pan, world, 520, 4); S.voice(T.kidJump - 0.15, 420, 0.25, 'u', 0.035 * a.g, a.pan, world, 0.9); S.voice(T.kidJump + 0.4, 460, 0.3, 'o', 0.03 * a.g, a.pan, world, 0.8); }
-    // gasps along the street when it hits
-    for (const [x, z, f, dt] of [[10.55, -7.1, 230, 0.12], [8.05, -3.4, 140, 0.2], [-8.7, -4.0, 210, 0.15], [-10.1, -25, 220, 0.3]]) { const a = this.at(x, z, T.g0); S.voice(T.g0 + dt, f, 0.28, 'a', 0.04 * a.g, a.pan, world, 0.8); }
-    // the old man: the push, the effort, falling back, the sigh; the bench creaks
-    { const a = this.at(11.87, -2.1, T.oldMan[0]), t0 = T.oldMan[0];
-      this.creak(t0 + 0.9, 1.2, 180, 0.03 * a.g, a.pan, world);
-      S.voice(t0 + 1.1, 112, 0.9, 'o', 0.05 * a.g, a.pan, world, 0.85); S.thump(t0 + 2.5, 0.2 * a.g, world); this.creak(t0 + 2.45, 0.5, 150, 0.04 * a.g, a.pan, world);
-      S.breath(t0 + 2.9, 0.9, false, 0.04 * a.g, world); }
-    // the paramedics: effort, a dropped bag
-    { const a = this.at(5, -9, T.limit); S.voice(T.limit + 0.5, 150, 0.4, 'u', 0.035 * a.g, a.pan, world, 0.85); S.thump(T.limit + 1.4, 0.12 * a.g, world); S.voice(T.limit + 1.6, 210, 0.5, 'a', 0.03 * a.g, a.pan, world, 0.75); }
-    // shouts when the brake slips
-    { const a = this.at(-2.7, -25.4, T.slips[0]); S.voice(T.slips[0] + 0.15, 190, 0.35, 'e', 0.07 * a.g, a.pan, world, 1.1); S.voice(T.slips[1] + 0.1, 200, 0.5, 'a', 0.08 * a.g, a.pan, world, 0.9); S.voice(T.drop + 0.1, 230, 0.6, 'o', 0.08 * a.g, a.pan, world, 0.8); }
-  }
-
-  /* ---- the loading bay, the pallet, the pickup ---- */
-  _pallet(S, ctx, world, rev) {
-    const B = GV.bay, P = GV_FALL.pallet, a = this.at(9.6, -15.8, B.creak);
-    this.creak(B.creak, B.crack - B.creak + 0.1, 58, 0.18 * a.g + 0.05, a.pan, world);
-    this.creak(B.creak + 0.3, 0.7, 96, 0.08 * a.g + 0.02, a.pan, world);
-    S.backfire(B.crack, 0.5 * a.g + 0.1, world, true); S.clunk(B.crack + 0.01, 0.5 * a.g, a.pan, world); S.ring(B.crack + 0.02, 0.5, 1300, 0.02, world);
-    this.scrape(B.crack + 0.1, B.drop - B.crack - 0.05, 700, 0.08 * a.g, a.pan, world);
-    S.hiss(P.t0 + 0.2, P.T2 - 0.2, 0.03, a.pan, world);
-    const h = this.at(9.36, -15.85, P.hit);
-    this.crash(P.hit, 0.8 * h.g + 0.25, h.pan, world, rev, 12, 0.8);
-    for (let k = 0; k < 9; k++) S.tick(P.hit + 0.02 + S.rng.range(0, 0.3), S.rng.range(3000, 6000), 0.05, world);   // the windscreen
-    // the pickup's alarm: on until the next disaster drowns it out
-    const pts = this._spatial(() => ({ x: 9.25, z: -15.6 }), P.hit + 0.6, GV.scaffold.fold + 1.0, 1 / 10, 8);
-    S.alarm(P.hit + 0.6, GV.scaffold.fold + 1.0, pts, world, rev, this);
-  }
-
-  /* ---- the coupe, the truck, the ambulance ---- */
-  _cars(S, ctx, world, rev) {
-    const tr = this.app.traffic, T = GV, pos = (c) => (t) => ({ x: c.x, z: c.zt.value(t) });
-    const C = tr.coupe, K = tr.truck;
-    this.engine(pos(C), T.coupe - 4, T.coupe + 6, 62, 0.16, world);
-    for (let s = 0; s < 2; s++) { const ts = tr.scrapeT(s), a = this.at(C.x, C.zt.value(ts), ts); this.scrape(ts, s ? 0.3 : 0.42, 2600, 0.35 * a.g + 0.05, a.pan, world); S.clunk(ts, 0.4 * a.g, a.pan, world); }
-    this.engine(pos(K), T.truck - 4, T.truck + 6, 38, 0.24, world, 8);
-    const sn = tr.snapT(), a = this.at(K.x, K.zt.value(sn), sn);
-    S.backfire(sn, 0.7 * a.g + 0.1, world, true); S.clunk(sn, 0.6 * a.g, a.pan, world); S.ring(sn + 0.01, 0.9, 820, 0.03, world);
-    this.scrape(sn + 0.05, 1.2, 900, 0.07 * a.g, a.pan, world);
-    { const b = this.at(K.x, -33.5, T.truck + 4.8); S.hiss(T.truck + 4.8, 0.9, 0.06 * b.g + 0.01, b.pan, world); }
-    // other traffic passing
-    for (const id of ['sedanA', 'taxi', 'suvA', 'hatchA', 'sedanB', 'vanB']) { const c = tr.cars.find((k) => k.id === id); this.engine(pos(c), 0, 50, 50 + 10 * S.rng.next(), 0.06, world); }
-    // the ambulance: siren from behind you, stopping by the wreck
-    const M = tr.amb, pts = this._spatial(pos(M), 44.5, 51.2, 1 / 15, 10);
-    S.alarm(44.5, 51.2, pts, world, rev, this);
-    this.engine(pos(M), 44, CONFIG.duration, 44, 0.1, world);
-  }
-
-  /* ---- the crane: the outrigger, the overload alarm, the brake, the load, the boom's recoil ---- */
-  _crane(S, ctx, world, rev) {
-    const T = GV, cr = this.app.site.crane, P = GV_FALL.load;
-    const pad = this.at(-0.8, -28.2, T.outrigger);
-    S.crunch(T.outrigger, 0.6 * pad.g + 0.15, pad.pan, world, rev); S.thump(T.outrigger, 0.5, world); S.boom(T.outrigger, 0.18, world, rev);
-    for (let k = 0; k < 10; k++) S.click(T.outrigger + 0.05 + S.rng.range(0, 0.6), 0.15 * pad.g, pad.pan, world);
-    this.creak(T.outrigger + 0.1, 2.4, 48, 0.12 * pad.g + 0.04, pad.pan, world);
-    // the overload alarm: a hard beep from the crane
-    const beep = (t0, t1, per) => { for (let t = t0; t < t1; t += per) { const a = this.at(-4.4, -33.5, t, 12); S.tone(t, per * 0.5, 2900, 0.05 * a.g + 0.01, a.pan, world, 'square', 0.006, 0.02); } };
-    beep(T.outrigger + 0.3, T.outrigger + 4.5, 0.5); beep(T.slips[0] - 0.4, T.drop + 0.05, 0.25);
-    // the hoist brake slipping: a clack, the rope running a little, a groan
-    for (const ts of T.slips) { const a = this.at(-4.4, -33.5, ts, 12); S.clunk(ts, 0.5 * a.g + 0.1, a.pan, world); S.ring(ts + 0.01, 0.35, 1600, 0.02, world); this.scrape(ts + 0.02, 0.14, 4200, 0.12 * a.g, a.pan, world); this.creak(ts + 0.1, 0.8, 55, 0.1 * a.g, a.pan, world); }
-    // the brake lets go: a bang, the rope screaming off the drum, the air
-    { const a = this.at(-4.4, -33.5, T.drop, 12); S.backfire(T.drop, 0.6 * a.g + 0.15, world, true); S.ring(T.drop, 0.6, 1100, 0.03, world);
-      this.scrape(T.drop + 0.03, P.T2, 5200, 0.15 * a.g + 0.03, a.pan, this.fallBus);
-      const n = S.noise('pink', T.drop, P.hit), bp = S.filter('bandpass', 400, 0.8), g = ctx.createGain();
-      bp.frequency.setValueAtTime(300, T.drop); bp.frequency.linearRampToValueAtTime(1400, P.hit); g.gain.setValueAtTime(0, T.drop); g.gain.linearRampToValueAtTime(0.14, P.hit - 0.02); g.gain.linearRampToValueAtTime(0, P.hit);
-      n.connect(bp); bp.connect(g); g.connect(this.fallBus); }
-    // the hit: the biggest sound of the film
-    { const a = this.at(cr._fallXZ[0], cr._fallXZ[1], P.hit); this.crash(P.hit, 1.0, a.pan, world, rev, 18, 1.6); S.boom(P.hit + 0.03, 0.8, world, rev); S.thump(P.hit + 0.02, 1.0, world);
-      S.farBoom(P.hit + 0.1, 0.5, a.pan, world);
-      for (let k = 0; k < 30; k++) S.click(P.hit + 0.4 + 1.6 * Math.pow(S.rng.next(), 1.5), 0.1, S.rng.range(-0.6, 0.6), world); }
-    // the unloaded boom springing back up: a long groan and a low steel shudder
-    { const a = this.at(-4.4, -33.5, T.drop, 12); this.creak(T.drop + 0.15, 2.6, 40, 0.14, a.pan, world); S.ring(T.drop + 0.1, 1.4, 150, 0.03, world); }
-    // car alarms all down the street afterwards
-    for (const [x, z, dt] of [[5.6, -42, 0.8], [-5.6, -50.5, 1.3], [5.6, -52, 2.1]]) { const pts = this._spatial(() => ({ x, z }), P.hit + dt, CONFIG.duration, 1 / 5, 10); S.alarm(P.hit + dt, CONFIG.duration, pts, world, rev, this); }
-  }
-
-  /* ---- the scaffold, the awning, the water tank ---- */
-  _failures(S, ctx, world, rev) {
-    const T = GV, F = T.scaffold;
-    // the scaffold: groaning tubes, couplers popping, the fold, the landing, boards and bricks raining
-    { const a = this.at(11.4, -18, F.bow); this.creak(F.bow - 0.6, F.fold - F.bow + 0.8, 72, 0.14 * a.g + 0.04, a.pan, world); this.creak(F.bow, F.fold - F.bow + 0.4, 118, 0.08 * a.g + 0.02, a.pan, world);
-      for (let k = 0; k < 10; k++) { const tt = F.bow + S.rng.range(0, F.fold - F.bow + 0.4); S.ring(tt, 0.25, S.rng.range(1800, 3200), 0.012, world); S.click(tt, 0.18 * a.g, a.pan, world); }
-      S.backfire(F.fold, 0.5 * a.g + 0.1, world, true);
-      this.scrape(F.fold + 0.1, 0.9, 1800, 0.08 * a.g, a.pan, world);
-      const l = this.at(5.5, -18, F.fold + 1.05); this.crash(F.fold + 1.05, 0.75 * l.g + 0.25, l.pan, world, rev, 22, 1.8); }
-    // the awning: a creak, the tie rods snapping, the slap against the window, the sign hitting the pavement
-    { const A = T.awning, a = this.at(11.4, -6.7, A); this.creak(A - 0.8, 0.9, 130, 0.1 * a.g, a.pan, world);
-      S.ring(A, 0.3, 2100, 0.03, world); S.click(A, 0.3 * a.g, a.pan, world); S.ring(A + 0.05, 0.3, 1900, 0.025, world);
-      S.whump(A + 0.42, 0.45 * a.g + 0.1, a.pan, world); S.crunch(A + 0.43, 0.3 * a.g, a.pan, world, rev);
-      for (let k = 0; k < 6; k++) S.tick(A + 0.45 + S.rng.range(0, 0.25), S.rng.range(3000, 6000), 0.04, world);
-      const sl = A + 0.25 + Math.sqrt(2 * (GV_CITY.awning.y - 0.6 - LAYOUT.curbH - 0.35) / GV_G); S.crunch(sl, 0.35 * a.g + 0.05, a.pan, world, rev); S.thump(sl, 0.25 * a.g, world); }
-    // the water tank: steel legs groaning, buckling, the tank tipping, bursting, the water coming down
-    { const t0 = T.tank, a = this.at(-16.5, -3, t0); this.creak(t0 - 1.2, 1.4, 50, 0.12 * a.g + 0.03, a.pan, world);
-      S.clunk(t0, 0.4 * a.g + 0.05, a.pan, world); this.creak(t0, 0.85, 70, 0.1 * a.g, a.pan, world);
-      const tb = t0 + 0.85; S.backfire(tb, 0.4 * a.g + 0.1, world, false); S.crunch(tb, 0.45 * a.g + 0.1, a.pan, world, rev);
-      this.water(tb, tb + 7, 0.5 * a.g + 0.08, a.pan, world, (t) => MathX.smooth(t, tb, tb + 0.25) * Math.exp(-Math.max(0, t - tb - 0.4) / 1.8));
-      const w = this.at(-11, -3, tb + 1.3); this.water(tb + 1.2, tb + 7, 0.6 * w.g + 0.08, w.pan, world, (t) => MathX.smooth(t, tb + 1.2, tb + 1.5) * Math.exp(-Math.max(0, t - tb - 1.6) / 1.8));
-      S.whump(tb + 1.34, 0.3 * w.g, w.pan, world); }
-  }
-
-  /* ---- the airliner at full power ---- */
-  _plane(S, ctx, world, rev) {
-    const P = this.app.plane, t0 = GV.plane[0] - 0.4, t1 = 56, pos = (t) => { const v = P.position(t, new THREE.Vector3()); return { x: v.x, z: v.z, y: v.y }; };
-    const pts = this._spatial(pos, t0, t1, 1 / 20, 60).map((p) => { const v = P.position(p.t, new THREE.Vector3()), d3 = Math.hypot(v.x - this.cx.value(p.t), v.y - 1.6, v.z - this.cz.value(p.t)); return Object.assign(p, { gain: 140 / (140 + d3) }); });
-    const n = S.noise('pink', t0, t1), lp = S.filter('lowpass', 900, 0.6), n2 = S.noise('white', t0, t1), hp = S.filter('bandpass', 2400, 0.6), g = ctx.createGain(), p = ctx.createStereoPanner();
-    const o = ctx.createOscillator(), og = ctx.createGain(); o.type = 'sawtooth'; og.gain.value = 0.15;
-    n.connect(lp); lp.connect(g); n2.connect(hp); const hg = ctx.createGain(); hg.gain.value = 0.25; hp.connect(hg); hg.connect(g); o.connect(og); og.connect(g);
-    g.connect(p); p.connect(world); const rv = ctx.createGain(); rv.gain.value = 0.4; g.connect(rv); rv.connect(rev);
-    this._applySpatial(pts, g.gain, p.pan, [[o.frequency, 160], [lp.frequency, 900]], 0.75, (t) => MathX.smooth(t, t0, t0 + 0.8));
-    o.start(t0); o.stop(t1);
-  }
-
-  /* ---- after: the ringing quiet, the closing chord ---- */
-  _end(S, ctx, world, you, mus, rev) {
-    const T = GV, P = GV_FALL.load;
-    // a low pulse under the brake slipping (music supports; the sound effects lead)
-    for (let t = T.slips[0] - 0.3; t < T.drop; t += 0.46) S.tone(t, 0.3, 49, 0.12, 0, mus, 'sine', 0.01, 0.25);
-    // ears ringing after the hit
-    S.tone(P.hit + 0.15, 2.8, 3950, 0.012, 0, you, 'sine', 0.05, 2.4);
-    // the closing chord under the lines
-    for (const [f, d] of [[110, 0], [164.8, 0.1], [220, 0.2], [277.2, 0.35], [329.6, 0.5]]) S.tone(T.lineA[0] - 0.3 + d, T.end - T.lineA[0] + 0.3 - d, f, 0.03, 0, mus, 'sine', 1.2, 2.2);
+    // the platform: a low drone and an airy swell that build while she walks to the edge, cut dead as she steps off
+    { const a = T.diver.stand, b = T.diver.step + 0.08;
+      for (const [f, v] of [[55, 0.09], [82.4, 0.05], [110.6, 0.025]]) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = f; g.gain.setValueAtTime(0, a); g.gain.linearRampToValueAtTime(v, b - 0.1); g.gain.linearRampToValueAtTime(0, b); o.connect(g); g.connect(mus); o.start(a); o.stop(b + 0.05); }
+      const n = S.noise('pink', a, b + 0.05), bp = S.filter('bandpass', 300, 1.2), g = ctx.createGain();
+      bp.frequency.setValueAtTime(300, a); bp.frequency.exponentialRampToValueAtTime(2400, b); g.gain.setValueAtTime(0, a); g.gain.linearRampToValueAtTime(0.06, b - 0.05); g.gain.linearRampToValueAtTime(0, b);
+      n.connect(bp); bp.connect(g); g.connect(mus); }
+    for (const [f, d] of [[110, 0], [164.8, 0.1], [220, 0.2], [277.2, 0.35], [329.6, 0.5]]) S.tone(T.lineA[0] - 0.3 + d, T.end - T.lineA[0] + 0.3 - d, f, 0.05, 0, mus, 'sine', 1.2, 2.2);
     S.pluck(T.lineA[0], 220, 0.12, 0, mus, 3.0, 0.4); S.pluck(T.lineB[0], 164.8, 0.12, 0, mus, 3.0, 0.4); S.pluck(T.lineB[0] + 0.02, 110, 0.1, 0, mus, 3.0, 0.4);
+    S.pluck(T.lineC[0], 329.6, 0.1, 0, mus, 3.0, 0.35); S.pluck(T.lineC[0] + 0.03, 220, 0.08, 0, mus, 3.0, 0.35);
   }
 }

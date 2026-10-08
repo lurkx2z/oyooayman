@@ -1,31 +1,27 @@
 /* =====================================================================
-   FILM — "What if gravity became twice as strong?"
-   The film-specific half of the engine (see js/main.js): builds the sunny
-   avenue, the building site (crane, scaffold, awning, water tank), the traffic,
-   the people, the airliner, the effects, your hands and your shopping bag;
-   each frame it turns your head toward what matters (GV_LOOK), poses
-   everything for story time t, and grades the picture.
+   FILM — "What if gravity became twice as strong?" (v3: the leisure centre)
+   The film-specific half of the engine (see js/main.js): builds the leisure centre (centre.js), the things that
+   move or measure (props.js), the people (cast.js), the water effects (fx.js) and your hands; each frame it turns
+   your head toward what matters (GV_LOOK), puts your feet on the floor under you (the stair, the deck) or your
+   head on the water, switches to the under-water look when you go under, and grades the picture.
    ===================================================================== */
 
 // your hands (camera space; right-hand poses, mirrored for the left). Poses with `aim` are re-aimed every frame so a point
 // in the palm lands on a point in the world (gvAimHand).
 const GV_HAND_POSES = Object.assign({}, HAND_POSES, {
-  // the shopping bag hooked on your fingers, forearm forward (the bag hangs below the frame, its top just in view)
-  bagR:     { p: [0.095, -0.15, -0.42], F: [-0.12, -0.2, -0.97], N: [-0.25, -0.95, 0.1], curl: [1.45, 1.5, 1.5, 1.45], thumb: [0.25, 0.45] },
-  // gravity doubles: the bag yanks your hand down
-  bagDropR: { p: [0.13, -0.42, -0.34], F: [-0.05, -0.75, -0.65], N: [-0.4, -0.6, 0.6], curl: [1.5, 1.55, 1.55, 1.5], thumb: [0.2, 0.5], trem: 0.004 },
-  // lowering it to the pavement (aimed at the handles of the bag where it will rest)
-  bagLowR:  { p: [0.1, -0.3, -0.4], F: [0, -1, 0], N: [-1, 0, 0], curl: [1.5, 1.55, 1.55, 1.5], thumb: [0.2, 0.5], aim: [0, 0.09, 0.02], trem: 0.003 },
-  // going down: hands thrown out toward the ground, fingers spread
-  catchR:   { p: [0.14, -0.2, -0.38], F: [0.1, -0.35, -0.93], N: [0, -0.95, 0.3], curl: [0.1, 0.08, 0.12, 0.16], thumb: [0.7, 0.05] },
-  // palms flat on the pavement (aimed); then pushing up, arms shaking
-  plantR:   { p: [0.2, -0.4, -0.4], F: [0, 0, -1], N: [0, -1, 0], curl: [0.05, 0.04, 0.06, 0.1], thumb: [0.55, 0.12], aim: [0, 0.07, 0.012] },
-  pushR:    { p: [0.2, -0.4, -0.4], F: [0, 0, -1], N: [0, -1, 0], curl: [0.08, 0.06, 0.08, 0.12], thumb: [0.55, 0.12], aim: [0, 0.07, 0.012], trem: 0.0035 },
-  // a hand on your knee to get the rest of the way up
-  kneeR:    { p: [0.1, -0.36, -0.26], F: [-0.1, -0.85, -0.5], N: [-0.2, -0.45, 0.87], curl: [0.4, 0.45, 0.5, 0.55], thumb: [0.5, 0.2], trem: 0.003 },
+  // on the scale's grips (aimed): fingers wrapped round the upright handles, thumbs on top
+  gripR:  { p: [0.2, -0.4, -0.45], F: [0, 0, -1], N: [-1, 0, 0], curl: [1.35, 1.4, 1.45, 1.5], thumb: [0.3, 0.9], aim: [0, 0.075, 0.022] },
+  gripL:  { p: [0.2, -0.4, -0.45], F: [0, 0, -1], N: [-1, 0, 0], curl: [1.35, 1.4, 1.45, 1.5], thumb: [0.3, 0.9], aim: [0, 0.075, 0.022] },
+  // sliding down the stair's handrail (aimed)
+  railR:  { p: [0.2, -0.3, -0.5], F: [0, -0.5, -0.85], N: [0, -0.85, 0.5], curl: [0.75, 0.8, 0.85, 0.9], thumb: [0.35, 0.6], aim: [0, 0.07, 0.02] },
+  // palms on the pool's edge either side of you (aimed)
+  edgeR:  { p: [0.25, -0.5, -0.5], F: [0, 0, -1], N: [0, -1, 0], curl: [0.25, 0.25, 0.3, 0.35], thumb: [0.5, 0.15], aim: [0, 0.07, 0.012] },
+  edgeL:  { p: [0.25, -0.5, -0.5], F: [0, 0, -1], N: [0, -1, 0], curl: [0.25, 0.25, 0.3, 0.35], thumb: [0.5, 0.15], aim: [0, 0.07, 0.012] },
+  // floating: sculling just under the surface, low in the frame
+  scullR: { p: [0.17, -0.27, -0.42], F: [-0.25, -0.15, -1], N: [-0.15, -1, 0.1], curl: [0.15, 0.15, 0.2, 0.25], thumb: [0.4, 0.1] },
 });
-for (const k of ['catch', 'plant', 'push']) GV_HAND_POSES[k + 'L'] = Object.assign({}, GV_HAND_POSES[k + 'R'], { p: GV_HAND_POSES[k + 'R'].p.slice(), F: GV_HAND_POSES[k + 'R'].F.slice(), N: GV_HAND_POSES[k + 'R'].N.slice() });
-const GV_HAND_BLEND = Object.assign({}, HAND_BLEND, { bagR: 0.4, bagDropR: 0.22, bagLowR: 0.6, catchR: 0.14, catchL: 0.14, plantR: 0.12, plantL: 0.12, pushR: 0.5, pushL: 0.5, kneeR: 0.5 });
+for (const k of ['scull']) GV_HAND_POSES[k + 'L'] = Object.assign({}, GV_HAND_POSES[k + 'R']);
+const GV_HAND_BLEND = Object.assign({}, HAND_BLEND, { gripR: 0.4, gripL: 0.4, railR: 0.45, edgeR: 0.35, edgeL: 0.35, scullR: 0.6, scullL: 0.6 });
 for (const k of Object.keys(GV_HAND_POSES)) { if (k.endsWith('!')) continue; GV_HAND_POSES[k + '!'] = GV_HAND_POSES[k]; GV_HAND_BLEND[k + '!'] = 0.02; }
 
 const _gvAim = { y: new THREE.Vector3(), z: new THREE.Vector3(), x: new THREE.Vector3(), c: new THREE.Vector3(), q: new THREE.Quaternion() };
@@ -44,116 +40,113 @@ function gvAimHand(name, camera, world, Fw, Nw, side = 1) {
   for (let i = 0; i < 3; i++) P.p[i] = A.c.getComponent(i) - s * (A.x.getComponent(i) * l[0] + A.y.getComponent(i) * l[1] + A.z.getComponent(i) * l[2]);
 }
 
-// where the bag ends up: on the pavement just in front of your right foot (its handles' top)
-const GV_BAG = { x: 9.6, z: 0.92, h: 0.34 };
-// where your hands land when you go down
-const GV_PLANT = { x: GV_ME.x, z: GV_ME.zTrip - 0.46, w: 0.24 };
+// the stair's right handrail at z (it runs from the gym's floor to the deck)
+const GV_RAIL = { x: GV_C.stair.x1 + 0.05, h: 0.95 };
+function gvRailY(z) { const S = GV_C.stair, L = S.n * S.run; return GV_RAIL.h - S.rise * S.n * MathX.clamp((S.z0 - z) / L, 0, 1); }
 
+const _gvT = new THREE.Vector3(), _gvDv = { x: 0, y: 0, z: 0, mode: 0 };
+const gvDiverP = (dy) => (t) => { const d = gvDiverAt(t, _gvDv); return [d.x, d.y + dy, d.z]; };
 // where your eyes go: [start turning, arrived, target, fov]. A target is a world point or (t, app) → [x, y, z]
-// (moving things are followed); fov null = the default 66°.
+// (moving things are followed); fov null = the default.
 const GV_LOOK = [
-  [-1, -1, [6.2, 4.2, -40], null],                                                      // down the avenue: the crane, the scaffold, the kid
-  [GV.g0 + 0.15, GV.g0 + 0.7, [10.2, 0.9, -6.7], 50],                                   // the weight hits: the kid and his mum buckle
-  [GV.bagDown[0] - 0.5, GV.bagDown[0] + 0.3, [GV_BAG.x - 0.02, 0.05, GV_BAG.z - 0.25], null],   // the bag, to the pavement
-  [GV.bagDown[1] + 0.15, GV.bagDown[1] + 1.0, [9.75, 0.55, -6.3], 44],                  // the kid, trying again
-  [GV.kidJump + 1.2, GV.kidJump + 2.0, [11.7, 0.95, -2.0], 44],                         // the old man on the bench
-  [GV.oldMan[1] - 0.2, GV.oldMan[1] + 0.5, [9.8, 11.5, -15.2], 52],                     // up: the loading bay creaks
-  [GV.bay.drop + 0.05, GV.bay.drop + 0.35, (t, a) => { const p = a.site.scaffold.pallet; p.updateWorldMatrix(true, false); const v = p.getWorldPosition(_gvTmp); return [v.x, Math.max(v.y, 1.6), v.z]; }, 58],
-  [GV_FALL.pallet.hit + 0.5, GV_FALL.pallet.hit + 1.3, [9.1, 1.2, -15.3], 54],           // the wreck
-  [GV.coupe - 1.4, GV.coupe - 0.7, (t, a) => { const c = a.traffic.coupe; return [c.x, 0.5, Math.min(c.zt.value(t) - 1.5, -2)]; }, 60],
-  [GV.truck - 0.4, GV.truck + 0.3, (t, a) => { const c = a.traffic.truck; return [c.x, 1.4, Math.min(c.zt.value(t) - 1, -3)]; }, 56],
-  [GV.outrigger - 0.9, GV.outrigger - 0.3, [-0.9, 0.9, -28.2], 30],                     // the crane's outrigger pad
-  [GV.outrigger + 1.0, GV.outrigger + 2.0, (t, a) => { const l = a.site.crane.load.position; return [l.x, l.y + 2.5, l.z]; }, 46],   // the load swinging
-  [GV.scaffold.bow - 0.8, GV.scaffold.bow - 0.1, [11.6, 7.0, -18.5], 56],               // the scaffold bows…
-  [GV.scaffold.fold + 0.2, GV.scaffold.fold + 1.0, [7.5, 2.0, -18.5], 62],             // …and folds into the street
-  [GV.awning - 1.4, GV.awning - 0.8, [11.6, 3.0, -6.6], 54],                            // the old awning
-  [GV.tank - 1.3, GV.tank - 0.6, [-16.5, 19.5, -3.0], 50],                              // the water tank across the street
-  [GV.tank + 1.2, GV.tank + 2.0, [-12.0, 7.0, -3.0], 56],                               // the water coming down
-  [GV.plane[0] + 0.1, GV.plane[0] + 1.0, [7.5, 200, -30], 66],                           // the roar: you look up
-  [GV.plane[0] + 1.6, GV.plane[0] + 2.4, (t, a) => { const p = a.plane.position(t, _gvTmp); return [p.x, p.y, Math.min(p.z, a.camera.position.z - 25)]; }, 56],
-  [GV.plane[0] + 4.2, GV.plane[0] + 5.6, (t, a) => { const p = a.plane.position(t, _gvTmp); return [p.x, p.y, p.z]; }, 34],
-  [GV.limit - 0.4, GV.limit + 0.4, (t, a) => { const p = a.cast.byId.medA.root.position; return [p.x - 0.6, 0.95, p.z - 1.2]; }, 54],   // the paramedics
-  [GV.trip - 0.1, GV.trip + 0.38, [GV_PLANT.x, 0.0, GV_PLANT.z - 0.35], 66],            // you go down
-  [GV.up[0] + 1.2, GV.up[1] - 0.2, [7.0, 2.5, -16], 62],                                 // getting up, eyes up the street
-  // the load, held still in frame so you see each slip of the brake drop it; then wide and locked for the fall: the load at
-  // the top of the frame, the flatbed at the bottom; then down to the wreck, and the dust over the street
-  [GV.slips[0] - 0.7, GV.slips[0] - 0.1, (t, a) => { const f = a.site.crane._fallXZ; return [f[0], GV_FALL.load.base + GV_FALL.load.h + 0.4, f[1]]; }, 36],
-  [GV.drop - 0.05, GV.drop + 0.35, (t, a) => { const f = a.site.crane._fallXZ; return [f[0], 10, f[1]]; }, 66],
-  [GV_FALL.load.hit + 1.3, GV_FALL.load.hit + 2.3, (t, a) => { const f = a.site.crane._fallXZ; return [f[0], 2.5, f[1]]; }, 58],
-  [GV.hudBack + 0.4, GV.hudBack + 2.6, [3.5, 3.0, -26], 62],                              // the dust settling over the street
+  [-1, -1, [0.6, 0.05, -1.3], 66],                                                       // the scale's screen and grips, the gym beyond
+  [GV.g0 + 0.12, GV.g0 + 0.6, [0.6, 1.0, -1.2], 62],                                     // the weight hits: down at the screen (under the title)
+  [GV.title[1] - 0.3, GV.title[1] + 0.4, [0.6, 1.0, 0.75], 56],                         // the title's gone: the screen fills the frame
+  [GV.scale[1] - 0.6, GV.tread.look + 0.1, (t, a) => { const p = a.cast.byId.runner.root.position; return [p.x + 0.2, 0.75, p.z]; }, 40],   // the runner
+  [GV.offScale + 0.1, GV.bench.look + 0.3, [GV_C.bench.x, 0.85, GV_C.bench.barZ + 0.1], 60],    // the bench, from the lifter's feet
+  [GV.bench.drop + 0.9, GV.bench.drop + 1.9, [GV_C.court.hoop.x, 2.3, GV_C.court.hoop.z + 2.45], 50],    // through the glass: the court
+  [GV.toStair - 0.2, GV.toStair + 1.0, [2.0, -2.2, -16], 62],                             // over the balustrade: the pool hall
+  [GV.stair[0] - 0.3, GV.stair[0] + 0.6, [3.6, -3.4, -14.5], 64],                         // down the stair
+  [GV.stair[0] + 1.3, GV.stair[0] + 2.1, [3.3, -1.5, -8.4], 54],                          // the man sat on the steps
+  [GV.stair[0] + 3.9, GV.stair[0] + 4.8, [-3.0, -3.7, -13.0], 56],                        // the swimmers
+  [GV.deck + 1.6, GV.deck + 2.4, [GV_C.chair.x - 0.2, -1.6, GV_C.chair.z], 54],            // the lifeguard
+  [GV.deck + 3.4, GV.deck + 4.2, [GV_C.ladder.x - 0.3, -3.0, GV_C.ladder.z], 48],          // the man at the ladder
+  [GV.sit - 0.4, GV.sit + 0.6, [0.2, -3.6, -20.6], 64],                                   // sitting at the deep end
+  [GV.slide + 0.6, GV.float, [-3.2, -2.6, -27.5], 64],                                    // floating: the deep end, the tower
+  [GV.diver.stand - 0.6, GV.diver.stand + 0.3, [-4.5, 6.9, -29.6], 50],                   // up at the platform
+  [GV.diver.step - 0.15, GV.diver.step + 0.25, gvDiverP(1.4), 62],                         // she steps off: follow her down
+  [GV_FALL.hit - 0.12, GV_FALL.hit + 0.15, [GV_ENTRY.x, -2.3, GV_ENTRY.z], 62],           // the splash
+  [GV.under + 0.1, GV.under + 0.7, (t) => { const d = gvDiverAt(t, _gvDv); return [d.x, Math.min(d.y + 0.6, GV_WATER - 1.2), d.z]; }, 64],   // under: her plume, her rising
+  [GV.surface - 0.1, GV.surface + 0.7, (t) => { const d = gvDiverAt(t, _gvDv); return [d.x, GV_WATER + 0.3, d.z]; }, 58],   // up beside her: she floats
+  [GV.lineC[0] - 0.7, GV.lineC[0] + 1.1, [0.3, -1.8, -14.0], 60],                          // "even the water": the whole pool, everyone floating
 ];
-const _gvTmp = new THREE.Vector3();
 
 const FILM = {
   build(app) {
     const { scene, camera } = app;
     FILM._app = app;
     camera.near = 0.03; camera.far = 2600; camera.updateProjectionMatrix();
-    app.env = new GvCity(scene, app.renderer, app.rng);
+    app.env = new GvCentre(scene, app.renderer, app.rng);
     app.env.camera = camera;
     app.env.build();
-    app.site = { crane: new GvCrane(scene), scaffold: new GvScaffold(scene), awning: new GvAwning(scene), tank: new GvTank(scene) };
-    app.traffic = new GvTraffic(scene);
-    app.site.flatbed = new GvFlatbed(scene, app.traffic.factory);
+    app.props = { scale: new GvScale(scene), tread: new GvTreadmills(scene), bench: new GvBench(scene), hoop: new GvHoop(scene) };
+    app.water = new GvWater(scene);
     app.cast = new GvCast(app);
-    app.plane = new GvAirliner(scene);
     app.fx = new GvFx(app);
-    app.bag = this._bag(scene);
-    // you: muted sleeves, skin-tone nails (docs/STYLE_BIBLE.md § 11)
-    app.handShadows = new BlobShadows(scene, 4);       // your palms on the pavement
-    app.hands = new ViewerHands(camera, { scale: 1.04, sleeve: '#3a4552', cuff: '#2c343e', nail: '#c99c84', sleeveLen: 1.1, sleeveFit: 0.78, poses: GV_HAND_POSES, blends: GV_HAND_BLEND });
+    // you: bare forearms (a T-shirt's sleeves are above the frame), a sports watch
+    app.hands = new ViewerHands(camera, { scale: 1.04, skin: '#b98a70', sleeve: '#b3846a', cuff: '#b3846a', nail: '#c99c84', sleeveLen: 1.1, sleeveFit: 0.62, poses: GV_HAND_POSES, blends: GV_HAND_BLEND });
+    for (const m of Object.values(app.hands.mats)) gvSubmerge(m);
     Look.apply(scene, camera);                          // selective gloss + world-space grime (after the world is built)
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     app.audio = new GvAudio(app.tl, app);
     this._look = GV_LOOK.map((L) => ({ t0: L[0], t1: L[1], at: L[2], fov: L[3] }));
-  },
-
-  // a paper grocery bag: open at the top, a baguette and leeks poking out (origin at the top of its handles)
-  _bag(scene) {
-    const g = new THREE.Group(); g.name = 'bag'; scene.add(g);
-    const paper = Mat.std('#c39a64', { roughness: 0.92 }), inner = Mat.std('#8d6a40', { roughness: 0.95 }), H = GV_BAG.h, W = 0.28, D = 0.16, y0 = -0.06 - H / 2;
-    for (const s of [-1, 1]) {                                                 // the walls (outside paper, darker inside), the bottom
-      gvBox(W, H, 0.006, paper, g, 0, y0, s * D / 2); gvBox(W - 0.01, H - 0.01, 0.004, inner, g, 0, y0 + 0.005, s * (D / 2 - 0.005), 0, 0, 0, false);
-      gvBox(0.006, H, D, paper, g, s * W / 2, y0, 0); gvBox(0.004, H - 0.01, D - 0.01, inner, g, s * (W / 2 - 0.005), y0 + 0.005, 0, 0, 0, false);
-    }
-    gvBox(W, 0.006, D, inner, g, 0, -0.06 - H + 0.003, 0, 0, 0, 0, false);
-    for (const s of [-1, 1]) { gvBox(W + 0.008, 0.028, 0.01, Mat.std('#b08552', { roughness: 0.92 }), g, 0, -0.074, s * (D / 2 + 0.002), 0, 0, 0, false); }
-    // a baguette leaning out at the far end, three leeks, a red packet and a carton just showing
-    gvMesh(new THREE.CapsuleGeometry(0.028, 0.3, 4, 8), Mat.std('#d39a52', { roughness: 0.8 }), g, -0.085, -0.12, 0.02, 0, 0, 0.5, false);
-    for (let i = 0; i < 3; i++) {                                              // (leaning away from your hand)
-      const x = 0.075 + i * 0.02, z = -0.035 + i * 0.03, r = -0.22 - i * 0.07, ax = -Math.sin(r), ay = Math.cos(r);
-      gvMesh(new THREE.CylinderGeometry(0.012, 0.014, 0.3, 6), Mat.std('#e6ead2', { roughness: 0.8 }), g, x, -0.16, z, 0, 0, r, false);
-      gvMesh(new THREE.CylinderGeometry(0.022, 0.012, 0.16, 6), Mat.std('#4f7a2e', { roughness: 0.8 }), g, x + ax * 0.22, -0.16 + ay * 0.22, z, 0, 0, r, false);
-    }
-    gvBox(0.1, 0.11, 0.07, Mat.std('#c23a2a', { roughness: 0.6 }), g, -0.0, -0.1, 0.03, 0, 0.3, 0, false);
-    gvBox(0.08, 0.13, 0.08, Mat.std('#ece6d4', { roughness: 0.7 }), g, 0.02, -0.11, -0.035, 0, -0.2, 0.06, false);
-    for (const s of [-1, 1]) gvMesh(new THREE.TorusGeometry(0.045, 0.006, 4, 10, Math.PI), Mat.std('#a47e50', { roughness: 0.9 }), g, 0, -0.055, s * 0.05, 0, 0, 0, false);
-    return g;
+    this._air = { color: scene.fog.color.clone(), density: scene.fog.density, bg: scene.background.clone() };
+    this._uw = { color: new THREE.Color('#1d6a74'), bg: new THREE.Color('#1a5a64') };
   },
 
   update(app, t) {
     const cam = app.camera;
     // the world first (it doesn't depend on where you look; some looks follow things in it)
     app.env.update(t);
-    for (const k of ['crane', 'flatbed', 'scaffold', 'awning', 'tank']) app.site[k].update(t);
-    app.traffic.update(t);
+    const P = app.props;
+    P.scale.update(t); P.tread.update(t); P.bench.update(t);
     app.cast.update(t);
-    app.plane.update(t);
+    P.hoop.update(t, app.cast.hands);
+    GV_CAU.uCauTime.value = t;
+    // your body: the floor under your feet (the scale, the stair, the deck) or, once you're in, the water
+    this._body(app, t);
     this._lookAt(app, t);
     cam.updateMatrixWorld(true);
+    // under the water: the fog and the background turn to the water's colour
+    const under = cam.position.y < app.water.height(cam.position.x, cam.position.z, t) - 0.01 ? 1 : 0;
+    this.under = under;
+    const fog = app.scene.fog;
+    if (under) { fog.color.copy(this._uw.color); fog.density = 0.115; app.scene.background.copy(this._uw.bg); }
+    else { fog.color.copy(this._air.color); fog.density = this._air.density; app.scene.background.copy(this._air.bg); }
     // you
     this._aimHands(app, t);
     app.hands.update(t);
     this._handVisibility(app);
-    this._bagUpdate(app, t);
-    this._handShadows(app, t);
-    app.fx.update(t);
+    app.fx.update(t, under);
+    const bobs = app.cast.bobs.slice(0, GV_BOBS - 1);
+    if (t > GV.float - 0.5 && !under) bobs.push([cam.position.x, cam.position.z - 0.25, 0.006, 0]);
+    app.water.update(t, app.scene, bobs, app.fx.foam);
     this._shadowFocus(app);
-    // the dust of the last impact hangs over the street: hazier sky and air
-    const hz = app.fx.haze || 0, fog = app.scene.fog;
-    fog.density = 0.0011 + 0.0007 * hz;
-    fog.color.copy(app.env.fogColor).lerp(_gvDustCol, 0.4 * hz);
-    app.env.skyUniforms.uDust.value = 0.35 * hz;
+  },
+
+  // the eye's height: the controller gives it above the floor; add the floor (or the water) under you
+  _body(app, t) {
+    const cam = app.camera, x = cam.position.x, z = cam.position.z, H = SCRIPT.camera;
+    const tr = this._ht || (this._ht = new Track(H.height));
+    const extra = cam.position.y - (H.baseY + tr.value(t));            // the controller's own layers (bob, breath, startles)
+    const fl = gvFloorY(x, z);
+    let y = fl + tr.value(t) + extra;
+    // each step down the stair lands with a jolt
+    const S = GV_C.stair, u = (S.z0 - z) / S.run;
+    if (u > 0 && u < S.n + 0.6 && t > GV.stair[0] - 0.5 && t < GV.stair[1] + 0.5) {
+      const f = u - Math.floor(u), land = f > 0.5 ? Math.exp(-(f - 0.5) / 0.12) : 0;
+      y -= 0.025 * land; cam.rotation.x -= 0.018 * land;
+    }
+    if (t > GV.slide) {
+      // in: down under the surface for a moment, up to float with your eyes just above the water; under; up again
+      const wy = app.water.height(x, z, t) + 0.07;
+      const dip = -0.55 * MathX.smooth(t, GV.slide + 0.15, GV.slide + 0.45) * (1 - MathX.smooth(t, GV.slide + 0.55, GV.float + 0.2));
+      const dive = -1.15 * MathX.smooth(t, GV.under, GV.under + 0.7) * (1 - MathX.smooth(t, GV.surface - 0.7, GV.surface)) - 0.35 * MathX.smooth(t, GV.under + 1.2, GV.under + 2.6) * (1 - MathX.smooth(t, GV.surface - 1.5, GV.surface - 0.7));
+      const sitY = fl + tr.value(t) + extra;
+      y = MathX.lerp(sitY, wy + dip + dive + 0.6 * extra, MathX.smooth(t, GV.slide, GV.slide + 0.32));
+      // and the ring from the dive rocks you
+    }
+    cam.position.y = y;
   },
 
   // turn your head toward the next thing (blend between consecutive looks; moving targets are followed)
@@ -175,14 +168,21 @@ const FILM = {
     if (Math.abs(cam.fov - fov) > 1e-3) { cam.fov = fov; cam.updateProjectionMatrix(); }
   },
 
-  // the bag-lowering hand reaches for the bag's resting handles; your palms land flat on the pavement
+  // aimed hands: on the scale's grips, sliding down the handrail, on the pool's edge
   _aimHands(app, t) {
     const cam = app.camera, V = FILM._v || (FILM._v = { w: new THREE.Vector3(), f: new THREE.Vector3(), n: new THREE.Vector3() });
-    V.w.set(GV_BAG.x, LAYOUT.curbH + GV_BAG.h + 0.075, GV_BAG.z); V.f.set(0.05, -1, -0.15); V.n.set(-1, 0, 0);
-    gvAimHand('bagLowR', cam, V.w, V.f, V.n, 1);
-    for (const [side, names] of [[1, ['plantR', 'pushR']], [-1, ['plantL', 'pushL']]]) {
-      V.w.set(GV_PLANT.x + side * GV_PLANT.w, LAYOUT.curbH + 0.012, GV_PLANT.z); V.f.set(side * 0.25, 0, -1); V.n.set(0, -1, 0);
-      for (const n of names) gvAimHand(n, cam, V.w, V.f, V.n, side);
+    const G = app.props.scale.grips;
+    for (const [side, name, g] of [[1, 'gripR', G[1]], [-1, 'gripL', G[0]]]) {
+      const sq = 0.012 * MathX.smooth(t, GV.g0, GV.g0 + 0.15);                      // squeezing harder, pulled down a little
+      V.w.set(g.x + side * 0.022, g.y - sq, g.z); V.f.set(-side * 0.25, 0, -1); V.n.set(-side, 0, 0);
+      gvAimHand(name, cam, V.w, V.f, V.n, side);
+    }
+    const zr = Math.min(cam.position.z - 0.42, GV_C.stair.z0 - 0.1);
+    V.w.set(GV_RAIL.x, gvRailY(zr) + 0.035, zr); V.f.set(0, -0.58, -0.81); V.n.set(0, -0.81, 0.58);
+    gvAimHand('railR', cam, V.w, V.f, V.n, 1);
+    for (const [side, name] of [[1, 'edgeR'], [-1, 'edgeL']]) {
+      V.w.set(GV_C.pool.x1 + 0.12, GV_LOW + 0.012, cam.position.z - side * 0.26); V.f.set(-1, -0.05, -side * 0.15); V.n.set(0, -1, 0);
+      gvAimHand(name, cam, V.w, V.f, V.n, side);
     }
   },
 
@@ -193,61 +193,42 @@ const FILM = {
     }
   },
 
-  // soft contact shadows under your palms while they are flat on the pavement
-  _handShadows(app, t) {
-    const S = app.handShadows, k = MathX.smooth(t, GV.trip + 0.3, GV.trip + 0.45) * (1 - MathX.smooth(t, GV.up[0] + 1.2, GV.up[0] + 1.6));
-    S.begin();
-    if (k > 0.01) for (const side of [1, -1]) S.push(GV_PLANT.x + side * GV_PLANT.w, LAYOUT.curbH + 0.004, GV_PLANT.z - 0.02, 0.15, 0.3 * k, 0.2);
-    S.end();
-  },
-
-  // the bag: hangs from your fingers (swinging a little as you walk), then rests where you put it
-  _bagUpdate(app, t) {
-    const g = app.bag, h = app.hands.right.g, cam = app.camera;
-    if (t < GV.bagDown[1]) {
-      h.updateWorldMatrix(true, false);
-      g.position.set(0, 0.09, 0.02).applyMatrix4(h.matrixWorld);
-      g.position.y = Math.max(g.position.y, LAYOUT.curbH + GV_BAG.h + 0.075);
-      const sw = t < GV.g0 ? 0.07 * Math.sin(t * 5.4) : 0.03 * Math.exp(-(t - GV.g0) / 0.6) * Math.sin((t - GV.g0) * 7);
-      g.rotation.set(sw, cam.rotation.y, 0.05 * Math.sin(t * 2.7));
-    } else { g.position.set(GV_BAG.x, LAYOUT.curbH + GV_BAG.h + 0.075, GV_BAG.z); g.rotation.set(0, 0.25, 0.02); }
-  },
-
   // the sun's shadow box follows what you're looking at
   _shadowFocus(app) {
     const cam = app.camera, e = app.env, f = FILM._f || (FILM._f = new THREE.Vector3());
     cam.getWorldDirection(f); f.y = 0; if (f.lengthSq() < 1e-6) f.set(0, 0, -1); f.normalize();
-    const d = 30;
-    e.sun.target.position.set(cam.position.x + f.x * d, 0, cam.position.z + f.z * d); e.sun.target.updateMatrixWorld();
-    e.sun.position.copy(e.sunDir).multiplyScalar(170).add(e.sun.target.position);
+    const d = 14;
+    e.sun.target.position.set(cam.position.x + f.x * d, cam.position.y - 2, cam.position.z + f.z * d); e.sun.target.updateMatrixWorld();
+    e.sun.position.copy(e.sunDir).multiplyScalar(80).add(e.sun.target.position);
   },
 
   grade(t, p) {
-    const T = GV, PH = GV_FALL.pallet.hit, LH = GV_FALL.load.hit;
-    // sunny "ordinary day goes wrong" look (Friction's family): set everything every frame
+    const T = GV, H = GV_FALL.hit, U = this.under || 0;
+    // bright, warm interior (the sunny "ordinary day goes wrong" family): set everything every frame
     p.flash = 0; p.fade = 0; p.ao = 0.55; p.edgeBlur = 0;
-    p.exposure = 1.1; p.saturation = 1.2; p.contrast = 1.08; p.warmth = 0.07; p.blackLift = 0.0;
-    p.vignette = 0.45; p.soft = 0.015; p.bloom = 0.22; p.bloomThreshold = 1.4; p.grain = 0.02;
+    p.exposure = 1.08; p.saturation = 1.16; p.contrast = 1.07; p.warmth = 0.06; p.blackLift = 0.0;
+    p.vignette = 0.42; p.soft = 0.015; p.bloom = 0.24; p.bloomThreshold = 1.3; p.grain = 0.02;
     p.tunnel = 1.25; p.tunnelSoft = 0.5; p.tunnelDark = 0;
     p.flashColor.setRGB(1, 1, 1);
     if (p.smear) p.smear.set(0, 0);
-    // the change: a jolt of chroma; after it the light goes a touch flatter (colour as storytelling)
-    p.chroma = 0.006 * MathX.impulse(t, T.g0 + 0.05, 0.3) + 0.003 * MathX.impulse(t, PH, 0.2) + 0.004 * MathX.impulse(t, T.trip + 0.33, 0.25) + 0.006 * MathX.impulse(t, LH, 0.35);
+    // the change: a jolt of chroma; the bar's crash; your slide in; the diver's hit
+    p.chroma = 0.006 * MathX.impulse(t, T.g0 + 0.05, 0.3) + 0.003 * MathX.impulse(t, T.bench.drop, 0.2) + 0.003 * MathX.impulse(t, T.slide + 0.35, 0.25) + 0.004 * MathX.impulse(t, H, 0.3);
     const changed = MathX.smooth(t, T.g0, T.g0 + 2);
-    p.saturation -= 0.06 * changed; p.contrast += 0.03 * changed;
-    // the hits: two or three frames of white
-    p.flash = 0.22 * MathX.impulse(t, PH, 0.05) + (t >= LH ? 0.8 * (1 - MathX.smooth(t, LH + 0.04, LH + 0.13)) : 0);
-    // down on the pavement: the edges close in while you get your breath
-    const down = MathX.smooth(t, T.trip + 0.2, T.trip + 0.8) * (1 - MathX.smooth(t, T.up[1] - 0.5, T.up[1] + 0.8));
-    p.vignette += 0.3 * down; p.tunnel -= 0.25 * down; p.tunnelDark = 0.25 * down; p.edgeBlur = 0.2 * down;
-    // the dust after the last impact: lower contrast, warmer
-    const dust = MathX.smooth(t, LH, LH + 2.5);
-    p.contrast -= 0.06 * dust; p.warmth += 0.04 * dust; p.saturation -= 0.08 * dust;
-    p.exposure -= 0.1 * dust; p.vignette += 0.12 * dust;           // (a little darker, so the closing lines read over the dust)
+    p.saturation -= 0.04 * changed; p.contrast += 0.02 * changed;
+    // the stair under double weight: the edges close in a little
+    const stair = MathX.smooth(t, T.stair[0] + 1, T.stair[0] + 3) * (1 - MathX.smooth(t, T.stair[1] - 0.5, T.stair[1] + 1.5));
+    p.vignette += 0.12 * stair; p.tunnelDark = 0.1 * stair;
+    // in the water: calmer, cooler
+    const wet = MathX.smooth(t, T.float, T.float + 1.5);
+    p.warmth -= 0.03 * wet;
+    // under water: teal, softer, darker edges
+    if (U) { p.saturation = 0.95; p.contrast = 0.96; p.warmth = -0.12; p.exposure = 1.12; p.vignette = 0.62; p.edgeBlur = 0.18; p.bloom = 0.35; p.bloomThreshold = 1.1; p.tunnelDark = 0.15; }
+    // the closing lines: a touch darker so they read over the water
+    const end = MathX.smooth(t, T.lineA[0] - 0.5, T.lineA[0] + 1.5);
+    p.exposure -= 0.08 * end; p.vignette += 0.1 * end;
     // black at the very end
     p.fade = MathX.smooth(t, T.end - 0.6, T.end);
   },
 
-  debug(app, t) { return `g ${gvG(t).toFixed(2)} · pallet hit ${GV_FALL.pallet.hit.toFixed(2)} · load hit ${GV_FALL.load.hit.toFixed(2)}`; },
+  debug(app, t) { return `g ${gvG(t).toFixed(2)} · scale ${gvScaleKg(t).toFixed(1)} kg · dive hit ${GV_FALL.hit.toFixed(2)} · under ${this.under || 0}`; },
 };
-const _gvDustCol = new THREE.Color('#cbbfa8');

@@ -1,18 +1,19 @@
 /* =====================================================================
-   SCRIPT — "What if gravity became twice as strong?"
+   SCRIPT — "What if gravity became twice as strong?" (v3: the leisure centre)
    ★ The one file to edit for timing: the beats, the words, the readouts, your head (camera), your hands.
    Everything is a pure function of STORY time; CONFIG.edit cuts the take into the film.
    Plan and physics: films/gravity-2x/PLAN.md
 
    The rule: at GV.g0 surface gravity goes from 9.81 to 19.62 m/s² (over 0.25 s) and stays there.
-   Mass and inertia do NOT change: weight (m·g) doubles, falls are faster, springs sag twice as far.
+   Mass and inertia do NOT change: weight (m·g) doubles, falls are faster, and so does the water's weight
+   (buoyancy doubles with it: floating is unchanged).
    ===================================================================== */
 
-CONFIG.duration = 73.2;
-CONFIG.seed = 20261107;
+CONFIG.duration = 62.8;
+CONFIG.seed = 20261108;
 Object.assign(CONFIG.camera, {
-  cameraHeight: 1.7, walkSpeed: 1.25, bobStrength: 0.016, bobFrequency: 1.72, runStrideGain: 0.3,
-  breathingStrength: 0.005, breathRate: 15, fov: 66, shakeStrength: 1.0,
+  cameraHeight: 1.66, walkSpeed: 1.0, bobStrength: 0.022, bobFrequency: 1.55, runStrideGain: 0.3,
+  breathingStrength: 0.005, breathRate: 15, fov: 64, shakeStrength: 1.0,
 });
 CONFIG.render.shadowMapSize = 2048;
 
@@ -20,167 +21,174 @@ CONFIG.render.shadowMapSize = 2048;
 // THE BEATS (story seconds). Every other file keys off these.
 // ---------------------------------------------------------------------------------------------------------------------
 const GV = {
-  title: [-0.6, 3.1],
-  g0: 1.6, g1: 1.85,            // gravity 1 G → 2 G
-  bagDown: [4.3, 5.4],          // you put the bag down
-  kidJump: 7.1,                 // the kid tries again (he hopped twice before the change)
-  oldMan: [9.2, 12.0],          // the man on the bench tries to stand
-  bay: { creak: 14.2, crack: 15.15, drop: 15.55 },   // the loading bay gives; the pallet falls 10.2 m
-  coupe: 23.2,                  // the low coupe passes you; scrapes on the raised crossing
-  truck: 26.2,                  // the loaded box truck; its rear spring snaps on the crossing
-  outrigger: 30.0,              // the crane's outrigger pad punches into the road
-  scaffold: { bow: 33.6, fold: 35.4 },
-  awning: 38.2,
-  tank: 40.6,
-  plane: [43.0, 52.4],
-  limit: 52.6,                  // exhausted people, paramedics
-  trip: 55.0,                   // your knee gives; down on your hands
-  up: [56.4, 59.4],             // getting back up
-  slips: [60.1, 60.95, 61.55],  // the crane's hoist brake slips
-  drop: 62.6,                   // the brake gives
-  hudBack: 66.6,
-  lineA: [67.0, 68.8], lineB: [68.8, 72.0], note: [70.8, 72.6],
-  end: 73.2,
+  title: [-0.6, 3.2],
+  g0: 1.6, g1: 1.85,                       // gravity 1 G → 2 G
+  scale: [3.3, 6.3],                       // the scale's reading (readout + caption)
+  tread: { look: 6.0, slip: 7.5, sit: 8.25 },   // the runner clinging to the rails, carried off the back
+  offScale: 9.3,                           // you step off the scale
+  bench: { look: 10.0, heave: 11.0, drop: 12.55 },   // lifter + spotter heave the bar off the safety arms; it drops back
+  shot: 15.6,                              // the free throw is released
+  toStair: 18.6,                           // you turn and walk to the stair head
+  stair: [23.4, 30.2],                     // down the 16 steps
+  deck: 30.2,                              // the foot of the stair: along the deck
+  ladder: { up: 36.6, top: 38.2, slip: 39.0, splash: 39.35 },
+  sit: 40.2,                               // you sit on the edge of the deep end
+  slide: 41.5,                             // and slide in
+  float: 42.6,                             // floating
+  diver: { stand: 44.6, look: 45.4, edge: 46.7, step: 47.9 },
+  under: 49.45,                            // you duck under
+  surface: 54.3,                           // you come back up
+  lineA: [55.0, 62.2], lineB: [56.9, 62.2], lineC: [58.7, 62.2], note: [59.6, 62.2],
+  end: 62.8,
 };
 
-// the cut (story intervals kept): five invisible trims where the picture barely moves or the head whips round
-// (the bay before it creaks, the wreck hold, the swing up to the roar, the airliner far away, your hands on the pavement).
-// 73.2 s story → 68.7 s film.
-CONFIG.edit = [[0, 12.6], [13.6, 20.5], [21.7, 43.3], [43.8, 50.6], [51.8, 55.8], [56.4, GV.end]];
+// the cut (story intervals kept): trims inside the two long walks, during head turns
+CONFIG.edit = null;
 
-const GV_G0 = 9.81;
+const GV_G0 = 9.81, GV_G = 2 * GV_G0;
 // gravity in g (1 → 2)
 function gvG(t) { return 1 + MathX.smooth(t, GV.g0, GV.g1); }
-// the extra sag of anything sitting on springs: a damped step when gravity doubles (0 → 1 with an overshoot)
+// a damped step response (0 → 1 with an overshoot) starting at t0
 function gvSpring(t, f = 1.3, z = 0.28, t0 = GV.g0 + 0.05) {
   if (t < t0) return 0;
-  const a = t - t0, w = 2 * Math.PI * f;
-  return 1 - Math.exp(-z * w * a) * (Math.cos(w * a * Math.sqrt(1 - z * z)) + z / Math.sqrt(1 - z * z) * Math.sin(w * a * Math.sqrt(1 - z * z)));
+  const a = t - t0, w = 2 * Math.PI * f, wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * a) * (Math.cos(wd * a) + z / Math.sqrt(1 - z * z) * Math.sin(wd * a));
 }
 
-// the falling pallet (from the loading bay) and the crane load: a free fall at 2 G
-const GV_FALL = {
-  pallet: { t0: GV.bay.drop, h: 9.0 },         // off the tipped bay (≈ 10.9 m) onto the pickup's cab roof (1.9 m)
-  load: { t0: GV.drop, h: 21.7, base: 1.5 },    // the load's underside 23.2 m above the road: 21.7 m down to the trailer deck (1.5 m)
-};
-for (const k in GV_FALL) { const F = GV_FALL[k]; F.base = F.base || 0; F.T2 = Math.sqrt(2 * F.h / (2 * GV_G0)); F.T1 = Math.sqrt(2 * F.h / GV_G0); F.v2 = 2 * GV_G0 * F.T2; F.v1 = GV_G0 * F.T1; F.hit = F.t0 + F.T2; }
+// the leisure centre's levels (metres): the gym and the court at 0, the pool deck below, the water just under the deck
+const GV_LOW = -3.2, GV_WATER = -3.32;
 
-// where you stand (story): walking in, stopping when the weight hits, the trip at the end
-const GV_ME = { x: 9.35, z0: 3.6, z1: 1.3, zTrip: -0.4 };
+// the diver's fall: 10 m from the platform to the water, at 2 G
+const GV_FALL = { t0: GV.diver.step, h: 10.0 };
+GV_FALL.T2 = Math.sqrt(2 * GV_FALL.h / GV_G); GV_FALL.T1 = Math.sqrt(2 * GV_FALL.h / GV_G0);
+GV_FALL.v2 = GV_G * GV_FALL.T2; GV_FALL.v1 = GV_G0 * GV_FALL.T1; GV_FALL.hit = GV_FALL.t0 + GV_FALL.T2;
+GV_FALL.h1 = GV_FALL.v2 * GV_FALL.v2 / (2 * GV_G0);          // the height that gives the same speed at 1 G (20 m)
+
+// the free throw: same release (2.13 m, 6.99 m/s at 52°), 3.95 m to the rim (3.05 m). At 1 G it scores; at 2 G it
+// peaks at 2.90 m, below the rim, and lands 3.5 m out.
+const GV_THROW = { t0: GV.shot, y0: 2.13, v: 6.99, ang: MathX.deg(52), d: 3.95, rim: 3.05 };
+GV_THROW.vx = GV_THROW.v * Math.cos(GV_THROW.ang); GV_THROW.vy = GV_THROW.v * Math.sin(GV_THROW.ang);
+GV_THROW.peak1 = GV_THROW.y0 + GV_THROW.vy * GV_THROW.vy / (2 * GV_G0);
+GV_THROW.peak2 = GV_THROW.y0 + GV_THROW.vy * GV_THROW.vy / (2 * GV_G);
+
+// where you are (story): on the scale, by the bench, at the glass, the stair head (by the right-hand rail), the stair foot,
+// the deck, the edge of the deep end, sitting on it, floating; under water you swim toward the diver
+const GV_ME = {
+  scale: [0.6, 1.8], bench: [2.4, 0.05], glass: [3.6, -0.6], mid: [3.95, -1.6], head: [4.45, -5.8], foot: [4.45, -10.6],
+  deck: [4.6, -15.0], edge: [3.0, -20.35], sit: [2.25, -20.35], float: [1.15, -20.6], under: [0.95, -20.9], swim: [-2.3, -25.2],
+};
 
 const gvFmt = (n, d = 1) => n.toFixed(d);
+// your walk as keys for x (i = 0) or z (i = 1): stops at the scale, the bench, the glass; one continuous walk from the glass
+// down the stair and along the deck to the deep end; then into the water
+function gvPath(i) {
+  const M = GV_ME, k = (t, p, e) => (e ? [t, p[i], e] : [t, p[i]]);
+  return [k(0, M.scale), k(GV.offScale, M.scale), k(GV.offScale + 1.8, M.bench), k(GV.bench.drop + 0.6, M.bench), k(GV.bench.drop + 2.2, M.glass), k(GV.toStair, M.glass), k(GV.toStair + 2.2, M.mid, 'inSine'), k(GV.stair[0], M.head, 'linear'), k(GV.stair[1], M.foot, 'linear'), k(GV.deck + 4.6, M.deck, 'linear'),
+    k(GV.sit - 0.2, M.edge, 'outSine'), k(GV.sit + 0.9, M.sit), k(GV.slide, M.sit), k(GV.float, M.float), k(GV.under, M.under, 'linear'), k(GV.surface - 0.3, M.swim),
+    k(70, [M.swim[0] - 0.3, M.swim[1] - 0.2], 'linear')];
+}
+
+// under water: breaststroke arms, reach and sweep, every 1.2 s
 
 const SCRIPT = {
   meta: { title: 'What if gravity became twice as strong?', wav: 'gravity-2x-soundtrack.wav' },
 
   events: [
-    { id: 'start', time: 0.0, label: 'A sunny street; the title' },
-    { id: 'g', time: GV.g0, label: 'Gravity 1 G → 2 G' },
-    { id: 'bag', time: GV.bagDown[0], label: 'Your bag pulls your hand down' },
-    { id: 'kid', time: GV.kidJump - 1.0, label: 'The kid can barely jump' },
-    { id: 'bench', time: GV.oldMan[0], label: 'Standing up from the bench' },
-    { id: 'bay', time: GV.bay.creak, label: 'The loading bay gives; the pallet falls' },
-    { id: 'coupe', time: GV.coupe, label: 'The low coupe scrapes' },
-    { id: 'truck', time: GV.truck, label: 'The truck’s spring snaps' },
-    { id: 'crane', time: GV.outrigger - 1.0, label: 'The crane’s outrigger sinks' },
-    { id: 'scaffold', time: GV.scaffold.bow - 0.4, label: 'The scaffold buckles' },
-    { id: 'awning', time: GV.awning - 0.6, label: 'The old awning' },
-    { id: 'tank', time: GV.tank - 0.8, label: 'The water tank' },
-    { id: 'plane', time: GV.plane[0], label: 'The airliner can’t hold height' },
-    { id: 'limit', time: GV.limit, label: 'People exhausted; paramedics' },
-    { id: 'trip', time: GV.trip - 0.6, label: 'You go down' },
-    { id: 'slips', time: GV.slips[0] - 0.5, label: 'The hoist brake slips' },
-    { id: 'drop', time: GV.drop, label: 'The load falls' },
+    { id: 'start', time: 0.0, label: 'The gym; you on the scale; the title' },
+    { id: 'g', time: GV.g0, label: 'Gravity 1 G → 2 G: the scale runs to 140 kg' },
+    { id: 'tread', time: GV.tread.look, label: 'The runner is carried off the treadmill' },
+    { id: 'bench', time: GV.bench.look, label: 'The bar won’t come off the safety arms' },
+    { id: 'shot', time: GV.shot - 1.0, label: 'The free throw falls short' },
+    { id: 'stair', time: GV.toStair, label: 'To the stair; down into the pool hall' },
+    { id: 'pool', time: GV.stair[1] - 1.2, label: 'Swimmers float as before' },
+    { id: 'ladder', time: GV.ladder.up - 0.6, label: 'The man on the ladder can’t get out' },
+    { id: 'in', time: GV.sit, label: 'You slide into the deep end' },
+    { id: 'diver', time: GV.diver.stand, label: 'The diver on the 10 m platform' },
+    { id: 'fall', time: GV.diver.step, label: 'The 10 m drop: 1.01 s, 71 km/h' },
+    { id: 'under', time: GV.under, label: 'Under the water' },
     { id: 'line', time: GV.lineA[0], label: 'The closing lines' },
   ],
 
-  // your head (the look direction is aimed at world points in film.js, GV_LOOK; yaw/pitch here are the fallback)
+  // your head: the position path and the eye height above the floor under you (film.js adds the floor: the scale's
+  // platform, the stair, the deck; and in the pool, the water). Where you look is GV_LOOK in film.js.
   camera: {
-    baseY: 0.15,
-    x: [[0, GV_ME.x], [75, GV_ME.x]],
-    z: [[0, GV_ME.z0], [GV.g0 + 0.1, GV_ME.z1, 'linear'], [GV.trip - 1.4, GV_ME.z1], [GV.trip - 0.1, GV_ME.zTrip, 'inOutSine'], [75, GV_ME.zTrip]],
-    // knees buckle at the change; you stay lower (bent knees) under twice the weight; the fall and the slow climb back up
-    height: [[0, 1.7], [GV.g0, 1.7], [GV.g0 + 0.22, 1.42, 'outCubic'], [GV.g0 + 0.9, 1.56, 'inOutSine'], [GV.g0 + 2.2, 1.6], [GV.bagDown[0], 1.6], [GV.bagDown[0] + 0.65, 1.16, 'inOutSine'], [GV.bagDown[1] + 0.1, 1.18], [GV.bagDown[1] + 1.2, 1.57, 'inOutSine'],
-      [GV.trip, 1.58], [GV.trip + 0.32, 0.62, 'inCubic'], [GV.trip + 0.5, 0.56, 'outCubic'],
-      [GV.up[0], 0.56], [GV.up[0] + 1.0, 0.86, 'inOutSine'], [GV.up[0] + 1.6, 0.8], [GV.up[0] + 2.3, 1.22, 'inOutSine'], [GV.up[1], 1.55, 'inOutSine'],
-      [75, 1.58]],
-    yaw: [[0, 0], [75, 0]],
-    pitch: [[0, 0], [75, 0]],
-    tilt: [[0, 0], [GV.g0 + 0.1, 0], [GV.g0 + 0.35, -2.2], [GV.g0 + 1.4, 0], [GV.trip, 0], [GV.trip + 0.35, 6], [GV.up[0], 4], [GV.up[1], 0], [75, 0]],
-    fov: [[0, 66], [75, 66]],
-    startles: [[GV.g0 + 0.05, 1.2], [GV.bay.crack, 0.5], [GV_FALL.pallet.hit, 1.3], [GV.truck + 1.2, 0.7], [GV.outrigger, 0.8], [GV.scaffold.fold + 0.4, 1.0], [GV.awning, 0.9], [GV.tank + 0.4, 0.6], [GV.trip + 0.33, 1.4], [GV.slips[0], 0.35], [GV.slips[1], 0.45], [GV.slips[2], 0.55], [GV.drop + 0.05, 0.7], [GV_FALL.load.hit, 2.0]],
-    shakes: [[GV_FALL.pallet.hit, 0.7, 0.35], [GV.outrigger, 0.35, 0.4], [GV.scaffold.fold + 0.5, 0.6, 0.45], [GV.trip + 0.33, 0.8, 0.25], [GV.slips[0], 0.25, 0.3], [GV.slips[1], 0.3, 0.3], [GV.slips[2], 0.35, 0.3], [GV_FALL.load.hit, 2.6, 0.9]],
+    baseY: 0,
+    x: gvPath(0), z: gvPath(1),
+    // eye height above the floor: knees give at the change; lower and bent-kneed under the doubled weight; sitting on
+    // the edge (film.js takes over from the slide: the water line)
+    height: [[0, 1.66], [GV.g0, 1.66], [GV.g0 + 0.22, 1.36, 'outCubic'], [GV.g0 + 1.0, 1.52, 'inOutSine'], [GV.g0 + 2.4, 1.56],
+      [GV.sit, 1.54], [GV.sit + 0.9, 0.86, 'inOutSine'], [70, 0.86]],
+    yaw: [[0, 0], [70, 0]],
+    pitch: [[0, 0], [70, 0]],
+    tilt: [[0, 0], [GV.g0 + 0.1, 0], [GV.g0 + 0.35, -2.4], [GV.g0 + 1.4, 0], [70, 0]],
+    fov: [[0, 64], [70, 64]],
+    startles: [[GV.g0 + 0.05, 1.2], [GV.tread.sit, 0.35], [GV.bench.drop, 0.7], [GV.ladder.splash, 0.3], [GV.slide + 0.35, 0.9], [GV_FALL.hit, 0.6]],
+    shakes: [[GV.g0 + 0.05, 0.35, 0.45], [GV.bench.drop, 0.25, 0.25]],
   },
 
-  // your hands (camera-space poses in film.js; 'name!' = snap)
+  // your hands (camera-space poses in film.js; aimed ones are re-aimed at world points every frame; 'name!' = snap)
   hands: {
-    right: [[0, 'bagR'], [GV.g0, 'bagR'], [GV.g0 + 0.18, 'bagDropR'], [GV.bagDown[0], 'bagLowR'], [GV.bagDown[1], 'hidden'],
-      [GV.trip + 0.12, 'catchR'], [GV.trip + 0.42, 'plantR'], [GV.up[0] + 0.3, 'pushR'], [GV.up[0] + 1.9, 'kneeR'], [GV.up[1] - 0.6, 'hidden']],
-    left: [[0, 'hidden'], [GV.trip + 0.1, 'catchL'], [GV.trip + 0.42, 'plantL'], [GV.up[0] + 0.3, 'pushL'], [GV.up[0] + 1.6, 'hidden']],
+    right: [[0, 'gripR'], [GV.offScale - 0.15, 'hidden'], [GV.stair[0] - 0.3, 'railR'], [GV.stair[1] - 0.2, 'hidden'],
+      [GV.sit + 0.3, 'edgeR'], [GV.slide + 0.15, 'hidden'], [GV.float + 0.2, 'scullR'], [GV.under - 0.25, 'hidden'], [GV.surface - 0.2, 'scullR']],
+    left: [[0, 'gripL'], [GV.offScale - 0.15, 'hidden'], [GV.sit + 0.3, 'edgeL'], [GV.slide + 0.15, 'hidden'], [GV.float + 0.2, 'scullL'], [GV.under - 0.25, 'hidden'], [GV.surface - 0.2, 'scullL']],
   },
 
   tracks: {
-    pov: [[0, 1], [75, 1]],
-    // breathing gets harder under the weight; heavy after the fall
-    breathRate: [[0, 15], [GV.g0, 15], [GV.g0 + 1.5, 24], [12, 22], [GV.trip, 24], [GV.trip + 1, 34], [GV.up[1] + 1, 28], [75, 24]],
+    pov: [[0, 1], [70, 1]],
+    // breathing: hard under the weight; calm once you float; held under water
+    breathRate: [[0, 14], [GV.g0, 14], [GV.g0 + 1.5, 24], [GV.stair[1], 28], [GV.slide, 30], [GV.float + 1.0, 16], [GV.under - 0.2, 12], [70, 12]],
+    breathHold: [[0, 0], [GV.under - 0.3, 0], [GV.under, 1], [GV.surface, 1], [GV.surface + 0.4, 0], [70, 0]],
   },
 
   hud: {
     title: { in: GV.title[0], out: GV.title[1], fi: 0.2, fo: 0.45, cls: 'big center', html: '<span class="kick">WHAT IF GRAVITY</span><span class="hero">BECAME TWICE</span><span class="kick">AS STRONG?</span>' },
     captions: [
-      { t: 4.2, until: 7.0, text: 'Everything you lift feels twice as heavy.' },
-      { t: 9.5, until: 11.9, text: 'Standing up becomes hard work.' },
-      { t: 17.4, until: 20.1, text: 'And falling things hit twice as hard.' },
-      { t: 24.6, until: 27.0, text: 'Cars still drive. Their springs sag twice as far.' },
-      { t: 30.8, until: 33.4, text: 'Every machine was built for 1 G. Some with thin margins.' },
-      { t: 36.4, until: 39.2, text: 'Most buildings hold. The weak spots don’t.' },
-      { t: 46.0, until: 49.0, text: 'Its wings now carry twice the weight.' },
-      { t: 57.3, until: 59.6, text: 'Getting up is like lifting a second you.' },
+      { t: 3.6, until: 6.2, text: 'You didn’t gain a gram.' },
+      { t: 6.9, until: 9.4, text: 'Every stride lifts twice the weight.' },
+      { t: 10.9, until: 13.6, text: 'Every weight in the gym just doubled.' },
+      { t: 16.2, until: 18.8, text: 'Every throw falls short.' },
+      { t: 24.4, until: 27.4, text: 'Every flight of stairs is now two.' },
+      { t: 28.6, until: 32.6, text: 'But in the water, nothing changed.' },
+      { t: 37.6, until: 40.3, text: 'Until you try to get out.' },
+      { t: 44.9, until: 47.6, text: 'Ten metres of stairs feel like twenty.' },
+      { t: 47.6, until: 49.6, text: 'So she jumps.' },
     ],
     readouts: [
-      { from: -0.6, until: 9.8, top: 210, label: 'GRAVITY', value: (t) => `${gvFmt(gvG(t))} G`, sub: (t) => (t >= GV.g1 ? '19.6 m/s²' : '9.8 m/s²') },
-      { from: 4.6, until: 7.0, top: 470, label: '70 KG PERSON · WEIGHT', value: '1,373 N', sub: 'AT 1 G: 687 N · MASS STILL 70 KG' },
-      { from: 7.0, until: 9.6, top: 470, label: 'KID’S JUMP · SAME LEGS', value: '6 cm', sub: 'AT 1 G: 30 cm' },
-      { from: GV.bay.drop - 0.1, until: 20.1, top: 210, label: 'FALLING PALLET', value: (t) => gvFallValue(t), sub: (t) => gvFallSub(t) },
-      { from: GV.outrigger + 0.5, until: 33.4, top: 210, label: 'CRANE LOAD · MASS 12 t', value: 'PULLS LIKE 24 t', sub: 'OUTRIGGER PAD: 2× PRESSURE' },
-      { from: 44.6, until: 51.8, top: 210, label: 'AIRLINER ON APPROACH', value: 'NEEDS 2× LIFT', sub: 'STALL SPEED NOW 41% HIGHER' },
-      { from: GV.slips[0] - 0.3, until: GV.drop + 0.2, top: 210, label: 'HOIST BRAKE · OVERLOADED', value: (t) => `${gvFmt(gvG(t) * 100 / 1.25, 0)} %`, sub: 'OF WHAT IT CAN HOLD · SLIPPING' },
-      { from: GV.drop + 0.05, until: GV_FALL.load.hit + 2.6, top: 210, label: `FREE FALL · ${GV_FALL.load.h} m`, value: (t) => gvLoadValue(t), sub: (t) => gvLoadSub(t) },
-      { from: GV.hudBack, until: GV.end - 0.4, top: 210, label: 'GRAVITY', value: '2.0 G', sub: 'MASS UNCHANGED' },
+      { from: -0.6, until: 10.0, top: 210, label: 'GRAVITY', value: (t) => `${gvFmt(gvG(t))} G`, sub: (t) => (t >= GV.g1 ? '19.6 m/s²' : '9.8 m/s²') },
+      { from: GV.scale[0], until: GV.scale[1], top: 470, label: 'THE SCALE', value: (t) => `${gvFmt(gvScaleKg(t))} kg`, sub: 'YOUR MASS: STILL 70 kg' },
+      { from: GV.tread.look + 0.7, until: 9.6, top: 470, label: 'TREADMILL · 10 km/h', value: '2× THE LOAD', sub: 'SAME SPEED · EVERY STRIDE' },
+      { from: GV.bench.heave - 0.4, until: 14.0, top: 210, label: 'BARBELL · 80 kg', value: 'LIFTS LIKE 160', sub: 'AT 1 G: 785 N · NOW 1,570 N' },
+      { from: GV.shot - 0.4, until: 18.9, top: 210, label: 'SAME FREE THROW', value: (t) => gvThrowValue(t), sub: (t) => gvThrowSub(t) },
+      { from: GV.stair[0] + 0.6, until: 28.3, top: 210, label: 'ONE FLOOR UP · 3.2 m', value: 'WORK OF TWO', sub: '70 kg: 4,390 J · AT 1 G: 2,200 J' },
+      { from: 28.6, until: 33.0, top: 210, label: 'SWIMMERS', value: 'FLOAT THE SAME', sub: 'WEIGHT ×2 · BUOYANCY ×2' },
+      { from: GV.ladder.up - 0.2, until: GV.ladder.splash + 0.9, top: 210, label: 'LEAVING THE WATER', value: 'WEIGHT ×2 AGAIN', sub: 'BUOYANCY STOPS AT THE SURFACE' },
+      { from: GV.float + 0.3, until: GV.diver.stand + 0.2, top: 210, label: 'YOU, FLOATING', value: 'WEIGHT ≈ 0', sub: 'BUOYANCY 1,373 N = WEIGHT 1,373 N' },
+      { from: GV.diver.stand + 0.4, until: GV.diver.step, top: 210, label: '10 m PLATFORM', value: 'LIKE 20 m', sub: 'TO CLIMB BACK DOWN' },
+      { from: GV.diver.step - 0.05, until: GV_FALL.hit + 2.6, top: 210, label: `FALL · ${GV_FALL.h} m`, value: (t) => gvFallValue(t), sub: (t) => gvFallSub(t) },
+      { from: GV.under + 1.6, until: GV.surface - 0.3, top: 210, label: 'DEPTH 3 m', value: 'PRESSURE ×2', sub: 'FEELS LIKE 6 m AT 1 G' },
+      { from: GV.lineA[0] - 0.4, until: GV.end - 0.4, top: 210, label: 'GRAVITY', value: '2.0 G', sub: 'MASS UNCHANGED' },
     ],
     notes: [{ t: GV.note[0], until: GV.note[1], text: 'FICTIONAL INSTANT GRAVITY CHANGE · MASSES UNCHANGED · AIR PRESSURE CHANGES NOT SHOWN' }],
     // the closing lines, one after the other
-    stack: [{ until: GV.end - 0.6, lines: [[GV.lineA[0], 'Nothing became more massive.'], [GV.lineB[0], 'Everything just became twice as heavy.']] }],
-  },
-
-  // the airliner on approach (AircraftSystem spline: [t, x, y, z]): it comes over you from behind at full power, nose high,
-  // and sinks ever faster down the line of the avenue, below the rooftops before it is gone (it does not drop like a stone)
-  aircraft: {
-    path: [[GV.plane[0] - 0.4, 12, 150, 180], [44.6, 8, 128, 25], [47.4, -2, 100, -195], [50.0, -10, 62, -400], [52.6, -17, 18, -605], [56.0, -26, -40, -870]],
-    bank: [[GV.plane[0], 0], [56, 0]],
+    stack: [{ until: GV.end - 0.6, lines: [[GV.lineA[0], 'Nothing became more massive.'], [GV.lineB[0], 'Everything just became twice as heavy.'], [GV.lineC[0], 'Even the water.']] }],
   },
 };
 
-// the pallet's fall in numbers: while falling, the clock; at the hit, the speed
+// the scale: load cells measure force (calibrated for 1 G), so the reading follows gravity, with the display's lag
+function gvScaleKg(t) { return 70 * (1 + MathX.smooth(t, GV.g0 + 0.08, GV.g1 + 0.45)); }
+// the throw in numbers: the peak while it flies, then the comparison
+function gvThrowValue(t) { return t < GV_THROW.t0 + 0.32 ? '…' : `PEAK ${gvFmt(GV_THROW.peak2, 2)} m`; }
+function gvThrowSub(t) { return `RIM ${gvFmt(GV_THROW.rim, 2)} m · AT 1 G (GHOST): ${gvFmt(GV_THROW.peak1, 2)} m`; }
+// the fall: the clock while she falls, then the speed
 function gvFallValue(t) {
-  const F = GV_FALL.pallet;
+  const F = GV_FALL;
   if (t < F.hit) return `${gvFmt(MathX.clamp(t - F.t0, 0, F.T2), 2)} s`;
   return `${Math.round(F.v2 * 3.6)} km/h`;
 }
 function gvFallSub(t) {
-  const F = GV_FALL.pallet;
-  if (t < F.hit) return `FALL 9 m · AT 1 G: ${gvFmt(F.T1, 2)} s`;
-  return `IN ${gvFmt(F.T2, 2)} s · AT 1 G: ${Math.round(F.v1 * 3.6)} km/h · ENERGY ×2`;
-}
-function gvLoadValue(t) {
-  const F = GV_FALL.load;
-  if (t < F.hit) return `${gvFmt(MathX.clamp(t - F.t0, 0, F.T2), 2)} s`;
-  return `${Math.round(F.v2 * 3.6)} km/h`;
-}
-function gvLoadSub(t) {
-  const F = GV_FALL.load;
+  const F = GV_FALL;
   if (t < F.hit) return `AT 1 G: ${gvFmt(F.T1, 2)} s`;
-  return `AT 1 G: ${Math.round(F.v1 * 3.6)} km/h · 12 t`;
+  return `LIKE A ${Math.round(F.h1)} m DIVE AT 1 G · AT 1 G: ${Math.round(F.v1 * 3.6)} km/h`;
 }
 
 const SCRIPT_TRACKS = Object.fromEntries(Object.entries(SCRIPT.tracks).map(([k, v]) => [k, new Track(v, 'linear')]));

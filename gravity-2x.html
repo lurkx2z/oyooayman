@@ -64,7 +64,7 @@
     <div id="soundStatus" style="opacity:.75"></div>
     <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
   </div>
-  <div id="loading">BUILDING THE STREET…</div>
+  <div id="loading">BUILDING THE LEISURE CENTRE…</div>
   <div id="errorBox"></div>
 
   <script>
@@ -83,6 +83,8 @@
   <script src="js/core/textures.js"></script>
   <script src="js/core/geo.js"></script>
   <script src="js/fx/fog.js"></script>
+  <!-- indoor haze: even (no banks), no ground layer (the pool deck is below y = 0), allowed to close in under water -->
+  <script>installFog({ bankAmount: 0.2, lowAmount: 0, cap: 0.97 });</script>
   <script src="js/fx/postprocessing.js"></script>
   <script src="js/fx/look.js"></script>
   <script src="js/fx/particles.js"></script>
@@ -97,12 +99,10 @@
   <script src="js/ui/devControls.js"></script>
   <!-- this film (plan: films/gravity-2x/PLAN.md) -->
   <script src="films/gravity-2x/script.js"></script>
-  <script src="films/gravity-2x/city.js"></script>
-  <script src="films/gravity-2x/site.js"></script>
-  <script src="films/gravity-2x/traffic.js"></script>
+  <script src="films/gravity-2x/centre.js"></script>
+  <script src="films/gravity-2x/props.js"></script>
   <script src="films/gravity-2x/cast.js"></script>
   <script src="films/gravity-2x/fx.js"></script>
-  <script src="films/gravity-2x/air.js"></script>
   <script src="films/gravity-2x/audio.js"></script>
   <script src="films/gravity-2x/film.js"></script>
   <script src="films/gravity-2x/soundtrack.js"></script>
