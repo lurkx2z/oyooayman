@@ -51,9 +51,9 @@ class NrPlane {
 class NrImpact {
   constructor(scene) {
     this.glow = new BillboardSystem(scene, 8, true);
-    this.spray = new BillboardSystem(scene, 700, false);
-    this.spray.uniforms.uLight.value = 0.95;
-    this.fog = { color: new THREE.Color('#c9d4dc'), density: 0.00022 };
+    this.spray = new BillboardSystem(scene, 760, false);
+    this.spray.uniforms.uLight.value = 1.0;
+    this.fog = { color: new THREE.Color('#c9d4dc'), density: 0.00009 };
     this.P = NR_PLANE.imp;
   }
   update(S) {
@@ -61,22 +61,23 @@ class NrImpact {
     G.begin(); Sp.begin(this.fog);
     if (u >= 0) {
       const f = Math.exp(-u / 0.35);
-      if (f > 0.01) { G.push(I[0], 40 + 80 * u, I[1], 700 * (0.6 + u), 0, 0.9 * f, 1, 1.0, 0.92, 0.75); G.push(I[0], 15, I[1], 260, 0, f, 1, 1.0, 0.75, 0.45); }
+      if (f > 0.01) { G.push(I[0], 120 + 90 * u, I[1], 1100 * (0.5 + u), 0, f, 1, 1.0, 0.92, 0.75); G.push(I[0], 60, I[1], 420, 0, f, 1, 1.0, 0.8, 0.55); }
       // the column: puffs shot up from the impact, slowing as they climb (spray is water: it still feels the air), then drifting off with the wind
-      for (let i = 0; i < 340; i++) {
+      for (let i = 0; i < 420; i++) {
         const born = (hash1(i * 3 + 1) ** 2) * 1.4, a = u - born;
         if (a < 0) continue;
-        const v0 = 60 + 170 * hash1(i * 5 + 2), tau = 1.6 + 1.2 * hash1(i * 7 + 3), h = v0 * tau * (1 - Math.exp(-a / tau)) - 6 * a * a * 0.5;
-        const sp = 18 + 60 * hash1(i * 11 + 4), ang = hash1(i * 13 + 5) * 6.283, r = sp * tau * (1 - Math.exp(-a / tau)) * (0.3 + 0.7 * hash1(i * 17 + 6));
+        const v0 = 80 + 200 * hash1(i * 5 + 2), tau = 1.8 + 1.4 * hash1(i * 7 + 3), h = v0 * tau * (1 - Math.exp(-a / tau)) - 6 * a * a * 0.5;
+        const sp = 10 + 40 * hash1(i * 11 + 4), ang = hash1(i * 13 + 5) * 6.283, r = sp * tau * (1 - Math.exp(-a / tau)) * (0.3 + 0.7 * hash1(i * 17 + 6));
         const drift = nrWindDist(S) - nrWindDist(NR.impact + born);
         const x = I[0] + Math.cos(ang) * r + D.x * drift * 0.9, z = I[1] + Math.sin(ang) * r + D.z * drift * 0.9, y = Math.max(5, h);
-        const k = MathX.clamp(a / 9, 0, 1), size = 40 + 90 * hash1(i * 19 + 7) + 160 * k;
-        const shade = 0.82 + 0.16 * hash1(i * 23 + 8) - 0.18 * (1 - y / 600);
-        Sp.push(x, y, z, size, i * 1.7, 0.85 * Math.min(1, a * 3) * (1 - 0.6 * k), shade, 0.94, 0.96, 1.0);
+        const k = MathX.clamp(a / 9, 0, 1), size = 35 + 70 * hash1(i * 19 + 7) + 140 * k;
+        // sunlit on top, grey underneath, so it stands out against the pale horizon
+        const shade = 0.5 + 0.55 * MathX.clamp(y / 650, 0, 1) + 0.14 * hash1(i * 23 + 8);
+        Sp.push(x, y, z, size, i * 1.7, 0.92 * Math.min(1, a * 3) * (1 - 0.5 * k), shade, 0.98, 0.98, 1.0);
       }
       // a low skirt of spray rolling out along the river
       for (let i = 0; i < 90; i++) { const a = u - 0.2 * hash1(i + 400); if (a < 0) continue; const ang = (i / 90) * 6.283, r = 220 * (1 - Math.exp(-a / 1.5)) + 40;
-        Sp.push(I[0] + Math.cos(ang) * r, 18 + 25 * hash1(i + 500), I[1] + Math.sin(ang) * r, 70 + 60 * Math.min(1, a / 4), i, 0.7 * Math.min(1, a * 2) * (1 - MathX.clamp(a / 12, 0, 0.7)), 0.9, 0.94, 0.96, 1.0); }
+        Sp.push(I[0] + Math.cos(ang) * r, 18 + 25 * hash1(i + 500), I[1] + Math.sin(ang) * r, 70 + 60 * Math.min(1, a / 4), i, 0.7 * Math.min(1, a * 2) * (1 - MathX.clamp(a / 12, 0, 0.7)), 0.62, 0.94, 0.96, 1.0); }
     }
     G.end(); Sp.end();
   }

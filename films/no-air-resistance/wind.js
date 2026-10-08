@@ -124,7 +124,7 @@ class NrWind {
     this.flags = [];
     // three on the café's wall poles, one on the corner building, and a big one on a pole at the kerb in front of you
     const spots = NR_CITY.flags.map(([x, y, z]) => ({ x, y, z, type: 'wall', Lf: 2.1, Hf: 1.3 }))
-      .concat([{ x: 11.4, y: 12.85, z: -35.5, type: 'corner', Lf: 2.1, Hf: 1.3 }, { x: 7.6, y: 6.3, z: -4.0, type: 'ground', Lf: 2.7, Hf: 1.7 }]);
+      .concat([{ x: 11.4, y: 12.85, z: -35.5, type: 'corner', Lf: 2.1, Hf: 1.3 }, { x: 10.6, y: 6.3, z: -6.0, type: 'ground', Lf: 2.7, Hf: 1.7 }]);
     spots.forEach((sp, i) => {
       const { Lf, Hf } = sp, g = new THREE.PlaneGeometry(Lf, Hf, 22, 8); g.translate(Lf / 2, -Hf / 2, 0);
       const U = { uLoad: { value: 0 }, uLimp: { value: 0 }, uRip: { value: 0 }, uT: { value: 0 }, uPh: { value: i * 1.7 } };

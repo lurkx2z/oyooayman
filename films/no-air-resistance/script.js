@@ -26,7 +26,7 @@ const NR = {
   roar: 33.4, plane: 34.6,                     // the plane: heard, then seen
   storm: [40.6, 42.2], balloon: 44.6,          // the wind rises to 100 km/h; the balloon slips
   plunge: 48.2, slow: [48.35, 49.35],          // the plunge (slow motion); it drops behind the skyline; impact at NR.impact
-  planeImp: [-40, -2100],                      // where it comes down: 2.1 km away, just beyond the end of the avenue
+  planeImp: [-40, -2100],                      // where it comes down: 2.1 km away, in the river beyond the end of the avenue
   run: 56.9, land: [59.4, 61.6], board: 59.95, // you run; the debris lands; the sign board is knocked off above where you stood
   look: 62.4, line: [63.2, 67.7], black: 67.8,
 };
@@ -47,7 +47,7 @@ function nrPlaneLook(S) {
   return [Math.atan2(-dx, -dz) * 180 / Math.PI, Math.atan2(y - 1.7, Math.hypot(dx, dz)) * 180 / Math.PI];
 }
 const nrFollow = (s0, s1, k, dy = 0, dp = 0) => { const Y = [], P = []; for (let s = s0; s <= s1 + 1e-6; s += 0.2) { const [y, p] = nrPlaneLook(s); Y.push([+s.toFixed(2), y + dy, k]); P.push([+s.toFixed(2), p + dp, k]); } return [Y, P]; };
-const NR_TRACK = nrFollow(35.4, 40.0, 'linear', 0, -0.25), NR_PLUNGE = nrFollow(48.2, 49.2, 'linear', -0.6, -1.2);
+const NR_TRACK = nrFollow(35.4, 40.0, 'linear', 0, -0.25), NR_PLUNGE = nrFollow(48.2, 49.2, 'linear', 1.2, -0.8);
 
 const SCRIPT = {
   meta: { title: 'WHAT IF AIR RESISTANCE SUDDENLY DISAPPEARED?', wav: 'no-air-resistance-soundtrack.wav' },
@@ -79,16 +79,16 @@ const SCRIPT = {
       [20.4, 160, 'step'], [21.5, 152], [21.95, 146, 'inOutSine'], [22.4, 96, 'inOutSine'], [22.8, 42, 'inOutSine'], [23.6, 16], [24.6, 8.5], [27.8, 5.5],
       [28.4, -4, 'inOutCubic'], [30.6, -8], [31.0, -33, 'inOutCubic'], [31.3, -33], [32.1, -30, 'inOutSine'], [33.4, -8],
       [34.6, nrPlaneLook(34.6)[0], 'inOutCubic'], ...NR_TRACK[0], [40.8, 3, 'inOutCubic'], [43.6, 0],
-      [44.2, -22, 'inOutCubic'], [46.6, -22], [47.9, NR_PLUNGE[0][0][1], 'inOutCubic'], ...NR_PLUNGE[0], [49.8, 1.0, 'outSine'],
-      [53.0, 1.0], [56.3, 1.5], [57.0, 178, 'inOutCubic'], [58.6, 176], [59.0, 16, 'inOutCubic'], [59.5, 4], [59.95, -14, 'inOutCubic'], [60.3, -14], [61.55, -3, 'inOutSine'], [62.0, 2], [62.6, 8], [68.0, 10]],
+      [44.2, -22, 'inOutCubic'], [46.6, -22], [47.9, NR_PLUNGE[0][0][1], 'inOutCubic'], ...NR_PLUNGE[0], [49.85, 2.2, 'inOutSine'],
+      [53.0, 2.4], [56.3, 2.6], [57.0, 178, 'inOutCubic'], [58.6, 176], [59.0, 16, 'inOutCubic'], [59.5, 4], [59.95, -14, 'inOutCubic'], [60.3, -14], [61.55, -3, 'inOutSine'], [62.0, 2], [62.6, 8], [68.0, 10]],
     pitch: [[0, 4], [2.3, 4], [3.0, 7, 'inOutCubic'], [4.2, 5], [5.0, -10], [6.0, -48, 'inOutSine'], [10.9, -46],
       [20.4, 2, 'step'], [21.5, 1], [22.4, -3], [23.6, -1.5], [24.6, -1.2], [27.8, -0.8],
       [28.4, -22, 'inOutCubic'], [30.6, -20], [31.0, 19, 'inOutCubic'], [31.3, 19], [32.1, -18, 'inQuad'], [33.4, -6],
       [34.6, nrPlaneLook(34.6)[1] - 4, 'inOutCubic'], ...NR_TRACK[1], [40.8, 7, 'inOutCubic'], [43.6, 6],
-      [44.2, -4], [44.9, 2], [45.5, 58, 'inOutCubic'], [46.6, 60], [47.9, NR_PLUNGE[1][0][1], 'inOutCubic'], ...NR_PLUNGE[1], [49.8, 5.5, 'outSine'],
-      [53.0, 7], [56.3, 8], [57.0, -4], [58.6, -2], [59.0, 6], [59.5, 14], [59.95, 46, 'inOutCubic'], [60.3, 46], [61.55, -10, 'inQuad'], [62.0, -2], [62.6, 40, 'inOutSine'], [64.6, 56], [68.0, 58]],
-    fov: [[0, 66], [10.9, 66], [20.4, 66], [22.8, 64], [24.4, 32], [27.8, 27], [28.4, 64], [34.6, 58], [35.5, 5.5, 'inOutCubic'], [40.0, 5.5], [40.8, 62, 'inOutCubic'],
-      [44.2, 60], [46.6, 60], [47.9, 26, 'inOutCubic'], [49.2, 26], [49.8, 30], [53.0, 40], [56.3, 48], [57.0, 66], [68.0, 66]],
+      [44.2, -4], [44.9, 2], [45.5, 58, 'inOutCubic'], [46.6, 60], [47.9, NR_PLUNGE[1][0][1], 'inOutCubic'], ...NR_PLUNGE[1], [49.85, 4.5, 'inOutSine'],
+      [53.0, 7.5], [56.3, 8.5], [57.0, -4], [58.6, -2], [59.0, 6], [59.5, 14], [59.95, 46, 'inOutCubic'], [60.3, 46], [61.55, -10, 'inQuad'], [62.0, -2], [62.6, 40, 'inOutSine'], [64.6, 56], [68.0, 58]],
+    fov: [[0, 66], [10.9, 66], [20.4, 66], [22.8, 64], [24.4, 32], [27.8, 27], [28.4, 64], [34.6, 58], [35.5, 3.8, 'inOutCubic'], [40.0, 3.8], [40.8, 62, 'inOutCubic'],
+      [44.2, 60], [46.6, 60], [47.9, 15, 'inOutCubic'], [49.2, 15], [49.85, 30, 'inOutSine'], [53.0, 38], [56.3, 46], [57.0, 66], [68.0, 66]],
     tilt: [[0, 0], [57.0, 0], [57.6, -4], [59.2, 3], [60.0, -6], [61.0, 0], [68.0, 0]],
     startles: [[NR.loss + 0.15, 0.35], [22.35, 0.25], [29.5, 0.25], [NR.impact + 0.05, 0.3], [NR.boom, 0.8], [NR.board, 0.6], [61.1, 0.5], [NR.board + 1.56, 1.0]],
     shakes: [[NR.boom, 0.6, 0.6], [NR.board, 0.35, 0.3], [61.1, 0.4, 0.25], [NR.board + 1.56, 0.9, 0.35]],

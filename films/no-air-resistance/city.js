@@ -26,7 +26,7 @@ const NR_CITY = {
   corner: { z0: -49.5, z1: -34, floors: 4, style: 'redbrick' },
   billboard: { x: 13.9, z: -41.5, w: 14, h: 5, base: 19.2, yaw: 0.6 },   // panel centre x, z; bottom edge height; turned toward you
   hut: { x: 17.5, z: -27.5, w: 6, d: 2.6, h: 5.6 },
-  treesR: [-36, -54, -72, -81.5, -91, -100.5],
+  treesR: [-81.5, -91, -100.5],
   treesL: [12, 2.5, -7, -29.5, -38.5, -54, -72, -81.5, -91, -100.5],
   flags: [[11.0, 5.75, -14.6], [11.0, 5.75, -17.1], [11.0, 5.75, -19.6]],   // on short poles out from the café's first floor
   branchTree: [8.15, -16.0],
@@ -76,6 +76,24 @@ class NrCity extends Environment {
     const mk = (leafy) => { const d = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }); this._bendify(d, leafy); return d; };
     const db = mk(false), df = mk(true);
     this.root.traverse((o) => { if (o.isMesh && o.material === this.m.bark) o.customDepthMaterial = db; if (o.isMesh && o.material === this.m.foliage) o.customDepthMaterial = df; });
+  }
+
+  // the far towers (as the shared skyline), but keeping a wider gap down the line of the avenue: the airliner comes down
+  // in the river 2.1 km away, and you see it fall through that gap
+  _skyline() {
+    const rng = this.rng.fork(2), B = this.batch;
+    const styles = ['glassblue', 'glassteal', 'modern', 'stone', 'glassblue'];
+    for (let i = 0; i < 70; i++) {
+      const z = rng.range(-520, -1150);
+      let x = rng.range(-260, 260);
+      if (Math.abs(x) < 70) x += Math.sign(x || 1) * 75;
+      const w = rng.range(22, 48), d = rng.range(22, 44), h = rng.range(50, 230) * (Math.abs(x) < 120 ? 1 : 0.7);
+      const st = this.facades[rng.pick(styles)];
+      B.add(Geo.boxSides(x - w / 2, x + w / 2, 0, h, z - d / 2, z + d / 2, st.tileW, st.tileH), st.mat, null, { noShadow: true });
+      B.add(Geo.flat(x - w / 2, x + w / 2, z - d / 2, z + d / 2, h, 5), this.m.roof, null, { noShadow: true });
+      if (rng.next() < 0.3) B.box(w * 0.6, h * 0.15, d * 0.6, x, h + h * 0.075, z, st.mat, 0, { noShadow: true });
+      if (rng.next() < 0.25) B.add(new THREE.CylinderGeometry(0.4, 0.6, 18, 6), this.m.metal, Geo.matrix(x, h + 9, z), { noShadow: true });
+    }
   }
 
   /* ---------------- sky: a bright, breezy afternoon; the clouds run with the wind ---------------- */

@@ -135,7 +135,8 @@ const FILM = {
     if (!on || !xy || xy[0] < 40 || xy[0] > 1040 || xy[1] < 290 || xy[1] > 1700) { if (el._o !== '0') { el.style.opacity = '0'; el._o = '0'; } return; }
     if (el._h !== html) { el.innerHTML = html; el._h = html; }
     el.style.opacity = '1'; el._o = '1';
-    el.style.left = `calc(var(--u) * ${MathX.clamp(xy[0], 150, 930).toFixed(1)})`; el.style.top = `calc(var(--u) * ${MathX.clamp(xy[1], 240, 1680).toFixed(1)})`;
+    const [x0, x1] = side === 'right' ? [40, 620] : side === 'left' ? [460, 1040] : [150, 930];
+    el.style.left = `calc(var(--u) * ${MathX.clamp(xy[0], x0, x1).toFixed(1)})`; el.style.top = `calc(var(--u) * ${MathX.clamp(xy[1], 240, 1680).toFixed(1)})`;
   },
 
   _overlays(app, S) {
@@ -179,11 +180,12 @@ const FILM = {
     if (S > NR.balloon + 0.3 && S < 46.7) B = [this._proj(cam, V.copy(app.balloon.b.position).add({ x: 0, y: 0.5, z: 0 })), `BUOYANCY, NO DRAG · <b>${Math.round(app.balloon.speed(S) * 3.6)}</b> KM/H`];
     if (S > 48.1 && S < 49.3) A = [this._proj(cam, V.copy(app.plane.g.position).add({ x: 0, y: 70, z: 0 })), `LIFT 0 N · <b>${(Math.round(NR_PLANE.kmh(S) / 10) * 10).toLocaleString('en-US')}</b> KM/H`];
     // the impact is 2.1 km away: you see it at once, its sound takes 6 s (the air still carries sound)
-    if (S > NR.impact + 0.9 && S < NR.boom) line = `${(NR.impactDist / 1000).toFixed(1)} KM AWAY · ITS SOUND ARRIVES IN <b>${Math.ceil(NR.boom - S)} S</b>`;
+    if (S > NR.impact + 0.6 && S < NR.boom - 0.2) B = [this._proj(cam, V.set(NR.planeImp[0] - 60, 520, NR.planeImp[1])), `IMPACT · ${(NR.impactDist / 1000).toFixed(1)} KM AWAY`];
+    if (S > NR.impact + 0.9 && S < NR.boom) line = `ITS SOUND ARRIVES IN <b>${Math.ceil(NR.boom - S)} S</b>`;
     if (S > 58.9 && S < 60.3) { const k = this._debrisKmh || (this._debrisKmh = Math.round(app.debris.list.filter((d) => d.near).reduce((a, d) => a + d.P.kmh, 0) / app.debris.list.filter((d) => d.near).length / 10) * 10); line = `THROWN ${(NR.impactDist / 1000).toFixed(1)} KM · ARRIVING AT <b>≈ ${k} KM/H</b>`; }
     if (S > NR.board + 0.1 && S < app.board.landT + 0.4) {
       A = [this._proj(cam, V.copy(app.board.g.position).add({ x: 0, y: 1.1, z: 0 })), `SIGN BOARD · NO DRAG · <b>${Math.round(app.board.speed(S) * 3.6)}</b> KM/H`, 'right'];
-      if (app.board.ghost.visible) D = [this._proj(cam, V.copy(app.board.ghost.position).add({ x: 0, y: 1.1, z: 0 })), 'NORMAL AIR', 'left'];
+      if (app.board.ghost.visible && S > NR.board + 0.7) D = [this._proj(cam, V.copy(app.board.ghost.position).add({ x: 0, y: 1.1, z: 0 })), 'NORMAL AIR', 'left'];
     }
     for (const [el, T] of [[U.tagA, A], [U.tagB, B], [U.tagC, C], [U.tagD, D]]) this._tag(el, T && T[0], T && T[1], !!T, (T && T[2]) || '');
     html(U.line, line); set(U.line, 'opacity', line ? '1' : '0');
