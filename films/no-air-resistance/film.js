@@ -196,7 +196,7 @@ const FILM = {
     html(U.ice.querySelector('.v'), `${Math.round(NR_ICE.kmh(ip)).toLocaleString('en-US')} KM/H`);
     html(U.ice.querySelector('.sub'), `FELL ${(NR_ICE.h(ip) / 1000).toFixed(1)} KM · NOTHING SLOWED IT`);
     // the side view of the cloud's ice, and the count to the first of it
-    const ins = W(S, NR.cloud + 0.5, NR_ICE.first + 0.5, 0.3, 0.3);
+    const ins = W(S, NR.cloud + 0.5, NR_ICE.first, 0.3, 0.2);
     set(U.inset, 'opacity', ins.toFixed(3));
     if (ins > 0) {
       const hk = NR_ICE.h(S) / 1000, yb = this._iy(NR_ICE.base / 1000 - hk), yt = this._iy(NR_ICE.top / 1000 - hk);

@@ -58,7 +58,7 @@ CONFIG.edit = [[0, NR.drop.rel - 0.05], [NR.drop.rel - 0.05, NR.drop.rel + 2.55,
 
 // where you stand: the stair door (the opening), leaning out over the front parapet (the drop), the confetti, the storm, the
 // spot by the door where the ice finds you, inside the doorway
-const NR_CAM = { x0: 26.1, z0: -0.75, xP: 12.3, zP: -2.4, xC: 25.8, zC: -6.3, xG: 25.0, zG: -3.75, xD: 25.6, zD: -1.9, xIn: 28.25, zIn: -0.8 };
+const NR_CAM = { x0: 26.1, z0: -0.75, xP: 12.3, zP: -2.4, xC: 25.8, zC: -6.3, xG: 25.2, zG: -5.2, xD: 25.6, zD: -1.9, xIn: 28.25, zIn: -0.8 };
 
 const SCRIPT = {
   meta: { title: 'WHAT IF AIR RESISTANCE SUDDENLY DISAPPEARED?', wav: 'no-air-resistance-soundtrack.wav' },
@@ -92,17 +92,17 @@ const SCRIPT = {
     yaw: [[0, 88], [NR.loss, 87], [2.6, 83, 'inOutSine'], [3.3, 85], [NR.walk[0] - 0.001, 86],
       [NR.walk[0], 59, 'step'], [5.0, 61], [6.1, 90, 'inOutSine'], [NR.cut0, 90],
       // (12.4–20.4: the sky cut-away has its own camera)
-      [20.4, 127, 'step'], [24.2, 126], [26.4, 99, 'inOutSine'], [27.4, 98], [28.4, 115, 'inOutSine'], [29.8, 118], [30.4, 124, 'inOutSine'], [32.6, 122],
-      [34.2, 92, 'inOutSine'], [NR.ice0, 90], [37.3, 86, 'inOutSine'], [37.9, 92], [38.9, 90, 'inOutSine'],
+      [20.4, 127, 'step'], [24.2, 126], [26.4, 104, 'inOutSine'], [27.4, 103], [28.3, 126, 'inOutSine'], [29.8, 128], [30.4, 136, 'inOutSine'], [32.4, 136],
+      [33.6, 102, 'inOutSine'], [34.4, 93, 'inOutSine'], [NR.ice0, 90], [37.3, 86, 'inOutSine'], [37.9, 92], [38.9, 90, 'inOutSine'],
       [40.1, 90], [40.5, 85, 'inOutSine'], [41.5, 87], [41.9, 92, 'inOutSine'], [43.0, 86, 'inOutSine'], [44.0, 90], [46.3, 91], [46.7, 94, 'inOutSine'], [48.6, 92], [50.4, 94], [50.9, 99, 'inOutSine'], [52.5, 95],
       [NR.quiet + 0.5, 92], [NR.quiet + 4.6, 87, 'inOutSine'], [61.4, 81, 'inOutSine']],
     pitch: [[0, 15], [1.8, 6, 'inOutSine'], [NR.loss, 6], [2.7, 3, 'inOutSine'], [NR.walk[0] - 0.001, 4],
       [NR.walk[0], -75, 'step'], [5.0, -73], [6.1, -50, 'inOutSine'], [NR.drop.rel, -52], [NR.drop.rel + 1.3, -85, 'inOutSine'], [NR.cut0, -86],
-      [20.4, 10, 'step'], [21.0, 10], [21.7, 30, 'inOutSine'], [22.5, 31], [23.3, -6, 'inOutCubic'], [24.2, -4], [26.4, 2, 'inOutSine'], [30.4, 3], [30.7, 8], [32.0, 52, 'inOutCubic'], [33.0, 62], [33.5, 62],
+      [20.4, 10, 'step'], [21.0, 10], [21.7, 30, 'inOutSine'], [22.5, 31], [23.3, -6, 'inOutCubic'], [24.2, -4], [26.4, 2, 'inOutSine'], [30.4, 3], [30.7, 8], [32.0, 50, 'inOutCubic'], [32.5, 54], [33.6, 30, 'inOutSine'],
       [34.4, 14, 'inOutSine'], [NR.ice0 - 0.1, 12], [37.25, -14, 'inOutCubic'], [37.9, -8], [38.9, 2, 'inOutSine'],
       [44.0, 3], [44.4, 8, 'inOutSine'], [45.4, 7], [46.0, 3, 'inOutSine'], [NR.quiet, 2], [NR.quiet + 4.6, -3, 'inOutSine'], [61.4, -1, 'inOutSine']],
     fov: [[0, 72], [NR.walk[0] - 0.001, 72], [NR.walk[0], 66, 'step'], [NR.drop.rel + 0.3, 66], [NR.drop.rel + 2.1, 42, 'inOutSine'], [NR.cut0, 41],
-      [20.4, 66, 'step'], [34.4, 66], [35.2, 70, 'inOutSine'], [37.9, 70], [38.9, 68], [61.4, 68]],
+      [20.4, 66, 'step'], [30.6, 66], [31.7, 46, 'inOutSine'], [32.5, 47], [33.6, 66, 'inOutSine'], [34.4, 66], [35.2, 70, 'inOutSine'], [37.9, 70], [38.9, 68], [61.4, 68]],
     tilt: [[0, 0], [61.4, 0]],
     startles: [[NR.loss + 0.15, 0.35], [NR.pop, 0.25], [NR.ice0 + 0.02, 0.7], [37.45, 0.45], [NR_ROOF_HITS.panes[0], 0.2], [NR_ROOF_HITS.bottles, 0.35], [NR_ROOF_HITS.cake, 0.3], [NR_ROOF_HITS.line, 0.25], [NR_ROOF_HITS.pot, 0.3]],
     shakes: [[NR.ice0, 0.3, 0.5], [40.0, 0.08, 13.4]],

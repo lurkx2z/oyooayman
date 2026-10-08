@@ -130,8 +130,10 @@ class NrCity extends Environment {
             if (hi > lo + 0.001) {
               float hiE = d.x < 0.0 ? min(hi, -uEdge * h / d.x) : hi;
               float L = max(0.0, hiE - lo) / max(h, 0.03);
-              float st = 0.7 + 0.3 * noise(vec2(atan(d.z, d.x) * 160.0, 0.5));
-              col = mix(col, vec3(0.6, 0.64, 0.69) * (1.0 - 0.35 * uDark), (1.0 - exp(-0.6 * L)) * st * 0.9);
+              float st = 0.5 + 0.5 * noise(vec2(atan(d.z, d.x) * 220.0, 0.5));
+              col = mix(col, vec3(0.74, 0.77, 0.82) * (1.0 - 0.25 * uDark), (1.0 - exp(-0.8 * L)) * st * 0.92);
+              // its lower edge, where the falling ice ends: a pale fringe that comes down the sky
+              col += vec3(0.15, 0.16, 0.18) * (1.0 - smoothstep(0.0, 0.6, L)) * step(0.0005, L);
             }
           }
           gl_FragColor = vec4(col, 1.0);
