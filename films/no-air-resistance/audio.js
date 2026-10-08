@@ -1,14 +1,15 @@
 /* =====================================================================
    AUDIO — "What if air resistance suddenly disappeared?"
-   Sound is kept: the air still carries it. What changes is that nothing
-   solid makes wind noise any more. Before NR.loss the breeze is heard
-   through what it moves (the flag cracking, leaves, the awning, litter);
-   at the loss all of that stops dead and only the hollow rush of the
-   moving air is left, rising to a roar in the storm while nothing rattles.
-   Falling things make no whoosh: they are heard only when they hit.
-   Distant events arrive at 343 m/s: the airliner (supersonic by then)
-   announces itself with its sonic boom; its impact is seen at once and
-   heard 6.1 s later; the debris lands before its own sound gets to you.
+   Sound is kept: the air still carries it. What changes is that air and
+   solids no longer push on each other, so nothing solid makes wind noise
+   any more. Before NR.loss the breeze is heard through what it moves (the
+   flag cracking, leaves, the awning, litter) and as a rush round you; at
+   the loss all of that stops dead and only a faint hiss is left. The storm
+   is silent: 100 km/h of air that cannot touch anything. Falling things make
+   no whoosh: they are heard only when they hit. The airliner falls without a
+   sound (it no longer pushes the air aside: no roar, no sonic boom); its
+   impact is seen at once and heard 6.1 s later, and the street holds its
+   breath until then; the debris lands before its own sound gets to you.
    Every cue is scheduled on STORY time; Edit.spliceAudio follows the cut
    and the quarter-speed plunge (which comes out two octaves lower).
    Bake: NODE_PATH=$(npm root -g) node tools/bake-soundtrack.cjs --page no-air-resistance.html --out films/no-air-resistance/soundtrack.js
@@ -17,7 +18,7 @@
 class NrAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
   // anything the sound depends on that is not inside SCRIPT (so a stale baked copy is detected)
-  fingerprintData() { return [NR, NR_CAM, NR_PEOPLE, NR_PIGEONS, NR_DEBRIS_SPEC, NR_CITY.flags, NR_STEAM, NR_PLANE.dir]; }
+  fingerprintData() { return [NR, NR_CAM, NR_PEOPLE, NR_PIGEONS, NR_FLYERS, NR_DEBRIS_SPEC, NR_CITY.flags, NR_STEAM, NR_PLANE.dir]; }
 
   // a soft ceiling just under full scale, and true silence after the cut to black
   async renderOffline() {
@@ -65,7 +66,7 @@ class NrAudio extends AudioEngine {
     this.S = S;
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.knee.value = 6; comp.ratio.value = 3; comp.attack.value = 0.008; comp.release.value = 0.25;
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.1;
-    const mix = ctx.createGain(); mix.gain.value = 2.12; mix.connect(comp);
+    const mix = ctx.createGain(); mix.gain.value = 2.75; mix.connect(comp);
     const out = ctx.createGain(); comp.connect(out); out.connect(lim); lim.connect(ctx.destination);
     out.gain.setValueAtTime(0, 0); out.gain.linearRampToValueAtTime(0.9, 0.03);
     const rev = S.reverb(1.8), rs = ctx.createGain(); rs.gain.value = 0.3; rev.connect(rs); rs.connect(mix);
@@ -75,6 +76,8 @@ class NrAudio extends AudioEngine {
     const [k0, k1] = NR.sky;
     street.gain.setValueAtTime(1, k0 - 0.01); street.gain.linearRampToValueAtTime(0, k0); street.gain.setValueAtTime(0, k1 - 0.01); street.gain.linearRampToValueAtTime(1, k1);
     sky.gain.setValueAtTime(0, 0); sky.gain.setValueAtTime(0, k0 - 0.01); sky.gain.linearRampToValueAtTime(1, k0); sky.gain.setValueAtTime(1, k1 - 0.01); sky.gain.linearRampToValueAtTime(0, k1);
+    // after the flash the street holds its breath until the sound of the impact arrives (the countdown and your heart stay clear)
+    street.gain.setValueAtTime(1, NR.impact); street.gain.linearRampToValueAtTime(0.22, NR.impact + 0.5); street.gain.setValueAtTime(0.22, NR.boom - 0.03); street.gain.linearRampToValueAtTime(1, NR.boom);
     this.rev = rev;
     this._air(S, street, end);
     this._street(S, street, end);
@@ -84,26 +87,28 @@ class NrAudio extends AudioEngine {
     this._sky(S, sky);
     this._car(S, street);
     this._pigeons(S, street, new RNG(6060));
-    this._plane(S, fx, end);
+    this._flyers(S, street);
+    this._look(S, street);
+    this._plane(S, fx);
     this._balloon(S, street);
     this._debris(S, fx);
     this._you(S, you);
     this._music(S, music, end);
   }
 
-  // the air itself: a hollow rush that follows the wind's speed (it never stops), and what it moves (that stops dead)
+  // the air itself: a hollow rush round you that follows the wind, and what it moves; at the loss both stop dead and a faint hiss is left (the storm adds nothing)
   _air(S, dest, end) {
     const ctx = S.ctx;
     const lay = (type, kind, f, q, pan) => { const n = S.noise(type, 0, end), b = S.filter(kind, f, q), g = ctx.createGain(); g.gain.value = 0; n.connect(b); b.connect(g); g.connect(S.panned(dest, pan)); return { g, b }; };
     const lo = lay('brown', 'lowpass', 280, 0.6, -0.25), body = lay('pink', 'bandpass', 480, 0.55, 0.25), air = lay('pink', 'bandpass', 1300, 0.5, -0.1);
     const leaves = lay('white', 'highpass', 3600, 0.7, 0.35);
     for (let t = 0; t <= end; t += 1 / 30) {
-      const k = Math.pow(nrWindKmh(t) / 100, 1.5) * nrGust(t), L = Math.min(1.6, nrLoad(t));
+      const a = nrAero(t), k = Math.pow(nrWindKmh(t) / 100, 1.5) * nrGust(t) * a + 0.06 * (1 - a), L = Math.min(1.6, nrLoad(t));
       // held back under the countdown after the flash and under the closing lines
       const duck = 1 - 0.45 * MathX.smooth(t, NR.impact, NR.impact + 0.8) * (1 - MathX.smooth(t, NR.boom - 0.3, NR.boom)) - 0.35 * MathX.smooth(t, NR.look, NR.line[0]);
-      lo.g.gain.linearRampToValueAtTime((0.035 + 0.2 * k) * duck, t);
-      body.g.gain.linearRampToValueAtTime((0.02 + 0.13 * k) * duck, t); body.b.frequency.linearRampToValueAtTime(380 + 260 * k, t);
-      air.g.gain.linearRampToValueAtTime((0.008 + 0.05 * k) * duck, t);
+      lo.g.gain.linearRampToValueAtTime((0.012 + 0.2 * k) * duck, t);
+      body.g.gain.linearRampToValueAtTime((0.006 + 0.13 * k) * duck, t); body.b.frequency.linearRampToValueAtTime(380 + 260 * k, t);
+      air.g.gain.linearRampToValueAtTime((0.004 + 0.05 * k) * duck, t);
       leaves.g.gain.linearRampToValueAtTime(0.03 * L, t);
     }
     // the big flag at the kerb: cracking and fluttering in the breeze, then nothing
@@ -129,7 +134,7 @@ class NrAudio extends AudioEngine {
     S.creak(Lt + 0.1, 0.5, 520, 0.02, 0.5, dest);
     for (let i = 0; i < 46; i++) { const u = 0.08 + 1.3 * Math.pow(rng.next(), 1.6); S.click(Lt + u, 0.012 * rng.range(0.4, 1), rng.range(-0.8, 0.8), dest); }
     // the hanging sign: it swings on (no air damps it), creaking at each end of the swing
-    for (let k = 0; Lt + 0.4 + k * 0.805 < 10.9; k++) S.creak(Lt + 0.4 + k * 0.805, 0.3, 640 + (k % 2) * 60, 0.016 * Math.exp(-0.145 * k), 0.4, dest);
+    for (let k = 0; Lt + 0.4 + k * 0.805 < NR.cut0; k++) S.creak(Lt + 0.4 + k * 0.805, 0.3, 640 + (k % 2) * 60, 0.016 * Math.exp(-0.145 * k), 0.4, dest);
     // the steam vent hissing in the curb lane, all film long
     const n = S.noise('white', 0, end), b = S.filter('bandpass', 3200, 0.8), g = S.ctx.createGain(); g.gain.value = 0.006; n.connect(b); b.connect(g); g.connect(S.panned(dest, -0.4));
   }
@@ -138,8 +143,8 @@ class NrAudio extends AudioEngine {
   _city(S, dest, end, rng) {
     const ctx = S.ctx, n = S.noise('brown', 0, end), lp = S.filter('lowpass', 170, 0.7), g = ctx.createGain(); n.connect(lp); lp.connect(g); g.connect(S.panned(dest, -0.15));
     g.gain.setValueAtTime(0.16, 0); g.gain.setValueAtTime(0.16, NR.impact + 0.3); g.gain.linearRampToValueAtTime(0.06, NR.impact + 3);
-    for (let t = 0.6; t < NR.impact + 1; t += rng.range(2.2, 4.4)) { if (t > 20 && t < 28.6) continue; S.burst(t, 1.8, 650, 0.6, 0.03, rng.pick([-0.6, -0.3, 0.2]), dest, 'pink', 0.7); }
-    for (const [t, f1, f2, p] of [[6.3, 392, 494, -0.6], [26.4, 415, 523, -0.7], [42.9, 370, 466, -0.5]]) S.horn(t, f1, f2, 0.012, p, dest);
+    for (let t = 0.6; t < NR.impact + 1; t += rng.range(2.2, 4.4)) { if (t > NR.sky[1] && t < NR.birds) continue; S.burst(t, 1.8, 650, 0.6, 0.03, rng.pick([-0.6, -0.3, 0.2]), dest, 'pink', 0.7); }
+    for (const [t, f1, f2, p] of [[4.6, 392, 494, -0.6], [29.0, 415, 523, -0.7], [44.1, 370, 466, -0.5]]) S.horn(t, f1, f2, 0.012, p, dest);
     S.chatter(0.2, NR.impact + 0.2, 0.012, 0.55, dest, 420, 3.0);
     for (let t = 0.4; t < NR.boom; t += rng.range(0.8, 2.6)) { const f = rng.range(2800, 4200), p = rng.range(-0.8, 0.8); for (let k = 0; k < rng.int(1, 3); k++) S.chirp(t + k * 0.1, f, 0.01, p, dest, false); }
     // after the boom: car alarms, near and far, to the end
@@ -156,7 +161,7 @@ class NrAudio extends AudioEngine {
   _steps(S, dest) {
     const C = this.app.cam, ph = C.stepPh;
     for (let i = 1; i < ph.length; i++) {
-      const t = i * C.dt; if (t >= 10.9 && t < NR.sky[1]) continue;
+      const t = i * C.dt; if (t >= NR.cut0 && t < NR.sky[1]) continue;
       if (Math.floor(ph[i]) !== Math.floor(ph[i - 1])) S.step(t, t > 50 ? 0.09 : 0.05, Math.floor(ph[i]) % 2 ? 0.12 : -0.12, dest);
     }
   }
@@ -172,7 +177,7 @@ class NrAudio extends AudioEngine {
       const a = k === 0 ? 1 : Math.pow(0.72, k);
       S.tone(t, 0.09, 165 + 10 * k, 0.07 * a, -0.25, dest, 'sine', 0.002, 0.08); S.click(t, 0.03 * a, -0.25, dest);
       t += 2 * v / NR_G; v *= 0.72;
-      if (t > 10.85) break;
+      if (t > NR.cut0 - 0.05) break;
     }
   }
 
@@ -195,7 +200,7 @@ class NrAudio extends AudioEngine {
 
   // the coasting car: tyres and an idling engine, no wind noise round it; the leaflets riffle out of the window
   _car(S, dest) {
-    const ctx = S.ctx, T = this.app.traffic, t0 = NR.sky[1] - 0.2, t1 = 28.6;
+    const ctx = S.ctx, T = this.app.traffic, t0 = NR.sky[1] - 0.2, t1 = NR.birds;
     const pos = (t) => ({ x: 1.75, z: T.heroZ(t) }), pts = this._spatial(pos, t0, t1);
     const tn = S.noise('pink', t0, t1), tb = S.filter('bandpass', 800, 0.55), tg = ctx.createGain(), tp = ctx.createStereoPanner();
     tn.connect(tb); tb.connect(tg); tg.connect(tp); tp.connect(dest);
@@ -211,7 +216,7 @@ class NrAudio extends AudioEngine {
   // the pigeons: cooing; startled, they clap their wings and hop but can't lift off; one steps off a ledge
   _pigeons(S, dest, rng) {
     const coo = (t, v, p) => { S.voice(t, 300, 0.22, 'u', v, p, dest, 0.8); S.voice(t + 0.3, 260, 0.35, 'u', v * 0.8, p, dest, 0.9); };
-    for (let t = 0.8; t < NR.startle; t += rng.range(1.2, 2.8)) { if (t >= 10.9 && t < NR.sky[1]) continue; coo(t, 0.008, rng.range(-0.1, 0.4)); }
+    for (let t = 0.8; t < NR.startle; t += rng.range(1.2, 2.8)) { if (t >= NR.cut0 && t < NR.sky[1]) continue; coo(t, 0.008, rng.range(-0.1, 0.4)); }
     NR_PIGEONS.forEach((p, i) => {
       for (let t = NR.startle + 0.06 * i; t < NR.ledge - 0.2; t += rng.range(0.32, 0.6)) { S.flap(t, (p[0] - 9.9) * 0.4, 0.05 * (1 - (t - NR.startle) / 3), dest); S.click(t + 0.36, 0.01, 0, dest); }
     });
@@ -221,29 +226,32 @@ class NrAudio extends AudioEngine {
     coo(land + 0.7, 0.012, 0.3);
   }
 
-  // the airliner: supersonic as it falls, it announces itself with a sonic boom; a growing far rumble; the impact heard 6 s after it is seen
-  _plane(S, dest, end) {
-    const ctx = S.ctx, rev = this.rev, sb = NR.roar;
-    // the sonic boom: a sharp double crack, echoing off the street
-    for (const [dt, v] of [[0, 0.5], [0.16, 0.42]]) { S.boom(sb + dt, v * 0.6, dest, rev); S.burst(sb + dt, 0.06, 900, 0.5, v * 0.25, 0, dest, 'white', 0.001); }
-    S.burst(sb + 0.3, 1.6, 400, 0.5, 0.04, 0, rev, 'pink', 0.05);
-    // the rumble, from the boom until the impact's sound arrives
-    const n = S.noise('brown', sb, NR.boom + 0.1), lp = S.filter('lowpass', 300, 0.7), g = ctx.createGain(), p = ctx.createStereoPanner();
-    n.connect(lp); lp.connect(g); g.connect(p); p.connect(dest); g.gain.setValueAtTime(0, sb);
-    const hn = S.noise('pink', sb, NR.boom + 0.1), hb = S.filter('bandpass', 900, 0.6), hg = ctx.createGain(); hn.connect(hb); hb.connect(hg); hg.connect(p); hg.gain.setValueAtTime(0, sb);
-    const P = new THREE.Vector3();
-    for (let t = sb + 0.3; t <= NR.boom; t += 1 / 20) {
-      // heard from where it was: the retarded time t − d/343
-      let te = t; for (let k = 0; k < 4; k++) { NR_PLANE.pos(te, P); te = t - Math.hypot(P.x - this.cx.value(t), P.y - 1.7, P.z - this.cz.value(t)) / 343; }
-      NR_PLANE.pos(te, P);
-      const d = Math.hypot(P.x - this.cx.value(t), P.y - 1.7, P.z - this.cz.value(t)), k = MathX.clamp(1400 / d, 0, 1) * MathX.smooth(t, sb + 0.3, sb + 2.5);
-      g.gain.linearRampToValueAtTime(0.5 * k, t); lp.frequency.linearRampToValueAtTime(180 + 900 * k, t); hg.gain.linearRampToValueAtTime(0.05 * k * k, t);
-      const bear = Math.atan2(-(P.x - this.cx.value(t)), -(P.z - this.cz.value(t))), rel = bear - MathX.deg(this.cyaw.value(t));
-      p.pan.linearRampToValueAtTime(MathX.clamp(-Math.sin(rel) * 0.7, -0.7, 0.7), t);
-    }
-    g.gain.linearRampToValueAtTime(0, NR.boom + 0.05); hg.gain.linearRampToValueAtTime(0, NR.boom + 0.05);
-    // the impact: seen at NR.impact, heard at NR.boom; the windows rattle
-    const B = NR.boom;
+  // the five pigeons flying up the street in the hook: wingbeats, then at the loss frantic flapping that lifts nothing,
+  // a thump as each hits the pavement (½gt² later), a scrape as it skids, a ruffle as it picks itself up
+  _flyers(S, dest) {
+    const o = {};
+    NR_FLYERS.forEach((F, i) => {
+      const pan = MathX.clamp((F[0] - NR_CAM.x) * 0.25, -0.5, 0.5);
+      for (let t = 0.35 + 0.11 * i; t < NR.loss; t += 0.36 + 0.03 * (i % 3)) S.flap(t, pan, 0.012, dest);
+      nrFlyerAt(F, NR.loss + 0.5, o); const land = NR.loss + o.tf;
+      for (let t = NR.loss + 0.04 * i; t < land - 0.05; t += 0.17) S.flap(t, pan, 0.03, dest);
+      S.thump(land, 0.05, dest); S.click(land, 0.025, pan, dest); S.burst(land + 0.01, 0.22, 2600, 0.7, 0.012, pan, dest, 'white', 0.01);
+      S.flap(land + 0.9 + 0.2 * i, pan, 0.02, dest);
+    });
+  }
+
+  // the man who sees it: "Look... up there!"
+  _look(S, dest) {
+    const t = NR.point + 0.08, p = 0.15;
+    S.voice(t, 150, 0.32, 'u', 0.05, p, dest, 0.92);
+    S.voice(t + 0.52, 175, 0.14, 'a', 0.045, p, dest, 1.05);
+    S.voice(t + 0.7, 190, 0.34, 'e', 0.05, p, dest, 1.2);
+  }
+
+  // the airliner falls without a sound (no roar, no sonic boom: it no longer pushes the air aside);
+  // its impact is seen at NR.impact and heard at NR.boom; the windows rattle
+  _plane(S, dest) {
+    const ctx = S.ctx, rev = this.rev, B = NR.boom;
     S.boom(B, 0.95, dest, rev); S.boom(B + 0.08, 0.6, dest, rev); S.farBoom(B, 0.5, 0, dest); S.thump(B + 0.02, 0.35, dest);
     const r = S.noise('brown', B, B + 5), rl = S.filter('lowpass', 140, 0.6), rg = ctx.createGain(); rg.gain.setValueAtTime(0, B); rg.gain.linearRampToValueAtTime(0.35, B + 0.3); rg.gain.setTargetAtTime(0, B + 0.6, 1.1); r.connect(rl); rl.connect(rg); rg.connect(dest);
     const w = ctx.createBufferSource(), wh = S.filter('bandpass', 2600, 0.9), wg = ctx.createGain(); w.buffer = S.crackleBuffer(1.1, 1600); wg.gain.value = 0.18; w.connect(wh); wh.connect(wg); wg.connect(S.panned(dest, 0.4)); w.start(B + 0.05);
@@ -301,20 +309,22 @@ class NrAudio extends AudioEngine {
     const sw = S.burst(NR.loss - 1.0, 1.05, 700, 0.7, 0.0, 0, out, 'pink', 1.0); sw.g.gain.cancelScheduledValues(NR.loss - 1.0); sw.g.gain.setValueAtTime(0, NR.loss - 1.0); sw.g.gain.linearRampToValueAtTime(0.05, NR.loss - 0.02); sw.g.gain.linearRampToValueAtTime(0, NR.loss);
     S.thump(NR.loss, 0.22, out); S.tone(NR.loss, 2.6, 55, 0.05, 0, out, 'sine', 0.01, 2.0); S.tone(NR.loss, 2.0, 1760, 0.006, 0, out, 'sine', 0.005, 1.8);
     const low = [220, 261.6, 329.6, 293.7, 261.6, 220, 196, 220];
-    for (let t = NR.loss + 0.9, k = 0; t < 10.6; t += 0.55, k++) S.pluck(t, low[k % low.length], 0.022, k % 2 ? 0.25 : -0.25, out, 1.0, 0.5);
+    for (let t = NR.loss + 0.9, k = 0; t < NR.cut0 - 0.3; t += 0.55, k++) S.pluck(t, low[k % low.length], 0.022, k % 2 ? 0.25 : -0.25, out, 1.0, 0.5);
     // into the cut: a riser; the sky: a hit, a drone, a pulse; hope at the pull, then it falls
-    const ri = S.burst(9.9, 1.0, 400, 0.8, 0.0, 0, out, 'pink', 0.9); ri.g.gain.cancelScheduledValues(9.9); ri.g.gain.setValueAtTime(0, 9.9); ri.g.gain.linearRampToValueAtTime(0.05, 10.88); ri.g.gain.linearRampToValueAtTime(0, 10.9); ri.b.frequency.exponentialRampToValueAtTime(3000, 10.9);
+    const c0 = NR.cut0, ri = S.burst(c0 - 1.0, 1.0, 400, 0.8, 0.0, 0, out, 'pink', 0.9); ri.g.gain.cancelScheduledValues(c0 - 1.0); ri.g.gain.setValueAtTime(0, c0 - 1.0); ri.g.gain.linearRampToValueAtTime(0.05, c0 - 0.02); ri.g.gain.linearRampToValueAtTime(0, c0); ri.b.frequency.exponentialRampToValueAtTime(3000, c0);
     S.thump(NR.sky[0], 0.18, out);
     for (const f of [55, 82.4]) S.tone(NR.sky[0], NR.sky[1] - NR.sky[0], f, 0.03, 0, out, 'sine', 0.3, 0.3);
     for (let t = NR.sky[0] + 0.3, k = 0; t < NR.sky[1] - 0.1; t += 0.62 - 0.12 * MathX.smooth(t, NR.sky[0], NR.sky[1]), k++) S.tone(t, 0.16, k % 2 ? 61.7 : 55, 0.05, 0, out, 'triangle', 0.004, 0.14);
     for (const f of [261.6, 329.6, 392]) S.tone(NR.deploy + 0.3, 2.0, f, 0.011, 0, out, 'triangle', 0.4, 0.6);
     for (const f of [220, 261.6, 311.1]) S.tone(18.7, 1.7, f, 0.011, 0, out, 'triangle', 0.1, 0.8);
-    // the street again: a steady pulse and a motif, building through the plane and the storm
+    // the street again: a steady pulse and a motif, building through the plane; it drops out for the silent storm
     for (let t = NR.sky[1] + 0.2, k = 0; t < NR.plunge; t += 0.6 - 0.15 * MathX.smooth(t, 34, 47), k++) {
-      if (t > NR.roar - 0.1 && t < NR.roar + 1.0) continue;
+      if (t > NR.storm[0] && t < NR.stormCut[1] + 0.2) continue;
       S.tone(t, 0.16, k % 4 === 0 ? 65.4 : 55, 0.04 + 0.03 * MathX.smooth(t, 30, 47), 0, out, 'triangle', 0.004, 0.14);
     }
-    for (let t = NR.sky[1] + 0.4, k = 0; t < NR.roar - 0.3; t += 1.2, k++) S.pluck(t, low[(k * 3) % low.length], 0.018, k % 2 ? 0.3 : -0.3, out, 1.2, 0.5);
+    for (let t = NR.sky[1] + 0.4, k = 0; t < NR.point - 0.2; t += 1.2, k++) { if (t > NR.car.cut[0] && t < NR.car.cut[1]) continue; S.pluck(t, low[(k * 3) % low.length], 0.018, k % 2 ? 0.3 : -0.3, out, 1.2, 0.5); }
+    // you find it: a low hit and a high glint
+    S.thump(NR.plane, 0.16, out); S.tone(NR.plane, 2.4, 41.2, 0.05, 0, out, 'sine', 0.01, 2.0); S.tone(NR.plane + 0.4, 2.0, 1318.5, 0.006, 0.2, out, 'sine', 0.05, 1.6);
     const dr = ctx.createGain(); dr.connect(out); dr.gain.setValueAtTime(0, NR.plane);
     for (const [t, v] of [[NR.plane + 1.5, 0.018], [44, 0.026], [NR.plunge, 0.04], [NR.impact - 0.02, 0.05], [NR.impact, 0]]) dr.gain.linearRampToValueAtTime(v, t);
     for (const f of [55, 82.4, 116.5]) { const o = ctx.createOscillator(); o.type = f > 100 ? 'triangle' : 'sine'; o.frequency.value = f; o.connect(dr); o.start(NR.plane); o.stop(NR.impact + 0.05); }
@@ -323,10 +333,10 @@ class NrAudio extends AudioEngine {
     for (let t = NR.plunge, k = 0; t < NR.impact - 0.05; t += 0.3, k++) S.tone(t, 0.12, k % 2 ? 61.7 : 55, 0.07, 0, out, 'triangle', 0.004, 0.1);
     const r2 = S.burst(NR.slow[1], NR.impact - NR.slow[1], 500, 0.7, 0.0, 0, out, 'pink', 0.5); r2.g.gain.cancelScheduledValues(NR.slow[1]); r2.g.gain.setValueAtTime(0, NR.slow[1]); r2.g.gain.linearRampToValueAtTime(0.06, NR.impact - 0.01); r2.g.gain.linearRampToValueAtTime(0, NR.impact); r2.b.frequency.exponentialRampToValueAtTime(2800, NR.impact);
     // the countdown to the sound: one tick a second, as the number changes
-    for (let k = Math.floor(NR.boom - NR.impact - 0.9); k >= 1; k--) S.tick(NR.boom - k, 1500, 0.012, out);
+    for (let k = Math.floor(NR.boom - NR.impact - 0.9); k >= 1; k--) S.tick(NR.boom - k, 1500, 0.02, out);
     // the run: a driving low pulse
     for (let t = NR.boom + 0.5, k = 0; t < NR.look - 0.4; t += 0.3, k++) S.tone(t, 0.12, k % 4 === 3 ? 73.4 : 55, 0.06, 0, out, 'triangle', 0.004, 0.1);
     // the end: one held chord under the lines
-    for (const f of [110, 164.8, 220, 246.9, 261.6]) S.tone(NR.look + 0.4, NR.black - NR.look - 0.4, f, 0.012, 0, out, 'triangle', 1.6, 0.05);
+    for (const f of [110, 164.8, 220, 246.9, 261.6]) S.tone(NR.look + 0.4, NR.black - NR.look - 0.4, f, 0.018, 0, out, 'triangle', 1.6, 0.05);
   }
 }
