@@ -475,7 +475,7 @@ class NstGarden extends Environment {
     const low = 1 - MathX.smooth(this.sunDir.y, 0.05, 0.35);
     hor.lerp(new THREE.Color('#e0a97c'), 0.45 * low * dl * (1 - storm));
     this.scene.background.copy(hor);
-    this.scene.fog.density = MathX.lerp(0.0032, 0.016, storm) * (1 + 0.6 * rain);
+    this.scene.fog.density = MathX.lerp(0.0032, 0.012, storm) * (1 + 0.45 * rain) * (1 - 0.45 * MathX.smooth(t, NST.drone, NST.drone + 3));   // thinner for the rise: you see the landscape
     // lightning: two flashes during the payoff
     const fl = Math.max(MathX.impulse(t, 58.35, 0.09), 0.7 * MathX.impulse(t, 58.6, 0.06), 0.9 * MathX.impulse(t, 64.2, 0.08));
     U.uFlash.value = fl;
@@ -484,7 +484,7 @@ class NstGarden extends Environment {
     this.sun.position.copy(this.sunDir).multiplyScalar(60).add(f); this.sun.target.position.copy(f);
     this.sun.intensity = 3.2 * MathX.smooth(this.sunDir.y, -0.02, 0.18) * (1 - 0.92 * storm) + 4 * fl;
     this.sun.color.setRGB(1, 0.93 - 0.18 * low, 0.84 - 0.3 * low);
-    this.hemi.intensity = (0.25 + 0.95 * dl) * (1 - 0.35 * storm) + 2.5 * fl;
+    this.hemi.intensity = (0.5 + 0.7 * dl) * (1 - 0.35 * storm) + 2.5 * fl;      // (moonlit nights, not black)
     this.hemi.color.copy(zen).lerp(new THREE.Color('#b9cfe0'), 0.5);
     this.scene.environmentIntensity = (0.12 + 0.3 * dl) * (1 - 0.3 * storm);
 
@@ -557,15 +557,16 @@ class NstGarden extends Environment {
     place(this.striders[2], pad[0] - 0.026, ys + 0.006, pad[1] - 0.014, -2.2, stand(-0.004, 1));
     // 0: the hero — walks to the pad's edge, steps onto the water, punches through, struggles, sinks
     const s0 = this.striders[0], u = t - T.strider;
-    const px = pad[0] + 0.01, pz = pad[1] + 0.068;
+    // (it walks to the pad's left edge, in open water, so you see it go through)
+    const px = pad[0] - 0.074, pz = pad[1] - 0.004;
     if (u < 0) {
-      const k = MathX.clamp((t - T.pond) / (T.strider - T.pond), 0, 1);
-      place(s0, MathX.lerp(px - 0.03, px, k), ys + 0.006, MathX.lerp(pz - 0.045, pz, k), 3.0, stand(-0.004, 2));
+      const k = Ease.inOutSine(MathX.clamp((t - T.pond - 0.3) / (T.strider - T.pond - 0.3), 0, 1));
+      place(s0, MathX.lerp(px + 0.05, px, k), ys + 0.006, MathX.lerp(pz + 0.02, pz, k), Math.PI / 2 - 0.3, stand(-0.004, 2));
     } else {
       const fall = Math.min(1, u / 0.35), sink = Math.max(0, u - 0.35);
       const y = ys + 0.006 - 0.012 * Ease.inQuad(fall) - 0.012 * (1 - Math.exp(-sink * 0.6)) - 0.004 * sink;
       const flail = (l, out) => { const a = l.ang + 0.6 * Math.sin(u * 14 + l.ang * 4) * Math.exp(-sink * 0.25); out.set(Math.sin(a) * l.L, 0.004 * Math.sin(u * 11 + l.ang), -Math.cos(a) * l.L * 0.9); };
-      place(s0, px + 0.006 * Math.min(1, u * 3), y, pz + 0.012 * Math.min(1, u * 2) + 0.004 * sink, 3.0 + 0.4 * Math.sin(u * 2) * Math.min(1, sink), u < 0.08 ? stand(-0.004 - u * 0.2, 0) : flail);
+      place(s0, px - 0.014 * Math.min(1, u * 2) - 0.004 * sink, y, pz + 0.004 * Math.min(1, u * 3), Math.PI / 2 - 0.3 + 0.4 * Math.sin(u * 2) * Math.min(1, sink), u < 0.08 ? stand(-0.004 - u * 0.2, 0) : flail);
     }
     // 3: already drowned under the surface near the pads, drifting
     place(this.striders[3], pad[0] - 0.09 + 0.004 * Math.sin(t * 0.3), ys - 0.035, pad[1] + 0.05, 1.2 + 0.05 * t, (l, out) => { const a = l.ang * 1.1; out.set(Math.sin(a) * l.L, -0.003 + 0.002 * Math.sin(t * 2 + l.ang), -Math.cos(a) * l.L); });
@@ -585,24 +586,19 @@ class NstGarden extends Environment {
         const x0 = cp.x + (hx - 0.5) * 2 * box, z0 = cp.z + (hz - 0.5) * 2 * box, y = cp.y + 6 - age * 12;
         const x = x0 + wind * age, len = 0.25 + 0.4 * sz;
         // a torn ligament: two short offset pieces instead of one round drop
-        const a = 0.09 * rain * (0.6 + 0.4 * sz);
-        S.push(x, y, z0, x + 0.05 * wind * 0.1, y - len, z0, 0.78, 0.82, 0.85, a, 0.0035 + 0.003 * sz);
+        const a = 0.13 * rain * (0.6 + 0.4 * sz);
+        S.push(x, y, z0, x + 0.05 * wind * 0.1, y - len, z0, 0.8, 0.84, 0.87, a, 0.0028 + 0.0025 * sz);
         S.push(x + 0.03, y - len * 1.25, z0 + 0.02, x + 0.034, y - len * 1.7, z0 + 0.02, 0.78, 0.82, 0.85, a * 0.6, 0.0025);
       }
-      // mist: the falling water shreds into fine spray that drifts with the wind (veils), and hangs low over the pond
-      const NV = Math.floor(320 * rain);
+      // mist: the falling water shreds into fine spray that drifts with the wind: a few huge, faint sheets far off
+      // (never close to the lens: up close, soft billboards read as cotton balls)
+      const NV = Math.floor(70 * rain);
       for (let i = 0; i < NV; i++) {
-        const per = 4 + 3 * hash1(i * 3.1), ph = hash1(i * 1.9 + 4) * per, cyc = Math.floor((t + ph) / per), age = ((t + ph) / per - cyc);
-        const R = 4 + 34 * hash1(i * 5.3 + cyc), an = hash2(i, cyc + 9) * 6.283;
-        const x = cp.x + Math.cos(an) * R + (age - 0.5) * 9, z = cp.z + Math.sin(an) * R - 4, y = 0.4 + 7 * hash1(i * 7.7 + cyc) - age * 2.5;
-        const a = 0.09 * rain * Math.sin(age * Math.PI);
-        M.push(x, y, z, 3 + 5 * hash1(i * 9 + cyc), age * 0.5 + i, a, 1.0, 0.72, 0.76, 0.78);
-      }
-      const P = NST_G.pond;
-      for (let i = 0; i < Math.floor(70 * rain); i++) {
-        const per = 2.5 + hash1(i) * 2, ph = hash1(i * 3.3) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc;
-        const an = hash2(i, cyc) * 6.28, rr = Math.sqrt(hash2(i + 5, cyc)) * P.r;
-        M.push(P.x + Math.cos(an) * rr + age * 0.6, P.y + 0.06 + age * 0.1, P.z + Math.sin(an) * rr, 0.5 + 0.6 * hash1(i * 4), i, 0.16 * rain * Math.sin(age * Math.PI), 1.0, 0.75, 0.8, 0.82);
+        const per = 5 + 3 * hash1(i * 3.1), ph = hash1(i * 1.9 + 4) * per, cyc = Math.floor((t + ph) / per), age = ((t + ph) / per - cyc);
+        const R = 9 + 32 * hash1(i * 5.3 + cyc), an = hash2(i, cyc + 9) * 6.283;
+        const x = cp.x + Math.cos(an) * R + (age - 0.5) * 10, z = cp.z + Math.sin(an) * R, y = 1.5 + 6 * hash1(i * 7.7 + cyc) - age * 2;
+        const a = 0.035 * rain * Math.sin(age * Math.PI);
+        M.push(x, y, z, 12 + 10 * hash1(i * 9 + cyc), age * 0.3 + i, a, 1.0, 0.7, 0.74, 0.76);
       }
     }
     S.end(); M.end();

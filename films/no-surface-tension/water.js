@@ -8,18 +8,21 @@
      nstSpreadR(V, dt)   gravity–viscous spreading radius of a film (Huppert: R ∝ (g V³ t / ν)^(1/8))
    ===================================================================== */
 
+// brightness of what water's rim mirrors (1 indoors / by day; film.js lowers it at night and in the storm)
+const NST_RIM = { value: 1 };
+
 function nstWaterMat({ color = '#a9c3cc', opacity = 0.32, fres = 0.6, rough = 0.03, env = 1.4, side = THREE.FrontSide, name = 'nstWater', depthWrite = false } = {}) {
   const m = new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: 0.0, transparent: true, opacity, depthWrite, side, name, envMapIntensity: env });
   m.userData.fres = { value: fres };
   m.onBeforeCompile = (sh) => {
-    sh.uniforms.uFres = m.userData.fres;
+    sh.uniforms.uFres = m.userData.fres; sh.uniforms.uRim = NST_RIM;
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform float uFres;')
+      .replace('#include <common>', '#include <common>\nuniform float uFres, uRim;')
       .replace('#include <opaque_fragment>', `#include <opaque_fragment>
         {
           float fr = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 3.0);
           // the rim mirrors the bright room; specular highlights stay bright instead of being thinned by the low alpha
-          gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.78, 0.84, 0.87), clamp(uFres * fr, 0.0, 1.0) * 0.6);
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.78, 0.84, 0.87) * uRim, clamp(uFres * fr, 0.0, 1.0) * 0.6);
           float lum = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
           gl_FragColor.a = clamp(diffuseColor.a + uFres * fr + 0.85 * smoothstep(0.9, 2.6, lum), 0.0, 1.0);
         }`);

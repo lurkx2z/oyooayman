@@ -81,7 +81,7 @@ const FILM = {
     this.canStream = new NstStream(app.scene, nstWaterMat({ color: '#c8dade', opacity: 0.38, fres: 0.75 }), { a: new THREE.Vector3(), v0: new THREE.Vector3(), r0: 0.006, yEnd: 0, seed: 71 });
     // the umbrella: 8 gores, dark navy, ribs; its underside soaks through in the rain (shader: wet spreading from the apex)
     const u = new THREE.Group(); app.scene.add(u);
-    const cm = new THREE.MeshStandardMaterial({ color: '#25324a', roughness: 0.6, side: THREE.DoubleSide, name: 'nstUmbrella' });
+    const cm = new THREE.MeshStandardMaterial({ color: '#3f6f76', roughness: 0.6, side: THREE.DoubleSide, name: 'nstUmbrella' });
     cm.userData.wet = { value: 0 };
     cm.onBeforeCompile = (sh) => {
       sh.uniforms.uWet = cm.userData.wet;
@@ -96,6 +96,11 @@ const FILM = {
           float streak = wet * smoothstep(0.6, 1.0, abs(sin(an * 28.0 + rr * 3.0))) * 0.5;
           diffuseColor.rgb *= 1.0 - 0.45 * wet - 0.2 * streak;
           diffuseColor.rgb += seam * 0.03;`)
+        .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+          { // thin fabric glows with the daylight behind it (seen from underneath); soaked patches go dark
+            float rr3 = length(vLocU.xz) / 0.52;
+            float wet3 = smoothstep(rr3 - 0.25, rr3 + 0.05, uWet * 1.25);
+            totalEmissiveRadiance += diffuseColor.rgb * (0.55 - 0.3 * wet3) * (gl_FrontFacing ? 0.0 : 1.0); }`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
           { float rr2 = length(vLocU.xz) / 0.52; roughnessFactor = mix(roughnessFactor, 0.12, smoothstep(rr2 - 0.25, rr2 + 0.05, uWet * 1.25)); }`);
     };
@@ -109,7 +114,7 @@ const FILM = {
     const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.95, 8), rib); shaft.position.y = -0.255; u.add(shaft);
     const hdl = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.12, 10), new THREE.MeshStandardMaterial({ color: '#3a2a20', roughness: 0.5 })); hdl.position.y = -0.68; u.add(hdl);
     this.umb = u; this.umbMat = cm;
-    this.umbSpray = new NstSpray(app.scene, 500);
+    this.umbSpray = new NstSpray(app.scene, 600);
   },
 
   update(app, t) {
@@ -131,6 +136,7 @@ const FILM = {
     F.set(box[0], 0, box[1]);
     if (sc.right !== box[2]) { sc.left = -box[2]; sc.right = box[2]; sc.top = box[2]; sc.bottom = -box[2]; sc.updateProjectionMatrix(); }
     G.update(t, cam);
+    NST_RIM.value = seg === 'kitchen' ? 1 : (0.15 + 0.85 * nstDaylight(nstDay(t))) * (1 - 0.65 * nstStorm(t));
     // inside, the garden's sun and sky would light the room through its walls: keep only a little of them (the window light is the kitchen's own)
     if (seg === 'kitchen') { app.scene.fog.density *= 0.3; G.sun.castShadow = false; G.sun.intensity *= 0.25; G.hemi.intensity *= 0.4; } else G.sun.castShadow = true;
     if (seg === 'bench') G.hemi.intensity *= 1.5;     // the bench is in the house's shade: more sky fill
@@ -145,7 +151,7 @@ const FILM = {
     }
     if (t >= T.clip - 0.5 && t < T.clipLet + 1.0) {
       K.clipPos(Math.min(t, T.clipLet), V); V.y += 0.007;
-      if (t > T.clipLet) V.y += 0.09 * MathX.smooth(t, T.clipLet - 0.02, T.clipLet + 0.35);
+      if (t > T.clipLet) V.y += 0.09 * MathX.smooth(t, T.clipLet - 0.02, T.clipLet + 0.35) + 0.3 * MathX.smooth(t, T.clipLet + 0.35, T.clipLet + 0.95);   // and away, up out of frame
       Fw.set(-0.8, -0.55, -0.15); Nw.set(0.05, -0.35, -0.95);       // from the right, side-on: the bowl stays in view
       for (const n of ['clipHold', 'clipOpen']) nstAimHand(n, cam, V, Fw, Nw);
     }
@@ -192,8 +198,9 @@ const FILM = {
     if (showU) {
       const c = cam.position, yaw = MathX.deg(SCRIPT_TRACKS.pov ? 0 : 0);
       const hx = Math.sin(0) * 0, fwx = -Math.sin(cam.rotation.y), fwz = -Math.cos(cam.rotation.y);
-      this.umb.position.set(c.x + 0.06 + fwx * 0.12, c.y + 0.5, c.z + fwz * 0.12);
-      this.umb.rotation.set(0.05 * Math.sin(t * 0.9), 0, -0.04 + 0.03 * Math.sin(t * 0.7));
+      const rx = -fwz, rz = fwx;                                   // your right, on the ground plane
+      this.umb.position.set(c.x + rx * 0.08 + fwx * 0.05, c.y + 0.33, c.z + rz * 0.08 + fwz * 0.05);
+      this.umb.rotation.set(0.05 * Math.sin(t * 0.9), 0, -0.1 + 0.03 * Math.sin(t * 0.7));
       this.umb.updateMatrixWorld(true);
       V.set(0, -0.6, 0).applyMatrix4(this.umb.matrixWorld);
       Fw.set(-1, 0, 0.2); Nw.set(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cam.rotation.y); Fw.set(-1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cam.rotation.y);
@@ -202,9 +209,9 @@ const FILM = {
       this.umbMat.userData.wet.value = wet;
       // water that soaks through can't hang as drops under the fabric: it falls straight off as fine spray
       const ux = this.umb.position.x, uy = this.umb.position.y, uz = this.umb.position.z;
-      this.umbSpray.emit(t, 160, 0.9, T.rain + 1.2, T.drone, (i, cyc, h) => {
+      this.umbSpray.emit(t, 420, 0.9, T.rain + 1.2, T.drone, (i, cyc, h) => {
         const a = hash1(i * 3.1 + cyc) * 6.28, rr = Math.sqrt(hash1(i * 7.3 + cyc * 1.7)) * 0.5 * Math.min(1, wet * 1.3);
-        return { p: [ux + Math.cos(a) * rr, uy + 0.1 - rr * 0.4, uz + Math.sin(a) * rr], v: [0.1, -0.8, 0], life: 0.9, size0: 0.006, size1: 0.02, a: 0.5 * wet, g: 6 };
+        return { p: [ux + Math.cos(a) * rr, uy + 0.1 - rr * 0.4, uz + Math.sin(a) * rr], v: [0.1, -0.6, 0], life: 1.1, size0: 0.0025, size1: 0.009, a: 0.45 * wet, g: 5 };
       }, 1, [0.8, 0.86, 0.9]);
     }
     this.umbSpray.end();
@@ -238,6 +245,10 @@ const FILM = {
     p.warmth += 0.04 * wilt * (1 - storm);
     p.saturation -= 0.26 * storm; p.exposure -= 0.1 * storm; p.contrast += 0.04 * storm; p.warmth -= 0.1 * storm; p.blackLift += 0.006 * storm;
     p.vignette += 0.12 * storm;
+    // nights in the time-lapse: lifted so they read as moonlight, not black frames
+    if (t > T.lapse && t < T.clouds) p.exposure += 0.3 * (1 - nstDaylight(nstDay(t)));
+    // the rise: a little clearer
+    p.exposure += 0.08 * MathX.smooth(t, T.drone, T.drone + 2); p.saturation += 0.08 * MathX.smooth(t, T.drone, T.drone + 2);
     // lightning (the sky does most of it; a whisper of flash in the grade)
     p.flash = 0.18 * Math.max(MathX.impulse(t, 58.35, 0.06), MathX.impulse(t, 64.2, 0.06));
     p.flashColor.setRGB(0.85, 0.9, 1.0);
