@@ -4,16 +4,35 @@
    picture, the sound waves, the sound and the camera), the words, the readouts, your head, your hands.
    Rule: the speed of sound in air drops from 343 m/s to 34.3 m/s (1,235 → 123 km/h). Light is unchanged.
    Every delayed sound comes from js/audio/soundArrival.js: arrival = event time + distance / speed of sound.
+   One afternoon in a football stadium, six shots (hard cuts; the story clock never jumps):
+     1 the start line · 2 the friend in the stand · 3 the announcement · 4 the shot · 5 the drum · 6 the thunder
    Plan: films/slow-sound/PLAN.md
    ===================================================================== */
 
-CONFIG.duration = 69.8;          // story length (no cut: film = story)
+CONFIG.duration = 68.2;          // story length (no Edit: film = story; the cuts are camera cuts)
 CONFIG.seed = 20261008;
 Object.assign(CONFIG.camera, {
-  cameraHeight: 1.68, walkSpeed: 1.3, bobStrength: 0.013, bobFrequency: 1.72,
-  breathingStrength: 0.005, breathRate: 15, fov: 64, shakeStrength: 1.0,
+  cameraHeight: 1.66, walkSpeed: 1.3, bobStrength: 0.0, bobFrequency: 1.72,
+  breathingStrength: 0.004, breathRate: 15, fov: 50, shakeStrength: 1.0,
 });
 CONFIG.render.shadowMapSize = 2048;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// THE STADIUM (metres). Pitch: x along its length (goals at x = ±52.5), z across (touchlines at z = ±34).
+// The main stand (with the roof you sit under at the end) is on +z, the far stand on −z, the storm far beyond it.
+// ---------------------------------------------------------------------------------------------------------------------
+const SND_ST = {
+  half: [52.5, 34],
+  // long stands: rows along x; row r: seat line at depth d0 + r·dz from the pitch centre line, floor y0 + r·dy
+  side: { x0: -56, x1: 56, d0: 40.9, dz: 0.85, y0: 1.2, dy: 0.42, rows: 22 },
+  // end stands: rows along z, at x = ±(d0 + r·dz)
+  end: { z0: -33, z1: 33, d0: 60.9, dz: 0.85, y0: 1.0, dy: 0.42, rows: 16 },
+  towers: [[-66, 52], [66, 52], [-66, -52], [66, -52]],     // floodlight masts (the loudspeakers hang on them)
+  screen: { x: -77.6, y: 12.6, z: 0, w: 16, h: 9 },          // the big screen above the west end stand
+};
+// a seat in a long stand (s = +1 main, −1 far): world position of the floor under row r at x
+function sndSideSeat(s, r, x) { const S = SND_ST.side; return { x, y: S.y0 + r * S.dy, z: s * (S.d0 + r * S.dz) }; }
+function sndEndSeat(s, r, z) { const S = SND_ST.end; return { x: s * (S.d0 + r * S.dz), y: S.y0 + r * S.dy, z }; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE BEATS (story seconds). Every other file keys off these.
@@ -22,62 +41,114 @@ const SND = {
   title: [-0.6, 3.7],
   rule: [1.35, 2.45],          // the speed of sound drops under the title (343 → 34.3 m/s)
   C0: 343, C1: 34.3,
-  // claps under the title (heard on time, then later and later as the speed of sound drops), then three more close up
-  friend: { x: -9.8, y: 1.55, z: -22.5, claps: [0.55, 1.15, 1.75, 2.35, 2.95, 5.1, 5.7, 6.3], shout: 7.35, wave: [4.2, 4.9] },
-  pile: { x: 40, y: 1.2, z: -95, t0: 0.55, period: 1.3, last: 16.15 },
-  amb: { x: -1.75, y: 1.6, v: 13.89, tc: 22.4 },               // 50 km/h, closest at 22.4 (Mach 0.40)
-  // on the highway at 110 km/h (Mach 0.89), speeds up from t0 to 126 km/h (Mach 1.02) and holds it; closest to you at tc.
-  // At Mach 1.02 the shock only reaches you if the car has been supersonic for ≥ perp/√(M²−1) ≈ 236 m before it passes:
-  // it cruises at Mach 1.02 for 251 m (still air at 20 °C; a warm afternoon or a breeze would take that margin away)
-  sport: { x: 57.2, y: 6.6, v0: 30.56, a: 2.2, v1: 35.0, t0: 27.0, tc: 36.2 },
-  drone: { x: 15.6, z: -4.8, up: 39.0, fall: 42.4, down: 43.15 },
-  pilot: { x: 18.8, z: -8.2 },
-  plane: { x: 24, v: 72.2, tc: 48.6, h: 220, glide: 0.0524 },  // 260 km/h on approach (Mach 2.1), 220 m up, 3° glide
-  police: { x: -1.75, y: 1.4, v: 44.44, tc: 59.2 },            // 160 km/h (Mach 1.30): the street payoff
-  lineA: [63.9, 66.1], lineB: [66.3, 68.5], note: [68.1, 69.4], black: 69.55, end: 69.8,
-  boom: {},                                                    // when each shock reaches YOU (computed below)
+  cuts: [9.6, 15.6, 22.6, 31.0, 43.6],
+  // 1. a fun-run start line across the pitch (30 runners on the halfway line); the starter at the far touchline
+  gun: { x: -1.6, y: 2.1, z: -36.6, set: 0.9, bang: 4.3 },
+  line: { x: 0, z0: -31, z1: 31, n: 30 },
+  // the lightning under the title (≈ 1.9 km beyond the far stand): its thunder is the last scene
+  flash: { t: 2.7, x: -300, z: -1869, base: 1150 },
+  flash2: { t: 66.0, x: 420, z: -1500, base: 1100 },
+  // 2. your friend, standing in row 11 of the main stand, waves and shouts
+  friend: { x: -22, row: 11, shout: 10.35, wave: [9.75, 12.6] },
+  // 3. the announcer (on the big screen) — one voice, played by four loudspeaker clusters and the roof speaker
+  pa: { speak: 16.3, words: 'LADIES AND GENTLEMEN…' },
+  // 4. the referee's whistle, then a free kick from 22 m (144 km/h = Mach 1.17; it slows through Mach 1 on the way)
+  whistle: { x: 40, y: 1.62, z: -9.2, t: 23.2 },
+  kick: { t: 26.0, x: 30.2, z: -1.6, tx: 52.55, ty: 2.12, tz: 3.15, v0: 40.0, k: 0.0133 },
+  // 5. the drum at the far end of the far stand: every section claps when IT hears the beat
+  drum: { x: -48, row: 13, t0: 31.4, period: 0.75, n: 16 },
+  // 6. the payoff
+  lineA: [61.0, 63.4], lineB: [63.6, 66.2], note: [66.4, 67.8], black: 67.95, end: 68.2,
 };
-(() => { const S = SND.sport; S.tA = S.t0 + (S.v1 - S.v0) / S.a; S.zA = 1 - S.v1 * (S.tc - S.tA); const u = S.tA - S.t0; S.z0 = S.zA - (S.v0 * u + 0.5 * S.a * u * u); S.tM = S.t0 + (SND.C1 - S.v0) / S.a; })();
+SND.friend.y = sndSideSeat(1, SND.friend.row, 0).y; SND.friend.z = sndSideSeat(1, SND.friend.row, 0).z;
+SND.drum.y = sndSideSeat(-1, SND.drum.row, 0).y; SND.drum.z = sndSideSeat(-1, SND.drum.row, 0).z;
+// the loudspeakers: the four masts (26 m up) and the front edge of the main stand's roof
+SND.pa.speakers = [{ x: 0, y: 16.4, z: 41.6 }, ...SND_ST.towers.map(([x, z]) => ({ x: x * 0.97, y: 26, z: z * 0.95 }))];
 
 // the speed of sound right now (m/s): 343 → 34.3 under the title
 function sndC(t) { const k = MathX.smooth(t, SND.rule[0], SND.rule[1]); return SND.C0 * Math.pow(SND.C1 / SND.C0, k); }
+// the distance a sound front made at te has travelled by t (the speed of sound changes under the title)
+const SND_RUN = (() => {
+  const dt = 1 / 240, n = Math.ceil((CONFIG.duration + 2) / dt), R = new Float32Array(n + 1);
+  for (let i = 1; i <= n; i++) R[i] = R[i - 1] + sndC((i - 0.5) * dt) * dt;
+  const at = (t) => { const f = MathX.clamp(t / dt, 0, n - 1.001), i = Math.floor(f); return R[i] + (R[i + 1] - R[i]) * (f - i); };
+  return (te, t) => at(t) - at(te);
+})();
 
-// ---------------------------------------------------------------------------------------------------------------------
-// THINGS THAT MOVE (pure functions of story time) — positions in metres; the sound source point of each
-// ---------------------------------------------------------------------------------------------------------------------
 const SND_P = (x, y, z) => ({ x, y, z });
-function sndAmb(t) { const A = SND.amb; return SND_P(A.x, A.y, 1 + A.v * (t - A.tc)); }
-function sndSportV(t) { const S = SND.sport; return t < S.t0 ? S.v0 : t < S.tA ? S.v0 + S.a * (t - S.t0) : S.v1; }
-function sndSport(t) {
-  const S = SND.sport;
-  if (t < S.t0) return SND_P(S.x, S.y, S.z0 + S.v0 * (t - S.t0));
-  if (t < S.tA) { const u = t - S.t0; return SND_P(S.x, S.y, S.z0 + S.v0 * u + 0.5 * S.a * u * u); }
-  return SND_P(S.x, S.y, S.zA + S.v1 * (t - S.tA));
-}
-function sndPlane(t) { const P = SND.plane, z = 1 + P.v * (t - P.tc); return SND_P(P.x, P.h - P.glide * (z - 1), z); }
-function sndPolice(t) { const P = SND.police; return SND_P(P.x, P.y, 1 + P.v * (t - P.tc)); }
-// the drone: lifts off, can't hold height on supersonic propeller tips, wobbles, flips and drops
-function sndDrone(t) {
-  const D = SND.drone;
-  if (t < D.up) return { x: D.x, y: 0.2, z: D.z, roll: 0, pitch: 0, spin: 0 };
-  const u = t - D.up;
-  let y = 0.2 + 2.1 * MathX.smooth(u, 0, 1.0) - 0.5 * MathX.smooth(u, 1.0, 2.6);
-  let roll = (0.06 + 0.32 * MathX.smooth(u, 0.8, 3.4)) * Math.sin(u * 9.5) + 0.05 * Math.sin(u * 23);
-  let pitch = (0.05 + 0.22 * MathX.smooth(u, 1.0, 3.4)) * Math.sin(u * 7.3 + 1);
-  let x = D.x + 0.25 * Math.sin(u * 3.1) * MathX.smooth(u, 0.5, 2.5), z = D.z + 0.18 * Math.sin(u * 2.3 + 1);
-  if (t > D.fall) {   // a tip stalls: it rolls over and falls (free fall from ~1.9 m: ~0.6 s)
-    const f = t - D.fall, ff = Math.min(f, D.down - D.fall);
-    y = Math.max(0.12, (0.2 + 2.1 - 0.5 * MathX.smooth(D.fall - D.up, 1.0, 2.6)) - 4.9 * ff * ff);
-    roll = Math.sin((D.fall - D.up) * 9.5) * 0.3 + 2.6 * MathX.smooth(f, 0, 0.7);
-    x += 0.9 * MathX.smooth(f, 0, 0.75); pitch += 0.4 * MathX.smooth(f, 0, 0.7);
-    if (t > D.down) { const g = t - D.down; x += 0.35 * MathX.smooth(g, 0, 0.5); roll = 2.6 + 0.5 * MathX.smooth(g, 0, 0.4); y = 0.12 + 0.18 * Math.max(0, Math.sin(Math.min(g, 0.3) / 0.3 * Math.PI)) * (1 - MathX.smooth(g, 0.3, 0.6)); }
+const SND_GUN = SND_P(SND.gun.x, SND.gun.y, SND.gun.z);
+const SND_FRIEND_MOUTH = SND_P(SND.friend.x, SND.friend.y + 1.55, SND.friend.z);
+const SND_DRUM = SND_P(SND.drum.x, SND.drum.y + 0.8, SND.drum.z);
+const SND_BOLT = SND_P(SND.flash.x, 0, SND.flash.z);
+// when a point first hears something made at a fixed point at a fixed time (after the change: plain distance / c)
+function sndHeardAt(te, src, p) { return te + SoundArrival.dist(src, p) / SND.C1; }
+// the thunder (ground strike: the nearest part of the bolt) reaches point p at …
+function sndThunderAt(p) { return sndHeardAt(SND.flash.t, SND_BOLT, { x: p.x, y: 0, z: p.z }); }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// THINGS THAT MOVE (pure functions of story time)
+// ---------------------------------------------------------------------------------------------------------------------
+// the runners: each one goes when the bang reaches IT (+ a reaction time); a sprint start, v(τ) = vmax(1 − e^(−τ/1.05))
+const SND_RUNNERS = (() => {
+  const L = SND.line, out = [];
+  for (let i = 0; i < L.n; i++) {
+    const z = L.z0 + (L.z1 - L.z0) * i / (L.n - 1) + (hash1(i * 7 + 3) - 0.5) * 0.25;
+    const head = SND_P(L.x + 0.2, 0.9, z);
+    const go = sndHeardAt(SND.gun.bang, SND_GUN, head) + 0.13 + hash1(i * 13 + 1) * 0.06;
+    out.push({ i, z, go, vmax: 6.6 + hash1(i * 17 + 5) * 2.0, tau: 1.0 + hash1(i * 19 + 2) * 0.25 });
   }
-  return { x, y, z, roll, pitch, spin: t < D.down + 0.4 ? 1 : 0 };
+  return out;
+})();
+function sndRunnerX(R, t) { const u = Math.max(0, t - R.go); return SND.line.x + R.vmax * (u - R.tau * (1 - Math.exp(-u / R.tau))); }
+
+// the ball: on the spot, then kicked at v0 toward the top corner with real drag (v = v0 / (1 + k·v0·t)); in the net it drops
+const SND_BALL = (() => {
+  const K = SND.kick, from = { x: K.x, y: 0.11, z: K.z }, to = { x: K.tx, y: K.ty, z: K.tz };
+  const L = SoundArrival.dist(from, to), ux = (to.x - from.x) / L, uz = (to.z - from.z) / L;
+  const s = (u) => Math.log(1 + K.k * K.v0 * u) / K.k;                     // distance flown after u seconds
+  const tGoal = K.t + (Math.exp(K.k * L) - 1) / (K.k * K.v0);
+  const tMach1 = K.t + (K.v0 / SND.C1 - 1) / (K.k * K.v0);                // it slows through Mach 1 here
+  return { from, to, L, ux, uz, s, tGoal, tMach1 };
+})();
+function sndBallV(t) { const K = SND.kick; return t < K.t || t > SND_BALL.tGoal ? 0 : K.v0 / (1 + K.k * K.v0 * (t - K.t)); }
+// after the goal line: on to the back of the net (2 m), which it pushes out; then it drops
+const SND_NET = (() => {
+  const B = SND_BALL, K = SND.kick, vG = K.v0 / (1 + K.k * K.v0 * (B.tGoal - K.t)), back = 52.5 + 1.9;
+  const uN = (back - B.to.x) / (B.ux * vG);
+  return { vG, back, uN, tN: B.tGoal + uN, y: B.to.y - 0.6 * uN, z: B.to.z + B.uz * vG * uN };
+})();
+function sndNetDepth(u) { return u <= 0 ? 0 : 0.72 * (1 - Math.exp(-u / 0.045)) * Math.exp(-Math.max(0, u - 0.12) / 0.38); }
+function sndNetBulge(t) { const N = SND_NET; return { depth: sndNetDepth(t - N.tN), y: N.y, z: N.z }; }
+function sndBall(t) {
+  const K = SND.kick, B = SND_BALL, N = SND_NET;
+  if (t <= K.t) return SND_P(B.from.x, B.from.y, B.from.z);
+  if (t <= B.tGoal) {
+    const d = B.s(t - K.t), f = d / B.L;
+    // a slight rise then a dip onto the corner (a driven shot), plus a little swerve
+    return SND_P(B.from.x + (B.to.x - B.from.x) * f, B.from.y + (B.to.y - B.from.y) * f + 0.55 * Math.sin(Math.PI * f), B.from.z + (B.to.z - B.from.z) * f + 0.35 * Math.sin(Math.PI * f));
+  }
+  const u = t - B.tGoal;
+  if (u <= N.uN) return SND_P(B.to.x + B.ux * N.vG * u, B.to.y - 0.6 * u, B.to.z + B.uz * N.vG * u);
+  // in the net: carried out with it, then it falls as the net springs back
+  const w = u - N.uN;
+  return SND_P(N.back + sndNetDepth(w) - 0.12 - 0.3 * MathX.smooth(w, 0.25, 0.9), Math.max(0.11, N.y - 4.9 * Math.max(0, w - 0.08) ** 2), N.z + 0.25 * (1 - Math.exp(-w / 0.3)));
+}
+// a lightning flash at t0: three return strokes in 0.2 s, then a dying glow (0 … ~1)
+function sndFlashLevel(t, t0) {
+  const u = t - t0;
+  if (u < 0 || u > 1.2) return 0;
+  let k = 0;
+  for (const [ts, a] of [[0, 1.0], [0.075, 0.7], [0.19, 0.85]]) if (u >= ts) k += a * Math.exp(-(u - ts) / 0.04);
+  return Math.min(1.2, k + 0.12 * Math.exp(-u / 0.3));
 }
 
-// the listener (your head) — the camera's keyframed position (filled in once SCRIPT.camera exists)
-let SND_CX = null, SND_CZ = null;
-function sndEar(t) { return SND_P(SND_CX.value(t), 1.83, SND_CZ.value(t)); }
+// the listener (your head) — the camera's keyframed position (filled in below)
+// (sampled at 30 Hz like the camera's keys, read by direct index: the sound code asks for it many thousands of times)
+let SND_EAR = null;
+function sndEar(t) {
+  const E = SND_EAR, f = MathX.clamp(t * 30, 0, E.n - 1.001), i = Math.floor(f), w = f - i;
+  return SND_P(E.x[i] + (E.x[i + 1] - E.x[i]) * w, E.y[i] + (E.y[i + 1] - E.y[i]) * w, E.z[i] + (E.z[i + 1] - E.z[i]) * w);
+}
 
 // when a sound made at a FIXED point at time te reaches your ear — follows the speed of sound as it changes under
 // the title (sound already in flight slows down with it), then SoundArrival's rule: te + distance / c
@@ -88,206 +159,184 @@ function sndArriveFixed(te, src) {
   return t;
 }
 
-// when each shock front reaches a point near the ground (straight, level, constant-speed pass):
-// the moment the source is level with the point + perp·√(M²−1)/v (SoundArrival.boomDelay)
-function sndPoliceBoomAt(x, z, y = 1.3) {
-  const P = SND.police; return P.tc + (z - 1) / P.v + SoundArrival.boomDelay(Math.hypot(x - P.x, y - P.y), P.v, SND.C1);
-}
-function sndPlaneBoomAt(x, z, y = 1.3) {
-  const P = SND.plane, tz = P.tc + (z - 1) / P.v, q = sndPlane(tz);
-  return tz + SoundArrival.boomDelay(Math.hypot(x - P.x, q.y - y), P.v, SND.C1) + SND.boom.planeFix;
-}
-// the car only reaches Mach 1.02 for its last 251 m: points too far from the highway never get its shock (null)
-function sndSportBoomAt(x, z, y = 1.3) {
-  const S = SND.sport, M = S.v1 / SND.C1, perp = Math.hypot(x - S.x, y - S.y), run = perp / Math.sqrt(M * M - 1);
-  if (z - run < S.zA) return null;
-  return S.tc + (z - 1) / S.v1 + SoundArrival.boomDelay(perp, S.v1, SND.C1);
-}
-
-// where the airliner's shock front is on the avenue at time t (the z where it touches the road): it sweeps up the
-// street toward you at the airliner's speed (bisection on sndPlaneBoomAt, which rises with z)
-function sndPlaneFront(t) {
-  let lo = -900, hi = 60;
-  for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (sndPlaneBoomAt(0, m, 0.3) < t) lo = m; else hi = m; }
-  return (lo + hi) / 2;
-}
-
-// the pile driver's hits (the hammer drops every 1.3 s until it is switched off)
-const SND_PILE_HITS = (() => { const P = SND.pile, a = []; for (let t = P.t0; t <= P.last + 1e-6; t += P.period) a.push(+t.toFixed(3)); return a; })();
-
 // ---------------------------------------------------------------------------------------------------------------------
-// YOUR HEAD: base keys + "look at" windows that track moving things (sampled into the yaw/pitch keys below)
+// YOUR HEAD, shot by shot: where you are, what you look at, the lens (vertical FOV). Sampled at 30 Hz below.
 // ---------------------------------------------------------------------------------------------------------------------
-const SND_CAM_X = [[0, 9.4], [71, 9.4]];
-const SND_CAM_Z = [[0, 7.2], [4.6, 1.0, 'linear'], [71, 1.0]];
-// base yaw / pitch (degrees; yaw 0 = down the avenue, + = left) used outside the look windows
-const SND_BASE_YAW = [[0, 30], [10.6, 30], [11.9, -16], [19.0, -16], [19.4, 20], [23.0, 70], [24.8, -2], [37.0, -118], [37.7, -110], [39.0, -50],
-  [44.0, -20], [49.2, 8], [54.3, 10], [54.6, 13], [55.2, 8], [59.9, 60], [62.7, 58], [64.2, 36.5], [71, 35.5]];
-const SND_BASE_PITCH = [[0, 3], [11.0, 2], [37.0, 1], [38.4, -4], [44, 8], [49.4, 2], [54.3, 1], [54.5, -1.5], [55.0, 0.5], [59.9, 1], [71, 0.5]];
-// [from, to, target(t) → {x,y,z}, blend in s, blend out s, lag s, pitch cap °]
-const SND_LOOKS = [
-  // the friend: from the first frame (aimed above their head under the title, so they sit below it), then close up
-  [-1.0, 11.0, (t) => SND_P(SND.friend.x, 1.25 + 3.1 * (1 - MathX.smooth(t, 3.3, 4.7)), SND.friend.z), 0.9, 1.1, 0],
-  [11.0, 19.1, () => SND_P(SND.pile.x - 0.75, 4.6, SND.pile.z), 1.1, 0.6, 0],
-  // the ambulance: followed until it is level with you (not round behind you), then a pan through the front
-  [19.0, 23.4, (t) => { const q = sndAmb(t); return SND_P(q.x, q.y, Math.min(q.z, SND_CZ.value(t) - 1.5)); }, 0.7, 1.1, 0.16],
-  // the car on the highway: 110 km/h, through the barrier, past you; your head follows it a little after the boom
-  [24.2, 37.4, (t) => SND_P(SND.sport.x, 6.5, sndSport(t).z), 1.3, 0.8, 0.12],
-  [38.5, 44.0, (t) => { const d = sndDrone(t); return SND_P(d.x, d.y + 0.2, d.z); }, 1.1, 1.0, 0.12],
-  [44.4, 48.9, (t) => sndPlane(t), 1.2, 1.2, 0.2, 56],
-  // the airliner's shock front coming up the avenue (you follow it in)
-  [49.6, 54.35, (t) => SND_P(-4.0, 3.0, sndPlaneFront(t) - 4), 1.2, 0.3, 0.1],
-  // the police car, from far down the avenue — then the shopfronts across the street as it goes by them
-  [55.0, 58.95, (t) => { const p = sndPolice(t); return SND_P(p.x, 1.0, p.z); }, 0.6, 0.5, 0.1],
-  [58.85, 63.0, (t) => SND_P(-12.5, 2.3, -12.0 + 3.0 * MathX.smooth(t, 60.4, 62.8)), 0.6, 0.9, 0],
+const SND_EYE = [
+  SND_P(6.5, 1.66, 37.0),            // 1 pitch-side at the near end of the start line
+  SND_P(-3.5, 1.66, 30.0),           // 2 on the pitch below the main stand (your friend is 28 m away, up in row 11)
+  SND_P(-2.0, 1.66, 33.0),           // 3 by the near touchline, the big screen at the far west end
+  SND_P(55.8, 1.66, 6.2),            // 4 behind the goal line, just outside the post
+  SND_P(49.5, 1.66, -33.2),          // 5 the corner of the pitch, looking along the far stand
+  null,                              // 6 standing in row 12 of the main stand (set below)
 ];
-const SND_FOV = [[0, 40], [3.3, 38], [4.6, 22], [5.4, 15], [10.5, 15], [11.0, 24], [11.6, 22], [12.4, 10.5], [18.6, 10.5], [19.4, 46], [24.0, 46], [25.3, 3.6], [28.0, 4.1],
-  [30.0, 4.6], [32.0, 5.6], [33.5, 6.6], [34.5, 8.0], [35.2, 13], [35.9, 26], [36.4, 42], [37.4, 52], [38.4, 46], [39.4, 34], [44.0, 36], [44.6, 50],
-  [48.9, 56], [50.0, 14], [51.0, 15], [52.0, 19], [53.0, 28], [53.7, 42], [54.3, 54], [54.6, 50], [55.4, 22], [56.4, 16], [57.5, 18], [58.2, 30],
-  [58.7, 50], [60.4, 50], [62.6, 38], [63.2, 36], [64.4, 30], [71, 28]];
+SND_EYE[5] = (() => { const q = sndSideSeat(1, 12, 6.0); return SND_P(q.x, q.y + 1.62, q.z); })();
+const SND_FRONT_Z = (t) => SND.gun.z + SND_RUN(SND.gun.bang, t);   // where the bang's front is along the line
+function sndNearRunnersX(t) { let s = 0; for (let i = 22; i < 30; i++) s += sndRunnerX(SND_RUNNERS[i], t); return s / 8; }
+
+// each shot: [t0, t1, eye(t), target(t), vfov(t)]
+const SND_SHOTS = [
+  [0, SND.cuts[0], (t) => SND_P(6.5 + 0.08 * t, 1.66, 37.0),
+    (t) => {
+      const A = SND_P(-1.0, 7.0 - 5.6 * MathX.smooth(t, 3.0, 4.4), -18);                           // the line, the starter, the storm
+      const zf = Math.min(31, SND_FRONT_Z(t)), F = SND_P(0, 1.0, Math.min(25, zf - 7));                 // following the bang along the line
+      const R = SND_P(sndNearRunnersX(t) + 6, 1.2, 24);                                              // the last runners away
+      const a = MathX.smooth(t, 4.2, 4.9), b = MathX.smooth(t, 6.2, 7.2);
+      const mix = (p, q, w) => SND_P(p.x + (q.x - p.x) * w, p.y + (q.y - p.y) * w, p.z + (q.z - p.z) * w);
+      return mix(mix(A, F, a), R, b);
+    },
+    (t) => 34 - 2 * MathX.smooth(t, 0, 4) + 22 * MathX.smooth(t, 4.6, 6.8)],
+  [SND.cuts[0], SND.cuts[1], (t) => SND_P(-3.5, 1.66, 30.0 + 0.25 * (t - SND.cuts[0])),
+    (t) => SND_P(SND.friend.x, SND.friend.y + 1.3 + 0.3 * MathX.smooth(t, 9.6, 11), SND.friend.z),
+    (t) => 21 - 3.5 * MathX.smooth(t, 9.6, 15.6)],
+  [SND.cuts[1], SND.cuts[2], (t) => SND_P(-2.0 - 0.12 * (t - SND.cuts[1]), 1.66, 33.0),
+    (t) => SND_P(SND_ST.screen.x, SND_ST.screen.y - 1.5 - 4.5 * MathX.smooth(t, 19.6, 22.0), SND_ST.screen.z - 9 * MathX.smooth(t, 19.6, 22.0)),
+    (t) => 30 + 10 * MathX.smooth(t, 19.6, 22.2)],
+  [SND.cuts[2], SND.cuts[3], (t) => SND_P(55.8, 1.66, 6.2),
+    (t) => {
+      const W = SND_P(SND.whistle.x, 1.7, SND.whistle.z), K = SND_P(SND.kick.x - 1.0, 1.0, SND.kick.z + 0.6);
+      const N = SND_P(53.6, 1.0, 2.6), Fd = SND_P(28, 2.4, -2);
+      const a = MathX.smooth(t, 23.9, 24.8), b = MathX.smooth(t, 26.75, 27.35), c = MathX.smooth(t, 28.6, 29.6);
+      const mix = (p, q, w) => SND_P(p.x + (q.x - p.x) * w, p.y + (q.y - p.y) * w, p.z + (q.z - p.z) * w);
+      return mix(mix(mix(W, K, a), N, b), Fd, c);
+    },
+    (t) => 30 + 10 * MathX.smooth(t, 26.7, 27.3) + 4 * MathX.smooth(t, 28.6, 29.6)],
+  [SND.cuts[3], SND.cuts[4], (t) => SND_P(49.5, 1.66, -33.2),
+    (t) => SND_P(-34 + 22 * MathX.smooth(t, 31, 43.6), 6.0, -50.5),
+    (t) => 34 + 6 * MathX.smooth(t, 31, 43.6)],
+  [SND.cuts[4], 99, (t) => SND_EYE[5],
+    (t) => SND_P(-5, 2.0 + 9 * MathX.smooth(t, 50, 55.5) - 9 * MathX.smooth(t, 56.2, 58.4) + 13 * MathX.smooth(t, 62.4, 66.6), -42),
+    (t) => 56 + 4 * MathX.smooth(t, 50, 55.5) - 2 * MathX.smooth(t, 56.2, 58.4)],
+];
+function sndShotAt(t) { let k = 0; for (let i = 0; i < SND.cuts.length; i++) if (t >= SND.cuts[i]) k = i + 1; return k; }
+// true when a cut falls between t0 and t1 (no whip smear across a cut)
+function sndCutBetween(t0, t1) { for (const c of SND.cuts) if (t0 < c && t1 >= c) return true; return false; }
 
 const SCRIPT = {
   meta: { title: 'WHAT IF THE SPEED OF SOUND BECAME 10× SLOWER?', wav: 'slow-sound-soundtrack.wav' },
 
   events: [
-    { id: 'start', time: 0.0, label: 'Busy street; the title; the friend clapping' },
+    { id: 'start', time: 0.0, label: 'The start line; the title; a far flash' },
     { id: 'rule', time: SND.rule[0], label: 'Sound slows to 34.3 m/s' },
-    { id: 'friend', time: 4.2, label: '30 m: claps and a shout 0.88 s late' },
-    { id: 'pile', time: 11.0, label: '100 m: the pile driver, 2.9 s late' },
-    { id: 'amb', time: 19.0, label: 'Ambulance at 50 km/h: Mach 0.40' },
-    { id: 'sport', time: 24.0, label: 'Highway car: Mach 0.89, then supersonic' },
-    { id: 'drone', time: 38.4, label: 'Drone: supersonic propeller tips' },
-    { id: 'plane', time: 44.2, label: 'A silent Mach 2.1 airliner' },
-    { id: 'planeBoom', time: 49.3, label: 'Its shock comes up the street' },
-    { id: 'police', time: 55.0, label: 'Police car at Mach 1.3: the windows' },
+    { id: 'bang', time: SND.gun.bang, label: 'The gun: the runners go one by one' },
+    { id: 'friend', time: SND.cuts[0], label: 'Your friend shouts: 0.8 s late, hollow' },
+    { id: 'pa', time: SND.cuts[1], label: 'One announcement, three arrivals' },
+    { id: 'kick', time: SND.cuts[2], label: 'The whistle; a supersonic shot' },
+    { id: 'drum', time: SND.cuts[3], label: 'The drum: claps sweep down the stand' },
+    { id: 'thunder', time: SND.cuts[4], label: 'The flash from the start: its thunder' },
     { id: 'line', time: SND.lineA[0], label: 'The closing line' },
   ],
 
   camera: {
-    baseY: 0.15,
-    x: SND_CAM_X,
-    z: SND_CAM_Z,
-    height: null, yaw: null, pitch: null, tilt: null, startles: null, shakes: null,   // filled in below (they key off the booms)
-    fov: SND_FOV,
+    baseY: 0,
+    x: null, z: null, height: null, yaw: null, pitch: null, fov: null,   // sampled below
+    tilt: null, startles: null, shakes: null,
   },
 
-  // your hands only go up once: to your ears when the police car's shock hits (filled in below)
-  hands: { right: null, left: null },
+  hands: { right: null, left: null },     // up to your ears when the thunder arrives (filled in below)
 
   tracks: {
-    pov: [[0, 1], [71, 1]],
+    pov: [[0, 1], [70, 1]],
   },
-
-  // the airliner (js/world/aircraft.js): sampled from sndPlane, wings rocking (filled in below)
-  aircraft: { path: [], bank: [] },
 
   hud: {
     title: { in: SND.title[0], out: SND.title[1], fi: 0.2, fo: 0.45, cls: 'big center', html: '<span class="kick">WHAT IF THE</span><span class="hero">SPEED OF SOUND</span><span class="kick">BECAME 10× SLOWER?</span>' },
     captions: [
-      { t: 8.7, until: 10.9, text: 'You’d see people speak before you heard them.' },
-      { t: 12.9, until: 15.6, text: 'A hundred metres away: three seconds late.' },
-      { t: 16.5, until: 17.8, text: 'It had already stopped…' },
-      { t: 17.9, until: 19.2, text: '…but the bangs kept coming.' },
-      { t: 20.8, until: 23.2, text: 'Passing sirens would drop more than an octave.' },
-      { t: 25.4, until: 27.9, text: 'Highway speed is now almost the speed of sound.' },
-      { t: 29.0, until: 31.7, text: 'A normal road car could break the sound barrier.' },
-      { t: 32.1, until: 34.9, text: 'It’s outrunning its own sound.' },
-      { t: 39.8, until: 41.8, text: 'Small propellers would go supersonic too…' },
-      { t: 42.0, until: 43.9, text: '…and couldn’t keep it in the air.' },
-      { t: 45.4, until: 47.9, text: 'Even a landing airliner would be supersonic.' },
-      { t: 48.2, until: 50.4, text: 'And you can’t hear it. Not yet.' },
-      { t: 50.7, until: 53.6, text: 'You’d see it hit the street before you heard it.' },
-      { t: 56.0, until: 58.4, text: 'A police car you’d never hear coming.' },
-      { t: 60.8, until: 63.2, text: 'Only the weakest windows gave way.' },
-      { t: SND.lineA[0], until: SND.lineA[1], text: 'You wouldn’t need a fighter jet…' },
-      { t: SND.lineB[0], until: SND.lineB[1], text: '…to break the sound barrier.' },
+      { t: 6.8, until: 9.4, text: 'Whoever stood nearest the gun would start first.' },
+      { t: 11.5, until: 13.3, text: 'You’d see people shout before you heard them…' },
+      { t: 13.45, until: 15.5, text: '…and every voice would sound hollow.' },
+      { t: 18.3, until: 21.2, text: 'One announcement would reach you three times.' },
+      { t: 26.95, until: 28.85, text: 'A hard shot would break the sound barrier.' },
+      { t: 29.0, until: 30.95, text: 'You’d hear the kick after the goal.' },
+      { t: 34.3, until: 36.9, text: 'A crowd could never clap in time…' },
+      { t: 37.1, until: 40.2, text: '…each beat would roll down the stand.' },
+      { t: 44.3, until: 46.6, text: 'Remember the flash at the start?' },
+      { t: 46.8, until: 49.3, text: 'Its thunder still hasn’t arrived.' },
+      { t: 50.0, until: 53.6, text: 'Thunder would take half a minute per kilometre.' },
+      { t: SND.lineA[0], until: SND.lineA[1], text: 'You’d see everything as it happened…' },
+      { t: SND.lineB[0], until: SND.lineB[1], text: '…and hear it long after it was over.' },
     ],
-    readouts: [
-      { from: 0.0, until: 4.3, top: 200, label: 'SPEED OF SOUND', value: (t) => sndKmh(t), sub: (t) => `${sndC(t) >= 100 ? Math.round(sndC(t)) : sndC(t).toFixed(1)} M/S` },
-      // the friend's claps and shout: a live count while each one is on its way to you
-      { from: 4.4, until: 10.9, top: 200, label: 'SOUND DELAY', value: (t) => { const q = sndInFlight(SND.friendArr, t); return q ? `${(t - q[0]).toFixed(2)} S` : `${sndDelay(SND.friend).toFixed(2)} S`; },
-        sub: (t) => (sndInFlight(SND.friendArr, t) ? 'ON ITS WAY TO YOU…' : `HEARD · DISTANCE ${Math.round(sndDist(SND.friend))} M`) },
-      { from: 11.9, until: 19.2, top: 200, label: 'SOUND DELAY', value: () => `${sndDelay(SND.pile).toFixed(1)} S`,
-        sub: (t) => { const n = SND.pileArr.filter((q) => q[0] <= t && t < q[1]).length; return `${n} ${n === 1 ? 'BANG' : 'BANGS'} STILL ON THE WAY`; },
-        ctx: (t) => (t >= SND_PILE_HITS[SND_PILE_HITS.length - 1] ? 'THE HAMMER HAS STOPPED' : `DISTANCE ${Math.round(sndDist(SND.pile) / 10) * 10} M`) },
-      { from: 19.4, until: 24.0, top: 200, label: 'AMBULANCE · 50 KM/H', value: `MACH ${(SND.amb.v / SND.C1).toFixed(2)}`, sub: (t) => (t < SND.ambFlip ? 'SIREN PITCH +68%' : 'SIREN PITCH −29%') },
-      { from: 24.8, until: 37.9, top: 200, label: 'CAR SPEED', value: (t) => `LOCAL MACH ${(sndSportV(t) / SND.C1).toFixed(2)}`,
-        sub: (t) => `${Math.round(sndSportV(t) * 3.6)} KM/H · ${sndSportV(t) > SND.C1 ? 'SUPERSONIC' : 'BARRIER 123 KM/H'}`,
-        ctx: (t) => (t < SND.sport.tM ? '' : t < SND.boom.sport ? `ITS SHOCK WAVE REACHES YOU IN ${(SND.boom.sport - t).toFixed(1)} S` : 'SHOCK WAVE: HEARD') },
-      { from: 39.2, until: 44.0, top: 200, label: 'DRONE PROPELLER TIPS', value: 'MACH 2.6', sub: '≈ 90 M/S' },
-      { from: 44.8, until: 48.9, top: 200, label: 'AIRLINER · 260 KM/H', value: `MACH ${(SND.plane.v / SND.C1).toFixed(1)}`, sub: 'AT CRUISE ALTITUDE: MACH 8' },
-      { from: 49.6, until: 54.9, top: 200, label: 'ITS SHOCK WAVE', value: (t) => `${Math.max(0, Math.round((SND_CZ.value(t) - sndPlaneFront(t)) / 5) * 5)} M`,
-        sub: (t) => (t < SND.boom.plane ? 'COMING UP THE STREET · 290 KM/H' : 'HEARD') },
-      { from: 55.4, until: 59.5, top: 200, label: 'POLICE CAR · 160 KM/H', value: `MACH ${(SND.police.v / SND.C1).toFixed(2)}`,
-        sub: (t) => (t < SND.boom.police ? `ITS SHOCK WAVE REACHES YOU IN ${(SND.boom.police - t).toFixed(1)} S` : 'HEARD') },
-      { from: 63.6, until: 69.0, top: 200, label: 'SPEED OF SOUND', value: '123 KM/H', sub: '34.3 M/S' },
-    ],
-    says: [],                          // "Hey!" is placed at the moment the shout ARRIVES (filled in below)
+    readouts: [],                      // filled in below (they key off the computed arrivals)
+    says: [],                          // what is shouted / announced, placed when it ARRIVES (filled in below)
     notes: [{ t: SND.note[0], until: SND.note[1], text: 'FICTIONAL SIMULATION<br>ONLY THE SPEED OF SOUND IN AIR WAS CHANGED' }],
   },
 };
 
 function sndKmh(t) { const k = sndC(t) * 3.6; return k >= 1000 ? `${Math.floor(k / 1000)},${String(Math.round(k % 1000)).padStart(3, '0')} KM/H` : `${Math.round(k)} KM/H`; }
-function sndDist(p) { return SoundArrival.dist(p, SND_P(9.4, 1.83, 1.0)); }
-function sndDelay(p) { return sndDist(p) / SND.C1; }
-// the [made, heard] pair whose sound is on its way to you at t (the latest made), or null
-function sndInFlight(list, t) { let q = null; for (const p of list) if (p[0] <= t && t < p[1]) q = p; return q; }
 
-// --- the booms at YOUR ear (exact, from SoundArrival), then everything that keys off them -------------------------
+// --- the head, the arrivals at YOUR ear, and everything that keys off them -------------------------------------------
 (function sndBuild() {
-  const C = SCRIPT.camera, B = SND.boom, c = SND.C1;
-  SND_CX = new Track(C.x); SND_CZ = new Track(C.z);
-  // the earliest arrival over each source's supersonic emissions is its shock (a fold: an interior minimum)
-  const S = SND.sport, fs = SoundArrival.firstArrival(sndSport, sndEar, c, S.tM, S.tc, 1 / 480);
-  B.sport = fs.tr; B.sportFold = fs.te > S.tM + 0.05;
-  B.police = SoundArrival.firstArrival(sndPolice, sndEar, c, 40, SND.police.tc, 1 / 480).tr;
-  B.plane = SoundArrival.firstArrival(sndPlane, sndEar, c, 30, SND.plane.tc, 1 / 240).tr;
-  B.planeFix = 0;
-  B.planeFix = B.plane - sndPlaneBoomAt(9.4, 1.0, 1.83);   // the straight-line formula, trued up to the exact value at you
-  const tS = B.sport, tP = B.police, tQ = B.plane;
-  // the shocks hit you: a jolt and a shake each; the police car's (closest, the strongest) makes you duck, hands to ears
-  C.startles = [[tS + 0.02, 0.9], [tQ + 0.02, 1.2], [tP + 0.02, 1.3]];
-  C.shakes = [[tS + 0.02, 0.55, 0.35], [tQ + 0.02, 0.9, 0.7], [tP + 0.02, 0.85, 0.45]];
-  C.height = [[0, 1.68], [tP, 1.68], [tP + 0.3, 1.5, 'outQuad'], [tP + 2.65, 1.66], [71, 1.68]];
-  C.tilt = [[0, 0], [tP - 0.05, 0], [tP + 0.25, -3.5], [tP + 1.85, 0], [71, 0]];
-  // (up in front of you first — you see them — then over your ears)
-  SCRIPT.hands.right = [[0, 'hidden'], [tP + 0.04, 'ear'], [tP + 1.95, 'ear'], [tP + 2.65, 'hidden']];   // (up to your ears, out of frame: the duck and the shake carry it)
-  SCRIPT.hands.left = [[0, 'hidden'], [tP + 0.07, 'ear'], [tP + 1.85, 'ear'], [tP + 2.55, 'hidden']];
-  // for the readouts: when each of the friend's sounds and each bang is made and heard; when the siren's pitch flips
-  SND.friendArr = [...SND.friend.claps.filter((t) => t > 4), SND.friend.shout].map((t) => [t, sndArriveFixed(t, SND.friend)]);
-  SND.pileArr = SND_PILE_HITS.map((t) => [t, sndArriveFixed(t, SND.pile)]);
-  SND.ambFlip = SND.amb.tc + SoundArrival.dist(sndAmb(SND.amb.tc), sndEar(SND.amb.tc)) / c;
-  // sample the head: base keys blended toward each look window's target
-  const by = new Track(SND_BASE_YAW), bp = new Track(SND_BASE_PITCH), fv = new Track(SND_FOV);
-  const yaw = [], pitch = [];
-  let prevYaw = null;
-  for (let i = 0; i <= Math.round(CONFIG.duration * 30); i++) {
-    const t = i / 30, cx = SND_CX.value(t), cz = SND_CZ.value(t), ey = 1.83;
-    let y = by.value(t), p = bp.value(t);
-    for (const [a, b, fn, fi, fo, lag, cap = 72] of SND_LOOKS) {
-      const w = MathX.smooth(t, a - fi * 0.5, a + fi * 0.5) * (1 - MathX.smooth(t, b - fo * 0.5, b + fo * 0.5));
-      if (w <= 0) continue;
-      const q = fn(Math.max(a, t - lag)), dx = q.x - cx, dz = q.z - cz, dh = Math.hypot(dx, dz);
-      let ly = Math.atan2(-dx, -dz) * 180 / Math.PI, lp = Math.min(cap, Math.atan2(q.y - ey, dh) * 180 / Math.PI);
-      while (ly - y > 180) ly -= 360; while (ly - y < -180) ly += 360;
-      y += (ly - y) * w; p += (lp - p) * w;
-    }
-    // through a long lens you brace: the controller's idle head sway is cancelled out (fully below 6° of view)
-    const st = 1 - MathX.smooth(fv.value(t), 6, 24);
-    y -= st * (noise1(t * 0.35, 11) * 0.6 + noise1(t * 1.3, 12) * 0.12); p -= st * (noise1(t * 0.3, 13) * 0.45 + noise1(t * 1.1, 14) * 0.1);
-    if (prevYaw !== null) { while (y - prevYaw > 180) y -= 360; while (y - prevYaw < -180) y += 360; }
-    prevYaw = y;
-    yaw.push([+t.toFixed(4), +y.toFixed(3), 'linear']); pitch.push([+t.toFixed(4), +p.toFixed(3), 'linear']);
+  const C = SCRIPT.camera, A = SND, n = Math.round(CONFIG.duration * 30) + 30;
+  // 1. sample each shot at 30 Hz: position (cut = a jump between two frames), aim (smoothed inside each shot), lens
+  const X = [], Y = [], Z = [], YAW = [], PITCH = [], FOV = [];
+  let sy = null, sp = null, prevShot = -1;
+  for (let i = 0; i <= n; i++) {
+    const t = i / 30, k = sndShotAt(t), [, , eyeFn, tgtFn, fovFn] = SND_SHOTS[k];
+    const e = eyeFn(t), q = tgtFn(t), dx = q.x - e.x, dz = q.z - e.z;
+    let yaw = Math.atan2(-dx, -dz) * 180 / Math.PI, pitch = Math.atan2(q.y - e.y, Math.hypot(dx, dz)) * 180 / Math.PI;
+    if (k !== prevShot) { sy = yaw; sp = pitch; prevShot = k; }
+    while (yaw - sy > 180) yaw -= 360; while (yaw - sy < -180) yaw += 360;
+    sy += (yaw - sy) * 0.22; sp += (pitch - sp) * 0.22;                  // a head, not a gimbal: a little lag
+    const fov = fovFn(t);
+    // through a long lens you brace: cancel the controller's idle sway (fully below 12° of view)
+    const st = 1 - MathX.smooth(fov, 12, 30);
+    const yw = sy - st * (noise1(t * 0.35, 11) * 0.6 + noise1(t * 1.3, 12) * 0.12), pt = sp - st * (noise1(t * 0.3, 13) * 0.45 + noise1(t * 1.1, 14) * 0.1);
+    const tt = +t.toFixed(4);
+    X.push([tt, +e.x.toFixed(3), 'linear']); Y.push([tt, +e.y.toFixed(3), 'linear']); Z.push([tt, +e.z.toFixed(3), 'linear']);
+    YAW.push([tt, +yw.toFixed(3), 'linear']); PITCH.push([tt, +pt.toFixed(3), 'linear']); FOV.push([tt, +fov.toFixed(3), 'linear']);
   }
-  C.yaw = yaw; C.pitch = pitch;
-  // the airliner path and its rocking wings (it is fighting its own shock waves)
-  const A = SCRIPT.aircraft;
-  for (let t = 40.0; t <= 58.0 + 1e-6; t += 0.5) { const q = sndPlane(t); A.path.push([+t.toFixed(2), q.x, +q.y.toFixed(2), +q.z.toFixed(2)]); }
-  for (let t = 40.0; t <= 58.0 + 1e-6; t += 0.35) A.bank.push([+t.toFixed(2), +(7 * Math.sin(t * 1.9) + 3 * Math.sin(t * 4.3 + 1)).toFixed(2)]);
-  // the shout: an empty bubble while the mouth moves, the words when the sound reaches you
-  const tr = sndArriveFixed(SND.friend.shout, SND.friend);
-  SCRIPT.hud.says.push({ t: SND.friend.shout, until: +tr.toFixed(3), text: '“ … ”' });
-  SCRIPT.hud.says.push({ t: +tr.toFixed(3), until: +(tr + 1.3).toFixed(3), text: '“Hey! Over here!”' });
+  C.x = X; C.z = Z; C.height = Y; C.yaw = YAW; C.pitch = PITCH; C.fov = FOV;
+  SND_EAR = { x: Float64Array.from(X, (k) => k[1]), y: Float64Array.from(Y, (k) => k[1]), z: Float64Array.from(Z, (k) => k[1]), n: X.length };
+
+  // 2. what reaches you, and when
+  const H = A.heard = {};
+  H.gun = sndArriveFixed(A.gun.bang, SND_GUN);
+  H.shout = sndArriveFixed(A.friend.shout, SND_FRIEND_MOUTH);
+  H.pa = A.pa.speakers.map((p) => sndArriveFixed(A.pa.speak, p)).sort((a, b) => a - b);
+  H.whistle = sndArriveFixed(A.whistle.t, SND_P(A.whistle.x, A.whistle.y, A.whistle.z));
+  H.kick = sndArriveFixed(A.kick.t, SND_P(A.kick.x, 0.15, A.kick.z));
+  // the ball's own sound: the first arrival over its flight is the fold where it slows through Mach 1 (its "crack")
+  H.ball = SoundArrival.firstArrival(sndBall, sndEar, A.C1, A.kick.t, SND_BALL.tGoal, 1 / 960).tr;
+  H.drum = sndArriveFixed(A.drum.t0, SND_DRUM) - A.drum.t0;          // (the delay of every beat)
+  H.thunder = sndThunderAt(sndEar(59));
+  // 3. what that does to you: jolts, the thunder's shake, hands up to your ears
+  const tT = H.thunder;
+  C.startles = [[H.gun + 0.02, 0.35], [H.ball + 0.02, 0.6], [tT + 0.02, 1.25]];
+  C.shakes = [[H.ball + 0.01, 0.35, 0.25], [tT + 0.02, 0.75, 1.6]];
+  C.tilt = [[0, 0], [tT, 0], [tT + 0.25, -2.5], [tT + 2.5, 0], [70, 0]];
+  SCRIPT.hands.right = [[0, 'hidden'], [tT + 0.06, 'ear'], [tT + 2.6, 'ear'], [tT + 3.3, 'hidden']];
+  SCRIPT.hands.left = [[0, 'hidden'], [tT + 0.09, 'ear'], [tT + 2.5, 'ear'], [tT + 3.2, 'hidden']];
+
+  // 4. the readouts (top-left)
+  const R = SCRIPT.hud.readouts, top = 200;
+  const dGun = SoundArrival.dist(SND_GUN, sndEar(5));
+  R.push({ from: 0.0, until: 4.15, top, label: 'SPEED OF SOUND', value: (t) => sndKmh(t), sub: (t) => `${sndC(t) >= 100 ? Math.round(sndC(t)) : sndC(t).toFixed(1)} M/S` });
+  R.push({ from: 4.3, until: 9.5, top, label: 'THE STARTING GUN', value: (t) => `${Math.min(t, H.gun) - A.gun.bang >= 0 ? (Math.min(t, H.gun) - A.gun.bang).toFixed(2) : '0.00'} S`,
+    sub: (t) => (t < H.gun ? 'ITS BANG IS ON ITS WAY TO YOU…' : `HEARD · ${Math.round(dGun)} M AWAY`),
+    ctx: (t) => (t < H.gun ? '' : `THE NEAREST RUNNER HEARD IT ${(SND_RUNNERS[29].go - SND_RUNNERS[0].go).toFixed(1)} S AFTER THE FIRST`) });
+  const dF = SoundArrival.dist(SND_FRIEND_MOUTH, sndEar(10.5));
+  R.push({ from: 10.0, until: 15.5, top, label: 'SOUND DELAY', value: (t) => (t < A.friend.shout ? '0.00 S' : `${(Math.min(t, H.shout) - A.friend.shout).toFixed(2)} S`),
+    sub: (t) => (t >= A.friend.shout && t < H.shout ? 'ON ITS WAY TO YOU…' : `DISTANCE ${Math.round(dF)} M`),
+    ctx: (t) => (t < 13.45 ? '' : 'THROAT RESONANCES 10× LOWER') });
+  R.push({ from: 16.0, until: 22.5, top, label: 'ONE ANNOUNCEMENT', value: (t) => `${H.pa.filter((x) => x <= t).length} OF ${H.pa.length} HEARD`,
+    sub: () => `5 LOUDSPEAKERS · ${Math.round((H.pa[0] - A.pa.speak) * 10) / 10}–${Math.round((H.pa[H.pa.length - 1] - A.pa.speak) * 10) / 10} S LATE` });
+  R.push({ from: 23.1, until: 25.9, top, label: 'REFEREE’S WHISTLE', value: '10× LOWER', sub: 'ITS NOTE IS SET BY ITS AIR CHAMBER' });
+  R.push({ from: 26.0, until: 30.95, top, label: 'THE SHOT · 144 KM/H', value: `MACH ${(A.kick.v0 / A.C1).toFixed(2)}`,
+    sub: (t) => (t < SND_BALL.tGoal ? 'SUPERSONIC' : t < H.kick ? 'GOAL · THE KICK IS STILL ON ITS WAY' : 'THE KICK: HEARD') });
+  const dD = SoundArrival.dist(SND_DRUM, sndEar(35));
+  R.push({ from: 31.6, until: 43.4, top, label: 'THE DRUM', value: `${H.drum.toFixed(1)} S LATE`, sub: `${Math.round(dD)} M AWAY`,
+    ctx: 'EACH SECTION CLAPS WHEN IT HEARS IT' });
+  const dT = SoundArrival.dist(SND_BOLT, sndEar(50)) / 1000;
+  R.push({ from: 44.0, until: tT + 0.1, top, label: 'THE FLASH AT 0:03', value: (t) => `${Math.max(0, tT - t).toFixed(1)} S`,
+    sub: () => `${dT.toFixed(2)} KM AWAY`, ctx: 'UNTIL ITS THUNDER REACHES YOU' });
+  R.push({ from: tT + 0.1, until: 66.0, top, label: 'THE THUNDER', value: `${(tT - A.flash.t).toFixed(0)} S LATE`, sub: 'IT WOULD ROLL ON FOR OVER A MINUTE' });
+  R.push({ from: 66.15, until: 67.85, top, label: 'THAT FLASH', value: (t) => `${Math.round(sndThunderAt(sndEar(66)) - t)} S`, sub: 'UNTIL YOU HEAR IT' });
+
+  // 5. the words: an empty bubble while they are on their way, the words when they arrive
+  const S = SCRIPT.hud.says;
+  S.push({ t: A.friend.shout, until: +H.shout.toFixed(3), text: '“ … ”' });
+  S.push({ t: +H.shout.toFixed(3), until: +(H.shout + 1.6).toFixed(3), text: '“Hey! Up here!”' });
+  H.pa.forEach((tr, i) => S.push({ t: +tr.toFixed(3), until: +(i + 1 < H.pa.length ? Math.min(H.pa[i + 1], tr + 1.1) : tr + 1.3).toFixed(3), text: '“Ladies and gentlemen…”' }));
 })();
 
 const SCRIPT_TRACKS = Object.fromEntries(Object.entries(SCRIPT.tracks).map(([k, v]) => [k, new Track(v, 'linear')]));

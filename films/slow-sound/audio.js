@@ -1,10 +1,14 @@
 /* =====================================================================
    AUDIO — the episode's soundtrack, synthesised and rendered offline (js/audio/audioEngine.js).
-   Every sound reaches you when SoundArrival says it does (speed of sound 34.3 m/s after the title):
-     · fixed sources (claps, the shout, the pile driver, breaking glass, alarms) at sndArriveFixed(te, where)
-     · moving sources (siren, cars, the airliner's engines) through a DelayNode whose delay follows
-       SoundArrival.delayCurve: the pitch shift (Doppler) and the late arrival come out exact
-     · supersonic sources are silent until their shock arrives; then the boom (an N-wave), then what follows them
+   Every sound reaches you when SoundArrival's rule says (arrival = event + distance / 34.3 m/s), from where it was
+   made, to where YOUR ear is at that moment (the ear jumps at each cut). What changes in this air, besides timing:
+     · voices: the vocal folds keep their pitch, but the throat and mouth resonances scale with the speed of
+       sound (10× lower): every voice comes out deep, hollow and muffled
+     · anything whose note is set by an air cavity drops ~10×: the referee's whistle hoots, claps become soft thumps
+       (the cupped palms), the ball's ping becomes a deep "dum"
+     · echoes come back seconds later; one announcement from five loudspeakers arrives three times
+   Thousands of small sounds (claps, cheers, gasps, footsteps) are mixed here in JavaScript from the crowd's own
+   numbers (crowd.js), each one placed by its own distance; the rest are Web Audio nodes.
    Bake it when the film is final:
      NODE_PATH=$(npm root -g) node tools/bake-soundtrack.cjs --page slow-sound.html --out films/slow-sound/soundtrack.js
    ===================================================================== */
@@ -13,31 +17,34 @@ class SndAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
   // everything the sound depends on that is not inside SCRIPT (so a stale baked copy is detected)
   fingerprintData() {
-    const fns = [sndC, sndAmb, sndSport, sndSportV, sndPlane, sndPolice, sndDrone, sndEar, sndArriveFixed, sndPoliceBoomAt, sndPlaneBoomAt, sndSportBoomAt, SndGlass, SndCity, SndCast];
-    return [SND, SND_PILE_HITS, Object.values(SoundArrival).map(String), fns.map(String)];
+    const fns = [sndC, sndEar, sndArriveFixed, sndHeardAt, sndThunderAt, sndBall, sndBallV, sndNetBulge, sndNetDepth, sndRunnerX, sndCrowdSeats, SndCrowd, sndFlashLevel];
+    return [SND, SND_ST, SND_RUNNERS, Object.values(SoundArrival).map(String), fns.map(String)];
   }
 
   _build(ctx) {
-    const S = new SoundKit(ctx, CONFIG.seed), T = SND, B = SND.boom, END = CONFIG.duration + 1.0, c = SND.C1, app = this.app;
+    const S = new SoundKit(ctx, CONFIG.seed), T = SND, H = SND.heard, END = CONFIG.duration + 1.0, c = SND.C1, app = this.app, SR = ctx.sampleRate;
     // offline-safe envelopes (Chrome's offline renderer clicks on very short exponential ramps)
     S.env = (g, t, a, peak, d) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t + Math.max(a, 0.006)); g.gain.setTargetAtTime(0, t + Math.max(a, 0.006), Math.max(0.004, d / 4)); };
-    const tone = S.tone.bind(S);
-    S.tone = (t, dur, f, vol, pan, dest, type = 'sine', attack = 0.01, release = null) => tone(t, dur, f, vol, pan, dest, type, Math.max(attack, 0.006), release);
     const rng = new RNG(CONFIG.seed + 5);
+    const tT = H.thunder;
 
-    // mix chain: buses → compressor → out → limiter → soft clip (the limiter lets the first ms of a boom through:
-    // an oversampled soft knee catches it, so the file stays under −1 dBTP after the AAC encode)
+    // mix chain: buses → (your hands over your ears) → compressor → out → limiter → soft clip
     const clip = ctx.createWaveShaper(), CN = 2048, cv = new Float32Array(CN), knee = 0.6, ceil = 0.84;
     for (let i = 0; i < CN; i++) { const x = (i / (CN - 1)) * 2 - 1, ax = Math.abs(x); cv[i] = Math.sign(x) * (ax <= knee ? ax : knee + (ceil - knee) * Math.tanh((ax - knee) / (ceil - knee))); }
     clip.curve = cv; clip.oversample = '4x'; clip.connect(ctx.destination);
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.001; lim.release.value = 0.12; lim.connect(clip);
     const out = ctx.createGain(); out.gain.value = 0.9; out.connect(lim);
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 8; comp.ratio.value = 3.5; comp.attack.value = 0.004; comp.release.value = 0.25; comp.connect(out);
-    const mix = ctx.createGain(), mixHp = S.filter('highpass', 26, 0.7); mix.gain.value = 1.5; mix.connect(mixHp); mixHp.connect(comp);   // (nothing below 26 Hz reaches the dynamics)
-    const rev = S.reverb(2.6), revG = ctx.createGain(); revG.gain.value = 0.3; rev.connect(revG); revG.connect(mix);
+    const ears = S.filter('lowpass', 20000, 0.7); ears.connect(comp);
+    ears.frequency.setValueAtTime(20000, 0); ears.frequency.setValueAtTime(20000, tT + 0.12); ears.frequency.exponentialRampToValueAtTime(650, tT + 0.3);
+    ears.frequency.setValueAtTime(650, tT + 2.55); ears.frequency.exponentialRampToValueAtTime(20000, tT + 3.3);
+    const mix = ctx.createGain(), mixHp = S.filter('highpass', 26, 0.7); mix.gain.value = 1.5; mix.connect(mixHp); mixHp.connect(ears);
+    // the stadium's reverb: long (echoes take ten times longer to die away in this air)
+    const rev = S.reverb(4.2), revG = ctx.createGain(); revG.gain.value = 0.3; rev.connect(revG); revG.connect(mix);
     const bus = (g) => { const b = ctx.createGain(); b.gain.value = g; b.connect(mix); return b; };
-    const amb = bus(0.35), you = bus(0.85), src = bus(1.0), fx = bus(1.15), mus = bus(0.5);
+    const amb = bus(0.4), src = bus(1.0), fx = bus(1.15), mus = bus(0.5), crowd = bus(1.0);
     const send = (node, amt) => { const g = ctx.createGain(); g.gain.value = amt; node.connect(g); g.connect(rev); };
+    send(crowd, 0.35);
 
     // where a sound comes from, for your ears: pan by its bearing against the way you face, level by distance
     const panOf = (p, t) => {
@@ -45,145 +52,94 @@ class SndAudio extends AudioEngine {
       return MathX.clamp((dx * Math.cos(yaw) - dz * Math.sin(yaw)) / d, -1, 1) * 0.85;
     };
     const lvl = (p, t, ref) => ref / (ref + SoundArrival.dist(p, sndEar(t)));
+    // when a sound made at te at p reaches your ear: the first moment its front (it travels SND_RUN) gets to where
+    // your ear is then (your ear jumps at the cuts, so this marches forward instead of iterating)
+    const arrive = (te, p) => {
+      const hit = (t) => SND_RUN(te, t) >= SoundArrival.dist(p, sndEar(t));
+      let t = te;
+      for (let i = 0; i < 9000; i++) {
+        const t2 = t + 1 / 60;
+        if (hit(t2)) { let lo = t, hi = t2; for (let k = 0; k < 18; k++) { const m = (lo + hi) / 2; if (hit(m)) hi = m; else lo = m; } return hi; }
+        t = t2;
+      }
+      return Infinity;
+    };
     // a one-shot made at te at point p: scheduled when it ARRIVES; fn(tr, gain, pan)
-    const at = (te, p, ref, fn) => { const tr = sndArriveFixed(te, p); if (tr < END) fn(tr, lvl(p, tr, ref), panOf(p, tr)); return tr; };
-
-    // a continuous moving source heard through a delay line (late arrival + exact Doppler).
-    // make(dest) builds the source's emitted sound (in emission time) into dest; te0..te1: when it is sounding
-    const moving = (posFn, te0, te1, a, b, make, vol, ref, dest, opts = {}) => {
-      const pts = SoundArrival.delayCurve(posFn, sndEar, c, a, b, 1 / 120, te0);
-      const maxD = Math.max(1, ...pts.map((q) => (q.delay === null ? 0 : q.delay))) + 0.5;
-      const dly = ctx.createDelay(maxD), g = ctx.createGain(), pn = ctx.createStereoPanner(), lp = S.filter('lowpass', opts.lp || 9000, 0.7);
-      make(dly);
-      dly.connect(lp); lp.connect(g); g.connect(pn); pn.connect(dest);
-      if (opts.rev) send(pn, opts.rev);
-      let last = pts.find((q) => q.delay !== null), dl = last ? last.delay : 1;
-      g.gain.setValueAtTime(0, 0); dly.delayTime.setValueAtTime(dl, 0); pn.pan.setValueAtTime(0, 0);
-      // a source coming at you crowds its sound into less time: louder as well as higher (×dte/dt, capped)
-      let prev = null, dop = 1;
-      for (const q of pts) {
-        let gv = 0, pv = 0;
-        if (q.delay !== null && q.te >= te0 && q.te <= te1) {
-          dl = q.delay;
-          const sp = posFn(q.te);
-          if (prev && prev.te !== null) { const r = (q.te - prev.te) / (q.t - prev.t); if (r > 0 && r < 50) dop += (MathX.clamp(r, 0.3, 6) - dop) * 0.25; }
-          gv = vol * ref / (ref + q.d) * dop * (opts.gainFn ? opts.gainFn(q.te, q.t) : 1);
-          if (opts.level) gv = opts.level(q, gv);
-          pv = panOf(sp, q.t);
-        }
-        prev = q;
-        dly.delayTime.linearRampToValueAtTime(Math.min(dl, maxD - 0.01), q.t);
-        g.gain.linearRampToValueAtTime(gv, q.t);
-        pn.pan.linearRampToValueAtTime(pv, q.t);
+    const at = (te, p, ref, fn) => { const tr = arrive(te, p); if (tr < END - 0.3) fn(tr, lvl(p, tr, ref), panOf(p, tr)); return tr; };
+    // its echoes off the four stand fronts (image sources): later, softer, duller
+    const WALLS = [['z', -SND_ST.side.d0 + 0.42], ['z', SND_ST.side.d0 - 0.42], ['x', -SND_ST.end.d0 + 0.42], ['x', SND_ST.end.d0 - 0.42]];
+    const echoes = (te, p, ref, fn) => {
+      for (const [ax, w] of WALLS) {
+        const q = { x: p.x, y: p.y, z: p.z }; q[ax] = 2 * w - p[ax];
+        at(te, q, ref, (tr, g, pn) => fn(tr, g * 0.45, pn));
       }
-      g.gain.linearRampToValueAtTime(0, b + 0.05);
-      return { dly, g, pn };
     };
 
-    // the other branch behind a supersonic source: after its shock you also hear what it made on the way in, latest
-    // first (the arrival curve te + d/c falls before its fold; tFold is when that fold reaches you)
-    const movingEarly = (posFn, tMin, tFold, b, make, vol, ref, dest, opts = {}) => {
-      const A = (te, t) => te + SoundArrival.dist(posFn(te), sndEar(t)) / c - t;
-      const pts = [];
-      let teFold = tMin;
-      { let best = Infinity; for (let te = tMin; te <= tFold; te += 1 / 240) { const v = te + SoundArrival.dist(posFn(te), sndEar(tFold)) / c; if (v < best) { best = v; teFold = te; } } }
-      for (let t = tFold + 1 / 120; t <= b; t += 1 / 120) {
-        if (A(tMin, t) < 0) break;                                  // everything it made has arrived
-        let lo = tMin, hi = teFold;
-        for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (A(m, t) > 0) lo = m; else hi = m; }
-        const te = (lo + hi) / 2; pts.push({ t, te, delay: t - te, d: (t - te) * c });
-      }
-      if (pts.length < 2) return;
-      const maxD = Math.max(...pts.map((q) => q.delay)) + 0.5;
-      const dly = ctx.createDelay(maxD), g = ctx.createGain(), pn = ctx.createStereoPanner(), lp = S.filter('lowpass', opts.lp || 9000, 0.7);
-      make(dly);
-      dly.connect(lp); lp.connect(g); g.connect(pn); pn.connect(dest);
-      if (opts.rev) send(pn, opts.rev);
-      g.gain.setValueAtTime(0, 0); dly.delayTime.setValueAtTime(pts[0].delay, 0); pn.pan.setValueAtTime(0, 0);
-      g.gain.setValueAtTime(0, pts[0].t - 0.01);
-      for (let i = 1; i < pts.length; i++) {
-        const q = pts[i], r = Math.min(6, Math.abs((q.te - pts[i - 1].te) / (q.t - pts[i - 1].t)));
-        dly.delayTime.linearRampToValueAtTime(q.delay, q.t);
-        g.gain.linearRampToValueAtTime(vol * ref / (ref + q.d) * r * MathX.smooth(q.t, pts[0].t, pts[0].t + 0.05) * (opts.gainFn ? opts.gainFn(q.te, q.t) : 1), q.t);
-        pn.pan.linearRampToValueAtTime(panOf(posFn(q.te), q.t), q.t);
-      }
-      g.gain.linearRampToValueAtTime(0, pts[pts.length - 1].t + 0.05);
+    // --- small sounds mixed in JavaScript: thousands of grains, each placed by its own arrival ---------------------
+    const NS = Math.ceil(END * SR), G = [new Float32Array(NS), new Float32Array(NS)];
+    const grain = (arr, t, g, pan) => {
+      if (!(t < END) || g <= 0) return;
+      const i0 = Math.round(t * SR), a = Math.cos((pan + 1) * Math.PI / 4) * g, b = Math.sin((pan + 1) * Math.PI / 4) * g, L = G[0], R = G[1];
+      for (let i = 0, n = Math.min(arr.length, NS - i0); i < n; i++) { const v = arr[i]; L[i0 + i] += v * a; R[i0 + i] += v * b; }
     };
-
-    // an N-wave: the two-crack "boom-boom" of a shock (front and tail shocks), duration T
-    const nwave = (t, T, vol, dest, lpF, revAmt, pan = 0) => {
-      const sr = ctx.sampleRate, n = Math.ceil((T + 0.03) * sr), buf = ctx.createBuffer(1, n, sr), d = buf.getChannelData(0), rise = 0.0012 * sr;
-      for (let i = 0; i < n; i++) {
-        const x = i / sr;
-        if (x <= T) d[i] = (1 - 2 * x / T) * Math.min(1, i / rise);
-        else d[i] = -Math.max(0, 1 - (x - T) * sr / rise);
-      }
-      const s = ctx.createBufferSource(); s.buffer = buf;
-      // (high-passed: the slow pressure ramp between the cracks is infrasound — no speaker plays it, but it would pump the limiter)
-      const lp = S.filter('lowpass', lpF, 0.6), hp = S.filter('highpass', 38, 0.7), g = ctx.createGain(), p = S.panned(dest, pan);
-      g.gain.value = vol; s.connect(lp); lp.connect(hp); hp.connect(g); g.connect(p); send(g, revAmt);
-      s.start(t);
+    const noiseArr = (n, seed) => { const r = new RNG(seed), a = new Float32Array(n); for (let i = 0; i < n; i++) a[i] = r.next() * 2 - 1; return a; };
+    const biquad = (x, type, f, Q) => {
+      const w = 2 * Math.PI * f / SR, cw = Math.cos(w), sw = Math.sin(w), al = sw / (2 * Q), a0 = 1 + al;
+      let b0, b1, b2; const a1 = -2 * cw / a0, a2 = (1 - al) / a0;
+      if (type === 'lp') { b0 = (1 - cw) / 2; b1 = 1 - cw; b2 = (1 - cw) / 2; } else if (type === 'hp') { b0 = (1 + cw) / 2; b1 = -(1 + cw); b2 = (1 + cw) / 2; } else { b0 = al; b1 = 0; b2 = -al; }
+      b0 /= a0; b1 /= a0; b2 /= a0;
+      let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+      for (let i = 0; i < x.length; i++) { const x0 = x[i], y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x0; y2 = y1; y1 = y0; x[i] = y0; }
+      return x;
     };
-    // a rumble that follows a big shock (the ground and the buildings ringing)
-    const rumble = (t, dur, vol, f, dest) => {
-      const n = S.noise('brown', t, t + dur + 0.2), lp = S.filter('lowpass', f, 0.7), g = ctx.createGain();
-      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.05); g.gain.setTargetAtTime(0, t + 0.08, dur / 3.5);
-      n.connect(lp); lp.connect(g); g.connect(dest); send(g, 0.4);
+    const norm = (x) => { let m = 1e-9; for (const v of x) m = Math.max(m, Math.abs(v)); for (let i = 0; i < x.length; i++) x[i] /= m; return x; };
+    // a hollow voice in JS (a buzz at the vocal folds' pitch, through resonances ten times lower than in normal air)
+    const hollowArr = (dur, f0, f1, seed, att, rel) => {
+      const n = Math.round(dur * SR), x = new Float32Array(n), r = new RNG(seed);
+      let ph = 0;
+      for (let i = 0; i < n; i++) { const u = i / n, f = f0 + (f1 - f0) * u + 4 * Math.sin(i / SR * 2 * Math.PI * 5.5); ph += f / SR; x[i] = (ph % 1) * 2 - 1 + (r.next() * 2 - 1) * 0.35; }
+      const y = Float32Array.from(x), z2 = Float32Array.from(x);
+      biquad(x, 'bp', 95, 1.6); biquad(y, 'bp', 160, 2.0); biquad(z2, 'lp', 330, 0.9);
+      for (let i = 0; i < n; i++) { const u = i / SR, e = Math.min(1, u / att) * Math.min(1, (dur - u) / rel); x[i] = (x[i] * 1.0 + y[i] * 0.7 + z2[i] * 0.45) * Math.max(0, e); }
+      return norm(x);
     };
-    // window glass rattling in the frames (many tiny ticks)
-    const rattle = (t, dur, vol, pan, dest) => {
-      for (let k = 0; k < dur * 38; k++) {
-        const tt = t + rng.range(0, dur) * rng.range(0.2, 1), f = rng.range(1800, 5200), o = ctx.createOscillator(), g = ctx.createGain();
-        o.frequency.value = f; S.env(g, tt, 0.001, vol * rng.range(0.3, 1) * Math.exp(-(tt - t) / (dur * 0.5)), 0.03);
-        o.connect(g); g.connect(S.panned(dest, MathX.clamp(pan + rng.range(-0.5, 0.5), -1, 1))); o.start(tt); o.stop(tt + 0.08);
-      }
-    };
-    // a pane bursting: a sharp crack, then the shower of pieces hitting the ground
-    const glass = (t, vol, pan, dest, small = false) => {
-      const P = S.panned(dest, pan);
-      const n = S.noise('white', t, t + 0.5), hp = S.filter('highpass', 2400, 0.7), g = ctx.createGain();
-      S.env(g, t, 0.002, vol * 0.8, small ? 0.08 : 0.22); n.connect(hp); hp.connect(g); g.connect(P); send(g, 0.35);
-      const k = small ? 5 : 22;
-      for (let i = 0; i < k; i++) {
-        const tt = t + 0.02 + rng.range(0, small ? 0.25 : 0.7) * rng.range(0.3, 1), f = rng.range(2600, 7800), o = ctx.createOscillator(), og = ctx.createGain();
-        o.frequency.value = f; S.env(og, tt, 0.001, vol * rng.range(0.12, 0.4), rng.range(0.02, 0.09));
-        o.connect(og); og.connect(P); o.start(tt); o.stop(tt + 0.15);
-      }
-      if (!small) S.clunk(t, vol * 0.35, pan, dest);
-    };
+    // the grains
+    const CLAPS = [0, 1, 2, 3, 4, 5].map((k) => {        // a clap: cupped palms ring ~10× lower — a soft thump, with a little click
+      const n = Math.round(0.14 * SR), x = noiseArr(n, 300 + k), y = noiseArr(n, 400 + k);
+      biquad(x, 'bp', 150 + k * 14, 1.4); biquad(y, 'hp', 1400, 0.7);
+      for (let i = 0; i < n; i++) { const u = i / SR; x[i] = x[i] * Math.min(1, u / 0.002) * Math.exp(-u / 0.03) + 0.07 * y[i] * Math.exp(-u / 0.003); }
+      return norm(x);
+    });
+    const STEPS = [0, 1, 2, 3].map((k) => {
+      const n = Math.round(0.11 * SR), x = noiseArr(n, 500 + k);
+      biquad(x, 'lp', 320 + k * 40, 0.8);
+      for (let i = 0; i < n; i++) { const u = i / SR; x[i] = (x[i] + 0.6 * Math.sin(2 * Math.PI * 72 * u)) * Math.min(1, u / 0.002) * Math.exp(-u / 0.022); }
+      return norm(x);
+    });
+    const CHEERS = [0, 1, 2, 3, 4].map((k) => hollowArr(2.4 + 0.3 * hash1(k), 230 + 60 * hash1(k * 3), 250 + 70 * hash1(k * 5), 600 + k, 0.12, 0.9));
+    const GASPS = [0, 1, 2, 3].map((k) => hollowArr(0.6, 300 + 40 * k, 220 + 30 * k, 700 + k, 0.02, 0.45));
 
     // ---------------------------------------------------------------------------------------------------------------
-    // 1. the city: a bed of distant traffic and air; it thins out toward the shocks, and almost goes before the line
-    const bed = (type, f, q, vol) => { const n = S.noise(type, 0, END), b = S.filter('lowpass', f, q), g = ctx.createGain(); g.gain.value = vol; n.connect(b); b.connect(g); g.connect(amb); };
-    bed('brown', 300, 0.7, 0.32); bed('pink', 1600, 0.5, 0.05);
-    const A = amb.gain;
-    A.setValueAtTime(0.35, 0); A.linearRampToValueAtTime(0.35, 49.0); A.linearRampToValueAtTime(0.14, 51.0);
-    A.setValueAtTime(0.14, B.plane); A.linearRampToValueAtTime(0.28, B.plane + 1.5); A.linearRampToValueAtTime(0.16, B.police - 1.0);
-    A.setValueAtTime(0.16, B.police); A.linearRampToValueAtTime(0.22, B.police + 2.5); A.linearRampToValueAtTime(0.07, T.lineA[0] + 0.5); A.linearRampToValueAtTime(0.0, END);
-    // the avenue's own cars (they drive at ~12 m/s: Mach 0.35) — a few passes heard through the delay line
-    if (app && app.cast) {
-      const near = app.cast.cars.filter((k) => Math.abs(k.x) < 6).slice(0, 8);
-      for (const k of near) {
-        const pos = (t) => ({ x: k.x, y: 0.6, z: app.cast._zAt(k.table, Math.max(0, t)) });
-        moving(pos, 0, END - 1, 0.2, END - 1, (d) => {
-          const n = S.noise('pink', 0, END), bp = S.filter('bandpass', 420 + hash1(k.i) * 200, 0.8), g = ctx.createGain(); g.gain.value = 0.9;
-          n.connect(bp); bp.connect(g); g.connect(d);
-          const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 38 + hash1(k.i * 3) * 14; const og = ctx.createGain(), ol = S.filter('lowpass', 220, 0.7); og.gain.value = 0.35; o.connect(ol); ol.connect(og); og.connect(d); o.start(0); o.stop(END);
-        }, 0.2, 5, src, { rev: 0.1, lp: 5000, gainFn: (te, t) => 1 - 0.75 * MathX.smooth(t, T.lineA[0] - 1.5, T.lineA[0] + 0.5) });
-      }
-    }
-
-    // 2. your footsteps (only while you walk)
+    // 1. the stadium: a crowd murmur all round. Under the title it sinks into a deep, hollow murmur (voices in this air)
     {
-      const zT = new Track(SCRIPT.camera.z);
-      let walked = 0, next = 0.7, pz = zT.value(0);
-      for (let t = 0; t < CONFIG.duration; t += 1 / 60) {
-        const z = zT.value(t); walked += Math.abs(z - pz); pz = z;
-        if (walked >= next) { S.step(t, 0.2, (Math.round(next / 0.7) % 2 ? 0.15 : -0.15), you); next += 0.7; }
-      }
+      const n = S.noise('pink', 0, END), bp = S.filter('bandpass', 900, 0.55), lp = S.filter('lowpass', 2600, 0.6), g = ctx.createGain();
+      bp.frequency.setValueAtTime(900, 0); bp.frequency.setValueAtTime(900, T.rule[0]); bp.frequency.exponentialRampToValueAtTime(140, T.rule[1]);
+      lp.frequency.setValueAtTime(2600, 0); lp.frequency.setValueAtTime(2600, T.rule[0]); lp.frequency.exponentialRampToValueAtTime(420, T.rule[1]);
+      g.gain.value = 1.5; n.connect(bp); bp.connect(lp); lp.connect(g); g.connect(amb);
+      // swells (a crowd is never steady)
+      const sw = ctx.createGain(); g.disconnect(); g.connect(sw); sw.connect(amb);
+      sw.gain.setValueAtTime(1, 0); for (let t = 0.5; t < END; t += 1.3 + rng.range(0, 1.6)) sw.gain.linearRampToValueAtTime(0.75 + rng.range(0, 0.5), t);
+      const hum = S.noise('brown', 0, END), hl = S.filter('lowpass', 140, 0.7), hg = ctx.createGain(); hg.gain.value = 0.5; hum.connect(hl); hl.connect(hg); hg.connect(amb);
+      // the level shot by shot: a hush before the free kick; a hush as the storm comes; it all thins out at the end
+      const A = amb.gain, K = SND.kick;
+      A.setValueAtTime(0.4, 0);
+      A.setValueAtTime(0.4, SND.cuts[2]); A.linearRampToValueAtTime(0.26, K.t - 1.2); A.linearRampToValueAtTime(0.18, K.t);
+      A.setValueAtTime(0.18, SND.cuts[3] - 0.05); A.linearRampToValueAtTime(0.32, SND.cuts[3]);
+      A.setValueAtTime(0.32, SND.cuts[4] - 0.05); A.linearRampToValueAtTime(0.4, SND.cuts[4]); A.linearRampToValueAtTime(0.4, 53.0); A.linearRampToValueAtTime(0.22, 57.0);
+      A.setValueAtTime(0.22, tT); A.linearRampToValueAtTime(0.34, tT + 3.5); A.linearRampToValueAtTime(0.12, T.lineB[0]); A.linearRampToValueAtTime(0.0, END - 0.3);
     }
 
-    // 3. the rule change under the title: everything sags (a falling tone with the counter)
+    // 2. the rule change under the title: everything sags (a falling tone with the counter)
     {
       const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'triangle';
       o.frequency.setValueAtTime(220, T.rule[0]); o.frequency.exponentialRampToValueAtTime(55, T.rule[1] + 0.2);
@@ -195,133 +151,146 @@ class SndAudio extends AudioEngine {
       n.connect(bp); bp.connect(ng); ng.connect(mus);
     }
 
-    // 4. the friend: claps and the shout, each heard when it arrives (≈ 0.9 s after you see it)
-    const F = T.friend, FP = { x: F.x, y: F.y, z: F.z };
-    for (const tc of F.claps) at(tc, FP, 9, (tr, g, pn) => {
-      const n = S.noise('white', tr, tr + 0.08), bp = S.filter('bandpass', 1500, 0.9), gg = ctx.createGain();
-      S.env(gg, tr, 0.001, 0.55 * g * 4, 0.04); n.connect(bp); bp.connect(gg); gg.connect(S.panned(src, pn)); send(gg, 0.5);
-    });
-    // (a voice in this air: the pitch is the vocal folds' and stays, but the mouth and throat resonances scale with the
-    //  speed of sound, ~10× lower — the words come out as a deep, hollow, muffled call; the bubble carries the words)
-    const mouth = S.filter('lowpass', 360, 1.4), mouthG = ctx.createGain(); mouthG.gain.value = 2.6; mouth.connect(mouthG); mouthG.connect(src);
-    at(F.shout, FP, 9, (tr, g, pn) => {
-      const v = g * 4 * 0.5;
-      S.voice(tr, 255, 0.3, 'e', v, pn, mouth, 0.88);
-      S.voice(tr + 0.42, 238, 0.13, 'o', v * 0.85, pn, mouth, 0.95);
-      S.voice(tr + 0.56, 226, 0.12, 'e', v * 0.8, pn, mouth, 0.92);
-      S.voice(tr + 0.71, 262, 0.42, 'i', v * 0.95, pn, mouth, 0.8);
-    });
-
-    // 5. the pile driver (100 m): bang + ringing steel, ~2.9 s after each blow; the last three after it has stopped
-    for (const th of SND_PILE_HITS) at(th, { x: T.pile.x - 0.75, y: 1.0, z: T.pile.z }, 14, (tr, g, pn) => {
-      const v = 0.95 * g * 5.5, P = S.panned(src, pn);
-      const n = S.noise('white', tr, tr + 0.15), lp = S.filter('lowpass', 2200, 0.7), gg = ctx.createGain(); S.env(gg, tr, 0.001, v, 0.05); n.connect(lp); lp.connect(gg); gg.connect(P); send(gg, 0.6);
-      const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.setValueAtTime(150, tr); o.frequency.exponentialRampToValueAtTime(55, tr + 0.2); S.env(og, tr, 0.002, v * 1.2, 0.25); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.4);
-      for (const [f, a, d] of [[470, 0.3, 0.6], [1180, 0.16, 0.4], [2050, 0.08, 0.25]]) { const r = ctx.createOscillator(), rg = ctx.createGain(); r.frequency.value = f; S.env(rg, tr, 0.002, v * a, d); r.connect(rg); rg.connect(P); send(rg, 0.4); r.start(tr); r.stop(tr + d * 1.6); }
-    });
-
-    // 6. the ambulance siren (two-tone) through the delay line: +68 % coming, −29 % going (over an octave apart)
-    moving(sndAmb, 9.0, 31.0, 9.0, 33.0, (d) => {
-      const o = ctx.createOscillator(); o.type = 'square';
-      for (let t = 9.0; t < 31.0; t += 0.55) o.frequency.setValueAtTime(Math.round((t - 9) / 0.55) % 2 ? 600 : 450, t);
-      const lp = S.filter('lowpass', 1800, 0.7), g = ctx.createGain(); g.gain.value = 0.5; o.connect(lp); lp.connect(g); g.connect(d); o.start(9.0); o.stop(31.0);
-      const n = S.noise('pink', 9, 31), bp = S.filter('lowpass', 500, 0.7), ng = ctx.createGain(); ng.gain.value = 0.5; n.connect(bp); bp.connect(ng); ng.connect(d);
-    }, 0.55, 8, src, { rev: 0.2 });
-
-    // 7. the 110 km/h car on the highway (Mach 0.89): its sound is squeezed up ~9× coming, then drops 4 octaves
-    const engine = (dest, t0, t1, f0, noiseF, nv, ov) => {
-      const n = S.noise('pink', t0, t1), lp = S.filter('lowpass', noiseF, 0.6), g = ctx.createGain(); g.gain.value = nv; n.connect(lp); lp.connect(g); g.connect(dest);
-      const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f0; const ol = S.filter('lowpass', f0 * 4, 0.8), og = ctx.createGain(); og.gain.value = ov; o.connect(ol); ol.connect(og); og.connect(dest); o.start(t0); o.stop(t1);
+    // 3. the start: "Set!" (in normal air: a clear voice, on time), then the gun, heard 2.2 s late, and the stadium's
+    //    echoes 2 s after that; the runners' feet, each set from where that runner is
+    const G0 = SND_P(T.gun.x, T.gun.y, T.gun.z);
+    at(T.gun.set, SND_P(T.gun.x + 0.35, 1.65, T.gun.z), 9, (tr, g, pn) => S.voice(tr, 175, 0.34, 'e', 3.2 * g, pn, src, 0.92));
+    const bang = (tr, g, pn, bright) => {
+      const P = S.panned(fx, pn);
+      const n = S.noise('white', tr, tr + 0.3), hp = S.filter(bright ? 'highpass' : 'lowpass', bright ? 700 : 1400, 0.7), ng = ctx.createGain();
+      S.env(ng, tr, 0.001, g, bright ? 0.07 : 0.25); n.connect(hp); hp.connect(ng); ng.connect(P); send(ng, 0.5);
+      const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.setValueAtTime(170, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25);
+      S.env(og, tr, 0.002, g * 1.1, 0.3); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.45);
     };
-
-    // 8. the car that goes supersonic: its whole approach arrives squeezed into a rising scream, then the boom
-    // (half a kilometre away the squeezed sound would be faint; the film lets you hear it build: a floor under the
-    //  natural level that rises into the shock, so the scream is there before the boom, never louder than it)
-    const sportFirst = (SoundArrival.delayCurve(sndSport, sndEar, c, 26, B.sport, 1 / 60, 0).find((q) => q.delay !== null) || { t: B.sport - 2.7 }).t;
-    const sportLevel = (q, g) => (q.t < B.sport ? Math.max(g, 0.03 + 0.34 * Math.pow(MathX.smooth(q.t, sportFirst, B.sport), 2)) : g);
-    moving(sndSport, 0.0, 44.0, 26.0, 46.0, (d) => engine(d, 0, 44, 62, 420, 0.8, 0.5), 0.55, 10, src, { rev: 0.12, lp: 6500, level: sportLevel });
-    nwave(B.sport, 0.15, 0.8, fx, 5000, 0.4, -0.55);          // (near the source an N-wave lasts ≈ its length ÷ its own speed: 4.5 m ÷ 35 m/s)
-    S.thump(B.sport + 0.01, 0.35, fx);
-    rattle(B.sport + 0.05, 0.9, 0.06, 0.5, fx);
-
-    // 9. the drone: propeller tips at Mach 2.6 → a tearing buzz-saw crackle; then it falls (9.5 m away: 0.28 s late)
-    {
-      const D = T.drone, dp = (t) => { const q = sndDrone(t); return { x: q.x, y: q.y + LAYOUT.curbH, z: q.z }; };
-      moving(dp, D.up, D.down + 0.1, D.up - 0.5, D.down + 2, (d) => {
-        const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(140, D.up); o.frequency.linearRampToValueAtTime(340, D.up + 0.8);
-        for (let t = D.up + 0.8; t < D.down; t += 0.11) o.frequency.linearRampToValueAtTime(330 + 40 * Math.sin(t * 7) + rng.range(-25, 25), t);
-        const ws = ctx.createWaveShaper(), curve = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; curve[i] = Math.tanh(x * 6); } ws.curve = curve;
-        const og = ctx.createGain(); og.gain.setValueAtTime(0, D.up); og.gain.linearRampToValueAtTime(0.4, D.up + 0.5); og.gain.setValueAtTime(0.4, D.down - 0.05); og.gain.linearRampToValueAtTime(0, D.down + 0.05);
-        o.connect(ws); ws.connect(og); og.connect(d); o.start(D.up); o.stop(D.down + 0.2);
-        const cb = ctx.createBufferSource(); cb.buffer = S.crackleBuffer(4, 520); cb.loop = true; const cg = ctx.createGain(), hp = S.filter('highpass', 900, 0.7);
-        cg.gain.setValueAtTime(0, D.up); cg.gain.linearRampToValueAtTime(0.9, D.up + 0.7); cg.gain.setValueAtTime(0.9, D.down - 0.05); cg.gain.linearRampToValueAtTime(0, D.down + 0.05);
-        cb.connect(hp); hp.connect(cg); cg.connect(d); cb.start(D.up); cb.stop(D.down + 0.2);
-      }, 0.5, 5, src, { rev: 0.15 });
-      at(D.down, dp(D.down), 5, (tr, g, pn) => { S.clunk(tr, 0.7 * g * 2.2, pn, src); S.click(tr + 0.12, 0.25 * g * 2.2, pn, src); S.clunk(tr + 0.3, 0.3 * g * 2.2, pn, src); });
-    }
-
-    // 10. the airliner (Mach 2.1): nothing at all until its shock arrives, then a huge double boom and the city's reply
-    nwave(B.plane, 1.0, 0.55, fx, 1500, 0.8, 0.0);             // (a 70 m airliner at 72 m/s: a long boom … boom, ~1 s apart)
-    S.boom(B.plane + 0.02, 0.4, fx, rev);
-    rumble(B.plane + 0.05, 4.5, 0.24, 130, fx);
-    rattle(B.plane + 0.03, 2.2, 0.1, 0, fx);
-    // its engines, heard only from the boom on (receding, ~3× lower), surging
-    moving(sndPlane, 30.0, 60.0, B.plane - 0.5, 70.0, (d) => {
-      const n = S.noise('brown', 30, 60), lp = S.filter('lowpass', 700, 0.6), g = ctx.createGain(); g.gain.value = 1.2; n.connect(lp); lp.connect(g); g.connect(d);
-      const w = S.noise('pink', 30, 60), bp = S.filter('bandpass', 1400, 1.2), wg = ctx.createGain(); wg.gain.value = 0.25; w.connect(bp); bp.connect(wg); wg.connect(d);
-      for (let t = 40; t < 60; t += 0.9 + rng.range(0, 1.3)) S.backfire(t, 0.5, d, false);
-    }, 0.75, 120, src, { rev: 0.4, lp: 3000, gainFn: (te, t) => 1 - 0.7 * MathX.smooth(t, B.plane + 1.2, B.police - 1.5) });   // (it recedes under the police beat)
-    // ... and, as with the police car, what it made on its way in arrives after the boom too, in reverse (fainter)
-    movingEarly(sndPlane, 30.0, B.plane, END - 0.5, (d) => {
-      const n = S.noise('brown', 30, 50), lp = S.filter('lowpass', 700, 0.6), g = ctx.createGain(); g.gain.value = 1.2; n.connect(lp); lp.connect(g); g.connect(d);
-      const w = S.noise('pink', 30, 50), bp = S.filter('bandpass', 1400, 1.2), wg = ctx.createGain(); wg.gain.value = 0.25; w.connect(bp); bp.connect(wg); wg.connect(d);
-    }, 0.35, 120, src, { rev: 0.4, gainFn: (te, t) => 1 - 0.7 * MathX.smooth(t, B.plane + 1.2, B.police - 1.5) });
-    // car alarms in the lot (each starts when the shock reaches that car, heard when its sound reaches you)
-    if (app && app.cast) {
-      const al = app.cast.parked.filter((k) => k.alarm).sort((a, b) => Math.hypot(a.x - 9.4, a.z - 1) - Math.hypot(b.x - 9.4, b.z - 1)).slice(0, 3);
-      al.forEach((k, i) => {
-        const p = { x: k.x, y: 1, z: k.z }, tr = sndArriveFixed(k.tA + 0.25, p), t1 = T.lineA[0] + 0.6, pts = this._spatial(() => p, tr, t1, 1 / 10, 12);
-        // (they keep going, but the mix lets them fall away under the closing line)
-        S.alarm(tr, t1, pts.map((q) => Object.assign({}, q, { gain: q.gain * 0.3 * (1 - MathX.smooth(q.t, T.lineA[0] - 2.5, t1)) })), src, rev, this);
-      });
-      // the pigeons burst off the roof
-      for (const b of app.cast.birds.filter((_, i) => i % 3 === 0)) at(b.tA, { x: b.x, y: b.y, z: b.z }, 14, (tr, g, pn) => S.flap(tr, pn, 0.12 * g * 3, src));
-    }
-
-    // 11. the police car (Mach 1.3): silent while it comes; its shock; the glass; then its siren, low and moaning
-    moving(sndPolice, 40.0, 66.0, B.police - 0.3, END - 0.5, (d) => {
-      const o = ctx.createOscillator(); o.type = 'square';
-      o.frequency.setValueAtTime(700, 40);
-      for (let t = 40; t < 66; t += 2.4) { o.frequency.linearRampToValueAtTime(1400, t + 1.2); o.frequency.linearRampToValueAtTime(700, t + 2.4); }
-      const lp = S.filter('lowpass', 2200, 0.7), g = ctx.createGain(); g.gain.value = 0.55; o.connect(lp); lp.connect(g); g.connect(d); o.start(40); o.stop(66);
-      engine(d, 40, 66, 70, 520, 0.6, 0.35);
-    }, 0.75, 8, src, { rev: 0.3, gainFn: (te, t) => 1 - 0.8 * MathX.smooth(t, T.lineA[0] - 1.0, T.lineA[0] + 1.5) });
-    // ... and after the shock, the sound it made while it came at you arrives too, in reverse and ~3× higher
-    // (the earlier branch of the arrival curve: emitted earlier, heard later), fading as it comes from further away
-    movingEarly(sndPolice, 40.0, B.police, END - 0.5, (d) => {
-      const o = ctx.createOscillator(); o.type = 'square';
-      o.frequency.setValueAtTime(700, 40);
-      for (let t = 40; t < 60; t += 2.4) { o.frequency.linearRampToValueAtTime(1400, t + 1.2); o.frequency.linearRampToValueAtTime(700, t + 2.4); }
-      const lp = S.filter('lowpass', 2200, 0.7), g = ctx.createGain(); g.gain.value = 0.55; o.connect(lp); lp.connect(g); g.connect(d); o.start(40); o.stop(60);
-    }, 0.6, 8, src, { rev: 0.3, gainFn: (te, t) => 1 - 0.8 * MathX.smooth(t, T.lineA[0] - 1.0, T.lineA[0] + 1.5) });
-    nwave(B.police, 0.13, 1.4, fx, 6500, 0.55, 0.5);           // the hardest hit: the closest shock
-    S.thump(B.police + 0.01, 0.95, fx);
-    rumble(B.police + 0.02, 1.8, 0.5, 220, fx);
-    // every pane that bursts or cracks, heard from where it is (the cascade rolls in from down the street)
-    if (app && app.glass) {
-      for (const p of app.glass.panes) {
-        if (!p.fate) continue;
-        const where = { x: p.xf, y: 1.6, z: p.zc };
-        at(p.tf, where, 6, (tr, g, pn) => glass(tr, (p.fate === 2 ? 1.0 : 0.35) * g * 3.2, pn, src, p.fate === 1));
+    at(T.gun.bang, G0, 12, (tr, g, pn) => bang(tr, 6.5 * g, pn, true));
+    echoes(T.gun.bang, G0, 12, (tr, g, pn) => bang(tr, 6.5 * g, pn, false));
+    SND_RUNNERS.forEach((R) => {
+      let k = 1;
+      for (let t = R.go; t < SND.cuts[0] + 1.5; t += 1 / 240) {
+        if (sndRunnerX(R, t) - SND.line.x < k * 1.15) continue;
+        const p = SND_P(sndRunnerX(R, t), 0.05, R.z), tr = arrive(t, p);
+        grain(STEPS[k % 4], tr, 0.5 * lvl(p, tr, 3), panOf(p, tr));
+        k++;
       }
+    });
+
+    // 4. your friend: "Hey! Up here!" — 0.8 s late, and hollow
+    const FM = SND_FRIEND_MOUTH;
+    at(T.friend.shout, FM, 9, (tr, g, pn) => {
+      const v = 4.4 * g;
+      for (const [dt, dur, f0, f1, sd] of [[0, 0.3, 270, 250, 1], [0.42, 0.13, 240, 236, 2], [0.57, 0.42, 280, 228, 3]]) grain(hollowArr(dur, f0, f1, 800 + sd, 0.02, 0.12), tr + dt, v, pn);
+    });
+
+    // 5. the announcer, through five loudspeakers: each copy arrives from its own speaker (three arrivals here)
+    {
+      const syl = [[0, 0.16, 135, 130], [0.17, 0.21, 128, 124], [0.42, 0.14, 132, 128], [0.6, 0.17, 142, 136], [0.78, 0.13, 132, 128], [0.93, 0.38, 124, 108]];
+      const words = syl.map(([, dur, f0, f1], i) => { const x = hollowArr(dur, f0, f1, 900 + i, 0.015, 0.06); return x; });
+      T.pa.speakers.forEach((P, si) => at(T.pa.speak, P, 26, (tr, g, pn) => {
+        syl.forEach(([dt], i) => grain(words[i], tr + dt, 2.6 * g, pn));
+        // the loudspeaker's own horn ring (a little brightness the voice no longer has)
+        const n = S.noise('pink', tr, tr + 1.4), bp = S.filter('bandpass', 1300, 3), gg = ctx.createGain();
+        gg.gain.setValueAtTime(0, tr); gg.gain.linearRampToValueAtTime(0.05 * g * 2.6, tr + 0.03); gg.gain.setValueAtTime(0.05 * g * 2.6, tr + 1.25); gg.gain.linearRampToValueAtTime(0, tr + 1.4);
+        n.connect(bp); bp.connect(gg); gg.connect(S.panned(src, pn)); send(gg, 0.6);
+      }));
     }
 
-    // 12. the score: barely there — a low swell under the supersonic car and the airliner, silence before each shock
+    // 6. the referee's whistle: its note is set by its air chamber — ten times lower, a hoot with the pea's trill
+    const WP = SND_P(T.whistle.x, T.whistle.y, T.whistle.z);
+    const hoot = (tr, g, pn) => {
+      const o = ctx.createOscillator(), o2 = ctx.createOscillator(), am = ctx.createOscillator(), amg = ctx.createGain(), g2 = ctx.createGain(), og = ctx.createGain(), P = S.panned(src, pn);
+      o.type = 'triangle'; o.frequency.setValueAtTime(330, tr); o.frequency.linearRampToValueAtTime(352, tr + 0.08); o.frequency.setValueAtTime(352, tr + 0.75); o.frequency.linearRampToValueAtTime(320, tr + 0.95);
+      o2.type = 'sine'; o2.frequency.value = 704;
+      am.frequency.value = 27; amg.gain.value = 0.45; am.connect(amg); amg.connect(og.gain);
+      og.gain.setValueAtTime(0, tr); og.gain.linearRampToValueAtTime(g * 0.55, tr + 0.04); og.gain.setValueAtTime(g * 0.55, tr + 0.8); og.gain.linearRampToValueAtTime(0, tr + 0.98);
+      g2.gain.value = 0.12; o2.connect(g2); g2.connect(og);
+      o.connect(og); og.connect(P); send(og, 0.5);
+      for (const x of [o, o2, am]) { x.start(tr); x.stop(tr + 1.05); }
+    };
+    at(T.whistle.t, WP, 10, (tr, g, pn) => hoot(tr, 3.2 * g, pn));
+    echoes(T.whistle.t, WP, 10, (tr, g, pn) => hoot(tr, 2.4 * g, pn));
+
+    // 7. the shot: the ball outruns its own sound — a crack (its shock, as it drops through Mach 1), the kick's deep
+    //    "dum" (the ball's air rings ten times lower), the net
+    {
+      const K = T.kick, KP = SND_P(K.x, 0.15, K.z), N = SND_NET, NP = SND_P(N.back, N.y, N.z);
+      const crack = (tr, g, pn) => {
+        const n = S.noise('white', tr, tr + 0.05), hp = S.filter('highpass', 1600, 0.7), gg = ctx.createGain();
+        S.env(gg, tr, 0.0005, g, 0.012); n.connect(hp); hp.connect(gg); gg.connect(S.panned(fx, pn)); send(gg, 0.35);
+      };
+      { const tr = H.ball, p = sndBall(SND_BALL.tMach1); crack(tr, 1.6, panOf(p, tr)); }
+      at(K.t, KP, 8, (tr, g, pn) => {
+        const P = S.panned(src, pn), o = ctx.createOscillator(), og = ctx.createGain();
+        o.frequency.setValueAtTime(96, tr); o.frequency.exponentialRampToValueAtTime(70, tr + 0.3); S.env(og, tr, 0.003, 4.5 * g, 0.35); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.5); send(og, 0.4);
+        const n = S.noise('pink', tr, tr + 0.1), lp = S.filter('lowpass', 900, 0.7), ng = ctx.createGain(); S.env(ng, tr, 0.001, 3.2 * g, 0.05); n.connect(lp); lp.connect(ng); ng.connect(P);
+      });
+      at(N.tN, NP, 6, (tr, g, pn) => {
+        const n = S.noise('white', tr, tr + 0.6), bp = S.filter('bandpass', 1500, 0.8), gg = ctx.createGain();
+        gg.gain.setValueAtTime(0, tr); gg.gain.linearRampToValueAtTime(1.3 * g, tr + 0.02); gg.gain.setTargetAtTime(0, tr + 0.04, 0.12);
+        n.connect(bp); bp.connect(gg); gg.connect(S.panned(src, pn));
+      });
+    }
+
+    // 8. the crowd: the cheer after the goal (everyone SEES it at once; you hear the stands one after another),
+    //    the claps (each fan claps when the drum reaches IT), the gasps when the thunder reaches each seat
+    const fans = app && app.crowd ? app.crowd.fans : [];
+    fans.forEach((f, i) => {
+      if (i % 17 === 0 && f.tGoal < 1e5) {
+        const tr = arrive(f.tGoal + 0.08, f.head);
+        grain(CHEERS[i % 5], tr, 0.55 * lvl(f.head, tr, 10), panOf(f.head, tr));
+      }
+      if (i % 13 === 0 && f.clapper) {
+        for (let k = 0; k < T.drum.n; k++) {
+          const te = T.drum.t0 + k * T.drum.period + f.tDrum + 0.09, tr = arrive(te, f.head);
+          if (tr > END - 0.5) break;
+          grain(CLAPS[(i + k) % 6], tr, 0.5 * lvl(f.head, tr, 5), panOf(f.head, tr));
+        }
+      }
+      if (i % 19 === 0) {
+        const tr = arrive(f.tThunder + 0.12, f.head);
+        grain(GASPS[i % 4], tr, 0.5 * lvl(f.head, tr, 8), panOf(f.head, tr));
+      }
+    });
+
+    // 9. the drum: a deep bass drum, every beat heard from where it is
+    for (let k = 0; k < T.drum.n; k++) at(T.drum.t0 + k * T.drum.period, SND_DRUM, 12, (tr, g, pn) => {
+      const P = S.panned(src, pn), o = ctx.createOscillator(), og = ctx.createGain();
+      o.frequency.setValueAtTime(78, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25); S.env(og, tr, 0.003, 5.5 * g, 0.4); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.6); send(og, 0.45);
+      const n = S.noise('pink', tr, tr + 0.08), lp = S.filter('lowpass', 500, 0.7), ng = ctx.createGain(); S.env(ng, tr, 0.001, 2.2 * g, 0.05); n.connect(lp); lp.connect(ng); ng.connect(P);
+    });
+
+    // the grains, played
+    {
+      const buf = ctx.createBuffer(2, NS, SR); buf.copyToChannel(G[0], 0); buf.copyToChannel(G[1], 1);
+      const s = ctx.createBufferSource(); s.buffer = buf; s.connect(crowd); s.start(0);
+    }
+
+    // 10. the thunder (the flash under the title, 1.94 km away): a crack, then a roll that would go on for a minute
+    {
+      const pn = panOf(SND_BOLT, tT);
+      // the crack: a sharp tearing front, then the first heavy boom
+      const n = S.noise('white', tT, tT + 0.8), hp = S.filter('highpass', 500, 0.6), g = ctx.createGain();
+      g.gain.setValueAtTime(0, tT); g.gain.linearRampToValueAtTime(1.6, tT + 0.004); g.gain.setTargetAtTime(0, tT + 0.01, 0.05);
+      n.connect(hp); hp.connect(g); g.connect(S.panned(fx, pn)); send(g, 0.6);
+      S.boom(tT + 0.02, 1.0, fx, rev);
+      S.thump(tT + 0.01, 0.9, fx);
+      // the roll: brown noise through a low filter, in uneven waves (sound from further up the bolt, and its branches)
+      const roll = S.noise('brown', tT, END), rl = S.filter('lowpass', 260, 0.8), rg = ctx.createGain(), mid = S.noise('pink', tT, END), ml = S.filter('lowpass', 900, 0.6), mg = ctx.createGain();
+      roll.connect(rl); rl.connect(rg); rg.connect(S.panned(fx, pn * 0.6)); send(rg, 0.5);
+      mid.connect(ml); ml.connect(mg); mg.connect(S.panned(fx, pn * 0.4));
+      rg.gain.setValueAtTime(0, tT); rg.gain.linearRampToValueAtTime(1.5, tT + 0.06);
+      mg.gain.setValueAtTime(0, tT); mg.gain.linearRampToValueAtTime(0.5, tT + 0.03); mg.gain.setTargetAtTime(0.05, tT + 0.2, 0.8);
+      const peaks = [[0.9, 1.25], [2.1, 1.0], [3.4, 1.15], [5.2, 0.8], [6.9, 0.9], [8.6, 0.6]];
+      let lv = 1.5;
+      rg.gain.setTargetAtTime(0.55, tT + 0.1, 0.35);
+      for (const [dt, a] of peaks) { const t0 = tT + dt; if (t0 > END - 0.5) break; rg.gain.setTargetAtTime(a, t0 - 0.3, 0.12); rg.gain.setTargetAtTime(a * 0.45, t0 + 0.2, 0.4); lv = a; }
+      rg.gain.setTargetAtTime(0, END - 0.6, 0.15); mg.gain.setTargetAtTime(0, END - 0.6, 0.15);
+    }
+
+    // 11. the score: almost nothing — a low swell under the wait for the thunder, silence just before it,
+    //     a quiet chord under the closing line
     const pad = (t0, t1, notes, vol) => { for (const f of notes) S.tone(t0, t1 - t0, f, vol, 0, mus, 'sine', (t1 - t0) * 0.45, (t1 - t0) * 0.35); };
-    pad(29.5, B.sport - 0.15, [55, 82.4], 0.05);
-    pad(44.5, 50.5, [49, 73.4, 98], 0.045);
-    pad(55.4, B.police - 0.2, [58.3, 87.3], 0.045);
-    // the closing chord under the line
-    for (const f of [110, 164.8, 220, 277.2]) S.tone(T.lineA[0] - 0.3, 6.6, f, 0.032, 0, mus, 'sine', 1.4, 2.6);
+    pad(44.2, 52.5, [55, 82.4], 0.05);
+    pad(51.5, tT - 0.45, [58.3, 87.3, 116.5], 0.05);
+    for (const f of [110, 164.8, 220, 277.2]) S.tone(T.lineA[0] - 0.3, 6.8, f, 0.03, 0, mus, 'sine', 1.4, 2.6);
   }
 }

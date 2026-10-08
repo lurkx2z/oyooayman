@@ -1,327 +1,241 @@
 /* =====================================================================
-   CAST — the friend across the street, walkers, the drone pilot, the site crew; the avenue's traffic,
-   the ambulance, the police car; the highway's traffic, the 110 km/h car and the car that goes supersonic;
-   the parked cars in the lot (their alarms go off); the drone; pigeons on a roof.
-   People react to each boom when it reaches THEM (sndPoliceBoomAt / sndPlaneBoomAt), not when it reaches you.
+   CAST — the people you see up close (full rigs): the 30 runners and the starter (shot 1), your friend and
+   their neighbours (2), the referee, the free-kick taker, the wall and the keeper (4), the drummer (5),
+   the players and your neighbours in the stand (6), and the ball. Each one is shown only in its shots.
+   Everyone reacts to a sound when it reaches THEM (script.js: sndHeardAt / sndThunderAt), never when it
+   reaches you; to the goal they react at once (they see it).
    ===================================================================== */
 
-// (when each shock front reaches a point: sndPoliceBoomAt / sndPlaneBoomAt / sndSportBoomAt in script.js)
-
-// --- film poses (add to the shared rig) --------------------------------------------------------------------------
+// --- film poses (added to the shared rig; names are this film's) --------------------------------------------
 Object.assign(ACTIONS, {
-  // claps: hands meet 0.15 s after the action starts, then every 0.6 s
-  clap(τ, c) {
-    const p = ACTIONS.idle(τ, c), ph = ((τ - 0.15) / 0.6 % 1 + 1) % 1;
-    const open = ph < 0.5 ? MathX.smooth(ph, 0.0, 0.45) : 1 - MathX.smooth(ph, 0.55, 1.0);
-    const a = -0.32 + 0.6 * open;
-    p.lSh = [1.2, a]; p.rSh = [1.2, a]; p.lEl = 0.95 + 0.25 * open; p.rEl = 0.95 + 0.25 * open;
-    p.spine = 0.02; p.neck = -0.02; p.headYaw = 0;
+  sndSet(τ, c) {          // a standing start: weight forward, one arm forward, waiting for the gun
+    const p = basePose(), w = 0.012 * Math.sin(τ * 1.7 + c.seed * 9);
+    p.hipY = 0.84; p.spine = 0.5 + w; p.neck = -0.32;
+    p.lHip = [0.42, 0.04]; p.rHip = [-0.32, 0.04]; p.lKnee = 0.75; p.rKnee = 0.5; p.lFoot = -0.1; p.rFoot = 0.2;
+    p.lSh = [-0.55, 0.1]; p.rSh = [0.85, 0.1]; p.lEl = 1.1; p.rEl = 1.3;
     return p;
   },
-  wave(τ, c) {
+  sndSprint(τ, c) {
+    const p = basePose(), φ = c.walkPhase, s = Math.sin(φ), co = Math.cos(φ), k = MathX.smooth(τ, 0, 1.2);
+    p.lHip = [0.85 * s, 0.03]; p.rHip = [-0.85 * s, 0.03];
+    p.lKnee = 0.35 + 1.25 * Math.max(0, co) ** 1.2; p.rKnee = 0.35 + 1.25 * Math.max(0, -co) ** 1.2;
+    p.lFoot = 0.25 * Math.max(0, -co); p.rFoot = 0.25 * Math.max(0, co);
+    p.lSh = [-0.85 * s, 0.1]; p.rSh = [0.85 * s, 0.1]; p.lEl = 1.45; p.rEl = 1.45;
+    p.spine = 0.42 - 0.2 * k; p.neck = -0.25 + 0.15 * k; p.hipY = 0.88 + 0.04 * Math.abs(co);
+    return p;
+  },
+  sndStarter(τ, c) {      // the gun held up overhead (fired at SND.gun.bang: a kick of the arm)
+    const p = ACTIONS.idle(τ, c), r = MathX.impulse(τ, SND.gun.bang - SND.gun.set, 0.12);
+    p.rSh = [2.85 - 0.25 * r, 0.25]; p.rEl = 0.15 + 0.4 * r; p.lSh = [0.2, 0.1]; p.lEl = 0.5; p.neck = 0.05; p.headYaw = 0.35;
+    return p;
+  },
+  sndWave(τ, c) {
     const p = ACTIONS.idle(τ, c);
-    p.rSh = [2.55, 0.42]; p.rEl = 0.55 + 0.4 * Math.sin(τ * 10); p.lSh = [0.1, 0.1]; p.headYaw = 0; p.neck = -0.05;
+    p.rSh = [2.6, 0.45]; p.rEl = 0.5 + 0.45 * Math.sin(τ * 9); p.lSh = [0.12, 0.1]; p.headYaw = 0; p.neck = -0.06;
     return p;
   },
-  shout(τ, c) {
-    const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.25);
-    p.lSh = [1.35 * k, 0.45 * k]; p.rSh = [1.35 * k, 0.45 * k]; p.lEl = 2.25 * k; p.rEl = 2.25 * k;
-    p.spine = -0.08 * k; p.neck = -0.2 * k; p.mouth = 1; p.headYaw = 0;
+  sndShout(τ, c) {        // hands cupped round the mouth, leaning in
+    const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.2);
+    p.lSh = [1.3 * k, 0.42 * k]; p.rSh = [1.3 * k, 0.42 * k]; p.lEl = 2.3 * k; p.rEl = 2.3 * k;
+    p.spine = 0.1 * k; p.neck = -0.12 * k; p.mouth = 1; p.headYaw = 0;
     return p;
   },
-  lookUp(τ, c) {
+  sndWhistle(τ, c) {
+    const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.2);
+    p.rSh = [1.45 * k, 0.32 * k]; p.rEl = 2.35 * k; p.neck = -0.05; p.headYaw = 0;
+    return p;
+  },
+  sndPoint(τ, c) {
+    const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.3);
+    p.rSh = [1.45 * k, 0.05]; p.rEl = 0.1; p.headYaw = 0.1;
+    return p;
+  },
+  sndKick(τ, c) {         // the strike lands at τ = 0.1
+    const p = basePose(), a = MathX.smooth(τ, 0, 0.1), b = MathX.smooth(τ, 0.1, 0.32), r = MathX.smooth(τ, 0.45, 1.0);
+    p.rHip = [(-0.85 + 1.3 * a + 0.9 * b) * (1 - r), 0.05]; p.rKnee = (1.5 - 1.25 * a) * (1 - r) + 0.05;
+    p.lHip = [0.25 * (1 - r), 0.05]; p.lKnee = 0.35 * (1 - r) + 0.05;
+    p.spine = -0.12 * (1 - r); p.lSh = [0.55, 0.95 * (1 - r) + 0.1]; p.rSh = [-0.3, 0.7 * (1 - r) + 0.1]; p.lEl = 0.4; p.rEl = 0.4;
+    p.hipY = 0.9;
+    return p;
+  },
+  sndCelebrate(τ, c) {    // running off with the arms out
+    const p = ACTIONS.jog(τ, c);
+    p.lSh = [0.15, 1.35]; p.rSh = [0.15, 1.35]; p.lEl = 0.15; p.rEl = 0.15; p.spine = 0.05; p.neck = -0.15;
+    return p;
+  },
+  sndWall(τ, c) {         // hands covering, a jump as the ball is struck (the root is lifted in update)
     const p = ACTIONS.idle(τ, c);
-    p.neck = -0.55 + 0.06 * Math.sin(τ * 0.8 + c.seed * 5); p.spine = -0.08; p.headYaw = noise1(τ * 0.3, c.seedI) * 0.25;
+    p.lSh = [0.35, -0.12]; p.rSh = [0.35, -0.12]; p.lEl = 0.5; p.rEl = 0.5; p.spine = 0.08; p.headYaw = 0;
     return p;
   },
-  pointUp(τ, c) {
-    const p = ACTIONS.lookUp(τ, c), k = Math.min(1, τ / 0.5);
-    p.rSh = [2.35 * k, 0.25]; p.rEl = 0.15;
+  sndKeeper(τ, c) {
+    const p = basePose(), w = Math.sin(τ * 6) * 0.03;
+    p.hipY = 0.84; p.spine = 0.28; p.neck = -0.2; p.lHip = [0.3, 0.25]; p.rHip = [0.3, 0.25]; p.lKnee = 0.6 + w; p.rKnee = 0.6 - w;
+    p.lSh = [0.45, 0.55]; p.rSh = [0.45, 0.55]; p.lEl = 0.6; p.rEl = 0.6;
     return p;
   },
-  pilot(τ, c) {     // holding the controller at the chest, looking at the drone
-    const p = ACTIONS.idle(τ, c);
-    p.lSh = [0.62, 0.05]; p.rSh = [0.62, 0.05]; p.lEl = 1.7; p.rEl = 1.7; p.neck = 0.12; p.headYaw = 0.1 * Math.sin(τ * 0.7);
+  sndDive(τ, c) {         // late, to his left (+x in the rig)
+    const p = basePose(), k = MathX.smooth(τ, 0, 0.35);
+    p.rootRoll = -1.15 * k; p.hipY = 0.84 - 0.32 * k; p.spine = 0.1;
+    p.lSh = [2.7 * k, 0.3]; p.rSh = [2.6 * k, 0.2]; p.lEl = 0.2; p.rEl = 0.2;
+    p.lHip = [0.2, 0.5 * k]; p.rHip = [0.1, 0.1]; p.lKnee = 0.3; p.rKnee = 0.6;
     return p;
   },
-  pilotUp(τ, c) { const p = ACTIONS.pilot(τ, c); p.neck = -0.35; return p; },
-  // the shock hits: a flinch with the hands up to the ears, then a crouch
-  duck(τ, c) {
-    const p = basePose(), k = Math.min(1, τ / 0.18), cr = MathX.smooth(τ, 0.1, 0.6);
-    p.lSh = [1.9 * k, 0.55]; p.rSh = [1.9 * k, 0.55]; p.lEl = 2.45 * k; p.rEl = 2.45 * k;
-    p.spine = 0.25 + 0.35 * cr; p.neck = 0.35; p.hipY = 0.93 - 0.28 * cr;
-    p.lHip = [0.55 * cr, 0.12]; p.rHip = [0.5 * cr, 0.12]; p.lKnee = 1.1 * cr; p.rKnee = 1.0 * cr; p.lFoot = 0.3 * cr; p.rFoot = 0.3 * cr;
+  // the drummer: the left hand steadies the drum, the right swings down on every beat (beats every SND.drum.period)
+  sndDrum(τ, c) {
+    const p = ACTIONS.idle(τ, c), D = SND.drum, u = τ - 0.5, k = Math.floor(u / D.period), ph = u - k * D.period;
+    let a = 1.7;
+    if (u >= -0.4 && k < D.n) a = u < 0 ? 1.7 : ph < 0.55 ? 0.75 + 0.95 * MathX.smooth(ph, 0.04, 0.5) : 1.7 - 0.95 * MathX.smooth(ph, 0.6, D.period);
+    else if (k >= D.n) a = 0.75 + 0.6 * MathX.smooth(u - D.n * D.period, 0, 0.6);
+    p.rSh = [a, 0.35]; p.rEl = 0.9; p.lSh = [0.65, 0.2]; p.lEl = 1.3; p.spine = 0.08; p.neck = 0.1; p.headYaw = 0.2;
     return p;
   },
-  flinchUp(τ, c) {     // a short startle while standing (arms half up), then looking about
-    const p = ACTIONS.idle(τ, c), k = Math.exp(-τ / 0.5) * Math.min(1, τ / 0.08);
-    p.lSh = [0.9 * k, 0.35 * k]; p.rSh = [0.9 * k, 0.35 * k]; p.lEl = 1.6 * k; p.rEl = 1.6 * k; p.spine = 0.18 * k; p.neck = 0.2 * k;
-    p.headYaw = (1 - k) * Math.sin(τ * 1.4 + c.seed * 3) * 0.6;
+  // the thunder hits: a flinch with the hands to the ears and a crouch, then up again looking round
+  sndDuck(τ, c) {
+    const p = basePose(), k = Math.min(1, τ / 0.14), back = MathX.smooth(τ, 1.6, 3.2), cr = MathX.smooth(τ, 0.08, 0.5) * (1 - back), kk = k * (1 - back * 0.85);
+    p.lSh = [1.9 * kk, 0.55]; p.rSh = [1.9 * kk, 0.55]; p.lEl = 2.45 * kk; p.rEl = 2.45 * kk;
+    p.spine = 0.2 + 0.35 * cr; p.neck = 0.3 * (1 - back); p.hipY = 0.93 - 0.22 * cr;
+    p.lHip = [0.45 * cr, 0.1]; p.rHip = [0.4 * cr, 0.1]; p.lKnee = 0.9 * cr; p.rKnee = 0.8 * cr; p.lFoot = 0.25 * cr; p.rFoot = 0.25 * cr;
+    p.headYaw = back * Math.sin(τ * 1.3 + c.seed * 4) * 0.7;
+    return p;
+  },
+  sndWatch(τ, c) {        // a fan watching the match: weight shifts, a hand to the mouth now and then
+    const p = ACTIONS.idle(τ, c), h = Math.max(0, Math.sin(τ * 0.4 + c.seed * 9)) ** 6;
+    p.rSh = [0.2 + 1.2 * h, 0.15]; p.rEl = 0.3 + 1.9 * h; p.headYaw = noise1(τ * 0.25, c.seedI) * 0.35;
     return p;
   },
 });
-Object.assign(BLEND, { clap: 0.25, wave: 0.3, shout: 0.18, lookUp: 0.8, pointUp: 0.4, pilot: 0.5, pilotUp: 0.6, duck: 0.08, flinchUp: 0.06 });
-Object.assign(LOOKS, {
-  sndFriend: { skin: 1, build: 'avg', shirt: '#b8862c', sleeves: 'long', pants: '#2c3440', shoes: '#d8d4ca', sole: '#f0ede6', hair: '#2a1a12', jacket: true, collar: true, inner: '#e8e2d4' },
-  sndPilot: { skin: 4, build: 'avg', shirt: '#3b5f7a', sleeves: 'long', pants: '#3a3a36', shoes: '#cfcac0', sole: '#e8e4dc', hair: '#111', hat: { type: 'cap', color: '#a33a2a' }, backpack: '#2b2e30' },
-  sndCop: { skin: 2, build: 'broad', shirt: '#22344f', sleeves: 'long', pants: '#1c2533', shoes: '#111', sole: '#222', hair: '#1a1410' },
-});
+Object.assign(BLEND, { sndSet: 0.6, sndSprint: 0.14, sndStarter: 0.5, sndWave: 0.3, sndShout: 0.16, sndWhistle: 0.15, sndPoint: 0.3, sndKick: 0.08, sndCelebrate: 0.4,
+  sndWall: 0.4, sndKeeper: 0.4, sndDive: 0.08, sndDrum: 0.4, sndDuck: 0.06, sndWatch: 0.6 });
 
-// --- the cast: [id, look, path [[t,x,z]...], states, face?] ------------------------------------------------------
-const SND_PEOPLE = [
-  ['F', 'sndFriend', [[0, SND.friend.x, SND.friend.z]], [[0, 'idle'], [0.4, 'clap'], [3.15, 'idle'], [4.2, 'wave'], [4.95, 'clap'], [6.6, 'idle'], [7.1, 'shout'], [8.3, 'wave'], [9.5, 'idle'], [11.5, 'look']], -140],
-  ['P', 'sndPilot', [[0, SND.pilot.x, SND.pilot.z]], [[0, 'pilot'], [SND.drone.up - 0.2, 'pilotUp'], [SND.drone.fall + 0.25, 'pilot']], 137],
-  // walkers on your sidewalk: one comes toward you under the title and passes on your right; one walks away
-  // down the avenue later (they never cross the views you look along)
-  ['W1', 'casual6', [[0, 11.5, -14], [12, 11.5, 14], [40, 11.6, 48]], [[0, 'walk']]],
-  ['W3', 'casual3', [[40, 11.4, 10], [71, 11.4, -28]], [[0, 'walk']]],
-  // across the street
-  ['L1', 'casual2', [[0, -10.6, 8], [45, -10.6, -40], [71, -10.6, -62]], [[0, 'walk']]],
-  ['L2', 'casual8', [[0, -9.4, -60], [52, -9.4, 6], [71, -9.4, 26]], [[0, 'walk']]],
-  ['L3', 'casual5', [[0, -11.2, -66], [71, -11.2, -18]], [[0, 'walk']]],   // (never beside the friend while you watch them)
-  ['L4', 'casual7', [[0, -10.2, -12], [30, -10.2, -12]], [[0, 'idle'], [20, 'look']], 110],
-  ['B1', 'casual6', [[0, -10.6, -44.5]], [[0, 'phone']], 80],
-  ['B2', 'casual1', [[0, -10.9, -42.2]], [[0, 'idle'], [15, 'look']], 95],
-  // lot: a couple walking to their car
-  ['C1', 'casual7', [[0, 24.5, -40], [40, 24.5, -8], [71, 24.5, -8]], [[0, 'walk']]],
-  ['C2', 'casual3', [[0, 25.3, -41], [40, 25.3, -9], [71, 25.3, -9]], [[0, 'walk']]],
-  // the site crew by the pile driver
-  ['S1', 'worker', [[0, 36.5, -89]], [[0, 'idle']], -60],
-  ['S2', 'worker', [[0, 43.5, -92.5]], [[0, 'look']], 80],
-];
+// looks: runners in bright tops, two kits, the referee, the keeper, the friend, fans
+(() => {
+  const tops = ['#d8433a', '#2f78c4', '#f2f0e8', '#3fa35a', '#f0a531', '#7a4bb0', '#1f2a36', '#e86fa0', '#20a3a8', '#e4e0d8'];
+  tops.forEach((c, i) => { LOOKS['sndRun' + i] = { skin: i % 6, build: ['slim', 'avg', 'slim', 'broad'][i % 4], shirt: c, sleeves: 'short', pants: ['#1d2026', '#2b3a55', '#3a3a3a'][i % 3], shoes: '#e8e6e0', sole: '#f4f2ee', hair: ['#1b1410', '#4a3220', '#9c7a4a', '#151515'][i % 4], hairStyle: ['short', 'pony', 'short', 'bun', 'short'][i % 5] }; });
+  Object.assign(LOOKS, {
+    sndHome: { skin: 2, build: 'avg', shirt: '#e2b82e', sleeves: 'short', pants: '#1f2f52', shoes: '#111', sole: '#222', hair: '#1b1410' },
+    sndHome2: { skin: 4, build: 'avg', shirt: '#e2b82e', sleeves: 'short', pants: '#1f2f52', shoes: '#111', sole: '#222', hair: '#111' },
+    sndAway: { skin: 0, build: 'avg', shirt: '#c23a30', sleeves: 'short', pants: '#efeee8', shoes: '#111', sole: '#222', hair: '#4a3220' },
+    sndAway2: { skin: 3, build: 'broad', shirt: '#c23a30', sleeves: 'short', pants: '#efeee8', shoes: '#111', sole: '#222', hair: '#151515' },
+    sndRef: { skin: 1, build: 'avg', shirt: '#151719', sleeves: 'short', pants: '#151719', shoes: '#111', sole: '#222', hair: '#3a2a1e' },
+    sndKeeperL: { skin: 5, build: 'broad', shirt: '#3fae5a', sleeves: 'long', pants: '#1d2026', shoes: '#111', sole: '#222', hair: '#6b4a2c', gloves: '#f2f0e8' },
+    sndFriend: { skin: 1, build: 'avg', shirt: '#e2b82e', sleeves: 'long', pants: '#2c3440', shoes: '#d8d4ca', sole: '#f0ede6', hair: '#2a1a12', jacket: true, collar: true, inner: '#1f2f52', scarf: '#1f2f52' },
+    sndStarterL: { skin: 3, build: 'broad', shirt: '#f2f0e8', sleeves: 'long', pants: '#1d2026', shoes: '#111', sole: '#222', hair: '#151515', hat: { type: 'cap', color: '#c4362e' } },
+    sndFanA: { skin: 0, build: 'avg', shirt: '#e2b82e', sleeves: 'long', pants: '#2a2f38', shoes: '#3a3633', sole: '#c9c4b8', hair: '#4a3220', jacket: true, collar: true, scarf: '#1f2f52' },
+    sndFanB: { skin: 2, build: 'slim', shirt: '#1f2f52', sleeves: 'long', pants: '#1f1f24', shoes: '#111', sole: '#2a2a2a', hair: '#2a1a12', hairStyle: 'long', scarf: '#e2b82e' },
+    sndFanC: { skin: 4, build: 'broad', shirt: '#d9d6cc', sleeves: 'short', pants: '#39435a', shoes: '#cfcac0', sole: '#e8e4dc', hair: '#111', hat: { type: 'cap', color: '#1f2f52' } },
+    sndFanD: { skin: 1, build: 'avg', shirt: '#3c5a46', sleeves: 'long', pants: '#454d58', shoes: '#c8c3b8', sole: '#e6e2da', hair: '#7a5c40', hood: true, jacket: true },
+    sndFanE: { skin: 5, build: 'slim', shirt: '#e2b82e', sleeves: 'short', pants: '#22262c', shoes: '#d8d4ca', sole: '#f0ede6', hair: '#9c7a4a', hairStyle: 'pony' },
+  });
+})();
+
+// facing (the rig's `face`, degrees) to look from (x0, z0) toward (x1, z1)
+function sndFace(x0, z0, x1, z1) { return (Math.atan2(x1 - x0, z1 - z0) - Math.PI) * 180 / Math.PI; }
 
 class SndCast {
   constructor(app) {
     const scene = app.scene;
     this.app = app;
-    // people (+ when each boom reaches each of them → their reaction)
-    this.people = SND_PEOPLE.map(([id, look, path, states, face]) => {
-      const st = states.slice();
-      const p0 = path[path.length - 1], lead = path[0];
-      const posAt = (t) => { let q = path[0]; for (let i = 1; i < path.length; i++) if (path[i][0] <= t) q = path[i]; return q; };
-      // the airliner's shock: a startle; the police car's (closer, stronger, the glass going): a duck; then looking about
-      const cut = 54.2;
-      if (id !== 'S1' && id !== 'S2') {
-        const pAt = (t) => {   // position at time t (they stop walking at the first shock)
-          t = Math.min(t, cut);
-          for (let i = 1; i < path.length; i++) if (t <= path[i][0]) { const a = path[i - 1], b = path[i], f = (t - a[0]) / (b[0] - a[0]); return [a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f]; }
-          return [p0[1], p0[2]];
-        };
-        const [qx, qz] = pAt(cut), tQ = sndPlaneBoomAt(qx, qz), tP = sndPoliceBoomAt(qx, qz);
-        const keep = st.filter((s) => s[0] < Math.min(tQ, cut));
-        keep.push([tQ, 'flinchUp'], [tP, 'duck'], [tP + 2.4 + hash1(id.charCodeAt(0) * 7 + id.length) * 1.2, 'look']);
-        st.length = 0; st.push(...keep);
-      }
-      // reacting people stop walking where they are
-      let pth = path;
-      if (path.length > 1 && id !== 'S1' && id !== 'S2') {
-        const out = [];
-        for (const k of path) if (k[0] < cut) out.push(k);
-        const a = path.find((k) => k[0] >= cut);
-        if (a && out.length) { const b = out[out.length - 1], f = (cut - b[0]) / (a[0] - b[0]); out.push([cut, b[1] + (a[1] - b[1]) * f, b[2] + (a[2] - b[2]) * f]); }
-        pth = out.length > 1 ? out : path;
-      }
-      return new Person({ id, look, y: LAYOUT.curbH, path: pth, states: st, face, faceUntil: undefined }, scene);
+    this.list = [];                         // { p: Person, shots: [...], lift: fn(t) }
+    const add = (spec, shots, lift) => { const p = new Person(spec, scene); this.list.push({ p, shots, lift }); return p; };
+    const E = SND_EYE;
+
+    // 1. the runners (each goes when the bang reaches it) and the starter
+    SND_RUNNERS.forEach((R) => {
+      const path = [[0, SND.line.x, R.z], [R.go, SND.line.x, R.z]];
+      for (let t = R.go + 0.1; t <= SND.cuts[0] + 0.2; t += 0.1) path.push([+t.toFixed(3), sndRunnerX(R, t), R.z]);
+      add({ id: 'run' + R.i, look: 'sndRun' + (R.i * 7 % 10), path, states: [[0, 'sndSet'], [R.go, 'sndSprint']], stride: 2.3 }, [0]);
     });
-    this.shadows = new BlobShadows(scene, 64);
+    this.starter = add({ id: 'starter', look: 'sndStarterL', path: [[0, SND.gun.x + 0.35, SND.gun.z]], states: [[0, 'idle'], [SND.gun.set, 'sndStarter'], [SND.gun.bang + 1.4, 'idle']], face: sndFace(SND.gun.x, SND.gun.z, 0, 0) }, [0]);
+    { const gun = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.12, 0.2), Mat.std('#16181a', { roughness: 0.4, metalness: 0.5 })); gun.position.set(0, -0.08, 0.06); this.starter.j.ra.hand.add(gun); }
 
-    const F = new VehicleFactory();
-    const mk = (type, color, name) => { const c = F.build(type, color); c.group.name = 'veh:' + (name || type); scene.add(c.group); return c; };
-    // --- avenue traffic: lane x, start z, speed m/s (+ = toward you); everybody slows when the booms hit
-    //     (the two SUVs cross your line to the friend before 1 s, so nothing hides the claps slipping late under the title)
-    const lanes = [
-      ['sedan', '#6c7a86', 1.75, -10, -12.0], ['suv', '#3d4a44', 5.25, -6, -11.0], ['hatch', '#8a4a3c', 1.75, 175, -12.5], ['van', '#c9c4b8', 5.25, -80, -10.5],
-      ['taxi', '#c4a24c', 1.75, -120, -12.0], ['ev', '#2f5d6a', 5.25, 120, -11.5], ['sedan', '#2b2f36', 1.75, 140, -12.2], ['hatch', '#5e6b52', 5.25, 220, -11.0],
-      ['pickup', '#7a6a58', 1.75, 250, -12.0], ['sedan', '#9a9a94', 5.25, 330, -11.5], ['suv', '#5a3a36', 1.75, 380, -12.4], ['taxi', '#c4a24c', 5.25, 460, -11.2],
-      ['suv', '#4a5866', -5.25, -25, 11.5], ['sedan', '#8c8a84', -5.25, -150, 12.0], ['hatch', '#3a4c5c', -5.25, -260, 11.0], ['van', '#d8d2c4', -5.25, -380, 11.5],
-      ['sedan', '#6a3a34', -5.25, -500, 12.0], ['ev', '#c8c8c2', -5.25, -620, 11.2], ['sedan', '#2c3a2e', -5.25, -760, 12.0],
-      ['hatch', '#6b6f78', -5.25, -880, 12.5], ['sedan', '#384048', -5.25, 60, 12.0],
-    ];
-    this.cars = lanes.map(([type, color, x, z0, v], i) => ({ c: mk(type, color), x, z0, v, i, table: null }));
-    for (const k of this.cars) k.table = this._driveTable(k);
-    // two drivers who stop dead after a shock, in the view you end on (brake lights, hazards): the near one at the
-    // airliner's (so it is standing still, out of the way, when the police car comes), the far one at the police car's.
-    // Each one's start is solved so it comes to rest at its spot
-    for (const [type, color, x, v, zEnd, stopAt] of [['sedan', '#5d6f7e', 1.75, -11.8, -12.5, 'plane'], ['suv', '#8a8478', -5.25, 11.2, -21.5, 'police']]) {
-      const k = { c: mk(type, color), x, v, i: this.cars.length, stop: true, stopAt, z0: 0, table: null };
-      let lo = zEnd - v * 80, hi = zEnd;
-      if (lo > hi) [lo, hi] = [hi, lo];
-      for (let it = 0; it < 36; it++) { k.z0 = (lo + hi) / 2; const zt = this._driveTable(k), zf = zt[zt.length - 1]; if ((zf - zEnd) * Math.sign(v) > 0) { if (v > 0) hi = k.z0; else lo = k.z0; } else { if (v > 0) lo = k.z0; else hi = k.z0; } }
-      k.table = this._driveTable(k);
-      this.cars.push(k);
+    // 2. your friend (row 11), and the people round them
+    const F = SND.friend, fy = sndSideSeat(1, F.row, 0).y, faceF = sndFace(F.x, F.z, E[1].x, E[1].z);
+    this.friend = add({ id: 'friend', look: 'sndFriend', y: fy, path: [[0, F.x, F.z - 0.1]], states: [[0, 'idle'], [F.wave[0], 'sndWave'], [F.shout, 'sndShout'], [F.shout + 0.95, 'sndWave'], [F.wave[1], 'sndWatch']], face: faceF }, [1]);
+    const nb = [['nb1', 'sndFanB', 10, -22.6], ['nb2', 'sndFanC', 10, -21.4], ['nb3', 'sndFanD', 11, -23.15], ['nb4', 'sndFanE', 11, -20.85], ['nb5', 'sndFanA', 12, -22.5], ['nb6', 'sndFanD', 12, -21.3]];
+    for (const [id, look, r, x] of nb) { const q = sndSideSeat(1, r, x); add({ id, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch']], face: sndFace(x, q.z, x * 0.6, 0) + (hash1(x * 3) - 0.5) * 30 }, [1]); }
+
+    // 4. the free kick: referee, taker, wall, keeper, two more players
+    const K = SND.kick, W = SND.whistle;
+    add({ id: 'ref', look: 'sndRef', path: [[0, W.x, W.z]], states: [[0, 'idle'], [W.t - 0.25, 'sndWhistle'], [W.t + 0.9, 'sndPoint'], [W.t + 2.2, 'look']], face: sndFace(W.x, W.z, K.x, K.z) }, [3]);
+    const bx = K.x - 0.55, bz = K.z - 0.15;
+    add({ id: 'taker', look: 'sndHome', path: [[0, bx - 4.6, bz - 2.2], [K.t - 1.0, bx - 4.6, bz - 2.2], [K.t, bx, bz], [K.t + 0.6, bx + 1.4, bz + 0.3], [SND_BALL.tGoal + 0.5, bx + 2.2, bz + 0.2], [SND.cuts[3], bx + 13, bz - 16]],
+      states: [[0, 'idle'], [K.t - 1.0, 'jog'], [K.t - 0.1, 'sndKick'], [SND_BALL.tGoal + 0.5, 'sndCelebrate']], stride: 1.9 }, [3]);
+    for (let i = 0; i < 4; i++) add({ id: 'wall' + i, look: i % 2 ? 'sndAway' : 'sndAway2', path: [[0, 39.3, -2.9 + i * 0.55]], states: [[0, 'sndWall'], [SND_BALL.tGoal + 0.3, 'look']], face: sndFace(39.3, -2.2, K.x, K.z) }, [3],
+      (t) => { const u = t - K.t - 0.02 - i * 0.03; return u > 0 && u < 0.55 ? 0.42 * Math.sin(Math.PI * u / 0.55) : 0; });
+    add({ id: 'keeper', look: 'sndKeeperL', path: [[0, 52.0, 0.3], [K.t + 0.12, 52.0, 0.4], [K.t + 0.5, 51.9, 2.1]], states: [[0, 'sndKeeper'], [K.t + 0.12, 'sndDive'], [K.t + 2.2, 'look']], face: sndFace(52, 0.3, K.x, K.z) }, [3]);
+    add({ id: 'p1', look: 'sndHome2', path: [[0, 41.5, 6.5], [K.t, 41.5, 6.5], [K.t + 1.2, 44.2, 7.5]], states: [[0, 'idle'], [K.t, 'jog'], [K.t + 1.2, 'sndCelebrate']], face: sndFace(41.5, 6.5, K.x, K.z) }, [3]);
+    add({ id: 'p2', look: 'sndAway', path: [[0, 44, -5.5]], states: [[0, 'idle'], [SND_BALL.tGoal + 0.3, 'look']], face: sndFace(44, -5.5, K.x, K.z) }, [3]);
+
+    // 5. the drummer (row 13 of the far stand), with the drum, and a flag waved beside them
+    const Dq = sndSideSeat(-1, SND.drum.row, SND.drum.x);
+    this.drummer = add({ id: 'drummer', look: 'sndFanA', y: Dq.y, path: [[0, SND.drum.x, Dq.z + 0.1]], states: [[0, 'sndWatch'], [SND.drum.t0 - 0.5, 'sndDrum']], face: 0 }, [4]);
+    { const g = new THREE.Group(), shell = Mat.std('#1f2f52', { roughness: 0.5 }), skin = Mat.std('#efe9da', { roughness: 0.7 });
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.34, 20), shell));
+      for (const y of [-0.175, 0.175]) { const k = new THREE.Mesh(new THREE.CircleGeometry(0.4, 20), skin); k.rotation.x = y > 0 ? -Math.PI / 2 : Math.PI / 2; k.position.y = y; g.add(k); }
+      g.position.set(SND.drum.x + 0.12, Dq.y + 0.95, Dq.z + 0.48); g.traverse((o) => { if (o.isMesh) o.castShadow = true; }); scene.add(g); this.drum = g; }
+    { const q = sndSideSeat(-1, SND.drum.row + 1, SND.drum.x + 1.6);
+      add({ id: 'flagger', look: 'sndFanE', y: q.y, path: [[0, SND.drum.x + 1.6, q.z + 0.1]], states: [[0, 'sndWatch']], face: 0 }, [4]);
+      this.flag = this._flag(scene, SND.drum.x + 1.9, q.y + 1.5, q.z + 0.2); }
+
+    // 6. your neighbours in the stand (rows 10–12), and the players on the pitch
+    for (const [r, x, look] of [[11, 4.6, 'sndFanA'], [11, 5.2, 'sndFanC'], [11, 5.8, 'sndFanB'], [10, 4.4, 'sndFanD'], [10, 5.0, 'sndFanE'], [10, 5.6, 'sndFanA'], [10, 6.2, 'sndFanC'], [12, 5.35, 'sndFanD'], [12, 4.75, 'sndFanB']]) {
+      const q = sndSideSeat(1, r, x), tT = sndThunderAt({ x, y: q.y + 1.6, z: q.z }) + 0.04 + hash1(x * 31) * 0.05;
+      add({ id: 'me' + r + '_' + x, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch'], [tT, 'sndDuck']], face: sndFace(x, q.z, x * 0.3, -10) + (hash1(x * 7) - 0.5) * 24 }, [5]);
     }
-    // --- the ambulance and the police car (sirens, light bars)
-    this.amb = this._ambulance(F, scene);
-    this.police = this._policeCar(F, scene);
-    // --- the highway: heroes + steady traffic both ways
-    // the car that goes supersonic: low, bright orange-red (yellow read as a taxi), headlights on (it has to read from 400 m away)
-    this.sport = mk('ev', '#ff4a12', 'sport');
-    { const hl = new THREE.MeshStandardMaterial({ color: '#fffbe8', emissive: new THREE.Color('#fff4dc'), emissiveIntensity: 7, roughness: 0.2 });
-      this.sport.group.traverse((o) => { if (o.isMesh && o.material && o.material.name === 'headlight') o.material = hl; });
-      // (and the haze doesn't swallow it in the long lens: the hero car alone ignores the fog)
-      const nf = new Map(); this.sport.group.traverse((o) => { if (o.isMesh && o.material && !Array.isArray(o.material)) { if (!nf.has(o.material)) { const m = o.material.clone(); m.fog = false; nf.set(o.material, m); } o.material = nf.get(o.material); } }); }
-    const hw = [];
-    const lanesH = [[60.0, 1, 27.5], [64.0, -1, 28.5], [66.8, -1, 26.0]];   // (the near +Z lane at SND.sport.x is the hero's)
-    lanesH.forEach(([x, dir, v], li) => {
-      for (let j = 0; j < 9; j++) {
-        const type = ['sedan', 'suv', 'hatch', 'van', 'pickup', 'ev'][(j + li * 2) % 6];
-        const col = ['#6c7a86', '#3d4a44', '#8a8478', '#d8d2c4', '#2b2f36', '#5e6b52', '#7a3a34', '#9aa0a6', '#c4a24c'][(j * 3 + li) % 9];
-        hw.push({ c: mk(type, col), x, dir, v: v + hash1(j * 13 + li) * 3, z0: -700 + j * 150 + hash1(j * 7 + li * 3) * 60 });
-      }
-    });
-    this.hwCars = hw;
-    // --- parked cars in the lot (some will have their alarms go off at the airliner's boom)
-    this.parked = [];
-    const types = ['sedan', 'hatch', 'suv', 'ev', 'pickup', 'sedan', 'hatch'], cols = ['#6c7a86', '#3d4a44', '#8a4a3c', '#c9c4b8', '#2f5d6a', '#2b2f36', '#5e6b52', '#7a6a58', '#9a9a94', '#5a3a36', '#4a5866', '#b7b2a6'];
-    let n = 0;
-    for (const x0 of [16.0, 26.0, 36.0]) for (const side of [-1, 1]) for (let z = 0.7; z > -73; z -= 2.6) {
-      const hsh = hash2(Math.round(x0 * 10 + side), Math.round(z * 10));
-      if (hsh < 0.42) continue;
-      if (x0 === 26.0 && side < 0 && z < -6 && z > -42) continue;   // the couple's aisle
-      if (x0 === 16.0 && z > -11) continue;                             // the lot entrance: the drone and its pilot
-      { const px = x0 + side * 1.35 - 9.4, pz = z - 1.3 - 1, L = Math.hypot(30.6, 96);   // keep the line of sight to the pile driver clear
-        if (Math.abs(px * (-96 / L) - pz * (30.6 / L)) < 3.6) continue;
-        // ... and the wedge you watch the highway car through (nothing big and boxy under it in the long lens)
-        const brg = Math.atan2(-px, -pz) * 180 / Math.PI;
-        if (brg > -38 && brg < -3 && Math.hypot(px, pz) < 120) continue; }
-      const type = types[n % types.length], c = mk(type, cols[(n * 5) % cols.length], 'parked');
-      const x = x0 + side * 1.35;
-      c.group.position.set(x, LAYOUT.curbH, z - 1.3);
-      c.group.rotation.y = side > 0 ? Math.PI : 0;
-      // each shock rocks it on its springs when the front reaches it (the car's lightly, the police car's hardest)
-      const rock = [[sndSportBoomAt(x, z - 1.3, 0.8), 0.03], [sndPlaneBoomAt(x, z - 1.3, 0.8), 0.04], [sndPoliceBoomAt(x, z - 1.3, 0.8), 0.045]].filter((r) => r[0] !== null);
-      this.parked.push({ c, x, z: z - 1.3, alarm: hsh > 0.7, tA: sndPlaneBoomAt(x, z - 1.3), rock });
-      n++;
+    const pl = [['h1', 'sndHome', -12, 4], ['h2', 'sndHome2', 6, -14], ['h3', 'sndHome', 18, 9], ['h4', 'sndHome2', -24, -18], ['a1', 'sndAway', -6, -6], ['a2', 'sndAway2', 12, 2], ['a3', 'sndAway', -18, 12], ['a4', 'sndAway2', 26, -10], ['rf', 'sndRef', 2, 6]];
+    for (const [id, look, x, z] of pl) {
+      // they walk with the play (slowly toward the ball, at the centre) and duck when the thunder reaches them
+      const t0 = SND.cuts[4], tT = sndThunderAt({ x, y: 1.6, z }) + 0.06 + hash1(x * 13 + z) * 0.06;
+      add({ id: 'pl' + id, look, path: [[t0, x, z], [tT, x * 0.85, z * 0.85]], states: [[0, 'walk'], [tT, 'sndDuck'], [tT + 3.4, 'look']], stride: 1.3 }, [5]);
     }
-    // --- the drone and the pigeons
-    this.drone = this._drone(scene);
-    this.birds = this._birds(scene);
-    this._v = new THREE.Vector3();
+
+    // the ball
+    { const g = new THREE.IcosahedronGeometry(0.11, 1), n = g.attributes.position.count, col = new Float32Array(n * 3);
+      for (let i = 0; i < n; i += 3) { const dark = hash1(i * 7 + 3) < 0.22; for (let k = 0; k < 3; k++) col.set(dark ? [0.05, 0.05, 0.06] : [0.92, 0.92, 0.9], (i + k) * 3); }
+      g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+      this.ball = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true }));
+      this.ball.castShadow = true; scene.add(this.ball); }
+    this.shadows = new BlobShadows(scene, 96);
   }
 
-  // speed over time for an avenue car: cruise, then slow right down when the booms come, then creep on
-  _driveTable(k) {
-    const dt = 1 / 30, n = Math.ceil((CONFIG.duration + 1) / dt), zs = new Float32Array(n + 1);
-    let z = k.z0;
-    for (let i = 0; i <= n; i++) {
-      zs[i] = z;
-      const t = i * dt;
-      let f = 1;
-      const tQ = sndPlaneBoomAt(k.x, z);
-      if (k.stopAt === 'plane') { f *= 1 - MathX.smooth(t, tQ, tQ + 1.6); z += k.v * f * dt; continue; }   // stops dead at the airliner's
-      f *= 1 - 0.6 * MathX.smooth(t, tQ, tQ + 1.4);                                       // after the airliner's boom: brake
-      const tP = sndPoliceBoomAt(k.x, z);
-      if (k.stop) f *= 1 - MathX.smooth(t, tP, tP + 1.6);                                     // (or stop dead)
-      else f *= 1 - 0.9 * MathX.smooth(t, tP, tP + 1.0) + 0.3 * MathX.smooth(t, tP + 3.5, tP + 7);    // after the police car's: almost stop, then creep
-      z += k.v * f * dt;
-    }
-    return zs;
-  }
-  _zAt(table, t) { const f = MathX.clamp(t * 30, 0, table.length - 1.001), i = Math.floor(f); return table[i] + (table[i + 1] - table[i]) * (f - i); }
-
-  _lightBar(group, y, L, colors) {
-    const bar = new THREE.Group(), m = [];
-    for (let i = 0; i < 2; i++) {
-      const mat = new THREE.MeshStandardMaterial({ color: '#222', emissive: new THREE.Color(colors[i]), emissiveIntensity: 0, roughness: 0.3 });
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.12, 0.5), mat); b.position.set(0, y, (i ? 1 : -1) * 0.3); bar.add(b); m.push(mat);
-    }
-    const base = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.06, 1.2), Mat.std('#1b1d20', { roughness: 0.5 })); base.position.set(0, y - 0.08, 0); bar.add(base);
-    bar.position.x = L * 0.12; group.add(bar);
-    return m;
-  }
-  _ambulance(F, scene) {
-    const c = F.build('van', '#e9e6de'); c.group.name = 'veh:amb'; scene.add(c.group);
-    const red = Mat.std('#b8231d', { roughness: 0.5 });
-    for (const s of [-1, 1]) { const st = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.22, 0.02), red); st.position.set(-0.4, 1.15, s * 1.02); c.group.add(st); }
-    c.bar = this._lightBar(c.group, 2.5, 0.5, ['#ff2a1a', '#ff2a1a']);
-    return c;
-  }
-  _policeCar(F, scene) {
-    const c = F.build('sedan', '#e8e6e0'); c.group.name = 'veh:police'; scene.add(c.group);
-    const dark = Mat.std('#1d2a40', { roughness: 0.5 });
-    for (const s of [-1, 1]) { const st = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.3, 0.02), dark); st.position.set(0.1, 0.62, s * 0.92); c.group.add(st); }
-    c.bar = this._lightBar(c.group, 1.5, -0.6, ['#ff2a1a', '#2a6bff']);
-    return c;
-  }
-
-  _drone(scene) {
-    const g = new THREE.Group(), dark = Mat.std('#2a2d31', { roughness: 0.45 }), grey = Mat.std('#8e959c', { roughness: 0.4, metalness: 0.3 });
-    const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; g.add(m); return m; };
-    add(new THREE.BoxGeometry(0.34, 0.1, 0.22), dark, 0, 0, 0);
-    add(new THREE.BoxGeometry(0.18, 0.06, 0.14), grey, 0, 0.07, 0);
-    add(new THREE.SphereGeometry(0.05, 10, 8), Mat.std('#111', { roughness: 0.2 }), 0.17, -0.07, 0);
-    this.droneProps = [];
-    const blur = new THREE.MeshBasicMaterial({ color: '#2e3238', transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide });   // (dark and faint: a blurred prop, not a frosted bubble)
-    for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
-      const arm = add(new THREE.BoxGeometry(0.36, 0.03, 0.04), dark, sx * 0.17, 0, sz * 0.13); arm.rotation.y = Math.atan2(sz * 0.13, sx * 0.17) * -1;
-      add(new THREE.CylinderGeometry(0.035, 0.04, 0.06, 10), grey, sx * 0.32, 0.03, sz * 0.25);
-      const disc = add(new THREE.CircleGeometry(0.17, 24), blur, sx * 0.32, 0.07, sz * 0.25); disc.rotation.x = -Math.PI / 2; disc.castShadow = false;
-      const blade = add(new THREE.BoxGeometry(0.34, 0.006, 0.035), dark, sx * 0.32, 0.07, sz * 0.25);
-      this.droneProps.push({ disc, blade });
-    }
-    const led = new THREE.MeshBasicMaterial({ color: '#ff3b2e', toneMapped: false }); add(new THREE.SphereGeometry(0.018, 6, 4), led, 0.33, 0.0, 0.25);
-    g.scale.setScalar(1.25);
+  _flag(scene, x, y, z) {
+    const geo = new THREE.PlaneGeometry(2.4, 1.5, 12, 4); geo.translate(1.2, 0, 0);
+    const c = Tex.canvas(256, 160), q = c.getContext('2d');
+    q.fillStyle = '#e2b82e'; q.fillRect(0, 0, 256, 160); q.fillStyle = '#1f2f52'; q.fillRect(0, 54, 256, 52);
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: Tex.tex(c, { repeat: false }), side: THREE.DoubleSide, roughness: 0.8 }));
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 2.6, 6), Mat.std('#8a8478', { roughness: 0.5 }));
+    const g = new THREE.Group(); pole.position.set(0, 0.6, 0); m.position.set(0, 1.2, 0); g.add(pole, m); g.position.set(x, y, z);
     scene.add(g);
-    return g;
+    return { g, m, base: Float32Array.from(geo.attributes.position.array) };
   }
-
-  // pigeons on the roof edge across the street; they burst off when the airliner's boom reaches them
-  _birds(scene) {
-    const mat = new THREE.MeshStandardMaterial({ color: '#4a4c52', roughness: 0.9, side: THREE.DoubleSide });
-    const bodyG = new THREE.ConeGeometry(0.07, 0.34, 6); bodyG.rotateX(Math.PI / 2);
-    const wingG = new THREE.BufferGeometry(); wingG.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -0.08, 0.38, 0, -0.02, 0, 0, 0.1, 0.38, 0, -0.02, 0.3, 0, 0.06, 0, 0, 0.1], 3)); wingG.computeVertexNormals();
-    const out = [];
-    // (a row on the near roof across the street, then little flocks of five along both sides, far down the avenue:
-    //  they go up one flock after another as the shock comes up the street)
-    for (let i = 0; i < 110; i++) {
-      const g = new THREE.Group(); g.add(new THREE.Mesh(bodyG, mat));
-      const wl = new THREE.Mesh(wingG, mat), wr = new THREE.Mesh(wingG, mat); wr.scale.x = -1; g.add(wl, wr);
-      g.scale.setScalar(1.9); scene.add(g);
-      const fl = Math.floor((i - 20) / 5), side = i < 20 || fl % 2 ? -1 : 1;
-      const z = i < 20 ? -14 - i * 1.1 - hash1(i) * 0.6 : -40 - fl * 15 - ((i - 20) % 5) * 0.9 - hash1(i) * 2;
-      const x = side * (12.75 + hash1(i * 31) * 0.25), y = this._roofAt(side, z) + 0.15;
-      out.push({ g, wl, wr, x, y, z, s: hash1(i * 17 + 3), tA: sndPlaneBoomAt(x, z, y) - 0.05 + hash1(i * 5) * 0.15 });   // (the shock reaches the roof edge first)
-    }
-    return out;
-  }
-
-  _roofAt(side, z) { const r = (this.app.env.roofs || []).find((b) => b.side === side && z >= b.z0 && z <= b.z1); return r ? r.H : 17.8; }
 
   update(t) {
-    const B = this.shadows, h = LAYOUT.curbH;
+    const shot = sndShotAt(t), B = this.shadows;
     B.begin();
-    for (const p of this.people) { p.update(t); const q = p.root.position; B.push(q.x, q.y + 0.012, q.z, 0.55, 0.45); }
-    // avenue cars
-    const place = (c, x, y, z, dir) => { const g = c.group; g.position.set(x, y, z); g.rotation.y = (dir > 0 ? Math.PI : 0) + Math.PI / 2; for (const w of c.wheels) w.rotation.z = -(dir > 0 ? z : -z) / c.r; };
-    for (const k of this.cars) { const z = this._zAt(k.table, t); place(k.c, k.x, 0, z, k.v); const br = this._zAt(k.table, t - 0.12) - z, br2 = this._zAt(k.table, t - 0.24) - this._zAt(k.table, t - 0.12); const tPk = k.stopAt === 'plane' ? sndPlaneBoomAt(k.x, z) : sndPoliceBoomAt(k.x, z); k.c.tail.emissiveIntensity = Math.abs(br2) - Math.abs(br) > 0.004 || (k.stop && t > tPk) ? 5.5 : 0.6; k.c.hazard.emissiveIntensity = t > tPk + 1.2 && (k.stop || k.i % 3 === 0) && Math.floor(t * 2.2) % 2 ? 6 : 0; if (Math.abs(z) < 120) B.push(k.x, 0.01, z, 1.2, 0.5, 2.6); }
-    // ambulance: drives through; its lights flash
-    { const q = sndAmb(t), c = this.amb; place(c, q.x, 0, q.z, 1); c.group.visible = t > 12 && t < 32; const on = Math.floor(t * 5) % 2; c.bar[0].emissiveIntensity = on ? 7 : 0.3; c.bar[1].emissiveIntensity = on ? 0.3 : 7; if (c.group.visible) B.push(q.x, 0.01, q.z, 1.3, 0.5, 2.9); }
-    { const q = sndPolice(t), c = this.police; place(c, q.x, 0, q.z, 1); c.group.visible = t > 49 && t < 60; const on = Math.floor(t * 7) % 2; c.bar[0].emissiveIntensity = on ? 8 : 0.3; c.bar[1].emissiveIntensity = on ? 0.3 : 8; if (c.group.visible) B.push(q.x, 0.01, q.z, 1.2, 0.5, 2.6); }
-    // highway
-    const top = SND_CITY.hwy.top;
-    { const q = sndSport(t); place(this.sport, SND.sport.x, top, q.z, 1); this.sport.group.visible = t > 22 && t < 42; }
-    for (const k of this.hwCars) { const z = k.z0 + k.dir * k.v * t; place(k.c, k.x, top, z, k.dir); }
-    // parked cars: alarms (hazards) from the airliner's boom on
-    for (const k of this.parked) {
-      const on = k.alarm && t > k.tA + 0.25 && Math.floor((t - k.tA) * 2.2) % 2 === 0; k.c.hazard.emissiveIntensity = on ? 6 : 0; if (Math.abs(k.z) < 70) B.push(k.x, h + 0.01, k.z, 1.15, 0.45, 2.5);
-      let r = 0; for (const [tb, a] of k.rock) { const u = t - tb; if (u > 0 && u < 1.6) r += a * Math.sin(u * 17) * Math.exp(-u * 3.2); }
-      k.c.group.rotation.x = r;
+    for (const it of this.list) {
+      const on = it.shots.includes(shot);
+      it.p.root.visible = on;
+      if (!on) continue;
+      it.p.update(t);
+      if (it.lift) { it.p.root.position.y += it.lift(t); it.p.root.updateMatrixWorld(true); }
+      const q = it.p.root.position, gy = it.p.spec.y || 0, h = Math.max(0, q.y - gy);
+      B.push(q.x, gy + 0.012, q.z, 0.55 * (1 + h), 0.45 * Math.max(0.2, 1 - h * 1.5));
+    }
+    // the ball (shot 4)
+    this.ball.visible = shot === 3;
+    if (this.ball.visible) {
+      const b = sndBall(t), sp = sndBallV(t); this.ball.position.set(b.x, b.y, b.z);
+      this.ball.rotation.set(t * 3.1, t * 17 * (sp > 0 ? 1 : 0), 0.4);
+      B.push(b.x, 0.012, b.z, 0.32, 0.5 * MathX.clamp(1 - b.y / 3, 0, 1));
     }
     B.end();
-    // drone
-    {
-      const d = sndDrone(t), g = this.drone;
-      g.position.set(d.x, LAYOUT.curbH + d.y, d.z); g.rotation.set(d.pitch, 0.6, d.roll);
-      this.droneProps.forEach((p, i) => { p.disc.visible = d.spin > 0; p.blade.visible = d.spin === 0; p.disc.material.opacity = 0.16 + 0.05 * Math.sin(t * 60 + i); p.disc.rotation.z = t * 90 + i; });
-    }
-    // pigeons
-    for (const b of this.birds) {
-      const u = t - b.tA;
-      if (u < 0) { b.g.position.set(b.x, b.y, b.z); b.g.rotation.set(0, Math.PI / 2 + (b.s - 0.5), 0); b.wl.rotation.z = b.wr.rotation.z = 1.2; continue; }
-      const ang = (b.s - 0.5) * 1.6;
-      b.g.position.set(b.x - u * (3 + b.s * 3) * Math.cos(ang) * 0.4, b.y + u * (2.5 + b.s * 2) - 0.3 * Math.sin(u * 3), b.z - u * (5 + 4 * b.s) * Math.sin(ang + 1.2));
-      b.g.rotation.set(-0.3, Math.PI / 2 + ang, 0);
-      const f = Math.sin(u * 26 + b.s * 9) * 0.9; b.wl.rotation.z = f; b.wr.rotation.z = -f;
+    this.drum.visible = this.flag.g.visible = shot === 4;
+    if (this.flag.g.visible) {
+      const pos = this.flag.m.geometry.attributes.position, b = this.flag.base;
+      for (let i = 0; i < pos.count; i++) { const x = b[i * 3], y = b[i * 3 + 1]; pos.setZ(i, x * (0.18 * Math.sin(x * 2.2 - t * 6.5) + 0.06 * Math.sin(y * 3 + t * 4))); }
+      pos.needsUpdate = true;
+      this.flag.g.rotation.z = 0.25 * Math.sin(t * 1.6) + 0.15;
     }
   }
 }
