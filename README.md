@@ -70,7 +70,8 @@ Everything is procedural, so there are no models, images or sound files to downl
 > racket strings, a shoe's foam, a cushion and a rubber band keep every stretch and dent; a trampoline becomes a funnel; you
 > draw a bow and the arrow just drops; a tuning fork goes "tk" and stays bent; your watch stopped one second into the video,
 > because the quartz crystal inside it is a tiny tuning fork; so did every clock on Earth; and a time-lapse of the plaza
-> keeps the shape of the whole day while its clock never moves. Air, water and living tissue are unchanged. Redesign notes:
+> keeps the shape of the whole day while its clock never moves, until by dusk the trampoline's mat lies flat on the paving.
+> The last shot loops back to the opening's desk clock. Air, water and living tissue are unchanged. Redesign notes:
 > [`films/no-elasticity/REDESIGN.md`](films/no-elasticity/REDESIGN.md); plan and review log:
 > [`films/no-elasticity/PLAN.md`](films/no-elasticity/PLAN.md); delivery report:
 > [`films/no-elasticity/EPISODE_REPORT.md`](films/no-elasticity/EPISODE_REPORT.md).
