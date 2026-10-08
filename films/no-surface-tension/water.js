@@ -175,11 +175,12 @@ class NstStream {
         const th = (k / nr) * Math.PI * 2;
         let rr = r * (1 - 0.85 * pinch);
         if (rag > 0) {
-          const n1 = Math.sin(th * 2 + parcel * 31 + sd) * 0.5 + Math.sin(th * 3 - parcel * 47 + sd * 2) * 0.35 + Math.sin(th * 5 + parcel * 73) * 0.25;
+          // fine fluted ridges that change parcel by parcel (nothing smooths them): fibrous, not a twisting ribbon
+          const n1 = Math.sin(th * 5 + parcel * 31 + sd) * 0.32 + Math.sin(th * 7 - parcel * 47 + sd * 2) * 0.28 + Math.sin(th * 11 + parcel * 73) * 0.22 + Math.sin(th * 3 + parcel * 19 + sd * 0.7) * 0.14;
           rr *= 1 + rag * n1;
           // gaps: the column tears into ligaments (radius falls to ~0 in places)
           const gap = 0.5 + 0.5 * Math.sin(parcel * 57 + th * 1.0 + sd * 1.3) * Math.sin(parcel * 23 + sd);
-          rr *= 1 - brk * MathX.smooth(gap, 0.45, 0.8) * 0.92;
+          rr *= 1 - brk * MathX.smooth(gap, 0.5, 0.85) * 0.75;
           rr = Math.max(rr, 0.00005);
         }
         // the ragged column also wanders sideways a little

@@ -14,7 +14,7 @@
 
 class NstAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
-  fingerprintData() { return [NST, NST_K, NST_G]; }
+  fingerprintData() { return [NST, NST_K, NST_G, NST_TB]; }
   async renderOffline() { const buf = await super.renderOffline(); AudioEngine.declick(buf, 0.15); return buf; }
 
   _build(ctx) {
@@ -95,7 +95,8 @@ class NstAudio extends AudioEngine {
   /* outdoors (the pond → the end): air, leaves, birds and insects that thin out as the garden wilts; crickets at night */
   _outdoors(S, bus) {
     const ctx = S.ctx, T = NST, t0 = T.pond, end = CONFIG.duration + 0.3;
-    const on = (t) => MathX.smooth(t, t0 - 0.02, t0 + 0.02);
+    const inStem = (t) => MathX.smooth(t, T.stem - 0.03, T.stem) * (1 - MathX.smooth(t, T.lapse - 0.03, T.lapse));
+    const on = (t) => MathX.smooth(t, t0 - 0.02, t0 + 0.02) * (1 - inStem(t));
     const day = (t) => (t < T.lapse ? 1 : nstDaylight(nstDay(t)));
     const life = (t) => (1 - 0.8 * nstWilt(t)) * (1 - nstStorm(t));
     this._band(S, bus, 'pink', [120, 1600], t0 - 0.05, end, (t) => on(t) * (0.05 + 0.02 * MathX.smooth(t, T.clouds - 1, T.rain)) * (1 - 0.5 * nstRain(t)), 0, 0.1);
@@ -104,7 +105,7 @@ class NstAudio extends AudioEngine {
     const r = new RNG(CONFIG.seed + 21);
     // birds (daylight, while things are alive)
     for (let t = t0 + 0.1; t < T.rain; t += r.range(0.35, 1.2)) {
-      const v = 0.024 * life(t) * day(t); if (v < 0.002) continue;
+      const v = 0.024 * life(t) * day(t) * (1 - inStem(t)); if (v < 0.002) continue;
       const n = r.int(2, 5), f = r.range(2600, 4600), pan = r.range(-0.8, 0.8);
       for (let k = 0; k < n; k++) S.chirp(t + k * r.range(0.07, 0.12), f * r.range(0.9, 1.12), v * r.range(0.5, 1), pan, k % 2 ? this.rev : bus);
     }
@@ -134,9 +135,33 @@ class NstAudio extends AudioEngine {
     this._band(S, bus, 'white', [4800, 0.8], T.tapOn - 0.05, T.clip + 0.05, (t) => 0.06 * on(t) * (0.9 + 0.1 * Math.sin(t * 9.1)), 0.15, 0.03);
     this._band(S, bus, 'pink', [600, 0.9], T.tapOn - 0.05, T.clip + 0.05, (t) => 0.035 * on(t), 0.1, 0.05);
     this._soda(S, bus);
-    // the watering can: a hiss into the soil, and run-off sheeting off the bench without a single drip
+    // the watering can into the tube dish: a soft hiss (no splashy patter), the dish filling under it
     this._band(S, bus, 'white', [3300, 0.8], T.pour, T.pourEnd + 0.5, (t) => 0.05 * MathX.smooth(t, T.pour + 0.2, T.pour + 0.5) * (1 - MathX.smooth(t, T.pourEnd - 0.2, T.pourEnd + 0.15)), -0.1, 0.03);
-    this._band(S, bus, 'pink', [900, 1.4], T.pour + 0.8, T.wick, (t) => 0.03 * MathX.smooth(t, T.pour + 0.9, T.pour + 1.6) * (1 - MathX.smooth(t, T.wick - 0.05, T.wick)), 0.2, 0.05);
+    this._band(S, bus, 'pink', [700, 1.4], T.pour + 0.3, T.pourEnd + 0.4, (t) => 0.025 * MathX.smooth(t, T.pour + 0.4, T.pour + 0.9) * (1 - MathX.smooth(t, T.pourEnd - 0.1, T.pourEnd + 0.35)), -0.1, 0.05);
+    this._stem(S, bus);
+  }
+
+  /* inside the stem: the column under tension hums faintly, like a stretched wire; the air pushes through a pit with a
+     thin rising hiss, then the column snaps: a sharp click (plants really do click when this happens: the "acoustic
+     emissions" botanists record from drought-stressed stems) and the air rushing up; the next tube follows */
+  _stem(S, bus) {
+    const ctx = S.ctx, T = NST, t0 = T.stem, t1 = T.lapse;
+    const inS = (t) => MathX.smooth(t, t0 - 0.02, t0 + 0.08) * (1 - MathX.smooth(t, t1 - 0.05, t1));
+    // a soft low interior drone (you are inside wet tissue) and the taut hum of the tubes
+    this._band(S, bus, 'brown', [50, 380], t0 - 0.05, t1 + 0.05, (t) => 0.06 * inS(t), 0, 0.05);
+    for (const [f, v, k] of [[880, 0.006, 0], [1320, 0.0035, 1]]) {
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+      this._curve(o.frequency, (t) => f * (1 + 0.004 * Math.sin(t * 5.3 + k) + 0.03 * MathX.smooth(t, T.seed - 0.6, T.snap)), t0, t1, 0.03);
+      this._curve(g.gain, (t) => v * inS(t) * (1 + 1.2 * MathX.smooth(t, T.seed - 0.6, T.snap)) * (1 - 0.85 * MathX.smooth(t, T.snap, T.snap + 0.05)) * (1 + 0.5 * MathX.smooth(t, T.snap + 0.6, T.snap + 1.1) * (1 - MathX.smooth(t, T.snap + 1.15, T.snap + 1.2))), t0, t1, 0.02);
+      o.connect(g); g.connect(S.panned(bus, k ? 0.2 : -0.2)); o.start(t0); o.stop(t1 + 0.1);
+    }
+    // the air squeezing through the pit (rising), then each snap: click, a thud through the tissue, a rush of air
+    this._band(S, bus, 'white', [5000, 1.2], T.seed - 0.2, T.snap + 0.05, (t) => 0.035 * Math.pow(MathX.smooth(t, T.seed - 0.15, T.snap), 2) * (1 - MathX.smooth(t, T.snap, T.snap + 0.04)), -0.1, 0.01);
+    for (const [ts, v, pan] of [[T.snap, 1, -0.05], [T.snap + 1.15, 0.65, 0.25]]) {
+      S.click(ts, 0.09 * v, pan, bus); S.click(ts + 0.012, 0.05 * v, pan, bus);
+      S.thump(ts + 0.01, 0.1 * v, bus);
+      this._band(S, bus, 'pink', [1800, 0.7], ts, ts + 1.0, (t) => 0.06 * v * MathX.smooth(t, ts, ts + 0.03) * Math.exp(-(t - ts) / 0.28), pan, 0.01);
+    }
   }
 
   /* the sparkling water: the cap's ratchet, the seal's hiss, then one whoomph and a roar of spray; afterwards nothing:
@@ -170,17 +195,23 @@ class NstAudio extends AudioEngine {
     // the watering can lifted: a slosh
     this._band(S, bus, 'pink', [450, 1.2], T.bench + 0.2, T.bench + 1.2, (t) => 0.03 * Math.max(0, Math.sin((t - T.bench - 0.2) * Math.PI)), -0.2, 0.02);
     // the cuts outside: a soft air shift
-    for (const t of [T.pond, T.bench, T.lapse, T.duck]) this._band(S, bus, 'pink', [400, 3000], t - 0.25, t + 0.3, (u) => 0.03 * MathX.smooth(u, t - 0.25, t) * (1 - MathX.smooth(u, t, t + 0.3)), 0, 0.02);
+    for (const t of [T.pond, T.bench, T.stem, T.lapse, T.fin]) this._band(S, bus, 'pink', [400, 3000], t - 0.25, t + 0.3, (u) => 0.03 * MathX.smooth(u, t - 0.25, t) * (1 - MathX.smooth(u, t, t + 0.3)), 0, 0.02);
     // the gust on the closing line (the leaf dips; a surge of water runs off its tip)
     this._band(S, bus, 'pink', [700, 0.6], T.line2 - 0.4, T.line2 + 2.2, (t) => 0.05 * MathX.smooth(t, T.line2 - 0.3, T.line2 + 0.2) * (1 - MathX.smooth(t, T.line2 + 0.4, T.line2 + 2.1)), -0.3, 0.03);
-    // the duck: hard, muffled paddling under the waterline (a low swish each stroke) and a few hoarse, tired quacks
-    for (let t = T.duck + 0.05; t < T.dive; t += 1 / 1.7) {
-      for (const [dt, pan] of [[0, -0.1], [0.5 / 1.7, 0.1]]) this._band(S, bus, 'brown', [90, 600], t + dt, t + dt + 0.3, (u) => 0.05 * Math.sin(MathX.clamp((u - t - dt) / 0.28, 0, 1) * Math.PI), pan, 0.01);
+    // the duck (from the waterline): hard, muffled paddling (a low swish each stroke), hoarse tired quacks; as it
+    // sinks, alarmed quacks and two bouts of wet wing-beating on the water (soft slaps, no splashy plinks)
+    for (let t = T.desc + 0.05; t < T.end; t += 1 / 1.7) {
+      const v = 0.05 * MathX.smooth(t, T.wl - 0.6, T.wl) * (1 - 0.5 * MathX.smooth(t, T.line2, T.line2 + 2));
+      if (v < 0.004) continue;
+      for (const [dt, pan] of [[0, 0.1], [0.5 / 1.7, 0.2]]) this._band(S, bus, 'brown', [90, 600], t + dt, t + dt + 0.3, (u) => v * Math.sin(MathX.clamp((u - t - dt) / 0.28, 0, 1) * Math.PI), pan, 0.01);
     }
-    for (const [t, n] of [[T.duck + 1.1, 3], [T.duck + 3.6, 2], [T.duck + 5.6, 4]]) for (let k = 0; k < n; k++) S.voice(t + k * 0.19, 470 - 25 * k, 0.13, 'a', 0.018, -0.1, bus, 0.72);
-    // it paddles under the leaf in the close-up: soft strokes on the surface (no plips), two tired quacks
-    for (let t = T.land + 0.6; t < T.line2 + 1.2; t += 1 / 1.7) this._band(S, bus, 'pink', [500, 1.0], t, t + 0.25, (u) => 0.018 * Math.sin(MathX.clamp((u - t) / 0.24, 0, 1) * Math.PI), 0.15, 0.01);
-    for (let k = 0; k < 2; k++) S.voice(T.line1 + 1.4 + k * 0.2, 450 - 25 * k, 0.13, 'a', 0.012, 0.15, bus, 0.72);
+    for (const [t, n, f, v] of [[T.wl + 0.9, 2, 470, 0.016], [T.sink + 0.3, 4, 520, 0.022], [T.line1 + 0.45, 3, 500, 0.018]]) for (let k = 0; k < n; k++) S.voice(t + k * 0.17, f - 25 * k, 0.13, 'a', v, 0.15, bus, 0.72);
+    for (const [b0, b1] of [[T.sink + 0.4, T.sink + 2.1], [T.line1 + 0.55, T.line1 + 1.85]]) {
+      for (let t = b0; t < b1; t += 1 / 5.2) {
+        S.flap(t, 0.15 + 0.1 * Math.sin(t * 9), 0.05, bus);
+        this._band(S, bus, 'pink', [1100, 0.8], t + 0.04, t + 0.16, (u) => 0.03 * Math.sin(MathX.clamp((u - t - 0.04) / 0.12, 0, 1) * Math.PI), 0.15, 0.01);
+      }
+    }
   }
 
   /* the time-lapse days, the clouds, the rain (a roar of mist with no patter), far thunder */
@@ -197,8 +228,8 @@ class NstAudio extends AudioEngine {
     this._band(S, bus, 'brown', [60, 700], T.clouds - 1, end, (t) => 0.05 * MathX.smooth(t, T.clouds - 1, T.rain + 1) * (0.75 + 0.25 * Math.sin(t * 0.5)), 0, 0.1);
     // rain: one smooth, soft roar (no drops, no patter, no plinks on the pond: a drop hitting water rings because it
     // traps a tiny bubble, and with no surface tension there is no bubble to ring); at the waterline it is half muffled
-    const R = (t) => nstRain(t), wl = (t) => (t >= T.duck && t < T.dive ? 1 : 0);
-    this._band(S, water, 'pink', [500, 7000], T.rain - 0.6, end, (t) => 0.048 * R(t) * (1 - 0.35 * wl(t)) * (t > T.dive ? 1.1 : 1), 0, 0.05);
+    const R = (t) => nstRain(t), wl = (t) => MathX.smooth(t, T.wl - 0.1, T.wl + 0.2);
+    this._band(S, water, 'pink', [500, 7000], T.rain - 0.6, end, (t) => 0.048 * R(t) * (1 - 0.35 * wl(t)) * (t > T.fin ? 1.1 : 1), 0, 0.05);
     this._band(S, water, 'pink', [80, 500], T.rain - 0.6, end, (t) => 0.05 * R(t) * wl(t), 0, 0.05);
     this._band(S, water, 'white', [5200, 0.7], T.rain - 0.6, end, (t) => 0.018 * R(t) * (1 - 0.5 * wl(t)), 0.2, 0.05);
     // thunder: far before the rain, then with the lightning
@@ -224,12 +255,15 @@ class NstAudio extends AudioEngine {
       S.thump(T.drop + 0.02, 0.14, bus);
     }
     // a soft two-note pulse under the kitchen beats (D–A, very quiet), a new note at each new consequence
-    const beats = [T.tap, T.clip, T.soda, T.pond, T.bench];
+    const beats = [T.tap, T.clip, T.soda, T.pond, T.bench, T.stem];
     for (let t = T.zero + 0.6; t < T.lapse - 0.2; t += 0.75) {
       const k = beats.filter((b) => b <= t).length, f = [146.8, 164.8, 174.6, 196, 220, 196, 174.6, 164.8][k % 8];
       S.tone(t, 0.5, f, 0.02, 0, lp, 'triangle', 0.02, 0.45);
       S.tone(t + 0.375, 0.35, f * 1.5, 0.01, 0.2, lp, 'sine', 0.02, 0.3);
     }
+    // the ghosts of normal water (the tubes climbing one by one, the duck floating high): a soft glassy note for each
+    NST_TB.hN.forEach((h, i) => S.tone(T.pourEnd + 0.45 + 0.22 * i, 0.9, [587, 740, 880, 1175][i], 0.006, 0.1 * i - 0.15, lp, 'sine', 0.02, 0.8));
+    S.tone(T.wl + 0.85, 1.4, 880, 0.006, 0.1, lp, 'sine', 0.05, 1.2); S.tone(T.wl + 0.95, 1.4, 1318.5, 0.004, 0.15, lp, 'sine', 0.05, 1.2);
     // a hit on each cut to a new consequence
     for (const t of beats) S.tone(t, 1.2, 73.4, 0.05, 0, lp, 'sine', 0.008, 1.1);
     // the time-lapse: a warm pad (D major-ish) that loses its third and slides flat as the garden wilts; ticks speed up
@@ -245,8 +279,8 @@ class NstAudio extends AudioEngine {
     // the storm: a held low D with a slow beating fifth
     for (const [f, v] of [[73.4, 0.02], [110.4, 0.01], [146.8, 0.006]]) {
       const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f;
-      this._curve(g.gain, (t) => v * MathX.smooth(t, T.rain, T.rain + 3) * (1 - MathX.smooth(t, T.dive, T.dive + 1)), T.rain, T.dive + 1.1, 0.1);
-      o.connect(g); g.connect(lp); o.start(T.rain); o.stop(T.dive + 1.3);
+      this._curve(g.gain, (t) => v * MathX.smooth(t, T.rain, T.rain + 3) * (1 - MathX.smooth(t, T.desc, T.desc + 1)), T.rain, T.desc + 1.1, 0.1);
+      o.connect(g); g.connect(lp); o.start(T.rain); o.stop(T.desc + 1.3);
     }
     // the closing chord (D minor add9 → D with the third on the last line), rising under the payoff
     const chord = (t0, t1, notes, v) => {
@@ -258,7 +292,7 @@ class NstAudio extends AudioEngine {
         }
       }
     };
-    chord(T.dive, T.line2 + 0.3, [[73.4, 1.2], [146.8, 1], [220, 0.8], [329.6, 0.5], [349.2, 0.6]], 0.009);
+    chord(T.desc, T.line2 + 0.3, [[73.4, 1.2], [146.8, 1], [220, 0.8], [329.6, 0.5], [349.2, 0.6]], 0.009);
     chord(T.line2, end, [[73.4, 1.2], [146.8, 1], [220, 0.8], [293.7, 0.6], [370, 0.6], [440, 0.4]], 0.01);
   }
 }

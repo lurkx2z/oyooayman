@@ -165,7 +165,7 @@ class NstKitchen {
 
     // the tap's stream (into the basin)
     const wm = nstWaterMat({ color: '#6f8a93', opacity: 0.5, fres: 0.8 });
-    this.stream = new NstStream(g, wm, { a: new THREE.Vector3(T.spout[0], T.spout[1] - 0.004, T.spout[2]), v0: new THREE.Vector3(0, -0.28, 0.012), r0: 0.0036, yEnd: top - sd + 0.02, seed: 4, spread: 1, frayLen: 0.17, ns: 60, nrad: 10 });
+    this.stream = new NstStream(g, wm, { a: new THREE.Vector3(T.spout[0], T.spout[1] - 0.004, T.spout[2]), v0: new THREE.Vector3(0, -0.28, 0.012), r0: 0.0036, yEnd: top - sd + 0.02, seed: 4, spread: 0.2, frayLen: 0.17, ns: 60, nrad: 12 });
     this.spray = new NstSpray(this.scene, 900);      // a stream with nothing smoothing it sheds shreds and mist, not drops
 
     // ---------- upper cabinets, a fridge edge, a shelf: the room around the counter
@@ -454,6 +454,7 @@ class NstKitchen {
     const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.0146, 0.0146, 0.004, 30, 1, true), capM); ring.position.y = D.neck - 0.006; b.add(ring);
     // the eruption: a white column out of the neck that frays as it rises and rains back down, spray, torn shreds
     const jm = nstWaterMat({ color: '#f4f7f8', opacity: 0.86, fres: 0.4, env: 0.3, rough: 0.5 });
+    jm.emissive.set('#8a9396');      // (white all round: shaded, the torn top read as grey crumpled paper)
     this.jets = [[0.0, 3.3, 0.0, 0.011], [0.13, 3.05, 0.04, 0.0072], [-0.12, 3.1, -0.05, 0.0072], [0.04, 2.7, 0.14, 0.006], [-0.08, 2.85, 0.11, 0.0062], [0.07, 2.95, -0.12, 0.0058]].map(([vx, vy, vz, r0], i) => ({
       V: new THREE.Vector3(vx, vy, vz), r0,
       s: new NstStream(g, jm, { a: new THREE.Vector3(D.x, top + D.neck + 0.002, D.z), v0: new THREE.Vector3(vx, vy, vz), r0, yEnd: top + D.neck + 0.2, ns: 72, nrad: 10, seed: 80 + i * 7, spread: 0.9 }),     // (each arc ends in mid-air on its way down: what falls back is spray and shreds)
@@ -498,7 +499,7 @@ class NstKitchen {
       st.T = (st.v0.y * -1 + Math.sqrt(st.v0.y * st.v0.y + 2 * 9.81 * (st.a.y - level))) / 9.81;   // flight time to the water
       const T0 = T.tapOn + 0.25;
       const vy0 = -st.v0.y, tauAt = (d) => (-vy0 + Math.sqrt(vy0 * vy0 + 2 * 9.81 * d)) / 9.81;
-      sp.emit(t, 420, 0.4, T0, T.clip, (i, cyc, h) => {
+      if (false) sp.emit(t, 420, 0.4, T0, T.clip, (i, cyc, h) => {
         const d = 0.05 + 0.3 * Math.pow(h, 0.8), tau = Math.min(tauAt(d), st.T), u = MathX.clamp(d / 0.17, 0, 1.5);
         st.at(tau, c);
         const a = hash1(i * 5.3 + cyc) * 6.28, off = 0.003 + 0.012 * u * hash1(i * 2.9 + cyc * 0.7);
@@ -509,7 +510,7 @@ class NstKitchen {
       const cx = c.x, cz = c.z;
       sp.emit(t, 300, 0.9, T0 + 0.1, T.clip, (i, cyc, h) => {
         const a = hash1(i * 3.7 + cyc) * 6.28, rr = 0.006 + 0.025 * h, sv = 0.12 + 0.35 * hash1(i * 1.3 + cyc * 2.1);
-        return { p: [cx + Math.cos(a) * rr, level + 0.004, cz + Math.sin(a) * rr], v: [Math.cos(a) * sv, 0.12 + 0.35 * hash1(i * 4.1 + cyc), Math.sin(a) * sv], life: 0.8, size0: 0.016, size1: 0.05, a: 0.06 * on, g: 1.5 };
+        return { p: [cx + Math.cos(a) * rr, level + 0.004, cz + Math.sin(a) * rr], v: [Math.cos(a) * sv, 0.12 + 0.35 * hash1(i * 4.1 + cyc), Math.sin(a) * sv], life: 0.8, size0: 0.03, size1: 0.09, a: 0.03 * on, g: 1.5 };
       }, 1.0, [0.84, 0.88, 0.9]);
     }
     sp.end();
@@ -555,9 +556,9 @@ class NstKitchen {
 
     // the tap: the lever lifts a little, a trickle starts; it never pinches into drops
     const on = MathX.smooth(t, T.tapOn, T.tapOn + 0.35) * (1 - MathX.smooth(t, T.clip - 0.05, T.clip));
-    const more = MathX.smooth(t, T.tapMore, T.tapMore + 0.7);      // … then opened further: a wide, twisting, fraying veil
+    const more = MathX.smooth(t, T.tapMore, T.tapMore + 0.7);      // … then opened further: a thicker, rougher rope (still one piece: no drops)
     this.lever.rotation.z = -(0.3 + 0.5 * more) * on;
-    this.stream.spread = 1 + 0.6 * more; this.stream.frayLen = 0.17 - 0.04 * more;
+    this.stream.spread = 0.05 + 0.05 * more; this.stream.frayLen = 0.17 - 0.03 * more;      // (it thins as it speeds up; it only roughens)
     this.stream.update(t, on * (1 + 0.75 * more), gone);
     const level = top - NST_K.sink.depth + 0.012 + 0.07 * MathX.clamp((Math.min(t, T.clip) - T.tapOn) / 12, 0, 1);
     this.basinW.position.y = level;
@@ -574,8 +575,7 @@ class NstKitchen {
     this.clipGhost.visible = ga > 0.003; this.clipGhost.material.opacity = ga;
     if (ga > 0.003) { const B = NST_K.bowl; this.clipGhost.position.set(B.x + 0.012, top + B.water + 0.0012, B.z + 0.004); this.clipGhost.rotation.set(0, 0.4, 0); }
     const ru = t - T.clipLet;
-    if (ru > 0 && ru < 1.4) { const s = 0.006 + ru * 0.07; this.ring.scale.set(s, s, 1); this.ring.material.opacity = 0.55 * (1 - ru / 1.4) * MathX.smooth(ru, 0, 0.05); this.ring.visible = s < this.bowlWaterR; }
-    else this.ring.visible = false;
+    this.ring.visible = false;      // (no ring where it goes in: short crisp ripples are capillary waves, and they need surface tension)
 
     this._sodaUpdate(t);
   }
@@ -622,7 +622,7 @@ class NstKitchen {
     sp.emit(t, 620, 0.8, tOpen, tOpen + 3.2, (i, cyc, h) => {
       const born = tOpen + hash1(i * 13.7 + 3) * 0.8 + cyc * 0.8, g0 = this.sodaGas(born);
       const a = hash1(i * 5.1 + cyc) * 6.283, sv = 0.12 + 0.55 * hash1(i * 2.3 + cyc * 1.1), up = (1.2 + 2.4 * h) * (0.35 + 0.65 * g0);
-      return { p: [neck.x, neck.y, neck.z], v: [Math.cos(a) * sv, up, Math.sin(a) * sv], life: 0.55 + 0.4 * hash1(i * 3.3 + cyc), size0: 0.005, size1: 0.018 + 0.014 * h, a: 0.12 * g0, g: 7.5, floor: top + 0.002 };
+      return { p: [neck.x, neck.y, neck.z], v: [Math.cos(a) * sv, up, Math.sin(a) * sv], life: 0.35 + 0.25 * hash1(i * 3.3 + cyc), size0: 0.01, size1: 0.03 + 0.02 * h, a: 0.065 * g0, g: 7.5, floor: top + 0.002 };
     }, 1.0, [0.95, 0.97, 0.98]);
     // and a hiss of fine spray off the column at the moment it goes
     sp.emit(t, 200, 0.5, tOpen - 0.02, tOpen + 0.9, (i, cyc, h) => {
@@ -634,7 +634,7 @@ class NstKitchen {
     if (u > 0) for (let i = 0; i < 520; i++) {
       const born = tOpen + 2.4 * Math.pow(hash1(i * 3.71 + 2), 1.6), age = t - born;
       if (age < 0 || age > 1.2) continue;
-      const g0 = this.sodaGas(born); if (g0 < 0.05) continue;
+      const g0 = this.sodaGas(born); if (g0 < 0.05 || hash1(i * 1.17 + 5) < 0.4) continue;
       const a = hash1(i * 9.13) * 6.283, sv = (0.15 + 0.75 * hash1(i * 4.7)) * (0.5 + 0.5 * g0), vy = (1.0 + 2.6 * hash1(i * 2.9)) * (0.35 + 0.65 * g0);
       const h0 = 0.02 + 0.25 * hash1(i * 6.1) * g0;
       const px = (tt) => neck.x + Math.cos(a) * sv * tt, py = (tt) => neck.y + h0 + vy * tt - 4.9 * tt * tt, pz = (tt) => neck.z + Math.sin(a) * sv * tt;
