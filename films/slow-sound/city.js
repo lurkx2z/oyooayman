@@ -37,8 +37,19 @@ class SndCity extends Environment {
     this._highway();
     this._site();
     this.batch.build(this.root, 'env');
+    // the base ground sits 2 cm under the avenue; in the offline renderer it won the depth test for single frames
+    // (a tan flash of the road): drop that one sheet well below, and push it back in depth as well
+    this.root.traverse((o) => { if (o.isMesh && o.material === this.m.groundDirt) o.position.y -= 0.25; });
     this._pileRig();
     this._environmentMap();
+  }
+
+  _ground() {
+    const d = this.m.dirt;
+    this.m.dirt = this.m.groundDirt = d.clone();
+    Object.assign(this.m.groundDirt, { polygonOffset: true, polygonOffsetFactor: 4, polygonOffsetUnits: 8 });
+    super._ground();
+    this.m.dirt = d;
   }
 
   /* ---------------- sky: a clear, warm afternoon (copy-then-own of the Air film's sunny sky) ---------------- */
@@ -77,7 +88,7 @@ class SndCity extends Environment {
     const sky = new THREE.Mesh(new THREE.SphereGeometry(2000, 48, 24), mat);
     sky.name = 'sky'; sky.frustumCulled = false; sky.renderOrder = -10;
     this.scene.add(sky); this.sky = sky;
-    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0011);
+    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0007);   // a clear sunny afternoon: far blocks soften, nothing goes milky
     this.scene.background = horizon.clone();
   }
 
@@ -117,7 +128,7 @@ class SndCity extends Environment {
     }
     // a low hedge and bollards along the sidewalk edge (gaps for the entrances)
     const hedge = Mat.std('#3f5133', { roughness: 1, flatShading: true });
-    for (const [z0, z1] of [[29.0, -1.0], [-21.0, -52.0], [-60.0, -110.0]]) B.box(0.9, 0.85, z0 - z1, 13.55, h + 0.42, (z0 + z1) / 2, hedge);
+    for (const [z0, z1] of [[-21.0, -52.0], [-60.0, -110.0]]) B.box(0.9, 0.85, z0 - z1, 13.55, h + 0.42, (z0 + z1) / 2, hedge);
     for (let z = -1.6; z > -9.6; z -= 2.0) B.add(new THREE.CylinderGeometry(0.11, 0.11, 0.85, 8), m.metal, Geo.matrix(13.4, h + 0.42, z));
     // a grass verge with a few trees at the lot's far end, and a fence along the highway
     for (let z = -120; z > -260; z -= 14) this._tree(18 + 9 * hash1(z), z, this.rng.fork(Math.round(-z)), 1.1);

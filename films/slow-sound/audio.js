@@ -13,7 +13,7 @@ class SndAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
   // everything the sound depends on that is not inside SCRIPT (so a stale baked copy is detected)
   fingerprintData() {
-    const fns = [sndC, sndAmb, sndH1, sndSport, sndSportV, sndPlane, sndPolice, sndDrone, sndEar, sndArriveFixed, sndPoliceBoomAt, sndPlaneBoomAt, sndSportBoomAt, SndGlass, SndCity, SndCast];
+    const fns = [sndC, sndAmb, sndSport, sndSportV, sndPlane, sndPolice, sndDrone, sndEar, sndArriveFixed, sndPoliceBoomAt, sndPlaneBoomAt, sndSportBoomAt, SndGlass, SndCity, SndCast];
     return [SND, SND_PILE_HITS, Object.values(SoundArrival).map(String), fns.map(String)];
   }
 
@@ -74,6 +74,36 @@ class SndAudio extends AudioEngine {
       }
       g.gain.linearRampToValueAtTime(0, b + 0.05);
       return { dly, g, pn };
+    };
+
+    // the other branch behind a supersonic source: after its shock you also hear what it made on the way in, latest
+    // first (the arrival curve te + d/c falls before its fold; tFold is when that fold reaches you)
+    const movingEarly = (posFn, tMin, tFold, b, make, vol, ref, dest, opts = {}) => {
+      const A = (te, t) => te + SoundArrival.dist(posFn(te), sndEar(t)) / c - t;
+      const pts = [];
+      let teFold = tMin;
+      { let best = Infinity; for (let te = tMin; te <= tFold; te += 1 / 240) { const v = te + SoundArrival.dist(posFn(te), sndEar(tFold)) / c; if (v < best) { best = v; teFold = te; } } }
+      for (let t = tFold + 1 / 120; t <= b; t += 1 / 120) {
+        if (A(tMin, t) < 0) break;                                  // everything it made has arrived
+        let lo = tMin, hi = teFold;
+        for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (A(m, t) > 0) lo = m; else hi = m; }
+        const te = (lo + hi) / 2; pts.push({ t, te, delay: t - te, d: (t - te) * c });
+      }
+      if (pts.length < 2) return;
+      const maxD = Math.max(...pts.map((q) => q.delay)) + 0.5;
+      const dly = ctx.createDelay(maxD), g = ctx.createGain(), pn = ctx.createStereoPanner(), lp = S.filter('lowpass', opts.lp || 9000, 0.7);
+      make(dly);
+      dly.connect(lp); lp.connect(g); g.connect(pn); pn.connect(dest);
+      if (opts.rev) send(pn, opts.rev);
+      g.gain.setValueAtTime(0, 0); dly.delayTime.setValueAtTime(pts[0].delay, 0); pn.pan.setValueAtTime(0, 0);
+      g.gain.setValueAtTime(0, pts[0].t - 0.01);
+      for (let i = 1; i < pts.length; i++) {
+        const q = pts[i], r = Math.min(6, Math.abs((q.te - pts[i - 1].te) / (q.t - pts[i - 1].t)));
+        dly.delayTime.linearRampToValueAtTime(q.delay, q.t);
+        g.gain.linearRampToValueAtTime(vol * ref / (ref + q.d) * r * MathX.smooth(q.t, pts[0].t, pts[0].t + 0.05) * (opts.gainFn ? opts.gainFn(q.te, q.t) : 1), q.t);
+        pn.pan.linearRampToValueAtTime(panOf(posFn(q.te), q.t), q.t);
+      }
+      g.gain.linearRampToValueAtTime(0, pts[pts.length - 1].t + 0.05);
     };
 
     // an N-wave: the two-crack "boom-boom" of a shock (front and tail shocks), duration T
@@ -195,14 +225,14 @@ class SndAudio extends AudioEngine {
       const n = S.noise('pink', t0, t1), lp = S.filter('lowpass', noiseF, 0.6), g = ctx.createGain(); g.gain.value = nv; n.connect(lp); lp.connect(g); g.connect(dest);
       const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f0; const ol = S.filter('lowpass', f0 * 4, 0.8), og = ctx.createGain(); og.gain.value = ov; o.connect(ol); ol.connect(og); og.connect(dest); o.start(t0); o.stop(t1);
     };
-    moving(sndH1, 0.0, 40.0, 10.0, 40.0, (d) => engine(d, 0, 40, 46, 380, 0.8, 0.4), 0.55, 10, src, { rev: 0.12, lp: 7000 });
 
     // 8. the car that goes supersonic: its whole approach arrives squeezed into a rising scream, then the boom
     // (half a kilometre away the squeezed sound would be faint; the film lets you hear it build: a floor under the
     //  natural level that rises into the shock, so the scream is there before the boom, never louder than it)
-    const sportLevel = (q, g) => (q.t < B.sport ? Math.max(g, 0.03 + 0.34 * Math.pow(MathX.smooth(q.t, 33.75, B.sport), 2)) : g);
+    const sportFirst = (SoundArrival.delayCurve(sndSport, sndEar, c, 26, B.sport, 1 / 60, 0).find((q) => q.delay !== null) || { t: B.sport - 2.7 }).t;
+    const sportLevel = (q, g) => (q.t < B.sport ? Math.max(g, 0.03 + 0.34 * Math.pow(MathX.smooth(q.t, sportFirst, B.sport), 2)) : g);
     moving(sndSport, 0.0, 44.0, 26.0, 46.0, (d) => engine(d, 0, 44, 62, 420, 0.8, 0.5), 0.55, 10, src, { rev: 0.12, lp: 6500, level: sportLevel });
-    nwave(B.sport, 0.09, 0.85, fx, 5000, 0.4, -0.55);
+    nwave(B.sport, 0.15, 0.8, fx, 5000, 0.4, -0.55);          // (an N-wave lasts at least the car's length ÷ the speed of sound)
     S.thump(B.sport + 0.01, 0.35, fx);
     rattle(B.sport + 0.05, 0.9, 0.06, 0.5, fx);
 
@@ -223,9 +253,9 @@ class SndAudio extends AudioEngine {
     }
 
     // 10. the airliner (Mach 2.1): nothing at all until its shock arrives, then a huge double boom and the city's reply
-    nwave(B.plane, 0.32, 1.0, fx, 1500, 0.8, 0.0);
-    S.boom(B.plane + 0.02, 0.85, fx, rev);
-    rumble(B.plane + 0.05, 4.5, 0.55, 130, fx);
+    nwave(B.plane, 0.9, 0.8, fx, 1500, 0.8, 0.0);             // (a 70 m airliner: a long boom … boom, ~0.9 s apart)
+    S.boom(B.plane + 0.02, 0.7, fx, rev);
+    rumble(B.plane + 0.05, 4.5, 0.42, 130, fx);
     rattle(B.plane + 0.03, 2.2, 0.1, 0, fx);
     // its engines, heard only from the boom on (receding, ~3× lower), surging
     moving(sndPlane, 30.0, 60.0, B.plane - 0.5, 70.0, (d) => {
@@ -253,9 +283,17 @@ class SndAudio extends AudioEngine {
       const lp = S.filter('lowpass', 2200, 0.7), g = ctx.createGain(); g.gain.value = 0.55; o.connect(lp); lp.connect(g); g.connect(d); o.start(40); o.stop(66);
       engine(d, 40, 66, 70, 520, 0.6, 0.35);
     }, 0.75, 8, src, { rev: 0.3, gainFn: (te, t) => 1 - 0.8 * MathX.smooth(t, T.lineA[0] - 1.0, T.lineA[0] + 1.5) });
-    nwave(B.police, 0.075, 1.0, fx, 6500, 0.55, 0.5);
-    S.thump(B.police + 0.01, 0.6, fx);
-    rumble(B.police + 0.02, 1.6, 0.32, 220, fx);
+    // ... and after the shock, the sound it made while it came at you arrives too, in reverse and ~3× higher
+    // (the earlier branch of the arrival curve: emitted earlier, heard later), fading as it comes from further away
+    movingEarly(sndPolice, 40.0, B.police, END - 0.5, (d) => {
+      const o = ctx.createOscillator(); o.type = 'square';
+      o.frequency.setValueAtTime(700, 40);
+      for (let t = 40; t < 60; t += 2.4) { o.frequency.linearRampToValueAtTime(1400, t + 1.2); o.frequency.linearRampToValueAtTime(700, t + 2.4); }
+      const lp = S.filter('lowpass', 2200, 0.7), g = ctx.createGain(); g.gain.value = 0.55; o.connect(lp); lp.connect(g); g.connect(d); o.start(40); o.stop(60);
+    }, 0.6, 8, src, { rev: 0.3, gainFn: (te, t) => 1 - 0.8 * MathX.smooth(t, T.lineA[0] - 1.0, T.lineA[0] + 1.5) });
+    nwave(B.police, 0.13, 1.25, fx, 6500, 0.55, 0.5);           // the hardest hit: the closest shock
+    S.thump(B.police + 0.01, 0.8, fx);
+    rumble(B.police + 0.02, 1.8, 0.5, 220, fx);
     // every pane that bursts or cracks, heard from where it is (the cascade rolls in from down the street)
     if (app && app.glass) {
       for (const p of app.glass.panes) {

@@ -26,12 +26,12 @@ class SndRipples {
     this.MAX = MAX;
     // [x, z, te, height of the source above the ground, strength, life]
     const E = [], F = SND.friend;
-    for (const t of F.claps) E.push([F.x, F.z, t, 1.1, 0.9, 1.5]);
-    E.push([F.x, F.z, F.shout, 1.5, 1.0, 1.6]);
-    for (const t of SND_PILE_HITS) E.push([SND.pile.x, SND.pile.z, t, 0.4, 1.0, 3.3]);
-    for (let t = 17.5; t < 25.4; t += 0.3) { const q = sndAmb(t); E.push([q.x, q.z, t, 1.5, 0.45, 1.9]); }
-    for (let t = 22.6; t < 28.6; t += 0.3) { const q = sndH1(t); E.push([q.x, q.z, t, q.y - 0.15, 0.4, 2.4]); }
-    for (let t = 26.5; t < 37.2; t += 0.22) { const q = sndSport(t); E.push([q.x, q.z, t, q.y - 0.15, 0.5, 3.0]); }
+    // (the claps, the shout and the bangs are the ones you are meant to watch travel: bright and long-lived)
+    for (const t of F.claps) E.push([F.x, F.z, t, 1.1, 2.6, 1.6]);
+    E.push([F.x, F.z, F.shout, 1.5, 3.0, 1.7]);
+    for (const t of SND_PILE_HITS) E.push([SND.pile.x, SND.pile.z, t, 0.4, 3.2, 3.4]);
+    for (let t = 17.5; t < 25.4; t += 0.3) { const q = sndAmb(t); E.push([q.x, q.z, t, 1.5, 0.9, 1.9]); }
+    for (let t = 23.5; t < 37.2; t += 0.22) { const q = sndSport(t); E.push([q.x, q.z, t, q.y - 0.15, 0.5, 3.0]); }
     for (let t = 54.6; t < 60.4; t += 0.16) { const q = sndPolice(t); E.push([q.x, q.z, t, 1.25, 0.45, 1.4]); }
     this.E = E;
     const U = this.uniforms = {
@@ -109,10 +109,11 @@ class SndRipples {
     U.uN.value = n; U.uT.value = t;
     U.uPla2.value.y = SND.boom.planeFix;
     // the wakes show while their source is near (each shock reaches the whole street within a few seconds)
+    // (a shock itself is invisible: only a faint shimmer line where it is — the dust and the glass carry it)
     U.uFront.value.set(
-      MathX.window(t, 54.0, 62.5, 0.4, 1.5) * 1.1,
-      MathX.window(t, 50.0, 57.0, 0.5, 1.5) * 0.75,
-      MathX.window(t, 33.0, 39.0, 0.5, 1.2) * 0.8);
+      MathX.window(t, 54.0, 62.5, 0.4, 1.5) * 0.22,
+      MathX.window(t, 50.0, 57.0, 0.5, 1.5) * 0.2,
+      MathX.window(t, 33.0, 39.0, 0.5, 1.2) * 0.15);
     if (fog) { U.uFogColor.value.copy(fog.color); U.uFogDensity.value = fog.density; }
   }
 }
@@ -122,31 +123,39 @@ class SndRipples {
    ------------------------------------------------------------------------------------------------------------------- */
 class SndDust {
   constructor(scene) {
-    this.sys = new BillboardSystem(scene, 900);
+    this.sys = new BillboardSystem(scene, 2400);
     const P = [], h = LAYOUT.curbH;
     // [x, y, z, t0, size, alpha, life, seed, kind] kind 0 dust, 1 glass glitter
     let s = 1;
     // the car's shock across the lot (light: it is only just supersonic)
     for (let x = 14; x <= 52; x += 3.6) for (let z = -90; z <= 30; z += 3.6) {
       const jx = x + (hash1(s * 3) - 0.5) * 2.4, jz = z + (hash1(s * 5) - 0.5) * 2.4, tb = sndSportBoomAt(jx, jz, 0.3);
-      if (tb !== null && tb > 33) P.push([jx, h, jz, tb, 1.6, 0.07, 2.0, s, 0]);
+      if (tb !== null && tb > 33) P.push([jx, h, jz, tb, 2.2, 0.13, 2.2, s, 0]);
       s++;
     }
-    // the airliner's shock: the avenue, the sidewalks and the lot
-    for (let x = -12; x <= 50; x += 7) for (let z = -230; z <= 40; z += 7) {
-      const jx = x + (hash1(s * 3) - 0.5) * 4.5, jz = z + (hash1(s * 5) - 0.5) * 4.5;
-      if (jx > 12.6 && jx < 13.8) { s++; continue; }
-      const street = Math.abs(jx) < 12.5; P.push([jx, Math.abs(jx) < LAYOUT.roadHalf ? 0 : h, jz, sndPlaneBoomAt(jx, jz, 0.3), street ? 2.6 : 2.0, street ? 0.13 : 0.07, 2.4, s, 0]);
+    // the car's wake on the highway deck (grit off the road behind it)
+    for (let z = -330; z <= 60; z += 2.4) {
+      const S = SND.sport, tz = (() => { let lo = 20, hi = 42; for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (sndSport(m).z < z) lo = m; else hi = m; } return lo; })();
+      P.push([S.x + (hash1(s * 3) - 0.5) * 2.6, SND_CITY.hwy.top, z, tz + 0.05, 1.7, 0.16, 1.8, s, 0]); s++;
+    }
+    // the airliner's shock: a low wall of dust that comes up the avenue (gutters and pavements dirtiest), the lot lighter
+    for (let x = -12; x <= 12; x += 2.4) for (let z = -330; z <= 40; z += 3.0) {
+      const jx = x + (hash1(s * 3) - 0.5) * 2.0, jz = z + (hash1(s * 5) - 0.5) * 2.6, edge = Math.abs(Math.abs(jx) - 7) < 1.6 || Math.abs(jx) > 8.5;
+      P.push([jx, Math.abs(jx) < LAYOUT.roadHalf ? 0 : h, jz, sndPlaneBoomAt(jx, jz, 0.3), edge ? 3.6 : 2.8, edge ? 0.26 : 0.15, 2.8, s, 0]);
       s++;
+    }
+    for (let x = 15; x <= 50; x += 6) for (let z = -120; z <= 30; z += 6) {
+      const jx = x + (hash1(s * 3) - 0.5) * 4, jz = z + (hash1(s * 5) - 0.5) * 4;
+      P.push([jx, h, jz, sndPlaneBoomAt(jx, jz, 0.3), 2.4, 0.09, 2.4, s, 0]); s++;
     }
     // the police car's wake along the street (the gutters are dusty)
     for (const x of [-10.5, -7.6, -6.6, -3.6, 0.4, 3.6, 6.6, 7.6, 10.5]) for (let z = -260; z <= 40; z += 3.2) {
       const jz = z + hash1(s) * 3.2, gutter = Math.abs(Math.abs(x) - 6.8) < 1;
-      P.push([x + (hash1(s * 7) - 0.5), Math.abs(x) < LAYOUT.roadHalf ? 0 : h, jz, sndPoliceBoomAt(x, jz, 0.3), gutter ? 2.0 : 1.3, gutter ? 0.2 : 0.09, 2.0, s, 0]);
+      P.push([x + (hash1(s * 7) - 0.5), Math.abs(x) < LAYOUT.roadHalf ? 0 : h, jz, sndPoliceBoomAt(x, jz, 0.3), gutter ? 2.4 : 1.6, gutter ? 0.24 : 0.12, 2.2, s, 0]);
       s++;
     }
     // the pile driver: a puff at the base of the pile with every blow
-    for (const t of SND_PILE_HITS) for (let k = 0; k < 4; k++) P.push([SND.pile.x - 0.75 + (hash1(s) - 0.5) * 1.5, h + 0.2, SND.pile.z + (hash1(s * 3) - 0.5) * 1.5, t + 0.01, 1.6, 0.3, 1.8, s++, 0]);
+    for (const t of SND_PILE_HITS) for (let k = 0; k < 7; k++) P.push([SND.pile.x - 0.75 + (hash1(s) - 0.5) * 2.4, h + 0.2, SND.pile.z + (hash1(s * 3) - 0.5) * 2.4, t + 0.01 + k * 0.02, 2.6, 0.42, 2.0, s++, 0]);
     // the drone hits the ground
     for (let k = 0; k < 8; k++) P.push([SND.drone.x + 1.1 + (hash1(s) - 0.5) * 0.9, h - 0.15, SND.drone.z + (hash1(s * 3) - 0.5) * 0.9, SND.drone.down + 0.02 + k * 0.015, 0.45, 0.16, 1.2, s++, 0]);
     this.P = P.sort((a, b) => a[3] - b[3]);
@@ -163,7 +172,7 @@ class SndDust {
       if (p[8] === 0) {
         const grow = 1 - Math.exp(-u * 2.2), size = p[4] * (0.35 + 1.1 * grow);
         const a = p[5] * MathX.smooth(u, 0, 0.12) * (1 - k) * (1 - k);
-        B.push(p[0] + (hash1(sd * 11) - 0.5) * u * 0.8, p[1] + 0.15 + size * 0.28 + u * 0.2, p[2] + u * 0.6, size, hash1(sd) * 6.28, a, 1, 0.62, 0.57, 0.5);
+        B.push(p[0] + (hash1(sd * 11) - 0.5) * u * 1.4, p[1] + 0.15 + size * 0.28 + u * (0.35 + 0.4 * hash1(sd * 3)), p[2] + u * 0.6, size, hash1(sd) * 6.28 + u * 0.4 * (hash1(sd * 5) - 0.5), a, 1, 0.66, 0.61, 0.54);
       } else {
         const a = p[5] * (1 - k) * (0.5 + 0.5 * Math.sin(u * 40 + sd));
         B.push(p[0], p[1] - u * 0.8, p[2], p[4] * (0.6 + 0.6 * k), hash1(sd) * 6.28, a, 1.4, 0.92, 0.96, 1.0);
@@ -202,9 +211,19 @@ class SndPlaneFx {
     this.streams = [];
     // engine flames (surging) — additive glows at the exhausts
     this.flames = [];
-    const fm = new THREE.MeshBasicMaterial({ color: '#ff8a3a', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false });
-    for (const s of [-1, 1]) { const fg = new THREE.ConeGeometry(0.75, 6, 12, 1, true); fg.rotateX(Math.PI / 2); fg.translate(0, 0, 3); const f = new THREE.Mesh(fg, fm.clone()); f.position.set(s * 5.9, -2.3, 1.8); g.add(f); this.flames.push(f); }
-    this.smoke = new BillboardSystem(scene, 260);
+    // (over-bright so the bloom catches them: they have to read from 200 m in daylight)
+    const fm = new THREE.MeshBasicMaterial({ color: new THREE.Color(3.2, 1.35, 0.42), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, fog: false });
+    const gm = new THREE.MeshBasicMaterial({ color: new THREE.Color(3.6, 2.4, 1.1), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, fog: false });
+    this.glows = [];
+    for (const s of [-1, 1]) {
+      const fg = new THREE.ConeGeometry(1.25, 11, 14, 1, true); fg.rotateX(Math.PI / 2); fg.translate(0, 0, 5.5);
+      const f = new THREE.Mesh(fg, fm.clone()); f.position.set(s * 5.9, -2.3, 1.8); g.add(f); this.flames.push(f);
+      const gl = new THREE.Mesh(new THREE.SphereGeometry(1.5, 14, 10), gm.clone()); gl.position.set(s * 5.9, -2.3, 2.2); g.add(gl); this.glows.push(gl);
+    }
+    // the airliner reads against the bright sky only without the street's haze on it
+    g.traverse((o) => { if (o.isMesh && o.material && o.material.fog && o.material !== this.coneMat) { o.material = o.material.clone(); o.material.fog = false; } });
+    this.vapMat = this.collar.material;
+    this.smoke = new BillboardSystem(scene, 760);
     this._q = new THREE.Quaternion(); this._e = new THREE.Euler();
   }
 
@@ -216,30 +235,32 @@ class SndPlaneFx {
     // shudder: it is flying through its own shock waves
     if (on) {
       const k = 1.0;
-      this._e.set(MathX.deg(noise1(t * 4.1, 3) * 1.6 * k), MathX.deg(noise1(t * 3.3, 4) * 1.0 * k), MathX.deg(noise1(t * 5.2, 5) * 2.2 * k));
+      this._e.set(MathX.deg(noise1(t * 6.1, 3) * 2.6 * k), MathX.deg(noise1(t * 4.3, 4) * 1.6 * k), MathX.deg(noise1(t * 7.2, 5) * 3.6 * k));
       this._q.setFromEuler(this._e); g.quaternion.multiply(this._q);
     }
-    this.coneMat.uniforms.uA.value = on ? 0.16 : 0;
-    this.vapMat.opacity = on ? 0.13 + 0.06 * noise1(t * 6, 9) : 0;
+    this.coneMat.uniforms.uA.value = on ? 0.1 : 0;
+    this.vapMat.opacity = on ? 0.05 + 0.03 * noise1(t * 6, 9) : 0;
     this.collar.scale.set(1 + 0.05 * noise1(t * 9, 1), 1 + 0.05 * noise1(t * 8, 2), 1);
     this.flames.forEach((f, i) => {
       // compressor surges: the left engine bangs and spits flame, the right one flickers
       const surge = Math.max(0, noise1(t * (i ? 3.1 : 5.3), 20 + i)) * (i ? 0.6 : 1.4);
-      f.material.opacity = on ? Math.min(0.85, surge * 1.2) : 0;
-      f.scale.set(1, 1, 0.4 + surge * 1.4);
+      f.material.opacity = on ? Math.min(0.9, 0.18 + surge * 1.2) : 0;
+      f.scale.set(1, 1, 0.45 + surge * 1.5);
+      this.glows[i].material.opacity = on ? Math.min(0.85, 0.25 + surge * 0.9) : 0;
+      this.glows[i].scale.setScalar(0.8 + surge * 0.7);
     });
     // a dark smoke trail from the left (failing) engine + a thin grey one from the right
     const S = this.smoke;
     S.begin(fog);
     if (t > 40) {
-      const DT = 0.09, k1 = Math.floor(Math.min(t, 58) / DT);
-      for (let k = k1; k > k1 - 120; k--) {
+      const DT = 0.03, k1 = Math.floor(Math.min(t, 58) / DT);   // (puffs close enough to merge into one ribbon)
+      for (let k = k1; k > k1 - 360; k--) {
         const te = k * DT; if (te < 40) break;
         const age = t - te;
         for (const side of [-1, 1]) {
           if (side > 0 && k % 2) continue;
           const p = this._exhaust(te, side), sd = k * 2 + (side > 0 ? 1 : 0);
-          const size = (side < 0 ? 4.0 : 2.5) + age * (side < 0 ? 4.0 : 2.5), a = (side < 0 ? 0.6 : 0.2) * Math.exp(-age / 7) * MathX.smooth(age, 0, 0.3);
+          const size = (side < 0 ? 5.0 : 3.0) + age * (side < 0 ? 4.0 : 2.5), a = (side < 0 ? 0.42 : 0.14) * Math.exp(-age / 7) * MathX.smooth(age, 0, 0.3);
           const sh = side < 0 ? 0.32 : 0.6;
           S.push(p[0] + (hash1(sd) - 0.5) * age * 1.6, p[1] - age * 0.6 + (hash1(sd * 3) - 0.5) * age, p[2] + (hash1(sd * 5) - 0.5) * age * 1.2, size, hash1(sd * 7) * 6.28, a, sh, 0.9, 0.86, 0.8);
         }
@@ -253,6 +274,7 @@ class SndPlaneFx {
    GLASS: the shop windows near you. Each pane has a strength (hash); the police car's shock bursts the weakest,
    cracks some; the airliner's deeper but weaker boom cracks only a few.
    ------------------------------------------------------------------------------------------------------------------- */
+const SND_GLASS_WATCH = [[-7.5, 2], [-12.5, 1], [-17.5, 2]];   // [z on the left-hand shopfronts, 1 cracks / 2 bursts]
 class SndGlass {
   constructor(scene, env, dust) {
     this.panes = [];
@@ -270,10 +292,16 @@ class SndGlass {
         const za = Math.min(zOf(a), zOf(b)), zb = Math.max(zOf(a), zOf(b)), zc = (za + zb) / 2;
         const w = hash1(id * 97 + 13), left = side < 0;
         const tP = sndPoliceBoomAt(xf, zc, 1.6), tQ = sndPlaneBoomAt(xf, zc, 1.6);
-        // the police car passes 10.8 m from the left-hand shops and 14.2 m from yours: its shock is stronger on the left
+        // a shock of a few hundred pascals only finishes off panes that were already weak or strained: a few burst, more
+        // crack, most hold. The police car passes 10.8 m from the left-hand shops and 14.2 m from yours (stronger on the left);
+        // the airliner's long boom cracks a few others (its own weakness draw, wp)
+        const wp = hash1(id * 53 + 7);
         let fate = 0, tf = 0;                                    // 0 holds, 1 cracks, 2 bursts
-        if (w < 0.045) { fate = 1; tf = tQ; }                    // the airliner's boom: only the very weakest crack
-        if (w < (left ? 0.3 : 0.18)) { fate = 2; tf = tP; } else if (w < (left ? 0.52 : 0.36) && fate === 0) { fate = 1; tf = tP; }
+        if (wp < 0.06) { fate = 1; tf = tQ; }
+        else if (w < (left ? 0.12 : 0.05)) { fate = 2; tf = tP; }
+        else if (w < (left ? 0.3 : 0.14)) { fate = 1; tf = tP; }
+        // the stretch of shopfront you watch as the police car goes by: two weak panes give way, one cracks, the rest hold
+        if (left && zc > -24 && zc < -2) { fate = 0; tf = 0; const f = SND_GLASS_WATCH.find((q) => Math.abs(zc - q[0]) < (zb - za) / 2); if (f) { fate = f[1]; tf = tP; } }
         const p = { id, side, xf, za, zb, zc, y0, y1, w, fate, tf, wobble: [tQ, tP] };
         if (fate) {
           const g = new THREE.PlaneGeometry(zb - za, y1 - y0);

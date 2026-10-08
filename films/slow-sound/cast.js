@@ -69,7 +69,7 @@ Object.assign(LOOKS, {
 
 // --- the cast: [id, look, path [[t,x,z]...], states, face?] ------------------------------------------------------
 const SND_PEOPLE = [
-  ['F', 'sndFriend', [[0, SND.friend.x, SND.friend.z]], [[0, 'idle'], [2.35, 'clap'], [2.85, 'idle'], [4.2, 'wave'], [4.95, 'clap'], [6.6, 'idle'], [7.1, 'shout'], [8.3, 'wave'], [9.5, 'idle'], [11.5, 'look']], -140],
+  ['F', 'sndFriend', [[0, SND.friend.x, SND.friend.z]], [[0, 'idle'], [0.4, 'clap'], [3.15, 'idle'], [4.2, 'wave'], [4.95, 'clap'], [6.6, 'idle'], [7.1, 'shout'], [8.3, 'wave'], [9.5, 'idle'], [11.5, 'look']], -140],
   ['P', 'sndPilot', [[0, SND.pilot.x, SND.pilot.z]], [[0, 'pilot'], [SND.drone.up - 0.2, 'pilotUp'], [SND.drone.fall + 0.25, 'pilot']], 137],
   // walkers on your sidewalk: one comes toward you under the title and passes on your right; one walks away
   // down the avenue later (they never cross the views you look along)
@@ -78,7 +78,7 @@ const SND_PEOPLE = [
   // across the street
   ['L1', 'casual2', [[0, -10.6, 8], [45, -10.6, -40], [71, -10.6, -62]], [[0, 'walk']]],
   ['L2', 'casual8', [[0, -9.4, -60], [52, -9.4, 6], [71, -9.4, 26]], [[0, 'walk']]],
-  ['L3', 'casual5', [[0, -11.2, -30], [71, -11.2, 18]], [[0, 'walk']]],
+  ['L3', 'casual5', [[0, -11.2, -66], [71, -11.2, -18]], [[0, 'walk']]],   // (never beside the friend while you watch them)
   ['L4', 'casual7', [[0, -10.2, -12], [30, -10.2, -12]], [[0, 'idle'], [20, 'look']], 110],
   ['B1', 'casual6', [[0, -10.6, -44.5]], [[0, 'phone']], 80],
   ['B2', 'casual1', [[0, -10.9, -42.2]], [[0, 'idle'], [15, 'look']], 95],
@@ -129,7 +129,7 @@ class SndCast {
     const mk = (type, color, name) => { const c = F.build(type, color); c.group.name = 'veh:' + (name || type); scene.add(c.group); return c; };
     // --- avenue traffic: lane x, start z, speed m/s (+ = toward you); everybody slows when the booms hit
     const lanes = [
-      ['sedan', '#6c7a86', 1.75, -10, -12.0], ['suv', '#3d4a44', 5.25, 30, -11.0], ['hatch', '#8a4a3c', 1.75, 60, -12.5], ['van', '#c9c4b8', 5.25, -80, -10.5],
+      ['sedan', '#6c7a86', 1.75, -10, -12.0], ['suv', '#3d4a44', 5.25, 30, -11.0], ['hatch', '#8a4a3c', 1.75, 175, -12.5], ['van', '#c9c4b8', 5.25, -80, -10.5],
       ['taxi', '#c4a24c', 1.75, -120, -12.0], ['ev', '#2f5d6a', 5.25, 120, -11.5], ['sedan', '#2b2f36', 1.75, 140, -12.2], ['hatch', '#5e6b52', 5.25, 220, -11.0],
       ['pickup', '#7a6a58', 1.75, 250, -12.0], ['sedan', '#9a9a94', 5.25, 330, -11.5], ['suv', '#5a3a36', 1.75, 380, -12.4], ['taxi', '#c4a24c', 5.25, 460, -11.2],
       ['suv', '#4a5866', -5.25, -40, 11.5], ['sedan', '#8c8a84', -5.25, -150, 12.0], ['hatch', '#3a4c5c', -5.25, -260, 11.0], ['van', '#d8d2c4', -5.25, -380, 11.5],
@@ -138,14 +138,26 @@ class SndCast {
     ];
     this.cars = lanes.map(([type, color, x, z0, v], i) => ({ c: mk(type, color), x, z0, v, i, table: null }));
     for (const k of this.cars) k.table = this._driveTable(k);
+    // two drivers who stop dead after the police car's shock, in the view you end on (brake lights, hazards):
+    // each one's start is solved so it comes to rest at its spot
+    for (const [type, color, x, v, zEnd] of [['sedan', '#5d6f7e', 1.75, -11.8, -12.5], ['suv', '#8a8478', -5.25, 11.2, -21.5]]) {
+      const k = { c: mk(type, color), x, v, i: this.cars.length, stop: true, z0: 0, table: null };
+      let lo = zEnd - v * 80, hi = zEnd;
+      if (lo > hi) [lo, hi] = [hi, lo];
+      for (let it = 0; it < 36; it++) { k.z0 = (lo + hi) / 2; const zt = this._driveTable(k), zf = zt[zt.length - 1]; if ((zf - zEnd) * Math.sign(v) > 0) { if (v > 0) hi = k.z0; else lo = k.z0; } else { if (v > 0) lo = k.z0; else hi = k.z0; } }
+      k.table = this._driveTable(k);
+      this.cars.push(k);
+    }
     // --- the ambulance and the police car (sirens, light bars)
     this.amb = this._ambulance(F, scene);
     this.police = this._policeCar(F, scene);
     // --- the highway: heroes + steady traffic both ways
-    this.h1 = mk('sedan', '#a8b0b8', 'h1');
-    this.sport = mk('ev', '#b3261e', 'sport');
+    // the car that goes supersonic: low, bright yellow, headlights on (it has to read from 400 m away)
+    this.sport = mk('ev', '#ffc21a', 'sport');
+    { const hl = new THREE.MeshStandardMaterial({ color: '#fffbe8', emissive: new THREE.Color('#fff4dc'), emissiveIntensity: 7, roughness: 0.2 });
+      this.sport.group.traverse((o) => { if (o.isMesh && o.material && o.material.name === 'headlight') o.material = hl; }); }
     const hw = [];
-    const lanesH = [[60.0, 1, 27.5], [64.0, -1, 28.5], [66.8, -1, 26.0]];   // (the near +Z lane at SND.h1.x is the heroes')
+    const lanesH = [[60.0, 1, 27.5], [64.0, -1, 28.5], [66.8, -1, 26.0]];   // (the near +Z lane at SND.sport.x is the hero's)
     lanesH.forEach(([x, dir, v], li) => {
       for (let j = 0; j < 9; j++) {
         const type = ['sedan', 'suv', 'hatch', 'van', 'pickup', 'ev'][(j + li * 2) % 6];
@@ -164,7 +176,10 @@ class SndCast {
       if (x0 === 26.0 && side < 0 && z < -6 && z > -42) continue;   // the couple's aisle
       if (x0 === 16.0 && z > -11) continue;                             // the lot entrance: the drone and its pilot
       { const px = x0 + side * 1.35 - 9.4, pz = z - 1.3 - 1, L = Math.hypot(30.6, 96);   // keep the line of sight to the pile driver clear
-        if (Math.abs(px * (-96 / L) - pz * (30.6 / L)) < 3.6) continue; }
+        if (Math.abs(px * (-96 / L) - pz * (30.6 / L)) < 3.6) continue;
+        // ... and the wedge you watch the highway car through (nothing big and boxy under it in the long lens)
+        const brg = Math.atan2(-px, -pz) * 180 / Math.PI;
+        if (brg > -38 && brg < -3 && Math.hypot(px, pz) < 75) continue; }
       const type = types[n % types.length], c = mk(type, cols[(n * 5) % cols.length], 'parked');
       const x = x0 + side * 1.35;
       c.group.position.set(x, LAYOUT.curbH, z - 1.3);
@@ -189,7 +204,8 @@ class SndCast {
       const tQ = sndPlaneBoomAt(k.x, z);
       f *= 1 - 0.6 * MathX.smooth(t, tQ, tQ + 1.4);                                       // after the airliner's boom: brake
       const tP = sndPoliceBoomAt(k.x, z);
-      f *= 1 - 0.9 * MathX.smooth(t, tP, tP + 1.0) + 0.3 * MathX.smooth(t, tP + 3.5, tP + 7);    // after the police car's: almost stop, then creep
+      if (k.stop) f *= 1 - MathX.smooth(t, tP, tP + 1.6);                                     // (or stop dead)
+      else f *= 1 - 0.9 * MathX.smooth(t, tP, tP + 1.0) + 0.3 * MathX.smooth(t, tP + 3.5, tP + 7);    // after the police car's: almost stop, then creep
       z += k.v * f * dt;
     }
     return zs;
@@ -248,11 +264,15 @@ class SndCast {
     const bodyG = new THREE.ConeGeometry(0.07, 0.34, 6); bodyG.rotateX(Math.PI / 2);
     const wingG = new THREE.BufferGeometry(); wingG.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -0.08, 0.38, 0, -0.02, 0, 0, 0.1, 0.38, 0, -0.02, 0.3, 0, 0.06, 0, 0, 0.1], 3)); wingG.computeVertexNormals();
     const out = [];
-    for (let i = 0; i < 52; i++) {
+    // (a row on the near roof across the street, then little flocks of five along both sides, far down the avenue:
+    //  they go up one flock after another as the shock comes up the street)
+    for (let i = 0; i < 110; i++) {
       const g = new THREE.Group(); g.add(new THREE.Mesh(bodyG, mat));
       const wl = new THREE.Mesh(wingG, mat), wr = new THREE.Mesh(wingG, mat); wr.scale.x = -1; g.add(wl, wr);
-      g.scale.setScalar(1.15); scene.add(g);
-      const side = i < 16 || i % 2 ? -1 : 1, z = i < 16 ? -14 - i * 1.1 - hash1(i) * 0.6 : -40 - (i - 16) * 3.4 - hash1(i) * 2, x = side * (12.75 + hash1(i * 31) * 0.25), y = this._roofAt(side, z) + 0.15;
+      g.scale.setScalar(1.9); scene.add(g);
+      const fl = Math.floor((i - 20) / 5), side = i < 20 || fl % 2 ? -1 : 1;
+      const z = i < 20 ? -14 - i * 1.1 - hash1(i) * 0.6 : -40 - fl * 15 - ((i - 20) % 5) * 0.9 - hash1(i) * 2;
+      const x = side * (12.75 + hash1(i * 31) * 0.25), y = this._roofAt(side, z) + 0.15;
       out.push({ g, wl, wr, x, y, z, s: hash1(i * 17 + 3), tA: sndPlaneBoomAt(x, z) - 0.05 + hash1(i * 5) * 0.15 });
     }
     return out;
@@ -266,14 +286,13 @@ class SndCast {
     for (const p of this.people) { p.update(t); const q = p.root.position; B.push(q.x, q.y + 0.012, q.z, 0.55, 0.45); }
     // avenue cars
     const place = (c, x, y, z, dir) => { const g = c.group; g.position.set(x, y, z); g.rotation.y = (dir > 0 ? Math.PI : 0) + Math.PI / 2; for (const w of c.wheels) w.rotation.z = -(dir > 0 ? z : -z) / c.r; };
-    for (const k of this.cars) { const z = this._zAt(k.table, t); place(k.c, k.x, 0, z, k.v); const br = this._zAt(k.table, t - 0.12) - z, br2 = this._zAt(k.table, t - 0.24) - this._zAt(k.table, t - 0.12); k.c.tail.emissiveIntensity = Math.abs(br2) - Math.abs(br) > 0.004 ? 5.5 : 0.6; k.c.hazard.emissiveIntensity = t > sndPoliceBoomAt(k.x, z) + 1.2 && k.i % 3 === 0 && Math.floor(t * 2.2) % 2 ? 6 : 0; if (Math.abs(z) < 120) B.push(k.x, 0.01, z, 1.2, 0.5, 2.6); }
+    for (const k of this.cars) { const z = this._zAt(k.table, t); place(k.c, k.x, 0, z, k.v); const br = this._zAt(k.table, t - 0.12) - z, br2 = this._zAt(k.table, t - 0.24) - this._zAt(k.table, t - 0.12); const tPk = sndPoliceBoomAt(k.x, z); k.c.tail.emissiveIntensity = Math.abs(br2) - Math.abs(br) > 0.004 || (k.stop && t > tPk) ? 5.5 : 0.6; k.c.hazard.emissiveIntensity = t > tPk + 1.2 && (k.stop || k.i % 3 === 0) && Math.floor(t * 2.2) % 2 ? 6 : 0; if (Math.abs(z) < 120) B.push(k.x, 0.01, z, 1.2, 0.5, 2.6); }
     // ambulance: drives through; its lights flash
     { const q = sndAmb(t), c = this.amb; place(c, q.x, 0, q.z, 1); c.group.visible = t > 12 && t < 32; const on = Math.floor(t * 5) % 2; c.bar[0].emissiveIntensity = on ? 7 : 0.3; c.bar[1].emissiveIntensity = on ? 0.3 : 7; if (c.group.visible) B.push(q.x, 0.01, q.z, 1.3, 0.5, 2.9); }
     { const q = sndPolice(t), c = this.police; place(c, q.x, 0, q.z, 1); c.group.visible = t > 49 && t < 60; const on = Math.floor(t * 7) % 2; c.bar[0].emissiveIntensity = on ? 8 : 0.3; c.bar[1].emissiveIntensity = on ? 0.3 : 8; if (c.group.visible) B.push(q.x, 0.01, q.z, 1.2, 0.5, 2.6); }
     // highway
     const top = SND_CITY.hwy.top;
-    { const q = sndH1(t); place(this.h1, SND.h1.x, top, q.z, 1); this.h1.group.visible = t > 20 && t < 34; }
-    { const q = sndSport(t); place(this.sport, SND.sport.x, top, q.z, 1); this.sport.group.visible = t > 26 && t < 42; }
+    { const q = sndSport(t); place(this.sport, SND.sport.x, top, q.z, 1); this.sport.group.visible = t > 22 && t < 42; }
     for (const k of this.hwCars) { const z = k.z0 + k.dir * k.v * t; place(k.c, k.x, top, z, k.dir); }
     // parked cars: alarms (hazards) from the airliner's boom on
     for (const k of this.parked) { const on = k.alarm && t > k.tA + 0.25 && Math.floor((t - k.tA) * 2.2) % 2 === 0; k.c.hazard.emissiveIntensity = on ? 6 : 0; if (Math.abs(k.z) < 70) B.push(k.x, h + 0.01, k.z, 1.15, 0.45, 2.5); }

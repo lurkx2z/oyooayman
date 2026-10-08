@@ -8,8 +8,11 @@
      debug(app, t)     text for the D debug panel
    ===================================================================== */
 
-const SND_HAND_POSES = Object.assign({}, HAND_POSES, {});
-const SND_HAND_BLEND = Object.assign({}, HAND_BLEND, { ear: 0.12 });
+// 'shield': both hands flung up in front of you as the police car's shock hits (low in the frame, palms out)
+const SND_HAND_POSES = Object.assign({}, HAND_POSES, {
+  shield: { p: [0.07, -0.115, -0.3], F: [-0.25, 1, 0.25], N: [0.15, 0.1, -1], curl: [0.2, 0.22, 0.28, 0.34], thumb: [0.7, 0.12] },
+});
+const SND_HAND_BLEND = Object.assign({}, HAND_BLEND, { ear: 0.12, shield: 0.07 });
 for (const k of Object.keys(SND_HAND_POSES)) { SND_HAND_POSES[k + '!'] = SND_HAND_POSES[k]; SND_HAND_BLEND[k + '!'] = 0.02; }
 
 const FILM = {
@@ -58,7 +61,7 @@ const FILM = {
     if (app && app.cam) {
       const C = app.cam, dt = 1 / 30, vf = C.tfov.value(t), hfov = 2 * Math.atan(Math.tan(MathX.deg(vf) / 2) * 9 / 16) * 180 / Math.PI;
       const yr = (C.tyaw.value(t) - C.tyaw.value(t - dt)) / dt, pr = (C.tpitch.value(t) - C.tpitch.value(t - dt)) / dt;
-      p.smear.set(MathX.clamp(yr / hfov * 0.005, -0.02, 0.02), MathX.clamp(-pr / vf * 0.005, -0.02, 0.02));
+      p.smear.set(MathX.clamp(yr / hfov * 0.0025, -0.01, 0.01), MathX.clamp(-pr / vf * 0.0025, -0.01, 0.01));
     }
     // the shocks: a pressure hit you feel (a 2–3 frame lift, a jolt of chroma and edge blur), strongest last
     p.flash = 0.1 * I(t, B.sport, 0.07) + 0.16 * I(t, B.plane, 0.09) + 0.22 * I(t, B.police, 0.08);

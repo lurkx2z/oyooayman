@@ -21,7 +21,11 @@
     #hud .story-readout { left: calc(var(--u) * 44); padding: calc(var(--u) * 14) calc(var(--u) * 24); border-radius: calc(var(--u) * 14); background: rgba(4, 6, 10, 0.4); }
     #hud .story-readout .label { font-size: calc(var(--u) * 28); letter-spacing: 0.16em; opacity: 0.92; color: #ffffff; }
     #hud .story-readout .value { font-size: calc(var(--u) * 88); margin-top: calc(var(--u) * 6); }
-    #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; opacity: 0.9; margin-top: calc(var(--u) * 8); color: #ffd7a8; }
+    #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 34); letter-spacing: 0.1em; opacity: 0.95; margin-top: calc(var(--u) * 8); color: #ffd7a8; }
+    #hud .story-readout .ctx { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 28); letter-spacing: 0.1em; opacity: 0.95; margin-top: calc(var(--u) * 8); color: #fff1c2; }
+    #hud .story-readout .ctx:empty { display: none; }
+    /* what the friend shouts: big, just above their head (they are in the middle of the frame) */
+    #hud .story-say { top: calc(var(--u) * 690); font-size: calc(var(--u) * 50); padding: calc(var(--u) * 12) calc(var(--u) * 30); }
     #hud .story-end { top: calc(var(--u) * 820); font-size: calc(var(--u) * 66); }
   </style>
 </head>
