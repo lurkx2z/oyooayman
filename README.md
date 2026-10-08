@@ -64,6 +64,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Film: *What if gravity became twice as strong?*** — open `gravity-2x.html` (68.7 s). On a sunny city sidewalk,
+> Earth's surface gravity doubles at 1.6 s and stays doubled. Nothing becomes more massive; everything just weighs twice
+> as much. Your bag yanks your hand down, a kid's 30 cm hop becomes 6 cm, an old man can't stand up, a pallet of bricks
+> falls 9 m in 0.96 s and hits at 68 km/h, a low coupe scrapes, a truck's spring snaps, a crane's outrigger punches
+> into the road, a scaffold folds, an awning and a water tank give way, an airliner sinks below the rooftops, and the
+> crane's overloaded hoist brake slips and drops 12 t of steel 21.7 m onto a flatbed at 105 km/h. Physics rules, shot
+> list and review log: [`films/gravity-2x/PLAN.md`](films/gravity-2x/PLAN.md); delivery notes:
+> [`films/gravity-2x/EPISODE_REPORT.md`](films/gravity-2x/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
@@ -345,6 +354,23 @@ films/sim/aware.js       NPC_AWARE_01: the hero head (eyes that aim at the lens,
 films/sim/glitch.js      wireframe, debug labels, LOD pop, flat tree, checker, the ripple, the crack and the void
 films/sim/audio.js       the world's sound on its own clock (repeated, paused, reversed, replayed) + the film's sounds
 films/sim/film.js        FILM hooks: the fake pause, the exact replay of the opening, the composite, the interface, the grade
+```
+
+Film: *What if gravity became twice as strong?* (`gravity-2x.html`):
+
+```
+films/gravity-2x/PLAN.md            physics rules and numbers, the places, shot list (story → film seconds), review log
+films/gravity-2x/EPISODE_REPORT.md  what shipped: timestamps, systems, limitations, review notes
+films/gravity-2x/script.js          ★ the beats (GV), the cut, the fall maths, camera, hands, captions, readouts, the airliner path
+films/gravity-2x/city.js            the sunny avenue (Environment subclass): buildings, the HARDWARE shop, bench, raised crossing
+films/gravity-2x/site.js            the crane (outrigger, brake creep and slips, the fall, the boom's recoil), the flatbed,
+                                    the scaffold and its loading bay, the awning, the rooftop water tank
+films/gravity-2x/traffic.js         the low coupe, the loaded box truck, the pickup, the ambulance, background cars
+films/gravity-2x/cast.js            the people and their gravity actions (buckle, heavy, bench try, carry, hands and knees)
+films/gravity-2x/air.js             the sinking airliner (AircraftSystem subclass)
+films/gravity-2x/fx.js              dust, glints, debris and water, every particle at 2 G
+films/gravity-2x/audio.js           the soundtrack (AudioEngine subclass); baked into soundtrack.js
+films/gravity-2x/film.js            FILM hooks: where your eyes go (GV_LOOK), hands and the bag, shadows, haze, the grade
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):
