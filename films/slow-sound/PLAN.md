@@ -1,117 +1,105 @@
 # WHAT IF THE SPEED OF SOUND BECAME 10× SLOWER? — production plan
 
-A 69.8-second vertical (9:16, 1080×1920, 30 fps) first-person film on the shared engine. One place, one continuous take, no
-cuts: you stand on the kerb at the corner of a parking lot on a sunny avenue, with a construction site and an elevated
-highway beyond the lot. Under the centred title the speed of sound falls from 343 m/s to **34.3 m/s** (1,235 → 123 km/h)
-at 1.35–2.45 s. From then on every sound in the film reaches you late, by exactly its distance ÷ 34.3 m/s, and anything
-faster than 123 km/h outruns its own sound.
+A 63-second vertical (9:16, 1080×1920, 30 fps) first-person film on the shared engine. **One afternoon in a football
+stadium, six shots** (hard cuts; the story clock never jumps), a black storm standing beyond the far stand. Under the
+centred title the speed of sound falls from 343 m/s to **34.3 m/s** (1,235 → 123 km/h) at 1.35–2.45 s. From then on
+every sound reaches you late, by exactly its distance ÷ 34.3 m/s, and anything faster than 123 km/h outruns its own sound.
+
+This is the **redesign** ordered by the owner's creative override (2026-10-08): audio is the defining mechanic, and the
+template (person → car → machinery → airplane → destruction, in a city street) is gone. The first version (a one-take
+city avenue) is in the branch history up to `e2e3ae3`; the redesign brief is in `/mnt/project-files/slow-sound/REDESIGN.md`
+(the five identity questions, the ten ranked consequences, the three signature moments, the old → new shot table).
 
 ## 1. Rules (the fictional rule, held constant, changed, simplifications, what we must not claim)
 
 | Item | This episode |
 |---|---|
 | Exact fictional rule | The speed of sound in air is 34.3 m/s instead of 343 m/s. Nothing else is changed. |
-| Held constant | Light, air density and pressure, gravity, materials, engines, people, the speeds things normally move at. |
-| Changed | Every sound arrives 10× later (2.9 ms per metre). Every speed is 10× closer to Mach 1: 50 km/h is Mach 0.40, 110 km/h Mach 0.89, 126 km/h Mach 1.02, 160 km/h Mach 1.30, a landing airliner Mach 2.1, a cruising one Mach 8 (236 m/s against the colder air's 29.5 m/s at 11 km). |
-| Real consequences (one per beat) | 30 m: a clap and a shout arrive 0.88 s after you see them. 100 m: a pile driver's bangs arrive 2.94 s late and keep coming after it stops. A 50 km/h siren is pitched +68 % coming and −29 % going (more than an octave apart). A car at 110 km/h is at Mach 0.89; speeding up to 126 km/h it passes Mach 1 and drags a shock cone: what it emitted after that arrives squeezed together, and its boom reaches you only after it has run p / √(M²−1) ≈ 240 m supersonic. Propeller tips go supersonic and crackle. A landing airliner flies silently overhead; its shock comes up the street toward you at about 80 m/s (290 km/h: on a 3° glide the ground footprint runs 1/(1 − M·tan 3°) ≈ 1.11× faster than the plane) and reaches you ~5.7 s later, sets off car alarms and the pigeons; after it, the sound the airliner made while it approached arrives in reverse. A police car at Mach 1.3, 11 m away, is never heard coming; its shock bursts the weakest windows along the street; after it has passed, the siren it sounded while approaching arrives in reverse. |
-| Simplifications | Sound is a single wave speed with no wind, no temperature layering and no absorption change. Shock strength is not simulated as a pressure field: which panes give way is chosen per pane from a seeded hash (about 12 % burst on the near side, 5 % across), and on the stretch of shopfront you watch the fates are set by hand (two weak panes burst, one cracks, the rest hold) so it reads. Hearing a 34 m/s world: the same air, the same ear, the same loudness at the source. Absorption (which grows roughly as 1/c³, so about 1,000× here) is **not** modelled: distant sounds would really be duller and fainter. A voice's pitch stays but its formants would scale with c (deep, hollow); the shout is muffled with a low resonance rather than modelled exactly. The car's Mach 1.02 has a thin margin: it needs still air at about 20 °C (a 30 °C day or a 2 m/s headwind would keep it subsonic). "A normal road car" ignores transonic drag and the engine breathing the same slow air, which would both make 126 km/h harder to reach. |
-| Misconceptions to avoid | A sonic boom is not a one-off "bang when you break the barrier": it is a cone dragged behind for as long as the thing is supersonic, heard when the cone sweeps over you. You never hear a supersonic thing coming; you hear it after it has passed. Light is unaffected: you still see everything on time. |
-| Formulas / numbers used | `soundArrivalTime = eventTime + distance / soundSpeed` (`js/audio/soundArrival.js`). Mach = v / 34.3. Cone half-angle = asin(1/M). A shock reaches a listener at perpendicular distance p only after the source has been supersonic for p / √(M²−1) of track. Doppler: the received sound is the emitted sound replayed through a delay line whose delay is the exact arrival time, so pitch and loudness change by dte/dt. Arrival of a supersonic source is a fold of A(te) = te + d(te)/c; its minimum is the boom. |
-| Must NOT claim | That this could happen; exact window-breaking overpressures; that the airliner would survive (it is shown shuddering, flames surging, smoke pouring); any specific real place or vehicle model. |
+| Held constant | Light, air density and pressure, gravity, people, how fast people move and kick, the weather. |
+| Changed | Every sound arrives 10× later (29 ms per metre, half a minute per kilometre). Every speed is 10× closer to Mach 1 (a 144 km/h shot is Mach 1.17). Anything whose pitch is set by an air cavity drops ~10× (a whistle hoots; a voice keeps its pitch but its throat and mouth resonances drop, so it sounds deep and hollow). Echoes take 10× longer to come back. |
+| Real consequences (one per beat) | A gun's bang runs down a 62 m start line in 1.8 s: each runner starts when it reaches them. A shout 28 m away arrives 0.81 s after you see it. One announcement from five loudspeakers at 17–109 m reaches you as three arrivals 0.5, 2.0 and 3.1 s late. A free kick at 144 km/h is supersonic: the goal goes in before you hear it struck. A drum 99.5 m away is heard 2.9 s late, and a crowd clapping to it claps in a wave, each fan when the beat reaches them. A lightning flash 1.71 km away is seen at 0:03 and heard at 0:52; its front crosses the stadium in 3.2 s, the far stand first. |
+| Simplifications | One wave speed, no wind, no temperature layering. Absorption (which grows roughly as 1/c³, ~1,000× here) is **not** modelled: distant sounds would really be duller and fainter. Thunder is timed from the bolt's ground point (its nearest part); the roll after it stands for the rest of the channel. Voices: a buzz at the speaker's pitch through resonances ten times lower (a stylised hollow voice, not a measured one). The ball's drag: v = v0 / (1 + k·v0·t) with k = 0.0133 /m. The thunder's front is drawn as a ring/sphere from the ground point. |
+| Misconceptions to avoid | A sonic boom is not a one-off bang "when it breaks the barrier": it is the cone the ball drags; here you hear the crack where the ball slows through Mach 1, after the goal. Light is unaffected: you see everything on time. |
+| Formulas / numbers used | `arrival = eventTime + distance / 34.3` (`js/audio/soundArrival.js`). Mach = v / 34.3. The ball's first arrival is the minimum of te + d(te)/c over its flight (`SoundArrival.firstArrival`). Thunder: 1,711 m ÷ 34.3 = 49.9 s. |
+| Must NOT claim | That this could happen; that real crowds or players would behave exactly so; any real stadium, club or broadcaster. |
 
 ## 2. The places (layout in metres, camera path)
 
-- **You**: x 9.4, eye 1.83 m, on the right kerb of a two-lanes-each-way avenue (centre x 0, shopfronts at x ±12.5).
-  You step forward from z 7.2 to z 1.0 during the title and stand there to the end.
-- **The friend**: across the avenue at (−9.8, −22.5), 30.3 m from you — claps five times under the title (heard on time, then later
-  and later as the speed drops), waves, claps three more times, shouts "Hey! Over here!".
-- **The parking lot and plaza** to your right (x 13…52), cars parked in rows; three of them have alarms.
-- **The construction site**: a pile driver at (40, −95), 100.8 m away, hitting every 1.3 s until 16.15 s.
-- **The elevated highway** at x 62 (deck 6 m, open galvanised rails): the orange-red sports car comes toward you on it from
-  ~400 m at 110 km/h, passes Mach 1 at 28.7 s and passes you at x 57.2, 48 m away. Nothing stands in the long-lens line to it
-  (the cross street's buildings on your side start beyond the highway).
-- **The drone** in the lot at (15.6, −4.8); its pilot at (18.8, −8.2).
-- **The airliner**: on a 3° glide at 72 m/s, 220 m up, passing over x 24 at 48.6 s, flying toward you and over you.
-- **Light**: the sun is behind you and to the right, so the avenue, the friend and the far shopfronts are front-lit.
-- **The police car** in the near lane (x −1.75) at 44.4 m/s, passing you at 59.2 s, 11 m away.
+- **The stadium**: pitch 105 × 68 (x along its length, goals at x = ±52.5); the main stand on +z (22 rows, a roof from
+  z 41.8 to 61.5), the far stand on −z, end stands at ±x, floodlight masts with loudspeaker clusters at (±66, ±52), a
+  big screen above the west end. A city of low blocks and trees outside. The storm: a shelf cloud and rain curtain toward
+  (−263, −1639), 1.71 km beyond the far stand; the sun behind the main stand lights the pitch and the far stand.
+- **Shot 1** (0–9.6): you stand in row 8 of the main stand at x 6.5 (eye 6.2 m up), above the near end of a 30-runner
+  start line on the halfway line; the starter fires at (−1.6, −36.6), 85 m away.
+- **Shot 2** (9.6–15.6): on the pitch below the main stand at (−3.5, 30); your friend stands on their seat in row 11 at
+  x −22, 27.9 m away.
+- **Shot 3** (15.6–22.6): by the near touchline at (−2, 33); the big screen at the west end; loudspeakers 17–109 m away.
+- **Shot 4** (22.6–31.0): beside the east goal, just behind the line of its back net, at (55.6, 8.8); the referee at
+  (40, −9.2), the free kick from (30.2, −1.6), 27.5 m away.
+- **Shot 5** (31.0–42.4): the far corner of the pitch (49.5, −33.2), looking along the far stand; the drummer in row 13
+  at x −48, 99.5 m away.
+- **Shot 6** (42.4–63.0): standing in row 12 of the main stand at x 6, under the roof, looking across at the storm.
 
-## 3. Shot list (story seconds = film seconds, no cuts)
+## 3. Shot list (story seconds = film seconds)
 
 | # | Time | What we SEE | What we HEAR | Caption / HUD |
 |---|---|---|---|---|
-| 1 | 0–4.6 | Busy sunny street; the friend across the avenue already clapping; you step to the kerb | the claps on time, then later and later; a falling tone as the rule changes | centred TITLE · SPEED OF SOUND 1,235 → 123 KM/H |
-| 2 | 4.2–11.0 | Zoom to the friend: a wave, three claps, a shout; rings spread from each sound | each clap 0.88 s after the hands meet; "Hey! Over here!" late | SOUND DELAY live counter 0.00 → 0.88 S · bubble "“ … ”" then "“Hey! Over here!”" on arrival · "You'd see people speak before you heard them." |
-| 3 | 11.0–19.1 | Zoom to the pile driver at 100 m, a dust puff each blow; it stops at 16.15 | bangs 2.94 s late; three more after it has stopped | SOUND DELAY 2.9 S · N BANGS STILL ON THE WAY · "A hundred metres away: three seconds late." · "It had already stopped…" / "…but the bangs kept coming." |
-| 4 | 19.0–24.0 | An ambulance at 50 km/h passes in the avenue | its two-tone siren high coming, more than an octave lower going | AMBULANCE · 50 KM/H MACH 0.40 · SIREN PITCH +68 % → −29 % · "Passing sirens would drop more than an octave." |
-| 5 | 24.0–37.9 | Long lens on an orange-red sports car on the highway at 110 km/h; it speeds up past 123 km/h, dust off the deck behind it; the lens widens as it passes | a squeezed high whine, then (supersonic) its squeezed approach building into the boom (36.48), rattling windows, its engine low | LOCAL MACH 0.89 → 1.02 · SUPERSONIC · "ITS SHOCK WAVE REACHES YOU IN x S" · "Highway speed is now almost the speed of sound." · "A normal road car could break the sound barrier." · "It's outrunning its own sound." |
-| 6 | 38.3–44.2 | The drone takes off, its props crackling, and drops | a tearing buzz-saw crackle, then the crash 0.28 s late (9.5 m) | DRONE PROPELLER TIPS MACH 2.6 · "Small propellers would go supersonic too…" / "…and couldn't keep it in the air." |
-| 7 | 44.2–49.1 | A landing airliner overhead, shuddering, flames surging, smoke, a cone of shocked air, in silence | nothing from it | AIRLINER · 260 KM/H MACH 2.1 / AT CRUISE ALTITUDE MACH 8 · "Even a landing airliner would be supersonic." · "And you can't hear it. Not yet." |
-| 8 | 49.3–54.4 | Look down the avenue: a low wall of dust comes up the street, pigeons burst off the roofs flock by flock, a sedan in the near lane brakes to a stop | the bed thins; then the long double boom (54.36), rumble, car alarms, wings, then the airliner's own approach arriving in reverse | ITS SHOCK WAVE 355 M → 0 M · COMING UP THE STREET · 290 KM/H · "You'd see it hit the street before you heard it." |
-| 9 | 55.0–59.5 | A police car at 160 km/h comes straight up the near lane, lights flashing, silent; its shock (59.41): your fingers fly up into the frame, windows burst | silence (the quietest bed of the film), then the hardest crack, thump and rumble; glass pane by pane; its siren reversed, then low | POLICE CAR · 160 KM/H MACH 1.30 · countdown · "A police car you'd never hear coming." |
-| 10 | 60.0–63.2 | Hold on the shopfronts: two panes gone with glitter on the pavement, one cracked, most intact, a man cowering | glass still falling, alarms | "Only the weakest windows gave way." |
-| 11 | 63.2–69.8 | Aftermath: back to the friend across the avenue, stopped cars with brake lights and hazards | alarms falling away, a low chord | SPEED OF SOUND 123 KM/H / 34.3 M/S · "You wouldn't need a fighter jet…" (63.9) / "…to break the sound barrier." (66.3) · two-line FICTIONAL SIMULATION note (68.1) · fade to black 69.55–69.8 |
+| 1 | 0–3.7 | Title over the start line, the far stand, the black storm; lightning strikes in it at 2.7 | "Set!" on time (0.9); the crowd's murmur sinks into a deep hollow murmur, a falling tone, as the speed drops; no thunder | centred TITLE · SPEED OF SOUND 1,235 → 123 KM/H |
+| 1 | 4.3–9.6 | The gun: a puff, a glassy dome and a ring run down the line; the runners peel off one by one (4.66 → 6.43); the view follows the front, then settles on the staggered line | the bang at 6.77, then its echoes off the stands; footsteps from where each runner is | THE STARTING GUN 0.00 → 2.47 S · ITS BANG IS ON ITS WAY TO YOU… → HEARD · 85 M AWAY · THE NEAREST RUNNER HEARD IT 1.8 S AFTER THE FIRST · "Whoever stood nearest the gun would start first." |
+| 2 | 9.6–15.6 | Long lens: the friend (orange jacket, on their seat) waves, cups their hands and shouts (10.35), waves, shouts again (13.2) | each shout 0.81 s late, deep and hollow | SOUND DELAY 0.00 → 0.81 S · bubbles "“Hey! Up here!”" (11.16), "“Over here!”" (14.0) on arrival · "You'd see people shout before you heard them…" / "…and every voice would sound hollow." · THROAT RESONANCES 10× LOWER |
+| 3 | 15.6–22.6 | The big screen: the announcer speaks (16.3), lower third LADIES AND GENTLEMEN…; rings and domes from five loudspeakers | the hollow announcement three times: 16.80, 18.29/18.42, 19.38/19.47, each with its horn's ring | ONE ANNOUNCEMENT · 1 → 5 OF 5 HEARD · 5 LOUDSPEAKERS 0.5–3.2 S LATE · "One announcement would reach you three times." |
+| 4 | 22.6–31.0 | The referee's whistle (23.2); the run-up; the kick (26.0); the ball's rings pile into a V; the wall jumps, the keeper dives, goal (26.67), the net bulges; the crowd jumps on sight; the scorer celebrates | the whistle as a low hoot (23.89) with its echoes; silence during the shot; the crack (26.78) and the kick's deep "dum" (26.80) after the goal, the net; the cheers arrive stand by stand | REFEREE'S WHISTLE · 10× LOWER · THE SHOT · 144 KM/H · MACH 1.17 · SUPERSONIC → GOAL · THE KICK IS STILL ON ITS WAY → THE KICK: HEARD · "A hard shot would break the sound barrier." / "You'd hear the kick after the goal." |
+| 5 | 31.0–42.4 | Along the far stand: the drummer beats every 0.75 s (31.4, 13 beats); each fan claps when the beat reaches them: stripes of raised arms and scarves roll along the stand; domes and rings from each beat | each beat 2.9 s late; ~700 claps, each placed by its own arrival | THE DRUM · 2.9 S LATE · 99 M AWAY · EACH SECTION CLAPS WHEN IT HEARS IT · "A crowd could never clap in time…" / "…each beat would roll down the stand." |
+| 6 | 42.4–49.0 | From your seat: the storm over the far stand; the view lifts to it, then the lens closes on the far stand | the bed thins to near-silence and a low pad | THE FLASH AT 0:03 · 9.8 → 0.0 S · 1.71 KM AWAY · UNTIL ITS THUNDER REACHES YOU · "Remember the flash at the start?" / "Thunder would take half a minute per kilometre." |
+| 6 | 49.0–52.6 | The thunder's front reaches the far stand (49.4–49.9): the fans duck section by section; the lens opens and follows the front (a line on the grass, a faint wall in the air) across the pitch (51.1 centre, 52.07 near touchline); the players duck | gasps from between you and the storm arrive with the thunder | countdown |
+| 6 | 52.6–63.0 | It reaches you: shake, your hands to your ears, the rows around you duck; the view lifts to the sky; a new bolt (60.8); fade (62.75) | crack, boom, thump; the world muffled for 2.5 s; the roll in waves; a quiet chord | THE THUNDER · 50 S LATE · IT WOULD ROLL ON FOR OVER A MINUTE · "You'd see everything as it happened…" / "…and hear it long after it was over." · THAT FLASH · 45 S · UNTIL YOU HEAR IT · FICTIONAL SIMULATION note |
 
 ## 4. Hero shots (screenshot-worthy; cover candidate that doesn't spoil the payoff)
 
-- **Cover candidate (~46 s)**: the airliner overhead, shuddering in its own cone of shocked air, flames at the engines,
-  with "MACH 2.1" on screen. It spoils nothing about the street payoff.
-- The orange-red sports car on the highway, dust lifting off the deck behind it, "SUPERSONIC" on screen (~34 s).
-- The pigeon wave and dust sweeping up the avenue ahead of the airliner's boom (~53 s).
-- The shopfronts after the police car: glitter carpets in front of a few burst windows (~61 s).
+- **Cover candidate (~5.5 s)**: the start line from the stand, half the runners gone and half still waiting, the dome and
+  ring of the bang crossing the line, the black storm behind. It spoils nothing.
+- The clap stripes rolling along the far stand (~35 s).
+- The free kick's ring V on the grass with the ball in the air (~26.4 s).
+- The far stand ducking under the thunder, the storm above (~49.9 s).
 
 ## 5. Escalation check (a new consequence every 5–8 s; nothing static for 3 s)
 
-Claps slipping late under the title (1.4) → delayed voice (4.2) → delayed bangs at 100 m (11.0) → bangs after it stops
-(16.5) → Doppler octave (19.0) → almost supersonic at highway speed (24.0) → the car breaks the barrier (28.7) → its boom
-(36.5) → supersonic propellers (38.4) → a silent supersonic airliner (44.2) → its shock coming up the street (49.3) and
-arriving (54.4) → a silent police car (55.0) and the glass (59.4) → the aftermath and the line (63.2). Longest gap between
-new consequences: 7.8 s (the car's run from Mach 1 to its boom, held by the countdown). People, then machines, then
-infrastructure, then the street.
+The rule (1.35) and a silent flash (2.7) → the bang running down the line (4.3) → a voice that arrives late and hollow
+(10.35) → one voice heard three times (16.3) → a whistle an octave-and-a-half lower (23.2) → a supersonic shot heard
+after the goal (26.0) → a crowd that can't clap together (31.4) → the flash's thunder, still on its way (42.4) → its front
+crossing the stadium (49.4) → reaching you (52.6) → a new flash whose thunder is a minute away (60.8). People, then a
+whole crowd, then the sky. Longest gap between new consequences: 6.8 s (the drum shot, carried by the moving clap stripes).
 
 ## 6. Sound
 
-`films/slow-sound/audio.js` (`SndAudio`, an AudioEngine subclass; the engine file is untouched). Every source is timed
-by `SoundArrival`: one-shots are scheduled at their arrival time; moving sources (ambulance, highway cars, drone, airliner,
-police car, the avenue's own cars) are played through a delay line whose delay follows `SoundArrival.delayCurve`, which
-gives the late arrival, the Doppler pitch and the "everything at once" compression of a supersonic approach exactly. The
-booms are N-waves whose near-field length is about the body's length ÷ its speed, L / v (car 0.13 s, police car 0.11 s,
-airliner ~1.0 s; the film uses 0.15, 0.13 and 0.9 s),
-high-passed so the infrasonic ramp between the cracks doesn't pump the limiter, with a thump, rumble and window rattle.
-After the police car has passed, the siren it sounded while approaching arrives in reverse (the early branch of the
-arrival curve, `movingEarly`). Glass is placed pane by pane at the time each pane's breaking is heard. The mix measures
-−16.1 LUFS integrated, true peak −1.6 dBTP (an oversampled soft clip after the limiter). The airliner's engines
-also arrive through `movingEarly` after its boom (reversed, fading under the police beat). Licence-safe: everything is
-synthesised.
-
-One deliberate liberty: at 400–1,100 m the supersonic car's squeezed approach would be faint; the film puts a rising floor
-under it (never louder than the boom) so you hear it build.
+`films/slow-sound/audio.js` (`SndAudio`, an AudioEngine subclass; the engine file is untouched). Every one-shot is
+scheduled when its front reaches your ear (your ear jumps at the cuts): the arrival is found by marching the front
+(`SND_RUN`, which also handles the speed change under the title) against the ear's path. Thousands of small sounds
+(claps, cheers, gasps, footsteps) are mixed in JavaScript as grains, each placed by its own source's arrival, from the
+crowd's own numbers (`crowd.js`). Echoes are image sources off the four stand fronts. Voices are hollow (a buzz at the
+speaker's pitch through low resonances). Buses: crowd bed, sources, voices, effects, crowd, music, each with a trim; the
+thunder is the loudest moment. Measured (preview): −14.2 LUFS, true peak −1.2 dBFS before encoding (the final encode
+passes the audio through a limiter: AAC raises true peak by ~1.2 dB). Everything is synthesised.
 
 ## 7. Systems / files
 
-- `js/audio/soundArrival.js` — **new shared helper** (engine commit, additive): `arrivalTime`, `arrival`, `emissions`,
-  `emitTimeAt`, `delayCurve`, `firstArrival`, `mach`, `coneHalfAngle`, `boomDelay`.
-- `films/slow-sound/script.js` — numbers, paths, camera, captions, readouts; computes the three boom times at load.
-- `films/slow-sound/city.js` — `SndCity` (Environment subclass): avenue, lot, site, elevated highway, roofs and units for the glass.
-- `films/slow-sound/cast.js` — `SndCast`: friend, pilot, walkers, reactions, cars, police car, pile driver, drone, pigeons.
-- `films/slow-sound/waves.js` — `SndRipples` (expanding sound rings and wake fronts on the ground), `SndDust`, `SndPlaneFx`
-  (cone, vapour collar, flames, smoke, shudder), `SndGlass` (per-pane fates, burst/crack decals, shards, glitter).
+- `js/audio/soundArrival.js` — shared helper (added by this episode's first version, unchanged).
+- `films/slow-sound/script.js` — ★ the beats, the stadium layout, every moving thing, the camera shot by shot, the
+  arrivals at your ear, captions and live readouts.
+- `films/slow-sound/stadium.js` — `SndStadium` (Environment subclass): the pitch, stands, roof, masts and loudspeakers,
+  LED boards, the big screen (drawn live), goals and the bulging net, the city outside, the storm sky, lightning.
+- `films/slow-sound/crowd.js` — `SndCrowd`: ~9,000 fans, instanced, posed in the vertex shader from story time and their
+  own drum / thunder / goal times.
+- `films/slow-sound/cast.js` — `SndCast`: runners and the starter, the friend, the referee, the free kick, the drummer,
+  your neighbours, the players, the ball.
+- `films/slow-sound/waves.js` — `SndRipples` (rings on the grass), `SndShells` (fronts in the air), `SndPuffs` (gun smoke).
 - `films/slow-sound/audio.js` — the sound. `films/slow-sound/film.js` — build/update/grade.
-- Reused: CameraController, ViewerHands, StoryHUD, post grade, Look, PeopleSystem, VehicleFactory, BillboardSystem,
-  BlobShadows, AircraftSystem, SoundKit, Environment.
+- Reused: CameraController, ViewerHands, StoryHUD, post grade, Look, Person rig, BillboardSystem, BlobShadows,
+  SoundKit, SoundArrival, Environment.
 
 ## 8. Review log (scores as given, swipe timestamps, what changed — never inflated)
 
-Two rounds of four independent reviews (retention, a normal viewer, visual/cinematography, physics). Full notes, swipe
-points and what changed are in `EPISODE_REPORT.md`.
+City version (before the redesign): two rounds of four reviews: round 1 retention 4, viewer 5, visual 4.5, physics 7;
+round 2 retention 5, viewer 6, visual 5, physics 7.5.
 
-| Round | Previewed | Retention | Normal viewer | Visual | Physics |
-|---|---|---|---|---|---|
-| 1 | fe8fbab + plan | 4/10 | 5/10 | 4.5/10 | 7/10 |
-| 2 | c183492 | 5/10 | 6/10 | 5/10 | 7.5/10 |
-
-After round 2 (no third round was run): thin crisp ripple rings instead of glare bands, lighter dust with a near-camera
-fade and a taller billow under the airliner's shock, the shock-front view cleared of the lamp post and bin, the near-lane
-sedan brakes to a stop at the airliner boom so it doesn't cross the window payoff, parked cars rock on each boom, the sun
-moved behind you, the shout muffled, the airliner's reversed approach added, 290 km/h and L / v corrected, the ending
-tightened to 69.8 s with a two-line disclaimer plate. Not done: cutting ~9 s from 11–38 s (a cut breaks the continuous
-sound-delay take), a closer police pass.
+Stadium version: see `EPISODE_REPORT.md`.

@@ -339,7 +339,8 @@ function sndKmh(t) { const k = sndC(t) * 3.6; return k >= 1000 ? `${Math.floor(k
   R.push({ from: 42.8, until: tT + 0.1, top, label: 'THE FLASH AT 0:03', value: (t) => `${Math.max(0, tT - t).toFixed(1)} S`,
     sub: () => `${dT.toFixed(2)} KM AWAY`, ctx: 'UNTIL ITS THUNDER REACHES YOU' });
   R.push({ from: tT + 0.1, until: A.flash2.t, top, label: 'THE THUNDER', value: `${(tT - A.flash.t).toFixed(0)} S LATE`, sub: 'IT WOULD ROLL ON FOR OVER A MINUTE' });
-  R.push({ from: A.flash2.t + 0.15, until: A.note[1] + 0.05, top, label: 'THAT FLASH', value: (t) => `${Math.round(sndThunderAt(sndEar(A.flash2.t)) - t)} S`, sub: 'UNTIL YOU HEAR IT' });
+  const e2 = sndEar(A.flash2.t), tT2 = sndHeardAt(A.flash2.t, SND_P(A.flash2.x, 0, A.flash2.z), { x: e2.x, y: 0, z: e2.z });   // (the next flash's thunder: long after the film)
+  R.push({ from: A.flash2.t + 0.15, until: A.note[1] + 0.05, top, label: 'THAT FLASH', value: (t) => `${Math.round(tT2 - t)} S`, sub: 'UNTIL YOU HEAR IT' });
 
   // 5. the words, shown when they ARRIVE
   const S = SCRIPT.hud.says;

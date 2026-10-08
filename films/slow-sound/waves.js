@@ -20,7 +20,7 @@ class SndRipples {
     for (const s of P.pa.speakers) E.push([s.x, s.z, P.pa.speak, s.y, 2.4, 4.2, 0.6]);
     E.push([P.whistle.x, P.whistle.z, P.whistle.t, P.whistle.y, 2.6, 1.7, 0.2]);
     E.push([P.kick.x, P.kick.z, P.kick.t, 0.15, 2.8, 1.3, 0.14]);
-    for (let te = P.kick.t + 0.005; te < SND_BALL.tGoal; te += 0.022) { const b = sndBall(te); E.push([b.x, b.z, te, b.y, 1.1, 0.5, 0.09]); }
+    for (let te = P.kick.t + 0.005; te < SND_BALL.tGoal; te += 0.03) { const b = sndBall(te); E.push([b.x, b.z, te, b.y, 1.2, 0.5, 0.09]); }
     for (let k = 0; k < P.drum.n; k++) E.push([P.drum.x, P.drum.z, P.drum.t0 + k * P.drum.period, P.drum.y + 0.8, 1.5, 4.4, 0.3]);
     this.E = E;
     this.thunder = [SND_BOLT.x, SND_BOLT.z, P.flash.t];
@@ -93,9 +93,9 @@ class SndShells {
     E.push([P.whistle.x, P.whistle.y + 0.1, P.whistle.z, P.whistle.t, 0.75, 1.5]);
     E.push([P.kick.x, 0.15, P.kick.z, P.kick.t, 0.7, 1.2]);
     for (let te = P.kick.t + 0.02; te < SND_BALL.tGoal; te += 0.06) { const b = sndBall(te); E.push([b.x, b.y, b.z, te, 0.32, 0.55]); }
-    for (let k = 0; k < P.drum.n; k++) E.push([P.drum.x, P.drum.y + 1.0, P.drum.z, P.drum.t0 + k * P.drum.period, 0.42, 4.4]);
+    for (let k = 0; k < P.drum.n; k++) E.push([P.drum.x, P.drum.y + 1.0, P.drum.z, P.drum.t0 + k * P.drum.period, 0.42, 3.3]);
     this.E = E;
-    this.MAX = 24;
+    this.MAX = 12;
     const U = this.uniforms = { uFogDensity: { value: 0 } };
     const vs = /* glsl */`
       attribute float aS; varying vec3 vW, vC; varying float vS, vDepth;
@@ -118,12 +118,12 @@ class SndShells {
         if (vW.y < 0.02) discard;
         vec3 N = normalize(vW - vC), V = normalize(cameraPosition - vW);
         float f = 1.0 - abs(dot(N, V));
-        float a = vS * uK * (0.03 + 0.5 * pow(f, 5.0));
+        float a = vS * uK * (0.06 + 1.0 * pow(f, 5.0));   // (one face now, so twice the old two-face strength)
         a *= exp(-uFogDensity * vDepth) * smoothstep(1.0, 9.0, vDepth);
         gl_FragColor = vec4(vec3(0.88, 0.94, 1.0) * a, 1.0);
       }`;
     const mk = () => new THREE.ShaderMaterial({ uniforms: { uFogDensity: U.uFogDensity, uK: { value: 1 } }, vertexShader: vs, fragmentShader: fs,
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.FrontSide });   // (the near half only: half the fill)
     const g = new THREE.SphereGeometry(1, 64, 32);
     this.aS = new THREE.InstancedBufferAttribute(new Float32Array(this.MAX), 1);
     g.setAttribute('aS', this.aS);
