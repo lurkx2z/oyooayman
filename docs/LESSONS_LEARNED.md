@@ -141,9 +141,24 @@
   before.
 - `installFog` runs once; the first call wins (environment.js calls it with defaults).
 - `Environment.update` is Oxygen-specific. Override it in every subclass.
+- In an `Environment` subclass, give your own helper methods a film prefix. The base class already has `_bench`,
+  `_tree`, `_trees`, `_cafe` …; a subclass `_bench()` silently replaces the park-bench builder and gets called from the
+  base layout code too (No Surface Tension built its potting bench three times this way).
+- The Look grime shader paints any large `MeshStandardMaterial` with 1.25 m "replaced slab" cells: on a lawn they show
+  as dark rectangles. Opt a material out with `mat.userData.grime = 0`.
 - A test page inside `films/<slug>/` breaks relative paths. Test pages go in the root as `zz_*.html` and are deleted
   before committing.
 - Google Fonts fail in headless and from `file://` (proxy/cert). Fonts are bundled.
+
+- **A cut keyed as two camera keys at the same time shows one frame of the old shot.** `Track.value(t)` at exactly a
+  duplicated key time returns the first (pre-cut) key's value, while sets switched by `t >= T` are already on the new
+  shot: one broken frame per cut whenever T lands on a frame (no-surface-tension v2). Put the pre-cut key 0.01 s
+  before the cut: `[T - 0.01, old], [T, new]`.
+- **To lift one dark object, light the object, not the scene.** A small point light added to make a wet duck read lit
+  the pond's underside next to the camera: a blown-out glare (no-surface-tension v2). A self-light term in the object's
+  own material (`totalEmissiveRadiance += diffuseColor.rgb * k` via `onBeforeCompile`) only touches that object.
+- **A fast time-lapse flips day/night in two frames.** At about a day per second, a daylight curve that switches over
+  an hour of sun angle lasts two frames: a strobe. Average the light over half a second of story time.
 
 **Audio** (see `SOUND_GUIDE.md` § 6): offline exponential-ramp spikes; noise before its envelope; quiet/loud mixes;
 sub-only drones; cues running past their scene; editing `audioEngine.js` invalidates all bakes; changing SCRIPT after

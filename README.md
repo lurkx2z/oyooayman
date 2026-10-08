@@ -64,6 +64,17 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Film: *What if water lost all surface tension?*** — open `no-surface-tension.html` (60.1 s, version 2). Under the
+> title, water's surface tension falls from 72 mN/m to 0 and stays there; nothing else changes. Everything happens at
+> small scale in one kitchen and its garden: a brimming glass and its beads slump into films, a tap stream can't pinch
+> into drops, a paperclip sinks, a bottle of sparkling water turns white and erupts the moment it is opened (bubbles no
+> longer need to overcome a barrier), a water strider falls through the pond, water climbs none of four glass capillary
+> tubes, air breaks the water column inside a sunflower stem, the sunflower wilts in three days, and in the rain its
+> leaf tip can't make a drop; the camera follows the thread down to the waterline, where a duck soaks through and
+> sinks: *"It looks like a tiny force… until an entire ecosystem depends on it."* Then the rain stops, a low sun
+> comes out, and the duck tries to take off and can't. Physics rules, shot list and review log:
+> [`films/no-surface-tension/PLAN.md`](films/no-surface-tension/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -345,6 +356,21 @@ films/sim/aware.js       NPC_AWARE_01: the hero head (eyes that aim at the lens,
 films/sim/glitch.js      wireframe, debug labels, LOD pop, flat tree, checker, the ripple, the crack and the void
 films/sim/audio.js       the world's sound on its own clock (repeated, paused, reversed, replayed) + the film's sounds
 films/sim/film.js        FILM hooks: the fake pause, the exact replay of the opening, the composite, the interface, the grade
+```
+
+Film: *What if water lost all surface tension?* (`no-surface-tension.html`):
+
+```
+films/no-surface-tension/PLAN.md        the rule, what's held constant, the places, the shot list, sound, review log
+films/no-surface-tension/script.js      ★ every beat time, the cut (CONFIG.edit), captions, readouts, camera, hands
+films/no-surface-tension/water.js       water material, spreading drops and films, the fraying stream, mist, the wet look
+films/no-surface-tension/kitchen.js     the kitchen: glass and beads, tap and sink (with ghost drops), glass bowl, paperclip, the erupting bottle
+films/no-surface-tension/garden.js      the garden (Environment subclass): sky by day/night/rain, pond, striders, the duck, the sunflower, wilting, rain
+films/no-surface-tension/tubes.js       the capillary demo on the bench: four glass tubes in a dish, a cm card, ghost columns
+films/no-surface-tension/stem.js        inside the sunflower stem: xylem tubes, a pore, the column that snaps
+films/no-surface-tension/film.js        FILM hooks: hand poses, the watering can, the waterline lens, the finale camera, the grade
+films/no-surface-tension/audio.js       drips that stop, the hiss, the eruption, clicks in the stem, the duck, rain with no patter, the chord
+films/no-surface-tension/soundtrack.js  the baked soundtrack (regenerate with tools/bake-soundtrack.cjs after any sound change)
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):

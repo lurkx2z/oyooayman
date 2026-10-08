@@ -210,3 +210,43 @@
 - **Audience:** **performed extremely strongly** (handoff).
 - **Lessons:** self-aware parody + full production seriousness; use the edit layer aggressively; every link of a chain
   needs its own visible proof.
+
+### What if water lost all surface tension?  (2026-10-08 batch, built on its own branch)
+- **Page / folder:** `no-surface-tension.html` · `films/no-surface-tension/` (no cross-film files)
+- **Duration:** version 2: 60.1 s film (65.7 s story; `CONFIG.edit` keeps five stretches). Version 1 (60.3 s) is
+  commit 7f52dbf.
+- **Version 1 built:**
+  - a Fresnel water material, spreading drop/film puddles (Huppert's gravity–viscous law), a fraying tap stream,
+    soft mist, a wet look for counters;
+  - a kitchen (glass with a domed top and beads, gooseneck tap and steel sink, glass bowl, paperclip, paper towel,
+    sponge) with its own reflection map;
+  - a garden `Environment` subclass: sky by day, night and storm; pond with pads and striders; potting bench; flower
+    bed; three-day wilting (droop and colour); torn-strand rain; the park and city beyond;
+  - the watering can, a soaking umbrella shader, world tags ("NORMAL WATER WOULD …"), a drone rise with lightning;
+  - a sound design where water's voice is drops, so after the change it only hisses.
+- **Version 2 (the owner's 2026-10-08 creative override: "beautiful, strange microscopic physics", no city):** the
+  towel, sponge, watering-can-on-soil, umbrella, drone rise and city were replaced by a sparkling-water bottle that
+  erupts when opened, glass capillary tubes with ghost columns of where water used to climb, the inside of a sunflower
+  stem where air breaks the water column, a three-day wilt of one sunflower, its leaf tip in the rain letting water go as
+  a thread, and a soaked duck sinking at the pond's waterline beside the ghost of where it used to float. Pale "ghosts"
+  replaced the text tags. Kept: the glass, the tap (now with ghost drops), the paperclip, the strider.
+- **Worked (per reviewers):** version 1: the tap ribbon, clear kitchen beats, physics 7 → 8. Version 2: the bottle
+  eruption, the stem snap, the tube ghosts, the leaf thread and the waterline duck were called the distinctive moments;
+  physics 8; distinctiveness 8 then 7 (the most different film of the batch).
+- **Didn't:** version 1's first cut was too long with a dead time-lapse, rain read as normal rain; an engine method name
+  clash (`_bench`) built the potting bench three times; the Look grime pass painted dark slabs on the lawn
+  (`userData.grime = 0` fixes it). Version 2's first finale was too dark to read on a phone; camera keys exactly at a
+  cut showed one frame of the previous shot; the ghost device and the rainy tilt-up ending still read as recycled (the tilt was
+  replaced by the soaked duck failing to take off after the rain).
+- **Reviews:** version 1, three rounds (retention / viewer / visual / cinematography / physics): 5 / 5 / 5.5 / 5 / 7 →
+  5 / 6 / 5 / 5 / 7 → 6 / 5 / 6 / 6 / 8. Version 2: 5.5 / 6 / 5.5 / 5 / 7 → 4.5 / 5.5 / 5 / 4.5 / 8 → final audit of
+  the real MP4 5.5 / 6 / 6 / 5.5 / 8 → re-check after its top-3 fixes 5 / 6 / 6 / 5.5 / 8 (distinctiveness 7.5,
+  keep-watching 5.5). The ending's last fixes (the failed take-off) were not re-scored. Full log in
+  `films/no-surface-tension/PLAN.md` § 8.
+- **Audience:** UNKNOWN.
+- **Lessons:** in a subclass of `Environment`, prefix private method names (the base class has `_bench`, `_tree` …);
+  soft round sprites always read as drops, so "no drops" water needs streaks, ribbons or haze; show what is missing
+  (a ghost outline or a "would be here" tag), because an absent effect is invisible on its own; but one ghost device
+  used four times reads as a template; small-scale water needs light (a dark rainy finale is unreadable on a phone);
+  a camera 'step' key placed exactly at a cut time returns the previous shot's value on that frame (put it 0.01 s
+  earlier).
