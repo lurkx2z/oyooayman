@@ -20,19 +20,20 @@ CONFIG.render.shadowMapSize = 2048;
 const NST = {
   title: [-0.6, 3.9],
   drop: 1.2, zero: 1.6,            // surface tension falls 72 → 0 mN/m between these
-  tap: 4.4, tapOn: 5.0,            // the tap, barely open: a trickle that can't break into drops
+  tap: 4.4, tapOn: 4.45,            // the tap, barely open: a trickle that can't break into drops
   clip: 9.6, clipLet: 10.95,       // the paperclip: lowered onto the water, let go, sinks
   towel: 14.6, towelIn: 15.55,     // a paper towel strip dipped in the bowl: nothing climbs
   sponge: 18.3, spongeUp: 18.45,   // the soaked sponge lifted out of the sink: it can't hold the water
-  pond: 22.2, strider: 24.6,       // outside, at the pond: a water strider steps off a lily pad and falls through
+  pond: 22.2, strider: 23.8,       // outside, at the pond: a water strider steps off a lily pad and falls through
   bench: 29.0, pour: 29.75, pourEnd: 33.3,   // watering a pot: it runs straight out of the bottom
   wick: 33.7,                      // the self-watering wick (cut from the film: CONFIG.edit)
   lapse: 37.4, lapse0: 38.0, lapse1: 44.6,  // days pass: the plants wilt
-  clouds: 48.2, rain: 49.4,        // rain: torn spray, not drops
+  clouds: 48.2, rain: 48.9,        // rain: torn spray, not drops
   umb: 52.6,                       // look up: the umbrella soaks through
   drone: 57.0,                     // the payoff: up over the garden, the park, the city in the storm
   line1: 60.6, line2: 63.4, note: 66.6, end: 68.6,
-  flashes: [[58.3, 1.0], [61.75, 0.75], [64.2, 0.95]],   // lightning in the payoff [time, strength] (sky, grade, thunder)
+  flashes: [[58.3, 1.0], [60.55, 0.8], [63.35, 0.95]],   // (the last two land with the closing lines)
+    // lightning in the payoff [time, strength] (sky, grade, thunder)
 };
 
 // the cut (story intervals kept): the pond's tail, the wick pot, the end of the time-lapse → ≈ 61 s
@@ -104,7 +105,7 @@ const SCRIPT = {
     yaw: [[0, 0], [4.4, 0], [4.4, 63, 'step'], [9.6, 64], [9.6, 0, 'step'], [14.6, 0], [18.3, 0], [18.3, -4, 'step'], [22.2, -5],
       [22.2, 2, 'step'], [23.7, 1], [24.5, 0, 'inOutSine'], [29.0, -1],
       [29.0, 186, 'step'], [33.7, 187], [33.7, 200, 'step'], [37.4, 199],
-      [37.4, 6, 'step'], [44.0, 3], [45.2, 3], [47.9, 3], [50.6, 10], [52.6, 6], [53.4, 4], [57.0, 2]],
+      [37.4, 14, 'step'], [44.0, 11], [45.2, 11], [47.9, 10.5], [50.6, 12], [52.6, 7], [53.4, 4], [57.0, 2]],
     pitch: [[0, -20], [4.4, -20.5], [4.4, 5, 'step'], [9.6, 4], [9.6, -19, 'step'], [10.9, -21], [11.6, -25, 'inOutSine'], [14.6, -26], [14.6, -15.5, 'step'], [18.3, -16], [18.3, -46, 'step'], [18.5, -46], [19.6, -38, 'inOutSine'], [22.2, -37],
       [22.2, -65, 'step'], [24.4, -66], [29.0, -66.5],
       [29.0, -27, 'step'], [33.7, -28], [33.7, -6, 'step'], [37.4, -7],
@@ -138,13 +139,13 @@ const SCRIPT = {
     captions: [
       { t: 5.6, until: 9.3, text: 'Water would stop forming drops.' },
       { t: 11.6, until: 14.4, text: 'A paperclip used to float on it.' },
-      { t: 16.2, until: 18.25, text: 'Paper can’t soak it up anymore.' },
+      { t: 16.2, until: 18.25, text: 'Paper towels can’t pull it up anymore.' },
       { t: 19.2, until: 21.95, text: 'A sponge can’t hold water anymore.' },
       { t: 22.9, until: 27.75, text: 'Insects that walk on water fall through.' },
       { t: 30.6, until: 33.65, text: 'Soil can’t hold water either.' },
-      { t: 38.4, until: 41.3, text: 'Leaves pull water up from the roots.' },
+      { t: 38.4, until: 41.3, text: 'Leaves pull water up through hair-thin tubes.' },
       { t: 41.6, until: 44.9, text: 'Without surface tension, air leaks in and the pull breaks.' },
-      { t: 50.0, until: 52.9, text: 'Rain can’t hold itself together.' },
+      { t: 49.0, until: 52.9, text: 'Rain can’t hold itself together.' },
       { t: 53.9, until: 56.8, text: 'And woven fabric can’t keep it out.' },
       { t: NST.line1, until: NST.line2 - 0.25, text: 'It looks like a tiny force…' },
       { t: NST.line2, until: NST.note - 0.1, text: '…until an entire ecosystem depends on it.' },
@@ -154,11 +155,11 @@ const SCRIPT = {
       { from: 22.5, until: 27.75, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'NO SURFACE SKIN TO STAND ON' },
       { from: 29.9, until: 33.65, top: 220, label: 'CAPILLARY RISE', value: () => '0 mm', sub: 'TINY PORES CAN’T HOLD WATER NOW' },
       { from: 37.9, until: 48.6, top: 220, label: 'TIME SINCE THE CHANGE', value: (t) => nstDayText(t), sub: (t) => `PLANTS WILTING · ${Math.round(nstWilt(t) * 100)} %` },
-      { from: 49.7, until: 52.9, top: 220, label: 'RAINDROPS', value: () => '0', sub: 'IT FALLS AS TORN RIBBONS AND MIST' },
+      { from: 48.6, until: 52.9, top: 220, label: 'ROUND DROPS', value: () => '0', sub: 'IT FALLS AS SHREDS AND MIST' },
       { from: 57.2, until: 66.4, top: 220, label: 'SURFACE TENSION', value: () => '0 mN/m', sub: 'SAME WATER · NO DROPS' },
     ],
     notes: [
-      { t: NST.note, until: NST.end + 0.2, text: 'FICTIONAL RULE: ONLY WATER’S SURFACE TENSION CHANGED · TIME COMPRESSED' },
+      { t: NST.note, until: NST.end + 0.2, text: 'FICTIONAL RULE: ONLY WATER’S SURFACE TENSION CHANGED<br>TIME COMPRESSED' },
     ],
   },
 };

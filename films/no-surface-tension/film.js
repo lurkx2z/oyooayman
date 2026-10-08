@@ -90,26 +90,17 @@ const FILM = {
     cm.onBeforeCompile = (sh) => {
       sh.uniforms.uWet = cm.userData.wet;
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vLocU;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvLocU = position;');
-      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vLocU; uniform float uWet;')
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vLocU; uniform float uWet;\nfloat nstVn(vec2 q) { vec2 i = floor(q), f = fract(q); f = f * f * (3.0 - 2.0 * f); float a = fract(sin(dot(i, vec2(12.9, 78.2))) * 43758.5), b = fract(sin(dot(i + vec2(1, 0), vec2(12.9, 78.2))) * 43758.5), c = fract(sin(dot(i + vec2(0, 1), vec2(12.9, 78.2))) * 43758.5), d = fract(sin(dot(i + vec2(1, 1), vec2(12.9, 78.2))) * 43758.5); return mix(mix(a, b, f.x), mix(c, d, f.x), f.y); }')
         .replace('#include <color_fragment>', `#include <color_fragment>
           float rr = length(vLocU.xz) / 0.52;
           float an = atan(vLocU.z, vLocU.x);
           float seam = pow(abs(cos(an * 4.0)), 18.0);
           float n = fract(sin(dot(floor(vec2(an * 9.0, rr * 14.0)), vec2(12.9, 78.2))) * 43758.5);
-          // soaked spots: water soaks in only where it lands (no wicking sideways now): spots that each appear in place,
-          // darken and stay, until most of the canopy is spotted (a few dry gaps remain)
-          vec2 sp = vLocU.xz / 0.07; vec2 si = floor(sp); float wet = 0.0;
-          for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
-            vec2 c = si + vec2(float(i), float(j));
-            float h1 = fract(sin(dot(c, vec2(12.9, 78.2))) * 43758.5), h2 = fract(sin(dot(c, vec2(39.3, 11.7))) * 24634.6), h3 = fract(sin(dot(c, vec2(73.1, 52.9))) * 31718.9);
-            vec2 ctr = c + 0.5 + 0.6 * (vec2(h1, h2) - 0.5);
-            vec2 dv = sp - ctr; float ang2 = atan(dv.y, dv.x);
-            float rad = (0.22 + 0.55 * h3 * h3) * (1.0 + 0.09 * sin(ang2 * 2.0 + h2 * 20.0) + 0.04 * sin(ang2 * 5.0 + h1 * 31.0));
-            float on = smoothstep(h1 * 0.9, h1 * 0.9 + 0.12, uWet * (1.0 + 0.25 * (1.0 - rr)));
-            wet = max(wet, on * (1.0 - smoothstep(rad * 0.6, rad, length(dv))));
-          }
-          wet *= 0.92;
-          float streak = 0.0;
+          // soaking through: the fine spray wets the fabric evenly, and where the falling shreds hit it darkens in
+          // ragged streaks that run down the slope of each panel (gravity, not wicking: nothing spreads sideways)
+          float gn = 0.65 * nstVn(vec2(an * 15.0 + 2.0 * nstVn(vec2(an * 5.0, rr * 3.0)), rr * 2.6 - uWet * 0.7)) + 0.35 * nstVn(vec2(an * 37.0, rr * 6.0 - uWet * 1.4));
+          float streak = smoothstep(0.5, 0.82, gn + 0.22 * rr - 0.3 * (1.0 - uWet));
+          float wet = clamp(0.55 * uWet * (0.5 + 0.5 * rr) + 0.45 * streak * smoothstep(0.05, 0.4, uWet), 0.0, 0.9);
           diffuseColor.rgb *= mix(vec3(1.0), vec3(0.6, 0.5, 0.32), wet);     // soaked: a deeper, more saturated ochre
           diffuseColor.rgb += seam * 0.03;`)
         .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
@@ -139,7 +130,7 @@ const FILM = {
     if (t >= T.drone) {
       const k = Ease.inOutSine(MathX.clamp((t - T.drone) / (T.end - T.drone), 0, 1)), k2 = MathX.smooth(t, T.drone, T.drone + 6);
       cam.position.set(MathX.lerp(-2.0, -0.6, k), MathX.lerp(2.0, 24, k), MathX.lerp(-1.0, 6.5, k));
-      this._v.set(MathX.lerp(-1.1, -0.8, k2), MathX.lerp(1.2, 0.0, k2), MathX.lerp(-9.0, -52, k));
+      this._v.set(MathX.lerp(-1.1, -0.8, k2), MathX.lerp(1.2, 0.0, k2), MathX.lerp(-9.0, -100, k));
       cam.up.set(0, 1, 0); cam.lookAt(this._v);
       cam.fov = MathX.lerp(62, 54, k); cam.updateProjectionMatrix();
     }
@@ -166,7 +157,7 @@ const FILM = {
       for (const n of ['tapReach', 'tapTurn']) nstAimHand(n, cam, V, Fw, Nw);
     }
     if (t >= T.clip - 0.5 && t < T.clipLet + 1.0) {
-      K.clipPos(Math.min(t, T.clipLet), V); V.x += 0.017; V.y += 0.031; V.z -= 0.007;     // pinching its right-hand end, fingertips above the water
+      K.clipPos(Math.min(t, T.clipLet), V); V.x += 0.017; V.y += 0.04; V.z -= 0.007;     // pinching its right-hand end, fingertips above the water
       if (t > T.clipLet) V.y += 0.09 * MathX.smooth(t, T.clipLet - 0.02, T.clipLet + 0.35) + 0.3 * MathX.smooth(t, T.clipLet + 0.35, T.clipLet + 0.95);   // and away, up out of frame
       Fw.set(-0.8, -0.55, -0.15); Nw.set(0.05, -0.35, -0.95);       // from the right, side-on: the bowl stays in view
       for (const n of ['clipHold', 'clipOpen']) nstAimHand(n, cam, V, Fw, Nw);
@@ -269,7 +260,7 @@ const FILM = {
     p.saturation -= 0.26 * storm; p.exposure -= 0.1 * storm; p.contrast += 0.04 * storm; p.warmth -= 0.1 * storm; p.blackLift += 0.006 * storm;
     p.vignette += 0.12 * storm;
     // nights in the time-lapse: lifted so they read as moonlight, not black frames
-    if (t > T.lapse && t < T.clouds) p.exposure += 0.3 * (1 - nstDaylight(nstDay(t)));
+    if (t > T.lapse && t < T.clouds) p.exposure += 0.5 * (1 - nstDaylight(nstDay(t)));
     // the rise: a little clearer
     p.exposure += 0.08 * MathX.smooth(t, T.drone, T.drone + 2); p.saturation += 0.08 * MathX.smooth(t, T.drone, T.drone + 2);
     // lightning (the sky does most of it; a whisper of flash in the grade)

@@ -33,7 +33,7 @@ function nstWaterMat({ color = '#a9c3cc', opacity = 0.32, fres = 0.6, rough = 0.
 
 // a bead (glossy see-through lens) → a thin wet film (reads as a darker, glossy wet patch on the surface), k 0..1
 // (a dim reflection: a thin film on a counter mirrors the window as a faint sheen, not as a white sheet)
-const NST_WET = { color: new THREE.Color('#0b0f11'), opacity: 0.5, fres: 0.3, env: 0.18, rough: 0.1 };
+const NST_WET = { color: new THREE.Color('#0b0f11'), opacity: 0.5, fres: 0.42, env: 0.36, rough: 0.06 };
 function nstWetLook(m, k) {
   const u = m.userData;
   if (!u.base) u.base = { color: m.color.clone(), opacity: m.opacity, fres: u.fres.value, env: m.envMapIntensity, rough: m.roughness };

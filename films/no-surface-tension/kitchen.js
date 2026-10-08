@@ -7,7 +7,7 @@
 
 const NST_K = {
   top: 0.92,
-  domeH: 0.0055,                    // the water heaped above the rim of a brimming glass (exaggerated a little)
+  domeH: 0.0075,                    // the water heaped above the rim of a brimming glass (exaggerated a little)
   glass: { x: -0.56, z: 0.52, r: 0.036, rb: 0.031, h: 0.112, wall: 0.0028 },
   beads: [[-0.65, 0.555, 1.0], [-0.47, 0.565, 0.8], [-0.625, 0.615, 0.45], [-0.5, 0.62, 0.35], [-0.67, 0.49, 0.25]],   // x, z, ml (around the glass's foot)
   leafBeads: [[0.0, 0.006, 0.08], [-0.012, -0.012, 0.05], [0.014, -0.01, 0.04]],   // offsets on the hero leaf, ml
@@ -415,9 +415,9 @@ class NstKitchen {
     const ys = top + B.water;
     if (t < T.clipLet) { const k = Ease.inOutSine(MathX.clamp((t - T.clip - 0.3) / (T.clipLet - T.clip - 0.3), 0, 1)); return out.set(B.x + 0.012, MathX.lerp(ys + 0.075, ys + 0.004, k), B.z + 0.004); }
     const u = t - T.clipLet;
-    // it sinks through water: quick at first, slowed by the water (terminal ≈ 0.18 m/s for a flat clip), tumbling
+    // it sinks through water: quick at first, slowed by the water (a flat clip settles at roughly 0.1 m/s), tumbling
     // (a flat clip glides and wobbles side to side on the way down)
-    const depth = Math.min(B.water - 0.0075, 0.12 * u + 0.004 * (1 - Math.exp(-u * 8)));
+    const depth = Math.min(B.water - 0.0075, 0.08 * u + 0.004 * (1 - Math.exp(-u * 8)));
     const glide = 0.006 * Math.sin(u * 9) * Math.exp(-u * 1.6) * (depth < B.water - 0.0076 ? 1 : 0);
     return out.set(B.x + 0.012 + 0.01 * Math.min(1, u * 2.5) + glide, ys + 0.004 - depth - 0.004 * Math.min(1, u * 10), B.z + 0.004 - 0.022 * Math.min(1, u * 2.5));
   }
@@ -446,7 +446,7 @@ class NstKitchen {
         st.at(tau, c);
         const a = hash1(i * 5.3 + cyc) * 6.28, off = 0.003 + 0.012 * u * hash1(i * 2.9 + cyc * 0.7);
         const vy = st.v0.y - 9.81 * tau;
-        return { p: [c.x + Math.cos(a) * off, c.y, c.z + Math.sin(a) * off], v: [Math.cos(a) * 0.09 * u, vy * 0.8, Math.sin(a) * 0.09 * u], life: 0.32, size0: 0.006, size1: 0.02, a: 0.09 * on * Math.min(1, u), g: 9.81, floor: level };     // (soft wisps, not specks: specks read as drops)
+        return { p: [c.x + Math.cos(a) * off, c.y, c.z + Math.sin(a) * off], v: [Math.cos(a) * 0.09 * u, vy * 0.8, Math.sin(a) * 0.09 * u], life: 0.32, size0: 0.014, size1: 0.04, a: 0.04 * on * Math.min(1, u), g: 9.81, floor: level };     // (soft wisps, not specks: specks read as drops)
       }, 1.0, [0.9, 0.94, 0.96]);
       st.at(st.T, c);
       const cx = c.x, cz = c.z;
@@ -511,7 +511,7 @@ class NstKitchen {
     const u = Math.max(0, t - T.clipLet);
     this.clip.rotation.set(0.9 * (1 - Math.exp(-u * 5)) * Math.sin(u * 6) * Math.exp(-u * 1.5) + (u > 0.5 ? 0.04 : 0), 0.4 + 0.5 * Math.min(1, u * 2), 0.6 * Math.min(1, u * 3) * Math.exp(-u * 2.5));
     this.clip.visible = t > T.clip - 0.1 && t < T.sponge;
-    const ga = 0.55 * MathX.smooth(t, T.clipLet + 0.25, T.clipLet + 0.7) * (1 - MathX.smooth(t, T.towel - 0.4, T.towel));
+    const ga = 0.3 * MathX.smooth(t, T.clipLet + 0.25, T.clipLet + 0.7) * (1 - MathX.smooth(t, T.towel - 0.4, T.towel));
     this.clipGhost.visible = ga > 0.003; this.clipGhost.material.opacity = ga;
     if (ga > 0.003) { const B = NST_K.bowl; this.clipGhost.position.set(B.x + 0.012, top + B.water + 0.0012, B.z + 0.004); this.clipGhost.rotation.set(0, 0.4, 0); }
     const ru = t - T.clipLet;

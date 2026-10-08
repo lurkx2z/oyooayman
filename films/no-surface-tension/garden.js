@@ -268,7 +268,7 @@ class NstGarden extends Environment {
       return g;
     };
     this.striders = [mk(1.35), mk(1.25), mk(1.3), mk(1.2)];
-    this.ripples = [0, 1].map(() => { const m = new THREE.Mesh(new THREE.RingGeometry(0.88, 1.0, 48), new THREE.MeshBasicMaterial({ color: '#dfe9e6', transparent: true, opacity: 0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.renderOrder = 5; m.visible = false; this.root.add(m); return m; });
+    this.ripples = [0, 1].map(() => { const m = new THREE.Mesh(new THREE.RingGeometry(0.95, 1.0, 64), new THREE.MeshBasicMaterial({ color: '#dfe9e6', transparent: true, opacity: 0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.renderOrder = 5; m.visible = false; this.root.add(m); return m; });
     this._sv = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
   }
 
@@ -492,7 +492,7 @@ class NstGarden extends Environment {
     const low = 1 - MathX.smooth(this.sunDir.y, 0.05, 0.35);
     hor.lerp(new THREE.Color('#e0a97c'), 0.45 * low * dl * (1 - storm));
     this.scene.background.copy(hor);
-    this.scene.fog.density = MathX.lerp(0.0032, 0.012, storm) * (1 + 0.45 * rain) * (1 - 0.72 * MathX.smooth(t, NST.drone, NST.drone + 3));   // thinner for the rise: you see the landscape
+    this.scene.fog.density = MathX.lerp(0.0032, 0.012, storm) * (1 + 0.45 * rain) * (1 - 0.82 * MathX.smooth(t, NST.drone, NST.drone + 3));   // thinner for the rise: you see the landscape
     // lightning: two flashes during the payoff
     const fl = nstFlash(t);
     U.uFlash.value = fl;
@@ -506,7 +506,8 @@ class NstGarden extends Environment {
     this.scene.environmentIntensity = (0.18 + 0.24 * dl) * (1 - 0.3 * storm);
 
     // wilting: lawn toward straw, leaves toward olive, flowers bow, potted leaves droop
-    this.lawnMat.color.setRGB(0.85 + 0.8 * wilt, 0.85 + 0.12 * wilt, 0.85 - 0.25 * wilt);      // (linear multipliers: green → dry straw)
+    // (pushed further toward straw under the storm light, which otherwise turns dry grass back to olive green)
+    this.lawnMat.color.setRGB(0.85 + (0.8 + 0.45 * storm) * wilt, 0.85 + (0.12 + 0.06 * storm) * wilt, 0.85 - (0.25 + 0.2 * storm) * wilt);      // (linear multipliers: green → dry straw)
     this.m.foliage.color.setRGB(1 + 0.3 * wilt, 1 - 0.3 * wilt, 1 - 0.45 * wilt);         // (dull olive-brown, not autumn gold)
     for (const fw of this.flowers) {
       const w = MathX.clamp(wilt * 1.25 - fw.lag, 0, 1);
@@ -592,11 +593,11 @@ class NstGarden extends Environment {
     }
     // the ripples from the break-through (gravity ripples: faint, slow)
     this.ripples.forEach((m, k) => {
-      const ru = u - 0.15 - k * 0.35, on = ru > 0 && ru < 2.2;
+      const ru = u - 0.15 - k * 0.6, on = ru > 0 && ru < 2.2;
       m.visible = on; if (!on) return;
-      const R = 0.008 + 0.045 * ru; m.scale.set(R, R, 1);
+      const R = 0.008 + 0.06 * ru; m.scale.set(R, R, 1);
       m.position.set(px - 0.014, ys + 0.0012, pz + 0.004);
-      m.material.opacity = 0.35 * (1 - ru / 2.2) * MathX.smooth(ru, 0, 0.08) * (k ? 0.6 : 1);
+      m.material.opacity = 0.16 * (1 - ru / 2.2) * MathX.smooth(ru, 0, 0.08) * (k ? 0.6 : 1);
     });
     // 3: already drowned under the surface near the pads, drifting
     place(this.striders[3], pad[0] - 0.09 + 0.004 * Math.sin(t * 0.3), ys - 0.035, pad[1] + 0.05, 1.2 + 0.05 * t, (l, out) => { const a = l.ang * 1.1; out.set(Math.sin(a) * l.L, -0.003 + 0.002 * Math.sin(t * 2 + l.ang), -Math.cos(a) * l.L); });
@@ -610,7 +611,7 @@ class NstGarden extends Environment {
       // without surface tension falling water can't stay as drops: it falls as slow, wavy torn ribbons (like the tap's
       // stream) that twist and fray (≈1.5–3 m/s, not the 9 m/s of big raindrops) and drift on the wind. Each slot is
       // one ribbon drawn as a short twisting polyline; nothing is drawn right at the lens (up close they read as scratches).
-      const N = Math.floor(1500 * rain), box = 8, P = this._rp || (this._rp = new Float32Array(18));
+      const N = Math.floor(950 * rain), box = 8, P = this._rp || (this._rp = new Float32Array(18));
       for (let i = 0; i < N; i++) {
         const vf = 1.5 + 1.5 * hash1(i * 1.3), per = H / vf;
         const ph = hash1(i * 2.7 + 1) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc, tt = age * per;
@@ -623,7 +624,7 @@ class NstGarden extends Environment {
         // the ribbon trails up-wind of its head: length 0.2–0.6 m, a helical twist that travels along it
         const L = 0.2 + 0.4 * sz, hyp = Math.hypot(wind, vf), dx = -wind / hyp, dy = vf / hyp;
         const A = 0.018 + 0.03 * sz, ph0 = hash1(i * 9.1 + cyc) * 6.283, gap = Math.floor(hash1(i * 4.4 + cyc) * 7);
-        const a = 0.34 * rain * (0.55 + 0.45 * sz) * Math.min(1, age * 8) * Math.min(1, (1 - age) * 8) * near;
+        const a = 0.2 * rain * (0.55 + 0.45 * sz) * Math.min(1, age * 8) * Math.min(1, (1 - age) * 8) * near;
         for (let k = 0; k < 6; k++) {
           const u = k / 5, w = A * (0.35 + 0.65 * u), q = ph0 + u * 7.5 - tt * 5;
           P[k * 3] = x + dx * L * u - dy * w * Math.sin(q);
@@ -632,10 +633,10 @@ class NstGarden extends Environment {
         }
         for (let k = 0; k < 5; k++) {
           if (k === gap) continue;                                 // torn: one link missing on most ribbons
-          const u = k / 5, ak = a * (1 - 0.55 * u), wk = (0.0045 + 0.004 * sz) * (1 - 0.5 * u);
+          const u = k / 5, ak = a * (1 - 0.55 * u), wk = (0.011 + 0.012 * sz) * (1 - 0.45 * u);     // (wide translucent strips: thin lines read as scratches)
           // the streak quad overhangs its ends by its width: pull the ends in so links don't overlap into bright beads
           const ex = P[k * 3 + 3] - P[k * 3], ey = P[k * 3 + 4] - P[k * 3 + 1], ez = P[k * 3 + 5] - P[k * 3 + 2], el = Math.hypot(ex, ey, ez) || 1, f = wk / el;
-          S.push(P[k * 3] + ex * f, P[k * 3 + 1] + ey * f, P[k * 3 + 2] + ez * f, P[k * 3 + 3] - ex * f, P[k * 3 + 4] - ey * f, P[k * 3 + 5] - ez * f, 0.82, 0.86, 0.89, ak, wk);
+          S.push(P[k * 3] + ex * f, P[k * 3 + 1] + ey * f, P[k * 3 + 2] + ez * f, P[k * 3 + 3] - ex * f, P[k * 3 + 4] - ey * f, P[k * 3 + 5] - ez * f, 0.72, 0.82, 0.92, ak, wk);
         }
       }
       // mist: the falling water shreds into fine spray that drifts with the wind: a few huge, faint sheets far off
