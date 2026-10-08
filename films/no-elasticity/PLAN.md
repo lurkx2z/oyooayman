@@ -12,8 +12,8 @@ whole day while its clock never moves → night on the stopped clock. Why and ho
 §2–§7 below describe the v1 cut (its code is still in the repository, switched off by `NE_STREET`). Film time = story
 time in v2 (no `CONFIG.edit`).
 
-**Status (2026-10-08):** v1 delivered in the morning (60.2 s). v2 redesign built, reviewed (§8, round 5) and rendered;
-delivery details in `EPISODE_REPORT.md`.
+**Status (2026-10-08):** v1 delivered in the morning (60.2 s). v2 redesign built, reviewed (§8, rounds 5 and 6),
+rendered, audited at 1080 × 1920, fixed and re-rendered (§8, final audit); delivery details in `EPISODE_REPORT.md`.
 
 **Story clock and the cut.** Camera, script, props, cars and sound all run on one 73.6 s story clock (the times in this
 plan are story times unless marked "film"). `CONFIG.edit` drops the waits (story 18.2–21.6, 26.9–33.6, 40.8–42.2,
@@ -64,18 +64,20 @@ You stand by the plaza at (11.4, −2.9) for the ball, the montage and the tramp
 
 | # | Time | What we SEE | What we HEAR | Caption / HUD |
 |---|---|---|---|---|
-| 1 | 0–1.75 | **Hook.** Seated at a café table under the title: a Newton's cradle clacks (0.15, 0.62, 1.09); a red quartz desk clock beside it takes its last step at 1.0 (3:41:51 → 3:41:52). At 1.56 the end ball swings back and nothing flies out: the row shoves along together. | Three bright clacks, two ticks (the second the last), a low hit and a slack, falling tone as the rule bites, then one dead "tock". | **TITLE** (to 3.5) · SHAPE RECOVERY 100 % → 0 % (1.0–1.45) · NOTHING SPRINGS BACK |
-| 2 | 1.75–5.6 | Low insert beside the cradle: the five balls swing a little as one; from 3.3 a yellow ghost ball and dashed string where the far ball should have flown. | Café room tone. | *A Newton's cradle passes the hit along by springing back…* · *…so now the balls just shove together.* · tag NORMALLY, THIS ONE FLIES OUT |
+| 1 | 0–2.6 | **Hook.** Seated at a café table under the title, leaning in a little toward the clock: a Newton's cradle clacks (0.15, 0.62, 1.09); a red quartz desk clock beside it takes its last step at 1.0 (3:41:51 → 3:41:52) and misses the next one at 2.0. At 1.56 the end ball swings back and nothing flies out: the row shoves along together. | Three bright clacks, two ticks (the second the last), a low hit and a slack, falling tone as the rule bites, then one dead "tock". | **TITLE** (to 3.5) · SHAPE RECOVERY 100 % → 0 % (1.0–1.45) · NOTHING SPRINGS BACK |
+| 2 | 2.6–5.6 | Low insert beside the cradle: the five balls swing a little as one; from 3.5 a yellow ghost ball and dashed string where the far ball should have flown. | Café room tone. | *Steel can’t spring back now…* · *…so the balls just shove together.* · tag NORMALLY, THIS ONE FLIES OUT |
 | 3 | 5.6–13.4 | **Everyday things** (four close inserts): racket strings stay stretched (the ball barely leaves them); shoe foam stays crushed; a cushion keeps the dent; your hands stretch a rubber band once. | Thup, foam, bench, rubber rustle (no snap). | A label plate on each. |
 | 4 | 13.4–18.2 | **Trampoline.** A kid lands; the mat stays down in a funnel. | One dull whump, no boing; "oh?". | *Even things built to bounce back…* · *Bodies are fine. Their gear isn't.* |
-| 5 | 18.2–21.2 | **The bow**, first person at eye level: nock, draw, aim at a target 14 m away, let go. The string goes limp, the limbs stay bent, the arrow falls off the bow. | A soft creasing (no creak), a held breath, a soft "fwup" (no twang), one dry clatter. | *A bow is a spring you bend by hand…* / *…and nothing bends it back.* · LAUNCH SPEED 0 km/h · NORMALLY ABOUT 200 km/h |
-| 6 | 21.2–23.4 | Low, just behind the fallen arrow's nock, along it to the untouched target. | A breath of wind. | *The arrow just falls.* |
+| 5 | 18.2–21.8 | **The bow**, first person at eye level: nock, draw, aim at a target 14 m away, let go. The string goes limp, the limbs stay bent, the arrow falls off the bow. | A soft creasing (no creak), a held breath, a soft "fwup" (no twang), one dry clatter. | *A bow is a spring you bend by hand…* / *…and nothing bends it back.* · LAUNCH SPEED 0 km/h · NORMALLY ABOUT 200 km/h |
+| 6 | 21.8–23.4 | Low, just behind the fallen arrow's nock, along it to the untouched target. | A breath of wind. | *The arrow just falls.* |
 | 7 | 23.4–27.3 | **The tuning fork**, at the café table: you slap its prong flat on the table top; bring it up: the prong stays bent in, a dashed line where it was. | Far voices; one dead "tk"; nothing. | *Tuning forks ring by springing back.* / *This one just goes “tk”.* · TUNING FORK 440 Hz → SILENT · tag STAYS BENT · DRAWN 10× BIGGER |
 | 8 | 27.3–30.9 | **Your watch**: you raise your left wrist; it says 3:41:52. | The sleeve; no tick. | *Your watch stopped too…* / *…one second into this video.* |
 | 9 | 30.9–37.3 | **Inside the watch** (macro): the dial lifts away; past the gears down to the quartz crystal in its can, cut open; yellow ghost prongs show its normal vibration, then stop. | A whoosh down, a low drone, a thin fast whine for the ghost that stops dead, a soft thump. | *Inside it: a quartz tuning fork, smaller than a grain of rice.* / *It keeps time by springing back 32,768 times a second.* · QUARTZ CRYSTAL 32,768 Hz → 0 Hz · *No spring-back. No tick.* |
-| 10 | 37.3–40.9 | **The plaza clock** face-on, stopped at 3:41:52; the camera rises. | A low boom. | EVERY QUARTZ CLOCK 3:41:52 · *Every quartz clock on Earth stopped at the same instant.* · *So did every phone and computer.* |
-| 11 | 40.9–55.6 | **Time-lapse** from above the plaza, the stopped clock in front: shadows sweep, people stream through. Inserts: the trampoline (44.9–47.3) sinks deeper only when someone heavier lands; a tree (47.3–49.6) leans further with each stronger gust, a dashed line where its trunk stood. Dusk: lamps and the clock's dial light up. | A rush into fast time, sped-up voices, gusts, dull landings, a pulse of plucked notes that climbs and slows at dusk, crickets. | THE CLOCKS SAY 3:41 PM · THE REAL TIME 3:42 → 9:05 PM · *The clocks stay at 3:41. The day doesn't.* · *And everything people use keeps the shape they leave it in.* · *The trees keep every gust.* · *Without elasticity…* / *…almost nothing gets a second chance to return to shape.* |
-| 12 | 55.6–60.6 | **Night** on the lit plaza clock, still at 3:41:52, drifting in; fade at 60.6. | Crickets, the closing chord, one last quiet tick. | Note (fictional rule) · *Now watch the clock in the first second.* |
+| 10 | 37.3–40.9 | **The plaza clock** face-on, stopped at 3:41:52; the camera rises. | A low boom. | EVERY QUARTZ CLOCK 3:41:52 · *Every quartz clock on Earth stopped at the same instant.* · *So did the clock in your phone.* |
+| 11 | 40.9–49.6 | **Time-lapse** from above the plaza, the stopped clock in front: shadows sweep, people stream through. Inserts: the trampoline (44.9–47.3) sinks deeper only after a harder landing; a tree (47.3–49.6) leans further with each stronger gust, a dashed line where its trunk stood. | A rush into fast time, sped-up voices, gusts, dull landings, a pulse of plucked notes that climbs through the afternoon. | THE CLOCKS SAY 3:41 PM · THE REAL TIME 3:42 PM → · *The clocks stay at 3:41. The day doesn't.* · *And everything people use keeps the shape they leave it in.* · *A trunk is mostly dead wood. It keeps every gust.* |
+| 12 | 49.6–54.4 | **Dusk at the trampoline**: back on the wide, the camera comes down to the trampoline's level. One landing (51.2) takes the mat deeper; the day's hardest (52.6) takes it down flat onto the paving, where it stays. | Gusts, two dull landings, the pulse slowing. | *Without elasticity…* / *…almost nothing gets a second chance to return to shape.* · tag MAT ON THE GROUND · IT STAYS THERE |
+| 13 | 54.4–58.0 | **Night** on the plaza clock, still at 3:41:52: a push in on its lit dial as the lamps come on behind it. | Crickets, the closing chord. | Note (fictional rule) |
+| 14 | 58.0–60.6 | **The loop**: back on the café table, now lamp-lit; the red desk clock still at 3:41:52; fade at 60.6. | One last quiet tick. | *Rewatch the red clock: one tick, then never again.* |
 
 ## 4. Hero shots
 
@@ -178,3 +180,17 @@ plaza. Physics: "trees keep every gust" vs living tissue (trunks are mostly dead
 the plaza carries on (now "the clock in your phone"); "heavier lands" (it is the harder landing). All fixed before the
 final render (see `EPISODE_REPORT.md`). Their bigger structural idea (move the bow into the first ten seconds) was not
 taken: it would break the escalation from bouncing to time, and the film would need new material to stay over 60 s.
+
+**v2, final production audit** (the rendered 1080 × 1920 MP4, checked frame by frame and with ffprobe by a fresh
+reviewer): normal viewer 6, retention 5, cinematography and phone clarity 5, physics 8. Its three highest-impact problems,
+all fixed and re-rendered (585 frames): (1) a dead ending, 49.6–60.6, a slow push into one stopped clock and a cut to
+another: now the dusk wide comes down to the trampoline, the day's hardest landing takes the mat flat onto the paving
+(tagged), then a cut to a shorter push on the night clock; (2) the loop payoff could not be checked, because the opening
+cut away from the desk clock at 1.75 s, before it could miss a tick: the wide now holds to 2.6 s and leans in toward the
+clock, the seconds hand is thicker, and the last line says what to look for; (3) six glitch frames: hand poses one frame
+late at three cuts (13.4, 18.2, 23.4), a motion-blur trail across the cut at 18.2, the café sitter snapping round at
+10.13, the quartz macro jumping in scale at 33.47. Also: the double readout no longer covers the café loop shot; the
+cradle clacks are about 6 dB louder. Not changed (noted by the audit): the montage's header plates are a second caption
+system; the watch dial on black at 30.9 is the only shot in a void; the time-lapse's first stretch (41.5–44.9) has little
+motion; the HUD sub-labels are small on a phone. The audit also asked why the lamp posts don't lean like the tree: under this
+rule they do, but a steel post only flexes a few millimetres in a gust, so it keeps a few millimetres.

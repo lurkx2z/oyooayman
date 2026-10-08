@@ -80,9 +80,22 @@ for differentiation, the delivered cut 4/10). Its three most recycled beats and 
 
 Physics review fixes: the recovery readout holds 100 % until the clock's last step at 1.0 s; LAUNCH SPEED (not arrow
 speed); "No spring-back. No tick." (not "no time"); "same instant"; THE REAL TIME (not "the sun says"); "So did every phone
-and computer"; the tags follow the running-max model ("DEEPER ONLY WHEN SOMEONE HEAVIER LANDS", "EACH STRONGER GUST BENDS
+and computer" (later "So did the clock in your phone."); the tags follow the running-max model ("DEEPER ONLY WHEN SOMEONE HEAVIER LANDS", "EACH STRONGER GUST BENDS
 IT FURTHER"); the tennis ball barely leaves the strings (its air still pushes back); the fork's bend is labelled "DRAWN 10×
 BIGGER".
+
+## Round 3: after the final production audit
+
+A fresh reviewer audited the rendered 1080 × 1920 MP4 (viewer 6, retention 5, cinematography and phone clarity 5,
+physics 8) and ranked three problems. What changed:
+
+| Problem | Fix |
+|---|---|
+| 49.6–60.6 a dead ending: a slow push into one stopped clock, then a cut to another | **49.6–54.4 dusk at the trampoline**: the camera comes down to its level and the day's hardest landing takes the mat flat onto the paving, where it stays (tag MAT ON THE GROUND · IT STAYS THERE). Then a cut to a shorter push on the night clock (54.4–58.0) and the loop |
+| The loop payoff couldn't be checked: the desk clock left the frame at 1.75 s, before it could miss a tick | The opening wide holds to 2.6 s and leans in toward the clock; its seconds hand is thicker; the last line says what to look for ("Rewatch the red clock: one tick, then never again.") |
+| Six glitch frames (10.13, 13.40, 18.17–18.20, 23.40, 33.47) | Snap hand poses finish on the cut frame; no blur trail across a cut; the café sitter turns instead of snapping round; the quartz macro's small settle eases out instead of jumping |
+
+The slow time-lapse start, the montage's header plates and the small HUD sub-labels were noted and left as they are.
 
 ## Physics notes for the new beats
 

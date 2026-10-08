@@ -22,16 +22,16 @@ Closing note: "Fictional rule: solids never spring back. People, air and water a
 
 ## What changed from v1 (the exact scenes)
 
-| v1 (delivered 2026-10-08 morning) | v2 |
+| v1 (delivered 2026-10-08 morning) | v2 (final) |
 |---|---|
-| 0–5.6 a teenager dribbles a solid rubber ball in the plaza; low close-up of its flat spot | **0–5.6 a Newton's cradle and a quartz desk clock on a café table.** Three clacks under the title; the clock takes its last step at 1.0 s; at 1.56 the end ball swings back and nothing flies out: the row just shoves along together ("tock", not "clack"). Low insert with a ghost of the ball that should have flown out |
+| 0–5.6 a teenager dribbles a solid rubber ball in the plaza; low close-up of its flat spot | **0–5.6 a Newton's cradle and a quartz desk clock on a café table.** Three clacks under the title; the clock takes its last step at 1.0 s and misses the next at 2.0; at 1.56 the end ball swings back and nothing flies out: the row just shoves along together ("tock", not "clack"). From 2.6 a low insert with a ghost of the ball that should have flown out |
 | 5.6–13.4 montage; 13.4–18.2 trampoline | Kept (bigger label lines; the tennis ball now barely leaves the strings, since its air still pushes back) |
 | 18.2–23.5 a red hatch over a speed table, low wheel shot | **18.2–21.8 the bow**, first person: draw, aim (target beside the grip), let go. The arrow falls off the bow; the bow turns side-on with its limbs still bent. **21.8–23.4** a low 3/4 shot of the arrow lying on the paving |
 | 23.5–30.7 cars scraping over the table; a truck on its bump stops | **23.4–27.3 the tuning fork** at the café table: it goes "tk" and the struck prong stays bent. **27.3–30.9 your watch** stopped at 3:41:52, "one second into this video" |
 | 30.7–36.1 the footbridge's 7 mm sag | **30.9–37.3 inside the watch** (macro): the quartz crystal, a tuning fork that should spring back 32,768 times a second, is still |
 | 36.1–46.0 a three-car crash at an intersection | **37.3–40.9 the plaza clock**, stopped at the same instant; "So did the clock in your phone." |
-| 46.0–50.0 a 5 km/h tap dents a bumper | **40.9–49.6 time-lapse** of the rest of the day: THE CLOCKS SAY 3:41 PM vs THE REAL TIME 3:42 → 9:05 PM; inserts of the trampoline (deeper only after a harder landing) and a tree whose lean grows with each stronger gust |
-| 50.0–60.2 an empty street, then back to the ball close-up | **49.6–58.0** one push from the dusk wide into the lit, stopped clock, the closing lines and the note; **58.0–60.6** cut back to the desk clock on the café table: "Now watch the clock in the first second." (the loop) |
+| 46.0–50.0 a 5 km/h tap dents a bumper | **40.9–49.6 time-lapse** of the rest of the day: THE CLOCKS SAY 3:41 PM vs THE REAL TIME 3:42 PM onward; inserts of the trampoline (deeper only after a harder landing) and a tree whose lean grows with each stronger gust |
+| 50.0–60.2 an empty street, then back to the ball close-up | **49.6–54.4 dusk at the trampoline**: the day's hardest landing takes the mat flat onto the paving, where it stays; **54.4–58.0** a push in on the lit plaza clock at night, still at 3:41, and the note; **58.0–60.6** back to the desk clock on the café table: "Rewatch the red clock: one tick, then never again." (the loop) |
 
 ### The v1 problems this answers (the owner's "fix the existing video" list)
 
