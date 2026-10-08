@@ -64,6 +64,17 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Episode: *What if everything lost its elasticity?*** — open `no-elasticity.html` (60.6 s, v2 redesign). Solids still
+> resist being deformed but never spring back. A Newton's cradle stops passing the hit along (the row just shoves together);
+> racket strings, a shoe's foam, a cushion and a rubber band keep every stretch and dent; a trampoline becomes a funnel; you
+> draw a bow and the arrow just drops; a tuning fork goes "tk" and stays bent; your watch stopped one second into the video,
+> because the quartz crystal inside it is a tiny tuning fork; so did every clock on Earth; and a time-lapse of the plaza
+> keeps the shape of the whole day while its clock never moves, until by dusk the trampoline's mat lies flat on the paving.
+> The last shot loops back to the opening's desk clock. Air, water and living tissue are unchanged. Redesign notes:
+> [`films/no-elasticity/REDESIGN.md`](films/no-elasticity/REDESIGN.md); plan and review log:
+> [`films/no-elasticity/PLAN.md`](films/no-elasticity/PLAN.md); delivery report:
+> [`films/no-elasticity/EPISODE_REPORT.md`](films/no-elasticity/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
@@ -319,6 +330,25 @@ films/slip/sea.js        the seabed (one analytic height field in JS and GLSL), 
 films/slip/cast.js       people with umbrellas, in the quake, at the seafront, running inland
 films/slip/audio.js      rain, the squeak and the thud, the underground pulses, the rupture, the quake, sirens, the roar
 films/slip/film.js       FILM hooks: which scene, hands, the quake shake, reflections, the cuts, the grade, the end card
+```
+
+Film: *What if everything lost its elasticity?* (`no-elasticity.html`):
+
+```
+films/no-elasticity/PLAN.md     the rule (resist, never spring back), the place, shot list, sound, review log
+films/no-elasticity/REDESIGN.md the v2 redesign: ranked consequences, signature moments, shot list before/after
+films/no-elasticity/script.js   ★ every beat time (NE), camera, your hands, captions, readouts (NE_STREET: the v1 street beats, off)
+films/no-elasticity/city.js     the sunny avenue, the speed table, the plaza, the footbridge that keeps its sag, the signal masts
+films/no-elasticity/props.js    the ball, the round trampoline (its mat funnels), the racket, the shoe, the cushions, the band
+films/no-elasticity/cars.js     cars whose springs take a permanent set at each bump, the truck, the inelastic crash, the tap
+films/no-elasticity/cast.js     the teenager, the kid, the café sitter, the walkers and runners on the bridge (its load)
+films/no-elasticity/cradle.js   the opening: a Newton's cradle that stops passing the hit along, the quartz desk clock
+films/no-elasticity/bow.js      the bow whose arrow drops, the tuning fork that stays bent, your watch
+films/no-elasticity/clocks.js   the plaza's quartz clock, the macro inside the watch, the time-lapse (dents, gusts, dusk)
+films/no-elasticity/film.js     FILM hooks: the inserts and cinematic shots, labels pinned to the world, the grade
+films/no-elasticity/audio.js    the soundtrack (clacks that turn into a dead tock, no twang, no ring, no tick; the day running on)
+films/no-elasticity/soundtrack.js  the baked soundtrack (regenerate with tools/bake-soundtrack.cjs after any sound change)
+films/no-elasticity/EPISODE_REPORT.md  the delivery report: timings, systems, limitations, review scores
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):

@@ -1,0 +1,124 @@
+# No elasticity: creative redesign (2026-10-08)
+
+This applies the owner's creative direction override ("stop making repetitive videos") to the delivered 60.2 s cut. Plan
+first, then build. The working systems stay: the engine, the city, the ball, the montage, the trampoline, the hands, the
+people, the HUD, the sound engine and the render pipeline.
+
+## The five questions
+
+1. **What can this episode show that none of our videos have shown?** Time stopping. Every quartz clock counts time with a
+   tiny tuning fork that springs back 32,768 times a second. With no elastic recovery, every clock and watch on Earth stopped
+   the instant the rule began, one second into the video. Nobody notices, and the day carries on without them.
+2. **The most surprising consequence:** your watch stopped at the start of the video, and the reason is elasticity.
+3. **The most visually unusual consequence:** you draw a bow, let go, and the arrow just drops at your feet. The limbs stay
+   bent and the string hangs limp.
+4. **The scene viewers will remember:** the plaza in time-lapse. The sun crosses the sky and shadows swing round, while the
+   clock in the foreground never moves. Everything people use keeps the shape they left it in: the trampoline sinks deeper
+   after every heavier jumper and the plaza's trees lean further with every gust.
+5. **Without the HUD, could someone tell this film from the others?** Yes. There are no cars, aircraft, cranes or crashes,
+   and no shot looks down a street. The film opens on a Newton's cradle on a café table, then shows a bow, a tuning fork,
+   a watch, the inside of a quartz watch and a time-lapse of one plaza that ends on its stopped clock at night.
+
+## The rule's ten most interesting genuine consequences, ranked
+
+Each is scored for surprise, visual clarity and emotional impact (1–5 each), out of 15.
+
+| # | Consequence | S | V | E | Total | Use |
+|---|---|---|---|---|---|---|
+| 1 | Quartz clocks and watches stop (the crystal is a tiny tuning fork) | 5 | 3 | 5 | 13 | **New: payoff** |
+| 2 | A bow can't shoot: the arrow drops | 5 | 5 | 3 | 13 | **New: signature B** |
+| 3 | A bouncing ball lands dead (round 2: a Newton's cradle that stops passing the hit along) | 4 | 5 | 3 | 12 | Signature A |
+| 4 | A trampoline becomes a funnel | 3 | 5 | 3 | 11 | Keep |
+| 5 | Things that ring go dead (a tuning fork, bells, strings) | 4 | 3 | 3 | 10 | **New** |
+| 6 | Everything used keeps the shape of its heaviest use (the plaza by evening) | 3 | 4 | 3 | 10 | **New: payoff image** |
+| 7 | Strings, foam, cushions and rubber bands keep every stretch | 2 | 4 | 2 | 8 | Keep (montage) |
+| 8 | Car springs ratchet lower at every bump | 3 | 2 | 2 | 7 | Cut |
+| 9 | A bridge keeps its deepest sag (mm) | 2 | 1 | 2 | 5 | Cut |
+| 10 | A crash doesn't rebound (real crashes barely rebound anyway) | 1 | 4 | 3 | 8 | Cut (template car crash) |
+
+## Three signature moments
+
+- **A, first surprise (round 2: replaced):** a Newton's cradle on a café table clacks three times under the title. Then
+  the rule bites, the end ball swings back in, and nothing flies out: the whole row just shoves along together with a dull
+  "tock" and swings a little as one lump. A dashed ghost shows where the far ball should have flown. (Round 1 used a solid
+  rubber ball dribbled in the plaza; the differentiation review called that opening a recycled "plaza pedestrian" shot.)
+- **B, impossible-looking (new):** first person, you draw a bow and let go. Nothing happens to the arrow except that it
+  falls off the bow. The limbs stay bent, the string hangs limp, and the target 14 m away is untouched.
+- **C, payoff (new):** your watch stopped one second into the video. Inside it, the quartz tuning fork stopped. So did every
+  clock on Earth, and every phone and computer. A time-lapse of the plaza follows: the sun goes down, the frozen clock never
+  moves, and the plaza fills with the dents of the day (two close inserts count them). It ends at night on the lit, stopped
+  clock: "Now watch the clock in the first second." The desk clock beside the cradle took its last step at 1.0 s.
+
+The escalation is natural for this rule. It goes from things that bounce (the cradle), to things that cushion (shoe, cushion),
+to things that store energy (trampoline, bow), to things that vibrate (tuning fork), to the vibration that keeps time
+(quartz). It ends on the whole world carrying every mark.
+
+## Revised shot list (film seconds)
+
+| Original shot (delivered cut) | Why it feels repetitive | Replacement | Why it is more interesting |
+|---|---|---|---|
+| 0–5.6 ball hook; 5.6–13.4 montage; 13.4–18.2 trampoline | Not repetitive; this is the episode's own material | **Kept in round 1; round 2 replaced the ball hook with a Newton's cradle (below)** (a quartz post clock is added to the plaza, and your hands now wear a watch in the rubber-band shot: both stopped at 1.0 s, planted for the payoff) | Plants the twist. Rewatchers can see the clock's second hand stop under the title |
+| 18.2–23.5 a red hatch over a speed table, a low wheel shot | The car-on-a-street beat every episode has | **18.2–23.4 The bow.** First person: draw, aim, let go; the arrow drops at your feet; a low insert of the arrow on the paving with the untouched target behind | Impossible-looking and instant to read. Nobody has seen it, and it is pure elasticity (a bow is a spring you load by hand) |
+| 23.5–30.7 low cars scraping, a loaded truck on its bump stops | A second and third car beat; looking down the same avenue | **23.4–27.3 The tuning fork.** Seated at a café table you slap the fork's prong flat on the table top; the prong stays pushed in and it goes "tk" instead of ringing | Sound itself depends on springing back. It also sets up the next beat |
+| 30.7–36.1 the footbridge (7 mm sag, drawn 300×) | Invisible numbers on generic city infrastructure | **27.3–30.9 Your watch.** You raise your wrist: it stopped at 3:41:52, one second into this video | A personal "wait, what?" twist. It turns the viewer back to the start |
+| 36.1–46.0 a three-car crash at an intersection, an arc round the wreck | "Car sliding across intersection", the template destruction payoff | **30.9–37.3 Inside the watch** (macro): past the gears to the quartz crystal, a tuning fork the size of a grain of rice that should spring back 32,768 times a second. It is still | A new environment (a microscopic world) and the hidden spring that runs modern life |
+| 46.0–50.0 a 5 km/h tap dents a bumper | One more car beat | **37.3–40.9 The plaza clock**, frozen at 3:41:52: "Every quartz clock on Earth stopped at the same instant" | Scales the twist from your wrist to the planet without any destruction |
+| 50.0–60.2 an empty street, then back to the ball close-up | A quiet return to the opening after the strongest event | **40.9–60.6 Time-lapse payoff**, from above the plaza with the frozen clock in the foreground. THE CLOCKS SAY 3:41 PM against THE REAL TIME 3:42 → 9:05 PM. The sun goes down, building shadows sweep the plaza, people stream through, and the dents pile up: the trampoline sinks deeper after every heavier jumper, the trees lean further with every gust. Dusk, lamps and the clock's dial light up, then the closing lines | The ending is the biggest idea, not a recap. The world keeps the shape of its whole day while time itself has stopped |
+
+The cut code stays in the repository: cars, crash and footbridge in `cars.js` and `city.js`, switched off by `NE_STREET`.
+
+## Round 2: after the independent differentiation review
+
+The reviewer compared a preview of the round-1 build with Oxygen, Friction and the four other finals (scores: this cut 7/10
+for differentiation, the delivered cut 4/10). Its three most recycled beats and what replaced them:
+
+| Recycled beat (round 1) | Why the reviewer flagged it | Replacement (round 2) |
+|---|---|---|
+| 0–5.6 a teen dribbling in the plaza, a low shot of the dead ball | The "pedestrian in a plaza" opening every episode has | **0–5.6 a Newton's cradle and a quartz desk clock on a café table.** It clacks, then the hit after the rule just shoves the row along. A low insert shows a ghost of the ball that should have flown out. The desk clock's last step is at 1.0 s |
+| 21.95–23.4 looking down at the fallen arrow | "Looking down after the final impact" | A low shot from just behind the arrow's nock, along the arrow to the untouched target (no tilt down) |
+| 40.9–59.6 one wide crowded plaza | Hard to read on a phone; the dents weren't countable | Two close inserts inside the time-lapse: the trampoline only sinks deeper when someone heavier lands (44.9–47.3), and a tree whose lean grows with each stronger gust, with a dashed line where its trunk stood (47.3–49.6). Night ending on the stopped clock |
+
+Physics review fixes: the recovery readout holds 100 % until the clock's last step at 1.0 s; LAUNCH SPEED (not arrow
+speed); "No spring-back. No tick." (not "no time"); "same instant"; THE REAL TIME (not "the sun says"); "So did every phone
+and computer" (later "So did the clock in your phone."); the tags follow the running-max model ("DEEPER ONLY WHEN SOMEONE HEAVIER LANDS", "EACH STRONGER GUST BENDS
+IT FURTHER"); the tennis ball barely leaves the strings (its air still pushes back); the fork's bend is labelled "DRAWN 10×
+BIGGER".
+
+## Round 3: after the final production audit
+
+A fresh reviewer audited the rendered 1080 × 1920 MP4 (viewer 6, retention 5, cinematography and phone clarity 5,
+physics 8) and ranked three problems. What changed:
+
+| Problem | Fix |
+|---|---|
+| 49.6–60.6 a dead ending: a slow push into one stopped clock, then a cut to another | **49.6–54.4 dusk at the trampoline**: the camera comes down to its level and the day's hardest landing takes the mat flat onto the paving, where it stays (tag MAT ON THE GROUND · IT STAYS THERE). Then a cut to a shorter push on the night clock (54.4–58.0) and the loop |
+| The loop payoff couldn't be checked: the desk clock left the frame at 1.75 s, before it could miss a tick | The opening wide holds to 2.6 s and leans in toward the clock; its seconds hand is thicker; the last line says what to look for ("Rewatch the red clock: one tick, then never again.") |
+| Six glitch frames (10.13, 13.40, 18.17–18.20, 23.40, 33.47) | Snap hand poses finish on the cut frame; no blur trail across a cut; the café sitter turns instead of snapping round; the quartz macro's small settle eases out instead of jumping |
+
+A second fresh reviewer re-checked the result (viewer 6, retention 6, cinematography and phone clarity 6, physics 8) and
+caught one new problem: the two landings at dusk were people appearing already in the mat. They now walk up, climb onto
+the frame and jump in. The opening also leans in further on the desk clock, and the end no longer fades to black, so the
+loop is seamless. The slow time-lapse start, the montage's header plates and the small HUD sub-labels were noted and left
+as they are.
+
+## Physics notes for the new beats
+
+- **Newton's cradle:** the clack passes along the row because each steel ball is squashed a few micrometres and springs
+  back, handing the momentum to the next one. With no recovery, the returning ball's hit is perfectly inelastic: all five
+  move off together at a fifth of its speed and swing about 7° as one lump, while most of the energy goes into permanent
+  dents and heat. The film says "…so now the balls just shove together." 
+
+- **Bow:** the limbs store the draw as elastic bending and give it back to the arrow (a recurve shoots at about 55–60 m/s,
+  about 200 km/h). Without recovery, drawing still takes the full force (the limbs resist), but on release nothing pushes
+  back. The string goes slack and the arrow drops.
+- **Tuning fork:** an A4 fork sings at 440 Hz because its prongs spring back. Now a strike just pushes them in, and they stay.
+- **Quartz:** a watch crystal is a quartz tuning fork a few millimetres long that resonates at 32,768 Hz (2¹⁵). The watch
+  counts those vibrations to step its second hand. With no elastic restoring force there is no oscillation, so the count
+  stops. This holds for every quartz clock and watch, and for wind-up ones too (their hairspring is a spring).
+- **Time-lapse:** each object keeps the running maximum of what it was loaded with. The trampoline gets deeper only when
+  someone heavier lands (a lighter kid changes nothing). A tree bends in a gust like a tree today, but no longer straightens
+  afterwards, so its lean only ever grows, gust by gust. Nothing recovers overnight.
+- **Why no flat basketballs:** an inflated ball is held round by the air inside it, and air is unchanged, so a basketball
+  still bounces (a bit worse, since its rubber skin no longer helps). The film uses a solid rubber ball instead.
+- **Phones and computers:** their clocks are quartz too, so the film says they stopped as well. Cars are not claimed (no
+  moving vehicles are shown). The closing note says: people, air and water are unchanged.
