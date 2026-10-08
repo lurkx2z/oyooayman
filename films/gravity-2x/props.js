@@ -147,7 +147,7 @@ class GvPullUp {
       gvBox(0.05, 0.05, 0.55, frame, g, s * 0.68, 0.75, -0.24, 0.9, 0, 0);                    // braces (away from you)
       gvMesh(new THREE.CylinderGeometry(0.02, 0.02, 0.2, 10), foam, g, s * 0.5, B.y, 0, 0, 0, Math.PI / 2);   // grip foam
     }
-    gvMesh(new THREE.CylinderGeometry(0.016, 0.016, 1.42, 12), chrome, g, 0, B.y, 0, 0, 0, Math.PI / 2);
+    gvMesh(new THREE.CylinderGeometry(0.021, 0.021, 1.42, 14), Mat.std('#eef1f4', { roughness: 0.12, metalness: 0.55, emissive: '#3b4046' }), g, 0, B.y, 0, 0, 0, Math.PI / 2);
     gvBox(1.43, 0.06, 0.06, frame, g, 0, B.y + 0.12, 0);
     // a rubber mat under it
     gvBox(1.5, 0.02, 1.3, foam, g, 0, 0.01, 0.2, 0, 0, 0, false);

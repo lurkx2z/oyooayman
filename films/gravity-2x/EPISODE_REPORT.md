@@ -69,3 +69,31 @@ No third-party media.
 Five independent reviewers scored the first v3 preview (scores as given, not inflated): retention **5/10**,
 cinematography **5/10**, normal viewer **6/10**, physics **8/10** (clarity of science 7), creative differentiation
 **6/10**. The top 3 problems and every fix are in `PLAN.md` § 8. The final was **not re-scored** after the fixes.
+
+## FINAL PRODUCTION AUDIT (on the actual 1080×1920 output)
+An independent reviewer audited the first encoded final (scores as given): retention **7/10**, cinematography/visual
+**6.5/10**, normal viewer **7/10**, physics **8/10**, creative differentiation **7/10**.
+- **Style:** on-model (centred serif title on frame 1, small top-left HUD, serif captions, clean low-poly light).
+- **Pacing:** no stretch over 4 s without a new event (longest 2.9 s); 35.65–40.7 felt slow.
+- **Physics:** every on-screen number checked out; two wording problems (the stair HUD vs caption, "feels weightless").
+- **Phone clarity (360×640):** headlines and captions read; the small HUD sub-lines don't; the pull-up, the floating
+  shot and the small diver were hard to read.
+- **Output:** 1,810 frames, 30 fps CFR, 1080×1920, no decode errors, no duplicate/black frames except the fade; the
+  trims are clean one-frame cuts; sync within a frame at five checked events; one glitch at the climb-out.
+- **Top 3 fixed afterwards** (only the changed shots re-rendered): the climb-out glitch (head jump, above/below-water
+  flicker, early "0 kg", early splash), the stair's two messages and invisible knee buckle, the unreadable pull-up.
+  Details: `PLAN.md` § 8. The fixed final was not re-scored.
+
+## KNOWN LIMITATIONS
+- The small HUD sub-lines (e.g. "AT 1 G 785 N · NOW 1,570 N") are too small to read on a phone; the headlines carry it.
+- The three trims read as location jumps rather than invisible cuts.
+- The floating shot (35.65–37.4) doesn't make it obvious that it is you floating.
+- The forearms in the hang read as cones (the engine's hand rig); people are low-poly with procedural animation.
+- Some structure echoes v2: the fall clock with a 1 G ghost, the closing-line pattern, "like holding two of you".
+- The sound has only been level-measured, not listened to by a person.
+- Simplifications: instant, uniform change; the atmosphere's response (pressure toward 2 atm) is not shown.
+
+## PERFORMANCE / FPS
+Headless Chromium with software rendering (SwiftShader, 4 cores), not GPU numbers: boot 5 s; per frame 209–387 draw
+calls and 57k–80k triangles (sampled at film 1, 12.6, 19.5, 27, 41.7, 44, 50, 58 s). Final render: 1,810 frames at
+1080×1920 in about 77 min with 4 workers. Real-time playback fps on a GPU was not measured.

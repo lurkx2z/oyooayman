@@ -28,7 +28,7 @@ const GV = {
   offScale: 9.3,                           // you step off the scale
   bench: { look: 10.0, heave: 11.0, drop: 12.55 },   // lifter + spotter heave the bar off the safety arms; it drops back
   shot: 15.6,                              // the free throw is released
-  hang: { go: 17.3, at: 18.4, grab: 18.55, lift: 18.9, pull: 19.55, peel: 20.55, drop: 21.05 },   // you try a dead hang on the pull-up bar
+  hang: { go: 17.3, at: 18.4, grab: 18.55, lift: 18.9, pull: 19.55, peel: 20.15, drop: 21.05 },   // you try a dead hang on the pull-up bar
   toStair: 21.7,                           // (cut) to the stair head
   stair: [23.4, 30.2],                     // down the 16 steps
   deck: 30.2,                              // the foot of the stair: along the deck
@@ -129,14 +129,14 @@ const SCRIPT = {
       [GV.hang.peel - 0.1, 1.6, 'inOutSine'], [GV.hang.drop, 1.59], [GV.hang.drop + 0.16, 1.34, 'inQuad'], [GV.hang.drop + 0.4, 1.04, 'outQuad'], [GV.hang.drop + 0.7, 1.12, 'inOutSine'],
       [GV.stair[0] - 0.2, 1.56],
       // a step down that your knee doesn't hold
-      [25.75, 1.56], [25.95, 1.33, 'outCubic'], [26.7, 1.55, 'inOutSine'],
+      [25.75, 1.56], [25.95, 1.16, 'outCubic'], [26.2, 1.2], [26.9, 1.55, 'inOutSine'],
       [GV.sit, 1.54], [GV.sit + 0.9, 0.86, 'inOutSine'], [70, 0.86]],
     yaw: [[0, 0], [70, 0]],
     pitch: [[0, 0], [70, 0]],
     tilt: [[0, 0], [GV.g0 + 0.1, 0], [GV.g0 + 0.35, -2.4], [GV.g0 + 1.4, 0], [70, 0]],
     fov: [[0, 64], [70, 64]],
-    startles: [[GV.g0 + 0.05, 1.2], [GV.tread.sit, 0.35], [GV.bench.drop, 0.7], [GV.hang.drop + 0.16, 1.0], [25.92, 0.6], [GV.ladder.splash, 0.3], [GV_FALL.hit, 0.6], [GV.out.give + 0.3, 0.8]],
-    shakes: [[GV.g0 + 0.05, 0.35, 0.45], [GV.bench.drop, 0.25, 0.25], [GV.hang.pull + 0.2, 0.9, 0.12], [GV.hang.drop + 0.16, 0.3, 0.35], [GV.out.top - 0.7, 1.1, 0.14]],
+    startles: [[GV.g0 + 0.05, 1.2], [GV.tread.sit, 0.35], [GV.bench.drop, 0.7], [GV.hang.drop + 0.16, 1.0], [25.92, 1.1], [GV.ladder.splash, 0.3], [GV_FALL.hit, 0.6], [GV.out.give + 0.3, 0.8]],
+    shakes: [[GV.g0 + 0.05, 0.35, 0.45], [GV.bench.drop, 0.25, 0.25], [GV.hang.pull + 0.2, 0.9, 0.12], [GV.hang.drop + 0.16, 0.3, 0.35], [GV.out.top - 0.7, 1.1, 0.14], [25.92, 0.35, 0.4]],
   },
 
   // your hands (camera-space poses in film.js; aimed ones are re-aimed at world points every frame; 'name!' = snap)
@@ -176,13 +176,13 @@ const SCRIPT = {
       { from: GV.bench.heave - 0.4, until: 14.0, top: 210, label: 'BARBELL · 80 kg', value: 'LIFTS LIKE 160 kg', sub: 'AT 1 G 785 N · NOW 1,570 N' },
       { from: GV.shot - 0.4, until: 17.35, top: 210, label: 'SAME FREE THROW', value: (t) => gvThrowValue(t), sub: (t) => gvThrowSub(t) },
       { from: GV.hang.lift + 0.1, until: GV.hang.drop + 0.5, top: 210, label: 'DEAD HANG · YOUR GRIP', value: 'HOLDS 140 kg', sub: 'AT 1 G: 70 kg' },
-      { from: GV.stair[0] + 0.9, until: 28.2, top: 210, label: 'HIS CLIMB · ONE FLOOR', value: 'WORK OF TWO', sub: '4,400 J · AT 1 G 2,200 J' },
+      { from: GV.stair[0] + 0.9, until: 28.2, top: 210, label: 'EVERY STEP DOWN · 20 cm', value: 'LANDS 2× AS HARD', sub: '70 kg: 275 J A STEP · AT 1 G 137 J' },
       { from: 28.4, until: 31.25, top: 210, label: 'FLOATING', value: 'SAME AS BEFORE', sub: 'WEIGHT ×2 · BUOYANCY ×2' },
       { from: GV.ladder.up - 0.2, until: GV.ladder.splash + 0.7, top: 210, label: 'LEAVING THE WATER', value: 'BUOYANCY GONE', sub: 'HE LIFTS HIS FULL 2× WEIGHT' },
-      { from: 42.85, until: GV.diver.stand - 0.1, top: 210, label: 'YOU, FLOATING', value: 'FEELS WEIGHTLESS', sub: 'BUOYANCY = WEIGHT = 1,373 N' },
+      { from: 42.85, until: GV.diver.stand - 0.1, top: 210, label: 'YOU, FLOATING', value: 'FEELS LIKE BEFORE', sub: 'BUOYANCY = WEIGHT = 1,373 N' },
       { from: GV.diver.step - 0.05, until: GV_FALL.hit + 2.1, top: 210, label: `FALL · ${GV_FALL.h} m · GHOST: 1 G`, value: (t) => gvFallValue(t), sub: (t) => gvFallSub(t) },
       { from: GV.under + 1.85, until: GV.surface - 0.3, top: 210, label: 'HER DEPTH 3 m', value: 'WATER PRESSURE ×2', sub: 'LIKE 6 m AT 1 G' },
-      { from: GV.out.push + 0.1, until: GV.out.give + 0.7, top: 210, label: 'ON YOUR ARMS', value: (t) => `${Math.round(gvOutKg(t))} kg`, sub: (t) => `AT 1 G: ${Math.round(gvOutKg(t) / 2)} kg` },
+      { from: GV.out.push + 0.1, until: GV.out.give + 0.3, top: 210, label: 'ON YOUR ARMS', value: (t) => `${Math.round(gvOutKg(Math.min(t, GV.out.give - 1e-3)))} kg`, sub: (t) => `AT 1 G: ${Math.round(gvOutKg(Math.min(t, GV.out.give - 1e-3)) / 2)} kg` },
       { from: GV.lineA[0] - 0.4, until: GV.end - 0.4, top: 210, label: 'GRAVITY', value: '2.0 G', sub: 'MASS UNCHANGED' },
     ],
     notes: [{ t: GV.note[0], until: GV.note[1], text: 'FICTIONAL INSTANT GRAVITY CHANGE · MASSES UNCHANGED · AIR PRESSURE CHANGES NOT SHOWN' }],

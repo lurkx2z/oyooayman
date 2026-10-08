@@ -58,7 +58,7 @@ class GvAudio extends AudioEngine {
     out.gain.setValueAtTime(0.9, END - 0.8); out.gain.linearRampToValueAtTime(0.0001, END);
     // the world, heard through water when you're under: a low-pass that closes when you go in and opens when you surface
     const muff = S.filter('lowpass', 18000, 0.7); muff.connect(mixIn);
-    const wet = [[T.slide + 0.18, T.slide + 0.85], [T.under + 0.12, T.surface + 0.02], [T.out.give + 0.26, T.out.give + 0.76]];
+    const wet = [[T.slide + 0.18, T.slide + 0.85], [T.under + 0.12, T.surface + 0.02], [T.out.give + 0.33, T.out.give + 0.78]];
     muff.frequency.setValueAtTime(18000, 0);
     for (const [a, b] of wet) { muff.frequency.setValueAtTime(18000, a); muff.frequency.exponentialRampToValueAtTime(420, a + 0.08); muff.frequency.setValueAtTime(420, b - 0.06); muff.frequency.exponentialRampToValueAtTime(18000, b + 0.05); }
     const world = ctx.createGain(); world.connect(muff);
@@ -324,10 +324,10 @@ class GvAudio extends AudioEngine {
     for (let t = O.push + 0.2; t < O.give + 0.2; t += 0.07) this.drip(t + 0.05 * S.rng.next(), 0.025, S.rng.range(-0.5, 0.5), you);
     S.heart(O.top - 0.3, 0.14, you); S.heart(O.top + 0.15, 0.16, you);
     S.voice(O.give, 190, 0.22, 'a', 0.07, 0, you, 0.75);
-    S.thump(O.give + 0.22, 0.6, you); this.splash(O.give + 0.22, 0.45, 0, you, hallRev, 1.4);
+    S.thump(O.give + 0.3, 0.6, you); this.splash(O.give + 0.3, 0.45, 0, you, hallRev, 1.4);
     { const a = this.at(1.55, -32.5, O.give, 4); S.voice(O.give + 0.35, 135, 0.4, 'o', 0.04 * a.g, a.pan, world, 0.85); }
-    for (let k = 0; k < 8; k++) this.drip(O.give + 0.3 + 0.4 * S.rng.next(), 0.03, S.rng.range(-0.4, 0.4), you, S.rng.range(300, 800));
-    S.gasp(O.give + 0.8, 0.075, you); S.hiss(O.give + 0.85, 0.6, 0.025, 0, you);
+    for (let k = 0; k < 8; k++) this.drip(O.give + 0.36 + 0.4 * S.rng.next(), 0.03, S.rng.range(-0.4, 0.4), you, S.rng.range(300, 800));
+    S.gasp(O.give + 0.82, 0.075, you); S.hiss(O.give + 0.86, 0.6, 0.025, 0, you);
   }
 
   /* ---- the dive: the hush, the air, the hit, the hall's echo ---- */
@@ -352,7 +352,7 @@ class GvAudio extends AudioEngine {
   /* ---- under water: a muffled roar, her bubbles, your heartbeat ---- */
   _under(S, ctx, uw, you) {
     const T = GV, t0 = T.under + 0.1, t1 = T.surface + 0.05;
-    for (const [a, b, v] of [[T.slide + 0.2, T.slide + 0.85, 0.5], [t0, t1, 1], [T.out.give + 0.27, T.out.give + 0.76, 0.6]]) {
+    for (const [a, b, v] of [[T.slide + 0.2, T.slide + 0.85, 0.5], [t0, t1, 1], [T.out.give + 0.33, T.out.give + 0.78, 0.6]]) {
       const n = S.noise('brown', a, b + 0.1), lp = S.filter('lowpass', 300, 0.7), g = ctx.createGain();
       g.gain.setValueAtTime(0, a); g.gain.linearRampToValueAtTime(0.4 * v, a + 0.06); g.gain.setValueAtTime(0.4 * v, b - 0.08); g.gain.linearRampToValueAtTime(0, b);
       n.connect(lp); lp.connect(g); g.connect(uw);

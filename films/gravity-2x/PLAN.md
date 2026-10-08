@@ -147,10 +147,10 @@ stair, the walk along the deck, the slide into the water) take the 67.5 s story 
 | 4 | 9.3–15.4 | 9.3–15.4 | Along the bench from the lifter's feet: he and his spotter heave the 80 kg bar off the safety arms (11.0); it drops back with a clang and chalk (12.55) | strain voices, the bar trembling, the crash | BARBELL 80 kg · LIFTS LIKE 160 kg · AT 1 G 785 N · NOW 1,570 N · "Every weight in the gym just doubled." |
 | 5 | 15.4–17.3 | 15.4–17.3 | Through the glass: a free throw peaks below the rim and lands short; the dotted 1 G ghost arc scores | the ball's thuds through glass, a groan | PEAK 2.90 m · RIM 3.05 m · AT 1 G 3.68 m · "The same throw falls short." |
 | 6 | 17.3–21.75 | 17.3–21.75 | **New: the pull-up bar.** You reach up and hang (18.55): the camera sinks under your doubled weight, your arms shake as you try to pull up (19.55), your left hand peels off the chrome (20.55), you drop and land hard (21.05) | hands on chrome, the frame creaking, a long strain, the slip, the landing thud | DEAD HANG · YOUR GRIP HOLDS 140 kg · AT 1 G: 70 kg · "Just hanging on is like holding two of you." |
-| 7 | 23.45–28.3 | 21.75–26.6 | Down the open stair, a man sat halfway with his hand on the rail; at 25.9 your knee gives on a step | heavy steps, the treads ringing, his breath | HIS CLIMB · ONE FLOOR · WORK OF TWO · 4,400 J · AT 1 G 2,200 J · "Every step down lands twice as hard." |
+| 7 | 23.45–28.3 | 21.75–26.6 | Down the open stair, a man sat halfway with his hand on the rail; at 25.9 your knee gives on a step | heavy steps, the treads ringing, his breath, your knee's thud | EVERY STEP DOWN · 20 cm · LANDS 2× AS HARD · 70 kg: 275 J A STEP · AT 1 G 137 J · "Every step down lands twice as hard." |
 | 8 | 28.3–31.3 | 26.6–29.6 | From the stair foot: swimmers lying on the water exactly as before; everyone on the deck is flattened | the hall's echo, lapping water | FLOATING · SAME AS BEFORE · "But in the water, you float exactly as before." |
 | 9 | 34.0–40.05 | 29.6–35.65 | Close (fov 40) on the ladder: a man climbs; slower and slower as he leaves the water; he stalls shaking at the top, his grip goes and he drops back in | his strain, water pouring off, the splash | LEAVING THE WATER · BUOYANCY GONE · HE LIFTS HIS FULL 2× WEIGHT · "Until you try to get out." |
-| 10 | 42.85–44.6 | 35.65–37.4 | You're floating at the deep end (you've just slid in) | water off your face, a gasp | YOU, FLOATING · FEELS WEIGHTLESS · BUOYANCY = WEIGHT = 1,373 N |
+| 10 | 42.85–44.6 | 35.65–37.4 | You're floating at the deep end (you've just slid in) | water off your face, a gasp | YOU, FLOATING · FEELS LIKE BEFORE · BUOYANCY = WEIGHT = 1,373 N |
 | 11 | 44.6–47.9 | 37.4–40.7 | Up at the 10 m platform: the diver gets up off her knees, looks back at the stairs, walks to the edge | a low drone and a riser | "She climbed up before the change." · "So she jumps." |
 | 12 | 47.9–48.91 | 40.7–41.71 | She steps off; a pale 1 G "ghost" diver falls beside her and is only halfway (5.0 m) when she hits | the hall hushes, air | FALL · 10 m · GHOST: 1 G · clock to 1.01 s · AT 1 G 1.43 s |
 | 13 | 48.91–49.45 | 41.71–42.25 | Entry: a crown splash and white water; the wave rocks you | a heavy slap, the roar, the hall answering | 71 km/h · LIKE A 20 m DIVE AT 1 G · AT 1 G 50 km/h |
@@ -219,7 +219,29 @@ Dropped from the page (kept in git at `99692f2`): `city.js`, `site.js`, `traffic
 3. *A small climax and no "suspended load"* → a new first-person dead hang on a pull-up bar (your grip holds 140 kg,
    your hand peels, you drop); the dive pushed in with a 1 G ghost diver falling alongside (she hits while the ghost
    is halfway) and a bigger crown splash.
-Plus the physics wording fixes above. The final was not re-scored by the reviewers after these fixes.
+Plus the physics wording fixes above.
+
+**v3 final audit** (an independent reviewer on the actual 1080×1920 final, 60.3 s; scores as given): retention **7**/10 ·
+cinematography/visual **6.5**/10 · normal viewer **7**/10 · physics **8**/10 · creative differentiation **7**/10.
+Output checks: 1,810 frames at 30 fps CFR, 1080×1920, no decode errors, no duplicate or black frames except the
+intended fade, the three trims are clean one-frame cuts (they read as location jumps, not invisible), audio 19 ms
+longer than the video, −16.6 LUFS, −2.2 dBTP, sync within a frame at the change, the bar crash, the landing, the
+ladder splash and the dive entry. No stretch over 4 s without a new event (longest 2.9 s).
+Its top 3 and the fixes (then only the changed shots were re-rendered):
+1. *The climb-out glitch (51.97–52.7):* a one-frame head jump at the give, the picture flickering above/below the
+   water for 0.4 s, the readout dropping to "0 kg" before you fall, the splash 3 frames early → the look follows
+   your actual height through the give, you go under once and come up through the surface in one move (checked
+   frame by frame: one switch down at 52.30, one up at 52.73), the readout freezes and fades, the splash moved to
+   the entry.
+2. *The stair said two things (HUD about his climb, caption about your steps) and the knee buckle was invisible* →
+   HUD "EVERY STEP DOWN · 20 cm · LANDS 2× AS HARD · 70 kg: 275 J A STEP · AT 1 G 137 J"; a deeper dip, a jolt and a
+   shake at the buckle.
+3. *The pull-up didn't read (no visible bar, the slip lasted 2 frames)* → a brighter, thicker chrome bar, the view
+   pitched so the bar crosses the frame under your hands, the left hand peels 0.4 s earlier and slides off over 0.9 s.
+Also: "FEELS WEIGHTLESS" → "FEELS LIKE BEFORE" (the film's own point), the diver's platform shot tightened (fov 50 →
+34), the scale display kept clear of the title at the change. Still weak (not fixed): the small HUD sub-lines are
+unreadable at phone size; the trims read as location jumps; the floating shot (35.65–37.4) is unclear; the forearms
+look like cones (engine hand rig); some of the closing structure echoes v2. The fixed final was not re-scored.
 
 
 ## 9. v2 (superseded): the street film
