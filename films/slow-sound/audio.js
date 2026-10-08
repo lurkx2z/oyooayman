@@ -27,12 +27,12 @@ class SndAudio extends AudioEngine {
 
     // mix chain: buses → compressor → out → limiter
     const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12; lim.connect(ctx.destination);
-    const out = ctx.createGain(); out.gain.value = 1.0; out.connect(lim);
+    const out = ctx.createGain(); out.gain.value = 0.93; out.connect(lim);   // (~0.6 dB of headroom for the AAC encode)
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 8; comp.ratio.value = 3.5; comp.attack.value = 0.004; comp.release.value = 0.25; comp.connect(out);
-    const mix = ctx.createGain(); mix.gain.value = 2.2; mix.connect(comp);
+    const mix = ctx.createGain(); mix.gain.value = 1.5; mix.connect(comp);
     const rev = S.reverb(2.6), revG = ctx.createGain(); revG.gain.value = 0.3; rev.connect(revG); revG.connect(mix);
     const bus = (g) => { const b = ctx.createGain(); b.gain.value = g; b.connect(mix); return b; };
-    const amb = bus(0.7), you = bus(0.85), src = bus(1.0), fx = bus(1.0), mus = bus(0.45);
+    const amb = bus(0.35), you = bus(0.85), src = bus(1.0), fx = bus(1.15), mus = bus(0.5);
     const send = (node, amt) => { const g = ctx.createGain(); g.gain.value = amt; node.connect(g); g.connect(rev); };
 
     // where a sound comes from, for your ears: pan by its bearing against the way you face, level by distance
@@ -55,14 +55,19 @@ class SndAudio extends AudioEngine {
       if (opts.rev) send(pn, opts.rev);
       let last = pts.find((q) => q.delay !== null), dl = last ? last.delay : 1;
       g.gain.setValueAtTime(0, 0); dly.delayTime.setValueAtTime(dl, 0); pn.pan.setValueAtTime(0, 0);
+      // a source coming at you crowds its sound into less time: louder as well as higher (×dte/dt, capped)
+      let prev = null, dop = 1;
       for (const q of pts) {
         let gv = 0, pv = 0;
         if (q.delay !== null && q.te >= te0 && q.te <= te1) {
           dl = q.delay;
           const sp = posFn(q.te);
-          gv = vol * ref / (ref + q.d) * (opts.gainFn ? opts.gainFn(q.te, q.t) : 1);
+          if (prev && prev.te !== null) { const r = (q.te - prev.te) / (q.t - prev.t); if (r > 0 && r < 50) dop += (MathX.clamp(r, 0.3, 6) - dop) * 0.25; }
+          gv = vol * ref / (ref + q.d) * dop * (opts.gainFn ? opts.gainFn(q.te, q.t) : 1);
+          if (opts.level) gv = opts.level(q, gv);
           pv = panOf(sp, q.t);
         }
+        prev = q;
         dly.delayTime.linearRampToValueAtTime(Math.min(dl, maxD - 0.01), q.t);
         g.gain.linearRampToValueAtTime(gv, q.t);
         pn.pan.linearRampToValueAtTime(pv, q.t);
@@ -117,9 +122,9 @@ class SndAudio extends AudioEngine {
     const bed = (type, f, q, vol) => { const n = S.noise(type, 0, END), b = S.filter('lowpass', f, q), g = ctx.createGain(); g.gain.value = vol; n.connect(b); b.connect(g); g.connect(amb); };
     bed('brown', 300, 0.7, 0.32); bed('pink', 1600, 0.5, 0.05);
     const A = amb.gain;
-    A.setValueAtTime(0.7, 0); A.linearRampToValueAtTime(0.7, 49.0); A.linearRampToValueAtTime(0.32, 51.0);
-    A.setValueAtTime(0.32, B.plane); A.linearRampToValueAtTime(0.55, B.plane + 1.5); A.linearRampToValueAtTime(0.3, B.police - 1.0);
-    A.setValueAtTime(0.3, B.police); A.linearRampToValueAtTime(0.4, B.police + 2.5); A.linearRampToValueAtTime(0.12, T.lineA[0] + 0.5); A.linearRampToValueAtTime(0.0, END);
+    A.setValueAtTime(0.35, 0); A.linearRampToValueAtTime(0.35, 49.0); A.linearRampToValueAtTime(0.14, 51.0);
+    A.setValueAtTime(0.14, B.plane); A.linearRampToValueAtTime(0.28, B.plane + 1.5); A.linearRampToValueAtTime(0.16, B.police - 1.0);
+    A.setValueAtTime(0.16, B.police); A.linearRampToValueAtTime(0.22, B.police + 2.5); A.linearRampToValueAtTime(0.07, T.lineA[0] + 0.5); A.linearRampToValueAtTime(0.0, END);
     // the avenue's own cars (they drive at ~12 m/s: Mach 0.35) — a few passes heard through the delay line
     if (app && app.cast) {
       const near = app.cast.cars.filter((k) => Math.abs(k.x) < 6).slice(0, 8);
@@ -129,7 +134,7 @@ class SndAudio extends AudioEngine {
           const n = S.noise('pink', 0, END), bp = S.filter('bandpass', 420 + hash1(k.i) * 200, 0.8), g = ctx.createGain(); g.gain.value = 0.9;
           n.connect(bp); bp.connect(g); g.connect(d);
           const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 38 + hash1(k.i * 3) * 14; const og = ctx.createGain(), ol = S.filter('lowpass', 220, 0.7); og.gain.value = 0.35; o.connect(ol); ol.connect(og); og.connect(d); o.start(0); o.stop(END);
-        }, 0.32, 5, src, { rev: 0.1, lp: 5000 });
+        }, 0.2, 5, src, { rev: 0.1, lp: 5000, gainFn: (te, t) => 1 - 0.75 * MathX.smooth(t, T.lineA[0] - 1.5, T.lineA[0] + 0.5) });
       }
     }
 
@@ -171,7 +176,7 @@ class SndAudio extends AudioEngine {
 
     // 5. the pile driver (100 m): bang + ringing steel, ~2.9 s after each blow; the last three after it has stopped
     for (const th of SND_PILE_HITS) at(th, { x: T.pile.x - 0.75, y: 1.0, z: T.pile.z }, 14, (tr, g, pn) => {
-      const v = 0.95 * g * 7.5, P = S.panned(src, pn);
+      const v = 0.95 * g * 5.5, P = S.panned(src, pn);
       const n = S.noise('white', tr, tr + 0.15), lp = S.filter('lowpass', 2200, 0.7), gg = ctx.createGain(); S.env(gg, tr, 0.001, v, 0.05); n.connect(lp); lp.connect(gg); gg.connect(P); send(gg, 0.6);
       const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.setValueAtTime(150, tr); o.frequency.exponentialRampToValueAtTime(55, tr + 0.2); S.env(og, tr, 0.002, v * 1.2, 0.25); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.4);
       for (const [f, a, d] of [[470, 0.3, 0.6], [1180, 0.16, 0.4], [2050, 0.08, 0.25]]) { const r = ctx.createOscillator(), rg = ctx.createGain(); r.frequency.value = f; S.env(rg, tr, 0.002, v * a, d); r.connect(rg); rg.connect(P); send(rg, 0.4); r.start(tr); r.stop(tr + d * 1.6); }
@@ -193,7 +198,10 @@ class SndAudio extends AudioEngine {
     moving(sndH1, 0.0, 40.0, 10.0, 40.0, (d) => engine(d, 0, 40, 46, 380, 0.8, 0.4), 0.55, 10, src, { rev: 0.12, lp: 7000 });
 
     // 8. the car that goes supersonic: its whole approach arrives squeezed into a rising scream, then the boom
-    moving(sndSport, 0.0, 44.0, 26.0, 46.0, (d) => engine(d, 0, 44, 62, 420, 0.8, 0.5), 0.55, 10, src, { rev: 0.12, lp: 6500 });
+    // (half a kilometre away the squeezed sound would be faint; the film lets you hear it build: a floor under the
+    //  natural level that rises into the shock, so the scream is there before the boom, never louder than it)
+    const sportLevel = (q, g) => (q.t < B.sport ? Math.max(g, 0.03 + 0.34 * Math.pow(MathX.smooth(q.t, 33.75, B.sport), 2)) : g);
+    moving(sndSport, 0.0, 44.0, 26.0, 46.0, (d) => engine(d, 0, 44, 62, 420, 0.8, 0.5), 0.55, 10, src, { rev: 0.12, lp: 6500, level: sportLevel });
     nwave(B.sport, 0.09, 0.85, fx, 5000, 0.4, -0.55);
     S.thump(B.sport + 0.01, 0.35, fx);
     rattle(B.sport + 0.05, 0.9, 0.06, 0.5, fx);
@@ -229,8 +237,9 @@ class SndAudio extends AudioEngine {
     if (app && app.cast) {
       const al = app.cast.parked.filter((k) => k.alarm).sort((a, b) => Math.hypot(a.x - 9.4, a.z - 1) - Math.hypot(b.x - 9.4, b.z - 1)).slice(0, 3);
       al.forEach((k, i) => {
-        const p = { x: k.x, y: 1, z: k.z }, tr = sndArriveFixed(k.tA + 0.25, p), pts = this._spatial(() => p, tr, END, 1 / 10, 12);
-        S.alarm(tr, END, pts.map((q) => Object.assign({}, q, { gain: q.gain * 0.55 })), src, rev, this);
+        const p = { x: k.x, y: 1, z: k.z }, tr = sndArriveFixed(k.tA + 0.25, p), t1 = T.lineA[0] + 0.6, pts = this._spatial(() => p, tr, t1, 1 / 10, 12);
+        // (they keep going, but the mix lets them fall away under the closing line)
+        S.alarm(tr, t1, pts.map((q) => Object.assign({}, q, { gain: q.gain * 0.3 * (1 - MathX.smooth(q.t, T.lineA[0] - 2.5, t1)) })), src, rev, this);
       });
       // the pigeons burst off the roof
       for (const b of app.cast.birds.filter((_, i) => i % 3 === 0)) at(b.tA, { x: b.x, y: b.y, z: b.z }, 14, (tr, g, pn) => S.flap(tr, pn, 0.12 * g * 3, src));
@@ -243,7 +252,7 @@ class SndAudio extends AudioEngine {
       for (let t = 40; t < 66; t += 2.4) { o.frequency.linearRampToValueAtTime(1400, t + 1.2); o.frequency.linearRampToValueAtTime(700, t + 2.4); }
       const lp = S.filter('lowpass', 2200, 0.7), g = ctx.createGain(); g.gain.value = 0.55; o.connect(lp); lp.connect(g); g.connect(d); o.start(40); o.stop(66);
       engine(d, 40, 66, 70, 520, 0.6, 0.35);
-    }, 0.75, 8, src, { rev: 0.3 });
+    }, 0.75, 8, src, { rev: 0.3, gainFn: (te, t) => 1 - 0.8 * MathX.smooth(t, T.lineA[0] - 1.0, T.lineA[0] + 1.5) });
     nwave(B.police, 0.075, 1.0, fx, 6500, 0.55, 0.5);
     S.thump(B.police + 0.01, 0.6, fx);
     rumble(B.police + 0.02, 1.6, 0.32, 220, fx);

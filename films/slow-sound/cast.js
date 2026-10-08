@@ -163,8 +163,8 @@ class SndCast {
       if (hsh < 0.42) continue;
       if (x0 === 26.0 && side < 0 && z < -6 && z > -42) continue;   // the couple's aisle
       if (x0 === 16.0 && z > -11) continue;                             // the lot entrance: the drone and its pilot
-      const zl = 1 - (96 * (x0 + side * 1.35 - 9.4)) / 30.6;            // keep the line of sight to the pile driver clear
-      if (Math.abs(z - 1.3 - zl) < 3.4) continue;
+      { const px = x0 + side * 1.35 - 9.4, pz = z - 1.3 - 1, L = Math.hypot(30.6, 96);   // keep the line of sight to the pile driver clear
+        if (Math.abs(px * (-96 / L) - pz * (30.6 / L)) < 3.6) continue; }
       const type = types[n % types.length], c = mk(type, cols[(n * 5) % cols.length], 'parked');
       const x = x0 + side * 1.35;
       c.group.position.set(x, LAYOUT.curbH, z - 1.3);
@@ -248,11 +248,11 @@ class SndCast {
     const bodyG = new THREE.ConeGeometry(0.07, 0.34, 6); bodyG.rotateX(Math.PI / 2);
     const wingG = new THREE.BufferGeometry(); wingG.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -0.08, 0.38, 0, -0.02, 0, 0, 0.1, 0.38, 0, -0.02, 0.3, 0, 0.06, 0, 0, 0.1], 3)); wingG.computeVertexNormals();
     const out = [];
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 52; i++) {
       const g = new THREE.Group(); g.add(new THREE.Mesh(bodyG, mat));
       const wl = new THREE.Mesh(wingG, mat), wr = new THREE.Mesh(wingG, mat); wr.scale.x = -1; g.add(wl, wr);
       g.scale.setScalar(1.15); scene.add(g);
-      const x = -12.75 - hash1(i * 31) * 0.25, z = -14 - i * 1.1 - hash1(i) * 0.6, y = this._roofAt(-1, z) + 0.15;
+      const side = i < 16 || i % 2 ? -1 : 1, z = i < 16 ? -14 - i * 1.1 - hash1(i) * 0.6 : -40 - (i - 16) * 3.4 - hash1(i) * 2, x = side * (12.75 + hash1(i * 31) * 0.25), y = this._roofAt(side, z) + 0.15;
       out.push({ g, wl, wr, x, y, z, s: hash1(i * 17 + 3), tA: sndPlaneBoomAt(x, z) - 0.05 + hash1(i * 5) * 0.15 });
     }
     return out;
@@ -266,7 +266,7 @@ class SndCast {
     for (const p of this.people) { p.update(t); const q = p.root.position; B.push(q.x, q.y + 0.012, q.z, 0.55, 0.45); }
     // avenue cars
     const place = (c, x, y, z, dir) => { const g = c.group; g.position.set(x, y, z); g.rotation.y = (dir > 0 ? Math.PI : 0) + Math.PI / 2; for (const w of c.wheels) w.rotation.z = -(dir > 0 ? z : -z) / c.r; };
-    for (const k of this.cars) { const z = this._zAt(k.table, t); place(k.c, k.x, 0, z, k.v); if (Math.abs(z) < 120) B.push(k.x, 0.01, z, 1.2, 0.5, 2.6); }
+    for (const k of this.cars) { const z = this._zAt(k.table, t); place(k.c, k.x, 0, z, k.v); const br = this._zAt(k.table, t - 0.12) - z, br2 = this._zAt(k.table, t - 0.24) - this._zAt(k.table, t - 0.12); k.c.tail.emissiveIntensity = Math.abs(br2) - Math.abs(br) > 0.004 ? 5.5 : 0.6; k.c.hazard.emissiveIntensity = t > sndPoliceBoomAt(k.x, z) + 1.2 && k.i % 3 === 0 && Math.floor(t * 2.2) % 2 ? 6 : 0; if (Math.abs(z) < 120) B.push(k.x, 0.01, z, 1.2, 0.5, 2.6); }
     // ambulance: drives through; its lights flash
     { const q = sndAmb(t), c = this.amb; place(c, q.x, 0, q.z, 1); c.group.visible = t > 12 && t < 32; const on = Math.floor(t * 5) % 2; c.bar[0].emissiveIntensity = on ? 7 : 0.3; c.bar[1].emissiveIntensity = on ? 0.3 : 7; if (c.group.visible) B.push(q.x, 0.01, q.z, 1.3, 0.5, 2.9); }
     { const q = sndPolice(t), c = this.police; place(c, q.x, 0, q.z, 1); c.group.visible = t > 49 && t < 60; const on = Math.floor(t * 7) % 2; c.bar[0].emissiveIntensity = on ? 8 : 0.3; c.bar[1].emissiveIntensity = on ? 0.3 : 8; if (c.group.visible) B.push(q.x, 0.01, q.z, 1.2, 0.5, 2.6); }

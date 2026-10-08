@@ -111,7 +111,7 @@ class SndRipples {
     // the wakes show while their source is near (each shock reaches the whole street within a few seconds)
     U.uFront.value.set(
       MathX.window(t, 54.0, 62.5, 0.4, 1.5) * 1.1,
-      MathX.window(t, 50.0, 57.0, 0.5, 1.5) * 0.5,
+      MathX.window(t, 50.0, 57.0, 0.5, 1.5) * 0.75,
       MathX.window(t, 33.0, 39.0, 0.5, 1.2) * 0.8);
     if (fog) { U.uFogColor.value.copy(fog.color); U.uFogDensity.value = fog.density; }
   }
@@ -136,7 +136,7 @@ class SndDust {
     for (let x = -12; x <= 50; x += 7) for (let z = -230; z <= 40; z += 7) {
       const jx = x + (hash1(s * 3) - 0.5) * 4.5, jz = z + (hash1(s * 5) - 0.5) * 4.5;
       if (jx > 12.6 && jx < 13.8) { s++; continue; }
-      P.push([jx, Math.abs(jx) < LAYOUT.roadHalf ? 0 : h, jz, sndPlaneBoomAt(jx, jz, 0.3), 2.2, 0.075, 2.4, s, 0]);
+      const street = Math.abs(jx) < 12.5; P.push([jx, Math.abs(jx) < LAYOUT.roadHalf ? 0 : h, jz, sndPlaneBoomAt(jx, jz, 0.3), street ? 2.6 : 2.0, street ? 0.13 : 0.07, 2.4, s, 0]);
       s++;
     }
     // the police car's wake along the street (the gutters are dusty)
@@ -308,7 +308,26 @@ class SndGlass {
       // glass dust/glitter at the burst
       for (let k = 0; k < 7; k++) dust.glitter.push([p.xf - p.side * (0.3 + hash1(p.id * 5 + k) * 1.4), p.y0 + 0.6 + hash1(p.id * 9 + k) * 1.8, p.za + hash1(p.id * 3 + k) * (p.zb - p.za), p.tf + 0.02, 0.9, 0.5, 1.1, p.id * 10 + k, 1]);
     }
+    // the glass lying on the sidewalk in front of each burst pane (glints once the pieces have landed)
+    const gl = this._glitterTex(), gm = new THREE.MeshBasicMaterial({ map: gl, transparent: true, depthWrite: false, opacity: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    this.carpets = bursts.map((p) => {
+      const g = new THREE.PlaneGeometry(2.6, p.zb - p.za + 0.6); g.rotateX(-Math.PI / 2);
+      const m = new THREE.Mesh(g, gm.clone()); m.material.map = gl.clone(); m.material.map.needsUpdate = true; m.material.map.offset.set(hash1(p.id * 7), hash1(p.id * 11));
+      m.position.set(p.xf - p.side * 1.45, LAYOUT.curbH + 0.014, p.zc); m.renderOrder = 2; scene.add(m);
+      return { m, t: p.tf + 0.5 };
+    });
     this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._e = new THREE.Euler(); this._p = new THREE.Vector3(); this._s = new THREE.Vector3();
+  }
+
+  _glitterTex() {
+    const W = 256, c = Tex.canvas(W, W), x = c.getContext('2d'), r = new RNG(73);
+    x.clearRect(0, 0, W, W);
+    for (let i = 0; i < 420; i++) {
+      const px = r.next() * W, py = r.next() * W, edge = Math.min(px, W - px, py, W - py) / (W * 0.5), a = Math.min(1, edge * 2.2) * (0.35 + r.next() * 0.65);
+      const s = 1 + r.next() * r.next() * 7;
+      x.fillStyle = `rgba(235,244,250,${(a * 0.8).toFixed(2)})`; x.beginPath(); x.moveTo(px, py); x.lineTo(px + s, py + s * 0.3); x.lineTo(px + s * 0.4, py + s); x.closePath(); x.fill();
+    }
+    return Tex.tex(c, { repeat: false });
   }
 
   // a pane's fracture: dark gaps where glass is gone, jagged pieces still in the frame (burst), or a crack web
@@ -316,20 +335,28 @@ class SndGlass {
     const W = 512, H = 512, c = Tex.canvas(W, H), x = c.getContext('2d'), r = new RNG(burst ? 71 : 72);
     x.clearRect(0, 0, W, H);
     if (burst) {
-      // the hole: the interior seen without glass (a little darker, no reflections)
-      x.fillStyle = 'rgba(8,9,11,0.7)'; x.fillRect(0, 0, W, H);
-      // jagged remnants along the frame
-      x.fillStyle = 'rgba(196,214,224,0.85)'; x.strokeStyle = 'rgba(255,255,255,1)'; x.lineWidth = 3;
-      const edge = (pts) => { x.beginPath(); x.moveTo(pts[0][0], pts[0][1]); for (const p of pts.slice(1)) x.lineTo(p[0], p[1]); x.closePath(); x.fill(); x.stroke(); };
+      // the hole: the shop seen without glass (darker: no more reflections)
+      x.fillStyle = 'rgba(6,7,9,0.38)'; x.fillRect(0, 0, W, H);
+      // irregular pieces still held by the frame: translucent, with bright broken edges
+      const piece = (pts) => {
+        x.beginPath(); x.moveTo(pts[0][0], pts[0][1]); for (const p of pts.slice(1)) x.lineTo(p[0], p[1]); x.closePath();
+        x.fillStyle = `rgba(200,216,226,${(0.22 + r.next() * 0.2).toFixed(2)})`; x.fill();
+        x.strokeStyle = 'rgba(245,250,255,0.75)'; x.lineWidth = 1.4; x.stroke();
+      };
       for (let side = 0; side < 4; side++) {
-        for (let i = 0; i < 7; i++) {
-          const a = (i + r.next() * 0.6) / 7, b = a + 0.06 + r.next() * 0.14, d = 40 + r.next() * 150;
-          const P = (u, v) => side === 0 ? [u * W, v] : side === 1 ? [W - v, u * H] : side === 2 ? [u * W, H - v] : [v, u * H];
-          edge([P(a, 0), P(b, 0), P((a + b) / 2 + (r.next() - 0.5) * 0.05, d)]);
+        const P = (u, v) => side === 0 ? [u * W, v] : side === 1 ? [W - v, u * H] : side === 2 ? [u * W, H - v] : [v, u * H];
+        let u = r.next() * 0.08;
+        while (u < 0.97) {
+          const w = 0.04 + r.next() * 0.22, b = Math.min(1, u + w), long = r.next() < 0.22;
+          const d1 = (long ? 90 + r.next() * 170 : 10 + r.next() * 60), d2 = d1 * (0.3 + r.next() * 0.6);
+          if (r.next() < 0.75) piece([P(u, 0), P(b, 0), P(b - w * r.next() * 0.4, d2), P(u + w * (0.2 + r.next() * 0.5), d1)]);
+          u = b + r.next() * 0.06;
         }
       }
-      // a corner piece hanging on
-      edge([[0, 0], [W * 0.32, 0], [W * 0.12, H * 0.22], [0, H * 0.4]]);
+      // a few cracks running through what is left near the frame
+      x.strokeStyle = 'rgba(245,250,255,0.5)'; x.lineWidth = 1.1;
+      for (let i = 0; i < 14; i++) { const e = r.int(0, 3), u = r.next(); let px = e === 0 ? u * W : e === 1 ? W : e === 2 ? u * W : 0, py = e === 0 ? 0 : e === 1 ? u * H : e === 2 ? H : u * H;
+        x.beginPath(); x.moveTo(px, py); for (let k = 0; k < 3; k++) { px += (W / 2 - px) * 0.12 + (r.next() - 0.5) * 40; py += (H / 2 - py) * 0.12 + (r.next() - 0.5) * 40; x.lineTo(px, py); } x.stroke(); }
     } else {
       x.strokeStyle = 'rgba(255,255,255,0.9)'; x.lineWidth = 1.6;
       const cx = W * (0.3 + r.next() * 0.4), cy = H * (0.3 + r.next() * 0.4);
@@ -346,6 +373,7 @@ class SndGlass {
 
   update(t) {
     for (const p of this.panes) if (p.mesh) p.mesh.visible = t >= p.tf;
+    for (const c of this.carpets) c.m.material.opacity = 0.85 * MathX.smooth(t, c.t, c.t + 0.4);
     const I = this.shards, m = this._m, g = -9.81, h = LAYOUT.curbH, ground = (x) => (Math.abs(x) < LAYOUT.roadHalf ? 0.0 : h) + 0.012;
     let n = 0;
     for (const s of this.S) {

@@ -44,7 +44,7 @@ class SndCity extends Environment {
   /* ---------------- sky: a clear, warm afternoon (copy-then-own of the Air film's sunny sky) ---------------- */
   _sky() {
     this.sunDir = new THREE.Vector3(-0.42, 0.6, 0.68).normalize();
-    const zenith = new THREE.Color('#5a8cc0'), horizon = new THREE.Color('#c6d6e2');
+    const zenith = new THREE.Color('#6a8fb6'), horizon = new THREE.Color('#c8d5df');
     this.fogColor = new THREE.Color('#cdd6dc');
     this.skyUniforms = { uZenith: { value: zenith }, uHorizon: { value: horizon }, uGround: { value: new THREE.Color('#8d9590') }, uSunDir: { value: this.sunDir }, uSunColor: { value: new THREE.Color('#ffe2b4') }, uTime: { value: 0 } };
     const mat = new THREE.ShaderMaterial({
@@ -64,9 +64,9 @@ class SndCity extends Environment {
           col += uSunColor * (pow(sd, 4.0) * 0.16 + pow(sd, 40.0) * 0.25);
           col = mix(col, uHorizon * 1.04, 0.25 * (1.0 - smoothstep(0.0, 0.18, abs(h))));
           if (h > 0.0) {
-            vec2 uv = d.xz / (h + 0.18) * 0.42 + vec2(uTime * 0.006, uTime * 0.002);
+            vec2 uv = d.xz / (h + 0.18) * 1.1 + vec2(uTime * 0.006, uTime * 0.002);
             float c = fbm(uv * 1.3);
-            float cov = smoothstep(0.5, 0.8, c) * smoothstep(0.0, 0.12, h);
+            float cov = smoothstep(0.46, 0.76, c) * smoothstep(0.0, 0.12, h);
             vec3 lit = mix(vec3(1.0, 0.98, 0.95), uSunColor, 0.25) * 1.05, shade = mix(uHorizon, uZenith, 0.35) * 0.92;
             vec3 cl = mix(shade, lit, smoothstep(0.45, 0.9, fbm(uv * 1.3 + uSunDir.xz * 0.15)));
             col = mix(col, cl, cov * 0.78);
@@ -111,13 +111,13 @@ class SndCity extends Environment {
       for (let z = 2; z > -74; z -= 2.6) B.add(Geo.flat(x0 - 2.6, x0 + 2.6, z - 0.06, z + 0.06, y, 1), m.markWhite, null, { noShadow: true });
       B.add(Geo.flat(x0 - 0.06, x0 + 0.06, -74, 2, y, 1), m.markWhite, null, { noShadow: true });
     }
-    for (const [x, z] of [[21, -34], [21, -64], [41, -14], [41, -48], [24, 18]]) {
+    for (const [x, z] of [[23, -20], [21, -64], [41, -14], [41, -48], [24, 18]]) {
       B.add(new THREE.CylinderGeometry(0.09, 0.13, 9, 8), m.metal, Geo.matrix(x, h + 4.5, z));
       B.box(1.4, 0.18, 0.5, x, h + 9.0, z, m.metal); B.box(1.2, 0.04, 0.36, x, h + 8.9, z, m.white, 0, { noShadow: true });
     }
     // a low hedge and bollards along the sidewalk edge (gaps for the entrances)
     const hedge = Mat.std('#3f5133', { roughness: 1, flatShading: true });
-    for (const [z0, z1] of [[29.0, -1.0], [-10.0, -52.0], [-60.0, -110.0]]) B.box(0.9, 0.85, z0 - z1, 13.55, h + 0.42, (z0 + z1) / 2, hedge);
+    for (const [z0, z1] of [[29.0, -1.0], [-21.0, -52.0], [-60.0, -110.0]]) B.box(0.9, 0.85, z0 - z1, 13.55, h + 0.42, (z0 + z1) / 2, hedge);
     for (let z = -1.6; z > -9.6; z -= 2.0) B.add(new THREE.CylinderGeometry(0.11, 0.11, 0.85, 8), m.metal, Geo.matrix(13.4, h + 0.42, z));
     // a grass verge with a few trees at the lot's far end, and a fence along the highway
     for (let z = -120; z > -260; z -= 14) this._tree(18 + 9 * hash1(z), z, this.rng.fork(Math.round(-z)), 1.1);
@@ -210,8 +210,8 @@ class SndCity extends Environment {
     // foreground pieces beside you (the parallax layer): a sign pole and a bin
     const np = Tex.label([['NO', 40], ['STOPPING', 44], ['ANY TIME', 30]], { w: 192, h: 256, bg: '#f4f4f0', fg: '#c0392b', border: '#c0392b' });
     const npm = new THREE.MeshStandardMaterial({ map: np, roughness: 0.6 });
-    B.add(new THREE.CylinderGeometry(0.035, 0.035, 2.7, 6), m.metal, Geo.matrix(7.75, h + 1.35, -7.5));
-    B.box(0.03, 0.5, 0.42, 7.75, h + 2.35, -7.5, npm, 0, { noShadow: true });
+    B.add(new THREE.CylinderGeometry(0.035, 0.035, 2.7, 6), m.metal, Geo.matrix(7.75, h + 1.35, -3.5));
+    B.box(0.03, 0.5, 0.42, 7.75, h + 2.35, -3.5, npm, 0, { noShadow: true });
     B.add(new THREE.CylinderGeometry(0.3, 0.27, 0.95, 12), m.metalGreen, Geo.matrix(8.0, h + 0.475, 4.6));
     B.add(new THREE.CylinderGeometry(0.33, 0.33, 0.08, 12), m.metalGreen, Geo.matrix(8.0, h + 0.99, 4.6));
     const nameA = Tex.label(['RIVER RD'], { w: 512, h: 112, font: 70, bg: '#1d6b3c', border: '#ffffff' }), sa = new THREE.MeshStandardMaterial({ map: nameA, roughness: 0.5 });
@@ -262,7 +262,7 @@ class SndCity extends Environment {
     B.add(Geo.flat(S.x0, S.x1, S.z0, S.z1, h + 0.012, 6), m.dirt, null, { noShadow: true });
     const HH = 2.2;
     // hoarding on the two sides that face you (front at z1, side at x0)
-    B.add(Geo.quad([S.x0, h, S.z1], [S.x1, h, S.z1], [S.x1, h + HH, S.z1], [S.x0, h + HH, S.z1], 0, 0, (S.x1 - S.x0) / 8, 1), m.hoarding, null);
+    for (let x = S.x0; x < S.x1; x += 3) B.add(Geo.quad([x, h, S.z1], [x + 3, h, S.z1], [x + 3, h + 1.9, S.z1], [x, h + 1.9, S.z1], 0, 0, 1, 1), m.lattice, null, { noShadow: true });
     B.add(Geo.quad([S.x0, h, S.z0], [S.x0, h, S.z1], [S.x0, h + HH, S.z1], [S.x0, h + HH, S.z0], 0, 0, (S.z1 - S.z0) / 8, 1), m.hoarding, null);
     for (let x = S.x0; x <= S.x1; x += 2.4) B.box(0.1, HH + 0.1, 0.1, x, h + HH / 2, S.z1 - 0.1, m.plywood);
     // a stack of steel piles waiting, a site hut, a skip, cones
