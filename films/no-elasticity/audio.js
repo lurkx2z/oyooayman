@@ -9,13 +9,17 @@
    those are solids springing back) and, at the end, one crash that doesn't rebound.
    ===================================================================== */
 
+// how long the dropped arrow takes to reach the ground after the release (bow.js: NeArrow._release().land, measured)
+const NE_ARROW_LAND = 0.68;
+
 class NeAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = SCRIPT.meta.wav; }
   // anything the sound depends on that is not inside SCRIPT (so a stale baked copy is detected)
-  fingerprintData() { return [NE, NE_WALKERS.map((w) => [w.tm, w.v, w.dz]), NE_CRASH.tv, NE_TAP, NE_BALL, NE_RACKET, NE_SHOE]; }
+  fingerprintData() { return [NE, NE_WALKERS.map((w) => [w.tm, w.v, w.dz]), NE_CRASH.tv, NE_TAP, NE_BALL, NE_RACKET, NE_SHOE, NE_STREET, NE_PIT, NE_GUSTS, NE_CLOCK, NE_ARROW_LAND]; }
 
   _build(ctx) {
     const S = new SoundKit(ctx, CONFIG.seed), T = NE, END = CONFIG.duration + 1.4, app = this.app, TR = app.traffic;
+    const ST = NE_STREET;
     // offline-safe envelopes (Chrome's offline renderer clicks on very short exponential ramps)
     S.env = (g, t, a, peak, d) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), t + Math.max(a, 0.006)); g.gain.setTargetAtTime(0, t + Math.max(a, 0.006), Math.max(0.004, d / 4)); };
     const tone = S.tone.bind(S);
@@ -35,7 +39,7 @@ class NeAudio extends AudioEngine {
     const amb = bus(0.75), you = bus(0.8), mus = bus(0.42), fx = bus(1.0), cars = bus(0.9);
     // a short dip of the bed and the music just before each dead hit, so the thud lands in a small silence
     { const dk = ctx.createGain(); dk.connect(mix); for (const b of [amb, mus]) { b.disconnect(); b.connect(dk); }
-      const hits = [[neBallTimes().tc4, 0.75], [T.land, 0.6], [38.85, 0.55], [NE.tap, 0.6]].sort((a, b) => a[0] - b[0]);
+      const hits = (ST ? [[neBallTimes().tc4, 0.75], [T.land, 0.6], [38.85, 0.55], [NE.tap, 0.6]] : [[neBallTimes().tc4, 0.75], [T.land, 0.6], [NE.bow.release, 0.7], [NE.fork.strike, 0.6]]).sort((a, b) => a[0] - b[0]);
       dk.gain.setValueAtTime(1, 0);
       for (const [t, d] of hits) { dk.gain.setValueAtTime(1, t - 0.35); dk.gain.linearRampToValueAtTime(1 - d, t - 0.03); dk.gain.setValueAtTime(1 - d, t + 0.08); dk.gain.linearRampToValueAtTime(1, t + 0.6); } }
     const R = (a, b) => S.rng.range(a, b);
@@ -69,15 +73,21 @@ class NeAudio extends AudioEngine {
     // 1. a sunny afternoon: the city bed, a few birds in the plaza trees; it thins out as the street gives up
     const bed = (type, f, q, vol) => { const n = S.noise(type, 0, END), b = S.filter('lowpass', f, q), g = ctx.createGain(); g.gain.value = vol; n.connect(b); b.connect(g); g.connect(amb); };
     bed('brown', 300, 0.7, 0.16); bed('pink', 1600, 0.5, 0.06);
-    amb.gain.setValueAtTime(0.75, 0); amb.gain.linearRampToValueAtTime(0.75, 52.4); amb.gain.linearRampToValueAtTime(0.12, 53.1); amb.gain.setValueAtTime(0.12, T.crash); amb.gain.linearRampToValueAtTime(0.35, T.crash + 0.3);   // a held breath before the hit
-    amb.gain.setValueAtTime(0.35, 57); amb.gain.linearRampToValueAtTime(0.5, 60); amb.gain.linearRampToValueAtTime(0.0, T.end + 0.3);
-    for (let t = 0.6; t < 50; t += R(1.6, 4.2)) S.chirp(t, R(2600, 4200), R(0.012, 0.025), R(0.1, 0.6), amb, false);
+    if (ST) { amb.gain.setValueAtTime(0.75, 0); amb.gain.linearRampToValueAtTime(0.75, 52.4); amb.gain.linearRampToValueAtTime(0.12, 53.1); amb.gain.setValueAtTime(0.12, T.crash); amb.gain.linearRampToValueAtTime(0.35, T.crash + 0.3);   // a held breath before the hit
+    amb.gain.setValueAtTime(0.35, 57); amb.gain.linearRampToValueAtTime(0.5, 60); amb.gain.linearRampToValueAtTime(0.0, T.end + 0.3); }
+    if (!ST) {   // the plaza; a quieter room at the café table; almost nothing inside the watch; the plaza again, into the evening
+      amb.gain.setValueAtTime(0.75, 0); amb.gain.setValueAtTime(0.75, NE.fork.t0 - 0.05); amb.gain.linearRampToValueAtTime(0.42, NE.fork.t0 + 0.05);
+      amb.gain.setValueAtTime(0.42, NE.quartz[0]); amb.gain.linearRampToValueAtTime(0.1, NE.quartz[0] + 0.4);
+      amb.gain.setValueAtTime(0.1, NE.clockShot[0] - 0.05); amb.gain.linearRampToValueAtTime(0.75, NE.clockShot[0] + 0.1);
+      amb.gain.setValueAtTime(0.75, 50); amb.gain.linearRampToValueAtTime(0.5, 56); amb.gain.linearRampToValueAtTime(0.0, NE.end + 0.3);
+    }
+    for (let t = 0.6; t < (ST ? 50 : 52); t += R(1.6, 4.2)) { if (!ST && t > NE.fork.t0 - 0.3 && t < NE.clockShot[0] + 0.3) continue; S.chirp(t, R(2600, 4200), R(0.012, 0.025), R(0.1, 0.6), amb, false); }
 
     // 2. your footsteps (from the camera's walk)
     { const xT = new Track(SCRIPT.camera.x), zT = new Track(SCRIPT.camera.z);
       let walked = 0, next = 0.66, px = xT.value(0), pz = zT.value(0);
       for (let t = 0; t < CONFIG.duration; t += 1 / 60) {
-        const x = xT.value(t), z = zT.value(t); walked += Math.hypot(x - px, z - pz); px = x; pz = z;
+        const x = xT.value(t), z = zT.value(t), d = Math.hypot(x - px, z - pz); if (d < 0.5) walked += d; px = x; pz = z;   // (a cut to a new place is not a walk)
         if (walked >= next) { S.step(t, 0.18, (Math.round(next / 0.66) % 2 ? 0.12 : -0.12), you); next += 0.66; }
       } }
 
@@ -135,6 +145,70 @@ class NeAudio extends AudioEngine {
       S.voice(16.1, 330, 0.35, 'a', 0.02 * P.g * 2, P.pan + 0.1, fx, 1.1);        // the parent
     }
 
+    if (!ST) {
+    // 7. the new cut's beats
+    // 7a. the plaza clock: two quiet quartz ticks… and the second one (one second in) is its last
+    for (const tk of [0.0, NE.stop]) { const P = place(NE_CLOCK.x, NE_CLOCK.z, tk, 6); S.tick(tk + 0.01, 2900, 0.05 * P.g * 2, pan(fx, P.pan)); S.click(tk + 0.012, 0.03 * P.g * 2, P.pan, fx); }
+    // 7b. the bow: the arrow nocks, the limbs bend (a soft, dead creasing, like bending lead: no creak), a held breath; at the
+    //     release the string just goes slack (a soft "fwup", no twang) and the arrow clatters once at your feet
+    { const B = NE.bow;
+      burst(B.t0 + 0.02, 0.28, 'pink', 700, 0.7, 0.05, 0.1, you, 0.06);
+      S.click(B.t0 + 0.2, 0.06, 0.05, fx); S.tick(B.t0 + 0.2, 1900, 0.015, fx);
+      { const n = S.noise('pink', B.draw[0], B.release + 0.05), bp = S.filter('bandpass', 260, 1.1), g = ctx.createGain();
+        bp.frequency.setValueAtTime(240, B.draw[0]); bp.frequency.linearRampToValueAtTime(520, B.draw[1]);
+        g.gain.setValueAtTime(0, B.draw[0]); g.gain.linearRampToValueAtTime(0.07, B.draw[0] + 0.3); g.gain.linearRampToValueAtTime(0.05, B.draw[1]); g.gain.linearRampToValueAtTime(0, B.draw[1] + 0.25);
+        n.connect(bp); bp.connect(g); g.connect(fx); }
+      for (let i = 0; i < 6; i++) S.click(B.draw[0] + 0.15 + i * 0.14 + R(0, 0.05), 0.012, R(-0.1, 0.1), fx);
+      S.breath(B.draw[0] - 0.1, 0.7, true, 0.05, you);
+      thud(B.release, 0.42, 0.05, fx, 150, 65, 0.06); burst(B.release, 0.14, 'pink', 520, 0.8, 0.06, 0.05, fx, 0.004);
+      S.breath(B.release + 0.3, 0.8, false, 0.045, you);
+      const tl = B.release + NE_ARROW_LAND;
+      thud(tl, 0.32, -0.05, fx, 620, 280, 0.03); for (let i = 0; i < 4; i++) S.click(tl + i * 0.022 + R(0, 0.01), 0.05 - i * 0.01, R(-0.15, 0.05), fx);
+      burst(B.shot[0], 0.6, 'pink', 380, 0.5, 0.03, 0, amb, 0.15);   // low by the paving: a breath of wind
+    }
+    // 7c. the café: far voices; the fork comes up, goes over the table and hits it: "tk". No ring.
+    { const F = NE.fork;
+      S.chatter(F.t0 + 0.1, NE.watch.t1 - 0.1, 0.007, -0.25, amb, 360, 2.6);
+      burst(F.t0 + 0.05, 0.3, 'pink', 800, 0.6, 0.04, 0.15, you, 0.08); burst(23.75, 0.35, 'pink', 700, 0.6, 0.035, 0.15, you, 0.1);
+      thud(F.strike, 0.5, 0.05, fx, 820, 360, 0.022); thud(F.strike + 0.002, 0.42, 0.05, fx, 230, 110, 0.05); S.click(F.strike, 0.07, 0.05, fx);
+      burst(F.up[0] + 0.05, 0.4, 'pink', 800, 0.6, 0.04, 0.1, you, 0.12);
+    }
+    // 7d. your watch: the sleeve, then nothing (no tick)
+    burst(NE.watch.up[0], 0.45, 'pink', 750, 0.6, 0.045, -0.15, you, 0.12);
+    // 7e. inside the watch: a drop into a small, quiet world; the dial lifts away; the crystal's normal shiver (a thin, fast
+    //     whine standing in for 32,768 vibrations a second)… which stops dead
+    { const Q = NE.quartz;
+      { const n = S.noise('pink', Q[0] - 0.4, Q[0] + 1.0), bp = S.filter('bandpass', 2400, 0.8), g = ctx.createGain();
+        bp.frequency.setValueAtTime(2600, Q[0] - 0.4); bp.frequency.exponentialRampToValueAtTime(180, Q[0] + 0.9);
+        g.gain.setValueAtTime(0, Q[0] - 0.4); g.gain.linearRampToValueAtTime(0.09, Q[0] + 0.05); g.gain.linearRampToValueAtTime(0, Q[0] + 0.95);
+        n.connect(bp); bp.connect(g); g.connect(fx); }
+      burst(NE_Q.dialUp[0], NE_Q.dialUp[1] - NE_Q.dialUp[0], 'white', 1500, 1.2, 0.03, 0.1, fx, 0.15);
+      { const t0 = NE_Q.ghost[0], t1 = NE_Q.ghost[1], o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+        o.type = 'triangle'; o.frequency.value = 3277; o2.frequency.value = 6554; lfo.frequency.value = 58; lg.gain.value = 0.006;
+        g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(0.012, t0 + 0.25); g.gain.setValueAtTime(0.012, t1 - 0.01); g.gain.linearRampToValueAtTime(0, t1);
+        lfo.connect(lg); lg.connect(g.gain); o.connect(g); o2.connect(g); g.connect(pan(fx, 0.1));
+        for (const x of [o, o2, lfo]) { x.start(t0); x.stop(t1 + 0.05); } }
+      S.thump(NE_Q.ghost[1] + 0.02, 0.15, fx);
+    }
+    // 7f. the plaza clock: every quartz clock stopped at the same second (a low hit as it fills the frame)
+    S.boom(NE.clockShot[0] + 0.05, 0.2, fx, rev);
+    // 7g. the time-lapse: a rush into fast time; the plaza's voices sped up; gusts in the trees; the trampoline's dead landings;
+    //     crickets after dusk
+    { const L = NE.lapse;
+      { const n = S.noise('pink', L[0] - 0.5, L[0] + 0.7), bp = S.filter('bandpass', 300, 0.9), g = ctx.createGain();
+        bp.frequency.setValueAtTime(300, L[0] - 0.5); bp.frequency.exponentialRampToValueAtTime(3200, L[0] + 0.3);
+        g.gain.setValueAtTime(0, L[0] - 0.5); g.gain.linearRampToValueAtTime(0.08, L[0] + 0.05); g.gain.linearRampToValueAtTime(0, L[0] + 0.65);
+        n.connect(bp); bp.connect(g); g.connect(fx); }
+      S.chatter(L[0] + 0.3, 54.5, 0.011, 0.1, amb, 560, 6);
+      for (const [tg, sv] of NE_GUSTS) { const n = S.noise('pink', tg - 0.1, tg + 1.2), lp = S.filter('bandpass', 520, 0.6), g = ctx.createGain();
+        g.gain.setValueAtTime(0, tg - 0.1); g.gain.linearRampToValueAtTime(0.025 + 0.035 * sv, tg + 0.12); g.gain.linearRampToValueAtTime(0, tg + 1.1);
+        n.connect(lp); lp.connect(g); g.connect(pan(amb, -0.15)); }
+      for (const [tp] of NE_PIT) { thud(tp, 0.26, 0.35, fx, 95, 42, 0.16); groan(tp + 0.02, 0.4, 130, 0.025, 0.35, fx); }
+      for (let t = 53.4; t < NE.end; t += R(0.45, 0.9)) { const f = R(4100, 4500), p = R(-0.6, 0.6); for (let k = 0; k < 3; k++) S.tone(t + k * 0.045, 0.025, f, 0.005, p, amb, 'sine', 0.006, 0.015); }
+    }
+    }
+
+    if (ST) {
     // 8. traffic: engines and tyres (spatialised from each car's path), the table's climbs and landings, scrapes
     const engine = (car, t0, t1, f, vol) => {
       const pos = (t) => { const p = car.spec.pose(t); return p ? { x: p.x, z: p.z } : { x: 1e4, z: 1e4 }; };
@@ -205,6 +279,7 @@ class NeAudio extends AudioEngine {
       burst(NE.tap, 0.16, 'white', 2600, 1.4, 0.06, P.pan, fx, 0.002);
       for (let i = 0; i < 6; i++) S.click(NE.tap + 0.02 + i * R(0.015, 0.04), 0.02, P.pan + R(-0.1, 0.1), fx);
     }
+    }   // (the first cut's street)
 
     // 11. music: a quiet pad whose pitch slowly sags (nothing holds its tension); silence before the crash; a closing chord
     { const pad = (t0, t1, notes, vol, sag) => {
@@ -215,6 +290,7 @@ class NeAudio extends AudioEngine {
           o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(mus); o.start(t0); o2.start(t0); o.stop(t1 + 0.1); o2.stop(t1 + 0.1);
         }
       };
+      if (ST) {
       pad(13.4, 31.5, [110, 164.8, 220], 0.03, 0.97);
       pad(31.0, 48.9, [98, 146.8, 196, 246.9], 0.032, 0.955);
       // a low pulse that tightens toward the crash (music supports, sound effects dominate)
@@ -222,6 +298,26 @@ class NeAudio extends AudioEngine {
       // the closing chord under the line, unresolved, and a last sag at the very end
       for (const f of [87.3, 130.8, 174.6, 220, 261.6]) S.tone(T.line[0] - 0.2, 7.6, f, 0.03, 0, mus, 'sine', 1.2, 2.8);
       pad(T.note[0] - 0.4, T.end + 0.6, [65.4, 98], 0.035, 0.94);
+      } else {
+      // the new cut: the sagging pad under the plaza and the bow; a thinner one at the café that is gone before the watch
+      // (so its silence is real); a low drone inside the watch; then, from the clock, the day running on without them:
+      // a quick pulse of plucked notes that climbs through the afternoon and slows at dusk; the closing chord; a last sag
+      pad(13.4, 23.7, [110, 164.8, 220], 0.03, 0.97);
+      pad(23.2, 28.4, [98, 146.8, 196], 0.022, 0.975);
+      for (const [f, v] of [[55, 0.075], [82.4, 0.045]]) S.tone(NE.quartz[0] + 0.1, NE.quartz[1] - NE.quartz[0] - 0.3, f, v, 0, mus, 'sine', 0.8, 0.6);
+      for (const f of [1318.5, 1975.5]) S.tone(NE.quartz[0] + 0.6, NE_Q.ghost[1] - NE.quartz[0] - 0.6, f, 0.005, 0.2, mus, 'sine', 1.2, 0.05);
+      pad(NE.clockShot[0], 51.0, [87.3, 130.8, 174.6, 220], 0.026, 1.0);
+      { const sc = [174.6, 220, 261.6, 293.7, 349.2, 440, 523.3, 587.3, 698.5], pat = [0, 2, 4, 2, 1, 3, 5, 3];
+        let k = 0;
+        for (let t = NE.lapse[0] + 0.25; t < 55.4; k++) {
+          const u = MathX.clamp((t - NE.lapse[0]) / (52.5 - NE.lapse[0]), 0, 1), dusk = MathX.smooth(t, 52.5, 55.4), lift = Math.min(3, Math.floor(u * 4));
+          const f = sc[Math.min(sc.length - 1, pat[k % pat.length] + lift)];
+          S.pluck(t, f, (0.03 + 0.015 * u) * (1 - 0.6 * dusk), (k % 2 ? 0.25 : -0.25), mus, 0.9, 0.45);
+          t += MathX.lerp(0.25, 0.5, dusk);
+        } }
+      for (const f of [87.3, 130.8, 174.6, 220, 261.6]) S.tone(T.line[0] - 0.2, 7.6, f, 0.03, 0, mus, 'sine', 1.2, 2.8);
+      pad(T.note[0] - 0.4, T.end + 0.6, [65.4, 98], 0.035, 0.94);
+      }
     }
   }
 }

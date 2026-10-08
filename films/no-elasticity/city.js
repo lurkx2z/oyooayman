@@ -28,6 +28,18 @@ const NE_CITY = {
   trees: [[16.0, -29.5], [27.0, -5.0], [30.0, -31.0]],
 };
 
+// the wind's direction (it blows toward +x, +z: the trees lean that way, across the time-lapse frame)
+const NE_WIND = [0.85, 0.53];
+// the sky through the time-lapse: [minutes, zenith, horizon, sun, fog, hemisphere sky, hemisphere ground, hemisphere intensity]
+const NE_SKY_KEYS = [
+  [942, '#4d8bd0', '#c6d8e6', '#ffe4b8', '#c9d3d9', '#bcd2ec', '#7d6e5e', 1.45],
+  [1080, '#4a84c8', '#d6dbd8', '#ffd8a0', '#cfd2d0', '#b8cce4', '#7a6a58', 1.35],
+  [1150, '#4677b8', '#ecc79a', '#ffb878', '#d8c4ac', '#b0bcd6', '#6e5e50', 1.15],
+  [1195, '#3c5f9c', '#f2a070', '#ff8a4a', '#c89c86', '#9aa2c4', '#5a4c46', 0.9],
+  [1225, '#2c4680', '#d0786a', '#ff7040', '#8c7080', '#7a84aa', '#3e3a3e', 0.7],
+  [1265, '#16224a', '#4a4a6e', '#ff6a3a', '#3a3e56', '#4c5888', '#26262e', 0.5],
+];
+
 // road surface height (the speed table) — used by every car
 function neRoadY(z) {
   const T = NE_CITY.table;
@@ -51,13 +63,14 @@ function neSagReal(t) {
 function neSag(t) { return neSagReal(t) * NE_SAG_DRAW; }
 const neSagText = (t) => `${(neSagReal(t) * 1000).toFixed(1)} mm`;
 // the signal arm's droop at its tip (m): small and slow (a gust's push stays); the lamp posts no longer lean
-function neDroop(t) { return 0.02 + 0.08 * MathX.smooth(t, 43.0, 51.0); }
+function neDroop(t) { return NE_STREET ? 0.02 + 0.08 * MathX.smooth(t, 43.0, 51.0) : 0.02; }
 function neLean(t) { return 0; }
 
 class NeCity extends Environment {
   build() {
     this._materials();
     this._bendMaterials();
+    this._leanMaterials();
     this._sky();
     this._lights();
     this._ground();
@@ -73,6 +86,53 @@ class NeCity extends Environment {
     this._lampsBend();
     this.batch.build(this.root, 'env');
     this._environmentMap();
+    // the trees' shadows lean with them
+    this.root.traverse((o) => { if (o.isMesh && (o.material === this.m.bark || o.material === this.m.foliage)) o.customDepthMaterial = this.leanDepth; });
+    this._sky0 = { zen: this.skyUniforms.uZenith.value.clone(), hor: this.skyUniforms.uHorizon.value.clone(), sun: this.skyUniforms.uSunColor.value.clone(), dir: this.sunDir.clone(), sunC: this.sun.color.clone(), k0: new THREE.Color(NE_SKY_KEYS[0][3]) };
+  }
+
+  // every tree bends a little further downwind with each gust and stays bent (neTreeLean in clocks.js): the higher a
+  // point on the tree, the further it moves. (The merged tree geometry is already in world space.)
+  _leanMaterials() {
+    this.leanU = { uLean: { value: 0 } };
+    const W = NE_WIND, U = this.leanU;
+    const patch = (sh) => {
+      Object.assign(sh.uniforms, U);
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uLean;')
+        .replace('#include <begin_vertex>', `#include <begin_vertex>
+          { float hh = max(0.0, transformed.y - 0.45), d = uLean * 0.022 * hh * hh; transformed.xz += vec2(${W[0].toFixed(4)}, ${W[1].toFixed(4)}) * d; transformed.y -= 0.5 * d * d / max(hh, 0.5); }`);
+    };
+    for (const m of [this.m.bark, this.m.foliage]) {
+      Look.surface(m, false); Look.grime(m, 0.5);
+      const prev = m.onBeforeCompile, key = m.customProgramCacheKey;
+      m.onBeforeCompile = (sh, r) => { prev.call(m, sh, r); patch(sh); };
+      m.customProgramCacheKey = () => key.call(m) + 'neLean';
+    }
+    this.leanDepth = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
+    this.leanDepth.onBeforeCompile = patch; this.leanDepth.customProgramCacheKey = () => 'neLeanDepth';
+  }
+
+  // the time-lapse light (pure function of the minutes the sun says): the sun swings round and sinks behind the buildings
+  // across the avenue, the sky goes gold, then orange, then blue; the shop windows glow
+  _lapse(t) {
+    const S0 = this._sky0, U = this.skyUniforms, m = neSunMinutes(t), on = t >= NE.lapse[0];
+    const u = on ? MathX.clamp((m - 942) / (1215 - 942), 0, 1) : 0;
+    const el = MathX.deg(36.9 * Math.pow(1 - u, 0.85)), az = MathX.deg(121.7 + 78 * u);
+    if (!on) { this.sunDir.copy(S0.dir); } else this.sunDir.set(Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az)).normalize();
+    // the colour keys (minutes): zenith, horizon, sun, fog, hemisphere sky, hemisphere ground, hemisphere intensity
+    const K = NE_SKY_KEYS; let i = 0; while (i + 1 < K.length && K[i + 1][0] <= m) i++;
+    const a = K[i], b = K[Math.min(i + 1, K.length - 1)], w = on && b !== a ? MathX.clamp((m - a[0]) / (b[0] - a[0]), 0, 1) : 0, c = this._c || (this._c = new THREE.Color());
+    const mix = (out, j) => out.set(on ? a[j] : K[0][j]).lerp(c.set(on ? b[j] : K[0][j]), w);
+    mix(U.uZenith.value, 1); mix(U.uHorizon.value, 2); mix(U.uSunColor.value, 3); mix(this.scene.fog.color, 4);
+    mix(this.hemi.color, 5); mix(this.hemi.groundColor, 6); this.hemi.intensity = on ? MathX.lerp(a[7], b[7], w) : K[0][7];
+    this.scene.background.copy(U.uHorizon.value);
+    { const k = U.uSunColor.value, k0 = S0.k0; this.sun.color.setRGB(S0.sunC.r * k.r / k0.r, S0.sunC.g * k.g / k0.g, S0.sunC.b * k.b / k0.b); }
+    this.sun.intensity = on ? 4.3 * (1 - MathX.smooth(m, 18 * 60, 19 * 60 + 52) * 0.98) - 0.4 * MathX.smooth(m, 19 * 60 + 20, 19 * 60 + 52) : 4.3;
+    this.sun.intensity = Math.max(0, this.sun.intensity);
+    this.scene.environmentIntensity = 0.42 - 0.26 * neDusk(t);
+    for (const sm of this.shopMats) sm.emissiveIntensity = 0.55 + 0.9 * neDusk(t);
+    // keep the sun aimed at the current shadow box
+    const tgt = this.sun.target.position; this.sun.position.copy(this.sunDir).multiplyScalar(200).add(tgt); this.sun.updateMatrixWorld();
   }
 
   // materials that bend in world space (uniform-driven): the footbridge, the drooping signal arm, the leaning lamp posts
@@ -410,7 +470,10 @@ class NeCity extends Environment {
   }
 
   update(t) {
-    this.skyUniforms.uTime.value = t;
+    // the clouds stream past in the time-lapse
+    this.skyUniforms.uTime.value = t + 150 * neLapse(t);
+    this._lapse(t);
+    this.leanU.uLean.value = neTreeLean(t);
     if (this.dynamic.ad) this.dynamic.ad.emissiveIntensity = 0.6;
     const U = this.bendU, sag = neSag(t), droop = neDroop(t);
     U.uSag.value = sag; U.uDroop.value = droop; U.uLean.value = neLean(t);

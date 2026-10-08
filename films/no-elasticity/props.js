@@ -98,7 +98,8 @@ class NeBall {
 // The first landing stretches the mat for good: it stays a funnel.
 // ---------------------------------------------------------------------------------------------------------------------
 const NE_TRAMP = { x: 19.0, z: -12.5, R: 1.8, mat: 1.46, top: 0.95, depth: 0.36 };
-function neMatDepth(t) { return NE_TRAMP.depth * Ease.outCubic(MathX.clamp((t - NE.land) / 0.3, 0, 1)) + 0.04 * MathX.smooth(t, NE.land2, NE.land2 + 0.15); }
+// (and in the time-lapse each heavier jumper takes it further: neTrampLapse in clocks.js)
+function neMatDepth(t) { return Math.max(NE_TRAMP.depth * Ease.outCubic(MathX.clamp((t - NE.land) / 0.3, 0, 1)) + 0.04 * MathX.smooth(t, NE.land2, NE.land2 + 0.15), neTrampLapse(t)); }
 
 class NeTramp {
   constructor(scene) {

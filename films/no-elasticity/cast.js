@@ -103,6 +103,10 @@ Object.assign(LOOKS, {
       return p;
     },
   });
+  // the time-lapse crowd changes pose from one frame to the next (each visit is minutes of the afternoon): instant aliases
+  for (const [k, base] of [['neLIdle', 'idle'], ['neLLook', 'look'], ['neLHand', 'handHead'], ['neLSit', 'sit'], ['neLSitG', 'sitGround'], ['neLWalk', 'walk'], ['neLLand', 'neKidLand']]) {
+    ACTIONS[k] = base === 'neKidLand' ? (τ, c) => ACTIONS.neKidLand(0.3, c) : (τ, c) => ACTIONS[base](τ + 1.7, c); BLEND[k] = 0.01;
+  }
   Object.assign(BLEND, { neDribble: 0.2, neReach: 0.15, neStare: 0.5, neCrouch: 0.6, nePoke: 0.12, neKidReady: 0.4, neKidPrep: 0.12, neKidAir: 0.06, neKidLand: 0.05, neKidSit: 0.8,
     neStandUp: 0.1, neFlinch: 0.06 });
 })();
@@ -119,7 +123,7 @@ const NE_KID = { pad: [1.7, 0.2], mid: [0.05, -0.03] };        // trampoline-loc
 // to the right one at 3.6–4.0 m/s and is gone before the insert ends. A runner's footfalls load the deck harder than
 // walking does (taken here as 1.8× their weight on average). Everyone keeps right; paths are straight, speeds constant.
 const NE_RUN_IN = 41.2;      // the first runner steps onto the deck (the insert opens just after)
-const NE_WALKERS = (() => {
+const NE_WALKERS = !NE_STREET ? [] : (() => {
   const B = NE_CITY.bridge, rng = new RNG(4242), out = [], L = B.half + 1.2, T0 = NE.bridge[0];
   const push = (id, look, dir, v, dz, tm, run) => out.push({ id, look, dir, v, dz, tm, t0: tm - L / v, t1: tm + L / v, run, f: run ? 1.8 : 1 });
   // walkers: where they are along the deck when the insert starts
@@ -149,11 +153,11 @@ function neCastSpecs() {
   const K = NE, TR = NE_TRAMP;
   return [
     // the teenager with the ball (stands still; the ball is beside the right hand)
-    { id: 'teen', look: 'neTeen', y: 0.15, path: [[0, NE_TEEN.x, NE_TEEN.z], [5.7, NE_TEEN.x, NE_TEEN.z], [7.4, ...NE_TEEN.aside], [60, ...NE_TEEN.aside], [60.05, ...NE_TEEN.end]], face: NE_TEEN.face,
+    { id: 'teen', look: 'neTeen', y: 0.15, show: (t) => t < NE.lapse[0], path: [[0, NE_TEEN.x, NE_TEEN.z], [5.7, NE_TEEN.x, NE_TEEN.z], [7.4, ...NE_TEEN.aside], [60, ...NE_TEEN.aside], [60.05, ...NE_TEEN.end]], face: NE_TEEN.face,
       faceAt: (t) => (t < 5.7 ? NE_TEEN.face : t < 60 ? NE_TEEN.asideFace : NE_TEEN.endFace),
       states: [[-5, 'neDribble'], [1.15, 'neReach'], [1.7, 'neStare'], [2.6, 'neCrouch'], [K.poke, 'nePoke'], [4.5, 'neCrouch'], [5.7, 'walk'], [7.4, 'neCrouch'], [14.6, 'neStare'], [19.0, 'sitGround']] },
     // the kid: beside the trampoline with a parent, then up on its frame, the jump, the landing, a second try, sitting in the pit
-    { id: 'kid', look: 'neKid', scale: 0.7, y: 0.15, path: [[0, TR.x + 2.1, TR.z + 1.9]], face: 52,
+    { id: 'kid', look: 'neKid', scale: 0.7, show: (t) => t < NE.lapse[0], path: [[0, TR.x + 2.1, TR.z + 1.9]], face: 52,
       states: [[0, 'idle'], [13.0, 'neKidReady'], [K.jump - 0.3, 'neKidPrep'], [K.jump, 'neKidAir'], [K.land, 'neKidLand'], [16.35, 'neKidPrep'], [K.jump2, 'neKidAir'], [K.land2, 'neKidLand'], [17.45, 'neKidSit']],
       at: (t) => {
         if (t < 13.0) return null;
@@ -171,21 +175,26 @@ function neCastSpecs() {
         return base;
       } },
     // the parent watching from beside the frame
-    { id: 'parent', look: 'casual6', y: 0.15, path: [[0, TR.x + 2.6, TR.z + 2.0]], face: 52,
+    { id: 'parent', look: 'casual6', y: 0.15, show: (t) => t < NE.lapse[0], path: [[0, TR.x + 2.6, TR.z + 2.0]], face: 52,
       states: [[0, 'idle'], [16.05, 'neFlinch'], [17.4, 'handHead'], [19.5, 'look']] },
     // the café sitter: sits on the left cushion, gets up during the insert, walks off along the café front
     { id: 'cafe', look: 'neCafe', y: 0.15, seat: 0.47, face: 90, faceUntil: 10.1, path: [[0, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [9.6, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [10.1, NE_CITY.bench.x - 0.42, NE_CITY.bench.z - 0.52], [10.9, 11.2, 3.5], [19.7, 11.0, 15]],
-      states: [[0, 'sit'], [9.6, 'neStandUp'], [10.1, 'walk']] },
+      states: [[0, 'sit'], [9.6, 'neStandUp'], [10.1, 'walk']], show: (t) => t < 19.7 },
     // the footbridge walkers and runners
     ...NE_WALKERS.map(neBridgeWalker),
-    // life around: the far sidewalk, the bus stop, the corners of the junction (they flinch at the crash)
-    { id: 'E1', look: 'casual5', y: 0.15, path: [[0, 26.6, -32], [40, 26.6, -3]], states: [[0, 'walk']] },
-    { id: 'E2', look: 'casual8', y: 0.15, path: [[0, -9.4, -4], [60, -9.4, -80]], states: [[0, 'walk']] },
-    { id: 'E3', look: 'casual7', y: 0.15, path: [[0, -10.4, -70], [70, -10.4, 10]], states: [[0, 'walk']] },
-    { id: 'E4', look: 'casual1', y: 0.15, path: [[0, -10.9, -23.2]], face: -90, states: [[0, 'phone'], [53.7, 'neFlinch']] },
-    { id: 'E5', look: 'casual2', y: 0.15, path: [[0, 9.3, -60], [46, 9.3, -40.6]], states: [[0, 'walk'], [46, 'idle'], [53.65, 'neFlinch'], [56, 'look']] },
-    { id: 'E6', look: 'casual4', y: 0.15, path: [[0, 9.9, -38.8]], face: 80, states: [[0, 'phone'], [53.7, 'neFlinch'], [56.2, 'look']] },
-    { id: 'E7', look: 'casual6', y: 0.15, path: [[0, -9.6, -38.6]], face: -80, states: [[0, 'idle'], [53.7, 'neFlinch'], [56.4, 'handHead']] },
+    // life around: the far sidewalk, the bus stop, the corners of the junction (in the first cut they flinched at the crash);
+    // none of them are out in the time-lapse (its own crowd is below)
+    ...[
+      { id: 'E1', look: 'casual5', y: 0.15, path: [[0, 26.6, -32], [40, 26.6, -3]], states: [[0, 'walk']] },
+      { id: 'E2', look: 'casual8', y: 0.15, path: [[0, -9.4, -4], [60, -9.4, -80]], states: [[0, 'walk']] },
+      { id: 'E3', look: 'casual7', y: 0.15, path: [[0, -10.4, -70], [70, -10.4, 10]], states: [[0, 'walk']] },
+      { id: 'E4', look: 'casual1', y: 0.15, path: [[0, -10.9, -23.2]], face: -90, states: NE_STREET ? [[0, 'phone'], [53.7, 'neFlinch']] : [[0, 'look']] },
+      { id: 'E5', look: 'casual2', y: 0.15, path: [[0, 9.3, -60], [46, 9.3, -40.6]], states: NE_STREET ? [[0, 'walk'], [46, 'idle'], [53.65, 'neFlinch'], [56, 'look']] : [[0, 'walk']] },
+      { id: 'E6', look: 'casual4', y: 0.15, path: [[0, 9.9, -38.8]], face: 80, states: NE_STREET ? [[0, 'phone'], [53.7, 'neFlinch'], [56.2, 'look']] : [[0, 'idle']] },
+      { id: 'E7', look: 'casual6', y: 0.15, path: [[0, -9.6, -38.6]], face: -80, states: NE_STREET ? [[0, 'idle'], [53.7, 'neFlinch'], [56.4, 'handHead']] : [[0, 'idle']] },
+    ].map((e) => (NE_STREET ? e : Object.assign(e, { show: (t) => t < NE.lapse[0] }))),
+    // the time-lapse crowd (clocks.js)
+    ...(NE_STREET ? [] : neLapseSpecs(neLapseV())),
   ];
 }
 
@@ -205,10 +214,11 @@ class NeCast {
     B.begin();
     for (const p of this.people) {
       const S = p.spec;
+      if (S.seatAt) { const st = S.seatAt(t); if (st !== undefined) S.seat = st; }
       p.update(t);
       const at = S.at ? S.at(t) : null;
       if (at) p.root.position.x = at[0], p.root.position.z = at[1];
-      if (S.faceAt) p.root.rotation.y = Math.PI + MathX.deg(S.faceAt(t));
+      if (S.faceAt) { const f = S.faceAt(t); if (f !== undefined) p.root.rotation.y = Math.PI + MathX.deg(f); }
       if (typeof S.y === 'function') p.root.position.y = S.y(t, p.root.position, app);
       p.root.visible = S.show ? S.show(t, p.root.position) : true;
       p.root.updateMatrixWorld(true);
@@ -221,7 +231,7 @@ class NeCast {
       }
     }
     // cars: a soft dark patch under each body (grounds them outside the sun's shadow box)
-    for (const c of app.traffic.cars) {
+    if (app.traffic) for (const c of app.traffic.cars) {
       if (!c.g.visible) continue;
       const ps = c.spec.pose(t);
       B.push(ps.x, neRoadY(ps.z) + 0.015, ps.z, c.W * 1.15, 0.55, c.L * 1.02, ps.yaw);
