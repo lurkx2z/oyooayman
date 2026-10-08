@@ -19,7 +19,7 @@ const NST_G = {
   sunflower: { x: -2.49, z: -6.04 },      // among the pond's rim stones; its big leaf reaches out over the water
   // the soaked duck in the finale, (x, z) at NST.desc, wl, sink, line1, line2, end: in front of the waterline camera,
   // a little to the right of the leaf's thread, slowing as it sinks
-  duck: [[-1.58, -6.366], [-1.886, -6.553], [-1.969, -6.622], [-1.994, -6.641], [-2.01, -6.657], [-2.016, -6.67]],
+  duck: [[-1.58, -6.366], [-1.848, -6.54], [-1.862, -6.545], [-1.872, -6.548], [-1.876, -6.549], [-1.881, -6.551]],     // (after the waterline it paddles hard and gets nowhere: it stays in the middle of the frame)
   duckFloat: 0.036, duckSoaked: -0.03, duckSunk: -0.052,     // body height above the pond's surface: normal / soaked / sinking
 };
 
@@ -717,6 +717,10 @@ class NstGarden extends Environment {
 
   _updateDuck(t) {
     const T = NST, G = NST_G, P = G.pond, d = this.duck, gd = this.duckGhost;
+    // at the waterline the pads lie flat on the surface (seen from exactly the water's level, their curled rims and
+    // undersides drew a dark slab across the shot)
+    const flat = t >= T.wl - 0.1;
+    for (const m of this.pads) { m.scale.z = flat ? 0.0001 : 1; m.position.y = P.y + (flat ? -0.0003 : 0.002); }
     d.visible = t > T.wl - 0.5;      // (it paddles in from the right as the camera reaches the water)
     if (!d.visible) { gd.visible = false; return; }
     const ph = (t - T.desc) * Math.PI * 2 * 1.7;                   // paddling hard: ~1.7 strokes a second
@@ -726,6 +730,9 @@ class NstGarden extends Environment {
     let [x, z] = at(t);
     const nx = at(t + 0.05), px = at(t - 0.05);
     let dx = nx[0] - px[0], dz = nx[1] - px[1]; if (Math.hypot(dx, dz) < 1e-5) { dx = 0.28; dz = 0.37; }
+    // from the waterline on it barely moves (paddling and getting nowhere), so it keeps the heading it came in on
+    { const D0 = G.duck[0], D1 = G.duck[1], hx = D1[0] - D0[0], hz = D1[1] - D0[1], hl = Math.hypot(hx, hz), b = MathX.smooth(t, T.wl - 0.45, T.wl - 0.05), l0 = Math.hypot(dx, dz);
+      dx = MathX.lerp(dx / l0, hx / hl, b); dz = MathX.lerp(dz / l0, hz / hl, b); }
     const L = Math.hypot(dx, dz), sk = MathX.smooth(t, T.sink, T.sink + 2.4);
     x += (dx / L) * 0.006 * Math.sin(ph) * (1 - 0.6 * sk); z += (dz / L) * 0.006 * Math.sin(ph) * (1 - 0.6 * sk);       // a surge with each stroke
     // soaked, it rides low (only its back and head clear the water); then the water gets further into the feathers

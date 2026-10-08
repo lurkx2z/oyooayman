@@ -94,7 +94,7 @@ const FILM = {
           if (d < 0.0 || uOn < 0.001) discard;
           float k = smoothstep(0.0, 1.15, d);
           vec3 c = mix(vec3(0.17, 0.31, 0.27), vec3(0.03, 0.075, 0.07), k);
-          float a = mix(0.4, 0.78, k);
+          float a = mix(0.2, 0.8, k);                 // (light just under the line, so the soaked duck's body and feet read)
           // daylight coming down through the surface: soft moving bands just under the line
           float sh = 0.5 + 0.5 * sin(vS.x * 9.0 + uT * 1.3 + sin(vS.x * 3.0 - uT) * 2.0);
           c += vec3(0.05, 0.08, 0.06) * sh * (1.0 - smoothstep(0.0, 0.5, d));
