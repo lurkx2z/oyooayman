@@ -228,8 +228,8 @@ class NrAudio extends AudioEngine {
     const t = NR.pop, pan = this._pan(t, 19.0, -1.4), m = this.app.storm.muzzle(), fl = nrFloorAt(m.x, m.z), v = NR_CONFETTI.v0;
     S.burst(t, 0.05, 1400, 0.8, 0.1, pan, dest, 'white', 0.001); S.clunk(t, 0.08, pan, dest); S.ping(t + 0.005, 310, 0.03, pan, dest, 0.7); S.ping(t + 0.01, 470, 0.015, pan, dest, 0.5);
     const tl = t + (v + Math.sqrt(v * v + 2 * NR_G * (m.y - fl))) / NR_G, rng = new RNG(4410);
-    for (let k = 0; k < 70; k++) { const dt = 0.16 * Math.pow(rng.next(), 1.5) - 0.03; S.click(tl + dt, rng.range(0.008, 0.02), pan + rng.range(-0.15, 0.15), dest); }
-    S.burst(tl, 0.18, 5200, 0.7, 0.03, pan, dest, 'white', 0.01);
+    for (let k = 0; k < 70; k++) { const dt = 0.16 * Math.pow(rng.next(), 1.5) - 0.03; S.click(tl + dt, rng.range(0.004, 0.011), pan + rng.range(-0.15, 0.15), dest); }
+    S.burst(tl, 0.18, 5200, 0.7, 0.02, pan, dest, 'white', 0.01);
   }
 
   // the rain (water: the wind still carries it): a hiss on everything, from the gust front to the end
@@ -302,7 +302,7 @@ class NrAudio extends AudioEngine {
     // the stair housing's roof over your head: each stone that punches through it, a hard knock and a splinter
     for (const [x, z, t] of NR_HUT_HOLES) { if (t >= q) continue; const p = P(t, x, z), v = t < NR.roofHit + 0.6 ? 0.12 : 0.05; S.crack(t, v, p, dest, 1100); S.burst(t + 0.005, 0.12, 2400, 0.8, v * 0.35, p, dest, 'white', 0.002); }
     // the first stones: each one a crack you feel (the very first the loudest thing in the film so far)
-    NR_ROOF_HITS.first.forEach(([t, x, z], k) => { const p = P(t, x, z), v = k === 0 ? 0.3 : 0.16; S.crack(t, v, p, dest, 1800); S.boom(t, k === 0 ? 0.12 : 0.05, dest, this.rev); S.burst(t + 0.01, 0.5, 1200, 0.6, v * 0.25, p, dest, 'pink', 0.004); });
+    NR_ROOF_HITS.first.forEach(([t, x, z], k) => { const p = P(t, x, z), v = k === 0 ? 0.42 : 0.16; S.crack(t, v, p, dest, 1800); S.boom(t, k === 0 ? 0.2 : 0.05, dest, this.rev); S.burst(t + 0.01, 0.5, 1200, 0.6, v * 0.25, p, dest, 'pink', 0.004); });
     { const t = H.pot, C = NR_ROOF.chimney, p = P(t, C.x, C.z); S.crunch(t, 0.12, p, dest, this.rev); S.crack(t, 0.1, p, dest, 1500); }
   }
 

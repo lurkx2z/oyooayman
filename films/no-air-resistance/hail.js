@@ -279,13 +279,13 @@ class NrStorm {
     const n = NR_ROOF_HITS.first.length, g = new THREE.CircleGeometry(1, 14); g.rotateX(-Math.PI / 2);
     const pos = g.attributes.position; for (let i = 1; i < pos.count; i++) { const f = 0.75 + 0.35 * hash1(i * 3.1); pos.setX(i, pos.getX(i) * f); pos.setZ(i, pos.getZ(i) * f); }
     const mk = (col, ro) => { const m = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ color: col, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -3 - ro, polygonOffsetUnits: -3 - ro }), n); m.frustumCulled = false; m.receiveShadow = true; m.renderOrder = 2 + ro; this.app.scene.add(m); return m; };
-    this.crPow = mk('#e4eaef', 0); this.crPit = mk('#5a5651', 1);
+    this.crPow = mk('#dde4ea', 0); this.crPit = mk('#7d7872', 1);
   }
   _craterUpdate(S) {
     NR_ROOF_HITS.first.forEach(([t, x, z, k], j) => {
       const fy = nrFloorAt(x, z) ?? NR_ROOF.y, w = S - t, on = w > 0, g = on ? Math.min(1, w / 0.06) : 0.0001;
       this._m4.makeRotationY(j * 1.3).scale(this._p.set(0.3 * k * g, 1, 0.3 * k * g)).setPosition(x, fy + 0.008, z); this.crPow.setMatrixAt(j, this._m4);
-      this._m4.makeRotationY(j * 2.1).scale(this._p.set(0.09 * k * g, 1, 0.09 * k * g)).setPosition(x, fy + 0.01, z); this.crPit.setMatrixAt(j, this._m4);
+      this._m4.makeRotationY(j * 2.1).scale(this._p.set(0.06 * k * g, 1, 0.06 * k * g)).setPosition(x, fy + 0.01, z); this.crPit.setMatrixAt(j, this._m4);
     });
     this.crPow.instanceMatrix.needsUpdate = true; this.crPit.instanceMatrix.needsUpdate = true;
   }

@@ -103,6 +103,8 @@ class NrCity extends Environment {
           float sd = max(dot(d, uSunDir), 0.0);
           col += uSunColor * (pow(sd, 4.0) * 0.16 + pow(sd, 40.0) * 0.3 + pow(sd, 900.0) * 1.5) * (1.0 - 0.8 * uDark);
           col = mix(col, uHorizon * 1.04, 0.25 * (1.0 - smoothstep(0.0, 0.18, abs(h))));
+          // under a storm even the clear sky beyond its edge looks dull from here (and it mustn't be the brightest thing in the frame)
+          col = mix(col, col * vec3(0.66, 0.69, 0.73), uDark);
           if (h > 0.0) {
             // fair-weather cumulus on the clear side
             vec2 uv = d.xz / (h + 0.18) * 1.1 + vec2(uTime * 0.05, uTime * 0.03);
