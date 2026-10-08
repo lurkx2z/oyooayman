@@ -126,9 +126,9 @@ const FILM = {
       if (u < tl) P.freeP.quaternion.copy(r.q); else P.freeP.rotation.set(-Math.PI / 2, 0, r.yaw, 'YXZ');
       const b = this._ball(u, r.b.y, this._bv || (this._bv = new THREE.Vector3()));
       P.freeB.position.set(r.b.x - b.z * 0.6, b.y, r.b.z - b.z * 0.4); P.freeB.rotation.set(-b.z / 0.033, 0, 0);
-      // the ghost: the same sheet in normal air sails off with the wind
-      const gh = NR_DROP.ghost(u), ga = 0.5 * MathX.smooth(u, 0.0, 0.12), D = NR_WIND_DIR;
-      P.ghost.position.set(r.p.x + D.x * gh[1] - 0.12 * Math.min(u * 3, 1), Math.max(floor + 0.002, r.p.y - gh[0]), r.p.z + D.z * gh[1]); P.ghost.quaternion.copy(r.q); P.ghost.rotateX(gh[2]); P.ghost.rotateZ(0.4 * gh[2]);
+      // the ghost: the same sheet in normal (still) air flutters down at a walking pace
+      const gh = NR_DROP.ghost(u), ga = 0.5 * MathX.smooth(u, 0.0, 0.12);
+      P.ghost.position.set(r.p.x + gh[1], Math.max(floor + 0.002, r.p.y - gh[0]), r.p.z + gh[2]); P.ghost.quaternion.copy(r.q); P.ghost.rotateX(0.5 + 0.4 * gh[3]); P.ghost.rotateZ(0.5 * gh[3]);
       P.ghost.material.opacity = ga; P.ge.material.opacity = Math.min(1, ga * 3);
     }
     app.hands.update(S);
@@ -162,7 +162,7 @@ const FILM = {
     U.aero.classList.toggle('small', S > NR.cut0);
     U.aero.classList.toggle('zero', S > NR.loss + 0.2);
     // WIND: once it has been shown to still blow, and when the storm brings more of it
-    set(U.wind, 'opacity', (W(S, NR.title[1], NR.drop.up, 0.4, 0.3) + W(S, NR.gale[0] - 0.2, 27.4, 0.3, 0.3)).toFixed(3));
+    set(U.wind, 'opacity', (W(S, NR.title[1], NR.walk[1], 0.4, 0.1) + W(S, NR.gale[0] - 0.2, 27.4, 0.3, 0.3)).toFixed(3));
     html(U.wind.querySelector('.v'), `${Math.round(nrWindKmh(S) / 5) * 5} KM/H`);
     // the cut-away: this piece of ice's speed and height, and when it lands on the roof
     set(U.speed, 'opacity', (sky ? MathX.smooth(S, 12.55, 12.9) : 0).toFixed(3)); set(U.alt, 'opacity', (sky ? MathX.smooth(S, 12.7, 13.05) : 0).toFixed(3));
@@ -182,7 +182,8 @@ const FILM = {
     // tags pinned to things
     const V = this._tv || (this._tv = new THREE.Vector3()), P = app.props, St = app.storm;
     let A = null, B = null, C = null, D = null, line = '';
-    if (S > NR.walk[0] + 0.05 && S < 5.4 && app.roof.kiteG.visible) A = [this._proj(cam, V.copy(app.roof.kiteG.position).add({ x: 0, y: 0.5, z: 0 })), 'KITE · <b>NO LIFT</b>', 'right'];
+    if (S > 3.7 && S < NR.walk[1] - 0.1) A = [this._proj(cam, V.set(NR_ROOF.x0 + 0.3, NR_ROOF.y + 2.3, 2.3)), 'KITE · <b>NO LIFT</b> · IN THE STREET', 'right'];
+    if (S > NR.walk[1] + 0.15 && S < NR.drop.rel - 0.1) A = [this._proj(cam, V.set((NR_WELL.rail + NR_WELL.vx1) / 2, NR_WELL.yb + 0.5, -0.8)), 'GROUND FLOOR · <b>22 M DOWN</b>', 'right'];
     if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8)), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
     if (S > NR.drop.rel + 0.1 && S < NR.cut0 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: 0, y: 0.3, z: 0 })), 'NORMAL AIR', 'left'];
     if (sky) {
@@ -211,7 +212,7 @@ const FILM = {
   grade(S, p) {
     const app = FILM._app, sky = S >= NR.sky[0] && S < NR.sky[1], storm = app && app.env ? app.env.storm(S) : 0, ice = MathX.smooth(NR_ICE.flux(S), 0.05, 0.9);
     p.flash = 0; p.fade = 0; p.chroma = 0; p.ao = 0.7; p.flashColor.setRGB(1, 1, 1);
-    p.exposure = 1.12 - 0.1 * storm + 0.04 * ice; p.saturation = 1.12 - 0.14 * storm - 0.1 * ice; p.contrast = 1.07 + 0.05 * storm; p.warmth = 0.04 - 0.07 * storm; p.blackLift = 0.01 + 0.01 * ice;
+    p.exposure = 1.12 - 0.1 * storm - 0.03 * ice; p.saturation = 1.12 - 0.14 * storm - 0.1 * ice; p.contrast = 1.07 + 0.05 * storm + 0.04 * ice; p.warmth = 0.04 - 0.07 * storm; p.blackLift = 0.01 + 0.01 * ice;
     p.vignette = 0.5 + 0.12 * storm; p.soft = 0.04; p.bloom = 0.16 + 0.12 * ice; p.bloomThreshold = 1.3 - 0.25 * ice; p.grain = 0.022;
     p.tunnel = 1.25; p.tunnelSoft = 0.5; p.tunnelDark = 0; p.edgeBlur = 0; p.smear.set(0, 0);
     if (sky) {
@@ -226,10 +227,12 @@ const FILM = {
       p.smear.set(MathX.clamp(yr / hfov * 0.005, -0.02, 0.02), MathX.clamp(-pr / vf * 0.005, -0.02, 0.02));
     }
     // a flicker of white when something breaks near you
-    for (const t of [NR_ROOF_HITS.bottles, NR_ROOF_HITS.cake, NR_ROOF_HITS.pot]) p.flash += 0.05 * MathX.impulse(S, t, 0.05);
+    for (const t of [NR_ROOF_HITS.bottles, NR_ROOF_HITS.cake, NR_ROOF_HITS.pot, NR_ROOF_HITS.table]) p.flash += 0.05 * MathX.impulse(S, t, 0.05);
+    NR_ROOF_HITS.first.forEach(([t], k) => { p.flash += (k === 0 ? 0.22 : 0.08) * MathX.impulse(S, t, 0.06); });
+    p.flash += 0.12 * MathX.impulse(S, NR.roofHit, 0.06);
     // the end: a touch darker so the closing lines read
     const endK = MathX.smooth(S, NR.line[0] - 0.4, NR.line[0] + 0.6); p.exposure -= 0.12 * endK; p.vignette += 0.2 * endK;
-    if (S >= NR.black) p.fade = 1;
+    p.fade = S >= NR.black ? 1 : MathX.smooth(S, NR.fade[0], NR.fade[1]);
   },
 
   anchor() { return null; },

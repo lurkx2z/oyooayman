@@ -77,7 +77,9 @@ class NrAudio extends AudioEngine {
     const roof = bus(1), sky = bus(1), you = bus(1), fx = bus(1), music = bus(0.8);
     // the roof and the sky cut-away never sound together
     const [k0, k1] = NR.sky;
-    for (const b of [roof, fx]) { b.gain.setValueAtTime(1, k0 - 0.01); b.gain.linearRampToValueAtTime(0, k0); b.gain.setValueAtTime(0, k1 - 0.01); b.gain.linearRampToValueAtTime(1, k1); }
+    // (and in the stairwell the roof's sounds are muffled, through the door behind you)
+    roof.gain.setValueAtTime(1, NR.walk[1] - 0.01); roof.gain.linearRampToValueAtTime(0.3, NR.walk[1] + 0.02);
+    for (const b of [roof, fx]) { const g0 = b === roof ? 0.3 : 1; b.gain.setValueAtTime(g0, k0 - 0.01); b.gain.linearRampToValueAtTime(0, k0); b.gain.setValueAtTime(0, k1 - 0.01); b.gain.linearRampToValueAtTime(1, k1); }
     sky.gain.setValueAtTime(0, 0); sky.gain.setValueAtTime(0, k0 - 0.01); sky.gain.linearRampToValueAtTime(1, k0); sky.gain.setValueAtTime(1, k1 - 0.01); sky.gain.linearRampToValueAtTime(0, k1);
     this.rev = rev;
     this._air(S, roof, end);
@@ -192,6 +194,11 @@ class NrAudio extends AudioEngine {
     S.click(NR.drop.rel, 0.006, 0.15, dest);
     const r = this.app.props && this.app.props.rel, h = r ? r.p.y - LAYOUT.curbH : 22.4, t0 = NR.drop.rel + Math.sqrt(2 * h / NR_G) + h / 343;
     S.burst(t0, 0.07, 1700, 0.9, 0.05, 0.1, dest, 'white', 0.002); S.burst(t0, 0.12, 600, 0.8, 0.02, 0.1, dest, 'pink', 0.002);
+    // (22 m down a stairwell: it rings round the walls)
+    S.burst(t0, 0.07, 1700, 0.9, 0.08, 0, this.rev, 'white', 0.002); S.tone(t0, 0.12, 170, 0.08, 0, this.rev, 'sine', 0.002, 0.1);
+    // the stairwell's own hollow quiet
+    const wn = S.noise('brown', NR.walk[1], NR.cut0 + 0.05), wl = S.filter('lowpass', 260, 0.7), wg = S.ctx.createGain(); wn.connect(wl); wl.connect(wg); wg.connect(dest);
+    wg.gain.setValueAtTime(0, NR.walk[1]); wg.gain.linearRampToValueAtTime(0.03, NR.walk[1] + 0.05); wg.gain.setValueAtTime(0.03, NR.cut0 - 0.05); wg.gain.linearRampToValueAtTime(0, NR.cut0);
     let v = 0.72 * Math.sqrt(2 * NR_G * h), t = t0;
     for (let k = 0; k < 8; k++) {
       const a = k === 0 ? 1 : Math.pow(0.72, k);
@@ -216,10 +223,10 @@ class NrAudio extends AudioEngine {
     roll(t0 + 0.05, 1.6, 0.3, 0.3); roll(NR_SKY.bolt[2] + 0.4, 0.9, 0.12, -0.2);
   }
 
-  // the confetti cannon: a pop and a hiss of air; then the whole load lands at once, a rattle like a handful of gravel
+  // the confetti cannon (a spring): a clack and a twang; then the whole load lands at once, a rattle like a handful of gravel
   _confetti(S, dest) {
     const t = NR.pop, pan = this._pan(t, 19.0, -1.4), m = this.app.storm.muzzle(), fl = nrFloorAt(m.x, m.z), v = NR_CONFETTI.v0;
-    S.burst(t, 0.06, 900, 0.7, 0.12, pan, dest, 'white', 0.001); S.pop(t, 0.06, dest); S.hiss(t + 0.01, 0.35, 0.02, pan, dest);
+    S.burst(t, 0.05, 1400, 0.8, 0.1, pan, dest, 'white', 0.001); S.clunk(t, 0.08, pan, dest); S.ping(t + 0.005, 310, 0.03, pan, dest, 0.7); S.ping(t + 0.01, 470, 0.015, pan, dest, 0.5);
     const tl = t + (v + Math.sqrt(v * v + 2 * NR_G * (m.y - fl))) / NR_G, rng = new RNG(4410);
     for (let k = 0; k < 70; k++) { const dt = 0.16 * Math.pow(rng.next(), 1.5) - 0.03; S.click(tl + dt, rng.range(0.008, 0.02), pan + rng.range(-0.15, 0.15), dest); }
     S.burst(tl, 0.18, 5200, 0.7, 0.03, pan, dest, 'white', 0.01);
@@ -230,6 +237,8 @@ class NrAudio extends AudioEngine {
     const ctx = S.ctx, n = S.noise('white', NR.gale[0] - 0.1, end), b = S.filter('bandpass', 5200, 0.5), g = ctx.createGain(), n2 = S.noise('pink', NR.gale[0] - 0.1, end), b2 = S.filter('lowpass', 900, 0.6), g2 = ctx.createGain();
     n.connect(b); b.connect(g); g.connect(S.panned(dest, -0.1)); n2.connect(b2); b2.connect(g2); g2.connect(S.panned(dest, 0.15));
     g.gain.setValueAtTime(0, NR.gale[0]); g.gain.linearRampToValueAtTime(0.045, NR.gale[0] + 1.2); g2.gain.setValueAtTime(0, NR.gale[0]); g2.gain.linearRampToValueAtTime(0.03, NR.gale[0] + 1.2);
+    // the moment the last ice lands: the rain drops away for a breath, then comes back (the silence is the ice stopping)
+    for (const [G, v] of [[g, 0.045], [g2, 0.03]]) { G.gain.setValueAtTime(v, NR.quiet); G.gain.linearRampToValueAtTime(v * 0.2, NR.quiet + 0.05); G.gain.setValueAtTime(v * 0.2, NR.quiet + 0.9); G.gain.linearRampToValueAtTime(v * 0.8, NR.quiet + 3.0); }
     // drops ticking on the hut and the chairs
     const rng = new RNG(6070);
     for (let t = NR.gale[0] + 0.3; t < end; t += rng.range(0.03, 0.12)) { if (t > NR.sky[0] && t < NR.sky[1]) continue; S.click(t, rng.range(0.002, 0.006), rng.range(-0.7, 0.7), dest); }

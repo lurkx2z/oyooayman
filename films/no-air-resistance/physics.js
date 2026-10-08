@@ -37,14 +37,14 @@ function nrSpring(S, z, freq = 0.55, damp = 0.12) {
 /* ---------------- the drop: a sheet of paper and a tennis ball held out over the parapet, let go together ---------------- */
 // without air: both fall ½gt² — 22.4 m to the pavement in 2.14 s, arriving at 21 m/s (75 km/h).
 // The ghost: what the same sheet does in normal air in a 50 km/h wind (it sails off with the wind, sinking slowly)
+// in still air (the stairwell) a sheet of paper flutters down at ~1 m/s, rocking side to side: when the real one lands,
+// 22 m down, its normal-air ghost has dropped about two metres
 const NR_DROP = {
   fall(u) { return u <= 0 ? 0 : 0.5 * NR_G * u * u; },
-  ghost(u) {      // [down, along the wind, rot] for the normal-air sheet
-    if (u <= 0) return [0, 0, 0];
-    const U = 50 / 3.6, tau = 0.32;
-    const along = U * (u - tau * (1 - Math.exp(-u / tau)));
-    const down = 0.5 * NR_G * Math.min(u, 0.1) ** 2 - 0.35 * Math.max(0, u - 0.1) + 0.9 * Math.max(0, u - 0.9) + 0.18 * Math.sin(u * 4.1);
-    return [down, along, 2.4 * u + 0.8 * Math.sin(u * 5.3)];
+  ghost(u) {      // [down, sway x, sway z, rock] for the normal-air sheet
+    if (u <= 0) return [0, 0, 0, 0];
+    const down = 0.5 * NR_G * Math.min(u, 0.12) ** 2 + 0.95 * Math.max(0, u - 0.12) + 0.06 * Math.sin(u * 5.6);
+    return [down, 0.15 * Math.sin(u * 2.8), 0.28 * (Math.sin(u * 1.9 + 0.4) - Math.sin(0.4)), 0.9 * Math.sin(u * 2.8)];
   },
 };
 
@@ -62,7 +62,7 @@ const NR_STONE = {
   get lands() { return NR.loss + Math.sqrt(2 * this.H0 / NR_G); },
 };
 
-/* ---------------- the confetti cannon: spring-loaded (a compressed-air one couldn't push anything now), fired straight up at 11 m/s ---------------- */
+/* ---------------- the confetti cannon: a spring-loaded toy, fired straight up at 11 m/s ---------------- */
 // no drag: every flake flies the same parabola as a pebble would (6.2 m up, back in 2.2 s), so the cloud stays a clump
 // and lands like a handful of gravel. In normal air it would stop within a metre and blow away on the wind. A toy
 // paratrooper rides out with it: its canopy can't fill, so it flies the same parabola and lands with the confetti.

@@ -85,6 +85,14 @@ const NR_HUT_HOLES = (() => {
   out[0] = [27.3, -0.62, NR.roofHit, 0.1]; out[1] = [27.1, -1.08, NR.roofHit + 0.3, 0.09]; out[2] = [27.5, -1.18, NR.roofHit + 0.55, 0.085]; out[3] = [26.95, -0.45, NR.roofHit + 0.85, 0.08];
   return out;
 })();
+// the stairwell under the stair housing: a dog-leg stair round an open well, six storeys down to the ground floor. You
+// stand at the top, at the rail (x = rail), over the well (x rail…vx1, z vz0…vz1); the near flights (x nx…rail) and the
+// far ones (x vx1…x1) zig-zag down past it, a landing at each end of it
+const NR_WELL = (() => {
+  const H = NR_ROOF.hut, t = 0.2, Y = NR_ROOF.y, yb = LAYOUT.curbH, n = 6;
+  return { x0: H.x0 + t, x1: H.x1 - t, z0: H.z0 + t, z1: H.z1 - t, nx: 27.8, rail: 28.55, vx1: 29.25, vz0: -2.0, vz1: 0.4, yb, n, hs: (Y - yb) / n };
+})();
+
 const NR_HOLES_ROOF_GLSL = `
   uniform vec4 uHoles[${60}]; uniform float uS;
   float nrRoofHole(vec2 p, out float rim) {
@@ -133,7 +141,7 @@ class NrRoof {
     this.B = new Batcher();
     this._deck(); this._parapets(); this._hut(); this._clutter(); this._chimney(); this._skylightBuild(); this._tableBuild();
     this.B.build(scene, 'roof');
-    this._laundry(); this._bunting(); this._tablecloth(); this._kite(); this._smoke();
+    this._laundry(); this._bunting(); this._tablecloth(); this._kite(); this._smoke(); this._well();
   }
 
   /* ---------------- textures ---------------- */
@@ -161,9 +169,14 @@ class NrRoof {
   /* ---------------- the deck, the parapets ---------------- */
   _deck() {
     const R = NR_ROOF, y = R.y, B = this.B, t = R.parT;
-    // (with a hole under the skylight)
-    const K = R.skylight, kx0 = K.x - K.w / 2, kx1 = K.x + K.w / 2, kz0 = K.z - K.d / 2, kz1 = K.z + K.d / 2;
-    for (const [a, b, c, d] of [[R.x0 + t, R.x1 - t, R.z0 + t, kz0], [R.x0 + t, R.x1 - t, kz1, R.z1 - t], [R.x0 + t, kx0, kz0, kz1], [kx1, R.x1 - t, kz0, kz1]]) B.add(Geo.flat(a, b, c, d, y + 0.004, 1), this.m.paver, null, { noShadow: true });
+    // (with holes under the skylight and under the stair housing, which has its own floor and the stairwell)
+    const K = R.skylight, Hh = R.hut, holes = [[K.x - K.w / 2, K.x + K.w / 2, K.z - K.d / 2, K.z + K.d / 2], [Hh.x0 + 0.05, Hh.x1 - 0.05, Hh.z0 + 0.05, Hh.z1 - 0.05]];
+    const xs = [R.x0 + t, R.x1 - t, ...holes.flatMap((h) => [h[0], h[1]])].sort((p, q) => p - q), zs = [R.z0 + t, R.z1 - t, ...holes.flatMap((h) => [h[2], h[3]])].sort((p, q) => p - q);
+    for (let i = 0; i + 1 < xs.length; i++) for (let j = 0; j + 1 < zs.length; j++) {
+      const a = xs[i], b = xs[i + 1], c = zs[j], d = zs[j + 1], mx = (a + b) / 2, mz = (c + d) / 2;
+      if (b - a < 1e-3 || d - c < 1e-3 || holes.some((h) => mx > h[0] && mx < h[1] && mz > h[2] && mz < h[3])) continue;
+      B.add(Geo.flat(a, b, c, d, y + 0.004, 1), this.m.paver, null, { noShadow: true });
+    }
     // the timber platform under the party (4 cm)
     const P = R.platform; B.add(new THREE.BoxGeometry(P.w, 0.04, P.d), this.m.deck, Geo.matrix(P.x, y + 0.02, P.z));
   }
@@ -195,7 +208,7 @@ class NrRoof {
     ceil.position.set((H.x0 + H.x1) / 2, y + h - 0.01, zc); this.app.scene.add(ceil);
     this.holeU = [slab.material.userData.holes, ceil.material.userData.holes];
     // inside: a dim stairwell (floor, inner walls, the first steps down)
-    B.add(Geo.flat(H.x0 + t, H.x1 - t, H.z0 + t, H.z1 - t, y + 0.01, 1), this.m.inside, null, { noShadow: true });
+    B.add(Geo.flat(H.x0 + t, NR_WELL.rail, H.z0 + t, H.z1 - t, y + 0.01, 1), this.m.inside, null, { noShadow: true });
     B.box(0.02, h - 0.02, H.z1 - H.z0 - 2 * t, H.x1 - t - 0.01, y + h / 2, zc, this.m.inside, 0, { noShadow: true });
     for (const z of [H.z0 + t + 0.01, H.z1 - t - 0.01]) B.box(H.x1 - H.x0 - 2 * t, h - 0.02, 0.02, (H.x0 + H.x1) / 2, y + h / 2, z, this.m.inside, 0, { noShadow: true });
     // the lamp over the door (a warm bulkhead light)
@@ -279,6 +292,79 @@ class NrRoof {
       cb.build(inner, 'chair'); this.app.scene.add(g);
       return { g, t: NR_ROOF_HITS.chairs[i], dir: i % 2 ? 1 : -1 };
     });
+  }
+
+  /* ---------------- the stairwell (seen from its top rail, looking down) ---------------- */
+  // flat-shaded and lit by hand (vertex colours): daylight from the hut's door and the windows fading with depth, a lamp's
+  // glow on the ground floor; the sun can't reach in here
+  _well() {
+    const W = NR_WELL, Y = NR_ROOF.y, pos = [], col = [], c = new THREE.Color(), hs = W.hs;
+    const light = (y) => { const d = (Y - y) / (Y - W.yb); return 0.92 * Math.exp(-2.1 * d) + 0.62 * Math.exp(-(y - W.yb) / 2.4) + 0.07; };
+    const shade = { px: 0.62, nx: 0.74, py: 1.0, ny: 0.38, pz: 0.86, nz: 0.56 };
+    const vtx = (x, y, z, base, f, flat) => { pos.push(x, y, z); const L = flat ? 1 : light(y) * f; c.set(base); col.push(Math.min(1, c.r * L), Math.min(1, c.g * L), Math.min(1, c.b * L)); };
+    const quad = (a, b, cc, d, base, f, flat) => { for (const v of [a, b, cc, a, cc, d]) vtx(v[0], v[1], v[2], base, f, flat); };
+    const box = (x0, x1, y0, y1, z0, z1, base) => {
+      quad([x0, y1, z0], [x0, y1, z1], [x1, y1, z1], [x1, y1, z0], base, shade.py);
+      quad([x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1], base, shade.ny);
+      quad([x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0], base, shade.nx);
+      quad([x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1], base, shade.px);
+      quad([x0, y0, z0], [x0, y1, z0], [x1, y1, z0], [x1, y0, z0], base, shade.nz);
+      quad([x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1], base, shade.pz);
+    };
+    // a slanted bar from (x, ya, za) to (x, yb, zb), w wide (x) and h deep (y)
+    const bar = (xa, xb, ya, yb, za, zb, h, base) => {
+      quad([xa, ya, za], [xa, yb, zb], [xb, yb, zb], [xb, ya, za], base, shade.py);
+      quad([xa, ya - h, za], [xa, yb - h, zb], [xa, yb, zb], [xa, ya, za], base, shade.nx);
+      quad([xb, ya, za], [xb, yb, zb], [xb, yb - h, zb], [xb, ya - h, za], base, shade.px);
+      quad([xa, ya - h, za], [xb, ya - h, za], [xb, yb - h, zb], [xa, yb - h, zb], base, shade.ny);
+    };
+    const wallC = '#d9d0bf', stepC = '#b9b2a6', nose = '#7d776d', railC = '#3a3c3e', stringC = '#e9e4da', slab = '#c9c1b2';
+    // the walls (inner faces, in 0.5 m bands so the light can fade down them)
+    for (let y = W.yb; y < Y - 0.01; y += 0.5) {
+      const y1 = Math.min(Y, y + 0.5);
+      quad([W.x0, y, W.z0], [W.x0, y, W.z1], [W.x0, y1, W.z1], [W.x0, y1, W.z0], wallC, shade.px);
+      quad([W.x1, y, W.z0], [W.x1, y1, W.z0], [W.x1, y1, W.z1], [W.x1, y, W.z1], wallC, shade.nx);
+      quad([W.x0, y, W.z0], [W.x0, y1, W.z0], [W.x1, y1, W.z0], [W.x1, y, W.z0], wallC, shade.pz);
+      quad([W.x0, y, W.z1], [W.x1, y, W.z1], [W.x1, y1, W.z1], [W.x0, y1, W.z1], wallC, shade.nz);
+    }
+    // the ground floor: stone tiles
+    for (let i = 0; W.x0 + i * 0.32 < W.x1; i++) for (let j = 0; W.z0 + j * 0.32 < W.z1; j++) {
+      const a = W.x0 + i * 0.32, b = Math.min(W.x1, a + 0.32), z0 = W.z0 + j * 0.32, z1 = Math.min(W.z1, z0 + 0.32), y = W.yb + 0.002;
+      quad([a, y, z0], [a, y, z1], [b, y, z1], [b, y, z0], (i + j) % 2 ? '#3a3f42' : '#9a9387', 1.0);
+    }
+    const n = 10, tr = (W.vz1 - W.vz0) / n;
+    for (let k = 0; k < W.n; k++) {
+      const yk = Y - k * hs, yh = yk - hs / 2, r = hs / 2 / n;
+      // the corridor at this floor (the top one is the hut's own floor), with a door in the wall; the landing at the near end
+      if (k > 0) { box(W.x0, W.nx, yk - 0.25, yk, W.z0, W.z1, slab); quad([W.x0 + 0.01, yk, -1.3], [W.x0 + 0.01, yk, -0.3], [W.x0 + 0.01, yk + 2.1, -0.3], [W.x0 + 0.01, yk + 2.1, -1.3], '#6b5a48', shade.px); }
+      box(k > 0 ? W.nx : W.rail, W.x1, yk - 0.25, yk, W.z0, W.vz0, slab);
+      // flight 1 (far side) down to the half landing; the half landing (with a window); flight 2 (near side) down to the next floor
+      for (let i = 0; i < n; i++) {
+        const top = yk - (i + 1) * r, za = W.vz0 + i * tr;
+        box(W.vx1, W.x1, top - r - 0.12, top, za, za + tr, stepC); box(W.vx1, W.x1, top - 0.03, top, za + tr - 0.03, za + tr, nose);
+        const top2 = yh - (i + 1) * r, zb = W.vz1 - (i + 1) * tr;
+        box(W.nx, W.rail, top2 - r - 0.12, top2, zb, zb + tr, stepC); box(W.nx, W.rail, top2 - 0.03, top2, zb, zb + 0.03, nose);
+        // balusters on the well side of each step
+        box(W.vx1 + 0.03, W.vx1 + 0.05, top, top + 0.9, za + tr / 2 - 0.01, za + tr / 2 + 0.01, railC);
+        box(W.rail - 0.05, W.rail - 0.03, top2, top2 + 0.9, zb + tr / 2 - 0.01, zb + tr / 2 + 0.01, railC);
+      }
+      box(W.nx, W.x1, yh - 0.25, yh, W.vz1, W.z1, slab);
+      quad([W.x1 - 0.01, yh + 0.9, 0.55], [W.x1 - 0.01, yh + 2.1, 0.55], [W.x1 - 0.01, yh + 2.1, 1.25], [W.x1 - 0.01, yh + 0.9, 1.25], '#eef3f6', 1, true);
+      // the strings (white) and the handrails (dark) along the well
+      bar(W.vx1, W.vx1 + 0.04, yk + 0.02, yh + 0.02, W.vz0, W.vz1, 0.32, stringC);
+      bar(W.rail - 0.04, W.rail, yh + 0.02, yk - hs + 0.02, W.vz1, W.vz0, 0.32, stringC);
+      bar(W.vx1 + 0.02, W.vx1 + 0.06, yk + 0.92, yh + 0.92, W.vz0, W.vz1, 0.04, railC);
+      bar(W.rail - 0.06, W.rail - 0.02, yh + 0.92, yk - hs + 0.92, W.vz1, W.vz0, 0.04, railC);
+      // the landings' rails across the ends of the well
+      box(W.rail, W.vx1, yk + 0.88, yk + 0.92, W.vz0 - 0.04, W.vz0, railC);
+      box(W.rail, W.vx1, yh + 0.88, yh + 0.92, W.vz1, W.vz1 + 0.04, railC);
+      for (let x = W.rail + 0.1; x < W.vx1 - 0.05; x += 0.12) { box(x - 0.01, x + 0.01, yk, yk + 0.9, W.vz0 - 0.03, W.vz0 - 0.01, railC); box(x - 0.01, x + 0.01, yh, yh + 0.9, W.vz1 + 0.01, W.vz1 + 0.03, railC); }
+    }
+    // the top rail you lean over (along the well's near side, at the top)
+    box(W.rail - 0.05, W.rail + 0.01, Y + 0.9, Y + 0.95, W.vz0, W.vz1, railC);
+    for (let z = W.vz0 + 0.06; z < W.vz1; z += 0.12) box(W.rail - 0.03, W.rail - 0.01, Y, Y + 0.9, z - 0.01, z + 0.01, railC);
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true })); m.name = 'well'; this.app.scene.add(m); this.well = m;
   }
 
   /* ---------------- cloth: the sheets and the tablecloth ---------------- */
