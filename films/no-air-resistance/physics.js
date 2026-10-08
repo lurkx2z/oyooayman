@@ -44,7 +44,7 @@ function nrTable(T, step, init) {
 }
 
 /* ---------------- the drop: a sheet of paper and a tennis ball, side by side, released together ---------------- */
-// without air: both fall ½gt² (from ~1.3 m: 0.52 s). The ghost: what a sheet does in normal air (≈ 0.9 m/s, fluttering)
+// without air: both fall ½gt² (from ~1.38 m: 0.53 s). The ghost: what a sheet does in normal air (≈ 0.9 m/s, fluttering)
 const NR_DROP = {
   fall(u) { return u <= 0 ? 0 : 0.5 * NR_G * u * u; },
   ghost(u) {      // [down, side, rot] for the normal-air sheet: a falling-leaf flutter, ~0.55 m/s down on average
@@ -118,7 +118,7 @@ function nrDebrisPiece(tx, ty, tz, T) {
 }
 
 /* ---------------- the sign board knocked off the building beside you: 12 m up, no drag ---------------- */
-// it drops in 1.55 s and hits at ≈ 55 km/h; in normal air a light board like this sails down at ~4–5 m/s
+// it drops in 1.61 s and hits at ≈ 55 km/h; in normal air a light board like this sails down at ~4–5 m/s
 const NR_BOARD = {
   y0: 12.0,
   fall(u) { return u <= 0 ? 0 : 0.5 * NR_G * u * u; },
