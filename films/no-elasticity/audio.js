@@ -5,7 +5,7 @@
      NODE_PATH=$(npm root -g) node tools/bake-soundtrack.cjs --page no-elasticity.html --out films/no-elasticity/soundtrack.js
    The idea of the mix: the sounds of things springing back go missing. The ball's ring, the racket's ping, the
    trampoline's boing, a rubber band's snap, a car's bounce: each one is replaced by a dull, final thud. What is
-   left is thumping (flat-spotted tyres), scraping (cars on their bump stops), groaning steel and, at the end,
+   left is thudding (springs that stay down), scraping (cars on their bump stops), groaning steel and, at the end,
    one crash that doesn't rebound.
    ===================================================================== */
 
@@ -136,7 +136,7 @@ class NeAudio extends AudioEngine {
         if (ph !== last && L.moving) { last = ph; const P = place(L.x, L.z, t, 4); burst(t, 0.07, 'white', 1500, 0.8, 0.09 * P.g * 2, P.pan, fx, 0.002); thud(t, 0.12 * P.g * 2, P.pan, fx, 120, 60, 0.05); }
       } }
 
-    // 8. traffic: engines and tyres (spatialised from each car's path), the table's climbs and landings, flat-spot thumps, scrapes
+    // 8. traffic: engines and tyres (spatialised from each car's path), the table's climbs and landings, scrapes
     const engine = (car, t0, t1, f, vol) => {
       const pos = (t) => { const p = car.spec.pose(t); return p ? { x: p.x, z: p.z } : { x: 1e4, z: 1e4 }; };
       const pts = this._spatial(pos, t0, t1, 1 / 15, 7);
@@ -151,27 +151,16 @@ class NeAudio extends AudioEngine {
     };
     for (const c of TR.cars) {
       const id = c.spec.id;
-      const span = { H: [18.5, 33], B1: [0, 12], B2: [0, 14], B3: [0, 16], C1: [27, 45], C2: [28, 45], TR: [29, 52], BUS: [30, 56], C5: [30, 52], Q1: [44, 62], Q2: [46, 62], X1: [46, 54.1], X2: [48, 54.1], X3: [48, 55.2] }[id];
+      const span = { H: [18.5, 32], B1: [0, 12], B2: [0, 14], B3: [0, 16], C1: [27, 45], C2: [28, 45], TR: [28, 50], BUS: [30, 47], C5: [36, 56], Q1: [44, 56], Q2: [44, 56], X1: [46, 53.7], X2: [48, 53.7], X3: [48, 55.0] }[id];
       if (!span) continue;
       const big = id === 'TR' || id === 'BUS';
       engine(c, span[0], span[1], big ? 31 : id === 'H' ? 44 : R(40, 52), big ? 0.32 : 0.16);
-      // the table: a heavy thump on each climb, a clunk on each landing, and after it a thump every turn of a flat-spotted wheel
+      // the table: a heavy thump on each climb, a clunk and a groan of springs on each landing
       for (const e of c.events) {
         const ps = c.spec.pose(e.t); if (!ps) continue;
         const P = place(ps.x, ps.z, e.t, 6), k = big ? 1.6 : 1;
         if (e.kind === 'climb') thud(e.t, 0.45 * P.g * k, P.pan, cars, 90, 40, 0.12);
         else { S.clunk(e.t, 0.3 * P.g * k, P.pan, cars); thud(e.t + 0.01, 0.5 * P.g * k, P.pan, cars, 75, 35, 0.15); groan(e.t, 0.35, 95, 0.03 * P.g * k, P.pan, cars, 0.6); }
-      }
-      if (c.events.length && !big) {
-        const tA = c.events[0].t;
-        let lastRev = null;
-        for (let t = tA + 0.05; t < span[1] - 0.2; t += 1 / 60) {
-          const ps = c.spec.pose(t); if (!ps) break;
-          const rev = Math.floor((ps.dist - c.spec.pose(tA).dist) / (2 * Math.PI * c.r));
-          if (lastRev !== null && rev !== lastRev) { const P = place(ps.x, ps.z, t, 5); thud(t, 0.22 * P.g, P.pan, cars, 80, 40, 0.07); }
-          lastRev = rev;
-          if (c.spec.pose(t + 1 / 60) && Math.abs(c.spec.pose(t + 1 / 60).dist - ps.dist) < 1e-4) break;   // (stopped)
-        }
       }
     }
     // scrapes: steel on asphalt (bumpers on the table; the truck's dragging bar)
@@ -181,13 +170,8 @@ class NeAudio extends AudioEngine {
       g.gain.setValueAtTime(0, s.t0); g.gain.linearRampToValueAtTime((s.drag ? 0.09 : 0.12) * P.g, s.t0 + 0.02); g.gain.linearRampToValueAtTime((s.drag ? 0.07 : 0.03) * P.g, s.t0 + d * 0.6); g.gain.linearRampToValueAtTime(0, s.t0 + d);
       n.connect(hp); hp.connect(g); g.connect(pan(cars, P.pan));
     }
-    // the bus kneels with a hiss… and the pump runs, and it doesn't come back up
-    { const ps = TR.bus.spec.pose(42.5), P = place(ps.x, ps.z, 42.5, 8);
-      S.hiss(42.5, 0.9, 0.08 * P.g * 2, P.pan, cars);
-      const o = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', 420, 2); o.type = 'square'; o.frequency.value = 58;
-      g.gain.setValueAtTime(0, 44.2); g.gain.linearRampToValueAtTime(0.03 * P.g * 2, 44.4); g.gain.setValueAtTime(0.03 * P.g * 2, 46.0); g.gain.linearRampToValueAtTime(0, 46.3);
-      o.connect(lp); lp.connect(g); g.connect(pan(cars, P.pan)); o.start(44.2); o.stop(46.4);
-      S.hiss(45.5, 0.5, 0.06 * P.g * 2, P.pan, cars); }
+    // the bus's air brakes at the stop
+    { const ps = TR.bus.spec.pose(45.5), P = place(ps.x, ps.z, 45.5, 8); S.hiss(45.5, 0.6, 0.06 * P.g * 2, P.pan, cars); }
 
     // 9. structures: the footbridge groans at each step of its sag; the signal arm and the lamp posts creak as they give
     for (let i = 1; i < NE_SAG_STEPS.length; i++) { const t = NE_SAG_STEPS[i][0] - 0.3; groan(t, 1.0, 62 + i * 3, 0.05 + 0.012 * i, -0.05, fx, 0.75); burst(t + 0.2, 0.5, 'brown', 260, 0.6, 0.05, 0, fx, 0.1); }

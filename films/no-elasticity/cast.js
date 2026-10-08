@@ -120,14 +120,9 @@ Object.assign(LOOKS, {
 // ---------------------------------------------------------------------------------------------------------------------
 // who is where
 // ---------------------------------------------------------------------------------------------------------------------
-const NE_TEEN = { x: 13.2, z: -5.9, face: 122 };
-const NE_KID = { pad: [1.52, 0.12], mid: [0.06, -0.04] };      // trampoline-local stand points (on the frame pad → the middle)
-
-// feet height of someone standing at trampoline-local (lx, lz) on the mat at time t
-function neMatY(app, lx, lz, t) {
-  const T = app.tramp, d = neMatDepth(t), pull = 0.07 * d / NE_TRAMP.depth;
-  return 0.15 + T.y0 - 0.01 + T.sinkAt(lx, lz, d) - pull * 0.6;
-}
+// the teenager dribbles at x, z (the ball stays where it died); during the montage they move aside to `aside`, facing the ball
+const NE_TEEN = { x: 13.2, z: -5.9, face: 135, aside: [11.75, -6.25], asideFace: -114 };
+const NE_KID = { pad: [1.7, 0.2], mid: [0.05, -0.03] };        // trampoline-local stand points (on the pad → the middle)
 
 // a walker crossing the footbridge (dir ±1) who reaches midspan at time tm
 function neBridgeWalker(id, look, dir, tm, dz, v = 1.35, dx = 0) {
@@ -140,8 +135,9 @@ function neCastSpecs() {
   const K = NE, TR = NE_TRAMP;
   return [
     // the teenager with the ball (stands still; the ball is beside the right hand)
-    { id: 'teen', look: 'neTeen', y: 0.15, path: [[0, NE_TEEN.x, NE_TEEN.z]], face: NE_TEEN.face,
-      states: [[-5, 'neDribble'], [1.9, 'neReach'], [2.45, 'neStare'], [3.75, 'neCrouch'], [K.poke, 'nePoke'], [5.4, 'neCrouch'], [14.6, 'neStare'], [21.0, 'sitGround']] },
+    { id: 'teen', look: 'neTeen', y: 0.15, path: [[0, NE_TEEN.x, NE_TEEN.z], [5.7, NE_TEEN.x, NE_TEEN.z], [7.4, ...NE_TEEN.aside]], face: NE_TEEN.face,
+      faceAt: (t) => (t < 5.7 ? NE_TEEN.face : NE_TEEN.asideFace),
+      states: [[-5, 'neDribble'], [1.9, 'neReach'], [2.45, 'neStare'], [3.75, 'neCrouch'], [K.poke, 'nePoke'], [5.4, 'neCrouch'], [5.7, 'walk'], [7.4, 'neCrouch'], [14.6, 'neStare'], [21.0, 'sitGround']] },
     // the kid: beside the trampoline with a parent, then up on its frame, the jump, the landing, a second try, sitting in the pit
     { id: 'kid', look: 'neKid', scale: 0.7, y: 0.15, path: [[0, TR.x + 2.1, TR.z + 1.9]], face: 52,
       states: [[0, 'idle'], [13.0, 'neKidReady'], [K.jump - 0.3, 'neKidPrep'], [K.jump, 'neKidAir'], [K.land, 'neKidLand'], [16.35, 'neKidPrep'], [K.jump2, 'neKidAir'], [K.land2, 'neKidLand'], [17.45, 'neKidSit']],
@@ -153,10 +149,10 @@ function neCastSpecs() {
       faceAt: (t) => (t < 13.0 ? 52 : 90),
       y: (t, p, app) => {
         if (t < 13.0) return 0.15;
-        const lx = p.x - TR.x, lz = p.z - TR.z, pad = 0.15 + app.tramp.y0 + 0.09;
+        const lx = p.x - TR.x, lz = p.z - TR.z, M = app.tramp, pad = M.padTop;
         if (t < K.jump) return pad;
-        if (t < K.land) { const T = K.land - K.jump, τ = t - K.jump, y1 = neMatY(app, 0, 0, K.land), v0 = (y1 - pad + 0.5 * NE_G * T * T) / T; return pad + v0 * τ - 0.5 * NE_G * τ * τ; }
-        const base = neMatY(app, lx, lz, t);
+        if (t < K.land) { const T = K.land - K.jump, τ = t - K.jump, y1 = M.surfaceY(NE_KID.mid[0], NE_KID.mid[1], K.land), v0 = (y1 - pad + 0.5 * NE_G * T * T) / T; return pad + v0 * τ - 0.5 * NE_G * τ * τ; }
+        const base = M.surfaceY(lx, lz, t);
         if (t > K.jump2 && t < K.land2) { const T = K.land2 - K.jump2, τ = t - K.jump2; return base + (0.5 * NE_G * T) * τ - 0.5 * NE_G * τ * τ; }
         return base;
       } },
@@ -164,8 +160,8 @@ function neCastSpecs() {
     { id: 'parent', look: 'casual6', y: 0.15, path: [[0, TR.x + 2.6, TR.z + 2.0]], face: 52,
       states: [[0, 'idle'], [16.05, 'neFlinch'], [17.4, 'handHead'], [19.5, 'look']] },
     // the jogger: comes up the sidewalk toward you, stops to check her shoe, then goes past you on your left
-    { id: 'jog', look: 'casual3', y: 0.15, stride: 2.1, path: [[0, 8.5, -60], [17.6, 8.5, -9.4], [19.1, 8.5, -5.1], [19.55, 8.5, -4.3], [20.35, 8.5, -4.3], [20.9, 8.5, -3.2], [27, 8.5, 12]],
-      states: [[0, 'jog'], [K.rule[1], 'neJogFlat'], [19.2, 'walk'], [19.55, 'neCheckShoe'], [20.3, 'walk'], [20.8, 'neJogFlat']] },
+    { id: 'jog', look: 'casual3', y: 0.15, stride: 2.1, path: [[0, 8.5, -61], [17.6, 8.5, -9.0], [19.05, 8.5, -4.6], [19.5, 8.5, -3.4], [20.35, 8.5, -3.4], [21.25, 8.5, -0.8], [27, 8.5, 14]],
+      states: [[0, 'jog'], [K.rule[1], 'neJogFlat'], [19.05, 'walk'], [19.5, 'neCheckShoe'], [20.3, 'walk'], [20.7, 'neJogFlat']] },
     // the café sitter: sits on the left cushion, gets up during the insert, walks off along the café front
     { id: 'cafe', look: 'neCafe', y: 0.15, seat: 0.47, face: 90, faceUntil: 10.4, path: [[0, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [9.85, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [10.4, NE_CITY.bench.x - 0.42, NE_CITY.bench.z - 0.52], [11.2, 11.2, 3.5], [20, 11.0, 15]],
       states: [[0, 'sit'], [9.85, 'neStandUp'], [10.4, 'walk']] },

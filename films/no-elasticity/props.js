@@ -82,66 +82,71 @@ class NeBall {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// the park trampoline: a raised steel frame, springs all round, a black mat. The first landing stretches it for good.
+// the plaza trampoline (round, 3.6 m): steel ring on U-legs, springs all round under a narrow blue pad, a black mat.
+// The first landing stretches the mat for good: it stays a funnel.
 // ---------------------------------------------------------------------------------------------------------------------
-const NE_TRAMP = { x: 17.0, z: -12.5, hx: 1.7, hz: 1.3, inset: 0.3, top: 1.0, depth: 0.74 };
+const NE_TRAMP = { x: 19.0, z: -12.5, R: 1.8, mat: 1.46, top: 0.95, depth: 0.7 };
 function neMatDepth(t) { return NE_TRAMP.depth * Ease.outCubic(MathX.clamp((t - NE.land) / 0.3, 0, 1)) + 0.04 * MathX.smooth(t, NE.land2, NE.land2 + 0.15); }
 
 class NeTramp {
   constructor(scene) {
     const T = NE_TRAMP, g = new THREE.Group(); g.position.set(T.x, 0.15, T.z); scene.add(g); this.g = g;
-    const steel = Mat.std('#59636b', { roughness: 0.4, metalness: 0.7 }), pad = Mat.std('#2d5f8a', { roughness: 0.75 });
-    const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; g.add(m); return m; };
-    const y0 = T.top - 0.15;
-    // frame tubes (rectangle) + legs
-    for (const s of [-1, 1]) { add(new THREE.BoxGeometry(2 * T.hx + 0.1, 0.07, 0.07), steel, 0, y0, s * T.hz); add(new THREE.BoxGeometry(0.07, 0.07, 2 * T.hz + 0.1), steel, s * T.hx, y0, 0); }
-    for (const [lx, lz] of [[-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1]]) add(new THREE.BoxGeometry(0.06, y0, 0.06), steel, lx * (T.hx - 0.05), y0 / 2, lz * T.hz);
-    // narrow blue pads on the frame (the springs between frame and mat stay visible)
-    for (const s of [-1, 1]) { add(new THREE.BoxGeometry(2 * T.hx + 0.3, 0.06, 0.16), pad, 0, y0 + 0.06, s * (T.hz + 0.04)); add(new THREE.BoxGeometry(0.16, 0.06, 2 * T.hz + 0.3), pad, s * (T.hx + 0.04), y0 + 0.06, 0); }
-    // the mat: a subdivided plane, deformed every frame
-    const mw = 2 * (T.hx - T.inset), md = 2 * (T.hz - T.inset);
-    this.matGeo = new THREE.PlaneGeometry(mw, md, 34, 26); this.matGeo.rotateX(-Math.PI / 2);
+    const steel = Mat.std('#69737a', { roughness: 0.4, metalness: 0.7 }), pad = Mat.std('#2d63a0', { roughness: 0.75 });
+    const add = (geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); m.castShadow = true; m.receiveShadow = true; g.add(m); return m; };
+    const y0 = T.top - 0.15; this.y0 = y0;
+    // the frame ring, six legs and three U-shaped ground bars
+    add(new THREE.TorusGeometry(T.R, 0.032, 8, 72), steel, 0, y0, 0, Math.PI / 2);
+    for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.26; add(new THREE.CylinderGeometry(0.028, 0.028, y0, 8), steel, Math.cos(a) * T.R, y0 / 2, Math.sin(a) * T.R); }
+    for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2 + 0.26; add(new THREE.TorusGeometry(T.R, 0.026, 6, 16, Math.PI / 3), steel, 0, 0.03, 0, Math.PI / 2, 0, a); }
+    // the pad: a flat blue ring over the outer half of the springs, with a skirt
+    const ring = new THREE.RingGeometry(T.R - 0.16, T.R + 0.1, 72, 1); ring.rotateX(-Math.PI / 2);
+    add(ring, pad, 0, y0 + 0.055, 0).castShadow = true;
+    const skirt = new THREE.CylinderGeometry(T.R + 0.1, T.R + 0.1, 0.07, 72, 1, true); add(skirt, pad, 0, y0 + 0.02, 0);
+    const inner = new THREE.CylinderGeometry(T.R - 0.16, T.R - 0.16, 0.05, 72, 1, true); add(inner, pad, 0, y0 + 0.03, 0);
+    this.padTop = 0.15 + y0 + 0.058;
+    // the mat: a polar grid (deformed every frame), black with a white border ring
+    this.matGeo = new THREE.RingGeometry(0.0, T.mat, 64, 20); this.matGeo.rotateX(-Math.PI / 2);
     this.matBase = this.matGeo.attributes.position.array.slice();
-    const mc = Tex.canvas(256, 256), mx = mc.getContext('2d'); mx.fillStyle = '#17181a'; mx.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 256; i += 4) { mx.fillStyle = 'rgba(255,255,255,0.05)'; mx.fillRect(i, 0, 1, 256); mx.fillRect(0, i, 256, 1); }
-    mx.strokeStyle = '#c9c4b5'; mx.lineWidth = 6; mx.strokeRect(6, 6, 244, 244);
+    const mc = Tex.canvas(256, 256), mx = mc.getContext('2d'); mx.fillStyle = '#151618'; mx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 256; i += 4) { mx.fillStyle = 'rgba(255,255,255,0.045)'; mx.fillRect(i, 0, 1, 256); mx.fillRect(0, i, 256, 1); }
+    mx.strokeStyle = '#d8d2c2'; mx.lineWidth = 5; mx.beginPath(); mx.arc(128, 128, 120, 0, Math.PI * 2); mx.stroke();
+    mx.lineWidth = 3; mx.beginPath(); mx.arc(128, 128, 22, 0, Math.PI * 2); mx.stroke();
     this.mat = new THREE.Mesh(this.matGeo, new THREE.MeshStandardMaterial({ map: Tex.tex(mc), roughness: 0.85, side: THREE.DoubleSide, name: 'neMat' }));
     this.mat.position.y = y0 - 0.01; this.mat.receiveShadow = true; this.mat.castShadow = true; g.add(this.mat);
-    // springs: one instanced helix (unit length along +X), placed between the frame and the mat edge
-    const pts = []; for (let i = 0; i <= 64; i++) { const a = i / 64 * Math.PI * 2 * 9; pts.push(new THREE.Vector3(i / 64, Math.cos(a) * 0.022, Math.sin(a) * 0.022)); }
+    // springs: one instanced helix (unit length along +X), radial from the frame ring to the mat's edge
+    const pts = []; for (let i = 0; i <= 64; i++) { const a = i / 64 * Math.PI * 2 * 9; pts.push(new THREE.Vector3(i / 64, Math.cos(a) * 0.02, Math.sin(a) * 0.02)); }
     const helix = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 96, 0.005, 4, false);
     this.springs = [];
-    const step = 0.2;
-    for (let x = -T.hx + T.inset + 0.1; x < T.hx - T.inset; x += step) for (const s of [-1, 1]) this.springs.push({ ox: x, oz: s * T.hz, ix: x, iz: s * (T.hz - T.inset) });
-    for (let z = -T.hz + T.inset + 0.1; z < T.hz - T.inset; z += step) for (const s of [-1, 1]) this.springs.push({ ox: s * T.hx, oz: z, ix: s * (T.hx - T.inset), iz: z });
-    this.inst = new THREE.InstancedMesh(helix, Mat.std('#b9c0c6', { roughness: 0.3, metalness: 0.8 }), this.springs.length);
+    for (let i = 0; i < 72; i++) { const a = i / 72 * Math.PI * 2, c = Math.cos(a), s = Math.sin(a); this.springs.push({ ox: c * (T.R - 0.02), oz: s * (T.R - 0.02), ix: c * T.mat, iz: s * T.mat }); }
+    this.inst = new THREE.InstancedMesh(helix, Mat.std('#c3c9ce', { roughness: 0.3, metalness: 0.8 }), this.springs.length);
     this.inst.castShadow = false; g.add(this.inst);
-    this.y0 = y0; this._d = -1;
-    this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._v = new THREE.Vector3(); this._s = new THREE.Vector3(); this._a = new THREE.Vector3(1, 0, 0);
+    this._d = -1;
+    this._m = new THREE.Matrix4(); this._q = new THREE.Quaternion(); this._v = new THREE.Vector3(); this._s = new THREE.Vector3(); this._a = new THREE.Vector3(1, 0, 0); this._u = new THREE.Vector3();
   }
 
-  // the mat's height (local, relative to the frame plane) at local (x, z) for a centre depth d: a membrane cone
+  // the mat's height (local, relative to the frame plane) at local (x, z) for a centre depth d: a membrane funnel
   sinkAt(lx, lz, d) {
-    const T = NE_TRAMP, ax = Math.abs(lx) / (T.hx - T.inset), az = Math.abs(lz) / (T.hz - T.inset);
-    const rho = Math.min(1, Math.sqrt(ax * ax * 0.6 + az * az * 0.6 + Math.max(ax, az) ** 2 * 0.4));
-    const k = Math.pow(1 - rho, 1.25), core = MathX.smooth(rho, 0.0, 0.12);
-    return -d * (k * core + (1 - core) * Math.pow(1 - 0.12, 1.25)) - 0.06 * d * (1 - rho);
+    const rho = Math.min(1, Math.hypot(lx, lz) / NE_TRAMP.mat), k = Math.pow(1 - rho, 1.3), core = MathX.smooth(rho, 0.0, 0.14);
+    return -d * (k * core + (1 - core) * Math.pow(1 - 0.14, 1.3)) - 0.05 * d * (1 - rho);
   }
+  // the edge of the stretched mat sits a little lower too (its springs are stretched)
+  pull(d) { return 0.06 * d / NE_TRAMP.depth; }
+  // world height of the mat's surface under someone standing at trampoline-local (lx, lz) at time t
+  surfaceY(lx, lz, t) { const d = neMatDepth(t); return 0.15 + this.y0 - 0.01 + this.sinkAt(lx, lz, d) - this.pull(d); }
 
   update(t) {
     const d = neMatDepth(t);
     if (Math.abs(d - this._d) < 1e-4) return;
     this._d = d;
-    const p = this.matGeo.attributes.position.array, b = this.matBase, T = NE_TRAMP;
-    const pull = 0.07 * d / T.depth;    // the stretched mat sits a little lower at its edge, too
-    for (let i = 0; i < p.length; i += 3) p[i + 1] = b[i + 1] + this.sinkAt(b[i], b[i + 2], d) - pull * 0.6;
+    const p = this.matGeo.attributes.position.array, b = this.matBase, pull = this.pull(d);
+    for (let i = 0; i < p.length; i += 3) p[i + 1] = b[i + 1] + this.sinkAt(b[i], b[i + 2], d) - pull;
     this.matGeo.attributes.position.needsUpdate = true; this.matGeo.computeVertexNormals();
     // springs: from the frame to the (lowered) mat edge; stretched springs show their coils spread apart
     this.springs.forEach((s, i) => {
-      const a = this._v.set(s.ox, this.y0 + 0.01, s.oz), bx = s.ix, bz = s.iz, by = this.y0 - pull * 0.6 - 0.005;
-      const dx = bx - a.x, dy = by - a.y, dz = bz - a.z, len = Math.hypot(dx, dy, dz);
-      this._q.setFromUnitVectors(this._a, new THREE.Vector3(dx / len, dy / len, dz / len));
-      this._s.set(len + pull * 0.9, 1 - 0.25 * pull / 0.07, 1 - 0.25 * pull / 0.07);
+      const a = this._v.set(s.ox, this.y0 + 0.005, s.oz), by = this.y0 - 0.01 - pull;
+      const dx = s.ix - a.x, dy = by - a.y, dz = s.iz - a.z, len = Math.hypot(dx, dy, dz);
+      this._q.setFromUnitVectors(this._a, this._u.set(dx / len, dy / len, dz / len));
+      this._s.set(len * (1 + 0.5 * pull), 1 - 2.5 * pull, 1 - 2.5 * pull);
       this._m.compose(a, this._q, this._s);
       this.inst.setMatrixAt(i, this._m);
     });
@@ -162,8 +167,8 @@ class NeRacket {
     const frame = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ell, true), 120, 0.011, 8, true), frameMat); frame.scale.set(1, 1, 1.6); frame.castShadow = true; g.add(frame);
     const strip = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ell.slice(10, 27)), 30, 0.0118, 8, false), accent); strip.scale.set(1.01, 1.01, 1.7); g.add(strip);
     // throat (two arms) and the handle running out of frame
-    for (const s of [-1, 1]) { const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.01, 0.17, 8), frameMat); arm.position.set(s * 0.045, -R.a - 0.07, 0); arm.rotation.z = s * 0.42; g.add(arm); }
-    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.016, 0.22, 8), frameMat); shaft.position.set(0, -R.a - 0.22, 0); g.add(shaft);
+    for (const s of [-1, 1]) { const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.01, 0.17, 8), frameMat); arm.position.set(s * 0.04, -R.a - 0.06, 0); arm.rotation.z = -s * 0.42; g.add(arm); }
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.016, 0.24, 8), frameMat); shaft.position.set(0, -R.a - 0.24, 0); g.add(shaft);
     const hg = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.018, 0.26, 8), grip); hg.position.set(0, -R.a - 0.45, 0); g.add(hg);
     // the string bed: a subdivided ellipse-masked plane with a string-grid texture; deformed toward −Z by the pocket
     const c = Tex.canvas(256, 320), x = c.getContext('2d'); x.clearRect(0, 0, 256, 320);
@@ -238,7 +243,7 @@ class NeShoe {
     for (let i = N; i >= 0; i--) { const x = 0.29 * i / N; shape.lineTo(x, -outline(x) * 0.92); }
     const slab = (h, mat, y) => { const ge = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: true, bevelThickness: 0.004, bevelSize: 0.004, bevelSegments: 2, curveSegments: 4 }); ge.rotateX(Math.PI / 2); ge.translate(0, y + h, 0); const m = new THREE.Mesh(ge, mat); m.castShadow = true; m.receiveShadow = true; return m; };
     foot.add(slab(0.007, dark, 0));
-    this.mid = slab(0.034, white, 0.007); this.mid.geometry.translate(0, -0.041, 0); this.mid.position.y = 0.007; foot.add(this.mid);   // scaled in Y from its bottom
+    this.mid = slab(0.034, white, 0.007); this.mid.geometry.translate(0, -0.007, 0); this.mid.position.y = 0.007; foot.add(this.mid);   // scaled in Y from its bottom
     // the upper: lofted rings along the foot (height grows toward the ankle collar), on its own group so it rides on the foam
     const up = new THREE.Group(); foot.add(up); this.up = up;
     const rings = [];
@@ -269,7 +274,7 @@ class NeShoe {
   update(t) {
     const S = NE_SHOE, vis = t > 7.3 && t < 9.8; this.g.visible = vis; if (!vis) return;
     const f = this.foam(t);
-    this.mid.scale.y = f; this.up.position.y = -0.034 * (1 - f);
+    this.mid.scale.y = f; this.up.position.y = 0.036 - 0.034 * (1 - f);
     // the step (slow motion): swing in toe-first from the left, heel strike, roll flat, heel lift, toe off, swing out to the right
     const F = this.foot, heelX = 0.0;
     let px, py, pitch;
@@ -346,7 +351,7 @@ class NeBand {
     const A = this.tip(this.hands.left, this._a), B = this.tip(this.hands.right, this._b);
     const D = A.distanceTo(B), rf = 0.011;
     // the loop's length: its rest length, or the longest it has ever been stretched (it never comes back)
-    const rest = 0.06;
+    const rest = 0.08;
     let Lh = rest;
     for (let s = NE.mont[3][0]; s <= t + 1e-6; s += 1 / 60) { const pa = this._probe(s); if (pa > Lh) Lh = pa; }
     // one strand on each side of the fingers; slack strands hang in a parabola (arc length ≈ D + 8s²/3D)
@@ -366,6 +371,6 @@ class NeBand {
     this.mesh.geometry.dispose();
     this.mesh.geometry = new THREE.TubeGeometry(curve, 90, 0.0024, 5, true);
   }
-  // the gap between your fingertips at time s, from the scripted hand poses (bandIn 6 cm → bandOut 24 cm → bandIn)
-  _probe(s) { const k = MathX.smooth(s, 11.8, 12.3) - MathX.smooth(s, 12.5, 13.0); return 0.06 + 0.18 * Math.max(0, k); }
+  // the gap between your fingertips at time s, from the scripted hand poses (bandIn 8 cm → bandOut 26 cm → bandIn)
+  _probe(s) { const k = MathX.smooth(s, 11.8, 12.3) - MathX.smooth(s, 12.5, 13.0); return 0.08 + 0.18 * Math.max(0, k); }
 }

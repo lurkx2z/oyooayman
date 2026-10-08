@@ -2,11 +2,11 @@
    CARS — vehicles whose tyres and springs never recover.
    Each car is the shared VehicleFactory body (js/world/vehicles.js) on a
    rig of its own: four corners with a permanent spring "set" (how far
-   each spring has been pushed in and stayed), and tyres that keep a flat
-   spot wherever a bump pressed them (the flat rotates with the wheel, so
-   the car thumps once per turn). Every load event (climbing onto the speed
-   table, landing off it) is found once at load time by scanning the car's
-   path, so a frame is still a pure function of time.
+   each steel spring has been pushed in and stayed). Tyres stay round: the
+   air inside them is unchanged and still pushes the rubber back out (an
+   open question for the comments). Every load event (climbing onto the
+   speed table, landing off it) is found once at load time by scanning the
+   car's path, so a frame is still a pure function of time.
    Also here: the box truck (copied from Friction's, then owned), the
    sparks of cars scraping on their bump stops, and the crash: an SUV
    T-bones a crossing sedan and a van piles in; momentum is conserved,
@@ -64,7 +64,7 @@ function neCoilGeo() {
 // ---------------------------------------------------------------------------------------------------------------------
 // one car on the rig
 //   spec: { id, type, color, pose(t) → {x, z, yaw, dist}, k: [front, rear] load multipliers, preset: [cf, cr] spring set
-//           already taken before the film, flats0 (initial flat depth), coils, low (scrapes), hazardFrom, brake(t),
+//           already taken before the film, coils, low (scrapes), hazardFrom, brake(t),
 //           crush(t) → {front, rear, left, right, xc} }
 // ---------------------------------------------------------------------------------------------------------------------
 class NeCar {
@@ -107,7 +107,7 @@ class NeCar {
   _axleX(ps, i) { return ps.x - Math.sin(ps.yaw) * this.axles[i]; }
 
   // scan the path once: every time an axle climbs onto the table or lands off it (after the rule has bitten), the springs
-  // on that axle take a permanent set and its tyres a flat spot where they touched
+  // on that axle take a permanent set
   _findEvents() {
     const S = this.spec, k = S.k || [1, 1], ev = [];
     this.events = ev;
@@ -125,12 +125,6 @@ class NeCar {
         prevH[i] = h; prevS[i] = slope;
       }
     }
-    // the flat spots each event leaves (at the angle that was touching the road)
-    for (const e of ev) {
-      const ps = S.pose(e.t);
-      for (const w of this.wheels) if (w.axle === e.axle) w.flats.push({ t: e.t, phi: -Math.PI / 2 + ps.dist / this.r, d: Math.min(0.045, e.a * 0.42) });
-    }
-    if (S.flats0) for (const w of this.wheels) w.flats.unshift({ t: -10, phi: hash1(w.axle * 3 + w.side + this.r) * 6.28, d: S.flats0 });
   }
 
   // permanent spring set on axle i at time t (smoothly applied over ~0.07 s per event, capped at the bump stop)
@@ -335,17 +329,17 @@ class NeTraffic {
     add({ id: 'B1', type: 'sedan', color: '#6c7a86', pose: neLane(1.75, -1, 0, 6, [[0, 9.0]], { until: 12 }) });
     add({ id: 'B2', type: 'suv', color: '#3d4a44', pose: neLane(-5.25, 1, 0, -60, [[0, 8.0]], { until: 14 }) });
     add({ id: 'B3', type: 'taxi', color: '#c9a64a', pose: neLane(-1.75, 1, 0, -120, [[0, 10.0]], { until: 16 }) });
-    // the traffic beat: oncoming cars over the table (already riding low from other bumps since the change)
-    add({ id: 'C1', type: 'sedan', color: '#55606b', low: true, preset: [0.06, 0.05], flats0: 0.012, pose: neLane(-1.75, 1, 27, -70, [[27, 9], [31.0, 5.2], [36, 5.2]]), brake: (t) => MathX.window(t, 30.4, 31.6, 0.2, 0.2) });
-    add({ id: 'C2', type: 'suv', color: '#4a5546', low: true, preset: [0.05, 0.06], flats0: 0.01, pose: neLane(-5.25, 1, 28, -72, [[28, 8], [32.4, 4.8], [40, 4.8]]) });
-    this.truck = add({ id: 'TR', type: 'truck', color: '#e9e5da', low: true, k: [0.8, 3.4], stop: 0.3, preset: [0.04, 0.1], pose: neLane(-5.25, 1, 29, -78, [[29, 7], [34.2, 4.0], [38.0, 4.0], [41.6, 0]]),
-      hazardFrom: 40.6, boxTilt: null });
-    this.bus = add({ id: 'BUS', type: 'bus', color: '#d8d4c6', low: true, preset: [0.05, 0.05], kneel: { side: 0, t: 42.5, a: 0.13 },
-      pose: neLane(-1.75, 1, 30, -95, [[30, 6], [37.5, 4.6], [43.0, 4.6], [45.5, 0]]), hazardFrom: 45.0 });
-    add({ id: 'C5', type: 'hatch', color: '#6e5a48', low: true, preset: [0.07, 0.06], pose: neLane(5.25, -1, 30, 26, [[30, 5.0]], { until: 52 }) });
-    // far traffic that queues up behind the wreck
-    add({ id: 'Q1', type: 'sedan', color: '#3c4650', preset: [0.05, 0.05], pose: neLane(-1.75, 1, 40, -150, [[40, 9], [53.0, 9], [55.5, 0]]), brake: (t) => (t > 53.4 ? 1 : 0) });
-    add({ id: 'Q2', type: 'van', color: '#8a8f96', preset: [0.05, 0.06], pose: neLane(-5.25, 1, 42, -160, [[42, 8], [54.5, 8], [57.0, 0]]), brake: (t) => (t > 54.8 ? 1 : 0) });
+    // the traffic beat. The box truck comes past you (lane 1.75, away from you) and over the table: its rear springs flatten
+    // on the landing, the box tips back and its rear bar drags. Oncoming cars already ride on their bump stops and scrape.
+    this.truck = add({ id: 'TR', type: 'truck', color: '#e9e5da', low: true, k: [0.8, 3.4], stop: 0.3, preset: [0.04, 0.08], pose: neLane(1.75, -1, 28, 30, [[28, 7], [32.5, 4.0], [41, 4.0], [45, 5.5]]) });
+    this.c1 = add({ id: 'C1', type: 'sedan', color: '#55606b', low: true, preset: [0.1, 0.11], pose: neLane(-1.75, 1, 27, -70, [[27, 9], [31.0, 5.2], [36, 5.2]]), brake: (t) => MathX.window(t, 30.4, 31.6, 0.2, 0.2) });
+    add({ id: 'C2', type: 'suv', color: '#4a5546', low: true, preset: [0.09, 0.1], pose: neLane(-5.25, 1, 28, -72, [[28, 8], [32.4, 4.8], [40, 4.8]]) });
+    // the bus pulls in at the stop on the far side (air suspension: air is unchanged, so it rides normally)
+    this.bus = add({ id: 'BUS', type: 'bus', color: '#d8d4c6', pose: neLane(-5.25, 1, 30, -95, [[30, 6], [37.5, 4.6], [43.0, 4.6], [45.5, 0]]) });
+    add({ id: 'C5', type: 'hatch', color: '#6e5a48', low: true, preset: [0.1, 0.1], pose: neLane(1.75, -1, 37, 30, [[37, 6.0]], { until: 60 }) });
+    // traffic held up by the wreck: one behind the van, one at the red on the far lane
+    add({ id: 'Q1', type: 'sedan', color: '#3c4650', preset: [0.05, 0.05], pose: neLane(-1.75, 1, 44, -176, [[44, 10], [54.0, 10], [55.43, 0]]), brake: (t) => (t > 54.0 ? 1 : 0) });
+    add({ id: 'Q2', type: 'van', color: '#8a8f96', preset: [0.05, 0.06], pose: neLane(-5.25, 1, 44, -150, [[44, 9], [53.5, 9], [55.5, 0]]), brake: (t) => (t > 53.5 ? 1 : 0) });
     // the crash cars
     const crushOf = (who) => (t) => {
       const C = NE_CRASH, a = MathX.smooth(t, C.ti, C.ti + 0.09), b = MathX.smooth(t, C.tv, C.tv + 0.08);
@@ -353,7 +347,7 @@ class NeTraffic {
       if (who === 'sedan') return { front: 0, rear: 0, left: 0.0, right: 0.42 * a, xc: 0.15 };
       return { front: 0.36 * b, rear: 0, left: 0, right: 0, xc: 0 };
     };
-    this.suv = add({ id: 'X1', type: 'suv', color: '#2f3f36', preset: [0.07, 0.06], flats0: 0.014, pose: (t) => (t < 44 ? null : neCrashPose('suv', t)), crush: crushOf('suv'), brake: (t) => (t > NE.crash - 0.32 ? 1 : 0) });
+    this.suv = add({ id: 'X1', type: 'suv', color: '#2f3f36', preset: [0.07, 0.06], pose: (t) => (t < 44 ? null : neCrashPose('suv', t)), crush: crushOf('suv'), brake: (t) => (t > NE.crash - 0.32 ? 1 : 0) });
     this.sedan = add({ id: 'X2', type: 'sedan', color: '#8b9aa8', preset: [0.05, 0.05], pose: (t) => (t < 44 ? null : neCrashPose('sedan', t)), crush: crushOf('sedan') });
     this.van = add({ id: 'X3', type: 'van', color: '#dcd8ce', preset: [0.05, 0.07], pose: (t) => (t < 44 ? null : neCrashPose('van', t)), crush: crushOf('van'), brake: (t) => (t > NE_CRASH.tb ? 1 : 0), hazardFrom: 57 });
     this.cars = cars;
@@ -410,7 +404,7 @@ class NeTraffic {
     const D = this.dust; D.begin(fog);
     const B = this.bits; B.begin(fog);
     const C = NE_CRASH;
-    for (const [tc, n, who] of [[C.ti, 60, 'sedan'], [C.tv, 40, 'van']]) {
+    for (const [tc, n, who] of [[C.ti, 46, 'sedan'], [C.tv, 30, 'van']]) {
       const a = t - tc; if (a < 0) continue;
       const ps = neCrashPose(who === 'sedan' ? 'sedan' : 'suv', tc + 0.02);
       for (let i = 0; i < n; i++) {
@@ -418,16 +412,16 @@ class NeTraffic {
         if (a < life) {
           const ang = hash1(k + 1) * 6.283, sp = 0.6 + 2.0 * hash1(k + 2), sl = Math.min(a, 1.2);
           const x = ps.x + Math.cos(ang) * (0.8 + sp * sl), z = ps.z + Math.sin(ang) * (0.8 + sp * sl), y = 0.25 + 0.9 * hash1(k + 3) + 0.4 * sl;
-          D.push(x, y, z, 0.9 + 1.6 * sl, hash1(k + 4) * 6, 0.28 * (1 - a / life), 0.9, 0.78, 0.74, 0.68);
+          if (i % 2 === 0) D.push(x, y, z, 0.7 + 1.2 * sl, hash1(k + 4) * 6, 0.14 * (1 - a / life), 0.9, 0.74, 0.72, 0.68);
         }
         // glass: ballistic, then lying on the road (bright little chips)
         const g0 = k + 9, vx = (hash1(g0) - 0.5) * 5, vz = (hash1(g0 + 1) - 0.2) * 5, vy = 1 + 2.5 * hash1(g0 + 2), tl = (vy + Math.sqrt(vy * vy + 2 * 9.8 * 1.0)) / 9.8, aa = Math.min(a, tl);
         const gx = ps.x + vx * aa, gz = ps.z + vz * aa, gy = Math.max(0.02, 1.0 + vy * aa - 4.9 * aa * aa);
-        B.push(gx, gy, gz, 0.05 + 0.04 * hash1(g0 + 3), hash1(g0 + 4) * 6, 0.9, 1.3, 0.85, 0.92, 0.98);
+        B.push(gx, gy, gz, 0.022 + 0.02 * hash1(g0 + 3), hash1(g0 + 4) * 6, 0.75, 1.15, 0.82, 0.9, 0.96);
       }
     }
     D.end(); B.end();
   }
 }
 
-const neRideText = (t) => (FILM._app && FILM._app.traffic ? `RIDE HEIGHT −${FILM._app.traffic.heroRide(t)} CM` : '');
+const neRideText = (t) => { const n = FILM._app && FILM._app.traffic ? FILM._app.traffic.heroRide(t) : 0; return n > 0 ? `THE RED CAR SITS ${n} CM LOWER` : 'SPRINGS DON’T PUSH BACK'; };
