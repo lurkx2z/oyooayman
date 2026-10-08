@@ -111,7 +111,7 @@ class SndStadium extends Environment {
             vec3 storm = mix(face, under, below);
             storm += vec3(0.05, 0.055, 0.06) * exp(-pow((el - eb) / 0.012, 2.0)) * (0.5 + b2);   // the shelf's lip
             // lightning: the cloud base lights up around the strike, the whole storm a little
-            float fl = uFlash * (0.25 + 1.8 * exp(-pow(acos(clamp(dot(hz, uFlashDir), -1.0, 1.0)) / 0.18, 2.0)) * (0.4 + below));
+            float fl = uFlash * (0.12 + 1.3 * exp(-pow(acos(clamp(dot(hz, uFlashDir), -1.0, 1.0)) / 0.16, 2.0)) * (0.4 + below));
             storm += vec3(0.78, 0.8, 1.0) * fl * (0.5 + 0.5 * b2);
             col = mix(col, storm, wall);
           }
@@ -332,8 +332,7 @@ class SndStadium extends Environment {
     const mats = txts.map((t, i) => {
       const W = 1024, H = 96, c = Tex.canvas(W, H), x = c.getContext('2d'), [bg, fg] = cols[i % cols.length];
       x.fillStyle = bg; x.fillRect(0, 0, W, H); x.fillStyle = fg; x.font = `700 64px ${Tex.fontCond}`; x.textAlign = 'center'; x.textBaseline = 'middle';
-      x.fillText(t, W / 2, H / 2 + 3);
-      x.fillStyle = 'rgba(0,0,0,0.28)'; for (let k = 0; k < W; k += 3) x.fillRect(k, 0, 1, H);
+      x.fillText(t, W / 2, H / 2 + 3);   // (no LED pixel lines: at a distance they shimmer)
       return new THREE.MeshBasicMaterial({ map: Tex.tex(c, { repeat: false }), color: new THREE.Color(0.86, 0.86, 0.86), name: 'ledBoard' });
     });
     const back = Mat.std('#22262b', { roughness: 0.7 });
@@ -458,6 +457,7 @@ class SndStadium extends Environment {
   /* ---------------- outside: the city round the stadium, trees ---------------- */
   _outside() {
     const B = this.batch, rng = this.rng.fork(7), styles = ['tanbrick', 'cream', 'modern', 'stone', 'glassblue', 'redbrick', 'sage', 'whitebrick', 'glassteal'];
+    this.city = [];                                    // (the roofs: the birds on them, waves.js)
     for (let i = 0; i < 150; i++) {
       const a = rng.range(0, Math.PI * 2), r = rng.range(170, 720);
       const x = Math.cos(a) * r, z = Math.sin(a) * r * 1.1;
@@ -465,6 +465,7 @@ class SndStadium extends Environment {
       const st = this.facades[rng.pick(styles)];
       B.add(Geo.boxSides(x - w / 2, x + w / 2, 0, h, z - d / 2, z + d / 2, st.tileW, st.tileH), st.mat, null, { noShadow: true });
       B.add(Geo.flat(x - w / 2, x + w / 2, z - d / 2, z + d / 2, h, 5), this.m.roof, null, { noShadow: true });
+      this.city.push({ x, z, w, d, h });
     }
     const tr = this.rng.fork(8);
     for (let i = 0; i < 70; i++) {
@@ -493,8 +494,8 @@ class SndStadium extends Environment {
       const core = new THREE.MeshBasicMaterial({ color: '#f4f1ff', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide });
       const glow = new THREE.MeshBasicMaterial({ color: '#8f95ff', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, toneMapped: false, side: THREE.DoubleSide });
       const grp = new THREE.Group();
-      grp.add(new THREE.Mesh(ribbon(pts, 2.6), core), new THREE.Mesh(ribbon(pts, 12), glow));
-      for (const b of branches) grp.add(new THREE.Mesh(ribbon(b, 1.4), core), new THREE.Mesh(ribbon(b, 7), glow));
+      grp.add(new THREE.Mesh(ribbon(pts, 4.2), core), new THREE.Mesh(ribbon(pts, 15), glow));
+      for (const b of branches) grp.add(new THREE.Mesh(ribbon(b, 2.2), core), new THREE.Mesh(ribbon(b, 8), glow));
       grp.position.set(F.x, 0, F.z);
       grp.rotation.y = Math.atan2(-F.x, -F.z);           // face the stadium
       grp.traverse((o) => { if (o.isMesh) { o.frustumCulled = false; o.renderOrder = -5; } });
@@ -511,7 +512,7 @@ class SndStadium extends Environment {
     for (const b of this.bolts) {
       const k = sndFlashLevel(t, b.F.t);
       b.grp.visible = k > 0.03;
-      b.core.opacity = Math.min(1, k * 1.4); b.glow.opacity = Math.min(0.6, k * 0.5);
+      b.core.opacity = Math.min(1, k * 1.5); b.glow.opacity = Math.min(0.8, k * 0.7);
       if (k > fl) { fl = k; flDir = b.F; }
     }
     this.skyUniforms.uFlash.value = fl;

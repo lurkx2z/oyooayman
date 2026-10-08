@@ -34,10 +34,15 @@ Object.assign(ACTIONS, {
     p.rSh = [2.6, 0.45]; p.rEl = 0.5 + 0.45 * Math.sin(τ * 9); p.lSh = [0.12, 0.1]; p.headYaw = 0; p.neck = -0.06;
     return p;
   },
-  sndShout(τ, c) {        // hands cupped round the mouth, leaning in
+  sndShout(τ, c) {        // one hand cupped beside the mouth (the mouth stays in view, wide open), the other arm out
     const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.2);
-    p.lSh = [1.3 * k, 0.42 * k]; p.rSh = [1.3 * k, 0.42 * k]; p.lEl = 2.3 * k; p.rEl = 2.3 * k;
-    p.spine = 0.1 * k; p.neck = -0.12 * k; p.mouth = 1; p.headYaw = 0;
+    p.rSh = [1.2 * k, 0.65 * k]; p.rEl = 2.15 * k; p.lSh = [0.55 * k, 0.35 * k]; p.lEl = 0.35;
+    p.spine = 0.14 * k; p.neck = -0.18 * k; p.mouth = 1; p.headYaw = 0;
+    return p;
+  },
+  sndCheer(τ, c) {        // the goal: both arms up (the jumps are a lift of the root, in the cast list)
+    const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.18), w = 0.12 * Math.sin(τ * 7 + c.seed * 5);
+    p.lSh = [2.85 * k, 0.35 + w]; p.rSh = [2.85 * k, 0.35 - w]; p.lEl = 0.25; p.rEl = 0.25; p.spine = -0.08 * k; p.neck = 0.2 * k;
     return p;
   },
   sndWhistle(τ, c) {
@@ -83,10 +88,10 @@ Object.assign(ACTIONS, {
   },
   // the drummer: the left hand steadies the drum, the right swings down on every beat (beats every SND.drum.period)
   sndDrum(τ, c) {
-    const p = ACTIONS.idle(τ, c), D = SND.drum, u = τ - 0.5, k = Math.floor(u / D.period), ph = u - k * D.period;
+    const p = ACTIONS.idle(τ, c), D = SND.drum, T = D.period, u = τ - 0.5, k = Math.floor(u / T), ph = u - k * T;
     let a = 1.7;
-    if (u >= -0.4 && k < D.n) a = u < 0 ? 1.7 : ph < 0.55 ? 0.75 + 0.95 * MathX.smooth(ph, 0.04, 0.5) : 1.7 - 0.95 * MathX.smooth(ph, 0.6, D.period);
-    else if (k >= D.n) a = 0.75 + 0.6 * MathX.smooth(u - D.n * D.period, 0, 0.6);
+    if (u >= -0.4 && k < D.n) a = u < 0 ? 1.7 : ph < 0.6 * T ? 0.75 + 0.95 * MathX.smooth(ph, 0.04 * T, 0.55 * T) : 1.7 - 0.95 * MathX.smooth(ph, 0.7 * T, T);
+    else if (k >= D.n) a = 0.75 + 0.6 * MathX.smooth(u - D.n * T, 0, 0.6);
     p.rSh = [a, 0.35]; p.rEl = 0.9; p.lSh = [0.65, 0.2]; p.lEl = 1.3; p.spine = 0.08; p.neck = 0.1; p.headYaw = 0.2;
     return p;
   },
@@ -106,7 +111,7 @@ Object.assign(ACTIONS, {
   },
 });
 Object.assign(BLEND, { sndSet: 0.6, sndSprint: 0.14, sndStarter: 0.5, sndWave: 0.3, sndShout: 0.16, sndWhistle: 0.15, sndPoint: 0.3, sndKick: 0.08, sndCelebrate: 0.4,
-  sndWall: 0.4, sndKeeper: 0.4, sndDive: 0.08, sndDrum: 0.4, sndDuck: 0.06, sndWatch: 0.6 });
+  sndWall: 0.4, sndKeeper: 0.4, sndDive: 0.08, sndDrum: 0.4, sndDuck: 0.06, sndWatch: 0.6, sndCheer: 0.12 });
 
 // looks: runners in bright tops, two kits, the referee, the keeper, the friend, fans
 (() => {
@@ -126,6 +131,8 @@ Object.assign(BLEND, { sndSet: 0.6, sndSprint: 0.14, sndStarter: 0.5, sndWave: 0
     sndFanC: { skin: 4, build: 'broad', shirt: '#d9d6cc', sleeves: 'short', pants: '#39435a', shoes: '#cfcac0', sole: '#e8e4dc', hair: '#111', hat: { type: 'cap', color: '#1f2f52' } },
     sndFanD: { skin: 1, build: 'avg', shirt: '#3c5a46', sleeves: 'long', pants: '#454d58', shoes: '#c8c3b8', sole: '#e6e2da', hair: '#7a5c40', hood: true, jacket: true },
     sndFanE: { skin: 5, build: 'slim', shirt: '#e2b82e', sleeves: 'short', pants: '#22262c', shoes: '#d8d4ca', sole: '#f0ede6', hair: '#9c7a4a', hairStyle: 'pony' },
+    sndSteward: { skin: 2, build: 'avg', shirt: '#cdef2e', sleeves: 'long', pants: '#23272e', shoes: '#111', sole: '#222', hair: '#1b1410', jacket: true, collar: true, inner: '#2a2f38' },
+    sndSteward2: { skin: 4, build: 'broad', shirt: '#cdef2e', sleeves: 'long', pants: '#23272e', shoes: '#111', sole: '#222', hair: '#111', hat: { type: 'cap', color: '#1f2f52' } },
   });
 })();
 
@@ -144,7 +151,8 @@ class SndCast {
     SND_RUNNERS.forEach((R) => {
       const path = [[0, SND.line.x, R.z], [R.go, SND.line.x, R.z]];
       for (let t = R.go + 0.1; t <= SND.cuts[0] + 0.2; t += 0.1) path.push([+t.toFixed(3), sndRunnerX(R, t), R.z]);
-      add({ id: 'run' + R.i, look: 'sndRun' + (R.i * 7 % 10), path, states: [[0, 'sndSet'], [R.go, 'sndSprint']], stride: 2.3 }, [0]);
+      // (standing at the line; "Set!" is heard on time, in normal air: they all crouch together)
+      add({ id: 'run' + R.i, look: 'sndRun' + (R.i * 7 % 10), path, states: [[0, 'idle'], [SND.gun.set + 0.15 + hash1(R.i * 5 + 9) * 0.12, 'sndSet'], [R.go, 'sndSprint']], stride: 2.3, face: -90 }, [0]);
     });
     this.starter = add({ id: 'starter', look: 'sndStarterL', path: [[0, SND.gun.x + 0.35, SND.gun.z]], states: [[0, 'idle'], [SND.gun.set, 'sndStarter'], [SND.gun.bang + 1.4, 'idle']], face: sndFace(SND.gun.x, SND.gun.z, 0, 0) }, [0]);
     { const gun = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.12, 0.2), Mat.std('#16181a', { roughness: 0.4, metalness: 0.5 })); gun.position.set(0, -0.08, 0.06); this.starter.j.ra.hand.add(gun); }
@@ -152,7 +160,8 @@ class SndCast {
     // 2. your friend (row 11), and the people round them
     const F = SND.friend, fy = F.y, faceF = sndFace(F.x, F.z, E[1].x, E[1].z);
     this.friend = add({ id: 'friend', look: 'sndFriend', y: fy, path: [[0, F.x, F.z - 0.1]], states: [[0, 'idle'], [F.wave[0], 'sndWave'], [F.shout, 'sndShout'], [F.shout + 0.95, 'sndWave'], [F.shout2, 'sndShout'], [F.shout2 + 0.75, 'sndWave'], [F.wave[1], 'sndWatch']], face: faceF }, [1]);
-    const nb = [['nb1', 'sndFanB', 10, -22.6], ['nb2', 'sndFanC', 10, -21.4], ['nb3', 'sndFanD', 11, -23.15], ['nb4', 'sndFanC', 11, -20.85], ['nb5', 'sndFanB', 12, -22.5], ['nb6', 'sndFanD', 12, -21.3]];
+    const nb = [['nb1', 'sndFanB', 10, -23.4], ['nb2', 'sndFanC', 10, -20.3], ['nb3', 'sndFanD', 11, -25.2], ['nb4', 'sndFanC', 11, -19.6], ['nb5', 'sndFanB', 12, -22.6], ['nb6', 'sndFanD', 13, -18.4],
+      ['nb7', 'sndFanA', 8, -26.4], ['nb8', 'sndFanE', 7, -21.0], ['nb9', 'sndFanA', 14, -24.8], ['nb10', 'sndFanE', 15, -20.2], ['nb11', 'sndFanC', 9, -17.5], ['nb12', 'sndFanD', 13, -27.1]];
     for (const [id, look, r, x] of nb) { const q = sndSideSeat(1, r, x); add({ id, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch']], face: sndFace(x, q.z, x * 0.6, 0) + (hash1(x * 3) - 0.5) * 30 }, [1]); }
 
     // 4. the free kick: referee, taker, wall, keeper, two more players
@@ -164,25 +173,37 @@ class SndCast {
     for (let i = 0; i < 4; i++) add({ id: 'wall' + i, look: i % 2 ? 'sndAway' : 'sndAway2', path: [[0, 39.3, -2.9 + i * 0.55]], states: [[0, 'sndWall'], [SND_BALL.tGoal + 0.3, 'look']], face: sndFace(39.3, -2.2, K.x, K.z) }, [3],
       (t) => { const u = t - K.t - 0.02 - i * 0.03; return u > 0 && u < 0.55 ? 0.42 * Math.sin(Math.PI * u / 0.55) : 0; });
     add({ id: 'keeper', look: 'sndKeeperL', path: [[0, 52.0, 0.3], [K.t + 0.12, 52.0, 0.4], [K.t + 0.5, 51.9, 2.1]], states: [[0, 'sndKeeper'], [K.t + 0.12, 'sndDive'], [K.t + 2.2, 'look']], face: sndFace(52, 0.3, K.x, K.z) }, [3]);
-    add({ id: 'p1', look: 'sndHome2', path: [[0, 41.5, 6.5], [K.t, 41.5, 6.5], [K.t + 1.2, 44.2, 7.5]], states: [[0, 'idle'], [K.t, 'jog'], [K.t + 1.2, 'sndCelebrate']], face: sndFace(41.5, 6.5, K.x, K.z) }, [3]);
-    add({ id: 'p2', look: 'sndAway', path: [[0, 44, -5.5]], states: [[0, 'idle'], [SND_BALL.tGoal + 0.3, 'look']], face: sndFace(44, -5.5, K.x, K.z) }, [3]);
+    add({ id: 'p1', look: 'sndHome2', path: [[0, 39.5, 7.5], [K.t, 39.5, 7.5], [K.t + 1.2, 42.2, 8.5]], states: [[0, 'idle'], [K.t, 'jog'], [K.t + 1.2, 'sndCelebrate']], face: sndFace(39.5, 7.5, K.x, K.z) }, [3]);
+    add({ id: 'p2', look: 'sndAway', path: [[0, 41.2, -6.8]], states: [[0, 'idle'], [SND_BALL.tGoal + 0.3, 'look']], face: sndFace(41.2, -6.8, K.x, K.z) }, [3]);
+
+    // (shot 4: the fans just below you in the main stand; they leap up the moment they SEE the goal)
+    for (const [r, x, look] of [[12, 36.5, 'sndFanA'], [10, 37.6, 'sndFanE'], [8, 36.4, 'sndFanB'], [6, 39.0, 'sndFanC'], [4, 36.8, 'sndFanE'], [3, 38.4, 'sndFanD']]) {
+      const q = sndSideSeat(1, r, x), tc = SND_BALL.tGoal + 0.2 + hash1(x * 3 + r) * 0.2;
+      add({ id: 'k' + r, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch'], [tc, 'sndCheer']], face: sndFace(x, q.z, 42, 0) + (hash1(r * 7) - 0.5) * 16 }, [3],
+        (t) => { const u = t - tc; return u > 0 && u < 2.6 ? 0.22 * Math.pow(Math.abs(Math.sin(u * (6.2 + r * 0.1))), 1.5) * (1 - MathX.smooth(u, 1.8, 2.6)) : 0; });
+    }
 
     // 5. the drummer (row 13 of the far stand), with the drum, and a flag waved beside them
     const Dq = sndSideSeat(-1, SND.drum.row, SND.drum.x);
-    this.drummer = add({ id: 'drummer', look: 'sndFanA', y: Dq.y, path: [[0, SND.drum.x, Dq.z + 0.1]], states: [[0, 'sndWatch'], [SND.drum.t0 - 0.5, 'sndDrum']], face: 0 }, [4]);
+    this.drummer = add({ id: 'drummer', look: 'sndFanA', y: Dq.y, path: [[0, SND.drum.x, Dq.z + 0.1]], states: [[0, 'sndWatch'], [SND.drum.t0 - 0.5, 'sndDrum']], face: 180 }, [4]);
     { const g = new THREE.Group(), shell = Mat.std('#1f2f52', { roughness: 0.5 }), skin = Mat.std('#efe9da', { roughness: 0.7 });
       g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.34, 20), shell));
       for (const y of [-0.175, 0.175]) { const k = new THREE.Mesh(new THREE.CircleGeometry(0.4, 20), skin); k.rotation.x = y > 0 ? -Math.PI / 2 : Math.PI / 2; k.position.y = y; g.add(k); }
       g.position.set(SND.drum.x + 0.12, Dq.y + 0.95, Dq.z + 0.48); g.traverse((o) => { if (o.isMesh) o.castShadow = true; }); scene.add(g); this.drum = g; }
-    { const q = sndSideSeat(-1, SND.drum.row + 1, SND.drum.x + 1.6);
-      add({ id: 'flagger', look: 'sndFanE', y: q.y, path: [[0, SND.drum.x + 1.6, q.z + 0.1]], states: [[0, 'sndWatch']], face: 0 }, [4]);
-      this.flag = this._flag(scene, SND.drum.x + 1.9, q.y + 1.5, q.z + 0.2); }
+    { const q = sndSideSeat(-1, SND.drum.row + 1, SND.drum.x + 1.9);
+      add({ id: 'flagger', look: 'sndFanE', y: q.y, path: [[0, SND.drum.x + 1.9, q.z + 0.1]], states: [[0, 'sndWatch']], face: 180 }, [4]);
+      this.flag = this._flag(scene, SND.drum.x + 2.2, q.y + 1.5, q.z + 0.2); }
 
     // 6. your neighbours in the stand (rows 10–12), and the players on the pitch
     // (the view runs out over x ≈ 5.9 in rows 10–11: nobody stands right on it, the nearest heads frame its lower corners)
     for (const [r, x, look] of [[11, 4.55, 'sndFanA'], [11, 5.25, 'sndFanC'], [11, 6.6, 'sndFanE'], [11, 7.35, 'sndFanD'], [10, 4.4, 'sndFanD'], [10, 5.2, 'sndFanE'], [10, 6.6, 'sndFanA'], [10, 7.4, 'sndFanC'], [12, 4.9, 'sndFanD'], [12, 7.1, 'sndFanB']]) {
       const q = sndSideSeat(1, r, x), tT = sndThunderAt({ x, y: q.y + 1.6, z: q.z }) + 0.04 + hash1(x * 31) * 0.05;
       add({ id: 'me' + r + '_' + x, look, y: q.y, path: [[0, x, q.z - 0.1]], states: [[0, 'sndWatch'], [tT, 'sndDuck']], face: sndFace(x, q.z, x * 0.3, -10) + (hash1(x * 7) - 0.5) * 24 }, [5]);
+    }
+    // stewards along the near touchline, facing the crowd: the last people the front passes before it reaches you
+    for (const [id, look, x] of [['s1', 'sndSteward', -15.5], ['s2', 'sndSteward2', -4.5], ['s3', 'sndSteward', 3.0], ['s4', 'sndSteward2', 12.5]]) {
+      const z = 35.7, tT = sndThunderAt({ x, y: 1.6, z }) + 0.05 + hash1(x * 5) * 0.05;
+      add({ id: 'st' + id, look, path: [[0, x, z]], states: [[0, 'idle'], [tT, 'sndDuck'], [tT + 3.4, 'look']], face: sndFace(x, z, x * 0.8, z + 12) }, [5]);
     }
     const pl = [['h1', 'sndHome', -12, 4], ['h2', 'sndHome2', 6, -14], ['h3', 'sndHome', 18, 9], ['h4', 'sndHome2', -24, -18], ['a1', 'sndAway', -6, -6], ['a2', 'sndAway2', 12, 2], ['a3', 'sndAway', -18, 12], ['a4', 'sndAway2', 26, -10], ['rf', 'sndRef', 2, 6]];
     for (const [id, look, x, z] of pl) {

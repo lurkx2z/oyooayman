@@ -70,12 +70,15 @@ class SndAudio extends AudioEngine {
     };
     // a one-shot made at te at point p: scheduled when it ARRIVES; fn(tr, gain, pan)
     const at = (te, p, ref, fn) => { const tr = arrive(te, p); if (tr < END - 0.3) fn(tr, lvl(p, tr, ref), panOf(p, tr)); return tr; };
-    // its echoes off the four stand fronts (image sources): later, softer, duller
+    // its echoes off the four stand fronts (image sources): later, softer, duller (only off a wall on YOUR side:
+    // if you are up in a stand, behind its front wall, that wall's echo goes back out over the pitch)
     const WALLS = [['z', -SND_ST.side.d0 + 0.42], ['z', SND_ST.side.d0 - 0.42], ['x', -SND_ST.end.d0 + 0.42], ['x', SND_ST.end.d0 - 0.42]];
     const echoes = (te, p, ref, fn) => {
       for (const [ax, w] of WALLS) {
         const q = { x: p.x, y: p.y, z: p.z }; q[ax] = 2 * w - p[ax];
-        at(te, q, ref, (tr, g, pn) => fn(tr, g * 0.45, pn));
+        const tr = arrive(te, q);
+        if (!(tr < END - 0.3) || Math.sign(sndEar(tr)[ax] - w) !== Math.sign(p[ax] - w)) continue;
+        fn(tr, lvl(q, tr, ref) * 0.45, panOf(q, tr));
       }
     };
 
@@ -147,11 +150,11 @@ class SndAudio extends AudioEngine {
     {
       const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'triangle';
       o.frequency.setValueAtTime(220, T.rule[0]); o.frequency.exponentialRampToValueAtTime(55, T.rule[1] + 0.2);
-      g.gain.setValueAtTime(0, T.rule[0] - 0.2); g.gain.linearRampToValueAtTime(0.07, T.rule[0] + 0.1); g.gain.linearRampToValueAtTime(0.0, T.rule[1] + 0.9);
+      g.gain.setValueAtTime(0, T.rule[0] - 0.2); g.gain.linearRampToValueAtTime(0.15, T.rule[0] + 0.1); g.gain.linearRampToValueAtTime(0.0, T.rule[1] + 0.9);
       o.connect(g); g.connect(mus); o.start(T.rule[0] - 0.2); o.stop(T.rule[1] + 1);
       const n = S.noise('pink', T.rule[0] - 0.2, T.rule[1] + 1), bp = S.filter('bandpass', 3000, 0.9), ng = ctx.createGain();
       bp.frequency.setValueAtTime(3200, T.rule[0]); bp.frequency.exponentialRampToValueAtTime(260, T.rule[1] + 0.3);
-      ng.gain.setValueAtTime(0, T.rule[0] - 0.2); ng.gain.linearRampToValueAtTime(0.05, T.rule[0] + 0.3); ng.gain.linearRampToValueAtTime(0, T.rule[1] + 0.9);
+      ng.gain.setValueAtTime(0, T.rule[0] - 0.2); ng.gain.linearRampToValueAtTime(0.09, T.rule[0] + 0.3); ng.gain.linearRampToValueAtTime(0, T.rule[1] + 0.9);
       n.connect(bp); bp.connect(ng); ng.connect(mus);
     }
 
@@ -161,7 +164,8 @@ class SndAudio extends AudioEngine {
     at(T.gun.set, SND_P(T.gun.x + 0.35, 1.65, T.gun.z), 9, (tr, g, pn) => S.voice(tr, 175, 0.34, 'e', 6.4 * g, pn, src, 0.92));
     const bang = (tr, g, pn, bright) => {
       const P = S.panned(fx, pn);
-      const n = S.noise('white', tr, tr + 0.3), hp = S.filter(bright ? 'highpass' : 'lowpass', bright ? 700 : 1400, 0.7), ng = ctx.createGain();
+      // (in this air high notes die within metres — absorption grows as 1/c³ — so even the direct bang is dull)
+      const n = S.noise('white', tr, tr + 0.3), hp = S.filter(bright ? 'bandpass' : 'lowpass', bright ? 620 : 700, bright ? 0.8 : 0.7), ng = ctx.createGain();
       S.env(ng, tr, 0.001, g, bright ? 0.07 : 0.25); n.connect(hp); hp.connect(ng); ng.connect(P); send(ng, 0.5);
       const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.setValueAtTime(170, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25);
       S.env(og, tr, 0.002, g * 1.1, 0.3); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.45);
@@ -196,7 +200,7 @@ class SndAudio extends AudioEngine {
       T.pa.speakers.forEach((P, si) => at(T.pa.speak, P, 26, (tr, g, pn) => {
         syl.forEach(([dt], i) => grain(words[i], tr + dt, 2.6 * g, pn, VG));
         // the loudspeaker's own horn ring (a little brightness the voice no longer has)
-        const n = S.noise('pink', tr, tr + 1.4), bp = S.filter('bandpass', 1300, 3), gg = ctx.createGain();
+        const n = S.noise('pink', tr, tr + 1.4), bp = S.filter('bandpass', 800, 3), gg = ctx.createGain();
         gg.gain.setValueAtTime(0, tr); gg.gain.linearRampToValueAtTime(0.05 * g * 2.6, tr + 0.03); gg.gain.setValueAtTime(0.05 * g * 2.6, tr + 1.25); gg.gain.linearRampToValueAtTime(0, tr + 1.4);
         n.connect(bp); bp.connect(gg); gg.connect(S.panned(src, pn)); send(gg, 0.6);
       }));
@@ -222,17 +226,17 @@ class SndAudio extends AudioEngine {
     {
       const K = T.kick, KP = SND_P(K.x, 0.15, K.z), N = SND_NET, NP = SND_P(N.back, N.y, N.z);
       const crack = (tr, g, pn) => {
-        const n = S.noise('white', tr, tr + 0.05), hp = S.filter('highpass', 1600, 0.7), gg = ctx.createGain();
+        const n = S.noise('white', tr, tr + 0.05), hp = S.filter('bandpass', 650, 0.8), gg = ctx.createGain();
         S.env(gg, tr, 0.0005, g, 0.012); n.connect(hp); hp.connect(gg); gg.connect(S.panned(fx, pn)); send(gg, 0.35);
       };
-      { const tr = H.ball, p = sndBall(SND_BALL.tMach1); crack(tr, 1.6, panOf(p, tr)); }
+      { const tr = H.ball, p = sndBall(SND_BALL.tMach1); crack(tr, 3.0, panOf(p, tr)); }
       at(K.t, KP, 8, (tr, g, pn) => {
         const P = S.panned(src, pn), o = ctx.createOscillator(), og = ctx.createGain();
-        o.frequency.setValueAtTime(96, tr); o.frequency.exponentialRampToValueAtTime(70, tr + 0.3); S.env(og, tr, 0.003, 4.5 * g, 0.35); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.5); send(og, 0.4);
-        const n = S.noise('pink', tr, tr + 0.1), lp = S.filter('lowpass', 900, 0.7), ng = ctx.createGain(); S.env(ng, tr, 0.001, 3.2 * g, 0.05); n.connect(lp); lp.connect(ng); ng.connect(P);
+        o.frequency.setValueAtTime(96, tr); o.frequency.exponentialRampToValueAtTime(70, tr + 0.3); S.env(og, tr, 0.003, 7.5 * g, 0.4); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.5); send(og, 0.4);
+        const n = S.noise('pink', tr, tr + 0.1), lp = S.filter('lowpass', 700, 0.7), ng = ctx.createGain(); S.env(ng, tr, 0.001, 5.0 * g, 0.06); n.connect(lp); lp.connect(ng); ng.connect(P);
       });
       at(N.tN, NP, 6, (tr, g, pn) => {
-        const n = S.noise('white', tr, tr + 0.6), bp = S.filter('bandpass', 1500, 0.8), gg = ctx.createGain();
+        const n = S.noise('white', tr, tr + 0.6), bp = S.filter('bandpass', 700, 0.8), gg = ctx.createGain();
         gg.gain.setValueAtTime(0, tr); gg.gain.linearRampToValueAtTime(1.3 * g, tr + 0.02); gg.gain.setTargetAtTime(0, tr + 0.04, 0.12);
         n.connect(bp); bp.connect(gg); gg.connect(S.panned(src, pn));
       });
@@ -244,13 +248,13 @@ class SndAudio extends AudioEngine {
     fans.forEach((f, i) => {
       if (i % 17 === 0 && f.tGoal < 1e5) {
         const tr = arrive(f.tGoal + 0.08, f.head);
-        grain(CHEERS[i % 5], tr, 0.38 * lvl(f.head, tr, 10), panOf(f.head, tr));
+        grain(CHEERS[i % 5], tr, 0.26 * lvl(f.head, tr, 10), panOf(f.head, tr));
       }
       if (i % 13 === 0 && f.clapper) {
         for (let k = 0; k < T.drum.n; k++) {
           const te = T.drum.t0 + k * T.drum.period + f.tDrum + 0.09, tr = arrive(te, f.head);
           if (tr > END - 0.5) break;
-          grain(CLAPS[(i + k) % 6], tr, 1.1 * lvl(f.head, tr, 5), panOf(f.head, tr));
+          grain(CLAPS[(i + k) % 6], tr, 0.6 * lvl(f.head, tr, 5), panOf(f.head, tr));
         }
       }
       if (i % 19 === 0) {
@@ -262,8 +266,8 @@ class SndAudio extends AudioEngine {
     // 9. the drum: a deep bass drum, every beat heard from where it is
     for (let k = 0; k < T.drum.n; k++) at(T.drum.t0 + k * T.drum.period, SND_DRUM, 12, (tr, g, pn) => {
       const P = S.panned(src, pn), o = ctx.createOscillator(), og = ctx.createGain();
-      o.frequency.setValueAtTime(78, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25); S.env(og, tr, 0.003, 7.7 * g, 0.4); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.6); send(og, 0.45);
-      const n = S.noise('pink', tr, tr + 0.08), lp = S.filter('lowpass', 500, 0.7), ng = ctx.createGain(); S.env(ng, tr, 0.001, 2.2 * g, 0.05); n.connect(lp); lp.connect(ng); ng.connect(P);
+      o.frequency.setValueAtTime(78, tr); o.frequency.exponentialRampToValueAtTime(48, tr + 0.25); S.env(og, tr, 0.003, 4.2 * g, 0.32); o.connect(og); og.connect(P); o.start(tr); o.stop(tr + 0.6); send(og, 0.45);
+      const n = S.noise('pink', tr, tr + 0.08), lp = S.filter('lowpass', 500, 0.7), ng = ctx.createGain(); S.env(ng, tr, 0.001, 1.3 * g, 0.05); n.connect(lp); lp.connect(ng); ng.connect(P);
     });
 
     // the grains, played
@@ -274,17 +278,18 @@ class SndAudio extends AudioEngine {
       }
     }
 
-    // 10. the thunder (the flash under the title, 1.71 km away): a crack, then a roll that would go on for a minute
+    // 10. the thunder (the flash under the title, 1.71 km away): no crack (over 1.7 km this air soaks up everything
+    //     above ~200 Hz), a deep blow you feel, then a roll that would go on for a minute
     {
       const pn = panOf(SND_BOLT, tT);
-      // the crack: a sharp tearing front, then the first heavy boom
-      const n = S.noise('white', tT, tT + 0.8), hp = S.filter('highpass', 500, 0.6), g = ctx.createGain();
-      g.gain.setValueAtTime(0, tT); g.gain.linearRampToValueAtTime(1.6, tT + 0.004); g.gain.setTargetAtTime(0, tT + 0.01, 0.05);
+      // the front: a heavy low blow
+      const n = S.noise('white', tT, tT + 0.8), hp = S.filter('lowpass', 380, 0.7), g = ctx.createGain();
+      g.gain.setValueAtTime(0, tT); g.gain.linearRampToValueAtTime(3.2, tT + 0.006); g.gain.setTargetAtTime(0, tT + 0.02, 0.09);
       n.connect(hp); hp.connect(g); g.connect(S.panned(fx, pn)); send(g, 0.6);
       S.boom(tT + 0.02, 1.0, fx, rev);
       S.thump(tT + 0.01, 0.9, fx);
       // the roll: brown noise through a low filter, in uneven waves (sound from further up the bolt, and its branches)
-      const roll = S.noise('brown', tT, END), rl = S.filter('lowpass', 260, 0.8), rg = ctx.createGain(), mid = S.noise('pink', tT, END), ml = S.filter('lowpass', 900, 0.6), mg = ctx.createGain();
+      const roll = S.noise('brown', tT, END), rl = S.filter('lowpass', 260, 0.8), rg = ctx.createGain(), mid = S.noise('pink', tT, END), ml = S.filter('lowpass', 420, 0.6), mg = ctx.createGain();
       roll.connect(rl); rl.connect(rg); rg.connect(S.panned(fx, pn * 0.6)); send(rg, 0.5);
       mid.connect(ml); ml.connect(mg); mg.connect(S.panned(fx, pn * 0.4));
       rg.gain.setValueAtTime(0, tT); rg.gain.linearRampToValueAtTime(1.5, tT + 0.06);

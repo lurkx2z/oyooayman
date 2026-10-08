@@ -25,10 +25,11 @@ function sndNoise2(x, y) {
 function sndCrowdSeats() {
   const S = SND_ST.side, E = SND_ST.end, out = [], rng = new RNG(4401);
   const free = (stand, r, x) => {
-    if (stand === 'main' && r >= 10 && r <= 12 && Math.abs(x - SND.friend.x) < 1.5) return false;   // the friend and their neighbours (rigs)
+    if (stand === 'main' && r >= 5 && r <= 16 && Math.abs(x - SND.friend.x) < 6.5) return false;    // a quiet block round the friend (a few rigs)
     if (stand === 'main' && r >= 10 && r <= 13 && Math.abs(x - 6.0) < 2.1) return false;             // your rows at the end (rigs)
-    if (stand === 'main' && r >= 6 && r <= 9 && Math.abs(x - 6.6) < 0.95) return false;              // your place at the start
-    if (stand === 'far' && r >= 12 && r <= 14 && Math.abs(x - SND.drum.x) < 1.2) return false;       // the drummer
+    if (stand === 'main' && r >= 2 && r <= 9 && x > 2.0 && x < 11.5 && !(r >= 8 && Math.abs(x - 6.6) > 0.95)) return false;   // your place at the start, and the rows below it
+    if (stand === 'main' && r <= 17 && x > 35.6 && x < 41.5) return false;                           // below you in shot 4 (rigs)
+    if (stand === 'far' && Math.abs(r - SND.drum.row) <= 1 && x > SND.drum.x - 1.2 && x < SND.drum.x + 2.3) return false;   // the drummer
     return true;
   };
   for (const s of [-1, 1]) {
@@ -71,7 +72,7 @@ class SndCrowd {
       f.tDrum = SoundArrival.dist(SND_DRUM, f.head) / SND.C1 + 0.12 + 0.05 * h;   // after each beat is struck, this fan claps (hands meet 0.09 s later)
       f.tThunder = sndThunderAt(f.head) + 0.05 + 0.1 * s3;                          // the thunder reaches this seat: it ducks
       f.tGoal = !f.away && s2 > 0.18 ? SND_BALL.tGoal + 0.22 + 0.4 * h : 1e6;       // it SEES the goal: it jumps
-      f.scarf = !f.away && s3 > 0.45;
+      f.scarf = !f.away && s3 > 0.2;
       f.clapper = !f.away && h > 0.07;
       f.h = h; f.s2 = s2; f.s3 = s3;
     }
@@ -167,7 +168,7 @@ class SndCrowd {
             float ph = (t - uDrum.x - aA.y) / uDrum.y;
             float k = clamp(floor(ph + 0.25), 0.0, uDrum.z - 1.0);
             float cu = (ph - k) * uDrum.y;
-            float up = aB.w * smoothstep(-0.05, 0.05, cu) * (1.0 - smoothstep(0.2, 0.42, cu));
+            float up = aB.w * smoothstep(-0.05, 0.05, cu) * (1.0 - smoothstep(0.3, 0.5, cu));
             float meet = 1.0 - smoothstep(0.0, 0.05, abs(cu - 0.09));
             float sway = sin(t * (0.7 + 0.5 * fract(seed * 7.0)) + seed * 40.0);
             vec3 p = transformed;
@@ -178,7 +179,7 @@ class SndCrowd {
               vec3 dRest = normalize(vec3(sx * 0.12, -1.0, 0.1 + 0.08 * sway));
               vec3 dUp = normalize(vec3(sx * 0.45, 1.0, 0.16));
               vec3 dMeet = normalize(vec3(-sx * 0.28, 1.0, 0.32));
-              vec3 dDuck = normalize(vec3(-sx * 0.05, 0.8, 0.75));
+              vec3 dDuck = normalize(vec3(-sx * 0.3, 0.8, 0.5));
               vec3 d = normalize(mix(dRest, mix(dUp, dMeet, meet), up));
               d = normalize(mix(d, dUp, jOn * smoothstep(0.0, 0.12, gu) * (1.0 - smoothstep(2.2, 3.0, gu))));
               d = normalize(mix(d, dDuck, duck));
@@ -200,10 +201,10 @@ class SndCrowd {
             if (part > 0.5) {
               float yaw = 0.07 * sway * (1.0 - duck);
               p.xz = mat2(cos(yaw), -sin(yaw), sin(yaw), cos(yaw)) * p.xz;
-              float lean = 0.55 * duck, py = p.y - 0.9;
+              float lean = 0.9 * duck, py = p.y - 0.9;
               p = vec3(p.x, 0.9 + py * cos(lean) - p.z * sin(lean), py * sin(lean) + p.z * cos(lean));
             }
-            p.y *= 1.0 - 0.14 * duck;
+            p.y *= 1.0 - 0.24 * duck;
             p.y += jump;
             transformed = p;
             vec3 pants = mix(vec3(0.05, 0.06, 0.09), vec3(0.09, 0.13, 0.22), step(0.5, fract(seed * 7.31)));
@@ -213,9 +214,9 @@ class SndCrowd {
         .replace('#include <common>', '#include <common>\nvarying vec3 vCrowdCol; varying float vScarf;')
         .replace('#include <color_fragment>', `#include <color_fragment>
           diffuseColor.rgb = vCrowdCol;
-          if (vScarf >= 0.0) diffuseColor.rgb = mix(vec3(0.03, 0.06, 0.16), vec3(0.85, 0.62, 0.06), step(0.5, fract(vScarf * 3.0 + 0.25)));`);
+          if (vScarf >= 0.0) diffuseColor.rgb = mix(vec3(0.96, 0.95, 0.9), vec3(0.85, 0.62, 0.06), step(0.72, fract(vScarf * 3.0 + 0.25)));`);
     };
-    mat.customProgramCacheKey = () => 'sndCrowd1';
+    mat.customProgramCacheKey = () => 'sndCrowd2';
     return mat;
   }
 
