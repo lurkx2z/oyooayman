@@ -144,6 +144,13 @@
 - A test page inside `films/<slug>/` breaks relative paths. Test pages go in the root as `zz_*.html` and are deleted
   before committing.
 - Google Fonts fail in headless and from `file://` (proxy/cert). Fonts are bundled.
+- **Hard camera cuts in a film without walking tip the view for 4 frames.** The camera controller measures walking
+  speed over ±0.05 s of the eye's track, so a cut's jump in position reads as a sprint and its step sway (pitch, roll,
+  x, which `bobStrength: 0` does not turn off) fires for the two frames either side of every cut: a 20–60 px snap on a
+  long lens. If you never walk, set `walkSpeed` huge in `CONFIG.camera` (Slow sound uses `1e6`).
+- A front (a wall of sound, a shock) coming straight at the camera is invisible as a surface: you see it edge-on only
+  where it meets the ground. Draw where it meets the world (a line a few pixels wide, widened against foreshortening on
+  the ground) and a short glow on what it has just passed (Slow sound's `SndFrontLine`).
 
 **Audio** (see `SOUND_GUIDE.md` § 6): offline exponential-ramp spikes; noise before its envelope; quiet/loud mixes;
 sub-only drones; cues running past their scene; editing `audioEngine.js` invalidates all bakes; changing SCRIPT after

@@ -73,8 +73,9 @@ Everything is procedural, so there are no models, images or sound files to downl
 > a friend's shout arrives 0.8 s late as a blurred buzz; one announcement from five loudspeakers arrives three times; a
 > referee's whistle hoots 10× lower; a 144 km/h free kick is Mach 1.17 and you hear the kick after the goal; a crowd
 > clapping to a drum claps in ripples spreading out from it. Then the opening flash's thunder, 1.7 km away, comes back:
-> birds lift off the city's roofs as it reaches them, the far stand ducks, the front crosses the pitch and hits you
-> 50 s after the flash. This is the redesign (the first version was a one-take city avenue). Shot list, physics and
+> drawn as a bright line sweeping over everything it crosses, it lights up the city building by building (birds lift
+> off the roofs), the far stand row by row as it ducks, the pitch, then the rows in front of you, and hits you 50 s after
+> the flash. This is the redesign (the first version was a one-take city avenue). Shot list, physics and
 > review log: [`films/slow-sound/PLAN.md`](films/slow-sound/PLAN.md); production report:
 > [`films/slow-sound/EPISODE_REPORT.md`](films/slow-sound/EPISODE_REPORT.md).
 
@@ -344,7 +345,7 @@ films/slow-sound/script.js        ★ the beats, the stadium layout, every movin
 films/slow-sound/stadium.js       the pitch, stands, roof, masts and loudspeakers, the big screen, goals and net, the city, the storm, lightning
 films/slow-sound/crowd.js         ~9,000 instanced fans posed in the vertex shader from their own drum / goal / thunder times
 films/slow-sound/cast.js          runners and the starter, the friend, the referee, the free kick, the drummer, players, stewards, neighbours
-films/slow-sound/waves.js         sound fronts: rings on the grass, domes in the air, the thunder's curtain, gun smoke, birds on the roofs
+films/slow-sound/waves.js         sound fronts: rings on the grass, domes in the air, the thunder's line on the world, gun smoke, birds
 films/slow-sound/audio.js         every sound timed by its arrival at your ear (grains per fan, stand echoes, hollow voices, the thunder)
 films/slow-sound/film.js          FILM hooks: build, update, hands, the grade and the thunder's hit
 films/slow-sound/soundtrack.js    the baked soundtrack
