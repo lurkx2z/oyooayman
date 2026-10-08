@@ -359,7 +359,7 @@ const FILM = {
       if (t > NE.crashSlow[0] && t < NE.crashSlow[1]) { p.contrast += 0.06; p.saturation -= 0.08; p.vignette += 0.15; }
       if (t >= NE.bridge[0] && t < NE.bridge[1]) p.exposure += 0.14;
     }
-    p.fade = MathX.smooth(t, NE.end - 0.45, NE.end);
+    // (no fade to black at the end: the last shot is the opening's desk clock, so the film loops straight back to it)
     // whip pans drag a little (camera-lag trail)
     const app = FILM._app;
     if (app && app.cam && !this.shotAt(t) && !this.shotAt(t - 1 / 30)) {

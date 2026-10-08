@@ -214,6 +214,8 @@ class NeQuartz {
 // [time, the mat's new depth (m), who]: it only goes deeper when someone heavier than every jumper before lands (a lighter
 // kid changes nothing); the last, heaviest landing takes the mat down flat on the paving
 const NE_PIT = [[42.7, 0.45, 12], [44.2, 0.56, 13], [45.5, 0.56, 15], [46.55, 0.66, 2], [51.2, 0.72, 6], [52.6, 0.92, 9]];
+// the last landings, seen in the dusk wide: the direction (from the middle) of the side the jumper comes from
+const NE_PIT_SEEN = [[0.2, -0.98], [0.98, 0.2]];
 function neTrampLapse(t) { let d = 0; for (const [ts, dd] of NE_PIT) { if (t < ts) break; d += (dd - d) * Ease.outCubic(MathX.clamp((t - ts) / 0.12, 0, 1)); } return d; }
 // the trees: every gust bends them a little further and they stay bent (the running maximum of the gusts so far)
 // the gusts [time, the lean they leave (0..1)]: each one only adds when it is stronger than every gust before it; the two
@@ -301,7 +303,20 @@ function neLapseVisits() {
   // the trampoline jumpers come first (they set the mat's new depths), then everyone else fills the gaps
   const busy = Array.from({ length: ppl }, () => []);
   const free = (i, a, b) => busy[i].every(([c, d]) => b <= c - 0.15 || a >= d + 0.15);
-  NE_PIT.forEach(([ts, , i]) => { const v = { who: i, t0: ts - 0.12, t1: ts + 0.75, kind: 'pit', x: T.x + r.range(-0.25, 0.25), z: T.z + r.range(-0.25, 0.25), face: r.range(-180, 180), act: 'neKidLand' }; out.push(v); busy[i].push([v.t0, v.t1]); });
+  NE_PIT.forEach(([ts, , i], k) => {
+    const v = { who: i, t0: ts - 0.12, t1: ts + 0.75, kind: 'pit', x: T.x + r.range(-0.25, 0.25), z: T.z + r.range(-0.25, 0.25), face: r.range(-180, 180), act: 'neKidLand' }; out.push(v); busy[i].push([v.t0, v.t1]);
+    // (the last landings fall in the slowed dusk wide, where they are seen: the jumper walks up, climbs onto the frame,
+    // crouches and jumps into the middle, from the far side as the camera sees it)
+    const dir = NE_PIT_SEEN[k - (NE_PIT.length - NE_PIT_SEEN.length)];
+    if (!dir) return;
+    const at = (d) => [T.x + dir[0] * d, T.z + dir[1] * d], [rx, rz] = at(T.R), [ox, oz] = at(T.R + 1.6), [fx, fz] = at(T.R + 0.3), face = neFaceTo(rx, rz, v.x, v.z);
+    Object.assign(v, { t0: ts, face, raw: true });
+    out.push({ who: i, t0: ts - 1.35, t1: ts - 1.0, kind: 'walk', x: ox, z: oz, x1: fx, z1: fz, act: 'walk' },
+      { who: i, t0: ts - 1.0, t1: ts - 0.65, kind: 'rim', x: fx, z: fz, x1: rx, z1: rz, face, act: 'neKidReady', raw: true, climb: true },
+      { who: i, t0: ts - 0.65, t1: ts - 0.4, kind: 'rim', x: rx, z: rz, face, act: 'neKidPrep', raw: true },
+      { who: i, t0: ts - 0.4, t1: ts, kind: 'jump', x: rx, z: rz, x1: v.x, z1: v.z, face, act: 'neKidAir', raw: true });
+    busy[i].push([ts - 1.35, ts]);
+  });
   for (let i = 0; i < ppl; i++) {
     let t = L0 + r.range(0, 1.6);
     while (t < L1) {
@@ -333,7 +348,7 @@ function neLapseSpecs(V) {
   for (let i = 0; i < V.n; i++) {
     const vs = V.list.filter((v) => v.who === i).sort((a, b) => a.t0 - b.t0), path = [], states = [[0, 'idle']];
     const alias = { idle: 'neLIdle', look: 'neLLook', handHead: 'neLHand', sit: 'neLSit', sitGround: 'neLSitG', walk: 'neLWalk', neKidLand: 'neLLand' };
-    for (const v of vs) { path.push([v.t0, v.x, v.z], [v.t1 - 0.001, v.x1 === undefined ? v.x : v.x1, v.z1 === undefined ? v.z : v.z1]); states.push([v.t0, alias[v.act] || v.act]); }
+    for (const v of vs) { path.push([v.t0, v.x, v.z], [v.t1 - 0.001, v.x1 === undefined ? v.x : v.x1, v.z1 === undefined ? v.z : v.z1]); states.push([v.t0, v.raw ? v.act : alias[v.act] || v.act]); }
     if (!path.length) continue;
     const at = (t) => { for (const v of vs) if (t >= v.t0 && t < v.t1) return v; return null; };
     const kid = V.looks[i] === 'neKid';
@@ -341,7 +356,13 @@ function neLapseSpecs(V) {
       show: (t) => !!at(t),
       faceAt: (t) => { const v = at(t); return v && v.face !== undefined ? v.face : undefined; },
       seatAt: (t) => { const v = at(t); return v && v.seat !== undefined ? v.seat : undefined; },
-      y: (t, p, app) => { const v = at(t); return v && v.kind === 'pit' ? app.tramp.surfaceY(p.x - NE_TRAMP.x, p.z - NE_TRAMP.z, t) : 0.15; } });
+      y: (t, p, app) => { const v = at(t), T = NE_TRAMP;
+        if (!v) return 0.15;
+        if (v.kind === 'pit') return app.tramp.surfaceY(p.x - T.x, p.z - T.z, t);
+        // (up onto the frame's pad; then the arc down into the mat)
+        if (v.kind === 'rim') return v.climb ? 0.15 + 0.85 * MathX.smooth(t, v.t0, v.t0 + 0.25) : 1.0;
+        if (v.kind === 'jump') { const s = MathX.clamp((t - v.t0) / (v.t1 - v.t0), 0, 1), yl = app.tramp.surfaceY(v.x1 - T.x, v.z1 - T.z, v.t1 - 0.001); return 1.0 + (yl - 1.0) * s + 2.0 * s * (1 - s); }
+        return 0.15; } });
   }
   return specs;
 }
