@@ -83,7 +83,7 @@ const FILM = {
     this.canStream = new NstStream(app.scene, nstWaterMat({ color: '#c8dade', opacity: 0.38, fres: 0.75 }), { a: new THREE.Vector3(), v0: new THREE.Vector3(), r0: 0.006, yEnd: 0, seed: 71 });
     // the umbrella: 8 gores, dark navy, ribs; its underside soaks through in the rain (shader: wet spreading from the apex)
     const u = new THREE.Group(); app.scene.add(u);
-    const cm = new THREE.MeshStandardMaterial({ color: '#3f6f76', roughness: 0.6, side: THREE.DoubleSide, name: 'nstUmbrella' });
+    const cm = new THREE.MeshStandardMaterial({ color: '#d9b84e', roughness: 0.6, side: THREE.DoubleSide, name: 'nstUmbrella' });
     cm.userData.wet = { value: 0 };
     cm.onBeforeCompile = (sh) => {
       sh.uniforms.uWet = cm.userData.wet;
@@ -94,17 +94,22 @@ const FILM = {
           float an = atan(vLocU.z, vLocU.x);
           float seam = pow(abs(cos(an * 4.0)), 18.0);
           float n = fract(sin(dot(floor(vec2(an * 9.0, rr * 14.0)), vec2(12.9, 78.2))) * 43758.5);
-          float wet = smoothstep(rr - 0.25, rr + 0.05, uWet * 1.25 - 0.1 * n);
+          // soaked patches: blotches that grow and join (value noise over the canopy), a little ahead near the top
+          vec2 bq = vec2(an * 2.6, rr * 5.0); vec2 bi = floor(bq), bf = fract(bq); bf = bf * bf * (3.0 - 2.0 * bf);
+          float h00 = fract(sin(dot(bi, vec2(12.9, 78.2))) * 43758.5), h10 = fract(sin(dot(bi + vec2(1, 0), vec2(12.9, 78.2))) * 43758.5);
+          float h01 = fract(sin(dot(bi + vec2(0, 1), vec2(12.9, 78.2))) * 43758.5), h11 = fract(sin(dot(bi + vec2(1, 1), vec2(12.9, 78.2))) * 43758.5);
+          float blot = mix(mix(h00, h10, bf.x), mix(h01, h11, bf.x), bf.y);
+          float wet = smoothstep(0.0, 0.08, uWet * 1.35 - (0.3 * rr + 0.7 * blot));
           float streak = wet * smoothstep(0.6, 1.0, abs(sin(an * 28.0 + rr * 3.0))) * 0.5;
-          diffuseColor.rgb *= 1.0 - 0.45 * wet - 0.2 * streak;
+          diffuseColor.rgb *= 1.0 - 0.6 * wet - 0.2 * streak;
           diffuseColor.rgb += seam * 0.03;`)
         .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
           { // thin fabric glows with the daylight behind it (seen from underneath); soaked patches go dark
             float rr3 = length(vLocU.xz) / 0.52;
-            float wet3 = smoothstep(rr3 - 0.25, rr3 + 0.05, uWet * 1.25);
-            totalEmissiveRadiance += diffuseColor.rgb * (0.55 - 0.3 * wet3) * (gl_FrontFacing ? 0.0 : 1.0); }`)
+            float wet3 = wet;          // (declared in the colour chunk above, same scope)
+            totalEmissiveRadiance += diffuseColor.rgb * (0.55 - 0.35 * wet3) * (gl_FrontFacing ? 0.0 : 1.0); }`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-          { float rr2 = length(vLocU.xz) / 0.52; roughnessFactor = mix(roughnessFactor, 0.12, smoothstep(rr2 - 0.25, rr2 + 0.05, uWet * 1.25)); }`);
+          roughnessFactor = mix(roughnessFactor, 0.15, wet);`);
     };
     cm.customProgramCacheKey = () => 'nstUmb';
     const canopy = new THREE.Mesh(new THREE.ConeGeometry(0.55, 0.22, 8, 4, true), cm); canopy.position.y = 0.11; u.add(canopy);
@@ -116,7 +121,7 @@ const FILM = {
     const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.95, 8), rib); shaft.position.y = -0.255; u.add(shaft);
     const hdl = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.12, 10), new THREE.MeshStandardMaterial({ color: '#3a2a20', roughness: 0.5 })); hdl.position.y = -0.68; u.add(hdl);
     this.umb = u; this.umbMat = cm;
-    this.umbSpray = new NstSpray(app.scene, 600);
+    this.umbDrip = new StreakSystem(app.scene, 500);       // what soaks through falls off the fabric as fine torn strands
   },
 
   update(app, t) {
@@ -172,7 +177,7 @@ const FILM = {
     this.can.visible = showCan;
     if (showCan) {
       const tilt = MathX.smooth(t, T.pour - 0.2, T.pour + 0.45) * (1 - MathX.smooth(t, T.pourEnd - 0.1, T.pourEnd + 0.4));
-      const away = MathX.smooth(t, T.pourEnd + 0.05, T.wick);      // lowered out of view
+      const away = 0;
       const A = NST_G.potA;
       this.can.position.set(A.x + 0.36 + 0.12 * away, NST_G.bench.top + 0.42 - 0.06 * tilt - 0.55 * away, A.z - 0.22 - 0.25 * away);
       // local +X (the spout) points at the pot (toward −X world, slightly +Z); tilt pitches the spout down
@@ -196,7 +201,7 @@ const FILM = {
     // the umbrella: held over your head from when the clouds come; its underside soaks; spray falls through onto you
     const showU = t >= T.clouds + 0.6 && t < T.drone;
     this.umb.visible = showU;
-    this.umbSpray.begin(app.scene.fog);
+    this.umbDrip.begin();
     if (showU) {
       const c = cam.position, yaw = MathX.deg(SCRIPT_TRACKS.pov ? 0 : 0);
       const hx = Math.sin(0) * 0, fwx = -Math.sin(cam.rotation.y), fwz = -Math.cos(cam.rotation.y);
@@ -207,16 +212,23 @@ const FILM = {
       V.set(0, -0.6, 0).applyMatrix4(this.umb.matrixWorld);
       Fw.set(-1, 0, 0.2); Nw.set(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cam.rotation.y); Fw.set(-1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cam.rotation.y);
       nstAimHand('umbHold', cam, V, Fw, Nw);
-      const wet = MathX.smooth(t, T.rain + 0.3, T.umb + 2.6);
+      const wet = MathX.smooth(t, T.umb + 0.4, T.umb + 4.0);
       this.umbMat.userData.wet.value = wet;
-      // water that soaks through can't hang as drops under the fabric: it falls straight off as fine spray
-      const ux = this.umb.position.x, uy = this.umb.position.y, uz = this.umb.position.z;
-      this.umbSpray.emit(t, 420, 0.9, T.rain + 1.2, T.drone, (i, cyc, h) => {
-        const a = hash1(i * 3.1 + cyc) * 6.28, rr = Math.sqrt(hash1(i * 7.3 + cyc * 1.7)) * 0.5 * Math.min(1, wet * 1.3);
-        return { p: [ux + Math.cos(a) * rr, uy + 0.1 - rr * 0.4, uz + Math.sin(a) * rr], v: [0.1, -0.6, 0], life: 1.1, size0: 0.0025, size1: 0.009, a: 0.45 * wet, g: 5 };
-      }, 1, [0.8, 0.86, 0.9]);
+      // water that soaks through can't hang as drops under the fabric: it falls straight off as fine torn strands,
+      // slowly (spray, not drops), from the soaked patches; nothing is drawn near the lens
+      const ux = this.umb.position.x, uy = this.umb.position.y, uz = this.umb.position.z, cp = cam.position;
+      for (let i = 0; i < 380; i++) {
+        const per = 0.9 + 0.5 * hash1(i * 1.7), ph = hash1(i * 2.3) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc, tt = age * per;
+        const a = hash1(i * 3.1 + cyc) * 6.28, rr = (0.12 + 0.4 * Math.sqrt(hash1(i * 7.3 + cyc * 1.7))) * Math.min(1, wet * 1.3);
+        const k = MathX.clamp((wet * 1.25 - rr / 0.52) * 3, 0, 1); if (k <= 0) continue;
+        const vf = 1.2 + 0.8 * hash1(i * 5.1 + cyc);
+        const x = ux + Math.cos(a) * rr + 0.25 * tt, y = uy + 0.11 - rr * 0.42 - vf * tt, z = uz + Math.sin(a) * rr;
+        const d = Math.hypot(x - cp.x, y - cp.y, z - cp.z); if (d < 0.3) continue;
+        const L = 0.03 + 0.04 * hash1(i + cyc), al = 0.8 * k * Math.min(1, age * 6) * (1 - age) * MathX.smooth(d, 0.3, 0.45);
+        this.umbDrip.push(x, y, z, x + 0.004, y - L, z, 0.85, 0.88, 0.9, al, 0.0022);
+      }
     }
-    this.umbSpray.end();
+    this.umbDrip.end();
 
     app.hands.update(t);
 
@@ -252,7 +264,7 @@ const FILM = {
     // the rise: a little clearer
     p.exposure += 0.08 * MathX.smooth(t, T.drone, T.drone + 2); p.saturation += 0.08 * MathX.smooth(t, T.drone, T.drone + 2);
     // lightning (the sky does most of it; a whisper of flash in the grade)
-    p.flash = 0.18 * Math.max(MathX.impulse(t, 58.35, 0.06), MathX.impulse(t, 64.2, 0.06));
+    p.flash = 0.22 * nstFlash(t);
     p.flashColor.setRGB(0.85, 0.9, 1.0);
     // dips at the bigger jumps (out to the pond, into the time-lapse), black at the end
     p.fade = Math.max(1 - MathX.smooth(t, T.lapse, T.lapse + 0.3), 0) * (t >= T.lapse ? 1 : 0) * 0.8;

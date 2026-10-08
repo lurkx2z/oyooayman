@@ -3,7 +3,7 @@
    The sound idea: water's voice is made of DROPS — the plip of a drip,
    the patter of rain, the gurgle of a tap are drops snapping shut and
    bubbles popping, all held together by surface tension. When it goes
-   (1.75 s, a taut string goes slack) water loses its voice: the tap
+   (1.2 s, a taut string goes slack) water loses its voice: the tap
    only hisses, the sponge pours in silence, the rain arrives as one
    soft roar of mist with no patter at all. Around it: a quiet kitchen,
    a garden full of birds that thins out over the accelerated days, the
@@ -74,7 +74,7 @@ class NstAudio extends AudioEngine {
     const r = new RNG(CONFIG.seed + 11);
     for (let t = 0.3; t < t1 - 0.3; t += r.range(0.6, 1.8)) { const n = r.int(2, 4), f = r.range(2600, 4200), pan = r.range(-0.6, 0.6); for (let k = 0; k < n; k++) S.chirp(t + k * r.range(0.08, 0.13), f * r.range(0.92, 1.1), r.range(0.006, 0.012), pan, lp); }
     // a dripping tap somewhere, a drop every 0.7 s … until drops stop existing
-    for (const t of [0.15, 0.85, 1.55]) this._plip(S, t, 0.05, -0.25, bus);
+    for (const t of [T.drop - 1.05, T.drop - 0.38]) this._plip(S, t, 0.05, -0.25, bus);
     // a clock on the wall: you can hear how quiet the water has gone
     for (let t = 2.6; t < t1; t += 1.0) S.tone(t, 0.03, 2400, 0.0016, 0.5, bus, 'square', 0.006, 0.02);
   }
@@ -126,11 +126,10 @@ class NstAudio extends AudioEngine {
       this._band(S, bus, 'pink', [380, 1.2], t, t + 0.35, (u) => 0.05 * Math.sqrt(ml) * MathX.smooth(u, t, t + 0.03) * (1 - MathX.smooth(u, t + 0.05, t + 0.33)), (x + 0.6) * 4, 0.01);
     });
     this._band(S, bus, 'white', [2600, 1.0], T.drop, T.drop + 1.6, (u) => 0.045 * MathX.smooth(u, T.drop, T.drop + 0.15) * (1 - MathX.smooth(u, T.drop + 0.5, T.drop + 1.55)), 0.15, 0.02);
-    // the tap: no gurgle, no splash — a smooth hiss, like poured sand (on from the lever until you go outside)
-    const on = (t) => MathX.smooth(t, T.tapOn, T.tapOn + 0.35) * (1 - MathX.smooth(t, T.pond - 0.03, T.pond));
-    const near = (t) => (t < T.clip ? 1 : 0.4);                // off-camera after the cut, still running
-    this._band(S, bus, 'white', [4800, 0.8], T.tapOn - 0.05, T.pond + 0.05, (t) => 0.075 * on(t) * near(t) * (0.9 + 0.1 * Math.sin(t * 9.1)), 0.15, 0.03);
-    this._band(S, bus, 'pink', [600, 0.9], T.tapOn - 0.05, T.pond + 0.05, (t) => 0.045 * on(t) * near(t), 0.1, 0.05);
+    // the tap (a trickle): no plinking drips, no gurgle — a soft, smooth hiss, like poured sand; off at the cut
+    const on = (t) => MathX.smooth(t, T.tapOn, T.tapOn + 0.35) * (1 - MathX.smooth(t, T.clip - 0.03, T.clip));
+    this._band(S, bus, 'white', [4800, 0.8], T.tapOn - 0.05, T.clip + 0.05, (t) => 0.06 * on(t) * (0.9 + 0.1 * Math.sin(t * 9.1)), 0.15, 0.03);
+    this._band(S, bus, 'pink', [600, 0.9], T.tapOn - 0.05, T.clip + 0.05, (t) => 0.035 * on(t), 0.1, 0.05);
     // the sponge: lifted out, and the water just pours off it — in a hush
     this._band(S, bus, 'white', [3800, 0.9], T.spongeUp, T.pond, (t) => 0.04 * MathX.smooth(t, T.spongeUp + 0.1, T.spongeUp + 0.4) * (1 - MathX.smooth(t, T.spongeUp + 1.8, T.pond - 0.1)), 0.3, 0.03);
     // the watering can: a hiss into the soil, and run-off sheeting off the bench without a single drip
@@ -177,7 +176,7 @@ class NstAudio extends AudioEngine {
     this._band(S, water, 'white', [5200, 0.7], T.rain - 0.6, end, (t) => 0.018 * R(t) * (1 + 1.4 * MathX.smooth(t, T.umb - 0.3, T.umb + 1.5) * (1 - MathX.smooth(t, T.drone - 0.1, T.drone + 0.6))), 0.2, 0.05);
     // thunder: far before the rain, then with the lightning
     S.farBoom(T.clouds + 0.7, 0.12, -0.5, this.revBig);
-    for (const [t, v] of [[58.45, 0.22], [58.7, 0.13], [64.35, 0.19]]) { S.boom(t + 0.25, v, bus, this.revBig); S.farBoom(t + 0.1, v * 0.8, -0.3, this.revBig); }
+    for (const [t, k] of NST.flashes) { const v = 0.21 * k; S.boom(t + 0.35, v, bus, this.revBig); S.farBoom(t + 0.2, v * 0.8, -0.3, this.revBig); }
   }
 
   /* music: the slack string at the change, a soft pulse for the kitchen, a warm pad that sours as the plants wilt,
@@ -198,7 +197,7 @@ class NstAudio extends AudioEngine {
       S.thump(T.drop + 0.02, 0.22, bus);
     }
     // a soft two-note pulse under the kitchen beats (D–A, very quiet), a new note at each new consequence
-    const beats = [T.tap, T.clip, T.towel, T.sponge, T.pond, T.bench, T.wick];
+    const beats = [T.tap, T.clip, T.towel, T.sponge, T.pond, T.bench];
     for (let t = T.zero + 0.6; t < T.lapse - 0.2; t += 0.75) {
       const k = beats.filter((b) => b <= t).length, f = [146.8, 164.8, 174.6, 196, 220, 196, 174.6, 164.8][k % 8];
       S.tone(t, 0.5, f, 0.02, 0, lp, 'triangle', 0.02, 0.45);

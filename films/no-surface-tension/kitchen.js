@@ -114,7 +114,14 @@ class NstKitchen {
 
     // ---------- lower cabinets + counter (with the sink cut out)
     const C = { x0: -1.75, x1: 2.25, z0: W.z, z1: W.z + 0.62 };
-    box(C.x1 - C.x0, 0.82, 0.58, (C.x0 + C.x1) / 2, 0.47, C.z0 + 0.29, mCabDark);
+    // the carcass, open under the sink (a solid box here would cap the basin at y 0.88 and hide what's in it)
+    {
+      const sx0 = K.sink.x0 - 0.005, sx1 = K.sink.x1 + 0.005, sz0 = K.sink.z0 - 0.005, sz1 = K.sink.z1 + 0.005, yb = 0.06, yt = 0.88, yu = top - K.sink.depth - 0.01;
+      const cb = (x0, x1, y0, y1, z0, z1) => box(x1 - x0, y1 - y0, z1 - z0, (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2, mCabDark);
+      cb(C.x0, sx0, yb, yt, C.z0, C.z0 + 0.58); cb(sx1, C.x1, yb, yt, C.z0, C.z0 + 0.58);
+      cb(sx0, sx1, yb, yu, C.z0, C.z0 + 0.58);
+      cb(sx0, sx1, yu, yt, C.z0, sz0); cb(sx0, sx1, yu, yt, sz1, C.z0 + 0.58);
+    }
     box(C.x1 - C.x0, 0.08, 0.52, (C.x0 + C.x1) / 2, 0.04, C.z0 + 0.26, std('#1e2220'));   // kick plinth
     for (let x = C.x0 + 0.02; x < C.x1 - 0.1; x += 0.5) {
       box(0.47, 0.74, 0.02, x + 0.24, 0.49, C.z1 - 0.03, mCab);

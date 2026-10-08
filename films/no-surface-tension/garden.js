@@ -97,7 +97,7 @@ class NstGarden extends Environment {
     this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0035);
     this.scene.background = new THREE.Color('#c3d3dc');
     this.dayCols = { zen: new THREE.Color('#5d86b3'), hor: new THREE.Color('#c6d4da'), fog: new THREE.Color('#aab6b5') };
-    this.nightCols = { zen: new THREE.Color('#0d1424'), hor: new THREE.Color('#25304a'), fog: new THREE.Color('#1c2433') };
+    this.nightCols = { zen: new THREE.Color('#1b2944'), hor: new THREE.Color('#3d4b6a'), fog: new THREE.Color('#2c3850') };
     this.stormCols = { zen: new THREE.Color('#3b4248'), hor: new THREE.Color('#6d767a'), fog: new THREE.Color('#5f686b') };
   }
 
@@ -214,11 +214,20 @@ class NstGarden extends Environment {
     for (let i = 0; i < 70; i++) { const a = r.range(3.6, 5.6), R = rim(a) - r.range(0.0, 0.25), h = r.range(0.5, 1.1); B.add(new THREE.ConeGeometry(0.012, h, 4), Mat.std('#5c7038', { roughness: 0.8 }), Geo.matrix(P.x + Math.cos(a) * R, h / 2 - 0.05, P.z + Math.sin(a) * R, r.range(-0.15, 0.15), 0, r.range(-0.15, 0.15)), { noShadow: true }); }
     // the water surface (reflective, slightly see-through; rain makes it misty, not ringed)
     const sg = new THREE.ShapeGeometry(new THREE.Shape(Array.from({ length: 72 }, (_, i) => { const a = (i / 72) * Math.PI * 2, R = rim(a) + 0.02; return new THREE.Vector2(Math.cos(a) * R, -Math.sin(a) * R); })));
-    this.pondMat = nstWaterMat({ color: '#3d5a58', opacity: 0.62, fres: 0.35, rough: 0.06, env: 1.3 });
+    this.pondMat = nstWaterMat({ color: '#3d5a58', opacity: 0.5, fres: 0.35, rough: 0.06, env: 1.3 });
     const surf = new THREE.Mesh(sg, this.pondMat); surf.rotation.x = -Math.PI / 2; surf.position.set(P.x, P.y, P.z); surf.renderOrder = 3; surf.name = 'pondSurface'; this.root.add(surf);
     this.pondSurf = surf;
     // lily pads (a notch each), a couple of flowers
-    const padM = new THREE.MeshStandardMaterial({ color: '#3f6a2e', roughness: 0.45, name: 'nstPad', side: THREE.DoubleSide }), padM2 = new THREE.MeshStandardMaterial({ color: '#4e7a36', roughness: 0.5, name: 'nstPad2', side: THREE.DoubleSide });
+    // a vein texture so the pads read as leaves, not flat discs: radial veins, a darker rim, mottling
+    const vcv = Tex.canvas(256, 256), vc = vcv.getContext('2d');
+    vc.fillStyle = '#ffffff'; vc.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 260; i++) { vc.fillStyle = `rgba(${hash1(i) > 0.5 ? '40,60,20' : '230,240,190'},${0.05 + 0.08 * hash1(i * 3)})`; vc.beginPath(); vc.arc(hash1(i * 7) * 256, hash1(i * 11) * 256, 3 + 9 * hash1(i * 13), 0, 6.28); vc.fill(); }
+    vc.strokeStyle = 'rgba(225,240,175,0.6)'; vc.lineWidth = 2.2;
+    for (let k = 0; k < 24; k++) { const a = (k / 24) * 6.283; vc.beginPath(); vc.moveTo(128, 128); vc.quadraticCurveTo(128 + Math.cos(a + 0.12) * 62, 128 + Math.sin(a + 0.12) * 62, 128 + Math.cos(a) * 124, 128 + Math.sin(a) * 124); vc.stroke(); }
+    const gr = vc.createRadialGradient(128, 128, 60, 128, 128, 128); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(0.85, 'rgba(0,0,0,0.05)'); gr.addColorStop(1, 'rgba(60,40,0,0.45)');
+    vc.fillStyle = gr; vc.fillRect(0, 0, 256, 256);
+    const vt = Tex.tex(vcv);
+    const padM = new THREE.MeshStandardMaterial({ color: '#36612a', map: vt, roughness: 0.4, name: 'nstPad', side: THREE.DoubleSide }), padM2 = new THREE.MeshStandardMaterial({ color: '#416d30', map: vt, roughness: 0.45, name: 'nstPad2', side: THREE.DoubleSide });
     this.pads = NST_G.pads.map(([x, z, rr, ry], i) => {
       const g = new THREE.CircleGeometry(rr, 28, 0.25, Math.PI * 2 - 0.5);
       const p = g.attributes.position; for (let k = 0; k < p.count; k++) { const px = p.getX(k), py = p.getY(k); p.setZ(k, 0.004 * (px * px + py * py) / (rr * rr)); } g.computeVertexNormals();
@@ -253,6 +262,7 @@ class NstGarden extends Environment {
       return g;
     };
     this.striders = [mk(1.35), mk(1.25), mk(1.3), mk(1.2)];
+    this.ripples = [0, 1].map(() => { const m = new THREE.Mesh(new THREE.RingGeometry(0.88, 1.0, 48), new THREE.MeshBasicMaterial({ color: '#dfe9e6', transparent: true, opacity: 0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.renderOrder = 5; m.visible = false; this.root.add(m); return m; });
     this._sv = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
   }
 
@@ -275,7 +285,7 @@ class NstGarden extends Environment {
     B.box(N.x1 - N.x0, 0.03, 0.55, (N.x0 + N.x1) / 2, 0.3, (N.z0 + N.z1) / 2, wood2);
     // stacked pots and a bag on the lower shelf, a trowel on top
     for (let i = 0; i < 3; i++) B.add(new THREE.CylinderGeometry(0.09, 0.07, 0.14, 14, 1, true), Mat.std('#a95e3c', { roughness: 0.9, side: THREE.DoubleSide }), Geo.matrix(N.x0 + 0.25, 0.39 + i * 0.05, -0.45));
-    B.box(0.4, 0.22, 0.26, N.x0 + 0.9, 0.43, -0.42, Mat.std('#4f5a3a', { roughness: 0.95 }));
+    B.box(0.4, 0.22, 0.26, N.x1 - 0.25, 0.43, -0.5, Mat.std('#5b5a48', { roughness: 0.95 }));
     B.box(0.03, 0.01, 0.2, N.x1 - 0.12, N.top + 0.005, -0.25, Mat.std('#7b5a3e'), 0.4);
     // pot A (the one you water): terracotta with drainage holes, a saucer, a leafy plant
     const A = NST_G.potA, top = N.top, potM = Mat.std('#b0643f', { roughness: 0.85 });
@@ -287,8 +297,9 @@ class NstGarden extends Environment {
     const sauc = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.115, 0.03, 26, 1, true), Mat.std('#a5583a', { roughness: 0.85, side: THREE.DoubleSide })); sauc.position.set(A.x, top + 0.015, A.z); this.root.add(sauc);
     const saucB = new THREE.Mesh(new THREE.CircleGeometry(0.115, 26), Mat.std('#8d4a31', { roughness: 0.9 })); saucB.rotation.x = -Math.PI / 2; saucB.position.set(A.x, top + 0.002, A.z); this.root.add(saucB);
     // water appearing in the saucer, then spilling over the bench top and off its front edge
-    this.saucW = new THREE.Mesh(new THREE.RingGeometry(0.08, 0.124, 32), nstWaterMat({ color: '#8aa3a8', opacity: 0.5, fres: 0.5 })); this.saucW.rotation.x = -Math.PI / 2; this.saucW.position.set(A.x, top + 0.004, A.z); this.saucW.renderOrder = 3; this.root.add(this.saucW);
+    this.saucW = new THREE.Mesh(new THREE.RingGeometry(0.08, 0.124, 32), nstWaterMat({ color: '#2a3638', opacity: 0.55, fres: 0.5, env: 0.5 })); this.saucW.rotation.x = -Math.PI / 2; this.saucW.position.set(A.x, top + 0.004, A.z); this.saucW.renderOrder = 3; this.root.add(this.saucW);
     this.benchSpill = new NstPuddle(this.root, nstWaterMat({ color: '#90a8ac', opacity: 0.42, fres: 0.55 }), { na: 56, nr: 6, seed: 41 });
+    nstWetLook(this.benchSpill.mesh.material, 0.85);
     this.benchSpill.group.position.set(A.x, top + 0.0015, A.z - 0.06);
     // drainage streams out of the pot's holes into the saucer, and off the bench edge to the ground
     const dm = nstWaterMat({ color: '#c3d5d9', opacity: 0.38, fres: 0.7 });
@@ -475,28 +486,30 @@ class NstGarden extends Environment {
     const low = 1 - MathX.smooth(this.sunDir.y, 0.05, 0.35);
     hor.lerp(new THREE.Color('#e0a97c'), 0.45 * low * dl * (1 - storm));
     this.scene.background.copy(hor);
-    this.scene.fog.density = MathX.lerp(0.0032, 0.012, storm) * (1 + 0.45 * rain) * (1 - 0.45 * MathX.smooth(t, NST.drone, NST.drone + 3));   // thinner for the rise: you see the landscape
+    this.scene.fog.density = MathX.lerp(0.0032, 0.012, storm) * (1 + 0.45 * rain) * (1 - 0.72 * MathX.smooth(t, NST.drone, NST.drone + 3));   // thinner for the rise: you see the landscape
     // lightning: two flashes during the payoff
-    const fl = Math.max(MathX.impulse(t, 58.35, 0.09), 0.7 * MathX.impulse(t, 58.6, 0.06), 0.9 * MathX.impulse(t, 64.2, 0.08));
+    const fl = nstFlash(t);
     U.uFlash.value = fl;
     // sun + sky light
     const f = this.focus;
     this.sun.position.copy(this.sunDir).multiplyScalar(60).add(f); this.sun.target.position.copy(f);
     this.sun.intensity = 3.2 * MathX.smooth(this.sunDir.y, -0.02, 0.18) * (1 - 0.92 * storm) + 4 * fl;
     this.sun.color.setRGB(1, 0.93 - 0.18 * low, 0.84 - 0.3 * low);
-    this.hemi.intensity = (0.5 + 0.7 * dl) * (1 - 0.35 * storm) + 2.5 * fl;      // (moonlit nights, not black)
+    this.hemi.intensity = (0.8 + 0.45 * dl) * (1 - 0.35 * storm) + 2.5 * fl + 0.35 * MathX.smooth(t, NST.drone, NST.drone + 2);      // (moonlit nights, not black)
     this.hemi.color.copy(zen).lerp(new THREE.Color('#b9cfe0'), 0.5);
-    this.scene.environmentIntensity = (0.12 + 0.3 * dl) * (1 - 0.3 * storm);
+    this.scene.environmentIntensity = (0.18 + 0.24 * dl) * (1 - 0.3 * storm);
 
     // wilting: lawn toward straw, leaves toward olive, flowers bow, potted leaves droop
-    this.lawnMat.color.setRGB(1 + 0.12 * wilt, 1 - 0.1 * wilt, 1 - 0.38 * wilt);
-    this.m.foliage.color.setRGB(1 + 0.25 * wilt, 1 - 0.02 * wilt, 1 - 0.45 * wilt);
+    this.lawnMat.color.setRGB(1 + 1.5 * wilt, 1 + 0.35 * wilt, 1 - 0.15 * wilt);      // (linear multipliers: green → straw)
+    this.m.foliage.color.setRGB(1 + 0.85 * wilt, 1 - 0.04 * wilt, 1 - 0.6 * wilt);
     for (const fw of this.flowers) {
       const w = MathX.clamp(wilt * 1.25 - fw.lag, 0, 1);
-      fw.segs.forEach((s, k) => { s.rotation.x = (k === 0 ? 0.04 : 0.18 * k * k) * w * 2.2; s.rotation.z = fw.dir * 0.1 * w; });
-      fw.head.rotation.x = -0.4 + 1.9 * w;
+      fw.segs.forEach((s, k) => { s.rotation.x = (k === 0 ? 0.08 : 0.2 * k * k) * w * 2.2; s.rotation.z = fw.dir * 0.15 * w; });
+      fw.head.rotation.x = -0.4 + 2.2 * w;
     }
-    for (const mm of this.bedMats.slice(0, 3)) mm.color.offsetHSL(0, 0, 0);
+    if (!this._bedBase) this._bedBase = this.bedMats.map((mm) => mm.color.clone());
+    const brown = this._brown || (this._brown = new THREE.Color('#7a5c3a'));
+    this.bedMats.forEach((mm, i) => mm.color.copy(this._bedBase[i]).lerp(brown, (i < 3 ? 0.55 : 0.45) * wilt));
     this._droop(this.potPlantA, t < NST.lapse ? 0 : wilt);
     this._droop(this.potPlantB, t < NST.lapse ? 0.25 * MathX.smooth(t, NST.wick - 2, NST.wick + 3) : Math.min(1, wilt * 1.3));
     this._droop(this.bigPlant, wilt);
@@ -563,11 +576,20 @@ class NstGarden extends Environment {
       const k = Ease.inOutSine(MathX.clamp((t - T.pond - 0.3) / (T.strider - T.pond - 0.3), 0, 1));
       place(s0, MathX.lerp(px + 0.05, px, k), ys + 0.006, MathX.lerp(pz + 0.02, pz, k), Math.PI / 2 - 0.3, stand(-0.004, 2));
     } else {
-      const fall = Math.min(1, u / 0.35), sink = Math.max(0, u - 0.35);
-      const y = ys + 0.006 - 0.012 * Ease.inQuad(fall) - 0.012 * (1 - Math.exp(-sink * 0.6)) - 0.004 * sink;
+      // nothing holds its feet up: it goes through slowly enough to see, then hangs just under the surface, kicking
+      const fall = Math.min(1, u / 0.6), sink = Math.max(0, u - 0.6);
+      const y = ys + 0.006 - 0.011 * Ease.inQuad(fall) - 0.005 * (1 - Math.exp(-sink * 0.5)) - 0.0012 * sink;
       const flail = (l, out) => { const a = l.ang + 0.6 * Math.sin(u * 14 + l.ang * 4) * Math.exp(-sink * 0.25); out.set(Math.sin(a) * l.L, 0.004 * Math.sin(u * 11 + l.ang), -Math.cos(a) * l.L * 0.9); };
       place(s0, px - 0.014 * Math.min(1, u * 2) - 0.004 * sink, y, pz + 0.004 * Math.min(1, u * 3), Math.PI / 2 - 0.3 + 0.4 * Math.sin(u * 2) * Math.min(1, sink), u < 0.08 ? stand(-0.004 - u * 0.2, 0) : flail);
     }
+    // the ripples from the break-through (gravity ripples: faint, slow)
+    this.ripples.forEach((m, k) => {
+      const ru = u - 0.15 - k * 0.35, on = ru > 0 && ru < 2.2;
+      m.visible = on; if (!on) return;
+      const R = 0.008 + 0.045 * ru; m.scale.set(R, R, 1);
+      m.position.set(px - 0.014, ys + 0.0012, pz + 0.004);
+      m.material.opacity = 0.35 * (1 - ru / 2.2) * MathX.smooth(ru, 0, 0.08) * (k ? 0.6 : 1);
+    });
     // 3: already drowned under the surface near the pads, drifting
     place(this.striders[3], pad[0] - 0.09 + 0.004 * Math.sin(t * 0.3), ys - 0.035, pad[1] + 0.05, 1.2 + 0.05 * t, (l, out) => { const a = l.ang * 1.1; out.set(Math.sin(a) * l.L, -0.003 + 0.002 * Math.sin(t * 2 + l.ang), -Math.cos(a) * l.L); });
   }
@@ -576,28 +598,30 @@ class NstGarden extends Environment {
     const S = this.streaks, M = this.mist;
     S.begin(); M.begin(this.scene.fog);
     if (rain > 0.01 && cam) {
-      const cp = cam.position, wind = 1.6;
-      // streaks in a box around the camera (falling torn ligaments): pure function of t via hashed slots
-      const N = Math.floor(2400 * rain), box = 9;
+      const cp = cam.position, H = 10;
+      // without surface tension falling water can't stay as drops: it shreds into fine spray that falls slowly
+      // (≈1.5–3 m/s, not the 9 m/s of big raindrops) and drifts on the wind. Each slot is a short torn strand.
+      const N = Math.floor(2400 * rain), box = 8;
       for (let i = 0; i < N; i++) {
-        const per = 0.55 + 0.25 * hash1(i * 1.3);
-        const ph = hash1(i * 2.7 + 1) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc;
+        const vf = 1.5 + 1.5 * hash1(i * 1.3), per = H / vf;
+        const ph = hash1(i * 2.7 + 1) * per, cyc = Math.floor((t + ph) / per), age = (t + ph) / per - cyc, tt = age * per;
         const hx = hash2(i, cyc), hz = hash2(i + 77, cyc), sz = 0.35 + hash1(i * 5 + cyc) * 0.65;
-        const x0 = cp.x + (hx - 0.5) * 2 * box, z0 = cp.z + (hz - 0.5) * 2 * box, y = cp.y + 6 - age * 12;
-        const x = x0 + wind * age, len = 0.25 + 0.4 * sz;
-        // a torn ligament: two short offset pieces instead of one round drop
-        const a = 0.13 * rain * (0.6 + 0.4 * sz);
-        S.push(x, y, z0, x + 0.05 * wind * 0.1, y - len, z0, 0.8, 0.84, 0.87, a, 0.0028 + 0.0025 * sz);
-        S.push(x + 0.03, y - len * 1.25, z0 + 0.02, x + 0.034, y - len * 1.7, z0 + 0.02, 0.78, 0.82, 0.85, a * 0.6, 0.0025);
+        const wind = 2.2 + 0.8 * Math.sin(t * 0.7 + hx * 3);
+        const x0 = cp.x + (hx - 0.5) * 2 * box - wind * per * 0.5, z0 = cp.z + (hz - 0.5) * 2 * box, y = cp.y + 5 - vf * tt;
+        const x = x0 + wind * tt + 0.15 * Math.sin(tt * 3 + i), z = z0 + 0.12 * Math.sin(tt * 2.3 + i * 1.7);
+        // a strand along the motion (wind + fall), broken in two, with a little curl
+        const L = 0.06 + 0.12 * sz, dx = wind / Math.hypot(wind, vf), dy = -vf / Math.hypot(wind, vf), a = 0.2 * rain * (0.5 + 0.5 * sz) * Math.min(1, age * 8) * Math.min(1, (1 - age) * 8);
+        S.push(x, y, z, x + dx * L, y + dy * L, z + 0.01, 0.8, 0.84, 0.87, a, 0.0022 + 0.002 * sz);
+        S.push(x + dx * L * 1.35, y + dy * L * 1.35, z + 0.015, x + dx * L * 1.9 + 0.01, y + dy * L * 1.9, z + 0.02, 0.78, 0.82, 0.85, a * 0.55, 0.0018);
       }
       // mist: the falling water shreds into fine spray that drifts with the wind: a few huge, faint sheets far off
       // (never close to the lens: up close, soft billboards read as cotton balls)
-      const NV = Math.floor(70 * rain);
+      const NV = t < NST.drone + 1.6 ? Math.floor(70 * rain) : 0;
       for (let i = 0; i < NV; i++) {
         const per = 5 + 3 * hash1(i * 3.1), ph = hash1(i * 1.9 + 4) * per, cyc = Math.floor((t + ph) / per), age = ((t + ph) / per - cyc);
         const R = 9 + 32 * hash1(i * 5.3 + cyc), an = hash2(i, cyc + 9) * 6.283;
         const x = cp.x + Math.cos(an) * R + (age - 0.5) * 10, z = cp.z + Math.sin(an) * R, y = 1.5 + 6 * hash1(i * 7.7 + cyc) - age * 2;
-        const a = 0.035 * rain * Math.sin(age * Math.PI);
+        const a = 0.035 * rain * Math.sin(age * Math.PI) * (1 - MathX.smooth(t, NST.drone, NST.drone + 1.5));   // (big sheets seen from above cut the ground in wedges)
         M.push(x, y, z, 12 + 10 * hash1(i * 9 + cyc), age * 0.3 + i, a, 1.0, 0.7, 0.74, 0.76);
       }
     }
