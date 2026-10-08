@@ -235,7 +235,7 @@ const FILM = {
     if (S > NR.plunge && S < 49.65) A = [this._proj(cam, V.copy(app.plane.g.position).add({ x: 0, y: 32, z: 0 })), `NO LIFT · <b>${(Math.round(NR_PLANE.kmh(S) / 10) * 10).toLocaleString('en-US')}</b> KM/H`];
     if (S > NR.slow[0] && S < NR.slow[1]) line = 'SLOW MOTION ×¼';
     if (S > NR.drop.rel - 0.05 && S < NR.drop.rel + 0.55) line = 'SLOW MOTION ×0.4';
-    if (S > NR.impact + 0.6 && S < NR.boom - 0.2) B = [this._proj(cam, V.set(NR.planeImp[0] - 80, 640, NR.planeImp[1])), `IMPACT · ${(NR.impactDist / 1000).toFixed(1)} KM AWAY`];
+    if (S > NR.impact + 0.6 && S < NR.boom - 0.2) B = [this._proj(cam, V.set(NR.planeImp[0] - 80, 380, NR.planeImp[1])), `IMPACT · ${(NR.impactDist / 1000).toFixed(1)} KM AWAY`];
     if (S > 59.0 && S < 60.0) { const k = this._debrisKmh || (this._debrisKmh = Math.round(app.debris.list.filter((d) => d.near).reduce((a, d) => a + d.P.kmh, 0) / app.debris.list.filter((d) => d.near).length / 10) * 10); line = `THROWN ${(NR.impactDist / 1000).toFixed(1)} KM · <b>≈ ${k} KM/H</b>`; }
     if (S > NR.board + 0.1 && S < app.board.landT + 0.4) A = [this._proj(cam, V.copy(app.board.g.position).add({ x: 0, y: 1.0, z: 0 })), S < app.board.landT ? `SIGN BOARD · NO DRAG · <b>${Math.round(app.board.speed(S) * 3.6)}</b> KM/H` : `HIT AT <b>${Math.round(app.board.speed(app.board.landT - 0.001) * 3.6)}</b> KM/H`, 'left'];
     for (const [el, T] of [[U.tagA, A], [U.tagB, B], [U.tagC, C], [U.tagD, D]]) this._tag(el, T && T[0], T && T[1], !!T, (T && T[2]) || '');

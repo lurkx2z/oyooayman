@@ -94,12 +94,12 @@ class NrImpact {
       // the flash and the fireball (burning fuel: a gas, so it is not thrown about like the debris)
       const f = Math.exp(-u / 0.08);
       if (f > 0.01) G.push(I[0], 60 + 60 * u, I[1], 420 * (0.3 + u), 0, f, 1, 1.0, 0.95, 0.85);
-      // the fireball: a dome of burning fuel that swells, then (hot gas, still buoyant) lifts, cools and darkens into smoke
+      // the fireball: a dome of burning fuel that swells, then (hot gas, still buoyant) lifts, cools and greys out into the spray
       const R = 85 * (1 - Math.exp(-u / 0.3)), lift = 25 * Math.max(0, u - 0.4) ** 1.6, fade = Math.exp(-Math.max(0, u - 0.8) / 1.6) * MathX.smooth(u, 0, 0.05), cool = MathX.smooth(u, 0.5, 2.6);
       if (fade > 0.01) for (let k = 0; k < 30; k++) {
         const th = hash1(k * 7 + 1) * 6.283, ph = hash1(k * 3 + 2) * 1.45, e = 1 - k / 30, rr = R * (0.15 + 0.85 * e);
         const x = I[0] + Math.cos(th) * Math.cos(ph) * rr, z = I[1] + Math.sin(th) * Math.cos(ph) * rr * 0.6, y = R * 0.15 + Math.sin(ph) * rr * 0.9 + lift;
-        const r = MathX.lerp(MathX.lerp(1.0, 0.7, e), 0.09, cool), g = MathX.lerp(MathX.lerp(0.5, 0.13, e), 0.075, cool), bl = MathX.lerp(MathX.lerp(0.16, 0.03, e), 0.065, cool);
+        const r = MathX.lerp(MathX.lerp(1.0, 0.7, e), 0.16, cool), g = MathX.lerp(MathX.lerp(0.5, 0.13, e), 0.17, cool), bl = MathX.lerp(MathX.lerp(0.16, 0.03, e), 0.19, cool);
         Fi.push(x, y, z, R * (0.4 + 0.35 * hash1(k * 5 + 3)), k, 0.92 * fade, 1 - 0.3 * e * hash1(k * 11 + 4), r, g, bl);
       }
       // the column: spray shot straight up, narrow and tall, slowing as it climbs, then leaning off with the wind
@@ -111,10 +111,11 @@ class NrImpact {
         const drift = nrWindDist(S) - nrWindDist(NR.impact + born), lean = MathX.clamp(h / 500, 0, 1);
         const x = I[0] + Math.cos(ang) * r + D.x * drift * 0.9 * lean, z = I[1] + Math.sin(ang) * r + D.z * drift * 0.9 * lean, y = Math.max(8, h);
         const k = MathX.clamp(a / 9, 0, 1), size = 40 + 60 * hash1(i * 19 + 7) + 110 * k;
-        // river silt, dust and smoke: dark and dirty low down, greyer on top; the sun side lighter, the far side darker (it has to read on a pale sky)
+        // dense spray from the river (water, so it rides the wind; any dust or soot in it is solid and falls straight back):
+        // shadowed blue-grey low down, lighter on top, the sun side lighter (it has to read against a pale sky)
         const side = (Math.cos(ang) * this.sun.x + Math.sin(ang) * this.sun.y) * r / (r + 25);
-        const shade = 0.07 + 0.2 * MathX.clamp(y / 900, 0, 1) + 0.04 * hash1(i * 23 + 8) + 0.12 * side, low = 1 - MathX.clamp(y / 260, 0, 1);
-        Sp.push(x, y, z, size, i * 1.7, MathX.smooth(a, 0.05, 0.6) * (1 - 0.2 * k), shade, 1.0 - 0.1 * low, 0.94 - 0.12 * low, 0.88 - 0.16 * low);
+        const shade = 0.1 + 0.26 * MathX.clamp(y / 900, 0, 1) + 0.05 * hash1(i * 23 + 8) + 0.16 * side, low = 1 - MathX.clamp(y / 260, 0, 1);
+        Sp.push(x, y, z, size, i * 1.7, MathX.smooth(a, 0.05, 0.6) * (1 - 0.2 * k), shade, 0.84 - 0.08 * low, 0.92 - 0.08 * low, 1.0 - 0.06 * low);
       }
       // the base surge rolling out along the river
       for (let i = 0; i < 90; i++) { const a = u - 0.2 * hash1(i + 400); if (a < 0) continue; const ang = (i / 90) * 6.283, r = 200 * (1 - Math.exp(-a / 1.5)) + 30;
