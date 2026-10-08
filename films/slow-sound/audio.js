@@ -201,12 +201,15 @@ class SndAudio extends AudioEngine {
       const n = S.noise('white', tr, tr + 0.08), bp = S.filter('bandpass', 1500, 0.9), gg = ctx.createGain();
       S.env(gg, tr, 0.001, 0.55 * g * 4, 0.04); n.connect(bp); bp.connect(gg); gg.connect(S.panned(src, pn)); send(gg, 0.5);
     });
+    // (a voice in this air: the pitch is the vocal folds' and stays, but the mouth and throat resonances scale with the
+    //  speed of sound, ~10× lower — the words come out as a deep, hollow, muffled call; the bubble carries the words)
+    const mouth = S.filter('lowpass', 360, 1.4), mouthG = ctx.createGain(); mouthG.gain.value = 2.6; mouth.connect(mouthG); mouthG.connect(src);
     at(F.shout, FP, 9, (tr, g, pn) => {
       const v = g * 4 * 0.5;
-      S.voice(tr, 255, 0.3, 'e', v, pn, src, 0.88);
-      S.voice(tr + 0.42, 238, 0.13, 'o', v * 0.85, pn, src, 0.95);
-      S.voice(tr + 0.56, 226, 0.12, 'e', v * 0.8, pn, src, 0.92);
-      S.voice(tr + 0.71, 262, 0.42, 'i', v * 0.95, pn, src, 0.8);
+      S.voice(tr, 255, 0.3, 'e', v, pn, mouth, 0.88);
+      S.voice(tr + 0.42, 238, 0.13, 'o', v * 0.85, pn, mouth, 0.95);
+      S.voice(tr + 0.56, 226, 0.12, 'e', v * 0.8, pn, mouth, 0.92);
+      S.voice(tr + 0.71, 262, 0.42, 'i', v * 0.95, pn, mouth, 0.8);
     });
 
     // 5. the pile driver (100 m): bang + ringing steel, ~2.9 s after each blow; the last three after it has stopped
@@ -237,11 +240,11 @@ class SndAudio extends AudioEngine {
     const sportFirst = (SoundArrival.delayCurve(sndSport, sndEar, c, 26, B.sport, 1 / 60, 0).find((q) => q.delay !== null) || { t: B.sport - 2.7 }).t;
     const sportLevel = (q, g) => (q.t < B.sport ? Math.max(g, 0.03 + 0.34 * Math.pow(MathX.smooth(q.t, sportFirst, B.sport), 2)) : g);
     moving(sndSport, 0.0, 44.0, 26.0, 46.0, (d) => engine(d, 0, 44, 62, 420, 0.8, 0.5), 0.55, 10, src, { rev: 0.12, lp: 6500, level: sportLevel });
-    nwave(B.sport, 0.15, 0.8, fx, 5000, 0.4, -0.55);          // (an N-wave lasts at least the car's length ÷ the speed of sound)
+    nwave(B.sport, 0.15, 0.8, fx, 5000, 0.4, -0.55);          // (near the source an N-wave lasts ≈ its length ÷ its own speed: 4.5 m ÷ 35 m/s)
     S.thump(B.sport + 0.01, 0.35, fx);
     rattle(B.sport + 0.05, 0.9, 0.06, 0.5, fx);
 
-    // 9. the drone: propeller tips at Mach 2.6 → a tearing buzz-saw crackle; then it falls (8.5 m away: 0.25 s late)
+    // 9. the drone: propeller tips at Mach 2.6 → a tearing buzz-saw crackle; then it falls (9.5 m away: 0.28 s late)
     {
       const D = T.drone, dp = (t) => { const q = sndDrone(t); return { x: q.x, y: q.y + LAYOUT.curbH, z: q.z }; };
       moving(dp, D.up, D.down + 0.1, D.up - 0.5, D.down + 2, (d) => {
@@ -258,7 +261,7 @@ class SndAudio extends AudioEngine {
     }
 
     // 10. the airliner (Mach 2.1): nothing at all until its shock arrives, then a huge double boom and the city's reply
-    nwave(B.plane, 0.9, 0.55, fx, 1500, 0.8, 0.0);             // (a 70 m airliner: a long boom … boom, ~0.9 s apart)
+    nwave(B.plane, 1.0, 0.55, fx, 1500, 0.8, 0.0);             // (a 70 m airliner at 72 m/s: a long boom … boom, ~1 s apart)
     S.boom(B.plane + 0.02, 0.4, fx, rev);
     rumble(B.plane + 0.05, 4.5, 0.24, 130, fx);
     rattle(B.plane + 0.03, 2.2, 0.1, 0, fx);
@@ -268,6 +271,11 @@ class SndAudio extends AudioEngine {
       const w = S.noise('pink', 30, 60), bp = S.filter('bandpass', 1400, 1.2), wg = ctx.createGain(); wg.gain.value = 0.25; w.connect(bp); bp.connect(wg); wg.connect(d);
       for (let t = 40; t < 60; t += 0.9 + rng.range(0, 1.3)) S.backfire(t, 0.5, d, false);
     }, 0.75, 120, src, { rev: 0.4, lp: 3000, gainFn: (te, t) => 1 - 0.7 * MathX.smooth(t, B.plane + 1.2, B.police - 1.5) });   // (it recedes under the police beat)
+    // ... and, as with the police car, what it made on its way in arrives after the boom too, in reverse (fainter)
+    movingEarly(sndPlane, 30.0, B.plane, END - 0.5, (d) => {
+      const n = S.noise('brown', 30, 50), lp = S.filter('lowpass', 700, 0.6), g = ctx.createGain(); g.gain.value = 1.2; n.connect(lp); lp.connect(g); g.connect(d);
+      const w = S.noise('pink', 30, 50), bp = S.filter('bandpass', 1400, 1.2), wg = ctx.createGain(); wg.gain.value = 0.25; w.connect(bp); bp.connect(wg); wg.connect(d);
+    }, 0.35, 120, src, { rev: 0.4, gainFn: (te, t) => 1 - 0.7 * MathX.smooth(t, B.plane + 1.2, B.police - 1.5) });
     // car alarms in the lot (each starts when the shock reaches that car, heard when its sound reaches you)
     if (app && app.cast) {
       const al = app.cast.parked.filter((k) => k.alarm).sort((a, b) => Math.hypot(a.x - 9.4, a.z - 1) - Math.hypot(b.x - 9.4, b.z - 1)).slice(0, 3);
