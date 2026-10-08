@@ -97,3 +97,21 @@ An independent reviewer audited the first encoded final (scores as given): reten
 Headless Chromium with software rendering (SwiftShader, 4 cores), not GPU numbers: boot 5 s; per frame 209–387 draw
 calls and 57k–80k triangles (sampled at film 1, 12.6, 19.5, 27, 41.7, 44, 50, 58 s). Final render: 1,810 frames at
 1080×1920 in about 77 min with 4 workers. Real-time playback fps on a GPU was not measured.
+
+## FINAL OUTPUT
+- Final MP4 (1080×1920, 30 fps, 1,810 frames, H.264 + AAC 160 kbps, 60.3 s, 26.9 MiB, one file):
+  `/mnt/project-files/gravity-2x/gravity-2x_v3.mp4` (project files; not committed). Audio −16.6 LUFS, −2.2 dBTP,
+  LRA 6.0. Decodes with no errors; the fall back into the water is in sync (sound 52.26, picture 52.27–52.30).
+- Runnable ZIP (tested from a fresh unzip, boots with sound): `/mnt/project-files/gravity-2x/gravity-2x_v3_film.zip`.
+- Before/after sheet (v2 street vs v3): `/mnt/project-files/gravity-2x/gravity-2x_before_after.jpg`.
+- v2 is still at `/mnt/project-files/gravity-2x/gravity-2x.mp4` and in git at `99692f2`.
+
+## CREATIVE ASSESSMENT
+v3 is a different film from v2 and from the sibling episodes: indoors, human-scale, no vehicles, no aircraft, no
+collapse. The weight is felt through your own body (the scale under your hands, the dead hang, the stair, your arms
+failing at the pool edge), which is what the brief asked for. The strongest idea is the turn in the pool: doubled
+gravity changes nothing in the water, until you try to leave it; the ladder man and your own failed press-out make
+that concrete, and "Even the water." closes it. The dive with its 1 G ghost is the spectacle. Weakest: the calm middle
+(26.6–40.7) and the floating shot, the trims that read as jumps, and HUD sub-lines too small for a phone. On the
+independent audit it scored 7 / 6.5 / 7 / 8 / 7 (retention, visual, viewer, physics, differentiation), up from
+5 / 5 / 6 / 8 / 6 on the first v3 preview; the fixed final was not re-scored.
