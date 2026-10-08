@@ -4,10 +4,11 @@
      NstPuddle           a sessile drop that can slump into a spreading thin film (polar mesh, volume kept)
      NstStream           a falling stream: smooth glassy column (normal) → ragged, fraying, breaking up (no surface tension)
      NstSpray            soft spray / mist particles (instanced billboards, hashed lifetimes)
+     nstWetLook(m, k)    bead → wet film look (darker, glossy)
      nstSpreadR(V, dt)   gravity–viscous spreading radius of a film (Huppert: R ∝ (g V³ t / ν)^(1/8))
    ===================================================================== */
 
-function nstWaterMat({ color = '#a9c3cc', opacity = 0.32, fres = 0.6, rough = 0.04, env = 1.6, side = THREE.FrontSide, name = 'nstWater', depthWrite = false } = {}) {
+function nstWaterMat({ color = '#a9c3cc', opacity = 0.32, fres = 0.6, rough = 0.03, env = 1.4, side = THREE.FrontSide, name = 'nstWater', depthWrite = false } = {}) {
   const m = new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: 0.0, transparent: true, opacity, depthWrite, side, name, envMapIntensity: env });
   m.userData.fres = { value: fres };
   m.onBeforeCompile = (sh) => {
@@ -17,11 +18,24 @@ function nstWaterMat({ color = '#a9c3cc', opacity = 0.32, fres = 0.6, rough = 0.
       .replace('#include <opaque_fragment>', `#include <opaque_fragment>
         {
           float fr = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 3.0);
-          gl_FragColor.a = clamp(diffuseColor.a + uFres * fr, 0.0, 1.0);
+          // the rim mirrors the bright room; specular highlights stay bright instead of being thinned by the low alpha
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.78, 0.84, 0.87), clamp(uFres * fr, 0.0, 1.0) * 0.6);
+          float lum = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
+          gl_FragColor.a = clamp(diffuseColor.a + uFres * fr + 0.85 * smoothstep(0.9, 2.6, lum), 0.0, 1.0);
         }`);
   };
   m.customProgramCacheKey = () => 'nstWater';
   return m;
+}
+
+// a bead (glossy see-through lens) → a thin wet film (reads as a darker, glossy wet patch on the surface), k 0..1
+const NST_WET = { color: new THREE.Color('#141b1f'), opacity: 0.42, fres: 0.7 };
+function nstWetLook(m, k) {
+  const u = m.userData;
+  if (!u.base) u.base = { color: m.color.clone(), opacity: m.opacity, fres: u.fres.value };
+  m.color.copy(u.base.color).lerp(NST_WET.color, k);
+  m.opacity = MathX.lerp(u.base.opacity, NST_WET.opacity, k);
+  u.fres.value = MathX.lerp(u.base.fres, NST_WET.fres, k);
 }
 
 // radius (m) of a thin film of volume V (m³) spreading under gravity against viscosity, dt seconds after it was let go

@@ -117,7 +117,7 @@ class NstGarden extends Environment {
     const B = this.batch, r = this.rng.fork(21);
     // the lawn (its colour drains toward straw as it wilts: driven per frame)
     const cv = Tex.canvas(512, 512), c = cv.getContext('2d');
-    c.fillStyle = '#6f8a48'; c.fillRect(0, 0, 512, 512);
+    c.fillStyle = '#6c8050'; c.fillRect(0, 0, 512, 512);
     for (let i = 0; i < 26000; i++) { const v = r.range(-1, 1); c.fillStyle = `rgba(${v > 0 ? '150,170,90' : '40,60,25'},${Math.abs(v) * 0.22})`; c.fillRect(r.range(0, 512), r.range(0, 512), 1.2, r.range(2, 5)); }
     for (let i = 0; i < 60; i++) { c.fillStyle = `rgba(60,80,35,${r.range(0.05, 0.14)})`; c.beginPath(); c.arc(r.range(0, 512), r.range(0, 512), r.range(10, 40), 0, 6.28); c.fill(); }
     const lt = Tex.tex(cv); lt.repeat.set(9, 9);
@@ -204,7 +204,7 @@ class NstGarden extends Environment {
     if (bg.attributes.normal.getY(NR) < 0) { const ix = bg.index.array; for (let i = 0; i < ix.length; i += 3) { const t = ix[i + 1]; ix[i + 1] = ix[i + 2]; ix[i + 2] = t; } bg.computeVertexNormals(); }
     const bowl = new THREE.Mesh(bg, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, name: 'nstPondBed', side: THREE.DoubleSide })); bowl.receiveShadow = true; this.root.add(bowl);
     // pebbles on the bed
-    for (let i = 0; i < 40; i++) { const a = r.range(0, 6.28), rr = r.range(0.2, 1.3); B.add(new THREE.DodecahedronGeometry(r.range(0.03, 0.08), 0), Mat.std('#4a4a40', { roughness: 1 }), Geo.matrix(P.x + Math.cos(a) * rr, -P.depth * 0.9 * Math.sin((1 - rr / 1.6) * Math.PI / 2), P.z + Math.sin(a) * rr, r.next(), r.next(), 0, 1, 0.5, 1), { noShadow: true }); }
+    for (let i = 0; i < 40; i++) { const a = r.range(0, 6.28), rr = r.range(0.2, 1.3); B.add(new THREE.DodecahedronGeometry(r.range(0.025, 0.055), 0), Mat.std('#33372a', { roughness: 1 }), Geo.matrix(P.x + Math.cos(a) * rr, -P.depth * 0.9 * Math.sin((1 - rr / 1.6) * Math.PI / 2), P.z + Math.sin(a) * rr, r.next(), r.next(), 0, 1, 0.5, 1), { noShadow: true }); }
     // rim stones
     for (let i = 0; i < 46; i++) {
       const a = (i / 46) * Math.PI * 2 + r.range(-0.04, 0.04), R = rim(a) + r.range(0.0, 0.12), s = r.range(0.11, 0.2);
@@ -300,19 +300,19 @@ class NstGarden extends Environment {
     const Bp = NST_G.potB;
     const jar = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.13, 28, 1, true), new THREE.MeshStandardMaterial({ color: '#dfeef0', roughness: 0.05, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide, name: 'nstJarGlass' }));
     jar.position.set(Bp.x, top + 0.065, Bp.z); jar.renderOrder = 4; this.root.add(jar);
-    const jw = new THREE.Mesh(new THREE.CylinderGeometry(0.071, 0.071, 0.085, 28), nstWaterMat({ color: '#93b4bc', opacity: 0.4, fres: 0.4 })); jw.position.set(Bp.x, top + 0.0435, Bp.z); jw.renderOrder = 3; this.root.add(jw);
+    const jw = new THREE.Mesh(new THREE.CylinderGeometry(0.071, 0.071, 0.085, 28), nstWaterMat({ color: '#6f8f98', opacity: 0.2, fres: 0.35 })); jw.position.set(Bp.x, top + 0.0435, Bp.z); jw.renderOrder = 3; this.root.add(jw);
     const pb = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.06, 0.14, 24), Mat.std('#2f3a33', { roughness: 0.55 })); pb.position.set(Bp.x, top + 0.13 + 0.07, Bp.z); pb.castShadow = true; this.root.add(pb);
     this.soilBMat = new THREE.MeshStandardMaterial({ color: '#8a7460', roughness: 1, name: 'nstSoilB' });
     const soilB = new THREE.Mesh(new THREE.CircleGeometry(0.08, 22), this.soilBMat); soilB.rotation.x = -Math.PI / 2; soilB.position.set(Bp.x, top + 0.265, Bp.z); this.root.add(soilB);
     // the wick: wet (dark) below the water line, dry (pale) above it — it doesn't climb
     const wick = new THREE.CatmullRomCurve3([new THREE.Vector3(Bp.x + 0.01, top + 0.012, Bp.z), new THREE.Vector3(Bp.x - 0.012, top + 0.06, Bp.z + 0.01), new THREE.Vector3(Bp.x + 0.006, top + 0.105, Bp.z - 0.004), new THREE.Vector3(Bp.x, top + 0.14, Bp.z)]);
     const wcv = Tex.canvas(16, 128), wc = wcv.getContext('2d');
-    wc.fillStyle = '#e8e0cc'; wc.fillRect(0, 0, 16, 128);
-    wc.fillStyle = '#7d7462'; wc.fillRect(0, 0, 16, 67);                // tube v runs along the curve: the lower part (in the water) is wet
+    wc.fillStyle = '#f4efe2'; wc.fillRect(0, 0, 16, 128);
+    wc.fillStyle = '#3a3024'; wc.fillRect(0, 0, 16, 67);                // tube v runs along the curve: the lower part (in the water) is wet
     for (let y = 0; y < 128; y += 4) { wc.fillStyle = 'rgba(0,0,0,0.12)'; wc.fillRect(0, y, 16, 1); }
     const wt = Tex.tex(wcv); wt.wrapS = wt.wrapT = THREE.ClampToEdgeWrapping;
     const wickM = new THREE.MeshStandardMaterial({ map: wt, roughness: 0.95, name: 'nstWick' });
-    const wm = new THREE.Mesh(new THREE.TubeGeometry(wick, 24, 0.006, 8), wickM);
+    const wm = new THREE.Mesh(new THREE.TubeGeometry(wick, 24, 0.009, 10), wickM);
     // TubeGeometry's u runs along the curve, v around it: rotate the texture so the wet band follows the length
     wt.center.set(0.5, 0.5); wt.rotation = Math.PI / 2;
     wm.castShadow = true; this.root.add(wm);

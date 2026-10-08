@@ -27,8 +27,11 @@
     #hud .story-title.big.center .hero { font-size: calc(var(--u) * 92); white-space: nowrap; }
     /* world tags pinned to points (the towel's "would climb to here" line, the wick) */
     #hud .nst-tag { position: absolute; transform: translate(0, -50%); opacity: 0; pointer-events: none; white-space: nowrap; }
-    #hud .nst-tag span { display: inline-block; margin-left: calc(var(--u) * 18); font-family: var(--hud-font); font-size: calc(var(--u) * 25); font-weight: 600; letter-spacing: 0.12em; color: #ffd7a8;
+    #hud .nst-tag span { display: inline-block; margin-left: calc(var(--u) * 18); font-family: var(--hud-font); font-size: calc(var(--u) * 25); font-weight: 600; letter-spacing: 0.12em; line-height: 1.25; color: #ffd7a8;
       padding: calc(var(--u) * 7) calc(var(--u) * 14); border-radius: calc(var(--u) * 8); background: rgba(4, 6, 10, 0.55); }
+    #hud .nst-tag.left { transform: translate(-100%, -50%); text-align: right; }
+    #hud .nst-tag.left span { margin-left: 0; margin-right: calc(var(--u) * 18); line-height: 1.25; }
+    #hud .nst-tag.left.line::before { right: auto; left: 100%; margin-right: 0; margin-left: calc(var(--u) * -18); width: calc(var(--u) * 120); }
     #hud .nst-tag.line::before { content: ''; position: absolute; right: 100%; top: 50%; width: calc(var(--u) * 150); border-top: calc(var(--u) * 3) dashed rgba(255, 215, 168, 0.9); margin-right: calc(var(--u) * -18); }
   </style>
 </head>

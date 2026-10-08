@@ -7,10 +7,10 @@
 
 const NST_K = {
   top: 0.92,
-  glass: { x: -0.6, z: 0.47, r: 0.036, rb: 0.031, h: 0.112, wall: 0.0028 },
-  beads: [[-0.53, 0.63, 0.55], [-0.665, 0.655, 0.32], [-0.47, 0.72, 0.2], [-0.72, 0.58, 0.16], [-0.59, 0.745, 0.12]],   // x, z, ml
+  glass: { x: -0.56, z: 0.52, r: 0.036, rb: 0.031, h: 0.112, wall: 0.0028 },
+  beads: [[-0.6, 0.66, 0.7], [-0.545, 0.69, 0.4], [-0.65, 0.705, 0.25], [-0.585, 0.738, 0.2], [-0.635, 0.622, 0.12]],   // x, z, ml
   leafBeads: [[0.0, 0.006, 0.08], [-0.012, -0.012, 0.05], [0.014, -0.01, 0.04]],   // offsets on the hero leaf, ml
-  bowl: { x: -0.2, z: 0.61, r: 0.105, h: 0.072, water: 0.054 },
+  bowl: { x: -0.2, z: 0.61, r: 0.072, h: 0.098, water: 0.074 },      // a clear glass dish: you see the clip sink from the side
   sink: { x0: 0.0, x1: 0.62, z0: 0.33, z1: 0.75, depth: 0.2 },
   tap: { x: 0.31, z: 0.27, spout: [0.31, 1.205, 0.5], lever: [0.37, 1.02, 0.27] },
   roll: { x: -1.38, z: 0.4 },
@@ -34,8 +34,8 @@ function nstClipCurve() {
 }
 
 class NstKitchen {
-  constructor(scene) {
-    this.scene = scene;
+  constructor(scene, renderer) {
+    this.scene = scene; this.renderer = renderer;
     this.root = new THREE.Group(); this.root.name = 'kitchen'; scene.add(this.root);
     this.r = new RNG(CONFIG.seed + 5);
     this.v = new THREE.Vector3(); this.v2 = new THREE.Vector3();
@@ -50,10 +50,11 @@ class NstKitchen {
 
     // ---------- materials (own materials; Look.apply is not run on the kitchen: no street grime on a counter)
     const stone = Tex.canvas(512, 512), sc = stone.getContext('2d');
-    sc.fillStyle = '#2a2c2e'; sc.fillRect(0, 0, 512, 512);
-    for (let i = 0; i < 9000; i++) { const v = r.range(0, 1); sc.fillStyle = v < 0.5 ? `rgba(70,72,76,${r.range(0.15, 0.4)})` : v < 0.85 ? `rgba(20,20,22,${r.range(0.2, 0.5)})` : `rgba(150,150,145,${r.range(0.12, 0.3)})`; const s = r.range(0.6, 2.6); sc.fillRect(r.range(0, 512), r.range(0, 512), s, s); }
+    sc.fillStyle = '#2b2d2f'; sc.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 70; i++) { sc.fillStyle = `rgba(${r.chance(0.5) ? '54,56,60' : '26,26,28'},${r.range(0.04, 0.1)})`; sc.beginPath(); sc.ellipse(r.range(0, 512), r.range(0, 512), r.range(14, 50), r.range(6, 18), r.range(0, 3), 0, 6.28); sc.fill(); }
+    for (let i = 0; i < 2500; i++) { const v = r.range(0, 1); sc.fillStyle = v < 0.6 ? `rgba(62,64,68,${r.range(0.1, 0.3)})` : v < 0.9 ? `rgba(18,18,20,${r.range(0.15, 0.35)})` : `rgba(120,120,116,${r.range(0.06, 0.16)})`; const s = r.range(0.6, 1.8); sc.fillRect(r.range(0, 512), r.range(0, 512), s, s); }
     const stoneT = Tex.tex(stone); stoneT.repeat.set(4, 1.2);
-    this.mStone = std('#ffffff', { map: stoneT, roughness: 0.42, envMapIntensity: 0.55, name: 'nstCounter' });
+    this.mStone = std('#ffffff', { map: stoneT, roughness: 0.5, envMapIntensity: 0.28, name: 'nstCounter' });
     const tile = Tex.canvas(256, 256), tc = tile.getContext('2d');
     tc.fillStyle = '#a9a69c'; tc.fillRect(0, 0, 256, 256);
     for (let row = 0; row < 8; row++) for (let col = -1; col < 4; col++) {
@@ -69,14 +70,14 @@ class NstKitchen {
     const mWall = std('#ffffff', { map: wallT, roughness: 0.92 });
     const mCab = std('#5d6b62', { roughness: 0.55 });            // muted sage cabinet doors
     const mCabDark = std('#3f4943', { roughness: 0.6 });
-    const mSteel = std('#b4b8bb', { roughness: 0.28, metalness: 0.9, envMapIntensity: 1.0 });
-    const mSteelDark = std('#6f7478', { roughness: 0.35, metalness: 0.85 });
+    const mSteel = std('#c4c8cb', { roughness: 0.22, metalness: 0.75, envMapIntensity: 3.2 });
+    const mSteelDark = std('#8a8f93', { roughness: 0.3, metalness: 0.7, envMapIntensity: 2.5 });
     const mWood = std('#7b5a3e', { roughness: 0.6 });
     const fl = Tex.canvas(512, 512), f = fl.getContext('2d');
     for (let i = 0; i < 8; i++) for (let k = 0; k < 3; k++) { const v = r.range(-10, 10), off = (i % 2) * 170; f.fillStyle = `rgb(${132 + v},${104 + v * 0.8},${78 + v * 0.6})`; f.fillRect(k * 256 - off, i * 64, 254, 62); }
     const floorT = Tex.tex(fl); floorT.repeat.set(4, 4);
     const mFloor = std('#ffffff', { map: floorT, roughness: 0.6 });
-    this.mGlass = new THREE.MeshStandardMaterial({ color: '#dfeef0', roughness: 0.04, metalness: 0, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide, envMapIntensity: 1.4, name: 'nstGlass' });
+    this.mGlass = nstWaterMat({ color: '#d6e6ea', opacity: 0.04, fres: 0.55, rough: 0.03, env: 0.7, side: THREE.DoubleSide, name: 'nstGlass' });
 
     // ---------- room shell: floor, ceiling, walls (the back wall has the window and the garden door)
     add(new THREE.PlaneGeometry(5.4, 4.2), mFloor, -0.4, 0, 2.1, -Math.PI / 2, 0, 0, false);
@@ -130,7 +131,7 @@ class NstKitchen {
     box(0.01, sd, sl, S.x0, top - sd / 2, cz, mSteel); box(0.01, sd, sl, S.x1, top - sd / 2, cz, mSteel);
     add(new THREE.CylinderGeometry(0.03, 0.03, 0.006, 16), std('#2a2d30', { roughness: 0.4, metalness: 0.7 }), cx, top - sd + 0.008, cz, 0, 0, 0, false);
     // the water in the basin (rises while the tap runs)
-    this.basinW = add(new THREE.PlaneGeometry(sw - 0.012, sl - 0.012), nstWaterMat({ color: '#8fa9b0', opacity: 0.42, fres: 0.5 }), cx, top - sd + 0.02, cz, -Math.PI / 2, 0, 0, false);
+    this.basinW = add(new THREE.PlaneGeometry(sw - 0.012, sl - 0.012), nstWaterMat({ color: '#3a5057', opacity: 0.3, fres: 0.5 }), cx, top - sd + 0.02, cz, -Math.PI / 2, 0, 0, false);
     this.basinW.renderOrder = 3;
 
     // ---------- the tap: a gooseneck mixer with a side lever
@@ -146,8 +147,9 @@ class NstKitchen {
     const lvb = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.022, 14), mSteel); lvb.rotation.z = Math.PI / 2; this.lever.add(lvb);
 
     // the tap's stream (into the basin) + the film clinging to the underside of the spout
-    const wm = nstWaterMat({ color: '#c6dade', opacity: 0.35, fres: 0.75 });
-    this.stream = new NstStream(g, wm, { a: new THREE.Vector3(T.spout[0], T.spout[1] - 0.004, T.spout[2]), v0: new THREE.Vector3(0, -0.45, 0.02), r0: 0.0042, yEnd: top - sd + 0.02, seed: 4 });
+    const wm = nstWaterMat({ color: '#7d98a1', opacity: 0.42, fres: 0.8 });
+    this.stream = new NstStream(g, wm, { a: new THREE.Vector3(T.spout[0], T.spout[1] - 0.004, T.spout[2]), v0: new THREE.Vector3(0, -0.45, 0.02), r0: 0.0056, yEnd: top - sd + 0.02, seed: 4 });
+    this.spray = new NstSpray(this.scene, 700);      // a stream with nothing smoothing it sheds shreds and mist, not drops
     this.cling = new NstStream(g, wm, { a: new THREE.Vector3(T.x, top + 0.318, T.z + 0.17), v0: new THREE.Vector3(0, -0.05, 0.12), r0: 0.0016, yEnd: top - sd + 0.02, seed: 9 });
 
     // ---------- upper cabinets, a fridge edge, a shelf: the room around the counter
@@ -193,33 +195,58 @@ class NstKitchen {
 
     // ---------- light: soft north window light (cool), a warm room fill, sky ambience
     const key = new THREE.DirectionalLight('#e8eef2', 2.6);
-    key.position.set(0.05, 2.9, -2.1); key.target.position.set(-0.45, top, 0.62);
+    key.position.set(1.05, 2.92, -0.98); key.target.position.set(-0.55, top, 0.62);
     key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
     const kc = key.shadow.camera; kc.left = -1.6; kc.right = 1.6; kc.top = 1.6; kc.bottom = -1.6; kc.near = 0.5; kc.far = 7;
     key.shadow.bias = -0.0004; key.shadow.normalBias = 0.01; key.shadow.radius = 6;
     g.add(key, key.target); this.key = key;
-    // a reflection light behind the props: puts the bright glints on water and glass (the window, mirrored)
-    const glint = new THREE.DirectionalLight('#f4f7f8', 1.3); glint.position.set(-0.55, 1.6, -0.9); glint.target.position.set(-0.6, top, 0.7); g.add(glint, glint.target);
     const fill = new THREE.PointLight('#ffd9a8', 0.9, 6, 1.6); fill.position.set(-0.3, 2.45, 2.2); g.add(fill);
     const fill2 = new THREE.PointLight('#ffe2b8', 0.35, 2.5, 2); fill2.position.set(-1.1, 1.42, 0.5); g.add(fill2);
     const hemi = new THREE.HemisphereLight('#c9d4d8', '#5a4a3c', 0.85); g.add(hemi);
-    this.lights = [key, glint, fill, fill2, hemi];
+    this.lights = [key, fill, fill2, hemi];
+    this._roomReflections();
+  }
+
+  // indoor reflections: the garden's sky map makes counters, glass and water glow like they are outdoors.
+  // A dim room with one bright window, rendered once into a PMREM and given to every kitchen material.
+  _roomReflections() {
+    if (!this.renderer) return;
+    const es = new THREE.Scene();
+    const basic = (c, k = 1) => { const m = new THREE.MeshBasicMaterial({ color: c, side: THREE.BackSide }); m.color.multiplyScalar(k); return m; };
+    const room = new THREE.Mesh(new THREE.BoxGeometry(5, 2.8, 5), [basic('#4a4640'), basic('#4a4640'), basic('#6a655d'), basic('#2a2724'), basic('#45413b'), basic('#514c45')]);
+    room.position.y = 0.5; es.add(room);
+    const plane = (w, h, c, k, x, y, z, ry = 0) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k) })); m.position.set(x, y, z); m.rotation.y = ry; es.add(m); };
+    plane(1.4, 0.55, '#e4ecf0', 3.2, 0.3, 1.25, -2.45);        // the window: sky
+    plane(1.4, 0.4, '#8fa37c', 1.1, 0.3, 0.78, -2.45);         //             garden
+    plane(1.6, 0.22, '#fff2dc', 2.2, 0, 1.88, 0.6);            // ceiling light (faces down via rotation below)
+    es.children[es.children.length - 1].rotation.x = Math.PI / 2;
+    const pm = new THREE.PMREMGenerator(this.renderer);
+    const env = pm.fromScene(es, 0.02).texture;
+    pm.dispose();
+    this.root.traverse(o => {
+      if (!o.isMesh) return;
+      for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m && m.isMeshStandardMaterial && !m.envMap) { m.envMap = env; m.needsUpdate = true; }
+    });
+    this.envMap = env;
   }
 
   // ---------------------------------------------------------------- the brimming glass
   _glass() {
     const G = NST_K.glass, top = NST_K.top, g = this.root;
-    const prof = [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(G.rb, 0.0), new THREE.Vector2(G.rb + 0.001, 0.003), new THREE.Vector2(G.r, G.h), new THREE.Vector2(G.r - G.wall, G.h), new THREE.Vector2(G.rb - G.wall + 0.001, 0.012), new THREE.Vector2(0.0, 0.012)];
-    const gl = new THREE.Mesh(new THREE.LatheGeometry(prof, 40), this.mGlass);
-    gl.position.set(G.x, top, G.z); gl.renderOrder = 4; g.add(gl);
+    // built from simple parts (clean normals: a lathe's centre point puts a star-shaped artefact in the thick base)
+    const gl = new THREE.Group(); gl.position.set(G.x, top, G.z); g.add(gl);
+    const part = (geo, y, rx) => { const m = new THREE.Mesh(geo, this.mGlass); m.position.y = y; m.rotation.x = rx; m.renderOrder = 4; gl.add(m); };
+    part(new THREE.CylinderGeometry(G.r, G.rb, G.h - 0.002, 48, 1, true), 0.002 + (G.h - 0.002) / 2, 0);
+    part(new THREE.CylinderGeometry(G.r - G.wall, G.rb - G.wall, G.h - 0.012, 48, 1, true), 0.012 + (G.h - 0.012) / 2, 0);
+    part(new THREE.RingGeometry(G.r - G.wall, G.r, 48), G.h, -Math.PI / 2);
     this.glass = gl;
     // the water inside: up to the rim
     const wIn = G.r - G.wall - 0.0004;
-    const wm = nstWaterMat({ color: '#9ec0c8', opacity: 0.28, fres: 0.45 });
+    const wm = nstWaterMat({ color: '#4f6f78', opacity: 0.16, fres: 0.3, env: 0.6 });
     const body = new THREE.Mesh(new THREE.CylinderGeometry(wIn, G.rb - G.wall, G.h - 0.012, 40, 1, true), wm);
     body.position.set(G.x, top + 0.012 + (G.h - 0.012) / 2, G.z); body.renderOrder = 3; g.add(body);
     // the dome above the rim (held only by surface tension) → flat
-    this.dome = new NstPuddle(g, nstWaterMat({ color: '#b4d0d6', opacity: 0.3, fres: 0.8 }), { na: 48, nr: 8, seed: 2 });
+    this.dome = new NstPuddle(g, nstWaterMat({ color: '#6f8c95', opacity: 0.2, fres: 0.55, rough: 0.02, env: 1.2 }), { na: 48, nr: 8, seed: 2 });
     this.dome.group.position.set(G.x, top + G.h - 0.0006, G.z);
     // the overflow: a film running down the outside of the glass (shader-masked, with a few faster rivulets)
     const fm = nstWaterMat({ color: '#b9d3d9', opacity: 0.3, fres: 0.85, side: THREE.DoubleSide });
@@ -241,14 +268,14 @@ class NstKitchen {
     this.overflow.position.set(G.x, top + G.h / 2, G.z); this.overflow.renderOrder = 5; g.add(this.overflow);
     this.overflowMat = fm;
     // the spill spreading out around the foot of the glass
-    this.spill = new NstPuddle(g, nstWaterMat({ color: '#93aeb5', opacity: 0.4, fres: 0.55 }), { na: 64, nr: 7, seed: 5 });
+    this.spill = new NstPuddle(g, nstWaterMat({ color: '#56717a', opacity: 0.26, fres: 0.45, rough: 0.02, env: 1.2 }), { na: 64, nr: 7, seed: 5 });
     this.spill.group.position.set(G.x, top + 0.0003, G.z);
   }
 
   _beads() {
     const top = NST_K.top;
     this.beadObjs = NST_K.beads.map(([x, z, ml], i) => {
-      const p = new NstPuddle(this.root, nstWaterMat({ color: '#a4c1c9', opacity: 0.34, fres: 0.75 }), { na: 48, nr: 9, seed: 11 + i * 3 });
+      const p = new NstPuddle(this.root, nstWaterMat({ color: '#5f7c86', opacity: 0.2, fres: 0.5, rough: 0.02, env: 1.2 }), { na: 48, nr: 9, seed: 11 + i * 3 });
       p.group.position.set(x, top + 0.0002 + i * 0.00002, z);
       return { p, V: ml * 1e-6, delay: 0.03 * i + hash1(i + 4) * 0.05 };
     });
@@ -295,7 +322,7 @@ class NstKitchen {
     const wet = new THREE.Mesh(leafGeo(0.118, 0.106, 0.18), this.leafWetMat); wet.position.z = 0.0008; wet.renderOrder = 3; hero.add(wet);
     // beads on the hero leaf (near-spheres on a waxy leaf) — in leaf-local space (the leaf lies in XY, normal +Z)
     this.leafBeads = NST_K.leafBeads.map(([dx, dy, ml], i) => {
-      const p = new NstPuddle(hero, nstWaterMat({ color: '#bcd6dc', opacity: 0.32, fres: 0.85 }), { na: 32, nr: 7, seed: 31 + i });
+      const p = new NstPuddle(hero, nstWaterMat({ color: '#7d9aa2', opacity: 0.22, fres: 0.6, rough: 0.02, env: 1.2 }), { na: 32, nr: 7, seed: 31 + i });
       p.group.position.set(dx, 0.06 + dy, 0.002 + 0.06 * 0.06 * 0.06 / 0.12);
       p.group.rotation.x = Math.PI / 2;
       return { p, V: ml * 1e-6 };
@@ -303,20 +330,24 @@ class NstKitchen {
   }
 
   _bowl() {
-    const B = NST_K.bowl, top = NST_K.top, g = this.root;
-    const prof = [];
-    for (let i = 0; i <= 10; i++) { const a = i / 10; prof.push(new THREE.Vector2(0.045 + (B.r - 0.045) * Math.sin(a * Math.PI / 2), B.h * (1 - Math.cos(a * Math.PI / 2)))); }
-    for (let i = 10; i >= 0; i--) { const a = i / 10; prof.push(new THREE.Vector2(0.04 + (B.r - 0.05) * Math.sin(a * Math.PI / 2), 0.006 + (B.h - 0.004) * (1 - Math.cos(a * Math.PI / 2)))); }
-    const bowl = new THREE.Mesh(new THREE.LatheGeometry(prof, 48), this.std('#e7e3dc', { roughness: 0.32, side: THREE.DoubleSide, envMapIntensity: 0.7 }));
-    bowl.position.set(B.x, top, B.z); bowl.castShadow = true; bowl.receiveShadow = true; g.add(bowl);
-    // inside glaze: a deep blue-grey so the water and the sinking clip read
-    const inner = new THREE.Mesh(new THREE.CircleGeometry(0.045, 32), this.std('#4d6470', { roughness: 0.3 }));
-    inner.rotation.x = -Math.PI / 2; inner.position.set(B.x, top + 0.0065, B.z); g.add(inner);
+    const B = NST_K.bowl, top = NST_K.top, g = this.root, base = 0.007;
+    // a straight-sided clear glass dish with a thick base
+    const dg = new THREE.Group(); dg.position.set(B.x, top, B.z); g.add(dg);
+    const part = (geo, y, rx) => { const m = new THREE.Mesh(geo, this.mGlass); m.position.y = y; m.rotation.x = rx; m.renderOrder = 4; dg.add(m); return m; };
+    part(new THREE.CylinderGeometry(B.r, B.r - 0.002, B.h, 56, 1, true), B.h / 2, 0);
+    part(new THREE.CylinderGeometry(B.r - 0.003, B.r - 0.005, B.h - base, 56, 1, true), base + (B.h - base) / 2, 0);
+    part(new THREE.RingGeometry(B.r - 0.003, B.r, 56), B.h, -Math.PI / 2);
+    part(new THREE.CircleGeometry(B.r - 0.002, 56), 0.0004, Math.PI / 2);
+    // the floor of the dish: a dark slate coaster under it so the water and the sinking clip read
+    const inner = new THREE.Mesh(new THREE.CircleGeometry(B.r - 0.004, 48), this.std('#2c3a42', { roughness: 0.35 }));
+    inner.rotation.x = -Math.PI / 2; inner.position.set(B.x, top + base, B.z); g.add(inner);
     this.bowlInner = inner;
-    // the water surface + a ring wave when the clip goes in
-    const wr = 0.04 + (B.r - 0.05) * Math.sin(Math.acos(1 - (B.water - 0.006) / (B.h - 0.004)));
+    // the water: its side (seen through the glass) and its surface; a ring wave when the clip goes in
+    const wr = B.r - 0.0035;
     this.bowlWaterR = wr;
-    this.bowlSurf = new THREE.Mesh(new THREE.CircleGeometry(wr, 48), nstWaterMat({ color: '#7f9ba6', opacity: 0.38, fres: 0.55 }));
+    const side = new THREE.Mesh(new THREE.CylinderGeometry(wr, wr - 0.0015, B.water - base, 56, 1, true), nstWaterMat({ color: '#4c6a74', opacity: 0.18, fres: 0.3, env: 0.6 }));
+    side.position.set(B.x, top + base + (B.water - base) / 2, B.z); side.renderOrder = 3; g.add(side);
+    this.bowlSurf = new THREE.Mesh(new THREE.CircleGeometry(wr, 56), nstWaterMat({ color: '#5d7c86', opacity: 0.26, fres: 0.55 }));
     this.bowlSurf.rotation.x = -Math.PI / 2; this.bowlSurf.position.set(B.x, top + B.water, B.z); this.bowlSurf.renderOrder = 3; g.add(this.bowlSurf);
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.98, 1.0, 48), new THREE.MeshBasicMaterial({ color: '#e8f2f4', transparent: true, opacity: 0, depthWrite: false }));
     this.ring.rotation.x = -Math.PI / 2; this.ring.position.set(B.x, top + B.water + 0.0006, B.z); this.ring.renderOrder = 4; g.add(this.ring);
@@ -345,10 +376,10 @@ class NstKitchen {
     };
     m.customProgramCacheKey = () => 'nstTowel';
     this.towelMat = m;
-    const geo = new THREE.PlaneGeometry(0.1, 0.21, 6, 12);
+    const geo = new THREE.PlaneGeometry(0.06, 0.21, 4, 12);
     geo.translate(0, -0.105, 0);                                  // the origin is the top edge (where the fingers hold it)
     const p = geo.attributes.position;
-    for (let i = 0; i < p.count; i++) { const y = p.getY(i), x = p.getX(i); p.setZ(i, 0.004 * Math.sin(y * 60 + x * 30) + 0.01 * (x / 0.05) * (x / 0.05) * 0.4); }
+    for (let i = 0; i < p.count; i++) { const y = p.getY(i), x = p.getX(i); p.setZ(i, 0.003 * Math.sin(y * 60 + x * 30) + 0.004 * (x / 0.03) * (x / 0.03)); }
     geo.computeVertexNormals();
     this.towel = new THREE.Mesh(geo, m); this.towel.castShadow = true; this.root.add(this.towel);
   }
@@ -389,18 +420,43 @@ class NstKitchen {
     return out.set(x + 0.02 * k, MathX.lerp(y0, top + 0.16, k), z - 0.03 * k);
   }
 
+  // the frayed stream: shreds peel off its lower half; where it hits the basin it throws up a fine, slow mist
+  _tapMist(t, on, level) {
+    const sp = this.spray, st = this.stream, T = NST, c = this.v2;
+    sp.begin(this.scene.fog);
+    if (on > 0.05 && t < T.pond) {
+      st.T = (st.v0.y * -1 + Math.sqrt(st.v0.y * st.v0.y + 2 * 9.81 * (st.a.y - level))) / 9.81;   // flight time to the water
+      const T0 = T.tapOn + 0.25;
+      sp.emit(t, 260, 0.45, T0, T.pond, (i, cyc, h) => {
+        const u = 0.35 + 0.65 * Math.sqrt(h), tau = u * st.T;
+        st.at(tau, c);
+        const a = hash1(i * 5.3 + cyc) * 6.28, off = 0.004 + 0.012 * u * hash1(i * 2.9 + cyc * 0.7);
+        const vy = st.v0.y - 9.81 * tau;
+        return { p: [c.x + Math.cos(a) * off, c.y, c.z + Math.sin(a) * off], v: [Math.cos(a) * 0.12, vy * 0.85, Math.sin(a) * 0.12], life: 0.3, size0: 0.0018, size1: 0.005, a: 0.42 * on, g: 9.81, floor: level };
+      }, 1.0, [0.86, 0.9, 0.92]);
+      st.at(st.T, c);
+      const cx = c.x, cz = c.z;
+      sp.emit(t, 300, 0.9, T0 + 0.1, T.pond, (i, cyc, h) => {
+        const a = hash1(i * 3.7 + cyc) * 6.28, rr = 0.006 + 0.025 * h, sv = 0.12 + 0.35 * hash1(i * 1.3 + cyc * 2.1);
+        return { p: [cx + Math.cos(a) * rr, level + 0.004, cz + Math.sin(a) * rr], v: [Math.cos(a) * sv, 0.12 + 0.35 * hash1(i * 4.1 + cyc), Math.sin(a) * sv], life: 0.8, size0: 0.004, size1: 0.018, a: 0.28 * on, g: 1.5 };
+      }, 1.0, [0.84, 0.88, 0.9]);
+    }
+    sp.end();
+  }
+
   update(t) {
     const top = NST_K.top, G = NST_K.glass, gone = nstGone(t), T = NST, td = T.drop;
     // beads → films
     for (const b of this.beadObjs) {
       const dt = t - td - b.delay;
       const R0 = Math.sqrt(2 * b.V / (Math.PI * 0.0042 * 1.15));     // a squat bead ~4 mm tall
-      if (dt <= 0) { b.p.set(R0, 0.0042 * Math.min(1, Math.pow(b.V / 0.3e-6, 0.2)), 0, 0); continue; }
+      if (dt <= 0) { b.p.set(R0, 0.0042 * Math.min(1, Math.pow(b.V / 0.3e-6, 0.2)), 0, 0); nstWetLook(b.p.mesh.material, 0); continue; }
       const k = MathX.smooth(dt, 0, 0.14);
       const R = Math.max(R0, nstSpreadR(b.V, dt) * 1.1) * MathX.lerp(1, 1, k);
       const flat = k, rough = 0.16 * k;
       const H = b.V / (Math.PI * R * R * MathX.lerp(0.5, 0.82, flat));
       b.p.set(MathX.lerp(R0, R, k), H, flat, rough, [1.0, 1.08]);
+      nstWetLook(b.p.mesh.material, k);
     }
     // the glass: the dome above the rim collapses and overflows, running down the outside and out over the counter
     const wIn = G.r - G.wall - 0.0004, dtG = t - td - 0.02;
@@ -412,7 +468,7 @@ class NstKitchen {
       this.overflowMat.userData.prog.value = MathX.clamp(Math.pow(dtG / 0.55, 0.8), 0, 1);
       const ds = dtG - 0.45;
       this.spill.mesh.visible = ds > 0;
-      if (ds > 0) { const V = 9e-6, R = G.rb + 0.003 + nstSpreadR(V, ds) * 0.9; this.spill.set(R, V / (Math.PI * R * R * 0.85), 1, 0.12 * Math.min(1, ds * 3)); }
+      if (ds > 0) { const V = 9e-6, R = G.rb + 0.003 + nstSpreadR(V, ds) * 0.9; this.spill.set(R, V / (Math.PI * R * R * 0.85), 1, 0.12 * Math.min(1, ds * 3)); nstWetLook(this.spill.mesh.material, 1); }
     }
     // leaf beads → soaked into a wet sheen
     for (let i = 0; i < this.leafBeads.length; i++) {
@@ -432,6 +488,7 @@ class NstKitchen {
     const level = top - NST_K.sink.depth + 0.012 + 0.07 * MathX.clamp((t - T.tapOn) / 12, 0, 1);
     this.basinW.position.y = level;
     this.stream.yEnd = level;
+    this._tapMist(t, on, level);
 
     // the paperclip: in your fingers, set on the water, straight through, onto the bottom
     this.clipPos(t, this.v);

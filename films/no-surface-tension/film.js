@@ -39,8 +39,8 @@ function nstSeg(t) { return t < NST.pond ? 'kitchen' : t < NST.bench ? 'pond' : 
 
 // labels pinned to points in the world: [t0, t1, point fn(t, out), text]
 const NST_TAGS = [
-  { t0: 16.1, t1: 18.3, at: (t, o) => o.set(NST_K.bowl.x - 0.01 + 0.06, NST_K.top + NST_K.bowl.water + 0.045, NST_K.bowl.z - 0.005), text: 'NORMAL WATER WOULD CLIMB TO HERE', line: true },
-  { t0: 34.7, t1: 37.2, at: (t, o) => o.set(NST_G.potB.x + 0.02, NST_G.bench.top + 0.115, NST_G.potB.z), text: 'WICK · DRY ABOVE THE WATER LINE', line: false },
+  { t0: 16.1, t1: 18.3, at: (t, o) => o.set(NST_K.bowl.x - 0.01 + 0.033, NST_K.top + NST_K.bowl.water + 0.045, NST_K.bowl.z - 0.005), text: 'NORMAL WATER<br>WOULD CLIMB<br>TO HERE', line: true },
+  { t0: 34.5, t1: 37.2, at: (t, o) => o.set(NST_G.potB.x + 0.012, NST_G.bench.top + 0.1, NST_G.potB.z), text: 'DRY ABOVE<br>THE WATER LINE', line: false },
 ];
 
 const FILM = {
@@ -52,7 +52,7 @@ const FILM = {
     app.garden.camera = camera;
     app.garden.build();
     Look.apply(app.garden.root, camera);
-    app.kitchen = new NstKitchen(scene);
+    app.kitchen = new NstKitchen(scene, renderer);
     app.kitchen.build();
     // first-person arms: a muted knit sleeve, skin-tone nails, long slim sleeves (docs/STYLE_BIBLE.md § 11)
     app.hands = new ViewerHands(camera, { scale: 1.0, skin: '#c4957a', nail: '#c99c84', sleeve: '#4b5560', cuff: '#3a424b', watch: false, sleeveLen: 1.1, sleeveFit: 0.8,
@@ -60,7 +60,7 @@ const FILM = {
     this._props(app);
     // world tags (one-off HTML in the HUD layer)
     const hud = document.getElementById('hud');
-    this.tags = NST_TAGS.map((d) => { const el = document.createElement('div'); el.className = 'nst-tag' + (d.line ? ' line' : ''); el.innerHTML = `<span>${d.text}</span>`; hud.appendChild(el); return { d, el }; });
+    this.tags = NST_TAGS.map((d) => { const el = document.createElement('div'); el.className = 'nst-tag' + (d.line ? ' line' : '') + (d.left ? ' left' : ''); el.innerHTML = `<span>${d.text}</span>`; hud.appendChild(el); return { d, el }; });
     app.hud = new StoryHUD(hud, app.tl);
     app.audio = new NstAudio(app.tl, app);
     this._v = new THREE.Vector3(); this._w = new THREE.Vector3(); this._f = new THREE.Vector3(); this._n = new THREE.Vector3(); this._q = new THREE.Quaternion();
@@ -117,7 +117,7 @@ const FILM = {
     // the payoff: a rising camera over the garden, the park and the city in the storm (no body motion)
     if (t >= T.drone) {
       const k = Ease.inOutSine(MathX.clamp((t - T.drone) / (T.end - T.drone), 0, 1)), k2 = MathX.smooth(t, T.drone, T.drone + 6);
-      cam.position.set(MathX.lerp(-1.35, -0.6, k), MathX.lerp(2.0, 16.5, k), MathX.lerp(-1.4, 5.5, k));
+      cam.position.set(MathX.lerp(-2.0, -0.6, k), MathX.lerp(2.0, 16.5, k), MathX.lerp(-1.0, 5.5, k));
       this._v.set(MathX.lerp(-1.1, -0.8, k2), MathX.lerp(1.2, 0.0, k2), MathX.lerp(-9.0, -34, k));
       cam.up.set(0, 1, 0); cam.lookAt(this._v);
       cam.fov = MathX.lerp(62, 54, k); cam.updateProjectionMatrix();
@@ -131,24 +131,26 @@ const FILM = {
     F.set(box[0], 0, box[1]);
     if (sc.right !== box[2]) { sc.left = -box[2]; sc.right = box[2]; sc.top = box[2]; sc.bottom = -box[2]; sc.updateProjectionMatrix(); }
     G.update(t, cam);
-    if (seg === 'kitchen') { app.scene.fog.density *= 0.3; G.sun.castShadow = false; } else G.sun.castShadow = true;
+    // inside, the garden's sun and sky would light the room through its walls: keep only a little of them (the window light is the kitchen's own)
+    if (seg === 'kitchen') { app.scene.fog.density *= 0.3; G.sun.castShadow = false; G.sun.intensity *= 0.25; G.hemi.intensity *= 0.4; } else G.sun.castShadow = true;
+    if (seg === 'bench') G.hemi.intensity *= 1.5;     // the bench is in the house's shade: more sky fill
     K.update(t);
 
     // hands: aim the active pose at its contact point
     const V = this._v, Fw = this._f, Nw = this._n;
     if (t >= T.tap && t < T.tapOn + 1.3) {
       K.lever.updateMatrixWorld(true); V.set(0, 0.088, 0).applyMatrix4(K.lever.matrixWorld);
-      Fw.set(-0.15, -0.35, -1); Nw.set(-1, 0.1, 0.0);
+      Fw.set(-0.85, -0.1, -0.5); Nw.set(0.1, -0.9, -0.3);            // from your right, palm down on the lever
       for (const n of ['tapReach', 'tapTurn']) nstAimHand(n, cam, V, Fw, Nw);
     }
     if (t >= T.clip - 0.5 && t < T.clipLet + 1.0) {
-      K.clipPos(Math.min(t, T.clipLet), V); V.y += 0.004;
-      if (t > T.clipLet) V.y += 0.03 * MathX.smooth(t, T.clipLet + 0.1, T.clipLet + 0.8);
-      Fw.set(-0.1, -0.65, -0.75); Nw.set(0.1, -0.75, 0.65);
+      K.clipPos(Math.min(t, T.clipLet), V); V.y += 0.007;
+      if (t > T.clipLet) V.y += 0.09 * MathX.smooth(t, T.clipLet - 0.02, T.clipLet + 0.35);
+      Fw.set(-0.8, -0.55, -0.15); Nw.set(0.05, -0.35, -0.95);       // from the right, side-on: the bowl stays in view
       for (const n of ['clipHold', 'clipOpen']) nstAimHand(n, cam, V, Fw, Nw);
     }
     if (t >= T.towel - 0.5 && t < T.sponge + 0.2) {
-      K.towelTop(t, V); V.x += 0.035; V.y += 0.004;
+      K.towelTop(t, V); V.x += 0.02; V.y += 0.004;
       Fw.set(-0.25, -0.15, -1); Nw.set(-1, 0.05, 0.2);
       nstAimHand('towelHold', cam, V, Fw, Nw);
     }
@@ -158,13 +160,13 @@ const FILM = {
       nstAimHand('spongeGrab', cam, V, Fw, Nw);
     }
     // the watering can: held in front of you, tilted to pour into pot A, then levelled
-    const showCan = t >= T.bench && t < T.lapse - 0.6;
+    const showCan = t >= T.bench && t < T.wick;
     this.can.visible = showCan;
     if (showCan) {
       const tilt = MathX.smooth(t, T.pour - 0.2, T.pour + 0.45) * (1 - MathX.smooth(t, T.pourEnd - 0.1, T.pourEnd + 0.4));
-      const away = MathX.smooth(t, T.pourEnd + 0.3, T.pourEnd + 1.0);
+      const away = MathX.smooth(t, T.pourEnd + 0.05, T.wick);      // lowered out of view
       const A = NST_G.potA;
-      this.can.position.set(A.x + 0.36 + 0.1 * away, NST_G.bench.top + 0.42 - 0.06 * tilt + 0.05 * away, A.z - 0.22 - 0.15 * away);
+      this.can.position.set(A.x + 0.36 + 0.12 * away, NST_G.bench.top + 0.42 - 0.06 * tilt - 0.55 * away, A.z - 0.22 - 0.25 * away);
       // local +X (the spout) points at the pot (toward −X world, slightly +Z); tilt pitches the spout down
       this.can.rotation.set(0, Math.PI - 0.35, 0.55 * tilt - 0.08, 'YXZ');
       this.can.updateMatrixWorld(true);
@@ -229,7 +231,7 @@ const FILM = {
     p.flashColor.setRGB(1, 1, 1);
     if (seg === 'kitchen') { p.ao = 0.45; p.edgeBlur = 0.35; p.warmth = 0.06; p.exposure = 1.14; }
     if (seg === 'pond') { p.edgeBlur = 0.45; p.ao = 0.4; }
-    if (seg === 'bench') { p.ao = 0.5; p.edgeBlur = 0.2; }
+    if (seg === 'bench') { p.ao = 0.5; p.edgeBlur = 0.2; p.exposure = 1.22; p.warmth = 0.08; }
     // the rule change: a soft cooling pulse under the title
     p.saturation -= 0.06 * MathX.impulse(t, T.drop, 0.6);
     // the time-lapse / the wilting: a touch warmer and drier, then the storm: cold, flatter, darker
