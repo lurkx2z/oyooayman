@@ -186,10 +186,13 @@ class SndCast {
     // 5. the drummer (row 13 of the far stand), with the drum, and a flag waved beside them
     const Dq = sndSideSeat(-1, SND.drum.row, SND.drum.x);
     this.drummer = add({ id: 'drummer', look: 'sndFanA', y: Dq.y, path: [[0, SND.drum.x, Dq.z + 0.1]], states: [[0, 'sndWatch'], [SND.drum.t0 - 0.5, 'sndDrum']], face: 180 }, [4]);
-    { const g = new THREE.Group(), shell = Mat.std('#1f2f52', { roughness: 0.5 }), skin = Mat.std('#efe9da', { roughness: 0.7 });
-      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.34, 20), shell));
-      for (const y of [-0.175, 0.175]) { const k = new THREE.Mesh(new THREE.CircleGeometry(0.4, 20), skin); k.rotation.x = y > 0 ? -Math.PI / 2 : Math.PI / 2; k.position.y = y; g.add(k); }
-      g.position.set(SND.drum.x + 0.12, Dq.y + 0.95, Dq.z + 0.48); g.traverse((o) => { if (o.isMesh) o.castShadow = true; }); scene.add(g); this.drum = g; }
+    // a big red drum, its head tipped toward the pitch so it reads through the long lens
+    { const g = new THREE.Group(), shell = Mat.std('#c4362a', { roughness: 0.45 }), skin = Mat.std('#f1ece0', { roughness: 0.7 }), rim = Mat.std('#e8c21f', { roughness: 0.4 });
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.42, 24), shell));
+      for (const y of [-0.215, 0.215]) { const k = new THREE.Mesh(new THREE.CircleGeometry(0.47, 24), skin); k.rotation.x = y > 0 ? -Math.PI / 2 : Math.PI / 2; k.position.y = y; g.add(k);
+        const r = new THREE.Mesh(new THREE.TorusGeometry(0.49, 0.03, 6, 24), rim); r.rotation.x = Math.PI / 2; r.position.y = y; g.add(r); }
+      g.rotation.x = 0.55;
+      g.position.set(SND.drum.x + 0.12, Dq.y + 0.95, Dq.z + 0.52); g.traverse((o) => { if (o.isMesh) o.castShadow = true; }); scene.add(g); this.drum = g; }
     { const q = sndSideSeat(-1, SND.drum.row + 1, SND.drum.x + 1.9);
       add({ id: 'flagger', look: 'sndFanE', y: q.y, path: [[0, SND.drum.x + 1.9, q.z + 0.1]], states: [[0, 'sndWatch']], face: 180 }, [4]);
       this.flag = this._flag(scene, SND.drum.x + 2.2, q.y + 1.5, q.z + 0.2); }

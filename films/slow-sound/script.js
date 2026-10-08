@@ -360,7 +360,7 @@ function sndKmh(t) { const k = sndC(t) * 3.6; return k >= 1000 ? `${Math.floor(k
     ctx: (t) => (t < A.kick.t + 0.25 ? '' : 'THEN THE AIR BRAKES IT HARD') });
   const dD = SoundArrival.dist(SND_DRUM, SND_EYE[4]);
   R.push({ from: SND.cuts[3] + 0.2, until: SND.cuts[4] - 0.1, top, label: 'THE DRUM', value: `${H.drum.toFixed(1)} S LATE`, sub: `${Math.round(dD)} M AWAY`,
-    ctx: 'EACH FAN CLAPS WHEN THE BEAT REACHES THEM' });
+    ctx: 'EACH FAN CLAPS WHEN THEY HEAR IT' });
   const eT = SND_EYE[5], dT = SoundArrival.dist(SND_BOLT, { x: eT.x, y: 0, z: eT.z });
   R.push({ from: SND.cuts[4] + 0.2, until: tT + 0.1, top, label: 'THE FLASH AT 0:03', value: (t) => `${Math.max(0, tT - t).toFixed(1)} S`,
     sub: (t) => `ITS THUNDER: ${Math.max(0, Math.round(dT - SND_RUN(A.flash.t, t)))} M AWAY`, ctx: 'UNTIL IT REACHES YOU' });
