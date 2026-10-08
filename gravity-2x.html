@@ -23,6 +23,15 @@
     #hud .story-readout .value { font-size: calc(var(--u) * 88); margin-top: calc(var(--u) * 6); }
     #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; opacity: 0.9; margin-top: calc(var(--u) * 8); color: #ffd7a8; }
     #hud .story-end { top: calc(var(--u) * 820); font-size: calc(var(--u) * 66); }
+    /* the two closing lines (SCRIPT.hud.stack), on a soft dark plate */
+    #hud .story-stack { top: calc(var(--u) * 780); width: calc(var(--u) * 920); }
+    #hud .story-stack .line { position: relative; }
+    #hud .story-stack .line::before { content: ''; position: absolute; left: -8%; right: -8%; top: -35%; bottom: -35%; z-index: -1;
+      background: radial-gradient(closest-side, rgba(4, 6, 8, 0.42), rgba(4, 6, 8, 0.14) 65%, rgba(4, 6, 8, 0)); }
+    #hud .story-stack .line { font-size: calc(var(--u) * 64); font-weight: 600; line-height: 1.22; margin-bottom: calc(var(--u) * 26);
+      text-shadow: 0 0 calc(var(--u) * 24) rgba(0, 0, 0, 0.7), 0 calc(var(--u) * 3) calc(var(--u) * 10) rgba(0, 0, 0, 0.6); }
+    #hud .story-stack .line:first-child { font-style: italic; font-weight: 500; font-size: calc(var(--u) * 58); }
+    #hud .story-note { top: calc(var(--u) * 1150); font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; opacity: 0.85; }
   </style>
 </head>
 <body>
@@ -81,13 +90,18 @@
   <script src="js/world/people.js"></script>
   <script src="js/world/vehicles.js"></script>
   <script src="js/world/environment.js"></script>
+  <script src="js/world/aircraft.js"></script>
   <script src="js/audio/audioEngine.js"></script>
   <script src="js/ui/storyHud.js"></script>
   <script src="js/ui/devControls.js"></script>
   <!-- this film (plan: films/gravity-2x/PLAN.md) -->
   <script src="films/gravity-2x/script.js"></script>
   <script src="films/gravity-2x/city.js"></script>
+  <script src="films/gravity-2x/site.js"></script>
+  <script src="films/gravity-2x/traffic.js"></script>
   <script src="films/gravity-2x/cast.js"></script>
+  <script src="films/gravity-2x/fx.js"></script>
+  <script src="films/gravity-2x/air.js"></script>
   <script src="films/gravity-2x/audio.js"></script>
   <script src="films/gravity-2x/film.js"></script>
   <script src="films/gravity-2x/soundtrack.js"></script>
