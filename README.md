@@ -64,6 +64,17 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Film: *What if gravity became twice as strong?*** — open `gravity-2x.html` (60.3 s). In a leisure centre, Earth's
+> surface gravity doubles at 1.6 s and stays doubled. Nothing becomes more massive; everything just weighs twice as
+> much. The gym scale under your hands runs from 70.0 to 140.0 kg, a runner is carried off the back of her treadmill,
+> two men can't lift an 80 kg bar off the safety arms, a free throw peaks below the rim while its 1 G ghost scores, you
+> hang from a pull-up bar until your grip gives, and every stair step lands twice as hard. In the pool nothing changed:
+> the water weighs twice as much too, so everyone floats exactly as before, until they try to get out. A diver steps
+> off the 10 m tower and hits the water in 1.01 s at 71 km/h while a 1 G ghost is only halfway down; you watch her
+> plume from under the water, then try to press yourself out of the pool and can't. Physics rules, shot list and review
+> log: [`films/gravity-2x/PLAN.md`](films/gravity-2x/PLAN.md); delivery notes:
+> [`films/gravity-2x/EPISODE_REPORT.md`](films/gravity-2x/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
@@ -345,6 +356,23 @@ films/sim/aware.js       NPC_AWARE_01: the hero head (eyes that aim at the lens,
 films/sim/glitch.js      wireframe, debug labels, LOD pop, flat tree, checker, the ripple, the crack and the void
 films/sim/audio.js       the world's sound on its own clock (repeated, paused, reversed, replayed) + the film's sounds
 films/sim/film.js        FILM hooks: the fake pause, the exact replay of the opening, the composite, the interface, the grade
+```
+
+Film: *What if gravity became twice as strong?* (`gravity-2x.html`):
+
+```
+films/gravity-2x/PLAN.md            physics rules and numbers, the places, shot list (story → film seconds), review log
+films/gravity-2x/EPISODE_REPORT.md  what shipped: timestamps, systems, limitations, review notes
+films/gravity-2x/script.js          ★ the beats (GV), the cuts, the fall and throw maths, camera, hands, captions, readouts
+films/gravity-2x/centre.js          the leisure centre (Environment subclass): gym, sports hall, open stair, pool hall, tower
+films/gravity-2x/props.js           the scale display, treadmills, the bench and bar, the pull-up bar, the basket and ball
+                                    (with its 1 G ghost), the pool water (surface, ripples, under-water view)
+films/gravity-2x/cast.js            the people and their 2 G actions (cling, carried off, heave, stair sit, float, ladder,
+                                    the diver and her 1 G ghost)
+films/gravity-2x/fx.js              splashes, spray, droplets, bubbles, chalk, every particle at 2 G
+films/gravity-2x/audio.js           the soundtrack (AudioEngine subclass); baked into soundtrack.js
+films/gravity-2x/film.js            FILM hooks: where your eyes go (GV_LOOK), your hands (grips, bar, deck), the floor and
+                                    the water under you, the under-water mode, the grade
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):
