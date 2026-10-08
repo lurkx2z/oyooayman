@@ -77,13 +77,15 @@ None. All geometry is procedural, all sound is synthesised, fonts are the repo's
 - The final cut has not been through a third review round.
 
 ## FINAL PREVIEW PATH
-- Final MP4 (1080×1920, 30 fps, 69.8 s): `/mnt/project-files/slow-sound/slow-sound_final_1080x1920.mp4` (project
-  files; MP4s are not committed to the repo).
+- Final MP4 (1080×1920, 30 fps, 69.8 s, H.264 3,024 kbps + AAC 160 kbps, 26.7 MiB):
+  `/mnt/project-files/slow-sound/slow-sound_final_1080x1920.mp4` (project files; MP4s are not committed to the repo).
+  Its audio measures −16.1 LUFS; the AAC encode lifts the true peak from −1.6 to −0.4 dBTP.
 - Runnable ZIP: `/mnt/project-files/slow-sound/slow-sound_film.zip` (unzip, double-click `slow-sound.html`, press Space).
 
 ## PERFORMANCE/FPS
-- Rendering here is software-only (SwiftShader, no GPU): about 6.5 s per 1080×1920 frame per worker; 2 workers is the
-  fastest setting (0.15 frames/s together; 4 workers thrash). The final render took about 3.8 hours.
+- Rendering here is software-only (SwiftShader, no GPU): 7.7–8.5 s per 1080×1920 frame per worker (the dusty middle
+  and the long-lens car are the slowest); 2 workers is the fastest setting (4 workers thrash). The final render of
+  2,095 frames took 2 h 28 min (8,883 s).
 - Boot about 14 s; with the baked soundtrack the sound is ready immediately (live synthesis takes about 30 s).
 - Real-time frame rate on a GPU machine was not measured.
 
