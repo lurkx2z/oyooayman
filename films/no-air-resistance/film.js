@@ -43,15 +43,12 @@ const FILM = {
     app.ui = {
       aero: mk('readout story-readout nr-aero', '<div class="label">AERODYNAMIC FORCE</div><div class="value"><span class="v">100%</span></div><div class="sub">NO DRAG · NO LIFT · ON ANY SOLID</div>'),
       wind: mk('readout story-readout nr-wind', '<div class="label">WIND</div><div class="value"><span class="v">50 KM/H</span></div><div class="sub">THE AIR IS STILL MOVING</div>'),
-      speed: mk('readout story-readout nr-speed', '<div class="label">THIS ICE IS FALLING AT</div><div class="value"><span class="v">0 KM/H</span></div><div class="sub">IN NORMAL AIR: ≈ 100 KM/H</div>'),
-      alt: mk('readout story-readout nr-alt', '<div class="label">ALTITUDE</div><div class="value"><span class="v">0 M</span></div><div class="sub">HITS THE ROOF IN 34 S</div>'),
+      clock: mk('readout story-readout nr-clock', '<div class="label">THE CLOUD’S ICE LANDS IN</div><div class="value"><span class="v">16 S</span></div>'),
       ice: mk('readout story-readout nr-ice', '<div class="label">ICE LANDING NOW</div><div class="value"><span class="v">0 KM/H</span></div><div class="sub">FELL 6.0 KM</div>'),
       tagA: mk('nr-tag'), tagB: mk('nr-tag'), tagC: mk('nr-tag ghost'), tagD: mk('nr-tag ghost'),
       line: mk('nr-line'),
-      meanwhile: mk('nr-meanwhile', 'MEANWHILE, 9 KM UP'),
-      count: mk('nr-count', '<div class="lab">THE FIRST ICE LANDS IN</div><div class="num">3</div>'),
+      meanwhile: mk('nr-meanwhile', '<span>9 KM ABOVE THE PARTY</span>'),
     };
-    app.ui.countNum = app.ui.count.querySelector('.num');
     app.audio = typeof NrAudio !== 'undefined' ? new NrAudio(app.tl, app) : new AudioEngine(app.tl);
   },
 
@@ -99,8 +96,8 @@ const FILM = {
   // the haze: the storm's rain thickens it a little; the ice's white-out thickens it a lot (it clears when the ice is down)
   _fog(app, S) {
     const f = app.scene.fog, k = app.env.storm(S), w = MathX.smooth(NR_ICE.flux(S), 0.05, 0.9);
-    f.density = 0.0011 + 0.0007 * k + 0.012 * w;
-    f.color.copy(app.env.fogColor).lerp(this._fogStorm || (this._fogStorm = new THREE.Color('#8f979f')), k).lerp(this._fogIce || (this._fogIce = new THREE.Color('#aab2b9')), w);
+    f.density = 0.0011 + 0.0007 * k + 0.007 * w;
+    f.color.copy(app.env.fogColor).lerp(this._fogStorm || (this._fogStorm = new THREE.Color('#8f979f')), k).lerp(this._fogIce || (this._fogIce = new THREE.Color('#8e969e')), w);
   },
 
   update(app, S) {
@@ -143,12 +140,12 @@ const FILM = {
   // the button rail on the right (18 %), above the description zone (75 % down))
   _tag(el, xy, html, on, side = '') {
     if (el._side !== side) { el.classList.toggle('left', side === 'left'); el.classList.toggle('right', side === 'right'); el._side = side; }
-    if (!on || !xy || xy[0] < 10 || xy[0] > 1070 || xy[1] < 120 || xy[1] > 1700) { if (el._o !== '0') { el.style.opacity = '0'; el._o = '0'; } return; }
+    if (!on || !xy || xy[0] < 10 || xy[0] > 1070 || xy[1] < 120 || xy[1] > 1720) { if (el._o !== '0') { el.style.opacity = '0'; el._o = '0'; } return; }
     if (el._h !== html) { el.innerHTML = html; el._h = html; }
     el.style.opacity = '1'; el._o = '1';
     const w = el.offsetWidth / (parseFloat(document.documentElement.style.getPropertyValue('--u')) || 0.5) || 420;   // its width (design px)
     const [x0, x1] = side === 'right' ? [86, 886 - w * 1.04] : side === 'left' ? [86 + w * 1.04, 886] : [86 + w / 2, 886 - w / 2];
-    el.style.left = `calc(var(--u) * ${MathX.clamp(xy[0], x0, Math.max(x0, x1)).toFixed(1)})`; el.style.top = `calc(var(--u) * ${MathX.clamp(xy[1], 250, 1440).toFixed(1)})`;
+    el.style.left = `calc(var(--u) * ${MathX.clamp(xy[0], x0, Math.max(x0, x1)).toFixed(1)})`; el.style.top = `calc(var(--u) * ${MathX.clamp(xy[1], side ? 400 : 450, 1440).toFixed(1)})`;
   },
 
   _overlays(app, S) {
@@ -156,7 +153,7 @@ const FILM = {
     const sky = S >= NR.sky[0] && S < NR.sky[1], cam = sky ? app.aerial.cam : app.camera;
     // AERODYNAMIC FORCE 100 % → 0 % (big in the opening, small in the corner later)
     const a = Math.round(nrAero(S) * 100);
-    set(U.aero, 'opacity', (sky ? 0 : S < NR.cut0 ? W(S, NR.title[1] - 1.9, NR.cut0, 0.3, 0.05) : W(S, 20.6, NR_ICE.first - 0.1, 0.4, 0.15) * 0.85).toFixed(3));   // (the ice readout takes its place)
+    set(U.aero, 'opacity', (S < NR.walk[1] ? W(S, NR.title[1] - 1.9, NR.walk[1], 0.3, 0.05) : 0).toFixed(3));
     html(U.aero.querySelector('.v'), `${a}%`);
     set(U.aero.querySelector('.sub'), 'opacity', MathX.smooth(S, NR.loss + 0.3, NR.loss + 0.7).toFixed(2));
     U.aero.classList.toggle('small', S > NR.cut0);
@@ -164,32 +161,26 @@ const FILM = {
     // WIND: once it has been shown to still blow, and when the storm brings more of it
     set(U.wind, 'opacity', (W(S, NR.title[1], NR.walk[1], 0.4, 0.1) + W(S, NR.gale[0] - 0.2, 27.4, 0.3, 0.3)).toFixed(3));
     html(U.wind.querySelector('.v'), `${Math.round(nrWindKmh(S) / 5) * 5} KM/H`);
-    // the cut-away: this piece of ice's speed and height, and when it lands on the roof
-    set(U.speed, 'opacity', (sky ? MathX.smooth(S, 12.55, 12.9) : 0).toFixed(3)); set(U.alt, 'opacity', (sky ? MathX.smooth(S, 12.7, 13.05) : 0).toFixed(3));
-    html(U.speed.querySelector('.v'), `${Math.round(NR_STONE.speed(S) * 3.6)} KM/H`);
-    html(U.alt.querySelector('.v'), `${(Math.round(NR_STONE.alt(S) / 10) * 10).toLocaleString('en-US')} M`);
-    html(U.alt.querySelector('.sub'), `HITS THE ROOF IN ${Math.ceil(NR_STONE.lands - S)} S`);
-    set(U.meanwhile, 'opacity', W(S, NR.sky[0], 14.4, 0.05, 0.4).toFixed(3));
+    // back on the roof: the clock to the cloud's first ice (the ice readout takes its place)
+    set(U.clock, 'opacity', W(S, NR.sky[1] + 0.4, NR_ICE.first - 0.04, 0.4, 0.06).toFixed(3));
+    html(U.clock.querySelector('.v'), `${Math.max(1, Math.ceil(NR_ICE.first - S))} S`);
+    set(U.meanwhile, 'opacity', W(S, NR.sky[0], NR.sky[0] + 1.7, 0.05, 0.35).toFixed(3));
     // the ice: how fast what is landing now is going, and how far it fell
     const ip = MathX.clamp(S, NR_ICE.first, NR_ICE.last);
     set(U.ice, 'opacity', W(S, NR_ICE.first - 0.05, NR.quiet + 1.0, 0.15, 0.6).toFixed(3));
     html(U.ice.querySelector('.v'), `${Math.round(NR_ICE.kmh(ip)).toLocaleString('en-US')} KM/H`);
-    html(U.ice.querySelector('.sub'), `FELL ${(NR_ICE.h(ip) / 1000).toFixed(1)} KM · NOTHING SLOWED IT`);
-    // the count to the first of the cloud's ice
-    const cnt = S > NR_ICE.first - 3 && S < NR_ICE.first - 0.02;
-    set(U.count, 'opacity', cnt ? '1' : '0');
-    if (cnt) html(U.countNum, `${Math.ceil(NR_ICE.first - S)}`);
+    html(U.ice.querySelector('.sub'), `FELL ${(NR_ICE.h(ip) / 1000).toFixed(1)} KM · THE AIR DIDN’T SLOW IT`);
     // tags pinned to things
     const V = this._tv || (this._tv = new THREE.Vector3()), P = app.props, St = app.storm;
     let A = null, B = null, C = null, D = null, line = '';
-    if (S > 3.7 && S < NR.walk[1] - 0.1) A = [this._proj(cam, V.set(NR_ROOF.x0 + 0.3, NR_ROOF.y + 2.3, 2.3)), 'KITE · <b>NO LIFT</b> · IN THE STREET', 'right'];
-    if (S > NR.walk[1] + 0.15 && S < NR.drop.rel - 0.1) A = [this._proj(cam, V.set((NR_WELL.rail + NR_WELL.vx1) / 2, NR_WELL.yb + 0.5, -0.8)), 'GROUND FLOOR · <b>22 M DOWN</b>', 'right'];
-    if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8)), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
+    if (S > 3.7 && S < NR.walk[1] - 0.1) A = [this._proj(cam, V.set(NR_ROOF.x0 + 0.3, NR_ROOF.y + 2.3, 2.3)), 'KITE · <b>NO LIFT</b>', 'right'];
+    if (S > NR.walk[1] + 0.15 && S < NR.drop.rel - 0.1) A = [[600, 1330], 'GROUND FLOOR · <b>22 M DOWN</b>'];
+    if (S > NR.drop.rel + 0.5 && S < NR.cut0 && P.rel) { const tl = Math.sqrt(2 * (P.rel.p.y - LAYOUT.curbH - 0.004) / NR_G); A = [this._proj(cam, V.copy(P.rel.b).setY(0.8).add({ x: 0.9, y: 0, z: 0.3 })), `BOTH LAND IN <b>${tl.toFixed(2)} S</b>`, 'right']; }
     if (S > NR.drop.rel + 0.1 && S < NR.cut0 && P.ghost.visible) C = [this._proj(cam, V.copy(P.ghost.position).add({ x: 0, y: 0.3, z: 0 })), 'NORMAL AIR', 'left'];
     if (sky) {
       // the piece of ice you are falling with; the cloud (water: it stays up with the air) streaming up past
-      if (S > 13.1 && S < 14.9) A = [this._proj(cam, V.set(0, 0.03, 0)), 'THIS PIECE OF ICE · <b>NO DRAG</b>', 'right'];
-      if (S > 14.5 && S < 16.3) B = [this._proj(cam, V.set(NR_SKY.wallX + 4, cam.position.y - 14, -110)), 'CLOUD = WATER · <b>STAYS UP</b>', 'left'];
+      if (S > NR.sky[0] + 0.25 && S < 15.9) A = [this._proj(cam, V.set(0, 0.03, 0)), `THIS ICE · <b>${Math.round(NR_STONE.speed(S) * 3.6)} KM/H</b>`, 'right'];
+      if (S > 17.3 && S < 19.9) B = [[560, 600], 'CLOUD DROPLETS · <b>STILL HELD UP</b>'];
     }
     // the confetti: one clump (and its normal-air ghost blowing away)
     // the confetti (one clump) and the toy paratrooper fired with it (its canopy can't open), and the toy's normal-air ghost
@@ -197,13 +188,14 @@ const FILM = {
     if (S > NR.pop + 1.3 && S < NR.pop + 2.8 && St.toy.visible) B = [this._proj(cam, St.toyAt(S, V).add({ x: 0, y: 0.45, z: 0 })), 'PARACHUTE · <b>CAN’T OPEN</b>', 'left'];
     if (S > NR.pop + 0.45 && S < NR.pop + 1.9) D = [this._proj(cam, St.toyGhostAt(S, V).add({ x: 0, y: 0.9, z: 0 })), 'NORMAL AIR', 'left'];
     // the storm: the rain (water) is still blown; the sheets aren't; soot falls while steam blows
-    if (S > NR.gale[0] + 0.7 && S < 27.4) B = [this._proj(cam, V.set(cam.position.x - 3.2, cam.position.y + 0.3, cam.position.z - 1.4)), 'RAIN IS WATER · <b>STILL BLOWN</b>'];
+    if (S > NR.gale[0] + 0.7 && S < 27.4) B = [this._proj(cam, V.set(0.5, 0.1, -3).applyMatrix4(cam.matrixWorld)), 'RAIN IS WATER · <b>STILL BLOWN</b>'];
     if (S > NR.gale[0] + 1.3 && S < 27.9 && app.roof.ghostSheet.m.visible) D = [this._proj(cam, V.copy(app.roof.sheets[0].m.position).add({ x: -0.4, y: 0.25, z: -1.0 })), 'NORMAL AIR', 'left'];
     // after the ice: the one sheet left hangs dead still in the storm, shot to lace, while the rain flies past it
-    if (S > NR.out + 0.2 && S < NR.line[0] - 0.1) { const Lt = app.roof.lineT; A = [this._proj(cam, V.copy(app.roof.sheets[2].m.position).add({ x: Lt[0] * 0.9, y: 0.3, z: Lt[1] * 0.9 })), 'RAIN: BLOWN · <b>SHEET: STILL</b>', 'right']; }
+    if (S > NR.out + 0.2 && S < NR.line[0] - 0.1) { const Lt = app.roof.lineT; A = [this._proj(cam, V.copy(app.roof.sheets[2].m.position).add({ x: Lt[0] * 0.9, y: 0.3, z: Lt[1] * 0.9 })), 'IN A 110 KM/H WIND · <b>BARELY MOVES</b>', 'right']; }
     if (S > NR.balloon + 0.3 && S < NR.cloud - 0.2) B = [this._proj(cam, app.balloons.centre(S, V).add({ x: 0, y: 0.6, z: 0 })), `BUOYANCY, NO DRAG · <b>${Math.round(app.balloons.speed(S) * 3.6)}</b> KM/H`];
     if (S > NR.drop.rel - 0.05 && S < NR.drop.rel + 2.2) line = 'SLOW MOTION ×0.6';
-    if (S > NR.inDoor - 1.0 && S < 40.45) line = 'ICE: <b>STRAIGHT DOWN</b> · RAIN: BLOWN';
+    if (S > NR.slow[0] && S < NR.slow[1]) line = 'SLOW MOTION ×0.5';
+    if (S > NR.inDoor - 1.0 && S < 40.0) line = 'ICE: <b>STRAIGHT DOWN</b> · RAIN: BLOWN';
     for (const [el, T] of [[U.tagA, A], [U.tagB, B], [U.tagC, C], [U.tagD, D]]) this._tag(el, T && T[0], T && T[1], !!T, (T && T[2]) || '');
     html(U.line, line ? `<span>${line}</span>` : ''); set(U.line, 'opacity', line ? '1' : '0');
     set(U.line, 'top', S > NR.drop.up && S < NR.cut0 ? 'calc(var(--u) * 1720)' : '');   // (in the drop: low, below the ball)
@@ -228,8 +220,11 @@ const FILM = {
     }
     // a flicker of white when something breaks near you
     for (const t of [NR_ROOF_HITS.bottles, NR_ROOF_HITS.cake, NR_ROOF_HITS.pot, NR_ROOF_HITS.table]) p.flash += 0.05 * MathX.impulse(S, t, 0.05);
-    NR_ROOF_HITS.first.forEach(([t], k) => { p.flash += (k === 0 ? 0.22 : 0.08) * MathX.impulse(S, t, 0.06); });
-    p.flash += 0.12 * MathX.impulse(S, NR.roofHit, 0.06);
+    NR_ROOF_HITS.first.forEach(([t], k) => { p.flash += (k === 0 ? 0.14 : 0.05) * MathX.impulse(S, t, 0.06); });
+    p.flash += 0.08 * MathX.impulse(S, NR.roofHit, 0.06);
+    // under the holed roof: less bloom, so the holes stay holes (not glowing puffs)
+    const hutK = MathX.smooth(S, NR.roofHit - 0.3, NR.roofHit + 0.3) * (1 - MathX.smooth(S, NR.out - 0.3, NR.out + 0.6));
+    p.bloom *= 1 - 0.65 * hutK; p.bloomThreshold += 0.35 * hutK;
     // the end: a touch darker so the closing lines read
     const endK = MathX.smooth(S, NR.line[0] - 0.4, NR.line[0] + 0.6); p.exposure -= 0.12 * endK; p.vignette += 0.2 * endK;
     p.fade = S >= NR.black ? 1 : MathX.smooth(S, NR.fade[0], NR.fade[1]);

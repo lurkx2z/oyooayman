@@ -180,7 +180,7 @@ class NrStorm {
     if (k > 0) {
       const U = nrWindKmh(S) / 3.6, D = NR_WIND_DIR, vx = D.x * U, vz = D.z * U, vy = -6.5, H = NR_ROOF.hut, Y = NR_ROOF.y, c = cam.position;
       const bx = 30, by = 18, bz = 30, x0 = c.x - bx / 2, y0 = c.y - 7, z0 = c.z - bz / 2, n = Math.floor(3300 * k), sh = 1 / 30;
-      const wrap = (v, s) => v - s * Math.floor(v / s), dim = 1 - 0.4 * MathX.smooth(NR_ICE.flux(S), 0.05, 0.6);
+      const wrap = (v, s) => v - s * Math.floor(v / s), dim = 1 - 0.55 * MathX.smooth(NR_ICE.flux(S), 0.05, 0.6);
       for (let i = 0; i < n; i++) {
         const gs = 0.85 + 0.3 * hash1(i * 7 + 3);
         const x = x0 + wrap(hash1(i * 7 + 1) * 977 + vx * gs * S - x0, bx), y = y0 + wrap(hash1(i * 7 + 2) * 977 + vy * S - y0, by), z = z0 + wrap(hash1(i * 7 + 4) * 977 + vz * gs * S - z0, bz);
@@ -188,7 +188,7 @@ class NrStorm {
         const f = nrFloorAt(x, z); if (f !== null && y < f) continue;
         const ddx = x - c.x, ddy = y - c.y, ddz = z - c.z; if (ddx * ddx + ddy * ddy + ddz * ddz < 1.4) continue;
         const a = (0.3 + 0.25 * hash1(i * 7 + 5)) * k * dim;
-        R.push(x, y, z, x - vx * gs * sh, y - vy * sh, z - vz * gs * sh, 0.8, 0.85, 0.94, a, 0.009 + 0.004 * hash1(i * 7 + 6));
+        R.push(x, y, z, x - vx * gs * sh, y - vy * sh, z - vz * gs * sh, 0.74, 0.8, 0.9, a, 0.007 + 0.003 * hash1(i * 7 + 6));
       }
     }
     R.end();
@@ -200,7 +200,7 @@ class NrStorm {
     const fw = this._fw || (this._fw = new THREE.Vector3()); cam.getWorldDirection(fw); const fl = Math.hypot(fw.x, fw.z) || 1, fx = fw.x / fl, fz = fw.z / fl;
     const sky = S >= NR.sky[0] && S < NR.sky[1];
     if (!sky && S > NR_ICE.first - 0.2 && S < NR_ICE.last + 0.6) {
-      const sh = 1 / 100, D = NR_ICE.drift, j0 = Math.max(0, Math.floor((S - 0.9 - NR_ICE.first) * NR_HAIL.R)), j1 = Math.floor((S + 0.14 - NR_ICE.first) * NR_HAIL.R);
+      const sh = 1 / 200, D = NR_ICE.drift, j0 = Math.max(0, Math.floor((S - 0.9 - NR_ICE.first) * NR_HAIL.R)), j1 = Math.floor((S + 0.14 - NR_ICE.first) * NR_HAIL.R);
       for (let j = j1; j >= j0; j--) {
         NR_HAIL.at(j, o); if (!o.on) continue;
         const age = S - o.t, f = nrFloorAt(o.x, o.z), fy = f === null ? 0 : f;
@@ -209,7 +209,7 @@ class NrStorm {
           const v = NR_ICE.v(o.t), hb = Math.max(0, -age * v), ha = (sh - age) * v;
           if (hb > 80) continue;
           const xa = o.x + D[0] * ha, za = o.z + D[1] * ha, xb = o.x + D[0] * hb, zb = o.z + D[1] * hb;
-          I.push(xa, fy + ha, za, xb, fy + hb, zb, 0.86, 0.93, 1.0, 0.5 + 0.4 * Math.min(1, o.k), 0.006 + 0.012 * o.k);
+          I.push(xa, fy + ha, za, xb, fy + hb, zb, 0.95, 0.98, 1.0, 0.7 + 0.3 * Math.min(1, o.k), 0.01 + 0.016 * o.k);
         }
         if (f === null || age < 0) continue;
         const dx = o.x - c.x, dz = o.z - c.z, d2 = dx * dx + dz * dz, d = Math.sqrt(d2);
@@ -218,11 +218,14 @@ class NrStorm {
         if (age < 0.05 && d2 < 1600 && d2 > 9) { const sz = (0.05 + 0.12 * o.k) * (1 + 0.8 * age / 0.05); Fl.push(o.x, fy + 0.5 * sz, o.z, sz, hash1(j) * 6.3, 0.7 * (1 - age / 0.05), 1, 0.95, 0.98, 1.0); }
         // a brief puff of ice powder, low over the spot (a solid: it falls straight back, no dust hangs in the air)
         if (age < 0.16 && d2 < 520 && d2 > 16) { const w = age / 0.16, sz = (0.04 + 0.08 * o.k) * (0.6 + 1.0 * w); Pu.push(o.x, fy + 0.5 * sz, o.z, sz, hash1(j * 3) * 6.3, 0.3 * (1 - w) ** 1.5, 1.0, 0.93, 0.95, 0.98); }
-        // a splash of chips: thrown out fast and low, falling straight back down (drawn with a 1/50 s blur)
+        // a splash of chips (drawn with a 1/50 s blur): the bigger bits hop out and fall back; the rest leave fast and flat,
+        // tens of metres a second (no air to stop them), and skim off across the deck
         if (d2 < 520 && age < 0.9 && hash1(j * 5 + 6) < 0.7) {
-          const nq = o.k > 0.6 ? 7 : 5, sb = Math.min(age, 1 / 50), lw = 0.005 + 0.007 * o.k;
+          const nq = o.k > 0.6 ? 8 : 6, sb = Math.min(age, 1 / 50), lw = 0.005 + 0.007 * o.k;
           for (let q = 0; q < nq; q++) {
-            const h = hash1(j * 11 + q), a = hash1(j * 13 + q) * 6.283, vh = (2.0 + 6.0 * h) * (0.6 + o.k), vy = (0.6 + 2.4 * hash1(j * 17 + q)) * (0.6 + 0.8 * o.k);
+            const h = hash1(j * 11 + q), a = hash1(j * 13 + q) * 6.283, fast = q % 2 === 1;
+            const vh = fast ? (20 + 90 * h * h) * (0.6 + 0.6 * o.k) : (2.0 + 6.0 * h) * (0.6 + o.k), vy = (fast ? 0.3 + 1.2 * hash1(j * 17 + q) : (0.6 + 2.4 * hash1(j * 17 + q)) * (0.6 + 0.8 * o.k));
+            if (fast && (age > 0.2 || vh * age > 7)) continue;
             const y = fy + vy * age - 0.5 * NR_G * age * age; if (y < fy) continue;
             const ca = Math.cos(a) * vh, sa = Math.sin(a) * vh, ta = age - sb, yb = fy + vy * ta - 0.5 * NR_G * ta * ta;
             Sp.push(o.x + ca * ta, yb, o.z + sa * ta, o.x + ca * age, y, o.z + sa * age, 0.93, 0.96, 1.0, 0.9 * (1 - age / 0.9), lw);
@@ -242,7 +245,7 @@ class NrStorm {
         Mi.push(gx, f + 0.5 * ms + 0.8 * k, gz, ms, m * 0.7, 0.1 * Math.sin(Math.PI * Math.min(1, k * 1.15)), 1.0, 0.92, 0.94, 0.97);
       }
     }
-    // the first stones, close to you: each one the size of a golf ball at 1,200+ km/h (~1 kJ: a rifle bullet's energy)
+    // the first stones, close to you: each one the size of a golf ball at 1,200+ km/h (~2 kJ: a rifle bullet's energy)
     if (!sky) this._heroHits(S, I, Fl, Sp, Pu, c);
     I.end(); Fl.end(); Sp.end(); Pu.end(); Mi.end();
     this._craterUpdate(S);
@@ -261,12 +264,15 @@ class NrStorm {
       if (age < 0.75) for (let q = 0; q < 40; q++) {
         const h = (n) => hash1(j * 977 + q * 13 + n), a = (q + h(1)) / 40 * 6.283, vh = (1.5 + 6 * h(2)) * k, vy = (0.8 + 3.5 * h(3)) * k;
         const y = fy + vy * age - 0.5 * NR_G * age * age; if (y < fy) continue;
-        const sz = (0.025 + 0.04 * h(4)) * k, w = age / 0.75;
+        const sz = (0.025 + 0.04 * h(4)) * k * MathX.clamp((dc - 1.0) / 4, 0.25, 1), w = age / 0.75;
         Pu.push(x + Math.cos(a) * vh * age, y, z + Math.sin(a) * vh * age, sz, h(5) * 6.3, 0.9 * (1 - w), 1.0, 0.94, 0.96, 0.99);
       }
-      // a spray of chips (and on the first, the confetti it landed in), fast and low, falling straight back
+      // a spray of chips (and on the first, the confetti it landed in): some hop out and fall back; most leave flat at
+      // 30–180 m/s (nothing slows them) and are gone across the roof in a frame or two
       for (let q = 0; q < 46; q++) {
-        const h = (n) => hash1(j * 1931 + q * 17 + n), a = h(1) * 6.283, vh = (2 + 9 * h(2)) * k, vy = (0.5 + 5 * h(3)) * k, sb = Math.min(age, 1 / 50), ta = age - sb;
+        const h = (n) => hash1(j * 1931 + q * 17 + n), fast = q % 3 !== 0, a = h(1) * 6.283, sb = Math.min(age, 1 / 50), ta = age - sb;
+        const vh = fast ? (30 + 150 * h(2) * h(2)) * (0.6 + 0.4 * k) : (2 + 9 * h(2)) * k, vy = fast ? (0.3 + 1.5 * h(3)) * k : (0.5 + 5 * h(3)) * k;
+        if (fast && (age > 0.25 || vh * age > 9)) continue;
         const y = fy + vy * age - 0.5 * NR_G * age * age; if (y < fy) continue;
         const cf = j === 0 && q % 3 === 0, c = cf ? [[0.95, 0.76, 0.3], [0.91, 0.34, 0.5], [0.31, 0.7, 0.91], [0.38, 0.77, 0.43]][q % 4] : [0.94, 0.97, 1.0];
         Sp.push(x + Math.cos(a) * vh * ta, fy + vy * ta - 0.5 * NR_G * ta * ta, z + Math.sin(a) * vh * ta, x + Math.cos(a) * vh * age, y, z + Math.sin(a) * vh * age, c[0], c[1], c[2], 0.95 * (1 - age / 1.3), 0.008 + 0.006 * k);

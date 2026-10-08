@@ -2,7 +2,8 @@
    SKY — the cut-away "MEANWHILE, 9 KM UP" (its own scene, shown through
    FILM.view): a ride down beside one piece of the storm cloud's ice
    (NR_STONE). Everything solid up here (every hailstone, every grain of
-   graupel and snow) has been falling since the change, from rest, all at
+   graupel and snow) has been falling since the change, from rest (a
+   simplification: in the updraft small ice was rising), all at
    the same rate: so around you the ice hangs perfectly still, while the
    cloud itself (water droplets, which still ride the air) streams up past
    at 370 → 650 km/h. You fall past the sunlit side of the storm's tower,
@@ -28,7 +29,8 @@ class NrAerial {
     this.L = new THREE.Vector3(...NR_SKY.sun).normalize();
     this._dome();
     const sun = new THREE.DirectionalLight('#fff3e2', 3.0); sun.position.copy(this.L).multiplyScalar(100); sc.add(sun, sun.target); this.sun = sun;
-    this.hemi = new THREE.HemisphereLight('#a9c4e6', '#8d8f94', 0.9); sc.add(this.hemi);
+    this.hemi = new THREE.HemisphereLight('#a9c4e6', '#8d8f94', 0.6); sc.add(this.hemi);
+    const rim = new THREE.DirectionalLight('#e2ecff', 2.4); rim.position.set(-0.35, 0.55, -1); sc.add(rim, rim.target); this.rim = rim;
     this.flashL = new THREE.PointLight('#dfe8ff', 0, 400, 1.2); this.flashL.position.set(26, 14, -40); sc.add(this.flashL);
     this._camTracks();
     this._stones();
@@ -36,13 +38,11 @@ class NrAerial {
     this.puffs = new BillboardSystem(sc, 5200, false); this.puffs.uniforms.uLight.value = 1.0;
     this.far = new BillboardSystem(sc, 900, false); this.far.uniforms.uLight.value = 1.0; this.far.mesh.renderOrder = 3;
     this.glint = new BillboardSystem(sc, 1400, true); this.glint.mesh.renderOrder = 8;
-    this.wisp = new StreakSystem(sc, 900); this.wisp.mesh.material.blending = THREE.NormalBlending; this.wisp.mesh.renderOrder = 7;
-    this.glow = new BillboardSystem(sc, 8, true); this.glow.mesh.renderOrder = 9;
+    this.wisp = new StreakSystem(sc, 1500); this.wisp.mesh.material.blending = THREE.NormalBlending; this.wisp.mesh.renderOrder = 7;
     this.boltC = new StreakSystem(sc, 64); this.boltC.mesh.renderOrder = 9;
-    this.mist = new BillboardSystem(sc, 160, false); this.mist.uniforms.uLight.value = 1.0; this.mist.mesh.renderOrder = 6;
     this._fr = new THREE.Frustum(); this._pm = new THREE.Matrix4(); this._sp = new THREE.Sphere(); this._v = new THREE.Vector3();
     this._hemiSky = new THREE.Color('#a9c4e6'); this._hemiGr = new THREE.Color('#8d8f94'); this._hemiIn = new THREE.Color('#e6eaee');
-    this._fogOut = new THREE.Color('#9fb3c9'); this._fogIn = new THREE.Color('#9da4ad'); this._fogDeep = new THREE.Color('#6d737c'); this._fogBolt = new THREE.Color('#e4ebff');
+    this._fogOut = new THREE.Color('#9fb3c9'); this._fogIn = new THREE.Color('#878e97'); this._fogDeep = new THREE.Color('#596069'); this._fogBolt = new THREE.Color('#e4ebff');
   }
 
   // the sky: deep blue up here, a pale horizon (3° below level from 9 km), the land far below in haze; the sun
@@ -69,13 +69,13 @@ class NrAerial {
   _camTracks() {
     const K = (keys) => new SmoothTrack(keys);
     this.tk = {
-      az: K([[12.4, -10], [13.6, -18], [14.8, -36], [15.6, -46], [16.4, -52], [17.2, -36], [18.4, -22], [20.4, -16]]),
-      d: K([[12.4, 0.52], [13.6, 0.5], [14.8, 0.58], [15.6, 0.5], [16.4, 0.42], [17.2, 0.46], [18.4, 0.42], [20.4, 0.33]]),
-      h: K([[12.4, 0.1], [13.6, 0.09], [14.8, 0.12], [15.6, 0.32], [16.4, 0.4], [17.2, 0.12], [18.4, 0.06], [20.4, 0.04]]),
+      az: K([[14.2, -20], [15.0, -34], [15.8, -46], [16.5, -52], [17.2, -36], [18.4, -22], [20.4, -16]]),
+      d: K([[14.2, 0.36], [15.0, 0.44], [15.8, 0.5], [16.5, 0.42], [17.2, 0.42], [18.4, 0.38], [20.4, 0.3]]),
+      h: K([[14.2, -0.2], [15.0, -0.08], [15.8, 0.3], [16.5, 0.4], [17.2, 0.12], [18.4, 0.06], [20.4, 0.04]]),
       // where you look: past the stone (azimuth offset, deg), and how far down (deg)
-      la: K([[12.4, -6], [13.6, -6], [14.8, -4], [15.6, 0], [16.4, -2], [17.2, 0], [18.4, 3], [20.4, 2]]),
-      pd: K([[12.4, 4], [13.6, 4], [14.8, 2], [15.6, -34], [16.4, -50], [17.0, -14], [17.6, -2], [18.4, 0], [20.4, 0]]),
-      fov: K([[12.4, 56], [13.6, 56], [14.8, 60], [15.6, 66], [16.4, 70], [17.2, 62], [18.4, 58], [20.4, 52]]),
+      la: K([[14.2, -6], [15.0, -4], [15.8, 0], [16.5, -2], [17.2, 0], [18.4, 3], [20.4, 2]]),
+      pd: K([[14.2, 7], [15.0, 3], [15.8, -20], [16.4, -26], [17.0, -10], [17.6, -2], [18.4, 0], [20.4, 0]]),
+      fov: K([[14.2, 54], [15.0, 58], [15.8, 66], [16.4, 70], [17.2, 60], [18.4, 54], [20.4, 48]]),
     };
   }
   camAt(S, out) {
@@ -103,7 +103,7 @@ class NrAerial {
     core.scale.setScalar(0.62); hero.add(shell, core); hero.scale.setScalar(0.02); this.scene.add(hero); this.hero = hero;
     // the others: small hail and graupel, 0.8–3.6 cm, from 25 cm to 14 m away (none where the camera passes)
     const r = new RNG(5151), path = [];
-    for (let S = 12.4; S <= 20.4; S += 0.1) path.push(this.camAt(S, new THREE.Vector3()));
+    for (let S = NR.sky[0]; S <= NR.sky[1]; S += 0.1) path.push(this.camAt(S, new THREE.Vector3()));
     this.st = [];
     for (let tries = 0; this.st.length < 460 && tries < 4000; tries++) {
       const rr = 0.25 + 13.75 * Math.pow(r.next(), 1.7), th = r.range(0, Math.PI * 2), cz = r.range(-1, 1), sz = Math.sqrt(1 - cz * cz);
@@ -157,7 +157,7 @@ class NrAerial {
       for (let i = 0; i < 22; i++) { const q = r.range(0, 6.28), dd = Math.sqrt(r.next()) * R, hh = (1 - dd / R) * (top - 2600) * r.range(0.3, 1); F.push([cx + Math.cos(q) * dd, 2600 + hh, cz + Math.sin(q) * dd, r.range(0.3, 0.6) * R, r.range(0, 6.3), 0.7 + 0.35 * (hh / (top - 2600))]); }
     }
     // the lumps: one instanced faceted ball (a little irregular), white, rough
-    const mat = new THREE.MeshStandardMaterial({ color: '#f6f8fa', roughness: 1, metalness: 0, flatShading: true, emissive: '#53606f', emissiveIntensity: 0.42 });
+    const mat = new THREE.MeshStandardMaterial({ color: '#f6f8fa', roughness: 1, metalness: 0, flatShading: true, emissive: '#53606f', emissiveIntensity: 0.16 });
     this.lumpMat = mat;
     const im = new THREE.InstancedMesh(this._stoneGeo(2, 21, 0.12), mat, 6500); im.frustumCulled = false; im.count = 0; this.scene.add(im); this.lumpM = im;
   }
@@ -176,7 +176,7 @@ class NrAerial {
     fogC.copy(this._fogOut).lerp(this._fogIn, inK).lerp(this._fogDeep, deepK * inK).lerp(this._fogBolt, bolt * inK * 0.85);
     sc.fog.density = 0.00005 + 0.042 * inK;
     sc.background.copy(fogC); this.domeU.uFog.value.copy(fogC); this.domeU.uIn.value = inK;
-    this.sun.intensity = 3.0 * (1 - inK) + 1.5 * inK * (1 - 0.5 * deepK); this.hemi.intensity = 0.9 + 0.7 * inK - 0.4 * deepK * inK + 0.2 * bolt * inK;
+    this.sun.intensity = 3.0 * (1 - inK) + 1.5 * inK * (1 - 0.5 * deepK); this.hemi.intensity = 0.6 + 1.0 * inK - 0.4 * deepK * inK + 0.2 * bolt * inK;
     this.hemi.color.copy(this._hemiSky).lerp(this._hemiIn, inK); this.hemi.groundColor.copy(this._hemiGr).lerp(this._hemiIn, inK * 0.8);
     this.flashL.intensity = 90 * bolt * inK;
     this.stoneMat.emissiveIntensity = 0.6 + 0.3 * inK;
@@ -224,33 +224,15 @@ class NrAerial {
     // inside: the droplets stream up past you at your speed (a 1/30 s smear), in a box that wraps round you
     const W = this.wisp; W.begin();
     if (inK > 0.01) {
-      const bx = 34, by = 40, bz = 34, sh = 1 / 30, wrap = (q, s) => q - s * Math.floor(q / s), rise = 0.5 * NR_G * (S - NR.loss) ** 2;
-      for (let i = 0; i < 560; i++) {
+      const bx = 26, by = 40, bz = 26, sh = 1 / 30, wrap = (q, s) => q - s * Math.floor(q / s), rise = 0.5 * NR_G * (S - NR.loss) ** 2;
+      for (let i = 0; i < 1100; i++) {
         const x = cp.x - bx / 2 + wrap(hash1(i * 5 + 1) * 977 - cp.x + bx / 2, bx), z = cp.z - bz / 2 + wrap(hash1(i * 5 + 2) * 977 - cp.z + bz / 2, bz), y = cp.y - by / 2 + wrap(hash1(i * 5 + 3) * 977 + rise, by);
-        const dd = Math.hypot(x - cp.x, y - cp.y, z - cp.z); if (dd < 1.2) continue;
-        const a = (0.05 + 0.08 * hash1(i * 5 + 4)) * inK * MathX.smooth(dd, 1.2, 4) * (1 + 1.2 * bolt), c = (0.86 + 0.1 * hash1(i * 5 + 5)) * (0.75 + 0.6 * bolt) * (1 - 0.25 * deepK);
+        const dd = Math.hypot(x - cp.x, y - cp.y, z - cp.z); if (dd < 1.0) continue;
+        const a = (0.09 + 0.12 * hash1(i * 5 + 4)) * inK * MathX.smooth(dd, 1.0, 3.5) * (1 + 1.2 * bolt), c = (0.86 + 0.1 * hash1(i * 5 + 5)) * (0.75 + 0.6 * bolt) * (1 - 0.25 * deepK);
         W.push(x, y - v * sh * 0.5, z, x, y + v * sh * 0.5, z, c, c * 1.01, c * 1.04, a * 0.8, 0.08 + 0.35 * hash1(i * 5 + 6));
       }
     }
     W.end();
-    // ... and soft clots of mist rushing up past (each crosses the frame in a few frames)
-    const Mi = this.mist; Mi.begin(sc.fog);
-    if (inK > 0.01) {
-      const rise = 0.5 * NR_G * (S - NR.loss) ** 2, wrap = (q, s) => q - s * Math.floor(q / s), bx = 30, by = 60, bz = 30;
-      const ms = this._ms || (this._ms = []); ms.length = 0;
-      for (let i = 0; i < 150; i++) {
-        const x = cp.x - bx / 2 + wrap(hash1(i * 7 + 1) * 911 - cp.x + bx / 2, bx), z = cp.z - bz / 2 + wrap(hash1(i * 7 + 2) * 911 - cp.z + bz / 2, bz), y = cp.y - by / 2 + wrap(hash1(i * 7 + 3) * 911 + rise, by);
-        const dd = Math.hypot(x - cp.x, y - cp.y, z - cp.z), sz = 1.2 + 2.2 * hash1(i * 7 + 4); if (dd < sz * 0.7) continue;
-        ms.push([dd, x, y, z, sz, hash1(i * 7 + 5) * 6.3]);
-      }
-      ms.sort((a, b) => b[0] - a[0]);
-      for (const [dd, x, y, z, sz, rot] of ms) Mi.push(x, y, z, sz, rot, 0.1 * inK * MathX.smooth(dd, sz * 0.7, sz * 1.6), (0.78 + 0.4 * bolt) * (1 - 0.25 * deepK), 1, 1, 1.02);
-    }
-    Mi.end();
-    // the stroke itself: a glow somewhere off to the right, seen through the cloud
-    const Gw = this.glow; Gw.begin(null);
-    if (bolt > 0.01) Gw.push(20, 14, -70, 46, 0, 0.45 * bolt * inK, 1, 0.85, 0.9, 1.0);
-    Gw.end();
     // ... and its channel, glimpsed through the cloud for a frame or two
     const Bc = this.boltC; Bc.begin();
     if (bolt > 0.25 && inK > 0.5) {

@@ -7,7 +7,7 @@
    Plan: films/no-air-resistance/PLAN.md
    ===================================================================== */
 
-CONFIG.duration = 61.4;
+CONFIG.duration = 62.4;
 CONFIG.seed = 20261019;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.68, walkSpeed: 1.2, bobStrength: 0.013, bobFrequency: 1.72, runStrideGain: 0.55,
@@ -23,20 +23,21 @@ const NR = {
   loss: 2.0,                                   // the air stops pushing on solids: the laundry drops, the kite falls
   walk: [3.4, 6.3],                            // you look across to the kite's flyer at the parapet; at 6.3 the cut into the stairwell
   drop: { up: 6.35, rel: 7.4 },                // hands out over the stairwell's rail; paper and ball let go together (the fall plays at 0.6×)
-  cut0: 10.4,                                  // the drop ends here (straight to the sky)
-  sky: [12.4, 20.4],                           // the cut-away: 9 km up, falling beside one piece of the cloud's ice (into the cloud at ~16.6)
+  cut0: 10.1,                                  // the drop ends here (straight to the sky)
+  sky: [14.2, 20.4],                           // the cut-away: 9 km up, falling beside one piece of the cloud's ice (into the cloud at ~16.6)
   pop: 21.15,                                  // the (spring) confetti cannon, fired straight up, a toy paratrooper with the confetti
   gale: [24.0, 25.4],                          // the gust front: the wind rises 50 → 110 km/h; the rain arrives with it
   balloon: 30.4,                               // the child lets go of the balloons
   cloud: 33.0,                                 // you look up into the cloud: its ice is falling
   ice0: 36.98,                                 // the first of the cloud's ice lands (NR_ICE.first: the lowest ice, 6 km up, falls for 35 s)
+  slow: [36.85, 37.75],                        // the first stones, at half speed
   run: 37.45,                                  // you back off to the stair door
   inDoor: 38.9,                                // on its threshold, looking out
   roofHit: 45.2,                               // the ice starts coming through the stair housing's roof over you
   back: 46.4,                                  // you back off to the top of the stairs
   quiet: 53.48,                                // the last of the cloud's ice lands (NR_ICE.last); silence
   out: 54.4,                                   // you step out onto the roof
-  line: [56.0, 60.9], fade: [60.5, 61.2], black: 61.2,
+  line: [56.0, 61.8], fade: [61.4, 62.1], black: 62.1,
 };
 
 // the roof: a five-storey building on your side of the avenue (x 12.5–30.5, z −21.6…3.0), its deck 21.4 m up. Everything is
@@ -63,12 +64,12 @@ const NR_ROOF_HITS = {
   sheets: [49.7, 47.8, 99], chairs: [48.35, 49.3, 50.25, 51.15], pot: 50.6, table: 50.95,
 };
 
-// the cuts: the opening take, the drop (at 0.6×), the sky, the roof
-CONFIG.edit = [[0, NR.drop.rel - 0.05], [NR.drop.rel - 0.05, NR.drop.rel + 2.55, 0.6], [NR.drop.rel + 2.55, NR.cut0], [NR.sky[0], CONFIG.duration]];
+// the cuts: the opening take, the drop (at 0.6×), the sky, the roof (the first stones landing at 0.5×)
+CONFIG.edit = [[0, NR.drop.rel - 0.05], [NR.drop.rel - 0.05, NR.drop.rel + 2.35, 0.6], [NR.drop.rel + 2.35, NR.cut0], [NR.sky[0], NR.slow[0]], [NR.slow[0], NR.slow[1], 0.5], [NR.slow[1], CONFIG.duration]];
 
 // where you stand: the stair door (the opening), leaning over the stairwell's top rail (the drop), the confetti, the storm, the
 // spot by the door where the ice finds you, on the door's threshold, at the top of the stairs inside, the walk out
-const NR_CAM = { x0: 26.1, z0: -0.75, xP: 28.9, zP: -0.85, xC: 24.4, zC: -5.0, xG: 25.2, zG: -5.2, xD: 25.6, zD: -1.9, xT: 27.0, xIn: 28.1, zIn: -0.8, xOut: 24.9, zOut: -1.3 };
+const NR_CAM = { x0: 26.1, z0: -0.75, xP: 28.9, zP: -0.85, xC: 24.4, zC: -5.0, xG: 25.2, zG: -5.2, xD: 25.6, zD: -1.9, xT: 27.0, xIn: 27.85, zIn: -0.8, xOut: 24.9, zOut: -1.3 };
 
 const SCRIPT = {
   meta: { title: 'WHAT IF AIR RESISTANCE SUDDENLY DISAPPEARED?', wav: 'no-air-resistance-soundtrack.wav' },
@@ -94,27 +95,34 @@ const SCRIPT = {
     baseY: NR_ROOF.y,
     x: [[0, NR_CAM.x0], [NR.walk[0], NR_CAM.x0], [NR.walk[1] - 0.001, NR_CAM.x0 - 0.25, 'inOutSine'], [NR.walk[1], NR_CAM.xP, 'step'], [NR.cut0, NR_CAM.xP],
       [20.4, NR_CAM.xC, 'step'], [24.0, NR_CAM.xC], [26.2, NR_CAM.xG, 'inOutSine'], [32.6, NR_CAM.xG], [34.0, NR_CAM.xD, 'inOutSine'], [NR.ice0 + 0.2, NR_CAM.xD],
-      [38.2, 26.1, 'inOutSine'], [38.55, 26.6, 'linear'], [38.9, NR_CAM.xT, 'outSine'], [44.3, NR_CAM.xT], [45.1, 27.85, 'inOutSine'], [47.3, NR_CAM.xIn, 'inOutSine'], [NR.out, NR_CAM.xIn],
-      [55.4, 27.2, 'inSine'], [56.6, 25.9, 'linear'], [57.6, NR_CAM.xOut, 'outSine'], [61.4, NR_CAM.xOut - 0.25, 'inOutSine']],
+      [38.2, 26.1, 'inOutSine'], [38.55, 26.6, 'linear'], [38.9, NR_CAM.xT, 'outSine'], [44.3, NR_CAM.xT], [45.1, NR_CAM.xIn, 'inOutSine'], [NR.out, NR_CAM.xIn],
+      [55.4, 27.2, 'inSine'], [56.6, 25.9, 'linear'], [57.6, NR_CAM.xOut, 'outSine'], [62.4, NR_CAM.xOut - 0.3, 'inOutSine']],
     z: [[0, NR_CAM.z0], [NR.walk[0], NR_CAM.z0], [5.4, -2.4, 'inOutSine'], [NR.walk[1] - 0.001, -2.45], [NR.walk[1], NR_CAM.zP, 'step'], [NR.cut0, NR_CAM.zP],
       [20.4, NR_CAM.zC, 'step'], [24.0, NR_CAM.zC], [26.2, NR_CAM.zG, 'inOutSine'], [32.6, NR_CAM.zG], [34.0, NR_CAM.zD, 'inOutSine'], [NR.ice0 + 0.2, NR_CAM.zD],
-      [38.2, -1.15, 'inOutSine'], [38.55, -0.85, 'linear'], [38.9, NR_CAM.zIn, 'outSine'], [NR.out, NR_CAM.zIn], [55.4, -0.85, 'inSine'], [57.6, NR_CAM.zOut, 'inOutSine'], [61.4, NR_CAM.zOut]],
-    height: [[0, 1.68], [NR.walk[1] - 0.001, 1.68], [NR.walk[1], 1.56, 'step'], [NR.cut0, 1.5], [20.4, 1.68, 'step'], [37.2, 1.68], [37.6, 1.56], [38.9, 1.63], [46.8, 1.63], [47.5, 1.45], [NR.out, 1.45], [55.5, 1.68], [61.4, 1.68]],
+      [38.2, -1.15, 'inOutSine'], [38.55, -0.85, 'linear'], [38.9, NR_CAM.zIn, 'outSine'], [NR.out, NR_CAM.zIn], [55.4, -0.85, 'inSine'], [57.6, NR_CAM.zOut, 'inOutSine'], [62.4, NR_CAM.zOut]],
+    height: [[0, 1.68], [NR.walk[1] - 0.001, 1.68], [NR.walk[1], 1.56, 'step'], [NR.cut0, 1.5], [20.4, 1.68, 'step'], [37.2, 1.68], [37.6, 1.56], [38.9, 1.63], [46.8, 1.63], [47.5, 1.45], [NR.out, 1.45], [55.5, 1.68], [62.4, 1.68]],
     yaw: [[0, 88], [NR.loss, 87], [2.6, 83, 'inOutSine'], [3.3, 85], [4.9, 110, 'inOutSine'], [NR.walk[1] - 0.001, 111],
       [NR.walk[1], 2, 'step'], [NR.drop.rel, 0], [NR.cut0, -1],
-      // (12.4–20.4: the cut-away has its own camera)
-      [20.4, 124, 'step'], [24.0, 123], [26.2, 110, 'inOutSine'], [27.4, 108], [29.3, 110], [30.1, 136, 'inOutSine'], [32.4, 136],
+      // (NR.sky: the cut-away has its own camera)
+      [20.4, 124, 'step'], [24.0, 123], [26.2, 110, 'inOutSine'], [27.4, 108], [29.3, 110], [30.0, 141, 'inOutSine'], [31.0, 141], [32.4, 139],
       [33.6, 102, 'inOutSine'], [34.4, 93, 'inOutSine'], [36.2, 94], [36.85, 95.5, 'inOutSine'], [37.2, 93], [37.45, 99, 'outSine'], [37.75, 90, 'inOutSine'], [38.2, 86], [38.9, 90, 'inOutSine'],
-      [40.1, 92], [40.5, 96, 'inOutSine'], [41.5, 94], [41.9, 92, 'inOutSine'], [43.0, 95, 'inOutSine'], [44.0, 91], [45.0, 90], [45.5, 88], [46.2, 86], [47.3, 90, 'inOutSine'],
-      [48.6, 91], [50.4, 95, 'inOutSine'], [50.9, 97], [52.5, 93, 'inOutSine'], [NR.quiet + 0.5, 92], [55.4, 92, 'inOutSine'], [57.6, 97, 'inOutSine'], [61.4, 95, 'inOutSine']],
+      // from the doorway: a snap in on each thing as it goes (the bottles, the cake), the look up at the roof, then the sheet,
+      // the chairs, and the chimney pot and the table in one frame
+      [40.0, 92], [40.3, 96.5, 'outCubic'], [41.2, 96], [41.9, 93, 'inOutSine'], [42.55, 94], [42.8, 95.5, 'outCubic'], [43.6, 95.5], [44.1, 92, 'inOutSine'],
+      [45.0, 90], [45.5, 88], [46.2, 86], [47.3, 90, 'inOutSine'], [47.55, 90], [47.75, 91, 'outCubic'], [48.15, 91], [48.45, 95.5, 'inOutSine'], [49.6, 95.5],
+      [50.2, 100, 'inOutSine'], [51.8, 99], [52.5, 93, 'inOutSine'], [NR.quiet + 0.5, 92], [55.4, 92, 'inOutSine'], [57.6, 97, 'inOutSine'], [62.4, 95, 'inOutSine']],
     pitch: [[0, 15], [1.4, 6, 'inOutSine'], [2.8, 6], [3.4, 4, 'inOutSine'], [4.9, -1, 'inOutSine'], [NR.walk[1] - 0.001, -2],
       [NR.walk[1], -56, 'step'], [NR.drop.rel, -60], [NR.drop.rel + 1.3, -87, 'inOutSine'], [NR.cut0, -88],
-      [20.4, 12, 'step'], [21.0, 12], [21.9, 40, 'inOutSine'], [22.4, 42], [23.25, -8, 'inOutCubic'], [24.0, -4], [26.2, 1, 'inOutSine'], [30.0, 2], [30.4, 4], [30.7, 9], [32.0, 50, 'inOutCubic'], [32.5, 54], [33.6, 30, 'inOutSine'],
+      [20.4, 12, 'step'], [21.0, 12], [21.7, 24, 'inOutSine'], [22.6, 25], [23.25, -4, 'inOutCubic'], [24.0, -4], [26.2, 1, 'inOutSine'], [29.4, 2], [30.0, 6, 'inOutSine'], [30.45, 6], [31.25, 22, 'inOutCubic'], [32.3, 27], [33.6, 30, 'inOutSine'],
       [34.4, 14, 'inOutSine'], [36.1, 12], [36.85, -8, 'inOutSine'], [37.2, -10], [37.45, -3, 'outSine'], [37.75, -12, 'inOutSine'], [38.2, -6], [38.9, 1, 'inOutSine'],
-      [44.9, 2], [45.25, 5], [45.75, 50, 'inOutSine'], [46.7, 53], [47.5, 4, 'inOutSine'], [NR.quiet, 3], [NR.out, 1], [55.4, -2, 'inOutSine'], [57.6, 1, 'inOutSine'], [61.4, 4, 'inOutSine']],
-    fov: [[0, 64], [NR.walk[0], 64], [4.8, 34, 'inOutSine'], [NR.walk[1] - 0.001, 33], [NR.walk[1], 64, 'step'], [NR.drop.rel + 0.3, 64], [NR.drop.rel + 2.0, 30, 'inOutSine'], [NR.cut0, 29],
-      [20.4, 66, 'step'], [21.15, 66], [21.75, 40, 'inOutSine'], [22.5, 40], [23.3, 60, 'inOutSine'], [24.0, 66, 'inOutSine'], [30.6, 66], [31.7, 46, 'inOutSine'], [32.5, 47], [33.6, 66, 'inOutSine'], [34.4, 66], [35.2, 68, 'inOutSine'], [36.9, 68], [38.9, 72, 'inOutSine'], [46.7, 72], [47.5, 58, 'inOutSine'], [NR.out, 58], [55.6, 64, 'inOutSine'], [61.4, 64]],
-    tilt: [[0, 0], [61.4, 0]],
+      [40.0, 1], [40.3, -5, 'outCubic'], [41.2, -5], [41.9, 0, 'inOutSine'], [42.55, 0], [42.8, -6, 'outCubic'], [43.6, -6], [44.1, 2, 'inOutSine'],
+      [44.9, 2], [45.25, 5], [45.75, 50, 'inOutSine'], [46.7, 53], [47.5, 4, 'inOutSine'], [47.75, 0, 'outCubic'], [48.15, 0], [48.45, -5, 'inOutSine'], [49.6, -5],
+      [50.2, 1, 'inOutSine'], [51.8, -1], [52.5, 3, 'inOutSine'], [NR.quiet, 3], [NR.out, 1], [55.4, -2, 'inOutSine'], [57.6, 1, 'inOutSine'], [62.4, 4, 'inOutSine']],
+    fov: [[0, 64], [NR.walk[0], 64], [4.8, 34, 'inOutSine'], [NR.walk[1] - 0.001, 33], [NR.walk[1], 64, 'step'], [NR.drop.rel + 0.3, 64], [NR.drop.rel + 2.0, 44, 'inOutSine'], [NR.cut0, 43],
+      [20.4, 66, 'step'], [21.15, 66], [21.7, 54, 'inOutSine'], [22.6, 54], [23.3, 62, 'inOutSine'], [24.0, 66, 'inOutSine'], [29.4, 66], [30.0, 40, 'inOutSine'], [30.45, 40], [31.25, 52, 'inOutSine'], [32.3, 56], [33.6, 66, 'inOutSine'], [34.4, 66], [35.2, 68, 'inOutSine'], [36.9, 68], [38.9, 72, 'inOutSine'],
+      [40.0, 72], [40.3, 46, 'outCubic'], [41.2, 47], [41.9, 66, 'inOutSine'], [42.55, 66], [42.8, 46, 'outCubic'], [43.6, 47], [44.1, 64, 'inOutSine'], [45.2, 66], [45.75, 72, 'inOutSine'], [46.7, 72], [47.5, 58, 'inOutSine'],
+      [47.55, 58], [47.75, 44, 'outCubic'], [48.15, 45], [48.45, 46, 'inOutSine'], [49.6, 46], [50.2, 50, 'inOutSine'], [51.8, 50], [52.6, 58, 'inOutSine'], [NR.out, 58], [55.6, 64, 'inOutSine'], [62.4, 64]],
+    tilt: [[0, 0], [62.4, 0]],
     startles: [[NR.loss + 0.15, 0.35], [NR.pop, 0.2], [NR.ice0 + 0.02, 0.8], [37.2, 0.5], [37.45, 0.3], [37.66, 0.55], [38.2, 0.4], [NR_ROOF_HITS.panes[0], 0.15], [NR_ROOF_HITS.bottles, 0.3], [NR_ROOF_HITS.cake, 0.25],
       [NR.roofHit + 0.04, 0.6], [NR_ROOF_HITS.sheets[1], 0.2], [NR_ROOF_HITS.pot, 0.25], [NR_ROOF_HITS.table, 0.35]],
     shakes: [[NR.ice0, 0.35, 0.5], [37.66, 0.25, 0.4], [38.9, 0.06, 6.3], [NR.roofHit, 0.11, 8.25]],
@@ -128,7 +136,7 @@ const SCRIPT = {
   },
 
   tracks: {
-    pov: [[0, 1], [NR.sky[0] - 0.001, 1], [NR.sky[0], 0, 'step'], [NR.sky[1] - 0.001, 0], [NR.sky[1], 1, 'step'], [61.4, 1]],
+    pov: [[0, 1], [NR.sky[0] - 0.001, 1], [NR.sky[0], 0, 'step'], [NR.sky[1] - 0.001, 0], [NR.sky[1], 1, 'step'], [62.4, 1]],
   },
 
   hud: {
@@ -137,23 +145,22 @@ const SCRIPT = {
       { t: 3.55, until: 4.9, text: 'The wind is still blowing at 50 km/h…' },
       { t: 5.0, until: NR.walk[1] - 0.05, text: '…but the kite dropped like a brick.' },
       { t: 8.4, until: NR.cut0, text: 'Paper now falls as fast as a ball.' },
-      { t: 12.9, until: 15.3, text: 'Up in the storm, all of its ice is falling…' },
-      { t: 15.45, until: 17.7, text: '…and nothing is slowing it down.' },
-      { t: 18.0, until: 20.3, text: 'Every piece is heading for that roof.' },
-      { t: 21.9, until: 23.95, text: 'A parachute would be useless.' },
+      { t: 14.5, until: 17.05, text: 'Up in the storm, all of its ice is falling…' },
+      { t: 17.2, until: 20.3, text: '…and the air can’t slow it down.' },
+      { t: 21.9, until: 23.95, text: 'So a parachute is useless.' },
       { t: 25.6, until: 27.4, text: 'The rain flies sideways…' },
       { t: 27.5, until: 29.9, text: '…but the washing barely moves.' },
-      { t: 30.9, until: 32.9, text: 'Balloons would rocket up at 2 g.' },
+      { t: 30.9, until: 32.9, text: 'Balloons now rocket up at 2 g.' },
       { t: 33.3, until: 35.0, text: 'That cloud’s ice has been falling for 31 seconds…' },
       { t: 35.1, until: 36.9, text: '…and the first of it is about to land.' },
-      { t: 40.6, until: 42.6, text: 'Nothing slowed it on the way down.' },
+      { t: 40.6, until: 42.5, text: 'It’s landing faster than sound.' },
       { t: 45.35, until: 47.6, text: 'And now it’s coming through the roof.' },
-      { t: 49.4, until: 51.8, text: 'Now faster than a pistol bullet.' },
+      { t: 48.5, until: 50.5, text: 'Now faster than a pistol bullet.' },
     ],
     says: [],
     stack: [{ t: NR.line[0], until: NR.line[1], lines: [[NR.line[0], 'Every storm cloud'], [NR.line[0], 'is full of ice.'], [57.9, 'Only the air holds it up.']] }],
     readouts: [],
-    notes: [{ t: 58.9, until: NR.line[1], text: 'Fictional physics: only solids lose air resistance (rain, steam and cloud droplets still ride the wind) · sound and breathing kept' }],
+    notes: [{ t: 58.9, until: NR.line[1], text: 'Fictional physics: only solids lose air resistance (rain, steam and cloud droplets still ride the wind; the falling ice loses no speed to them) · buoyancy, sound and breathing kept' }],
   },
 };
 

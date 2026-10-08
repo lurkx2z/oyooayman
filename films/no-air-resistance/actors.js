@@ -143,7 +143,7 @@ class NrBalloons {
       return { m, L: 0.95 + 0.25 * hash1(i * 7 + 1), ox: Math.cos(a) * 0.17, oz: Math.sin(a) * 0.17, ph: i * 1.3, ak: 0.92 + 0.16 * hash1(i * 7 + 2) };
     });
     const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(cols.length * 6), 3));
-    this.str = new THREE.LineSegments(sg, new THREE.LineBasicMaterial({ color: '#f2f2ee' })); this.str.frustumCulled = false; scene.add(this.str);
+    this.str = new THREE.LineSegments(sg, new THREE.LineBasicMaterial({ color: '#b9b8b0' })); this.str.frustumCulled = false; scene.add(this.str);
     this._h = new THREE.Vector3(); this.p0 = null;
   }
   _release() {

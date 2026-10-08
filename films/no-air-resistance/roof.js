@@ -99,8 +99,9 @@ const NR_HOLES_ROOF_GLSL = `
     float m = 0.0; rim = 0.0;
     for (int i = 0; i < ${60}; i++) { vec4 h = uHoles[i]; if (uS < h.z) continue;
       float r = h.w * (0.6 + 0.4 * smoothstep(h.z, h.z + 0.08, uS)), d = length(p - h.xy);
-      float th = atan(p.y - h.y, p.x - h.x), jag = 0.8 + 0.1 * sin(th * 3.0 + h.z * 17.0) + 0.07 * sin(th * 5.0 + h.x * 23.0) + 0.05 * sin(th * 11.0 + h.y * 31.0);
-      m = max(m, 1.0 - step(r * jag, d)); rim = max(rim, 1.0 - smoothstep(r * jag, r * jag * 1.9, d)); }
+      float th = atan(p.y - h.y, p.x - h.x), jag = 0.78 + 0.1 * sin(th * 3.0 + h.z * 17.0) + 0.07 * sin(th * 5.0 + h.x * 23.0) + 0.05 * sin(th * 11.0 + h.y * 31.0) + 0.06 * abs(sin(th * 19.0 + h.x * 41.0)) + 0.04 * abs(sin(th * 31.0 + h.y * 13.0));
+      float sp = 1.35 + 0.5 * abs(sin(th * 7.0 + h.z * 29.0));      // (splintered timber round the edge, ragged and dark)
+      m = max(m, 1.0 - step(r * jag, d)); rim = max(rim, 1.0 - smoothstep(r * jag * 0.98, r * jag * sp, d)); }
     return m; }`;
 // patch a material so the hut roof's holes cut through it (world xz)
 function nrHoley(mat, key) {
@@ -110,7 +111,7 @@ function nrHoley(mat, key) {
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;').replace('#include <project_vertex>', '#include <project_vertex>\nvHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;' + NR_HOLES_ROOF_GLSL)
       .replace('#include <color_fragment>', `#include <color_fragment>
-        { float rim; if (nrRoofHole(vHoleW.xz, rim) > 0.5) discard; diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.3, 0.24, 0.18), rim * 0.85); }`);
+        { float rim; if (nrRoofHole(vHoleW.xz, rim) > 0.5) discard; diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.13, 0.1, 0.075), rim * 0.95); }`);
   };
   mat.customProgramCacheKey = () => key;
   mat.userData.holes = U;
@@ -544,7 +545,7 @@ class NrRoof {
     // nothing to damp it but the cloth) and then hang still, whatever the wind does. In the storm the rain (water: still
     // blown at 110 km/h) drums on them: a lean of ~12° and a shiver. Then the ice shoots their pegs away: each drops
     // straight down and folds over onto the deck
-    const rk = MathX.smooth(S, NR.gale[0] + 0.4, NR.gale[0] + 1.8) * (1 - MathX.smooth(landed, 0.05, 0.4));
+    const rk = MathX.smooth(S, NR.gale[0] + 0.4, NR.gale[0] + 1.8) * (1 - MathX.smooth(landed, 0.05, 0.4) * (1 - MathX.smooth(S, NR.quiet, NR.quiet + 1.5)));      // (the rain's lean returns once the ice is down)
     for (const Sh of this.sheets) {
       const lz = nrLoad(Math.min(S, NR.loss), Sh.i * 3), th0 = 1.05 * Math.min(1.25, lz) + 0.1 * noise1(Math.min(S, NR.loss) * 1.3 + Sh.i, 7);
       const th = after ? th0 * Math.exp(-0.75 * u) * Math.cos(2.9 * u) + rk * (0.21 + 0.035 * noise1(S * 2.3 + Sh.i * 5, 13)) : th0;
@@ -653,8 +654,8 @@ class NrRoof {
       for (const [x, z, t, r] of NR_HUT_HOLES) {
         const w = S - t; if (w < 0) continue;
         const a = (0.05 + 0.03 * hash1(Math.floor(t * 977))) * MathX.smooth(w, 0, 0.25) * fade;
-        Bm.push(x, top, z, x + 0.05, Y + 0.02, z - 0.03, 0.78, 0.83, 0.9, a, r * 1.1);
-        Bm.push(x, top, z, x + 0.05, Y + 0.6, z - 0.03, 0.85, 0.88, 0.95, a * 0.6, r * 0.5);
+        Bm.push(x, top, z, x + 0.05, Y + 0.02, z - 0.03, 0.78, 0.83, 0.9, a * 0.8, r * 0.75);
+        Bm.push(x, top, z, x + 0.05, Y + 0.6, z - 0.03, 0.85, 0.88, 0.95, a * 0.5, r * 0.4);
       }
     }
     // and the ice that keeps coming in through each hole once it's open: a streak to the floor (1/100 s: longer than the

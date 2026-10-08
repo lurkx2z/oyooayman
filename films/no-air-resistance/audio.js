@@ -217,7 +217,7 @@ class NrAudio extends AudioEngine {
     // far thunder (a low roll), then in the cloud a close stroke: a crack, a tearing rumble
     const roll = (t, dur, vol, pan) => { const r = S.noise('brown', t, t + dur + 0.1), rl = S.filter('lowpass', 160, 0.7), rg = ctx.createGain(); r.connect(rl); rl.connect(rg); rg.connect(S.panned(dest, pan));
       rg.gain.setValueAtTime(0, t); rg.gain.linearRampToValueAtTime(vol, t + dur * 0.25); rg.gain.setTargetAtTime(0, t + dur * 0.35, dur * 0.25); };
-    roll(13.3, 2.6, 0.09, -0.5); roll(15.8, 2.2, 0.06, 0.4);
+    roll(a + 0.4, 2.4, 0.09, -0.5); roll(16.7, 1.8, 0.06, 0.4);
     const t0 = NR_SKY.bolt[0] + 0.25;
     S.burst(t0, 0.09, 2200, 0.6, 0.16, 0.35, dest, 'white', 0.001); S.burst(t0 + 0.01, 0.4, 700, 0.6, 0.12, 0.35, dest, 'pink', 0.003);
     roll(t0 + 0.05, 1.6, 0.3, 0.3); roll(NR_SKY.bolt[2] + 0.4, 0.9, 0.12, -0.2);
@@ -327,8 +327,8 @@ class NrAudio extends AudioEngine {
     S.thump(NR.sky[0], 0.18, out);
     for (const f of [55, 82.4]) S.tone(NR.sky[0], NR.sky[1] - NR.sky[0], f, 0.03, 0, out, 'sine', 0.3, 0.3);
     for (let t = NR.sky[0] + 0.3, k = 0; t < NR.sky[1] - 0.1; t += 0.62 - 0.12 * MathX.smooth(t, NR.sky[0], NR.sky[1]), k++) S.tone(t, 0.16, k % 2 ? 61.7 : 55, 0.05, 0, out, 'triangle', 0.004, 0.14);
-    for (const f of [220, 261.6, 329.6]) S.tone(13.0, 3.2, f, 0.008, 0, out, 'triangle', 0.8, 1.2);
-    for (const f of [207.7, 246.9, 311.1]) S.tone(16.6, 3.6, f, 0.01, 0, out, 'triangle', 0.3, 1.4);
+    for (const f of [220, 261.6, 329.6]) S.tone(NR.sky[0] + 0.3, 2.4, f, 0.008, 0, out, 'triangle', 0.8, 1.2);
+    for (const f of [207.7, 246.9, 311.1]) S.tone(16.7, 3.5, f, 0.01, 0, out, 'triangle', 0.3, 1.4);
     // the roof again: a light pulse; it grows when the storm comes
     for (let t = NR.sky[1] + 0.2, k = 0; t < NR.cloud; t += 0.6 - 0.1 * MathX.smooth(t, NR.gale[0], NR.cloud), k++) S.tone(t, 0.16, k % 4 === 0 ? 65.4 : 55, 0.03 + 0.03 * MathX.smooth(t, NR.gale[0], NR.cloud), 0, out, 'triangle', 0.004, 0.14);
     for (let i = 0; i < 4; i++) S.pluck(NR.balloon + 0.2 + i * 0.13, [440, 523.3, 659.3, 880][i], 0.02, 0.1, out, 1.2, 0.7);
