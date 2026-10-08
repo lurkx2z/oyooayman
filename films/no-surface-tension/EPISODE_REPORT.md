@@ -75,16 +75,17 @@ None. Everything is procedural; the only data file is the baked soundtrack `soun
 - Bubbles, soap, tears and ink are deliberately left out for the comments (brief).
 
 ## FINAL PREVIEW PATH
-- MP4 (1080×1920, 30 fps, H.264 + AAC): delivered in the project thread and stored at
-  `/mnt/project-files/no-surface-tension/no-surface-tension.mp4` (not committed: the repo is public and stays light).
+- MP4 (1080×1920, 30 fps, H.264 3.5 Mbit/s + AAC 160k, 60.3 s, 26.8 MiB, −17.2 LUFS): delivered in the project
+  thread and stored at `/mnt/project-files/no-surface-tension/no-surface-tension.mp4` (not committed: the repo is
+  public and stays light).
 - Runnable ZIP: `/mnt/project-files/no-surface-tension/no-surface-tension_film.zip` (unzip, double-click
   `no-surface-tension.html`, press Space). Or open `no-surface-tension.html` from a clone of this branch.
 
 ## PERFORMANCE / FPS
 - Per frame: 160–1160 draw calls (including shadow passes) and 63–91 k triangles; the garden storm shots are the
   heaviest (rain strips, wilting plants, park and city).
-- The final render ran headless on a software renderer (4 workers): about 20 frames per minute overall, so about
-  1.5 hours for the whole film. Real-time playback in Chrome on a GPU was not measured here; the kitchen shots are light,
+- The final render ran headless on a software renderer with 4 workers: 1810 frames in about 69 minutes (the kitchen
+  chunks were the slowest per frame). Real-time playback in Chrome on a GPU was not measured here; the kitchen shots are light,
   and the garden is in the same range as the other city films.
 - Everything is a pure function of time (seeded, no `Math.random`, no wall clock), so any frame renders identically.
 
