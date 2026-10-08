@@ -7,7 +7,7 @@ small human things → machines → infrastructure → the payoff. Brief: `docs/
 **Story clock and the cut.** Camera, script, props, cars and sound all run on one 73.6 s story clock (the times in this
 plan are story times unless marked "film"). `CONFIG.edit` drops the waits (story 18.2–21.6, 26.9–33.6, 40.8–42.2,
 47.6–52.8) and plays the crash, story 53.35–55.0, at a third of real speed. Film length 60.2 s. Film time = story time up
-to 18.2, −3.4 s to 26.9, −10.1 s to 40.8, −11.5 s to 47.6, −16.1 s to 53.35, (slow motion: film 36.65 + 3 × (story − 53.35))
+to 18.2, −3.4 s to 26.9, −10.1 s to 40.8, −11.5 s to 47.6, −16.7 s to 53.35, (slow motion: film 36.65 + 3 × (story − 53.35))
 to 55.0, and −13.4 s after 55.0.
 
 ## 1. Rules
@@ -35,19 +35,19 @@ front with a cushioned bench at (12.08, 3.2).
 You stand by the plaza at (11.4, −2.9) for the ball, the montage and the trampoline; at the kerb (8.3, −2.1) for the traffic
 (the move is inside a cut), then step back toward the plaza (9.7, −1.5) for the ending.
 
-## 3. Shot list (as built in cut 4; story seconds, film seconds in brackets)
+## 3. Shot list (as built in the final cut; story seconds, film seconds in brackets)
 
 | # | Time | What we SEE | What we HEAR | Caption / HUD |
 |---|---|---|---|---|
 | 1 | 0–5.6 [0–5.6] | **Hook.** A teenager bouncing a solid rubber ball on the plaza; recovery drains under the title; the next landing (1.45) stays down. Cut low beside the ball, just above the paving (1.75): its flat bottom on the ground, a dashed arc over its old round top. | Rubber thocks, a hit as the rule bites, a dip, one dead thud. | **TITLE** (to 3.5) · SHAPE RECOVERY 100 % → 0 % · NOTHING SPRINGS BACK · tag WHERE ITS TOP USED TO BE · *A solid rubber ball hits… and doesn't come back up.* · *It squashes. It stays squashed.* |
 | 2 | 5.6–13.4 [same] | **Everyday things** (four close inserts, ~2 s each): racket strings stay stretched; a shoe's foam stays crushed under a dashed line; a cushion, seen from above, keeps the dent; your hands stretch a rubber band once and it stays slack. | Thup, foam squelch, bench creak, rubber creak (no snap). | Label plate on each. |
-| 3 | 13.4–18.2 [same] | **Trampoline.** A kid jumps on: the mat stays down in a funnel; his second hop is an ordinary hop on his own legs that lands dead. | The mat sinks with a dull rumble, no boing; the kid's "oh?". | *Bouncing is only the beginning.* · tag SPRINGS STRETCHED · MAT STAYS DOWN · *Bodies are fine. Their gear isn't.* |
+| 3 | 13.4–18.2 [same] | **Trampoline.** A kid jumps on: the mat stays down in a funnel; his second hop is an ordinary hop on his own legs that lands dead. | The mat sinks with one dull whump, no boing; the kid's "oh?". | *Even things built to bounce back…* · tag SPRINGS STRETCHED · MAT STAYS DOWN · *Bodies are fine. Their gear isn't.* |
 | 4 | 21.6–26.9 [18.2–23.5] | **The red hatch.** It comes toward the table; cut low beside its front wheel (23.3): up, up, down, down; the body settles below a dashed line that tilts with the road. | Engine, thumps on the climbs, clunks on the landings. | RIDE HEIGHT LOST 0 → 8 cm · NEARLY ON ITS BUMP STOPS · tags WHERE THE BODY USED TO SIT, SPRING STAYS SQUASHED · *Suspension is mostly springs…* / *…so every bump leaves it lower.* |
-| 5 | 33.6–40.8 [23.5–30.7] | **Low cars, then the truck.** From the kerb (tighter lens) two low cars crawl over the table, sparks spraying from under them; a loaded box truck comes past; side-on beside its rear axle (36.5), the box drops below a dashed line and ends on its bump stops; it drives off tail-low. | Scrapes, engines, the truck's heavy landing. | *A few bumps later, they scrape on every one.* · *A loaded truck sinks even faster.* · TRUCK'S REAR DROP 0 → 6 → 11 cm · tags WHERE THE BOX USED TO SIT, REAR SPRINGS · ON THE STOPS |
-| 6 | 42.2–47.6 [30.7–36.1] | **The footbridge**, face-on from high over the avenue, the whole span and both stair towers in frame, a slow push: a running club crosses; the deck dips and keeps the dip. | Dull thumps of feet on the deck, a low rumble. | FOOTBRIDGE SAG → 7.2 mm · IT KEEPS ITS DEEPEST DIP · tags WHERE THE DECK WAS, SAG DRAWN 300× LARGER · *Bridges flex a little, all day…* / *…now each one keeps the shape of its worst day.* |
-| 7 | 52.8–59.4 [36.1–46.0] | **Payoff: the crash**, from 5.5 m up behind the SUV: it runs the red into the sedan's flank (1/3 speed, film 36.65–41.6), they crumple, lock and slide off as one. At the van's hit (54.7) cut to a slow high arc round the wreck from the side the van comes in. | Dry tyre scrub (no horn), slowed crunch, dry glass, the van's hit, steam. | *Crashed cars normally rebound a little…* / *…these don't. They stay locked.* · SEPARATION SPEED 0 m/s · NORMALLY ABOUT 1 m/s · *Three cars. One wreck.* |
+| 5 | 33.6–40.8 [23.5–30.7] | **Low cars, then the truck.** From the kerb (tighter lens) two low cars crawl over the table, sparks spraying from under them; a loaded box truck comes past; side-on beside its rear axle (36.5), the box drops below a dashed line and ends on its bump stops; it drives off tail-low. | Scrapes, engines, the truck's heavy landing. | *A few bumps later, they scrape on every one.* · *A loaded truck runs out of travel even sooner.* · TRUCK'S REAR DROP 0 → 6 → 11 cm · tags WHERE THE BOX USED TO SIT, REAR SPRINGS · ON THE STOPS |
+| 6 | 42.2–47.6 [30.7–36.1] | **The footbridge**, face-on from high over the avenue, the whole span and both stair towers in frame, a slow push: a running club crosses; the deck dips and keeps the dip. | Dull thumps of feet on the deck. | FOOTBRIDGE SAG → 7.2 mm · IT KEEPS ITS DEEPEST DIP · tags WHERE THE DECK WAS, SAG DRAWN 300× LARGER · *Bridges flex a little, all day…* / *…now each one keeps the shape of its worst day.* |
+| 7 | 52.8–59.4 [36.1–46.0] | **Payoff: the crash**, from 5.5 m up behind the SUV: it runs the red into the sedan's flank (1/3 speed, film 36.65–41.6), they crumple, lock and slide off as one. At the van's hit (54.7) cut to a slow high arc round the wreck from the side the van comes in. | Dry tyre scrub (no horn), slowed crunch, dry glass, the van's hit, steam. | *Crashed cars normally rebound a little…* / *…these don't. They stay jammed together.* · SEPARATION SPEED 0 m/s · NORMALLY ABOUT 1 m/s · *Three cars. One wreck.* (on the arc) |
 | 8 | 59.4–63.4 [46.0–50.0] | **The tap.** Wider at first: a late hatch brakes behind the wreck and touches the van at 5 km/h, backs off; the camera pushes in, centred on its nose, a dashed line where its front was. | Tyre scrub, a small dull crunch. | IMPACT SPEED 5 km/h · NORMALLY: IT SPRINGS BACK · tag BUMPER PUSHED IN · STAYS IN · *Now even a tap leaves a dent.* |
-| 9 | 63.4–73.6 [50.0–60.2] | **The tired street**, you turn back to the plaza; then low beside the flat ball again (66.5), the teenager sitting behind it (the opening, looped). | Quiet air, the closing chord. | SHAPE RECOVERY 0 % · *Without elasticity…* / *…almost nothing gets a second chance to return to shape.* · note FICTIONAL RULE… |
+| 9 | 63.4–73.6 [50.0–60.2] | **The tired street** for a beat, then low beside the flat ball again (65.3 [51.9]), the same pose as the opening insert, its dashed arc back, slowly pushing in to the end (the opening, looped). | Quiet air, the closing chord. | SHAPE RECOVERY 0 % · *Without elasticity…* / *…almost nothing gets a second chance to return to shape.* · note *Fictional rule: solids never spring back. People, air, water and engines work as normal.* |
 
 ## 4. Hero shots
 
@@ -65,9 +65,10 @@ No gap is longer than ~4 s.
 ## 6. Sound
 
 `films/no-elasticity/audio.js` (an AudioEngine subclass): street bed and birds, footsteps, the ball then the dead thud,
-the rule hit with a slack-string glide, montage foley, trampoline groan, engines per car, table thumps and clunks, scrape
-loops, the bus's air-brake hiss, footsteps and a groan on the bridge, the crash layers, the tap, music pads and a closing
-chord. The bed and music dip for half a second before each dead hit. Mixed to about −16 LUFS, true peak under −1 dBTP.
+the rule hit with a slack-string glide, montage foley (a rubber-band rustle, no snap), one dull whump as the trampoline mat
+sinks, engines per car, table thumps and clunks, scrape loops, the bus's air-brake hiss, dull feet on the bridge deck, the
+crash layers (dry tyre scrub, no horns), the tap, music pads and a closing chord. Nothing rings, groans or creaks for long:
+those are solids vibrating elastically. The bed and music dip for half a second before each dead hit. Mixed to about −16 LUFS, true peak under −1 dBTP.
 Baked to `soundtrack.js`.
 
 ## 7. Systems / files
@@ -107,3 +108,25 @@ white flash; the bridge too small, dark and static; "cars scrape on everything" 
 overclaim); the tap's dent off-centre; the ending a static back view. Physics: "REBOUND SPEED 0 m/s" while the wreck slides
 reads wrong (now SEPARATION SPEED); closed-cell foam would recover a little ("mostly stays crushed"); the ball should be
 called solid; sustained groans and tyre squeals are solids ringing (now dull rumbles and dry scrubs). Addressed in cut 4.
+
+**Round 4** (60.2 s fourth cut): physics 8, retention 6, cinematography 6, normal viewer 5. Main findings: the hook's
+flat spot barely reads at phone size; the car, scraping cars and truck repeat one idea; the bridge is thin and "7.2 mm" is
+an anticlimax; the crash camera, straight behind the SUV, hides the contact; the wreck arc is too tight and "Three cars.
+One wreck." comes before the third car is visible; the tap's nose sits at the frame edge; the empty street at film 50–53
+is dead air; the teenager's sitting legs look broken; the closing note in capitals reads like fine print ("ENGINES
+SPARED?"); "Bouncing is only the beginning" is followed by more bouncing; a red tag sits on the red car; tags touch the
+frame edge. Physics: a loaded truck does not sink faster, it runs out of travel sooner; creaks and long rumbles are solids
+vibrating, so they should be dull whumps; sparks at crawling speed are debatable; "jammed together" is more exact than
+"locked"; braking dive would also set the late hatch's springs.
+
+Fixed in the final polish (not re-scored): the street shot cut short and the end moved to 65.3, back on the opening
+insert's pose so the film loops (the legs out of frame); captions rewritten ("Even things built to bounce back…", "runs out
+of travel even sooner", "They stay jammed together"); "Three cars. One wreck." moved onto the arc; the crash camera moved
+off-axis with its aim on the contact; the wreck arc wider and higher; the tap's nose centred; tags clamped inside the frame
+with a dark plate on the red car; the trampoline groan is one short whump and the bridge's long groan is gone; the note is
+in plain words and sits higher.
+
+Still weak (honest): the ball's flat spot is subtle at phone size; the footbridge is still thin in the frame; the scraping
+sparks are barely visible (and debatable at crawling speed); the montage reads as a list; the rubber-band hands look odd;
+the van's tail is a blank slab; the late hatch shows no braking dive; an 18 cm solid rubber ball is heavy to dribble; the
+car and truck beats feel alike. The sound has only been level-measured, never listened to.

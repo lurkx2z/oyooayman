@@ -71,7 +71,8 @@ Everything is procedural, so there are no models, images or sound files to downl
 > one speed table; a loaded truck's rear springs end on their bump stops; a footbridge keeps the deepest dip a running club
 > gave it; a crash doesn't rebound at all (the cars crumple, lock and slide off as one); and a 5 km/h tap leaves a bumper
 > pushed in. Air, water and living tissue are unchanged (so tyres stay round). Plan, rules, shot list and review log:
-> [`films/no-elasticity/PLAN.md`](films/no-elasticity/PLAN.md).
+> [`films/no-elasticity/PLAN.md`](films/no-elasticity/PLAN.md); delivery report:
+> [`films/no-elasticity/EPISODE_REPORT.md`](films/no-elasticity/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
@@ -339,7 +340,9 @@ films/no-elasticity/props.js    the ball, the round trampoline (its mat funnels)
 films/no-elasticity/cars.js     cars whose springs take a permanent set at each bump, the truck, the inelastic crash, the tap
 films/no-elasticity/cast.js     the teenager, the kid, the café sitter, the walkers and runners on the bridge (its load)
 films/no-elasticity/film.js     FILM hooks: the inserts and cinematic shots, labels pinned to the world, the grade
-films/no-elasticity/audio.js    the soundtrack (every "boing" replaced by a dead thud; no horns; scrapes, dull groans, one crash)
+films/no-elasticity/audio.js    the soundtrack (every "boing" replaced by a dead thud; no horns; scrapes, dull whumps, one crash)
+films/no-elasticity/soundtrack.js  the baked soundtrack (regenerate with tools/bake-soundtrack.cjs after any sound change)
+films/no-elasticity/EPISODE_REPORT.md  the delivery report: timings, systems, limitations, review scores
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):
