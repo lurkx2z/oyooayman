@@ -128,9 +128,9 @@ class SndDust {
     // [x, y, z, t0, size, alpha, life, seed, kind] kind 0 dust, 1 glass glitter
     let s = 1;
     // the car's shock across the lot (light: it is only just supersonic)
-    for (let x = 14; x <= 52; x += 3.6) for (let z = -90; z <= 30; z += 3.6) {
+    for (let x = 14; x <= 52; x += 4.8) for (let z = -90; z <= 30; z += 4.8) {
       const jx = x + (hash1(s * 3) - 0.5) * 2.4, jz = z + (hash1(s * 5) - 0.5) * 2.4, tb = sndSportBoomAt(jx, jz, 0.3);
-      if (tb !== null && tb > 33) P.push([jx, h, jz, tb, 2.2, 0.13, 2.2, s, 0]);
+      if (tb !== null && tb > 33) P.push([jx, h, jz, tb, 1.7, 0.06, 1.8, s, 0]);
       s++;
     }
     // the car's wake on the highway deck (grit off the road behind it)
@@ -139,19 +139,19 @@ class SndDust {
       P.push([S.x + (hash1(s * 3) - 0.5) * 2.6, SND_CITY.hwy.top, z, tz + 0.05, 1.7, 0.16, 1.8, s, 0]); s++;
     }
     // the airliner's shock: a low wall of dust that comes up the avenue (gutters and pavements dirtiest), the lot lighter
-    for (let x = -12; x <= 12; x += 2.4) for (let z = -330; z <= 40; z += 3.0) {
+    for (let x = -12; x <= 12; x += 3.0) for (let z = -330; z <= 40; z += 3.0) {
       const jx = x + (hash1(s * 3) - 0.5) * 2.0, jz = z + (hash1(s * 5) - 0.5) * 2.6, edge = Math.abs(Math.abs(jx) - 7) < 1.6 || Math.abs(jx) > 8.5;
-      P.push([jx, Math.abs(jx) < LAYOUT.roadHalf ? 0 : h, jz, sndPlaneBoomAt(jx, jz, 0.3), edge ? 3.6 : 2.8, edge ? 0.26 : 0.15, 2.8, s, 0]);
+      P.push([jx, Math.abs(jx) < LAYOUT.roadHalf ? 0 : h, jz, sndPlaneBoomAt(jx, jz, 0.3), edge ? 3.4 : 2.6, edge ? 0.22 : 0.1, 2.1, s, 0]);
       s++;
     }
     for (let x = 15; x <= 50; x += 6) for (let z = -120; z <= 30; z += 6) {
       const jx = x + (hash1(s * 3) - 0.5) * 4, jz = z + (hash1(s * 5) - 0.5) * 4;
-      P.push([jx, h, jz, sndPlaneBoomAt(jx, jz, 0.3), 2.4, 0.09, 2.4, s, 0]); s++;
+      P.push([jx, h, jz, sndPlaneBoomAt(jx, jz, 0.3), 2.2, 0.06, 2.0, s, 0]); s++;
     }
     // the police car's wake along the street (the gutters are dusty)
     for (const x of [-10.5, -7.6, -6.6, -3.6, 0.4, 3.6, 6.6, 7.6, 10.5]) for (let z = -260; z <= 40; z += 3.2) {
       const jz = z + hash1(s) * 3.2, gutter = Math.abs(Math.abs(x) - 6.8) < 1;
-      P.push([x + (hash1(s * 7) - 0.5), Math.abs(x) < LAYOUT.roadHalf ? 0 : h, jz, sndPoliceBoomAt(x, jz, 0.3), gutter ? 2.4 : 1.6, gutter ? 0.24 : 0.12, 2.2, s, 0]);
+      P.push([x + (hash1(s * 7) - 0.5), Math.abs(x) < LAYOUT.roadHalf ? 0 : h, jz, sndPoliceBoomAt(x, jz, 0.3), gutter ? 2.0 : 1.5, gutter ? 0.13 : 0.06, 1.9, s, 0]);
       s++;
     }
     // the pile driver: a puff at the base of the pile with every blow
@@ -163,7 +163,7 @@ class SndDust {
   }
 
   update(t, fog) {
-    const B = this.sys;
+    const B = this.sys, E = sndEar(t);
     B.begin(fog);
     const push = (p) => {
       const u = t - p[3];
@@ -171,7 +171,8 @@ class SndDust {
       const k = u / p[6], sd = p[7];
       if (p[8] === 0) {
         const grow = 1 - Math.exp(-u * 2.2), size = p[4] * (0.35 + 1.1 * grow);
-        const a = p[5] * MathX.smooth(u, 0, 0.12) * (1 - k) * (1 - k);
+        // dust right at your face would only fog the lens: it thins out within a few metres of you
+        const a = p[5] * MathX.smooth(u, 0, 0.12) * (1 - k) * (1 - k) * MathX.smooth(Math.hypot(p[0] - E.x, p[2] - E.z), 2.5, 9);
         B.push(p[0] + (hash1(sd * 11) - 0.5) * u * 1.4, p[1] + 0.15 + size * 0.28 + u * (0.35 + 0.4 * hash1(sd * 3)), p[2] + u * 0.6, size, hash1(sd) * 6.28 + u * 0.4 * (hash1(sd * 5) - 0.5), a, 1, 0.66, 0.61, 0.54);
       } else {
         const a = p[5] * (1 - k) * (0.5 + 0.5 * Math.sin(u * 40 + sd));
@@ -333,8 +334,8 @@ class SndGlass {
           ax: r(9) * 6.28, ay: r(10) * 6.28, wx: (r(11) - 0.5) * 30, wy: (r(12) - 0.5) * 24, rest: r(13) * 6.28,
         });
       }
-      // glass dust/glitter at the burst
-      for (let k = 0; k < 7; k++) dust.glitter.push([p.xf - p.side * (0.3 + hash1(p.id * 5 + k) * 1.4), p.y0 + 0.6 + hash1(p.id * 9 + k) * 1.8, p.za + hash1(p.id * 3 + k) * (p.zb - p.za), p.tf + 0.02, 0.9, 0.5, 1.1, p.id * 10 + k, 1]);
+      // glass glitter at the burst: small sparks, not soft balls
+      for (let k = 0; k < 16; k++) dust.glitter.push([p.xf - p.side * (0.2 + hash1(p.id * 5 + k) * 1.6), p.y0 + 0.3 + hash1(p.id * 9 + k) * 2.0, p.za + hash1(p.id * 3 + k) * (p.zb - p.za), p.tf + 0.02 + hash1(p.id * 13 + k) * 0.12, 0.26, 0.7, 0.9, p.id * 20 + k, 1]);
     }
     // the glass lying on the sidewalk in front of each burst pane (glints once the pieces have landed)
     const gl = this._glitterTex(), gm = new THREE.MeshBasicMaterial({ map: gl, transparent: true, depthWrite: false, opacity: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });

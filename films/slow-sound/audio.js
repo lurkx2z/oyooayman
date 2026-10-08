@@ -25,11 +25,15 @@ class SndAudio extends AudioEngine {
     S.tone = (t, dur, f, vol, pan, dest, type = 'sine', attack = 0.01, release = null) => tone(t, dur, f, vol, pan, dest, type, Math.max(attack, 0.006), release);
     const rng = new RNG(CONFIG.seed + 5);
 
-    // mix chain: buses → compressor → out → limiter
-    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12; lim.connect(ctx.destination);
-    const out = ctx.createGain(); out.gain.value = 0.93; out.connect(lim);   // (~0.6 dB of headroom for the AAC encode)
+    // mix chain: buses → compressor → out → limiter → soft clip (the limiter lets the first ms of a boom through:
+    // an oversampled soft knee catches it, so the file stays under −1 dBTP after the AAC encode)
+    const clip = ctx.createWaveShaper(), CN = 2048, cv = new Float32Array(CN), knee = 0.6, ceil = 0.84;
+    for (let i = 0; i < CN; i++) { const x = (i / (CN - 1)) * 2 - 1, ax = Math.abs(x); cv[i] = Math.sign(x) * (ax <= knee ? ax : knee + (ceil - knee) * Math.tanh((ax - knee) / (ceil - knee))); }
+    clip.curve = cv; clip.oversample = '4x'; clip.connect(ctx.destination);
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.001; lim.release.value = 0.12; lim.connect(clip);
+    const out = ctx.createGain(); out.gain.value = 0.9; out.connect(lim);
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 8; comp.ratio.value = 3.5; comp.attack.value = 0.004; comp.release.value = 0.25; comp.connect(out);
-    const mix = ctx.createGain(); mix.gain.value = 1.5; mix.connect(comp);
+    const mix = ctx.createGain(), mixHp = S.filter('highpass', 26, 0.7); mix.gain.value = 1.5; mix.connect(mixHp); mixHp.connect(comp);   // (nothing below 26 Hz reaches the dynamics)
     const rev = S.reverb(2.6), revG = ctx.createGain(); revG.gain.value = 0.3; rev.connect(revG); revG.connect(mix);
     const bus = (g) => { const b = ctx.createGain(); b.gain.value = g; b.connect(mix); return b; };
     const amb = bus(0.35), you = bus(0.85), src = bus(1.0), fx = bus(1.15), mus = bus(0.5);
@@ -115,8 +119,9 @@ class SndAudio extends AudioEngine {
         else d[i] = -Math.max(0, 1 - (x - T) * sr / rise);
       }
       const s = ctx.createBufferSource(); s.buffer = buf;
-      const lp = S.filter('lowpass', lpF, 0.6), g = ctx.createGain(), p = S.panned(dest, pan);
-      g.gain.value = vol; s.connect(lp); lp.connect(g); g.connect(p); send(g, revAmt);
+      // (high-passed: the slow pressure ramp between the cracks is infrasound — no speaker plays it, but it would pump the limiter)
+      const lp = S.filter('lowpass', lpF, 0.6), hp = S.filter('highpass', 38, 0.7), g = ctx.createGain(), p = S.panned(dest, pan);
+      g.gain.value = vol; s.connect(lp); lp.connect(hp); hp.connect(g); g.connect(p); send(g, revAmt);
       s.start(t);
     };
     // a rumble that follows a big shock (the ground and the buildings ringing)
@@ -253,16 +258,16 @@ class SndAudio extends AudioEngine {
     }
 
     // 10. the airliner (Mach 2.1): nothing at all until its shock arrives, then a huge double boom and the city's reply
-    nwave(B.plane, 0.9, 0.8, fx, 1500, 0.8, 0.0);             // (a 70 m airliner: a long boom … boom, ~0.9 s apart)
-    S.boom(B.plane + 0.02, 0.7, fx, rev);
-    rumble(B.plane + 0.05, 4.5, 0.42, 130, fx);
+    nwave(B.plane, 0.9, 0.55, fx, 1500, 0.8, 0.0);             // (a 70 m airliner: a long boom … boom, ~0.9 s apart)
+    S.boom(B.plane + 0.02, 0.4, fx, rev);
+    rumble(B.plane + 0.05, 4.5, 0.24, 130, fx);
     rattle(B.plane + 0.03, 2.2, 0.1, 0, fx);
     // its engines, heard only from the boom on (receding, ~3× lower), surging
     moving(sndPlane, 30.0, 60.0, B.plane - 0.5, 70.0, (d) => {
       const n = S.noise('brown', 30, 60), lp = S.filter('lowpass', 700, 0.6), g = ctx.createGain(); g.gain.value = 1.2; n.connect(lp); lp.connect(g); g.connect(d);
       const w = S.noise('pink', 30, 60), bp = S.filter('bandpass', 1400, 1.2), wg = ctx.createGain(); wg.gain.value = 0.25; w.connect(bp); bp.connect(wg); wg.connect(d);
       for (let t = 40; t < 60; t += 0.9 + rng.range(0, 1.3)) S.backfire(t, 0.5, d, false);
-    }, 1.1, 120, src, { rev: 0.4, lp: 3000 });
+    }, 0.75, 120, src, { rev: 0.4, lp: 3000, gainFn: (te, t) => 1 - 0.7 * MathX.smooth(t, B.plane + 1.2, B.police - 1.5) });   // (it recedes under the police beat)
     // car alarms in the lot (each starts when the shock reaches that car, heard when its sound reaches you)
     if (app && app.cast) {
       const al = app.cast.parked.filter((k) => k.alarm).sort((a, b) => Math.hypot(a.x - 9.4, a.z - 1) - Math.hypot(b.x - 9.4, b.z - 1)).slice(0, 3);
@@ -291,8 +296,8 @@ class SndAudio extends AudioEngine {
       for (let t = 40; t < 60; t += 2.4) { o.frequency.linearRampToValueAtTime(1400, t + 1.2); o.frequency.linearRampToValueAtTime(700, t + 2.4); }
       const lp = S.filter('lowpass', 2200, 0.7), g = ctx.createGain(); g.gain.value = 0.55; o.connect(lp); lp.connect(g); g.connect(d); o.start(40); o.stop(60);
     }, 0.6, 8, src, { rev: 0.3, gainFn: (te, t) => 1 - 0.8 * MathX.smooth(t, T.lineA[0] - 1.0, T.lineA[0] + 1.5) });
-    nwave(B.police, 0.13, 1.25, fx, 6500, 0.55, 0.5);           // the hardest hit: the closest shock
-    S.thump(B.police + 0.01, 0.8, fx);
+    nwave(B.police, 0.13, 1.4, fx, 6500, 0.55, 0.5);           // the hardest hit: the closest shock
+    S.thump(B.police + 0.01, 0.95, fx);
     rumble(B.police + 0.02, 1.8, 0.5, 220, fx);
     // every pane that bursts or cracks, heard from where it is (the cascade rolls in from down the street)
     if (app && app.glass) {

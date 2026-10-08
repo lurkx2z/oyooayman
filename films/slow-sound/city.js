@@ -88,7 +88,7 @@ class SndCity extends Environment {
     const sky = new THREE.Mesh(new THREE.SphereGeometry(2000, 48, 24), mat);
     sky.name = 'sky'; sky.frustumCulled = false; sky.renderOrder = -10;
     this.scene.add(sky); this.sky = sky;
-    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.0007);   // a clear sunny afternoon: far blocks soften, nothing goes milky
+    this.scene.fog = new THREE.FogExp2(this.fogColor.clone(), 0.00045);   // a clear sunny afternoon: far blocks soften, nothing goes milky
     this.scene.background = horizon.clone();
   }
 
@@ -122,7 +122,7 @@ class SndCity extends Environment {
       for (let z = 2; z > -74; z -= 2.6) B.add(Geo.flat(x0 - 2.6, x0 + 2.6, z - 0.06, z + 0.06, y, 1), m.markWhite, null, { noShadow: true });
       B.add(Geo.flat(x0 - 0.06, x0 + 0.06, -74, 2, y, 1), m.markWhite, null, { noShadow: true });
     }
-    for (const [x, z] of [[23, -20], [21, -64], [41, -14], [41, -48], [24, 18]]) {
+    for (const [x, z] of [[20, -100], [22, -128], [41, -14], [41, -48], [24, 18]]) {   // none in the long-lens line to the highway car
       B.add(new THREE.CylinderGeometry(0.09, 0.13, 9, 8), m.metal, Geo.matrix(x, h + 4.5, z));
       B.box(1.4, 0.18, 0.5, x, h + 9.0, z, m.metal); B.box(1.2, 0.04, 0.36, x, h + 8.9, z, m.white, 0, { noShadow: true });
     }
@@ -131,7 +131,7 @@ class SndCity extends Environment {
     for (const [z0, z1] of [[-21.0, -52.0], [-60.0, -110.0]]) B.box(0.9, 0.85, z0 - z1, 13.55, h + 0.42, (z0 + z1) / 2, hedge);
     for (let z = -1.6; z > -9.6; z -= 2.0) B.add(new THREE.CylinderGeometry(0.11, 0.11, 0.85, 8), m.metal, Geo.matrix(13.4, h + 0.42, z));
     // a grass verge with a few trees at the lot's far end, and a fence along the highway
-    for (let z = -120; z > -260; z -= 14) this._tree(18 + 9 * hash1(z), z, this.rng.fork(Math.round(-z)), 1.1);
+    for (let z = -162; z > -260; z -= 14) this._tree(18 + 9 * hash1(z), z, this.rng.fork(Math.round(-z)), 1.1);
     for (let z = 5; z > -262; z -= 3) B.box(0.05, 1.8, 3.0, 53.0, h + 0.9, z - 1.5, m.lattice, 0, { noShadow: true });
     for (let z = 5; z > -262; z -= 3) B.add(new THREE.CylinderGeometry(0.04, 0.04, 1.9, 5), m.galv, Geo.matrix(53.0, h + 0.95, z));
   }
@@ -165,7 +165,8 @@ class SndCity extends Environment {
     row(1, L.zNear, P.rightRowZ, { fMin: 3, fMax: 6 });
     row(1, cz0, -420, { fMin: 4, fMax: 9 }); row(1, -420, -900, { fMin: 6, fMax: 14 });
     row(-1, L.zNear, cz1, { fMin: 3, fMax: 6 }); row(-1, cz0, -420, { fMin: 4, fMax: 10 }); row(-1, -420, -900, { fMin: 6, fMax: 14 });
-    for (const s of [-1, 1]) { this._rowX(s, 34, 260, cz1, 1, rng); this._rowX(s, 34, 260, cz0, -1, rng); }
+    // on your side the cross street's buildings start beyond the highway, so the lot, the deck and its cars stay in view
+    for (const s of [-1, 1]) { const xa = s > 0 ? 74 : 34; this._rowX(s, xa, 260, cz1, 1, rng); this._rowX(s, xa, 260, cz0, -1, rng); }
     // the second row behind the left-hand shops (taller: depth above the rooftops)
     let z = 160;
     while (z > -800) {
@@ -201,7 +202,7 @@ class SndCity extends Environment {
   _trees() {
     const rng = this.rng.fork(3), L = LAYOUT, cz0 = L.crossZ - L.crossHalf - 6, cz1 = L.crossZ + L.crossHalf + 6;
     for (let z = 36; z > -460; z -= 9.5) { if (z < cz1 && z > cz0) continue; if (Math.abs(z - L.busStop.z) < 4 || Math.abs(z - SND.friend.z) < 3) continue; this._tree(-8.15, z + rng.range(-0.8, 0.8), rng, rng.range(0.85, 1.2)); }
-    for (let z = 40; z > -460; z -= 11) { if (z < cz1 && z > cz0) continue; if (z < 18 && z > -30) continue; this._tree(8.15, z + rng.range(-0.8, 0.8), rng, rng.range(0.85, 1.2)); }
+    for (let z = 40; z > -460; z -= 11) { if (z < cz1 && z > cz0) continue; if (z < 18 && z > -100) continue; this._tree(8.15, z + rng.range(-0.8, 0.8), rng, rng.range(0.85, 1.2)); }
   }
 
   _streetFurniture() {
