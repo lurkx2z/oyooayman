@@ -203,7 +203,7 @@ class SndPuffs {
    (they hear it), so you can watch the front come over the city toward the stadium */
 class SndBirds {
   constructor(scene, city) {
-    this.sys = new BillboardSystem(scene, 400);
+    this.sys = new BillboardSystem(scene, 640);
     const E = SND_EYE[5], wallEl = Math.atan2(12.4 - E.y, E.z + 60.5);
     const view = Math.atan2(-4 - E.x, -(-42 - E.z));
     const roofs = (city || []).filter((b) => {
@@ -213,11 +213,11 @@ class SndBirds {
     }).sort((a, b) => sndThunderAt(a) - sndThunderAt(b)).slice(0, 9);
     this.B = [];
     roofs.forEach((b, fi) => {
-      const tl = sndThunderAt(b) + 0.15, n = 22 + Math.floor(hash1(fi * 7) * 12);
+      const tl = sndThunderAt(b) + 0.15, n = 46 + Math.floor(hash1(fi * 7) * 22);
       for (let i = 0; i < n; i++) {
         const sd = fi * 100 + i, a = hash1(sd) * 6.28;
         this.B.push({ x: b.x + (hash1(sd * 3) - 0.5) * b.w * 0.8, z: b.z + (hash1(sd * 5) - 0.5) * b.d * 0.8, y: b.h + 0.4, tl: tl + hash1(sd * 7) * 0.25,
-          vx: Math.cos(a) * (3 + 3 * hash1(sd * 11)), vz: Math.sin(a) * (3 + 3 * hash1(sd * 11)) + 2.5, vy: 5 + 4 * hash1(sd * 13), ph: hash1(sd * 17) * 6.28, sz: 0.9 + 0.5 * hash1(sd * 19) });
+          vx: Math.cos(a) * (3 + 3 * hash1(sd * 11)), vz: Math.sin(a) * (3 + 3 * hash1(sd * 11)) + 2.5, vy: 5 + 4 * hash1(sd * 13), ph: hash1(sd * 17) * 6.28, sz: 1.5 + 0.9 * hash1(sd * 19) });   // drawn ~2× a real bird so the flocks read on a phone
       }
     });
   }
