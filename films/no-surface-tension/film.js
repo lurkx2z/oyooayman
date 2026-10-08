@@ -46,7 +46,7 @@ function nstSeg(t) { return t < NST.pond ? 'kitchen' : t < NST.bench ? 'pond' : 
 const NST_FIN = {
   a0: [0.3, 0.02, 0.1], la0: [0.0, -0.04, 0.0], a1: [0.27, 0.01, 0.09], la1: [0.0, -0.05, 0.0], fov0: 40, fov1: 37,
   bc: [0.75, -0.45, -0.55], lbc: [0.0, -0.5, 0.0],
-  c0: [0.526, 0, -1.633], c1: [0.5, 0, -1.5], lk: [0.21, 0, -0.32], fovC: 54, fovD: 50,      // (the push-in: 1.26 → 1.13 m from the duck)
+  c0: [0.526, 0, -1.633], c1: [0.5, 0, -1.5], lk: [0.364, 0, -0.383], fovC: 54, fovD: 50,      // (the push-in: 1.26 → 1.13 m from the duck)
   uH: 0.1,                   // where the waterline sits on screen (0 = the middle, 1 = the top): just above the middle
 };
 

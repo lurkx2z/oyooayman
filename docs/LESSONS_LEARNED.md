@@ -150,6 +150,16 @@
   before committing.
 - Google Fonts fail in headless and from `file://` (proxy/cert). Fonts are bundled.
 
+- **A cut keyed as two camera keys at the same time shows one frame of the old shot.** `Track.value(t)` at exactly a
+  duplicated key time returns the first (pre-cut) key's value, while sets switched by `t >= T` are already on the new
+  shot: one broken frame per cut whenever T lands on a frame (no-surface-tension v2). Put the pre-cut key 0.01 s
+  before the cut: `[T - 0.01, old], [T, new]`.
+- **To lift one dark object, light the object, not the scene.** A small point light added to make a wet duck read lit
+  the pond's underside next to the camera: a blown-out glare (no-surface-tension v2). A self-light term in the object's
+  own material (`totalEmissiveRadiance += diffuseColor.rgb * k` via `onBeforeCompile`) only touches that object.
+- **A fast time-lapse flips day/night in two frames.** At about a day per second, a daylight curve that switches over
+  an hour of sun angle lasts two frames: a strobe. Average the light over half a second of story time.
+
 **Audio** (see `SOUND_GUIDE.md` § 6): offline exponential-ramp spikes; noise before its envelope; quiet/loud mixes;
 sub-only drones; cues running past their scene; editing `audioEngine.js` invalidates all bakes; changing SCRIPT after
 baking.

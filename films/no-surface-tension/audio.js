@@ -208,12 +208,18 @@ class NstAudio extends AudioEngine {
       for (const [dt, pan] of [[0, 0.1], [0.5 / 1.7, 0.2]]) this._band(S, bus, 'brown', [90, 600], t + dt, t + dt + 0.3, (u) => v * Math.sin(MathX.clamp((u - t - dt) / 0.28, 0, 1) * Math.PI), pan, 0.01);
     }
     for (const [t, n, f, v] of [[T.wl + 0.9, 2, 470, 0.016], [T.sink + 0.3, 4, 520, 0.022], [T.line1 + 0.45, 3, 500, 0.018]]) for (let k = 0; k < n; k++) S.voice(t + k * 0.17, f - 25 * k, 0.13, 'a', v, 0.15, bus, 0.72);
-    for (const [b0, b1] of [[T.sink + 0.4, T.sink + 2.1], [T.line1 + 0.55, T.line1 + 1.85]]) {
+    // the take-off attempt after the rain (on the same beat grid as the wings on screen): louder, frantic
+    const tk = NST_DUCK_TRY, kb = T.sink + 0.4 + Math.ceil((tk + 0.05 - T.sink - 0.4) * 5.2) / 5.2;
+    for (const [b0, b1, v] of [[T.sink + 0.4, T.sink + 2.1, 1], [T.line1 + 0.55, T.line1 + 1.85, 1], [kb, tk + 1.3, 1.5]]) {
       for (let t = b0; t < b1; t += 1 / 5.2) {
-        S.flap(t, 0.15 + 0.1 * Math.sin(t * 9), 0.05, bus);
-        this._band(S, bus, 'pink', [1100, 0.8], t + 0.04, t + 0.16, (u) => 0.03 * Math.sin(MathX.clamp((u - t - 0.04) / 0.12, 0, 1) * Math.PI), 0.15, 0.01);
+        S.flap(t, 0.15 + 0.1 * Math.sin(t * 9), 0.05 * v, bus);
+        this._band(S, bus, 'pink', [1100, 0.8], t + 0.04, t + 0.16, (u) => 0.03 * v * Math.sin(MathX.clamp((u - t - 0.04) / 0.12, 0, 1) * Math.PI), 0.15, 0.01);
       }
     }
+    for (let k = 0; k < 4; k++) S.voice(tk + 0.1 + k * 0.15, 560 - 20 * k, 0.12, 'a', 0.024, 0.15, bus, 0.7);
+    // it slumps back in: a heavy soft slap and a wash of water (no splash, no plinks)
+    S.thump(tk + 1.05, 0.1, bus);
+    this._band(S, bus, 'pink', [380, 0.9], tk + 1.0, tk + 1.9, (u) => 0.06 * MathX.smooth(u, tk + 1.0, tk + 1.08) * (1 - MathX.smooth(u, tk + 1.1, tk + 1.85)), 0.1, 0.02);
   }
 
   /* the time-lapse days, the clouds, the rain (a roar of mist with no patter), far thunder */
