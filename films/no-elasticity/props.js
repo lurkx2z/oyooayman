@@ -145,14 +145,15 @@ class NeTramp {
   // the edge of the stretched mat sits a little lower too (its springs are stretched)
   pull(d) { return 0.06 * d / NE_TRAMP.depth; }
   // world height of the mat's surface under someone standing at trampoline-local (lx, lz) at time t
-  surfaceY(lx, lz, t) { const d = neMatDepth(t); return 0.15 + this.y0 - 0.01 + this.sinkAt(lx, lz, d) - this.pull(d); }
+  surfaceY(lx, lz, t) { const d = neMatDepth(t); return Math.max(0.158, 0.15 + this.y0 - 0.01 + this.sinkAt(lx, lz, d) - this.pull(d)); }
 
   update(t) {
     const d = neMatDepth(t);
     if (Math.abs(d - this._d) < 1e-4) return;
     this._d = d;
-    const p = this.matGeo.attributes.position.array, b = this.matBase, pull = this.pull(d);
-    for (let i = 0; i < p.length; i += 3) p[i + 1] = b[i + 1] + this.sinkAt(b[i], b[i + 2], d) - pull;
+    // (stretched far enough, its middle lies flat on the paving)
+    const p = this.matGeo.attributes.position.array, b = this.matBase, pull = this.pull(d), floor = 0.008 - (this.y0 - 0.01);
+    for (let i = 0; i < p.length; i += 3) p[i + 1] = Math.max(floor, b[i + 1] + this.sinkAt(b[i], b[i + 2], d) - pull);
     this.matGeo.attributes.position.needsUpdate = true; this.matGeo.computeVertexNormals();
     // springs: from the frame to the (lowered) mat edge; stretched springs show their coils spread apart
     this.springs.forEach((s, i) => {

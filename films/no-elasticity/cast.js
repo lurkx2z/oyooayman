@@ -179,7 +179,10 @@ function neCastSpecs() {
       states: [[0, 'idle'], [16.05, 'neFlinch'], [17.4, 'handHead'], [19.5, 'look']] },
     // the café sitter: sits on the left cushion, gets up during the insert, walks off along the café front
     { id: 'cafe', look: 'neCafe', y: 0.15, seat: 0.47, face: 90, faceUntil: 10.1, path: [[0, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [9.6, NE_CITY.bench.x - 0.06, NE_CITY.bench.z - 0.52], [10.1, NE_CITY.bench.x - 0.42, NE_CITY.bench.z - 0.52], [10.9, 11.2, 3.5], [19.7, 11.0, 15]],
-      states: [[0, 'sit'], [9.6, 'neStandUp'], [10.1, 'walk']], show: (t) => t < 19.7 },
+      states: [[0, 'sit'], [9.6, 'neStandUp'], [10.1, 'walk']], show: (t) => t < 19.7,
+      // (turns from facing the table to his walking direction over 0.45 s, instead of snapping round at 10.1)
+      faceAt: (t) => { if (t < 9.95 || t >= 10.4) return undefined; const B = NE_CITY.bench, w = Math.atan2(11.2 - (B.x - 0.42), 3.5 - (B.z - 0.52)) * 180 / Math.PI - 180, d = ((w - 90) % 360 + 540) % 360 - 180;
+        return 90 + d * Ease.inOutSine((t - 9.95) / 0.45); } },
     // the footbridge walkers and runners
     ...NE_WALKERS.map(neBridgeWalker),
     // life around: the far sidewalk, the bus stop, the corners of the junction (in the first cut they flinched at the crash);

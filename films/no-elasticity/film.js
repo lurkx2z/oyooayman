@@ -106,12 +106,10 @@ const NE_SHOTS = [
       const d = 8.6 - 0.6 * u;
       return { p: [tx + sx * d, 1.45, tz + sz * d], at: [tx + NE_WIND[0] * 0.7, 3.05, tz + NE_WIND[1] * 0.7], fov: 55, focus: [tx, tz, d] }; } },
   { id: 'lapse', t0: NE.lapse[0], t1: NE.push, cam: (t) => neLapseCam(t) },
-  // dusk into night: one continuous push from the wide into the plaza clock's lit dial, still at 3:41
+  // dusk into night: the plaza clock, still at 3:41, face-on; one push in on its dial as the lamps come on behind it
   { id: 'push', t0: NE.push, t1: NE.loop,
-    cam: (t) => { const C = NE_CLOCK, n = [Math.sin(C.ry), Math.cos(C.ry)], x = [n[1], -n[0]], W = neLapseCam(NE.push), u = Ease.inOutSine(MathX.clamp((t - NE.push) / (NE.loop - NE.push), 0, 1)), q = (a, b) => a.map((v, i) => v + (b[i] - v) * u);
-      // (the aim settles on the clock early, so it stays in frame while the camera swings round to face it)
-      const p1 = [C.x + n[0] * 2.6 + x[0] * 0.15, C.h - 0.12, C.z + n[1] * 2.6 + x[1] * 0.15], a1 = [C.x + x[0] * 0.03, C.h + 0.02, C.z + x[1] * 0.03], k = Ease.inOutSine(MathX.clamp((t - NE.push) / 2.6, 0, 1));
-      return { p: q(W.p, p1), at: W.at.map((v, i) => v + (a1[i] - v) * k), fov: W.fov + (42 - W.fov) * u, focus: [C.x, C.z, 2.6 + 12 * (1 - u)] }; } },
+    cam: (t) => { const C = NE_CLOCK, n = [Math.sin(C.ry), Math.cos(C.ry)], x = [n[1], -n[0]], u = Ease.outSine(MathX.clamp((t - NE.push) / (NE.loop - NE.push), 0, 1)), v = 1 - u, d = 2.6 + 3.0 * v, s = 0.15 + 0.5 * v;
+      return { p: [C.x + n[0] * d + x[0] * s, C.h - 0.12 - 0.5 * v, C.z + n[1] * d + x[1] * s], at: [C.x + x[0] * 0.03, C.h + 0.02 - 0.12 * v, C.z + x[1] * 0.03], fov: 42 + 4 * v, focus: [C.x, C.z, d] }; } },
   // the loop: back on the café table, the desk clock that stopped one second into the video
   { id: 'loop', t0: NE.loop, t1: NE.end + 1,
     cam: (t) => { const D = NE_DESK, f = [Math.sin(D.ry), Math.cos(D.ry)], u = Ease.outSine(MathX.clamp((t - NE.loop) / (NE.end - NE.loop), 0, 1)), d = 0.44 - 0.05 * u, cy = NE_CRADLE.y0 + 0.074;
@@ -120,12 +118,16 @@ const NE_SHOTS = [
 
 // the clock shot and the time-lapse: one continuous camera (face-on to the clock, then up and back over the plaza; then a
 // slow drift through the afternoon)
-const NE_LAPSE_CAM = { p0: [10.3, 4.0, -6.7], p1: [10.95, 3.8, -7.2], at0: [18.8, 2.3, -13.7], at1: [18.8, 2.2, -13.7], fov: 56 };
+const NE_LAPSE_CAM = { p0: [10.3, 4.0, -6.7], p1: [10.95, 3.8, -7.2], at0: [18.8, 2.3, -13.7], at1: [18.8, 2.2, -13.7], fov: 56, t1: 49.6,
+  // back from the inserts at dusk: the camera comes down to the trampoline's level, so the mat shows under its frame when
+  // the day's heaviest landing takes it down to the paving (NE_PIT)
+  p2: [11.9, 2.0, -7.8], at2: [19.0, 0.6, -12.5], fov2: 40, t2: 53.3 };
 function neLapseCam(t) {
   const C = NE_CLOCK, n = [Math.sin(C.ry), Math.cos(C.ry)], head = [C.x, C.h, C.z], L = NE_LAPSE_CAM;
-  const lap = Ease.inOutSine(MathX.clamp((t - NE.lapse[0]) / (NE.push - NE.lapse[0]), 0, 1)), q = (a, b, u) => a.map((v, i) => v + (b[i] - v) * u);
+  const lap = Ease.inOutSine(MathX.clamp((t - NE.lapse[0]) / (L.t1 - NE.lapse[0]), 0, 1)), q = (a, b, u) => a.map((v, i) => v + (b[i] - v) * u);
   const pL = q(L.p0, L.p1, lap), aL = q(L.at0, L.at1, lap);
-  if (t >= NE.lapse[0]) return { p: pL, at: aL, fov: L.fov, focus: [17, -11.5, 16] };
+  if (t >= NE.lapse[0]) { const m = Ease.inOutSine(MathX.clamp((t - L.t1) / (L.t2 - L.t1), 0, 1));
+    return { p: q(pL, L.p2, m), at: q(aL, L.at2, m), fov: L.fov + (L.fov2 - L.fov) * m, focus: [17, -11.5, 16 - 4 * m] }; }
   // the clock shot: face-on, a little below the dial; then (from 38.9) up and back to the time-lapse framing
   const u = (t - NE.clockShot[0]) / (NE.lapse[0] - NE.clockShot[0]), k = Ease.inOutSine(MathX.clamp((t - 38.6) / (NE.lapse[0] - 38.6), 0, 1));
   const pC = [head[0] + n[0] * (3.3 - 0.25 * u) + 0.25, head[1] - 0.32, head[2] + n[1] * (3.3 - 0.25 * u)], aC = [head[0], head[1] - 0.15, head[2]];
@@ -140,8 +142,9 @@ const NE_TAGS = [
   { t0: 33.85, t1: 35.75, at: () => neQ(NE_Q.can[0] + 1.6, NE_Q.can[1] + 0.4, NE_Q.can[2] + 0.9), text: 'NORMALLY', cls: 'ne-tag line' },
   { t0: NE.ins.tramp[0] + 0.25, t1: NE.ins.tramp[1] - 0.1, at: () => [NE_TRAMP.x, 0.95, NE_TRAMP.z], text: 'DEEPER ONLY AFTER A HARDER LANDING' },
   { t0: NE.ins.tree[0] + 0.25, t1: NE.ins.tree[1] - 0.1, at: () => [NE_CITY.trees[NE_LEAN_TREE][0], 5.4, NE_CITY.trees[NE_LEAN_TREE][1]], text: 'EACH STRONGER GUST BENDS IT FURTHER' },
+  { t0: NE_PIT[NE_PIT.length - 1][0] + 0.15, t1: NE.push, at: () => [NE_TRAMP.x, 1.25, NE_TRAMP.z], text: 'MAT ON THE GROUND · IT STAYS THERE' },
   // (the first cut)
-  { t0: 3.45, t1: NE.cradleIns[1] - 0.1, at: (t, app) => { const g = app.cradle.ghostWorld(); g[1] += NE_CRADLE.r + 0.004; return g; }, text: 'NORMALLY, THIS ONE FLIES OUT', cls: 'ne-tag line' },
+  { t0: 3.6, t1: NE.cradleIns[1] - 0.1, at: (t, app) => { const g = app.cradle.ghostWorld(); g[1] += NE_CRADLE.r + 0.004; return g; }, text: 'NORMALLY, THIS ONE FLIES OUT', cls: 'ne-tag line' },
   { street: true, t0: 3.55, t1: 5.45, at: (t, app) => { const [bx, bz] = app.ball.spot(app.cast); return [bx, NE_BALL.ground + 2 * NE_BALL.r + 0.004, bz]; }, text: 'WHERE ITS TOP USED TO BE', cls: 'ne-tag line' },
   { t0: 16.15, t1: 17.35, at: () => [NE_TRAMP.x - 1.2, 1.35, NE_TRAMP.z + 1.2], text: 'SPRINGS STRETCHED · MAT STAYS DOWN' },
   { street: true, t0: 23.9, t1: 25.4, at: (t, app) => { const w = app.heroWheel(t); return [w.x + 0.15, 0.62, w.z - 0.75]; }, text: 'WHERE THE BODY USED TO SIT', cls: 'ne-tag line' },
@@ -363,7 +366,8 @@ const FILM = {
       const C = app.cam, dt = 1 / 30, vf = C.tfov.value(t);
       const hfov = 2 * Math.atan(Math.tan(MathX.deg(vf) / 2) * 9 / 16) * 180 / Math.PI;
       const yr = (C.tyaw.value(t) - C.tyaw.value(t - dt)) / dt, pr = (C.tpitch.value(t) - C.tpitch.value(t - dt)) / dt;
-      const cut = Math.abs(yr) > 1500 || Math.abs(pr) > 1500 ? 0 : 1;
+      // (every real pan in this film is slow; anything this fast is a cut between two set-ups, so no trail)
+      const cut = Math.abs(yr) > 400 || Math.abs(pr) > 400 ? 0 : 1;
       p.smear.set(cut * MathX.clamp(yr / hfov * 0.008, -0.025, 0.025), cut * MathX.clamp(-pr / vf * 0.008, -0.025, 0.025));
     } else p.smear.set(0, 0);
   },

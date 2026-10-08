@@ -30,8 +30,9 @@ const NE = {
   rule: [1.0, 1.45],           // shape recovery 100 % → 0 % under the title, from the clock's last step
   stop: 1.0,                   // the second hand's last step: every quartz clock stops at 3:41:52 (the fork can't ring any more)
   // the opening, seated at the café table: a Newton's cradle (it clacks, then the hit after the rule just shoves the row
-  // along: NE_CRADLE), then a low insert beside it with a ghost of the ball that should have flown out
-  cradleIns: [1.75, 5.6],
+  // along: NE_CRADLE), then a low insert beside it with a ghost of the ball that should have flown out. The wide holds past
+  // 2.0 s so a rewatch can see the desk clock miss its next tick
+  cradleIns: [2.6, 5.6],
   // the bounce: contact times of the solid rubber ball with the ground (the 4th is weak, then it lands dead at ≈ 1.45)
   dribble: { t0: -1.08, P: 0.62 },
   ballShot: [1.75, 5.6],       // low beside the dead ball: the outline of its round shape; his hand presses on it
@@ -55,8 +56,10 @@ const NE = {
   // (the trampoline, a tree), back to the plaza at dusk, then night on the clock
   lapse: [40.9, 60.6],
   ins: { tramp: [44.9, 47.3], tree: [47.3, 49.6] },
-  line: [49.8, 55.5],
-  push: 49.6,                  // from the dusk wide, one slow push into the stopped clock as the lamps come on…
+  line: [49.8, 54.3],
+  // the dusk wide (49.6 →): a slow move in on the trampoline as the heaviest landing of the day takes its mat down to the
+  // paving (NE_PIT), then one push into the stopped clock as the lamps come on…
+  push: 54.4,
   night: 55.6,
   note: [55.7, 57.9],
   loop: 58.0,                  // …then a cut back to the desk clock on the café table, still at 3:41:52 (the loop)
@@ -76,6 +79,9 @@ function neLapse(t) { return MathX.clamp((t - NE.lapse[0]) / (NE.lapse[1] - 1.0 
 const NE_STOPPED = { h: 3, m: 41, s: 52 };                // every clock: 3:41:52 pm (it showed 3:41:51 at the first frame)
 function neSunMinutes(t) { return 15 * 60 + 42 + Ease.inOutSine(neLapse(t)) * (21 * 60 + 5 - (15 * 60 + 42)); }
 const neClockText = (mins) => { const h = Math.floor(mins / 60), m = Math.floor(mins % 60); return `${h > 12 ? h - 12 : h}:${String(m).padStart(2, '0')} PM`; };
+
+// a hand key ending in '!' snaps in 0.02 s: put it this much before a cut so the cut frame already has the new pose
+const NE_SNAP = 0.02;
 
 // where you stand: by the plaza for the ball, the montage and the trampoline; at the archery line; at the café table
 const NE_YOU = { x: 11.4, z: -2.9 };
@@ -114,17 +120,17 @@ const SCRIPT = {
     z: [[0, NE_TABLE.z], [5.55, NE_TABLE.z], [5.6, NE_YOU.z, 'step'], [18.15, NE_YOU.z], [18.2, NE_ARCH.z, 'step'], [23.35, NE_ARCH.z], [23.4, NE_TABLE.z, 'step'], [75, NE_TABLE.z]],
     // (seated at the café table for the cradle, the fork and the watch)
     height: [[0, 1.22], [5.55, 1.22], [5.6, 1.68, 'step'], [23.35, 1.68], [23.4, 1.22, 'step'], [75, 1.22]],
-    yaw: [[0, -90], [5.55, -90], [5.6, -31, 'step'],
+    yaw: [[0, -90], [2.6, -91.5], [5.55, -91.5], [5.6, -31, 'step'],
       [13.4, -27, 'step'], [14.6, -39], [15.2, -40.4], [18.15, -40],
       // the bow: the target clear to the right of the grip; after the release, hold on the bent bow and the slack string
       [18.2, 9.5, 'step'], [20.2, 8.9], [21.8, 9.8],
       // the café table: the fork, then your watch
       [23.4, -88, 'step'], [24.3, -90], [25.1, -92], [27.3, -92], [28.1, -95], [30.9, -95.5], [75, -95.5]],
-    pitch: [[0, -16], [1.75, -16.5], [5.55, -16.5], [5.6, -18, 'step'], [NE.mont[3][0], -34, 'step'],
+    pitch: [[0, -16], [2.6, -16.6], [5.55, -16.6], [5.6, -18, 'step'], [NE.mont[3][0], -34, 'step'],
       [13.4, -9, 'step'], [14.6, -5], [18.15, -5],
       [18.2, -1.5, 'step'], [20.2, -1.2], [21.8, -4],
       [23.4, -26, 'step'], [24.05, -38], [24.45, -38], [25.15, -8, 'outQuad'], [27.3, -7], [28.1, -9], [30.9, -10], [75, -10]],
-    fov: [[0, 50], [1.75, 46], [5.55, 46], [5.6, 38, 'step'], [NE.mont[3][0], 64, 'step'],
+    fov: [[0, 50], [2.6, 43], [5.55, 43], [5.6, 38, 'step'], [NE.mont[3][0], 64, 'step'],
       [13.4, 42, 'step'], [14.6, 32], [15.2, 30], [18.15, 30],
       [18.2, 72, 'step'], [20.2, 70], [20.9, 80], [21.8, 80],
       [23.4, 52, 'step'], [24.0, 40], [24.5, 40], [25.4, 44], [27.3, 42], [28.1, 34], [30.9, 32], [75, 32]],
@@ -134,13 +140,13 @@ const SCRIPT = {
 
   // your hands: the rubber band; the bow (left: bow hand, right: on the string); the tuning fork (right); your watch (left)
   hands: {
-    right: [[0, 'hidden'], [11.45, 'bandIn!'], [11.8, 'bandOut'], [12.5, 'bandIn'], [13.4, 'hidden!'],
-      [NE.bow.t0, 'nock!'], [NE.bow.draw[0], 'drawn'], [NE.bow.release, 'loose'], [NE.bow.low, 'hidden'],
-      [NE.fork.t0, 'forkUp!'], [23.72, 'forkAim'], [24.2, 'forkHit'], [NE.fork.up[0], 'forkShow'], [NE.fork.t1 - 0.1, 'hidden'],
-      [NE.watch.t1, 'hidden!']],
-    left: [[0, 'hidden'], [11.45, 'bandIn!'], [11.8, 'bandOut'], [12.5, 'bandIn'], [13.4, 'hidden!'],
-      [NE.bow.t0, 'bowHold!'], [20.45, 'bowShow'],
-      [NE.fork.t0, 'hidden!'], [NE.watch.up[0], 'watchUp'], [NE.watch.t1, 'hidden!']],
+    right: [[0, 'hidden'], [11.45 - NE_SNAP, 'bandIn!'], [11.8, 'bandOut'], [12.5, 'bandIn'], [NE.back - NE_SNAP, 'hidden!'],
+      [NE.bow.t0 - NE_SNAP, 'nock!'], [NE.bow.draw[0], 'drawn'], [NE.bow.release, 'loose'], [NE.bow.low, 'hidden'],
+      [NE.fork.t0 - NE_SNAP, 'forkUp!'], [23.72, 'forkAim'], [24.2, 'forkHit'], [NE.fork.up[0], 'forkShow'], [NE.fork.t1 - 0.1, 'hidden'],
+      [NE.watch.t1 - NE_SNAP, 'hidden!']],
+    left: [[0, 'hidden'], [11.45 - NE_SNAP, 'bandIn!'], [11.8, 'bandOut'], [12.5, 'bandIn'], [NE.back - NE_SNAP, 'hidden!'],
+      [NE.bow.t0 - NE_SNAP, 'bowHold!'], [20.45, 'bowShow'],
+      [NE.fork.t0 - NE_SNAP, 'hidden!'], [NE.watch.up[0], 'watchUp'], [NE.watch.t1 - NE_SNAP, 'hidden!']],
   },
 
   tracks: {
@@ -152,8 +158,8 @@ const SCRIPT = {
   hud: {
     title: { in: NE.title[0], out: NE.title[1], fi: 0.2, fo: 0.4, cls: 'big center', html: '<span class="kick">WHAT IF EVERYTHING</span><span class="kick">LOST ITS</span><span class="hero">ELASTICITY?</span>' },
     captions: [
-      { t: 1.85, until: 3.35, text: 'A Newton’s cradle passes the hit<br>along by springing back…' },
-      { t: 3.5, until: 5.5, text: '…so now the balls<br>just shove together.' },
+      { t: 2.75, until: 4.05, text: 'Steel can’t spring back now…' },
+      { t: 4.15, until: 5.5, text: '…so the balls just<br>shove together.' },
       { t: 13.55, until: 15.4, text: 'Even things built<br>to bounce back…' },
       { t: 16.1, until: 18.1, text: 'Bodies are fine. Their gear isn’t.' },
       { t: 18.35, until: 20.1, text: 'A bow is a spring<br>you bend by hand…' },
@@ -171,9 +177,9 @@ const SCRIPT = {
       { t: 41.4, until: 43.9, text: 'The clocks stay at 3:41.<br>The day doesn’t.' },
       { t: 44.2, until: 47.2, text: 'And everything people use<br>keeps the shape they leave it in.' },
       { t: 47.45, until: 49.5, text: 'A trunk is mostly dead wood.<br>It keeps every gust.' },
-      { t: NE.line[0], until: 52.3, text: 'Without elasticity…' },
-      { t: 52.6, until: NE.line[1], text: '…almost nothing gets a second chance<br>to return to shape.' },
-      { t: NE.rewatch[0], until: NE.rewatch[1], text: 'Now watch the clock<br>in the first second.' },
+      { t: NE.line[0], until: 51.9, text: 'Without elasticity…' },
+      { t: 52.1, until: NE.line[1], text: '…almost nothing gets a second chance<br>to return to shape.' },
+      { t: NE.rewatch[0], until: NE.rewatch[1], text: 'Rewatch the red clock:<br>one tick, then never again.' },
     ],
     readouts: [
       { from: -0.6, until: 5.5, top: 210, label: 'SHAPE RECOVERY', value: neRecovery, sub: (t) => (t >= NE.rule[1] + 0.1 ? 'NOTHING SPRINGS BACK' : '') },
@@ -182,8 +188,8 @@ const SCRIPT = {
       { from: NE.watch.up[1] - 0.2, until: NE.watch.t1, top: 210, label: 'YOUR WATCH', value: '3:41:52', sub: 'STOPPED 1 s INTO THIS VIDEO' },
       { from: NE.quartz[0] + 0.3, until: NE.quartz[1], top: 210, label: 'QUARTZ CRYSTAL', value: (t) => (t < 35.85 ? '32,768 Hz' : '0 Hz'), sub: (t) => (t < 35.85 ? 'WHEN IT SPRINGS BACK' : 'IT DOESN’T') },
       { from: NE.clockShot[0] + 0.2, until: NE.clockShot[1], top: 210, label: 'EVERY QUARTZ CLOCK', value: '3:41:52', sub: 'STOPPED AT THE SAME INSTANT' },
-      { from: NE.lapse[0] + 0.3, until: NE.end, top: 210, label: 'THE CLOCKS SAY', value: '3:41 PM', sub: '' },
-      { from: NE.lapse[0] + 0.3, until: NE.end, top: 420, label: 'THE REAL TIME', value: (t) => neClockText(neSunMinutes(t)), sub: '' },
+      { from: NE.lapse[0] + 0.3, until: NE.loop, top: 210, label: 'THE CLOCKS SAY', value: '3:41 PM', sub: '' },
+      { from: NE.lapse[0] + 0.3, until: NE.loop, top: 420, label: 'THE REAL TIME', value: (t) => neClockText(neSunMinutes(t)), sub: '' },
     ],
     notes: [{ t: NE.note[0], until: NE.note[1], text: 'Fictional rule: solids never spring back.<br>People, air and water are unchanged.' }],
   },

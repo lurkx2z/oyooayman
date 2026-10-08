@@ -188,7 +188,7 @@ class NeQuartz {
     if (t < 33.45) {
       const P0 = [-1.2, 78, 0], A0 = [0, 3, 0], P1 = [cx - 3.2, cy + 19, cz], A1 = [cx + 0.1, cy, cz], u = d0;
       p = P0.map((v, i) => v + (P1[i] - v) * u); a = A0.map((v, i) => v + (A1[i] - v) * u); fov = 40 - 4 * u;
-      p[1] -= 3 * MathX.smooth(t, q0, 31.3);           // a small settle on the dial before it lifts
+      p[1] -= 3 * MathX.smooth(t, q0, 31.3) * (1 - u);  // a small settle on the dial before it lifts (gone by the macro)
     } else {
       const u = Ease.outSine(d1);
       p = [cx - 3.2 - 0.3 * u, cy + 19 - 5.5 * u, cz + 0.4 * u]; a = [cx + 0.1 + 0.2 * u, cy, cz]; fov = 36;
@@ -212,13 +212,13 @@ class NeQuartz {
 // ---------------------------------------------------------------------------------------------------------------------
 // the trampoline: each heavier jumper stretches the mat further, and it stays (until the middle rests on the ground)
 // [time, the mat's new depth (m), who]: it only goes deeper when someone heavier than every jumper before lands (a lighter
-// kid changes nothing); the last, heaviest landing takes the mat down to the paving
-const NE_PIT = [[42.7, 0.45, 12], [44.2, 0.56, 13], [45.5, 0.56, 15], [46.55, 0.66, 2], [51.2, 0.72, 6], [53.9, 0.79, 9]];
+// kid changes nothing); the last, heaviest landing takes the mat down flat on the paving
+const NE_PIT = [[42.7, 0.45, 12], [44.2, 0.56, 13], [45.5, 0.56, 15], [46.55, 0.66, 2], [51.2, 0.72, 6], [52.6, 0.92, 9]];
 function neTrampLapse(t) { let d = 0; for (const [ts, dd] of NE_PIT) { if (t < ts) break; d += (dd - d) * Ease.outCubic(MathX.clamp((t - ts) / 0.12, 0, 1)); } return d; }
 // the trees: every gust bends them a little further and they stay bent (the running maximum of the gusts so far)
 // the gusts [time, the lean they leave (0..1)]: each one only adds when it is stronger than every gust before it; the two
 // strongest land while the tree insert watches (47.3–49.6)
-const NE_GUSTS = [[42.3, 0.12], [43.6, 0.22], [45.0, 0.33], [46.4, 0.45], [47.75, 0.62], [48.75, 0.8], [50.6, 0.86], [52.4, 0.92], [54.2, 0.96], [56.0, 1.0]];
+const NE_GUSTS = [[42.3, 0.12], [43.6, 0.22], [45.0, 0.33], [46.4, 0.45], [47.75, 0.62], [48.75, 0.8], [50.6, 0.86], [51.8, 0.92], [54.2, 0.96], [56.0, 1.0]];
 function neTreeLean(t) {
   let l = 0;
   for (const [tg, s] of NE_GUSTS) { if (t < tg) break; const k = MathX.smooth(t, tg, tg + 0.14), over = 0.12 * Math.sin(Math.PI * MathX.clamp((t - tg) / 0.3, 0, 1)); l = Math.max(l, (s + over) * k + l * (1 - k)); }

@@ -74,7 +74,7 @@ class NeCradle {
   update(t) {
     const a = neCradleAngles(t);
     this.piv.forEach((p, i) => { p.rotation.x = -a[i]; });
-    this.ghost.visible = t >= 3.3 && t < NE.cradleIns[1];                   // with the second line, after the title
+    this.ghost.visible = t >= 3.5 && t < NE.cradleIns[1];                   // after the title
     // only in the opening and the last shot (later beats at this table are framed for other things); the desk clock sits
     // between you and the cradle, so it stays out of the low insert
     this.g.visible = t < NE.cradleIns[1] || t >= NE.loop;
@@ -96,7 +96,7 @@ class NeDeskClock {
     const dt = Tex.tex(neClockDial()); this.dialMat = new THREE.MeshStandardMaterial({ map: dt, emissiveMap: dt, emissive: new THREE.Color('#fff1d8'), emissiveIntensity: 0, roughness: 0.4, name: 'neDeskDial' });
     add(new THREE.CircleGeometry(R, 40), this.dialMat, 0, 0, 0.0005, 0, 0, 0, f).castShadow = false;
     const hand = (len, w, mat, z, tail = 0) => { const h = new THREE.Group(); h.position.z = z; f.add(h); add(new THREE.BoxGeometry(w, len + tail, 0.0012), mat, 0, (len - tail) / 2, 0, 0, 0, 0, h); return h; };
-    this.hr = hand(0.028, 0.0045, dark, 0.002); this.min = hand(0.042, 0.003, dark, 0.0033); this.sec = hand(0.046, 0.0015, red, 0.0046, 0.011);
+    this.hr = hand(0.028, 0.0045, dark, 0.002); this.min = hand(0.042, 0.003, dark, 0.0033); this.sec = hand(0.046, 0.0026, red, 0.0046, 0.012);   // (thick enough to see it step on a phone)
     add(new THREE.CylinderGeometry(0.0025, 0.0025, 0.002, 10), red, 0, 0, 0.0055, Math.PI / 2, 0, 0, f);
     this._s = -1;
   }

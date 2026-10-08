@@ -76,7 +76,7 @@ class NeAudio extends AudioEngine {
     if (ST) { amb.gain.setValueAtTime(0.75, 0); amb.gain.linearRampToValueAtTime(0.75, 52.4); amb.gain.linearRampToValueAtTime(0.12, 53.1); amb.gain.setValueAtTime(0.12, T.crash); amb.gain.linearRampToValueAtTime(0.35, T.crash + 0.3);   // a held breath before the hit
     amb.gain.setValueAtTime(0.35, 57); amb.gain.linearRampToValueAtTime(0.5, 60); amb.gain.linearRampToValueAtTime(0.0, T.end + 0.3); }
     if (!ST) {   // a quiet room at the café table; the plaza; the café again; almost nothing inside the watch; the plaza, into the evening
-      amb.gain.setValueAtTime(0.42, 0); amb.gain.setValueAtTime(0.42, NE.cradleIns[1] - 0.05); amb.gain.linearRampToValueAtTime(0.75, NE.cradleIns[1] + 0.05); amb.gain.setValueAtTime(0.75, NE.fork.t0 - 0.05); amb.gain.linearRampToValueAtTime(0.42, NE.fork.t0 + 0.05);
+      amb.gain.setValueAtTime(0.3, 0); amb.gain.setValueAtTime(0.3, NE.cradleIns[1] - 0.05); amb.gain.linearRampToValueAtTime(0.75, NE.cradleIns[1] + 0.05); amb.gain.setValueAtTime(0.75, NE.fork.t0 - 0.05); amb.gain.linearRampToValueAtTime(0.42, NE.fork.t0 + 0.05);
       amb.gain.setValueAtTime(0.42, NE.quartz[0]); amb.gain.linearRampToValueAtTime(0.1, NE.quartz[0] + 0.4);
       amb.gain.setValueAtTime(0.1, NE.clockShot[0] - 0.05); amb.gain.linearRampToValueAtTime(0.75, NE.clockShot[0] + 0.1);
       amb.gain.setValueAtTime(0.75, 50); amb.gain.linearRampToValueAtTime(0.5, 56); amb.gain.linearRampToValueAtTime(0.0, NE.end + 0.3);
@@ -153,8 +153,8 @@ class NeAudio extends AudioEngine {
     // the Newton's cradle: three bright steel clacks (the hit passed along by springing back)… then one dead "tock" and
     // the row swinging as one, in silence
     NE_CRADLE.hits.forEach((tc, i) => { const p = i % 2 ? 0.08 : -0.08;
-      burst(tc, 0.025, 'white', 5200, 1.6, 0.09, p, fx, 0.001); S.click(tc, 0.07, p, fx);
-      S.tone(tc, 0.16, 2650, 0.045, p, fx, 'sine', 0.001, 0.14); S.tone(tc, 0.1, 4310, 0.022, p, fx, 'sine', 0.001, 0.08); S.tone(tc, 0.07, 6890, 0.01, p, fx, 'sine', 0.001, 0.05); });
+      burst(tc, 0.025, 'white', 5200, 1.6, 0.17, p, fx, 0.001); S.click(tc, 0.13, p, fx);
+      S.tone(tc, 0.16, 2650, 0.085, p, fx, 'sine', 0.001, 0.14); S.tone(tc, 0.1, 4310, 0.042, p, fx, 'sine', 0.001, 0.08); S.tone(tc, 0.07, 6890, 0.02, p, fx, 'sine', 0.001, 0.05); });
     thud(NE_CRADLE.dead, 0.55, 0.05, fx, 340, 140, 0.04); burst(NE_CRADLE.dead, 0.06, 'pink', 900, 0.9, 0.05, 0.05, fx, 0.002);
     // the rewatch line: one last quiet tick (the clock you will now go back and watch)
     S.tick(NE.rewatch[0] + 0.15, 2900, 0.035, pan(rev, 0.2));
