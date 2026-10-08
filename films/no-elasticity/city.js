@@ -38,7 +38,7 @@ function neRoadY(z) {
 }
 
 // the footbridge's permanent midspan sag (m) — it ratchets down a step each time a group crosses (see cast.js)
-const NE_SAG_STEPS = [[0, 0.012], [43.2, 0.05], [45.6, 0.11], [48.0, 0.22], [50.3, 0.34]];
+const NE_SAG_STEPS = [[0, 0.012], [43.2, 0.07], [45.6, 0.17], [48.0, 0.31], [50.3, 0.48]];
 function neSag(t) {
   let s = NE_SAG_STEPS[0][1];
   for (let i = 1; i < NE_SAG_STEPS.length; i++) { const [tt, v] = NE_SAG_STEPS[i]; s += (v - NE_SAG_STEPS[i - 1][1]) * MathX.smooth(t, tt - 0.6, tt + 0.35); }
@@ -205,8 +205,9 @@ class NeCity extends Environment {
     // yellow-black warning bollards and a sign at the plaza end
     const sign = Tex.label([['SPEED', 40], ['TABLE', 40], ['15', 70]], { w: 192, h: 256, bg: '#f2c230', fg: '#1b1b1b', border: '#1b1b1b' });
     const sm = new THREE.MeshStandardMaterial({ map: sign, roughness: 0.6 });
-    B.add(new THREE.CylinderGeometry(0.035, 0.035, 2.5, 6), m.metal, Geo.matrix(7.6, 0.15 + 1.25, -6.6));
-    B.box(0.03, 0.62, 0.46, 7.6, 0.15 + 2.2, -6.6, sm, 0, { noShadow: true });
+    // (on the far kerb, facing your way, so it never stands between you and the table)
+    B.add(new THREE.CylinderGeometry(0.035, 0.035, 2.5, 6), m.metal, Geo.matrix(-7.6, 0.15 + 1.25, -8.4));
+    B.box(0.46, 0.62, 0.03, -7.6, 0.15 + 2.2, -8.38, sm, 0, { noShadow: true });
   }
 
   // the plaza: planters, benches, a basketball hoop, painted court lines, a low wall
@@ -311,11 +312,11 @@ class NeCity extends Environment {
       const zl = z - 15;
       if (!(zl < cz1 && zl > cz0) && Math.abs(zl - NE_CITY.lamps[0][1]) > 3 && Math.abs(zl - NE_CITY.bridge.z) > 4) this._streetLight(-7.45, zl, -1);
     }
-    for (const [x, z] of [[7.7, -26], [-7.7, -33], [7.7, -63], [-7.7, 14]]) {
+    for (const [x, z] of [[7.7, -7.6], [-7.7, -33], [7.7, -63], [-7.7, 14]]) {          // (none beside the wheel shot's path)
       B.add(new THREE.CylinderGeometry(0.13, 0.15, 0.6, 10), m.red, Geo.matrix(x, h + 0.3, z));
       B.add(new THREE.SphereGeometry(0.14, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), m.red, Geo.matrix(x, h + 0.6, z));
     }
-    for (const [x, z] of [[7.75, -28], [-7.8, -14], [-7.8, 8], [7.75, -62.5], [8.0, 4.0]]) {
+    for (const [x, z] of [[7.75, -33.6], [-7.8, -14], [-7.8, 8], [7.75, -62.5], [8.0, 4.0]]) {
       B.add(new THREE.CylinderGeometry(0.3, 0.27, 0.95, 12), m.metalGreen, Geo.matrix(x, h + 0.475, z));
       B.add(new THREE.CylinderGeometry(0.33, 0.33, 0.08, 12), m.metalGreen, Geo.matrix(x, h + 0.99, z));
     }

@@ -119,8 +119,10 @@ class NeCar {
       for (let i = 0; i < 2; i++) {
         const h = neRoadY(this._axleZ(ps, i)), slope = prevH[i] === null ? 0 : (h - prevH[i]) / dt;
         if (prevH[i] !== null) {
-          if (prevS[i] <= 1e-4 && slope > 1e-3) ev.push({ t, axle: i, kind: 'climb', a: 0.042 * k[i] });
-          if (prevS[i] < -1e-3 && h <= 1e-5) ev.push({ t, axle: i, kind: 'land', a: 0.034 * k[i] });
+          // (one event per axle per ramp: ignore a repeat within 0.3 s)
+          const fresh = (kind) => !ev.some((e) => e.axle === i && e.kind === kind && t - e.t < 0.3);
+          if (prevS[i] <= 1e-4 && slope > 1e-3 && fresh('climb')) ev.push({ t, axle: i, kind: 'climb', a: 0.042 * k[i] });
+          if (prevS[i] < -1e-3 && h <= 1e-5 && fresh('land')) ev.push({ t, axle: i, kind: 'land', a: 0.034 * k[i] });
         }
         prevH[i] = h; prevS[i] = slope;
       }
