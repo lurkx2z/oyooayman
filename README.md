@@ -64,6 +64,11 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **What if men suddenly disappeared from the world?** — open `men-disappear.html` (67 s). You are in a commuter train on
+> a harbour viaduct when every adult man vanishes in the same second. The film is about systems: the train's dead man's
+> switch stops it, a car on old cruise control keeps going, and a crewless container ship on autopilot hits the viaduct.
+> Shot list, sources and review log: [`films/men-disappear/PLAN.md`](films/men-disappear/PLAN.md).
 
 | Time | Beat |
 |---|---|
