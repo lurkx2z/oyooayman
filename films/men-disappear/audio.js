@@ -24,6 +24,8 @@ class MdAudio extends AudioEngine {
     const out = ctx.createGain(); out.gain.value = 1.0; out.connect(lim);
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 4; comp.connect(out);
     const mix = ctx.createGain(); mix.gain.value = 2.2; mix.connect(comp);
+    // a held breath: the whole mix sinks for the last moment before the hit, then the impact lands at full level
+    mix.gain.setValueAtTime(2.2, T.hit - 0.9); mix.gain.linearRampToValueAtTime(0.9, T.hit - 0.3); mix.gain.setValueAtTime(0.9, T.hit - 0.02); mix.gain.linearRampToValueAtTime(2.2, T.hit);
     const rev = S.reverb(2.6), revG = ctx.createGain(); revG.gain.value = 0.25; rev.connect(revG); revG.connect(mix);
     const bus = (g, dest = mix) => { const b = ctx.createGain(); b.gain.value = g; b.connect(dest); return b; };
     const car = bus(0.9), mus = bus(0.42), fx = bus(1.0);
@@ -123,7 +125,8 @@ class MdAudio extends AudioEngine {
       g.gain.value = 0;
       for (let t = T.harbour - 1; t < END; t += 0.2) {
         const gap = mdShipGap(t), k = t < T.hit ? MathX.clamp(1 - gap / 180, 0, 1) : Math.exp(-(t - T.hit) / 4);
-        g.gain.linearRampToValueAtTime(0.02 + 0.14 * k * k, t);
+        const duck = t < T.hit ? 1 - 0.6 * MathX.smooth(t, T.hit - 0.9, T.hit - 0.3) : 1;   // a held breath before the hit
+        g.gain.linearRampToValueAtTime((0.02 + 0.14 * k * k) * duck, t);
       }
       for (const x of [o, o2, lfo]) { x.start(T.harbour - 1); x.stop(END); }
     }
@@ -149,13 +152,13 @@ class MdAudio extends AudioEngine {
     for (const t of [T.cockpit, T.fire, T.ward, T.back]) S.thump(t, 0.12, fx);
 
     // 9. the countdown: a low pulse that tightens as the bow closes
-    for (let t = T.back + 1; t < T.hit - 0.05;) {
+    for (let t = T.back + 1; t < T.hit - 0.6;) {   // stops half a second early: a breath of near-silence before the hit
       const k = MathX.ramp(t, T.back, T.hit);
       S.tone(t, 0.3, 55, 0.05 + 0.07 * k, 0, mus, 'sine', 0.01, 0.25);
       t += MathX.lerp(1.1, 0.42, k);
     }
-    S.tone(T.cab, T.hit - T.cab, 73.4, 0.03, 0, mus, 'triangle', 3.0, 0.2);
-    S.tone(T.turn, T.hit - T.turn, 110, 0.02, 0, mus, 'sawtooth', 4.0, 0.2);
+    S.tone(T.cab, T.hit - 0.5 - T.cab, 73.4, 0.03, 0, mus, 'triangle', 3.0, 0.2);
+    S.tone(T.turn, T.hit - 0.5 - T.turn, 110, 0.02, 0, mus, 'sawtooth', 4.0, 0.2);
 
     // 10. the impact: steel into concrete; the span falls onto the bow; the near end into the water
     S.boom(T.hit, 0.9, outside, rev);

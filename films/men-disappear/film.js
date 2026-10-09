@@ -53,7 +53,7 @@ const MD_LOOK = [
   // (kept a little behind you along the road: straight down, the viaduct's own deck and parapet hide it)
   [9.3, 16.7, (t, o, c) => { const k = MD_CARS[0], m = mdCarMotion(k, Math.min(t, MD.cruise + 0.3)); return o.set(MD_G.roadX + 3.5, MD_G.quay + 0.6, Math.max(k[4] + m.d - 4, c.z + 14)); }, (t) => MathX.lerp(40, 31, MathX.smooth(t, 12.3, 13.6)), 0.9, 0.7],
   // the harbour: the ship crossing toward the viaduct
-  [16.3, 20.8, (t, o) => mdShipPt(t, 50, 12, 0, o), 50, 0.9, 0.4],
+  [16.3, 20.8, (t, o) => mdShipPt(t, 50, 12, 0, o), (t) => MathX.lerp(50, 36, Ease.inOutSine(MathX.clamp((t - 17.0) / 3.4, 0, 1))), 0.9, 0.4],   // a slow push-in on the ship
   // telephoto: its wheelhouse, lit, empty
   [20.4, 24.0, (t, o) => mdShipPt(t, 148.5, 30.2, 0, o), (t) => MathX.lerp(50, 6.5, Ease.inOutSine(MathX.clamp((t - 20.4) / 0.9, 0, 1))), 0.4, 0.01],
   // back on the train: the bow is much closer
@@ -61,9 +61,9 @@ const MD_LOOK = [
   // a glance back: the women take the children to the back of the car
   [33.5, 34.9, { l: [0.2, 1.3, 15.5] }, 64, 0.45, 0.5],
   // the cab: you turn to the bow coming in on the right
-  [36.6, 41.45, (t, o) => { const b = mdShipBow(t); return o.set((b[0] - 4.4) / 2 + 3, 16, -62); }, 52, 0.9, 0.01],
+  [36.6, 41.45, (t, o) => mdShipPt(t, 15, 9, 0, o), (t) => MathX.lerp(52, 40, MathX.smooth(t, 37.0, 41.0)), 0.9, 0.01],   // the bow closing on the viaduct
   // (after the view from above) bracing: the track ahead, the pier under it
-  [44.14, 46.45, { w: [-4.4, 21.5, -50] }, 62, 0.01, 0.01],
+  [44.14, 46.45, (t, o) => mdShipPt(t, 12, 9, 0, o), 46, 0.01, 0.01],
   // …the deck four metres ahead of you drops away
   [48.59, 51.55, { w: [-4.4, 19.0, -11] }, 62, 0.01, 0.01],
   // after: the rails end in the air, four metres ahead
@@ -134,11 +134,15 @@ const FILM = {
     app.hands.update(t);
     this._handVis(app);
     const shot = app.montage.update(t);
-    if (D || shot) { app.hands.right.g.visible = false; app.hands.left.g.visible = false; }
+    // the hands' sway reacts to the camera's jump on a cut back into the car: keep them out of the first frames
+    const cutBack = [MD.montage[1], ...MD_DRONE.map((d) => d.t1)].some((c) => t >= c && t < c + 0.25);
+    if (D || shot || cutBack) { app.hands.right.g.visible = false; app.hands.left.g.visible = false; }
     // the world
     app.env.update(t);
     if (FILM._fogD === undefined) FILM._fogD = app.scene.fog.density;
-    app.scene.fog.density = FILM._fogD * (1 - 0.65 * MathX.smooth(t, 20.4, 21.2) * (1 - MathX.smooth(t, 23.6, 24.0)));
+    const thin = Math.max(MathX.smooth(t, 20.4, 21.2) * (1 - MathX.smooth(t, 23.6, 24.0)),    // the telephoto
+      0.6 * MathX.smooth(t, 36.6, 37.6) * (1 - MathX.smooth(t, 46.4, 46.41)));                   // the ship seen from the cab
+    app.scene.fog.density = FILM._fogD * (1 - 0.65 * thin);
     app.ship.update(t);
     app.bridge.update(t);
     app.cast.update(t);

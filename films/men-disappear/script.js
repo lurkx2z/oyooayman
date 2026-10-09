@@ -178,7 +178,7 @@ const SCRIPT = {
       { from: 24.1, until: 26.5, top: 236, label: 'AIRLINE PILOTS', value: '≈ 95 %', sub: 'ARE MEN' },
       { from: 26.7, until: 29.0, top: 236, label: 'FIREFIGHTERS (US)', value: '≈ 95 %', sub: 'ARE MEN' },
       { from: 29.25, until: 31.6, top: 236, label: 'NURSES WORLDWIDE', value: '≈ 90 %', sub: 'ARE WOMEN' },
-      { from: 37.2, until: 47.4, top: 236, label: 'SHIP TO PIER', value: (t) => `${Math.max(0, Math.round(mdShipGap(t)))} m`, sub: (t) => `IMPACT IN ${mdClock(MD.hit - t)} · 6.2 KNOTS` },
+      { from: 37.2, until: 47.4, top: 236, label: 'PIER IMPACT IN', value: (t) => mdClock(MD.hit - t), sub: (t) => `SHIP ${Math.max(0, Math.round(mdShipGap(t)))} m AWAY · 6.2 KNOTS` },
       { from: 55.0, until: 58.4, top: 236, label: 'TRAIN STOPPED', value: '4 m', sub: 'SHORT OF THE FALLEN SPAN' },
     ],
     endLine: { t: MD.line[0], until: MD.line[1], text: 'They were gone in an instant.<br><span class="l2">Some machines were built to notice. Most weren’t.</span>' },

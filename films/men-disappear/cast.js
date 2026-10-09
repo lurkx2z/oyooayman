@@ -88,7 +88,7 @@ const MD_PEOPLE = [
   ['W9', 'mdW9', 0, -1, [2, 3], [[0, 'mdPhone'], [MD_V + 0.4, 'mdAlarm']]],
 ];
 // who walks to the back when the bow gets close (start time offsets, target z, aisle x)
-const MD_RETREAT = { W3: [-5.0, 13.5, -0.55], W1: [0.4, 16.4, -0.35], W2: [0.0, 17.6, -0.25], W6: [1.2, 18.6, 0.3], B1: [-1.4, 19.0, -0.3], W4: [-1.6, 18.8, 0.2], W7: [1.6, 19.2, 0.35], W5: [1.9, 17.8, -0.4] };
+const MD_RETREAT = { W3: [-5.0, 13.5, -0.55], W1: [0.4, 16.4, -0.35], W2: [0.0, 17.6, -0.25], W6: [1.2, 18.6, 0.3], B1: [-1.4, 19.0, -0.3], W4: [-4.2, 18.8, 0.2], W7: [1.6, 19.2, 0.35], W5: [1.9, 17.8, -0.4] };
 
 class MdCast {
   constructor(app, train) {
