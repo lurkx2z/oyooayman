@@ -40,14 +40,14 @@ class MdCockpit {
             vec3 cl = mix(lit * 0.62, lit, smoothstep(0.35, 0.75, c + 0.2 * (c2 - 0.5)));
             col = mix(col, cl, smoothstep(0.02, -0.04, d.y));
           }
-          gl_FragColor = vec4(col, 1.0);
+          gl_FragColor = vec4(col * vec3(0.5, 0.54, 0.6), 1.0);
         }` }));
     sky.frustumCulled = false; S.add(sky); this.sky = sky;
     // light: the low sun through the windscreen, a soft fill
     const sunL = new THREE.DirectionalLight('#ffd9a8', 3.0); sunL.position.copy(this.sun).multiplyScalar(20); sunL.castShadow = true;
     sunL.shadow.mapSize.set(1024, 1024); Object.assign(sunL.shadow.camera, { left: -3, right: 3, top: 3, bottom: -3, near: 1, far: 50 }); sunL.shadow.bias = -0.0005; S.add(sunL);
-    S.add(new THREE.HemisphereLight('#c8d4e2', '#3a342c', 0.9));
-    const fill = new THREE.PointLight('#ffe8cc', 1.2, 4, 1.5); fill.position.set(0, 1.9, 0.6); S.add(fill);
+    S.add(new THREE.HemisphereLight('#c8d4e2', '#3a342c', 1.6));
+    const fill = new THREE.PointLight('#ffe8cc', 3.0, 5, 1.5); fill.position.set(0, 1.45, 1.2); S.add(fill);
     const m = { panel: mdStd('#2c3036', { roughness: 0.6 }), panelL: mdStd('#454b52', { roughness: 0.65 }), frame: mdStd('#3a3e44', { roughness: 0.55 }),
       seat: mdStd('#3a3632', { roughness: 0.9 }), fleece: mdStd('#c8bba4', { roughness: 1 }), metal: mdStd('#8c9196', { roughness: 0.35, metalness: 0.8 }),
       lever: mdStd('#1c1e21', { roughness: 0.5 }), glass: new THREE.MeshStandardMaterial({ color: '#d8e4ec', roughness: 0.05, transparent: true, opacity: 0.08, depthWrite: false, name: 'cockpit glass' }) };
@@ -101,9 +101,9 @@ class MdCockpit {
     this.g.rotation.z = 0.006 * Math.sin(u * 0.7);
     // camera: the jump seat behind and between them, a slow push toward the windscreen
     const k = Ease.inOutSine(MathX.clamp(u / 2.8, 0, 1));
-    this.camera.position.set(0.08, 1.42 - 0.04 * k, 1.35 - 0.45 * k);
-    this.camera.lookAt(0.0, 1.12, -1.2);
-    this.camera.fov = 62; this.camera.updateProjectionMatrix();
+    this.camera.position.set(0.05, 1.78 - 0.06 * k, 2.35 - 0.45 * k);
+    this.camera.lookAt(0.0, 0.95, -0.5);
+    this.camera.fov = 70; this.camera.updateProjectionMatrix();
   }
 }
 
@@ -162,7 +162,7 @@ class MdFireStation {
     this.beacon = mdCyl(S, 0.12, 0.12, 0.2, -2, 5.6, 12.7, new THREE.MeshBasicMaterial({ color: '#ff3a1a', name: 'alarm' }));
     const sign = Tex.label([['TURNOUT', 60], ['STATION 4 · ENGINE 1', 30]], { w: 512, h: 192, bg: '#240806', fg: '#ff5a3a', font: 60 });
     this.signM = new THREE.MeshBasicMaterial({ map: sign, color: new THREE.Color(1.6, 1.6, 1.6), name: 'turnout' });
-    const sg = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.75), this.signM); sg.position.set(1.0, 4.1, 12.8); sg.rotation.y = Math.PI; S.add(sg);
+    const sg = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.75), this.signM); sg.position.set(-6.82, 3.5, 0.6); sg.rotation.y = Math.PI / 2; S.add(sg);
     for (let i = 0; i < 4; i++) for (const x of [-3.2, 3.2]) mdBox(S, 0.25, 0.06, 2.2, x, 6.0, -8 + i * 6, new THREE.MeshStandardMaterial({ color: '#fff', emissive: '#fff6e8', emissiveIntensity: 1.6, name: 'tube' }));
     this.alarmL = new THREE.PointLight('#ff3018', 0, 14, 1.4); this.alarmL.position.set(-2, 5.2, 11.5); S.add(this.alarmL);
     for (const z of [-6, 2, 9]) { const L = new THREE.PointLight('#f2f0ea', 7, 16, 1.4); L.position.set(0, 5.6, z); S.add(L); }
@@ -178,8 +178,8 @@ class MdFireStation {
     // the engine's own warning lights are off (nobody in it); its beacons just catch the light
     // camera: low, alongside the engine's cab, drifting toward the open door
     const k = Ease.inOutSine(MathX.clamp(u / 2.6, 0, 1));
-    this.camera.position.set(-0.9 - 0.2 * k, 1.35, 1.2 - 2.4 * k);
-    this.camera.lookAt(-3.3, 1.7, -8.0 - 1.0 * k);
+    this.camera.position.set(1.2 - 0.3 * k, 1.75, 10.6 - 1.6 * k);
+    this.camera.lookAt(-2.4, 1.5, -6.0);
     this.camera.fov = 60; this.camera.updateProjectionMatrix();
   }
 }

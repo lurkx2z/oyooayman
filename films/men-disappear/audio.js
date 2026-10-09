@@ -44,7 +44,7 @@ class MdAudio extends AudioEngine {
       n.connect(lp); lp.connect(g); g.connect(car);
       const n2 = S.noise('pink', 0, END), bp = S.filter('bandpass', 900, 0.5), g2 = ctx.createGain(); g2.gain.value = 0;
       n2.connect(bp); bp.connect(g2); g2.connect(car);
-      for (let t = 0; t < END; t += 0.1) { const k = MD_TRAIN.v(t) / 16; g.gain.linearRampToValueAtTime(0.06 + 0.5 * k, t); g2.gain.linearRampToValueAtTime(0.004 + 0.05 * k * k, t); lp.frequency.linearRampToValueAtTime(140 + 160 * k, t); }
+      for (let t = 0; t < END; t += 0.1) { const k = MD_TRAIN.v(t) / 16; g.gain.linearRampToValueAtTime(0.06 + 0.4 * k, t); g2.gain.linearRampToValueAtTime(0.004 + 0.05 * k * k, t); lp.frequency.linearRampToValueAtTime(140 + 160 * k, t); }
       // the joints: when the wheels pass each rail joint (the train runs MD_TRAIN.s metres)
       const axles = [1.6, 4.0, 15.9, 18.3, 22.2, 24.6];             // axle positions behind the nose (m)
       let last = 0;
@@ -123,7 +123,7 @@ class MdAudio extends AudioEngine {
       g.gain.value = 0;
       for (let t = T.harbour - 1; t < END; t += 0.2) {
         const gap = mdShipGap(t), k = t < T.hit ? MathX.clamp(1 - gap / 180, 0, 1) : Math.exp(-(t - T.hit) / 4);
-        g.gain.linearRampToValueAtTime(0.02 + 0.22 * k * k, t);
+        g.gain.linearRampToValueAtTime(0.02 + 0.14 * k * k, t);
       }
       for (const x of [o, o2, lfo]) { x.start(T.harbour - 1); x.stop(END); }
     }
@@ -151,7 +151,7 @@ class MdAudio extends AudioEngine {
     // 9. the countdown: a low pulse that tightens as the bow closes
     for (let t = T.back + 1; t < T.hit - 0.05;) {
       const k = MathX.ramp(t, T.back, T.hit);
-      S.tone(t, 0.3, 55, 0.07 + 0.1 * k, 0, mus, 'sine', 0.01, 0.25);
+      S.tone(t, 0.3, 55, 0.05 + 0.07 * k, 0, mus, 'sine', 0.01, 0.25);
       t += MathX.lerp(1.1, 0.42, k);
     }
     S.tone(T.cab, T.hit - T.cab, 73.4, 0.03, 0, mus, 'triangle', 3.0, 0.2);
