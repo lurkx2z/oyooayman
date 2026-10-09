@@ -50,9 +50,9 @@ carried by the train (`film.js`); `MD_LOOK` turns your head toward things.
 | 4 | 16.6–24 | **Signature B: the ghost ship.** At the right window: a 180 m container ship crossing toward the viaduct. Telephoto (fog thinned): its wheelhouse lit and empty (tag WHEELHOUSE · NOBODY ON WATCH). | A slow diesel beat through the glass. | MERCHANT SEAFARERS 98.7 % ARE MEN · 1.89 MILLION SEAFARERS / THIS SHIP · 6.2 KNOTS · CREW 0 · *Nobody is steering that ship.* · *Almost every merchant seafarer is a man.* |
 | 5 | 24–31.7 | **MEANWHILE** (2.5 s each): a cockpit over the Atlantic, both seats empty, autopilot on · a fire station: the turnout alarm, engines ready, nobody comes · a hospital ward at night: the nurses carry on. | Engine roar + chime · the alarm in an empty bay · monitors beeping. | AIRLINE PILOTS ≈ 95 % ARE MEN · FIREFIGHTERS (US) ≈ 95 % · NURSES WORLDWIDE ≈ 90 % ARE WOMEN · *The autopilot doesn't know.* · *The alarm rings. Nobody comes.* · *But the wards keep running.* |
 | 6 | 31.7–36.6 | **Back:** the bow is much closer. The women take the children to the back of the car (a glance back). You walk up the car; the cab door slides open. | A tightening low pulse. | *A ship can't stop like a train.* |
-| 7 | 36.6–41.4 | **The cab**, behind the empty driver's desk (your hands on its edge), looking out at the ship closing on the pier. | The pulse tightens, the diesel grows. | SHIP TO PIER n m · IMPACT IN 00:0x · 6.2 KNOTS · *Thirty thousand tonnes, heading for a pier.* |
+| 7 | 36.6–41.4 | **The cab**, behind the empty driver's desk: the bow comes in through the windscreen and grows (fog thinned, slow push-in). | The pulse tightens, the diesel grows. | PIER IMPACT IN 00:xx · SHIP n m AWAY · 6.2 KNOTS · *Thirty thousand tonnes, heading for a pier.* |
 | 8 | 41.4–44.15 | **Inside the ship's wheelhouse:** empty chairs, the wheel making the autopilot's small corrections, a radar display, the viaduct coming up ahead. | Diesel, a watch alarm. | *Autopilot on. Nobody at the helm.* |
-| 9 | 44.15–46.4 | Back in the cab: the track ahead, the pier. | The pulse at its tightest. | countdown |
+| 9 | 44.15–46.4 | Back in the cab: the bow right beside the viaduct. | The pulse at its tightest, then it stops; the whole mix sinks for 0.6 s (a held breath). | countdown |
 | 10 | 46.4–48.6 | **Signature C, outside:** low on the water by the pier, the bow slides in and hits it at 47.6; the column breaks apart. | Steel into concrete, a deep boom, the steel shriek. | — |
 | 11 | 48.6–51.5 | **The cab:** dust rolls up ahead; the span's far end drops onto the bow, then the deck in front of you falls away into the water. | Second crunch; the splash. | — |
 | 12 | 51.5–54.4 | High behind the train, stopped at the edge, the span lying from the bow into the water. | Rumble, water. | — |
@@ -105,3 +105,9 @@ closing crane shot; brake shot pushed in; telephoto fog thinned; spray reduced; 
 
 Not changed (still weak): the road / SUV beat and the montage stay (replacing them was a rebuild of a third of the film);
 "boys stay" is never shown; the sound has only been level-measured, never listened to.
+
+**Final 1080×1920 audit (v1 final):** retention 6.5, viewer 6, clarity on a phone 6, cinematography 6, visual quality 6,
+physics / accuracy 8. Top 3 fixed: a passenger standing up into the camera on the cut back at 31.70 s (her retreat now
+starts during the montage); the countdown now shows the ship and the countdown is the main number; the pulse stops early
+and the mix dips before the hit, so the impact lands ~11 dB above the moment before it (it was ~5 dB). Also a slow
+push-in on the ship at 17–20 s. These fixes were not re-scored. See `EPISODE_REPORT.md`.
