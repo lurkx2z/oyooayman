@@ -150,7 +150,7 @@ class MdShip {
     for (const [bi, bx] of bays.entries()) {
       const deckY = this.sheer(bx);
       const rows = Math.floor((this.hb(bx, deckY) * 2 - 1.2) / 2.5);
-      const tiers = bi === 0 ? 2 : bi === 1 ? 3 : 4;
+      const tiers = bi === 0 ? 3 : bi === 1 ? 4 : 5;
       for (let r = 0; r < rows; r++) {
         const z = (r - (rows - 1) / 2) * 2.5, h = tiers - (rng.next() < 0.18 ? 1 : 0);
         for (let k = 0; k < h; k++) list.push([bx + 6.1, deckY + 1.3 + k * 2.6, z, pal[Math.floor(rng.next() * pal.length)].clone().multiplyScalar(0.85 + 0.25 * rng.next()), bi, r, k, rows]);
@@ -166,7 +166,7 @@ class MdShip {
 
   // the accommodation house aft: decks of lit windows, the wheelhouse on top (empty, lit), bridge wings, the funnel
   _house() {
-    const m = this.m, S = MD_SHIP, x0 = 146, x1 = 160, yd = this.sheer(150), lv = 2.9, n = 5;
+    const m = this.m, S = MD_SHIP, x0 = 146, x1 = 160, yd = this.sheer(150), lv = 2.9, n = 6;
     const add = (geo, mat, x, y, z) => { const o = new THREE.Mesh(geo, mat); o.position.set(x, y, z); this.g.add(o); return o; };
     add(new THREE.BoxGeometry(x1 - x0, n * lv, 24), m.white, (x0 + x1) / 2, yd + n * lv / 2, 0);
     // window rows (lit cabins, some dark) on the front face and the sides

@@ -110,7 +110,11 @@ class MdBridge {
       B.add(q, M.conc, null);
     }
     // parapets
-    for (const xe of [R.x0 + 0.15, R.x1 - 0.15]) B.box(0.3, 1.15, len, xe, yT + 0.57, zc, M.conc);
+    for (const xe of [R.x0 + 0.15, R.x1 - 0.15]) {
+      B.box(0.3, 0.3, len, xe, yT + 0.15, zc, M.conc);
+      for (const y of [0.62, 1.08]) B.box(0.06, 0.06, len, xe, yT + y, zc, M.steel, 0, { noShadow: true });
+      for (let z = z0 + 1; z < z1; z += 2.0) B.box(0.06, 0.8, 0.06, xe, yT + 0.7, z, M.steel, 0, { noShadow: true });
+    }
     // track: slab track (concrete strips), rails, fastening blocks
     for (const xt of [0, -4.4]) {
       B.box(2.6, 0.25, len, xt, yT + 0.12, zc, M.slab, 0, { noShadow: true });

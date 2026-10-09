@@ -23,7 +23,13 @@
     #hud .story-readout .value { font-size: calc(var(--u) * 88); margin-top: calc(var(--u) * 6); }
     #hud .story-readout .sub { font-family: var(--hud-font); font-size: calc(var(--u) * 26); letter-spacing: 0.12em; opacity: 0.9; margin-top: calc(var(--u) * 8); color: #ffd7a8; }
     #hud .story-end { top: calc(var(--u) * 820); font-size: calc(var(--u) * 66); }
+    #hud .story-end { text-shadow: 0 0 calc(var(--u) * 30) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 3) calc(var(--u) * 10) rgba(0, 0, 0, 0.85); }
+    #hud .story-note { background: rgba(4, 6, 9, 0.62); padding: calc(var(--u) * 14) calc(var(--u) * 24); border-radius: calc(var(--u) * 12); font-size: calc(var(--u) * 30); }
     #hud .story-end .l2 { display: block; margin-top: calc(var(--u) * 24); font-style: italic; font-size: calc(var(--u) * 54); opacity: 0.92; }
+    /* a label pinned to something in the world, with a tick down to it */
+    #hud .md-tag { position: absolute; transform: translate(-50%, calc(-100% - var(--u) * 26)); white-space: nowrap; font-family: var(--hud-font); font-size: calc(var(--u) * 34);
+      letter-spacing: 0.08em; color: #fff; background: rgba(200, 40, 30, 0.82); padding: calc(var(--u) * 8) calc(var(--u) * 16); border-radius: calc(var(--u) * 10); }
+    #hud .md-tag::after { content: ''; position: absolute; left: 50%; top: 100%; width: calc(var(--u) * 3); height: calc(var(--u) * 26); background: rgba(255, 255, 255, 0.85); transform: translateX(-50%); }
     /* the montage label */
     #hud .md-chyron { position: absolute; left: 50%; top: calc(var(--u) * 470); transform: translateX(-50%); text-align: center; width: calc(var(--u) * 900);
       background: rgba(6, 7, 10, 0.42); padding: calc(var(--u) * 18) 0; border-radius: calc(var(--u) * 22); color: #fff; }

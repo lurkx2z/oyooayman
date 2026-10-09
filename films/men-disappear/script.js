@@ -37,7 +37,7 @@ const MD = {
   cab: 36.4,              // you at the cab door: the track ahead, the pier, the bow
   turn: 42.6,             // the bow swings into the pier's line
   hit: 47.6,              // the bow hits the pier
-  drone: [49.2, 54.4],    // the outside angles
+  drones: [[46.4, 48.3], [51.5, 54.4]],   // the outside angles (the impact; then the span on the bow, the train at the edge)
   after: 54.4,            // back in the car: the track ends in the air
   line: [58.6, 63.2],
   note: [63.4, 66.4],
@@ -48,7 +48,7 @@ const MD = {
 // THE GEOMETRY (metres)
 // ---------------------------------------------------------------------------------------------------------------------
 const MD_G = {
-  rail: 30.0,             // rail head above the water
+  rail: 24.0,             // rail head above the water
   floor: 1.1,             // car floor above the rail head
   carLen: 20.0, carW: 2.9, carH: 2.25,
   cab: 2.4,               // the cab bulkhead (train-local z)
@@ -58,6 +58,7 @@ const MD_G = {
   shoreZ: 22,             // left side: land (the waterfront road) for z > shoreZ, the inner basin beyond
   roadX: -30,             // the waterfront road's centre line (world x)
   quay: 2.4,              // land and road height above the water
+  trackX: -4.4,           // the train runs on the viaduct's left-hand track (the land side)
 };
 MD_G.floorY = MD_G.rail + MD_G.floor;
 
@@ -71,7 +72,8 @@ const MD_TRAIN = (() => {
     const t = i * dt;
     // the brake builds over 0.6 s (air brakes), eases off in the last 0.4 m/s (the final jolt is a short spring-back)
     let a = 0;
-    if (t > MD.brake) a = aMax * MathX.smooth(t, MD.brake, MD.brake + 0.6) * (0.75 + 0.25 * MathX.smooth(v, 0.0, 0.8));
+    if (v <= 0) a = 0;
+    else if (t > MD.brake) a = aMax * MathX.smooth(t, MD.brake, MD.brake + 0.6) * (0.75 + 0.25 * MathX.smooth(v, 0.0, 0.8));
     else if (t > MD.vanish) a = 0.05;                  // power cut with the driver gone: it coasts (rolling resistance)
     S[i] = s; V[i] = v; A[i] = a;
     v = Math.max(0, v - a * dt); s += v * dt;
@@ -124,13 +126,14 @@ const SCRIPT = {
   // your head, in TRAIN-LOCAL metres (film.js adds the train's position). Where you look: MD_LOOK in film.js.
   camera: {
     baseY: MD_G.floorY,
-    // (after the outside angles you are in the cab itself, beside the empty driver's seat: a cut)
-    x: [[0, 0.2], [MD.road[0] - 0.4, 0.2], [MD.road[0] + 0.9, -1.08], [MD.road[1] - 0.4, -1.08], [MD.harbour + 0.6, 0.3], [MD.back, 0.3],
-      [MD.cab - 1.6, 0.3], [MD.cab, 0.1], [MD.after - 0.001, 0.1], [MD.after, 0.42, 'step'], [CONFIG.duration, 0.42]],
-    z: [[0, 6.7], [MD.road[0] - 0.4, 6.7], [MD.road[0] + 0.9, 7.5], [MD.road[1] - 0.4, 7.5], [MD.harbour + 0.6, 7.6], [MD.back, 7.6],
-      [MD.cab - 1.6, 5.4, 'linear'], [MD.cab, 3.05], [MD.after - 0.001, 3.05], [MD.after, 1.2, 'step'], [CONFIG.duration, 1.2]],
-    height: [[0, 1.64], [MD.road[0] + 0.3, 1.64], [MD.road[0] + 1.0, 1.4], [MD.road[1] - 0.4, 1.4], [MD.harbour + 0.6, 1.62], [MD.cab, 1.6],
-      [MD.after - 0.001, 1.6], [MD.after, 1.66, 'step'], [CONFIG.duration, 1.66]],
+    // the road beat: kneeling on the empty seat at the left-hand window; the harbour: at the right-hand window;
+    // then a quick walk up the car and through the cab door (it slides open) to stand behind the empty driver's desk
+    x: [[0, -0.45], [MD.road[0] - 0.4, -0.45], [MD.road[0] + 0.9, -1.08], [MD.road[1] - 0.4, -1.08], [MD.harbour + 0.6, 0.85], [34.6, 0.85],
+      [35.5, 0.15], [36.2, 0.05], [37.0, 0.3], [CONFIG.duration, 0.3]],
+    z: [[0, 7.7], [MD.road[0] - 0.4, 7.7], [MD.road[0] + 0.9, 7.5], [MD.road[1] - 0.4, 7.5], [MD.harbour + 0.6, 8.6], [34.6, 8.6],
+      [35.5, 6.0, 'linear'], [36.2, 3.2, 'linear'], [37.0, 1.08], [CONFIG.duration, 1.08]],
+    height: [[0, 1.64], [MD.road[0] + 0.3, 1.64], [MD.road[0] + 1.0, 1.4], [MD.road[1] - 0.4, 1.4], [MD.harbour + 0.6, 1.55], [34.6, 1.55],
+      [35.5, 1.64], [37.0, 1.74], [CONFIG.duration, 1.74]],
     yaw: [[0, 0], [CONFIG.duration, 0]],
     pitch: [[0, 0], [CONFIG.duration, 0]],
     fov: [[0, 64], [CONFIG.duration, 64]],
@@ -138,15 +141,15 @@ const SCRIPT = {
     shakes: [[MD.brake + 0.1, 0.35, 0.35], [MD.stop, 0.25, 0.3], [MD.hit + 0.05, 0.6, 0.6], [MD.hit + 1.9, 0.9, 0.9], [MD.hit + 3.0, 0.5, 0.8]],
   },
 
-  // your hands: the right one catches the pole when the brake slams on; both on the cab door's frame at the end
+  // your hands: the right one catches the pole when the brake slams on; both on the edge of the driver's desk in the cab
   hands: {
-    right: [[0, 'hidden'], [MD.brake + 0.05, 'poleR'], [MD.road[0] - 0.2, 'hidden'], [MD.cab - 0.3, 'doorR'], [MD.hit + 6.2, 'hidden!']],
-    left: [[0, 'hidden'], [MD.cab - 0.1, 'doorL'], [MD.hit + 6.2, 'hidden!']],
+    right: [[0, 'hidden'], [MD.brake + 0.05, 'poleR'], [MD.road[0] - 0.2, 'hidden'], [36.7, 'deskR'], [MD.line[0] + 0.6, 'hidden']],
+    left: [[0, 'hidden'], [36.85, 'deskL'], [MD.line[0] + 0.4, 'hidden']],
   },
 
   tracks: {
     pov: [[0, 1], [MD.montage[0] - 0.001, 1], [MD.montage[0], 0, 'step'], [MD.back - 0.001, 0], [MD.back, 1, 'step'],
-      [MD.drone[0] - 0.001, 1], [MD.drone[0], 0, 'step'], [MD.drone[1] - 0.001, 0], [MD.drone[1], 1, 'step'], [CONFIG.duration, 1]],
+      ...MD.drones.flatMap(([a, b]) => [[a - 0.001, 1], [a, 0, 'step'], [b - 0.001, 0], [b, 1, 'step']]), [CONFIG.duration, 1]],
   },
 
   hud: {
@@ -178,7 +181,7 @@ const SCRIPT = {
       { from: 37.2, until: 47.4, top: 236, label: 'PIER IMPACT IN', value: (t) => mdClock(MD.hit - t), sub: (t) => `BOW ${Math.max(0, Math.round(mdShipGap(t)))} m AWAY · 6.2 KNOTS` },
     ],
     endLine: { t: MD.line[0], until: MD.line[1], text: 'They were gone in an instant.<br><span class="l2">Everything they were doing kept going.</span>' },
-    notes: [{ t: MD.note[0], until: MD.note[1], text: 'WORKFORCE SHARES: ICS/BIMCO 2021 · ISWAP · US BLS 2025 · WHO 2020 · UN WPP 2024.<br>EVENTS COMPRESSED FOR THIS SIMULATION. NOT A PREDICTION.' }],
+    notes: [{ t: MD.note[0], until: MD.note[1], text: 'WORKFORCE SHARES: ICS/BIMCO 2021 · ISWAP · US BLS (CPS) · WHO 2020 · UN WPP 2024.<br>EVENTS COMPRESSED FOR THIS SIMULATION. NOT A PREDICTION.' }],
   },
 };
 

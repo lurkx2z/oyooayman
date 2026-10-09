@@ -9,7 +9,7 @@
 const MD_RX = MD_G.roadX;
 // [id, type, colour, lane x, z at t 0, speed m/s (− = toward −z), driver 'm' | 'w' | 'cruise' | 'parked', drift m (lateral, + = toward +x)]
 const MD_CARS = [
-  ['cruise', 'suv', '#b9bcbe', MD_RX + 1.6, 247.6, -13.9, 'cruise', 4.4],
+  ['cruise', 'suv', '#b9bcbe', MD_RX + 1.6, 274.4, -13.9, 'cruise', 4.4],
   ['c2', 'hatch', '#7a3a30', MD_RX + 1.6, 92, -9.5, 'w', 0],
   ['c8', 'ev', '#8a8f94', MD_RX + 1.6, 186, -12.5, 'm', -0.5],
   ['c1', 'sedan', '#5c6670', MD_RX + 4.0, 128, -11.0, 'm', 0.2],
@@ -19,9 +19,9 @@ const MD_CARS = [
   ['c7', 'pickup', '#6e5a44', MD_RX - 1.6, 104, 12.0, 'm', -0.4],
   ['c5', 'bus', '#3d6a78', MD_RX - 3.6, 30, 8.5, 'm', 0],
   // parked along the near kerb (the van the SUV hits) and the far kerb
-  ['p1', 'van', '#e2ded4', MD_RX + 6.0, 39.5, 0, 'parked', 0],
+  ['p1', 'van', '#e2ded4', MD_RX + 6.0, 66.0, 0, 'parked', 0],
   ['p2', 'hatch', '#4a5a6a', MD_RX + 6.0, 54, 0, 'parked', 0],
-  ['p3', 'sedan', '#6a3a3a', MD_RX + 6.0, 82, 0, 'parked', 0],
+  ['p3', 'sedan', '#6a3a3a', MD_RX + 6.0, 140, 0, 'parked', 0],
   ['p4', 'suv', '#3a4048', MD_RX - 6.0, 46, 0, 'parked', 0],
   ['p5', 'sedan', '#9a9488', MD_RX - 6.0, 63, 0, 'parked', 0],
   ['p6', 'hatch', '#5a6a5a', MD_RX - 6.0, 120, 0, 'parked', 0],

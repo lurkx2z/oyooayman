@@ -51,12 +51,14 @@ class MdTrain {
       dark: M('#1d2024', { roughness: 0.6 }),
       rubber: M('#151617', { roughness: 0.9 }),
       lightStrip: new THREE.MeshStandardMaterial({ color: '#fffaf0', emissive: '#fff4e2', emissiveIntensity: 2.2, roughness: 0.5, name: 'car lights' }),
-      glass: new THREE.MeshPhysicalMaterial({ color: '#c8d6dc', roughness: 0.06, metalness: 0.0, transparent: true, opacity: 0.12, depthWrite: false, envMapIntensity: 0.9, name: 'car glass' }),
+      glass: new THREE.MeshBasicMaterial({ color: '#c8d6dc', transparent: true, opacity: 0.07, depthWrite: false, name: 'car glass' }),   // (no specular: the car's own lamps made orbs on it)
       glassOut: new THREE.MeshStandardMaterial({ color: '#1e262c', roughness: 0.12, metalness: 0.4, transparent: true, opacity: 0.55, depthWrite: false, name: 'shell glass' }),
+      // the windscreen (seen from inside the cab): no specular, or the cab's own lamps make orbs on it
+      wsGlass: new THREE.MeshBasicMaterial({ color: '#141a1f', transparent: true, opacity: 0.3, depthWrite: false, name: 'windscreen glass' }),
       litWin: new THREE.MeshStandardMaterial({ color: '#3a3830', emissive: '#f6ead2', emissiveIntensity: 0.75, roughness: 0.6, name: 'lit windows' }),
       console: M('#2b3036', { roughness: 0.55 }),
       lamp: new THREE.MeshBasicMaterial({ color: new THREE.Color('#ff3020').multiplyScalar(3.5), name: 'brake lamp' }),
-      screen: new THREE.MeshBasicMaterial({ color: new THREE.Color('#9fd0e8').multiplyScalar(1.2), name: 'cab screen' }),
+      screen: new THREE.MeshBasicMaterial({ color: new THREE.Color('#6f9ab0').multiplyScalar(0.6), name: 'cab screen' }),
       head: new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff6e8').multiplyScalar(4), name: 'headlight' }),
     };
     this.front = new THREE.Group(); this.g.add(this.front);
@@ -155,7 +157,7 @@ class MdTrain {
     if (full) {
       // nose: a sloped dark windscreen over a yellow warning panel, headlights, a coupler
       box(C.W - 0.04, 0.95, 0.12, 0, 0.42, -0.02, m.yellow);
-      const ws = box(C.W - 0.3, 1.25, 0.06, 0, 1.55, 0.12, m.glassOut); ws.rotation.x = -0.18;
+      const ws = box(C.W - 0.3, 1.25, 0.06, 0, 1.55, 0.12, m.wsGlass); ws.rotation.x = -0.18;
       box(C.W - 0.04, 0.5, 0.12, 0, 2.35, 0.0, m.paint);
       for (const s of [-1, 1]) { box(0.3, 0.14, 0.05, s * 1.0, 0.75, -0.1, m.head); box(0.12, 0.08, 0.05, s * 1.0, 0.55, -0.1, m.lamp); box(0.14, C.H + 0.4, 0.4, s * (C.W / 2 - 0.07), (C.H + 0.4) / 2 - 0.05, 0.15, m.paint); }
       box(0.5, 0.3, 0.6, 0, -0.35, -0.25, m.under);
@@ -252,12 +254,15 @@ class MdTrain {
     // the cab bulkhead with its door (a window in it)
     const bz = MD_G.cab;
     for (const s of [-1, 1]) box(1.0, C.H, 0.06, s * 0.95, C.H / 2, bz, m.wall);
-    box(0.9, 0.98, 0.05, 0, 0.49, bz, m.door);
     box(0.9, C.H - 1.86, 0.05, 0, (C.H + 1.86) / 2, bz, m.wall);
-    for (const s of [-1, 1]) box(0.12, 0.88, 0.05, s * 0.39, 1.42, bz, m.door);
-    box(0.66, 0.04, 0.05, 0, 0.99, bz, m.door); box(0.66, 0.04, 0.05, 0, 1.85, bz, m.door);
-    const dg = add(new THREE.PlaneGeometry(0.66, 0.84), m.glass, 0, 1.42, bz + 0.03); void dg;
-    box(0.03, 0.18, 0.04, 0.33, 1.0, bz + 0.06, m.steel);                                           // the handle
+    // the door itself slides into the wall on the right (you open it near the end)
+    const dGrp = new THREE.Group(); g.add(dGrp); this.cabDoor = dGrp;
+    const dbox = (w, h, d, x, y, z, mat) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); o.position.set(x, y, z); dGrp.add(o); return o; };
+    dbox(0.9, 0.98, 0.05, 0, 0.49, bz - 0.07, m.door);
+    for (const s of [-1, 1]) dbox(0.12, 0.88, 0.05, s * 0.39, 1.42, bz - 0.07, m.door);
+    dbox(0.66, 0.04, 0.05, 0, 0.99, bz - 0.07, m.door); dbox(0.66, 0.04, 0.05, 0, 1.85, bz - 0.07, m.door);
+    const dg = new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.84), m.glass); dg.position.set(0, 1.42, bz - 0.07); dGrp.add(dg);
+    dbox(0.03, 0.18, 0.04, -0.33, 1.0, bz - 0.11, m.steel);                                          // the handle
     this.doorFrame = { z: bz + 0.05, x: [-0.4, 0.4], y: [0.99, 1.86] };
   }
 
@@ -290,7 +295,17 @@ class MdTrain {
     box(2.0, 0.04, 2.3, 0, MD_CAR.H, 1.25, m.ceiling);
     const desk = box(2.3, 0.85, 0.75, 0, 0.6, 0.62, m.console);
     const top = box(2.3, 0.05, 0.75, 0, 1.05, 0.66, m.console); top.rotation.x = 0.28; void desk;
-    for (const [x, w] of [[-0.55, 0.36], [0.05, 0.42], [0.62, 0.3]]) { const s = add(new THREE.PlaneGeometry(w, 0.2), m.screen, x, 1.13, 0.5, -1.1, 0, 0); void s; }
+    {
+      const c = Tex.canvas(256, 128), x = c.getContext('2d');
+      x.fillStyle = '#0c1218'; x.fillRect(0, 0, 256, 128);
+      x.strokeStyle = '#3f6f86'; x.lineWidth = 4; x.beginPath(); x.arc(64, 70, 40, Math.PI * 0.8, Math.PI * 2.2); x.stroke();
+      x.strokeStyle = '#d65a3a'; x.beginPath(); x.moveTo(64, 70); x.lineTo(40, 42); x.stroke();
+      x.fillStyle = '#7fb0c8'; x.font = '600 18px "JetBrains Mono"'; x.fillText('0 km/h', 34, 112);
+      x.strokeStyle = '#4f7f96'; x.lineWidth = 3; x.beginPath(); x.moveTo(130, 64); x.lineTo(246, 64); x.stroke();
+      x.fillStyle = '#d65a3a'; x.fillRect(150, 54, 30, 20); x.fillStyle = '#7fb0c8'; x.fillText('EB', 200, 40);
+      const scm = new THREE.MeshBasicMaterial({ map: Tex.tex(c, { repeat: false }), color: new THREE.Color(0.75, 0.75, 0.75), name: 'cab screen' });
+      for (const [x2, w] of [[-0.55, 0.36], [0.05, 0.42]]) add(new THREE.PlaneGeometry(w, 0.2), scm, x2, 1.13, 0.5, -1.1, 0, 0);
+    }
     // the driver's seat (empty) on the left of the cab, the second seat on the right
     for (const sx of [-0.55, 0.6]) {
       box(0.5, 0.1, 0.5, sx, 0.52, 1.55, m.seatShell);
@@ -302,15 +317,15 @@ class MdTrain {
     const st = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.2, 8), m.steel); st.position.y = 0.1; this.dmh.add(st);
     const tg = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.16, 10), m.grip); tg.rotation.z = Math.PI / 2; tg.position.y = 0.2; this.dmh.add(tg);
     // the emergency brake lamp and its label
-    this.brakeLamp = add(new THREE.CylinderGeometry(0.035, 0.035, 0.02, 12), m.lamp, 0.35, 1.13, 0.72, 0.28, 0, 0);
+    this.brakeLamp = add(new THREE.CylinderGeometry(0.03, 0.03, 0.02, 12), m.lamp, 0.82, 1.13, 0.6, 0.28, 0, 0);
     const lab = Tex.label(['EMERGENCY', 'BRAKE'], { w: 256, h: 128, bg: '#1c1f22', fg: '#e8e2d2', font: 40 });
-    add(new THREE.PlaneGeometry(0.16, 0.08), new THREE.MeshBasicMaterial({ map: lab, name: 'cab label' }), 0.52, 1.13, 0.72, -1.3, 0, 0);
+    add(new THREE.PlaneGeometry(0.16, 0.08), new THREE.MeshBasicMaterial({ map: lab, color: new THREE.Color(0.7, 0.7, 0.7), name: 'cab label' }), 0.98, 1.13, 0.6, -1.3, 0, 0);
     // a cab light
     const cl = new THREE.PointLight('#e8f0ff', 1.6, 4, 1.8); cl.position.set(0, 2.0, 1.4); g.add(cl);
   }
 
   update(t) {
-    this.g.position.set(0, MD_G.floorY, mdNoseZ(t));
+    this.g.position.set(MD_G.trackX, MD_G.floorY, mdNoseZ(t));
     // the car rocks gently while it runs, dips at the brake, rocks at the stop and at the impact
     const run = MD_TRAIN.v(t) / 16;
     const roll = run * 0.004 * Math.sin(t * 1.7) + MathX.impulse(t, MD.hit + 0.05, 0.9) * Math.sin(Math.max(0, t - MD.hit) * 7) * 0.012 + MathX.impulse(t, MD.hit + 1.9, 1.2) * Math.sin(Math.max(0, t - MD.hit - 1.9) * 5) * 0.01;
@@ -318,9 +333,10 @@ class MdTrain {
     this.g.rotation.set(-pitch, 0, roll);
     for (const S of this.straps) S.p.rotation.x = -mdStrapAngle(t, S.i) + (S.held && t < MD.vanish ? 0.0 : 0);
     this.led.offset.x = (t * 0.07) % 1;
+    this.cabDoor.position.x = 0.86 * Ease.inOutSine(MathX.clamp((t - 35.5) / 0.7, 0, 1));
     // the dead man's handle springs up when the driver vanishes; the lamp lights when the brake applies, and blinks
     this.dmh.rotation.x = -0.5 * (1 - MathX.smooth(t, MD.vanish, MD.vanish + 0.12));
     const on = t > MD.brake ? (Math.floor((t - MD.brake) * 2.5) % 2 === 0 ? 1 : 0.15) : 0.08;
-    this.m.lamp.color.setRGB(3.5 * on, 0.6 * on, 0.4 * on);
+    this.m.lamp.color.setRGB(1.8 * on, 0.3 * on, 0.2 * on);
   }
 }

@@ -30,8 +30,7 @@ class MdAudio extends AudioEngine {
     // outside, heard through the glass while you are in the car (opens up for the outside angles and the montage gap)
     const outLP = S.filter('lowpass', 1400, 0.6); outLP.connect(mix);
     const outside = bus(1.0, outLP);
-    const inCar = (t) => !((t >= T.drone[0] && t < T.drone[1]));
-    for (const [a, b] of [[T.drone[0], T.drone[1]]]) {
+    for (const [a, b] of T.drones) {
       outLP.frequency.setValueAtTime(1400, a - 0.01); outLP.frequency.linearRampToValueAtTime(9000, a + 0.02);
       outLP.frequency.setValueAtTime(9000, b - 0.01); outLP.frequency.linearRampToValueAtTime(1400, b + 0.02);
     }
@@ -183,6 +182,5 @@ class MdAudio extends AudioEngine {
     S.tone(T.after, END - T.after, 640, 0.006, 0.5, outside, 'square', 0.5, 1.0);
     for (const f of [98, 146.8, 196, 246.9]) S.tone(T.line[0] - 0.3, 6.5, f, 0.032, 0, mus, 'sine', 1.4, 3.0);
     S.tone(T.line[0] + 1.2, 5, 392, 0.01, 0, mus, 'sine', 1.5, 2.5);
-    void inCar;
   }
 }

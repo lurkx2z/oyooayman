@@ -10,10 +10,11 @@
 // the palm lands on a point in the world (the pole, the cab door's frame).
 const MD_HAND_POSES = {
   poleR: { p: [0.2, -0.2, -0.45], F: [0, 0, -1], N: [1, 0, 0], curl: [1.3, 1.35, 1.4, 1.4], thumb: [0.12, 0.75], aim: [0, 0.05, 0.03], trem: 0.0015 },
-  doorR: { p: [0.2, -0.2, -0.45], F: [0, 0, -1], N: [1, 0, 0], curl: [1.15, 1.25, 1.3, 1.35], thumb: [0.2, 0.6], aim: [0, 0.05, 0.03], trem: 0.002 },
-  doorL: { p: [0.2, -0.2, -0.45], F: [0, 0, -1], N: [1, 0, 0], curl: [1.15, 1.25, 1.3, 1.35], thumb: [0.2, 0.6], aim: [0, 0.05, 0.03], trem: 0.002 },
+  // both hands on the front edge of the driver's desk, fingers over it, leaning in to see out
+  deskR: { p: [0.2, -0.2, -0.45], F: [0, 0, -1], N: [0, -1, 0], curl: [0.9, 1.0, 1.05, 1.1], thumb: [0.35, 0.3], aim: [0, 0.04, 0.025], trem: 0.0015 },
+  deskL: { p: [0.2, -0.2, -0.45], F: [0, 0, -1], N: [0, -1, 0], curl: [0.9, 1.0, 1.05, 1.1], thumb: [0.35, 0.3], aim: [0, 0.04, 0.025], trem: 0.0015 },
 };
-const MD_HAND_BLEND = { poleR: 0.16, doorR: 0.35, doorL: 0.4 };
+const MD_HAND_BLEND = { poleR: 0.16, deskR: 0.45, deskL: 0.5 };
 for (const k of Object.keys(MD_HAND_POSES)) { MD_HAND_POSES[k + '!'] = MD_HAND_POSES[k]; MD_HAND_BLEND[k + '!'] = 0.02; }
 MD_HAND_POSES['hidden!'] = HAND_POSES.hidden; MD_HAND_BLEND['hidden!'] = 0.02;
 
@@ -34,7 +35,7 @@ function mdAimHand(name, camera, world, Fw, Nw, side = 1) {
 }
 
 // train-local → world (the car's tiny pitch and roll are ignored for aiming)
-function mdLocal(t, x, y, z, out) { return out.set(x, MD_G.floorY + y, mdNoseZ(t) + z); }
+function mdLocal(t, x, y, z, out) { return out.set(MD_G.trackX + x, MD_G.floorY + y, mdNoseZ(t) + z); }
 // a point on the ship (ship-local metres) → world
 function mdShipPt(t, x, y, z, out) { const w = mdShipWorld(t, x, y, z); return out.set(w[0], w[1], w[2]); }
 
@@ -48,28 +49,39 @@ const MD_LOOK = [
   [1.95, 4.7, { l: [0.62, 0.42, 3.9] }, 60, 0.4, 0.45],
   // the brake: the cab door's window (the driver's seat is empty, the handle has sprung up)
   [4.5, 9.5, { l: [0.05, 1.25, 1.0] }, 50, 0.35, 0.6],
-  // the road below the left-hand windows: the cars coast, one doesn't
-  [9.3, 16.7, (t, o) => o.set(MD_G.roadX + 0.5, MD_G.quay + 0.4, 44.0 + 14 * (1 - MathX.smooth(t, 9.3, 13.6))), 46, 0.9, 0.7],
+  // the road below the left-hand windows, looking back over the viaduct's edge: the cars coast; the SUV doesn't
+  // (kept a little behind you along the road: straight down, the viaduct's own deck and parapet hide it)
+  [9.3, 16.7, (t, o, c) => { const k = MD_CARS[0], m = mdCarMotion(k, Math.min(t, MD.cruise + 0.3)); return o.set(MD_G.roadX + 3.5, MD_G.quay + 0.6, Math.max(k[4] + m.d - 4, c.z + 14)); }, 40, 0.9, 0.7],
   // the harbour: the ship crossing toward the viaduct
-  [16.3, 20.8, (t, o) => mdShipPt(t, 46, 13, 0, o), 50, 0.9, 0.4],
+  [16.3, 20.8, (t, o) => mdShipPt(t, 50, 12, 0, o), 50, 0.9, 0.4],
   // telephoto: its wheelhouse, lit, empty
-  [20.4, 24.0, (t, o) => mdShipPt(t, 146.5, 28.5, 0, o), (t) => MathX.lerp(50, 7.5, Ease.inOutSine(MathX.clamp((t - 20.4) / 0.9, 0, 1))), 0.4, 0.01],
+  [20.4, 24.0, (t, o) => mdShipPt(t, 148.5, 30.2, 0, o), (t) => MathX.lerp(50, 6.5, Ease.inOutSine(MathX.clamp((t - 20.4) / 0.9, 0, 1))), 0.4, 0.01],
   // back on the train: the bow is much closer
-  [31.69, 34.6, (t, o) => mdShipPt(t, 34, 12, 0, o), 58, 0.01, 0.5],
+  [31.69, 33.9, (t, o) => mdShipPt(t, 34, 12, 0, o), 58, 0.01, 0.5],
   // a glance back: the women take the children to the back of the car
-  [34.2, 35.6, { l: [0.2, 1.3, 15.5] }, 64, 0.4, 0.5],
-  // the cab door: the track ahead, the pier and the bow coming for it
-  [36.0, 49.3, (t, o) => { const b = mdShipBow(t), k = MathX.smooth(t, MD.turn, MD.hit); return o.set(MathX.lerp((b[0] + 6 - 2.1) / 2, 0.6, k), 23.0, -60); }, 60, 0.6, 0.01],
-  // the cab, after: the rails end in the air; the span lies across the bow
-  [54.39, 67.0, (t, o) => o.set(0.4, MathX.lerp(24.5, 21.0, MathX.smooth(t, 55, 58)), MathX.lerp(-14, -40, MathX.smooth(t, MD.line[0] - 1, MD.line[1]))), 58, 0.01, 0.01],
+  [33.5, 34.9, { l: [0.2, 1.3, 15.5] }, 64, 0.45, 0.5],
+  // the cab: the track ahead, the pier and the bow coming for it
+  [36.6, 49.2, (t, o) => { const b = mdShipBow(t), k = MathX.smooth(t, MD.turn, MD.hit); return o.set(MathX.lerp((b[0] + 22) * 0.5 - 4, 1.0, k), 16.0, -62); }, 66, 0.9, 0.5],
+  // …the deck four metres ahead of you drops away
+  [48.7, 54.4, { w: [-4.4, 19.0, -11] }, 66, 0.5, 0.01],
+  // after: the rails end in the air; the span lies across the bow
+  [54.39, 67.0, (t, o) => o.set(-4.0, MathX.lerp(17.0, 13.5, MathX.smooth(t, 55, 58)), MathX.lerp(-15, -42, MathX.smooth(t, MD.line[0] - 1, MD.line[1]))), 64, 0.01, 0.01],
 ];
 
 // the two outside angles after the impact
 const MD_DRONE = [
-  // low over the water off the right side: the far end of the span drops onto the bow, the near end follows
-  { t0: MD.drone[0], t1: 51.9, pos: [74, 7.5, -6], at: [-4, 17, -38], drift: [-1.6, 0.4, -1.2], fov: 54 },
+  // low on the water off the pier: the bow slides in and hits it
+  { t0: 46.4, t1: 48.3, pos: [26, 3.2, -28], at: [2, 10, -62], drift: [-0.5, 0.1, -0.6], fov: 56 },
+  // off the right side: the span lies across the bow, its near end in the water
+  { t0: 51.5, t1: 53.0, pos: [58, 15, 34], at: [-6, 9, -42], drift: [-1.4, 0.2, -0.8], fov: 50 },
   // high behind the train: it stopped four metres short of the gap
-  { t0: 51.9, t1: MD.drone[1], pos: [-17, 47, 33], at: [0, 16, -30], drift: [0.6, -0.5, -1.4], fov: 52 },
+  { t0: 53.0, t1: 54.4, pos: [-13, 33, 44], at: [-4.4, 19, -12], drift: [0.4, -0.4, -1.2], fov: 54 },
+];
+// labels pinned to things in the world: [t0, t1, point(t, out), text(t)]
+const MD_TAGS = [
+  [11.4, 15.3, (t, o) => { const k = MD_CARS[0], m = mdCarMotion(k, t), dk = MathX.smooth(t, MD.vanish + 3, MD.cruise); return o.set(k[3] + k[7] * dk, MD_G.quay + 2.4, k[4] + m.d); },
+    (t) => (t < MD.cruise ? `NO DRIVER · CRUISE CONTROL · ${Math.round(mdCarKmh('cruise', t))} km/h` : 'NO DRIVER · CRUISE CONTROL')],
+  [21.2, 23.8, (t, o) => mdShipPt(t, 147, 32.2, 0, o), () => 'WHEELHOUSE · NOBODY ON WATCH'],
 ];
 const MD_MONTAGE_LABEL = { cockpit: ['ABOVE THE ATLANTIC', 'FLIGHT 288 · BOTH SEATS EMPTY'], fire: ['A FIRE STATION', 'A CALL COMES IN'], ward: ['A HOSPITAL WARD', 'THE NIGHT SHIFT'] };
 
@@ -95,6 +107,7 @@ const FILM = {
       poses: MD_HAND_POSES, blends: MD_HAND_BLEND });
     app.puffs = new BillboardSystem(scene, 900, false);
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
+    const tg = document.createElement('div'); tg.className = 'md-tag'; tg.style.opacity = '0'; document.getElementById('hud').appendChild(tg); app.tag = tg;
     const ch = document.createElement('div'); ch.className = 'md-chyron'; ch.style.opacity = '0'; document.getElementById('hud').appendChild(ch); app.chyron = ch;
     app.audio = new MdAudio(app.tl, app);
     FILM._v = { a: new THREE.Vector3(), b: new THREE.Vector3(), f: new THREE.Vector3(), n: new THREE.Vector3() };
@@ -104,7 +117,7 @@ const FILM = {
     const cam = app.camera, V = FILM._v;
     // the train carries you: script positions are train-local
     app.train.update(t);
-    cam.position.z += mdNoseZ(t);
+    cam.position.x += MD_G.trackX; cam.position.z += mdNoseZ(t);
     // the brake throws you toward the nose a little
     const surge = mdSurge(t);
     cam.position.z -= 0.07 * surge; cam.rotation.x -= 0.025 * surge;
@@ -128,6 +141,7 @@ const FILM = {
     this._focus(app, t, D);
     this._fx(app, t);
     this._chyron(app, t, shot);
+    this._tag(app, t);
     void V;
   },
 
@@ -145,7 +159,7 @@ const FILM = {
       const w = MathX.smooth(t, L[0], L[0] + L[4]) * (1 - MathX.smooth(t, L[1] - L[5], L[1]));
       if (w <= 0) continue;
       const T = L[2];
-      if (typeof T === 'function') T(t, tg); else if (T.l) mdLocal(t, T.l[0], T.l[1], T.l[2], tg); else tg.set(...T.w);
+      if (typeof T === 'function') T(t, tg, cam.position); else if (T.l) mdLocal(t, T.l[0], T.l[1], T.l[2], tg); else tg.set(...T.w);
       const dx = tg.x - cam.position.x, dy = tg.y - cam.position.y, dz = tg.z - cam.position.z;
       let y = Math.atan2(-dx, -dz); const p = Math.atan2(dy, Math.hypot(dx, dz));
       while (y - yaw > Math.PI) y -= Math.PI * 2; while (y - yaw < -Math.PI) y += Math.PI * 2;
@@ -174,11 +188,10 @@ const FILM = {
     mdLocal(t, 0.0 + 0.03, 1.28, MD_CAR.doors[0] + 0.04, V.a);
     V.f.set(-0.3, -0.1, -1); V.n.set(-1, 0, 0.2);
     mdAimHand('poleR', cam, V.a, V.f, V.n, 1);
-    // the cab door's frame: one hand each side, fingers curling round the edge toward the cab
-    const F = app.train.doorFrame;
-    for (const [name, side] of [['doorR', 1], ['doorL', -1]]) {
-      mdLocal(t, side * (F.x[1] + 0.02), 1.36 + (side > 0 ? -0.06 : 0), F.z + 0.05, V.a);
-      V.f.set(-side * 0.25, 0.05, -1); V.n.set(-side, 0, 0.15);
+    // the desk's front edge (train-local z 1.0, top at y 1.08): one hand each side of you, fingers curling over it
+    for (const [name, side] of [['deskR', 1], ['deskL', -1]]) {
+      mdLocal(t, 0.3 + side * 0.24, 1.1, 1.02, V.a);
+      V.f.set(-side * 0.1, -0.35, -1); V.n.set(0, -1, 0.3);
       mdAimHand(name, cam, V.a, V.f, V.n, side);
     }
   },
@@ -247,11 +260,21 @@ const FILM = {
         const h1 = hash1(i * 4.3 + 7), h2 = hash1(i * 6.1 + 8), h3 = hash1(i * 8.7 + 9);
         const z = -2.5 - 24 * h1 * h1, side = h2 < 0.5 ? -1 : 1, vy = 6 + 14 * h3 * (1 - h1 * 0.6), vx = side * (2 + 6 * h2);
         const tt = Math.min(ds, 2.6), y = Math.max(0.4, vy * tt - 4.9 * tt * tt), x = -2.1 + side * 3 + vx * tt;
-        const al = 0.75 * Math.min(1, ds / 0.1) * Math.exp(-ds / 1.8);
-        P.push(x, y + h3 * 2, z, 2.4 + ds * 2.2 + 2 * h3, h1 * 6, al, 0.98, 0.95, 0.97, 0.98);
+        const al = 0.55 * Math.min(1, ds / 0.1) * Math.exp(-ds / 1.5);
+        P.push(x, y + h3 * 2, z, 1.8 + ds * 1.5 + 1.5 * h3, h1 * 6, al, 0.98, 0.95, 0.97, 0.98);
       }
     }
     P.end();
+  },
+
+  _tag(app, t) {
+    const tg = app.tag, T = MD_TAGS.find((g) => t >= g[0] && t < g[1]), v = FILM._tv || (FILM._tv = new THREE.Vector3());
+    if (!T) { if (tg._o !== 0) { tg.style.opacity = '0'; tg._o = 0; } return; }
+    T[2](t, v); v.project(app.camera);
+    const vis = v.z < 1 && Math.abs(v.x) < 0.95 && v.y < 0.92 && v.y > -0.9;
+    const txt = T[3](t); if (tg._t !== txt) { tg.textContent = txt; tg._t = txt; }
+    tg.style.left = `${MathX.clamp((v.x + 1) / 2 * 100, 22, 78).toFixed(2)}%`; tg.style.top = `${((1 - v.y) / 2 * 100).toFixed(2)}%`;
+    const o = vis ? StoryHUD.win(t, T[0], T[1], 0.2, 0.2) : 0; tg.style.opacity = o.toFixed(3); tg._o = o;
   },
 
   // MEANWHILE · where we are
