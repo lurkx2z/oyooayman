@@ -20,7 +20,7 @@ class MdAudio extends AudioEngine {
     S.tone = (t, dur, f, vol, pan, dest, type = 'sine', attack = 0.01, release = null) => tone(t, dur, f, vol, pan, dest, type, Math.max(attack, 0.006), release);
 
     // mix chain: buses → compressor → out → limiter
-    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12; lim.connect(ctx.destination);
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12; const post = ctx.createGain(); post.gain.value = 0.8; post.connect(ctx.destination); lim.connect(post);   // trim to ≈ −16.7 LUFS, peaks under −1.5 dB
     const out = ctx.createGain(); out.gain.value = 1.0; out.connect(lim);
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 4; comp.connect(out);
     const mix = ctx.createGain(); mix.gain.value = 2.2; mix.connect(comp);

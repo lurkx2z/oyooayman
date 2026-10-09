@@ -318,7 +318,7 @@ const FILM = {
     p.chroma += 0.007 * MathX.impulse(t, T.hit, 0.35);
     // the end line: the colour drains a little; black at the very end
     const end = MathX.smooth(t, T.line[0] - 0.5, T.line[0] + 1.5);
-    p.saturation -= 0.1 * end; p.exposure -= 0.06 * end;
+    p.saturation -= 0.1 * end; p.exposure -= 0.16 * end; p.vignette += 0.25 * end;   // darker so the white end line reads on a phone
     p.fade = MathX.smooth(t, T.end - 0.7, T.end);
   },
 
