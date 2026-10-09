@@ -78,7 +78,7 @@ class MdRoad {
       g.rotation.y = (v0 < 0 ? 0 : Math.PI) + Math.PI / 2 + yawDrift;
       // the SUV hits the van: it noses down and twists; the van is shoved and rocks
       if (id === 'cruise' && t > MD.cruise) { const b = t - MD.cruise; g.rotation.y += 0.12 * MathX.smooth(b, 0, 0.35); g.rotation.z = 0.04 * Math.sin(b * 9) * Math.exp(-b / 0.5); }
-      if (id === 'p1' && t > MD.cruise + 0.12) { const b = t - MD.cruise - 0.12; g.position.z -= 1.4 * (1 - Math.exp(-b / 0.25)); g.position.x += 0.35 * (1 - Math.exp(-b / 0.3)); g.rotation.y += 0.09 * (1 - Math.exp(-b / 0.3)); g.rotation.x = 0.03 * Math.sin(b * 8) * Math.exp(-b / 0.6); }
+      if (id === 'p1' && t > MD.cruise + 0.12) { const b = t - MD.cruise - 0.12; g.position.z -= 3.0 * (1 - Math.exp(-b / 0.35)); g.position.x += 0.35 * (1 - Math.exp(-b / 0.3)); g.rotation.y += 0.09 * (1 - Math.exp(-b / 0.3)); g.rotation.x = 0.03 * Math.sin(b * 8) * Math.exp(-b / 0.6); }
       for (const w of k.v.wheels) w.rotation.z = -Math.abs(m.d) / k.r;
       // hazards: the women who braked switch them on; the van after it is hit
       const haz = (who === 'w' && t > V + 2.2) || (id === 'p1' && t > MD.cruise + 0.6);

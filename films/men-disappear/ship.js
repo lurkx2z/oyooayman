@@ -51,7 +51,7 @@ class MdShip {
       stripe: Mat.std('#c9a13a', { roughness: 0.5 }),
       glass: new THREE.MeshStandardMaterial({ color: '#1d2a33', roughness: 0.08, metalness: 0.4, transparent: true, opacity: 0.38, depthWrite: false, name: 'wheelhouse glass' }),
       lit: new THREE.MeshStandardMaterial({ color: '#2a2620', emissive: '#ffe2b0', emissiveIntensity: 1.4, roughness: 0.9, name: 'litWin' }),
-      room: new THREE.MeshStandardMaterial({ color: '#cfc8b8', emissive: '#fff0d8', emissiveIntensity: 0.55, roughness: 0.9, side: THREE.BackSide, name: 'bridge room' }),
+      room: new THREE.MeshStandardMaterial({ color: '#cfc8b8', emissive: '#ffe2b8', emissiveIntensity: 0.7, roughness: 0.9, side: THREE.BackSide, name: 'bridge room' }),
       lamp: (c, k = 3) => new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), name: 'navlight' }),
     };
     this._hull();
@@ -183,13 +183,15 @@ class MdShip {
     const yw = yd + n * lv, wh = 3.0;
     this.wheel = { x: x0 + 3.5, y: yw + 1.6, z: 0 };
     add(new THREE.BoxGeometry(9, 0.3, 30.5), m.white, x0 + 4.5, yw + wh + 0.15, 0);                // roof (runs out over the wings)
-    add(new THREE.BoxGeometry(9, 1.0, 26), m.white, x0 + 4.5, yw + 0.5, 0);                        // below the windows
-    add(new THREE.BoxGeometry(6, wh, 25.6), m.room, x0 + 4.0, yw + wh / 2, 0);                     // the room (inside faces lit)
+    add(new THREE.BoxGeometry(0.3, 1.0, 26), m.white, x0 + 0.95, yw + 0.5, 0);                      // below the windows
+    add(new THREE.BoxGeometry(6.2, 0.05, 25.8), m.deck, x0 + 4.0, yw + 0.03, 0);                     // the deck of the wheelhouse
+    // the room (inside faces lit; its front face left open so you can see out through the glass)
+    add(new THREE.BoxGeometry(6, wh, 25.6), [m.room, new THREE.MeshBasicMaterial({ visible: false }), m.room, m.room, m.room, m.room], x0 + 4.0, yw + wh / 2, 0);
     add(new THREE.BoxGeometry(0.1, wh - 1.0, 25.4), m.glass, x0 + 0.95, yw + 1.0 + (wh - 1.0) / 2, 0);   // the front glass
     for (let i = 0; i <= 10; i++) add(new THREE.BoxGeometry(0.22, wh - 1.0, 0.18), m.white, x0 + 0.95, yw + 1.0 + (wh - 1.0) / 2, -12.7 + i * 2.54);   // mullions
     // inside: the console along the windows, two empty chairs, the wheel stand, screens glowing
     add(new THREE.BoxGeometry(1.1, 1.1, 14), m.dark, x0 + 1.8, yw + 0.55, 0);
-    const scr = new THREE.MeshBasicMaterial({ color: new THREE.Color('#7fb2c8').multiplyScalar(1.3), name: 'screens' });
+    const scr = new THREE.MeshBasicMaterial({ map: mdRadarTex(), name: 'screens' });
     for (let i = 0; i < 6; i++) { const s = add(new THREE.BoxGeometry(0.05, 0.5, 0.8), scr, x0 + 2.3, yw + 1.35, -5 + i * 2); s.rotation.z = 0.3; }
     for (const z of [-1.6, 1.6]) {
       add(new THREE.BoxGeometry(0.8, 0.5, 0.8), m.dark, x0 + 3.3, yw + 0.75, z);
@@ -197,6 +199,10 @@ class MdShip {
       add(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 6), m.grey, x0 + 3.3, yw + 0.25, z);
     }
     add(new THREE.CylinderGeometry(0.12, 0.16, 1.0, 8), m.grey, x0 + 2.6, yw + 0.5, 0);
+    { const w = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.035, 6, 20), m.dark); w.position.set(x0 + 2.75, yw + 1.05, 0); w.rotation.y = Math.PI / 2; this.g.add(w); this.helm = w; }
+    add(new THREE.CylinderGeometry(0.045, 0.04, 0.1, 12), m.white, x0 + 1.95, yw + 1.15, 0.9);          // a mug, left on the console
+    { const lab = Tex.label([['AUTOPILOT  ON', 34], ['HDG 260°   6.2 kn', 26]], { w: 512, h: 160, bg: '#081014', fg: '#58e08a', font: 34 });
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.25), new THREE.MeshBasicMaterial({ map: lab, name: 'autopilot' })); p.position.set(x0 + 2.3, yw + 1.4, -0.9); p.rotation.set(0, Math.PI / 2, 0); p.rotateX(-0.3); this.g.add(p); }
     // bridge wings out to the ship's sides, with the side lights (red to port, green to starboard)
     for (const side of [-1, 1]) {
       add(new THREE.BoxGeometry(4, 1.2, 3.2), m.white, x0 + 2.0, yw + 0.6, side * 13.9);
@@ -233,6 +239,7 @@ class MdShip {
     this.g.rotation.set(0, S.head, 0, 'YXZ');
     this.g.rotation.z = -p.trim * 40; this.g.rotation.x = p.roll;
     this.radar.rotation.y = t * 2.6;
+    this.helm.rotation.x = 0.05 * Math.sin(t * 0.9);           // the autopilot's small corrections turn the wheel
     // the loose containers (ship-local motion: they keep the ship's 3.2 m/s when it stops; gravity once off the deck)
     const d = t - MD.hit, M = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1);
     for (const f of this.fallers) {
@@ -249,4 +256,16 @@ class MdShip {
     }
     this.boxes.instanceMatrix.needsUpdate = true;
   }
+}
+
+// a dim radar / chart display for the wheelhouse screens (dark, so it doesn't read as a blank plate)
+function mdRadarTex() {
+  const c = document.createElement('canvas'); c.width = 128; c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#06141a'; x.fillRect(0, 0, 128, 128);
+  x.strokeStyle = '#2f8a6a'; x.lineWidth = 2;
+  for (const r of [20, 40, 58]) { x.beginPath(); x.arc(64, 64, r, 0, Math.PI * 2); x.stroke(); }
+  x.beginPath(); x.moveTo(64, 64); x.lineTo(110, 30); x.stroke();
+  x.fillStyle = '#7ad0a0'; x.fillRect(80, 40, 4, 4); x.fillRect(40, 84, 3, 3);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }

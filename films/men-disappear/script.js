@@ -37,7 +37,7 @@ const MD = {
   cab: 36.4,              // you at the cab door: the track ahead, the pier, the bow
   turn: 42.6,             // the bow swings into the pier's line
   hit: 47.6,              // the bow hits the pier
-  drones: [[46.4, 48.3], [51.5, 54.4]],   // the outside angles (the impact; then the span on the bow, the train at the edge)
+  drones: [[41.4, 44.15], [46.4, 48.6], [51.5, 54.4], [58.4, 67.0]],   // outside: the ship's line from above; the impact; the train at the edge; the closing crane
   after: 54.4,            // back in the car: the track ends in the air
   line: [58.6, 63.2],
   note: [63.4, 66.4],
@@ -98,7 +98,7 @@ function mdSurge(t) {
 // numbers on screen (sources and arithmetic: films/men-disappear/PLAN.md § 1)
 // ---------------------------------------------------------------------------------------------------------------------
 function mdPop(t) {
-  // UN WPP 2024 medium projection for late 2026 ≈ 8.30 billion; ~4.3 births a second net
+  // UN WPP 2024 medium projection for late 2026 ≈ 8.30 billion; ~2.4 people a second net growth
   const base = 8301468210 + Math.floor(Math.max(0, t) * 2.4);
   const gone = 2921600480;                             // men aged 18+ ≈ 35.2 % of everyone
   const n = t < MD.vanish ? base : base - gone;
@@ -128,12 +128,12 @@ const SCRIPT = {
     baseY: MD_G.floorY,
     // the road beat: kneeling on the empty seat at the left-hand window; the harbour: at the right-hand window;
     // then a quick walk up the car and through the cab door (it slides open) to stand behind the empty driver's desk
-    x: [[0, -0.45], [MD.road[0] - 0.4, -0.45], [MD.road[0] + 0.9, -1.08], [MD.road[1] - 0.4, -1.08], [MD.harbour + 0.6, 0.85], [34.6, 0.85],
+    x: [[0, -0.45], [MD.road[0] - 0.4, -0.45], [MD.road[0] + 0.9, -1.2], [MD.road[1] - 0.4, -1.2], [MD.harbour + 0.6, 0.85], [34.6, 0.85],
       [35.5, 0.15], [36.2, 0.05], [37.0, 0.3], [CONFIG.duration, 0.3]],
-    z: [[0, 7.7], [MD.road[0] - 0.4, 7.7], [MD.road[0] + 0.9, 7.5], [MD.road[1] - 0.4, 7.5], [MD.harbour + 0.6, 8.6], [34.6, 8.6],
+    z: [[0, 7.7], [MD.road[0] - 0.4, 7.7], [MD.road[0] + 0.9, 7.5], [MD.road[1] - 0.4, 7.5], [MD.harbour + 0.6, 9.3], [34.6, 9.3],
       [35.5, 6.0, 'linear'], [36.2, 3.2, 'linear'], [37.0, 1.08], [CONFIG.duration, 1.08]],
-    height: [[0, 1.64], [MD.road[0] + 0.3, 1.64], [MD.road[0] + 1.0, 1.4], [MD.road[1] - 0.4, 1.4], [MD.harbour + 0.6, 1.55], [34.6, 1.55],
-      [35.5, 1.64], [37.0, 1.74], [CONFIG.duration, 1.74]],
+    height: [[0, 1.64], [MD.road[0] + 0.3, 1.64], [MD.road[0] + 1.0, 1.56], [MD.road[1] - 0.4, 1.56], [MD.harbour + 0.6, 1.55], [34.6, 1.55],
+      [35.5, 1.64], [37.0, 1.82], [CONFIG.duration, 1.82]],
     yaw: [[0, 0], [CONFIG.duration, 0]],
     pitch: [[0, 0], [CONFIG.duration, 0]],
     fov: [[0, 64], [CONFIG.duration, 64]],
@@ -156,32 +156,33 @@ const SCRIPT = {
     title: { in: MD.title[0], out: MD.title[1], fi: 0.2, fo: 0.45, cls: 'big center', html: '<span class="kick">WHAT IF MEN</span><span class="hero">SUDDENLY DISAPPEARED</span><span class="kick">FROM THE WORLD?</span>' },
     captions: [
       { t: 4.15, until: 6.9, text: 'Every adult man. The same second.' },
-      { t: 6.9, until: 9.2, text: 'The driver let go of the controls…' },
-      { t: 9.6, until: 12.0, text: 'Cars have no dead man’s switch.' },
+      { t: 6.9, until: 9.2, text: 'The driver let go. The train braked itself.' },
+      { t: 9.6, until: 12.0, text: 'Most cars have no dead man’s switch.' },
       { t: 12.0, until: 14.4, text: 'With no foot on the pedal, they coast.' },
-      { t: 14.4, until: 16.4, text: 'Unless cruise control was on.' },
-      { t: 17.4, until: 20.2, text: 'Almost every sailor on Earth is a man.' },
-      { t: 20.6, until: 23.6, text: 'Nobody on board. Engine still running.' },
+      { t: 14.4, until: 16.4, text: 'Unless an older car was on cruise control.' },
+      { t: 17.4, until: 20.2, text: 'Nobody is steering that ship.' },
+      { t: 20.6, until: 23.6, text: 'Almost every merchant seafarer is a man.' },
       { t: 24.25, until: 26.4, text: 'The autopilot doesn’t know.' },
       { t: 26.85, until: 28.95, text: 'The alarm rings. Nobody comes.' },
       { t: 29.4, until: 31.6, text: 'But the wards keep running.' },
       { t: 33.0, until: 35.8, text: 'A ship can’t stop like a train.' },
-      { t: 37.0, until: 40.4, text: 'Forty thousand tonnes. Nobody at the helm.' },
-      { t: 42.8, until: 45.8, text: 'It isn’t heading for the gap.' },
+      { t: 37.0, until: 40.4, text: 'Thirty thousand tonnes, heading for a pier.' },
+      { t: 41.7, until: 44.1, text: 'Autopilot on. Nobody at the helm.' },
       { t: 55.0, until: 58.2, text: 'The train stopped itself. The ship couldn’t.' },
     ],
     readouts: [
       { from: 0.0, until: 4.3, top: 236, label: 'WORLD POPULATION', value: mdPop, sub: (t) => (t < MD.vanish ? '' : '2.92 BILLION MEN (18+) · GONE') },
       { from: 4.7, until: 9.4, top: 236, label: 'TRAIN · DRIVER GONE', value: mdTrainKmh, unit: 'km/h', sub: 'DEAD MAN’S SWITCH → EMERGENCY BRAKE' },
-      { from: 13.1, until: 16.3, top: 236, label: 'SILVER SUV · NOBODY INSIDE', value: (t) => String(Math.round(mdCarKmh('cruise', t))), unit: 'km/h', sub: 'CRUISE CONTROL STILL ON' },
-      { from: 17.2, until: 23.7, top: 236, label: 'SEAFARERS WORLDWIDE', value: '98.8 %', sub: 'ARE MEN', ctx: (t) => (t < 20.4 ? '1.89 MILLION SAILORS' : 'THIS SHIP · 6.2 KNOTS · CREW 0') },
+      { from: 13.1, until: 16.3, top: 236, label: 'SILVER SUV · NOBODY INSIDE', value: (t) => String(Math.round(mdCarKmh('cruise', t))), unit: 'km/h', sub: 'OLD CRUISE CONTROL · NO AUTO-BRAKE' },
+      { from: 17.2, until: 23.7, top: 236, label: 'MERCHANT SEAFARERS', value: '98.7 %', sub: 'ARE MEN', ctx: (t) => (t < 20.4 ? '1.89 MILLION SEAFARERS' : 'THIS SHIP · 6.2 KNOTS · CREW 0') },
       { from: 24.1, until: 26.5, top: 236, label: 'AIRLINE PILOTS', value: '≈ 95 %', sub: 'ARE MEN' },
       { from: 26.7, until: 29.0, top: 236, label: 'FIREFIGHTERS (US)', value: '≈ 95 %', sub: 'ARE MEN' },
       { from: 29.25, until: 31.6, top: 236, label: 'NURSES WORLDWIDE', value: '≈ 90 %', sub: 'ARE WOMEN' },
-      { from: 37.2, until: 47.4, top: 236, label: 'PIER IMPACT IN', value: (t) => mdClock(MD.hit - t), sub: (t) => `BOW ${Math.max(0, Math.round(mdShipGap(t)))} m AWAY · 6.2 KNOTS` },
+      { from: 37.2, until: 47.4, top: 236, label: 'SHIP TO PIER', value: (t) => `${Math.max(0, Math.round(mdShipGap(t)))} m`, sub: (t) => `IMPACT IN ${mdClock(MD.hit - t)} · 6.2 KNOTS` },
+      { from: 55.0, until: 58.4, top: 236, label: 'TRAIN STOPPED', value: '4 m', sub: 'SHORT OF THE FALLEN SPAN' },
     ],
-    endLine: { t: MD.line[0], until: MD.line[1], text: 'They were gone in an instant.<br><span class="l2">Everything they were doing kept going.</span>' },
-    notes: [{ t: MD.note[0], until: MD.note[1], text: 'WORKFORCE SHARES: ICS/BIMCO 2021 · ISWAP · US BLS (CPS) · WHO 2020 · UN WPP 2024.<br>EVENTS COMPRESSED FOR THIS SIMULATION. NOT A PREDICTION.' }],
+    endLine: { t: MD.line[0], until: MD.line[1], text: 'They were gone in an instant.<br><span class="l2">Some machines were built to notice. Most weren’t.</span>' },
+    notes: [{ t: MD.note[0], until: MD.note[1], text: 'WORKFORCE SHARES: ICS/BIMCO 2021 · ISWAP · US BLS (CPS) · WHO 2020 · UN WPP 2024.<br>FIGURES ARE ESTIMATES. EVENTS COMPRESSED FOR THIS SIMULATION. NOT A PREDICTION.' }],
   },
 };
 

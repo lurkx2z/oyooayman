@@ -302,7 +302,6 @@ class MdTrain {
       x.strokeStyle = '#d65a3a'; x.beginPath(); x.moveTo(64, 70); x.lineTo(40, 42); x.stroke();
       x.fillStyle = '#7fb0c8'; x.font = '600 18px "JetBrains Mono"'; x.fillText('0 km/h', 34, 112);
       x.strokeStyle = '#4f7f96'; x.lineWidth = 3; x.beginPath(); x.moveTo(130, 64); x.lineTo(246, 64); x.stroke();
-      x.fillStyle = '#d65a3a'; x.fillRect(150, 54, 30, 20); x.fillStyle = '#7fb0c8'; x.fillText('EB', 200, 40);
       const scm = new THREE.MeshBasicMaterial({ map: Tex.tex(c, { repeat: false }), color: new THREE.Color(0.75, 0.75, 0.75), name: 'cab screen' });
       for (const [x2, w] of [[-0.55, 0.36], [0.05, 0.42]]) add(new THREE.PlaneGeometry(w, 0.2), scm, x2, 1.13, 0.5, -1.1, 0, 0);
     }

@@ -44,14 +44,14 @@ function mdShipPt(t, x, y, z, out) { const w = mdShipWorld(t, x, y, z); return o
 // { w: world } | function (t, out) → world.
 const MD_LOOK = [
   // the car, the nose ahead (people on both benches, the harbour in the right-hand windows)
-  [0.0, 2.2, { l: [0.45, 1.1, 0.0] }, 64, 0.01, 0.4],
+  [0.0, 2.2, { l: [0.45, 0.8, 0.0] }, 64, 0.01, 0.4],
   // the coffee cup falls out of nobody's hand
   [1.95, 4.7, { l: [0.62, 0.42, 3.9] }, 60, 0.4, 0.45],
   // the brake: the cab door's window (the driver's seat is empty, the handle has sprung up)
-  [4.5, 9.5, { l: [0.05, 1.25, 1.0] }, 50, 0.35, 0.6],
+  [4.5, 9.5, { l: [0.05, 1.25, 1.0] }, (t) => MathX.lerp(50, 34, MathX.smooth(t, 5.4, 7.2)), 0.35, 0.6],
   // the road below the left-hand windows, looking back over the viaduct's edge: the cars coast; the SUV doesn't
   // (kept a little behind you along the road: straight down, the viaduct's own deck and parapet hide it)
-  [9.3, 16.7, (t, o, c) => { const k = MD_CARS[0], m = mdCarMotion(k, Math.min(t, MD.cruise + 0.3)); return o.set(MD_G.roadX + 3.5, MD_G.quay + 0.6, Math.max(k[4] + m.d - 4, c.z + 14)); }, 40, 0.9, 0.7],
+  [9.3, 16.7, (t, o, c) => { const k = MD_CARS[0], m = mdCarMotion(k, Math.min(t, MD.cruise + 0.3)); return o.set(MD_G.roadX + 3.5, MD_G.quay + 0.6, Math.max(k[4] + m.d - 4, c.z + 14)); }, (t) => MathX.lerp(40, 31, MathX.smooth(t, 12.3, 13.6)), 0.9, 0.7],
   // the harbour: the ship crossing toward the viaduct
   [16.3, 20.8, (t, o) => mdShipPt(t, 50, 12, 0, o), 50, 0.9, 0.4],
   // telephoto: its wheelhouse, lit, empty
@@ -60,22 +60,26 @@ const MD_LOOK = [
   [31.69, 33.9, (t, o) => mdShipPt(t, 34, 12, 0, o), 58, 0.01, 0.5],
   // a glance back: the women take the children to the back of the car
   [33.5, 34.9, { l: [0.2, 1.3, 15.5] }, 64, 0.45, 0.5],
-  // the cab: the track ahead, the pier and the bow coming for it
-  [36.6, 49.2, (t, o) => { const b = mdShipBow(t), k = MathX.smooth(t, MD.turn, MD.hit); return o.set(MathX.lerp((b[0] + 22) * 0.5 - 4, 1.0, k), 16.0, -62); }, 66, 0.9, 0.5],
+  // the cab: you turn to the bow coming in on the right
+  [36.6, 41.45, (t, o) => { const b = mdShipBow(t); return o.set((b[0] - 4.4) / 2 + 3, 16, -62); }, 52, 0.9, 0.01],
+  // (after the view from above) bracing: the track ahead, the pier under it
+  [44.14, 46.45, { w: [-4.4, 21.5, -50] }, 62, 0.01, 0.01],
   // …the deck four metres ahead of you drops away
-  [48.7, 54.4, { w: [-4.4, 19.0, -11] }, 66, 0.5, 0.01],
-  // after: the rails end in the air; the span lies across the bow
-  [54.39, 67.0, (t, o) => o.set(-4.0, MathX.lerp(17.0, 13.5, MathX.smooth(t, 55, 58)), MathX.lerp(-15, -42, MathX.smooth(t, MD.line[0] - 1, MD.line[1]))), 64, 0.01, 0.01],
+  [48.59, 51.55, { w: [-4.4, 19.0, -11] }, 62, 0.01, 0.01],
+  // after: the rails end in the air, four metres ahead
+  [54.39, 58.45, (t, o) => o.set(-4.4, 20.5, MathX.lerp(-6, -14, MathX.smooth(t, 55, 58))), 58, 0.01, 0.01],
 ];
 
 // the two outside angles after the impact
 const MD_DRONE = [
-  // low on the water off the pier: the bow slides in and hits it
-  { t0: 46.4, t1: 48.3, pos: [26, 3.2, -28], at: [2, 10, -62], drift: [-0.5, 0.1, -0.6], fov: 56 },
-  // off the right side: the span lies across the bow, its near end in the water
-  { t0: 51.5, t1: 53.0, pos: [58, 15, 34], at: [-6, 9, -42], drift: [-1.4, 0.2, -0.8], fov: 50 },
+  // from high over the harbour: the ship's line runs into a pier, not through the wide navigation gap
+  { t0: 41.4, t1: 44.15, ship: true, pos: [152.6, 30.25, 0.7], at: [0, 15, -3], drift: [-0.35, 0, 0], fov: 58 },
+  // off the pier at cap height: the bow (stacks behind it) slides in and hits; the column breaks
+  { t0: 46.4, t1: 48.6, pos: [38, 13, -22], at: [2, 12.5, -62], drift: [-0.7, 0, -0.5], fov: 60 },
   // high behind the train: it stopped four metres short of the gap
-  { t0: 53.0, t1: 54.4, pos: [-13, 33, 44], at: [-4.4, 19, -12], drift: [0.4, -0.4, -1.2], fov: 54 },
+  { t0: 51.5, t1: 54.4, pos: [-13, 33, 44], at: [-4.4, 19, -12], drift: [0.4, -0.4, -1.4], fov: 54 },
+  // the close: rising slowly behind the train's nose, over the gap, to the ship with its lit, empty wheelhouse
+  { t0: 58.4, t1: 67.0, pos: [-34, 38, 34], at: [18, 9, -70], drift: [0.9, 1.0, -1.8], fov: 50 },
 ];
 // labels pinned to things in the world: [t0, t1, point(t, out), text(t)]
 const MD_TAGS = [
@@ -133,6 +137,8 @@ const FILM = {
     if (D || shot) { app.hands.right.g.visible = false; app.hands.left.g.visible = false; }
     // the world
     app.env.update(t);
+    if (FILM._fogD === undefined) FILM._fogD = app.scene.fog.density;
+    app.scene.fog.density = FILM._fogD * (1 - 0.65 * MathX.smooth(t, 20.4, 21.2) * (1 - MathX.smooth(t, 23.6, 24.0)));
     app.ship.update(t);
     app.bridge.update(t);
     app.cast.update(t);
@@ -174,8 +180,11 @@ const FILM = {
   _drone(t) {
     const D = MD_DRONE.find((d) => t >= d.t0 && t < d.t1);
     if (!D) return null;
-    const u = t - D.t0, x = D.pos[0] + D.drift[0] * u, y = D.pos[1] + D.drift[1] * u, z = D.pos[2] + D.drift[2] * u;
-    const dx = D.at[0] - x, dy = D.at[1] - y, dz = D.at[2] - z;
+    const u = t - D.t0;
+    let x = D.pos[0] + D.drift[0] * u, y = D.pos[1] + D.drift[1] * u, z = D.pos[2] + D.drift[2] * u, ax = D.at[0], ay = D.at[1], az = D.at[2];
+    // a camera riding in the ship (ship-local metres)
+    if (D.ship) { const p = mdShipWorld(t, x, y, z), a = mdShipWorld(t, ax, ay, az); [x, y, z] = p; [ax, ay, az] = a; }
+    const dx = ax - x, dy = ay - y, dz = az - z;
     // the big hits shake even the outside camera a little
     const sh = 0.004 * (MathX.impulse(t, MD_FALL.tLand, 0.6) + (MD_FALL_B.tWater ? MathX.impulse(t, MD_FALL_B.tWater, 0.8) : 0));
     return { x, y, z, yaw: Math.atan2(-dx, -dz) + sh * Math.sin(t * 41), pitch: Math.atan2(dy, Math.hypot(dx, dz)) + sh * Math.sin(t * 53), fov: D.fov };
@@ -260,7 +269,7 @@ const FILM = {
         const h1 = hash1(i * 4.3 + 7), h2 = hash1(i * 6.1 + 8), h3 = hash1(i * 8.7 + 9);
         const z = -2.5 - 24 * h1 * h1, side = h2 < 0.5 ? -1 : 1, vy = 6 + 14 * h3 * (1 - h1 * 0.6), vx = side * (2 + 6 * h2);
         const tt = Math.min(ds, 2.6), y = Math.max(0.4, vy * tt - 4.9 * tt * tt), x = -2.1 + side * 3 + vx * tt;
-        const al = 0.55 * Math.min(1, ds / 0.1) * Math.exp(-ds / 1.5);
+        const al = 0.4 * Math.min(1, ds / 0.1) * Math.exp(-ds / 0.9);
         P.push(x, y + h3 * 2, z, 1.8 + ds * 1.5 + 1.5 * h3, h1 * 6, al, 0.98, 0.95, 0.97, 0.98);
       }
     }
@@ -273,7 +282,7 @@ const FILM = {
     T[2](t, v); v.project(app.camera);
     const vis = v.z < 1 && Math.abs(v.x) < 0.95 && v.y < 0.92 && v.y > -0.9;
     const txt = T[3](t); if (tg._t !== txt) { tg.textContent = txt; tg._t = txt; }
-    tg.style.left = `${MathX.clamp((v.x + 1) / 2 * 100, 22, 78).toFixed(2)}%`; tg.style.top = `${((1 - v.y) / 2 * 100).toFixed(2)}%`;
+    tg.style.left = `${MathX.clamp((v.x + 1) / 2 * 100, 34, 66).toFixed(2)}%`; tg.style.top = `${((1 - v.y) / 2 * 100).toFixed(2)}%`;
     const o = vis ? StoryHUD.win(t, T[0], T[1], 0.2, 0.2) : 0; tg.style.opacity = o.toFixed(3); tg._o = o;
   },
 
