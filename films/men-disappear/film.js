@@ -82,6 +82,8 @@ const MD_DRONE = [
 ];
 // labels pinned to things in the world: [t0, t1, point(t, out), text(t)]
 const MD_TAGS = [
+  // her phone: she is calling her father
+  [MD.vanish + 2.2, MD.vanish + 4.6, (t, o) => FILM._app.cast.byId.W1.j.head.getWorldPosition(o).add(FILM._tv2.set(0, 0.32, 0)), (t) => (t < MD.vanish + 3.4 ? 'CALLING DAD…' : 'DAD · NO ANSWER')],
   [11.4, 15.3, (t, o) => { const k = MD_CARS[0], m = mdCarMotion(k, t), dk = MathX.smooth(t, MD.vanish + 3, MD.cruise); return o.set(k[3] + k[7] * dk, MD_G.quay + 2.4, k[4] + m.d); },
     (t) => (t < MD.cruise ? `NO DRIVER · CRUISE CONTROL · ${Math.round(mdCarKmh('cruise', t))} km/h` : 'NO DRIVER · CRUISE CONTROL')],
   [16.2, MD.planeHit - 0.3, (t, o) => FILM._app.cascade.plane.position(t, o).add(FILM._tv2.set(0, 6, 0)), () => 'FLIGHT 288 · NOBODY AT THE CONTROLS'],
@@ -98,7 +100,9 @@ const MD_CARDS = [
   [MD.gridRoom[0], MD.gridRoom[1], 'MEANWHILE', 'GRID CONTROL', 'DISPATCH DESKS · UNSTAFFED'],
   [MD.water[0], MD.water[0] + 1.7, 'LATER', '+2 DAYS', 'NO POWER, ANYWHERE'],
   [MD.earth[0], MD.earth[1], 'SEEN FROM SPACE', 'THE NIGHT SIDE', 'CITY LIGHTS, GOING OUT'],
-  [MD.births[0], MD.births[1], 'BIRTHS PER DAY, WORLDWIDE', '≈ 360,000', 'IN ~9 MONTHS: ALMOST NONE'],
+  [MD.nursery[0], MD.nursery[0] + 1.8, '+9 MONTHS', 'A MATERNITY WARD', 'NOT ONE BABY'],
+  [MD.school[0], MD.school[0] + 1.8, '+20 YEARS', 'A SCHOOL', 'BUILT FOR SIX HUNDRED'],
+  [MD.future[0], MD.future[0] + 1.8, 'SEEN FROM SPACE', 'DECADES LATER', 'THE LIGHTS NEVER CAME BACK'],
   [MD.food[0], MD.food[1], '+2 WEEKS', 'A SUPERMARKET', 'NO DELIVERY FOR 13 DAYS'],
 ];
 
@@ -402,6 +406,8 @@ const FILM = {
     // the end line: darker so the white line reads on a phone; black at the very end
     const end = MathX.smooth(t, T.line[0] - 0.5, T.line[0] + 1.5);
     p.exposure -= 0.1 * end; p.vignette += 0.2 * end;
+    // the epilogue's daylight interiors: take back the night lift the dark city gets
+    if (t >= T.nursery[0] && t < T.school[1]) { p.exposure -= 0.42; p.bloom = 0.2; p.bloomThreshold = 1.4; }
     p.fade = MathX.smooth(t, T.fin - 0.8, T.fin);
   },
 

@@ -3,15 +3,15 @@
    ★ The one file to edit for timing: the beats, the words, the readouts, your head (camera), your hands.
    Everything is a pure function of STORY time (CONFIG.edit cuts the final film from it). Plan: films/men-disappear/PLAN.md
 
-   THE RULE: at one instant every adult man (18+) on Earth vanishes, with whatever he is wearing. Anything he was
-   holding falls. Boys stay. Nothing else changes: machines keep doing whatever they were last told to do.
+   THE RULE: at one instant every man and boy on Earth vanishes, with whatever he is wearing. Anything he was
+   holding falls. Nothing else changes: machines keep doing whatever they were last told to do.
 
    THE PLACE: the front car of a commuter train on a harbour viaduct, late afternoon. Train-local metres: x across the
    car (+x = right-hand windows, the harbour), y up from the car floor, z along the car (0 = the nose, +z = toward
    the back; the train runs toward world −z). World: water at y 0, rail head at MD_G.rail, track centred on x 0.
    ===================================================================== */
 
-CONFIG.duration = 78.0;          // story length (the film is cut from it with CONFIG.edit)
+CONFIG.duration = 90.0;          // story length (the film is cut from it with CONFIG.edit)
 CONFIG.seed = 20261009;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.64, walkSpeed: 1.0, bobStrength: 0.012, bobFrequency: 1.8,
@@ -25,7 +25,7 @@ CONFIG.render.shadowMapSize = 2048;
 // ---------------------------------------------------------------------------------------------------------------------
 const MD = {
   title: [-0.6, 3.9],
-  vanish: 1.8,            // every adult man is gone (one frame)
+  vanish: 1.8,            // every man and boy is gone (one frame)
   brake: 4.6,             // the dead man's switch: the handle has been released for 2.8 s → emergency brake
   road: [9.2, 15.6],      // you lean to the left window: the cars below have no drivers
   cruise: 14.6,           // the SUV on cruise control reaches the parked van
@@ -48,14 +48,16 @@ const MD = {
   food: [59.6, 63.4],     // +2 WEEKS: insert: the supermarket, stripped
   nuke: [63.4, 67.6],     // +2 WEEKS: the power station across the harbour
   nukeBang: 65.5,         // the reactor building's roof blows (hydrogen, as at Fukushima)
-  end: [67.6, 78.0],      // the close: the dark harbour city
+  end: [67.6, 90.0],      // the close: the dark harbour city (the epilogue's inserts cut in over it)
   line: [68.0, 71.6],
-  births: [71.8, 74.4],
-  note: [74.4, 77.6],
-  fin: 78.0,
+  nursery: [72.0, 76.6],  // +9 MONTHS: insert: a maternity ward, every bassinet empty
+  school: [76.6, 80.8],   // +20 YEARS: insert: a classroom for thirty, two pupils
+  future: [80.8, 86.6],   // +20 → +80 YEARS: the planet, nearly dark; the projected population falling
+  note: [86.8, 89.6],
+  fin: 90.0,
   retreat: 40.0,          // the passengers move to the back of the car (off camera: after the wheelhouse cut)
 };
-MD.montage = [MD.fireSt, MD.gov, MD.gridRoom, MD.earth, MD.queue, MD.food];
+MD.montage = [MD.fireSt, MD.gov, MD.gridRoom, MD.earth, MD.queue, MD.food, MD.nursery, MD.school, MD.future];
 // the world clock: minutes since the vanish (real time, then the jumps)
 const MD_JUMPS = [[MD.fires[0], 20, '+20 MINUTES'], [MD.gov[0], 60, '+1 HOUR'], [MD.grid[0], 6 * 60, '+6 HOURS'], [MD.water[0], 2 * 24 * 60, '+2 DAYS'], [MD.food[0], 14 * 24 * 60, '+2 WEEKS']];
 function mdWorldMin(t) {
@@ -120,16 +122,26 @@ function mdSurge(t) {
 function mdPop(t) {
   // UN WPP 2024 medium projection for late 2026 ≈ 8.30 billion; ~2.4 people a second net growth
   const base = 8301468210 + Math.floor(Math.max(0, t) * 2.4);
-  const gone = 2921600480;                             // men aged 18+ ≈ 35.2 % of everyone
+  const gone = 4175638730;                             // every male, all ages ≈ 50.3 % of everyone (UN WPP 2024)
   const n = t < MD.vanish ? base : base - gone;
   return n.toLocaleString('en-US');
+}
+// the epilogue's projection: the women and girls left, no births (the frozen stock is a rounding error at this scale),
+// a standard ageing curve, no deaths from the collapse counted. Years 20 / 40 / 60 / 80 → billions (PLAN.md § 0).
+const MD_PROJ = [[20, 3.15], [40, 2.06], [60, 0.96], [80, 0.17]];
+function mdFutureYear(t) { return Math.round(MathX.lerp(20, 80, Ease.inOutSine(MathX.clamp((t - MD.future[0] - 0.3) / (MD.future[1] - MD.future[0] - 0.8), 0, 1)))); }
+function mdFuturePop(t) {
+  const u = MathX.lerp(20, 80, Ease.inOutSine(MathX.clamp((t - MD.future[0] - 0.3) / (MD.future[1] - MD.future[0] - 0.8), 0, 1)));
+  let i = 0; while (i < MD_PROJ.length - 2 && u > MD_PROJ[i + 1][0]) i++;
+  const [y0, p0] = MD_PROJ[i], [y1, p1] = MD_PROJ[i + 1], v = MathX.lerp(p0, p1, MathX.clamp((u - y0) / (y1 - y0), 0, 1));
+  return Math.round(v * 1e9).toLocaleString('en-US');
 }
 function mdTrainKmh(t) { return Math.round(MD_TRAIN.v(t) * 3.6); }
 
 // the shares on screen (sources: films/men-disappear/PLAN.md § 1). Rounded; see the plan for the exact figures.
 const MD_STAT = {
   pilots: '≈ 94 %', fire: '94 %', power: '93 %', lines: '97 %', water: '94 %', trucks: '92 %', diesel: '7 DAYS', births: '≈ 360,000', leaders: '≈ 85 %',
-  note: 'SHARES: ISWAP · ICS/BIMCO 2021 · US BLS & CENSUS ACS 2024 · UN WOMEN & IPU 2026 · NRC · UN WPP 2024.<br>FIGURES ARE ESTIMATES. EVENTS COMPRESSED FOR THIS SIMULATION. NOT A PREDICTION.',
+  note: 'SHARES: ISWAP · ICS/BIMCO 2021 · US BLS & CENSUS ACS 2024 · UN WOMEN & IPU 2026 · NRC · UN WPP 2024.<br>POPULATION AFTER YEAR 0 IS A PROJECTION: NO BIRTHS, AGEING ONLY.<br>FIGURES ARE ESTIMATES. EVENTS COMPRESSED FOR THIS SIMULATION. NOT A PREDICTION.',
 };
 
 const SCRIPT = {
@@ -178,7 +190,7 @@ const SCRIPT = {
   hud: {
     title: { in: MD.title[0], out: MD.title[1], fi: 0.2, fo: 0.45, cls: 'big center', html: '<span class="kick">WHAT IF MEN</span><span class="hero">SUDDENLY DISAPPEARED</span><span class="kick">FROM THE WORLD?</span>' },
     captions: [
-      { t: 4.15, until: 6.6, text: 'Every adult man. The same second.' },
+      { t: 4.15, until: 6.6, text: 'Every man and boy. The same second.' },
       { t: 6.6, until: 9.2, text: 'The driver let go. The train braked itself.' },
       { t: 9.6, until: 12.1, text: 'Cars have no dead man’s switch.' },
       { t: 12.1, until: 15.5, text: 'Millions of cars. Nobody at the wheel.' },
@@ -204,10 +216,15 @@ const SCRIPT = {
       { t: 61.7, until: 63.3, text: 'The shelves are stripped in days.' },
       { t: 63.6, until: 65.4, text: 'Reactors shut down, but still need cooling.' },
       { t: 65.6, until: 67.5, text: 'Days later, the diesel ran out.' },
-      { t: 72.2, until: 74.3, text: 'Sperm banks could cover only a tiny fraction.' },
+      { t: 72.3, until: 74.3, text: 'Births almost stop.' },
+      { t: 74.4, until: 76.5, text: 'Sperm banks and frozen embryos: a tiny fraction.' },
+      { t: 76.9, until: 78.7, text: 'A classroom built for thirty.' },
+      { t: 78.8, until: 80.7, text: 'Nobody can make sperm from women’s cells. Yet.' },
+      { t: 81.1, until: 83.6, text: 'Every year, far more funerals than births.' },
+      { t: 83.7, until: 86.5, text: 'Humanity would hang on a few frozen samples.' },
     ],
     readouts: [
-      { from: 0.0, until: 4.3, top: 236, label: 'WORLD POPULATION', value: mdPop, sub: (t) => (t < MD.vanish ? '' : '≈ 2.9 BILLION MEN (18+) · GONE') },
+      { from: 0.0, until: 4.3, top: 236, label: 'WORLD POPULATION', value: mdPop, sub: (t) => (t < MD.vanish ? '' : '≈ 4.2 BILLION MEN AND BOYS · GONE') },
       { from: 4.7, until: 9.2, top: 236, label: 'TRAIN · DRIVER GONE', value: mdTrainKmh, unit: 'km/h', sub: 'DEAD MAN’S SWITCH → EMERGENCY BRAKE' },
       { from: 13.1, until: 15.5, top: 236, label: 'SILVER SUV · NOBODY INSIDE', value: (t) => String(Math.round(mdCarKmh('cruise', t))), unit: 'km/h', sub: 'CRUISE CONTROL · NO AUTO-BRAKE' },
       { from: 16.0, until: 21.2, top: 236, label: 'AIRLINE PILOTS (WORLD)', value: MD_STAT.pilots, sub: 'ARE MEN' },
@@ -217,9 +234,12 @@ const SCRIPT = {
       { from: 45.6, until: 52.9, top: 236, label: 'POWER PLANT OPERATORS (US)', value: MD_STAT.power, sub: 'ARE MEN', ctx: (t) => (t < MD.blackout ? 'LINE WORKERS ' + MD_STAT.lines + ' MEN' : 'POWER · OFF') },
       { from: 53.4, until: 55.5, top: 236, label: 'WATER PLANT OPERATORS (US)', value: MD_STAT.water, sub: 'ARE MEN' },
       { from: 59.8, until: 63.3, top: 236, label: 'TRUCK DRIVERS (US)', value: MD_STAT.trucks, sub: 'ARE MEN' },
+      { from: 72.3, until: 76.5, top: 236, label: 'BIRTHS PER DAY, WORLDWIDE', value: (t) => (t < 74.3 ? MD_STAT.births : 'ALMOST NONE'), sub: (t) => (t < 74.3 ? 'BEFORE THE VANISH' : 'NINE MONTHS LATER') },
+      { from: 76.9, until: 80.7, top: 236, label: 'WORLD POPULATION · PROJECTED', value: '≈ 3.2 BILLION', sub: 'ALMOST NOBODY UNDER 20' },
+      { from: 81.0, until: 86.5, top: 236, label: 'WORLD POPULATION · PROJECTED', value: mdFuturePop, sub: (t) => `YEAR ${mdFutureYear(t)} · ALMOST EVERYONE IS OVER ${mdFutureYear(t)}` },
       { from: 63.6, until: 67.5, top: 236, label: 'BACKUP DIESEL', value: MD_STAT.diesel, sub: 'OF FUEL ON SITE (US RULE)', ctx: (t) => (t < MD.nukeBang ? 'REACTOR COOLING · ON DIESEL' : 'COOLING · LOST') },
     ],
-    endLine: { t: MD.line[0], until: MD.line[1], text: 'A third of humanity vanished in a second.<br><span class="l2">The systems they ran failed, one by one.</span>' },
+    endLine: { t: MD.line[0], until: MD.line[1], text: 'Half of humanity vanished in a second.<br><span class="l2">The systems they ran failed, one by one.</span>' },
     notes: [{ t: MD.note[0], until: MD.note[1], text: MD_STAT.note }],
   },
 };

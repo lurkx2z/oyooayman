@@ -15,6 +15,7 @@ Object.assign(LOOKS, {
   mdW7: { skin: 5, build: 'slim', shirt: '#8a4a3a', sleeves: 'long', pants: '#1f2228', shoes: '#d0cac0', sole: '#eeeae2', hair: '#1a120c', hairStyle: 'long', jacket: true },
   mdW8: { skin: 2, build: 'avg', shirt: '#4a5260', sleeves: 'long', pants: '#2b2b2f', shoes: '#151515', sole: '#2a2a2a', hair: '#3a2416', hairStyle: 'bun', coat: true, scarf: '#5a6a7a' },
   mdW9: { skin: 1, build: 'slim', shirt: '#5a6650', sleeves: 'long', pants: '#3a3630', shoes: '#2a221a', sole: '#16120e', hair: '#8a6440', hairStyle: 'pony', jacket: true, collar: true },
+  mdGirl: { skin: 1, build: 'slim', shirt: '#8a4a6a', sleeves: 'long', pants: '#2a3038', shoes: '#c8c2b6', sole: '#e6e2da', hair: '#3a2818', hairStyle: 'pony', jacket: true, backpack: '#a8452c' },
   mdBoy: { skin: 1, build: 'slim', shirt: '#3a5a7a', sleeves: 'long', pants: '#2a3038', shoes: '#c8c2b6', sole: '#e6e2da', hair: '#3a2818', jacket: true, hood: true, backpack: '#a8452c' },
   mdM1: { skin: 0, build: 'avg', shirt: '#2f3a46', sleeves: 'long', pants: '#2a2c30', shoes: '#2a1f18', sole: '#1a1612', hair: '#3a2a1e', jacket: true, collar: true },
   mdM2: { skin: 3, build: 'broad', shirt: '#5a5246', sleeves: 'long', pants: '#3a3a34', shoes: '#1a1612', sole: '#2a2622', hair: '#111', hat: { type: 'cap', color: '#2c3138' } },
@@ -62,7 +63,7 @@ const MD_V = MD.vanish;
 // [id, look, man?, side (+1 right bench / −1 left / 0 standing), seat index [bench, k] or standing [x, z, θ], states, extra]
 const MD_PEOPLE = [
   // front section (z 2.6–5.3): in view when you look forward
-  ['W1', 'mdW1', 0, 1, [0, 1], [[0, 'mdPhone'], [MD_V + 0.25, 'mdAlarm'], [MD.brake + 2.0, 'mdSitLook'], [MD.harbour + 1.4, 'mdLookOut'], [MD.retreat + 0.6, 'idle']]],
+  ['W1', 'mdW1', 0, 1, [0, 1], [[0, 'mdPhone'], [MD_V + 0.25, 'mdAlarm'], [MD_V + 1.3, 'mdPhone'], [MD.road[0] - 0.2, 'mdSitLook'], [MD.harbour + 1.4, 'mdLookOut'], [MD.retreat + 0.6, 'idle']]],
   ['M1', 'mdM1', 1, 1, [0, 3], [[0, 'mdCup']]],
   ['M2', 'mdM2', 1, 1, [0, 4], [[0, 'mdDoze']]],
   ['M3', 'mdM3', 1, -1, [0, 1], [[0, 'mdPhone']]],
@@ -77,7 +78,7 @@ const MD_PEOPLE = [
   ['M9', 'mdM9', 1, -1, [1, 6], [[0, 'mdSitLook']]],
   ['W7', 'mdW7', 0, -1, [1, 9], [[0, 'mdPhone'], [MD_V + 0.3, 'mdAlarm']]],
   ['M7', 'mdM7', 1, 1, [1, 0], [[0, 'mdRead']]],
-  ['B1', 'mdBoy', 0, 1, [1, 3], [[0, 'mdSitLook'], [MD_V + 0.4, 'mdAlarm'], [MD.brake + 1.6, 'mdLookOut']], { child: true }],
+  ['B1', 'mdGirl', 0, 1, [1, 3], [[0, 'mdSitLook'], [MD_V + 0.4, 'mdAlarm'], [MD.brake + 1.6, 'mdLookOut']], { child: true }],
   ['W4', 'mdW4', 0, 1, [1, 4], [[0, 'mdPhone'], [MD_V + 0.3, 'mdAlarm'], [MD.brake + 1.4, 'mdHug']]],
   ['M8', 'mdM8', 1, 1, [1, 7], [[0, 'mdDoze']]],
   ['W5', 'mdW5', 0, 1, [1, 10], [[0, 'mdSitLook'], [MD_V + 0.45, 'mdAlarm']]],

@@ -387,7 +387,7 @@ class MdMarket {
       mdPerson(S, 'mkC', 'mdW5', 0.2, -11.0, 0, [[0, 'walk']], [[0, 0.2, -11.0], [4, 0.1, -7.4]]),
       mdPerson(S, 'mkD', 'mdW4', -0.6, -14.5, 180, [[0, 'mdNoSignal']]),
     ];
-    const kid = mdPerson(S, 'mkKid', 'mdBoy', 1.05, -7.0, 210, [[0, 'look']]); kid.root.scale.setScalar(0.7); this.people.push(kid);
+    const kid = mdPerson(S, 'mkKid', 'mdGirl', 1.05, -7.0, 210, [[0, 'look']]); kid.root.scale.setScalar(0.7); this.people.push(kid);
     const tr2 = new THREE.Group(); tr2.position.set(0.2, 0, -10.3); S.add(tr2); this.tr2 = tr2;
     for (const [w, h, d, x, y, z] of [[0.55, 0.02, 0.9, 0, 0.3, 0], [0.55, 0.5, 0.02, 0, 0.6, -0.45], [0.55, 0.5, 0.02, 0, 0.6, 0.45], [0.02, 0.5, 0.9, -0.27, 0.6, 0], [0.02, 0.5, 0.9, 0.27, 0.6, 0]]) mdBox(tr2, w, h, d, x, y, z, m.wire);
   }
@@ -506,7 +506,7 @@ class MdQueue {
       if (i !== 3 && i !== 5) mdHeld(p, mdBucketMesh(['#c8c4b8', '#3a6aa8', '#c84a3a', '#e0d8c0'][i % 4]));
       this.people.push(p);
     }
-    const kid = mdPerson(S, 'qKid', 'mdBoy', 0.75, 7.25, 190, [[0, 'look']]); kid.root.scale.setScalar(0.72); this.people.push(kid);
+    const kid = mdPerson(S, 'qKid', 'mdGirl', 0.75, 7.25, 190, [[0, 'look']]); kid.root.scale.setScalar(0.72); this.people.push(kid);
     S.add(new THREE.HemisphereLight('#c8ccd0', '#4a4844', 1.3));
     const sun = new THREE.DirectionalLight('#e8e4dc', 1.4); sun.position.set(8, 14, 6); S.add(sun);
   }
@@ -531,7 +531,20 @@ class MdEarth extends EarthScene {
     this._side = new THREE.Vector3(); this._up = new THREE.Vector3(0, 1, 0);
   }
   update(t) {
+    if (t >= MD.future[0]) {   // decades on: a few scattered lights, the planet turning slowly
+      const v = t - MD.future[0];
+      this.earth.rotation.y = 0.4 + v * 0.02; this.clouds.rotation.y = 0.5 + v * 0.026;
+      this.uniforms.uLights.value = 0.12 - 0.08 * MathX.clamp(v / (MD.future[1] - MD.future[0]), 0, 1);
+      const d = 3.6 - 0.35 * Ease.inOutSine(MathX.clamp(v / (MD.future[1] - MD.future[0]), 0, 1));
+      this._side.copy(this._up).cross(this.viewDir).normalize();
+      // the sun low behind the limb: a thin day crescent so the dark side reads as a planet
+      this.uniforms.uSun.value.copy(this._side).multiplyScalar(0.9).addScaledVector(this.viewDir, -0.34).addScaledVector(this._up, 0.15).normalize();
+      this.camera.position.copy(this.viewDir).multiplyScalar(d).addScaledVector(this._side, -0.1 + 0.05 * v);
+      this.camera.lookAt(0, 0.1, 0); this.camera.updateMatrixWorld(true);
+      return;
+    }
     const u = t - MD.earth[0];
+    this.uniforms.uSun.value.copy(this.sunDir);
     this.earth.rotation.y = u * 0.01; this.clouds.rotation.y = u * 0.012;
     // all lit, then three hard steps down to a few scattered points (hospitals, plants on their own generators)
     const steps = [[0.5, 0.6], [0.95, 0.28], [1.4, 0.05]];
@@ -545,8 +558,96 @@ class MdEarth extends EarthScene {
   }
 }
 
+// +9 MONTHS: a maternity ward. Rows of bassinets, made up and empty; a midwife among them, another at the desk.
+class MdNursery {
+  constructor() {
+    const S = this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(54, 9 / 16, 0.05, 200);
+    S.background = new THREE.Color('#d8dcd8');
+    S.fog = new THREE.FogExp2(new THREE.Color('#b8bcb8'), 0.008);
+    const m = { floor: mdStd('#a8b4b0', { roughness: 0.35 }), wall: mdStd('#e4e2da', { roughness: 0.85 }), wall2: mdStd('#c8d8e4', { roughness: 0.85 }),
+      steel: mdStd('#c8ccd0', { roughness: 0.3, metalness: 0.7 }), sheet: mdStd('#f2f2ee', { roughness: 0.95 }), pink: mdStd('#e8c4c8', { roughness: 0.95 }), blue: mdStd('#bcd0e4', { roughness: 0.95 }),
+      clear: new THREE.MeshStandardMaterial({ color: '#e8f2f6', roughness: 0.1, transparent: true, opacity: 0.35, depthWrite: false }), card: mdStd('#ffffff', { roughness: 0.9 }), desk: mdStd('#8a7a64', { roughness: 0.7 }) };
+    mdBox(S, 10, 0.1, 16, 0, -0.05, 0, m.floor); mdBox(S, 10, 0.1, 16, 0, 3.0, 0, m.wall);
+    mdBox(S, 0.2, 3, 16, -5, 1.5, 0, m.wall2); mdBox(S, 10, 3, 0.2, 0, 1.5, -8, m.wall2); mdBox(S, 10, 3, 0.2, 0, 1.5, 8, m.wall);
+    mdBox(S, 0.2, 0.9, 16, 5, 0.45, 0, m.wall); mdBox(S, 0.2, 0.5, 16, 5, 2.75, 0, m.wall);
+    for (let z = -8; z <= 8; z += 2.6) mdBox(S, 0.22, 1.6, 0.12, 5, 1.7, z, m.wall);
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(16, 1.6), new THREE.MeshBasicMaterial({ color: new THREE.Color('#eef2f4').multiplyScalar(1.2) })); win.position.set(5.12, 1.7, 0); win.rotation.y = -Math.PI / 2; S.add(win);
+    // the bassinets: a clear cot on a steel trolley, a folded blanket, a blank name card. Every one empty.
+    for (let row = 0; row < 3; row++) for (let k = 0; k < 6; k++) {
+      const x = -3.0 + row * 2.2, z = -6.2 + k * 1.9, B = new THREE.Group(); B.position.set(x, 0, z); B.rotation.y = 0.02 * Math.sin(row * 3 + k); S.add(B);
+      for (const e of [-1, 1]) for (const f of [-1, 1]) mdCyl(B, 0.015, 0.015, 0.62, e * 0.26, 0.31, f * 0.38, m.steel);
+      mdBox(B, 0.6, 0.03, 0.85, 0, 0.12, 0, m.steel); mdBox(B, 0.58, 0.03, 0.82, 0, 0.62, 0, m.steel);
+      mdBox(B, 0.5, 0.3, 0.74, 0, 0.8, 0, m.clear); mdBox(B, 0.46, 0.05, 0.7, 0, 0.67, 0, m.sheet);
+      mdBox(B, 0.3, 0.06, 0.24, 0, 0.72, 0.18, (row + k) % 2 ? m.pink : m.blue);
+      mdBox(B, 0.16, 0.1, 0.01, 0, 0.88, -0.375, m.card);
+    }
+    // the desk at the far end, a wall clock
+    mdBox(S, 2.4, 0.9, 0.7, 1.6, 0.45, -7.2, m.desk);
+    mdCyl(S, 0.3, 0.3, 0.04, 0, 2.3, -7.88, m.card, Math.PI / 2);
+    this.people = [
+      mdPerson(S, 'nuA', 'mdW3', -1.9, -1.2, 200, [[0, 'mdStandLook']]),
+      mdPerson(S, 'nuB', 'mdW8', 1.4, -6.5, 170, [[0, 'look']]),
+    ];
+    S.add(new THREE.HemisphereLight('#e8eef2', '#7a7a72', 0.7));
+    const sun = new THREE.DirectionalLight('#fff0dc', 1.6); sun.position.set(14, 8, 2); sun.target.position.set(0, 0, 0); S.add(sun, sun.target);
+    for (const z of [-5, 0, 5]) { const L = new THREE.PointLight('#f4f6ff', 2, 9, 1.5); L.position.set(0, 2.8, z); S.add(L); }
+  }
+  update(t) {
+    const u = t - MD.nursery[0];
+    for (const p of this.people) p.update(u);
+    const k = Ease.inOutSine(MathX.clamp(u / (MD.nursery[1] - MD.nursery[0]), 0, 1));
+    this.camera.position.set(-1.9 + 0.5 * k, 1.35 - 0.1 * k, 4.4 - 2.4 * k);
+    this.camera.lookAt(-0.9, 0.62, -3.0);
+    this.camera.fov = 54; this.camera.updateProjectionMatrix();
+  }
+}
+
+// +20 YEARS: a primary school classroom built for thirty. Two girls at the front, the teacher at the board.
+class MdSchool {
+  constructor() {
+    const S = this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(52, 9 / 16, 0.05, 200);
+    S.background = new THREE.Color('#c8c0b0');
+    S.fog = new THREE.FogExp2(new THREE.Color('#b8b0a0'), 0.012);
+    const m = { floor: mdStd('#8a6a4a', { roughness: 0.6 }), wall: mdStd('#d8ccb4', { roughness: 0.9 }), desk: mdStd('#b89a70', { roughness: 0.6 }), leg: mdStd('#4a5058', { roughness: 0.4, metalness: 0.5 }),
+      chair: mdStd('#3a6a8a', { roughness: 0.6 }), dust: mdStd('#cfc6b4', { roughness: 1 }), board: mdStd('#24382e', { roughness: 0.8 }) };
+    mdBox(S, 10, 0.1, 12, 0, -0.05, 0, m.floor); mdBox(S, 10, 0.1, 12, 0, 3.2, 0, m.wall);
+    mdBox(S, 0.2, 3.2, 12, -5, 1.6, 0, m.wall); mdBox(S, 10, 3.2, 0.2, 0, 1.6, -6, m.wall); mdBox(S, 10, 3.2, 0.2, 0, 1.6, 6, m.wall);
+    mdBox(S, 0.2, 0.9, 12, 5, 0.45, 0, m.wall); mdBox(S, 0.2, 0.4, 12, 5, 3.0, 0, m.wall);
+    for (let z = -6; z <= 6; z += 3) mdBox(S, 0.22, 1.9, 0.14, 5, 1.85, z, m.wall);
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(12, 1.9), new THREE.MeshBasicMaterial({ color: new THREE.Color('#f2ecdc').multiplyScalar(1.25) })); win.position.set(5.12, 1.85, 0); win.rotation.y = -Math.PI / 2; S.add(win);
+    // the board
+    const bt = Tex.label([['CLASS 4 · YEAR 20', 52], ['PUPILS TODAY: 2', 44]], { w: 1024, h: 340, bg: '#24382e', fg: '#e8ecdc', font: 52 });
+    const b = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 1.4), new THREE.MeshStandardMaterial({ map: bt, roughness: 0.9 })); b.position.set(0, 1.75, -5.88); S.add(b);
+    // thirty desks; most of them dusty, chairs pushed in
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 6; c++) {
+      const x = -3.4 + c * 1.36, z = -3.4 + r * 1.55, D = new THREE.Group(); D.position.set(x, 0, z); S.add(D);
+      mdBox(D, 1.0, 0.04, 0.55, 0, 0.72, 0, m.desk); for (const e of [-1, 1]) for (const f of [-1, 1]) mdCyl(D, 0.018, 0.018, 0.7, e * 0.45, 0.35, f * 0.22, m.leg);
+      const used = r === 0 && (c === 2 || c === 3);
+      if (!used) mdBox(D, 0.96, 0.005, 0.5, 0, 0.745, 0, m.dust);
+      const ch = new THREE.Group(); ch.position.set(0, 0, used ? 0.62 : 0.42); D.add(ch);
+      mdBox(ch, 0.42, 0.04, 0.4, 0, 0.44, 0, m.chair); mdBox(ch, 0.42, 0.36, 0.04, 0, 0.64, 0.2, m.chair);
+      for (const e of [-1, 1]) for (const f of [-1, 1]) mdCyl(ch, 0.012, 0.012, 0.44, e * 0.18, 0.22, f * 0.17, m.leg);
+    }
+    const gA = mdPerson(S, 'scA', 'mdGirl', -0.68, -2.78, 180, [[0, 'sit']]); gA.root.scale.setScalar(0.72); gA.spec.seat = 0.44 / 0.72 - 0.05;
+    const gB = mdPerson(S, 'scB', 'mdW9', 0.68, -2.78, 180, [[0, 'sit']]); gB.root.scale.setScalar(0.7); gB.spec.seat = 0.44 / 0.7 - 0.05;
+    this.people = [gA, gB, mdPerson(S, 'scT', 'mdW6', 2.0, -5.2, 200, [[0, 'look']])];
+    S.add(new THREE.HemisphereLight('#f0e8d8', '#5a4a3a', 1.1));
+    const sun = new THREE.DirectionalLight('#ffe8c8', 2.4); sun.position.set(14, 7, -2); sun.target.position.set(0, 0, 0); S.add(sun, sun.target);
+  }
+  update(t) {
+    const u = t - MD.school[0];
+    for (const p of this.people) p.update(u);
+    const k = Ease.inOutSine(MathX.clamp(u / (MD.school[1] - MD.school[0]), 0, 1));
+    this.camera.position.set(-1.8 + 0.8 * k, 1.75 - 0.2 * k, 3.6 - 1.8 * k);
+    this.camera.lookAt(0, 0.85, -3.6);
+    this.camera.fov = 52; this.camera.updateProjectionMatrix();
+  }
+}
+
 class MdMontage {
-  constructor() { this.fire = new MdFireStation(); this.grid = new MdGridRoom(); this.market = new MdMarket(); this.earth = new MdEarth(); this.chamber = new MdChamber(); this.queue = new MdQueue(); }
+  constructor() { this.fire = new MdFireStation(); this.grid = new MdGridRoom(); this.market = new MdMarket(); this.earth = new MdEarth(); this.chamber = new MdChamber(); this.queue = new MdQueue(); this.nursery = new MdNursery(); this.school = new MdSchool(); }
   shotAt(t) {
     if (t >= MD.fireSt[0] && t < MD.fireSt[1]) return this.fire;
     if (t >= MD.gridRoom[0] && t < MD.gridRoom[1]) return this.grid;
@@ -554,6 +655,9 @@ class MdMontage {
     if (t >= MD.earth[0] && t < MD.earth[1]) return this.earth;
     if (t >= MD.gov[0] && t < MD.gov[1]) return this.chamber;
     if (t >= MD.queue[0] && t < MD.queue[1]) return this.queue;
+    if (t >= MD.nursery[0] && t < MD.nursery[1]) return this.nursery;
+    if (t >= MD.school[0] && t < MD.school[1]) return this.school;
+    if (t >= MD.future[0] && t < MD.future[1]) return this.earth;
     return null;
   }
   update(t) { const s = this.shotAt(t); if (s) s.update(t); return s; }

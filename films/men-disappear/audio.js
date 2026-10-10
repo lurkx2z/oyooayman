@@ -70,7 +70,7 @@ class MdAudio extends AudioEngine {
     for (const [t, f, v, p] of [[T.vanish + 0.35, 260, 0.08, 0.3], [T.vanish + 0.55, 240, 0.07, -0.4], [T.vanish + 0.9, 330, 0.06, 0.2], [T.vanish + 1.3, 250, 0.08, -0.3]]) {
       S.voice(t, f, 0.24, 'a', v, p, car, 1.25); S.voice(t + 0.28, f * 1.1, 0.18, 'o', v * 0.8, p, car, 1.1);
     }
-    S.voice(T.vanish + 1.1, 380, 0.35, 'a', 0.07, 0.4, car, 1.3);                       // the boy
+    S.voice(T.vanish + 1.1, 380, 0.35, 'a', 0.07, 0.4, car, 1.3);                       // the girl
     S.chatter(T.brake + 1.8, T.wheel[0], 0.035, 0.0, car, 250, 2.4);
     for (const [t, f, p] of [[T.planeHit + 0.5, 300, 0.3], [T.planeHit + 0.8, 270, -0.2], [T.planeHit + 1.3, 340, 0.1]]) S.voice(t, f, 0.3, 'o', 0.08, p, car, 1.3);   // the car sees the plane go in
 
@@ -283,6 +283,10 @@ class MdAudio extends AudioEngine {
     fire(T.end[0], T.fin + 0.8, 0.18, -0.4);
     S.tone(T.end[0] + 0.5, T.fin - T.end[0], 640, 0.005, 0.5, outside, 'square', 0.5, 1.0);
     for (const f of [98, 116.5, 146.8, 196]) S.tone(T.line[0] - 0.3, 8.5, f, 0.032, 0, mus, 'sine', 1.4, 3.0);
-    S.tone(T.births[0], 5, 392, 0.01, 0, mus, 'sine', 1.5, 2.5);
+    S.tone(T.nursery[0], 5, 392, 0.01, 0, mus, 'sine', 1.5, 2.5);
+    // the epilogue: a ward clock in a silent room; the chord sinking a step for each jump in years
+    for (let t = T.nursery[0] + 0.3; t < T.nursery[1]; t += 1.0) S.click(t, 0.03, 0.2, fx);
+    for (const f of [87.3, 130.8, 164.8]) S.tone(T.school[0] - 0.2, 4.8, f, 0.028, 0, mus, 'sine', 1.2, 2.0);
+    for (const f of [73.4, 110, 138.6]) S.tone(T.future[0] - 0.2, T.fin - T.future[0], f, 0.03, 0, mus, 'sine', 1.6, 3.5);
   }
 }
