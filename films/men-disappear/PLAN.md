@@ -1,11 +1,58 @@
 # WHAT IF MEN SUDDENLY DISAPPEARED FROM THE WORLD? — production plan
 
-A 67-second vertical (9:16, final 1080×1920, 30 fps) first-person film on the shared engine. You are a woman standing in
+v1/v2: a 67-second vertical (9:16, final 1080×1920, 30 fps) first-person film on the shared engine. You are a woman standing in
 the front car of a commuter train on a harbour viaduct, late afternoon. At 1.8 s every adult man on Earth vanishes. The
 film is about **systems, not people**: what keeps running when the person operating it is gone. Tone is neutral and
 respectful: men simply vanish (no bodies, no gore, no jokes about either sex).
 
 No edit: story time = film time (0–67 s).
+
+## 0. v3: the cascade cut (78 s, current)
+
+**Why:** v2 was posted on TikTok (≈ 21.8K likes, ≈ 1,200 comments). The top comments said it looked like "nothing major
+happened" ("regular Tuesday", "so nothing?"). Viewers listed the jobs that are mostly men (grid, water, trucking, pilots,
+ships, nuclear, leaders) and expected the collapse to be shown. The owner asked for a far more chaotic,
+world-ending cut that also shows women struggling to cope, and a harder opening.
+
+**Shape:** real time for the first 36 s, then the film jumps forward with a "SINCE THE VANISH" clock (top right) and
+time cards. Each failure carries one cited share.
+
+| Time (s) | Beat | On screen |
+|---|---|---|
+| 0–9 | The car; the vanish at 1.8 (horns, crashes and screams outside at once); the dead man's brake | world population; train km/h |
+| 9–15.6 | Cars below with nobody at the wheel; the SUV on cruise control | SUV km/h |
+| 15.6–21.4 | An airliner on approach with nobody flying it goes into the harbour (the sound arrives ~1 s late: 350 m) | AIRLINE PILOTS (WORLD) ≈ 94 % |
+| 21.4–36.2 | The ship; the empty wheelhouse; the pier and the span fall; the train stopped 4 m short | MERCHANT SEAFARERS (WORLD) 98.7 % |
+| 36.2–41.6 | +20 MIN: waterfront fires; insert: the fire station alarm with no crew | FIREFIGHTERS (US) 94 % |
+| 41.6–45.2 | +1 HOUR: the national assembly's emergency session, almost every seat empty | COUNTRIES LED ONLY BY MEN ≈ 85 % |
+| 45.2–53.0 | +6 HOURS: dusk; insert: grid control, frequency falling; the city goes dark in three steps; the Earth's night side loses its lights | POWER PLANT OPERATORS (US) 93 % |
+| 53.0–59.6 | +2 DAYS: the outfall pours sewage into the basin; insert: women queueing at a dry street tap, no signal | WATER PLANT OPERATORS (US) 94 % |
+| 59.6–63.4 | +2 WEEKS: a supermarket being stripped | TRUCK DRIVERS (US) 92 % |
+| 63.4–67.6 | The power station: reactors scrammed, cooling on diesel; days later the diesel runs out; hydrogen blast (Fukushima-like) | BACKUP DIESEL 7 DAYS (US RULE) |
+| 67.6–78 | The dark city from above; "A third of humanity vanished in a second. / The systems they ran failed, one by one."; births per day ≈ 360,000 → almost none in ~9 months; sperm banks could cover only a tiny fraction | source note |
+
+### v3 sources (research notes kept outside the repo; summary)
+
+| Share | Value | Source |
+|---|---|---|
+| Power plant operators, distributors, dispatchers (US) | 92.8 % men | Data USA (Census ACS 2024), SOC 51-8010 |
+| Electrical power-line installers (US) | 97.3 % men | Data USA (ACS 2024), SOC 49-9051 |
+| Water and wastewater operators (US) | 94.5 % men | Data USA (ACS 2024), SOC 51-8031 |
+| Truck drivers (US) | 92.1 % men | Data USA (ACS 2024), SOC 53-3030; IRU 2023 (36 countries) ≈ 94 % |
+| Airline pilots (world) | ≈ 94 % men | ISWAP 2021 via Statista (secondary) |
+| Firefighters (US) | 93.8 % (2024), 94.9 % (2025) men | US BLS CPS Table 11 |
+| Merchant seafarers (world) | 98.7 % men | ICS/BIMCO Seafarer Workforce Report 2021 |
+| Countries with a woman head of state or government | 28 of ≈ 193 (≈ 15 %) | UN Women, 1 Jan 2026 |
+| Members of parliament (world) | 72.5 % men | IPU, 1 Jan 2026 |
+| Cabinet ministers (world) | 77.6 % men | UN Women, 1 Jan 2026 |
+| Reactors trip on loss of off-site power; 7 days of diesel on site | US rule | NRC (Browns Ferry 2011; Reg. Guide 1.137) |
+| Grid cascade within minutes | 2003 US–Canada blackout | US–Canada Task Force final report, 2004 |
+| Pumps stop → taps fail, sewage discharges | Cleveland 2003; EPA guide | WaterWorld 2003; EPA 800-R-19-001 |
+| Births per day | ≈ 360,000 | UN WPP 2024 (≈ 132 million a year) |
+
+Wording kept honest after the fact review: "a third of humanity" (adult men ≈ 35 %), "the grid balances itself. For a
+while." (second-by-second balancing is automatic), "Most trucks stopped", "Days later, the diesel ran out" (decay heat
+at two weeks heats slowly), "(US RULE)" on the 7 days. The time jumps are compressed; the note says so.
 
 ## 1. Rules
 
