@@ -11,7 +11,7 @@ const MD_RX = MD_G.roadX;
 const MD_CARS = [
   ['cruise', 'suv', '#b9bcbe', MD_RX + 1.6, 274.4, -13.9, 'cruise', 4.4],
   ['c2', 'hatch', '#7a3a30', MD_RX + 1.6, 92, -9.5, 'w', 0],
-  ['c8', 'ev', '#8a8f94', MD_RX + 1.6, 186, -12.5, 'm', -0.5],
+  ['c8', 'ev', '#8a8f94', MD_RX + 1.6, 186, -12.5, 'm', 4.0, 144.6],   // drifts into the parked sedan (p3) seconds after the vanish
   ['c1', 'sedan', '#5c6670', MD_RX + 4.0, 128, -11.0, 'm', 0.2],
   ['c3', 'van', '#d4d0c4', MD_RX + 4.0, 220, -10.5, 'm', 0.2],
   ['c4', 'taxi', '#c4a24c', MD_RX - 1.6, 18, 10.5, 'm', -0.5],
@@ -47,8 +47,17 @@ function mdCarMotion(c, t) {
     return { d: s * (dV + u0 * MD_REACT + u0 * bb - 0.5 * MD_WBRAKE * bb * bb), v: Math.max(0, u0 - MD_WBRAKE * b) };
   }
   const tc = u0 / MD_COAST, b = Math.min(a, tc);
-  return { d: s * (dV + u0 * b - 0.5 * MD_COAST * b * b), v: Math.max(0, u0 - MD_COAST * a) };
+  const d = s * (dV + u0 * b - 0.5 * MD_COAST * b * b), v = Math.max(0, u0 - MD_COAST * a);
+  // a coasting car that drifts into a parked one stops dead where it hits (c[8]: the z where it stops)
+  if (c[8] !== undefined && (z0 + d - c[8]) * s >= 0) return { d: c[8] - z0, v: 0 };
+  return { d, v };
 }
+// when a car with a stop point hits (closed form: solve the coasting distance)
+function mdCrashT(id) {
+  const c = MD_CARS.find((k) => k[0] === id), u0 = Math.abs(c[5]), need = Math.abs(c[8] - c[4]) - u0 * MD.vanish;
+  return MD.vanish + (u0 - Math.sqrt(u0 * u0 - 2 * MD_COAST * need)) / MD_COAST;
+}
+const MD_CRASH0 = mdCrashT('c8');
 function mdCarKmh(id, t) { const c = MD_CARS.find((k) => k[0] === id); return mdCarMotion(c, t).v * 3.6; }
 
 class MdRoad {
@@ -70,7 +79,7 @@ class MdRoad {
       const c = k.c, [id, , , lane, z0, v0, who, drift] = c, m = mdCarMotion(c, t);
       const z = z0 + m.d;
       // drift across the lane while coasting (camber, no hands on the wheel); a little yaw while it drifts
-      const dk = who === 'cruise' ? MathX.smooth(t, V + 3, MD.cruise) : MathX.smooth(t, V + 0.5, V + 14);
+      const dk = who === 'cruise' ? MathX.smooth(t, V + 3, MD.cruise) : c[8] !== undefined ? MathX.smooth(t, V + 0.2, MD_CRASH0) : MathX.smooth(t, V + 0.5, V + 14);
       const x = lane + drift * dk;
       const yawDrift = who === 'parked' ? 0 : -Math.sign(v0 || 1) * drift * 0.05 * Math.sin(dk * Math.PI);
       const g = k.v.group;
@@ -78,10 +87,12 @@ class MdRoad {
       g.rotation.y = (v0 < 0 ? 0 : Math.PI) + Math.PI / 2 + yawDrift;
       // the SUV hits the van: it noses down and twists; the van is shoved and rocks
       if (id === 'cruise' && t > MD.cruise) { const b = t - MD.cruise; g.rotation.y += 0.12 * MathX.smooth(b, 0, 0.35); g.rotation.z = 0.04 * Math.sin(b * 9) * Math.exp(-b / 0.5); }
+      if (id === 'c8' && t > MD_CRASH0) { const b = t - MD_CRASH0; g.rotation.y += 0.22 * MathX.smooth(b, 0, 0.3); g.rotation.z = 0.05 * Math.sin(b * 9) * Math.exp(-b / 0.5); }
+      if (id === 'p3' && t > MD_CRASH0 + 0.05) { const b = t - MD_CRASH0 - 0.05; g.position.z -= 2.4 * (1 - Math.exp(-b / 0.3)); g.position.x += 0.5 * (1 - Math.exp(-b / 0.3)); g.rotation.y += 0.14 * (1 - Math.exp(-b / 0.3)); }
       if (id === 'p1' && t > MD.cruise + 0.12) { const b = t - MD.cruise - 0.12; g.position.z -= 3.0 * (1 - Math.exp(-b / 0.35)); g.position.x += 0.35 * (1 - Math.exp(-b / 0.3)); g.rotation.y += 0.09 * (1 - Math.exp(-b / 0.3)); g.rotation.x = 0.03 * Math.sin(b * 8) * Math.exp(-b / 0.6); }
       for (const w of k.v.wheels) w.rotation.z = -Math.abs(m.d) / k.r;
       // hazards: the women who braked switch them on; the van after it is hit
-      const haz = (who === 'w' && t > V + 2.2) || (id === 'p1' && t > MD.cruise + 0.6);
+      const haz = (who === 'w' && t > V + 2.2) || (id === 'p1' && t > MD.cruise + 0.6) || (id === 'p3' && t > MD_CRASH0 + 0.5);
       if (k.v.hazard) k.v.hazard.emissiveIntensity = haz && Math.floor(t * 1.6) % 2 === 0 ? 2.2 : 0;
       // brake lights: on for the women braking; off for the coasting cars (nobody's foot is on the pedal)
       if (k.v.tail) k.v.tail.emissiveIntensity = who === 'w' && t > V + MD_REACT && m.v > 0 ? 2.0 : 0.5;

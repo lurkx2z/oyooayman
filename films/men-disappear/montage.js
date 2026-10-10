@@ -328,10 +328,10 @@ class MdGridRoom {
     if (this._q !== q) { this._draw(q); this._q = q; }
     for (const b of this.beacons) b.material.color.setRGB(on ? 2.4 : 0.4, on ? 1.0 : 0.15, 0.05);
     this.alarmL.intensity = on ? 5 : 0.6;
-    this.screens.forEach((sm, i) => { const red = hash1(i * 3.3) < MathX.clamp(u / 1.6, 0, 1); sm.color.setRGB(red ? (on ? 1.6 : 0.5) : 0.25, red ? 0.15 : 0.4, red ? 0.1 : 0.55); });
+    this.screens.forEach((sm, i) => { const red = hash1(i * 3.3) < MathX.clamp(u / 1.6, 0, 1); sm.color.setRGB(red ? (on ? 0.95 : 0.35) : 0.12, red ? 0.08 : 0.2, red ? 0.05 : 0.3); });
     const k = Ease.inOutSine(MathX.clamp(u / 2.1, 0, 1));
-    this.camera.position.set(-2.2 + 0.8 * k, 1.75, 6.5 - 1.6 * k);
-    this.camera.lookAt(-0.4, 2.4, -9.8);
+    this.camera.position.set(1.2 + 0.6 * k, 1.75, 6.5 - 1.6 * k);
+    this.camera.lookAt(3.0, 3.8, -9.8);
     this.camera.fov = 58; this.camera.updateProjectionMatrix();
   }
 }
@@ -344,7 +344,7 @@ class MdMarket {
     const S = this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(60, 9 / 16, 0.05, 200);
     S.background = new THREE.Color('#1a1b1c');
-    S.fog = new THREE.FogExp2(new THREE.Color('#2a2b2c'), 0.035);
+    S.fog = new THREE.FogExp2(new THREE.Color('#2a2b2c'), 0.018);
     const m = { floor: new THREE.MeshStandardMaterial({ map: Tex.concrete(77, [168, 164, 156]), roughness: 0.3, name: 'shop floor' }), shelf: mdStd('#c8ccd0', { roughness: 0.5, metalness: 0.3 }),
       back: mdStd('#e2e0da', { roughness: 0.8 }), ceil: mdStd('#6a6c6e', { roughness: 0.9 }), tag: mdStd('#f2d840', { roughness: 0.6 }), wire: mdStd('#8a9096', { roughness: 0.3, metalness: 0.9 }) };
     mdBox(S, 12, 0.1, 40, 0, -0.05, 0, m.floor);
@@ -374,14 +374,27 @@ class MdMarket {
     const sign = Tex.label([['BREAD · MILK · EGGS', 40]], { w: 512, h: 96, bg: '#1e4a8a', fg: '#ffffff', font: 40 });
     const sg = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.45), new THREE.MeshStandardMaterial({ map: sign, roughness: 0.7 })); sg.position.set(0, 3.4, -9); S.add(sg);
     // the light: grey day through the front windows (behind the camera), one emergency light down the aisle
-    const day = new THREE.DirectionalLight('#c8ccd0', 1.2); day.position.set(2, 3, 10); S.add(day);
-    S.add(new THREE.HemisphereLight('#9aa0a6', '#3a3836', 0.7));
-    this.em = new THREE.PointLight('#fff2d8', 4, 12, 1.6); this.em.position.set(0, 3.8, -12); S.add(this.em);
+    const day = new THREE.DirectionalLight('#c8ccd0', 2.4); day.position.set(2, 3, 10); S.add(day);
+    S.add(new THREE.HemisphereLight('#9aa0a6', '#3a3836', 1.4));
+    this.em = new THREE.PointLight('#fff2d8', 9, 16, 1.6); this.em.position.set(0, 3.8, -12); S.add(this.em);
     mdBox(S, 0.5, 0.12, 0.2, 0, 4.05, -12, new THREE.MeshBasicMaterial({ color: '#fff4e0' }));
     for (let i = 0; i < 6; i++) mdBox(S, 0.2, 0.05, 2.0, 0, 4.08, 6 - i * 5, mdStd('#9a9c9e', { roughness: 0.5 }));   // the strip lights, off
+    // the women stripping what's left: one reaching to the top shelf, one with a child, one pushing a trolley, one
+    // checking a phone with no signal
+    this.people = [
+      mdPerson(S, 'mkA', 'mdW3', -0.85, -3.0, 90, [[0, 'mdReach']]),
+      mdPerson(S, 'mkB', 'mdW8', 0.7, -7.5, 200, [[0, 'mdHold']]),
+      mdPerson(S, 'mkC', 'mdW5', 0.2, -11.0, 0, [[0, 'walk']], [[0, 0.2, -11.0], [4, 0.1, -7.4]]),
+      mdPerson(S, 'mkD', 'mdW4', -0.6, -14.5, 180, [[0, 'mdNoSignal']]),
+    ];
+    const kid = mdPerson(S, 'mkKid', 'mdBoy', 1.05, -7.0, 210, [[0, 'look']]); kid.root.scale.setScalar(0.7); this.people.push(kid);
+    const tr2 = new THREE.Group(); tr2.position.set(0.2, 0, -10.3); S.add(tr2); this.tr2 = tr2;
+    for (const [w, h, d, x, y, z] of [[0.55, 0.02, 0.9, 0, 0.3, 0], [0.55, 0.5, 0.02, 0, 0.6, -0.45], [0.55, 0.5, 0.02, 0, 0.6, 0.45], [0.02, 0.5, 0.9, -0.27, 0.6, 0], [0.02, 0.5, 0.9, 0.27, 0.6, 0]]) mdBox(tr2, w, h, d, x, y, z, m.wire);
   }
   update(t) {
     const u = t - MD.food[0];
+    for (const p of this.people) p.update(u);
+    this.tr2.position.z = this.people[2].locate(u).z + 0.9;
     this.em.intensity = 4 * (0.75 + 0.25 * (Math.floor(u * 9) % 7 === 0 ? 0.2 : 1));
     const k = Ease.inOutSine(MathX.clamp(u / 2.4, 0, 1));
     this.camera.position.set(0.15, 1.55, 3.5 - 2.0 * k);
@@ -390,12 +403,157 @@ class MdMarket {
   }
 }
 
+/* ---------------- 7. people: the women left to cope (v3) ---------------- */
+// film actions for the survival scenes (pure functions of τ)
+Object.assign(ACTIONS, {
+  // working a dry tap: bent over it, both hands on the handle, turning it again and again
+  mdTap(τ, c) { const p = ACTIONS.idle(τ, c), w = Math.sin(τ * 5.5 + c.seed * 4); p.spine = 0.42; p.neck = 0.25; p.lSh = [0.95, 0.12]; p.rSh = [0.95, 0.12]; p.lEl = 0.7 + 0.25 * w; p.rEl = 0.7 - 0.25 * w; p.lKnee = 0.18; p.rKnee = 0.18; p.hipY = 0.9; return p; },
+  // holding a bucket (or a bottle) in the right hand, waiting, looking about
+  mdBucket(τ, c) { const p = ACTIONS.look(τ, c); p.rSh = [0.04, 0.16]; p.rEl = 0.08; return p; },
+  // reaching up to an empty shelf
+  mdReach(τ, c) { const p = ACTIONS.idle(τ, c), w = Math.sin(τ * 1.4 + c.seed * 3); p.rSh = [2.2 + 0.2 * w, 0.2]; p.rEl = 0.3; p.lSh = [0.5, 0.1]; p.lEl = 1.0; p.neck = -0.35; p.spine = -0.08; p.headYaw = 0.2 * w; return p; },
+  // holding a phone up: no signal
+  mdNoSignal(τ, c) { const p = ACTIONS.idle(τ, c); p.rSh = [1.55 + 0.25 * Math.sin(τ * 0.9 + c.seed), 0.18]; p.rEl = 0.65; p.neck = -0.25; p.headYaw = 0.25 * Math.sin(τ * 0.7); p.lSh = [0.1, 0.12]; return p; },
+  // an arm round a child's shoulders
+  mdHold(τ, c) { const p = ACTIONS.look(τ, c); p.lSh = [0.35, 0.55]; p.lEl = 1.35; return p; },
+});
+function mdPerson(scene, id, look, x, z, face, states, path) {
+  const p = new Person({ id, look, path: path || [[0, x, z]], states, face, y: 0 }, scene);
+  return p;
+}
+function mdHeld(person, mesh, side = -1, y = -0.18) { const h = (side < 0 ? person.j.ra : person.j.la).hand; mesh.position.set(0, y, 0); h.add(mesh); return mesh; }
+function mdBucketMesh(color = '#c8c4b8') { const g = new THREE.Group(); const b = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.11, 0.3, 14, 1, true), mdStd(color, { roughness: 0.6, side: THREE.DoubleSide })); b.position.y = -0.12; g.add(b); const bot = new THREE.Mesh(new THREE.CircleGeometry(0.11, 14), mdStd(color)); bot.rotation.x = -Math.PI / 2; bot.position.y = -0.27; g.add(bot); return g; }
+
+// the government: the national assembly's chamber, an hour on. Most seats empty; a few women standing in the aisles,
+// one on a phone that won't connect; the screen over the speaker's chair with nothing to announce.
+class MdChamber {
+  constructor() {
+    const S = this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(56, 9 / 16, 0.05, 300);
+    S.background = new THREE.Color('#14100c');
+    S.fog = new THREE.FogExp2(new THREE.Color('#1a140e'), 0.012);
+    const m = { carpet: mdStd('#3a4a6a', { roughness: 0.95 }), wood: mdStd('#6a4628', { roughness: 0.55 }), woodD: mdStd('#3e2816', { roughness: 0.6 }), seat: mdStd('#2c4a7a', { roughness: 0.8 }),
+      wall: mdStd('#8a7454', { roughness: 0.9 }), paper: mdStd('#f2efe6', { roughness: 0.9 }), mic: mdStd('#202224', { roughness: 0.4, metalness: 0.6 }), gold: mdStd('#c8a050', { roughness: 0.4, metalness: 0.6 }) };
+    mdBox(S, 60, 0.1, 60, 0, -0.05, 0, m.carpet);
+    // the hemicycle: five tiers of curved desks facing the speaker's chair (at z = −10)
+    const C = [0, -10], r = new RNG(6161);
+    for (let row = 0; row < 6; row++) {
+      const R = 7 + row * 2.0, y = row * 0.45, n = 10 + row * 3;
+      mdBox(S, 2 * R + 6, y, 2.0, 0, y / 2, C[1] + R, m.woodD);   // (the tier's floor, under the desks)
+      for (let i = 0; i < n; i++) {
+        const a = -1.15 + 2.3 * (i + 0.5) / n, x = C[0] + Math.sin(a) * R, z = C[1] + Math.cos(a) * R;
+        mdBox(S, 1.25, 0.8, 0.55, x, y + 0.4, z, m.wood, 0, a);
+        const ch = new THREE.Group(); ch.position.set(C[0] + Math.sin(a) * (R + 0.85), y, C[1] + Math.cos(a) * (R + 0.85)); ch.rotation.y = a + (r.next() - 0.5) * 0.6; S.add(ch);
+        mdBox(ch, 0.6, 0.1, 0.55, 0, 0.5, 0, m.seat); mdBox(ch, 0.6, 0.75, 0.1, 0, 0.9, 0.28, m.seat, -0.1);
+        if (r.next() < 0.5) mdBox(S, 0.3, 0.01, 0.4, x + (r.next() - 0.5) * 0.6, y + 0.81, z, m.paper, 0, a + r.next());   // the papers where they left them
+        if (i % 2 === 0) mdCyl(S, 0.01, 0.01, 0.35, x, y + 0.98, z - 0.1, m.mic, 0.4, a);
+      }
+    }
+    // the speaker's chair, the clerks' table, the screen above
+    mdBox(S, 7, 1.2, 2.2, 0, 0.6, -10.5, m.wood); mdBox(S, 1.2, 2.6, 1.0, 0, 1.3, -12.2, m.seat);
+    mdBox(S, 40, 14, 0.4, 0, 7, -14, m.wall); mdBox(S, 0.4, 14, 60, -22, 7, 0, m.wall); mdBox(S, 0.4, 14, 60, 22, 7, 0, m.wall);
+    const scr = Tex.label([['EMERGENCY SESSION', 46], ['NO QUORUM · NO STATEMENT', 38]], { w: 1024, h: 300, bg: '#0a1a3a', fg: '#e8eef8', font: 46 });
+    this.screen = new THREE.Mesh(new THREE.PlaneGeometry(9, 2.64), new THREE.MeshBasicMaterial({ map: scr, color: new THREE.Color(1.1, 1.1, 1.1) })); this.screen.position.set(0, 6.0, -13.7); S.add(this.screen);
+    mdCyl(S, 1.1, 1.1, 0.15, 0, 9.5, -13.7, m.gold, Math.PI / 2);   // the crest
+    // the women: in the aisle, on the steps, at the clerks' table
+    this.people = [
+      mdPerson(S, 'chA', 'mdW6', -2.2, -6.2, 160, [[0, 'look']]),
+      mdPerson(S, 'chB', 'mdW2', 1.6, -5.4, 200, [[0, 'mdNoSignal']]),
+      mdPerson(S, 'chC', 'mdW9', 3.4, -7.4, 230, [[0, 'handHead']]),
+      mdPerson(S, 'chD', 'mdW1', -3.8, -8.6, 140, [[0, 'phone']]),
+      mdPerson(S, 'chE', 'mdW7', 0.6, -3.6, 180, [[0, 'walk']], [[0, 0.6, -3.6], [3.6, -0.6, -6.6]]),
+    ];
+    S.add(new THREE.HemisphereLight('#c8b898', '#2a2018', 0.9));
+    const key = new THREE.DirectionalLight('#ffe2b8', 1.6); key.position.set(-6, 14, 8); S.add(key);
+    this.sp = new THREE.PointLight('#ffd9a0', 30, 30, 1.5); this.sp.position.set(0, 9, -6); S.add(this.sp);
+  }
+  update(t) {
+    const u = t - MD.gov[0];
+    for (const p of this.people) p.update(u);
+    const k = Ease.inOutSine(MathX.clamp(u / (MD.gov[1] - MD.gov[0]), 0, 1));
+    this.camera.position.set(-2.0 + 1.6 * k, 4.6 - 0.6 * k, 10.5 - 2.6 * k);
+    this.camera.lookAt(0.3, 1.5, -6.5);
+    this.camera.fov = 56; this.camera.updateProjectionMatrix();
+  }
+}
+
+// +2 DAYS: a square with a public standpipe. A line of women with buckets and bottles; the one at the front works the
+// tap; nothing comes. No signal on the phones, nobody in charge to ask.
+class MdQueue {
+  constructor() {
+    const S = this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(50, 9 / 16, 0.05, 300);
+    S.background = new THREE.Color('#8e8f8a');
+    S.fog = new THREE.FogExp2(new THREE.Color('#8e8f8a'), 0.018);
+    const ground = new THREE.MeshStandardMaterial({ map: Tex.concrete(91, [150, 146, 138]), roughness: 0.9 }); ground.map.repeat.set(10, 10);
+    mdBox(S, 80, 0.1, 80, 0, -0.05, 0, ground);
+    // the buildings round the square (facade texture from the shared kit)
+    for (const [x, z, w, h, ry, st, sd] of [[-14, -8, 26, 16, 0.25, 'redbrick', 901], [10, -16, 22, 19, -0.1, 'tanbrick', 902], [18, 6, 20, 14, -1.4, 'whitebrick', 903]]) {
+      const tx = Tex.facade(FACADE_STYLES[st], sd); tx.map.repeat.set(w / (tx.tileW || 12), h / (tx.tileH || 13.2));
+      const mat = new THREE.MeshStandardMaterial({ map: tx.map, roughness: 1 });
+      const b = mdBox(S, w, h, 12, x, h / 2, z, mat, 0, ry);
+    }
+    // the standpipe: a post with a tap, a grate below, a few jerrycans
+    const iron = mdStd('#3c5a4a', { roughness: 0.5, metalness: 0.4 }), steel = mdStd('#9aa0a4', { roughness: 0.3, metalness: 0.8 });
+    mdCyl(S, 0.12, 0.15, 1.1, 0, 0.55, 0, iron); mdCyl(S, 0.04, 0.04, 0.3, 0, 0.95, 0.15, steel, Math.PI / 2); mdBox(S, 0.18, 0.05, 0.05, 0, 1.15, 0, steel);
+    mdBox(S, 0.8, 0.02, 0.8, 0, 0.01, 0.3, mdStd('#2a2a2a', { roughness: 0.6 }));
+    for (const [x, z, c] of [[0.9, 0.6, '#d8c040'], [1.2, 0.2, '#2a5aa0'], [-0.9, 1.4, '#d8c040']]) mdBox(S, 0.3, 0.45, 0.18, x, 0.22, z, mdStd(c, { roughness: 0.5 }), 0, x);
+    // the line: front one at the tap, the rest waiting with buckets
+    const looks = ['mdW3', 'mdW4', 'mdW8', 'mdW5', 'mdW2', 'mdW1', 'mdW7', 'mdW9'];
+    this.people = [mdPerson(S, 'qA', 'mdW6', 0, 0.75, 180, [[0, 'mdTap']])];
+    for (let i = 0; i < 8; i++) {
+      const z = 2.0 + i * 1.05, x = 0.25 * Math.sin(i * 1.7), p = mdPerson(S, 'q' + i, looks[i], x, z, 180 + 10 * Math.sin(i * 2.3), [[0, i === 3 ? 'mdNoSignal' : i === 5 ? 'mdHold' : 'mdBucket']]);
+      if (i !== 3 && i !== 5) mdHeld(p, mdBucketMesh(['#c8c4b8', '#3a6aa8', '#c84a3a', '#e0d8c0'][i % 4]));
+      this.people.push(p);
+    }
+    const kid = mdPerson(S, 'qKid', 'mdBoy', 0.75, 7.25, 190, [[0, 'look']]); kid.root.scale.setScalar(0.72); this.people.push(kid);
+    S.add(new THREE.HemisphereLight('#c8ccd0', '#4a4844', 1.3));
+    const sun = new THREE.DirectionalLight('#e8e4dc', 1.4); sun.position.set(8, 14, 6); S.add(sun);
+  }
+  update(t) {
+    const u = t - MD.queue[0];
+    for (const p of this.people) p.update(u);
+    const k = Ease.inOutSine(MathX.clamp(u / (MD.queue[1] - MD.queue[0]), 0, 1));
+    this.camera.position.set(3.4 - 0.6 * k, 1.5, 9.5 - 5.0 * k);
+    this.camera.lookAt(0, 1.0, 1.2 - 0.6 * k);
+    this.camera.fov = 50; this.camera.updateProjectionMatrix();
+  }
+}
+
+/* ---------------- 6. the planet at night: the lights go out (v3) ---------------- */
+// The shared Earth (js/world/earth.js) from the night side over the Atlantic: North America's east coast, Europe and
+// West Africa lit; the lights go out in three steps (the patches the engine already draws).
+class MdEarth extends EarthScene {
+  constructor() {
+    super();
+    this.viewDir = EarthScene.dirFromLonLat(18, 40);
+    this.sunDir.copy(EarthScene.dirFromLonLat(-150, -10)); this.uniforms.uSun.value.copy(this.sunDir);
+    this._side = new THREE.Vector3(); this._up = new THREE.Vector3(0, 1, 0);
+  }
+  update(t) {
+    const u = t - MD.earth[0];
+    this.earth.rotation.y = u * 0.01; this.clouds.rotation.y = u * 0.012;
+    // all lit, then three hard steps down to a few scattered points (hospitals, plants on their own generators)
+    const steps = [[0.5, 0.6], [0.95, 0.28], [1.4, 0.05]];
+    let L = 1; for (const [ts, v] of steps) if (u >= ts) L = v;
+    this.uniforms.uLights.value = L;
+    const dist = 3.3 - 0.25 * Ease.inOutSine(MathX.clamp(u / 2.0, 0, 1));
+    this._side.copy(this._up).cross(this.viewDir).normalize();
+    this.camera.position.copy(this.viewDir).multiplyScalar(dist).addScaledVector(this._side, 0.12 * u);
+    this.camera.lookAt(0, 0.1, 0);
+    this.camera.updateMatrixWorld(true);
+  }
+}
+
 class MdMontage {
-  constructor() { this.fire = new MdFireStation(); this.grid = new MdGridRoom(); this.market = new MdMarket(); }
+  constructor() { this.fire = new MdFireStation(); this.grid = new MdGridRoom(); this.market = new MdMarket(); this.earth = new MdEarth(); this.chamber = new MdChamber(); this.queue = new MdQueue(); }
   shotAt(t) {
     if (t >= MD.fireSt[0] && t < MD.fireSt[1]) return this.fire;
     if (t >= MD.gridRoom[0] && t < MD.gridRoom[1]) return this.grid;
     if (t >= MD.food[0] && t < MD.food[1]) return this.market;
+    if (t >= MD.earth[0] && t < MD.earth[1]) return this.earth;
+    if (t >= MD.gov[0] && t < MD.gov[1]) return this.chamber;
+    if (t >= MD.queue[0] && t < MD.queue[1]) return this.queue;
     return null;
   }
   update(t) { const s = this.shotAt(t); if (s) s.update(t); return s; }

@@ -53,7 +53,7 @@ const MD_LOOK = [
   [9.3, 15.6, (t, o, c) => { const k = MD_CARS[0], m = mdCarMotion(k, Math.min(t, MD.cruise + 0.3)); return o.set(MD_G.roadX + 3.5, MD_G.quay + 0.6, Math.max(k[4] + m.d - 4, c.z + 14)); }, (t) => MathX.lerp(40, 31, MathX.smooth(t, 12.3, 13.6)), 0.9, 0.01],
   // the right-hand window: the airliner coming over low, then where it went in
   [15.58, 21.6, (t, o) => { if (t < MD.planeHit - 0.15) { FILM._app.cascade.plane.position(Math.min(t + 0.25, MD.planeHit), o); return o; } return o.set(MD_PLANE_HIT[0] - 10, 6, MD_PLANE_HIT[2]); },
-    (t) => MathX.lerp(58, 36, MathX.smooth(t, 16.5, MD.planeHit)), 0.01, 0.5],
+    (t) => MathX.lerp(52, 30, MathX.smooth(t, 16.2, MD.planeHit - 0.4)), 0.01, 0.5],
   // the ship, close now
   [21.3, 26.9, (t, o) => mdShipPt(t, 46, 12, 0, o), (t) => MathX.lerp(52, 40, MathX.smooth(t, 21.5, 23.3)), 0.6, 0.01],
   // telephoto: its wheelhouse, lit, empty
@@ -68,7 +68,7 @@ const MD_DRONE = [
   // off the pier at cap height: the bow (stacks behind it) slides in and hits; the column breaks
   { t0: MD.wheel[1], t1: 32.2, pos: [38, 13, -22], at: [2, 12.5, -62], drift: [-0.7, 0, -0.5], fov: 60 },
   // high behind the train: the span falls four metres in front of it
-  { t0: 32.2, t1: MD.fires[0], pos: [-13, 33, 44], at: [-4.4, 19, -12], drift: [0.4, -0.4, -1.4], fov: 54 },
+  { t0: 32.2, t1: MD.fires[0], pos: [24, 40, -40], at: [-4, 18, 0], drift: [0, -0.5, 0.8], fov: 52 },
   // +20 MIN: on the viaduct's deck by the last car, looking down at the waterfront: the crashes burn; so do the blocks
   { t0: MD.fires[0], t1: MD.grid[0], pos: [-6.5, 26.4, 60], at: [-42, 12, 170], drift: [0, 0, 0.45], atDrift: [-0.5, 0.6, 2.0], fov: 56, hand: 1 },
   // +6 HOURS: dusk over the city; then the blackout
@@ -78,7 +78,7 @@ const MD_DRONE = [
   // +2 WEEKS: across the harbour, the power station (a long lens from the deck)
   { t0: MD.nuke[0], t1: MD.end[0], pos: [2.6, 26.8, 36], at: [1262, 62, 720], drift: [0, 0, 0], atDrift: [0, 4, 0], fov: 12, hand: 0.25 },
   // the close: rising over the broken bridge and the dark city
-  { t0: MD.end[0], t1: MD.fin, pos: [-16, 34, -20], at: [-160, 22, 300], drift: [0.6, 3.2, -1.6], atDrift: [-6, -2, 10], fov: 52 },
+  { t0: MD.end[0], t1: MD.fin, pos: [60, 90, -160], at: [-120, 10, 150], drift: [2, 3, -2], atDrift: [-4, 0, 6], fov: 50 },
 ];
 // labels pinned to things in the world: [t0, t1, point(t, out), text(t)]
 const MD_TAGS = [
@@ -90,11 +90,15 @@ const MD_TAGS = [
 ];
 // the cards: time jumps and the inserts
 const MD_CARDS = [
-  [MD.fires[0], MD.fires[0] + 1.7, 'LATER', '+20 MINUTES', ''],
-  [MD.fireSt[0], MD.fireSt[1], 'MEANWHILE', 'A FIRE STATION', 'THE ALARM HAS BEEN RINGING FOR 19 MINUTES'],
+  [MD.fires[0], MD.fires[0] + 1.7, 'LATER', '+20 MINUTES', 'ALL OVER THE WORLD'],
+  [MD.fireSt[0], MD.fireSt[1], 'MEANWHILE', 'A FIRE STATION', 'ALARM RINGING FOR 19 MINUTES'],
+  [MD.gov[0], MD.gov[0] + 1.8, '+1 HOUR', 'THE GOVERNMENT', 'EMERGENCY SESSION'],
   [MD.grid[0], MD.grid[0] + 1.7, 'LATER', '+6 HOURS', 'DUSK'],
-  [MD.gridRoom[0], MD.gridRoom[1], 'MEANWHILE', 'GRID CONTROL', 'SUPPLY AND DEMAND: NOBODY MATCHING THEM'],
-  [MD.water[0], MD.water[0] + 1.7, 'LATER', '+2 DAYS', ''],
+  [MD.queue[0], MD.queue[0] + 1.6, 'MEANWHILE', 'A STREET TAP', 'THE LINE SINCE DAWN'],
+  [MD.gridRoom[0], MD.gridRoom[1], 'MEANWHILE', 'GRID CONTROL', 'DISPATCH DESKS · UNSTAFFED'],
+  [MD.water[0], MD.water[0] + 1.7, 'LATER', '+2 DAYS', 'NO POWER, ANYWHERE'],
+  [MD.earth[0], MD.earth[1], 'SEEN FROM SPACE', 'THE NIGHT SIDE', 'CITY LIGHTS, GOING OUT'],
+  [MD.births[0], MD.births[1], 'BIRTHS PER DAY, WORLDWIDE', '≈ 360,000', 'IN ~9 MONTHS: ALMOST NONE'],
   [MD.food[0], MD.food[1], '+2 WEEKS', 'A SUPERMARKET', 'NO DELIVERY FOR 13 DAYS'],
 ];
 
@@ -239,7 +243,7 @@ const FILM = {
     U.uHit.value.set(-2.1, MD_G.pierHit, MD.hit + 0.3, 0.9);
     U.uSplash.value.set(-2.1, -2.0, MD_FALL_B.tWater || 1e4, 26);
     // sewage: from the third day, a brown plume out of the outfall into the basin (and on)
-    const sew = t >= MD.water[0] ? 1 : 0, sr = t < MD.water[0] ? 0 : t < MD.food[0] ? 9 + (t - MD.water[0]) * 4.2 : 220;
+    const sew = t >= MD.water[0] ? (t < MD.food[0] ? 1 : 0.5) : 0, sr = t < MD.water[0] ? 0 : t < MD.food[0] ? 9 + (t - MD.water[0]) * 4.2 : 120;
     U.uSewage.value.set(MD_OUTFALL[0], MD_G.shoreZ - 2 - 0.45 * sr, sr, sew * 0.9);
     // the fuel burning on the water where the plane went in
     const pf = t < MD.planeHit ? 0 : (t < MD.fires[0] ? 1 : t < MD.water[0] ? 0.6 : 0.25) * MathX.smooth(t, MD.planeHit, MD.planeHit + 0.3);
@@ -352,8 +356,11 @@ const FILM = {
     // haze from the smoke (thinner for the long lenses)
     const thin = Math.max(MathX.smooth(t, 23.3, 24.0) * (1 - MathX.smooth(t, 26.75, 26.8)), t >= MD.nuke[0] && t < MD.end[0] ? 0.96 : 0);
     app.scene.fog.density = FILM._fogD * (1 + 0.7 * S.haze) * (1 - 0.7 * thin);
-    E.sun.intensity = 2.7 * (1 - n) * (1 - 0.7 * g);
-    E.hemi.intensity = 1.05 * (1 - 0.8 * n) * (1 + 0.1 * g);
+    // the blackout: the same three steps as the city's windows; the street level goes dark with them
+    const db = t - MD.blackout, bo = t >= MD.grid[0] && t < MD.water[0] && db >= 0 ? (db < 0.55 ? 0.35 : db < 1.1 ? 0.6 : 0.8) : 0;
+    E.sun.intensity = 2.7 * (1 - n) * (1 - 0.7 * g) * (1 - bo);
+    E.hemi.intensity = 1.05 * (1 - 0.8 * n) * (1 + 0.1 * g) * (1 - bo);
+    if (E.shopMats) for (const m of E.shopMats) m.emissiveIntensity = t >= MD.blackout ? 0 : 0.55;   // no power from here on
     W.uSkyH.value.copy(C.wH).lerp(C.fG, g).lerp(C.hN, n);
     W.uSkyZ.value.copy(C.wZ).lerp(C.zG, g).lerp(C.zN, n);
     W.uDeep.value.copy(C.wD).multiplyScalar(1 - 0.75 * n);

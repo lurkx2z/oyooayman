@@ -107,6 +107,11 @@ class MdAudio extends AudioEngine {
     }
     S.clunk(T.stop, 0.3, 0, car); S.clunk(T.stop + 0.18, 0.15, 0, car);
 
+    // 5b. the first seconds outside: every car with a man at the wheel lets go at once — horns, a crash below, more far off
+    S.crunch(MD_CRASH0, 0.75, -0.6, outside, rev); S.farBoom(MD_CRASH0 + 0.05, 0.4, -0.6, outside);
+    for (const [t, f, p] of [[T.vanish + 0.9, 400, -0.7], [T.vanish + 1.2, 470, 0.6], [T.vanish + 1.7, 430, -0.3], [T.vanish + 2.4, 390, 0.7]]) S.horn(t, f, f * 0.92, 0.05, p, outside);
+    for (const [t, p] of [[T.vanish + 2.1, 0.7], [T.vanish + 3.3, -0.8], [T.vanish + 4.6, 0.5]]) { S.crunch(t, 0.22, p, outside, rev); S.farBoom(t, 0.18, p, outside); }
+    for (const [t, f, p] of [[T.vanish + 0.7, 420, -0.4], [T.vanish + 1.5, 380, 0.5], [T.vanish + 2.0, 460, 0.1]]) S.voice(t, f, 0.45, 'a', 0.09, p, car, 1.35);   // screams in the car
     // 6. the road below (through the glass): a horn from a woman who braked, the SUV into the van
     S.horn(T.vanish + 3.4, 420, 380, 0.05, -0.6, outside);
     S.horn(T.road[0] + 1.6, 440, 400, 0.04, -0.6, outside);
@@ -211,6 +216,19 @@ class MdAudio extends AudioEngine {
       for (let t = a + 0.05; t < b - 0.05; t += 0.13) S.tone(t, 0.1, 1050, 0.05, 0, fx, 'square', 0.006, 0.05);
       for (let t = a + 0.4; t < b; t += 0.7) S.tone(t, 0.35, 660, 0.035, 0.1, fx, 'triangle', 0.01, 0.2);
       S.thump(a, 0.12, fx); S.thump(b, 0.12, fx); }
+    // +1 HOUR: the chamber: desk phones ringing that nobody answers, a few voices, the hush of a big room
+    { const [a, b] = T.gov;
+      const n = S.noise('pink', a, b), lp = S.filter('lowpass', 900, 0.5), g = ctx.createGain(); g.gain.value = 0.05; n.connect(lp); lp.connect(g); g.connect(rev); g.connect(fx);
+      for (const [t0, f, p] of [[a + 0.2, 880, -0.5], [a + 0.9, 760, 0.4], [a + 1.6, 940, -0.1]]) for (let t = t0; t < b - 0.3; t += 2.0) { S.tone(t, 0.45, f, 0.025, p, fx, 'square', 0.01, 0.05); S.tone(t + 0.55, 0.45, f, 0.025, p, fx, 'square', 0.01, 0.05); }
+      S.chatter(a + 0.3, b, 0.03, 0.2, fx, 240, 1.4); S.thump(a, 0.14, fx); S.thump(b, 0.12, fx); }
+    // the street tap: the handle squeaking round, a bucket's clank, the line murmuring, a child
+    { const [a, b] = T.queue;
+      for (let t = a + 0.3; t < b; t += 0.36) S.tone(t, 0.12, 1250 + 80 * Math.sin(t * 3), 0.012, 0, fx, 'triangle', 0.01, 0.06);
+      for (const t of [a + 0.8, a + 2.3, a + 3.1]) S.clunk(t, 0.12, 0.3, fx);
+      S.chatter(a + 0.1, b, 0.04, -0.2, fx, 245, 2.4); S.chatter(a + 0.5, b, 0.025, 0.3, fx, 300, 1.6);
+      S.voice(a + 2.6, 360, 0.3, 'a', 0.05, 0.4, fx, 1.2);
+      const w = S.noise('pink', a, b), wl = S.filter('lowpass', 500, 0.4), wg = ctx.createGain(); wg.gain.value = 0.05; w.connect(wl); wl.connect(wg); wg.connect(fx);
+      S.thump(a, 0.12, fx); }
     // +6 HOURS: the city's hum at dusk; in grid control the alarms and the frequency falling; then everything drops
     {
       const a = T.grid[0], bo = T.blackout, o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
@@ -237,7 +255,8 @@ class MdAudio extends AudioEngine {
       const w = S.noise('pink', a + 1.2, T.food[0]), wb = S.filter('bandpass', 1900, 0.8), wg = ctx.createGain(); wg.gain.value = 0.05; w.connect(wb); wb.connect(wg); wg.connect(S.panned(outside, -0.3));
       for (const t of [a + 2.4, a + 2.6, a + 4.1]) S.chirp(t, 1700, 0.02, 0.4, outside, false);
     }
-    // +2 WEEKS: the supermarket: a dying emergency light's buzz, nothing else
+    // +2 WEEKS: the supermarket: a dying emergency light's buzz, a trolley's rattle, a few voices
+    { const [a, b] = T.food; S.chatter(a + 0.2, b, 0.03, 0.1, fx, 250, 1.6); for (let t = a + 0.4; t < b; t += 0.21) S.click(t, 0.025, 0.2, fx); }
     {
       const [a, b] = T.food;
       const o = ctx.createOscillator(), g = ctx.createGain(), bp = S.filter('bandpass', 400, 2); o.type = 'sawtooth'; o.frequency.value = 100;

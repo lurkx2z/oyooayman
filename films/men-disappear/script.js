@@ -11,7 +11,7 @@
    the back; the train runs toward world −z). World: water at y 0, rail head at MD_G.rail, track centred on x 0.
    ===================================================================== */
 
-CONFIG.duration = 72.0;          // story length (the film is cut from it with CONFIG.edit)
+CONFIG.duration = 78.0;          // story length (the film is cut from it with CONFIG.edit)
 CONFIG.seed = 20261009;
 Object.assign(CONFIG.camera, {
   cameraHeight: 1.64, walkSpeed: 1.0, bobStrength: 0.012, bobFrequency: 1.8,
@@ -36,29 +36,32 @@ const MD = {
   wheel: [26.8, 29.4],    // inside the empty wheelhouse
   hit: 31.0,              // the bow hits the pier
   drones: [[26.8, 29.4], [29.4, 32.2], [32.2, 36.2]],
-  fires: [36.2, 42.2],    // +20 MIN: fires nobody puts out
-  fireSt: [39.0, 40.9],   // insert: the fire station (alarm, nobody)
-  grid: [42.2, 50.6],     // +6 HOURS: dusk; the grid
-  gridRoom: [44.4, 46.5], // insert: the grid control room (alarms, empty chairs)
-  blackout: 47.3,         // the city goes dark, district by district
-  water: [50.6, 56.2],    // +2 DAYS: no pumps; sewage in the harbour
-  food: [56.2, 58.6],     // +2 WEEKS: insert: the supermarket
-  nuke: [58.6, 62.8],     // +2 WEEKS: the power station across the harbour
-  nukeBang: 60.7,         // the reactor building's roof blows (hydrogen, as at Fukushima)
-  end: [62.8, 72.0],      // the close: the dark harbour city
-  line: [63.4, 67.9],
-  births: [66.2, 69.6],
-  note: [68.2, 71.4],
-  fin: 72.0,
-  retreat: 24.0,           // the passengers move to the back of the car (off camera after the wheelhouse cut)
+  fires: [36.2, 41.6],    // +20 MIN: fires nobody puts out
+  fireSt: [38.6, 40.3],   // insert: the fire station (alarm, nobody)
+  gov: [41.6, 45.2],      // +1 HOUR: the government: a chamber with almost nobody in it
+  grid: [45.2, 53.0],     // +6 HOURS: dusk; the grid
+  gridRoom: [47.2, 48.9], // insert: the grid control room (alarms, empty chairs)
+  blackout: 49.6,         // the city goes dark in three steps
+  earth: [51.0, 53.0],    // insert: the planet at night, its lights going out
+  water: [53.0, 59.6],    // +2 DAYS: no pumps; sewage in the harbour
+  queue: [55.6, 59.6],    // insert: women queueing at a dry standpipe
+  food: [59.6, 63.4],     // +2 WEEKS: insert: the supermarket, stripped
+  nuke: [63.4, 67.6],     // +2 WEEKS: the power station across the harbour
+  nukeBang: 65.5,         // the reactor building's roof blows (hydrogen, as at Fukushima)
+  end: [67.6, 78.0],      // the close: the dark harbour city
+  line: [68.0, 71.6],
+  births: [71.8, 74.4],
+  note: [74.4, 77.6],
+  fin: 78.0,
+  retreat: 40.0,          // the passengers move to the back of the car (off camera: after the wheelhouse cut)
 };
-MD.montage = [MD.fireSt, MD.gridRoom, MD.food];
+MD.montage = [MD.fireSt, MD.gov, MD.gridRoom, MD.earth, MD.queue, MD.food];
 // the world clock: minutes since the vanish (real time, then the jumps)
-const MD_JUMPS = [[MD.fires[0], 20, '+20 MINUTES'], [MD.grid[0], 6 * 60, '+6 HOURS'], [MD.water[0], 2 * 24 * 60, '+2 DAYS'], [MD.food[0], 14 * 24 * 60, '+2 WEEKS']];
+const MD_JUMPS = [[MD.fires[0], 20, '+20 MINUTES'], [MD.gov[0], 60, '+1 HOUR'], [MD.grid[0], 6 * 60, '+6 HOURS'], [MD.water[0], 2 * 24 * 60, '+2 DAYS'], [MD.food[0], 14 * 24 * 60, '+2 WEEKS']];
 function mdWorldMin(t) {
   let base = Math.max(0, t - MD.vanish) / 60, t0 = MD.vanish;
   for (const [tj, m] of MD_JUMPS) if (t >= tj) { base = m; t0 = tj; }
-  return t < MD_JUMPS[0][0] ? base : base + (t - t0) / 60 * (t >= MD.grid[0] && t < MD.water[0] ? 6 : 1);   // the dusk runs a little faster
+  return t < MD_JUMPS[0][0] ? base : base + (t - t0) / 60 * (t >= MD.grid[0] && t < MD.water[0] ? 600 : t >= MD.gov[0] && t < MD.grid[0] ? 60 : 1);   // the dusk runs a little faster
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -125,8 +128,8 @@ function mdTrainKmh(t) { return Math.round(MD_TRAIN.v(t) * 3.6); }
 
 // the shares on screen (sources: films/men-disappear/PLAN.md § 1). Rounded; see the plan for the exact figures.
 const MD_STAT = {
-  pilots: '≈ 94 %', fire: '94 %', power: '93 %', lines: '97 %', water: '94 %', trucks: '92 %', diesel: '7 DAYS', births: '≈ 360,000',
-  note: 'SHARES: ISWAP · ICS/BIMCO 2021 · US BLS & CENSUS ACS 2024 · NRC · UN WPP 2024.<br>FIGURES ARE ESTIMATES. EVENTS COMPRESSED FOR THIS SIMULATION. NOT A PREDICTION.',
+  pilots: '≈ 94 %', fire: '94 %', power: '93 %', lines: '97 %', water: '94 %', trucks: '92 %', diesel: '7 DAYS', births: '≈ 360,000', leaders: '≈ 85 %',
+  note: 'SHARES: ISWAP · ICS/BIMCO 2021 · US BLS & CENSUS ACS 2024 · UN WOMEN & IPU 2026 · NRC · UN WPP 2024.<br>FIGURES ARE ESTIMATES. EVENTS COMPRESSED FOR THIS SIMULATION. NOT A PREDICTION.',
 };
 
 const SCRIPT = {
@@ -158,7 +161,7 @@ const SCRIPT = {
     yaw: [[0, 0], [CONFIG.duration, 0]],
     pitch: [[0, 0], [CONFIG.duration, 0]],
     fov: [[0, 64], [CONFIG.duration, 64]],
-    startles: [[MD.vanish + 0.15, 0.5], [MD.brake + 0.1, 0.9], [MD.planeHit + 0.9, 0.5]],
+    startles: [[MD.vanish + 0.15, 0.5], [MD.brake + 0.1, 0.9]],
     shakes: [[MD.brake + 0.1, 0.35, 0.35], [MD.stop, 0.25, 0.3], [MD.planeHit + 1.0, 0.4, 0.5]],
   },
 
@@ -179,38 +182,44 @@ const SCRIPT = {
       { t: 6.6, until: 9.2, text: 'The driver let go. The train braked itself.' },
       { t: 9.6, until: 12.1, text: 'Cars have no dead man’s switch.' },
       { t: 12.1, until: 15.5, text: 'Millions of cars. Nobody at the wheel.' },
-      { t: 16.0, until: 18.4, text: 'Planes land by hand.' },
+      { t: 16.0, until: 18.4, text: 'Most landings are flown by hand.' },
       { t: 18.4, until: 21.2, text: 'Nobody is flying this one.' },
       { t: 21.8, until: 24.0, text: 'Nobody is steering that ship.' },
       { t: 27.1, until: 29.3, text: 'Autopilot on. Nobody at the helm.' },
       { t: 29.6, until: 31.0, text: 'It can’t stop.' },
       { t: 33.0, until: 36.1, text: 'The train stopped itself. The ship couldn’t.' },
-      { t: 36.9, until: 38.9, text: 'Fires start everywhere.' },
-      { t: 39.1, until: 40.9, text: 'The alarm rings. Nobody comes.' },
-      { t: 41.0, until: 42.1, text: 'They spread.' },
-      { t: 42.9, until: 44.4, text: 'Someone has to balance the grid, every second.' },
-      { t: 44.6, until: 46.4, text: 'Nobody is.' },
-      { t: 47.6, until: 50.4, text: 'The whole grid goes down.' },
-      { t: 51.0, until: 53.4, text: 'No power, no pumps. The taps run dry.' },
-      { t: 53.4, until: 56.1, text: 'Sewage pours into the harbour.' },
-      { t: 56.4, until: 58.5, text: 'Food comes by truck. The trucks stopped.' },
-      { t: 58.8, until: 60.6, text: 'Reactors shut down, but still need cooling.' },
-      { t: 60.8, until: 62.7, text: 'The backup diesel ran out.' },
+      { t: 36.7, until: 38.5, text: 'Fires start. Nobody fights them.' },
+      { t: 38.7, until: 40.3, text: 'The alarm rings. The crew is gone.' },
+      { t: 40.4, until: 41.5, text: 'In every city at once.' },
+      { t: 42.0, until: 43.6, text: 'Most countries just lost their leaders.' },
+      { t: 43.6, until: 45.1, text: 'Nobody is giving orders.' },
+      { t: 45.9, until: 47.1, text: 'The grid balances itself. For a while.' },
+      { t: 47.3, until: 48.9, text: 'Then plants trip. Nobody resets them.' },
+      { t: 49.8, until: 50.9, text: 'The city goes dark.' },
+      { t: 51.1, until: 52.9, text: 'Then the rest of the world.' },
+      { t: 53.6, until: 55.5, text: 'No power, no pumps. Taps run dry.' },
+      { t: 55.7, until: 57.6, text: 'No signal. No news. Nobody in charge.' },
+      { t: 57.7, until: 59.5, text: 'Nobody knows what to do next.' },
+      { t: 59.9, until: 61.6, text: 'Food comes by truck. Most trucks stopped.' },
+      { t: 61.7, until: 63.3, text: 'The shelves are stripped in days.' },
+      { t: 63.6, until: 65.4, text: 'Reactors shut down, but still need cooling.' },
+      { t: 65.6, until: 67.5, text: 'Days later, the diesel ran out.' },
+      { t: 72.2, until: 74.3, text: 'Sperm banks could cover only a tiny fraction.' },
     ],
     readouts: [
-      { from: 0.0, until: 4.3, top: 236, label: 'WORLD POPULATION', value: mdPop, sub: (t) => (t < MD.vanish ? '' : '2.92 BILLION MEN (18+) · GONE') },
+      { from: 0.0, until: 4.3, top: 236, label: 'WORLD POPULATION', value: mdPop, sub: (t) => (t < MD.vanish ? '' : '≈ 2.9 BILLION MEN (18+) · GONE') },
       { from: 4.7, until: 9.2, top: 236, label: 'TRAIN · DRIVER GONE', value: mdTrainKmh, unit: 'km/h', sub: 'DEAD MAN’S SWITCH → EMERGENCY BRAKE' },
       { from: 13.1, until: 15.5, top: 236, label: 'SILVER SUV · NOBODY INSIDE', value: (t) => String(Math.round(mdCarKmh('cruise', t))), unit: 'km/h', sub: 'CRUISE CONTROL · NO AUTO-BRAKE' },
-      { from: 16.0, until: 21.2, top: 236, label: 'AIRLINE PILOTS', value: MD_STAT.pilots, sub: 'ARE MEN' },
-      { from: 21.6, until: 26.6, top: 236, label: 'MERCHANT SEAFARERS', value: '98.7 %', sub: 'ARE MEN', ctx: 'THIS SHIP · 6.2 KNOTS · CREW 0' },
-      { from: 36.6, until: 42.1, top: 236, label: 'FIREFIGHTERS (US)', value: MD_STAT.fire, sub: 'ARE MEN' },
-      { from: 42.6, until: 50.4, top: 236, label: 'POWER PLANT OPERATORS (US)', value: MD_STAT.power, sub: 'ARE MEN', ctx: (t) => (t < MD.blackout ? 'LINE WORKERS ' + MD_STAT.lines + ' MEN' : 'CITY POWER · OFF') },
-      { from: 50.8, until: 56.1, top: 236, label: 'WATER PLANT OPERATORS (US)', value: MD_STAT.water, sub: 'ARE MEN' },
-      { from: 56.4, until: 58.5, top: 236, label: 'TRUCK DRIVERS (US)', value: MD_STAT.trucks, sub: 'ARE MEN' },
-      { from: 58.8, until: 62.7, top: 236, label: 'BACKUP DIESEL', value: MD_STAT.diesel, sub: 'OF FUEL ON SITE', ctx: (t) => (t < MD.nukeBang ? 'REACTOR COOLING · ON DIESEL' : 'COOLING · LOST') },
-      { from: MD.births[0], until: MD.births[1], top: 236, label: 'BIRTHS PER DAY (WORLD)', value: MD_STAT.births, sub: 'NINE MONTHS FROM NOW: ALMOST NONE' },
+      { from: 16.0, until: 21.2, top: 236, label: 'AIRLINE PILOTS (WORLD)', value: MD_STAT.pilots, sub: 'ARE MEN' },
+      { from: 21.6, until: 26.6, top: 236, label: 'MERCHANT SEAFARERS (WORLD)', value: '98.7 %', sub: 'ARE MEN', ctx: 'THIS SHIP · 6.2 KNOTS · CREW 0' },
+      { from: 36.6, until: 41.5, top: 236, label: 'FIREFIGHTERS (US)', value: MD_STAT.fire, sub: 'ARE MEN' },
+      { from: 41.9, until: 45.1, top: 236, label: 'COUNTRIES LED ONLY BY MEN', value: MD_STAT.leaders, sub: 'OF THE WORLD’S COUNTRIES', ctx: 'PARLIAMENTS 72 % MEN · CABINETS 78 % MEN' },
+      { from: 45.6, until: 52.9, top: 236, label: 'POWER PLANT OPERATORS (US)', value: MD_STAT.power, sub: 'ARE MEN', ctx: (t) => (t < MD.blackout ? 'LINE WORKERS ' + MD_STAT.lines + ' MEN' : 'POWER · OFF') },
+      { from: 53.4, until: 55.5, top: 236, label: 'WATER PLANT OPERATORS (US)', value: MD_STAT.water, sub: 'ARE MEN' },
+      { from: 59.8, until: 63.3, top: 236, label: 'TRUCK DRIVERS (US)', value: MD_STAT.trucks, sub: 'ARE MEN' },
+      { from: 63.6, until: 67.5, top: 236, label: 'BACKUP DIESEL', value: MD_STAT.diesel, sub: 'OF FUEL ON SITE (US RULE)', ctx: (t) => (t < MD.nukeBang ? 'REACTOR COOLING · ON DIESEL' : 'COOLING · LOST') },
     ],
-    endLine: { t: MD.line[0], until: MD.line[1], text: 'Half the world vanished in a second.<br><span class="l2">Everything they kept running stopped with them.</span>' },
+    endLine: { t: MD.line[0], until: MD.line[1], text: 'A third of humanity vanished in a second.<br><span class="l2">The systems they ran failed, one by one.</span>' },
     notes: [{ t: MD.note[0], until: MD.note[1], text: MD_STAT.note }],
   },
 };

@@ -42,7 +42,7 @@ function mdSky(t) {
     return S;
   }
   if (t < MD.food[0]) { S.night = 0.12; S.haze = 0.2; S.grey = 0.75; S.glow = 0.1; return S; }
-  if (t < MD.end[0]) { S.night = 0.42; S.haze = 0.3; S.grey = 0.95; S.glow = 0.15; return S; }
+  if (t < MD.end[0]) { S.night = 0.78; S.haze = 0.3; S.grey = 0.6; S.glow = 0.15; return S; }
   S.night = 0.93; S.haze = 0.6; S.grey = 0.4; S.glow = 1.0;
   return S;
 }
@@ -217,7 +217,7 @@ class MdCascade {
     // --- the city's windows: on at dusk; the blackout sweeps across from MD.blackout
     const U = this.cityU;
     U.uOn.value = MathX.smooth(sky.night, 0.35, 0.7) * (t >= MD.grid[0] && t < MD.water[0] ? 1 : 0);
-    U.uCut.value = t < MD.blackout ? -1 : (t - MD.blackout) / 2.4;
+    const db = t - MD.blackout; U.uCut.value = db < 0 ? -1 : db < 0.55 ? 0.42 : db < 1.1 ? 0.72 : 1.6;   // three hard steps
     U.uTime.value = Math.floor(t * 12) / 12;
     U.fogColor.value.copy(this.app.scene.fog.color); U.fogDensity.value = this.app.scene.fog.density;
     this.city.visible = U.uOn.value > 0.01;
@@ -269,6 +269,17 @@ class MdCascade {
         G.push(x, y, z, 14 + 26 * h2 + u * 6, h1 * 6, 0.9 * Math.exp(-u / 0.55) * Math.min(1, u / 0.05), 1, 1.0, 0.55 + 0.3 * h3, 0.2);
         S.push(x + u * 3, y + u * 5, z, 16 + u * 14, h2 * 6, 0.55 * Math.min(1, u / 0.4) * Math.exp(-u / 4), 0.22, 0.25, 0.23, 0.22);
       }
+      // a tall white spray column, then a dark smoke stalk from the burning fuel
+      for (let i = 0; i < 40; i++) {
+        const h1 = hash1(i * 1.9 + 31), h2 = hash1(i * 4.3 + 32), k = i / 40, rise = (1 - Math.exp(-dp / 0.5)) * (15 + 70 * k);
+        const fall = Math.max(0, dp - 1.2) * Math.max(0, dp - 1.2) * 4.9 * 0.6;
+        const y = Math.max(1, rise - fall), al = 0.8 * Math.min(1, dp / 0.06) * Math.exp(-Math.max(0, dp - 1.5) / 1.2);
+        S.push(hx + (h1 - 0.5) * (8 + 14 * k), y, hz + (h2 - 0.5) * 8, 10 + 12 * k + dp * 4, h1 * 6, al, 1.0, 0.96, 0.97, 0.98);
+      }
+      for (let i = 0; i < 30; i++) {
+        const h1 = hash1(i * 6.1 + 41), ph = (dp * 0.12 + i / 30) % 1, up = 4 + ph * 90 * Math.min(1, dp / 2);
+        S.push(hx - 10 + ph * 30 + (h1 - 0.5) * 8, up, hz + (h1 - 0.5) * 10, 10 + 22 * ph, h1 * 6, 0.75 * Math.min(1, (dp - 0.4) / 0.8) * (1 - ph) * (dp > 0.4 ? 1 : 0), 0.12, 0.25, 0.23, 0.22);
+      }
       for (let i = 0; i < 60; i++) {
         const h1 = hash1(i * 7.7 + 5), h2 = hash1(i * 2.3 + 6), u = Math.min(dp, 2.8), vy = 14 + 26 * h2, vx = -20 - 30 * h1;
         const y = Math.max(0.5, vy * u - 4.9 * u * u), x = hx + 40 * h1 - 20 + vx * 0.15 * u, z = hz + (h2 - 0.5) * 50;
@@ -284,11 +295,11 @@ class MdCascade {
         const h1 = hash1(i * 3.3 + 70), ph = (t * 0.9 + i / 46) % 1, u = ph * 1.1, v = 4.5 + 1.5 * h1;
         const y = 0.9 - 4.9 * u * u * 0.6, z = oz - v * u, x = ox + (h1 - 0.5) * 1.6;
         if (y < -0.2) continue;
-        S.push(x, Math.max(0.9, y), z, 1.2 + 1.2 * ph, h1 * 6, 0.85 * (1 - ph * 0.5), 0.55, 0.42, 0.33, 0.2);
+        S.push(x, Math.max(0.9, y), z, 0.9 + 0.9 * ph, h1 * 6, 0.85 * (1 - ph * 0.5), 0.3, 0.42, 0.33, 0.2);
       }
       for (let i = 0; i < 26; i++) {   // foam where it lands
         const h1 = hash1(i * 5.1 + 90), h2 = hash1(i * 7.9 + 91), ph = (t * 0.25 + h1) % 1;
-        S.push(ox + (h2 - 0.5) * 6 + ph * 2, 1.0, oz - 4 - h1 * 8 - ph * 6, 1.6 + 2 * ph, h2 * 6, 0.45 * (1 - ph), 0.6, 0.5, 0.42, 0.28);
+        S.push(ox + (h2 - 0.5) * 6 + ph * 2, 1.0, oz - 4 - h1 * 8 - ph * 6, 1.2 + 1.5 * ph, h2 * 6, 0.4 * (1 - ph), 0.35, 0.5, 0.42, 0.28);
       }
     }
     G.end(); S.end();
@@ -334,7 +345,7 @@ class MdCascade {
       for (let i = 0; i < 40; i++) {
         const h1 = hash1(i * 2.9 + 21), h2 = hash1(i * 3.7 + 22), u = Math.min(d, 4), a = h1 * 6.283, vh = 25 + 45 * h2, vy = 30 + 50 * hash1(i + 40);
         const y = V.y + vy * u - 4.9 * u * u; if (y < MD_G.quay) continue;
-        S.push(V.x + Math.cos(a) * vh * u, y, V.z + Math.sin(a) * vh * u * 0.7, 3 + 3 * h2, h1, 0.9, 0.15, 0.3, 0.3, 0.3);
+        G.push(V.x + Math.cos(a) * vh * u, y, V.z + Math.sin(a) * vh * u * 0.7, 2 + 2.5 * h2, h1, 0.9 * Math.exp(-u / 1.6), 1, 1.0, 0.55, 0.2);   // burning debris
       }
     }
   }
