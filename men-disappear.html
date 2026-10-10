@@ -32,6 +32,9 @@
       letter-spacing: 0.08em; color: #fff; background: rgba(200, 40, 30, 0.82); padding: calc(var(--u) * 8) calc(var(--u) * 16); border-radius: calc(var(--u) * 10); }
     #hud .md-tag::after { content: ''; position: absolute; left: 50%; top: 100%; width: calc(var(--u) * 3); height: calc(var(--u) * 26); background: rgba(255, 255, 255, 0.85); transform: translateX(-50%); }
     /* the montage label */
+    #hud .md-clock { position: absolute; right: calc(var(--u) * 54); top: calc(var(--u) * 150); text-align: right; font-family: var(--hud-font); color: #fff; text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(0, 0, 0, 0.7); transition: none; }
+    #hud .md-clock .cl { display: block; font-size: calc(var(--u) * 24); letter-spacing: 0.3em; opacity: 0.8; }
+    #hud .md-clock .cv { display: block; font-size: calc(var(--u) * 52); letter-spacing: 0.06em; margin-top: calc(var(--u) * 4); }
     #hud .md-chyron { position: absolute; left: 50%; top: calc(var(--u) * 470); transform: translateX(-50%); text-align: center; width: calc(var(--u) * 900);
       background: rgba(6, 7, 10, 0.42); padding: calc(var(--u) * 18) 0; border-radius: calc(var(--u) * 22); color: #fff; }
     #hud .md-chyron .mw { display: block; font-family: var(--hud-font); font-size: calc(var(--u) * 28); letter-spacing: 0.4em; opacity: 0.85; }
@@ -97,6 +100,7 @@
   <script src="js/world/people.js"></script>
   <script src="js/world/vehicles.js"></script>
   <script src="js/world/environment.js"></script>
+  <script src="js/world/aircraft.js"></script>
   <script src="js/audio/audioEngine.js"></script>
   <script src="js/ui/storyHud.js"></script>
   <script src="js/ui/devControls.js"></script>
@@ -110,6 +114,7 @@
   <script src="films/men-disappear/cast.js"></script>
   <script src="films/men-disappear/road.js"></script>
   <script src="films/men-disappear/montage.js"></script>
+  <script src="films/men-disappear/cascade.js"></script>
   <script src="films/men-disappear/audio.js"></script>
   <script src="films/men-disappear/film.js"></script>
   <script src="films/men-disappear/soundtrack.js"></script>

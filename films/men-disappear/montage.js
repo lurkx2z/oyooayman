@@ -171,7 +171,7 @@ class MdFireStation {
     S.add(new THREE.HemisphereLight('#c8ccd0', '#4a4640', 0.8));
   }
   update(t) {
-    const u = t - MD.fire, on = Math.floor(u * 3) % 2 === 0;
+    const u = t - MD.fireSt[0], on = Math.floor(u * 3) % 2 === 0;
     this.beacon.material.color.setRGB(on ? 2.4 : 0.35, on ? 0.35 : 0.05, 0.03);
     this.signM.color.setScalar(on ? 1.8 : 0.7);
     this.alarmL.intensity = on ? 6 : 0.8;
@@ -258,11 +258,145 @@ class MdWard {
   }
 }
 
+/* ---------------- 4. the grid control room (v3) ---------------- */
+// A regional control room at dusk: the video wall's map, frequency falling from 50.00 Hz as generation and demand
+// drift apart with nobody dispatching; alarms; the desks and chairs empty.
+class MdGridRoom {
+  constructor() {
+    const S = this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(58, 9 / 16, 0.05, 200);
+    S.background = new THREE.Color('#06080b');
+    S.fog = new THREE.FogExp2(new THREE.Color('#06080b'), 0.02);
+    const m = { floor: mdStd('#2a2d31', { roughness: 0.8 }), wall: mdStd('#3a3f46', { roughness: 0.9 }), desk: mdStd('#4a4f56', { roughness: 0.5 }), top: mdStd('#2f3338', { roughness: 0.4 }),
+      chair: mdStd('#1c1e22', { roughness: 0.7 }), metal: mdStd('#8a9096', { roughness: 0.35, metalness: 0.8 }) };
+    mdBox(S, 30, 0.1, 30, 0, -0.05, 0, m.floor);
+    mdBox(S, 30, 7, 0.3, 0, 3.5, -10, m.wall); mdBox(S, 0.3, 7, 30, -11, 3.5, 0, m.wall); mdBox(S, 0.3, 7, 30, 11, 3.5, 0, m.wall); mdBox(S, 30, 0.3, 30, 0, 7, 0, m.wall);
+    // the video wall
+    this.cv = document.createElement('canvas'); this.cv.width = 1024; this.cv.height = 400; this.ctx = this.cv.getContext('2d');
+    this.tex = new THREE.CanvasTexture(this.cv); this.tex.colorSpace = THREE.SRGBColorSpace;
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(16, 6.25), new THREE.MeshBasicMaterial({ map: this.tex, color: new THREE.Color(1.25, 1.25, 1.25), name: 'videowall' }));
+    wall.position.set(0, 3.6, -9.8); S.add(wall);
+    // the map: substations and lines (seeded)
+    const r = new RNG(9911); this.nodes = []; this.lines = [];
+    for (let i = 0; i < 26; i++) this.nodes.push([60 + r.next() * 640, 70 + r.next() * 290]);
+    for (let i = 0; i < 26; i++) for (let j = i + 1; j < 26; j++) { const a = this.nodes[i], b = this.nodes[j]; if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 150 && r.next() < 0.7) this.lines.push([i, j, r.next()]); }
+    // three rows of desks with monitors, the chairs pushed back
+    this.screens = [];
+    for (let row = 0; row < 3; row++) for (let i = 0; i < 4; i++) {
+      const x = -6 + i * 4, z = -4 + row * 3.4;
+      mdBox(S, 3.4, 0.08, 1.1, x, 0.76, z, m.top); mdBox(S, 3.3, 0.7, 0.08, x, 0.38, z + 0.5, m.desk);
+      for (let k = -1; k <= 1; k++) {
+        const sm = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.25, 0.4, 0.55), name: 'monitor' });
+        mdBox(S, 0.95, 0.55, 0.05, x + k * 1.05, 1.18, z - 0.3, sm, -0.08); this.screens.push(sm);
+      }
+      const ch = new THREE.Group(); ch.position.set(x + (hash1(i + row * 4) - 0.5) * 1.2, 0, z + 1.0 + hash1(i * 3 + row) * 0.6); ch.rotation.y = (hash1(i * 7 + row) - 0.5) * 1.6; S.add(ch);
+      mdBox(ch, 0.55, 0.1, 0.55, 0, 0.5, 0, m.chair); mdBox(ch, 0.55, 0.6, 0.08, 0, 0.85, 0.26, m.chair, 0.1); mdCyl(ch, 0.03, 0.03, 0.45, 0, 0.25, 0, m.metal);
+    }
+    mdCyl(S, 0.045, 0.04, 0.1, 2.3, 0.85, -0.7, mdStd('#e0dcd2'));   // a mug, left on a desk
+    // the alarm beacons on the side walls, the room lights low
+    this.beacons = [-10.7, 10.7].map((x) => { const b = mdCyl(S, 0.15, 0.15, 0.25, x, 5.8, -6, new THREE.MeshBasicMaterial({ color: '#ff8a10' })); b.rotation.z = Math.PI / 2; return b; });
+    this.alarmL = new THREE.PointLight('#ff3a10', 0, 18, 1.5); this.alarmL.position.set(0, 5.5, -6); S.add(this.alarmL);
+    this.wallL = new THREE.PointLight('#7aa8ff', 9, 16, 1.5); this.wallL.position.set(0, 3.5, -7); S.add(this.wallL);
+    S.add(new THREE.HemisphereLight('#4a5260', '#101214', 0.5));
+  }
+  _draw(u) {
+    const c = this.ctx, W = 1024, H = 400;
+    c.fillStyle = '#081420'; c.fillRect(0, 0, W, H);
+    // lines trip one after another (red), then the whole map goes red
+    const trip = MathX.clamp(u / 1.8, 0, 1);
+    for (const [i, j, k] of this.lines) {
+      const a = this.nodes[i], b = this.nodes[j], red = k < trip * 1.1;
+      c.strokeStyle = red ? (Math.floor(u * 6 + k * 10) % 2 ? '#ff3020' : '#7a1810') : '#3ad08a'; c.lineWidth = red ? 4 : 3;
+      c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
+    }
+    for (const [x, y] of this.nodes) { c.fillStyle = '#d8e8f0'; c.fillRect(x - 5, y - 5, 10, 10); }
+    // frequency and balance
+    const f = 50.0 - 1.45 * Math.pow(trip, 1.6);
+    c.fillStyle = '#0d1c2a'; c.fillRect(740, 30, 260, 340);
+    c.font = 'bold 26px sans-serif'; c.fillStyle = '#9ab8cc'; c.fillText('FREQUENCY', 760, 70);
+    c.font = 'bold 64px sans-serif'; c.fillStyle = f < 49.8 ? (Math.floor(u * 4) % 2 ? '#ff3a28' : '#ffb0a0') : '#5af0a0'; c.fillText(f.toFixed(2), 760, 140);
+    c.font = 'bold 26px sans-serif'; c.fillText('Hz', 940, 140);
+    c.fillStyle = '#9ab8cc'; c.fillText('GENERATION', 760, 200); c.fillText('DEMAND', 760, 280);
+    c.fillStyle = '#3ad08a'; c.fillRect(760, 212, 200 * (0.92 - 0.5 * trip), 26);
+    c.fillStyle = '#e0b040'; c.fillRect(760, 292, 200 * 0.86, 26);
+    c.fillStyle = trip > 0.4 ? '#ff3a28' : '#9ab8cc'; c.font = 'bold 22px sans-serif'; c.fillText(trip > 0.4 ? 'LOAD SHEDDING · FAILED' : 'DISPATCH · NO RESPONSE', 760, 350);
+    this.tex.needsUpdate = true;
+  }
+  update(t) {
+    const u = t - MD.gridRoom[0], on = Math.floor(u * 2.5) % 2 === 0;
+    const q = Math.floor(u * 15) / 15;                 // redraw at 15 fps
+    if (this._q !== q) { this._draw(q); this._q = q; }
+    for (const b of this.beacons) b.material.color.setRGB(on ? 2.4 : 0.4, on ? 1.0 : 0.15, 0.05);
+    this.alarmL.intensity = on ? 5 : 0.6;
+    this.screens.forEach((sm, i) => { const red = hash1(i * 3.3) < MathX.clamp(u / 1.6, 0, 1); sm.color.setRGB(red ? (on ? 1.6 : 0.5) : 0.25, red ? 0.15 : 0.4, red ? 0.1 : 0.55); });
+    const k = Ease.inOutSine(MathX.clamp(u / 2.1, 0, 1));
+    this.camera.position.set(-2.2 + 0.8 * k, 1.75, 6.5 - 1.6 * k);
+    this.camera.lookAt(-0.4, 2.4, -9.8);
+    this.camera.fov = 58; this.camera.updateProjectionMatrix();
+  }
+}
+
+/* ---------------- 5. the supermarket, two weeks on (v3) ---------------- */
+// An aisle with the shelves stripped, the power off: grey daylight from the front windows, one emergency light,
+// a few things nobody wanted, a trolley left in the aisle.
+class MdMarket {
+  constructor() {
+    const S = this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(60, 9 / 16, 0.05, 200);
+    S.background = new THREE.Color('#1a1b1c');
+    S.fog = new THREE.FogExp2(new THREE.Color('#2a2b2c'), 0.035);
+    const m = { floor: new THREE.MeshStandardMaterial({ map: Tex.concrete(77, [168, 164, 156]), roughness: 0.3, name: 'shop floor' }), shelf: mdStd('#c8ccd0', { roughness: 0.5, metalness: 0.3 }),
+      back: mdStd('#e2e0da', { roughness: 0.8 }), ceil: mdStd('#6a6c6e', { roughness: 0.9 }), tag: mdStd('#f2d840', { roughness: 0.6 }), wire: mdStd('#8a9096', { roughness: 0.3, metalness: 0.9 }) };
+    mdBox(S, 12, 0.1, 40, 0, -0.05, 0, m.floor);
+    mdBox(S, 12, 0.2, 40, 0, 4.2, 0, m.ceil);
+    // two shelf runs either side of the aisle
+    const r = new RNG(5151), cols = ['#c83a2a', '#e8d8a0', '#2a6ab0', '#f0a030', '#3a8a4a', '#d8d4cc', '#7a2a6a'];
+    for (const side of [-1, 1]) {
+      const x = side * 1.55;
+      mdBox(S, 0.9, 2.1, 32, x + side * 0.45, 1.05, -2, m.back);
+      for (let lv = 0; lv < 5; lv++) {
+        const y = 0.18 + lv * 0.44;
+        mdBox(S, 0.7, 0.03, 32, x + side * 0.05, y, -2, m.shelf);
+        mdBox(S, 0.02, 0.05, 32, x - side * 0.3, y + 0.02, -2, m.tag);
+        // what's left: a few packs, mostly at the back of the shelf
+        for (let i = 0; i < 70; i++) {
+          if (r.next() > 0.08) continue;
+          const z = -17.5 + i * 0.45, w = r.range(0.15, 0.3), h = r.range(0.12, 0.32);
+          mdBox(S, w, h, r.range(0.12, 0.25), x + side * r.range(0.05, 0.25), y + h / 2 + 0.02, z, mdStd(r.pick(cols), { roughness: 0.6 }), 0, r.range(-0.4, 0.4));
+        }
+      }
+    }
+    // a box on the floor, a trolley left in the aisle
+    mdBox(S, 0.45, 0.3, 0.35, 0.5, 0.15, -3.5, mdStd('#b89a6a'), 0, 0.5);
+    const tr = new THREE.Group(); tr.position.set(-0.35, 0, -6.5); tr.rotation.y = 0.35; S.add(tr);
+    for (const [w, h, d, x, y, z] of [[0.55, 0.02, 0.9, 0, 0.3, 0], [0.55, 0.5, 0.02, 0, 0.6, -0.45], [0.55, 0.5, 0.02, 0, 0.6, 0.45], [0.02, 0.5, 0.9, -0.27, 0.6, 0], [0.02, 0.5, 0.9, 0.27, 0.6, 0], [0.6, 0.03, 0.03, 0, 1.0, 0.55]]) mdBox(tr, w, h, d, x, y, z, m.wire);
+    // the hanging aisle sign
+    const sign = Tex.label([['BREAD · MILK · EGGS', 40]], { w: 512, h: 96, bg: '#1e4a8a', fg: '#ffffff', font: 40 });
+    const sg = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.45), new THREE.MeshStandardMaterial({ map: sign, roughness: 0.7 })); sg.position.set(0, 3.4, -9); S.add(sg);
+    // the light: grey day through the front windows (behind the camera), one emergency light down the aisle
+    const day = new THREE.DirectionalLight('#c8ccd0', 1.2); day.position.set(2, 3, 10); S.add(day);
+    S.add(new THREE.HemisphereLight('#9aa0a6', '#3a3836', 0.7));
+    this.em = new THREE.PointLight('#fff2d8', 4, 12, 1.6); this.em.position.set(0, 3.8, -12); S.add(this.em);
+    mdBox(S, 0.5, 0.12, 0.2, 0, 4.05, -12, new THREE.MeshBasicMaterial({ color: '#fff4e0' }));
+    for (let i = 0; i < 6; i++) mdBox(S, 0.2, 0.05, 2.0, 0, 4.08, 6 - i * 5, mdStd('#9a9c9e', { roughness: 0.5 }));   // the strip lights, off
+  }
+  update(t) {
+    const u = t - MD.food[0];
+    this.em.intensity = 4 * (0.75 + 0.25 * (Math.floor(u * 9) % 7 === 0 ? 0.2 : 1));
+    const k = Ease.inOutSine(MathX.clamp(u / 2.4, 0, 1));
+    this.camera.position.set(0.15, 1.55, 3.5 - 2.0 * k);
+    this.camera.lookAt(-0.2, 1.1, -12);
+    this.camera.fov = 60; this.camera.updateProjectionMatrix();
+  }
+}
+
 class MdMontage {
-  constructor() { this.cockpit = new MdCockpit(); this.fire = new MdFireStation(); this.ward = new MdWard(); }
+  constructor() { this.fire = new MdFireStation(); this.grid = new MdGridRoom(); this.market = new MdMarket(); }
   shotAt(t) {
-    if (t < MD.montage[0] || t >= MD.montage[1]) return null;
-    return t < MD.fire ? this.cockpit : t < MD.ward ? this.fire : this.ward;
+    if (t >= MD.fireSt[0] && t < MD.fireSt[1]) return this.fire;
+    if (t >= MD.gridRoom[0] && t < MD.gridRoom[1]) return this.grid;
+    if (t >= MD.food[0] && t < MD.food[1]) return this.market;
+    return null;
   }
   update(t) { const s = this.shotAt(t); if (s) s.update(t); return s; }
 }

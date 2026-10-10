@@ -20,7 +20,7 @@ class MdAudio extends AudioEngine {
     S.tone = (t, dur, f, vol, pan, dest, type = 'sine', attack = 0.01, release = null) => tone(t, dur, f, vol, pan, dest, type, Math.max(attack, 0.006), release);
 
     // mix chain: buses → compressor → out → limiter
-    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12; const post = ctx.createGain(); post.gain.value = 0.8; post.connect(ctx.destination); lim.connect(post);   // trim to ≈ −16.7 LUFS, peaks under −1.5 dB
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -2.5; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.12; const post = ctx.createGain(); post.gain.value = 0.74; post.connect(ctx.destination); lim.connect(post);   // trim to ≈ −16.7 LUFS, peaks under −1.5 dB
     const out = ctx.createGain(); out.gain.value = 1.0; out.connect(lim);
     const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.knee.value = 8; comp.ratio.value = 4; comp.connect(out);
     const mix = ctx.createGain(); mix.gain.value = 2.2; mix.connect(comp);
@@ -32,13 +32,11 @@ class MdAudio extends AudioEngine {
     // outside, heard through the glass while you are in the car (opens up for the outside angles and the montage gap)
     const outLP = S.filter('lowpass', 1400, 0.6); outLP.connect(mix);
     const outside = bus(1.0, outLP);
-    for (const [a, b] of T.drones) {
-      outLP.frequency.setValueAtTime(1400, a - 0.01); outLP.frequency.linearRampToValueAtTime(9000, a + 0.02);
-      outLP.frequency.setValueAtTime(9000, b - 0.01); outLP.frequency.linearRampToValueAtTime(1400, b + 0.02);
-    }
-    // the montage takes you somewhere else: the train and the harbour drop away for those seconds
-    const world = [car, outside];
-    for (const g of world) { g.gain.setValueAtTime(g.gain.value, T.montage[0] - 0.04); g.gain.linearRampToValueAtTime(0.0001, T.montage[0]); g.gain.setValueAtTime(0.0001, T.montage[1] - 0.02); g.gain.linearRampToValueAtTime(g === car ? 0.9 : 1.0, T.montage[1] + 0.02); }
+    // from the wheelhouse on, every shot is outside the car: the glass opens and the car's own sounds go
+    outLP.frequency.setValueAtTime(1400, T.wheel[0] - 0.01); outLP.frequency.linearRampToValueAtTime(9000, T.wheel[0] + 0.02);
+    car.gain.setValueAtTime(0.9, T.wheel[0] - 0.03); car.gain.linearRampToValueAtTime(0.0001, T.wheel[0]);
+    // each insert (fire station, grid control, supermarket) takes you somewhere else: the harbour drops away
+    for (const [a, b] of T.montage) { outside.gain.setValueAtTime(1.0, a - 0.04); outside.gain.linearRampToValueAtTime(0.0001, a); outside.gain.setValueAtTime(0.0001, b - 0.02); outside.gain.linearRampToValueAtTime(1.0, b + 0.02); }
 
     // 1. the train: a rumble that follows its speed; the rail joints every 18 m (two bogies, two axles each)
     {
@@ -73,8 +71,8 @@ class MdAudio extends AudioEngine {
       S.voice(t, f, 0.24, 'a', v, p, car, 1.25); S.voice(t + 0.28, f * 1.1, 0.18, 'o', v * 0.8, p, car, 1.1);
     }
     S.voice(T.vanish + 1.1, 380, 0.35, 'a', 0.07, 0.4, car, 1.3);                       // the boy
-    S.chatter(T.brake + 1.8, T.montage[0], 0.035, 0.0, car, 250, 2.4);
-    S.chatter(T.back, T.hit - 2, 0.03, 0.1, car, 255, 2.0);
+    S.chatter(T.brake + 1.8, T.wheel[0], 0.035, 0.0, car, 250, 2.4);
+    for (const [t, f, p] of [[T.planeHit + 0.5, 300, 0.3], [T.planeHit + 0.8, 270, -0.2], [T.planeHit + 1.3, 340, 0.1]]) S.voice(t, f, 0.3, 'o', 0.08, p, car, 1.3);   // the car sees the plane go in
 
     // 3. the vanish itself: no bang, just the air going still — a soft low drop and a held high tone
     S.thump(T.vanish, 0.18, fx);
@@ -86,7 +84,7 @@ class MdAudio extends AudioEngine {
       const n = S.noise('white', t, t + d + 0.1), bp = S.filter('bandpass', 2600, 0.7), g = ctx.createGain(); S.env(g, t, 0.04, 0.05, d); n.connect(bp); bp.connect(g); g.connect(S.panned(car, -0.3));
     }
     S.click(T.vanish + 0.5, 0.1, -0.4, car);
-    for (let t = T.vanish + 1.6; t < T.cab; t += 2.4) {
+    for (let t = T.vanish + 1.6; t < T.wheel[0]; t += 2.4) {
       const near = t < T.road[0] ? 1 : 0.55;
       for (let k = 0; k < 8; k++) S.tone(t + k * 0.075, 0.06, k % 2 ? 1320 : 1760, 0.016 * near, -0.25, car, 'square', 0.006, 0.03);
     }
@@ -134,31 +132,32 @@ class MdAudio extends AudioEngine {
     { const n = S.noise('pink', 0, END), lp = S.filter('lowpass', 900, 0.4), g = ctx.createGain(); g.gain.value = 0.03; n.connect(lp); lp.connect(g); g.connect(outside); }
     for (const t of [18.2, 19.0, 39.5, 61.0]) S.chirp(t, 1700, 0.02, 0.5, outside, false);
 
-    // 8. the montage
-    // cockpit: the engines' steady roar, an autopilot chime
-    { const a = T.cockpit, b = T.fire, n = S.noise('brown', a, b), lp = S.filter('lowpass', 420, 0.5), g = ctx.createGain(); S.env(g, a, 0.03, 0.35, b - a); g.gain.setValueAtTime(0.35, b - 0.08); g.gain.linearRampToValueAtTime(0, b); n.connect(lp); lp.connect(g); g.connect(fx);
-      S.tone(a + 0.6, 0.6, 880, 0.04, 0.2, fx, 'sine', 0.01, 0.5); S.tone(a + 0.75, 0.7, 1175, 0.035, 0.2, fx, 'sine', 0.01, 0.6); }
-    // fire station: the turnout alarm, ringing in an empty bay
-    { const a = T.fire, b = T.ward;
-      for (let t = a + 0.05; t < b - 0.05; t += 0.13) S.tone(t, 0.1, 1050, 0.05, 0, fx, 'square', 0.006, 0.05);
-      for (let t = a + 0.6; t < b; t += 1.0) S.tone(t, 0.35, 660, 0.03, 0.1, fx, 'triangle', 0.01, 0.2);
-      const n = S.noise('pink', a, b), lp = S.filter('lowpass', 1500, 0.5), g = ctx.createGain(); g.gain.value = 0.05; n.connect(lp); lp.connect(g); g.connect(fx); }
-    // ward: monitors beeping steadily, the soft hush of the room
-    { const a = T.ward, b = T.montage[1];
-      for (let t = a + 0.2; t < b; t += 0.85) S.tone(t, 0.08, 980, 0.04, -0.2, fx, 'sine', 0.006, 0.05);
-      for (let t = a + 0.55; t < b; t += 1.05) S.tone(t, 0.08, 870, 0.025, 0.3, fx, 'sine', 0.006, 0.05);
-      const n = S.noise('pink', a, b), lp = S.filter('lowpass', 700, 0.5), g = ctx.createGain(); g.gain.value = 0.04; n.connect(lp); lp.connect(g); g.connect(fx); }
-    // a soft tick on each cut
-    for (const t of [T.cockpit, T.fire, T.ward, T.back]) S.thump(t, 0.12, fx);
-
-    // 9. the countdown: a low pulse that tightens as the bow closes
-    for (let t = T.back + 1; t < T.hit - 0.6;) {   // stops half a second early: a breath of near-silence before the hit
-      const k = MathX.ramp(t, T.back, T.hit);
-      S.tone(t, 0.3, 55, 0.05 + 0.07 * k, 0, mus, 'sine', 0.01, 0.25);
-      t += MathX.lerp(1.1, 0.42, k);
+    // 8. the airliner: its engines at approach power, growing on the right; it goes in; the sound arrives ~1 s later (350 m)
+    {
+      const a = T.plane[0] - 1.0, b = T.planeHit, n = S.noise('pink', a, b + 0.05), bp = S.filter('bandpass', 700, 0.4), lp = S.filter('lowpass', 2600, 0.5), g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, a); g.gain.linearRampToValueAtTime(0.05, T.plane[0] + 0.5); g.gain.linearRampToValueAtTime(0.22, b - 0.3); g.gain.setValueAtTime(0.22, b + 0.98); g.gain.linearRampToValueAtTime(0.0001, b + 1.02);
+      n.connect(bp); bp.connect(lp); lp.connect(g); g.connect(S.panned(outside, 0.5));
+      S.tone(a, b - a + 1, 3100, 0.004, 0.5, outside, 'sine', 1.5, 0.05);               // the turbine whine
+      const hb = T.planeHit + 1.0;
+      S.boom(hb, 1.0, outside, rev); S.crunch(hb + 0.02, 0.7, 0.5, outside, rev); S.farBoom(hb + 0.3, 0.5, 0.4, outside);
+      const w = S.noise('white', hb, hb + 4), wl = S.filter('lowpass', 1800, 0.5), wg = ctx.createGain(); S.env(wg, hb + 0.2, 0.3, 0.25, 3.2); w.connect(wl); wl.connect(wg); wg.connect(S.panned(outside, 0.4));
     }
-    S.tone(T.cab, T.hit - 0.5 - T.cab, 73.4, 0.03, 0, mus, 'triangle', 3.0, 0.2);
-    S.tone(T.turn, T.hit - 0.5 - T.turn, 110, 0.02, 0, mus, 'sawtooth', 4.0, 0.2);
+    // 8b. inside the wheelhouse: the engine through the deck, the autopilot's steering pump, a radio nobody answers
+    {
+      const a = T.wheel[0], b = T.wheel[1], fxw = S.panned(fx, 0);
+      const n = S.noise('brown', a, b), lp = S.filter('lowpass', 160, 0.7), g = ctx.createGain(); g.gain.setValueAtTime(0.45, a); g.gain.setValueAtTime(0.45, b - 0.05); g.gain.linearRampToValueAtTime(0.0001, b); n.connect(lp); lp.connect(g); g.connect(fxw);
+      for (let t = a + 0.3; t < b; t += 0.9) S.tone(t, 0.35, 230, 0.03, -0.3, fx, 'sawtooth', 0.04, 0.2);   // the steering pump
+      const r = S.noise('white', a + 0.6, b - 0.1), rb = S.filter('bandpass', 1800, 1.2), rg = ctx.createGain(); rg.gain.value = 0.025; r.connect(rb); rb.connect(rg); rg.connect(S.panned(fx, 0.4));
+      for (const t of [a + 0.8, a + 1.6]) S.tone(t, 0.25, 1240, 0.03, 0.4, fx, 'square', 0.006, 0.05);       // the radio's call tone
+      S.thump(a, 0.12, fx);
+    }
+    // 9. the countdown: a low pulse that tightens as the bow closes
+    for (let t = T.wheel[0] + 0.5; t < T.hit - 0.6;) {   // stops half a second early: a breath of near-silence before the hit
+      const k = MathX.ramp(t, T.wheel[0], T.hit);
+      S.tone(t, 0.3, 55, 0.05 + 0.07 * k, 0, mus, 'sine', 0.01, 0.25);
+      t += MathX.lerp(0.9, 0.38, k);
+    }
+    S.tone(T.wheel[0], T.hit - 0.5 - T.wheel[0], 73.4, 0.03, 0, mus, 'triangle', 2.0, 0.2);
 
     // 10. the impact: steel into concrete; the span falls onto the bow; the near end into the water
     S.boom(T.hit, 0.9, outside, rev);
@@ -181,9 +180,90 @@ class MdAudio extends AudioEngine {
     // the train shakes on its rails at each hit
     S.clunk(T.hit + 0.08, 0.3, 0, car); S.clunk(MD_FALL.tLand + 0.1, 0.4, 0, car);
 
-    // 11. after: the quiet — water, a far alarm on the ship, the car's hum; then the chord under the line
-    S.tone(T.after, END - T.after, 640, 0.006, 0.5, outside, 'square', 0.5, 1.0);
-    for (const f of [98, 146.8, 196, 246.9]) S.tone(T.line[0] - 0.3, 6.5, f, 0.032, 0, mus, 'sine', 1.4, 3.0);
-    S.tone(T.line[0] + 1.2, 5, 392, 0.01, 0, mus, 'sine', 1.5, 2.5);
+    // 11. the cascade. Under it all, a low drone that climbs a step at each jump in time
+    {
+      const steps = [[T.fires[0], 49], [T.grid[0], 52], [T.water[0], 55], [T.food[0], 58.3]];
+      for (const [k, [t0, f]] of steps.entries()) {
+        const t1 = k < steps.length - 1 ? steps[k + 1][0] : T.end[0];
+        S.tone(t0, t1 - t0 + 0.3, f, 0.05, 0, mus, 'sawtooth', 0.6, 0.4);
+        S.tone(t0, t1 - t0 + 0.3, f * 1.5, 0.018, 0, mus, 'triangle', 1.0, 0.4);
+      }
+      // the jumps: a rising swell into a hit
+      for (const [tj] of MD_JUMPS) {
+        const n = S.noise('pink', tj - 0.9, tj + 0.1), hp = S.filter('highpass', 600, 0.5), g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, tj - 0.9); g.gain.exponentialRampToValueAtTime(0.12, tj - 0.02); g.gain.linearRampToValueAtTime(0.0001, tj);
+        n.connect(hp); hp.connect(g); g.connect(fx); S.thump(tj, 0.5, fx); S.boom(tj, 0.18, fx, rev);
+      }
+    }
+    // +20 MIN: the fires — crackle and roar, glass going, car alarms nobody switches off (no sirens: nobody is coming)
+    const crk = S.crackleBuffer(8, 90);
+    const fire = (a, b, vol, pan, dest = outside) => {
+      const src = ctx.createBufferSource(); src.buffer = crk; src.loop = true; const g = ctx.createGain(), bp = S.filter('bandpass', 2400, 0.6);
+      g.gain.setValueAtTime(0.0001, a); g.gain.linearRampToValueAtTime(vol, a + 0.3); g.gain.setValueAtTime(vol, b - 0.2); g.gain.linearRampToValueAtTime(0.0001, b);
+      src.connect(bp); bp.connect(g); g.connect(S.panned(dest, pan)); src.start(a); src.stop(b + 0.1);
+      const n = S.noise('brown', a, b), lp = S.filter('lowpass', 300, 0.6), ng = ctx.createGain(); S.env(ng, a, 0.4, vol * 1.6, b - a); n.connect(lp); lp.connect(ng); ng.connect(S.panned(dest, pan));
+    };
+    fire(T.fires[0], T.grid[0], 0.7, -0.3);
+    S.crunch(T.fires[0] + 1.6, 0.3, -0.4, outside, rev); S.crunch(T.fires[0] + 4.2, 0.25, -0.5, outside, rev); S.farBoom(T.fires[0] + 5.3, 0.35, -0.6, outside);
+    for (const [a, f, p] of [[T.fires[0], 760, -0.5], [T.fires[0] + 0.7, 910, 0.3]]) for (let t = a; t < T.grid[0]; t += 0.5) S.tone(t, 0.25, f, 0.012, p, outside, 'square', 0.01, 0.05);
+    // the fire station: the turnout alarm, ringing in an empty bay
+    { const [a, b] = T.fireSt;
+      for (let t = a + 0.05; t < b - 0.05; t += 0.13) S.tone(t, 0.1, 1050, 0.05, 0, fx, 'square', 0.006, 0.05);
+      for (let t = a + 0.4; t < b; t += 0.7) S.tone(t, 0.35, 660, 0.035, 0.1, fx, 'triangle', 0.01, 0.2);
+      S.thump(a, 0.12, fx); S.thump(b, 0.12, fx); }
+    // +6 HOURS: the city's hum at dusk; in grid control the alarms and the frequency falling; then everything drops
+    {
+      const a = T.grid[0], bo = T.blackout, o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sawtooth'; o2.type = 'sine'; o.frequency.setValueAtTime(100, a); o2.frequency.setValueAtTime(50, a);
+      o.frequency.setValueAtTime(100, T.gridRoom[0]); o.frequency.linearRampToValueAtTime(94, bo - 0.1); o.frequency.exponentialRampToValueAtTime(30, bo + 0.5);
+      o2.frequency.setValueAtTime(50, T.gridRoom[0]); o2.frequency.linearRampToValueAtTime(47, bo - 0.1); o2.frequency.exponentialRampToValueAtTime(15, bo + 0.5);
+      const lp = S.filter('lowpass', 900, 0.6); g.gain.setValueAtTime(0.0001, a); g.gain.linearRampToValueAtTime(0.06, a + 1.2); g.gain.linearRampToValueAtTime(0.1, bo - 0.1); g.gain.linearRampToValueAtTime(0.0001, bo + 0.55);
+      o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(mix); o.start(a); o2.start(a); o.stop(bo + 0.7); o2.stop(bo + 0.7);
+      fire(a, T.water[0], 0.25, -0.6);
+      const [ra, rb] = T.gridRoom;
+      for (let t = ra + 0.05; t < rb; t += 0.32) S.tone(t, 0.16, 1320, 0.04, 0.2, fx, 'square', 0.006, 0.04);
+      for (let t = ra + 0.2; t < rb; t += 0.9) S.tone(t, 0.5, 520, 0.03, -0.2, fx, 'triangle', 0.02, 0.2);
+      S.thump(ra, 0.12, fx); S.thump(rb, 0.12, fx);
+      // the blackout: a heavy contactor clunk, the hum gone, the city's sound sucked out; a beat of silence
+      S.clunk(bo, 0.7, 0, fx); S.boom(bo, 0.45, fx, rev); S.thump(bo + 0.02, 0.6, fx);
+      mix.gain.setValueAtTime(2.2, bo + 0.3); mix.gain.linearRampToValueAtTime(1.0, bo + 0.6); mix.gain.setValueAtTime(1.0, bo + 1.6); mix.gain.linearRampToValueAtTime(2.2, bo + 3.0);
+      for (const [t, p] of [[bo + 1.8, -0.4], [bo + 2.5, 0.5]]) S.tone(t, 2.5, p < 0 ? 640 : 590, 0.01, p, outside, 'square', 0.2, 0.6);   // battery alarms start up in the dark
+    }
+    // +2 DAYS: a tap that coughs air and stops; the outfall pouring into the basin; gulls
+    {
+      const a = T.water[0];
+      for (let k = 0; k < 6; k++) { const t = a + 0.3 + k * 0.22 + 0.06 * Math.sin(k * 3); const n = S.noise('white', t, t + 0.12), bp = S.filter('bandpass', 1500 + 300 * k, 1.5), g = ctx.createGain(); S.env(g, t, 0.005, 0.05 * (1 - k / 7), 0.08); n.connect(bp); bp.connect(g); g.connect(fx); }
+      const n = S.noise('brown', a + 1.2, T.food[0]), bp = S.filter('lowpass', 700, 0.5), g = ctx.createGain(); S.env(g, a + 1.2, 0.8, 0.35, T.food[0] - a - 1.2); g.gain.setValueAtTime(0.3, T.food[0] - 0.05); g.gain.linearRampToValueAtTime(0.0001, T.food[0]); n.connect(bp); bp.connect(g); g.connect(S.panned(outside, -0.3));
+      const w = S.noise('pink', a + 1.2, T.food[0]), wb = S.filter('bandpass', 1900, 0.8), wg = ctx.createGain(); wg.gain.value = 0.05; w.connect(wb); wb.connect(wg); wg.connect(S.panned(outside, -0.3));
+      for (const t of [a + 2.4, a + 2.6, a + 4.1]) S.chirp(t, 1700, 0.02, 0.4, outside, false);
+    }
+    // +2 WEEKS: the supermarket: a dying emergency light's buzz, nothing else
+    {
+      const [a, b] = T.food;
+      const o = ctx.createOscillator(), g = ctx.createGain(), bp = S.filter('bandpass', 400, 2); o.type = 'sawtooth'; o.frequency.value = 100;
+      g.gain.setValueAtTime(0.0001, a); for (let t = a; t < b; t += 0.08) g.gain.setValueAtTime(hash1(t * 13.1) > 0.25 ? 0.05 : 0.0001, t);
+      g.gain.setValueAtTime(0.0001, b); o.connect(bp); bp.connect(g); g.connect(fx); o.start(a); o.stop(b + 0.05);
+      S.thump(a, 0.12, fx); S.thump(b, 0.12, fx);
+    }
+    // the power station across the water: its diesel generators chug, falter and stop (the fuel is gone) — then the blast
+    {
+      const a = T.nuke[0], stopT = T.nukeBang - 1.1, o = ctx.createOscillator(), g = ctx.createGain(), lp = S.filter('lowpass', 220, 0.8), am = ctx.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(45, a); o.frequency.setValueAtTime(45, stopT - 0.8); o.frequency.linearRampToValueAtTime(28, stopT);
+      g.gain.setValueAtTime(0.0001, a); g.gain.linearRampToValueAtTime(0.18, a + 0.4);
+      for (let t = stopT - 0.8; t < stopT; t += 0.11) g.gain.setValueAtTime(hash1(t * 7.7) > 0.4 ? 0.18 : 0.02, t);
+      g.gain.setValueAtTime(0.0001, stopT);
+      const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 7; lg.gain.value = 0.4; lfo.connect(lg); lg.connect(am.gain); am.gain.value = 0.6;
+      o.connect(lp); lp.connect(am); am.connect(g); g.connect(S.panned(outside, 0.2)); for (const x of [o, lfo]) { x.start(a); x.stop(stopT + 0.1); }
+      const wind = S.noise('pink', a, T.fin + 1), wl = S.filter('lowpass', 600, 0.4), wg = ctx.createGain(); wg.gain.value = 0.06; wind.connect(wl); wl.connect(wg); wg.connect(outside);
+      mix.gain.setValueAtTime(2.2, T.nukeBang - 0.8); mix.gain.linearRampToValueAtTime(1.0, T.nukeBang - 0.3); mix.gain.setValueAtTime(1.0, T.nukeBang - 0.02); mix.gain.linearRampToValueAtTime(2.2, T.nukeBang);
+      const hb = T.nukeBang + 0.25;
+      S.boom(hb, 1.0, outside, rev); S.boom(hb + 0.35, 0.7, outside, rev); S.farBoom(hb + 0.1, 0.8, 0.1, outside); S.thump(hb, 0.8, fx);
+      const r = S.noise('brown', hb, hb + 7), rl = S.filter('lowpass', 260, 0.6), rg = ctx.createGain(); S.env(rg, hb, 0.3, 0.6, 5.5); r.connect(rl); rl.connect(rg); rg.connect(outside);
+    }
+    // the close: the dark city, fires far off, a battery alarm somewhere; the chord under the line
+    fire(T.end[0], T.fin + 0.8, 0.18, -0.4);
+    S.tone(T.end[0] + 0.5, T.fin - T.end[0], 640, 0.005, 0.5, outside, 'square', 0.5, 1.0);
+    for (const f of [98, 116.5, 146.8, 196]) S.tone(T.line[0] - 0.3, 8.5, f, 0.032, 0, mus, 'sine', 1.4, 3.0);
+    S.tone(T.births[0], 5, 392, 0.01, 0, mus, 'sine', 1.5, 2.5);
   }
 }

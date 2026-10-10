@@ -31,6 +31,7 @@ class MdHarbour extends Environment {
     this.skyUniforms = {
       uZenith: { value: zenith }, uHorizon: { value: horizon }, uGround: { value: new THREE.Color('#5a5d58') },
       uSunDir: { value: this.sunDir }, uSunColor: { value: new THREE.Color('#ffd09a') }, uTime: { value: 0 },
+      uGlow: { value: new THREE.Vector4(0, 0, 0, 0) }, uGlowColor: { value: new THREE.Color('#ff7a2a') }, uCloud: { value: 1 },
     };
     const mat = new THREE.ShaderMaterial({
       uniforms: this.skyUniforms, side: THREE.BackSide, depthWrite: false,
@@ -38,7 +39,7 @@ class MdHarbour extends Environment {
         varying vec3 vDir;
         void main(){ vDir = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }`,
       fragmentShader: /* glsl */`
-        uniform vec3 uZenith, uHorizon, uGround, uSunDir, uSunColor; uniform float uTime; varying vec3 vDir;
+        uniform vec3 uZenith, uHorizon, uGround, uSunDir, uSunColor, uGlowColor; uniform float uTime, uCloud; uniform vec4 uGlow; varying vec3 vDir;
         float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float noise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f);
           return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y); }
@@ -58,10 +59,13 @@ class MdHarbour extends Environment {
             float thick = smoothstep(0.5, 0.85, c);
             vec3 lit = mix(vec3(0.86, 0.84, 0.8), uSunColor * 1.05, pow(sd, 3.0) * 0.8);   // sun-facing edges glow warm
             vec3 shade = mix(uZenith * 0.95, vec3(0.42, 0.45, 0.5), thick);
-            vec3 cl = mix(lit, shade, clamp(thick * 0.9 + (0.5 - c2) * 0.3, 0.0, 1.0));
+            vec3 cl = mix(lit, shade, clamp(thick * 0.9 + (0.5 - c2) * 0.3, 0.0, 1.0)) * uCloud;
             cl = mix(cl, hor, smoothstep(0.25, 0.0, h) * 0.6);                    // clouds fade into the horizon haze
             col = mix(col, cl, cover * 0.92 * smoothstep(-0.02, 0.12, h));
           }
+          // the burning city lights the underside of the smoke and cloud (uGlow: direction xz, spread, strength)
+          float gd = max(dot(normalize(vec2(d.x, d.z)), uGlow.xy), 0.0);
+          col += uGlowColor * uGlow.w * pow(gd, uGlow.z) * exp(-max(h, 0.0) * 6.0);
           gl_FragColor = vec4(col, 1.0);
         }`,
     });
@@ -102,6 +106,8 @@ class MdHarbour extends Environment {
       uShipDim: { value: new THREE.Vector2(180, 30) },
       uHit: { value: new THREE.Vector4(0, 0, -100, 0) },    // impact x, z, time, strength
       uSplash: { value: new THREE.Vector4(0, 0, -100, 0) }, // the span's splash x, z, time, length
+      uSewage: { value: new THREE.Vector4(-30, 21, 0, 0) },  // outfall x, z, reach (m), amount
+      uGlowW: { value: new THREE.Vector4(0, 0, 0, 0) },      // a fire on the water: x, z, radius, strength (lights the water orange)
     });
     this.waterMat = new THREE.ShaderMaterial({
       uniforms: this.WU, fog: true,
@@ -112,7 +118,7 @@ class MdHarbour extends Environment {
           ${THREE.ShaderChunk.fog_vertex}
         }`,
       fragmentShader: /* glsl */`
-        uniform float uTime; uniform vec3 uSkyH, uSkyZ, uDeep, uSunDir, uSun; uniform vec4 uShip, uHit, uSplash; uniform vec2 uShipDim; varying vec3 vW;
+        uniform float uTime; uniform vec3 uSkyH, uSkyZ, uDeep, uSunDir, uSun; uniform vec4 uShip, uHit, uSplash, uSewage, uGlowW; uniform vec2 uShipDim; varying vec3 vW;
         ${THREE.ShaderChunk.fog_pars_fragment}
         float wh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float wn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(wh(i), wh(i+vec2(1,0)), f.x), mix(wh(i+vec2(0,1)), wh(i+vec2(1,1)), f.x), f.y); }
@@ -160,7 +166,16 @@ class MdHarbour extends Environment {
           sky += uSun * (pow(sd, 40.0) * 0.6 + pow(sd, 400.0) * 3.0);
           float fres = 0.025 + 0.975 * pow(1.0 - clamp(dot(n, V), 0.0, 1.0), 5.0);
           vec3 body = uDeep * (0.85 + 0.3 * wn(P * 0.01));
-          vec3 col = mix(body, sky, clamp(fres, 0.0, 1.0) * 0.9);
+          // sewage: a brown plume spreading from the outfall, streaky with the current
+          float sr = length((P - uSewage.xy) * vec2(1.7, 1.0));
+          float sew = uSewage.w * smoothstep(uSewage.z, uSewage.z * 0.35, sr + (wn(P * 0.03 + t * 0.02) - 0.5) * uSewage.z * 0.7);
+          body = mix(body, vec3(0.13, 0.1, 0.05), sew);
+          vec3 col = mix(body, sky * (1.0 - 0.85 * sew), clamp(fres, 0.0, 1.0) * 0.9 * (1.0 - 0.6 * sew));
+          col = mix(col, vec3(0.24, 0.2, 0.1), sew * 0.3 * smoothstep(0.4, 0.8, wn(P * 0.25 + t * 0.05)));
+          col *= 1.0 - 0.3 * sew;   // scum
+          // a fire on the water lights it
+          float gr = length(P - uGlowW.xy);
+          col += vec3(1.0, 0.45, 0.12) * uGlowW.w * exp(-gr / uGlowW.z) * (0.6 + 0.4 * fres);
           // under the hull: the ship's own shadow darkens the water a little (and nothing reflects under it)
           col *= 1.0 - 0.35 * exp(-max(side, 0.0) / 4.0) * step(0.0, a) * step(a, L);
           vec3 foamC = vec3(0.86, 0.88, 0.86);
@@ -230,6 +245,7 @@ class MdHarbour extends Environment {
     const B = this.batch, m = this.m, F = this.facades[style], st = F.style, Q = MD_G.quay;
     const gH = 4.4, H = gH + floors * st.floorH;
     const x0 = face > 0 ? xf - depth : xf, x1 = face > 0 ? xf : xf + depth;
+    (this.cityRects || (this.cityRects = [])).push({ x0, x1, z0, z1, h: Q + H, y0: Q + gH, kind: 'row' });
     B.add(Geo.boxSides(x0, x1, Q, Q + gH, z0, z1, 3, gH), F.wall, null);
     B.add(Geo.boxSides(x0, x1, Q + gH, Q + H, z0, z1, F.tileW, F.tileH), F.mat, null);
     B.add(Geo.flat(x0, x1, z0, z1, Q + H, 4), m.roof, null, { noShadow: true });
@@ -290,6 +306,7 @@ class MdHarbour extends Environment {
       const w = rng.range(14, 26), st = this.facades[rng.pick(near)], fl = rng.int(4, 9), H = 4.4 + fl * st.style.floorH, Q = MD_G.quay;
       const z0 = MD_G.shoreZ + 22, z1 = z0 + 18;
       this.batch.add(Geo.boxSides(x - w, x, Q, Q + 4.4, z0, z1, 3, 4.4), st.wall, null);
+      this.cityRects.push({ x0: x - w, x1: x, z0, z1, h: Q + H, y0: Q + 4.4, kind: 'basin' });
       this.batch.add(Geo.boxSides(x - w, x, Q + 4.4, Q + H, z0, z1, st.tileW, st.tileH), st.mat, null);
       this.batch.add(Geo.flat(x - w, x, z0, z1, Q + H, 4), this.m.roof, null, { noShadow: true });
       x -= w + rng.range(0, 4);
@@ -298,6 +315,7 @@ class MdHarbour extends Environment {
     for (let zz = MD_G.shoreZ + 40; zz < 1100;) {
       const w = rng.range(16, 32), h = rng.range(30, 70), st = this.facades[rng.pick(far)], x1 = xf - 30, x0 = x1 - rng.range(18, 30);
       this.batch.add(Geo.boxSides(x0, x1, MD_G.quay, MD_G.quay + h, zz, zz + w, st.tileW, st.tileH), st.mat, null);
+      this.cityRects.push({ x0, x1, z0: zz, z1: zz + w, h: MD_G.quay + h, y0: MD_G.quay + 4, kind: 'tall' });
       this.batch.add(Geo.flat(x0, x1, zz, zz + w, MD_G.quay + h, 4), this.m.roof, null, { noShadow: true });
       zz += w + rng.range(0, 8);
     }
@@ -305,6 +323,7 @@ class MdHarbour extends Environment {
       const x = rng.range(-140, -700), zz = rng.range(-80, 1200), w = rng.range(22, 44), d = rng.range(22, 40), h = rng.range(45, 170);
       const st = this.facades[rng.pick(['glassblue', 'glassteal', 'modern', 'stone'])];
       this.batch.add(Geo.boxSides(x - w / 2, x + w / 2, MD_G.quay, h, zz - d / 2, zz + d / 2, st.tileW, st.tileH), st.mat, null, { noShadow: true });
+      this.cityRects.push({ x0: x - w / 2, x1: x + w / 2, z0: zz - d / 2, z1: zz + d / 2, h, y0: MD_G.quay + 4, kind: 'tower' });
       this.batch.add(Geo.flat(x - w / 2, x + w / 2, zz - d / 2, zz + d / 2, h, 5), this.m.roof, null, { noShadow: true });
     }
   }
