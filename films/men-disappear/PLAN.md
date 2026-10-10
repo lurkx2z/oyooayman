@@ -7,7 +7,27 @@ respectful: men simply vanish (no bodies, no gore, no jokes about either sex).
 
 No edit: story time = film time (0–67 s).
 
-## 0. v3: the cascade cut (78 s, current)
+## 0a. v3b: every man and boy, and the long horizon (90 s, current)
+
+**Why:** the owner sent a competitor's "every woman disappeared" film (117 s) that ends with extinction: a falling
+population counter, jumps to year 104, a last human. The owner wants this film to show the male case as worse.
+**Honest framing:** losing women is biologically more final (there is no artificial womb, while sperm banks and frozen
+embryos exist). Losing men is worse in the first weeks, because the grid, water, food and reactors stop at once. The
+long tail then ends the same way.
+
+- Premise is now every man and boy: ≈ 4.18 B, 50.3 % of 8.30 B (UN WPP 2024). The train's boy is now a girl, so no
+  child vanishes on screen. End line: "Half of humanity vanished in a second."
+- About 4 s in, a passenger's phone shows "CALLING DAD…", then "DAD · NO ANSWER".
+- Epilogue, after the line:
+  - 72.0–76.6: +9 MONTHS, a maternity ward with every bassinet empty. Births drop from ≈ 360,000/day to almost none;
+    sperm banks and frozen embryos cover a tiny fraction.
+  - 76.6–80.8: +20 YEARS, a classroom for thirty with two pupils. In-vitro sperm from female cells has only worked in mice.
+  - 80.8–86.6: the planet decades on, nearly dark, with a projected population counter.
+- **Projection:** the 4.13 B women and girls left, today's age structure, a Gompertz ageing curve, no births and no
+  collapse deaths. Year 20 ≈ 3.15 B, year 40 ≈ 2.06 B, year 60 ≈ 0.96 B, year 80 ≈ 0.17 B. Labelled PROJECTED on screen
+  and in the end note.
+
+## 0. v3: the cascade cut (78 s, superseded by 0a)
 
 **Why:** v2 was posted on TikTok (≈ 21.8K likes, ≈ 1,200 comments). The top comments said it looked like "nothing major
 happened" ("regular Tuesday", "so nothing?"). Viewers listed the jobs that are mostly men (grid, water, trucking, pilots,

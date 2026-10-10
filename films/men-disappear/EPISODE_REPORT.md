@@ -3,6 +3,19 @@
 Page `men-disappear.html` · folder `films/men-disappear/` · branch `episode/men-disappear-p0297u` · 67.0 s, 1080×1920,
 30 fps · one MP4 under 30 MiB plus a runnable ZIP (unzip, open `men-disappear.html`, press Space).
 
+## v3 final (2026-10-10): the cascade, every man and boy, the long horizon
+
+- **Final:** men-disappear_final_v3_1080x1920.mp4. 90.0 s, 30 fps, 26.4 MiB, −17.2 LUFS, −2.4 dBTP after the limiter remux.
+- **Beats:** see PLAN.md § 0a and § 0.
+- **Scores:** the pre-epilogue review gave retention 7, viewer 7, phone 6, cine 6, visual 5, facts 6. The epilogue, the
+  premise change and the Dad call have not been re-scored by an independent reviewer.
+- **Still weak:**
+  - The nursery and school people are simple rigs, standing still.
+  - The Earth epilogue is slow.
+  - The run time (90 s) is above the 60–72 s house format; the owner asked for more.
+  - The owner's ZIP plays almost black on their own graphics card. This was not reproducible on SwiftShader or Mesa
+    llvmpipe, and the cause is unknown.
+
 ## The idea
 
 Every man aged 18 and over vanishes in the same second. The film is about **systems, not people**: what keeps running
