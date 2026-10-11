@@ -42,7 +42,7 @@ SETS.natural = [
   { file: '7-jessica', label: 'Jessica (female, expressive, conversational)', voice: 'cgSgspJ2msm6clMCkdW9' },
   { file: '8-sarah', label: 'Sarah (female, soft, young)', voice: 'EXAVITQu4vr4xnSDxMaL' },
   { file: '9-george-reference', label: 'George (the first voice you heard), same natural settings, for reference', voice: 'JBFqnCBsd6RMkjVDRZzb' },
-].map((v) => ({ model: 'eleven_v4', format: 'mp3_44100_128', settings: CONVERSATIONAL, ...v }));
+].map((v) => ({ model: 'eleven_v4', format: 'mp3_44100_192', fallbackFormat: 'mp3_44100_128', settings: CONVERSATIONAL, ...v }));   // 192 kbps needs Creator+; falls back to 128
 SETS.narrator = [
   { file: '1-george-v4-128k-current', label: 'George, eleven_v4, 128 kbps (what you heard)', voice: 'JBFqnCBsd6RMkjVDRZzb', model: 'eleven_v4', format: 'mp3_44100_128' },
   { file: '2-george-v4-192k', label: 'George, eleven_v4, 192 kbps (higher bitrate; Creator plan or above)', voice: 'JBFqnCBsd6RMkjVDRZzb', model: 'eleven_v4', format: 'mp3_44100_192' },
@@ -86,7 +86,14 @@ async function main() {
   for (const v of VARIANTS) {
     const mp3 = path.join(orig, v.file + '.mp3');
     try {
-      const r = await N.synthesize({ text: TEXT, voice: v.voice, model: v.model, format: v.format, voiceSettings: v.settings, apiKey });
+      let r;
+      try {
+        r = await N.synthesize({ text: TEXT, voice: v.voice, model: v.model, format: v.format, voiceSettings: v.settings, apiKey });
+      } catch (e) {
+        if (!(v.fallbackFormat && /output_format_not_allowed/.test(e.message))) throw e;
+        v.format = v.fallbackFormat;   // the plan doesn't allow the higher bitrate
+        r = await N.synthesize({ text: TEXT, voice: v.voice, model: v.model, format: v.format, voiceSettings: v.settings, apiKey });
+      }
       fs.writeFileSync(mp3, r.audio);
     } catch (e) {
       console.log(`SKIPPED ${v.file}: ${e.message}`);
@@ -101,6 +108,7 @@ async function main() {
     const norm = spawnSync('ffmpeg', ['-y', '-v', 'error', '-i', mp3, '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11,aresample=44100', '-c:a', 'pcm_s16le', wav]);
     if (norm.status !== 0) { rows.push({ ...v, error: 'loudness match failed' }); continue; }
     const after = loudness(wav);
+    v.label += ` [${v.format.split('_').pop()} kbps]`;
     rows.push({ ...v, seconds: check.report.seconds, kb: Math.round(check.report.bytes / 1024), lufs: before.lufs, tp: before.tp, lufsAfter: after.lufs });
     console.log(`ok      ${v.file}: ${check.report.seconds} s, ${Math.round(check.report.bytes / 1024)} KiB, original ${before.lufs} LUFS (peak ${before.tp} dBFS) -> matched ${after.lufs} LUFS`);
   }
