@@ -17,12 +17,6 @@ on:
         description: "ElevenLabs voice id (default: George)"
         required: false
         default: "JBFqnCBsd6RMkjVDRZzb"
-  push:
-    branches: ["feature/elevenlabs-narration-*"]
-    paths:
-      - ".github/workflows/narration-test.yml"
-      - "tools/narrate.cjs"
-      - "tools/test-narration.cjs"
 
 permissions:
   contents: read

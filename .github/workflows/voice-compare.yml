@@ -15,11 +15,6 @@ on:
         description: "Line to compare (leave empty for the default line)"
         required: false
         default: ""
-  push:
-    branches: ["feature/elevenlabs-narration-*"]
-    paths:
-      - ".github/workflows/voice-compare.yml"
-      - "tools/voice-compare.cjs"
 
 permissions:
   contents: read

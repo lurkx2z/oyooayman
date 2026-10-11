@@ -61,7 +61,12 @@ The workflow **Narration test** runs the same test on GitHub's servers with the 
 3. Green tick = every check passed. The run page shows a summary table; download **sample-mp3** under **Artifacts**
    (a ZIP containing `sample.mp3`).
 
-It runs only when started by hand or when the narration tools change on a `feature/elevenlabs-narration-*` branch.
+It runs only when started by hand (never on a push), so every API call is deliberate.
+
+**Free tier warning (2026-10-11):** after ~10 requests from GitHub Actions in 25 minutes, ElevenLabs disabled Free Tier
+access on the account (`401 detected_unusual_activity`: "can be triggered by using a proxy or VPN"). Requests from
+cloud servers look like that to them. Use a paid plan for API work from GitHub; the free tier also has no commercial
+licence and caps MP3 at 128 kbps (`mp3_44100_192` needs Creator).
 
 ## 2. Prove it works (the test)
 
