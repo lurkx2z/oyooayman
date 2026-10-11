@@ -6,6 +6,11 @@ name: Voice comparison
 on:
   workflow_dispatch:
     inputs:
+      set:
+        description: "Which voices: natural (conversational) or narrator (announcer style)"
+        type: choice
+        options: [natural, narrator]
+        default: natural
       text:
         description: "Line to compare (leave empty for the default line)"
         required: false
@@ -39,12 +44,13 @@ jobs:
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           COMPARE_TEXT: ${{ inputs.text }}
+          COMPARE_SET: ${{ inputs.set || 'natural' }}
         run: |
           if [ -z "$ELEVENLABS_API_KEY" ]; then
             echo "::error::The secret ELEVENLABS_API_KEY is missing. Add it under Settings > Secrets and variables > Actions."
             exit 1
           fi
-          set -- --out out/voice-comparison --summary "$GITHUB_STEP_SUMMARY"
+          set -- --out out/voice-comparison --set "$COMPARE_SET" --summary "$GITHUB_STEP_SUMMARY"
           if [ -n "$COMPARE_TEXT" ]; then set -- "$@" --text "$COMPARE_TEXT"; fi
           node tools/voice-compare.cjs "$@"
 
