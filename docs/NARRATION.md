@@ -1,8 +1,10 @@
 # Narration — ElevenLabs text-to-speech
 
-> Status (2026-10-11): **pipeline built, real ElevenLabs call not yet verified.** The tools are tested offline (MP3
-> verifier, script parsing, request shape against a local stand-in server). The first real check is
-> `node tools/test-narration.cjs` on a machine that has the API key. Update this line once it passes.
+> Status (2026-10-11): **real ElevenLabs generation verified by machine on GitHub Actions** (workflow *Narration test*,
+> run 38164798843): `eleven_v4`, voice George, 89 characters → 94 502-byte MP3, 226 frames at 44.1 kHz, 5.9 s, full
+> ffmpeg decode with no errors, mean −23.7 dB / peak −6.4 dB. The key came from the repository secret and showed as `***`
+> in the log. Still to confirm: the owner listening to `sample.mp3`. The cloud coding container itself cannot reach
+> `api.elevenlabs.io`; use the workflow.
 
 Voice-over is a separate audio file made from an **approved** narration script. It does not change the engine, the
 film pages or `js/audio/audioEngine.js`, and it is not part of the baked soundtrack. Narration is mixed onto the
