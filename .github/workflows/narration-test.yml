@@ -1,0 +1,74 @@
+# Narration test: turns one sentence into an MP3 with ElevenLabs, checks the file is a real,
+# playable, non-silent MP3, and attaches it to the run as a downloadable artifact (sample.mp3).
+#
+# Needs the repository secret ELEVENLABS_API_KEY (Settings > Secrets and variables > Actions).
+# The key is only passed to the test as an environment variable; GitHub masks it in logs and
+# the tool never prints it. See docs/NARRATION.md.
+name: Narration test
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: "Sentence to speak (leave empty for the default test sentence)"
+        required: false
+        default: ""
+      voice:
+        description: "ElevenLabs voice id (default: George)"
+        required: false
+        default: "JBFqnCBsd6RMkjVDRZzb"
+  push:
+    branches: ["feature/elevenlabs-narration-*"]
+    paths:
+      - ".github/workflows/narration-test.yml"
+      - "tools/narrate.cjs"
+      - "tools/test-narration.cjs"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: narration-test-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  narration-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install ffmpeg (for the full playback check)
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg >/dev/null; }
+          ffmpeg -version | head -1
+
+      - name: Check the MP3 checker itself (offline, no key)
+        run: node tools/test-narration.cjs --selftest
+
+      - name: Generate and verify sample.mp3
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          NARRATION_TEXT: ${{ inputs.text }}
+          NARRATION_VOICE: ${{ inputs.voice || 'JBFqnCBsd6RMkjVDRZzb' }}
+        run: |
+          if [ -z "$ELEVENLABS_API_KEY" ]; then
+            echo "::error::The secret ELEVENLABS_API_KEY is missing. Add it under Settings > Secrets and variables > Actions, then run this again."
+            exit 1
+          fi
+          set -- --out out/sample.mp3 --voice "$NARRATION_VOICE" --summary "$GITHUB_STEP_SUMMARY"
+          if [ -n "$NARRATION_TEXT" ]; then set -- "$@" --text "$NARRATION_TEXT"; fi
+          node tools/test-narration.cjs "$@"
+
+      - name: Upload sample.mp3
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sample-mp3
+          path: out/sample.mp3
+          if-no-files-found: error
+          retention-days: 14

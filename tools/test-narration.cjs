@@ -4,7 +4,7 @@
    playable, non-silent MP3. Exit code 0 only if every check passes.
 
      node tools/test-narration.cjs                       (writes renders/narration-test/sample.mp3)
-     node tools/test-narration.cjs --out my-test.mp3 --voice <id> --model <id>
+     node tools/test-narration.cjs --out my-test.mp3 --voice <id> --model <id> --text "Your own sentence."
      node tools/test-narration.cjs --selftest            (offline: checks the MP3 verifier itself, no API call)
 
    Needs ELEVENLABS_API_KEY set as an environment variable (docs/NARRATION.md). Costs about 70 characters.
@@ -18,7 +18,7 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) =>
   if (a.startsWith('--')) acc.push([a.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : true]);
   return acc;
 }, []));
-const SENTENCE = 'What if gravity doubled at breakfast? Your coffee cup would suddenly weigh twice as much.';
+const SENTENCE = (typeof args.text === 'string' && args.text.trim()) || 'What if gravity doubled at breakfast? Your coffee cup would suddenly weigh twice as much.';
 
 function printReport(v) {
   const r = v.report || {};
@@ -68,13 +68,20 @@ async function main() {
   console.log(`2/3 Saved ${r.audio.length} bytes (characters billed: ${r.characters ?? 'not reported'}).`);
 
   console.log('3/3 Verifying the MP3…');
-  const v = N.verifyMp3(out, { minSeconds: 2 });   // the sentence takes ~4-6 s to say
+  const v = N.verifyMp3(out, { minSeconds: Math.min(2, SENTENCE.length / 40) });   // speech runs ~15 characters/s, so N/40 s is a safe floor; the default sentence takes ~5 s
   printReport(v);
   if (!v.ok) {
     console.error('\nTEST FAILED:\n  - ' + v.problems.join('\n  - '));
     process.exit(1);
   }
   console.log(`\nTEST PASSED. Listen to it: ${out}`);
+  if (args.summary) {   // a small markdown report (GitHub Actions shows it on the run page)
+    const r = v.report;
+    fs.appendFileSync(args.summary, `## Narration test passed\n\n| Check | Result |\n|---|---|\n| Text | ${SENTENCE.replace(/\|/g, '/')} |\n`
+      + `| Voice / model | ${voice} / ${model} |\n| File | sample.mp3, ${r.bytes} bytes |\n| MP3 frames | ${r.frames} at ${r.sampleRate} Hz |\n`
+      + `| Duration | ${r.seconds} s |\n| Full decode (ffmpeg) | ${r.decoded ? 'no errors' : 'not run'} |\n| Loudness | mean ${r.meanDb} dB, peak ${r.peakDb} dB |\n\n`
+      + 'Download it from **Artifacts** at the bottom of this page.\n');
+  }
 }
 
 main().catch((e) => { console.error('TEST FAILED: ' + e.message); process.exit(1); });

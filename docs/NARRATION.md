@@ -14,6 +14,7 @@ Files:
 |---|---|
 | `tools/narrate.cjs` | approved script → one MP3 per paragraph + `narration.mp3` (joined) + `manifest.json` (clip start times and durations) |
 | `tools/test-narration.cjs` | the end-to-end test: one sentence → MP3 → checks it is a real, playable, non-silent MP3 |
+| `.github/workflows/narration-test.yml` | runs that test on GitHub Actions (no local setup) and attaches `sample.mp3` to the run |
 | `.agents/skills/text-to-speech/` | ElevenLabs' official text-to-speech skill (installed with `npx skills add elevenlabs/skills --skill text-to-speech`; `.claude/skills/text-to-speech` links to it) |
 
 No `npm install` is needed: the tools call the documented REST endpoint
@@ -46,6 +47,19 @@ elevenlabs.io and make a new one.
 **Cloud sessions** (Claude Code on the web) don't see your PC's variables. To let a cloud session run narration, the
 project needs a cloud environment that has `ELEVENLABS_API_KEY` as an environment variable **and** allows the domain
 `api.elevenlabs.io` in its network access settings.
+
+## 1b. Or run it on GitHub (nothing to install)
+
+The workflow **Narration test** runs the same test on GitHub's servers with the key stored as a GitHub secret.
+
+1. Add the key once: repo page → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
+   → Name `ELEVENLABS_API_KEY`, Secret = the key → **Add secret**. GitHub hides it in logs; nobody can read it back.
+2. Run it: **Actions** tab → **Narration test** → open the latest run → **Re-run all jobs**
+   (or **Run workflow** once the workflow is on the default branch; you can type your own sentence there).
+3. Green tick = every check passed. The run page shows a summary table; download **sample-mp3** under **Artifacts**
+   (a ZIP containing `sample.mp3`).
+
+It runs only when started by hand or when the narration tools change on a `feature/elevenlabs-narration-*` branch.
 
 ## 2. Prove it works (the test)
 
