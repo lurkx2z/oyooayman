@@ -198,6 +198,7 @@ tools/render-wav.cjs       the soundtrack as a WAV                    tools/enco
 tools/check-page.cjs       boot + sound check                         tools/bake-soundtrack.cjs  bake the sound into the film
 tools/preview-sheets.sh    1 fps contact sheets from rendered frames
 tools/new-episode.sh       start a new episode from templates/episode/
+tools/narrate.cjs          ElevenLabs voice-over from an approved script  tools/test-narration.cjs  end-to-end voice test (docs/NARRATION.md)
 ```
 
 Film: *How did kids have fun before screens?* (`before-screens.html`):

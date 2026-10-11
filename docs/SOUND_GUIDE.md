@@ -53,7 +53,8 @@ tools/bake-soundtrack.cjs → films/<slug>/soundtrack.js   (loaded by the page b
 - **Edit points:** sync a beat, a camera move, an action and a VFX on the same frame (Crossover at 120 BPM: a beat
   every 0.5 s, cuts on bar lines).
 - **Dialogue** has no TTS: subtitles (`SCRIPT.hud.says`) plus formant "voice" blips, laughs and chatter
-  (`SoundKit.voice/laugh/chatter`).
+  (`SoundKit.voice/laugh/chatter`). Optional **narration** (ElevenLabs voice-over) is separate: generated from an
+  approved script and mixed onto the finished MP4, never into the engine (`docs/NARRATION.md`).
 
 ## 3. Layering recipe (per scene)
 

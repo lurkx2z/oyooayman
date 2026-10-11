@@ -19,6 +19,7 @@
 | 9 | Bake + check | `films/<slug>/soundtrack.js`; `check-page` passes | ~5 min |
 | 10 | Final render | 1080×1920 @ 30 fps JPEG frames (4 workers) | **1–3 h** in the background |
 | 11 | Encode + deliver | one MP4 < 30 MiB + a runnable ZIP; README + PLAN review log | ~10 min |
+| (12) | Narration (optional) | approved `films/<slug>/NARRATION.md` → `tools/narrate.cjs` → voice mixed onto the MP4 | ~5 min |
 
 **Golden rules:**
 - **Finish the whole video before polishing any part of it.**
@@ -227,6 +228,16 @@ NODE_PATH=$(npm root -g) node tools/check-page.cjs /tmp/ziptest/<slug>-film/<slu
 
 - Then: README entry (*"Nth film: … — open `<slug>.html` (N s)"* + file list); PLAN.md status and review log; commit and
   push.
+
+### Optional: narration (voice-over)
+
+If the episode has an approved narration script, generate the voice with ElevenLabs and mix it onto the encoded MP4
+as the last step. Setup, script format and the exact mix command: `docs/NARRATION.md`.
+
+```bash
+node tools/narrate.cjs --script films/<slug>/NARRATION.md --dry-run   # check the clips and character cost first
+node tools/narrate.cjs --script films/<slug>/NARRATION.md             # → films/<slug>/narration/ (every file verified)
+```
 
 ## 12. How the owner runs and records it
 
