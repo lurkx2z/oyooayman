@@ -1,0 +1,332 @@
+{
+ "episode": "gravity-doubled-3min",
+ "voice": "IKne3meq5aSn9XLyUdCD",
+ "model": "eleven_v4",
+ "voice_settings": {
+  "stability": 0.4,
+  "similarity_boost": 0.75
+ },
+ "timing_source": "forced alignment (ElevenLabs), seconds from the start of each MP3",
+ "note": "decoded_seconds is the decoded audio length (the manifest \"seconds\" includes MP3 padding). Loudness is the raw clip; normalise in the mix.",
+ "clips": [
+  {
+   "id": "01-s01-moment",
+   "scene": 1,
+   "file": "01-s01-moment.mp3",
+   "align": "01-s01-moment.align.json",
+   "text": "What if gravity doubled... right now? No warning. No countdown. Just one ordinary morning, when everything on Earth suddenly becomes twice as heavy.",
+   "decoded_seconds": 10.64,
+   "speech_start": 0.14,
+   "speech_end": 10.22,
+   "speech_seconds": 10.08,
+   "words": 23,
+   "pauses_over_0_25s": [
+    [
+     1.46,
+     2.04
+    ],
+    [
+     2.56,
+     3.24
+    ],
+    [
+     3.78,
+     4.16
+    ],
+    [
+     4.86,
+     5.26
+    ],
+    [
+     6.68,
+     6.96
+    ],
+    [
+     8.08,
+     8.34
+    ]
+   ],
+   "loudness_lufs": -28.3,
+   "true_peak_dbtp": -8.5,
+   "script_slot_seconds": 16,
+   "fits_slot": true,
+   "spare_seconds": 5.36,
+   "fade_out_after": 10.52,
+   "script_slot": "0:00-0:16"
+  },
+  {
+   "id": "02-s03-mass",
+   "scene": 3,
+   "file": "02-s03-mass.mp3",
+   "align": "02-s03-mass.align.json",
+   "text": "Here's the strange part. Nothing has gained mass. Your coffee, your phone, even your own body still contain exactly the same amount of matter. But gravity pulls on all of it twice as hard.",
+   "decoded_seconds": 13.44,
+   "speech_start": 0.06,
+   "speech_end": 12.84,
+   "speech_seconds": 12.78,
+   "words": 34,
+   "pauses_over_0_25s": [
+    [
+     1.2,
+     1.82
+    ],
+    [
+     3.16,
+     3.72
+    ],
+    [
+     4.3,
+     4.58
+    ],
+    [
+     5.06,
+     5.44
+    ],
+    [
+     6.52,
+     6.82
+    ],
+    [
+     9.46,
+     10.02
+    ]
+   ],
+   "loudness_lufs": -29.2,
+   "true_peak_dbtp": -10.5,
+   "script_slot_seconds": 18,
+   "fits_slot": true,
+   "spare_seconds": 4.56,
+   "fade_out_after": 13.14,
+   "script_slot": "0:25-0:43"
+  },
+  {
+   "id": "03-s04-experiment",
+   "scene": 4,
+   "file": "03-s04-experiment.mp3",
+   "align": "03-s04-experiment.align.json",
+   "text": "Now imagine dropping two identical objects from the same height. Under normal gravity, a one-meter fall takes about zero point four five seconds. But under double gravity, that drops to just zero point three two. And the impact? Roughly twice the energy, if everything else stays the same.",
+   "decoded_seconds": 19.04,
+   "speech_start": 0.08,
+   "speech_end": 18.52,
+   "speech_seconds": 18.44,
+   "words": 48,
+   "pauses_over_0_25s": [
+    [
+     3.68,
+     4.3
+    ],
+    [
+     5.26,
+     5.62
+    ],
+    [
+     8.88,
+     9.44
+    ],
+    [
+     10.62,
+     11
+    ],
+    [
+     13.46,
+     14.02
+    ],
+    [
+     14.66,
+     15.18
+    ],
+    [
+     16.56,
+     16.92
+    ]
+   ],
+   "loudness_lufs": -29.0,
+   "true_peak_dbtp": -9.3,
+   "script_slot_seconds": 22,
+   "fits_slot": true,
+   "spare_seconds": 2.96,
+   "fade_out_after": 18.82,
+   "script_slot": "0:43-1:05"
+  },
+  {
+   "id": "04-s06-body",
+   "scene": 6,
+   "file": "04-s06-body.mp3",
+   "align": "04-s06-body.align.json",
+   "text": "But the real problem isn't your coffee. It's you. Every time you stand, walk, or climb a staircase, your muscles have to fight twice the gravitational force. And your heart now faces a much harder challenge pushing blood upward toward your brain.",
+   "decoded_seconds": 16.16,
+   "speech_start": 0.06,
+   "speech_end": 15.7,
+   "speech_seconds": 15.64,
+   "words": 42,
+   "pauses_over_0_25s": [
+    [
+     1.1,
+     1.36
+    ],
+    [
+     2.24,
+     2.74
+    ],
+    [
+     3.36,
+     4.08
+    ],
+    [
+     5.28,
+     5.6
+    ],
+    [
+     7.14,
+     7.54
+    ],
+    [
+     10.5,
+     10.98
+    ]
+   ],
+   "loudness_lufs": -29.2,
+   "true_peak_dbtp": -10.7,
+   "script_slot_seconds": 21,
+   "fits_slot": true,
+   "spare_seconds": 4.84,
+   "fade_out_after": 16.0,
+   "script_slot": "1:15-1:36"
+  },
+  {
+   "id": "05-s08-city",
+   "scene": 8,
+   "file": "05-s08-city.mp3",
+   "align": "05-s08-city.align.json",
+   "text": "Outside, the world looks familiar. But everything behaves differently. Cars sit lower on their suspension. Ordinary objects become exhausting to carry. And a fountain that once sent water high into the air might barely reach half its previous height, assuming the water leaves the nozzle at the same speed. Gravity has changed the rules of everyday life.",
+   "decoded_seconds": 22.88,
+   "speech_start": 0.06,
+   "speech_end": 22.46,
+   "speech_seconds": 22.4,
+   "words": 57,
+   "pauses_over_0_25s": [
+    [
+     0.58,
+     0.86
+    ],
+    [
+     2.12,
+     2.68
+    ],
+    [
+     4.54,
+     5.16
+    ],
+    [
+     7.12,
+     7.68
+    ],
+    [
+     10.32,
+     10.84
+    ],
+    [
+     13.54,
+     13.88
+    ],
+    [
+     16.16,
+     16.54
+    ],
+    [
+     18.98,
+     19.62
+    ]
+   ],
+   "loudness_lufs": -29.3,
+   "true_peak_dbtp": -10.0,
+   "script_slot_seconds": 23,
+   "fits_slot": true,
+   "spare_seconds": 0.12,
+   "fade_out_after": 22.76,
+   "script_slot": "1:47-2:10"
+  },
+  {
+   "id": "06-s10-question",
+   "scene": 10,
+   "file": "06-s10-question.mp3",
+   "align": "06-s10-question.align.json",
+   "text": "And this is just the beginning. Buildings, machines, bridges, and even the human body were designed around a world with normal gravity. Some systems could handle the extra load. Others would reach their limits. The real question isn't whether life changes. It's how much of our world could adapt.",
+   "decoded_seconds": 20.24,
+   "speech_start": 0.04,
+   "speech_end": 19.74,
+   "speech_seconds": 19.7,
+   "words": 49,
+   "pauses_over_0_25s": [
+    [
+     1.98,
+     2.68
+    ],
+    [
+     4.02,
+     4.3
+    ],
+    [
+     4.72,
+     4.98
+    ],
+    [
+     9.12,
+     9.78
+    ],
+    [
+     11.82,
+     12.34
+    ],
+    [
+     14.02,
+     14.6
+    ],
+    [
+     17.1,
+     17.6
+    ]
+   ],
+   "loudness_lufs": -29.0,
+   "true_peak_dbtp": -10.2,
+   "script_slot_seconds": 19,
+   "fits_slot": false,
+   "spare_seconds": -1.24,
+   "fade_out_after": 20.04,
+   "script_slot": "2:24-2:43"
+  },
+  {
+   "id": "07-s12-final",
+   "scene": 12,
+   "file": "07-s12-final.mp3",
+   "align": "07-s12-final.align.json",
+   "text": "Could humanity learn to live under twice Earth's gravity... or would the weight of our own world defeat us?",
+   "decoded_seconds": 6.96,
+   "speech_start": 0.06,
+   "speech_end": 6.6,
+   "speech_seconds": 6.54,
+   "words": 19,
+   "pauses_over_0_25s": [
+    [
+     3.28,
+     3.86
+    ]
+   ],
+   "loudness_lufs": -28.8,
+   "true_peak_dbtp": -10.4,
+   "script_slot_seconds": 8,
+   "fits_slot": true,
+   "spare_seconds": 1.04,
+   "fade_out_after": 6.9,
+   "script_slot": "2:52-3:00"
+  }
+ ],
+ "no_narration_scenes": [
+  2,
+  5,
+  7,
+  9,
+  11
+ ],
+ "total_decoded_seconds": 109.36
+}
