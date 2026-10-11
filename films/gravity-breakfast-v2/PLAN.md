@@ -1,48 +1,73 @@
-# PLAN — "What If Gravity Doubled at Breakfast?" V2 (Cinematic Hybrid prototype)
+# PLAN — "What If Gravity Doubled at Breakfast?" (Cinematic Hybrid prototype)
 
-V2 of the 30-second, 16:9 (1920×1080, 30 fps) visual experiment. V1 stays as it was (`gravity-breakfast.html`,
-`films/gravity-breakfast/`). V2 lives in `films/gravity-breakfast-v2/` + `gravity-breakfast-v2.html`. **No shared engine
-file is changed.** It was built from the owner's V2 brief (2026-10-11, "Cinematic Hybrid V2: polish and correct"):
-keep the café, the amber/violet palette and the cinematography; fix the gravity HUD, the cartoon look, the glow and the
-slow opening; make the struggle physically convincing; give every shot a new consequence.
+A **30-second, 16:9 (1920×1080, 30 fps) visual experiment**, not a channel episode. It tests the owner's "Cinematic
+Hybrid" direction (2026-10-11): about 60 % of our immersive 3D simulation look (POV, physics, scale, atmosphere, serif
+HUD) and 40 % of a long-form reference channel's storytelling (one simple stylised character, expressive acting,
+intentional amber/violet lighting, varied camera: wide, medium, extreme close-up, top-down, POV, measurement overlays).
 
-## What V2 changes (vs V1)
-- **One gravity state.** `gbG(t)` (script.js) is the only gravity value. The fountain, the lamps, the falling cups and
-  the gauge all read it. The gauge is on screen from 0.35 s to the end line and never resets: 1.0 g before the drop, then
-  a single needle swing to 2.0 g. V1 re-animated 1.0 → 2.0 g in the close-up, which read as gravity resetting.
-- **Opening.** The title sits over the café interior from frame 1, with the hero already drinking. Gravity doubles at 3.0 s
-  (V1: 5.6 s, after a 3 s exterior opener).
-- **Characters.** Adult proportions: the head is about 80 % of V1's, oval with a jaw, a chin, cheekbones and a nose. Small almond
-  eyes with large dark irises, thin dark brows, a fine lip line, slim dark glasses. Matte skin and cloth, a thin rim
-  only, less saturated skin tones. Expression ranges are compressed in `applyFace` (restrained acting).
-- **Glow.** Bloom 0.42 → 0.16 (threshold 1.05 → 1.3), exposure 1.08 → 1.0. Matte darker china with no rim. Less rim on
-  people and the POV hands.
-- **Struggle.** One close-up (no top-down, no ghost cup). He braces his left palm flat on the table, dips, and pulls. The cup
-  rises 5 cm with a growing tremble and drops back (free fall in 2 g, clink, slosh). He leans in and uses both hands, and his
-  head comes down to meet the cup for one sip. He sets it down carefully. Hand orientation comes from `orientHand` after IK.
-- **Lamps.** The cord stretch is reduced to 3 cm (a cord spring under double weight), not a drop.
+Everything lives in `films/gravity-breakfast/` + `gravity-breakfast.html`. **No shared engine file is changed.**
+The 16:9 frame, depth of field and the character rig are all film-side:
+- `film.js` replaces the page's `resize()` on the SceneManager instance with a 16:9 version (capture mode already
+  honours `?w=1920&h=1080`), and sets `--u` = 1/1920 of the frame width so HUD sizes are in 1920-wide design px.
+- `post.js` subclasses `PostProcessing` (`GbPost`) and injects a cheap depth-of-field term into the existing
+  composite (it reuses the AO pass's view depth and the bloom blur pyramid; no second chain).
+- `rig.js` is a new reusable stylised character (`GbCharacter`), separate from the locked `js/world/people.js` rig.
 
 ## 1. The rule
-- At **3.0 s** gravity goes from 1.0 g to 2.0 g (0.12 s ramp). Everything else stays the same.
-- What it shows: the cup slams down. His arm (about 4 kg) feels like 8 kg, so lifting a cup is slow work but possible.
-  Standing means carrying twice his weight. Lamps swing at period ÷ √2. Fountain jets reach half height (h = v²/2g). Things
-  fall faster. Balloons rise faster because buoyancy doubles too.
+- At **5.6 s** gravity goes from 1.0 g to 2.0 g, everywhere, instantly. Everything else stays the same.
+- Honest physics shown on screen:
+  - a raised cup is pulled down twice as hard and slams onto the table; liquid sloshes lower and settles faster;
+  - your body weighs twice as much: posture collapses, standing up is like squatting your own body weight;
+  - a 0.35 kg cup now feels like 0.70 kg. **A cup is still liftable**: the struggle is shown as slow and shaky,
+    not impossible (the caption makes the body, not the cup, the real problem);
+  - pendant lamps drop and bounce on their cords, then swing faster (pendulum period ÷ √2);
+  - a poured stream falls faster and gets thinner;
+  - fountain jets reach **half** the height (same pump pressure → same nozzle speed; h = v² / 2g);
+  - string lights and awnings sag further; pigeons have to flap harder and sink;
+  - **helium balloons rise faster** (buoyancy is the weight of the displaced air, which doubles too): the payoff.
 
-## 3. Shot list (V2)
+## 2. The places
+- One café corner at **sunrise** ("breakfast"): violet-blue sky, a low amber sun behind the plaza, amber practicals.
+- Interior (x −5…5, z −3.5…3.5, 3.2 m high): window wall at z = −3.5 with mullioned windows and a door, wainscot, plank
+  floor, counter + shelves + espresso machine at the back, three pendant lamps, small round tables.
+- Exterior: sidewalk, the café facade with a striped awning and string lights, a small plaza with a round fountain,
+  one tree, a bench, a balloon vendor, pigeons, low townhouses behind (lit windows), a sun disc on the horizon.
+  (No cars, cranes, airplanes or collapsing buildings.)
 
-| Time | Shot | Consequence shown |
-|---|---|---|
-| 0.0–4.15 | **S2 Medium**, interior, slow drift; title over it | breakfast, the sip; at 3.0 the drop: cup slams, splash, slump, glasses slide |
-| 4.15–6.9 | **S3 Wide**, interior, tilt up to the lamp | the whole room: waiter buckles to a knee, lamps bounce, plants droop |
-| 6.9–13.5 | **S4 Close-up** (one shot): rack focus hands → face; push into his eyes | the struggle: brace, failed lift, two-handed sip |
-| 13.5–19.9 | **S5 POV** | standing is twice the work; the lamp swings fast; a cup slides off the tilted tray and smashes; the fountain through the window |
-| 19.9–30.0 | **S6 Exterior wide → crane up** | fountain at half height (old height marked); the balloons escape faster into the sunrise; end line |
+## 3. Shot list (story seconds = film seconds; no edit)
+
+| Time | Shot | What we SEE | What we HEAR | HUD / caption |
+|---|---|---|---|---|
+| 0.0–3.0 | **S1 Establishing wide**, exterior, slow push + crane down | Plaza at sunrise, tall fountain jets, amber café windows, our character visible at the window table | birds, fountain, soft café bed, music (warm plucks) | centred serif title |
+| 3.0–5.6 | **S2 Medium**, interior 3/4 front, slow drift | He sips, smiles, lifts the cup for another sip | cup clink, room tone | — |
+| 5.6–10.0 | **S3 Medium wide → push**, interior | Gravity doubles: camera dips, cup slams down, coffee splashes, chair creaks and sinks, posture collapses, glasses slide down his nose; lamps bounce; he tries to straighten up | low gravity "drop" hit, cup clunk, splash, chair creak, body slump, lamps' cords twang | readout GRAVITY 1.0 → 2.0 g |
+| 10.0–15.6 | **S4 Extreme close-up**, cup + hand at table height, face blurred behind; rack focus to the face | He tries to lift the cup: slow, shaky, ghost cup shows the 1 g lift; gauge animates 1.0 g → 2.0 g; rack focus to his strained face | strain breaths, ceramic scrape, gauge ticks | gauge; captions |
+| 15.6–16.3 | **Transition** | Push into his dark face; frame goes dark; eyelids open into POV | whoosh, heartbeat | — |
+| 16.3–23.0 | **S5 POV** (our immersive style, his hands) | Hands press the table, he tries to stand (heavy, shaky, sinks back); looks up at a lamp hanging low and swinging fast; the barista's pour falls fast and thin; turns to the window: the fountain is short | effort breaths, creak, lamp swing, pour | caption |
+| 23.0–30.0 | **S6 Wide reveal**, exterior crane up and back | Fountain at half height (dotted line marks the old height), sagging string lights swinging, awning sagging, pigeons struggling, a jogger on her knees, the vendor's balloons escaping and shooting up | wind, fountain lower pitch, balloon rubbing, music resolves | captions, end line |
+
+**Top-down shot:** S4 opens on a 1.2 s top-down insert of the table (cup ring + spilled coffee) before the side close-up.
 
 ## 4. Sound cue markers
-`GB_CUES` (script.js) lists every cue; `audio.js` schedules from `GB`: bed and motif 0.0; drop 3.0 (clunk, splash, creak,
-slump, lamp twang, tray rattle); brace 7.2; attempt 1 7.95 with the clink at 9.15; attempt 2 9.9 (breaths and sip);
-set-down 12.45; whoosh and heartbeat 12.75; eyes open 13.5; standing effort 14.1; lamp squeaks from 16.65; smash 18.155;
-outside 19.9; balloons 23.4; resolve 26.4.
+Every cue is also in `SCRIPT.events` (dev-bar ticks) and `GB_CUES` (read by `audio.js`):
+
+| t | cue |
+|---|---|
+| 0.0 | room tone + birds + fountain bed; warm pluck motif |
+| 3.0 | cut inside (exterior bed ducks) |
+| 3.5 | sip |
+| 5.6 | **G-drop** (sub hit + pressure swell), cup clunk 5.72, splash 5.75, chair creak 5.8, slump 5.95 |
+| 6.1 | lamp cords twang / swing creaks |
+| 10.0 | cut to close-up (room ducks), gauge ticks 10.4–11.6 |
+| 11.0–14.8 | strain breaths, ceramic scrape |
+| 15.6 | push-in whoosh, heartbeat 15.9 |
+| 16.3 | eyes open (air) |
+| 17.0–19.0 | effort, chair creak |
+| 20.0 | lamp swing |
+| 21.0 | pour |
+| 23.0 | cut outside: wind, fountain (lower), birds flapping |
+| 25.5 | balloons released (rubber squeak, whoosh up) |
+| 28.0 | music resolve chord |
 
 ## 5. Systems / files
 - `script.js` beats (`GB`), cues, SCRIPT (events, POV camera tracks, hands, HUD), CONFIG (1920×1080).

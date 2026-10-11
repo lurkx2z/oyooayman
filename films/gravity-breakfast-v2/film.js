@@ -101,7 +101,7 @@ const FILM = {
     const e = C.hero.face.eyes[1].eg; e.updateMatrixWorld(true); ctx.eyeP = e.getWorldPosition(new THREE.Vector3());
     // camera
     let S = null;
-    if (!pov) { S = gbSmoothShot(shot, t, ctx); gbApplyShot(cam, S); }
+    if (!pov) { S = shot.cam(t, ctx); gbApplyShot(cam, S); }
     // look-dev: ?gbcam=x,y,z,ax,ay,az[,fov] overrides the shot camera (inspection only)
     const dc = /[?&]gbcam=([^&]+)/.exec(location.search);
     if (dc) { const v = dc[1].split(',').map(Number); S = { pos: new THREE.Vector3(v[0], v[1], v[2]), at: new THREE.Vector3(v[3], v[4], v[5]), fov: v[6] || 30, focus: 1, dof: 0 }; gbApplyShot(cam, S); }

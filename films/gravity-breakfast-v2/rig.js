@@ -119,22 +119,6 @@ function gbEvalTrack(keys, lib, t, base) {
   return out;
 }
 
-// V2 "momentum": the same pose track, low-passed with a causal exponential kernel (a pure function of t: it samples
-// the track at a few past times). Each joint group trails by its own time constant, so the pelvis leads, the chest
-// follows, and the head, forearms and hands arrive last (overlapping action instead of every joint stopping at once).
-const _GB_LAG = (k) => (/^(root|pel)/.test(k) ? 0.045 : /^(sp|ch|[LR](Sh[XYA]|Hip|Kn))/.test(k) ? 0.08 : 0.13);
-const _GB_TAUS = [0, 0.03, 0.06, 0.09, 0.13, 0.18, 0.24, 0.32, 0.42];
-function gbEvalSmooth(keys, lib, t) {
-  const S = _GB_TAUS.map((tau) => gbEvalTrack(keys, lib, t - tau));
-  const out = {}, ks = new Set(); for (const P of S) for (const k of Object.keys(P)) ks.add(k);
-  for (const k of ks) {
-    const L = _GB_LAG(k); let a = 0, w = 0;
-    for (let i = 0; i < S.length; i++) { const wi = Math.exp(-_GB_TAUS[i] / L); a += (S[i][k] || 0) * wi; w += wi; }
-    out[k] = a / w;
-  }
-  return out;
-}
-
 class GbCharacter {
   constructor(scene, lookName, opts = {}) {
     this.L = Object.assign({}, GB_LOOKS[lookName] || GB_LOOKS.hero, opts.look || {});

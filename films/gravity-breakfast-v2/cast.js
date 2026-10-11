@@ -233,7 +233,7 @@ class GbCast {
     const H = this.hero, [cx, cz] = GB_SET.heroChair, sink = this.cafe.heroChair.seat.position.y - 0.46;
     H.place(cx, sink, cz, Math.PI / 2);
     H.root.visible = !opts.pov;
-    const P = gbEvalSmooth(GB_HERO_POSES, GB_POSES, t);
+    const P = gbEvalTrack(GB_HERO_POSES, GB_POSES, t);
     // additive layers: breathing (slow before, heavy after), impact springs, effort tremble
     const after = MathX.smooth(t, GB.g, GB.g + 0.4);
     const br = Math.sin(t * Math.PI * 2 * (0.24 + 0.2 * after)) * (1.0 + 1.6 * after);
@@ -320,7 +320,7 @@ class GbCast {
     // walks in with the tray (3.0 → 5.3), stops beside the next table, facing him (−X)
     const x = gbTrack('wx', [[0, 0.6], [0.2, 0.6], [2.6, -1.0, 'outSine'], [30, -1.0]]).value(t), z = gbTrack('wz', [[0, -1.4], [0.2, -1.4], [2.6, -1.72, 'outSine'], [30, -1.72]]).value(t);
     W.place(x, 0, z, -2.1);
-    const P = gbEvalSmooth(GB_WAITER_POSES, GB_POSES, t);
+    const P = gbEvalTrack(GB_WAITER_POSES, GB_POSES, t);
     const walking = MathX.window(t, 0.1, 2.65, 0.2, 0.35);
     if (walking > 0) { const c = gbCycle((t - 0.1) * 0.95, 'walk'); for (const k of ['LHipX', 'RHipX', 'LKnX', 'RKnX', 'LAnX', 'RAnX', 'rootY', 'pelY']) P[k] = (P[k] || 0) * (1 - walking) + c[k] * walking; }
     P.spX += gbSpring(t, GB.g + 0.1, 6, 2.2, 4);
@@ -395,7 +395,7 @@ class GbCast {
     // vendor: holds the bunch high; in 2 g his arm sags; at the release his grip fails and he looks up
     const V = this.vendor;
     V.place(1.4, 0, -9.2, 0.15);
-    const VP = gbEvalSmooth([[0, 'vendorHold', 0.01], [GB.g, 'vendorSag', 0.35, 'outQuad'], [GB.release, 'vendorLookUp', 0.5, 'outBack']], GB_POSES, t);
+    const VP = gbEvalTrack([[0, 'vendorHold', 0.01], [GB.g, 'vendorSag', 0.35, 'outQuad'], [GB.release, 'vendorLookUp', 0.5, 'outBack']], GB_POSES, t);
     VP.RShX += gbSpring(t, GB.release, 14, 2.4, 4); VP.chX = (VP.chX || 0) + Math.sin(t * 1.6) * 1.2;
     V.applyPose(VP);
     V.applyFace(gbEvalTrack([[0, 'content', 0.01], [GB.g, 'strain', 0.3], [GB.release, 'surprise', 0.15], [GB.release + 0.8, 'awe', 0.4]], GB_FACES, t), { x: 0, y: t > GB.release ? 0.9 : 0.1 });
@@ -428,7 +428,7 @@ class GbCast {
     const J = this.jogger;
     const jx = gbTrack('jx', [[0, -9.8], [GB.g, -1.6, 'linear'], [30, -1.6]]).value(t), jz = gbTrack('jz', [[0, -7.6], [GB.g, -9.6, 'linear'], [30, -9.6]]).value(t);
     J.place(jx, 0, jz, Math.atan2(8.2, -2.0));
-    let JP = gbEvalSmooth([[0, 'stand', 0.01], [GB.g, 'jogKneel', 0.45, 'outQuad']], GB_POSES, t);
+    let JP = gbEvalTrack([[0, 'stand', 0.01], [GB.g, 'jogKneel', 0.45, 'outQuad']], GB_POSES, t);
     if (t < GB.g + 0.3) { const c = gbCycle(t * 1.45, 'jog'), w = 1 - MathX.smooth(t, GB.g, GB.g + 0.3); for (const k of Object.keys(c)) JP[k] = (JP[k] || 0) * (1 - w) + c[k] * w; }
     JP.chX += Math.sin(t * Math.PI * 2 * 0.6) * 3 * after;
     J.applyPose(JP);
@@ -436,7 +436,7 @@ class GbCast {
     // the man on the bench: reading posture → slumped
     const Sx = this.sitter;
     Sx.place(5.5, 0.0, -11.35, -Math.PI / 2 + 0.35 + Math.PI);
-    const SP = gbEvalSmooth([[0, 'sit', 0.01], [GB.g, 'benchSlump', 0.4, 'outQuad']], GB_POSES, t);
+    const SP = gbEvalTrack([[0, 'sit', 0.01], [GB.g, 'benchSlump', 0.4, 'outQuad']], GB_POSES, t);
     SP.rootY = -0.37 + (SP.rootY + 0.36) * 0.5;
     Sx.applyPose(SP);
     Sx.applyFace(gbEvalTrack([[0, 'content', 0.01], [GB.g, 'exhausted', 0.4]], GB_FACES, t), { x: 0.3, y: -0.2 });
