@@ -1,24 +1,24 @@
 # What If Gravity Doubled? — verification report
 
-Two exports of the same picture: **v1** (the original mix, as in the ZIP) and **v2** (the cinematic mix, see
-`MIX_V2_REPORT.md`). Everything below was measured from the exported files or read from the running page.
+Three exports of the same picture: **v1** (the original mix, as in the ZIP), **v2** (the cinematic mix, see
+`MIX_V2_REPORT.md`) and **v3** (the dynamic mix, see `MIX_V3_REPORT.md`). Everything below was measured from the exported files or read from the running page.
 
 ## 1. The exported files
 
-| | v1 original mix | v2 cinematic mix |
-|---|---|---|
-| File | `gravity-doubled-narrated_v1_original-mix_1920x1080.mp4` | `gravity-doubled-narrated_v2_cinematic-mix_1920x1080.mp4` |
-| Size | 26.8 MiB | 26.8 MiB |
-| Picture | 1920×1080, 30 fps, 1832 frames, H.264 | identical (the decoded video streams have the same MD5, `8430d3c5…`) |
-| Duration | 61.067 s | 61.067 s |
-| Audio | AAC 160 kb/s, 48 kHz stereo | AAC 160 kb/s, 48 kHz stereo |
-| Integrated loudness (in the MP4) | −16.4 LUFS | **−14.9 LUFS** |
-| True peak (in the MP4, after AAC) | −2.1 dBTP | **−2.1 dBTP** |
-| Loudness range | 5.8 LU | 2.9 LU |
+| | v1 original mix | v2 cinematic mix | v3 dynamic mix |
+|---|---|---|---|
+| File | `…_v1_original-mix_1920x1080.mp4` | `…_v2_cinematic-mix_1920x1080.mp4` | `…_v3_dynamic-mix_1920x1080.mp4` |
+| Size | 26.8 MiB | 26.8 MiB | 26.8 MiB |
+| Picture | 1920×1080, 30 fps, 1832 frames, H.264 | identical | identical (all three decoded video streams have the same MD5, `8430d3c5…`) |
+| Duration | 61.067 s | 61.067 s | 61.067 s |
+| Audio | AAC 160 kb/s, 48 kHz stereo | the same | the same |
+| Integrated loudness (in the MP4) | −16.4 LUFS | −14.9 LUFS | **−15.1 LUFS** |
+| True peak (in the MP4, after AAC) | −2.1 dBTP | −2.1 dBTP | **−1.9 dBTP** |
+| Loudness range | 5.8 LU | 2.9 LU | **4.2 LU** |
 
 - Black frames: only 60.80–61.03 s, the planned fade to black at the end. No other black frame.
 - Frozen picture: none (no stretch of 1 s or more without change).
-- Both pages (`gravity-doubled-narrated.html`, `gravity-doubled-narrated-v2.html`) boot with no errors and play their
+- All three pages (`gravity-doubled-narrated.html`, `-v2.html`, `-v3.html`) boot with no errors and play their
   baked soundtrack (`tools/check-page.cjs`).
 
 ## 2. Physics (read from the page while it runs)
@@ -50,6 +50,9 @@ same suspension response, so they sound only while the body moves on screen.
 | The clamps open | 30.460 s (frame 913.8) | 30.460 s | 0 ms |
 | The 2 g cup lands | 30.780 s (frame 923.4) | 30.779 s | −1 ms |
 | The 1 g cup lands | 30.912 s (frame 927.4) | 30.912 s | 0 ms |
+
+v3, measured the same way: the doubling, the set-down, the clamps and the 2 g smash start on the same millisecond;
+the 1 g smash's sharpest rise is 6 ms after its landing time (a fifth of a frame).
 
 The ducking follows the real word times from the forced alignment (`narration-timing.js`): five spoken windows, each
 duck complete 0.1 s before the first word and released after the last. The measured duck depths match the settings

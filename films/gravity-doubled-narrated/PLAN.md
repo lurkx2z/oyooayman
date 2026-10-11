@@ -47,7 +47,7 @@ pages are untouched).
 `gravity-doubled-narrated-v2.html` loads `mix-v2.js` + `audio-v2.js` and the baked `soundtrack-v2.js`; every other file
 is shared with v1, so the picture is identical (the two MP4s' decoded video streams have the same MD5). The five stems
 (narration, music, ambience, movement foley, physics/impacts) stay separate until export:
-`render-stems.cjs` renders each alone, `mix-v2.py` measures them, sets their levels (written back into `mix-v2.js`),
+`render-stems.cjs` renders each alone, `mix-stems.py` (formerly `mix-v2.py`) measures them, sets their levels (written back into `mix-v2.js`),
 sums, masters to −15 LUFS / ≤ −2 dBTP and verifies. Ducking is per stem from the real word times. Full numbers:
 `MIX_V2_REPORT.md`; checks: `VERIFICATION.md`.
 
@@ -59,5 +59,10 @@ sums, masters to −15 LUFS / ≤ −2 dBTP and verifies. Ducking is per stem fr
       pacing 6.5, long-form potential 8.5); the sound went too quiet when the narrator stopped
 - [x] v2 cinematic mix: five stems, per-stem ducking, rebuilt sound design and score, −14.9 LUFS / −2.1 dBTP in the MP4
 - [x] Final 1080p MP4s (v1 original mix and v2), reports, stems and audio preview delivered
-- [ ] Listening pass by ear on a phone and on headphones (the mix was checked by measurement only)
+- [x] Owner's analysis of v2: level right (−14.9 LUFS, −2.1 dBTP) but only 2.9 LU of loudness range; asked for dynamics
+      and better sound design, not a louder mix
+- [x] v3 dynamic mix (`gravity-doubled-narrated-v3.html`, `MIX_V3_REPORT.md`): a dynamics map per stem, a hush before
+      the set-down and the drop, a heartbeat build, a J-cut outside, room storytelling, a smash crunch; LRA 3.0 → 4.3 LU,
+      the set-down's punch 9.5 → 16.2 LU, the 2 g smash 10.7 → 14.2 LU; −15.1 LUFS / −1.9 dBTP in the MP4
+- [ ] Listening pass by ear on a phone and on headphones (every mix so far was checked by measurement only)
 - Next milestone suggested by the owner: a 3-minute mini-documentary (not started)

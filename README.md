@@ -72,10 +72,11 @@ Everything is procedural, so there are no models, images or sound files to downl
 > markers. It is self-contained in `films/gravity-breakfast/`, and no engine files were changed. Plan, shots and cues:
 > [`films/gravity-breakfast/PLAN.md`](films/gravity-breakfast/PLAN.md).
 >
-> **First narrated film (16:9): *What If Gravity Doubled?*** Open `gravity-doubled-narrated-v2.html` (61 s, 1920×1080;
-> the original mix stays in `gravity-doubled-narrated.html`). Built voice first: five ElevenLabs lines (Charlie) with
-> deliberate silent sections between them, the timeline fitted to the real word times. v2 mixes five separate stems
-> (narration, music, ambience, movement, impacts) with per-stem ducking from the word times, mastered to −15 LUFS.
+> **First narrated film (16:9): *What If Gravity Doubled?*** Open `gravity-doubled-narrated-v3.html` (61 s, 1920×1080;
+> the earlier mixes stay in `gravity-doubled-narrated.html` and `-v2.html`). Built voice first: five ElevenLabs lines
+> (Charlie) with deliberate silent sections between them, the timeline fitted to the real word times. v2 mixes five
+> separate stems (narration, music, ambience, movement, impacts) with per-stem ducking from the word times, mastered to
+> −15 LUFS; v3 adds a dynamics map (hushes before the hits, builds into the climaxes) at the same loudness.
 > Plan, script and reports: [`films/gravity-doubled-narrated/`](films/gravity-doubled-narrated/PLAN.md).
 
 | Time | Beat |

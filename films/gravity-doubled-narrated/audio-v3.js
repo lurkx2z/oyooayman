@@ -10,7 +10,7 @@
        stirring and a newspaper before it; the plaza sound starts before the cut outside (a J-cut);
      - fuller impacts: the smash gets a dense crunch of micro-fractures, the set-down a soft weight through the table;
      - breath that moves (turbulent airflow) with less synthetic voice in the effort sounds.
-   FIVE STEMS, kept separate until the final export (mix-v2.py renders each one alone with `audio.solo = '<stem>'`):
+   FIVE STEMS, kept separate until the final export (mix-stems.py measures each one, rendered alone with `audio.solo = '<stem>'`):
      voice  the five ElevenLabs clips (never regenerated), levelled per clip, a presence lift, an even compressor
      music  an original score in F: felt piano, string pads, pizzicato, a few bells and a felt drum, scored to the action
      amb    the café (room tone, the espresso machine, the square through the glass) and the plaza (wind, the fountain,

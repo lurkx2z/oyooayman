@@ -159,6 +159,6 @@ gasps and effort sounds are wordless foley; the café and plaza murmur is synthe
 ## Files
 
 `audio-v2.js` (the stems and sound design), `mix-v2.js` (levels, ducking, voice trims), `render-stems.cjs` (renders each
-stem alone), `mix-v2.py` (measure → level → sum → master → verify → report), `soundtrack-v2.js` (the baked v2 mix for the
+stem alone), `mix-stems.py`, formerly `mix-v2.py` (measure → level → sum → master → verify → report), `soundtrack-v2.js` (the baked v2 mix for the
 page). Re-run: `render-stems.cjs <dir>` and `render-stems.cjs <dir> music,amb,foley,sfx --raw`, then
-`mix-v2.py <dir> timeline.json <out> --v1 <v1.wav> --use-gains`.
+`mix-stems.py <dir> timeline.json <out> --v1 <v1.wav> --use-gains` (v2 is its default mix file).
