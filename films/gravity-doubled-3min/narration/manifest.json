@@ -1,0 +1,95 @@
+{
+  "voice": "IKne3meq5aSn9XLyUdCD",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75
+  },
+  "clips": [
+    {
+      "id": "01-s01-moment",
+      "text": "What if gravity doubled... right now? No warning. No countdown. Just one ordinary morning, when everything on Earth suddenly becomes twice as heavy.",
+      "file": "01-s01-moment.mp3",
+      "align": "01-s01-moment.align.json",
+      "seconds": 10.71,
+      "speech_start": 0,
+      "speech_end": 10.64,
+      "hash": "fcfdb6fe3b42d6c2",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "02-s03-mass",
+      "text": "Here's the strange part. Nothing has gained mass. Your coffee, your phone, even your own body still contain exactly the same amount of matter. But gravity pulls on all of it twice as hard.",
+      "file": "02-s03-mass.mp3",
+      "align": "02-s03-mass.align.json",
+      "seconds": 13.51,
+      "speech_start": 0,
+      "speech_end": 13.44,
+      "hash": "5924a2524eb040cf",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "03-s04-experiment",
+      "text": "Now imagine dropping two identical objects from the same height. Under normal gravity, a one-meter fall takes about zero point four five seconds. But under double gravity, that drops to just zero point three two. And the impact? Roughly twice the energy, if everything else stays the same.",
+      "file": "03-s04-experiment.mp3",
+      "align": "03-s04-experiment.align.json",
+      "seconds": 19.1,
+      "speech_start": 0,
+      "speech_end": 19.12,
+      "hash": "dc4d9d99422428ae",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "04-s06-body",
+      "text": "But the real problem isn't your coffee. It's you. Every time you stand, walk, or climb a staircase, your muscles have to fight twice the gravitational force. And your heart now faces a much harder challenge pushing blood upward toward your brain.",
+      "file": "04-s06-body.mp3",
+      "align": "04-s06-body.align.json",
+      "seconds": 16.22,
+      "speech_start": 0,
+      "speech_end": 16.24,
+      "hash": "715428c8e76d521d",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "05-s08-city",
+      "text": "Outside, the world looks familiar. But everything behaves differently. Cars sit lower on their suspension. Ordinary objects become exhausting to carry. And a fountain that once sent water high into the air might barely reach half its previous height, assuming the water leaves the nozzle at the same speed. Gravity has changed the rules of everyday life.",
+      "file": "05-s08-city.mp3",
+      "align": "05-s08-city.align.json",
+      "seconds": 22.94,
+      "speech_start": 0,
+      "speech_end": 22.96,
+      "hash": "dfb2fe35df22f466",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "06-s10-question",
+      "text": "And this is just the beginning. Buildings, machines, bridges, and even the human body were designed around a world with normal gravity. Some systems could handle the extra load. Others would reach their limits. The real question isn't whether life changes. It's how much of our world could adapt.",
+      "file": "06-s10-question.mp3",
+      "align": "06-s10-question.align.json",
+      "seconds": 20.3,
+      "speech_start": 0,
+      "speech_end": 20.32,
+      "hash": "66568fa472617437",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "07-s12-final",
+      "text": "Could humanity learn to live under twice Earth's gravity... or would the weight of our own world defeat us?",
+      "file": "07-s12-final.mp3",
+      "align": "07-s12-final.align.json",
+      "seconds": 7.03,
+      "speech_start": 0,
+      "speech_end": 7.04,
+      "hash": "3b5baead79eae4ca",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    }
+  ]
+}
