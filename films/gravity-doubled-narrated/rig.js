@@ -28,6 +28,8 @@ const GB_LOOKS = {
     hairStyle: 'cap', cap: '#c99b45', build: 1.08, head: 1.0 },
   jogger: { skin: '#a46d4f', lip: '#5a2f2a', top: '#c9566f', topDark: '#a9405d', pants: '#24243a', shoes: '#e6e0d6', sole: '#7a6a5a', hair: '#1a1012',
     hairStyle: 'pony', build: 0.9, head: 0.96 },
+  shopper: { skin: '#9b6a4f', lip: '#4e2824', top: '#7c4f73', topDark: '#62395a', pants: '#2e2a3a', shoes: '#4a2f2a', sole: '#1a1414', hair: '#2a1a16',
+    hairStyle: 'bun', build: 0.94, head: 0.97 },
   sitter: { skin: '#c08b6c', lip: '#6a3c34', top: '#66764a', topDark: '#55633a', pants: '#3b3346', shoes: '#463830', sole: '#1c1716', hair: '#cfc8bd',
     hairStyle: 'short', build: 1.05, head: 1.0 },
 };
@@ -306,20 +308,20 @@ class GbCharacter {
     // hand frame: fingers along −Y, palm faces +X for the right hand side convention → palm toward the body centre
     const pn = -sx;   // palm normal x sign (right hand at −X: palm faces +X)
     const h = this._joint(side + 'Hand', wr, 0, 0, 0);
-    gbAdd(h, gbRoundBox(0.028, 0.085, 0.072, 0.012, 2), M.skin, 0, -0.045, 0);
+    gbAdd(h, gbRoundBox(0.028, 0.085, 0.072, 0.012, 4), M.skin, 0, -0.045, 0);
     const fingers = [];
     const fz = [0.026, 0.009, -0.008, -0.024], fl = [0.046, 0.05, 0.047, 0.038];
     for (let i = 0; i < 4; i++) {
       const f1 = new THREE.Group(); f1.position.set(0, -0.086, fz[i]); h.add(f1);
-      gbAdd(f1, gbCapsule(0.0095, fl[i] * 0.55, 3, 8), M.skin, 0, -fl[i] * 0.3, 0, { cast: false });
+      gbAdd(f1, gbCapsule(0.0095, fl[i] * 0.55, 6, 14), M.skin, 0, -fl[i] * 0.3, 0, { cast: false });
       const f2 = new THREE.Group(); f2.position.set(0, -fl[i] * 0.58, 0); f1.add(f2);
-      gbAdd(f2, gbCapsule(0.0088, fl[i] * 0.45, 3, 8), M.skin, 0, -fl[i] * 0.24, 0, { cast: false });
+      gbAdd(f2, gbCapsule(0.0088, fl[i] * 0.45, 6, 14), M.skin, 0, -fl[i] * 0.24, 0, { cast: false });
       fingers.push([f1, f2]);
     }
     const t1 = new THREE.Group(); t1.position.set(pn * 0.008, -0.02, 0.034); h.add(t1);
-    gbAdd(t1, gbCapsule(0.011, 0.03, 3, 8), M.skin, 0, -0.02, 0, { cast: false });
+    gbAdd(t1, gbCapsule(0.011, 0.03, 6, 14), M.skin, 0, -0.02, 0, { cast: false });
     const t2 = new THREE.Group(); t2.position.set(0, -0.042, 0); t1.add(t2);
-    gbAdd(t2, gbCapsule(0.0098, 0.022, 3, 8), M.skin, 0, -0.015, 0, { cast: false });
+    gbAdd(t2, gbCapsule(0.0098, 0.022, 6, 14), M.skin, 0, -0.015, 0, { cast: false });
     this['hand' + side] = { h, fingers, t1, t2, pn };
   }
 

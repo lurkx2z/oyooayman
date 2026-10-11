@@ -15,6 +15,9 @@ const GB_SET = {
   lamps: [[-2.12, -2.62], [-0.25, -2.5], [1.95, -2.5], [0.7, 0.9], [-2.4, 1.2]],
   ceil: 3.2, tableH: 0.74, lampLen: 1.22,
   fountain: [-1.5, -13.5], fr: 2.5,
+  // narrated film: the bench and the parked car (outside, scenes 6–8) — [x, z, yaw]
+  bench: [3.2, -9.0, Math.PI * 0.9], car: [2.645, -10.884, Math.PI * 1.9],   // the car parallel to the bench, its front wing in front of him
+  shopper: [-0.6, -8.5, Math.PI * 0.62], jogger: [-5.6, -11.2, 1.2],
   sunDir: new THREE.Vector3(0.1, 0.085, -1).normalize(),     // toward the sun (low, beyond the plaza)
 };
 
@@ -250,7 +253,7 @@ class GbCafe {
     this.heroChair = this._chair(hx, hz, Math.PI / 2);
     const chairs = [[0.4, -2.55, -Math.PI / 2], [-0.25, -1.85, Math.PI], [1.3, -2.6, Math.PI / 2], [2.6, -2.6, -Math.PI / 2], [0.55, 1.4, Math.PI], [-0.05, 0.6, Math.PI / 2],
       [-2.4, 1.8, Math.PI], [-3.1, 1.0, Math.PI / 2], [3.0, 2.3, Math.PI], [-1.5, -2.74, -Math.PI / 2]];
-    for (const [x, z, y] of chairs) this._chair(x, z, y);
+    this.chairs = chairs.map(([x, z, y]) => Object.assign(this._chair(x, z, y), { x, z }));
     // the hero's breakfast: saucer, cup (posed by cast.js), a plate with a croissant, a little vase with a flower
     const [tx, tz] = GB_SET.heroTable, y = GB_SET.tableH;
     const china = gbMat('#cbc1b2', { rough: 0.62, name: 'gbChina', env: 0.3 });
@@ -268,7 +271,8 @@ class GbCafe {
     gbAdd(this.bloom, new THREE.SphereGeometry(0.009, 8, 6), gbMat('#f2c14e', { rough: 0.6 }), 0, 0.004, 0);
     this.vase = vase;
     // other tables' cups
-    for (const [x, z] of [[1.95, -2.6], [0.55, 0.7], [3.0, 1.6]]) { gbAdd(this.root, gbLathe([[0, 0], [0.06, 0], [0.07, 0.008], [0, 0.008]], 24), china, x + 0.05, y, z); gbAdd(this.root, gbLathe([[0, 0], [0.032, 0], [0.04, 0.07], [0.036, 0.075], [0, 0.075]], 20), china, x + 0.05, y + 0.008, z); }
+    this.otherCups = [];
+    for (const [x, z] of [[1.95, -2.6], [0.55, 0.7], [3.0, 1.6]]) { this.otherCups.push({ x, z, a: gbAdd(this.root, gbLathe([[0, 0], [0.06, 0], [0.07, 0.008], [0, 0.008]], 24), china, x + 0.05, y, z), b: gbAdd(this.root, gbLathe([[0, 0], [0.032, 0], [0.04, 0.07], [0.036, 0.075], [0, 0.075]], 20), china, x + 0.05, y + 0.008, z) }); }
   }
 
   // ------------------------------------------------------------------------------------------ pendant lamps
@@ -419,7 +423,7 @@ class GbCafe {
     gbAdd(R, new THREE.CylinderGeometry(1.1, 1.1, 0.25, 24), gbMat('#5a4a44', { rough: 0.9 }), -9.4, 0.12, -10.6);
     // bench
     const bM = gbMat('#4a3026', { rough: 0.7, rim: 0.3 }), iron = gbMat('#1c1a1e', { rough: 0.5, metal: 0.5 });
-    const bench = new THREE.Group(); bench.position.set(5.6, 0, -11.2); bench.rotation.y = -Math.PI / 2 + 0.35; R.add(bench);
+    const bench = new THREE.Group(); bench.position.set(GB_SET.bench[0], 0, GB_SET.bench[1]); bench.rotation.y = GB_SET.bench[2]; R.add(bench);
     for (let k = 0; k < 4; k++) gbAdd(bench, gbRoundBox(1.8, 0.04, 0.09, 0.015, 2), bM, 0, 0.46, -0.16 + k * 0.1);
     for (let k = 0; k < 3; k++) gbAdd(bench, gbRoundBox(1.8, 0.09, 0.035, 0.012, 2), bM, 0, 0.62 + k * 0.12, -0.22, { rx: -0.2 });
     for (const x of [-0.8, 0.8]) gbAdd(bench, gbRoundBox(0.06, 0.46, 0.5, 0.01, 2), iron, x, 0.23, -0.05);
@@ -507,17 +511,25 @@ class GbCafe {
     this.dust = new BillboardSystem(this.scene, 220, true);
   }
 
+  // the experiment shots: clear the table + chairs that stand between that camera and the lanes (staged demonstration)
+  setClear(on) {
+    const near = (x, z) => Math.abs(x - 0.65) < 1.4 && z > -0.3 && z < 2.2;
+    this.tables.forEach((T, i) => { const [x, z] = GB_SET.tables[i]; if (near(x, z)) T.visible = !on; });
+    for (const C of this.chairs) if (near(C.x, C.z)) C.g.visible = !on;
+    for (const C of this.otherCups) if (near(C.x, C.z)) { C.a.visible = !on; C.b.visible = !on; }
+  }
+
   // ------------------------------------------------------------------------------------------ per-frame (pure function of t)
   update(t, camera) {
     const g = gbG(t), u = gbSince(t), on = u > 0 ? 1 : 0;
     // ---- pendant lamps: drop + bounce on the cord at the switch, then swing at the new (faster) period
     for (const L of this.lamps) {
       const ph = L.i * 1.7;
-      const len0 = GB_SET.lampLen, stretch = on * (0.03 * MathX.smooth(u, 0, 0.12) + gbSpring(t, GB.g, 0.025, 2.2, 2.0));   // the cord stretches under the doubled weight
+      const len0 = GB_SET.lampLen, stretch = on * (0.012 * MathX.smooth(u, 0, 0.12) + gbSpring(t, GB.g, 0.008, 2.2, 2.0));   // the cord stretches under the doubled weight
       const len = len0 + stretch;
       const w1 = Math.sqrt(9.81 / len0), w2 = Math.sqrt(19.62 / len0);
       const pre = 0.018 * Math.sin(w1 * t + ph);
-      const post = on * (0.17 + 0.03 * L.i) * Math.exp(-0.16 * u) * Math.sin(w2 * u + 0.3 * L.i);
+      const post = on * (0.03 + 0.006 * L.i) * Math.exp(-0.16 * u) * Math.sin(w2 * u + 0.3 * L.i);   // narrated cut: a small jolt ("nothing looks different")
       const ax = pre * (1 - MathX.smooth(u, 0, 0.3)) + post, az = 0.6 * post * Math.cos(L.i) + 0.012 * Math.sin(w1 * t * 0.9 + ph);
       L.piv.rotation.set(az, 0, ax);
       L.cord.scale.y = len; L.cord.position.y = -len / 2;
@@ -534,7 +546,7 @@ class GbCafe {
       C.g.rotation.z = gbSpring(t, GB.g + 0.04, 0.012, 5, 4) * on;
     }
     // ---- plants and the flower: leaves droop under the new weight, with a springy settle
-    const droop = on * gbSettle(t, GB.g, 0.7, 0.25, 2.4);
+    const droop = on * gbSettle(t, GB.g, 0.7, 0.25, 2.4) * 0.3;   // narrated cut: subtle
     for (const P of this.plants) for (const L of P.leaves) {
       const sway = 0.04 * Math.sin(t * 1.3 + L.k * 1.7) * (1 - 0.5 * droop);
       L.tilt.rotation.x = L.base + (P.hang ? 0.25 : 0.55) * droop * (0.7 + 0.6 * hash1(L.k * 13)) + sway;
@@ -544,7 +556,7 @@ class GbCafe {
     this.bloom.rotation.z = -0.6 * droop;
     // ---- awning sag (+ a wobble), valance follows its front edge
     {
-      const sag = 0.06 + on * (0.16 * gbSettle(t, GB.g, 0.6, 0.3, 2.0) + gbSpring(t, GB.g, 0.03, 3.1, 1.6)), z0 = -3.72;
+      const sag = 0.06 + on * (0.05 * gbSettle(t, GB.g, 0.6, 0.3, 2.0) + gbSpring(t, GB.g, 0.012, 3.1, 1.6)), z0 = -3.72;
       const p = this.awning.geometry.attributes.position, B = this.awBase;
       for (let i = 0; i < p.count; i++) {
         const x = B[i * 3], zz = B[i * 3 + 2];       // zz −0.625…0.625 across the depth (front = +0.625 after rotateX(−90°): local z)
@@ -600,8 +612,10 @@ class GbCafe {
         const ph = (t / life + hash1(i * 3)) % 1;
         const x = -4.6 + hash1(i * 7) * 9.2, z = -3.3 + hash1(i * 11) * 2.4;
         const y = 0.5 + hash1(i * 13) * 2.3 - ph * life * fall + 0.06 * Math.sin(t * 0.4 + i);
-        const a = 0.22 * Math.sin(Math.PI * ph) * (0.4 + 0.6 * hash1(i * 17));
-        D.push(x + 0.05 * Math.sin(t * 0.3 + i), y, z, 0.012 + 0.012 * hash1(i * 19), 0, a, 1, 1.0, 0.8, 0.55);
+        const xx = x + 0.05 * Math.sin(t * 0.3 + i), cp = camera.position;
+        // motes right in front of the lens would blur into big discs over faces: fade them out near the camera
+        const a = 0.22 * Math.sin(Math.PI * ph) * (0.4 + 0.6 * hash1(i * 17)) * MathX.smooth(Math.hypot(xx - cp.x, y - cp.y, z - cp.z), 0.4, 0.9);
+        D.push(xx, y, z, 0.012 + 0.012 * hash1(i * 19), 0, a, 1, 1.0, 0.8, 0.55);
       }
     }
     D.end();

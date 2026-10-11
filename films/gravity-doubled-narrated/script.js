@@ -41,10 +41,11 @@ GB.lane1 = [gnW('c-falling', 15).start, gnW('c-falling', 22).end];   // "zero po
 GB.lane2 = [gnW('c-falling', 24).start, gnW('c-falling', 31).end];   // "zero point three two seconds at double gravity"
 // SCENE 5 — no narration: the drop, the impacts, a slow-motion replay, the hold
 GB.drop = NC.speechEnd + 1.25;                     // the clamps open (both lanes at the same instant)
-GB.replay = GB.drop + 2.05;                        // slow-motion replay starts (same shot)
-GB.replayRate = 0.16;
-GB.replayFrom = -0.12;                             // replay covers experiment time −0.12 … +0.62 s
-GB.replayEnd = GB.replay + (0.62 - GB.replayFrom) / GB.replayRate;
+GB.replay = GB.drop + 1.8;                         // slow-motion replay starts (same shot)
+GB.replayRate = 0.2;                               // 5× slower
+GB.replayFrom = -0.08;                             // replay covers experiment time −0.08 … +0.52 s (both impacts)
+GB.replayTo = 0.52;
+GB.replayEnd = GB.replay + (GB.replayTo - GB.replayFrom) / GB.replayRate;   // then real time again: the shards settle, a held result
 // SCENE 6 — outside (narration D)
 GB.out = ND.start - 0.35;                          // cut outside: the man on the bench tries to rise
 GB.rise1 = [ND.start + 0.6, gnW('d-outside', 8).end + 0.2];   // first attempt: he pushes up… and sinks back
@@ -77,9 +78,11 @@ function gbSince(t) { return t - GB.g; }
 function gbExpT(t) {
   if (t < GB.replay) return t - GB.drop;
   if (t < GB.replayEnd) return GB.replayFrom + (t - GB.replay) * GB.replayRate;
-  return 0.62 + (t - GB.replayEnd);   // after the replay: the result holds (shards settled)
+  return GB.replayTo + (t - GB.replayEnd);   // after the replay: real time resumes, the shards settle, the result holds
 }
 function gbInReplay(t) { return t >= GB.replay && t < GB.replayEnd; }
+
+if (GB.replayEnd > GB.out - 1) console.warn('replay runs into the cut outside');
 
 // SOUND CUE MARKERS (film s): audio.js schedules from this table; the dev bar shows the same ids
 const GB_CUES = [
@@ -126,7 +129,7 @@ const SCRIPT = {
   ],
 
   // (no POV in this film: every shot is a cinematic camera from shots.js; the controller just idles)
-  camera: { baseY: 0, x: [[0, 0]], z: [[0, 0]], height: [[0, 1.2]], yaw: [[0, 0]], pitch: [[0, 0]], fov: [[0, 44]] },
+  camera: { baseY: 0, x: [[0, 0]], z: [[0, 0]], height: [[0, 1.2]], yaw: [[0, 0]], pitch: [[0, 0]], fov: [[0, 44]], startles: [], shakes: [] },
   hands: { right: [[0, 'hidden']], left: [[0, 'hidden']] },
   tracks: {},
 

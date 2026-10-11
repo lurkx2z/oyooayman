@@ -37,6 +37,29 @@
     .gb-tag { position: absolute; font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.16em; font-size: calc(var(--u) * 24); color: #f6ead8; opacity: 0;
       padding: calc(var(--u) * 6) calc(var(--u) * 14); border-radius: calc(var(--u) * 8); background: rgba(14, 8, 24, 0.45); white-space: nowrap; transform: translate(-50%, -50%); }
     .gb-tag b { font-family: var(--book); font-weight: 600; letter-spacing: 0; font-size: 1.35em; color: #ffd9a8; margin-left: 0.25em; }
+    /* narration subtitles (film.js builds one per phrase): bottom centre, one or two lines, word-timed from the real audio */
+    .gn-sub { position: absolute; bottom: calc(var(--u) * 84); left: 50%; transform: translateX(-50%); font-family: var(--book); font-size: calc(var(--u) * 48); font-weight: 600; line-height: 1.22;
+      color: #fff4e4; padding: calc(var(--u) * 12) calc(var(--u) * 30); border-radius: calc(var(--u) * 12); background: rgba(14, 8, 22, 0.55); max-width: calc(var(--u) * 1380); width: max-content; text-align: center;
+      text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(0, 0, 0, 0.6); pointer-events: none; }
+    .gn-sub span { transition: none; }
+    /* the opening line is the title: big serif, left of centre, clear of the cup */
+    .gn-sub.gn-title { bottom: auto; top: calc(var(--u) * 400); left: 24%; font-size: calc(var(--u) * 86); font-weight: 700; line-height: 1.08; color: #ffd9a8; width: calc(var(--u) * 790);
+      background: radial-gradient(closest-side, rgba(10, 6, 18, 0.5), rgba(10, 6, 18, 0.2) 62%, rgba(10, 6, 18, 0)); padding: calc(var(--u) * 40) calc(var(--u) * 40);
+      text-shadow: 0 0 calc(var(--u) * 30) rgba(20, 8, 30, 0.8), 0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.7); }
+    /* the drop experiment: lane labels above the boards, live timers under them, the replay tag */
+    .gb-lane { position: absolute; transform: translate(-100%, -50%); text-align: center; pointer-events: none; padding: calc(var(--u) * 8) calc(var(--u) * 22); border-radius: calc(var(--u) * 12); background: rgba(14, 8, 24, 0.5); }
+    .gb-lane .g { font-family: var(--book); font-size: calc(var(--u) * 62); font-weight: 700; line-height: 1; color: #fff1dc; }
+    .gb-lane .n { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.18em; font-size: calc(var(--u) * 19); color: #f1e6d6; opacity: 0.85; margin-top: calc(var(--u) * 6); }
+    .gb-lane .p { font-family: var(--book); font-size: calc(var(--u) * 36); font-weight: 600; color: #ffc98a; margin-top: calc(var(--u) * 4); font-variant-numeric: tabular-nums; }
+    .gb-lane.on { box-shadow: 0 0 0 calc(var(--u) * 2) rgba(255, 201, 138, 0.75); }
+    .gb-timer { position: absolute; transform: translate(-100%, -50%); font-family: var(--book); font-size: calc(var(--u) * 56); font-weight: 600; color: #fff1dc; font-variant-numeric: tabular-nums;
+      padding: calc(var(--u) * 4) calc(var(--u) * 20); border-radius: calc(var(--u) * 10); background: rgba(14, 8, 24, 0.55); pointer-events: none; white-space: nowrap; }
+    .gb-lane.r, .gb-timer.r { transform: translate(0, -50%); }
+    .gb-timer small { font-size: 0.6em; opacity: 0.85; }
+    .gb-timer.done { color: #ffc98a; box-shadow: 0 0 0 calc(var(--u) * 2) rgba(255, 201, 138, 0.7); }
+    .gb-replay { position: absolute; top: calc(var(--u) * 64); right: calc(var(--u) * 70); font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.22em; font-size: calc(var(--u) * 24); color: #f6ead8;
+      padding: calc(var(--u) * 10) calc(var(--u) * 20); border-radius: calc(var(--u) * 10); background: rgba(14, 8, 24, 0.5); pointer-events: none; }
+    .gb-replay::before { content: ''; display: inline-block; width: 0.6em; height: 0.6em; border-radius: 50%; background: #ff8a6b; margin-right: 0.7em; vertical-align: 0.05em; }
     /* ?safe: the central 9:16 column (for the future vertical cut) */
     .gb-safe { position: absolute; top: 0; bottom: 0; left: 50%; width: 31.64%; transform: translateX(-50%); border-left: 2px dashed rgba(120, 255, 200, 0.7); border-right: 2px dashed rgba(120, 255, 200, 0.7); pointer-events: none; display: none; }
     body.gb-showsafe .gb-safe { display: block; }
@@ -100,15 +123,19 @@
   <script src="js/ui/storyHud.js"></script>
   <script src="js/ui/devControls.js"></script>
   <!-- this film (plan: films/gravity-doubled-narrated/PLAN.md) -->
+  <script src="films/gravity-doubled-narrated/narration-timing.js"></script>
+  <script src="films/gravity-doubled-narrated/narration-audio.js"></script>
   <script src="films/gravity-doubled-narrated/script.js"></script>
   <script src="films/gravity-doubled-narrated/toon.js"></script>
   <script src="films/gravity-doubled-narrated/rig.js"></script>
   <script src="films/gravity-doubled-narrated/cafe.js"></script>
   <script src="films/gravity-doubled-narrated/plaza.js"></script>
+  <script src="films/gravity-doubled-narrated/car.js"></script>
   <script src="films/gravity-doubled-narrated/cast.js"></script>
   <script src="films/gravity-doubled-narrated/shots.js"></script>
   <script src="films/gravity-doubled-narrated/post.js"></script>
   <script src="films/gravity-doubled-narrated/audio.js"></script>
+  <script src="films/gravity-doubled-narrated/drop.js"></script>
   <script src="films/gravity-doubled-narrated/film.js"></script>
   <script src="films/gravity-doubled-narrated/soundtrack.js"></script>
   <script src="js/main.js"></script>

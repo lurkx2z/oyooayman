@@ -7,77 +7,83 @@ window.GN = {
   {
    "id": "a-opening",
    "file": "01-a-opening.mp3",
+   "hash": "4af6235e4ea29c83",
    "start": 0.5,
    "seconds": 2.508,
    "end": 3.008,
    "speechEnd": 2.835,
+   "lufs": -30.2,
+   "gainDb": 8.2,
    "text": "What if gravity suddenly doubled?",
    "words": [
     {
      "text": "What",
-     "start": 0.5,
-     "end": 0.74
+     "start": 0.66,
+     "end": 0.76
     },
     {
      "text": "if",
-     "start": 0.82,
-     "end": 0.9
+     "start": 0.84,
+     "end": 0.924
     },
     {
      "text": "gravity",
      "start": 1.06,
-     "end": 1.54
+     "end": 1.56
     },
     {
      "text": "suddenly",
-     "start": 1.7,
-     "end": 2.18
+     "start": 1.78,
+     "end": 2.16
     },
     {
      "text": "doubled?",
-     "start": 2.34,
-     "end": 2.835
+     "start": 2.38,
+     "end": 2.8
     }
    ]
   },
   {
    "id": "b-cafe",
    "file": "02-b-cafe.mp3",
+   "hash": "8952c6da54a84659",
    "start": 5,
    "seconds": 6.348,
    "end": 11.348,
    "speechEnd": 10.74,
+   "lufs": -29.1,
+   "gainDb": 7.1,
    "text": "At first, nothing looks different. But that coffee cup? Same mass. Twice the weight.",
    "words": [
     {
      "text": "At",
-     "start": 5,
-     "end": 5.08
+     "start": 5.04,
+     "end": 5.14
     },
     {
      "text": "first,",
-     "start": 5.24,
-     "end": 5.67
+     "start": 5.26,
+     "end": 5.64
     },
     {
      "text": "nothing",
-     "start": 5.96,
+     "start": 5.98,
      "end": 6.28
     },
     {
      "text": "looks",
-     "start": 6.4,
-     "end": 6.52
+     "start": 6.32,
+     "end": 6.54
     },
     {
      "text": "different.",
-     "start": 6.96,
-     "end": 7.44
+     "start": 6.58,
+     "end": 6.96
     },
     {
      "text": "But",
      "start": 7.48,
-     "end": 7.56
+     "end": 7.6
     },
     {
      "text": "that",
@@ -86,300 +92,306 @@ window.GN = {
     },
     {
      "text": "coffee",
-     "start": 7.96,
-     "end": 8.12
+     "start": 7.84,
+     "end": 8.06
     },
     {
      "text": "cup?",
-     "start": 8.44,
-     "end": 8.8
+     "start": 8.14,
+     "end": 8.274
     },
     {
      "text": "Same",
-     "start": 8.84,
+     "start": 8.88,
      "end": 9.08
     },
     {
      "text": "mass.",
-     "start": 9.4,
-     "end": 9.478
+     "start": 9.14,
+     "end": 9.44
     },
     {
      "text": "Twice",
-     "start": 9.8,
-     "end": 10.2
+     "start": 9.84,
+     "end": 10.24
     },
     {
      "text": "the",
      "start": 10.28,
-     "end": 10.36
+     "end": 10.38
     },
     {
      "text": "weight.",
      "start": 10.44,
-     "end": 10.74
+     "end": 10.7
     }
    ]
   },
   {
    "id": "c-falling",
    "file": "03-c-falling.mp3",
+   "hash": "955d372770d46f7c",
    "start": 18,
    "seconds": 11.729,
    "end": 29.729,
    "speechEnd": 29.21,
+   "lufs": -28.8,
+   "gainDb": 6.8,
    "text": "Now watch what happens when we drop it. From one meter, the fall takes about zero point four five seconds at normal gravity... and zero point three two seconds at double gravity.",
    "words": [
     {
      "text": "Now",
-     "start": 18,
-     "end": 18.24
+     "start": 18.1,
+     "end": 18.22
     },
     {
      "text": "watch",
-     "start": 18.32,
-     "end": 18.56
+     "start": 18.36,
+     "end": 18.58
     },
     {
      "text": "what",
-     "start": 18.64,
-     "end": 18.72
+     "start": 18.62,
+     "end": 18.76
     },
     {
      "text": "happens",
-     "start": 18.8,
-     "end": 19.2
+     "start": 18.82,
+     "end": 19.24
     },
     {
      "text": "when",
      "start": 19.28,
-     "end": 19.36
+     "end": 19.42
     },
     {
      "text": "we",
-     "start": 19.44,
+     "start": 19.46,
      "end": 19.6
     },
     {
      "text": "drop",
-     "start": 19.72,
-     "end": 19.84
+     "start": 19.64,
+     "end": 19.86
     },
     {
      "text": "it.",
      "start": 19.92,
-     "end": 20.063
+     "end": 20.02
     },
     {
      "text": "From",
-     "start": 20.56,
+     "start": 20.58,
      "end": 20.8
     },
     {
      "text": "one",
-     "start": 20.88,
-     "end": 21.04
+     "start": 20.84,
+     "end": 21.02
     },
     {
      "text": "meter,",
-     "start": 21.32,
-     "end": 21.558
+     "start": 21.06,
+     "end": 21.34
     },
     {
      "text": "the",
      "start": 21.68,
-     "end": 21.76
+     "end": 21.82
     },
     {
      "text": "fall",
-     "start": 21.84,
-     "end": 22.08
+     "start": 21.86,
+     "end": 22.1
     },
     {
      "text": "takes",
-     "start": 22.16,
-     "end": 22.32
+     "start": 22.14,
+     "end": 22.34
     },
     {
      "text": "about",
      "start": 22.4,
-     "end": 22.72
+     "end": 22.66
     },
     {
      "text": "zero",
      "start": 22.8,
-     "end": 22.96
+     "end": 23.04
     },
     {
      "text": "point",
-     "start": 23.12,
-     "end": 23.44
+     "start": 23.14,
+     "end": 23.34
     },
     {
      "text": "four",
-     "start": 23.52,
-     "end": 23.6
+     "start": 23.5,
+     "end": 23.66
     },
     {
      "text": "five",
-     "start": 23.76,
-     "end": 23.92
+     "start": 23.78,
+     "end": 23.96
     },
     {
      "text": "seconds",
      "start": 24.08,
-     "end": 24.48
+     "end": 24.46
     },
     {
      "text": "at",
-     "start": 24.56,
-     "end": 24.72
+     "start": 24.6,
+     "end": 24.76
     },
     {
      "text": "normal",
-     "start": 24.8,
-     "end": 25.12
+     "start": 24.84,
+     "end": 25.1
     },
     {
      "text": "gravity...",
-     "start": 25.2,
+     "start": 25.18,
      "end": 25.537
     },
     {
      "text": "and",
-     "start": 26.08,
-     "end": 26.32
+     "start": 26.06,
+     "end": 26.22
     },
     {
      "text": "zero",
-     "start": 26.44,
-     "end": 26.56
+     "start": 26.36,
+     "end": 26.62
     },
     {
      "text": "point",
      "start": 26.72,
-     "end": 26.96
+     "end": 27
     },
     {
      "text": "three",
-     "start": 27.04,
-     "end": 27.36
+     "start": 27.06,
+     "end": 27.26
     },
     {
      "text": "two",
      "start": 27.44,
-     "end": 27.6
+     "end": 27.58
     },
     {
      "text": "seconds",
-     "start": 27.68,
+     "start": 27.72,
      "end": 28.114
     },
     {
      "text": "at",
      "start": 28.24,
-     "end": 28.48
+     "end": 28.46
     },
     {
      "text": "double",
-     "start": 28.64,
-     "end": 28.8
+     "start": 28.5,
+     "end": 28.74
     },
     {
      "text": "gravity.",
-     "start": 29.24,
-     "end": 29.76
+     "start": 28.84,
+     "end": 29.21
     }
    ]
   },
   {
    "id": "d-outside",
    "file": "04-d-outside.mp3",
+   "hash": "f3bc623acb8e43ce",
    "start": 37.4,
    "seconds": 7.471,
    "end": 44.871,
    "speechEnd": 44.34,
+   "lufs": -29.6,
+   "gainDb": 7.6,
    "text": "Outside, your legs must work harder just to stand. Even parked cars sink deeper into their suspension.",
    "words": [
     {
      "text": "Outside,",
-     "start": 37.4,
-     "end": 38.2
+     "start": 37.46,
+     "end": 37.98
     },
     {
      "text": "your",
-     "start": 38.28,
-     "end": 38.44
+     "start": 38.32,
+     "end": 38.48
     },
     {
      "text": "legs",
-     "start": 38.6,
-     "end": 38.76
+     "start": 38.52,
+     "end": 38.78
     },
     {
      "text": "must",
-     "start": 38.88,
-     "end": 39
+     "start": 38.82,
+     "end": 39.02
     },
     {
      "text": "work",
-     "start": 39.12,
+     "start": 39.06,
      "end": 39.24
     },
     {
      "text": "harder",
-     "start": 39.32,
-     "end": 39.8
+     "start": 39.38,
+     "end": 39.7
     },
     {
      "text": "just",
-     "start": 39.92,
-     "end": 40.04
+     "start": 39.88,
+     "end": 40.06
     },
     {
      "text": "to",
-     "start": 40.12,
-     "end": 40.2
+     "start": 40.1,
+     "end": 40.24
     },
     {
      "text": "stand.",
-     "start": 40.28,
+     "start": 40.34,
      "end": 40.78
     },
     {
      "text": "Even",
-     "start": 41.4,
-     "end": 41.72
+     "start": 41.459,
+     "end": 41.74
     },
     {
      "text": "parked",
      "start": 41.8,
-     "end": 42.12
+     "end": 42.08
     },
     {
      "text": "cars",
-     "start": 42.2,
-     "end": 42.6
+     "start": 42.22,
+     "end": 42.62
     },
     {
      "text": "sink",
      "start": 42.68,
-     "end": 42.92
+     "end": 42.96
     },
     {
      "text": "deeper",
-     "start": 43,
+     "start": 43.02,
      "end": 43.32
     },
     {
      "text": "into",
-     "start": 43.44,
+     "start": 43.38,
      "end": 43.56
     },
     {
      "text": "their",
-     "start": 43.64,
-     "end": 43.72
+     "start": 43.6,
+     "end": 43.7
     },
     {
      "text": "suspension.",
@@ -391,71 +403,74 @@ window.GN = {
   {
    "id": "e-ending",
    "file": "05-e-ending.mp3",
+   "hash": "589f9b42858fec14",
    "start": 53.4,
    "seconds": 5.564,
    "end": 58.964,
    "speechEnd": 58.541,
+   "lufs": -28.7,
+   "gainDb": 6.7,
    "text": "And this is only the first minute. What happens when the whole world has to live like this?",
    "words": [
     {
      "text": "And",
-     "start": 53.4,
-     "end": 53.56
+     "start": 53.44,
+     "end": 53.62
     },
     {
      "text": "this",
-     "start": 53.64,
+     "start": 53.66,
      "end": 53.8
     },
     {
      "text": "is",
-     "start": 53.88,
-     "end": 53.96
+     "start": 53.86,
+     "end": 54.02
     },
     {
      "text": "only",
-     "start": 54.04,
-     "end": 54.28
+     "start": 54.08,
+     "end": 54.3
     },
     {
      "text": "the",
-     "start": 54.4,
-     "end": 54.52
+     "start": 54.34,
+     "end": 54.54
     },
     {
      "text": "first",
-     "start": 54.68,
+     "start": 54.58,
      "end": 54.84
     },
     {
      "text": "minute.",
      "start": 55,
-     "end": 55.366
+     "end": 55.34
     },
     {
      "text": "What",
-     "start": 55.88,
+     "start": 55.9,
      "end": 56.04
     },
     {
      "text": "happens",
-     "start": 56.12,
-     "end": 56.36
+     "start": 56.08,
+     "end": 56.4
     },
     {
      "text": "when",
      "start": 56.44,
-     "end": 56.52
+     "end": 56.56
     },
     {
      "text": "the",
      "start": 56.6,
-     "end": 56.76
+     "end": 56.7
     },
     {
      "text": "whole",
-     "start": 56.92,
-     "end": 57.08
+     "start": 56.78,
+     "end": 56.98
     },
     {
      "text": "world",
@@ -464,8 +479,8 @@ window.GN = {
     },
     {
      "text": "has",
-     "start": 57.56,
-     "end": 57.64
+     "start": 57.52,
+     "end": 57.68
     },
     {
      "text": "to",
@@ -474,18 +489,18 @@ window.GN = {
     },
     {
      "text": "live",
-     "start": 57.88,
-     "end": 57.96
+     "start": 57.84,
+     "end": 57.98
     },
     {
      "text": "like",
-     "start": 58.04,
+     "start": 58.02,
      "end": 58.2
     },
     {
      "text": "this?",
-     "start": 58.28,
-     "end": 58.541
+     "start": 58.24,
+     "end": 58.5
     }
    ]
   }
@@ -494,83 +509,83 @@ window.GN = {
   {
    "clip": "a-opening",
    "title": true,
-   "start": 0.5,
-   "end": 2.835,
+   "start": 0.66,
+   "end": 2.8,
    "tokens": [
     {
      "text": "What",
-     "start": 0.5,
-     "end": 0.74
+     "start": 0.66,
+     "end": 0.76
     },
     {
      "text": "if",
-     "start": 0.82,
-     "end": 0.9
+     "start": 0.84,
+     "end": 0.924
     },
     {
      "text": "gravity",
      "start": 1.06,
-     "end": 1.54
+     "end": 1.56
     },
     {
      "text": "suddenly",
-     "start": 1.7,
-     "end": 2.18
+     "start": 1.78,
+     "end": 2.16
     },
     {
      "text": "doubled?",
-     "start": 2.34,
-     "end": 2.835
+     "start": 2.38,
+     "end": 2.8
     }
    ],
-   "show": 0.44,
-   "hide": 3.135
+   "show": 0.6,
+   "hide": 3.1
   },
   {
    "clip": "b-cafe",
    "title": false,
-   "start": 5,
-   "end": 7.44,
+   "start": 5.04,
+   "end": 6.96,
    "tokens": [
     {
      "text": "At",
-     "start": 5,
-     "end": 5.08
+     "start": 5.04,
+     "end": 5.14
     },
     {
      "text": "first,",
-     "start": 5.24,
-     "end": 5.67
+     "start": 5.26,
+     "end": 5.64
     },
     {
      "text": "nothing",
-     "start": 5.96,
+     "start": 5.98,
      "end": 6.28
     },
     {
      "text": "looks",
-     "start": 6.4,
-     "end": 6.52
+     "start": 6.32,
+     "end": 6.54
     },
     {
      "text": "different.",
-     "start": 6.96,
-     "end": 7.44
+     "start": 6.58,
+     "end": 6.96
     }
    ],
-   "show": 4.94,
-   "hide": 7.42
+   "show": 4.98,
+   "hide": 7.26
   },
   {
    "clip": "b-cafe",
    "title": false,
    "start": 7.48,
-   "end": 8.8,
+   "end": 8.274,
    "tokens": [
     {
      "text": "But",
      "start": 7.48,
-     "end": 7.56
+     "end": 7.6
     },
     {
      "text": "that",
@@ -579,146 +594,146 @@ window.GN = {
     },
     {
      "text": "coffee",
-     "start": 7.96,
-     "end": 8.12
+     "start": 7.84,
+     "end": 8.06
     },
     {
      "text": "cup?",
-     "start": 8.44,
-     "end": 8.8
+     "start": 8.14,
+     "end": 8.274
     }
    ],
    "show": 7.42,
-   "hide": 8.78
+   "hide": 8.574
   },
   {
    "clip": "b-cafe",
    "title": false,
-   "start": 8.84,
-   "end": 10.74,
+   "start": 8.88,
+   "end": 10.7,
    "tokens": [
     {
      "text": "Same",
-     "start": 8.84,
+     "start": 8.88,
      "end": 9.08
     },
     {
      "text": "mass.",
-     "start": 9.4,
-     "end": 9.478
+     "start": 9.14,
+     "end": 9.44
     },
     {
      "text": "Twice",
-     "start": 9.8,
-     "end": 10.2
+     "start": 9.84,
+     "end": 10.24
     },
     {
      "text": "the",
      "start": 10.28,
-     "end": 10.36
+     "end": 10.38
     },
     {
      "text": "weight.",
      "start": 10.44,
-     "end": 10.74
+     "end": 10.7
     }
    ],
-   "show": 8.78,
-   "hide": 11.04
+   "show": 8.82,
+   "hide": 11
   },
   {
    "clip": "c-falling",
    "title": false,
-   "start": 18,
-   "end": 20.063,
+   "start": 18.1,
+   "end": 20.02,
    "tokens": [
     {
      "text": "Now",
-     "start": 18,
-     "end": 18.24
+     "start": 18.1,
+     "end": 18.22
     },
     {
      "text": "watch",
-     "start": 18.32,
-     "end": 18.56
+     "start": 18.36,
+     "end": 18.58
     },
     {
      "text": "what",
-     "start": 18.64,
-     "end": 18.72
+     "start": 18.62,
+     "end": 18.76
     },
     {
      "text": "happens",
-     "start": 18.8,
-     "end": 19.2
+     "start": 18.82,
+     "end": 19.24
     },
     {
      "text": "when",
      "start": 19.28,
-     "end": 19.36
+     "end": 19.42
     },
     {
      "text": "we",
-     "start": 19.44,
+     "start": 19.46,
      "end": 19.6
     },
     {
      "text": "drop",
-     "start": 19.72,
-     "end": 19.84
+     "start": 19.64,
+     "end": 19.86
     },
     {
      "text": "it.",
      "start": 19.92,
-     "end": 20.063
+     "end": 20.02
     }
    ],
-   "show": 17.94,
-   "hide": 20.363
+   "show": 18.04,
+   "hide": 20.32
   },
   {
    "clip": "c-falling",
    "title": false,
-   "start": 20.56,
-   "end": 22.72,
+   "start": 20.58,
+   "end": 22.66,
    "tokens": [
     {
      "text": "From",
-     "start": 20.56,
+     "start": 20.58,
      "end": 20.8
     },
     {
      "text": "one",
-     "start": 20.88,
-     "end": 21.04
+     "start": 20.84,
+     "end": 21.02
     },
     {
      "text": "meter,",
-     "start": 21.32,
-     "end": 21.558
+     "start": 21.06,
+     "end": 21.34
     },
     {
      "text": "the",
      "start": 21.68,
-     "end": 21.76
+     "end": 21.82
     },
     {
      "text": "fall",
-     "start": 21.84,
-     "end": 22.08
+     "start": 21.86,
+     "end": 22.1
     },
     {
      "text": "takes",
-     "start": 22.16,
-     "end": 22.32
+     "start": 22.14,
+     "end": 22.34
     },
     {
      "text": "about",
      "start": 22.4,
-     "end": 22.72
+     "end": 22.66
     }
    ],
-   "show": 20.5,
+   "show": 20.52,
    "hide": 22.74
   },
   {
@@ -730,26 +745,26 @@ window.GN = {
     {
      "text": "0.45",
      "start": 22.8,
-     "end": 23.92
+     "end": 23.96
     },
     {
      "text": "seconds",
      "start": 24.08,
-     "end": 24.48
+     "end": 24.46
     },
     {
      "text": "at",
-     "start": 24.56,
-     "end": 24.72
+     "start": 24.6,
+     "end": 24.76
     },
     {
      "text": "normal",
-     "start": 24.8,
-     "end": 25.12
+     "start": 24.84,
+     "end": 25.1
     },
     {
      "text": "gravity…",
-     "start": 25.2,
+     "start": 25.18,
      "end": 25.537
     }
    ],
@@ -759,138 +774,138 @@ window.GN = {
   {
    "clip": "c-falling",
    "title": false,
-   "start": 26.08,
-   "end": 29.76,
+   "start": 26.06,
+   "end": 29.21,
    "tokens": [
     {
      "text": "and",
-     "start": 26.08,
-     "end": 26.32
+     "start": 26.06,
+     "end": 26.22
     },
     {
      "text": "0.32",
-     "start": 26.44,
-     "end": 27.6
+     "start": 26.36,
+     "end": 27.58
     },
     {
      "text": "seconds",
-     "start": 27.68,
+     "start": 27.72,
      "end": 28.114
     },
     {
      "text": "at",
      "start": 28.24,
-     "end": 28.48
+     "end": 28.46
     },
     {
      "text": "double",
-     "start": 28.64,
-     "end": 28.8
+     "start": 28.5,
+     "end": 28.74
     },
     {
      "text": "gravity.",
-     "start": 29.24,
-     "end": 29.76
+     "start": 28.84,
+     "end": 29.21
     }
    ],
-   "show": 26.02,
-   "hide": 30.06
+   "show": 26,
+   "hide": 29.51
   },
   {
    "clip": "d-outside",
    "title": false,
-   "start": 37.4,
+   "start": 37.46,
    "end": 40.78,
    "tokens": [
     {
      "text": "Outside,",
-     "start": 37.4,
-     "end": 38.2
+     "start": 37.46,
+     "end": 37.98
     },
     {
      "text": "your",
-     "start": 38.28,
-     "end": 38.44
+     "start": 38.32,
+     "end": 38.48
     },
     {
      "text": "legs",
-     "start": 38.6,
-     "end": 38.76
+     "start": 38.52,
+     "end": 38.78
     },
     {
      "text": "must",
-     "start": 38.88,
-     "end": 39
+     "start": 38.82,
+     "end": 39.02
     },
     {
      "text": "work",
-     "start": 39.12,
+     "start": 39.06,
      "end": 39.24
     },
     {
      "text": "harder",
-     "start": 39.32,
-     "end": 39.8
+     "start": 39.38,
+     "end": 39.7
     },
     {
      "text": "just",
-     "start": 39.92,
-     "end": 40.04
+     "start": 39.88,
+     "end": 40.06
     },
     {
      "text": "to",
-     "start": 40.12,
-     "end": 40.2
+     "start": 40.1,
+     "end": 40.24
     },
     {
      "text": "stand.",
-     "start": 40.28,
+     "start": 40.34,
      "end": 40.78
     }
    ],
-   "show": 37.34,
+   "show": 37.4,
    "hide": 41.08
   },
   {
    "clip": "d-outside",
    "title": false,
-   "start": 41.4,
+   "start": 41.459,
    "end": 44.34,
    "tokens": [
     {
      "text": "Even",
-     "start": 41.4,
-     "end": 41.72
+     "start": 41.459,
+     "end": 41.74
     },
     {
      "text": "parked",
      "start": 41.8,
-     "end": 42.12
+     "end": 42.08
     },
     {
      "text": "cars",
-     "start": 42.2,
-     "end": 42.6
+     "start": 42.22,
+     "end": 42.62
     },
     {
      "text": "sink",
      "start": 42.68,
-     "end": 42.92
+     "end": 42.96
     },
     {
      "text": "deeper",
-     "start": 43,
+     "start": 43.02,
      "end": 43.32
     },
     {
      "text": "into",
-     "start": 43.44,
+     "start": 43.38,
      "end": 43.56
     },
     {
      "text": "their",
-     "start": 43.64,
-     "end": 43.72
+     "start": 43.6,
+     "end": 43.7
     },
     {
      "text": "suspension.",
@@ -898,84 +913,84 @@ window.GN = {
      "end": 44.34
     }
    ],
-   "show": 41.34,
+   "show": 41.399,
    "hide": 44.64
   },
   {
    "clip": "e-ending",
    "title": false,
-   "start": 53.4,
-   "end": 55.366,
+   "start": 53.44,
+   "end": 55.34,
    "tokens": [
     {
      "text": "And",
-     "start": 53.4,
-     "end": 53.56
+     "start": 53.44,
+     "end": 53.62
     },
     {
      "text": "this",
-     "start": 53.64,
+     "start": 53.66,
      "end": 53.8
     },
     {
      "text": "is",
-     "start": 53.88,
-     "end": 53.96
+     "start": 53.86,
+     "end": 54.02
     },
     {
      "text": "only",
-     "start": 54.04,
-     "end": 54.28
+     "start": 54.08,
+     "end": 54.3
     },
     {
      "text": "the",
-     "start": 54.4,
-     "end": 54.52
+     "start": 54.34,
+     "end": 54.54
     },
     {
      "text": "first",
-     "start": 54.68,
+     "start": 54.58,
      "end": 54.84
     },
     {
      "text": "minute.",
      "start": 55,
-     "end": 55.366
+     "end": 55.34
     }
    ],
-   "show": 53.34,
-   "hide": 55.666
+   "show": 53.38,
+   "hide": 55.64
   },
   {
    "clip": "e-ending",
    "title": false,
-   "start": 55.88,
-   "end": 58.541,
+   "start": 55.9,
+   "end": 58.5,
    "tokens": [
     {
      "text": "What",
-     "start": 55.88,
+     "start": 55.9,
      "end": 56.04
     },
     {
      "text": "happens",
-     "start": 56.12,
-     "end": 56.36
+     "start": 56.08,
+     "end": 56.4
     },
     {
      "text": "when",
      "start": 56.44,
-     "end": 56.52
+     "end": 56.56
     },
     {
      "text": "the",
      "start": 56.6,
-     "end": 56.76
+     "end": 56.7
     },
     {
      "text": "whole",
-     "start": 56.92,
-     "end": 57.08
+     "start": 56.78,
+     "end": 56.98
     },
     {
      "text": "world",
@@ -984,8 +999,8 @@ window.GN = {
     },
     {
      "text": "has",
-     "start": 57.56,
-     "end": 57.64
+     "start": 57.52,
+     "end": 57.68
     },
     {
      "text": "to",
@@ -994,22 +1009,22 @@ window.GN = {
     },
     {
      "text": "live",
-     "start": 57.88,
-     "end": 57.96
+     "start": 57.84,
+     "end": 57.98
     },
     {
      "text": "like",
-     "start": 58.04,
+     "start": 58.02,
      "end": 58.2
     },
     {
      "text": "this?",
-     "start": 58.28,
-     "end": 58.541
+     "start": 58.24,
+     "end": 58.5
     }
    ],
-   "show": 55.82,
-   "hide": 58.841
+   "show": 55.84,
+   "hide": 58.8
   }
  ]
 };

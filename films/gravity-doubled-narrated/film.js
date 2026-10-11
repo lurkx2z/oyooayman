@@ -1,21 +1,13 @@
 /* =====================================================================
-   FILM — "What If Gravity Doubled at Breakfast?" (Cinematic Hybrid prototype, 16:9)
-     build(app)   the café + plaza, the cast, his POV hands, the HUD (title/captions + gauge, lids, tags), sound
-     update(app,t) shot camera (or the POV controller), set, cast, hands, rim light, shadows, fog, HUD extras
-     grade(t, p)   warm sunrise grade per shot; DOF; the gravity hit; transitions
-   16:9 note: the shared SceneManager sizes the stage 9:16; this film installs its own resize() on the app
-   instance (film-side, no engine edit). Capture mode already honours ?w=1920&h=1080.
+   FILM — "What If Gravity Doubled?" (narrated film test, 16:9)
+     build(app)   café + plaza + parked car, the cast, the drop experiment, the HUD (gauge, word-timed narration
+                  subtitles, lane labels and timers, the car's ride-height tag), the sound
+     update(app,t) shot camera, set, cast, experiment, rim light, shadows, fog, HUD
+     grade(t, p)   warm sunrise grade per shot; DOF; the gravity hit; the end fade
+   16:9: the shared SceneManager sizes the stage 9:16, so this film installs its own resize() on the app instance
+   (film-side, no engine edit). Capture mode honours ?w=1920&h=1080.
    ===================================================================== */
 
-// POV hand poses: hands resting / pressing flat on the table edge (aimed at world points every frame)
-const GB_HAND_POSES = Object.assign({}, HAND_POSES, {
-  gbRest: { p: [0.12, -0.3, -0.42], F: [0, 0.35, -1], N: [0, -1, -0.3], curl: [0.25, 0.3, 0.35, 0.4], thumb: [0.4, 0.25], aim: [0, 0.05, 0] },
-  gbPress: { p: [0.13, -0.3, -0.42], F: [0, 0.35, -1], N: [0, -1, -0.3], curl: [0.08, 0.08, 0.1, 0.14], thumb: [0.6, 0.1], aim: [0, 0.05, 0], trem: 0.0035 },
-});
-const GB_HAND_BLEND = Object.assign({}, HAND_BLEND, { gbRest: 0.3, gbPress: 0.35 });
-for (const k of Object.keys(GB_HAND_POSES)) { GB_HAND_POSES[k + '!'] = GB_HAND_POSES[k]; GB_HAND_BLEND[k + '!'] = 0.02; }
-
-// the 16:9 resize (installed on the SceneManager instance)
 function gbResize() {
   let sw, sh;
   if (CONFIG.captureMode) { sw = CONFIG.captureWidth; sh = CONFIG.captureHeight; }
@@ -43,29 +35,24 @@ const FILM = {
   build(app) {
     FILM._app = app;
     app.resize = gbResize.bind(app);
-    if (/[?&]safe\b/.test(location.search)) document.body.classList.add('gb-showsafe');
     app.renderer.shadowMap.type = THREE.PCFShadowMap;
     app.scene.fog = new THREE.FogExp2('#6e5070', 0.012);
     app.camera.near = 0.02; app.camera.far = 900;
     app.cafe = new GbCafe(app.scene); app.cafe.build();
     app.cast = new GbCast(app, app.cafe);
-    // his hands in POV: the same dark skin as his face, teal sleeves (the locked ViewerHands, recoloured)
-    app.hands = new ViewerHands(app.camera, { scale: 1.0, skin: '#5e3c2f', nail: '#7a5446', sleeve: '#357780', cuff: '#285d64', watch: false,
-      sleeveLen: 1.1, sleeveFit: 0.85, poses: GB_HAND_POSES, blends: GB_HAND_BLEND });
-    for (const k of ['skin', 'nail', 'sleeve', 'cuff']) { app.hands.mats[k].roughness = k === 'skin' ? 0.6 : 0.95; gbAddRim(app.hands.mats[k], k === 'skin' ? 0.4 : 0.25, -1); }
-    // environment reflections: a small PMREM of the dawn sky
+    app.drop = new GbDrop(app.scene, (m) => app.cast._cup(m, m));
     const pm = new THREE.PMREMGenerator(app.renderer), es = new THREE.Scene();
     es.add(new THREE.Mesh(new THREE.SphereGeometry(50, 32, 16), gbSkyMaterial()));
     app.scene.environment = pm.fromScene(es, 0.04).texture;
     app.scene.background = new THREE.Color('#2a2d63');
-    // HUD
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     this._hudExtras(app);
     app.audio = new GbAudio(app.tl, app);
   },
 
   _hudExtras(app) {
-    const hud = document.getElementById('hud'), stage = document.getElementById('stage');
+    const hud = document.getElementById('hud');
+    // the gravity gauge (prototype design): top-left dial + big serif number + a small line
     const ticks = [];
     for (let i = 0; i <= 8; i++) {
       const g = 0.5 + i * 0.25, a = (-120 + (i / 8) * 240) * Math.PI / 180, r1 = 62, r2 = i % 2 ? 54 : 48;
@@ -79,92 +66,62 @@ const FILM = {
       <div><div class="lab">GRAVITY</div><div class="val"><span class="v">1.0</span><small>g</small></div><div class="sub"></div></div>`;
     hud.appendChild(g);
     app.gauge = { el: g, needle: g.querySelector('.needle'), arc: g.querySelector('.arc'), v: g.querySelector('.v'), sub: g.querySelector('.sub'), last: {} };
-    const lt = document.createElement('div'); lt.className = 'gb-lid top'; const lb = document.createElement('div'); lb.className = 'gb-lid bot';
-    stage.appendChild(lt); stage.appendChild(lb); app.lids = [lt, lb];
-    const mkTag = () => { const d = document.createElement('div'); d.className = 'gb-tag'; hud.appendChild(d); return d; };
-    app.tags = { ghost: mkTag(), real: mkTag(), old: mkTag(), now: mkTag(), lamp: mkTag(), b2: mkTag(), b1: mkTag(), m4: mkTag(), m8: mkTag(), m12: mkTag() };
-    app.tags.lamp.innerHTML = 'CORD STRETCHES · SWINGS 1.4× FASTER'; app.tags.b2.innerHTML = '2 g'; app.tags.b1.innerHTML = '1 g · NORMAL';
-    app.tags.m4.innerHTML = '4 m'; app.tags.m8.innerHTML = '8 m'; app.tags.m12.innerHTML = '12 m';
-    app.tags.ghost.innerHTML = '1 g · NORMAL'; app.tags.real.innerHTML = '2 g';
-    app.tags.old.innerHTML = 'BEFORE · 1 g'; app.tags.now.innerHTML = 'NOW · 2 g <b>½ height</b>';
-    const sf = document.createElement('div'); sf.className = 'gb-safe'; stage.appendChild(sf);
+    // narration subtitles: one element per phrase, one span per word (word-timed from the real audio)
+    app.subs = GN.phrases.map((P) => {
+      const d = document.createElement('div'); d.className = 'gn-sub' + (P.title ? ' gn-title' : '');
+      d.innerHTML = P.tokens.map((tk) => `<span>${tk.text}</span>`).join(' ');
+      d.style.opacity = '0'; hud.appendChild(d);
+      return { P, el: d, spans: [...d.querySelectorAll('span')], last: {} };
+    });
+    // experiment labels (projected) and the replay tag
+    const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; d.style.opacity = '0'; hud.appendChild(d); return d; };
+    app.lab = {
+      l1: mk('gb-lane l', '<div class="g">1 g</div><div class="n">NORMAL GRAVITY</div><div class="p">≈ 0.45 s</div>'),
+      l2: mk('gb-lane r', '<div class="g">2 g</div><div class="n">DOUBLE GRAVITY</div><div class="p">≈ 0.32 s</div>'),
+      t1: mk('gb-timer l', '<span class="v">0.00</span><small> s</small>'),
+      t2: mk('gb-timer r', '<span class="v">0.00</span><small> s</small>'),
+      m1: mk('gb-tag', '1.00 m'),
+      replay: mk('gb-replay', 'SLOW-MOTION REPLAY'),
+      car1: mk('gb-tag', 'RIDE HEIGHT AT 1 g'),
+      car2: mk('gb-tag', 'AT 2 g · <b>≈10 cm lower</b>'),
+    };
   },
 
   update(app, t) {
     const shot = gbShotAt(t), cam = app.camera, C = app.cast;
     FILM._shot = shot;
-    const pov = !!shot.pov, outside = !!shot.outside;
-    // the set first (lamps, chair sink), then the cast (the hero sits on the sunk chair)
-    // V3: the falling-cup shot runs on slow-motion scene time (story time everywhere else)
-    const tc = shot.id === 'S5b' ? gbScene(t) : t;
-    FILM._tc = tc;
-    app.cafe.update(tc, cam);
-    const ctx = {};
-    C._fallSide = GB_FALL_SIDE;
-    C.update(tc, { pov, outside: true, seated: true, ghost: false });
-    ctx.smashP = C.smashP; ctx.fallSide = GB_FALL_SIDE;
-    if (C.raceBase) { ctx.raceLead = C.raceLead; ctx.raceGhost = C.raceGhost; }
-    ctx.cupP = C.cup.position.clone();
-    ctx.faceP = C.hero.worldOf('hc', new THREE.Vector3());
-    const e = C.hero.face.eyes[1].eg; e.updateMatrixWorld(true); ctx.eyeP = e.getWorldPosition(new THREE.Vector3());
-    // camera
-    let S = null;
-    if (!pov) { S = shot.cam(t, ctx); gbApplyShot(cam, S); }
-    // look-dev: ?gbcam=x,y,z,ax,ay,az[,fov] overrides the shot camera (inspection only)
-    const dc = /[?&]gbcam=([^&]+)/.exec(location.search);
-    if (dc) { const v = dc[1].split(',').map(Number); S = { pos: new THREE.Vector3(v[0], v[1], v[2]), at: new THREE.Vector3(v[3], v[4], v[5]), fov: v[6] || 30, focus: 1, dof: 0 }; gbApplyShot(cam, S); }
-    FILM._S = S;
-    // POV hands: aimed so the palms sit on the table edge (they stay put while the head rises)
-    if (pov) {
-      const [tx, tz] = GB_SET.heroTable, y = GB_SET.tableH + 0.012;
-      const Fw = new THREE.Vector3(1, 0, 0), Nw = new THREE.Vector3(0, -1, 0);
-      cam.updateMatrixWorld(true);
-      for (const [name, side] of [['gbRest', 1], ['gbPress', 1]]) {
-        const P = GB_HAND_POSES[name];
-        gbAimHand(P, cam, new THREE.Vector3(tx - 0.3, y + (name === 'gbPress' ? 0.0 : 0.01), tz + 0.17), Fw.clone().add(new THREE.Vector3(0, 0, 0.25)), Nw, side);
-      }
-      // the left hand mirrors: aim its own copy
-      const L = (GB_HAND_POSES.gbRestL = GB_HAND_POSES.gbRestL || JSON.parse(JSON.stringify(GB_HAND_POSES.gbRest)));
-      gbAimHand(L, cam, new THREE.Vector3(tx - 0.3, y + 0.01, tz - 0.17), new THREE.Vector3(1, 0, -0.25), Nw, -1);
-      const LP = (GB_HAND_POSES.gbPressL = GB_HAND_POSES.gbPressL || JSON.parse(JSON.stringify(GB_HAND_POSES.gbPress)));
-      gbAimHand(LP, cam, new THREE.Vector3(tx - 0.3, y, tz - 0.17), new THREE.Vector3(1, 0, -0.25), Nw, -1);
+    const outside = !!shot.outside, exp = !!shot.exp;
+    app.cafe.setClear(exp);
+    app.cafe.update(t, cam);
+    C.carRef = shot.id === 'O2' ? MathX.window(t, GB.carCU + 0.5, GB.world + 0.1, 0.4, 0.3) : 0;
+    C.update(t, { outside, exp });
+    app.drop.update(t, exp);
+    const ctx = { car: C.car };
+    if (!outside && !exp) {
+      ctx.cupP = C.cup.position.clone();
+      const [tx, tz] = GB_SET.heroTable; ctx.cupRestP = new THREE.Vector3(tx - 0.22, GB_SET.tableH + 0.008, tz + 0.12);
+      ctx.cupH = C.cupState(t, ctx.cupRestP).h;
+      ctx.faceP = C.hero.worldOf('hc', new THREE.Vector3());
     }
-    app.hands.update(t);
-    if (pov) this._leftHand(app, t);
-    // rim light: toward the window/sun, in view space
+    let S = shot.cam(t, ctx);
+    // look-dev: FILM._dbgCam = [x,y,z, ax,ay,az, fov] overrides the shot camera (inspection only, via stills --eval)
+    if (FILM._dbgCam) { const v = FILM._dbgCam; S = { pos: new THREE.Vector3(v[0], v[1], v[2]), at: new THREE.Vector3(v[3], v[4], v[5]), fov: v[6] || 40, focus: 1, dof: 0 }; }
+    gbApplyShot(cam, S);
+    FILM._S = S;
     cam.updateMatrixWorld(true);
     GB_RIM.dir.value.copy(GB_SET.sunDir).add(new THREE.Vector3(0, 0.25, 0)).normalize().transformDirection(cam.matrixWorldInverse);
     GB_RIM.gain.value = shot.rim || 1;
     if (outside) GB_RIM.color.value.setRGB(1.0, 0.7, 0.45); else GB_RIM.color.value.setRGB(1.0, 0.58, 0.3);
-    // sun shadows follow the shot
-    if (outside) app.cafe.focusShadow(0, -9, 16); else app.cafe.focusShadow(-1.2, -2.0, 4.5);
-    // fog per place
+    if (outside) app.cafe.focusShadow(2.6, -10.0, 9); else if (exp) app.cafe.focusShadow(0.65, -1.0, 2.5); else app.cafe.focusShadow(-1.2, -2.0, 4.5);
     const F = app.scene.fog;
-    if (outside) { F.color.set('#9a7690'); F.density = 0.011; } else { F.color.set('#5e4462'); F.density = pov ? 0.02 : 0.016; }
+    if (outside) { F.color.set('#9a7690'); F.density = 0.011; } else { F.color.set('#5e4462'); F.density = 0.016; }
     this._hudUpdate(app, t, shot);
   },
 
-  // the ViewerHands mirror the right pose for the left hand; give the left its own aimed pose
-  _leftHand(app, t) {
-    const H = app.hands, h = H.left, S = SCRIPT.hands.left;
-    let i = 0; while (i + 1 < S.length && S[i + 1][0] <= t) i++;
-    const cur = S[i][1].replace('!', ''), prev = i > 0 ? S[i - 1][1].replace('!', '') : cur;
-    const pick = (n) => (n === 'gbRest' ? GB_HAND_POSES.gbRestL : n === 'gbPress' ? GB_HAND_POSES.gbPressL : null);
-    const A = pick(prev), B = pick(cur);
-    if (!A || !B) return;
-    const w = i > 0 ? Ease.inOutSine(MathX.clamp((t - S[i][0]) / (GB_HAND_BLEND[cur] || 0.3), 0, 1)) : 1;
-    const L = (u, v) => u + (v - u) * w;
-    h.g.position.set(-L(A.p[0], B.p[0]), L(A.p[1], B.p[1]), L(A.p[2], B.p[2]));
-    H._orient(A.F, A.N, -1, H._q); H._orient(B.F, B.N, -1, H._q2);
-    h.g.quaternion.slerpQuaternions(H._q, H._q2, w);
-  },
-
   _hudUpdate(app, t, shot) {
-    const G = app.gauge, cam = app.camera;
-    // gauge (V2): ONE gravity value for the whole film. The needle follows gbG(t) — the same function the physics
-    // uses — through a meter response (a quick swing with a small overshoot that settles), and never resets.
-    // It is on screen from the first second to the wide finale, in every shot.
-    const vis = MathX.window(t, 0.35, GB.end - 0.5, 0.35, 0.4);   // V4: stays up to the end (the race numbers are the result)
+    const G = app.gauge, cam = app.camera, W = StoryHUD.win;
+    // the gauge: ONE gravity value (gbG, the physics' own) through a meter response; hidden in the experiment shots
+    const vis = W(t, 0.25, GB.end - 0.8, 0.35, 0.5) * (shot.exp ? 0 : 1);
     const gNow = gbG(t), swing = MathX.ramp(t, GB.g, GB.g + 0.9);
     const gv = t < GB.g ? 1 : 1 + (gNow - 1) * Ease.outBack(swing);
     const val = Math.min(2, Math.max(1, gNow < 1.5 ? 1 : gv)).toFixed(1);
@@ -174,48 +131,54 @@ const FILM = {
     G.needle.setAttribute('transform', `rotate(${ang.toFixed(2)} 75 75)`);
     const a0 = (-120 + ((1 - 0.5) / 2) * 240) * Math.PI / 180, a1 = ang * Math.PI / 180, R = 62;
     G.arc.setAttribute('d', gv > 1.005 ? `M ${75 + Math.sin(a0) * R} ${75 - Math.cos(a0) * R} A ${R} ${R} 0 0 1 ${75 + Math.sin(a1) * R} ${75 - Math.cos(a1) * R}` : '');
-    const sub = t < GB.g + 0.5 ? (t < GB.g ? 'EARTH NORMAL' : '')
-      : t < GB.close ? 'SAME MASS · TWICE THE WEIGHT'
-      : t < GB.pov ? 'HIS ARM 4 kg → FEELS LIKE 8 kg'
-      : t < GB.fall ? 'HIS BODY 75 kg → FEELS LIKE 150 kg'
-      : t < GB.out ? (t < app.cast.smashT + 0.15 ? 'SLOW MOTION · TWICE THE ACCELERATION'
-        : `${app.cast.fallT.toFixed(2)} s · HITS AT ${Math.sqrt(2 * 19.62 * app.cast.fallH).toFixed(1)} m/s   (1 g: ${app.cast.fallT1.toFixed(2)} s · ${Math.sqrt(2 * 9.81 * app.cast.fallH).toFixed(1)} m/s)`)
-      : t < GB.wide ? 'SAME NOZZLE SPEED → HALF THE HEIGHT'
-      : t < GB.release ? 'BALLOON: WEIGHT ×2 · LIFT FROM THE AIR ×2'
-      : `CLIMBED  2 g: ${(app.cast.raceH2 || 0).toFixed(1)} m · 1 g: ${(app.cast.raceH1 || 0).toFixed(1)} m`;
+    const sub = t < GB.g ? 'EARTH NORMAL' : t < GB.g + 0.6 ? '' : 'SAME MASS · TWICE THE WEIGHT';
     if (G.last.s !== sub) { G.sub.textContent = sub; G.last.s = sub; }
-    // eyelids (V3): one short partial blink into the POV — no second blink, no long black
-    const close = 0.42 * MathX.smooth(t, GB.pov - 0.2, GB.pov - 0.02) * (1 - MathX.smooth(t, GB.pov + 0.02, GB.pov + 0.25));
-    const lidH = (close * 52).toFixed(2) + '%';
-    for (const l of app.lids) { if (l._h !== lidH) { l.style.height = lidH; l._h = lidH; } l.style.display = close > 0.002 ? 'block' : 'none'; }
-    // pinned tags (projected): the ghost vs real cup in the close-up; old vs new jet height in the wide
-    const W = 1920, Hh = 1080, u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--u')) || 1;
-    const place = (el, world, a) => {
+    // narration subtitles: visible only while that phrase is being spoken; each word brightens as it is said
+    for (const S of app.subs) {
+      const P = S.P, a = W(t, P.show, P.hide, 0.12, 0.18);
+      const o = a.toFixed(3);
+      if (S.last.o !== o) { S.el.style.opacity = o; S.last.o = o; }
+      if (a > 0.001) S.spans.forEach((sp, i) => { const k = (t >= P.tokens[i].start - 0.04 ? 1 : 0.42).toString(); if (sp._k !== k) { sp.style.opacity = k; sp._k = k; } });
+    }
+    // projection helper (16:9 frame in design pixels)
+    const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--u')) || 1;
+    const place = (el, world, a, dx = 0, dy = 0) => {
       if (a <= 0.01) { if (el._a !== 0) { el.style.opacity = '0'; el._a = 0; } return; }
       const p = world.clone().project(cam);
-      el.style.left = ((p.x * 0.5 + 0.5) * W * u).toFixed(1) + 'px'; el.style.top = ((-p.y * 0.5 + 0.5) * Hh * u).toFixed(1) + 'px';
-      el.style.opacity = a.toFixed(3); el._a = a;
+      el.style.left = (((p.x * 0.5 + 0.5) * 1920 + dx) * u).toFixed(1) + 'px'; el.style.top = (((-p.y * 0.5 + 0.5) * 1080 + dy) * u).toFixed(1) + 'px';
+      const s = a.toFixed(3); if (el._a !== s) { el.style.opacity = s; el._a = s; }
     };
-    // V3: the falling cup (S5b): '2 g' on the real cup, '1 g' on the ghost released beside it
-    const C = app.cast, isFall = shot.id === 'S5b', tc = FILM._tc;
-    const fa = isFall ? MathX.window(tc, GB_TOFF + 0.06, C._smashScene + 0.5, 0.08, 0.3) : 0;
-    const realP = (C.trayCupB.visible ? C.trayCupB.position : C.smashP).clone().add(new THREE.Vector3(0, 0.16, 0));
-    place(app.tags.real, realP, fa); place(app.tags.ghost, C.ghost.position.clone().add(new THREE.Vector3(0, 0.16, 0)), fa * (C.ghost.visible ? 1 : 0));
-    const isS6 = shot.id === 'S6a', fz = GB_SET.fountain;
-    const la = isS6 ? MathX.window(t, GB.out + 0.7, GB.wide, 0.35, 0.3) : 0;
-    app.cafe.oldLineM.opacity = 0.9 * la;
-    place(app.tags.old, new THREE.Vector3(fz[0] + 1.25, 1.78 + app.cafe.H1, fz[1]), la);
-    place(app.tags.now, new THREE.Vector3(fz[0] + 1.25, 1.78 + app.cafe.Hc + 0.15, fz[1]), la);
-    // V4: the lamp in the room shot (the most central one on screen while the camera looks up)
-    const lk = shot.id === 'S3' ? MathX.window(t, GB.room + 1.3, GB.close - 0.5, 0.25, 0.25) : 0;
-    let best = null, bd = 9;
-    if (lk > 0) for (const L of app.cafe.lamps) { const w = L.body.getWorldPosition(new THREE.Vector3()); const q = w.clone().project(cam); const d = Math.hypot(q.x, q.y); if (q.z < 1 && d < bd) { bd = d; best = w; } }
-    place(app.tags.lamp, best ? best.clone().add(new THREE.Vector3(0, 0.12, 0)) : new THREE.Vector3(), best ? lk : 0);
-    // V4: the balloon race (2 g bunch vs the 1 g ghost) and its height scale
-    const rb = C.raceBase, ra = shot.id === 'S6b' && rb ? MathX.smooth(t, GB.release + 0.15, GB.release + 0.5) * (1 - MathX.smooth(t, GB.end - 0.6, GB.end - 0.2)) : 0;
-    place(app.tags.b2, rb ? C.raceLead.clone().add(new THREE.Vector3(-0.35, 0.05, 0)) : new THREE.Vector3(), ra);
-    place(app.tags.b1, rb ? C.raceGhost.clone().add(new THREE.Vector3(0.45, 0.05, 0)) : new THREE.Vector3(), ra);
-    for (const [k, m] of [['m4', 4], ['m8', 8], ['m12', 12]]) place(app.tags[k], rb ? rb.clone().add(new THREE.Vector3(0.18, m + 0.15, 0)) : new THREE.Vector3(), rb && shot.id === 'S6b' ? MathX.smooth(t, GB.release - 0.3, GB.release) * (1 - MathX.smooth(t, GB.end - 0.6, GB.end - 0.2)) * 0.85 : 0);
+    // the experiment: lane labels over the boards; the predicted time lights up as the narrator says it;
+    // the timers count the measured fall live and freeze at the landing; "1.00 m" on the stick while it is said
+    const L = app.lab, D = app.drop, E = shot.exp;
+    const la = E ? MathX.smooth(t, GB.wideExp + 0.6, GB.wideExp + 1.4) : 0;
+    const Z = GB_DROP.z;
+    for (const [k, li, win] of [['l1', 0, GB.lane1], ['l2', 1, GB.lane2]]) {
+      const LN = GB_DROP.lanes[li], ex = LN.x + LN.side * (GB_DROP.boardW / 2 + 0.03);   // just outside the board's outer edge
+      place(L[k], new THREE.Vector3(ex, 0.84, Z - 0.2), la);
+      const hi = MathX.window(t, win[0] - 0.1, GB.out, 0.25, 0.3);
+      const pe = L[k].querySelector('.p'); const ps = hi.toFixed(2); if (pe._s !== ps) { pe.style.opacity = ps; pe._s = ps; }
+      L[k].classList.toggle('on', t >= win[0] - 0.1 && t < win[1] + 0.6);
+      const ta = E ? MathX.smooth(t, GB.drop - 0.9, GB.drop - 0.4) : 0;
+      const te = L[li ? 't2' : 't1'];
+      place(te, new THREE.Vector3(ex, 0.36, Z - 0.2), ta);
+      const tv = D.timer(t, li).toFixed(2);
+      const ve = te.querySelector('.v'); if (ve.textContent !== tv) ve.textContent = tv;
+      te.classList.toggle('done', gbExpT(t) >= D.lanes[li].landT);
+    }
+    place(L.m1, new THREE.Vector3(GB_DROP.rulerX + 0.05, GB_DROP.h, Z), E ? MathX.window(t, GB.oneM[0] - 0.1, GB.oneM[1] + 1.2, 0.25, 0.5) : 0, 70, 0);
+    const ra = E ? W(t, GB.replay - 0.1, GB.replayEnd + 0.2, 0.25, 0.4) : 0;
+    if (L.replay._a !== ra.toFixed(3)) { L.replay.style.opacity = ra.toFixed(3); L.replay._a = ra.toFixed(3); }
+    // the car: where the body sat at 1 g (dashed line + ghost) and where it sits now
+    const ca = app.cast.carRef || 0, car = app.cast.car;
+    if (ca > 0.01) {
+      car.g.updateMatrixWorld(true);
+      // tags just behind the front wheel: the dashed 1 g sill line (above) and the sill where it is now (below)
+      const zs = GB_CAR.refSide * (GB_CAR.W / 2 + 0.08), tx = GB_CAR.wheelX - GB_CAR.wheelR - 0.55;
+      const p1 = new THREE.Vector3(tx, GB_CAR.wheelR + car.sill, zs).applyMatrix4(car.g.matrixWorld);
+      const p2 = new THREE.Vector3(tx, car.sill, zs).applyMatrix4(car.body.matrixWorld);
+      place(L.car1, p1, ca, 0, -30); place(L.car2, p2, ca, 0, 40);
+    } else { place(L.car1, new THREE.Vector3(), 0); place(L.car2, new THREE.Vector3(), 0); }
   },
 
   grade(t, p) {
@@ -227,25 +190,20 @@ const FILM = {
     p.flashColor.setRGB(1.0, 0.86, 0.7);
     p.dof = S ? S.dof : 0; p.focus = S ? S.focus : 5;
     if (shot.outside) { p.exposure = 0.98; p.saturation = 1.08; p.warmth = 0.07; p.bloom = 0.22; p.bloomThreshold = 1.2; }
-    if (shot.pov) { p.ao = 0.45; p.vignette = 0.62; p.dof = 0.12; p.focus = 2.2; }
-    if (shot.id === 'S4') { p.ao = 0.45; }
-    if (shot.id === 'S5b') { p.vignette = 0.55; p.saturation = 1.0; }
-    // the gravity hit: a quick pressure pulse (exposure dip + a breath of chroma), not a white flash
+    if (shot.exp) { p.ao = 0.5; p.vignette = 0.5; p.saturation = 1.0; p.contrast = 1.1; }
+    if (shot.id === 'S2c' || shot.id === 'S3') p.ao = 0.45;
+    // the doubling: a pressure pulse (exposure dip + a breath of chroma, a vignette squeeze), not a white flash
     const hit = MathX.impulse(t, GB.g, 0.14);
-    p.exposure *= 1 - 0.22 * hit; p.chroma = 0.004 * hit; p.vignette += 0.35 * MathX.impulse(t, GB.g, 0.5);
-    // after the hit the room reads a touch heavier (story through colour)
+    p.exposure *= 1 - 0.18 * hit; p.chroma = 0.004 * hit; p.vignette += 0.3 * MathX.impulse(t, GB.g, 0.5);
     const after = MathX.smooth(t, GB.g, GB.g + 1.5);
-    if (!shot.outside) { p.saturation -= 0.04 * after; p.contrast += 0.04 * after; }
+    if (!shot.outside && !shot.exp) { p.saturation -= 0.03 * after; p.contrast += 0.03 * after; }
     // effort: the vignette tightens while he strains
-    p.vignette += 0.14 * (MathX.window(t, GB.try[0], GB.try[1], 0.4, 0.4) + MathX.window(t, GB.stand[0], GB.stand[1], 0.4, 0.3));
-    // transitions: a dip to black between the exterior and the interior (fast), the push into his face (dark),
-    // a warm light bloom through the window into the outside reveal
-    // V3: a short, partial dip on the push (max 0.5) — the V2 long black at ~14.4 s is gone
-    p.fade = 0.5 * MathX.smooth(t, GB.push + 0.3, GB.pov - 0.04) * (1 - MathX.smooth(t, GB.pov, GB.pov + 0.25));
-    p.smear.set(0, 0);
-    // the end
-    p.fade = Math.max(p.fade, MathX.smooth(t, GB.end - 0.45, GB.end));
+    p.vignette += 0.12 * MathX.window(t, GB.lift, GB.down, 0.4, 0.4) + 0.1 * MathX.window(t, GB.rise2[0], GB.rise2[1], 0.4, 0.4);
+    // the replay reads as a replay: a little cooler and softer
+    if (gbInReplay(t)) { p.saturation -= 0.12; p.warmth -= 0.04; p.vignette += 0.08; }
+    // no fade-in: the café is there from frame 1; only the slow fade at the very end
+    p.fade = MathX.smooth(t, GB.fade[0], GB.fade[1]);
   },
 
-  debug(app, t) { const s = gbShotAt(t); return `shot ${s.id} · g ${gbG(t).toFixed(2)}`; },
+  debug(app, t) { const s = gbShotAt(t); return `shot ${s.id} · g ${gbG(t).toFixed(2)} · exp ${gbExpT(t).toFixed(3)}`; },
 };
