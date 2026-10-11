@@ -1,0 +1,71 @@
+{
+  "voice": "IKne3meq5aSn9XLyUdCD",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75
+  },
+  "clips": [
+    {
+      "id": "01-a-opening",
+      "text": "What if gravity suddenly doubled?",
+      "file": "01-a-opening.mp3",
+      "align": "01-a-opening.align.json",
+      "seconds": 2.53,
+      "speech_start": 0,
+      "speech_end": 2.48,
+      "hash": "4af6235e4ea29c83",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "02-b-cafe",
+      "text": "At first, nothing looks different. But that coffee cup? Same mass. Twice the weight.",
+      "file": "02-b-cafe.mp3",
+      "align": "02-b-cafe.align.json",
+      "seconds": 6.37,
+      "speech_start": 0,
+      "speech_end": 6.32,
+      "hash": "8952c6da54a84659",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "03-c-falling",
+      "text": "Now watch what happens when we drop it. From one meter, the fall takes about zero point four five seconds at normal gravity... and zero point three two seconds at double gravity.",
+      "file": "03-c-falling.mp3",
+      "align": "03-c-falling.align.json",
+      "seconds": 11.76,
+      "speech_start": 0,
+      "speech_end": 11.76,
+      "hash": "955d372770d46f7c",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "04-d-outside",
+      "text": "Outside, your legs must work harder just to stand. Even parked cars sink deeper into their suspension.",
+      "file": "04-d-outside.mp3",
+      "align": "04-d-outside.align.json",
+      "seconds": 7.5,
+      "speech_start": 0,
+      "speech_end": 7.52,
+      "hash": "f3bc623acb8e43ce",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    },
+    {
+      "id": "05-e-ending",
+      "text": "And this is only the first minute. What happens when the whole world has to live like this?",
+      "file": "05-e-ending.mp3",
+      "align": "05-e-ending.align.json",
+      "seconds": 5.59,
+      "speech_start": 0,
+      "speech_end": 5.6,
+      "hash": "589f9b42858fec14",
+      "verified": true,
+      "timing": "tts-with-timestamps"
+    }
+  ]
+}
