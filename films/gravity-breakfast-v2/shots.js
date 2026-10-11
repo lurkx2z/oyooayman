@@ -66,6 +66,26 @@ const GB_SHOTS = [
 
 function gbShotAt(t) { for (const s of GB_SHOTS) if (t >= s.t0 && t < s.t1) return s; return GB_SHOTS[GB_SHOTS.length - 1]; }
 
+// V2: a camera with mass. The shot's authored path is filtered with a kernel that leans into the past (it trails
+// slightly, like a follow-cam on a spring) and a little into the future (it starts moving before an authored ease
+// begins, so moves never start or stop dead). Samples stay inside the shot, so cuts stay cuts. Pure function of t.
+const _GB_CK = (() => { const k = []; for (let i = -3; i <= 9; i++) { const d = i * 0.04; k.push([d, Math.exp(-0.5 * ((d - 0.08) / 0.13) ** 2)]); } return k; })();
+function gbSmoothShot(shot, t, ctx) {
+  const S0 = shot.cam(t, ctx);
+  const pos = new THREE.Vector3(), at = new THREE.Vector3();
+  let w = 0, fov = 0, roll = 0;
+  for (const [d, wk] of _GB_CK) {
+    const tt = MathX.clamp(t - d, shot.t0, shot.t1 - 1e-3);
+    const S = d === 0 ? S0 : shot.cam(tt, ctx);
+    pos.addScaledVector(S.pos, wk); at.addScaledVector(S.at, wk); fov += S.fov * wk; roll += (S.roll || 0) * wk; w += wk;
+  }
+  pos.multiplyScalar(1 / w); at.multiplyScalar(1 / w);
+  // the impact dip/roll at the drop keeps its snap: blend the raw camera back in for 0.4 s after the hit
+  const snap = MathX.window(t, GB.g - 0.02, GB.g + 0.45, 0.02, 0.3);
+  pos.lerp(S0.pos, snap); at.lerp(S0.at, snap);
+  return Object.assign({}, S0, { pos, at, fov: MathX.lerp(fov / w, S0.fov, snap), roll: MathX.lerp(roll / w, S0.roll || 0, snap) });
+}
+
 // apply a shot camera (overrides the POV controller's pose)
 function gbApplyShot(camera, S) {
   camera.position.copy(S.pos);
