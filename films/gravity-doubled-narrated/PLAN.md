@@ -42,9 +42,22 @@ pages are untouched).
 - Car: static spring sag doubles at 2 g (+9 cm spring, +1.2 cm tyre ≈ 10 cm lower), ride frequency unchanged (√(k/m)).
   His push on the wing (≈half his doubled weight) dips the front ~3 cm; it rocks back at the same 1.66 Hz.
 
+## v2: the cinematic mix (same picture)
+
+`gravity-doubled-narrated-v2.html` loads `mix-v2.js` + `audio-v2.js` and the baked `soundtrack-v2.js`; every other file
+is shared with v1, so the picture is identical (the two MP4s' decoded video streams have the same MD5). The five stems
+(narration, music, ambience, movement foley, physics/impacts) stay separate until export:
+`render-stems.cjs` renders each alone, `mix-v2.py` measures them, sets their levels (written back into `mix-v2.js`),
+sums, masters to −15 LUFS / ≤ −2 dBTP and verifies. Ducking is per stem from the real word times. Full numbers:
+`MIX_V2_REPORT.md`; checks: `VERIFICATION.md`.
+
 ## Status
 
 - [x] Voice generated and aligned (5 clips, 33.6 s of speech)
 - [x] Timeline built around the real audio, all scenes in place, mix baked
-- [ ] Preview + independent reviews + fixes
-- [ ] Final 1080p MP4 and reports
+- [x] v1 delivered as a runnable ZIP; owner review: 7/10 overall (visual 7.5, camera 7, animation 6, physics 7,
+      pacing 6.5, long-form potential 8.5); the sound went too quiet when the narrator stopped
+- [x] v2 cinematic mix: five stems, per-stem ducking, rebuilt sound design and score, −14.9 LUFS / −2.1 dBTP in the MP4
+- [x] Final 1080p MP4s (v1 original mix and v2), reports, stems and audio preview delivered
+- [ ] Listening pass by ear on a phone and on headphones (the mix was checked by measurement only)
+- Next milestone suggested by the owner: a 3-minute mini-documentary (not started)
