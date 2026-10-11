@@ -63,11 +63,12 @@ function parseScript(src) {
 }
 
 /* ---------- the API call ---------- */
-async function synthesize({ text, voice, model, format, previousText, nextText, apiKey }) {
+async function synthesize({ text, voice, model, format, previousText, nextText, voiceSettings, apiKey }) {
   const url = `${API_BASE}/v1/text-to-speech/${encodeURIComponent(voice)}?output_format=${encodeURIComponent(format)}`;
   const body = { text, model_id: model };
   if (previousText) body.previous_text = previousText;   // request stitching: keeps tone continuous across clips
   if (nextText) body.next_text = nextText;
+  if (voiceSettings) body.voice_settings = voiceSettings;   // stability, similarity_boost (+ style, use_speaker_boost on v2/v3)
   let res;
   try {
     res = await fetch(url, {
