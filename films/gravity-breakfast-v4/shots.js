@@ -85,14 +85,23 @@ const GB_SHOTS = [
   // S6b — the balloon vendor: low by the café door (vendor right, fountain behind, sun low in the gap);
   //        at the release the camera cranes up after the balloons and lets them go into the sunrise
   { id: 'S6b', t0: GB.wide, t1: 30.01, outside: true, rim: 1.1,
-    cam: (t) => {
-      const k0 = Ease.inOutSine(MathX.ramp(t, GB.wide, GB.release + 0.2));
-      const k1 = Ease.inOutSine(MathX.ramp(t, GB.release - 0.1, 29.4));
+    cam: (t, ctx) => {
+      // V4: before the release, the vendor and his bunch (the question); after it, the camera follows the RACE: it
+      // aims between the 2 g balloon and the 1 g ghost (balloons right of frame, clear of the end line) and cranes up
+      // with them so the 2 m scale ticks pass by.
+      const k0 = Ease.inOutSine(MathX.ramp(t, GB.wide, GB.release));
       const pos = _gbL(_gbV(-1.0, 1.25, -5.9), _gbV(-0.85, 1.38, -6.3), k0);
-      pos.lerp(_gbV(-0.4, 3.4, -4.6), k1);
-      const at = _gbL(_gbV(0.9, 1.85, -10.2), _gbV(1.0, 2.0, -10.4), k0);
-      at.lerp(_gbV(0.6, 9.2, -14.5), k1);
-      return { pos, at, fov: 46 + 8 * k1, focus: MathX.lerp(4.3, 10, k1), dof: 0.22 };
+      const at = _gbL(_gbV(0.9, 1.85, -10.2), _gbV(1.1, 2.4, -10.4), k0);
+      let fov = 46;
+      if (ctx.raceLead && t > GB.release) {
+        const k1 = Ease.inOutSine(MathX.ramp(t, GB.release + 0.1, GB.release + 1.6));
+        const mid = ctx.raceLead.clone().lerp(ctx.raceGhost, 0.5);
+        const aim = _gbV(mid.x - 3.1, mid.y - 0.1, mid.z);
+        at.lerp(aim, k1);
+        pos.lerp(_gbV(-2.4, 1.4 + 0.42 * (mid.y - 2.5), -4.6), k1);
+        fov = 46 + 6 * k1;
+      }
+      return { pos, at, fov, focus: pos.distanceTo(at), dof: 0.18 };
     } },
 ];
 

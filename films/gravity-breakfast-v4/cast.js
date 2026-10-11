@@ -91,6 +91,10 @@ const GB_TOFF = GB.waiter + 0.75;   // V3: the cup goes over the tray's edge (sc
 // V3: where the wrist sits (in the cup's local frame) when the fingers are through the handle — tuned in close-up stills
 const GB_GRIP_WRIST = new THREE.Vector3(-0.095, 0.04, 0.092);
 
+// V4: balloon climb height (m) u seconds after release at g (in g units). Terminal speed 1.6 m/s at 1 g, ×√g;
+// time constant τ = v/a with the net acceleration ∝ g → τ = 0.5 s / √g.
+function gbBalloonRise(u, gg) { const v = 1.6 * Math.sqrt(gg), tau = 0.5 / Math.sqrt(gg); return v * (u - tau * (1 - Math.exp(-u / tau))); }
+
 class GbCast {
   constructor(app, cafe) {
     this.app = app; this.cafe = cafe;
@@ -176,6 +180,16 @@ class GbCast {
       const str = new THREE.Line(sg, new THREE.LineBasicMaterial({ color: '#efe6d6', transparent: true, opacity: 0.8 })); str.frustumCulled = false; S.add(str);
       return { g, str, i, off: [Math.cos(i * 2.4) * 0.3 * (i ? 1 : 0), 1.5 + 0.22 * hash1(i * 7), Math.sin(i * 2.4) * 0.3 * (i ? 1 : 0)] };
     });
+    // V4: the 1 g ghost balloon (same shape as the lead balloon, faint) and the height scale
+    this.ghostBalloonM = gbMat('#f0a090', { rough: 0.5, transparent: true, opacity: 0, emissive: '#e2614f', emi: 0.25, depthWrite: false, name: 'gbGhostBalloon' });
+    { const g = new THREE.Group(); S.add(g); gbAdd(g, geo, this.ghostBalloonM, 0, 0, 0, { cast: false });
+      const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(16 * 3), 3));
+      const str = new THREE.Line(sg, new THREE.LineBasicMaterial({ color: '#fff2dc', transparent: true, opacity: 0 })); str.frustumCulled = false; S.add(str);
+      g.visible = false; str.visible = false; this.ghostBalloon = { g, str }; }
+    { const pts = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 12.2, 0)];
+      for (let m = 2; m <= 12; m += 2) { const w = m % 4 ? 0.12 : 0.22; pts.push(new THREE.Vector3(-w, m, 0), new THREE.Vector3(w, m, 0)); }
+      this.rulerM = new THREE.LineBasicMaterial({ color: '#fff6e8', transparent: true, opacity: 0, depthWrite: false, depthTest: false, fog: false });
+      this.ruler = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), this.rulerM); this.ruler.frustumCulled = false; this.ruler.visible = false; this.ruler.renderOrder = 8; S.add(this.ruler); }
   }
 
   _pigeons() {
@@ -281,6 +295,15 @@ class GbCast {
     P.hdY = (P.hdY || 0) + 7 * Math.sin(Math.PI * 2 * 2.1 * (t - GB.a1[1] - 0.4)) * MathX.window(t, GB.a1[1] + 0.4, GB.a1[1] + 1.15, 0.12, 0.25);
     const rel = MathX.window(t, GB.a2[1] + 0.02, GB.push + 0.2, 0.3, 0.3);
     P.LShrug -= 0.016 * rel; P.RShrug -= 0.016 * rel; P.chX -= 3 * rel; P.hdX += 4 * rel;
+    // V4 whole-body effort: as the cup breaks free he leans back against it (counterweight) and the bracing arm pushes
+    // down (left shoulder rises); when it slips the sudden load jerks his torso and head forward; on attempt 2 he
+    // leans in to meet the cup halfway and the effort tremble moves into the shoulders
+    const pull = MathX.window(t, GB.a1[0] + 0.15, GB.a1[1], 0.35, 0.08);
+    P.chX -= 6 * pull; P.spX = (P.spX || 0) - 3 * pull; P.LShrug += 0.012 * pull; P.hdZ = (P.hdZ || 0) + 4 * pull;
+    P.chX += gbSpring(t, GB.a1[1] + 0.03, 5, 2.6, 5); P.hdX += gbSpring(t, GB.a1[1] + 0.05, 7, 2.4, 4.5);
+    P.RShrug -= 0.01 * MathX.window(t, GB.a1[1], GB.a1[1] + 0.5, 0.05, 0.3);
+    const lift2 = MathX.window(t, GB.a2[0] + 0.1, GB.a2[0] + 1.3, 0.3, 0.2);
+    P.LShrug += 0.01 * lift2; P.RShrug += 0.006 * lift2 * Math.sin(t * 61);
     H.applyPose(P);
     // the cup and the hands (IK): right hand on the cup handle when held; left hand resting on the table
     const v = this.tmp, [tx, tz] = GB_SET.heroTable, rest = v[0].set(tx - 0.22, GB_SET.tableH + 0.008, tz + 0.12);
@@ -508,13 +531,18 @@ class GbCast {
     // vendor: holds the bunch high; in 2 g his arm sags; at the release his grip fails and he looks up
     const V = this.vendor;
     V.place(1.4, 0, -9.2, 0.15);
-    const VP = gbEvalTrack([[0, 'vendorHold', 0.01], [GB.g, 'vendorSag', 0.35, 'outQuad'], [GB.release, 'vendorLookUp', 0.5, 'outBack']], GB_POSES, t);
-    VP.RShX += gbSpring(t, GB.release, 14, 2.4, 4); VP.chX = (VP.chX || 0) + Math.sin(t * 1.6) * 1.2;
-    VP.RFing = MathX.lerp(0.85, 0.05, MathX.smooth(t, GB.release - 0.08, GB.release + 0.12)); VP.RThumb = MathX.lerp(0.7, 0.1, MathX.smooth(t, GB.release - 0.08, GB.release + 0.12));
-    VP.RShX -= 6 * MathX.window(t, GB.release - 0.9, GB.release - 0.05, 0.5, 0.05);   // his arm sinks under the pull before the grip goes
-    V.applyPose(VP);
-    V.applyFace(gbEvalTrack([[0, 'content', 0.01], [GB.g, 'strain', 0.3], [GB.release, 'surprise', 0.15], [GB.release + 0.8, 'awe', 0.4]], GB_FACES, t), { x: 0, y: t > GB.release ? 0.9 : 0.1 });
-    const hand = V.worldOf('RWr', new THREE.Vector3()); hand.y -= 0.05;
+    const poseV = (tt) => {
+      const VP = gbEvalTrack([[0, 'vendorHold', 0.01], [GB.g, 'vendorSag', 0.35, 'outQuad'], [GB.release, 'vendorLookUp', 0.5, 'outBack']], GB_POSES, tt);
+      VP.RShX += gbSpring(tt, GB.release, 14, 2.4, 4); VP.chX = (VP.chX || 0) + Math.sin(tt * 1.6) * 1.2;
+      VP.RFing = MathX.lerp(0.85, 0.05, MathX.smooth(tt, GB.release - 0.08, GB.release + 0.12)); VP.RThumb = MathX.lerp(0.7, 0.1, MathX.smooth(tt, GB.release - 0.08, GB.release + 0.12));
+      VP.RShX -= 6 * MathX.window(tt, GB.release - 0.9, GB.release - 0.05, 0.5, 0.05);   // his arm sinks under the pull before the grip goes
+      V.applyPose(VP);
+      V.applyFace(gbEvalTrack([[0, 'content', 0.01], [GB.g, 'strain', 0.3], [GB.release, 'surprise', 0.15], [GB.release + 0.8, 'awe', 0.4]], GB_FACES, tt), { x: 0, y: tt > GB.release ? 0.9 : 0.1 });
+    return V.worldOf('RWr', new THREE.Vector3()).add(new THREE.Vector3(0, -0.05, 0));
+    };
+    // V4: the balloons leave from where his hand was at the release (pose that instant first: still a pure function of t)
+    const hand0 = t > GB.release ? poseV(GB.release) : null;
+    const hand = poseV(t);
     // balloons (V3): held, they bob and jostle on taut strings; when gravity doubles, buoyancy doubles too and the bunch
     // jerks upward (strings snap taut). At the release the vendor's fingers open and they climb ~√2 faster than at 1 g,
     // strings trailing and swinging; the breeze carries them out over the square.
@@ -522,16 +550,19 @@ class GbCast {
     for (const B of this.balloons) {
       const k = B.i, u = t - GB.release - 0.035 * k;
       const sw = 1 - 0.55 * after;
-      const bob = new THREE.Vector3(Math.sin(t * 1.1 + k) * 0.07 * sw + Math.sin(t * 2.7 + k * 3) * 0.015, Math.sin(t * 1.4 + k * 2) * 0.035 * sw + jerk * (0.6 + 0.4 * hash1(k)), Math.cos(t * 0.9 + k) * 0.07 * sw);
-      const held = new THREE.Vector3(hand.x + B.off[0] * (1 - 0.2 * after), hand.y + B.off[1] + 0.1 * after, hand.z + B.off[2] * (1 - 0.2 * after)).add(bob);
-      let p = held, vel = new THREE.Vector3(0, 0, 0);
+      const heldAt = (tt, h) => {
+        const af = MathX.smooth(tt, GB.g, GB.g + 0.3), w = 1 - 0.55 * af, jk = gbSpring(tt, GB.g, 0.12, 2.6, 3.5);
+        return new THREE.Vector3(h.x + B.off[0] * (1 - 0.2 * af) + Math.sin(tt * 1.1 + k) * 0.07 * w + Math.sin(tt * 2.7 + k * 3) * 0.015,
+          h.y + B.off[1] + 0.1 * af + Math.sin(tt * 1.4 + k * 2) * 0.035 * w + jk * (0.6 + 0.4 * hash1(k)),
+          h.z + B.off[2] * (1 - 0.2 * af) + Math.cos(tt * 0.9 + k) * 0.07 * w);
+      };
+      let p = u <= 0 ? heldAt(t, hand) : null;
       if (u > 0) {
-        // buoyancy − weight doubled; drag the same → about √2 faster climb (plus a quick start)
-        // (party balloon ≈ 1.6 m/s at 1 g → ≈ 2.3 m/s at 2 g)
-        const vUp = 1.6 * 1.414, rise = vUp * u - (vUp / 1.6) * (1 - Math.exp(-1.6 * u)) * 0.6;
-        const fan = 1 + 0.15 * k;
-        p = held.clone().add(new THREE.Vector3((Math.sin(u * 0.8 + k) * 0.5 * u * 0.4 - 0.2 * u) * fan, rise, (Math.cos(u * 0.7 + k * 2) * 0.3 * u * 0.4 - 0.85 * u) * fan));
-        vel.set(-0.2, vUp * (1 - 0.6 * Math.exp(-1.6 * u)), -0.85);
+        // V4 physics: lift = weight of displaced air (ρ·V·g) and the balloon's weight (m·g) BOTH double, so the net
+        // upward force doubles; drag (½ρCdAv²) does not change with g. Terminal climb speed ∝ √(net force) → ×√2
+        // (≈1.6 m/s at 1 g → ≈2.3 m/s at 2 g), and it gets there sooner (net acceleration doubles: τ ÷ √2).
+        const rise = gbBalloonRise(u, 2), start = heldAt(GB.release + 0.035 * k, hand0);
+        p = start.add(new THREE.Vector3(Math.sin(u * 0.8 + k) * 0.08 * u * (k ? 1 : 0.3) + 0.06 * u, rise, Math.cos(u * 0.7 + k * 2) * 0.06 * u * (k ? 1 : 0.3) - 0.22 * u));
       }
       B.g.position.copy(p);
       // tilt with motion (rising balloons lean into the breeze) + a slow spin
@@ -555,6 +586,26 @@ class GbCast {
       }
       pos.needsUpdate = true;
     }
+    // V4 — the experiment: a faint 1 g ghost of the lead balloon released at the same instant beside it, and a height
+    // scale (2 m ticks) between them. Same breeze for both; only the vertical motion differs.
+    const rk = MathX.smooth(t, GB.release - 0.4, GB.release);
+    const G = this.ghostBalloon, Ldr = this.balloons[0];
+    G.g.visible = show && t > GB.release - 0.4; G.str.visible = G.g.visible;
+    if (hand0 || t > GB.release - 0.4) {
+      const h0 = hand0 || hand, u = Math.max(0, t - GB.release);
+      const base = new THREE.Vector3(h0.x + 1.0, h0.y + Ldr.off[1], h0.z + 0.25);
+      G.g.position.copy(base).add(new THREE.Vector3(0.06 * u, gbBalloonRise(u, 1), -0.22 * u));
+      G.g.rotation.set(0, t * 0.3, 0); this.ghostBalloonM.opacity = 0.62 * rk;
+      const kn = new THREE.Vector3(0, -0.29, 0).add(G.g.position), pos = G.str.geometry.attributes.position;
+      for (let j = 0; j < 16; j++) { const s = j / 15; pos.setXYZ(j, kn.x + Math.sin(s * 4 - u * 7) * 0.08 * s, kn.y - s * 1.45 * Math.min(1, 0.3 + u), kn.z + 0.2 * s * s); }
+      pos.needsUpdate = true; G.str.material.opacity = 0.35 * rk;
+      // the scale: a vertical line from the release height with ticks every 2 m (labels are HUD tags in film.js)
+      this.ruler.visible = show && rk > 0.01; this.rulerM.opacity = 0.9 * rk;
+      this.ruler.position.set(h0.x + 0.5, h0.y + Ldr.off[1], h0.z + 0.1 - 0.0);
+      this.raceBase = this.ruler.position.clone();
+      this.raceH2 = u > 0 ? gbBalloonRise(u, 2) : 0; this.raceH1 = u > 0 ? gbBalloonRise(u, 1) : 0;
+      this.raceLead = Ldr.g.position; this.raceGhost = G.g.position;
+    } else { this.ruler.visible = false; this.raceBase = null; }
     // jogger: jogs across, drops to her knees when gravity doubles
     const J = this.jogger;
     const jx = gbTrack('jx', [[0, -6.0], [GB.g, 4.4, 'linear'], [30, 4.4]]).value(t), jz = gbTrack('jz', [[0, -8.0], [GB.g, -12.4, 'linear'], [30, -12.4]]).value(t);

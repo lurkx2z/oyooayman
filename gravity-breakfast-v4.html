@@ -19,7 +19,8 @@
     /* captions: one short line, bottom centre, soft plate; inside the central 9:16 column when short */
     #hud .story-caption { top: auto; bottom: calc(var(--u) * 92); left: 50%; transform: translateX(-50%); font-family: var(--book); font-size: calc(var(--u) * 50); font-weight: 600; line-height: 1.2;
       padding: calc(var(--u) * 12) calc(var(--u) * 30); border-radius: calc(var(--u) * 12); background: rgba(14, 8, 22, 0.55); max-width: calc(var(--u) * 1300); width: max-content; text-align: center; }
-    #hud .story-end { top: calc(var(--u) * 420); font-size: calc(var(--u) * 64); width: calc(var(--u) * 1300); }
+    /* V4: the end line sits left of centre; the balloon race climbs on the right */
+    #hud .story-end { top: calc(var(--u) * 470); font-size: calc(var(--u) * 60); width: calc(var(--u) * 900); left: 29%; margin-left: calc(var(--u) * -450); transform: none; }
     /* the gravity gauge (film.js builds it): top-left label → dial + big serif number → small line */
     .gb-gauge { position: absolute; left: calc(var(--u) * 64); top: calc(var(--u) * 60); display: flex; align-items: center; gap: calc(var(--u) * 22);
       padding: calc(var(--u) * 16) calc(var(--u) * 30) calc(var(--u) * 16) calc(var(--u) * 20); border-radius: calc(var(--u) * 18); background: rgba(14, 8, 24, 0.42); opacity: 0; }

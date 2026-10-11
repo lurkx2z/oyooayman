@@ -1,4 +1,31 @@
-# PLAN — "What If Gravity Doubled at Breakfast?" V3 (Cinematic Hybrid prototype, visual quality pass)
+# PLAN — "What If Gravity Doubled at Breakfast?" V4 (Cinematic Hybrid prototype, physics and storytelling pass)
+
+## V4 (2026-10-11): physics and storytelling pass
+Separate copy of V3 (`films/gravity-breakfast-v4/` + `gravity-breakfast-v4.html`); V3 stays as it was. Sections below
+the V4 notes describe the V3 base this was built on.
+
+**Science audit (every caption, HUD line, effect):**
+- Mass vs weight: "Gravity doubles. Same mass, twice the weight."; "His 4 kg arm now weighs what 8 kg used to." HUD:
+  "SAME MASS · TWICE THE WEIGHT".
+- Falling: no "twice as fast" claim. Caption "Falling things gain speed twice as quickly. They land sooner, and
+  harder." HUD "SLOW MOTION · TWICE THE ACCELERATION", then the measured result: 0.56 m in 0.24 s, hitting at 4.7 m/s
+  (1 g: 0.34 s, 3.3 m/s; v = √(2gh), so the impact speed is √2 higher, not 2×).
+- Fountain: "Same water speed, so the fountain only reaches half as high." HUD "SAME NOZZLE SPEED → HALF THE HEIGHT"
+  (h = v²/2g); the jets in the simulation already use that formula.
+- Lamps: tag "CORD STRETCHES · SWINGS 1.4× FASTER" (pendulum period ∝ √(L/g)).
+- Balloons: kept "faster", explained. Lift = weight of displaced air = ρ·V·g, so it doubles with g, exactly like the
+  balloon's own weight m·g; the net upward force (ρV − m)·g doubles. Drag ½ρCdAv² does not depend on g. Terminal climb
+  speed v = √(2(ρV − m)g / (ρCdA)) → ×√2 (≈1.6 → ≈2.3 m/s), and the net acceleration doubles, so it reaches that speed
+  sooner (τ ÷ √2). If the doubled gravity also made the air denser (same air mass above, double pressure), ρ cancels
+  in v to first order and the answer is still about √2. `gbBalloonRise(u, g)` in `cast.js`.
+
+**Ending — one experiment:** setup question "So will a balloon still float?" (22.85 s) → the vendor opens his hand
+(24.3 s) → the 2 g bunch races a faint 1 g ghost balloon released at the same instant beside it, up a scale with ticks
+every 2 m; the camera cranes with the race; the gauge counts "CLIMBED 2 g: … m · 1 g: … m" (≈8.8 m vs ≈6.1 m after
+4.3 s) → result line "Twice the weight, twice the lift. It climbs about 40 % faster." (left of frame, clear of the race).
+
+**Coffee struggle:** added whole-body layers: he leans back against the cup as it breaks free, the bracing arm pushes
+down (left shoulder up), the slip jerks his torso and head forward, shoulders tremble on the two-handed lift.
 
 A **30-second, 16:9 (1920×1080, 30 fps) visual experiment**, not a channel episode. V3 is a separate copy of V2
 (`films/gravity-breakfast-v3/` + `gravity-breakfast-v3.html`); V1 and V2 are untouched. No shared engine file is changed.

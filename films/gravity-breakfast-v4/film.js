@@ -82,7 +82,9 @@ const FILM = {
     const lt = document.createElement('div'); lt.className = 'gb-lid top'; const lb = document.createElement('div'); lb.className = 'gb-lid bot';
     stage.appendChild(lt); stage.appendChild(lb); app.lids = [lt, lb];
     const mkTag = () => { const d = document.createElement('div'); d.className = 'gb-tag'; hud.appendChild(d); return d; };
-    app.tags = { ghost: mkTag(), real: mkTag(), old: mkTag(), now: mkTag() };
+    app.tags = { ghost: mkTag(), real: mkTag(), old: mkTag(), now: mkTag(), lamp: mkTag(), b2: mkTag(), b1: mkTag(), m4: mkTag(), m8: mkTag(), m12: mkTag() };
+    app.tags.lamp.innerHTML = 'CORD STRETCHES · SWINGS 1.4× FASTER'; app.tags.b2.innerHTML = '2 g'; app.tags.b1.innerHTML = '1 g · NORMAL';
+    app.tags.m4.innerHTML = '4 m'; app.tags.m8.innerHTML = '8 m'; app.tags.m12.innerHTML = '12 m';
     app.tags.ghost.innerHTML = '1 g · NORMAL'; app.tags.real.innerHTML = '2 g';
     app.tags.old.innerHTML = 'BEFORE · 1 g'; app.tags.now.innerHTML = 'NOW · 2 g <b>½ height</b>';
     const sf = document.createElement('div'); sf.className = 'gb-safe'; stage.appendChild(sf);
@@ -101,6 +103,7 @@ const FILM = {
     C._fallSide = GB_FALL_SIDE;
     C.update(tc, { pov, outside: true, seated: true, ghost: false });
     ctx.smashP = C.smashP; ctx.fallSide = GB_FALL_SIDE;
+    if (C.raceBase) { ctx.raceLead = C.raceLead; ctx.raceGhost = C.raceGhost; }
     ctx.cupP = C.cup.position.clone();
     ctx.faceP = C.hero.worldOf('hc', new THREE.Vector3());
     const e = C.hero.face.eyes[1].eg; e.updateMatrixWorld(true); ctx.eyeP = e.getWorldPosition(new THREE.Vector3());
@@ -161,7 +164,7 @@ const FILM = {
     // gauge (V2): ONE gravity value for the whole film. The needle follows gbG(t) — the same function the physics
     // uses — through a meter response (a quick swing with a small overshoot that settles), and never resets.
     // It is on screen from the first second to the wide finale, in every shot.
-    const vis = MathX.window(t, 0.35, GB.line[0] - 0.2, 0.35, 0.4);
+    const vis = MathX.window(t, 0.35, GB.end - 0.5, 0.35, 0.4);   // V4: stays up to the end (the race numbers are the result)
     const gNow = gbG(t), swing = MathX.ramp(t, GB.g, GB.g + 0.9);
     const gv = t < GB.g ? 1 : 1 + (gNow - 1) * Ease.outBack(swing);
     const val = Math.min(2, Math.max(1, gNow < 1.5 ? 1 : gv)).toFixed(1);
@@ -172,12 +175,14 @@ const FILM = {
     const a0 = (-120 + ((1 - 0.5) / 2) * 240) * Math.PI / 180, a1 = ang * Math.PI / 180, R = 62;
     G.arc.setAttribute('d', gv > 1.005 ? `M ${75 + Math.sin(a0) * R} ${75 - Math.cos(a0) * R} A ${R} ${R} 0 0 1 ${75 + Math.sin(a1) * R} ${75 - Math.cos(a1) * R}` : '');
     const sub = t < GB.g + 0.5 ? (t < GB.g ? 'EARTH NORMAL' : '')
-      : t < GB.close ? 'EVERYTHING WEIGHS TWICE AS MUCH'
+      : t < GB.close ? 'SAME MASS · TWICE THE WEIGHT'
       : t < GB.pov ? 'HIS ARM 4 kg → FEELS LIKE 8 kg'
       : t < GB.fall ? 'HIS BODY 75 kg → FEELS LIKE 150 kg'
-      : t < GB.out ? (t < app.cast.smashT + 0.15 ? 'SLOW MOTION · FALLS TWICE AS FAST'
-        : `${app.cast.fallH.toFixed(1)} m IN ${app.cast.fallT.toFixed(2)} s · AT 1 g: ${app.cast.fallT1.toFixed(2)} s`)
-      : 'SAME 2.0 g OUTSIDE';
+      : t < GB.out ? (t < app.cast.smashT + 0.15 ? 'SLOW MOTION · TWICE THE ACCELERATION'
+        : `${app.cast.fallT.toFixed(2)} s · HITS AT ${Math.sqrt(2 * 19.62 * app.cast.fallH).toFixed(1)} m/s   (1 g: ${app.cast.fallT1.toFixed(2)} s · ${Math.sqrt(2 * 9.81 * app.cast.fallH).toFixed(1)} m/s)`)
+      : t < GB.wide ? 'SAME NOZZLE SPEED → HALF THE HEIGHT'
+      : t < GB.release ? 'BALLOON: WEIGHT ×2 · LIFT FROM THE AIR ×2'
+      : `CLIMBED  2 g: ${(app.cast.raceH2 || 0).toFixed(1)} m · 1 g: ${(app.cast.raceH1 || 0).toFixed(1)} m`;
     if (G.last.s !== sub) { G.sub.textContent = sub; G.last.s = sub; }
     // eyelids (V3): one short partial blink into the POV — no second blink, no long black
     const close = 0.42 * MathX.smooth(t, GB.pov - 0.2, GB.pov - 0.02) * (1 - MathX.smooth(t, GB.pov + 0.02, GB.pov + 0.25));
@@ -201,6 +206,16 @@ const FILM = {
     app.cafe.oldLineM.opacity = 0.9 * la;
     place(app.tags.old, new THREE.Vector3(fz[0] + 1.25, 1.78 + app.cafe.H1, fz[1]), la);
     place(app.tags.now, new THREE.Vector3(fz[0] + 1.25, 1.78 + app.cafe.Hc + 0.15, fz[1]), la);
+    // V4: the lamp in the room shot (the most central one on screen while the camera looks up)
+    const lk = shot.id === 'S3' ? MathX.window(t, GB.room + 1.3, GB.close - 0.5, 0.25, 0.25) : 0;
+    let best = null, bd = 9;
+    if (lk > 0) for (const L of app.cafe.lamps) { const w = L.body.getWorldPosition(new THREE.Vector3()); const q = w.clone().project(cam); const d = Math.hypot(q.x, q.y); if (q.z < 1 && d < bd) { bd = d; best = w; } }
+    place(app.tags.lamp, best ? best.clone().add(new THREE.Vector3(0, 0.12, 0)) : new THREE.Vector3(), best ? lk : 0);
+    // V4: the balloon race (2 g bunch vs the 1 g ghost) and its height scale
+    const rb = C.raceBase, ra = shot.id === 'S6b' && rb ? MathX.smooth(t, GB.release + 0.15, GB.release + 0.5) * (1 - MathX.smooth(t, GB.end - 0.6, GB.end - 0.2)) : 0;
+    place(app.tags.b2, rb ? C.raceLead.clone().add(new THREE.Vector3(-0.35, 0.05, 0)) : new THREE.Vector3(), ra);
+    place(app.tags.b1, rb ? C.raceGhost.clone().add(new THREE.Vector3(0.45, 0.05, 0)) : new THREE.Vector3(), ra);
+    for (const [k, m] of [['m4', 4], ['m8', 8], ['m12', 12]]) place(app.tags[k], rb ? rb.clone().add(new THREE.Vector3(0.18, m + 0.15, 0)) : new THREE.Vector3(), rb && shot.id === 'S6b' ? MathX.smooth(t, GB.release - 0.3, GB.release) * (1 - MathX.smooth(t, GB.end - 0.6, GB.end - 0.2)) * 0.85 : 0);
   },
 
   grade(t, p) {
