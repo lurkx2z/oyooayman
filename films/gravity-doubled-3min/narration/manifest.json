@@ -13,11 +13,11 @@
       "file": "01-s01-moment.mp3",
       "align": "01-s01-moment.align.json",
       "seconds": 10.71,
-      "speech_start": 0,
-      "speech_end": 10.64,
+      "speech_start": 0.14,
+      "speech_end": 10.22,
       "hash": "fcfdb6fe3b42d6c2",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "02-s03-mass",
@@ -25,11 +25,11 @@
       "file": "02-s03-mass.mp3",
       "align": "02-s03-mass.align.json",
       "seconds": 13.51,
-      "speech_start": 0,
-      "speech_end": 13.44,
+      "speech_start": 0.06,
+      "speech_end": 12.84,
       "hash": "5924a2524eb040cf",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "03-s04-experiment",
@@ -37,11 +37,11 @@
       "file": "03-s04-experiment.mp3",
       "align": "03-s04-experiment.align.json",
       "seconds": 19.1,
-      "speech_start": 0,
-      "speech_end": 19.12,
+      "speech_start": 0.08,
+      "speech_end": 18.52,
       "hash": "dc4d9d99422428ae",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "04-s06-body",
@@ -49,11 +49,11 @@
       "file": "04-s06-body.mp3",
       "align": "04-s06-body.align.json",
       "seconds": 16.22,
-      "speech_start": 0,
-      "speech_end": 16.24,
+      "speech_start": 0.06,
+      "speech_end": 15.7,
       "hash": "715428c8e76d521d",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "05-s08-city",
@@ -61,11 +61,11 @@
       "file": "05-s08-city.mp3",
       "align": "05-s08-city.align.json",
       "seconds": 22.94,
-      "speech_start": 0,
-      "speech_end": 22.96,
+      "speech_start": 0.06,
+      "speech_end": 22.46,
       "hash": "dfb2fe35df22f466",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "06-s10-question",
@@ -73,11 +73,11 @@
       "file": "06-s10-question.mp3",
       "align": "06-s10-question.align.json",
       "seconds": 20.3,
-      "speech_start": 0,
-      "speech_end": 20.32,
+      "speech_start": 0.04,
+      "speech_end": 19.74,
       "hash": "66568fa472617437",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "07-s12-final",
@@ -85,11 +85,11 @@
       "file": "07-s12-final.mp3",
       "align": "07-s12-final.align.json",
       "seconds": 7.03,
-      "speech_start": 0,
-      "speech_end": 7.04,
+      "speech_start": 0.06,
+      "speech_end": 6.6,
       "hash": "3b5baead79eae4ca",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     }
   ]
 }
