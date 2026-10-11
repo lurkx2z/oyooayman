@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
-"""MIX v2 — measures, levels, sums and masters the five stems of gravity-doubled-narrated-v2 (rendered by render-stems.cjs).
+"""MIX STEMS — measures, levels, sums and masters the five stems of a gravity-doubled-narrated mix (rendered by
+render-stems.cjs). v2 uses mix-v2.js (the default), v3 uses mix-v3.js.
 
-  python3 films/gravity-doubled-narrated/mix-v2.py <stems_dir> <timeline.json> <out_dir> [--v1 v1_mix.wav] [--write-gains]
+  python3 films/gravity-doubled-narrated/mix-stems.py <stems_dir> <timeline.json> <out_dir>
+          [--mix mix-v3.js] [--name v3] [--ref v1=v1_mix.wav --ref v2=v2_mix.wav] [--write-gains | --use-gains]
+  (--v1 <wav> is the same as --ref v1=<wav>)
 
 1. ANALYSE every stem on its own (BS.1770 K-weighted loudness): integrated, in the spoken windows, in the speech-free
    windows, the loudest 400 ms, peaks; and the loudness of each named event (the set-down, the smashes, the step...).
 2. LEVEL: one gain per stem from targets relative to the narrator (the voice sits at VO_TARGET in its spoken windows):
    music and ambience by their loudness in the speech-free sections, foley by its typical active level there, effects
-   by their loudest moment. --write-gains stores the gains in mix-v2.js, so the page's live render matches the export.
-3. SUM the stems (each already ducked under the real word times by audio-v2.js), glue-compress gently, set the
+   by their loudest moment. --write-gains stores the gains in the mix file, so the page's live render matches the export.
+3. SUM the stems (each already ducked and shaped by the page's audio code), glue-compress gently (unless the mix file
+   says glue: false), set the
    integrated loudness to the target and true-peak limit (4× oversampled) under the ceiling.
 4. VERIFY and report: speech-to-background ratio per spoken window, the duck depth measured from the audio (needs the
    *_raw.wav stems), loudness when the narrator stops, peaks and limiter activity, and that the voice stem is silent
-   in every speech-free section. Writes mix_v2.wav, report.json, REPORT.md and PNG plots.
-Needs: Python 3 + numpy + Pillow, ffmpeg, node (to read mix-v2.js).
+   in every speech-free section; the punch of each key impact over the sound just before it. Writes mix_<name>.wav,
+   report.json and PNG plots.
+Needs: Python 3 + numpy + Pillow, ffmpeg, node (to read the mix file).
 """
 import json, os, re, subprocess, sys
 import numpy as np
@@ -23,7 +28,8 @@ SR = 48000
 HERE = os.path.dirname(os.path.abspath(__file__))
 STEMS = ['voice', 'music', 'amb', 'foley', 'sfx']
 NAMES = {'voice': 'Narration', 'music': 'Music', 'amb': 'Ambience', 'foley': 'Movement (foley)', 'sfx': 'Physics / impacts'}
-COL = {'voice': (120, 200, 255), 'music': (255, 190, 110), 'amb': (120, 220, 150), 'foley': (230, 140, 230), 'sfx': (255, 110, 100), 'mix': (240, 240, 240), 'v1': (150, 150, 150)}
+COL = {'voice': (120, 200, 255), 'music': (255, 190, 110), 'amb': (120, 220, 150), 'foley': (230, 140, 230), 'sfx': (255, 110, 100), 'mix': (240, 240, 240), 'v1': (110, 110, 110), 'v2': (200, 150, 90)}
+MIXJS = os.path.join(HERE, 'mix-v2.js')   # set from --mix in main()
 KW = 'highshelf=f=1681.97:g=4.0:width_type=q:width=0.7071,highpass=f=38.14:width_type=q:width=0.5'
 VO_TARGET = -16.0                     # the narrator's loudness in its spoken windows, before mastering
 REL = {'music': -3.5, 'amb': -10.0, 'foley': -5.0, 'sfx': 1.0}   # targets relative to the narrator (LU), see LEVEL above
@@ -79,19 +85,19 @@ def write_wav(path, x, fmt='pcm_s24le'):
 
 
 def read_mix_js():
-    js = os.path.join(HERE, 'mix-v2.js')
+    js = MIXJS
     out = subprocess.run(['node', '-e', f"global.window={{}};require({json.dumps(js)});console.log(JSON.stringify(window.GB_MIX))"], capture_output=True, text=True, check=True).stdout
     return json.loads(out)
 
 
 def write_gains(gains):
-    js = os.path.join(HERE, 'mix-v2.js'); s = open(js).read()
+    js = MIXJS; s = open(js).read()
     for k, g in gains.items(): s = re.sub(r'(\b%s: \{ gain: )-?[\d.]+' % k, lambda m: m.group(1) + f'{g:.1f}', s)
     open(js, 'w').write(s)
 
 
 def write_trims(trims):
-    js = os.path.join(HERE, 'mix-v2.js'); s = open(js).read()
+    js = MIXJS; s = open(js).read()
     for k, g in trims.items(): s = re.sub(r"('%s': )-?[\d.]+" % k, lambda m: m.group(1) + f'{g:.1f}', s)
     open(js, 'w').write(s)
 
@@ -145,7 +151,10 @@ def main():
     a = sys.argv[1:]
     if len(a) < 3: print(__doc__); sys.exit(1)
     sdir, tlp, out = a[0], a[1], a[2]
-    v1p = a[a.index('--v1') + 1] if '--v1' in a else None
+    global MIXJS
+    if '--mix' in a: MIXJS = os.path.join(HERE, a[a.index('--mix') + 1])
+    NAME = a[a.index('--name') + 1] if '--name' in a else 'v2'
+    refs = [a[i + 1].split('=', 1) for i, k in enumerate(a) if k == '--ref'] + ([['v1', a[a.index('--v1') + 1]]] if '--v1' in a else [])
     os.makedirs(out, exist_ok=True)
     TL = json.load(open(tlp)); B = TL['beats']; DUR = TL['duration']
     M = read_mix_js()
@@ -207,12 +216,12 @@ def main():
     mean = float(np.mean(list(pl_raw.values())))
     trims = {k: round(float((M.get('voiceTrim') or {}).get(k, 0) + (mean - v) * 0.9), 1) for k, v in pl_raw.items()}
     measured_gains = dict(gains)
-    if '--use-gains' in a: gains = {k: float(M['stems'][k]['gain']) for k in STEMS}   # the final export uses exactly what mix-v2.js says
+    if '--use-gains' in a: gains = {k: float(M['stems'][k]['gain']) for k in STEMS}   # the final export uses exactly what the mix file says
     elif '--write-gains' in a: write_gains(gains); write_trims(trims)
     G = {s: 10 ** (gains[s] / 20) for s in STEMS}
     # ---------------------------------------------------------------- 3. sum + master
     pre = sum(X[s] * G[s] for s in STEMS)
-    glued = filt(pre, 'acompressor=threshold=0.1995:ratio=1.5:attack=30:release=300:knee=2.8:makeup=1:detection=rms')
+    glued = filt(pre, 'acompressor=threshold=0.1995:ratio=1.5:attack=30:release=300:knee=2.8:makeup=1:detection=rms') if M.get('glue', True) else pre
     ceiling = M['ceiling']; lim = ceiling - 0.3; gain = M['target'] - integrated(filt(glued, KW)); master = None
     for it in range(8):   # the limiter shaves a little loudness: re-aim the gain and the limit until both targets hold
         y = filt(glued * 10 ** (gain / 20), f'aresample={SR * 4},alimiter=limit={10 ** (lim / 20):.5f}:attack=1:release=60:level=disabled:latency=1,aresample={SR}')
@@ -226,7 +235,7 @@ def main():
     os.remove(os.path.join(out, '_tmp.wav'))
     y, mgain, mlim, I, TP, LRA = master
     final_end = int(DUR * SR)
-    write_wav(os.path.join(out, 'mix_v2.wav'), y)
+    write_wav(os.path.join(out, f'mix_{NAME}.wav'), y)
     # ---------------------------------------------------------------- 4. verify
     yk = filt(y, KW)
     rest = filt(sum(X[s] * G[s] for s in STEMS if s != 'voice'), KW)
@@ -278,37 +287,61 @@ def main():
         t, ms = blocks(K[s] * G[s] * 10 ** (mgain / 20), 0.4, 0.02, max(0, a0 - 0.2), b0 + 0.2)
         _, msm2 = blocks(yk, 0.4, 0.02, max(0, a0 - 0.2), b0 + 0.2)
         ev[name] = {'stem': s, 'stem_momentary_max': round(float(lu(ms).max()), 1), 'mix_momentary_max': round(float(lu(msm2).max()), 1), 'mix_peak_dBFS': round(peak_db(y[int(a0 * SR):int(b0 * SR)]), 1)}
+    # punch: how far each key impact rises above the sound just before it (the loudest 50 ms block in the first 0.2 s
+    # of the hit, against the 1 s that ends 50 ms before it). Same measure for the reference mixes.
+    lanes = {l['id']: l['impact_film_s'] for l in TL['drop']['lanes']}
+    hits = {'Gravity doubles': B['g'], 'Cup set down': B['down'], 'Clamps open': B['drop'], '2 g cup smashes': lanes['g2'], '1 g cup smashes': lanes['g1'],
+            'He drops back onto the bench': B['rise1'][0] + 1.58, 'Palm on the car': B['rise2'][0] - 0.05, 'The heavy step': B['step'][0] + 0.85}
+    def punch(zk, t):
+        _, mh = blocks(zk, 0.05, 0.005, t - 0.02, t + 0.25); bed = integrated(zk, [(max(0, t - 1.05), t - 0.05)]) if t > 1.2 else float('nan')
+        _, mb = blocks(zk, 1.0, 1.0, max(0, t - 1.05), t - 0.05)
+        hit = float(lu(mh).max()); bedl = float(lu(mb.mean())) if len(mb) else float('nan')
+        return {'hit_LUFS_50ms': round(hit, 1), 'before_LUFS_1s': round(bedl, 1), 'punch_LU': round(hit - bedl, 1)}
+    pun = {k: punch(yk, t) for k, t in hits.items()}
     per_clip = {c['id']: round(integrated(vok * 10 ** (mgain / 20), [(c['words'][0]['start'], c['speechEnd'])]), 1) for c in TL['narration']}
     lim_hits = float((np.abs(y) > 10 ** ((mlim - 0.5) / 20)).mean() * 100)
     rep = {'targets': {'voice_in_speech': VO_TARGET, 'relative_LU': REL, 'integrated': M['target'], 'true_peak_ceiling': ceiling},
            'stems_measured_at_0dB': ana, 'stem_gains_dB': gains, 'stem_gains_from_targets_dB': measured_gains, 'voice_trims_dB': (M.get('voiceTrim') if '--use-gains' in a else trims), 'master': {'gain_dB': round(mgain, 2), 'limiter_dBFS': round(mlim, 2), 'integrated_LUFS': I, 'true_peak_dBTP': TP, 'LRA': LRA, 'samples_near_limit_pct': round(lim_hits, 3)},
            'speech_windows': [[round(a0, 3), round(b0, 3)] for a0, b0 in wins], 'speech_to_background': snr,
            'ducking': {k: {kk: vv for kk, vv in v.items() if kk != 'curve'} for k, v in duck.items()}, 'when_the_narrator_stops': stops, 'sections': sec,
-           'voice_in_speech_free_sections': vfree, 'speech_free_sections': [[round(a0, 3), round(b0, 3)] for a0, b0 in free], 'subtitles_in_speech_free_sections': len(subs_in_free), 'subtitle_linger_s': sub_linger, 'narration_loudness_per_line': per_clip, 'events': ev}
-    if v1p:
-        v1 = load(v1p)[:n]; v1k = filt(v1, KW)
-        t1, m1 = blocks(v1k, 3.0, 0.1)
-        rep['v1'] = {'integrated': round(integrated(v1k), 1), 'in_speech': round(integrated(v1k, wins), 1), 'speech_free': round(integrated(v1k, big_free), 1), 'peak_dBFS': round(peak_db(v1), 1),
-                     'sections': [{'span': s['span'], 'kind': s['kind'], 'integrated': round(integrated(v1k, [tuple(s['span'])]), 1), 'short_term_min': round(float(lu(m1)[(t1 >= s['span'][0] + 1.5) & (t1 <= s['span'][1] - 1.5)].min()), 1) if s['span'][1] - s['span'][0] > 3.2 else None} for s in sec],
-                     'events': {name: round(float(lu(blocks(v1k, 0.4, 0.02, max(0, a0 - 0.2), b0 + 0.2)[1]).max()), 1) for name, (a0, b0, s) in events.items()}}
-        rep['v1']['when_the_narrator_stops'] = []
+           'voice_in_speech_free_sections': vfree, 'speech_free_sections': [[round(a0, 3), round(b0, 3)] for a0, b0 in free], 'subtitles_in_speech_free_sections': len(subs_in_free), 'subtitle_linger_s': sub_linger, 'narration_loudness_per_line': per_clip, 'events': ev, 'punch': pun,
+           'short_term_percentiles': {p: round(float(np.percentile(S3[S3 > -70], p)), 1) for p in (5, 10, 50, 90, 95)}}
+    refc = {}
+    rep['refs'] = {}
+    for lab, path in refs:
+        v = load(path)[:n]; vk = filt(v, KW)
+        t1, m1 = blocks(vk, 3.0, 0.1); refc[lab] = (t1, lu(m1))
+        R = rep['refs'][lab] = {'integrated': round(integrated(vk), 1), 'in_speech': round(integrated(vk, wins), 1), 'speech_free': round(integrated(vk, big_free), 1), 'peak_dBFS': round(peak_db(v), 1),
+             'true_peak_LRA': true_peak(path),
+             'sections': [{'span': x['span'], 'kind': x['kind'], 'integrated': round(integrated(vk, [tuple(x['span'])]), 1), 'short_term_min': round(float(lu(m1)[(t1 >= x['span'][0] + 1.5) & (t1 <= x['span'][1] - 1.5)].min()), 1) if x['span'][1] - x['span'][0] > 3.2 else None} for x in sec],
+             'events': {name: round(float(lu(blocks(vk, 0.4, 0.02, max(0, a0 - 0.2), b0 + 0.2)[1]).max()), 1) for name, (a0, b0, st) in events.items()},
+             'punch': {k: punch(vk, t) for k, t in hits.items()},
+             'short_term_percentiles': {p: round(float(np.percentile(lu(m1)[lu(m1) > -70], p)), 1) for p in (5, 10, 50, 90, 95)}, 'when_the_narrator_stops': []}
         for c in TL['narration']:
             e = c['speechEnd']
             if e > DUR - 3: continue
             before = float(np.interp(e - 0.2, t1, lu(m1))); sel = (t1 >= e + 0.5) & (t1 <= e + 4)
-            rep['v1']['when_the_narrator_stops'].append({'line': c['id'], 'drop_LU': round(before - float(lu(m1)[sel].min()), 1)})
+            R['when_the_narrator_stops'].append({'line': c['id'], 'drop_LU': round(before - float(lu(m1)[sel].min()), 1)})
     json.dump(rep, open(os.path.join(out, 'report.json'), 'w'), indent=1)
     # ---------------------------------------------------------------- plots
-    pl = Plot(DUR, 'v2 stems after levelling and ducking: momentary loudness (400 ms) of each stem; shaded = the narrator is speaking')
+    pl = Plot(DUR, f'{NAME} stems after levelling and ducking: momentary loudness (400 ms) of each stem; shaded = the narrator is speaking')
     pl.shade(wins); pl.grid(); pl.marks(marks)
     for s in STEMS:
         t, ms = blocks(K[s] * G[s] * 10 ** (mgain / 20), 0.4, 0.05); pl.line(t, lu(ms), COL[s], 2)
-    pl.legend([(NAMES[s], COL[s]) for s in STEMS]); pl.save(os.path.join(out, 'stems_v2.png'))
-    pl = Plot(DUR, 'Final mix: short-term loudness (3 s), v1 (grey) vs v2 (white); shaded = narration', lo=-40, hi=-5)
+    pl.legend([(NAMES[s], COL[s]) for s in STEMS]); pl.save(os.path.join(out, f'stems_{NAME}.png'))
+    labs = [lab for lab, _ in refs]
+    pl = Plot(DUR, 'Final mix: short-term loudness (3 s), ' + ', '.join(labs + [NAME + ' (white)']) + '; shaded = narration', lo=-40, hi=-5)
     pl.shade(wins); pl.grid(5); pl.marks(marks)
-    if v1p: pl.line(t1, lu(m1), COL['v1'], 3)
+    for lab in labs: pl.line(*refc[lab], COL.get(lab, (150, 150, 150)), 3)
     pl.line(ts, S3, COL['mix'], 3)
-    pl.legend([('v1 (the ZIP)', COL['v1']), ('v2', COL['mix'])]); pl.save(os.path.join(out, 'v1_vs_v2_loudness.png'))
+    pl.legend([(lab, COL.get(lab, (150, 150, 150))) for lab in labs] + [(NAME, COL['mix'])]); pl.save(os.path.join(out, '_vs_'.join(labs + [NAME]) + '_loudness.png'))
+    # the same, momentary (400 ms): shows the hits and the quiet moments the 3 s curve smooths over
+    pl = Plot(DUR, 'Momentary loudness (400 ms), ' + ', '.join(labs[-1:] + [NAME + ' (white)']) + '; shaded = narration', lo=-45, hi=-5)
+    pl.shade(wins); pl.grid(5); pl.marks(marks)
+    for lab, path in refs[-1:]:
+        tq, mq = blocks(filt(load(path)[:n], KW), 0.4, 0.05); pl.line(tq, lu(mq), COL.get(lab, (150, 150, 150)), 2)
+    pl.line(tm, Mm, COL['mix'], 2)
+    pl.legend([(lab, COL.get(lab, (150, 150, 150))) for lab in labs[-1:]] + [(NAME, COL['mix'])]); pl.save(os.path.join(out, f'momentary_{NAME}.png'))
     if duck:
         # (the plot font has no minus sign or division sign: plain ASCII in the title)
         title = 'Ducking measured from the rendered stems (ducked / un-ducked, 100 ms blocks; gaps = stem silent): ' + ', '.join(f"{NAMES[s].split(' ')[0].lower()} {M['stems'][s]['duck']:g} dB" for s in duck)
@@ -319,10 +352,12 @@ def main():
         pl.legend([(NAMES[s], COL[s]) for s in duck]); pl.save(os.path.join(out, 'ducking_measured.png'))
     print(json.dumps({k: rep[k] for k in ['stem_gains_dB', 'master']}, indent=1))
     print('speech/background (median, min, % under 6):', [(w['window'], w['median_LU'], w['min_LU'], w['below6_pct']) for w in snr]); print('voice trims ->', trims)
-    print('narrator stops (drop LU):', [(s['line'], s['drop_LU']) for s in stops], ' v1:', rep.get('v1', {}).get('when_the_narrator_stops'))
+    print('narrator stops (drop LU):', [(x['line'], x['drop_LU']) for x in stops], ' refs:', {k: v['when_the_narrator_stops'] for k, v in rep['refs'].items()})
     print('sections:', [(s['kind'][:6], s['span'], s['integrated'], s['short_term_min']) for s in sec])
-    if v1p: print('v1 sections:', [(s['span'], s['integrated'], s['short_term_min']) for s in rep['v1']['sections']])
-    for k2, v2 in ev.items(): print(f"  {k2:40s} stem {v2['stem_momentary_max']:6.1f}  mix {v2['mix_momentary_max']:6.1f}  v1 {rep.get('v1', {}).get('events', {}).get(k2, '')}")
+    for lab, R in rep['refs'].items(): print(lab, 'sections:', [(x['span'], x['integrated'], x['short_term_min']) for x in R['sections']])
+    for k2, v2 in ev.items(): print(f"  {k2:40s} stem {v2['stem_momentary_max']:6.1f}  mix {v2['mix_momentary_max']:6.1f}  refs {[R['events'].get(k2) for R in rep['refs'].values()]}")
+    print('punch (LU above the second before):'); [print(f"  {k:30s} {NAME} {v['punch_LU']:5.1f}  " + '  '.join(f"{lab} {R['punch'][k]['punch_LU']:5.1f}" for lab, R in rep['refs'].items())) for k, v in pun.items()]
+    print('short-term percentiles:', rep['short_term_percentiles'], {lab: R['short_term_percentiles'] for lab, R in rep['refs'].items()}, 'LRA', LRA, {lab: R['true_peak_LRA'] for lab, R in rep['refs'].items()})
     print('narration per line:', per_clip)
     print('voice in speech-free:', vfree, 'subs there:', len(subs_in_free))
     print('ducking:', rep['ducking'])
