@@ -3,6 +3,7 @@
    timestamps, so subtitles and scene timing can follow the real voice.
 
      node tools/narrate-aligned.cjs --script films/<slug>/NARRATION.md [--out dir] [--force] [--dry-run]
+     node tools/narrate-aligned.cjs --script films/<slug>/NARRATION.md --realign   (re-time the existing clips only)
 
    Per clip it writes <id>.mp3 and <id>.align.json:
      { text, seconds, source, words: [{ text, start, end }], characters: [{ text, start, end }] }
@@ -12,6 +13,8 @@
      1. ElevenLabs "text-to-speech with timestamps" (audio + character alignment in one call);
      2. if that endpoint refuses the model, plain text-to-speech + ElevenLabs forced alignment
         of the finished audio.
+   With --realign (or --align forced on a fresh run) the finished audio is also sent to forced alignment and
+   those word times replace the TTS ones: the TTS alignment can land words inside the pauses around punctuation.
    Same approved-script format, voice defaults (Charlie, eleven_v4, 0.4 / 0.75), request
    stitching and MP3 verification as tools/narrate.cjs (reused from it, not copied).
 
@@ -108,6 +111,18 @@ async function main() {
     const file = path.join(outDir, `${c.id}.mp3`), alignFile = path.join(outDir, `${c.id}.align.json`);
     const hash = crypto.createHash('sha256').update([voice, model, format, JSON.stringify(voiceSettings), clips[k - 1]?.text || '', c.text, clips[k + 1]?.text || ''].join('\u0000')).digest('hex').slice(0, 16);
     const prev = old.clips.find((o) => o.id === c.id);
+    if (args.realign) {
+      if (!prev || !fs.existsSync(file)) { console.error(`  [${c.id}] no clip to realign`); failed++; continue; }
+      const fa = await forcedAlign({ file, text: c.text, apiKey });
+      const words = fa.words.length ? fa.words : wordsFromChars(fa.characters);
+      const a = JSON.parse(fs.readFileSync(alignFile, 'utf8'));
+      a.tts_words = a.tts_words || a.words; a.words = words.map((w) => ({ text: w.text, start: +w.start.toFixed(3), end: +w.end.toFixed(3) }));
+      a.characters_forced = fa.characters; a.source = 'forced-alignment';
+      fs.writeFileSync(alignFile, JSON.stringify(a, null, 1) + '\n');
+      console.log(`  [${c.id}] realigned: ${words.length} words (forced alignment)`);
+      manifest.clips.push(Object.assign({}, prev, { timing: 'forced-alignment', speech_start: a.words[0]?.start ?? null, speech_end: a.words[a.words.length - 1]?.end ?? null }));
+      continue;
+    }
     if (!args.force && prev && prev.hash === hash && fs.existsSync(file) && fs.existsSync(alignFile) && N.verifyMp3(file).ok) {
       console.log(`  [${c.id}] unchanged, kept (${prev.seconds} s)`); manifest.clips.push(prev); continue;
     }

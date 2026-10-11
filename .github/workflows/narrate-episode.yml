@@ -15,6 +15,10 @@ on:
         description: "Regenerate every clip even if its text did not change"
         type: boolean
         default: false
+      realign:
+        description: "Only re-time the existing clips with forced alignment (no new audio)"
+        type: boolean
+        default: false
   push:
     branches: ["episode/gravity-doubled-narrated-*"]
     paths: ["films/gravity-doubled-narrated/NARRATION.md"]
@@ -50,12 +54,13 @@ jobs:
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           FORCE: ${{ inputs.force && '--force' || '' }}
+          REALIGN: ${{ inputs.realign && '--realign' || '' }}
         run: |
           if [ -z "$ELEVENLABS_API_KEY" ]; then
             echo "::error::The secret ELEVENLABS_API_KEY is missing. Add it under Settings > Secrets and variables > Actions."
             exit 1
           fi
-          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION.md" --summary "$GITHUB_STEP_SUMMARY" $FORCE
+          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION.md" --summary "$GITHUB_STEP_SUMMARY" $FORCE $REALIGN
 
       - name: Commit the clips back to this branch
         run: |
@@ -63,7 +68,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "films/$SLUG/narration"
           if git diff --cached --quiet; then echo "nothing new to commit"; exit 0; fi
-          git commit -m "narration: $SLUG clips + word timestamps (ElevenLabs, run ${GITHUB_RUN_ID})"
+          git commit -m "narration: $SLUG clips / word timestamps (ElevenLabs, run ${GITHUB_RUN_ID})"
           for i in 1 2 3 4; do
             git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
             sleep $((i * 3))
