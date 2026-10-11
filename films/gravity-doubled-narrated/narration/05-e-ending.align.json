@@ -2,67 +2,67 @@
  "id": "05-e-ending",
  "text": "And this is only the first minute. What happens when the whole world has to live like this?",
  "seconds": 5.59,
- "source": "tts-with-timestamps",
+ "source": "forced-alignment",
  "words": [
   {
    "text": "And",
-   "start": 0,
-   "end": 0.16
+   "start": 0.04,
+   "end": 0.22
   },
   {
    "text": "this",
-   "start": 0.24,
+   "start": 0.26,
    "end": 0.4
   },
   {
    "text": "is",
-   "start": 0.48,
-   "end": 0.56
+   "start": 0.46,
+   "end": 0.62
   },
   {
    "text": "only",
-   "start": 0.64,
-   "end": 0.88
+   "start": 0.68,
+   "end": 0.9
   },
   {
    "text": "the",
-   "start": 1,
-   "end": 1.12
+   "start": 0.94,
+   "end": 1.14
   },
   {
    "text": "first",
-   "start": 1.28,
+   "start": 1.18,
    "end": 1.44
   },
   {
    "text": "minute.",
    "start": 1.6,
-   "end": 2.44
+   "end": 1.94
   },
   {
    "text": "What",
-   "start": 2.48,
+   "start": 2.5,
    "end": 2.64
   },
   {
    "text": "happens",
-   "start": 2.72,
-   "end": 2.96
+   "start": 2.68,
+   "end": 3
   },
   {
    "text": "when",
    "start": 3.04,
-   "end": 3.12
+   "end": 3.16
   },
   {
    "text": "the",
    "start": 3.2,
-   "end": 3.36
+   "end": 3.3
   },
   {
    "text": "whole",
-   "start": 3.52,
-   "end": 3.68
+   "start": 3.38,
+   "end": 3.58
   },
   {
    "text": "world",
@@ -71,8 +71,8 @@
   },
   {
    "text": "has",
-   "start": 4.16,
-   "end": 4.24
+   "start": 4.12,
+   "end": 4.28
   },
   {
    "text": "to",
@@ -81,18 +81,18 @@
   },
   {
    "text": "live",
-   "start": 4.48,
-   "end": 4.56
+   "start": 4.44,
+   "end": 4.58
   },
   {
    "text": "like",
-   "start": 4.64,
+   "start": 4.62,
    "end": 4.8
   },
   {
    "text": "this?",
-   "start": 4.88,
-   "end": 5.6
+   "start": 4.84,
+   "end": 5.1
   }
  ],
  "characters": [
@@ -550,6 +550,555 @@
    "text": "?",
    "start": 5.52,
    "end": 5.6
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "And",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "this",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "is",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "only",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": "the",
+   "start": 1,
+   "end": 1.12
+  },
+  {
+   "text": "first",
+   "start": 1.28,
+   "end": 1.44
+  },
+  {
+   "text": "minute.",
+   "start": 1.6,
+   "end": 2.44
+  },
+  {
+   "text": "What",
+   "start": 2.48,
+   "end": 2.64
+  },
+  {
+   "text": "happens",
+   "start": 2.72,
+   "end": 2.96
+  },
+  {
+   "text": "when",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": "the",
+   "start": 3.2,
+   "end": 3.36
+  },
+  {
+   "text": "whole",
+   "start": 3.52,
+   "end": 3.68
+  },
+  {
+   "text": "world",
+   "start": 3.76,
+   "end": 4.08
+  },
+  {
+   "text": "has",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": "to",
+   "start": 4.32,
+   "end": 4.4
+  },
+  {
+   "text": "live",
+   "start": 4.48,
+   "end": 4.56
+  },
+  {
+   "text": "like",
+   "start": 4.64,
+   "end": 4.8
+  },
+  {
+   "text": "this?",
+   "start": 4.88,
+   "end": 5.6
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "A",
+   "start": 0.04,
+   "end": 0.06
+  },
+  {
+   "text": "n",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "d",
+   "start": 0.12,
+   "end": 0.22
+  },
+  {
+   "text": " ",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": "t",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": "h",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "i",
+   "start": 0.3,
+   "end": 0.38
+  },
+  {
+   "text": "s",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.46
+  },
+  {
+   "text": "i",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "s",
+   "start": 0.62,
+   "end": 0.62
+  },
+  {
+   "text": " ",
+   "start": 0.62,
+   "end": 0.68
+  },
+  {
+   "text": "o",
+   "start": 0.68,
+   "end": 0.7
+  },
+  {
+   "text": "n",
+   "start": 0.7,
+   "end": 0.8
+  },
+  {
+   "text": "l",
+   "start": 0.8,
+   "end": 0.86
+  },
+  {
+   "text": "y",
+   "start": 0.9,
+   "end": 0.9
+  },
+  {
+   "text": " ",
+   "start": 0.9,
+   "end": 0.94
+  },
+  {
+   "text": "t",
+   "start": 0.94,
+   "end": 0.96
+  },
+  {
+   "text": "h",
+   "start": 0.96,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.18
+  },
+  {
+   "text": "f",
+   "start": 1.18,
+   "end": 1.24
+  },
+  {
+   "text": "i",
+   "start": 1.24,
+   "end": 1.26
+  },
+  {
+   "text": "r",
+   "start": 1.26,
+   "end": 1.3
+  },
+  {
+   "text": "s",
+   "start": 1.3,
+   "end": 1.36
+  },
+  {
+   "text": "t",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.6
+  },
+  {
+   "text": "m",
+   "start": 1.6,
+   "end": 1.66
+  },
+  {
+   "text": "i",
+   "start": 1.66,
+   "end": 1.68
+  },
+  {
+   "text": "n",
+   "start": 1.68,
+   "end": 1.74
+  },
+  {
+   "text": "u",
+   "start": 1.74,
+   "end": 1.78
+  },
+  {
+   "text": "t",
+   "start": 1.78,
+   "end": 1.9
+  },
+  {
+   "text": "e",
+   "start": 1.9,
+   "end": 1.94
+  },
+  {
+   "text": ".",
+   "start": 1.94,
+   "end": 1.94
+  },
+  {
+   "text": " ",
+   "start": 1.94,
+   "end": 1.94
+  },
+  {
+   "text": "W",
+   "start": 2.5,
+   "end": 2.52
+  },
+  {
+   "text": "h",
+   "start": 2.52,
+   "end": 2.54
+  },
+  {
+   "text": "a",
+   "start": 2.54,
+   "end": 2.58
+  },
+  {
+   "text": "t",
+   "start": 2.58,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": "h",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "a",
+   "start": 2.72,
+   "end": 2.74
+  },
+  {
+   "text": "p",
+   "start": 2.74,
+   "end": 2.8
+  },
+  {
+   "text": "p",
+   "start": 2.8,
+   "end": 2.82
+  },
+  {
+   "text": "e",
+   "start": 2.82,
+   "end": 2.9
+  },
+  {
+   "text": "n",
+   "start": 2.9,
+   "end": 2.92
+  },
+  {
+   "text": "s",
+   "start": 2.92,
+   "end": 3
+  },
+  {
+   "text": " ",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": "w",
+   "start": 3.04,
+   "end": 3.06
+  },
+  {
+   "text": "h",
+   "start": 3.06,
+   "end": 3.08
+  },
+  {
+   "text": "e",
+   "start": 3.08,
+   "end": 3.14
+  },
+  {
+   "text": "n",
+   "start": 3.14,
+   "end": 3.16
+  },
+  {
+   "text": " ",
+   "start": 3.16,
+   "end": 3.2
+  },
+  {
+   "text": "t",
+   "start": 3.2,
+   "end": 3.2
+  },
+  {
+   "text": "h",
+   "start": 3.2,
+   "end": 3.22
+  },
+  {
+   "text": "e",
+   "start": 3.22,
+   "end": 3.3
+  },
+  {
+   "text": " ",
+   "start": 3.3,
+   "end": 3.38
+  },
+  {
+   "text": "w",
+   "start": 3.38,
+   "end": 3.4
+  },
+  {
+   "text": "h",
+   "start": 3.4,
+   "end": 3.46
+  },
+  {
+   "text": "o",
+   "start": 3.46,
+   "end": 3.5
+  },
+  {
+   "text": "l",
+   "start": 3.5,
+   "end": 3.56
+  },
+  {
+   "text": "e",
+   "start": 3.56,
+   "end": 3.58
+  },
+  {
+   "text": " ",
+   "start": 3.58,
+   "end": 3.76
+  },
+  {
+   "text": "w",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "o",
+   "start": 3.84,
+   "end": 3.86
+  },
+  {
+   "text": "r",
+   "start": 3.86,
+   "end": 3.92
+  },
+  {
+   "text": "l",
+   "start": 3.92,
+   "end": 3.98
+  },
+  {
+   "text": "d",
+   "start": 3.98,
+   "end": 4.08
+  },
+  {
+   "text": " ",
+   "start": 4.08,
+   "end": 4.12
+  },
+  {
+   "text": "h",
+   "start": 4.12,
+   "end": 4.16
+  },
+  {
+   "text": "a",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": "s",
+   "start": 4.24,
+   "end": 4.28
+  },
+  {
+   "text": " ",
+   "start": 4.28,
+   "end": 4.32
+  },
+  {
+   "text": "t",
+   "start": 4.32,
+   "end": 4.32
+  },
+  {
+   "text": "o",
+   "start": 4.32,
+   "end": 4.4
+  },
+  {
+   "text": " ",
+   "start": 4.4,
+   "end": 4.44
+  },
+  {
+   "text": "l",
+   "start": 4.44,
+   "end": 4.48
+  },
+  {
+   "text": "i",
+   "start": 4.48,
+   "end": 4.5
+  },
+  {
+   "text": "v",
+   "start": 4.5,
+   "end": 4.54
+  },
+  {
+   "text": "e",
+   "start": 4.54,
+   "end": 4.58
+  },
+  {
+   "text": " ",
+   "start": 4.58,
+   "end": 4.62
+  },
+  {
+   "text": "l",
+   "start": 4.62,
+   "end": 4.66
+  },
+  {
+   "text": "i",
+   "start": 4.66,
+   "end": 4.68
+  },
+  {
+   "text": "k",
+   "start": 4.68,
+   "end": 4.7
+  },
+  {
+   "text": "e",
+   "start": 4.7,
+   "end": 4.8
+  },
+  {
+   "text": " ",
+   "start": 4.8,
+   "end": 4.84
+  },
+  {
+   "text": "t",
+   "start": 4.84,
+   "end": 4.86
+  },
+  {
+   "text": "h",
+   "start": 4.86,
+   "end": 4.88
+  },
+  {
+   "text": "i",
+   "start": 4.88,
+   "end": 5.06
+  },
+  {
+   "text": "s",
+   "start": 5.06,
+   "end": 5.1
+  },
+  {
+   "text": "?",
+   "start": 5.1,
+   "end": 5.1
   }
  ]
 }

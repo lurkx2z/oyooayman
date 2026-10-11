@@ -13,11 +13,11 @@
       "file": "01-a-opening.mp3",
       "align": "01-a-opening.align.json",
       "seconds": 2.53,
-      "speech_start": 0,
-      "speech_end": 2.48,
+      "speech_start": 0.16,
+      "speech_end": 2.3,
       "hash": "4af6235e4ea29c83",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "02-b-cafe",
@@ -25,11 +25,11 @@
       "file": "02-b-cafe.mp3",
       "align": "02-b-cafe.align.json",
       "seconds": 6.37,
-      "speech_start": 0,
-      "speech_end": 6.32,
+      "speech_start": 0.04,
+      "speech_end": 5.7,
       "hash": "8952c6da54a84659",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "03-c-falling",
@@ -37,11 +37,11 @@
       "file": "03-c-falling.mp3",
       "align": "03-c-falling.align.json",
       "seconds": 11.76,
-      "speech_start": 0,
-      "speech_end": 11.76,
+      "speech_start": 0.1,
+      "speech_end": 11.24,
       "hash": "955d372770d46f7c",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "04-d-outside",
@@ -49,11 +49,11 @@
       "file": "04-d-outside.mp3",
       "align": "04-d-outside.align.json",
       "seconds": 7.5,
-      "speech_start": 0,
-      "speech_end": 7.52,
+      "speech_start": 0.06,
+      "speech_end": 6.98,
       "hash": "f3bc623acb8e43ce",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "05-e-ending",
@@ -61,11 +61,11 @@
       "file": "05-e-ending.mp3",
       "align": "05-e-ending.align.json",
       "seconds": 5.59,
-      "speech_start": 0,
-      "speech_end": 5.6,
+      "speech_start": 0.04,
+      "speech_end": 5.1,
       "hash": "589f9b42858fec14",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     }
   ]
 }
