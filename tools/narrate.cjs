@@ -7,9 +7,10 @@
      node tools/narrate.cjs --text "What if gravity doubled?" --out renders/line.mp3
    Options:
      --out <dir|file>  where to write (default: films/<slug>/narration/ next to the script)
-     --voice <id>      ElevenLabs voice id (default: the script's `voice:`, else George)
+     --voice <id>      ElevenLabs voice id (default: the script's `voice:`, else Charlie; Liam is the backup)
      --model <id>      model id (default: the script's `model:`, else eleven_v4)
      --format <fmt>    output format (default mp3_44100_128)
+     --stability <0-1> --similarity <0-1>   voice settings (default 0.4 / 0.75, natural; also `stability:` / `similarity:` in the script)
      --dry-run         show what would be sent and the character count; calls nothing
      --force           regenerate clips even if their text has not changed
 
@@ -29,7 +30,10 @@ const crypto = require('crypto');
 const { execFileSync, spawnSync } = require('child_process');
 
 const API_BASE = process.env.ELEVENLABS_BASE_URL || 'https://api.elevenlabs.io';   // override only for local tests
-const DEFAULT_VOICE = 'JBFqnCBsd6RMkjVDRZzb';   // George (male, narrative)
+const DEFAULT_VOICE = 'IKne3meq5aSn9XLyUdCD';   // Charlie (male, natural, Australian): the owner's pick, 2026-10-11
+const BACKUP_VOICE = 'TX3LPaxmHKxFdv7VOQHJ';    // Liam (male, young, clear): the owner's second choice
+// The official skill's "conversational" preset; the owner wants a normal, natural voice, not an announcer.
+const DEFAULT_SETTINGS = { stability: 0.4, similarity_boost: 0.75 };
 const DEFAULT_MODEL = 'eleven_v4';
 const DEFAULT_FORMAT = 'mp3_44100_128';
 
@@ -182,12 +186,16 @@ async function main() {
     outDir = path.dirname(out); single = out;
   }
   const voice = args.voice || meta.voice || DEFAULT_VOICE;
+  const voiceSettings = {
+    stability: parseFloat(args.stability ?? meta.stability ?? DEFAULT_SETTINGS.stability),
+    similarity_boost: parseFloat(args.similarity ?? meta.similarity ?? DEFAULT_SETTINGS.similarity_boost),
+  };
   const model = args.model || meta.model || DEFAULT_MODEL;
   const format = args.format || meta.format || DEFAULT_FORMAT;
   if (!format.startsWith('mp3')) { console.error('only mp3_* output formats are supported by this tool'); process.exit(1); }
 
   const chars = clips.reduce((n, c) => n + c.text.length, 0);
-  console.log(`${clips.length} clip(s), ${chars} characters, voice ${voice}, model ${model}, format ${format}`);
+  console.log(`${clips.length} clip(s), ${chars} characters, voice ${voice}, model ${model}, format ${format}, stability ${voiceSettings.stability}, similarity ${voiceSettings.similarity_boost}`);
   console.log(`output: ${path.relative(process.cwd(), single || outDir) || '.'}`);
   if (args['dry-run']) {
     clips.forEach((c) => console.log(`  [${c.id}] ${c.text}`));
@@ -205,7 +213,7 @@ async function main() {
   for (let k = 0; k < clips.length; k++) {
     const c = clips[k];
     const file = single || path.join(outDir, `${c.id}.mp3`);
-    const key = sha([voice, model, format, clips[k - 1]?.text || '', c.text, clips[k + 1]?.text || ''].join('\u0000'));
+    const key = sha([voice, model, format, JSON.stringify(voiceSettings), clips[k - 1]?.text || '', c.text, clips[k + 1]?.text || ''].join('\u0000'));
     const prev = old.clips.find((o) => o.id === c.id);
     if (!args.force && prev && prev.hash === key && fs.existsSync(file) && verifyMp3(file).ok) {
       console.log(`  [${c.id}] unchanged, kept (${prev.seconds} s)`);
@@ -213,7 +221,7 @@ async function main() {
       continue;
     }
     process.stdout.write(`  [${c.id}] generating… `);
-    const r = await synthesize({ text: c.text, voice, model, format, apiKey, previousText: clips[k - 1]?.text, nextText: clips[k + 1]?.text });
+    const r = await synthesize({ text: c.text, voice, model, format, voiceSettings, apiKey, previousText: clips[k - 1]?.text, nextText: clips[k + 1]?.text });
     fs.writeFileSync(file, r.audio);
     spent += Number(r.characters) || c.text.length;
     const v = verifyMp3(file);
@@ -248,5 +256,5 @@ async function main() {
   console.log('all narration files verified.');
 }
 
-module.exports = { parseScript, synthesize, scanMp3, verifyMp3, hasFfmpeg, requireKey, DEFAULT_VOICE, DEFAULT_MODEL, DEFAULT_FORMAT };
+module.exports = { parseScript, synthesize, scanMp3, verifyMp3, hasFfmpeg, requireKey, DEFAULT_VOICE, BACKUP_VOICE, DEFAULT_SETTINGS, DEFAULT_MODEL, DEFAULT_FORMAT };
 if (require.main === module) main().catch((e) => { console.error('narrate failed: ' + e.message); process.exit(1); });

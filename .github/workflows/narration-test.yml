@@ -14,9 +14,9 @@ on:
         required: false
         default: ""
       voice:
-        description: "ElevenLabs voice id (default: George)"
+        description: "ElevenLabs voice id (default: Charlie; Liam = TX3LPaxmHKxFdv7VOQHJ)"
         required: false
-        default: "JBFqnCBsd6RMkjVDRZzb"
+        default: "IKne3meq5aSn9XLyUdCD"
 
 permissions:
   contents: read
@@ -48,7 +48,7 @@ jobs:
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           NARRATION_TEXT: ${{ inputs.text }}
-          NARRATION_VOICE: ${{ inputs.voice || 'JBFqnCBsd6RMkjVDRZzb' }}
+          NARRATION_VOICE: ${{ inputs.voice || 'IKne3meq5aSn9XLyUdCD' }}
         run: |
           if [ -z "$ELEVENLABS_API_KEY" ]; then
             echo "::error::The secret ELEVENLABS_API_KEY is missing. Add it under Settings > Secrets and variables > Actions, then run this again."

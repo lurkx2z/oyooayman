@@ -88,7 +88,9 @@ the checker itself offline (no key, no credits).
 ```markdown
 ---
 status: draft            # change to: approved   (the tool refuses anything else, so drafts never cost credits)
-voice: JBFqnCBsd6RMkjVDRZzb   # George; optional
+voice: IKne3meq5aSn9XLyUdCD   # Charlie (the default); optional
+stability: 0.4               # optional; 0.4 / 0.75 is the natural, conversational default
+similarity: 0.75             # optional
 model: eleven_v4              # optional
 gap: 0.35                     # seconds of silence between clips in narration.mp3; optional
 ---
@@ -101,8 +103,12 @@ gap: 0.35                     # seconds of silence between clips in narration.mp
 - Each paragraph (blank line between) becomes one clip. `[name]` at the start names it (`01-hook.mp3`).
 - One paragraph per beat in `script.js`, so each clip can be placed on its beat.
 - Write numbers the way they should be said if it matters ("two g", "zero point two four seconds").
-- Voices: George `JBFqnCBsd6RMkjVDRZzb` (narrative), Daniel `onwK4e9ZLuTAKqWW03F9` (authoritative),
-  Sarah `EXAVITQu4vr4xnSDxMaL`, Charlotte `XB0fDUnXU5powFXDhCwa`. `eleven_v4` takes audio tags like `[whispers]`.
+- **House voice: Charlie** `IKne3meq5aSn9XLyUdCD` (male, natural, Australian), chosen by the owner on 2026-10-11 from
+  a loudness-matched comparison of nine voices. The owner wants a normal, natural voice, not an announcer. Backup: **Liam**
+  `TX3LPaxmHKxFdv7VOQHJ` (male, young, clear). Defaults: `eleven_v4`, stability 0.4, similarity 0.75.
+- Write lines the way people talk (contractions, short questions, asides); it matters as much as the voice.
+- Charlie comes out quiet (about −28 LUFS raw); the mix step (§ 5) brings it up. Compare voices with the
+  **Voice comparison** workflow (`tools/voice-compare.cjs`, sets `natural` and `narrator`).
 
 ## 4. Generate the narration
 

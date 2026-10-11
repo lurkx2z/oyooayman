@@ -7,7 +7,7 @@
      node tools/test-narration.cjs --out my-test.mp3 --voice <id> --model <id> --text "Your own sentence."
      node tools/test-narration.cjs --selftest            (offline: checks the MP3 verifier itself, no API call)
 
-   Needs ELEVENLABS_API_KEY set as an environment variable (docs/NARRATION.md). Costs about 70 characters.
+   Needs ELEVENLABS_API_KEY set as an environment variable (docs/NARRATION.md). Costs about 110 characters.
    ===================================================================== */
 const fs = require('fs');
 const path = require('path');
@@ -18,7 +18,7 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) =>
   if (a.startsWith('--')) acc.push([a.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : true]);
   return acc;
 }, []));
-const SENTENCE = (typeof args.text === 'string' && args.text.trim()) || 'What if gravity doubled at breakfast? Your coffee cup would suddenly weigh twice as much.';
+const SENTENCE = (typeof args.text === 'string' && args.text.trim()) || "Imagine you're having breakfast, and gravity suddenly doubles. Your coffee cup? It now weighs twice as much.";
 
 function printReport(v) {
   const r = v.report || {};
@@ -63,7 +63,7 @@ async function main() {
   const voice = args.voice || N.DEFAULT_VOICE, model = args.model || N.DEFAULT_MODEL;
 
   console.log(`1/3 Sending ${SENTENCE.length} characters to ElevenLabs (voice ${voice}, model ${model})…`);
-  const r = await N.synthesize({ text: SENTENCE, voice, model, format: N.DEFAULT_FORMAT, apiKey });
+  const r = await N.synthesize({ text: SENTENCE, voice, model, format: N.DEFAULT_FORMAT, voiceSettings: N.DEFAULT_SETTINGS, apiKey });
   fs.writeFileSync(out, r.audio);
   console.log(`2/3 Saved ${r.audio.length} bytes (characters billed: ${r.characters ?? 'not reported'}).`);
 
