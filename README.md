@@ -64,6 +64,13 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Prototype (16:9): *What If Gravity Doubled at Breakfast?*** Open `gravity-breakfast.html` (30 s, 1920×1080). This is the
+> "Cinematic Hybrid" experiment: our 3D look plus simple expressive original characters, warm amber/violet lighting,
+> and varied cameras (establishing, medium, wide, top-down, close-up with rack focus, a push into the hero's eyes that
+> becomes the POV, and a crane wide). It also has an on-screen gravity gauge and a synthesized soundtrack keyed to cue
+> markers. It is self-contained in `films/gravity-breakfast/`, and no engine files were changed. Plan, shots and cues:
+> [`films/gravity-breakfast/PLAN.md`](films/gravity-breakfast/PLAN.md).
 
 | Time | Beat |
 |---|---|
