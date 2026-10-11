@@ -1,0 +1,80 @@
+# Narrate an episode: turns an approved films/<slug>/NARRATION.md into one verified MP3 per
+# segment plus word timestamps (tools/narrate-aligned.cjs), then commits them back to the
+# branch so the film can be built around the real audio. Uses the repository secret
+# ELEVENLABS_API_KEY (never printed). See docs/NARRATION.md.
+name: Narrate episode
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: "Episode folder under films/"
+        required: true
+        default: "gravity-doubled-narrated"
+      force:
+        description: "Regenerate every clip even if its text did not change"
+        type: boolean
+        default: false
+  push:
+    branches: ["episode/gravity-doubled-narrated-*"]
+    paths: ["films/gravity-doubled-narrated/NARRATION.md"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: narrate-episode-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  narrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SLUG: ${{ inputs.slug || 'gravity-doubled-narrated' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install ffmpeg (for the playback check)
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg >/dev/null; }
+          ffmpeg -version | head -1
+
+      - name: Generate, verify and time every clip
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+        run: |
+          if [ -z "$ELEVENLABS_API_KEY" ]; then
+            echo "::error::The secret ELEVENLABS_API_KEY is missing. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION.md" --summary "$GITHUB_STEP_SUMMARY" $FORCE
+
+      - name: Commit the clips back to this branch
+        run: |
+          git config user.name "narration-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "films/$SLUG/narration"
+          if git diff --cached --quiet; then echo "nothing new to commit"; exit 0; fi
+          git commit -m "narration: $SLUG clips + word timestamps (ElevenLabs, run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3))
+          done
+          exit 1
+
+      - name: Upload the clips too
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: narration-${{ env.SLUG }}
+          path: films/${{ env.SLUG }}/narration
+          if-no-files-found: ignore
+          retention-days: 14
