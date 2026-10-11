@@ -121,7 +121,7 @@ const FILM = {
   _hudUpdate(app, t, shot) {
     const G = app.gauge, cam = app.camera, W = StoryHUD.win;
     // the gauge: ONE gravity value (gbG, the physics' own) through a meter response; hidden in the experiment shots
-    const vis = W(t, -1, GB.end - 0.8, 0.35, 0.5) * (shot.exp ? 0 : 1);   // on from frame 1
+    const vis = W(t, 0.25, GB.end - 0.8, 0.35, 0.5) * (shot.exp ? 0 : 1);
     const gNow = gbG(t), swing = MathX.ramp(t, GB.g, GB.g + 0.9);
     const gv = t < GB.g ? 1 : 1 + (gNow - 1) * Ease.outBack(swing);
     const val = Math.min(2, Math.max(1, gNow < 1.5 ? 1 : gv)).toFixed(1);

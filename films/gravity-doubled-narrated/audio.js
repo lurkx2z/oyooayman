@@ -53,10 +53,7 @@ class GbAudio extends AudioEngine {
     // sits ≈8 dB clear of everything else; it comes back up in the speech-free sequences
     const mduck = ctx.createGain(); mix.connect(mduck); mduck.connect(comp);
     { const keys = [[0, 1]];
-      // after a line the mix comes back up; in the quiet café gaps (after A and B: room tone, cup, breath) a little more
-      const up = { 'a-opening': 1.6, 'b-cafe': 1.7 };
-      GN.clips.forEach((c, i) => { const u = up[c.id] || 1, n = GN.clips[i + 1];
-        keys.push([c.start - 0.25, i && up[GN.clips[i - 1].id] ? up[GN.clips[i - 1].id] : 1], [c.start, 0.5], [c.speechEnd + 0.1, 0.5], [c.speechEnd + 0.6, u]); if (n && u !== 1) keys.push([n.start - 0.25, u]); });
+      for (const c of GN.clips) keys.push([c.start - 0.25, 1], [c.start, 0.5], [c.speechEnd + 0.1, 0.5], [c.speechEnd + 0.6, 1]);
       mduck.gain.setValueAtTime(1, 0); for (const [t, v] of keys) mduck.gain.linearRampToValueAtTime(v, Math.max(0.001, t)); }
     const rev = S.reverb(2.2), revG = ctx.createGain(); revG.gain.value = 0.24; rev.connect(revG); revG.connect(mix);
     const bus = (g) => { const b = ctx.createGain(); b.gain.value = g; b.connect(mix); return b; };
@@ -81,7 +78,7 @@ class GbAudio extends AudioEngine {
     auto(inB.gain, [[0, 0.85], [T.out - X, 0.85], [T.out, 0], [END, 0]]);
     auto(outB.gain, [[0, 0], [T.out - X, 0], [T.out, 0.95], [END - 1.2, 0.8], [END, 0]]);
     const bed = (dest, type, ft, f, q, vol) => { const n = S.noise(type, 0, END), b = S.filter(ft, f, q), g = ctx.createGain(); g.gain.value = vol; n.connect(b); b.connect(g); g.connect(dest); return g; };
-    bed(inB, 'brown', 'lowpass', 260, 0.7, 0.12);   // (kept low: a sub rumble reads as nothing on a phone and masks the music)
+    bed(inB, 'brown', 'lowpass', 260, 0.7, 0.28);
     bed(inB, 'pink', 'bandpass', 1500, 0.6, 0.012);
     const esp = bed(inB, 'white', 'bandpass', 3800, 2.5, 0.0);                  // the espresso machine's faint hiss
     auto(esp.gain, [[0, 0], [0.5, 0.004], [T.exp, 0.004], [T.exp + 0.3, 0.0], [END, 0]]);
@@ -99,28 +96,28 @@ class GbAudio extends AudioEngine {
     const F = (n) => 174.61 * Math.pow(2, n / 12);
     const motif = [0, 4, 7, 12, 9, 7, 4, 5];
     for (let i = 0; i < 14; i++) { const t = 0.12 + i * 0.36; if (t > T.g - 0.12) break; S.pluck(t, F(motif[i % 8] + (i >= 8 ? 2 : 0)), 0.15, (i % 2 ? 0.25 : -0.25), mus, 1.6, 0.55); }
-    S.tone(0.0, T.g, F(0), 0.028, 0, mus, 'triangle', 0.4, 0.05);
+    S.tone(0.0, T.g, F(-12), 0.045, 0, mus, 'triangle', 0.4, 0.05);
     // the doubling: a short rising tension cue into the hit, then a semitone-down drone
     { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(F(-5), T.g - 1.1); o.frequency.linearRampToValueAtTime(F(-4), T.g);
       const lp = S.filter('lowpass', 500, 0.7); g.gain.setValueAtTime(0, T.g - 1.1); g.gain.linearRampToValueAtTime(0.03, T.g - 0.05); g.gain.linearRampToValueAtTime(0, T.g + 0.05);
       o.connect(lp); lp.connect(g); g.connect(mus); o.start(T.g - 1.1); o.stop(T.g + 0.1); }
-    S.tone(T.g + 0.5, T.exp - T.g - 0.2, F(-1), 0.03, 0, mus, 'triangle', 1.5, 1.0);
+    S.tone(T.g + 0.5, T.exp - T.g - 0.2, F(-13), 0.05, 0, mus, 'triangle', 1.5, 1.0);
     // scene 3 (no narration): a held high tone that tightens while he holds the cup, released at the set-down
     S.tone(T.lift, T.down - T.lift + 0.4, F(11), 0.012, 0.15, mus, 'sine', 1.5, 0.6);
     S.tone(T.top - 0.2, T.down - T.top + 0.3, F(12), 0.01, -0.15, mus, 'sine', 1.0, 0.5);
-    for (let i = 0; i < 4; i++) S.pluck(T.down + 0.2 + i * 0.42, F([7, 4, 0, -5][i]), 0.13, (i % 2 ? 0.3 : -0.3), mus, 1.8, 0.4);
+    for (let i = 0; i < 4; i++) S.pluck(T.down + 0.2 + i * 0.42, F([7, 4, 0, -5][i]), 0.09, (i % 2 ? 0.3 : -0.3), mus, 1.8, 0.4);
     // the experiment: a soft clock-like pulse under the narration that stops before the drop (anticipation)
     for (let t = T.exp + 0.4; t < T.drop - 0.75; t += 0.5) S.pluck(t, F(12 + ((Math.round((t - T.exp) / 0.5) % 2) ? 7 : 0)), 0.035, 0.1, mus, 0.4, 0.8);
-    S.tone(T.exp + 0.2, T.drop - T.exp - 0.6, F(0), 0.022, 0, mus, 'triangle', 1.2, 0.6);
+    S.tone(T.exp + 0.2, T.drop - T.exp - 0.6, F(-12), 0.035, 0, mus, 'triangle', 1.2, 0.6);
     { const t = T.drop - 0.9; S.tone(t, 0.9, F(19), 0.012, 0, mus, 'sine', 0.7, 0.05); }   // a thin held note in the hold
     // the result: a bright little chord after both impacts; the replay sits on a low swell; the hold resolves
     for (const n of [0, 4, 7, 12]) S.tone(T.drop + 0.75, 1.8, F(n + 12), 0.012, 0, mus, 'sine', 0.05, 1.4);
-    S.tone(T.replay, T.replayEnd - T.replay + 0.6, F(0), 0.026, 0, mus, 'triangle', 1.2, 0.8);
+    S.tone(T.replay, T.replayEnd - T.replay + 0.6, F(-24 + 12), 0.04, 0, mus, 'triangle', 1.2, 0.8);
     for (const n of [0, 7, 12, 16]) S.tone(T.replayEnd - 0.2, T.out - T.replayEnd + 0.6, F(n), 0.014, 0, mus, 'sine', 0.6, 0.6);
     // outside: the motif, slower and a fourth lower (heavy); more present in the speech-free scene 7
     for (let i = 0; i < 8; i++) S.pluck(T.out + 0.5 + i * 0.85, F(motif[i] - 5), 0.09, (i % 2 ? 0.3 : -0.3), mus, 2.0, 0.4);
-    S.tone(T.out, T.pull - T.out, F(-5), 0.026, 0, mus, 'triangle', 1.5, 1.0);
-    for (let i = 0; i < 10; i++) S.pluck(T.world + 0.3 + i * 0.8, F(motif[(i + 2) % 8] - 5 + (i > 5 ? 2 : 0)), 0.16, (i % 2 ? 0.35 : -0.35), mus, 2.2, 0.45);
+    S.tone(T.out, T.pull - T.out, F(-17), 0.04, 0, mus, 'triangle', 1.5, 1.0);
+    for (let i = 0; i < 10; i++) S.pluck(T.world + 0.3 + i * 0.8, F(motif[(i + 2) % 8] - 5 + (i > 5 ? 2 : 0)), 0.12, (i % 2 ? 0.35 : -0.35), mus, 2.2, 0.45);
     S.tone(T.world, T.pull - T.world + 0.5, F(-5), 0.016, 0.2, mus, 'sine', 1.5, 1.0);
     // the ending: the resolve chord swells under the last line and decays naturally past the last frame
     for (const n of [-12, 0, 4, 7, 12, 16]) S.tone(T.pull + 0.2, END - T.pull - 0.2, F(n), n > 7 ? 0.016 : 0.028, 0, mus, 'sine', 1.6, 2.6);
@@ -178,9 +175,9 @@ class GbAudio extends AudioEngine {
     { const sl = (te) => T.replay + (te - T.replayFrom) / T.replayRate;
       S.tone(sl(0), 0.4, 600, 0.03, 0, fx, 'square', 0.004, 0.3);
       for (let i = 0; i < 2; i++) {
-        const t = sl(land[i]), pan = i ? 0.35 : -0.35, v = i ? 1.0 : 0.75;   // (kept under the voice level: weight, not volume)
-        S.boom(t, 0.15 * v, fx, rev);
-        { const n = S.noise('pink', t, t + 1.4), lp = S.filter('lowpass', 900, 0.7), g = ctx.createGain(); S.env(g, t, 0.02, 0.065 * v, 1.2); n.connect(lp); lp.connect(g); g.connect(S.panned(fx, pan)); }
+        const t = sl(land[i]), pan = i ? 0.35 : -0.35;
+        S.boom(t, 0.3, fx, rev);
+        { const n = S.noise('pink', t, t + 1.4), lp = S.filter('lowpass', 900, 0.7), g = ctx.createGain(); S.env(g, t, 0.02, 0.12, 1.2); n.connect(lp); lp.connect(g); g.connect(S.panned(fx, pan)); }
       }
       const t = T.replay - 0.2, d = T.replayEnd - t, n = S.noise('pink', t, t + d + 0.2), bp = S.filter('bandpass', 300, 0.8), g = ctx.createGain();
       bp.frequency.setValueAtTime(260, t); bp.frequency.exponentialRampToValueAtTime(140, t + d);
