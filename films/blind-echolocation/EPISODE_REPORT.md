@@ -98,3 +98,6 @@ Mix as delivered: −15.1 LUFS integrated, −1.7 dBTP true peak, loudness range
 The final frames are rendered in software WebGL (no GPU in the cloud container): 15,094 frames at 1920×1080 with four
 workers, about 0.3 frames a second, so the render takes most of a night. The sound-view shader was made 2–3× faster for
 this (its loops now stop at the slots in use; the frames are pixel-identical to before).
+On a PC with a graphics card the same film renders in one command, `node films/blind-echolocation/render-gpu.cjs`
+(steps in [`RENDER_ON_PC.md`](RENDER_ON_PC.md)). It uses the mastered soundtrack committed as `final-soundtrack.m4a`
+(AAC 256k, −15.1 LUFS, −2.0 dBTP).
