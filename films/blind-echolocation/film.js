@@ -238,6 +238,7 @@ const FILM = {
   grade(t, p) {
     const shot = FILM._shot || beShotAt(t), S = FILM._S, L = FILM._look || BE_REAL;
     p.flash = 0; p.fade = 0; p.chroma = 0; p.edgeBlur = 0; p.smear.set(0, 0);
+    if (shot.flash) p.flash = shot.flash(t);
     p.ao = 0.5; p.exposure = 1.0; p.saturation = 1.06; p.contrast = 1.07; p.warmth = 0.08; p.blackLift = 0.01;
     p.vignette = 0.42; p.soft = 0.012; p.bloom = 0.2; p.bloomThreshold = 1.25; p.grain = 0.022; p.uneven = 0.025; p.keepWarm = 1;
     p.tunnel = 1.3; p.tunnelSoft = 0.5; p.tunnelDark = 0;
