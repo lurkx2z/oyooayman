@@ -55,12 +55,14 @@ const FILM = {
     apt.hero = cast.heroIn(apt.scene, 'noor');
     apt.slice = new BeSlice(apt.scene, -BE_APT.W, BE_APT.W, -BE_APT.D, BE_APT.D, 0.72);
     beScene2Props(apt);
+    beScene3Props(apt);
     cast.buildPhone(apt.scene); beAcoustic(cast.phoneScreenM, { refl: 0.9, crisp: 0.9 }); beAcousticScene(cast.phone);
     // the acoustic layers of each set
     for (const S of Object.values(app.sets)) { S.waves = new BeWaves(S.scene, 14); S.rings = new BeRings(S.scene, 64, true); S.ringsX = new BeRings(S.scene, 32, false); }
     app.pulses = new BePulses();
     this._schedule(app);
     beSchedule2(app);
+    beSchedule3(app);
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     this._hudExtras(app);
     app.audio = new BeAudio(app.tl, app);
@@ -101,6 +103,9 @@ const FILM = {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; d.style.opacity = '0'; hud.appendChild(d); return d; };
     app.title = mk('be-title', '<div class="q">What if you went blind…</div><div class="s">and learned to see with sound?</div>');
     app.tag = mk('be-tag', 'VISUALIZATION · SOUND SLOWED');
+    app.rt = mk('be-tag be-rt', '');
+    app.big = mk('be-big', 'Echolocation');
+    app.chart = document.createElement('canvas'); app.chart.className = 'be-chart'; app.chart.width = 1920; app.chart.height = 1080; app.chart.style.opacity = '0'; hud.appendChild(app.chart);
     app.mtag = mk('be-tag be-mtag', '<span class="a">THE MOVIE VERSION</span><span class="b">NOT HOW IT WORKS</span>');
     app.subs = BN.phrases.map((P) => {
       const d = document.createElement('div'); d.className = 'be-sub';
@@ -124,6 +129,8 @@ const FILM = {
       if (t < BE.s2) C.heroBed(set.hero, t, ctx.bedV, !!shot.fp);
       else if (t < BE.s3) beHeroS2(set.hero, t, set, C);
       else set.hero.root.visible = false;
+      if (t >= BE.s3 && t < BE.s4) beHeroS3(set.hero2, t, set); else set.hero2.root.visible = false;
+      set.doorPivot.rotation.y = t >= BE.s3 ? -1.45 : 0;
       beProps2(set, t);
       void ring;
     }
@@ -136,13 +143,15 @@ const FILM = {
     // ---- the view mode (reality ↔ acoustic)
     const L = FILM._look = shot.look(t);
     BE_AC.uBeAc.value = L.ac; BE_AC.real.world.value = L.world; BE_AC.real.hero.value = L.hero; BE_AC.real.glow.value = L.glow ?? L.world;
-    BE_AC.uBeT.value = t;
+    const T = shot.clock ? shot.clock.value(t) : t;   // a slowed shot runs the sound on its own clock
+    BE_AC.uBeT.value = T;
     BE_AC.uBeDecay.value = shot.decay || 0.4; BE_AC.uBeGain.value = shot.gainAt ? shot.gainAt(t) : shot.gain || 1; BE_AC.gain.hero.value = shot.heroGain || 0.6;
-    app.pulses.apply(t, 1, (q) => q.set === shot.set && (!q.shot || q.shot === shot.id));
+    app.pulses.apply(T, 1, (q) => q.set === shot.set && (!q.shot || q.shot === shot.id) && (shot.clock ? q.clock === 'c3' : !q.clock));
     // ---- the set: lights fade with reality (they are what the audience sees, not what she hears)
     if (shot.set === 'apt') {
       set.update(t, L.ac > 0.5 ? L.world : 1, cam);
-      for (const m of set.pendant) m.visible = !shot.plan;
+      if (!set.ceilings) { set.ceilings = []; set.root.traverse((o) => { if (o.isMesh && /Ceiling(Plaster|LampGlow)|backroom/i.test(o.material.name || '') && (o.position.y > 2 || /Ceiling/.test(o.material.name))) set.ceilings.push(o); }); }
+      for (const m of set.pendant.concat(set.ceilings)) m.visible = !shot.plan;
       const F = set.scene.fog; F.color.set('#cdb9a6').multiplyScalar(MathX.lerp(1, L.world, L.ac)); F.density = 0.018;
       this._aptAcoustics(app, set, t, L);
     }
@@ -154,7 +163,7 @@ const FILM = {
   _aptAcoustics(app, set, t, L) {
     const W = set.waves, R = set.rings, RX = set.ringsX, C = app.cast;
     W.begin(); R.begin(); RX.begin();
-    if (L.ac > 0.5) {
+    if (L.ac > 0.5 && t < BE.s2) {
       // the impact: the outgoing shell and its reflections (image sources) from the room's walls, floor and ceiling
       set.slice.hide();
       if (!FILM._shot.plan) {
@@ -171,7 +180,7 @@ const FILM = {
       RX.source(new THREE.Vector3(0, 0, 0), [], t);
       for (const s of this.stepTimes) if (t > s && t < s + 1.1) RX.source(this.stepP(s), [s], t, { r: 0.4, a: 0.75, dur: 1.0, th: 0.07, squash: 0.45 });
     }
-    if (L.ac > 0.05) beRings2(this._app, set, t, FILM._shot);
+    if (L.ac > 0.05) { beRings2(this._app, set, t, FILM._shot); beFx3(this._app, set, t, FILM._shot); }
     W.end(); R.end(); RX.end();
   },
 
@@ -180,6 +189,14 @@ const FILM = {
     const ta = W(t, BE.title[0], BE.title[1], 0.5, 0.6).toFixed(3); if (app.title._a !== ta) { app.title.style.opacity = ta; app.title._a = ta; }
     const tg = (shot.tag ? MathX.smooth(t, shot.t0 + 0.3, shot.t0 + 0.8) * (1 - MathX.smooth(t, shot.t1 - 0.4, shot.t1)) : 0).toFixed(3);
     if (app.tag._a !== tg) { app.tag.style.opacity = tg; app.tag._a = tg; }
+    // the slowed clock's readout: the real time since the click
+    const rto = (shot.clock ? MathX.smooth(t, shot.t0 + 0.4, shot.t0 + 0.9) * (1 - MathX.smooth(t, shot.t1 - 0.3, shot.t1)) : 0).toFixed(3);
+    if (app.rt._a !== rto) { app.rt.style.opacity = rto; app.rt._a = rto; }
+    if (shot.clock) { const txt = 'REAL TIME AFTER THE CLICK  ' + (shot.clock.value(t) * 1000).toFixed(1) + ' ms'; if (app.rt._t !== txt) { app.rt.textContent = txt; app.rt._t = txt; } }
+    const bo = W(t, BE.echoW - 0.1, BE.over + 0.9, 0.6, 0.7).toFixed(3); if (app.big._a !== bo) { app.big.style.opacity = bo; app.big._a = bo; }
+    const co = (shot.chart ? MathX.smooth(t, shot.t0, shot.t0 + 0.35) * (1 - MathX.smooth(t, shot.t1 - 0.3, shot.t1)) : 0);
+    if (app.chart._a !== co.toFixed(3)) { app.chart.style.opacity = co.toFixed(3); app.chart._a = co.toFixed(3); }
+    if (co > 0) beDrawSignatures(app.chart, MathX.ramp(t, shot.t0 + 0.2, shot.t1 - 0.6));
     const mt = (shot.movie ? MathX.smooth(t, BE.movies + 0.3, BE.movies + 0.7) * (1 - MathX.smooth(t, BE.learn - 0.5, BE.learn)) : 0).toFixed(3);
     if (app.mtag._a !== mt) { app.mtag.style.opacity = mt; app.mtag._a = mt; }
     const nb = t > BE.superN + 0.15 ? '1' : '0';

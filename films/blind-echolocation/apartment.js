@@ -381,7 +381,43 @@ class BeApartment {
     const len = Hh.x1 - Hh.x0, cx = (Hh.x0 + Hh.x1) / 2, cz = (Hh.z0 + Hh.z1) / 2, wz = Hh.z1 - Hh.z0;
     gbAdd(R, new THREE.PlaneGeometry(len, wz), new THREE.MeshStandardMaterial({ map: this.tx.floor, color: '#cfa985', roughness: 0.6, name: 'beHallFloorWood' }), cx, 0, cz, { rx: -Math.PI / 2, cast: false });
     gbAdd(R, new THREE.PlaneGeometry(len, wz), gbMat('#efe6da', { rough: 0.95, name: 'beHallCeilingPlaster' }), cx, Hh.H, cz, { rx: Math.PI / 2, cast: false });
-    gbAdd(R, new THREE.BoxGeometry(len, Hh.H, 0.12), wall, cx, Hh.H / 2, Hh.z1 + 0.06);
+    // the far wall of the hall, with an open doorway (x 3.8…4.7) into a dark room (scene 3: "a doorway")
+    const dx0 = 3.8, dx1 = 4.7, dh = 2.06;
+    gbAdd(R, new THREE.BoxGeometry(dx0 - Hh.x0, Hh.H, 0.12), wall, (Hh.x0 + dx0) / 2, Hh.H / 2, Hh.z1 + 0.06);
+    gbAdd(R, new THREE.BoxGeometry(Hh.x1 - dx1, Hh.H, 0.12), wall, (dx1 + Hh.x1) / 2, Hh.H / 2, Hh.z1 + 0.06);
+    gbAdd(R, new THREE.BoxGeometry(dx1 - dx0, Hh.H - dh, 0.12), wall, (dx0 + dx1) / 2, (Hh.H + dh) / 2, Hh.z1 + 0.06);
+    const trim = gbMat('#f4efe6', { rough: 0.5, name: 'beDoorFrameWood' });
+    for (const x of [dx0 - 0.03, dx1 + 0.03]) gbAdd(R, new THREE.BoxGeometry(0.06, dh + 0.05, 0.16), trim, x, (dh + 0.05) / 2, Hh.z1 + 0.06);
+    gbAdd(R, new THREE.BoxGeometry(dx1 - dx0 + 0.12, 0.06, 0.16), trim, (dx0 + dx1) / 2, dh + 0.03, Hh.z1 + 0.06);
+    { // the dark room beyond it (a box, unlit)
+      const dk = gbMat('#2a2622', { rough: 0.95, name: 'beBackroomWall' }), z0 = Hh.z1 + 0.12, z1 = z0 + 2.6;
+      gbAdd(R, new THREE.BoxGeometry(3.0, 0.02, z1 - z0), dk, (dx0 + dx1) / 2, -0.01, (z0 + z1) / 2, { cast: false });
+      gbAdd(R, new THREE.BoxGeometry(3.0, Hh.H, 0.1), dk, (dx0 + dx1) / 2, Hh.H / 2, z1);
+      for (const x of [(dx0 + dx1) / 2 - 1.5, (dx0 + dx1) / 2 + 1.5]) gbAdd(R, new THREE.BoxGeometry(0.1, Hh.H, z1 - z0), dk, x, Hh.H / 2, (z0 + z1) / 2);
+      gbAdd(R, new THREE.BoxGeometry(3.0, 0.02, z1 - z0), dk, (dx0 + dx1) / 2, Hh.H, (z0 + z1) / 2, { cast: false });
+    }
+    this.hallDoorway = { x0: dx0, x1: dx1, h: dh };
+    // a tall bookcase against the far wall (x 1.4…2.3): shelves, books, a box, a vase (scene 3: "a large piece of furniture")
+    {
+      const bx = 1.85, bw = 0.9, bd = 0.32, bh = 1.86, bz = Hh.z1 - bd / 2, wd = gbMat('#8a5d3c', { rough: 0.55, name: 'beBookcaseWood', rim: 0.08 });
+      const g = new THREE.Group(); g.position.set(bx, 0, bz); R.add(g);
+      for (const sx of [-1, 1]) gbAdd(g, new THREE.BoxGeometry(0.025, bh, bd), wd, sx * (bw / 2 - 0.0125), bh / 2, 0);
+      gbAdd(g, new THREE.BoxGeometry(bw, bh, 0.012), wd, 0, bh / 2, bd / 2 - 0.006);
+      const br = new RNG(57);
+      for (let i = 0; i < 5; i++) {
+        const y = 0.06 + i * 0.44; gbAdd(g, new THREE.BoxGeometry(bw - 0.05, 0.022, bd - 0.02), wd, 0, y, -0.005);
+        if (i === 4) break;
+        let x = -bw / 2 + 0.05;
+        while (x < bw / 2 - 0.12) {
+          if (br.chance(0.12)) { x += br.range(0.06, 0.14); continue; }
+          const w = br.range(0.022, 0.05), h = br.range(0.2, 0.32);
+          gbAdd(g, gbRoundBox(w, h, br.range(0.17, 0.23), 0.003, 1), gbMat(br.pick(['#7d4a3a', '#3f5a6a', '#c9a45c', '#5e6e4a', '#8a6b8c', '#d8cdb8', '#2f3d4f']), { rough: 0.8, name: 'beBookCover' }), x + w / 2, y + 0.011 + h / 2, -0.02, { rz: br.chance(0.1) ? 0.18 : 0 });
+          x += w + 0.003;
+        }
+      }
+      gbAdd(g, gbLathe([[0, 0], [0.06, 0], [0.08, 0.1], [0.04, 0.22], [0.045, 0.26], [0, 0.26]], 18), gbMat('#5b7c8c', { rough: 0.25, name: 'beVaseCeramic' }), 0.25, bh + 0.01, -0.02);
+      this.bookcase = g;
+    }
     gbAdd(R, new THREE.BoxGeometry(0.12, Hh.H, wz), wall, Hh.x1 + 0.06, Hh.H / 2, cz);
     gbAdd(R, new THREE.BoxGeometry(0.12, Hh.H, wz), wall, Hh.x0 - 0.06, Hh.H / 2, cz);
     // the bedroom-side wall of the hall continues beyond the bedroom
