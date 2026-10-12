@@ -78,4 +78,23 @@ The fixes were not re-scored by the reviewers.
 
 ## Deliverables
 
-DELIVERABLES_PLACEHOLDER
+Everything is in the project's shared folder `blind-echolocation/` (and the source on this branch):
+
+| What | Where |
+|---|---|
+| Final film, 1920×1080, 30 fps, H.264 + AAC | `blind-echolocation_final_1080p.mp4` |
+| A small copy under 30 MiB (for sending from a phone) | `blind-echolocation_final_small.mp4` |
+| Playable film (unzip, open `blind-echolocation.html`, press Space; sound baked in) | `blind-echolocation_film.zip` |
+| Final mix (stereo, mastered) and the narration track as it sits in the mix | `audio/blind-echolocation_final_mix.flac`, `audio/blind-echolocation_narration_track.flac` |
+| The fourteen voice clips with their word timings (made by the narration thread, untouched) | `narration/` |
+| Screenplay, transcript, subtitles (SRT, VTT), master timeline (MD, JSON) | `docs/` (also in this folder of the repo) |
+| Contact sheets, one per scene, a frame every 2.5 s from the final render | `contact-sheets/scene01.jpg … scene14.jpg` |
+| This report | `docs/EPISODE_REPORT.md` |
+
+Mix as delivered: −15.1 LUFS integrated, −1.7 dBTP true peak, loudness range 5.5 LU; the narrator sits at about the same loudness in every scene, the street, rain and café beds 8–10 LU under it, the silent sections from near-silence (the anechoic room) to the rain taking over (about 2 LU above the voice).
+
+## Render note
+
+The final frames are rendered in software WebGL (no GPU in the cloud container): 15,094 frames at 1920×1080 with four
+workers, about 0.3 frames a second, so the render takes most of a night. The sound-view shader was made 2–3× faster for
+this (its loops now stop at the slots in use; the frames are pixel-identical to before).
