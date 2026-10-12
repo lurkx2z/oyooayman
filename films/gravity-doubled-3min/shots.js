@@ -94,12 +94,12 @@ const GB_SHOTS = [
       const at = _gbL(_gbV(x2, cy, Z), _gbV(D.rulerX, 0.62, Z), k);
       return { pos, at, fov: MathX.lerp(30, 34, k), focus: pos.distanceTo(at), dof: 0.3 + 0.6 * (1 - k) };
     } },
-  // D2 — "under normal gravity": drift toward the 1 g lane
+  // D2 — "under normal gravity": from the left, a slow push on the 1 g lane
   { id: 'D2', t0: GB.lane1[0] - 0.2, t1: GB.lane2[0] - 0.2, rim: 0.9, exp: true,
-    cam: gbMove(GB.lane1[0] - 0.2, GB.lane2[0] - 0.2, [_gbV(0.5, 0.86, GB_DROP.z + 2.2), _gbV(0.4, 0.8, GB_DROP.z), 36], [_gbV(0.28, 0.9, GB_DROP.z + 1.95), _gbV(0.32, 0.8, GB_DROP.z), 34], { dof: 0.35 }) },
-  // D3 — "but under double gravity": the same framing on the 2 g lane
+    cam: gbMove(GB.lane1[0] - 0.2, GB.lane2[0] - 0.2, [_gbV(-0.35, 1.0, GB_DROP.z + 1.75), _gbV(0.38, 0.78, GB_DROP.z), 36], [_gbV(-0.15, 0.92, GB_DROP.z + 1.45), _gbV(0.34, 0.8, GB_DROP.z), 33], { dof: 0.35 }) },
+  // D3 — "but under double gravity": low from the right, looking up the 2 g lane
   { id: 'D3', t0: GB.lane2[0] - 0.2, t1: GB.clampCU, rim: 0.9, exp: true,
-    cam: gbMove(GB.lane2[0] - 0.2, GB.clampCU, [_gbV(0.8, 0.86, GB_DROP.z + 2.2), _gbV(0.9, 0.8, GB_DROP.z), 36], [_gbV(1.02, 0.9, GB_DROP.z + 1.95), _gbV(0.98, 0.8, GB_DROP.z), 34], { dof: 0.35 }) },
+    cam: gbMove(GB.lane2[0] - 0.2, GB.clampCU, [_gbV(1.75, 0.42, GB_DROP.z + 1.4), _gbV(0.98, 0.9, GB_DROP.z), 38], [_gbV(1.55, 0.5, GB_DROP.z + 1.15), _gbV(0.98, 0.95, GB_DROP.z), 34], { dof: 0.35 }) },
   // D4 — "And the impact?": both clamps side by side, the two balls; the quiet before the release; a slow push
   { id: 'D4', t0: GB.clampCU, t1: GB.dropWide, rim: 0.9, exp: true,
     cam: (t) => {
@@ -128,9 +128,9 @@ const GB_SHOTS = [
   // F3 — he is up, braced on the table, breathing (a slow drift around him)
   { id: 'F3', t0: GB.upCut, t1: GB.heart, rim: 1.0,
     cam: gbMove(GB.upCut, GB.heart, [_gbV(-1.25, 1.3, -1.95), _gbV(-2.85, 1.2, -2.78), 42], [_gbV(-1.4, 1.35, -1.75), _gbV(-2.9, 1.25, -2.78), 40], { dof: 0.4 }) },
-  // F4 — "And your heart…": another customer on the stairs, from below; she stops, a hand to her chest
+  // F4 — "And your heart…": another customer on the stairs, a slow push to her face and her hand on her chest
   { id: 'F4', t0: GB.heart, t1: GB.s7, rim: 1.0,
-    cam: gbMove(GB.heart, GB.s7, [_gbV(1.4, 0.75, 1.15), _gbV(0.0, 1.55, 2.95), 44], [_gbV(1.25, 0.82, 1.3), _gbV(-0.1, 1.6, 2.95), 40], { dof: 0.35 }) },
+    cam: gbMove(GB.heart, GB.s7, [_gbV(-1.45, 2.45, 3.0), _gbV(-0.1, 1.85, 2.95), 38], [_gbV(-2.15, 2.85, 2.98), _gbV(-0.6, 2.15, 2.95), 36], { dof: 0.3 }) },
   // ================= SCENE 7 — no narration: the stairs
   // G1 — the wide from the room: his last heavy steps to the foot of the stairs
   { id: 'G1', t0: GB.s7, t1: GB.rail - 0.3, rim: 1.0,
@@ -196,7 +196,7 @@ const GB_SHOTS = [
     cam: gbMove(GB.eng, GB.back10, [_gbV(-5.5, 1.0, -7.7), _gbV(-7.6, 2.1, -5.0), 50], [_gbV(-5.7, 1.05, -7.5), _gbV(-7.7, 2.3, -4.9), 46], { dof: 0.3 }) },
   // J4 — "The real question…": back to him, his face
   { id: 'J4', t0: GB.back10, t1: GB.s11, outside: true, rim: 1.1,
-    cam: gbMove(GB.back10, GB.s11, [_gbV(-4.0, 1.5, -11.4), _gbV(-3.9, 1.5, -10.2), 38], [_gbV(-4.0, 1.55, -11.15), _gbV(-3.9, 1.52, -10.2), 34], { dof: 0.35 }) },
+    cam: gbMove(GB.back10, GB.s11, [_gbV(-4.15, 1.5, -11.9), _gbV(-3.88, 1.5, -10.4), 30], [_gbV(-4.1, 1.55, -11.7), _gbV(-3.88, 1.52, -10.4), 26], { dof: 0.3 }) },
   // ================= SCENE 11 — no narration: the silent reveal
   // K1 — people helping each other: the shopper pulls the jogger to her feet
   { id: 'K1', t0: GB.s11, t1: GB.help[0] + 3.3, outside: true, rim: 1.15,

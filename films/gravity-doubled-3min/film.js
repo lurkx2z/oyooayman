@@ -91,17 +91,17 @@ const FILM = {
       e2: mk('gb-tag', `IMPACT ENERGY <b>${f1(l0(1).energy)} J · 2×</b>`),
       r1: mk('gb-res l', `<div>FALL <b>${f2(l0(0).landT)} s</b></div><div>IMPACT <b>${f1(l0(0).vImpact)} m/s</b></div><div>ENERGY <b>${f1(l0(0).energy)} J</b></div>`),
       r2: mk('gb-res r', `<div>FALL <b>${f2(l0(1).landT)} s</b></div><div>IMPACT <b>${f1(l0(1).vImpact)} m/s</b></div><div>ENERGY <b>${f1(l0(1).energy)} J</b></div>`),
-      bounce: mk('gb-tag', `FIRST BOUNCE · SAME HEIGHT <b>${Math.round(D.e * D.e * D.h * 100)} cm</b>`),
+      bounce: mk('gb-tag', `FIRST BOUNCE · SAME HEIGHT <b>${Math.round(D.e * D.e * D.h * 100)} cm</b><div style=\"font-size:0.62em;opacity:0.8;margin-top:0.3em\">same restitution assumed</div>`),
       replay: mk('gb-replay', 'SLOW-MOTION REPLAY ×4'),
       car1: mk('gb-tag', 'RIDE HEIGHT AT 1 g'),
       car2: mk('gb-tag', 'AT 2 g · <b>≈10 cm lower</b>'),
       // the hologram: mass never changes; weight (the force) doubles
       hm: mk('gb-holo', '<div class="k">MASS</div><div class="v">0.25 kg</div><div class="s">UNCHANGED</div>'),
-      hw: mk('gb-holo w', '<div class="k">WEIGHT AT <span class="gg">1 g</span></div><div class="v"><span class="n">2.5</span> N</div><div class="s">×<span class="x">1.0</span></div>'),
+      hw: mk('gb-holo w', '<div class="k">WEIGHT AT <span class="gg">1 g</span></div><div class="v"><span class="n">2.45</span> N</div><div class="s">×<span class="x">1</span></div>'),
       hb: mk('gb-holo b', '<div class="k">YOUR BODY · 75 kg</div><div class="v">736 N → 1,472 N</div><div class="s">SAME MASS · TWICE THE WEIGHT</div>'),
       f1g: mk('gb-tag', 'JET HEIGHT AT 1 g'),
       f2g: mk('gb-tag', 'AT 2 g · <b>HALF</b>'),
-      load: mk('gb-holo w', '<div class="k">BRACKET LOAD</div><div class="v">2.0× <small>design</small></div><div class="s">RATED MARGIN 2.5×</div>'),
+      load: mk('gb-holo w', '<div class="k">BRACKET LOAD</div><div class="v">2.0× <small>design</small></div><div class="s">THIS BRACKET: RATED 2.5×</div>'),
     };
   },
 
@@ -144,7 +144,7 @@ const FILM = {
     else if (t >= GB.heart && t < GB.out) app.cafe.focusShadow(0.6, 2.6, 3.5);
     else app.cafe.focusShadow(-1.8, -2.4, 3.5);
     const F = app.scene.fog;
-    if (outside) { F.color.set('#9a7690'); F.density = 0.011; } else { F.color.set('#5e4462'); F.density = 0.016; }
+    if (outside) { F.color.set('#8f7890'); F.density = 0.0075; } else { F.color.set('#5e4462'); F.density = 0.016; }
     this._hudUpdate(app, t, shot);
   },
 
@@ -175,7 +175,7 @@ const FILM = {
       const P = S.P, a = W(t, P.show, P.hide, 0.12, 0.18);
       const o = a.toFixed(3);
       if (S.last.o !== o) { S.el.style.opacity = o; S.last.o = o; }
-      if (a > 0.001) S.spans.forEach((sp, i) => { const k = (t >= P.tokens[i].start - 0.04 ? 1 : 0.42).toString(); if (sp._k !== k) { sp.style.opacity = k; sp._k = k; } });
+      if (a > 0.001) S.spans.forEach((sp, i) => { const k = (t >= P.tokens[i].start - 0.04 ? 1 : 0.62).toString(); if (sp._k !== k) { sp.style.opacity = k; sp._k = k; } });
     }
     // projection helper (16:9 frame in design pixels)
     const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--u')) || 1;
@@ -191,10 +191,12 @@ const FILM = {
     if (H && shot.holo && shot.id !== 'C2') {
       place(L.hm, H.massP, H.a * MathX.smooth(t, GB.mass - 0.2, GB.mass + 0.3), -150, -20);
       place(L.hw, H.arrowP, H.aw, 150, 0);
-      const x = L.hw.querySelector('.x'), n = L.hw.querySelector('.n'), xs = H.w.toFixed(1), ns = (2.45 * H.w).toFixed(1);
+      // no in-between numbers: the arrow grows as a comparison, the label states the two weights (1 g reference, now 2 g)
+      const two = H.w > 1.5, x = L.hw.querySelector('.x'), n = L.hw.querySelector('.n'), gg = L.hw.querySelector('.gg');
+      const xs = two ? '2  (was 2.45 N at 1 g)' : '1', ns = two ? '4.9' : '2.45', gs = two ? '2 g · NOW' : '1 g';
       if (x.textContent !== xs) x.textContent = xs;
       if (n.textContent !== ns) n.textContent = ns;
-      const gg = L.hw.querySelector('.gg'), gs = H.w > 1.95 ? '2 g' : H.w > 1.05 ? '…' : '1 g'; if (gg.textContent !== gs) gg.textContent = gs;
+      if (gg.textContent !== gs) gg.textContent = gs;
     } else { place(L.hm, null, 0); place(L.hw, null, 0); }
     place(L.hb, shot.id === 'C2' && FILM._app.cast.hero.root.visible ? FILM._app.cast.hero.worldOf('hc', V(0, 0, 0)).add(V(0, -0.3, 0.55)) : null, shot.id === 'C2' ? W(t, GB.body + 0.3, GB.pull, 0.4, 0.3) : 0, 0, 0);
     // ---- the experiment: lane labels over the boards; the predicted time lights up as the narrator says it;
@@ -247,10 +249,10 @@ const FILM = {
     p.vignette = 0.45; p.soft = 0.015; p.bloom = 0.16; p.bloomThreshold = 1.3; p.grain = 0.024; p.uneven = 0.03; p.keepWarm = 1;
     p.tunnel = 1.3; p.tunnelSoft = 0.5; p.tunnelDark = 0;
     p.flashColor.setRGB(1.0, 0.86, 0.7);
-    p.dof = S ? S.dof : 0; p.focus = S ? S.focus : 5;
+    p.dof = S ? S.dof * 0.5 : 0; p.focus = S ? S.focus : 5;
     if (shot.outside) {
       const late = FILM._late(t);
-      p.exposure = 0.98 - 0.05 * late; p.saturation = 1.08 + 0.04 * late; p.warmth = 0.07 + 0.07 * late; p.bloom = 0.22 + 0.08 * late; p.bloomThreshold = 1.2 - 0.1 * late;
+      p.contrast = 1.13; p.exposure = 0.98 - 0.05 * late; p.saturation = 1.08 + 0.04 * late; p.warmth = 0.07 + 0.07 * late; p.bloom = 0.22 + 0.08 * late; p.bloomThreshold = 1.2 - 0.1 * late;
     }
     if (shot.exp) { p.ao = 0.5; p.vignette = 0.5; p.saturation = 1.0; p.contrast = 1.1; }
     if (shot.holo) { p.bloom = 0.18; }

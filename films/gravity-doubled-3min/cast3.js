@@ -556,6 +556,8 @@ class GbCast3 {
       const jx = -5.4, jz = -11.6, wx = jx + 0.95, wz = jz + 0.25;
       const yawW = Math.atan2(jx - wx, jz - wz);
       W.place(wx, 0, wz, yawW); J.place(jx, 0, jz, yawW + Math.PI);
+      // scene 12 (on the cut): both have turned to look across the square with him, a little apart
+      if (t >= GB.s12) { W.place(wx + 0.3, 0, wz - 0.1, Math.PI * 0.95); J.place(jx - 0.15, 0, jz, Math.PI * 1.03); }
       const h = GB.help;
       const WP = gbEvalTrack([[0, 'shopBrace', 0.01], [h[0] - 0.8, 'helpPull', 0.8], [h[0] + 1.0, 'helpPull', 0.4], [h[1] - 0.6, 'standTired', 1.0]], GB_POSES, t);
       WP.pelX -= 6 * MathX.window(t, h[0] + 0.6, h[0] + 2.6, 0.5, 0.5);

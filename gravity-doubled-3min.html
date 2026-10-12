@@ -28,14 +28,14 @@
     .gb-gauge .lab { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.2em; font-size: calc(var(--u) * 24); color: #f1e6d6; opacity: 0.92; }
     .gb-gauge .val { font-family: var(--book); font-size: calc(var(--u) * 84); line-height: 1; margin-top: calc(var(--u) * 6); color: #fff1dc; font-variant-numeric: tabular-nums; }
     .gb-gauge .val small { font-size: 0.55em; margin-left: 0.12em; opacity: 0.9; }
-    .gb-gauge .sub { font-family: var(--hud-font); font-weight: 500; letter-spacing: 0.12em; font-size: calc(var(--u) * 22); color: #ffc98a; margin-top: calc(var(--u) * 10); min-height: 1em; }
+    .gb-gauge .sub { font-family: var(--hud-font); font-weight: 500; letter-spacing: 0.1em; font-size: calc(var(--u) * 28); color: #ffc98a; margin-top: calc(var(--u) * 10); min-height: 1em; }
     /* POV eyelids (the transition into the character's eyes) */
     .gb-lid { position: absolute; left: -5%; width: 110%; height: 60%; background: #120d18; pointer-events: none; }
     .gb-lid.top { top: 0; border-radius: 0 0 50% 50% / 0 0 22% 22%; }
     .gb-lid.bot { bottom: 0; border-radius: 50% 50% 0 0 / 22% 22% 0 0; }
     /* ghost label in the close-up and the old-height label in the wide */
-    .gb-tag { position: absolute; font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.16em; font-size: calc(var(--u) * 24); color: #f6ead8; opacity: 0;
-      padding: calc(var(--u) * 6) calc(var(--u) * 14); border-radius: calc(var(--u) * 8); background: rgba(14, 8, 24, 0.45); white-space: nowrap; transform: translate(-50%, -50%); }
+    .gb-tag { position: absolute; font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.14em; font-size: calc(var(--u) * 36); color: #f6ead8; opacity: 0;
+      padding: calc(var(--u) * 8) calc(var(--u) * 18); border-radius: calc(var(--u) * 10); background: rgba(14, 8, 24, 0.7); white-space: nowrap; transform: translate(-50%, -50%); }
     .gb-tag b { font-family: var(--book); font-weight: 600; letter-spacing: 0; font-size: 1.35em; color: #ffd9a8; margin-left: 0.25em; }
     /* narration subtitles (film.js builds one per phrase): bottom centre, one or two lines, word-timed from the real audio */
     .gn-sub { position: absolute; bottom: calc(var(--u) * 84); left: 50%; transform: translateX(-50%); font-family: var(--book); font-size: calc(var(--u) * 48); font-weight: 600; line-height: 1.22;
@@ -49,7 +49,7 @@
     /* the drop experiment: lane labels above the boards, live timers under them, the replay tag */
     .gb-lane { position: absolute; transform: translate(-100%, -50%); text-align: center; pointer-events: none; padding: calc(var(--u) * 8) calc(var(--u) * 22); border-radius: calc(var(--u) * 12); background: rgba(14, 8, 24, 0.5); }
     .gb-lane .g { font-family: var(--book); font-size: calc(var(--u) * 62); font-weight: 700; line-height: 1; color: #fff1dc; }
-    .gb-lane .n { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.18em; font-size: calc(var(--u) * 19); color: #f1e6d6; opacity: 0.85; margin-top: calc(var(--u) * 6); }
+    .gb-lane .n { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.16em; font-size: calc(var(--u) * 28); color: #f1e6d6; opacity: 0.9; margin-top: calc(var(--u) * 6); }
     .gb-lane .p { font-family: var(--book); font-size: calc(var(--u) * 36); font-weight: 600; color: #ffc98a; margin-top: calc(var(--u) * 4); font-variant-numeric: tabular-nums; }
     .gb-lane.on { box-shadow: 0 0 0 calc(var(--u) * 2) rgba(255, 201, 138, 0.75); }
     .gb-timer { position: absolute; transform: translate(-100%, -50%); font-family: var(--book); font-size: calc(var(--u) * 56); font-weight: 600; color: #fff1dc; font-variant-numeric: tabular-nums;
@@ -57,7 +57,7 @@
     .gb-lane.r, .gb-timer.r { transform: translate(0, -50%); }
     .gb-timer small { font-size: 0.6em; opacity: 0.85; }
     .gb-timer.done { color: #ffc98a; box-shadow: 0 0 0 calc(var(--u) * 2) rgba(255, 201, 138, 0.7); }
-    .gb-replay { position: absolute; top: calc(var(--u) * 64); right: calc(var(--u) * 70); font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.22em; font-size: calc(var(--u) * 24); color: #f6ead8;
+    .gb-replay { position: absolute; top: calc(var(--u) * 64); right: calc(var(--u) * 70); font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.2em; font-size: calc(var(--u) * 32); color: #f6ead8;
       padding: calc(var(--u) * 10) calc(var(--u) * 20); border-radius: calc(var(--u) * 10); background: rgba(14, 8, 24, 0.5); pointer-events: none; }
     .gb-replay::before { content: ''; display: inline-block; width: 0.6em; height: 0.6em; border-radius: 50%; background: #ff8a6b; margin-right: 0.7em; vertical-align: 0.05em; }
     /* ?safe: the central 9:16 column (for the future vertical cut) */
@@ -68,15 +68,15 @@
     .gb-ep .k { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.3em; font-size: calc(var(--u) * 24); color: #f1e6d6; opacity: 0.85; }
     .gb-ep .t { font-family: var(--book); font-style: italic; font-size: calc(var(--u) * 40); color: #fff1dc; margin-top: calc(var(--u) * 8); text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
     .gb-holo { position: absolute; transform: translate(-50%, -50%); pointer-events: none; padding: calc(var(--u) * 10) calc(var(--u) * 22); border-radius: calc(var(--u) * 12);
-      background: rgba(8, 18, 34, 0.55); box-shadow: 0 0 0 calc(var(--u) * 2) rgba(127, 196, 255, 0.55); text-align: left; white-space: nowrap; }
-    .gb-holo .k { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.2em; font-size: calc(var(--u) * 20); color: #bfe4ff; }
-    .gb-holo .v { font-family: var(--book); font-size: calc(var(--u) * 46); font-weight: 600; color: #f2f8ff; line-height: 1.1; font-variant-numeric: tabular-nums; }
+      background: rgba(8, 18, 34, 0.72); box-shadow: 0 0 0 calc(var(--u) * 2) rgba(127, 196, 255, 0.55); text-align: left; white-space: nowrap; }
+    .gb-holo .k { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.18em; font-size: calc(var(--u) * 30); color: #bfe4ff; }
+    .gb-holo .v { font-family: var(--book); font-size: calc(var(--u) * 66); font-weight: 600; color: #f2f8ff; line-height: 1.1; font-variant-numeric: tabular-nums; }
     .gb-holo .v small { font-size: 0.5em; opacity: 0.8; }
-    .gb-holo .s { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.14em; font-size: calc(var(--u) * 19); color: #9fe0b8; margin-top: calc(var(--u) * 2); }
+    .gb-holo .s { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.12em; font-size: calc(var(--u) * 28); color: #9fe0b8; margin-top: calc(var(--u) * 2); }
     .gb-holo.w { box-shadow: 0 0 0 calc(var(--u) * 2) rgba(255, 180, 107, 0.7); background: rgba(30, 14, 8, 0.55); }
-    .gb-holo.w .k { color: #ffd9a8; } .gb-holo.w .s { color: #ffc98a; font-size: calc(var(--u) * 26); }
-    .gb-res { position: absolute; transform: translate(-100%, -50%); pointer-events: none; padding: calc(var(--u) * 10) calc(var(--u) * 22); border-radius: calc(var(--u) * 12); background: rgba(14, 8, 24, 0.58);
-      font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.14em; font-size: calc(var(--u) * 20); color: #f1e6d6; line-height: 1.7; white-space: nowrap; }
+    .gb-holo.w .k { color: #ffd9a8; } .gb-holo.w .s { color: #ffc98a; font-size: calc(var(--u) * 36); }
+    .gb-res { position: absolute; transform: translate(-100%, -50%); pointer-events: none; padding: calc(var(--u) * 10) calc(var(--u) * 22); border-radius: calc(var(--u) * 12); background: rgba(14, 8, 24, 0.72);
+      font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.12em; font-size: calc(var(--u) * 30); color: #f1e6d6; line-height: 1.7; white-space: nowrap; }
     .gb-res.r { transform: translate(0, -50%); }
     .gb-res b { font-family: var(--book); font-size: 1.5em; letter-spacing: 0; color: #ffd9a8; margin-left: 0.3em; font-variant-numeric: tabular-nums; }
   </style>

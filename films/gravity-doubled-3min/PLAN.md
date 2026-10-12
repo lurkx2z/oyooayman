@@ -14,9 +14,9 @@ logic and v3 dynamic-mix approach, copied into this folder (the 60 s film is unt
 |---|---|---|---|
 | 1 The moment it happens | clip 1, 0.40–10.58 | café at sunrise, title, push to his cup; on "heavy" (10.35) gravity 1.0 → 2.0 g, the arm sinks, the cup clacks down | 0–13.25 |
 | 2 First struggle | none | close on the hand: grip, brace, the lift (≈6 cm), the tremble, the slow set-down at 20.85; one take on hands and face; aftermath | 13.25–24.8 |
-| 3 Same mass, double weight | clip 3, 25.20–38.01 | a blue hologram twin of the cup: MASS 0.25 kg unchanged; his body label (75 kg, 736 N → 1,472 N); the WEIGHT arrow grows 1× → 2× on "twice as hard" | 24.8–39.9 |
+| 3 Same mass, double weight | clip 3, 25.20–38.01 | a blue hologram twin of the cup: MASS 0.25 kg unchanged; WEIGHT 2.45 N at 1 g → 4.9 N now (no in-between numbers); his body label (75 kg, 736 N → 1,472 N); the WEIGHT arrow grows 1× → 2× on "twice as hard" | 24.8–39.9 |
 | 4 The experiment | clip 4, 40.40–58.87 | two identical ceramic balls, 1.00 m, 1 g and 2 g lanes; predicted 0.45 s / 0.32 s light up as spoken; impact energy 6.3 J / 12.6 J; the clamps close up | 39.9–60.47 |
-| 5 The drop | none | both clamps open at 60.47; landings at 0.452 s and 0.320 s; bounces; 4× slow-motion replay with a strobe trail; measured results held | 60.47–71.1 |
+| 5 The drop | none | both clamps open at 60.47; landings at 0.452 s and 0.319 s; bounces; 4× slow-motion replay with a strobe trail; measured results held | 60.47–71.1 |
 | 6 Your body | clip 6, 71.60–87.31 | "It's you": he pushes up from the chair (knees low angle, legs trembling), braced on the table; a customer climbs the stairs, a hand to her chest | 71.1–87.71 |
 | 7 The stairs | none | he walks to the stairs, takes the rail, climbs one step, tries the second, the foot comes back down; close on his hand on the rail, then his face | 87.71–100.4 |
 | 8 The city reacts | clip 8, 100.80–123.27 | the plaza, people resting; the car's 1 g ride-height line vs now (≈10 cm lower); a cyclist barely lifts her bike off the rack; the fountain jet with its 1 g height line ("half"); people against walls and on the bench | 100.4–123.72 |
@@ -32,19 +32,21 @@ Scene 10's clip (20.3 s) is longer than its 19 s slot in the script, so scene 10
 
 - One gravity value drives everything (`gbG(t)`): HUD, physics, sound. It doubles at "heavy" and stays 2.0 g.
 - Mass never changes; weight = m·g doubles (cup 2.45 → 4.9 N; a 75 kg person 736 → 1,472 N).
-- Drop: t = √(2h/g), found by stepping each lane's own trajectory: 0.452 s vs 0.320 s; impact speed 4.43 vs 6.27 m/s;
+- Drop: t = √(2h/g), found by stepping each lane's own trajectory: 0.452 s vs 0.319 s; impact speed 4.43 vs 6.26 m/s;
   impact energy m·g·h = 6.3 vs 12.6 J (0.64 kg ball). No air drag (an 8 cm ceramic ball over 1 m: under 1 %).
 - Bounces: the same restitution (e = 0.55, ceramic ball on a rubber-topped pad) in both lanes, so both first bounces
-  peak at the same 30 cm; the 2 g ball's bounce rhythm is √2 faster. Simplification: restitution is assumed not to
+  peak at the same 30 cm (the screen says "same restitution assumed"); the 2 g ball's bounce rhythm is √2 faster. Simplification: restitution is assumed not to
   depend on impact speed. The pad's dent is √2 deeper in 2 g (twice the energy into the same spring). Nothing
   shatters: nothing in the physics says a ceramic ball must break at 6 m/s on rubber.
 - Fountain: same nozzle speed → jet height v²/2g halves (the narration states the assumption).
-- Car: static spring sag doubles (+9 cm spring, +1.2 cm tyre ≈ 10 cm lower), as in the 60 s film.
+- Car: static spring sag doubles (+9 cm spring, +1.2 cm tyre ≈ 10 cm lower), as in the 60 s film. Simplification: linear
+  springs; a real car could reach its bump stops first.
 - Pendant lamps swing at √2 the 1 g rate; the cord stretches a little.
 - People: knees bent, short heavy steps, hands on rails, walls, tables; climbing one step is a struggle. The body's
   responses are illustrative, not measured.
-- Balcony gauge: 2.0× design load against a rated margin of 2.5× ("some systems could handle the extra load"). An
-  illustrative example, not a real structure.
+- Balcony gauge: 2.0× design load against this bracket's rated margin of 2.5× ("some systems could handle the extra
+  load"). An illustrative, deliberately generous example: typical design load factors are about 1.35–1.6, so many real
+  structures would be past their design capacity at 2 g ("others would reach their limits").
 
 ## Shots (shots.js)
 
