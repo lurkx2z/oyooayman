@@ -7,8 +7,9 @@
          way, a landmark); her hand finds the lever without searching
      Z3  "But echolocation reveals… the smallest signals.": a restrained sound view: only the room's small sounds (the
          clock, a bird at the window, the street, a neighbour's steps beyond the door) and her hand on the lever
-     Z4  "And maybe that's the most incredible part… how to notice.": the door opens on the warm hallway; she steps onto
-         the threshold and unfolds her cane (three snaps), its tip on the floor
+     Z4  "And maybe that's the most incredible part…": the door opens on the warm hallway; she steps onto the threshold
+     Z4b "Sometimes, the world has more information… how to notice.": from along the hallway, in its warm light: she
+         unfolds her cane (three snaps) and its tip finds the floor ahead
      Z5  (no narration) the opening's own view from the bed: she stands in the doorway; one click; the hall answers at
          once (real time: no travelling front); the picture fades while the music finishes
    ===================================================================== */

@@ -8,8 +8,8 @@
                   cane unfolding (three snaps: each section pulled home by its elastic), its tip on the floor
      beyond       a neighbour's steps in the hall, through the closed door (Z3); when the door opens the hall and the
                   open window at its end pour in: birds, the street, voices far below, air: a warm wash
-     the click    one click on the threshold: the hall's far wall 1.6 m ahead answers at ≈ 9 ms, the open door beside her
-                  at ≈ 3 ms, the hall's two ends late and weak (≈ 22 and 48 ms), the bedroom behind her ≈ 26 ms
+     the click    one click on the threshold: the hall's far wall 1.2 m ahead (and the ceiling above her) answers at
+                  ≈ 7 ms, the open door leaf beside her at ≈ 3 ms, the hall's two ends late and weak (≈ 22 and 48 ms), the bedroom behind her ≈ 26 ms
      music        the opening's felt-piano figure comes back as the alarm stops (the film began with it); D, Bm, G, A under
                   the words; it resolves on D after the click and rings out with the fade
    ===================================================================== */
@@ -35,8 +35,8 @@ beSound('sfx', 'home', function (ctx, dest, K) {
   // the click on the threshold: the hall answers at once (and the room behind her, softer)
   const hall = K.room('hall14', { size: [12, 2.6, 1.4], src: [6.2, 1.55, 0.2], lis: [6.25, 1.6, 0.3], rt60: 0.55, absorb: 0.32, bright: 0.5, damp: 4.0, seed: 141, wet: 0.5 });
   const c = beClickArr(fx, { f: 3050 }), ms = (m) => 2 * m / 343;
-  const rL = [[ms(0.5), 0.12, 6000], [ms(1.57), 0.36, 5200], [ms(1.6) + 0.0012, 0.12, 3800], [ms(3.8), 0.09, 3000], [ms(4.4), 0.06, 2200], [ms(8.2), 0.035, 2000]];
-  const rR = [[ms(1.57), 0.34, 5200], [ms(1.62) + 0.0009, 0.13, 3800], [ms(3.8), 0.05, 3000], [ms(4.4), 0.07, 2200], [ms(8.2), 0.05, 2000]];
+  const rL = [[ms(0.47), 0.12, 6000], [ms(1.18), 0.36, 5200], [ms(1.15) + 0.0012, 0.12, 3800], [ms(3.8), 0.09, 3000], [ms(4.4), 0.06, 2200], [ms(8.2), 0.035, 2000]];
+  const rR = [[ms(1.18), 0.34, 5200], [ms(1.15) + 0.0009, 0.13, 3800], [ms(3.8), 0.05, 3000], [ms(4.4), 0.07, 2200], [ms(8.2), 0.05, 2000]];
   const Lr = beWithEchoes(fx, c, rL), Rr = beWithEchoes(fx, c, rR), m = Math.max(Lr.length, Rr.length), Lx = new Float32Array(m), Rx = new Float32Array(m); Lx.set(Lr); Rx.set(Rr);
   const pk = Math.max(GBX.peak(Lx), GBX.peak(Rx)); for (let i = 0; i < m; i++) { Lx[i] /= pk; Rx[i] /= pk; }
   K.putLR(Lx, Rx, B.qClick, { vol: 0.42, room: hall, wet: 0.8 });
