@@ -109,6 +109,7 @@ const FILM = {
     app.rt = mk('be-tag be-rt', '');
     app.big = mk('be-big', 'Echolocation');
     app.chart = document.createElement('canvas'); app.chart.className = 'be-chart'; app.chart.width = 1920; app.chart.height = 1080; app.chart.style.opacity = '0'; hud.appendChild(app.chart);
+    app.week = mk('be-week', '');
     app.labs = [];   // projected science labels (shot.labels(t) → [{ p, html, a, cls }])
     app.mtag = mk('be-tag be-mtag', '<span class="a">THE MOVIE VERSION</span><span class="b">NOT HOW IT WORKS</span>');
     app.subs = BN.phrases.map((P) => {
@@ -203,6 +204,9 @@ const FILM = {
     if (app.rt._a !== rto) { app.rt.style.opacity = rto; app.rt._a = rto; }
     if (shot.clock) { const txt = 'REAL TIME AFTER THE CLICK  ' + (shot.clock.value(t) * 1000).toFixed(1) + ' ms'; if (app.rt._t !== txt) { app.rt.textContent = txt; app.rt._t = txt; } }
     const bo = W(t, BE.echoW - 0.1, BE.over + 0.9, 0.6, 0.7).toFixed(3); if (app.big._a !== bo) { app.big.style.opacity = bo; app.big._a = bo; }
+    const wk = shot.week ? shot.week(t) : 0, wa = (wk ? MathX.smooth(t, shot.t0 + 0.15, shot.t0 + 0.5) * (1 - MathX.smooth(t, shot.t1 - 0.25, shot.t1)) : 0).toFixed(3);
+    if (app.week._a !== wa) { app.week.style.opacity = wa; app.week._a = wa; }
+    if (wk && app.week._n !== wk) { app.week.innerHTML = '<span>WEEK</span> ' + wk; app.week._n = wk; }
     // projected labels
     const labs = shot.labels ? shot.labels(t) : [], v = new THREE.Vector3();
     while (app.labs.length < labs.length) { const d = document.createElement('div'); d.className = 'be-lab'; d.style.opacity = '0'; document.getElementById('hud').appendChild(d); app.labs.push(d); }

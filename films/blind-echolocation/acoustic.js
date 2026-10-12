@@ -101,7 +101,8 @@ vec3 beAcoustic(vec3 P, vec3 N) {
     vec3 col = q.w > 0.5 && q.w < 1.5 ? uBeColC : (q.w > 1.5 ? uBeColB : mix(uBeColB, uBeColA, smoothstep(0.15, 0.8, r) * (0.55 + 0.45 * front)));
     acc += col * k;
   }
-  return acc * uBeGain * uBeGrpGain;
+  // surfaces right at the lens (first-person shots) fade out: the glow is information about the room, not the eye
+  return acc * uBeGain * uBeGrpGain * smoothstep(0.25, 1.1, length(cameraPosition - P));
 }
 `;
 

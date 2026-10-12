@@ -217,9 +217,17 @@ class GbCharacter {
     const a = 0.142 * hs, bb = 0.182 * hs, c = 0.15 * hs;          // an oval, taller than wide
     this.headR = [a, bb, c];
     const hc = this._joint('hc', hd, 0, 0.15 * hs, 0);       // head centre
-    gbAdd(hc, new THREE.SphereGeometry(1, 40, 30), M.skin, 0, 0.004, -0.004, { s: [a, bb, c] });
-    // jaw and chin: a narrower lower face that ends in a defined chin
-    gbAdd(hc, new THREE.SphereGeometry(1, 32, 20), M.skin, 0, -0.07 * hs, 0.012 * hs, { s: [a * 0.8, bb * 0.62, c * 0.86] });
+    // skull, jaw and lower face in ONE smooth surface (two intersecting spheres drew a hard crease across the cheeks
+    // that read as a beard line in close-ups): the lower half narrows and its front comes forward to the chin
+    { const g = new THREE.SphereGeometry(1, 48, 36), p = g.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        let x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+        const k = MathX.smooth(y, 0.05, -0.85);
+        x *= 1 - 0.2 * k; z += 0.1 * k * Math.max(0, z + 0.25); y -= 0.04 * k * Math.max(0, z);
+        p.setXYZ(i, x * a, y * bb, z * c);
+      }
+      g.computeVertexNormals();
+      gbAdd(hc, g, M.skin, 0, 0.004, -0.004); }
     gbAdd(hc, new THREE.SphereGeometry(1, 18, 12), M.skin, 0, -0.15 * hs, 0.07 * hs, { s: [0.034 * hs, 0.026 * hs, 0.03 * hs] });
     // cheekbones (break the ball silhouette in three-quarter views)
     for (const sx of [1, -1]) gbAdd(hc, new THREE.SphereGeometry(1, 16, 12), M.skin, sx * 0.06 * hs, -0.026 * hs, 0.08 * hs, { s: [0.036 * hs, 0.026 * hs, 0.048 * hs] });

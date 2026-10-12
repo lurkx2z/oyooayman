@@ -17,6 +17,13 @@ function bnF(n, txt, from = 0) {
   throw new Error(`bnF: "${txt}" not found in scene ${n}`);
 }
 
+// the first word of scene n (after `from`) that IS `txt` (whole word, case/punctuation ignored)
+function bnE(n, txt, from = 0) {
+  const k = txt.toLowerCase(), ws = BN_CLIP[n].words;
+  for (let i = from; i < ws.length; i++) if (ws[i].text.toLowerCase().replace(/[^a-z0-9']/g, '') === k) return ws[i];
+  throw new Error(`bnE: "${txt}" not found in scene ${n}`);
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // THE BEATS (film seconds). Every other file keys off these.
 // ---------------------------------------------------------------------------------------------------------------------
