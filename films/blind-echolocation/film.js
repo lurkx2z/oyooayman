@@ -54,11 +54,13 @@ const FILM = {
     apt.scene.fog = new THREE.FogExp2('#cdb9a6', 0.018);
     apt.hero = cast.heroIn(apt.scene, 'noor');
     apt.slice = new BeSlice(apt.scene, -BE_APT.W, BE_APT.W, -BE_APT.D, BE_APT.D, 0.72);
+    beScene2Props(apt);
     cast.buildPhone(apt.scene); beAcoustic(cast.phoneScreenM, { refl: 0.9, crisp: 0.9 }); beAcousticScene(cast.phone);
     // the acoustic layers of each set
     for (const S of Object.values(app.sets)) { S.waves = new BeWaves(S.scene, 14); S.rings = new BeRings(S.scene, 64, true); S.ringsX = new BeRings(S.scene, 32, false); }
     app.pulses = new BePulses();
     this._schedule(app);
+    beSchedule2(app);
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     this._hudExtras(app);
     app.audio = new BeAudio(app.tl, app);
@@ -99,6 +101,7 @@ const FILM = {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; d.style.opacity = '0'; hud.appendChild(d); return d; };
     app.title = mk('be-title', '<div class="q">What if you went blind…</div><div class="s">and learned to see with sound?</div>');
     app.tag = mk('be-tag', 'VISUALIZATION · SOUND SLOWED');
+    app.mtag = mk('be-tag be-mtag', '<span class="a">THE MOVIE VERSION</span><span class="b">NOT HOW IT WORKS</span>');
     app.subs = BN.phrases.map((P) => {
       const d = document.createElement('div'); d.className = 'be-sub';
       d.innerHTML = P.tokens.map((tk) => `<span>${tk.text}</span>`).join(' ');
@@ -119,7 +122,9 @@ const FILM = {
       C.phoneScreenM.emissiveIntensity = t < BE.dark0 ? 1.1 : 0;
       ctx.bedV = C.bedView(t);
       if (t < BE.s2) C.heroBed(set.hero, t, ctx.bedV, !!shot.fp);
+      else if (t < BE.s3) beHeroS2(set.hero, t, set, C);
       else set.hero.root.visible = false;
+      beProps2(set, t);
       void ring;
     }
     let S = shot.cam(t, ctx);
@@ -132,8 +137,8 @@ const FILM = {
     const L = FILM._look = shot.look(t);
     BE_AC.uBeAc.value = L.ac; BE_AC.real.world.value = L.world; BE_AC.real.hero.value = L.hero; BE_AC.real.glow.value = L.glow ?? L.world;
     BE_AC.uBeT.value = t;
-    BE_AC.uBeDecay.value = shot.decay || 0.4; BE_AC.uBeGain.value = shot.gain || 1; BE_AC.gain.hero.value = shot.heroGain || 0.6;
-    app.pulses.apply(t, 1, (q) => q.set === shot.set);
+    BE_AC.uBeDecay.value = shot.decay || 0.4; BE_AC.uBeGain.value = shot.gainAt ? shot.gainAt(t) : shot.gain || 1; BE_AC.gain.hero.value = shot.heroGain || 0.6;
+    app.pulses.apply(t, 1, (q) => q.set === shot.set && (!q.shot || q.shot === shot.id));
     // ---- the set: lights fade with reality (they are what the audience sees, not what she hears)
     if (shot.set === 'apt') {
       set.update(t, L.ac > 0.5 ? L.world : 1, cam);
@@ -166,6 +171,7 @@ const FILM = {
       RX.source(new THREE.Vector3(0, 0, 0), [], t);
       for (const s of this.stepTimes) if (t > s && t < s + 1.1) RX.source(this.stepP(s), [s], t, { r: 0.4, a: 0.75, dur: 1.0, th: 0.07, squash: 0.45 });
     }
+    if (L.ac > 0.05) beRings2(this._app, set, t, FILM._shot);
     W.end(); R.end(); RX.end();
   },
 
@@ -174,6 +180,10 @@ const FILM = {
     const ta = W(t, BE.title[0], BE.title[1], 0.5, 0.6).toFixed(3); if (app.title._a !== ta) { app.title.style.opacity = ta; app.title._a = ta; }
     const tg = (shot.tag ? MathX.smooth(t, shot.t0 + 0.3, shot.t0 + 0.8) * (1 - MathX.smooth(t, shot.t1 - 0.4, shot.t1)) : 0).toFixed(3);
     if (app.tag._a !== tg) { app.tag.style.opacity = tg; app.tag._a = tg; }
+    const mt = (shot.movie ? MathX.smooth(t, BE.movies + 0.3, BE.movies + 0.7) * (1 - MathX.smooth(t, BE.learn - 0.5, BE.learn)) : 0).toFixed(3);
+    if (app.mtag._a !== mt) { app.mtag.style.opacity = mt; app.mtag._a = mt; }
+    const nb = t > BE.superN + 0.15 ? '1' : '0';
+    if (app.mtag._b !== nb) { app.mtag.classList.toggle('no', nb === '1'); app.mtag._b = nb; }
     for (const S of app.subs) {
       const P = S.P, a = W(t, P.show, P.hide, 0.12, 0.18) * (t < BE.title[1] ? 0 : 1), o = a.toFixed(3);
       if (S.last.o !== o) { S.el.style.opacity = o; S.last.o = o; }

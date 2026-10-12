@@ -195,3 +195,79 @@ function beMusicKit(ctx, K) {
   };
   return (K._music = M);
 }
+
+// ================================================================================================= SCENE 2
+beSound('sfx', 'bedroom-s2', function (ctx, dest, K) {
+  const { fx, sr, r } = K, B = BE;
+  const room = K.room('bedroom2', Object.assign({ src: [2.2, 0.6, 1.9], lis: [2.5, 1.5, 1.9] }, BE_BEDROOM));
+  // B1: her nails on the floorboards under the dresser; the phone found; the alarm silenced (a soft screen tap)
+  for (let t = B.s2 + 0.4; t < B.grab; t += r.range(0.35, 0.6)) K.put(fx.rustle(0.18, { density: 900, rub: 0.3, lo: 1200, hi: 7000, grain: 0.003 }), t, { vol: 0.05, norm: true, pan: -0.3, room, wet: 0.5 });
+  K.put(fx.hit([[1900, 0.012, 1], [3300, 0.008, 0.5]], { width: 0.0008, amp: 0.5 }), B.grab, { vol: 0.08, norm: true, pan: -0.3, room });
+  K.put(fx.hit([[2600, 0.004, 1]], { width: 0.0015, amp: 0.4 }), B.silence - 0.05, { vol: 0.05, norm: true, pan: -0.2, room });
+  // B3: the pour: the stream into the glass. Its note RISES as the glass fills (the air column above the water gets
+  // shorter): the sound a blind person really uses, together with the finger on the rim
+  {
+    const t0 = B.water + 0.1, d = 0.95, n = Math.ceil(d * sr), y = fx.white(n), z = new Float32Array(n);
+    GBX.bq(y, 'bp', 2400, 0.8, sr);
+    let ph = 0;
+    for (let i = 0; i < n; i++) {
+      const u = i / n, lvl = 0.04 + 0.84 * Math.min(1, u * 1.05), L = 0.1 * (1 - lvl) + 0.012, f = 343 / (4 * L);
+      ph += 2 * Math.PI * f / sr; z[i] = Math.sin(ph) * (0.5 + 0.5 * Math.sin(ph * 0.5 + i * 0.0007));
+      const e = Math.min(1, u * 15, (1 - u) * 12);
+      y[i] = (y[i] * 0.6 + z[i] * 0.35) * e;
+    }
+    for (let t = 0; t < d; t += r.range(0.02, 0.06)) { const L = new Float32Array(n), R = new Float32Array(n); fx.bubble(L, R, Math.round(t * sr), r.range(700, 1800) * (1 + t), r.range(0.004, 0.01), 0.3, 0); for (let i = 0; i < n; i++) y[i] += L[i] + R[i]; }
+    K.put(y, t0, { vol: 0.16, norm: true, pan: -0.25, room, wet: 0.4 });
+  }
+  // B4: the palm over the painted door (a dry slide), the lever found, pressed (a metal latch)
+  K.put(fx.rustle(1.0, { density: 300, rub: 0.6, lo: 900, hi: 5000, grain: 0.01 }), B.handle + 0.1, { vol: 0.06, norm: true, pan: -0.3, room });
+  K.put(fx.hit(fx.metalModes(1450, 0.3).concat([[620, 0.02, 0.6]]), { width: 0.0007, amp: 0.6 }), B.handle + 1.25, { vol: 0.12, norm: true, pan: -0.35, room });
+  // B6: the movie version's own cheesy sound design: a sci-fi sonar ping and a riser… and on "superhuman" it powers down
+  K.put(fx.shimmer(1.6, 880, { skew: 0.15 }), B.movies + 0.05, { vol: 0.08, norm: true, room, wet: 0.2 });
+  { const d = 2.6, n = Math.ceil(d * sr), y = fx.arr(d); let ph = 0;
+    for (let i = 0; i < n; i++) { const u = i / n, f = 1500 * Math.pow(0.04, u); ph += 2 * Math.PI * f / sr; y[i] = (Math.sin(ph) + 0.4 * Math.sign(Math.sin(ph * 0.5))) * Math.pow(1 - u, 1.5) * Math.min(1, u * 60) * (0.6 + 0.4 * Math.sin(i / sr * 2 * Math.PI * 14)); }
+    GBX.bq(y, 'lp', 3000, 0.7, sr);
+    K.put(y, B.superN + 0.05, { vol: 0.1, norm: true }); }
+  // B8: her bare feet on the boards (soft), fingertips whispering along the plaster; ★ the knuckle tap on the wall
+  const plan = beScene2Props._plan;
+  if (plan) for (const h of plan) if (h.t0 > BE.walk[0] && h.t0 < BE.walk[1] + 0.5) K.put(fx.woodStep({ weight: 0.25 }), h.t0, { vol: 0.05, norm: true, pan: 0.1, lp: 2500, room, wet: 0.5 });
+  K.put(fx.rustle(B.walk[1] - B.walk[0], { density: 120, rub: 0.7, lo: 1500, hi: 6000, grain: 0.02, env: (u) => Math.min(1, u * 8, (1 - u) * 8) }), B.walk[0], { vol: 0.03, norm: true, pan: 0.35, room });
+  { const y = fx.slap([[150, 0.02, 1], [420, 0.012, 0.6], [1100, 0.006, 0.35], [2600, 0.003, 0.2]], { amp: 1, skin: 0.35, width: 0.0012, len: 0.3 });
+    K.put(y, B.tap, { vol: 0.42, norm: true, pan: 0.3, room, wet: 1.6 }); }
+});
+beSound('foley', 'bedroom-s2', function (ctx, dest, K) {
+  const { fx } = K, B = BE;
+  const room = K.room('bedroomF2', Object.assign({ src: [2.0, 1.4, 1.5], lis: [2.0, 1.5, 1.5] }, BE_BEDROOM, { wet: 0.22 }));
+  const cloth = (t, d, v, pan = 0) => K.put(fx.rustle(d, { density: 240, rub: 0.4, lo: 350, hi: 4500, grain: 0.018 }), t, { vol: v, norm: true, pan, room });
+  const breath = (t, d, v, o = {}) => K.put(fx.breath(d, o), t, { vol: v, norm: true, room, wet: 0.5 });
+  cloth(B.s2 + 0.1, 2.6, 0.09, -0.2); breath(B.grab + 0.2, 1.4, 0.06, {});                 // kneeling, the relief
+  cloth(B.clothes, 1.3, 0.14, 0.15);                                                      // the sweater
+  cloth(B.handle, 0.6, 0.05, -0.2);
+  breath(B.attn + 0.8, 0.8, 0.05, { inhale: true }); breath(B.attn + 2.2, 1.2, 0.04, {});
+  breath(B.learn + 0.4, 1.3, 0.04, {});
+  breath(B.tap + 0.18, 0.4, 0.09, { inhale: true });                                      // the tiny surprise
+  breath(B.tap + 2.0, 1.5, 0.04, {});
+});
+beSound('amb', 'bedroom-s2', function (ctx, dest, K) {
+  const { fx, sr } = K, B = BE;
+  // B7: the room's own sounds, louder for the "sparse map": the clock (south wall), traffic beyond the window, the hall
+  for (let t = Math.ceil(B.learn); t < B.one + 0.5; t += 1) K.put(fx.hit([[3100, 0.006, 1], [5200, 0.004, 0.5], [1400, 0.01, 0.4]], { width: 0.0003, amp: 1 }), t, { vol: 0.05, norm: true, pan: 0.15 });
+  { const d = B.one - B.learn, n = Math.ceil(d * sr), y = fx.white(n); GBX.bq(y, 'bp', 700, 0.7, sr); GBX.bq(y, 'lp', 1300, 0.7, sr);
+    for (let i = 0; i < n; i++) { const u = i / n; y[i] *= Math.pow(Math.sin(Math.PI * u), 2); }
+    K.put(y, B.learn, { vol: 0.07, norm: true, pan: -0.7 }); }
+  for (const t of [B.learn + 1.9, B.learn + 2.5]) K.put(fx.woodStep({ weight: 0.6 }), t, { vol: 0.06, norm: true, pan: 0.6, lp: 1000 });
+});
+beSound('music', 'bedroom-s2', function (ctx, dest, K) {
+  const B = BE, M = beMusicKit(ctx, K);
+  // the montage: patient, a little stuck: low strings and a slow piano that keeps returning to the same two notes
+  M.strings(B.s2 + 0.8, B.movies - 0.2, ['A1', 'E2', 'A2'], 0.7, { att: 1.5, rel: 1.0, cut: 600 });
+  M.strings(B.clothes - 0.4, B.movies - 0.2, ['C#4', 'E4'], 0.3, { att: 2.0, rel: 1.0, cut: 1400, vib: 3 });
+  [[B.first, 'A4'], [B.first + 1.4, 'E4'], [B.clothes, 'A4'], [B.water, 'B4'], [B.handle, 'A4'], [B.attn, 'E4'], [B.attn + 1.9, 'C#5'], [B.attn + 3.6, 'B4']].forEach(([t, n], i) => M.piano(t, n, 0.32, 2.2, i % 2 ? 0.2 : -0.2, 0.8));
+  // the movie version: a trailer cliché (big, bright, synthetic), cut dead on "superhuman"
+  M.strings(B.movies, B.superN + 0.05, ['D3', 'A3', 'D4', 'F#4', 'A4'], 1.1, { att: 1.0, rel: 0.05, cut: 1800, cutTo: 5000, vib: 2, wave: 'square' });
+  M.strings(B.movies + 0.5, B.superN + 0.05, ['D2', 'D1'], 1.4, { att: 0.5, rel: 0.05, cut: 300, wave: 'square' });
+  // the sparse map: nothing (the room is the music); the walk: a quiet pad; silence for the tap; one harmonic after it
+  M.strings(B.one + 0.6, B.tap - 0.25, ['E2', 'B2', 'G#3'], 0.55, { att: 2.0, rel: 0.25, cut: 700 });
+  M.strings(B.tap + 0.9, B.s3 + 1.4, ['E5', 'B5'], 0.3, { att: 1.2, rel: 1.2, cut: 4500, vib: 3 });
+  M.bell(B.tap + 0.6, 'B6', 0.2, 0.3);
+});

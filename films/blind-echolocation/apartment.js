@@ -15,7 +15,7 @@ const BE_APT = {
   door: { x0: -1.62, x1: -0.72, h: 2.06 },
   nightR: [-1.22, -1.78], nightL: [1.2, -1.78], nightH: 0.6,      // bedside tables (centre x, z) and top height
   dresser: { x0: -2.3, x1: -1.78, z0: -0.95, z1: 0.35, legs: 0.13, top: 0.86 },
-  chair: [1.55, 1.35, -2.4],
+  chair: [1.55, 1.35, 0.74],          // facing the corner: its back (with the sweater) toward the room
   phone0: new THREE.Vector3(-1.13, 0.6 + 0.0045, -1.7),          // on the right bedside table
   hall: { z0: 2.22, z1: 3.62, x0: -5.0, x1: 7.0, H: 2.6 },
   sunDir: new THREE.Vector3(0.8, 0.5, -0.33).normalize(),         // toward the morning sun (through the window)
