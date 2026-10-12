@@ -150,9 +150,10 @@ const FILM = {
     BE_AC.uBeAc.value = L.ac; BE_AC.real.world.value = L.world; BE_AC.real.hero.value = L.hero; BE_AC.real.glow.value = L.glow ?? L.world;
     const T = shot.clock ? shot.clock.value(t) : t;   // a slowed shot runs the sound on its own clock
     BE_AC.uBeT.value = T;
-    BE_AC.uBeDecay.value = shot.decay || 0.4; BE_AC.uBeGain.value = shot.gainAt ? shot.gainAt(t) : shot.gain || 1; BE_AC.gain.hero.value = shot.heroGain || 0.6;
+    BE_AC.uBeDecay.value = shot.decay || 0.4; BE_AC.uBeFall.value = typeof shot.fall === 'function' ? shot.fall(t) : shot.fall || 0.09; BE_AC.uBeGain.value = shot.gainAt ? shot.gainAt(t) : shot.gain || 1; BE_AC.gain.hero.value = shot.heroGain || 0.6;
     app.pulses.apply(T, 1, (q) => q.set === shot.set && (!q.shot || q.shot === shot.id) && (shot.clock ? q.clock === (shot.clockId || 'c3') : !q.clock));
     // ---- the set: lights fade with reality (they are what the audience sees, not what she hears)
+    for (const v of BE_AC.uBeCS.value) v.w = 0; for (const v of BE_AC.uBeLS.value) v.z = 0; BE_AC.uBeRev.value.w = 0;   // (scene 13's city lights its own continuous sources)
     if (shot.set === 'apt') {
       set.update(t, L.ac > 0.5 ? L.world : 1, cam);
       if (!set.ceilings) { set.ceilings = []; set.root.traverse((o) => { if (o.isMesh && /Ceiling(Plaster|LampGlow)|backroom/i.test(o.material.name || '') && (o.position.y > 2 || /Ceiling/.test(o.material.name))) set.ceilings.push(o); }); }

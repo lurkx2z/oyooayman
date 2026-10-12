@@ -18,6 +18,7 @@ class BeArena {
   constructor() { this.scene = new THREE.Scene(); this.scene.name = 'arena'; this.root = new THREE.Group(); this.scene.add(this.root); }
   build() {
     const S = this.scene, R = this.root, C = BE_ARENA, r = new RNG(1201), L = C.x1 - C.x0, Wd = C.z1 - C.z0;
+    const top = this.top = [];   // what is above the walls (the roof, its trusses, the lamps): it dissolves as scene 13 rises
     S.background = new THREE.Color('#0a0d16');
     // ---- materials
     const brickTx = (rep) => beCanvasTex(512, 512, (x, w, h) => {
@@ -71,11 +72,11 @@ class BeArena {
     const roofTx = beCanvasTex(512, 512, (x, w, h) => { for (let i = 0; i < 16; i++) { const v = r.range(-10, 10); x.fillStyle = `rgb(${58 + v},${44 + v},${34 + v})`; x.fillRect(0, i * 32, w, 32); x.fillStyle = 'rgba(20, 14, 10, 0.6)'; x.fillRect(0, i * 32, w, 2); } Tex.noise(x, w, h, 6, r); }, [L / 3, 4]);
     const roofM = new THREE.MeshStandardMaterial({ map: roofTx, color: '#a08c7c', roughness: 0.8, name: 'beArenaRoofWood', envMapIntensity: 0.2 });
     const slope = Math.atan2(C.ridge - C.H, Wd / 2), len = Math.hypot(C.ridge - C.H, Wd / 2) + 0.4;
-    for (const s of [-1, 1]) this.roof = gbAdd(R, new THREE.PlaneGeometry(L, len), roofM, (C.x0 + C.x1) / 2, (C.H + C.ridge) / 2, s * Wd / 4, { rx: Math.PI / 2 + s * -slope * 1, cast: true });
+    for (const s of [-1, 1]) top.push(this.roof = gbAdd(R, new THREE.PlaneGeometry(L, len), roofM, (C.x0 + C.x1) / 2, (C.H + C.ridge) / 2, s * Wd / 4, { rx: Math.PI / 2 + s * -slope * 1, cast: true }));
     for (const x of [C.x0, C.x1]) { const sh = new THREE.Shape(); sh.moveTo(-Wd / 2, 0); sh.lineTo(Wd / 2, 0); sh.lineTo(0, C.ridge - C.H); sh.lineTo(-Wd / 2, 0);
-      gbAdd(R, new THREE.ShapeGeometry(sh), brickEndM, x + (x < 0 ? -0.05 : 0.05), C.H, 0, { ry: Math.PI / 2 }); }
+      top.push(gbAdd(R, new THREE.ShapeGeometry(sh), brickEndM, x + (x < 0 ? -0.05 : 0.05), C.H, 0, { ry: Math.PI / 2 })); }
     const steelM = gbMat('#2f3438', { rough: 0.45, metal: 0.7, name: 'beArenaTrussSteel' });
-    const beam = (a, b, s = 0.14) => { const d = b.clone().sub(a), m = beBox(R, s, s, d.length(), (a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2, steelM, { cast: false }); m.lookAt(b.x, b.y, b.z); m.updateMatrix(); return m; };
+    const beam = (a, b, s = 0.14) => { const d = b.clone().sub(a), m = beBox(R, s, s, d.length(), (a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2, steelM, { cast: false }); m.lookAt(b.x, b.y, b.z); m.updateMatrix(); top.push(m); return m; };
     const V = (x, y, z) => new THREE.Vector3(x, y, z);
     for (let x = C.x0 + C.bay; x < C.x1 - 0.5; x += C.bay) {
       beam(V(x, C.H, C.z0 + 0.3), V(x, C.H, C.z1 - 0.3), 0.18);
@@ -136,7 +137,7 @@ class BeArena {
     const bulbM = this.bulbM = new THREE.MeshStandardMaterial({ color: '#fff3dc', emissive: '#ffcf8a', emissiveIntensity: 2.4, name: 'beArenaLampGlow' });
     this.lamps = [];
     for (let x = C.x0 + 4; x < C.x1; x += C.bay) for (const z of [-4.5, 4.5]) {
-      const g = new THREE.Group(); g.position.set(x, 6.4, z); R.add(g);
+      const g = new THREE.Group(); g.position.set(x, 6.4, z); R.add(g); top.push(g);
       const sh = gbAdd(g, new THREE.SphereGeometry(0.45, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2), shadeM, 0, 0, 0, { cast: false }); sh.material.side = THREE.DoubleSide;
       const bm = bulbM.clone(); const b = gbAdd(g, new THREE.SphereGeometry(0.13, 12, 8), bm, 0, 0.02, 0, { cast: false });
       gbAdd(g, new THREE.CylinderGeometry(0.008, 0.008, C.H + 0.6 - 6.4, 4), steelM, 0, (C.H + 0.6 - 6.4) / 2 + 0.4, 0, { cast: false });

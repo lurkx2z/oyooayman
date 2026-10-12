@@ -27,16 +27,25 @@ const BE_AC = {
   uBeGain: { value: 1 },
   uBeDecay: { value: 0.4 },    // seconds a contact keeps glowing
   uBeLine: { value: 5.0 },      // contour lines per metre
+  uBeFall: { value: 0.09 },     // how fast a pulse weakens with distance (1 / (1 + d² · fall)); the city of scene 13 is wider
   uBePO: { value: Array.from({ length: 16 }, () => new THREE.Vector4()) },   // origin xyz, t0
   uBePP: { value: Array.from({ length: 16 }, () => new THREE.Vector4()) },   // speed (m/s, visual), strength, width (m), kind (0 click, 1 source/amber, 2 weak/violet)
   uBePD: { value: Array.from({ length: 16 }, () => new THREE.Vector4()) },   // a beamed click: aim xyz, how directional (0 = all round)
+  // continuous sources (scene 13's city: the traffic, the fountain): xyz, strength (0 = off); they glow, they don't pulse
+  uBeCS: { value: Array.from({ length: 24 }, () => new THREE.Vector4()) },
+  uBeCSFall: { value: 0.004 },
+  // line sources (a street's traffic is a line of noise): axis (0 = along z at x = c, 1 = along x at z = c), c, strength,
+  // how fast the busy stretches drift along it; and the reveal (xz centre, radius, softness: 0 = everywhere)
+  uBeLS: { value: Array.from({ length: 10 }, () => new THREE.Vector4()) },
+  uBeLSFall: { value: 0.012 },
+  uBeRev: { value: new THREE.Vector4() },
   uBeColA: { value: new THREE.Color('#62f3ff') },   // strong return
   uBeColB: { value: new THREE.Color('#7a5cff') },   // weak return
   uBeColC: { value: new THREE.Color('#ffb05a') },   // sound source
   // per-group reality brightness in the acoustic view (0 = black): world, people, light sources
   real: { world: { value: 0 }, hero: { value: 0 }, glow: { value: 0 } },
   // per-group acoustic gain (the hero's own body hardly "returns" his own click)
-  gain: { world: { value: 1 }, hero: { value: 0.6 }, glow: { value: 1 } },
+  gain: { world: { value: 1 }, hero: { value: 0.6 }, glow: { value: 1 }, water: { value: 0.18 } },
 };
 
 // material character from its name (sets are built with descriptive material names)
@@ -55,8 +64,8 @@ function beClassify(name) {
 }
 
 const BE_AC_GLSL = /* glsl */`
-uniform float uBeAc, uBeT, uBeGain, uBeDecay, uBeLine, uBeRefl, uBeCrisp, uBeReal, uBeGrpGain;
-uniform vec4 uBePO[16]; uniform vec4 uBePP[16]; uniform vec4 uBePD[16];
+uniform float uBeAc, uBeT, uBeGain, uBeDecay, uBeLine, uBeFall, uBeRefl, uBeCrisp, uBeReal, uBeGrpGain;
+uniform vec4 uBePO[16]; uniform vec4 uBePP[16]; uniform vec4 uBePD[16]; uniform vec4 uBeCS[24]; uniform float uBeCSFall; uniform vec4 uBeLS[10]; uniform float uBeLSFall; uniform vec4 uBeRev;
 uniform vec3 uBeColA, uBeColB, uBeColC;
 varying vec3 vBeW;
 float beH3(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
@@ -93,7 +102,7 @@ vec3 beAcoustic(vec3 P, vec3 N) {
     float tail = lag > 0.0 ? exp(-since / uBeDecay) : 0.0;
     float facing = clamp(dot(N, D / d), 0.0, 1.0);
     float ret = mix(0.25 + 0.75 * facing, pow(facing, 5.0) * 1.4, uBeCrisp);
-    float fall = 1.0 / (1.0 + d * d * 0.09);
+    float fall = 1.0 / (1.0 + d * d * uBeFall);
     float mask = 0.25 + 0.75 * smoothstep(0.3, 0.72, beN3(P * 1.7 + float(i) * 3.7));
     float r = uBeRefl;
     float kf = (front + rev * mask) * (0.2 + 0.8 * facing) * (0.3 + 0.7 * r);
@@ -103,11 +112,29 @@ vec3 beAcoustic(vec3 P, vec3 N) {
     vec3 col = q.w > 0.5 && q.w < 1.5 ? uBeColC : (q.w > 1.5 ? uBeColB : mix(uBeColB, uBeColA, smoothstep(0.15, 0.8, r) * (0.55 + 0.45 * front)));
     acc += col * k;
   }
+  // continuous sources: a steady, flickering glow on what faces them (the noise is never quite steady); only inside the
+  // reveal (the city appears outward from the hall)
+  float rev = uBeRev.w > 0.0 ? 1.0 - smoothstep(uBeRev.z - uBeRev.w, uBeRev.z, length(P.xz - uBeRev.xy)) : 1.0;
+  for (int i = 0; i < 24; i++) {
+    vec4 c = uBeCS[i]; if (c.w <= 0.0) continue;
+    vec3 D = c.xyz - P; float d = length(D) + 1e-4, facing = clamp(dot(N, D / d), 0.0, 1.0);
+    float flick = 0.55 + 0.45 * beN3(P * 0.3 + vec3(uBeT * 1.9, 0.0, float(i)));
+    acc += uBeColC * (c.w / (1.0 + d * d * uBeCSFall)) * (0.12 + 0.88 * facing) * (0.3 + 0.7 * uBeRefl) * (0.2 + 0.8 * dots) * flick * rev;
+  }
+  for (int i = 0; i < 10; i++) {
+    vec4 l = uBeLS[i]; if (l.z <= 0.0) continue;
+    float off = (l.x < 0.5 ? P.x : P.z) - l.y, along = l.x < 0.5 ? P.z : P.x;
+    vec3 D = l.x < 0.5 ? vec3(-off, 0.9 - P.y, 0.0) : vec3(0.0, 0.9 - P.y, -off);
+    float d = length(D) + 1e-4, facing = clamp(dot(N, D / d), 0.0, 1.0);
+    float busy = 0.12 + 0.88 * smoothstep(0.4, 0.75, beN3(vec3(along * 0.03 - uBeT * l.w, l.y * 0.07, float(i) * 1.7)));
+    acc += uBeColC * (l.z / (1.0 + d * d * uBeLSFall)) * (0.12 + 0.88 * facing) * (0.3 + 0.7 * uBeRefl) * (0.25 + 0.75 * dots + 0.6 * crease) * busy * rev;
+  }
   // surfaces right at the lens (first-person shots) fade out: the glow is information about the room, not the eye
   return acc * uBeGain * uBeGrpGain * smoothstep(0.25, 1.1, length(cameraPosition - P));
 }
 `;
 
+BE_AC.real.water = BE_AC.real.world;   // open water: a mirror for sound, it sends a click on, it answers little
 const _beMats = new Set();
 // o: refl, crisp, group ('world' | 'hero' | 'glow'). Idempotent per material.
 function beAcoustic(m, o = {}) {
@@ -119,8 +146,8 @@ function beAcoustic(m, o = {}) {
   m.onBeforeCompile = (sh, r) => {
     if (prev) prev.call(m, sh, r);
     Object.assign(sh.uniforms, {
-      uBeAc: BE_AC.uBeAc, uBeT: BE_AC.uBeT, uBeGain: BE_AC.uBeGain, uBeDecay: BE_AC.uBeDecay, uBeLine: BE_AC.uBeLine,
-      uBePO: BE_AC.uBePO, uBePP: BE_AC.uBePP, uBePD: BE_AC.uBePD, uBeColA: BE_AC.uBeColA, uBeColB: BE_AC.uBeColB, uBeColC: BE_AC.uBeColC,
+      uBeAc: BE_AC.uBeAc, uBeT: BE_AC.uBeT, uBeGain: BE_AC.uBeGain, uBeDecay: BE_AC.uBeDecay, uBeLine: BE_AC.uBeLine, uBeFall: BE_AC.uBeFall,
+      uBePO: BE_AC.uBePO, uBePP: BE_AC.uBePP, uBePD: BE_AC.uBePD, uBeCS: BE_AC.uBeCS, uBeCSFall: BE_AC.uBeCSFall, uBeLS: BE_AC.uBeLS, uBeLSFall: BE_AC.uBeLSFall, uBeRev: BE_AC.uBeRev, uBeColA: BE_AC.uBeColA, uBeColB: BE_AC.uBeColB, uBeColC: BE_AC.uBeColC,
       uBeRefl: { value: refl }, uBeCrisp: { value: crisp }, uBeReal: BE_AC.real[grp], uBeGrpGain: BE_AC.gain[grp],
     });
     sh.vertexShader = sh.vertexShader
