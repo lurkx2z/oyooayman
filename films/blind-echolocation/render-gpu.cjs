@@ -8,11 +8,12 @@
 
    Writes to renders/blind-echolocation/:
      blind-echolocation_final_1080p.mp4   1920×1080 30 fps, H.264 CRF 18 + the mastered soundtrack (AAC 256k, copied)
-     blind-echolocation_final_small.mp4   1280×720 two-pass, under 30 MiB (for sending from a phone)
+     blind-echolocation_final_small.mp4   1280×720 two-pass, under 30 MiB (for sending from a phone), AAC 128k copied
      check.jpg                            8 frames across the film
    Resumable: re-run the same command and finished 15-second segments are kept.
    Options: --workers 4  --out <dir>  --gpu auto|headless|headed|software  --channel msedge|chrome  --from <frame> --to <frame>  --w 1920 --h 1080
             --ffmpeg <path to ffmpeg>  --no-final (segments only)  --to 119 --final (a quick test of the whole chain)
+            --small-only (only swap the small copy's soundtrack for small-soundtrack.m4a)
    ===================================================================== */
 const path = require('path');
 const fs = require('fs');
@@ -30,7 +31,9 @@ const ARGS = process.argv.slice(2).reduce((o, a, i, arr) => {
 }, {});
 const ROOT = path.resolve(__dirname, '../..');
 const PAGE = path.join(ROOT, 'blind-echolocation.html');
-const SOUND = path.join(__dirname, 'final-soundtrack.m4a');
+const SOUND = path.join(__dirname, 'final-soundtrack.m4a');         // AAC 256k, −15.1 LUFS, −2.0 dBTP
+const SMALL_SOUND = path.join(__dirname, 'small-soundtrack.m4a');   // AAC 128k, −15.2 LUFS, −1.6 dBTP (measured; low-bitrate
+                                                                    // AAC adds peaks, so it is encoded once and copied)
 const OUT = path.resolve(ROOT, ARGS.out || 'renders/blind-echolocation');
 const SEGDIR = path.join(OUT, 'segments');
 const W = +(ARGS.w || 1920), H = +(ARGS.h || 1080), FPS = 30, SEG = +(ARGS.seg || 450);
@@ -90,6 +93,15 @@ async function openPage(mode) {
   fs.mkdirSync(SEGDIR, { recursive: true });
   if (!fs.existsSync(SOUND)) throw new Error('missing ' + SOUND + ' (pull the branch again)');
   ff(['-version'], 'version');
+  if (ARGS['small-only']) {
+    // swap the small copy's soundtrack for small-soundtrack.m4a (the picture is copied, nothing is re-rendered)
+    if (!fs.existsSync(SMALL)) throw new Error('no small copy yet at ' + SMALL);
+    const tmp = SMALL.replace(/\.mp4$/, '.new.mp4');
+    ff(['-loglevel', 'error', '-i', SMALL, '-i', SMALL_SOUND, '-map', '0:v', '-map', '1:a', '-c', 'copy', '-shortest', '-movflags', '+faststart', tmp], 'small soundtrack');
+    fs.renameSync(tmp, SMALL);
+    console.log(`wrote ${SMALL} (${(fs.statSync(SMALL).size / 1048576).toFixed(1)} MiB), ${loudness(SMALL)}`);
+    return;
+  }
   const first = await openPage(ARGS.gpu || 'auto');
   console.log(`browser: ${first.how}, graphics: ${first.gpu}`);
   const dur = await first.p.evaluate(() => Edit.duration());
@@ -151,13 +163,13 @@ async function openPage(mode) {
   ff(['-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-i', SOUND, '-map', '0:v', '-map', '1:a', '-c', 'copy', '-t', String(DUR), '-movflags', '+faststart', FINAL], 'final');
   console.log(`wrote ${FINAL} (${(fs.statSync(FINAL).size / 1048576).toFixed(0)} MiB), ${loudness(FINAL)}`);
 
-  // the small copy: 720p two-pass sized to 27 MiB, AAC 96k through a true-peak limiter
-  const vk = Math.floor((27 * 1048576 * 8 / DUR - 96000 - 30000) / 1000);
+  // the small copy: 720p two-pass sized to 27 MiB, with the small soundtrack copied
+  const vk = Math.floor((27 * 1048576 * 8 / DUR - 128000 - 30000) / 1000);
   const log = path.join(OUT, 'x264pass');
   const NUL = process.platform === 'win32' ? 'NUL' : '/dev/null';
   ff(['-loglevel', 'error', '-i', FINAL, '-vf', 'scale=1280:720:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow', '-b:v', vk + 'k', '-pix_fmt', 'yuv420p', '-pass', '1', '-passlogfile', log, '-an', '-f', 'mp4', NUL], 'small pass 1');
-  ff(['-loglevel', 'error', '-i', FINAL, '-vf', 'scale=1280:720:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow', '-b:v', vk + 'k', '-pix_fmt', 'yuv420p', '-pass', '2', '-passlogfile', log,
-    '-af', 'alimiter=limit=0.708:attack=1:release=60:level=false', '-c:a', 'aac', '-b:a', '96k', '-t', String(DUR), '-movflags', '+faststart', SMALL], 'small pass 2');
+  ff(['-loglevel', 'error', '-i', FINAL, '-i', SMALL_SOUND, '-map', '0:v', '-map', '1:a', '-vf', 'scale=1280:720:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow', '-b:v', vk + 'k', '-pix_fmt', 'yuv420p',
+    '-pass', '2', '-passlogfile', log, '-c:a', 'copy', '-t', String(DUR), '-movflags', '+faststart', SMALL], 'small pass 2');
   for (const f of fs.readdirSync(OUT)) if (f.startsWith('x264pass')) fs.rmSync(path.join(OUT, f));
   console.log(`wrote ${SMALL} (${(fs.statSync(SMALL).size / 1048576).toFixed(1)} MiB), ${loudness(SMALL)}`);
 

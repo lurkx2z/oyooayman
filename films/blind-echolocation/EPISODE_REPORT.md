@@ -100,4 +100,4 @@ workers, about 0.3 frames a second, so the render takes most of a night. The sou
 this (its loops now stop at the slots in use; the frames are pixel-identical to before).
 On a PC with a graphics card the same film renders in one command, `node films/blind-echolocation/render-gpu.cjs`
 (steps in [`RENDER_ON_PC.md`](RENDER_ON_PC.md)). It uses the mastered soundtrack committed as `final-soundtrack.m4a`
-(AAC 256k, −15.1 LUFS, −2.0 dBTP).
+(AAC 256k, −15.1 LUFS, −2.0 dBTP); the small copy copies `small-soundtrack.m4a` (AAC 128k, −15.2 LUFS, −1.6 dBTP).
