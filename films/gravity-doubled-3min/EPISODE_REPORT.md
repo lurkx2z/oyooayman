@@ -8,7 +8,7 @@ never cut). Master timeline, physics and shot list: `PLAN.md`.
 
 | File | What it is |
 |---|---|
-| `gravity-doubled-3min_final_1080p.mp4` | the film, one MP4 under 30 MiB |
+| `gravity-doubled-3min_final_1080p.mp4` | the film: 179.7 s, 1920×1080, 30 fps, H.264 1.13 Mbps + AAC 160k, 28.2 MiB; −15.0 LUFS, −1.8 dBTP in the MP4 |
 | `gravity-doubled-3min_film.zip` | runnable copy: unzip, open `gravity-doubled-3min.html`, press Space |
 | `gravity-doubled-3min_mix.wav` | the mastered soundtrack (48 kHz) |
 | `timeline.json` | master timeline: narration clips with every word, shots, beats, drop physics, speech-free sections |
