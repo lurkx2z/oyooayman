@@ -170,9 +170,13 @@ beSound('amb', 'rain', function (ctx, dest, K) {
     const J4a = BE_SHOTS.find((s) => s.id === 'J4a'), nW = 1 / _beRms(w, 0, n);
     for (let i = 0; i < n; i++) { const t = T0 + i / sr, g = beRainK(t) * (0.25 + 0.75 * Math.max(MathX.window(t, J4a.t0 - 0.4, J4a.t1 + 1.2, 0.4, 1.0), MathX.window(t, B.j9 - 0.5, B.j9b + 0.8, 0.8, 1.0))) * (0.6 + 0.4 * wv(t));
       L[i] += w[i] * nW * 0.012 * g; R[i] += w[i] * nW * 0.012 * g * 0.85; } }
+  // scene 11: once she is through the café's door the street is behind glass and an open door: duller, further
+  const muffle = (A, Z) => { if (typeof beCafeIn !== 'function') return; const a = Float32Array.from(A), b = Float32Array.from(Z); for (const x of [a, b]) { GBX.bq(x, 'lp', 900, 0.7, sr); GBX.bq(x, 'lp', 1400, 0.7, sr); }
+    for (let i0 = 0; i0 < A.length; i0 += 64) { const m = 0.85 * beCafeIn(T0 + i0 / sr); if (m < 1e-4) continue; for (let i = i0; i < Math.min(A.length, i0 + 64); i++) { A[i] = A[i] * (1 - m) + a[i] * m * 0.55; Z[i] = Z[i] * (1 - m) + b[i] * m * 0.55; } } };
+  muffle(L, R);
   K.putLR(L, R, T0, { vol: 0.34, fadeIn: 1.4, stop: T1, fade: 1.5, room: street, wet: 0.3 });
   // the rain itself (diffuse already: a light send only)
-  const bed = beRainBed(K, T0, T1);
+  const bed = beRainBed(K, T0, T1); muffle(bed.L, bed.R);
   K.putLR(bed.L, bed.R, T0, { vol: 1, stop: T1, fade: 1.5, room: street, wet: 0.08 });
 });
 
@@ -183,9 +187,13 @@ beSound('foley', 'rain', function (ctx, dest, K) {
   const arcade = K.room('arcadeF', Object.assign({ src: [8, 0.2, 1.3], lis: [8, 1.6, 1.3], wet: 0.45 }, BE_ARCADE_ROOM));
   const splash = (w) => { const m = Math.round(0.06 * sr), y = fx.white(m); GBX.bq(y, 'bp', 2400, 0.8, sr); for (let i = 0; i < m; i++) y[i] *= Math.exp(-i / (m * 0.22)) * w; _beBubble(y, Math.round(r.range(0.004, 0.012) * sr), r.range(1200, 2400), 0.006, 0.25 * w); return y; };
   const wetAt = (t) => beWetK(t) * (1 - beRainShelter(t));
+  // scene 11: inside the café the floor is boards (and a small, soft room)
+  const cafeR = typeof BE_CAFE_ROOM === 'object' ? K.room('cafeRF', Object.assign({ src: [5.3, 0.2, 1.2], lis: [5.3, 1.6, 1.2], wet: 0.4 }, BE_CAFE_ROOM)) : null;
+  const inCafe = (t) => !!cafeR && typeof beCafeIn === 'function' && beCafeIn(t) > 0.5;
   for (const sg of BE_HERO_CITY) {
     for (const t of beCaneTaps(sg)) {
       if (t < B.s10 || t > T1) continue;
+      if (inCafe(t)) { K.put(fx.hit(fx.woodModes(330, 0.7), { width: 0.0005, amp: 1 }), t, { vol: 0.06, norm: true, pan: r.range(-0.15, 0.15), room: cafeR, wet: 0.45 }); continue; }
       const w = wetAt(t), y = fx.hit(fx.stoneModes(2.6), { width: 0.0006, amp: 1 }), s = splash(0.5 * w);
       for (let i = 0; i < s.length && i < y.length; i++) y[i] += s[i];
       const under = beRainShelter(t) > 0.5;
@@ -193,6 +201,7 @@ beSound('foley', 'rain', function (ctx, dest, K) {
     }
     if (sg.p1) for (const h of beActPlan(sg)) {
       if (h.t0 <= sg.t0 || h.t0 >= sg.t1 + 0.6 || h.t0 < B.s10 || h.t0 > T1) continue;
+      if (inCafe(h.t0)) { K.put(fx.woodStep({ weight: 0.4 }), h.t0, { vol: 0.07, norm: true, pan: h.side === 'L' ? -0.08 : 0.08, room: cafeR, wet: 0.45 }); continue; }
       const w = wetAt(h.t0), y = fx.step({ weight: 0.4, scuff: 0.12 * (1 - w) }), s = splash(0.9 * w);
       const i0 = Math.round(0.004 * sr); for (let i = 0; i < s.length && i0 + i < y.length; i++) y[i0 + i] += s[i];
       const under = beRainShelter(h.t0) > 0.5;

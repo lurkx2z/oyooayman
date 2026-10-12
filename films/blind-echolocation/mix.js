@@ -19,9 +19,9 @@ window.BE_MIX = {
   dyn: {
     // scene 9: the street rises under "mask" (the masking is the point), then steps back in the words-free gap so the
     // signal's tick comes forward
-    // scene 10: in the words-free gap the rain is the whole soundtrack
+    // scene 10: in the words-free gap the rain is the whole soundtrack; scene 11: in the gap the café pours out
     amb: [['i5', -0.2, 0], ['i5', 0.5, 3], ['i6', -0.3, 3], ['i6', 0.6, 0], ['i9', 0, 0], ['i9', 1.0, -3], ['i9b', 0.8, -3], ['s10', 0.2, 0],
-      ['j9', -0.2, 0], ['j9', 0.8, 3], ['s11', -0.4, 3], ['s11', 1.2, 0]],
+      ['j9', -0.2, 0], ['j9', 0.8, 3], ['s11', -0.4, 3], ['s11', 1.2, 0], ['k10', 0, 0], ['k10', 0.8, 2.5], ['s12', -0.3, 2.5], ['s12', 0.5, 0]],
   },
   glue: false,
   target: -15.0, ceiling: -1.8,

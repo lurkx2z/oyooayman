@@ -130,7 +130,7 @@ class BeCity {
     const building = (x0, x1, front, dir, o = {}) => {
       const w = x1 - x0, h = o.h || r.range(12, 26), d = 16, F = fac[o.f ?? Math.floor(r.next() * fac.length)], cx = (x0 + x1) / 2, back = front + dir * d;
       const gf = o.gf ?? 4.2;
-      if (o.arcade) { beBox(R, w - 0.05, h - gf, d, cx, (h + gf) / 2, (front + back) / 2, F.side); beBox(R, w - 0.05, gf, back - o.arcade, cx, gf / 2, (o.arcade + back) / 2, F.side); }
+      if (o.arcade) { beBox(R, w - 0.05, h - gf, d, cx, (h + gf) / 2, (front + back) / 2, F.side); (this.arcadeGf = this.arcadeGf || []).push(beBox(R, w - 0.05, gf, back - o.arcade, cx, gf / 2, (o.arcade + back) / 2, F.side)); }
       else beBox(R, w - 0.05, h, d, cx, h / 2, (front + back) / 2, F.side);
       const pg = new THREE.PlaneGeometry(w - 0.1, h - gf), uv = pg.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * Math.max(1, Math.round(w / 3.2)), uv.getY(i) * Math.max(1, Math.round((h - gf) / 3.3)));
       gbAdd(R, pg, F.m, cx, gf + (h - gf) / 2, front - dir * 0.02, { ry: dir > 0 ? Math.PI : 0, cast: false });
@@ -168,11 +168,11 @@ class BeCity {
       for (let k = 0; k < 6; k++) { x.fillStyle = 'rgba(255, 236, 200, 0.9)'; x.beginPath(); x.arc(560 + k * 75, 70, 14, 0, 7); x.fill(); x.fillStyle = 'rgba(60, 40, 25, 0.9)'; x.fillRect(540 + k * 75, 300, 50, 8); x.fillRect(560 + k * 75, 308, 8, 120); }
     }, [1, 1]);
     const cafeM = this.cafeM = new THREE.MeshStandardMaterial({ map: cafeTx, emissiveMap: cafeTx, emissive: '#ffffff', emissiveIntensity: 0.35, roughness: 0.3, name: 'beCityCafeWindowGlass', envMapIntensity: 0.9 });
-    for (const dx of [-3.0, 3.0]) gbAdd(R, new THREE.PlaneGeometry(4.6, 3.2), cafeM, A.door + dx, 1.75, A.back - 0.02, { ry: Math.PI, cast: false });
+    this.cafeWins = [-3.0, 3.0].map((dx) => gbAdd(R, new THREE.PlaneGeometry(4.6, 3.2), cafeM, A.door + dx, 1.75, A.back - 0.02, { ry: Math.PI, cast: false }));
     const frameM = gbMat('#2a2e33', { rough: 0.4, metal: 0.5, name: 'beCityCafeFrameMetal' });
     for (const dx of [-0.65, 0.65]) beBox(R, 0.08, 2.5, 0.12, A.door + dx, 1.25, A.back - 0.03, frameM);
     beBox(R, 1.38, 0.1, 0.12, A.door, 2.52, A.back - 0.03, frameM);
-    gbAdd(R, new THREE.PlaneGeometry(1.2, 2.4), cafeM, A.door, 1.2, A.back + 2.5, { ry: Math.PI, cast: false });   // the room beyond the door
+    this.cafeBack = gbAdd(R, new THREE.PlaneGeometry(1.2, 2.4), cafeM, A.door, 1.2, A.back + 2.5, { ry: Math.PI, cast: false });   // the room beyond the door (scene 11 builds the real room)
     const dp = this.cafeDoor = new THREE.Group(); dp.position.set(A.door - 0.6, 0, A.back - 0.02); R.add(dp);
     gbAdd(dp, new THREE.BoxGeometry(1.18, 2.4, 0.04), new THREE.MeshStandardMaterial({ color: '#d6e4ea', roughness: 0.05, metalness: 0.2, transparent: true, opacity: 0.28, name: 'beCityCafeDoorGlass' }), 0.6, 1.2, 0, { cast: false });
     for (const [w, h, x, y] of [[0.06, 2.4, 0.03, 1.2], [0.06, 2.4, 1.17, 1.2], [1.2, 0.08, 0.6, 0.04], [1.2, 0.06, 0.6, 2.37]]) beBox(dp, w, h, 0.06, x, y, 0, frameM);
