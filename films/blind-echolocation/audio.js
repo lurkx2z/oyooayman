@@ -87,17 +87,36 @@ class BeAudio extends AudioEngine {
         this.vo[c.id] = await dc.decodeAudioData(u8.buffer);
       }
     }
-    return super.renderOffline();
+    if (this.solo) return super.renderOffline();
+    // the five stems render in parallel (each offline context renders on its own thread), then the master (the end
+    // fade and the peak limiter) runs once on their sum: the same result as one context, in a fraction of the time
+    // (three groups, heaviest first, to keep the memory to three full-length buffers)
+    const dur = CONFIG.duration + 1.5, n = Math.ceil(dur * this.sampleRate), groups = [['music'], ['sfx'], ['foley', 'amb', 'voice']];
+    const bufs = await Promise.all(groups.map((g) => { const ctx = new OfflineAudioContext(2, n, this.sampleRate); this._build(ctx, { stems: g, noMaster: true }); return ctx.startRendering(); }));
+    for (const b of bufs.slice(1)) for (let c = 0; c < 2; c++) { const x = b.getChannelData(c), y = bufs[0].getChannelData(c); for (let i = 0; i < n; i++) y[i] += x[i]; }
+    const mc = new OfflineAudioContext(2, n, this.sampleRate), src = mc.createBufferSource();
+    src.buffer = bufs[0]; bufs.length = 0; src.connect(this._master(mc)); src.start(0);
+    const buf = await mc.startRendering();
+    AudioEngine.declick(buf);
+    return Edit.spliceAudio(buf);
   }
-  _build(ctx) {
-    const M = window.BE_MIX, END = CONFIG.duration + 1.5, only = this.solo;
+  // the master: the end fade, then a fast peak limiter (returns its input node)
+  _master(ctx) {
     const master = ctx.createGain();
     master.gain.setValueAtTime(1, 0); master.gain.setValueAtTime(1, CONFIG.duration - (window.BE_CUT ? 1.4 : 3)); master.gain.linearRampToValueAtTime(0, CONFIG.duration);
-    if (only) master.connect(ctx.destination);
-    else { const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.1; master.connect(lim); lim.connect(ctx.destination); }
+    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.1; master.connect(lim); lim.connect(ctx.destination);
+    return master;
+  }
+  _build(ctx, o = {}) {
+    const M = window.BE_MIX, END = CONFIG.duration + 1.5, only = this.solo;
+    let master;
+    if (only || o.noMaster) { master = ctx.createGain(); master.connect(ctx.destination); }
+    if (only) { master.gain.setValueAtTime(1, 0); master.gain.setValueAtTime(1, CONFIG.duration - (window.BE_CUT ? 1.4 : 3)); master.gain.linearRampToValueAtTime(0, CONFIG.duration); }
+    if (!master) master = this._master(ctx);
     const wins = beSpeechWindows(M.merge);
     for (const id of BE_STEMS) {
       if (only && only !== id) continue;
+      if (o.stems && !o.stems.includes(id)) continue;
       const st = M.stems[id], bus = ctx.createGain();
       let node = bus;
       if (st.hp) for (let k = 0; k < 2; k++) { const f = ctx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = st.hp; f.Q.value = 0.707; node.connect(f); node = f; }

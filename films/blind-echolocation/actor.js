@@ -36,6 +36,7 @@ function beActor(H, t, segs, o = {}) {
     P.LShX = (P.LShX || 0) + 9 * walking * Math.sin(ph); if (!seg.cane) P.RShX = (P.RShX || 0) - 9 * walking * Math.sin(ph);
     P.chY = 3 * walking * Math.sin(ph);
     sweep = Math.sin(ph + Math.PI / 2) * walking;
+    if (seg.sweepAdd) sweep += seg.sweepAdd(t);   // a deliberate reach of the cane while walking (scene 10: the column)
     feet = gbFeetAt(plan, t, 0.06);
   } else {
     yaw = typeof seg.yaw === 'function' ? seg.yaw(t) : (seg.yaw ?? 0);
@@ -47,7 +48,7 @@ function beActor(H, t, segs, o = {}) {
   P.hdY = (P.hdY || 0) + (typeof seg.hdY === 'function' ? seg.hdY(t) : seg.hdY || 0);
   P.chX = (P.chX || 0) - breath; P.LShrug = breath * 0.002; P.RShrug = breath * 0.002;
   if (seg.adjust) seg.adjust(P, t);
-  gbStandOn(H, P, feet, { bend: 0.04 });
+  if (!/^sit/.test(seg.pose || '')) gbStandOn(H, P, feet, { bend: 0.04 });   // seated poses keep their own legs
   H.applyPose(P);
   if (seg.after) seg.after(H, t);   // e.g. arm IK toward something she touches
   const F = Object.assign({}, GB_FACES[seg.face || 'listen']);
@@ -58,6 +59,12 @@ function beActor(H, t, segs, o = {}) {
   H.applyFace(F, { x: 0, y: -0.15 });
   let tip = null;
   if (o.cane) { if (seg.cane) tip = beCaneUpdate(o.cane, H, sweep, { lift: seg.lift ? seg.lift(t) : 0 }); else o.cane.visible = false; }
+  // a solid thing in the cane's way (seg.tipStop: { c: Vector3, r }): the tip stops on its surface instead of passing through
+  if (tip && seg.tipStop) {
+    const S = seg.tipStop, dx = tip.x - S.c.x, dz = tip.z - S.c.z, d = Math.hypot(dx, dz);
+    if (d < S.r) { tip.x = S.c.x + dx / Math.max(d, 1e-4) * S.r; tip.z = S.c.z + dz / Math.max(d, 1e-4) * S.r; o.cane.position.copy(tip);
+      const hand = H.worldOf('RWr').add(new THREE.Vector3(0, -0.06, 0)); o.cane.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), hand.sub(tip).normalize()); }
+  }
   return { seg, walking, tip, sweep };
 }
 // the times at which a walking segment's cane tip touches down at each side of its arc (for taps in the sound)
@@ -69,4 +76,11 @@ function beCaneTaps(seg) {
     if (Math.floor(a / Math.PI) !== Math.floor(b / Math.PI)) out.push(t);
   }
   return out;
+}
+
+// a walking ease: speeds up over the first `a` of the walk, slows over the last `b` (steady between); k → distance
+function beEaseWalk(a = 0.1, b = 0.1) {
+  const n = 240, s = [0];
+  for (let i = 1; i <= n; i++) { const k = (i - 0.5) / n; s.push(s[i - 1] + MathX.smooth(k, 0, a) * (1 - MathX.smooth(k, 1 - b, 1))); }
+  return (k) => { const f = MathX.clamp(k) * n, i = Math.min(n - 1, Math.floor(f)); return MathX.lerp(s[i], s[i + 1], f - i) / s[n]; };
 }

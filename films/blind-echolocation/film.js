@@ -199,6 +199,8 @@ const FILM = {
     const ta = W(t, BE.title[0], BE.title[1], 0.5, 0.6).toFixed(3); if (app.title._a !== ta) { app.title.style.opacity = ta; app.title._a = ta; }
     const tg = (shot.tag ? MathX.smooth(t, shot.t0 + 0.3, shot.t0 + 0.8) * (1 - MathX.smooth(t, shot.t1 - 0.4, shot.t1)) : 0).toFixed(3);
     if (app.tag._a !== tg) { app.tag.style.opacity = tg; app.tag._a = tg; }
+    const tt = typeof shot.tag === 'string' ? shot.tag : 'VISUALIZATION · SOUND SLOWED';   // e.g. 'SLOW MOTION' for real footage slowed
+    if (shot.tag && app.tag._t !== tt) { app.tag.textContent = tt; app.tag._t = tt; }
     // the slowed clock's readout: the real time since the click
     const rto = (shot.clock ? MathX.smooth(t, shot.t0 + 0.4, shot.t0 + 0.9) * (1 - MathX.smooth(t, shot.t1 - 0.3, shot.t1)) : 0).toFixed(3);
     if (app.rt._a !== rto) { app.rt.style.opacity = rto; app.rt._a = rto; }
