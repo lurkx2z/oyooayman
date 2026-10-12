@@ -13,11 +13,11 @@
       "file": "01-s01-last-sight.mp3",
       "align": "01-s01-last-sight.align.json",
       "seconds": 25.99,
-      "speech_start": 0,
-      "speech_end": 25.92,
+      "speech_start": 0.1,
+      "speech_end": 25.7,
       "hash": "f17c640ae67c2512",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "02-s02-without-light",
@@ -25,11 +25,11 @@
       "file": "02-s02-without-light.mp3",
       "align": "02-s02-without-light.align.json",
       "seconds": 26.38,
-      "speech_start": 0,
-      "speech_end": 26.32,
+      "speech_start": 0.06,
+      "speech_end": 25.76,
       "hash": "f224a52cf2bfd622",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "03-s03-first-echo",
@@ -37,11 +37,11 @@
       "file": "03-s03-first-echo.mp3",
       "align": "03-s03-first-echo.align.json",
       "seconds": 25.76,
-      "speech_start": 0,
-      "speech_end": 25.68,
+      "speech_start": 0.1,
+      "speech_end": 25.14,
       "hash": "1660821b38792496",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "04-s04-how-it-works",
@@ -49,11 +49,11 @@
       "file": "04-s04-how-it-works.mp3",
       "align": "04-s04-how-it-works.align.json",
       "seconds": 28.13,
-      "speech_start": 0,
-      "speech_end": 28.16,
+      "speech_start": 0.12,
+      "speech_end": 27.58,
       "hash": "b5a92c5766cf0e78",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "05-s05-building-a-world",
@@ -61,11 +61,11 @@
       "file": "05-s05-building-a-world.mp3",
       "align": "05-s05-building-a-world.align.json",
       "seconds": 33.18,
-      "speech_start": 0,
-      "speech_end": 33.2,
+      "speech_start": 0.08,
+      "speech_end": 32.5,
       "hash": "78f91ac342069638",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "06-s06-what-it-reveals",
@@ -73,11 +73,11 @@
       "file": "06-s06-what-it-reveals.mp3",
       "align": "06-s06-what-it-reveals.align.json",
       "seconds": 30.15,
-      "speech_start": 0,
-      "speech_end": 30.16,
+      "speech_start": 0.08,
+      "speech_end": 29.48,
       "hash": "1e8cb6f0f7b46cb0",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "07-s07-brain",
@@ -85,11 +85,11 @@
       "file": "07-s07-brain.mp3",
       "align": "07-s07-brain.align.json",
       "seconds": 30.62,
-      "speech_start": 0,
-      "speech_end": 30.64,
+      "speech_start": 0.02,
+      "speech_end": 30.12,
       "hash": "73f9bb4fff162901",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "08-s08-quiet-room",
@@ -98,10 +98,10 @@
       "align": "08-s08-quiet-room.align.json",
       "seconds": 28.87,
       "speech_start": 0,
-      "speech_end": 28.8,
+      "speech_end": 28.24,
       "hash": "50d60e1b3e643605",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "09-s09-city",
@@ -109,11 +109,11 @@
       "file": "09-s09-city.mp3",
       "align": "09-s09-city.align.json",
       "seconds": 33.44,
-      "speech_start": 0,
-      "speech_end": 33.44,
+      "speech_start": 0.1,
+      "speech_end": 32.84,
       "hash": "73f80dde0b3d27fd",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "10-s10-rain",
@@ -121,11 +121,11 @@
       "file": "10-s10-rain.mp3",
       "align": "10-s10-rain.align.json",
       "seconds": 30.3,
-      "speech_start": 0,
-      "speech_end": 30.24,
+      "speech_start": 0.1,
+      "speech_end": 29.52,
       "hash": "cc511be4f48de8f5",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "11-s11-not-a-picture",
@@ -133,11 +133,11 @@
       "file": "11-s11-not-a-picture.mp3",
       "align": "11-s11-not-a-picture.align.json",
       "seconds": 33.91,
-      "speech_start": 0,
-      "speech_end": 33.84,
+      "speech_start": 0.06,
+      "speech_end": 33.32,
       "hash": "222dd2fd89bcd7e9",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "12-s12-final-experiment",
@@ -145,11 +145,11 @@
       "file": "12-s12-final-experiment.mp3",
       "align": "12-s12-final-experiment.align.json",
       "seconds": 24.06,
-      "speech_start": 0,
-      "speech_end": 24.08,
+      "speech_start": 0.1,
+      "speech_end": 23.48,
       "hash": "bbd93e8d6881db5f",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "13-s13-world-returns",
@@ -157,11 +157,11 @@
       "file": "13-s13-world-returns.mp3",
       "align": "13-s13-world-returns.align.json",
       "seconds": 30.69,
-      "speech_start": 0,
-      "speech_end": 30.72,
+      "speech_start": 0.1,
+      "speech_end": 30.16,
       "hash": "58bd3b6deae8fa15",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     },
     {
       "id": "14-s14-last-question",
@@ -169,11 +169,11 @@
       "file": "14-s14-last-question.mp3",
       "align": "14-s14-last-question.align.json",
       "seconds": 27.74,
-      "speech_start": 0,
-      "speech_end": 27.76,
+      "speech_start": 0.14,
+      "speech_end": 27.5,
       "hash": "643120d7e9e92089",
       "verified": true,
-      "timing": "tts-with-timestamps"
+      "timing": "forced-alignment"
     }
   ]
 }
