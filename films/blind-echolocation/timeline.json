@@ -1,0 +1,1124 @@
+{
+ "title": "What If You Went Blind… And Learned to See With Sound?",
+ "duration": 503.14,
+ "fps": 30,
+ "size": [
+  1920,
+  1080
+ ],
+ "scenes": [
+  {
+   "n": 1,
+   "title": "Scene 1 — The last thing you see",
+   "start": 0,
+   "end": 32.3,
+   "narration": {
+    "clip": "01-s01-last-sight.mp3",
+    "start": 1,
+    "speechEnd": 26.7,
+    "gainDb": 6.6
+   },
+   "noNarration": {
+    "start": 26.7,
+    "end": 32.3
+   },
+   "shots": [
+    {
+     "id": "A1",
+     "t0": 0,
+     "t1": 27.43,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "A2",
+     "t0": 27.43,
+     "t1": 29.4,
+     "set": "apt",
+     "slowedLabel": true
+    },
+    {
+     "id": "A3",
+     "t0": 29.4,
+     "t1": 32.3,
+     "set": "apt",
+     "slowedLabel": false
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "title": "Scene 2 — A world without light",
+   "start": 32.3,
+   "end": 63.36,
+   "narration": {
+    "clip": "02-s02-without-light.mp3",
+    "start": 33.4,
+    "speechEnd": 59.16,
+    "gainDb": 7.5
+   },
+   "noNarration": {
+    "start": 59.16,
+    "end": 63.36
+   },
+   "shots": [
+    {
+     "id": "B1",
+     "t0": 32.3,
+     "t1": 36.23,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "B2",
+     "t0": 36.23,
+     "t1": 37.57,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "B3",
+     "t0": 37.57,
+     "t1": 38.79,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "B4",
+     "t0": 38.79,
+     "t1": 40.52,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "B5",
+     "t0": 40.52,
+     "t1": 45.9,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "B6",
+     "t0": 45.9,
+     "t1": 50.4,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "B7",
+     "t0": 50.4,
+     "t1": 54.64,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "B8",
+     "t0": 54.64,
+     "t1": 59.21,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "B8b",
+     "t0": 59.21,
+     "t1": 63.36,
+     "set": "apt",
+     "slowedLabel": true
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "title": "Scene 3 — The first echo",
+   "start": 63.36,
+   "end": 95.9,
+   "narration": {
+    "clip": "03-s03-first-echo.mp3",
+    "start": 64.36,
+    "speechEnd": 89.5,
+    "gainDb": 7.4
+   },
+   "noNarration": {
+    "start": 89.5,
+    "end": 95.9
+   },
+   "shots": [
+    {
+     "id": "C1",
+     "t0": 63.36,
+     "t1": 65.37,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "C2",
+     "t0": 65.37,
+     "t1": 75,
+     "set": "apt",
+     "slowedLabel": true
+    },
+    {
+     "id": "C4a",
+     "t0": 75,
+     "t1": 75.8,
+     "set": "apt",
+     "slowedLabel": true
+    },
+    {
+     "id": "C4b",
+     "t0": 75.8,
+     "t1": 76.68,
+     "set": "apt",
+     "slowedLabel": true
+    },
+    {
+     "id": "C4c",
+     "t0": 76.68,
+     "t1": 78.34,
+     "set": "apt",
+     "slowedLabel": true
+    },
+    {
+     "id": "C5",
+     "t0": 78.34,
+     "t1": 81.5,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "C6",
+     "t0": 81.5,
+     "t1": 86.88,
+     "set": "apt",
+     "slowedLabel": true
+    },
+    {
+     "id": "C7",
+     "t0": 86.88,
+     "t1": 89.85,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "C8",
+     "t0": 89.85,
+     "t1": 95.9,
+     "set": "apt",
+     "slowedLabel": true
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "title": "Scene 4 — How a human can echolocate",
+   "start": 95.9,
+   "end": 130.08,
+   "narration": {
+    "clip": "04-s04-how-it-works.mp3",
+    "start": 96.9,
+    "speechEnd": 124.48,
+    "gainDb": 7.6
+   },
+   "noNarration": {
+    "start": 124.48,
+    "end": 130.08
+   },
+   "shots": [
+    {
+     "id": "D1",
+     "t0": 95.9,
+     "t1": 98.99,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "D1b",
+     "t0": 98.99,
+     "t1": 101.1,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "D2",
+     "t0": 101.1,
+     "t1": 106.32,
+     "set": "void",
+     "slowedLabel": true
+    },
+    {
+     "id": "D3",
+     "t0": 106.32,
+     "t1": 112.62,
+     "set": "void",
+     "slowedLabel": true
+    },
+    {
+     "id": "D4",
+     "t0": 112.62,
+     "t1": 114.55,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "D5",
+     "t0": 114.55,
+     "t1": 118.62,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "D6",
+     "t0": 118.62,
+     "t1": 124.83,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "D7",
+     "t0": 124.83,
+     "t1": 130.08,
+     "set": "void",
+     "slowedLabel": true
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "title": "Scene 5 — Building a world from sound",
+   "start": 130.08,
+   "end": 170.28,
+   "narration": {
+    "clip": "05-s05-building-a-world.mp3",
+    "start": 131.18,
+    "speechEnd": 163.68,
+    "gainDb": 7
+   },
+   "noNarration": {
+    "start": 163.68,
+    "end": 170.28
+   },
+   "shots": [
+    {
+     "id": "E1",
+     "t0": 130.08,
+     "t1": 133.84,
+     "set": "centre",
+     "slowedLabel": false
+    },
+    {
+     "id": "E2",
+     "t0": 133.84,
+     "t1": 137.44,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "E2c",
+     "t0": 137.44,
+     "t1": 139.05,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "E2d",
+     "t0": 139.05,
+     "t1": 141.8,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "E3",
+     "t0": 141.8,
+     "t1": 149.93,
+     "set": "centre",
+     "slowedLabel": false
+    },
+    {
+     "id": "E4",
+     "t0": 149.93,
+     "t1": 153.55,
+     "set": "centre",
+     "slowedLabel": false
+    },
+    {
+     "id": "E5",
+     "t0": 153.55,
+     "t1": 163.93,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "E6",
+     "t0": 163.93,
+     "t1": 170.28,
+     "set": "centre",
+     "slowedLabel": true
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "title": "Scene 6 — What does an echo actually reveal?",
+   "start": 170.28,
+   "end": 207.16,
+   "narration": {
+    "clip": "06-s06-what-it-reveals.mp3",
+    "start": 171.28,
+    "speechEnd": 200.76,
+    "gainDb": 8.1
+   },
+   "noNarration": {
+    "start": 200.76,
+    "end": 207.16
+   },
+   "shots": [
+    {
+     "id": "F1",
+     "t0": 170.28,
+     "t1": 173.83,
+     "set": "centre",
+     "slowedLabel": false
+    },
+    {
+     "id": "F2",
+     "t0": 173.83,
+     "t1": 178.24,
+     "set": "centre",
+     "slowedLabel": false
+    },
+    {
+     "id": "F3a",
+     "t0": 178.24,
+     "t1": 180.46,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "F3c",
+     "t0": 180.46,
+     "t1": 183.1,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "F4",
+     "t0": 183.1,
+     "t1": 186.26,
+     "set": "centre",
+     "slowedLabel": false
+    },
+    {
+     "id": "F4b",
+     "t0": 186.26,
+     "t1": 188.4,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "F4c",
+     "t0": 188.4,
+     "t1": 190.44,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "F5",
+     "t0": 190.44,
+     "t1": 201.11,
+     "set": "centre",
+     "slowedLabel": true
+    },
+    {
+     "id": "F6",
+     "t0": 201.11,
+     "t1": 207.16,
+     "set": "centre",
+     "slowedLabel": true
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "title": "Scene 7 — The brain starts changing",
+   "start": 207.16,
+   "end": 243.98,
+   "narration": {
+    "clip": "07-s07-brain.mp3",
+    "start": 208.26,
+    "speechEnd": 238.38,
+    "gainDb": 7
+   },
+   "noNarration": {
+    "start": 238.38,
+    "end": 243.98
+   },
+   "shots": [
+    {
+     "id": "G1",
+     "t0": 207.16,
+     "t1": 211.19,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "G2",
+     "t0": 211.19,
+     "t1": 216.05,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "G3",
+     "t0": 216.05,
+     "t1": 225.3,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "G4",
+     "t0": 225.3,
+     "t1": 231.05,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "G5",
+     "t0": 231.05,
+     "t1": 238.63,
+     "set": "void",
+     "slowedLabel": false
+    },
+    {
+     "id": "G6",
+     "t0": 238.63,
+     "t1": 243.98,
+     "set": "void",
+     "slowedLabel": false
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "title": "Scene 8 — The room that swallows sound",
+   "start": 243.98,
+   "end": 280.62,
+   "narration": {
+    "clip": "08-s08-quiet-room.mp3",
+    "start": 244.98,
+    "speechEnd": 273.22,
+    "gainDb": 8.3
+   },
+   "noNarration": {
+    "start": 273.22,
+    "end": 280.62
+   },
+   "shots": [
+    {
+     "id": "H1",
+     "t0": 243.98,
+     "t1": 248.22,
+     "set": "lab",
+     "slowedLabel": false
+    },
+    {
+     "id": "H2",
+     "t0": 248.22,
+     "t1": 252.03,
+     "set": "lab",
+     "slowedLabel": false
+    },
+    {
+     "id": "H3",
+     "t0": 252.03,
+     "t1": 258.76,
+     "set": "lab",
+     "slowedLabel": true
+    },
+    {
+     "id": "H4",
+     "t0": 258.76,
+     "t1": 262.21,
+     "set": "lab",
+     "slowedLabel": false
+    },
+    {
+     "id": "H5",
+     "t0": 262.21,
+     "t1": 266.28,
+     "set": "lab",
+     "slowedLabel": true
+    },
+    {
+     "id": "H6",
+     "t0": 266.28,
+     "t1": 273.42,
+     "set": "lab",
+     "slowedLabel": false
+    },
+    {
+     "id": "H7a",
+     "t0": 273.42,
+     "t1": 276.62,
+     "set": "lab",
+     "slowedLabel": true
+    },
+    {
+     "id": "H7b",
+     "t0": 276.62,
+     "t1": 280.62,
+     "set": "lab",
+     "slowedLabel": false
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "title": "Scene 9 — The city becomes a wall of sound",
+   "start": 280.62,
+   "end": 320.16,
+   "narration": {
+    "clip": "09-s09-city.mp3",
+    "start": 281.72,
+    "speechEnd": 314.56,
+    "gainDb": 7.9
+   },
+   "noNarration": {
+    "start": 314.56,
+    "end": 320.16
+   },
+   "shots": [
+    {
+     "id": "I1",
+     "t0": 280.62,
+     "t1": 283.96,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "I2",
+     "t0": 283.96,
+     "t1": 287.33,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "I3",
+     "t0": 287.33,
+     "t1": 294.28,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "I4",
+     "t0": 294.28,
+     "t1": 297.36,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "I5",
+     "t0": 297.36,
+     "t1": 301,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "I6",
+     "t0": 301,
+     "t1": 306.47,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "I7",
+     "t0": 306.47,
+     "t1": 309.24,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "I8",
+     "t0": 309.24,
+     "t1": 312.65,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "I8b",
+     "t0": 312.65,
+     "t1": 314.81,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "I9a",
+     "t0": 314.81,
+     "t1": 317.31,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "I9b",
+     "t0": 317.31,
+     "t1": 320.16,
+     "set": "city",
+     "slowedLabel": false
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "title": "Scene 10 — The sound of rain",
+   "start": 320.16,
+   "end": 357.48,
+   "narration": {
+    "clip": "10-s10-rain.mp3",
+    "start": 321.36,
+    "speechEnd": 350.88,
+    "gainDb": 8
+   },
+   "noNarration": {
+    "start": 350.88,
+    "end": 357.48
+   },
+   "shots": [
+    {
+     "id": "J1",
+     "t0": 320.16,
+     "t1": 323,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "J2",
+     "t0": 323,
+     "t1": 325.47,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "J3a",
+     "t0": 325.47,
+     "t1": 327.2,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "J3b",
+     "t0": 327.2,
+     "t1": 327.88,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "J3c",
+     "t0": 327.88,
+     "t1": 328.52,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "J3d",
+     "t0": 328.52,
+     "t1": 329.42,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "J3e",
+     "t0": 329.42,
+     "t1": 330.52,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "J4a",
+     "t0": 330.52,
+     "t1": 332.24,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "J4b",
+     "t0": 332.24,
+     "t1": 334.81,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "J5",
+     "t0": 334.81,
+     "t1": 337.79,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "J6",
+     "t0": 337.79,
+     "t1": 340.89,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "J7",
+     "t0": 340.89,
+     "t1": 343.87,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "J8a",
+     "t0": 343.87,
+     "t1": 346.81,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "J8b",
+     "t0": 346.81,
+     "t1": 351.08,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "J9a",
+     "t0": 351.08,
+     "t1": 354.48,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "J9b",
+     "t0": 354.48,
+     "t1": 357.48,
+     "set": "city",
+     "slowedLabel": false
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "title": "Scene 11 — You don't need a perfect picture",
+   "start": 357.48,
+   "end": 397.4,
+   "narration": {
+    "clip": "11-s11-not-a-picture.mp3",
+    "start": 358.48,
+    "speechEnd": 391.8,
+    "gainDb": 7.6
+   },
+   "noNarration": {
+    "start": 391.8,
+    "end": 397.4
+   },
+   "shots": [
+    {
+     "id": "K1",
+     "t0": 357.48,
+     "t1": 360.44,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "K2",
+     "t0": 360.44,
+     "t1": 364.82,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "K3",
+     "t0": 364.82,
+     "t1": 367.72,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "K4",
+     "t0": 367.72,
+     "t1": 370.44,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "K5",
+     "t0": 370.44,
+     "t1": 373.72,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "K6",
+     "t0": 373.72,
+     "t1": 377.08,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "K7",
+     "t0": 377.08,
+     "t1": 382,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "K8",
+     "t0": 382,
+     "t1": 385.75,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "K9",
+     "t0": 385.75,
+     "t1": 392,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "K10a",
+     "t0": 392,
+     "t1": 393.7,
+     "set": "city",
+     "slowedLabel": false
+    },
+    {
+     "id": "K10b",
+     "t0": 393.7,
+     "t1": 395.2,
+     "set": "city",
+     "slowedLabel": true
+    },
+    {
+     "id": "K10c",
+     "t0": 395.2,
+     "t1": 397.4,
+     "set": "city",
+     "slowedLabel": false
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "title": "Scene 12 — The final experiment",
+   "start": 397.4,
+   "end": 431.48,
+   "narration": {
+    "clip": "12-s12-final-experiment.mp3",
+    "start": 398.4,
+    "speechEnd": 421.88,
+    "gainDb": 7.6
+   },
+   "noNarration": {
+    "start": 421.88,
+    "end": 431.48
+   },
+   "shots": [
+    {
+     "id": "M1",
+     "t0": 397.4,
+     "t1": 402.88,
+     "set": "arena",
+     "slowedLabel": false
+    },
+    {
+     "id": "M2",
+     "t0": 402.88,
+     "t1": 407,
+     "set": "arena",
+     "slowedLabel": true
+    },
+    {
+     "id": "M3",
+     "t0": 407,
+     "t1": 409.51,
+     "set": "arena",
+     "slowedLabel": false
+    },
+    {
+     "id": "M4",
+     "t0": 409.51,
+     "t1": 414.66,
+     "set": "arena",
+     "slowedLabel": false
+    },
+    {
+     "id": "M5a",
+     "t0": 414.66,
+     "t1": 416.55,
+     "set": "arena",
+     "slowedLabel": false
+    },
+    {
+     "id": "M5b",
+     "t0": 416.55,
+     "t1": 419.26,
+     "set": "arena",
+     "slowedLabel": true
+    },
+    {
+     "id": "M6",
+     "t0": 419.26,
+     "t1": 422.03,
+     "set": "arena",
+     "slowedLabel": true
+    },
+    {
+     "id": "G1",
+     "t0": 422.03,
+     "t1": 423.98,
+     "set": "arena",
+     "slowedLabel": true
+    },
+    {
+     "id": "G23",
+     "t0": 423.98,
+     "t1": 429.43,
+     "set": "arena",
+     "slowedLabel": true
+    },
+    {
+     "id": "G4",
+     "t0": 429.43,
+     "t1": 430.78,
+     "set": "arena",
+     "slowedLabel": true
+    },
+    {
+     "id": "G4r",
+     "t0": 430.78,
+     "t1": 431.48,
+     "set": "arena",
+     "slowedLabel": false
+    }
+   ]
+  },
+  {
+   "n": 13,
+   "title": "Scene 13 — The world returns in a different form",
+   "start": 431.48,
+   "end": 468.64,
+   "narration": {
+    "clip": "13-s13-world-returns.mp3",
+    "start": 432.48,
+    "speechEnd": 462.64,
+    "gainDb": 7.6
+   },
+   "noNarration": {
+    "start": 462.64,
+    "end": 468.64
+   },
+   "shots": [
+    {
+     "id": "N1",
+     "t0": 431.48,
+     "t1": 434.55,
+     "set": "arena",
+     "slowedLabel": false
+    },
+    {
+     "id": "N2",
+     "t0": 434.55,
+     "t1": 444.66,
+     "set": "arena",
+     "slowedLabel": true
+    },
+    {
+     "id": "C1",
+     "t0": 444.66,
+     "t1": 451.24,
+     "set": "sfield",
+     "slowedLabel": true
+    },
+    {
+     "id": "C2",
+     "t0": 451.24,
+     "t1": 457.37,
+     "set": "sfield",
+     "slowedLabel": true
+    },
+    {
+     "id": "C3",
+     "t0": 457.37,
+     "t1": 462.64,
+     "set": "sfield",
+     "slowedLabel": true
+    },
+    {
+     "id": "G13",
+     "t0": 462.64,
+     "t1": 468.64,
+     "set": "sfield",
+     "slowedLabel": true
+    }
+   ]
+  },
+  {
+   "n": 14,
+   "title": "Scene 14 — The last question",
+   "start": 468.64,
+   "end": 503.14,
+   "narration": {
+    "clip": "14-s14-last-question.mp3",
+    "start": 469.64,
+    "speechEnd": 497.14,
+    "gainDb": 7.5
+   },
+   "noNarration": {
+    "start": 497.14,
+    "end": 503.14
+   },
+   "shots": [
+    {
+     "id": "Z1",
+     "t0": 468.64,
+     "t1": 471.44,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "Z1b",
+     "t0": 471.44,
+     "t1": 474.28,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "Z2",
+     "t0": 474.28,
+     "t1": 481.49,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "Z3",
+     "t0": 481.49,
+     "t1": 489.44,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "Z4",
+     "t0": 489.44,
+     "t1": 493.54,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "Z4b",
+     "t0": 493.54,
+     "t1": 497.29,
+     "set": "apt",
+     "slowedLabel": false
+    },
+    {
+     "id": "Z5",
+     "t0": 497.29,
+     "t1": 503.14,
+     "set": "apt",
+     "slowedLabel": false
+    }
+   ]
+  }
+ ]
+}
