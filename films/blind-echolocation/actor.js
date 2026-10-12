@@ -49,6 +49,7 @@ function beActor(H, t, segs, o = {}) {
   if (seg.adjust) seg.adjust(P, t);
   gbStandOn(H, P, feet, { bend: 0.04 });
   H.applyPose(P);
+  if (seg.after) seg.after(H, t);   // e.g. arm IK toward something she touches
   const F = Object.assign({}, GB_FACES[seg.face || 'listen']);
   const cl = (o.clicks || []).reduce((m, c) => Math.max(m, MathX.window(t, c - 0.12, c + 0.1, 0.08, 0.1)), 0);
   F.open = Math.max(F.open || 0, 0.12 * cl); if (cl > 0.01) F.width = 0.85;
