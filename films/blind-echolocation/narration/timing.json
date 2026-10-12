@@ -1,0 +1,1084 @@
+{
+ "episode": "blind-echolocation",
+ "voice": "IKne3meq5aSn9XLyUdCD",
+ "model": "eleven_v4",
+ "voice_settings": {
+  "stability": 0.4,
+  "similarity_boost": 0.75
+ },
+ "timing_source": "forced alignment (ElevenLabs), seconds from the start of each MP3",
+ "note": "decoded_seconds is the decoded audio length (the manifest \"seconds\" include MP3 padding). narration_budget = the scene slot minus its NO NARRATION seconds. Loudness is the raw clip; normalise in the mix.",
+ "clips": [
+  {
+   "id": "01-s01-last-sight",
+   "scene": 1,
+   "file": "01-s01-last-sight.mp3",
+   "align": "01-s01-last-sight.align.json",
+   "text": "Imagine waking up tomorrow… and discovering you can't see anything. No sunlight. No colors. Not even the shape of your own hands. But here's the strange part. Your room hasn't disappeared. You can still hear the alarm beside you. Cars outside. Someone walking down the hallway. And your brain is about to discover that sound can reveal things your eyes no longer can.",
+   "decoded_seconds": 25.92,
+   "speech_start": 0.1,
+   "speech_end": 25.7,
+   "speech_seconds": 25.6,
+   "words": 63,
+   "script_words": 63,
+   "pauses_over_0_25s": [
+    [
+     1.68,
+     2.32
+    ],
+    [
+     3.14,
+     3.4
+    ],
+    [
+     4.66,
+     5.4
+    ],
+    [
+     6.14,
+     6.58
+    ],
+    [
+     7.24,
+     7.9
+    ],
+    [
+     9.78,
+     10.5
+    ],
+    [
+     11.76,
+     12.36
+    ],
+    [
+     14,
+     14.6
+    ],
+    [
+     16.38,
+     16.82
+    ],
+    [
+     17.68,
+     18.14
+    ],
+    [
+     19.52,
+     20.2
+    ]
+   ],
+   "loudness_lufs": -28.6,
+   "true_peak_dbtp": -11.5,
+   "script_slot": "0:00-0:30",
+   "script_slot_seconds": 30,
+   "no_narration_seconds": 5,
+   "narration_budget_seconds": 25,
+   "over_budget_seconds": 0.92,
+   "fade_out_after": 25.89,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.22,
+    "last_30ms_peak_db": -84.3,
+    "first_5ms_peak_db": -80.8,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -80.8,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "02-s02-without-light",
+   "scene": 2,
+   "file": "02-s02-without-light.mp3",
+   "align": "02-s02-without-light.align.json",
+   "text": "At first, everything takes longer. Finding your clothes. Pouring water. Reaching for a door handle. Things you once did without thinking suddenly require attention. And contrary to what movies suggest, your other senses don't instantly become superhuman. But you can learn to pay attention to information that was always there. And one particular sound is about to change how you understand space.",
+   "decoded_seconds": 26.32,
+   "speech_start": 0.06,
+   "speech_end": 25.76,
+   "speech_seconds": 25.7,
+   "words": 62,
+   "script_words": 62,
+   "pauses_over_0_25s": [
+    [
+     0.66,
+     1.08
+    ],
+    [
+     2.38,
+     2.98
+    ],
+    [
+     3.96,
+     4.32
+    ],
+    [
+     5.02,
+     5.54
+    ],
+    [
+     6.76,
+     7.32
+    ],
+    [
+     9.04,
+     9.38
+    ],
+    [
+     10.78,
+     11.44
+    ],
+    [
+     13.38,
+     13.74
+    ],
+    [
+     16.7,
+     17.2
+    ],
+    [
+     21.1,
+     21.56
+    ]
+   ],
+   "loudness_lufs": -29.5,
+   "true_peak_dbtp": -10.4,
+   "script_slot": "0:30-0:58",
+   "script_slot_seconds": 28,
+   "no_narration_seconds": 0,
+   "narration_budget_seconds": 28,
+   "over_budget_seconds": -1.68,
+   "fade_out_after": 26.06,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.56,
+    "last_30ms_peak_db": -18.3,
+    "first_5ms_peak_db": -80.8,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -63.9,
+    "click_at_end": true
+   }
+  },
+  {
+   "id": "03-s03-first-echo",
+   "scene": 3,
+   "file": "03-s03-first-echo.mp3",
+   "align": "03-s03-first-echo.align.json",
+   "text": "Listen. Every time you make a sound, part of it travels outward. When those sound waves encounter a surface, some of their energy reflects back toward you. A wall. A doorway. A large piece of furniture. Each changes the sound in a different way. And if you learn to recognize those changes, echoes can become clues about the space around you. There's a name for this. Echolocation.",
+   "decoded_seconds": 25.68,
+   "speech_start": 0.1,
+   "speech_end": 25.14,
+   "speech_seconds": 25.04,
+   "words": 67,
+   "script_words": 67,
+   "pauses_over_0_25s": [
+    [
+     0.48,
+     1.16
+    ],
+    [
+     2.58,
+     2.98
+    ],
+    [
+     4.38,
+     5.12
+    ],
+    [
+     7.18,
+     7.64
+    ],
+    [
+     9.94,
+     10.6
+    ],
+    [
+     11.04,
+     11.44
+    ],
+    [
+     11.98,
+     12.32
+    ],
+    [
+     13.52,
+     14.08
+    ],
+    [
+     16.28,
+     16.8
+    ],
+    [
+     18.88,
+     19.3
+    ],
+    [
+     22.08,
+     22.72
+    ],
+    [
+     23.62,
+     24.16
+    ]
+   ],
+   "loudness_lufs": -29.4,
+   "true_peak_dbtp": -10.2,
+   "script_slot": "0:58-1:30",
+   "script_slot_seconds": 32,
+   "no_narration_seconds": 6,
+   "narration_budget_seconds": 26,
+   "over_budget_seconds": -0.32,
+   "fade_out_after": 25.44,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.54,
+    "last_30ms_peak_db": -76.3,
+    "first_5ms_peak_db": -78.3,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -63.5,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "04-s04-how-it-works",
+   "scene": 4,
+   "file": "04-s04-how-it-works.mp3",
+   "align": "04-s04-how-it-works.align.json",
+   "text": "Some human echolocators produce sharp clicks using their tongue. Sound travels through air at roughly three hundred and forty-three meters per second. If a wall is two meters away, the sound can travel there and back in about twelve milliseconds. That's incredibly fast. Your brain doesn't need to hear a completely separate echo each time. Small differences in timing, loudness and sound quality can provide useful spatial information.",
+   "decoded_seconds": 28.08,
+   "speech_start": 0.12,
+   "speech_end": 27.58,
+   "speech_seconds": 27.46,
+   "words": 68,
+   "script_words": 68,
+   "pauses_over_0_25s": [
+    [
+     3.88,
+     4.58
+    ],
+    [
+     8.96,
+     9.52
+    ],
+    [
+     11.16,
+     11.56
+    ],
+    [
+     15.38,
+     15.82
+    ],
+    [
+     17.24,
+     17.8
+    ],
+    [
+     21.38,
+     21.92
+    ],
+    [
+     23.34,
+     23.68
+    ],
+    [
+     25.2,
+     25.5
+    ]
+   ],
+   "loudness_lufs": -29.6,
+   "true_peak_dbtp": -9.6,
+   "script_slot": "1:30-2:00",
+   "script_slot_seconds": 30,
+   "no_narration_seconds": 5,
+   "narration_budget_seconds": 25,
+   "over_budget_seconds": 3.08,
+   "fade_out_after": 27.88,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.5,
+    "last_30ms_peak_db": -80.8,
+    "first_5ms_peak_db": -63.5,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -65.7,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "05-s05-building-a-world",
+   "scene": 5,
+   "file": "05-s05-building-a-world.mp3",
+   "align": "05-s05-building-a-world.align.json",
+   "text": "This is not something you master overnight. But with practice, people can learn to distinguish openings, nearby obstacles, and even differences between certain shapes. Researchers have trained blind and sighted adults to echolocate over a period of ten weeks. And both groups improved. Now imagine what that learning process might feel like. A hallway is no longer simply an unknown stretch of space. You begin recognizing where a wall might end. Where an opening begins. Where there's enough room to move.",
+   "decoded_seconds": 33.12,
+   "speech_start": 0.08,
+   "speech_end": 32.5,
+   "speech_seconds": 32.42,
+   "words": 81,
+   "script_words": 81,
+   "pauses_over_0_25s": [
+    [
+     2.24,
+     2.74
+    ],
+    [
+     3.72,
+     4.08
+    ],
+    [
+     6,
+     6.36
+    ],
+    [
+     7.26,
+     7.6
+    ],
+    [
+     9.98,
+     10.72
+    ],
+    [
+     16.22,
+     16.66
+    ],
+    [
+     18.08,
+     18.9
+    ],
+    [
+     21.68,
+     22.4
+    ],
+    [
+     25.84,
+     26.52
+    ],
+    [
+     28.82,
+     29.28
+    ],
+    [
+     30.34,
+     30.94
+    ]
+   ],
+   "loudness_lufs": -29.0,
+   "true_peak_dbtp": -10.3,
+   "script_slot": "2:00-2:33",
+   "script_slot_seconds": 33,
+   "no_narration_seconds": 6,
+   "narration_budget_seconds": 27,
+   "over_budget_seconds": 6.12,
+   "fade_out_after": 32.8,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.62,
+    "last_30ms_peak_db": -62.0,
+    "first_5ms_peak_db": -45.0,
+    "sound_from_first_sample": true,
+    "tail_floor_db": -59.4,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "06-s06-what-it-reveals",
+   "scene": 6,
+   "file": "06-s06-what-it-reveals.mp3",
+   "align": "06-s06-what-it-reveals.align.json",
+   "text": "But there's something important to understand. Echolocation isn't like suddenly gaining a second pair of eyes. You don't see colors, read signs, or recognize someone's face through sound. And different surfaces behave very differently. Some reflect sound strongly. Others absorb much of it. So even a skilled echolocator has to interpret incomplete information. The world isn't becoming a perfect picture. It's becoming a collection of useful clues.",
+   "decoded_seconds": 30.08,
+   "speech_start": 0.08,
+   "speech_end": 29.48,
+   "speech_seconds": 29.4,
+   "words": 67,
+   "script_words": 67,
+   "pauses_over_0_25s": [
+    [
+     2.18,
+     2.8
+    ],
+    [
+     6.44,
+     7.06
+    ],
+    [
+     8.14,
+     8.42
+    ],
+    [
+     11.4,
+     11.92
+    ],
+    [
+     14.4,
+     15.08
+    ],
+    [
+     16.68,
+     17.22
+    ],
+    [
+     18.66,
+     19.26
+    ],
+    [
+     21.14,
+     21.4
+    ],
+    [
+     23.64,
+     24.16
+    ],
+    [
+     26.4,
+     26.92
+    ]
+   ],
+   "loudness_lufs": -30.1,
+   "true_peak_dbtp": -11.0,
+   "script_slot": "2:33-3:04",
+   "script_slot_seconds": 31,
+   "no_narration_seconds": 6,
+   "narration_budget_seconds": 25,
+   "over_budget_seconds": 5.08,
+   "fade_out_after": 29.78,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.6,
+    "last_30ms_peak_db": -84.3,
+    "first_5ms_peak_db": -84.3,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -73.4,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "07-s07-brain",
+   "scene": 7,
+   "file": "07-s07-brain.mp3",
+   "align": "07-s07-brain.align.json",
+   "text": "And here's where things get even more interesting. Your brain isn't a fixed machine. It can adapt through learning. In brain-imaging research, people trained in echolocation showed increased responses to echoes in regions normally associated with vision. And this wasn't limited to people who were blind. Sighted participants showed changes too. That doesn't mean hearing has turned into eyesight. It means your brain can learn new ways of extracting information from sound.",
+   "decoded_seconds": 30.56,
+   "speech_start": 0.02,
+   "speech_end": 30.12,
+   "speech_seconds": 30.1,
+   "words": 72,
+   "script_words": 72,
+   "pauses_over_0_25s": [
+    [
+     2.54,
+     3.08
+    ],
+    [
+     5.16,
+     5.7
+    ],
+    [
+     7.28,
+     7.96
+    ],
+    [
+     9.32,
+     9.74
+    ],
+    [
+     16.6,
+     17.22
+    ],
+    [
+     19.52,
+     20.12
+    ],
+    [
+     22.22,
+     22.98
+    ],
+    [
+     25.4,
+     25.94
+    ]
+   ],
+   "loudness_lufs": -29.0,
+   "true_peak_dbtp": -8.3,
+   "script_slot": "3:04-3:32",
+   "script_slot_seconds": 28,
+   "no_narration_seconds": 5,
+   "narration_budget_seconds": 23,
+   "over_budget_seconds": 7.56,
+   "fade_out_after": 30.42,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.44,
+    "last_30ms_peak_db": -73.4,
+    "first_5ms_peak_db": -54.9,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -62.7,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "08-s08-quiet-room",
+   "scene": 8,
+   "file": "08-s08-quiet-room.mp3",
+   "align": "08-s08-quiet-room.align.json",
+   "text": "But what happens when echoes become difficult to hear? Imagine entering a room designed to absorb sound. Your usual reflections grow weaker. The information you've practiced interpreting becomes harder to use. The walls haven't moved. The room hasn't changed size. Yet the acoustic clues that helped you understand it are disappearing. And suddenly, you remember an important truth. Echolocation is useful. But it has limits.",
+   "decoded_seconds": 28.8,
+   "speech_start": 0,
+   "speech_end": 28.24,
+   "speech_seconds": 28.24,
+   "words": 65,
+   "script_words": 65,
+   "pauses_over_0_25s": [
+    [
+     2.88,
+     3.54
+    ],
+    [
+     6.6,
+     7.3
+    ],
+    [
+     9.28,
+     9.88
+    ],
+    [
+     13.48,
+     14.04
+    ],
+    [
+     15.08,
+     15.52
+    ],
+    [
+     17,
+     17.48
+    ],
+    [
+     21.02,
+     21.54
+    ],
+    [
+     22.22,
+     22.58
+    ],
+    [
+     24.3,
+     24.86
+    ],
+    [
+     26.5,
+     26.92
+    ],
+    [
+     27.12,
+     27.42
+    ]
+   ],
+   "loudness_lufs": -30.3,
+   "true_peak_dbtp": -10.4,
+   "script_slot": "3:32-4:02",
+   "script_slot_seconds": 30,
+   "no_narration_seconds": 7,
+   "narration_budget_seconds": 23,
+   "over_budget_seconds": 5.8,
+   "fade_out_after": 28.54,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.56,
+    "last_30ms_peak_db": -80.8,
+    "first_5ms_peak_db": -38.0,
+    "sound_from_first_sample": true,
+    "tail_floor_db": -56.9,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "09-s09-city",
+   "scene": 9,
+   "file": "09-s09-city.mp3",
+   "align": "09-s09-city.align.json",
+   "text": "Now take that ability outside. A city is completely different from a quiet hallway. Traffic. Conversations. Footsteps. Engines. Reflections bouncing between buildings. Some of those sounds help you understand what's happening. Others can mask the quiet echoes you're trying to notice. And this is where real navigation skills, mobility tools, and experience matter. Echolocation can contribute information. It isn't a replacement for a cane, accessible signals, or learning how to travel safely.",
+   "decoded_seconds": 33.36,
+   "speech_start": 0.1,
+   "speech_end": 32.84,
+   "speech_seconds": 32.74,
+   "words": 72,
+   "script_words": 72,
+   "pauses_over_0_25s": [
+    [
+     1.92,
+     2.54
+    ],
+    [
+     5.44,
+     5.96
+    ],
+    [
+     6.4,
+     6.88
+    ],
+    [
+     7.74,
+     8.26
+    ],
+    [
+     8.82,
+     9.32
+    ],
+    [
+     9.84,
+     10.24
+    ],
+    [
+     12.32,
+     12.86
+    ],
+    [
+     15.44,
+     15.94
+    ],
+    [
+     19.14,
+     19.58
+    ],
+    [
+     21.86,
+     22.16
+    ],
+    [
+     23.08,
+     23.34
+    ],
+    [
+     24.62,
+     25.1
+    ],
+    [
+     27.36,
+     27.82
+    ],
+    [
+     29.56,
+     29.86
+    ],
+    [
+     30.82,
+     31.18
+    ]
+   ],
+   "loudness_lufs": -29.9,
+   "true_peak_dbtp": -10.7,
+   "script_slot": "4:02-4:31",
+   "script_slot_seconds": 29,
+   "no_narration_seconds": 5,
+   "narration_budget_seconds": 24,
+   "over_budget_seconds": 9.36,
+   "fade_out_after": 33.14,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.52,
+    "last_30ms_peak_db": -80.8,
+    "first_5ms_peak_db": -78.3,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -63.9,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "10-s10-rain",
+   "scene": 10,
+   "file": "10-s10-rain.mp3",
+   "align": "10-s10-rain.align.json",
+   "text": "Then it starts raining. And the entire soundscape changes. Drops strike pavement, metal, leaves, umbrellas, glass. Thousands of tiny impacts create new sounds across the environment. But rain doesn't simply reveal a perfect map. It can also drown out quieter echoes. Every environment has its own acoustic character. And learning to navigate with sound means learning when to trust a clue, when to check it, and when to slow down.",
+   "decoded_seconds": 30.24,
+   "speech_start": 0.1,
+   "speech_end": 29.52,
+   "speech_seconds": 29.42,
+   "words": 70,
+   "script_words": 70,
+   "pauses_over_0_25s": [
+    [
+     1.3,
+     1.74
+    ],
+    [
+     3.78,
+     4.36
+    ],
+    [
+     5.58,
+     5.96
+    ],
+    [
+     6.26,
+     6.64
+    ],
+    [
+     7,
+     7.28
+    ],
+    [
+     7.88,
+     8.18
+    ],
+    [
+     8.66,
+     9.36
+    ],
+    [
+     13.04,
+     13.7
+    ],
+    [
+     16.28,
+     16.68
+    ],
+    [
+     19.06,
+     19.78
+    ],
+    [
+     22.36,
+     22.76
+    ],
+    [
+     24.44,
+     24.76
+    ],
+    [
+     26.56,
+     26.96
+    ],
+    [
+     27.64,
+     28.1
+    ]
+   ],
+   "loudness_lufs": -30.0,
+   "true_peak_dbtp": -11.5,
+   "script_slot": "4:31-5:02",
+   "script_slot_seconds": 31,
+   "no_narration_seconds": 6,
+   "narration_budget_seconds": 25,
+   "over_budget_seconds": 5.24,
+   "fade_out_after": 29.82,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.72,
+    "last_30ms_peak_db": -35.6,
+    "first_5ms_peak_db": -30.5,
+    "sound_from_first_sample": true,
+    "tail_floor_db": -61.7,
+    "click_at_end": true
+   }
+  },
+  {
+   "id": "11-s11-not-a-picture",
+   "scene": 11,
+   "file": "11-s11-not-a-picture.mp3",
+   "align": "11-s11-not-a-picture.align.json",
+   "text": "Here's something easy to forget. Understanding the world isn't only about knowing what things look like. A familiar voice tells you who's nearby. Footsteps reveal that someone is approaching. Touch gives you details that sound alone cannot. And memory helps you understand places you've learned. Blind people use many different combinations of senses, skills and tools. Echolocation is one remarkable possibility among them. The goal isn't to recreate eyesight. It's to gain useful information and greater independence.",
+   "decoded_seconds": 33.84,
+   "speech_start": 0.06,
+   "speech_end": 33.32,
+   "speech_seconds": 33.26,
+   "words": 77,
+   "script_words": 77,
+   "pauses_over_0_25s": [
+    [
+     1.66,
+     2.26
+    ],
+    [
+     3.36,
+     3.62
+    ],
+    [
+     6,
+     6.62
+    ],
+    [
+     8.98,
+     9.54
+    ],
+    [
+     11.76,
+     12.26
+    ],
+    [
+     15.08,
+     15.54
+    ],
+    [
+     18.4,
+     18.9
+    ],
+    [
+     23.3,
+     23.82
+    ],
+    [
+     27.04,
+     27.58
+    ],
+    [
+     29.72,
+     30.14
+    ]
+   ],
+   "loudness_lufs": -29.6,
+   "true_peak_dbtp": -10.8,
+   "script_slot": "5:02-5:32",
+   "script_slot_seconds": 30,
+   "no_narration_seconds": 5,
+   "narration_budget_seconds": 25,
+   "over_budget_seconds": 8.84,
+   "fade_out_after": 33.62,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.52,
+    "last_30ms_peak_db": -25.3,
+    "first_5ms_peak_db": -84.3,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -66.8,
+    "click_at_end": true
+   }
+  },
+  {
+   "id": "12-s12-final-experiment",
+   "scene": 12,
+   "file": "12-s12-final-experiment.mp3",
+   "align": "12-s12-final-experiment.align.json",
+   "text": "Months ago, even finding your way across a bedroom felt unfamiliar. Now, you've learned to recognize patterns in reflected sound. So let's try one last experiment. A large room. An obstacle ahead. Two possible passages. No visual information. Just the tools and skills you've practiced. Could you work out where the open route begins?",
+   "decoded_seconds": 24.0,
+   "speech_start": 0.1,
+   "speech_end": 23.48,
+   "speech_seconds": 23.38,
+   "words": 54,
+   "script_words": 54,
+   "pauses_over_0_25s": [
+    [
+     0.66,
+     1.06
+    ],
+    [
+     4.08,
+     4.78
+    ],
+    [
+     5.02,
+     5.4
+    ],
+    [
+     8.24,
+     8.9
+    ],
+    [
+     10.78,
+     11.42
+    ],
+    [
+     12.2,
+     12.8
+    ],
+    [
+     13.84,
+     14.54
+    ],
+    [
+     15.86,
+     16.56
+    ],
+    [
+     17.88,
+     18.4
+    ],
+    [
+     20.58,
+     21.16
+    ]
+   ],
+   "loudness_lufs": -29.6,
+   "true_peak_dbtp": -10.8,
+   "script_slot": "5:32-6:03",
+   "script_slot_seconds": 31,
+   "no_narration_seconds": 9,
+   "narration_budget_seconds": 22,
+   "over_budget_seconds": 2.0,
+   "fade_out_after": 23.78,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.52,
+    "last_30ms_peak_db": -76.3,
+    "first_5ms_peak_db": -74.7,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -63.5,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "13-s13-world-returns",
+   "scene": 13,
+   "file": "13-s13-world-returns.mp3",
+   "align": "13-s13-world-returns.align.json",
+   "text": "Think about how extraordinary that is. You began by losing one way of understanding the world. But with time, practice, and the right support, you learned to use information you once ignored. Not every blind person uses echolocation. And learning it doesn't give anyone supernatural abilities. But for some people, reflected sound can become a genuinely useful part of navigating space. The world hasn't become visible again. You've simply learned a different way to understand part of it.",
+   "decoded_seconds": 30.64,
+   "speech_start": 0.1,
+   "speech_end": 30.16,
+   "speech_seconds": 30.06,
+   "words": 78,
+   "script_words": 78,
+   "pauses_over_0_25s": [
+    [
+     2.22,
+     2.78
+    ],
+    [
+     5.92,
+     6.26
+    ],
+    [
+     7,
+     7.36
+    ],
+    [
+     8.98,
+     9.32
+    ],
+    [
+     11.8,
+     12.48
+    ],
+    [
+     14.98,
+     15.4
+    ],
+    [
+     18.46,
+     18.9
+    ],
+    [
+     19.78,
+     20.12
+    ],
+    [
+     24.3,
+     24.88
+    ],
+    [
+     26.82,
+     27.22
+    ]
+   ],
+   "loudness_lufs": -29.6,
+   "true_peak_dbtp": -7.4,
+   "script_slot": "6:03-6:31",
+   "script_slot_seconds": 28,
+   "no_narration_seconds": 5,
+   "narration_budget_seconds": 23,
+   "over_budget_seconds": 7.64,
+   "fade_out_after": 30.46,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.48,
+    "last_30ms_peak_db": -80.8,
+    "first_5ms_peak_db": -50.8,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -64.3,
+    "click_at_end": false
+   }
+  },
+  {
+   "id": "14-s14-last-question",
+   "scene": 14,
+   "file": "14-s14-last-question.mp3",
+   "align": "14-s14-last-question.align.json",
+   "text": "So, what if you went blind? It wouldn't mean the end of understanding your surroundings. Your life would change. You'd face real challenges. And no single skill would solve all of them. But echolocation reveals something fascinating about the human brain. It can learn to find meaning in the smallest signals. And maybe that's the most incredible part. Sometimes, the world has more information to offer than we ever knew how to notice.",
+   "decoded_seconds": 27.68,
+   "speech_start": 0.14,
+   "speech_end": 27.5,
+   "speech_seconds": 27.36,
+   "words": 73,
+   "script_words": 73,
+   "pauses_over_0_25s": [
+    [
+     0.34,
+     0.74
+    ],
+    [
+     1.94,
+     2.56
+    ],
+    [
+     5.3,
+     5.88
+    ],
+    [
+     6.98,
+     7.42
+    ],
+    [
+     8.86,
+     9.22
+    ],
+    [
+     11.62,
+     12.1
+    ],
+    [
+     15.98,
+     16.46
+    ],
+    [
+     19.52,
+     20
+    ],
+    [
+     22.18,
+     22.74
+    ],
+    [
+     23.28,
+     23.56
+    ]
+   ],
+   "loudness_lufs": -29.5,
+   "true_peak_dbtp": -10.0,
+   "script_slot": "6:31-7:00",
+   "script_slot_seconds": 29,
+   "no_narration_seconds": 5,
+   "narration_budget_seconds": 24,
+   "over_budget_seconds": 3.68,
+   "fade_out_after": 27.65,
+   "checks": {
+    "all_words_aligned": true,
+    "words_without_energy": [],
+    "seconds_after_last_word": 0.18,
+    "last_30ms_peak_db": -84.3,
+    "first_5ms_peak_db": -80.8,
+    "sound_from_first_sample": false,
+    "tail_floor_db": -80.8,
+    "click_at_end": false
+   }
+  }
+ ],
+ "total_decoded_seconds": 408.32,
+ "notes": [
+  "02-s02-without-light: click in the last 30 ms (-18.3 dB over a -63.9 dB tail, 0.56 s after the last word); removed by the fade at fade_out_after",
+  "05-s05-building-a-world: sound from the first sample (-45.0 dB in the first 5 ms); fade in over 10 ms at most",
+  "08-s08-quiet-room: sound from the first sample (-38.0 dB in the first 5 ms); fade in over 10 ms at most",
+  "10-s10-rain: click in the last 30 ms (-35.6 dB over a -61.7 dB tail, 0.72 s after the last word); removed by the fade at fade_out_after",
+  "10-s10-rain: sound from the first sample (-30.5 dB in the first 5 ms); fade in over 10 ms at most",
+  "11-s11-not-a-picture: click in the last 30 ms (-25.3 dB over a -66.8 dB tail, 0.52 s after the last word); removed by the fade at fade_out_after"
+ ]
+}
