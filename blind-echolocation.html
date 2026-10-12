@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What If You Went Blind... And Learned to See With Sound?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* 16:9 (1920×1080). --u = one design pixel of a 1920-wide frame (set by film.js). Page-level only. */
+    #hud::before { display: none; }
+    /* the title: left third, over the sunlit room (the phone is on the right) */
+    .be-title { position: absolute; left: calc(var(--u) * 150); top: calc(var(--u) * 330); width: calc(var(--u) * 900); pointer-events: none;
+      text-shadow: 0 0 calc(var(--u) * 30) rgba(30, 14, 6, 0.65), 0 calc(var(--u) * 3) calc(var(--u) * 14) rgba(0, 0, 0, 0.6); }
+    .be-title .q { font-family: var(--book); font-weight: 700; font-size: calc(var(--u) * 104); line-height: 1.04; color: #fff3e0; }
+    .be-title .s { font-family: var(--book); font-style: italic; font-size: calc(var(--u) * 54); color: #ffd9a8; margin-top: calc(var(--u) * 18); }
+    /* narration subtitles: bottom centre, one or two lines, word-timed from the real audio */
+    .be-sub { position: absolute; bottom: calc(var(--u) * 78); left: 50%; transform: translateX(-50%); font-family: var(--book); font-size: calc(var(--u) * 46); font-weight: 600; line-height: 1.22;
+      color: #fff6ea; padding: calc(var(--u) * 11) calc(var(--u) * 28); border-radius: calc(var(--u) * 12); background: rgba(8, 8, 14, 0.52); max-width: calc(var(--u) * 1400); width: max-content; text-align: center;
+      text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(0, 0, 0, 0.6); pointer-events: none; }
+    /* the honesty tag on slowed wave visualizations */
+    .be-tag { position: absolute; top: calc(var(--u) * 56); right: calc(var(--u) * 64); font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.22em; font-size: calc(var(--u) * 22);
+      color: #bdf6ff; padding: calc(var(--u) * 9) calc(var(--u) * 18); border-radius: calc(var(--u) * 10); background: rgba(6, 14, 22, 0.55); box-shadow: 0 0 0 calc(var(--u) * 1.5) rgba(98, 243, 255, 0.35); pointer-events: none; }
+    /* science labels (projected next to things) */
+    .be-lab { position: absolute; transform: translate(-50%, -50%); pointer-events: none; padding: calc(var(--u) * 10) calc(var(--u) * 22); border-radius: calc(var(--u) * 12);
+      background: rgba(6, 14, 24, 0.7); box-shadow: 0 0 0 calc(var(--u) * 1.5) rgba(98, 243, 255, 0.45); white-space: nowrap; color: #e8fbff; }
+    .be-lab .k { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.18em; font-size: calc(var(--u) * 26); color: #9fe9f5; }
+    .be-lab .v { font-family: var(--book); font-size: calc(var(--u) * 60); font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .be-lab .v small { font-size: 0.5em; opacity: 0.8; }
+    .be-lab .s { font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.12em; font-size: calc(var(--u) * 24); color: #ffd39a; margin-top: calc(var(--u) * 2); }
+    .be-lab.w { box-shadow: 0 0 0 calc(var(--u) * 1.5) rgba(255, 176, 90, 0.6); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="hud"></div>
+    </div>
+  </div>
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What If You Went Blind?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">LISTENING…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine (unchanged; this film only configures and extends it from its own folder) -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script>installFog({ bankScale: 0.05, bankAmount: 0.3, lowHeight: 1.6, lowAmount: 0.4, cap: 0.85 });</script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (plan: films/blind-echolocation/PLAN.md) -->
+  <script src="films/blind-echolocation/narration-timing.js"></script>
+  <script src="films/blind-echolocation/narration-audio.js"></script>
+  <script src="films/blind-echolocation/script.js"></script>
+  <script src="films/blind-echolocation/toon.js"></script>
+  <script src="films/blind-echolocation/rig.js"></script>
+  <script src="films/blind-echolocation/castbase.js"></script>
+  <script src="films/blind-echolocation/motion.js"></script>
+  <script src="films/blind-echolocation/acoustic.js"></script>
+  <script src="films/blind-echolocation/apartment.js"></script>
+  <script src="films/blind-echolocation/cast.js"></script>
+  <script src="films/blind-echolocation/shots.js"></script>
+  <script src="films/blind-echolocation/post.js"></script>
+  <script src="films/blind-echolocation/audiokit.js"></script>
+  <script src="films/blind-echolocation/mix.js"></script>
+  <script src="films/blind-echolocation/audio.js"></script>
+<script src="films/blind-echolocation/sound-bedroom.js"></script>
+  <script src="films/blind-echolocation/film.js"></script>
+  <script src="films/blind-echolocation/soundtrack.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
