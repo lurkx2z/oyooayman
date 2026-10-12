@@ -208,7 +208,7 @@ const FILM = {
     const bo = W(t, BE.echoW - 0.1, BE.over + 0.9, 0.6, 0.7).toFixed(3); if (app.big._a !== bo) { app.big.style.opacity = bo; app.big._a = bo; }
     const wk = shot.week ? shot.week(t) : 0, wa = (wk ? MathX.smooth(t, shot.t0 + 0.15, shot.t0 + 0.5) * (1 - MathX.smooth(t, shot.t1 - 0.25, shot.t1)) : 0).toFixed(3);
     if (app.week._a !== wa) { app.week.style.opacity = wa; app.week._a = wa; }
-    if (wk && app.week._n !== wk) { app.week.innerHTML = '<span>WEEK</span> ' + wk; app.week._n = wk; }
+    if (wk && app.week._n !== wk) { app.week.innerHTML = typeof wk === 'string' ? wk : '<span>WEEK</span> ' + wk; app.week._n = wk; }   // a string: a card of its own
     // projected labels
     const labs = shot.labels ? shot.labels(t) : [], v = new THREE.Vector3();
     while (app.labs.length < labs.length) { const d = document.createElement('div'); d.className = 'be-lab'; d.style.opacity = '0'; document.getElementById('hud').appendChild(d); app.labs.push(d); }

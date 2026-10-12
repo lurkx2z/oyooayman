@@ -29,6 +29,7 @@ const BE_AC = {
   uBeLine: { value: 5.0 },      // contour lines per metre
   uBePO: { value: Array.from({ length: 16 }, () => new THREE.Vector4()) },   // origin xyz, t0
   uBePP: { value: Array.from({ length: 16 }, () => new THREE.Vector4()) },   // speed (m/s, visual), strength, width (m), kind (0 click, 1 source/amber, 2 weak/violet)
+  uBePD: { value: Array.from({ length: 16 }, () => new THREE.Vector4()) },   // a beamed click: aim xyz, how directional (0 = all round)
   uBeColA: { value: new THREE.Color('#62f3ff') },   // strong return
   uBeColB: { value: new THREE.Color('#7a5cff') },   // weak return
   uBeColC: { value: new THREE.Color('#ffb05a') },   // sound source
@@ -55,7 +56,7 @@ function beClassify(name) {
 
 const BE_AC_GLSL = /* glsl */`
 uniform float uBeAc, uBeT, uBeGain, uBeDecay, uBeLine, uBeRefl, uBeCrisp, uBeReal, uBeGrpGain;
-uniform vec4 uBePO[16]; uniform vec4 uBePP[16];
+uniform vec4 uBePO[16]; uniform vec4 uBePP[16]; uniform vec4 uBePD[16];
 uniform vec3 uBeColA, uBeColB, uBeColC;
 varying vec3 vBeW;
 float beH3(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
@@ -98,6 +99,7 @@ vec3 beAcoustic(vec3 P, vec3 N) {
     float kf = (front + rev * mask) * (0.2 + 0.8 * facing) * (0.3 + 0.7 * r);
     float kt = tail * ret * r * mask;
     float k = q.y * fall * (kf + kt * (0.03 + 0.8 * dots + 0.5 * crease + 0.9 * fres));
+    vec4 bd = uBePD[i]; if (bd.w > 0.0) k *= mix(1.0, smoothstep(0.35, 0.95, dot(-D / d, bd.xyz)), bd.w);
     vec3 col = q.w > 0.5 && q.w < 1.5 ? uBeColC : (q.w > 1.5 ? uBeColB : mix(uBeColB, uBeColA, smoothstep(0.15, 0.8, r) * (0.55 + 0.45 * front)));
     acc += col * k;
   }
@@ -118,7 +120,7 @@ function beAcoustic(m, o = {}) {
     if (prev) prev.call(m, sh, r);
     Object.assign(sh.uniforms, {
       uBeAc: BE_AC.uBeAc, uBeT: BE_AC.uBeT, uBeGain: BE_AC.uBeGain, uBeDecay: BE_AC.uBeDecay, uBeLine: BE_AC.uBeLine,
-      uBePO: BE_AC.uBePO, uBePP: BE_AC.uBePP, uBeColA: BE_AC.uBeColA, uBeColB: BE_AC.uBeColB, uBeColC: BE_AC.uBeColC,
+      uBePO: BE_AC.uBePO, uBePP: BE_AC.uBePP, uBePD: BE_AC.uBePD, uBeColA: BE_AC.uBeColA, uBeColB: BE_AC.uBeColB, uBeColC: BE_AC.uBeColC,
       uBeRefl: { value: refl }, uBeCrisp: { value: crisp }, uBeReal: BE_AC.real[grp], uBeGrpGain: BE_AC.gain[grp],
     });
     sh.vertexShader = sh.vertexShader
@@ -165,8 +167,9 @@ class BePulses {
   apply(T, scale = 1, filter = null) {
     const live = this.list.filter((q) => T >= q.t - 0.001 && T < q.t + q.life && (!filter || filter(q))).sort((a, b) => b.t - a.t).slice(0, 16);
     for (let i = 0; i < 16; i++) {
-      const O = BE_AC.uBePO.value[i], Q = BE_AC.uBePP.value[i], q = live[i];
-      if (!q) { Q.set(0, 0, 0, 0); continue; }
+      const O = BE_AC.uBePO.value[i], Q = BE_AC.uBePP.value[i], Dq = BE_AC.uBePD.value[i], q = live[i];
+      if (!q) { Q.set(0, 0, 0, 0); Dq.set(0, 0, 0, 0); continue; }
+      if (q.beam) Dq.set(q.beam.x, q.beam.y, q.beam.z, q.beamK ?? 0.97); else Dq.set(0, 0, 0, 0);
       const p = typeof q.p === 'function' ? q.p(q.t) : q.p;
       O.set(p.x, p.y, p.z, q.t);
       // fade the whole pulse out over its last 30 % of life
@@ -237,12 +240,12 @@ class BeWaves {
     const age = T - o.t; if (age <= 0) return;
     const speed = opt.speed || o.speed || 3, R = speed * age, life = opt.life || 2.2;
     const fade = 1 - MathX.smooth(age, life * 0.55, life), a0 = (opt.a ?? 0.9) * fade;
-    this.push(o.p, R, a0 * Math.exp(-R * 0.12), opt.col || '#9ff6ff', null, null, opt.band || 0);
+    this.push(o.p, R, a0 * Math.exp(-R * 0.12), opt.col || '#9ff6ff', opt.clip || null, null, opt.band || 0);   // opt.clip: a beamed click (half shell)
     for (const W of walls) {
       const dist = o.p.clone().sub(W.p).dot(W.n);         // source's distance from the wall (> 0 inside)
       if (dist <= 0 || R < dist) continue;
       const img = o.p.clone().addScaledVector(W.n, -2 * dist);
-      this.push(img, R, a0 * (W.refl ?? 0.7) * Math.exp(-R * 0.15), W.col || opt.ecol || '#62f3ff', [W.p, W.n], W.clip2 || null, opt.band || 0);
+      this.push(img, R, a0 * (W.refl ?? 0.7) * Math.exp(-R * 0.15), W.col || opt.ecol || '#62f3ff', [W.p, W.n], W.clip2 || (W.floor && opt.clip) || null, opt.band || 0);
     }
   }
 }

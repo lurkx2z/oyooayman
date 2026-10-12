@@ -155,8 +155,8 @@ beSound('sfx', 'cafe', function (ctx, dest, K) {
 // ================================================================================================= MUSIC: the guitar
 beSound('music', 'cafe', function (ctx, dest, K) {
   const B = BE, fx = K.fx, M = beMusicKit(ctx, K), r = new RNG(1121);
-  const pl = (t, nn, v, pan = 0, o = {}) => fx.play(bePluckBuf(fx, gbHz(nn), o.dur || 3.4, o), t, M.bus, { vol: v * 0.32, pan });
-  const pad = (t0, t1, notes, v, o = {}) => M.strings(t0, t1, notes, v, Object.assign({ wave: 'triangle', cut: 1300, vib: 4, att: 1.6, rel: 1.6 }, o));
+  const pl = (t, nn, v, pan = 0, o = {}) => fx.play(bePluckBuf(fx, gbHz(nn), o.dur || 3.4, o), t, M.bus, { vol: v * 0.5, pan });
+  const pad = (t0, t1, notes, v, o = {}) => M.strings(t0, t1, notes, v * 1.45, Object.assign({ wave: 'triangle', cut: 1300, vib: 4, att: 1.6, rel: 1.6 }, o));
   const strum = (t, notes, v, pan = 0, gap = 0.035) => notes.forEach((nn, k) => pl(t + k * gap + r.range(0, 0.008), nn, v * (1 - 0.08 * k), pan + (k - notes.length / 2) * 0.06));
   // "Here's something easy to forget": a few open notes, the rain still around her
   [[0.7, 'A3', -0.2], [1.45, 'D4', 0.15], [2.2, 'F#4', -0.05]].forEach(([dt, nn, p]) => pl(B.s11 + dt, nn, 0.11, p));
