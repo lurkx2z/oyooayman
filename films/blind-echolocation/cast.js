@@ -50,6 +50,8 @@ class BeCast {
   // one hero per set (each set is its own THREE.Scene); the look changes with the cardigan from scene 3
   heroIn(scene, look = 'noor') {
     const H = new GbCharacter(scene, look, { name: 'noor-' + scene.name });
+    // the face takes no cast shadows (the skull's overhang would draw a hard line across the jaw in close-ups)
+    H.J.hc.traverse((o) => { if (o.isMesh) o.receiveShadow = false; });
     beAcousticScene(H.root, 'hero');
     return H;
   }

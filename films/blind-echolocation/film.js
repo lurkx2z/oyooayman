@@ -57,12 +57,15 @@ const FILM = {
     beScene2Props(apt);
     beScene3Props(apt);
     cast.buildPhone(apt.scene); beAcoustic(cast.phoneScreenM, { refl: 0.9, crisp: 0.9 }); beAcousticScene(cast.phone);
+    // the later chapters' sets (each scene file registers its builder: (app, cast) => …)
+    for (const f of BE_SET_BUILDERS) f(app, cast);
     // the acoustic layers of each set
     for (const S of Object.values(app.sets)) { S.waves = new BeWaves(S.scene, 14); S.rings = new BeRings(S.scene, 64, true); S.ringsX = new BeRings(S.scene, 32, false); }
     app.pulses = new BePulses();
     this._schedule(app);
     beSchedule2(app);
     beSchedule3(app);
+    for (const f of BE_SCHEDULERS) f(app);
     app.hud = new StoryHUD(document.getElementById('hud'), app.tl);
     this._hudExtras(app);
     app.audio = new BeAudio(app.tl, app);
@@ -106,6 +109,7 @@ const FILM = {
     app.rt = mk('be-tag be-rt', '');
     app.big = mk('be-big', 'Echolocation');
     app.chart = document.createElement('canvas'); app.chart.className = 'be-chart'; app.chart.width = 1920; app.chart.height = 1080; app.chart.style.opacity = '0'; hud.appendChild(app.chart);
+    app.labs = [];   // projected science labels (shot.labels(t) → [{ p, html, a, cls }])
     app.mtag = mk('be-tag be-mtag', '<span class="a">THE MOVIE VERSION</span><span class="b">NOT HOW IT WORKS</span>');
     app.subs = BN.phrases.map((P) => {
       const d = document.createElement('div'); d.className = 'be-sub';
@@ -133,7 +137,7 @@ const FILM = {
       set.doorPivot.rotation.y = t >= BE.s3 ? -1.45 : 0;
       beProps2(set, t);
       void ring;
-    }
+    } else if (set.frame) set.frame(app, t, shot, ctx);   // a later set poses its own cast
     let S = shot.cam(t, ctx);
     if (FILM._dbgCam) { const v = FILM._dbgCam; S = { pos: new THREE.Vector3(v[0], v[1], v[2]), at: new THREE.Vector3(v[3], v[4], v[5]), fov: v[6] || 50, focus: 1, dof: 0 }; }
     cam.position.copy(S.pos); cam.up.set(0, 1, 0); cam.lookAt(S.at);
@@ -146,7 +150,7 @@ const FILM = {
     const T = shot.clock ? shot.clock.value(t) : t;   // a slowed shot runs the sound on its own clock
     BE_AC.uBeT.value = T;
     BE_AC.uBeDecay.value = shot.decay || 0.4; BE_AC.uBeGain.value = shot.gainAt ? shot.gainAt(t) : shot.gain || 1; BE_AC.gain.hero.value = shot.heroGain || 0.6;
-    app.pulses.apply(T, 1, (q) => q.set === shot.set && (!q.shot || q.shot === shot.id) && (shot.clock ? q.clock === 'c3' : !q.clock));
+    app.pulses.apply(T, 1, (q) => q.set === shot.set && (!q.shot || q.shot === shot.id) && (shot.clock ? q.clock === (shot.clockId || 'c3') : !q.clock));
     // ---- the set: lights fade with reality (they are what the audience sees, not what she hears)
     if (shot.set === 'apt') {
       set.update(t, L.ac > 0.5 ? L.world : 1, cam);
@@ -154,6 +158,11 @@ const FILM = {
       for (const m of set.pendant.concat(set.ceilings)) m.visible = !shot.plan;
       const F = set.scene.fog; F.color.set('#cdb9a6').multiplyScalar(MathX.lerp(1, L.world, L.ac)); F.density = 0.018;
       this._aptAcoustics(app, set, t, L);
+    } else {
+      if (set.update) set.update(t, L, cam, shot);
+      set.waves.begin(); set.rings.begin(); set.ringsX.begin();
+      if (set.fx) set.fx(app, t, shot, L);
+      set.waves.end(); set.rings.end(); set.ringsX.end();
     }
     for (const S2 of Object.values(app.sets)) if (S2 !== set) { S2.waves.begin(); S2.waves.end(); S2.rings.begin(); S2.rings.end(); S2.ringsX.begin(); S2.ringsX.end(); }
     this._hudUpdate(app, t, shot);
@@ -194,9 +203,21 @@ const FILM = {
     if (app.rt._a !== rto) { app.rt.style.opacity = rto; app.rt._a = rto; }
     if (shot.clock) { const txt = 'REAL TIME AFTER THE CLICK  ' + (shot.clock.value(t) * 1000).toFixed(1) + ' ms'; if (app.rt._t !== txt) { app.rt.textContent = txt; app.rt._t = txt; } }
     const bo = W(t, BE.echoW - 0.1, BE.over + 0.9, 0.6, 0.7).toFixed(3); if (app.big._a !== bo) { app.big.style.opacity = bo; app.big._a = bo; }
-    const co = (shot.chart ? MathX.smooth(t, shot.t0, shot.t0 + 0.35) * (1 - MathX.smooth(t, shot.t1 - 0.3, shot.t1)) : 0);
+    // projected labels
+    const labs = shot.labels ? shot.labels(t) : [], v = new THREE.Vector3();
+    while (app.labs.length < labs.length) { const d = document.createElement('div'); d.className = 'be-lab'; d.style.opacity = '0'; document.getElementById('hud').appendChild(d); app.labs.push(d); }
+    app.labs.forEach((d, i) => {
+      const L = labs[i], a = L ? MathX.clamp(L.a, 0, 1) : 0, o = a.toFixed(3);
+      if (d._a !== o) { d.style.opacity = o; d._a = o; }
+      if (!L || a <= 0) return;
+      if (d._h !== L.html) { d.innerHTML = L.html; d._h = L.html; }
+      const cls = 'be-lab ' + (L.cls || ''); if (d.className !== cls) d.className = cls;
+      if (L.p) v.copy(L.p).project(app.camera); else v.set(0, 0, 0);   // no p: a screen-placed card (dx, dy in %)
+      d.style.left = ((v.x * 0.5 + 0.5) * 100 + (L.dx || 0)).toFixed(2) + '%'; d.style.top = ((0.5 - v.y * 0.5) * 100 + (L.dy || 0)).toFixed(2) + '%';
+    });
+    const co = (shot.chart || shot.draw ? MathX.smooth(t, shot.t0, shot.t0 + 0.35) * (1 - MathX.smooth(t, shot.t1 - 0.3, shot.t1)) : 0);
     if (app.chart._a !== co.toFixed(3)) { app.chart.style.opacity = co.toFixed(3); app.chart._a = co.toFixed(3); }
-    if (co > 0) beDrawSignatures(app.chart, MathX.ramp(t, shot.t0 + 0.2, shot.t1 - 0.6));
+    if (co > 0) { if (shot.draw) shot.draw(app.chart, t); else beDrawSignatures(app.chart, MathX.ramp(t, shot.t0 + 0.2, shot.t1 - 0.6)); }
     const mt = (shot.movie ? MathX.smooth(t, BE.movies + 0.3, BE.movies + 0.7) * (1 - MathX.smooth(t, BE.learn - 0.5, BE.learn)) : 0).toFixed(3);
     if (app.mtag._a !== mt) { app.mtag.style.opacity = mt; app.mtag._a = mt; }
     const nb = t > BE.superN + 0.15 ? '1' : '0';

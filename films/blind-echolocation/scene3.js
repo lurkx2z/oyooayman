@@ -50,7 +50,7 @@ function beScene3Props(set) {
 function beMouth(H) {
   H.root.updateMatrixWorld(true);
   const hd = H.worldOf('hd'), f = new THREE.Vector3(0, 0, 1).applyQuaternion(H.J.hd.getWorldQuaternion(new THREE.Quaternion()));
-  return hd.addScaledVector(f, 0.1).add(new THREE.Vector3(0, -0.04, 0));
+  return hd.addScaledVector(f, 0.13).add(new THREE.Vector3(0, 0.055, 0));
 }
 
 // the hero in scene 3

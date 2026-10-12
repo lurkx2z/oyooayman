@@ -60,6 +60,9 @@ BE.one = bnF(2, 'one').start - 0.6;                   // she walks along the wal
 BE.tap = BN_CLIP[2].speechEnd + 0.75;                 // ★ the knuckles knock the wall
 BE.s3 = BN_SC[3].start;
 
+// later chapters register their sets and pulse schedules here (film.js runs them in build)
+const BE_SET_BUILDERS = [], BE_SCHEDULERS = [];
+
 // a checkpoint page can end the film early (window.BE_CUT, set in that page before the scripts load)
 BE.end = window.BE_CUT || BN.duration;
 CONFIG.duration = BE.end;
