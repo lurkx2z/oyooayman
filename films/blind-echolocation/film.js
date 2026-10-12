@@ -134,8 +134,10 @@ const FILM = {
       if (t < BE.s2) C.heroBed(set.hero, t, ctx.bedV, !!shot.fp);
       else if (t < BE.s3) beHeroS2(set.hero, t, set, C);
       else set.hero.root.visible = false;
-      if (t >= BE.s3 && t < BE.s4) beHeroS3(set.hero2, t, set); else set.hero2.root.visible = false;
-      set.doorPivot.rotation.y = t >= BE.s3 ? -1.45 : 0;
+      if (t >= BE.s3 && t < BE.s4) beHeroS3(set.hero2, t, set); else if (t >= BE.s14) beHeroS14(set.hero2, t, set, C); else set.hero2.root.visible = false;
+      if (t < BE.s14) { set.caneFold.visible = false; set.cane14.visible = false; }
+      set.doorPivot.rotation.y = t >= BE.s14 ? beDoor14(t) : t >= BE.s3 ? -1.45 : 0;
+      set.warm14.intensity = t >= BE.s14 ? 6 * Ease.inOutSine(MathX.ramp(t, BE.qOpen[0], BE.qOpen[1] + 0.8)) : 0;
       beProps2(set, t);
       void ring;
     } else if (set.frame) set.frame(app, t, shot, ctx);   // a later set poses its own cast
@@ -191,7 +193,7 @@ const FILM = {
       RX.source(new THREE.Vector3(0, 0, 0), [], t);
       for (const s of this.stepTimes) if (t > s && t < s + 1.1) RX.source(this.stepP(s), [s], t, { r: 0.4, a: 0.75, dur: 1.0, th: 0.07, squash: 0.45 });
     }
-    if (L.ac > 0.05) { beRings2(this._app, set, t, FILM._shot); beFx3(this._app, set, t, FILM._shot); }
+    if (L.ac > 0.05) { beRings2(this._app, set, t, FILM._shot); beFx3(this._app, set, t, FILM._shot); if (t >= BE.s14) beFx14(this._app, set, t, FILM._shot); }
     W.end(); R.end(); RX.end();
   },
 

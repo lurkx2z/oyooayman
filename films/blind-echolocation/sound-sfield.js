@@ -116,9 +116,9 @@ beSound('sfx', 'sfield', function (ctx, dest, K) {
   const bridge = posts.concat([[_beSfMs(3.95), 0.4, 4000], [_beSfMs(4.0) + 0.0015, 0.15, 3000], [_beSfMs(17), 0.09, 1600], [_beSfMs(40), 0.04, 1200]]);
   B.nB.clicks.forEach((t, k) => { if (t === B.nG[2]) return; const q = beArenaAt(BE_SF_CAST.B, t), P = _beSfPlace(q.x, 1.55, q.z, beSfEar(t), 4, 0.9); clickLR(t, bridge, bridge.map(([d, g, f]) => [d + 0.0005, g * 0.9, f]), { vol: 0.28 * MathX.clamp(P.g * 1.8, 0.35, 1), f: 2700 + 80 * k, pan: P.pan * 0.6, room: street, wet: 0.4 }); });
   // the gap: three measured clicks over the city (each with its own place's answer)
-  clickLR(B.nG[0], hallReps(5, 1.2), hallReps(5, 0.8), { vol: 0.3, f: 3000, pan: -0.5, room: hall, wet: 1.2 });
-  clickLR(B.nG[1], cornerL, cornerR, { vol: 0.28, f: 3250, pan: 0.45, room: street, wet: 0.55 });
-  clickLR(B.nG[2], bridge, bridge, { vol: 0.28, f: 2750, pan: 0.1, room: street, wet: 0.5 });
+  clickLR(B.nG[0], hallReps(5, 1.2), hallReps(5, 0.8), { vol: 0.52, f: 3000, pan: -0.5, room: hall, wet: 1.2 });
+  clickLR(B.nG[1], cornerL, cornerR, { vol: 0.5, f: 3250, pan: 0.45, room: street, wet: 0.55 });
+  clickLR(B.nG[2], bridge, bridge, { vol: 0.5, f: 2750, pan: 0.1, room: street, wet: 0.5 });
   void r;
 });
 
@@ -141,7 +141,10 @@ beSound('music', 'sfield', function (ctx, dest, K) {
   M.strings(B.n3 + 0.3, B.ng + 0.2, ['A5', 'D6'], 0.09, { att: 3.0, rel: 1.5, cut: 3600, vib: 3 });
   // the gap: the peak. Full D, built on the three clicks (each answered by a chord's tone, high, then the whole); it
   // resolves and carries softly into the morning of scene 14
-  M.strings(B.ng - 0.1, B.s14 + 2.6, ['D2', 'A2', 'D3', 'F#3', 'A3', 'D4', 'F#4', 'A4'], 1.15, { att: 1.0, rel: 3.0, cut: 1500, cutTo: 3000, keys: [[B.nG[0], 0.75], [B.nG[2] + 0.4, 1.0], [B.s14 - 1.0, 0.85], [B.s14 + 0.5, 0.35]] });
+  // (it steps back for each click, so the click and its answer are heard clearly, then swells again)
+  const dip = (t, v) => [[t - 0.06, v], [t + 0.02, v * 0.45], [t + 0.45, v * 0.6], [t + 1.0, v]];
+  M.strings(B.ng - 0.1, B.s14 + 2.6, ['D2', 'A2', 'D3', 'F#3', 'A3', 'D4', 'F#4', 'A4'], 1.35, { att: 0.9, rel: 3.0, cut: 1500, cutTo: 3000,
+    keys: [[B.nG[0] - 0.3, 0.7], ...dip(B.nG[0], 0.75), ...dip(B.nG[1], 0.9), ...dip(B.nG[2], 1.0), [B.s14 - 1.0, 0.9], [B.s14 + 0.5, 0.35]] });
   M.piano(B.ng + 0.02, 'D2', 0.32, 3.5, 0, 1.5); M.piano(B.ng + 0.02, 'D3', 0.24, 3.5, 0, 1.5);
   [['A4', 'D5'], ['C#5', 'E5'], ['D5', 'F#5', 'A5']].forEach((ns, k) => ns.forEach((nn, j) => M.piano(B.nG[k] + 0.3 + j * 0.09, nn, 0.24 + 0.03 * k, 2.6, [-0.4, 0.4, 0.1][k], 1.0)));
   M.bell(B.nG[2] + 0.35, 'D6', 0.3, 0.1);
