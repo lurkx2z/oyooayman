@@ -190,3 +190,11 @@ class BeCast {
     H.solveArm('L', new THREE.Vector3(-0.1, 0.66, -1.4), new THREE.Vector3(0.5, -1, 0).normalize(), 0.8);
   }
 }
+
+// show or hide a character's facial features (eyes, brows, mouth, glasses): in the sound view a face returns only a shape
+function beFaceShown(H, on) {
+  const F = H.face; if (!F || F._shown === on) return; F._shown = on;
+  for (const e of F.eyes) e.eg.visible = on;
+  for (const b of F.brows) b.bg.visible = on;
+  if (F.fill) F.fill.visible = on; if (F.line) F.line.visible = on; if (F.glasses) F.glasses.visible = on;
+}

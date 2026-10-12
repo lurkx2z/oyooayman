@@ -19,6 +19,7 @@
 
 Object.assign(GB_LOOKS, {
   cityA: { skin: '#c08b6c', lip: '#7a4a40', top: '#4a5d7a', topDark: '#3c4c64', pants: '#3a3438', shoes: '#2b2622', sole: '#141212', hair: '#5a4030', hairStyle: 'short', build: 1.02, head: 1.0 },
+  cityC: { skin: '#e0b496', lip: '#8a5048', top: '#6e7178', topDark: '#585b62', pants: '#2c2e36', shoes: '#3a3430', sole: '#141212', hair: '#3a2c24', hairStyle: 'short', build: 1.04, head: 1.0 },
   cityB: { skin: '#6b4433', lip: '#3a2220', top: '#a35a3a', topDark: '#87482e', pants: '#2a2c3a', shoes: '#d6cfc4', sole: '#6a5a4c', hair: '#140e0c', hairStyle: 'pony', build: 0.92, head: 0.97 },
 });
 
@@ -55,7 +56,7 @@ BE_SET_BUILDERS.push((app, cast) => {
   c.hero = cast.heroIn(c.scene, 'noorC');
   c.cane = beCane(c.scene);
   c.peds = {};
-  for (const [id, look] of [['p1', 'jogger'], ['p2', 'shopper'], ['p3', 'vendor'], ['p4', 'hero'], ['s1', 'sitter'], ['s2', 'cityB'], ['p5', 'cityA']]) {
+  for (const [id, look] of [['p1', 'jogger'], ['p2', 'shopper'], ['p3', 'vendor'], ['p4', 'cityC'], ['s1', 'sitter'], ['s2', 'cityB'], ['p5', 'cityA']]) {
     const P = c.peds[id] = new GbCharacter(c.scene, look, { name: id }); beAcousticScene(P.root, 'hero'); P.J.hc.traverse((o) => { if (o.isMesh) o.receiveShadow = false; });
   }
   beAcousticScene(c.hero.root, 'hero');

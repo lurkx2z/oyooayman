@@ -1,8 +1,8 @@
 /* =====================================================================
    SOUND — scene 3 (the hallway). A long, narrow, hard corridor (12 × 2.6 × 1.4 m): its parallel walls 1.4 m apart give
    a fast flutter (a reflection every ≈ 8 ms) that the bedroom never had. Her tongue click is a short, bright palatal
-   "tock" (≈ 2–4 kHz, ≈ 1 ms). The three answers in C4 are built from the geometry: a wall 1 m away returns one strong
-   copy 5.8 ms later; an open doorway returns almost nothing; a bookcase ≈ 1 m away returns many weak copies spread from ≈ 5.6 ms over ≈ 3 ms.
+   "tock" (≈ 2–4 kHz, ≈ 1 ms). The three answers in C4 are built from the geometry: a wall 0.7 m away returns one strong
+   copy 4.1 ms later (and a weaker flutter at 8.2 ms); an open doorway returns almost nothing; a bookcase ≈ 1 m away returns many weak copies spread from ≈ 5.6 ms over ≈ 3 ms.
    ===================================================================== */
 const BE_HALL = { size: [12, 2.6, 1.4], rt60: 0.75, absorb: 0.22, bright: 0.6, wet: 0.38, seed: 52 };
 

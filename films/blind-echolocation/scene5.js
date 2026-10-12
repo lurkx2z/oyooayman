@@ -83,6 +83,8 @@ function beCentreFrame(app, t, shot) {
   set._act = beActor(set.hero, t, BE_HERO_CTR, { cane: set.cane, clicks: beClicksCtr(), blinks: [BE.s5 + 2.0, BE.e3 + 3.0, BE.e4 + 1.2] });
   beActor(set.coach, t, BE_COACH_CTR, { blinks: [BE.s5 + 1.4, BE.e3 + 2.0] });
   set.coach.root.visible = set.coach.root.position.x > -30;
+  // scene 6 (F3c): once the sound view has taken over, the coach's face is only a rounded shape (no eyes, brows, mouth)
+  beFaceShown(set.coach, !(shot.id === 'F3c' && t > BE.f3c + 1.1));
   if (shot.fp) set.hero.root.visible = false;
 }
 
@@ -176,10 +178,12 @@ function beDrawStudy(cv, t) {
   const ki = MathX.ramp(t, bnF(5, 'ten').start - 0.2, bnF(5, 'improved').start + 0.6);
   const curve = (f, col, a) => { x.strokeStyle = col; x.globalAlpha = a0 * a; x.lineWidth = 5; x.shadowColor = col; x.shadowBlur = 10; x.beginPath();
     const n = Math.floor(100 * ki); for (let j = 0; j <= n; j++) { const u = j / 100, X = gx0 + (gx1 - gx0) * u, Y = gy0 - (gy0 - gy1) * f(u); if (j) x.lineTo(X, Y); else x.moveTo(X, Y); } x.stroke(); x.shadowBlur = 0; x.globalAlpha = a0; };
-  curve((u) => 0.18 + 0.62 * (1 - Math.exp(-u * 2.4)) / (1 - Math.exp(-2.4)), '#ffb05a', aw);
-  curve((u) => 0.12 + 0.6 * (1 - Math.exp(-u * 2.1)) / (1 - Math.exp(-2.1)), '#62f3ff', as);
+  // the two groups' curves cross and end together: neither group is "better" (the study: neither age nor blindness limited learning)
+  curve((u) => 0.15 + 0.6 * (1 - Math.exp(-u * 2.4)) / (1 - Math.exp(-2.4)) + 0.025 * Math.sin(u * 7.0), '#ffb05a', aw);
+  curve((u) => 0.15 + 0.6 * (1 - Math.exp(-u * 2.0)) / (1 - Math.exp(-2.0)) - 0.025 * Math.sin(u * 6.0 + 0.6), '#62f3ff', as);
   const kb = MathX.smooth(t, bnF(5, 'both').start - 0.1, bnF(5, 'both').start + 0.4);
   _beTxt(x, 'BOTH GROUPS IMPROVED', X0 + PW / 2, Y0 + 245, { align: 'center', font: '700 34px Inter, sans-serif', col: `rgba(255, 240, 220, ${kb})` });
+  _beTxt(x, 'NEITHER AGE NOR BLINDNESS LIMITED LEARNING', X0 + PW / 2, Y0 + 288, { align: 'center', font: '600 21px Inter, sans-serif', col: `rgba(255, 220, 180, ${0.85 * kb})` });
   _beTxt(x, 'curves illustrative', gx1, gy0 - 14, { align: 'right', font: 'italic 500 18px Inter, sans-serif', col: 'rgba(220, 240, 255, 0.45)' });
   x.globalAlpha = 1;
 }

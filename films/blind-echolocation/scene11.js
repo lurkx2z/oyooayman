@@ -20,7 +20,7 @@
           they go in together
    ===================================================================== */
 Object.assign(GB_LOOKS, {
-  friend: { skin: '#b67c5c', lip: '#6e3a32', top: '#2f5d55', topDark: '#244a44', pants: '#3b3f4c', shoes: '#5a3a2a', sole: '#1e1612', hair: '#2a1a12', hairStyle: 'pony', build: 0.96, head: 0.98 },
+  friend: { skin: '#b67c5c', lip: '#6e3a32', top: '#7a3f63', topDark: '#62324f', pants: '#3b3f4c', shoes: '#5a3a2a', sole: '#1e1612', hair: '#2a1a12', hairStyle: 'pony', build: 0.96, head: 0.98 },
   barista: { skin: '#d4a385', lip: '#8a4a44', top: '#2b2b2e', topDark: '#1e1e21', pants: '#2b2b30', shoes: '#2a2420', sole: '#141212', hair: '#6a4a2e', hairStyle: 'short', build: 1.0, head: 1.0 },
 });
 

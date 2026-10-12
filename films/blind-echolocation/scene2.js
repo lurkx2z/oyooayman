@@ -179,7 +179,7 @@ function beProps2(set, t) {
     // the walk along the wall (reality), tracking; then close on her hand and face for the tap and the reaction
     { id: 'B8', t0: B.one, t1: B.tap - 0.7, set: 'apt', look: () => BE_REAL,
       cam: (t) => { const x = MathX.lerp(-0.85, 0.55, Ease.inOutSine(MathX.ramp(t, B.one, B.tap - 0.7))); return { pos: V(x, 1.35, 0.05), at: V(x + 0.75, 1.15, 1.75), fov: 46, focus: 1.8, dof: 0.5 }; } },
-    { id: 'B8b', t0: B.tap - 0.7, t1: B.s3, set: 'apt', decay: 0.5,
+    { id: 'B8b', t0: B.tap - 0.7, t1: B.s3, set: 'apt', tag: true, decay: 0.5,
       look: (t) => { const k = MathX.window(t, B.tap - 0.02, B.tap + 2.2, 0.08, 1.1); return { ac: k, world: MathX.lerp(1, 0.18, k), hero: MathX.lerp(1, 0.45, k), glow: MathX.lerp(1, 0.2, k) }; },
       cam: (t) => { const k = Ease.inOutSine(MathX.ramp(t, B.tap - 0.7, B.s3)); return { pos: V(1.72 - 0.1 * k, 1.42, 1.02 + 0.12 * k), at: V(1.0, 1.28, 1.86), fov: 40 - 6 * k, focus: 1.0, dof: 0.9 }; } },
   ];

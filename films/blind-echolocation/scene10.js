@@ -18,7 +18,7 @@
 Object.assign(GB_LOOKS, {
   rainA: { skin: '#a8765a', lip: '#5a2f2a', top: '#3d4a3a', topDark: '#2f3a2c', pants: '#2a2a33', shoes: '#2b2622', sole: '#141212', hair: '#3a2a22', hairStyle: 'short', build: 1.0, head: 1.0 },
   rainB: { skin: '#5a3a2c', lip: '#2e1a18', top: '#8a3a46', topDark: '#702e38', pants: '#22242e', shoes: '#3a2f2a', sole: '#161212', hair: '#120c0a', hairStyle: 'pony', build: 0.94, head: 0.98 },
-  rainC: { skin: '#d0a080', lip: '#7a4a40', top: '#c9a24a', topDark: '#a8863a', pants: '#3a3438', shoes: '#4a3a30', sole: '#1a1414', hair: '#7a5a3a', hairStyle: 'short', build: 1.05, head: 1.0 },
+  rainC: { skin: '#d0a080', lip: '#7a4a40', top: '#6f6488', topDark: '#5a506f', pants: '#3a3438', shoes: '#4a3a30', sole: '#1a1414', hair: '#7a5a3a', hairStyle: 'short', build: 1.05, head: 1.0 },
 });
 
 BE.j2 = bnE(10, 'and').start - 0.1;

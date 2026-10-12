@@ -129,22 +129,22 @@ BE_SCHEDULERS.push((app) => {
       look: (t) => { const k = MathX.smooth(t, B.n2, B.n2 + 0.7); return k > 0.98 ? ac(0.02, 0.5) : { ac: 1, world: MathX.lerp(1, 0.02, k), hero: MathX.lerp(1, 0.5, k), glow: MathX.lerp(1, 0.04, k) }; },
       cam: beMove(B.n2, B.n3, [V(20.5, 6.2, 8.0), V(12.2, 0.8, 2.8), 50], [V(26, 58, 30), V(12, 0, 0.5), 46], { dof: 0, ease: Ease.inOutSine }) },
     // C1: the city appears around the hall, as sound (outward from it)
-    { id: 'C1', t0: B.n3, t1: B.n4, set: 'sfield', tag: 'VISUALIZATION · A METAPHOR', look: () => ac(0.0, 0.5), decay: 0.9, gain: 1.5, heroGain: 0.7,
+    { id: 'C1', t0: B.n3, t1: B.n4, set: 'sfield', tag: 'A METAPHOR · SOUND SLOWED', look: () => ac(0.0, 0.5), decay: 0.9, gain: 1.5, heroGain: 0.7,
       fall: (t) => MathX.lerp(0.025, 0.0016, MathX.smooth(t, B.n3, B.n3 + 2.5)),
       csGain: (t) => MathX.smooth(t, B.n3 + 0.3, B.n3 + 2.0), reveal: (t) => MathX.lerp(12, 560, Ease.inOutSine(MathX.ramp(t, B.n3 + 0.3, B.n4 + 0.4))),
       cam: beMove(B.n3, B.n4, [V(26, 58, 30), V(12, 0, 0.5), 46], [V(60, 135, 120), V(30, 0, 10), 52], { dof: 0, ease: Ease.inOutSine }) },
     // C2: down to the woman at the corner (she faces the crossing; behind her the lamp post, the parked cars, the corner)
-    { id: 'C2', t0: B.n4, t1: B.n5, set: 'sfield', tag: 'VISUALIZATION · A METAPHOR', look: () => ac(0.0, 0.8), decay: 1.3, gain: 1.5, heroGain: 0.7, fall: 0.0016,
+    { id: 'C2', t0: B.n4, t1: B.n5, set: 'sfield', tag: 'A METAPHOR · SOUND SLOWED', look: () => ac(0.0, 0.8), decay: 1.3, gain: 1.5, heroGain: 0.7, fall: 0.0016,
       csGain: (t) => MathX.lerp(1, 0.6, MathX.smooth(t, B.n4 + 1.5, B.n4 + 3.2)),
       cam: ((a, b) => (t) => (t < B.n4 + 3.2 ? a(t) : b(t)))(
         beMove(B.n4, B.n4 + 3.2, [V(112, 30, -52), V(84, 0, -31), 50], [V(74.6, 1.55, -28.0), V(78.6, 1.15, -30.6), 40], { dof: 0, ease: Ease.inOutCubic }),
         beMove(B.n4 + 3.2, B.n5, [V(74.6, 1.55, -28.0), V(78.6, 1.15, -30.6), 40], [V(74.2, 1.5, -28.9), V(78.8, 1.15, -30.9), 38], { dof: 0, ease: Ease.linear })) },
     // C3: on the bridge: the man with the cane crossing; his clicks answer from the rails and the water
-    { id: 'C3', t0: B.n5, t1: B.ng, set: 'sfield', tag: 'VISUALIZATION · A METAPHOR', look: () => ac(0.0, 0.7), decay: 0.9, gain: 1.5, heroGain: 0.7, fall: 0.0016, csGain: () => 0.6,
+    { id: 'C3', t0: B.n5, t1: B.ng, set: 'sfield', tag: 'A METAPHOR · SOUND SLOWED', look: () => ac(0.0, 0.7), decay: 0.9, gain: 1.5, heroGain: 0.7, fall: 0.0016, csGain: () => 0.6,
       cam: (() => { const m = beMove(B.n5, B.ng, [V(86.5, 11, 127), V(77.4, 0.3, 136), 46], [V(86, 10, 146), V(77.4, 0.3, 143), 44], { dof: 0, ease: Ease.inOutSine });
         return (t) => { const c = m(t), h = FILM._app.sets.sfield.B.root.position; c.at.set(MathX.lerp(c.at.x, h.x, 0.6), c.at.y, MathX.lerp(c.at.z, h.z, 0.6)); return c; }; })() },
     // G: three measured clicks over the city; the music peaks; to black
-    { id: 'G13', t0: B.ng, t1: B.s14, set: 'sfield', tag: 'VISUALIZATION · A METAPHOR', look: (t) => ac(0.0, 0.5 * (1 - MathX.smooth(t, B.s14 - 1.1, B.s14 - 0.1))), decay: 1.0, heroGain: 0.7, fall: 0.0016,
+    { id: 'G13', t0: B.ng, t1: B.s14, set: 'sfield', tag: 'A METAPHOR · SOUND SLOWED', look: (t) => ac(0.0, 0.5 * (1 - MathX.smooth(t, B.s14 - 1.1, B.s14 - 0.1))), decay: 1.0, heroGain: 0.7, fall: 0.0016,
       gainAt: (t) => 1.5 * (1 - MathX.smooth(t, B.s14 - 1.1, B.s14 - 0.1)), fadeOut: [B.s14 - 1.1, B.s14 - 0.1],
       csGain: (t) => 0.7 * (1 - MathX.smooth(t, B.s14 - 1.1, B.s14 - 0.1)),
       cam: beMove(B.ng, B.s14, [V(20, 160, 215), V(50, 0, 55), 50], [V(85, 165, 225), V(52, 0, 55), 50], { dof: 0 }) },

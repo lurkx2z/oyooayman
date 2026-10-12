@@ -241,7 +241,7 @@ function beDrawCues(cv, t) {
   x.clearRect(0, 0, W, H);
   const cues = [
     ['TIMING', bnF(4, 'timing').start, 'later = farther', (ms, i) => Math.exp(-Math.pow((ms - (i ? 7 : 2.5)) / 0.18, 2))],
-    ['LOUDNESS', bnF(4, 'loudness').start, 'stronger = bigger or harder', (ms, i) => (i ? 0.35 : 1) * Math.exp(-Math.pow((ms - 4.5) / 0.18, 2))],
+    ['LOUDNESS', bnF(4, 'loudness').start, 'stronger = closer, bigger or harder', (ms, i) => (i ? 0.35 : 1) * Math.exp(-Math.pow((ms - 4.5) / 0.18, 2))],
     ['SOUND QUALITY', bnF(4, 'quality').start - 0.3, 'duller = softer surface', (ms, i) => i ? 0.55 * Math.exp(-Math.pow((ms - 4.5) / 0.9, 2)) : Math.exp(-Math.pow((ms - 4.5) / 0.14, 2))],
   ];
   const cw = 500, gap = 40, X0 = (W - (3 * cw + 2 * gap)) / 2, Y0 = 90, ch = 330;

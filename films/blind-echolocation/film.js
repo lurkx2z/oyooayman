@@ -75,14 +75,14 @@ const FILM = {
   _schedule(app) {
     const P = app.pulses, C = app.cast, ph = (t) => C.phoneAt(t).P;
     // scene 1: the alarm's buzz (amber): faint when the room "hasn't disappeared", clearer on "the alarm beside you"
-    for (const t of C.buzzTimes(BE.room, BE.knock)) P.add({ t, p: ph(t).clone(), kind: 1, speed: 1.0, w: 0.05, life: 1.2, str: 0.45 + 0.7 * MathX.smooth(t, BE.alarm - 0.5, BE.alarm + 0.6), set: 'apt' });
+    for (const t of C.buzzTimes(BE.room, BE.knock)) P.add({ t, p: ph(t).clone(), kind: 1, speed: 1.4, w: 0.06, life: 1.5, str: 0.7 + 1.1 * MathX.smooth(t, BE.alarm - 0.5, BE.alarm + 0.6), set: 'apt' });
     // the car outside (violet): a moving source beyond the window
     this.carP = (t) => new THREE.Vector3(7.5, 0.6, -9 + 15 * MathX.ramp(t, BE.cars - 0.4, BE.cars + 2.6));
-    for (let t = BE.cars; t < BE.cars + 2.2; t += 0.32) P.add({ t, p: this.carP(t), kind: 2, speed: 9, w: 0.45, life: 1.4, str: 1.5 * MathX.window(t, BE.cars, BE.cars + 2.2, 0.4, 0.8), set: 'apt' });
+    for (let t = BE.cars; t < BE.cars + 2.2; t += 0.32) P.add({ t, p: this.carP(t), kind: 2, speed: 9, w: 0.45, life: 1.4, str: 1.3 * MathX.window(t, BE.cars, BE.cars + 2.2, 0.4, 0.8), set: 'apt' });
     // footsteps in the hallway (amber, small)
     this.stepTimes = beEvery(BE.steps, BE.steps + 3.2, 0.56, 0.04, 3);
     this.stepP = (t) => new THREE.Vector3(-3.6 + 2.0 * (t - BE.steps), 0.05, 2.9);
-    for (const t of this.stepTimes) P.add({ t, p: this.stepP(t), kind: 1, speed: 2.5, w: 0.07, life: 1.0, str: 1.0, set: 'apt' });
+    for (const t of this.stepTimes) P.add({ t, p: this.stepP(t), kind: 1, speed: 2.5, w: 0.08, life: 1.1, str: 1.4, set: 'apt' });
     // her fingertips on the table edge, the knock
     P.add({ t: BE.touch, p: new THREE.Vector3(-0.99, BE_APT.nightH, -1.62), kind: 0, speed: 2.2, w: 0.04, life: 1.0, str: 0.55, set: 'apt' });
     P.add({ t: BE.knock, p: BE_APT.phone0.clone(), kind: 0, speed: 2.5, w: 0.05, life: 1.0, str: 0.6, set: 'apt' });
@@ -188,10 +188,10 @@ const FILM = {
       const under = t > BE.slide[1];
       R.source(ph, C.buzzTimes(BE.room - 0.2, t + 0.01).filter((x) => x > t - 1.5), t, { r: under ? 0.1 : 0.16, a: (under ? 0.5 : 0.95) * MathX.smooth(t, BE.room - 0.3, BE.alarm + 0.5) + (under ? 0 : 0.15), dur: 1.0 });
       // the car: violet ripples beyond the window wall (direction and motion only)
-      if (t > BE.cars - 0.5 && t < BE.cars + 3.5) RX.source(this.carP(t), beEvery(BE.cars, BE.cars + 2.3, 0.32).filter((x) => x <= t), t, { r: 1.3, a: 0.65, col: '#9a7cff', dur: 1.3, th: 0.05 });
+      if (t > BE.cars - 0.5 && t < BE.cars + 3.5) RX.source(this.carP(t), beEvery(BE.cars, BE.cars + 2.3, 0.32).filter((x) => x <= t), t, { r: 2.4, a: 0.95, col: '#9a7cff', dur: 1.4, th: 0.08 });
       // footsteps in the hall (through the wall: small amber rings, low on the floor)
       RX.source(new THREE.Vector3(0, 0, 0), [], t);
-      for (const s of this.stepTimes) if (t > s && t < s + 1.1) RX.source(this.stepP(s), [s], t, { r: 0.4, a: 0.75, dur: 1.0, th: 0.07, squash: 0.45 });
+      for (const s of this.stepTimes) if (t > s && t < s + 1.1) RX.source(this.stepP(s), [s], t, { r: 0.6, a: 0.95, dur: 1.0, th: 0.08, squash: 0.45 });
     }
     if (L.ac > 0.05) { beRings2(this._app, set, t, FILM._shot); beFx3(this._app, set, t, FILM._shot); if (t >= BE.s14) beFx14(this._app, set, t, FILM._shot); }
     W.end(); R.end(); RX.end();
@@ -200,7 +200,9 @@ const FILM = {
   _hudUpdate(app, t, shot) {
     const W = StoryHUD.win;
     const ta = W(t, BE.title[0], BE.title[1], 0.5, 0.6).toFixed(3); if (app.title._a !== ta) { app.title.style.opacity = ta; app.title._a = ta; }
-    const tg = (shot.tag ? MathX.smooth(t, shot.t0 + 0.3, shot.t0 + 0.8) * (1 - MathX.smooth(t, shot.t1 - 0.4, shot.t1)) : 0).toFixed(3);
+    // the label fades in and out once per RUN of consecutive labelled shots (it does not blink at every cut)
+    const run = shot.tag ? beTagRun(shot) : null;
+    const tg = (run ? MathX.smooth(t, run[0] + 0.2, run[0] + 0.6) * (1 - MathX.smooth(t, run[1] - 0.4, run[1])) : 0).toFixed(3);
     if (app.tag._a !== tg) { app.tag.style.opacity = tg; app.tag._a = tg; }
     const tt = typeof shot.tag === 'string' ? shot.tag : 'VISUALIZATION · SOUND SLOWED';   // e.g. 'SLOW MOTION' for real footage slowed
     if (shot.tag && app.tag._t !== tt) { app.tag.textContent = tt; app.tag._t = tt; }
@@ -234,7 +236,7 @@ const FILM = {
     for (const S of app.subs) {
       const P = S.P, a = W(t, P.show, P.hide, 0.12, 0.18) * (t < BE.title[1] ? 0 : 1), o = a.toFixed(3);
       if (S.last.o !== o) { S.el.style.opacity = o; S.last.o = o; }
-      if (a > 0.001) S.spans.forEach((sp, i) => { const k = (t >= P.tokens[i].start - 0.04 ? 1 : 0.6).toString(); if (sp._k !== k) { sp.style.opacity = k; sp._k = k; } });
+      if (a > 0.001) S.spans.forEach((sp, i) => { const k = (t >= P.tokens[i].start - 0.04 ? 1 : 0.78).toString(); if (sp._k !== k) { sp.style.opacity = k; sp._k = k; } });
     }
   },
 
@@ -268,3 +270,13 @@ const FILM = {
 
   debug(app, t) { const s = beShotAt(t); return `shot ${s.id} · ac ${(FILM._look || BE_REAL).ac.toFixed(2)}`; },
 };
+
+// the run of consecutive shots that carry the same "slowed" label as this one: [first t0, last t1]
+function beTagRun(shot) {
+  if (shot._run) return shot._run;
+  const i = BE_SHOTS.indexOf(shot), txt = (s) => (typeof s.tag === 'string' ? s.tag : s.tag ? 'slowed' : null), me = txt(shot);
+  let a = i, b = i;
+  while (a > 0 && txt(BE_SHOTS[a - 1]) === me && Math.abs(BE_SHOTS[a - 1].t1 - BE_SHOTS[a].t0) < 1e-3) a--;
+  while (b < BE_SHOTS.length - 1 && txt(BE_SHOTS[b + 1]) === me && Math.abs(BE_SHOTS[b].t1 - BE_SHOTS[b + 1].t0) < 1e-3) b++;
+  return (shot._run = [BE_SHOTS[a].t0, Math.min(BE_SHOTS[b].t1, BE.end)]);
+}

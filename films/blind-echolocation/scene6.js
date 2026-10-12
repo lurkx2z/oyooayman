@@ -64,11 +64,11 @@ BE_COACH_CTR.push(
       cam: beMove(B.s6, B.f2, [V(-3.8, 2.9, -2.9), V(2.0, 0.9, 2.2), 46], [V(-3.4, 2.5, -2.4), V(1.3, 0.9, 1.2), 42], { dof: 0.3 }) },
     { id: 'F2', t0: B.f2, t1: B.f3a, set: 'centre', look: () => BE_REAL,
       cam: (t) => { const h = head(), k = Ease.inOutSine(MathX.ramp(t, B.f2, B.f3a)); return { pos: V(h.x + 0.35, h.y + 0.02, h.z - 1.9 + 0.5 * k), at: V(h.x, h.y - 0.12, h.z), fov: 32, focus: 1.6, dof: 0.8 }; } },
-    { id: 'F3a', t0: B.f3a, t1: B.f3c, set: 'centre', look: drain(B.f3a + 0.45), decay: 2.2, gain: 1.4,
+    { id: 'F3a', t0: B.f3a, t1: B.f3c, set: 'centre', tag: true, look: drain(B.f3a + 0.45), decay: 2.2, gain: 1.4,
       cam: (t) => { const k = Ease.inOutSine(MathX.ramp(t, B.f3a + 0.6, B.f3b + 0.25)); return { pos: V(-2.0 - 0.3 * k, 1.7, MathX.lerp(-0.7, 1.5, k)), at: V(-5, MathX.lerp(1.7, 1.5, k), MathX.lerp(-1.2, 2.0, k)), fov: 52, focus: 3, dof: 0 }; },
       labels: (t) => [lab(V(-4.9, 2.75, -1.2), '<div class="k">COLOURS</div><div class="s">NOT IN THE ECHO</div>', MathX.smooth(t, B.f3a + 0.7, B.f3a + 1.0)),
         lab(V(-4.9, 2.35, 2.0), '<div class="k">WORDS</div><div class="s">NOT IN THE ECHO</div>', MathX.smooth(t, B.f3b + 0.2, B.f3b + 0.45))] },
-    { id: 'F3c', t0: B.f3c, t1: B.f4, set: 'centre', look: drain(B.f3c + 0.7), decay: 0.6, gain: 1.4, heroGain: 1.2,
+    { id: 'F3c', t0: B.f3c, t1: B.f4, set: 'centre', tag: true, look: drain(B.f3c + 0.7), decay: 0.6, gain: 1.4, heroGain: 1.2,
       cam: (t) => { const h = ct().coach.worldOf('hd').add(V(0, 0.08, 0)), k = MathX.ramp(t, B.f3c, B.f4); return { pos: V(h.x + 0.62 - 0.08 * k, h.y + 0.02, h.z + 0.52 - 0.06 * k), at: V(h.x, h.y - 0.04, h.z), fov: 30, focus: 0.8, dof: 0.8 }; },
       labels: (t) => [lab(ct().coach.worldOf('hd').add(V(0, 0.42, 0)), '<div class="k">A FACE</div><div class="s">ONLY A ROUNDED SHAPE</div>', MathX.smooth(t, B.f3c + 1.1, B.f3c + 1.4))] },
     { id: 'F4', t0: B.f4, t1: B.f4b, set: 'centre', look: () => BE_REAL,
@@ -78,10 +78,12 @@ BE_COACH_CTR.push(
     { id: 'F4c', t0: B.f4c, t1: B.f5, set: 'centre', tag: true, decay: 0.7, gain: 1.4, look: () => dark(),
       cam: beMove(B.f4c, B.f5, [V(1.9, 1.6, 1.6), V(-1.4, 0.6, 2.3), 50], [V(1.7, 1.6, 1.5), V(-1.4, 0.6, 2.3), 48], { dof: 0 }) },
     { id: 'F5', t0: B.f5, t1: B.f6, set: 'centre', tag: true, plan: true, decay: 0.75, gain: 1.5, heroGain: 0.9,
-      look: (t) => { const k = MathX.window(t, B.f5full, B.f5full + 1.1, 0.35, 0.45); return { ac: 1, world: MathX.lerp(0.012, 0.85, k), hero: MathX.lerp(0.25, 0.9, k), glow: MathX.lerp(0.03, 0.8, k) }; },
+      // "…a perfect picture": for a moment the room as SIGHT gives it (the real picture, labelled), then back to the clues
+      look: (t) => { const k = MathX.window(t, B.f5full, B.f5full + 1.1, 0.35, 0.45); return { ac: 1 - k, world: MathX.lerp(0.012, 1, k), hero: MathX.lerp(0.25, 1, k), glow: MathX.lerp(0.03, 1, k) }; },
       cam: (t) => { const a = MathX.lerp(-2.5, -1.6, MathX.ramp(t, B.f5, B.f6)); return { pos: V(0.6 + 7.2 * Math.sin(a), 6.4, 0.3 + 7.2 * Math.cos(a)), at: V(0.4, 0.4, 0.2), fov: 48, focus: 8, dof: 0 }; },
       labels: (t) => { const k = (i) => MathX.smooth(t, B.f5clues + 0.25 + i * 0.35, B.f5clues + 0.6 + i * 0.35) * (1 - MathX.smooth(t, B.f6 - 0.4, B.f6));
-        return [lab(V(-0.6, 3.0, -4.0), '<div class="k">A WALL</div>', k(0)), lab(V(2.9, 2.6, 4.0), '<div class="k">AN OPENING</div>', k(1)),
+        const kf = MathX.window(t, B.f5full, B.f5full + 1.1, 0.3, 0.35);
+        return [lab(V(0.4, 3.6, 0.2), '<div class="k">WHAT SIGHT GIVES</div><div class="s">NOT WHAT AN ECHO GIVES</div>', kf, 'w'), lab(V(-0.6, 3.0, -4.0), '<div class="k">A WALL</div>', k(0)), lab(V(2.9, 2.6, 4.0), '<div class="k">AN OPENING</div>', k(1)),
           lab(V(3.2, 2.6, -1.9), '<div class="k">SOMETHING HARD</div>', k(2)), lab(V(-1.4, 1.75, 2.3), '<div class="k">SOMETHING SOFT</div>', k(3))]; } },
     { id: 'F6', t0: B.f6, t1: B.s7, set: 'centre', tag: true, plan: true, decay: 0.8, gain: 1.6, heroGain: 1.0, look: () => dark(0.012, 0.35),
       cam: beMove(B.f6, B.s7, [V(0.9, 8.2, 3.6), V(0.9, 0, 0.7), 54], [V(0.9, 7.6, 3.3), V(0.9, 0, 0.7), 54], { dof: 0, ease: Ease.outSine }) },

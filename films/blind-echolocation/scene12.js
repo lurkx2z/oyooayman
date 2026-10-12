@@ -55,6 +55,33 @@ BE_SET_BUILDERS.push((app, cast) => {
   ar.update = function (t, L) { const lit = L.ac > 0.5 ? L.world : 1; this.light((x) => beArenaDim(x, t), lit); this.scene.fog.density = L.ac > 0.5 ? 0 : 0.012; };
 });
 
+// the course as she has learned it from the three clicks (the audience's memory map): faint outlines that appear only
+// once an echo has answered from them (the obstacle's face, then the bay, then the open passage's edge) and stay, dim,
+// until the picture comes back. A record of what was heard, never more than the echoes gave.
+BE_SET_BUILDERS.push((app) => {
+  const ar = app.sets.arena, C = BE_ARENA, O = C.O, A = C.A, y0 = 0.03;
+  const wall = (x0, z0, x1, z1, h) => [[x0, y0, z0, x1, y0, z1], [x0, h, z0, x1, h, z1], [x0, y0, z0, x0, h, z0], [x1, y0, z1, x1, h, z1]];
+  const box = (x0, z0, x1, z1, h) => [...wall(x0, z0, x1, z0, h), ...wall(x1, z0, x1, z1, h), ...wall(x1, z1, x0, z1, h), ...wall(x0, z1, x0, z0, h)];
+  const mk = (segs, col) => {
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(segs.flat(), 3));
+    const L = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+    L.frustumCulled = false; L.visible = false; ar.scene.add(L); return L;
+  };
+  ar.memory = [
+    { L: mk(wall(O.x - 0.02, O.z0, O.x - 0.02, O.z1, O.h), '#86f2ff'), t: () => BE.mC[0] + 0.62 },
+    { L: mk([...wall(A.x0, A.z + 0.02, A.x1, A.z + 0.02, O.h), ...wall(C.back.x - 0.02, A.z, C.back.x - 0.02, C.ret.z, O.h), ...wall(O.x + 0.1, C.ret.z - 0.02, C.back.x, C.ret.z - 0.02, O.h)], '#b59aff'), t: () => BE.mC[1] + 0.75 },
+    { L: mk([[O.x - 0.02, y0, O.z1, O.x - 0.02, O.h, O.z1], ...box(C.crates.x0, C.crates.z0, C.crates.x1, C.crates.z1, 1.5)], '#86f2ff'), t: () => BE.mC[2] + 0.8 },
+  ];
+});
+function beArenaMemory(set, t, shot) {
+  if (!set.memory) return;
+  const on = shot && ['G1', 'G23', 'G4'].includes(shot.id) ? 1 - MathX.smooth(t, BE.mThru[0] - 0.2, BE.mRet) : 0;
+  for (const m of set.memory) {
+    const t0 = m.t(), a = on * (MathX.smooth(t, t0 - 0.1, t0 + 0.25) * (0.16 + 0.34 * Math.exp(-Math.max(0, t - t0 - 0.25) / 0.9)));
+    m.L.visible = a > 0.002; m.L.material.opacity = a;
+  }
+}
+
 // her blocking: in from the doors to the start; the clicks; the careful walk to the obstacle; the test; through
 const BE_HERO_ARENA = (() => {
   const B = BE, K = BE_M, yawPQ = Math.atan2(K.Q.x - K.P.x, K.Q.z - K.P.z);
@@ -99,6 +126,7 @@ function beArenaFrame(app, t, shot) {
   set._act = beActor(set.hero, t, BE_HERO_ARENA, { cane: set.cane, clicks: beArenaClicks(), blinks: [BE.s12 + 1.8, BE.m3 + 1.4, BE.m5 + 1.6, BE.m6 + 1.2, BE.m8 + 1.0] });
   beActor(set.coach, t, BE_COACH_ARENA, { blinks: [BE.s12 + 2.4, BE.m4 + 1.2, BE.m7 + 0.8] });
   if (shot.fp) set.hero.root.visible = false;
+  beArenaMemory(set, t, shot);
 }
 // her cane's taps (small rings where the tip lands)
 const _beArenaTaps = () => { if (!BE._arenaTaps) { BE._arenaTaps = []; for (const sg of BE_HERO_ARENA) for (const t of beCaneTaps(sg)) BE._arenaTaps.push(t); BE._arenaTaps.push(BE.mTap); } return BE._arenaTaps; };
@@ -123,19 +151,19 @@ BE_SCHEDULERS.push((app) => {
     for (const sh of ['M5b', 'M6', 'G23', 'G4']) P.add({ t, p, kind: 0, speed: 2.2, w: 0.05, life: 0.9, str: t === B.mTap ? 1.0 : 0.45, set: 'arena', shot: sh }); } }
   // G1: ahead. The obstacle's face 2 m off answers broad and strong (the image source behind it sends the return back)
   { const t = B.mC[0], p = mouth(t, 'G1'), O = BE_ARENA.O, img = p.clone(); img.x = 2 * O.x - p.x;
-    P.add({ t, p, kind: 0, speed: 3.4, w: 0.11, life: 2.0, str: 1.1, set: 'arena', shot: 'G1', click: true, planes: ['obstacle', 'floor'], shellA: 0.2 });
-    P.add({ t, p: img, kind: 0, speed: 3.4, w: 0.1, life: 1.6, str: 0.7, set: 'arena', shot: 'G1' }); }
+    P.add({ t, p, kind: 0, speed: 3.4, w: 0.12, life: 2.6, str: 2.0, set: 'arena', shot: 'G1', click: true, planes: ['obstacle', 'floor'], shellA: 0.12 });
+    P.add({ t, p: img, kind: 0, speed: 3.4, w: 0.1, life: 2.0, str: 1.3, set: 'arena', shot: 'G1' }); }
   // G23 left: the bay. Its walls are close on every side: the returns pile up (violet, quick repeats)
   { const t = B.mC[1], p = mouth(t, 'G23');
-    P.add({ t, p, kind: 0, speed: 4.5, w: 0.1, life: 1.1, str: 0.75, set: 'arena', shot: 'G23', click: true, planes: ['bayA', 'bayBack', 'floor'], shellA: 0.08, beam: new THREE.Vector3(0.6, 0, -0.8) });
+    P.add({ t, p, kind: 0, speed: 4.5, w: 0.11, life: 1.6, str: 1.4, set: 'arena', shot: 'G23', click: true, planes: ['bayA', 'bayBack', 'floor'], shellA: 0.06, beam: new THREE.Vector3(0.6, 0, -0.8) });
     const pts = [[6.6, 1.3, -4.4], [8.4, 1.2, -5.15], [10.9, 1.2, -4.1], [9.2, 1.4, -3.05], [7.2, 1.0, -3.3]];
     pts.forEach(([x, y, z], k) => { const q = new THREE.Vector3(x, y, z), d = q.distanceTo(p) / 4.5;
-      for (let j = 0; j < 4; j++) P.add({ t: t + d + j * 0.16 + k * 0.03, p: q, kind: 2, speed: 2.6, w: 0.07, life: 0.9, str: 0.85 * Math.pow(0.62, j), set: 'arena', shot: 'G23' }); }); }
+      for (let j = 0; j < 4; j++) P.add({ t: t + d + j * 0.16 + k * 0.03, p: q, kind: 2, speed: 2.6, w: 0.07, life: 1.2, str: 1.4 * Math.pow(0.62, j), set: 'arena', shot: 'G23' }); }); }
   // G23 right: the passage. Nothing close answers; the sound goes on into the open hall, fainter and fainter
   { const t = B.mC[2], p = mouth(t, 'G23');
-    P.add({ t, p, kind: 0, speed: 4.5, w: 0.1, life: 2.0, str: 0.75, set: 'arena', shot: 'G23', click: true, planes: [], shellA: 0.1, beam: new THREE.Vector3(0.5, 0, 0.87) });
+    P.add({ t, p, kind: 0, speed: 4.5, w: 0.11, life: 2.4, str: 1.3, set: 'arena', shot: 'G23', click: true, planes: [], shellA: 0.07, beam: new THREE.Vector3(0.5, 0, 0.87) });
     [[7.1, 1.1, 4.0, 1.0], [9.6, 1.0, 4.4, 0.8], [12.8, 1.0, 4.6, 0.6], [16.5, 1.0, 4.8, 0.42], [21.0, 1.0, 5.0, 0.28]].forEach(([x, y, z, s]) => { const q = new THREE.Vector3(x, y, z);
-      P.add({ t: t + q.distanceTo(p) / 4.5, p: q, kind: 0, speed: 3.0, w: 0.09, life: 1.1, str: s, set: 'arena', shot: 'G23' }); }); }
+      P.add({ t: t + q.distanceTo(p) / 4.5, p: q, kind: 0, speed: 3.0, w: 0.1, life: 1.5, str: 1.7 * s, set: 'arena', shot: 'G23' }); }); }
   FILM._shot = null;
 });
 
@@ -154,10 +182,12 @@ BE_SCHEDULERS.push((app) => {
     // M2: the hall answers: from high behind, the click's shell grows through the dark hall; the walls answer late
     { id: 'M2', t0: B.m2, t1: B.m3, set: 'arena', tag: true, look: () => ac(0.025, 0.4), decay: 0.6, gain: 1.4, heroGain: 0.6, shells: false,
       cam: beMove(B.m2, B.m3, [V(21.5, 8.6, 3.6), V(0.6, 0.7, -0.7), 50], [V(20.0, 8.5, 3.3), V(0.4, 0.7, -0.6), 48], { dof: 0 }),
-      labels: (t) => [lab(V(2.5, 2.6, -10.5), '<div class="k">THE FAR WALLS ANSWER LATE</div><div class="s">≈ 65 ms · A LARGE ROOM</div>', win(t, B.mL2[0] + 1.6, B.m3, 0.4, 0.4))] },
+      labels: (t) => [lab(V(2.5, 2.6, -10.5), '<div class="k">THE SIDE WALLS ANSWER LATE</div><div class="s">≈ 64 ms · A LARGE ROOM</div>', win(t, B.mL2[0] + 1.6, B.m3, 0.4, 0.4))] },
     // M3: behind the pair, down the hall: the instructor's hand on her shoulder; the lamps go out, far end first
     { id: 'M3', t0: B.m3, t1: B.m4, set: 'arena', look: () => BE_REAL,
-      cam: beMove(B.m3, B.m4, [V(-4.6, 2.3, 2.6), V(8, 2.9, -1.2), 50], [V(-4.9, 2.45, 2.75), V(8, 3.2, -1.2), 52], { dof: 0.12, focus: (t, pos) => pos.distanceTo(hp()) }) },
+      cam: beMove(B.m3, B.m4, [V(-4.6, 2.3, 2.6), V(8, 2.9, -1.2), 50], [V(-4.9, 2.45, 2.75), V(8, 3.2, -1.2), 52], { dof: 0.12, focus: (t, pos) => pos.distanceTo(hp()) }),
+      // the lamps go out for the audience's sake: the dark changes nothing for her
+      labels: (t) => [lab(V(9, 4.6, -1.2), '<div class="k">LIGHTS OUT FOR US</div><div class="s">NOTHING CHANGES FOR HER</div>', win(t, B.m3 + 1.2, B.m4 - 0.1, 0.35, 0.35))] },
     // M4: the sweep: up from behind her, forward over the obstacle; the course from above
     { id: 'M4', t0: B.m4, t1: B.m5, set: 'arena', look: () => BE_REAL,
       cam: (t) => { const k = Ease.inOutSine(MathX.ramp(t, B.m4, B.m5)), u = Math.sin(k * Math.PI);   // a crane up behind her, the course opening out below
@@ -178,23 +208,23 @@ BE_SCHEDULERS.push((app) => {
     { id: 'M5b', t0: B.m5b, t1: B.m6, set: 'arena', tag: true, look: () => ac(0.02, 0.45), decay: 0.5, gain: 1.3, heroGain: 0.7, shells: false,
       cam: (t) => { const h = hp(); return { pos: V(h.x + 0.35, 0.42, h.z - 1.75), at: V(h.x + 1.0, 0.32, h.z), fov: 50, focus: 1.8, dof: 0 }; } },
     // M6: behind her, in the dark, as she walks toward what she cannot see
-    { id: 'M6', t0: B.m6, t1: B.m7, set: 'arena', tag: true, look: () => ac(0.018, 0.4), decay: 0.5, gain: 1.3, heroGain: 0.7, shells: false,
+    { id: 'M6', t0: B.m6, t1: B.m7, set: 'arena', tag: true, look: () => ac(0.045, 0.4), decay: 0.5, gain: 1.3, heroGain: 0.7, shells: false,
       cam: (t) => { const h = hp(); return { pos: V(h.x - 1.6, 1.78, h.z + 0.55), at: V(h.x + 4, 1.05, h.z - 0.1), fov: 52, focus: 2, dof: 0 }; } },
     // G1: click; the camera goes with the wave; the obstacle's face answers broad
-    { id: 'G1', t0: B.m7, t1: B.m7b, set: 'arena', tag: true, look: () => ac(0.02, 0.35), decay: 0.5, gain: 1.5, heroGain: 0.6, shells: false,
+    { id: 'G1', t0: B.m7, t1: B.m7b, set: 'arena', tag: true, look: () => ac(0.07, 0.45), decay: 0.95, gain: 2.0, heroGain: 0.6, shells: false,
       cam: beMove(B.mC[0] - 0.2, B.mC[0] + 1.0, [V(3.4, 1.72, 1.35), V(7.0, 1.3, 0.6), 54], [V(4.9, 1.66, 1.4), V(7.0, 1.3, 0.5), 60], { dof: 0, ease: Ease.inOutCubic }),
       labels: (t) => [lab(V(BE_ARENA.O.x - 0.1, 2.25, 0.2), '<div class="k">A BROAD, STRONG ECHO</div><div class="s">SOMETHING LARGE, CLOSE AHEAD</div>', win(t, B.mC[0] + 0.6, B.m7b, 0.25, 0.25))] },
     // G23: high behind her, both ways in frame: left, the bay rings (enclosed); right, the sound carries on (open)
     // (high above and behind her, the course as the sweep showed it: the bay on her left, the passage on her right)
-    { id: 'G23', t0: B.m7b, t1: B.m8 + 1.3, set: 'arena', tag: true, look: () => ac(0.022, 0.4), decay: 0.5, gain: 1.5, heroGain: 0.6, shells: false,
+    { id: 'G23', t0: B.m7b, t1: B.m8 + 1.3, set: 'arena', tag: true, look: () => ac(0.075, 0.5), decay: 0.95, gain: 2.0, heroGain: 0.6, shells: false,
       cam: beMove(B.m7b, B.m8 + 1.3, [V(0.5, 7.7, 0.3), V(8.2, 0.0, 0.2), 56], [V(1.3, 7.5, 0.5), V(8.4, 0.0, 0.4), 54], { dof: 0 }),
       labels: (t) => [lab(V(8.6, 1.7, -4.15), '<div class="k">ENCLOSED</div><div class="s">ECHOES CLOSE ON EVERY SIDE</div>', win(t, B.mC[1] + 0.75, B.m8 + 1.3, 0.3, 0.3)),
         lab(V(9.6, 1.7, 4.2), '<div class="k">OPEN</div><div class="s">THE SOUND CARRIES ON</div>', win(t, B.mC[2] + 0.75, B.m8 + 1.3, 0.25, 0.25))] },
     // G4: from the open side of the passage: she turns, the cane finds the obstacle's end, she comes through;
     // G4r: the same move, the picture back (the route was hers before the light was)
     { id: 'G4', t0: B.m8 + 1.3, t1: B.mRet, set: 'arena', tag: true, cam: (t) => g4cam(t),
-      look: (t) => ac(MathX.lerp(0.025, 0.3, MathX.smooth(t, B.mThru[0] - 0.2, B.mRet)), MathX.lerp(0.62, 0.8, MathX.smooth(t, B.mThru[0] - 0.2, B.mRet))),
-      decay: 0.5, gain: 1.4, heroGain: 0.7, shells: false,
+      look: (t) => ac(MathX.lerp(0.07, 0.3, MathX.smooth(t, B.mThru[0] - 0.2, B.mRet)), MathX.lerp(0.62, 0.8, MathX.smooth(t, B.mThru[0] - 0.2, B.mRet))),
+      decay: 0.8, gain: 1.8, heroGain: 0.7, shells: false,
       labels: (t) => [lab(V(BE_ARENA.O.x, 0.75, BE_ARENA.O.z1), '<div class="k">THE CANE CONFIRMS THE EDGE</div>', win(t, B.mTap + 0.05, B.mRet, 0.2, 0.2))] },
     { id: 'G4r', t0: B.mRet, t1: B.s13, set: 'arena', look: () => BE_REAL, cam: (t) => g4cam(t) },
   ];

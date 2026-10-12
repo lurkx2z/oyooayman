@@ -92,10 +92,13 @@ function beHeroS3(H, t, set) {
 (function () {
   const V = (x, y, z) => new THREE.Vector3(x, y, z), B = BE;
   const head = () => FILM._app.sets.apt.hero2.worldOf('hd').add(V(0, 0.06, 0));
-  const hallDim = (k = 1) => ({ ac: 1, world: 0.0, hero: 0.16 * k, glow: 0.05 });
+  const hallDim = (k = 1) => ({ ac: 1, world: 0.022, hero: 0.16 * k, glow: 0.05 });   // the hall a bare ghost (it is there; she cannot see it)
   const S = [
     { id: 'C1', t0: B.s3, t1: B.every, set: 'apt', look: () => BE_REAL,
-      cam: (t) => { const h = head(), k = Ease.inOutSine(MathX.ramp(t, B.s3, B.every)); return { pos: V(h.x + 0.62 - 0.1 * k, h.y + 0.02, h.z - 0.42 + 0.06 * k), at: h, fov: 32, focus: 0.75, dof: 1.0 }; } },
+      cam: (t) => {   // the lit hallway first (the space the echoes will describe), then in to her face for the click
+        const h = head(), k = Ease.inOutSine(MathX.ramp(t, B.s3, B.every)), w = Ease.outCubic(MathX.ramp(t, B.s3, B.listen - 0.1));
+        const close = V(h.x + 0.62 - 0.1 * k, h.y + 0.02, h.z - 0.42 + 0.06 * k), wide = V(h.x + 2.6, h.y + 0.2, h.z + 0.35);
+        const pos = wide.lerp(close, w); return { pos, at: h, fov: MathX.lerp(52, 32, w), focus: pos.distanceTo(h), dof: MathX.lerp(0.2, 1.0, w) }; } },
     // the same click, slowed: side-on, the hall's width across the frame; her figure dim, the fronts bright
     { id: 'C2', t0: B.every, t1: B.awall, set: 'apt', tag: true, clock: BE_C3CLOCK, decay: 0.0004, gain: 1.4, heroGain: 1.0,
       look: (t) => Object.assign(hallDim(), { hero: 0.16 + 0.1 * MathX.smooth(t, B.reflects, B.reflects + 1) }),
@@ -135,7 +138,7 @@ function beSchedule3(app) {
   for (const W of set.hallWalls.slice(0, 2)) { const d = m0.clone().sub(W.p).dot(W.n); P.add({ t: 0, p: m0.clone().addScaledVector(W.n, -2 * d), kind: 0, speed: 343, w: 0.06, life: 1, str: 0.6, set: 'apt', clock: 'c3', echo: true }); }
   set._c3mouth = m0;
   // C4: three surfaces (visual speed 2.6 m/s: slowed ≈ 130×)
-  for (const [sh, t] of [['C4a', B.awall + 0.05], ['C4b', B.adoor + 0.04], ['C4c', B.afurn + 0.04]]) P.add({ t, p: mouthAt(t + 0.01), kind: 0, speed: 4.2, w: 0.08, life: 2, str: 1.5, set: 'apt', shot: sh });
+  for (const [sh, t] of [['C4a', B.awall + 0.05], ['C4b', B.adoor + 0.04], ['C4c', B.afurn + 0.04]]) P.add({ t, p: mouthAt(t + 0.01), kind: 0, speed: 4.2, w: 0.1, life: 2.4, str: 2.5, set: 'apt', shot: sh });
   // C6/C7: clicks while she walks
   for (const t of B.clicks3) { const m = mouthAt(t + 0.01); for (const sh of ['C6', 'C7']) P.add({ t, p: m, kind: 0, speed: 3.2, w: 0.08, life: 2.6, str: 1.2, set: 'apt', shot: sh }); }
   // C8: from above (the hall, the doorways, the bookcase)
@@ -154,14 +157,14 @@ function beFx3(app, set, t, shot) {
 }
 
 // SCIENCE (C5): the three echo signatures, drawn as what a microphone at her ear would record after one click
-// (amplitude vs time, 0–20 ms). Wall 1.7 m away: one clean return at 2·1.7/343 ≈ 9.9 ms. Open doorway: the sound
+// (amplitude vs time, 0–20 ms). Wall 0.7 m away (the one she clicked at): one clean return at 2·0.7/343 ≈ 4.1 ms, then its flutter (8.2, 12.3 ms). Open doorway: the sound
 // passes through; only weak, late returns from the room beyond. Bookcase ≈ 1 m: many small returns spread over a few
 // ms (shelves, books at different depths). Illustrative shapes; the delays follow from the distances.
 function beDrawSignatures(cv, k) {
   const x = cv.getContext('2d'), W = cv.width, H = cv.height;
   x.clearRect(0, 0, W, H);
   x.fillStyle = 'rgba(4, 8, 14, 0.92)'; x.fillRect(0, 0, W, H);
-  const rows = [['A WALL', '#62f3ff', (ms) => 0.95 * Math.exp(-Math.pow((ms - 9.9) / 0.18, 2)) + 0.25 * Math.exp(-Math.pow((ms - 15.6) / 0.25, 2))],
+  const rows = [['A WALL', '#62f3ff', (ms) => 0.95 * Math.exp(-Math.pow((ms - 4.1) / 0.18, 2)) + 0.3 * Math.exp(-Math.pow((ms - 8.2) / 0.22, 2)) + 0.1 * Math.exp(-Math.pow((ms - 12.3) / 0.25, 2))],
     ['A DOORWAY', '#7a5cff', (ms) => 0.12 * Math.exp(-Math.pow((ms - 17.5) / 0.6, 2)) + 0.08 * Math.exp(-Math.pow((ms - 19.2) / 0.5, 2))],
     ['A BOOKCASE', '#ffb05a', (ms) => { let v = 0; const r = new RNG(9); for (let i = 0; i < 14; i++) { const c = 5.6 + r.range(0, 3.2), a = r.range(0.15, 0.5) * Math.exp(-(c - 5.6) / 3); v += a * Math.exp(-Math.pow((ms - c) / 0.09, 2)); } return v; }]];
   const x0 = 520, x1 = 1680, msMax = 20, rowH = 230, top = 170;

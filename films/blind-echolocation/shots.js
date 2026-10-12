@@ -25,7 +25,8 @@ function beCollapse(t) {
   const k = MathX.smooth(t, BE.dark0, BE.dark1);
   return {
     ac: MathX.smooth(t, BE.dark0, BE.dark0 + 0.35),
-    world: MathX.lerp(1, 0.07, Ease.outCubic(k)) * (1 - MathX.smooth(t, BE.sun - 0.4, BE.colors + 0.3) * 0.95),
+    // …and on "your room hasn't disappeared" the room's shape comes back, barely (about 1 %): it is still there, around her
+    world: MathX.lerp(1, 0.07, Ease.outCubic(k)) * (1 - MathX.smooth(t, BE.sun - 0.4, BE.colors + 0.3) * 0.95) + 0.011 * MathX.smooth(t, BE.room - 0.2, BE.room + 1.4),
     glow: MathX.lerp(1, 0.4, k) * (1 - MathX.smooth(t, BE.dark1, BE.sun)),
     hero: MathX.lerp(1, 0.22, k) * (1 - MathX.smooth(t, BE.hands - 1.0, BE.hands)),
   };
@@ -41,7 +42,7 @@ const BE_SHOTS = [
   // A2 — the impact from above: the wave leaves the phone on the floor and sweeps the room (bed, dresser, walls, her);
   //      the phone skids under the dresser, a trail of small contacts
   //      (a plan view through the ceiling, like a cut-away model: the clearest picture of where the echoes go)
-  { id: 'A2', t0: BE.wide1, t1: BE.back1, set: 'apt', tag: true, plan: true, decay: 1.1, gain: 1.8, heroGain: 1.2,
+  { id: 'A2', t0: BE.wide1, t1: BE.back1, set: 'apt', tag: 'CUT-AWAY · WHERE THE SOUND GOES · SLOWED', plan: true, decay: 1.1, gain: 1.8, heroGain: 1.2,
     cam: beMove(BE.wide1, BE.back1, [_beV(-0.1, 5.4, 1.5), _beV(-0.3, 0, -0.25), 44], [_beV(-0.4, 4.7, 1.25), _beV(-0.6, 0, -0.4), 44], { dof: 0, ease: Ease.outSine }),
     look: () => BE_DARK },
   // A3 — back in first person: she turns toward the sound under the dresser; the phone still buzzes there
