@@ -169,7 +169,7 @@ const GB_SHOTS = [
     cam: gbMove(GB.fount, GB.rules, [_gbV(-1.0, 1.15, -9.4), _gbV(-1.5, 1.3, -13.5), 38], [_gbV(1.3, 1.6, -7.4), _gbV(-1.5, 1.4, -13.5), 44], { dof: 0.25 }) },
   // H5 — "Gravity has changed the rules": people against the café wall and slumped on the bench (a pan)
   { id: 'H5', t0: GB.rules, t1: GB.s9, outside: true, rim: 1.1,
-    cam: gbMove(GB.rules, GB.s9, [_gbV(-0.6, 1.35, -6.6), _gbV(-2.4, 1.0, -4.2), 40], [_gbV(-0.2, 1.35, -6.9), _gbV(3.0, 0.85, -9.0), 42], { dof: 0.25 }) },
+    cam: gbMove(GB.rules, GB.s9, [_gbV(0.6, 1.5, -7.6), _gbV(-2.3, 1.05, -4.2), 40], [_gbV(0.8, 1.45, -7.4), _gbV(3.0, 0.85, -9.0), 42], { dof: 0.25 }) },
   // ================= SCENE 9 — no narration: three connected moments
   // I1 — she pushes the bicycle up the gentle ramp (tracking beside her, low)
   { id: 'I1', t0: GB.s9, t1: GB.s9b, outside: true, rim: 1.1,
@@ -183,20 +183,20 @@ const GB_SHOTS = [
     cam: gbMove(GB.s9b, GB.s9c, [_gbV(0.5, 0.75, -9.0), _gbV(-1.5, 0.9, -13.5), 44], [_gbV(0.8, 1.05, -8.7), _gbV(-1.6, 0.9, -13.6), 48], { dof: 0.15 }) },
   // I3 — him at the edge of the square, a hand on a bollard, watching (over his shoulder, then his face)
   { id: 'I3', t0: GB.s9c, t1: GB.s10, outside: true, rim: 1.1,
-    cam: gbMove(GB.s9c, GB.s10, [_gbV(1.6, 1.6, -5.4), _gbV(-1.0, 1.0, -11.0), 40], [_gbV(0.3, 1.5, -6.9), _gbV(1.05, 1.5, -6.1), 38], { dof: 0.4 }) },
+    cam: gbMove(GB.s9c, GB.s10, [_gbV(2.4, 1.85, -5.0), _gbV(0.0, 1.1, -9.0), 42], [_gbV(1.6, 1.55, -7.3), _gbV(1.05, 1.5, -6.1), 38], { dof: 0.4 }) },
   // ================= SCENE 10 — the bigger question
   // J1 — the wide: the whole square, people stopped; a slow crane up
   { id: 'J1', t0: GB.s10, t1: GB.sky, outside: true, rim: 1.15,
     cam: gbMove(GB.s10, GB.sky, [_gbV(6.0, 1.6, -5.4), _gbV(-1.0, 1.0, -12.0), 48], [_gbV(6.6, 3.0, -4.8), _gbV(-1.2, 0.8, -12.5), 50], { dof: 0.1 }) },
   // J2 — him looking at the skyline: low, behind his shoulder, the towers beyond
   { id: 'J2', t0: GB.sky, t1: GB.eng, outside: true, rim: 1.15,
-    cam: gbMove(GB.sky, GB.eng, [_gbV(-3.5, 1.2, -9.0), _gbV(-4.1, 2.6, -16), 44], [_gbV(-3.6, 1.0, -9.3), _gbV(-4.2, 3.0, -16), 42], { dof: 0.2 }) },
+    cam: gbMove(GB.sky, GB.eng, [_gbV(-3.0, 1.35, -8.5), _gbV(-4.1, 2.6, -16), 46], [_gbV(-3.1, 1.2, -8.7), _gbV(-4.2, 3.0, -16), 44], { dof: 0.2 }) },
   // J3 — "Some systems…": the engineer under the loaded balcony, torch on the bracket's gauge (low angle)
   { id: 'J3', t0: GB.eng, t1: GB.back10, outside: true, rim: 1.1, gaugeTag: true,
-    cam: gbMove(GB.eng, GB.back10, [_gbV(-6.2, 1.0, -6.9), _gbV(-7.9, 2.8, -4.7), 46], [_gbV(-6.4, 1.1, -6.6), _gbV(-7.85, 2.95, -4.6), 40], { dof: 0.3 }) },
+    cam: gbMove(GB.eng, GB.back10, [_gbV(-5.5, 1.0, -7.7), _gbV(-7.6, 2.1, -5.0), 50], [_gbV(-5.7, 1.05, -7.5), _gbV(-7.7, 2.3, -4.9), 46], { dof: 0.3 }) },
   // J4 — "The real question…": back to him, his face
   { id: 'J4', t0: GB.back10, t1: GB.s11, outside: true, rim: 1.1,
-    cam: gbMove(GB.back10, GB.s11, [_gbV(-4.0, 1.5, -11.4), _gbV(-3.9, 1.5, -10.2), 38], [_gbV(-4.0, 1.55, -11.15), _gbV(-3.9, 1.52, -10.2), 34], { dof: 0.6 }) },
+    cam: gbMove(GB.back10, GB.s11, [_gbV(-4.0, 1.5, -11.4), _gbV(-3.9, 1.5, -10.2), 38], [_gbV(-4.0, 1.55, -11.15), _gbV(-3.9, 1.52, -10.2), 34], { dof: 0.35 }) },
   // ================= SCENE 11 — no narration: the silent reveal
   // K1 — people helping each other: the shopper pulls the jogger to her feet
   { id: 'K1', t0: GB.s11, t1: GB.help[0] + 3.3, outside: true, rim: 1.15,
@@ -207,7 +207,7 @@ const GB_SHOTS = [
   // ================= SCENE 12 — the final question
   // L1 — from behind him, across the square to the skyline; a slow rise and pull back; the fade after the last word
   { id: 'L1', t0: GB.s12, t1: GB.end + 1, outside: true, rim: 1.2,
-    cam: gbMove(GB.s12, GB.end, [_gbV(-3.75, 1.65, -8.9), _gbV(-4.2, 1.7, -14), 40], [_gbV(-3.2, 2.6, -7.2), _gbV(-4.4, 2.2, -16), 46], { dof: 0.12 }) },
+    cam: gbMove(GB.s12, GB.end, [_gbV(-3.6, 1.85, -8.9), _gbV(-4.2, 1.5, -14), 42], [_gbV(-3.0, 2.6, -7.6), _gbV(-4.4, 2.0, -16), 48], { dof: 0.12 }) },
 ];
 
 function gbShotAt(t) { for (const s of GB_SHOTS) if (t >= s.t0 && t < s.t1) return s; return GB_SHOTS[GB_SHOTS.length - 1]; }
