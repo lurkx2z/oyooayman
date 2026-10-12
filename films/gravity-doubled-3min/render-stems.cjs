@@ -2,7 +2,7 @@
    RENDER STEMS — renders each stem of a v2/v3 soundtrack ON ITS OWN (audio-v2.js / audio-v3.js `solo`), ducked and shaped
    as in the film but at 0 dB stem gain, and writes them as 32-bit float WAVs (48 kHz stereo). mix-stems.py measures,
    levels, sums and masters them.
-     NODE_PATH=$(npm root -g) node films/gravity-doubled-narrated/render-stems.cjs <out_dir> [voice,music,amb,foley,sfx] [--raw] [--page gravity-doubled-narrated-v3.html]
+     NODE_PATH=$(npm root -g) node films/gravity-doubled-3min/render-stems.cjs <out_dir> [voice,music,amb,foley,sfx] [--raw] [--page gravity-doubled-narrated-v3.html]
    --raw renders without the ducking and the dynamics map (for the before/after analysis). "mix" renders the page's own
    live mix. The page defaults to gravity-doubled-narrated-v2.html.
    ===================================================================== */
@@ -15,7 +15,7 @@ const OUT = path.resolve(process.argv[2] || '.');
 const STEMS = (process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : 'voice,music,amb,foley,sfx').split(',');
 const RAW = process.argv.includes('--raw');
 const ROOT = path.resolve(__dirname, '..', '..');
-const PAGE = process.argv.includes('--page') ? process.argv[process.argv.indexOf('--page') + 1] : 'gravity-doubled-narrated-v2.html';
+const PAGE = process.argv.includes('--page') ? process.argv[process.argv.indexOf('--page') + 1] : 'gravity-doubled-3min.html';
 
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });

@@ -4,8 +4,8 @@
                      shots and cuts, story beats, sound cues, the measured drop physics, the speech-free sections
      subtitles.srt   one cue per phrase, exactly when the narrator says it (same timing the page shows)
      subtitles.vtt   the same, with per-word timestamps
-     NODE_PATH=$(npm root -g) node films/gravity-doubled-narrated/export-deliverables.cjs <out_dir>
-   Everything comes from the page (window.GN / GB / GB_CUES / GB_SHOTS / the drop rig), so it always matches the film.
+     NODE_PATH=$(npm root -g) node films/gravity-doubled-3min/export-deliverables.cjs <out_dir>
+   Everything comes from the page (window.GN / GB / GB_SHOTS / the drop rig), so it always matches the film.
    ===================================================================== */
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -13,7 +13,7 @@ const path = require('path');
 
 const OUT = path.resolve(process.argv[2] || '.');
 const ROOT = path.resolve(__dirname, '..', '..');
-const PAGE = 'gravity-doubled-narrated.html';
+const PAGE = 'gravity-doubled-3min.html';
 
 const ts = (t, sep) => {
   const ms = Math.round(t * 1000), h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60, r = ms % 1000;
@@ -31,14 +31,14 @@ const ts = (t, sep) => {
     const beats = {}; for (const k in GB) beats[k] = Array.isArray(GB[k]) ? GB[k].map(r3) : r3(GB[k]);
     const app = FILM._app;
     return {
-      title: 'What If Gravity Doubled? (narrated film test)', duration: r3(CONFIG.duration), fps: 30, width: 1920, height: 1080,
+      title: 'What If Gravity Doubled? Episode 01: The Day Everything Became Heavy', duration: r3(CONFIG.duration), fps: 30, width: 1920, height: 1080,
       voice: { id: GN.voice, name: 'Charlie', model: GN.model },
       narration: GN.clips.map((c) => ({ id: c.id, file: 'narration/' + c.file, text: c.text, start: c.start, end: c.end, speechEnd: c.speechEnd, seconds: c.seconds, lufsRaw: c.lufs, gainDb: c.gainDb, words: c.words })),
       subtitles: GN.phrases.map((P) => ({ clip: P.clip, show: P.show, hide: P.hide, text: P.tokens.map((t) => t.text).join(' '), words: P.tokens })),
       shots: GB_SHOTS.map((s) => ({ id: s.id, start: r3(Math.max(0, s.t0)), end: r3(Math.min(CONFIG.duration, s.t1)), outside: !!s.outside, experiment: !!s.exp })),
       beats,
-      soundCues: GB_CUES.map(([t, id, what]) => ({ t: r3(t), id, what })),
-      drop: { height_m: GB_DROP.h, lanes: app.drop.lanes.map((o) => ({ id: o.L.id, g_ms2: o.L.g, landT_s: r3(o.landT), impact_ms: r3(o.vImpact), release_film_s: r3(GB.drop), impact_film_s: r3(GB.drop + o.landT) })) },
+      scenes: SCRIPT.events.map((e) => ({ t: r3(e.time), id: e.id, label: e.label })),
+      drop: { height_m: GB_DROP.h, ball: { diameter_m: 2 * GB_DROP.r, mass_kg: GB_DROP.mass, restitution: GB_DROP.e }, lanes: app.drop.lanes.map((o) => ({ id: o.L.id, g_ms2: o.L.g, landT_s: r3(o.landT), impact_ms: r3(o.vImpact), energy_J: r3(o.energy), release_film_s: r3(GB.drop), impact_film_s: r3(GB.drop + o.landT), bounces_s: gbBallPath(o.L.g, 5).hits.map((h) => r3(h.t)) })) },
       car: { sag1g_m: GB_CAR.sag1, tyre1g_m: GB_CAR.tyre1, extraDropAt2g_m: r3(GB_CAR.sag1 + GB_CAR.tyre1), rideFreq_Hz: GB_CAR.freq },
     };
   });

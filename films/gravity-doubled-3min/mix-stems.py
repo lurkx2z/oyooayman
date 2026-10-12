@@ -29,7 +29,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 STEMS = ['voice', 'music', 'amb', 'foley', 'sfx']
 NAMES = {'voice': 'Narration', 'music': 'Music', 'amb': 'Ambience', 'foley': 'Movement (foley)', 'sfx': 'Physics / impacts'}
 COL = {'voice': (120, 200, 255), 'music': (255, 190, 110), 'amb': (120, 220, 150), 'foley': (230, 140, 230), 'sfx': (255, 110, 100), 'mix': (240, 240, 240), 'v1': (110, 110, 110), 'v2': (200, 150, 90)}
-MIXJS = os.path.join(HERE, 'mix-v2.js')   # set from --mix in main()
+MIXJS = os.path.join(HERE, 'mix.js')   # set from --mix in main()
 KW = 'highshelf=f=1681.97:g=4.0:width_type=q:width=0.7071,highpass=f=38.14:width_type=q:width=0.5'
 VO_TARGET = -16.0                     # the narrator's loudness in its spoken windows, before mastering
 REL = {'music': -3.5, 'amb': -10.0, 'foley': -5.0, 'sfx': 1.0}   # targets relative to the narrator (LU), see LEVEL above
@@ -153,7 +153,7 @@ def main():
     sdir, tlp, out = a[0], a[1], a[2]
     global MIXJS
     if '--mix' in a: MIXJS = os.path.join(HERE, a[a.index('--mix') + 1])
-    NAME = a[a.index('--name') + 1] if '--name' in a else 'v2'
+    NAME = a[a.index('--name') + 1] if '--name' in a else '3min'
     refs = [a[i + 1].split('=', 1) for i, k in enumerate(a) if k == '--ref'] + ([['v1', a[a.index('--v1') + 1]]] if '--v1' in a else [])
     os.makedirs(out, exist_ok=True)
     TL = json.load(open(tlp)); B = TL['beats']; DUR = TL['duration']
@@ -168,24 +168,27 @@ def main():
     for c in TL['narration']: free.append((prev, onset[c['id']])); prev = c['speechEnd']
     free.append((prev, DUR))
     big_free = [(s, e) for s, e in free if e - s >= 2.0]          # the real silent sequences (not the 0.66 s before the first word)
+    lanes = {l['id']: l for l in TL['drop']['lanes']}
+    sl = lambda te: B['replay'] + (te - B['replayFrom']) / B['replayRate']
     events = {   # name: (t0, t1, stem) — the moments whose loudness we check
         'Gravity doubles (the room settles)': (B['g'], B['g'] + 0.6, 'sfx'),
-        'Fingers on the handle': (B['grip'], B['grip'] + 0.3, 'sfx'),
+        'First set-down (too fast)': (B['cupDown1'] - 0.05, B['cupDown1'] + 0.4, 'sfx'),
         'The cup sticks, then scrapes free': (B['lift'], B['lift'] + 0.6, 'sfx'),
         '★ Cup set down on the saucer': (B['down'] - 0.05, B['down'] + 0.45, 'sfx'),
         'Clamps open': (B['drop'] - 0.02, B['drop'] + 0.2, 'sfx'),
-        '★ 2 g cup smashes (0.32 s)': (B['drop'] + 0.30, B['drop'] + 0.42, 'sfx'),
-        '★ 1 g cup smashes (0.45 s)': (B['drop'] + 0.44, B['drop'] + 0.75, 'sfx'),
-        'Replay: slowed 2 g hit': (B['replay'] + (0.319 - B['replayFrom']) / B['replayRate'] - 0.05, B['replay'] + (0.319 - B['replayFrom']) / B['replayRate'] + 0.6, 'sfx'),
-        'He drops back onto the bench': (B['rise1'][0] + 1.5, B['rise1'][0] + 2.0, 'sfx'),
-        'Palm on the car / springs': (B['rise2'][0] - 0.1, B['rise2'][0] + 0.8, 'sfx'),
+        '★ 2 g ball lands (0.32 s)': (lanes['g2']['impact_film_s'], lanes['g2']['impact_film_s'] + 0.12, 'sfx'),
+        '★ 1 g ball lands (0.45 s)': (lanes['g1']['impact_film_s'], lanes['g1']['impact_film_s'] + 0.12, 'sfx'),
+        'Replay: slowed 2 g hit': (sl(lanes['g2']['landT_s']) - 0.05, sl(lanes['g2']['landT_s']) + 0.6, 'sfx'),
+        'Chair slides back (standing up)': (B['stand'][0] - 0.55, B['stand'][0] + 0.3, 'sfx'),
+        '★ First stair, under his weight': (B['step1'][0] + 0.6, B['step1'][0] + 1.2, 'sfx'),
+        'Bicycle set down': (B['lift2'][1] + 0.3, B['lift2'][1] + 0.7, 'sfx'),
         'Effort grunt (cup lift)': (B['lift'], B['lift'] + 1.1, 'foley'),
         'Relief breath': (B['letGo'], B['letGo'] + 1.2, 'foley'),
-        'Effort grunt (standing up)': (B['rise2'][0], B['rise2'][0] + 1.5, 'foley'),
-        '★ The heavy step': (B['step'][0] + 0.8, B['step'][0] + 1.2, 'foley'),
-        'Passer-by gasps': (B['world'] + 1.2, B['world'] + 1.9, 'foley'),
+        'Effort grunt (standing up)': (B['stand'][0] + 0.4, B['stand'][0] + 2.0, 'foley'),
+        'Effort grunt (first stair)': (B['step1'][0], B['step1'][0] + 1.6, 'foley'),
+        'The pull (helping her up)': (B['help'][0] + 0.8, B['help'][0] + 2.6, 'foley'),
     }
-    marks = [(B['g'], 'g'), (B['down'], 'cup down'), (B['drop'], 'drop'), (B['replay'], 'replay'), (B['out'], 'outside'), (B['rise2'][0], 'push'), (B['step'][0] + 0.85, 'step'), (B['pull'], 'end')]
+    marks = [(B['g'], 'g'), (B['down'], 'cup'), (B['s3'], 'S3'), (B['drop'], 'drop'), (B['s6'], 'S6'), (B['s7'], 'stairs'), (B['out'], 'outside'), (B['s9'], 'S9'), (B['s10'], 'S10'), (B['s11'], 'S11'), (B['s12'], 'S12')]
 
     # ---------------------------------------------------------------- 1. analyse
     X, K = {}, {}
@@ -289,9 +292,8 @@ def main():
         ev[name] = {'stem': s, 'stem_momentary_max': round(float(lu(ms).max()), 1), 'mix_momentary_max': round(float(lu(msm2).max()), 1), 'mix_peak_dBFS': round(peak_db(y[int(a0 * SR):int(b0 * SR)]), 1)}
     # punch: how far each key impact rises above the sound just before it (the loudest 50 ms block in the first 0.2 s
     # of the hit, against the 1 s that ends 50 ms before it). Same measure for the reference mixes.
-    lanes = {l['id']: l['impact_film_s'] for l in TL['drop']['lanes']}
-    hits = {'Gravity doubles': B['g'], 'Cup set down': B['down'], 'Clamps open': B['drop'], '2 g cup smashes': lanes['g2'], '1 g cup smashes': lanes['g1'],
-            'He drops back onto the bench': B['rise1'][0] + 1.58, 'Palm on the car': B['rise2'][0] - 0.05, 'The heavy step': B['step'][0] + 0.85}
+    hits = {'Gravity doubles': B['g'], 'Cup set down': B['down'], 'Clamps open': B['drop'], '2 g ball lands': lanes['g2']['impact_film_s'], '1 g ball lands': lanes['g1']['impact_film_s'],
+            'First stair': B['step1'][0] + 0.7, 'Bicycle set down': B['lift2'][1] + 0.35}
     def punch(zk, t):
         _, mh = blocks(zk, 0.05, 0.005, t - 0.02, t + 0.25); bed = integrated(zk, [(max(0, t - 1.05), t - 0.05)]) if t > 1.2 else float('nan')
         _, mb = blocks(zk, 1.0, 1.0, max(0, t - 1.05), t - 0.05)

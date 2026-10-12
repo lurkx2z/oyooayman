@@ -1,25 +1,16 @@
 /* =====================================================================
-   AUDIO v3 — "What If Gravity Doubled?" — the dynamic mix (gravity-doubled-narrated-v3.html). The picture is the same
-   film as v1 and v2; only the sound changes. js/audio/audioEngine.js is unchanged (this is a subclass).
-   v3 = v2's sound design and balance (audio-v2.js, kept unchanged for v2) plus:
-     - a DYNAMICS MAP (mix-v3.js `dyn`): per-stem level automation that leaves room before the hits and builds where the
-       action builds: a breath-in before gravity doubles, a hush before the cup touches down, near silence before the
-       clamps open, a crescendo through the stand-up to his step, a fade with the last picture;
-     - the score shaped to it: a heartbeat-like pulse under the end of line C, cut to silence before the drop;
-     - storytelling in the room: the square outside goes quiet after the doubling and the birds fall silent; a spoon
-       stirring and a newspaper before it; the plaza sound starts before the cut outside (a J-cut);
-     - fuller impacts: the smash gets a dense crunch of micro-fractures, the set-down a soft weight through the table;
-     - breath that moves (turbulent airflow) with less synthetic voice in the effort sounds.
-   FIVE STEMS, kept separate until the final export (mix-stems.py measures each one, rendered alone with `audio.solo = '<stem>'`):
-     voice  the five ElevenLabs clips (never regenerated), levelled per clip, a presence lift, an even compressor
-     music  an original score in F: felt piano, string pads, pizzicato, a few bells and a felt drum, scored to the action
-     amb    the café (room tone, the espresso machine, the square through the glass) and the plaza (wind, the fountain,
-            birds, pigeons, a distant murmur)
-     foley  character movement: clothes, breath and effort, hands, shoes, the passer-by's bag, the jogger
-     sfx    physics and impacts: ceramic (modal synthesis), chairs, the bench, the car's springs, the drop and its shards
-   Ducking is driven by the real word times (window.GN): each stem dips by its own amount under every spoken window with
-   a smooth attack (≈0.22 s, starting just before the first word) and release (≈0.8 s after the last). Levels and duck
-   depths live in mix-v3.js. Every sound is synthesised from seeded noise and maths: a pure function of time.
+   AUDIO — "What If Gravity Doubled? Episode 01" (3-minute film). js/audio/audioEngine.js is unchanged (this is a subclass).
+   Built on the narrated test's v3 dynamic mix (films/gravity-doubled-narrated/audio-v3.js): the same DSP, the same five
+   stems and the same ducking, with the sound design written for this film's twelve scenes:
+     voice  the seven ElevenLabs clips (never regenerated), levelled per clip, each faded out 0.3 s after its last word
+     music  an original score in F, scored scene by scene: sparse under the narrator, carrying the five silent scenes
+     amb    the café (room tone, machine, the regulars, a clock after the change, the square through the glass) and the
+            plaza (wind, the fountain, birds, pigeons, leaves, a murmur, far heavy steps)
+     foley  breath, effort, clothes, hands: the hero, the climber, the cyclist, the shopper and the jogger
+     sfx    physics: the doubling, the cup, the hologram, the ceramic balls on their pads (every impact at its computed
+            time, bounces included), chairs, stair treads, the rail, the bicycle, the freewheel, the balcony bracket
+   Ducking follows the real word times (window.GN); the DYNAMICS MAP (mix.js `dyn`) leaves room before the hits and builds
+   where the action builds. Every sound is synthesised from seeded noise and maths: a pure function of time.
    ===================================================================== */
 
 const GB_STEMS = ['voice', 'music', 'amb', 'foley', 'sfx'];
@@ -53,10 +44,11 @@ function gbDuckCurve(depth, M, wins, end, rate) {
   for (let i = 0; i < n; i++) c[i] = Math.pow(10, gbDuckDb(i / rate, depth, M, wins) / 20);
   return c;
 }
-// the dynamics map (mix-v3.js dyn): a beat name → film time. GB keys ('drop', 'step[0]') or a line's first/last word ('C<', 'C>')
+// the dynamics map (mix.js dyn): a beat name → film time. GB keys ('drop', 'step1[0]') or a narration clip's first/last
+// word ('N4<', 'N4>': clip s04's first word, its last word's end)
 function gbBeat(name) {
-  const m = /^([A-E])([<>])$/.exec(name);
-  if (m) { const c = GN.clips.find((x) => x.id[0] === m[1].toLowerCase()); return m[2] === '<' ? c.words[0].start : c.speechEnd; }
+  const m = /^N(\d+)([<>])$/.exec(name);
+  if (m) { const c = GN.clips.find((x) => x.id.startsWith('s' + m[1].padStart(2, '0'))); return m[2] === '<' ? c.words[0].start : c.speechEnd; }
   const k = /^(\w+)(?:\[(\d)\])?$/.exec(name), v = GB[k[1]];
   if (v == null) throw new Error('dyn: unknown beat ' + name);
   return k[2] != null ? v[+k[2]] : v;
@@ -358,11 +350,47 @@ class GbFx {
   }
 }
 
+// ---- extra generators for this film
+Object.assign(GbFx.prototype, {
+  // a footstep on wooden boards or a stair tread: a soft heel knock through the board's modes, a creak if it is loaded
+  woodStep(o = {}) {
+    const sr = this.sr, r = this.r, w = o.weight || 0.6, y = this.arr(0.7);
+    GBX.strike(y, 0, Math.round(0.003 * sr), 0.9 * w, this.woodModes(o.f || r.range(95, 130), 1.6), sr);
+    for (let i = 0; i < 0.3 * sr; i++) y[i] += 0.45 * w * Math.sin(2 * Math.PI * (o.body || 72) * i / sr) * Math.exp(-i / (0.05 * sr)) * Math.min(1, i / (0.003 * sr));
+    GBX.strike(y, Math.round(r.range(0.07, 0.1) * sr), Math.round(0.0015 * sr), 0.3 * w, this.woodModes(r.range(170, 220)), sr);
+    if (o.creak) { const c = this.creak(r.range(0.25, 0.45), [[r.range(150, 190), 0.02, 1], [r.range(380, 430), 0.012, 0.6], [r.range(760, 860), 0.008, 0.3]], { rate: [14, 40] }); for (let i = 0; i < c.length && i + 0.04 * sr < y.length; i++) y[i + Math.round(0.04 * sr)] += c[i] * o.creak; }
+    if (o.scuff) { const sc = this.rustle(0.2, { density: 500, rub: 0.5, lo: 800, hi: 4000, grain: 0.006 }); for (let i = 0; i < sc.length; i++) y[i] += sc[i] * o.scuff; }
+    return y;
+  },
+  // the ceramic ball landing on its rubber pad (over a steel plate): a dull "dok" of the pad and plate, the glazed ball's
+  // own short ring, a little rubber squeak. o.v impact speed (m/s); o.slow stretches it for the replay (and lowers it)
+  ballHit(o = {}) {
+    const sr = this.sr, slow = o.slow || 1, P = o.pitch || 1, vr = o.v / 4.43, y = this.arr(0.9 * slow);
+    const st = (m) => m.map(([f, tau, a]) => [f * P, tau * Math.pow(slow, 0.7), a]);
+    GBX.strike(y, 0, Math.round(0.0012 * slow * sr), 0.9 * vr, st([[165, 0.06, 1], [260, 0.045, 0.6], [410, 0.03, 0.4], [690, 0.018, 0.25]]), sr);   // pad + plate
+    GBX.strike(y, 0, Math.round(0.0005 * slow * sr), 0.28 * vr, st([[3420, 0.05, 1], [5100, 0.035, 0.55], [7900, 0.02, 0.35]]), sr);                    // the ball rings
+    GBX.strike(y, 0, Math.round(0.0025 * slow * sr), 0.5 * vr, st(this.metalModes(520, 0.35)), sr);                                                // the stand's base plate
+    for (let i = 0; i < 0.12 * slow * sr; i++) y[i] += 0.5 * vr * Math.sin(2 * Math.PI * 58 * P * i / sr) * Math.exp(-i / (0.04 * slow * sr)) * Math.min(1, i / (0.002 * sr));
+    return y;
+  },
+  // a short synthetic shimmer (the hologram): high partials fading in and out, gently detuned
+  shimmer(dur, f0, o = {}) {
+    const sr = this.sr, n = Math.ceil(dur * sr), y = this.arr(dur), r = this.r;
+    for (const k of [1, 1.5, 2, 3, 4]) {
+      const f = f0 * k * r.range(0.997, 1.003), a = 1 / k;
+      for (let i = 0; i < n; i++) { const t = i / sr, u = t / dur; y[i] += a * Math.sin(2 * Math.PI * f * t + 2 * Math.sin(2 * Math.PI * 5.3 * t)) * Math.sin(Math.PI * Math.pow(u, o.skew || 0.6)) * (0.7 + 0.3 * Math.sin(2 * Math.PI * (7 + k) * t)); }
+    }
+    return y;
+  },
+  beep(f, dur) { const sr = this.sr, y = this.arr(dur + 0.02); for (let i = 0; i < dur * sr; i++) { const t = i / sr; y[i] = Math.sin(2 * Math.PI * f * t) * Math.min(1, t / 0.004, (dur - t) / 0.01); } return y; },
+});
+
 class GbAudio extends AudioEngine {
-  constructor(tl, app) { super(tl); this.app = app; this.wavName = 'gravity-doubled-narrated-v3-soundtrack.wav'; this.solo = null; this.noDuck = false; }
+  constructor(tl, app) { super(tl); this.app = app; this.wavName = 'gravity-doubled-3min-soundtrack.wav'; this.solo = null; this.noDuck = false; }
   fingerprintData() {
-    return [GB, GB_CUES, GN.clips.map((c) => [c.id, c.hash, c.start, c.seconds, c.gainDb]), GB_CAR, GB_DROP, window.GB_MIX,
-      GbFx.toString(), Object.values(GBX).map(String).join(''), gnSpeechWindows.toString(), gbDuckDb.toString(), gbBeat.toString(), gbDynDb.toString()];
+    return [GB, GN.clips.map((c) => [c.id, c.hash, c.start, c.seconds, c.gainDb]), GB_CAR, GB_DROP, GB_SET.stairs, GB_SET.ramp, window.GB_MIX,
+      GbFx.toString(), Object.values(GBX).map(String).join(''), Object.values(GbFx.prototype).map(String).join(''), gnSpeechWindows.toString(), gbDuckDb.toString(), gbBeat.toString(), gbDynDb.toString(),
+      GbAudio.toString()];
   }
 
   // the voice clips are MP3s: decode them before the offline render schedules them (not needed for the other stems alone)
@@ -384,7 +412,7 @@ class GbAudio extends AudioEngine {
     const M = window.GB_MIX, END = CONFIG.duration + 1.5, only = this.solo;
     const master = ctx.createGain();
     if (only) master.connect(ctx.destination);
-    else {   // the live fallback's master: only a safety limiter (no glue: v3 keeps its dynamics; the export is mastered by mix-stems.py)
+    else {   // the live fallback's master: only a safety limiter (the export is mastered by mix-stems.py)
       const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.1;
       master.connect(lim); lim.connect(ctx.destination);
     }
@@ -397,11 +425,10 @@ class GbAudio extends AudioEngine {
       const trim = ctx.createGain(), duck = ctx.createGain();
       trim.gain.value = only ? 1 : Math.pow(10, st.gain / 20);
       node.connect(trim); trim.connect(duck); duck.connect(master);
-      // one gain curve per stem: the duck under the narrator (skipped for a --raw render) × the dynamics map
       const dyn = (M.dyn || {})[id], dk = st.duck && !this.noDuck;
       if (dk || dyn) {
         const n = Math.ceil(END * 100) + 1, c = new Float32Array(n);
-        for (let i = 0; i < n; i++) c[i] = Math.pow(10, ((dk ? gbDuckDb(i / 100, st.duck, M, wins) : 0) + gbDynDb(i / 100, dyn)) / 20);
+        for (let i = 0; i < n; i++) c[i] = Math.pow(10, ((dk ? gbDuckDb(i / 100, st.duck, M, wins) : 0) + (this.noDuck ? 0 : gbDynDb(i / 100, dyn))) / 20);
         duck.gain.setValueCurveAtTime(c, 0, END);
       }
       this['_' + id](ctx, bus, END);
@@ -418,14 +445,17 @@ class GbAudio extends AudioEngine {
     low.connect(pres); pres.connect(vc); vc.connect(mk); mk.connect(dest);
     for (const c of GN.clips) {
       const buf = this.vo && this.vo[c.id]; if (!buf) continue;
-      const src = ctx.createBufferSource(), g = ctx.createGain(), v = Math.pow(10, (c.gainDb + ((window.GB_MIX.voiceTrim || {})[c.id] || 0)) / 20), f1 = Math.min(c.start + buf.duration, c.speechEnd + 0.4);
-      src.buffer = buf; src.connect(g); g.connect(low); src.start(c.start);
-      // every word plays whole; only the silent tail after the last word is faded (clip B's file ends on a click)
-      g.gain.setValueAtTime(v, c.start); g.gain.setValueAtTime(v, f1 - 0.15); g.gain.linearRampToValueAtTime(0, f1);
+      const src = ctx.createBufferSource(), g = ctx.createGain(), v = Math.pow(10, (c.gainDb + ((window.GB_MIX.voiceTrim || {})[c.id] || 0)) / 20);
+      // every word plays whole; the clip fades out just after its last word (last word + 0.3 s): clip 02's file ends on a click
+      const f1 = Math.min(c.start + buf.duration, c.speechEnd + 0.3);
+      src.buffer = buf; src.connect(g); g.connect(low); src.start(c.start); src.stop(f1 + 0.02);
+      g.gain.setValueAtTime(v, c.start); g.gain.setValueAtTime(v, f1 - 0.12); g.gain.linearRampToValueAtTime(0, f1);
     }
   }
 
   // ===================================================================================================== MUSIC
+  // an original score in F: felt piano, string section, pizzicato, bells, a felt drum. Under the narrator it is sparse;
+  // in the five silent scenes it carries the story (the dynamics map in mix.js shapes it further)
   _music(ctx, dest, END) {
     const fx = new GbFx(ctx, CONFIG.seed + 101), S = new SoundKit(ctx, CONFIG.seed + 102), r = new RNG(CONFIG.seed + 103), T = GB;
     const bus = ctx.createGain(); bus.connect(dest);
@@ -436,10 +466,10 @@ class GbAudio extends AudioEngine {
     const pizz = (t, n, vol, pan = 0, bright = 0.35) => S.pluck(t, gbHz(n), vol * 0.32, pan, bus, 1.4, bright);
     const tick = (t, f, vol, pan = 0) => fx.play(fx.hit([[f, 0.035, 1], [f * 2.68, 0.018, 0.45], [f * 4.1, 0.01, 0.2]], { width: 0.0006 }), t, bus, { vol: vol * 0.3, pan });
     const drum = (t, n, vol) => { const f = gbHz(n); fx.play(fx.hit([[f, 0.5, 1], [f * 1.5, 0.3, 0.55], [f * 1.99, 0.22, 0.4], [f * 2.44, 0.15, 0.25], [f * 2.9, 0.1, 0.12]], { width: 0.003, len: 2.2, noise: 0.15, nhp: 400, nlen: 0.01 }), t, bus, { vol: vol * 0.5 }); };
-    // string section: three players per note a few cents apart (left / centre / right), sawtooth through a soft lowpass
-    // o: att, rel, cut, cutTo (filter opens over the note), keys [[t, level 0…1]] (crescendo shape), pan
+    const beat = (t, v) => fx.play(fx.hit([[70, 0.16, 1], [104, 0.1, 0.45], [141, 0.07, 0.3], [212, 0.04, 0.12]], { width: 0.007, len: 0.9 }), t, bus, { vol: v * 0.4, norm: true });
     const strings = (t0, t1, notes, vol, o = {}) => {
-      const att = o.att || 1.0, rel = o.rel || 1.2, g = ctx.createGain();
+      if (t1 - t0 < 0.1) return;
+      const att = Math.min(o.att || 1.0, (t1 - t0) * 0.45), rel = Math.min(o.rel || 1.2, (t1 - t0) * 0.45), g = ctx.createGain();
       g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol * 0.11 * (o.keys ? o.keys[0][1] : 1), t0 + att);
       for (const [t, v] of (o.keys || [])) if (t > t0 + att && t < t1 - rel) g.gain.linearRampToValueAtTime(vol * 0.11 * v, t);
       const vEnd = o.keys ? o.keys[o.keys.length - 1][1] : 1;
@@ -462,24 +492,23 @@ class GbAudio extends AudioEngine {
         });
       }
     };
+    // a chord walk: [[t, notes], …] up to tEnd, each chord held to the next
+    const walk = (list, tEnd, vol, o = {}) => list.forEach(([t, notes], i) => strings(t - 0.1, (list[i + 1] ? list[i + 1][0] : tEnd) + 0.15, notes, vol, Object.assign({ att: 0.7, rel: 0.5, cut: 1300 }, o)));
 
-    // ---- S1: a warm felt-piano figure in F over a soft pad; a short swell on "suddenly doubled"; everything stops dead at g
+    // ================= S1: a warm felt-piano figure in F over a soft pad; a short swell; everything stops dead at g
     const figA = ['F4', 'C5', 'A4', 'E5', 'G4', 'C5', 'A4', 'D5'];
-    // (v3: everything is gone 80 ms before the hit, so the room's crash lands in a breath of silence)
     for (let i = 0; 0.1 + i * 0.36 < T.g - 0.25; i++) piano(0.1 + i * 0.36, figA[i % 8], 0.4 + 0.08 * (i % 2 ? 0 : 1), Math.min(1.2, T.g - 0.14 - 0.1 - i * 0.36), i % 2 ? 0.25 : -0.25, 0.06);
-    piano(0.1, 'F2', 0.55, T.g - 0.26, 0, 0.06); piano(0.1, 'C3', 0.35, T.g - 0.26, 0, 0.06);
+    for (const t of [0.1, 2.98, 5.86]) { piano(t, 'F2', 0.5, Math.min(2.8, T.g - 0.26 - t), 0, 0.06); piano(t, 'C3', 0.32, Math.min(2.8, T.g - 0.26 - t), 0, 0.06); }
+    piano(8.7, 'D2', 0.45, T.g - 0.26 - 8.7, 0, 0.06);
     strings(0.0, T.g - 0.08, ['F3', 'A3', 'C4', 'E4'], 0.45, { att: 0.8, rel: 0.08, cut: 1500 });
     strings(T.g - 0.9, T.g - 0.08, ['C3', 'G3', 'Db4'], 0.55, { att: 0.75, rel: 0.05, cut: 900, cutTo: 1800 });
-    // ---- after the doubling: a low, uneasy D (cellos), a thin high E creeping in; a single low piano note for the weight
+    // after the doubling: a low uneasy D (cellos), a thin high E creeping in; one low piano note for the weight
     piano(T.g + 0.42, 'D2', 0.7, 2.4); drum(T.g + 0.42, 'D2', 0.55);
-    strings(T.g + 0.35, T.room + 0.7, ['D2', 'A2', 'D3'], 1.6, { att: 0.9, rel: 0.9, cut: 750 });
-    strings(T.g + 0.8, T.room + 0.5, ['E5'], 0.35, { att: 1.3, rel: 0.6, cut: 4000, vib: 4 });
-    // ---- under line B: Dm9 → Bbmaj7, sparse piano
-    strings(T.room, T.reachCut + 0.2, ['D3', 'F3', 'A3', 'E4'], 0.5, { att: 1.0, rel: 0.5, cut: 1300 });
-    strings(T.reachCut, T.lift + 0.1, ['Bb2', 'D3', 'F3', 'A3'], 0.5, { att: 0.5, rel: 0.4, cut: 1300 });
-    for (const [t, n] of [[T.room + 0.2, 'A4'], [T.room + 1.7, 'F4'], [T.reachCut + 0.1, 'D5'], [T.grip, 'C5'], [T.lift - 0.6, 'A4']]) piano(t, n, 0.36, 1.6, 0.15);
-    // ---- the cup (no narration): a low A pulse that tightens while he lifts and holds, slows while he lowers it,
-    //      high strings rubbing a semitone, a thin held note before the set-down, then F major and four soft plucks
+    strings(T.g + 0.35, T.s2 + 0.8, ['D2', 'A2', 'D3'], 1.5, { att: 0.9, rel: 0.9, cut: 750 });
+    strings(T.g + 0.8, T.s2 + 0.6, ['E5'], 0.35, { att: 1.3, rel: 0.6, cut: 4000, vib: 4 });
+    // ================= S2 (no narration): the struggle. A low A pulse that tightens while he lifts and holds, slows while
+    //      he lowers it, high strings rubbing a semitone, a hush before the set-down, then F major and four soft plucks
+    strings(T.s2 + 0.3, T.lift + 0.2, ['A2', 'E3'], 0.6, { att: 1.2, rel: 0.3, cut: 700 });
     { let t = T.grip + 0.1, k = 0;
       while (t < Math.min(T.lower + 1.6, T.down - 0.45)) {
         const v = t < T.lift ? 0.15 + 0.25 * (t - T.grip) / (T.lift - T.grip) : t < T.top ? 0.5 + 0.35 * (t - T.lift) / (T.top - T.lift) : t < T.lower ? 0.85 : 0.85 - 0.5 * (t - T.lower) / 1.6;
@@ -489,92 +518,107 @@ class GbAudio extends AudioEngine {
       } }
     strings(T.lift - 0.2, T.down - 0.3, ['A2', 'E3'], 0.9, { att: 1.5, rel: 0.3, cut: 800, keys: [[T.lift + 1.3, 0.6], [T.top, 1.0], [T.lower, 1.0], [T.down - 0.65, 0.55]] });
     strings(T.lift + 0.4, T.lower + 1.0, ['E5', 'F5'], 0.45, { att: 1.8, rel: 0.5, cut: 3500, keys: [[T.lift + 2.2, 0.5], [T.top + 0.8, 1.0], [T.lower + 0.5, 0.7]], vib: 3 });
-    strings(T.lower + 0.7, T.down - 0.3, ['A5'], 0.3, { att: 0.6, rel: 0.12, cut: 5000, vib: 2 });   // (v3: gone before the cup touches: the hush)
+    strings(T.lower + 0.7, T.down - 0.3, ['A5'], 0.3, { att: 0.6, rel: 0.12, cut: 5000, vib: 2 });
     piano(T.down + 0.03, 'F2', 0.55, 3.5); piano(T.down + 0.05, 'C4', 0.4, 3.5); piano(T.down + 0.06, 'F4', 0.4, 3.5); piano(T.down + 0.08, 'A4', 0.45, 3.5);
-    strings(T.down, T.exp + 0.5, ['F3', 'A3', 'C4', 'E4'], 0.75, { att: 0.45, rel: 0.7, cut: 1600 });
+    strings(T.down, T.s3 + 0.8, ['F3', 'A3', 'C4', 'E4'], 0.7, { att: 0.45, rel: 0.7, cut: 1600 });
     ['C5', 'A4', 'F4', 'C4'].forEach((n, i) => pizz(T.down + 0.22 + i * 0.36, n, 0.5, i % 2 ? 0.3 : -0.3, 0.55));
-    // ---- the experiment (line C): a soft tick-tock pulse and a slow chord walk; a bell as each predicted time lights
+    // ================= S3: same mass, double weight. Dm9 → Bbmaj7 → F/A → Gm7; a bell on "mass", a rising line on "twice"
+    walk([[T.s3 + 0.5, ['D3', 'F3', 'A3', 'E4']], [T.coffee, ['Bb2', 'D3', 'F3', 'A3']], [T.body + 0.2, ['A2', 'C3', 'F3', 'A3']], [T.pull, ['G2', 'D3', 'F3', 'Bb3']]], T.exp + 0.4, 0.5);
+    bell(T.holo + 0.05, 'A5', 0.4, 0.3); bell(T.mass + 0.05, 'E6', 0.45, -0.3);
+    [[T.s3 + 0.6, 'A4'], [T.coffee + 0.05, 'F4'], [T.body + 0.3, 'C5'], [T.pull + 0.1, 'Bb4']].forEach(([t, n], i) => piano(t, n, 0.36, 1.8, i % 2 ? 0.2 : -0.2));
+    strings(T.twice[0] - 1.2, T.exp + 0.3, ['D4', 'G4'], 0.35, { att: 1.0, rel: 0.4, cut: 1800, cutTo: 4200, keys: [[T.twice[1], 1.0]] });
+    // ================= S4: the experiment. A soft tick-tock and a chord walk; a bell as each predicted time lights; from
+    //      "but under double gravity" a heartbeat that quickens and stops dead before the clamps open
     for (let t = T.exp + 0.5, k = 0; t < T.lane2[0] - 0.05; t += 0.5, k++) tick(t, k % 2 ? 1310 : 1750, k % 2 ? 0.8 : 1.0, 0.1);
-    // v3: from "at double gravity" the clock gives way to a heartbeat (a soft low lub-dub), quickening and growing
-    //     until it stops dead before the clamps open
-    { const beat = (t, v) => fx.play(fx.hit([[70, 0.16, 1], [104, 0.1, 0.45], [141, 0.07, 0.3], [212, 0.04, 0.12]], { width: 0.007, len: 0.9 }), t, bus, { vol: v * 0.4, norm: true });
-      for (let t = T.lane2[0] + 0.1, k = 0, gap = 0.84; t < T.drop - 0.75; t += gap, gap = Math.max(0.6, gap * 0.95), k++) {
-        const u = (t - T.lane2[0]) / (T.drop - T.lane2[0]); beat(t, 0.35 + 0.5 * u); beat(t + 0.19, (0.35 + 0.5 * u) * 0.62);
-      } }
-    strings(T.exp + 0.1, T.wideExp + 0.9, ['A2', 'E3', 'G3', 'C4'], 0.75, { att: 0.8, rel: 0.6, cut: 1200 });
-    strings(T.wideExp + 0.7, T.lane1[0] + 1.4, ['F2', 'C3', 'E3', 'A3'], 0.75, { att: 0.6, rel: 0.6, cut: 1200 });
-    strings(T.lane1[0] + 1.2, T.lane2[0], ['E2', 'C3', 'G3', 'E4'], 0.75, { att: 0.6, rel: 0.5, cut: 1200 });
-    strings(T.lane2[0] - 0.1, NC.speechEnd + 0.3, ['D2', 'A2', 'F3', 'C4'], 0.75, { att: 0.6, rel: 0.5, cut: 1200 });
-    piano(NC.start + 0.15, 'E4', 0.4, 1.5, 0.1); piano(T.oneM[0], 'C5', 0.4, 1.5, 0.1);
+    for (let t = T.lane2[0] + 0.1, gap = 0.84; t < T.drop - 0.75; t += gap, gap = Math.max(0.58, gap * 0.95)) {
+      const u = (t - T.lane2[0]) / (T.drop - T.lane2[0]); beat(t, 0.35 + 0.5 * u); beat(t + 0.19, (0.35 + 0.5 * u) * 0.62);
+    }
+    walk([[T.exp + 0.1, ['A2', 'E3', 'G3', 'C4']], [T.wideExp + 0.7, ['F2', 'C3', 'E3', 'A3']], [T.lane1[0] + 1.2, ['E2', 'C3', 'G3', 'E4']], [T.lane2[0] - 0.1, ['D2', 'A2', 'F3', 'C4']]], N4.speechEnd + 0.3, 0.7, { cut: 1200 });
+    piano(N4.start + 0.15, 'E4', 0.4, 1.5, 0.1); piano(T.oneM[0], 'C5', 0.4, 1.5, 0.1);
     bell(T.lane1[0] + 0.05, 'C6', 0.55, -0.35); bell(T.lane2[0] + 0.05, 'E6', 0.55, 0.35);
-    // ---- the hold before the drop: the pulse stops, a thin high note and a low swell opening up, cut just before the clamps
-    // (v3: the swell starts under the end of line C, grows, and is cut 0.46 s before the clamps: silence, click, smash)
-    strings(T.lane2[0] + 1.0, T.drop - 0.47, ['A5', 'E6'], 0.35, { att: 1.0, rel: 0.03, cut: 6000, vib: 2, keys: [[NC.speechEnd, 0.7], [T.drop - 0.55, 1.0]] });
-    strings(T.lane2[0] + 0.5, T.drop - 0.47, ['D2', 'A2', 'D3'], 1.0, { att: 1.2, rel: 0.03, cut: 400, cutTo: 2000, keys: [[NC.speechEnd, 0.6], [T.drop - 0.55, 1.0]] });
-    // ---- the result (after both impacts): a small bell chord and an F add9 swell; the replay sits on a low Bb with a
-    //      reverse swell sucked into the slowed 2 g hit; then Bb → Csus4 into the cut outside
-    const tRes = T.drop + 0.75;
-    ['F5', 'A5', 'C6'].forEach((n, i) => bell(tRes + i * 0.035, n, 0.6, [-0.3, 0, 0.3][i]));
-    piano(tRes, 'F2', 0.5, 1.5); piano(tRes + 0.02, 'C4', 0.35, 1.5);
-    strings(tRes - 0.05, T.replay + 0.3, ['F3', 'C4', 'G4', 'A4'], 0.6, { att: 0.3, rel: 0.5, cut: 2200 });
+    // the hold before the drop: a thin high note and a low swell, cut 0.46 s before the clamps: silence, click, impacts
+    strings(T.lane2[0] + 1.0, T.drop - 0.47, ['A5', 'E6'], 0.35, { att: 1.0, rel: 0.03, cut: 6000, vib: 2, keys: [[N4.speechEnd, 0.7], [T.drop - 0.55, 1.0]] });
+    strings(T.lane2[0] + 0.5, T.drop - 0.47, ['D2', 'A2', 'D3'], 1.0, { att: 1.2, rel: 0.03, cut: 400, cutTo: 2000, keys: [[N4.speechEnd, 0.6], [T.drop - 0.55, 1.0]] });
+    // ================= S5: the result after the bounces settle; the replay on a low Bb with a reverse swell sucked into the
+    //      slowed 2 g hit; Bb → Csus4 → F into scene 6
+    const tRes = T.drop + 1.75;
+    ['F5', 'A5', 'C6'].forEach((n, i) => bell(tRes + i * 0.035, n, 0.55, [-0.3, 0, 0.3][i]));
+    piano(tRes, 'F2', 0.45, 1.5); piano(tRes + 0.02, 'C4', 0.32, 1.2);
     const sl = (te) => T.replay + (te - T.replayFrom) / T.replayRate, land2 = Math.min(...this.app.drop.lanes.map((o) => o.landT));
-    strings(T.replay - 0.1, T.replayEnd + 0.3, ['Bb1', 'F2', 'Bb2', 'F3'], 1.3, { att: 1.0, rel: 0.5, cut: 700 });
+    strings(T.replay - 0.1, T.replayEnd + 0.3, ['Bb1', 'F2', 'Bb2', 'F3'], 1.2, { att: 1.0, rel: 0.5, cut: 700 });
     strings(T.replay + 0.4, T.replayEnd + 0.2, ['D6'], 0.2, { att: 1.0, rel: 0.4, cut: 6000, vib: 2 });
     strings(sl(land2) - 1.1, sl(land2) + 0.02, ['Bb3', 'C4', 'D4', 'F4'], 0.9, { att: 1.05, rel: 0.02, cut: 700, cutTo: 2600 });
-    piano(T.replayEnd + 0.05, 'Bb2', 0.5, 2.0); piano(T.replayEnd + 0.07, 'D4', 0.4, 2.0); piano(T.replayEnd + 0.09, 'F4', 0.35, 2.0); piano(T.replayEnd + 0.4, 'C5', 0.4, 1.6, 0.2);
-    strings(T.replayEnd, T.out - 0.7, ['Bb2', 'F3', 'D4'], 0.65, { att: 0.5, rel: 0.4, cut: 1500 });
-    strings(T.out - 0.85, T.out + 0.35, ['C3', 'F3', 'G3', 'C4'], 0.65, { att: 0.4, rel: 0.3, cut: 1500 });
-    // ---- outside (line D): Dm → Bb → Gm7, the piano figure slower and lower
-    strings(T.out - 0.05, T.carCU + 0.2, ['D3', 'F3', 'A3'], 0.48, { att: 0.6, rel: 0.5, cut: 1300 });
-    strings(T.carCU, ND.speechEnd - 1.2, ['Bb2', 'F3', 'D4'], 0.48, { att: 0.6, rel: 0.4, cut: 1300 });
-    strings(ND.speechEnd - 1.4, T.world - 0.05, ['G2', 'D3', 'F3', 'Bb3'], 0.5, { att: 0.5, rel: 0.3, cut: 1300 });
-    ['D4', 'A4', 'F4', 'E4', 'D4', 'C4', 'A3', 'Bb3'].forEach((n, i) => piano(T.out + 0.55 + i * 0.85, n, 0.38, 1.6, i % 2 ? 0.25 : -0.25));
-    // ---- he stands (no narration — the score takes the room): the chords climb with each stage of the effort, a felt drum
-    //      on every push, the pizzicato labouring under it; C major lands with his step; F opens out on the wide
-    const R2 = T.rise2, ST = T.step, land = ST[0] + 0.85;
-    const walk = [[T.world - 0.1, R2[0] + 0.75, ['Bb2', 'D3', 'F3', 'Bb3'], 0.75], [R2[0] + 0.7, R2[0] + 1.65, ['A2', 'C3', 'F3', 'A3', 'C4'], 0.8],
-      [R2[0] + 1.6, ST[0] - 0.25, ['G2', 'D3', 'F3', 'Bb3'], 0.85], [ST[0] - 0.3, land + 0.05, ['C3', 'F3', 'G3', 'C4'], 0.85],
-      [land, T.wide2 + 0.1, ['C3', 'E3', 'G3', 'C4', 'E4'], 0.85], [T.wide2, T.wide2 + 1.75, ['F2', 'C3', 'F3', 'A3', 'C4', 'F4'], 1.0],
-      [T.wide2 + 1.7, T.pull + 0.1, ['D3', 'F3', 'A3', 'D4'], 0.9], [T.pull, NE.start + 0.9, ['Bb2', 'F3', 'D4'], 0.65]];
-    for (const [a, b, notes, v] of walk) strings(a, b, notes, v, { att: Math.min(0.6, (b - a) * 0.4), rel: 0.25, cut: 1500 + 300 * v });
-    strings(R2[0], T.wide2 + 1.8, ['F5', 'C6'], 0.25, { att: 2.0, rel: 0.6, cut: 5000, keys: [[land, 0.6], [T.wide2 + 0.2, 1.0]], vib: 4 });
-    for (const [t, n, v] of [[R2[0], 'F2', 0.7], [R2[0] + 0.7, 'F2', 0.6], [R2[0] + 1.6, 'G2', 0.65], [land, 'C2', 0.7], [T.wide2 + 0.05, 'F2', 0.6]]) drum(t, n, v);
-    { const roots = (t) => t < R2[0] + 0.7 ? 'Bb2' : t < R2[0] + 1.6 ? 'A2' : t < ST[0] - 0.3 ? 'G2' : 'C3';
-      for (let t = T.world + 0.1, k = 0; t < ST[0] - 0.3; t += 0.38, k++) pizz(t, roots(t), 0.45 + 0.35 * (t - T.world) / (ST[0] - T.world), k % 2 ? 0.25 : -0.25, 0.3);
-      for (let t = land + 0.05, k = 0; t < T.pull - 0.2; t += 0.4, k++) pizz(t, t < T.wide2 ? (k % 2 ? 'G2' : 'C2') : t < T.wide2 + 1.7 ? (k % 2 ? 'C3' : 'F2') : (k % 2 ? 'A2' : 'D2'), 0.5, k % 2 ? 0.25 : -0.25, 0.4); }
-    [[T.world + 0.1, 'F4'], [R2[0] + 0.4, 'A4'], [R2[0] + 1.25, 'G4'], [R2[0] + 2.1, 'Bb4'], [ST[0] + 0.1, 'C5'], [land, 'E5'], [T.wide2 + 0.05, 'F5'], [T.wide2 + 0.85, 'C5'], [T.wide2 + 1.7, 'A4'], [T.pull - 0.4, 'D5']]
-      .forEach(([t, n], i) => piano(t, n, 0.55, 1.8, i % 2 ? 0.25 : -0.25));
-    // ---- the ending (line E): Dm → Bb → C → F; the last chord opens into Fmaj9 and decays to the final frame
-    strings(NE.start + 0.7, gnW('e-ending', 7).start + 0.1, ['Bb2', 'F3', 'D4'], 0.55, { att: 0.6, rel: 0.4, cut: 1400 });
-    strings(gnW('e-ending', 7).start, gnW('e-ending', 14).start, ['C3', 'G3', 'E4'], 0.55, { att: 0.5, rel: 0.3, cut: 1400 });
-    strings(gnW('e-ending', 14).start - 0.1, T.end + 0.05, ['F2', 'C3', 'A3', 'E4', 'G4'], 0.85, { att: 0.8, rel: 2.2, cut: 1500, keys: [[NE.speechEnd + 0.3, 1.0], [T.end - 2.3, 0.9]] });
-    [[NE.start + 0.1, 'A4'], [gnW('e-ending', 7).start, 'F4'], [gnW('e-ending', 14).start, 'G4']].forEach(([t, n]) => piano(t, n, 0.4, 1.6, 0.15));
-    piano(NE.speechEnd + 0.15, 'F2', 0.55, 2.4); piano(NE.speechEnd + 0.17, 'C4', 0.45, 2.4); piano(NE.speechEnd + 0.2, 'A4', 0.5, 2.4);
-    piano(NE.speechEnd + 1.0, 'C5', 0.45, 1.6, 0.2); bell(T.end - 1.4, 'F6', 0.35, 0);
+    piano(T.replayEnd + 0.05, 'Bb2', 0.5, 2.0); piano(T.replayEnd + 0.07, 'D4', 0.4, 2.0); piano(T.replayEnd + 0.09, 'F4', 0.35, 2.0); piano(T.replayEnd + 0.6, 'C5', 0.4, 1.6, 0.2);
+    walk([[T.replayEnd, ['Bb2', 'F3', 'D4']], [T.s6 - 1.6, ['C3', 'F3', 'G3', 'C4']]], T.s6 + 0.5, 0.6, { cut: 1500 });
+    // ================= S6: your body. Dm → Bb → Gm → A (a question); the standing up gets a felt drum and a climb; under
+    //      "your heart" a low heartbeat
+    walk([[T.s6 + 0.3, ['D3', 'F3', 'A3']], [T.stand[0], ['Bb2', 'D3', 'F3', 'Bb3']], [T.upCut, ['G2', 'D3', 'G3', 'Bb3']], [T.heart, ['A2', 'E3', 'G3', 'C#4']]], T.s7 + 0.3, 0.5);
+    drum(T.stand[0] + 0.5, 'Bb1', 0.45); drum(T.stand[0] + 2.0, 'D2', 0.4);
+    [[T.s6 + 0.4, 'A4'], [T.you, 'D5'], [T.stand[0] + 1.0, 'F4'], [T.upCut + 0.2, 'G4'], [T.heart + 0.2, 'E4']].forEach(([t, n], i) => piano(t, n, 0.36, 1.8, i % 2 ? 0.2 : -0.2));
+    for (let t = T.heart + 0.3, k = 0; t < T.s7 - 0.4; t += 0.92, k++) { beat(t, 0.4); beat(t + 0.2, 0.25); }
+    // ================= S7 (no narration): the stairs. The pizzicato labours with his steps, the chords climb; on the first
+    //      step a drum and C; at the second attempt everything thins to one high note; when he stops, a soft resolution
+    { const roots = (t) => t < T.walk[1] ? 'D2' : t < T.step1[0] ? 'E2' : 'F2';
+      for (let t = T.s7 + 0.2, k = 0; t < T.step1[1] + 0.3; t += 0.46, k++) pizz(t, roots(t), 0.45 + 0.3 * (t - T.s7) / (T.step1[1] - T.s7), k % 2 ? 0.25 : -0.25, 0.3); }
+    walk([[T.s7, ['D3', 'F3', 'A3', 'D4']], [T.walk[1] - 0.2, ['E3', 'G3', 'C4', 'E4']], [T.step1[0] + 0.2, ['F2', 'C3', 'F3', 'A3', 'C4']]], T.step2[0] + 0.4, 0.8, { cut: 1600 });
+    drum(T.step1[0] + 0.7, 'F1', 0.6); drum(T.step1[1] - 0.15, 'C2', 0.5);
+    strings(T.step2[0] - 0.2, T.back[1] + 0.5, ['G5'], 0.3, { att: 0.5, rel: 0.4, cut: 5000, vib: 2 });
+    strings(T.back[1] + 0.2, T.out + 0.4, ['Bb2', 'F3', 'D4', 'A4'], 0.65, { att: 1.2, rel: 0.8, cut: 1400 });
+    piano(T.handCU + 0.1, 'Bb2', 0.4, 2.5); piano(T.handCU + 0.12, 'F4', 0.36, 2.5); piano(T.handCU + 1.6, 'A4', 0.36, 2.0, 0.2); piano(T.handCU + 3.0, 'G4', 0.34, 1.6, -0.2);
+    // ================= S8: the city. Dm → Bb → Gm7 → C, the piano figure slower and lower, a few plucks
+    walk([[T.out, ['D3', 'F3', 'A3']], [T.carCU, ['Bb2', 'F3', 'D4']], [T.fount, ['G2', 'D3', 'F3', 'Bb3']], [T.rules, ['C3', 'F3', 'G3', 'C4']]], T.s9 + 0.3, 0.45);
+    ['D4', 'A4', 'F4', 'E4', 'D4', 'C4', 'A3', 'Bb3', 'D4', 'F4', 'E4', 'C4'].forEach((n, i) => piano(T.out + 0.55 + i * 1.6, n, 0.34, 1.6, i % 2 ? 0.25 : -0.25));
+    // ================= S9 (no narration): a gentle theme. F → C/E → Dm → Bb → F; the melody walks with her up the ramp; it
+    //      opens at the fountain reveal; it thins to piano when we find him at the edge of the square
+    walk([[T.s9 - 0.1, ['F2', 'C3', 'F3', 'A3']], [T.s9 + 2.6, ['E2', 'C3', 'G3', 'C4']], [T.s9b, ['D2', 'A2', 'F3', 'A3', 'D4']], [T.s9b + 2.5, ['Bb1', 'F2', 'D3', 'F3', 'Bb3']], [T.s9c, ['F2', 'C3', 'A3']]], T.s10 + 0.3, 0.75, { cut: 1700 });
+    [['A4', 0], ['C5', 0.65], ['F5', 1.3], ['E5', 2.6], ['D5', 3.25], ['C5', 3.9], ['A4', 5.3], ['F5', 6.0], ['E5', 6.6], ['D5', 7.8], ['F5', 8.4], ['C5', 10.0], ['A4', 11.3], ['G4', 12.6]]
+      .forEach(([n, d], i) => piano(T.s9 + d, n, 0.5, 1.6, i % 2 ? 0.2 : -0.2));
+    for (let t = T.s9, k = 0; t < T.s9b; t += 0.55, k++) pizz(t, k % 2 ? 'C3' : 'F2', 0.3, k % 2 ? 0.25 : -0.25, 0.35);
+    strings(T.s9b - 0.3, T.s9c + 0.5, ['A5', 'D6'], 0.25, { att: 1.5, rel: 1.0, cut: 5000, vib: 4 });
+    bell(T.s9b + 0.1, 'A6', 0.3, 0.3); bell(T.s9b + 0.45, 'F6', 0.25, -0.3);
+    // ================= S10: the bigger question. Low strings Dm → Bb → Gm → A7 under the line; a slow low pulse from "Some
+    //      systems…", one bell for "the real question"
+    walk([[T.s10, ['D2', 'A2', 'F3']], [T.sky, ['Bb1', 'F2', 'D3', 'F3']], [T.eng, ['G1', 'D2', 'Bb2', 'D3']], [T.back10, ['A1', 'E2', 'C#3', 'G3']]], T.s11 + 0.3, 0.75, { cut: 900 });
+    for (let t = T.eng + 0.2; t < T.back10 - 0.2; t += 1.2) drum(t, 'D2', 0.22);
+    [[T.s10 + 0.3, 'F4'], [T.sky + 0.1, 'D4'], [T.back10 + 0.05, 'E4']].forEach(([t, n]) => piano(t, n, 0.34, 2.0, 0.1));
+    bell(T.back10 + 0.1, 'E5', 0.35, 0);
+    // ================= S11 (no narration): the reveal. The warmest, fullest moment: F → Bbmaj7 → C → F with the piano
+    //      figure from the opening coming back (slower) and bells like the jets' sparkle
+    walk([[T.s11 - 0.1, ['F2', 'C3', 'F3', 'A3', 'C4']], [T.s11 + 2.6, ['Bb1', 'F2', 'D3', 'A3', 'D4']], [T.s11 + 5.2, ['C2', 'G2', 'E3', 'G3', 'C4']], [T.s11 + 7.6, ['F2', 'C3', 'A3', 'C4', 'F4']]], T.s12 + 0.6, 1.0, { cut: 2000 });
+    strings(T.s11 + 1.0, T.s12 + 0.4, ['F5', 'C6'], 0.28, { att: 2.0, rel: 1.0, cut: 5500, vib: 4 });
+    for (let i = 0; T.s11 + 0.2 + i * 0.6 < T.s12 - 0.3; i++) piano(T.s11 + 0.2 + i * 0.6, figA[i % 8], 0.4, 1.1, i % 2 ? 0.25 : -0.25);
+    for (const [d, n, p] of [[1.3, 'C7', 0.4], [3.1, 'A6', -0.4], [4.8, 'F6', 0.2], [6.9, 'C7', -0.2], [8.6, 'A6', 0.35]]) bell(T.s11 + d, n, 0.22, p);
+    drum(T.s11 + 5.2, 'C2', 0.35); drum(T.s11 + 7.6, 'F1', 0.45);
+    // ================= S12: the final question. Dm → Bb → C under the line; after the last word Fmaj9 opens and decays
+    const wq = N12.words, wMid = wq[Math.floor(wq.length / 2)].start;
+    walk([[T.s12, ['D3', 'F3', 'A3']], [wMid, ['Bb2', 'F3', 'D4']], [N12.speechEnd - 1.4, ['C3', 'G3', 'E4']]], N12.speechEnd + 0.2, 0.5, { cut: 1400 });
+    strings(N12.speechEnd + 0.1, T.end + 0.05, ['F2', 'C3', 'A3', 'E4', 'G4'], 0.85, { att: 0.8, rel: 2.2, cut: 1500, keys: [[N12.speechEnd + 0.6, 1.0], [T.end - 2.0, 0.85]] });
+    [[T.s12 + 0.3, 'A4'], [wMid, 'F4'], [N12.speechEnd - 1.3, 'G4']].forEach(([t, n]) => piano(t, n, 0.38, 1.6, 0.15));
+    piano(N12.speechEnd + 0.15, 'F2', 0.55, 2.4); piano(N12.speechEnd + 0.17, 'C4', 0.45, 2.4); piano(N12.speechEnd + 0.2, 'A4', 0.5, 2.4);
+    piano(N12.speechEnd + 1.0, 'C5', 0.45, 1.6, 0.2); bell(T.end - 1.6, 'F6', 0.32, 0);
   }
 
   // ===================================================================================================== AMBIENCE
   _amb(ctx, dest, END) {
     const fx = new GbFx(ctx, CONFIG.seed + 201), r = fx.r, sr = fx.sr, T = GB;
     const inside = ctx.createGain(), outside = ctx.createGain(); inside.connect(dest); outside.connect(dest);
-    // the café is the café (room tone, machine, the square through the glass); the experiment shots lower it a little
-    inside.gain.setValueAtTime(1, 0); inside.gain.setValueAtTime(1, T.exp - 0.3); inside.gain.linearRampToValueAtTime(0.7, T.exp + 0.3);
-    // v3: a J-cut — the square's sound arrives 0.7 s before the picture cuts outside; the café's tail overlaps the cut
-    inside.gain.setValueAtTime(0.7, T.out - 0.05); inside.gain.linearRampToValueAtTime(0, T.out + 0.25);
+    // the café is the café; the experiment shots lower it; a J-cut: the square's sound arrives 0.7 s before the picture
+    inside.gain.setValueAtTime(1, 0); inside.gain.setValueAtTime(1, T.exp - 0.3); inside.gain.linearRampToValueAtTime(0.6, T.exp + 0.3);
+    inside.gain.setValueAtTime(0.6, T.s6 - 0.3); inside.gain.linearRampToValueAtTime(1, T.s6 + 0.2);
+    inside.gain.setValueAtTime(1, T.out - 0.05); inside.gain.linearRampToValueAtTime(0, T.out + 0.25);
     outside.gain.setValueAtTime(0, 0); outside.gain.setValueAtTime(0, T.out - 0.7); outside.gain.linearRampToValueAtTime(0.5, T.out - 0.05); outside.gain.linearRampToValueAtTime(1, T.out + 0.3);
     // ---- the café bed (stereo)
     const ci = T.out + 0.4, L = fx.arr(ci), R = fx.arr(ci), n = L.length;
-    { // room tone: a low, soft air (no sub rumble) + a little high air
-      for (const [X, seedOff] of [[L, 0], [R, 1]]) {
-        const w = fx.white(n), h = fx.white(n); GBX.bq(w, 'lp', 380, 0.6, sr); GBX.bq(w, 'hp', 70, 0.7, sr); GBX.bq(h, 'bp', 1900, 0.4, sr);
-        for (let i = 0; i < n; i++) X[i] += w[i] * 0.16 + h[i] * 0.012;
-      } }
-    { // the espresso machine: a faint boiler hiss and a gurgle now and then (panned right, behind the counter)
+    for (const X of [L, R]) {   // room tone
+      const w = fx.white(n), h = fx.white(n); GBX.bq(w, 'lp', 380, 0.6, sr); GBX.bq(w, 'hp', 70, 0.7, sr); GBX.bq(h, 'bp', 1900, 0.4, sr);
+      for (let i = 0; i < n; i++) X[i] += w[i] * 0.16 + h[i] * 0.012;
+    }
+    { // the espresso machine: a faint hiss, a gurgle now and then (behind the counter, right)
       const h = fx.white(n); GBX.bq(h, 'bp', 3900, 3, sr);
       GBX.mixIn(L, R, h, 0, 0.012, 0.6);
-      for (const t0 of [1.4, 9.6, 23.2, 33.4]) for (let t = t0; t < t0 + 0.5; t += r.range(0.015, 0.05)) fx.bubble(L, R, Math.round(t * sr), r.range(160, 520), r.range(0.01, 0.03), 0.05, 0.6);
+      for (const t0 of [1.4, 9.6, 23.2, 33.4, 52.0, 74.5, 91.0]) for (let t = t0; t < t0 + 0.5; t += r.range(0.015, 0.05)) fx.bubble(L, R, Math.round(t * sr), r.range(160, 520), r.range(0.01, 0.03), 0.05, 0.6);
     }
-    { // the square through the glass: a distant murmur of people, the fountain, the odd bird (all muffled)
+    { // the square through the glass: a murmur (quiet after the doubling, then smaller and uneasy), the fountain, birds
       const m = new Float32Array(n);
       for (let v = 0; v < 4; v++) {
         const f0 = r.range(105, 220), wv = fx.wander(0.7); let ph = 0, syl = 0, a = 0, tgt = 0;
@@ -586,31 +630,42 @@ class GbAudio extends AudioEngine {
       const m2 = Float32Array.from(m); GBX.bq(m, 'bp', 520, 1.2, sr); GBX.bq(m2, 'bp', 1350, 1.6, sr);
       for (let i = 0; i < n; i++) m[i] += m2[i] * 0.5;
       GBX.bq(m, 'lp', 850, 0.7, sr);
-      // v3: when gravity doubles the square goes quiet (everyone stops), then a smaller, uneasy murmur comes back
-      for (let i = 0; i < n; i++) { const t = i / sr; m[i] *= t < T.g ? 1 : t < T.g + 0.15 ? 1 - (t - T.g) / 0.15 : t < T.g + 4.5 ? 0 : Math.min(0.55, 0.55 * (t - T.g - 4.5) / 3); }
+      for (let i = 0; i < n; i++) { const t = i / sr; m[i] *= t < T.g ? 1 : t < T.g + 0.15 ? 1 - (t - T.g) / 0.15 : t < T.g + 4.5 ? 0 : Math.min(0.5, 0.5 * (t - T.g - 4.5) / 3); }
       GBX.mixIn(L, R, m, 0, 0.05, -0.35);
       const fo = fx.white(n); GBX.bq(fo, 'bp', 1500, 0.8, sr); GBX.bq(fo, 'lp', 2400, 0.7, sr);
       GBX.mixIn(L, R, fo, 0, 0.012, -0.5);
-      // (v3: the birds fall silent when gravity doubles and only come back, warily, a few seconds later)
-      for (let t = 0.8; t < T.exp; t += r.range(1.6, 3.4)) { if (t > T.g - 0.1 && t < T.g + 6.5) continue; const c = this._chirpArr(fx, r.range(2600, 3600), r.int(1, 3)); GBX.bq(c, 'lp', 2200, 0.7, sr); GBX.mixIn(L, R, c, Math.round(t * sr), 0.025, r.range(-0.8, -0.2)); }
+      for (let t = 0.8; t < ci - 1; t += r.range(1.8, 3.8)) { if (t > T.g - 0.1 && t < T.g + 6.5) continue; const c = this._chirpArr(fx, r.range(2600, 3600), r.int(1, 3)); GBX.bq(c, 'lp', 2200, 0.7, sr); GBX.mixIn(L, R, c, Math.round(t * sr), 0.022, r.range(-0.8, -0.2)); }
     }
-    { // the waiter's cups at the counter: light clinks before the doubling, a heavy one after
-      for (const [t, v] of [[0.35, 0.05], [1.25, 0.04], [2.05, 0.05]]) GBX.mixIn(L, R, fx.hit(fx.cupModes().concat(fx.saucerModes()), { width: 0.0003, amp: 1 }), Math.round(t * sr), v, 0.55);
-      for (const [t, v] of [[T.g + 0.95, 0.08], [T.room + 1.3, 0.06]]) {
+    { // the waiter's cups: light clinks before the doubling, heavy ones after; a spoon and a newspaper before it
+      for (const [t, v] of [[0.35, 0.05], [1.25, 0.04], [2.05, 0.05], [6.4, 0.04]]) GBX.mixIn(L, R, fx.hit(fx.cupModes().concat(fx.saucerModes()), { width: 0.0003, amp: 1 }), Math.round(t * sr), v, 0.55);
+      for (const [t, v] of [[T.g + 0.95, 0.08], [T.s3 + 6.0, 0.05], [T.s6 + 3.0, 0.05], [T.s7 + 9.5, 0.05]]) {
         const y = fx.hit(fx.cupModes().concat(fx.saucerModes()), { width: 0.0006, amp: 1 });
         GBX.strike(y, 0, Math.round(0.002 * sr), 0.6, fx.woodModes(170), sr);
         GBX.mixIn(L, R, y, Math.round(t * sr), v, 0.55);
       }
-    }
-    { // v3: life in the café before the doubling: a spoon stirring a cup at the next table, two taps on the rim, a newspaper
       const cm = fx.cupModes(1.12).map(([f, tau, a]) => [f, tau * 0.7, a]);
       for (let t = 0.55, k = 0; t < 1.55; t += 0.21 + 0.03 * Math.sin(k * 1.7), k++) GBX.mixIn(L, R, fx.hit(cm, { width: 0.00025, amp: 1 }), Math.round(t * sr), 0.011 + 0.005 * (k % 2), -0.45);
       for (const t of [1.72, 1.86]) GBX.mixIn(L, R, fx.hit(cm, { width: 0.0002, amp: 1 }), Math.round(t * sr), 0.02, -0.45);
       const pg = fx.rustle(0.45, { density: 900, rub: 0.25, lo: 1400, hi: 9000, grain: 0.004, peak: 3200, env: (u) => Math.pow(Math.sin(Math.PI * u), 0.6) * (u < 0.7 ? 1 : 1.4) });
-      GBX.mixIn(L, R, pg, Math.round(1.98 * sr), 0.02, 0.4);
+      GBX.mixIn(L, R, pg, Math.round(4.6 * sr), 0.02, 0.4);
+    }
+    { // the regulars' murmur at the next table (until the doubling), and a clock ticking on the wall afterwards
+      const mm = new Float32Array(Math.round((T.g + 0.2) * sr));
+      for (let v = 0; v < 2; v++) {
+        const f0 = v ? 190 : 118, wv = fx.wander(0.8); let ph = 0, syl = 0, a = 0, tgt = 0;
+        for (let i = 0; i < mm.length; i++) {
+          if (i >= syl) { syl = i + Math.round(r.range(0.08, 0.24) * sr); tgt = (Math.sin(i / sr * 0.8 + v * 3) > 0 ? 1 : 0.15) * (r.chance(0.75) ? r.range(0.4, 1) : 0); }
+          a += (tgt - a) * 0.002; ph += f0 * (1 + 0.1 * wv(i / sr)) / sr; if (ph >= 1) { ph -= 1; mm[i] += a; }
+        }
+      }
+      GBX.bq(mm, 'bp', 700, 1.0, sr); GBX.bq(mm, 'lp', 1700, 0.7, sr);
+      for (let i = 0; i < mm.length; i++) mm[i] *= Math.min(1, (T.g + 0.12 - i / sr) / 0.12);
+      GBX.mixIn(L, R, mm, 0, 0.035, 0.25);
+      const tk = fx.hit([[3100, 0.012, 1], [5200, 0.008, 0.5]], { width: 0.0002 });
+      for (let t = T.g + 6, k = 0; t < ci - 0.5; t += 1, k++) GBX.mixIn(L, R, tk, Math.round(t * sr), k % 2 ? 0.006 : 0.008, -0.7);
     }
     fx.play(L, 0, inside, { xr: R, vol: 1.8 });
-    // ---- the plaza (stereo): gusting wind, the fountain (lower and heavier at 2 g), birds, pigeons, a distant murmur
+    // ---- the plaza (stereo): gusting wind, the fountain, birds, pigeons, leaves, a distant murmur, far heavy steps
     const t0 = T.out - 0.75, D = END - t0, oL = fx.arr(D), oR = fx.arr(D), m = oL.length;
     { const gust = fx.wander(0.11), gust2 = fx.wander(0.23);
       for (const [X, ph] of [[oL, 0], [oR, 0.7]]) {
@@ -622,27 +677,26 @@ class GbAudio extends AudioEngine {
         }
         GBX.bq(X, 'hp', 110, 0.7, sr);
       } }
-    { // the fountain: a spray bed + many bubbles + the heavier splash of the falling water
+    { // the fountain: the short jets fall back heavier and sooner at 2 g (a denser, lower splash)
       const bed = fx.white(m), sp = fx.white(m); GBX.bq(bed, 'hp', 700, 0.7, sr); GBX.bq(bed, 'lp', 6500, 0.7, sr); GBX.bq(sp, 'bp', 420, 0.9, sr);
       const wv = fx.wander(0.5);
       for (let i = 0; i < m; i++) { const a = 1 + 0.15 * wv(i / sr); oL[i] += (bed[i] * 0.03 + sp[i] * 0.05) * a; oR[i] += (bed[(i + 5003) % m] * 0.03 + sp[(i + 7919) % m] * 0.05) * a; }
       for (let t = 0; t < D; t += r.range(0.002, 0.012)) fx.bubble(oL, oR, Math.round(t * sr), Math.exp(r.range(Math.log(350), Math.log(2600))), r.range(0.004, 0.02), r.range(0.006, 0.035), r.range(-0.2, 0.7));
     }
-    { // a distant murmur of the square (very low, unintelligible)
-      const mm = new Float32Array(m);
+    { const mm = new Float32Array(m);
       for (let v = 0; v < 3; v++) {
         const f0 = r.range(110, 230), wv = fx.wander(0.6); let ph = 0, syl = 0, a = 0, tgt = 0;
         for (let i = 0; i < m; i++) {
-          if (i >= syl) { syl = i + Math.round(r.range(0.1, 0.3) * sr); tgt = r.chance(0.6) ? r.range(0.3, 1) : 0; }
+          if (i >= syl) { syl = i + Math.round(r.range(0.1, 0.3) * sr); tgt = r.chance(0.5) ? r.range(0.3, 1) : 0; }
           a += (tgt - a) * 0.0015; ph += f0 * (1 + 0.12 * wv(i / sr)) / sr; if (ph >= 1) { ph -= 1; mm[i] += a; }
         }
       }
       GBX.bq(mm, 'bp', 600, 1.0, sr); GBX.bq(mm, 'lp', 1300, 0.7, sr);
-      GBX.mixIn(oL, oR, mm, 0, 0.03, 0.3);
+      GBX.mixIn(oL, oR, mm, 0, 0.026, 0.3);
     }
-    { // sparrows in the trees (short twitter runs), pigeon coos, the two low-flying pigeons' wings
-      for (let t = 0.6; t < D - 0.5; t += r.range(1.4, 3.2)) GBX.mixIn(oL, oR, this._chirpArr(fx, r.range(3200, 4800), r.int(2, 6)), Math.round(t * sr), r.range(0.03, 0.06), r.range(-0.8, 0.8));
-      for (const t of [T.out + 1.5, T.out + 5.8, T.world + 2.4, T.wide2 + 2.0, T.pull + 3.0, T.end - 1.9]) {
+    { // sparrows, pigeon coos, the low-flying pigeons' wings, leaves
+      for (let t = 0.6; t < D - 0.5; t += r.range(1.6, 3.6)) GBX.mixIn(oL, oR, this._chirpArr(fx, r.range(3200, 4800), r.int(2, 6)), Math.round(t * sr), r.range(0.025, 0.05), r.range(-0.8, 0.8));
+      for (const t of [T.out + 1.5, T.out + 7.8, T.fount + 3, T.s9 + 4.4, T.s10 + 2.0, T.eng + 2.5, T.s11 + 3.0, T.end - 2.4]) {
         const y = fx.arr(1.1), f0 = r.range(330, 390); let ph = 0;
         for (let i = 0; i < y.length; i++) {
           const u = i / y.length, lobes = Math.max(0, Math.sin(Math.PI * Math.min(1, u * 3.2))) * (u < 0.32 ? 0.7 : 0) + Math.max(0, Math.sin(Math.PI * (u - 0.35) / 0.55)) * (u > 0.35 && u < 0.9 ? 1 : 0);
@@ -650,35 +704,31 @@ class GbAudio extends AudioEngine {
           ph += 2 * Math.PI * f / sr; y[i] = (Math.sin(ph) + 0.35 * Math.sin(2 * ph) + 0.1 * Math.sin(3 * ph)) * lobes;
         }
         GBX.bq(y, 'lp', 1200, 0.7, sr);
-        GBX.mixIn(oL, oR, y, Math.round((t - t0) * sr), 0.06, r.range(-0.4, 0.3));
+        GBX.mixIn(oL, oR, y, Math.round((t - t0) * sr), 0.055, r.range(-0.4, 0.3));
       }
-      for (let i = 0; i < 2; i++) for (let k = -1; k < 4; k++) {   // each pass: u = 0…9 s across the square (cast.js), loudest mid-way
-        const ts = T.out - i * 4.5 + k * 9; if (ts + 9 < t0 || ts > END) continue;
+      for (let k = 0; k < 9; k++) {   // the two flying pigeons' passes (cast3.js: every 9 s), laboured wingbeats
+        const ts = T.out - 4.5 * (k % 2) + Math.floor(k / 2) * 9; if (ts + 9 < t0 || ts > END) continue;
         const y = fx.arr(9);
         for (let t = 0; t < 9; t += 1 / 5.4) {
           const a = Math.pow(Math.sin(Math.PI * t / 9), 2), fl = fx.rustle(0.05, { density: 600, rub: 0.6, lo: 600, hi: 2400, grain: 0.004, env: (u) => Math.sin(Math.PI * u) });
           for (let j = 0; j < fl.length; j++) { const q = Math.round(t * sr) + j; if (q < y.length) y[q] += fl[j] * a; }
         }
-        const i0 = Math.round((ts - t0) * sr);
-        const Lh = y.subarray(0, 4.5 * sr | 0), Rh = y.subarray(4.5 * sr | 0);
-        GBX.mixIn(oL, oR, Lh, i0, 0.05, -0.5); GBX.mixIn(oL, oR, Rh, i0 + (4.5 * sr | 0), 0.05, 0.5);
+        GBX.mixIn(oL, oR, y, Math.round((ts - t0) * sr), 0.035, k % 2 ? 0.4 : -0.4);
       }
-    }
-    { // v3: the leaves of the trees around the square, rustling with the gusts (left and right of the frame)
       const gw = fx.wander(0.13);
       for (const [pan, ph] of [[-0.7, 0], [0.75, 3.1]]) {
         const lv = fx.rustle(D, { density: 260, rub: 0.12, lo: 1800, hi: 7500, grain: 0.005, env: (u) => Math.pow(Math.max(0, 0.45 + 0.55 * gw(u * D + ph)), 2) });
         GBX.mixIn(oL, oR, lv, 0, 0.018, pan);
-      } }
-    { // v3: people crossing the far side of the square — slow, heavy steps (everyone weighs twice as much), far away
-      for (const [ta, tb, pa, pb] of [[T.out + 0.8, T.out + 8.5, -0.8, 0.2], [T.world + 2.5, T.end - 2.5, 0.7, -0.3]]) {
+      }
+    }
+    { // people crossing the far side of the square: slow, heavy steps, far away
+      for (const [ta, tb, pa, pb] of [[T.out + 0.8, T.out + 9.5, -0.8, 0.2], [T.s10 + 1.0, T.s12 + 6.0, 0.7, -0.3]]) {
         for (let t = ta, k = 0; t < tb; t += r.range(0.95, 1.15), k++) {
           const y = fx.step({ weight: 0.4, scuff: k % 3 === 0 ? 0.25 : 0 }); GBX.bq(y, 'lp', 1600, 0.7, sr);
-          GBX.mixIn(oL, oR, y, Math.round((t - t0) * sr), 0.012, pa + (pb - pa) * (t - ta) / (tb - ta));
+          GBX.mixIn(oL, oR, y, Math.round((t - t0) * sr), 0.01, pa + (pb - pa) * (t - ta) / (tb - ta));
         } } }
     fx.play(oL, t0, outside, { xr: oR, vol: 0.7 });
   }
-  // a short run of sparrow chirps (n notes)
   _chirpArr(fx, f, n) {
     const sr = fx.sr, r = fx.r, y = fx.arr(n * 0.11 + 0.1);
     let t = 0;
@@ -690,79 +740,105 @@ class GbAudio extends AudioEngine {
     return y;
   }
 
+  // the landing times of a foothold plan (holds after the two starting ones), within [ta, tb]
+  _landings(plan, ta, tb) { return plan.filter((h) => h.t0 > ta && h.t0 < tb).map((h) => h); }
+
   // ===================================================================================================== FOLEY
   // every event is peak-normalised, so each `vol` below is that sound's peak level inside the stem (1 = the loudest)
   _foley(ctx, dest) {
-    const fx = new GbFx(ctx, CONFIG.seed + 301), T = GB;
+    const fx = new GbFx(ctx, CONFIG.seed + 301), T = GB, C = this.app.cast;
     const bus = this._withRooms(ctx, fx, dest, 0.2, 0.08);
     const P = (x, t, vol, pan = 0) => fx.play(x, t, bus, { vol, pan, norm: true });
     const rustle = (t, dur, vol, pan = 0, o = {}) => P(fx.rustle(dur, o), t, vol, pan);
     const breath = (t, dur, vol, o = {}, pan = 0) => P(fx.breath(dur, o), t, vol, pan);
-    // ---- the café: the doubling hits him (a jolt of clothes, a sharp intake, a worried breath out)
+    const breathing = (ta, tb, vol, period, pan = 0, f0 = 110) => { for (let t = ta, k = 0; t < tb; t += period * (k % 2 ? 0.55 : 0.45), k++) breath(t, period * 0.42, k % 2 ? vol * 0.75 : vol, k % 2 ? { inhale: true } : { voice: 0.06, f0 }, pan); };
+    // ---- S1: the doubling hits him (a jolt of clothes, a sharp intake, a worried breath out); the arm sinks
     rustle(T.g + 0.01, 0.45, 0.3, 0, { env: (u) => Math.exp(-u * 5) * Math.min(1, u * 30), density: 500 });
     breath(T.g + 0.06, 0.32, 0.3, { inhale: true });
     breath(T.g + 0.8, 0.75, 0.3, {});
-    rustle(T.g + 0.06, 0.5, 0.08, 0.55, { density: 300 });                                    // the waiter sags onto the counter
-    // the reach: left palm to the table, the right hand out to the cup
-    rustle(T.reach[0] - 0.35, 0.6, 0.18, -0.2);
-    P(fx.slap(fx.woodModes(200, 0.8), { amp: 0.7, width: 0.004, skin: 0.5 }), T.reach[0] + 0.2, 0.22, -0.25);
-    rustle(T.reach[0] - 0.05, 1.0, 0.14, 0.1);
-    // the lift: a quick breath in, held; the pull (a strained grunt through closed lips); strained breaths while it hangs
+    rustle(T.g + 0.06, 0.5, 0.08, 0.55, { density: 300 });
+    rustle(T.cupDown1 - 0.5, 0.6, 0.14, 0);
+    // ---- S2: the brace (left palm to the table), the grip, the lift with a strained grunt, breaths, the slow lowering
+    P(fx.slap(fx.woodModes(200, 0.8), { amp: 0.7, width: 0.004, skin: 0.5 }), T.brace + 0.05, 0.22, -0.25);
+    rustle(T.brace - 0.3, 0.6, 0.16, -0.2); rustle(T.grip - 0.2, 0.5, 0.12, 0.1);
     breath(T.lift - 0.42, 0.3, 0.24, { inhale: true });
     rustle(T.lift - 0.3, 0.32, 0.14, 0);
     breath(T.lift + 0.3, 1.0, 0.55, { voice: 0.32, f0: 112, nasal: true, env: (u) => Math.min(1, u / 0.15) * (1 - Math.pow(u, 3)) });
     rustle(T.lift + 0.12, 0.75, 0.2, 0);
     for (let t = T.lift + 1.2, k = 0; t < T.lower - 0.25; t += 0.78, k++) breath(t, k % 2 ? 0.42 : 0.5, k % 2 ? 0.26 : 0.36, k % 2 ? { inhale: true } : { voice: 0.12, f0: 118 });
     rustle(T.top - 0.3, 0.5, 0.14, 0);
-    // lowering: he lets the breath out slowly through his teeth while he follows the cup down
     breath(T.lower + 0.1, T.down - T.lower - 0.15, 0.2, { teeth: true, env: (u) => Math.min(1, u / 0.2) * (0.7 + 0.3 * Math.sin(u * 9)) * (1 - Math.pow(u, 4)) });
     rustle(T.lower, 0.95, 0.14, 0, { density: 150 });
-    // down: he sags, then the long relieved breath out
     rustle(T.down + 0.12, 0.45, 0.16, 0);
     breath(T.letGo + 0.04, 1.15, 0.55, { voice: 0.08, f0: 105, env: (u) => Math.min(1, u / 0.06) * Math.pow(1 - u, 1.6) });
     rustle(T.letGo + 0.25, 0.8, 0.18, 0);
-    // ---- outside: the man on the bench (already out of breath). Attempt 1 is under the narrator: kept smaller
-    const R1 = T.rise1, R2 = T.rise2, ST = T.step, land = ST[0] + 0.85;
-    for (let t = T.out + 0.1, k = 0; t < R1[0] - 0.6; t += 0.62, k++) breath(t, 0.5, k % 2 ? 0.12 : 0.16, k % 2 ? { inhale: true } : {});
-    rustle(R1[0] - 0.6, 0.6, 0.16, 0);
-    breath(R1[0] - 0.5, 0.42, 0.2, { inhale: true });
-    breath(R1[0] + 0.02, 1.25, 0.28, { voice: 0.25, f0: 104, env: (u) => Math.min(1, u / 0.1) * (1 - Math.pow(u, 2.5)) });   // the push: a strained breath
-    P(fx.step({ weight: 0.25, scuff: 0.6 }), R1[0] + 0.05, 0.2, -0.1); P(fx.step({ weight: 0.2, scuff: 0.5 }), R1[0] + 0.12, 0.16, 0.1);
-    rustle(R1[0] + 0.05, 0.8, 0.16, 0);
-    // he drops back onto the bench: the body lands, a defeated breath out, then heavy breathing
-    P(fx.slap(fx.woodModes(150, 1.2), { amp: 1, width: 0.012, skin: 0.1, len: 0.6 }), R1[0] + 1.58, 0.3, 0);
-    rustle(R1[0] + 1.5, 0.5, 0.18, 0, { env: (u) => Math.exp(-u * 4) * Math.min(1, u * 20) });
-    breath(R1[0] + 1.66, 0.85, 0.22, { voice: 0.12, f0: 100 });
-    for (let t = R1[0] + 2.7, k = 0; t < R2[0] - 0.8; t += 0.66, k++) breath(t, 0.52, k % 2 ? 0.12 : 0.16, k % 2 ? { inhale: true } : {});
-    // the second attempt (no narration): he leans, reaches for the car's wing, palm on the metal (its ring is in sfx), pushes up
-    rustle(R2[0] - 0.7, 0.6, 0.22, 0); rustle(R2[0] - 0.55, 0.5, 0.18, 0.15);
-    breath(R2[0] - 0.45, 0.35, 0.38, { inhale: true });
-    P(fx.slap([[900, 0.01, 0.3]], { amp: 0.4, width: 0.002, skin: 0.9, len: 0.1 }), R2[0] - 0.05, 0.32, 0.2);
-    breath(R2[0] + 0.02, 1.5, 0.45, { voice: 0.45, f0: 100, env: (u) => Math.min(1, u / 0.08) * (0.85 + 0.15 * Math.sin(u * 20)) * (1 - Math.pow(u, 3)) });
-    P(fx.step({ weight: 0.3, scuff: 0.7 }), R2[0] + 0.1, 0.32, -0.1); P(fx.step({ weight: 0.22, scuff: 0.5 }), R2[0] + 0.22, 0.26, 0.1);
-    rustle(R2[0] + 0.3, 1.3, 0.24, 0, { density: 300 });
-    breath(R2[0] + 1.6, 0.8, 0.4, { voice: 0.15, f0: 108 }); breath(R2[0] + 2.45, 0.45, 0.28, { inhale: true });
-    // he lets go of the car and steps: the foot lifts (a scuff), lands heavy (his doubled weight), the weight rolls over
-    P(fx.slap([[700, 0.01, 0.2]], { amp: 0.2, width: 0.003, skin: 0.5, len: 0.08 }), ST[0] - 0.3, 0.14, 0.2);
-    rustle(ST[0] - 0.3, 0.6, 0.16, 0.1);
-    P(fx.rustle(0.25, { density: 400, rub: 0.5, lo: 900, hi: 4000, grain: 0.006 }), ST[0] + 0.05, 0.22, 0.05);
-    breath(ST[0] + 0.1, 0.7, 0.3, { voice: 0.25, f0: 104 });
-    P(fx.step({ weight: 1.0, scuff: 0.3, body: 92, decay: 0.075 }), land, 1.0, 0.05);
-    rustle(land, 0.8, 0.24, 0, { env: (u) => Math.exp(-u * 3) * Math.min(1, u * 25) });
-    P(fx.rustle(0.5, { density: 600, rub: 0.15, lo: 2200, hi: 8000, grain: 0.003, env: (u) => Math.exp(-u * 3) }), land + 0.15, 0.16, 0.05);
-    breath(ST[1] + 0.1, 1.1, 0.45, { voice: 0.1, f0: 100, env: (u) => Math.min(1, u / 0.06) * Math.pow(1 - u, 1.5) });
-    // the passer-by with the shopping bag: each dip — the bag swings and crackles, a scuff, a gasp; she catches herself
-    [T.world + 1.2, T.wide2 + 0.9, T.pull + 1.4].forEach((d, i) => {
-      const k = i === 2 ? 0.35 : 0.6;                                                     // she is in the background; the third dip is under the last line
-      P(fx.rustle(0.6, { density: 1400, rub: 0.15, lo: 2000, hi: 9000, grain: 0.0025, peak: 4200 }), d, 0.16 * k, -0.3);
-      P(fx.step({ weight: 0.2, scuff: 0.8 }), d + 0.08, 0.16 * k, -0.3);
-      breath(d + 0.03, 0.32, 0.26 * k, { inhale: true }, -0.3);
-      P(fx.step({ weight: 0.35, scuff: 0.3 }), d + 0.68, 0.16 * k, -0.3);
-      P(fx.rustle(0.45, { density: 1200, rub: 0.15, lo: 2000, hi: 9000, grain: 0.0025, peak: 4200 }), d + 0.66, 0.12 * k, -0.3);
-      breath(d + 0.75, 0.6, 0.2 * k, { voice: 0.2, f0: 205 }, -0.3);
+    breathing(T.letGo + 1.4, T.s3 + 1.5, 0.22, 1.5);
+    // ---- S3: he breathes, quietly (under the narrator); a shift in the chair on "your own body"
+    breathing(T.s3 + 1.5, T.exp - 0.5, 0.1, 1.8);
+    rustle(T.body + 0.2, 0.6, 0.12, 0);
+    // ---- S6: "It's you." He gets up: the lean, both palms on the table, a long strained push, legs shaking; then up, breathing
+    breathing(T.s6 + 0.3, T.stand[0] - 0.6, 0.14, 1.6);
+    rustle(T.stand[0] - 0.6, 0.6, 0.2, 0);
+    P(fx.slap(fx.woodModes(190, 0.8), { amp: 0.8, width: 0.004, skin: 0.5 }), T.stand[0] - 0.08, 0.24, -0.2);
+    P(fx.slap(fx.woodModes(205, 0.8), { amp: 0.8, width: 0.004, skin: 0.5 }), T.stand[0] - 0.02, 0.22, 0.2);
+    breath(T.stand[0] - 0.05, 0.35, 0.3, { inhale: true });
+    breath(T.stand[0] + 0.4, 1.6, 0.5, { voice: 0.38, f0: 108, env: (u) => Math.min(1, u / 0.1) * (0.85 + 0.15 * Math.sin(u * 22)) * (1 - Math.pow(u, 3)) });
+    rustle(T.stand[0] + 0.3, 2.2, 0.24, 0, { density: 300 });
+    P(fx.woodStep({ weight: 0.35, scuff: 0.6 }), T.stand[0] + 0.5, 0.18, -0.1); P(fx.woodStep({ weight: 0.3, scuff: 0.5 }), T.stand[0] + 0.62, 0.16, 0.1);
+    breath(T.stand[1] - 0.6, 0.9, 0.42, { voice: 0.14, f0: 104 });
+    breathing(T.upCut + 0.4, T.heart - 0.2, 0.26, 1.1);
+    // the climber on the stairs (her breath, her clothes, a little moan of effort at each step up)
+    for (const h of this._landings(C.climbPlan, T.heart - 3.5, T.s7)) { breath(h.t0 - 0.5, 0.5, 0.16, { voice: 0.18, f0: 190 }, -0.35); rustle(h.t0 - 0.4, 0.4, 0.08, -0.35); }
+    breathing(T.chest - 0.4, T.s7 - 0.4, 0.14, 1.0, -0.35, 195);
+    rustle(T.chest - 0.2, 0.5, 0.12, -0.35);
+    // ---- S7: his walk (heavy steps are in sfx), his breathing building; the first step: a grunt; the second: a held
+    //      breath, the foot hesitates, comes back down; he stops and breathes hard, his hand squeezing the rail
+    breathing(T.s7, T.step1[0] - 0.4, 0.3, 1.0, 0.1);
+    rustle(T.rail - 0.3, 0.5, 0.18, 0.1);
+    P(fx.slap([[620, 0.012, 0.6], [1180, 0.008, 0.3]], { amp: 0.6, width: 0.003, skin: 0.8, len: 0.15 }), T.rail, 0.3, 0.15);   // palm on the wooden rail
+    breath(T.step1[0] - 0.35, 0.3, 0.34, { inhale: true });
+    breath(T.step1[0] + 0.1, 1.5, 0.62, { voice: 0.42, f0: 104, env: (u) => Math.min(1, u / 0.1) * (0.85 + 0.15 * Math.sin(u * 22)) * (1 - Math.pow(u, 3)) });
+    rustle(T.step1[0], 1.4, 0.26, 0, { density: 320 });
+    breath(T.step1[1] + 0.1, 0.6, 0.4, { voice: 0.1, f0: 104 });
+    breath(T.step2[0] - 0.3, 0.3, 0.36, { inhale: true });
+    breath(T.step2[0], 0.9, 0.34, { voice: 0.3, f0: 110, nasal: true, env: (u) => Math.min(1, u / 0.15) * (1 - Math.pow(u, 2)) });
+    rustle(T.step2[0], 1.0, 0.2, 0);
+    breath(T.back[1] - 0.1, 1.3, 0.55, { voice: 0.12, f0: 100, env: (u) => Math.min(1, u / 0.06) * Math.pow(1 - u, 1.5) });
+    breathing(T.back[1] + 1.2, T.out - 0.3, 0.36, 0.95);
+    P(fx.creak(0.6, [[640, 0.01, 1], [1300, 0.007, 0.5]], { rate: [40, 90] }), T.handCU + 0.4, 0.14, 0.1);   // the grip tightens on the rail
+    // ---- S8: outside. The shopper's dips (bag crackle, a scuff, a gasp); the bench man's breathing; the cyclist's lift
+    const dips = [T.out + 1.5, T.carry + 0.6, T.half + 0.5, T.s9b + 1.2];
+    dips.forEach((d) => {
+      P(fx.rustle(0.6, { density: 1400, rub: 0.15, lo: 2000, hi: 9000, grain: 0.0025, peak: 4200 }), d, 0.12, -0.3);
+      P(fx.step({ weight: 0.2, scuff: 0.8 }), d + 0.08, 0.1, -0.3);
+      breath(d + 0.03, 0.32, 0.15, { inhale: true }, -0.3);
+      breath(d + 0.75, 0.6, 0.12, { voice: 0.2, f0: 205 }, -0.3);
     });
-    // the jogger on the ground in the background, still catching her breath (slowing down)
-    for (let t = T.out + 0.2, k = 0; t < T.end; k++) { const p = 0.85 + 0.25 * (t - T.out) / (T.end - T.out); breath(t, p * 0.45, (k % 2 ? 0.05 : 0.065) * (1 - 0.4 * (t - T.out) / (T.end - T.out)), k % 2 ? { inhale: true } : {}, -0.55); t += p * 0.5; }
+    breathing(T.out + 0.3, T.carCU - 0.2, 0.08, 1.6, 0.4, 98);
+    const L2 = T.lift2;
+    breath(L2[0] - 0.3, 0.3, 0.3, { inhale: true }, 0.2);
+    breath(L2[0] + 0.25, 1.6, 0.46, { voice: 0.36, f0: 200, env: (u) => Math.min(1, u / 0.1) * (1 - Math.pow(u, 3)) }, 0.2);
+    rustle(L2[0], 1.8, 0.18, 0.2);
+    breath(L2[1] - 0.2, 0.8, 0.3, { voice: 0.1, f0: 195 }, 0.2);
+    // ---- S9: the ramp. Her footsteps are in sfx; here her breath (harder halfway, the stop) and her jacket
+    breathing(T.ramp[0] + 0.3, T.ramp[1] + 1.5, 0.28, 0.9, 0.1, 200);
+    rustle(T.s9 - 0.5, T.ramp[1] - T.s9 + 0.5, 0.1, 0.1, { density: 120 });
+    // him at the edge of the square: one long breath out
+    breath(T.s9c + 1.3, 1.4, 0.3, { voice: 0.06, f0: 104, env: (u) => Math.min(1, u / 0.08) * Math.pow(1 - u, 1.4) });
+    // ---- S10: the engineer's jacket, his torch click (sfx), a long breath; the hero's breathing under the last line
+    rustle(T.eng - 0.2, 0.6, 0.12, -0.4); breath(T.gaugeUp[1] - 0.4, 1.0, 0.16, { voice: 0.08, f0: 100 }, -0.4);
+    breathing(T.back10, T.s11, 0.12, 1.4);
+    // ---- S11: the help. Her bag set down, both hands, the pull (two strained breaths), the jogger's gasp, a relieved laugh-breath
+    const H = T.help;
+    rustle(H[0] - 0.8, 0.8, 0.18, -0.3);
+    breath(H[0] + 0.5, 0.35, 0.3, { inhale: true }, -0.3);
+    breath(H[0] + 0.85, 1.6, 0.48, { voice: 0.36, f0: 200, env: (u) => Math.min(1, u / 0.1) * (1 - Math.pow(u, 3)) }, -0.35);
+    breath(H[0] + 1.1, 1.8, 0.44, { voice: 0.32, f0: 225, env: (u) => Math.min(1, u / 0.1) * (1 - Math.pow(u, 2.5)) }, -0.2);
+    rustle(H[0] + 0.7, 2.6, 0.24, -0.3, { density: 320 });
+    P(fx.step({ weight: 0.45, scuff: 0.6 }), H[0] + 3.0, 0.24, -0.25); P(fx.step({ weight: 0.4, scuff: 0.3 }), H[0] + 3.4, 0.2, -0.3);
+    for (const d of [0, 0.22, 0.4]) breath(H[1] - 0.6 + d, 0.18, 0.2, { voice: 0.25, f0: 230 }, -0.3);
+    breathing(H[1] + 0.5, T.s12, 0.14, 1.3, -0.3, 210);
+    breathing(T.s12, T.end - 1.0, 0.08, 1.6);
   }
 
   // a stem's room sound: the café room (short, early reflections) until the cut outside, then a sparse plaza reflection
@@ -779,18 +855,17 @@ class GbAudio extends AudioEngine {
   }
 
   // ===================================================================================================== SFX
-  // every event is peak-normalised (`vol` = its peak in the stem); the two smashes share one scale so the 2 g cup stays
+  // every event is peak-normalised (`vol` = its peak in the stem); the ball impacts share one scale so the 2 g ball stays
   // louder by its real impact speed (√2 → +3 dB)
   _sfx(ctx, dest) {
-    const fx = new GbFx(ctx, CONFIG.seed + 401), r = fx.r, sr = fx.sr, T = GB;
+    const fx = new GbFx(ctx, CONFIG.seed + 401), r = fx.r, sr = fx.sr, T = GB, C = this.app.cast;
     const bus = this._withRooms(ctx, fx, dest, 0.22, 0.1);
     const P = (x, t, vol, pan = 0, o = {}) => fx.play(x, t, bus, Object.assign({ vol, pan, norm: true }, o));
     const chairModes = () => [[r.range(290, 340), 0.012, 1], [r.range(600, 680), 0.009, 0.8], [r.range(1100, 1250), 0.006, 0.5], [r.range(2000, 2300), 0.004, 0.3]];
-    // ---- THE DOUBLING: no boom. The whole room drops onto its supports at once: a soft body thump, every cup and saucer
-    //      in the room clatters, spoons jingle, the lamp shades knock on their cords, chairs and the floor creak, the
-    //      window panes buzz in their frames, the plant's leaves shiver
+    const stairModes = () => [[r.range(140, 175), 0.022, 1], [r.range(360, 420), 0.014, 0.6], [r.range(720, 840), 0.009, 0.35]];
+    // ---- THE DOUBLING: no boom. The whole room drops onto its supports at once
     { const y = fx.arr(0.6);
-      for (let i = 0; i < y.length; i++) { const t = i / sr; y[i] = Math.sin(2 * Math.PI * (48 * t + 47 * 0.08 * (1 - Math.exp(-t / 0.08)))) * Math.exp(-t / 0.13) * Math.min(1, t / 0.006); }   // 95 → 48 Hz
+      for (let i = 0; i < y.length; i++) { const t = i / sr; y[i] = Math.sin(2 * Math.PI * (48 * t + 47 * 0.08 * (1 - Math.exp(-t / 0.08)))) * Math.exp(-t / 0.13) * Math.min(1, t / 0.006); }
       GBX.bq(y, 'hp', 40, 0.7, sr);
       P(y, T.g, 0.32, 0); }
     P(fx.creak(1.1, [[140, 0.02, 1], [330, 0.014, 0.7], [610, 0.01, 0.4]], { rate: [12, 32], env: (u) => Math.exp(-u * 2.5) * Math.min(1, u * 12) }), T.g + 0.03, 0.22, 0);
@@ -798,70 +873,95 @@ class GbAudio extends AudioEngine {
       const t = T.g + r.range(0.004, 0.09), pan = r.range(-0.85, 0.85), v = r.range(0.05, 0.11), cm = fx.cupModes(r.range(0.92, 1.1)).concat(fx.saucerModes(r.range(0.92, 1.1)));
       P(fx.hit(cm, { width: 0.0003, amp: 1, extra: [[r.range(0.03, 0.07), 0.0003, 0.35], [r.range(0.09, 0.14), 0.0003, 0.12]] }), t, v, pan);
     }
-    P(fx.hit(fx.cupModes().concat(fx.saucerModes()), { width: 0.00035, amp: 1, extra: [[0.045, 0.0003, 0.4], [0.1, 0.0003, 0.15], [0.14, 0.0003, 0.06]] }), T.g + 0.01, 0.28, -0.1);   // his own cup
     for (let k = 0; k < 6; k++) P(fx.hit(fx.metalModes(r.range(2800, 4200), 0.25), { width: 0.0002, extra: [[r.range(0.02, 0.05), 0.0002, 0.4]] }), T.g + r.range(0.01, 0.06), 0.07, r.range(-0.7, 0.7));
     for (const [d, pan] of [[0.03, -0.45], [0.05, 0.1], [0.07, 0.5]]) {
       P(fx.hit(fx.metalModes(r.range(780, 1050), 0.6), { width: 0.0008, amp: 1 }), T.g + d, 0.12, pan);
       for (let k = 0; k < 5; k++) P(fx.hit([[r.range(3000, 6000), 0.02, 1], [r.range(6500, 9000), 0.012, 0.5]], { width: 0.0001 }), T.g + d + r.range(0.0, 0.25), 0.04, pan);
     }
-    { const y = fx.hit(fx.glassModes(), { width: 0.002, amp: 1 });   // the panes buzz against their frames
+    { const y = fx.hit(fx.glassModes(), { width: 0.002, amp: 1 });
       for (let k = 1; k < 9; k++) GBX.strike(y, Math.round(k * 0.022 * sr), Math.round(0.0004 * sr), 0.5 * Math.exp(-k * 0.35), [[2400, 0.006, 1], [3700, 0.004, 0.6]], sr);
       P(y, T.g + 0.02, 0.14, -0.6); }
     for (let k = 0; k < 4; k++) P(fx.creak(r.range(0.15, 0.35), chairModes(), { rate: [30, 90] }), T.g + r.range(0.02, 0.3), r.range(0.1, 0.16), r.range(-0.8, 0.8));
-    P(fx.creak(0.55, chairModes(), { rate: [25, 60], env: (u) => Math.exp(-u * 3) * Math.min(1, u * 15) }), T.g + 0.04, 0.26, 0);                // his chair
-    P(fx.creak(0.5, [[180, 0.015, 1], [410, 0.01, 0.7], [800, 0.007, 0.4]], { rate: [20, 50] }), T.g + 0.08, 0.14, 0.55);                       // the counter under the waiter
-    P(fx.rustle(0.9, { density: 600, rub: 0.2, lo: 1500, hi: 7000, grain: 0.004, env: (u) => Math.exp(-u * 3) * Math.min(1, u * 20) }), T.g + 0.05, 0.1, -0.7);   // the plant
-    for (let k = 0; k < 5; k++) P(fx.hit(fx.cupModes(r.range(0.95, 1.05)), { width: 0.0002, amp: 1 }), T.g + r.range(0.3, 0.8), r.range(0.05, 0.09), r.range(-0.7, 0.7));   // late settles
-    for (const [d, pan] of [[0.95, 0.4], [1.6, -0.5], [2.2, 0.2]]) P(fx.creak(r.range(0.35, 0.6), [[r.range(130, 160), 0.02, 1], [r.range(300, 360), 0.014, 0.7], [r.range(560, 660), 0.01, 0.4]], { rate: [10, 26] }), T.g + d, 0.12, pan);   // the building settles
-    // ---- THE CUP
+    P(fx.creak(0.55, chairModes(), { rate: [25, 60], env: (u) => Math.exp(-u * 3) * Math.min(1, u * 15) }), T.g + 0.04, 0.26, 0);
+    P(fx.creak(0.5, [[180, 0.015, 1], [410, 0.01, 0.7], [800, 0.007, 0.4]], { rate: [20, 50] }), T.g + 0.08, 0.14, 0.55);
+    P(fx.rustle(0.9, { density: 600, rub: 0.2, lo: 1500, hi: 7000, grain: 0.004, env: (u) => Math.exp(-u * 3) * Math.min(1, u * 20) }), T.g + 0.05, 0.1, -0.7);
+    for (let k = 0; k < 5; k++) P(fx.hit(fx.cupModes(r.range(0.95, 1.05)), { width: 0.0002, amp: 1 }), T.g + r.range(0.3, 0.8), r.range(0.05, 0.09), r.range(-0.7, 0.7));
+    for (const [d, pan] of [[0.95, 0.4], [1.6, -0.5], [2.2, 0.2]]) P(fx.creak(r.range(0.35, 0.6), [[r.range(130, 160), 0.02, 1], [r.range(300, 360), 0.014, 0.7], [r.range(560, 660), 0.01, 0.4]], { rate: [10, 26] }), T.g + d, 0.12, pan);
+    // ---- THE CUP: the coffee lurches in his sinking hand; the first set-down (a clack, too fast); the struggle; ★ set-down
     const cupset = fx.cupModes(), saucer = fx.saucerModes(), both = cupset.concat(saucer), cupPan = -0.1;
-    P(fx.hit(cupset, { width: 0.00035, amp: 0.5, noise: 0.08, nhp: 3000 }), T.grip, 0.2, cupPan);                                  // fingertips on the handle
-    for (let k = 0; k < 5; k++) P(fx.hit(both, { width: 0.00025, amp: 1 }), T.lift + 0.02 + k * (2 * Math.PI / 90), 0.12 + 0.05 * k, cupPan);   // the stick: it rattles at 14 Hz
-    P(fx.creak(0.16, cupset.map(([f, tau, a]) => [f, tau * 0.25, a]), { rate: [700, 1150], env: (u) => Math.sin(Math.PI * u) }), T.lift + 0.33, 0.16, cupPan);   // porcelain squeak as it breaks free
-    { const y = fx.hit(saucer, { width: 0.0005, amp: 1 }); GBX.strike(y, 0, Math.round(0.002 * sr), 0.5, fx.woodModes(210), sr); P(y, T.lift + 0.37, 0.3, cupPan); }   // the saucer clacks back down
+    P(fx.liquid(1.6, (t) => 0.9 * Math.exp(-t * 2.5) * Math.abs(Math.sin(t * 14))), T.g, 0.08, cupPan);
+    { const y = fx.hit(both, { width: 0.0004, amp: 1, noise: 0.12, nhp: 2500, extra: [[0.06, 0.0003, 0.35], [0.11, 0.0003, 0.12]] }); GBX.strike(y, 0, Math.round(0.0025 * sr), 0.6, fx.woodModes(185), sr); P(y, T.cupDown1, 0.42, cupPan); }
+    P(fx.hit(cupset, { width: 0.00035, amp: 0.5, noise: 0.08, nhp: 3000 }), T.grip, 0.2, cupPan);
+    for (let k = 0; k < 5; k++) P(fx.hit(both, { width: 0.00025, amp: 1 }), T.lift + 0.02 + k * (2 * Math.PI / 90), 0.12 + 0.05 * k, cupPan);
+    P(fx.creak(0.16, cupset.map(([f, tau, a]) => [f, tau * 0.25, a]), { rate: [700, 1150], env: (u) => Math.sin(Math.PI * u) }), T.lift + 0.33, 0.16, cupPan);
+    { const y = fx.hit(saucer, { width: 0.0005, amp: 1 }); GBX.strike(y, 0, Math.round(0.002 * sr), 0.5, fx.woodModes(210), sr); P(y, T.lift + 0.37, 0.3, cupPan); }
     P(fx.liquid(T.down - T.lift + 1.2, (t) => { const tt = t + T.lift + 0.35, h = tt < T.down ? 0.45 * Math.abs(Math.sin(tt * 9)) * Math.min(1, (tt - T.lift - 0.35) * 2) : 0; return Math.min(1, h + (tt > T.down ? 0.9 * Math.exp(-(tt - T.down) * 3) * Math.abs(Math.sin((tt - T.down) * 15)) : 0)); }), T.lift + 0.35, 0.1, cupPan);
-    P(fx.creak(0.8, chairModes(), { rate: [20, 55] }), T.lift + 0.15, 0.22, 0.05);                    // the chair under his braced weight
+    P(fx.creak(0.8, chairModes(), { rate: [20, 55] }), T.lift + 0.15, 0.22, 0.05);
     P(fx.creak(1.1, chairModes(), { rate: [15, 40] }), T.top - 0.1, 0.17, 0.05);
     P(fx.creak(1.2, chairModes(), { rate: [12, 35] }), T.lower + 0.3, 0.15, 0.05);
-    { // ★ the set-down: porcelain on porcelain, a solid wooden "tock" through the table, three little settle bounces
-      const y = fx.hit(both, { width: 0.00045, amp: 1, noise: 0.15, nhp: 2500, extra: [[0.0785, 0.0003, 0.42], [0.157, 0.0003, 0.16], [0.236, 0.0003, 0.06]] });
+    { const y = fx.hit(both, { width: 0.00045, amp: 1, noise: 0.15, nhp: 2500, extra: [[0.0785, 0.0003, 0.42], [0.157, 0.0003, 0.16], [0.236, 0.0003, 0.06]] });
       GBX.strike(y, 0, Math.round(0.0025 * sr), 0.8, fx.woodModes(185), sr);
-      // v3: the weight of it — a soft low "dum" of the table top taking a cup that weighs twice as much
       for (let i = 0; i < 0.25 * sr; i++) { const t = i / sr; y[i] += 0.22 * Math.sin(2 * Math.PI * 108 * t) * Math.exp(-t / 0.035) * Math.min(1, t / 0.002); }
       P(y, T.down, 0.6, cupPan); }
-    P(fx.hit(cupset, { width: 0.0003, amp: 0.25 }), T.letGo, 0.1, cupPan);                           // the fingers come off the handle
-    P(fx.creak(0.7, chairModes(), { rate: [20, 50] }), T.letGo + 0.2, 0.24, 0.05);                    // he sags back
-    // ---- THE DROP (both lanes at the measured times; the 2 g cup lands √2 faster, so it is louder and its shards
-    //      bounce sooner); the slow-motion replay re-synthesises the same events 5× slower and lower; then real time again
-    const lanes = this.app.drop.lanes.map((o) => ({ landT: o.landT, v: o.vImpact, g: o.L.g, pan: o.L.side * 0.38 }));
-    const real = lanes.map((L) => fx.smash({ v: L.v, g: L.g, pan: L.pan })), slow = lanes.map((L) => fx.smash({ v: L.v, g: L.g, pan: L.pan, slow: 5, pitch: 0.55, len: 1.4 }));
-    const div = Math.max(...real.map((s) => GBX.peak(s.L, s.R))), divS = Math.max(...slow.map((s) => GBX.peak(s.L, s.R)));
+    P(fx.hit(cupset, { width: 0.0003, amp: 0.25 }), T.letGo, 0.1, cupPan);
+    P(fx.creak(0.7, chairModes(), { rate: [20, 50] }), T.letGo + 0.2, 0.24, 0.05);
+    // ---- THE HOLOGRAM: a soft shimmer as the twin appears; a tone on "mass"; the weight arrow's rising hum on "twice"
+    P(fx.shimmer(1.4, 880), T.holo - 0.3, 0.12, 0.3);
+    P(fx.shimmer(0.7, 1320, { skew: 0.3 }), T.mass - 0.05, 0.08, -0.2);
+    { const d = T.twice[1] + 0.2 - (T.twice[0] - 0.4), y = fx.arr(d + 0.3);
+      for (let i = 0; i < y.length; i++) { const t = i / sr, u = Math.min(1, t / d), f = 220 * Math.pow(2, u); y[i] = (Math.sin(2 * Math.PI * f * t) + 0.3 * Math.sin(4 * Math.PI * f * t)) * Math.sin(Math.PI * Math.min(1, t / (d + 0.3))) ; }
+      GBX.bq(y, 'lp', 1500, 0.7, sr); P(y, T.twice[0] - 0.4, 0.1, 0.3); }
+    // ---- THE DROP: the clamps; each ball's impacts at the measured times (fall, then bounces with the same restitution: the
+    //      2 g ball's rhythm is √2 faster); the replay re-synthesises the same hits 4× slower and lower; then real time
+    const lanes = this.app.drop.lanes.map((o) => ({ hits: gbBallPath(o.L.g, 5).hits, pan: o.L.side * 0.38 }));
+    const vMax = Math.max(...lanes.map((L) => L.hits[0].v));
     for (const L of lanes) P(fx.clamp(), T.drop, 0.14, L.pan);
-    lanes.forEach((L, i) => P(real[i].L, T.drop + L.landT, 1.0, 0, { xr: real[i].R, norm: div, stop: T.replay, fade: 0.1 }));
     const sl = (te) => T.replay + (te - T.replayFrom) / T.replayRate;
-    for (const L of lanes) P(fx.clamp({ slow: 4, pitch: 0.6 }), sl(0), 0.2, L.pan);
-    lanes.forEach((L, i) => P(slow[i].L, sl(L.landT), 0.55, 0, { xr: slow[i].R, norm: divS, stop: T.replayEnd, fade: 0.12 }));
-    lanes.forEach((L, i) => P(real[i].L, T.replayEnd, 1.0, 0, { xr: real[i].R, norm: div, offset: T.replayTo - L.landT, fadeIn: 0.04 }));
-    // ---- OUTSIDE: the bench (wood slats on an iron frame), the car's wing and springs
-    const benchM = () => [[r.range(200, 240), 0.015, 1], [r.range(450, 500), 0.01, 0.8], [r.range(860, 940), 0.007, 0.5], [r.range(1600, 1800), 0.004, 0.25]];
-    const R1 = T.rise1, R2 = T.rise2, ST = T.step;
-    P(fx.creak(0.8, benchM(), { rate: [18, 50] }), R1[0] - 0.05, 0.2, 0);
-    P(fx.hit(fx.woodModes(160).concat([[520, 0.2, 0.15], [1240, 0.12, 0.08]]), { width: 0.006, amp: 1 }), R1[0] + 1.58, 0.35, 0);
-    P(fx.creak(0.6, benchM(), { rate: [20, 60], env: (u) => Math.exp(-u * 3) * Math.min(1, u * 15) }), R1[0] + 1.6, 0.22, 0);
-    P(fx.creak(0.9, benchM(), { rate: [15, 45] }), R2[0], 0.3, 0);
-    P(fx.hit(fx.woodModes(230, 0.6), { width: 0.002, amp: 0.5 }), R2[0] + 0.75, 0.16, 0);
-    // his palm on the car's front wing: a dull, hand-damped ring of sheet steel
-    P(fx.slap(fx.panelModes(0.5), { amp: 1, width: 0.004, skin: 0.4, len: 0.5 }), R2[0] - 0.05, 0.5, 0.2);
-    { // the springs: groan and squeak only while the body moves (|velocity| of the same response car.js draws)
-      const car = this.app.cast.car, C = GB_CAR, kC = 250 * 9.81 / C.sag1;
-      const steps = [[R2[0] - 0.05, 650, 0.35], [R2[0] + 0.6, 250, 0.4], [R2[0] + 1.6, -500, 0.6], [ST[0] - 0.3, -400, 0.25]].map(([t0, F, rise]) => [t0, F / (2 * kC), rise]);   // (= cast.js updateOutside)
-      const t0 = R2[0] - 0.1, dur = ST[0] + 2.6 - t0, vel = [];
-      let vmax = 1e-9;
-      for (let t = t0; t < t0 + dur; t += 0.01) { const v = Math.abs(car._resp(t + 0.005, steps) - car._resp(t - 0.005, steps)) / 0.01; vel.push(v); vmax = Math.max(vmax, v); }
-      const env = (u, t) => Math.pow(Math.min(1, vel[Math.min(vel.length - 1, Math.floor(t / 0.01))] / vmax), 0.8);
-      P(fx.creak(dur, [[r.range(170, 200), 0.02, 1], [r.range(400, 440), 0.012, 0.6], [r.range(740, 800), 0.008, 0.3]], { rate: [35, 95], env }), t0, 0.4, 0.2);
-      P(fx.creak(dur, [[1650, 0.02, 1], [2480, 0.015, 0.6], [3900, 0.01, 0.35]], { rate: [320, 760], env: (u, t) => Math.pow(env(u, t), 2) }), t0, 0.06, 0.25);
-      for (const tt of [R2[0] + 1.6 + 0.12, ST[0] - 0.3 + 0.1]) P(fx.hit(fx.metalModes(r.range(380, 460), 0.3).concat(fx.panelModes(0.3)), { width: 0.003, amp: 0.6 }), tt, 0.2, 0.2);   // the top mounts knock as it rises
+    for (const L of lanes) for (const h of L.hits) {
+      const v = 0.95 * h.v / vMax;
+      if (T.drop + h.t < T.replay - 0.05) P(fx.ballHit({ v: h.v }), T.drop + h.t, v, L.pan, { stop: T.replay, fade: 0.08 });
+      if (h.t >= T.replayFrom && h.t < T.replayTo) P(fx.ballHit({ v: h.v, slow: 3, pitch: 0.6 }), sl(h.t), 0.8 * h.v / vMax, L.pan);
+      if (h.t >= T.replayTo) P(fx.ballHit({ v: h.v }), T.replayEnd + (h.t - T.replayTo), v, L.pan);
     }
+    for (const L of lanes) P(fx.clamp({ slow: 4, pitch: 0.6 }), sl(0), 0.18, L.pan);
+    { const y = fx.arr(0.5); for (let i = 0; i < y.length; i++) { const t = i / sr; y[i] = Math.sin(2 * Math.PI * 2100 * t) * Math.exp(-t / 0.08) * 0.5; } P(y, T.replay - 0.02, 0.06, 0.6); }   // the replay "tick"
+    // ---- S6: the chair slides back over the boards as he pushes up; the table takes his hands; the climber's treads
+    P(fx.creak(0.8, [[r.range(260, 300), 0.012, 1], [r.range(520, 600), 0.009, 0.7], [r.range(1000, 1150), 0.006, 0.4]], { rate: [60, 140], env: (u) => Math.sin(Math.PI * u) }), T.stand[0] - 0.55, 0.36, 0.1);
+    P(fx.creak(0.9, [[120, 0.02, 1], [260, 0.014, 0.6], [480, 0.01, 0.35]], { rate: [15, 40] }), T.stand[0], 0.24, 0);   // the table under his weight
+    P(fx.creak(1.2, chairModes(), { rate: [14, 40] }), T.s6 + 1.0, 0.12, 0.05);
+    for (const h of this._landings(C.climbPlan, T.heart - 3.5, T.s7)) P(fx.woodStep({ weight: 0.55, creak: 0.5, f: r.range(110, 140) }), h.t0, 0.3, -0.35);
+    // ---- S7: his heavy steps on the boards; the first tread groans under him; the second step's foot scrapes and lands back
+    for (const h of this._landings(C.heroPlan, T.walk[0], T.step1[0] + 0.2)) P(fx.woodStep({ weight: 0.9, scuff: 0.25, creak: 0.2, body: 66 }), h.t0, 0.55, 0.1);
+    for (const h of this._landings(C.heroPlan, T.step1[0] + 0.2, T.step1[1] + 1)) P(fx.woodStep({ weight: 1.0, creak: 0.9, body: 62, f: 105 }), h.t0, 0.75, 0.05);
+    P(fx.creak(1.0, stairModes(), { rate: [10, 30], env: (u) => Math.exp(-u * 2) * Math.min(1, u * 10) }), T.step1[0] + 0.75, 0.4, 0.05);
+    P(fx.creak(0.7, stairModes(), { rate: [14, 34] }), T.step2[0] + 0.1, 0.22, 0.05);
+    P(fx.rustle(0.3, { density: 500, rub: 0.5, lo: 800, hi: 3500, grain: 0.006 }), T.step2[0] + 0.25, 0.16, 0.05);
+    P(fx.woodStep({ weight: 0.7, creak: 0.5, body: 64, f: 108 }), T.back[1] - 0.15, 0.5, 0.05);
+    P(fx.creak(1.3, [[r.range(580, 640), 0.012, 1], [r.range(1150, 1250), 0.008, 0.5]], { rate: [25, 60] }), T.rail + 0.1, 0.12, 0.15);   // the rail
+    P(fx.creak(1.0, stairModes(), { rate: [12, 30] }), T.handCU + 0.8, 0.18, 0.05);
+    // ---- S8: the car is quiet (it sank at the change); the bicycle comes out of the rack: the frame knocks the hoop, the
+    //      chain rattles, the basket's load shifts, then it is set down
+    const L2 = T.lift2;
+    P(fx.hit(fx.metalModes(r.range(600, 700), 0.4), { width: 0.0008, amp: 1 }), L2[0] + 0.45, 0.3, 0.3);
+    for (let k = 0; k < 18; k++) P(fx.hit(fx.metalModes(r.range(1800, 3200), 0.12), { width: 0.0002 }), L2[0] + 0.4 + k * r.range(0.04, 0.09), r.range(0.04, 0.09), 0.3);
+    P(fx.rustle(0.6, { density: 1200, rub: 0.2, lo: 1500, hi: 8000, grain: 0.003 }), L2[0] + 0.5, 0.12, 0.35);
+    P(fx.hit(fx.panelModes(0.4).concat(fx.metalModes(480, 0.3)), { width: 0.004, amp: 1 }), L2[1] + 0.35, 0.36, 0.3);   // the bike set down: tyres and frame
+    for (let k = 0; k < 8; k++) P(fx.hit(fx.metalModes(r.range(1800, 3200), 0.12), { width: 0.0002 }), L2[1] + 0.38 + k * 0.05, 0.05, 0.3);
+    // ---- S9: the ramp. Her steps on stone (heavy, short); the tyres crunching grit; the freewheel ticking with the wheel
+    for (const h of this._landings(C.rampPlan, T.ramp[0], T.ramp[1] + 1)) P(fx.step({ weight: 0.7, scuff: 0.3 }), h.t0, 0.32, 0.1);
+    { const t0 = T.ramp[0], d = T.ramp[1] - t0 + 0.5, spd = (t) => Math.abs(C.rampZ(t + 0.05) - C.rampZ(t - 0.05)) / 0.1;
+      const roll = fx.rustle(d, { density: 900, rub: 0.35, lo: 300, hi: 2600, grain: 0.004, env: (u) => Math.min(1, spd(t0 + u * d) / 0.7) });
+      P(roll, t0, 0.14, 0.15);
+      let ang = 0; const tk = fx.hit([[4200, 0.004, 1], [6100, 0.003, 0.5]], { width: 0.0001 });
+      for (let t = t0; t < t0 + d; t += 0.005) { ang += spd(t) * 0.005 / 0.34; if (ang > Math.PI * 2 / 24) { ang -= Math.PI * 2 / 24; P(tk, t, 0.06, 0.2, { norm: false, vol: 0.05 }); } }
+    }
+    // ---- S10: the balcony bracket groans faintly under its doubled load; the engineer's torch click and the tablet's beeps
+    P(fx.hit([[2400, 0.01, 1], [3900, 0.006, 0.5]], { width: 0.0002 }), T.eng + 0.1, 0.1, -0.4);
+    P(fx.creak(2.6, [[r.range(70, 90), 0.05, 1], [r.range(180, 210), 0.03, 0.6], [r.range(420, 470), 0.02, 0.3]], { rate: [6, 16], env: (u) => Math.sin(Math.PI * u) }), T.gaugeUp[0], 0.22, -0.45);
+    P(fx.hit(fx.metalModes(r.range(210, 250), 1.0), { width: 0.004, amp: 1 }), T.gaugeUp[0] + 2.4, 0.16, -0.45);
+    P(fx.beep(1480, 0.07), T.gaugeUp[1] - 0.2, 0.06, -0.4); P(fx.beep(1480, 0.07), T.gaugeUp[1] - 0.05, 0.06, -0.4);
+    // ---- S11: the shopping bag set down on the paving
+    P(fx.hit(fx.stoneModes(1.2), { width: 0.006, amp: 1 }), T.help[0] - 0.75, 0.16, -0.3);
+    P(fx.rustle(0.5, { density: 1400, rub: 0.15, lo: 2000, hi: 9000, grain: 0.0025, peak: 4200 }), T.help[0] - 0.78, 0.1, -0.3);
   }
 }

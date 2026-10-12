@@ -134,7 +134,7 @@ const GB_SHOTS = [
   // ================= SCENE 7 — no narration: the stairs
   // G1 — the wide from the room: his last heavy steps to the foot of the stairs
   { id: 'G1', t0: GB.s7, t1: GB.rail - 0.3, rim: 1.0,
-    cam: gbMove(GB.s7, GB.rail - 0.3, [_gbV(4.2, 1.5, -0.4), _gbV(1.6, 1.05, 2.9), 44], [_gbV(3.7, 1.45, 0.0), _gbV(1.2, 1.0, 2.9), 42], { dof: 0.3 }) },
+    cam: gbMove(GB.s7, GB.rail - 0.3, [_gbV(3.6, 1.55, -0.9), _gbV(1.7, 1.05, 2.9), 42], [_gbV(3.25, 1.5, -0.55), _gbV(1.2, 1.0, 2.9), 40], { dof: 0.3 }) },
   // G2 — side on, low: the hand takes the rail; the first step; the second… the foot hesitates and comes back
   { id: 'G2', t0: GB.rail - 0.3, t1: GB.handCU, rim: 1.0,
     cam: gbMove(GB.rail - 0.3, GB.handCU, [_gbV(2.6, 1.1, 1.4), _gbV(1.0, 0.7, 2.95), 44], [_gbV(2.45, 1.0, 1.55), _gbV(0.9, 0.75, 2.95), 40], { dof: 0.4 }) },
@@ -175,7 +175,7 @@ const GB_SHOTS = [
   { id: 'I1', t0: GB.s9, t1: GB.s9b, outside: true, rim: 1.1,
     cam: (t, ctx) => {
       const z = ctx.rampZ;
-      const pos = _gbV(8.4, 0.95, z + 1.1), at = _gbV(10.8, 0.85, z - 0.6);
+      const pos = _gbV(10.15, 1.75, z - 3.1), at = _gbV(10.85, 1.0, z);   // ahead of her, up the ramp: she climbs toward us
       return { pos, at, fov: 42, focus: pos.distanceTo(at), dof: 0.35 };
     } },
   // I2 — the fountain: the wide reveal of the short jets
@@ -200,7 +200,7 @@ const GB_SHOTS = [
   // ================= SCENE 11 — no narration: the silent reveal
   // K1 — people helping each other: the shopper pulls the jogger to her feet
   { id: 'K1', t0: GB.s11, t1: GB.help[0] + 3.3, outside: true, rim: 1.15,
-    cam: gbMove(GB.s11, GB.help[0] + 3.3, [_gbV(-4.3, 1.0, -9.6), _gbV(-5.0, 0.8, -11.5), 42], [_gbV(-4.0, 1.2, -9.4), _gbV(-5.0, 1.1, -11.5), 40], { dof: 0.4 }) },
+    cam: gbMove(GB.s11, GB.help[0] + 3.3, [_gbV(-6.6, 1.1, -9.8), _gbV(-5.0, 0.85, -11.5), 42], [_gbV(-6.4, 1.25, -9.6), _gbV(-5.0, 1.1, -11.5), 40], { dof: 0.4 }) },
   // K2 — the slow wide rising shot: the square at the low sun, short sparkling jets, him by the fountain
   { id: 'K2', t0: GB.help[0] + 3.3, t1: GB.s12, outside: true, rim: 1.2,
     cam: gbMove(GB.help[0] + 3.3, GB.s12, [_gbV(1.5, 1.4, -7.0), _gbV(-2.5, 1.0, -12.5), 46], [_gbV(3.5, 5.0, -4.5), _gbV(-2.0, 0.6, -13.5), 50], { dof: 0.08 }) },
