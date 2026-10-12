@@ -35,7 +35,7 @@ function lines(text) {
     duration: BE.end,
     scenes: BN.scenes, phrases: BN.phrases,
     clips: BN.clips.map((c) => ({ id: c.id, scene: c.scene, file: c.file, start: c.start, speechEnd: c.speechEnd, seconds: c.seconds, gainDb: c.gainDb, text: c.text })),
-    shots: BE_SHOTS.map((s) => ({ id: s.id, t0: s.t0, t1: Math.min(s.t1, BE.end), set: s.set, slowedLabel: !!s.tag })),
+    shots: BE_SHOTS.map((s) => ({ id: s.id, t0: Math.max(0, s.t0), t1: Math.min(s.t1, BE.end), set: s.set, slowedLabel: !!s.tag })),
   }));
   await br.close();
   fs.mkdirSync(OUT, { recursive: true });

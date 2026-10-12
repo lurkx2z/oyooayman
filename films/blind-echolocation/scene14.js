@@ -219,7 +219,7 @@ BE_SCHEDULERS.push((app) => {
       cam: beMove(B.z4, B.qSnap[0] - 0.35, [V(-0.72, 1.45, -0.2), V(-1.32, 1.2, 3.0), 50], [V(-0.8, 1.42, 0.3), V(-1.3, 1.15, 3.2), 46], { dof: 0.4, focus: (t, p) => p.distanceTo(H().root.position) }) },
     // Z4b: from the hallway, facing her in the warm light: the cane unfolds, the tip finds the floor, she smiles
     { id: 'Z4b', t0: B.qSnap[0] - 0.35, t1: B.z5, set: 'apt', look: () => BE_REAL,
-      cam: beMove(B.qSnap[0] - 0.35, B.z5, [V(1.15, 1.3, 3.3), V(-1.25, 1.0, 2.62), 44], [V(0.9, 1.34, 3.32), V(-1.25, 1.08, 2.66), 40], { dof: 0.3, focus: (t, p) => p.distanceTo(H().root.position) }) },
+      cam: beMove(B.qSnap[0] - 0.35, B.z5, [V(1.15, 1.3, 3.3), V(-1.25, 0.9, 2.8), 50], [V(0.95, 1.32, 3.32), V(-1.25, 0.95, 2.82), 45], { dof: 0.3, focus: (t, p) => p.distanceTo(H().root.position) }) },
     // Z5: the opening's view from the bed; the click; the answer; the fade
     { id: 'Z5', t0: B.z5, t1: 1e9, set: 'apt', decay: 1.2, gain: 1.7, heroGain: 0.8,
       look: (t) => { const k = MathX.smooth(t, B.qClick - 0.02, B.qClick + 0.12); return { ac: k, world: MathX.lerp(1, 0.4, k), hero: MathX.lerp(1, 0.6, k), glow: MathX.lerp(1, 0.45, k) }; },
