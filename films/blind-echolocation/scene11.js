@@ -15,7 +15,7 @@
      K8   "Echolocation is one remarkable possibility among them.": at the door, a click: the glass door and the
           windows answer, close and broad (the sound view)
      K9   "The goal isn't to recreate eyesight. It's to gain useful information and greater independence.": the sound
-          view gives way to the picture: the two of them at the door, wide; she smiles
+          view gives way to the picture: the two of them at the door, from the shopfront; she smiles
      K10  (no narration) the friend opens the door; the room beyond pours out (voices, cups, a warm enclosed room);
           they go in together
    ===================================================================== */
@@ -257,11 +257,11 @@ BE_SCHEDULERS.push((app) => {
     { id: 'K2', t0: B.k2, t1: B.k3, set: 'city', look: () => BE_REAL,
       cam: (t) => { const x = fx(), k = MathX.ramp(t, B.k2, B.k3); return { pos: V(x - 2.7 + 0.2 * k, 1.5, 12.75), at: V(x, 1.42, 13.65), fov: 38, focus: 2.85, dof: 0.35 }; } },
     // K3: her experience: the voice to her right, warm; she turns toward it
-    { id: 'K3', t0: B.k3, t1: B.k4, set: 'city', tag: true, look: () => ac(0.04, 0.32), decay: 0.5, gain: 1.2, heroGain: 0.55, shells: false, splash: 0.9,
+    { id: 'K3', t0: B.k3, t1: B.k4, set: 'city', tag: true, look: () => ac(0.025, 0.32), decay: 0.5, gain: 1.2, heroGain: 0.55, shells: false, splash: 0.9,
       cam: beMove(B.k3, B.k4, [V(50.25, 1.78, 14.35), V(55.5, 1.35, 12.9), 50], [V(50.35, 1.76, 14.3), V(55.0, 1.35, 13.0), 48], { dof: 0 }),
       labels: (t) => [lab(ct().friend.worldOf('hd').add(V(0, 0.32, 0)), '<div class="k">A VOICE SHE KNOWS</div>', MathX.smooth(t, B.k3 + 0.5, B.k3 + 0.9) * (1 - MathX.smooth(t, B.k4 - 0.4, B.k4)))] },
     // K4: low, her experience: the steps, closer with each one
-    { id: 'K4', t0: B.k4, t1: B.k5, set: 'city', tag: true, look: () => ac(0.04, 0.32), decay: 0.5, gain: 1.2, heroGain: 0.55, shells: false, splash: 0.9,
+    { id: 'K4', t0: B.k4, t1: B.k5, set: 'city', tag: true, look: () => ac(0.025, 0.32), decay: 0.5, gain: 1.2, heroGain: 0.55, shells: false, splash: 0.9,
       cam: beMove(B.k4, B.k5, [V(49.9, 0.32, 12.85), V(54.5, 0.12, 13.6), 54], [V(50.05, 0.3, 12.9), V(53.5, 0.12, 13.55), 54], { dof: 0 }),
       labels: (t) => [lab(V(52.6, 0.45, 13.6), '<div class="k">FOOTSTEPS</div><div class="s">CLOSER WITH EVERY STEP</div>', MathX.smooth(t, B.k4 + 0.4, B.k4 + 0.8) * (1 - MathX.smooth(t, B.k5 - 0.4, B.k5)))] },
     // K5: hands: hers on Noor's forearm; Noor takes her arm above the elbow; she turns to lead
@@ -279,13 +279,13 @@ BE_SCHEDULERS.push((app) => {
           lab(N.worldOf('LWr').add(V(0, -0.1, 0)), '<div class="k">A GUIDE’S ARM</div>', a(B.kW.skills)),
           lab(ct().cane.position.clone().add(V(0, 0.12, 0)), '<div class="k">THE CANE</div>', a(B.kW.tools))]; } },
     // K8: at the door: a click; the glass front answers, close and broad (the sound view)
-    { id: 'K8', t0: B.k8, t1: B.k9, set: 'city', tag: true, look: () => ac(0.04, 0.35), decay: 0.45, gain: 1.3, heroGain: 0.6, shells: false, splash: 0.9,
+    { id: 'K8', t0: B.k8, t1: B.k9, set: 'city', tag: true, look: () => ac(0.025, 0.35), decay: 0.45, gain: 1.3, heroGain: 0.6, shells: false, splash: 0.9,
       cam: beMove(B.k8, B.k9, [V(56.9, 1.75, 12.0), V(57.9, 1.35, 15.2), 50], [V(57.05, 1.7, 12.35), V(57.85, 1.35, 15.2), 48], { dof: 0 }),
       labels: (t) => [lab(V(58, 2.15, 15.1), '<div class="k">ECHOLOCATION</div><div class="s">ONE TOOL AMONG MANY</div>', MathX.smooth(t, B.kClick + 0.5, B.kClick + 0.9) * (1 - MathX.smooth(t, B.k9 - 0.4, B.k9)))] },
-    // K9: the sound view gives way to the picture: the two of them at the door, wide, warm
+    // K9: the sound view gives way to the picture: the two of them at the door, from the shopfront (their faces), warm
     { id: 'K9', t0: B.k9, t1: B.k10, set: 'city', look: (t) => { const k = MathX.smooth(t, B.k9 + 0.5, B.k9 + 1.9); return { ac: k < 0.5 ? 1 : 0, world: k < 0.5 ? MathX.lerp(0.04, 0.4, k * 2) : 1, hero: k < 0.5 ? MathX.lerp(0.35, 0.8, k * 2) : 1, glow: 0.05 }; },
       decay: 0.45, gain: 1.2, heroGain: 0.6, shells: false,
-      cam: beMove(B.k9, B.k10, [V(56.2, 1.55, 13.0), V(57.65, 1.45, 14.1), 40], [V(54.1, 2.35, 12.25), V(57.7, 1.2, 14.2), 46], { dof: 0.12, ease: Ease.inOutCubic }) },
+      cam: beMove(B.k9, B.k10, [V(60.1, 1.62, 14.9), V(57.55, 1.36, 13.85), 40], [V(59.55, 1.52, 15.0), V(57.55, 1.3, 13.8), 37], { dof: 0.12, focus: (t, pos) => pos.distanceTo(mid()), ease: Ease.inOutSine }) },
     // K10a: the friend pushes the door; warm light falls on them
     { id: 'K10a', t0: B.k10, t1: B.k10b, set: 'city', look: () => BE_REAL,
       cam: beMove(B.k10, B.k10b, [V(60.4, 1.55, 12.45), V(57.8, 1.3, 14.75), 42], [V(60.2, 1.53, 12.55), V(57.8, 1.3, 14.85), 41], { dof: 0.12, focus: (t, pos) => pos.distanceTo(mid()) }) },

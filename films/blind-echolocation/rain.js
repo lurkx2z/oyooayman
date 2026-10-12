@@ -152,9 +152,9 @@ class BeRain {
           vec2 d = f - (0.2 + 0.6 * h); vec2 wd = normalize(uWind + vec2(0.001));
           float along = dot(d, wd), across = dot(d, vec2(-wd.y, wd.x));
           float dash = step(h.x, 0.55) * smoothstep(0.05, 0.0, abs(across)) * smoothstep(0.22, 0.0, abs(along));
-          float a = uA * band * (0.12 + 0.55 * dash);
+          float a = uA * band * (0.22 + 0.6 * dash);   // a grey veil (the heavier rain), its streaks bright
           if (a < 0.004) discard;
-          gl_FragColor = vec4(vec3(0.85, 0.88, 0.92), a);
+          gl_FragColor = vec4(mix(vec3(0.3, 0.33, 0.37), vec3(0.88, 0.9, 0.94), dash), a);
         }`,
     });
     for (const y of [1.2, 4.5, 8.0, 11.5]) { const q = new THREE.Mesh(new THREE.PlaneGeometry(70, 40), m); q.rotation.x = -Math.PI / 2; q.position.y = y; q.userData.beSkip = true; q.renderOrder = 6; g.add(q); }

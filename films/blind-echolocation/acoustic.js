@@ -164,7 +164,8 @@ function beAcoustic(m, o = {}) {
         if (uBeAc > 0.001) {
           vec3 beN = normalize(inverseTransformDirection(normal, viewMatrix));
           vec3 beA = beAcoustic(vBeW, beN);
-          gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * uBeReal + beA, uBeAc);
+          vec3 beC = mix(vec3(dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114))), gl_FragColor.rgb, 0.45);   // sound carries no colour: what is left of the picture is greyed
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, beC * uBeReal + beA, uBeAc);
         }`);
     if (!/beAcoustic\(vBeW/.test(sh.fragmentShader)) console.warn('beAcoustic: injection failed for', m.name);
   };

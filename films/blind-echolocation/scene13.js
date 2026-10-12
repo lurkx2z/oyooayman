@@ -141,7 +141,7 @@ BE_SCHEDULERS.push((app) => {
         beMove(B.n4 + 3.2, B.n5, [V(74.6, 1.55, -28.0), V(78.6, 1.15, -30.6), 40], [V(74.2, 1.5, -28.9), V(78.8, 1.15, -30.9), 38], { dof: 0, ease: Ease.linear })) },
     // C3: on the bridge: the man with the cane crossing; his clicks answer from the rails and the water
     { id: 'C3', t0: B.n5, t1: B.ng, set: 'sfield', tag: 'A METAPHOR · SOUND SLOWED', look: () => ac(0.0, 0.7), decay: 0.9, gain: 1.5, heroGain: 0.7, fall: 0.0016, csGain: () => 0.6,
-      cam: (() => { const m = beMove(B.n5, B.ng, [V(86.5, 11, 127), V(77.4, 0.3, 136), 46], [V(86, 10, 146), V(77.4, 0.3, 143), 44], { dof: 0, ease: Ease.inOutSine });
+      cam: (() => { const m = beMove(B.n5, B.ng, [V(85, 8, 129), V(77.4, 0.4, 136), 44], [V(83, 5.4, 145), V(77.4, 0.6, 143), 38], { dof: 0, ease: Ease.inOutSine });
         return (t) => { const c = m(t), h = FILM._app.sets.sfield.B.root.position; c.at.set(MathX.lerp(c.at.x, h.x, 0.6), c.at.y, MathX.lerp(c.at.z, h.z, 0.6)); return c; }; })() },
     // G: three measured clicks over the city; the music peaks; to black
     { id: 'G13', t0: B.ng, t1: B.s14, set: 'sfield', tag: 'A METAPHOR · SOUND SLOWED', look: (t) => ac(0.0, 0.5 * (1 - MathX.smooth(t, B.s14 - 1.1, B.s14 - 0.1))), decay: 1.0, heroGain: 0.7, fall: 0.0016,

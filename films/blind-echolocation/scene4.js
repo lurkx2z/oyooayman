@@ -127,7 +127,7 @@ function beVoidFx(app, t, shot) {
       labels: (t) => { const T = BE_C4CLOCK.value(t), m = mouth(), w = vd().walls[0].p.x;
         return [
           lab(V(m.x + 1.0, 0.85, 0.35), '<div class="v">2 <small>m</small></div>', StoryHUD.win(t, bnF(4, 'two').start - 0.15, B.d4, 0.3, 0.3)),
-          lab(V(w, 1.9, 0), '<div class="k">AT THE WALL</div><div class="v">5.8 <small>ms</small></div>', T >= BE_C4_RT / 2 ? StoryHUD.win(t, B.dWall, B.dBack - 0.3, 0.2, 0.3) : 0, '', 7, 0),
+          lab(V(w, 1.9, 0), '<div class="k">AT THE WALL</div><div class="v">5.8 <small>ms</small></div>', T >= BE_C4_RT / 2 ? StoryHUD.win(t, B.dWall, bnF(4, 'twelve').start - 0.25, 0.2, 0.3) : 0, '', 7, 0),
           lab(V(m.x, 2.0, 0), '<div class="k">BACK AT HER EARS</div><div class="v">11.7 <small>ms</small></div>', T >= BE_C4_RT * 0.999 ? StoryHUD.win(t, B.dBack - 0.05, B.d4, 0.2, 0.3) : 0),
           lab(null, '<div class="k">THERE AND BACK: 4 m</div><div class="v">4 m ÷ 343 m/s ≈ 12 <small>ms</small></div>', StoryHUD.win(t, bnF(4, 'twelve').start - 0.1, B.d4, 0.35, 0.3), 'w', 18, -34),
         ]; } },

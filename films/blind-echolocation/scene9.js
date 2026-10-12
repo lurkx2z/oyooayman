@@ -195,7 +195,7 @@ BE_SCHEDULERS.push((app) => {
     { id: 'I2', t0: B.i2, t1: B.i3, set: 'city', look: () => BE_REAL,
       cam: (t) => { const x = hx(t), k = MathX.ramp(t, B.i2, B.i3); return { pos: V(x + 4.6 - 0.6 * k, 1.45, 8.35), at: V(x - 0.4, 1.15, 9.6), fov: 40, focus: 4.6, dof: 0.45 }; } },
     // I3: the sound view: high behind her, down the street; each word lights its sources
-    { id: 'I3', t0: B.i3, t1: B.i4, set: 'city', tag: true, decay: 0.5, gain: 1.2, heroGain: 0.5, look: () => ac(0.085, 0.4),
+    { id: 'I3', t0: B.i3, t1: B.i4, set: 'city', tag: true, decay: 0.5, gain: 1.2, heroGain: 0.5, look: () => ac(0.03, 0.4),
       cam: (t) => { const x = hx(t), k = Ease.inOutSine(MathX.ramp(t, B.i3, B.i4)); return { pos: V(x - 6.5 + 1.5 * k, 4.0 - 0.4 * k, 10.9), at: V(x + 9, 0.4, 5.6), fov: 56, focus: 10, dof: 0 }; },
       labels: (t) => { const W = B.iW, set = ct(), a = (w0, w1) => MathX.smooth(t, w0 - 0.05, w0 + 0.25) * (1 - MathX.smooth(t, w1, w1 + 0.4));
         const car = set.cars.filter((c) => !c.bus && c.lane === 1).map((c) => set.carX(c, t)).filter((x) => x > hx(t) + 2).sort((p, q) => p - q)[0] ?? hx(t) + 12;
@@ -210,14 +210,14 @@ BE_SCHEDULERS.push((app) => {
     { id: 'I4', t0: B.i4, t1: B.i5, set: 'city', look: () => BE_REAL,
       cam: (t) => { const h = head(), k = MathX.ramp(t, B.i4, B.i5); return { pos: V(h.x + 1.5 - 0.1 * k, h.y - 0.05, h.z - 1.0), at: V(h.x, h.y - 0.1, h.z), fov: 32, focus: 1.8, dof: 0.7 }; } },
     // I5: the sound view, close behind her: her click is swamped; the masking card
-    { id: 'I5', t0: B.i5, t1: B.i6, set: 'city', tag: true, decay: 0.45, gain: 1.4, heroGain: 0.5, noise: 1.6, look: () => ac(0.07, 0.4),
+    { id: 'I5', t0: B.i5, t1: B.i6, set: 'city', tag: true, decay: 0.45, gain: 1.4, heroGain: 0.5, noise: 1.6, look: () => ac(0.025, 0.4),
       cam: (t) => { const h = head(); return { pos: V(h.x - 2.4, h.y + 0.7, h.z + 1.3), at: V(h.x + 3, h.y - 0.6, h.z - 1.4), fov: 52, focus: 2.5, dof: 0 }; },
       draw: (cv, t) => beDrawMasking(cv, t) },
     // I6: low on the cane: the tactile paving at the corner; she stops (the camera rises to show the corner)
     { id: 'I6', t0: B.i6, t1: B.i7, set: 'city', look: () => BE_REAL,
       cam: (t) => { const k = Ease.inOutSine(MathX.ramp(t, B.i6 + 1.8, B.i7)); return { pos: V(30.6 + 0.8 * k, MathX.lerp(0.32, 1.5, k), MathX.lerp(8.7, 7.9, k)), at: V(MathX.lerp(29.4, 28.8, k), MathX.lerp(0.05, 1.0, k), 9.55), fov: 46, focus: 1.6, dof: 0.6 * (1 - k) }; } },
     // I7: the sound view over her right shoulder, along the building line: the wall answers until it ends
-    { id: 'I7', t0: B.i7, t1: B.i8, set: 'city', tag: true, decay: 0.8, gain: 1.7, heroGain: 0.5, noise: 0.5, shells: false, look: () => ac(0.05, 0.35),
+    { id: 'I7', t0: B.i7, t1: B.i8, set: 'city', tag: true, decay: 0.8, gain: 1.7, heroGain: 0.5, noise: 0.5, shells: false, look: () => ac(0.022, 0.35),
       cam: (t) => { const k = MathX.ramp(t, B.i7, B.i8); return { pos: V(23.2 + 0.5 * k, 2.4, 10.4), at: V(30.5, 1.3, 11.6), fov: 56, focus: 4, dof: 0 }; },
       labels: (t) => [lab(V(26.9, 2.4, 12.0), '<div class="k">THE WALL ENDS HERE</div>', MathX.smooth(t, B.i7Clicks[0] + 0.5, B.i7Clicks[0] + 0.9)),
         lab(V(33.5, 1.4, 13.5), '<div class="k">OPEN SPACE</div><div class="s">THE SIDE STREET</div>', MathX.smooth(t, B.i7Clicks[1] + 0.3, B.i7Clicks[1] + 0.7))] },
@@ -227,7 +227,7 @@ BE_SCHEDULERS.push((app) => {
     { id: 'I8b', t0: B.i8b, t1: B.i9, set: 'city', look: () => BE_REAL,
       cam: beMove(B.i8b, B.i9, [V(25.2, 1.6, 12.2), V(31, 1.0, 6.5), 46], [V(25.0, 2.0, 12.6), V(31, 1.0, 6.0), 46], { dof: 0.2 }) },
     // I9a: (no narration) the sound view: the noise falls into layers; the walk tone
-    { id: 'I9a', t0: B.i9, t1: B.i9b, set: 'city', tag: true, decay: 0.45, gain: 1.2, heroGain: 0.5, noise: 1.0, shells: false, look: () => ac(0.07, 0.38),
+    { id: 'I9a', t0: B.i9, t1: B.i9b, set: 'city', tag: true, decay: 0.45, gain: 1.2, heroGain: 0.5, noise: 1.0, shells: false, look: () => ac(0.025, 0.38),
       layers: (t) => MathX.smooth(t, B.i9 + 0.2, B.i9 + 1.4),
       cam: beMove(B.i9, B.i9b, [V(25.4, 3.2, 12.4), V(36, 0.8, 7.0), 52], [V(25.8, 3.0, 12.2), V(36, 0.8, 7.5), 50], { dof: 0 }),
       labels: (t) => { const a = MathX.smooth(t, B.i9 + 0.6, B.i9 + 1.2), set = ct(); return [

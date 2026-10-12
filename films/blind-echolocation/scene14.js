@@ -1,8 +1,9 @@
 /* =====================================================================
    SCENE 14 — "The last question". The bedroom of the opening, months later: the same morning sun, the same phone,
    the same door. She knows the room now.
-     Z1  "So, what if you went blind? … your surroundings.": the alarm rings on the bedside table, as it did in the first
-         seconds of the film; her hand goes straight to it, silences it and sets it back down, square on the table
+     Z1  "So, what if you went blind?": the alarm rings on the bedside table, as it did in the first seconds of the film;
+         her hand goes straight to it, silences it and sets it back down, square on the table (an insert)
+     Z1b "It wouldn't mean the end of understanding your surroundings.": her face, from the corner; she straightens
      Z2  "Your life would change… all of them.": she walks to the door (her fingertips brush the dresser's corner on the
          way, a landmark); her hand finds the lever without searching
      Z3  "But echolocation reveals… the smallest signals.": a restrained sound view: only the room's small sounds (the
@@ -204,9 +205,13 @@ BE_SCHEDULERS.push((app) => {
   // the opening's own view from the bed (t ≈ 2 s): eye, yaw, pitch
   const eye = V(-0.36, 1.112, -1.44), yaw0 = -0.786, pit0 = -0.017, dir = (y, p) => V(Math.sin(y) * Math.cos(p), Math.sin(p), Math.cos(y) * Math.cos(p));
   const S = [
-    // Z1: over her right shoulder, down to the bedside table (the phone where it rang in the opening)
-    { id: 'Z1', t0: B.s14, t1: B.z2, set: 'apt', look: () => BE_REAL,
-      cam: beMove(B.s14, B.z2, [V(0.38, 1.42, -1.78), V(-1.08, 0.98, -1.52), 50], [V(0.3, 1.46, -1.66), V(-1.1, 1.06, -1.42), 46], { dof: 0.5, focus: (t, p) => p.distanceTo(V(-1.12, 0.8, -1.6)) }) },
+    // Z1: the insert, low from the west wall: the phone ringing on the bedside table (where it rang in the opening); her
+    // hand takes it, silences it, sets it down square and leaves
+    { id: 'Z1', t0: B.s14, t1: B.q14.let + 0.35, set: 'apt', look: () => BE_REAL,
+      cam: beMove(B.s14, B.q14.let + 0.35, [V(-1.95, 1.1, -1.62), V(-1.1, 0.74, -1.64), 50], [V(-1.92, 1.08, -1.58), V(-1.1, 0.72, -1.64), 47], { dof: 0.6, focus: (t, p) => p.distanceTo(BE_APT.phone0) }) },
+    // Z1b: from the corner beyond the bedside table (she faces it): she straightens, listening
+    { id: 'Z1b', t0: B.q14.let + 0.35, t1: B.z2, set: 'apt', look: () => BE_REAL,
+      cam: beMove(B.q14.let + 0.35, B.z2, [V(-2.1, 1.4, -1.96), V(-1.03, 1.06, -1.42), 62], [V(-2.06, 1.41, -1.92), V(-1.01, 1.1, -1.38), 58], { dof: 0.3, focus: (t, p) => p.distanceTo(V(-1.03, 1.2, -1.4)) }) },
     // Z2: the walk to the door, from the window side (the dresser and the door beyond her)
     { id: 'Z2', t0: B.z2, t1: B.z3, set: 'apt', look: () => BE_REAL,
       cam: (t) => { const h = H().root.position, k = Ease.inOutSine(MathX.ramp(t, B.z2, B.z3)); const pos = V(0.95 - 0.25 * k, 1.42, -0.85 + 1.25 * k);

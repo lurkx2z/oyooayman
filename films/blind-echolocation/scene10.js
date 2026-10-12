@@ -40,7 +40,7 @@ BE.s11 = BN_SC[11].start;
 BE.jW = { pavement: bnE(10, 'pavement').start, metal: bnE(10, 'metal').start, leaves: bnE(10, 'leaves').start, umbrellas: bnE(10, 'umbrellas').start, glass: bnE(10, 'glass').start,
   trust: bnE(10, 'trust').start, check: bnE(10, 'check').start, slow: bnE(10, 'slow').start };
 BE.rain0 = bnE(10, 'raining').start - 0.3;                 // the first drops
-BE.jRail = BE.j2 + 1.15;                                     // the macro drop meets the rail
+BE.jRail = BE.j2 + 0.5;                                      // the macro drop meets the rail
 BE.jFlash = BE.j4a + 0.75;                                   // lightning, far off (thunder follows in the sound)
 BE.j6Clicks = [BE.j6 + 0.35, bnE(10, 'quieter').start - 0.05];
 BE.jTap = BE.jW.check + 0.2;                                 // her cane meets the column
@@ -48,7 +48,7 @@ BE.jStop = BE.jW.slow + 0.4;                                 // she has slowed t
 BE.jIn = [BE.j9b - 0.6, BE.j9b + 1.8];                       // she steps in under the arcade
 
 function beRainK(t) { return 0.12 * MathX.smooth(t, BE.rain0 - 0.2, BE.rain0 + 0.4) + 0.88 * MathX.smooth(t, BE.rain0 + 0.6, BE.j3a); }
-function beStormK(t) { return MathX.smooth(t, BE.s10 - 0.2, BE.rain0 + 0.8); }
+function beStormK(t) { return MathX.smooth(t, BE.s10 - 3.2, BE.rain0 + 0.5); }   // the sky starts closing at the end of scene 9's crossing
 function beWetK(t) { return MathX.smooth(t, BE.rain0, BE.j3a + 1.2); }
 // the sheet of rain in the gap (J9a): a band of heavier rain moving along +x
 function beRainFront(t) { const k = MathX.ramp(t, BE.j9 - 0.6, BE.j9b + 0.3); return [MathX.lerp(22, 62, k), 4.5, MathX.window(t, BE.j9 - 0.6, BE.j9b + 0.4, 0.6, 0.5)]; }
@@ -294,7 +294,7 @@ BE_SCHEDULERS.push((app) => {
       cam: beMove(B.s10, B.j2, [V(42.2, 0.75, 8.2), V(30, 4.6, 10.4), 48], [V(42.0, 0.7, 8.25), V(30, 5.2, 10.2), 50], { dof: 0.08, focus: () => 6.5 }) },
     // J2: SLOW MOTION macro: one drop meets the metal guard rail
     { id: 'J2', t0: B.j2, t1: B.j3a, set: 'city', look: () => BE_REAL, rate: 1 / 30, tag: 'SLOW MOTION', splash: 0.5, rainDens: 0.5, rainAlpha: 0.5,
-      cam: (t) => { const k = MathX.ramp(t, B.j2, B.j3a); return { pos: V(42.02 - 0.012 + 0.012 * k, 1.034, 7.35 - 0.13 + 0.01 * k), at: V(42.02, 1.029, 7.35), fov: 21, focus: 0.13, dof: 1.8 }; } },
+      cam: (t) => { const k = MathX.ramp(t, B.j2, B.j3a); return { pos: V(42.02 - 0.012 + 0.012 * k, 1.034, 7.35 - 0.13 + 0.01 * k), at: V(42.02, 1.029, 7.35), fov: 21, focus: 0.13, dof: 1.1 }; } },
     // J3: the inserts, each on its word
     { id: 'J3a', t0: B.j3a, t1: B.j3b, set: 'city', look: () => BE_REAL, rate: 1 / 6, tag: 'SLOW MOTION', splash: 1.0, rainHalf: 5, splashSize: 1.5, splashAlpha: 0.9,
       cam: (t) => { const k = MathX.ramp(t, B.j3a, B.j3b); return { pos: V(45.4 + 0.25 * k, 0.2, 8.6), at: V(47.0 + 0.25 * k, 0.0, 9.4), fov: 40, focus: 1.6, dof: 0.9 }; } },
@@ -309,18 +309,18 @@ BE_SCHEDULERS.push((app) => {
     // J4a: the storm from high above the street (lightning, far off); J4b: the same street as sound
     { id: 'J4a', t0: B.j4a, t1: B.j4b, set: 'city', look: () => BE_REAL, fogD: 0.009, rainHalf: 34, rainFog: 0.006, rainAlpha: 0.5,
       cam: beMove(B.j4a, B.j4b, [V(14, 30, -16), V(50, 0, 8), 44], [V(16, 28, -15), V(50, 0, 8), 44], { dof: 0 }) },
-    { id: 'J4b', t0: B.j4b, t1: B.j5, set: 'city', tag: true, look: () => ac(0.06, 0.4), rainHalf: 34, splash: 1.0, decay: 0.5, gain: 1.2, heroGain: 0.5, noise: 0.6, shells: false,
+    { id: 'J4b', t0: B.j4b, t1: B.j5, set: 'city', tag: true, look: () => ac(0.025, 0.4), rainHalf: 34, splash: 1.0, decay: 0.5, gain: 1.2, heroGain: 0.5, noise: 0.6, shells: false,
       cam: beMove(B.j4b, B.j5, [V(16, 28, -15), V(50, 0, 8), 44], [V(18, 26, -14), V(50, 0, 8), 44], { dof: 0 }),
       labels: (t) => [lab(V(38, 1.5, 9.5), '<div class="k">EVERY DROP IS A TINY SOUND</div>', MathX.smooth(t, B.j4b + 0.4, B.j4b + 0.9))] },
     // J5: with her, walking in the rain (front three-quarter, tracking)
     { id: 'J5', t0: B.j5, t1: B.j6, set: 'city', look: () => BE_REAL,
       cam: (t) => { const p = hero(), k = MathX.ramp(t, B.j5, B.j6); return { pos: V(p.x + 2.6 - 0.2 * k, 1.45, p.z - 1.55), at: V(p.x, 1.25, p.z), fov: 38, focus: 3.0, dof: 0.15 }; } },
     // J6: the sound view close behind her: her clicks go out into the rain's thousand small sounds
-    { id: 'J6', t0: B.j6, t1: B.j7, set: 'city', tag: true, look: () => ac(0.06, 0.4), splash: 1.0, rainHalf: 10, decay: 0.45, gain: 1.3, heroGain: 0.5, noise: 0.5, shells: false,
+    { id: 'J6', t0: B.j6, t1: B.j7, set: 'city', tag: true, look: () => ac(0.025, 0.4), splash: 1.0, rainHalf: 10, decay: 0.45, gain: 1.3, heroGain: 0.5, noise: 0.5, shells: false,
       cam: (t) => { const h = head(), k = MathX.ramp(t, B.j6, B.j7); return { pos: V(h.x - 2.2 - 0.3 * k, h.y + 0.6, h.z - 1.0), at: V(h.x + 3, h.y - 0.7, h.z + 0.8), fov: 54, focus: 2.5, dof: 0 }; },
       labels: (t) => [lab(V(hero().x + 2.6, 0.9, 11.6), '<div class="k">HER ECHO</div><div class="s">LOST IN THE RAIN</div>', MathX.smooth(t, B.j6Clicks[1] + 0.3, B.j6Clicks[1] + 0.8))] },
     // J7: the sound view, wider, looking east: three places, three characters
-    { id: 'J7', t0: B.j7, t1: B.j8, set: 'city', tag: true, look: () => ac(0.06, 0.4), splash: 1.0, rainHalf: 18, decay: 0.5, gain: 1.2, heroGain: 0.5, noise: 0.5, shells: false,
+    { id: 'J7', t0: B.j7, t1: B.j8, set: 'city', tag: true, look: () => ac(0.025, 0.4), splash: 1.0, rainHalf: 18, decay: 0.5, gain: 1.2, heroGain: 0.5, noise: 0.5, shells: false,
       cam: beMove(B.j7, B.j8, [V(35.5, 4.4, 1.2), V(55, 0.6, 1.6), 60], [V(36.5, 4.2, 1.3), V(55, 0.6, 1.8), 58], { dof: 0 }),
       labels: (t) => { const a = (t0) => MathX.smooth(t, t0, t0 + 0.4); return [
         lab(V(46, 0.6, 1.5), '<div class="k">OPEN STREET</div><div class="s">A STEADY HISS</div>', a(B.j7 + 0.4)),
@@ -330,9 +330,9 @@ BE_SCHEDULERS.push((app) => {
     { id: 'J8a', t0: B.j8, t1: B.j8b, set: 'city', look: () => BE_REAL,
       cam: (t) => { const p = hero(), k = MathX.ramp(t, B.j8, B.j8b); return { pos: V(p.x + 0.4 - 0.3 * k, 1.05, 6.7), at: V(p.x + 0.6, 1.0, p.z + 1.0), fov: 40, focus: p.z - 6.7, dof: 0.15 }; } },
     { id: 'J8b', t0: B.j8b, t1: B.j9, set: 'city', look: () => BE_REAL,
-      cam: (t) => { const k = Ease.inOutSine(MathX.ramp(t, B.j8b, B.j9)); return { pos: V(53.9 - 0.2 * k, 0.95, 10.0 - 0.1 * k), at: V(52.0, 0.55, 11.5), fov: 46, focus: 2.2, dof: 0.2 }; } },
+      cam: (t) => { const k = Ease.inOutSine(MathX.ramp(t, B.j8b, B.j9)); return { pos: V(53.9 - 0.2 * k, 0.95, 10.0 - 0.1 * k), at: V(52.0, 0.6, 11.5), fov: 56, focus: 2.2, dof: 0.2 }; } },
     // J9a: (no narration) from straight above, tracking: a sheet of heavier rain sweeps along the street
-    { id: 'J9a', t0: B.j9, t1: B.j9b, set: 'city', look: () => BE_REAL, rainHalf: 22, splash: 0.75, splashSize: 2.2, rainAlpha: 0.6, fogD: 0.006, curtain: 0.6,
+    { id: 'J9a', t0: B.j9, t1: B.j9b, set: 'city', look: () => BE_REAL, rainHalf: 22, splash: 0.75, splashSize: 2.2, rainAlpha: 0.6, fogD: 0.006, curtain: 0.95,
       cam: beMove(B.j9, B.j9b, [V(41.0, 17.5, -1.2), V(49.6, 0, 10.2), 46], [V(44.0, 16.5, -0.5), V(51.4, 0, 10.9), 46], { dof: 0 }) },
     // J9b: (no narration) under the arcade, looking out: she steps in from the rain; the drips fall from the roof's edge
     { id: 'J9b', t0: B.j9b, t1: B.s11, set: 'city', look: () => BE_REAL, rainAlpha: 0.6,

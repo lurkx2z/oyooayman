@@ -64,6 +64,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **First long-form film: *What if you went blind… and learned to see with sound?*** — open `blind-echolocation.html`
+> (16:9, 1920×1080, 8:23). An animated science documentary in fourteen scenes, narrated (fourteen recorded clips, never
+> cut or sped up) with the screenplay's silent passages kept: losing sight, the first echo, how a human echolocates
+> (2 m wall ≈ 12 ms), training, what an echo can and cannot reveal, the brain, the anechoic room, the city, the rain, a
+> friend, a final test, the city as sound, and the bedroom again. Three looks: reality, a sound view (an artistic
+> metaphor, never "what blind people see") and science cutaways. Every click is rendered with the echoes of its own
+> room. Plan: [`films/blind-echolocation/PLAN.md`](films/blind-echolocation/PLAN.md); screenplay, timeline, subtitles
+> and review log beside it.
 
 | Time | Beat |
 |---|---|
@@ -319,6 +328,21 @@ films/slip/sea.js        the seabed (one analytic height field in JS and GLSL), 
 films/slip/cast.js       people with umbrellas, in the quake, at the seafront, running inland
 films/slip/audio.js      rain, the squeak and the thud, the underground pulses, the rupture, the quake, sirens, the roar
 films/slip/film.js       FILM hooks: which scene, hands, the quake shake, reflections, the cuts, the grade, the end card
+```
+
+Film: *What if you went blind… and learned to see with sound?* (`blind-echolocation.html`, 16:9):
+
+```
+films/blind-echolocation/PLAN.md          modes, the protagonist, the scenes, sound, science rules, commands
+films/blind-echolocation/SCREENPLAY.md    the owner's approved screenplay, word for word
+films/blind-echolocation/EPISODE_REPORT.md  reviews (scores as given), fixes, what is still weak, deliverables
+films/blind-echolocation/script.js, narration-timing.js   the clips' real word times; every beat is keyed to a word
+films/blind-echolocation/shots.js, scene2.js … scene14.js  ★ each scene's shots (its shot list in words at the top)
+films/blind-echolocation/film.js          FILM hooks: shots, the sound view vs reality, pulses and rings, HUD, grade
+films/blind-echolocation/acoustic.js      the sound view (a click's front lighting surfaces by material, distance, facing)
+films/blind-echolocation/apartment.js, centre.js, lab.js, city.js, rain.js, arena.js, sfield.js, brain.js, void.js  the sets
+films/blind-echolocation/sound-*.js, audio.js, mix.js   each place's acoustics and the five-stem dynamic mix
+films/blind-echolocation/export-docs.cjs, contact-sheets.py, render-stems.cjs, make-zip.sh   deliverable tools
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):

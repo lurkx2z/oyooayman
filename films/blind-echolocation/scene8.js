@@ -180,7 +180,7 @@ BE_SCHEDULERS.push((app) => {
       cam: beMove(B.h7, B.h7b, [V(0.25, 1.4, 1.5), V(-0.7, 1.15, -2.1), 54], [V(0.15, 1.35, 1.25), V(-0.65, 1.1, -2.1), 52], { dof: 0 }) },
     // H7b: reality from the side: the cane checks, she walks slowly forward; the tip meets the foam
     { id: 'H7b', t0: B.h7b, t1: B.s9, set: 'lab', look: () => BE_REAL,
-      cam: (t) => { const h = head(); return { pos: V(1.55, 1.1, h.z + 0.35), at: V(-0.45, 0.75, h.z - 0.55), fov: 48, focus: 2.0, dof: 0.35 }; } },
+      cam: (t) => { const h = head(); return { pos: V(1.55, 1.1, h.z + 0.35), at: V(-0.45, 0.85, h.z - 0.55), fov: 52, focus: 2.0, dof: 0.35 }; } },
   ];
   const i = BE_SHOTS.findIndex((s) => s.id === 'X');
   BE_SHOTS.splice(i, 0, ...S);

@@ -113,14 +113,14 @@ class BeSoundCity {
   // the nearest cars, the fountain and the weir glow steadily on what faces them. The shot can reveal it outward
   // from the hall (shot.reveal(t) = radius in metres)
   update(t, L, cam, shot) {
-    const CS = BE_AC.uBeCS.value, LS = BE_AC.uBeLS.value, on = L && L.ac > 0.5 ? (shot && shot.csGain ? shot.csGain(t) : 1) : 0;
+    const CS = BE_AC.uBeCS.value, LS = BE_AC.uBeLS.value, on = 1.7 * (L && L.ac > 0.5 ? (shot && shot.csGain ? shot.csGain(t) : 1) : 0);   // ×1.7: about a stop brighter (review)
     this.cars.forEach((g, i) => { const c = this.carAt(i, t); g.position.copy(c.p); g.rotation.y = c.yaw; if (i < 20) CS[i].set(c.p.x, 0.9, c.p.z, 1.0 * on * (0.85 + 0.15 * Math.sin(t * 1.3 + i))); });
     const F = BE_SF.square.fountain, W = BE_SF.river; CS[20].set(F[0], 1.6, F[1], 0.9 * on);
     [124, 135, 146].forEach((z, k) => CS[21 + k].set(W.weirX + 1.2, W.y + 0.6, z, 1.1 * on));
     let n = 0;
     for (const [x] of BE_SF.roadsX) LS[n++].set(0, x, 0.5 * on, 0.25 + 0.05 * n);
     for (const [z] of BE_SF.roadsZ) LS[n++].set(1, z, (z === -40 ? 0.6 : 0.5) * on, -0.22 - 0.04 * n);
-    BE_AC.uBeCSFall.value = 0.012; BE_AC.uBeLSFall.value = 0.03;
+    BE_AC.uBeCSFall.value = 0.01; BE_AC.uBeLSFall.value = 0.026;
     if (shot && shot.reveal) { const rv = shot.reveal(t); BE_AC.uBeRev.value.set(13, 0, rv, Math.max(20, rv * 0.35)); }
   }
 }
