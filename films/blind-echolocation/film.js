@@ -168,6 +168,7 @@ const FILM = {
       if (set.fx) set.fx(app, t, shot, L);
       set.waves.end(); set.rings.end(); set.ringsX.end();
     }
+    { let nc = 0, nl = 0; BE_AC.uBeCS.value.forEach((v, i) => { if (v.w > 0) nc = i + 1; }); BE_AC.uBeLS.value.forEach((v, i) => { if (v.z > 0) nl = i + 1; }); BE_AC.uBeN.value.y = nc; BE_AC.uBeN.value.z = nl; if (L.ac <= 0.001) BE_AC.uBeN.value.set(0, 0, 0); }   // (the view's block is off then)
     for (const S2 of Object.values(app.sets)) if (S2 !== set) { S2.waves.begin(); S2.waves.end(); S2.rings.begin(); S2.rings.end(); S2.ringsX.begin(); S2.ringsX.end(); }
     this._hudUpdate(app, t, shot);
   },

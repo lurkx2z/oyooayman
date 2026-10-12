@@ -39,6 +39,9 @@ const BE_AC = {
   uBeLS: { value: Array.from({ length: 10 }, () => new THREE.Vector4()) },
   uBeLSFall: { value: 0.012 },
   uBeRev: { value: new THREE.Vector4() },
+  // how many slots are in use (pulses, continuous sources, line sources): the loops stop there (software WebGL runs
+  // every iteration of a loop otherwise, even the empty ones; this changes nothing in the picture, only the cost)
+  uBeN: { value: new THREE.Vector3() },
   uBeColA: { value: new THREE.Color('#62f3ff') },   // strong return
   uBeColB: { value: new THREE.Color('#7a5cff') },   // weak return
   uBeColC: { value: new THREE.Color('#ffb05a') },   // sound source
@@ -65,7 +68,7 @@ function beClassify(name) {
 
 const BE_AC_GLSL = /* glsl */`
 uniform float uBeAc, uBeT, uBeGain, uBeDecay, uBeLine, uBeFall, uBeRefl, uBeCrisp, uBeReal, uBeGrpGain;
-uniform vec4 uBePO[16]; uniform vec4 uBePP[16]; uniform vec4 uBePD[16]; uniform vec4 uBeCS[24]; uniform float uBeCSFall; uniform vec4 uBeLS[10]; uniform float uBeLSFall; uniform vec4 uBeRev;
+uniform vec4 uBePO[16]; uniform vec4 uBePP[16]; uniform vec4 uBePD[16]; uniform vec4 uBeCS[24]; uniform float uBeCSFall; uniform vec4 uBeLS[10]; uniform float uBeLSFall; uniform vec4 uBeRev; uniform vec3 uBeN;
 uniform vec3 uBeColA, uBeColB, uBeColC;
 varying vec3 vBeW;
 float beH3(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
@@ -85,6 +88,7 @@ vec3 beAcoustic(vec3 P, vec3 N) {
   float crease = clamp(length(fwidth(N)) * 3.0, 0.0, 1.0);
   float fres = pow(1.0 - abs(dot(N, normalize(cameraPosition - P))), 3.0);   // grazing surfaces outline the forms
   for (int i = 0; i < 16; i++) {
+    if (float(i) >= uBeN.x) break;
     vec4 o = uBePO[i], q = uBePP[i];
     if (q.y <= 0.0) continue;
     float age = uBeT - o.w;
@@ -116,12 +120,14 @@ vec3 beAcoustic(vec3 P, vec3 N) {
   // reveal (the city appears outward from the hall)
   float rev = uBeRev.w > 0.0 ? 1.0 - smoothstep(uBeRev.z - uBeRev.w, uBeRev.z, length(P.xz - uBeRev.xy)) : 1.0;
   for (int i = 0; i < 24; i++) {
+    if (float(i) >= uBeN.y) break;
     vec4 c = uBeCS[i]; if (c.w <= 0.0) continue;
     vec3 D = c.xyz - P; float d = length(D) + 1e-4, facing = clamp(dot(N, D / d), 0.0, 1.0);
     float flick = 0.55 + 0.45 * beN3(P * 0.3 + vec3(uBeT * 1.9, 0.0, float(i)));
     acc += uBeColC * (c.w / (1.0 + d * d * uBeCSFall)) * (0.12 + 0.88 * facing) * (0.3 + 0.7 * uBeRefl) * (0.2 + 0.8 * dots) * flick * rev;
   }
   for (int i = 0; i < 10; i++) {
+    if (float(i) >= uBeN.z) break;
     vec4 l = uBeLS[i]; if (l.z <= 0.0) continue;
     float off = (l.x < 0.5 ? P.x : P.z) - l.y, along = l.x < 0.5 ? P.z : P.x;
     vec3 D = l.x < 0.5 ? vec3(-off, 0.9 - P.y, 0.0) : vec3(0.0, 0.9 - P.y, -off);
@@ -147,7 +153,7 @@ function beAcoustic(m, o = {}) {
     if (prev) prev.call(m, sh, r);
     Object.assign(sh.uniforms, {
       uBeAc: BE_AC.uBeAc, uBeT: BE_AC.uBeT, uBeGain: BE_AC.uBeGain, uBeDecay: BE_AC.uBeDecay, uBeLine: BE_AC.uBeLine, uBeFall: BE_AC.uBeFall,
-      uBePO: BE_AC.uBePO, uBePP: BE_AC.uBePP, uBePD: BE_AC.uBePD, uBeCS: BE_AC.uBeCS, uBeCSFall: BE_AC.uBeCSFall, uBeLS: BE_AC.uBeLS, uBeLSFall: BE_AC.uBeLSFall, uBeRev: BE_AC.uBeRev, uBeColA: BE_AC.uBeColA, uBeColB: BE_AC.uBeColB, uBeColC: BE_AC.uBeColC,
+      uBePO: BE_AC.uBePO, uBePP: BE_AC.uBePP, uBePD: BE_AC.uBePD, uBeCS: BE_AC.uBeCS, uBeCSFall: BE_AC.uBeCSFall, uBeLS: BE_AC.uBeLS, uBeLSFall: BE_AC.uBeLSFall, uBeRev: BE_AC.uBeRev, uBeN: BE_AC.uBeN, uBeColA: BE_AC.uBeColA, uBeColB: BE_AC.uBeColB, uBeColC: BE_AC.uBeColC,
       uBeRefl: { value: refl }, uBeCrisp: { value: crisp }, uBeReal: BE_AC.real[grp], uBeGrpGain: BE_AC.gain[grp],
     });
     sh.vertexShader = sh.vertexShader
@@ -204,6 +210,7 @@ class BePulses {
       const fade = 1 - MathX.smooth(T, q.t + q.life * 0.7, q.t + q.life);
       Q.set(q.speed, q.str * scale * fade, q.w, q.kind);
     }
+    BE_AC.uBeN.value.x = live.length;
     return live;
   }
 }
