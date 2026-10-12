@@ -11,7 +11,7 @@
      blind-echolocation_final_small.mp4   1280×720 two-pass, under 30 MiB (for sending from a phone)
      check.jpg                            8 frames across the film
    Resumable: re-run the same command and finished 15-second segments are kept.
-   Options: --workers 4  --out <dir>  --gpu auto|headless|headed|software  --from <frame> --to <frame>  --w 1920 --h 1080
+   Options: --workers 4  --out <dir>  --gpu auto|headless|headed|software  --channel msedge|chrome  --from <frame> --to <frame>  --w 1920 --h 1080
             --ffmpeg <path to ffmpeg>  --no-final (segments only)  --to 119 --final (a quick test of the whole chain)
    ===================================================================== */
 const path = require('path');
@@ -55,10 +55,14 @@ function loudness(file) {
 
 // Open the page in a browser that really uses the GPU (headless first, then a visible window).
 async function openPage(mode) {
+  // --channel msedge|chrome uses the Edge or Chrome already installed on the PC instead of Playwright's own browser
+  const ch = ARGS.channel && ARGS.channel !== true ? ARGS.channel : null;
   const tries = mode === 'software' ? [{ software: true }]
+    : ch ? (mode === 'headed' ? [{ headless: false, channel: ch }] : [{ headless: true, channel: ch }, { headless: false, channel: ch }])
     : mode === 'headed' ? [{ headless: false }]
     : mode === 'headless' ? [{ headless: true, channel: 'chromium' }]
-    : [{ headless: true, channel: 'chromium' }, { headless: true }, { headless: false }];
+    : [{ headless: true, channel: 'chromium' }, { headless: true }, { headless: false },
+      { headless: true, channel: 'msedge' }, { headless: true, channel: 'chrome' }];
   const why = [];
   for (const t of tries) {
     let br;
@@ -75,9 +79,9 @@ async function openPage(mode) {
         return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
       });
       const soft = /swiftshader|llvmpipe|software|basic render/i.test(gpu);
-      if (soft && !t.software) { why.push(`${t.headless ? 'headless' : 'window'}: only software graphics (${gpu})`); await br.close(); continue; }
-      return { br, p, gpu, how: t.software ? 'software' : t.headless ? 'headless' : 'headed' };
-    } catch (e) { why.push(`${t.headless ? 'headless' : 'window'}: ${e.message.split('\n')[0]}`); if (br) await br.close().catch(() => {}); }
+      if (soft && !t.software) { why.push(`${t.channel || 'playwright'} ${t.headless ? 'headless' : 'window'}: only software graphics (${gpu})`); await br.close(); continue; }
+      return { br, p, gpu, how: t.software ? 'software' : `${t.channel || 'playwright'} ${t.headless ? 'headless' : 'window'}` };
+    } catch (e) { why.push(`${t.channel || 'playwright'} ${t.headless ? 'headless' : 'window'}: ${e.message.split('\n')[0]}`); if (br) await br.close().catch(() => {}); }
   }
   throw new Error(`no GPU browser (${why.join('; ')}). Update the graphics driver, or run with --gpu software (very slow).`);
 }

@@ -40,6 +40,9 @@ Output, in `renders/blind-echolocation/` inside the repo folder (that folder is 
 
 ## If something goes wrong
 
+- **The render browser won't start** (a missing-file or "assembly" error from Windows): run
+  `npx playwright install --force chromium`, or use the Edge that comes with Windows by adding `--channel msedge`
+  to both commands. Without that option the script already falls back to Edge, then Chrome.
 - **`no GPU browser`**: update the graphics driver, then try `--gpu headed`. A browser window opens; leave it alone
   while it renders. Don't use `--gpu software`, which is the slow cloud path.
 - **The speed is lower than expected**: try `--workers 6` on a CPU with 8 or more cores, or `--workers 3` if
