@@ -78,6 +78,12 @@ Everything is procedural, so there are no models, images or sound files to downl
 > separate stems (narration, music, ambience, movement, impacts) with per-stem ducking from the word times, mastered to
 > −15 LUFS; v3 adds a dynamics map (hushes before the hits, builds into the climaxes) at the same loudness.
 > Plan, script and reports: [`films/gravity-doubled-narrated/`](films/gravity-doubled-narrated/PLAN.md).
+>
+> **Three-minute documentary: *What If Gravity Doubled? Episode 01, The Day Everything Became Heavy*.** Open
+> `gravity-doubled-3min.html` (179.7 s, 1920×1080). Twelve scenes cut around seven Charlie narration clips, with five
+> silent scenes: the café, a ceramic-ball drop experiment at 1 g vs 2 g with a 4× replay, a hologram of mass vs weight,
+> the stairs, and the square outside. Mixed from five stems with a dynamics map (−14.9 LUFS, LRA 5.4).
+> Plan, report: [`films/gravity-doubled-3min/`](films/gravity-doubled-3min/PLAN.md).
 
 | Time | Beat |
 |---|---|
