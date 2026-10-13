@@ -1,0 +1,244 @@
+{
+ "id": "24-s7-survive",
+ "text": "Earth would survive.",
+ "seconds": 1.67,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Earth",
+   "start": 0.08,
+   "end": 0.3
+  },
+  {
+   "text": "would",
+   "start": 0.38,
+   "end": 0.52
+  },
+  {
+   "text": "survive.",
+   "start": 0.6,
+   "end": 1.18
+  }
+ ],
+ "characters": [
+  {
+   "text": "E",
+   "start": 0,
+   "end": 0.064
+  },
+  {
+   "text": "a",
+   "start": 0.064,
+   "end": 0.128
+  },
+  {
+   "text": "r",
+   "start": 0.128,
+   "end": 0.192
+  },
+  {
+   "text": "t",
+   "start": 0.192,
+   "end": 0.256
+  },
+  {
+   "text": "h",
+   "start": 0.256,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.44
+  },
+  {
+   "text": "w",
+   "start": 0.44,
+   "end": 0.464
+  },
+  {
+   "text": "o",
+   "start": 0.464,
+   "end": 0.488
+  },
+  {
+   "text": "u",
+   "start": 0.488,
+   "end": 0.512
+  },
+  {
+   "text": "l",
+   "start": 0.512,
+   "end": 0.536
+  },
+  {
+   "text": "d",
+   "start": 0.536,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "s",
+   "start": 0.64,
+   "end": 0.667
+  },
+  {
+   "text": "u",
+   "start": 0.667,
+   "end": 0.693
+  },
+  {
+   "text": "r",
+   "start": 0.693,
+   "end": 0.72
+  },
+  {
+   "text": "v",
+   "start": 0.72,
+   "end": 0.88
+  },
+  {
+   "text": "i",
+   "start": 0.88,
+   "end": 0.987
+  },
+  {
+   "text": "v",
+   "start": 0.987,
+   "end": 1.093
+  },
+  {
+   "text": "e",
+   "start": 1.093,
+   "end": 1.2
+  },
+  {
+   "text": ".",
+   "start": 1.2,
+   "end": 1.6
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Earth",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "would",
+   "start": 0.44,
+   "end": 0.56
+  },
+  {
+   "text": "survive.",
+   "start": 0.64,
+   "end": 1.6
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "E",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "a",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "r",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.26
+  },
+  {
+   "text": "h",
+   "start": 0.26,
+   "end": 0.3
+  },
+  {
+   "text": " ",
+   "start": 0.3,
+   "end": 0.38
+  },
+  {
+   "text": "w",
+   "start": 0.38,
+   "end": 0.42
+  },
+  {
+   "text": "o",
+   "start": 0.42,
+   "end": 0.44
+  },
+  {
+   "text": "u",
+   "start": 0.44,
+   "end": 0.46
+  },
+  {
+   "text": "l",
+   "start": 0.46,
+   "end": 0.5
+  },
+  {
+   "text": "d",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": " ",
+   "start": 0.52,
+   "end": 0.6
+  },
+  {
+   "text": "s",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "u",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "r",
+   "start": 0.66,
+   "end": 0.76
+  },
+  {
+   "text": "v",
+   "start": 0.76,
+   "end": 0.86
+  },
+  {
+   "text": "i",
+   "start": 0.86,
+   "end": 0.94
+  },
+  {
+   "text": "v",
+   "start": 0.98,
+   "end": 1.04
+  },
+  {
+   "text": "e",
+   "start": 1.04,
+   "end": 1.18
+  },
+  {
+   "text": ".",
+   "start": 1.18,
+   "end": 1.18
+  }
+ ]
+}

@@ -1,0 +1,434 @@
+{
+ "id": "12-s4-move",
+ "text": "And then… the oceans begin to move.",
+ "seconds": 3.34,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "And",
+   "start": 0.06,
+   "end": 0.22
+  },
+  {
+   "text": "then…",
+   "start": 0.3,
+   "end": 0.6
+  },
+  {
+   "text": "the",
+   "start": 1.06,
+   "end": 1.14
+  },
+  {
+   "text": "oceans",
+   "start": 1.38,
+   "end": 1.8
+  },
+  {
+   "text": "begin",
+   "start": 1.88,
+   "end": 2.16
+  },
+  {
+   "text": "to",
+   "start": 2.22,
+   "end": 2.3
+  },
+  {
+   "text": "move.",
+   "start": 2.36,
+   "end": 2.68
+  }
+ ],
+ "characters": [
+  {
+   "text": "A",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "n",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "d",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.6
+  },
+  {
+   "text": "t",
+   "start": 0.6,
+   "end": 0.69
+  },
+  {
+   "text": "h",
+   "start": 0.69,
+   "end": 0.78
+  },
+  {
+   "text": "e",
+   "start": 0.78,
+   "end": 0.87
+  },
+  {
+   "text": "n",
+   "start": 0.87,
+   "end": 0.96
+  },
+  {
+   "text": "…",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": " ",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "t",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "h",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "e",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "o",
+   "start": 1.36,
+   "end": 1.52
+  },
+  {
+   "text": "c",
+   "start": 1.52,
+   "end": 1.584
+  },
+  {
+   "text": "e",
+   "start": 1.584,
+   "end": 1.648
+  },
+  {
+   "text": "a",
+   "start": 1.648,
+   "end": 1.712
+  },
+  {
+   "text": "n",
+   "start": 1.712,
+   "end": 1.776
+  },
+  {
+   "text": "s",
+   "start": 1.776,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 2
+  },
+  {
+   "text": "b",
+   "start": 2,
+   "end": 2.032
+  },
+  {
+   "text": "e",
+   "start": 2.032,
+   "end": 2.064
+  },
+  {
+   "text": "g",
+   "start": 2.064,
+   "end": 2.096
+  },
+  {
+   "text": "i",
+   "start": 2.096,
+   "end": 2.128
+  },
+  {
+   "text": "n",
+   "start": 2.128,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": "t",
+   "start": 2.24,
+   "end": 2.28
+  },
+  {
+   "text": "o",
+   "start": 2.28,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.8
+  },
+  {
+   "text": "m",
+   "start": 2.8,
+   "end": 2.92
+  },
+  {
+   "text": "o",
+   "start": 2.92,
+   "end": 3.04
+  },
+  {
+   "text": "v",
+   "start": 3.04,
+   "end": 3.16
+  },
+  {
+   "text": "e",
+   "start": 3.16,
+   "end": 3.28
+  },
+  {
+   "text": ".",
+   "start": 3.28,
+   "end": 3.36
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "And",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "then…",
+   "start": 0.6,
+   "end": 1
+  },
+  {
+   "text": "the",
+   "start": 1.04,
+   "end": 1.28
+  },
+  {
+   "text": "oceans",
+   "start": 1.36,
+   "end": 1.84
+  },
+  {
+   "text": "begin",
+   "start": 2,
+   "end": 2.16
+  },
+  {
+   "text": "to",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "move.",
+   "start": 2.8,
+   "end": 3.36
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "A",
+   "start": 0.06,
+   "end": 0.08
+  },
+  {
+   "text": "n",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "d",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": " ",
+   "start": 0.22,
+   "end": 0.3
+  },
+  {
+   "text": "t",
+   "start": 0.3,
+   "end": 0.3
+  },
+  {
+   "text": "h",
+   "start": 0.3,
+   "end": 0.36
+  },
+  {
+   "text": "e",
+   "start": 0.36,
+   "end": 0.56
+  },
+  {
+   "text": "n",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "…",
+   "start": 0.6,
+   "end": 0.6
+  },
+  {
+   "text": " ",
+   "start": 0.6,
+   "end": 0.6
+  },
+  {
+   "text": "t",
+   "start": 1.06,
+   "end": 1.06
+  },
+  {
+   "text": "h",
+   "start": 1.06,
+   "end": 1.08
+  },
+  {
+   "text": "e",
+   "start": 1.08,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.38
+  },
+  {
+   "text": "o",
+   "start": 1.38,
+   "end": 1.44
+  },
+  {
+   "text": "c",
+   "start": 1.44,
+   "end": 1.56
+  },
+  {
+   "text": "e",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "a",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "n",
+   "start": 1.68,
+   "end": 1.78
+  },
+  {
+   "text": "s",
+   "start": 1.78,
+   "end": 1.8
+  },
+  {
+   "text": " ",
+   "start": 1.8,
+   "end": 1.88
+  },
+  {
+   "text": "b",
+   "start": 1.88,
+   "end": 1.94
+  },
+  {
+   "text": "e",
+   "start": 1.94,
+   "end": 2
+  },
+  {
+   "text": "g",
+   "start": 2,
+   "end": 2.04
+  },
+  {
+   "text": "i",
+   "start": 2.04,
+   "end": 2.06
+  },
+  {
+   "text": "n",
+   "start": 2.06,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.22
+  },
+  {
+   "text": "t",
+   "start": 2.22,
+   "end": 2.22
+  },
+  {
+   "text": "o",
+   "start": 2.26,
+   "end": 2.3
+  },
+  {
+   "text": " ",
+   "start": 2.3,
+   "end": 2.36
+  },
+  {
+   "text": "m",
+   "start": 2.36,
+   "end": 2.44
+  },
+  {
+   "text": "o",
+   "start": 2.44,
+   "end": 2.5
+  },
+  {
+   "text": "v",
+   "start": 2.5,
+   "end": 2.64
+  },
+  {
+   "text": "e",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": ".",
+   "start": 2.68,
+   "end": 2.68
+  }
+ ]
+}

@@ -1,0 +1,354 @@
+{
+ "id": "08-s3-chaos",
+ "text": "Global trade goes into chaos.",
+ "seconds": 2.53,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Global",
+   "start": 0.08,
+   "end": 0.4
+  },
+  {
+   "text": "trade",
+   "start": 0.54,
+   "end": 0.88
+  },
+  {
+   "text": "goes",
+   "start": 0.98,
+   "end": 1.18
+  },
+  {
+   "text": "into",
+   "start": 1.22,
+   "end": 1.48
+  },
+  {
+   "text": "chaos.",
+   "start": 1.54,
+   "end": 2.12
+  }
+ ],
+ "characters": [
+  {
+   "text": "G",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "l",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "o",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": "b",
+   "start": 0.16,
+   "end": 0.213
+  },
+  {
+   "text": "a",
+   "start": 0.213,
+   "end": 0.267
+  },
+  {
+   "text": "l",
+   "start": 0.267,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.48
+  },
+  {
+   "text": "t",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "r",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "a",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "d",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "e",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "g",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "o",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "e",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "s",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "i",
+   "start": 1.2,
+   "end": 1.26
+  },
+  {
+   "text": "n",
+   "start": 1.26,
+   "end": 1.32
+  },
+  {
+   "text": "t",
+   "start": 1.32,
+   "end": 1.38
+  },
+  {
+   "text": "o",
+   "start": 1.38,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "c",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "h",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "a",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "o",
+   "start": 1.76,
+   "end": 1.92
+  },
+  {
+   "text": "s",
+   "start": 1.92,
+   "end": 2.08
+  },
+  {
+   "text": ".",
+   "start": 2.08,
+   "end": 2.48
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Global",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "trade",
+   "start": 0.48,
+   "end": 0.88
+  },
+  {
+   "text": "goes",
+   "start": 0.96,
+   "end": 1.12
+  },
+  {
+   "text": "into",
+   "start": 1.2,
+   "end": 1.44
+  },
+  {
+   "text": "chaos.",
+   "start": 1.52,
+   "end": 2.48
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "G",
+   "start": 0.08,
+   "end": 0.14
+  },
+  {
+   "text": "l",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": "o",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "b",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "a",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "l",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.54
+  },
+  {
+   "text": "t",
+   "start": 0.54,
+   "end": 0.62
+  },
+  {
+   "text": "r",
+   "start": 0.62,
+   "end": 0.68
+  },
+  {
+   "text": "a",
+   "start": 0.68,
+   "end": 0.74
+  },
+  {
+   "text": "d",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": "e",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.98
+  },
+  {
+   "text": "g",
+   "start": 0.98,
+   "end": 1.02
+  },
+  {
+   "text": "o",
+   "start": 1.02,
+   "end": 1.08
+  },
+  {
+   "text": "e",
+   "start": 1.08,
+   "end": 1.16
+  },
+  {
+   "text": "s",
+   "start": 1.16,
+   "end": 1.18
+  },
+  {
+   "text": " ",
+   "start": 1.18,
+   "end": 1.22
+  },
+  {
+   "text": "i",
+   "start": 1.22,
+   "end": 1.24
+  },
+  {
+   "text": "n",
+   "start": 1.24,
+   "end": 1.32
+  },
+  {
+   "text": "t",
+   "start": 1.32,
+   "end": 1.38
+  },
+  {
+   "text": "o",
+   "start": 1.38,
+   "end": 1.48
+  },
+  {
+   "text": " ",
+   "start": 1.48,
+   "end": 1.54
+  },
+  {
+   "text": "c",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "h",
+   "start": 1.58,
+   "end": 1.68
+  },
+  {
+   "text": "a",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "o",
+   "start": 1.86,
+   "end": 1.94
+  },
+  {
+   "text": "s",
+   "start": 1.94,
+   "end": 2.12
+  },
+  {
+   "text": ".",
+   "start": 2.12,
+   "end": 2.12
+  }
+ ]
+}

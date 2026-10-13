@@ -1,0 +1,624 @@
+{
+ "id": "19-s6-crisis",
+ "text": "Governments face a crisis unlike anything in history.",
+ "seconds": 3.74,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Governments",
+   "start": 0.1,
+   "end": 0.5
+  },
+  {
+   "text": "face",
+   "start": 0.6,
+   "end": 0.78
+  },
+  {
+   "text": "a",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": "crisis",
+   "start": 0.98,
+   "end": 1.56
+  },
+  {
+   "text": "unlike",
+   "start": 1.62,
+   "end": 2.12
+  },
+  {
+   "text": "anything",
+   "start": 2.2,
+   "end": 2.58
+  },
+  {
+   "text": "in",
+   "start": 2.62,
+   "end": 2.72
+  },
+  {
+   "text": "history.",
+   "start": 2.76,
+   "end": 3.22
+  }
+ ],
+ "characters": [
+  {
+   "text": "G",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "o",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "v",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": "e",
+   "start": 0.16,
+   "end": 0.213
+  },
+  {
+   "text": "r",
+   "start": 0.213,
+   "end": 0.267
+  },
+  {
+   "text": "n",
+   "start": 0.267,
+   "end": 0.32
+  },
+  {
+   "text": "m",
+   "start": 0.32,
+   "end": 0.352
+  },
+  {
+   "text": "e",
+   "start": 0.352,
+   "end": 0.384
+  },
+  {
+   "text": "n",
+   "start": 0.384,
+   "end": 0.416
+  },
+  {
+   "text": "t",
+   "start": 0.416,
+   "end": 0.448
+  },
+  {
+   "text": "s",
+   "start": 0.448,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "f",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "a",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "c",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": "e",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "a",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "c",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "r",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "i",
+   "start": 1.12,
+   "end": 1.22
+  },
+  {
+   "text": "s",
+   "start": 1.22,
+   "end": 1.32
+  },
+  {
+   "text": "i",
+   "start": 1.32,
+   "end": 1.42
+  },
+  {
+   "text": "s",
+   "start": 1.42,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "u",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "n",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "l",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "i",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "k",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "e",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": " ",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "a",
+   "start": 2.16,
+   "end": 2.21
+  },
+  {
+   "text": "n",
+   "start": 2.21,
+   "end": 2.26
+  },
+  {
+   "text": "y",
+   "start": 2.26,
+   "end": 2.31
+  },
+  {
+   "text": "t",
+   "start": 2.31,
+   "end": 2.36
+  },
+  {
+   "text": "h",
+   "start": 2.36,
+   "end": 2.41
+  },
+  {
+   "text": "i",
+   "start": 2.41,
+   "end": 2.46
+  },
+  {
+   "text": "n",
+   "start": 2.46,
+   "end": 2.51
+  },
+  {
+   "text": "g",
+   "start": 2.51,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "i",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": "n",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 3.2
+  },
+  {
+   "text": "h",
+   "start": 3.2,
+   "end": 3.269
+  },
+  {
+   "text": "i",
+   "start": 3.269,
+   "end": 3.337
+  },
+  {
+   "text": "s",
+   "start": 3.337,
+   "end": 3.406
+  },
+  {
+   "text": "t",
+   "start": 3.406,
+   "end": 3.474
+  },
+  {
+   "text": "o",
+   "start": 3.474,
+   "end": 3.543
+  },
+  {
+   "text": "r",
+   "start": 3.543,
+   "end": 3.611
+  },
+  {
+   "text": "y",
+   "start": 3.611,
+   "end": 3.68
+  },
+  {
+   "text": ".",
+   "start": 3.68,
+   "end": 3.76
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Governments",
+   "start": 0,
+   "end": 0.48
+  },
+  {
+   "text": "face",
+   "start": 0.56,
+   "end": 0.72
+  },
+  {
+   "text": "a",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "crisis",
+   "start": 0.96,
+   "end": 1.52
+  },
+  {
+   "text": "unlike",
+   "start": 1.6,
+   "end": 2.08
+  },
+  {
+   "text": "anything",
+   "start": 2.16,
+   "end": 2.56
+  },
+  {
+   "text": "in",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "history.",
+   "start": 3.2,
+   "end": 3.76
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "G",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "o",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "v",
+   "start": 0.22,
+   "end": 0.22
+  },
+  {
+   "text": "e",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": "r",
+   "start": 0.24,
+   "end": 0.28
+  },
+  {
+   "text": "n",
+   "start": 0.28,
+   "end": 0.32
+  },
+  {
+   "text": "m",
+   "start": 0.32,
+   "end": 0.34
+  },
+  {
+   "text": "e",
+   "start": 0.34,
+   "end": 0.36
+  },
+  {
+   "text": "n",
+   "start": 0.36,
+   "end": 0.44
+  },
+  {
+   "text": "t",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "s",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": " ",
+   "start": 0.5,
+   "end": 0.6
+  },
+  {
+   "text": "f",
+   "start": 0.6,
+   "end": 0.66
+  },
+  {
+   "text": "a",
+   "start": 0.66,
+   "end": 0.7
+  },
+  {
+   "text": "c",
+   "start": 0.7,
+   "end": 0.76
+  },
+  {
+   "text": "e",
+   "start": 0.76,
+   "end": 0.78
+  },
+  {
+   "text": " ",
+   "start": 0.78,
+   "end": 0.84
+  },
+  {
+   "text": "a",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": " ",
+   "start": 0.9,
+   "end": 0.98
+  },
+  {
+   "text": "c",
+   "start": 0.98,
+   "end": 1.1
+  },
+  {
+   "text": "r",
+   "start": 1.1,
+   "end": 1.16
+  },
+  {
+   "text": "i",
+   "start": 1.16,
+   "end": 1.22
+  },
+  {
+   "text": "s",
+   "start": 1.22,
+   "end": 1.3
+  },
+  {
+   "text": "i",
+   "start": 1.3,
+   "end": 1.44
+  },
+  {
+   "text": "s",
+   "start": 1.44,
+   "end": 1.56
+  },
+  {
+   "text": " ",
+   "start": 1.56,
+   "end": 1.62
+  },
+  {
+   "text": "u",
+   "start": 1.62,
+   "end": 1.7
+  },
+  {
+   "text": "n",
+   "start": 1.7,
+   "end": 1.78
+  },
+  {
+   "text": "l",
+   "start": 1.78,
+   "end": 1.82
+  },
+  {
+   "text": "i",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": "k",
+   "start": 1.86,
+   "end": 1.92
+  },
+  {
+   "text": "e",
+   "start": 1.92,
+   "end": 2.12
+  },
+  {
+   "text": " ",
+   "start": 2.12,
+   "end": 2.2
+  },
+  {
+   "text": "a",
+   "start": 2.2,
+   "end": 2.28
+  },
+  {
+   "text": "n",
+   "start": 2.28,
+   "end": 2.34
+  },
+  {
+   "text": "y",
+   "start": 2.34,
+   "end": 2.42
+  },
+  {
+   "text": "t",
+   "start": 2.42,
+   "end": 2.44
+  },
+  {
+   "text": "h",
+   "start": 2.46,
+   "end": 2.5
+  },
+  {
+   "text": "i",
+   "start": 2.5,
+   "end": 2.5
+  },
+  {
+   "text": "n",
+   "start": 2.5,
+   "end": 2.56
+  },
+  {
+   "text": "g",
+   "start": 2.56,
+   "end": 2.58
+  },
+  {
+   "text": " ",
+   "start": 2.58,
+   "end": 2.62
+  },
+  {
+   "text": "i",
+   "start": 2.62,
+   "end": 2.68
+  },
+  {
+   "text": "n",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "h",
+   "start": 2.76,
+   "end": 2.82
+  },
+  {
+   "text": "i",
+   "start": 2.82,
+   "end": 2.92
+  },
+  {
+   "text": "s",
+   "start": 2.92,
+   "end": 2.96
+  },
+  {
+   "text": "t",
+   "start": 2.96,
+   "end": 3
+  },
+  {
+   "text": "o",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": "r",
+   "start": 3.04,
+   "end": 3.16
+  },
+  {
+   "text": "y",
+   "start": 3.16,
+   "end": 3.22
+  },
+  {
+   "text": ".",
+   "start": 3.22,
+   "end": 3.22
+  }
+ ]
+}

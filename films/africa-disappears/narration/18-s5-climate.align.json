@@ -1,0 +1,1284 @@
+{
+ "id": "18-s5-climate",
+ "text": "And without Africa's land and geography, winds, rainfall, and ocean circulation could change across the planet.",
+ "seconds": 7.42,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "And",
+   "start": 0.02,
+   "end": 0.14
+  },
+  {
+   "text": "without",
+   "start": 0.2,
+   "end": 0.56
+  },
+  {
+   "text": "Africa's",
+   "start": 0.64,
+   "end": 1.06
+  },
+  {
+   "text": "land",
+   "start": 1.14,
+   "end": 1.4
+  },
+  {
+   "text": "and",
+   "start": 1.42,
+   "end": 1.5
+  },
+  {
+   "text": "geography,",
+   "start": 1.58,
+   "end": 2.16
+  },
+  {
+   "text": "winds,",
+   "start": 2.6,
+   "end": 2.96
+  },
+  {
+   "text": "rainfall,",
+   "start": 3.26,
+   "end": 3.76
+  },
+  {
+   "text": "and",
+   "start": 3.9,
+   "end": 3.98
+  },
+  {
+   "text": "ocean",
+   "start": 4.16,
+   "end": 4.4
+  },
+  {
+   "text": "circulation",
+   "start": 4.5,
+   "end": 5.12
+  },
+  {
+   "text": "could",
+   "start": 5.3,
+   "end": 5.5
+  },
+  {
+   "text": "change",
+   "start": 5.58,
+   "end": 5.92
+  },
+  {
+   "text": "across",
+   "start": 5.98,
+   "end": 6.28
+  },
+  {
+   "text": "the",
+   "start": 6.32,
+   "end": 6.42
+  },
+  {
+   "text": "planet.",
+   "start": 6.46,
+   "end": 6.86
+  }
+ ],
+ "characters": [
+  {
+   "text": "A",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "n",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "d",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "w",
+   "start": 0.16,
+   "end": 0.217
+  },
+  {
+   "text": "i",
+   "start": 0.217,
+   "end": 0.274
+  },
+  {
+   "text": "t",
+   "start": 0.274,
+   "end": 0.331
+  },
+  {
+   "text": "h",
+   "start": 0.331,
+   "end": 0.389
+  },
+  {
+   "text": "o",
+   "start": 0.389,
+   "end": 0.446
+  },
+  {
+   "text": "u",
+   "start": 0.446,
+   "end": 0.503
+  },
+  {
+   "text": "t",
+   "start": 0.503,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "A",
+   "start": 0.64,
+   "end": 0.693
+  },
+  {
+   "text": "f",
+   "start": 0.693,
+   "end": 0.747
+  },
+  {
+   "text": "r",
+   "start": 0.747,
+   "end": 0.8
+  },
+  {
+   "text": "i",
+   "start": 0.8,
+   "end": 0.853
+  },
+  {
+   "text": "c",
+   "start": 0.853,
+   "end": 0.907
+  },
+  {
+   "text": "a",
+   "start": 0.907,
+   "end": 0.96
+  },
+  {
+   "text": "'",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "s",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "l",
+   "start": 1.12,
+   "end": 1.18
+  },
+  {
+   "text": "a",
+   "start": 1.18,
+   "end": 1.24
+  },
+  {
+   "text": "n",
+   "start": 1.24,
+   "end": 1.3
+  },
+  {
+   "text": "d",
+   "start": 1.3,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "a",
+   "start": 1.44,
+   "end": 1.467
+  },
+  {
+   "text": "n",
+   "start": 1.467,
+   "end": 1.493
+  },
+  {
+   "text": "d",
+   "start": 1.493,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.64
+  },
+  {
+   "text": "g",
+   "start": 1.64,
+   "end": 1.7
+  },
+  {
+   "text": "e",
+   "start": 1.7,
+   "end": 1.76
+  },
+  {
+   "text": "o",
+   "start": 1.76,
+   "end": 1.863
+  },
+  {
+   "text": "g",
+   "start": 1.863,
+   "end": 1.966
+  },
+  {
+   "text": "r",
+   "start": 1.966,
+   "end": 2.069
+  },
+  {
+   "text": "a",
+   "start": 2.069,
+   "end": 2.171
+  },
+  {
+   "text": "p",
+   "start": 2.171,
+   "end": 2.274
+  },
+  {
+   "text": "h",
+   "start": 2.274,
+   "end": 2.377
+  },
+  {
+   "text": "y",
+   "start": 2.377,
+   "end": 2.48
+  },
+  {
+   "text": ",",
+   "start": 2.48,
+   "end": 2.52
+  },
+  {
+   "text": " ",
+   "start": 2.52,
+   "end": 2.56
+  },
+  {
+   "text": "w",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "i",
+   "start": 2.64,
+   "end": 2.76
+  },
+  {
+   "text": "n",
+   "start": 2.76,
+   "end": 2.88
+  },
+  {
+   "text": "d",
+   "start": 2.88,
+   "end": 3
+  },
+  {
+   "text": "s",
+   "start": 3,
+   "end": 3.12
+  },
+  {
+   "text": ",",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.36
+  },
+  {
+   "text": "r",
+   "start": 3.36,
+   "end": 3.4
+  },
+  {
+   "text": "a",
+   "start": 3.4,
+   "end": 3.44
+  },
+  {
+   "text": "i",
+   "start": 3.44,
+   "end": 3.48
+  },
+  {
+   "text": "n",
+   "start": 3.48,
+   "end": 3.52
+  },
+  {
+   "text": "f",
+   "start": 3.52,
+   "end": 3.6
+  },
+  {
+   "text": "a",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "l",
+   "start": 3.68,
+   "end": 3.76
+  },
+  {
+   "text": "l",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": ",",
+   "start": 3.84,
+   "end": 3.92
+  },
+  {
+   "text": " ",
+   "start": 3.92,
+   "end": 4
+  },
+  {
+   "text": "a",
+   "start": 4,
+   "end": 4.027
+  },
+  {
+   "text": "n",
+   "start": 4.027,
+   "end": 4.053
+  },
+  {
+   "text": "d",
+   "start": 4.053,
+   "end": 4.08
+  },
+  {
+   "text": " ",
+   "start": 4.08,
+   "end": 4.16
+  },
+  {
+   "text": "o",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": "c",
+   "start": 4.24,
+   "end": 4.3
+  },
+  {
+   "text": "e",
+   "start": 4.3,
+   "end": 4.36
+  },
+  {
+   "text": "a",
+   "start": 4.36,
+   "end": 4.42
+  },
+  {
+   "text": "n",
+   "start": 4.42,
+   "end": 4.48
+  },
+  {
+   "text": " ",
+   "start": 4.48,
+   "end": 4.6
+  },
+  {
+   "text": "c",
+   "start": 4.6,
+   "end": 4.63
+  },
+  {
+   "text": "i",
+   "start": 4.63,
+   "end": 4.66
+  },
+  {
+   "text": "r",
+   "start": 4.66,
+   "end": 4.69
+  },
+  {
+   "text": "c",
+   "start": 4.69,
+   "end": 4.72
+  },
+  {
+   "text": "u",
+   "start": 4.72,
+   "end": 4.8
+  },
+  {
+   "text": "l",
+   "start": 4.8,
+   "end": 4.88
+  },
+  {
+   "text": "a",
+   "start": 4.88,
+   "end": 4.96
+  },
+  {
+   "text": "t",
+   "start": 4.96,
+   "end": 5.04
+  },
+  {
+   "text": "i",
+   "start": 5.04,
+   "end": 5.12
+  },
+  {
+   "text": "o",
+   "start": 5.12,
+   "end": 5.2
+  },
+  {
+   "text": "n",
+   "start": 5.2,
+   "end": 5.28
+  },
+  {
+   "text": " ",
+   "start": 5.28,
+   "end": 5.4
+  },
+  {
+   "text": "c",
+   "start": 5.4,
+   "end": 5.424
+  },
+  {
+   "text": "o",
+   "start": 5.424,
+   "end": 5.448
+  },
+  {
+   "text": "u",
+   "start": 5.448,
+   "end": 5.472
+  },
+  {
+   "text": "l",
+   "start": 5.472,
+   "end": 5.496
+  },
+  {
+   "text": "d",
+   "start": 5.496,
+   "end": 5.52
+  },
+  {
+   "text": " ",
+   "start": 5.52,
+   "end": 5.72
+  },
+  {
+   "text": "c",
+   "start": 5.72,
+   "end": 5.753
+  },
+  {
+   "text": "h",
+   "start": 5.753,
+   "end": 5.787
+  },
+  {
+   "text": "a",
+   "start": 5.787,
+   "end": 5.82
+  },
+  {
+   "text": "n",
+   "start": 5.82,
+   "end": 5.853
+  },
+  {
+   "text": "g",
+   "start": 5.853,
+   "end": 5.887
+  },
+  {
+   "text": "e",
+   "start": 5.887,
+   "end": 5.92
+  },
+  {
+   "text": " ",
+   "start": 5.92,
+   "end": 6
+  },
+  {
+   "text": "a",
+   "start": 6,
+   "end": 6.04
+  },
+  {
+   "text": "c",
+   "start": 6.04,
+   "end": 6.08
+  },
+  {
+   "text": "r",
+   "start": 6.08,
+   "end": 6.12
+  },
+  {
+   "text": "o",
+   "start": 6.12,
+   "end": 6.16
+  },
+  {
+   "text": "s",
+   "start": 6.16,
+   "end": 6.2
+  },
+  {
+   "text": "s",
+   "start": 6.2,
+   "end": 6.24
+  },
+  {
+   "text": " ",
+   "start": 6.24,
+   "end": 6.32
+  },
+  {
+   "text": "t",
+   "start": 6.32,
+   "end": 6.347
+  },
+  {
+   "text": "h",
+   "start": 6.347,
+   "end": 6.373
+  },
+  {
+   "text": "e",
+   "start": 6.373,
+   "end": 6.4
+  },
+  {
+   "text": " ",
+   "start": 6.4,
+   "end": 6.48
+  },
+  {
+   "text": "p",
+   "start": 6.48,
+   "end": 6.627
+  },
+  {
+   "text": "l",
+   "start": 6.627,
+   "end": 6.773
+  },
+  {
+   "text": "a",
+   "start": 6.773,
+   "end": 6.92
+  },
+  {
+   "text": "n",
+   "start": 6.92,
+   "end": 7.067
+  },
+  {
+   "text": "e",
+   "start": 7.067,
+   "end": 7.213
+  },
+  {
+   "text": "t",
+   "start": 7.213,
+   "end": 7.36
+  },
+  {
+   "text": ".",
+   "start": 7.36,
+   "end": 7.44
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "And",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "without",
+   "start": 0.16,
+   "end": 0.56
+  },
+  {
+   "text": "Africa's",
+   "start": 0.64,
+   "end": 1.04
+  },
+  {
+   "text": "land",
+   "start": 1.12,
+   "end": 1.36
+  },
+  {
+   "text": "and",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "geography,",
+   "start": 1.64,
+   "end": 2.52
+  },
+  {
+   "text": "winds,",
+   "start": 2.56,
+   "end": 3.2
+  },
+  {
+   "text": "rainfall,",
+   "start": 3.36,
+   "end": 3.92
+  },
+  {
+   "text": "and",
+   "start": 4,
+   "end": 4.08
+  },
+  {
+   "text": "ocean",
+   "start": 4.16,
+   "end": 4.48
+  },
+  {
+   "text": "circulation",
+   "start": 4.6,
+   "end": 5.28
+  },
+  {
+   "text": "could",
+   "start": 5.4,
+   "end": 5.52
+  },
+  {
+   "text": "change",
+   "start": 5.72,
+   "end": 5.92
+  },
+  {
+   "text": "across",
+   "start": 6,
+   "end": 6.24
+  },
+  {
+   "text": "the",
+   "start": 6.32,
+   "end": 6.4
+  },
+  {
+   "text": "planet.",
+   "start": 6.48,
+   "end": 7.44
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "A",
+   "start": 0.02,
+   "end": 0.06
+  },
+  {
+   "text": "n",
+   "start": 0.06,
+   "end": 0.06
+  },
+  {
+   "text": "d",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": " ",
+   "start": 0.14,
+   "end": 0.2
+  },
+  {
+   "text": "w",
+   "start": 0.2,
+   "end": 0.2
+  },
+  {
+   "text": "i",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.3
+  },
+  {
+   "text": "h",
+   "start": 0.3,
+   "end": 0.38
+  },
+  {
+   "text": "o",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": "u",
+   "start": 0.4,
+   "end": 0.46
+  },
+  {
+   "text": "t",
+   "start": 0.46,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "A",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "f",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "r",
+   "start": 0.74,
+   "end": 0.78
+  },
+  {
+   "text": "i",
+   "start": 0.78,
+   "end": 0.86
+  },
+  {
+   "text": "c",
+   "start": 0.86,
+   "end": 0.88
+  },
+  {
+   "text": "a",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "'",
+   "start": 0.92,
+   "end": 0.92
+  },
+  {
+   "text": "s",
+   "start": 1,
+   "end": 1.06
+  },
+  {
+   "text": " ",
+   "start": 1.06,
+   "end": 1.14
+  },
+  {
+   "text": "l",
+   "start": 1.14,
+   "end": 1.22
+  },
+  {
+   "text": "a",
+   "start": 1.22,
+   "end": 1.26
+  },
+  {
+   "text": "n",
+   "start": 1.26,
+   "end": 1.3
+  },
+  {
+   "text": "d",
+   "start": 1.3,
+   "end": 1.4
+  },
+  {
+   "text": " ",
+   "start": 1.4,
+   "end": 1.42
+  },
+  {
+   "text": "a",
+   "start": 1.42,
+   "end": 1.44
+  },
+  {
+   "text": "n",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": "d",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": " ",
+   "start": 1.5,
+   "end": 1.58
+  },
+  {
+   "text": "g",
+   "start": 1.58,
+   "end": 1.64
+  },
+  {
+   "text": "e",
+   "start": 1.64,
+   "end": 1.74
+  },
+  {
+   "text": "o",
+   "start": 1.74,
+   "end": 1.84
+  },
+  {
+   "text": "g",
+   "start": 1.84,
+   "end": 1.86
+  },
+  {
+   "text": "r",
+   "start": 1.86,
+   "end": 1.9
+  },
+  {
+   "text": "a",
+   "start": 1.9,
+   "end": 1.92
+  },
+  {
+   "text": "p",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "h",
+   "start": 2,
+   "end": 2.14
+  },
+  {
+   "text": "y",
+   "start": 2.14,
+   "end": 2.16
+  },
+  {
+   "text": ",",
+   "start": 2.16,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.6
+  },
+  {
+   "text": "w",
+   "start": 2.6,
+   "end": 2.66
+  },
+  {
+   "text": "i",
+   "start": 2.66,
+   "end": 2.68
+  },
+  {
+   "text": "n",
+   "start": 2.68,
+   "end": 2.78
+  },
+  {
+   "text": "d",
+   "start": 2.78,
+   "end": 2.96
+  },
+  {
+   "text": "s",
+   "start": 2.96,
+   "end": 2.96
+  },
+  {
+   "text": ",",
+   "start": 2.96,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.26
+  },
+  {
+   "text": "r",
+   "start": 3.26,
+   "end": 3.3
+  },
+  {
+   "text": "a",
+   "start": 3.3,
+   "end": 3.34
+  },
+  {
+   "text": "i",
+   "start": 3.34,
+   "end": 3.38
+  },
+  {
+   "text": "n",
+   "start": 3.38,
+   "end": 3.52
+  },
+  {
+   "text": "f",
+   "start": 3.52,
+   "end": 3.56
+  },
+  {
+   "text": "a",
+   "start": 3.56,
+   "end": 3.62
+  },
+  {
+   "text": "l",
+   "start": 3.62,
+   "end": 3.74
+  },
+  {
+   "text": "l",
+   "start": 3.74,
+   "end": 3.76
+  },
+  {
+   "text": ",",
+   "start": 3.76,
+   "end": 3.76
+  },
+  {
+   "text": " ",
+   "start": 3.76,
+   "end": 3.9
+  },
+  {
+   "text": "a",
+   "start": 3.9,
+   "end": 3.92
+  },
+  {
+   "text": "n",
+   "start": 3.92,
+   "end": 3.98
+  },
+  {
+   "text": "d",
+   "start": 3.98,
+   "end": 3.98
+  },
+  {
+   "text": " ",
+   "start": 3.98,
+   "end": 4.16
+  },
+  {
+   "text": "o",
+   "start": 4.16,
+   "end": 4.2
+  },
+  {
+   "text": "c",
+   "start": 4.2,
+   "end": 4.3
+  },
+  {
+   "text": "e",
+   "start": 4.3,
+   "end": 4.3
+  },
+  {
+   "text": "a",
+   "start": 4.3,
+   "end": 4.34
+  },
+  {
+   "text": "n",
+   "start": 4.4,
+   "end": 4.4
+  },
+  {
+   "text": " ",
+   "start": 4.4,
+   "end": 4.5
+  },
+  {
+   "text": "c",
+   "start": 4.5,
+   "end": 4.56
+  },
+  {
+   "text": "i",
+   "start": 4.56,
+   "end": 4.6
+  },
+  {
+   "text": "r",
+   "start": 4.6,
+   "end": 4.68
+  },
+  {
+   "text": "c",
+   "start": 4.68,
+   "end": 4.7
+  },
+  {
+   "text": "u",
+   "start": 4.7,
+   "end": 4.8
+  },
+  {
+   "text": "l",
+   "start": 4.8,
+   "end": 4.86
+  },
+  {
+   "text": "a",
+   "start": 4.86,
+   "end": 4.98
+  },
+  {
+   "text": "t",
+   "start": 4.98,
+   "end": 4.98
+  },
+  {
+   "text": "i",
+   "start": 4.98,
+   "end": 5
+  },
+  {
+   "text": "o",
+   "start": 5,
+   "end": 5.1
+  },
+  {
+   "text": "n",
+   "start": 5.1,
+   "end": 5.12
+  },
+  {
+   "text": " ",
+   "start": 5.12,
+   "end": 5.3
+  },
+  {
+   "text": "c",
+   "start": 5.3,
+   "end": 5.32
+  },
+  {
+   "text": "o",
+   "start": 5.32,
+   "end": 5.34
+  },
+  {
+   "text": "u",
+   "start": 5.34,
+   "end": 5.36
+  },
+  {
+   "text": "l",
+   "start": 5.36,
+   "end": 5.4
+  },
+  {
+   "text": "d",
+   "start": 5.4,
+   "end": 5.5
+  },
+  {
+   "text": " ",
+   "start": 5.5,
+   "end": 5.58
+  },
+  {
+   "text": "c",
+   "start": 5.58,
+   "end": 5.6
+  },
+  {
+   "text": "h",
+   "start": 5.6,
+   "end": 5.7
+  },
+  {
+   "text": "a",
+   "start": 5.7,
+   "end": 5.74
+  },
+  {
+   "text": "n",
+   "start": 5.74,
+   "end": 5.8
+  },
+  {
+   "text": "g",
+   "start": 5.8,
+   "end": 5.9
+  },
+  {
+   "text": "e",
+   "start": 5.9,
+   "end": 5.92
+  },
+  {
+   "text": " ",
+   "start": 5.92,
+   "end": 5.98
+  },
+  {
+   "text": "a",
+   "start": 5.98,
+   "end": 6.04
+  },
+  {
+   "text": "c",
+   "start": 6.04,
+   "end": 6.12
+  },
+  {
+   "text": "r",
+   "start": 6.12,
+   "end": 6.14
+  },
+  {
+   "text": "o",
+   "start": 6.14,
+   "end": 6.16
+  },
+  {
+   "text": "s",
+   "start": 6.16,
+   "end": 6.24
+  },
+  {
+   "text": "s",
+   "start": 6.24,
+   "end": 6.28
+  },
+  {
+   "text": " ",
+   "start": 6.28,
+   "end": 6.32
+  },
+  {
+   "text": "t",
+   "start": 6.32,
+   "end": 6.32
+  },
+  {
+   "text": "h",
+   "start": 6.32,
+   "end": 6.34
+  },
+  {
+   "text": "e",
+   "start": 6.34,
+   "end": 6.42
+  },
+  {
+   "text": " ",
+   "start": 6.42,
+   "end": 6.46
+  },
+  {
+   "text": "p",
+   "start": 6.46,
+   "end": 6.52
+  },
+  {
+   "text": "l",
+   "start": 6.52,
+   "end": 6.58
+  },
+  {
+   "text": "a",
+   "start": 6.58,
+   "end": 6.62
+  },
+  {
+   "text": "n",
+   "start": 6.62,
+   "end": 6.68
+  },
+  {
+   "text": "e",
+   "start": 6.68,
+   "end": 6.74
+  },
+  {
+   "text": "t",
+   "start": 6.82,
+   "end": 6.86
+  },
+  {
+   "text": ".",
+   "start": 6.86,
+   "end": 6.86
+  }
+ ]
+}

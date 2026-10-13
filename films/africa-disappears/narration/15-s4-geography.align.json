@@ -1,0 +1,444 @@
+{
+ "id": "15-s4-geography",
+ "text": "The world's geography begins changing.",
+ "seconds": 2.95,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "The",
+   "start": 0.06,
+   "end": 0.1
+  },
+  {
+   "text": "world's",
+   "start": 0.22,
+   "end": 0.56
+  },
+  {
+   "text": "geography",
+   "start": 0.6,
+   "end": 1.2
+  },
+  {
+   "text": "begins",
+   "start": 1.34,
+   "end": 1.82
+  },
+  {
+   "text": "changing.",
+   "start": 1.88,
+   "end": 2.4
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "h",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "e",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "w",
+   "start": 0.16,
+   "end": 0.208
+  },
+  {
+   "text": "o",
+   "start": 0.208,
+   "end": 0.256
+  },
+  {
+   "text": "r",
+   "start": 0.256,
+   "end": 0.304
+  },
+  {
+   "text": "l",
+   "start": 0.304,
+   "end": 0.352
+  },
+  {
+   "text": "d",
+   "start": 0.352,
+   "end": 0.4
+  },
+  {
+   "text": "'",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "s",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "g",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "e",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "o",
+   "start": 0.72,
+   "end": 0.789
+  },
+  {
+   "text": "g",
+   "start": 0.789,
+   "end": 0.857
+  },
+  {
+   "text": "r",
+   "start": 0.857,
+   "end": 0.926
+  },
+  {
+   "text": "a",
+   "start": 0.926,
+   "end": 0.994
+  },
+  {
+   "text": "p",
+   "start": 0.994,
+   "end": 1.063
+  },
+  {
+   "text": "h",
+   "start": 1.063,
+   "end": 1.131
+  },
+  {
+   "text": "y",
+   "start": 1.131,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "b",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "e",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "g",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "i",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "n",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "s",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "c",
+   "start": 1.84,
+   "end": 1.91
+  },
+  {
+   "text": "h",
+   "start": 1.91,
+   "end": 1.98
+  },
+  {
+   "text": "a",
+   "start": 1.98,
+   "end": 2.05
+  },
+  {
+   "text": "n",
+   "start": 2.05,
+   "end": 2.12
+  },
+  {
+   "text": "g",
+   "start": 2.12,
+   "end": 2.19
+  },
+  {
+   "text": "i",
+   "start": 2.19,
+   "end": 2.26
+  },
+  {
+   "text": "n",
+   "start": 2.26,
+   "end": 2.33
+  },
+  {
+   "text": "g",
+   "start": 2.33,
+   "end": 2.4
+  },
+  {
+   "text": ".",
+   "start": 2.4,
+   "end": 2.88
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "The",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "world's",
+   "start": 0.16,
+   "end": 0.48
+  },
+  {
+   "text": "geography",
+   "start": 0.56,
+   "end": 1.2
+  },
+  {
+   "text": "begins",
+   "start": 1.28,
+   "end": 1.76
+  },
+  {
+   "text": "changing.",
+   "start": 1.84,
+   "end": 2.88
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.06,
+   "end": 0.06
+  },
+  {
+   "text": "h",
+   "start": 0.06,
+   "end": 0.08
+  },
+  {
+   "text": "e",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": " ",
+   "start": 0.1,
+   "end": 0.22
+  },
+  {
+   "text": "w",
+   "start": 0.22,
+   "end": 0.28
+  },
+  {
+   "text": "o",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "r",
+   "start": 0.3,
+   "end": 0.36
+  },
+  {
+   "text": "l",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": "d",
+   "start": 0.38,
+   "end": 0.44
+  },
+  {
+   "text": "'",
+   "start": 0.44,
+   "end": 0.44
+  },
+  {
+   "text": "s",
+   "start": 0.5,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "g",
+   "start": 0.6,
+   "end": 0.66
+  },
+  {
+   "text": "e",
+   "start": 0.66,
+   "end": 0.78
+  },
+  {
+   "text": "o",
+   "start": 0.78,
+   "end": 0.88
+  },
+  {
+   "text": "g",
+   "start": 0.88,
+   "end": 0.9
+  },
+  {
+   "text": "r",
+   "start": 0.9,
+   "end": 0.94
+  },
+  {
+   "text": "a",
+   "start": 0.94,
+   "end": 0.96
+  },
+  {
+   "text": "p",
+   "start": 0.96,
+   "end": 1.06
+  },
+  {
+   "text": "h",
+   "start": 1.06,
+   "end": 1.18
+  },
+  {
+   "text": "y",
+   "start": 1.18,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.34
+  },
+  {
+   "text": "b",
+   "start": 1.34,
+   "end": 1.38
+  },
+  {
+   "text": "e",
+   "start": 1.38,
+   "end": 1.48
+  },
+  {
+   "text": "g",
+   "start": 1.48,
+   "end": 1.54
+  },
+  {
+   "text": "i",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "n",
+   "start": 1.58,
+   "end": 1.74
+  },
+  {
+   "text": "s",
+   "start": 1.74,
+   "end": 1.82
+  },
+  {
+   "text": " ",
+   "start": 1.82,
+   "end": 1.88
+  },
+  {
+   "text": "c",
+   "start": 1.88,
+   "end": 1.9
+  },
+  {
+   "text": "h",
+   "start": 1.9,
+   "end": 2
+  },
+  {
+   "text": "a",
+   "start": 2,
+   "end": 2.02
+  },
+  {
+   "text": "n",
+   "start": 2.02,
+   "end": 2.1
+  },
+  {
+   "text": "g",
+   "start": 2.1,
+   "end": 2.18
+  },
+  {
+   "text": "i",
+   "start": 2.18,
+   "end": 2.24
+  },
+  {
+   "text": "n",
+   "start": 2.24,
+   "end": 2.34
+  },
+  {
+   "text": "g",
+   "start": 2.34,
+   "end": 2.4
+  },
+  {
+   "text": ".",
+   "start": 2.4,
+   "end": 2.4
+  }
+ ]
+}

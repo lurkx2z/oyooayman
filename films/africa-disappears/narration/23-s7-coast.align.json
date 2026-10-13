@@ -1,0 +1,594 @@
+{
+ "id": "23-s7-coast",
+ "text": "Coastlines shift. The world's maps become obsolete.",
+ "seconds": 4.31,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Coastlines",
+   "start": 0.06,
+   "end": 0.68
+  },
+  {
+   "text": "shift.",
+   "start": 0.8,
+   "end": 1.16
+  },
+  {
+   "text": "The",
+   "start": 1.76,
+   "end": 1.86
+  },
+  {
+   "text": "world's",
+   "start": 1.92,
+   "end": 2.26
+  },
+  {
+   "text": "maps",
+   "start": 2.34,
+   "end": 2.68
+  },
+  {
+   "text": "become",
+   "start": 2.72,
+   "end": 3.08
+  },
+  {
+   "text": "obsolete.",
+   "start": 3.14,
+   "end": 3.7
+  }
+ ],
+ "characters": [
+  {
+   "text": "C",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "o",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "a",
+   "start": 0.16,
+   "end": 0.213
+  },
+  {
+   "text": "s",
+   "start": 0.213,
+   "end": 0.267
+  },
+  {
+   "text": "t",
+   "start": 0.267,
+   "end": 0.32
+  },
+  {
+   "text": "l",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "i",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "n",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "s",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "s",
+   "start": 0.8,
+   "end": 0.976
+  },
+  {
+   "text": "h",
+   "start": 0.976,
+   "end": 1.152
+  },
+  {
+   "text": "i",
+   "start": 1.152,
+   "end": 1.328
+  },
+  {
+   "text": "f",
+   "start": 1.328,
+   "end": 1.504
+  },
+  {
+   "text": "t",
+   "start": 1.504,
+   "end": 1.68
+  },
+  {
+   "text": ".",
+   "start": 1.68,
+   "end": 1.733
+  },
+  {
+   "text": " ",
+   "start": 1.733,
+   "end": 1.787
+  },
+  {
+   "text": "T",
+   "start": 1.787,
+   "end": 1.804
+  },
+  {
+   "text": "h",
+   "start": 1.804,
+   "end": 1.822
+  },
+  {
+   "text": "e",
+   "start": 1.822,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "w",
+   "start": 1.92,
+   "end": 1.968
+  },
+  {
+   "text": "o",
+   "start": 1.968,
+   "end": 2.016
+  },
+  {
+   "text": "r",
+   "start": 2.016,
+   "end": 2.064
+  },
+  {
+   "text": "l",
+   "start": 2.064,
+   "end": 2.112
+  },
+  {
+   "text": "d",
+   "start": 2.112,
+   "end": 2.16
+  },
+  {
+   "text": "'",
+   "start": 2.16,
+   "end": 2.2
+  },
+  {
+   "text": "s",
+   "start": 2.2,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "m",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": "a",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "p",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "s",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "b",
+   "start": 2.72,
+   "end": 2.773
+  },
+  {
+   "text": "e",
+   "start": 2.773,
+   "end": 2.827
+  },
+  {
+   "text": "c",
+   "start": 2.827,
+   "end": 2.88
+  },
+  {
+   "text": "o",
+   "start": 2.88,
+   "end": 2.933
+  },
+  {
+   "text": "m",
+   "start": 2.933,
+   "end": 2.987
+  },
+  {
+   "text": "e",
+   "start": 2.987,
+   "end": 3.04
+  },
+  {
+   "text": " ",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": "o",
+   "start": 3.12,
+   "end": 3.26
+  },
+  {
+   "text": "b",
+   "start": 3.26,
+   "end": 3.4
+  },
+  {
+   "text": "s",
+   "start": 3.4,
+   "end": 3.54
+  },
+  {
+   "text": "o",
+   "start": 3.54,
+   "end": 3.68
+  },
+  {
+   "text": "l",
+   "start": 3.68,
+   "end": 3.82
+  },
+  {
+   "text": "e",
+   "start": 3.82,
+   "end": 3.96
+  },
+  {
+   "text": "t",
+   "start": 3.96,
+   "end": 4.1
+  },
+  {
+   "text": "e",
+   "start": 4.1,
+   "end": 4.24
+  },
+  {
+   "text": ".",
+   "start": 4.24,
+   "end": 4.32
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Coastlines",
+   "start": 0,
+   "end": 0.72
+  },
+  {
+   "text": "shift.",
+   "start": 0.8,
+   "end": 1.733
+  },
+  {
+   "text": "The",
+   "start": 1.787,
+   "end": 1.84
+  },
+  {
+   "text": "world's",
+   "start": 1.92,
+   "end": 2.24
+  },
+  {
+   "text": "maps",
+   "start": 2.32,
+   "end": 2.64
+  },
+  {
+   "text": "become",
+   "start": 2.72,
+   "end": 3.04
+  },
+  {
+   "text": "obsolete.",
+   "start": 3.12,
+   "end": 4.32
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "C",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "a",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": "s",
+   "start": 0.18,
+   "end": 0.26
+  },
+  {
+   "text": "t",
+   "start": 0.26,
+   "end": 0.38
+  },
+  {
+   "text": "l",
+   "start": 0.38,
+   "end": 0.42
+  },
+  {
+   "text": "i",
+   "start": 0.42,
+   "end": 0.5
+  },
+  {
+   "text": "n",
+   "start": 0.5,
+   "end": 0.58
+  },
+  {
+   "text": "e",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": "s",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": " ",
+   "start": 0.68,
+   "end": 0.8
+  },
+  {
+   "text": "s",
+   "start": 0.8,
+   "end": 0.82
+  },
+  {
+   "text": "h",
+   "start": 0.82,
+   "end": 0.9
+  },
+  {
+   "text": "i",
+   "start": 0.9,
+   "end": 0.94
+  },
+  {
+   "text": "f",
+   "start": 0.94,
+   "end": 1.06
+  },
+  {
+   "text": "t",
+   "start": 1.06,
+   "end": 1.16
+  },
+  {
+   "text": ".",
+   "start": 1.16,
+   "end": 1.16
+  },
+  {
+   "text": " ",
+   "start": 1.16,
+   "end": 1.16
+  },
+  {
+   "text": "T",
+   "start": 1.76,
+   "end": 1.78
+  },
+  {
+   "text": "h",
+   "start": 1.78,
+   "end": 1.78
+  },
+  {
+   "text": "e",
+   "start": 1.78,
+   "end": 1.86
+  },
+  {
+   "text": " ",
+   "start": 1.86,
+   "end": 1.92
+  },
+  {
+   "text": "w",
+   "start": 1.92,
+   "end": 1.98
+  },
+  {
+   "text": "o",
+   "start": 1.98,
+   "end": 2
+  },
+  {
+   "text": "r",
+   "start": 2,
+   "end": 2.04
+  },
+  {
+   "text": "l",
+   "start": 2.04,
+   "end": 2.08
+  },
+  {
+   "text": "d",
+   "start": 2.08,
+   "end": 2.14
+  },
+  {
+   "text": "'",
+   "start": 2.14,
+   "end": 2.14
+  },
+  {
+   "text": "s",
+   "start": 2.18,
+   "end": 2.26
+  },
+  {
+   "text": " ",
+   "start": 2.26,
+   "end": 2.34
+  },
+  {
+   "text": "m",
+   "start": 2.34,
+   "end": 2.4
+  },
+  {
+   "text": "a",
+   "start": 2.4,
+   "end": 2.46
+  },
+  {
+   "text": "p",
+   "start": 2.46,
+   "end": 2.6
+  },
+  {
+   "text": "s",
+   "start": 2.6,
+   "end": 2.68
+  },
+  {
+   "text": " ",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "b",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "e",
+   "start": 2.76,
+   "end": 2.84
+  },
+  {
+   "text": "c",
+   "start": 2.84,
+   "end": 2.88
+  },
+  {
+   "text": "o",
+   "start": 2.88,
+   "end": 2.9
+  },
+  {
+   "text": "m",
+   "start": 2.9,
+   "end": 2.92
+  },
+  {
+   "text": "e",
+   "start": 2.92,
+   "end": 3.08
+  },
+  {
+   "text": " ",
+   "start": 3.08,
+   "end": 3.14
+  },
+  {
+   "text": "o",
+   "start": 3.14,
+   "end": 3.22
+  },
+  {
+   "text": "b",
+   "start": 3.22,
+   "end": 3.28
+  },
+  {
+   "text": "s",
+   "start": 3.28,
+   "end": 3.34
+  },
+  {
+   "text": "o",
+   "start": 3.34,
+   "end": 3.44
+  },
+  {
+   "text": "l",
+   "start": 3.44,
+   "end": 3.46
+  },
+  {
+   "text": "e",
+   "start": 3.46,
+   "end": 3.56
+  },
+  {
+   "text": "t",
+   "start": 3.56,
+   "end": 3.6
+  },
+  {
+   "text": "e",
+   "start": 3.68,
+   "end": 3.7
+  },
+  {
+   "text": ".",
+   "start": 3.7,
+   "end": 3.7
+  }
+ ]
+}

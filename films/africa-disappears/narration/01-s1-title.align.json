@@ -1,0 +1,424 @@
+{
+ "id": "01-s1-title",
+ "text": "What if Africa suddenly disappeared?",
+ "seconds": 2.8,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "What",
+   "start": 0.14,
+   "end": 0.24
+  },
+  {
+   "text": "if",
+   "start": 0.3,
+   "end": 0.4
+  },
+  {
+   "text": "Africa",
+   "start": 0.62,
+   "end": 1.06
+  },
+  {
+   "text": "suddenly",
+   "start": 1.3,
+   "end": 1.84
+  },
+  {
+   "text": "disappeared?",
+   "start": 1.88,
+   "end": 2.54
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.15
+  },
+  {
+   "text": "h",
+   "start": 0.15,
+   "end": 0.18
+  },
+  {
+   "text": "a",
+   "start": 0.18,
+   "end": 0.21
+  },
+  {
+   "text": "t",
+   "start": 0.21,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.36
+  },
+  {
+   "text": "i",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": "f",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "A",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "f",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "r",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "i",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "c",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "a",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.28
+  },
+  {
+   "text": "s",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "u",
+   "start": 1.36,
+   "end": 1.406
+  },
+  {
+   "text": "d",
+   "start": 1.406,
+   "end": 1.451
+  },
+  {
+   "text": "d",
+   "start": 1.451,
+   "end": 1.497
+  },
+  {
+   "text": "e",
+   "start": 1.497,
+   "end": 1.543
+  },
+  {
+   "text": "n",
+   "start": 1.543,
+   "end": 1.589
+  },
+  {
+   "text": "l",
+   "start": 1.589,
+   "end": 1.634
+  },
+  {
+   "text": "y",
+   "start": 1.634,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.84
+  },
+  {
+   "text": "d",
+   "start": 1.84,
+   "end": 1.893
+  },
+  {
+   "text": "i",
+   "start": 1.893,
+   "end": 1.947
+  },
+  {
+   "text": "s",
+   "start": 1.947,
+   "end": 2
+  },
+  {
+   "text": "a",
+   "start": 2,
+   "end": 2.07
+  },
+  {
+   "text": "p",
+   "start": 2.07,
+   "end": 2.14
+  },
+  {
+   "text": "p",
+   "start": 2.14,
+   "end": 2.21
+  },
+  {
+   "text": "e",
+   "start": 2.21,
+   "end": 2.28
+  },
+  {
+   "text": "a",
+   "start": 2.28,
+   "end": 2.35
+  },
+  {
+   "text": "r",
+   "start": 2.35,
+   "end": 2.42
+  },
+  {
+   "text": "e",
+   "start": 2.42,
+   "end": 2.49
+  },
+  {
+   "text": "d",
+   "start": 2.49,
+   "end": 2.56
+  },
+  {
+   "text": "?",
+   "start": 2.56,
+   "end": 2.72
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "What",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "if",
+   "start": 0.36,
+   "end": 0.48
+  },
+  {
+   "text": "Africa",
+   "start": 0.56,
+   "end": 1.04
+  },
+  {
+   "text": "suddenly",
+   "start": 1.28,
+   "end": 1.68
+  },
+  {
+   "text": "disappeared?",
+   "start": 1.84,
+   "end": 2.72
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "a",
+   "start": 0.18,
+   "end": 0.22
+  },
+  {
+   "text": "t",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.3
+  },
+  {
+   "text": "i",
+   "start": 0.3,
+   "end": 0.38
+  },
+  {
+   "text": "f",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.62
+  },
+  {
+   "text": "A",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": "f",
+   "start": 0.66,
+   "end": 0.76
+  },
+  {
+   "text": "r",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "i",
+   "start": 0.82,
+   "end": 0.84
+  },
+  {
+   "text": "c",
+   "start": 0.9,
+   "end": 0.92
+  },
+  {
+   "text": "a",
+   "start": 0.92,
+   "end": 1.06
+  },
+  {
+   "text": " ",
+   "start": 1.06,
+   "end": 1.3
+  },
+  {
+   "text": "s",
+   "start": 1.3,
+   "end": 1.38
+  },
+  {
+   "text": "u",
+   "start": 1.42,
+   "end": 1.44
+  },
+  {
+   "text": "d",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": "d",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": "e",
+   "start": 1.5,
+   "end": 1.54
+  },
+  {
+   "text": "n",
+   "start": 1.54,
+   "end": 1.64
+  },
+  {
+   "text": "l",
+   "start": 1.64,
+   "end": 1.66
+  },
+  {
+   "text": "y",
+   "start": 1.66,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "d",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": "i",
+   "start": 1.92,
+   "end": 1.98
+  },
+  {
+   "text": "s",
+   "start": 1.98,
+   "end": 2.04
+  },
+  {
+   "text": "a",
+   "start": 2.04,
+   "end": 2.16
+  },
+  {
+   "text": "p",
+   "start": 2.16,
+   "end": 2.18
+  },
+  {
+   "text": "p",
+   "start": 2.18,
+   "end": 2.2
+  },
+  {
+   "text": "e",
+   "start": 2.2,
+   "end": 2.3
+  },
+  {
+   "text": "a",
+   "start": 2.3,
+   "end": 2.36
+  },
+  {
+   "text": "r",
+   "start": 2.36,
+   "end": 2.4
+  },
+  {
+   "text": "e",
+   "start": 2.4,
+   "end": 2.52
+  },
+  {
+   "text": "d",
+   "start": 2.52,
+   "end": 2.54
+  },
+  {
+   "text": "?",
+   "start": 2.54,
+   "end": 2.54
+  }
+ ]
+}
