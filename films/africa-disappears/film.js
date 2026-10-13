@@ -128,10 +128,28 @@ function afPlanetLabels(t, shot, app) {
     out.push({ x: v.x * 0.5 + 0.5, y: 0.5 - v.y * 0.5, html, a });
   };
   if (shot.id === 'P2') {
-    AF_CITIES.slice(0, 7).forEach(([name, lon, lat, pop], i) => {
+    // the six biggest cities that do not crowd each other (Alexandria sits on Cairo); each label runs right of its dot,
+    // so it is dropped if it would leave the frame, cross the readout (top left) or the caption (lower third)
+    const n0 = out.length;
+    ['Cairo', 'Lagos', 'Kinshasa', 'Luanda', 'Khartoum', 'Abidjan'].forEach((nm, i) => {
+      const [name, lon, lat, pop] = AF_CITIES.find((c) => c[0] === nm);
       const a = MathX.smooth(t, AF.erased + 0.3 + i * 0.35, AF.erased + 0.8 + i * 0.35) * (1 - MathX.smooth(t, AF.mine - 0.5, AF.mine - 0.1));
       put(lon, lat, `<span class="d"></span>${name}<small>${(pop / 1e6).toFixed(1)} M</small>`, a);
     });
+    for (let i = out.length - 1; i >= n0; i--) { const l = out[i]; if (l.x < 0.03 || l.x > 0.8 || (l.y > 0.62 && l.y < 0.82) || l.y < 0.1 || l.y > 0.93 || (l.y < 0.25 && l.x < 0.55)) out.splice(i, 1); }
+  }
+  if (shot.id === 'T1') {
+    // Africa's big ports as nodes of the network; on "Ports disappear" each flares red, pops and is gone
+    const n0 = out.length;
+    [['LAGOS', 'lag'], ['TANGER MED', 'tng'], ['DURBAN', 'dur'], ['MOMBASA', 'mom'], ['PORT SAID', 'sai'], ['ABIDJAN', 'abi'], ['DAKAR', 'dak']].forEach(([name, wp], i) => {
+      const [lon, lat] = AF_WP[wp], tr = AF.ports - 0.15 + i * 0.26;
+      const a = MathX.smooth(t, AF.trade + 0.6 + i * 0.1, AF.trade + 1.0 + i * 0.1) * (1 - MathX.smooth(t, tr + 0.35, tr + 0.75));
+      const red = MathX.smooth(t, tr, tr + 0.06), pop = 1 + 1.4 * MathX.smooth(t, tr, tr + 0.5);
+      const col = red > 0.5 ? '#ff4a3a' : 'rgba(255, 215, 168, 0.9)';
+      put(lon, lat, `<span class="d" style="background:${red > 0.5 ? '#ff4a3a' : 'transparent'};box-shadow:0 0 0 calc(var(--u) * 3) ${col};transform:scale(${pop.toFixed(2)})"></span>` +
+        `<span style="color:${red > 0.5 ? '#ff8a7a' : '#f6efe2'}">${name}</span><small style="color:${red > 0.5 ? '#ff6a5a' : '#ffd7a8'}">${red > 0.5 ? 'PORT · GONE' : 'PORT'}</small>`, a);
+    });
+    for (let i = out.length - 1; i >= n0; i--) { const l = out[i]; if (l.x < 0.03 || l.x > 0.8 || (l.y > 0.64 && l.y < 0.8) || l.y < 0.06 || l.y > 0.95) out.splice(i, 1); }
   }
   if (shot.id === 'T2') {
     const a = MathX.smooth(t, AF.suez, AF.suez + 0.3) * (1 - MathX.smooth(t, AF.board - 0.4, AF.board - 0.1));

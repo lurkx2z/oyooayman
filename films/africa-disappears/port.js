@@ -5,7 +5,7 @@
    ===================================================================== */
 
 AF_SET_BUILDERS.port = (app) => {
-  const S = afSet(app, { sky: '#a9b4bf', fog: 0.00013, fogColor: '#aab4bd', fov: 40, sun: [-200, 260, 160], sunColor: '#fff3e0', sunI: 2.6,
+  const S = afSet(app, { sky: '#a9b4bf', fog: 0.00013, fogColor: '#aab4bd', fov: 40, sun: [-200, 260, 160], sunColor: '#fff3e0', sunI: 2.2,
     hemi: ['#c4ccd6', '#4b4a46', 0.9], shadow: 2048, shadowR: 420, shadowFar: 1400, far: 9000, env: ['#c9d1da', '#a6b0ba', '#3a3d40'] });
   const { scene, camera } = S;
   afSky(scene, '#8c9cad', '#b9c2cb', '#8a949c', { r: 6000 });
@@ -16,7 +16,7 @@ AF_SET_BUILDERS.port = (app) => {
   afBox(1400, 6, 520, asph, 0, -3, -300).receiveShadow = true;
   afBox(1400, 6.4, 40, conc, 0, -3, -20).receiveShadow = true;
   // container stacks: blocks of rows × bays × tiers
-  const COLS = ['#2d4a66', '#7a3029', '#bdbab2', '#3f5a4c', '#9a5a30', '#646a70', '#2a3448', '#857a44', '#5a3a48'];
+  const COLS = ['#2d4a66', '#7a3029', '#9e9b94', '#3f5a4c', '#9a5a30', '#646a70', '#2a3448', '#857a44', '#5a3a48'];
   const boxG = new THREE.BoxGeometry(12.2, 2.6, 2.44), boxM = afMat('#ffffff', { roughness: 0.7 });
   const NI = 16000, inst = new THREE.InstancedMesh(boxG, boxM, NI), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), c = new THREE.Color();
   let n = 0;
@@ -33,7 +33,7 @@ AF_SET_BUILDERS.port = (app) => {
   inst.count = n; inst.castShadow = inst.receiveShadow = true; scene.add(inst);
   // ship-to-shore cranes, idle with their booms raised: a portal on four legs straddling the quay, a long girder
   // running back over the yard (machinery house at its tail), an A-frame on top and the waterside boom tipped up
-  const craneM = afMat('#6f8ea8', { roughness: 0.55, metalness: 0.2 }), houseM = afMat('#dfe2e4', { roughness: 0.6 });
+  const craneM = afMat('#6f8ea8', { roughness: 0.55, metalness: 0.2 }), houseM = afMat('#9ea4aa', { roughness: 0.7 });
   const strut = (g, a, b, w, M = craneM) => {   // a square member from point a to point b
     const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), d = B.clone().sub(A), m = new THREE.Mesh(new THREE.BoxGeometry(w, d.length(), w), M);
     m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());

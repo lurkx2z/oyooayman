@@ -139,7 +139,34 @@ function afFloor(scene, depth, o = {}) {
     col.set([c.r, c.g, c.b], i * 3);
   }
   g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
-  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0, flatShading: false }));
+  // rock detail (seen from a few km up the floor is otherwise a smooth blur): one seeded tile, sampled at two scales
+  // so the repeat does not show; it also bumps the shading
+  const tex = afRockTex(), rep = L / (o.tile || 2400);
+  tex.repeat.set(rep, rep);
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0, map: tex, bumpMap: tex, bumpScale: 3 });
+  mat.onBeforeCompile = (sh) => {
+    sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\n  diffuseColor.rgb *= 0.45 + 1.1 * texture2D(map, vMapUv * 0.173 + vec2(0.37, 0.71)).r;');
+  };
+  const m = new THREE.Mesh(g, mat);
   m.position.set(X0, 0, Z0); scene.add(m);
   return m;
+}
+let AF_ROCK_TEX = null;
+function afRockTex() {
+  if (AF_ROCK_TEX) return AF_ROCK_TEX;
+  const S = 256, c = Tex.canvas(S, S), x = c.getContext('2d'), img = x.createImageData(S, S);
+  // mottled rock (fBm), tileable: the noise is summed over the four wrapped copies with blend weights
+  const f = (u, v) => {
+    let a = 0, w = 0.5, sc = 6; for (let k = 0; k < 5; k++) { a += w * afN2(u * sc + k * 17.3, v * sc - k * 9.1); sc *= 2; w *= 0.5; }
+    return a;
+  };
+  for (let j = 0; j < S; j++) for (let i = 0; i < S; i++) {
+    const u = i / S, v = j / S;
+    const n = f(u, v) * (1 - u) * (1 - v) + f(u - 1, v) * u * (1 - v) + f(u, v - 1) * (1 - u) * v + f(u - 1, v - 1) * u * v;
+    const val = MathX.clamp(0.25 + 1.1 * (n - 0.3) + 0.08 * Math.sin(v * Math.PI * 2 * 9 + n * 6), 0, 1);
+    const k = (j * S + i) * 4, g8 = Math.round(val * 255); img.data[k] = img.data[k + 1] = img.data[k + 2] = g8; img.data[k + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
+  AF_ROCK_TEX = Tex.tex(c, { repeat: true, srgb: false });
+  return AF_ROCK_TEX;
 }

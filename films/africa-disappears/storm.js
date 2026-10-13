@@ -1,6 +1,7 @@
 /* =====================================================================
    SET · STORM — a container ship in the churned Atlantic as the ocean pours toward the basin. A heavy swell (crests
-   ~12 m above the troughs), wind-torn foam, rain. The ship pitches into the seas and the bow throws up walls of spray.
+   ~12 m above the troughs), wind-torn foam, low spindrift (no rain: the sea is churned by the currents, not a
+   storm). The ship pitches into the seas and the bow throws up walls of spray.
    This shot carries the film's first narration-free beat (3 s of water, ship and music).
    The sea is a sum of Gerstner waves, evaluated identically on the GPU (the surface) and the CPU (the ship's motion,
    the spray), so everything stays a pure function of time.
@@ -150,8 +151,8 @@ AF_SET_BUILDERS.storm = (app) => {
   const navR = new THREE.Mesh(new THREE.SphereGeometry(0.6, 8, 6), new THREE.MeshBasicMaterial({ color: '#ff3a2a' })); navR.position.set(-L / 2 + 22, 36.5, -17.5); ship.add(navR);
   const navG = new THREE.Mesh(new THREE.SphereGeometry(0.6, 8, 6), new THREE.MeshBasicMaterial({ color: '#3aff7a' })); navG.position.set(-L / 2 + 22, 36.5, 17.5); ship.add(navG);
   const lampW = new THREE.PointLight('#ffe0b0', 0, 60, 1.6); lampW.position.set(-L / 2 + 28, 30, 0); ship.add(lampW);
-  // spray and rain
-  const spray = new BillboardSystem(scene, 1400, false), rain = new StreakSystem(scene, 1400);
+  // spray, and spindrift torn off the crests
+  const spray = new BillboardSystem(scene, 1400, false), drift = new StreakSystem(scene, 600);
   // a torn, cloudy spray puff (not a round dot)
   spray.uniforms.uMap.value = (() => {
     const c = Tex.canvas(128, 128), x = c.getContext('2d'), rng = new RNG(7);
@@ -191,14 +192,15 @@ AF_SET_BUILDERS.storm = (app) => {
         spray.push(x, y, z, sz, b, a, 1.0, 0.8, 0.84, 0.86);
       }
       spray.end();
-      // rain: streaks around the camera, wind-blown
-      rain.begin();
-      for (let i = 0; i < 1300; i++) {
-        const h1 = afR(i, 1), h2 = afR(i, 2), h3 = afR(i, 3), fall = 28;
-        const ph = (h3 + t * fall / 60) % 1, rx = cx + (h1 - 0.5) * 120 + 30, rz = cz + (h2 - 0.5) * 120 + 40, ry = cy + 50 - ph * 60;
-        rain.push(rx, ry, rz, rx + 0.9, ry - 2.4, rz + 0.3, 0.75, 0.8, 0.85, 0.28, 0.02);
+      // spindrift: short streaks skimming the water around the camera, blown along with the swell
+      drift.begin();
+      for (let i = 0; i < 520; i++) {
+        const h1 = afR(i, 1), h2 = afR(i, 2), h3 = afR(i, 3), ph = (h3 + t * 0.55) % 1;
+        const rx = cx - 30 + (h1 - 0.5) * 160 - 60 + ph * 140, rz = cz + 20 + (h2 - 0.5) * 140;
+        const ry = afWaveH(rx, rz, t) + 0.4 + 2.2 * h2, fade = Math.sin(Math.PI * ph);
+        drift.push(rx, ry, rz, rx - 3.2, ry - 0.15, rz + 0.5, 0.82, 0.86, 0.88, 0.22 * fade, 0.05);
       }
-      rain.end();
+      drift.end();
       lampW.intensity = 6;
     },
     grade(t, p) { p.warmth = -0.08; p.saturation = 0.78; p.contrast = 1.12; p.vignette = 0.75; p.grain = 0.035; },

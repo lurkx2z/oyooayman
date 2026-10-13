@@ -21,10 +21,13 @@ function afSpeechWindows(merge) {
   for (const [a, b] of ws) { const L = out[out.length - 1]; if (L && a - L[1] < merge) L[1] = Math.max(L[1], b); else out.push([a, b]); }
   return out;
 }
+// a window that ends just before one of the film's hits (M.fast: AF keys) lets go at once, so the hit lands at full level
 function afDuckDb(t, depth, M, wins) {
   let d = 0;
+  const hits = (M.fast || []).map((k) => AF[k]);
   for (const [a, b] of wins) {
-    const a1 = a - M.lead, a0 = a1 - M.attack, r0 = b + M.hold, r1 = r0 + M.release;
+    const a1 = a - M.lead, a0 = a1 - M.attack, hit = hits.find((h) => h > b - 0.05 && h - b < 1.5);
+    const r0 = hit != null ? Math.min(b + 0.02, hit - 0.1) : b + M.hold, r1 = hit != null ? Math.min(r0 + 0.1, hit) : r0 + M.release;
     let k = 0;
     if (t >= a1 && t <= r0) k = 1;
     else if (t < a1 && t > a0) k = 0.5 - 0.5 * Math.cos(Math.PI * (t - a0) / (a1 - a0));
@@ -141,7 +144,7 @@ class AfAudio extends AudioEngine {
       for (let i = 0; i < n; i++) {
         const t = i / 100;
         let db = (dk ? afDuckDb(t, st.duck, M, wins) : 0) + (this.noDuck ? 0 : afDynDb(t, dyn));
-        if (id !== 'voice' && t > AF.end - 0.06) db = -120;            // the cut to silence
+        if (id !== 'voice' && t > AF.end - 1 / 30) db = -120;          // the cut to silence (on the last frame)
         c[i] = Math.pow(10, db / 20);
       }
       duck.gain.setValueCurveAtTime(c, 0, END);
@@ -175,9 +178,13 @@ class AfAudio extends AudioEngine {
     const vc = ctx.createDynamicsCompressor(); vc.threshold.value = C.threshold; vc.knee.value = C.knee; vc.ratio.value = C.ratio; vc.attack.value = C.attack; vc.release.value = C.release;
     const mk = ctx.createGain(); mk.gain.value = Math.pow(10, 4 / 20);
     low.connect(pres); pres.connect(vc); vc.connect(mk); mk.connect(dest);
+    // the per-clip trims go after the compressor (before it, 3:1 would undo most of them); each is set in the
+    // silence before its clip
+    const trims = window.AF_MIX.voiceTrim || {}, order = AN.clips.slice().sort((a, b) => a.start - b.start);
+    order.forEach((c, i) => { const at = i ? Math.max(order[i - 1].speechEnd + 0.35, c.start - 0.05) : 0; mk.gain.setValueAtTime(Math.pow(10, (4 + (trims[c.id] || 0)) / 20), Math.max(0, at)); });
     for (const c of AN.clips) {
       const buf = this.vo && this.vo[c.id]; if (!buf) continue;
-      const src = ctx.createBufferSource(), g = ctx.createGain(), v = Math.pow(10, (c.gainDb + ((window.AF_MIX.voiceTrim || {})[c.id] || 0)) / 20);
+      const src = ctx.createBufferSource(), g = ctx.createGain(), v = Math.pow(10, c.gainDb / 20);
       const f1 = Math.min(c.start + buf.duration, c.speechEnd + 0.3);   // every word whole; fade just after the last one
       src.buffer = buf; src.connect(g); g.connect(low); src.start(Math.max(0, c.start), Math.max(0, -c.start)); src.stop(f1 + 0.02);
       g.gain.setValueAtTime(v, Math.max(0, c.start)); g.gain.setValueAtTime(v, f1 - 0.12); g.gain.linearRampToValueAtTime(0, f1);

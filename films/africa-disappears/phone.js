@@ -41,8 +41,8 @@ AF_SET_BUILDERS.phone = (app) => {
       const R = [['Mama', 'Lagos', 23], ['Baba', 'Lagos', 11], ['Ama', 'Accra', 6], ['Uncle Kofi', 'Kumasi', 4], ['Tunde', 'Lagos', 3], ['Office', 'Nairobi', 2], ['Mama', 'Lagos', 19]];
       R.forEach(([n, c, k], i) => {
         const y = 230 + i * 112; x.fillStyle = 'rgba(255,255,255,0.08)'; x.fillRect(24, y - 60, w - 48, 1);
-        x.fillStyle = '#ff5a4e'; x.font = `600 40px ${Tex.fontSans}`; x.fillText(`${n} (${k})`, 34, y);
-        x.fillStyle = 'rgba(255,255,255,0.55)'; x.font = `400 28px ${Tex.fontSans}`; x.fillText(`${c} · call failed`, 34, y + 36);
+        x.fillStyle = '#ff6b5f'; x.font = `700 46px ${Tex.fontSans}`; x.fillText(`${n} (${k})`, 34, y);
+        x.fillStyle = 'rgba(255,255,255,0.7)'; x.font = `500 31px ${Tex.fontSans}`; x.fillText(`${c} · call failed`, 34, y + 38);
         x.textAlign = 'right'; x.fillStyle = 'rgba(255,255,255,0.45)'; x.fillText(i < 2 ? 'now' : 'yesterday', w - 34, y); x.textAlign = 'left';
       });
     } else {
@@ -71,10 +71,11 @@ AF_SET_BUILDERS.phone = (app) => {
       const a = t - AF.phone;
       let mode = 'calling', press = 0;
       if (a >= 1.9 && a < 2.85) mode = 'failed';
-      if (a >= 4.6 && a < 5.4) mode = 'failed';
-      if (a >= 5.4) mode = 'list';
+      if (a >= 4.6 && a < 5.1) mode = 'failed';
+      if (a >= 5.1) mode = 'list';
       if (a >= 2.45 && a < 2.85) press = Math.round(MathX.ramp(a, 2.45, 2.85) * 6) / 6 + 0.01;
-      const dim = Math.round(MathX.smooth(t, AF.coast - 1.2, AF.coast - 0.2) * 0.7 * 10) / 10;
+      // the screen dims only at the very end, so the list of failed calls can be read
+      const dim = Math.round(MathX.smooth(t, AF.coast - 0.55, AF.coast - 0.05) * 0.5 * 10) / 10;
       scr.update({ mode, dots: Math.floor((t * 2.5) % 4), press, dim });
       scrGlow.intensity = 0.5 * (1 - dim);
       const k = afK(t, AF.phone, AF.coast, (x) => x);

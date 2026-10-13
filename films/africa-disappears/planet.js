@@ -19,9 +19,9 @@ function afDir(lon, lat) { return EarthScene.dirFromLonLat(lon, lat); }
 const AF_PLANET_GLSL = /* glsl */`
   uniform sampler2D uDay, uData, uAux;
   uniform vec3 uSun;
-  uniform float uT, uVan0, uVanDur, uFront, uLevel, uSea, uExag, uMode, uLights, uFoam, uSwirl, uGhost, uBasinLit, uMoon, uGhostL, uHaze;
+  uniform float uT, uVan0, uVanDur, uFront, uLevel, uSea, uExag, uMode, uLights, uFoam, uSwirl, uGhost, uBasinLit, uMoon, uGhostL, uHaze, uSpill;
   uniform vec3 uSweep;
-  uniform vec4 uPatch; uniform float uPatchOn;
+  uniform vec4 uPatch; uniform float uPatchOn; uniform vec2 uRef;
   float afH(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float afN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
     return mix(mix(afH(i), afH(i + vec2(1, 0)), f.x), mix(afH(i + vec2(0, 1)), afH(i + vec2(1, 1)), f.x), f.y); }
@@ -48,8 +48,8 @@ class AfPlanet {
       uDay: { value: this.tex.day }, uData: { value: this.tex.data }, uAux: { value: this.tex.aux },
       uSun: { value: this.sun.clone() }, uT: { value: 0 }, uVan0: { value: 1e9 }, uVanDur: { value: 1.0 }, uSweep: { value: afDir(-20, 20) },
       uFront: { value: 0 }, uLevel: { value: 0 }, uSea: { value: 0 }, uExag: { value: AF_EXAG }, uMode: { value: 0 }, uLights: { value: 1 },
-      uFoam: { value: 0 }, uSwirl: { value: 0 }, uGhost: { value: 0 }, uBasinLit: { value: 1 }, uMoon: { value: 0 }, uGhostL: { value: 0 }, uHaze: { value: 1 },
-      uPatch: { value: new THREE.Vector4(0, 0, 0.01, 0.01) }, uPatchOn: { value: 0 },
+      uFoam: { value: 0 }, uSwirl: { value: 0 }, uGhost: { value: 0 }, uBasinLit: { value: 1 }, uMoon: { value: 0 }, uGhostL: { value: 0 }, uHaze: { value: 1 }, uSpill: { value: 0 },
+      uPatch: { value: new THREE.Vector4(0, 0, 0.01, 0.01) }, uPatchOn: { value: 0 }, uRef: { value: new THREE.Vector2(0.5, 0.5) },
     };
     // the vertex shader: the whole sphere, or (AF_PATCH) a fine grid over one lon/lat window for the close shots
     // (the 1024×512 sphere has a vertex every ~39 km: too coarse for a 4 km wall seen from a few hundred km)
@@ -123,25 +123,40 @@ class AfPlanet {
             // the fill
             float front = afFrontAt(vUv, uT);
             float wet = smoothstep(km - 6.0, km + 6.0, front) * step(0.0001, uFront);
+            // the direction along the old coast (from the distance map's gradient), for curtains and streaks
+            // (the distance map is 8-bit, ~6 km steps: take its slope from a blurred, wider lookup so the direction is
+            // smooth, and measure from the shot's own aim point so the coordinate does not swing with it)
+            float wu = du * 10.0, wv = dv * 10.0;
+            vec2 gd = vec2(texture2D(uData, vUv + vec2(wu, 0.0), 3.0).g - texture2D(uData, vUv - vec2(wu, 0.0), 3.0).g,
+                           texture2D(uData, vUv + vec2(0.0, wv), 3.0).g - texture2D(uData, vUv - vec2(0.0, wv), 3.0).g) + 1e-6;
+            float along = dot((vUv - uRef) * vec2(4096.0, 2048.0), normalize(vec2(-gd.y, gd.x)));
+            // the first spill, seconds after the vanish: thin curtains already run over the low points of the rim
+            // and grow down the wall (uSpill 0…1 = from the lip to the foot)
+            float cur = uSpill * smoothstep(0.52, 0.64, afF(vec2(along * 0.05, 3.7))) * smoothstep(uSpill * 64.0, uSpill * 64.0 - 8.0, km);
+            wet = max(wet, cur);
+            float wallK = smoothstep(58.0, 14.0, km);   // on the wall itself
             float frontBand = exp(-pow((front - km) / 22.0, 2.0)) * step(0.0001, uFront) * (1.0 - uLevel);
             // churned water: turbid brown-grey at the front, clearing and deepening as the level rises
             vec2 q = vUv * vec2(160.0, 80.0);
             // eddies: the pattern is warped twice by drifting noise, so the streaks curl like marbled water
             vec2 w1 = vec2(afF(q * 0.35 + vec2(uT * 0.06, 0.0)), afF(q * 0.35 + vec2(5.2, -uT * 0.05)));
-            vec2 q2 = q + uSwirl * 3.2 * (w1 - 0.5) + uSwirl * 1.6 * vec2(sin(w1.y * 6.3 + uT * 0.2), cos(w1.x * 6.3 - uT * 0.17));
+            float swl = uSwirl * (1.0 - wallK);   // (no eddies on the wall: there the water only falls)
+            vec2 q2 = q + swl * 3.2 * (w1 - 0.5) + swl * 1.6 * vec2(sin(w1.y * 6.3 + uT * 0.2), cos(w1.x * 6.3 - uT * 0.17));
             float sw = afF(q2 + vec2(uT * 0.05, -uT * 0.03));
             float streak = afF(vec2(q2.x * 0.7 + sw * 3.0, q2.y * 2.2 - sw * 2.0));
             vec3 turbid = mix(vec3(0.25, 0.27, 0.25), vec3(0.15, 0.25, 0.29), uLevel);
             vec3 deepW = vec3(0.06, 0.17, 0.27);
             vec3 wcol = mix(turbid, deepW, smoothstep(0.3, 1.0, uLevel) * smoothstep(60.0, 300.0, km));
             wcol = wcol * wcol * 1.2;   // (to linear)
-            wcol *= 0.8 + 0.45 * streak;
             // the falls: on the wall the water runs downhill in streaks (across the slope fine, down the slope long)
-            vec2 gd = vec2(De.g - Dw.g, Dn.g - Ds.g * 1.0) + 1e-6;
-            float along = dot(vUv * vec2(4096.0, 2048.0), normalize(vec2(-gd.y, gd.x)));
             float fall = smoothstep(0.42, 0.78, afF(vec2(along * 2.2, km * 0.06 - uT * 1.4))) * smoothstep(58.0, 8.0, km);
+            // over the lip the sheet is glassy blue-green; it breaks up white as it falls
+            vec3 sheet = mix(vec3(0.012, 0.075, 0.085), vec3(0.26, 0.31, 0.32), smoothstep(2.0, 22.0, km));
+            wcol = mix(wcol, sheet, wallK * (1.0 - uLevel));
+            wcol *= mix(0.8 + 0.45 * streak, 0.6 + 0.7 * fall, wallK);
+            fall *= smoothstep(1.0, 12.0, km);
             float pool = smoothstep(130.0, 50.0, km) * smoothstep(0.45, 0.8, afF(q2 * 3.0 + vec2(-uT * 0.4, uT * 0.3)));
-            float foamW = clamp(frontBand * mix(0.85, 0.25 + 0.75 * fall, smoothstep(70.0, 40.0, km)) + uFoam * (fall * 0.95 + pool * 0.6) + 0.4 * uSwirl * smoothstep(0.6, 0.82, streak) * (1.0 - uLevel * 0.7), 0.0, 1.0);
+            float foamW = clamp(frontBand * mix(0.85, 0.25 + 0.75 * fall, smoothstep(70.0, 40.0, km)) + uFoam * (fall * 0.95 + pool * 0.6) + 0.4 * swl * smoothstep(0.6, 0.82, streak) * (1.0 - uLevel * 0.7), 0.0, 1.0);
             wcol = mix(wcol, vec3(0.72, 0.75, 0.74), foamW);
             vec3 after = mix(basin, wcol, wet);
             col = mix(col, after, van);
@@ -224,6 +239,7 @@ class AfPlanet {
   // place the camera: looking at (lon, lat) from `dist` (units of Earth radius from the centre), with an offset of the
   // aim point (in degrees) so the subject can sit low or high in the 9:16 frame, and a roll
   aim(lon, lat, dist, fov, o = {}) {
+    this.uniforms.uRef.value.set((lon + 180) / 360, (lat + 90) / 180);
     const d = afDir(lon, lat), up = new THREE.Vector3(0, 1, 0);
     const east = up.clone().cross(d).normalize(), north = d.clone().cross(east).normalize();
     // tilt: look from above-behind (degrees, toward the south) to get an oblique view of the surface
@@ -243,6 +259,7 @@ class AfPlanet {
   // straight down), `from` (the camera's bearing from the point: 0 north, 90 east…), `look` (degrees: raises the view so
   // the point sits lower in frame), `upMix` (0 = north up, 1 = the horizon level), `lift` (aim above/below the surface)
   orbit(lon, lat, o = {}) {
+    this.uniforms.uRef.value.set((lon + 180) / 360, (lat + 90) / 180);
     const d = afDir(lon, lat), up = new THREE.Vector3(0, 1, 0);
     const east = up.clone().cross(d).normalize(), north = d.clone().cross(east).normalize();
     const b = MathX.deg(o.from ?? 180), p = MathX.deg(o.pitch ?? 0);
@@ -267,7 +284,7 @@ class AfPlanet {
     U.uT.value = s.t; U.uVan0.value = s.van0 ?? 1e9; U.uVanDur.value = s.vanDur ?? 1.0;
     U.uFront.value = s.front || 0; U.uLevel.value = s.level || 0; U.uSea.value = s.sea || 0; U.uMode.value = s.mode || 0;
     U.uLights.value = s.lights ?? 1; U.uFoam.value = s.foam || 0; U.uSwirl.value = s.swirl || 0; U.uGhost.value = s.ghost || 0;
-    U.uBasinLit.value = s.basinLit ?? 1; U.uMoon.value = s.moon || 0; U.uGhostL.value = s.ghostL || 0;
+    U.uBasinLit.value = s.basinLit ?? 1; U.uMoon.value = s.moon || 0; U.uGhostL.value = s.ghostL || 0; U.uSpill.value = s.spill || 0;
     if (s.sun) U.uSun.value.copy(afDir(s.sun[0], s.sun[1]));
     // the fine patch for close shots: [lon0, lat0, lon1, lat1]
     const P = s.patch;
@@ -350,8 +367,8 @@ class AfLanes {
     // one mesh per lane (a flat ribbon on the sphere) + ship dots
     this.mat = new THREE.ShaderMaterial({
       uniforms: { uT: { value: 0 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-      vertexShader: 'attribute float aS; attribute float aA; varying float vS; varying float vA; varying vec3 vC; attribute vec3 aC; void main(){ vS = aS; vA = aA; vC = aC; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: 'uniform float uT; varying float vS; varying float vA; varying vec3 vC; void main(){ float pulse = 0.65 + 0.35 * sin(vS * 60.0 - uT * 3.0); gl_FragColor = vec4(vC * vA * pulse, 1.0); }',
+      vertexShader: 'attribute float aS; attribute float aA; attribute float aR; varying float vS; varying float vA; varying float vR; varying vec3 vC; attribute vec3 aC; void main(){ vS = aS; vA = aA; vR = aR; vC = aC; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: 'uniform float uT; varying float vS; varying float vA; varying float vR; varying vec3 vC; void main(){ float pulse = 0.65 + 0.35 * sin(vS * 60.0 - uT * 3.0); gl_FragColor = vec4(mix(vC, vec3(1.6, 0.16, 0.1), vR) * vA * mix(pulse, 1.0, vR), 1.0); }',
     });
     this.meshes = this.lanes.map((L) => { const m = this._ribbon(L); this.group.add(m); return m; });
     // ship dots: instanced small quads
@@ -405,6 +422,7 @@ class AfLanes {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aS', new THREE.BufferAttribute(s, 1));
     g.setAttribute('aA', new THREE.BufferAttribute(a, 1)); g.setAttribute('aC', new THREE.BufferAttribute(c, 3)); g.setIndex(idx);
+    g.setAttribute('aR', new THREE.BufferAttribute(new Float32Array(n * 2), 1));
     const m = new THREE.Mesh(g, this.mat); m.frustumCulled = false; m.userData.L = L; return m;
   }
   // the lane's brightness along its length at time s: lanes appear (grow in), African lanes and Suez break and fade,
@@ -414,13 +432,22 @@ class AfLanes {
     let a = (L.main ? 0.55 : 0.28) * T.on;
     const grow = MathX.clamp((T.grow - u * 0.6) / 0.4, 0, 1); a *= grow;
     if (L.kind === 'af' || L.kind === 'cape') {
-      const tc = T.cut0 + (T.cut1 - T.cut0) * L.cut;   // each lane breaks at its own moment
-      const k = MathX.clamp((s.t - tc) / 0.5, 0, 1), flick = k > 0 && k < 1 ? (Math.sin(s.t * 70 + L.li) > 0 ? 1 : 0.2) : 1;
-      a *= (1 - k) * flick;
+      // each lane breaks at its own moment: it flares red, then flickers out, retracting from the African end
+      // (the end of the waypoint chain) back toward the port it came from
+      const tc = T.cut0 + (T.cut1 - T.cut0) * L.cut;
+      const k = MathX.clamp((s.t - tc) / 0.9, 0, 1), flick = k > 0 && k < 1 ? (Math.sin(s.t * 70 + L.li) > 0 ? 1 : 0.35) : 1;
+      a *= MathX.clamp((1 - k) * 1.6 - u * 0.6 * (k > 0 ? 1 : 0), 0, 1) * flick * (1 + 0.8 * MathX.clamp((s.t - tc + 0.45) / 0.15, 0, 1) * (1 - k));
     }
     if (L.kind === 'suez') { const k = MathX.clamp((s.t - T.suez) / 0.6, 0, 1); a *= (1 - k) * (k > 0 && k < 1 ? (Math.sin(s.t * 60) > 0 ? 1.4 : 0.3) : 1) + (1 - k) * 0; }
     if (L.kind === 'detour') a = (L.main ? 0.75 : 0.35) * T.on * MathX.clamp((T.detour - u) / 0.15, 0, 1) * (T.detour > 0 ? 1 : 0);
     return a;
+  }
+  // how red a breaking lane is (0 … 1): from just before its break until it is gone
+  _red(L, s) {
+    const T = s.trade; if (!T) return 0;
+    if (L.kind === 'af' || L.kind === 'cape') { const tc = T.cut0 + (T.cut1 - T.cut0) * L.cut; return MathX.clamp((s.t - tc + 0.45) / 0.15, 0, 1); }
+    if (L.kind === 'suez') return MathX.clamp((s.t - T.suez + 0.3) / 0.12, 0, 1);
+    return 0;
   }
   update(s) {
     const on = s.trade && s.trade.on > 0.001;
@@ -428,16 +455,17 @@ class AfLanes {
     if (!on) return;
     this.mat.uniforms.uT.value = s.t;
     for (const m of this.meshes) {
-      const L = m.userData.L, A = m.geometry.attributes.aA, S = m.geometry.attributes.aS;
+      const L = m.userData.L, A = m.geometry.attributes.aA, S = m.geometry.attributes.aS, R = m.geometry.attributes.aR;
       for (let j = 0; j < A.count; j++) A.array[j] = this._alpha(L, S.array[j], s);
-      A.needsUpdate = true;
+      R.array.fill(this._red(L, s));
+      A.needsUpdate = true; R.needsUpdate = true;
     }
     for (let i = 0; i < this.nShips; i++) {
       const L = this.lanes[this.shipLane[i]], u = (this.shipPhase[i] + s.t * this.shipSpeed[i] * (L.kind === 'detour' ? 2 : 1)) % 1;
       const f = u * (L.pts.length - 1), k = Math.floor(f), p = L.pts[k].clone().lerp(L.pts[Math.min(L.pts.length - 1, k + 1)], f - k).multiplyScalar(1.001);
       const a = MathX.clamp(this._alpha(L, u, s) * 2.2, 0, 1);
       this.shipPos.set([p.x, p.y, p.z], i * 3);
-      const c = L.kind === 'detour' ? [1, 0.7, 0.4] : [0.85, 0.95, 1];
+      const rr = this._red(L, s), c = L.kind === 'detour' ? [1, 0.7, 0.4] : [0.85 + 0.15 * rr, 0.95 - 0.8 * rr, 1 - 0.85 * rr];
       this.shipCol.set([c[0] * a, c[1] * a, c[2] * a], i * 3);
     }
     this.ships.geometry.attributes.position.needsUpdate = true; this.ships.geometry.attributes.color.needsUpdate = true;

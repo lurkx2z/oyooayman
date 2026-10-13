@@ -11,7 +11,9 @@ const afLogLerp = (a, b, k) => a * Math.pow(b / a, k);
 // the planet's state for the whole film (what has happened by time t)
 function afPlanetState(t, extra = {}) {
   const F = afFill(t);
-  return Object.assign({ t, van0: AF.van0, vanDur: AF.vanDur, front: F.front, level: F.level, foam: F.foam, swirl: F.front > 0 ? 1 : 0, sea: afSea(t), sun: [12, 3] }, extra);
+  // seconds after the vanish the first curtains already pour over the rim and run down the wall (the ocean never waits)
+  const spill = MathX.smooth(t, AF.van0 + 1.4, AF.van0 + 4.6);
+  return Object.assign({ t, van0: AF.van0, vanDur: AF.vanDur, front: F.front, level: F.level, foam: Math.max(F.foam, spill), spill, swirl: F.front > 0 ? 1 : 0, sea: afSea(t), sun: [12, 3] }, extra);
 }
 
 const AF_SHOTS = [
@@ -30,8 +32,9 @@ const AF_SHOTS = [
     const k = afK(t, AF.erased - 0.25, AF.mine);
     // the cities' ghosts (where their lights were) fade out on "erased"
     const ghostL = 0;
-    P.set(afPlanetState(t, { sun: [-95, 5], clouds: 0.4, moon: 1, ghost: 0.5 + 0.5 * afK(t, AF.erasedW - 0.4, AF.erasedW + 0.6), ghostL }));
-    P.aim(afLerp(16, 20, k), afLerp(8, 11, k), afLerp(2.6, 2.35, k), 32, { tilt: afLerp(18, 26, k), dy: -1.5 });
+    // moonlight: the ocean a cold blue, the basin a charcoal hole (darker than the sea, lighter than space)
+    P.set(afPlanetState(t, { sun: [-95, 5], clouds: 0.4, moon: 1.25, basinLit: 2.4, ghost: 0.5 + 0.5 * afK(t, AF.erasedW - 0.4, AF.erasedW + 0.6), ghostL }));
+    P.aim(afLerp(17, 18.5, k), afLerp(9, 10.5, k), afLerp(3.6, 3.4, k), 32, { tilt: afLerp(14, 19, k), dy: -7 });
   } },
   // ================= 2 — THE ECONOMIC SHOCK (sets: mine, factory)
   { id: 'M1', t0: AF.mine, t1: AF.platinum, set: 'mine' },
@@ -45,7 +48,8 @@ const AF_SHOTS = [
     const k = afK(t, AF.trade, AF.suez - 0.2);
     P.set(afPlanetState(t, { mode: 1, clouds: 0, lights: 0, atmo: 0.5, sun: [30, 20],
       trade: { on: 1, grow: 0.6 + 2.5 * (t - AF.trade), cut0: AF.ports - 0.1, cut1: AF.collapse + 1.2, suez: 1e9, detour: 0 } }));
-    P.aim(42 - 18 * k, 18 - 6 * k, afLerp(3.6, 3.2, k), 32, { tilt: 8, dy: -1 });
+    // Africa in the middle, so its ports (labels in film.js) can be seen go
+    P.aim(afLerp(24, 16, k), afLerp(12, 8, k), afLerp(4.0, 3.6, k), 32, { tilt: 8, dy: -3 });
   } },
   { id: 'T2', t0: AF.suez - 0.2, t1: AF.board, set: 'planet', frame(t, P) {
     const k = afK(t, AF.suez - 0.2, AF.board), z = afK(t, AF.suez - 0.2, AF.suez + 0.6, Ease.outCubic);

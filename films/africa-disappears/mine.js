@@ -103,7 +103,7 @@ AF_SET_BUILDERS.mine = (app) => {
       for (let j = 0; j < trucks.length; j++) for (let i = 0; i < 14; i++) {
         const age = ((t * 1.6 + i / 14 + j * 0.37) % 1) * 5.5; if (t - age > AF.mineGo) continue;   // no new dust once the ground is gone
         const p = truckAt(trucks[j], t - age);
-        dust.push(p.x + age * 3, p.y + 3 + age * 2.0 - drop, p.z - age * 1.5, 5 + age * 5 + drop * 0.15, i, 0.3 * (1 - age / 5.5), 1.0, 0.72, 0.6, 0.47);
+        dust.push(p.x + age * 3, p.y + 3 + age * 2.0 - drop, p.z - age * 1.5, 5 + age * 5, i, 0.3 * (1 - age / 5.5) * Math.exp(-fall * 2.2), 1.0, 0.72, 0.6, 0.47);
       }
       dust.end();
       // the vanish: a seam from the horizon toward (and past) the camera. s = distance toward the camera / 4.2 km:
@@ -114,6 +114,6 @@ AF_SET_BUILDERS.mine = (app) => {
       const u = t - AF.mineGo;
       U.uDisK.value = u < 0 ? -1e3 : u < 0.55 ? afLerp(-6.5, -0.5, 1 - Math.pow(1 - u / 0.55, 2)) : u < 1.4 ? afLerp(-0.5, -0.03, (u - 0.55) / 0.85) : afLerp(-0.03, 0.4, Math.min(1, (u - 1.4) / 0.25));
     },
-    grade(t, p) { p.warmth = 0.06; p.saturation = 1.04; p.bloom = 0.35; p.bloomThreshold = 0.95; },
+    grade(t, p) { p.warmth = 0.05; p.saturation = 1.12; p.contrast = 1.2; p.exposure = 0.94; p.blackLift = 0; p.bloom = 0.3; p.bloomThreshold = 1.0; },
   };
 };

@@ -20,21 +20,22 @@ function afMusicKit(ctx, K) {
     },
     bell: (t, n, vol, pan = 0) => fx.play(fx.bellBuf(gbMidi(n)), t, bus, { vol: vol * 0.25, pan }),
     // a low drum (a timpani-like membrane): f the pitch, vol, soft = a wider mallet
-    drum(t, vol, f = 49, soft = 1) {
-      const key = 'drum' + f + '_' + soft;
+    drum(t, vol, f = 49, soft = 1, dk = 1) {
+      const key = 'drum' + f + '_' + soft + '_' + dk;
       if (!fx.cache[key]) {
-        const y = fx.hit(drumModes(f), { width: 0.006 * soft, amp: 1, noise: 0.25, nlen: 0.02, nhp: 300, len: 3.2 });
+        const y = fx.hit(drumModes(f).map(([a, tau, b]) => [a, tau * dk, b]), { width: 0.006 * soft, amp: 1, noise: 0.25, nlen: 0.02, nhp: 300, len: 3.2 * Math.max(dk, 0.3) });
         let pk = 0; for (let i = 0; i < y.length; i++) pk = Math.max(pk, Math.abs(y[i])); for (let i = 0; i < y.length; i++) y[i] /= pk;
         fx.cache[key] = y;
       }
       return fx.play(fx.cache[key], t, bus, { vol: vol * 0.5 });
     },
-    // a timpani roll from t0 to t1, the level following keys [[t, v], …]
-    roll(t0, t1, keys, f = 49) {
+    // a timpani roll from t0 to t1, the level following keys [[t, v], …] (higher and shorter strokes than single hits,
+    // so the roll stays a roll and does not pile up into a sub drone)
+    roll(t0, t1, keys, f = 80) {
       for (let t = t0, i = 0; t < t1; t += 0.065 + 0.012 * Math.sin(i * 1.7), i++) {
         let v = keys[0][1];
         for (let k = 1; k < keys.length; k++) if (t >= keys[k - 1][0]) v = keys[k - 1][1] + (keys[k][1] - keys[k - 1][1]) * MathX.clamp((t - keys[k - 1][0]) / (keys[k][0] - keys[k - 1][0]), 0, 1);
-        M.drum(t, v * (0.8 + 0.2 * Math.sin(i * 2.3)), f, 1.6);
+        M.drum(t, v * (0.8 + 0.2 * Math.sin(i * 2.3)), f, 1.6, 0.35);
       }
     },
     strings(t0, t1, notes, vol, o = {}) {
@@ -113,7 +114,7 @@ afSound('music', 'score', function (ctx, bus, K) {
   M.strings(A.silence - 0.05, A.forest + 0.05, ['D1', 'D2', 'A2', 'D3', 'F3', 'A3', 'D4'], 2.0, { att: 0.15, rel: 0.12, cut: 2400, cutTo: 3600 });
   M.strings(A.silence - 0.05, A.forest + 0.05, ['D1', 'A1'], 1.2, { att: 0.15, rel: 0.12, cut: 700, wave: 'square', vib: 3 });
   M.drum(A.silence, 1.1, 41);
-  M.roll(A.silence + 0.2, A.forest - 0.35, [[A.silence, 0.2], [A.forest - 0.4, 0.75]], 46);
+  M.roll(A.silence + 0.2, A.forest - 0.35, [[A.silence, 0.2], [A.forest - 0.4, 0.75]]);
   M.drum(A.forest - 0.3, 1.0, 41);
   // ---- 5: loss: sparse piano over a soft pad; each vanish takes the pad away
   M.strings(A.forest + 0.3, A.forestGo + 0.1, ['F2', 'C3', 'A3'], 0.55, { att: 1.2, rel: 0.25, cut: 900 });
@@ -127,7 +128,7 @@ afSound('music', 'score', function (ctx, bus, K) {
   for (let t = A.room + 0.4; t < A.halt; t += 0.92) M.piano(t, 'D2', 0.32, 0.5, 0, 0.2);
   M.strings(A.room, A.halt + 0.3, ['D2', 'A2', 'E3'], 0.5, { att: 1.0, rel: 0.3, cut: 520 });
   M.strings(A.halt, A.phone + 0.4, ['D1', 'A1', 'D2'], 0.6, { att: 0.5, rel: 0.4, cut: 300 });
-  M.strings(A.phone + 0.6, A.quiet, ['A4'], 0.22, { att: 2.0, rel: 1.4, cut: 2200, vib: 4 });
+  M.strings(A.phone + 0.6, A.quiet, ['A3'], 0.22, { att: 2.0, rel: 1.4, cut: 2200, vib: 4 });   // (not A4: it beats against the 425 Hz ring)
   // ---- 7: the rebuild: the progression returns and grows; "Earth would survive" opens to F major; the final swell
   M.prog([[A.coast + 0.3, AF_CH.Dm], [A.coast + 2.9, AF_CH.Bb], [A.coast + 5.3, AF_CH.F], [A.maps - 0.2, AF_CH.C], [A.maps + 2.3, AF_CH.Dm]], A.earth + 0.2, 0.75,
     { cut: 900, cutTo: 2000 });
@@ -137,9 +138,10 @@ afSound('music', 'score', function (ctx, bus, K) {
   M.strings(A.never, A.pull + 0.3, ['D2', 'A2', 'D3', 'F3', 'A3'], 1.0, { att: 0.6, rel: 0.4, cut: 2000 });
   M.piano(A.never + 0.1, 'D4', 0.45, 3, 0); M.piano(A.never + 0.8, 'A4', 0.36, 2.6, 0.2);
   // ★ the last three seconds: the swell (it is cut, not faded, by the mix at the last frame)
-  M.strings(A.pull - 0.1, A.end + 0.3, ['D1', 'D2', 'A2', 'D3', 'F3', 'A3', 'D4', 'F4'], 1.6, { att: 0.3, rel: 0.05, cut: 1200, cutTo: 4200, cutAt: A.end, keys: [[A.pull + 0.3, 1], [A.end - 0.1, 2.0]] });
-  M.strings(A.pull - 0.1, A.end + 0.3, ['D1', 'A1'], 1.1, { att: 0.3, rel: 0.05, cut: 600, cutTo: 1200, wave: 'square', vib: 3, keys: [[A.pull + 0.3, 0.8], [A.end - 0.1, 1.6]] });
-  M.roll(A.pull + 0.4, A.end, [[A.pull + 0.4, 0.15], [A.end - 0.05, 1.0]], 46);
+  // (it starts low enough to have somewhere to go: 0.5 → 1.6, brightening all the way)
+  M.strings(A.pull - 0.1, A.end + 0.3, ['D1', 'D2', 'A2', 'D3', 'F3', 'A3', 'D4', 'F4'], 1.6, { att: 0.3, rel: 0.05, cut: 1200, cutTo: 5000, cutAt: A.end, keys: [[A.pull + 0.3, 0.5], [A.end - 0.1, 1.6]] });
+  M.strings(A.pull - 0.1, A.end + 0.3, ['A1'], 1.1, { att: 0.3, rel: 0.05, cut: 600, cutTo: 1200, wave: 'square', vib: 3, keys: [[A.pull + 0.3, 0.5], [A.end - 0.1, 1.3]] });
+  M.roll(A.pull + 0.4, A.end, [[A.pull + 0.4, 0.15], [A.end - 0.05, 1.0]]);
   [['D6', 0.6], ['A5', 1.2], ['F6', 1.8], ['D6', 2.4]].forEach(([n, o], i) => M.bell(A.pull + o, n, 0.35 + 0.1 * i, i % 2 ? 0.45 : -0.45));
 });
 

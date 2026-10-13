@@ -56,15 +56,21 @@ function afChirp(fx, o = {}) {
   }
   return y;
 }
-// a gull's cry: a falling, raspy two-part call
+// a gull's cry: a falling series of short, raspy "kyow" notes (a saw, roughened at ~50 Hz, through a formant)
 function afGull(fx) {
-  const sr = fx.sr, r = fx.r, d = r.range(0.5, 0.8), y = fx.arr(d * 2.2); let ph = 0;
-  for (const [o, s] of [[0, 1], [d * 1.15, 0.9]]) {
-    const n = Math.round(d * s * sr), i0 = Math.round(o * sr), fa = r.range(1400, 1700);
-    for (let i = 0; i < n; i++) { const u = i / n, f = fa * (1.25 - 0.45 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 23 * i / sr)); ph += 2 * Math.PI * f / sr;
-      const v = Math.sin(ph) + 0.5 * Math.sin(2 * ph) + 0.3 * Math.sin(3 * ph) + 0.35 * (r.next() - 0.5); y[i0 + i] += v * Math.pow(Math.sin(Math.PI * Math.min(1, u * 1.3)), 0.6) * (1 - u * 0.5); }
+  const sr = fx.sr, r = fx.r, notes = r.int(3, 5), y = fx.arr(notes * 0.36 + 0.1); let ph = 0;
+  const f0 = r.range(1100, 1350);
+  for (let k = 0, o = 0; k < notes; k++) {
+    const d = r.range(0.2, 0.3), n = Math.round(d * sr), i0 = Math.round(o * sr), fa = f0 * Math.pow(0.93, k) * r.range(0.97, 1.03);
+    for (let i = 0; i < n; i++) {
+      const u = i / n, f = fa * (u < 0.25 ? 0.8 + 0.8 * u : 1.0 - 0.32 * (u - 0.25)), rough = 1 + 0.5 * Math.sin(2 * Math.PI * 50 * i / sr + 2 * Math.sin(2 * Math.PI * 7 * i / sr));
+      ph += 2 * Math.PI * f / sr;
+      const saw = 2 * ((ph / (2 * Math.PI)) % 1) - 1;
+      y[i0 + i] += (saw * rough + 0.25 * (r.next() - 0.5)) * Math.pow(Math.sin(Math.PI * Math.min(1, u * 1.15)), 0.7) * (1 - 0.15 * k);
+    }
+    o += d + r.range(0.04, 0.08);
   }
-  GBX.bq(y, 'bp', 1900, 0.9, sr);
+  GBX.bq(y, 'peak', 1600, 1.4, sr, 9); GBX.bq(y, 'bp', 1700, 0.8, sr); GBX.bq(y, 'lp', 4500, 0.7, sr);
   return y;
 }
 // an electric fizz: dense crackle with random sizes, o.env(u) shapes it, o.rate (clicks/s), o.hp
@@ -75,14 +81,22 @@ function afCrackle(fx, d, o = {}) {
   return y;
 }
 
-// play x at t through a filter whose frequency follows curve (Hz, evenly spaced over x's length)
+// play x at t through a filter whose frequency follows curve (Hz, evenly spaced over x's length). The filter runs
+// here (a biquad whose coefficients follow the curve every 32 samples), so the level is set from what comes OUT of it
+function afSweep(x, sr, type, q, curve) {
+  const y = new Float32Array(x.length), B = 32, T = { lowpass: 'lp', highpass: 'hp', bandpass: 'bp' }[type] || type;
+  let x1 = 0, x2 = 0, y1 = 0, y2 = 0, b0, b1, b2, a1, a2;
+  for (let i0 = 0; i0 < x.length; i0 += B) {
+    const u = i0 / Math.max(1, x.length - 1) * (curve.length - 1), j = Math.min(curve.length - 2, Math.floor(u)), f = curve[j] + (curve[j + 1] - curve[j]) * (u - j);
+    const w = 2 * Math.PI * Math.min(f, sr * 0.45) / sr, cs = Math.cos(w), al = Math.sin(w) / (2 * q), a0 = 1 + al;
+    if (T === 'lp') { b0 = (1 - cs) / 2; b1 = 1 - cs; b2 = b0; } else if (T === 'hp') { b0 = (1 + cs) / 2; b1 = -(1 + cs); b2 = b0; } else { b0 = al; b1 = 0; b2 = -al; }
+    b0 /= a0; b1 /= a0; b2 /= a0; a1 = -2 * cs / a0; a2 = (1 - al) / a0;
+    for (let i = i0; i < Math.min(x.length, i0 + B); i++) { const xi = x[i], v = b0 * xi + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = xi; y2 = y1; y1 = v; y[i] = v; }
+  }
+  return y;
+}
 function afSweepPut(K, x, t, type, q, curve, o = {}) {
-  const ctx = K.ctx, f = ctx.createBiquadFilter(), g = ctx.createGain(), p = ctx.createStereoPanner();
-  f.type = type; f.Q.value = q; f.frequency.setValueCurveAtTime(curve, Math.max(0, t), x.length / K.sr);
-  let pk = 0; for (let i = 0; i < x.length; i++) pk = Math.max(pk, Math.abs(x[i]));
-  g.gain.value = (o.vol ?? 1) / Math.max(1e-9, pk) * (o.gain || 1); p.pan.value = o.pan || 0;
-  f.connect(g); g.connect(p); p.connect(K.bus);
-  return K.fx.play(x, t, f, { vol: 1 });
+  return K.put(afSweep(x, K.sr, type, q, curve), t, { vol: (o.vol ?? 1) * (o.gain || 1), norm: true, pan: o.pan || 0, room: o.room, wet: o.wet });
 }
 
 // ---- the beds ------------------------------------------------------------------------------------------------------
@@ -140,26 +154,26 @@ afSound('amb', 'places', function (ctx, bus, K) {
   // ---- the port: wind, slap of water on the quay, gulls, a ship's horn far out
   afBed(K, A.port, A.prices, { colour: 'pink', f: [['bp', 650, 0.5]], vol: 0.12, am: 0.5, wr: 0.8 });
   afBed(K, A.port, A.prices, { colour: 'pink', f: [['lp', 700]], vol: 0.06, env: (u, t) => 0.6 + 0.4 * Math.sin(t * 4.2) * Math.sin(t * 1.3) });
-  [[0.25, -0.5], [1.4, 0.4], [2.2, -0.2]].forEach(([o, p]) => K.put(afGull(fx), A.port + o, { vol: 0.05, norm: true, pan: p, room: big, wet: 0.3 }));
+  [[0.25, -0.5], [1.4, 0.4], [2.2, -0.2]].forEach(([o, p]) => K.put(afGull(fx), A.port + o, { vol: 0.03, norm: true, pan: p, room: big, wet: 0.3 }));
   afTone(K, A.port + 0.5, 2.6, 86, [[1, 1], [2, 0.8], [3, 0.55], [4, 0.3], [5, 0.2], [6, 0.1]], (u) => Math.min(1, u * 8) * Math.min(1, (1 - u) * 3), { f: [['lp', 900]], vol: 0.06, pan: 0.5, room: big, wet: 0.8 });
   // ---- the supermarket: fridge hum, the store's low murmur
-  afTone(K, A.prices, A.oceans - A.prices, 120, [[1, 1], [2, 0.6], [3, 0.2]], null, { vol: 0.02, pan: -0.4 });
+  afTone(K, A.prices, A.oceans - A.prices, 100, [[1, 1], [2, 0.6], [3, 0.2]], null, { vol: 0.02, pan: -0.4 });
   afBed(K, A.prices, A.oceans, { colour: 'pink', f: [['bp', 500, 0.8], ['lp', 1600]], vol: 0.04, am: 0.4, room: hall, wet: 0.6 });
   // ---- the oceans: the roar of the Atlantic falling 4 km; then the fronts crossing the floor
   afBed(K, A.oceans, A.surge, { colour: 'brown', f: [['lp', 900], ['peak', 140, 0.7, 4]], vol: 0.36, am: 0.25, wr: 1.4, fi: 0.9, env: (u) => 0.35 + 0.65 * u });
   afBed(K, A.oceans + 0.3, A.surge, { colour: 'pink', f: [['bp', 1300, 0.7]], vol: 0.09, am: 0.5, wr: 3, fi: 1.0, env: (u) => u });
-  afBed(K, A.surge, A.ship, { colour: 'brown', f: [['lp', 700]], vol: 0.3, am: 0.35, wr: 0.9, fi: 0.08 });
+  afBed(K, A.surge, A.ship, { colour: 'brown', f: [['lp', 700]], vol: 0.2, am: 0.35, wr: 0.9, fi: 0.08 });
   afBed(K, A.surge, A.ship, { colour: 'pink', f: [['bp', 900, 0.6]], vol: 0.07, am: 0.6, wr: 2 });
-  // ---- the storm: the sea's roar, the wind howling in the rigging, rain on steel
+  // ---- the storm: the sea's roar, the wind howling in the rigging, spindrift hissing off the crests
   {
     const d = A.forest - A.ship, n = Math.ceil(d * sr);
-    afBed(K, A.ship, A.forest, { colour: 'brown', f: [['lp', 600]], vol: 0.3, am: 0.3, wr: 0.4, env: (u, t) => 0.8 + 0.2 * MathX.clamp(afShipSlam(t), 0, 1) });
+    afBed(K, A.ship, A.forest, { colour: 'brown', f: [['lp', 600]], vol: 0.2, am: 0.3, wr: 0.4, env: (u, t) => 0.8 + 0.2 * MathX.clamp(afShipSlam(t), 0, 1) });
     for (let k = 0; k < 2; k++) {
       // a howl: a narrow band whose centre glides with the gusts
       const y = afNoise(fx, n, 'pink'), w = fx.wander(0.22), fq = [520, 820][k];
       for (let i = 0; i < n; i++) y[i] *= (0.55 + 0.45 * w(i / sr + 3 * k)) * Math.min(1, i / (0.05 * sr), (n - i) / (0.05 * sr));
       const curve = new Float32Array(Math.ceil(d * 50)); for (let j = 0; j < curve.length; j++) curve[j] = fq * (1 + 0.45 * w(j / 50 + 3 * k));
-      afSweepPut(K, y, A.ship, 'bandpass', 4, curve, { vol: 0.07, pan: k ? 0.5 : -0.5 });
+      afSweepPut(K, y, A.ship, 'bandpass', 4, curve, { vol: 0.045, pan: k ? 0.5 : -0.5 });
     }
     afBed(K, A.ship, A.forest, { colour: 'white', f: [['hp', 1800], ['lp', 9000]], vol: 0.08, am: 0.2 });
   }
@@ -197,10 +211,11 @@ afSound('amb', 'places', function (ctx, bus, K) {
   afTone(K, A.phone, A.coast - A.phone, 50, [[1, 0.3], [2, 1], [4, 0.3]], null, { vol: 0.016, pan: -0.5 });
   for (let t = Math.ceil(A.phone); t < A.coast - 0.2; t += 1) K.put(fx.hit([[3100, 0.006, 1], [5200, 0.004, 0.5], [1400, 0.01, 0.4]], { width: 0.0003 }), t, { vol: 0.03, norm: true, pan: 0.45 });
   afBed(K, A.phone + 2.5, A.phone + 6.5, { colour: 'pink', f: [['bp', 450, 0.6], ['lp', 900]], vol: 0.02, env: (u) => Math.pow(Math.sin(Math.PI * u), 2), mono: true, pan: 0.6 });
+  afBed(K, A.phone, A.coast + 0.1, { colour: 'pink', f: [['lp', 900], ['hp', 90]], vol: 0.07, fi: 0.3, fo: 0.1 });   // the room itself
   // ---- the coast: wind, gulls, the surf getting farther each day; the mud ticking as it dries
-  afBed(K, A.coast, A.earth, { colour: 'pink', f: [['bp', 700, 0.5]], vol: 0.09, am: 0.5, wr: 0.5, fi: 0.1 });
+  afBed(K, A.coast - 0.8, A.earth, { colour: 'pink', f: [['bp', 700, 0.5]], vol: 0.09, am: 0.5, wr: 0.5, fi: 0.8 });   // (in before the cut)
   afBed(K, A.coast, A.earth, { colour: 'brown', f: [['lp', 650]], vol: 0.12, env: (u, t) => (1 - 0.7 * u) * (0.7 + 0.3 * Math.sin(t * 0.9)) });
-  [[0.8, -0.4], [2.6, 0.5], [5.1, -0.1], [7.4, 0.3]].forEach(([o, p]) => K.put(afGull(fx), A.coast + o, { vol: 0.035, norm: true, pan: p, room: big, wet: 0.4 }));
+  [[0.8, -0.4], [2.6, 0.5], [5.1, -0.1], [7.4, 0.3]].forEach(([o, p]) => K.put(afGull(fx), A.coast + o, { vol: 0.021, norm: true, pan: p, room: big, wet: 0.4 }));
   K.put(afCrackle(fx, A.earth - A.coast - 1, { rate: 60, hp: 3000, env: (u) => u }), A.coast + 1, { vol: 0.02, norm: true });
   // ---- the new Earth
   space(A.earth, A.end + 0.5, 0.07);
