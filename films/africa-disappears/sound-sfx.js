@@ -93,7 +93,7 @@ afSound('sfx', 'events', function (ctx, bus, K) {
     }
   }
   // ---- 5: the rainforest goes; the waterhole goes (an elephant calls just before)
-  afVanish(K, A.forestGo - 0.45, { size: 0.85, d: 1.2 });
+  afVanish(K, A.forestGo - 0.35, { size: 0.85, d: 1.15 });
   afTone(K, A.wild + 0.45, 1.05, (s) => 330 + 260 * Math.min(1, s / 0.25) - 60 * Math.max(0, s - 0.6), [[1, 1], [2, 0.8], [3, 0.6], [4, 0.45], [5, 0.3], [6, 0.2], [8, 0.1]],
     (u) => Math.min(1, u * 14) * Math.pow(1 - u, 0.6) * (0.8 + 0.2 * Math.sin(u * 140)), { f: [['bp', 1100, 0.7], ['lp', 3200]], vol: 0.06, pan: -0.35, room: big, wet: 1.4 });
   afVanish(K, A.savGo - 0.35, { size: 0.75, d: 1.05 });

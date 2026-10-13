@@ -37,7 +37,7 @@ function afDissolvable(mat, U) {
         float disE = disS - uDisK;
         if (disE < 0.0) discard;`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        totalEmissiveRadiance += vec3(1.0, 0.62, 0.3) * 6.0 * (1.0 - smoothstep(0.0, 0.012, disE)) * step(-100.0, uDisK);`);
+        totalEmissiveRadiance += vec3(1.0, 0.62, 0.3) * 7.0 * (1.0 - smoothstep(0.0, 0.02, disE)) * step(-100.0, uDisK);`);
   };
   mat.customProgramCacheKey = () => 'afDis';
   return mat;

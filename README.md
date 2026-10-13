@@ -64,6 +64,14 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Narrated film: *What if Africa suddenly disappeared?*** — open `africa-disappears.html` (1:57, vertical). The
+> owner's own script, read by the house narrator, with the picture cut to the voice: the continent goes in one second
+> and leaves a 4 km deep basin; a platinum mine, a car plant and a battery line lose their supply; trade lanes, the Suez
+> Canal, a departures board and a chocolate aisle show the network breaking; the Atlantic pours over the rim and a ship
+> fights the churn; the rainforest and a waterhole go; an emergency session, a dead factory, a call to Lagos that never
+> connects; then the world's sea level falls ~300 m and a harbour's coast walks out to sea. Shot list, numbers and
+> review log: [`films/africa-disappears/PLAN.md`](films/africa-disappears/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -319,6 +327,19 @@ films/slip/sea.js        the seabed (one analytic height field in JS and GLSL), 
 films/slip/cast.js       people with umbrellas, in the quake, at the seafront, running inland
 films/slip/audio.js      rain, the squeak and the thud, the underground pulses, the rupture, the quake, sirens, the roar
 films/slip/film.js       FILM hooks: which scene, hands, the quake shake, reflections, the cuts, the grade, the end card
+```
+
+Film: *What if Africa suddenly disappeared?* (`africa-disappears.html`):
+
+```
+films/africa-disappears/PLAN.md          the checked numbers, the shot list, the sound, the review log
+films/africa-disappears/NARRATION.md     the owner's script as narrated (25 clips) · build-timing.cjs → narration-timing.js
+films/africa-disappears/script.js        ★ every beat time (from the voice's word times), the basin's fill, the sea-level fall
+films/africa-disappears/planet.js        the globe: Natural Earth maps (planet-data.js), the vanish, the basin, the fill, trade
+films/africa-disappears/shots.js         the shot list: which set, which camera, for every second
+films/africa-disappears/kit.js           what the ground sets share: the dissolve, the basin floor, sky domes, canvas textures
+films/africa-disappears/<set>.js         mine, factory, board, port, shelf, storm, forest, room, phone, coast
+films/africa-disappears/sound-*.js       the score, the ambiences, the effects · audio.js + mix.js: stems, ducking, limiter
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):

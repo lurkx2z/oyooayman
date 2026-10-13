@@ -164,7 +164,7 @@ afSound('amb', 'places', function (ctx, bus, K) {
     afBed(K, A.ship, A.forest, { colour: 'white', f: [['hp', 1800], ['lp', 9000]], vol: 0.08, am: 0.2 });
   }
   // ---- the rainforest at dawn: insects, birds near and far, a drip; all of it gone with the seam; then the void
-  const fSeam = A.forestGo + 0.72;
+  const fSeam = A.forestGo + 0.8;
   afBed(K, A.forest, fSeam, { colour: 'white', f: [['bp', 6200, 4], ['bp', 6200, 3]], vol: 0.025, env: (u, t) => 0.6 + 0.4 * Math.sin(t * 9), fo: 0.12 });
   afBed(K, A.forest, fSeam, { colour: 'pink', f: [['bp', 900, 0.5]], vol: 0.03, fo: 0.12 });
   for (let t = A.forest + 0.1; t < fSeam - 0.25; t += r.range(0.15, 0.5)) K.put(afChirp(fx, { f0: r.range(2000, 5200) }), t, { vol: r.range(0.015, 0.05), norm: true, pan: r.range(-0.8, 0.8), room: big, wet: 0.35 });

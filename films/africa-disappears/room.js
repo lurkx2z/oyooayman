@@ -13,7 +13,7 @@ LOOKS.afSuit5 = { skin: 0, build: 'slim', shirt: '#2c2c34', sleeves: 'long', pan
 AF_SET_BUILDERS.room = (app) => {
   const S = afSet(app, { sky: '#05070a', fov: 38, sun: null, hemi: ['#46566a', '#141210', 0.35], env: ['#2a3442', '#151a20', '#0a0a0a'] });
   const { scene, camera } = S;
-  const wall = afMat('#23272c', { roughness: 0.85 }), wood = afMat('#3a2a1e', { roughness: 0.35 }), carpet = afMat('#1d2024', { roughness: 1 });
+  const wall = afMat('#23272c', { roughness: 0.85 }), wood = afMat('#3a2a1e', { roughness: 0.62 }), carpet = afMat('#1d2024', { roughness: 1 });
   afBox(12, 0.1, 20, carpet, 0, -0.05, 0); afBox(12, 4, 0.2, wall, 0, 2, -8.1); afBox(0.2, 4, 20, wall, -6, 2, 0); afBox(0.2, 4, 20, wall, 6, 2, 0); afBox(12, 0.2, 20, afMat('#16191c'), 0, 4.1, 0);
   // wall panels with slim lights
   for (let i = -2; i <= 2; i++) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.06, 3, 0.04), new THREE.MeshBasicMaterial({ color: '#c8b48a' })); p.position.set(-5.88, 2, i * 3); scene.add(p); const p2 = p.clone(); p2.position.x = 5.88; scene.add(p2); }

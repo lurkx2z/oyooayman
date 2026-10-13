@@ -16,7 +16,7 @@ function afMineH(x, z) {
   return Math.max(h, -bh * 12.4) - 0.6 * fbm1(x * 0.05 + z * 0.03, 9);
 }
 
-const AF_MINE_HAZE = new THREE.Color('#8f8a82');   // the haze over the abyss: cooler, darker
+const AF_MINE_HAZE = new THREE.Color('#77726a');   // the haze over the abyss: cooler, darker
 AF_SET_BUILDERS.mine = (app) => {
   const S = afSet(app, { sky: '#c9b79a', fog: 0.00005, fogColor: '#b4a896', fov: 38, sun: [620, 230, -260], sunColor: '#ffd3a0', sunI: 2.6,
     hemi: ['#b9c7d6', '#6b5240', 0.45], shadow: 2048, shadowR: 900, shadowFar: 2000, far: 70000, env: ['#9fb2c6', '#c9b79a', '#5b4a3c'] });
@@ -92,24 +92,27 @@ AF_SET_BUILDERS.mine = (app) => {
       const k = afK(t, AF.mine, AF.platinum, Ease.inOutSine);
       const dn = afK(t, AF.mineGo + 0.5, AF.platinum, Ease.inOutSine);
       // from just above the rim, across the pit; after the vanish the camera tips down into the abyss
-      afCam(camera, afV([-820, 150, 520], [-700, 135, 430], k), afV(afV([200, -120, -60], [240, -130, -40], k), [400, -420, -80], dn), 40);
+      afCam(camera, afV([-820, 150, 520], [-700, 135, 430], k), afV(afV([200, -120, -60], [240, -130, -40], k), [300, -900, -60], dn), 40);
       const fk = MathX.smooth(t, AF.mineGo + 0.3, AF.mineGo + 1.8);
-      scene.fog.density = afLerp(0.00005, 0.0000065, fk); scene.fog.color.set('#b4a896').lerp(AF_MINE_HAZE, fk);
+      scene.fog.density = afLerp(0.00005, 0.0000045, fk); scene.fog.color.set('#b4a896').lerp(AF_MINE_HAZE, fk);
       for (const T of trucks) { const p = truckAt(T, t); T.g.position.set(p.x, p.y, p.z); T.g.rotation.y = p.yaw; }
       // dust behind the trucks (each puff is born at the truck's past position and drifts, grows, fades)
       dust.begin(scene.fog);
+      // the dust hangs in the air, not on the ground: when the ground goes, air rushes down into the void and takes it
+      const fall = Math.max(0, t - AF.mineGo - 1.0), drop = 45 * fall * fall;
       for (let j = 0; j < trucks.length; j++) for (let i = 0; i < 14; i++) {
         const age = ((t * 1.6 + i / 14 + j * 0.37) % 1) * 5.5; if (t - age > AF.mineGo) continue;   // no new dust once the ground is gone
         const p = truckAt(trucks[j], t - age);
-        dust.push(p.x + age * 3, p.y + 3 + age * 2.0, p.z - age * 1.5, 5 + age * 5, i, 0.3 * (1 - age / 5.5), 1.0, 0.72, 0.6, 0.47);
+        dust.push(p.x + age * 3, p.y + 3 + age * 2.0 - drop, p.z - age * 1.5, 5 + age * 5 + drop * 0.15, i, 0.3 * (1 - age / 5.5), 1.0, 0.72, 0.6, 0.47);
       }
       dust.end();
       // the vanish: a seam from the horizon toward (and past) the camera. s = distance toward the camera / 4.2 km:
       // the horizon is at about -6, the pit at -0.3, the camera at 0; everything with s < K is gone
       const o = camera.position;
       U.uDisO.value.set(o.x, 0, o.z); U.uDisDir.value.set(o.x, 0, o.z).normalize(); U.uDisLen.value = 4200; U.uDisNoise.value = 0.012;
-      const v = afK(t, AF.mineGo, AF.mineGo + 1.7, (x) => x);
-      U.uDisK.value = t < AF.mineGo ? -1e3 : -6.5 * Math.pow(1 - v, 2.5) + 0.4 * v;
+      // (paced so the seam spends its time where we can see it: the horizon in half a second, then the pit, then us at ~1.43 s)
+      const u = t - AF.mineGo;
+      U.uDisK.value = u < 0 ? -1e3 : u < 0.55 ? afLerp(-6.5, -0.5, 1 - Math.pow(1 - u / 0.55, 2)) : u < 1.4 ? afLerp(-0.5, -0.03, (u - 0.55) / 0.85) : afLerp(-0.03, 0.4, Math.min(1, (u - 1.4) / 0.25));
     },
     grade(t, p) { p.warmth = 0.06; p.saturation = 1.04; p.bloom = 0.35; p.bloomThreshold = 0.95; },
   };

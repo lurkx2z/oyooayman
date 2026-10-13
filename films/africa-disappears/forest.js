@@ -115,8 +115,9 @@ AF_SET_BUILDERS.forest = (app) => {
         mist.end();
         const o = C.camera.position;
         C.U.uDisO.value.set(o.x, 0, o.z); C.U.uDisDir.value.set(o.x - riverX(cz - 900), 0, 900).normalize(); C.U.uDisLen.value = 3600; C.U.uDisNoise.value = 0.01;
-        const vv = afK(t, AF.forestGo, AF.wild - 0.15, (x) => x);
-        C.U.uDisK.value = t < AF.forestGo ? -1e3 : -7 * Math.pow(1 - vv, 2.2) + 0.3 * vv;
+        // the seam: the far forest in a quarter second, then it crosses the canopy we can see, then us
+        const u = t - AF.forestGo;
+        C.U.uDisK.value = u < 0 ? -1e3 : u < 0.25 ? afLerp(-7, -1.1, 1 - Math.pow(1 - u / 0.25, 2)) : u < 0.8 ? afLerp(-1.1, -0.03, (u - 0.25) / 0.55) : afLerp(-0.03, 0.3, Math.min(1, (u - 0.8) / 0.12));
         mist.mesh.visible = t < AF.forestGo + 1.0;
         C.scene.fog.density = afLerp(0.00022, 0.000009, MathX.smooth(t, AF.forestGo + 0.05, AF.forestGo + 0.75));
       } else {
