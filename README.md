@@ -71,7 +71,8 @@ Everything is procedural, so there are no models, images or sound files to downl
 > Canal, a departures board and a chocolate aisle show the network breaking; the Atlantic pours over the rim and a ship
 > fights the churn; the rainforest and a waterhole go; an emergency session, a dead factory, a call to Lagos that never
 > connects; then the world's sea level falls ~300 m and a harbour's coast walks out to sea. Shot list, numbers and
-> review log: [`films/africa-disappears/PLAN.md`](films/africa-disappears/PLAN.md).
+> review log: [`films/africa-disappears/PLAN.md`](films/africa-disappears/PLAN.md); reviews, fixes and what is still weak:
+> [`films/africa-disappears/EPISODE_REPORT.md`](films/africa-disappears/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
@@ -340,6 +341,7 @@ films/africa-disappears/shots.js         the shot list: which set, which camera,
 films/africa-disappears/kit.js           what the ground sets share: the dissolve, the basin floor, sky domes, canvas textures
 films/africa-disappears/<set>.js         mine, factory, board, port, shelf, storm, forest, room, phone, coast
 films/africa-disappears/sound-*.js       the score, the ambiences, the effects · audio.js + mix.js: stems, ducking, limiter
+films/africa-disappears/render-gpu.cjs   the final render on a PC graphics card (one command; the mastered soundtracks *.m4a)
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):
