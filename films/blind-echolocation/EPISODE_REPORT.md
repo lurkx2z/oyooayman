@@ -59,6 +59,9 @@ The fixes were not re-scored by the reviewers.
   macro drop lands at the start of its shot; the sheet of heavier rain reads as a grey veil sweeping the street.
 - **Scene 13**: the sound city about one stop brighter; the camera comes closer to the man on the bridge.
 - **Costumes**: the friend, a passer-by and the rain extras no longer wear colours close to hers.
+- **After the final render** (found on the final frames): in the sound view her yellow top was greyed with the rest
+  of the picture and read as bare skin. She now keeps her colours there; the world is still greyed. The film was
+  rendered again with this fix (v2).
 - **Mix**: ambience beds that sat at the voice's level in scenes 7, 9, 10 and 11 pulled under it; the silences of
   scenes 12 and 13 lifted (music, sfx); the door to the warm hallway opens louder in scene 14.
 
@@ -78,26 +81,33 @@ The fixes were not re-scored by the reviewers.
 
 ## Deliverables
 
-Everything is in the project's shared folder `blind-echolocation/` (and the source on this branch):
+The film to upload is **v2**, rendered on the owner's PC (graphics card, `render-gpu.cjs`):
+`renders\blind-echolocation-v2\blind-echolocation_final_1080p.mp4` (1920×1080, 30 fps, H.264 CRF 18 + AAC 256k,
+1.8 GB) and `blind-echolocation_final_small.mp4` (1280×720, 26.0 MiB). The same film, rendered in the cloud, is in the
+project's shared folder `blind-echolocation/` with everything else (and the source on this branch):
 
 | What | Where |
 |---|---|
-| Final film, 1920×1080, 30 fps, H.264 + AAC | `blind-echolocation_final_1080p.mp4` |
-| A small copy under 30 MiB (for sending from a phone) | `blind-echolocation_final_small.mp4` |
+| Final film, 1920×1080, 30 fps, H.264 8 Mbps two-pass + AAC 256k, 496 MiB | `blind-echolocation_final_1080p.mp4` |
+| A small copy, 1280×720, 26.0 MiB (under 30 MiB, for sending from a phone) | `blind-echolocation_final_small.mp4` |
 | Playable film (unzip, open `blind-echolocation.html`, press Space; sound baked in) | `blind-echolocation_film.zip` |
 | Final mix (stereo, mastered) and the narration track as it sits in the mix | `audio/blind-echolocation_final_mix.flac`, `audio/blind-echolocation_narration_track.flac` |
 | The fourteen voice clips with their word timings (made by the narration thread, untouched) | `narration/` |
 | Screenplay, transcript, subtitles (SRT, VTT), master timeline (MD, JSON) | `docs/` (also in this folder of the repo) |
 | Contact sheets, one per scene, a frame every 2.5 s from the final render | `contact-sheets/scene01.jpg … scene14.jpg` |
+| The colour fix, before and after | `review/sound-view-colour-fix_before_after.jpg` |
 | This report | `docs/EPISODE_REPORT.md` |
 
-Mix as delivered: −15.1 LUFS integrated, −1.7 dBTP true peak, loudness range 5.5 LU; the narrator sits at about the same loudness in every scene, the street, rain and café beds 8–10 LU under it, the silent sections from near-silence (the anechoic room) to the rain taking over (about 2 LU above the voice).
+Mix as delivered: −15.1 LUFS integrated, −1.7 dBTP true peak in the mastered WAV (−2.0 dBTP in the MP4's AAC; the small copy −15.2 LUFS, −1.6 dBTP), loudness range 5.2–5.5 LU; the narrator sits at about the same loudness in every scene, the street, rain and café beds 8–10 LU under it, the silent sections from near-silence (the anechoic room) to the rain taking over (about 2 LU above the voice).
 
 ## Render note
 
-The final frames are rendered in software WebGL (no GPU in the cloud container): 15,094 frames at 1920×1080 with four
-workers, about 0.3 frames a second, so the render takes most of a night. The sound-view shader was made 2–3× faster for
+In the cloud the frames render in software WebGL (no GPU): 15,095 frames at 1920×1080 with four workers ran at about
+0.3–0.4 frames a second, so the first full render took about 12 hours. The sound-view shader was made 2–3× faster for
 this (its loops now stop at the slots in use; the frames are pixel-identical to before).
-On a PC with a graphics card the same film renders in one command, `node films/blind-echolocation/render-gpu.cjs`
-(steps in [`RENDER_ON_PC.md`](RENDER_ON_PC.md)). It uses the mastered soundtrack committed as `final-soundtrack.m4a`
-(AAC 256k, −15.1 LUFS, −2.0 dBTP); the small copy copies `small-soundtrack.m4a` (AAC 128k, −15.2 LUFS, −1.6 dBTP).
+
+On the owner's PC (RTX 3060 Ti, through the installed Chrome) the same film renders in about 20 minutes with
+`node films/blind-echolocation/render-gpu.cjs --channel chrome` (steps in [`RENDER_ON_PC.md`](RENDER_ON_PC.md); about
+13–16 frames a second). Playwright's own browser would not start on that PC, hence `--channel chrome`. It uses the
+mastered soundtrack committed as `final-soundtrack.m4a` (AAC 256k, −15.1 LUFS, −2.0 dBTP); the small copy copies
+`small-soundtrack.m4a` (AAC 128k, −15.2 LUFS, −1.6 dBTP; a 96k re-encode had peaked at −0.1 dBTP).

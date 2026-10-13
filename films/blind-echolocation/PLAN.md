@@ -90,9 +90,12 @@ NODE_PATH=$(npm root -g) node films/blind-echolocation/render-stems.cjs /tmp/st 
 NODE_PATH=$(npm root -g) node films/blind-echolocation/export-docs.cjs /tmp/docs          # SRT, VTT, transcript, timeline
 python3 films/blind-echolocation/contact-sheets.py /tmp/stills /tmp/docs/timeline.json /tmp/sheets
 films/blind-echolocation/make-zip.sh /tmp/blind.zip blind-echolocation                      # runnable ZIP (sound baked)
-tools/render-parallel.sh blind-echolocation.html /tmp/full 1920 1080 4 30                   # final frames
+tools/render-parallel.sh blind-echolocation.html /tmp/full 1920 1080 4 30                   # final frames (cloud, hours)
+node films/blind-echolocation/render-gpu.cjs --channel chrome                                # whole film on a PC GPU (~20 min)
 ```
 
 ## Review log
 
 See `EPISODE_REPORT.md` for the independent reviews, their scores as given, the fixes and what is still weak.
+
+Final: v2 (2026-10-13), with her colours kept in the sound view; rendered on the owner's PC and in the cloud.
