@@ -27,6 +27,22 @@ function afWaveH(x, z, t) {
   return afWaveDisp(x2, z2, t, _afD)[1];
 }
 
+// the ship's motion on the waves (190 m × 30 m, 5.5 m/s): heave, pitch, roll and the bow's water height. Shared by
+// the set and the sound (the bow slams are heard when they are seen)
+function afShipPose(t) {
+  const L = 190, B = 30, x0 = 5.5 * t, pts = [[L * 0.42, 0], [-L * 0.42, 0], [0, B * 0.45], [0, -B * 0.45], [0, 0], [L * 0.2, 0], [-L * 0.2, 0]];
+  const hs = pts.map(([a, b]) => afWaveH(x0 + a, b, t));
+  const heave = (hs[4] * 2 + hs[0] + hs[1] + hs[2] + hs[3] + hs[5] + hs[6]) / 8;
+  const pitch = Math.atan2((hs[0] + hs[5]) / 2 - (hs[1] + hs[6]) / 2, L * 0.62) * 0.9;
+  const roll = Math.atan2(hs[2] - hs[3], B * 0.9) * 0.6 + 0.04 * Math.sin(t * 0.7);
+  return { x: x0, y: heave - 1.5, pitch, roll, bowH: hs[0] };
+}
+// how hard the bow is hitting the sea at time t (0…~2): the spray and the slam sounds both follow it
+function afShipSlam(t) {
+  const P = afShipPose(t), dropV = afShipPose(t + 0.1).bowH - P.bowH;
+  return MathX.clamp((P.bowH - P.y - 1.0) / 4, 0, 1) + MathX.clamp(-dropV, 0, 1);
+}
+
 AF_SET_BUILDERS.storm = (app) => {
   const S = afSet(app, { sky: '#4a545c', fog: 0.0022, fogColor: '#58626a', fov: 46, sun: [-300, 220, -500], sunColor: '#c9d2da', sunI: 1.1,
     hemi: ['#8a96a2', '#202a30', 0.85], far: 9000, env: ['#7a8792', '#59646c', '#1e262c'] });
@@ -147,15 +163,7 @@ AF_SET_BUILDERS.storm = (app) => {
     }
     return Tex.tex(c, { repeat: false, srgb: false });
   })();
-  const SPEED = 5.5, HEAD = new THREE.Vector2(1, 0);
-  const shipPose = (t) => {
-    const x0 = SPEED * t, pts = [[L * 0.42, 0], [-L * 0.42, 0], [0, B * 0.45], [0, -B * 0.45], [0, 0], [L * 0.2, 0], [-L * 0.2, 0]];
-    const hs = pts.map(([a, b]) => afWaveH(x0 + a, b, t));
-    const heave = (hs[4] * 2 + hs[0] + hs[1] + hs[2] + hs[3] + hs[5] + hs[6]) / 8;
-    const pitch = Math.atan2((hs[0] + hs[5]) / 2 - (hs[1] + hs[6]) / 2, L * 0.62) * 0.9;
-    const roll = Math.atan2(hs[2] - hs[3], B * 0.9) * 0.6 + 0.04 * Math.sin(t * 0.7);
-    return { x: x0, y: heave - 1.5, pitch, roll, bowH: hs[0] };
-  };
+  const HEAD = new THREE.Vector2(1, 0), shipPose = afShipPose;
   return {
     scene, camera,
     frame(t) {
@@ -173,8 +181,7 @@ AF_SET_BUILDERS.storm = (app) => {
       spray.begin(scene.fog);
       for (let i = 0; i < 160; i++) {
         const b = Math.floor(t * 70) - i, tb = b / 70, age = t - tb; if (age < 0 || age > 2.2) continue;
-        const Pb = shipPose(tb), dropV = (shipPose(tb + 0.1).bowH - Pb.bowH);
-        const slam = MathX.clamp((Pb.bowH - Pb.y - 1.0) / 4, 0, 1) + MathX.clamp(-dropV, 0, 1);
+        const Pb = shipPose(tb), slam = afShipSlam(tb);
         if (slam < 0.25) continue;
         const h1 = hash2(b, 3), h2 = hash2(b, 5), h3 = hash2(b, 7);
         const side = h1 < 0.5 ? -1 : 1, vx = 4 + 10 * h2, vy = 8 + 18 * h3 * Math.min(slam, 1.2), vz = side * (6 + 14 * Math.abs(h1 - 0.5) * 2);

@@ -56,6 +56,7 @@ AF.silence = afE(15);                                 // NO NARRATION: water, sh
 AF.forest = afS(16) - 0.45;                           // the Congo rainforest, the same second
 AF.forestGo = afW(17, 'gone').start - 0.25;           // ★ it dissolves
 AF.wild = afW(17, 'entire').start - 0.2;              // elephants at a waterhole
+AF.savGo = afW(17, 'vanish').start - 0.3;            // ★ the waterhole goes
 AF.flow = afS(18) - 0.3;                              // the turning Earth: circulation lines
 AF.flowBend = afW(18, 'winds').start;
 // 6 — HUMANITY FACES THE AFTERMATH

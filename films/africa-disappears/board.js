@@ -42,12 +42,15 @@ AF_SET_BUILDERS.board = (app) => {
   const boardMesh = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), boardM); boardMesh.position.set(0, 5.8, 0); scene.add(boardMesh);
   afBox(9.5, 9.5, 0.4, afMat('#15171a', { roughness: 0.6 }), 0, 5.8, -0.25);
   // the hall: a glossy floor, a ceiling of light strips, two silhouettes looking up
-  const fl = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: '#1a1d22', roughness: 0.15, metalness: 0.2 })); fl.rotation.x = -Math.PI / 2; scene.add(fl);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: '#2a2e35', roughness: 0.2, metalness: 0.2 })); fl.rotation.x = -Math.PI / 2; scene.add(fl);
   const glow = new THREE.PointLight('#b7c6dc', 30, 40, 1.4); glow.position.set(0, 6, 6); scene.add(glow);
+  const hall = new THREE.PointLight('#c9d4e2', 60, 60, 1.2); hall.position.set(2, 9, 26); scene.add(hall);   // the hall's lights behind us
   for (let i = 0; i < 6; i++) { const strip = new THREE.Mesh(new THREE.BoxGeometry(30, 0.1, 0.4), new THREE.MeshBasicMaterial({ color: '#c9d6e8' })); strip.position.set(0, 13, 4 + i * 4); scene.add(strip); }
   const people = [];
-  for (const [id, look, x, z] of [['b1', 'casual8', -1.9, 12.6], ['b2', 'casual1', 1.3, 13.4]]) {
-    const p = new Person({ id, look, states: [[0, 'idle']] }, scene); p.root.position.set(x, 0, z); p.root.rotation.y = Math.PI; people.push(p);
+  // travellers stopped under the board, looking up (backs to us)
+  for (const [id, look, x, z, ry] of [['b1', 'casual8', -2.6, 9.4, 0.1], ['b2', 'casual1', -0.9, 10.6, -0.05], ['b3', 'casual3', 1.2, 9.0, 0.2], ['b4', 'casual5', 2.9, 11.2, -0.15],
+    ['b5', 'casual2', -3.8, 12.4, 0.25], ['b6', 'casual6', 0.4, 12.9, 0.0], ['b7', 'casual4', 3.6, 7.8, -0.3]]) {
+    const p = new Person({ id, look, states: [[0, 'idle']] }, scene); p.root.position.set(x, 0, z); p.root.rotation.y = Math.PI + ry; people.push(p);
   }
   return {
     scene, camera,
@@ -62,7 +65,8 @@ AF_SET_BUILDERS.board = (app) => {
       cv.update(st);
       for (const p of people) afPose(p, t);
       const k = afK(t, AF.board, AF.port);
-      afCam(camera, [afLerp(-1.3, -0.8, k), 1.25, afLerp(18.2, 17.4, k)], [-0.2, 5.5, 0], 50, -1.2);
+      // from a mezzanine rail: the board fills the upper frame (clear of the captions), the travellers below it
+      afCam(camera, [afLerp(-1.1, -0.6, k), 3.3, afLerp(20.6, 19.8, k)], [-0.15, 4.25, 0], 50, -1.0);
     },
     grade(t, p) { p.warmth = -0.06; p.bloom = 0.45; p.bloomThreshold = 0.85; p.vignette = 0.7; },
   };

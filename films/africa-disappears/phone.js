@@ -8,10 +8,22 @@ AF_SET_BUILDERS.phone = (app) => {
   const S = afSet(app, { sky: '#06080b', fov: 36, sun: null, hemi: ['#3a4250', '#120e0a', 0.25], env: ['#3a3f48', '#1a1c20', '#0b0a09'] });
   const { scene, camera } = S;
   const TOP = 0.75;
-  afBox(1.6, 0.04, 1.0, afMat('#4a3224', { roughness: 0.4 }), 0, TOP - 0.02, -0.1);
-  // a warm lamp off to the left, the window's cold light behind
-  const lamp = new THREE.PointLight('#ffbf80', 12, 3, 1.6); lamp.position.set(-0.55, 1.15, -0.35); scene.add(lamp);
-  const win = new THREE.PointLight('#7d93b8', 2.5, 3, 1.5); win.position.set(0.3, 1.2, -0.9); scene.add(win);
+  // an old wooden table: planks with grain (seeded), oiled dark
+  const woodTex = (() => {
+    const c = Tex.canvas(1024, 1024), x = c.getContext('2d');
+    x.fillStyle = '#2e1e14'; x.fillRect(0, 0, 1024, 1024);
+    for (let i = 0; i < 900; i++) {
+      const y = afR(i, 41) * 1024, a = 0.04 + 0.1 * afR(i, 42), l = afR(i, 43) > 0.5;
+      x.strokeStyle = l ? `rgba(120,80,50,${a})` : `rgba(10,6,4,${a * 1.5})`; x.lineWidth = 1 + 3 * afR(i, 44);
+      x.beginPath(); x.moveTo(0, y); for (let X = 0; X <= 1024; X += 64) x.lineTo(X, y + 6 * Math.sin(X * 0.004 + i) + 3 * Math.sin(X * 0.02 + i * 3)); x.stroke();
+    }
+    for (let k = 1; k < 4; k++) { x.fillStyle = 'rgba(0,0,0,0.55)'; x.fillRect(0, k * 256 - 2, 1024, 4); }   // plank seams
+    const t = Tex.tex(c); t.repeat.set(1, 1); return t;
+  })();
+  const top = afBox(1.6, 0.04, 1.0, afMat('#ffffff', { map: woodTex, roughness: 0.45 }), 0, TOP - 0.02, -0.1); top.rotation.y = Math.PI / 2 + 0.25; top.scale.set(0.62, 1, 1.6);
+  // a warm lamp off to the upper left (a pool of light that falls off across the table), the window's cold light behind
+  const lamp = new THREE.PointLight('#ffbf80', 1.6, 2.4, 2); lamp.position.set(-0.45, 1.25, -0.3); scene.add(lamp);
+  const win = new THREE.PointLight('#7d93b8', 1.2, 3, 1.5); win.position.set(0.4, 1.2, -0.9); scene.add(win);
   // things on the table
   const mug = afCyl(0.042, 0.04, 0.095, afMat('#d8d2c8', { roughness: 0.4 }), -0.17, TOP + 0.0475, -0.12);
   const tea = afCyl(0.038, 0.038, 0.004, afMat('#3a2412', { roughness: 0.1 }), -0.17, TOP + 0.085, -0.12);
@@ -68,6 +80,6 @@ AF_SET_BUILDERS.phone = (app) => {
       const k = afK(t, AF.phone, AF.coast, (x) => x);
       afCam(camera, [afLerp(0.035, 0.03, k), TOP + afLerp(0.33, 0.3, k), afLerp(0.2, 0.18, k)], [0, TOP, -0.004], 36, -3);
     },
-    grade(t, p) { p.warmth = 0.04; p.bloom = 0.35; p.bloomThreshold = 0.8; p.vignette = 0.8; p.exposure = 1.1; p.grain = 0.03; },
+    grade(t, p) { p.warmth = 0.02; p.bloom = 0.35; p.bloomThreshold = 0.8; p.vignette = 0.85; p.exposure = 1.0; p.grain = 0.03; },
   };
 };

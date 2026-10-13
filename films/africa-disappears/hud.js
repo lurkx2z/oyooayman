@@ -32,7 +32,7 @@ const AF_TAGS = [
   { from: () => AF.surge + 0.1, until: () => AF.ship - 0.15, text: 'TIME-LAPSE · 2 DAYS' },
   { from: () => AF.forest + 0.1, until: () => AF.flow - 0.2, text: 'CONGO BASIN · THE SAME SECOND' },
   { from: () => AF.flow + 0.3, until: () => AF.room - 0.2, text: 'ILLUSTRATION · NOT A FORECAST' },
-  { from: () => AF.halt + 0.1, until: () => AF.phone - 0.15, text: 'WEEKS LATER' },
+  { from: () => AF.halt + 0.1, until: () => AF.phone - 0.15, text: 'MONTHS LATER' },
   { from: () => AF.coast + 0.2, until: () => AF.earth - 0.15, text: 'TIME-LAPSE · WEEKS' },
 ];
 function afReadoutAt(t) {

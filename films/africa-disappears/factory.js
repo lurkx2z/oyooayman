@@ -90,7 +90,7 @@ AF_SET_BUILDERS.factory = (app) => {
     x.fillStyle = '#060606'; x.fillRect(0, 0, w, h);
     x.font = `700 64px ${Tex.fontCond}`; x.textAlign = 'center';
     x.fillStyle = st.on ? '#ff3b2a' : '#3a1210'; x.fillText('LINE 3 · STOPPED', w / 2, 100);
-    x.fillStyle = st.on ? '#ffb43a' : '#3a2a10'; x.font = `600 52px ${Tex.fontCond}`; x.fillText('NO PARTS · DAY ' + st.day, w / 2, 190);
+    x.fillStyle = st.on ? '#ffb43a' : '#3a2a10'; x.font = `600 52px ${Tex.fontCond}`; x.fillText('NO PARTS · IDLE ' + st.day + ' DAYS', w / 2, 190);
   });
   const boardM = new THREE.MeshBasicMaterial({ map: board.tex, toneMapped: false });
   // hung over the line, facing back up it
@@ -104,6 +104,17 @@ AF_SET_BUILDERS.factory = (app) => {
   }));
   beam.position.set(14, 6, -8); beam.rotation.z = 0.5; scene.add(beam);
   const motes = new BillboardSystem(scene, 400, true);
+  // high windows in the left wall; in the dark hall, grey daylight falls from them in shafts across the stopped line
+  const winM = new THREE.MeshBasicMaterial({ color: '#b8c6d8' });
+  for (let x = -74; x <= 74; x += 8) { const w = new THREE.Mesh(new THREE.PlaneGeometry(5, 1.8), winM); w.position.set(x, 10.1, -21.75); scene.add(w); }
+  const SHAFTS = [[-24, -16, 1.5], [-10, -2, 2.4], [4, 12, 0.8], [18, 26, 2.0], [32, 40, 1.2]];   // window x, floor x, floor z
+  const shafts = SHAFTS.map(([wx, fx, fz]) => {
+    const A = new THREE.Vector3(wx, 10.1, -21.6), B = new THREE.Vector3(fx, 0, fz), d = A.clone().sub(B);
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 2.2, d.length(), 24, 1, true), beam.material);
+    m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); scene.add(m);
+    const L = new THREE.SpotLight('#c4d4ec', 0, 40, 0.11, 0.7, 1.2); L.position.copy(A); L.target.position.copy(B); scene.add(L); scene.add(L.target);
+    return { m, L };
+  });
 
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v3 = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), tip = new THREE.Vector3();
   // the line's travel: how far the bodies have moved by time t (it slows and stops in 'stop'; frozen afterwards)
@@ -155,10 +166,10 @@ AF_SET_BUILDERS.factory = (app) => {
         L.m.emissiveIntensity = 3.0 * on; lit += on;
       }
       const litK = lit / lightRows.length;
-      hemi.intensity = mode === 'dark' ? 0.035 : afLerp(0.06, 1.0, litK);
+      hemi.intensity = mode === 'dark' ? 0.09 : afLerp(0.06, 1.0, litK);
       sun.intensity = mode === 'dark' ? 0.0 : afLerp(0.0, 1.4, litK);
       sun.castShadow = mode !== 'dark';
-      scene.environmentIntensity = mode === 'dark' ? 0.03 : afLerp(0.04, 1, litK);
+      scene.environmentIntensity = mode === 'dark' ? 0.08 : afLerp(0.04, 1, litK);
       // ---- the cells: rows of 18 across, streaming along x
       cells.visible = mode === 'cells';
       if (mode === 'cells') {
@@ -173,8 +184,9 @@ AF_SET_BUILDERS.factory = (app) => {
       }
       // ---- the dark hall: the board, a shaft of daylight with dust
       const isDark = mode === 'dark';
-      boardMesh.visible = isDark; board.update({ on: isDark ? 1 : 0, day: 23 });
-      beam.material.uniforms.uA.value = isDark ? 0.06 : 0; redL.intensity = isDark ? 9 * (0.85 + 0.15 * Math.sin(t * 2.2)) : 0; beam.visible = isDark;
+      boardMesh.visible = isDark; board.update({ on: isDark ? 1 : 0, day: 71 });
+      beam.material.uniforms.uA.value = isDark ? 0.07 : 0; redL.intensity = isDark ? 9 * (0.85 + 0.15 * Math.sin(t * 2.2)) : 0; beam.visible = isDark;
+      for (const S of shafts) { S.m.visible = isDark; S.L.intensity = isDark ? 260 : 0; }
       motes.begin(); if (isDark) for (let i = 0; i < 260; i++) {
         const u = afR(i, 5), w = afR(i, 6), y0 = afR(i, 7) * 12;
         const y = (y0 - t * 0.08 * (0.5 + w)) % 12, yy = y < 0 ? y + 12 : y;
@@ -194,7 +206,7 @@ AF_SET_BUILDERS.factory = (app) => {
         afCam(camera, [-44, afLerp(5.2, 4.8, k), afLerp(9.5, 9.0, k)], [10, 1.6, -1.5], 44);
       } else {
         const k = afK(t, AF.halt, AF.phone);
-        afCam(camera, [afLerp(-34, -30, k), 2.6, 4.2], [-12, 4.2, -0.4], 44);
+        afCam(camera, [afLerp(-38, -35, k), afLerp(3.2, 3.0, k), afLerp(6.8, 6.4, k)], [-12, 4.6, -0.6], 44);
       }
     },
     grade(t, p, shot) {

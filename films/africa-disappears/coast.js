@@ -20,7 +20,7 @@ function afCoastH(x, z) {
 }
 
 AF_SET_BUILDERS.coast = (app) => {
-  const S = afSet(app, { sky: '#9fb3c6', fog: 0.00004, fogColor: '#9fb2c4', fov: 40, sun: [-900, 1300, 700], sunColor: '#fff4e2', sunI: 2.0,
+  const S = afSet(app, { sky: '#9fb3c6', fog: 0.000022, fogColor: '#a3b6c8', fov: 40, sun: [-900, 1300, 700], sunColor: '#fff4e2', sunI: 2.0,
     hemi: ['#c4d2e0', '#5a5040', 0.45], shadow: 2048, shadowR: 1800, shadowFar: 5000, far: 40000, env: ['#c4d2e0', '#a9b7c4', '#4a4840'] });
   const { scene, camera } = S;
   afSky(scene, '#6f8fb0', '#c9d4dc', '#8899a6', { r: 30000 });
@@ -52,18 +52,23 @@ AF_SET_BUILDERS.coast = (app) => {
       float seaAtY = -y;                                                    // the drop needed to expose this point (m)
       float tExp = mix(uTs0, uTs1, clamp((seaAtY - uSea0) / max(uSea1 - uSea0, 1e-3), 0.0, 1.0));
       float dry = smoothstep(0.0, 2.2, uT - tExp);
-      vec3 mud = mix(vec3(0.045, 0.042, 0.036), vec3(0.15, 0.135, 0.105), dry) * (0.7 + 0.6 * cf(q * 0.02));
-      mud = mix(mud, mud * vec3(0.8, 0.85, 0.9), smoothstep(0.55, 0.7, cf(q * 0.006 + 3.0)));  // runnels and pools
+      // fresh seabed: dark and wet at the waterline, drying to pale sand; strandlines where the sea paused each day;
+      // dark weed beds; pools left behind that hold the sky
+      vec3 mud = mix(vec3(0.05, 0.045, 0.035), vec3(0.34, 0.27, 0.17), dry) * (0.75 + 0.5 * cf(q * 0.02));
+      mud = mix(mud, vec3(0.06, 0.07, 0.04), smoothstep(0.6, 0.75, cf(q * 0.0045 + 7.0)) * 0.7);
+      mud *= 1.0 - 0.3 * smoothstep(0.88, 0.98, fract(seaAtY / 3.0)) * step(0.0, seaAtY);
+      float pool = smoothstep(0.66, 0.7, cf(q * 0.009 + 3.0)) * (1.0 - dry * 0.6);
+      mud = mix(mud, vec3(0.22, 0.30, 0.38), pool);
       vec3 ground = vCW.z < 0.0 ? land : mud;
       // the sea: shallow turquoise over sand, deep blue
-      vec3 sea = mix(vec3(0.10, 0.30, 0.32), vec3(0.02, 0.07, 0.13), smoothstep(0.0, 14.0, depth));
+      vec3 sea = mix(vec3(0.05, 0.24, 0.26), vec3(0.008, 0.04, 0.085), smoothstep(0.0, 12.0, depth));
       float surf = (1.0 - smoothstep(0.0, 1.4, abs(depth))) * (0.6 + 0.4 * cn(q * 0.08 + uT));
       diffuseColor.rgb = depth > 0.0 ? sea : ground;
       diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.92, 0.94, 0.92), surf * 0.8);
       // the old coastline (a dashed map line), shown on "maps"
       float oldC = (1.0 - smoothstep(4.0, 11.0, abs(vCW.z - 6.0))) * step(0.45, fract(vCW.x / 70.0)) * uOld;
       diffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0, 0.86, 0.35), oldC);`)
-      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = (uLevel - vCW.y) > 0.0 ? 0.18 : roughnessFactor;')
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = (uLevel - vCW.y) > 0.0 ? 0.3 : roughnessFactor;')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1.0, 0.86, 0.35) * 1.4 * (1.0 - smoothstep(4.0, 11.0, abs(vCW.z - 6.0))) * step(0.45, fract(vCW.x / 70.0)) * uOld;');
   };
   gm.customProgramCacheKey = () => 'afCoast';
@@ -120,9 +125,9 @@ AF_SET_BUILDERS.coast = (app) => {
     labels(t, shot, app) {
       const a = MathX.smooth(t, AF.maps + 0.2, AF.maps + 0.8) * (1 - MathX.smooth(t, AF.earth - 0.4, AF.earth - 0.1));
       if (a <= 0) return [];
-      const p = new THREE.Vector3(-700, 2, 6).project(camera);
+      const p = new THREE.Vector3(-160, 2, 6).project(camera);
       return [{ x: p.x * 0.5 + 0.5, y: 0.5 - p.y * 0.5, a, html: '<span class="d"></span>THE COAST · A MONTH AGO' }];
     },
-    grade(t, p) { p.warmth = 0.02; p.saturation = 1.0; p.contrast = 1.06; },
+    grade(t, p) { p.warmth = 0.03; p.saturation = 1.08; p.contrast = 1.12; },
   };
 };

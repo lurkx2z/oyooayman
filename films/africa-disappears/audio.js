@@ -48,12 +48,49 @@ function afDynDb(t, keys) {
   return K[K.length - 1][1];
 }
 
+// a look-ahead true-peak limiter on a rendered AudioBuffer (in place): the peak between samples is estimated by 4×
+// windowed-sinc oversampling; the gain needed to keep it under `ceilDb` is held ahead of each peak (5 ms look-ahead,
+// linear attack) and released over ~120 ms. Deterministic; the page and the video get exactly the same sound.
+function afLimit(buf, ceilDb) {
+  const sr = buf.sampleRate, n = buf.length, C = buf.numberOfChannels, ceil = Math.pow(10, ceilDb / 20), ch = [];
+  for (let c = 0; c < C; c++) ch.push(buf.getChannelData(c));
+  const TAPS = 8, PH = [0.25, 0.5, 0.75].map((f) => {
+    const w = []; let sum = 0;
+    for (let k = -TAPS + 1; k <= TAPS; k++) { const x = k - f, sinc = Math.abs(x) < 1e-9 ? 1 : Math.sin(Math.PI * x) / (Math.PI * x), win = 0.5 + 0.5 * Math.cos(Math.PI * x / TAPS); w.push(sinc * win); sum += sinc * win; }
+    return w.map((v) => v / sum);
+  });
+  const need = new Float32Array(n).fill(1);
+  for (const x of ch) for (let i = 0; i < n; i++) {
+    let p = Math.abs(x[i]);
+    if (p > ceil * 0.7) for (const w of PH) { let v = 0; for (let k = 0; k < w.length; k++) { const j = i + k - TAPS + 1; if (j >= 0 && j < n) v += w[k] * x[j]; } p = Math.max(p, Math.abs(v)); }
+    if (p > ceil) need[i] = Math.min(need[i], ceil / p);
+  }
+  const L = Math.round(0.005 * sr), g1 = new Float32Array(n), dq = new Int32Array(n);
+  // g1[i] = min(need[i … i+L]) (a monotonic deque, scanning backwards)
+  let h = 0, e = 0;
+  for (let i = n - 1; i >= 0; i--) {
+    while (e > h && need[dq[e - 1]] >= need[i]) e--;
+    dq[e++] = i; while (dq[h] > i + L) h++;
+    g1[i] = need[dq[h]];
+  }
+  // a box average over the last L samples (never above need[i]), then a smooth release
+  let acc = 0; const rel = 1 - Math.exp(-1 / (0.12 * sr));
+  let g = 1;
+  for (let i = 0; i < n; i++) {
+    acc += g1[i] - (i >= L ? g1[i - L] : 0);
+    const g2 = (acc + Math.max(0, L - i - 1)) / L;
+    g = Math.min(g2, g + (1 - g) * rel);
+    if (g < 1) for (const x of ch) x[i] *= g;
+  }
+  return buf;
+}
+
 class AfAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'africa-disappears-soundtrack.wav'; this.solo = null; this.noDuck = false; }
   fingerprintData() {
     return [AF, AN.clips.map((c) => [c.id, c.hash, c.start, c.seconds, c.gainDb]), window.AF_MIX, Object.values(GBX).map(String).join(''),
       Object.values(GbFx.prototype).map(String).join(''), Object.values(AF_SOUND).flat().map((b) => b.name + b.fn).join(''),
-      afDuckDb.toString(), afDynDb.toString(), AfAudio.toString(), afFill.toString(), afSea.toString()];
+      afDuckDb.toString(), afDynDb.toString(), AfAudio.toString(), afFill.toString(), afSea.toString(), afLimit.toString(), afShipSlam.toString(), afShipPose.toString(), afWaveDisp.toString(), JSON.stringify(AF_WAVES), JSON.stringify(AF_BOARD_ROWS)];
   }
   async renderOffline() {
     this.vo = {};
@@ -74,14 +111,14 @@ class AfAudio extends AudioEngine {
     src.buffer = bufs[0]; bufs.length = 0; src.connect(this._master(mc)); src.start(0);
     const buf = await mc.startRendering();
     AudioEngine.declick(buf);
+    afLimit(buf, window.AF_MIX.ceiling ?? -1.5);
     return Edit.spliceAudio(buf);
   }
-  // the master: the cut to silence at the very end, then a fast peak limiter
+  // the master gain (the true-peak limiter runs on the rendered buffer: afLimit)
   _master(ctx) {
     const master = ctx.createGain(), M = window.AF_MIX;
     master.gain.value = Math.pow(10, (M.master || 0) / 20);
-    const lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.002; lim.release.value = 0.1;
-    master.connect(lim); lim.connect(ctx.destination);
+    master.connect(ctx.destination);
     return master;
   }
   _build(ctx, o = {}) {

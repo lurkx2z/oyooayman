@@ -117,3 +117,29 @@ function afSky(scene, top, hor, low, o = {}) {
 
 // pose a Person that has no path (placed by hand): its state machine at time t
 function afPose(p, t, extra = {}) { p.apply(p.poseAt(t, Object.assign({ seed: p.seed, seedI: p.seedI, walkPhase: 0, seat: p.spec.seat }, extra))); p.root.updateMatrixWorld(true); }
+
+// 2-D value noise and fbm (seeded, smooth) for the sets' terrain
+function afN2(x, z) {
+  const i = Math.floor(x), j = Math.floor(z), fx = x - i, fz = z - j, u = fx * fx * (3 - 2 * fx), w = fz * fz * (3 - 2 * fz);
+  return afLerp(afLerp(hash2(i, j), hash2(i + 1, j), u), afLerp(hash2(i, j + 1), hash2(i + 1, j + 1), u), w);
+}
+function afF2(x, z, o = 4) { let s = 0, a = 0.5, f = 1; for (let k = 0; k < o; k++) { s += a * afN2(x * f + k * 17.3, z * f - k * 9.1); a *= 0.5; f *= 2.03; } return s / (1 - Math.pow(0.5, o)); }
+
+// the floor of the new basin, far under a ground set: once the land has gone this is what the camera looks down on —
+// a dark rock plain kilometres below, long ridges catching the low sun, fading into the haze of 4 km of air
+function afFloor(scene, depth, o = {}) {
+  const L = o.size || 110000, N = 240, g = new THREE.PlaneGeometry(L, L, N, N); g.rotateX(-Math.PI / 2);
+  const P = g.attributes.position, col = new Float32Array(P.count * 3), c = new THREE.Color();
+  const a = new THREE.Color(o.a || '#2a2623'), b = new THREE.Color(o.b || '#6a5e52'), X0 = o.x || 0, Z0 = o.z || 0;
+  for (let i = 0; i < P.count; i++) {
+    const x = P.getX(i) + X0, z = P.getZ(i) + Z0;
+    const n = afF2(x / 11000, z / 11000), r = 1 - Math.abs(2 * afF2(x / 5200 + 40, z / 8000 - 7, 3) - 1);
+    P.setY(i, -depth + 1100 * n + 650 * r * r * r);
+    c.copy(a).lerp(b, MathX.clamp(r * r * 0.8 + 0.45 * (afN2(x / 900, z / 900) - 0.5) + 0.3 * (n - 0.5), 0, 1));
+    col.set([c.r, c.g, c.b], i * 3);
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0, flatShading: false }));
+  m.position.set(X0, 0, Z0); scene.add(m);
+  return m;
+}

@@ -81,10 +81,10 @@ const AF_SHOTS = [
   // ================= 5 — THE ENVIRONMENTAL DISASTER
   { id: 'R1', t0: AF.forest, t1: AF.wild, set: 'forest', mode: 'canopy' },
   { id: 'R2', t0: AF.wild, t1: AF.flow, set: 'forest', mode: 'savanna' },
-  // C1: the turning Earth: wind and current lines bend into a new pattern
+  // C1: the turning Earth (the basin full now, a new sea): wind and current lines bend into a new pattern
   { id: 'C1', t0: AF.flow, t1: AF.room, set: 'planet', frame(t, P) {
     const k = afK(t, AF.flow, AF.room);
-    P.set(afPlanetState(t, { sun: [20, 5], clouds: 0.35, flow: { on: MathX.smooth(t, AF.flow, AF.flow + 0.8), k: afK(t, AF.flowBend, AF.room - 1.0) } }));
+    P.set(afPlanetState(t, { sun: [20, 5], clouds: 0.35, level: 0.85, swirl: 0.3, foam: 0, ghost: 0.6, flow: { on: MathX.smooth(t, AF.flow, AF.flow + 0.8), k: afK(t, AF.flowBend, AF.room - 1.0) } }));
     P.aim(afLerp(-5, 35, k), afLerp(8, 4, k), 3.3, 32, { tilt: 6, dy: -1 });
   } },
   // ================= 6 — HUMANITY

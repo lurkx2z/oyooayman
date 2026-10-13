@@ -16,11 +16,12 @@ function afMineH(x, z) {
   return Math.max(h, -bh * 12.4) - 0.6 * fbm1(x * 0.05 + z * 0.03, 9);
 }
 
+const AF_MINE_HAZE = new THREE.Color('#8f8a82');   // the haze over the abyss: cooler, darker
 AF_SET_BUILDERS.mine = (app) => {
   const S = afSet(app, { sky: '#c9b79a', fog: 0.00005, fogColor: '#b4a896', fov: 38, sun: [620, 230, -260], sunColor: '#ffd3a0', sunI: 2.6,
-    hemi: ['#b9c7d6', '#6b5240', 0.45], shadow: 2048, shadowR: 900, shadowFar: 2000, far: 30000, env: ['#9fb2c6', '#c9b79a', '#5b4a3c'] });
+    hemi: ['#b9c7d6', '#6b5240', 0.45], shadow: 2048, shadowR: 900, shadowFar: 2000, far: 70000, env: ['#9fb2c6', '#c9b79a', '#5b4a3c'] });
   const { scene, camera, U } = S;
-  afSky(scene, '#6f8fb3', '#dcc6a2', '#121416', { sunDir: [0.86, 0.32, -0.36], sunGlow: '#ffc27a', r: 20000 });
+  afSky(scene, '#6f8fb3', '#dcc6a2', '#5a5248', { sunDir: [0.86, 0.32, -0.36], sunGlow: '#ffc27a', r: 20000 });
   // ---- the ground: one heightfield (3.2 km) + a ring of veld to the horizon
   const N = 420, L = 3200, g = new THREE.PlaneGeometry(L, L, N, N); g.rotateX(-Math.PI / 2);
   const P = g.attributes.position, col = new Float32Array(P.count * 3), c = new THREE.Color();
@@ -45,7 +46,8 @@ AF_SET_BUILDERS.mine = (app) => {
   g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
   const ground = new THREE.Mesh(g, afMat('#ffffff', { vertexColors: true, roughness: 0.95 }, U)); ground.receiveShadow = true; ground.castShadow = true; scene.add(ground);
   const ring = new THREE.Mesh(new THREE.RingGeometry(1450, 26000, 96, 1), afMat('#968a62', { roughness: 1 }, U)); ring.rotation.x = -Math.PI / 2; ring.position.y = -0.4; ring.receiveShadow = true; scene.add(ring);
-  // (below the land there is nothing to draw: the sky dome's dark lower half is the abyss, 4 km of shadowed air)
+  // below the land: the floor of the new basin, 4 km down (hidden until the land above it has gone)
+  afFloor(scene, 4000, { x: -760, z: 470, a: '#241f1b', b: '#6a5a4a' });
   // ---- scrub: dark bushes as instanced blobs on the veld
   const bushG = new THREE.IcosahedronGeometry(1, 0), bushM = afMat('#4d5532', { roughness: 1, flatShading: true }, U), NB = 2600;
   const bush = new THREE.InstancedMesh(bushG, bushM, NB), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sv = new THREE.Vector3();
@@ -91,7 +93,8 @@ AF_SET_BUILDERS.mine = (app) => {
       const dn = afK(t, AF.mineGo + 0.5, AF.platinum, Ease.inOutSine);
       // from just above the rim, across the pit; after the vanish the camera tips down into the abyss
       afCam(camera, afV([-820, 150, 520], [-700, 135, 430], k), afV(afV([200, -120, -60], [240, -130, -40], k), [400, -420, -80], dn), 40);
-      scene.fog.density = afLerp(0.00005, 0.000018, MathX.smooth(t, AF.mineGo + 0.3, AF.mineGo + 1.8));
+      const fk = MathX.smooth(t, AF.mineGo + 0.3, AF.mineGo + 1.8);
+      scene.fog.density = afLerp(0.00005, 0.0000065, fk); scene.fog.color.set('#b4a896').lerp(AF_MINE_HAZE, fk);
       for (const T of trucks) { const p = truckAt(T, t); T.g.position.set(p.x, p.y, p.z); T.g.rotation.y = p.yaw; }
       // dust behind the trucks (each puff is born at the truck's past position and drifts, grows, fades)
       dust.begin(scene.fog);

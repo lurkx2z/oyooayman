@@ -5,7 +5,7 @@
    ===================================================================== */
 
 AF_SET_BUILDERS.port = (app) => {
-  const S = afSet(app, { sky: '#a9b4bf', fog: 0.00032, fogColor: '#a6b0ba', fov: 40, sun: [-200, 260, 160], sunColor: '#f4f1ea', sunI: 2.0,
+  const S = afSet(app, { sky: '#a9b4bf', fog: 0.00013, fogColor: '#aab4bd', fov: 40, sun: [-200, 260, 160], sunColor: '#fff3e0', sunI: 2.6,
     hemi: ['#c4ccd6', '#4b4a46', 0.9], shadow: 2048, shadowR: 420, shadowFar: 1400, far: 9000, env: ['#c9d1da', '#a6b0ba', '#3a3d40'] });
   const { scene, camera } = S;
   afSky(scene, '#8c9cad', '#b9c2cb', '#8a949c', { r: 6000 });
@@ -31,15 +31,29 @@ AF_SET_BUILDERS.port = (app) => {
     }
   }
   inst.count = n; inst.castShadow = inst.receiveShadow = true; scene.add(inst);
-  // ship-to-shore cranes, booms raised (idle)
-  const blue = afMat('#3a6ea5', { roughness: 0.6 }), red = afMat('#b8402e', { roughness: 0.6 });
+  // ship-to-shore cranes, idle with their booms raised: a portal on four legs straddling the quay, a long girder
+  // running back over the yard (machinery house at its tail), an A-frame on top and the waterside boom tipped up
+  const craneM = afMat('#6f8ea8', { roughness: 0.55, metalness: 0.2 }), houseM = afMat('#dfe2e4', { roughness: 0.6 });
+  const strut = (g, a, b, w, M = craneM) => {   // a square member from point a to point b
+    const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), d = B.clone().sub(A), m = new THREE.Mesh(new THREE.BoxGeometry(w, d.length(), w), M);
+    m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
+    m.castShadow = m.receiveShadow = true; g.add(m); return m;
+  };
   for (let i = 0; i < 7; i++) {
-    const g = new THREE.Group(); g.position.set(-330 + i * 105, 0, -24); scene.add(g);
-    const M = i % 2 ? blue : red;
-    for (const [x, z] of [[-9, -14], [9, -14], [-9, 14], [9, 14]]) afBox(2, 48, 2, M, x, 24, z, g);
-    afBox(20, 3, 32, M, 0, 48, 0, g); afBox(14, 6, 14, M, 0, 52, -10, g);
-    const boom = afBox(3, 3, 70, M, 0, 50, 40, g); boom.rotation.x = -1.15; boom.position.set(0, 70, 22);
-    const back = afBox(3, 3, 40, M, 0, 50, -30, g);
+    const g = new THREE.Group(); g.position.set(-330 + i * 105, 0, -24); g.rotation.y = 0; scene.add(g);
+    for (const x of [-9, 9]) {
+      strut(g, [x, 0, -14], [x, 46, -14], 2.2); strut(g, [x, 0, 14], [x, 46, 14], 2.2);   // legs
+      strut(g, [x, 13, -14], [x, 13, 14], 1.6);                                           // sill beam
+      strut(g, [x, 13, -14], [x, 44, 14], 0.9); strut(g, [x, 13, 14], [x, 44, -14], 0.9); // cross bracing
+      strut(g, [x * 0.45, 46, -58], [x * 0.45, 46, 18], 2.4);                              // girder + backreach
+      strut(g, [x * 0.45, 46, -6], [x * 0.25, 82, 2], 1.6); strut(g, [x * 0.45, 46, 12], [x * 0.25, 82, 2], 1.6);   // the A-frame
+      strut(g, [x * 0.45, 46, 18], [x * 0.45, 46 + 58 * Math.sin(1.2), 18 + 58 * Math.cos(1.2)], 2.0);   // boom, raised
+      strut(g, [x * 0.25, 82, 2], [x * 0.45, 46 + 58 * Math.sin(1.2), 18 + 58 * Math.cos(1.2)], 0.5);    // forestay
+      strut(g, [x * 0.25, 82, 2], [x * 0.45, 46, -58], 0.5);                                              // backstay
+    }
+    strut(g, [-9, 46, -14], [9, 46, -14], 2.0); strut(g, [-9, 46, 14], [9, 46, 14], 2.0);   // portal beams
+    afBox(12, 8, 16, houseM, 0, 51, -48, g);                                               // machinery house
+    afBox(5, 4, 5, houseM, 3, 41, 9, g);                                                   // the cab, parked
   }
   // a ship at the quay (not being worked) and the anchorage
   const hullM = afMat('#2c3438', { roughness: 0.6 }), redHull = afMat('#7a2a24', { roughness: 0.7 }), whiteM = afMat('#e2e0da', { roughness: 0.6 });

@@ -3,14 +3,15 @@
      canopy   over the Congo rainforest at dawn: an unbroken roof of crowns, emergent giants, a brown river winding
               through, mist in the low ground. On "gone" it goes like everything else: a seam from the horizon to us
      savanna  low at a waterhole at sunset: elephants drinking, acacias, a giraffe far off. "Entire ecosystems vanish."
-   Both use the kit's dissolve; under the land there is only the abyss (the sky dome's dark lower half).
+   Both use the kit's dissolve; under the land is the floor of the new basin, 4 km down (afFloor).
    ===================================================================== */
 
 AF_SET_BUILDERS.forest = (app) => {
   // ======================================================= the rainforest
   const C = afSet(app, { sky: '#b9c4b8', fog: 0.00022, fogColor: '#a9b7b0', fov: 42, sun: [700, 260, 60], sunColor: '#ffe2b8', sunI: 2.4,
-    hemi: ['#c8d4d8', '#2c3a22', 0.7], far: 26000, env: ['#c8d4d8', '#9aa898', '#1a2416'] });
-  afSky(C.scene, '#8aa3b8', '#e6d9c2', '#101312', { sunDir: [0.55, 0.18, -0.8], sunGlow: '#ffd29a', r: 20000 });
+    hemi: ['#c8d4d8', '#2c3a22', 0.7], far: 70000, env: ['#c8d4d8', '#9aa898', '#1a2416'] });
+  afSky(C.scene, '#8aa3b8', '#e6d9c2', '#5c625e', { sunDir: [0.55, 0.18, -0.8], sunGlow: '#ffd29a', r: 20000 });
+  afFloor(C.scene, 4000, { z: -400, a: '#26231f', b: '#6e6456' });
   const riverX = (z) => 140 * Math.sin(z * 0.0021) + 60 * Math.sin(z * 0.0057 + 1.3);
   const groundH = (x, z) => 18 * fbm1(x * 0.0012 + 3, 2) + 12 * fbm1(z * 0.0015, 4) - 26 * Math.exp(-Math.pow((x - riverX(z)) / 160, 2));
   {
@@ -51,8 +52,9 @@ AF_SET_BUILDERS.forest = (app) => {
   const mist = new BillboardSystem(C.scene, 200, false);
   // ======================================================= the savanna waterhole
   const V = afSet(app, { sky: '#e0a76a', fog: 0.0016, fogColor: '#d8a070', fov: 34, sun: [-300, 40, -600], sunColor: '#ffb070', sunI: 2.4,
-    hemi: ['#f0c090', '#4a3020', 0.28], far: 20000, env: ['#f0b880', '#c88a58', '#2a1a10'] });
-  afSky(V.scene, '#7a7fa8', '#ffb46a', '#0e0c0b', { sunDir: [-0.45, 0.05, -0.89], sunGlow: '#ffd08a', hw: 0.18, r: 15000 });
+    hemi: ['#f0c090', '#4a3020', 0.28], far: 70000, env: ['#f0b880', '#c88a58', '#2a1a10'] });
+  afSky(V.scene, '#7a7fa8', '#ffb46a', '#3a2c24', { sunDir: [-0.45, 0.05, -0.89], sunGlow: '#ffd08a', hw: 0.18, r: 15000 });
+  afFloor(V.scene, 4000, { a: '#2e2620', b: '#8a6a50' });
   const sunDisc = new THREE.Mesh(new THREE.CircleGeometry(160, 48), new THREE.MeshBasicMaterial({ color: '#ffe0a0', fog: false, toneMapped: false }));
   sunDisc.position.set(-0.45 * 9000, 0.05 * 9000 + 120, -0.89 * 9000); sunDisc.lookAt(0, 0, 0); V.scene.add(sunDisc);
   {
@@ -116,7 +118,7 @@ AF_SET_BUILDERS.forest = (app) => {
         const vv = afK(t, AF.forestGo, AF.wild - 0.15, (x) => x);
         C.U.uDisK.value = t < AF.forestGo ? -1e3 : -7 * Math.pow(1 - vv, 2.2) + 0.3 * vv;
         mist.mesh.visible = t < AF.forestGo + 1.0;
-        C.scene.fog.density = afLerp(0.00022, 0.0001, MathX.smooth(t, AF.forestGo + 0.3, AF.forestGo + 1.6));
+        C.scene.fog.density = afLerp(0.00022, 0.000009, MathX.smooth(t, AF.forestGo + 0.05, AF.forestGo + 0.75));
       } else {
         const k = afK(t, AF.wild, AF.flow, (x) => x);
         for (const e of elephants) {
@@ -127,8 +129,9 @@ AF_SET_BUILDERS.forest = (app) => {
         afCam(V.camera, [afLerp(9, 6, k), 1.7, afLerp(2, -1, k)], [-6, 2.2, -120], 34);
         const o = V.camera.position;
         V.U.uDisO.value.set(o.x, 0, o.z); V.U.uDisDir.value.set(0, 0, 1); V.U.uDisLen.value = 900; V.U.uDisNoise.value = 0.03;
-        const t0 = afW(17, 'vanish').start - 0.3, vv = afK(t, t0, t0 + 0.9, (x) => x);
+        const t0 = AF.savGo, vv = afK(t, t0, t0 + 0.9, (x) => x);
         V.U.uDisK.value = t < t0 ? -1e3 : -2.4 * Math.pow(1 - vv, 1.6) + 0.2 * vv;
+        V.scene.fog.density = afLerp(0.0016, 0.000012, MathX.smooth(t, t0 + 0.2, t0 + 1.0));
       }
     },
     grade(t, p, shot) {
