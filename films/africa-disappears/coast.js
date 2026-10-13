@@ -128,6 +128,6 @@ AF_SET_BUILDERS.coast = (app) => {
       const p = new THREE.Vector3(-160, 2, 6).project(camera);
       return [{ x: p.x * 0.5 + 0.5, y: 0.5 - p.y * 0.5, a, html: '<span class="d"></span>THE COAST · A MONTH AGO' }];
     },
-    grade(t, p) { p.warmth = 0.03; p.saturation = 1.08; p.contrast = 1.12; },
+    grade(t, p) { p.warmth = 0.03; p.saturation = 1.1; p.contrast = 1.18; },
   };
 };

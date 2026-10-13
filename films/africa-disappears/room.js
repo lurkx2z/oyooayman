@@ -65,7 +65,7 @@ AF_SET_BUILDERS.room = (app) => {
     const sc = new THREE.Mesh(new THREE.PlaneGeometry(0.33, 0.21), lapM); sc.position.set(side * 0.72, 0.92, z); sc.rotation.y = side < 0 ? -Math.PI / 2 : Math.PI / 2; sc.rotation.x = 0; scene.add(sc);
   }
   // one standing at the screen
-  const pres = new Person({ id: 'pres', look: 'afSuit4', states: [[0, 'idle']] }, scene); pres.root.position.set(-2.1, 0, -6.6); pres.root.rotation.y = 0.5; people.push(pres);
+  const pres = new Person({ id: 'pres', look: 'afSuit4', states: [[0, 'idle']] }, scene); pres.root.position.set(-3.25, 0, -6.9); pres.root.rotation.y = 0.7;   // beside the screen, clear of its ticker people.push(pres);
   return {
     scene, camera,
     frame(t) {

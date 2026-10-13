@@ -5,7 +5,7 @@
    ===================================================================== */
 
 AF_SET_BUILDERS.port = (app) => {
-  const S = afSet(app, { sky: '#a9b4bf', fog: 0.00013, fogColor: '#aab4bd', fov: 40, sun: [-200, 260, 160], sunColor: '#fff3e0', sunI: 2.2,
+  const S = afSet(app, { sky: '#a9b4bf', fog: 0.00007, fogColor: '#aab4bd', fov: 40, sun: [-200, 260, 160], sunColor: '#fff3e0', sunI: 2.2,
     hemi: ['#c4ccd6', '#4b4a46', 0.9], shadow: 2048, shadowR: 420, shadowFar: 1400, far: 9000, env: ['#c9d1da', '#a6b0ba', '#3a3d40'] });
   const { scene, camera } = S;
   afSky(scene, '#8c9cad', '#b9c2cb', '#8a949c', { r: 6000 });
@@ -92,6 +92,6 @@ AF_SET_BUILDERS.port = (app) => {
       anchor.forEach((s, i) => { s.visible = i < 4 + Math.floor(12 * MathX.smooth(t, AF.port + 0.1, AF.prices - 0.3) + 1e-6); });
       afCam(camera, [afLerp(-430, -360, k), afLerp(170, 185, k), afLerp(-360, -350, k)], [afLerp(-60, -20, k), 0, afLerp(220, 260, k)], 42);
     },
-    grade(t, p) { p.warmth = -0.04; p.saturation = 0.95; p.contrast = 1.08; },
+    grade(t, p) { p.warmth = -0.04; p.saturation = 1.05; p.contrast = 1.15; },
   };
 };

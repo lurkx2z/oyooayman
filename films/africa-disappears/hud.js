@@ -27,17 +27,17 @@ const AF_READOUTS = [
   { from: () => afW(24, 'survive').start, until: () => AF.end - 0.6, label: 'SEA LEVEL, WORLDWIDE', value: '≈ −300 m', sub: 'IF THE BASIN IS ~4 KM DEEP' },
 ];
 const AF_TAGS = [
-  // one clock for the whole film, counted from the vanish (T + 0), so the jumps between sections read as jumps
-  { from: () => AF.mine + 0.1, until: () => AF.mineGo + 1.4, text: 'SOUTH AFRICA · T + 0 s' },
+  // the clock counts from the vanish; the flashbacks to the vanish itself say so, so the jumps read as deliberate
+  { from: () => AF.mine + 0.1, until: () => AF.mineGo + 1.4, text: 'SOUTH AFRICA · THE SAME SECOND' },
   { from: () => AF.gone + 0.1, until: () => AF.trade - 0.2, text: 'T + 3 WEEKS' },
   { from: () => AF.port + 0.1, until: () => AF.prices - 0.1, text: 'ROTTERDAM · T + 1 MONTH' },
-  { from: () => AF.oceans + 0.2, until: () => AF.surge - 0.1, text: 'T + 1 HOUR' },
-  { from: () => AF.surge + 0.1, until: () => AF.ship - 0.15, text: 'T + 2 DAYS · TIME-LAPSE' },
-  { from: () => AF.forest + 0.1, until: () => AF.wild - 0.15, text: 'CONGO BASIN · T + 0 s' },
-  { from: () => AF.wild + 0.1, until: () => AF.flow - 0.2, text: 'TANZANIA · T + 0 s' },
+  { from: () => AF.oceans + 0.2, until: () => AF.surge - 0.1, text: 'MEANWHILE · HOUR 1' },
+  { from: () => AF.surge + 0.1, until: () => AF.ship - 0.15, text: 'DAYS 1–2 · TIME-LAPSE' },
+  { from: () => AF.forest + 0.1, until: () => AF.wild - 0.15, text: 'CONGO BASIN · THE SAME SECOND' },
+  { from: () => AF.wild + 0.1, until: () => AF.flow - 0.2, text: 'TANZANIA · THE SAME SECOND' },
   { from: () => AF.flow + 0.3, until: () => AF.room - 0.2, text: 'ILLUSTRATION · NOT A FORECAST' },
   { from: () => AF.halt + 0.1, until: () => AF.phone - 0.15, text: 'T + 3 MONTHS' },
-  { from: () => AF.coast + 0.2, until: () => AF.earth - 0.15, text: 'TIME-LAPSE · THE FIRST WEEKS' },
+  { from: () => AF.coast + 0.2, until: () => AF.earth - 0.15, text: 'TIME-LAPSE · AS THE BASIN FILLS' },
 ];
 function afReadoutAt(t) {
   for (const R of AF_READOUTS) {

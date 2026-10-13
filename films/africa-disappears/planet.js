@@ -480,7 +480,8 @@ class AfLanes {
    --------------------------------------------------------------------------------------------------------------------- */
 class AfFlow {
   constructor(scene) {
-    this.N = 340; this.M = 30;
+    // ~120 long, thick streamlines from a jittered grid over the hemisphere the camera sees (not random hairlines)
+    this.N = 120; this.M = 44;
     const n = this.N * this.M * 2;
     this.pos = new Float32Array(n * 3); this.col = new Float32Array(n * 3);
     const idx = [];
@@ -490,7 +491,10 @@ class AfFlow {
     this.mesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
     this.mesh.frustumCulled = false; scene.add(this.mesh);
     this.seeds = [];
-    for (let l = 0; l < this.N; l++) this.seeds.push([hash1(l * 7 + 1) * 360 - 180, Math.asin(hash1(l * 7 + 2) * 1.9 - 0.95) * 180 / Math.PI, hash1(l * 7 + 3)]);
+    for (let l = 0; l < this.N; l++) {
+      const gx = l % 12, gy = Math.floor(l / 12);
+      this.seeds.push([-75 + (gx + 0.5 + 0.7 * (hash1(l * 7 + 1) - 0.5)) * (180 / 12), -47 + (gy + 0.5 + 0.7 * (hash1(l * 7 + 2) - 0.5)) * 9.4, hash1(l * 7 + 3)]);
+    }
   }
   // wind (east, north) in deg/step at lon, lat; k blends today's field into the changed one
   field(lo, la, k, t) {
@@ -520,10 +524,10 @@ class AfFlow {
         const p = afDir(lo, la).multiplyScalar(1.012);
         const nx = lo + u * 0.9 / Math.max(0.25, Math.cos(la * Math.PI / 180)), ny = MathX.clamp(la + v * 0.9, -80, 80);
         const q = afDir(nx, ny).multiplyScalar(1.012);
-        const tan = q.clone().sub(p).normalize(), side = p.clone().normalize().cross(tan).normalize().multiplyScalar(0.0016 * (1 - i / this.M * 0.5));
-        const along = i / (this.M - 1), d = Math.abs(along - head), glow = Math.exp(-d * d * 60);
+        const along = i / (this.M - 1), d = along - head, glow = d <= 0 ? Math.exp(-d * d * 90) : Math.exp(-d * d * 2500);   // a bright head with a tail
+        const tan = q.clone().sub(p).normalize(), side = p.clone().normalize().cross(tan).normalize().multiplyScalar(0.0042 * (0.55 + 0.45 * Math.sin(Math.PI * along)) * (1 + 0.6 * glow));
         const changed = F.k * Math.exp(-((((((lo - 20) + 540) % 360) - 180) ** 2) + ((la - 5) ** 2)) / 1600);
-        const a = F.on * (0.18 + 0.9 * glow) * Math.sin(Math.PI * along);
+        const a = F.on * (0.22 + 1.0 * glow) * Math.pow(Math.sin(Math.PI * along), 0.6);
         const c = [0.6 + 0.4 * changed, 0.85 - 0.25 * changed, 1.0 - 0.6 * changed];
         for (let k = 0; k < 2; k++) {
           tmp.copy(p).addScaledVector(side, k ? 1 : -1);

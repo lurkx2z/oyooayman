@@ -111,8 +111,9 @@ afSound('music', 'score', function (ctx, bus, K) {
     A.silence + 0.1, 1.15, { cut: 1500 });
   for (let t = A.surge + 0.75; t < A.silence - 0.1; t += 0.75) M.drum(t, 0.28 + 0.22 * MathX.smooth(t, A.surge, A.silence), 46);
   // ★ the narration-free beat: everything at once (the low brass doubles the root), the drums roll and break
-  M.strings(A.silence - 0.05, A.forest + 0.05, ['D1', 'D2', 'A2', 'D3', 'F3', 'A3', 'D4'], 2.0, { att: 0.15, rel: 0.12, cut: 2400, cutTo: 3600 });
-  M.strings(A.silence - 0.05, A.forest + 0.05, ['D1', 'A1'], 1.2, { att: 0.15, rel: 0.12, cut: 700, wave: 'square', vib: 3 });
+  // (bright rather than heavy: the low end is the drums' and the blows'; the limiter should barely touch it)
+  M.strings(A.silence - 0.05, A.forest + 0.05, ['D2', 'A2', 'D3', 'F3', 'A3', 'D4'], 1.3, { att: 0.15, rel: 0.12, cut: 3500, cutTo: 6000 });
+  M.strings(A.silence - 0.05, A.forest + 0.05, ['A1'], 1.2, { att: 0.15, rel: 0.12, cut: 700, wave: 'square', vib: 3 });
   M.drum(A.silence, 1.1, 41);
   M.roll(A.silence + 0.2, A.forest - 0.35, [[A.silence, 0.2], [A.forest - 0.4, 0.75]]);
   M.drum(A.forest - 0.3, 1.0, 41);
@@ -128,7 +129,7 @@ afSound('music', 'score', function (ctx, bus, K) {
   for (let t = A.room + 0.4; t < A.halt; t += 0.92) M.piano(t, 'D2', 0.32, 0.5, 0, 0.2);
   M.strings(A.room, A.halt + 0.3, ['D2', 'A2', 'E3'], 0.5, { att: 1.0, rel: 0.3, cut: 520 });
   M.strings(A.halt, A.phone + 0.4, ['D1', 'A1', 'D2'], 0.6, { att: 0.5, rel: 0.4, cut: 300 });
-  M.strings(A.phone + 0.6, A.quiet, ['A3'], 0.22, { att: 2.0, rel: 1.4, cut: 2200, vib: 4 });   // (not A4: it beats against the 425 Hz ring)
+  M.strings(A.phone + 0.6, A.quiet, ['A3'], 0.22, { att: 2.0, rel: 1.4, cut: 2200, vib: 4, wave: 'triangle' });   // (A3, triangle: no 440 Hz to beat against the 425 Hz ring)
   // ---- 7: the rebuild: the progression returns and grows; "Earth would survive" opens to F major; the final swell
   M.prog([[A.coast + 0.3, AF_CH.Dm], [A.coast + 2.9, AF_CH.Bb], [A.coast + 5.3, AF_CH.F], [A.maps - 0.2, AF_CH.C], [A.maps + 2.3, AF_CH.Dm]], A.earth + 0.2, 0.75,
     { cut: 900, cutTo: 2000 });
@@ -139,7 +140,7 @@ afSound('music', 'score', function (ctx, bus, K) {
   M.piano(A.never + 0.1, 'D4', 0.45, 3, 0); M.piano(A.never + 0.8, 'A4', 0.36, 2.6, 0.2);
   // ★ the last three seconds: the swell (it is cut, not faded, by the mix at the last frame)
   // (it starts low enough to have somewhere to go: 0.5 → 1.6, brightening all the way)
-  M.strings(A.pull - 0.1, A.end + 0.3, ['D1', 'D2', 'A2', 'D3', 'F3', 'A3', 'D4', 'F4'], 1.6, { att: 0.3, rel: 0.05, cut: 1200, cutTo: 5000, cutAt: A.end, keys: [[A.pull + 0.3, 0.5], [A.end - 0.1, 1.6]] });
+  M.strings(A.pull - 0.1, A.end + 0.3, ['D1', 'D2', 'A2', 'D3', 'F3', 'A3', 'D4', 'F4'], 1.2, { att: 0.3, rel: 0.05, cut: 1200, cutTo: 5000, cutAt: A.end, keys: [[A.pull + 0.3, 0.5], [A.end - 0.1, 1.6]] });
   M.strings(A.pull - 0.1, A.end + 0.3, ['A1'], 1.1, { att: 0.3, rel: 0.05, cut: 600, cutTo: 1200, wave: 'square', vib: 3, keys: [[A.pull + 0.3, 0.5], [A.end - 0.1, 1.3]] });
   M.roll(A.pull + 0.4, A.end, [[A.pull + 0.4, 0.15], [A.end - 0.05, 1.0]]);
   [['D6', 0.6], ['A5', 1.2], ['F6', 1.8], ['D6', 2.4]].forEach(([n, o], i) => M.bell(A.pull + o, n, 0.35 + 0.1 * i, i % 2 ? 0.45 : -0.45));

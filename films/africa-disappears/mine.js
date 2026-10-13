@@ -19,13 +19,13 @@ function afMineH(x, z) {
 const AF_MINE_HAZE = new THREE.Color('#77726a');   // the haze over the abyss: cooler, darker
 AF_SET_BUILDERS.mine = (app) => {
   const S = afSet(app, { sky: '#c9b79a', fog: 0.00005, fogColor: '#b4a896', fov: 38, sun: [620, 230, -260], sunColor: '#ffd3a0', sunI: 2.6,
-    hemi: ['#b9c7d6', '#6b5240', 0.45], shadow: 2048, shadowR: 900, shadowFar: 2000, far: 70000, env: ['#9fb2c6', '#c9b79a', '#5b4a3c'] });
+    hemi: ['#b9c7d6', '#6b5240', 0.32], shadow: 2048, shadowR: 900, shadowFar: 2000, far: 70000, env: ['#9fb2c6', '#c9b79a', '#5b4a3c'] });
   const { scene, camera, U } = S;
-  afSky(scene, '#6f8fb3', '#dcc6a2', '#5a5248', { sunDir: [0.86, 0.32, -0.36], sunGlow: '#ffc27a', r: 20000 });
+  afSky(scene, '#6a8db5', '#d0c2a6', '#5a5248', { sunDir: [0.86, 0.32, -0.36], sunGlow: '#ffc27a', r: 20000 });
   // ---- the ground: one heightfield (3.2 km) + a ring of veld to the horizon
   const N = 420, L = 3200, g = new THREE.PlaneGeometry(L, L, N, N); g.rotateX(-Math.PI / 2);
   const P = g.attributes.position, col = new Float32Array(P.count * 3), c = new THREE.Color();
-  const veldA = new THREE.Color('#857a50'), veldB = new THREE.Color('#9c8c62'), rockA = new THREE.Color('#5e4a3e'), rockB = new THREE.Color('#7d7268'), road = new THREE.Color('#c4b092'), pool = new THREE.Color('#2c4a40');
+  const veldA = new THREE.Color('#857a50'), veldB = new THREE.Color('#9c8c62'), rockA = new THREE.Color('#6b4030'), rockB = new THREE.Color('#7d7268'), road = new THREE.Color('#c4b092'), pool = new THREE.Color('#2c4a40');
   for (let i = 0; i < P.count; i++) {
     const x = P.getX(i), z = P.getZ(i), r = Math.hypot(x / 1.3, z);
     let y = afMineH(x, z);
@@ -35,7 +35,7 @@ AF_SET_BUILDERS.mine = (app) => {
       const d = (560 - r) / 34, f = d - Math.floor(d), top = f < 0.5 ? 1 : 0;
       // rock strata: alternating rust and grey bands down the pit; the bench tops are dusty haul roads
       c.copy(rockA).lerp(rockB, MathX.clamp(0.5 + 0.5 * Math.sin(Math.floor(d) * 1.7) + 0.3 * fbm1(x * 0.02 + z * 0.013, 4)));
-      if (top) c.lerp(road, 0.6);
+      if (top) c.lerp(road, 0.35);
       if (y < -15 * 12.2) c.copy(pool);
     } else {
       c.copy(veldA).lerp(veldB, 0.5 + 0.5 * fbm1(x * 0.006 - z * 0.004, 7));
@@ -91,8 +91,9 @@ AF_SET_BUILDERS.mine = (app) => {
     frame(t, shot) {
       const k = afK(t, AF.mine, AF.platinum, Ease.inOutSine);
       const dn = afK(t, AF.mineGo + 0.5, AF.platinum, Ease.inOutSine);
-      // from just above the rim, across the pit; after the vanish the camera tips down into the abyss
-      afCam(camera, afV([-820, 150, 520], [-700, 135, 430], k), afV(afV([200, -120, -60], [240, -130, -40], k), [300, -900, -60], dn), 40);
+      // from just above the rim, across the pit; after the vanish the camera tips down into the abyss, toward the far
+      // horizon of the floor 4 km below (so the depth reads: a dark plain receding into haze under the same sky)
+      afCam(camera, afV([-820, 150, 520], [-700, 135, 430], k), afV(afV([200, -120, -60], [240, -130, -40], k), [1500, -700, -300], dn), 40);
       const fk = MathX.smooth(t, AF.mineGo + 0.3, AF.mineGo + 1.8);
       scene.fog.density = afLerp(0.00005, 0.0000045, fk); scene.fog.color.set('#b4a896').lerp(AF_MINE_HAZE, fk);
       for (const T of trucks) { const p = truckAt(T, t); T.g.position.set(p.x, p.y, p.z); T.g.rotation.y = p.yaw; }

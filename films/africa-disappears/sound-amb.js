@@ -160,7 +160,7 @@ afSound('amb', 'places', function (ctx, bus, K) {
   afTone(K, A.prices, A.oceans - A.prices, 100, [[1, 1], [2, 0.6], [3, 0.2]], null, { vol: 0.02, pan: -0.4 });
   afBed(K, A.prices, A.oceans, { colour: 'pink', f: [['bp', 500, 0.8], ['lp', 1600]], vol: 0.04, am: 0.4, room: hall, wet: 0.6 });
   // ---- the oceans: the roar of the Atlantic falling 4 km; then the fronts crossing the floor
-  afBed(K, A.oceans, A.surge, { colour: 'brown', f: [['lp', 900], ['peak', 140, 0.7, 4]], vol: 0.36, am: 0.25, wr: 1.4, fi: 0.9, env: (u) => 0.35 + 0.65 * u });
+  afBed(K, A.oceans - 0.8, A.surge, { colour: 'brown', f: [['lp', 900], ['peak', 140, 0.7, 4]], vol: 0.24, am: 0.25, wr: 1.4, fi: 0.6, env: (u) => 0.35 + 0.65 * u });   // (swells in the pause before "And then")
   afBed(K, A.oceans + 0.3, A.surge, { colour: 'pink', f: [['bp', 1300, 0.7]], vol: 0.09, am: 0.5, wr: 3, fi: 1.0, env: (u) => u });
   afBed(K, A.surge, A.ship, { colour: 'brown', f: [['lp', 700]], vol: 0.2, am: 0.35, wr: 0.9, fi: 0.08 });
   afBed(K, A.surge, A.ship, { colour: 'pink', f: [['bp', 900, 0.6]], vol: 0.07, am: 0.6, wr: 2 });

@@ -8,7 +8,7 @@
 
 AF_SET_BUILDERS.forest = (app) => {
   // ======================================================= the rainforest
-  const C = afSet(app, { sky: '#b9c4b8', fog: 0.00022, fogColor: '#a9b7b0', fov: 42, sun: [700, 260, 60], sunColor: '#ffe2b8', sunI: 2.4,
+  const C = afSet(app, { sky: '#b9c4b8', fog: 0.00011, fogColor: '#a9b7b0', fov: 42, sun: [700, 260, 60], sunColor: '#ffe2b8', sunI: 2.4,
     hemi: ['#c8d4d8', '#2c3a22', 0.7], far: 70000, env: ['#c8d4d8', '#9aa898', '#1a2416'] });
   afSky(C.scene, '#8aa3b8', '#e6d9c2', '#5c625e', { sunDir: [0.55, 0.18, -0.8], sunGlow: '#ffd29a', r: 20000 });
   afFloor(C.scene, 4000, { z: -400, a: '#26231f', b: '#6e6456' });
@@ -119,7 +119,7 @@ AF_SET_BUILDERS.forest = (app) => {
         const u = t - AF.forestGo;
         C.U.uDisK.value = u < 0 ? -1e3 : u < 0.25 ? afLerp(-7, -1.1, 1 - Math.pow(1 - u / 0.25, 2)) : u < 0.8 ? afLerp(-1.1, -0.03, (u - 0.25) / 0.55) : afLerp(-0.03, 0.3, Math.min(1, (u - 0.8) / 0.12));
         mist.mesh.visible = t < AF.forestGo + 1.0;
-        C.scene.fog.density = afLerp(0.00022, 0.000009, MathX.smooth(t, AF.forestGo + 0.05, AF.forestGo + 0.75));
+        C.scene.fog.density = afLerp(0.00011, 0.000009, MathX.smooth(t, AF.forestGo + 0.05, AF.forestGo + 0.75));
       } else {
         const k = afK(t, AF.wild, AF.flow, (x) => x);
         for (const e of elephants) {
@@ -136,7 +136,7 @@ AF_SET_BUILDERS.forest = (app) => {
       }
     },
     grade(t, p, shot) {
-      if (shot.mode === 'canopy') { p.warmth = 0.03; p.saturation = 1.05; p.bloom = 0.3; }
+      if (shot.mode === 'canopy') { p.warmth = 0.03; p.saturation = 1.12; p.contrast = 1.14; p.bloom = 0.3; }
       else { p.warmth = 0.1; p.saturation = 1.08; p.bloom = 0.45; p.bloomThreshold = 0.85; p.vignette = 0.65; }
     },
   };

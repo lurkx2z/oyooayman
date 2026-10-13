@@ -1,7 +1,6 @@
 /* =====================================================================
    SET · STORM — a container ship in the churned Atlantic as the ocean pours toward the basin. A heavy swell (crests
-   ~12 m above the troughs), wind-torn foam, low spindrift (no rain: the sea is churned by the currents, not a
-   storm). The ship pitches into the seas and the bow throws up walls of spray.
+   ~12 m above the troughs), wind-torn foam (no rain: the sea is churned by the currents, not a storm). The ship pitches into the seas and the bow throws up walls of spray.
    This shot carries the film's first narration-free beat (3 s of water, ship and music).
    The sea is a sum of Gerstner waves, evaluated identically on the GPU (the surface) and the CPU (the ship's motion,
    the spray), so everything stays a pure function of time.
@@ -134,7 +133,7 @@ AF_SET_BUILDERS.storm = (app) => {
   const hullM = afMat('#26364a', { roughness: 0.5 }), redM = afMat('#6b211c', { roughness: 0.7 }), whiteM = afMat('#d7d5cf', { roughness: 0.6 });
   const hull = new THREE.Mesh(hullG, hullM); hull.castShadow = true; ship.add(hull);
   const boot = new THREE.Mesh(hullG, redM); boot.scale.set(1.004, 0.45, 1.01); boot.position.y = -6.6; ship.add(boot);
-  const deckCols = ['#2d4a66', '#7a3029', '#bdbab2', '#3f5a4c', '#9a5a30', '#646a70', '#2a3448', '#857a44'];
+  const deckCols = ['#2f5f8f', '#a8382c', '#c9c6be', '#3f7350', '#c0602c', '#7c8288', '#26467a', '#b08a2a'];
   const cb = new THREE.BoxGeometry(12.2, 2.6, 2.44), cm = afMat('#ffffff', { roughness: 0.7 });
   const ci = new THREE.InstancedMesh(cb, cm, 1600), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1), c = new THREE.Color();
   let n = 0;
@@ -142,7 +141,7 @@ AF_SET_BUILDERS.storm = (app) => {
     const x = -L / 2 + 42 + bay * 13.2, tiers = 3 + Math.floor(afR(bay * 20 + row, 2) * 4);
     const narrow = x > L / 2 - 45 ? Math.max(0, Math.floor((x - (L / 2 - 45)) / 6)) : 0;
     if (row < narrow || row > 10 - narrow) continue;
-    for (let k = 0; k < tiers; k++) { ci.setMatrixAt(n, m4.compose(v.set(x, 10 + 1.3 + k * 2.6, -12.2 + row * 2.44), q, one)); ci.setColorAt(n, c.set(deckCols[Math.floor(afR(n, 5) * 8)]).multiplyScalar(0.6 + 0.2 * afR(n, 6))); n++; }
+    for (let k = 0; k < tiers; k++) { ci.setMatrixAt(n, m4.compose(v.set(x, 10 + 1.3 + k * 2.6, -12.2 + row * 2.44), q, one)); ci.setColorAt(n, c.set(deckCols[Math.floor(afR(n, 5) * 8)]).multiplyScalar(0.85 + 0.25 * afR(n, 6))); n++; }
   }
   ci.count = n; ci.castShadow = true; ship.add(ci);
   afBox(14, 26, 28, whiteM, -L / 2 + 22, 23, 0, ship); afBox(10, 4, 34, whiteM, -L / 2 + 22, 34, 0, ship);
@@ -151,8 +150,8 @@ AF_SET_BUILDERS.storm = (app) => {
   const navR = new THREE.Mesh(new THREE.SphereGeometry(0.6, 8, 6), new THREE.MeshBasicMaterial({ color: '#ff3a2a' })); navR.position.set(-L / 2 + 22, 36.5, -17.5); ship.add(navR);
   const navG = new THREE.Mesh(new THREE.SphereGeometry(0.6, 8, 6), new THREE.MeshBasicMaterial({ color: '#3aff7a' })); navG.position.set(-L / 2 + 22, 36.5, 17.5); ship.add(navG);
   const lampW = new THREE.PointLight('#ffe0b0', 0, 60, 1.6); lampW.position.set(-L / 2 + 28, 30, 0); ship.add(lampW);
-  // spray, and spindrift torn off the crests
-  const spray = new BillboardSystem(scene, 1400, false), drift = new StreakSystem(scene, 600);
+  // spray off the bow
+  const spray = new BillboardSystem(scene, 1400, false);
   // a torn, cloudy spray puff (not a round dot)
   spray.uniforms.uMap.value = (() => {
     const c = Tex.canvas(128, 128), x = c.getContext('2d'), rng = new RNG(7);
@@ -192,17 +191,8 @@ AF_SET_BUILDERS.storm = (app) => {
         spray.push(x, y, z, sz, b, a, 1.0, 0.8, 0.84, 0.86);
       }
       spray.end();
-      // spindrift: short streaks skimming the water around the camera, blown along with the swell
-      drift.begin();
-      for (let i = 0; i < 520; i++) {
-        const h1 = afR(i, 1), h2 = afR(i, 2), h3 = afR(i, 3), ph = (h3 + t * 0.55) % 1;
-        const rx = cx - 30 + (h1 - 0.5) * 160 - 60 + ph * 140, rz = cz + 20 + (h2 - 0.5) * 140;
-        const ry = afWaveH(rx, rz, t) + 0.4 + 2.2 * h2, fade = Math.sin(Math.PI * ph);
-        drift.push(rx, ry, rz, rx - 3.2, ry - 0.15, rz + 0.5, 0.82, 0.86, 0.88, 0.22 * fade, 0.05);
-      }
-      drift.end();
       lampW.intensity = 6;
     },
-    grade(t, p) { p.warmth = -0.08; p.saturation = 0.78; p.contrast = 1.12; p.vignette = 0.75; p.grain = 0.035; },
+    grade(t, p) { p.warmth = -0.06; p.saturation = 0.92; p.contrast = 1.14; p.vignette = 0.75; p.grain = 0.035; },
   };
 };

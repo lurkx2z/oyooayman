@@ -50,7 +50,7 @@ afSound('sfx', 'events', function (ctx, bus, K) {
   const hall = K.verb('hallS', 2.8, { bright: 0.45, damp: 3, wet: 0.5, seed: 41 }), big = K.verb('bigS', 4.5, { bright: 0.4, damp: 2.4, wet: 0.55, seed: 43 });
   // ---- 1: the continent goes; the cities' lights go out
   afVanish(K, A.van0 - 0.25, { size: 1.15, d: 1.25 });
-  for (let i = 0; i < 7; i++) K.put(afCrackle(fx, 0.25, { rate: 500, hp: 2500, env: (u) => 1 - u }), A.erased + 0.15 + i * 0.32 + r.range(0, 0.1), { vol: 0.06, norm: true, pan: r.range(-0.5, 0.5), room: big, wet: 0.3 });
+  for (let i = 0; i < 7; i++) K.put(afCrackle(fx, 0.25, { rate: 500, hp: 2500, env: (u) => 1 - u }), A.erased + 0.15 + i * 0.32 + r.range(0, 0.1), { vol: 0.15, norm: true, pan: r.range(-0.5, 0.5), room: big, wet: 0.3 });
   // ---- 2: the mine: the seam comes in from the horizon (a roar that grows and opens), passes us, and the ground is gone
   {
     const d = 1.45, n = Math.ceil(d * sr), y = afNoise(fx, n, 'pink'), curve = new Float32Array(64);
@@ -105,7 +105,7 @@ afSound('sfx', 'events', function (ctx, bus, K) {
       afBlow(K, t, { f0: 54, tau: 0.3, vol: 0.24 * k * quiet, pan: 0.1 });
       { const n = Math.ceil(1.2 * sr), z = afNoise(fx, n, 'white'); GBX.bq(z, 'hp', 1500, 0.7, sr); GBX.bq(z, 'lp', 11000, 0.7, sr);
         for (let j = 0; j < n; j++) z[j] *= Math.min(1, j / (0.004 * sr)) * Math.exp(-j / (0.28 * sr));
-        K.put(z, t + 0.03, { vol: 0.2 * k * quiet, norm: true, pan: 0.12 }); }
+        K.put(z, t + 0.03, { vol: 0.28 * k * quiet, norm: true, pan: 0.12 }); }
       { const n = Math.ceil(1.6 * sr), z = afNoise(fx, n, 'pink'); GBX.bq(z, 'lp', 2200, 0.7, sr);
         for (let j = 0; j < n; j++) z[j] *= Math.min(1, j / (0.01 * sr)) * Math.exp(-j / (0.45 * sr));
         K.put(z, t + 0.05, { vol: 0.2 * k * quiet, norm: true, pan: 0.05 }); }
@@ -113,6 +113,13 @@ afSound('sfx', 'events', function (ctx, bus, K) {
       K.put(fx.creak(1.1, [[r.range(210, 260), 0.03, 1], [r.range(520, 600), 0.02, 0.6], [r.range(1100, 1300), 0.01, 0.3]], { rate: [18, 45] }), t + 0.25, { vol: 0.05 * k, norm: true, pan: -0.3, room: big, wet: 0.6 });
     }
   }
+  // ★ the narration-free beat opens with a crash of water (bright, so a phone hears the hit), drawn in by a reversed swell
+  { const n = Math.ceil(1.6 * sr), z = afNoise(fx, n, 'white'); GBX.bq(z, 'hp', 2000, 0.7, sr); GBX.bq(z, 'lp', 12000, 0.7, sr);
+    for (let j = 0; j < n; j++) z[j] *= Math.min(1, j / (0.003 * sr)) * Math.exp(-j / (0.42 * sr));
+    K.put(z, A.silence, { vol: 0.3, norm: true });
+    const m = Math.ceil(0.7 * sr), w = afNoise(fx, m, 'pink'); GBX.bq(w, 'hp', 900, 0.7, sr);
+    for (let j = 0; j < m; j++) { const u = j / m; w[j] *= Math.pow(u, 3) * Math.min(1, (m - j) / (0.004 * sr)); }
+    K.put(w, A.silence - 0.7, { vol: 0.16, norm: true }); }
   // ---- 5: the rainforest goes; the waterhole goes (an elephant calls just before)
   afVanish(K, A.forestGo - 0.35, { size: 0.85, d: 1.15, rush: 0.5 });
   K.put(afTrumpet(fx), A.wild + 0.12, { vol: 0.06, norm: true, pan: -0.35, room: big, wet: 1.2 });

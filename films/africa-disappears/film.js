@@ -132,9 +132,9 @@ function afPlanetLabels(t, shot, app) {
     // so it is dropped if it would leave the frame, cross the readout (top left) or the caption (lower third)
     const n0 = out.length;
     ['Cairo', 'Lagos', 'Kinshasa', 'Luanda', 'Khartoum', 'Abidjan'].forEach((nm, i) => {
-      const [name, lon, lat, pop] = AF_CITIES.find((c) => c[0] === nm);
+      const [name, lon, lat] = AF_CITIES.find((c) => c[0] === nm);   // (names only: the dataset's populations are city proper)
       const a = MathX.smooth(t, AF.erased + 0.3 + i * 0.35, AF.erased + 0.8 + i * 0.35) * (1 - MathX.smooth(t, AF.mine - 0.5, AF.mine - 0.1));
-      put(lon, lat, `<span class="d"></span>${name}<small>${(pop / 1e6).toFixed(1)} M</small>`, a);
+      put(lon, lat, `<span class="d"></span>${name}`, a);
     });
     for (let i = out.length - 1; i >= n0; i--) { const l = out[i]; if (l.x < 0.03 || l.x > 0.8 || (l.y > 0.62 && l.y < 0.82) || l.y < 0.1 || l.y > 0.93 || (l.y < 0.25 && l.x < 0.55)) out.splice(i, 1); }
   }

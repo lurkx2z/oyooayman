@@ -54,9 +54,9 @@ AF.geo = afS(15);
 AF.silence = afE(15);                                 // NO NARRATION: water, ship, music
 // 5 — THE ENVIRONMENTAL DISASTER
 AF.forest = afS(16) - 0.45;                           // the Congo rainforest, the same second
-AF.forestGo = afW(17, 'gone').start - 0.25;           // ★ it dissolves
+AF.forestGo = afW(17, 'gone').start - 0.65;           // ★ it dissolves (the seam is through the canopy by the end of "gone")
 AF.wild = afW(17, 'entire').start - 0.2;              // elephants at a waterhole
-AF.savGo = afW(17, 'vanish').start - 0.3;            // ★ the waterhole goes
+AF.savGo = afW(17, 'vanish').start - 0.7;            // ★ the waterhole goes (gone by the end of "vanish")
 AF.flow = afS(18) - 0.3;                              // the turning Earth: circulation lines
 AF.flowBend = afW(18, 'winds').start;
 // 6 — HUMANITY FACES THE AFTERMATH
@@ -79,11 +79,12 @@ CONFIG.render.shadowMapSize = 2048;
 
 // the story's slow processes, as functions of time (the HUD, the picture and the sound all read these)
 // the basin's fill: the front (km from the old coast) and the level (0 = the floor, 1 = the sea), time-lapsed
+// (by the first hour the whole wall is a waterfall: the front starts at its foot, ~60 km out, and crosses the floor)
 function afFill(t) {
   if (t < AF.oceans) return { front: 0, level: 0, foam: 0, hours: 0 };
   const k = MathX.clamp((t - AF.oceans) / (AF.ship - AF.oceans), 0, 1);
   const front = 30 + 1900 * Math.pow(Ease.inOutSine(MathX.clamp((t - AF.surge + 1.2) / (AF.ship - AF.surge + 1.2), 0, 1)), 1.15);
-  return { front: t < AF.surge - 1.2 ? 120 * Math.pow(MathX.smooth(t, AF.oceans + 0.2, AF.surge - 1.2), 0.8) : Math.max(front, 120), level: 0.35 * MathX.smooth(t, AF.currents, AF.ship + 0.5), foam: 1 - 0.4 * k, hours: k };
+  return { front: t < AF.surge - 1.2 ? 60 + 60 * Math.pow(MathX.smooth(t, AF.oceans + 0.2, AF.surge - 1.2), 0.8) : Math.max(front, 120), level: 0.35 * MathX.smooth(t, AF.currents, AF.ship + 0.5), foam: 1 - 0.4 * k, hours: k };
 }
 // the world's sea level drop (0…1 = 0…300 m) as the basin fills (the coast shot runs days; the final Earth: all of it)
 function afSea(t) { return t < AF.coast ? 0 : t < AF.earth ? 0.4 * MathX.smooth(t, AF.coast + 0.5, AF.earth) : 1; }
