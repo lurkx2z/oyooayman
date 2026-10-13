@@ -94,7 +94,7 @@ project's shared folder `blind-echolocation/` with everything else (and the sour
 | Final mix (stereo, mastered) and the narration track as it sits in the mix | `audio/blind-echolocation_final_mix.flac`, `audio/blind-echolocation_narration_track.flac` |
 | The fourteen voice clips with their word timings (made by the narration thread, untouched) | `narration/` |
 | Screenplay, transcript, subtitles (SRT, VTT), master timeline (MD, JSON) | `docs/` (also in this folder of the repo) |
-| Contact sheets, one per scene, a frame every 2.5 s from the final render | `contact-sheets/scene01.jpg … scene14.jpg` |
+| Contact sheets, one per scene, a frame every 2.5 s from the final render | `contact-sheets/scene01.jpg … scene14.jpg` (also in this folder of the repo) |
 | The colour fix, before and after | `review/sound-view-colour-fix_before_after.jpg` |
 | This report | `docs/EPISODE_REPORT.md` |
 
