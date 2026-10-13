@@ -67,7 +67,7 @@ function beClassify(name) {
 }
 
 const BE_AC_GLSL = /* glsl */`
-uniform float uBeAc, uBeT, uBeGain, uBeDecay, uBeLine, uBeFall, uBeRefl, uBeCrisp, uBeReal, uBeGrpGain;
+uniform float uBeAc, uBeT, uBeGain, uBeDecay, uBeLine, uBeFall, uBeRefl, uBeCrisp, uBeReal, uBeGrpGain, uBeSat;
 uniform vec4 uBePO[16]; uniform vec4 uBePP[16]; uniform vec4 uBePD[16]; uniform vec4 uBeCS[24]; uniform float uBeCSFall; uniform vec4 uBeLS[10]; uniform float uBeLSFall; uniform vec4 uBeRev; uniform vec3 uBeN;
 uniform vec3 uBeColA, uBeColB, uBeColC;
 varying vec3 vBeW;
@@ -142,19 +142,21 @@ vec3 beAcoustic(vec3 P, vec3 N) {
 
 BE_AC.real.water = BE_AC.real.world;   // open water: a mirror for sound, it sends a click on, it answers little
 const _beMats = new Set();
-// o: refl, crisp, group ('world' | 'hero' | 'glow'). Idempotent per material.
+// o: refl, crisp, group ('world' | 'hero' | 'glow'), sat. Idempotent per material.
 function beAcoustic(m, o = {}) {
   if (!m || m.userData.beAc) return m;
   const c = beClassify(m.name);
-  const refl = o.refl ?? c.refl, crisp = o.crisp ?? c.crisp, grp = o.group || 'world';
-  m.userData.beAc = { refl, crisp, grp };
+  // sat: how much colour is left of the picture in the acoustic view (sound carries no colour, so the world is greyed;
+  // she keeps hers: her greyed yellow top read as bare skin)
+  const refl = o.refl ?? c.refl, crisp = o.crisp ?? c.crisp, grp = o.group || 'world', sat = o.sat ?? 0.45;
+  m.userData.beAc = { refl, crisp, grp, sat };
   const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey ? m.customProgramCacheKey.bind(m) : () => '';
   m.onBeforeCompile = (sh, r) => {
     if (prev) prev.call(m, sh, r);
     Object.assign(sh.uniforms, {
       uBeAc: BE_AC.uBeAc, uBeT: BE_AC.uBeT, uBeGain: BE_AC.uBeGain, uBeDecay: BE_AC.uBeDecay, uBeLine: BE_AC.uBeLine, uBeFall: BE_AC.uBeFall,
       uBePO: BE_AC.uBePO, uBePP: BE_AC.uBePP, uBePD: BE_AC.uBePD, uBeCS: BE_AC.uBeCS, uBeCSFall: BE_AC.uBeCSFall, uBeLS: BE_AC.uBeLS, uBeLSFall: BE_AC.uBeLSFall, uBeRev: BE_AC.uBeRev, uBeN: BE_AC.uBeN, uBeColA: BE_AC.uBeColA, uBeColB: BE_AC.uBeColB, uBeColC: BE_AC.uBeColC,
-      uBeRefl: { value: refl }, uBeCrisp: { value: crisp }, uBeReal: BE_AC.real[grp], uBeGrpGain: BE_AC.gain[grp],
+      uBeRefl: { value: refl }, uBeCrisp: { value: crisp }, uBeReal: BE_AC.real[grp], uBeGrpGain: BE_AC.gain[grp], uBeSat: { value: sat },
     });
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', '#include <common>\nvarying vec3 vBeW;')
@@ -170,7 +172,7 @@ function beAcoustic(m, o = {}) {
         if (uBeAc > 0.001) {
           vec3 beN = normalize(inverseTransformDirection(normal, viewMatrix));
           vec3 beA = beAcoustic(vBeW, beN);
-          vec3 beC = mix(vec3(dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114))), gl_FragColor.rgb, 0.45);   // sound carries no colour: what is left of the picture is greyed
+          vec3 beC = mix(vec3(dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114))), gl_FragColor.rgb, uBeSat);   // sound carries no colour: what is left of the picture is greyed (not her)
           gl_FragColor.rgb = mix(gl_FragColor.rgb, beC * uBeReal + beA, uBeAc);
         }`);
     if (!/beAcoustic\(vBeW/.test(sh.fragmentShader)) console.warn('beAcoustic: injection failed for', m.name);
@@ -181,12 +183,12 @@ function beAcoustic(m, o = {}) {
   return m;
 }
 
-// apply to every standard material under a root (group defaults to 'world')
-function beAcousticScene(root, group = 'world', over = {}) {
+// apply to every standard material under a root (group defaults to 'world'; base: options for all of them)
+function beAcousticScene(root, group = 'world', over = {}, base = {}) {
   root.traverse((o) => {
     if (!o.isMesh || o.userData.beSkip) return;
     const ms = Array.isArray(o.material) ? o.material : [o.material];
-    for (const m of ms) if (m && m.isMeshStandardMaterial) beAcoustic(m, Object.assign({ group }, over[m.name] || {}));
+    for (const m of ms) if (m && m.isMeshStandardMaterial) beAcoustic(m, Object.assign({ group }, base, over[m.name] || {}));
   });
 }
 

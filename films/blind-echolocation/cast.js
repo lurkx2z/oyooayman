@@ -52,7 +52,7 @@ class BeCast {
     const H = new GbCharacter(scene, look, { name: 'noor-' + scene.name });
     // the face takes no cast shadows (the skull's overhang would draw a hard line across the jaw in close-ups)
     H.J.hc.traverse((o) => { if (o.isMesh) o.receiveShadow = false; });
-    beAcousticScene(H.root, 'hero');
+    beAcousticScene(H.root, 'hero', {}, { sat: 1 });   // she keeps her colours in the acoustic view
     return H;
   }
 
