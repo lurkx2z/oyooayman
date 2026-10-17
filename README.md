@@ -376,6 +376,18 @@ tools/render-preview.cjs   optional frame-exact MP4 renderer
 
 **To retime or restage anything, edit `js/scene/script.js`.** Each vehicle there says where it should end up (`stopS`) and how hard it brakes. The code works out where it has to start. A built-in check warns in the console if two cars would overlap.
 
+Film: *What if your car could fly?* (the Tesla Roadster, `tesla-flying-roadster.html`, narrated, 9:16):
+
+```
+films/tesla-flying-roadster/PLAN.md          physics, sources, shot list
+films/tesla-flying-roadster/script.js        ★ beats keyed to the narration's words (narration-timing.js)
+films/tesla-flying-roadster/motion.js        the curl ramp and the demo run (integrated once, pure function of time)
+films/tesla-flying-roadster/roadster.js      the car: body, canopy, fans, 10 nozzles, x-ray, cabin
+films/tesla-flying-roadster/site*.js         the test site and its shots; sky.js the stunt plane and the stall
+films/tesla-flying-roadster/hud.js           readouts, tags, the three-ways chips, the verdict
+films/tesla-flying-roadster/sound-*.js       score, ambience, effects (mix.js levels, audio.js the engine subclass)
+```
+
 ## Science notes (what the simulation assumes)
 
 These were checked by an independent science review pass; see the review summary in the session.
