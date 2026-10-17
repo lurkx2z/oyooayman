@@ -46,7 +46,7 @@ similarity: 0.75
 
 [loop] And Tesla's ramp has a speed trick of its own. Think of a toy car on a loop.
 
-[curve] Going round a curve, the track has to keep pushing the car inward. At the top of the loop, inward is up. If the car is fast enough, the track is pushing it into the ceiling.
+[curve] Going round a curve, a car keeps trying to carry on straight. At the top of the loop, straight on means up, into the track. If it's fast enough, that alone pins it to the ceiling.
 
 [numbers] For a loop this size, you'd only need about twenty-five kilometres an hour. Stunt drivers have done full loops in real cars this way.
 
