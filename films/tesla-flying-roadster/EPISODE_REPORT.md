@@ -40,5 +40,7 @@ sound 7. Top fixes applied in v2 (see `PLAN.md` § 5). v2 not re-scored.
 
 ## Deliverables
 - Runnable ZIPs: `/mnt/project-files/tesla-flying-roadster/tesla-flying-roadster-v1.zip`, `-v2.zip`.
-- Final MP4: rendered on the owner's GPU with `node films/tesla-flying-roadster/render-gpu.cjs --channel chrome`
-  (output in `renders/tesla-flying-roadster/` on that PC).
+- Final MP4 (2026-10-17, commit deb7b7d, rendered on the owner's GPU with
+  `node films/tesla-flying-roadster/render-gpu.cjs --channel chrome`, ~24 fps): `renders/tesla-flying-roadster/` on that PC.
+  `tesla-flying-roadster_final.mp4` is 26.2 MiB, H.264 1080×1920 30 fps, 152.07 s, −15.3 LUFS and −1.9 dBTP (measured);
+  `_master.mp4` is 439 MiB.
