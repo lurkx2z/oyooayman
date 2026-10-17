@@ -67,16 +67,17 @@ trSound('amb', 'places', function (ctx, bus, K) {
       const curve = new Float32Array(Math.ceil(d * 30)); for (let j = 0; j < curve.length; j++) curve[j] = 300 + 1600 * Math.pow(trSkyV(t0 + j / 30) / 69, 1.5);
       trSweepPut(K, y, t0, 'bandpass', 0.8, curve, { vol: 0.13, pan: k ? 0.35 : -0.35 });
     }
-    // the engine: a buzzy firing note (≈ 2700 rpm at cruise) and its harmonics, a little throatier as the speed bleeds
+    // the engine: a six-cylinder's firing note (≈ 135 Hz at 2,700 rpm) over the two-blade prop's 90 Hz beat, a little
+    // throatier as the speed bleeds
     const y = fx.arr(d); let ph = 0;
     for (let i = 0; i < n; i++) {
-      const t = t0 + i / sr, v = trSkyV(t), f = 45 * (0.75 + 0.25 * v / 69) * (t > A.stall ? 0.92 : 1);
+      const t = t0 + i / sr, v = trSkyV(t), f = 135 * (0.75 + 0.25 * v / 69) * (t > A.stall ? 0.92 : 1);
       ph += 2 * Math.PI * f / sr;
-      const pulse = Math.pow(Math.max(0, Math.sin(ph)), 4) - 0.2 + 0.25 * Math.sin(2 * ph + 0.4) + 0.15 * Math.sin(3 * ph);
+      const pulse = Math.pow(Math.max(0, Math.sin(ph)), 4) - 0.2 + 0.25 * Math.sin(2 * ph + 0.4) + 0.15 * Math.sin(3 * ph) + 0.35 * Math.sin(ph * 2 / 3) + 0.15 * Math.sin(ph * 4 / 3);
       const far = t > A.fall ? 1 - 0.6 * MathX.smooth(t, A.fall, A.suck) : 1;
       y[i] = pulse * far * Math.min(1, i / (0.05 * sr), (n - i) / (0.05 * sr));
     }
-    GBX.bq(y, 'lp', 1400, 0.7, sr); GBX.bq(y, 'peak', 160, 1, sr, 4);
+    GBX.bq(y, 'lp', 2200, 0.7, sr); GBX.bq(y, 'peak', 270, 1, sr, 3);
     K.put(y, t0, { vol: 0.07, norm: true, pan: -0.1, room: open, wet: 0.3 });
     // the stall's buffet: the airflow breaking away from the wing shakes it (a rough, low rattle)
     trBed(K, A.stall - 0.35, A.fall + 1.2, { colour: 'brown', f: [['bp', 70, 0.8], ['lp', 400]], vol: 0.18, am: 0.9, wr: 9, fi: 0.3, fo: 0.6, env: (u) => Math.sin(Math.PI * Math.min(1, u * 1.4)) });

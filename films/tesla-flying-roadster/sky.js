@@ -11,7 +11,7 @@
 // airspeed (m/s): 250 km/h cruising, bleeding to 80 km/h by the stall, picking up again in the fall
 function trSkyV(t) {
   const slow = MathX.smooth(t, TR.slow, TR.stall + 0.2), fall = MathX.smooth(t, TR.fall, TR.suck);
-  return MathX.lerp(MathX.lerp(69, 22, slow), 38, fall);
+  return MathX.lerp(MathX.lerp(69, 28, slow), 40, fall);
 }
 // lift as a fraction of the weight it can carry (1 = level flight): ∝ v², times what the angle of attack adds; after
 // the stall it collapses
@@ -188,10 +188,10 @@ TR_SET_BUILDERS.sky = (app) => {
       const cam = camera, P = plane.g.position;
       if (t < TR.lift) {
         const kk = trK(t, TR.plane, TR.lift);
-        trCamD(cam, [P.x + trLerp(10, 7, kk), P.y + trLerp(2.2, 1.0, kk), trLerp(13, 15, kk)], [P.x - 0.5, P.y, 0], trLerp(38, 42, kk), t, 0.7);
+        trCamD(cam, [P.x + trLerp(7, 3, kk), P.y + trLerp(2.0, 1.0, kk), trLerp(19, 21, kk)], [P.x + 0.3, P.y, 0], trLerp(40, 42, kk), t, 0.7);
       } else if (t < TR.fall) {
         const kk = trK(t, TR.lift, TR.fall);
-        trCamD(cam, [P.x - 3.2, P.y * 0.5 + trLerp(0.8, 0.2, kk), trLerp(25, 23, kk)], [P.x - 3.2, P.y * 0.6 - 0.4, 0], 44, t, 0.5);
+        trCamD(cam, [P.x - 1.8, P.y * 0.5 + trLerp(0.8, 0.2, kk), trLerp(28, 26, kk)], [P.x - 1.8, P.y * 0.6 - 0.4, 0], 44, t, 0.5);
       } else {
         // it falls away; the camera tips down and follows it, lagging, so it shrinks but stays in frame
         const kk = trK(t, TR.fall, TR.suck);

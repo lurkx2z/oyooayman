@@ -8,8 +8,8 @@
 
    Writes to renders/tesla-flying-roadster/:
      tesla-flying-roadster_final.mp4          THE deliverable: 1080×1920 30 fps, two-pass sized under 30 MiB, AAC 160k copied
-                                          (−15.7 LUFS, −1.3 dBTP, measured)
-     tesla-flying-roadster_master.mp4         1080×1920 H.264 CRF 18 + AAC 256k (−15.7 LUFS, −1.7 dBTP): the archive copy
+                                          (−15.3 LUFS, −1.9 dBTP, measured)
+     tesla-flying-roadster_master.mp4         1080×1920 H.264 CRF 18 + AAC 256k (−15.3 LUFS, −1.8 dBTP): the archive copy
      check.jpg                            8 frames across the film
    Resumable: re-run the same command and finished 15-second segments are kept.
    Options: --workers 4  --out <dir>  --gpu auto|headless|headed|software  --channel msedge|chrome  --from <frame> --to <frame>  --w 1080 --h 1920
@@ -31,8 +31,8 @@ const ARGS = process.argv.slice(2).reduce((o, a, i, arr) => {
 }, {});
 const ROOT = path.resolve(__dirname, '../..');
 const PAGE = path.join(ROOT, 'tesla-flying-roadster.html');
-const SOUND = path.join(__dirname, 'final-soundtrack.m4a');         // AAC 256k, −15.7 LUFS, −1.7 dBTP
-const SMALL_SOUND = path.join(__dirname, 'small-soundtrack.m4a');   // AAC 160k, −15.7 LUFS, −1.3 dBTP (measured; low-bitrate
+const SOUND = path.join(__dirname, 'final-soundtrack.m4a');         // AAC 256k, −15.3 LUFS, −1.8 dBTP
+const SMALL_SOUND = path.join(__dirname, 'small-soundtrack.m4a');   // AAC 160k, −15.3 LUFS, −1.9 dBTP (measured; low-bitrate
                                                                     // AAC adds peaks, so it is encoded once and copied)
 const OUT = path.resolve(ROOT, ARGS.out || 'renders/tesla-flying-roadster');
 const SEGDIR = path.join(OUT, 'segments');
@@ -148,7 +148,7 @@ async function openPage(mode) {
   if (ARGS['no-final'] || A !== 0 || (B !== LAST && !ARGS.final)) { console.log('segments only (partial range or --no-final)'); return; }
   const DUR = B === LAST ? dur : (B + 1) / FPS;   // --to N --final: a short test of the whole chain
 
-  // join the segments, add the mastered soundtrack (copied: −15.7 LUFS, −1.7 dBTP)
+  // join the segments, add the mastered soundtrack (copied: −15.3 LUFS, −1.8 dBTP)
   const list = path.join(OUT, 'segments.txt');
   fs.writeFileSync(list, segs.map((s) => `file '${s.file.replace(/\\/g, '/').replace(/'/g, "'\\''")}'`).join('\n') + '\n');
   ff(['-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-i', SOUND, '-map', '0:v', '-map', '1:a', '-c', 'copy', '-t', String(DUR), '-movflags', '+faststart', FINAL], 'final');

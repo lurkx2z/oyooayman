@@ -122,14 +122,9 @@ TR_SET_BUILDERS.site = (app) => {
         const b = o.clone().addScaledVector(R.up, -0.55); b.z = sz * (HW + 0.25);
         trBeam(a, b, 0.16, steelM, scene);
         // a column to the ground on the outside of the loop's climbing side and under the ceiling towers
-        if (a.y > 0.8 && ri % 2 === 0 && (R.p.x > 0.5 || (s > TR_LOOP && s < TR_TRACK - 3))) { const g0 = b.clone(); g0.y = 0; g0.z = sz * (HW + 0.6); trBeam(b, g0, 0.16, steelM, scene); }
+        if (sz < 0 && a.y > 0.8 && ri % 2 === 0 && (R.p.x > 0.5 || (s > TR_LOOP && s < TR_TRACK - 3))) { const g0 = b.clone(); g0.y = 0; g0.z = sz * (HW + 0.6); trBeam(b, g0, 0.16, steelM, scene); }
       }
       const a = o.clone().addScaledVector(R.up, -0.55); a.z = -(HW + 0.25); const b = a.clone(); b.z = HW + 0.25; trBeam(a, b, 0.14, steelM, scene);
-    }
-    // side towers (lattice) under the ceiling end and behind the loop
-    for (const tx of [-TR_LC / 2 + 0.5, TR_R + 0.7]) for (const sz of [-1, 1]) {
-      const top = tx > 0 ? TR_R : 2 * TR_R - 0.9;
-      for (let y = 0; y < top - 0.1; y += 1.5) { trBeam(new THREE.Vector3(tx - 0.6, y, sz * (HW + 0.6)), new THREE.Vector3(tx + 0.6, Math.min(top, y + 1.5), sz * (HW + 0.6)), 0.08, steelM, scene); }
     }
   }
   // ---- floodlight towers (a mast, a bank of lamps that bloom) and soft beams through the haze

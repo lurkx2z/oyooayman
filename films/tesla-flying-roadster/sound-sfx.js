@@ -17,7 +17,7 @@ function trJetSfx(K, t0, t1, k, o = {}) {
   for (let j = 0; j < env.length; j++) env[j] = Math.max(0, Math.min(1, k(t0 + j / 200)));
   const mk = () => {
     const y = trNoise(fx, n, sl < 1 ? 'pink' : 'white');
-    GBX.bq(y, 'hp', 260 * sl + 60, 0.7, sr); GBX.bq(y, 'peak', 2600 * sl + 300, 0.8, sr, 5); GBX.bq(y, 'lp', 11000 * sl + 900, 0.7, sr);
+    GBX.bq(y, 'hp', 90 * sl + 30, 0.7, sr); GBX.bq(y, 'peak', 220 * sl + 60, 0.8, sr, 3); GBX.bq(y, 'peak', 2600 * sl + 300, 0.8, sr, 5); GBX.bq(y, 'lp', 11000 * sl + 900, 0.7, sr);
     const w = fx.wander(o.wr || 7);
     for (let i = 0; i < n; i++) { const u = i / sr * 200, j = Math.floor(u), e = env[j] + (env[j + 1] - env[j]) * (u - j); y[i] *= e * (1 + 0.18 * w(i / sr)) * Math.min(1, i / (0.003 * sr), (n - i) / (0.01 * sr)); }
     return y;
@@ -109,7 +109,7 @@ trSound('sfx', 'events', function (ctx, bus, K) {
 
   // ---- 4: the sky. A cut to the plane; the stall warning horn as the speed bleeds away; the drop
   trWhoosh(K, A.plane, { d: 0.8, vol: 0.12 });
-  trTone(K, A.slow + 0.9, A.fall + 0.4 - A.slow - 0.9, 2900, [[1, 1], [2, 0.45], [3, 0.3], [5, 0.12]], (u, t) => Math.min(1, t / 0.03) * Math.min(1, (A.fall + 0.4 - A.slow - 0.9 - t) / 0.05) * (0.75 + 0.25 * Math.sin(t * 40)), { vol: 0.02, pan: 0.15, f: [['bp', 2900, 1.2]] });
+  trTone(K, A.slow + 0.9, A.fall + 0.4 - A.slow - 0.9, 2900, [[1, 1], [2, 0.45], [3, 0.3], [5, 0.12]], (u, t) => Math.min(1, t / 0.03) * Math.min(1, (A.fall + 0.4 - A.slow - 0.9 - t) / 0.05) * (0.75 + 0.25 * Math.sin(t * 40)), { vol: 0.045, pan: 0.15, f: [['bp', 2900, 1.2]] });
   K.put(fx.creak(0.7, fx.metalModes(150, 0.7), {}), A.stall + 0.05, { vol: 0.05, norm: true, pan: -0.2 });
   { // the fall: the wind rises to a scream
     const t0 = A.fall, d = A.suck - t0, n = Math.ceil(d * sr), y = trNoise(fx, n, 'pink'), curve = new Float32Array(64);

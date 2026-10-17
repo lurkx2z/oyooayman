@@ -7,19 +7,20 @@
        approved for public roads (Tesla's site, via CBS); the FAA says it does not meet its definition of an aircraft
      our estimates (labelled as such): a ~1.8 t car; suction to hold 2 g over ~5 m² of floor ≈ 7 kPa ≈ 7 % of 101 kPa;
        hovering needs ~18 kN of thrust; cold air gives ~600 m/s exhaust (Isp ≈ 60 s) → ~30 kg of air per second;
-       600 L holds ~100–300 kg depending on the (unpublished) pressure → seconds of hover
+       600 L holds ~200–350 kg depending on the (unpublished) pressure → seconds of hover
    ===================================================================== */
 
 const TR_READOUTS = [
-  { from: () => TR.go + 0.3, until: () => TR.go + 2.4, label: '0–60 MPH', value: 'UNDER 1 s', sub: 'TESLA\'S CLAIM · ON THE REAR THRUSTERS' },
-  { from: () => trW(5, 'moves').start, until: () => TR.inv - 0.3, label: 'AIRSPEED', value: (t) => `${Math.round(trSkyV(t) * 3.6)} km/h`, sub: 'LIFT HOLDS THE PLANE UP' },
-  { from: () => TR.slow + 0.1, until: () => TR.fall + 0.6, label: 'AIRSPEED', value: (t) => `${Math.round(trSkyV(t) * 3.6)} km/h`, sub: (t) => t < TR.stall ? 'LIFT FALLS WITH SPEED²' : 'STALL · LIFT GONE' },
+  { from: () => TR.go + 0.3, until: () => TR.go + 2.4, label: '0–60 MPH', value: 'UNDER 1 s', sub: 'TESLA\'S CLAIM' },
+  { from: () => trW(5, 'moves').start, until: () => TR.inv - 0.3, label: 'AIRSPEED', value: (t) => `${Math.round(trSkyV(t) * 3.6)} km/h`, sub: 'LIFT HOLDS THE PLANE UP · ILLUSTRATIVE' },
+  { from: () => TR.slow + 0.1, until: () => TR.fall + 0.6, label: 'AIRSPEED', value: (t) => `${Math.round(trSkyV(t) * 3.6)} km/h`, sub: (t) => t < TR.stall ? 'LIFT NEEDS SPEED² · ILLUSTRATIVE' : 'STALL · LIFT COLLAPSES' },
   { from: () => TR.twoG - 0.1, until: () => TR.tenth - 0.3, label: 'FAN SUCTION', value: 'UP TO 2 g', sub: 'TESLA\'S CLAIM' },
-  { from: () => TR.tenth, until: () => TR.leave - 0.3, label: 'PRESSURE DIFFERENCE', value: '≈ 7 kPa', sub: 'UNDER 1/10 OF THE AIR\'S 101 kPa · OUR ESTIMATE' },
+  { from: () => TR.tenth, until: () => TR.creep - 0.3, label: 'PRESSURE DIFFERENCE', value: '≈ 7 kPa', sub: 'UNDER 1/10 OF THE AIR\'S 101 kPa · OUR ESTIMATE' },
+  { from: () => TR.creep, until: () => TR.leave - 0.3, label: 'WHY FANS?', value: 'SLOW = NO GRIP', sub: 'AT SPEED THE CURVE ALONE PINS IT (v²/R > g) · FANS HOLD IT SLOW' },
   { from: () => trW(13, 'six').start - 0.2, until: () => TR.blast - 0.2, label: 'COMPRESSED AIR', value: '≈ 600 L', sub: '10 NOZZLES · TESLA' },
   { from: () => trW(15, 'thirty').start - 0.2, until: () => trW(15, 'those').start - 0.15, label: 'AIR NEEDED TO HOVER', value: '≈ 30 kg/s', sub: 'OUR ESTIMATE · ~1.8 t CAR' },
   { from: () => trW(15, 'those').start, until: () => TR.heli - 0.3, label: 'HOVER TIME', value: (t) => `${Math.max(0, Math.min(t, TR.empty) - (TR.hover + 0.9)).toFixed(1)} s`,
-    sub: (t) => t < TR.empty ? `TANKS ≈ ${Math.max(0, Math.round(250 - 30 * Math.max(0, t - TR.hover - 0.9)))} kg LEFT` : 'TANKS EMPTY' },
+    sub: (t) => t < TR.empty ? `TANKS ≈ ${Math.max(0, Math.round(30 * (TR.empty - Math.max(t, TR.hover + 0.9))))} kg LEFT` : 'TANKS EMPTY' },
 ];
 const TR_TAGS = [
   { from: () => TR.go + 0.1, until: () => TR.replay - 0.2, text: 'RECONSTRUCTION · FROM REPORTS OF THE DEMO' },
@@ -28,6 +29,7 @@ const TR_TAGS = [
   { from: () => TR.drop, until: () => TR.brk - 0.1, text: 'SLOW MOTION' },
   { from: () => TR.hover + 0.2, until: () => TR.heli - 0.2, text: 'WHAT IF IT TRIED TO HOVER? · OUR ESTIMATE' },
   { from: () => TR.kick - 0.3, until: () => TR.real - 0.2, text: 'RECONSTRUCTION · FROM REPORTS OF THE DEMO' },
+  { from: () => TR.pov + 0.2, until: () => TR.end, text: 'WHAT IF · IN THE DEMO NOBODY WAS ON BOARD' },
 ];
 // the three ways to beat gravity: shown from "three ways" to the end of the hop; the current one lit
 function trWayAt(t) {
@@ -54,6 +56,6 @@ function trTagAt(t) {
 }
 // the verdict panel (section 6): what was shown, what is promised
 const TR_VERDICT = {
-  shown: ['Clings to a ramp upside down', 'Jumps on air thrusters', 'On a closed test site'],
+  shown: ['Clings to a ramp upside down', 'Jumps on air thrusters', 'On a closed test site, nobody on board'],
   promised: ['Production in 2028', 'Flying mode not road legal'],
 };

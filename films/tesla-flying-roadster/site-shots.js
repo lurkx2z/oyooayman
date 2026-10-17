@@ -159,7 +159,7 @@ const SITE_SHOTS = {
       } else if (t < C.tAir) {
         // B: from the run-in, under the ceiling, looking up the loop: it climbs, goes over, comes back upside down
         const k = trK(t, C.tLoop, C.tAir);
-        trCamD(cam, [trLerp(-6.5, -7.2, k), 1.1, trLerp(8.6, 9.2, k)], [trLerp(1.0, -2.5, k), trLerp(5.0, 6.6, k), 0], 54, t, 0.4);
+        trCamD(cam, [trLerp(-4.5, -5.5, k), 1.6, trLerp(13.5, 14.5, k)], [trLerp(0.6, -3.0, k), trLerp(4.6, 7.2, k), 0], 50, t, 0.4);
       } else {
         // C: wide and low as it drops off the end, rolls over in the air and lands
         trCamD(cam, [-7, 2.4, 21], [trLerp(c.x, -14, 0.5), Math.max(1.8, c.y * 0.7 + 0.8), 0], 40, t, 0.6);
@@ -168,7 +168,7 @@ const SITE_SHOTS = {
       // the jets (in the run's own clock): the launch on the rear four, the roll on one side's corners and a fender,
       // the braking burst on all four corners
       const jets = { rear: (x) => trDemo(x).jets.rear || 0, cornerL: (x) => { const j = trDemo(x).jets; return Math.max(j.roll || 0, j.brake ? 0.9 : 0); }, cornerR: (x) => (trDemo(x).jets.brake ? 0.9 : 0), fender: (x) => 0.6 * (trDemo(x).jets.roll || 0) };
-      trCarJets(puffs, τ, sh.car, trDemo, jets, { speed: 18, life: 0.7, alpha: 0.5 });
+      trCarJets(puffs, τ, sh.car, trDemo, jets, { speed: 18, life: 0.45, alpha: 0.24 });
       if (st.landed != null) trRing(puffs, τ, TR_DEMO.tLand - 0.1, TR_DEMO.tLand + 0.6, () => 1, new THREE.Vector3(c.x, 0, 0), { speed: 7, life: 1.6, color: [0.7, 0.66, 0.6], alpha: 0.35 });
     },
     grade(t, p) { const C = trRunClock(); p.shake = 0; },
@@ -179,10 +179,11 @@ const SITE_SHOTS = {
       trRunClock();
       const τ = TR_REPLAY.at(t), st = trDemo(τ);
       trPoseCar(sh.car, st);
-      const k = trK(t, TR.replay, TR.plane);
-      trCamD(this.camera, [trLerp(-2.0, -5.0, k), 0.9, trLerp(5.6, 6.6, k)], [trLerp(-3.8, -9.0, k), trLerp(7.4, 6.4, k), 0], 46, t, 0.3);
+      // side-on and a little below, following the car so it stays whole in frame (the ramp's end in shot)
+      const k = trK(t, TR.replay, TR.plane), c = st.c;
+      trCamD(this.camera, [c.x + trLerp(2.5, 1.0, k), Math.max(1.2, c.y - 3.2), 10.5], [c.x - 0.6, c.y - 0.4, 0], 42, t, 0.3);
       const jets = { cornerL: (x) => { const j = trDemo(x).jets; return Math.max(j.roll || 0, j.brake ? 0.9 : 0); }, cornerR: (x) => (trDemo(x).jets.brake ? 0.9 : 0), fender: (x) => 0.6 * (trDemo(x).jets.roll || 0) };
-      trCarJets(puffs, τ, sh.car, trDemo, jets, { speed: 18, life: 0.7, alpha: 0.5 });
+      trCarJets(puffs, τ, sh.car, trDemo, jets, { speed: 18, life: 0.45, alpha: 0.24 });
     },
     labels(t, shot, app, sh, cam) {
       const out = [], a = MathX.smooth(t, TR.replay + 0.5, TR.replay + 0.9) * (1 - MathX.smooth(t, trW(3, 'then').start, trW(3, 'then').start + 0.3));
@@ -201,7 +202,7 @@ const SITE_SHOTS = {
       const fan = st.fan ?? 0;
       car.fanSpin(t * 34 * fan, 1.5 * xr * fan);
       // the pressure arrows: on "around it presses harder" the blue ones grow in; the amber ones under the floor stay short
-      const pa = MathX.smooth(t, TR.press - 0.2, TR.press + 0.5) * (1 - MathX.smooth(t, TR.leave + 0.6, TR.drop + 0.2));
+      const pa = MathX.smooth(t, TR.press - 0.2, TR.press + 0.5) * (1 - MathX.smooth(t, TR.leave - 0.2, TR.leave + 0.4));
       sh.press.visible = pa > 0.01;
       sh.outside.forEach((a, i) => { const k = MathX.smooth(pa, i * 0.012, 0.6 + i * 0.012); a.scale.setScalar(0.001 + k); a.position.y = a.userData.y0 ?? (a.userData.y0 = a.position.y); });
       sh.inside.forEach((a, i) => { a.scale.setScalar(0.001 + MathX.smooth(t, TR.press + 0.6 + i * 0.03, TR.press + 1.0 + i * 0.03) * pa); });
@@ -223,8 +224,10 @@ const SITE_SHOTS = {
       const c = st.c, cam = this.camera;
       if (t < TR.leave) {
         const k = trK(t, TR.suck, TR.leave);
-        const ang = trLerp(-0.45, 0.3, k), r = trLerp(8.6, 7.6, k);
-        trCamD(cam, [c.x + Math.sin(ang) * r, trLerp(3.0, 3.6, k), Math.cos(ang) * r], [c.x, c.y + 0.5, 0], trLerp(46, 42, k), t, 0.25);
+        // in on the fans, back out wide for the pressure arrows, round to the side as it creeps to the end
+        const r = t < TR.press ? trLerp(8.6, 5.6, trK(t, TR.suck, TR.press)) : t < TR.tenth ? trLerp(5.6, 10.5, trK(t, TR.press, TR.press + 2.5)) : trLerp(10.5, 8.5, trK(t, TR.tenth, TR.leave));
+        const ang = trLerp(-0.75, 0.55, k), y = t < TR.press ? trLerp(3.0, 4.6, trK(t, TR.suck, TR.press)) : trLerp(4.6, 3.4, k);
+        trCamD(cam, [c.x + Math.sin(ang) * r, y, Math.cos(ang) * r], [c.x, c.y + 0.3, 0], trLerp(46, 42, k), t, 0.25);
       } else if (t < TR.drop + 1.2) {
         const k = trK(t, TR.leave, TR.drop + 1.2);
         trCamD(cam, [trLerp(-4.5, -7.0, k), trLerp(3.4, 3.0, k), trLerp(11.0, 11.6, k)], [trLerp(-7.5, -9.0, k), c.y - 0.3, 0], 46, t, 0.25);
@@ -314,8 +317,8 @@ const SITE_SHOTS = {
     frame(t, shot, app, sh, puffs) {
       const st = { c: new THREE.Vector3(TR_PAD.x, TR_CG, TR_PAD.z), fwd: new THREE.Vector3(1, 0, 0), up0: new THREE.Vector3(0, 1, 0), roll: 0, s: 0 };
       trPoseCar(sh.car, st);
-      const k = trK(t, TR.real, TR.pov, (u) => u), ang = trLerp(0.5, 1.25, k);
-      trCamD(this.camera, [TR_PAD.x + Math.cos(ang) * 6.8, trLerp(1.2, 0.9, k), TR_PAD.z + Math.sin(ang) * 6.8], [TR_PAD.x + 0.3, 0.75, TR_PAD.z], 36, t, 0.3);
+      const k = trK(t, TR.real, TR.pov, (u) => u), ang = trLerp(-0.2, 1.1, k);
+      trCamD(this.camera, [TR_PAD.x + Math.cos(ang) * 12.5, trLerp(2.2, 1.6, k), TR_PAD.z + Math.sin(ang) * 12.5], [TR_PAD.x, trLerp(2.4, 2.1, k), TR_PAD.z], 40, t, 0.3);
       trCarJets(puffs, t, sh.car, () => st, { corner: (tt) => 0.1 }, { speed: 1.5, life: 1.8, size: 0.3, grow: 1, alpha: 0.12, dt: 1 / 15 });
     },
     grade(t, p) { p.exposure = 0.92; p.vignette = 0.66; },
@@ -323,7 +326,7 @@ const SITE_SHOTS = {
   // ★ the last shot: the passenger seat, up the curl until the ground is overhead
   pov: {
     frame(t, shot, app, sh, puffs) {
-      const s = MathX.lerp(-9, TR_LOOP + 3.2, trK(t, TR.pov - 0.2, TR.end - 1.4, (u) => u * u * (3 - 2 * u)));
+      const s = MathX.lerp(-9, TR_LOOP + 3.2, trK(t, TR.pov - 0.2, TR.pov + 2.7, (u) => u * u * (3 - 2 * u)));
       const R = trRampAt(s), st = { c: R.p.clone().addScaledVector(R.up, TR_CG), fwd: R.fwd, up0: R.up, roll: 0, s };
       trPoseCar(sh.car, st);
       sh.car.inside(true);
@@ -331,6 +334,6 @@ const SITE_SHOTS = {
       const cam = this.camera; cam.position.copy(eye); cam.up.copy(R.up); cam.lookAt(look);
       cam.fov = 62; cam.updateProjectionMatrix(); cam.updateMatrixWorld(true);
     },
-    grade(t, p) { },
+    grade(t, p) { p.exposure = (p.exposure ?? 1) * 1.35; },
   },
 };
