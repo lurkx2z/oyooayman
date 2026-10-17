@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What if your car could fly?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* this film's HUD (page-level only). 16:9 (1920×1080): --u = one design pixel of a 1920-wide frame (set by film.js) */
+    #hud .story-title.big.center { top: calc(var(--u) * 300); width: calc(var(--u) * 1200); margin-left: calc(var(--u) * -600); }
+    #hud .story-title.big.center::before { background: radial-gradient(closest-side, rgba(2, 3, 6, 0.55), rgba(2, 3, 6, 0.22) 62%, rgba(2, 3, 6, 0)); }
+    #hud .story-title.big.center .kick { font-family: var(--book); font-size: calc(var(--u) * 56); font-weight: 600; letter-spacing: 0.05em; }
+    #hud .story-title.big.center .hero { font-family: var(--book); font-size: calc(var(--u) * 112); font-weight: 700; line-height: 1.04; }
+    #hud .story-title.big.center .main { text-shadow: 0 0 calc(var(--u) * 30) rgba(0, 0, 0, 0.8), 0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.7); }
+    /* the narration, word-timed: one line on a dark plate near the bottom */
+    .af-sub { position: absolute; bottom: calc(var(--u) * 70); left: 50%; transform: translateX(-50%); font-family: var(--book); font-size: calc(var(--u) * 46); font-weight: 600;
+      line-height: 1.2; color: #f4eee4; padding: calc(var(--u) * 11) calc(var(--u) * 28); border-radius: calc(var(--u) * 12); background: rgba(4, 6, 9, 0.55);
+      max-width: calc(var(--u) * 1400); width: max-content; text-align: center; text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(0, 0, 0, 0.6); pointer-events: none; }
+    .af-sub span { transition: none; }
+    /* the readout, top left */
+    .af-ro { position: absolute; left: calc(var(--u) * 64); top: calc(var(--u) * 118); padding: calc(var(--u) * 14) calc(var(--u) * 24); border-radius: calc(var(--u) * 12);
+      background: rgba(4, 6, 10, 0.45); pointer-events: none; max-width: calc(var(--u) * 700); }
+    .af-ro .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.16em; color: #ffffff; opacity: 0.92; }
+    .af-ro .v { font-family: var(--book); font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 6); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; }
+    .af-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 22); letter-spacing: 0.12em; margin-top: calc(var(--u) * 8); color: #ffd7a8; }
+    /* the tag, top left above the readout */
+    .af-tag { position: absolute; left: calc(var(--u) * 64); top: calc(var(--u) * 52); font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.2em; font-size: calc(var(--u) * 24);
+      color: #f3ead8; padding: calc(var(--u) * 9) calc(var(--u) * 18); border-radius: calc(var(--u) * 10); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
+    /* labels pinned to places */
+    .af-lab { position: absolute; transform: translate(calc(var(--u) * -16), -50%); pointer-events: none; white-space: nowrap; font-family: var(--hud-font); font-weight: 600;
+      font-size: calc(var(--u) * 28); letter-spacing: 0.1em; color: #f6efe2; text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.9); }
+    .af-lab small { display: block; margin-left: calc(var(--u) * 34); font-size: 0.78em; opacity: 0.85; color: #ffd7a8; }
+    /* the three ways to beat gravity: chips top right */
+    .tr-ways { position: absolute; right: calc(var(--u) * 64); top: calc(var(--u) * 52); display: flex; gap: calc(var(--u) * 14); pointer-events: none; }
+    .tr-ways .w { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.14em; color: #f3ead8; padding: calc(var(--u) * 10) calc(var(--u) * 20);
+      border-radius: calc(var(--u) * 40); background: rgba(6, 8, 12, 0.55); box-shadow: inset 0 0 0 calc(var(--u) * 2) rgba(255, 215, 168, 0.35); transition: none; }
+    .tr-ways .w b { display: inline-block; margin-right: calc(var(--u) * 10); color: #ffd7a8; font-family: var(--book); font-size: 1.15em; }
+    .tr-ways .w.on { background: rgba(255, 176, 102, 0.92); color: #1a1208; box-shadow: none; }
+    .tr-ways .w.on b { color: #1a1208; }
+    /* panels: the verdict (shown / promise), the timeline, the chapter card */
+    .tr-verdict { position: absolute; left: calc(var(--u) * 1040); right: calc(var(--u) * 64); top: calc(var(--u) * 130); display: flex; flex-direction: column; gap: calc(var(--u) * 26);
+      padding: calc(var(--u) * 30) calc(var(--u) * 36); border-radius: calc(var(--u) * 20); background: rgba(4, 6, 10, 0.62); pointer-events: none; }
+    .tr-verdict .h { font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 26); letter-spacing: 0.2em; margin-bottom: calc(var(--u) * 10); }
+    .tr-verdict .h.ok { color: #9be39b; } .tr-verdict .h.pr { color: #ffd7a8; }
+    .tr-verdict .i { font-family: var(--book); font-size: calc(var(--u) * 40); line-height: 1.25; color: #f4eee4; }
+    .af-lab .d { display: inline-block; width: calc(var(--u) * 14); height: calc(var(--u) * 14); border-radius: 50%; margin-right: calc(var(--u) * 16);
+      box-shadow: 0 0 0 calc(var(--u) * 3) rgba(255, 215, 168, 0.9); vertical-align: middle; }
+    .tr-chap { position: absolute; left: calc(var(--u) * 120); top: calc(var(--u) * 420); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 24) rgba(0, 0, 0, 0.8); }
+    .tr-chap .n { font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 28); letter-spacing: 0.3em; color: #ffd7a8; }
+    .tr-chap .t { font-family: var(--book); font-weight: 700; font-size: calc(var(--u) * 92); color: #f6efe2; line-height: 1.05; margin-top: calc(var(--u) * 10); }
+    .tr-time { position: absolute; left: calc(var(--u) * 160); right: calc(var(--u) * 160); top: calc(var(--u) * 170); height: calc(var(--u) * 260); pointer-events: none; }
+    .tr-time .ln { position: absolute; left: 0; right: 0; top: calc(var(--u) * 120); height: calc(var(--u) * 4); background: rgba(246, 239, 226, 0.7); transform-origin: left; }
+    .tr-time .y { position: absolute; top: calc(var(--u) * 60); transform: translateX(-50%); text-align: center; font-family: var(--book); font-weight: 700; font-size: calc(var(--u) * 56); color: #f6efe2; text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.8); }
+    .tr-time .y::after { content: ''; display: block; margin: calc(var(--u) * 14) auto 0; width: calc(var(--u) * 20); height: calc(var(--u) * 20); border-radius: 50%; background: #ffd7a8; }
+    .tr-time .y small { display: block; font-family: var(--hud-font); font-size: calc(var(--u) * 22); letter-spacing: 0.14em; font-weight: 600; color: #ffd7a8; margin-top: calc(var(--u) * 40); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="hud"></div>
+    </div>
+  </div>
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What if your car could fly?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">BUILDING THE TEST SITE…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine (unchanged; this film only configures and extends it from its own folder) -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script>installFog({ bankScale: 0.012, bankAmount: 0.4, lowHeight: 6, lowAmount: 0.5, cap: 0.9 });</script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/world/heroes.js"></script>
+    <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (plan: films/tesla-flying-roadster-long/PLAN.md) -->
+  <script src="films/tesla-flying-roadster-long/narration-timing.js"></script>
+  <script src="films/tesla-flying-roadster-long/narration-audio.js"></script>
+  <script src="films/tesla-flying-roadster-long/script.js"></script>
+  <script src="films/tesla-flying-roadster-long/hud.js"></script>
+  <script src="films/tesla-flying-roadster-long/kit.js"></script>
+  <script src="films/tesla-flying-roadster-long/motion.js"></script>
+  <script src="films/tesla-flying-roadster-long/roadster.js"></script>
+  <script src="films/tesla-flying-roadster-long/film.js"></script>
+  <script src="films/tesla-flying-roadster-long/site.js"></script>
+  <script src="films/tesla-flying-roadster-long/site-shots.js"></script>
+  <script src="films/tesla-flying-roadster-long/sky.js"></script>
+  <script src="films/tesla-flying-roadster-long/track.js"></script>
+  <script src="films/tesla-flying-roadster-long/toy.js"></script>
+  <script src="films/tesla-flying-roadster-long/space.js"></script>
+  <script src="films/tesla-flying-roadster-long/shots.js"></script>
+  <script src="films/tesla-flying-roadster-long/audiokit.js"></script>
+  <script src="films/tesla-flying-roadster-long/mix.js"></script>
+  <script src="films/tesla-flying-roadster-long/audio.js"></script>
+  <script src="films/tesla-flying-roadster-long/sound-lib.js"></script>
+  <script src="films/tesla-flying-roadster-long/sound-music.js"></script>
+  <script src="films/tesla-flying-roadster-long/sound-amb.js"></script>
+  <script src="films/tesla-flying-roadster-long/sound-sfx.js"></script>
+  <script src="films/tesla-flying-roadster-long/sound-worlds.js"></script>
+  <script src="films/tesla-flying-roadster-long/soundtrack.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
