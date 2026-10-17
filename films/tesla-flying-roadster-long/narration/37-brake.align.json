@@ -1,0 +1,844 @@
+{
+ "id": "37-brake",
+ "text": "And just before landing, a burst from all four corners slows the fall.",
+ "seconds": 5.02,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "And",
+   "start": 0.04,
+   "end": 0.16
+  },
+  {
+   "text": "just",
+   "start": 0.3,
+   "end": 0.5
+  },
+  {
+   "text": "before",
+   "start": 0.52,
+   "end": 0.84
+  },
+  {
+   "text": "landing,",
+   "start": 0.88,
+   "end": 1.26
+  },
+  {
+   "text": "a",
+   "start": 1.58,
+   "end": 1.7
+  },
+  {
+   "text": "burst",
+   "start": 1.74,
+   "end": 2.02
+  },
+  {
+   "text": "from",
+   "start": 2.04,
+   "end": 2.32
+  },
+  {
+   "text": "all",
+   "start": 2.42,
+   "end": 2.64
+  },
+  {
+   "text": "four",
+   "start": 2.66,
+   "end": 2.8
+  },
+  {
+   "text": "corners",
+   "start": 2.92,
+   "end": 3.32
+  },
+  {
+   "text": "slows",
+   "start": 3.58,
+   "end": 3.88
+  },
+  {
+   "text": "the",
+   "start": 3.92,
+   "end": 4.019
+  },
+  {
+   "text": "fall.",
+   "start": 4.08,
+   "end": 4.4
+  }
+ ],
+ "characters": [
+  {
+   "text": "A",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "n",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "d",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.36
+  },
+  {
+   "text": "j",
+   "start": 0.36,
+   "end": 0.39
+  },
+  {
+   "text": "u",
+   "start": 0.39,
+   "end": 0.42
+  },
+  {
+   "text": "s",
+   "start": 0.42,
+   "end": 0.45
+  },
+  {
+   "text": "t",
+   "start": 0.45,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.64
+  },
+  {
+   "text": "b",
+   "start": 0.64,
+   "end": 0.667
+  },
+  {
+   "text": "e",
+   "start": 0.667,
+   "end": 0.693
+  },
+  {
+   "text": "f",
+   "start": 0.693,
+   "end": 0.72
+  },
+  {
+   "text": "o",
+   "start": 0.72,
+   "end": 0.747
+  },
+  {
+   "text": "r",
+   "start": 0.747,
+   "end": 0.773
+  },
+  {
+   "text": "e",
+   "start": 0.773,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "l",
+   "start": 0.88,
+   "end": 0.971
+  },
+  {
+   "text": "a",
+   "start": 0.971,
+   "end": 1.063
+  },
+  {
+   "text": "n",
+   "start": 1.063,
+   "end": 1.154
+  },
+  {
+   "text": "d",
+   "start": 1.154,
+   "end": 1.246
+  },
+  {
+   "text": "i",
+   "start": 1.246,
+   "end": 1.337
+  },
+  {
+   "text": "n",
+   "start": 1.337,
+   "end": 1.429
+  },
+  {
+   "text": "g",
+   "start": 1.429,
+   "end": 1.52
+  },
+  {
+   "text": ",",
+   "start": 1.52,
+   "end": 1.573
+  },
+  {
+   "text": " ",
+   "start": 1.573,
+   "end": 1.627
+  },
+  {
+   "text": "a",
+   "start": 1.627,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.84
+  },
+  {
+   "text": "b",
+   "start": 1.84,
+   "end": 1.872
+  },
+  {
+   "text": "u",
+   "start": 1.872,
+   "end": 1.904
+  },
+  {
+   "text": "r",
+   "start": 1.904,
+   "end": 1.936
+  },
+  {
+   "text": "s",
+   "start": 1.936,
+   "end": 1.968
+  },
+  {
+   "text": "t",
+   "start": 1.968,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.16
+  },
+  {
+   "text": "f",
+   "start": 2.16,
+   "end": 2.2
+  },
+  {
+   "text": "r",
+   "start": 2.2,
+   "end": 2.24
+  },
+  {
+   "text": "o",
+   "start": 2.24,
+   "end": 2.28
+  },
+  {
+   "text": "m",
+   "start": 2.28,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": "a",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "l",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "l",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.76
+  },
+  {
+   "text": "f",
+   "start": 2.76,
+   "end": 2.79
+  },
+  {
+   "text": "o",
+   "start": 2.79,
+   "end": 2.82
+  },
+  {
+   "text": "u",
+   "start": 2.82,
+   "end": 2.85
+  },
+  {
+   "text": "r",
+   "start": 2.85,
+   "end": 2.88
+  },
+  {
+   "text": " ",
+   "start": 2.88,
+   "end": 3
+  },
+  {
+   "text": "c",
+   "start": 3,
+   "end": 3.03
+  },
+  {
+   "text": "o",
+   "start": 3.03,
+   "end": 3.06
+  },
+  {
+   "text": "r",
+   "start": 3.06,
+   "end": 3.09
+  },
+  {
+   "text": "n",
+   "start": 3.09,
+   "end": 3.12
+  },
+  {
+   "text": "e",
+   "start": 3.12,
+   "end": 3.227
+  },
+  {
+   "text": "r",
+   "start": 3.227,
+   "end": 3.333
+  },
+  {
+   "text": "s",
+   "start": 3.333,
+   "end": 3.44
+  },
+  {
+   "text": " ",
+   "start": 3.44,
+   "end": 3.6
+  },
+  {
+   "text": "s",
+   "start": 3.6,
+   "end": 3.64
+  },
+  {
+   "text": "l",
+   "start": 3.64,
+   "end": 3.68
+  },
+  {
+   "text": "o",
+   "start": 3.68,
+   "end": 3.733
+  },
+  {
+   "text": "w",
+   "start": 3.733,
+   "end": 3.787
+  },
+  {
+   "text": "s",
+   "start": 3.787,
+   "end": 3.84
+  },
+  {
+   "text": " ",
+   "start": 3.84,
+   "end": 3.92
+  },
+  {
+   "text": "t",
+   "start": 3.92,
+   "end": 3.947
+  },
+  {
+   "text": "h",
+   "start": 3.947,
+   "end": 3.973
+  },
+  {
+   "text": "e",
+   "start": 3.973,
+   "end": 4
+  },
+  {
+   "text": " ",
+   "start": 4,
+   "end": 4.08
+  },
+  {
+   "text": "f",
+   "start": 4.08,
+   "end": 4.26
+  },
+  {
+   "text": "a",
+   "start": 4.26,
+   "end": 4.44
+  },
+  {
+   "text": "l",
+   "start": 4.44,
+   "end": 4.62
+  },
+  {
+   "text": "l",
+   "start": 4.62,
+   "end": 4.8
+  },
+  {
+   "text": ".",
+   "start": 4.8,
+   "end": 4.96
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "And",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "just",
+   "start": 0.36,
+   "end": 0.48
+  },
+  {
+   "text": "before",
+   "start": 0.64,
+   "end": 0.8
+  },
+  {
+   "text": "landing,",
+   "start": 0.88,
+   "end": 1.573
+  },
+  {
+   "text": "a",
+   "start": 1.627,
+   "end": 1.68
+  },
+  {
+   "text": "burst",
+   "start": 1.84,
+   "end": 2
+  },
+  {
+   "text": "from",
+   "start": 2.16,
+   "end": 2.32
+  },
+  {
+   "text": "all",
+   "start": 2.4,
+   "end": 2.64
+  },
+  {
+   "text": "four",
+   "start": 2.76,
+   "end": 2.88
+  },
+  {
+   "text": "corners",
+   "start": 3,
+   "end": 3.44
+  },
+  {
+   "text": "slows",
+   "start": 3.6,
+   "end": 3.84
+  },
+  {
+   "text": "the",
+   "start": 3.92,
+   "end": 4
+  },
+  {
+   "text": "fall.",
+   "start": 4.08,
+   "end": 4.96
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "A",
+   "start": 0.04,
+   "end": 0.08
+  },
+  {
+   "text": "n",
+   "start": 0.08,
+   "end": 0.14
+  },
+  {
+   "text": "d",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.3
+  },
+  {
+   "text": "j",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": "u",
+   "start": 0.34,
+   "end": 0.36
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.44
+  },
+  {
+   "text": "t",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": " ",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "b",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.66
+  },
+  {
+   "text": "f",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "o",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "r",
+   "start": 0.72,
+   "end": 0.78
+  },
+  {
+   "text": "e",
+   "start": 0.78,
+   "end": 0.84
+  },
+  {
+   "text": " ",
+   "start": 0.84,
+   "end": 0.88
+  },
+  {
+   "text": "l",
+   "start": 0.88,
+   "end": 0.98
+  },
+  {
+   "text": "a",
+   "start": 0.98,
+   "end": 1.02
+  },
+  {
+   "text": "n",
+   "start": 1.02,
+   "end": 1.04
+  },
+  {
+   "text": "d",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "i",
+   "start": 1.14,
+   "end": 1.16
+  },
+  {
+   "text": "n",
+   "start": 1.16,
+   "end": 1.24
+  },
+  {
+   "text": "g",
+   "start": 1.24,
+   "end": 1.26
+  },
+  {
+   "text": ",",
+   "start": 1.26,
+   "end": 1.26
+  },
+  {
+   "text": " ",
+   "start": 1.26,
+   "end": 1.58
+  },
+  {
+   "text": "a",
+   "start": 1.58,
+   "end": 1.7
+  },
+  {
+   "text": " ",
+   "start": 1.7,
+   "end": 1.74
+  },
+  {
+   "text": "b",
+   "start": 1.74,
+   "end": 1.8
+  },
+  {
+   "text": "u",
+   "start": 1.8,
+   "end": 1.82
+  },
+  {
+   "text": "r",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": "s",
+   "start": 1.86,
+   "end": 1.94
+  },
+  {
+   "text": "t",
+   "start": 1.94,
+   "end": 2.02
+  },
+  {
+   "text": " ",
+   "start": 2.02,
+   "end": 2.04
+  },
+  {
+   "text": "f",
+   "start": 2.04,
+   "end": 2.08
+  },
+  {
+   "text": "r",
+   "start": 2.08,
+   "end": 2.1
+  },
+  {
+   "text": "o",
+   "start": 2.1,
+   "end": 2.16
+  },
+  {
+   "text": "m",
+   "start": 2.16,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.42
+  },
+  {
+   "text": "a",
+   "start": 2.42,
+   "end": 2.44
+  },
+  {
+   "text": "l",
+   "start": 2.44,
+   "end": 2.5
+  },
+  {
+   "text": "l",
+   "start": 2.5,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.66
+  },
+  {
+   "text": "f",
+   "start": 2.66,
+   "end": 2.7
+  },
+  {
+   "text": "o",
+   "start": 2.7,
+   "end": 2.74
+  },
+  {
+   "text": "u",
+   "start": 2.74,
+   "end": 2.78
+  },
+  {
+   "text": "r",
+   "start": 2.78,
+   "end": 2.8
+  },
+  {
+   "text": " ",
+   "start": 2.8,
+   "end": 2.92
+  },
+  {
+   "text": "c",
+   "start": 2.92,
+   "end": 3
+  },
+  {
+   "text": "o",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": "r",
+   "start": 3.04,
+   "end": 3.08
+  },
+  {
+   "text": "n",
+   "start": 3.08,
+   "end": 3.14
+  },
+  {
+   "text": "e",
+   "start": 3.14,
+   "end": 3.18
+  },
+  {
+   "text": "r",
+   "start": 3.18,
+   "end": 3.3
+  },
+  {
+   "text": "s",
+   "start": 3.3,
+   "end": 3.32
+  },
+  {
+   "text": " ",
+   "start": 3.32,
+   "end": 3.58
+  },
+  {
+   "text": "s",
+   "start": 3.58,
+   "end": 3.64
+  },
+  {
+   "text": "l",
+   "start": 3.64,
+   "end": 3.68
+  },
+  {
+   "text": "o",
+   "start": 3.68,
+   "end": 3.74
+  },
+  {
+   "text": "w",
+   "start": 3.74,
+   "end": 3.84
+  },
+  {
+   "text": "s",
+   "start": 3.84,
+   "end": 3.88
+  },
+  {
+   "text": " ",
+   "start": 3.88,
+   "end": 3.92
+  },
+  {
+   "text": "t",
+   "start": 3.92,
+   "end": 3.94
+  },
+  {
+   "text": "h",
+   "start": 3.94,
+   "end": 3.94
+  },
+  {
+   "text": "e",
+   "start": 3.94,
+   "end": 4.019
+  },
+  {
+   "text": " ",
+   "start": 4.019,
+   "end": 4.059
+  },
+  {
+   "text": "f",
+   "start": 4.08,
+   "end": 4.14
+  },
+  {
+   "text": "a",
+   "start": 4.14,
+   "end": 4.18
+  },
+  {
+   "text": "l",
+   "start": 4.18,
+   "end": 4.26
+  },
+  {
+   "text": "l",
+   "start": 4.26,
+   "end": 4.4
+  },
+  {
+   "text": ".",
+   "start": 4.4,
+   "end": 4.4
+  }
+ ]
+}

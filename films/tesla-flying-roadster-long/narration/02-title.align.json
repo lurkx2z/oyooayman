@@ -1,0 +1,644 @@
+{
+ "id": "02-title",
+ "text": "What if your car could fly? Tesla says this one can.",
+ "seconds": 4.39,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "What",
+   "start": 0.14,
+   "end": 0.24
+  },
+  {
+   "text": "if",
+   "start": 0.32,
+   "end": 0.42
+  },
+  {
+   "text": "your",
+   "start": 0.46,
+   "end": 0.58
+  },
+  {
+   "text": "car",
+   "start": 0.74,
+   "end": 0.92
+  },
+  {
+   "text": "could",
+   "start": 1.02,
+   "end": 1.14
+  },
+  {
+   "text": "fly?",
+   "start": 1.3,
+   "end": 1.7
+  },
+  {
+   "text": "Tesla",
+   "start": 2.26,
+   "end": 2.64
+  },
+  {
+   "text": "says",
+   "start": 2.7,
+   "end": 2.96
+  },
+  {
+   "text": "this",
+   "start": 3.04,
+   "end": 3.2
+  },
+  {
+   "text": "one",
+   "start": 3.28,
+   "end": 3.38
+  },
+  {
+   "text": "can.",
+   "start": 3.48,
+   "end": 3.74
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "h",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "a",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "i",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "f",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.52
+  },
+  {
+   "text": "y",
+   "start": 0.52,
+   "end": 0.55
+  },
+  {
+   "text": "o",
+   "start": 0.55,
+   "end": 0.58
+  },
+  {
+   "text": "u",
+   "start": 0.58,
+   "end": 0.61
+  },
+  {
+   "text": "r",
+   "start": 0.61,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "c",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "a",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "r",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.08
+  },
+  {
+   "text": "c",
+   "start": 1.08,
+   "end": 1.104
+  },
+  {
+   "text": "o",
+   "start": 1.104,
+   "end": 1.128
+  },
+  {
+   "text": "u",
+   "start": 1.128,
+   "end": 1.152
+  },
+  {
+   "text": "l",
+   "start": 1.152,
+   "end": 1.176
+  },
+  {
+   "text": "d",
+   "start": 1.176,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "f",
+   "start": 1.28,
+   "end": 1.573
+  },
+  {
+   "text": "l",
+   "start": 1.573,
+   "end": 1.867
+  },
+  {
+   "text": "y",
+   "start": 1.867,
+   "end": 2.16
+  },
+  {
+   "text": "?",
+   "start": 2.16,
+   "end": 2.2
+  },
+  {
+   "text": " ",
+   "start": 2.2,
+   "end": 2.24
+  },
+  {
+   "text": "T",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "e",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": "s",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "l",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "a",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.8
+  },
+  {
+   "text": "s",
+   "start": 2.8,
+   "end": 2.84
+  },
+  {
+   "text": "a",
+   "start": 2.84,
+   "end": 2.88
+  },
+  {
+   "text": "y",
+   "start": 2.88,
+   "end": 2.92
+  },
+  {
+   "text": "s",
+   "start": 2.92,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "t",
+   "start": 3.04,
+   "end": 3.08
+  },
+  {
+   "text": "h",
+   "start": 3.08,
+   "end": 3.12
+  },
+  {
+   "text": "i",
+   "start": 3.12,
+   "end": 3.16
+  },
+  {
+   "text": "s",
+   "start": 3.16,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "o",
+   "start": 3.28,
+   "end": 3.333
+  },
+  {
+   "text": "n",
+   "start": 3.333,
+   "end": 3.387
+  },
+  {
+   "text": "e",
+   "start": 3.387,
+   "end": 3.44
+  },
+  {
+   "text": " ",
+   "start": 3.44,
+   "end": 3.88
+  },
+  {
+   "text": "c",
+   "start": 3.88,
+   "end": 4.027
+  },
+  {
+   "text": "a",
+   "start": 4.027,
+   "end": 4.173
+  },
+  {
+   "text": "n",
+   "start": 4.173,
+   "end": 4.32
+  },
+  {
+   "text": ".",
+   "start": 4.32,
+   "end": 4.4
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "What",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "if",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "your",
+   "start": 0.52,
+   "end": 0.64
+  },
+  {
+   "text": "car",
+   "start": 0.72,
+   "end": 0.96
+  },
+  {
+   "text": "could",
+   "start": 1.08,
+   "end": 1.2
+  },
+  {
+   "text": "fly?",
+   "start": 1.28,
+   "end": 2.2
+  },
+  {
+   "text": "Tesla",
+   "start": 2.24,
+   "end": 2.64
+  },
+  {
+   "text": "says",
+   "start": 2.8,
+   "end": 2.96
+  },
+  {
+   "text": "this",
+   "start": 3.04,
+   "end": 3.2
+  },
+  {
+   "text": "one",
+   "start": 3.28,
+   "end": 3.44
+  },
+  {
+   "text": "can.",
+   "start": 3.88,
+   "end": 4.4
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "a",
+   "start": 0.18,
+   "end": 0.22
+  },
+  {
+   "text": "t",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "i",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "f",
+   "start": 0.38,
+   "end": 0.42
+  },
+  {
+   "text": " ",
+   "start": 0.42,
+   "end": 0.46
+  },
+  {
+   "text": "y",
+   "start": 0.46,
+   "end": 0.5
+  },
+  {
+   "text": "o",
+   "start": 0.5,
+   "end": 0.5
+  },
+  {
+   "text": "u",
+   "start": 0.5,
+   "end": 0.56
+  },
+  {
+   "text": "r",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": " ",
+   "start": 0.58,
+   "end": 0.74
+  },
+  {
+   "text": "c",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": "a",
+   "start": 0.82,
+   "end": 0.9
+  },
+  {
+   "text": "r",
+   "start": 0.9,
+   "end": 0.92
+  },
+  {
+   "text": " ",
+   "start": 0.92,
+   "end": 1.02
+  },
+  {
+   "text": "c",
+   "start": 1.02,
+   "end": 1.04
+  },
+  {
+   "text": "o",
+   "start": 1.04,
+   "end": 1.06
+  },
+  {
+   "text": "u",
+   "start": 1.06,
+   "end": 1.08
+  },
+  {
+   "text": "l",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "d",
+   "start": 1.12,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.3
+  },
+  {
+   "text": "f",
+   "start": 1.3,
+   "end": 1.36
+  },
+  {
+   "text": "l",
+   "start": 1.36,
+   "end": 1.66
+  },
+  {
+   "text": "y",
+   "start": 1.66,
+   "end": 1.7
+  },
+  {
+   "text": "?",
+   "start": 1.7,
+   "end": 1.7
+  },
+  {
+   "text": " ",
+   "start": 1.7,
+   "end": 1.7
+  },
+  {
+   "text": "T",
+   "start": 2.26,
+   "end": 2.32
+  },
+  {
+   "text": "e",
+   "start": 2.32,
+   "end": 2.42
+  },
+  {
+   "text": "s",
+   "start": 2.42,
+   "end": 2.5
+  },
+  {
+   "text": "l",
+   "start": 2.5,
+   "end": 2.52
+  },
+  {
+   "text": "a",
+   "start": 2.52,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.7
+  },
+  {
+   "text": "s",
+   "start": 2.7,
+   "end": 2.74
+  },
+  {
+   "text": "a",
+   "start": 2.74,
+   "end": 2.78
+  },
+  {
+   "text": "y",
+   "start": 2.78,
+   "end": 2.88
+  },
+  {
+   "text": "s",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "t",
+   "start": 3.04,
+   "end": 3.04
+  },
+  {
+   "text": "h",
+   "start": 3.04,
+   "end": 3.08
+  },
+  {
+   "text": "i",
+   "start": 3.08,
+   "end": 3.16
+  },
+  {
+   "text": "s",
+   "start": 3.16,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "o",
+   "start": 3.28,
+   "end": 3.32
+  },
+  {
+   "text": "n",
+   "start": 3.32,
+   "end": 3.34
+  },
+  {
+   "text": "e",
+   "start": 3.34,
+   "end": 3.38
+  },
+  {
+   "text": " ",
+   "start": 3.38,
+   "end": 3.48
+  },
+  {
+   "text": "c",
+   "start": 3.48,
+   "end": 3.56
+  },
+  {
+   "text": "a",
+   "start": 3.56,
+   "end": 3.64
+  },
+  {
+   "text": "n",
+   "start": 3.72,
+   "end": 3.74
+  },
+  {
+   "text": ".",
+   "start": 3.74,
+   "end": 3.74
+  }
+ ]
+}

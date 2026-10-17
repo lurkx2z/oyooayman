@@ -1,0 +1,814 @@
+{
+ "id": "15-hang",
+ "text": "So a wing can never just hang there. It needs speed, all the time.",
+ "seconds": 5.36,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "So",
+   "start": 0.1,
+   "end": 0.34
+  },
+  {
+   "text": "a",
+   "start": 0.4,
+   "end": 0.5
+  },
+  {
+   "text": "wing",
+   "start": 0.56,
+   "end": 0.74
+  },
+  {
+   "text": "can",
+   "start": 0.84,
+   "end": 1.02
+  },
+  {
+   "text": "never",
+   "start": 1.12,
+   "end": 1.38
+  },
+  {
+   "text": "just",
+   "start": 1.44,
+   "end": 1.7
+  },
+  {
+   "text": "hang",
+   "start": 1.78,
+   "end": 2.02
+  },
+  {
+   "text": "there.",
+   "start": 2.08,
+   "end": 2.32
+  },
+  {
+   "text": "It",
+   "start": 2.74,
+   "end": 2.86
+  },
+  {
+   "text": "needs",
+   "start": 2.9,
+   "end": 3.16
+  },
+  {
+   "text": "speed,",
+   "start": 3.3,
+   "end": 3.66
+  },
+  {
+   "text": "all",
+   "start": 4.04,
+   "end": 4.18
+  },
+  {
+   "text": "the",
+   "start": 4.22,
+   "end": 4.32
+  },
+  {
+   "text": "time.",
+   "start": 4.38,
+   "end": 4.76
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "o",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.32
+  },
+  {
+   "text": "a",
+   "start": 0.32,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.6
+  },
+  {
+   "text": "w",
+   "start": 0.6,
+   "end": 0.63
+  },
+  {
+   "text": "i",
+   "start": 0.63,
+   "end": 0.66
+  },
+  {
+   "text": "n",
+   "start": 0.66,
+   "end": 0.69
+  },
+  {
+   "text": "g",
+   "start": 0.69,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "c",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "a",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "n",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.2
+  },
+  {
+   "text": "n",
+   "start": 1.2,
+   "end": 1.232
+  },
+  {
+   "text": "e",
+   "start": 1.232,
+   "end": 1.264
+  },
+  {
+   "text": "v",
+   "start": 1.264,
+   "end": 1.296
+  },
+  {
+   "text": "e",
+   "start": 1.296,
+   "end": 1.328
+  },
+  {
+   "text": "r",
+   "start": 1.328,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "j",
+   "start": 1.44,
+   "end": 1.5
+  },
+  {
+   "text": "u",
+   "start": 1.5,
+   "end": 1.56
+  },
+  {
+   "text": "s",
+   "start": 1.56,
+   "end": 1.62
+  },
+  {
+   "text": "t",
+   "start": 1.62,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "h",
+   "start": 1.76,
+   "end": 1.82
+  },
+  {
+   "text": "a",
+   "start": 1.82,
+   "end": 1.88
+  },
+  {
+   "text": "n",
+   "start": 1.88,
+   "end": 1.94
+  },
+  {
+   "text": "g",
+   "start": 1.94,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "t",
+   "start": 2.08,
+   "end": 2.192
+  },
+  {
+   "text": "h",
+   "start": 2.192,
+   "end": 2.304
+  },
+  {
+   "text": "e",
+   "start": 2.304,
+   "end": 2.416
+  },
+  {
+   "text": "r",
+   "start": 2.416,
+   "end": 2.528
+  },
+  {
+   "text": "e",
+   "start": 2.528,
+   "end": 2.64
+  },
+  {
+   "text": ".",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": " ",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "I",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "t",
+   "start": 2.76,
+   "end": 2.8
+  },
+  {
+   "text": " ",
+   "start": 2.8,
+   "end": 2.88
+  },
+  {
+   "text": "n",
+   "start": 2.88,
+   "end": 2.928
+  },
+  {
+   "text": "e",
+   "start": 2.928,
+   "end": 2.976
+  },
+  {
+   "text": "e",
+   "start": 2.976,
+   "end": 3.024
+  },
+  {
+   "text": "d",
+   "start": 3.024,
+   "end": 3.072
+  },
+  {
+   "text": "s",
+   "start": 3.072,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.28
+  },
+  {
+   "text": "s",
+   "start": 3.28,
+   "end": 3.408
+  },
+  {
+   "text": "p",
+   "start": 3.408,
+   "end": 3.536
+  },
+  {
+   "text": "e",
+   "start": 3.536,
+   "end": 3.664
+  },
+  {
+   "text": "e",
+   "start": 3.664,
+   "end": 3.792
+  },
+  {
+   "text": "d",
+   "start": 3.792,
+   "end": 3.92
+  },
+  {
+   "text": ",",
+   "start": 3.92,
+   "end": 3.96
+  },
+  {
+   "text": " ",
+   "start": 3.96,
+   "end": 4
+  },
+  {
+   "text": "a",
+   "start": 4,
+   "end": 4.053
+  },
+  {
+   "text": "l",
+   "start": 4.053,
+   "end": 4.107
+  },
+  {
+   "text": "l",
+   "start": 4.107,
+   "end": 4.16
+  },
+  {
+   "text": " ",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": "t",
+   "start": 4.24,
+   "end": 4.267
+  },
+  {
+   "text": "h",
+   "start": 4.267,
+   "end": 4.293
+  },
+  {
+   "text": "e",
+   "start": 4.293,
+   "end": 4.32
+  },
+  {
+   "text": " ",
+   "start": 4.32,
+   "end": 4.8
+  },
+  {
+   "text": "t",
+   "start": 4.8,
+   "end": 4.92
+  },
+  {
+   "text": "i",
+   "start": 4.92,
+   "end": 5.04
+  },
+  {
+   "text": "m",
+   "start": 5.04,
+   "end": 5.16
+  },
+  {
+   "text": "e",
+   "start": 5.16,
+   "end": 5.28
+  },
+  {
+   "text": ".",
+   "start": 5.28,
+   "end": 5.36
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "So",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "a",
+   "start": 0.32,
+   "end": 0.48
+  },
+  {
+   "text": "wing",
+   "start": 0.6,
+   "end": 0.72
+  },
+  {
+   "text": "can",
+   "start": 0.8,
+   "end": 1.04
+  },
+  {
+   "text": "never",
+   "start": 1.2,
+   "end": 1.36
+  },
+  {
+   "text": "just",
+   "start": 1.44,
+   "end": 1.68
+  },
+  {
+   "text": "hang",
+   "start": 1.76,
+   "end": 2
+  },
+  {
+   "text": "there.",
+   "start": 2.08,
+   "end": 2.68
+  },
+  {
+   "text": "It",
+   "start": 2.72,
+   "end": 2.8
+  },
+  {
+   "text": "needs",
+   "start": 2.88,
+   "end": 3.12
+  },
+  {
+   "text": "speed,",
+   "start": 3.28,
+   "end": 3.96
+  },
+  {
+   "text": "all",
+   "start": 4,
+   "end": 4.16
+  },
+  {
+   "text": "the",
+   "start": 4.24,
+   "end": 4.32
+  },
+  {
+   "text": "time.",
+   "start": 4.8,
+   "end": 5.36
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": "o",
+   "start": 0.14,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.4
+  },
+  {
+   "text": "a",
+   "start": 0.4,
+   "end": 0.5
+  },
+  {
+   "text": " ",
+   "start": 0.5,
+   "end": 0.56
+  },
+  {
+   "text": "w",
+   "start": 0.56,
+   "end": 0.62
+  },
+  {
+   "text": "i",
+   "start": 0.62,
+   "end": 0.64
+  },
+  {
+   "text": "n",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "g",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": " ",
+   "start": 0.74,
+   "end": 0.84
+  },
+  {
+   "text": "c",
+   "start": 0.84,
+   "end": 0.84
+  },
+  {
+   "text": "a",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": "n",
+   "start": 0.94,
+   "end": 1.02
+  },
+  {
+   "text": " ",
+   "start": 1.02,
+   "end": 1.12
+  },
+  {
+   "text": "n",
+   "start": 1.12,
+   "end": 1.18
+  },
+  {
+   "text": "e",
+   "start": 1.18,
+   "end": 1.24
+  },
+  {
+   "text": "v",
+   "start": 1.24,
+   "end": 1.26
+  },
+  {
+   "text": "e",
+   "start": 1.26,
+   "end": 1.3
+  },
+  {
+   "text": "r",
+   "start": 1.3,
+   "end": 1.38
+  },
+  {
+   "text": " ",
+   "start": 1.38,
+   "end": 1.44
+  },
+  {
+   "text": "j",
+   "start": 1.44,
+   "end": 1.46
+  },
+  {
+   "text": "u",
+   "start": 1.46,
+   "end": 1.48
+  },
+  {
+   "text": "s",
+   "start": 1.48,
+   "end": 1.54
+  },
+  {
+   "text": "t",
+   "start": 1.54,
+   "end": 1.7
+  },
+  {
+   "text": " ",
+   "start": 1.7,
+   "end": 1.78
+  },
+  {
+   "text": "h",
+   "start": 1.78,
+   "end": 1.84
+  },
+  {
+   "text": "a",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "n",
+   "start": 1.88,
+   "end": 1.96
+  },
+  {
+   "text": "g",
+   "start": 1.96,
+   "end": 2.02
+  },
+  {
+   "text": " ",
+   "start": 2.02,
+   "end": 2.08
+  },
+  {
+   "text": "t",
+   "start": 2.08,
+   "end": 2.1
+  },
+  {
+   "text": "h",
+   "start": 2.1,
+   "end": 2.14
+  },
+  {
+   "text": "e",
+   "start": 2.14,
+   "end": 2.18
+  },
+  {
+   "text": "r",
+   "start": 2.18,
+   "end": 2.2
+  },
+  {
+   "text": "e",
+   "start": 2.28,
+   "end": 2.32
+  },
+  {
+   "text": ".",
+   "start": 2.32,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.74
+  },
+  {
+   "text": "I",
+   "start": 2.74,
+   "end": 2.76
+  },
+  {
+   "text": "t",
+   "start": 2.76,
+   "end": 2.86
+  },
+  {
+   "text": " ",
+   "start": 2.86,
+   "end": 2.9
+  },
+  {
+   "text": "n",
+   "start": 2.9,
+   "end": 2.94
+  },
+  {
+   "text": "e",
+   "start": 2.94,
+   "end": 2.98
+  },
+  {
+   "text": "e",
+   "start": 2.98,
+   "end": 3
+  },
+  {
+   "text": "d",
+   "start": 3,
+   "end": 3.08
+  },
+  {
+   "text": "s",
+   "start": 3.08,
+   "end": 3.16
+  },
+  {
+   "text": " ",
+   "start": 3.16,
+   "end": 3.3
+  },
+  {
+   "text": "s",
+   "start": 3.3,
+   "end": 3.34
+  },
+  {
+   "text": "p",
+   "start": 3.34,
+   "end": 3.42
+  },
+  {
+   "text": "e",
+   "start": 3.42,
+   "end": 3.44
+  },
+  {
+   "text": "e",
+   "start": 3.44,
+   "end": 3.64
+  },
+  {
+   "text": "d",
+   "start": 3.64,
+   "end": 3.66
+  },
+  {
+   "text": ",",
+   "start": 3.66,
+   "end": 3.66
+  },
+  {
+   "text": " ",
+   "start": 3.66,
+   "end": 4.04
+  },
+  {
+   "text": "a",
+   "start": 4.04,
+   "end": 4.059
+  },
+  {
+   "text": "l",
+   "start": 4.059,
+   "end": 4.12
+  },
+  {
+   "text": "l",
+   "start": 4.12,
+   "end": 4.18
+  },
+  {
+   "text": " ",
+   "start": 4.18,
+   "end": 4.22
+  },
+  {
+   "text": "t",
+   "start": 4.22,
+   "end": 4.24
+  },
+  {
+   "text": "h",
+   "start": 4.24,
+   "end": 4.28
+  },
+  {
+   "text": "e",
+   "start": 4.28,
+   "end": 4.32
+  },
+  {
+   "text": " ",
+   "start": 4.32,
+   "end": 4.38
+  },
+  {
+   "text": "t",
+   "start": 4.38,
+   "end": 4.48
+  },
+  {
+   "text": "i",
+   "start": 4.48,
+   "end": 4.58
+  },
+  {
+   "text": "m",
+   "start": 4.58,
+   "end": 4.6
+  },
+  {
+   "text": "e",
+   "start": 4.6,
+   "end": 4.76
+  },
+  {
+   "text": ".",
+   "start": 4.76,
+   "end": 4.76
+  }
+ ]
+}

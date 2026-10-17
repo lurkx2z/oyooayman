@@ -1,0 +1,134 @@
+{
+ "id": "46-kick",
+ "text": "Like this.",
+ "seconds": 1.33,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Like",
+   "start": 0.08,
+   "end": 0.26
+  },
+  {
+   "text": "this.",
+   "start": 0.32,
+   "end": 0.64
+  }
+ ],
+ "characters": [
+  {
+   "text": "L",
+   "start": 0,
+   "end": 0.04
+  },
+  {
+   "text": "i",
+   "start": 0.04,
+   "end": 0.08
+  },
+  {
+   "text": "k",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.32
+  },
+  {
+   "text": "t",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "h",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "i",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "s",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": ".",
+   "start": 0.64,
+   "end": 1.28
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Like",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "this.",
+   "start": 0.32,
+   "end": 1.28
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "L",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "i",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "k",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "e",
+   "start": 0.16,
+   "end": 0.26
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.32
+  },
+  {
+   "text": "t",
+   "start": 0.32,
+   "end": 0.34
+  },
+  {
+   "text": "h",
+   "start": 0.34,
+   "end": 0.38
+  },
+  {
+   "text": "i",
+   "start": 0.38,
+   "end": 0.44
+  },
+  {
+   "text": "s",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": ".",
+   "start": 0.64,
+   "end": 0.64
+  }
+ ]
+}

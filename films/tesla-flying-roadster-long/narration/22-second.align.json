@@ -1,0 +1,554 @@
+{
+ "id": "22-second",
+ "text": "That's where the second way comes in. Suction.",
+ "seconds": 3.42,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "That's",
+   "start": 0.12,
+   "end": 0.36
+  },
+  {
+   "text": "where",
+   "start": 0.4,
+   "end": 0.54
+  },
+  {
+   "text": "the",
+   "start": 0.58,
+   "end": 0.7
+  },
+  {
+   "text": "second",
+   "start": 0.78,
+   "end": 1.1
+  },
+  {
+   "text": "way",
+   "start": 1.14,
+   "end": 1.32
+  },
+  {
+   "text": "comes",
+   "start": 1.36,
+   "end": 1.6
+  },
+  {
+   "text": "in.",
+   "start": 1.68,
+   "end": 1.84
+  },
+  {
+   "text": "Suction.",
+   "start": 2.44,
+   "end": 2.96
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "h",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "a",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "'",
+   "start": 0.24,
+   "end": 0.28
+  },
+  {
+   "text": "s",
+   "start": 0.28,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "w",
+   "start": 0.4,
+   "end": 0.416
+  },
+  {
+   "text": "h",
+   "start": 0.416,
+   "end": 0.432
+  },
+  {
+   "text": "e",
+   "start": 0.432,
+   "end": 0.448
+  },
+  {
+   "text": "r",
+   "start": 0.448,
+   "end": 0.464
+  },
+  {
+   "text": "e",
+   "start": 0.464,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "t",
+   "start": 0.56,
+   "end": 0.613
+  },
+  {
+   "text": "h",
+   "start": 0.613,
+   "end": 0.667
+  },
+  {
+   "text": "e",
+   "start": 0.667,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.88
+  },
+  {
+   "text": "s",
+   "start": 0.88,
+   "end": 0.907
+  },
+  {
+   "text": "e",
+   "start": 0.907,
+   "end": 0.933
+  },
+  {
+   "text": "c",
+   "start": 0.933,
+   "end": 0.96
+  },
+  {
+   "text": "o",
+   "start": 0.96,
+   "end": 0.987
+  },
+  {
+   "text": "n",
+   "start": 0.987,
+   "end": 1.013
+  },
+  {
+   "text": "d",
+   "start": 1.013,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "w",
+   "start": 1.12,
+   "end": 1.173
+  },
+  {
+   "text": "a",
+   "start": 1.173,
+   "end": 1.227
+  },
+  {
+   "text": "y",
+   "start": 1.227,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "c",
+   "start": 1.36,
+   "end": 1.408
+  },
+  {
+   "text": "o",
+   "start": 1.408,
+   "end": 1.456
+  },
+  {
+   "text": "m",
+   "start": 1.456,
+   "end": 1.504
+  },
+  {
+   "text": "e",
+   "start": 1.504,
+   "end": 1.552
+  },
+  {
+   "text": "s",
+   "start": 1.552,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "i",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "n",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": ".",
+   "start": 1.84,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": "S",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "u",
+   "start": 2.48,
+   "end": 2.627
+  },
+  {
+   "text": "c",
+   "start": 2.627,
+   "end": 2.773
+  },
+  {
+   "text": "t",
+   "start": 2.773,
+   "end": 2.92
+  },
+  {
+   "text": "i",
+   "start": 2.92,
+   "end": 3.067
+  },
+  {
+   "text": "o",
+   "start": 3.067,
+   "end": 3.213
+  },
+  {
+   "text": "n",
+   "start": 3.213,
+   "end": 3.36
+  },
+  {
+   "text": ".",
+   "start": 3.36,
+   "end": 3.44
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "That's",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "where",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "the",
+   "start": 0.56,
+   "end": 0.72
+  },
+  {
+   "text": "second",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "way",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": "comes",
+   "start": 1.36,
+   "end": 1.6
+  },
+  {
+   "text": "in.",
+   "start": 1.68,
+   "end": 2.32
+  },
+  {
+   "text": "Suction.",
+   "start": 2.4,
+   "end": 3.44
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "h",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "a",
+   "start": 0.16,
+   "end": 0.26
+  },
+  {
+   "text": "t",
+   "start": 0.26,
+   "end": 0.26
+  },
+  {
+   "text": "'",
+   "start": 0.26,
+   "end": 0.26
+  },
+  {
+   "text": "s",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": " ",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "w",
+   "start": 0.4,
+   "end": 0.42
+  },
+  {
+   "text": "h",
+   "start": 0.42,
+   "end": 0.44
+  },
+  {
+   "text": "e",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "r",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": "e",
+   "start": 0.5,
+   "end": 0.54
+  },
+  {
+   "text": " ",
+   "start": 0.54,
+   "end": 0.58
+  },
+  {
+   "text": "t",
+   "start": 0.58,
+   "end": 0.6
+  },
+  {
+   "text": "h",
+   "start": 0.6,
+   "end": 0.62
+  },
+  {
+   "text": "e",
+   "start": 0.62,
+   "end": 0.7
+  },
+  {
+   "text": " ",
+   "start": 0.7,
+   "end": 0.78
+  },
+  {
+   "text": "s",
+   "start": 0.78,
+   "end": 0.86
+  },
+  {
+   "text": "e",
+   "start": 0.86,
+   "end": 0.92
+  },
+  {
+   "text": "c",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": "o",
+   "start": 0.96,
+   "end": 0.98
+  },
+  {
+   "text": "n",
+   "start": 0.98,
+   "end": 1.04
+  },
+  {
+   "text": "d",
+   "start": 1.04,
+   "end": 1.1
+  },
+  {
+   "text": " ",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "w",
+   "start": 1.14,
+   "end": 1.2
+  },
+  {
+   "text": "a",
+   "start": 1.2,
+   "end": 1.26
+  },
+  {
+   "text": "y",
+   "start": 1.26,
+   "end": 1.32
+  },
+  {
+   "text": " ",
+   "start": 1.32,
+   "end": 1.36
+  },
+  {
+   "text": "c",
+   "start": 1.36,
+   "end": 1.42
+  },
+  {
+   "text": "o",
+   "start": 1.42,
+   "end": 1.44
+  },
+  {
+   "text": "m",
+   "start": 1.44,
+   "end": 1.5
+  },
+  {
+   "text": "e",
+   "start": 1.52,
+   "end": 1.58
+  },
+  {
+   "text": "s",
+   "start": 1.58,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "i",
+   "start": 1.68,
+   "end": 1.8
+  },
+  {
+   "text": "n",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": ".",
+   "start": 1.84,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.84
+  },
+  {
+   "text": "S",
+   "start": 2.44,
+   "end": 2.52
+  },
+  {
+   "text": "u",
+   "start": 2.52,
+   "end": 2.62
+  },
+  {
+   "text": "c",
+   "start": 2.62,
+   "end": 2.68
+  },
+  {
+   "text": "t",
+   "start": 2.68,
+   "end": 2.7
+  },
+  {
+   "text": "i",
+   "start": 2.7,
+   "end": 2.74
+  },
+  {
+   "text": "o",
+   "start": 2.74,
+   "end": 2.88
+  },
+  {
+   "text": "n",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": ".",
+   "start": 2.96,
+   "end": 2.96
+  }
+ ]
+}

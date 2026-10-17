@@ -1,0 +1,464 @@
+{
+ "id": "53-end",
+ "text": "So… would you ride in it upside down?",
+ "seconds": 2.95,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "So…",
+   "start": 0.16,
+   "end": 0.46
+  },
+  {
+   "text": "would",
+   "start": 0.98,
+   "end": 1.16
+  },
+  {
+   "text": "you",
+   "start": 1.24,
+   "end": 1.32
+  },
+  {
+   "text": "ride",
+   "start": 1.42,
+   "end": 1.62
+  },
+  {
+   "text": "in",
+   "start": 1.66,
+   "end": 1.72
+  },
+  {
+   "text": "it",
+   "start": 1.76,
+   "end": 1.9
+  },
+  {
+   "text": "upside",
+   "start": 1.96,
+   "end": 2.32
+  },
+  {
+   "text": "down?",
+   "start": 2.36,
+   "end": 2.6
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.2
+  },
+  {
+   "text": "o",
+   "start": 0.2,
+   "end": 0.4
+  },
+  {
+   "text": "…",
+   "start": 0.4,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 1
+  },
+  {
+   "text": "w",
+   "start": 1,
+   "end": 1.024
+  },
+  {
+   "text": "o",
+   "start": 1.024,
+   "end": 1.048
+  },
+  {
+   "text": "u",
+   "start": 1.048,
+   "end": 1.072
+  },
+  {
+   "text": "l",
+   "start": 1.072,
+   "end": 1.096
+  },
+  {
+   "text": "d",
+   "start": 1.096,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "y",
+   "start": 1.2,
+   "end": 1.253
+  },
+  {
+   "text": "o",
+   "start": 1.253,
+   "end": 1.307
+  },
+  {
+   "text": "u",
+   "start": 1.307,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.48
+  },
+  {
+   "text": "r",
+   "start": 1.48,
+   "end": 1.51
+  },
+  {
+   "text": "i",
+   "start": 1.51,
+   "end": 1.54
+  },
+  {
+   "text": "d",
+   "start": 1.54,
+   "end": 1.57
+  },
+  {
+   "text": "e",
+   "start": 1.57,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": "i",
+   "start": 1.64,
+   "end": 1.66
+  },
+  {
+   "text": "n",
+   "start": 1.66,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "i",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "t",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "u",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "p",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "s",
+   "start": 2.08,
+   "end": 2.14
+  },
+  {
+   "text": "i",
+   "start": 2.14,
+   "end": 2.2
+  },
+  {
+   "text": "d",
+   "start": 2.2,
+   "end": 2.26
+  },
+  {
+   "text": "e",
+   "start": 2.26,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.44
+  },
+  {
+   "text": "d",
+   "start": 2.44,
+   "end": 2.47
+  },
+  {
+   "text": "o",
+   "start": 2.47,
+   "end": 2.5
+  },
+  {
+   "text": "w",
+   "start": 2.5,
+   "end": 2.53
+  },
+  {
+   "text": "n",
+   "start": 2.53,
+   "end": 2.56
+  },
+  {
+   "text": "?",
+   "start": 2.56,
+   "end": 2.96
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "So…",
+   "start": 0,
+   "end": 0.88
+  },
+  {
+   "text": "would",
+   "start": 1,
+   "end": 1.12
+  },
+  {
+   "text": "you",
+   "start": 1.2,
+   "end": 1.36
+  },
+  {
+   "text": "ride",
+   "start": 1.48,
+   "end": 1.6
+  },
+  {
+   "text": "in",
+   "start": 1.64,
+   "end": 1.68
+  },
+  {
+   "text": "it",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "upside",
+   "start": 1.92,
+   "end": 2.32
+  },
+  {
+   "text": "down?",
+   "start": 2.44,
+   "end": 2.96
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "o",
+   "start": 0.24,
+   "end": 0.46
+  },
+  {
+   "text": "…",
+   "start": 0.46,
+   "end": 0.46
+  },
+  {
+   "text": " ",
+   "start": 0.46,
+   "end": 0.46
+  },
+  {
+   "text": "w",
+   "start": 0.98,
+   "end": 1
+  },
+  {
+   "text": "o",
+   "start": 1,
+   "end": 1.02
+  },
+  {
+   "text": "u",
+   "start": 1.02,
+   "end": 1.04
+  },
+  {
+   "text": "l",
+   "start": 1.04,
+   "end": 1.06
+  },
+  {
+   "text": "d",
+   "start": 1.06,
+   "end": 1.16
+  },
+  {
+   "text": " ",
+   "start": 1.16,
+   "end": 1.24
+  },
+  {
+   "text": "y",
+   "start": 1.24,
+   "end": 1.26
+  },
+  {
+   "text": "o",
+   "start": 1.26,
+   "end": 1.26
+  },
+  {
+   "text": "u",
+   "start": 1.26,
+   "end": 1.32
+  },
+  {
+   "text": " ",
+   "start": 1.32,
+   "end": 1.42
+  },
+  {
+   "text": "r",
+   "start": 1.42,
+   "end": 1.48
+  },
+  {
+   "text": "i",
+   "start": 1.48,
+   "end": 1.54
+  },
+  {
+   "text": "d",
+   "start": 1.54,
+   "end": 1.56
+  },
+  {
+   "text": "e",
+   "start": 1.56,
+   "end": 1.62
+  },
+  {
+   "text": " ",
+   "start": 1.62,
+   "end": 1.66
+  },
+  {
+   "text": "i",
+   "start": 1.66,
+   "end": 1.68
+  },
+  {
+   "text": "n",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": " ",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "i",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "t",
+   "start": 1.8,
+   "end": 1.9
+  },
+  {
+   "text": " ",
+   "start": 1.9,
+   "end": 1.96
+  },
+  {
+   "text": "u",
+   "start": 1.96,
+   "end": 2.04
+  },
+  {
+   "text": "p",
+   "start": 2.04,
+   "end": 2.1
+  },
+  {
+   "text": "s",
+   "start": 2.1,
+   "end": 2.18
+  },
+  {
+   "text": "i",
+   "start": 2.18,
+   "end": 2.2
+  },
+  {
+   "text": "d",
+   "start": 2.2,
+   "end": 2.24
+  },
+  {
+   "text": "e",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.36
+  },
+  {
+   "text": "d",
+   "start": 2.36,
+   "end": 2.42
+  },
+  {
+   "text": "o",
+   "start": 2.42,
+   "end": 2.44
+  },
+  {
+   "text": "w",
+   "start": 2.44,
+   "end": 2.52
+  },
+  {
+   "text": "n",
+   "start": 2.58,
+   "end": 2.6
+  },
+  {
+   "text": "?",
+   "start": 2.6,
+   "end": 2.6
+  }
+ ]
+}
