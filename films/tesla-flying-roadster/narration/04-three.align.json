@@ -1,0 +1,774 @@
+{
+ "id": "04-three",
+ "text": "There are only three ways to beat gravity. The first is a wing.",
+ "seconds": 5.02,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "There",
+   "start": 0.06,
+   "end": 0.18
+  },
+  {
+   "text": "are",
+   "start": 0.2,
+   "end": 0.34
+  },
+  {
+   "text": "only",
+   "start": 0.4,
+   "end": 0.64
+  },
+  {
+   "text": "three",
+   "start": 0.82,
+   "end": 1.06
+  },
+  {
+   "text": "ways",
+   "start": 1.2,
+   "end": 1.54
+  },
+  {
+   "text": "to",
+   "start": 1.58,
+   "end": 1.72
+  },
+  {
+   "text": "beat",
+   "start": 1.76,
+   "end": 1.94
+  },
+  {
+   "text": "gravity.",
+   "start": 2,
+   "end": 2.44
+  },
+  {
+   "text": "The",
+   "start": 2.98,
+   "end": 3.12
+  },
+  {
+   "text": "first",
+   "start": 3.18,
+   "end": 3.54
+  },
+  {
+   "text": "is",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "a",
+   "start": 3.9,
+   "end": 3.98
+  },
+  {
+   "text": "wing.",
+   "start": 4.04,
+   "end": 4.32
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.032
+  },
+  {
+   "text": "h",
+   "start": 0.032,
+   "end": 0.064
+  },
+  {
+   "text": "e",
+   "start": 0.064,
+   "end": 0.096
+  },
+  {
+   "text": "r",
+   "start": 0.096,
+   "end": 0.128
+  },
+  {
+   "text": "e",
+   "start": 0.128,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "a",
+   "start": 0.24,
+   "end": 0.267
+  },
+  {
+   "text": "r",
+   "start": 0.267,
+   "end": 0.293
+  },
+  {
+   "text": "e",
+   "start": 0.293,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "o",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "n",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "l",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "y",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "t",
+   "start": 0.8,
+   "end": 0.864
+  },
+  {
+   "text": "h",
+   "start": 0.864,
+   "end": 0.928
+  },
+  {
+   "text": "r",
+   "start": 0.928,
+   "end": 0.992
+  },
+  {
+   "text": "e",
+   "start": 0.992,
+   "end": 1.056
+  },
+  {
+   "text": "e",
+   "start": 1.056,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "w",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "a",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "y",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "s",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "t",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": "o",
+   "start": 1.64,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "b",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "e",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "a",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "t",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "g",
+   "start": 2,
+   "end": 2.126
+  },
+  {
+   "text": "r",
+   "start": 2.126,
+   "end": 2.251
+  },
+  {
+   "text": "a",
+   "start": 2.251,
+   "end": 2.377
+  },
+  {
+   "text": "v",
+   "start": 2.377,
+   "end": 2.503
+  },
+  {
+   "text": "i",
+   "start": 2.503,
+   "end": 2.629
+  },
+  {
+   "text": "t",
+   "start": 2.629,
+   "end": 2.754
+  },
+  {
+   "text": "y",
+   "start": 2.754,
+   "end": 2.88
+  },
+  {
+   "text": ".",
+   "start": 2.88,
+   "end": 2.92
+  },
+  {
+   "text": " ",
+   "start": 2.92,
+   "end": 2.96
+  },
+  {
+   "text": "T",
+   "start": 2.96,
+   "end": 3.013
+  },
+  {
+   "text": "h",
+   "start": 3.013,
+   "end": 3.067
+  },
+  {
+   "text": "e",
+   "start": 3.067,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.4
+  },
+  {
+   "text": "f",
+   "start": 3.4,
+   "end": 3.456
+  },
+  {
+   "text": "i",
+   "start": 3.456,
+   "end": 3.512
+  },
+  {
+   "text": "r",
+   "start": 3.512,
+   "end": 3.568
+  },
+  {
+   "text": "s",
+   "start": 3.568,
+   "end": 3.624
+  },
+  {
+   "text": "t",
+   "start": 3.624,
+   "end": 3.68
+  },
+  {
+   "text": " ",
+   "start": 3.68,
+   "end": 3.76
+  },
+  {
+   "text": "i",
+   "start": 3.76,
+   "end": 3.8
+  },
+  {
+   "text": "s",
+   "start": 3.8,
+   "end": 3.84
+  },
+  {
+   "text": " ",
+   "start": 3.84,
+   "end": 4
+  },
+  {
+   "text": "a",
+   "start": 4,
+   "end": 4.32
+  },
+  {
+   "text": " ",
+   "start": 4.32,
+   "end": 4.64
+  },
+  {
+   "text": "w",
+   "start": 4.64,
+   "end": 4.72
+  },
+  {
+   "text": "i",
+   "start": 4.72,
+   "end": 4.8
+  },
+  {
+   "text": "n",
+   "start": 4.8,
+   "end": 4.88
+  },
+  {
+   "text": "g",
+   "start": 4.88,
+   "end": 4.96
+  },
+  {
+   "text": ".",
+   "start": 4.96,
+   "end": 5.04
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "There",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "are",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "only",
+   "start": 0.4,
+   "end": 0.72
+  },
+  {
+   "text": "three",
+   "start": 0.8,
+   "end": 1.12
+  },
+  {
+   "text": "ways",
+   "start": 1.2,
+   "end": 1.52
+  },
+  {
+   "text": "to",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "beat",
+   "start": 1.76,
+   "end": 1.92
+  },
+  {
+   "text": "gravity.",
+   "start": 2,
+   "end": 2.92
+  },
+  {
+   "text": "The",
+   "start": 2.96,
+   "end": 3.12
+  },
+  {
+   "text": "first",
+   "start": 3.4,
+   "end": 3.68
+  },
+  {
+   "text": "is",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "a",
+   "start": 4,
+   "end": 4.32
+  },
+  {
+   "text": "wing.",
+   "start": 4.64,
+   "end": 5.04
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.06,
+   "end": 0.08
+  },
+  {
+   "text": "h",
+   "start": 0.08,
+   "end": 0.08
+  },
+  {
+   "text": "e",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "r",
+   "start": 0.12,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "a",
+   "start": 0.2,
+   "end": 0.22
+  },
+  {
+   "text": "r",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": "e",
+   "start": 0.24,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.4
+  },
+  {
+   "text": "o",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "n",
+   "start": 0.44,
+   "end": 0.54
+  },
+  {
+   "text": "l",
+   "start": 0.54,
+   "end": 0.64
+  },
+  {
+   "text": "y",
+   "start": 0.64,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.82
+  },
+  {
+   "text": "t",
+   "start": 0.82,
+   "end": 0.84
+  },
+  {
+   "text": "h",
+   "start": 0.84,
+   "end": 0.92
+  },
+  {
+   "text": "r",
+   "start": 0.92,
+   "end": 0.94
+  },
+  {
+   "text": "e",
+   "start": 0.94,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1.06
+  },
+  {
+   "text": " ",
+   "start": 1.06,
+   "end": 1.2
+  },
+  {
+   "text": "w",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "a",
+   "start": 1.28,
+   "end": 1.38
+  },
+  {
+   "text": "y",
+   "start": 1.38,
+   "end": 1.48
+  },
+  {
+   "text": "s",
+   "start": 1.48,
+   "end": 1.54
+  },
+  {
+   "text": " ",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "t",
+   "start": 1.58,
+   "end": 1.58
+  },
+  {
+   "text": "o",
+   "start": 1.58,
+   "end": 1.72
+  },
+  {
+   "text": " ",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "b",
+   "start": 1.76,
+   "end": 1.78
+  },
+  {
+   "text": "e",
+   "start": 1.78,
+   "end": 1.82
+  },
+  {
+   "text": "a",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": "t",
+   "start": 1.86,
+   "end": 1.94
+  },
+  {
+   "text": " ",
+   "start": 1.94,
+   "end": 2
+  },
+  {
+   "text": "g",
+   "start": 2,
+   "end": 2.04
+  },
+  {
+   "text": "r",
+   "start": 2.04,
+   "end": 2.12
+  },
+  {
+   "text": "a",
+   "start": 2.12,
+   "end": 2.14
+  },
+  {
+   "text": "v",
+   "start": 2.14,
+   "end": 2.22
+  },
+  {
+   "text": "i",
+   "start": 2.22,
+   "end": 2.28
+  },
+  {
+   "text": "t",
+   "start": 2.28,
+   "end": 2.4
+  },
+  {
+   "text": "y",
+   "start": 2.4,
+   "end": 2.44
+  },
+  {
+   "text": ".",
+   "start": 2.44,
+   "end": 2.44
+  },
+  {
+   "text": " ",
+   "start": 2.44,
+   "end": 2.44
+  },
+  {
+   "text": "T",
+   "start": 2.98,
+   "end": 3
+  },
+  {
+   "text": "h",
+   "start": 3,
+   "end": 3.02
+  },
+  {
+   "text": "e",
+   "start": 3.02,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.18
+  },
+  {
+   "text": "f",
+   "start": 3.18,
+   "end": 3.26
+  },
+  {
+   "text": "i",
+   "start": 3.26,
+   "end": 3.28
+  },
+  {
+   "text": "r",
+   "start": 3.28,
+   "end": 3.34
+  },
+  {
+   "text": "s",
+   "start": 3.34,
+   "end": 3.44
+  },
+  {
+   "text": "t",
+   "start": 3.52,
+   "end": 3.54
+  },
+  {
+   "text": " ",
+   "start": 3.54,
+   "end": 3.76
+  },
+  {
+   "text": "i",
+   "start": 3.76,
+   "end": 3.82
+  },
+  {
+   "text": "s",
+   "start": 3.82,
+   "end": 3.84
+  },
+  {
+   "text": " ",
+   "start": 3.84,
+   "end": 3.9
+  },
+  {
+   "text": "a",
+   "start": 3.9,
+   "end": 3.98
+  },
+  {
+   "text": " ",
+   "start": 3.98,
+   "end": 4.04
+  },
+  {
+   "text": "w",
+   "start": 4.04,
+   "end": 4.12
+  },
+  {
+   "text": "i",
+   "start": 4.12,
+   "end": 4.14
+  },
+  {
+   "text": "n",
+   "start": 4.14,
+   "end": 4.28
+  },
+  {
+   "text": "g",
+   "start": 4.28,
+   "end": 4.32
+  },
+  {
+   "text": ".",
+   "start": 4.32,
+   "end": 4.32
+  }
+ ]
+}

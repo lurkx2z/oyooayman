@@ -1,0 +1,504 @@
+{
+ "id": "08-suction",
+ "text": "The Roadster uses the second way. Suction.",
+ "seconds": 3.66,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "The",
+   "start": 0.08,
+   "end": 0.14
+  },
+  {
+   "text": "Roadster",
+   "start": 0.22,
+   "end": 0.68
+  },
+  {
+   "text": "uses",
+   "start": 0.84,
+   "end": 1.12
+  },
+  {
+   "text": "the",
+   "start": 1.18,
+   "end": 1.28
+  },
+  {
+   "text": "second",
+   "start": 1.36,
+   "end": 1.64
+  },
+  {
+   "text": "way.",
+   "start": 1.72,
+   "end": 1.92
+  },
+  {
+   "text": "Suction.",
+   "start": 2.58,
+   "end": 3.04
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "h",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "e",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "R",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": "o",
+   "start": 0.22,
+   "end": 0.28
+  },
+  {
+   "text": "a",
+   "start": 0.28,
+   "end": 0.34
+  },
+  {
+   "text": "d",
+   "start": 0.34,
+   "end": 0.4
+  },
+  {
+   "text": "s",
+   "start": 0.4,
+   "end": 0.46
+  },
+  {
+   "text": "t",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "e",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": "r",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.8
+  },
+  {
+   "text": "u",
+   "start": 0.8,
+   "end": 0.86
+  },
+  {
+   "text": "s",
+   "start": 0.86,
+   "end": 0.92
+  },
+  {
+   "text": "e",
+   "start": 0.92,
+   "end": 0.98
+  },
+  {
+   "text": "s",
+   "start": 0.98,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "t",
+   "start": 1.12,
+   "end": 1.173
+  },
+  {
+   "text": "h",
+   "start": 1.173,
+   "end": 1.227
+  },
+  {
+   "text": "e",
+   "start": 1.227,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.44
+  },
+  {
+   "text": "s",
+   "start": 1.44,
+   "end": 1.467
+  },
+  {
+   "text": "e",
+   "start": 1.467,
+   "end": 1.493
+  },
+  {
+   "text": "c",
+   "start": 1.493,
+   "end": 1.52
+  },
+  {
+   "text": "o",
+   "start": 1.52,
+   "end": 1.547
+  },
+  {
+   "text": "n",
+   "start": 1.547,
+   "end": 1.573
+  },
+  {
+   "text": "d",
+   "start": 1.573,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "w",
+   "start": 1.68,
+   "end": 1.893
+  },
+  {
+   "text": "a",
+   "start": 1.893,
+   "end": 2.107
+  },
+  {
+   "text": "y",
+   "start": 2.107,
+   "end": 2.32
+  },
+  {
+   "text": ".",
+   "start": 2.32,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "S",
+   "start": 2.56,
+   "end": 3.08
+  },
+  {
+   "text": "u",
+   "start": 3.08,
+   "end": 3.167
+  },
+  {
+   "text": "c",
+   "start": 3.167,
+   "end": 3.253
+  },
+  {
+   "text": "t",
+   "start": 3.253,
+   "end": 3.34
+  },
+  {
+   "text": "i",
+   "start": 3.34,
+   "end": 3.427
+  },
+  {
+   "text": "o",
+   "start": 3.427,
+   "end": 3.513
+  },
+  {
+   "text": "n",
+   "start": 3.513,
+   "end": 3.6
+  },
+  {
+   "text": ".",
+   "start": 3.6,
+   "end": 3.68
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "The",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "Roadster",
+   "start": 0.16,
+   "end": 0.64
+  },
+  {
+   "text": "uses",
+   "start": 0.8,
+   "end": 1.04
+  },
+  {
+   "text": "the",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": "second",
+   "start": 1.44,
+   "end": 1.6
+  },
+  {
+   "text": "way.",
+   "start": 1.68,
+   "end": 2.48
+  },
+  {
+   "text": "Suction.",
+   "start": 2.56,
+   "end": 3.68
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "h",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": " ",
+   "start": 0.14,
+   "end": 0.22
+  },
+  {
+   "text": "R",
+   "start": 0.22,
+   "end": 0.28
+  },
+  {
+   "text": "o",
+   "start": 0.28,
+   "end": 0.34
+  },
+  {
+   "text": "a",
+   "start": 0.34,
+   "end": 0.38
+  },
+  {
+   "text": "d",
+   "start": 0.38,
+   "end": 0.48
+  },
+  {
+   "text": "s",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "t",
+   "start": 0.54,
+   "end": 0.56
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "r",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": " ",
+   "start": 0.68,
+   "end": 0.84
+  },
+  {
+   "text": "u",
+   "start": 0.84,
+   "end": 0.88
+  },
+  {
+   "text": "s",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1.06
+  },
+  {
+   "text": "s",
+   "start": 1.06,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "t",
+   "start": 1.18,
+   "end": 1.18
+  },
+  {
+   "text": "h",
+   "start": 1.18,
+   "end": 1.22
+  },
+  {
+   "text": "e",
+   "start": 1.22,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "s",
+   "start": 1.36,
+   "end": 1.42
+  },
+  {
+   "text": "e",
+   "start": 1.42,
+   "end": 1.5
+  },
+  {
+   "text": "c",
+   "start": 1.5,
+   "end": 1.52
+  },
+  {
+   "text": "o",
+   "start": 1.52,
+   "end": 1.54
+  },
+  {
+   "text": "n",
+   "start": 1.54,
+   "end": 1.6
+  },
+  {
+   "text": "d",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": " ",
+   "start": 1.64,
+   "end": 1.72
+  },
+  {
+   "text": "w",
+   "start": 1.72,
+   "end": 1.8
+  },
+  {
+   "text": "a",
+   "start": 1.8,
+   "end": 1.9
+  },
+  {
+   "text": "y",
+   "start": 1.9,
+   "end": 1.92
+  },
+  {
+   "text": ".",
+   "start": 1.92,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 1.92
+  },
+  {
+   "text": "S",
+   "start": 2.58,
+   "end": 2.64
+  },
+  {
+   "text": "u",
+   "start": 2.64,
+   "end": 2.74
+  },
+  {
+   "text": "c",
+   "start": 2.74,
+   "end": 2.8
+  },
+  {
+   "text": "t",
+   "start": 2.8,
+   "end": 2.82
+  },
+  {
+   "text": "i",
+   "start": 2.82,
+   "end": 2.86
+  },
+  {
+   "text": "o",
+   "start": 2.86,
+   "end": 3
+  },
+  {
+   "text": "n",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": ".",
+   "start": 3.04,
+   "end": 3.04
+  }
+ ]
+}

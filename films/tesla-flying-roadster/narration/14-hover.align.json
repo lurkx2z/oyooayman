@@ -1,0 +1,504 @@
+{
+ "id": "14-hover",
+ "text": "So could it just hover? Here's the catch.",
+ "seconds": 3.5,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "So",
+   "start": 0.12,
+   "end": 0.26
+  },
+  {
+   "text": "could",
+   "start": 0.56,
+   "end": 0.68
+  },
+  {
+   "text": "it",
+   "start": 0.72,
+   "end": 0.82
+  },
+  {
+   "text": "just",
+   "start": 0.92,
+   "end": 1.1
+  },
+  {
+   "text": "hover?",
+   "start": 1.16,
+   "end": 1.46
+  },
+  {
+   "text": "Here's",
+   "start": 2.2,
+   "end": 2.42
+  },
+  {
+   "text": "the",
+   "start": 2.46,
+   "end": 2.56
+  },
+  {
+   "text": "catch.",
+   "start": 2.62,
+   "end": 2.96
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "o",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.48
+  },
+  {
+   "text": "c",
+   "start": 0.48,
+   "end": 0.512
+  },
+  {
+   "text": "o",
+   "start": 0.512,
+   "end": 0.544
+  },
+  {
+   "text": "u",
+   "start": 0.544,
+   "end": 0.576
+  },
+  {
+   "text": "l",
+   "start": 0.576,
+   "end": 0.608
+  },
+  {
+   "text": "d",
+   "start": 0.608,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "i",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "t",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "j",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "u",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": "s",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "t",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "h",
+   "start": 1.12,
+   "end": 1.184
+  },
+  {
+   "text": "o",
+   "start": 1.184,
+   "end": 1.248
+  },
+  {
+   "text": "v",
+   "start": 1.248,
+   "end": 1.312
+  },
+  {
+   "text": "e",
+   "start": 1.312,
+   "end": 1.376
+  },
+  {
+   "text": "r",
+   "start": 1.376,
+   "end": 1.44
+  },
+  {
+   "text": "?",
+   "start": 1.44,
+   "end": 2.08
+  },
+  {
+   "text": " ",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "H",
+   "start": 2.16,
+   "end": 2.2
+  },
+  {
+   "text": "e",
+   "start": 2.2,
+   "end": 2.24
+  },
+  {
+   "text": "r",
+   "start": 2.24,
+   "end": 2.28
+  },
+  {
+   "text": "e",
+   "start": 2.28,
+   "end": 2.32
+  },
+  {
+   "text": "'",
+   "start": 2.32,
+   "end": 2.36
+  },
+  {
+   "text": "s",
+   "start": 2.36,
+   "end": 2.4
+  },
+  {
+   "text": " ",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "t",
+   "start": 2.48,
+   "end": 2.507
+  },
+  {
+   "text": "h",
+   "start": 2.507,
+   "end": 2.533
+  },
+  {
+   "text": "e",
+   "start": 2.533,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.76
+  },
+  {
+   "text": "c",
+   "start": 2.76,
+   "end": 2.8
+  },
+  {
+   "text": "a",
+   "start": 2.8,
+   "end": 2.84
+  },
+  {
+   "text": "t",
+   "start": 2.84,
+   "end": 2.88
+  },
+  {
+   "text": "c",
+   "start": 2.88,
+   "end": 2.92
+  },
+  {
+   "text": "h",
+   "start": 2.92,
+   "end": 2.96
+  },
+  {
+   "text": ".",
+   "start": 2.96,
+   "end": 3.44
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "So",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "could",
+   "start": 0.48,
+   "end": 0.64
+  },
+  {
+   "text": "it",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "just",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "hover?",
+   "start": 1.12,
+   "end": 2.08
+  },
+  {
+   "text": "Here's",
+   "start": 2.16,
+   "end": 2.4
+  },
+  {
+   "text": "the",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "catch.",
+   "start": 2.76,
+   "end": 3.44
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "o",
+   "start": 0.16,
+   "end": 0.26
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.56
+  },
+  {
+   "text": "c",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "o",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": "u",
+   "start": 0.62,
+   "end": 0.64
+  },
+  {
+   "text": "l",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "d",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": " ",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "i",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "t",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": " ",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": "j",
+   "start": 0.92,
+   "end": 0.92
+  },
+  {
+   "text": "u",
+   "start": 0.92,
+   "end": 0.94
+  },
+  {
+   "text": "s",
+   "start": 0.94,
+   "end": 1
+  },
+  {
+   "text": "t",
+   "start": 1,
+   "end": 1.1
+  },
+  {
+   "text": " ",
+   "start": 1.1,
+   "end": 1.16
+  },
+  {
+   "text": "h",
+   "start": 1.16,
+   "end": 1.24
+  },
+  {
+   "text": "o",
+   "start": 1.24,
+   "end": 1.26
+  },
+  {
+   "text": "v",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "e",
+   "start": 1.34,
+   "end": 1.42
+  },
+  {
+   "text": "r",
+   "start": 1.42,
+   "end": 1.46
+  },
+  {
+   "text": "?",
+   "start": 1.46,
+   "end": 1.46
+  },
+  {
+   "text": " ",
+   "start": 1.46,
+   "end": 1.46
+  },
+  {
+   "text": "H",
+   "start": 2.2,
+   "end": 2.24
+  },
+  {
+   "text": "e",
+   "start": 2.24,
+   "end": 2.26
+  },
+  {
+   "text": "r",
+   "start": 2.26,
+   "end": 2.28
+  },
+  {
+   "text": "e",
+   "start": 2.28,
+   "end": 2.32
+  },
+  {
+   "text": "'",
+   "start": 2.32,
+   "end": 2.32
+  },
+  {
+   "text": "s",
+   "start": 2.38,
+   "end": 2.42
+  },
+  {
+   "text": " ",
+   "start": 2.42,
+   "end": 2.46
+  },
+  {
+   "text": "t",
+   "start": 2.46,
+   "end": 2.48
+  },
+  {
+   "text": "h",
+   "start": 2.48,
+   "end": 2.48
+  },
+  {
+   "text": "e",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.62
+  },
+  {
+   "text": "c",
+   "start": 2.62,
+   "end": 2.7
+  },
+  {
+   "text": "a",
+   "start": 2.7,
+   "end": 2.74
+  },
+  {
+   "text": "t",
+   "start": 2.74,
+   "end": 2.86
+  },
+  {
+   "text": "c",
+   "start": 2.86,
+   "end": 2.9
+  },
+  {
+   "text": "h",
+   "start": 2.9,
+   "end": 2.96
+  },
+  {
+   "text": ".",
+   "start": 2.96,
+   "end": 2.96
+  }
+ ]
+}
