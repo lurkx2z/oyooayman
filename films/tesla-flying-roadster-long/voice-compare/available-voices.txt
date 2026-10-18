@@ -1,0 +1,26 @@
+name | voice id | labels | category
+Roger - Laid-Back, Casual, Resonant | CwhRBWXzGAHq8TQ4Fs17 | male, middle_aged, american, classy, conversational | premade
+Sarah - Mature, Reassuring, Confident | EXAVITQu4vr4xnSDxMaL | female, young, american, professional, entertainment_tv | premade
+Laura - Enthusiast, Quirky Attitude | FGY2WhTYpPnrIDTdsKH5 | female, young, american, sassy, social_media | premade
+Charlie - Deep, Confident, Energetic | IKne3meq5aSn9XLyUdCD | male, young, australian, hyped, conversational | premade
+George - Warm, Captivating Storyteller | JBFqnCBsd6RMkjVDRZzb | male, middle_aged, british, mature, narrative_story | premade
+Callum - Husky Trickster | N2lVS1w4EtoT3dr4eOWO | male, middle_aged, american, characters_animation | premade
+River - Relaxed, Neutral, Informative | SAz9YHcvj6GT2YYXdXww | neutral, middle_aged, american, calm, conversational | premade
+Harry - Fierce Warrior | SOYHLrjzK2X1ezoPC6cr | male, young, american, rough, characters_animation | premade
+Liam - Energetic, Social Media Creator | TX3LPaxmHKxFdv7VOQHJ | male, young, american, confident, social_media | premade
+Alice - Clear, Engaging Educator | Xb7hH8MSUJpSbSDYk0k2 | female, middle_aged, british, professional, informative_educational | premade
+Matilda - Knowledgable, Professional | XrExE9yKIg1WjnnlVkGX | female, middle_aged, american, upbeat, informative_educational | premade
+Will - Relaxed Optimist | bIHbv24MWmeRgasZH58o | male, young, american, chill, conversational | premade
+Jessica - Playful, Bright, Warm | cgSgspJ2msm6clMCkdW9 | female, young, american, cute, conversational | premade
+Eric - Smooth, Trustworthy | cjVigY5qzO86Huf0OWal | male, middle_aged, american, classy, conversational | premade
+Bella - Professional, Bright, Warm | hpp4J3VqNfWAUOO0d1Us | female, middle_aged, american, professional, informative_educational | premade
+Chris - Charming, Down-to-Earth | iP95p4xoKVk53GoZ742B | male, middle_aged, american, casual, conversational | premade
+Brian - Deep, Resonant and Comforting | nPczCjzI2devNBz1zQrb | male, middle_aged, american, classy, social_media | premade
+Daniel - Steady Broadcaster | onwK4e9ZLuTAKqWW03F9 | male, middle_aged, british, formal, informative_educational | premade
+Lily - Velvety Actress | pFZP5JQG7iQjIQuC4Bku | female, middle_aged, british, confident, informative_educational | premade
+Adam - Dominant, Firm | pNInz6obpgDQGcFmaJgB | male, middle_aged, american, social_media | premade
+Bill - Wise, Mature, Balanced | pqHfZKP75CvOlQylNhV4 | male, old, american, crisp, advertisement | premade
+Grandpa Spuds Oxley | NOpBlnGInO9m6vDvFkFC | male, old, american, gentle, conversational | professional
+Michael C. Vincent | uju3wxzG5OhpWcoi3SMy | male, middle_aged, american, confident, narrative_story | professional
+Mark - Natural Conversations | UgBBYS2sOqTuMpoF3BR0 | male, young, american, casual, conversational | professional
+Quentin - Narrator and Educator | Aa6nEBJJMKJwJkCx8VU2 | male, middle_aged, american, deep, informative_educational | professional

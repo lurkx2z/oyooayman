@@ -1,0 +1,16 @@
+VOICE COMPARISON
+
+Line: Until the air can't follow the wing any more. It tears away. That's a stall, and the lift collapses. So a wing can never just hang there. It needs speed, all the time.
+
+Listen to the .wav files in this folder (all matched to the same loudness, so compare the voice, not the volume).
+originals/ holds the MP3s exactly as ElevenLabs sent them.
+
+1-chris: Chris (male, casual, American) [128 kbps]
+2-eric: Eric (male, friendly, American) [128 kbps]
+3-will: Will (male, young, relaxed, American) [128 kbps]
+4-liam: Liam (male, young, clear, American) [128 kbps]
+5-roger: Roger (male, laid-back, American) [128 kbps]
+6-charlie: Charlie (male, natural, Australian) [128 kbps]
+7-jessica: Jessica (female, expressive, conversational) [128 kbps]
+8-sarah: Sarah (female, soft, young) [128 kbps]
+9-george-reference: George (the first voice you heard), same natural settings, for reference [128 kbps]
