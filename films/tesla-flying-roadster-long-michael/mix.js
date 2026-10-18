@@ -22,6 +22,6 @@ window.TR_MIX = {
     amb: [['toy', 0.0, -4], ['toyRun', 1.0, 0], ['numbers', 0.0, -3], ['flat', 0.0, 0], ['suck', -0.1, 0], ['suck', 1.0, -4], ['old', 0.0, 0], ['surface', 0.0, -3], ['drop', -0.1, -3], ['newton', 0.0, -4], ['brk', 0.0, 0], ['hover', 0.5, -3], ['heli', 0.0, 0], ['real', 0.5, -4], ['human', 0.0, -1]],
     sfx: [['go', -0.1, 5], ['questions', 0.0, 0], ['catch', 5.0, 0], ['catch', 5.6, 5], ['toy', 0.0, 0], ['flatFall', -0.2, 0], ['flatFall', 0.3, 5], ['suck', 0.0, 0], ['blast', -0.2, 0], ['blast', 0.2, 5], ['brk', 1.4, 0], ['kick', -0.5, 5], ['real', 0.0, 0]],
   },
-  master: 1.5,
+  master: 3.5,   // +2 dB over the Charlie cut: the quieter voice stem lowered the whole mix to −17.4 LUFS
   ceiling: -1.5,   // dBTP, the limiter's ceiling (trLimit)
 };
