@@ -30,11 +30,11 @@ const TR_READOUTS = [
   { from: () => trW(16, 'downforce').start, until: () => TR.theory - 0.2, label: 'DOWNFORCE', value: 'MORE THAN ITS WEIGHT', sub: 'AT RACING SPEED · AN OFTEN-QUOTED ESTIMATE' },
   { from: () => TR.catch + 0.3, until: () => TR.toy - 0.3, label: 'SPEED', value: (t) => `${Math.round(trTrackCatchV(t) * 3.6)} km/h`, sub: (t) => `DOWNFORCE ≈ ${Math.round(100 * trTrackCatchDF(t))} % OF ITS WEIGHT · ILLUSTRATIVE` },
   // the loop
-  { from: () => TR.numbers + 0.2, until: () => TR.flat - 0.3, label: 'SPEED NEEDED AT THE TOP', value: '≈ 25 km/h', sub: 'v² / R ≥ g ON THIS LOOP · OUR ESTIMATE' },
-  { from: () => trW(21, 'flat').start, until: () => TR.flatFall + 0.4, label: 'A FLAT CEILING', value: 'NO CURVE', sub: 'NOTHING PINS YOU UP THERE' },
+  { from: () => TR.numbers + 0.2, until: () => TR.flat - 0.3, label: 'SPEED NEEDED AT THE TOP', value: '≈ 25 km/h', sub: 'AT THE TOP · ≈ 55 km/h GOING IN · OUR ESTIMATE (THIS LOOP)' },
+  { from: () => trW(21, 'flat').start, until: () => TR.flatFall + 0.4, label: 'A FLAT CEILING', value: 'NO CURVE', sub: 'NOTHING PINS YOU UP THERE · RAMP SHAPE FROM REPORTS' },
   // suction
   { from: () => TR.twoG - 0.1, until: () => TR.tenth - 0.3, label: 'FAN SUCTION', value: 'UP TO 2 g', sub: TR_CLAIM + ' · TWICE ITS WEIGHT' },
-  { from: () => TR.tenth, until: () => TR.old - 0.3, label: 'PRESSURE DIFFERENCE', value: '≈ 7 kPa', sub: 'UNDER 1/10 OF THE AIR\'S 101 kPa · OUR ESTIMATE' },
+  { from: () => TR.tenth, until: () => TR.old - 0.3, label: 'PRESSURE DIFFERENCE', value: '≈ 7 kPa', sub: '≈ 35 kN OVER ≈ 5 m² OF FLOOR · UNDER 1/10 OF 101 kPa · OUR ESTIMATE' },
   { from: () => TR.old + 0.3, until: () => TR.brabham - 0.3, label: 'CHAPARRAL 2J', value: '1970', sub: 'TWO FANS AT THE BACK · BANNED' },
   { from: () => TR.brabham + 0.3, until: () => TR.mcm - 0.3, label: 'BRABHAM BT46B', value: '1978', sub: 'WON ITS FIRST RACE · WITHDRAWN' },
   { from: () => TR.mcm + 0.3, until: () => TR.surface - 0.3, label: 'McMURTRY SPÉIRLING', value: '2025', sub: (t) => t < trW(29, 'grip').start ? 'DROVE UPSIDE DOWN ON ITS FANS' : 'FANS GRIP EVEN STANDING STILL' },
@@ -45,10 +45,11 @@ const TR_READOUTS = [
   // the hover thought-experiment
   { from: () => trW(39, 'almost').start - 0.1, until: () => TR.kilos - 0.3, label: 'THRUST TO HOVER', value: '≈ 18 kN', sub: 'THE CAR\'S WHOLE WEIGHT (≈ 1.8 t) · OUR ESTIMATE' },
   { from: () => trW(40, 'thirty').start - 0.2, until: () => TR.lift0 + 0.2, label: 'AIR NEEDED TO HOVER', value: '≈ 30 kg/s', sub: 'OUR ESTIMATE · COLD AIR LEAVES AT ≈ 600 m/s' },
-  { from: () => TR.lift0 + 0.5, until: () => TR.heli - 0.3, label: 'HOVER TIME', value: (t) => `${Math.max(0, Math.min(t, TR.empty) - (TR.lift0 + 0.5)).toFixed(1)} s`,
-    sub: (t) => t < TR.empty ? `TANKS ≈ ${Math.max(0, Math.round(30 * (TR.empty - Math.max(t, TR.lift0 + 0.5))))} kg LEFT · OUR ESTIMATE` : 'TANKS EMPTY' },
+  { from: () => TR.lift0 + 0.5, until: () => TR.heli - 0.3, label: 'HOVER TIME', value: (t) => t < TR.empty ? `${Math.max(0, t - (TR.lift0 + 0.5)).toFixed(1)} s` : '≈ 5–12 s',
+    sub: (t) => t < TR.empty ? `TANKS ≈ ${Math.max(0, Math.round(30 * (TR.empty - Math.max(t, TR.lift0 + 0.5))))} kg LEFT · OUR ESTIMATE` : 'TANKS EMPTY · DEPENDS ON TANK PRESSURE (NOT PUBLISHED)' },
+  { from: () => TR.heli + 0.3, until: () => TR.bottle - 0.3, label: 'HELICOPTER', value: 'HOURS', sub: 'IT HOVERS UNTIL THE FUEL RUNS OUT' },
   // the reality check
-  { from: () => trW(50, 'america').start - 0.1, until: () => TR.human - 0.4, label: 'THE FAA', value: 'NOT AN AIRCRAFT', sub: 'FLYING MODE NOT LEGAL ON PUBLIC ROADS' },
+  { from: () => trW(50, 'america').start - 0.1, until: () => TR.human - 0.4, label: 'THE FAA', value: 'NOT AN AIRCRAFT', sub: 'SO NOT THE FAA\'S TO REGULATE · TESLA: FLYING MODE NOT FOR PUBLIC ROADS' },
 ];
 const TR_TAGS = [
   { from: () => TR.when + 0.2, until: () => TR.did - 0.2, text: 'OCT 15 2026 · SPACEX TEST SITE · McGREGOR, TEXAS' },
@@ -57,7 +58,7 @@ const TR_TAGS = [
   { from: () => TR.theory + 0.1, until: () => TR.toy - 0.2, text: 'IN THEORY · NOBODY HAS TRIED IT' },
   { from: () => TR.toy + 5.9, until: () => TR.toyRun - 0.1, text: 'SLOW MOTION' },
   { from: () => TR.numbers + 0.1, until: () => TR.flat - 0.2, text: 'RECONSTRUCTION · SLOWED DOWN' },
-  { from: () => TR.flat + 0.1, until: () => TR.flatFall - 0.7, text: 'RECONSTRUCTION · SLOWED DOWN' },
+  { from: () => TR.flat + 0.1, until: () => TR.flatFall - 0.7, text: 'RECONSTRUCTION · RAMP SHAPE APPROXIMATE' },
   { from: () => TR.flatFall - 0.5, until: () => TR.suck - 0.2, text: 'WHAT IF · THE FANS STOPPED' },
   { from: () => TR.suck + 0.2, until: () => TR.old - 0.2, text: 'EXPLAINER · SLOWED DOWN' },
   { from: () => TR.old + 0.1, until: () => TR.surface - 0.2, text: 'ILLUSTRATION · NOT THE REAL CARS' },
@@ -67,6 +68,7 @@ const TR_TAGS = [
   { from: () => TR.cold + 0.1, until: () => TR.space2 - 0.1, text: 'FROZEN IN MID-AIR' },
   { from: () => TR.space2 + 0.1, until: () => TR.nozzles - 0.1, text: 'ILLUSTRATION' },
   { from: () => TR.nozzles + 0.1, until: () => TR.brk - 0.1, text: 'SLOW MOTION' },
+  { from: () => TR.brk - 0.1, until: () => TR.hover - 0.2, text: 'RECONSTRUCTION · OUR READING OF THE DEMO' },
   { from: () => TR.hover + 0.2, until: () => TR.heli - 0.2, text: 'WHAT IF IT TRIED TO HOVER? · OUR ESTIMATE' },
   { from: () => TR.kick - 0.3, until: () => TR.real - 0.2, text: 'RECONSTRUCTION · FROM REPORTS OF THE DEMO' },
   { from: () => TR.human + 0.2, until: () => TR.end, text: 'WHAT IF · IN THE DEMO NOBODY WAS ON BOARD' },
@@ -114,4 +116,4 @@ const TR_VERDICT = {
   promised: [['0–60 mph in under 1 second', 49, 'onesecond'], ['A road-going version', 49, 'roadgoing'], ['The price', 49, 'price']],
 };
 // the timeline: [year, note, appears on (clip, word, from)]
-const TR_TIMELINE = [[2017, 'FIRST SHOWN', 49, 'seventeen'], [2020, 'FIRST PROMISED', 49, 'twenty', 27], [2026, 'THE DEMO', 49, 'that'], [2028, 'NOW PROMISED', 49, 'twentyeight']];
+const TR_TIMELINE = [[2017, 'FIRST SHOWN', 49, 'seventeen'], [2020, 'FIRST DUE', 49, 'twenty', 27], [2026, 'THE DEMO', 49, 'that'], [2028, 'NOW PROMISED', 49, 'twentyeight']];

@@ -26,12 +26,12 @@
     .af-ro .v { font-family: var(--book); font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 6); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; }
     .af-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 22); letter-spacing: 0.12em; margin-top: calc(var(--u) * 8); color: #ffd7a8; }
     /* the tag, top left above the readout */
-    .af-tag { position: absolute; left: calc(var(--u) * 64); top: calc(var(--u) * 52); font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.2em; font-size: calc(var(--u) * 24);
-      color: #f3ead8; padding: calc(var(--u) * 9) calc(var(--u) * 18); border-radius: calc(var(--u) * 10); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
+    .af-tag { position: absolute; left: calc(var(--u) * 64); top: calc(var(--u) * 52); font-family: var(--hud-font); font-weight: 600; letter-spacing: 0.18em; font-size: calc(var(--u) * 30);
+      color: #f3ead8; padding: calc(var(--u) * 10) calc(var(--u) * 20); border-radius: calc(var(--u) * 10); background: rgba(6, 8, 12, 0.7); pointer-events: none; }
     /* labels pinned to places */
     .af-lab { position: absolute; transform: translate(calc(var(--u) * -16), -50%); pointer-events: none; white-space: nowrap; font-family: var(--hud-font); font-weight: 600;
-      font-size: calc(var(--u) * 28); letter-spacing: 0.1em; color: #f6efe2; text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.9); }
-    .af-lab small { display: block; margin-left: calc(var(--u) * 34); font-size: 0.78em; opacity: 0.85; color: #ffd7a8; }
+      font-size: calc(var(--u) * 38); letter-spacing: 0.08em; color: #f6efe2; padding: calc(var(--u) * 6) calc(var(--u) * 14); border-radius: calc(var(--u) * 10); background: rgba(4, 6, 10, 0.55); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.9); }
+    .af-lab small { display: block; margin-left: calc(var(--u) * 34); font-size: 0.8em; opacity: 0.85; color: #ffd7a8; }
     /* the three ways to beat gravity: chips top right */
     .tr-ways { position: absolute; right: calc(var(--u) * 64); top: calc(var(--u) * 52); display: flex; gap: calc(var(--u) * 14); pointer-events: none; }
     .tr-ways .w { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.14em; color: #f3ead8; padding: calc(var(--u) * 10) calc(var(--u) * 20);
@@ -50,11 +50,12 @@
     .tr-chap { position: absolute; left: calc(var(--u) * 120); top: calc(var(--u) * 420); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 24) rgba(0, 0, 0, 0.8); }
     .tr-chap .n { font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 28); letter-spacing: 0.3em; color: #ffd7a8; }
     .tr-chap .t { font-family: var(--book); font-weight: 700; font-size: calc(var(--u) * 92); color: #f6efe2; line-height: 1.05; margin-top: calc(var(--u) * 10); }
-    .tr-time { position: absolute; left: calc(var(--u) * 160); right: calc(var(--u) * 160); top: calc(var(--u) * 170); height: calc(var(--u) * 260); pointer-events: none; }
+    .tr-time { position: absolute; left: calc(var(--u) * 160); right: calc(var(--u) * 160); top: calc(var(--u) * 150); height: calc(var(--u) * 300); pointer-events: none; }
+    .tr-time::before { content: ''; position: absolute; left: calc(var(--u) * -160); right: calc(var(--u) * -160); top: calc(var(--u) * -40); bottom: calc(var(--u) * -20); background: linear-gradient(rgba(4, 6, 10, 0.62), rgba(4, 6, 10, 0.62) 75%, rgba(4, 6, 10, 0)); }
     .tr-time .ln { position: absolute; left: 0; right: 0; top: calc(var(--u) * 120); height: calc(var(--u) * 4); background: rgba(246, 239, 226, 0.7); transform-origin: left; }
     .tr-time .y { position: absolute; top: calc(var(--u) * 60); transform: translateX(-50%); text-align: center; font-family: var(--book); font-weight: 700; font-size: calc(var(--u) * 56); color: #f6efe2; text-shadow: 0 0 calc(var(--u) * 16) rgba(0, 0, 0, 0.8); }
     .tr-time .y::after { content: ''; display: block; margin: calc(var(--u) * 14) auto 0; width: calc(var(--u) * 20); height: calc(var(--u) * 20); border-radius: 50%; background: #ffd7a8; }
-    .tr-time .y small { display: block; font-family: var(--hud-font); font-size: calc(var(--u) * 22); letter-spacing: 0.14em; font-weight: 600; color: #ffd7a8; margin-top: calc(var(--u) * 40); }
+    .tr-time .y small { display: block; font-family: var(--hud-font); font-size: calc(var(--u) * 28); letter-spacing: 0.12em; font-weight: 600; color: #ffd7a8; margin-top: calc(var(--u) * 40); }
   </style>
 </head>
 <body>

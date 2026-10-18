@@ -67,3 +67,12 @@ TR_SFX_EXTRA.push((K, H) => {
   K.put(fx.creak(0.4, fx.metalModes(200, 0.5), {}), 277.6, { vol: 0.04, norm: true });
   trThump(K, 277.6, { vol: 0.06, f0: 60, tau: 0.1 });
 });
+
+// the verdict's replays: a soft whoosh into the cling, the jump's jet burst and a distant landing
+TR_SFX_EXTRA.push((K, H) => {
+  const [r1, r2] = trRealCuts();
+  trWhoosh(K, r1, { d: 0.6, vol: 0.04 });
+  trWhoosh(K, r2, { d: 0.5, vol: 0.04 });
+  trJetSfx(K, r2 + 1.15, r2 + 1.5, () => 1, { vol: 0.05 });
+  trLandSfx(K, r2 + 2.85, { size: 0.5 });
+});

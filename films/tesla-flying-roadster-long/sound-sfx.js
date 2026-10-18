@@ -202,7 +202,7 @@ trSound('sfx', 'events', function (ctx, bus, K) {
   trWhoosh(K, A.real, { d: 0.6, vol: 0.06, down: true });
   for (const [n, w] of [[48, 'clings'], [48, 'jumps'], [48, 'closed'], [48, 'nobody'], [49, 'onesecond'], [49, 'roadgoing'], [49, 'price']]) tick(W(n, w) - 0.1, n === 49 ? 0.3 : -0.3);
   trWhoosh(K, A.timeline + 0.2, { d: 0.6, vol: 0.05 });
-  trDriveSfx(K, A.legal, A.human, () => 1.3, { vol: 0.03 });
+  trDriveSfx(K, A.legal, A.human, () => 3.2, { vol: 0.035 });
   { const b = W(50, 'tricks'); trJetSfx(K, b - 0.01, b + 0.6, (t) => MathX.smooth(t, b, b + 0.03) * (1 - MathX.smooth(t, b + 0.25, b + 0.4)), { vol: 0.25, thump: b, thumpVol: 0.1 }); }
   // ---- 7: you. The fans holding the car to the ceiling; the body creaks under the hanging weight
   trFanSfx(K, A.human, A.pov, () => 0.85, { vol: 0.05, room: open, wet: 0.3 });

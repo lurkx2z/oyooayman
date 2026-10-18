@@ -104,6 +104,8 @@ function trKickClock() {
   TR_KC.launchT = (15 + 3.5) / K.v; TR_KC.flight = flight;
   return TR_KC;
 }
+// the verdict's replays: the cling from "clings", the jump from "jumps", back to the pad on "closed"
+function trRealCuts() { return [trW(48, 'clings').start - 0.3, trW(48, 'jumps').start - 0.3, trW(48, 'closed').start - 0.3]; }
 function trKickState(τ) {
   const K = TR_KICK, C = trKickClock(), x0 = K.k0 - 15, kick = C.launchT, F = C.flight;
   const s = { fwd: new THREE.Vector3(1, 0, 0), up0: new THREE.Vector3(0, 1, 0), roll: 0, s: 0 };
@@ -409,8 +411,9 @@ const SITE_SHOTS = {
         const k = trK(t, TR.press, TR.twoG), a = trLerp(0.1, 0.35, k);
         trCamD(cam, [c.x + Math.sin(a) * trLerp(9.5, 10.5, k), trLerp(4.2, 4.6, k), Math.cos(a) * trLerp(9.5, 10.5, k)], [c.x, c.y + 0.2, 0], 44, t, 0.25);
       } else if (t < TR.tenth) {
-        const k = trK(t, TR.twoG, TR.tenth);
-        trCamD(cam, [c.x - trLerp(5.8, 4.8, k), 1.8, trLerp(4.5, 5.2, k)], [c.x + 0.3, c.y - 0.1, 0], 42, t, 0.3);
+        // a slow arc underneath: from behind the car round to its side, rising
+        const k = trK(t, TR.twoG, TR.tenth, (u) => u), a = trLerp(-1.15, 0.25, k), r = trLerp(7.0, 8.5, k);
+        trCamD(cam, [c.x + Math.sin(a) * r, trLerp(1.4, 3.0, k), Math.cos(a) * r], [c.x + 0.3, c.y - 0.2, 0], 42, t, 0.3);
       } else if (t < TR.old) {
         const k = trK(t, TR.tenth, TR.old, (u) => u), a = trLerp(0.6, 1.4, k);
         trCamD(cam, [c.x + Math.sin(a) * 8.0, trLerp(3.6, 4.4, k), Math.cos(a) * 8.0], [c.x, c.y, 0], 42, t, 0.25);
@@ -484,7 +487,7 @@ const SITE_SHOTS = {
       } else if (ph === 2) {
         // close on a corner nozzle: a test burst on "fast"
         const k = trK(t, c2, c3), n = car.nozzleWorld(0);
-        trCamD(cam, [n.x + trLerp(2.2, 1.7, k), trLerp(0.55, 0.45, k), n.z + trLerp(2.4, 2.0, k)], [n.x - 0.3, 0.3, n.z], 40, t, 0.2);
+        trCamD(cam, [n.x + trLerp(3.6, 1.4, k), trLerp(0.9, 0.42, k), n.z + trLerp(3.4, 1.9, k)], [n.x - 0.3, 0.3, n.z], 40, t, 0.2);
         const b = trW(40, 'fast').start - 0.05;
         trCarJets(puffs, t, car, () => st, { cornerL: (tt) => trBlip(tt, b, 0.9) + 0.6 * trBlip(tt, trW(40, 'thirty').start, 1.2) }, { speed: 16, life: 0.6, alpha: 0.4, size: 0.18, dt: 1 / 110 });
       } else {
@@ -562,15 +565,16 @@ const SITE_SHOTS = {
       const c = st.c, cam = this.camera;
       if (t < c1) {
         // dolly along the row of parked cars
+        // the Roadster waiting at the start of the lane, the kicker and the row of cars beyond it
         const k = trK(t, TR.hop, c1, (u) => u);
-        trCamD(cam, [K.k0 + trLerp(4, 23, k), 1.5, K.z + 8.5], [K.k0 + trLerp(7, 22, k), 1.0, K.z], 40, t, 0.4);
+        trCamD(cam, [K.k0 - 25 + 1.5 * k, trLerp(1.9, 1.6, k), K.z + trLerp(5.5, 4.8, k)], [K.k0 - 8 + 1.0 * k, 0.9, K.z], 42, t, 0.4);
       } else if (t < c2) {
         // low behind the Roadster, down the lane: the kicker, the cars
         const k = trK(t, c1, c2);
-        trCamD(cam, [K.k0 - 15 - trLerp(6.5, 5.5, k), trLerp(1.1, 0.9, k), K.z + trLerp(2.2, 1.6, k)], [K.k0 + 8, 1.2, K.z], 40, t, 0.4);
+        trCamD(cam, [K.k0 - 15 - trLerp(9.0, 8.0, k), trLerp(1.8, 1.5, k), K.z + trLerp(3.2, 2.6, k)], [K.k0 + 6, 1.0, K.z], 42, t, 0.4);
       } else {
-        const fo = MathX.smooth(t, C.inv(C.launchT), C.inv(C.launchT + C.flight) + 1.0);
-        trCamD(cam, [K.k0 + 16 + 8 * fo, 0.7, K.z + 10.5], [trLerp(K.k0 + 10, c.x, 0.65 + 0.35 * fo), Math.max(1.4, c.y * 0.75), K.z], 52, t, 0.5);
+        // side-on, tracking: the hop and the flip fill a third of the frame
+        trCamD(cam, [c.x + 1.5, 1.3 + 0.35 * Math.max(0, c.y - 1), K.z + 12.5], [c.x + 0.8, Math.max(1.3, c.y * 0.85), K.z], 46, t, 0.25);
       }
       const blips = ['short', 'sharp', 'bursts', 'launch', 'jump', 'flip'].map((w) => trW(45, w).start);
       const bl = (x) => { const tt = C.inv(x); let k = 0; for (const b of blips) k = Math.max(k, trBlip(tt, b, 0.14)); return tt < TR.kick - 1.2 ? k : 0; };
@@ -581,10 +585,23 @@ const SITE_SHOTS = {
   },
   // ---- 6: the verdict (the car on the left, the panel on the right), then the timeline over the whole site
   real: {
-    cuts() { return [TR.promise, TR.timeline]; },
+    cuts() { return [TR.promise, TR.timeline, ...trRealCuts()]; },
     frame(t, shot, app, sh, puffs) {
+      const cam = this.camera, ph = trPhase(t, [TR.real, TR.promise, TR.timeline]), [r1, r2, r3] = trRealCuts();
+      if (t >= r1 && t < r3) {
+        // the checklist's evidence: the cling on the ramp, then the jump over the cars, replayed behind the panel
+        if (t < r2) {
+          trRunClock();
+          const τ = TR_REPLAY.at(TR.replay + 0.6 + (t - r1) * 0.9), st = trDemo(τ), c = st.c; trPoseCar(sh.car, st);
+          trCamOff(cam, [c.x + 2.0, Math.max(1.2, c.y - 4.6), 14.5], [c.x - 0.6, c.y - 0.6, 0], 42, t, 2.4, 0.2);
+        } else {
+          const C = trKickClock(), K = TR_KICK, τ = 0.2 + (t - r2) * 0.95, st = trKickState(τ), c = st.c; trPoseCar(sh.car, st);
+          trCamOff(cam, [c.x + 1.5, 1.3 + 0.35 * Math.max(0, c.y - 1), K.z + 13], [c.x + 0.8, Math.max(1.3, c.y * 0.85), K.z], 46, t, 2.4, 0.2);
+          trCarJets(puffs, τ, sh.car, trKickState, { rear: (x) => (x > 0.1 && x < 0.9 ? 0.9 : 0), cornerL: (x) => (x > C.launchT - 0.05 && x < C.launchT + 0.3 ? 1 : 0), cornerR: (x) => (x > C.launchT - 0.05 && x < C.launchT + 0.3 ? 1 : 0) }, { speed: 16, life: 0.7, alpha: 0.5 });
+        }
+        return;
+      }
       const st = trPadState(), P = TR_PAD; trPoseCar(sh.car, st);
-      const cam = this.camera, ph = trPhase(t, [TR.real, TR.promise, TR.timeline]);
       if (ph === 0) {
         const k = trK(t, TR.real, TR.promise, (u) => u), a = trLerp(-0.3, 0.5, k);
         trCamOff(cam, [P.x + Math.cos(a) * 11.5, trLerp(2.2, 1.7, k), P.z + Math.sin(a) * 11.5], [P.x, 0.9, P.z], 40, t, 2.6, 0.3);
@@ -602,11 +619,13 @@ const SITE_SHOTS = {
   // the FAA: not an aircraft. It drives slowly along the lane, a car that does tricks (a blip of the jets)
   legal: {
     frame(t, shot, app, sh, puffs) {
-      const u = t - TR.legal, x = -54 + 1.3 * u, st = { c: new THREE.Vector3(x, TR_CG, 0), fwd: new THREE.Vector3(1, 0, 0.0001).normalize(), up0: new THREE.Vector3(0, 1, 0), roll: 0, s: 1.3 * u };
+      const V = 3.2, u = t - TR.legal, x = -54 + V * u, st = { c: new THREE.Vector3(x, TR_CG, 0), fwd: new THREE.Vector3(1, 0, 0.0001).normalize(), up0: new THREE.Vector3(0, 1, 0), roll: 0, s: V * u };
       trPoseCar(sh.car, st);
-      trCamD(this.camera, [x + trLerp(6.5, 3.5, trK(t, TR.legal, TR.human)), 0.9, 5.2], [x + 0.4, 0.8, 0], 40, t, 0.5);
+      // it drives past: from ahead of it round to its side, the camera keeping pace
+      const k = trK(t, TR.legal, TR.human, (u) => u), a = trLerp(0.55, -0.25, k);
+      trCamD(this.camera, [x + Math.sin(a) * 6.5, trLerp(1.0, 1.4, k), Math.cos(a) * 6.5], [x + 0.4, 0.8, 0], 40, t, 0.25);
       const b = trW(50, 'tricks').start;
-      trCarJets(puffs, t, sh.car, (tt) => ({ c: new THREE.Vector3(-54 + 1.3 * (tt - TR.legal), TR_CG, 0), fwd: st.fwd, up0: st.up0, roll: 0 }), { corner: (tt) => trBlip(tt, b, 0.18), rear: (tt) => trBlip(tt, b + 0.1, 0.2) }, { speed: 12, life: 0.7, alpha: 0.4, dt: 1 / 90 });
+      trCarJets(puffs, t, sh.car, (tt) => ({ c: new THREE.Vector3(-54 + 3.2 * (tt - TR.legal), TR_CG, 0), fwd: st.fwd, up0: st.up0, roll: 0 }), { corner: (tt) => trBlip(tt, b, 0.18), rear: (tt) => trBlip(tt, b + 0.1, 0.2) }, { speed: 12, life: 0.7, alpha: 0.4, dt: 1 / 90 });
     },
     grade(t, p) { p.exposure = 0.94; },
   },

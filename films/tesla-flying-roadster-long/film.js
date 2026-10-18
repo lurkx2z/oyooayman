@@ -95,7 +95,7 @@ const FILM = {
     const W = trWayAt(t);
     app.ways.style.opacity = W ? W.a.toFixed(3) : '0';
     if (W) [...app.ways.children].forEach((el, i) => { el.style.opacity = W.seen[i] ? (W.on === i ? '1' : W.on < 0 ? '0.85' : '0.38') : '0'; el.classList.toggle('on', W.on === i); });
-    const va = StoryHUD.win(t, TR.real + 0.2, TR.timeline, 0.3, 0.3);
+    const va = StoryHUD.win(t, trW(48, 'clings').start - 0.5, TR.timeline, 0.3, 0.3);
     app.verdict.style.opacity = va.toFixed(3);
     if (va > 0) {
       app.vItems.forEach((el, i) => { el.style.opacity = t >= app.vAt[i] ? '1' : '0'; });
