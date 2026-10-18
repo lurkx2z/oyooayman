@@ -7,8 +7,8 @@
      node films/tesla-flying-roadster-long-michael/render-gpu.cjs
 
    Writes to renders/tesla-flying-roadster-long-michael/:
-     tesla-flying-roadster-long_final_1080p.mp4   1920×1080 30 fps, H.264 CRF 18 + the mastered soundtrack (AAC 256k, copied)
-     tesla-flying-roadster-long_final_small.mp4   1280×720 two-pass, under 30 MiB (for sending from a phone), AAC 128k copied
+     tesla-flying-roadster-long-michael_final_1080p.mp4   1920×1080 30 fps, H.264 CRF 18 + the mastered soundtrack (AAC 256k, copied)
+     tesla-flying-roadster-long-michael_final_small.mp4   1280×720 two-pass, under 30 MiB (for sending from a phone), AAC 128k copied
      check.jpg                            8 frames across the film
    Resumable: re-run the same command and finished 15-second segments are kept.
    Options: --workers 4  --out <dir>  --gpu auto|headless|headed|software  --channel msedge|chrome  --from <frame> --to <frame>  --w 1920 --h 1080
@@ -39,8 +39,8 @@ const SEGDIR = path.join(OUT, 'segments');
 const W = +(ARGS.w || 1920), H = +(ARGS.h || 1080), FPS = 30, SEG = +(ARGS.seg || 450);
 const WORKERS = Math.max(1, +(ARGS.workers || 4));
 const FFMPEG = ARGS.ffmpeg || process.env.FFMPEG || 'ffmpeg';
-const FINAL = path.join(OUT, 'tesla-flying-roadster-long_final_1080p.mp4');
-const SMALL = path.join(OUT, 'tesla-flying-roadster-long_final_small.mp4');
+const FINAL = path.join(OUT, 'tesla-flying-roadster-long-michael_final_1080p.mp4');
+const SMALL = path.join(OUT, 'tesla-flying-roadster-long-michael_final_small.mp4');
 const url = pathToFileURL(PAGE).href + `?capture&w=${W}&h=${H}`;
 const hms = (s) => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 3600)}h${String(Math.floor(s / 60) % 60).padStart(2, '0')}m`; };
 
