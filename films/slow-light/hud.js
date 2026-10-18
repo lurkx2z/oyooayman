@@ -197,7 +197,9 @@ class SlHud {
       _p.set(l.p[0], l.p[1], l.p[2]).project(cam);
       const vis = _p.z < 1 && Math.abs(_p.x) < 1.1 && Math.abs(_p.y) < 1.1;
       d.style.opacity = vis ? String(l.a ?? 1) : '0';
-      d.style.left = ((_p.x * 0.5 + 0.5) * 100).toFixed(2) + '%'; d.style.top = ((-_p.y * 0.5 + 0.5) * 100).toFixed(2) + '%';
+      // (kept clear of the readout and the context box in the top left while that box is up)
+      const lx = (_p.x * 0.5 + 0.5) * 100, ly = (-_p.y * 0.5 + 0.5) * 100;
+      d.style.left = lx.toFixed(2) + '%'; d.style.top = (cx && lx < 44 ? Math.max(ly, 42) : ly).toFixed(2) + '%';
       const h = `<span class="d"></span>${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}`;
       if (d._h !== h) { d._h = h; d.innerHTML = h; }
     });
@@ -331,9 +333,9 @@ class SlHud {
         ${car(xr, 'none', 'rgba(255,255,255,0.85)', true)}${xA !== null ? car(xA, '#3a3226', '#d9a92e', false) : ''}${xB !== null ? car(xB, '#d9a92e', '#fff3c4', false) : ''}
       </g>
       <circle cx="380" cy="${yY.toFixed(1)}" r="10" fill="#fff"/><text x="380" y="${(yY + 38).toFixed(1)}" class="t" text-anchor="middle">YOU</text>
-      ${lab(xr, yL - 128, realAn, seen ? 'WHERE IT REALLY IS' : 'THE CAR', seen ? 'UNSEEN' : 'HEARD, NOT SEEN')}
-      ${xA !== null ? lab(xA, yL - 72, 'end', 'IT, DRIVING ON', 'TOO RED TO SEE') : ''}
-      ${xB !== null ? lab(xB, yL - 72, 'start', 'ITS PAST', 'RUNNING BACKWARDS') : ''}
+      ${lab(xr, yL - 156, realAn, seen ? 'WHERE IT REALLY IS' : 'THE CAR', seen ? 'UNSEEN' : 'HEARD, NOT SEEN')}
+      ${xA !== null ? lab(xA, yL - 104, 'end', 'IT, DRIVING ON', 'TOO RED TO SEE') : ''}
+      ${xB !== null ? lab(xB, yL - 52, 'start', 'ITS PAST', 'RUNNING BACKWARDS') : ''}
       <text x="380" y="452" class="s" text-anchor="middle">FROM ABOVE · THE RINGS ARE ITS LIGHT</text>`);
   }
   // Mum's text: radio from the mast, stopped on the way to your phone

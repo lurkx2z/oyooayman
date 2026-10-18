@@ -89,7 +89,9 @@ overhead shot. The score's theme comes back often (on purpose: it slows as light
 
 Score, room sound and effects are all synthesised (`sound-*.js`); the voices are speech shapes with no words you can
 make out. Every sound happens when it really happens (sound is never slowed), never when it is seen: that gap is the
-story. Mix measured on the final soundtrack: SEE BELOW.
+story. Measured on the final soundtrack (the 1080p file's AAC 256k): −15.3 LUFS integrated, loudness range 8.9 LU,
+true peak −1.3 dBTP. The small copy's 128k soundtrack goes through a peak limiter first, because low-bitrate AAC
+overshoots: −15.5 LUFS, 8.7 LU, −1.6 dBTP.
 
 ## Still weak
 

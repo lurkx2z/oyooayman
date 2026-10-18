@@ -90,4 +90,6 @@ score's theme (E–B–A–F#… G) slows as light does; the stop takes its last
 ## 5 · Delivery
 
 Runnable ZIP (unzip, open `slow-light.html`, press Space), then the final 1080p MP4 rendered on the owner's PC (GPU,
-through his Chrome) plus a small copy under 30 MiB. Report: `EPISODE_REPORT.md`.
+through his Chrome) plus a small copy under 30 MiB. Report: `EPISODE_REPORT.md`. The page plays the baked
+`soundtrack.js`; `render-gpu.cjs` copies in `final-soundtrack.m4a` (AAC 256k) and `small-soundtrack.m4a` (AAC 128k,
+peak-limited). All three come from one render of the mix; re-make them if the sound code or the timing changes.
