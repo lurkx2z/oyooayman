@@ -92,6 +92,12 @@ SH_WORLDS.proton = (app) => {
     fragmentShader: 'uniform float uOp; varying vec3 vC; void main(){ vec2 q = gl_PointCoord * 2.0 - 1.0; float r = length(q); if (r > 1.0) discard; float core = smoothstep(0.13, 0.03, r), halo = exp(-r * 5.0); gl_FragColor = vec4((vec3(1.0) * core * 2.0 + vC * halo * 1.4) * uOp, 1.0); }',
   });
   const quarks = new THREE.Points(qg, qm); quarks.frustumCulled = false; quarks.renderOrder = 8; R.add(quarks);
+  // a ring round the one quark you stay with (a marker of fixed size on screen: the quark itself never grows)
+  const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3), 3));
+  const rm = new THREE.ShaderMaterial({ uniforms: { uOp: { value: 0 }, uPx: { value: 150 } }, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
+    vertexShader: 'uniform float uPx; void main(){ gl_PointSize = uPx; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform float uOp; void main(){ vec2 q = gl_PointCoord * 2.0 - 1.0; float r = length(q); float a = smoothstep(0.035, 0.0, abs(r - 0.86)); if (a <= 0.0) discard; gl_FragColor = vec4(vec3(1.0, 0.9, 0.82) * a * 0.75 * uOp, 1.0); }' });
+  const qRing = new THREE.Points(rg, rm); qRing.frustumCulled = false; qRing.renderOrder = 9; R.add(qRing);
 
   // ---- quark–antiquark pairs: born from the field, fly apart, meet again and vanish (a flash)
   const NP = 260, pp = new Float32Array(NP * 2 * 3), pc = new Float32Array(NP * 2 * 3), pa = new Float32Array(NP * 2);
@@ -126,6 +132,8 @@ SH_WORLDS.proton = (app) => {
       // the quarks
       const qp = qg.attributes.position; Qs.q.forEach((q, i) => qp.setXYZ(i, ...q)); qp.needsUpdate = true;
       qm.uniforms.uPx.value = px; qm.uniforms.uOp.value = 1;
+      const rk = shWin(t, SH.quark + 0.2, SH.limit + 1.5, 0.6, 1.5); qRing.visible = rk > 0.001;
+      rg.attributes.position.setXYZ(0, ...Qs.q[0]); rg.attributes.position.needsUpdate = true; rm.uniforms.uOp.value = rk; rm.uniforms.uPx.value = 150 * px;
       // the pairs (each lives ~0.5 s: born together, apart, together again, a flash)
       const life = 0.55;
       for (let i = 0; i < NP; i++) {

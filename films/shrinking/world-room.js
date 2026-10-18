@@ -29,7 +29,7 @@ const SH_RM_POS = [
 ];
 const SH_RM_EYE = [[0, 0.93], [62, 0.93], [65.2, 0.93], [66.3, 0.62], [67.6, 0.66], [68.8, 0.97], [72.6, 0.97], [73.4, 0.9], [74, 0.93]];
 const SH_RM_DIR = [
-  [0, 0.06, 0.02], [3.2, 0.06, 0.02], [5.6, 0.04, 0.42], [8.4, 0.02, 0.36], [10.5, 0.08, -0.05], [14, 0.12, -0.02], [19, 0.1, 0.08],
+  [0, 0.06, 0.02], [3.2, 0.06, 0.02], [5.6, 0.04, 0.42], [8.2, 0.02, 0.34], [9.5, 0.04, -0.5], [12.2, 0.06, -0.42], [14, 0.12, -0.02], [19, 0.1, 0.08],
   [23.0, 0.11, 0.2], [28.5, 0.11, 0.33], [31.5, 0.11, 0.36], [32.4, 0.11, 0.33], [33.3, 0.12, 0.05], [35, 0.12, 0.12], [36.8, 0.1, 0.22],
   [42.8, 0.1, 0.22], [43.4, 0.35, 0.1], [45, -0.35, 0.08], [47.5, -0.2, 0.02],
   [49.5, 0.0, -0.3], [52, -0.04, -0.52], [55.5, -0.02, -0.42], [57.8, 0.85, -0.3], [62, 1.25, -0.12], [64.5, 1.4, -0.2],
@@ -85,6 +85,10 @@ function shRoomCam(t, h) {
       y = top + Math.sin(ph * Math.PI) * amp * shWin(t, SH.quake, SH.thrown + 0.2, 0.3, 0.1);
       yl = 0.9 + Math.sin(t * 3.1) * 0.5 + noise1(t * 2, 5) * 0.4; pl = -0.25 + noise1(t * 1.7, 9) * 0.25;
       roll = noise1(t * 4, 11) * 0.12;
+      // the buzz itself: a hard, fast shake while the motor runs (1.2 s on, 0.8 s off)
+      const c = (t - SH.quake) % 2.0, vb = t < SH.thrown ? MathX.clamp(Math.min(c / 0.03, (1.2 - c) / 0.06), 0, 1) : 0;
+      q = [q[0] + noise1(t * 37, 3) * 0.06 * h * vb, q[1], q[2] + noise1(t * 39, 6) * 0.06 * h * vb]; y += Math.abs(noise1(t * 43, 4)) * 0.08 * h * vb;
+      roll += noise1(t * 31, 5) * 0.06 * vb; pl += noise1(t * 29, 7) * 0.05 * vb;
       if (t >= SH.thrown) {
         // over the edge: out and down 7.8 mm to the floor, tumbling (slow motion)
         const v = MathX.clamp((t - SH.thrown) / (SH.floor - SH.thrown), 0, 1);
@@ -172,10 +176,11 @@ SH_WORLDS.room = (app) => {
     skin: '#c08f74', sleeve: '#3b4a5c', cuff: '#2c3846', watch: true,
     poses: {
       grab: { p: [0.1, -0.36, -0.36], F: [-0.05, -0.15, -1], N: [0, 1, 0.1], curl: [0.55, 0.6, 0.62, 0.66], thumb: [0.3, 0.5] },
+      palms: { p: [0.05, -0.21, -0.36], F: [-0.08, 1, -0.45], N: [0, 0.4, 1], curl: [0.18, 0.16, 0.24, 0.3], thumb: [0.7, 0.1] },
       lift: { p: [0.12, -0.2, -0.4], F: [-0.15, 0.25, -1], N: [0.05, 1, 0.3], curl: [0.45, 0.5, 0.55, 0.6], thumb: [0.35, 0.4], trem: 0.006 },
     },
-    blends: { grab: 0.5, lift: 0.6 },
-    script: { right: [[0, 'hidden'], [65.3, 'grab'], [67.6, 'lift'], [72.5, 'hidden']], left: [[0, 'hidden'], [65.4, 'grab'], [67.7, 'lift'], [72.55, 'hidden']] },
+    blends: { grab: 0.5, lift: 0.6, palms: 0.55 },
+    script: { right: [[0, 'hidden'], [9.1, 'palms'], [12.6, 'hidden'], [65.3, 'grab'], [67.6, 'lift'], [72.5, 'hidden']], left: [[0, 'hidden'], [9.25, 'palms'], [12.5, 'hidden'], [65.4, 'grab'], [67.7, 'lift'], [72.55, 'hidden']] },
   });
   hands.root.scale.setScalar(1 / 1.75);
 

@@ -18,8 +18,8 @@ function shAtomCam(t, h, T = [0, 0, 0]) {
   let dir = shN3([T[0] - p[0], T[1] - p[1], T[2] - p[2]]);
   const [yw, pt] = shYP(dir);
   const look = 0.55 * Math.sin((t - 296) * 0.5) * shWin(t, 296, 303, 1.5, 1.5) + 0.7 * Math.sin((t - 315) * 0.42) * shWin(t, 315.4, 320.4, 1.2, 1.4)
-    + 0.3 * Math.sin((t - 329.6) * 0.75) * shWin(t, 329.4, 333.4, 0.8, 0.9);
-  const up = 0.12 * Math.sin((t - 315) * 0.3) * shWin(t, 315.4, 320.4, 1.2, 1.4) + 0.2 * shWin(t, 329.0, 333.6, 0.8, 0.9);
+    + 0.3 * Math.sin((t - 327.6) * 0.75) * shWin(t, 324.4, 333.4, 1.2, 0.9);
+  const up = 0.12 * Math.sin((t - 315) * 0.3) * shWin(t, 315.4, 320.4, 1.2, 1.4) + 0.2 * shWin(t, 324.0, 333.6, 1.2, 0.9);
   dir = shDir(yw + look, pt + up);
   return { p, dir, roll: noise1(t * 0.2, 11) * 0.05 };
 }
@@ -162,11 +162,11 @@ SH_WORLDS.atom = (app) => {
         dg.attributes.position.needsUpdate = true; dg.attributes.sz.needsUpdate = true;
       }
       // the stadium and the pea
-      const sk = shWin(t, 328.6, 334.0, 1.2, 1.0);
+      const sk = shWin(t, 323.0, 334.0, 1.2, 1.0);
       lineM.opacity = 0.32 * sk; stad.visible = sk > 0.001;
-      const peaK = shWin(t, 328.8, 336.2, 1.0, 1.2);
+      const peaK = shWin(t, 326.5, 336.2, 1.0, 1.2);
       pea.material.uniforms.uOp.value = peaK; pea.material.uniforms.uPx.value = 16 * px;
-      ring.visible = sk > 0.001; ringM.uniforms.uOp.value = sk; ringM.uniforms.uPx.value = (70 + 10 * Math.sin(t * 3)) * px;
+      const rk = Math.max(sk, shWin(t, 333.6, 341.5, 0.6, 1.2)); ring.visible = rk > 0.001; ringM.uniforms.uOp.value = rk; ringM.uniforms.uPx.value = (70 + 10 * Math.sin(t * 3)) * px;
       pea.material.uniforms.uC.value.set(t < 334 ? '#9dff6a' : '#ffb27a');
       pea.visible = peaK > 0.001;
       // the nucleus: the nucleons tremble (they move at a fifth of the speed of light in there)

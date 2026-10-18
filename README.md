@@ -64,6 +64,13 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Long-form film: *What if you kept shrinking and couldn't stop?*** — open `shrinking.html` (7:38, 16:9, no
+> narration). One continuous first-person fall down the scale, from 1.75 m to the Planck length: the bedroom and the
+> cat, a toy brick, a jump onto the phone, its buzz as an earthquake, the dust (a mite, water that grabs like glue,
+> syrup air, bacteria), the electron-microscope grey (a virus firing, molecular hail, DNA), inside an atom, a proton's
+> storm, a quark, the foam of space, and a black hole that flashes away. Plan, physics and review log:
+> [`films/shrinking/PLAN.md`](films/shrinking/PLAN.md); report: [`films/shrinking/EPISODE_REPORT.md`](films/shrinking/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|

@@ -37,9 +37,9 @@ class ShHud {
     if (ra > 0) {
       this._txt('rov', this.roV, shFmt(h));
       const now = shNow(h), nx = shNext(h);
-      let sub = 'AS TALL AS ' + now[1];
+      let sub = (h > now[0] * 0.75 ? 'AS TALL AS ' : 'SMALLER THAN ') + now[1];   // (long gaps between landmarks: don't claim a size you're far below)
       if (h < 1.0e-19 * 0.98) sub = h > 1.7e-35 ? `A DECIMAL POINT AND ${shZeros(h)} ZEROS` : 'THE PLANCK LENGTH';
-      if (now[0] === 1.0e-19 && h > 0.98e-19) sub = 'THE SMALLEST THING EVER MEASURED';
+      if (now[0] === 1.0e-19 && h > 0.98e-19) sub = 'THE CLOSEST ANY EXPERIMENT HAS LOOKED';
       this._txt('ros', this.roS, sub);
       this._set('nx', this.nx, 'opacity', nx && t < SH.planck ? '1' : '0');
       if (nx) { this._txt('nxn', this.nxN, nx[1]); this._txt('nxv', this.nxV, shFmt(nx[0])); }

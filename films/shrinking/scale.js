@@ -46,12 +46,12 @@ const shZeros = (h) => -Math.floor(Math.log10(h)) - 1;
 
 // ---- what you are as tall as, and the next thing on the way down: [height (m), what, short name for NEXT]
 const SH_SIZES = [
-  [1.75, 'AN ADULT'], [1.15, 'A SIX-YEAR-OLD'], [0.5, 'A NEWBORN BABY'], [0.3, 'A CAT'], [0.15, 'A PENCIL'],
+  [1.75, 'AN ADULT'], [1.15, 'A SIX-YEAR-OLD'], [0.86, 'A TWO-YEAR-OLD'], [0.5, 'A NEWBORN BABY'], [0.3, 'A CAT'], [0.15, 'A PENCIL'],
   [0.065, 'YOUR THUMB'], [0.0114, 'A TOY BRICK'], [0.0078, 'THE EDGE OF YOUR PHONE'], [0.003, 'A FLEA'], [0.002, 'ONE LETTER ON A SCREEN'],
   [0.000055 * 10, 'TEN PIXELS'], [3.0e-4, 'A DUST MITE'], [7.0e-5, 'THE WIDTH OF A HAIR'], [3.0e-5, 'A GRAIN OF POLLEN'],
-  [8.0e-6, 'A RED BLOOD CELL'], [2.0e-6, 'A BACTERIUM'], [5.0e-7, 'A WAVE OF LIGHT'], [2.0e-7, 'A VIRUS'],
-  [1.0e-8, 'THE SKIN OF A CELL'], [2.0e-9, 'A STRAND OF DNA'], [3.0e-10, 'A WATER MOLECULE'], [1.5e-10, 'AN ATOM'],
-  [5.5e-15, 'A NUCLEUS'], [1.7e-15, 'A PROTON'], [1.0e-19, 'THE SMALLEST THING EVER MEASURED'], [1.6e-35, 'THE PLANCK LENGTH'],
+  [2.0e-6, 'A BACTERIUM'], [5.0e-7, 'A WAVE OF LIGHT'], [2.0e-7, 'A VIRUS'],
+  [2.0e-9, 'A STRAND OF DNA'], [1.5e-10, 'AN ATOM'],
+  [5.5e-15, 'A NUCLEUS'], [1.7e-15, 'A PROTON'], [1.0e-19, 'THE CLOSEST ANY EXPERIMENT HAS LOOKED'], [1.6e-35, 'THE PLANCK LENGTH'],
 ];
 // the line under your height: the last landmark you have shrunk to (or past)
 function shNow(h) {
@@ -67,16 +67,17 @@ function shNext(h) {
 // ---- your bedroom (4 m across), to you: the same ratio at human size
 const SH_ROOM = 4.0;
 const SH_LY = 9.4607e15;
-const SH_THINGS = [
-  [12, 'A BEDROOM'], [40, 'A HOUSE'], [150, 'A FOOTBALL PITCH'], [700, 'A SKYSCRAPER'], [4000, 'A MOUNTAIN'], [45e3, 'A CITY'],
-  [450e3, 'A COUNTRY'], [5e6, 'A CONTINENT'], [4e7, 'THE EARTH'], [4e8, 'JUPITER'], [5e9, 'THE SUN'], [3e11, 'THE ORBIT OF THE EARTH'],
-  [1.2e13, 'THE SOLAR SYSTEM'], [1e17, 'THE DISTANCE TO THE STARS'], [1.5e21, 'THE MILKY WAY'], [3e22, 'THE DISTANCE TO ANDROMEDA'],
-  [5e24, 'A SUPERCLUSTER OF GALAXIES'], [8.8e26, 'MOST OF THE UNIVERSE'], [Infinity, 'THE VISIBLE UNIVERSE'],
+const SH_THINGS = [   // [real size (m), what]
+  [4, 'A BEDROOM'], [15, 'A HOUSE'], [100, 'A FOOTBALL PITCH'], [400, 'A SKYSCRAPER'], [4000, 'A MOUNTAIN'], [30e3, 'A CITY'],
+  [800e3, 'A COUNTRY'], [4.5e6, 'A CONTINENT'], [12.7e6, 'THE EARTH'], [140e6, 'JUPITER'], [384e6, 'THE DISTANCE TO THE MOON'],
+  [1.39e9, 'THE SUN'], [3.0e11, 'THE ORBIT OF THE EARTH'], [9e12, 'THE ORBIT OF NEPTUNE'], [4.0e16, 'THE DISTANCE TO THE NEAREST STAR'],
+  [9.5e20, 'THE MILKY WAY'], [2.4e22, 'THE DISTANCE TO ANDROMEDA'], [8.8e26, 'THE VISIBLE UNIVERSE'],
 ];
 function shRoom(h) {
   const L = SH_ROOM * 1.75 / h;
-  let what = SH_THINGS[SH_THINGS.length - 1][1];
-  for (const [lim, name] of SH_THINGS) if (L < lim) { what = name; break; }
+  // "AS BIG AS" only when within 30 % of a real size; otherwise "BIGGER THAN" the largest thing it has passed
+  let what = 'AS BIG AS A BEDROOM';
+  for (const [sz, name] of SH_THINGS) { if (L >= sz * 0.7 && L <= sz * 1.3) { what = 'AS BIG AS ' + name; break; } if (L > sz) what = 'BIGGER THAN ' + name; }
   let v;
   if (L < 1000) v = `${shSig(L)} m`;
   else if (L < 1e9) v = `${Math.round(L / 1000).toLocaleString('en-US')} km`;
@@ -92,7 +93,6 @@ function shRoom(h) {
     if (k >= 1e6) v = `${shSig(k / 1e6)} million × the universe`;
     if (k >= 1e9) v = `${shSig(k / 1e9)} billion × the universe`;
   }
-  if (L > 8.8e26) what = 'BIGGER THAN EVERYTHING WE CAN SEE';
-  else what = 'AS BIG AS ' + what;
+  if (L > 8.8e26 * 1.3) what = 'BIGGER THAN EVERYTHING WE CAN SEE';
   return { L, v, what };
 }

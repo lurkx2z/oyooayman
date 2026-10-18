@@ -20,7 +20,7 @@
       font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 50); line-height: 1.2; color: #f6f1e7; pointer-events: none;
       text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.85), 0 0 calc(var(--u) * 4) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
     .sh-cap::before { content: ''; position: absolute; left: -14%; right: -14%; top: -55%; bottom: -55%; z-index: -1;
-      background: radial-gradient(closest-side, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0)); }
+      background: radial-gradient(closest-side, rgba(0, 0, 0, 0.56), rgba(0, 0, 0, 0)); }
     /* the readouts (top left: your height; top right: your bedroom, to you) */
     .sh-ro, .sh-room { position: absolute; top: calc(var(--u) * 58); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.6); }
     .sh-ro { left: calc(var(--u) * 70); }
@@ -35,7 +35,7 @@
     .sh-ro .nx .nn { font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 17); letter-spacing: 0.16em; color: #fff; }
     .sh-ro .nx .nv { display: block; font-family: var(--book); font-size: calc(var(--u) * 32); margin-top: calc(var(--u) * 4); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; }
     /* the honest label */
-    .sh-tag { position: absolute; left: calc(var(--u) * 70); top: calc(var(--u) * 300); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 16); letter-spacing: 0.18em;
+    .sh-tag { position: absolute; left: calc(var(--u) * 70); top: calc(var(--u) * 372); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 16); letter-spacing: 0.18em;
       color: #e9e2d4; padding: calc(var(--u) * 7) calc(var(--u) * 14); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
     /* Mum's notification (top centre, like a phone's banner) */
     .sh-msg { position: absolute; left: 50%; top: calc(var(--u) * 40); transform: translate(-50%, 0); width: calc(var(--u) * 560); display: flex; gap: calc(var(--u) * 18); align-items: center;
