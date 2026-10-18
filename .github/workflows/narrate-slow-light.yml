@@ -42,6 +42,24 @@ jobs:
           command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg >/dev/null; }
           ffmpeg -version | head -1
 
+      - name: Show the ElevenLabs account's credits (best effort, the key is never printed)
+        continue-on-error: true
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          node -e '
+            fetch("https://api.elevenlabs.io/v1/user/subscription", { headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY } })
+              .then(async (r) => {
+                const t = await r.text();
+                if (!r.ok) { console.log("subscription info unavailable: HTTP " + r.status + " " + t.slice(0, 200)); return; }
+                const j = JSON.parse(t), left = j.character_limit - j.character_count;
+                const reset = j.next_character_count_reset_unix ? new Date(j.next_character_count_reset_unix * 1000).toISOString() : "?";
+                const line = `account plan ${j.tier}: ${j.character_count} of ${j.character_limit} credits used, ${left} left, resets ${reset}`;
+                console.log(line);
+                if (process.env.GITHUB_STEP_SUMMARY) require("fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, line + "\n\n");
+              })
+              .catch((e) => console.log("subscription info unavailable: " + e.message));'
+
       - name: Generate, verify and time every clip
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
@@ -55,6 +73,8 @@ jobs:
           node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION.md" --realign --summary "$GITHUB_STEP_SUMMARY"
 
       - name: Commit the clips back to this branch
+        # always: a run that stops halfway (e.g. out of credits) still saves the clips it made, so they are not paid twice
+        if: always()
         run: |
           git config user.name "narration-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

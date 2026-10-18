@@ -146,6 +146,9 @@ async function main() {
     fs.writeFileSync(alignFile, JSON.stringify({ id: c.id, text: c.text, seconds: v.report.seconds, source, words, characters }, null, 1) + '\n');
     manifest.clips.push({ id: c.id, text: c.text, file: path.basename(file), align: path.basename(alignFile), seconds: v.report.seconds,
       speech_start: words[0]?.start ?? null, speech_end: words[words.length - 1]?.end ?? null, hash, verified: v.ok, timing: source });
+    // Save progress after every clip, so a run that stops halfway (e.g. out of credits) keeps the clips it already paid
+    // for; the next run sees them as unchanged and only generates the rest.
+    if (!args.realign) fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
   }
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
   if (failed) { console.error(`${failed} clip(s) failed verification. Do not use them.`); process.exit(4); }
