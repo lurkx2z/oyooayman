@@ -58,7 +58,11 @@ function shEnv(renderer, top, mid, low) {
 
 // a camera-facing plane that shows the crossfade texture (one per world, hidden unless that world is fading in)
 function shOverlay(world) {
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false }));
+  // (colour only: the outgoing world's alpha channel is ignored, so additive glows in it can't punch holes)
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.ShaderMaterial({ transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false,
+    uniforms: { map: { value: null }, opacity: { value: 1 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform sampler2D map; uniform float opacity; varying vec2 vUv; void main(){ gl_FragColor = vec4(texture2D(map, vUv).rgb, opacity); }' }));
   m.renderOrder = 10000; m.frustumCulled = false; m.visible = false;
   world.camera.add(m);
   if (!world.camera.parent) world.scene.add(world.camera);
@@ -101,8 +105,7 @@ const FILM = {
       const r = app.renderer, sz = r.getDrawingBufferSize(new THREE.Vector2());
       if (app.xfRT.width !== sz.x || app.xfRT.height !== sz.y) app.xfRT.setSize(sz.x, sz.y);
       r.setRenderTarget(app.xfRT); r.clear(); r.render(F.scene, F.camera); r.setRenderTarget(null);
-      W.overlay.material.map = app.xfRT.texture; W.overlay.material.opacity = k; W.overlay.material.needsUpdate = W.overlay.material._hadMap !== true;
-      W.overlay.material._hadMap = true;
+      W.overlay.material.uniforms.map.value = app.xfRT.texture; W.overlay.material.uniforms.opacity.value = k;
       W.overlay.visible = true; shFitOverlay(W);
       FILM._xf = { F, k };
     } else FILM._xf = null;

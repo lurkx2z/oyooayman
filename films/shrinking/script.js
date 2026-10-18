@@ -161,7 +161,7 @@ const SH_CAPS = [
   [380.0, 'As far as anyone knows, it has no size at all.'],
   [384.5, 'No experiment has ever seen anything smaller than this.'],
   [389.5, 'From here, nobody knows.'],
-  [393.5, 'Your bedroom, to you, is now bigger than the Milky Way.'],
+  [393.5, 'Your bedroom, to you, is now wider than a hundred galaxies.'],
   [398.5, 'You’re getting ten times smaller every few seconds.'],
   [403.5, 'Up there, she’s still calling.'],
   [408.5, 'Your bedroom is now wider than the whole visible universe.'],
