@@ -1,5 +1,8 @@
 # Episode report — What if your car could fly? (long cut, 16:9)
 
+> **Michael version** (2026-10-18): re-voiced by Michael C. Vincent, 472.8 s (7:53). Changes from the Charlie version: new narration and timing; voice stem −3.5 dB (his raw clips are louder); the jump run-up camera moved to the rear quarter so the jet vapour no longer fills the lens. Reviews below were scored on the Charlie version.
+
+
 **Film:** `tesla-flying-roadster-long-michael.html`, 486.9 s (8:07), 1920×1080, 30 fps. Charlie narration, 53 clips.
 **Ask:** "make it long form 8 min video" (2026-10-17). A separate film; the 2:32 vertical short is unchanged.
 

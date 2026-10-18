@@ -1,5 +1,8 @@
 # What if your car could fly? — the long cut (16:9, 8:07)
 
+> **This folder is the Michael version** (2026-10-18): the same film re-voiced by ElevenLabs Michael C. Vincent at the owner's request (7:53; the Charlie version in `films/tesla-flying-roadster-long/` is kept). Scenes follow his timing; the few fixed-second events go through `trRemap` (script.js). Page: `tesla-flying-roadster-long-michael.html`.
+
+
 Narrated widescreen documentary, 486.9 s, voice by Charlie (ElevenLabs, `NARRATION.md`, 53 clips). Page:
 `tesla-flying-roadster-long-michael.html`. A separate film from the 2:32 vertical short (`films/tesla-flying-roadster/`), which
 is unchanged. Owner's ask (2026-10-17): "make it long form 8 min video".

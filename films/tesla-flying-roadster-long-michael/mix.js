@@ -5,7 +5,7 @@
    ===================================================================== */
 window.TR_MIX = {
   stems: {
-    voice: { gain: -5.5, duck: 0, hp: 80 },
+    voice: { gain: -9.0, duck: 0, hp: 80 },   // Michael's raw clips are 3.5 dB louder than Charlie's (−25.5 vs −29.0 LUFS)
     music: { gain: 1.5, duck: -9.0, hp: 40 },
     amb: { gain: 6, duck: -6.0, hp: 45 },
     sfx: { gain: 3, duck: -5.0, hp: 30 },
