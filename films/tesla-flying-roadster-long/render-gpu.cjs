@@ -31,8 +31,8 @@ const ARGS = process.argv.slice(2).reduce((o, a, i, arr) => {
 }, {});
 const ROOT = path.resolve(__dirname, '../..');
 const PAGE = path.join(ROOT, 'tesla-flying-roadster-long.html');
-const SOUND = path.join(__dirname, 'final-soundtrack.m4a');         // AAC 256k, −15.1 LUFS, −2.0 dBTP
-const SMALL_SOUND = path.join(__dirname, 'small-soundtrack.m4a');   // AAC 128k, −15.2 LUFS, −1.6 dBTP (measured; low-bitrate
+const SOUND = path.join(__dirname, 'final-soundtrack.m4a');         // AAC 256k, −15.5 LUFS, −1.5 dBTP
+const SMALL_SOUND = path.join(__dirname, 'small-soundtrack.m4a');   // AAC 128k, −15.6 LUFS, −1.8 dBTP (measured; low-bitrate
                                                                     // AAC adds peaks, so it is encoded once and copied)
 const OUT = path.resolve(ROOT, ARGS.out || 'renders/tesla-flying-roadster-long');
 const SEGDIR = path.join(OUT, 'segments');
