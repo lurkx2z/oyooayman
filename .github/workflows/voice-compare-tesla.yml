@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches: ["episode/tesla-flying-roadster-*"]
-    paths: [".github/workflows/voice-compare-tesla.yml"]
+    paths: [".github/workflows/voice-compare-tesla.yml", "films/tesla-flying-roadster-long/voices.cjs"]
 
 permissions:
   contents: write
@@ -38,18 +38,15 @@ jobs:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         run: |
           if [ -z "$ELEVENLABS_API_KEY" ]; then echo "::error::The secret ELEVENLABS_API_KEY is missing."; exit 1; fi
-          git show origin/feature/elevenlabs-narration-kbxlfj:tools/voice-compare.cjs > /tmp/voice-compare.cjs
-          cp /tmp/voice-compare.cjs tools/voice-compare-tmp.cjs
-          node tools/voice-compare-tmp.cjs --out "$OUT" --set natural --text "$LINE" --summary "$GITHUB_STEP_SUMMARY"
-          rm tools/voice-compare-tmp.cjs
+          node films/tesla-flying-roadster-long/voices.cjs --out films/tesla-flying-roadster-long/voice-compare-fresh
 
       - name: Commit the comparison back to this branch
         run: |
           git config user.name "narration-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$OUT"
+          git add films/tesla-flying-roadster-long/voice-compare-fresh
           if git diff --cached --quiet; then echo "nothing new"; exit 0; fi
-          git commit -m "voice comparison for the long-form narrator (ElevenLabs, run ${GITHUB_RUN_ID})"
+          git commit -m "fresh voice comparison for the long-form narrator (ElevenLabs, run ${GITHUB_RUN_ID})"
           for i in 1 2 3 4; do
             git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
             sleep $((i * 3))
