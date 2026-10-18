@@ -1,0 +1,264 @@
+{
+ "id": "08-wingIntro",
+ "text": "The first is a wing.",
+ "seconds": 1.91,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "The",
+   "start": 0.06,
+   "end": 0.18
+  },
+  {
+   "text": "first",
+   "start": 0.26,
+   "end": 0.7
+  },
+  {
+   "text": "is",
+   "start": 0.76,
+   "end": 0.84
+  },
+  {
+   "text": "a",
+   "start": 0.9,
+   "end": 0.98
+  },
+  {
+   "text": "wing.",
+   "start": 1.04,
+   "end": 1.38
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "h",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "e",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "f",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "i",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "r",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "s",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "t",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "i",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "s",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "a",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "w",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "i",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "n",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "g",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": ".",
+   "start": 1.36,
+   "end": 1.84
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "The",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "first",
+   "start": 0.24,
+   "end": 0.64
+  },
+  {
+   "text": "is",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "a",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "wing.",
+   "start": 1.04,
+   "end": 1.84
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.06,
+   "end": 0.08
+  },
+  {
+   "text": "h",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "e",
+   "start": 0.1,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.26
+  },
+  {
+   "text": "f",
+   "start": 0.26,
+   "end": 0.32
+  },
+  {
+   "text": "i",
+   "start": 0.32,
+   "end": 0.34
+  },
+  {
+   "text": "r",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": "s",
+   "start": 0.42,
+   "end": 0.62
+  },
+  {
+   "text": "t",
+   "start": 0.62,
+   "end": 0.7
+  },
+  {
+   "text": " ",
+   "start": 0.7,
+   "end": 0.76
+  },
+  {
+   "text": "i",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "s",
+   "start": 0.82,
+   "end": 0.84
+  },
+  {
+   "text": " ",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": "a",
+   "start": 0.9,
+   "end": 0.98
+  },
+  {
+   "text": " ",
+   "start": 0.98,
+   "end": 1.04
+  },
+  {
+   "text": "w",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "i",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "n",
+   "start": 1.16,
+   "end": 1.32
+  },
+  {
+   "text": "g",
+   "start": 1.32,
+   "end": 1.38
+  },
+  {
+   "text": ".",
+   "start": 1.38,
+   "end": 1.38
+  }
+ ]
+}

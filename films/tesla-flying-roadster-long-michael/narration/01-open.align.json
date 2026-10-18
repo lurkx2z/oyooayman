@@ -1,0 +1,634 @@
+{
+ "id": "01-open",
+ "text": "This is a car. And it's about to drive upside down.",
+ "seconds": 4.31,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "This",
+   "start": 0.14,
+   "end": 0.58
+  },
+  {
+   "text": "is",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "a",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "car.",
+   "start": 0.88,
+   "end": 1.26
+  },
+  {
+   "text": "And",
+   "start": 1.82,
+   "end": 1.88
+  },
+  {
+   "text": "it's",
+   "start": 1.92,
+   "end": 2.02
+  },
+  {
+   "text": "about",
+   "start": 2.12,
+   "end": 2.34
+  },
+  {
+   "text": "to",
+   "start": 2.38,
+   "end": 2.48
+  },
+  {
+   "text": "drive",
+   "start": 2.54,
+   "end": 2.88
+  },
+  {
+   "text": "upside",
+   "start": 3.04,
+   "end": 3.54
+  },
+  {
+   "text": "down.",
+   "start": 3.6,
+   "end": 4.019
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.3
+  },
+  {
+   "text": "h",
+   "start": 0.3,
+   "end": 0.36
+  },
+  {
+   "text": "i",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": "s",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "i",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "s",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "a",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "c",
+   "start": 0.88,
+   "end": 1.013
+  },
+  {
+   "text": "a",
+   "start": 1.013,
+   "end": 1.147
+  },
+  {
+   "text": "r",
+   "start": 1.147,
+   "end": 1.28
+  },
+  {
+   "text": ".",
+   "start": 1.28,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "A",
+   "start": 1.8,
+   "end": 1.813
+  },
+  {
+   "text": "n",
+   "start": 1.813,
+   "end": 1.827
+  },
+  {
+   "text": "d",
+   "start": 1.827,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "i",
+   "start": 1.88,
+   "end": 1.9
+  },
+  {
+   "text": "t",
+   "start": 1.9,
+   "end": 1.92
+  },
+  {
+   "text": "'",
+   "start": 1.92,
+   "end": 1.96
+  },
+  {
+   "text": "s",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.16
+  },
+  {
+   "text": "a",
+   "start": 2.16,
+   "end": 2.192
+  },
+  {
+   "text": "b",
+   "start": 2.192,
+   "end": 2.224
+  },
+  {
+   "text": "o",
+   "start": 2.224,
+   "end": 2.256
+  },
+  {
+   "text": "u",
+   "start": 2.256,
+   "end": 2.288
+  },
+  {
+   "text": "t",
+   "start": 2.288,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": "t",
+   "start": 2.4,
+   "end": 2.44
+  },
+  {
+   "text": "o",
+   "start": 2.44,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.72
+  },
+  {
+   "text": "d",
+   "start": 2.72,
+   "end": 2.768
+  },
+  {
+   "text": "r",
+   "start": 2.768,
+   "end": 2.816
+  },
+  {
+   "text": "i",
+   "start": 2.816,
+   "end": 2.864
+  },
+  {
+   "text": "v",
+   "start": 2.864,
+   "end": 2.912
+  },
+  {
+   "text": "e",
+   "start": 2.912,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.08
+  },
+  {
+   "text": "u",
+   "start": 3.08,
+   "end": 3.14
+  },
+  {
+   "text": "p",
+   "start": 3.14,
+   "end": 3.2
+  },
+  {
+   "text": "s",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "i",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": "d",
+   "start": 3.36,
+   "end": 3.44
+  },
+  {
+   "text": "e",
+   "start": 3.44,
+   "end": 3.52
+  },
+  {
+   "text": " ",
+   "start": 3.52,
+   "end": 3.76
+  },
+  {
+   "text": "d",
+   "start": 3.76,
+   "end": 3.82
+  },
+  {
+   "text": "o",
+   "start": 3.82,
+   "end": 3.88
+  },
+  {
+   "text": "w",
+   "start": 3.88,
+   "end": 3.94
+  },
+  {
+   "text": "n",
+   "start": 3.94,
+   "end": 4
+  },
+  {
+   "text": ".",
+   "start": 4,
+   "end": 4.24
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "This",
+   "start": 0,
+   "end": 0.48
+  },
+  {
+   "text": "is",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "a",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "car.",
+   "start": 0.88,
+   "end": 1.76
+  },
+  {
+   "text": "And",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "it's",
+   "start": 1.88,
+   "end": 2
+  },
+  {
+   "text": "about",
+   "start": 2.16,
+   "end": 2.32
+  },
+  {
+   "text": "to",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "drive",
+   "start": 2.72,
+   "end": 2.96
+  },
+  {
+   "text": "upside",
+   "start": 3.08,
+   "end": 3.52
+  },
+  {
+   "text": "down.",
+   "start": 3.76,
+   "end": 4.24
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "i",
+   "start": 0.2,
+   "end": 0.4
+  },
+  {
+   "text": "s",
+   "start": 0.4,
+   "end": 0.58
+  },
+  {
+   "text": " ",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": "i",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": "s",
+   "start": 0.7,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "a",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": " ",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": "c",
+   "start": 0.88,
+   "end": 1.02
+  },
+  {
+   "text": "a",
+   "start": 1.04,
+   "end": 1.06
+  },
+  {
+   "text": "r",
+   "start": 1.06,
+   "end": 1.26
+  },
+  {
+   "text": ".",
+   "start": 1.26,
+   "end": 1.26
+  },
+  {
+   "text": " ",
+   "start": 1.26,
+   "end": 1.82
+  },
+  {
+   "text": "A",
+   "start": 1.82,
+   "end": 1.84
+  },
+  {
+   "text": "n",
+   "start": 1.84,
+   "end": 1.86
+  },
+  {
+   "text": "d",
+   "start": 1.86,
+   "end": 1.88
+  },
+  {
+   "text": " ",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": "i",
+   "start": 1.92,
+   "end": 1.94
+  },
+  {
+   "text": "t",
+   "start": 1.94,
+   "end": 1.98
+  },
+  {
+   "text": "'",
+   "start": 1.98,
+   "end": 1.98
+  },
+  {
+   "text": "s",
+   "start": 2,
+   "end": 2.02
+  },
+  {
+   "text": " ",
+   "start": 2.02,
+   "end": 2.12
+  },
+  {
+   "text": "a",
+   "start": 2.12,
+   "end": 2.16
+  },
+  {
+   "text": "b",
+   "start": 2.16,
+   "end": 2.22
+  },
+  {
+   "text": "o",
+   "start": 2.22,
+   "end": 2.24
+  },
+  {
+   "text": "u",
+   "start": 2.24,
+   "end": 2.34
+  },
+  {
+   "text": "t",
+   "start": 2.34,
+   "end": 2.34
+  },
+  {
+   "text": " ",
+   "start": 2.34,
+   "end": 2.38
+  },
+  {
+   "text": "t",
+   "start": 2.38,
+   "end": 2.38
+  },
+  {
+   "text": "o",
+   "start": 2.38,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.54
+  },
+  {
+   "text": "d",
+   "start": 2.54,
+   "end": 2.6
+  },
+  {
+   "text": "r",
+   "start": 2.6,
+   "end": 2.68
+  },
+  {
+   "text": "i",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "v",
+   "start": 2.72,
+   "end": 2.8
+  },
+  {
+   "text": "e",
+   "start": 2.8,
+   "end": 2.88
+  },
+  {
+   "text": " ",
+   "start": 2.88,
+   "end": 3.04
+  },
+  {
+   "text": "u",
+   "start": 3.04,
+   "end": 3.14
+  },
+  {
+   "text": "p",
+   "start": 3.14,
+   "end": 3.26
+  },
+  {
+   "text": "s",
+   "start": 3.26,
+   "end": 3.34
+  },
+  {
+   "text": "i",
+   "start": 3.34,
+   "end": 3.36
+  },
+  {
+   "text": "d",
+   "start": 3.36,
+   "end": 3.42
+  },
+  {
+   "text": "e",
+   "start": 3.42,
+   "end": 3.54
+  },
+  {
+   "text": " ",
+   "start": 3.54,
+   "end": 3.6
+  },
+  {
+   "text": "d",
+   "start": 3.6,
+   "end": 3.7
+  },
+  {
+   "text": "o",
+   "start": 3.7,
+   "end": 3.74
+  },
+  {
+   "text": "w",
+   "start": 3.74,
+   "end": 3.88
+  },
+  {
+   "text": "n",
+   "start": 3.88,
+   "end": 4.019
+  },
+  {
+   "text": ".",
+   "start": 4.019,
+   "end": 4.019
+  }
+ ]
+}

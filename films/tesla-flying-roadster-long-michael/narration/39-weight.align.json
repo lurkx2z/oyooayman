@@ -1,0 +1,1254 @@
+{
+ "id": "39-weight",
+ "text": "To hold up a car of almost two tonnes, the jets have to push with the car's whole weight. Every second.",
+ "seconds": 6.64,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "To",
+   "start": 0.04,
+   "end": 0.12
+  },
+  {
+   "text": "hold",
+   "start": 0.16,
+   "end": 0.34
+  },
+  {
+   "text": "up",
+   "start": 0.38,
+   "end": 0.46
+  },
+  {
+   "text": "a",
+   "start": 0.5,
+   "end": 0.58
+  },
+  {
+   "text": "car",
+   "start": 0.64,
+   "end": 0.9
+  },
+  {
+   "text": "of",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "almost",
+   "start": 1.1,
+   "end": 1.46
+  },
+  {
+   "text": "two",
+   "start": 1.52,
+   "end": 1.76
+  },
+  {
+   "text": "tonnes,",
+   "start": 1.82,
+   "end": 2.28
+  },
+  {
+   "text": "the",
+   "start": 2.6,
+   "end": 2.7
+  },
+  {
+   "text": "jets",
+   "start": 2.76,
+   "end": 2.96
+  },
+  {
+   "text": "have",
+   "start": 3.04,
+   "end": 3.16
+  },
+  {
+   "text": "to",
+   "start": 3.18,
+   "end": 3.3
+  },
+  {
+   "text": "push",
+   "start": 3.34,
+   "end": 3.56
+  },
+  {
+   "text": "with",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "the",
+   "start": 3.72,
+   "end": 3.8
+  },
+  {
+   "text": "car's",
+   "start": 3.86,
+   "end": 4.22
+  },
+  {
+   "text": "whole",
+   "start": 4.32,
+   "end": 4.52
+  },
+  {
+   "text": "weight.",
+   "start": 4.64,
+   "end": 4.92
+  },
+  {
+   "text": "Every",
+   "start": 5.36,
+   "end": 5.6
+  },
+  {
+   "text": "second.",
+   "start": 5.78,
+   "end": 6.2
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.04
+  },
+  {
+   "text": "o",
+   "start": 0.04,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "o",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "l",
+   "start": 0.24,
+   "end": 0.28
+  },
+  {
+   "text": "d",
+   "start": 0.28,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "u",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": "p",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "a",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "c",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "a",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "r",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "o",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "f",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.24
+  },
+  {
+   "text": "a",
+   "start": 1.24,
+   "end": 1.273
+  },
+  {
+   "text": "l",
+   "start": 1.273,
+   "end": 1.307
+  },
+  {
+   "text": "m",
+   "start": 1.307,
+   "end": 1.34
+  },
+  {
+   "text": "o",
+   "start": 1.34,
+   "end": 1.373
+  },
+  {
+   "text": "s",
+   "start": 1.373,
+   "end": 1.407
+  },
+  {
+   "text": "t",
+   "start": 1.407,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "t",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "w",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "o",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.88
+  },
+  {
+   "text": "t",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": "o",
+   "start": 1.92,
+   "end": 1.96
+  },
+  {
+   "text": "n",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": "n",
+   "start": 2,
+   "end": 2.187
+  },
+  {
+   "text": "e",
+   "start": 2.187,
+   "end": 2.373
+  },
+  {
+   "text": "s",
+   "start": 2.373,
+   "end": 2.56
+  },
+  {
+   "text": ",",
+   "start": 2.56,
+   "end": 2.587
+  },
+  {
+   "text": " ",
+   "start": 2.587,
+   "end": 2.613
+  },
+  {
+   "text": "t",
+   "start": 2.613,
+   "end": 2.622
+  },
+  {
+   "text": "h",
+   "start": 2.622,
+   "end": 2.631
+  },
+  {
+   "text": "e",
+   "start": 2.631,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "j",
+   "start": 2.72,
+   "end": 2.78
+  },
+  {
+   "text": "e",
+   "start": 2.78,
+   "end": 2.84
+  },
+  {
+   "text": "t",
+   "start": 2.84,
+   "end": 2.9
+  },
+  {
+   "text": "s",
+   "start": 2.9,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "h",
+   "start": 3.04,
+   "end": 3.06
+  },
+  {
+   "text": "a",
+   "start": 3.06,
+   "end": 3.08
+  },
+  {
+   "text": "v",
+   "start": 3.08,
+   "end": 3.1
+  },
+  {
+   "text": "e",
+   "start": 3.1,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": "t",
+   "start": 3.2,
+   "end": 3.24
+  },
+  {
+   "text": "o",
+   "start": 3.24,
+   "end": 3.28
+  },
+  {
+   "text": " ",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": "p",
+   "start": 3.36,
+   "end": 3.4
+  },
+  {
+   "text": "u",
+   "start": 3.4,
+   "end": 3.44
+  },
+  {
+   "text": "s",
+   "start": 3.44,
+   "end": 3.48
+  },
+  {
+   "text": "h",
+   "start": 3.48,
+   "end": 3.52
+  },
+  {
+   "text": " ",
+   "start": 3.52,
+   "end": 3.6
+  },
+  {
+   "text": "w",
+   "start": 3.6,
+   "end": 3.62
+  },
+  {
+   "text": "i",
+   "start": 3.62,
+   "end": 3.64
+  },
+  {
+   "text": "t",
+   "start": 3.64,
+   "end": 3.66
+  },
+  {
+   "text": "h",
+   "start": 3.66,
+   "end": 3.68
+  },
+  {
+   "text": " ",
+   "start": 3.68,
+   "end": 3.72
+  },
+  {
+   "text": "t",
+   "start": 3.72,
+   "end": 3.733
+  },
+  {
+   "text": "h",
+   "start": 3.733,
+   "end": 3.747
+  },
+  {
+   "text": "e",
+   "start": 3.747,
+   "end": 3.76
+  },
+  {
+   "text": " ",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "c",
+   "start": 3.84,
+   "end": 3.92
+  },
+  {
+   "text": "a",
+   "start": 3.92,
+   "end": 4
+  },
+  {
+   "text": "r",
+   "start": 4,
+   "end": 4.08
+  },
+  {
+   "text": "'",
+   "start": 4.08,
+   "end": 4.16
+  },
+  {
+   "text": "s",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": " ",
+   "start": 4.24,
+   "end": 4.32
+  },
+  {
+   "text": "w",
+   "start": 4.32,
+   "end": 4.368
+  },
+  {
+   "text": "h",
+   "start": 4.368,
+   "end": 4.416
+  },
+  {
+   "text": "o",
+   "start": 4.416,
+   "end": 4.464
+  },
+  {
+   "text": "l",
+   "start": 4.464,
+   "end": 4.512
+  },
+  {
+   "text": "e",
+   "start": 4.512,
+   "end": 4.56
+  },
+  {
+   "text": " ",
+   "start": 4.56,
+   "end": 4.64
+  },
+  {
+   "text": "w",
+   "start": 4.64,
+   "end": 4.747
+  },
+  {
+   "text": "e",
+   "start": 4.747,
+   "end": 4.853
+  },
+  {
+   "text": "i",
+   "start": 4.853,
+   "end": 4.96
+  },
+  {
+   "text": "g",
+   "start": 4.96,
+   "end": 5.067
+  },
+  {
+   "text": "h",
+   "start": 5.067,
+   "end": 5.173
+  },
+  {
+   "text": "t",
+   "start": 5.173,
+   "end": 5.28
+  },
+  {
+   "text": ".",
+   "start": 5.28,
+   "end": 5.32
+  },
+  {
+   "text": " ",
+   "start": 5.32,
+   "end": 5.36
+  },
+  {
+   "text": "E",
+   "start": 5.36,
+   "end": 5.424
+  },
+  {
+   "text": "v",
+   "start": 5.424,
+   "end": 5.488
+  },
+  {
+   "text": "e",
+   "start": 5.488,
+   "end": 5.552
+  },
+  {
+   "text": "r",
+   "start": 5.552,
+   "end": 5.616
+  },
+  {
+   "text": "y",
+   "start": 5.616,
+   "end": 5.68
+  },
+  {
+   "text": " ",
+   "start": 5.68,
+   "end": 5.76
+  },
+  {
+   "text": "s",
+   "start": 5.76,
+   "end": 5.893
+  },
+  {
+   "text": "e",
+   "start": 5.893,
+   "end": 6.027
+  },
+  {
+   "text": "c",
+   "start": 6.027,
+   "end": 6.16
+  },
+  {
+   "text": "o",
+   "start": 6.16,
+   "end": 6.293
+  },
+  {
+   "text": "n",
+   "start": 6.293,
+   "end": 6.427
+  },
+  {
+   "text": "d",
+   "start": 6.427,
+   "end": 6.56
+  },
+  {
+   "text": ".",
+   "start": 6.56,
+   "end": 6.64
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "To",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "hold",
+   "start": 0.16,
+   "end": 0.32
+  },
+  {
+   "text": "up",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "a",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "car",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": "of",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "almost",
+   "start": 1.24,
+   "end": 1.44
+  },
+  {
+   "text": "two",
+   "start": 1.52,
+   "end": 1.76
+  },
+  {
+   "text": "tonnes,",
+   "start": 1.88,
+   "end": 2.587
+  },
+  {
+   "text": "the",
+   "start": 2.613,
+   "end": 2.64
+  },
+  {
+   "text": "jets",
+   "start": 2.72,
+   "end": 2.96
+  },
+  {
+   "text": "have",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": "to",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "push",
+   "start": 3.36,
+   "end": 3.52
+  },
+  {
+   "text": "with",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "the",
+   "start": 3.72,
+   "end": 3.76
+  },
+  {
+   "text": "car's",
+   "start": 3.84,
+   "end": 4.24
+  },
+  {
+   "text": "whole",
+   "start": 4.32,
+   "end": 4.56
+  },
+  {
+   "text": "weight.",
+   "start": 4.64,
+   "end": 5.32
+  },
+  {
+   "text": "Every",
+   "start": 5.36,
+   "end": 5.68
+  },
+  {
+   "text": "second.",
+   "start": 5.76,
+   "end": 6.64
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.04,
+   "end": 0.06
+  },
+  {
+   "text": "o",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": " ",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "o",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "l",
+   "start": 0.24,
+   "end": 0.28
+  },
+  {
+   "text": "d",
+   "start": 0.32,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.38
+  },
+  {
+   "text": "u",
+   "start": 0.38,
+   "end": 0.44
+  },
+  {
+   "text": "p",
+   "start": 0.44,
+   "end": 0.46
+  },
+  {
+   "text": " ",
+   "start": 0.46,
+   "end": 0.5
+  },
+  {
+   "text": "a",
+   "start": 0.5,
+   "end": 0.58
+  },
+  {
+   "text": " ",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": "c",
+   "start": 0.64,
+   "end": 0.74
+  },
+  {
+   "text": "a",
+   "start": 0.74,
+   "end": 0.76
+  },
+  {
+   "text": "r",
+   "start": 0.76,
+   "end": 0.9
+  },
+  {
+   "text": " ",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": "o",
+   "start": 0.96,
+   "end": 1.02
+  },
+  {
+   "text": "f",
+   "start": 1.02,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.1
+  },
+  {
+   "text": "a",
+   "start": 1.1,
+   "end": 1.12
+  },
+  {
+   "text": "l",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "m",
+   "start": 1.2,
+   "end": 1.22
+  },
+  {
+   "text": "o",
+   "start": 1.22,
+   "end": 1.26
+  },
+  {
+   "text": "s",
+   "start": 1.26,
+   "end": 1.36
+  },
+  {
+   "text": "t",
+   "start": 1.36,
+   "end": 1.46
+  },
+  {
+   "text": " ",
+   "start": 1.46,
+   "end": 1.52
+  },
+  {
+   "text": "t",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "w",
+   "start": 1.6,
+   "end": 1.62
+  },
+  {
+   "text": "o",
+   "start": 1.62,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.82
+  },
+  {
+   "text": "t",
+   "start": 1.82,
+   "end": 1.92
+  },
+  {
+   "text": "o",
+   "start": 1.92,
+   "end": 1.94
+  },
+  {
+   "text": "n",
+   "start": 1.94,
+   "end": 2
+  },
+  {
+   "text": "n",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "e",
+   "start": 2.08,
+   "end": 2.26
+  },
+  {
+   "text": "s",
+   "start": 2.26,
+   "end": 2.28
+  },
+  {
+   "text": ",",
+   "start": 2.28,
+   "end": 2.28
+  },
+  {
+   "text": " ",
+   "start": 2.28,
+   "end": 2.6
+  },
+  {
+   "text": "t",
+   "start": 2.6,
+   "end": 2.6
+  },
+  {
+   "text": "h",
+   "start": 2.6,
+   "end": 2.6
+  },
+  {
+   "text": "e",
+   "start": 2.62,
+   "end": 2.7
+  },
+  {
+   "text": " ",
+   "start": 2.7,
+   "end": 2.74
+  },
+  {
+   "text": "j",
+   "start": 2.76,
+   "end": 2.8
+  },
+  {
+   "text": "e",
+   "start": 2.8,
+   "end": 2.84
+  },
+  {
+   "text": "t",
+   "start": 2.84,
+   "end": 2.9
+  },
+  {
+   "text": "s",
+   "start": 2.9,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "h",
+   "start": 3.04,
+   "end": 3.04
+  },
+  {
+   "text": "a",
+   "start": 3.04,
+   "end": 3.06
+  },
+  {
+   "text": "v",
+   "start": 3.06,
+   "end": 3.12
+  },
+  {
+   "text": "e",
+   "start": 3.16,
+   "end": 3.16
+  },
+  {
+   "text": " ",
+   "start": 3.16,
+   "end": 3.18
+  },
+  {
+   "text": "t",
+   "start": 3.18,
+   "end": 3.2
+  },
+  {
+   "text": "o",
+   "start": 3.2,
+   "end": 3.3
+  },
+  {
+   "text": " ",
+   "start": 3.3,
+   "end": 3.34
+  },
+  {
+   "text": "p",
+   "start": 3.34,
+   "end": 3.4
+  },
+  {
+   "text": "u",
+   "start": 3.4,
+   "end": 3.42
+  },
+  {
+   "text": "s",
+   "start": 3.42,
+   "end": 3.5
+  },
+  {
+   "text": "h",
+   "start": 3.5,
+   "end": 3.56
+  },
+  {
+   "text": " ",
+   "start": 3.56,
+   "end": 3.6
+  },
+  {
+   "text": "w",
+   "start": 3.6,
+   "end": 3.6
+  },
+  {
+   "text": "i",
+   "start": 3.6,
+   "end": 3.64
+  },
+  {
+   "text": "t",
+   "start": 3.64,
+   "end": 3.68
+  },
+  {
+   "text": "h",
+   "start": 3.68,
+   "end": 3.68
+  },
+  {
+   "text": " ",
+   "start": 3.68,
+   "end": 3.72
+  },
+  {
+   "text": "t",
+   "start": 3.72,
+   "end": 3.72
+  },
+  {
+   "text": "h",
+   "start": 3.72,
+   "end": 3.72
+  },
+  {
+   "text": "e",
+   "start": 3.72,
+   "end": 3.8
+  },
+  {
+   "text": " ",
+   "start": 3.8,
+   "end": 3.86
+  },
+  {
+   "text": "c",
+   "start": 3.86,
+   "end": 3.94
+  },
+  {
+   "text": "a",
+   "start": 3.94,
+   "end": 3.96
+  },
+  {
+   "text": "r",
+   "start": 3.96,
+   "end": 4.019
+  },
+  {
+   "text": "'",
+   "start": 4.019,
+   "end": 4.019
+  },
+  {
+   "text": "s",
+   "start": 4.12,
+   "end": 4.22
+  },
+  {
+   "text": " ",
+   "start": 4.22,
+   "end": 4.32
+  },
+  {
+   "text": "w",
+   "start": 4.32,
+   "end": 4.34
+  },
+  {
+   "text": "h",
+   "start": 4.34,
+   "end": 4.4
+  },
+  {
+   "text": "o",
+   "start": 4.4,
+   "end": 4.44
+  },
+  {
+   "text": "l",
+   "start": 4.44,
+   "end": 4.5
+  },
+  {
+   "text": "e",
+   "start": 4.5,
+   "end": 4.52
+  },
+  {
+   "text": " ",
+   "start": 4.52,
+   "end": 4.64
+  },
+  {
+   "text": "w",
+   "start": 4.64,
+   "end": 4.7
+  },
+  {
+   "text": "e",
+   "start": 4.7,
+   "end": 4.72
+  },
+  {
+   "text": "i",
+   "start": 4.72,
+   "end": 4.74
+  },
+  {
+   "text": "g",
+   "start": 4.74,
+   "end": 4.76
+  },
+  {
+   "text": "h",
+   "start": 4.76,
+   "end": 4.9
+  },
+  {
+   "text": "t",
+   "start": 4.9,
+   "end": 4.92
+  },
+  {
+   "text": ".",
+   "start": 4.92,
+   "end": 4.92
+  },
+  {
+   "text": " ",
+   "start": 4.92,
+   "end": 5.36
+  },
+  {
+   "text": "E",
+   "start": 5.36,
+   "end": 5.44
+  },
+  {
+   "text": "v",
+   "start": 5.44,
+   "end": 5.46
+  },
+  {
+   "text": "e",
+   "start": 5.46,
+   "end": 5.5
+  },
+  {
+   "text": "r",
+   "start": 5.5,
+   "end": 5.58
+  },
+  {
+   "text": "y",
+   "start": 5.58,
+   "end": 5.6
+  },
+  {
+   "text": " ",
+   "start": 5.6,
+   "end": 5.78
+  },
+  {
+   "text": "s",
+   "start": 5.78,
+   "end": 5.84
+  },
+  {
+   "text": "e",
+   "start": 5.84,
+   "end": 5.94
+  },
+  {
+   "text": "c",
+   "start": 5.94,
+   "end": 5.96
+  },
+  {
+   "text": "o",
+   "start": 5.96,
+   "end": 6
+  },
+  {
+   "text": "n",
+   "start": 6,
+   "end": 6.1
+  },
+  {
+   "text": "d",
+   "start": 6.1,
+   "end": 6.2
+  },
+  {
+   "text": ".",
+   "start": 6.2,
+   "end": 6.2
+  }
+ ]
+}

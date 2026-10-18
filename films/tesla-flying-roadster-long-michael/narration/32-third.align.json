@@ -1,0 +1,404 @@
+{
+ "id": "32-third",
+ "text": "And that's the third way. Thrust.",
+ "seconds": 2.72,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "And",
+   "start": 0.06,
+   "end": 0.14
+  },
+  {
+   "text": "that's",
+   "start": 0.2,
+   "end": 0.42
+  },
+  {
+   "text": "the",
+   "start": 0.46,
+   "end": 0.58
+  },
+  {
+   "text": "third",
+   "start": 0.64,
+   "end": 0.86
+  },
+  {
+   "text": "way.",
+   "start": 0.94,
+   "end": 1.18
+  },
+  {
+   "text": "Thrust.",
+   "start": 1.68,
+   "end": 2.18
+  }
+ ],
+ "characters": [
+  {
+   "text": "A",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "n",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "d",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": "h",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": "a",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "t",
+   "start": 0.3,
+   "end": 0.32
+  },
+  {
+   "text": "'",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "t",
+   "start": 0.48,
+   "end": 0.507
+  },
+  {
+   "text": "h",
+   "start": 0.507,
+   "end": 0.533
+  },
+  {
+   "text": "e",
+   "start": 0.533,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "t",
+   "start": 0.64,
+   "end": 0.688
+  },
+  {
+   "text": "h",
+   "start": 0.688,
+   "end": 0.736
+  },
+  {
+   "text": "i",
+   "start": 0.736,
+   "end": 0.784
+  },
+  {
+   "text": "r",
+   "start": 0.784,
+   "end": 0.832
+  },
+  {
+   "text": "d",
+   "start": 0.832,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 1.2
+  },
+  {
+   "text": "w",
+   "start": 1.2,
+   "end": 1.307
+  },
+  {
+   "text": "a",
+   "start": 1.307,
+   "end": 1.413
+  },
+  {
+   "text": "y",
+   "start": 1.413,
+   "end": 1.52
+  },
+  {
+   "text": ".",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "T",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": "h",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "r",
+   "start": 1.76,
+   "end": 1.98
+  },
+  {
+   "text": "u",
+   "start": 1.98,
+   "end": 2.2
+  },
+  {
+   "text": "s",
+   "start": 2.2,
+   "end": 2.42
+  },
+  {
+   "text": "t",
+   "start": 2.42,
+   "end": 2.64
+  },
+  {
+   "text": ".",
+   "start": 2.64,
+   "end": 2.72
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "And",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "that's",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "the",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "third",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": "way.",
+   "start": 1.2,
+   "end": 1.6
+  },
+  {
+   "text": "Thrust.",
+   "start": 1.68,
+   "end": 2.72
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "A",
+   "start": 0.06,
+   "end": 0.08
+  },
+  {
+   "text": "n",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "d",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": " ",
+   "start": 0.14,
+   "end": 0.2
+  },
+  {
+   "text": "t",
+   "start": 0.2,
+   "end": 0.22
+  },
+  {
+   "text": "h",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": "a",
+   "start": 0.24,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "'",
+   "start": 0.32,
+   "end": 0.32
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": " ",
+   "start": 0.42,
+   "end": 0.46
+  },
+  {
+   "text": "t",
+   "start": 0.46,
+   "end": 0.48
+  },
+  {
+   "text": "h",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": "e",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": " ",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": "t",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "h",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": "i",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "r",
+   "start": 0.74,
+   "end": 0.78
+  },
+  {
+   "text": "d",
+   "start": 0.78,
+   "end": 0.86
+  },
+  {
+   "text": " ",
+   "start": 0.86,
+   "end": 0.94
+  },
+  {
+   "text": "w",
+   "start": 0.94,
+   "end": 1.02
+  },
+  {
+   "text": "a",
+   "start": 1.02,
+   "end": 1.16
+  },
+  {
+   "text": "y",
+   "start": 1.16,
+   "end": 1.18
+  },
+  {
+   "text": ".",
+   "start": 1.18,
+   "end": 1.18
+  },
+  {
+   "text": " ",
+   "start": 1.18,
+   "end": 1.18
+  },
+  {
+   "text": "T",
+   "start": 1.68,
+   "end": 1.7
+  },
+  {
+   "text": "h",
+   "start": 1.7,
+   "end": 1.78
+  },
+  {
+   "text": "r",
+   "start": 1.78,
+   "end": 1.86
+  },
+  {
+   "text": "u",
+   "start": 1.86,
+   "end": 1.88
+  },
+  {
+   "text": "s",
+   "start": 1.88,
+   "end": 2.06
+  },
+  {
+   "text": "t",
+   "start": 2.06,
+   "end": 2.18
+  },
+  {
+   "text": ".",
+   "start": 2.18,
+   "end": 2.18
+  }
+ ]
+}

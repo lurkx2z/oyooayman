@@ -1,0 +1,844 @@
+{
+ "id": "17-catch",
+ "text": "But there's that word again. Speed. Slow down, and the grip disappears.",
+ "seconds": 5.43,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "But",
+   "start": 0.06,
+   "end": 0.18
+  },
+  {
+   "text": "there's",
+   "start": 0.22,
+   "end": 0.44
+  },
+  {
+   "text": "that",
+   "start": 0.48,
+   "end": 0.64
+  },
+  {
+   "text": "word",
+   "start": 0.7,
+   "end": 0.88
+  },
+  {
+   "text": "again.",
+   "start": 0.94,
+   "end": 1.36
+  },
+  {
+   "text": "Speed.",
+   "start": 1.84,
+   "end": 2.24
+  },
+  {
+   "text": "Slow",
+   "start": 2.82,
+   "end": 3.04
+  },
+  {
+   "text": "down,",
+   "start": 3.12,
+   "end": 3.46
+  },
+  {
+   "text": "and",
+   "start": 3.66,
+   "end": 3.76
+  },
+  {
+   "text": "the",
+   "start": 3.8,
+   "end": 3.88
+  },
+  {
+   "text": "grip",
+   "start": 3.94,
+   "end": 4.14
+  },
+  {
+   "text": "disappears.",
+   "start": 4.24,
+   "end": 5
+  }
+ ],
+ "characters": [
+  {
+   "text": "B",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "u",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "t",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.256
+  },
+  {
+   "text": "h",
+   "start": 0.256,
+   "end": 0.272
+  },
+  {
+   "text": "e",
+   "start": 0.272,
+   "end": 0.288
+  },
+  {
+   "text": "r",
+   "start": 0.288,
+   "end": 0.304
+  },
+  {
+   "text": "e",
+   "start": 0.304,
+   "end": 0.32
+  },
+  {
+   "text": "'",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.52
+  },
+  {
+   "text": "t",
+   "start": 0.52,
+   "end": 0.55
+  },
+  {
+   "text": "h",
+   "start": 0.55,
+   "end": 0.58
+  },
+  {
+   "text": "a",
+   "start": 0.58,
+   "end": 0.61
+  },
+  {
+   "text": "t",
+   "start": 0.61,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.76
+  },
+  {
+   "text": "w",
+   "start": 0.76,
+   "end": 0.79
+  },
+  {
+   "text": "o",
+   "start": 0.79,
+   "end": 0.82
+  },
+  {
+   "text": "r",
+   "start": 0.82,
+   "end": 0.85
+  },
+  {
+   "text": "d",
+   "start": 0.85,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 1.08
+  },
+  {
+   "text": "a",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "g",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "a",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": "i",
+   "start": 1.2,
+   "end": 1.24
+  },
+  {
+   "text": "n",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": ".",
+   "start": 1.28,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.96
+  },
+  {
+   "text": "S",
+   "start": 1.96,
+   "end": 2.016
+  },
+  {
+   "text": "p",
+   "start": 2.016,
+   "end": 2.072
+  },
+  {
+   "text": "e",
+   "start": 2.072,
+   "end": 2.128
+  },
+  {
+   "text": "e",
+   "start": 2.128,
+   "end": 2.184
+  },
+  {
+   "text": "d",
+   "start": 2.184,
+   "end": 2.24
+  },
+  {
+   "text": ".",
+   "start": 2.24,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 2.88
+  },
+  {
+   "text": "S",
+   "start": 2.88,
+   "end": 2.92
+  },
+  {
+   "text": "l",
+   "start": 2.92,
+   "end": 2.96
+  },
+  {
+   "text": "o",
+   "start": 2.96,
+   "end": 3
+  },
+  {
+   "text": "w",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": " ",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": "d",
+   "start": 3.12,
+   "end": 3.24
+  },
+  {
+   "text": "o",
+   "start": 3.24,
+   "end": 3.36
+  },
+  {
+   "text": "w",
+   "start": 3.36,
+   "end": 3.48
+  },
+  {
+   "text": "n",
+   "start": 3.48,
+   "end": 3.6
+  },
+  {
+   "text": ",",
+   "start": 3.6,
+   "end": 3.627
+  },
+  {
+   "text": " ",
+   "start": 3.627,
+   "end": 3.653
+  },
+  {
+   "text": "a",
+   "start": 3.653,
+   "end": 3.662
+  },
+  {
+   "text": "n",
+   "start": 3.662,
+   "end": 3.671
+  },
+  {
+   "text": "d",
+   "start": 3.671,
+   "end": 3.68
+  },
+  {
+   "text": " ",
+   "start": 3.68,
+   "end": 3.76
+  },
+  {
+   "text": "t",
+   "start": 3.76,
+   "end": 3.787
+  },
+  {
+   "text": "h",
+   "start": 3.787,
+   "end": 3.813
+  },
+  {
+   "text": "e",
+   "start": 3.813,
+   "end": 3.84
+  },
+  {
+   "text": " ",
+   "start": 3.84,
+   "end": 3.92
+  },
+  {
+   "text": "g",
+   "start": 3.92,
+   "end": 4.04
+  },
+  {
+   "text": "r",
+   "start": 4.04,
+   "end": 4.08
+  },
+  {
+   "text": "i",
+   "start": 4.08,
+   "end": 4.12
+  },
+  {
+   "text": "p",
+   "start": 4.12,
+   "end": 4.16
+  },
+  {
+   "text": " ",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": "d",
+   "start": 4.24,
+   "end": 4.293
+  },
+  {
+   "text": "i",
+   "start": 4.293,
+   "end": 4.347
+  },
+  {
+   "text": "s",
+   "start": 4.347,
+   "end": 4.4
+  },
+  {
+   "text": "a",
+   "start": 4.4,
+   "end": 4.46
+  },
+  {
+   "text": "p",
+   "start": 4.46,
+   "end": 4.52
+  },
+  {
+   "text": "p",
+   "start": 4.52,
+   "end": 4.58
+  },
+  {
+   "text": "e",
+   "start": 4.58,
+   "end": 4.64
+  },
+  {
+   "text": "a",
+   "start": 4.64,
+   "end": 4.88
+  },
+  {
+   "text": "r",
+   "start": 4.88,
+   "end": 5.12
+  },
+  {
+   "text": "s",
+   "start": 5.12,
+   "end": 5.36
+  },
+  {
+   "text": ".",
+   "start": 5.36,
+   "end": 5.44
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "But",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "there's",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "that",
+   "start": 0.52,
+   "end": 0.64
+  },
+  {
+   "text": "word",
+   "start": 0.76,
+   "end": 0.88
+  },
+  {
+   "text": "again.",
+   "start": 1.08,
+   "end": 1.68
+  },
+  {
+   "text": "Speed.",
+   "start": 1.96,
+   "end": 2.72
+  },
+  {
+   "text": "Slow",
+   "start": 2.88,
+   "end": 3.04
+  },
+  {
+   "text": "down,",
+   "start": 3.12,
+   "end": 3.627
+  },
+  {
+   "text": "and",
+   "start": 3.653,
+   "end": 3.68
+  },
+  {
+   "text": "the",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "grip",
+   "start": 3.92,
+   "end": 4.16
+  },
+  {
+   "text": "disappears.",
+   "start": 4.24,
+   "end": 5.44
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "B",
+   "start": 0.06,
+   "end": 0.08
+  },
+  {
+   "text": "u",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "t",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.22
+  },
+  {
+   "text": "t",
+   "start": 0.22,
+   "end": 0.22
+  },
+  {
+   "text": "h",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": "e",
+   "start": 0.24,
+   "end": 0.28
+  },
+  {
+   "text": "r",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "e",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": "'",
+   "start": 0.34,
+   "end": 0.34
+  },
+  {
+   "text": "s",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": " ",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "t",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": "h",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "a",
+   "start": 0.52,
+   "end": 0.52
+  },
+  {
+   "text": "t",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": "w",
+   "start": 0.7,
+   "end": 0.76
+  },
+  {
+   "text": "o",
+   "start": 0.76,
+   "end": 0.78
+  },
+  {
+   "text": "r",
+   "start": 0.78,
+   "end": 0.82
+  },
+  {
+   "text": "d",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.94
+  },
+  {
+   "text": "a",
+   "start": 0.94,
+   "end": 1
+  },
+  {
+   "text": "g",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "a",
+   "start": 1.04,
+   "end": 1.1
+  },
+  {
+   "text": "i",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "n",
+   "start": 1.14,
+   "end": 1.36
+  },
+  {
+   "text": ".",
+   "start": 1.36,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.84
+  },
+  {
+   "text": "S",
+   "start": 1.84,
+   "end": 1.86
+  },
+  {
+   "text": "p",
+   "start": 1.86,
+   "end": 1.94
+  },
+  {
+   "text": "e",
+   "start": 1.94,
+   "end": 1.96
+  },
+  {
+   "text": "e",
+   "start": 1.96,
+   "end": 2.1
+  },
+  {
+   "text": "d",
+   "start": 2.1,
+   "end": 2.24
+  },
+  {
+   "text": ".",
+   "start": 2.24,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.24
+  },
+  {
+   "text": "S",
+   "start": 2.82,
+   "end": 2.9
+  },
+  {
+   "text": "l",
+   "start": 2.9,
+   "end": 2.94
+  },
+  {
+   "text": "o",
+   "start": 2.94,
+   "end": 2.98
+  },
+  {
+   "text": "w",
+   "start": 2.98,
+   "end": 3.04
+  },
+  {
+   "text": " ",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": "d",
+   "start": 3.12,
+   "end": 3.22
+  },
+  {
+   "text": "o",
+   "start": 3.22,
+   "end": 3.24
+  },
+  {
+   "text": "w",
+   "start": 3.24,
+   "end": 3.36
+  },
+  {
+   "text": "n",
+   "start": 3.36,
+   "end": 3.46
+  },
+  {
+   "text": ",",
+   "start": 3.46,
+   "end": 3.46
+  },
+  {
+   "text": " ",
+   "start": 3.46,
+   "end": 3.66
+  },
+  {
+   "text": "a",
+   "start": 3.66,
+   "end": 3.7
+  },
+  {
+   "text": "n",
+   "start": 3.7,
+   "end": 3.74
+  },
+  {
+   "text": "d",
+   "start": 3.74,
+   "end": 3.76
+  },
+  {
+   "text": " ",
+   "start": 3.76,
+   "end": 3.78
+  },
+  {
+   "text": "t",
+   "start": 3.8,
+   "end": 3.8
+  },
+  {
+   "text": "h",
+   "start": 3.8,
+   "end": 3.8
+  },
+  {
+   "text": "e",
+   "start": 3.8,
+   "end": 3.88
+  },
+  {
+   "text": " ",
+   "start": 3.88,
+   "end": 3.94
+  },
+  {
+   "text": "g",
+   "start": 3.94,
+   "end": 3.98
+  },
+  {
+   "text": "r",
+   "start": 3.98,
+   "end": 4.019
+  },
+  {
+   "text": "i",
+   "start": 4.019,
+   "end": 4.059
+  },
+  {
+   "text": "p",
+   "start": 4.059,
+   "end": 4.14
+  },
+  {
+   "text": " ",
+   "start": 4.14,
+   "end": 4.24
+  },
+  {
+   "text": "d",
+   "start": 4.24,
+   "end": 4.28
+  },
+  {
+   "text": "i",
+   "start": 4.28,
+   "end": 4.36
+  },
+  {
+   "text": "s",
+   "start": 4.36,
+   "end": 4.4
+  },
+  {
+   "text": "a",
+   "start": 4.4,
+   "end": 4.5
+  },
+  {
+   "text": "p",
+   "start": 4.5,
+   "end": 4.52
+  },
+  {
+   "text": "p",
+   "start": 4.52,
+   "end": 4.62
+  },
+  {
+   "text": "e",
+   "start": 4.62,
+   "end": 4.64
+  },
+  {
+   "text": "a",
+   "start": 4.64,
+   "end": 4.78
+  },
+  {
+   "text": "r",
+   "start": 4.78,
+   "end": 4.82
+  },
+  {
+   "text": "s",
+   "start": 4.82,
+   "end": 5
+  },
+  {
+   "text": ".",
+   "start": 5,
+   "end": 5
+  }
+ ]
+}

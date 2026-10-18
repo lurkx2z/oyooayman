@@ -1,0 +1,954 @@
+{
+ "id": "18-loop",
+ "text": "And Tesla's ramp has a speed trick of its own. Think of a toy car on a loop.",
+ "seconds": 5.36,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "And",
+   "start": 0.02,
+   "end": 0.14
+  },
+  {
+   "text": "Tesla's",
+   "start": 0.2,
+   "end": 0.66
+  },
+  {
+   "text": "ramp",
+   "start": 0.74,
+   "end": 1.06
+  },
+  {
+   "text": "has",
+   "start": 1.1,
+   "end": 1.22
+  },
+  {
+   "text": "a",
+   "start": 1.28,
+   "end": 1.34
+  },
+  {
+   "text": "speed",
+   "start": 1.48,
+   "end": 1.68
+  },
+  {
+   "text": "trick",
+   "start": 1.74,
+   "end": 1.92
+  },
+  {
+   "text": "of",
+   "start": 1.96,
+   "end": 2.02
+  },
+  {
+   "text": "its",
+   "start": 2.06,
+   "end": 2.2
+  },
+  {
+   "text": "own.",
+   "start": 2.28,
+   "end": 2.56
+  },
+  {
+   "text": "Think",
+   "start": 3.12,
+   "end": 3.26
+  },
+  {
+   "text": "of",
+   "start": 3.3,
+   "end": 3.36
+  },
+  {
+   "text": "a",
+   "start": 3.4,
+   "end": 3.46
+  },
+  {
+   "text": "toy",
+   "start": 3.54,
+   "end": 3.74
+  },
+  {
+   "text": "car",
+   "start": 3.88,
+   "end": 4.2
+  },
+  {
+   "text": "on",
+   "start": 4.26,
+   "end": 4.32
+  },
+  {
+   "text": "a",
+   "start": 4.38,
+   "end": 4.44
+  },
+  {
+   "text": "loop.",
+   "start": 4.52,
+   "end": 4.78
+  }
+ ],
+ "characters": [
+  {
+   "text": "A",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "n",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "d",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "T",
+   "start": 0.16,
+   "end": 0.224
+  },
+  {
+   "text": "e",
+   "start": 0.224,
+   "end": 0.288
+  },
+  {
+   "text": "s",
+   "start": 0.288,
+   "end": 0.352
+  },
+  {
+   "text": "l",
+   "start": 0.352,
+   "end": 0.416
+  },
+  {
+   "text": "a",
+   "start": 0.416,
+   "end": 0.48
+  },
+  {
+   "text": "'",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "s",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "r",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "a",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "m",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "p",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "h",
+   "start": 1.12,
+   "end": 1.147
+  },
+  {
+   "text": "a",
+   "start": 1.147,
+   "end": 1.173
+  },
+  {
+   "text": "s",
+   "start": 1.173,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.36
+  },
+  {
+   "text": "a",
+   "start": 1.36,
+   "end": 1.4
+  },
+  {
+   "text": " ",
+   "start": 1.4,
+   "end": 1.44
+  },
+  {
+   "text": "s",
+   "start": 1.44,
+   "end": 1.488
+  },
+  {
+   "text": "p",
+   "start": 1.488,
+   "end": 1.536
+  },
+  {
+   "text": "e",
+   "start": 1.536,
+   "end": 1.584
+  },
+  {
+   "text": "e",
+   "start": 1.584,
+   "end": 1.632
+  },
+  {
+   "text": "d",
+   "start": 1.632,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": "t",
+   "start": 1.72,
+   "end": 1.74
+  },
+  {
+   "text": "r",
+   "start": 1.74,
+   "end": 1.76
+  },
+  {
+   "text": "i",
+   "start": 1.76,
+   "end": 1.813
+  },
+  {
+   "text": "c",
+   "start": 1.813,
+   "end": 1.867
+  },
+  {
+   "text": "k",
+   "start": 1.867,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 1.96
+  },
+  {
+   "text": "o",
+   "start": 1.96,
+   "end": 1.98
+  },
+  {
+   "text": "f",
+   "start": 1.98,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "i",
+   "start": 2.08,
+   "end": 2.107
+  },
+  {
+   "text": "t",
+   "start": 2.107,
+   "end": 2.133
+  },
+  {
+   "text": "s",
+   "start": 2.133,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": "o",
+   "start": 2.24,
+   "end": 2.507
+  },
+  {
+   "text": "w",
+   "start": 2.507,
+   "end": 2.773
+  },
+  {
+   "text": "n",
+   "start": 2.773,
+   "end": 3.04
+  },
+  {
+   "text": ".",
+   "start": 3.04,
+   "end": 3.08
+  },
+  {
+   "text": " ",
+   "start": 3.08,
+   "end": 3.12
+  },
+  {
+   "text": "T",
+   "start": 3.12,
+   "end": 3.136
+  },
+  {
+   "text": "h",
+   "start": 3.136,
+   "end": 3.152
+  },
+  {
+   "text": "i",
+   "start": 3.152,
+   "end": 3.168
+  },
+  {
+   "text": "n",
+   "start": 3.168,
+   "end": 3.184
+  },
+  {
+   "text": "k",
+   "start": 3.184,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "o",
+   "start": 3.28,
+   "end": 3.32
+  },
+  {
+   "text": "f",
+   "start": 3.32,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.4
+  },
+  {
+   "text": "a",
+   "start": 3.4,
+   "end": 3.44
+  },
+  {
+   "text": " ",
+   "start": 3.44,
+   "end": 3.52
+  },
+  {
+   "text": "t",
+   "start": 3.52,
+   "end": 3.6
+  },
+  {
+   "text": "o",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "y",
+   "start": 3.68,
+   "end": 3.76
+  },
+  {
+   "text": " ",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "c",
+   "start": 3.84,
+   "end": 3.947
+  },
+  {
+   "text": "a",
+   "start": 3.947,
+   "end": 4.053
+  },
+  {
+   "text": "r",
+   "start": 4.053,
+   "end": 4.16
+  },
+  {
+   "text": " ",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": "o",
+   "start": 4.24,
+   "end": 4.28
+  },
+  {
+   "text": "n",
+   "start": 4.28,
+   "end": 4.32
+  },
+  {
+   "text": " ",
+   "start": 4.32,
+   "end": 4.4
+  },
+  {
+   "text": "a",
+   "start": 4.4,
+   "end": 4.48
+  },
+  {
+   "text": " ",
+   "start": 4.48,
+   "end": 4.88
+  },
+  {
+   "text": "l",
+   "start": 4.88,
+   "end": 4.98
+  },
+  {
+   "text": "o",
+   "start": 4.98,
+   "end": 5.08
+  },
+  {
+   "text": "o",
+   "start": 5.08,
+   "end": 5.18
+  },
+  {
+   "text": "p",
+   "start": 5.18,
+   "end": 5.28
+  },
+  {
+   "text": ".",
+   "start": 5.28,
+   "end": 5.36
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "And",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "Tesla's",
+   "start": 0.16,
+   "end": 0.64
+  },
+  {
+   "text": "ramp",
+   "start": 0.72,
+   "end": 1.04
+  },
+  {
+   "text": "has",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "a",
+   "start": 1.36,
+   "end": 1.4
+  },
+  {
+   "text": "speed",
+   "start": 1.44,
+   "end": 1.68
+  },
+  {
+   "text": "trick",
+   "start": 1.72,
+   "end": 1.92
+  },
+  {
+   "text": "of",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": "its",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "own.",
+   "start": 2.24,
+   "end": 3.08
+  },
+  {
+   "text": "Think",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": "of",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": "a",
+   "start": 3.4,
+   "end": 3.44
+  },
+  {
+   "text": "toy",
+   "start": 3.52,
+   "end": 3.76
+  },
+  {
+   "text": "car",
+   "start": 3.84,
+   "end": 4.16
+  },
+  {
+   "text": "on",
+   "start": 4.24,
+   "end": 4.32
+  },
+  {
+   "text": "a",
+   "start": 4.4,
+   "end": 4.48
+  },
+  {
+   "text": "loop.",
+   "start": 4.88,
+   "end": 5.36
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "A",
+   "start": 0.02,
+   "end": 0.04
+  },
+  {
+   "text": "n",
+   "start": 0.04,
+   "end": 0.1
+  },
+  {
+   "text": "d",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": " ",
+   "start": 0.14,
+   "end": 0.2
+  },
+  {
+   "text": "T",
+   "start": 0.2,
+   "end": 0.26
+  },
+  {
+   "text": "e",
+   "start": 0.26,
+   "end": 0.36
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.44
+  },
+  {
+   "text": "l",
+   "start": 0.44,
+   "end": 0.46
+  },
+  {
+   "text": "a",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "'",
+   "start": 0.52,
+   "end": 0.52
+  },
+  {
+   "text": "s",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": " ",
+   "start": 0.66,
+   "end": 0.74
+  },
+  {
+   "text": "r",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": "a",
+   "start": 0.82,
+   "end": 0.9
+  },
+  {
+   "text": "m",
+   "start": 0.9,
+   "end": 1
+  },
+  {
+   "text": "p",
+   "start": 1,
+   "end": 1.06
+  },
+  {
+   "text": " ",
+   "start": 1.06,
+   "end": 1.1
+  },
+  {
+   "text": "h",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "a",
+   "start": 1.14,
+   "end": 1.2
+  },
+  {
+   "text": "s",
+   "start": 1.2,
+   "end": 1.22
+  },
+  {
+   "text": " ",
+   "start": 1.22,
+   "end": 1.28
+  },
+  {
+   "text": "a",
+   "start": 1.28,
+   "end": 1.34
+  },
+  {
+   "text": " ",
+   "start": 1.34,
+   "end": 1.48
+  },
+  {
+   "text": "s",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": "p",
+   "start": 1.5,
+   "end": 1.52
+  },
+  {
+   "text": "e",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": "e",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "d",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.74
+  },
+  {
+   "text": "t",
+   "start": 1.74,
+   "end": 1.78
+  },
+  {
+   "text": "r",
+   "start": 1.78,
+   "end": 1.82
+  },
+  {
+   "text": "i",
+   "start": 1.82,
+   "end": 1.84
+  },
+  {
+   "text": "c",
+   "start": 1.84,
+   "end": 1.9
+  },
+  {
+   "text": "k",
+   "start": 1.9,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 1.96
+  },
+  {
+   "text": "o",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": "f",
+   "start": 2,
+   "end": 2.02
+  },
+  {
+   "text": " ",
+   "start": 2.02,
+   "end": 2.06
+  },
+  {
+   "text": "i",
+   "start": 2.06,
+   "end": 2.12
+  },
+  {
+   "text": "t",
+   "start": 2.12,
+   "end": 2.16
+  },
+  {
+   "text": "s",
+   "start": 2.16,
+   "end": 2.2
+  },
+  {
+   "text": " ",
+   "start": 2.2,
+   "end": 2.28
+  },
+  {
+   "text": "o",
+   "start": 2.28,
+   "end": 2.32
+  },
+  {
+   "text": "w",
+   "start": 2.32,
+   "end": 2.52
+  },
+  {
+   "text": "n",
+   "start": 2.52,
+   "end": 2.56
+  },
+  {
+   "text": ".",
+   "start": 2.56,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.56
+  },
+  {
+   "text": "T",
+   "start": 3.12,
+   "end": 3.12
+  },
+  {
+   "text": "h",
+   "start": 3.12,
+   "end": 3.16
+  },
+  {
+   "text": "i",
+   "start": 3.16,
+   "end": 3.18
+  },
+  {
+   "text": "n",
+   "start": 3.18,
+   "end": 3.24
+  },
+  {
+   "text": "k",
+   "start": 3.24,
+   "end": 3.26
+  },
+  {
+   "text": " ",
+   "start": 3.26,
+   "end": 3.3
+  },
+  {
+   "text": "o",
+   "start": 3.3,
+   "end": 3.34
+  },
+  {
+   "text": "f",
+   "start": 3.34,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.4
+  },
+  {
+   "text": "a",
+   "start": 3.4,
+   "end": 3.46
+  },
+  {
+   "text": " ",
+   "start": 3.46,
+   "end": 3.54
+  },
+  {
+   "text": "t",
+   "start": 3.54,
+   "end": 3.64
+  },
+  {
+   "text": "o",
+   "start": 3.64,
+   "end": 3.74
+  },
+  {
+   "text": "y",
+   "start": 3.74,
+   "end": 3.74
+  },
+  {
+   "text": " ",
+   "start": 3.74,
+   "end": 3.88
+  },
+  {
+   "text": "c",
+   "start": 3.88,
+   "end": 3.98
+  },
+  {
+   "text": "a",
+   "start": 3.98,
+   "end": 4
+  },
+  {
+   "text": "r",
+   "start": 4,
+   "end": 4.2
+  },
+  {
+   "text": " ",
+   "start": 4.2,
+   "end": 4.26
+  },
+  {
+   "text": "o",
+   "start": 4.26,
+   "end": 4.3
+  },
+  {
+   "text": "n",
+   "start": 4.3,
+   "end": 4.32
+  },
+  {
+   "text": " ",
+   "start": 4.32,
+   "end": 4.38
+  },
+  {
+   "text": "a",
+   "start": 4.38,
+   "end": 4.44
+  },
+  {
+   "text": " ",
+   "start": 4.44,
+   "end": 4.52
+  },
+  {
+   "text": "l",
+   "start": 4.52,
+   "end": 4.56
+  },
+  {
+   "text": "o",
+   "start": 4.56,
+   "end": 4.6
+  },
+  {
+   "text": "o",
+   "start": 4.6,
+   "end": 4.76
+  },
+  {
+   "text": "p",
+   "start": 4.76,
+   "end": 4.78
+  },
+  {
+   "text": ".",
+   "start": 4.78,
+   "end": 4.78
+  }
+ ]
+}
