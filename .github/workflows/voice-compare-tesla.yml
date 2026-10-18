@@ -1,0 +1,57 @@
+# Voice comparison for the long-form Tesla Roadster film: one line from its script said by several natural ElevenLabs
+# voices (tools/voice-compare.cjs from the narration branch), loudness-matched, committed back to this branch so the
+# owner can pick a new narrator. Uses the repository secret ELEVENLABS_API_KEY (never printed).
+name: Voice comparison (Tesla long-form)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["episode/tesla-flying-roadster-*"]
+    paths: [".github/workflows/voice-compare-tesla.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OUT: films/tesla-flying-roadster-long/voice-compare
+      LINE: "Until the air can't follow the wing any more. It tears away. That's a stall, and the lift collapses. So a wing can never just hang there. It needs speed, all the time."
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install ffmpeg
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg >/dev/null; }
+
+      - name: Generate the voices
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          if [ -z "$ELEVENLABS_API_KEY" ]; then echo "::error::The secret ELEVENLABS_API_KEY is missing."; exit 1; fi
+          git show origin/feature/elevenlabs-narration-kbxlfj:tools/voice-compare.cjs > /tmp/voice-compare.cjs
+          cp /tmp/voice-compare.cjs tools/voice-compare-tmp.cjs
+          node tools/voice-compare-tmp.cjs --out "$OUT" --set natural --text "$LINE" --summary "$GITHUB_STEP_SUMMARY"
+          rm tools/voice-compare-tmp.cjs
+
+      - name: Commit the comparison back to this branch
+        run: |
+          git config user.name "narration-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$OUT"
+          if git diff --cached --quiet; then echo "nothing new"; exit 0; fi
+          git commit -m "voice comparison for the long-form narrator (ElevenLabs, run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3))
+          done
+          exit 1
