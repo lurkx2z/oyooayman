@@ -102,6 +102,18 @@ overshoots: −15.5 LUFS, 8.7 LU, −1.6 dBTP.
 - The flat repeats as a set; the ending card is static.
 - The mix was checked by measurement and spot listening of stems, not by watching the whole film with sound.
 
+## Final render
+
+Rendered on the owner's PC (GPU, through his Chrome) on 2026-10-18 with `render-gpu.cjs`, about 10 minutes for the
+frames. In `renders/slow-light/` there:
+- `slow-light_final_1080p.mp4`: 5:57 (356.5 s), 1920×1080, 30 fps, 1,367 MiB, for YouTube. −15.3 LUFS, LRA 9.0 LU,
+  −1.3 dBTP.
+- `slow-light_final_small.mp4`: 5:57, 1280×720, 26.1 MiB (under 30 MiB), for a phone. −15.4 LUFS, LRA 8.7 LU,
+  −1.6 dBTP.
+
+Eight sample frames were checked (right size, none blank, readout and captions present). The film was not watched
+in full with sound.
+
 ## Files
 
 - `slow-light.html`, `films/slow-light/*` (the film), `films/slow-light/soundtrack.js` (the baked sound).
