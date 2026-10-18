@@ -120,3 +120,13 @@ const SCRIPT = {
   },
 };
 const SCRIPT_TRACKS = {};
+
+// ---- the Charlie cut's beat times, so the few events written as fixed seconds (toy, track, space sounds; the toy's
+//      launches) follow the new voice: trRemap(t) maps a Charlie-cut time to this cut, linearly between the nearest beats
+const TR_OLD = {"hero": 0, "wide": 5.84, "when": 10.84, "did": 22.44, "go": 32.92, "claims": 44.92, "questions": 57.1, "replay": 57.1, "three": 68.42, "wing": 76.2, "plane": 74.88, "lift": 76.82, "liftW": 89.12, "speed": 90.46, "inv": 100.19, "noseUp": 106.234, "slow": 114.634, "stall": 124.454, "fall": 128.514, "skyEnd": 136.643, "race": 136.643, "theory": 148.963, "catch": 154.373, "toy": 161.013, "curve": 167.193, "toyRun": 179.204, "numbers": 181.804, "flat": 190.587, "flatFall": 202.187, "suck": 204.187, "fans": 207.982, "press": 220.389, "twoG": 229.937, "tenth": 240.597, "old": 250.23, "brabham": 260.551, "mcm": 269.46, "surface": 283.16, "creep": 283.56, "leave": 290.715, "drop": 292.125, "thrust": 296.175, "newton": 299.175, "cold": 304.635, "space2": 314.555, "nozzles": 318.195, "blast": 328.695, "rolled": 333.995, "brk": 339.768, "land": 340.568, "hover": 344.991, "weight": 350.831, "kilos": 358.046, "lift0": 368.58, "empty": 380.25, "heli": 383.57, "bottle": 394.53, "hop": 401.248, "kick": 413.268, "real": 419.518, "promise": 435.407, "timeline": 443.147, "legal": 450.091, "human": 462.311, "pov": 480.211, "end": 486.851, "__end": 486.851};
+function trRemap(t) {
+  const P = Object.keys(TR_OLD).map((k) => [TR_OLD[k], k === '__end' ? AN.duration : TR[k]]).filter((p) => typeof p[1] === 'number').sort((a, b) => a[0] - b[0]);
+  const Q = [[0, 0]]; for (const p of P) if (p[0] > Q[Q.length - 1][0] + 1e-6 && p[1] > Q[Q.length - 1][1]) Q.push(p);
+  for (let i = 1; i < Q.length; i++) if (t <= Q[i][0]) { const [a0, b0] = Q[i - 1], [a1, b1] = Q[i]; return b0 + (b1 - b0) * (t - a0) / (a1 - a0); }
+  return t - Q[Q.length - 1][0] + Q[Q.length - 1][1];
+}

@@ -14,9 +14,9 @@
 
 const TR_TOY = { R: 0.22, W: 0.07, y0: 0.004, LX: 1.45, v0: 3.6, g: 9.81, k: 0.025, tw: 0.028, sL: -0.70, mu: 0.5 };
 TR_TOY.LOOP = 2 * Math.PI * TR_TOY.R;
-TR_TOY.L1 = 166.55;                 // launch 1 (film s): eases into the slow-motion explanation
-TR_TOY.L2 = 179.95;                 // launch 2: the real-time run
-TR_TOY.cB = 167.25; TR_TOY.cC = 172.9;
+TR_TOY.L1 = trRemap(166.55);                 // launch 1 (film s): eases into the slow-motion explanation
+TR_TOY.L2 = trRemap(179.95);                 // launch 2: the real-time run
+TR_TOY.cB = trRemap(167.25); TR_TOY.cC = trRemap(172.9);
 
 // the track surface's centre line at arc length s: { p, fwd, up } (up = towards the car: the loop's centre in the loop)
 function trToyAt(s, out = {}) {

@@ -56,7 +56,7 @@ const TR_TAGS = [
   { from: () => TR.did + 0.2, until: () => TR.questions - 0.2, text: 'RECONSTRUCTION · FROM REPORTS OF THE DEMO' },
   { from: () => TR.questions + 0.1, until: () => TR.three - 0.2, text: 'SLOW MOTION · RECONSTRUCTION' },
   { from: () => TR.theory + 0.1, until: () => TR.toy - 0.2, text: 'IN THEORY · NOBODY HAS TRIED IT' },
-  { from: () => TR.toy + 5.9, until: () => TR.toyRun - 0.1, text: 'SLOW MOTION' },
+  { from: () => trRemap(166.91), until: () => TR.toyRun - 0.1, text: 'SLOW MOTION' },
   { from: () => TR.numbers + 0.1, until: () => TR.flat - 0.2, text: 'RECONSTRUCTION · SLOWED DOWN' },
   { from: () => TR.flat + 0.1, until: () => TR.flatFall - 0.7, text: 'RECONSTRUCTION · RAMP SHAPE APPROXIMATE' },
   { from: () => TR.flatFall - 0.5, until: () => TR.suck - 0.2, text: 'WHAT IF · THE FANS STOPPED' },
