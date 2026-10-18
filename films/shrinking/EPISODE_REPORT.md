@@ -84,4 +84,10 @@ baked soundtrack); the masters for the final MP4 are limited after AAC encoding 
 
 ## Deliverables
 
-DELIVERABLES_LINE
+- Runnable copy: `shrinking-film.zip` (unzip, open `shrinking.html`, press Space), in the project files under `shrinking/`.
+- Final film, rendered on the owner's PC graphics card (12 min of frames at ~18 fps) with `films/shrinking/render-gpu.cjs
+  --channel chrome`, in `Downloads\render\oyooayman\renders\shrinking\` on that PC:
+  - `shrinking_final_1080p.mp4`: 1920×1080, 30 fps, 458.0 s, 2,562 MiB, −15.2 LUFS, true peak −2.4 dBTP (for YouTube).
+  - `shrinking_final_small.mp4`: 1280×720, 458.0 s, 25.9 MiB, −15.3 LUFS, true peak −2.4 dBTP (for a phone).
+  - `check.jpg`: eight frames across the film, all with picture and readout.
+- The final files were checked by measurement and eight sample frames, not watched in full.
