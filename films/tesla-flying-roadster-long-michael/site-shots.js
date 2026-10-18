@@ -571,7 +571,7 @@ const SITE_SHOTS = {
       } else if (t < c2) {
         // low behind the Roadster, down the lane: the kicker, the cars
         const k = trK(t, c1, c2);
-        trCamD(cam, [K.k0 - 15 - trLerp(9.0, 8.0, k), trLerp(1.8, 1.5, k), K.z + trLerp(3.2, 2.6, k)], [K.k0 + 6, 1.0, K.z], 42, t, 0.4);
+        trCamD(cam, [K.k0 - 15 - trLerp(7.0, 6.0, k), trLerp(1.9, 1.6, k), K.z + trLerp(7.5, 6.8, k)], [K.k0 - 9 + 3 * k, 1.0, K.z], 42, t, 0.4);   // rear quarter: the jets blow past, not into the lens
       } else {
         // side-on, tracking: the hop and the flip fill a third of the frame
         trCamD(cam, [c.x + 1.5, 1.3 + 0.35 * Math.max(0, c.y - 1), K.z + 12.5], [c.x + 0.8, Math.max(1.3, c.y * 0.85), K.z], 46, t, 0.25);
