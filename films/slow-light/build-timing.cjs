@@ -22,7 +22,7 @@ const PAUSE = [
   2.4, 2.6, 1.6, 1.6,                 // 27–30 the mirror: the wave, the reflection late, walk, look back
   2.2, 3.0, 3.6, 2.4,                 // 31–34 the lamp: off (3.0: the room stays lit), on (3.6: the dark spreads), the egg
   2.4, 0.9, 0.8, 1.8, 2.2, 1.8,       // 35–40 the knock (36: right after the knock), "There.", freeze, stop, last
-  3.6, 1.6, 1.4,                      // 41–43 the dark: the door (keys first), every light is on, the text
+  2.8, 1.6, 1.4,                      // 41–43 the dark: the door (keys first), every light is on, the text
   3.6, 1.6, 1.6, 2.0,                 // 44–47 light returns: is this real, the lab, stopped, the question
 ];
 const GAP = 0.9;                      // between captions inside a beat

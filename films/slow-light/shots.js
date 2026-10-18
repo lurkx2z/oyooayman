@@ -1,7 +1,7 @@
 /* =====================================================================
    SHOTS — every shot of the film, in order: { id, t0, t1, set, mode }. Sets: home (the flat: living room, balcony,
    hallway mirror), street (the road outside at night), globe (the Earth, light lapping it), lab (Harvard, 1999),
-   dark (nothing reaches you: black, and the diagrams). Mode picks the action and camera inside a set.
+   dark (nothing reaches you: black, and the eye diagram). Mode picks the action and camera inside a set.
    Cut points come from script.js (SL), i.e. from the narration.
    ===================================================================== */
 
@@ -30,9 +30,8 @@ const SL_SHOTS = [
   { id: 'H1', t0: SL.knock, t1: SL.freeze, set: 'home', mode: 'knock' },
   { id: 'H2', t0: SL.freeze, t1: SL.last, set: 'home', mode: 'freeze' },
   // 9 — the dark
-  { id: 'I1', t0: SL.last, t1: SL.on2, set: 'dark', mode: 'eye' },
-  { id: 'I2', t0: SL.on2, t1: SL.text, set: 'home', mode: 'xray' },
-  { id: 'I3', t0: SL.text, t1: SL.real, set: 'dark', mode: 'text' },
+  { id: 'I1', t0: SL.last, t1: SL.door, set: 'dark', mode: 'eye' },
+  { id: 'I2', t0: SL.door, t1: SL.real, set: 'home', mode: 'xray' },
   // 10 — it's real; the question
   { id: 'J1', t0: SL.real, t1: SL.question, set: 'lab', mode: 'lab' },
   { id: 'J2', t0: SL.question, t1: 1e9, set: 'home', mode: 'after' },

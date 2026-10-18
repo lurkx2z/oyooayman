@@ -11,7 +11,7 @@ status: voiceless
 
 [title] What if light kept getting slower, and couldn't stop?
 
-[fast] Light is the fastest thing there is. / Seven times round the Earth. Every second.
+[fast] Light is the fastest thing there is. / 7½ times round the Earth. Every second.
 
 [rule] Tonight, it starts slowing down. / Just light. Nothing else.
 
@@ -41,15 +41,15 @@ status: voiceless
 
 [blue] This car's headlights look blue. / It's driving into its own light.
 
-[red] Driving away, its brake lights go deep red. / Then infrared. Gone.
+[red] Driving away, the whole car turns red. / Then infrared. Gone.
 
-[faster] The next car is faster than light.
+[faster] The next car is faster than light. / Like a jet outrunning its own sound.
 
 [cantsee] You can hear it coming. / You can't see it.
 
 [two] Then it appears from nowhere… / …and splits in two.
 
-[past] One is the car. / The other is its past, running backwards.
+[past] One shows it driving on. / The other is its past, running backwards.
 
 [cat] Light is slower than your cat now.
 
@@ -85,18 +85,18 @@ status: voiceless
 
 [stop] Then light stops.
 
-[last] The last light you'll ever see… / …is a millimetre from your eye. / It isn't coming.
+[last] The next light you'd see… / …is already inside your eye. / It never gets there.
 
 [door] In the dark, the front door. / Mum: "Why are all the lights off?"
 
 [on2] They're not. / Every light in the house is on.
 
-[text] Her "On my way" text is still travelling. / She beat it home.
+[text] Her "On my way" text is stuck 675 metres away. / She beat it home.
 
-[real] Is any of this real? / Some of it happened.
+[real] Is any of this real? / Slow light is. In a lab.
 
-[lab] 1999. Harvard. / Atoms cooled to almost absolute zero. / Light slowed to 17 metres a second. / As fast as a car in town.
+[lab] 1999. Harvard. / Atoms cooled to almost absolute zero. / Inside them, light slowed to 17 metres a second. / As fast as a car.
 
-[stopped] 2001: they stopped light. / Held it. / And let it go.
+[stopped] 2001: they stopped a pulse of light. / Stored it in the atoms. / And let it go.
 
 [question] If light slowed to walking pace… / …what would you race first?

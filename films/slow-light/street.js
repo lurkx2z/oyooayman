@@ -282,8 +282,8 @@ SL_SETS.street = (app) => {
         if (t > SL.car2Seen - 0.6) {
           const vA = drawCar(car2A, t, c, P0, V, SL.car2Tp, 1, 300 + SL_ST.v2 * (isNaN(tA) ? 0 : tA));
           const vB = drawCar(car2B, t, c, P0, V, SL.car2Tp, -1, 300 + SL_ST.v2 * (isNaN(tB) ? 0 : tB));
-          if (!isNaN(tA)) api._lab.push({ p: [E[0] + V[0] * tA, 2.1, SL_ST.lane], text: 'THE CAR', sub: 'NOW', a: slWin(t, slS('past') - 0.2, SL.cat, 0.4, 0.4) });
-          if (!isNaN(tB)) api._lab.push({ p: [E[0] + V[0] * tB, 2.1, SL_ST.lane], text: 'ITS PAST', sub: 'RUNNING BACKWARDS', a: slWin(t, slCap('past', 1).show - 0.2, SL.cat, 0.4, 0.4) });
+          if (!isNaN(tA)) api._lab.push({ p: [E[0] + V[0] * tA, 2.1, SL_ST.lane], text: 'IT, DRIVING ON', sub: 'TOO RED TO SEE', a: slWin(t, SL.car2Seen + 0.5, SL.cat, 0.4, 0.4) });
+          if (!isNaN(tB)) api._lab.push({ p: [E[0] + V[0] * tB, 2.1, SL_ST.lane], text: 'ITS PAST', sub: 'RUNNING BACKWARDS', a: slWin(t, SL.car2Seen + 0.5, SL.cat, 0.4, 0.4) });
         }
         // the moment its light first reaches you: everything it gives off, even its warmth, flashes through the
         // colours you can see (shifted up without limit there), then the two images move apart, black at first
@@ -294,16 +294,19 @@ SL_SETS.street = (app) => {
           puffs.add(xc, 0.6, SL_ST.lane, 6.0, 0.35 * a, 0.55, 0.5, 1.0);
           puffs.add(xc, -0.6, SL_ST.lane, 5.0, 0.25 * a, 0.55, 0.5, 1.0);
         }
-        // the camera: up the road (where it's coming from: nothing), then at the point it appears, then each image
-        const up = [E[0] + 40, 1.1, -1.5], at0 = [E[0] + SL_ST.b / Math.sqrt(3) + 0.6, 0.9, SL_ST.lane - 2.5];
-        const pA = [E[0] + V[0] * (isNaN(tA) ? 0 : tA), 0.9, SL_ST.lane - 1], pB = [E[0] + V[0] * (isNaN(tB) ? 0 : tB), 1.0, SL_ST.lane - 1];
-        const two0 = slCap('two', 0), two1 = slCap('two', 1), past0 = slCap('past', 0), past1 = slCap('past', 1);
+        // the camera: up the road (where it's coming from: nothing); your eyes follow the sound as it comes and passes
+        // (still nothing); then, wide and still, the point where it appears and splits; then each image
+        const up = [E[0] + 40, 1.1, -1.5], at0 = [E[0] + SL_ST.b / Math.sqrt(3) - 0.4, 0.9, SL_ST.lane - 2.5];
+        const xr = E[0] + V[0] * (t - SL.car2Tp), heard = [Math.max(xr, E[0] + 5), 1.0, SL_ST.lane - 1.5];
+        // (each image is held left of centre: the diagram from above sits on the right of the frame)
+        const pA = [E[0] + V[0] * (isNaN(tA) ? 0 : tA) + 5.5, 0.9, SL_ST.lane - 1], pB = [E[0] + V[0] * (isNaN(tB) ? 0 : tB), 1.0, SL_ST.lane + 8];
+        const two0 = slCap('two', 0), past0 = slCap('past', 0), past1 = slCap('past', 1);
         look = slV([E[0] - 30, 1.2, -1.5], up, slK(t, SL.faster, SL.faster + 2.5));
-        look = slV(look, at0, slK(t, two0.show - 0.3, two0.show + 2.2));
-        look = slV(look, pA, slK(t, two1.hide - 0.2, past0.show - 0.2));
+        look = slV(look, heard, slK(t, slS('cantsee') - 0.5, slS('cantsee') + 2.5));
+        look = slV(look, at0, slK(t, two0.show - 0.6, two0.show + 0.9));
+        look = slV(look, pA, slK(t, past0.show - 0.5, past0.show + 0.6));
         look = slV(look, pB, slK(t, past0.hide - 0.1, past1.show + 0.4));
-        // (your eyes follow each image in: the car going on, then its past far up the road)
-        fov = slLerp(slLerp(slLerp(55, 62, slK(t, SL.car2Seen - 2, SL.car2Seen)), 44, slK(t, two1.hide - 0.2, past0.show)), 20, slK(t, past0.hide - 0.1, past1.show + 0.6));
+        fov = slLerp(slLerp(slLerp(55, 68, slK(t, two0.show - 0.6, two0.show + 0.9)), 44, slK(t, past0.show - 0.5, past0.show + 0.6)), 24, slK(t, past0.hide - 0.1, past1.show + 0.6));
       }
       const dr = slDrift(t, 0.012, 0.35, 21);
       const eye = [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]];

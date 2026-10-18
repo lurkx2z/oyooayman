@@ -1,13 +1,14 @@
 /* =====================================================================
    HUD — this film's overlay (DOM, in #hud; a pure function of time). The centred title is the shared StoryHUD.
-     top left     SPEED OF LIGHT · the value · what it is as fast as / slower than · NEXT (the next landmark)
-                  under it, one context line for the scene (Gran's delay, flash → bang, the car's speed …)
-                  and the honest label (thought experiment / illustration / real experiment)
+     top left     SPEED OF LIGHT · the value · what it is as fast as / slower than (on a soft plate)
+                  under it, one context line for the scene (Gran's delay, the flash → bang stopwatch, what you
+                  hear and see of car 2, the knock's countdown …)
+     bottom left  the honest label (thought experiment / illustration / real experiment)
      top right    the time tonight; later Mum's "On my way" text, still travelling
      bottom       one caption at a time (from CAPTIONS.md via timing.js; numbers in amber); the last one is the
                   closing question, larger
-     right        the diagrams (illustrations): the cable to Sydney, the egg of light, the last light at your eye,
-                  the text that never arrived
+     right        the diagrams (illustrations): the cable to Sydney, car 2 from above, the egg of light, the text that
+                  never arrived; large in the middle: the light stopped inside your eye
      in the scene labels a set pins to places (set.labels(t) → [{ p, text, sub }])
    ===================================================================== */
 
@@ -39,31 +40,63 @@ function slDistBetween(t0, t1) { let acc = 0; const n = 400, dt = (t1 - t0) / n;
 SL.textDist = 800;                                          // the mast your phone listens to is 800 m away
 function slFmtAge(s) { return s < 90 ? Math.round(s) + ' SECONDS' : s < 5400 ? Math.round(s / 60) + ' MINUTES' : (s / 3600).toFixed(1) + ' HOURS'; }
 
-// the scene's one context line: [from, to, label, value(t)]
+// the fireworks stopwatch: each pair's first event (the flash, later the bang) starts it, the second stops it
+function slFwStopwatch(t) {
+  const P = SL_FW_PAIRS; let k = 0;
+  for (let i = 0; i < P.length; i++) if (t >= Math.min(P[i].f, P[i].b) - 0.3) k = i;
+  const p = P[k], e1 = Math.min(p.f, p.b), e2 = Math.max(p.f, p.b), tog = e2 - e1 < 0.05, bangFirst = p.b < p.f - 0.05;
+  const chip = (txt, at) => `<span class="chip${t >= at ? (t < at + 0.45 ? ' hit' : ' on') : ''}">● ${txt}</span>`;
+  const chips = bangFirst ? chip('HEARD', p.b) + chip('SEEN', p.f) : chip('SEEN', p.f) + chip('HEARD', p.b);
+  let v;
+  if (t < e1) v = '<span class="dim">0.0 s</span>';
+  else if (tog) v = 'TOGETHER';
+  else if (t < e2) v = (t - e1).toFixed(1) + ' s';
+  else v = (e2 - e1).toFixed(1) + ' s' + (bangFirst ? ' · BANG FIRST' : '');
+  return { l: bangFirst ? 'BANG → FLASH' : 'FLASH → BANG', v, v2: chips };
+}
+// car 2: what you hear of it (the sound is near enough instant) and what you see
+function slCar2Meter(t) {
+  const xr = SL_ST.eye[0] - SL_ST.v2 * (t - SL.car2Tp), d = Math.hypot(xr - SL_ST.eye[0], SL_ST.b);
+  const v = Math.round(SL_ST.v2 * 3.6) + ' km/h · TWICE AS FAST AS LIGHT';
+  let v2;
+  if (t < SL.car2Tp - 0.4) v2 = `HEARD: ${Math.round(d)} m AWAY · SEEN: <span class="dim">NOTHING</span>`;
+  else if (t < SL.car2Seen) v2 = 'HEARD: PASSING YOU · SEEN: <span class="dim">NOTHING</span>';
+  else v2 = `HEARD: ${Math.round(d)} m AWAY, GOING · SEEN: TWO OF IT`;
+  return { v, v2 };
+}
+// the knock: how late you see your hand; once you've heard it, the countdown to seeing it
+function slKnockMeter(t) {
+  if (t < SL.knockHit) return { v: 'SEEN ' + slFmtS(SL.knockDist / Math.max(1e-6, slC(t))) + ' s LATE' };
+  if (t < SL.knockSeen) return { v: 'SEEN IN ' + (SL.knockSeen - t).toFixed(1) + ' s', v2: '<span class="chip hit">● HEARD</span><span class="chip">● SEEN</span>' };
+  return { v: 'SEEN, ' + (SL.knockSeen - SL.knockHit).toFixed(1) + ' s LATE', v2: '<span class="chip on">● HEARD</span><span class="chip' + (t < SL.knockSeen + 0.45 ? ' hit' : ' on') + '">● SEEN</span>' };
+}
+// the scene's one context line: [from, to, label, value(t)] (value: text, or { l, v, v2 } with HTML)
 const SL_CTX = [
   [SL.fast + 4.0, SL.rule - 0.3, 'ONE SECOND OF LIGHT', () => '300,000 km · 7½ TIMES ROUND THE EARTH'],
   [SL.call + 1.2, SL.map - 0.2, "GRAN'S PICTURE", (t) => slFmtS(slGranDelay(slC(t))) + ' s LATE'],
   [SL.map + 0.6, SL.sun - 0.3, 'GPS SIGNALS', (t) => slFmtS(2.02e7 / slC(t) - 2.02e7 / SL_C0) + ' s LATE'],
   [SL.sun + 0.6, SL.fw - 0.3, 'SUNLIGHT ARRIVING', (t) => { const p = slC(t) / SL_C0 * 100; return (p >= 10 ? Math.round(p) : p >= 1 ? p.toFixed(1) : p.toFixed(2)) + '% OF NORMAL'; }],
-  [SL.f1 - 0.4, SL.street - 0.3, 'FLASH → BANG', (t) => { const g = SL.fwDist / SL_VSOUND - SL.fwDist / slC(Math.min(t, SL.f6)); return Math.abs(g) < 0.05 ? 'TOGETHER' : g > 0 ? slFmtS(g) + ' s' : 'BANG FIRST, ' + slFmtS(-g) + ' s'; }],
+  [SL.f1 - 0.6, SL.street - 0.3, 'FLASH → BANG', (t) => slFwStopwatch(t)],
   [SL.street + 1.6, SL.redGone + 1.2, 'THIS CAR', (t) => { const v = slCar1V(slCar1Seen(t)), b = v / slC(t); return Math.round(v * 3.6) + ' km/h · ' + (b < 0.27 ? 'A QUARTER OF LIGHT' : Math.round(b * 100) + '% OF LIGHT'); }],
-  [SL.faster + 0.4, SL.cat - 0.3, 'THE NEXT CAR', () => Math.round(SL_ST.v2 * 3.6) + ' km/h · TWICE AS FAST AS LIGHT'],
-  [SL.cat + 0.6, SL.mirror - 0.3, 'YOUR CAT, FLAT OUT', () => '30 km/h · 3 × LIGHT'],
+  [SL.faster + 0.4, SL.cat - 0.3, 'THE NEXT CAR', (t) => slCar2Meter(t)],
+  [SL.cat + 0.6, SL.mirror - 0.3, 'YOUR CAT, FLAT OUT', () => '25 km/h · 3 × LIGHT'],
   [SL.mirror + 0.6, SL.walkCut - 0.2, 'YOUR REFLECTION', () => slFmtS(2 * SL.mirrorDist / SL.cMirror) + ' s LATE'],
   [SL.walkCut + 0.5, SL.lamp - 0.3, 'YOU', () => (SL.walkU * 3.6).toFixed(1) + ' km/h · TWO-FIFTHS OF LIGHT'],
   [SL.lamp + 0.6, SL.knock - 0.3, 'LAMP → YOUR EYE', () => slFmtS(Math.hypot(SL_SWITCH_EYE[0] - SL_HOME.lamp[0], SL_SWITCH_EYE[1] - SL_HOME.lamp[1], SL_SWITCH_EYE[2] - SL_HOME.lamp[2]) / SL.cLamp) + ' s'],
-  [SL.knock + 0.6, SL.freeze - 0.2, 'YOUR HAND, ' + Math.round(SL.knockDist * 100) + ' cm AWAY', () => slFmtS(SL.knockDist / SL.cKnock) + ' s LATE'],
+  [SL.knock + 0.6, SL.freeze - 0.2, 'YOUR HAND, ' + Math.round(SL.knockDist * 100) + ' cm AWAY', (t) => slKnockMeter(t)],
   [SL.freeze + 0.3, SL.stop + 0.2, 'THE TABLE YOU SEE IS', (t) => t >= SL.stop ? 'GONE' : slFmtAge(slAgeOf(t, 0.4)) + ' OLD'],
 ];
 // the honest labels: [from, to, text]
 const SL_TAGS = [
   [0.3, SL.titleShot, 'LATER TONIGHT'],
   [SL.fast + 0.3, SL.rule, 'LIGHT, AS IT REALLY IS · SHOWN 40× SLOWER'],
-  [SL.rule + 0.4, SL.call + 6.5, 'THOUGHT EXPERIMENT · ONLY LIGHT SLOWS'],
+  [SL.rule + 0.4, SL.call + 6.5, 'THOUGHT EXPERIMENT · ONLY LIGHT SLOWS · WIRES AND CHIPS STILL WORK'],
   [SL.cable - 0.1, SL.cable + 7, 'ILLUSTRATION'],
+  [SL.map + 0.4, SL.sun - 0.3, 'ILLUSTRATION'],
   [slS('egg') - 0.2, slE('egg') + 1.0, 'ILLUSTRATION'],
-  [SL.last + 0.2, SL.on2, 'ILLUSTRATION'],
-  [SL.on2 + 0.2, SL.text, "ILLUSTRATION · WHAT'S REALLY THERE"],
+  [SL.last + 0.2, SL.door, 'ILLUSTRATION · YOUR EYE, NOT TO SCALE'],
+  [SL.door + 0.2, SL.on2, 'ILLUSTRATION · YOUR FLAT, FROM ABOVE'],
+  [SL.on2 + 0.2, SL.text, 'ILLUSTRATION · EVERY BULB IS ON'],
   [SL.text + 0.2, SL.real - 0.3, 'ILLUSTRATION'],
   [SL.lab + 0.2, SL.held - 0.4, 'REAL EXPERIMENT · HARVARD, 1999 · ILLUSTRATED, SLOWED DOWN'],
   [SL.held - 0.4, SL.question - 0.4, 'REAL EXPERIMENT · HARVARD, 2001 · ILLUSTRATED, SLOWED DOWN'],
@@ -71,17 +104,16 @@ const SL_TAGS = [
 // a caption's text with its numbers in amber
 function slCapHtml(s) {
   const esc = s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  return esc.replace(/\b(\d[\d,.]*(?:\s?(?:km\/h|metres|kilometres|seconds?))?|one|two|three|four|five|six|seven|eight|nine|ten|millimetre|a whole second|a fraction of a second)\b/gi, '<span class="n">$1</span>');
+  return esc.replace(/\b(\d[\d,.½]*(?:\s?(?:km\/h|metres|kilometres|seconds?))?|one|two|three|four|five|six|seven|eight|nine|ten|millimetre|a whole second|a fraction of a second)\b/gi, '<span class="n">$1</span>');
 }
 
 class SlHud {
   constructor(root) {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; root.appendChild(d); return d; };
-    this.ro = mk('sl-ro', '<div class="l">SPEED OF LIGHT</div><div class="v"></div><div class="s"></div>' +
-      '<div class="nx"><span class="nl">NEXT</span><span class="nn"></span><span class="nv"></span></div>');
+    this.ro = mk('sl-ro', '<div class="l">SPEED OF LIGHT</div><div class="v"></div><div class="s"></div>');
     this.roL = this.ro.querySelector('.l'); this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s');
-    this.nx = this.ro.querySelector('.nx'); this.nxN = this.ro.querySelector('.nn'); this.nxV = this.ro.querySelector('.nv');
-    this.ctx = mk('sl-ctx', '<span class="l"></span><span class="v"></span>'); this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v');
+    this.ctx = mk('sl-ctx', '<span class="l"></span><span class="v"></span><span class="v2"></span>');
+    this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
     this.tag = mk('sl-tag');
     this.clock = mk('sl-clock', '<div class="l">TONIGHT</div><div class="v"></div>'); this.clockV = this.clock.querySelector('.v');
     this.msg = mk('sl-msg', '<div class="hd"><b>MUM</b><span class="st"></span></div><div class="body">On my way x</div><div class="go"></div>');
@@ -105,11 +137,11 @@ class SlHud {
     const ra = Math.max(W(t, 0.4, SL.titleShot, 0.5, 0.4), W(t, SL.fast + 0.5, SL.stop + 2.5, 0.6, 0.8), W(t, SL.lab + 0.6, SL.question - 0.3, 0.6, 0.6));
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
-      let v, sub, next = null;
+      let v, sub;
       if (lab) {
         this._txt('rol', this.roL, 'LIGHT IN THE ATOM CLOUD');
         const held = t >= SL.held && t < SL.release;
-        v = held ? '0 km/h' : '61 km/h'; sub = held ? 'STOPPED · HELD FOR UP TO A THOUSANDTH OF A SECOND' : '17 METRES A SECOND';
+        v = held ? '0 km/h' : '61 km/h'; sub = held ? 'STORED IN THE ATOMS · UP TO A THOUSANDTH OF A SECOND' : '17 METRES A SECOND';
       } else {
         this._txt('rol', this.roL, 'SPEED OF LIGHT');
         const cc = t < SL.titleShot ? SL.cLamp : c;
@@ -120,17 +152,17 @@ class SlHud {
           const near = SL_MARKS.find((m) => cc > m[0] * 0.94 && cc < m[0] * 1.06);
           const above = SL_MARKS.filter((m) => m[0] > cc).pop();
           sub = near ? 'AS FAST AS ' + near[1] : above[0] === SL_C0 ? (() => { const p = cc / SL_C0 * 100; return (p >= 10 ? Math.round(p) : p >= 1 ? p.toFixed(1) : p.toFixed(2)) + '% OF ITS NORMAL SPEED'; })() : 'SLOWER THAN ' + above[1];
-          next = SL_MARKS.find((m) => m[0] < cc * 0.94);
         }
       }
       this._txt('rov', this.roV, v); this._txt('ros', this.roS, sub);
-      this._set('nx', this.nx, 'opacity', next && t > SL.rule + 1 && t < SL.stop ? '1' : '0');
-      if (next) { this._txt('nxn', this.nxN, next[1]); this._txt('nxv', this.nxV, slFmtC(next[0])); }
     }
     // ---- the context line
     const cx = SL_CTX.find((x) => t >= x[0] && t < x[1]);
     this._set('cx', this.ctx, 'opacity', cx ? W(t, cx[0], cx[1], 0.5, 0.4).toFixed(3) : '0');
-    if (cx) { this._txt('cxl', this.ctxL, cx[2]); this._txt('cxv', this.ctxV, cx[3](t)); }
+    if (cx) {
+      const r = cx[3](t), o = typeof r === 'string' ? { v: r } : r;
+      this._txt('cxl', this.ctxL, o.l || cx[2]); this._html('cxv', this.ctxV, o.v); this._html('cxv2', this.ctxV2, o.v2 || '');
+    }
     // ---- the honest label
     const tg = SL_TAGS.find((g) => t >= g[0] && t < g[1]);
     this._set('tg', this.tag, 'opacity', tg ? W(t, tg[0], tg[1], 0.5, 0.4).toFixed(3) : '0');
@@ -141,6 +173,7 @@ class SlHud {
     if (ca > 0) { const m = Math.floor(slClock(t)); this._txt('ckv', this.clockV, `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`); }
     const ma = W(t, SL.textSent, SL.real - 0.4, 0.4, 0.6) * (t > SL.stop + 0.3 && t < SL.text - 0.5 ? 0 : 1);
     this._set('ma', this.msg, 'opacity', ma.toFixed(3));
+    { const u = t - SL.textSent, k = u > 0 && u < 0.9 ? Math.sin(Math.PI * u / 0.9) * Math.exp(-u * 2) : 0; this._set('msc', this.msg, 'transform', k > 0.002 ? `scale(${(1 + 0.22 * k).toFixed(3)})` : 'none'); }
     if (ma > 0) {
       const gone = Math.min(SL.textDist, slDistBetween(SL.textSent, Math.min(t, SL.stop)));
       this._txt('mst', this.msgSt, 'SENT ' + (() => { const m = Math.floor(slClock(SL.textSent)); return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`; })());
@@ -174,11 +207,13 @@ class SlHud {
   _insets(t) {
     const W = StoryHUD.win;
     const which = [
-      ['cable', SL.cable - 0.2, SL.cable + 7.2], ['egg', slS('egg') - 0.3, slE('egg') + 1.2], ['eye', slS('last') - 0.2, SL.door - 0.3], ['text', SL.text + 0.3, SL.real - 0.4],
+      ['cable', SL.cable - 0.2, SL.cable + 7.2], ['car2', slCap('faster', 1).show - 0.3, slS('two') - 0.4], ['car2', SL.car2Seen + 0.2, SL.cat - 0.3],
+      ['egg', slS('egg') - 0.3, slE('egg') + 1.2], ['eye', SL.last - 0.1, SL.door - 0.2], ['text', SL.text + 0.3, SL.real - 0.4],
     ].find((x) => t >= x[1] && t < x[2]);
     const a = which ? W(t, which[1], which[2], 0.5, 0.5) : 0;
     this._set('ina', this.inset, 'opacity', a.toFixed(3));
     if (!which) return;
+    { const cls = which[0] === 'eye' ? 'sl-inset big' : 'sl-inset'; if (this._last.inb !== cls) { this._last.inb = cls; this.inset.className = cls; } }
     const k = which[0], u = t - which[1], key = k + '|' + Math.round(u * 30);
     if (key === this._insetKey) return;
     this._insetKey = key;
@@ -211,33 +246,95 @@ class SlHud {
   // the egg of light: every point on it is the same light-travel distance from the lamp to your eye (side view)
   static egg(u) {
     const Lx = 170, Ex = 590, y0 = 200, a = 260, f = (Ex - Lx) / 2, b = Math.sqrt(a * a - f * f), cx = (Lx + Ex) / 2;
-    const k = Math.min(1, u / 1.2), r = 0.25 + 0.75 * k;
-    const A = f + (a - f) * r, B = Math.sqrt(Math.max(1, A * A - f * f));
-    const px = cx + A * Math.cos(1.9 + 0.4 * Math.sin(u * 0.8)), py = y0 + B * Math.sin(1.9 + 0.4 * Math.sin(u * 0.8));
+    // (the egg on the floor is where this oval of equal light paths meets the floor: it grows as more light arrives)
+    const k = Math.min(1, u / 1.6), r = 0.25 + 0.75 * Ease.inOutSine(k);
+    const A = f + (a - f) * r, B = Math.sqrt(Math.max(1, A * A - f * f)), fy = y0 + b * 0.62, h = fy - y0;
+    const hx = B > h ? A * Math.sqrt(1 - (h / B) * (h / B)) : 0, q0 = (cx - hx).toFixed(1), q1 = (cx + hx).toFixed(1);
+    const paths = hx > 2 ? [q0, q1].map((qx) => `<polyline points="${Lx},${y0} ${qx},${fy} ${Ex},${y0}" fill="none" stroke="#fff6e6" stroke-width="2.5" stroke-dasharray="8 7"/><circle cx="${qx}" cy="${fy}" r="7" fill="#fff6e6"/>`).join('') : '';
     return SlHud.svg(`<rect x="0" y="0" width="760" height="470" rx="22" fill="rgba(6,9,14,0.66)"/>
-      <line x1="40" y1="${y0 + b * 0.62}" x2="720" y2="${y0 + b * 0.62}" stroke="rgba(222,214,196,0.45)" stroke-width="3"/>
-      <text x="50" y="${y0 + b * 0.62 + 34}" class="s">FLOOR</text>
-      <ellipse cx="${cx}" cy="${y0}" rx="${A.toFixed(1)}" ry="${B.toFixed(1)}" fill="rgba(255,190,110,0.13)" stroke="#ffd7a8" stroke-width="3.5"/>
-      <polyline points="${Lx},${y0} ${px.toFixed(1)},${py.toFixed(1)} ${Ex},${y0}" fill="none" stroke="#fff6e6" stroke-width="2.5" stroke-dasharray="8 7"/>
-      <circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="#fff6e6"/>
+      <line x1="40" y1="${fy}" x2="720" y2="${fy}" stroke="rgba(222,214,196,0.45)" stroke-width="3"/>
+      <text x="50" y="${fy + 34}" class="s">FLOOR</text>
+      <ellipse cx="${cx}" cy="${y0}" rx="${A.toFixed(1)}" ry="${B.toFixed(1)}" fill="rgba(255,190,110,0.1)" stroke="rgba(255,215,168,0.75)" stroke-width="3"/>
+      ${hx > 2 ? `<line x1="${q0}" y1="${fy}" x2="${q1}" y2="${fy}" stroke="#ffcf8a" stroke-width="9" stroke-linecap="round"/><text x="${cx}" y="${fy + 34}" class="t" text-anchor="middle">THE EGG OF LIGHT</text>` : ''}
+      ${paths}
       <circle cx="${Lx}" cy="${y0}" r="15" fill="#ffd27a"/><text x="${Lx}" y="${y0 - 28}" class="t" text-anchor="middle">LAMP</text>
       <circle cx="${Ex}" cy="${y0}" r="11" fill="none" stroke="#fff" stroke-width="3"/><circle cx="${Ex}" cy="${y0}" r="4" fill="#fff"/><text x="${Ex}" y="${y0 - 28}" class="t" text-anchor="middle">YOU</text>
-      <text x="380" y="448" class="s" text-anchor="middle">LAMP → FLOOR → YOU: THE SAME DISTANCE ALL ROUND THE EGG</text>`);
+      <text x="380" y="448" class="s" text-anchor="middle">LAMP → FLOOR → YOU: ONE DISTANCE ALL ROUND</text>`);
   }
-  // the last light you'll ever see, a millimetre from your eye
-  static eye(u) {
-    const cx = 470, cy = 230, ph = u * 0.0;
-    let wave = ''; for (let i = 0; i <= 60; i++) { const x = 150 + i * 2.2, env = Math.exp(-Math.pow((i - 30) / 13, 2)); wave += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + (cy - 20 * env * Math.sin(i * 0.9 + ph)).toFixed(1); }
-    return SlHud.svg(`<rect x="0" y="0" width="760" height="470" rx="22" fill="rgba(6,9,14,0.7)"/>
-      <circle cx="${cx}" cy="${cy}" r="150" fill="rgba(240,236,228,0.12)" stroke="rgba(240,236,228,0.6)" stroke-width="3"/>
-      <path d="M ${cx - 132} ${cy - 70} A 80 80 0 0 0 ${cx - 132} ${cy + 70}" fill="rgba(160,200,230,0.25)" stroke="rgba(200,225,240,0.8)" stroke-width="3"/>
-      <ellipse cx="${cx - 104}" cy="${cy}" rx="22" ry="52" fill="rgba(255,240,210,0.22)" stroke="rgba(255,240,210,0.7)" stroke-width="2.5"/>
-      <path d="M ${cx + 140} ${cy - 60} A 150 150 0 0 1 ${cx + 140} ${cy + 60}" fill="none" stroke="#e8846a" stroke-width="7"/>
-      <path d="${wave}" fill="none" stroke="#ffd7a8" stroke-width="3.5"/>
-      <line x1="${150 + 66}" y1="${cy + 60}" x2="${cx - 150}" y2="${cy + 60}" stroke="#fff" stroke-width="2"/><line x1="${150 + 66}" y1="${cy + 50}" x2="${150 + 66}" y2="${cy + 70}" stroke="#fff" stroke-width="2"/><line x1="${cx - 150}" y1="${cy + 50}" x2="${cx - 150}" y2="${cy + 70}" stroke="#fff" stroke-width="2"/>
-      <text x="${(216 + cx - 150) / 2}" y="${cy + 96}" class="t" text-anchor="middle">1 mm</text>
-      <text x="${cx + 120}" y="${cy + 108}" class="s" text-anchor="middle">RETINA</text><text x="214" y="${cy - 44}" class="s" text-anchor="middle">THE LAST LIGHT</text>
-      <text x="380" y="448" class="s" text-anchor="middle">YOUR EYE (NOT TO SCALE)</text>`);
+  // the light that stopped: the room and your eye are full of it, frozen; the next light you'd see is a hair from your
+  // retina and never gets there (side view of an eye, not to scale)
+  static eye(u, t) {
+    const cx = 450, cy = 228, R = 168, rx = cx + R - 16, cap = (k) => MathX.smooth(t, slCap('last', k).show - 0.2, slCap('last', k).show + 0.4);
+    const pk = (x, y, a, hot) => { let d = ''; for (let i = 0; i <= 24; i++) { const env = Math.exp(-Math.pow((i - 12) / 5.5, 2)); d += (i ? 'L' : 'M') + (x - 26 + i * 2.2).toFixed(1) + ' ' + (y - (hot ? 16 : 10) * env * Math.sin(i * 1.05)).toFixed(1); } return `<path d="${d}" fill="none" stroke="${hot ? '#fff1d6' : '#ffd7a8'}" stroke-width="${hot ? 4 : 2.5}" opacity="${a}"/>`; };
+    // frozen packets: in the room (left of the eye) and inside it; one, nearest the retina, is the next you'd have seen
+    let packets = '';
+    for (let i = 0; i < 26; i++) {
+      const x = 40 + slR(i, 61) * 640, y = 60 + slR(i, 62) * 340, inEye = Math.hypot(x - cx, y - cy) < R - 18;
+      if (Math.hypot(x - cx, y - cy) < R + 14 && !inEye) continue;
+      if (Math.abs(y - cy) < 22 && x > rx - 70) continue;
+      packets += pk(x, y, inEye ? 0.42 + 0.3 * cap(1) : 0.38, false);
+    }
+    const hx = rx - 34, hot = cap(0);
+    return SlHud.svg(`<rect x="0" y="0" width="760" height="470" rx="22" fill="rgba(6,9,14,0.72)"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="rgba(240,236,228,${(0.08 + 0.08 * cap(1)).toFixed(3)})" stroke="rgba(240,236,228,${(0.5 + 0.4 * cap(1)).toFixed(3)})" stroke-width="3"/>
+      <path d="M ${cx - R + 18} ${cy - 76} A 86 86 0 0 0 ${cx - R + 18} ${cy + 76}" fill="rgba(160,200,230,0.22)" stroke="rgba(200,225,240,0.8)" stroke-width="3"/>
+      <ellipse cx="${cx - R + 50}" cy="${cy}" rx="22" ry="54" fill="rgba(255,240,210,0.2)" stroke="rgba(255,240,210,0.7)" stroke-width="2.5"/>
+      <path d="M ${cx + R - 22} ${cy - 92} A ${R - 14} ${R - 14} 0 0 1 ${cx + R - 22} ${cy + 92}" fill="none" stroke="#e8846a" stroke-width="8"/>
+      ${packets}
+      ${pk(hx, cy, 0.35 + 0.65 * hot, true)}
+      <circle cx="${hx}" cy="${cy}" r="34" fill="rgba(255,225,170,${(0.18 * hot).toFixed(3)})"/>
+      <g opacity="${hot.toFixed(3)}"><line x1="${hx}" y1="${cy - 30}" x2="${hx + 40}" y2="${cy - R - 8}" stroke="#fff1d6" stroke-width="2"/>
+        <text x="${hx + 70}" y="${cy - R - 14}" class="t" text-anchor="end">THE NEXT LIGHT YOU'D SEE</text></g>
+      <g opacity="${cap(2).toFixed(3)}"><line x1="${hx + 20}" y1="${cy + 26}" x2="${hx + 70}" y2="${cy + R + 4}" stroke="#fff" stroke-width="2"/>
+        <text x="${hx + 100}" y="${cy + R + 28}" class="t" text-anchor="end">A HAIR FROM YOUR RETINA</text></g>
+      <text x="${cx + R + 16}" y="${cy - 100}" class="s" text-anchor="start">RETINA</text>
+      <text x="${cx - R - 6}" y="${cy - 92}" class="s" text-anchor="end">CORNEA</text>
+      <text x="380" y="452" class="s" text-anchor="middle">ALL THE LIGHT HERE HAS STOPPED</text>`);
+  }
+  // car 2, from above: the real car (unseen) outruns the light it gives off; that light's circles pile up into a cone
+  // behind it (like a jet's sound); when the cone's edge reaches you, you see it, and from then on light from two of
+  // its past moments reaches you at once: two images, one going on, one running backwards
+  static car2(u, t) {
+    const E0 = SL_ST.eye[0], V = -SL_ST.v2, Tp = SL.car2Tp, xr = E0 + V * (t - Tp), c = slC(t);
+    const cen = [E0, SL_ST.carY, SL_ST.lane], seen = t >= SL.car2Seen;
+    const tA = seen ? slMoveTau(t, c, SL_ST.eye, cen, [V, 0, 0], Tp, 1) : NaN, tB = seen ? slMoveTau(t, c, SL_ST.eye, cen, [V, 0, 0], Tp, -1) : NaN;
+    const xA = isNaN(tA) ? null : E0 + V * tA, xB = isNaN(tB) ? null : E0 + V * tB;
+    // to scale (px per metre): wide while it comes, close for the moment it appears and splits, wide again after
+    const k = t < Tp ? Math.min(20, 330 / (Math.abs(xr - E0) + 14)) : slLerp(20, 6.5, slK(t, Tp + 1.6, Tp + 5.5));
+    const X = (x) => 380 + (x - E0) * k, yL = 196, yY = yL + SL_ST.b * k;
+    // the circles of light it gave off (every 0.4 s over the last 24 s), as far as each has got; the two reaching you now
+    const ring = (te, a, w) => { const r = slDistBetween(te, t) * k; return `<circle cx="${X(E0 + V * (te - Tp)).toFixed(1)}" cy="${yL}" r="${r.toFixed(1)}" fill="none" stroke="rgba(255,215,168,${a.toFixed(3)})" stroke-width="${w}"/>`; };
+    let rings = '';
+    for (let i = 0; i < 60; i++) { const te = Math.floor(t / 0.4) * 0.4 - i * 0.4; if (te <= t && te > t - 24) rings += ring(te, 0.45 * Math.exp(-i / 34), 1.6); }
+    const hot = (tt) => isNaN(tt) ? '' : ring(Tp + tt, 0.9, 3);
+    const L = 4.6 * k, Wd = Math.max(10, 1.9 * k), on = (x) => X(x) > -L && X(x) < 760 + L;
+    const car = (x, fill, stroke, dash) => on(x) ? `<rect x="${(X(x) - L / 2).toFixed(1)}" y="${(yL - Wd / 2).toFixed(1)}" width="${L.toFixed(1)}" height="${Wd.toFixed(1)}" rx="5" fill="${fill}" stroke="${stroke}" stroke-width="3" ${dash ? 'stroke-dasharray="7 5"' : ''}/>` : '';
+    const txt = (x, y, an, a, b) => `<text x="${x.toFixed(1)}" y="${y}" class="t" text-anchor="${an}">${a}</text>${b ? `<text x="${x.toFixed(1)}" y="${y + 25}" class="s" text-anchor="${an}">${b}</text>` : ''}`;
+    // a label over a car, or at the edge with an arrow and how far, once it has left the diagram
+    const lab = (x, y, an, a, b) => {
+      const px = X(x), d = Math.round(Math.abs(x - E0));
+      if (px > 745) return txt(742, y, 'end', a + ' →', `${d} m${b ? ' · ' + b : ''}`);
+      if (px < 15) return txt(18, y, 'start', '← ' + a, `${d} m${b ? ' · ' + b : ''}`);
+      // (flip to the other side rather than run off the edge: about 260 px of text)
+      if (an === 'start' && Math.max(px - L / 2, 18) + 260 > 742) an = 'end';
+      else if (an === 'end' && Math.min(px + L / 2, 742) - 260 < 18) an = 'start';
+      const ax = an === 'end' ? Math.min(px + L / 2, 742) : an === 'start' ? Math.max(px - L / 2, 18) : MathX.clamp(px, 140, 620);
+      return txt(ax, y, an, a, b);
+    };
+    const ray = (x) => on(x) ? `<line x1="${X(x).toFixed(1)}" y1="${yL}" x2="380" y2="${yY.toFixed(1)}" stroke="#fff6e6" stroke-width="2.5" stroke-dasharray="6 6"/>` : '';
+    const realAn = X(xr) > 560 ? 'end' : X(xr) < 200 ? 'start' : 'middle';
+    return SlHud.svg(`<defs><clipPath id="slc2"><rect x="0" y="0" width="760" height="470" rx="22"/></clipPath></defs>
+      <rect x="0" y="0" width="760" height="470" rx="22" fill="rgba(6,9,14,0.76)"/>
+      <g clip-path="url(#slc2)">
+        <rect x="0" y="${(yL - Math.max(14, 2.0 * k)).toFixed(1)}" width="760" height="${(2 * Math.max(14, 2.0 * k)).toFixed(1)}" fill="rgba(222,214,196,0.12)"/>
+        ${rings}${hot(tA)}${hot(tB)}${xA !== null ? ray(xA) : ''}${xB !== null ? ray(xB) : ''}
+        ${car(xr, 'none', 'rgba(255,255,255,0.85)', true)}${xA !== null ? car(xA, '#3a3226', '#d9a92e', false) : ''}${xB !== null ? car(xB, '#d9a92e', '#fff3c4', false) : ''}
+      </g>
+      <circle cx="380" cy="${yY.toFixed(1)}" r="10" fill="#fff"/><text x="380" y="${(yY + 38).toFixed(1)}" class="t" text-anchor="middle">YOU</text>
+      ${lab(xr, yL - 128, realAn, seen ? 'WHERE IT REALLY IS' : 'THE CAR', seen ? 'UNSEEN' : 'HEARD, NOT SEEN')}
+      ${xA !== null ? lab(xA, yL - 72, 'end', 'IT, DRIVING ON', 'TOO RED TO SEE') : ''}
+      ${xB !== null ? lab(xB, yL - 72, 'start', 'ITS PAST', 'RUNNING BACKWARDS') : ''}
+      <text x="380" y="452" class="s" text-anchor="middle">FROM ABOVE · THE RINGS ARE ITS LIGHT</text>`);
   }
   // Mum's text: radio from the mast, stopped on the way to your phone
   static text(u, t) {

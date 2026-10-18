@@ -59,7 +59,7 @@ function slGranAt(τ) {
   const laugh = slWin(τ, heard + 0.1, heard + 3.6, 0.25, 0.9);
   const mouth = Math.max(0, Math.sin(τ * 17) * 0.5 + Math.sin(τ * 11.3) * 0.3) * MathX.clamp(T, 0, 1) + laugh * (0.55 + 0.3 * Math.abs(Math.sin(τ * 13)));
   const blink = Math.max(0, 1 - Math.abs(((τ * 0.31 + 0.4) % 1) - 0.5) * 40);
-  return { mouth, smile: 0.25 + laugh * 0.75, blink, tilt: 0.04 * Math.sin(τ * 0.7) + laugh * 0.08 * Math.sin(τ * 9), wave: slWin(τ, SL.call + 0.2, SL.call + 2.4, 0.3, 0.3), look: 0.1 * Math.sin(τ * 0.4) };
+  return { mouth, smile: 0.25 + laugh * 0.75, blink, tilt: 0.04 * Math.sin(τ * 0.7) + laugh * 0.17 * Math.sin(τ * 9), wave: slWin(τ, SL.call + 0.2, SL.call + 2.4, 0.3, 0.3), look: 0.1 * Math.sin(τ * 0.4) };
 }
 // you, in the little self-view (no delay): you laugh at your own joke, then you've moved on (you look away)
 function slYouAt(t) {

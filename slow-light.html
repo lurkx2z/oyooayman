@@ -14,6 +14,7 @@
     #hud .story-title.big.center::before { background: radial-gradient(closest-side, rgba(2, 3, 6, 0.5), rgba(2, 3, 6, 0.2) 62%, rgba(2, 3, 6, 0)); }
     #hud .story-title.big.center .kick { font-family: var(--book); font-size: calc(var(--u) * 54); font-weight: 600; letter-spacing: 0.06em; }
     #hud .story-title.big.center .hero { font-family: var(--book); font-size: calc(var(--u) * 124); font-weight: 700; line-height: 1.02; letter-spacing: 0.02em; }
+    #hud .story-title.big.center .kick.k2 { margin-top: calc(var(--u) * 6); font-size: calc(var(--u) * 58); color: #ffcf8a; }
     #hud .story-title.big.center .main { text-shadow: 0 0 calc(var(--u) * 30) rgba(0, 0, 0, 0.8), 0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.7); }
     /* the caption: one line, low, on a soft shadow (no plate); numbers amber; the closing question larger */
     .sl-cap { position: absolute; left: 50%; bottom: calc(var(--u) * 92); transform: translateX(-50%); width: max-content; max-width: calc(var(--u) * 1500); text-align: center;
@@ -23,42 +24,45 @@
       background: radial-gradient(closest-side, rgba(0, 0, 0, 0.56), rgba(0, 0, 0, 0)); }
     .sl-cap .n { color: #ffcf8a; }
     .sl-cap.q { bottom: calc(var(--u) * 430); font-size: calc(var(--u) * 82); font-weight: 600; max-width: calc(var(--u) * 1600); }
-    /* the counter (top left) and the context line under it */
-    .sl-ro, .sl-clock { position: absolute; top: calc(var(--u) * 58); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.6); }
-    .sl-ro { left: calc(var(--u) * 70); }
-    .sl-ro .l, .sl-clock .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 21); letter-spacing: 0.2em; color: #ffffff; opacity: 0.9; }
-    .sl-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 76); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
+    /* the counter (top left, on a soft plate) and the scene's context line under it */
+    .sl-ro, .sl-clock { position: absolute; top: calc(var(--u) * 44); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.6); }
+    .sl-ro { left: calc(var(--u) * 52); padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 18); border-radius: calc(var(--u) * 16); background: rgba(6, 8, 12, 0.42); }
+    .sl-ro .l, .sl-clock .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.18em; color: #ffffff; opacity: 0.92; }
+    .sl-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
       font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
-    .sl-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 19); letter-spacing: 0.15em; margin-top: calc(var(--u) * 6); color: #ffd7a8; }
-    .sl-ro .nx { margin-top: calc(var(--u) * 18); padding-top: calc(var(--u) * 12); border-top: calc(var(--u) * 1.5) solid rgba(255, 255, 255, 0.28); width: max-content; min-width: calc(var(--u) * 300); }
-    .sl-ro .nx .nl { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 17); letter-spacing: 0.2em; opacity: 0.7; margin-right: calc(var(--u) * 14); color: #fff; }
-    .sl-ro .nx .nn { font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 17); letter-spacing: 0.16em; color: #fff; }
-    .sl-ro .nx .nv { display: block; font-family: var(--book); font-size: calc(var(--u) * 32); margin-top: calc(var(--u) * 4); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; }
-    .sl-ctx { position: absolute; left: calc(var(--u) * 70); top: calc(var(--u) * 368); pointer-events: none; padding: calc(var(--u) * 10) calc(var(--u) * 18); border-radius: calc(var(--u) * 10);
+    .sl-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
+    .sl-ctx { position: absolute; left: calc(var(--u) * 52); top: calc(var(--u) * 262); pointer-events: none; padding: calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * 14); border-radius: calc(var(--u) * 14);
       background: rgba(6, 8, 12, 0.5); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
-    .sl-ctx .l { display: block; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 16); letter-spacing: 0.2em; color: #fff; opacity: 0.75; }
-    .sl-ctx .v { display: block; font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 36); margin-top: calc(var(--u) * 2); color: #ffd7a8; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
-    /* the honest label */
-    .sl-tag { position: absolute; left: calc(var(--u) * 70); top: calc(var(--u) * 478); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 16); letter-spacing: 0.18em;
-      color: #e9e2d4; padding: calc(var(--u) * 7) calc(var(--u) * 14); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
+    .sl-ctx .l { display: block; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.16em; color: #fff; opacity: 0.8; }
+    .sl-ctx .v { display: block; font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 40); margin-top: calc(var(--u) * 2); color: #ffd7a8; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+    .sl-ctx .v2 { display: block; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #f6efe2; white-space: nowrap; }
+    .sl-ctx .v2:empty { display: none; }
+    .sl-ctx .chip { display: inline-block; margin-right: calc(var(--u) * 18); opacity: 0.38; }
+    .sl-ctx .chip.on { opacity: 1; color: #ffcf8a; }
+    .sl-ctx .chip.hit { opacity: 1; color: #fff; text-shadow: 0 0 calc(var(--u) * 16) rgba(255, 220, 160, 0.95); }
+    .sl-ctx .dim { opacity: 0.55; }
+    /* the honest label (bottom left, under the caption line) */
+    .sl-tag { position: absolute; left: calc(var(--u) * 52); bottom: calc(var(--u) * 26); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 22); letter-spacing: 0.16em;
+      color: #e9e2d4; padding: calc(var(--u) * 7) calc(var(--u) * 16); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
     /* the time tonight, and Mum's text (top right) */
-    .sl-clock { right: calc(var(--u) * 70); text-align: right; }
-    .sl-clock .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 58); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; }
-    .sl-msg { position: absolute; right: calc(var(--u) * 70); top: calc(var(--u) * 190); width: calc(var(--u) * 420); padding: calc(var(--u) * 16) calc(var(--u) * 20); border-radius: calc(var(--u) * 22);
-      background: rgba(38, 40, 46, 0.78); box-shadow: 0 calc(var(--u) * 10) calc(var(--u) * 40) rgba(0, 0, 0, 0.4); pointer-events: none; color: #f2f2f4; font-family: var(--hud-font); }
-    .sl-msg .hd { display: flex; justify-content: space-between; font-size: calc(var(--u) * 17); letter-spacing: 0.1em; opacity: 0.75; }
+    .sl-clock { right: calc(var(--u) * 60); text-align: right; }
+    .sl-clock .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 62); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; }
+    .sl-msg { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 196); width: calc(var(--u) * 540); padding: calc(var(--u) * 16) calc(var(--u) * 22); border-radius: calc(var(--u) * 22);
+      background: rgba(38, 40, 46, 0.8); box-shadow: 0 calc(var(--u) * 10) calc(var(--u) * 40) rgba(0, 0, 0, 0.4); pointer-events: none; color: #f2f2f4; font-family: var(--hud-font); transform-origin: 100% 0; }
+    .sl-msg .hd { display: flex; justify-content: space-between; font-size: calc(var(--u) * 22); letter-spacing: 0.1em; opacity: 0.8; }
     .sl-msg .hd b { font-weight: 700; }
-    .sl-msg .body { display: inline-block; margin-top: calc(var(--u) * 10); font-size: calc(var(--u) * 26); padding: calc(var(--u) * 8) calc(var(--u) * 16); border-radius: calc(var(--u) * 18); background: #3a7bd5; }
-    .sl-msg .go { margin-top: calc(var(--u) * 10); font-size: calc(var(--u) * 16); letter-spacing: 0.14em; font-weight: 600; color: #ffd7a8; }
-    /* the diagrams (illustrations), right of centre */
-    .sl-inset { position: absolute; right: calc(var(--u) * 70); top: calc(var(--u) * 330); width: calc(var(--u) * 760); height: calc(var(--u) * 470); pointer-events: none; }
+    .sl-msg .body { display: inline-block; margin-top: calc(var(--u) * 10); font-size: calc(var(--u) * 32); padding: calc(var(--u) * 8) calc(var(--u) * 18); border-radius: calc(var(--u) * 20); background: #3a7bd5; }
+    .sl-msg .go { margin-top: calc(var(--u) * 10); font-size: calc(var(--u) * 22); letter-spacing: 0.1em; font-weight: 600; color: #ffd7a8; }
+    /* the diagrams (illustrations): right of centre, or large in the middle of the frame */
+    .sl-inset { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 372); width: calc(var(--u) * 800); height: calc(var(--u) * 495); pointer-events: none; }
+    .sl-inset.big { right: auto; left: 50%; margin-left: calc(var(--u) * -620); top: calc(var(--u) * 110); width: calc(var(--u) * 1240); height: calc(var(--u) * 767); }
     .sl-inset svg { width: 100%; height: 100%; display: block; }
-    .sl-inset .t { font-family: var(--hud-font); font-weight: 700; font-size: 24px; letter-spacing: 0.12em; fill: #f6efe2; }
-    .sl-inset .s { font-family: var(--hud-font); font-weight: 600; font-size: 19px; letter-spacing: 0.14em; fill: #ffd7a8; }
+    .sl-inset .t { font-family: var(--hud-font); font-weight: 700; font-size: 25px; letter-spacing: 0.1em; fill: #f6efe2; }
+    .sl-inset .s { font-family: var(--hud-font); font-weight: 600; font-size: 21px; letter-spacing: 0.12em; fill: #ffd7a8; }
     .sl-inset .b { font-family: var(--hud-font); font-weight: 600; font-size: 22px; fill: #fff; }
     /* labels pinned to places */
     .sl-lab { position: absolute; transform: translate(calc(var(--u) * -16), -50%); pointer-events: none; white-space: nowrap; font-family: var(--hud-font); font-weight: 600;
-      font-size: calc(var(--u) * 30); letter-spacing: 0.08em; color: #f6efe2; padding: calc(var(--u) * 6) calc(var(--u) * 14); border-radius: calc(var(--u) * 10); background: rgba(4, 6, 10, 0.55);
+      font-size: calc(var(--u) * 34); letter-spacing: 0.08em; color: #f6efe2; padding: calc(var(--u) * 6) calc(var(--u) * 14); border-radius: calc(var(--u) * 10); background: rgba(4, 6, 10, 0.55);
       text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.9); }
     .sl-lab small { display: block; margin-left: calc(var(--u) * 34); font-size: 0.75em; opacity: 0.9; color: #ffd7a8; }
     .sl-lab .d { display: inline-block; width: calc(var(--u) * 12); height: calc(var(--u) * 12); border-radius: 50%; margin-right: calc(var(--u) * 14);

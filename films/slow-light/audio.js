@@ -63,9 +63,9 @@ function slLimit(buf, ceilDb) {
 class SlAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'slow-light-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
-    return [SL, SL_CKEYS, SLT, window.SL_MIX, Object.values(SLX).map(String).join(''), Object.values(SlFx.prototype).map(String).join(''),
+    return [SL, SL_CKEYS, SLT, window.SL_MIX, Object.values(SLX).map(String).join(''), SlFx.toString(), Object.values(SlFx.prototype).map(String).join(''),
       Object.values(SL_SOUND).flat().map((b) => b.name + b.fn).join(''), slDynDb.toString(), SlAudio.toString(), slLimit.toString(), slC.toString(),
-      [slNoise, slBed, slTone, slCrackle, slSweep, slSweepPut].map(String).join('')];
+      [slNoise, slBed, slTone, slCrackle, slSweep, slSweepPut, ...SL_SOUND_FNS].map(String).join('')];
   }
   async renderOffline() {
     if (this.solo) return super.renderOffline();

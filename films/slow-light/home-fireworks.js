@@ -52,9 +52,10 @@ function slBuildFireworks(O) {
         const u = t - b.f;
         if (u < -b.rise || u > b.life + 0.4) continue;
         const c = slC(b.f), n = slN3([b.x - eye[0], b.y - eye[1], b.z - eye[2]]);
-        const put = (x, y, z, size, a, r, g, bb) => {
+        // its reflection in the water: faint (hundreds of sparks pile up in one column there, and the captions sit on it)
+        const put = (x, y, z, size, a, r, g, bb, refl = 0.09) => {
           puffs.add(x, y, z, size, a, r, g, bb);
-          puffs.add(x, 2 * Y - y, z, size * 1.1, a * 0.22, r, g, bb);                 // its reflection in the water
+          if (refl > 0) puffs.add(x, 2 * Y - y, z, size * 1.1, a * refl, r, g, bb);
         };
         // the rocket climbing (seen before the burst)
         if (u < 0 && b.rise > 0) {
@@ -66,7 +67,7 @@ function slBuildFireworks(O) {
           continue;
         }
         // the flash at the heart of the burst
-        if (u < 0.5) put(b.x, b.y, b.z, 70 * (1 - u * 1.6), 0.9 * Math.exp(-u * 7), 1, 0.92, 0.8);
+        if (u < 0.5) put(b.x, b.y, b.z, 90 * (1 - u * 1.6), 0.95 * Math.exp(-u * 7), 1, 0.92, 0.8, 0.05);
         for (let i = 0; i < b.n; i++) {
           const d = b.dirs[i], v0 = b.v0[i], dn = d[0] * n[0] + d[1] * n[1] + d[2] * n[2];
           // the age this spark is seen at: τ + disp(τ)·dn / c = u (a few fixed-point steps; light only ever lags)
@@ -87,7 +88,7 @@ function slBuildFireworks(O) {
           // its trail: where it was a moment earlier, dimmer
           for (let k = 1; k <= 3; k++) {
             const τk = Math.max(0, τ - k * 0.07), Dk = disp(v0, τk), sk = G * Math.max(0, τk - 0.5) ** 2 * 0.5;
-            put(b.x + d[0] * Dk, b.y + d[1] * Dk - sk, b.z + d[2] * Dk, 7 - k * 1.2, a * (0.55 - k * 0.13), rgb[0], rgb[1], rgb[2]);
+            put(b.x + d[0] * Dk, b.y + d[1] * Dk - sk, b.z + d[2] * Dk, 7 - k * 1.2, a * (0.55 - k * 0.13), rgb[0], rgb[1], rgb[2], 0);
           }
         }
       }

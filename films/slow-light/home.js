@@ -122,7 +122,7 @@ SL_SETS.home = (app) => {
   laser.position.set(-0.005, 0.072, 0.012); hands.right.g.add(laser);
   for (const o of [phone, laser]) o.traverse((m) => { m.layers.set(2); m.frustumCulled = false; });
   // the laser's beam (a faint line through the dust), its leading edge, the dot on the wall
-  const beamM = new THREE.MeshBasicMaterial({ color: '#ff2a1a', transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false });
+  const beamM = new THREE.MeshBasicMaterial({ color: '#ff2a1a', transparent: true, opacity: 0.38, blending: THREE.AdditiveBlending, depthWrite: false });
   const beam = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 6, 1, true).translate(0, 0.5, 0), beamM); beam.frustumCulled = false; beam.userData.slSkip = true; scene.add(beam);
   const glowTex = slDotTex(0.35);
   const sprite = (col, size) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); s.scale.setScalar(size); scene.add(s); return s; };
@@ -133,6 +133,8 @@ SL_SETS.home = (app) => {
   const mum = new Person({ id: 'slMum', look: 'slMum' }, scene); mum.root.visible = false;
   // the frozen light around every bulb (the illustration)
   const frozen = [[H.lamp[0], H.lamp[1], H.lamp[2]], [4.9, 2.28, 3.3], [-0.6, 2.05, 0.25]].map((p) => { const s = sprite('#ffe2b0', 0.5); s.position.set(...p); s.visible = false; return s; });
+  // a warm key light over the table for the knock (so the hand you are waiting to see reads)
+  const keyL = new THREE.PointLight('#ffd9b0', 0, 1.6, 2); keyL.position.set(-2.08, 1.32, -1.08); scene.add(keyL);
   // ---- the fireworks
   const fw = slBuildFireworks(O);
   const envDusk = scene.environment, envNight = slEnv(app.renderer, '#06080e', '#151b2a', '#07080b');
@@ -166,8 +168,7 @@ SL_SETS.home = (app) => {
   const catOnSofa = () => { catRoot.position.set(-1.12, 0.58, 1.38); catRoot.rotation.y = -1.25; cat.pose(SL_CAT_POSES.loaf, 0); };
   // the laser: she sits on the rug watching your hand, sprints to the wall (actual time), sits under the dot
   const C0 = [-1.35, 0.78], C1 = [2.86, 0.76];
-  SL.catGo = SL.laserOn + 0.62;                                    // she sees your thumb (≈ 0.52 s of light) and goes
-  const catRun = 0.56;                                              // 4.2 m flat out (up to ≈ 40 km/h)
+  const catRun = SL.catRun;                                         // (script.js)
   const catPos = (te) => { const u = MathX.clamp((te - SL.catGo) / catRun, 0, 1), k = u * u * (3 - 2 * u); return [slLerp(C0[0], C1[0], k), 0, slLerp(C0[1], C1[1], k)]; };
   const catVel = (te) => { const u = (te - SL.catGo) / catRun; if (u <= 0 || u >= 1) return [0, 0, 0]; const dk = 6 * u * (1 - u) / catRun; return [(C1[0] - C0[0]) * dk, 0, (C1[1] - C0[1]) * dk]; };
   const beamFrom = new THREE.Vector3(), _v = new THREE.Vector3();
@@ -186,8 +187,9 @@ SL_SETS.home = (app) => {
       P.lamp.visible = true; P.lampG.visible = true; P.mirror.mesh.visible = true;
       phone.visible = false; laser.visible = false; beam.visible = tip.visible = dot.visible = dotCore.visible = false;
       mum.root.visible = false; for (const s of frozen) s.visible = false;
+      keyL.intensity = 0;
       P.rocker.rotation.z = 0;
-      O.puffs.begin(); O.flash.intensity = 0;
+      O.puffs.begin(); O.flash.intensity = 0; O.water.material.roughness = 0.22;
       catOnSofa(); slSetSrc(catRoot, [0, 0, 0]);
       const d = outside(t, night);
       if (night) { S.sun.intensity = 0; S.hemi.intensity = 0.05; }
@@ -235,7 +237,9 @@ SL_SETS.home = (app) => {
         case 'call': case 'map': {
           const dr = slDrift(t, 0.006, 0.3, 3);
           eye = [SL_SOFA[0] + dr[0], SL_SOFA[1] + dr[1] - 0.02, SL_SOFA[2] + dr[2]];
-          look(eye, 0.12, -0.42, 50);
+          // (closing in on Gran as she falls behind, and again for her laugh; the map a little wider)
+          const fv = m === 'call' ? 50 - 9 * slK(t, SL.call + 1, SL.lagThree + 1) - 7 * slK(t, SL.jokeLaugh - 1.2, SL.jokeLaugh + 0.3) + 4 * slK(t, SL.jokeLaugh + 2.2, SL.map) : 44 - 5 * slK(t, SL.map, SL.mapSea + 2);
+          look(eye, 0.12 + (m === 'call' ? 0.012 * slK(t, SL.jokeLaugh - 1.2, SL.jokeLaugh + 0.3) : 0), -0.42, fv);
           phone.visible = true;
           const c = slC(t);
           if (m === 'call') {
@@ -257,10 +261,14 @@ SL_SETS.home = (app) => {
           eye = [SL_FW_EYE[0] + dr[0], SL_FW_EYE[1] + dr[1], SL_FW_EYE[2] + dr[2]];
           // (closing in on the last two, where the colours split)
           const zk = slK(t, SL.f5 + 1.6, SL.b6 - 0.2);
-          camAt(eye, [slLerp(slLerp(-30, 0, slK(tl, 0, 8)), -10, zk), SL_HOME.water + slLerp(190, 222, zk), -2000], slLerp(40, 26, zk));
+          // each bang arrives as a jolt (the glass and the rail shake a little)
+          let sh = 0; for (const p of SL_FW_PAIRS) { const u = t - p.b; if (u > 0 && u < 0.9) sh = Math.max(sh, Math.exp(-u * 6) * (p.b === SL.b6 ? 1.6 : 1)); }
+          const jx = sh * 0.0035 * Math.sin(t * 61), jy = sh * 0.0028 * Math.sin(t * 47 + 1);
+          eye[0] += jx; eye[1] += jy;
+          camAt(eye, [slLerp(slLerp(-25, 0, slK(tl, 0, 8)), -10, zk), SL_HOME.water + slLerp(190, 200, zk), -2000], slLerp(23, 20, zk), sh * 0.004 * Math.sin(t * 37));
           fw.draw(t, O.puffs, eye);
           const fl = fw.flashAt(t);
-          O.flash.intensity = 0.3 * fl;
+          O.flash.intensity = 0.14 * fl; O.water.material.roughness = 0.5;    // (a soft glint, not a white column under every burst)
           O.sky.material.uniforms.k.value = 1 + 0.6 * fl;
           break;
         }
@@ -271,7 +279,7 @@ SL_SETS.home = (app) => {
           { const te0 = slSeen(t, SL.cCat, eye, (x) => { const q = catPos(x); return [q[0], 0.2, q[2]]; }, 8), q = catPos(te0);
             const f = MathX.clamp((q[0] - C0[0]) / (C1[0] - C0[0]), 0, 1), k = Ease.inOutSine(f);
             const at = [slLerp(slLerp(-0.6, -0.9, slK(tl, 0, 6)), 2.9, k), slLerp(0.35, 0.55, k), slLerp(0.8, 0.78, k)];
-            camAt(eye, at, slLerp(46, 40, k)); }
+            camAt(eye, at, slLerp(slLerp(44, 38, slK(tl, 0, 6)), 24, k)); }
           P.hall.intensity = 1.2;
           laser.visible = t > SL.cat + 0.9;
           const c = SL.cCat;
@@ -305,9 +313,9 @@ SL_SETS.home = (app) => {
             if (x > 0.005) {
               const q = at(x);
               beam.visible = true; beam.position.copy(beamFrom); _v.set(q[0] - A[0], q[1] - A[1], q[2] - A[2]);
-              beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), _v.clone().normalize()); beam.scale.set(0.0012, x, 0.0012);
-              tip.visible = x < L - 0.01; tip.position.set(q[0], q[1], q[2]); tip.scale.setScalar(0.035 + 0.01 * Math.sin(t * 40));
-              if (x >= L - 0.01) { dot.visible = dotCore.visible = true; dot.position.set(Bp[0] - 0.01, Bp[1], Bp[2]); dotCore.position.copy(dot.position); dot.scale.setScalar(0.07 + 0.006 * Math.sin(t * 23)); }
+              beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), _v.clone().normalize()); beam.scale.set(0.0022, x, 0.0022);
+              tip.visible = x < L - 0.01; tip.position.set(q[0], q[1], q[2]); tip.scale.setScalar(0.1 + 0.015 * Math.sin(t * 40));
+              if (x >= L - 0.01) { dot.visible = dotCore.visible = true; dot.position.set(Bp[0] - 0.01, Bp[1], Bp[2]); dotCore.position.copy(dot.position); dot.scale.setScalar(0.12 + 0.01 * Math.sin(t * 23)); dotCore.scale.setScalar(0.035); }
             }
           }
           break;
@@ -346,8 +354,9 @@ SL_SETS.home = (app) => {
         }
         case 'knock': case 'freeze': {
           eye = SL_TABLE_EYE.slice();
-          camAt(eye, [-2.27, 0.66, -1.55], 55);
-          P.pend.intensity = 3.6; P.lamp.intensity = 7;
+          const kk = slK(t, SL.knock, SL.knockHit - 0.5);
+          camAt(eye, [slLerp(-2.27, -2.25, kk), slLerp(0.66, 0.73, kk), slLerp(-1.55, -1.38, kk)], slLerp(52, 40, kk));
+          P.pend.intensity = 3.6; P.lamp.intensity = 7; keyL.intensity = 1.6;
           // the light from your knuckles (39 cm away) left them a while ago: you see your hand as it was then. As light
           // slows to a stop, no newer light gets to you, so the hand you see stops too.
           handsT = Math.max(SL.knock + 0.7, slSeenAcross(t, SL.knockDist));
@@ -363,22 +372,40 @@ SL_SETS.home = (app) => {
           break;
         }
         case 'xray': {
-          // the illustration: the flat from above as a cut-away plan, lit only so you can see its shape; every bulb is
-          // on, and its light is piled up round the bulb, going nowhere
-          const tl = t - shot.t0;
-          eye = [slLerp(1.5, 1.3, slK(tl, 0, 7)), slLerp(10.6, 9.8, slK(tl, 0, 7)), slLerp(4.6, 4.2, slK(tl, 0, 7))];
-          camAt(eye, [1.3, 0, 0.6], 50);
-          P.lamp.intensity = 0; P.pend.intensity = 0; P.hall.intensity = 0; P.M.pend.emissiveIntensity = 1.4;
+          // the illustration: the flat from above as a cut-away plan, lit only so you can see its shape. Mum comes in
+          // through the front door and tries the switches; at "They're not." every bulb is shown on, its light piled up
+          // round the bulb, going nowhere
+          const tl = t - shot.t0, T0 = SL.door, rev = MathX.smooth(t, SL.on2 + 0.15, SL.on2 + 1.3);
+          eye = [slLerp(1.7, 1.4, slK(tl, 0, 24)), slLerp(10.4, 9.4, slK(tl, 0, 24)), slLerp(5.2, 4.6, slK(tl, 0, 24))];
+          camAt(eye, [slLerp(1.9, 1.4, slK(tl, 0, 24)), 0, slLerp(1.3, 0.9, slK(tl, 0, 24))], 50);
+          P.lamp.intensity = 0; P.pend.intensity = 0; P.hall.intensity = 0;
+          P.M.pend.emissiveIntensity = 1.4 * rev; P.M.bulb.emissiveIntensity = 6 * rev; P.M.shade.emissiveIntensity = 0.55 * rev;
           S.hemi.intensity = 0.75; S.hemi.color.set('#8aa2d6'); S.hemi.groundColor.set('#2a2c34');
-          for (const s of frozen) { s.visible = true; s.scale.setScalar(0.42 + 0.04 * Math.sin(t * 2 + s.position.x)); }
-          mum.root.visible = true; mum.root.position.set(5.05, 0, 3.62); mum.root.rotation.y = Math.PI * 1.15;
-          const mp = basePose(); mp.headYaw = 0.3 * Math.sin(t * 0.6); mp.rSh = [0.35, 0.15]; mp.rEl = 0.9; mum.apply(mp); mum.root.updateMatrixWorld(true);
+          for (const s of frozen) { s.visible = rev > 0.01; s.material.opacity = rev; s.scale.setScalar((0.42 + 0.04 * Math.sin(t * 2 + s.position.x)) * (0.6 + 0.4 * rev)); }
+          // Mum: the door opens, she steps in, shuts it, tries the hall switch; then walks to the living-room door
+          const path = [[T0 + 2.0, 5.05, 4.3], [T0 + 2.3, 5.05, 4.3], [T0 + 4.4, 4.85, 3.35], [SL.on2 + 1.2, 4.85, 3.35], [SL.on2 + 4.6, 1.85, 3.15], [1e9, 1.85, 3.15]];
+          let q = path[0], qn = path[0], f = 0;
+          for (let i = 1; i < path.length; i++) if (t < path[i][0]) { q = path[i - 1]; qn = path[i]; f = MathX.clamp((t - q[0]) / (qn[0] - q[0]), 0, 1); break; }
+          const fe = Ease.inOutSine(f), mx = slLerp(q[1], qn[1], fe), mz = slLerp(q[2], qn[2], fe), moving = (qn[1] !== q[1] || qn[2] !== q[2]) && f > 0 && f < 1;
+          mum.root.visible = t >= T0 + 2.0; mum.root.position.set(mx, 0, mz);
+          const flick = [slCap('door', 1).hide - 0.3, SL.on2 + 5.1];
+          let face = Math.PI;
+          if (moving) face = Math.atan2(qn[1] - q[1], qn[2] - q[2]);
+          else if (t > T0 + 4.4 && t < SL.on2 + 1.2) face = Math.atan2(4.35 - mx, 3.98 - mz);
+          mum.root.rotation.y = face;
+          const mp = basePose();
+          if (moving) Object.assign(mp, ACTIONS.walk(t, { seed: 0.6, seedI: 5, walkPhase: Math.hypot(mx - path[0][1], mz - path[0][2]) / 0.6 * Math.PI * 2 }));
+          const up = Math.max(slWin(t, flick[0] - 0.35, flick[0] + 1.75, 0.3, 0.4), slWin(t, flick[1] - 0.35, flick[1] + 0.75, 0.3, 0.4));
+          mp.rSh = [0.35 + 1.0 * up, 0.15]; mp.rEl = 0.9 - 0.4 * up; mp.headYaw = moving ? 0 : 0.3 * Math.sin(t * 0.6);
+          mum.apply(mp); mum.root.updateMatrixWorld(true);
+          api._mumP = [mx, mz];
+          // the front door
+          P.door.rotation.y = -1.2 * MathX.smooth(t, T0 + 1.8, T0 + 2.3) * (1 - MathX.smooth(t, T0 + 3.6, T0 + 3.85));
           // you, at the table where you knocked
           you.root.position.set(SL_HOME.table[0], 0, SL_HOME.table[2] + 0.66); you.root.rotation.y = Math.PI;
           const yp = ACTIONS.sit(t, { seat: 0.44, seedI: 2 }); yp.rSh = [1.25, 0.05]; yp.rEl = 0.35; yp.lSh = [1.2, 0.1]; yp.lEl = 0.5; yp.headYaw = 0.6;
           you.apply(yp); you.root.updateMatrixWorld(true);
           cam.layers.enable(1); P.slab.visible = true;
-          P.door.rotation.y = -1.2;
           break;
         }
         case 'after': default: {
@@ -400,10 +427,10 @@ SL_SETS.home = (app) => {
     // the illustration's labels: every bulb, you, Mum
     labels(t) {
       if (api._mode !== 'xray') return [];
-      const a = (k) => MathX.smooth(t, SL.on2 + 0.6 + k * 0.35, SL.on2 + 1.1 + k * 0.35);
-      const L = frozen.map((s, i) => ({ p: [s.position.x, s.position.y + 0.05, s.position.z], text: 'ON', a: a(i + 2) }));
-      L.push({ p: [SL_HOME.table[0], 1.35, SL_HOME.table[2] + 0.62], text: 'YOU', a: a(0) });
-      L.push({ p: [5.1, 1.0, 3.75], text: 'MUM', a: a(1) });
+      const a = (k) => MathX.smooth(t, SL.on2 + 0.6 + k * 0.35, SL.on2 + 1.1 + k * 0.35), m = api._mumP || [5, 3.5];
+      const L = frozen.map((s, i) => ({ p: [s.position.x, s.position.y + 0.05, s.position.z], text: 'ON', a: a(i) * (1 - MathX.smooth(t, SL.text - 0.2, SL.text + 0.4)) }));
+      L.push({ p: [SL_HOME.table[0], 1.35, SL_HOME.table[2] + 0.62], text: 'YOU', a: MathX.smooth(t, SL.door + 0.8, SL.door + 1.3) });
+      L.push({ p: [m[0] + 0.05, 0.2, m[1] + 0.45], text: 'MUM', a: MathX.smooth(t, SL.door + 2.6, SL.door + 3.1) });
       return L;
     },
     prerender(app) {
@@ -419,10 +446,10 @@ SL_SETS.home = (app) => {
       if (m === 'fireworks') { p.bloom = 0.65; p.bloomThreshold = 0.55; p.exposure = 1.08; p.vignette = 0.62; }
       if (m === 'cold' || m === 'lamp') { p.bloom = 0.42; p.bloomThreshold = 0.8; p.exposure = 1.05; }
       if (m === 'laser') { p.bloom = 0.5; p.bloomThreshold = 0.7; }
-      if (m === 'xray') { p.saturation = 0.45; p.contrast = 1.12; p.exposure = 1.1; p.warmth = -0.25; p.bloom = 0.7; p.bloomThreshold = 0.5; p.vignette = 0.7; }
+      if (m === 'xray') { p.fade = Math.max(p.fade, 1 - MathX.smooth(t, SL.door, SL.door + 0.9)); p.saturation = 0.45; p.contrast = 1.12; p.exposure = 1.1; p.warmth = -0.25; p.bloom = 0.7; p.bloomThreshold = 0.5; p.vignette = 0.7; }
       if (m === 'knock' || m === 'freeze') p.vignette = 0.62;
       if (m === 'after') { p.exposure = 1.0; }
-      if (m === 'cold') p.fade = Math.max(p.fade, 1 - MathX.smooth(t, 0, 0.5));
+      if (m === 'cold') p.fade = Math.max(p.fade, 0.55 * (1 - MathX.smooth(t, 0, 0.45)));
     },
   };
   return api;

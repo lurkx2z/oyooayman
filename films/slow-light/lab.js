@@ -32,8 +32,8 @@ SL_SETS.lab = (app) => {
   const top = slMesh(new THREE.BoxGeometry(3.0, 0.1, 1.5), [slStd('#2a2c30', 0.6), slStd('#2a2c30', 0.6), slStd('#ffffff', 0.45, 0.4, { map: holes }), slStd('#2a2c30', 0.6), slStd('#2a2c30', 0.6), slStd('#2a2c30', 0.6)], 0, 0.85, 0);
   for (const [x, z] of [[-1.3, -0.6], [1.3, -0.6], [-1.3, 0.6], [1.3, 0.6]]) slCyl(0.08, 0.1, 0.8, slStd('#1d1f22', 0.7), x, 0.4, z, null, 16);
   // ---- the vacuum chamber: a steel drum along x with windows, end flanges, a pump, the coils round it
-  const steel = slStd('#b9bec4', 0.32, 0.9), glassM = slStd('#7f98a8', 0.05, 0.1, { transparent: true, opacity: 0.18, depthWrite: false });
-  const drum = slMesh(new THREE.CylinderGeometry(0.2, 0.2, 0.62, 48, 1, true), slStd('#b9bec4', 0.32, 0.9, { side: THREE.DoubleSide }), C[0], C[1], C[2]); drum.rotation.z = Math.PI / 2;
+  const steel = slStd('#b9bec4', 0.38, 0.9, { envMapIntensity: 0.3 }), glassM = slStd('#7f98a8', 0.05, 0.1, { transparent: true, opacity: 0.18, depthWrite: false });
+  const drum = slMesh(new THREE.CylinderGeometry(0.2, 0.2, 0.62, 48, 1, true), slStd('#b9bec4', 0.38, 0.9, { side: THREE.DoubleSide, envMapIntensity: 0.3 }), C[0], C[1], C[2]); drum.rotation.z = Math.PI / 2;
   for (const s of [-1, 1]) { const f = slMesh(new THREE.CylinderGeometry(0.24, 0.24, 0.04, 48), steel, C[0] + s * 0.31, C[1], C[2]); f.rotation.z = Math.PI / 2; }
   // the big window facing you (a ring and its glass), and small ones where the beams go in
   { const ring = slMesh(new THREE.TorusGeometry(0.105, 0.016, 12, 48), steel, C[0], C[1], C[2] + 0.2); const g = slMesh(new THREE.CircleGeometry(0.1, 40), glassM, C[0], C[1], C[2] + 0.199); g.renderOrder = 3; }
@@ -88,7 +88,8 @@ SL_SETS.lab = (app) => {
       const up = MathX.smooth(tl, 0.3, 3.0);
       work.intensity = 26 * up; fill.intensity = 0.9 * up; S.hemi.intensity = 0.12 * up;
       const ctrlOn = !(t > SL.held && t < SL.release);
-      probeM.opacity = 0.1 * up; ctrlM.opacity = (ctrlOn ? 0.3 : 0.0) * MathX.smooth(tl, 2.0, 3.0);
+      // (while the pulse is stored in the atoms there is no light in the cloud at all: the probe's path goes dark too)
+      probeM.opacity = 0.1 * up * (1 - MathX.smooth(t, SL.held - 0.3, SL.held + 0.2) * (1 - MathX.smooth(t, SL.release, SL.release + 0.3))); ctrlM.opacity = (ctrlOn ? 0.3 : 0.0) * MathX.smooth(tl, 2.0, 3.0);
       // the camera: across the lab, in to the window, inside (the cloud, magnified), back out a little for 2001
       const kIn = slK(t, SL.lab - 0.5, SL.lab + 5.5), kIn2 = slK(t, SL.lab + 5.0, SL_LAB.in1 - 0.6);
       let eye = slV(slV([1.9, 1.75, 3.2], [0.35, 1.25, 0.9], kIn), [0.1, 1.08, 0.12], kIn2);

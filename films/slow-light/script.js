@@ -108,20 +108,34 @@ SL.cMirror = 1.4;                                      // walking pace: 5 km/h
 SL.mirrorDist = 1.4;                                   // you stand 1.4 m from the glass: 2.8 m there and back = 2 s
 SL.knockDist = 0.39;                                   // eye → knuckles on the table (m)
 SL.cKnock = SL.knockDist / (SL.knockSeen - SL.knockHit);   // the knock is seen exactly when the caption says "There."
-SL.cCat = 2.5;                                         // 9 km/h: a sprinting cat (≈ 30 km/h) beats it
+SL.cCat = 2.5;                                         // 9 km/h: a sprinting cat (≈ 25 km/h) beats it
+SL.catGo = SL.laserOn + 0.62;                          // she sees your thumb (≈ 0.52 s of light) and goes
+SL.catRun = 0.9;                                       // 4.2 m flat out (up to ≈ 25 km/h): under the dot before it is lit
 SL.cStreet = 27.8;                                     // 100 km/h
 SL.cCar2 = 3.5;                                        // 12.6 km/h: car 2 does 25 km/h, twice as fast as light
+// the fireworks: each pair's light set out when the shell burst (its bang is heard 2000 m / 343 m/s after that) and
+// arrives when the caption needs the flash; light already on its way slows too, so c is held in steps and each step is
+// solved (below, once slC exists) so that ∫ c dt over every trip is exactly 2 km
+const SL_FW_PAIRS = [[SL.f1, SL.b1], [SL.f2, SL.b2], [SL.f3, SL.b3], [SL.fb4, SL.fb4], [SL.f5, SL.b5], [SL.f6, SL.b6]].map(([f, b]) => ({ f, b, burst: b - SL.fwDist / SL_VSOUND }));
+const SL_FW_STEP = (() => {
+  const P = SL_FW_PAIRS, w = 0.15, at = [P[1].burst, P[1].f, P[3].burst, P[4].burst, P[3].f];   // where each step starts
+  const v = [1093, 610, 370, 315, 243];                                                     // first guesses (m/s)
+  const keys = [[at[0] - 0.4, v[0]]];
+  for (let i = 1; i < at.length; i++) keys.push([at[i] - w, v[i - 1]], [at[i] + w, v[i]]);
+  keys.push([P[5].f, v[4]], [P[5].f + 0.6, 0.93 * v[4]]);
+  return { keys, v };
+})();
+const SL_FW_KEYS = SL_FW_STEP.keys;
 const SL_CKEYS = [
   [-1e3, SL_C0], [SL.slow0, SL_C0],
   [slS('call'), 2.0e8], [SL.lagFrac, slCForGran(0.4)], [SL.lagOne, slCForGran(1.0)], [SL.lagThree, slCForGran(3.0)],
   [SL.jokeLaugh, slCForGran(4.2)], [SL.map, 6e6], [slE('map'), 2.2e6], [SL.sun, 1.5e6], [slE('sun'), 4e5],
-  [SL.fw, 2e5], [SL.f1, 1e5], [SL.b1, 4e3], [SL.f2, slCForGap(4.0)], [SL.b2, slCForGap(4.0) * 0.97],
-  [SL.f3, slCForGap(2.0)], [SL.b3, slCForGap(2.0) * 0.96], [SL.fb4, SL_VSOUND], [SL.b5, slCForGap(-1.6)], [SL.b6, slCForGap(-2.4)], [SL.f6 + 0.6, 225],
+  [SL.fw, 2e5], [SL.f1, 1e5], ...SL_FW_KEYS,
   [SL.street, 34], [slS('blue'), SL.cStreet], [SL.redGone + 1.0, SL.cStreet], [SL.faster, 12], [slS('cantsee') - 0.6, SL.cCar2], [slE('past') + 0.5, SL.cCar2],
   [SL.cat - 0.3, 5.0], [SL.laserOn - 0.4, SL.cCat], [slE('beat') + 0.6, SL.cCat],
   [SL.mirror - 0.3, 1.7], [SL.wave - 0.5, SL.cMirror], [slE('behind') + 0.6, SL.cMirror],
   [SL.lamp - 0.3, SL.cLamp], [slE('egg') + 0.8, SL.cLamp],
-  [SL.knock - 0.3, 0.12], [SL.knockHit - 0.6, SL.cKnock], [SL.knockSeen + 0.8, SL.cKnock],
+  [SL.knock - 0.3, 0.065], [SL.knockHit - 0.6, SL.cKnock], [SL.knockSeen + 0.8, SL.cKnock],
   [SL.freeze + 0.5, 0.02], [slE('freeze'), 0.0025], [SL.stop - 0.35, 0.0006],
 ];
 function slC(t) {
@@ -135,6 +149,17 @@ function slC(t) {
   // the last fraction of a second before the stop: down to nothing
   return K[K.length - 1][1] * (1 - MathX.smooth(t, K[K.length - 1][0], SL.stop));
 }
+
+// solve the fireworks steps: pair k+1's trip fixes step k (from the last pair back), a few rounds
+(() => {
+  const P = SL_FW_PAIRS, K = SL_FW_KEYS, trip = (p) => { let a = 0; const n = 600, dt = (p.f - p.burst) / n; for (let i = 0; i < n; i++) a += slC(p.burst + (i + 0.5) * dt) * dt; return a; };
+  const idx = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]];           // the keys that hold each step's value
+  for (let r = 0; r < 40; r++) for (let k = 4; k >= 0; k--) {
+    const p = P[k + 1], f = SL.fwDist / trip(p);
+    for (const i of idx[k]) K[i][1] *= f;
+  }
+  K[10][1] = 0.93 * K[9][1];
+})();
 
 // the clock on the wall (minutes after midnight) and Mum's text: one evening, compressed
 const SL_CLOCK = [[0, 19 * 60 + 18], [SL.rule, 19 * 60 + 24], [SL.map + 6, 19 * 60 + 41], [SL.sun, 19 * 60 + 47], [SL.fw - 0.01, 19 * 60 + 58],
@@ -163,7 +188,7 @@ const SCRIPT = {
   hands: { right: [[0, 'hidden']], left: [[0, 'hidden']] },
   tracks: {},
   hud: {
-    title: { in: SL.title[0], out: SL.title[1], fi: 0.25, fo: 0.5, cls: 'big center', html: '<span class="kick">WHAT IF LIGHT KEPT</span><span class="hero">GETTING SLOWER?</span>' },
+    title: { in: SL.title[0], out: SL.title[1], fi: 0.25, fo: 0.5, cls: 'big center', html: '<span class="kick">WHAT IF LIGHT KEPT</span><span class="hero">GETTING SLOWER</span><span class="kick k2">AND COULDN\'T STOP?</span>' },
     captions: [],
     readouts: [],
   },

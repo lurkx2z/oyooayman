@@ -79,6 +79,9 @@ class SlFx {
     s.buffer = b; if (o.rate) s.playbackRate.value = o.rate;
     s.connect(g);
     if (st) g.connect(dest); else { const p = ctx.createStereoPanner(); p.pan.value = o.pan || 0; g.connect(p); p.connect(dest); }
+    // (the gain's resting value too, not only from t0: a source that starts between samples renders one sample
+    // before t0, and at the default gain of 1 that sample is a click)
+    g.gain.value = o.fadeIn ? 0 : v;
     g.gain.setValueAtTime(o.fadeIn ? 0 : v, t0);
     if (o.fadeIn) g.gain.linearRampToValueAtTime(v, t0 + o.fadeIn);
     s.start(t0, (o.offset || 0) + Math.max(0, -t));

@@ -9,7 +9,13 @@ window.SL_MIX = {
     amb: { gain: 6, hp: 30 },
     sfx: { gain: 3, hp: 25 },
   },
-  dyn: { music: [], amb: [], sfx: [] },
-  master: 5,
+  dyn: {
+    // the score steps back under the call's voices, and under the car you can only hear (it has to be heard)
+    music: [['call', 0, 0], ['call', 1.0, -3.5], ['joke', 1.4, -3.5], ['joke', 2.6, 0],
+      ['faster', 0.5, 0], ['faster', 2.0, -5], ['car2Seen', -0.3, -5], ['car2Seen', -0.04, 0]],
+    amb: [],
+    sfx: [],
+  },
+  master: 9,
   ceiling: -1.5,   // dBTP, the limiter's ceiling (slLimit)
 };

@@ -64,6 +64,17 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Twelfth film: *What if light kept getting slower and couldn't stop?*** — open `slow-light.html` (5:57, 16:9,
+> voiceless: captions, a corner readout and sound). One evening in your flat on a harbour while light slows from
+> 300,000 km/s to nothing: Gran on a video call falls seconds behind; the fireworks' bang comes before the flash; a car
+> faster than light is heard, not seen, then splits in two (with a diagram from above); your cat beats a laser dot to
+> the wall; your reflection is two seconds late; switching off the lamp, the dark spills out of it; you hear your knock
+> and see your hand land 6.5 s later; then light stops. Mum comes home to a flat where every light is on. The real
+> experiments (Harvard, 1999 and 2001) close it. Plan and physics: [`films/slow-light/PLAN.md`](films/slow-light/PLAN.md);
+> captions: [`films/slow-light/CAPTIONS.md`](films/slow-light/CAPTIONS.md); report:
+> [`films/slow-light/EPISODE_REPORT.md`](films/slow-light/EPISODE_REPORT.md). Final render on a GPU:
+> `node films/slow-light/render-gpu.cjs`.
 
 | Time | Beat |
 |---|---|
