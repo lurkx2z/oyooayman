@@ -38,6 +38,7 @@ class ShHud {
       this._txt('rov', this.roV, shFmt(h));
       const now = shNow(h), nx = shNext(h);
       let sub = (h > now[0] * 0.75 ? 'AS TALL AS ' : 'SMALLER THAN ') + now[1];   // (long gaps between landmarks: don't claim a size you're far below)
+      if (nx && nx[0] > 1.0e-19 && h < nx[0] * 1.25) sub = 'AS TALL AS ' + nx[1];   // nearly there: say so a little early
       if (h < 1.0e-19 * 0.98) sub = h > 1.7e-35 ? `A DECIMAL POINT AND ${shZeros(h)} ZEROS` : 'THE PLANCK LENGTH';
       if (now[0] === 1.0e-19 && h > 0.98e-19) sub = 'THE CLOSEST ANY EXPERIMENT HAS LOOKED';
       this._txt('ros', this.roS, sub);

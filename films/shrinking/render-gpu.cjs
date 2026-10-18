@@ -31,8 +31,8 @@ const ARGS = process.argv.slice(2).reduce((o, a, i, arr) => {
 }, {});
 const ROOT = path.resolve(__dirname, '../..');
 const PAGE = path.join(ROOT, 'shrinking.html');
-const SOUND = path.join(__dirname, 'final-soundtrack.m4a');         // AAC 256k, −15.7 LUFS, −1.6 dBTP
-const SMALL_SOUND = path.join(__dirname, 'small-soundtrack.m4a');   // AAC 128k, −15.8 LUFS, −1.5 dBTP (measured; low-bitrate
+const SOUND = path.join(__dirname, 'final-soundtrack.m4a');         // AAC 256k, −15.2 LUFS, −2.4 dBTP
+const SMALL_SOUND = path.join(__dirname, 'small-soundtrack.m4a');   // AAC 128k, −15.3 LUFS, −2.4 dBTP (measured; low-bitrate
                                                                     // AAC adds peaks, so it is encoded once and copied)
 const OUT = path.resolve(ROOT, ARGS.out || 'renders/shrinking');
 const SEGDIR = path.join(OUT, 'segments');
@@ -157,7 +157,7 @@ async function openPage(mode) {
   if (ARGS['no-final'] || A !== 0 || (B !== LAST && !ARGS.final)) { console.log('segments only (partial range or --no-final)'); return; }
   const DUR = B === LAST ? dur : (B + 1) / FPS;   // --to N --final: a short test of the whole chain
 
-  // join the segments, add the mastered soundtrack (copied, already −15 LUFS / −2 dBTP)
+  // join the segments, add the mastered soundtrack (copied, already −15.2 LUFS / −2.4 dBTP)
   const list = path.join(OUT, 'segments.txt');
   fs.writeFileSync(list, segs.map((s) => `file '${s.file.replace(/\\/g, '/').replace(/'/g, "'\\''")}'`).join('\n') + '\n');
   ff(['-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-i', SOUND, '-map', '0:v', '-map', '1:a', '-c', 'copy', '-t', String(DUR), '-movflags', '+faststart', FINAL], 'final');

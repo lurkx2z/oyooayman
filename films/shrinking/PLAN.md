@@ -33,7 +33,7 @@ that size:
 
 ## Three signature moments
 
-1. **The cat looks down at you** (23.5 s) and jumps (32.4 s): the glass and the phone go over, its nose comes down.
+1. **The cat looks down at you** (17 s) and jumps (32.4 s): the glass and the phone go over, its nose comes down.
 2. **The phone's buzz as an earthquake** (113.2 s): Mum's call throws you off the screen into a slow fall.
 3. **The smallest possible thing is a black hole** (433 s): it forms, bends the foam round it, and flashes away.
 
@@ -49,8 +49,9 @@ that size:
 6. Beyond (371–458): a quark that doesn't grow · no experiment below here · the rings of scale · foam · the Planck
    length · the black hole · the flash · black · the phone buzzes in the dark (Mum: "Where are you?").
 
-Honest labels in the corner: SLOW MOTION (the jump, the fall), ILLUSTRATION · TOO SMALL FOR LIGHT (the grey),
-ILLUSTRATION · FALSE COLOUR (nucleus, proton), THEORY · BEYOND ANY EXPERIMENT (below the quark).
+Honest labels in the corner: SLOW MOTION (the jump, the fall), ILLUSTRATION · TOO SMALL FOR LIGHT (the grey, the
+atom), ILLUSTRATION · SLOWED DOWN A BILLION TIMES (the molecular hail), ILLUSTRATION · A MODEL, NOT AN IMAGE (nucleus,
+proton, quark), THEORY · BEYOND ANY EXPERIMENT (below 10⁻¹⁹ m), SPECULATION · BEYOND ANY EXPERIMENT (the black hole).
 
 ## Sound (no narrator)
 
@@ -66,3 +67,11 @@ the molecular hail are placed from the same motion the camera uses, so they land
 - The bedroom is our usual low-poly interior: kept small, seen from a few centimetres so it reads as a landscape.
 - Crossfades between worlds: one per world, each motivated (landing, colour fade, balls, haze, proton, the limit).
 - No cars, cranes, collapsing buildings, explosions or falling people; the only "disaster" is the phone's buzz.
+
+## Review log
+
+- **First full cut** (independent reviews on stills and the caption timeline): viewer appeal 7, retention 6, clarity 6,
+  visuals 7; science 7. Fixed: readout comparisons (real sizes, "as tall as" only near a landmark), the atom and
+  proton captions and labels (stadium and pea shown, quark weight 1%, SPECULATION on the ending, hail SLOWED DOWN),
+  a faster opening with the cat earlier, lower hands, the water made visible, bacteria that move, bounce light in the
+  look-up, darker caption backing. Not re-scored. Details and what is still weak: [`EPISODE_REPORT.md`](EPISODE_REPORT.md).

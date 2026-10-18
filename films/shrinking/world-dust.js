@@ -180,8 +180,10 @@ function shRoomBackdrop(app) {
   const rt = new THREE.WebGLCubeRenderTarget(1024, { type: THREE.HalfFloatType, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
   const cc = new THREE.CubeCamera(0.3, 60000, rt);
   cc.position.copy(room.camera.position); room.scene.add(cc);
+  // the lamp's light bouncing off the floor: lets you see the furniture's undersides from down here
+  const bounce = new THREE.HemisphereLight('#1c1c26', '#b8835c', 2.2); room.scene.add(bounce);
   cc.update(app.renderer, room.scene);
-  room.scene.remove(cc);
+  room.scene.remove(cc, bounce); bounce.dispose();
   room.phone.g.visible = pv; room.hands.root.visible = hv;
   const pm = new THREE.PMREMGenerator(app.renderer), env = pm.fromCubemap(rt.texture).texture; pm.dispose();
   return { bg: rt.texture, env };
@@ -287,10 +289,10 @@ SH_WORLDS.dust = (app) => {
     const hm = new THREE.Mesh(hg, hairM); hm.castShadow = hm.receiveShadow = true; R.add(hm); }
 
   // ---- the spilled water: a glassy hill with a rounded front, creeping in from the right
-  const waterM = new THREE.MeshPhysicalMaterial({ color: '#f2faff', roughness: 0.05, metalness: 0, transmission: 1, thickness: 900, ior: 1.33, attenuationColor: new THREE.Color('#9cc8dc'), attenuationDistance: 3500, envMapIntensity: 2.4, specularIntensity: 1 });
+  const waterM = new THREE.MeshPhysicalMaterial({ color: '#f2faff', roughness: 0.05, metalness: 0, transmission: 1, thickness: 900, ior: 1.33, attenuationColor: new THREE.Color('#7fb6d0'), attenuationDistance: 3500, envMapIntensity: 3.0, specularIntensity: 1 });
   // a glassy rim where the surface turns away from you (reads as liquid against the floor)
   waterM.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-      { float nv = clamp(abs(dot(normal, normalize(vViewPosition))), 0.0, 1.0); totalEmissiveRadiance += vec3(0.30, 0.36, 0.42) * pow(1.0 - nv, 3.0); }`); };
+      { float nv = clamp(abs(dot(normal, normalize(vViewPosition))), 0.0, 1.0); totalEmissiveRadiance += vec3(0.42, 0.52, 0.62) * pow(1.0 - nv, 2.2) + vec3(0.03, 0.05, 0.07); }`); };
   waterM.customProgramCacheKey = () => 'shwater';
   const water = new THREE.Group(); R.add(water);
   { const xs = [0, 12, 30, 60, 100, 160, 240, 340, 470, 640, 860, 1150, 1550, 2100, 3000, 4500, 7000, 12000, 24000], nz = 121, Z0 = -24000, Z1 = 24000;
@@ -304,7 +306,7 @@ SH_WORLDS.dust = (app) => {
     const wm = new THREE.Mesh(wg, waterM); wm.receiveShadow = true; water.add(wm);
     // the waterline: the meniscus at the edge catches the light in a bright thread
     const line = []; for (let j = 0; j <= 400; j++) { const z = -9000 + 18000 * j / 400; line.push(new THREE.Vector3(shDuFrontOff(z) + 2.5, 2.2, z)); }
-    const ml = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(line), 1600, 1.6, 6), new THREE.MeshBasicMaterial({ color: '#fff3e0', transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }));
+    const ml = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(line), 1600, 2.6, 6), new THREE.MeshBasicMaterial({ color: '#fff3e0', transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false }));
     water.add(ml); }
 
   // ---- the mite
@@ -329,9 +331,9 @@ SH_WORLDS.dust = (app) => {
   const cocM = new THREE.MeshPhysicalMaterial({ color: '#e0c890', roughness: 0.3, clearcoat: 0.5, emissive: '#3a2a10', emissiveIntensity: 0.3 });
   const flagM = shStd('#d8dcc0', 0.5);
   const bact = new THREE.Group(); R.add(bact);
-  const flagella = [];
+  const flagella = [], bugs = [];
   { const r = new RNG(77), C = SH_DU.col, rod = new THREE.CapsuleGeometry(0.32, 1.45, 6, 16), coc = new THREE.SphereGeometry(0.5, 20, 14);
-    const place = (x, z, ry, len = 1) => { const m = new THREE.Mesh(rod, bactM); m.scale.set(1, len, 1); m.rotation.set(Math.PI / 2, 0, ry, 'YXZ'); m.rotation.order = 'YXZ'; m.rotation.y = ry; m.position.set(x, C[1] + 0.33, z); m.castShadow = m.receiveShadow = true; bact.add(m); return m; };
+    const place = (x, z, ry, len = 1) => { const m = new THREE.Mesh(rod, bactM); m.scale.set(1, len, 1); m.rotation.set(Math.PI / 2, 0, ry, 'YXZ'); m.rotation.order = 'YXZ'; m.rotation.y = ry; m.position.set(x, C[1] + 0.33, z); m.castShadow = m.receiveShadow = true; bact.add(m); bugs.push({ m, x, z, ry, k: bugs.length }); return m; };
     // one big rod right beside where you end up (it fills the frame when the colours go), then the colony
     const big = place(C[0] + 1.4, C[2] - 2.6, 0.5, 1.1);
     for (let i = 0; i < 46; i++) {
@@ -348,7 +350,7 @@ SH_WORLDS.dust = (app) => {
     }
     for (let k = 0; k < 6; k++) {
       const a = r.range(0, 6.283), d = 4 + r.next() * 22, cx = C[0] + Math.cos(a) * d, cz2 = C[2] + Math.sin(a) * d - 4, n = r.int(7, 14);
-      for (let i = 0; i < n; i++) { const m = new THREE.Mesh(coc, cocM); m.position.set(cx + r.gauss() * 0.9, C[1] + 0.5 + Math.abs(r.gauss()) * 0.7, cz2 + r.gauss() * 0.9); m.castShadow = m.receiveShadow = true; bact.add(m); }
+      for (let i = 0; i < n; i++) { const m = new THREE.Mesh(coc, cocM); m.position.set(cx + r.gauss() * 0.9, C[1] + 0.5 + Math.abs(r.gauss()) * 0.7, cz2 + r.gauss() * 0.9); m.castShadow = m.receiveShadow = true; bact.add(m); bugs.push({ m, x: m.position.x, z: m.position.z, ry: null, k: bugs.length }); }
     }
     bact.userData.big = big; }
 
@@ -403,7 +405,7 @@ SH_WORLDS.dust = (app) => {
       if (!backdrop) { backdrop = shRoomBackdrop(app); W.scene.background = backdrop.bg; W.scene.environment = backdrop.env; W.scene.environmentIntensity = 1.2; }
       W.scene.backgroundIntensity = 1.0 * (1 - 0.85 * shE(t, 205, 228));
       // the water: front position; its thickness for refraction is in world units
-      water.position.x = shSpline(SH_DU_WATER, t)[0]; waterM.thickness = 900; waterM.attenuationDistance = 3500 * s;
+      water.position.x = shSpline(SH_DU_WATER, t)[0]; waterM.thickness = 900; waterM.attenuationDistance = 1600 * s;
       groundM.userData.U.uWX.value = t < 200 ? water.position.x : 1e9;   // (thickness is scaled by the mesh; the distance is not)
       water.visible = t < 200;
       // the call: the green light over the edge goes out when it stops ringing
@@ -414,6 +416,14 @@ SH_WORLDS.dust = (app) => {
       cliff.visible = t < 200;
       // bacteria flagella turning (a rotating corkscrew reads as a travelling wave)
       for (const F of flagella) F.f.rotation.y = t * F.w;
+      // nothing here is still: a slow twitch, then the same uneven air that shoves you shoves them (µm)
+      const jig = 0.05 + 0.16 * shE(t, 208, 215);
+      for (const B of bugs) {
+        const k = B.k * 1.618;
+        B.m.position.x = B.x + jig * (Math.sin(t * 1.9 + k) + 0.6 * Math.sin(t * 3.7 + k * 2.3));
+        B.m.position.z = B.z + jig * (Math.sin(t * 2.3 + k * 1.7) + 0.6 * Math.sin(t * 4.1 + k * 0.6));
+        if (B.ry !== null) B.m.rotation.y = B.ry + jig * 0.9 * Math.sin(t * 1.3 + k * 0.9);
+      }
       bact.visible = t > 192;
       // the key light and its shadow box follow you
       const tg = [cam.p[0] + dir[0] * 4 * hU, Math.max(0, cam.p[1] - hU), cam.p[2] + dir[2] * 4 * hU];
