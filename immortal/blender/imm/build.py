@@ -172,7 +172,7 @@ def _aren_outfit(ch, coll, seed):
 
 
 def _father_outfit(ch, coll, seed):
-    _tunic_outfit(ch, coll, seed, (0.19, 0.12, 0.07), hem=0.33, mantle=True, sleeve=0.3)
+    _tunic_outfit(ch, coll, seed, (0.085, 0.062, 0.045), hem=0.33, mantle=True, sleeve=0.3)
 
 
 def _villager_outfit(ch, coll, seed):

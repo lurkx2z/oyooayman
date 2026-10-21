@@ -336,6 +336,9 @@ class Aren(Actor):
         # small nods while speaking, a head drop when his father refuses his hand
         P.turn('head', (1, 0, 0), 3 * math.sin(2 * math.pi * 2.2 * t) * speaking(t, 'aren')
                + 4 * A.ramp(t, 42.4, 43.6))
+        # nobody holds a head perfectly still
+        P.turn('head', (0, 0, 1), wobble(t, 1.7, 0.9, 0.55))
+        P.turn('head', (1, 0, 0), wobble(t, 2.9, 0.6, 0.47))
         sac = self.sacc.at(t, 1.0 if look_up > 0.5 else 0.4)
         own = A.char_to_world(P, self.tear + Vector((0, 0, 0.0)))
         eye_t = tgt + sac
@@ -382,6 +385,10 @@ class Aren(Actor):
             'confused': K(t, [(32.0, 0), (33.2, 0.55), (34.6, 0.45), (35.6, 0.1)]),
             'grief': K(t, [(38.5, 0), (40.5, 0.3), (42.2, 0.55), (44.4, 0.62)]),
         })
+        # his smile is a little lopsided (left side first)
+        for k in ('MouthRightPullUp', 'RightCheekUp'):
+            if k in w:
+                w[k] *= 0.84
         # mouth breathing from exhaustion, a quiver as the smile breaks
         w['JawDrop'] = w.get('JawDrop', 0) + 0.05 * (0.5 + 0.5 * ph) * K(t, [(0, 1.0), (12, 0.6), (14, 0.2)])
         quiver = A.env(t, 23.6, 24.1, 25.5, 26.3) + 0.6 * A.env(t, 41.5, 42.3, 44.0, 45)
@@ -471,6 +478,8 @@ class Father(Actor):
         P.turn('head', (1, 0, 0), -4 * A.env(t, 20.0, 20.6, 22.5, 24.0))
         P.turn('head', (0, 0, 1), 4.5 * math.sin(2 * math.pi * 2.6 * (t - 29.85)) * A.env(t, 29.85, 29.95, 30.15, 30.3))
         P.turn('head', (1, 0, 0), 2.2 * math.sin(2 * math.pi * 2.0 * t) * speaking(t, 'father'))
+        P.turn('head', (0, 0, 1), wobble(t, 6.1, 0.7, 0.5))
+        P.turn('head', (1, 0, 0), wobble(t, 7.7, 0.5, 0.43))
         P.look = tgt + self.sacc.at(t, 1.0 if t > 12 else 0.3)
         # ---- arms: the stick, the frozen hand, the guard, the fingers that almost reach
         holding = t < self.release
@@ -488,9 +497,9 @@ class Father(Actor):
         frozen = K(t, [(10.6, 1.0), (13.0, 1.0), (15.5, 0.0)])
         guard = A.env(t, 20.95, 21.55, 22.8, 24.4)
         Bd.arms_hang(P, 1.0, elbow=16, fwd=0)
-        P.turn('upperarm02.R', (1, 0, 0), -(18 * frozen + 14 * guard))
-        P.turn('lowerarm01.R', (1, 0, 0), -(25 * frozen + 30 * guard))
-        P.turn('upperarm02.R', (0, 1, 0), 12 * frozen)
+        # the hand that held the stick stays where it was, half raised, fingers loose
+        P.turn('upperarm02.R', (1, 0, 0), -(14 * frozen + 14 * guard))
+        P.turn('lowerarm01.R', (1, 0, 0), -(38 * frozen + 30 * guard))
         # the left hand: fingers move as if to reach, and close again
         twitch = A.env(t, 37.35, 37.7, 37.85, 38.15)
         close = A.ramp(t, 38.05, 38.6)
@@ -913,7 +922,7 @@ def build_cameras(sc, coll, track, actors):
         u = A.smoother((t - 0.0) / 6.0)
         cam = Vector((1.6, -10.8, 1.65)).lerp(Vector((0.85, -8.1, 1.5)), u)
         subj = mid(eye('aren_eye', f), eye('father_eye', f), 0.42)
-        return cam, subj - Vector((0, 0, 0.35)), 0.0, 0.05, 30 + 3 * u, eye('aren_eye', f), 5.6, 0.12
+        return cam, subj - Vector((0, 0, 0.35)), 0.0, -0.1, 30 + 3 * u, eye('aren_eye', f), 5.6, 0.12
 
     def s2(f, t):
         u = A.smoother((t - 6.0) / 6.0)
