@@ -94,7 +94,7 @@ def character(cid, coll, subdiv=1):
     ch = C.Character(spec, rig, body, eyes, v, {k: Vector(x) for k, x in joints.items()})
     ch.landmarks = L
     hs = spec['hair']
-    hm = M.hair(f'{cid}_hair', hs['color'])
+    hm = M.hair(f'{cid}_hair', hs['color'], rough=hs.get('rough', 0.5), sheen=hs.get('sheen', 0.06))
     cap_mat = M.hair(f'{cid}_hair_cap', [c * 0.8 for c in hs['color']], rough=0.8, sheen=0.0)
     ch.extras += H.scalp_hair(ch, coll, hm, kind=hs['style'], n=hs.get('n', 170), length=tuple(hs.get('length', (0.05, 0.085))),
                               width=tuple(hs.get('width', (0.012, 0.019))), curl=hs.get('curl', 0.08),

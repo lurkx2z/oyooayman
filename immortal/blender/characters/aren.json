@@ -73,7 +73,9 @@
     "jitter": 0.15,
     "flat": 0.7,
     "tip": 0.25,
-    "gravity": 0.8
+    "gravity": 0.8,
+    "rough": 0.68,
+    "sheen": 0.02
   },
   "outfit": "aren_torn_tunic"
 }

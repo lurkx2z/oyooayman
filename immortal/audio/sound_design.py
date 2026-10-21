@@ -458,7 +458,7 @@ def music(sc, r):
     # the realisation: one low note, then a sparse figure under the father's words
     for name, t0, v, d in (('D2', 23.4, 1.0, 6.0), ('A2', 23.42, 0.6, 6.0), ('F3', 25.6, 0.5, 4.0),
                            ('E3', 27.9, 0.45, 3.5), ('D3', 30.0, 0.5, 4.0), ('A2', 32.4, 0.4, 3.5)):
-        put(piano(hz(name), d, r, v), t0, -21)
+        put(piano(hz(name), d, r, v), t0, -25 if t0 < 24 else -23)
     # "It's me.": strings return, very quiet, and swell slowly into the pull back
     put(strings([hz('D3'), hz('A3'), hz('E4')], 9.4, r, attack=3.5, release=0.08, bright=900), 35.0, -25)
     put(strings([hz('F3'), hz('A3'), hz('D4'), hz('A4')], 4.4, r, attack=3.2, release=0.06, bright=1600), 40.0, -22)

@@ -348,8 +348,9 @@ class Aren(Actor):
         hug = A.env(t, 19.35, 20.5, 21.55, 22.8)
         linger_R = A.env(t, 19.35, 20.5, 22.2, 23.6)
         swing_amp = 9 if walking else 0
-        Bd.arms_hang(P, 1.0, elbow=14 + 22 * hug, fwd=26 * hug,
-                     swing_L=swing_amp * 0.45 * -sw, swing_R=swing_amp * sw + 8 * (linger_R - hug), out=-6 * hug)
+        # the arms start to open for an embrace (sideways, not pointing at him)
+        Bd.arms_hang(P, 1.0, elbow=14 + 26 * hug, fwd=15 * hug,
+                     swing_L=swing_amp * 0.45 * -sw, swing_R=swing_amp * sw + 6 * (linger_R - hug), out=14 * hug)
         # the wounded left shoulder is held a little
         P.turn('upperarm02.L', (0, 1, 0), -4)
         P.turn('clavicle.L', (0, 1, 0), 2)
@@ -378,9 +379,9 @@ class Aren(Actor):
             'tired': K(t, [(0, 0.95), (9, 0.85), (10.5, 0.55), (13, 0.3), (16, 0.15), (25, 0.25), (45, 0.3)]),
             'recognition': K(t, [(8.6, 0), (9.6, 0.55), (11, 0.3), (13, 0), (21.25, 0), (21.5, 0.4), (22.9, 0)]),
             'hope_smile': K(t, [(12.8, 0), (13.7, 0.38), (14.1, 0.55), (15.0, 0.62), (16.0, 0.75), (19.0, 0.8),
-                                (20.4, 0.95), (21.3, 0.95), (21.8, 0.8), (22.6, 0.7), (23.4, 0.55), (24.0, 0.5),
-                                (25.2, 0.12), (26.0, 0.0), (35.6, 0.0), (36.3, 0.22), (37.2, 0.18), (38.2, 0.0)]),
-            'hurt': K(t, [(22.6, 0), (23.6, 0.3), (25.0, 0.55), (26.5, 0.6), (28, 0.45), (32.2, 0.4), (35, 0.35),
+                                (20.4, 0.95), (21.3, 0.95), (21.8, 0.9), (22.8, 0.88), (23.3, 0.7), (23.8, 0.5),
+                                (24.6, 0.3), (25.4, 0.08), (26.0, 0.0), (35.6, 0.0), (36.3, 0.22), (37.2, 0.18), (38.2, 0.0)]),
+            'hurt': K(t, [(22.9, 0), (23.5, 0.3), (24.2, 0.5), (25.1, 0.75), (26.5, 0.8), (28, 0.45), (32.2, 0.4), (35, 0.35),
                           (38.5, 0.4), (40, 0.3)]),
             'confused': K(t, [(32.0, 0), (33.2, 0.55), (34.6, 0.45), (35.6, 0.1)]),
             'grief': K(t, [(38.5, 0), (40.5, 0.3), (42.2, 0.55), (44.4, 0.62)]),
@@ -944,7 +945,7 @@ def build_cameras(sc, coll, track, actors):
         # dollies with the boy as he steps in, so the two never overlap on screen
         e0 = eye('aren_eye', int(18.5 * FPS) + 1)
         e1 = eye('aren_eye', f)
-        cam = Vector((e0.x + 0.6 * (e1.x - e0.x), e0.y, e0.z)) + Vector((-1.05, -1.3, -0.45))
+        cam = Vector((e0.x + 0.6 * (e1.x - e0.x), e0.y, e0.z)) + Vector((-0.7, -1.75, -0.45))
         subj = eye('father_hip', f) * 0.75 + eye('father_eye', f) * 0.25
         return cam, subj, 0.16, 0.1, 24, eye('father_eye', f), 4.0, 0.08
 
@@ -1052,19 +1053,31 @@ def build_shot_lights(sc, coll, cams, track):
     P = {
         'S1_return': (None, 0, None, 0, None),
         'S2_recognition': ('father_eye', 14, (0.6, 0.3, 0.0), 26, Vector((1.0, 1.0, 0.5))),
-        'S3_hope': ('aren_eye', 7, (-0.8, 0.35, 0.0), 20, Vector((-0.6, 0.9, 0.4))),
+        'S3_hope': ('aren_eye', 6, (-0.8, 0.35, 0.0), 16, Vector((-0.6, 0.9, 0.4))),
         'S4a_step_back': ('father_eye', 5, (0.6, 0.4, 0.0), 20, Vector((1.0, 0.6, 0.5))),
-        'S4b_smile_fades': ('aren_eye', 7, (-0.8, 0.35, 0.0), 20, Vector((-0.6, 0.9, 0.4))),
+        'S4b_smile_fades': ('aren_eye', 6, (-0.8, 0.35, 0.0), 16, Vector((-0.6, 0.9, 0.4))),
         'S5a_father_cu': ('father_eye', 16, (0.45, 0.25, 0.0), 24, Vector((0.9, 0.8, 0.45))),
-        'S5b_dont_know': ('aren_eye', 7, (-0.8, 0.35, 0.0), 20, Vector((-0.6, 0.9, 0.4))),
+        'S5b_dont_know': ('aren_eye', 6, (-0.8, 0.35, 0.0), 16, Vector((-0.6, 0.9, 0.4))),
         'S6a_its_me': ('aren_eye', 4, (0.0, 0.5, 0.0), 16, Vector((-0.4, 1.4, 0.6))),
         'S6b_villagers': ('elder_eye', 3, (0.5, 0.4, 0.0), 0, None),
         'S6c_pullback': ('aren_eye', 6, (-0.8, 0.35, 0.0), 16, Vector((-0.6, 0.9, 0.4))),
     }
+    # the sun is cheated round to the north in Aren's close-ups, so it rakes across his face instead of lighting it
+    # flat from the front (his face points east, almost into the sun); the far cheek is lit, the near one falls off
+    sun = bpy.data.objects['sun']
+    sun.rotation_mode = 'QUATERNION'
+    base_az = math.atan2(V.SUN_DIR.y, V.SUN_DIR.x)
+    sun_cheat = {'S3_hope': 48, 'S4b_smile_fades': 48, 'S5b_dont_know': 48}
     bk = A.Baker()
     for f in range(1, NF + 1):
         t = t_of(f)
         name = shot_at(t)[0]
+        az = base_az + math.radians(sun_cheat.get(name, 0))
+        el = math.asin(V.SUN_DIR.z)
+        sd = Vector((math.cos(el) * math.cos(az), math.cos(el) * math.sin(az), math.sin(el)))
+        qs = (-sd).to_track_quat('-Z', 'Y')
+        for i in range(4):
+            bk.put(sun, 'rotation_quaternion', i, f, qs[i])
         key, fe, fo, re, ro = P[name]
         cam = cams[name]
         fade = 1.0
