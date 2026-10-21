@@ -150,7 +150,7 @@ def head_frame(L):
     return center, s
 
 
-def scalp_mask(p, L, front_el=24.0, temple_el=4.0, ear_el=6.0, back_el=-32.0):
+def scalp_mask(p, L, front_el=24.0, temple_el=8.0, ear_el=-2.0, back_el=-32.0):
     """True where hair grows: by elevation/azimuth around the head centre, with a hairline that is high at the
     forehead, dips at the temples, clears the ears and drops to the nape."""
     c, s = head_frame(L)
@@ -158,9 +158,13 @@ def scalp_mask(p, L, front_el=24.0, temple_el=4.0, ear_el=6.0, back_el=-32.0):
     r = np.linalg.norm(rel, axis=1) + 1e-9
     el = np.degrees(np.arcsin(rel[:, 2] / r))
     az = np.degrees(np.abs(np.arctan2(rel[:, 0], -rel[:, 1])))
-    thr = np.interp(az, [0, 35, 60, 85, 105, 130, 180], [front_el, front_el - 7, temple_el, ear_el, ear_el + 2, -5, back_el])
+    # forehead, temple, sideburn in front of the ear, above the ear, behind the ear, nape
+    thr = np.interp(az, [0, 35, 55, 70, 90, 110, 130, 180],
+                    [front_el, front_el - 7, temple_el, ear_el - 20, ear_el - 18, ear_el - 12, -8, back_el])
     near = r < 3.2 * s
-    return near & (el > thr)
+    # the ears stick out from the skull: keep them bare
+    ear = (az > 62) & (az < 130) & (el < 4) & (r > 1.3 * s)
+    return near & (el > thr) & ~ear
 
 
 def _flow(kind, p, center, normal, rng):
@@ -225,7 +229,7 @@ def scalp_hair(ch, coll, mat, kind='messy', n=170, length=(0.05, 0.085), width=(
     hair = cb.build(coll, mat, body, ch.rig)
     objs = [hair]
     if cap:
-        inner = scalp_mask(co, L, front_el=26.0, temple_el=6.0, ear_el=8.0, back_el=-29.0)
+        inner = scalp_mask(co, L, front_el=26.0, temple_el=10.0, ear_el=0.0, back_el=-29.0)
         objs.append(shell(ch, coll, cap_mat or mat, inner, f'{ch.id}_hair_cap', offset * 0.7))
     return objs
 

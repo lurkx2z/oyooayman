@@ -38,8 +38,8 @@ SHOTS = [  # name, start, end
     ('S1_return', 0.0, 6.0),
     ('S2_recognition', 6.0, 12.0),
     ('S3_hope', 12.0, 18.5),
-    ('S4a_step_back', 18.5, 22.2),
-    ('S4b_smile_fades', 22.2, 26.5),
+    ('S4a_step_back', 18.5, 21.9),
+    ('S4b_smile_fades', 21.9, 26.5),
     ('S5a_father_cu', 26.5, 32.2),
     ('S5b_dont_know', 32.2, 35.0),
     ('S6a_its_me', 35.0, 38.6),
@@ -940,8 +940,8 @@ def build_cameras(sc, coll, track, actors):
         return cam, subj, 0.16, 0.1, 24, eye('father_eye', f), 4.0, 0.08
 
     def s4b(f, t):
-        f0 = int(22.2 * FPS) + 1
-        return aren_cu(f, t, 22.2, 26.5, Vector((1.12, -0.86, -0.01)), base_f=f0, push=0.1)
+        f0 = int(21.9 * FPS) + 1
+        return aren_cu(f, t, 21.9, 26.5, Vector((1.12, -0.86, -0.01)), base_f=f0, push=0.1)
 
     def s5a(f, t):
         f0 = int(26.5 * FPS) + 1

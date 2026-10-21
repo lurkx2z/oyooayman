@@ -104,7 +104,7 @@ def character(cid, coll, subdiv=1):
                              seed=seed_int(cid, 2)))
     paint = np.zeros(len(body.data.vertices), dtype=np.float32)
     co = np.array([vv.co[:] for vv in body.data.vertices])
-    paint = np.maximum(paint, H.soft_mask(co, H.scalp_mask(co, L, front_el=21.0, temple_el=2.0, ear_el=4.0,
+    paint = np.maximum(paint, H.soft_mask(co, H.scalp_mask(co, L, front_el=21.0, temple_el=6.0, ear_el=-4.0,
                                                             back_el=-36.0), co))
     if hs.get('beard'):
         objs, jaw = H.beard(ch, coll, hm, seed=seed_int(cid, 3), n=hs.get('beard_n', 1100),
