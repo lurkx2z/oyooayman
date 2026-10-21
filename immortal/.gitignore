@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+assets/makehuman/base_cache.npz
+build/
+renders/
+*.blend1

@@ -1,0 +1,67 @@
+{
+  "id": "villager_woman",
+  "display": "Neda (neighbour, water carrier)",
+  "notes": "Lived beside Aren's family all his life; first to see him in the episode outline.",
+  "macro": {
+    "gender": 0.0,
+    "years": 32,
+    "muscle": 0.5,
+    "weight": 0.45,
+    "height": 0.5,
+    "races": {
+      "african": 0.35,
+      "asian": 0.25,
+      "caucasian": 0.4
+    }
+  },
+  "modifiers": {
+    "eyes/l-eye-scale-incr": 0.4,
+    "eyes/r-eye-scale-incr": 0.4
+  },
+  "skin": {
+    "base": [
+      0.28,
+      0.155,
+      0.092
+    ],
+    "flush": [
+      0.36,
+      0.12,
+      0.085
+    ],
+    "dirt": 0.25,
+    "lid_flush": 0.3
+  },
+  "eyes": {
+    "iris": [
+      0.16,
+      0.09,
+      0.04
+    ]
+  },
+  "hair": {
+    "style": "long",
+    "color": [
+      0.03,
+      0.02,
+      0.015
+    ],
+    "n": 200,
+    "length": [
+      0.16,
+      0.26
+    ],
+    "brow_thickness": 0.8,
+    "brow_arch": 1.1
+  },
+  "outfit": "villager",
+  "outfit_params": {
+    "color": [
+      0.27,
+      0.19,
+      0.11
+    ],
+    "hem": 0.18,
+    "sleeve": 0.3
+  }
+}

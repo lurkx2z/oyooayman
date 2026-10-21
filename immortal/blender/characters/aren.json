@@ -1,0 +1,69 @@
+{
+  "id": "aren",
+  "display": "Aren",
+  "notes": "Canon: born ~12,000 years ago; here 14, starved and exhausted after the night of the escape. Same face is reused for every era: future episodes change hair, clothes and grooming, never the base shape (keep 'macro' and 'modifiers' fixed; older/modern looks go in 'eras').",
+  "macro": {
+    "gender": 1.0,
+    "years": 14,
+    "muscle": 0.42,
+    "weight": 0.36,
+    "height": 0.72,
+    "races": {
+      "african": 0.3,
+      "asian": 0.3,
+      "caucasian": 0.4
+    }
+  },
+  "modifiers": {
+    "eyes/l-eye-scale-incr": 0.8,
+    "eyes/r-eye-scale-incr": 0.8,
+    "eyes/l-eye-height2-incr": 0.35,
+    "eyes/r-eye-height2-incr": 0.35,
+    "nose/nose-scale-horiz-decr": 0.25,
+    "nose/nose-scale-vert-decr": 0.15,
+    "nose/nose-point-width-decr": 0.3,
+    "mouth/mouth-upperlip-volume-incr": 0.35,
+    "mouth/mouth-lowerlip-volume-incr": 0.35,
+    "cheek/l-cheek-volume-incr": 0.35,
+    "cheek/r-cheek-volume-incr": 0.35,
+    "head/head-oval": 0.4,
+    "eyebrows/eyebrows-trans-up": 0.15
+  },
+  "skin": {
+    "base": [
+      0.3,
+      0.165,
+      0.098
+    ],
+    "flush": [
+      0.38,
+      0.13,
+      0.09
+    ],
+    "dirt": 0.55,
+    "lid_flush": 0.45
+  },
+  "eyes": {
+    "iris": [
+      0.2,
+      0.11,
+      0.05
+    ]
+  },
+  "hair": {
+    "style": "messy",
+    "color": [
+      0.022,
+      0.015,
+      0.011
+    ],
+    "n": 190,
+    "length": [
+      0.05,
+      0.09
+    ],
+    "brow_thickness": 1.0,
+    "brow_arch": 1.0
+  },
+  "outfit": "aren_torn_tunic"
+}

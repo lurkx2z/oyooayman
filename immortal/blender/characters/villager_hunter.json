@@ -1,0 +1,68 @@
+{
+  "id": "villager_hunter",
+  "display": "Hunter",
+  "notes": "Young hunter; in the outline the hunters later try to take Aren back.",
+  "macro": {
+    "gender": 1.0,
+    "years": 22,
+    "muscle": 0.75,
+    "weight": 0.45,
+    "height": 0.6,
+    "races": {
+      "african": 0.3,
+      "asian": 0.35,
+      "caucasian": 0.35
+    }
+  },
+  "modifiers": {
+    "eyes/l-eye-scale-incr": 0.3,
+    "eyes/r-eye-scale-incr": 0.3
+  },
+  "skin": {
+    "base": [
+      0.25,
+      0.14,
+      0.083
+    ],
+    "flush": [
+      0.32,
+      0.11,
+      0.08
+    ],
+    "dirt": 0.4,
+    "lid_flush": 0.25
+  },
+  "eyes": {
+    "iris": [
+      0.14,
+      0.08,
+      0.04
+    ]
+  },
+  "hair": {
+    "style": "swept_back",
+    "color": [
+      0.025,
+      0.018,
+      0.013
+    ],
+    "n": 180,
+    "length": [
+      0.07,
+      0.12
+    ],
+    "brow_thickness": 1.1,
+    "brow_arch": 0.7
+  },
+  "outfit": "villager",
+  "outfit_params": {
+    "color": [
+      0.2,
+      0.13,
+      0.075
+    ],
+    "hem": 0.36,
+    "sleeve": 0.3,
+    "mantle": false
+  }
+}

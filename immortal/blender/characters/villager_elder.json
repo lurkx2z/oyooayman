@@ -1,0 +1,69 @@
+{
+  "id": "villager_elder",
+  "display": "Village elder",
+  "notes": "Decides on the sacrifice in the outline.",
+  "macro": {
+    "gender": 1.0,
+    "years": 66,
+    "muscle": 0.4,
+    "weight": 0.4,
+    "height": 0.45,
+    "races": {
+      "african": 0.3,
+      "asian": 0.3,
+      "caucasian": 0.4
+    }
+  },
+  "modifiers": {
+    "head/head-age-incr": 1.0,
+    "eyebrows/eyebrows-trans-down": 0.3
+  },
+  "skin": {
+    "base": [
+      0.27,
+      0.155,
+      0.095
+    ],
+    "flush": [
+      0.34,
+      0.12,
+      0.09
+    ],
+    "dirt": 0.2,
+    "lid_flush": 0.4
+  },
+  "eyes": {
+    "iris": [
+      0.15,
+      0.1,
+      0.06
+    ]
+  },
+  "hair": {
+    "style": "swept_back",
+    "color": [
+      0.33,
+      0.31,
+      0.29
+    ],
+    "n": 170,
+    "length": [
+      0.1,
+      0.18
+    ],
+    "brow_thickness": 1.2,
+    "brow_arch": 0.5,
+    "beard": true
+  },
+  "outfit": "villager",
+  "outfit_params": {
+    "color": [
+      0.22,
+      0.16,
+      0.1
+    ],
+    "hem": 0.2,
+    "sleeve": 0.35,
+    "mantle": true
+  }
+}
