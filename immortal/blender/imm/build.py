@@ -62,7 +62,7 @@ def paint_skin_attributes(body, v, joints, spec):
     flush = np.clip(flush, 0, 0.85)
     # dirt: stronger on limbs and torso, light on the face centre
     face_c = L['em'] + np.array([0, -0.3 * s, -0.8 * s])
-    dirt = 1.0 - 0.75 * _gauss(p, face_c, 1.1 * s)
+    dirt = 1.0 - spec['skin'].get('face_clean', 0.75) * _gauss(p, face_c, 1.1 * s)
     for name, data in (('flush', flush), ('dirt', dirt)):
         a = me.attributes.get(name) or me.attributes.new(name, 'FLOAT', 'POINT')
         a.data.foreach_set('value', data.astype(np.float32))
@@ -99,7 +99,7 @@ def character(cid, coll, subdiv=1):
     ch.extras += H.scalp_hair(ch, coll, hm, kind=hs['style'], n=hs.get('n', 170), length=tuple(hs.get('length', (0.05, 0.085))),
                               width=tuple(hs.get('width', (0.012, 0.019))), curl=hs.get('curl', 0.08),
                               jitter=hs.get('jitter', 0.0), flat=hs.get('flat', 0.38), seed=seed_int(cid, 1),
-                              cap_mat=cap_mat)
+                              cap_mat=cap_mat, tip=hs.get('tip', 0.08), gravity=hs.get('gravity'))
     ch.extras.append(H.brows(ch, coll, hm, thickness=hs.get('brow_thickness', 1.0), arch=hs.get('brow_arch', 1.0),
                              seed=seed_int(cid, 2)))
     paint = np.zeros(len(body.data.vertices), dtype=np.float32)
@@ -168,7 +168,7 @@ def _aren_outfit(ch, coll, seed):
              (np.array([0.07, -0.08, 0.62]), 0.03)]                              # left thigh
     stains = [(Vector(t) + Vector((0, 0, -0.02)), r * 2.6, 1.0) for t, r in tears]
     stains.append((Vector((0.04, -0.12, j['spine03____head'].z)), 0.06, 0.6))
-    _tunic_outfit(ch, coll, seed, (0.30, 0.20, 0.115), hem=0.43, tears=tears, stains=stains)
+    _tunic_outfit(ch, coll, seed, (0.17, 0.142, 0.108), hem=0.43, tears=tears, stains=stains)
 
 
 def _father_outfit(ch, coll, seed):

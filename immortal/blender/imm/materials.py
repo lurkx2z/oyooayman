@@ -219,8 +219,8 @@ def hair(name, color, rough=0.5, sheen=0.06):
     al = n.new('ShaderNodeAttribute')
     al.attribute_name = 'along'
     ar = n.new('ShaderNodeMapRange')
-    ar.inputs['To Min'].default_value = 0.5
-    ar.inputs['To Max'].default_value = 1.3
+    ar.inputs['To Min'].default_value = 0.72
+    ar.inputs['To Max'].default_value = 1.12
     l.new(al.outputs['Fac'], ar.inputs['Value'])
     mul2 = n.new('ShaderNodeMix')
     mul2.data_type = 'RGBA'
@@ -240,7 +240,7 @@ def hide(name, color, seed=0.0, stain_color=(0.11, 0.035, 0.025), mud_color=(0.1
     attributes 'stain' (old blood) and 'mud' (hem grime) when the mesh has them."""
     m, n, l = _new(name)
     b = _bsdf(n)
-    _set(b, rough=0.78, spec=0.25, sheen=0.25, sheen_rough=0.6, sheen_tint=(0.8, 0.7, 0.6, 1))
+    _set(b, rough=0.8, spec=0.22, sheen=0.12, sheen_rough=0.6, sheen_tint=(0.8, 0.7, 0.6, 1))
     tc = n.new('ShaderNodeTexCoord')
     nz = n.new('ShaderNodeTexNoise')
     nz.noise_dimensions = '4D'

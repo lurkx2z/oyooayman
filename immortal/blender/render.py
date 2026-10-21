@@ -81,9 +81,10 @@ for i, f in enumerate(frames):
         continue
     sc.frame_set(f)
     sc.camera = cam_for(f)
-    sc.render.filepath = path
+    sc.render.filepath = path[:-4] + '.part.png'  # renamed when complete, so a stopped render never leaves half a PNG
     t = time.time()
     bpy.ops.render.render(write_still=True)
+    os.replace(sc.render.filepath, path)
     done += 1
     el = time.time() - t_start
     left = (len(frames) - i - 1) * el / done

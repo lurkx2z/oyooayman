@@ -193,7 +193,7 @@ def _flow(kind, p, center, normal, rng):
 
 
 def scalp_hair(ch, coll, mat, kind='messy', n=170, length=(0.05, 0.085), width=(0.012, 0.019), seed=1,
-               offset=0.004, cap=True, curl=0.08, jitter=0.0, flat=0.38, cap_mat=None):
+               offset=0.004, cap=True, curl=0.08, jitter=0.0, flat=0.38, cap_mat=None, tip=0.08, gravity=None):
     body = ch.body
     L = ch.landmarks
     me = body.data
@@ -222,10 +222,10 @@ def scalp_hair(ch, coll, mat, kind='messy', n=170, length=(0.05, 0.085), width=(
         if kind == 'messy' and rel.y < 0 and rel.z > 0:
             ln = min(ln, 0.9 * (root.z - (L['em'][2] + 0.55 * s)) + 0.012) * rng.uniform(0.55, 1.0)  # fringe stops above the brows, uneven
         segs = 7
-        pts = grow(bvh, root, normal, d, max(ln, 0.015), segs, gravity=0.5 if kind == 'messy' else (1.2 if kind == 'long' else 0.7), curl=curl,
-                   rng=rng, offset=offset)
+        g = gravity if gravity is not None else 0.5 if kind == 'messy' else (1.2 if kind == 'long' else 0.7)
+        pts = grow(bvh, root, normal, d, max(ln, 0.015), segs, gravity=g, curl=curl, rng=rng, offset=offset)
         w = rng.uniform(*width)
-        cb.add(pts, taper(len(pts), w, tip=w * 0.08, root=0.35), int(vid), normal, flat=flat, shade=float(rng.uniform(-1, 1)))
+        cb.add(pts, taper(len(pts), w, tip=w * tip, root=0.35), int(vid), normal, flat=flat, shade=float(rng.uniform(-1, 1)))
     hair = cb.build(coll, mat, body, ch.rig)
     objs = [hair]
     if cap:
