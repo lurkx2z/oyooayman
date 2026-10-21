@@ -66,13 +66,18 @@ def frames_for(rig):
     return {s: HandFrame(rig, s) for s in ('L', 'R')}
 
 
+# the MakeHuman rest pose already bends the elbows by about this much
+REST_ELBOW = 45.0
+
+
 def arms_hang(P, amount=1.0, elbow=18, fwd=0.0, swing_L=0.0, swing_R=0.0, out=0.0):
-    """Arms from the MakeHuman rest A-pose down to the sides. swing = forward(+)/back(-) degrees."""
+    """Arms from the MakeHuman rest A-pose down to the sides. elbow = total bend in degrees (0 = straight);
+    swing = forward(+)/back(-) degrees."""
     P.turn('upperarm02.L', (0, 1, 0), (40 - out) * amount)
     P.turn('upperarm02.R', (0, 1, 0), -(40 - out) * amount)
     for s, sw in (('L', swing_L), ('R', swing_R)):
         P.turn(f'upperarm02.{s}', (1, 0, 0), -(fwd + sw))
-        P.turn(f'lowerarm01.{s}', (1, 0, 0), -elbow)
+        P.turn(f'lowerarm01.{s}', (1, 0, 0), -(elbow - REST_ELBOW * amount))
 
 
 def breathe(P, phase, depth=1.0):

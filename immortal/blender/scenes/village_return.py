@@ -499,12 +499,13 @@ class Father(Actor):
         guard = A.env(t, 20.95, 21.55, 22.8, 24.4)
         Bd.arms_hang(P, 1.0, elbow=16, fwd=0)
         # the hand that held the stick stays where it was, half raised, fingers loose
-        P.turn('upperarm02.R', (1, 0, 0), -(14 * frozen + 14 * guard))
-        P.turn('lowerarm01.R', (1, 0, 0), -(38 * frozen + 30 * guard))
+        # guard: the hand comes up to his own chest, elbow kept in (a flinch, not a reach)
+        P.turn('upperarm02.R', (1, 0, 0), -(14 * frozen + 3 * guard))
+        P.turn('lowerarm01.R', (1, 0, 0), -(38 * frozen + 62 * guard))
         # the left hand: fingers move as if to reach, and close again
         twitch = A.env(t, 37.35, 37.7, 37.85, 38.15)
         close = A.ramp(t, 38.05, 38.6)
-        P.turn('upperarm02.L', (1, 0, 0), -5 * twitch - 4 * guard)
+        P.turn('upperarm02.L', (1, 0, 0), -5 * twitch + 3 * guard)
         P.turn('lowerarm01.L', (1, 0, 0), -9 * twitch)
         Bd.hand(P, self.hands, 'L', curl=0.4 - 0.32 * twitch + 0.25 * close, thumb=0.3 - 0.15 * twitch + 0.2 * close,
                 spread=0.5 * twitch, per={'index': -0.08 * twitch})
