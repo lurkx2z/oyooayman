@@ -1,0 +1,19 @@
+{
+  "note": "Line timings in seconds of film time. visemes are [shape, start, end] relative to the line start (shapes in imm/face.py VISEMES). When recorded voices arrive, set start/end from the audio and the visemes are rescaled to the new length.",
+  "lines": [
+    {"id": "s3_aren_father", "who": "aren", "text": "Father?", "start": 14.2, "end": 14.8,
+     "visemes": [["F", 0.0, 0.07], ["A", 0.07, 0.22], ["T", 0.22, 0.3], ["E", 0.3, 0.58]]},
+    {"id": "s5_father_watched", "who": "father", "text": "I watched them take you.", "start": 27.3, "end": 28.9,
+     "visemes": [["A", 0.0, 0.15], ["U", 0.18, 0.26], ["A", 0.26, 0.42], ["S", 0.42, 0.52], ["T", 0.52, 0.58],
+                 ["T", 0.62, 0.68], ["E", 0.68, 0.76], ["M", 0.76, 0.84], ["T", 0.88, 0.94], ["E", 0.94, 1.12],
+                 ["T", 1.12, 1.18], ["U", 1.22, 1.55]]},
+    {"id": "s5_father_how", "who": "father", "text": "How are you alive?", "start": 30.3, "end": 31.6,
+     "visemes": [["A", 0.0, 0.2], ["O", 0.2, 0.26], ["A", 0.3, 0.48], ["U", 0.52, 0.68], ["A", 0.72, 0.82],
+                 ["T", 0.82, 0.88], ["A", 0.88, 1.08], ["F", 1.1, 1.2]]},
+    {"id": "s5_aren_dontknow", "who": "aren", "text": "I don't know.", "start": 34.0, "end": 34.9,
+     "visemes": [["A", 0.0, 0.15], ["T", 0.15, 0.22], ["O", 0.22, 0.4], ["T", 0.4, 0.48], ["T", 0.5, 0.56],
+                 ["O", 0.56, 0.85]]},
+    {"id": "s6_aren_itsme", "who": "aren", "text": "It's me.", "start": 36.3, "end": 37.0,
+     "visemes": [["E", 0.0, 0.08], ["T", 0.08, 0.15], ["S", 0.15, 0.25], ["M", 0.28, 0.36], ["E", 0.36, 0.65]]}
+  ]
+}

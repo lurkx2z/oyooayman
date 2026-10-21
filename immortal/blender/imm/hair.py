@@ -31,7 +31,7 @@ class ClumpBuilder:
 
     def __init__(self, name):
         self.name = name
-        self.verts, self.faces, self.root_of_vert, self.shade = [], [], [], []
+        self.verts, self.faces, self.root_of_vert, self.shade, self.along = [], [], [], [], []
 
     def add(self, pts, widths, root_vid, normal, flat=0.55, sides=6, shade=0.0):
         n = len(pts)
@@ -54,6 +54,7 @@ class ClumpBuilder:
                 self.verts.append(pts[i] + off)
                 self.root_of_vert.append(root_vid)
                 self.shade.append(shade)
+                self.along.append(i / max(1, n - 1))
         for i in range(n - 1):
             for k in range(sides):
                 a = base + i * sides + k
@@ -69,6 +70,8 @@ class ClumpBuilder:
             p.use_smooth = True
         a = me.attributes.new('shade', 'FLOAT', 'POINT')
         a.data.foreach_set('value', np.array(self.shade, dtype=np.float32))
+        a = me.attributes.new('along', 'FLOAT', 'POINT')
+        a.data.foreach_set('value', np.array(self.along, dtype=np.float32))
         ob = bpy.data.objects.new(self.name, me)
         coll.objects.link(ob)
         ob.data.materials.append(material)
@@ -147,7 +150,7 @@ def head_frame(L):
     return center, s
 
 
-def scalp_mask(p, L, front_el=26.0, temple_el=9.0, ear_el=13.0, back_el=-32.0):
+def scalp_mask(p, L, front_el=24.0, temple_el=4.0, ear_el=6.0, back_el=-32.0):
     """True where hair grows: by elevation/azimuth around the head centre, with a hairline that is high at the
     forehead, dips at the temples, clears the ears and drops to the nape."""
     c, s = head_frame(L)
@@ -155,7 +158,7 @@ def scalp_mask(p, L, front_el=26.0, temple_el=9.0, ear_el=13.0, back_el=-32.0):
     r = np.linalg.norm(rel, axis=1) + 1e-9
     el = np.degrees(np.arcsin(rel[:, 2] / r))
     az = np.degrees(np.abs(np.arctan2(rel[:, 0], -rel[:, 1])))
-    thr = np.interp(az, [0, 35, 60, 85, 105, 130, 180], [front_el, front_el - 4, temple_el, ear_el, ear_el + 2, -5, back_el])
+    thr = np.interp(az, [0, 35, 60, 85, 105, 130, 180], [front_el, front_el - 7, temple_el, ear_el, ear_el + 2, -5, back_el])
     near = r < 3.2 * s
     return near & (el > thr)
 
@@ -186,7 +189,7 @@ def _flow(kind, p, center, normal, rng):
 
 
 def scalp_hair(ch, coll, mat, kind='messy', n=170, length=(0.05, 0.085), width=(0.012, 0.019), seed=1,
-               offset=0.004, cap=True):
+               offset=0.004, cap=True, curl=0.08, jitter=0.0, flat=0.38, cap_mat=None):
     body = ch.body
     L = ch.landmarks
     me = body.data
@@ -205,6 +208,8 @@ def scalp_hair(ch, coll, mat, kind='messy', n=170, length=(0.05, 0.085), width=(
         root = Vector(co[vid])
         normal = Vector(nrm[vid])
         d = _flow(kind, root, center, normal, rng)
+        if jitter:
+            d = (d + Vector(rng.normal(0, jitter, 3))).normalized()
         ln = rng.uniform(*length)
         if kind == 'messy' and rng.random() < 0.1:
             ln *= 0.6  # a few short tufts lifting off the crown
@@ -213,15 +218,15 @@ def scalp_hair(ch, coll, mat, kind='messy', n=170, length=(0.05, 0.085), width=(
         if kind == 'messy' and rel.y < 0 and rel.z > 0:
             ln = min(ln, 0.9 * (root.z - (L['em'][2] + 0.55 * s)) + 0.012) * rng.uniform(0.55, 1.0)  # fringe stops above the brows, uneven
         segs = 7
-        pts = grow(bvh, root, normal, d, max(ln, 0.015), segs, gravity=0.5 if kind == 'messy' else (1.2 if kind == 'long' else 0.7), curl=0.08,
+        pts = grow(bvh, root, normal, d, max(ln, 0.015), segs, gravity=0.5 if kind == 'messy' else (1.2 if kind == 'long' else 0.7), curl=curl,
                    rng=rng, offset=offset)
         w = rng.uniform(*width)
-        cb.add(pts, taper(len(pts), w, tip=w * 0.12), int(vid), normal, flat=0.38, shade=float(rng.uniform(-1, 1)))
+        cb.add(pts, taper(len(pts), w, tip=w * 0.08, root=0.35), int(vid), normal, flat=flat, shade=float(rng.uniform(-1, 1)))
     hair = cb.build(coll, mat, body, ch.rig)
     objs = [hair]
     if cap:
-        inner = scalp_mask(co, L, front_el=34.0, temple_el=22.0, ear_el=32.0, back_el=-22.0)
-        objs.append(shell(ch, coll, mat, inner, f'{ch.id}_hair_cap', offset * 0.7))
+        inner = scalp_mask(co, L, front_el=26.0, temple_el=6.0, ear_el=8.0, back_el=-29.0)
+        objs.append(shell(ch, coll, cap_mat or mat, inner, f'{ch.id}_hair_cap', offset * 0.7))
     return objs
 
 
@@ -231,15 +236,17 @@ def shell(ch, coll, mat, vmask, name, offset):
     bm = bmesh.new()
     bm.from_mesh(body.data)
     bm.verts.ensure_lookup_table()
-    keep = [f for f in bm.faces if f.material_index == 0 and all(vmask[v.index] for v in f.verts)]
+    # faces touching the mask; vertices outside it stay close to the skin, so the cap's edge fades into the scalp
+    keep = [f for f in bm.faces if f.material_index == 0 and any(vmask[v.index] for v in f.verts)]
     drop = [f for f in bm.faces if f not in set(keep)]
     bmesh.ops.delete(bm, geom=drop, context='FACES_ONLY')
     loose = [v for v in bm.verts if not v.link_faces]
     src = [v.index for v in bm.verts if v.link_faces]
+    inside = [bool(vmask[i]) for i in src]
     bmesh.ops.delete(bm, geom=loose, context='VERTS')
     bm.verts.ensure_lookup_table()
-    for v in bm.verts:
-        v.co += v.normal * offset
+    for v, ins in zip(bm.verts, inside):
+        v.co += v.normal * offset * (1.0 if ins else 0.35)
     me = bpy.data.meshes.new(name)
     bm.to_mesh(me)
     bm.free()
@@ -267,7 +274,7 @@ def brows(ch, coll, mat, thickness=1.0, seed=7, arch=1.0, length=1.0):
     roots, normals, dirs, widths, lens = [], [], [], [], []
     for sx, e in ((1, L['eL']), (-1, L['eR'])):
         e = Vector(e)
-        n = int(26 * thickness)
+        n = int(34 * thickness)
         for i in range(n):
             t = i / (n - 1)
             x = e.x + sx * s * (-0.3 + 0.75 * t * length)
@@ -285,7 +292,7 @@ def brows(ch, coll, mat, thickness=1.0, seed=7, arch=1.0, length=1.0):
             roots.append(hit)
             normals.append(nrm)
             dirs.append(d)
-            widths.append(s * (0.055 - 0.02 * t) * thickness ** 0.5 * rng.uniform(0.85, 1.15))
+            widths.append(s * (0.042 - 0.016 * t) * thickness ** 0.5 * rng.uniform(0.85, 1.15))
             lens.append(s * (0.2 + 0.08 * math.sin(math.pi * t)) * rng.uniform(0.85, 1.2))
     vids = nearest_vertex_ids(body, roots)
     for r, nrm, d, w, ln, vid in zip(roots, normals, dirs, widths, lens, vids):
@@ -320,10 +327,11 @@ def beard(ch, coll, mat, n=320, length=(0.007, 0.016), seed=11, offset=0.0018):
     for vid in rng.choice(ids, size=min(n, len(ids)), replace=False):
         root = Vector(co[vid])
         normal = Vector(nrm[vid])
-        d = (Vector((0, 0, -1)) * 1.0 + normal * 0.2).normalized()
-        pts = grow(bvh, root, normal, d, rng.uniform(*length), 4, gravity=0.5, curl=0.08, rng=rng, offset=offset)
-        w = rng.uniform(0.005, 0.0085)
-        cb.add(pts, taper(len(pts), w, tip=w * 0.2, root=0.8), int(vid), normal, flat=0.4, sides=5,
+        d = (Vector((0, 0, -1)) * 1.0 + normal * 0.08).normalized()
+        d = (d - normal * d.dot(normal) * 0.85).normalized()       # lies along the skin
+        pts = grow(bvh, root, normal, d, rng.uniform(*length), 4, gravity=0.7, curl=0.12, rng=rng, offset=offset)
+        w = rng.uniform(0.004, 0.007)
+        cb.add(pts, taper(len(pts), w, tip=w * 0.15, root=0.7), int(vid), normal, flat=0.4, sides=4,
                shade=float(rng.uniform(-1, 1)))
     return [cb.build(coll, mat, body, ch.rig, smooth_levels=1)], jaw
 

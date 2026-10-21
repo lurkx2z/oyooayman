@@ -461,7 +461,7 @@ def smoke(coll, name, pos, height=3.5):
     fz = n.new('ShaderNodeMapRange')
     fz.inputs['From Min'].default_value = 0.0
     fz.inputs['From Max'].default_value = 1.0
-    fz.inputs['To Min'].default_value = 0.35
+    fz.inputs['To Min'].default_value = 0.14
     fz.inputs['To Max'].default_value = 0.0
     l.new(sep.outputs['Z'], fz.inputs['Value'])
     l.new(mr.outputs['Result'], rr.inputs[0])
@@ -599,14 +599,14 @@ def sky_world(sc, sun_dir=SUN_DIR, mist=0.012):
     return w   # no world volume: EEVEE treats it as infinite and it swallows the sky; mist is a volume box instead
 
 
-def ground_mist(coll, center=Vector((0, 6, 0)), size=(110, 100, 7.0), density=0.022):
+def ground_mist(coll, center=Vector((0, 6, 0)), size=(110, 100, 7.0), density=0.009):
     """Low mist lying on the ground: a volume box whose density falls off with height."""
     m, n, l = M._new('ground_mist')
     out = n.get('Material Output')
     n.remove(n.get('Principled BSDF'))
     vol = n.new('ShaderNodeVolumePrincipled')
     vol.inputs['Color'].default_value = (0.72, 0.78, 0.88, 1)
-    vol.inputs['Anisotropy'].default_value = 0.6
+    vol.inputs['Anisotropy'].default_value = 0.45
     tc = n.new('ShaderNodeTexCoord')
     sep = n.new('ShaderNodeSeparateXYZ')
     l.new(tc.outputs['Generated'], sep.inputs['Vector'])

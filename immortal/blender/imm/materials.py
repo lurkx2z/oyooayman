@@ -74,12 +74,12 @@ def skin(name, base, flush, dirt=0.0, seed=0.0, hair_color=None):
         hp = n.new('ShaderNodeAttribute')
         hp.attribute_name = 'hairpaint'
         dots = n.new('ShaderNodeTexNoise')
-        dots.inputs['Scale'].default_value = 900.0
-        dots.inputs['Detail'].default_value = 1.0
+        dots.inputs['Scale'].default_value = 260.0
+        dots.inputs['Detail'].default_value = 2.0
         l.new(tc.outputs['Object'], dots.inputs['Vector'])
         dr2 = n.new('ShaderNodeMapRange')
-        dr2.inputs['From Min'].default_value = 0.35
-        dr2.inputs['From Max'].default_value = 0.65
+        dr2.inputs['From Min'].default_value = 0.2
+        dr2.inputs['From Max'].default_value = 0.8
         l.new(dots.outputs['Fac'], dr2.inputs['Value'])
         hm = n.new('ShaderNodeMath')
         hm.operation = 'MULTIPLY'
@@ -169,11 +169,11 @@ def eye(name, iris):
     e[1].position = 0.085
     e[1].color = (0.0, 0.0, 0.0, 1)
     e.new(0.097).color = rgba([c * 0.8 for c in iris])
-    e.new(0.17).color = rgba([min(1, c * 1.8) for c in iris])
+    e.new(0.17).color = rgba([min(1, c * 1.3) for c in iris])
     e.new(0.235).color = rgba([c * 0.55 for c in iris])
     e.new(0.255).color = (0.02, 0.015, 0.012, 1)  # limbal ring
-    e.new(0.28).color = (0.62, 0.57, 0.53, 1)    # sclera (kept below white so it never glows)
-    e.new(0.6).color = (0.60, 0.50, 0.46, 1)
+    e.new(0.28).color = (0.52, 0.47, 0.43, 1)    # sclera (kept below white so it never glows)
+    e.new(0.6).color = (0.50, 0.42, 0.39, 1)
     e.new(0.85).color = (0.55, 0.35, 0.32, 1)    # back of the eye, never seen
     l.new(d.outputs[0], ir.inputs['Fac'])
     mixc = n.new('ShaderNodeMix')
@@ -193,7 +193,7 @@ def simple(name, base, rough=0.8, spec=0.2, sheen=0.0, sss=0.0, alpha=1.0):
     return m
 
 
-def hair(name, color, rough=0.62, sheen=0.25):
+def hair(name, color, rough=0.5, sheen=0.06):
     """Dark hair with per-clump value jitter (attribute 'shade' in -1..1) and a soft sheen."""
     m, n, l = _new(name)
     b = _bsdf(n)
@@ -215,7 +215,23 @@ def hair(name, color, rough=0.62, sheen=0.25):
     for k in ('Red', 'Green', 'Blue'):
         l.new(mr.outputs['Result'], comb.inputs[k])
     l.new(comb.outputs['Color'], mul.inputs[7])
-    l.new(mul.outputs[2], b.inputs['Base Color'])
+    # depth: roots in shadow, tips catch the light
+    al = n.new('ShaderNodeAttribute')
+    al.attribute_name = 'along'
+    ar = n.new('ShaderNodeMapRange')
+    ar.inputs['To Min'].default_value = 0.5
+    ar.inputs['To Max'].default_value = 1.3
+    l.new(al.outputs['Fac'], ar.inputs['Value'])
+    mul2 = n.new('ShaderNodeMix')
+    mul2.data_type = 'RGBA'
+    mul2.blend_type = 'MULTIPLY'
+    mul2.inputs['Factor'].default_value = 1.0
+    l.new(mul.outputs[2], mul2.inputs[6])
+    comb2 = n.new('ShaderNodeCombineColor')
+    for k in ('Red', 'Green', 'Blue'):
+        l.new(ar.outputs['Result'], comb2.inputs[k])
+    l.new(comb2.outputs['Color'], mul2.inputs[7])
+    l.new(mul2.outputs[2], b.inputs['Base Color'])
     return m
 
 

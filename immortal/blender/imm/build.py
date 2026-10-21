@@ -95,18 +95,22 @@ def character(cid, coll, subdiv=1):
     ch.landmarks = L
     hs = spec['hair']
     hm = M.hair(f'{cid}_hair', hs['color'])
+    cap_mat = M.hair(f'{cid}_hair_cap', [c * 0.8 for c in hs['color']], rough=0.8, sheen=0.0)
     ch.extras += H.scalp_hair(ch, coll, hm, kind=hs['style'], n=hs.get('n', 170), length=tuple(hs.get('length', (0.05, 0.085))),
-                              seed=seed_int(cid, 1))
+                              width=tuple(hs.get('width', (0.012, 0.019))), curl=hs.get('curl', 0.08),
+                              jitter=hs.get('jitter', 0.0), flat=hs.get('flat', 0.38), seed=seed_int(cid, 1),
+                              cap_mat=cap_mat)
     ch.extras.append(H.brows(ch, coll, hm, thickness=hs.get('brow_thickness', 1.0), arch=hs.get('brow_arch', 1.0),
                              seed=seed_int(cid, 2)))
     paint = np.zeros(len(body.data.vertices), dtype=np.float32)
     co = np.array([vv.co[:] for vv in body.data.vertices])
-    paint = np.maximum(paint, H.soft_mask(co, H.scalp_mask(co, L, front_el=22.0, temple_el=10.0, ear_el=20.0,
+    paint = np.maximum(paint, H.soft_mask(co, H.scalp_mask(co, L, front_el=21.0, temple_el=2.0, ear_el=4.0,
                                                             back_el=-36.0), co))
     if hs.get('beard'):
-        objs, jaw = H.beard(ch, coll, hm, seed=seed_int(cid, 3))
+        objs, jaw = H.beard(ch, coll, hm, seed=seed_int(cid, 3), n=hs.get('beard_n', 1100),
+                            length=tuple(hs.get('beard_length', (0.005, 0.012))))
         ch.extras += objs
-        paint = np.maximum(paint, 0.95 * H.soft_mask(co, jaw, co, radius=0.01))
+        paint = np.maximum(paint, 0.9 * H.soft_mask(co, jaw, co, radius=0.01))
     a = body.data.attributes.get('hairpaint') or body.data.attributes.new('hairpaint', 'FLOAT', 'POINT')
     a.data.foreach_set('value', paint)
     OUTFITS[spec['outfit']](ch, coll, seed)
@@ -138,7 +142,7 @@ def _tunic_outfit(ch, coll, seed, color, hem, tears=(), stains=(), mantle=False,
     return parts
 
 
-def H_fur(ch, src, coll, mat, seed, n=520):
+def H_fur(ch, src, coll, mat, seed, n=900):
     rng = np.random.default_rng(int(seed * 1000) + 99)
     me = src.data
     cb = H.ClumpBuilder(f'{ch.id}_fur_tufts')
@@ -149,9 +153,9 @@ def H_fur(ch, src, coll, mat, seed, n=520):
     for vid in ids:
         root = verts[vid] + Vector(rng.normal(0, 0.006, 3))
         nrm = me.vertices[vid].normal.copy()
-        d = (Vector((0, 0, -1)) * 0.8 + nrm * 0.5).normalized()
-        pts = H.grow(bvh, root, nrm, d, rng.uniform(0.025, 0.05), 4, 0.6, 0.15, rng, 0.004)
-        w = rng.uniform(0.006, 0.011)
+        d = (Vector((0, 0, -1)) * 0.9 + nrm * 0.25).normalized()
+        pts = H.grow(bvh, root, nrm, d, rng.uniform(0.014, 0.03), 4, 0.8, 0.15, rng, 0.003)
+        w = rng.uniform(0.007, 0.012)
         cb.add(pts, H.taper(len(pts), w, tip=w * 0.1), int(vid), nrm, flat=0.5, sides=5, shade=float(rng.uniform(-1, 1)))
     return cb.build(coll, mat, src, ch.rig, smooth_levels=0)
 

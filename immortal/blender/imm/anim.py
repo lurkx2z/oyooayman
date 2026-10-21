@@ -346,9 +346,11 @@ def walk_steps(path, t0, foot0, step_len, step_time, lift=0.06, rng_seed=0, jitt
     return steps, t, start_L, start_R, yaw0, heading_to_euler_z(at(total)[1])
 
 
-def pelvis_from_feet(rig, feet, t, yaw_override=None, crouch=0.03, bob=0.025, sway=0.022, ground=0.0):
+def pelvis_from_feet(rig, feet, t, yaw_override=None, crouch=0.03, bob=0.025, sway=0.022, ground=0.0, bias=0.0,
+                     offset=None):
     """Object placement (xy, z offset, yaw) that keeps both legs reachable: centre between the feet, shifted over the
-    stance foot, height dropping in double support (bob) and never higher than the legs allow."""
+    stance foot, height dropping in double support (bob) and never higher than the legs allow.
+    bias shifts the weight from the left (-0.5) to the right (+0.5) foot; offset is an extra world-space xy shift."""
     sL = feet.state('L', t)
     sR = feet.state('R', t)
     pL, pR = sL[0], sR[0]
@@ -362,7 +364,9 @@ def pelvis_from_feet(rig, feet, t, yaw_override=None, crouch=0.03, bob=0.025, sw
         st = pR if stance == 'R' else pL
         shift = (st - mid) * (sway / 0.1) * math.sin(math.pi * swing)
         lift_amt = math.sin(math.pi * swing)
-    xy = mid + shift
+    xy = mid + shift + (pR - pL) * bias
+    if offset is not None:
+        xy = xy + Vector((offset[0], offset[1], 0))
     # desired hip drop: crouch + bob (low at contact)
     drop = crouch + bob * (1 - lift_amt)
     # reach limit for each leg: hip joint above the ankle
