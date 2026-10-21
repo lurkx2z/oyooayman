@@ -31,6 +31,7 @@ ap.add_argument('--motion-blur', action='store_true')
 ap.add_argument('--gpu', action='store_true', help='EEVEE always uses the GPU when there is one; kept for scripts')
 ap.add_argument('--fast', action='store_true', help='cheaper shadows/volumes/no ray tracing (CPU previews)')
 a = ap.parse_args(argv)
+a.out = os.path.abspath(a.out)  # Blender resolves a relative render path against the .blend, not the working folder
 
 bpy.ops.wm.open_mainfile(filepath=os.path.abspath(a.blend))
 sc = bpy.context.scene
