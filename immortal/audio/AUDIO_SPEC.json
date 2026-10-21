@@ -1,0 +1,41 @@
+{
+  "_about": "Project Immortal audio requests. Read by immortal/tools/elevenlabs-assets.cjs on GitHub Actions (workflow immortal-audio.yml). Every finished file is kept by its id; changing an entry's text/prompt regenerates only that entry. Voice ids are not secrets.",
+  "model": "eleven_v4",
+  "fallback_models": ["eleven_v3", "eleven_multilingual_v2"],
+  "format": "mp3_44100_192",
+  "cast": {
+    "aren": {
+      "name": "Aren (Project Immortal)",
+      "description": "A 14-year-old boy, voice not yet broken, soft and slightly husky from exhaustion. Thin, breathy and fragile, as if he has been running all night. Natural and unpolished, quiet, close to the microphone. No accent drama, not a cartoon voice.",
+      "preview_text": "Father? It's me. I ran all night. I kept falling, and every time I fell I thought I wouldn't get up again. But I did. I don't know how. I don't know what happened to me. Please, just look at me. It's me.",
+      "target_f0_hz": 230
+    },
+    "father": {
+      "name": "Father (Project Immortal)",
+      "description": "A rugged 40-year-old man, low and rough voice worn by cold air and smoke, speaking quietly with restraint. Warm underneath, but now trembling and afraid. Natural, intimate, unpolished, no announcer tone.",
+      "preview_text": "I watched them take you. I stood there and I let them walk you up to the stones, and I did nothing. I told your sister you were gone. So tell me. How are you standing here? How are you alive?",
+      "target_f0_hz": 110
+    }
+  },
+  "lines": [
+    { "id": "s3_aren_father",   "cast": "aren",   "text": "Father?",                    "tagged": "[exhausted, hopeful, quiet] Father?",                   "stability": 0.35 },
+    { "id": "s5_father_watched", "cast": "father", "text": "I watched them take you.",   "tagged": "[quiet, trembling] I watched them take you.",          "stability": 0.35 },
+    { "id": "s5_father_how",     "cast": "father", "text": "How are you alive?",         "tagged": "[barely a whisper, afraid] How are you alive?",        "stability": 0.35 },
+    { "id": "s5_aren_dontknow",  "cast": "aren",   "text": "I don't know.",              "tagged": "[confused, small, close to tears] I don't know.",      "stability": 0.35 },
+    { "id": "s6_aren_itsme",     "cast": "aren",   "text": "It's me.",                   "tagged": "[pleading, voice breaking] It's me.",                  "stability": 0.3 }
+  ],
+  "sfx": [
+    { "id": "amb_forest_dawn",   "seconds": 22, "loop": true,  "prompt": "Quiet forest at dawn, distant soft birdsong, a light cold wind through leaves, very calm, no music, no voices" },
+    { "id": "amb_fire_embers",   "seconds": 15, "loop": true,  "prompt": "Small dying campfire, soft crackle and pops of embers, close, quiet, no wind, no music" },
+    { "id": "amb_village_far",   "seconds": 15, "loop": true,  "prompt": "Distant prehistoric village morning, faint indistinct murmur, a goat bleat far away, wood knocking, very quiet, no music" },
+    { "id": "fx_steps_soil_tired", "seconds": 8, "loop": false, "prompt": "Barefoot uneven tired footsteps on soft damp soil and dry leaves, slow, dragging, close" },
+    { "id": "fx_breath_boy",     "seconds": 10, "loop": false, "prompt": "Exhausted teenage boy breathing heavily through the mouth after running, shaky, close microphone, no words" },
+    { "id": "fx_step_back_man",  "seconds": 2,  "loop": false, "prompt": "A single heavy barefoot step backward on dirt, a soft scuff and leather clothing rustle, close" },
+    { "id": "fx_cloth_hide",     "seconds": 4,  "loop": false, "prompt": "Rough animal hide clothing rustling as a person moves slowly, close, subtle" },
+    { "id": "fx_whispers_crowd", "seconds": 8,  "loop": false, "prompt": "Three or four villagers whispering anxiously at a distance, indistinct words, tense, outdoors" },
+    { "id": "fx_stick_drop",     "seconds": 2,  "loop": false, "prompt": "A small wooden stick dropped onto dirt and ash beside a fire, soft clack" }
+  ],
+  "music": [
+    { "id": "mus_return", "seconds": 46, "prompt": "Restrained cinematic underscore for an animated film, 46 seconds. Opens almost silent with a soft low cello drone and distant wooden flute, mysterious dawn. Around 10 seconds a fragile hopeful piano motif. At 20 seconds the music drops to near silence for 3 seconds. Then low sustained strings, tense and sad, slowly growing, ending on an unresolved held chord that fades out. No drums, no percussion, no choir, no vocals." }
+  ]
+}
