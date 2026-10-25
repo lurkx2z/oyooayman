@@ -64,6 +64,13 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Long-form (16:9, voiceless): *What if the universe kept expanding faster and faster?*** — open
+> `universe-faster.html` (5:56). One night in your back garden: from 7:30 the doubling time of space shrinks and can't
+> stop. The first second, slowed down (every galaxy and star goes over the edge and nothing looks different), the sky
+> going out red stars first, you getting lighter, Earth coming apart from the outside in, the last second (your house,
+> you, the atoms), midnight, then what's real. Physics, shot list and reviews:
+> [`films/universe-faster/PLAN.md`](films/universe-faster/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -319,6 +326,17 @@ films/slip/sea.js        the seabed (one analytic height field in JS and GLSL), 
 films/slip/cast.js       people with umbrellas, in the quake, at the seafront, running inland
 films/slip/audio.js      rain, the squeak and the thud, the underground pulses, the rupture, the quake, sirens, the roar
 films/slip/film.js       FILM hooks: which scene, hands, the quake shake, reflections, the cuts, the grade, the end card
+```
+
+Film: *What if the universe kept expanding faster and faster?* (`universe-faster.html`, 16:9):
+
+```
+films/universe-faster/PLAN.md        the idea, every number (physics.js), honesty labels, structure, sound, delivery
+films/universe-faster/CAPTIONS.md    the captions (the film is told by them); build-timing.cjs times them into timing.js
+films/universe-faster/script.js      ★ every beat from the captions; film time → night time (the clock)
+films/universe-faster/garden*.js     your back garden (build + what happens to it), cat.js the cat, sky.js the sky
+films/universe-faster/cosmos.js      the galaxies (illustrated), scope.js Saturn in the telescope, hud.js the readouts
+films/universe-faster/sound-*.js     score, ambience, effects (mix.js levels); render-gpu.cjs the final render on a PC
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):
