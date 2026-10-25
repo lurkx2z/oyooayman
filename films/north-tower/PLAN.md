@@ -1,6 +1,6 @@
 # PLAN — *What if you were in the North Tower on September 11, 2001?*
 
-16:9 long-form, 1920×1080, 30 fps, 6:01. Voiceless, in the house format of *Slower light* and *Universe expanding
+16:9 long-form, 1920×1080, 30 fps, 6:08. Voiceless, in the house format of *Slower light* and *Universe expanding
 faster* (short second-person serif captions with empty screen between them, a corner readout, first person, one
 continuous morning), but in a different register: a memorial, not a spectacle. Owner's ask (2026-10-25): "POV, office
 worker during 911 … starts in one of the towers as a office worker … research the event accurately, and the buildings
@@ -39,9 +39,9 @@ The point of view is the evacuation that worked. Almost everyone below the impac
 |---|---|---|---|---|
 | 1 | 0:00–1:33 | 8:40–8:50 | floor 73 | title · morning · sky · tower · windows · 8:46 impact · after · outside · nobody · known |
 | 2 | 1:33–3:26 | 8:50–9:44 | stairway C | stair · glow · pace · 9:03 second · calm · right · transfer (48) · firefighters (37) · water (20) · thin (8) |
-| 3 | 3:26–4:11 | 9:45–9:58 | mezzanine, concourse, Vesey | mezz · police · escalator/concourse · out by 5 WTC · you look back |
-| 4 | 4:11–5:07 | 9:59–10:29 | Church & Vesey, West Broadway | 9:59 roar · cloud (near-black) · grey · walk · 10:28 |
-| 5 | 5:07–6:01 | — | empty stairway, black, the Hudson at night | out (7,500) · how · cost (2,977 · 2,753 · 343) · light · card |
+| 3 | 3:26–4:12 | 9:45–9:58 | mezzanine, concourse, Vesey | mezz · police · escalator/concourse · out by 5 WTC · you look back |
+| 4 | 4:12–5:08 | 9:59–10:29 | Church & Vesey, West Broadway | 9:59 roar · cloud (near-black) · grey · walk · 10:28 |
+| 5 | 5:08–6:08 | — | empty stairway, black, the Hudson at night | out (7,500) · how · cost (2,977 · 2,753 · 343) · light · card |
 
 ## 4 · Shots (`shots.js`)
 
@@ -122,3 +122,34 @@ What they found and what was done:
 - The end: wider, softer beams with a glow; a longer hold on the light before the card; the card under the skyline;
   the numbers (2,977 · 2,753 · 343) large, centred, amber. Captions larger for phones (62 px).
 
+
+**Round 2 (second cut, 6:01).**
+- Viewer: enjoyment 6, retention 6, clarity 7, emotional impact 7, visuals 5, tone 8.
+- Cinematography: image 6, composition 6, lighting 6, text 8 on a TV / 6 on a phone, picture matches caption 6,
+  overall 6.
+- History and respect: accuracy 8, architecture and interiors 7, respectfulness 8, platform safety 9.
+
+What they found and what was done (now 6:08, 82 captions):
+- The firefighters on 37 never appeared (their position was counted from 73 instead of from the shot's floor): fixed;
+  they climb the outer lane past you, helmets matte, hidden when they come within reach of the lens.
+- "Black smoke streams past the windows" (new caption) now has the smoke on screen: a dark stream in gusts a few metres
+  out. "No announcement comes" added to the speakers beat.
+- The firefighters beat: the camera keeps to the inner lane and looks down the outer one; no swing round on "Stay to
+  the right" (you turn only once the hurt man has passed).
+- 9:59 from Church Street: you run; the dust wall comes up the street towards you before the cut and the street darkens
+  as it arrives. Each tower's smoke stops being made when it falls, and the smoke already in the air drifts on.
+- The clock ran fast through both collapses: it now runs at real time there (9:59:00 → 9:59:14, 10:28:25 on).
+- 10:28: the look back on West Broadway is a level turn; the collapse finishes inside the shot.
+- West Broadway was a canyon of towers: now five-to-eight-floor Tribeca lofts. All city buildings now have one row of
+  windows per floor (they had three), so the skyline reads at its real size.
+- Times on their own (8:46, 9:03, 9:59, 10:28) are big amber numerals. Small labels and tags are larger for phones;
+  captions wrap evenly.
+- "Below the impact, nearly everyone got out. / Above it, no one could get down." and "441 were first responders."
+  added (both checked in `RESEARCH.md`).
+- The Tribute in Light: two separate beams (they were drawn one-sided and disappeared from some angles).
+- The corner tag now says "You are a composite of survivors' accounts · real times, sped up".
+
+Still weak after round 2 (not fixed): the stair shots from 1:34 to 2:35 share one high angle; there is no close-up of
+the water bottle; the office windows read as grey blocks from some angles; the office ceiling has gaps in its tiles
+before 8:46; the label-and-circle markers on the towers look a little game-like; the night skyline at the end is a
+simple block city.

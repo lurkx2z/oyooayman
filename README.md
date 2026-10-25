@@ -64,6 +64,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Long-form memorial: *What if you were in the North Tower on September 11, 2001?*** — open `north-tower.html`
+> (16:9, 6:08, voiceless). You are an office worker on the 73rd floor, 20 floors below the impact (a composite of
+> survivors' accounts), and the film follows your morning by the real clock: 8:46 from your desk, out by stairway C past
+> the firefighters climbing up, through the mezzanine and the concourse, onto Vesey Street; 9:59 from Church Street and
+> 10:28 from West Broadway, never closer than a survivor saw it. No plane, no one falling, no gore. It ends on the empty
+> stairway, the numbers and the Tribute in Light. Research and sources: [`films/north-tower/RESEARCH.md`](films/north-tower/RESEARCH.md);
+> plan and review log: [`films/north-tower/PLAN.md`](films/north-tower/PLAN.md); report and platform note:
+> [`films/north-tower/EPISODE_REPORT.md`](films/north-tower/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
@@ -319,6 +328,28 @@ films/slip/sea.js        the seabed (one analytic height field in JS and GLSL), 
 films/slip/cast.js       people with umbrellas, in the quake, at the seafront, running inland
 films/slip/audio.js      rain, the squeak and the thud, the underground pulses, the rupture, the quake, sirens, the roar
 films/slip/film.js       FILM hooks: which scene, hands, the quake shake, reflections, the cuts, the grade, the end card
+```
+
+Film: *What if you were in the North Tower on September 11, 2001?* (`north-tower.html`):
+
+```
+films/north-tower/RESEARCH.md      every fact with its source (9/11 Commission, NIST NCSTAR 1, FEMA 403, the Memorial)
+films/north-tower/PLAN.md          the idea, what the film will not show, structure, shots, sets, sound, review log
+films/north-tower/CAPTIONS.md      ★ the captions; build-timing.cjs times them into timing.js
+films/north-tower/script.js        every beat time, the clock (real times, sped up), floors, readouts
+films/north-tower/shots.js         which set and mode is on screen at every time
+films/north-tower/towers.js        the Twin Towers, the plaza, the city, the smoke plumes
+films/north-tower/office.js        floor 73: cubicles, the 22-inch windows, the jolt, paper and smoke outside
+films/north-tower/stair.js         stairway C: the flights, glow paint, the crowd, firefighters, the transfer hallway, water
+films/north-tower/lobby.js         the mezzanine, the escalator, the concourse
+films/north-tower/street.js        Vesey, Church Street, West Broadway: the street, the vehicles, both collapses, the dust
+films/north-tower/memorial.js      the end: the numbers, the Tribute in Light over the Hudson, the card
+films/north-tower/cast.js          office workers, firefighters in 2001 FDNY gear, police, people on the street; their poses
+films/north-tower/kit.js           shared helpers: particle pools, the camera, sets, textures
+films/north-tower/hud.js           the captions, the corner readouts, the tower diagram, the labels
+films/north-tower/film.js          FILM hooks: which set, the grade, the HUD
+films/north-tower/sound-*.js       the ambience, effects and score (audio.js mixes them; baked into soundtrack.js)
+films/north-tower/render-gpu.cjs   the final render on a GPU PC (1080p + a small phone copy)
 ```
 
 Film: *What if air became 10× denser?* (`air.html`):
