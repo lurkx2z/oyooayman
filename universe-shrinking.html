@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>What if the universe kept expanding faster and faster?</title>
+  <title>What if the universe kept shrinking and couldn't stop?</title>
   <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
   <link rel="stylesheet" href="fonts/fonts.css">
   <link rel="stylesheet" href="style.css">
@@ -31,7 +31,9 @@
     .uc-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
       font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
     .uc-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
-    .uc-ctx { position: absolute; left: calc(var(--u) * 52); top: calc(var(--u) * 262); pointer-events: none; padding: calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * 14); border-radius: calc(var(--u) * 14);
+    .uc-ro .nx { color: #f6efe2; opacity: 0.85; font-size: calc(var(--u) * 22); letter-spacing: 0.12em; }
+    .uc-ro .nx:empty { display: none; }
+    .uc-ctx { position: absolute; left: calc(var(--u) * 52); top: calc(var(--u) * 312); pointer-events: none; padding: calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * 14); border-radius: calc(var(--u) * 14);
       background: rgba(6, 8, 12, 0.5); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
     .uc-ctx .l { display: block; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.16em; color: #fff; opacity: 0.8; }
     .uc-ctx .v { display: block; font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 40); margin-top: calc(var(--u) * 2); color: #ffd7a8; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
@@ -91,7 +93,7 @@
   </div>
   <div id="debug"></div>
   <div id="startOverlay">
-    <div class="big">What if the universe kept expanding faster and faster?</div>
+    <div class="big">What if the universe kept shrinking and couldn't stop?</div>
     <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
     <div id="soundStatus" style="opacity:.75"></div>
     <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
@@ -138,7 +140,6 @@
   <script src="films/universe-shrinking/garden-build.js"></script>
   <script src="films/universe-shrinking/garden.js"></script>
   <script src="films/universe-shrinking/cosmos.js"></script>
-  <script src="films/universe-shrinking/scope.js"></script>
   <script src="films/universe-shrinking/dark.js"></script>
   <script src="films/universe-shrinking/shots.js"></script>
   <script src="films/universe-shrinking/hud.js"></script>

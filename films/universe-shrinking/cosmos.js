@@ -1,14 +1,15 @@
 /* =====================================================================
-   COSMOS — the galaxies, illustrated (a god's-eye view; everything here is labelled ILLUSTRATION). One set, four
+   COSMOS — the galaxies, illustrated (a god's-eye view; everything here is labelled ILLUSTRATION). One set, seven
    shots (modes):
-     grow    space growing, sped up: a field of galaxies drifts apart, each keeps its own size; a ruler between two of
-             them grows (100 million light years and counting); then in to one galaxy, held together by its gravity
-     edge    the first second, slowed down: the edge (c / H, where space carries things off faster than light) closes
-             in from 14 billion light years towards the Milky Way. Distances are squeezed to fit (a self-similar zoom:
-             the camera keeps the edge the same size on screen). Galaxies it has passed turn grey-red: cut off, still
-             in sight, their old light still coming
-     real    the real universe: gentle growth; a distant supernova flares (how the speeding up was found, 1998)
-     future  the real future: the other galaxies speed away, redden and fade; one is left. Ours
+     rule     space today, growing (a field of galaxies drifting apart; a ruler between two of them); at 7:30 it turns
+              round and shrinks, faster and faster
+     held     in on one galaxy: it keeps its size while the gaps close; then everything runs together (midnight)
+     promise  the history of the universe, rewound: the galaxies crowd together, turn young and blue, and dissolve into
+              the glow everything came from (the Big Bang's light, 380,000 years in)
+     close    out there tonight: the galaxies close in and crash together; light leaving them now can't reach you
+     real     the real universe: growing, a little faster every year
+     map      the biggest 3D map of the universe (DESI, 2025): two fans of galaxies, you at the point
+     turn     a quiet field under the HUD's diagram (the size of the universe, past and future)
    ===================================================================== */
 
 // the galaxy atlas: 4 × 2 tiles of 256 px (four spirals, two tilted spirals, two ellipticals), drawn once (seeded)
@@ -23,7 +24,7 @@ function ucGalaxyAtlas() {
       g.save(); g.beginPath(); g.rect(cx - T / 2, cy - T / 2, T, T); g.clip();
       g.translate(cx, cy); g.rotate(r.range(0, 6.28)); g.scale(1, tilt);
       if (ell) {
-        for (let i = 0; i < 260; i++) { const rr = Math.abs(r.gauss ? r.gauss() : (r.next() + r.next() + r.next() - 1.5)) * 42, a = r.range(0, 6.28); dot(Math.cos(a) * rr * 1.25, Math.sin(a) * rr * 0.8, r.range(6, 16), '255,214,170', 0.07); }
+        for (let i = 0; i < 260; i++) { const rr = Math.abs(r.next() + r.next() + r.next() - 1.5) * 42, a = r.range(0, 6.28); dot(Math.cos(a) * rr * 1.25, Math.sin(a) * rr * 0.8, r.range(6, 16), '255,214,170', 0.07); }
         dot(0, 0, 70, '255,220,180', 0.55); dot(0, 0, 26, '255,240,215', 0.9);
       } else {
         const arms = 2 + (k % 2), pitch = r.range(0.22, 0.32), turns = r.range(1.6, 2.2);
@@ -31,8 +32,7 @@ function ucGalaxyAtlas() {
         for (let a = 0; a < arms; a++) for (let i = 0; i < 520; i++) {
           const u = i / 520, th = u * turns * 6.283 + a * 6.283 / arms, rad = 10 * Math.exp(pitch * th);
           if (rad > 118) continue;
-          const sx = (r.next() - 0.5) * (6 + rad * 0.16), sy = (r.next() - 0.5) * (6 + rad * 0.16);
-          const blue = r.next() < 0.8;
+          const sx = (r.next() - 0.5) * (6 + rad * 0.16), sy = (r.next() - 0.5) * (6 + rad * 0.16), blue = r.next() < 0.8;
           dot(Math.cos(th) * rad + sx, Math.sin(th) * rad + sy, r.range(2.5, 7), blue ? '170,200,255' : '255,150,170', blue ? 0.22 : 0.3);
           if (r.next() < 0.12) dot(Math.cos(th) * rad + sx, Math.sin(th) * rad + sy, 1.6, '255,255,255', 0.8);
         }
@@ -41,27 +41,18 @@ function ucGalaxyAtlas() {
       g.restore();
     }
   });
-  const t = ucTex(c, { repeat: false }); return t;
+  return ucTex(c, { repeat: false });
 }
-// the Milky Way, larger, for the close shots
-function ucMilkyWayTex() {
-  const r = new RNG(CONFIG.seed + 502), S = 1024;
-  return ucTex(ucCanvas(S, S, (g) => {
-    g.fillStyle = '#000'; g.fillRect(0, 0, S, S); g.globalCompositeOperation = 'lighter'; g.translate(S / 2, S / 2);
-    const dot = (x, y, rad, col, a) => { const gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); };
-    dot(0, 0, 420, '150,170,230', 0.14);
-    for (let a = 0; a < 4; a++) for (let i = 0; i < 2600; i++) {
-      const u = i / 2600, th = u * 2.1 * 6.283 + a * 1.5708 + (a % 2) * 0.3, rad = 40 * Math.exp(0.21 * th);
-      if (rad > 470) continue;
-      const sp = 10 + rad * 0.14, sx = (r.next() - 0.5) * sp, sy = (r.next() - 0.5) * sp, blue = r.next() < 0.78;
-      dot(Math.cos(th) * rad + sx, Math.sin(th) * rad + sy, r.range(3, 11), blue ? '165,195,255' : '255,140,160', blue ? 0.16 : 0.22);
-      if (r.next() < 0.25) dot(Math.cos(th) * rad + sx, Math.sin(th) * rad + sy, 2.2, '255,255,255', 0.7);
-      if (r.next() < 0.1) dot(Math.cos(th) * rad + sx * 0.5, Math.sin(th) * rad + sy * 0.5, r.range(4, 8), '40,20,10', 0.0);
-    }
-    // the bar and the bulge
-    g.save(); g.rotate(0.5); g.scale(1, 0.38); dot(0, 0, 150, '255,210,150', 0.5); g.restore();
-    dot(0, 0, 110, '255,215,165', 0.6); dot(0, 0, 40, '255,240,215', 0.95);
-  }), { repeat: false });
+// the afterglow's mottled face (a seeded field of warm and cool spots, like the real maps)
+function ucGlowTex() {
+  const W = 512, H = 256, r = new RNG(CONFIG.seed + 509);
+  return ucTex(ucCanvas(W, H, (g) => {
+    const im = g.createImageData(W, H), d = im.data, sp = Array.from({ length: 900 }, () => [r.range(0, W), r.range(0, H), r.range(4, 22), r.range(-1, 1)]);
+    const f = new Float32Array(W * H);
+    for (const [x0, y0, s, a] of sp) for (let y = Math.max(0, Math.floor(y0 - 3 * s)); y < Math.min(H, y0 + 3 * s); y++) for (let x = Math.floor(x0 - 3 * s); x < x0 + 3 * s; x++) { const xx = (x + W) % W, q = ((x - x0) ** 2 + (y - y0) ** 2) / (s * s); f[y * W + xx] += a * Math.exp(-q); }
+    for (let i = 0; i < W * H; i++) { const v = MathX.clamp(0.5 + 0.22 * f[i], 0, 1); d[i * 4] = 255 * (0.75 + 0.25 * v); d[i * 4 + 1] = 255 * (0.32 + 0.4 * v); d[i * 4 + 2] = 255 * (0.08 + 0.3 * v * v); d[i * 4 + 3] = 255; }
+    g.putImageData(im, 0, 0);
+  }));
 }
 
 // galaxy billboards (instanced quads facing the camera, a tile of the atlas each)
@@ -87,166 +78,143 @@ function ucGalaxies(scene, atlas, max) {
     begin() { n = 0; },
     add(x, y, z, size, alpha, r, gg, b, tile, rot) {
       if (n >= max || !(alpha > 0.003) || !isFinite(x + y + z + size)) return;
-      P[n * 3] = x; P[n * 3 + 1] = y; P[n * 3 + 2] = z; S[n] = size; A[n] = Math.min(1.6, alpha); C[n * 3] = r; C[n * 3 + 1] = gg; C[n * 3 + 2] = b; TL[n] = tile; RO[n] = rot; n++;
+      P[n * 3] = x; P[n * 3 + 1] = y; P[n * 3 + 2] = z; S[n] = size; A[n] = Math.min(1.8, alpha); C[n * 3] = r; C[n * 3 + 1] = gg; C[n * 3 + 2] = b; TL[n] = tile; RO[n] = rot; n++;
     },
     end() { g.instanceCount = n; for (const x of at) x.needsUpdate = true; },
   };
 }
 
+// the growth in the illustrations (the size of space, × today's): rule, held, promise, close, real
+const UC_COS = {
+  rule(t) { const g = Math.exp(0.025 * Math.max(0, Math.min(t, UC.shrinkAt) - UC.rule)), u = Math.max(0, t - UC.shrinkAt); return g * Math.exp(-(0.03 * u + 0.0045 * u * u * u)); },
+  held(t) { const a0 = UC_COS.rule(UC.held), end = UC.promise - 0.25, u = MathX.clamp((t - UC.held) / (end - UC.held), 0, 1); return a0 * Math.pow(1 - u, 1.33) + 1e-4; },
+  promise(t) { const u = MathX.clamp((t - UC.promise) / (UC.begin - UC.promise), 0, 1); return Math.exp(-4.2 * Math.pow(u, 1.3)); },
+  close(t) { const u = Math.max(0, t - UC.close); return Math.exp(-(0.045 * u + 0.0012 * u * u * u)); },
+  real(t) { const u = Math.max(0, t - UC.real); return Math.exp(0.012 * u + 0.0004 * u * u); },
+};
+
 UC_SETS.cosmos = (app) => {
   const S = ucSet(app, { sky: '#010102', fov: 50, near: 0.001, far: 1e6, hemi: ['#000000', '#000000', 0] });
   const scene = S.scene, cam = S.camera;
-  const atlas = ucGalaxyAtlas(), gal = ucGalaxies(scene, atlas, 2400);
+  const atlas = ucGalaxyAtlas(), gal = ucGalaxies(scene, atlas, 3000);
   // the faint background: very distant galaxies, a sphere of dim dots that rides with the camera
   const bg = new THREE.Group(); scene.add(bg);
   { const N = 2600, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), r = new RNG(CONFIG.seed + 503);
     for (let i = 0; i < N; i++) { const z = r.range(-1, 1), a = r.range(0, 6.283), s = Math.sqrt(1 - z * z), R = 9e5; pos[i * 3] = Math.cos(a) * s * R; pos[i * 3 + 1] = z * R; pos[i * 3 + 2] = Math.sin(a) * s * R; const b = 0.15 + 0.5 * Math.pow(r.next(), 3); col[i * 3] = b; col[i * 3 + 1] = b * 0.95; col[i * 3 + 2] = b * 1.05; }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
     bg.add(new THREE.Points(g, new THREE.PointsMaterial({ size: 1.6, sizeAttenuation: false, vertexColors: true, transparent: true, depthWrite: false, fog: false }))); }
-  // the Milky Way (and Andromeda) up close
-  const mwTex = ucMilkyWayTex();
-  const mw = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: mwTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: new THREE.Color(1, 1, 1) }));
-  mw.renderOrder = 2; scene.add(mw);
-  // the edge: a sphere, its rim glowing
-  const edgeU = { uA: { value: 1 }, uC: { value: new THREE.Color('#ffcf8a') } };
-  const edge = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 48), new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, uniforms: edgeU,
-    vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * mv; }',
-    fragmentShader: 'uniform float uA; uniform vec3 uC; varying vec3 vN; varying vec3 vV; void main(){ float f = 1.0 - abs(dot(vN, vV)); float a = (0.008 + 0.55 * pow(f, 5.0)) * uA; gl_FragColor = vec4(uC * a, 1.0); }',
-  }));
-  edge.renderOrder = 4; scene.add(edge);
-  // a supernova (the real section) and the ruler (grow)
-  const flash = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: ucDotTex(0.25), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: new THREE.Color(1, 1, 1) }));
-  flash.renderOrder = 6; scene.add(flash);
+  const bgMat = bg.children[0].material;
+  // the ruler (rule), the light leaving a galaxy (close), the afterglow in front of the lens (promise)
   const rulerM = new THREE.LineDashedMaterial({ color: '#ffd7a8', dashSize: 0.06, gapSize: 0.05, transparent: true, depthWrite: false });
   const rulerG = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(1, 0, 0)]);
   const ruler = new THREE.Line(rulerG, rulerM); ruler.renderOrder = 7; scene.add(ruler);
+  const ringU = { uA: { value: 0 }, uC: { value: new THREE.Color('#bfe0ff') } };
+  const ring = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 32), new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, uniforms: ringU,
+    vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform float uA; uniform vec3 uC; varying vec3 vN; varying vec3 vV; void main(){ float f = 1.0 - abs(dot(vN, vV)); gl_FragColor = vec4(uC * (0.01 + 0.6 * pow(f, 6.0)) * uA, 1.0); }',
+  }));
+  ring.renderOrder = 4; scene.add(ring);
+  const glowMat = new THREE.MeshBasicMaterial({ map: ucGlowTex(), transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, color: new THREE.Color(0, 0, 0) });
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), glowMat); glow.renderOrder = 9; glow.position.set(0, 0, -2); cam.add(glow);
+  // ---- the DESI map: two fans of points (galaxies by distance: bright nearby galaxies, red galaxies, young blue galaxies,
+  // quasars), threaded into filaments; you at the point where they meet
+  const map = (() => {
+    const N = 90000, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), r = new RNG(CONFIG.seed + 511);
+    const fil = (x, y, z) => Math.sin(x * 0.9 + Math.sin(z * 0.6) * 2) * Math.sin(y * 1.1 + 1.3) * Math.sin(z * 0.8 + Math.sin(x * 0.5) * 2);
+    let i = 0;
+    while (i < N) {
+      const side = r.next() < 0.6 ? 1 : -1, d = 12 * Math.pow(r.next(), 0.55), a = r.range(-0.62, 0.62), b = r.range(-0.035, 0.035);
+      const x = Math.sin(a) * d, z = -side * Math.cos(a) * d, y = b * d;
+      if (Math.abs(fil(x, y * 8, z)) < 0.12 + 0.5 * r.next() * r.next() && r.next() < 0.85) continue;
+      const type = d < 2 ? [1, 0.92, 0.75] : d < 6 ? [1, 0.55, 0.42] : d < 9.5 ? [0.55, 0.7, 1] : [0.5, 1, 0.65];
+      pos[i * 3] = x; pos[i * 3 + 1] = y; pos[i * 3 + 2] = z; const k = 0.55 + 0.45 * r.next(); col[i * 3] = type[0] * k; col[i * 3 + 1] = type[1] * k; col[i * 3 + 2] = type[2] * k; i++;
+    }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const p = new THREE.Points(g, new THREE.PointsMaterial({ size: 2.0, sizeAttenuation: false, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8 }));
+    p.renderOrder = 3; scene.add(p); return p;
+  })();
+  const youDot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 12), new THREE.MeshBasicMaterial({ color: '#ffffff' })); scene.add(youDot);
 
-  // ---- the field for grow / real / future: a jittered lattice (comoving units: 1 = 10 million light years)
+  // ---- the field: a jittered lattice (comoving units: 1 = 10 million light years)
   const FIELD = [];
   { const r = new RNG(CONFIG.seed + 504);
     for (let x = -9; x <= 9; x++) for (let y = -5; y <= 5; y++) for (let z = -16; z <= 4; z++) {
       if (r.next() < 0.45) continue;
       FIELD.push({ p: [x + r.range(-0.45, 0.45), y * 0.9 + r.range(-0.45, 0.45), z + r.range(-0.45, 0.45)], s: r.range(0.1, 0.24), tile: r.int(0, 7), rot: r.range(0, 6.28), b: r.range(0.55, 1.1), warm: r.next() });
     } }
-  // the ruler's two galaxies and the hero (held together), near the middle of the view
+  // the ruler's two galaxies (near the middle of the view)
   const RA = { p: [-1.2, 0.15, -6.2], s: 0.26, tile: 1, rot: 0.4, b: 1.1, warm: 0.3 }, RB = { p: [1.35, -0.2, -6.8], s: 0.24, tile: 2, rot: 2.0, b: 1.1, warm: 0.6 };
   FIELD.push(RA, RB);
-  // ---- the edge shot's universe around the Milky Way: log-uniform in distance (so every zoom has galaxies)
-  const SKY = [];
-  { const r = new RNG(CONFIG.seed + 505);
-    for (let i = 0; i < 1500; i++) {
-      const d = Math.pow(10, r.range(Math.log10(0.6), Math.log10(9000))), z = r.range(-1, 1), a = r.range(0, 6.283), s = Math.sqrt(1 - z * z);
-      SKY.push({ d, p: [Math.cos(a) * s * d, z * d * 0.8, Math.sin(a) * s * d], s: r.range(0.02, 0.05), tile: r.int(0, 7), rot: r.range(0, 6.28), b: r.range(0.6, 1.1) });
-    } }
-  const MPC = 3.0857e22, VIRGO = [-9.5, 4.2, -12.9], AND = [0.55, 0.32, -0.42];     // (Mpc: Virgo 16.5, Andromeda 0.78)
-  for (let i = 0; i < 40; i++) { const r = ucR(i, 61), a = ucR(i, 62) * 6.28, rr = 0.6 + 1.6 * r; SKY.push({ d: 16.5, p: [VIRGO[0] + Math.cos(a) * rr, VIRGO[1] + (ucR(i, 63) - 0.5) * 1.6, VIRGO[2] + Math.sin(a) * rr], s: 0.05, tile: 6 + (i % 2), rot: a, b: 0.9 }); }
-  SKY.push({ d: 0.78, p: AND, s: 0.06, tile: 4, rot: 0.6, b: 1.3, and: 1 });
-
-  const _v = new THREE.Vector3();
-  // the growth in the illustrations (× per second of film): grow, real, future
-  const aGrow = (t) => Math.exp(0.034 * Math.max(0, t - UC.grow));
-  const aReal = (t) => Math.exp(0.018 * Math.max(0, t - UC.real));
-  const aFut = (t) => { const u = Math.max(0, t - UC.future); return Math.exp(0.05 * u + 0.012 * u * u * u / 6); };
-  // the edge shot: the edge in Mpc, and the camera that keeps it the same size on screen
-  const edgeMpc = (t) => ucEdge(Math.max(1e-30, ucNight(t))) / MPC;
-  // (the camera pulls in a little slower than the edge closes, so the edge visibly shrinks, about 3× across the shot)
-  const edgeD = (t) => { const E0 = edgeMpc(UC.far); return 2.15 * E0 * Math.pow(edgeMpc(t) / E0, 0.85); };
-
   const state = {};
-  function field(t, a, o = {}) {
+  // draw the field at scale a; o.young: bluer, brighter (the young universe); o.merge: brighter where they crowd
+  function field(a, o = {}) {
     gal.begin();
-    const cx = cam.position.x, cy = cam.position.y, cz = cam.position.z;
+    const cx = cam.position.x, cy = cam.position.y, cz = cam.position.z, yg = o.young || 0;
     for (const f of FIELD) {
       const x = f.p[0] * a, y = f.p[1] * a, z = f.p[2] * a;
-      const d = Math.hypot(x - cx, y - cy, z - cz), near = MathX.smooth(d, 0.15, 0.6), far = 1 - MathX.smooth(d, 14, 22);
-      let r = 1, g = 0.96 + 0.06 * f.warm, b = 0.92 + 0.14 * (1 - f.warm), al = f.b * near * far;
-      if (o.leave && f !== o.keep) { const k = o.leave(f, d); al *= k.a; r *= 1; g *= k.g; b *= k.b; }
-      gal.add(x, y, z, f.s, al, r, g, b, f.tile, f.rot);
+      const d = Math.hypot(x - cx, y - cy, z - cz), near = MathX.smooth(d, 0.08, 0.45), far = 1 - MathX.smooth(d, 14, 22);
+      const r = 1 - 0.3 * yg, g = (0.96 + 0.06 * f.warm) * (1 - 0.1 * yg), b = (0.92 + 0.14 * (1 - f.warm)) * (1 + 0.25 * yg);
+      gal.add(x, y, z, f.s * (1 - 0.35 * yg), f.b * near * far * (o.k ?? 1), r, g, b, f.tile, f.rot);
     }
     gal.end();
   }
   const CAM = {
-    grow(t) {
-      const k = ucK(t, UC.grow, UC.held + 1.5, Ease.linear), h = ucK(t, UC.held, UC.scope, Ease.inOutSine), d = ucDrift(t, 0.06, 0.2, 5);
-      // (then in to the ruler's left galaxy: it keeps its size while the gaps grow)
-      const a = aGrow(t), A = [RA.p[0] * a, RA.p[1] * a, RA.p[2] * a];
-      const p0 = [0.3 + d[0] - 0.4 * k, 0.35 + d[1], 2.2 - 0.5 * k], p1 = [A[0] + 0.25, A[1] + 0.12, A[2] + 0.75];
-      ucCam(cam, ucV(p0, p1, h), ucV([0, 0, -7], A, Math.min(1, h * 1.6)), ucLerp(52, 34, h));
+    rule(t) { const d = ucDrift(t, 0.05, 0.2, 5), k = ucK(t, UC.rule, UC.held, Ease.linear); ucCam(cam, [0.3 + d[0] - 0.3 * k, 0.35 + d[1], 2.2 - 0.4 * k], [0, 0, -7], 52); },
+    held(t) {
+      const a = UC_COS.held(t), A = [RA.p[0] * a, RA.p[1] * a, RA.p[2] * a], k = ucK(t, UC.held, UC.held + 2.5, Ease.inOutSine), out = ucK(t, UC.runout - 0.4, UC.promise - 0.2, Ease.inOutSine);
+      const p0 = [0.0, 0.3, 1.8], p1 = [A[0] + 0.3, A[1] + 0.1, A[2] + 0.8], p2 = [0.2, 0.25, 2.6];
+      ucCam(cam, ucV(ucV(p0, p1, k), p2, out), ucV(ucV([0, 0, -6], A, k), [0, 0, 0], out), ucLerp(ucLerp(52, 34, k), 46, out));
     },
-    edge(t) {
-      const k = ucK(t, UC.far, UC.andro, Ease.linear), D = edgeD(t), az = -0.5 + 0.7 * k;
-      ucCam(cam, [Math.sin(az) * D, D * (0.32 - 0.1 * k), Math.cos(az) * D], [0, 0, 0], 50);
-    },
-    real(t) { const k = ucK(t, UC.real, UC.future, Ease.linear), d = ucDrift(t, 0.05, 0.2, 9); ucCam(cam, [0.6 + d[0] - 1.2 * k, 0.3 + d[1], 2.6 - 1.4 * k], [0.2 - 0.6 * k, 0, -8], 50); },
-    future(t) { const k = ucK(t, UC.future, UC.question, Ease.linear), d = ucDrift(t, 0.02, 0.2, 11); ucCam(cam, [0.12 + d[0], 0.62 + d[1] - 0.08 * k, 1.45 + 0.1 * k], [0, 0, -2.5], 52 - 4 * k, -6); },
+    promise(t) { const k = ucK(t, UC.promise, UC.begin, Ease.inOutSine), d = ucDrift(t, 0.03, 0.2, 7); ucCam(cam, [0.2 + d[0], 0.3 + d[1], 2.4 - 1.6 * k], [0, 0, -4], 50 + 6 * k, -4 * k); },
+    close(t) { const k = ucK(t, UC.close, UC.frost, Ease.linear), d = ucDrift(t, 0.04, 0.2, 8); ucCam(cam, [0.5 + d[0] - 0.6 * k, 0.4 + d[1], 1.9 - 1.1 * k], [0, 0, -3], 50); },
+    real(t) { const k = ucK(t, UC.real, UC.clue, Ease.linear), d = ucDrift(t, 0.05, 0.2, 9); ucCam(cam, [0.6 + d[0] - 1.0 * k, 0.3 + d[1], 2.6 - 1.2 * k], [0.2 - 0.6 * k, 0, -8], 50); },
+    map(t) { const k = ucK(t, UC.clue, UC.turn, Ease.linear), az = -0.9 + 0.5 * k, R = 21 - 3 * k; ucCam(cam, [Math.sin(az) * R, 9.5 - 2 * k, Math.cos(az) * R * 0.5 + 2], [0, 0, -1.5], 48); },
+    turn(t) { const k = ucK(t, UC.turn, UC.same, Ease.linear), d = ucDrift(t, 0.03, 0.2, 11); ucCam(cam, [0.3 + d[0], 0.4 + d[1], 3.0 - 0.6 * k], [0, 0, -6], 52); },
   };
 
   return {
     scene, camera: cam,
     frame(t, shot) {
-      (CAM[shot.mode] || CAM.grow)(t);
+      (CAM[shot.mode] || CAM.rule)(t);
       bg.position.copy(cam.position);
-      mw.visible = false; edge.visible = false; flash.visible = false; ruler.visible = false;
-      if (shot.mode === 'grow') {
-        const a = aGrow(t); field(t, a);
-        // the ruler between RA and RB, its length in light years over it (the HUD pins the label)
+      ruler.visible = false; ring.visible = false; glow.visible = false; map.visible = false; youDot.visible = false; bgMat.opacity = 1;
+      const m = shot.mode;
+      if (m === 'rule' || m === 'held') {
+        const a = UC_COS[m](t); field(a, { k: m === 'held' ? 1 + 1.5 * MathX.smooth(t, UC.promise - 1.6, UC.promise - 0.2) : 1 });
         const A = new THREE.Vector3(...RA.p).multiplyScalar(a), B = new THREE.Vector3(...RB.p).multiplyScalar(a);
-        rulerG.setFromPoints([A, B]); ruler.computeLineDistances(); ruler.visible = true;
-        rulerM.opacity = ucWin(t, ucCap('grow', 1).show - 0.2, UC.held + 2.5, 0.5, 0.8);
-        state.ruler = [(A.x + B.x) / 2, (A.y + B.y) / 2 + 0.22, (A.z + B.z) / 2]; state.rulerLy = 100 * a;
-        state.hero = [RA.p[0] * a, RA.p[1] * a + 0.2, RA.p[2] * a];
-      } else if (shot.mode === 'edge') {
-        const E = edgeMpc(t), D = edgeD(t);
-        edge.visible = true; edge.scale.setScalar(E); edgeU.uA.value = 1;
-        gal.begin();
-        const cpos = cam.position;
-        for (const g of SKY) {
-          const dc = Math.hypot(g.p[0] - cpos.x, g.p[1] - cpos.y, g.p[2] - cpos.z);
-          const size = Math.max(g.s, dc * 0.016) * (g.and ? 1.4 : 1), out = g.d > E;
-          // (fade the ones far behind the view, and the ones too close to the lens)
-          const vis = MathX.smooth(dc, D * 0.08, D * 0.3) * (1 - MathX.smooth(g.d, E * 6, E * 14));
-          const k = out ? 0.42 : 1;
-          gal.add(g.p[0], g.p[1], g.p[2], size, g.b * vis * k * (g.and ? 1.4 : 1), out ? 1.0 : 1, out ? 0.62 : 0.97, out ? 0.55 : 1.04, g.tile, g.rot);
-        }
-        gal.end();
-        // the Milky Way at the centre: a bright little spiral (you)
-        mw.visible = true; mw.position.set(0, 0, 0); mw.scale.setScalar(Math.max(0.03, D * 0.035)); mw.quaternion.copy(cam.quaternion); mw.material.opacity = 1;
-        state.E = E; state.D = D;
-      } else if (shot.mode === 'real') {
-        const a = aReal(t); field(t, a);
-        // the supernova: one star in a distant galaxy outshines it for a few weeks (here a few seconds)
-        const at = ucCap('real', 2).show - 0.4, u = t - at, g = FIELD[260 % FIELD.length];
-        if (u > 0) { flash.visible = true; flash.position.set(g.p[0] * a + 0.04, g.p[1] * a + 0.02, g.p[2] * a); flash.quaternion.copy(cam.quaternion);
-          const k = Math.min(1, u / 0.35) * Math.exp(-Math.max(0, u - 0.35) / 2.6); flash.scale.setScalar(0.18 + 0.12 * k); flash.material.color.setRGB(1.6 * k, 1.5 * k, 1.35 * k); }
-        state.sn = [g.p[0] * a, g.p[1] * a + 0.12, g.p[2] * a];
-      } else if (shot.mode === 'future') {
-        const a = aFut(t), last = ucCap('future', 2).show - 0.6;
-        field(t, a, { leave: (f, d) => { if (Math.hypot(f.p[0], f.p[1], f.p[2] + 1.1) < 1.7) return { a: 0, g: 1, b: 1 }; const red = MathX.smooth(a, 1.2, 6); return { a: 1 - MathX.smooth(t, last - 5 - 3 * ucR(Math.round(f.rot * 1000), 3), last), g: 1 - 0.5 * red, b: 1 - 0.75 * red }; } });
-        // ours: the Milky Way (and Andromeda, long since merged into it), in front of you
-        mw.visible = true; mw.position.set(0, 0, -1.1); mw.scale.setScalar(1.15); mw.rotation.set(-1.05, 0, 0.3); mw.material.opacity = 1;
-        state.ours = [0.0, 0.42, -1.1];
+        if (m === 'rule') { rulerG.setFromPoints([A, B]); ruler.computeLineDistances(); ruler.visible = true; rulerM.opacity = ucWin(t, UC.rule + 0.6, UC.held + 0.1, 0.5, 0.3); }
+        state.ruler = [(A.x + B.x) / 2, (A.y + B.y) / 2 + 0.22, (A.z + B.z) / 2]; state.rulerLy = 100 * a; state.hero = [A.x, A.y + 0.2 * Math.max(0.3, a), A.z]; state.a = a;
+      } else if (m === 'promise') {
+        const a = UC_COS.promise(t), u = MathX.clamp((t - UC.promise) / (UC.begin - UC.promise), 0, 1);
+        field(a, { young: MathX.smooth(u, 0.2, 0.8), k: 1 + 1.2 * MathX.smooth(u, 0.4, 0.9) });
+        // the afterglow: everything dissolves into it (it fills the lens in the last seconds)
+        const gk = MathX.smooth(t, ucCap('promise', 1).show - 0.6, UC.begin - 0.4);
+        glow.visible = gk > 0; glow.scale.set(5, 3, 1); glowMat.color.setRGB(1.25 * gk, 1.0 * gk, 0.9 * gk); bgMat.opacity = 1 - gk;
+      } else if (m === 'close') {
+        const a = UC_COS.close(t); field(a, { k: 1 + 0.8 * MathX.smooth(t, UC.crashAt - 1, UC.crashAt + 2) });
+        // the light leaving one galaxy now: a shell that grows far slower than the galaxies close in
+        const lt = ucCap('close', 2).show - 0.6;
+        if (t > lt) { const g = FIELD[300 % FIELD.length]; ring.visible = true; ring.position.set(g.p[0] * a, g.p[1] * a, g.p[2] * a); ring.scale.setScalar(0.08 + 0.06 * (t - lt)); ringU.uA.value = MathX.smooth(t, lt, lt + 0.6); state.ring = [g.p[0] * a, g.p[1] * a + 0.3, g.p[2] * a]; }
+      } else if (m === 'real') {
+        field(UC_COS.real(t), { k: MathX.smooth(t, UC.real, UC.real + 1.0) });
+      } else if (m === 'map') {
+        gal.begin(); gal.end(); map.visible = true; youDot.visible = true; youDot.position.set(0, 0, 0); map.material.opacity = 0.85 * MathX.smooth(t, UC.clue, UC.clue + 1.0); bgMat.opacity = 0.4;
+      } else if (m === 'turn') {
+        field(1.0 - 0.02 * (t - UC.turn), { k: 0.45 });
       }
     },
-    grade(t, p, shot) { p.exposure = 1.1; p.bloom = 0.6; p.bloomThreshold = 0.6; p.vignette = 0.6; p.grain = 0.022; p.saturation = 1.08; p.contrast = 1.05; },
+    grade(t, p, shot) {
+      p.exposure = 1.1; p.bloom = 0.6; p.bloomThreshold = 0.6; p.vignette = 0.6; p.grain = 0.022; p.saturation = 1.08; p.contrast = 1.05;
+      if (shot.mode === 'real') p.fade = Math.max(p.fade, 1 - MathX.smooth(t, UC.real, UC.real + 0.8));
+      if (shot.mode === 'promise') p.bloom = 0.7;
+    },
     labels(t) {
       const s = ucShotAt(t), W = StoryHUD.win;
-      if (s.mode === 'grow' && state.ruler) {
-        const L = [{ p: state.ruler, text: ucThousands(state.rulerLy) + ' MILLION LIGHT YEARS', a: W(t, ucCap('grow', 1).show, UC.held + 2.2, 0.5, 0.5) }];
-        if (t > UC.held + 0.6) L.push({ p: state.hero, text: 'A GALAXY', sub: 'HELD TOGETHER BY ITS GRAVITY', a: W(t, ucCap('held', 1).show - 0.6, UC.scope - 0.2, 0.5, 0.3) });
-        return L;
-      }
-      if (s.mode === 'edge' && state.E) {
-        const E = state.E, L = [{ p: [0, -Math.max(0.03, state.D * 0.035) * 0.3, 0], text: 'YOU', sub: 'THE MILKY WAY', a: W(t, UC.far + 0.6, UC.andro, 0.5, 0.2) }];
-        // (on the sphere's rim, right of centre and a little up, as seen from the camera)
-        cam.updateMatrixWorld(); const rx = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), uy = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 1);
-        const rim = rx.multiplyScalar(E * 0.9).add(uy.multiplyScalar(E * 0.42));
-        L.push({ p: [rim.x, rim.y, rim.z], text: 'THE EDGE', sub: ucFmtLy(E * MPC), a: W(t, UC.far + 0.3, UC.andro, 0.5, 0.2) });
-        if (E < 120 && E > 2) L.push({ p: [VIRGO[0], VIRGO[1] + 1.4, VIRGO[2]], text: 'THE VIRGO CLUSTER', sub: E < 16.5 ? 'OVER THE EDGE' : '54 MILLION LIGHT YEARS', a: W(t, UC.far + 2.0, UC.andro, 0.4, 0.2) * MathX.smooth(E, 120, 70) });
-        return L;
-      }
-      if (s.mode === 'real' && state.sn && t > ucCap('real', 2).show - 0.2) return [{ p: state.sn, text: 'A SUPERNOVA', sub: 'DIMMER THAN IT SHOULD BE', a: W(t, ucCap('real', 2).show, ucS('rip') - 0.4, 0.4, 0.4) }];
-      if (s.mode === 'future' && state.ours) return [{ p: state.ours, text: 'OURS', a: W(t, ucCap('future', 2).show, UC.question - 0.2, 0.4, 0.3) }];
+      if (s.mode === 'rule' && state.ruler) return [{ p: state.ruler, text: ucThousands(state.rulerLy) + ' MILLION LIGHT YEARS', a: W(t, UC.rule + 0.6, UC.held + 0.1, 0.5, 0.3) }];
+      if (s.mode === 'held' && state.hero) return [{ p: state.hero, text: 'A GALAXY', sub: 'HELD TOGETHER · SAME SIZE', a: W(t, UC.held + 1.2, UC.runout - 0.3, 0.5, 0.4) }];
+      if (s.mode === 'close' && state.ring && t > ucCap('close', 2).show - 0.3) return [{ p: state.ring, text: 'ITS LIGHT, LEAVING NOW', sub: 'NEEDS MILLIONS OF YEARS · MIDNIGHT IS MINUTES AWAY', a: W(t, ucCap('close', 2).show, UC.frost - 0.2, 0.4, 0.3) }];
+      if (s.mode === 'map') return [{ p: [0, 0.15, 0], text: 'YOU', a: W(t, UC.clue + 0.8, UC.turn - 0.2, 0.4, 0.3) }];
       return [];
     },
   };

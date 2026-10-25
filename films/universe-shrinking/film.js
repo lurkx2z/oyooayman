@@ -1,5 +1,5 @@
 /* =====================================================================
-   FILM — "What if the universe kept expanding faster and faster?"
+   FILM — "What if the universe kept shrinking and couldn't stop?"
      build(app)    every set (each its own THREE.Scene + camera), the HUD, the soundtrack
      update(app,t) the shot's set and camera (shots.js), the HUD (hud.js)
      view(app,t)   [the shot's scene, its camera]
@@ -74,5 +74,5 @@ const FILM = {
     p.fade = Math.max(p.fade, MathX.smooth(t, UC.end - 0.6, UC.end - 0.05));
   },
 
-  debug(app, t) { const s = FILM._shot, n = ucNight(t); return `shot ${s ? s.id : '-'} · set ${s ? s.set : '-'} · mode ${s ? s.mode : '-'} · night ${ucClockText(n, true)} · a ${ucA(Math.max(0, n)).toPrecision(4)}`; },
+  debug(app, t) { const s = FILM._shot, n = ucNight(t); return `shot ${s ? s.id : '-'} · set ${s ? s.set : '-'} · mode ${s ? s.mode : '-'} · night ${ucClockText(n, true)} · s ${ucShrinkAt(t).toPrecision(4)} · ${ucFmtC(ucTempK(t))}`; },
 };

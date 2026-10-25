@@ -214,15 +214,19 @@ class UcSky {
     this.moon.lookAt(cam.position.x - this.g.position.x, cam.position.y - this.g.position.y, cam.position.z - this.g.position.z);
     const sz = Math.max(2 * Rm * Math.tan(ang), Rm * 0.0016 * (o.lens || 1));
     this.moon.scale.setScalar(sz);
-    const mDisp = E * S.moonL, mb = Math.min(2.2, mDisp), mc = ucUnitLum(S.moonRGB), mm = Math.max(...mc);
-    const skyBehind = E * S.L;
-    // (the disc shows against the sky behind it: when the two match it is gone)
-    const vis = MathX.smooth(mDisp / Math.max(1e-6, skyBehind), 1.0, 1.8);
-    this.moonMat.color.setRGB(...mc.map((x) => x / mm * mb)); this.moonMat.opacity = K * vis;
+    // (the disc hides the sky behind it: it shows sunlight off its face, the sky's own light off its face (albedo 0.12),
+    // and later its own heat (its dusty surface warms as fast as dead leaves). When that matches the sky it is gone; for a
+    // few minutes after, it is a little darker than the sky; then it glows with it)
+    const heat = 0.95 * ucBBLum(ucTempAt('leaves', Math.max(0, n))), mL = S.moonL + 0.12 * S.L + heat;
+    const mDisp = E * mL, mc = ucMixRGB([[S.moonL, S.moonRGB], [0.12 * S.L, S.rgb], [heat, UC_BB.at(ucTempAt('leaves', Math.max(0, n))).rgb]]);
+    const mu = ucUnitLum(mc), sc = Math.min(1, 2.2 / Math.max(1e-9, mDisp * Math.max(...mu)));
+    const skyBehind = E * S.L, vis = 1;
+    this.moonMat.color.setRGB(mu[0] * mDisp * sc / 0.72, mu[1] * mDisp * sc / 0.72, mu[2] * mDisp * sc / 0.72); this.moonMat.opacity = K;   // (÷ the face's mean shade)
+    const over = Math.max(0, mDisp - skyBehind) / Math.max(1e-6, mDisp);
     this.moonGlow.position.copy(this.moon.position); this.moonGlow.quaternion.copy(this.moon.quaternion); this.moonGlow.scale.setScalar(sz * 3.2);
-    this.moonGlow.material.color.setRGB(...mc.map((x) => x / mm * 0.2 * Math.min(1, mb) * vis * K * MathX.smooth(-skyBehind, -0.3, -0.05)));
+    this.moonGlow.material.color.setRGB(...mu.map((x) => x * 0.2 * Math.min(1, mDisp) * over * K * MathX.smooth(-skyBehind, -0.3, -0.05)));
     // what the sky sends down into the garden (display units, for a white surface): the Moon, the uniform sky, the band
-    this.moonLight = E * 0.25 * S.moonL / 2500 * vis;                 // (lux → a white surface's display ×π)
+    this.moonLight = E * 0.25 * S.moonL / 2500;                       // (lux → a white surface's display ×π)
     this.skyLight = E * S.L;
     this.bandLight = E * (0.16 * S.mw + 0.05 * S.dust);
     this.state = { S, E, vis, skyBehind, moonDisp: mDisp };

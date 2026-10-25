@@ -166,15 +166,15 @@ function ucThermal() {
     const left = UCP.R - n, dn = Math.min(30, Math.max(1e-5, left * 0.004));
     const Ts = skyT(n + dn / 2), Ts4 = Math.pow(Ts, 4);
     for (const k of kinds) {
-      const P = UC_STUFF[k], S = st[k];
+      const P = UC_STUFF[k], S = st[k], Told = S.T;
       const net = eps * sig * P.f * (Ts4 - Math.pow(S.T, 4)) - P.k * (S.T - P.T0);
       let dT = net * dn / P.C;
       if (P.ice && S.qi < P.ice) { S.qi += Math.max(0, net * dn); continue; }            // (the ice skin melts first, at 0 °C)
       if (P.boil && S.T + dT > P.boil && S.q < P.L) { const room = Math.max(0, P.boil - S.T); S.q += Math.max(0, net * dn - room * P.C); dT = room; }
       if (P.melt && k === 'frost' && S.T < P.melt && S.T + dT > P.melt) { S.T = P.melt; continue; }
       S.T = Math.max(150, S.T + dT);
-      // implicit cap: never past the sky (radiative balance), which also keeps the big steps stable
-      if (S.T > Ts && net > 0) S.T = Ts;
+      // implicit cap: heated by the sky, never past it (radiative balance), which also keeps the big steps stable
+      if (Told <= Ts && S.T > Ts) S.T = Ts;
     }
     n += dn; push();
   }

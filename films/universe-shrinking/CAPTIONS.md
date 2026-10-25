@@ -56,9 +56,9 @@ status: voiceless
 
 [lawn] 11:40. The lawn. The apple tree.
 
-[noon] 11:42. Brighter than noon. / The Moon fades into the sky.
+[noon] 11:42. Brighter than noon. / The shed. The fence.
 
-[shed] 11:43. The shed. The fence. / Your telescope melts.
+[shed] 11:43. Your telescope melts. / 11:44. The Moon fades into the sky.
 
 [glass] 11:45. The windows start to sag. / From here, pretend nothing can hurt you.
 

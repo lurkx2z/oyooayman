@@ -1,16 +1,16 @@
 /* =====================================================================
    GARDEN · BUILD — your back garden on a late-October night, built once (metres; the house's back wall is z = 0, the
    garden runs to −z, which faces SSE; +x is to the right, west-ish; y up).
-     the house      two storeys of brick, the kitchen window and the back door lit, one bedroom window lit upstairs
-     the patio      stone slabs, the bistro table (your mug of tea, a candle lantern), two chairs, pots
+     the house      two storeys of brick round a real kitchen (its window looks down the garden: later you watch from
+                    it) and a hall behind the back door (with a cat flap); one bedroom window lit upstairs
+     the patio      stone slabs, the bistro table (a mug, a lantern), two chairs, pots
      the lawn       to the brick back wall (the cat's wall), wooden fences either side with solar string lights
-     the telescope  a small white refractor on its tripod, pointed at Saturn
-     the bird bath  a stone bowl on a pedestal with a little solar fountain jet
-     beyond         the houses behind and either side (some windows lit), an apple tree, the shed, the town's glow
-   The ground is in PLATES, so that later tonight it can come apart: A (the house, the patio and the near lawn), B (the
-   far lawn, the bird bath, the tree, the shed, the back wall) and the neighbours' plots. Each plate is a slab of turf,
-   soil and rock; the crack between A and B is a zig-zag across the lawn.
-     ucBuildGarden(app, S) → { plates, parts… }
+     the telescope  a small white refractor on its tripod, pointed at the Andromeda galaxy (by Mirach)
+     the bird bath  a stone bowl on a pedestal, its water under a skin of ice
+     beyond         the houses behind and either side (some windows lit), an apple tree, the shed, the town
+   The ground is in plates (A: the house, the patio, the near lawn; B: the far lawn to the back wall; the neighbours'
+   plots), as in the faster film; tonight they stay put.
+     ucBuildGarden(app, S) → { parts… }
    ===================================================================== */
 
 const UC_G = {
@@ -230,6 +230,7 @@ function ucBuildGarden(app, S) {
     stone: ucStd('#8c877c', 0.85),
     stoneDark: ucStd('#6e6a62', 0.9),
     water: new THREE.MeshStandardMaterial({ color: '#16202a', roughness: 0.05, metalness: 0.4 }),
+    ice: ucStd('#c9d4dc', 0.45, 0.05),
     metal: ucStd('#24332c', 0.45, 0.6),
     white: ucStd('#e8e6e2', 0.35, 0.1),
     black: ucStd('#141414', 0.5, 0.3),
@@ -323,7 +324,8 @@ function ucBuildGarden(app, S) {
   ucBox(G.lawnW + 0.36, 0.08, 0.34, M.coping, 0, G.wallH + 0.04, G.wallZ, B);
   // ---------------------------------------------------------------- borders: shrubs, a flower bed, pots
   const r = new RNG(41);
-  const shrub = (x, z, s, parent, m = M.leaf) => { const o = ucMesh(ucBlob(s, r.int(0, 999)), m, x, s * 0.7, z, parent); o.rotation.y = r.range(0, 6); return o; };
+  P.foliage = [];                                   // (every shrub and crown: they burn and shrink to char later)
+  const shrub = (x, z, s, parent, m = M.leaf) => { const o = ucMesh(ucBlob(s, r.int(0, 999)), m, x, s * 0.7, z, parent); o.rotation.y = r.range(0, 6); P.foliage.push(o); return o; };
   for (let z = -3.6; z > G.wallZ + 0.6; z -= r.range(0.9, 1.5)) {
     const parent = z > -9.4 ? A : B;
     if (r.next() < 0.75) shrub(-W2 + 0.45, z, r.range(0.35, 0.6), parent, r.next() < 0.5 ? M.leaf : M.leaf2);
@@ -339,10 +341,10 @@ function ucBuildGarden(app, S) {
   ucCyl(0.13, 0.18, 2.1, M.bark, 0, 1.05, 0, tree, 9);
   const br = ucCyl(0.06, 0.09, 1.3, M.bark, 0.35, 2.2, 0.1, tree, 7); br.rotation.z = -0.6;
   const br2 = ucCyl(0.05, 0.08, 1.2, M.bark, -0.3, 2.3, -0.1, tree, 7); br2.rotation.z = 0.7;
-  for (const [x, y, z, s] of [[0, 3.0, 0, 1.25], [0.9, 2.7, 0.2, 0.9], [-0.9, 2.8, -0.2, 0.95], [0.2, 3.6, -0.3, 0.85], [-0.3, 2.5, 0.6, 0.8]]) ucMesh(ucBlob(s, r.int(0, 999)), r.next() < 0.5 ? M.leaf : M.leaf2, x, y, z, tree);
+  for (const [x, y, z, s] of [[0, 3.0, 0, 1.25], [0.9, 2.7, 0.2, 0.9], [-0.9, 2.8, -0.2, 0.95], [0.2, 3.6, -0.3, 0.85], [-0.3, 2.5, 0.6, 0.8]]) P.foliage.push(ucMesh(ucBlob(s, r.int(0, 999)), r.next() < 0.5 ? M.leaf : M.leaf2, x, y, z, tree));
   const shed = P.shed = new THREE.Group(); shed.position.set(G.shed[0], 0, G.shed[2]); B.add(shed);
   ucBox(2.2, 2.0, 1.8, M.shed, 0, 1.0, 0, shed);
-  const sr = ucGable(2.4, 2.1, 0.55, M.roof); sr.position.set(0, 2.0, 0); sr.rotation.y = Math.PI / 2; sr.castShadow = true; shed.add(sr);
+  const sr = P.shedRoof = ucGable(2.4, 2.1, 0.55, M.roof); sr.position.set(0, 2.0, 0); sr.rotation.y = Math.PI / 2; sr.castShadow = true; shed.add(sr);
   ucBox(0.8, 1.7, 0.04, ucStd('#3d4638', 0.9), -0.4, 0.9, 0.92, shed);
   // ---------------------------------------------------------------- the telescope (on A, loose: it can float)
   const scope = P.scope = new THREE.Group(); scope.position.set(...G.scope); A.add(scope);
@@ -350,9 +352,11 @@ function ucBuildGarden(app, S) {
   for (let k = 0; k < 3; k++) { const a = k * 2.094 + 0.3; ucRod([Math.sin(a) * 0.48, 0, Math.cos(a) * 0.48], [Math.sin(a) * 0.05, 1.15, Math.cos(a) * 0.05], 0.017, M.black, scope, 6); }
   ucCyl(0.06, 0.06, 0.12, M.black, 0, 0, 0, head, 12);
   const tube = P.tube = new THREE.Group(); tube.position.set(0, 0.1, 0); head.add(tube);
-  { const d = new THREE.Vector3(...ucSkyDir(UC_SKY.saturn.az, UC_SKY.saturn.alt)); tube.lookAt(d.x * 100, d.y * 100 + 1.28, d.z * 100); }
-  const tb = ucCyl(0.058, 0.058, 0.95, M.white, 0, 0, 0, tube, 20); tb.rotation.x = Math.PI / 2; tb.position.z = 0.12;
-  const dew = ucCyl(0.068, 0.066, 0.24, M.black, 0, 0, 0, tube, 20); dew.rotation.x = Math.PI / 2; dew.position.z = 0.66;
+  { const d = new THREE.Vector3(...ucSkyDir(UC_SKY.andromeda.az, UC_SKY.andromeda.alt)); tube.lookAt(d.x * 100, d.y * 100 + 1.28, d.z * 100); }   // (on the Andromeda galaxy, by Mirach)
+  // (the tube is subdivided along its length: it melts and sags later)
+  const tb = ucMesh(new THREE.CylinderGeometry(0.058, 0.058, 0.95, 20, 18), M.white, 0, 0, 0, tube); tb.rotation.x = Math.PI / 2; tb.position.z = 0.12;
+  const dew = ucMesh(new THREE.CylinderGeometry(0.068, 0.066, 0.24, 20, 5), M.black, 0, 0, 0, tube); dew.rotation.x = Math.PI / 2; dew.position.z = 0.66;
+  P.scopeHead = head;
   const fo = ucCyl(0.03, 0.03, 0.12, M.black, 0, 0, 0, tube, 10); fo.rotation.x = Math.PI / 2; fo.position.z = -0.4;
   const ep = ucCyl(0.016, 0.018, 0.08, M.black, 0, 0.04, -0.46, tube, 8); ep.rotation.x = -0.6;
   const fi = ucCyl(0.014, 0.014, 0.22, M.white, 0.07, 0.07, 0.15, tube, 8); fi.rotation.x = Math.PI / 2;
@@ -362,7 +366,9 @@ function ucBuildGarden(app, S) {
   ucCyl(0.11, 0.15, 0.78, M.stone, 0, 0.45, 0, bath, 14);
   const bowl = new THREE.Mesh(new THREE.LatheGeometry([[0.04, 0], [0.32, 0.05], [0.42, 0.14], [0.44, 0.16], [0.4, 0.16], [0.3, 0.08], [0, 0.07]].map(([x, y]) => new THREE.Vector2(x, y)), 24), M.stone);
   bowl.position.y = 0.84; bowl.castShadow = bowl.receiveShadow = true; bath.add(bowl);
+  // the water (8 cm deep, its top at 0.98 m) under a skin of ice, white with frost (garden.js turns one into the other)
   P.bathWater = ucCyl(0.38, 0.38, 0.01, M.water, 0, 0.98, 0, bath, 24);
+  P.bathIce = ucCyl(0.385, 0.385, 0.012, M.ice, 0, 0.985, 0, bath, 24);
   ucCyl(0.02, 0.025, 0.08, M.black, 0, 1.0, 0, bath, 8);                                                // the jet's nozzle
   // ---------------------------------------------------------------- the bistro set (on A), the mug, the lantern
   const table = P.table = new THREE.Group(); table.position.set(...G.table); A.add(table);
@@ -414,7 +420,7 @@ function ucBuildGarden(app, S) {
     for (let i = 0; i < 5; i++) { ucBox(0.05, 1.8, 14, M.fence, -10.9 + i * 5.45, 0.9, -24.6, NB); }
     for (let i = 0; i < 9; i++) shrub(-14 + i * 3.6 + r.range(-0.6, 0.6), -19 - r.range(0, 9), r.range(0.5, 1.1), NB, i % 2 ? M.leaf : M.leaf2);
     const t2 = new THREE.Group(); t2.position.set(6.5, 0, -22); NB.add(t2); ucCyl(0.2, 0.28, 3.2, M.bark, 0, 1.6, 0, t2, 8);
-    for (const [x, y, z, s] of [[0, 4.6, 0, 2.0], [1.4, 4.0, 0.5, 1.4], [-1.3, 4.2, -0.4, 1.5], [0.2, 5.6, 0, 1.3]]) ucMesh(ucBlob(s, r.int(0, 999)), M.leaf, x, y, z, t2);
+    for (const [x, y, z, s] of [[0, 4.6, 0, 2.0], [1.4, 4.0, 0.5, 1.4], [-1.3, 4.2, -0.4, 1.5], [0.2, 5.6, 0, 1.3]]) P.foliage.push(ucMesh(ucBlob(s, r.int(0, 999)), M.leaf, x, y, z, t2));
   }
   { // either side: next door's gardens and the backs of their houses (in line with yours)
     const gl = ucSlab(ccw([[-30, 6], [-W2 - 0.22, 6], [-W2 - 0.22, G.wallZ - 0.32], [-30, G.wallZ - 0.32]]), 9, M.grass, M.strata); NL.add(gl);

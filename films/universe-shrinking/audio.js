@@ -1,5 +1,5 @@
 /* =====================================================================
-   AUDIO — "What if the universe kept expanding faster and faster?" js/audio/audioEngine.js is unchanged (this is a
+   AUDIO — "What if the universe kept shrinking and couldn't stop?" js/audio/audioEngine.js is unchanged (this is a
    subclass); the DSP and generators come from audiokit.js (via the Slower light film). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
      music  an original score (sound-music.js)
@@ -62,7 +62,7 @@ class UcAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'universe-shrinking-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
     return [UC, UC_NKEYS, UCT, window.UC_MIX, Object.values(UCX).map(String).join(''), UcFx.toString(), Object.getOwnPropertyNames(UcFx.prototype).map((k) => String(UcFx.prototype[k])).join(''),
-      Object.values(UC_SOUND).flat().map((b) => b.name + b.fn).join(''), ucDynDb.toString(), UcAudio.toString(), ucLimit.toString(), ucNight.toString(), ucH.toString(), ucLnA.toString(),
+      Object.values(UC_SOUND).flat().map((b) => b.name + b.fn).join(''), ucDynDb.toString(), UcAudio.toString(), ucLimit.toString(), ucNight.toString(), ucH.toString(), ucLnS.toString(),
       UC_SOUND_FNS.map(String).join('')];
   }
   async renderOffline() {

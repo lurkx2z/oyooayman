@@ -62,8 +62,10 @@ UC.steam = ucS('steam') - 0.6;
 UC.leaves = ucS('leaves') - 0.4;
 UC.lawn = ucS('lawn') - 0.6;
 UC.noon = ucS('noon') - 0.5;
+UC.shedAt = ucCap('noon', 1).show;                     // the shed and the fence catch
 UC.shed = ucS('shed') - 0.4;
-UC.scopeAt = ucCap('shed', 1).show - 0.15;             // ★ the telescope melts
+UC.scopeAt = ucW('shed', 'melts').start;               // ★ the telescope melts
+UC.moonGo = ucCap('shed', 1).show;                     // the Moon fades into the sky
 UC.glass = ucS('glass') - 0.5;
 UC.pretend = ucCap('glass', 1).show - 0.2;
 // 6 — the afterglow
@@ -132,10 +134,11 @@ const UC_NKEYS = [
   [ucS('lawn') + 0.1, ucAt(23, 40, 32), 'lin'],                   // the tree and the lawn light
   [ucE('lawn') + 0.6, ucAt(23, 41, 40), 'lin'],
   [ucS('noon') + 0.1, ucAt(23, 42, 0), 'lin'],
-  [ucE('noon') + 0.4, ucAt(23, 42, 40), 'lin'],
-  [ucS('shed') + 0.1, ucAt(23, 42, 52), 'lin'],                   // the shed lights
-  [UC.scopeAt + 0.15, ucAt(23, 43, 50), 'lin'],                   // the telescope's tube melts (660 °C)
-  [ucE('shed') + 0.5, ucAt(23, 44, 20), 'lin'],
+  [UC.shedAt + 0.1, ucAt(23, 42, 52), 'lin'],                     // the shed lights (23:42:50)
+  [ucE('noon') + 0.4, ucAt(23, 43, 41), 'lin'],                   // the fence (23:43:40)
+  [UC.scopeAt + 0.15, ucAt(23, 43, 50), 'lin'],                   // the telescope's tube melts (660 °C, 23:43:49)
+  [UC.moonGo + 0.1, ucAt(23, 44, 6), 'lin'],
+  [ucE('shed') + 0.5, ucAt(23, 44, 30), 'lin'],                   // the Moon is gone (23:44:25)
   [ucS('glass') + 0.1, ucAt(23, 45, 45), 'lin'],                  // the glass softens
   [ucE('glass') + 0.6, ucAt(23, 46, 50), 'lin'],
   [ucS('bath') + 0.1, ucAt(23, 47, 47), 'lin'],                   // the bird bath boils
