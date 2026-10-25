@@ -38,7 +38,7 @@ TF.year = tfS('year') - 0.45;
 TF.yearGo = tfCap('year', 0).hide - 0.2;               // the year runs (sped up)
 TF.yearEnd = tfCap('year', 1).show - 0.1;
 TF.life = tfS('life') - 0.5;
-TF.lifeEnd = tfCap('life', 0).show + 1.4;
+TF.lifeEnd = tfCap('life', 0).hide - 0.4;
 TF.bigBang = tfCap('life', 1).show - 0.2;
 TF.cat = tfS('cat') - 0.5;
 TF.lie = tfS('lie') - 0.45;
@@ -165,8 +165,8 @@ function tfClock(t) {
   if (t >= TF.wd - 1 && t < TF.ns) { const head = tfDayT(t, tfS('wd3') + 0.6, tfE('wd3') - 0.4); return out(head, head * TFP.wd.frac, TFP.wd.frac, 'wd', 'fine'); }
   if (t >= TF.ns && t < TF.bh) { const head = tfDayT(t, tfS('ns5') + 0.4, tfCap('ns5', 0).hide - 0.2); return out(head, head * TFP.ns.frac, TFP.ns.frac, 'ns', 'ms'); }
   if (t >= TF.bh && t < TF.real) { const head = Math.max(0, t - (TF.ten - 30)); return out(head, tfBhGapAt(t), TFP.h / tfRho(t), 'bh', 'ms'); }
-  // home again: the gap since the video started (if you'd been standing)
-  const head = Math.max(0, t - TF.real); return out(head, t * TFP.gapE, TFP.gapE, 'home', 'fine');
+  // home again: the clocks as if they'd started with the video (at 7:00:00) and you'd been standing since
+  return out(t, t * TFP.gapE, TFP.gapE, 'home', 'fine');
 }
 // the head–feet gap on the platform since the platform scenes began (s), by integrating 1 − 1/ratio at 30 Hz
 let TF_BHGAP = null;
