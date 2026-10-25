@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Is it true time moves slower on your feet than your head?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* this film's HUD (page-level only). 16:9 (1920×1080): --u = one design pixel of a 1920-wide frame (set by film.js) */
+    #hud::before { height: 26%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)); }
+    #hud .story-title.big.center { top: calc(var(--u) * 330); width: calc(var(--u) * 1400); margin-left: calc(var(--u) * -700); }
+    #hud .story-title.big.center::before { background: radial-gradient(closest-side, rgba(2, 3, 6, 0.5), rgba(2, 3, 6, 0.2) 62%, rgba(2, 3, 6, 0)); }
+    #hud .story-title.big.center .kick { font-family: var(--book); font-size: calc(var(--u) * 54); font-weight: 600; letter-spacing: 0.06em; }
+    #hud .story-title.big.center .hero { font-family: var(--book); font-size: calc(var(--u) * 124); font-weight: 700; line-height: 1.02; letter-spacing: 0.02em; }
+    #hud .story-title.big.center .kick.k2 { margin-top: calc(var(--u) * 6); font-size: calc(var(--u) * 58); color: #ffcf8a; }
+    #hud .story-title.big.center .main { text-shadow: 0 0 calc(var(--u) * 30) rgba(0, 0, 0, 0.8), 0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.7); }
+    /* the caption: one line, low, on a soft shadow (no plate); numbers amber; the closing question larger */
+    .tf-cap { position: absolute; left: 50%; bottom: calc(var(--u) * 92); transform: translateX(-50%); width: max-content; max-width: calc(var(--u) * 1500); text-align: center;
+      font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 52); line-height: 1.2; color: #f6f1e7; pointer-events: none;
+      text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.85), 0 0 calc(var(--u) * 4) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
+    .tf-cap::before { content: ''; position: absolute; left: -14%; right: -14%; top: -55%; bottom: -55%; z-index: -1;
+      background: radial-gradient(closest-side, rgba(0, 0, 0, 0.56), rgba(0, 0, 0, 0)); }
+    .tf-cap .n { color: #ffcf8a; }
+    .tf-cap.q { bottom: calc(var(--u) * 430); font-size: calc(var(--u) * 82); font-weight: 600; max-width: calc(var(--u) * 1600); }
+    /* the counter (top left, on a soft plate) and the scene's context line under it */
+    .tf-ro, .tf-where { position: absolute; top: calc(var(--u) * 44); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.6); }
+    .tf-ro { left: calc(var(--u) * 52); padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 18); border-radius: calc(var(--u) * 16); background: rgba(6, 8, 12, 0.55); }
+    .tf-ro .l, .tf-where .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.18em; color: #ffffff; opacity: 0.92; }
+    .tf-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
+      font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+    .tf-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
+    .tf-ro .nx { color: #f6efe2; opacity: 0.85; font-size: calc(var(--u) * 22); letter-spacing: 0.12em; }
+    .tf-ro .nx:empty { display: none; }
+    .tf-ctx { position: absolute; left: calc(var(--u) * 52); top: calc(var(--u) * 312); pointer-events: none; padding: calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * 14); border-radius: calc(var(--u) * 14);
+      background: rgba(6, 8, 12, 0.62); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
+    .tf-ctx .l { display: block; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.16em; color: #fff; opacity: 0.8; }
+    .tf-ctx .v { display: block; font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 40); margin-top: calc(var(--u) * 2); color: #ffd7a8; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+    .tf-ctx .v2 { display: block; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #f6efe2; white-space: nowrap; }
+    .tf-ctx .v2:empty { display: none; }
+    .tf-ctx .chip { display: inline-block; margin-right: calc(var(--u) * 18); opacity: 0.38; }
+    .tf-ctx .chip.on { opacity: 1; color: #ffcf8a; }
+    .tf-ctx .chip.hit { opacity: 1; color: #fff; text-shadow: 0 0 calc(var(--u) * 16) rgba(255, 220, 160, 0.95); }
+    .tf-ctx .dim { opacity: 0.55; }
+    /* the honest label (bottom left, under the caption line) */
+    .tf-tag { position: absolute; left: calc(var(--u) * 52); bottom: calc(var(--u) * 26); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 22); letter-spacing: 0.16em;
+      color: #e9e2d4; padding: calc(var(--u) * 7) calc(var(--u) * 16); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
+    /* where you are (top right) and the gravity there */
+    .tf-where { right: calc(var(--u) * 60); text-align: right; }
+    .tf-where .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 46); line-height: 1.05; margin-top: calc(var(--u) * 6); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+    .tf-where .f { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 8); color: #ffd7a8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .tf-where .f:empty { display: none; }
+    .tf-where sup, .tf-ro sup { font-size: 0.6em; }
+    /* the two clocks in full (right, under WHERE): every digit; the digits that differ in amber */
+    .tf-clocks { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 210); padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 16); border-radius: calc(var(--u) * 16);
+      background: rgba(6, 8, 12, 0.6); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
+    .tf-clocks .r { display: flex; align-items: baseline; gap: calc(var(--u) * 18); white-space: nowrap; }
+    .tf-clocks .r + .r { margin-top: calc(var(--u) * 8); }
+    .tf-clocks .k { width: calc(var(--u) * 90); font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 24); letter-spacing: 0.16em; color: #fff; opacity: 0.85; }
+    .tf-clocks .d { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 20); letter-spacing: 0.12em; color: #f6efe2; opacity: 0.7; }
+    .tf-clocks .d:empty { display: none; }
+    .tf-clocks .t { font-family: "JetBrains Mono", monospace; font-weight: 500; font-size: calc(var(--u) * 34); color: #e9e2d4; letter-spacing: 0.01em; }
+    .tf-clocks .t b { font-weight: 600; color: #ffcf8a; }
+    .tf-clocks .g { margin-top: calc(var(--u) * 12); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 22); letter-spacing: 0.12em; color: #f6efe2; white-space: nowrap; }
+    .tf-clocks .g b { font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 1.25em; letter-spacing: 0.02em; color: #ffcf8a; }
+    .tf-ctx sup { font-size: 0.6em; }
+    /* the diagrams (illustrations): right of centre, or large in the middle of the frame */
+    .tf-inset { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 372); width: calc(var(--u) * 800); height: calc(var(--u) * 495); pointer-events: none; }
+    .tf-inset.mid { top: calc(var(--u) * 225); width: calc(var(--u) * 1100); height: calc(var(--u) * 680); }
+    .tf-inset.big { right: auto; left: 50%; margin-left: calc(var(--u) * -620); top: calc(var(--u) * 110); width: calc(var(--u) * 1240); height: calc(var(--u) * 767); }
+    .tf-inset svg { width: 100%; height: 100%; display: block; }
+    .tf-inset .t { font-family: var(--hud-font); font-weight: 700; font-size: 25px; letter-spacing: 0.1em; fill: #f6efe2; }
+    .tf-inset .s { font-family: var(--hud-font); font-weight: 600; font-size: 21px; letter-spacing: 0.12em; fill: #ffd7a8; }
+    .tf-inset .b { font-family: var(--hud-font); font-weight: 600; font-size: 22px; fill: #fff; }
+    .tf-inset .eq { font-family: var(--book); font-weight: 500; font-size: 46px; fill: #f6efe2; }
+    .tf-inset .eq.big { font-size: 64px; fill: #ffcf8a; }
+    /* labels pinned to places */
+    .tf-lab { position: absolute; transform: translate(calc(var(--u) * -14), -50%); pointer-events: none; white-space: nowrap; font-family: var(--hud-font); font-weight: 600;
+      font-size: calc(var(--u) * 34); letter-spacing: 0.08em; color: #f6efe2;
+      text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.9); }
+    /* (the plate sits behind the words only: the ring stays clear, so you see the thing it points at inside it) */
+    .tf-lab .t { display: inline-block; vertical-align: middle; padding: calc(var(--u) * 6) calc(var(--u) * 14); border-radius: calc(var(--u) * 10); background: rgba(4, 6, 10, 0.55); }
+    .tf-lab small { display: block; font-size: 0.75em; opacity: 0.9; color: #ffd7a8; }
+    .tf-lab .d { display: inline-block; width: calc(var(--u) * 28); height: calc(var(--u) * 28); border-radius: 50%; margin-right: calc(var(--u) * 8);
+      box-shadow: 0 0 0 calc(var(--u) * 2.5) rgba(255, 215, 168, 0.85); vertical-align: middle; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="hud"></div>
+    </div>
+  </div>
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">Is it true time moves slower on your feet than your head?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">STARTING THE CLOCKS…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine (unchanged; this film only configures and extends it from its own folder) -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script>installFog({ bankScale: 0.012, bankAmount: 0.0, lowHeight: 6, lowAmount: 0.0, cap: 0.9 });</script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/fx/mirror.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/world/earth.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (plan: films/time-on-your-feet/PLAN.md; captions: films/time-on-your-feet/CAPTIONS.md) -->
+  <script src="films/time-on-your-feet/timing.js"></script>
+  <script src="films/time-on-your-feet/physics.js"></script>
+  <script src="films/time-on-your-feet/script.js"></script>
+  <script src="films/time-on-your-feet/kit.js"></script>
+  <script src="films/time-on-your-feet/film.js"></script>
+  <script src="films/time-on-your-feet/body.js"></script>
+  <script src="films/time-on-your-feet/cat.js"></script>
+  <script src="films/time-on-your-feet/home.js"></script>
+  <script src="films/time-on-your-feet/lab.js"></script>
+  <script src="films/time-on-your-feet/tower.js"></script>
+  <script src="films/time-on-your-feet/orbit.js"></script>
+  <script src="films/time-on-your-feet/space.js"></script>
+  <script src="films/time-on-your-feet/wd.js"></script>
+  <script src="films/time-on-your-feet/ns.js"></script>
+  <script src="films/time-on-your-feet/bh.js"></script>
+  <script src="films/time-on-your-feet/shots.js"></script>
+  <script src="films/time-on-your-feet/hud.js"></script>
+  <script src="films/time-on-your-feet/audiokit.js"></script>
+  <script src="films/time-on-your-feet/mix.js"></script>
+  <script src="films/time-on-your-feet/audio.js"></script>
+  <script src="films/time-on-your-feet/sound-lib.js"></script>
+  <script src="films/time-on-your-feet/sound-music.js"></script>
+  <script src="films/time-on-your-feet/sound-amb.js"></script>
+  <script src="films/time-on-your-feet/sound-sfx.js"></script>
+  <script src="films/time-on-your-feet/soundtrack.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
