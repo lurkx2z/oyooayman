@@ -66,12 +66,14 @@ function ntTower(scene, T, o = {}) {
   // the roof edge, and the North Tower's antenna
   const roofM = new THREE.MeshStandardMaterial({ color: '#8a8e94', metalness: 0.5, roughness: 0.5 });
   const rf = new THREE.Mesh(new THREE.BoxGeometry(w + 0.3, 1.4, w + 0.3), roofM); rf.position.y = h - 0.7; g.add(rf);
-  if (o.antenna) {
-    const am = new THREE.MeshStandardMaterial({ color: '#6c7076', metalness: 0.6, roughness: 0.45 });
-    const m1 = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 2.6, 110, 10), am); m1.position.y = h + 55; g.add(m1);
-    for (const [y, r] of [[h + 2, 6], [h + 26, 3.4], [h + 52, 2.6]]) { const ring = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 2.4, 12), am); ring.position.y = y; g.add(ring); }
+  const ant = [];
+  if (o.antenna) {   // (dark against the sky, as in the photographs: a lattice mast reads as a dark rod from the street)
+    const am = new THREE.MeshStandardMaterial({ color: '#34373b', metalness: 0.5, roughness: 0.55 });
+    const m1 = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 3.3, 110, 10), am); m1.position.y = h + 55; g.add(m1); ant.push(m1);
+    for (const [y, r] of [[h + 2, 6.5], [h + 26, 4.2], [h + 52, 3.3]]) { const ring = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 2.6, 12), am); ring.position.y = y; g.add(ring); ant.push(ring); }
+    for (const a of ant) a.userData.y0 = a.position.y;
   }
-  return { g, body, mat };
+  return { g, body, mat, ant };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -180,7 +182,16 @@ function ntCity(scene, o = {}) {
 }
 // the plaza and the low buildings of the World Trade Center around it (3, 4, 5, 6 WTC: about 9 and 22 floors)
 function ntPlaza(scene) {
-  const m = new THREE.MeshStandardMaterial({ color: '#2c2b2c', roughness: 0.55, metalness: 0.3 });
+  // (4, 5 and 6 WTC: dark bronze-clad, with continuous bands of windows; one 10 m tile = 3 floors)
+  const skin = ntTex(ntCanvas(256, 256, (g, W, H) => {
+    g.fillStyle = '#2b2622'; g.fillRect(0, 0, W, H);
+    for (let f = 0; f < 3; f++) {
+      const y0 = f * H / 3 + 14, hh = H / 3 * 0.5, gr = g.createLinearGradient(0, y0, 0, y0 + hh);
+      gr.addColorStop(0, '#59626c'); gr.addColorStop(1, '#3a4148'); g.fillStyle = gr; g.fillRect(0, y0, W, hh);
+      g.fillStyle = '#211d1a'; for (let x = 0; x < W; x += 16) g.fillRect(x, y0, 3, hh);
+    }
+  }));
+  const m = new THREE.MeshStandardMaterial({ color: '#ffffff', map: skin, roughness: 0.5, metalness: 0.35 });
   const A = { pos: [], nor: [], uv: [], idx: [] };
   for (const [x0, x1, z0, z1, h] of [[-120, -45, 40, 105, 80], [60, 140, 150, 210, 36], [85, 145, -60, 70, 36], [-120, -40, -110, -50, 36], [70, 135, -150, -80, 36]]) ntBoxInto(A, x0, x1, 0, h, z0, z1);
   const low = new THREE.Mesh(ntGeoFrom(A), m); scene.add(low); low.castShadow = low.receiveShadow = true;

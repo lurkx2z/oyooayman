@@ -14,7 +14,7 @@ window.NT_MIX = {
     amb: [],
     sfx: [],
   },
-  master: 9,
+  master: 12.5,
   eq: [['lowshelf', 110, -2.5], ['highshelf', 3500, 2]],
   ceiling: -1.5,   // dBTP, the limiter's ceiling (ntLimit)
 };

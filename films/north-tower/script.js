@@ -60,7 +60,8 @@ NT.five = ntS('five') - 0.6;                             // up the stairs, out o
 NT.back = ntS('back') - 0.5;                             // you look back
 // 4 — 9:59, 10:28
 NT.roarShot = ntS('nine59') - 0.6;
-NT.roar = ntCap('nine59', 1).show - 1.2;                 // ★ 9:58:59 — the roar starts
+NT.roar = ntS('nine59') - 0.2;                           // ★ 9:58:59 (+1.2 s) — the South Tower starts to fall
+NT.run = ntCap('nine59', 2).show + 0.8;                  // you turn and run
 NT.cloudHit = ntS('cloud') - 0.4;                        // ★ the cloud reaches you
 NT.cloud = ntS('cloud') - 1.6;
 NT.grey = ntS('grey') - 1.6;
@@ -72,13 +73,15 @@ NT.out = ntS('out') - 1.6;
 NT.how = ntS('how') - 0.6;
 NT.cost = ntS('cost') - 1.2;
 NT.light = ntS('light') - 1.4;
-NT.card = ntE('light') + 1.2;                            // the remembrance card
+NT.card = ntE('light') + 3.5;                            // the remembrance card (the beams alone first)
 NT.end = NTT.duration;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FILM TIME → THE CLOCK THIS MORNING (s after midnight), linear between keys (the film runs about real time in the
 // moments that matter and sped up between them; the clock never runs backwards)
 // ---------------------------------------------------------------------------------------------------------------------
+// a stair shot's two clock keys: it starts at c0 and runs 3× until just before the cut
+const ntShotClock = (t0, t1, c0) => [[t0, c0], [t1 - 0.001, c0 + 3 * (t1 - t0)]];
 const NT_CKEYS = [
   [0, ntAt(8, 40, 52)],
   [NT.sky + 1.5, ntAt(8, 41, 6)],
@@ -87,19 +90,24 @@ const NT_CKEYS = [
   [NT.after, ntAt(8, 46, 58)],
   [NT.nobody, ntAt(8, 47, 50)],
   [NT.go, ntAt(8, 49, 20)],
-  [NT.stair, ntAt(8, 50, 10)],
-  [NT.second, ntAt(9, 2, 40)],
+  // (on the stairs the clock runs 3× inside a shot, about your pace on screen, and jumps at the cuts)
+  ...ntShotClock(NT.stair, NT.glow, ntAt(8, 50, 10)),
+  ...ntShotClock(NT.glow, NT.pace, ntAt(8, 53, 30)),
+  ...ntShotClock(NT.pace, NT.second, ntAt(8, 57, 0)),
+  [NT.second, ntAt(9, 3, 11) - (NT.shake - NT.second)],
   [NT.shake, ntAt(9, 3, 11)],                                      // ★ Flight 175
-  [NT.calm, ntAt(9, 5, 0)],
-  [NT.transfer, ntAt(9, 19, 30)],
-  [NT.ff, ntAt(9, 27, 0)],
-  [NT.water, ntAt(9, 35, 0)],
-  [NT.thin, ntAt(9, 39, 30)],
-  [NT.mezz, ntAt(9, 42, 0)],
-  [NT.esc, ntAt(9, 45, 30)],
-  [NT.five, ntAt(9, 50, 0)],
-  [NT.back, ntAt(9, 53, 0)],
-  [NT.roar, ntAt(9, 58, 59)],                                      // ★ the South Tower
+  [NT.calm - 0.001, ntAt(9, 3, 11) + 3 * (NT.calm - NT.shake)],
+  ...ntShotClock(NT.calm, NT.right, ntAt(9, 5, 0)),
+  ...ntShotClock(NT.right, NT.transfer, ntAt(9, 9, 0)),
+  ...ntShotClock(NT.transfer, NT.ff, ntAt(9, 15, 0)),
+  ...ntShotClock(NT.ff, NT.water, ntAt(9, 27, 0)),
+  ...ntShotClock(NT.water, NT.thin, ntAt(9, 38, 0)),
+  ...ntShotClock(NT.thin, NT.mezz, ntAt(9, 43, 0)),
+  [NT.mezz, ntAt(9, 45, 0)],
+  [NT.esc, ntAt(9, 47, 30)],
+  [NT.five, ntAt(9, 52, 0)],
+  [NT.back, ntAt(9, 56, 0)],
+  [ntS('nine59') - 0.05, ntAt(9, 58, 59)],                         // ★ the South Tower (it starts to fall a second later)
   [NT.cloudHit, ntAt(9, 59, 25)],
   [NT.grey, ntAt(10, 0, 30)],
   [NT.walk, ntAt(10, 6, 0)],
@@ -117,9 +125,10 @@ function ntClock(t) {
 function ntFilmAt(c) { let lo = 0, hi = NT.out; for (let i = 0; i < 50; i++) { const m = 0.5 * (lo + hi); if (ntClock(m) < c) lo = m; else hi = m; } return 0.5 * (lo + hi); }
 
 // the floor you are on, keyed to the clock (linear in clock time between keys; shown as a whole floor)
+// (each stair shot starts on its key floor and walks down from there at the crowd's pace: stair.js)
 const NT_FKEYS = [
-  [ntAt(8, 50, 10), 73], [ntAt(9, 3, 11), 66], [ntAt(9, 19, 30), 48], [ntAt(9, 21, 0), 47], [ntAt(9, 27, 0), 37],
-  [ntAt(9, 35, 0), 20], [ntAt(9, 39, 30), 8], [ntAt(9, 41, 30), 1],
+  [ntAt(8, 50, 10), 73], [ntAt(8, 53, 30), 70], [ntAt(8, 57, 0), 67], [ntAt(9, 3, 0), 62], [ntAt(9, 5, 0), 60],
+  [ntAt(9, 9, 0), 55], [ntAt(9, 15, 0), 48], [ntAt(9, 27, 0), 37], [ntAt(9, 38, 0), 20], [ntAt(9, 43, 0), 8], [ntAt(9, 44, 40), 1],
 ];
 function ntFloorF(t) {
   const c = ntClock(t), K = NT_FKEYS;

@@ -13,9 +13,9 @@ status: voiceless
 
 [sky] 8:41 AM. The sky is perfectly clear. / You can see for miles.
 
-[tower] About 8,900 people are in this building. / 110 floors. A quarter of a mile of steel.
+[tower] About 8,900 people are in your tower. / 110 floors. A quarter of a mile of steel.
 
-[windows] Each window is 22 inches wide. / The architect was afraid of heights.
+[windows] Each window is 22 inches wide. / The plaza is almost 900 feet below.
 
 [impact] 8:46. / Something hits the building. Far above you. / The whole tower sways. And sways back.
 
@@ -25,15 +25,15 @@ status: voiceless
 
 [nobody] The speakers are silent. Nobody tells you anything. / Some people want to wait. / You take your bag. You go.
 
-[known] You don't know it yet. / A plane has hit floors 93 to 99. / Above the 91st floor, all three stairways are gone.
+[known] You don't know it yet. / A plane has hit floors 93 to 99. / From the 92nd floor up, all three stairways are blocked.
 
 [stair] Stairway C. 44 inches wide. / Two people side by side. Thousands of people.
 
-[glow] After the 1993 bombing, the steps were marked with glowing paint. / Today it leads you down.
+[glow] After the 1993 bombing, the steps got glowing paint. / Where the lights fail, it still shows the way.
 
 [pace] About one floor a minute. / It smells of kerosene. Jet fuel.
 
-[second] 9:03. / The stairway shakes. / A second plane has hit the South Tower. / In here, almost nobody knows.
+[second] 9:03. / The stairway shakes. / A second plane has hit the South Tower. / Most people in here don't know.
 
 [calm] Mostly, it's calm. / People pass water down the line. / Someone says: "We're okay. Keep going."
 
@@ -43,7 +43,7 @@ status: voiceless
 
 [ff] Floor 37. Firefighters. / They're coming up. / Each one carries more than 60 pounds of gear. / They stop every few floors to breathe.
 
-[ff2] Everyone else is going down. / You press against the wall to let them pass.
+[ff2] Everyone else is going down. / You squeeze to one side to let them pass.
 
 [water] Floor 20. Water is running down the stairs. / Pipes have broken. Your shoes are soaked.
 
@@ -73,6 +73,6 @@ status: voiceless
 
 [how] Down the stairs. Helping each other. / Past the people who were climbing up.
 
-[cost] 2,977 people were killed on September 11, 2001. / 2,753 of them in New York. / 343 of them were firefighters.
+[cost] 2,977 people were killed on September 11, 2001. / 2,753 of them in New York. / 343 were firefighters. 60 were police officers.
 
-[light] Every year, two beams of light rise where the towers stood.
+[light] Every September 11, two beams of light rise over Lower Manhattan.

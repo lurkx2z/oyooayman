@@ -20,27 +20,22 @@ const NT_WHERE = [
   [NT.morning + 0.6, NT.known, 'FLOOR', () => '73', 'NORTH TOWER · 1 WORLD TRADE CENTER'],
   [NT.known, NT.stair, 'FLOOR', () => '73', 'THE CORE · STAIRWAY C'],
   [NT.stair, NT.transfer, 'FLOOR', (t) => String(ntFloorNow(t)), 'NORTH TOWER · STAIRWAY C'],
-  [NT.transfer, NT.transfer + 4.5, 'FLOOR', () => '48', 'THE TRANSFER HALLWAY'],
-  [NT.transfer + 4.5, NT.mezz, 'FLOOR', (t) => String(ntFloorNow(t)), 'NORTH TOWER · STAIRWAY C'],
+  [NT.transfer, NT.ff, 'FLOOR', () => '48', 'THE TRANSFER HALLWAY'],
+  [NT.ff, NT.mezz, 'FLOOR', (t) => String(ntFloorNow(t)), 'NORTH TOWER · STAIRWAY C'],
   [NT.mezz, NT.esc, 'PLAZA LEVEL', () => 'MEZZANINE', 'NORTH TOWER'],
   [NT.esc, NT.five, 'BELOW THE PLAZA', () => 'CONCOURSE', 'THE SHOPPING MALL'],
   [NT.five, NT.walk, 'OUTSIDE', () => 'VESEY STREET', 'NORTH OF THE TOWERS'],
   [NT.walk, NT.out - 0.4, 'OUTSIDE', () => 'WEST BROADWAY', 'WALKING NORTH'],
 ];
 // the scene's context line: [from, to, label, value(t)] (value: text, or { l, v, v2 } with HTML)
-const ntSince = (t) => { const s = Math.max(0, ntClock(t) - NT_HIT), m = Math.floor(s / 60); return m < 1 ? `${Math.floor(s)} SECONDS` : `${m} MINUTE${m === 1 ? '' : 'S'}`; };
+const ntSince = (t) => { const s = Math.max(0, ntClock(t) - NT_HIT), m = Math.floor(s / 60); return m < 1 ? 'UNDER A MINUTE' : `${m} MINUTE${m === 1 ? '' : 'S'}`; };
 const NT_CTX = [
-  [ntS('tower') - 0.2, NT.windows - 0.3, 'THE NORTH TOWER', () => ({ v: '1,368 ft · 110 FLOORS', v2: 'ABOUT 8,900 PEOPLE INSIDE AT 8:46' })],
-  [ntS('windows') - 0.2, NT.impactShot - 0.3, 'EACH WINDOW', () => ({ v: '22 in WIDE', v2: 'STEEL COLUMNS JUST OVER A YARD APART' })],
   [ntCap('impact', 2).show - 0.2, NT.known - 0.3, 'SINCE THE IMPACT', (t) => ({ v: ntSince(t), v2: t > ntCap('nobody', 0).show ? 'NO ANNOUNCEMENT REACHES YOU' : '' })],
   [ntS('known') + 0.2, NT.stair - 0.3, 'THE IMPACT', () => ({ v: 'FLOORS 93 TO 99', v2: '20 FLOORS ABOVE YOU' })],
-  [ntCap('stair', 0).show - 0.2, NT.glow - 0.3, 'STAIRWAY C', () => ({ v: '44 in WIDE', v2: 'TWO PEOPLE SIDE BY SIDE' })],
   [ntS('pace') - 0.2, NT.second - 0.3, 'SINCE THE IMPACT', (t) => ({ v: ntSince(t), v2: '' })],
-  [ntCap('second', 2).show - 0.2, NT.calm - 0.3, 'THE SOUTH TOWER', () => ({ v: 'HIT AT 9:03', v2: 'FLOORS 77 TO 85' })],
   [ntS('calm'), NT.transfer - 0.3, 'SINCE THE IMPACT', (t) => ({ v: ntSince(t), v2: '' })],
-  [ntS('ff') - 0.2, NT.water - 0.3, 'GOING UP', () => ({ v: 'FIREFIGHTERS', v2: 'ON FOOT · THE ELEVATORS ARE OUT' })],
+  [ntS('ff') - 0.2, NT.water - 0.3, 'GOING UP', () => ({ v: 'FIREFIGHTERS', v2: 'ON FOOT · MOST ELEVATORS ARE OUT' })],
   [ntS('water'), NT.mezz - 0.3, 'SINCE THE IMPACT', (t) => ({ v: ntSince(t), v2: '' })],
-  [ntS('nine59') + 2.0, NT.cloud - 0.3, 'THE SOUTH TOWER', () => ({ v: 'COLLAPSES IN 10 SECONDS', v2: '56 MINUTES AFTER IT WAS HIT' })],
 ];
 // the honest labels: [from, to, text]
 const NT_TAGS = [

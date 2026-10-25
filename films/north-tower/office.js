@@ -154,7 +154,7 @@ NT_SETS.office = (app) => {
   // ---- the ceiling tiles that fall, and the ones left hanging
   const tileM = ntStd('#e2ded6', 0.9, 0, { map: tileTex.clone() });
   tileM.map.repeat.set(1, 1);
-  const tiles = [[-1.8, 28.2, 0.15, 0.6], [0.6, 26.4, 0.55, 1.4], [-4.9, 25.8, 0.9, 0.3], [2.4, 29.1, 1.25, 2.2], [-6.5, 27.6, 1.6, 1.1]].map(([x, z, delay, spin]) => {
+  const tiles = [[-1.8, 28.2, 0.15, 0.6], [0.6, 26.4, 0.55, 1.4], [-4.9, 25.8, 0.9, 0.3], [2.4, 29.1, 1.25, 2.2], [-6.5, 27.6, 1.6, 1.1], [3.2, 27.6, 2.3, 1.7], [0.2, 24.4, NT.after + 1.1 - NT.hit, 0.9]].map(([x, z, delay, spin]) => {
     const m = ntBox(0.6, 0.016, 1.2, tileM, x, Y + NT_CEIL - 0.01, z); m.castShadow = true; return { m, x, z, delay, spin };
   });
   const holes = tiles.map((T) => { const h = ntBox(0.6, 0.01, 1.2, ntStd('#1a1816', 1), T.x, Y + NT_CEIL + 0.002, T.z); h.visible = false; return h; });
@@ -169,21 +169,21 @@ NT_SETS.office = (app) => {
   ].map((c, i) => Object.assign(c, { p: ntPerson(scene, 'off' + i, c.look) }));
 
   // ---- falling paper outside (burning ones glow at the edges), pure time
-  const NPAP = 700, papG = new THREE.PlaneGeometry(0.22, 0.28);
-  const papM = new THREE.MeshStandardMaterial({ color: '#f4f2ec', roughness: 0.9, side: THREE.DoubleSide, emissive: '#ffffff', emissiveIntensity: 0.12 });
-  const burnM = new THREE.MeshStandardMaterial({ color: '#d8c8b0', roughness: 0.9, side: THREE.DoubleSide, emissive: '#ff6a1a', emissiveIntensity: 1.2 });
-  const paper = new THREE.InstancedMesh(papG, papM, NPAP), burn = new THREE.InstancedMesh(papG, burnM, 40);
+  const NPAP = 1500, papG = new THREE.PlaneGeometry(0.22, 0.28);
+  const papM = new THREE.MeshStandardMaterial({ color: '#f4f2ec', roughness: 0.9, side: THREE.DoubleSide, emissive: '#ffffff', emissiveIntensity: 0.4 });
+  const burnM = new THREE.MeshStandardMaterial({ color: '#d8c8b0', roughness: 0.9, side: THREE.DoubleSide, emissive: '#ff6a1a', emissiveIntensity: 0.55 });
+  const paper = new THREE.InstancedMesh(papG, papM, NPAP), burn = new THREE.InstancedMesh(papG, burnM, 10);
   paper.frustumCulled = burn.frustumCulled = false; scene.add(paper); scene.add(burn);
   const _q = new THREE.Quaternion(), _e = new THREE.Euler(), _s = new THREE.Vector3(1, 1, 1), _p = new THREE.Vector3();
   function paperAt(t) {
     let nB = 0;
-    for (let i = 0; i < NPAP + 40; i++) {
+    for (let i = 0; i < NPAP + 10; i++) {
       const isB = i >= NPAP, k = isB ? i - NPAP : i, h = hash1(i * 17 + 3), h2 = hash1(i * 29 + 5), h3 = hash1(i * 43 + 7);
-      const t0 = NT.hit + 3 + h * 30, a = t - t0;
+      const t0 = NT.hit + 3 + h * 26, a = t - t0;
       const vis = a > 0 && t < NT.known;
       if (vis) {
         const fall = 1.1 + h2 * 0.9;
-        _p.set(-34 + h3 * 68 + Math.sin(a * 0.7 + i) * 2 + NT_WIND[0] * 0.2 * a, Y + 12 + 40 * hash1(i * 7 + 9) - fall * a, O.zWall + 1.2 + h2 * h2 * 34 + NT_WIND[2] * 0.15 * a);
+        _p.set(-22 + h3 * 44 + Math.sin(a * 0.7 + i) * 2 + NT_WIND[0] * 0.2 * a, Y + 6 + 34 * hash1(i * 7 + 9) - fall * a, O.zWall + 0.9 + h2 * h2 * 24 + NT_WIND[2] * 0.15 * a);
         _e.set(a * (1.2 + h) + i, a * (0.9 + h3) + i * 0.3, Math.sin(a * 2 + i) * 0.8); _q.setFromEuler(_e);
       } else _p.set(0, -9999, 0);
       _m.compose(_p, _q, _s);
@@ -197,21 +197,22 @@ NT_SETS.office = (app) => {
   const dust = ntPuffs(scene, 400, { additive: true });
   // and the black smoke that pours down close past your windows a minute later (survivors on the floors below the
   // impact saw it: the fire's smoke caught in the wind against the face of the tower)
-  const pour = ntPuffs(scene, 600, { soft: 1.0 });
+  const pour = ntPuffs(scene, 1000, { soft: 0.7 });
   function pourAt(t) {
     pour.begin();
-    if (t > NT.hit + 8) for (let i = 0; i < 560; i++) {
-      const a = t - (NT.hit + 8 + i * 0.06), h = hash1(i * 13 + 41), h2 = hash1(i * 19 + 43), h3 = hash1(i * 31 + 47);
+    if (t > NT.hit + 8) for (let i = 0; i < 950; i++) {
+      const a = t - (NT.hit + 8 + i * 0.036), h = hash1(i * 13 + 41), h2 = hash1(i * 19 + 43), h3 = hash1(i * 31 + 47);
       if (a < 0 || a > 20) continue;
       const x = -18 + h * 32 + NT_WIND[0] * 0.3 * a + noise1(a * 0.2 + i, 3) * 2;
-      const y = Y + 16 - (0.9 + 0.8 * h2) * a + noise1(a * 0.15 + i, 5) * 1.5, z = O.zWall + 2.6 + h3 * 10 + 0.25 * a;
+      const y = Y + 16 - (0.9 + 0.8 * h2) * a + noise1(a * 0.15 + i, 5) * 1.5, z = O.zWall + 1.0 + h3 * 7 + 0.2 * a;
       const c = 0.012 + 0.03 * h3;
-      const clump = 0.4 + 0.6 * MathX.smooth(noise1((NT.hit + 8 + i * 0.06) * 0.35, 17) + 0.25 * noise1(i * 0.37, 19), -0.3, 0.3);   // (it comes in gusts)
-      pour.add(x, y, z, 2.2 + 0.35 * a + 2 * h2, 0.9 * clump * MathX.smooth(a, 0, 2) * (1 - MathX.smooth(a, 14, 20)), c, c * 0.98, c * 0.95);
+      const clump = 0.4 + 0.6 * MathX.smooth(noise1((NT.hit + 8 + i * 0.036) * 0.35, 17) + 0.25 * noise1(i * 0.37, 19), -0.3, 0.3);   // (it comes in gusts)
+      pour.add(x, y, z, 1.3 + 0.24 * a + 1.3 * h2, Math.min(1, 1.25 * clump) * MathX.smooth(a, 0, 2) * (1 - MathX.smooth(a, 14, 20)), c, c * 0.98, c * 0.95);
     }
     pour.end();
   }
 
+  function ntSmokeDark(t) { return MathX.smooth(t, NT.hit + 14, NT.hit + 20) * (0.55 + 0.45 * MathX.smooth(noise1(t * 0.35, 17), -0.4, 0.4)); }
   // ---- the camera, by mode
   const cam = S.camera;
   const E = (Y + 1.62), SEAT = Y + 1.2;
@@ -225,7 +226,8 @@ NT_SETS.office = (app) => {
       case 'sky': { const k = Ease.inOutSine(u(NT.sky, NT.tower)), x = slit(-7.6); return [[x, E, 31.66 + 0.08 * k], [x - 330 - 40 * k, Y - 50 + 100 * k, 31 + 520], 52]; }
       case 'tower': { const k = u(NT.tower, NT.windows), x = slit(9.5); return [[x, E - 0.1, 31.64], [x + 18 - 6 * k, Y + 8 + 52 * Ease.inOutSine(k), 122], 58]; }
       case 'down': { const k = Ease.inOutSine(u(NT.windows, NT.impactShot)), x = slit(0.5); return [[x, E - 0.3, 31.76 + 0.05 * k], [x + 0.2, Y - 60 - 32 * k, 31.6 + 60 - 6 * k], 62]; }
-      case 'impact': case 'after': { const k = u(NT.impactShot, NT.outside); return [[MY.x + 0.1, s.mode === 'after' ? E : SEAT + 0.1, MY.z - 0.3 - 0.6 * MathX.smooth(t, NT.hit + 1, NT.after + 2)], s.mode === 'after' ? [MY.x + 3.2, Y + NT_CEIL - 0.1, MY.z - 4.5] : [MY.x + 0.2, Y + 1.15, MY.z + 3.0], 54 + 2 * k]; }
+      case 'impact': return [[MY.x + 0.1, SEAT + 0.1, MY.z - 0.45], [MY.x + 9, Y + 1.75 - 0.25 * MathX.smooth(t, NT.hit + 2, NT.after), MY.z - 3.2], 62];
+      case 'after': { const k = u(NT.after, NT.outside); return [[MY.x + 0.1, E, MY.z - 0.9 - 0.3 * k], [MY.x + 3.2, Y + NT_CEIL - 0.1, MY.z - 4.5], 56 + 2 * k]; }
       case 'outside': { const k = u(NT.outside, NT.nobody), x = slit(-2.2); return [[x, E, 31.62 + 0.12 * k], [x + 6 * k, Y + 9 - 14 * k, 31 + 34], 56]; }
       case 'nobody': {
         const w = MathX.smooth(t, NT.go, NT.known + 0.3), P = ntSpline([[0, MY.x + 0.1, MY.z - 0.9], [0.35, MY.x + 1.6, MY.z - 1.3], [0.7, MY.x + 3.1, 22.3], [1, 3.1, 17.4]], w);
@@ -262,13 +264,14 @@ NT_SETS.office = (app) => {
       const after = t >= NT.hit;
       // the camera, the jolt and the sway (the whole floor moves with you: the outside swings the other way)
       const [p, at, fov] = view(t, s);
-      const j = ntJolt(t, NT.hit, 1.6, 1.4), sw = ntSway(t, NT.hit, 1.0, 6.5, 12), j2 = ntJolt(t, NT.hit + 0.25, 0.6, 2.4, 6);
+      const j = ntJolt(t, NT.hit, 2.3, 1.4), sw = ntSway(t, NT.hit, 1.7, 6.5, 12), j2 = ntJolt(t, NT.hit + 0.25, 0.8, 2.4, 6);
       const d = ntDrift(t, s.mode === 'nobody' || s.mode === 'core' ? 0.012 : 0.006, 0.4, 3);
       ntCam(cam, [p[0] + d[0] + j[0] + j2[0] + sw[0], p[1] + d[1] + j[1] + j2[1], p[2] + d[2]], at, fov, j[2] + j2[2] + sw[1]);
       // the troffers: steady; at 8:46 they flicker, a few stay out
-      const fl = after ? MathX.clamp(1 - 0.85 * Math.max(0, noise1(t * 17, 5)) * Math.exp(-(t - NT.hit) / 2.5) - 0.5 * (MathX.smooth(t, NT.hit, NT.hit + 0.05) * (1 - MathX.smooth(t, NT.hit + 0.15, NT.hit + 0.7))), 0, 1) : 1;
+      const fl = after ? MathX.clamp(1 - 0.85 * Math.max(0, noise1(t * 17, 5)) * Math.max(Math.exp(-(t - NT.hit) / 2.5), s.mode === 'after' ? 0.55 * Math.max(0, noise1(t * 0.9, 6)) : 0) - 0.5 * (MathX.smooth(t, NT.hit, NT.hit + 0.05) * (1 - MathX.smooth(t, NT.hit + 0.15, NT.hit + 0.7))), 0, 1) : 1;
       trM.emissiveIntensity = fl * (after ? 0.92 : 1.0); ceilM.emissiveIntensity = 0.22 * fl * (after ? 0.9 : 1);
-      S.hemi.intensity = 0.75 * (0.75 + 0.25 * fl);
+      const sd = ntSmokeDark(t);
+      S.hemi.intensity = 0.75 * (0.75 + 0.25 * fl) * (1 - 0.3 * sd); S.sun.intensity = 2.6 * (1 - 0.6 * sd);
       // the screen
       const cm = Math.floor(ntClockParts(ntClock(t)).m % 10);
       screen.update({ on: !(after && t < NT.hit + 0.6) && t < NT.nobody + 3, m: cm, glitch: after && t < NT.hit + 3 ? Math.floor(t * 12) : 0 });
@@ -323,14 +326,16 @@ NT_SETS.office = (app) => {
       p.exposure = s.mode === 'down' || s.mode === 'sky' ? 0.95 : 1.02; p.saturation = 0.98; p.contrast = 1.05; p.warmth = 0.04; p.bloom = 0.32; p.bloomThreshold = 0.88;
       if (s.mode === 'core') { p.exposure = 0.96; p.warmth = 0.02; }
       // the jolt: a flash of the lights going, a little smear
-      if (t >= NT.hit && t < NT.hit + 1.2) { const a = t - NT.hit; p.exposure *= 1 - 0.35 * Math.exp(-a * 6) * (0.5 + 0.5 * Math.sin(a * 60)); p.chroma = 0.6 * Math.exp(-a * 4); }
+      if (t >= NT.hit && t < NT.hit + 1.2) { const a = t - NT.hit; p.exposure *= 1 - 0.35 * Math.exp(-a * 6) * (0.5 + 0.5 * Math.sin(a * 60)); }
+      // the smoke outside darkens the floor
+      p.exposure *= 1 - 0.3 * ntSmokeDark(t);
       p.fade = Math.max(p.fade, 1 - MathX.smooth(t, 0, 0.35));
     },
     labels(t) {
       const s = ntShotAt(t), W = StoryHUD.win;
-      if (s.mode === 'tower') return [{ p: [NT_TW.S.x - 20, NT_Y73 + 34, NT_TW.S.z - 32], text: 'THE SOUTH TOWER', sub: '2 WORLD TRADE CENTER', a: W(t, NT.tower + 1.0, NT.windows - 0.3, 0.5, 0.4) }];
+      if (s.mode === 'tower') return [{ p: [NT_TW.S.x - 20, NT_Y73 + 34, NT_TW.S.z - 32], text: 'THE SOUTH TOWER', sub: 'YOUR TOWER’S TWIN', a: W(t, NT.tower + 1.0, NT.windows - 0.3, 0.5, 0.4) }];
       if (s.mode === 'sky') return [{ p: [-1000, 0, 1150], text: 'THE HUDSON', sub: 'NEW JERSEY BEYOND', a: W(t, ntCap('sky', 1).show - 0.3, NT.tower - 0.3, 0.5, 0.4) }];
-      if (s.mode === 'down') return [{ p: [0.5, 0, 140], text: 'THE PLAZA', sub: '267 m BELOW', a: W(t, ntCap('windows', 0).show + 0.4, NT.impactShot - 0.3, 0.5, 0.4) }];
+      if (s.mode === 'down') return [{ p: [0.5, 0, 140], text: 'THE PLAZA', sub: 'ABOUT 880 ft BELOW', a: W(t, ntCap('windows', 0).show + 0.4, NT.impactShot - 0.3, 0.5, 0.4) }];
       return [];
     },
   };

@@ -229,9 +229,11 @@ function ntPuffs(scene, max = 6000, o = {}) {
       void main(){ vA = iAlpha; vC = iCol; vQ = position.xy * 2.0; vec4 mv = viewMatrix * vec4(iPos, 1.0); mv.xy += position.xy * iSize; vD = -mv.z; gl_Position = projectionMatrix * mv; }`,
     fragmentShader: `uniform vec3 fogCol; uniform float fogDen, soft; varying float vA; varying vec3 vC; varying float vD; varying vec2 vQ;
       void main(){ float r = dot(vQ, vQ); if (r > 1.0) discard; float a = vA * pow(1.0 - r, soft);
-        float f = 1.0 - exp(-fogDen * vD); gl_FragColor = vec4(mix(vC, fogCol, f), a * (1.0 - 0.6 * f)); }`,
+        float fd = fogDen * vD, f = 1.0 - exp(-fd * fd); gl_FragColor = vec4(mix(vC, fogCol, f), a * (1.0 - 0.6 * f)); }`,
   });
   const mesh = new THREE.Mesh(g, mat); mesh.frustumCulled = false; mesh.renderOrder = 5; scene.add(mesh);
+  // (every pool shares one GL program: without this, a pool can be drawn with another pool's fog and softness)
+  mesh.onBeforeRender = () => { mat.uniformsNeedUpdate = true; };
   let n = 0;
   return {
     mesh, mat,

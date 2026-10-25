@@ -22,7 +22,7 @@ const PAUSE = [
 // extra empty screen before caption k of a beat (s): where the picture and the sound carry it
 const EXTRA = { impact: { 1: 2.2, 2: 1.0 }, second: { 1: 0.8 }, nine59: { 1: 1.4, 2: 0.6 }, ten28: { 1: 1.2, 2: 1.4 }, cloud: { 1: 1.0 }, grey: { 1: 1.4 } };
 const GAP = 1.0;                      // between captions inside a beat
-const TAIL = 13.0;                    // the remembrance card, then black
+const TAIL = 15.5;                    // the remembrance card, then black
 const SECTION = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5];
 const hold = (s) => Math.min(4.4, Math.max(1.6, 1.1 + 0.05 * s.length));
 const TITLE_HOLD = 4.6;

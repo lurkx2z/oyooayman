@@ -26,7 +26,7 @@ function ntStairAt(p, r) {
 // how far you have come down in a stair shot (floors, from the shot's start): the crowd's pace with its stops
 const NT_PACE = 0.062;
 function ntStairLocal(t, s) {
-  const a = Math.max(0, t - s.t0 - (s.mode === 'enter' ? 2.6 : 0)), stops = { pace: [[3.2, 2.4]], calm: [[1.5, 3.0], [7.0, 1.6]], ff: [[2.0, 9.0]], ff2: [[0, 2.5]], transfer: [] }[s.mode] || [];
+  const a = Math.max(0, t - s.t0 - (s.mode === 'enter' ? 2.6 : 0)), stops = { pace: [[3.2, 2.4]], calm: [[1.5, 3.0], [7.0, 1.6]], ff: [[1.0, 9.5], [13.5, 8.0]], transfer: [] }[s.mode] || [];
   // integrate a speed that eases to zero in each stop
   let p = 0; const dt = 0.05;
   for (let x = 0; x < a; x += dt) {
@@ -114,10 +114,11 @@ NT_SETS.stair = (app) => {
   }
   const waterTex = ntTex(ntCanvas(256, 256, (g2, W, H) => {
     g2.fillStyle = '#000'; g2.fillRect(0, 0, W, H); const r = new RNG(12);
-    for (let i = 0; i < 260; i++) { g2.strokeStyle = `rgba(200,225,240,${r.range(0.1, 0.5)})`; g2.lineWidth = r.range(1, 3); g2.beginPath(); const x = r.range(0, W), y = r.range(0, H); g2.moveTo(x, y); g2.bezierCurveTo(x + 8, y + 20, x - 8, y + 40, x + r.range(-5, 5), y + 60); g2.stroke(); }
+    g2.fillStyle = 'rgb(105,105,105)'; g2.fillRect(0, 0, W, H);
+    for (let i = 0; i < 70; i++) { g2.strokeStyle = `rgba(255,255,255,${r.range(0.25, 0.8)})`; g2.lineWidth = r.range(1.5, 4); g2.beginPath(); const y = r.range(0, H), ph = r.range(0, 6), x0 = r.range(-40, W * 0.6), x1 = x0 + r.range(50, 200); for (let x = x0; x <= x1; x += 6) g2.lineTo(x, y + 4 * Math.sin(x * 0.06 + ph)); g2.stroke(); }
   }));
-  waterTex.repeat.set(2, 3);
-  const waterM = new THREE.MeshStandardMaterial({ color: '#8fb0c4', transparent: true, opacity: 0.0, roughness: 0.05, metalness: 0.4, alphaMap: waterTex, emissive: '#9fc4dc', emissiveIntensity: 0.15, depthWrite: false });
+  waterTex.repeat.set(2, 5);
+  const waterM = new THREE.MeshStandardMaterial({ color: '#86a3b5', transparent: true, opacity: 0.0, roughness: 0.06, metalness: 0.5, alphaMap: waterTex, emissive: '#b4d2e4', emissiveIntensity: 0.32, depthWrite: false });
   const wsheet = [];
   for (let c = 0; c < 5; c++) {
     const g = copies[c].g;
@@ -140,11 +141,17 @@ NT_SETS.stair = (app) => {
   const RI = 0.36, RO = 0.9, LI = 2 * NT_FLEN + 2 * Math.PI * RI, LO = 2 * NT_FLEN + 2 * Math.PI * RO;
   const inner = Array.from({ length: 18 }, (_, i) => ntPerson(scene, 'si' + i, NT_LOOKS[(i * 3) % NT_LOOKS.length]));
   const outer = Array.from({ length: 20 }, (_, i) => ntPerson(scene, 'so' + i, NT_LOOKS[(i * 7 + 2) % NT_LOOKS.length]));
-  const ffs = Array.from({ length: 7 }, (_, i) => ntPerson(scene, 'ff' + i, i % 2 ? 'ntFF2' : 'ntFF'));
+  const ffs = Array.from({ length: 11 }, (_, i) => ntPerson(scene, 'ff' + i, i % 2 ? 'ntFF2' : 'ntFF'));
+  ffs.forEach((p, i) => ntFireGear(p, i));
   const hurt = [ntPerson(scene, 'hurt', 'ntShirtB'), ntPerson(scene, 'help1', 'ntSuit'), ntPerson(scene, 'help2', 'ntPolo')];
   // a hose roll and a tool on some firefighters' shoulders
   const hoseM = ntStd('#c9b88a', 0.8);
-  ffs.forEach((p, i) => { if (i % 3 !== 2) { const h = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.07, 6, 12), hoseM); h.position.set(0.18, 0.42, -0.02); h.rotation.y = Math.PI / 2; p.j.spine.add(h); } });
+  ffs.forEach((p, i) => { if (i % 3 !== 2) { const h = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.06, 6, 14), hoseM); h.position.set(0.2, 0.44, -0.02); h.rotation.y = Math.PI / 2; p.j.spine.add(h); } });
+  // the water bottle passed along the line (calm)
+  const bottle = new THREE.Group(); scene.add(bottle);
+  ntBox(0.066, 0.2, 0.066, new THREE.MeshStandardMaterial({ color: '#cfe6f2', roughness: 0.08, metalness: 0.1, transparent: true, opacity: 0.75, emissive: '#7fa6bc', emissiveIntensity: 0.25 }), 0, 0, 0, bottle);
+  ntBox(0.068, 0.05, 0.068, ntStd('#2e6fb4', 0.5), 0, 0.01, 0, bottle); ntBox(0.03, 0.03, 0.03, ntStd('#f2f2f2', 0.4), 0, 0.115, 0, bottle);
+  const _h0 = new THREE.Vector3(), _h1 = new THREE.Vector3();
 
   // ---- the transfer hallway on 48 (built off to the side): gypsum walls, a strip of lights, the crowd walking
   const TR = new THREE.Group(); TR.position.set(60, 0, 0); scene.add(TR);
@@ -159,10 +166,11 @@ NT_SETS.stair = (app) => {
 
   const cam = S.camera, _m = new THREE.Matrix4(), _v = new THREE.Vector3();
   let curShot = null;
+  const hurtAt = (t) => { const sh = ntShotAt(t); return sh.mode === 'right' ? ntStairBase(sh) + ntStairLocal(NT.hurt - 3.0, sh) - 0.16 + (t - (NT.hurt - 3.0)) * 0.085 : -9; };
   function hide(list) { for (const p of list) p.root.visible = false; }
 
   return {
-    scene, camera: cam,
+    scene, camera: cam, _ffs: ffs,
     cuts() { return []; },
     frame(t, s) {
       curShot = s;
@@ -187,28 +195,36 @@ NT_SETS.stair = (app) => {
         c.sign.update({ n: Math.max(1, 73 - m) });
         c.door.rotation.y = 0; c.door.position.x = 0.6;
       });
-      // the camera: your eye 1.58 m over the inner lane, looking along the way down; the steps in the bob
-      const lane = s.mode === 'ff' || s.mode === 'ff2' ? RI - 0.04 : RI + 0.1;
+      // the camera: your eye 1.6 m over your lane, looking a couple of metres down the flight (about 25° down; more
+      // where the steps themselves are the point: the glow, the water); the steps in the bob
+      const lane = s.mode === 'ff' || s.mode === 'right' ? RI - 0.06 : RI + 0.1;
+      const look = s.mode === 'glow' ? [0.12, 0.95] : s.mode === 'water' ? [0.1, 0.45] : [0.21, 1.3];
       let E, ahead;
       {
-        const p = ntStairAt(Pc, lane); E = [p[0], p[1] + 1.58, p[2]];
-        const q = ntStairAt(Pc + 0.11, lane); ahead = [q[0] * 0.8, q[1] + 1.05, q[2]];
+        const p = ntStairAt(Pc, lane); E = [p[0], p[1] + 1.6, p[2]];
+        const q = ntStairAt(Pc + look[0], lane); ahead = [q[0] * 0.8, q[1] + look[1], q[2]];
       }
       if (s.mode === 'enter' && t < s.t0 + 2.6) {
         // through the door onto the landing, into the line
         const k = Ease.inOutSine(MathX.smooth(t, s.t0, s.t0 + 2.6));
         E = ntV([0.6, 1.6, -2.0], E, k); ahead = ntV([0.3, 1.2, 0.6], ahead, k);
       }
+      // the firefighters: look down the outer lane they come up; the injured man: turn to him as he passes
+      if (s.mode === 'ff') { const q = ntStairAt(Pc + 0.22, RO); ahead = ntV(ahead, [q[0], q[1] + 1.75, q[2]], 0.6); }
+      if (s.mode === 'right') {
+        const rel = hurtAt(t) - Pc, w = MathX.smooth(rel, -0.2, -0.06) * (1 - MathX.smooth(rel, 0.08, 0.22));
+        if (w > 0) { const q = ntStairAt(Math.max(0, hurtAt(t)), RO + 0.05); ahead = ntV(ahead, [q[0], q[1] + 1.35, q[2]], 0.75 * w); }
+      }
       const step = Math.sin(Pc * LI / NT_TREAD * Math.PI) * 0.018;
-      const shk = ntJolt(t, NT.shake, s.mode === 'shake' ? 1.4 : 0, 1.6), sw = ntSway(t, NT.shake + 0.3, s.mode === 'shake' ? 0.5 : 0, 6.5, 8);
+      const shk = ntJolt(t, NT.shake, s.mode === 'shake' ? 2.2 : 0, 1.6), sw = ntSway(t, NT.shake + 0.3, s.mode === 'shake' ? 0.7 : 0, 6.5, 8);
       const d = ntDrift(t, 0.01, 0.5, 9);
-      ntCam(cam, [E[0] + d[0] + shk[0] + sw[0], E[1] + step + d[1] + shk[1], E[2] + d[2]], ahead, s.mode === 'empty' ? 58 : 64, shk[2] + sw[1] + 0.8 * noise1(t * 0.3, 2));
+      ntCam(cam, [E[0] + d[0] + shk[0] + sw[0], E[1] + step + d[1] + shk[1], E[2] + d[2]], ahead, 58, shk[2] + sw[1] + 0.8 * noise1(t * 0.3, 2));
       // the lights: the landing just below, the half landing, the one above
       const lvl = (k) => { const mm = Math.floor(Pc) + k; return [0.5, -mm * Hf + 2.3, -0.9]; }, half = (k) => { const mm = Math.floor(Pc) + k; return [0, -mm * Hf - Hf / 2 + 2.3, 3.6]; };
       L1.position.set(...lvl(1)); L2.position.set(...half(0)); L3.position.set(...lvl(0));
       // power: normal; it dips in the glow beat (only the paint lights the way), and shudders at 9:03; empty = out
       let pw = 1;
-      if (s.mode === 'glow') pw = 1 - 0.85 * MathX.smooth(t, s.t0 + 1.2, s.t0 + 1.6) * (1 - MathX.smooth(t, ntE('glow') - 0.6, ntE('glow') + 1.2)) - 0.3 * Math.max(0, noise1(t * 14, 3)) * MathX.smooth(t, s.t0 + 0.6, s.t0 + 1.2);
+      if (s.mode === 'glow') pw = 1 - 0.7 * MathX.smooth(t, s.t0 + 1.2, s.t0 + 1.6) * (1 - MathX.smooth(t, ntE('glow') - 0.6, ntE('glow') + 1.2)) - 0.3 * Math.max(0, noise1(t * 14, 3)) * MathX.smooth(t, s.t0 + 0.6, s.t0 + 1.2);
       if (s.mode === 'shake' && t > NT.shake) pw = 1 - 0.7 * Math.exp(-(t - NT.shake) * 1.5) * (0.5 + 0.5 * Math.sin((t - NT.shake) * 40));
       if (empty) pw = 0.06;
       pw = MathX.clamp(pw, 0.04, 1);
@@ -227,51 +243,75 @@ NT_SETS.stair = (app) => {
       }
       drip.instanceMatrix.needsUpdate = true;
       // ---- people
-      if (empty) { hide(inner); hide(outer); hide(ffs); hide(hurt); return; }
+      if (empty) { hide(inner); hide(outer); hide(ffs); hide(hurt); bottle.visible = false; return; }
       const moving = (x) => { let v = 0; const dt = 0.25; v = (ntStairLocal(x + dt, s) - ntStairLocal(x - dt, s)) / (2 * dt); return MathX.clamp(v / NT_PACE, 0, 1.5); };
       const mv = moving(t);
-      const single = s.mode === 'ff' || s.mode === 'ff2' || s.mode === 'right';
-      // inner lane: ahead of you (and two behind)
+      const single = s.mode === 'ff' || s.mode === 'right', thin = s.mode === 'thin' || s.mode === 'water';
+      // the water bottle (calm): passed forward along the line, hand to hand, by the three people ahead of you
+      const b0 = ntCap('calm', 1).show - 0.6, bK = s.mode === 'calm' ? (t - b0) / 1.1 : -1;
+      // inner lane: ahead of you (and two behind); thin: a few, spaced out
       inner.forEach((p, i) => {
-        const k = i - 2, pp = Pc + (k >= 0 ? (k + 1) * 0.105 + 0.02 : (k) * 0.105) + 0.008 * noise1(t * 0.3, i);
-        if (k === -1 || pp < -0.05) { p.root.visible = false; return; }
+        const k = i - 2, gap = thin ? (s.mode === 'water' ? 0.17 : 0.24) : 0.105, pp = Pc + (k >= 0 ? (k + 1) * gap + 0.02 : (k) * 0.105) + 0.008 * noise1(t * 0.3, i);
+        if (k === -1 || pp < -0.05 || (thin && (k < 0 || k > 4))) { p.root.visible = false; return; }
         const q = ntStairAt(Math.max(0, pp), RI + 0.06 * noise1(i, 3));
         const ph = (pp * LI) / 0.62 * Math.PI * 2 + i;
-        ntPlace(p, q[0], q[1], q[2], q[3], 'ntDown', t + i, ph, 'ntWait', 1 - MathX.smooth(mv, 0.1, 0.5));
+        let act = 'ntDown', b = 'ntWait', w = 1 - MathX.smooth(mv, 0.1, 0.5);
+        if (bK > -0.3 && bK < 3.3 && k >= 0 && k <= 3) {
+          // k gives (reaching forward) during [k, k+1]; k takes (reaching back) during [k−1, k]
+          const give = MathX.smooth(bK, k - 0.3, k + 0.2) * (1 - MathX.smooth(bK, k + 0.8, k + 1.3)), take = MathX.smooth(bK, k - 1.3, k - 0.8) * (1 - MathX.smooth(bK, k - 0.1, k + 0.4));
+          if (give > take) { b = 'ntGive'; w = give; } else if (take > 0) { b = 'ntTake'; w = take; }
+        }
+        ntPlace(p, q[0], q[1], q[2], q[3], act, t + i, ph, b, w);
       });
+      bottle.visible = false;
+      if (bK > -0.3 && bK < 3.0) {
+        const k = Math.max(0, Math.floor(bK)), u = MathX.clamp(bK - k, 0, 1), A = inner[2 + Math.min(k, 3)], B = inner[2 + Math.min(k + 1, 3)];
+        if (A.root.visible && B.root.visible) {
+          A.handWorld(-1, _h0); B.handWorld(-1, _h1);
+          const e = Ease.inOutSine(MathX.smooth(u, 0.35, 0.75));
+          bottle.position.set(ntLerp(_h0.x, _h1.x, e), ntLerp(_h0.y, _h1.y, e) + 0.06 + 0.12 * Math.sin(Math.PI * e), ntLerp(_h0.z, _h1.z, e));
+          bottle.rotation.set(0.3 * Math.sin(bK * 3), bK, 0.2); bottle.visible = true;
+        }
+      }
       // outer lane: also going down, except when firefighters come up or everyone moves right
       outer.forEach((p, i) => {
         const k = i - 3, pp = Pc + k * 0.084 + 0.04 + 0.006 * noise1(t * 0.25, i + 40);
-        if (single || pp < -0.05 || (s.mode === 'enter' && pp < 0.05)) { p.root.visible = false; return; }
+        if (single || thin || pp < -0.05 || (s.mode === 'enter' && pp < 0.05)) { p.root.visible = false; return; }
         const q = ntStairAt(Math.max(0, pp), RO - 0.06 * noise1(i, 5));
         const ph = (pp * LO) / 0.62 * Math.PI * 2 + i * 1.7;
         ntPlace(p, q[0], q[1], q[2], q[3], 'ntDown', t + i, ph, 'ntWait', 1 - MathX.smooth(mv, 0.1, 0.5));
       });
-      // the firefighters: a column coming up the outer lane past you; one resting on the landing
-      if (s.mode === 'ff' || s.mode === 'ff2') {
-        const a = t - s.t0, start = s.mode === 'ff' ? 1.0 : 0.15;
+      // the firefighters: a long column coming up the outer lane past you (from a floor below, at their own slow
+      // pace, whether you stand or walk); one resting on the landing below, bent over, breathing
+      if (s.mode === 'ff') {
+        const a = t - s.t0;
         ffs.forEach((p, i) => {
-          if (i === 6) { const q = [1.0, -(Math.floor(Pc) + 1) * Hf, -0.8]; ntPlace(p, q[0], q[1], q[2], -Math.PI / 2 - 0.4, 'ntRest', t); return; }
-          const pp = Pc + start + i * 0.11 - a * 0.045 - (s.mode === 'ff2' ? 0 : 0);
-          if (pp < -0.3) { p.root.visible = false; return; }
-          const q = ntStairAt(Math.max(0, pp), RO), ph = -(pp * LO) / 0.7 * Math.PI * 2 + i * 2;
+          if (i === 10) { const q = [0.95, -(Math.floor(Pc) + 1) * Hf, -0.75]; ntPlace(p, q[0], q[1], q[2], -Math.PI / 2 - 0.4, 'ntRest', t); return; }
+          const pp = 0.42 + i * 0.13 + (i > 5 ? 0.35 : 0) - a * 0.042;
+          if (pp < Pc - 0.3 || pp > Pc + 1.4) { p.root.visible = false; return; }
+          const q = ntStairAt(Math.max(0, pp), RO + 0.04), ph = -(pp * LO) / 0.7 * Math.PI * 2 + i * 2;
           ntPlace(p, q[0], q[1], q[2], q[3] + Math.PI, 'ntClimb', t + i, ph);
         });
       } else hide(ffs);
-      // the injured man, helped down past you on the outer side
-      if (s.mode === 'right' && t > NT.hurt - 2.5) {
-        const a = t - (NT.hurt - 2.5), pp = Pc - 0.12 + a * 0.05;
-        const q = ntStairAt(Math.max(0, pp), RO - 0.05), q2 = ntStairAt(Math.max(0, pp - 0.07), RO - 0.05), q3 = ntStairAt(Math.max(0, pp + 0.07), RO - 0.08);
+      // the injured man, helped down past you on the outer (wall) side
+      if (s.mode === 'right' && t > NT.hurt - 3.0) {
+        const pp = hurtAt(t);
+        const q = ntStairAt(Math.max(0, pp), RO + 0.06), q2 = ntStairAt(Math.max(0, pp - 0.07), RO + 0.04), q3 = ntStairAt(Math.max(0, pp + 0.07), RO + 0.02);
         const ph = pp * LO / 0.55 * Math.PI * 2;
         ntPlace(hurt[0], q[0], q[1], q[2], q[3], 'ntHelped', t, ph);
         ntPlace(hurt[1], q2[0], q2[1], q2[2], q2[3], 'ntHelper', t, ph + 1.6);
         ntPlace(hurt[2], q3[0], q3[1], q3[2], q3[3], 'ntHelper', t, ph + 3.1);
       } else hide(hurt);
+      // nobody walks through the lens: anyone whose body is within half a metre of your eye is not drawn
+      for (const list of [inner, outer, ffs, hurt]) for (const p of list) {
+        if (!p.root.visible) continue;
+        const dx = p.root.position.x - cam.position.x, dz = p.root.position.z - cam.position.z, dy = cam.position.y - p.root.position.y;
+        if (dx * dx + dz * dz < 0.5 * 0.5 && dy > -0.3 && dy < 2.0) p.root.visible = false;
+      }
     },
     grade(t, p, s) {
-      p.exposure = 1.08; p.saturation = 0.9; p.contrast = 1.08; p.warmth = 0.01; p.vignette = 0.62; p.bloom = 0.42; p.bloomThreshold = 0.75; p.grain = 0.038;
+      p.exposure = 1.04; p.saturation = 0.72; p.contrast = 1.1; p.warmth = 0.01; p.vignette = 0.62; p.bloom = 0.42; p.bloomThreshold = 0.75; p.grain = 0.038;
       if (s.mode === 'empty') { p.exposure = 1.25; p.bloom = 0.6; p.saturation = 0.8; p.vignette = 0.75; }
-      if (s.mode === 'shake' && t > NT.shake && t < NT.shake + 1.5) p.chroma = 0.5 * Math.exp(-(t - NT.shake) * 3);
       if (s.mode === 'empty') p.fade = Math.max(p.fade, 1 - MathX.smooth(t, NT.out, NT.out + 1.8), MathX.smooth(t, NT.cost - 1.0, NT.cost));
     },
   };

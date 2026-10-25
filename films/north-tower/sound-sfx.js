@@ -35,9 +35,9 @@ ntSound('sfx', 'events', function (ctx, bus, K) {
   {
     const boom = fx.hit([[34, 0.6, 1], [48, 0.5, 0.8], [71, 0.35, 0.6], [118, 0.2, 0.4], [190, 0.12, 0.25]], { width: 0.03, noise: 0.6, nlen: 0.05, nhp: 200, len: 3.5 });
     NTX.bq(boom, 'lp', 1400, 0.7, sr);
-    K.put(boom, hit, { vol: 0.5, norm: true, pan: 0, room, wet: 0.3 });
+    K.put(boom, hit, { vol: 0.4, norm: true, pan: 0, room, wet: 0.3 });
     const R0 = ntRoar(fx, 4.5, { rise: 0.25, hold: 0.9, tail: 1.6, dist: 0.55 });
-    K.putLR(R0.L, R0.R, hit + 0.04, { vol: 0.32, norm: true, room, wet: 0.2 });
+    K.putLR(R0.L, R0.R, hit + 0.04, { vol: 0.26, norm: true, room, wet: 0.2 });
     // the frame of the building twisting: a long low groan, then the creaks at each end of the sway (6.5 s, dying)
     K.put(fx.creak(3.2, [[r.range(70, 90), 0.06, 1], [r.range(180, 220), 0.04, 0.6], [r.range(420, 480), 0.02, 0.3]], { rate: [9, 26], env: (u) => Math.min(1, u / 0.08) * Math.pow(1 - u, 1.2) }), hit + 0.25, { vol: 0.13, norm: true, pan: -0.2, room, wet: 0.4 });
     for (let k = 1; k <= 4; k++) { const t = hit + 1.6 + (k - 1) * 3.25, a = Math.exp(-(t - hit) / 12); K.put(fx.creak(r.range(1.4, 2.2), [[r.range(85, 110), 0.05, 1], [r.range(230, 270), 0.03, 0.55], [r.range(560, 640), 0.015, 0.25]], { rate: [6, 18] }), t, { vol: 0.07 * a, norm: true, pan: k % 2 ? 0.35 : -0.35, room, wet: 0.45 }); }
@@ -160,21 +160,21 @@ ntSound('sfx', 'events', function (ctx, bus, K) {
   {
     const tS = NT.roar + 1.2, arrive = tS + 1.05;
     const R2 = ntRoar(fx, 22, { rise: 2.6, hold: 9.5, tail: 5, dist: 0.25 });
-    K.putLR(R2.L, R2.R, arrive, { vol: 0.62, norm: true, room: out, wet: 0.25, stop: NT.cloudHit + 0.25, fade: 0.5 });
+    K.putLR(R2.L, R2.R, arrive, { vol: 0.4, norm: true, room: out, wet: 0.25, stop: NT.cloudHit + 0.25, fade: 0.5 });
     // (inside the cloud it goes on, far away and muffled, and dies before the grey)
     K.put(R2.L, NT.cloudHit - 0.2, { offset: NT.cloudHit - 0.2 - arrive, vol: 0.2, norm: true, lp: 240, fadeIn: 0.4, stop: NT.grey + 1.2, fade: 3.5 });
     const sub = fx.hit([[27, 1.2, 1], [36, 1.0, 0.8], [52, 0.6, 0.5]], { width: 0.08, len: 6 }); NTX.bq(sub, 'lp', 300, 0.7, sr);
     for (const dt of [0.4, 2.1, 4.0, 6.3]) K.put(sub, arrive + dt, { vol: 0.2, norm: true, pan: r.range(-0.2, 0.2), room: out, wet: 0.2 });
     [[0.2, -0.6], [0.5, 0.5], [0.8, -0.1], [1.2, 0.7]].forEach(([dt, pan]) => gasp(arrive - 0.6 + dt, 0.03, pan, out));
     // you run: fast steps, hard breathing
-    const run0 = ntCap('nine59', 2).show - 0.3;
+    const run0 = NT.run;
     for (let t = run0 + 0.3, i = 0; t < NT.cloudHit + 0.2; t += 0.31, i++) K.put(fx.step({ weight: 0.75, scuff: 0.3 }), t, { vol: 0.03, norm: true, pan: i % 2 ? 0.12 : -0.12, room: out, wet: 0.2 });
     for (let t = run0 + 0.4, i = 0; t < NT.cloudHit; t += 0.62, i++) breathe(t, 0.5, 0.04, i % 2 ? { voice: 0.2, f0: 150 } : { inhale: true, voice: 0.15, f0: 160 });
     // the cloud reaches you: a blast of air and grit, then everything goes far away
     const blast = ntNoise(fx, Math.ceil(3 * sr), 'pink');
     for (let i = 0; i < blast.length; i++) { const t = i / sr; blast[i] *= Math.min(1, t / 0.08) * Math.exp(-t / 0.9); }
     NTX.bq(blast, 'lp', 2400, 0.7, sr);
-    K.put(blast, NT.cloudHit - 0.15, { vol: 0.36, norm: true, pan: 0, room: out, wet: 0.2 });
+    K.put(blast, NT.cloudHit - 0.15, { vol: 0.26, norm: true, pan: 0, room: out, wet: 0.2 });
     K.put(fx.rustle(3.5, { density: 1800, rub: 0.2, lo: 1500, hi: 9000, grain: 0.003, env: (u) => Math.exp(-u * 1.6) }), NT.cloudHit - 0.1, { vol: 0.05, norm: true, pan: 0, room: out, wet: 0.2 });
   }
   // inside the cloud: you cough; your breath close, through your shirt
@@ -192,6 +192,6 @@ ntSound('sfx', 'events', function (ctx, bus, K) {
     const tN = NT.fall + 0.6, arrive = tN + 3.15;
     [[0.9, -0.5], [1.2, 0.4], [1.5, -0.1], [2.0, 0.6], [2.4, -0.7]].forEach(([dt, pan]) => gasp(tN + dt, 0.025, pan, out));
     const R3 = ntRoar(fx, 24, { rise: 3.2, hold: 10, tail: 6, dist: 0.8 });
-    K.putLR(R3.L, R3.R, arrive, { vol: 0.32, norm: true, room: out, wet: 0.45, stop: NT.out + 0.2, fade: 1.8 });
+    K.putLR(R3.L, R3.R, arrive, { vol: 0.2, norm: true, room: out, wet: 0.45, stop: NT.out + 0.2, fade: 1.8 });
   }
 });
