@@ -93,7 +93,8 @@ function ntWindowTex(seed, base, win, lit, litCol = '#7a7466') {
     for (let i = 0; i < 400; i++) { g.fillStyle = `rgba(0,0,0,${r.range(0, 0.05)})`; g.fillRect(r.range(0, W), r.range(0, H), r.range(2, 20), r.range(2, 10)); }
   }));
 }
-// add one box (x0..x1, y0..y1, z0..z1) to arrays; uv in metres / 10 (one window tile = 10 m)
+// add one box (x0..x1, y0..y1, z0..z1) to arrays; uv in metres / 10 (one window tile = 10 m), or / A.tile (city
+// blocks: 26 m, so a row of windows is a floor, about 3.3 m, and the buildings read at their real size)
 function ntBoxInto(A, x0, x1, y0, y1, z0, z1, top = true) {
   const faces = [
     [[x1, y0, z1], [x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [1, 0, 0], z1 - z0],
@@ -103,7 +104,7 @@ function ntBoxInto(A, x0, x1, y0, y1, z0, z1, top = true) {
   ];
   if (top) faces.push([[x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0], [0, 1, 0], -1]);
   for (const [a, b, c, d, n, w] of faces) {
-    const i0 = A.pos.length / 3, hh = (y1 - y0) / 10, ww = w > 0 ? w / 10 : 0.01;
+    const T = A.tile || 10, i0 = A.pos.length / 3, hh = (y1 - y0) / T, ww = w > 0 ? w / T : 0.01;
     for (const p of [a, b, c, d]) A.pos.push(p[0], p[1], p[2]);
     for (let k = 0; k < 4; k++) A.nor.push(n[0], n[1], n[2]);
     if (w > 0) A.uv.push(0, 0, ww, 0, ww, hh, 0, hh); else A.uv.push(0.02, 0.02, 0.03, 0.02, 0.03, 0.03, 0.02, 0.03);
@@ -132,7 +133,7 @@ function ntCity(scene, o = {}) {
     const tx = ntWindowTex(31 + k, '#08090b', '#0d0f12', 0.34, ['#ffd9a0', '#f2e6c8', '#cfe0ff'][k % 3]);
     return new THREE.MeshStandardMaterial({ color: '#15171a', map: tx, emissive: '#ffffff', emissiveMap: tx, emissiveIntensity: 0.9, roughness: 0.8 });
   });
-  const A = mats.map(() => ({ pos: [], nor: [], uv: [], idx: [] }));
+  const A = mats.map(() => ({ pos: [], nor: [], uv: [], idx: [], tile: 26 }));
   const BLK = 76, ST = 18;
   for (let bx = -Math.ceil(R / BLK); bx <= Math.ceil(R / BLK); bx++) for (let bz = -Math.ceil(R / BLK); bz <= Math.ceil(R / BLK); bz++) {
     const cx = bx * BLK + 12, cz = bz * BLK - 30;

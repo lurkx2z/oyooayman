@@ -27,7 +27,7 @@ NT_SETS.street = (app) => {
   S.sun.position.set(NT_CH + NT_SUN[0] * 400, NT_SUN[1] * 400 + 40, -420 + NT_SUN[2] * 400); S.sun.target.position.set(NT_CH, 0, -420);
   scene.fog = new THREE.FogExp2('#c9d6e2', 0.0004);
   const sky = ntSky(scene, '#2464b8', '#cfdeea', '#9db0c0', { sunDir: NT_SUN, sunGlow: '#fff2d8', hw: 0.3 });
-  ntCity(scene, { r: 2400, skip: (x, z) => ntNearWTC(x, z) || Math.abs(x - NT_CH) < 60 || (z < -150 && z > -240 && x > -120 && x < 240) || (Math.abs(x - NT_WB) < 40 && z < -240), seed: 1001, scale: 0.9, lowNorth: true });
+  ntCity(scene, { r: 2400, skip: (x, z) => ntNearWTC(x, z) || Math.abs(x - NT_CH) < 60 || (z < -150 && z > -240 && x > -120 && x < 240) || (Math.abs(x - NT_WB) < 75 && z < -240), seed: 1001, scale: 0.9, lowNorth: true });
   ntPlaza(scene);
   const N = ntTower(scene, NT_TW.N, { antenna: true }), SO = ntTower(scene, NT_TW.S, {});
   // the burning floors, as they looked from the street: a black band, the windows glowing orange in it
@@ -42,11 +42,12 @@ NT_SETS.street = (app) => {
     band.position.y = (f0 + f1) / 2 * NT_FLOOR_H; M.g.add(band);
   }
   // ---- Church Street: a canyon of buildings both sides from Vesey (z = −170) north, cross streets every 80 m
-  const A = [0, 1, 2, 3].map(() => ({ pos: [], nor: [], uv: [], idx: [] })), r = new RNG(311);
-  // (low near the towers, as in 2001: five to fifteen floors, so the towers stand over everything)
+  const A = [0, 1, 2, 3].map(() => ({ pos: [], nor: [], uv: [], idx: [], tile: 26 })), r = new RNG(311);
+  // (low near the towers, as in 2001: five to fifteen floors, so the towers stand over everything; West Broadway in
+  // Tribeca is cast-iron lofts, five to eight floors)
   for (const [cx, z0] of [[NT_CH, -218], [NT_WB, -262]]) for (const side of [-1, 1]) for (let z = z0; z > -1400; z -= 80) {
     let zz = z;
-    while (zz > z - 62) { const d = 12 + r.next() * 18, h = 20 + Math.pow(r.next(), 1.6) * (cx === NT_WB ? 34 : 60), x0 = cx + side * 15, x1 = cx + side * (15 + 25 + r.next() * 15); ntBoxInto(A[Math.floor(r.next() * 4)], Math.min(x0, x1), Math.max(x0, x1), 0, h, zz - d, zz); zz -= d + 0.4; }
+    while (zz > z - 62) { const d = 12 + r.next() * 18, h = cx === NT_WB ? 16 + Math.pow(r.next(), 1.6) * 16 : 20 + Math.pow(r.next(), 1.6) * 60, x0 = cx + side * 15, x1 = cx + side * (15 + 25 + r.next() * 15); ntBoxInto(A[Math.floor(r.next() * 4)], Math.min(x0, x1), Math.max(x0, x1), 0, h, zz - d, zz); zz -= d + 0.4; }
   }
   // Vesey Street's north side (and 7 World Trade Center, 47 floors) from the plaza to Church Street
   for (let x = -110; x < 135; x += 30 + r.next() * 10) { if (x < NT_WB + 22 && x + 28 > NT_WB - 22) continue; if (x < NT_WB) continue; ntBoxInto(A[Math.floor(r.next() * 4)], x, x + 28, 0, 24 + r.next() * 36, -240, -196); }
