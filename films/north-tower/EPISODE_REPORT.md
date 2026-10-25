@@ -53,6 +53,14 @@ going up.
 **Three signature moments.** The glow paint on the stairs in the dark (1:42); the firefighters climbing past you on
 37 (2:45); "Day turns to night" in the dust on Church Street (4:24).
 
+## Delivered
+
+- Final render (on the PC's GPU, from commit c979a2b): `D:\renders\north-tower\north-tower_final_1080p.mp4`
+  (1920×1080, 6:08, 2.0 GiB, −15.3 LUFS, −1.8 dBTP) and `north-tower_final_small.mp4` (1280×720, 26.0 MiB, −15.4 LUFS,
+  −2.6 dBTP). A copy of the small file is in `C:\Users\ayman\Downloads\render\north-tower-out\`. Check frames: no
+  black, broken or missing frames.
+- Runnable ZIP: `north-tower_film.zip` (open `north-tower.html`, press Space), tested with `tools/check-page.cjs`.
+
 ## What the film does not show, on purpose
 
 No plane. No one falling, no one hurt on screen, no bodies, no gore. No collapse closer than a survivor on the street
