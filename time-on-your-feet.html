@@ -84,6 +84,9 @@
     .tf-lab small { display: block; font-size: 0.75em; opacity: 0.9; color: #ffd7a8; }
     .tf-lab .d { display: inline-block; width: calc(var(--u) * 28); height: calc(var(--u) * 28); border-radius: 50%; margin-right: calc(var(--u) * 8);
       box-shadow: 0 0 0 calc(var(--u) * 2.5) rgba(255, 215, 168, 0.85); vertical-align: middle; }
+    /* near the right edge the words go on the left of the ring */
+    .tf-lab.r { display: flex; flex-direction: row-reverse; align-items: center; text-align: right; transform: translate(calc(-100% + var(--u) * 14), -50%); }
+    .tf-lab.r .d { margin-right: 0; margin-left: calc(var(--u) * 8); }
   </style>
 </head>
 <body>

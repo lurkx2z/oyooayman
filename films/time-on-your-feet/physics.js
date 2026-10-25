@@ -125,3 +125,13 @@ function tfBhTable(r, N = 512) {
   const cone = r < 1.5 ? Math.asin(Math.min(1, bc * lapse / r)) : Math.PI - Math.asin(Math.min(1, bc * lapse / r));
   return { phi, ring, cone, blue: 1 / lapse };
 }
+
+// ---- a star's colour from its surface temperature T (K): Planck's law through the same colour matching, as linear
+// RGB scaled so the brightest channel is 1 (white = 6,500 K). Light falling in by a factor k arrives as a star of k·T.
+function tfStarRGB(T) {
+  const pl = (l, T) => { const m = l * 1e-9; return 1 / (Math.pow(m, 5) * (Math.exp(0.0143878 / (m * T)) - 1)); };
+  const xyz = (T) => { let X = 0, Y = 0, Z = 0; for (let l = 380; l <= 780; l += 4) { const c = tfCie(l), p = pl(l, T); X += c[0] * p; Y += c[1] * p; Z += c[2] * p; } return [X, Y, Z]; };
+  const toRGB = (v) => [3.2406 * v[0] - 1.5372 * v[1] - 0.4986 * v[2], -0.9689 * v[0] + 1.8758 * v[1] + 0.0415 * v[2], 0.0557 * v[0] - 0.2040 * v[1] + 1.0570 * v[2]];
+  const w = toRGB(xyz(6500)), c = toRGB(xyz(T)), r = c.map((v, i) => Math.max(0, v / w[i]));
+  const mx = Math.max(...r); return r.map((v) => v / mx);
+}

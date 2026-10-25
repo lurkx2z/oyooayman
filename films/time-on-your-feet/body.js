@@ -102,7 +102,7 @@ function tfBuildBody(parent) {
   const g = new THREE.Group(); parent.add(g);
   const cloth = tfStd('#ffffff', 0.92, 0, { map: tfTex(tfClothCanvas('#5f6e8c', 3)) });
   const sock = tfStd('#ffffff', 0.95, 0, { map: tfTex(tfSockCanvas(), { repeat: false }) });
-  const hoodie = tfStd('#ffffff', 0.95, 0, { map: tfTex(tfClothCanvas('#6b7280', 9)) });   // (grey marl)
+  const hoodie = tfStd('#ffffff', 0.95, 0, { map: tfTex(tfClothCanvas('#4b505a', 9)) });   // (grey marl)
   const add = (geo, m, par = g) => { const o = new THREE.Mesh(geo, m); o.castShadow = o.receiveShadow = true; par.add(o); return o; };
   const legs = {};
   for (const s of [-1, 1]) {

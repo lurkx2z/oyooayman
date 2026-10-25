@@ -120,7 +120,7 @@ const TF_CTX = [
   [TF.wd2 + 0.4, TF.wd3 - 0.2, 'YOUR WEIGHT', () => ({ v: tfThousands(Math.round(TFP.wd.weightT / 100) * 100) + ' TONNES', v2: 'THE EIFFEL TOWER: 10,100' })],
   [TF.wd4 + 0.4, TF.ns - 0.2, 'SIRIUS B\'S LIGHT, STRETCHED', () => ({ v: 'AS IF RACING AWAY AT 80 km/s', v2: 'MEASURED BY HUBBLE, 2005' })],
   [TF.ns2 + 0.4, TF.nsLand - 0.2, 'YOU CAN SEE', () => ({ v: Math.round(TFP.ns.visible * 100) + '% OF ITS SURFACE', v2: 'LIGHT FROM THE FAR SIDE BENDS ROUND' })],
-  [TF.ns4 + 0.4, TF.ns5 - 0.2, 'STARLIGHT ARRIVES', () => ({ v: '×' + TFP.ns.blue.toFixed(2) + ' MORE ENERGY', v2: 'YELLOW STARS LOOK BLUE' })],
+  [TF.ns4 + 0.4, TF.ns5 - 0.2, 'STARLIGHT ARRIVES', () => ({ v: '×' + TFP.ns.blue.toFixed(2) + ' MORE ENERGY', v2: 'SUN-LIKE STARS TURN BLUE-WHITE' })],
   [TF.ns5 + 0.4, TF.bh - 0.2, 'TIME HERE RUNS', () => ({ v: Math.round(TFP.ns.rate * 100) + '% AS FAST AS ON EARTH', v2: 'ONE YEAR HERE = 1 YEAR 86 DAYS ON EARTH' })],
   [TF.bh2 + 0.3, TF.board - 0.2, 'EVENT HORIZON TELESCOPE · 2022', () => ({ v: 'ITS SHADOW, PHOTOGRAPHED', v2: '' })],
   [TF.board + 0.6, TF.sphere - 0.2, 'TO HOVER HERE', () => ({ v: 'A PUSH NO ROCKET COULD GIVE', v2: '' })],
@@ -216,6 +216,7 @@ class TfHud {
       const vis = _p.z < 1 && Math.abs(_p.x) < 1.1 && Math.abs(_p.y) < 1.1;
       d.style.opacity = vis ? String(l.a ?? 1) : '0';
       const lx = (_p.x * 0.5 + 0.5) * 100, ly = (-_p.y * 0.5 + 0.5) * 100;
+      const r = l.side ? l.side === 'l' : lx > 72; if (d._r !== r) { d._r = r; d.classList.toggle('r', r); }
       d.style.left = lx.toFixed(2) + '%'; d.style.top = ((ra > 0.05 || cx) && lx < 40 ? Math.max(ly, 46) : ly).toFixed(2) + '%';
       const h = `<span class="d"></span><span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`;
       if (d._h !== h) { d._h = h; d.innerHTML = h; }
@@ -295,7 +296,8 @@ class TfHud {
       <rect x="${(base + shift - 5).toFixed(1)}" y="124" width="10" height="82" fill="#000"/>
       <text x="${(base + shift).toFixed(1)}" y="244" class="b" text-anchor="middle">FROM SIRIUS B</text>
       <path d="M ${base + 8} 270 L ${(base + Math.max(14, shift)).toFixed(1)} 270" stroke="#ffcf8a" stroke-width="4"/>
-      <text x="380" y="340" class="s" text-anchor="middle">SHIFTED TOWARDS RED · ITS LIGHT CLIMBED OUT OF ITS GRAVITY</text>
-      <text x="380" y="380" class="s" text-anchor="middle">(THE SHIFT DRAWN 100× LARGER)</text>`);
+      <text x="380" y="330" class="s" text-anchor="middle">SHIFTED TOWARDS RED:</text>
+      <text x="380" y="366" class="s" text-anchor="middle">ITS LIGHT CLIMBED OUT OF ITS GRAVITY</text>
+      <text x="380" y="418" class="s" text-anchor="middle">(THE SHIFT DRAWN 100× LARGER)</text>`);
   }
 }

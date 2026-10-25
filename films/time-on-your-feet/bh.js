@@ -81,7 +81,7 @@ TF_SETS.bh = (app) => {
   const ringL = new THREE.DirectionalLight('#ffb070', 0); ringL.position.set(-3, -2, -4); scene.add(ringL); scene.add(ringL.target);
   plat.traverse((o) => { if (o.isMesh && o.material && (o.material.isMeshStandardMaterial || o.material.isMeshBasicMaterial)) tfEdgePatch(o.material); });
 
-  const E = TF_EYE, AH = tfAim(E, rig.head), AF = tfAim(E, rig.feet), AFEET = tfAim(E, [0.02, 0.05, -0.12]), AUP = [AH[0], 1.48];
+  const E = TF_EYE, AH = tfAim(E, rig.head), AF = tfAim(E, rig.feet), AFEET = tfAim(E, [0.02, 0.03, -0.3]), AUP = [AH[0], 1.48];
   const W = tfWin, K = tfK;
   // the hole for the approach: ahead and a little below; on the platform: straight down
   const HOLE_AHEAD = tfN3([0.12, -0.32, -1]), HOLE_DOWN = [0, -1, 0];
@@ -97,10 +97,10 @@ TF_SETS.bh = (app) => {
 
   const CAM = {
     cold(t) {
-      const a = TF.coldUp, b = TF.coldSky, k1 = K(t, a, a + 2.4), k2 = K(t, b, b + 2.6), dr = tfDrift(t, 0.006, 0.4, 3);
-      let aim = tfAimLerp([AH[0] + 0.05, AH[1] + 0.02], [AF[0] + 0.12, AF[1] + 0.08], k1);
+      const a = TF.coldUp, b = TF.coldSky, k1 = K(t, a - 0.3, a + 1.5), k2 = K(t, b, b + 2.6), dr = tfDrift(t, 0.006, 0.4, 3);
+      let aim = tfAimLerp([AH[0] + 0.06, AH[1] + 0.06], [tfLerp(AF[0], AFEET[0], 0.45), tfLerp(AF[1], AFEET[1], 0.45)], k1);
       aim = tfAimLerp(aim, [AH[0] + 0.25, 1.2], k2);
-      const fov = tfLerp(tfLerp(30 - 2 * K(t, -1, a), 44, k1), 64, k2);
+      const fov = tfLerp(tfLerp(36 - 2 * K(t, -1, a), 50, k1), 64, k2);
       tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0] + dr[0] * 2, aim[1] + dr[1] * 2, fov);
     },
     approach(t) {
@@ -128,9 +128,9 @@ TF_SETS.bh = (app) => {
     },
     two(t) {
       const dr = tfDrift(t, 0.006, 0.35, 15), c1 = tfCap('two', 1).show, c2 = tfCap('two', 2).show;
-      let aim = tfAimLerp([AFEET[0] + 0.1, AFEET[1] + 0.12], [AH[0], AH[1]], K(t, TF.two + 0.2, c1 - 0.2));
-      aim = tfAimLerp(aim, [AF[0] + 0.02, AF[1] + 0.02], K(t, c2 - 0.6, c2 + 1.4));
-      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(44, 36, K(t, c1 - 0.2, c1 + 1)) + 14 * K(t, c2 - 0.6, c2 + 1.4));
+      let aim = tfAimLerp([AFEET[0] + 0.1, AFEET[1] + 0.12], [AH[0] + 0.06, AH[1] + 0.07], K(t, TF.two + 0.2, c1 - 0.2));
+      aim = tfAimLerp(aim, [tfLerp(AF[0], AFEET[0], 0.4), tfLerp(AF[1], AFEET[1], 0.4) + 0.06], K(t, c2 - 0.6, c2 + 1.4));
+      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(48, 42, K(t, c1 - 0.2, c1 + 1)) + 8 * K(t, c2 - 0.6, c2 + 1.4));
     },
     toes(t) {
       const dr = tfDrift(t, 0.004, 0.35, 17);
@@ -139,17 +139,17 @@ TF_SETS.bh = (app) => {
     eleven(t) {
       const dr = tfDrift(t, 0.005, 0.35, 19);
       const aim = tfAimLerp([AFEET[0], AFEET[1] + 0.05], [AF[0] + 0.03, AF[1] + 0.02], K(t, TF.eleven, TF.eleven + 1.6));
-      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(36, 26, K(t, TF.eleven, TF.eleven + 2)));
+      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0] + 0.06 * K(t, TF.eleven, TF.eleven + 2), aim[1], tfLerp(36, 32, K(t, TF.eleven, TF.eleven + 2)));
     },
     day(t) {
       const dr = tfDrift(t, 0.005, 0.35, 21), c1 = tfCap('day', 1).show;
-      let aim = tfAimLerp([AH[0], AH[1]], [AF[0] + 0.03, AF[1] + 0.02], K(t, c1 + 0.2, c1 + 1.9));
-      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(30, 32, K(t, c1, c1 + 2)));
+      let aim = tfAimLerp([AH[0] + 0.06, AH[1] + 0.07], [AF[0] + 0.1, AF[1] + 0.03], K(t, c1 + 0.2, c1 + 1.9));
+      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(42, 40, K(t, c1, c1 + 2)));
     },
     outside(t) {
       const dr = tfDrift(t, 0.005, 0.3, 23), k = K(t, TF.outside - 0.4, TF.outside + 2.6);
-      const aim = tfAimLerp([AF[0], AF[1]], [AH[0] + 0.25, 1.18], k);
-      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(36, 50, k));
+      const aim = tfAimLerp([AF[0], AF[1]], [AH[0] + 0.5, 1.4], k);
+      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(36, 56, k));
     },
     edge(t) {
       const dr = tfDrift(t, 0.004, 0.3, 25), k = K(t, TF.edge - 0.4, TF.edge + 2.2);
@@ -160,7 +160,7 @@ TF_SETS.bh = (app) => {
       // your feet's eye: on the deck by your toes, looking up the pole at your head's clock
       const k = K(t, TF.feetView, TF.real), dr = tfDrift(t, 0.004, 0.3, 27);
       const n = rig.n, p = [rig.feet[0] + n[0] * 0.5 - 0.12 + dr[0], 0.08 + dr[1], rig.feet[2] + n[2] * 0.5 + dr[2]];
-      tfCam(cam, p, tfV([rig.feet[0], 0.6, rig.feet[2]], [rig.head[0], rig.head[1] - 0.03, rig.head[2]], K(t, TF.feetView - 0.2, TF.feetView + 2.2)), tfLerp(58, 44, k));
+      tfCam(cam, p, tfV([rig.feet[0], 0.6, rig.feet[2]], [rig.head[0], rig.head[1] - 0.03, rig.head[2]], K(t, TF.feetView - 0.2, TF.feetView + 2.2)), tfLerp(58, 26, K(t, TF.feetView, TF.feetView + 2.6)));
     },
   };
 
@@ -205,13 +205,14 @@ TF_SETS.bh = (app) => {
       let toes = { toeL: 0, toeR: 0 };
       if (m === 'toes' || m === 'eleven') toes = wiggle(feetTau(t), K(t, TF.wiggle - 0.2, TF.wiggle + 0.3));
       if (m === 'edge') { const tau = feetTau(Math.min(t, TF.freeze)); toes = wiggle(tau, 1); }
-      rig.update(F, { lamp: onPlat ? (m === 'feet' ? 4 : 9) : 0, ...toes, headCol: m === 'feet' ? [170, 190, 255] : null });
+      rig.update(F, { lamp: onPlat ? (m === 'feet' ? 2 : 2.6) : 0, ...toes, headCol: m === 'feet' ? [170, 190, 255] : null });
       rig.pole.bulb.material.color.setRGB(...(m === 'feet' ? [1.3, 1.7, 3.2] : [2.4, 2.2, 1.9]));
       rig.pole.lamp.color.set(m === 'feet' ? '#c4d0ff' : '#ffe7c4');
       // (the feet's-eye shot: the head's clock tipped a little towards the floor so it can be read from down there)
       rig.pole.units.head.tg.rotation.x = m === 'feet' ? 0.5 : 0;
       // ---- the deck's glow: white at rest; on the platform scenes stretched by head : feet
       const sh = tfShiftRGB(ratio), base = onPlat ? 0.8 : 0.5;
+      sh[1] = Math.min(sh[1], sh[0] * tfLerp(1, 0.75, MathX.smooth(ratio, 1.02, 1.12)));   // (warm white, not lime: the lamp's exact spectrum is ours to pick)
       deckM.emissive.setRGB(sh[0], sh[1], sh[2]); deckM.emissiveIntensity = base;
       glowL.groundColor.setRGB(sh[0], sh[1], sh[2]); glowL.intensity = 1.1;
       fill.intensity = onPlat ? 0.05 : 0.12;
@@ -233,8 +234,8 @@ TF_SETS.bh = (app) => {
       const s = tfShotAt(t), m = s.mode, c = cam.position;
       if (m === 'approach') { const d = HOLE_AHEAD; return [{ p: [c.x + d[0] * 50, c.y + d[1] * 50 + 9, c.z + d[2] * 50], text: 'SAGITTARIUS A*', sub: '4.3 MILLION SUNS · 26,000 LIGHT-YEARS', a: W(t, tfCap('bh', 1).show, TF.bh2 - 0.2, 0.5, 0.4) }]; }
       if (m === 'toes') return [{ p: [0.0, 0.08, -0.2], text: 'YOUR TOES', sub: 'AT HALF SPEED', a: W(t, TF.wiggle + 0.8, TF.eleven - 0.2, 0.4, 0.3) }];
-      if (m === 'eleven') return [{ p: rig.feet, text: 'YOUR FEET\'S CLOCK', sub: '11× SLOWER', a: W(t, TF.eleven + 1.8, TF.day - 0.2, 0.4, 0.3) }];
-      if (m === 'outside') return [{ p: [c.x + 120, c.y + 3000, c.z], text: 'THE WHOLE UNIVERSE', sub: '470 YEARS GO BY EVERY SECOND', a: W(t, TF.outside + 2.4, TF.edge - 0.2, 0.5, 0.3) }];
+      if (m === 'eleven') return [{ p: [rig.feet[0] + 0.0, rig.feet[1] + 0.13, rig.feet[2]], text: 'YOUR FEET\'S CLOCK', sub: '11× SLOWER', a: W(t, TF.eleven + 1.8, TF.day - 0.2, 0.4, 0.3) }];
+      if (m === 'outside') return [{ p: [c.x - 260, c.y + 3000, c.z + 120], text: 'THE WHOLE UNIVERSE', sub: '470 YEARS GO BY EVERY SECOND', a: W(t, TF.outside + 2.4, TF.edge - 0.2, 0.5, 0.3) }];
       return [];
     },
   };
