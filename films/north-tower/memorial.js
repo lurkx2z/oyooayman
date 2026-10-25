@@ -22,18 +22,18 @@ NT_SETS.memorial = (app) => {
   const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 2.2, 124, 6), new THREE.MeshBasicMaterial({ color: '#dfe8ff' })); spire.position.y = 417 + 62; ow.add(spire);
   // the beams: each a square of searchlights; drawn as a tall soft column of blue light, fading upward
   const beamM = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, uniforms: { k: { value: 1 } },
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, side: THREE.DoubleSide, uniforms: { k: { value: 1 } },   // (both sides: seen from any angle)
     vertexShader: 'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'uniform float k; varying vec2 vU; void main(){ float h = vU.y; float side = 1.0 - abs(vU.x * 2.0 - 1.0); float a = smoothstep(0.0, 0.55, side) * (0.42 * exp(-h * 2.2) + 0.12) * smoothstep(0.0, 0.004, h) * k; gl_FragColor = vec4(0.62, 0.77, 1.0, a); }',
+    fragmentShader: 'uniform float k; varying vec2 vU; void main(){ float h = vU.y; float side = 1.0 - abs(vU.x * 2.0 - 1.0); float a = smoothstep(0.0, 0.7, side) * (0.1 * exp(-h * 2.2) + 0.03) * smoothstep(0.0, 0.004, h) * k; gl_FragColor = vec4(0.56, 0.73, 1.0, a); }',
   });
-  const haloM = beamM.clone(); haloM.uniforms = { k: { value: 1 } }; haloM.fragmentShader = haloM.fragmentShader.replace('smoothstep(0.0, 0.55, side)', '0.38 * pow(side, 2.0)');
+  const haloM = beamM.clone(); haloM.uniforms = { k: { value: 1 } }; haloM.fragmentShader = haloM.fragmentShader.replace('smoothstep(0.0, 0.55, side)', '0.035 * pow(side, 2.5)');
   // (the searchlights stand in two squares on the roof of the Battery Parking Garage, south of the site; from New
   // Jersey they rise side by side)
-  const beams = [[40, 752], [40, 828]].map(([x, z]) => {
+  const beams = [[40, 730], [40, 850]].map(([x, z]) => {
     const g = new THREE.Group(); g.position.set(x, 30, z); scene.add(g);
     // (a soft-edged column: crossed planes so it has the same width from anywhere; wider as it rises into the haze)
-    for (let k = 0; k < 4; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), beamM); m.scale.set(110, 7000, 1); m.position.y = 3500; m.rotation.y = k * Math.PI / 4; g.add(m); }
-    for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), haloM); m.scale.set(280 + k * 220, 7000, 1); m.position.y = 3500; m.rotation.y = k * Math.PI / 3 + 0.4; g.add(m); }   // (the glow round it, in the haze)
+    for (let k = 0; k < 4; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), beamM); m.scale.set(42, 7000, 1); m.position.y = 3500; m.rotation.y = k * Math.PI / 4; g.add(m); }
+    for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), haloM); m.scale.set(160 + k * 120, 7000, 1); m.position.y = 3500; m.rotation.y = k * Math.PI / 3 + 0.4; g.add(m); }   // (the glow round it, in the haze)
     const base = new THREE.Mesh(new THREE.BoxGeometry(50, 4, 50), new THREE.MeshBasicMaterial({ color: '#cfe0ff' })); base.position.y = 2; g.add(base);
     return g;
   });
