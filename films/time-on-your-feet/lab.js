@@ -280,6 +280,7 @@ TF_SETS.lab = (app) => {
       p.exposure = 1.1; p.vignette = 0.6; p.bloom = 0.5; p.bloomThreshold = 0.8; p.grain = 0.028; p.contrast = 1.08; p.saturation = 1.05;
       if (m === 'jila' && t > TF.jila + 1.6) { p.bloom = 0.8; p.bloomThreshold = 0.5; p.vignette = 0.75; }
       if (m === 'pound') { p.exposure = 1.15; p.warmth = 0.03; }
+      if (m === 'intro' || m === 'nist') { p.exposure = 1.75; p.vignette = 0.45; p.blackLift = 0.012; }
     },
     labels(t) {
       const m = tfShotAt(t).mode;

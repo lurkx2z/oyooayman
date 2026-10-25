@@ -297,7 +297,7 @@ TF_SETS.home = (app) => {
       // "one at your feet" (down), "one at your head" (up), then hold on the head clock as they start
       let aim = tfAimLerp(AHC, [AFC[0] + 0.05, AFC[1] + 0.04], K(t, TF.pole, c1 + 0.9));
       aim = tfAimLerp(aim, AHC, K(t, tfW('pole', 'one', 3).start - 0.3, tfW('pole', 'one', 3).start + 0.9));
-      tfLook(cam, [EYE[0] + dr[0], EYE[1] + dr[1], EYE[2] + dr[2]], aim[0], aim[1], tfLerp(36, 30, K(t, tfCap('pole', 1).show, TF.drift)));
+      tfLook(cam, [EYE[0] + dr[0], EYE[1] + dr[1], EYE[2] + dr[2]], aim[0] + 0.03, aim[1] + 0.08, tfLerp(44, 40, K(t, tfCap('pole', 1).show, TF.drift)));
     },
     drift(t) {
       // step back to see the whole pole, then in on the feet clock's last digits
@@ -480,7 +480,7 @@ TF_SETS.home = (app) => {
       doorPivot.rotation.y = m === 'bigger' ? -1.6 * K(t, TF.go + 0.2, TF.go + 1.6) : 0;
       // ---- the bunk room: its sun, its clocks (the top bunk's runs ahead, by a whisker)
       roomSun.intensity = m === 'bunk' ? 30 : 0;
-      if (m === 'bunk') { const s = 7 * 3600 + 30 + (t - TF.question); for (const [i, f] of bunkClock.entries()) f.update({ big: '07:00:' + String(Math.floor(s % 60)).padStart(2, '0'), small: '.' + String(Math.floor((s % 1) * 1000)).padStart(3, '0') + (i ? ' 000 000 000 000 0' : ' 000 000 000 000 3'), on: 1 }); }
+      if (m === 'bunk') { const s = 7 * 3600 + 30 + (t - TF.question); for (const [i, f] of bunkClock.entries()) f.update({ big: '07:00:' + String(Math.floor(s % 60)).padStart(2, '0'), small: '.' + String(Math.floor((s % 1) * 1000)).padStart(3, '0') + (i ? ' 000 000 000 000 0' : ' 000 000 000 003 3'), on: 1 }); }
       this._N = N;
     },
     grade(t, p, shot) {
@@ -495,7 +495,7 @@ TF_SETS.home = (app) => {
       const s = tfShotAt(t), m = s.mode;
       if (m === 'cat') return [{ p: [cat.g.position.x, 0.3, cat.g.position.z], text: 'YOUR CAT', sub: 'HER HEAD IS 40 cm UP', a: W(t, TF.cat + 1.0, TF.lie - 0.2, 0.4, 0.3) }];
       if (m === 'upstairs') return [{ p: [-0.3, 3.6, -5.0], text: 'UPSTAIRS', sub: '3 m HIGHER', a: W(t, TF.upstairs + 2.0, TF.measured - 0.2, 0.4, 0.3) }];
-      if (m === 'hand') return [{ p: [P0.x + TF_HOME.you[0], 1.72, P0.z + TF_HOME.you[2]], text: 'THE FEET CLOCK', sub: 'ON TOP NOW · AND AHEAD', a: W(t, TF.poleFlipped + 0.2, TF.upstairs - 0.2, 0.4, 0.3) }];
+      if (m === 'hand') return [{ p: [P0.x + TF_HOME.you[0], 1.72, P0.z + TF_HOME.you[2]], text: 'THE FEET CLOCK', sub: 'ON TOP NOW · TICKING FASTER', a: W(t, TF.poleFlipped + 0.2, TF.upstairs - 0.2, 0.4, 0.3) }];
       if (m === 'why') return [{ p: [1.08, 2.2, -0.95], text: 'FASTER', sub: '', a: W(t, TF.fall, TF.maths - 0.2, 0.5, 0.3) }, { p: [1.08, 0.18, -0.95], text: 'SLOWER', sub: '', a: W(t, TF.fall + 0.4, TF.maths - 0.2, 0.5, 0.3) }];
       return [];
     },

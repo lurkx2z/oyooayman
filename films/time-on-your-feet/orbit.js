@@ -198,7 +198,7 @@ TF_SETS.orbit = (app) => {
     labels(t) {
       const m = tfShotAt(t).mode;
       if (m === 'gps') return [{ p: satPos(sats[5], t).toArray(), text: 'GPS SATELLITES', sub: '31 OF THEM · DRAWN BIGGER', a: W(t, tfCap('gps', 1).show + 0.4, TF.gps2 - 0.2, 0.4, 0.3) }];
-      if (m === 'sat') return [{ p: [1.3, 0.4, 1.0], text: 'ITS ATOMIC CLOCKS', sub: '+38 MILLIONTHS OF A SECOND A DAY', a: W(t, TF.gps2 + 1.0, TF.gps3 - 0.2, 0.4, 0.3) }];
+      if (m === 'sat') return [{ p: [1.3, 0.4, 1.0], text: 'ITS ATOMIC CLOCKS', sub: '+38.6 MILLIONTHS OF A SECOND A DAY', a: W(t, TF.gps2 + 1.0, TF.gps3 - 0.2, 0.4, 0.3) }];
       if (m === 'signal') { const c = CITY.clone().applyQuaternion(earthG.quaternion); return [{ p: c.toArray(), text: 'YOUR PHONE', sub: 'TIMES 4 SATELLITES\' SIGNALS', a: W(t, tfCap('gps3', 1).show + 0.2, TF.moon - 0.2, 0.4, 0.3) }]; }
       if (m === 'moon') return [{ p: [1.5, 2.3, -6.5], text: 'A CLOCK ON THE MOON', sub: '+56 MILLIONTHS OF A SECOND A DAY', a: W(t, TF.moon + 1.0, tfCap('moon', 1).show - 0.4, 0.4, 0.3) }];
       return [];

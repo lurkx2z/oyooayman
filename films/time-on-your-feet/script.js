@@ -109,7 +109,7 @@ TF.end = TFT.duration;
 // ---------------------------------------------------------------------------------------------------------------------
 TF.rhoDay = TFP.h / (365 - 1);
 const TF_RHO = [
-  [TF.ten - 0.4, 10], [tfS('ten') + 0.6, 10], [tfS('red') + 2.2, 4.2], [tfE('red'), 2.6], [tfS('two') + 0.5, TFP.h], [tfE('two') + 3.0, TFP.h],
+  [TF.ten - 0.4, 10], [tfE('ten') - 0.2, 10], [tfS('red') + 2.4, 4.2], [tfE('red'), 2.6], [tfS('two') + 0.5, TFP.h], [tfE('slow') - 0.6, TFP.h],
   [tfS('eleven') + 0.3, 0.17], [tfE('eleven') + 0.6, 0.17], [tfS('day') + 0.3, TF.rhoDay], [tfE('outside'), TF.rhoDay],
   [TF.freeze - 0.2, TF.rhoDay * 0.7], [TF.freeze + 2.6, 2e-5], [TF.end, 2e-5],
 ];
@@ -170,8 +170,9 @@ function tfClock(t) {
 }
 // the head–feet gap on the platform since the platform scenes began (s), by integrating 1 − 1/ratio at 30 Hz
 let TF_BHGAP = null;
+// (the gap the platform's clocks build up: from 10 m down; higher up, on the way down to the edge, it is tiny)
 function tfBhGapAt(t) {
-  if (!TF_BHGAP) { const t0 = TF.ten - 30, n = Math.ceil((TF.real - t0) * 30) + 2, a = new Float64Array(n); let s = 0; for (let i = 0; i < n; i++) { a[i] = s; const tt = t0 + i / 30; s += (1 - 1 / tfBhRatio(tfRho(tt))) / 30; } TF_BHGAP = { t0, a }; }
+  if (!TF_BHGAP) { const t0 = TF.ten - 30, n = Math.ceil((TF.real - t0) * 30) + 2, a = new Float64Array(n); let s = 0; for (let i = 0; i < n; i++) { a[i] = s; const tt = t0 + i / 30; s += (tt < TF.ten - 0.4 ? 0 : 1 - 1 / tfBhRatio(tfRho(tt))) / 30; } TF_BHGAP = { t0, a }; }
   const x = MathX.clamp((t - TF_BHGAP.t0) * 30, 0, TF_BHGAP.a.length - 1.001), i = Math.floor(x);
   return TF_BHGAP.a[i] + (TF_BHGAP.a[i + 1] - TF_BHGAP.a[i]) * (x - i);
 }

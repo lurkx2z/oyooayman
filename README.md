@@ -64,6 +64,14 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Long-form (16:9, voiceless): *Is it true time moves slower on your feet than your head?*** — open
+> `time-on-your-feet.html` (7:43). Yes: two of the most precise clocks ever built, one at your feet and one at your
+> head, drift apart in your hallway (6 billionths of a second a year). Then the five experiments that measured it
+> (1959–2022), GPS and the Moon, why (on Earth) gravity *is* this, and three places where the gap grows: Sirius B (6 µs a day),
+> a neutron star (2.6 s a day), and a platform lowered towards Sagittarius A*'s edge until your head ages a year for
+> every day at your feet and your feet freeze. Every number is computed in `physics.js`; the score's two identical
+> clock voices come apart only where the physics does. [`films/time-on-your-feet/PLAN.md`](films/time-on-your-feet/PLAN.md).
 
 | Time | Beat |
 |---|---|
@@ -403,3 +411,16 @@ These were checked by an independent science review pass; see the review summary
 
 - **Part 2 hook:** the ozone layer can't be rebuilt without O₂, so UV-C reaches the ground within hours.
 - **Alternative ending** (fiction, from the original brief): back on the collapsed POV, the O₂ readout flickers 0.0 → 0.1 → 0.3 % and you hear a sudden breath — "Why is oxygen coming back?"
+
+Film: *Is it true time moves slower on your feet than your head?* (`time-on-your-feet.html`, 16:9):
+```
+films/time-on-your-feet/PLAN.md        the film, every number with its source, honesty limits, scenes, sound
+films/time-on-your-feet/CAPTIONS.md    the captions (the film is told by them); build-timing.cjs times them into timing.js
+films/time-on-your-feet/script.js      ★ every beat from the captions; the two clocks; the platform's height
+films/time-on-your-feet/physics.js     gravitational time dilation for every place (Earth, GPS, Moon, Sirius B, neutron star, Sgr A*)
+films/time-on-your-feet/home.js …      the sets: home, lab, tower, orbit, wd, ns, bh (space.js: exact lensing)
+films/time-on-your-feet/hud.js         the readout, the clocks panel, the insets, labels
+films/time-on-your-feet/sound-*.js     score (two clock voices), ambience, effects; mix.js levels
+films/time-on-your-feet/render-gpu.cjs the final 1080p + phone copy on a PC with a graphics card
+```
+

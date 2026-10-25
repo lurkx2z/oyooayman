@@ -38,12 +38,13 @@ TFP.wd = (() => {
 TFP.ns = (() => {
   const M = 1.4 * TFP.Msun, R = 12e3, rs = 2 * TFP.G * M / TFP.c ** 2, x = rs / R;
   const g = TFP.G * M / (R * R) / Math.sqrt(1 - x);
-  // the share of its surface you can see at once from far away (Beloborodov 2002: 1 − cos α = (1 − cos ψ)(1 − r_s/R),
-  // the grazing ray α = 90° reaches ψ_max)
-  const cosPsiMax = 1 - 1 / (1 - x);
+  // the share of its surface you can see at once from far away: the grazing ray's exact bending angle
+  // ψ_max = ∫₀¹ dy / √((1 − x) − y²(1 − x·y)), y = R/r (integrated with y = 1 − s² to tame the end point)
+  let psi = 0; for (let i = 0, N = 4000; i < N; i++) { const s = (i + 0.5) / N, y = 1 - s * s; psi += 2 * s / N / Math.sqrt((1 - x) - y * y * (1 - x * y)); }
+  const cosPsiMax = Math.cos(psi);
   return { M, R, rs, x, g, gx: g / TFP.gE, rate: Math.sqrt(1 - x), blue: 1 / Math.sqrt(1 - x), frac: tfGapFrac(g), vesc: Math.sqrt(x), visible: (1 - cosPsiMax) / 2, bmax: R / Math.sqrt(1 - x) };
 })();
-// Sagittarius A*: 4.3 million solar masses (GRAVITY / Keck), 26,000 light-years away
+// Sagittarius A*: 4.3 million solar masses (GRAVITY / Keck), 27,000 light-years away (8.2 kpc)
 TFP.bh = (() => {
   const M = 4.3e6 * TFP.Msun, rs = 2 * TFP.G * M / TFP.c ** 2;
   return { M, rs, bc: 1.5 * Math.sqrt(3) * rs };
@@ -54,11 +55,11 @@ const tfBhPush = (rho) => TFP.c * TFP.c / rho / TFP.gE;
 // how fast the far universe runs as seen from a height ρ above the edge (×)
 const tfBhOutside = (rho) => 2 * TFP.bh.rs / rho;
 
-// ---- GPS (orbit radius 26,560 km) and the Moon, against a clock on the ground
+// ---- GPS (orbit radius 26,562 km) against a clock on the ground (on the rotating geoid): Ashby (2003) +45.7 µs/day from
+// gravity, −7.1 from speed; the clocks are set to 10.229 999 995 43 MHz, 4.4647e-10 slow: 38.6 µs a day, 11.6 km of light
 TFP.gps = (() => {
-  const GM = 3.986004418e14, Re = 6371e3, a = 26561.75e3, c2 = TFP.c ** 2;
-  const grav = GM / c2 * (1 / Re - 1 / a), v = Math.sqrt(GM / a), sr = v * v / (2 * c2);
-  return { alt: (a - Re) / 1000, grav: grav * TFP.day, speed: sr * TFP.day, net: (grav - sr) * TFP.day, km: (grav - sr) * TFP.day * TFP.c / 1000, f: 10.23e6 * (1 - (grav - sr)) };
+  const off = 4.4647e-10;
+  return { alt: 26561.75 - 6371, grav: 45.7e-6, speed: 7.1e-6, net: off * TFP.day, km: off * TFP.day * TFP.c / 1000, f: 10.23e6 * (1 - off) };
 })();
 TFP.moonClock = 56e-6;      // s/day a clock on the Moon gains on one on the Earth (NASA, 2024: ≈ 56 µs)
 

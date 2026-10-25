@@ -55,6 +55,9 @@ TF_SETS.bh = (app) => {
   const ROT_UP = new THREE.Matrix3().setFromMatrix4(new THREE.Matrix4().makeRotationZ(Math.PI / 2)), ROT_AHEAD = new THREE.Matrix3().setFromMatrix4(new THREE.Matrix4().makeRotationX(-0.3));
   // the bright point overhead (the whole universe, squeezed), and its halo
   const dot = tfGlowSprite(scene, '#dfe8ff', 1), halo = tfGlowSprite(scene, '#8fb0ff', 1);
+  // (in fast-forward: flashes round it, each a frame or two long: stars and galaxies living whole lives in a blink)
+  const sparks = Array.from({ length: 10 }, () => tfGlowSprite(scene, '#ffffff', 1));
+  const hsh = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
   halo.material.opacity = 0.5;
   // ---- the platform: a glowing deck of hexagonal tiles, a dark metal rim with small lights, four pods underneath
   const plat = new THREE.Group(); scene.add(plat);
@@ -115,11 +118,11 @@ TF_SETS.bh = (app) => {
     },
     sphere(t) {
       const k = K(t, TF.sphere, TF.lower), dr = tfDrift(t, 0.008, 0.3, 9);
-      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], 0.35 - 0.9 * k, tfLerp(-0.32, 0.02, K(t, TF.sphere, TF.sphere + 4)), 70);
+      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], 1.0 - 0.6 * k, tfLerp(-0.32, 0.02, K(t, TF.sphere, TF.sphere + 4)), 70);   // (turning, but never round to the pole)
     },
     lower(t) {
       const k = K(t, TF.lower, TF.lower + 4.5), dr = tfDrift(t, 0.006, 0.3, 11);
-      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], -0.55 - 0.2 * k, tfLerp(0.05, 1.42, k), tfLerp(70, 60, k));
+      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], 0.4 + 0.1 * k, tfLerp(0.02, 1.42, k), tfLerp(70, 60, k));
     },
     floor(t) {
       const dr = tfDrift(t, 0.006, 0.35, 13), k = K(t, TF.ten, TF.ten + 6);
@@ -152,9 +155,9 @@ TF_SETS.bh = (app) => {
       tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(36, 56, k));
     },
     edge(t) {
-      const dr = tfDrift(t, 0.004, 0.3, 25), k = K(t, TF.edge - 0.4, TF.edge + 2.2);
-      const aim = tfAimLerp([AH[0] + 0.4, 1.4], [AFEET[0] + 0.12, AFEET[1] + 0.1], k);
-      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], aim[0], aim[1], tfLerp(50, 40, k));
+      // (a cut straight down to your feet, slowly closer)
+      const dr = tfDrift(t, 0.004, 0.3, 25), k = K(t, TF.edge, TF.freeze + 2);
+      tfLook(cam, [E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]], AFEET[0] + 0.12, AFEET[1] + 0.1, tfLerp(46, 38, k));
     },
     feet(t) {
       // your feet's eye: on the deck by your toes, looking up the pole at your head's clock
@@ -188,9 +191,21 @@ TF_SETS.bh = (app) => {
       if (near) {
         const up = [cam.position.x, cam.position.y + 3000, cam.position.z];
         dot.position.set(...up); halo.position.set(...up);
-        const fl = m === 'outside' ? 1 + 0.35 * Math.sin(t * 31) * Math.sin(t * 7.3) + 0.25 * Math.sin(t * 53 + 1) : 1;
+        const ff = m === 'outside', fr = Math.floor(t * 30), fl = ff ? 0.75 + 0.6 * hsh(fr) + 0.2 * Math.sin(t * 53 + 1) : 1;
         dot.scale.setScalar(90 * fl); halo.scale.setScalar(520 * (0.8 + 0.2 * fl));
-      }
+        // its colour shimmers in fast-forward (blue-white ↔ gold), frame by frame
+        const hc = ff ? hsh(fr + 0.5) : 0.5;
+        dot.material.color.setRGB(0.85 + 0.15 * hc, 0.88 + 0.06 * hc, 1.0 - 0.3 * hc);
+        halo.material.color.setRGB(0.5 + 0.45 * hc, 0.66 + 0.1 * hc, 1.0 - 0.45 * hc);
+        sparks.forEach((sp, i) => {
+          const f2 = Math.floor(t * 30 / (1 + (i % 2))), on = ff && hsh(f2 * 13 + i * 7) > 0.55;
+          sp.visible = on; if (!on) return;
+          const ang = hsh(f2 * 3 + i) * 6.283, rad = 60 + 260 * hsh(f2 * 5 + i * 11);
+          sp.position.set(up[0] + Math.cos(ang) * rad, up[1], up[2] + Math.sin(ang) * rad);
+          sp.scale.setScalar(25 + 60 * hsh(f2 + i * 3));
+          sp.material.color.setRGB(1, 0.75 + 0.25 * hsh(i + f2), 0.6 + 0.4 * hsh(i * 2 + f2));
+        });
+      } else sparks.forEach((sp) => { sp.visible = false; });
       // ---- the platform, you, the clocks
       plat.visible = m !== 'approach';
       const c = tfClock(t), F = tfFmtClock(c);
@@ -232,7 +247,7 @@ TF_SETS.bh = (app) => {
     },
     labels(t) {
       const s = tfShotAt(t), m = s.mode, c = cam.position;
-      if (m === 'approach') { const d = HOLE_AHEAD; return [{ p: [c.x + d[0] * 50, c.y + d[1] * 50 + 9, c.z + d[2] * 50], text: 'SAGITTARIUS A*', sub: '4.3 MILLION SUNS · 26,000 LIGHT-YEARS', a: W(t, tfCap('bh', 1).show, TF.bh2 - 0.2, 0.5, 0.4) }]; }
+      if (m === 'approach') { const d = HOLE_AHEAD; return [{ p: [c.x + d[0] * 50, c.y + d[1] * 50 + 9, c.z + d[2] * 50], text: 'SAGITTARIUS A*', sub: '4.3 MILLION SUNS · 27,000 LIGHT-YEARS', a: W(t, tfCap('bh', 1).show, TF.bh2 - 0.2, 0.5, 0.4) }]; }
       if (m === 'toes') return [{ p: [0.0, 0.08, -0.2], text: 'YOUR TOES', sub: 'AT HALF SPEED', a: W(t, TF.wiggle + 0.8, TF.eleven - 0.2, 0.4, 0.3) }];
       if (m === 'eleven') return [{ p: [rig.feet[0] + 0.0, rig.feet[1] + 0.13, rig.feet[2]], text: 'YOUR FEET\'S CLOCK', sub: '11× SLOWER', a: W(t, TF.eleven + 1.8, TF.day - 0.2, 0.4, 0.3) }];
       if (m === 'outside') return [{ p: [c.x - 260, c.y + 3000, c.z + 120], text: 'THE WHOLE UNIVERSE', sub: '470 YEARS GO BY EVERY SECOND', a: W(t, TF.outside + 2.4, TF.edge - 0.2, 0.5, 0.3) }];

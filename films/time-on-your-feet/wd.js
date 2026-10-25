@@ -66,7 +66,7 @@ TF_SETS.wd = (app) => {
 
   // ---- the surface (metres): a glowing plain, a platform, you
   const SURF = new THREE.Group(); scene.add(SURF);   // (at the origin too: the star's model is hidden while you're down here)
-  const plainU = { uT: { value: 0 }, uK: { value: 0.82 } };
+  const plainU = { uT: { value: 0 }, uK: { value: 0.95 } };
   const plain = new THREE.Mesh(new THREE.CircleGeometry(60000, 128).rotateX(-Math.PI / 2), new THREE.ShaderMaterial({
     uniforms: plainU, fog: false,
     vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
@@ -80,11 +80,14 @@ TF_SETS.wd = (app) => {
         float far = length(p - cameraPosition.xz);
         float v = mix(0.62 + 0.62 * g, 0.95, smoothstep(30.0, 600.0, far));
         v *= mix(0.86, 1.18, smoothstep(200.0, 4000.0, far));
-        gl_FragColor = vec4(vec3(0.82, 0.9, 1.0) * v * uK, 1.0); }`,
+        // (a shimmer: the glow boils, faster and finer than the granulation, fading with distance)
+        float s = n(p / 0.6 + vec2(0.0, uT * 0.8)) * 0.6 + n(p / 0.25 - vec2(uT * 1.3, 0.0)) * 0.4;
+        v *= 1.0 + (s - 0.5) * 0.22 * (1.0 - smoothstep(10.0, 80.0, far));
+        gl_FragColor = vec4(vec3(0.74, 0.85, 1.0) * v * uK, 1.0); }`,
   }));
   SURF.add(plain);
   // a low hovering deck (the same idea as the black hole's platform, plainer) so your feet have somewhere to be
-  const deckM = tfStd('#2a2d32', 0.35, 0.8);
+  const deckM = tfStd('#7c828c', 0.55, 0.2, { emissive: '#4a525e' });   // (lit a little, so it reads as a platform against the glare)
   tfMesh(new THREE.CylinderGeometry(1.25, 1.1, 0.12, 64), deckM, 0, 0.06, 0, SURF);
   tfMesh(new THREE.TorusGeometry(1.25, 0.03, 10, 96).rotateX(Math.PI / 2), tfStd('#8a8f96', 0.3, 0.9), 0, 0.12, 0, SURF);
   const rigG = new THREE.Group(); rigG.position.set(0, 0.12, 0); SURF.add(rigG);

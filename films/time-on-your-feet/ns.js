@@ -41,23 +41,25 @@ TF_SETS.ns = (app) => {
   const uS = P.x;                                          // r_s / R
   const ROT_NS = new THREE.Matrix3().setFromMatrix4(new THREE.Matrix4().makeRotationY(2.1).multiply(new THREE.Matrix4().makeRotationX(0.5)));
   // ---- the ground near you: the crust, glowing, smooth as glass; it fades into the lens dome's far ground
-  const plainU = { uK: { value: 0.8 } };
+  const plainU = { uK: { value: 0.8 }, uT: { value: 0 } };
   const plain = new THREE.Mesh(new THREE.CircleGeometry(400, 96).rotateX(-Math.PI / 2), new THREE.ShaderMaterial({
     uniforms: plainU, transparent: true, depthWrite: false, fog: false,
     vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
-    fragmentShader: `uniform float uK; varying vec3 vW;
+    fragmentShader: `uniform float uK, uT; varying vec3 vW;
       float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y); }
       void main(){
         float g = 0.0, a = 0.5; vec2 q = vW.xz / 0.9; for (int i = 0; i < 5; i++){ g += a * n(q); q = q * 2.2 + 3.1; a *= 0.5; }
         float r0 = length(vW.xz - cameraPosition.xz);
-        vec3 c = vec3(0.62, 0.72, 1.0) * mix(0.32 + 0.5 * g, 0.55, smoothstep(8.0, 120.0, r0)) * uK;
+        // (a shimmer near you: the glow boils)
+        float s = n(vW.xz / 0.35 + vec2(0.0, uT * 1.1)) * 0.6 + n(vW.xz / 0.12 - vec2(uT * 1.7, 0.0)) * 0.4;
+        vec3 c = vec3(0.6, 0.74, 1.0) * mix(0.42 + 0.56 * g, 0.66, smoothstep(8.0, 120.0, r0)) * (1.0 + (s - 0.5) * 0.24 * (1.0 - smoothstep(4.0, 40.0, r0))) * uK;
         float r = length(vW.xz);
         gl_FragColor = vec4(c, 1.0 - smoothstep(120.0, 380.0, r)); }`,
   }));
   plain.renderOrder = -2; scene.add(plain);
   // a deck, you, the pole
-  const deckM = tfStd('#24272c', 0.3, 0.85);
+  const deckM = tfStd('#727883', 0.55, 0.25, { emissive: '#444c58' });
   tfMesh(new THREE.CylinderGeometry(1.25, 1.1, 0.12, 64), deckM, 0, 0.06, 0);
   tfMesh(new THREE.TorusGeometry(1.25, 0.03, 10, 96).rotateX(Math.PI / 2), tfStd('#8a8f96', 0.3, 0.9), 0, 0.12, 0);
   const rigG = new THREE.Group(); rigG.position.set(0, 0.12, 0); scene.add(rigG);
@@ -106,6 +108,7 @@ TF_SETS.ns = (app) => {
   const set = {
     scene, camera: cam,
     frame(t, shot) {
+      plainU.uT.value = t;
       const m = shot.mode;
       (CAM[m] || CAM.approach)(t);
       const far = m === 'approach';

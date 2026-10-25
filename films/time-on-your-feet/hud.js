@@ -67,7 +67,7 @@ function tfFmtClock(c) {
 }
 // the places (top right): [from, to, place, gravity line(t)]
 const TF_WHERE = [
-  [0.3, TF.titleShot, 'SAGITTARIUS A*', () => '5 mm ABOVE THE EDGE'],
+  [0.3, TF.titleShot, 'SAGITTARIUS A*', () => '4.7 mm ABOVE THE EDGE'],
   [TF.hall + 0.2, TF.measured, 'YOUR HALLWAY', () => 'GRAVITY 1 g'],
   [TF.pound + 0.3, TF.planes, 'HARVARD, 1959', () => 'A 22.5 m TOWER'],
   [TF.planes + 0.3, TF.nist, 'AROUND THE WORLD, 1971', () => '4 CLOCKS · 2 AIRLINER TRIPS'],
@@ -79,29 +79,34 @@ const TF_WHERE = [
   [TF.why + 0.4, TF.go, 'YOUR HALLWAY', () => 'GRAVITY 1 g'],
   [TF.wd + 0.6, TF.ns, 'SIRIUS B · 8.6 LIGHT-YEARS', () => 'GRAVITY ' + tfFmtG(TFP.wd.gx)],
   [TF.ns + 0.6, TF.bh, 'A NEUTRON STAR', () => 'GRAVITY ' + tfFmtG(TFP.ns.gx)],
-  [TF.bh + 0.6, TF.ten, 'SAGITTARIUS A* · 26,000 LIGHT-YEARS', (t) => { const r = tfBhR(t); return r > 1.02 ? (r - 1 < 9.5 ? (r - 1).toFixed(r - 1 < 1 ? 2 : 1) : Math.round(r - 1)) + ' × ITS RADIUS ABOVE THE EDGE' : 'JUST ABOVE THE EDGE'; }],
+  [TF.bh + 0.6, TF.ten, 'SAGITTARIUS A* · 27,000 LIGHT-YEARS', (t) => { const r = tfBhR(t); return r > 1.02 ? (r - 1 < 9.5 ? (r - 1).toFixed(r - 1 < 1 ? 2 : 1) : Math.round(r - 1)) + ' × ITS RADIUS ABOVE THE EDGE' : 'JUST ABOVE THE EDGE'; }],
   [TF.ten + 0.2, TF.real, 'SAGITTARIUS A*', (t) => { const rho = tfRho(t); return (rho >= 1 ? (rho < 9.95 ? rho.toFixed(1) : Math.round(rho)) + ' m' : rho >= 0.01 ? Math.round(rho * 100) + ' cm' : rho >= 0.001 ? (rho * 1000).toFixed(1) + ' mm' : 'A HAIR\'S WIDTH') + ' ABOVE THE EDGE'; }],
-  [TF.real + 0.6, TF.end, 'YOUR HALLWAY', () => 'GRAVITY 1 g'],
+  [TF.real + 0.6, TF.question, 'YOUR HALLWAY', () => 'GRAVITY 1 g'],
+  [TF.question + 0.3, TF.end, 'UPSTAIRS', () => 'GRAVITY 1 g'],
 ];
 // the readout (top left): when it shows, its value, and what's NEXT
 function tfReadoutAt(t) {
   const W = StoryHUD.win;
-  const a = Math.max(W(t, 0.5, TF.titleShot - 0.1, 0.5, 0.3), W(t, TF.life + 1.2, TF.measured - 0.1, 0.6, 0.3), W(t, TF.bigger + 0.3, TF.real - 0.2, 0.5, 0.4));
+  // (not in the cold open, and not on the way down to the black hole's edge: far from the edge its gravity is weaker
+  // than the neutron star's, and the readout would be wrong)
+  const a = Math.max(W(t, TF.life + 1.2, TF.bh - 0.2, 0.6, 0.4), W(t, TF.ten + 0.4, TF.real - 0.2, 0.5, 0.4));
   if (a <= 0) return null;
   // (frac = head rate / feet rate − 1, kept apart from the 1 so the tiny ones survive in floating point)
   let frac, next = '';
-  if (t < TF.titleShot) { frac = TFP.h / TF.rhoDay; next = ''; }
-  else if (t < TF.wd + 2.2) { frac = TFP.gapE; next = t > TF.bigger ? 'NEXT · A WHITE DWARF' : 'NEXT · STRONGER GRAVITY'; }
+  if (t < TF.wd + 2.2) {
+    frac = TFP.gapE;
+    next = t < TF.measured ? 'NEXT · HAS ANYONE MEASURED IT?' : t < TF.gps ? 'NEXT · IN YOUR POCKET' : t < TF.why ? 'NEXT · WHY?' : t < TF.bigger ? 'NEXT · STRONGER GRAVITY' : 'NEXT · A WHITE DWARF';
+  }
   else if (t < TF.ns) { frac = TFP.wd.frac; next = 'NEXT · A NEUTRON STAR'; }
-  else if (t < TF.bh + 1) { frac = TFP.ns.frac; next = 'NEXT · A BLACK HOLE'; }
   else if (t < TF.ten) { frac = TFP.ns.frac; next = 'NEXT · THE EDGE OF A BLACK HOLE'; }
-  else { frac = TFP.h / tfRho(t); next = t < TF.two ? 'NEXT · YOUR OWN HEIGHT ABOVE THE EDGE' : t < TF.eleven ? 'NEXT · 17 cm' : t < TF.day ? 'NEXT · 5 mm' : t < TF.edge ? 'NEXT · THE EDGE ITSELF' : ''; }
+  else { frac = TFP.h / tfRho(t); next = t < TF.two ? 'NEXT · YOUR OWN HEIGHT ABOVE THE EDGE' : t < TF.eleven ? 'NEXT · 17 cm' : t < TF.day ? 'NEXT · 4.7 mm' : t < TF.edge ? 'NEXT · THE EDGE ITSELF' : ''; }
   const life = tfLifeGap(frac), inf = t >= TF.freeze + 1.2;
-  return { a, v: inf ? 'NO LIMIT' : tfFmtSpan(life), s: frac > 0.5 ? 'WHILE YOUR FEET LIVE 80 YEARS' : 'OVER AN 80-YEAR LIFE', next };
+  // (once the gap is bigger than the life itself, say both lives: feet 80 years, head …)
+  const s = inf ? 'AND IT KEEPS GROWING' : frac > 0.5 ? 'FEET 80 YEARS · HEAD ' + tfFmtSpan(TFP.life * TFP.year * (1 + frac)) : 'OVER AN 80-YEAR LIFE';
+  return { a, v: inf ? 'NO LIMIT' : tfFmtSpan(life), s, next };
 }
 // the scene's context line: [from, to, label, value(t)] (value: text, or { l, v, v2 } with HTML)
 const TF_CTX = [
-  [0.6, TF.titleShot - 0.2, 'WHILE YOUR HEAD LIVES 1 YEAR', () => ({ v: 'YOUR FEET LIVE 1 DAY', v2: 'TIME AT YOUR HEAD · ×365' })],
   [TF.precise + 0.2, TF.drift - 0.2, 'THE BEST CLOCKS · OPTICAL LATTICE CLOCKS', () => ({ v: 'OFF BY UNDER 1 s IN 15 BILLION YEARS', v2: '' })],
   [TF.drift + 0.4, TF.year - 0.2, 'TIME AT YOUR HEAD RUNS FASTER BY', () => ({ v: '0.000 000 000 000 019 %', v2: 'HEAD 1.7 m ABOVE YOUR FEET' })],
   [TF.year + 0.5, TF.life + 1.0, 'THE GAP AFTER', (t) => { const c = tfClock(t), y = c.head / TFP.year; return { l: 'THE GAP AFTER', v: y < 0.02 ? Math.max(1, Math.round(c.head / 86400)) + (c.head < 1.5 * 86400 ? ' DAY' : ' DAYS') : y < 1.5 ? (y < 0.995 ? Math.round(y * 365) + ' DAYS' : '1 YEAR') : Math.round(y) + ' YEARS', v2: tfFrac(c.gap) + ' s' }; }],
@@ -109,23 +114,23 @@ const TF_CTX = [
   [TF.lie + 0.5, TF.hand - 0.2, 'HEAD AND FEET AT THE SAME HEIGHT', () => ({ v: 'THE SAME SPEED', v2: '' })],
   [TF.upstairs + 0.5, TF.measured - 0.2, 'ONE FLOOR UP · 3 m', () => ({ v: '+0.000 000 83 s', v2: 'OVER AN 80-YEAR LIFE' })],
   [TF.pound + 0.6, TF.planes - 0.2, 'POUND & REBKA', () => ({ v: '2.5 PARTS IN A MILLION BILLION', v2: 'THE ENERGY LOST, CLIMBING 22.5 m' })],
-  [TF.planes + 0.6, TF.nist - 0.2, 'HAFELE & KEATING', () => ({ v: 'EASTWARD −59 ns · WESTWARD +273 ns', v2: 'HEIGHT AND SPEED BOTH CHANGE TIME' })],
-  [TF.nist + 0.6, TF.skytree - 0.2, 'RAISED 33 cm', () => ({ v: 'FASTER BY 4 PARTS IN 10<sup>17</sup>', v2: '' })],
+  [TF.planes + 0.6, TF.nist - 0.2, 'HAFELE & KEATING', () => ({ v: 'EASTWARD −59 ns · WESTWARD +273 ns', v2: 'ns = A BILLIONTH OF A SECOND' })],
+  [TF.nist + 0.6, TF.skytree - 0.2, 'RAISED 33 cm', () => ({ v: 'FASTER BY 4 PARTS IN 10<sup>17</sup>', v2: 'A SECOND EVERY 800 MILLION YEARS' })],
   [TF.skytree + 1.0, TF.jila - 0.2, 'THE TOP CLOCK GAINS', () => ({ v: '4 BILLIONTHS OF A SECOND A DAY', v2: 'TAKAMOTO ET AL. · NATURE PHOTONICS' })],
-  [TF.jila + 0.6, TF.gps - 0.2, 'ACROSS 1 mm', () => ({ v: '1 PART IN 10<sup>19</sup>', v2: 'BOTHWELL ET AL. · NATURE' })],
-  [TF.gps2 + 0.4, TF.gps3 - 0.2, 'A GPS CLOCK, EVERY DAY', (t) => ({ v: t < tfCap('gps2', 1).show ? '+45.7 µs · WEAKER GRAVITY' : t < tfCap('gps2', 2).show ? '+45.7 µs · −7.2 µs SPEED' : '+38.5 µs · NET', v2: 'µs = A MILLIONTH OF A SECOND' })],
-  [TF.gps3 + 0.4, TF.moon - 0.2, 'SET BEFORE LAUNCH', () => ({ v: '10.229 999 995 43 MHz', v2: 'INSTEAD OF 10.23 MHz' })],
+  [TF.jila + 0.6, TF.gps - 0.2, 'ACROSS 1 mm', () => ({ v: '1 PART IN 10<sup>19</sup>', v2: 'A SECOND EVERY 300 BILLION YEARS' })],
+  [TF.gps2 + 0.4, TF.gps3 - 0.2, 'A GPS CLOCK, EVERY DAY', (t) => ({ v: t < tfCap('gps2', 1).show ? '+45.7 µs · WEAKER GRAVITY' : t < tfCap('gps2', 2).show ? '+45.7 µs · −7.1 µs SPEED' : '+38.6 µs · NET', v2: 'µs = A MILLIONTH OF A SECOND' })],
+  [TF.gps3 + 0.4, TF.moon - 0.2, 'SET BEFORE LAUNCH', () => ({ v: 'SLOWER BY 0.000 000 045 %', v2: '10.229 999 995 43 MHz, NOT 10.23' })],
   [TF.moon + 0.6, TF.why - 0.2, 'A CLOCK ON THE MOON GAINS', () => ({ v: '+56 µs A DAY', v2: 'COORDINATED LUNAR TIME · NASA' })],
   [TF.fall + 0.3, TF.maths - 0.2, 'EACH METRE UP, TIME RUNS FASTER BY', () => ({ v: '0.000 000 000 000 000 11', v2: 'SECONDS EVERY SECOND' })],
   [TF.wd2 + 0.4, TF.wd3 - 0.2, 'YOUR WEIGHT', () => ({ v: tfThousands(Math.round(TFP.wd.weightT / 100) * 100) + ' TONNES', v2: 'THE EIFFEL TOWER: 10,100' })],
   [TF.wd4 + 0.4, TF.ns - 0.2, 'SIRIUS B\'S LIGHT, STRETCHED', () => ({ v: 'AS IF RACING AWAY AT 80 km/s', v2: 'MEASURED BY HUBBLE, 2005' })],
   [TF.ns2 + 0.4, TF.nsLand - 0.2, 'YOU CAN SEE', () => ({ v: Math.round(TFP.ns.visible * 100) + '% OF ITS SURFACE', v2: 'LIGHT FROM THE FAR SIDE BENDS ROUND' })],
-  [TF.ns4 + 0.4, TF.ns5 - 0.2, 'STARLIGHT ARRIVES', () => ({ v: '×' + TFP.ns.blue.toFixed(2) + ' MORE ENERGY', v2: 'SUN-LIKE STARS TURN BLUE-WHITE' })],
+  [TF.ns4 + 0.4, TF.ns5 - 0.2, 'STARLIGHT ARRIVES', () => ({ v: TFP.ns.blue.toFixed(2) + '× THE ENERGY', v2: 'SUN-LIKE STARS LOOK WHITE' })],
   [TF.ns5 + 0.4, TF.bh - 0.2, 'TIME HERE RUNS', () => ({ v: Math.round(TFP.ns.rate * 100) + '% AS FAST AS ON EARTH', v2: 'ONE YEAR HERE = 1 YEAR 86 DAYS ON EARTH' })],
   [TF.bh2 + 0.3, TF.board - 0.2, 'EVENT HORIZON TELESCOPE · 2022', () => ({ v: 'ITS SHADOW, PHOTOGRAPHED', v2: '' })],
   [TF.board + 0.6, TF.sphere - 0.2, 'TO HOVER HERE', () => ({ v: 'A PUSH NO ROCKET COULD GIVE', v2: '' })],
-  [TF.ten + 0.4, TF.feel - 0.2, 'TIME AT YOUR HEAD', (t) => { const r = tfBhRatio(tfRho(t)); return { v: t >= TF.freeze + 1.2 ? '× NO LIMIT' : '× ' + (r < 1.995 ? r.toFixed(2) : r < 30 ? r.toFixed(r < 10 ? 1 : 0) : tfThousands(r)), v2: 'TO HOVER: ' + tfFmtG(tfBhPush(tfRho(t))) }; }],
-  [TF.real + 1.2, TF.home - 0.2, 'MEASURED', () => ({ v: '1959 · 1971 · 1976 · 2010 · 2020 · 2022', v2: 'AND EVERY GPS SATELLITE, EVERY DAY' })],
+  [TF.ten + 0.4, TF.feel - 0.2, 'TIME AT YOUR HEAD', (t) => { const r = tfBhRatio(tfRho(t)); return { v: t >= TF.freeze + 1.2 ? '× NO LIMIT' : '× ' + (r < 1.995 ? r.toFixed(2) : r < 30 ? r.toFixed(r < 10 ? 1 : 0) : tfThousands(r)), v2: 'TO HOVER: ' + (t >= TF.freeze + 1.2 ? 'NO LIMIT' : tfFmtG(tfBhPush(tfRho(t)))) }; }],
+  [TF.real + 1.2, TF.home - 0.2, 'MEASURED', () => ({ v: '1959 · 1971 · 2005 · 2010 · 2020 · 2022', v2: 'AND EVERY GPS SATELLITE, EVERY DAY' })],
   [TF.home + 0.5, TF.end, 'SINCE THIS VIDEO STARTED', (t) => ({ v: tfFrac(t * TFP.gapE, 2) + ' s', v2: 'YOUR FEET, BEHIND YOUR HEAD' })],
 ];
 // the honest labels: [from, to, text] (the first match wins)
@@ -133,15 +138,20 @@ const TF_TAGS = [
   [0.3, TF.titleShot, 'LATER IN THIS FILM · PRETEND NOTHING CAN HURT YOU'],
   [TF.hall + 0.4, TF.year, 'ILLUSTRATION · CLOCKS THIS GOOD FILL A LAB'],
   [TF.year + 0.3, TF.cat, 'SPED UP'],
+  [TF.cat + 0.3, TF.measured, 'ILLUSTRATION'],
   [TF.measured + 0.3, TF.gps, 'REAL EXPERIMENTS · ILLUSTRATED'],
   [TF.gps + 0.3, TF.why, 'REAL · ILLUSTRATED'],
   [TF.fall, TF.maths, 'THE DIFFERENCE EXAGGERATED 10,000,000,000,000,000 TIMES'],
-  [TF.wd + 0.4, TF.wd3 + 0.6, 'FROM HERE, PRETEND NOTHING CAN HURT YOU'],
+  [TF.why + 0.3, TF.wd, 'ILLUSTRATION'],
+  [TF.wd + 0.4, TF.wdLand, 'FROM HERE, PRETEND NOTHING CAN HURT YOU'],
   [tfS('wd3') + 0.6, tfE('wd3') + 0.4, 'A DAY, SPED UP'],
-  [TF.wd4, TF.ns5, 'PRETEND NOTHING CAN HURT YOU'],
+  [TF.wdLand, TF.wd4, 'ILLUSTRATED · IT HAS NO SOLID GROUND · PRETEND NOTHING CAN HURT YOU'],
+  [TF.wd4, TF.ns, 'REAL MEASUREMENT · A AND B DRAWN FAR APART'],
   [tfS('ns5') + 0.4, tfCap('ns5', 0).hide, 'A DAY, SPED UP'],
+  [TF.ns, TF.bh, 'PRETEND NOTHING CAN HURT YOU'],
   [TF.bh + 0.4, TF.board, 'ILLUSTRATION · ITS GLOW AS RADIO TELESCOPES SEE IT'],
   [TF.board, TF.real - 0.2, 'PRETEND YOUR PLATFORM CAN HOLD YOU UP · AND NOTHING CAN HURT YOU'],
+  [TF.real + 0.3, TF.end, 'ILLUSTRATION'],
 ];
 // a caption's text with its numbers in amber
 function tfCapHtml(s) {
@@ -159,7 +169,7 @@ class TfHud {
     this.tag = mk('tf-tag');
     this.where = mk('tf-where', '<div class="l">WHERE</div><div class="v"></div><div class="f"></div>'); this.whereV = this.where.querySelector('.v'); this.whereF = this.where.querySelector('.f');
     this.cap = mk('tf-cap');
-    this.caps = TFT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: tfCapHtml(c.text), q: g.id === 'question' })));
+    this.caps = TFT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: g.id === 'question' ? TF.end - 0.2 : c.hide, html: tfCapHtml(c.text), q: g.id === 'question' })));   // (the question stays to the end)
     this.clocks = mk('tf-clocks', '<div class="r h"><span class="k">HEAD</span><span class="d"></span><span class="t"></span></div><div class="r f"><span class="k">FEET</span><span class="d"></span><span class="t"></span></div><div class="g"></div>');
     this.ckH = this.clocks.querySelector('.h .t'); this.ckF = this.clocks.querySelector('.f .t'); this.ckHd = this.clocks.querySelector('.h .d'); this.ckFd = this.clocks.querySelector('.f .d'); this.ckG = this.clocks.querySelector('.g');
     this.inset = mk('tf-inset');
@@ -217,7 +227,11 @@ class TfHud {
       d.style.opacity = vis ? String(l.a ?? 1) : '0';
       const lx = (_p.x * 0.5 + 0.5) * 100, ly = (-_p.y * 0.5 + 0.5) * 100;
       const r = l.side ? l.side === 'l' : lx > 72; if (d._r !== r) { d._r = r; d.classList.toggle('r', r); }
-      d.style.left = lx.toFixed(2) + '%'; d.style.top = ((ra > 0.05 || cx) && lx < 40 ? Math.max(ly, 46) : ly).toFixed(2) + '%';
+      // (kept clear of the panels: the readout and context line top left, WHERE and the clocks top right)
+      let top = ly;
+      if ((ra > 0.05 || cx) && lx < 40) top = Math.max(top, 46);
+      if (lx > 55) top = Math.max(top, this._ckA > 0.05 ? 38 : wh ? 20 : 0);
+      d.style.left = lx.toFixed(2) + '%'; d.style.top = top.toFixed(2) + '%';
       const h = `<span class="d"></span><span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`;
       if (d._h !== h) { d._h = h; d.innerHTML = h; }
     });
@@ -227,8 +241,8 @@ class TfHud {
   _clocks(t) {
     const W = StoryHUD.win;
     const a = Math.max(W(t, 0.6, TF.titleShot - 0.1, 0.4, 0.3), W(t, TF.start - 0.5, TF.cat - 0.1, 0.4, 0.3), W(t, TF.wd3 + 0.2, TF.wd4 + 0.6, 0.4, 0.3),
-      W(t, TF.ns5 + 0.2, TF.bh - 0.1, 0.4, 0.3), W(t, TF.ten + 0.4, TF.outside - 0.1, 0.4, 0.3), W(t, TF.edge + 0.2, TF.real - 0.2, 0.4, 0.3), W(t, TF.home + 0.4, TF.question - 0.1, 0.4, 0.3));
-    this._set('cka', this.clocks, 'opacity', a.toFixed(3));
+      W(t, TF.ns5 + 0.2, TF.bh - 0.1, 0.4, 0.3), W(t, TF.ten + 0.4, TF.outside - 0.1, 0.4, 0.3) * (1 - W(t, TF.two + 0.3, tfCap('two', 2).show - 0.6, 0.3, 0.4)) * (1 - W(t, TF.slow + 0.1, TF.eleven - 0.2, 0.3, 0.4)), W(t, TF.edge + 0.2, TF.real - 0.2, 0.4, 0.3), W(t, TF.home + 0.4, TF.question - 0.1, 0.4, 0.3));
+    this._ckA = a; this._set('cka', this.clocks, 'opacity', a.toFixed(3));
     if (a <= 0) return;
     const c = tfClock(t), F = tfFmtClock(c);
     // the digits that differ, in amber
@@ -271,15 +285,15 @@ class TfHud {
       <text x="380" y="392" class="eq big" text-anchor="middle">= 9.8 m/s²</text>
       <text x="380" y="432" class="s" text-anchor="middle">THE PULL OF THE EARTH</text></g>`);
   }
-  // a GPS signal: in 38.5 µs it crosses 11.5 km (drawn to scale against a city)
+  // a GPS signal: in 38.6 µs it crosses 11.6 km (drawn to scale against a city)
   static signal(u) {
     const k = MathX.clamp(u / 2.2, 0, 1), x0 = 90, x1 = 670, x = x0 + (x1 - x0) * Ease.inOutSine(k);
     return TfHud.svg(`${TfHud.plate()}
-      <text x="40" y="58" class="t">IN 38 MILLIONTHS OF A SECOND</text>
+      <text x="40" y="58" class="t">IN 38.6 MILLIONTHS OF A SECOND</text>
       <line x1="${x0}" y1="230" x2="${x1}" y2="230" stroke="rgba(222,214,196,0.35)" stroke-width="3" stroke-dasharray="8 8"/>
       <line x1="${x0}" y1="230" x2="${x.toFixed(1)}" y2="230" stroke="#ffcf8a" stroke-width="6" stroke-linecap="round"/>
       <circle cx="${x.toFixed(1)}" cy="230" r="13" fill="#fff"/><circle cx="${x.toFixed(1)}" cy="230" r="26" fill="rgba(255,220,160,0.25)"/>
-      <text x="${x0}" y="290" class="b">0 km</text><text x="${x1}" y="290" class="b" text-anchor="end">11.5 km</text>
+      <text x="${x0}" y="290" class="b">0 km</text><text x="${x1}" y="290" class="b" text-anchor="end">11.6 km</text>
       <text x="380" y="380" class="s" text-anchor="middle">A GPS SIGNAL TRAVELS AT THE SPEED OF LIGHT</text>
       <text x="380" y="420" class="s" text-anchor="middle">EVERY 30 cm = 1 BILLIONTH OF A SECOND</text>`);
   }
