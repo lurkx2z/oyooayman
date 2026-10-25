@@ -1,6 +1,6 @@
 /* =====================================================================
    SOUND · LIB — the noise and filter generators the ambience and effects share (from the Slower light film, renamed
-   ux*), and this film's own generators. Every function here is listed in UC_SOUND_FNS at the end, so the baked
+   uc*), and this film's own generators (the fire). Every function here is listed in UC_SOUND_FNS at the end, so the baked
    soundtrack's fingerprint sees a change to any of them.
    ===================================================================== */
 
@@ -96,8 +96,6 @@ function ucFilmAt(n, a = UC.titleShot, b = UC.midnight) {
 }
 // how fast the night runs at t (night s per film s): ≪ 1 in the two slowed-down seconds
 function ucRate(t) { return Math.abs(ucNight(t + 0.04) - ucNight(t - 0.04)) / 0.08; }
-// the air at t (0…1 of its pressure; 1 before tonight's onset and after the film comes back to 7:29)
-function ucAirAt(t) { if (t >= UC.question - 0.2) return 1; if (t < UC.titleShot) return 0; return MathX.clamp(ucPressure(Math.max(0, ucNight(t))), 0, 1); }
 // a level curve sampled once (200 Hz) and read back by linear interpolation: the beds read their envelopes per sample
 function ucCurve(f, hz = 200) {
   const t0 = -2, n = Math.ceil((UC.end + 6 - t0) * hz), y = new Float32Array(n + 1);
@@ -131,4 +129,38 @@ function ucMeow(fx, o = {}) {
   return y;
 }
 
-const UC_SOUND_FNS = [ucNoise, ucBed, ucTone, ucChirp, ucCrackle, ucSweep, ucSweepPut, ucEv, ucWn, ucAddAt, ucPlace, ucFilmAt, ucRate, ucAirAt, ucCurve, ucCricket, ucOwl, ucMeow];
+// ---- the fire (from the garden's own fire front, garden.js: UC_BURN, ucCharAt, ucFlameEnv) -------------------------
+// the share of one kind of fuel alight at night time n (the front reaches a place where the front function is f at
+// ucCharAt(kind, f) less a few seconds' lead; f is spread over about 0.1 … 0.9)
+const UC_FIRE_LEAD = { grass: 6, leaves: 2.5, tree: 6, shed: 6, fence: 6 }, UC_FIRE_W = { grass: 1.0, leaves: 0.3, tree: 0.6, shed: 0.8, fence: 0.8 };
+function ucBurning(kind, n) { const B = UC_BURN[kind]; let s = 0; for (let f = 0.1; f <= 0.901; f += 0.05) s += ucFlameEnv(n - (ucCharAt(kind, f) - UC_FIRE_LEAD[kind]), B.dur); return s / 17; }
+function ucFireLevel(n) { let s = 0; for (const k of Object.keys(UC_FIRE_W)) s += UC_FIRE_W[k] * ucBurning(k, n); return s; }
+// the moments places catch (for the ignition sounds): night times, spread over the front, for one kind
+function ucIgnitions(kind, count) { const out = []; for (let i = 0; i < count; i++) { const f = 0.12 + 0.76 * (i + 0.5) / count; out.push(ucCharAt(kind, f) - UC_FIRE_LEAD[kind]); } return out; }
+// a fire, mono: the roar (low turbulent rumble), the flutter of the flames, a hiss, and crackles (wood: sharp pops
+// through small resonances). lv(u) its level over its length (0…1+); o.pop crackles per second at level 1
+function ucFire(fx, d, lv, o = {}) {
+  const sr = fx.sr, r = fx.r, n = Math.ceil(d * sr), y = fx.arr(d + 0.05);
+  const roar = ucNoise(fx, n, 'brown'); UCX.bq(roar, 'lp', o.lo || 320, 0.7, sr);
+  const flut = ucNoise(fx, n, 'pink'); UCX.bq(flut, 'bp', 520, 0.8, sr);
+  const hiss = ucNoise(fx, n, 'pink'); UCX.bq(hiss, 'hp', 2600, 0.7, sr); UCX.bq(hiss, 'lp', 9000, 0.7, sr);
+  const w1 = fx.wander(0.7), w2 = fx.wander(6);
+  for (let i = 0; i < n; i++) { const u = i / n, L = lv(u), f = 1 + 0.45 * w1(i / sr) + 0.25 * w2(i / sr); y[i] = L * (1.0 * roar[i] * f + 0.35 * flut[i] * (0.6 + 0.6 * Math.max(0, w2(i / sr * 1.7))) + 0.08 * hiss[i]); }
+  const pop = o.pop ?? 22, M = [[r.range(900, 1400), 0.004, 1], [r.range(2100, 3200), 0.003, 0.6], [r.range(4200, 6000), 0.002, 0.35]];
+  for (let i = 0; i < n; i++) {
+    const L = lv(i / n); if (r.next() >= pop * L / sr) continue;
+    const a = 0.25 + Math.pow(r.next(), 4) * 2.2, k = r.range(0.7, 1.4), z = fx.hit(M.map(([f, t, aa]) => [f * k, t, aa]), { width: 0.00015, noise: 0.8, nhp: 1500, nlen: 0.003, len: 0.03 });
+    for (let j = 0; j < z.length && i + j < y.length; j++) y[i + j] += z[j] * a * 0.5;
+  }
+  return y;
+}
+// an ignition: a soft "whump" (a low swell of air and a breath of flame), o.size
+function ucWhump(fx, o = {}) {
+  const sr = fx.sr, d = 0.5 + 0.5 * (o.size || 1), n = Math.ceil(d * sr), y = ucNoise(fx, n, 'brown'), z = ucNoise(fx, n, 'pink');
+  UCX.bq(y, 'lp', 180 + 60 * (o.size || 1), 0.8, sr); UCX.bq(z, 'bp', 700, 0.9, sr);
+  for (let i = 0; i < n; i++) { const u = i / n, e = Math.min(1, u / 0.08) * Math.pow(1 - u, 1.6); y[i] = (y[i] * 1.2 + z[i] * 0.4) * e; }
+  return y;
+}
+
+const UC_SOUND_FNS = [ucNoise, ucBed, ucTone, ucChirp, ucCrackle, ucSweep, ucSweepPut, ucEv, ucWn, ucAddAt, ucPlace, ucFilmAt, ucRate, ucCurve, ucCricket, ucOwl, ucMeow,
+  ucBurning, ucFireLevel, ucIgnitions, ucFire, ucWhump];

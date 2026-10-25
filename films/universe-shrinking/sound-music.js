@@ -1,21 +1,24 @@
 /* =====================================================================
-   SOUND · MUSIC — an original score in D minor, all synthesised (the Slower light film's kit, renamed ux*): string
+   SOUND · MUSIC — an original score in D minor, all synthesised (the Slower light film's kit, renamed uc*): string
    pads, a felt piano, bells, a low drum, a heartbeat, a filtered synth pulse. Three ideas of this film's own:
-     the theme     four bell notes, D–A–G–E, and then the D an octave up: the octave is the frequency DOUBLED, the way
-                   space doubles. It rings out whole over the title; it comes back slower and lonelier each time; at
-                   the end of the film it lands, whole and quiet, on that high D
-     the stretch   starlight crossing growing space gets stretched, redder: so does the music. From "Now the stretch
-                   reaches you" the sky's chord slides down, and its notes drop out one at a time as the stars go
-     the doubling  in the last second, one tick for every time space doubles in size. They start a breath apart and
-                   end as a buzz; then nothing, at midnight
-   The shape: a hush for the cold open (a heartbeat, a drone); the title; wonder for growing space, warmth for "held
-   together"; a little piano for Saturn; tension into 7:30, a hit on it; the first second held still, each galaxy a bell
-   cut short as it goes over the edge; time moving again; the sky's chord sliding down and thinning; clear and warm
-   for the Moon; one bell for Saturn, and a thread for its light still coming; the Sun: a low drum; then lighter and
-   playful (the fountain, the jump), thinner as the air goes, a dip for your ears; weightless: high and still; rising
-   lines as things fall up; the crack: drums and a low cluster; the cold open's drone again at 11:41; the theme alone
-   for the house; the last second: the ticks, the heartbeat, the tear; silence at midnight; then warmth coming back
-   for what's real, relief, the galaxies leaving, "Ours.", and the theme whole for the closing question.
+     the theme     four bell notes, D–A–G–E, and then the D an octave up. The octave is the frequency DOUBLED, the way
+                   every star's light doubles when the universe is half its size: at "twice as hot" the theme's D
+                   jumps its octave. It rings out over the title, comes back on the piano as things are lost, rings
+                   out whole for the light of the Big Bang, and lands, warm, for the closing question
+     the squeeze   starlight in shrinking space is squeezed, bluer: so is the music. From "Shrinking space squeezes
+                   it" the sky's chord slides UP and brightens, and the stars' bells come out thicker and higher
+     the halvings  in the last second, one tick for every time the universe halves in size again. They start a
+                   breath apart and end as a buzz; then nothing, at midnight
+   The shape: a hush for the cold open (a drone, a heartbeat); the title; the ice; wonder, then a turn and a quickening
+   pulse for the rule; warmth for "held together"; a rising line for the promise; almost nothing at 7:30 (a church clock
+   strikes in the effects); the squeeze, the octave, the most beautiful sky (D major, the theme whole); unease as the
+   dark glows; the stars' bells drowned one by one; drums as the galaxies crash; a sparse piano for the frost; a bell
+   for 0 °C; a pulse for the heat, the cat, going in; the fire: a low ostinato that grows; the Moon fading as a high
+   note into the pad; "pretend nothing can hurt you": the drums stop and the music opens out; the ice motif again for
+   the bird bath; a long rise for the afterglow; a low blow for the house; no edges (pure tones, no attacks) as the
+   garden disappears; the theme whole for the Big Bang's light; a crescendo for the Sun; the halvings, the heartbeat,
+   three hits and a swell for the last second; silence at midnight; then warmth coming back, a question in the music
+   for the clue, and the theme landing on its octave for 7:29.
    ===================================================================== */
 
 // the kit: string pads (three detuned oscillators per note through low-passes), felt piano (also reversed), bells,
@@ -133,6 +136,9 @@ const UC_CH = {
 const UC_THEME = ['D5', 'A5', 'G5', 'E5'], UC_THEME_END = 'D6';
 const ucOct = (n, k) => n.replace(/-?\d$/, (d) => String(+d + k));
 
+
+const UC_ICE = ['A5', 'E6', 'F5', 'D6'];                         // the ice (7:29), and again at "At 7:29, it was ice"
+
 ucSound('music', 'score', function (ctx, bus, K) {
   const M = ucMusicKit(ctx, K), C = UC_CH, cap = (id, k) => ucCap(id, k).show;
   // the theme: its four notes from t, spaced dts (a number or a list), in bells or piano (o.oct shifts it); returns
@@ -146,205 +152,230 @@ ucSound('music', 'score', function (ctx, bus, K) {
     });
     return tt;
   };
-  // bells walking round the chord tones
-  const arp = (t0, t1, steps, step, vol, oct = [5, 6], seq = [0, 1, 2, 1, 3, 2, 1, 2]) => {
-    for (let t = t0, i = 0; t < t1 - 0.05; t += step, i++) {
-      let ch = steps[0][1]; for (const [ts, c] of steps) if (t >= ts) ch = c;
-      const pcs = ch.map((n) => n.replace(/-?\d$/, '')), pc = pcs[(seq[i % seq.length] + 1) % pcs.length];
-      M.bell(t, pc + oct[(i >> 2) % oct.length], vol * (i % 4 === 0 ? 1 : 0.7), i % 2 ? 0.35 : -0.35);
+  // bells walking round a chord's tones from t0 to t1, step s (or s(t)), vol (or vol(t)); octaves oct
+  const arp = (t0, t1, notes, s, vol, oct = [5, 6], seq = [0, 2, 1, 3, 2, 4, 1, 3]) => {
+    const pcs = notes.map((n) => n.replace(/-?\d$/, ''));
+    for (let t = t0, i = 0; t < t1 - 0.05; i++) {
+      const v = typeof vol === 'function' ? vol(t) : vol;
+      if (v > 0.005) M.bell(t, pcs[seq[i % seq.length] % pcs.length] + oct[(i >> 2) % oct.length], v * (i % 4 === 0 ? 1 : 0.7), Math.sin(i * 1.9) * 0.6);
+      t += typeof s === 'function' ? s(t) : s;
     }
   };
+  const ice = (t, dt, vol) => UC_ICE.forEach((n, i) => M.piano(t + i * dt, n, vol * (i ? 0.85 : 1), 2.2, i % 2 ? 0.3 : -0.3, 0.6));
 
-  // ---- 1 · the cold open (11:41 tonight): a low drone, a thin high note, your heartbeat; a swell into the cut
+  // ---- the cold open (11:44 tonight): a low drone, a thin high note, a rub, your heartbeat; a swell into the cut
   M.strings(0, UC.titleShot + 0.2, ['D1', 'A1', 'D2'], 0.62, { att: 1.2, rel: 0.3, cut: 300, wave: 'sine', vib: 2 });
   M.strings(0.6, UC.titleShot + 0.1, ['A5'], 0.05, { att: 2.0, rel: 0.3, cut: 6000, wave: 'sine', vib: 3 });
   M.strings(1.5, UC.titleShot, ['Eb3', 'D4'], 0.16, { att: 2.5, rel: 0.2, cut: 900, wave: 'triangle', vib: 4 });
-  for (let t = 0.4; t < UC.titleShot - 0.3; t += 0.78) M.beat(t, 0.3);
+  for (let t = 0.4; t < UC.titleShot - 0.3; t += 0.74) M.beat(t, 0.3);
+  M.drum(cap('open', 1) - 0.05, 0.4, 36.7, 1.4);                                                   // "…setting your garden on fire."
   M.rpiano(UC.titleShot, 'D3', 0.32, 1.8, 0); M.rpiano(UC.titleShot, 'A3', 0.22, 1.8, 0);
 
-  // ---- the title (7:29, the garden): the theme rings out whole, then once more up high
+  // ---- the title (7:29, the garden): the theme rings out whole, then once more up high; the ice
   const T0 = UC.title[0];
-  M.drum(T0, 0.8, 36.7, 1.4); M.piano(T0, 'D2', 0.42, 3.5, 0);
-  M.strings(T0 - 0.1, UC.grow + 0.4, C.Dm9, 0.62, { att: 0.5, rel: 0.6, cut: 1400 });
+  M.drum(T0, 0.75, 36.7, 1.4); M.piano(T0, 'D2', 0.42, 3.5, 0);
+  M.strings(T0 - 0.1, UC.rule + 0.4, C.Dm9, 0.55, { att: 0.5, rel: 0.8, cut: 1400, cutTo: 900, cutAt: UC.frost0 + 2 });
   M.bell(theme(T0 + 0.1, 0.24, 0.45), UC_THEME_END, 0.55, 0);
-  M.bell(theme(T0 + 2.2, 0.18, 0.24, { oct: 1 }), ucOct(UC_THEME_END, 1), 0.28, 0);
-  M.piano(T0 + 2.4, 'A3', 0.22, 2.5, 0.2);
+  M.bell(theme(T0 + 2.2, 0.18, 0.22, { oct: 1 }), ucOct(UC_THEME_END, 1), 0.26, 0);
+  M.piano(cap('frozen', 0) + 0.1, 'A3', 0.2, 2.5, 0.2);
+  ice(UC.frost0 + 0.5, 0.55, 0.15); M.strings(UC.frost0 + 0.3, UC.rule + 0.3, ['E6'], 0.035, { att: 1.0, rel: 0.6, cut: 7000, wave: 'sine', vib: 2 });
 
-  // ---- space grows: wide and slow, opening out; bells drifting apart; "doubles": the octave, D then D
+  // ---- the rule: growing (wide, open); "it starts to shrink" (a reversed swell, the chord darkens); "faster and
+  //      faster" (a pulse that quickens)
   {
-    const g2 = cap('grow', 1) + 2.0, g = [[UC.grow, C.Bbmaj7], [cap('grow', 1) - 0.3, C.F], [g2, C.Dm9]];
-    M.prog(g, UC.held + 0.4, 0.62, { cut: 1100, cutTo: 2600, att: 1.2 });
-    for (let t = UC.grow + 0.6, i = 0; t < UC.held - 0.4; i++) { const ch = t < cap('grow', 1) - 0.3 ? C.Bbmaj7 : t < g2 ? C.F : C.Dm9, pcs = ch.map((n) => n.replace(/-?\d$/, '')); M.bell(t, pcs[(i * 2 + 1) % pcs.length] + (i % 3 ? 5 : 6), 0.13, Math.sin(i * 1.3) * 0.6); t += 0.55 + 0.12 * (i % 3); }
-    M.drum(UC.grow, 0.45, 36.7, 2); M.piano(UC.grow, 'Bb1', 0.3, 3, 0);
-    const td = ucW('grow', 'doubles').start; M.bell(td, 'D5', 0.36, -0.3); M.bell(td + 0.55, 'D6', 0.4, 0.3); M.piano(td, 'D2', 0.3, 3, 0);
+    const ts = UC.shrinkAt, tf = cap('rule', 2);
+    M.strings(UC.rule, ts + 0.3, C.Bbmaj7, 0.55, { att: 1.0, rel: 0.4, cut: 1100, cutTo: 2200 });
+    for (let t = UC.rule + 0.5, i = 0; t < ts - 0.4; i++) { M.bell(t, ['D5', 'F5', 'A5', 'D6', 'A5', 'F5'][i % 6], 0.12, Math.sin(i * 1.3) * 0.6); t += 0.5 + 0.08 * i; }   // drifting apart
+    M.drum(UC.rule, 0.4, 36.7, 2); M.piano(UC.rule, 'Bb1', 0.3, 3, 0);
+    M.rpiano(ts, 'A3', 0.3, 1.6, 0); M.rpiano(ts, 'D4', 0.22, 1.6, 0);
+    M.drum(ts, 0.55, 36.7, 1.4); M.piano(ts, 'D2', 0.32, 3, 0);
+    M.prog([[ts, C.Gm9], [tf - 0.2, C.Asus]], UC.held + 0.4, 0.5, { cut: 800, cutTo: 1700 });
+    for (let t = ts + 0.4, i = 0; t < UC.held - 0.2; i++) { M.bell(t, ['A5', 'F5', 'D5', 'A4'][i % 4], 0.1 + 0.04 * ucEv(t, ts, UC.held), (i % 2 ? 0.3 : -0.3)); t += 0.55 - 0.35 * ucEv(t, ts, UC.held); }   // closing in
+    ucPulse(ctx, M.bus, tf - 0.2, UC.held + 0.1, ['D3', 'A3'], 0.4, 0.3, { cut: 500, cutTo: 1200, acc: 4, decay: 0.3, stepAt: (t) => 0.42 - 0.24 * ucEv(t, tf, UC.held), ramp: (u) => 0.5 + 0.5 * u });
+    M.roll(tf + 1.0, UC.held, [[tf + 1.0, 0.04], [UC.held, 0.3]], 73);
   }
-  // ---- held together: warm and steady; a low note under each line
-  M.prog([[UC.held, C.F], [cap('held', 1) - 0.2, C.C], [cap('held', 1) + 1.65, C.Dm]], UC.scope + 0.5, 0.55, { cut: 1300 });
-  for (const [t, n] of [[ucS('held') + 0.05, 'F2'], [cap('held', 1) + 0.05, 'C2'], [cap('held', 1) + 1.85, 'D2']]) { M.piano(t, n, 0.3, 3, 0); M.piano(t + 0.02, ucOct(n, 2), 0.14, 2.5, 0.15); }
-  M.bell(cap('held', 1) + 2.2, 'A5', 0.18, 0.3);
+  // ---- held together: warm and steady; "only the empty space shrinks"; "at midnight, it runs out": a low blow
+  M.drum(UC.held + 0.3, 0.5, 36.7, 1.6);
+  M.prog([[UC.held + 0.3, C.F], [cap('held', 1) - 0.2, C.C], [cap('held', 2) - 0.2, C.Dm]], UC.promise + 0.4, 0.52, { cut: 1300 });
+  for (const [t, n] of [[cap('held', 0) + 0.05, 'F2'], [cap('held', 1) + 0.05, 'C2']]) { M.piano(t, n, 0.3, 3, 0); M.piano(t + 0.02, ucOct(n, 2), 0.14, 2.5, 0.15); }
+  M.drum(UC.runout + 0.2, 0.6, 36.7, 1.2, 1.3); M.piano(UC.runout + 0.2, 'D1', 0.36, 3.5, 0); M.bellCut(UC.runout + 0.25, 'D6', 0.3, 0.5, 0);
+  // ---- the promise: the history rewound, a rising line of bells; "the light of the Big Bang": the theme, glimpsed
+  M.prog([[UC.promise, C.Bbmaj7], [cap('promise', 1) - 0.2, C.Asus]], UC.begin + 0.5, 0.5, { cut: 1000, cutTo: 2000 });
+  for (let t = UC.promise + 0.5, i = 0; t < cap('promise', 1) - 0.3; i++, t += 0.36) M.bell(t, ['D5', 'E5', 'F5', 'A5', 'Bb5', 'D6', 'E6', 'F6', 'A6'][Math.min(8, i)], 0.09 + 0.012 * i, Math.sin(i * 1.7) * 0.5);
+  theme(cap('promise', 1) + 0.3, [0.6, 0.55, 0.8], 0.2, { oct: 0 });
+  M.rpiano(UC.begin + 0.1, 'A2', 0.26, 2.0, 0);
 
-  // ---- 7:29, Saturn: a little felt piano figure; "Rings and all": a sparkle
-  {
-    const fig = ['F4', 'A4', 'C5', 'A4', 'E4', 'A4', 'D5', 'A4'];
-    for (let t = UC.scope + 0.5, i = 0; t < UC.rule - 0.3; t += 0.42, i++) M.piano(t, fig[i % 8], 0.13 * (i % 4 === 0 ? 1.25 : 1), 1.2, i % 2 ? 0.2 : -0.2, 0.25);
-    M.strings(UC.scope, UC.rule + 0.4, C.Fmaj7, 0.36, { att: 1.0, rel: 0.6, cut: 1100 });
-    ['A5', 'C6', 'E6', 'A6', 'C7'].forEach((n, i) => M.bell(cap('scope', 1) + 0.1 + i * 0.07, n, 0.16, -0.4 + 0.2 * i));
-  }
-  // ---- 7:30: the rule. Tension: the pad leans, a reversed swell into the moment, a drum on it, a high cluster
-  //      appears (the first second begins) and stays
-  M.prog([[UC.rule, C.Gm9], [cap('rule', 1) - 0.2, C.Asus]], UC.onset + 0.1, 0.5, { cut: 900, cutTo: 1600 });
-  M.roll(cap('rule', 1), UC.onset, [[cap('rule', 1), 0.05], [UC.onset, 0.42]], 73);
-  M.rpiano(UC.onset, 'A3', 0.4, 2.2, 0); M.rpiano(UC.onset, 'D4', 0.3, 2.2, 0);
-  M.drum(UC.onset, 0.9, 36.7, 1.2); M.drum(UC.onset, 0.35, 73);
-  ['D6', 'E6', 'A6'].forEach((n, i) => M.bell(UC.onset + i * 0.02, n, 0.3, -0.4 + 0.4 * i));
+  // ---- 7:30: you can't feel a thing. Almost nothing: a held fifth (the church clock strikes in the effects)
+  M.strings(UC.begin, UC.mirach + 0.5, ['D2', 'A2', 'E3'], 0.42, { att: 1.0, rel: 0.6, cut: 600, vib: 2 });
+  M.bell(UC.onsetT + 1.4, 'A5', 0.14, 0.2);
 
-  // ---- 2 · the first second, slowed down: one chord held still the whole way; every galaxy that goes over the edge
-  //      is a bell cut short; Andromeda's own note; "You can still see it": a thread that goes on (its light)
+  // ---- 2 · the squeeze. Mirach, red then white; "squeezes it": the chord slides up and brightens
   {
-    const t0 = UC.onset, t1 = UC.resume + 0.4;
-    M.strings(t0, t1, ['D2', 'A2', 'E3', 'A3'], 0.5, { att: 2.0, rel: 1.0, cut: 700, vib: 1.5 });
-    M.strings(t0 + 1, t1, ['E5', 'A5'], 0.05, { att: 3.0, rel: 1.0, cut: 5000, wave: 'sine', vib: 1 });
-    // far: the farthest galaxies first, then nearer and nearer (lower, slower)
-    for (let i = 0; i < 14; i++) { const t = UC.far + 0.6 + i * 0.68 + 0.15 * Math.sin(i * 2.1); M.bellCut(t, ['A6', 'E6', 'G6', 'D6', 'C6', 'A5', 'E6', 'G5', 'D6', 'A5', 'F5', 'E5', 'D5', 'A4'][i], 0.12 + 0.012 * i, 0.12 + 0.02 * i, Math.sin(i * 1.9) * 0.7); }
-    { const tf = cap('far', 2) + 0.1; M.piano(tf, 'D2', 0.3, 4, 0); M.strings(tf, tf + 4.5, ['A2'], 0.3, { att: 0.2, rel: 2.5, cut: 600, wave: 'triangle', glide: -700, glideAt: tf + 4.5 }); }
-    // Andromeda: its own phrase (the theme's start, slow, piano), then it goes over the edge
-    M.piano(UC.andro + 0.6, 'D4', 0.22, 2.8, -0.2); M.piano(UC.andro + 2.2, 'A4', 0.2, 2.8, 0.2);
-    M.bellCut(UC.andGone, 'G5', 0.34, 0.22, 0); M.drum(UC.andGone, 0.25, 73);
-    M.strings(cap('andromeda', 2), cap('andromeda', 3) + 3.0, ['G5'], 0.055, { att: 0.6, rel: 2.0, cut: 6000, wave: 'sine', vib: 2 });
-    // letting go: each line a falling pair
-    [[ucS('letgo'), 'F4', 'C4'], [cap('letgo', 1), 'E4', 'A3'], [cap('letgo', 2), 'D4', 'G3']].forEach(([t, a, b], i) => { M.piano(t + 0.15, a, 0.22, 1.6, -0.25 + 0.25 * i); M.piano(t + 0.85, b, 0.2, 2.4, -0.25 + 0.25 * i); });
-    { const t = cap('letgo', 3); M.piano(t + 0.1, 'D2', 0.3, 3, 0); ['D4', 'A4', 'F5'].forEach((nn, i) => M.piano(t + 0.12, nn, 0.16, 2.6, -0.3 + 0.3 * i)); }   // "All at once.": all three notes together
-    // half a second in: every star — a shower of bells, all cut short
-    for (let i = 0; i < 22; i++) { const t = ucS('stars') + 0.2 + i * 0.09 + 0.04 * Math.sin(i * 3.3); M.bellCut(t, ['A6', 'E6', 'D6', 'G6', 'A5', 'C6', 'E5', 'G5'][i % 8], 0.08 + 0.05 * Math.abs(Math.sin(i)), 0.08, Math.sin(i * 2.7) * 0.8); }
-    // and nothing looks any different
-    M.bell(ucS('same') + 0.1, 'E6', 0.16, -0.2); M.bell(cap('same', 1) + 0.1, 'A5', 0.16, 0.2);
+    const t0 = UC.mirach, tq = cap('squeeze', 0) + 1.2, t1 = UC.half + 0.3, gl = { glide: 400, glideFrom: tq, glideAt: UC.half - 0.3 };
+    M.strings(t0, t1, ['D2', 'A2'], 0.42, Object.assign({ att: 1.0, rel: 0.6, cut: 500, cutTo: 900, cutAt: UC.half }, gl));
+    for (const [n, v] of [['F4', 0.08], ['A4', 0.08], ['C5', 0.07], ['E5', 0.06]]) M.strings(t0 + 0.3, t1, [n], v * 4, Object.assign({ att: 1.5, rel: 0.6, cut: 900, cutTo: 4500, cutAt: UC.half, wave: 'triangle', vib: 3 }, gl));
+    M.piano(t0 + 0.3, 'D2', 0.26, 3, 0); M.piano(cap('mirach', 1) + 0.1, 'A4', 0.16, 2.5, 0.2);              // "By 8:50, it's white."
+    arp(cap('mirach', 1), t1 - 0.2, ['D', 'F', 'A', 'C', 'E'], (t) => 0.62 - 0.3 * ucEv(t, tq, UC.half), (t) => 0.06 + 0.06 * ucEv(t, tq, UC.half), [5, 6]);
+    ['A5', 'C6', 'E6'].forEach((n, i) => M.bell(cap('squeeze', 1) + 0.1 + i * 0.32, n, 0.16, -0.3 + 0.3 * i));   // "Shorter waves. Bluer. Brighter."
   }
-  // ---- the first second is over: time moves again (the pad opens, a soft pulse starts)
-  M.prog([[UC.resume, C.Dm9], [cap('resume', 1) - 0.2, C.Bbmaj7]], UC.stretch + 0.4, 0.5, { cut: 900, cutTo: 1500 });
-  M.drum(UC.resume + 0.05, 0.4, 36.7, 1.6); M.bell(UC.resume + 0.1, 'D6', 0.22, 0);
-  ucPulse(ctx, M.bus, UC.resume + 0.4, UC.stretch, ['D3', 'A3'], 0.36, 0.3, { cut: 500, cutTo: 900, acc: 4, decay: 0.3 });
+  // ---- 9:14, half the size: the octave. "twice as hot": the theme's D, then the D above it
+  {
+    const td = ucW('half', 'twice').start;
+    M.drum(UC.half + 0.1, 0.55, 36.7, 1.4); M.piano(UC.half + 0.1, 'D2', 0.34, 3.5, 0);
+    M.prog([[UC.half + 0.1, C.Dm9], [cap('half', 1) - 0.2, C.Bbmaj7]], UC.more + 0.4, 0.5, { cut: 1500 });
+    theme(UC.half + 0.5, [0.45, 0.45, 0.7], 0.22);
+    M.bell(td, 'D5', 0.36, -0.3); M.bell(td + 0.5, 'D6', 0.42, 0.3); M.piano(td + 0.5, 'D3', 0.22, 3, 0);
+  }
+  // ---- stars come out, then thousands more: bells thicker and higher; 10:00, the best sky: D major, the theme whole
+  M.prog([[UC.more, C.F], [cap('more', 1) - 0.2, C.C]], UC.best + 0.4, 0.5, { cut: 1500, cutTo: 2600 });
+  arp(UC.more + 0.3, UC.best, ['F', 'A', 'C', 'E', 'G'], (t) => 0.4 - 0.26 * ucEv(t, UC.more, UC.best), (t) => 0.07 + 0.06 * ucEv(t, UC.more, UC.best), [5, 6, 6, 7]);
+  {
+    const tb = UC.best + 0.1;
+    M.drum(tb, 0.7, 36.7, 1.4); M.piano(tb, 'D2', 0.4, 4, 0); M.piano(tb + 0.02, 'F#3', 0.2, 4, 0.1);
+    M.strings(tb, UC.glow + 0.6, C.DmajBig, 0.6, { att: 0.8, rel: 1.0, cut: 2200 });
+    M.bell(theme(tb + 0.3, 0.38, 0.4), UC_THEME_END, 0.48, 0);
+    ['D6', 'F#6', 'A6', 'D7'].forEach((n, i) => M.bell(tb + 2.4 + i * 0.22, n, 0.16, -0.45 + 0.3 * i));
+  }
 
-  // ---- 3 · the sky goes out. The stretch: the sky's chord slides down (redder) and darkens; its notes drop out one
-  //      by one as the red stars, the Milky Way, then Andromeda's last light go
+  // ---- 3 · the glow: unease (the major turns minor, a held rub); the light of every galaxy: wide, strange
+  M.strings(UC.glow, UC.ebl + 0.4, ['D2', 'A2', 'F3', 'A3', 'Eb4'], 0.45, { att: 1.2, rel: 0.5, cut: 900, vib: 3 });
+  M.strings(UC.glow + 0.8, UC.city + 0.3, ['A5', 'Bb5'], 0.04, { att: 2.5, rel: 1.0, cut: 6000, wave: 'sine', vib: 2 });
+  M.prog([[UC.ebl, C.Bbmaj7], [cap('ebl', 1) - 0.2, C.Gm9]], UC.city + 0.4, 0.48, { cut: 900, cutTo: 1600 });
+  M.piano(UC.ebl + 0.3, 'Bb1', 0.28, 3.5, 0); M.piano(cap('ebl', 1) + 0.2, 'G1', 0.26, 3.5, 0);
+  for (let t = UC.ebl + 0.8, i = 0; t < UC.city - 0.3; i++, t += 0.9) M.bell(t, ['F6', 'D6', 'Bb5', 'A5'][i % 4], 0.07, Math.sin(i * 2.1) * 0.6);
+  // ---- the city-bright sky; twilight at 11 p.m.: a pulse starts; the stars drowned out: their bells drop away
   {
-    const t0 = UC.stretch, tR = UC.red, tEnd = UC.moon + 0.3, gl = { glide: -500, glideFrom: cap('stretch', 1), glideAt: tR + 6 };
-    const voices = [['A5', 0.06, cap('red', 0) + 1.2], ['E5', 0.07, cap('red', 1) + 1.2], ['C5', 0.07, cap('red', 2) + 1.8], ['A4', 0.09, tEnd]];
-    for (const [n, v, te] of voices) M.strings(t0 + 0.2, te, [n], v * 4, Object.assign({ att: 1.5, rel: 0.9, cut: 4000, cutTo: 1200, cutAt: tR + 8, wave: 'triangle', vib: 3 }, gl));
-    M.strings(t0, tEnd, ['D2', 'A2'], 0.45, Object.assign({ att: 1.0, rel: 0.8, cut: 600, cutTo: 350, cutAt: tEnd - 1 }, gl));
-    for (let t = t0 + 0.6, i = 0; t < tR + 8; i++) { const k = MathX.clamp((t - cap('stretch', 1)) / (tR + 6 - cap('stretch', 1)), 0, 1); M.bell(t, ['A6', 'E6', 'C6', 'A5'][i % 4], 0.12 * (1 - 0.7 * k), Math.sin(i * 1.7) * 0.6); t += 0.6 + 0.5 * k; }
-    M.piano(cap('stretch', 2) + 0.1, 'F2', 0.28, 3, 0);
+    const t0 = UC.city, t1 = UC.close + 0.3;
+    M.prog([[t0, C.Dm9], [cap('city', 1) - 0.2, C.Bbmaj7], [UC.drown, C.Gm9]], t1, 0.48, { cut: 900, cutTo: 3200, cutAt: UC.close });
+    ucPulse(ctx, M.bus, cap('city', 1) - 0.1, UC.close, ['D3', 'A3'], 0.36, 0.3, { cut: 500, cutTo: 1200, acc: 4, decay: 0.3, ramp: (u) => 0.4 + 0.6 * u });
+    arp(t0 + 0.3, UC.close - 0.2, ['D', 'F', 'A', 'C', 'E'], 0.3, (t) => 0.1 * (1 - ucEv(t, UC.drown, cap('drown', 1) + 1.5)), [6, 7]);
+    M.strings(UC.drown + 0.4, UC.close + 0.2, ['D6', 'E6', 'A6'], 0.04, { att: 3.0, rel: 0.5, cut: 9000, wave: 'sine', vib: 1 });   // the sky's glow, rising over them
   }
-  // ---- but the Moon is still white: clear, warm, no slide
-  M.prog([[UC.moon, C.Fmaj7], [cap('moon', 1) - 0.2, C.C], [cap('moon', 2) - 0.2, C.Am7]], UC.saturn + 0.4, 0.5, { cut: 1500 });
-  [['C5', 0], ['A4', 0.6], ['F4', 1.2], ['E4', 2.2]].forEach(([n, dt]) => M.piano(UC.moon + 0.3 + dt, n, 0.18, 2.0, 0.1));
-  M.bell(cap('moon', 1) + 0.1, 'E6', 0.16, -0.2); M.piano(cap('moon', 2) + 0.2, 'A2', 0.24, 3, 0);
-  // ---- Saturn, 9:34: back at the eyepiece. One bell as it goes over the edge; a thin thread goes on: its light
-  M.strings(UC.saturn, UC.blue + 0.3, ['D2', 'A2', 'E3'], 0.38, { att: 1.0, rel: 0.6, cut: 700 });
-  M.bellCut(UC.satGone, 'A5', 0.4, 0.3, 0); M.piano(UC.satGone, 'D2', 0.28, 3.5, 0);
-  M.strings(UC.satGone + 0.1, UC.blue + 0.6, ['A5'], 0.055, { att: 0.3, rel: 1.6, cut: 6000, wave: 'sine', vib: 2, keys: [[UC.satGone + 1, 1], [UC.blue, 0.5]] });
-  // ---- the bluest stars go last: high bells, thinning out, gone by 10:40
-  M.strings(UC.blue, UC.moon2 + 0.4, ['E5', 'A5', 'B5'], 0.2, { att: 0.6, rel: 1.0, cut: 5000, cutTo: 1200, wave: 'triangle' });
-  for (let t = UC.blue + 0.3, i = 0; t < cap('blue', 1) + 1.6; i++) { const k = MathX.clamp((t - UC.blue) / (cap('blue', 1) + 1.6 - UC.blue), 0, 1); M.bell(t, ['B6', 'E6', 'A6', 'B5'][i % 4], 0.14 * (1 - 0.8 * k), Math.sin(i * 2.2) * 0.6); t += 0.25 + 0.6 * k; }
-  // ---- now only the Moon: the theme, slow and alone, on the piano; the pad low
-  M.strings(UC.moon2, UC.sunGone + 0.2, ['D2', 'A2', 'F3'], 0.42, { att: 1.5, rel: 0.4, cut: 650 });
-  theme(UC.moon2 + 0.6, [1.4, 1.2, 1.8], 0.22, { piano: true, oct: -1, dur: 2.6 });
-  // ---- 10:55, the Sun goes over the edge: a low drum; the Moon lit by its last light (a low, dimming chord)
-  M.drum(UC.sunGone, 0.75, 36.7, 1.4); M.piano(UC.sunGone, 'D1', 0.4, 4, 0); M.piano(UC.sunGone, 'D2', 0.3, 4, 0);
-  M.strings(UC.sunGone, UC.weight + 0.4, ['D2', 'A2', 'D3', 'F3'], 0.5, { att: 0.1, rel: 1.2, cut: 1400, cutTo: 400 });
-  M.bell(cap('sun', 1) + 0.1, 'F5', 0.14, 0.3);
+  // ---- out there: the galaxies close in (drums, a roll); they crash; "their light will never reach you"
+  {
+    const tc = UC.crashAt;
+    M.strings(UC.close, UC.frost + 0.4, ['D1', 'A1', 'D2', 'Eb2'], 0.55, { att: 0.6, rel: 0.6, cut: 500, cutTo: 1100, cutAt: tc });
+    M.roll(UC.close + 0.6, tc, [[UC.close + 0.6, 0.04], [tc, 0.5]], 73);
+    M.drum(tc, 0.95, 36.7, 1.0, 1.4); M.drum(tc, 0.45, 49); M.piano(tc, 'D1', 0.42, 4, 0); M.piano(tc, 'Eb2', 0.28, 4, 0);
+    ucPulse(ctx, M.bus, tc, cap('close', 2), ['D2', 'Eb2'], 0.42, 0.38, { cut: 400, cutTo: 900, acc: 2, decay: 0.35 });
+    M.bellCut(cap('close', 2) + 0.2, 'A5', 0.26, 0.35, 0); M.bellCut(cap('close', 2) + 0.9, 'D5', 0.2, 0.35, 0);
+  }
 
-  // ---- 4 · lighter. 11:00, "now you can feel it": playful, lighter, higher; a pulse
+  // ---- 4 · the frost melting: a sparse, falling piano; "that cold is gone": a low D
+  M.strings(UC.frost, UC.zero + 0.4, ['D3', 'A3', 'E4'], 0.32, { att: 1.0, rel: 0.6, cut: 1200 });
+  [['E6', 0.4], ['D6', 1.1], ['A5', 1.9], ['F5', 2.9]].forEach(([n, dt]) => M.piano(UC.frost + dt, n, 0.13, 2.4, 0.2, 0.6));
+  M.piano(cap('frost', 1) + 0.2, 'D2', 0.26, 3.5, 0); M.piano(cap('frost', 1) + 1.4, 'C5', 0.12, 2.4, -0.2); M.piano(cap('frost', 1) + 2.3, 'A4', 0.12, 2.4, 0.2);
+  // ---- 0 °C: a bell; the Milky Way inside out: the chord turns over (minor to major, the dark notes bright)
   {
-    const t0 = UC.weight, t1 = UC.moongo;
-    M.prog([[t0, C.Dm9], [cap('weight', 1) - 0.2, C.Bbmaj7], [UC.fountain, C.F], [cap('fountain', 1) - 0.2, C.C]], t1 + 0.4, 0.42, { cut: 1500 });
-    ucPulse(ctx, M.bus, t0 + 0.3, t1, ['D4', 'A4'], 0.3, 0.26, { wave: 'square', cut: 1800, q: 1, decay: 0.2, acc: 4 });
-    const pl = ['D5', 'F5', 'A5', 'F5', 'E5', 'G5', 'A5', 'C6'];
-    for (let t = cap('weight', 1) + 0.3, i = 0; t < UC.fountain - 0.2; t += 0.3, i++) M.piano(t, pl[i % 8], 0.12, 0.25, i % 2 ? 0.25 : -0.25, 0.12);
-    // the fountain climbs higher (a rising run) … and falls slower (the notes coming down further and further apart)
-    ['F4', 'A4', 'C5', 'F5', 'A5', 'C6'].forEach((n, i) => M.bell(UC.fountain + 0.3 + i * 0.12, n, 0.2, -0.3 + 0.12 * i));
-    ['C6', 'A5', 'F5', 'C5', 'A4'].forEach((n, i) => M.bell(cap('fountain', 1) + 0.2 + 0.35 * i * (1 + 0.35 * i), n, 0.18, 0.3 - 0.12 * i));
+    const tz = UC.zeroAt, ti = cap('zero', 1);
+    M.bell(tz, 'D6', 0.32, 0); M.bell(tz + 0.5, 'A6', 0.2, 0.3); M.piano(tz, 'D2', 0.3, 4, 0);
+    M.strings(UC.zero, ti + 0.3, C.Dm, 0.42, { att: 0.8, rel: 0.4, cut: 1100 });
+    M.strings(ti, UC.warm + 0.4, C.Dmaj, 0.46, { att: 0.6, rel: 0.5, cut: 1300, cutTo: 2400 });
+    M.strings(ti + 0.2, UC.warm + 0.3, ['F#5', 'A5', 'D6'], 0.05, { att: 1.5, rel: 0.6, cut: 7000, wave: 'sine', vib: 2 });
+    for (let t = ti + 0.4, i = 0; t < UC.warm - 0.3; i++, t += 0.45) M.bell(t, ['D6', 'A5', 'F#5', 'A5', 'E6', 'D6'][i % 6], 0.08, Math.sin(i * 1.7) * 0.6);
   }
-  // ---- the Moon goes out: a single high note fading with it
-  M.strings(UC.moongo, UC.jump + 0.3, ['D2', 'A2', 'E3'], 0.36, { att: 0.6, rel: 0.6, cut: 700 });
-  M.strings(UC.moongo + 0.2, UC.jump - 0.3, ['F6'], 0.05, { att: 0.3, rel: 1.6, cut: 7000, wave: 'sine', vib: 2, keys: [[UC.moongo + 1, 1], [UC.jump - 1.5, 0.2]] });
-  // ---- jump: everything holds its breath while you hang (one chord), a soft note when you land
+  // ---- warmer than you; the cat; boiling; you go in: a pulse that quickens, a little running figure for the cat
   {
-    const tJ = UC.jump; let land = tJ + 1;
-    for (let u = 0.3; u < 6; u += 0.01) { const ge = 9.81 * Math.max(0.05, ucWeight(ucNight(tJ + u))); if (2.7 * u - 0.5 * ge * u * u <= 0) { land = tJ + u; break; } }
-    M.rpiano(tJ, 'A3', 0.26, 0.9, 0);
-    M.strings(tJ, land + 0.6, ['A3', 'D4', 'E4', 'A4'], 0.32, { att: 0.15, rel: 0.5, cut: 2400, wave: 'triangle', vib: 3 });
-    M.bell(tJ + 0.05, 'A5', 0.22, -0.2); M.bell(land, 'D5', 0.2, 0.2); M.piano(land, 'D3', 0.2, 2, 0);
-    M.strings(land, UC.air + 0.4, C.Dm9, 0.32, { att: 0.8, rel: 0.5, cut: 1100 });
+    const t0 = UC.warm, t1 = UC.steam;
+    M.prog([[t0, C.Gm9], [UC.catRun, C.Asus], [UC.boil, C.Dm9], [cap('boil', 1) - 0.2, C.Bbmaj7]], t1 + 0.4, 0.45, { cut: 900, cutTo: 1500 });
+    ucPulse(ctx, M.bus, t0 + 0.3, t1, ['D3', 'A3'], 0.36, 0.3, { cut: 600, cutTo: 1400, acc: 4, decay: 0.28, stepAt: (t) => 0.42 - 0.12 * ucEv(t, t0, t1) });
+    ['D5', 'E5', 'F5', 'A5', 'D6'].forEach((n, i) => M.piano(UC.catRun + 0.05 + i * 0.11, n, 0.12, 0.4, -0.2 + 0.1 * i, 0.2));   // she runs
+    M.drum(UC.boil + 0.1, 0.5, 36.7, 1.4); M.piano(UC.boil + 0.1, 'D2', 0.3, 3, 0);
   }
-  // ---- the air weighs less: the music thins (high, airy, quiet); a dip for your ears (mix.js); the tea; the flame
-  M.strings(UC.air, UC.zero + 0.4, ['D3', 'A3', 'E4'], 0.34, { att: 1.2, rel: 0.6, cut: 1400, cutTo: 700, cutAt: UC.flame });
-  M.strings(UC.air + 1, UC.zero + 0.3, ['A5'], 0.045, { att: 2.0, rel: 0.6, cut: 6000, wave: 'sine', vib: 2 });
-  for (let t = UC.tea + 0.8, i = 0; t < UC.flame - 0.4; i++) { M.bell(t, ['D6', 'F6', 'A6', 'E6', 'C7'][i % 5], 0.08 + 0.04 * Math.abs(Math.sin(i * 1.3)), Math.sin(i * 2.4) * 0.7); t += 0.35 + 0.25 * Math.abs(Math.sin(i * 1.9)); }
-  M.piano(UC.flame + 0.3, 'F4', 0.16, 3, -0.2); M.piano(UC.flame + 1.4, 'C5', 0.14, 3, 0.2); M.piano(cap('flame', 1) + 0.2, 'A4', 0.14, 3, 0);
 
-  // ---- 5 · 11:35, you weigh nothing: the pulse is gone; a floating pad, very high and still
+  // ---- 5 · the fire, from the kitchen: a low ostinato that grows; a hit as the leaves catch; "brighter than noon":
+  //      a high bright cluster; the telescope: a dark low note; the Moon fading: a high note sinking into the pad
   {
-    const tz = UC.zeroAt;
-    M.bell(tz, 'D6', 0.32, 0); M.bell(tz + 0.6, 'A6', 0.22, 0.3); M.piano(tz, 'D2', 0.3, 4, 0);
-    M.strings(tz - 0.2, UC.crack + 0.5, ['D4', 'A4', 'E5', 'A5'], 0.28, { att: 2.5, rel: 0.8, cut: 3000, wave: 'triangle', vib: 2 });
-    M.strings(tz, UC.crack + 0.4, ['D2', 'A2'], 0.3, { att: 2.0, rel: 0.6, cut: 400, wave: 'sine' });
-    // everything that isn't fixed down… starts to fall up: lines rising
-    for (let i = 0; i < 4; i++) { const t = UC.rise + 0.5 + i * 1.6, n = ['D4', 'F4', 'A4', 'D5'][i]; M.strings(t, t + 3.2, [n], 0.18, { att: 0.4, rel: 1.6, cut: 4000, wave: 'triangle', glide: 1200, glideAt: t + 3.2, pan: -0.5 + 0.33 * i }); }
+    const t0 = UC.steam, tp = UC.pretend, tl = ucW('leaves', 'fire').start;
+    M.prog([[t0, C.Dm], [UC.leaves, C.Dm9], [UC.lawn, C.Bbmaj7], [UC.noon, C.Gm9], [UC.shed, C.Dm], [UC.glass, C.Gm9], [cap('glass', 0) + 1.6, C.Asus]], tp + 0.3, 0.5, { cut: 700, cutTo: 1600 });
+    ucPulse(ctx, M.bus, t0 + 0.3, tp, ['D2', 'A2'], 0.42, 0.42, { cut: 380, cutTo: 1100, acc: 4, decay: 0.32, ramp: (u) => 0.45 + 0.55 * u });
+    M.drum(tl, 0.75, 36.7, 1.2); M.piano(tl, 'D1', 0.36, 3.5, 0);
+    for (let t = UC.lawn + 0.4; t < tp - 0.3; t += 1.68) M.drum(t, 0.25 + 0.2 * ucEv(t, UC.lawn, tp), 36.7, 1.6, 0.7);
+    M.strings(UC.noon + 0.3, UC.shed + 0.3, ['E5', 'A5', 'B5', 'D6'], 0.05, { att: 1.0, rel: 0.6, cut: 8000, wave: 'sine', vib: 2 });
+    M.drum(UC.shedAt + 0.05, 0.55, 49);
+    M.piano(UC.scopeAt, 'Eb2', 0.3, 3, 0); M.piano(UC.scopeAt + 0.02, 'D1', 0.28, 3, 0);
+    M.strings(UC.moonGo, cap('shed', 1) + 2.8, ['A5'], 0.07, { att: 0.2, rel: 2.0, cut: 6000, wave: 'sine', vib: 2, keys: [[UC.moonGo + 0.5, 1], [cap('shed', 1) + 2.0, 0.15]] });
+    theme(UC.moonGo + 0.2, [0.9, 0.8, 1.2], 0.15, { piano: true, dur: 2.4 });
+    M.roll(cap('glass', 0) + 1.0, tp, [[cap('glass', 0) + 1.0, 0.04], [tp, 0.42]], 73);
   }
-  // ---- the crack: a hit, a roll, a low cluster; Earth coming apart, from the outside in (a dark pulse)
+  // ---- "pretend nothing can hurt you": the drums stop; the music opens out, wide and high
   {
-    const tc = UC.crackAt;
-    M.roll(UC.crack + 0.5, tc, [[UC.crack + 0.5, 0.05], [tc, 0.5]], 73);
-    M.drum(tc, 1.0, 36.7, 1.0, 1.4); M.drum(tc, 0.5, 49); M.piano(tc, 'D1', 0.45, 4, 0); M.piano(tc, 'Eb2', 0.3, 4, 0);
-    M.strings(tc, UC.drift + 0.3, ['D1', 'A1', 'Eb2', 'D3'], 0.62, { att: 0.05, rel: 0.8, cut: 1600, cutTo: 500 });
-    ucPulse(ctx, M.bus, cap('crack', 1), UC.drift, ['D2', 'Eb2'], 0.42, 0.42, { cut: 400, cutTo: 900, acc: 2, decay: 0.35 });
-    M.drum(cap('crack', 1) + 0.05, 0.5, 36.7, 1.4);
+    const tp = UC.pretend;
+    M.drum(tp, 0.6, 36.7, 1.6); M.piano(tp, 'D2', 0.32, 4, 0); M.bell(tp + 0.1, 'F#6', 0.24, 0); M.bell(tp + 0.4, 'A6', 0.18, 0.3);
+    M.strings(tp, UC.bath + 0.5, C.DmajBig, 0.5, { att: 1.4, rel: 0.8, cut: 1600, cutTo: 2600 });
   }
-  // ---- 11:41: the cold open's drone again (we're back where we started); then the theme alone for the house
-  M.strings(UC.drift, UC.pieces + 0.5, ['D1', 'A1', 'D2'], 0.6, { att: 0.8, rel: 0.6, cut: 300, wave: 'sine', vib: 2 });
-  M.strings(UC.drift + 0.3, UC.pieces + 0.4, ['A5'], 0.05, { att: 1.5, rel: 0.6, cut: 6000, wave: 'sine', vib: 3 });
-  M.strings(UC.drift + 0.5, UC.pieces + 0.3, ['Eb3', 'D4'], 0.16, { att: 2.0, rel: 0.4, cut: 900, wave: 'triangle', vib: 4 });
-  M.strings(UC.pieces, UC.last + 0.3, ['D2', 'A2', 'F3', 'A3'], 0.4, { att: 1.5, rel: 0.6, cut: 800 });
-  theme(UC.pieces + 0.8, [1.1, 0.9, 1.5], 0.2, { piano: true, dur: 2.2 });
-  M.piano(cap('pieces', 1) + 0.15, 'F2', 0.28, 3.5, 0); M.piano(cap('pieces', 1) + 0.17, 'C4', 0.16, 3, 0.2);
 
-  // ---- 6 · the last second. One tick for every doubling of space (they speed up to a buzz); your heartbeat until
-  //      "Then you."; the house: a hit; you: everything bends; the atoms: a tear; then nothing at midnight
+  // ---- 6 · the bird bath boils; "At 7:29, it was ice": the ice motif again
+  M.prog([[UC.bath, C.Fmaj7], [cap('bath', 1) - 0.2, C.Dm9]], UC.red + 0.5, 0.42, { cut: 1300 });
+  ice(cap('bath', 1) + 0.15, 0.5, 0.16);
+  // ---- the afterglow: a long rise, the theme in the low strings, opening; "too cold to see": a bell
+  {
+    const t0 = UC.red, t1 = UC.melt + 0.3;
+    M.prog([[t0, C.Bbmaj7], [cap('red', 1) - 0.2, C.F], [cap('red', 2) - 0.2, C.C], [cap('red', 2) + 2.0, C.Dm9]], t1, 0.52, { cut: 800, cutTo: 2600, cutAt: UC.melt });
+    theme(t0 + 0.6, [1.4, 1.3, 1.8], 0.22, { piano: true, oct: -2, dur: 3 });
+    arp(cap('red', 1), t1 - 0.3, ['D', 'F', 'A', 'C', 'E'], 0.42, (t) => 0.05 + 0.07 * ucEv(t, cap('red', 1), UC.melt), [5, 6]);
+    M.bell(cap('red', 2) + 2.2, 'E6', 0.2, 0.2);
+  }
+  // ---- your house melts: one low blow
+  M.drum(UC.melt + 0.4, 0.9, 36.7, 1.0, 1.5); M.piano(UC.melt + 0.4, 'D1', 0.42, 4, 0); M.piano(UC.melt + 0.42, 'A1', 0.3, 4, 0);
+  M.strings(UC.melt + 0.4, UC.vanish + 0.6, ['D1', 'A1', 'D2', 'F2'], 0.5, { att: 0.1, rel: 1.0, cut: 900, cutTo: 500 });
+  // ---- no shadows, no edges: pure tones only, no attacks (the music loses its edges too)
+  M.strings(UC.vanish, UC.bigbang + 0.6, ['D3', 'A3', 'E4', 'A4', 'D5'], 0.4, { att: 2.5, rel: 1.2, cut: 2500, wave: 'sine', vib: 1 });
+  M.strings(cap('vanish', 1), UC.bigbang + 0.5, ['A5', 'E6'], 0.05, { att: 2.0, rel: 1.0, cut: 9000, wave: 'sine', vib: 0.5 });
+  // ---- 11:52, the Big Bang's light: the theme whole, rung out; its ripples: bells shimmering
+  {
+    const tb = ucW('bigbang', '2700').start;
+    M.strings(UC.bigbang, UC.sun + 0.5, C.DmajBig, 0.55, { att: 1.5, rel: 0.8, cut: 1800, cutTo: 3000 });
+    M.drum(tb, 0.8, 36.7, 1.2); M.piano(tb, 'D2', 0.42, 4.5, 0); M.piano(tb + 0.02, 'F#3', 0.22, 4.5, 0.1);
+    M.bell(theme(cap('bigbang', 1) + 0.2, 0.5, 0.42), UC_THEME_END, 0.5, 0);
+    arp(UC.ripples, UC.sun - 0.2, ['D', 'F#', 'A', 'E', 'B'], 0.18, (t) => 0.06 + 0.04 * Math.sin(2 * Math.PI * 0.4 * (t - UC.ripples)) ** 2, [6, 7]);
+  }
+  // ---- 11:55, the surface of the Sun: a crescendo
+  M.prog([[UC.sun, C.Bbmaj7], [UC.sun + 2.6, C.Asus]], UC.last + 0.3, 0.55, { cut: 1000, cutTo: 3000 });
+  M.roll(UC.sun + 0.5, UC.last, [[UC.sun + 0.5, 0.04], [UC.last, 0.5]], 73);
+  M.rpiano(UC.last, 'A2', 0.32, 2.0, 0); M.rpiano(UC.last, 'E3', 0.24, 2.0, 0);
+
+  // ---- 7 · the last second. A tick for every halving of the universe (they speed up to a buzz); your heartbeat;
+  //      a hit for the Sun's core, the nuclei, the protons; a swell for the end of physics; silence at midnight
   {
     const t0 = UC.last, tm = UC.midnight;
-    M.strings(t0, UC.you + 0.2, ['D2', 'A2', 'E3', 'A3'], 0.5, { att: 0.5, rel: 0.1, cut: 700, cutTo: 1600, cutAt: UC.house });
-    M.strings(UC.house, tm - 0.02, ['D1', 'D2', 'Eb2', 'A2'], 0.5, { att: 0.05, rel: 0.05, cut: 900, cutTo: 3000, cutAt: tm - 0.3 });
-    M.strings(UC.you, tm - 0.02, ['A4', 'Bb4', 'D5', 'Eb5'], 0.3, { att: 0.3, rel: 0.05, cut: 2500, cutTo: 7000, cutAt: tm - 0.4, glide: 1200, glideFrom: UC.you + 0.2, glideAt: tm, wave: 'triangle', vib: 12 });
-    // the doublings: N(t) = (h / ln 2) · ln(left₀ / left(t)); a tick at each whole number (at most one per 25 ms)
-    const N = (t) => (UCP.h / Math.LN2) * Math.log(3 / Math.max(1e-30, ucLeft(t)));
-    let last = -1, prevT = -1;
-    for (let t = t0 + 0.3; t < tm - 0.08; t += 0.002) {
+    M.drum(t0, 0.8, 36.7, 1.2); M.piano(t0, 'D1', 0.38, 3, 0);
+    M.strings(t0, UC.nuclei + 0.2, ['D2', 'A2', 'E3', 'A3'], 0.5, { att: 0.5, rel: 0.1, cut: 700, cutTo: 1600 });
+    M.strings(UC.nuclei, tm - 0.02, ['D1', 'D2', 'Eb2', 'A2'], 0.5, { att: 0.05, rel: 0.05, cut: 900, cutTo: 3000, cutAt: tm - 0.3 });
+    M.strings(UC.protons, tm - 0.02, ['A4', 'Bb4', 'D5', 'Eb5'], 0.3, { att: 0.3, rel: 0.05, cut: 2500, cutTo: 7000, cutAt: tm - 0.4, glide: 1200, glideFrom: UC.protons + 0.2, glideAt: tm, wave: 'triangle', vib: 12 });
+    // the halvings: N(t) = log₂ of how much smaller the universe is than at 7:30; a tick at each whole number
+    const N = (t) => { const n = ucNight(t); if (n < UCP.R - 60) return ucLnS(Math.max(0, n)) / Math.LN2; const L = ucLeft(t); return L > 0 ? ucLnSLeft(L) / Math.LN2 : 1e9; };
+    let last = Math.floor(N(t0 + 0.3)), prevT = -1;
+    for (let t = t0 + 0.3; t < Math.min(UC.planck + 0.3, tm - 0.08); t += 0.002) {
       const k = Math.floor(N(t)); if (k <= last) continue; last = k;
       if (t - prevT < 0.025) continue; prevT = t;
       const u = MathX.clamp((t - t0) / (tm - t0), 0, 1);
-      M.bellCut(t, u < 0.5 ? 'D6' : 'A6', 0.2 + 0.15 * u, 0.06, Math.sin(k * 1.7) * 0.4);
+      M.bellCut(t, u < 0.5 ? 'D6' : 'A6', 0.18 + 0.15 * u, 0.06, Math.sin(k * 1.7) * 0.4);
     }
-    for (let t = t0 + 0.4, dt = 0.8; t < UC.you - 0.1; t += dt, dt = Math.max(0.45, dt * 0.93)) M.beat(t, 0.32 + 0.2 * ucEv(t, t0, UC.you));
-    M.drum(UC.house, 1.0, 36.7, 1.0, 1.4); M.drum(UC.house, 0.55, 55); M.piano(UC.house, 'D1', 0.4, 3, 0);
-    M.drum(UC.you, 0.7, 49, 1.2); M.bellCut(UC.you, 'D5', 0.4, 0.4, 0);
-    M.roll(UC.atoms - 1.0, tm - 0.05, [[UC.atoms - 1.0, 0.05], [tm - 0.3, 0.55]], 73);
+    for (let t = t0 + 0.4, dt = 0.8; t < UC.protons - 0.1; t += dt, dt = Math.max(0.42, dt * 0.95)) M.beat(t, 0.3 + 0.2 * ucEv(t, t0, UC.protons));
+    M.drum(UC.core, 0.85, 36.7, 1.0, 1.2); M.piano(UC.core, 'D1', 0.36, 3, 0);
+    M.drum(UC.nuclei, 0.9, 36.7, 1.0, 1.4); M.drum(UC.nuclei, 0.5, 55);
+    M.drum(UC.protons, 0.8, 49, 1.2); M.bellCut(UC.protons, 'D5', 0.4, 0.4, 0);
+    M.roll(UC.planck - 1.0, tm - 0.05, [[UC.planck - 1.0, 0.05], [tm - 0.3, 0.55]], 73);
   }
   // ---- midnight: silence (the score stops dead with the picture)
 
-  // ---- 7 · is any of this real? Warmth coming back; "We've measured it since 1998": a bright bell (the supernova)
+  // ---- 8 · is any of this real? Warmth coming back out of the silence
   M.piano(UC.real + 0.5, 'D3', 0.24, 3.5, 0); M.piano(UC.real + 0.52, 'A3', 0.16, 3.5, 0.15);
-  M.strings(UC.real + 0.3, cap('real', 1) + 0.4, C.Dm9, 0.42, { att: 3.0, rel: 0.6, cut: 500, cutTo: 1400 });
-  M.prog([[cap('real', 1) - 0.2, C.Bbmaj7], [cap('real', 2) - 0.2, C.F], [cap('real', 3) - 0.2, C.Dm]], ucS('rip') + 0.4, 0.5, { cut: 1300 });
-  M.bell(cap('real', 1) + 0.1, 'F5', 0.2, -0.2); ['C6', 'F6', 'A6'].forEach((n, i) => M.bell(cap('real', 2) + 0.3 + i * 0.05, n, 0.24, -0.3 + 0.3 * i));
-  // a rip needs the push to keep growing (tension) … probably not (relief: the chord resolves and opens)
-  M.strings(ucS('rip'), cap('rip', 1) + 0.3, C.Gm9, 0.45, { att: 0.8, rel: 0.4, cut: 900, cutTo: 1300 });
-  M.roll(ucS('rip') + 0.6, cap('rip', 1) - 0.1, [[ucS('rip') + 0.6, 0.03], [cap('rip', 1) - 0.1, 0.2]], 73);
-  M.prog([[cap('rip', 1) - 0.1, C.Fmaj7], [cap('rip', 1) + 2.4, C.C]], UC.future + 0.4, 0.55, { cut: 1600 });
-  M.bell(cap('rip', 1) + 1.0, 'A5', 0.26, 0.2); M.bell(cap('rip', 1) + 1.35, 'C6', 0.22, -0.2); M.piano(cap('rip', 1) + 1.0, 'F2', 0.3, 3, 0);
-  // ---- the galaxies are leaving anyway: the theme slow, bittersweet; "Ours.": one bell and a low D
-  M.prog([[UC.future, C.Dm9], [cap('future', 1) - 0.2, C.Bbmaj7]], cap('future', 2) + 0.4, 0.45, { cut: 1200, cutTo: 700 });
-  theme(UC.future + 0.6, [1.5, 1.3, 1.9], 0.2, { piano: true, dur: 2.8 });
-  { const to = cap('future', 2) + 0.05; M.bell(to, 'D6', 0.38, 0); M.piano(to, 'D2', 0.32, 4, 0); M.strings(to, UC.question + 0.4, ['D3', 'A3', 'D4'], 0.3, { att: 0.2, rel: 1.0, cut: 1200, wave: 'triangle' }); }
+  M.strings(UC.real + 0.3, cap('real', 1) + 0.4, C.Dm9, 0.42, { att: 2.5, rel: 0.6, cut: 500, cutTo: 1400 });
+  M.prog([[cap('real', 1) - 0.2, C.Bbmaj7], [cap('real', 1) + 1.8, C.F]], UC.clue + 0.4, 0.48, { cut: 1300 });
+  M.bell(cap('real', 1) + 0.1, 'F5', 0.18, -0.2);
+  // ---- the clue: a question in the music (a soft pulse, an unresolved chord); "may be weakening": it thins
+  M.prog([[UC.clue, C.Gm9], [cap('clue', 1) - 0.2, C.Am7]], UC.turn + 0.4, 0.46, { cut: 1100, cutTo: 800, cutAt: UC.turn });
+  ucPulse(ctx, M.bus, UC.clue + 0.4, UC.turn, ['G3', 'D4'], 0.4, 0.24, { cut: 1200, cutTo: 600, q: 2, acc: 4, decay: 0.3, ramp: (u) => 1 - 0.6 * u });
+  ['D6', 'A5', 'F5'].forEach((n, i) => M.bell(cap('clue', 1) + 0.3 + i * 0.6, n, 0.16 - 0.03 * i, -0.3 + 0.3 * i));
+  // ---- the growth turns around: the theme's first notes, falling back; a Big Crunch in 20 billion years: a low D
+  M.prog([[UC.turn, C.Bbmaj7], [cap('turn', 1) - 0.2, C.Asus]], UC.same + 0.4, 0.48, { cut: 1100 });
+  ['D5', 'A5', 'G5', 'E5', 'D5', 'A4'].forEach((n, i) => M.piano(UC.turn + 0.6 + i * 0.5, n, 0.15, 2, i % 2 ? 0.2 : -0.2, 0.4));
+  M.drum(cap('turn', 1) + 0.1, 0.5, 36.7, 1.6); M.piano(cap('turn', 1) + 0.1, 'D2', 0.3, 3.5, 0);
+  // ---- billions of years, not four hours; the sky would end just like this: the theme slow, on the piano
+  M.prog([[UC.same, C.Dm9], [cap('same', 1) - 0.2, C.Bbmaj7]], UC.question + 0.4, 0.45, { cut: 1200, cutTo: 800 });
+  theme(UC.same + 0.6, [1.4, 1.2, 1.8], 0.2, { piano: true, dur: 2.8 });
 
   // ---- the question (7:29 again): light, the theme whole once more, and this time it lands on the octave, warm
   M.prog([[UC.question, C.F], [ucS('question') + 2.0, C.C], [cap('question', 1), C.Bbmaj7], [cap('question', 1) + 2.0, C.DmajBig]], UC.end + 1.4, 0.55, { cut: 1500, lastRel: 2.2 });

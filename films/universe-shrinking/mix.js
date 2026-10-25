@@ -10,9 +10,8 @@ window.UC_MIX = {
     sfx: { gain: 3, hp: 25 },
   },
   dyn: {
-    // your ears pop: for a moment everything goes dull and far, then comes back (a little less: the air is thinner)
-    music: [['pop', -0.05, 0], ['pop', 0.06, -6], ['pop', 1.6, 0]],
-    amb: [['pop', -0.05, 0], ['pop', 0.06, -9], ['pop', 1.3, -2.5]],
+    music: [],
+    amb: [],
     sfx: [],
   },
   master: 9,

@@ -3,9 +3,10 @@
    subclass); the DSP and generators come from audiokit.js (via the Slower light film). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
      music  an original score (sound-music.js)
-     amb    the garden's air at night, thinning as the air goes, then nothing (sound-amb.js)
-     sfx    the events: the cat, the telescope, the fountain, your jump, your ears, the tea, the crack, the house
-            (sound-sfx.js)
+     amb    the garden at night (the town, an owl, dogs, a dawn chorus at 11 p.m.), the hot wind, the fire as much as
+            is alight at that moment, the kitchen, the last second slowed into a throb (sound-amb.js)
+     sfx    the events: the cat, the ice, the church clock, the frost melting, the cat flap, the door, each place
+            catching fire, the telescope, the window glass, the bird bath, the house, the last second (sound-sfx.js)
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
 
@@ -63,7 +64,8 @@ class UcAudio extends AudioEngine {
   fingerprintData() {
     return [UC, UC_NKEYS, UCT, window.UC_MIX, Object.values(UCX).map(String).join(''), UcFx.toString(), Object.getOwnPropertyNames(UcFx.prototype).map((k) => String(UcFx.prototype[k])).join(''),
       Object.values(UC_SOUND).flat().map((b) => b.name + b.fn).join(''), ucDynDb.toString(), UcAudio.toString(), ucLimit.toString(), ucNight.toString(), ucH.toString(), ucLnS.toString(),
-      UC_SOUND_FNS.map(String).join('')];
+      UC_SOUND_FNS.map(String).join(''), JSON.stringify([UC_N, UC_BURN, UC_SHOTS, UC_FIRE_LEAD, UC_FIRE_W, UC_KITCHEN_MODES, UC_ICE]),
+      [ucPl, ucSoundNight, ucHeatK, ucSlowK, ucSkyNow, ucShotAt, ucCharAt, ucFlameEnv, ucLeft, ucLnSLeft, ucShrink].map(String).join('')];
   }
   async renderOffline() {
     if (this.solo) return super.renderOffline();

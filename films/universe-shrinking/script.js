@@ -138,7 +138,7 @@ const UC_NKEYS = [
   [UC.shedAt + 0.1, ucAt(23, 42, 52), 'lin'],                     // the shed lights (23:42:50)
   [ucE('noon') + 0.4, ucAt(23, 43, 41), 'lin'],                   // the fence (23:43:40)
   [UC.scopeAt + 0.15, ucAt(23, 43, 50), 'lin'],                   // the telescope's tube melts (660 °C, 23:43:49)
-  [UC.moonGo + 0.1, ucAt(23, 44, 2), 'lin'],
+  [UC.moonGo, ucAt(23, 44, 0), 'lin'],                            // the Moon: 11% brighter than the sky, then fading
   [ucE('shed') + 0.5, ucAt(23, 44, 30), 'lin'],                   // the Moon is gone (23:44:25)
   [ucS('glass') + 0.1, ucAt(23, 45, 45), 'lin'],                  // the glass softens
   [ucE('glass') + 0.6, ucAt(23, 46, 50), 'lin'],

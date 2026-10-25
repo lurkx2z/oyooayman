@@ -260,7 +260,15 @@ UC_SETS.garden = (app) => {
     return { x: b.x + lp.x, y: lp.y, z: b.z + lp.z, s: 0.0012 + 0.0022 * ucR(i, 43), r: ucR(i, 44) * 6.28, j: (ucR(i, 45) - 0.5) * 16, d: ucR(i, 46) < 0.45 };
   });
   const crystals = new THREE.InstancedMesh(new THREE.OctahedronGeometry(1, 0), ucStd('#f2f6fa', 0.2, 0, { flatShading: true }), NCR); crystals.castShadow = false; scene.add(crystals);
-  const drops = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshStandardMaterial({ color: '#22303a', roughness: 0.02, metalness: 0.0, transparent: true, opacity: 0.6, envMapIntensity: 2.2 }), NCR); drops.castShadow = false; scene.add(drops);
+  // (a droplet is a tiny lens: the bright sky upside down in its lower half, the dark grass above, a dark rim, a glint;
+  // drawn as discs facing the camera, lit as bright as the sky they show)
+  const dropTex = ucTex(ucCanvas(64, 64, (c, w) => {
+    const g = c.createLinearGradient(0, 0, 0, w); g.addColorStop(0, '#26401f'); g.addColorStop(0.42, '#6d8a6f'); g.addColorStop(0.66, '#dfe8ea'); g.addColorStop(1, '#ffffff');
+    c.save(); c.beginPath(); c.arc(w / 2, w / 2, w * 0.46, 0, 6.283); c.clip(); c.fillStyle = g; c.fillRect(0, 0, w, w);
+    const rr = c.createRadialGradient(w / 2, w / 2, w * 0.28, w / 2, w / 2, w * 0.47); rr.addColorStop(0, 'rgba(0,0,0,0)'); rr.addColorStop(1, 'rgba(12,22,14,0.8)'); c.fillStyle = rr; c.fillRect(0, 0, w, w); c.restore();
+    c.fillStyle = 'rgba(255,255,255,0.95)'; c.beginPath(); c.arc(w * 0.37, w * 0.31, w * 0.065, 0, 6.283); c.fill();
+  }), { repeat: false });
+  const drops = new THREE.InstancedMesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ map: dropTex, transparent: true, alphaTest: 0.02, depthWrite: false }), NCR); drops.castShadow = false; drops.renderOrder = 2; scene.add(drops);
   // ---- particles: flames (additive), smoke and steam (normal)
   const flames = ucFlames(scene, 5000), fire = ucPuffs(scene, 3000, { additive: true, soft: 2.2 });
   const smoke = ucPuffs(scene, 9000, { soft: 1.6 });
@@ -471,8 +479,9 @@ UC_SETS.garden = (app) => {
       _e.set(c.r, c.r * 1.7, c.r * 0.6); _q.setFromEuler(_e); _s.set(c.s * (1 - melt), c.s * 0.45 * (1 - melt), c.s * (1 - melt));
       _m4.compose(_v.set(c.x, c.y, c.z), _q, _s); crystals.setMatrixAt(i, _m4);
       const ds = c.d ? c.s * 0.9 * MathX.smooth(melt, 0.25, 1) * (1 - dry) : 0, slide = 0.006 * MathX.smooth(n, UC_N.frostMelt + 6 + c.j, UC_N.frostMelt + 30 + c.j);
-      _q.identity(); _s.set(ds, ds * 1.1, ds); _m4.compose(_v.set(c.x, Math.max(0.002, c.y - slide - ds * 0.3), c.z), _q, _s); drops.setMatrixAt(i, _m4);
+      _s.set(ds, ds * 1.08, ds); _m4.compose(_v.set(c.x, Math.max(0.002, c.y - slide - ds * 0.3), c.z), cam.quaternion, _s); drops.setMatrixAt(i, _m4);
     });
+    { const Ss = sky.state.S, d = 1.15 * sky.state.E * Ss.L, rgb = ucUnitLum(Ss.rgb); drops.material.color.setRGB(d * rgb[0], d * rgb[1], d * rgb[2]); }
     crystals.instanceMatrix.needsUpdate = true; drops.instanceMatrix.needsUpdate = true;
   }
 
@@ -544,7 +553,7 @@ UC_SETS.garden = (app) => {
     leaves(t) { const k = k01(t, UC.leaves, UC.lawn, Ease.linear), d = dr(t, 0.003, 12); look(add([-1.45, 1.68, 0.8 - 0.1 * k], d), [-0.9 - 0.4 * k, -0.2, -9.5], 44); },
     lawn(t) { const k = k01(t, UC.lawn, UC.noon, Ease.linear), d = dr(t, 0.003, 13); look(add([-1.6, 1.62, 0.95], d), [-2.4 - 0.3 * k, 1.5, -12.5], 46); },
     noon(t) { const k = k01(t, UC.shedAt - 0.9, UC.shedAt + 0.6, Ease.inOutSine), d = dr(t, 0.003, 14); look(add([-1.62, 1.45, 0.72], d), ucV([-1.5, 4.8, -10], [2.7, 1.3, -15], k), 48); },
-    shed(t) { const k = k01(t, UC.moonGo - 1.5, UC.moonGo + 0.1, Ease.inOutSine), p = [ucLerp(-1.3, -1.02, k), 1.55, 0.62]; look(p, ucV([1.25, 0.85, -5.6], skyAt(122, 20, p, 50), k), ucLerp(32, 10, k)); },
+    shed(t) { const k = k01(t, UC.moonGo - 1.5, UC.moonGo + 0.1, Ease.inOutSine), p = [ucLerp(-1.3, -1.02, k), 1.55, 0.62]; look(p, ucV([1.25, 0.85, -5.6], skyAt(122, 20, p, 50), k), ucLerp(32, 5, k)); },
     glass(t) { const k = k01(t, UC.glass, UC.bath, Ease.linear), d = dr(t, 0.003, 15); look(add([-1.6, 1.56, 1.45 - 0.2 * k], d), [-1.6, 1.45, -1], 52); },
     bath(t) { const k = k01(t, UC.bath, UC.red, Ease.linear), b = G.bath, d = dr(t, 0.005, 16); look(add([b[0] - 0.7 + 0.1 * k, 1.3, b[2] + 0.85 - 0.1 * k], d), [b[0] + 0.05, 0.98, b[2] - 0.1], 40); },
     red(t) { const k = k01(t, UC.red, UC.melt, Ease.inOutSine), p = [-0.6, 1.55, -9.6], d = dr(t, 0.006, 17); look(add(p, d), ucV(skyAt(132, 42, p), skyAt(146, 9, p), k), 64); },
@@ -589,6 +598,8 @@ UC_SETS.garden = (app) => {
       // looking straight at the glowing band, your eyes adapt to it (the rest of the sky darkens)
       if (shot.mode === 'zero') { const S = ucSkyNow(Math.max(0, n)); p.exposure *= ucExpoFor(S.A + 0.6 * S.dust) / S.E; p.bloomThreshold = 1.4; }
       if (KITCHEN.includes(shot.mode)) { p.vignette = 0.6; p.bloom = 0.5; }
+      // (the long look at the Moon: your eyes adapt to the bright sky around it, so the last of its contrast shows)
+      if (shot.mode === 'shed') { const k = k01(t, UC.moonGo - 1.5, UC.moonGo + 0.1, Ease.inOutSine); p.exposure *= ucLerp(1, 0.32, k); p.vignette = ucLerp(0.6, 0.35, k); }
       if (shot.mode === 'cold') { p.fade = Math.max(p.fade, 1 - MathX.smooth(t, 0, 0.6)); }
       if (['bigbang', 'sun', 'last'].includes(shot.mode)) { p.vignette = 0.25; p.contrast = 1.0; p.uneven = 0.12; }
       if (shot.mode === 'last') {
