@@ -24,13 +24,14 @@ NT_SETS.memorial = (app) => {
   const beamM = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, uniforms: { k: { value: 1 } },
     vertexShader: 'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'uniform float k; varying vec2 vU; void main(){ float h = vU.y; float side = 1.0 - abs(vU.x * 2.0 - 1.0); float a = pow(side, 1.6) * (0.55 * exp(-h * 1.6) + 0.18) * smoothstep(0.0, 0.02, h) * k; gl_FragColor = vec4(0.62, 0.78, 1.0, a); }',
+    fragmentShader: 'uniform float k; varying vec2 vU; void main(){ float h = vU.y; float side = 1.0 - abs(vU.x * 2.0 - 1.0); float a = smoothstep(0.0, 0.55, side) * (0.42 * exp(-h * 2.2) + 0.12) * smoothstep(0.0, 0.004, h) * k; gl_FragColor = vec4(0.62, 0.77, 1.0, a); }',
   });
-  const haloM = beamM.clone(); haloM.uniforms = { k: { value: 1 } }; haloM.fragmentShader = haloM.fragmentShader.replace('pow(side, 1.6)', '0.16 * pow(side, 2.4)');
+  const haloM = beamM.clone(); haloM.uniforms = { k: { value: 1 } }; haloM.fragmentShader = haloM.fragmentShader.replace('smoothstep(0.0, 0.55, side)', '0.38 * pow(side, 2.0)');
   const beams = [NT_TW.N, NT_TW.S].map((T) => {
     const g = new THREE.Group(); g.position.set(T.x, 0, T.z); scene.add(g);
-    for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(48 + k * 26, 7000, 1, 1), beamM); m.position.y = 3500; m.rotation.y = k * Math.PI / 3; g.add(m); }
-    for (let k = 0; k < 2; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(260 + k * 220, 7000, 1, 1), haloM); m.position.y = 3500; m.rotation.y = k * Math.PI / 2 + 0.4; g.add(m); }   // (the glow round it, in the haze)
+    // (a soft-edged column: crossed planes so it has the same width from anywhere; wider as it rises into the haze)
+    for (let k = 0; k < 4; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), beamM); m.scale.set(110, 7000, 1); m.position.y = 3500; m.rotation.y = k * Math.PI / 4; g.add(m); }
+    for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), haloM); m.scale.set(280 + k * 220, 7000, 1); m.position.y = 3500; m.rotation.y = k * Math.PI / 3 + 0.4; g.add(m); }   // (the glow round it, in the haze)
     const base = new THREE.Mesh(new THREE.BoxGeometry(50, 4, 50), new THREE.MeshBasicMaterial({ color: '#cfe0ff' })); base.position.y = 2; g.add(base);
     return g;
   });
@@ -44,7 +45,7 @@ NT_SETS.memorial = (app) => {
       if (s.mode === 'dark') { ntCam(cam, [0, -5000, 0], [0, -5000, -1], 40); beams.forEach((b) => (b.visible = false)); refl.begin(); refl.end(); return; }
       beams.forEach((b) => (b.visible = true));
       const k = MathX.clamp((t - NT.light) / (NT.end - NT.light), 0, 1);
-      ntCam(cam, [-1690 + 40 * k, 12, 420 - 30 * k], [40, 330 + 80 * k, 60], 44 - 3 * k);
+      ntCam(cam, [-1690 + 40 * k, 14, 420 - 30 * k], [40, 60 + 50 * k, 60], 46 - 3 * k);   // (the skyline across the middle, the river under it: the card goes there)
       beamM.uniforms.k.value = haloM.uniforms.k.value = MathX.smooth(t, NT.light + 0.6, NT.light + 3.5);
       refl.begin();
       for (let i = 0; i < 700; i++) {

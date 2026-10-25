@@ -89,9 +89,11 @@ Object.assign(ACTIONS, {
   ntCover(τ, c) { const p = ACTIONS.walk(τ, c); p.rSh = [1.25, 0.15]; p.rEl = 2.0; p.spine = 0.25; p.neck = 0.3; return p; },
   // standing, watching something high up and far away (the tower); and the same with a hand to the mouth
   ntWatch(τ, c) { const p = ACTIONS.idle(τ, c); p.neck = -0.2 + 0.03 * noise1(τ * 0.3, c.seedI + 4); p.headYaw = 0.1 * noise1(τ * 0.2, c.seedI + 7); return p; },
+  // an officer directing the crowd: the right arm out to the side, pointing the way, beating time ("keep moving")
+  ntPoint(τ, c) { const p = ACTIONS.idle(τ, c); p.rSh = [0.45, 1.25 + 0.1 * Math.sin(τ * 2.4 + c.seed * 3)]; p.rEl = 0.12; p.neck = 0.04; p.headYaw = 0.25; return p; },
   ntGasp(τ, c) { const p = ACTIONS.ntWatch(τ, c); p.rSh = [1.3, 0.12]; p.rEl = 2.05; p.lSh = [0.35, 0.1]; p.lEl = 0.9; p.spine = 0.08; return p; },
 });
-Object.assign(BLEND, { ntGive: 0.4, ntTake: 0.4, ntDown: 0.5, ntWait: 0.6, ntClimb: 0.5, ntRest: 0.8, ntHelped: 0.4, ntHelper: 0.4, ntWave: 0.5, ntType: 0.6, ntLookUp: 0.5, ntLookBack: 0.7, ntCover: 0.5, ntWatch: 0.8, ntGasp: 0.5 });
+Object.assign(BLEND, { ntGive: 0.4, ntTake: 0.4, ntDown: 0.5, ntWait: 0.6, ntClimb: 0.5, ntRest: 0.8, ntHelped: 0.4, ntHelper: 0.4, ntWave: 0.5, ntType: 0.6, ntLookUp: 0.5, ntLookBack: 0.7, ntCover: 0.5, ntWatch: 0.8, ntGasp: 0.5, ntPoint: 0.5 });
 
 // FDNY gear on a firefighter (2001): the traditional helmet's long back brim and its front shield, and the reflective
 // bands on the black bunker coat (chest, back, both sleeves, the hem)

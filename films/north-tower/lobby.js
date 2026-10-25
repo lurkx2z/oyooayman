@@ -37,12 +37,22 @@ NT_SETS.lobby = (app) => {
     g.clearRect(0, 0, W, H); const r = new RNG(44);
     for (let c = 0; c < 3; c++) { const cx = r.range(40, W - 40), cy = r.range(200, H - 200); for (let i = 0; i < 22; i++) { g.strokeStyle = `rgba(255,255,255,${r.range(0.4, 0.9)})`; g.lineWidth = r.range(0.6, 2); g.beginPath(); g.moveTo(cx, cy); let x = cx, y = cy; const a = r.range(0, 6.28); for (let k = 0; k < 5; k++) { x += Math.cos(a + r.range(-0.4, 0.4)) * r.range(20, 70); y += Math.sin(a + r.range(-0.4, 0.4)) * r.range(20, 90); g.lineTo(x, y); } g.stroke(); } }
   }), { repeat: false });
+  // (and the cracks as they read against the bright plaza: dark lines, a star where something hit)
+  const crackDark = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, fog: false, map: ntTex(ntCanvas(256, 1024, (g, W, H) => {
+    g.clearRect(0, 0, W, H); const r = new RNG(45);
+    for (let c = 0; c < 2; c++) {
+      const cx = r.range(50, W - 50), cy = r.range(300, H - 250);
+      for (let i = 0; i < 26; i++) { g.strokeStyle = `rgba(40,42,46,${r.range(0.5, 0.95)})`; g.lineWidth = r.range(1, 3); g.beginPath(); g.moveTo(cx, cy); let x = cx, y = cy; const a = i / 26 * 6.283 + r.range(-0.1, 0.1); for (let k = 0; k < 6; k++) { x += Math.cos(a + r.range(-0.35, 0.35)) * r.range(18, 60); y += Math.sin(a + r.range(-0.35, 0.35)) * r.range(18, 80); g.lineTo(x, y); } g.stroke(); }
+      for (const rr of [22, 48, 85]) { g.strokeStyle = 'rgba(50,52,56,0.7)'; g.lineWidth = 1.5; g.beginPath(); for (let k = 0; k <= 14; k++) { const a = k / 14 * 6.283, q = rr * (0.8 + 0.4 * r.next()); k ? g.lineTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q * 1.3) : g.moveTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q * 1.3); } g.stroke(); }
+    }
+  }), { repeat: false }), alphaMap: archTex });
   const panes = [];
   for (let k = 0; k < 9; k++) {
     const z = 8 - 1.525 - k * 3.05, st = [1, 0, 2, 1, 1, 0, 2, 1, 1][k];
     if (st === 2) continue;   // gone
     const m = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 7.6), new THREE.MeshStandardMaterial({ color: '#dfe8ee', transparent: true, opacity: 0.22, roughness: 0.05, metalness: 0.6, alphaMap: archTex, depthWrite: false, emissive: '#ffffff', emissiveMap: st === 1 ? crackTex : null, emissiveIntensity: st === 1 ? 0.55 : 0 }));
     m.position.set(13.15, 3.85, z); m.rotation.y = -Math.PI / 2; scene.add(m); panes.push(m);
+    if (st === 1) { const c = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 7.6), crackDark); c.position.set(13.12, 3.85, z); c.rotation.y = -Math.PI / 2; c.scale.x = k % 2 ? -1 : 1; scene.add(c); }
   }
   // outside: the plaza, bright and hazed (a backdrop of dust, low shapes of debris, no detail)
   const haze = new THREE.Mesh(new THREE.PlaneGeometry(200, 60), new THREE.MeshBasicMaterial({ color: '#e6e2da', fog: false }));
@@ -57,6 +67,10 @@ NT_SETS.lobby = (app) => {
   const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
   for (let i = 0; i < NG; i++) { const h = hash1(i * 3 + 1), h2 = hash1(i * 5 + 2); _p.set(12.6 - Math.pow(h, 2.2) * 9, 0.004, 8 - h2 * 28); _e.set(0, h * 20, 0); _q.setFromEuler(_e); const sc = 0.4 + 1.8 * hash1(i * 7 + 3); _s.set(sc, 1, sc); _m.compose(_p, _q, _s); glass.setMatrixAt(i, _m); }
   scene.add(glass);
+  const shardG = new THREE.ShapeGeometry(new THREE.Shape([new THREE.Vector2(0, 0), new THREE.Vector2(0.22, 0.05), new THREE.Vector2(0.08, 0.3)])); shardG.rotateX(-Math.PI / 2);
+  const NS = 240, shards = new THREE.InstancedMesh(shardG, new THREE.MeshStandardMaterial({ color: '#e8f0f4', roughness: 0.04, metalness: 0.85, emissive: '#dfe8ee', emissiveIntensity: 0.35, side: THREE.DoubleSide }), NS);
+  for (let i = 0; i < NS; i++) { const h = hash1(i * 11 + 4), h2 = hash1(i * 13 + 5); _p.set(12.7 - Math.pow(h, 1.6) * 6, 0.006 + 0.004 * h2, 8 - h2 * 28); _e.set((h - 0.5) * 0.08, h2 * 30, 0); _q.setFromEuler(_e); const sc = 0.5 + 1.6 * hash1(i * 17 + 6); _s.set(sc, 1, sc); _m.compose(_p, _q, _s); shards.setMatrixAt(i, _m); }
+  scene.add(shards);
   // the lights in the ceiling: a few out
   const lampM = new THREE.MeshStandardMaterial({ color: '#fff', emissive: '#fff8ea', emissiveIntensity: 1.2 });
   for (let x = -10; x <= 10; x += 4) for (let z = 6; z >= -18; z -= 4) if (hash2(x, z) > 0.3) ntBox(0.6, 0.05, 0.6, lampM, x, 7.98, z).castShadow = false;
@@ -137,7 +151,7 @@ NT_SETS.lobby = (app) => {
         const hx = q2[0] - q[0], hz = q2[2] - q[2], hd = Math.atan2(-hx, -hz), nx = Math.cos(hd), nz = -Math.sin(hd);
         ntPlace(p, q[0] + side * nx, q[1], q[2] + side * nz, hd, s.mode === 'conc' && i % 4 === 0 ? 'ntCover' : 'walk', t + i, pu * 9 + i);
       });
-      ntPlace(cops[0], 4.6, 0, -12.6, Math.PI * 0.62, 'ntWave', t);
+      ntPlace(cops[0], 3.4, 0, -10.6, Math.PI * 0.5, 'ntPoint', t);
       ntPlace(cops[1], -0.4, 0, -14.6, Math.PI * 0.2, 'ntWave', t + 1.3);
       cops.forEach((c) => (c.root.visible = s.mode !== 'conc'));
       // the plaza's haze moves; dust in the hall's light

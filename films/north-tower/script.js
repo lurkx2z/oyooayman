@@ -73,7 +73,7 @@ NT.out = ntS('out') - 1.6;
 NT.how = ntS('how') - 0.6;
 NT.cost = ntS('cost') - 1.2;
 NT.light = ntS('light') - 1.4;
-NT.card = ntE('light') + 3.5;                            // the remembrance card (the beams alone first)
+NT.card = ntE('light') + 4.5;                            // the remembrance card (the beams alone first)
 NT.end = NTT.duration;
 
 // ---------------------------------------------------------------------------------------------------------------------

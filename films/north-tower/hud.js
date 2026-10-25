@@ -62,7 +62,7 @@ class NtHud {
     this.tag = mk('nt-tag');
     this.clock = mk('nt-clock', '<div class="l">TUESDAY · SEPTEMBER 11, 2001</div><div class="v"></div>'); this.clockV = this.clock.querySelector('.v');
     this.cap = mk('nt-cap');
-    this.caps = NTT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: ntCapHtml(c.text), big: g.id === 'cost' || g.id === 'light' })));
+    this.caps = NTT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: ntCapHtml(c.text), big: false, num: g.id === 'cost' })));
     this.tower = mk('nt-tower');
     this.card = mk('nt-card', `<div class="k">IN MEMORY OF</div><div class="h">THE 2,977 PEOPLE<br>KILLED ON SEPTEMBER 11, 2001</div>
       <div class="k2">AND THE SIX KILLED IN THE BOMBING OF FEBRUARY 26, 1993</div>
@@ -102,7 +102,7 @@ class NtHud {
     }
     const cp = this.caps.find((x) => t >= x.show - 0.01 && t < x.hide);
     if (cp) {
-      this._html('cap', this.cap, cp.html); this._set('capq', this.cap, 'className', cp.big ? 'nt-cap q' : 'nt-cap');
+      this._html('cap', this.cap, cp.html); const cls = cp.num ? 'nt-cap c' : cp.big ? 'nt-cap q' : 'nt-cap'; if (this._last.capq !== cls) { this._last.capq = cls; this.cap.className = cls; }
       this._set('capa', this.cap, 'opacity', W(t, cp.show, cp.hide, 0.25, 0.35).toFixed(3));
     } else this._set('capa', this.cap, 'opacity', '0');
     this._towerBar(t);
