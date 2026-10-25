@@ -212,7 +212,7 @@ NT_SETS.stair = (app) => {
       // the firefighters: look down the outer lane they come up; the injured man: turn to him as he passes
       if (s.mode === 'ff') { const q = ntStairAt(Pc + 0.22, RO); ahead = ntV(ahead, [q[0], q[1] + 1.75, q[2]], 0.6); }
       if (s.mode === 'right') {
-        const rel = hurtAt(t) - Pc, w = MathX.smooth(rel, -0.2, -0.06) * (1 - MathX.smooth(rel, 0.08, 0.22));
+        const rel = hurtAt(t) - Pc, w = MathX.smooth(rel, -0.02, 0.07) * (1 - MathX.smooth(rel, 0.3, 0.45));   // (only once they're past you: no swing round)
         if (w > 0) { const q = ntStairAt(Math.max(0, hurtAt(t)), RO + 0.05); ahead = ntV(ahead, [q[0], q[1] + 1.35, q[2]], 0.75 * w); }
       }
       const step = Math.sin(Pc * LI / NT_TREAD * Math.PI) * 0.018;

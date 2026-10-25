@@ -49,7 +49,7 @@ status: voiceless
 
 [thin] Floor 8. The crowd thins out. / You can move faster now.
 
-[mezz] 9:42. The mezzanine. / The big windows are cracked. Glass on the floor.
+[mezz] 9:45. The mezzanine. / The big windows are cracked. Glass on the floor.
 
 [police] A police officer: "Don't look outside. Keep moving." / You don't look.
 

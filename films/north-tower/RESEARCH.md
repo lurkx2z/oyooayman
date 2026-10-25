@@ -92,8 +92,9 @@ film uses the 9/11 Commission's times.
   (Commission). The evacuation below the impact was, in the Commission's words, "a success": under one hour for most,
   against more than four hours in 1993.
 - The Memorial has **2,983 names**: the 2,977 of 2001 and the six killed in the bombing of February 26, 1993.
-- Since 2002, on each anniversary, two beams of light (the **Tribute in Light**) rise from Lower Manhattan where the
-  towers stood.
+- Since 2002, on each anniversary, two beams of light (the **Tribute in Light**) rise over Lower Manhattan: 88
+  searchlights in two 48-ft squares, set up in recent years on the roof of the Battery Parking Garage, a few
+  blocks south of the site, so the beams echo the towers without standing exactly where they stood.
 
 ## 5 · The morning
 

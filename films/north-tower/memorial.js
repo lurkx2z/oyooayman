@@ -2,8 +2,8 @@
    MEMORIAL — the end of the film. (The empty stairway before it is the stair set's 'empty' mode.)
      dark   a black frame for the numbers (2,977 · 2,753 · 343): nothing else on screen
      light  a September night, years later: Lower Manhattan from across the Hudson, its lights on, and two beams of
-            light rising from where the towers stood (the Tribute in Light, every September 11 since 2002). The
-            remembrance card comes up over it, then black.
+            light rising over Lower Manhattan (the Tribute in Light, every September 11 since 2002). The remembrance
+            card comes up under the skyline, over the river, then black.
    ===================================================================== */
 
 NT_SETS.memorial = (app) => {
@@ -27,8 +27,10 @@ NT_SETS.memorial = (app) => {
     fragmentShader: 'uniform float k; varying vec2 vU; void main(){ float h = vU.y; float side = 1.0 - abs(vU.x * 2.0 - 1.0); float a = smoothstep(0.0, 0.55, side) * (0.42 * exp(-h * 2.2) + 0.12) * smoothstep(0.0, 0.004, h) * k; gl_FragColor = vec4(0.62, 0.77, 1.0, a); }',
   });
   const haloM = beamM.clone(); haloM.uniforms = { k: { value: 1 } }; haloM.fragmentShader = haloM.fragmentShader.replace('smoothstep(0.0, 0.55, side)', '0.38 * pow(side, 2.0)');
-  const beams = [NT_TW.N, NT_TW.S].map((T) => {
-    const g = new THREE.Group(); g.position.set(T.x, 0, T.z); scene.add(g);
+  // (the searchlights stand in two squares on the roof of the Battery Parking Garage, south of the site; from New
+  // Jersey they rise side by side)
+  const beams = [[40, 752], [40, 828]].map(([x, z]) => {
+    const g = new THREE.Group(); g.position.set(x, 30, z); scene.add(g);
     // (a soft-edged column: crossed planes so it has the same width from anywhere; wider as it rises into the haze)
     for (let k = 0; k < 4; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), beamM); m.scale.set(110, 7000, 1); m.position.y = 3500; m.rotation.y = k * Math.PI / 4; g.add(m); }
     for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), haloM); m.scale.set(280 + k * 220, 7000, 1); m.position.y = 3500; m.rotation.y = k * Math.PI / 3 + 0.4; g.add(m); }   // (the glow round it, in the haze)
@@ -45,7 +47,7 @@ NT_SETS.memorial = (app) => {
       if (s.mode === 'dark') { ntCam(cam, [0, -5000, 0], [0, -5000, -1], 40); beams.forEach((b) => (b.visible = false)); refl.begin(); refl.end(); return; }
       beams.forEach((b) => (b.visible = true));
       const k = MathX.clamp((t - NT.light) / (NT.end - NT.light), 0, 1);
-      ntCam(cam, [-1690 + 40 * k, 14, 420 - 30 * k], [40, 60 + 50 * k, 60], 46 - 3 * k);   // (the skyline across the middle, the river under it: the card goes there)
+      ntCam(cam, [-1690 + 40 * k, 14, 420 - 30 * k], [30, 60 + 50 * k, 340], 46 - 3 * k);   // (the skyline across the middle, the river under it: the card goes there)
       beamM.uniforms.k.value = haloM.uniforms.k.value = MathX.smooth(t, NT.light + 0.6, NT.light + 3.5);
       refl.begin();
       for (let i = 0; i < 700; i++) {

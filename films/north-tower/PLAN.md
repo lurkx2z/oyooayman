@@ -1,6 +1,6 @@
 # PLAN — *What if you were in the North Tower on September 11, 2001?*
 
-16:9 long-form, 1920×1080, 30 fps, 5:57. Voiceless, in the house format of *Slower light* and *Universe expanding
+16:9 long-form, 1920×1080, 30 fps, 6:01. Voiceless, in the house format of *Slower light* and *Universe expanding
 faster* (short second-person serif captions with empty screen between them, a corner readout, first person, one
 continuous morning), but in a different register: a memorial, not a spectacle. Owner's ask (2026-10-25): "POV, office
 worker during 911 … starts in one of the towers as a office worker … research the event accurately, and the buildings
@@ -38,10 +38,10 @@ The point of view is the evacuation that worked. Almost everyone below the impac
 | # | film time | clock | where | beats |
 |---|---|---|---|---|
 | 1 | 0:00–1:33 | 8:40–8:50 | floor 73 | title · morning · sky · tower · windows · 8:46 impact · after · outside · nobody · known |
-| 2 | 1:33–3:25 | 8:50–9:42 | stairway C | stair · glow · pace · 9:03 second · calm · right · transfer (48) · firefighters (37) · water (20) · thin (8) |
-| 3 | 3:25–4:11 | 9:42–9:58 | mezzanine, concourse, Vesey | mezz · police · escalator/concourse · out by 5 WTC · you look back |
-| 4 | 4:11–5:07 | 9:59–10:29 | Church & Vesey, West Broadway | 9:59 roar · cloud · grey · walk · 10:28 |
-| 5 | 5:07–5:57 | — | empty stairway, black, the Hudson at night | out (7,500) · how · cost (2,977 · 2,753 · 343) · light · card |
+| 2 | 1:33–3:26 | 8:50–9:44 | stairway C | stair · glow · pace · 9:03 second · calm · right · transfer (48) · firefighters (37) · water (20) · thin (8) |
+| 3 | 3:26–4:11 | 9:45–9:58 | mezzanine, concourse, Vesey | mezz · police · escalator/concourse · out by 5 WTC · you look back |
+| 4 | 4:11–5:07 | 9:59–10:29 | Church & Vesey, West Broadway | 9:59 roar · cloud (near-black) · grey · walk · 10:28 |
+| 5 | 5:07–6:01 | — | empty stairway, black, the Hudson at night | out (7,500) · how · cost (2,977 · 2,753 · 343) · light · card |
 
 ## 4 · Shots (`shots.js`)
 
@@ -52,7 +52,8 @@ the door to stairway C · B1–B10 stairway C (the infinite shaft, re-placed as 
 follows you) · the transfer hallway · C1–C4 the mezzanine, the police officer, the escalator, the concourse under
 sprinklers · C5–C6 Vesey Street, the towers burning · D1–D5 9:59 from Church & Vesey, the cloud, the grey, West Broadway,
 10:28 · E1 the empty stairway (lights out, only the glow paint) · E2 black · E3 the Tribute in Light from across the
-Hudson, One World Trade Center beside it, the card.
+Hudson (from the Battery Parking Garage, where it is set up), One World Trade Center beside it, the card under the
+skyline, over the river.
 
 ## 5 · Sets
 
@@ -84,3 +85,40 @@ on the real moments; outside, placed on when their sound would arrive.
 
 9/11 content is sensitive on YouTube and TikTok. The film follows YouTube's guidance for tragic events (educational,
 documentary, no graphic imagery, a memorial framing). It may still be limited for ads; see EPISODE_REPORT.md.
+
+## 8 · Review log
+
+Three independent reviewers (a first-time viewer, a cinematographer, a historian checking accuracy and respect) watched
+the 5 fps preview as contact sheets. Scores as given, out of 10.
+
+**Round 1 (first cut, 5:57).**
+- Viewer: enjoyment 5, retention 4, clarity 6, emotional impact 6, visuals 4, tone 8.
+- Cinematography: image 5, composition 4, lighting 5, text 6 on a TV / 4 on a phone, picture matches caption 4,
+  overall 4.5.
+- History and respect: accuracy 8, architecture and interiors 6, respectfulness 7, platform safety 7.
+
+What they found and what was done:
+- The smoke outside was pale everywhere: a real bug (every particle pool shares one shader program, so pools were drawn
+  with another pool's fog). Fixed in `kit.js`; the smoke is black again.
+- 9:59 did not read: the collapse now starts on the caption, the camera holds on the South Tower, you turn and run
+  after the third caption, the cloud is darker. "Day turns to night" is now near-black for about four seconds, then the
+  grey lifts, with paper falling like snow.
+- 10:28 looked like a cotton-ball mushroom: rebuilt as filmed (the antenna sinks first; dust bursts out round the
+  falling front and never rises above the roofline; dark debris arcs out with pale trails; a ground cloud at the foot);
+  people on West Broadway stop and turn round, one with a hand to the mouth.
+- RGB glitch at both impacts, the "COLLAPSES IN 10 SECONDS" card, the seconds counter on the stairs: removed (game-like
+  in a memorial).
+- Accuracy: the transfer hallway readout (now 48 throughout), "all three stairways are gone" (now: impassable from
+  the 92nd floor up), the glow-paint beat (now: where the lights fail), elevators ("most elevators are out"), the
+  Tribute in Light (it stands on the Battery Parking Garage; the caption no longer says "where the towers stood"),
+  7 World Trade Center placed west of West Broadway, the clock (it now runs steadily inside each shot and
+  moves on only at cuts, the floor number with it).
+- The Vesey exit: stairs up out of the concourse by 5 WTC, fire engines, a ladder, ambulances and police cars with
+  flashing lights, paper on the ground, people coming out with you, 5 WTC's dark bronze front; the camera no longer
+  passes through a parked car.
+- Stairs: firefighters in 2001 FDNY gear (long-brimmed helmets with front shields, bunker coats with reflective bands,
+  hose rolls), a bottle of water passed hand to hand, the hurt man walking with help; the "crowd thins" beat thinner.
+- The mezzanine: cracked windows (star cracks), glass shards on the floor, a police officer mid-frame pointing the way.
+- The end: wider, softer beams with a glow; a longer hold on the light before the card; the card under the skyline;
+  the numbers (2,977 · 2,753 · 343) large, centred, amber. Captions larger for phones (62 px).
+

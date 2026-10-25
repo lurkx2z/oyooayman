@@ -133,7 +133,7 @@ class NtHud {
     this._towerKey = key;
     const H = 560, top = 30, Y = (fl) => top + H * (1 - fl / 110), x = 70, w = 54, gone = t > ntCap('known', 2).show - 0.2;
     const tick = (fl) => `<line x1="${x - 10}" y1="${Y(fl).toFixed(1)}" x2="${x}" y2="${Y(fl).toFixed(1)}" stroke="rgba(246,239,226,0.5)" stroke-width="2"/><text x="${x - 16}" y="${(Y(fl) + 7).toFixed(1)}" class="s" text-anchor="end">${fl}</text>`;
-    this.tower.innerHTML = `<svg viewBox="0 0 230 640" xmlns="http://www.w3.org/2000/svg">
+    this.tower.innerHTML = `<svg viewBox="0 0 290 640" xmlns="http://www.w3.org/2000/svg">
       <rect x="${x}" y="${top}" width="${w}" height="${H}" fill="rgba(200,206,214,0.16)" stroke="rgba(246,239,226,0.55)" stroke-width="2"/>
       ${gone ? `<rect x="${x}" y="${top}" width="${w}" height="${(Y(91) - top).toFixed(1)}" fill="rgba(40,40,44,0.75)"/>` : ''}
       <rect x="${x}" y="${Y(99).toFixed(1)}" width="${w}" height="${(Y(93) - Y(99)).toFixed(1)}" fill="#e0703a"/>

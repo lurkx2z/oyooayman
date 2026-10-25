@@ -61,7 +61,11 @@ function ntTower(scene, T, o = {}) {
   const base = new THREE.Mesh(new THREE.BoxGeometry(w - 0.6, 22, w - 0.6), new THREE.MeshStandardMaterial({ map: baseTex, metalness: 0.6, roughness: 0.38 }));
   base.position.y = 11; g.add(base);
   // the mechanical floors: darker louvre bands, slightly proud of the skin
-  const louv = new THREE.MeshStandardMaterial({ color: '#7d8188', metalness: 0.5, roughness: 0.5 });
+  // (grey louvres, not black: the bands read as a slightly darker, ribbed stripe in the photographs)
+  const louvTex = ntTex(ntCanvas(64, 64, (c, W, H) => { c.fillStyle = '#9a9ea4'; c.fillRect(0, 0, W, H); c.fillStyle = '#5d6168'; for (let y = 0; y < H; y += 8) c.fillRect(0, y, W, 3); }));
+  louvTex.repeat.set(w / 2, 2);
+  const louv = new THREE.MeshStandardMaterial({ color: '#ffffff', map: louvTex, metalness: 0.2, roughness: 0.6 });
+  if (o.env) louv.envMap = o.env;
   for (const f of [41, 75, 107]) if (f * NT_FLOOR_H < h - 5) { const b = new THREE.Mesh(new THREE.BoxGeometry(w + 0.12, NT_FLOOR_H * 2 - 0.8, w + 0.12), louv); b.position.y = (f - 0.5) * NT_FLOOR_H + NT_FLOOR_H; g.add(b); }
   // the roof edge, and the North Tower's antenna
   const roofM = new THREE.MeshStandardMaterial({ color: '#8a8e94', metalness: 0.5, roughness: 0.5 });
