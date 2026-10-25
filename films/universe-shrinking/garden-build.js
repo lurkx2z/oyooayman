@@ -81,6 +81,20 @@ function ucStrataCanvas(seed, w = 256, h = 1024) {
     for (let i = 0; i < 1600; i++) { const y = r.range(10, h); g.fillStyle = `rgba(${r.next() < 0.5 ? '255,240,220' : '0,0,0'},${r.range(0.03, 0.12)})`; g.fillRect(r.range(0, w), y, r.range(2, 12), r.range(1, 6)); }
   });
 }
+// the bird bath's ice (seen from above, the disc's top cap): grey-blue, white frost round the rim and in patches,
+// trapped bubbles, two cracks
+function ucIceCanvas(seed, w = 512) {
+  const r = new RNG(seed);
+  return ucCanvas(w, w, (g) => {
+    const c = w / 2, gr = g.createRadialGradient(c, c, 0, c, c, c);
+    gr.addColorStop(0, '#8496a4'); gr.addColorStop(0.7, '#9aabb7'); gr.addColorStop(0.9, '#cfd8de'); gr.addColorStop(1, '#e8edf0');
+    g.fillStyle = gr; g.fillRect(0, 0, w, w);
+    for (let i = 0; i < 26; i++) { const a = r.range(0, 6.28), d = r.range(0.1, 0.8) * c, rr = r.range(12, 46); const p = g.createRadialGradient(c + Math.cos(a) * d, c + Math.sin(a) * d, 0, c + Math.cos(a) * d, c + Math.sin(a) * d, rr); p.addColorStop(0, 'rgba(235,240,244,0.5)'); p.addColorStop(1, 'rgba(235,240,244,0)'); g.fillStyle = p; g.fillRect(0, 0, w, w); }
+    for (let i = 0; i < 260; i++) { const a = r.range(0, 6.28), d = Math.sqrt(r.next()) * c * 0.85, rr = r.range(1, 4.5); g.fillStyle = `rgba(245,248,250,${r.range(0.35, 0.8)})`; g.beginPath(); g.ellipse(c + Math.cos(a) * d, c + Math.sin(a) * d, rr, rr * r.range(0.6, 1), r.range(0, 3), 0, 6.28); g.fill(); }
+    g.strokeStyle = 'rgba(240,244,248,0.7)'; g.lineWidth = 1.6;
+    for (let k = 0; k < 2; k++) { let x = c + r.range(-0.3, 0.3) * c, y = c + r.range(-0.3, 0.3) * c, a = r.range(0, 6.28); g.beginPath(); g.moveTo(x, y); for (let i = 0; i < 14; i++) { a += r.range(-0.5, 0.5); x += Math.cos(a) * 18; y += Math.sin(a) * 18; g.lineTo(x, y); } g.stroke(); }
+  });
+}
 // a terrace's back: brick or render, windows (some lit, curtains), a door. → { map, glow }
 function ucBackFacade(seed, W = 512, H = 512) {
   const r = new RNG(seed * 13 + 5), lit = [];
@@ -230,7 +244,7 @@ function ucBuildGarden(app, S) {
     stone: ucStd('#8c877c', 0.85),
     stoneDark: ucStd('#6e6a62', 0.9),
     water: new THREE.MeshStandardMaterial({ color: '#16202a', roughness: 0.05, metalness: 0.4 }),
-    ice: ucStd('#c9d4dc', 0.45, 0.05),
+    ice: ucStd('#ffffff', 0.45, 0.05, { map: (() => { const t = ucTex(ucIceCanvas(12), { repeat: false }); return t; })() }),
     metal: ucStd('#24332c', 0.45, 0.6),
     white: ucStd('#e8e6e2', 0.35, 0.1),
     black: ucStd('#141414', 0.5, 0.3),
@@ -360,7 +374,7 @@ function ucBuildGarden(app, S) {
   const fo = ucCyl(0.03, 0.03, 0.12, M.black, 0, 0, 0, tube, 10); fo.rotation.x = Math.PI / 2; fo.position.z = -0.4;
   const ep = ucCyl(0.016, 0.018, 0.08, M.black, 0, 0.04, -0.46, tube, 8); ep.rotation.x = -0.6;
   const fi = ucCyl(0.014, 0.014, 0.22, M.white, 0.07, 0.07, 0.15, tube, 8); fi.rotation.x = Math.PI / 2;
-  // ---------------------------------------------------------------- the bird bath and its fountain (on B)
+  // ---------------------------------------------------------------- the bird bath (on B)
   const bath = P.bath = new THREE.Group(); bath.position.set(...G.bath); B.add(bath);
   ucCyl(0.3, 0.36, 0.08, M.stoneDark, 0, 0.04, 0, bath, 16);
   ucCyl(0.11, 0.15, 0.78, M.stone, 0, 0.45, 0, bath, 14);
@@ -369,7 +383,6 @@ function ucBuildGarden(app, S) {
   // the water (8 cm deep, its top at 0.98 m) under a skin of ice, white with frost (garden.js turns one into the other)
   P.bathWater = ucCyl(0.38, 0.38, 0.01, M.water, 0, 0.98, 0, bath, 24);
   P.bathIce = ucCyl(0.385, 0.385, 0.012, M.ice, 0, 0.985, 0, bath, 24);
-  ucCyl(0.02, 0.025, 0.08, M.black, 0, 1.0, 0, bath, 8);                                                // the jet's nozzle
   // ---------------------------------------------------------------- the bistro set (on A), the mug, the lantern
   const table = P.table = new THREE.Group(); table.position.set(...G.table); A.add(table);
   ucCyl(0.36, 0.36, 0.025, M.metal, 0, 0.72, 0, table, 28); ucCyl(0.02, 0.02, 0.7, M.metal, 0, 0.36, 0, table, 8); ucCyl(0.22, 0.24, 0.02, M.metal, 0, 0.01, 0, table, 18);

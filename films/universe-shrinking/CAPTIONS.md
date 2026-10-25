@@ -68,9 +68,9 @@ status: voiceless
 
 [melt] 11:50. Your house melts.
 
-[bigbang] 11:52. Space is 2,700 °C. / As hot as the universe 380,000 years after the Big Bang. / This is its light, the way it looked when it was made.
-
 [vanish] Now everything is as hot as the sky. / No shadows. No edges. / Your garden disappears into the light.
+
+[bigbang] 11:52. Space is 2,700 °C. / As hot as the universe 380,000 years after the Big Bang. / This is its light, the way it looked when it was made.
 
 [sun] 11:55. Every direction is as hot as the surface of the Sun.
 

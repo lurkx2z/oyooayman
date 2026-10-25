@@ -130,12 +130,12 @@ class UcSky {
     this.domeU = { uMwN: { value: nrm }, uMw: { value: new THREE.Color() }, uDust: { value: new THREE.Color() }, uBg: { value: new THREE.Color() },
       uAnd: { value: new THREE.Vector3(...ucSkyDir(UC_SKY.andromeda.az, UC_SKY.andromeda.alt)) }, uAndC: { value: new THREE.Color() },
       uNight: { value: 1 }, uGlow: { value: new THREE.Color('#2c2a2e') }, uTop: { value: new THREE.Color('#05070d') }, uHor: { value: new THREE.Color('#1c2130') }, uGlowK: { value: 1 },
-      uGround: { value: new THREE.Color('#000000') }, uK: { value: 1 } };
+      uGround: { value: new THREE.Color('#000000') }, uK: { value: 1 }, uRip: { value: 0 } };
     const dome = this.dome = new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 64, 32), new THREE.ShaderMaterial({
       side: THREE.BackSide, depthWrite: false, fog: false, uniforms: this.domeU,
       vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p; }',
       fragmentShader: /* glsl */`
-        uniform vec3 uMwN, uMw, uDust, uBg, uAnd, uAndC, uGlow, uTop, uHor, uGround; uniform float uNight, uGlowK, uK; varying vec3 vD;
+        uniform vec3 uMwN, uMw, uDust, uBg, uAnd, uAndC, uGlow, uTop, uHor, uGround; uniform float uNight, uGlowK, uK, uRip; varying vec3 vD;
         float h3(vec3 p) { return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
         float n3(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
           return mix(mix(mix(h3(i), h3(i + vec3(1,0,0)), f.x), mix(h3(i + vec3(0,1,0)), h3(i + vec3(1,1,0)), f.x), f.y),
@@ -160,6 +160,11 @@ class UcSky {
           vec2 q = vec2(dot(d - a, e1), dot(d - a, e2)) / 0.0175; q = vec2(c38 * q.x - s38 * q.y, s38 * q.x + c38 * q.y);
           float ell = exp(-(q.x * q.x / 2.6 + q.y * q.y / 0.25)) * 0.6 + exp(-(q.x * q.x + q.y * q.y) / 0.035) * 0.9;
           col += uAndC * ell * step(0.0, dot(d, a));
+          // the afterglow's ripples (one part in 100,000), drawn exaggerated when uRip > 0, in the colours of the
+          // published maps: cooler blue, warmer red
+          if (uRip > 0.0) { float v = fbm(d * 5.0 + 11.0) + 0.55 * fbm(d * 16.0 + 4.0) - 0.78;
+            vec3 pc = v < 0.0 ? mix(vec3(1.0, 0.95, 0.85), vec3(0.25, 0.45, 1.0), smoothstep(0.0, 0.3, -v)) : mix(vec3(1.0, 0.95, 0.85), vec3(1.0, 0.38, 0.12), smoothstep(0.0, 0.3, v));
+            col = mix(col, dot(col, vec3(0.2126, 0.7152, 0.0722)) * pc * 1.1, uRip * 0.85); }
           // below the horizon: the ground far off (lit by the sky)
           if (h < 0.0) col = mix(col, uGround, smoothstep(0.0, -0.06, h));
           gl_FragColor = vec4(col * uK, 1.0);

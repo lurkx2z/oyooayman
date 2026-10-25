@@ -72,8 +72,9 @@ UC.pretend = ucCap('glass', 1).show - 0.2;
 UC.bath = ucS('bath') - 0.6;
 UC.red = ucS('red') - 0.7;
 UC.melt = ucS('melt') - 0.6;
-UC.bigbang = ucS('bigbang') - 0.6;
 UC.vanish = ucS('vanish') - 0.7;
+UC.bigbang = ucS('bigbang') - 0.6;
+UC.ripples = ucCap('bigbang', 2).show;                 // its faint ripples (shown exaggerated)
 UC.sun = ucS('sun') - 0.6;
 // 7 — the last second
 UC.last = ucS('last') - 0.6;
@@ -137,7 +138,7 @@ const UC_NKEYS = [
   [UC.shedAt + 0.1, ucAt(23, 42, 52), 'lin'],                     // the shed lights (23:42:50)
   [ucE('noon') + 0.4, ucAt(23, 43, 41), 'lin'],                   // the fence (23:43:40)
   [UC.scopeAt + 0.15, ucAt(23, 43, 50), 'lin'],                   // the telescope's tube melts (660 °C, 23:43:49)
-  [UC.moonGo + 0.1, ucAt(23, 44, 6), 'lin'],
+  [UC.moonGo + 0.1, ucAt(23, 44, 2), 'lin'],
   [ucE('shed') + 0.5, ucAt(23, 44, 30), 'lin'],                   // the Moon is gone (23:44:25)
   [ucS('glass') + 0.1, ucAt(23, 45, 45), 'lin'],                  // the glass softens
   [ucE('glass') + 0.6, ucAt(23, 46, 50), 'lin'],
@@ -146,10 +147,10 @@ const UC_NKEYS = [
   [ucS('red') + 0.1, ucAt(23, 48, 45), 'lin'],                    // the afterglow overtakes the galaxies' light
   [ucE('red') + 0.6, ucAt(23, 50, 20), 'lin'],
   [ucS('melt') + 0.1, ucAt(23, 50, 45), 'lin'],                   // brick melts
-  [ucE('melt') + 0.6, ucAt(23, 51, 40), 'lin'],
+  [ucE('melt') + 0.6, ucAt(23, 51, 12), 'lin'],
+  [ucE('vanish') + 0.6, ucAt(23, 51, 58), 'lin'],                 // everything fades into the sky; the walls last
   [ucW('bigbang', '2700').start, ucAt(23, 52, 10), 'lin'],        // ★ 3,000 K
-  [ucE('bigbang') + 0.6, ucAt(23, 52, 58), 'lin'],
-  [ucE('vanish') + 0.6, ucAt(23, 54, 40), 'lin'],
+  [ucE('bigbang') + 0.6, ucAt(23, 52, 45), 'lin'],                 // (held near 3,000 K while the captions talk about it)
   [ucS('sun') + 0.1, ucAt(23, 55, 0), 'lin'],                     // the Sun's surface
   [ucE('sun') + 0.3, ucAt(23, 55, 30), 'log'],
   [UC.last - 0.1, UCP.R - 3, 'lin'],

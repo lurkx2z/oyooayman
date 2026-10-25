@@ -75,10 +75,10 @@ function ucSkyWords(L) {
 
 // the scene's context line: [from, to, label, value(t, n)] (value: text, or { l, v, v2 } with HTML)
 const UC_CTX = [
-  [UC.titleShot + 0.8, UC.rule - 0.3, 'THE GARDEN, 7:29 PM', (t, n) => ({ v: ucFmtC(ucTempAt('frost', n)) + ' · FROST', v2: 'STARS YOU CAN SEE: ' + ucThousands(Math.round(ucSkyNow(0).stars / 10) * 10) })],
+  [UC.titleShot + 0.8, UC.rule - 0.3, 'THE GARDEN, 7:29 PM', (t, n) => ({ v: ucFmtC(ucTempAt('frost', n)) + ' · FROST', v2: 'STARS YOU CAN SEE: ' + ucThousands(Math.round(ucSkyNow(0).stars / 100) * 100) })],
   [UC.rule + 0.6, UC.held - 0.2, 'THE SPACE BETWEEN THE GALAXIES', (t) => ({ v: t < UC.shrinkAt ? 'GROWING' : 'SHRINKING', v2: t < UC.shrinkAt ? 'AS IT HAS FOR 13.8 BILLION YEARS' : 'FROM 7:30 · FASTER AND FASTER' })],
   [UC.held + 0.6, UC.promise - 0.25, 'HELD TOGETHER · THEY KEEP THEIR SIZE', (t) => ({ v: 'ATOMS · YOU · STARS · GALAXIES', v2: t > UC.runout - 0.3 ? 'THE SPACE LEFT BETWEEN THEM: ' + Math.max(0, Math.round(100 * UC_COS.held(t) / UC_COS.held(UC.held))) + '%' : '' })],
-  [UC.promise + 0.5, UC.begin - 0.25, 'THE UNIVERSE, REWOUND', (t) => { const u = MathX.clamp((t - UC.promise) / (UC.begin - 0.6 - UC.promise), 0, 1), s = Math.exp(Math.log(1100) * Math.pow(u, 1.6)); return { l: 'THE UNIVERSE, REWOUND · AGE', v: ucFmtAge(s), v2: 'THE SMALLER IT WAS, THE HOTTER' }; }],
+  [UC.promise + 0.5, UC.begin - 0.25, 'THE UNIVERSE, REWOUND', (t) => { const u = MathX.clamp((t - UC.promise) / (UC.begin - 0.6 - UC.promise), 0, 1), s = Math.exp(Math.log(1100) * Math.pow(u, 1.6)); return { l: 'THE UNIVERSE, REWOUND · AGE', v: u > 0.97 ? 'ABOUT 380,000 YEARS' : ucFmtAge(s), v2: 'THE SMALLER IT WAS, THE HOTTER' }; }],
   [UC.mirach + 0.6, UC.squeeze - 0.3, 'MIRACH LOOKS', (t, n) => { const s = ucShrink(n); return { v: ucFmtC(3840 * s), v2: 'ITS LIGHT, SQUEEZED × ' + s.toFixed(2) }; }],
   [UC.squeeze + 0.4, UC.more - 0.3, 'STARLIGHT, SQUEEZED BY', (t, n) => ({ v: '× ' + ucShrink(n).toFixed(2), v2: 'STARS YOU CAN SEE: ' + ucThousands(Math.round(ucSkyNow(n).stars / 100) * 100) })],
   [UC.more + 0.4, UC.glow - 0.3, 'STARS YOU CAN SEE', (t, n) => ({ v: ucThousands(Math.round(ucSkyNow(n).stars / 100) * 100), v2: 'ON A CLEAR NIGHT HERE: 1,900' })],
@@ -97,9 +97,9 @@ const UC_CTX = [
   [UC.glass + 0.4, UC.bath - 0.2, 'WINDOW GLASS SOFTENS AT', (t, n) => ({ v: 'ABOUT 700 °C', v2: 'YOURS: ' + ucFmtC(ucTempAt('glass', n)) })],
   [UC.bath + 0.4, UC.red - 0.2, 'THE BIRD BATH', (t, n) => ({ v: ucFmtC(ucTempAt('water', n)) + (n > ucNightForTemp('water', 373.1) ? ' · BOILING' : ''), v2: 'AT 7:29: −2 °C · ICE' })],
   [UC.red + 0.4, UC.melt - 0.2, 'THE BIG BANG\'S AFTERGLOW', (t, n) => ({ v: 'TONIGHT: ' + ucFmtC(ucSpaceK(ucShrink(n))), v2: 'TODAY: −270 °C · INVISIBLE' })],
-  [UC.melt + 0.3, UC.bigbang - 0.2, 'BRICK MELTS AT', (t, n) => ({ v: 'ABOUT 1,600 °C', v2: 'YOUR WALLS: ' + ucFmtC(ucTempAt('brick', n)) })],
-  [UC.bigbang + 0.4, UC.vanish - 0.2, 'AS HOT AS THE UNIVERSE WAS', (t, n) => ({ v: ucFmtAge(ucShrink(n)), v2: 'AFTER THE BIG BANG' })],
-  [UC.vanish + 0.4, UC.sun - 0.2, 'EVERYTHING IN THE GARDEN', (t, n) => ({ v: 'AS HOT AS THE SKY', v2: 'LIGHT FROM EVERY DIRECTION · NO SHADOWS' })],
+  [UC.melt + 0.3, UC.vanish - 0.2, 'BRICK MELTS AT', (t, n) => ({ v: 'ABOUT 1,600 °C', v2: 'YOUR WALLS: ' + ucFmtC(ucTempAt('brick', n)) })],
+  [UC.vanish + 0.4, UC.bigbang - 0.2, 'EVERYTHING IN THE GARDEN', (t, n) => ({ v: 'AS HOT AS THE SKY', v2: 'LIGHT FROM EVERY DIRECTION · NO SHADOWS' })],
+  [UC.bigbang + 0.4, UC.sun - 0.2, 'THE UNIVERSE, REWOUND · AGE', () => ({ v: 'ABOUT 380,000 YEARS', v2: 'WHEN THE FIRST ATOMS FORMED' })],
   [UC.sun + 0.3, UC.last - 0.2, 'THE SURFACE OF THE SUN', (t, n) => ({ v: 'ABOUT 5,500 °C', v2: 'SPACE: ' + ucFmtC(ucSpaceK(ucShrink(n))) })],
   [UC.real + 1.0, UC.clue - 0.2, 'THE REAL UNIVERSE', () => ({ v: 'GROWING · FASTER EVERY YEAR', v2: 'FOUND IN 1998 · NOBEL PRIZE 2011' })],
   [UC.clue + 0.5, UC.turn - 0.2, 'DESI · THE BIGGEST 3D MAP', () => ({ v: '14 MILLION GALAXIES', v2: 'THE PUSH (DARK ENERGY) MAY BE WEAKENING' })],

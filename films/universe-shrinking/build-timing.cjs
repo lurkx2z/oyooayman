@@ -20,7 +20,7 @@ const PAUSE = [
   1.7, 0.9, 1.5, 1.1, 1.2,            // 13–17 the glow: the dark glows, every galaxy, a city's sky, drowned, out there
   1.3, 1.3, 1.1, 1.0,                 // 18–21 the heat: frost, 0 °C (inside out), warmer than you, boiling
   1.5, 1.0, 1.7, 1.3, 1.0, 1.3,       // 22–27 the fire: steam, the leaves, the lawn, noon, the shed, the windows
-  1.5, 1.7, 1.6, 1.5, 1.7, 1.5,       // 28–33 the afterglow: the bird bath, the red sky, the house, 2,700 °C, no edges, the Sun
+  1.5, 1.7, 1.6, 1.4, 1.6, 1.5,       // 28–33 the afterglow: the bird bath, the red sky, the house, no edges, 2,700 °C, the Sun
   1.7, 1.6,                           // 34–35 the last second, midnight
   2.1, 0.9, 0.9, 0.9, 1.3,            // 36–40 is this real, the clue, a Big Crunch, the same sky, the question
 ];

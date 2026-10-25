@@ -131,7 +131,8 @@ UC_SETS.cosmos = (app) => {
       pos[i * 3] = x; pos[i * 3 + 1] = y; pos[i * 3 + 2] = z; const k = 0.55 + 0.45 * r.next(); col[i * 3] = type[0] * k; col[i * 3 + 1] = type[1] * k; col[i * 3 + 2] = type[2] * k; i++;
     }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    const p = new THREE.Points(g, new THREE.PointsMaterial({ size: 2.0, sizeAttenuation: false, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.8 }));
+    const p = new THREE.Points(g, new THREE.PointsMaterial({ size: 1.6, sizeAttenuation: false, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.3 }));
+    p.rotation.y = Math.PI / 2;                          // (the fans lie left and right of you)
     p.renderOrder = 3; scene.add(p); return p;
   })();
   const youDot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 12), new THREE.MeshBasicMaterial({ color: '#ffffff' })); scene.add(youDot);
@@ -169,7 +170,8 @@ UC_SETS.cosmos = (app) => {
     promise(t) { const k = ucK(t, UC.promise, UC.begin, Ease.inOutSine), d = ucDrift(t, 0.03, 0.2, 7); ucCam(cam, [0.2 + d[0], 0.3 + d[1], 2.4 - 1.6 * k], [0, 0, -4], 50 + 6 * k, -4 * k); },
     close(t) { const k = ucK(t, UC.close, UC.frost, Ease.linear), d = ucDrift(t, 0.04, 0.2, 8); ucCam(cam, [0.5 + d[0] - 0.6 * k, 0.4 + d[1], 1.9 - 1.1 * k], [0, 0, -3], 50); },
     real(t) { const k = ucK(t, UC.real, UC.clue, Ease.linear), d = ucDrift(t, 0.05, 0.2, 9); ucCam(cam, [0.6 + d[0] - 1.0 * k, 0.3 + d[1], 2.6 - 1.2 * k], [0.2 - 0.6 * k, 0, -8], 50); },
-    map(t) { const k = ucK(t, UC.clue, UC.turn, Ease.linear), az = -0.9 + 0.5 * k, R = 21 - 3 * k; ucCam(cam, [Math.sin(az) * R, 9.5 - 2 * k, Math.cos(az) * R * 0.5 + 2], [0, 0, -1.5], 48); },
+    // (from above, the way the map is published: a slow drift in, turning a little)
+    map(t) { const k = ucK(t, UC.clue, UC.turn, Ease.inOutSine), a = 0.25 - 0.3 * k; ucCam(cam, [Math.sin(a) * 6.5, 25 - 7 * k, Math.cos(a) * 6.5], [0, 0, 0], 50); },
     turn(t) { const k = ucK(t, UC.turn, UC.same, Ease.linear), d = ucDrift(t, 0.03, 0.2, 11); ucCam(cam, [0.3 + d[0], 0.4 + d[1], 3.0 - 0.6 * k], [0, 0, -6], 52); },
   };
 
@@ -199,7 +201,7 @@ UC_SETS.cosmos = (app) => {
       } else if (m === 'real') {
         field(UC_COS.real(t), { k: MathX.smooth(t, UC.real, UC.real + 1.0) });
       } else if (m === 'map') {
-        gal.begin(); gal.end(); map.visible = true; youDot.visible = true; youDot.position.set(0, 0, 0); map.material.opacity = 0.85 * MathX.smooth(t, UC.clue, UC.clue + 1.0); bgMat.opacity = 0.4;
+        gal.begin(); gal.end(); map.visible = true; youDot.visible = true; youDot.position.set(0, 0, 0); map.material.opacity = 0.3 * MathX.smooth(t, UC.clue, UC.clue + 1.0); bgMat.opacity = 0.4;
       } else if (m === 'turn') {
         field(1.0 - 0.02 * (t - UC.turn), { k: 0.45 });
       }
@@ -208,6 +210,7 @@ UC_SETS.cosmos = (app) => {
       p.exposure = 1.1; p.bloom = 0.6; p.bloomThreshold = 0.6; p.vignette = 0.6; p.grain = 0.022; p.saturation = 1.08; p.contrast = 1.05;
       if (shot.mode === 'real') p.fade = Math.max(p.fade, 1 - MathX.smooth(t, UC.real, UC.real + 0.8));
       if (shot.mode === 'promise') p.bloom = 0.7;
+      if (shot.mode === 'map') { p.bloom = 0.3; p.bloomThreshold = 1.2; }
     },
     labels(t) {
       const s = ucShotAt(t), W = StoryHUD.win;

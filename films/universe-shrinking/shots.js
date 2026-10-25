@@ -40,9 +40,9 @@ const UC_SHOTS = [
   // 6 — the afterglow
   { id: 'F1', t0: UC.bath, t1: UC.red, set: 'garden', mode: 'bath' },
   { id: 'F2', t0: UC.red, t1: UC.melt, set: 'garden', mode: 'red' },
-  { id: 'F3', t0: UC.melt, t1: UC.bigbang, set: 'garden', mode: 'melt' },
-  { id: 'F4', t0: UC.bigbang, t1: UC.vanish, set: 'garden', mode: 'bigbang' },
-  { id: 'F5', t0: UC.vanish, t1: UC.sun, set: 'garden', mode: 'vanish' },
+  { id: 'F3', t0: UC.melt, t1: UC.vanish, set: 'garden', mode: 'melt' },
+  { id: 'F4', t0: UC.vanish, t1: UC.bigbang, set: 'garden', mode: 'vanish' },
+  { id: 'F5', t0: UC.bigbang, t1: UC.sun, set: 'garden', mode: 'bigbang' },
   { id: 'F6', t0: UC.sun, t1: UC.last, set: 'garden', mode: 'sun' },
   // 7 — the last second; midnight
   { id: 'G1', t0: UC.last, t1: UC.midnight, set: 'garden', mode: 'last' },
