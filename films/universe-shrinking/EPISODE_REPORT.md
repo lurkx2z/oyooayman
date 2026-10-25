@@ -111,6 +111,9 @@ effects were brought up (ambience +4 dB, effects +6 dB, the score −2.5 dB duri
 - Thumbnails (1280×720, house style, real film frames): `/mnt/project-files/universe-shrinking/thumbnail-fire.jpg`
   (0:02, the garden on fire from the kitchen: "698 °C / The sky did this.") and `thumbnail-house.jpg` (3:20, the house
   starting to melt: "2,063 °C / Your house starts to melt.", graded toward the physical orange).
+  The owner asked for the starry sky: `thumbnail-stars.jpg` (1:24, 10:02, the Milky Way over the house: "STARS YOU
+  CAN SEE / 132,000 / AND STILL RISING / Then it sets your garden on fire.") and `thumbnail-stars-temperature.jpg`
+  (the same frame: "−260 °C / Enjoy it while it lasts.").
 - Runnable ZIP: `/mnt/project-files/universe-shrinking/universe-shrinking-film.zip` (unzip, open
   `universe-shrinking.html`, press Space).
 - Final render (on the PC, GPU): `node films/universe-shrinking/render-gpu.cjs --channel chrome --workers 2 --out
