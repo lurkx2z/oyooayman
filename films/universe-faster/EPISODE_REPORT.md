@@ -131,18 +131,21 @@ same render, so the page plays it the moment it opens.
 
 ## Final render
 
-Not done yet: it runs on the owner's PC (GPU, through his Chrome), one command, in `Downloads\render\oyooayman`:
+Rendered on the owner's PC (RTX 3060 Ti, through his Chrome) on 2026-10-25 with `render-gpu.cjs`, about 15–18
+frames a second. His C: drive was full, so the output went to D: (`--out D:\renders\universe-faster`, 2 workers):
+- `D:\renders\universe-faster\universe-faster_final_1080p.mp4`: 5:56 (356.1 s), 1920×1080, 30 fps, 1,736 MiB, for
+  YouTube. −15.7 LUFS, −1.4 dBTP.
+- `D:\renders\universe-faster\universe-faster_final_small.mp4`: 5:56, 1280×720, 26.3 MiB (under 30 MiB), for a
+  phone. −15.8 LUFS, −2.2 dBTP.
 
-    git pull
-    git checkout claude/project-thread-wwe8bp
-    node films/universe-faster/render-gpu.cjs --channel chrome
+The 8 sample frames in `check.jpg` were checked (right size, none blank, readout, clock and captions present). The
+film was not watched in full with sound.
 
-It writes `renders/universe-faster/universe-faster_final_1080p.mp4` (for YouTube) and
-`universe-faster_final_small.mp4` (1280×720, under 30 MiB, for a phone), with `final-soundtrack.m4a` and
-`small-soundtrack.m4a` from this folder.
+To render again: in `Downloads\render\oyooayman`, on this branch,
+`node films/universe-faster/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\universe-faster-v2`.
 
 ## Files
 
 - `universe-faster.html`, `films/universe-faster/*` (the film), `films/universe-faster/soundtrack.js` (the baked sound).
 - `films/universe-faster/render-gpu.cjs`: the final render on a PC with a GPU.
-- `/mnt/project-files/universe-expanding-faster/`: the runnable ZIP, this report, thumbnails, a 360p preview.
+- `/mnt/project-files/universe-expanding-faster/`: the runnable ZIP, this report, two thumbnails.
