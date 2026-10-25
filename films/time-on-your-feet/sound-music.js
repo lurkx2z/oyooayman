@@ -260,7 +260,7 @@ tfSound('music', 'score', function (ctx, bus, K) {
       [TF.skytree, C.Cmaj7], [cap('skytree', 1) - 0.2, C.D], [TF.jila, C.Em9], [cap('jila', 1) - 0.2, C.Bsus]], t1 + 0.6, 0.44, { cut: 900, cutTo: 1800 });
     tfPulse(ctx, M.bus, cap('measured', 1), t1 - 0.3, ['E2', 'B2'], 0.3, 0.32, { cut: 450, cutTo: 1300, acc: 4, decay: 0.3, ramp: (u) => 0.45 + 0.55 * Math.sin(Math.PI * Math.min(1, u * 1.15)) });
     for (const [id, n] of [['pound', 'C2'], ['planes', 'G1'], ['nist', 'E2'], ['skytree', 'C2'], ['jila', 'E2']]) { const t = cap(id, 0); M.drum(t, 0.5, 41.2, 1.4); M.piano(t, n, 0.3, 3, 0); }
-    M.bell(tfW('nist', 'just').start, 'B5', 0.24, -0.2); M.bell(tfW('nist', 'exactly').start + 0.3, 'D6', 0.2, 0.2); M.bell(tfW('nist', 'einstein').start, 'G6', 0.22, 0);
+    M.bell(tfW('nist', 'just').start, 'B5', 0.24, -0.2); M.bell(tfW('nist', 'just').start + 0.3, 'D6', 0.2, 0.2); M.bell(tfW('nist', 'einstein').start, 'G6', 0.22, 0);
     arp(cap('jila', 0) + 0.3, t1 - 0.3, ['E', 'F#', 'B', 'D', 'G'], 0.2, 0.06, [6, 7]);                 // inside a cloud of atoms
   }
   // ---- 4 · GPS: wonder, bells going round; "Einstein built in": the figure once, both clocks; the Moon: space
