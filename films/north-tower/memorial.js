@@ -12,16 +12,25 @@ NT_SETS.memorial = (app) => {
   scene.fog = new THREE.FogExp2('#0b0f18', 0.00011);
   const sky = ntSky(scene, '#03050b', '#121a2c', '#05070c', { r: 20000, hw: 0.25 });
   ntCity(scene, { r: 2600, skip: ntNearWTC, seed: 2002, night: true, scale: 1.05 });
-  // a few taller towers of today's skyline (lit tops), none in the towers' footprints
+  // One World Trade Center (open since 2014), north-west of where the North Tower stood: its roof at 1,368 ft, as the
+  // North Tower's was, its spire to 1,776 ft
+  const owTex = ntWindowTex(1776, '#07080b', '#0b0d10', 0.3, '#cfdcf0'); owTex.repeat.set(12, 34);
+  const ow = new THREE.Group(); ow.position.set(-95, 0, -55); scene.add(ow);
+  const owBody = new THREE.Mesh(new THREE.CylinderGeometry(25, 43, 417 - 56, 8, 1), new THREE.MeshStandardMaterial({ color: '#0c0e13', map: owTex, emissive: '#ffffff', emissiveMap: owTex, emissiveIntensity: 0.55, roughness: 0.4, metalness: 0.4 }));
+  owBody.rotation.y = Math.PI / 8; owBody.position.y = 56 + (417 - 56) / 2; ow.add(owBody);
+  ntBox(61, 56, 61, ntStd('#0a0b0e', 0.6, 0.3), 0, 28, 0, ow);
+  const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 2.2, 124, 6), new THREE.MeshBasicMaterial({ color: '#dfe8ff' })); spire.position.y = 417 + 62; ow.add(spire);
   // the beams: each a square of searchlights; drawn as a tall soft column of blue light, fading upward
   const beamM = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, uniforms: { k: { value: 1 } },
     vertexShader: 'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'uniform float k; varying vec2 vU; void main(){ float h = vU.y; float side = 1.0 - abs(vU.x * 2.0 - 1.0); float a = pow(side, 1.6) * (0.55 * exp(-h * 1.6) + 0.18) * smoothstep(0.0, 0.02, h) * k; gl_FragColor = vec4(vec3(0.62, 0.78, 1.0) * a, a); }',
+    fragmentShader: 'uniform float k; varying vec2 vU; void main(){ float h = vU.y; float side = 1.0 - abs(vU.x * 2.0 - 1.0); float a = pow(side, 1.6) * (0.55 * exp(-h * 1.6) + 0.18) * smoothstep(0.0, 0.02, h) * k; gl_FragColor = vec4(0.62, 0.78, 1.0, a); }',
   });
+  const haloM = beamM.clone(); haloM.uniforms = { k: { value: 1 } }; haloM.fragmentShader = haloM.fragmentShader.replace('pow(side, 1.6)', '0.16 * pow(side, 2.4)');
   const beams = [NT_TW.N, NT_TW.S].map((T) => {
     const g = new THREE.Group(); g.position.set(T.x, 0, T.z); scene.add(g);
     for (let k = 0; k < 3; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(48 + k * 26, 7000, 1, 1), beamM); m.position.y = 3500; m.rotation.y = k * Math.PI / 3; g.add(m); }
+    for (let k = 0; k < 2; k++) { const m = new THREE.Mesh(new THREE.PlaneGeometry(260 + k * 220, 7000, 1, 1), haloM); m.position.y = 3500; m.rotation.y = k * Math.PI / 2 + 0.4; g.add(m); }   // (the glow round it, in the haze)
     const base = new THREE.Mesh(new THREE.BoxGeometry(50, 4, 50), new THREE.MeshBasicMaterial({ color: '#cfe0ff' })); base.position.y = 2; g.add(base);
     return g;
   });
@@ -35,8 +44,8 @@ NT_SETS.memorial = (app) => {
       if (s.mode === 'dark') { ntCam(cam, [0, -5000, 0], [0, -5000, -1], 40); beams.forEach((b) => (b.visible = false)); refl.begin(); refl.end(); return; }
       beams.forEach((b) => (b.visible = true));
       const k = MathX.clamp((t - NT.light) / (NT.end - NT.light), 0, 1);
-      ntCam(cam, [-2100 + 60 * k, 14, 420 - 30 * k], [40, 330 + 80 * k, 60], 42 - 3 * k);
-      beamM.uniforms.k.value = MathX.smooth(t, NT.light + 0.6, NT.light + 3.5);
+      ntCam(cam, [-1690 + 40 * k, 12, 420 - 30 * k], [40, 330 + 80 * k, 60], 44 - 3 * k);
+      beamM.uniforms.k.value = haloM.uniforms.k.value = MathX.smooth(t, NT.light + 0.6, NT.light + 3.5);
       refl.begin();
       for (let i = 0; i < 700; i++) {
         const h = hash1(i * 7 + 3), h2 = hash1(i * 13 + 4), x = -480 - h2 * 1100, z = -1400 + h * 2900, f = 0.4 + 0.6 * Math.abs(noise1(t * 0.6 + i, 2));

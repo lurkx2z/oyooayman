@@ -16,6 +16,7 @@ Object.assign(LOOKS, {
 });
 
 const NT_CH = 185;                     // Church Street's centreline (x)
+const NT_WB = -8;                      // West Broadway's (it runs north from the North Tower: the tower stands at its end)
 const NT_SB = { mark: 0 };             // (the South Tower's fall, and the North Tower's: see ntTopAt)
 // how far a tower's top has come down (m) since it began to fall at t0: about 10–12 s, accelerating
 function ntDropAt(t, t0, H, dur) { const a = t - t0; if (a <= 0) return 0; return Math.min(H + 5, H * Math.pow(a / dur, 1.7)); }
@@ -26,23 +27,37 @@ NT_SETS.street = (app) => {
   S.sun.position.set(NT_CH + NT_SUN[0] * 400, NT_SUN[1] * 400 + 40, -420 + NT_SUN[2] * 400); S.sun.target.position.set(NT_CH, 0, -420);
   scene.fog = new THREE.FogExp2('#c9d6e2', 0.0004);
   const sky = ntSky(scene, '#2464b8', '#cfdeea', '#9db0c0', { sunDir: NT_SUN, sunGlow: '#fff2d8', hw: 0.3 });
-  ntCity(scene, { r: 2400, skip: (x, z) => ntNearWTC(x, z) || Math.abs(x - NT_CH) < 60 || (z < -150 && z > -240 && x > -120 && x < 240), seed: 1001, scale: 0.9 });
+  ntCity(scene, { r: 2400, skip: (x, z) => ntNearWTC(x, z) || Math.abs(x - NT_CH) < 60 || (z < -150 && z > -240 && x > -120 && x < 240) || (Math.abs(x - NT_WB) < 40 && z < -240), seed: 1001, scale: 0.9, lowNorth: true });
   ntPlaza(scene);
   const N = ntTower(scene, NT_TW.N, { antenna: true }), SO = ntTower(scene, NT_TW.S, {});
+  // the burning floors, as they looked from the street: a black band, the windows glowing orange in it
+  const burnTex = ntTex(ntCanvas(512, 64, (g, W, H) => {
+    g.fillStyle = '#151210'; g.fillRect(0, 0, W, H); const rb = new RNG(93);
+    for (let i = 0; i < 70; i++) { const x = rb.range(0, W), y = rb.range(4, H - 4), w = rb.range(3, 16), gr = g.createRadialGradient(x, y, 0, x, y, w); gr.addColorStop(0, rb.next() < 0.5 ? '#ffb347' : '#ff7a1c'); gr.addColorStop(1, 'rgba(120,40,10,0)'); g.fillStyle = gr; g.fillRect(x - w, y - w, 2 * w, 2 * w); }
+    for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(0,0,0,${rb.range(0.3, 0.7)})`; g.fillRect(rb.range(0, W), rb.range(0, H), rb.range(10, 60), rb.range(4, 20)); }
+  }));
+  for (const [M, T, f0, f1] of [[N, NT_TW.N, 92, 100], [SO, NT_TW.S, 77, 85]]) {
+    const bt = burnTex.clone(); bt.needsUpdate = true; bt.repeat.set(2, 1);
+    const band = new THREE.Mesh(new THREE.BoxGeometry(T.w + 0.4, (f1 - f0) * NT_FLOOR_H, T.w + 0.4), new THREE.MeshBasicMaterial({ map: bt }));
+    band.position.y = (f0 + f1) / 2 * NT_FLOOR_H; M.g.add(band);
+  }
   // ---- Church Street: a canyon of buildings both sides from Vesey (z = −170) north, cross streets every 80 m
   const A = [0, 1, 2, 3].map(() => ({ pos: [], nor: [], uv: [], idx: [] })), r = new RNG(311);
-  for (const side of [-1, 1]) for (let z = -175; z > -1300; z -= 80) {
+  // (low near the towers, as in 2001: five to fifteen floors, so the towers stand over everything)
+  for (const [cx, z0] of [[NT_CH, -218], [NT_WB, -262]]) for (const side of [-1, 1]) for (let z = z0; z > -1400; z -= 80) {
     let zz = z;
-    while (zz > z - 62) { const d = 12 + r.next() * 18, h = 22 + Math.pow(r.next(), 1.6) * 110, x0 = NT_CH + side * 15, x1 = NT_CH + side * (15 + 25 + r.next() * 15); ntBoxInto(A[Math.floor(r.next() * 4)], Math.min(x0, x1), Math.max(x0, x1), 0, h, zz - d, zz); zz -= d + 0.4; }
+    while (zz > z - 62) { const d = 12 + r.next() * 18, h = 20 + Math.pow(r.next(), 1.6) * (cx === NT_WB ? 34 : 60), x0 = cx + side * 15, x1 = cx + side * (15 + 25 + r.next() * 15); ntBoxInto(A[Math.floor(r.next() * 4)], Math.min(x0, x1), Math.max(x0, x1), 0, h, zz - d, zz); zz -= d + 0.4; }
   }
   // Vesey Street's north side (and 7 World Trade Center, 47 floors) from the plaza to Church Street
-  for (let x = -110; x < 165; x += 30 + r.next() * 10) ntBoxInto(A[Math.floor(r.next() * 4)], x, x + 28, 0, x < 60 && x > -90 ? 174 : 30 + r.next() * 60, -240, -196);
+  for (let x = -110; x < 135; x += 30 + r.next() * 10) { if (x < NT_WB + 22 && x + 28 > NT_WB - 22) continue; ntBoxInto(A[Math.floor(r.next() * 4)], x, x + 28, 0, x < 60 && x > -90 ? 174 : 24 + r.next() * 30, -240, -196); }
   const fac = [['#a59d90', '#3e4146'], ['#8c8378', '#33363a'], ['#b5ae9f', '#4d5359'], ['#7d6352', '#2c2826']].map(([b, w], k) => new THREE.MeshStandardMaterial({ map: ntWindowTex(71 + k, b, w, 0.06), roughness: 0.8 }));
   A.forEach((a, k) => { const m = new THREE.Mesh(ntGeoFrom(a), fac[k]); m.castShadow = m.receiveShadow = true; scene.add(m); });
   // the street, the sidewalks, the kerbs
   const road = ntBox(26, 0.1, 1400, ntStd('#3a3a3c', 0.9), NT_CH, 0.0, -820); road.castShadow = false;
   for (const sx of [-1, 1]) { const sw = ntBox(5, 0.18, 1400, ntStd('#8b8780', 0.9), NT_CH + sx * 13, 0.09, -820); sw.castShadow = false; }
   const vesey = ntBox(320, 0.1, 22, ntStd('#3a3a3c', 0.9), 40, 0.0, -180); vesey.castShadow = false;
+  const wb = ntBox(22, 0.1, 1200, ntStd('#3a3a3c', 0.9), NT_WB, 0.0, -840); wb.castShadow = false;
+  for (const sx of [-1, 1]) { const sw = ntBox(5, 0.18, 1200, ntStd('#8b8780', 0.9), NT_WB + sx * 12.5, 0.09, -840); sw.castShadow = false; }
   // the stairs up out of the concourse by 5 WTC (you come up them)
   for (let k = 0; k < 12; k++) ntBox(3.2, 0.17, 0.32, ntStd('#8e8a84', 0.85), 140, -4 + k * 0.17 + 0.085, -160 - k * 0.32);
   ntBox(0.2, 1, 4, ntStd('#555', 0.5, 0.6), 138.3, 0.5, -162); ntBox(0.2, 1, 4, ntStd('#555', 0.5, 0.6), 141.7, 0.5, -162);
@@ -53,6 +68,10 @@ NT_SETS.street = (app) => {
     const type = ['sedan', 'taxi', 'suv', 'van', 'sedan', 'taxi'][i % 6], side = i % 2 ? 1 : -1, z = -200 - i * 34 - (i % 3) * 6;
     const c = VF.build(type, type === 'taxi' ? '#e8b923' : carCols[i % 6]); c.group.position.set(NT_CH + side * 9.2, 0, z); c.group.rotation.y = Math.PI / 2 + (side > 0 ? 0 : Math.PI); scene.add(c.group); cars.push(c.group);
     const d = VF.build(type, '#a9a69f'); d.group.position.copy(c.group.position); d.group.rotation.copy(c.group.rotation); d.group.visible = false; scene.add(d.group); ash.push(d.group);
+  }
+  for (let i = 0; i < 12; i++) {   // (and on West Broadway, already grey when you get there)
+    const type = ['sedan', 'taxi', 'van', 'suv'][i % 4], side = i % 2 ? 1 : -1, d = VF.build(type, '#a9a69f');
+    d.group.position.set(NT_WB + side * 8.6, 0, -640 - i * 41 - (i % 3) * 7); d.group.rotation.y = Math.PI / 2 + (side > 0 ? 0 : Math.PI); d.group.visible = false; scene.add(d.group); ash.push(d.group);
   }
   // ---- smoke, fire, the dust clouds, paper
   const puffs = ntPuffs(scene, 5200), fire = ntPuffs(scene, 300, { additive: true }), near = ntPuffs(scene, 2400), flakes = ntPuffs(scene, 1600, { additive: false });
@@ -85,8 +104,8 @@ NT_SETS.street = (app) => {
       if (b < 0) continue;
       const ang = h2 * Math.PI * 2, out = 30 + b * (6 + 10 * h3), y0 = Math.max(10, T.roof * (1 - Math.pow(Math.min(1, born / 11), 1.7)));
       const y = Math.max(8, y0 - b * 3) + 18 * Math.sin(b * 0.2 + i), sz = 30 + b * 6 + h3 * 30;
-      const c = 0.62 + 0.18 * h3;
-      P.add(T.x + Math.cos(ang) * out + NT_WIND[0] * b * 0.6, y, T.z + Math.sin(ang) * out + NT_WIND[2] * b * 0.6, sz, 0.32 * k * MathX.smooth(b, 0, 1.5), c, c * 0.95, c * 0.88);
+      const c = 0.46 + 0.2 * h3;
+      P.add(T.x + Math.cos(ang) * out + NT_WIND[0] * b * 0.6, y, T.z + Math.sin(ang) * out + NT_WIND[2] * b * 0.6, sz, 0.32 * k * MathX.smooth(b, 0, 1.5) * (1 - MathX.smooth(b, 18, 34)), c, c * 0.93, c * 0.84);   // (it thins as it drifts off south-east)
     }
   }
   // the surge up Church Street: a rolling wall, its front at zf (m) by the time t; ~ 14 m/s, slowing
@@ -96,12 +115,12 @@ NT_SETS.street = (app) => {
     const u = (a, b) => MathX.clamp((t - a) / (b - a), 0, 1);
     switch (s.mode) {
       case 'five': { const k = u(NT.five, NT.back); const P = ntSpline([[0, 140, -2.4, -160], [0.28, 140, 0.1, -164.5], [0.6, 160, 0.1, -176], [1, NT_CH - 4, 0.1, -205]], k); const Q = ntSpline([[0, 140, 0, -175], [0.3, 160, 1.2, -178], [0.7, NT_CH, 1.4, -200], [1, NT_CH - 3, 1.4, -260]], Math.min(1, k + 0.12)); return [[P[0], P[1] + 1.6, P[2]], Q, 60]; }
-      case 'back': { const k = u(NT.back, NT.roarShot); return [[NT_CH - 3, 1.6, -262 - 4 * k], ntV([NT_CH - 3, 1.5, -330], [40, 260 + 20 * k, 30], Ease.inOutSine(MathX.smooth(k, 0, 0.35))), 64]; }
-      case 'roar': { const k = u(NT.roarShot, NT.cloud), run = MathX.smooth(t, ntCap('nine59', 2).show - 0.3, ntCap('nine59', 2).show + 1.2), z = -330 - run * (t - ntCap('nine59', 2).show) * 3.4; return [[NT_CH - 2, 1.6, Math.min(-330, z)], ntV([60, 150 - 40 * k, 60], [NT_CH - 2, 1.4, -500], run), 60]; }
-      case 'cloud': { const z = -350 - (t - NT.cloud) * 1.2; return [[NT_CH - 2, 1.55, z], [NT_CH - 1, 1.4, z - 10], 62]; }
-      case 'grey': { const k = u(NT.grey, NT.walk), z = -380 - k * 9; return [[NT_CH - 3, 1.6, z], [NT_CH - 6 + 10 * k, 3 + 4 * k, z - 30], 60]; }
-      case 'walk': { const k = u(NT.walk, NT.fallShot), z = -560 - k * 7, look = MathX.smooth(k, 0.3, 0.75); return [[NT_CH - 3, 1.6, z], ntV([NT_CH - 3, 1.6, z - 40], [10, 200, 0], look), 58]; }
-      case 'fall': return [[NT_CH + 6, 1.6, -980], [20, 150, 0], 46];
+      case 'back': { const k = u(NT.back, NT.roarShot); return [[NT_CH - 7, 1.6, -206 - 4 * k], ntV([NT_CH - 3, 1.5, -330], [20, 215 + 30 * k, 50], Ease.inOutSine(MathX.smooth(k, 0, 0.35))), 64]; }
+      case 'roar': { const k = u(NT.roarShot, NT.cloud), run = MathX.smooth(t, ntCap('nine59', 2).show - 0.3, ntCap('nine59', 2).show + 1.2), z = -212 - run * (t - ntCap('nine59', 2).show) * 3.4; return [[NT_CH - 7 + 5 * run, 1.6, Math.min(-212, z)], ntV([40, 220 - 60 * k, 122], [NT_CH - 2, 1.4, -500], run), 62]; }
+      case 'cloud': { const z = -262 - (t - NT.cloud) * 1.2; return [[NT_CH - 2, 1.55, z], [NT_CH - 1, 1.4, z - 10], 62]; }
+      case 'grey': { const k = u(NT.grey, NT.walk), z = -290 - k * 9; return [[NT_CH - 3, 1.6, z], [NT_CH - 6 + 10 * k, 3 + 4 * k, z - 30], 60]; }
+      case 'walk': { const k = u(NT.walk, NT.fallShot), z = -760 - k * 7, look = MathX.smooth(k, 0.3, 0.75); return [[NT_WB + 3, 1.6, z], ntV([NT_WB + 3, 1.6, z - 40], [0, 210, 0], look), 56]; }
+      case 'fall': return [[NT_WB + 4, 1.6, -1080], [0, 196, 0], 31];
     }
     return [[NT_CH, 1.6, -300], [0, 100, 0], 60];
   }
@@ -122,7 +141,7 @@ NT_SETS.street = (app) => {
       for (const src of smoke) {
         if (src.tower === 'S' && t > tS) continue;
         if (src.tower === 'N' && t > tN) continue;
-        ntPlume(puffs, t, src, { fire });
+        ntPlume(puffs, t, src, { fire, alpha: 1.6 });
       }
       collapseCloud(puffs, t, NT_TW.S, tS, sTop, 1);
       collapseCloud(puffs, t, NT_TW.N, tN, nTop, 1.1);
@@ -137,7 +156,7 @@ NT_SETS.street = (app) => {
         near.add(x + noise1(t * 0.3 + i, 2) * 3, y + Math.sin(t * 0.8 + i) * 1.2, z, sz, 0.55 * MathX.smooth(t, tS + 3, tS + 5), c, c * 0.94, c * 0.85);
       }
       // the dark inside, then the slow settling (the grey)
-      const inside = s.mode === 'cloud' ? 1 : s.mode === 'grey' ? 1 - MathX.smooth(t, NT.grey, NT.grey + 8) * 0.7 : s.mode === 'walk' ? 0.25 : 0;
+      const inside = s.mode === 'cloud' ? 1 : s.mode === 'grey' ? 1 - MathX.smooth(t, NT.grey, NT.grey + 8) * 0.7 : s.mode === 'walk' ? 0.06 : 0;
       if (inside > 0) for (let i = 0; i < 700; i++) {
         const h = hash1(i * 29 + 5), h2 = hash1(i * 31 + 6), h3 = hash1(i * 37 + 7), R = 2 + h * 40;
         const x = cam.position.x + (h2 - 0.5) * R * 2, z = cam.position.z - 2 - h * 45, y = 0.3 + h3 * 9;
@@ -183,7 +202,7 @@ NT_SETS.street = (app) => {
       const dark = s.mode === 'cloud' ? 1 : s.mode === 'grey' ? 1 - 0.6 * MathX.smooth(t, NT.grey, NT.grey + 9) : s.mode === 'walk' || s.mode === 'fall' ? 0.3 : s.mode === 'roar' ? MathX.smooth(t, NT.cloudHit - 1.5, NT.cloudHit + 0.4) : 0;
       S.sun.intensity = 2.8 * (1 - 0.9 * dark); S.hemi.intensity = 0.8 * (1 - 0.6 * dark);
       scene.fog.color.setRGB(0.79 - 0.4 * dark, 0.84 - 0.43 * dark, 0.89 - 0.5 * dark);
-      scene.fog.density = 0.0004 + 0.09 * (s.mode === 'cloud' ? 1 : 0) + (s.mode === 'grey' ? 0.04 * (1 - MathX.smooth(t, NT.grey, NT.grey + 9)) + 0.004 : 0) + (s.mode === 'walk' ? 0.0025 : 0) + (s.mode === 'fall' ? 0.0007 : 0) + (s.mode === 'roar' ? 0.09 * MathX.smooth(t, NT.cloudHit - 1, NT.cloudHit + 0.3) : 0);
+      scene.fog.density = 0.0004 + 0.09 * (s.mode === 'cloud' ? 1 : 0) + (s.mode === 'grey' ? 0.04 * (1 - MathX.smooth(t, NT.grey, NT.grey + 9)) + 0.004 : 0) + (s.mode === 'walk' ? 0.0001 : 0) + (s.mode === 'roar' ? 0.09 * MathX.smooth(t, NT.cloudHit - 1, NT.cloudHit + 0.3) : 0);
       scene.background.setRGB(0.44 - 0.2 * dark, 0.62 - 0.35 * dark, 0.82 - 0.5 * dark);
       sky.material.uniforms.k.value = 1 - 0.75 * dark;
     },

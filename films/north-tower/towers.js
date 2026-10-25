@@ -142,6 +142,8 @@ function ntCity(scene, o = {}) {
         const d = Math.hypot(mx, mz), tall = Math.exp(-d / 900);
         let h = 18 + Math.pow(r.next(), 2.2) * (60 + 210 * tall) * (o.scale || 1);
         if (r.next() < 0.06 * tall) h += 90;
+        h = Math.min(h, 215);
+        if (o.lowNorth && mz < -200) h = Math.min(h * 0.5, 110);   // (north of Vesey Street: Tribeca, the Civic Center, lower)   // (in 2001 nothing near the towers came close to their height; the tallest others, 40 Wall and 70 Pine, stood half a mile east)
         const m = Math.floor(r.next() * mats.length);
         ntBoxInto(A[m], x0, x1, 0, h, z0, z1);
         if (h > 70 && r.next() < 0.6) { const inset = 3 + r.next() * 5; ntBoxInto(A[m], x0 + inset, x1 - inset, h, h + 8 + r.next() * 30, z0 + inset, z1 - inset); }
@@ -209,15 +211,15 @@ function ntPlume(P, t, src, o = {}) {
     const y = ey + 14 * grow + 0.35 * a - (src.sink || 0) * a * a * 0.01 + noise1(a * 0.07 + i, 5) * 3;
     const size = 9 + a * 1.6 * (0.7 + 0.6 * h3);
     const al = MathX.smooth(a, 0, 2.5) * Math.exp(-a / (life * 0.55)) * (src.alpha || 0.5) * (o.alpha || 1);
-    const k = src.dark ? 0.12 + 0.3 * MathX.smooth(a, 0, 30) : 0.45, c = k * (0.85 + 0.3 * h3);
+    const k = src.dark ? 0.025 + 0.11 * MathX.smooth(a, 0, 40) : 0.45, c = k * (0.85 + 0.3 * h3);
     P.add(x, y, z, size, al, c * 1.0, c * 0.97, c * 0.93);
   }
   // the fire's glow in the band (seen from far away only: a dim orange flicker, additive pool)
-  if (o.fire && src.fire) for (let k = 0; k < 18; k++) {
+  if (o.fire && src.fire) for (let k = 0; k < 30; k++) {
     const h = hash1(k * 13 + 5), [nx, nz] = src.face, along = (h - 0.5) * T.w * 0.75, fl = src.f0 + (src.f1 - src.f0) * hash1(k * 7 + 1);
     const fx = T.x + nx * (hw + 0.6) + (nz !== 0 ? along : 0), fz = T.z + nz * (hw + 0.6) + (nx !== 0 ? along : 0);
     const fl2 = 0.5 + 0.5 * noise1(t * 2.3 + k * 1.7, 41);
-    o.fire.add(fx, fl * NT_FLOOR_H, fz, 5 + 4 * fl2, 0.35 * fl2 * MathX.smooth(t, src.t0, src.t0 + 3), 1.0, 0.45, 0.15);
+    o.fire.add(fx, fl * NT_FLOOR_H, fz, 7 + 6 * fl2, 0.55 * fl2 * MathX.smooth(t, src.t0, src.t0 + 3), 1.0, 0.42, 0.12);
   }
 }
 // the sources this morning (t0 from the beats)

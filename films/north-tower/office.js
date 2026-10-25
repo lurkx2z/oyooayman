@@ -28,12 +28,15 @@ NT_SETS.office = (app) => {
   const south = ntTower(scene, NT_TW.S, { env });
   // your own tower's south face below and above you: the column covers stand out from the glass, so from the
   // window you see them run down to the plaza (and up)
-  const finM = ntStd('#c4c7cb', 0.35, 0.6, { envMap: env }), finG = new THREE.BoxGeometry(0.36, 1, 0.3);
+  const finM = ntStd('#b9bdc3', 0.45, 0.3, { envMap: env, envMapIntensity: 0.5 }), finG = new THREE.BoxGeometry(0.36, 1, 0.3);
   const fins = new THREE.InstancedMesh(finG, finM, 2 * 25);
-  for (let i = 0; i < 25; i++) for (const [y0, y1, k] of [[22, Y - 0.2, 0], [Y + NT_CEIL + 0.3, 417, 1]]) { const x = -12.2 + i * 1.016; _m0.compose(new THREE.Vector3(x, (y0 + y1) / 2, O.zWall + 0.62), new THREE.Quaternion(), new THREE.Vector3(1, y1 - y0, 1)); fins.setMatrixAt(i * 2 + k, _m0); }
+  for (let i = 0; i < 25; i++) for (const [y0, y1, k] of [[22, Y - 0.2, 0], [Y + NT_CEIL + 0.3, 417, 1]]) { const x = -31.0 + (i + 18) * 1.016; _m0.compose(new THREE.Vector3(x, (y0 + y1) / 2, O.zWall + 0.62), new THREE.Quaternion(), new THREE.Vector3(1, y1 - y0, 1)); fins.setMatrixAt(i * 2 + k, _m0); }
   scene.add(fins);
-  const skinBack = new THREE.Mesh(new THREE.PlaneGeometry(26, Y - 22), new THREE.MeshStandardMaterial({ color: '#3d4652', metalness: 0.6, roughness: 0.3, envMap: env }));
-  skinBack.position.set(0, 22 + (Y - 22) / 2, O.zWall + 0.47); scene.add(skinBack);
+  // (between the covers, floor after floor: the dark glass of a window, then the aluminium spandrel at the slab)
+  const bandTex = ntTex(ntCanvas(32, 128, (g, W, H) => { g.fillStyle = '#a7abb1'; g.fillRect(0, 0, W, H); g.fillStyle = '#1d242d'; g.fillRect(0, (1 - 2.55 / NT_FLOOR_H) * H, W, (2.1 / NT_FLOOR_H) * H); }));
+  bandTex.repeat.set(1, 67);
+  const skinBack = new THREE.Mesh(new THREE.PlaneGeometry(26, 67 * NT_FLOOR_H), ntStd('#ffffff', 0.45, 0.4, { map: bandTex, envMap: env, envMapIntensity: 0.45, side: THREE.DoubleSide }));
+  skinBack.position.set(0, (6 + 67 / 2) * NT_FLOOR_H, O.zWall + 0.47); scene.add(skinBack);
   const puffs = ntPuffs(scene, 2600), fire = ntPuffs(scene, 200, { additive: true });
 
   // ---- the floor, the ceiling, the core wall
@@ -42,7 +45,7 @@ NT_SETS.office = (app) => {
     for (let i = 0; i < 26000; i++) { const v = r.range(-22, 22); g.fillStyle = `rgba(${v > 0 ? 255 : 0},${v > 0 ? 255 : 0},${v > 0 ? 255 : 0},${Math.abs(v) / 200})`; g.fillRect(r.range(0, W), r.range(0, H), 2, 2); }
   }));
   carpet.repeat.set(30, 10);
-  const floor = ntBox(70, 0.1, 22, ntStd('#ffffff', 0.95, 0, { map: carpet }), 0, Y - 0.05, 22);
+  const floor = ntBox(70, 0.1, 20.4, ntStd('#ffffff', 0.95, 0, { map: carpet }), 0, Y - 0.05, 21.4);   // (core to the wall: nothing sticks out of the building)
   floor.castShadow = false;
   const tileTex = ntTex(ntCanvas(256, 512, (g, W, H) => {
     g.fillStyle = '#e4e1da'; g.fillRect(0, 0, W, H); const r = new RNG(9);
@@ -50,8 +53,8 @@ NT_SETS.office = (app) => {
     g.fillStyle = '#b9b4ab'; g.fillRect(0, 0, W, 5); g.fillRect(0, 0, 5, H);
   }));
   tileTex.repeat.set(70 / 0.61, 22 / 1.22);
-  const ceilM = ntStd('#ffffff', 0.9, 0, { map: tileTex });
-  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(70, 22), ceilM); ceil.rotation.x = Math.PI / 2; ceil.position.set(0, Y + NT_CEIL, 22); scene.add(ceil); ceil.receiveShadow = true;
+  const ceilM = ntStd('#ffffff', 0.9, 0, { map: tileTex, emissive: '#e8e4dc', emissiveMap: tileTex, emissiveIntensity: 0.22 });   // (lit by the troffers)
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(70, 20.4), ceilM); ceil.rotation.x = Math.PI / 2; ceil.position.set(0, Y + NT_CEIL, 21.4); scene.add(ceil); ceil.receiveShadow = true;
   // the troffers: fluorescent panels, 2 × 4 ft, every 8 ft
   const trM = new THREE.MeshStandardMaterial({ color: '#f4f6f4', emissive: '#f2f5ee', emissiveIntensity: 1.0, roughness: 0.4 });
   const trofs = [];
@@ -166,7 +169,7 @@ NT_SETS.office = (app) => {
   ].map((c, i) => Object.assign(c, { p: ntPerson(scene, 'off' + i, c.look) }));
 
   // ---- falling paper outside (burning ones glow at the edges), pure time
-  const NPAP = 420, papG = new THREE.PlaneGeometry(0.22, 0.28);
+  const NPAP = 700, papG = new THREE.PlaneGeometry(0.22, 0.28);
   const papM = new THREE.MeshStandardMaterial({ color: '#f4f2ec', roughness: 0.9, side: THREE.DoubleSide, emissive: '#ffffff', emissiveIntensity: 0.12 });
   const burnM = new THREE.MeshStandardMaterial({ color: '#d8c8b0', roughness: 0.9, side: THREE.DoubleSide, emissive: '#ff6a1a', emissiveIntensity: 1.2 });
   const paper = new THREE.InstancedMesh(papG, papM, NPAP), burn = new THREE.InstancedMesh(papG, burnM, 40);
@@ -176,11 +179,11 @@ NT_SETS.office = (app) => {
     let nB = 0;
     for (let i = 0; i < NPAP + 40; i++) {
       const isB = i >= NPAP, k = isB ? i - NPAP : i, h = hash1(i * 17 + 3), h2 = hash1(i * 29 + 5), h3 = hash1(i * 43 + 7);
-      const t0 = NT.hit + 5 + h * 40, a = t - t0;
+      const t0 = NT.hit + 3 + h * 30, a = t - t0;
       const vis = a > 0 && t < NT.known;
       if (vis) {
         const fall = 1.1 + h2 * 0.9;
-        _p.set(-34 + h3 * 68 + Math.sin(a * 0.7 + i) * 2 + NT_WIND[0] * 0.2 * a, Y + 34 - fall * a, O.zWall + 2.5 + h2 * 40 + NT_WIND[2] * 0.15 * a);
+        _p.set(-34 + h3 * 68 + Math.sin(a * 0.7 + i) * 2 + NT_WIND[0] * 0.2 * a, Y + 12 + 40 * hash1(i * 7 + 9) - fall * a, O.zWall + 1.2 + h2 * h2 * 34 + NT_WIND[2] * 0.15 * a);
         _e.set(a * (1.2 + h) + i, a * (0.9 + h3) + i * 0.3, Math.sin(a * 2 + i) * 0.8); _q.setFromEuler(_e);
       } else _p.set(0, -9999, 0);
       _m.compose(_p, _q, _s);
@@ -192,6 +195,22 @@ NT_SETS.office = (app) => {
   // the smoke that comes down past the south windows (from the fire 20 floors up, curling round the tower)
   const curl = { tower: 'N', face: [0, 1], f0: 80, f1: 92, t0: NT.hit + 9, rate: 4, dark: true, seed: 21, span: 1.0, alpha: 0.42, sink: 22, life: 40 };
   const dust = ntPuffs(scene, 400, { additive: true });
+  // and the black smoke that pours down close past your windows a minute later (survivors on the floors below the
+  // impact saw it: the fire's smoke caught in the wind against the face of the tower)
+  const pour = ntPuffs(scene, 600, { soft: 1.0 });
+  function pourAt(t) {
+    pour.begin();
+    if (t > NT.hit + 8) for (let i = 0; i < 560; i++) {
+      const a = t - (NT.hit + 8 + i * 0.06), h = hash1(i * 13 + 41), h2 = hash1(i * 19 + 43), h3 = hash1(i * 31 + 47);
+      if (a < 0 || a > 20) continue;
+      const x = -18 + h * 32 + NT_WIND[0] * 0.3 * a + noise1(a * 0.2 + i, 3) * 2;
+      const y = Y + 16 - (0.9 + 0.8 * h2) * a + noise1(a * 0.15 + i, 5) * 1.5, z = O.zWall + 2.6 + h3 * 10 + 0.25 * a;
+      const c = 0.012 + 0.03 * h3;
+      const clump = 0.4 + 0.6 * MathX.smooth(noise1((NT.hit + 8 + i * 0.06) * 0.35, 17) + 0.25 * noise1(i * 0.37, 19), -0.3, 0.3);   // (it comes in gusts)
+      pour.add(x, y, z, 2.2 + 0.35 * a + 2 * h2, 0.9 * clump * MathX.smooth(a, 0, 2) * (1 - MathX.smooth(a, 14, 20)), c, c * 0.98, c * 0.95);
+    }
+    pour.end();
+  }
 
   // ---- the camera, by mode
   const cam = S.camera;
@@ -203,11 +222,11 @@ NT_SETS.office = (app) => {
     switch (s.mode) {
       case 'title': { const k = Ease.inOutSine(u(-1, NT.morning)); return [[1.5 - 1.2 * k, E + 0.05, 15.5 + 4 * k], [0 - 1 * k, Y + 1.25, 31.5], 52]; }
       case 'desk': { const k = Ease.inOutSine(u(NT.morning, NT.sky)); return [[MY.x - 0.02, SEAT + 0.05 * k, MY.z - 0.05 - 0.15 * k], ntV([MY.x - 0.1, Y + 0.8, MY.z + 0.6], [MY.x + 0.5, Y + 1.5, MY.z + 3], Ease.inOutSine(MathX.smooth(k, 0.35, 1))), 50]; }
-      case 'sky': { const k = u(NT.sky, NT.tower), x = slit(-7.6); return [[x, E, 30.75 + 0.35 * k], [x - 180 - 60 * k, Y - 140, 31 + 520], 52]; }
-      case 'tower': { const k = u(NT.tower, NT.windows), x = slit(9.5); return [[x, E - 0.15, 31.1], [x + 18 - 6 * k, Y + 20 + 70 * Ease.inOutSine(k), 122], 58]; }
-      case 'down': { const k = Ease.inOutSine(u(NT.windows, NT.impactShot)), x = slit(0.5); return [[x, E - 0.25, 31.45 + 0.2 * k], [x + 0.2, Y - 60 - 200 * k, 31.6 + 50 - 30 * k], 62]; }
+      case 'sky': { const k = Ease.inOutSine(u(NT.sky, NT.tower)), x = slit(-7.6); return [[x, E, 31.66 + 0.08 * k], [x - 330 - 40 * k, Y - 50 + 100 * k, 31 + 520], 52]; }
+      case 'tower': { const k = u(NT.tower, NT.windows), x = slit(9.5); return [[x, E - 0.1, 31.64], [x + 18 - 6 * k, Y + 8 + 52 * Ease.inOutSine(k), 122], 58]; }
+      case 'down': { const k = Ease.inOutSine(u(NT.windows, NT.impactShot)), x = slit(0.5); return [[x, E - 0.3, 31.76 + 0.05 * k], [x + 0.2, Y - 60 - 32 * k, 31.6 + 60 - 6 * k], 62]; }
       case 'impact': case 'after': { const k = u(NT.impactShot, NT.outside); return [[MY.x + 0.1, s.mode === 'after' ? E : SEAT + 0.1, MY.z - 0.3 - 0.6 * MathX.smooth(t, NT.hit + 1, NT.after + 2)], s.mode === 'after' ? [MY.x + 3.2, Y + NT_CEIL - 0.1, MY.z - 4.5] : [MY.x + 0.2, Y + 1.15, MY.z + 3.0], 54 + 2 * k]; }
-      case 'outside': { const k = u(NT.outside, NT.nobody), x = slit(-2.2); return [[x, E, 30.85 + 0.3 * k], [x + 6 * k, Y + 10 - 12 * k, 31 + 34], 56]; }
+      case 'outside': { const k = u(NT.outside, NT.nobody), x = slit(-2.2); return [[x, E, 31.62 + 0.12 * k], [x + 6 * k, Y + 9 - 14 * k, 31 + 34], 56]; }
       case 'nobody': {
         const w = MathX.smooth(t, NT.go, NT.known + 0.3), P = ntSpline([[0, MY.x + 0.1, MY.z - 0.9], [0.35, MY.x + 1.6, MY.z - 1.3], [0.7, MY.x + 3.1, 22.3], [1, 3.1, 17.4]], w);
         const at = w < 0.05 ? [MY.x + 4, Y + 1.4, MY.z - 5] : [P[0] + 1.5, Y + 1.45, P[1] - 6];
@@ -248,7 +267,7 @@ NT_SETS.office = (app) => {
       ntCam(cam, [p[0] + d[0] + j[0] + j2[0] + sw[0], p[1] + d[1] + j[1] + j2[1], p[2] + d[2]], at, fov, j[2] + j2[2] + sw[1]);
       // the troffers: steady; at 8:46 they flicker, a few stay out
       const fl = after ? MathX.clamp(1 - 0.85 * Math.max(0, noise1(t * 17, 5)) * Math.exp(-(t - NT.hit) / 2.5) - 0.5 * (MathX.smooth(t, NT.hit, NT.hit + 0.05) * (1 - MathX.smooth(t, NT.hit + 0.15, NT.hit + 0.7))), 0, 1) : 1;
-      trM.emissiveIntensity = fl * (after ? 0.92 : 1.0);
+      trM.emissiveIntensity = fl * (after ? 0.92 : 1.0); ceilM.emissiveIntensity = 0.22 * fl * (after ? 0.9 : 1);
       S.hemi.intensity = 0.75 * (0.75 + 0.25 * fl);
       // the screen
       const cm = Math.floor(ntClockParts(ntClock(t)).m % 10);
@@ -290,6 +309,7 @@ NT_SETS.office = (app) => {
       for (const src of smoke) ntPlume(puffs, t, src, { fire });
       ntPlume(puffs, t, curl, {});
       puffs.end(); fire.end();
+      pourAt(t);
       // dust in the light, and more of it after the tiles fall
       dust.begin();
       for (let i = 0; i < 260; i++) {
@@ -308,8 +328,8 @@ NT_SETS.office = (app) => {
     },
     labels(t) {
       const s = ntShotAt(t), W = StoryHUD.win;
-      if (s.mode === 'tower') return [{ p: [NT_TW.S.x - 20, NT_Y73 + 70, NT_TW.S.z - 32], text: 'THE SOUTH TOWER', sub: '2 WORLD TRADE CENTER', a: W(t, NT.tower + 1.0, NT.windows - 0.3, 0.5, 0.4) }];
-      if (s.mode === 'sky') return [{ p: [-1300, 0, 1800], text: 'THE HUDSON', sub: 'NEW JERSEY BEYOND', a: W(t, ntCap('sky', 1).show - 0.3, NT.tower - 0.3, 0.5, 0.4) }];
+      if (s.mode === 'tower') return [{ p: [NT_TW.S.x - 20, NT_Y73 + 34, NT_TW.S.z - 32], text: 'THE SOUTH TOWER', sub: '2 WORLD TRADE CENTER', a: W(t, NT.tower + 1.0, NT.windows - 0.3, 0.5, 0.4) }];
+      if (s.mode === 'sky') return [{ p: [-1000, 0, 1150], text: 'THE HUDSON', sub: 'NEW JERSEY BEYOND', a: W(t, ntCap('sky', 1).show - 0.3, NT.tower - 0.3, 0.5, 0.4) }];
       if (s.mode === 'down') return [{ p: [0.5, 0, 140], text: 'THE PLAZA', sub: '267 m BELOW', a: W(t, ntCap('windows', 0).show + 0.4, NT.impactShot - 0.3, 0.5, 0.4) }];
       return [];
     },

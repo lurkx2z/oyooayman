@@ -25,7 +25,7 @@ const NT_WHERE = [
   [NT.mezz, NT.esc, 'PLAZA LEVEL', () => 'MEZZANINE', 'NORTH TOWER'],
   [NT.esc, NT.five, 'BELOW THE PLAZA', () => 'CONCOURSE', 'THE SHOPPING MALL'],
   [NT.five, NT.walk, 'OUTSIDE', () => 'VESEY STREET', 'NORTH OF THE TOWERS'],
-  [NT.walk, NT.out - 0.4, 'OUTSIDE', () => 'CHURCH STREET', 'WALKING NORTH'],
+  [NT.walk, NT.out - 0.4, 'OUTSIDE', () => 'WEST BROADWAY', 'WALKING NORTH'],
 ];
 // the scene's context line: [from, to, label, value(t)] (value: text, or { l, v, v2 } with HTML)
 const ntSince = (t) => { const s = Math.max(0, ntClock(t) - NT_HIT), m = Math.floor(s / 60); return m < 1 ? `${Math.floor(s)} SECONDS` : `${m} MINUTE${m === 1 ? '' : 'S'}`; };
