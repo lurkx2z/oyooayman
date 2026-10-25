@@ -113,3 +113,7 @@ effects were brought up (ambience +4 dB, effects +6 dB, the score −2.5 dB duri
 - Final render (on the PC, GPU): `node films/universe-shrinking/render-gpu.cjs --channel chrome --workers 2 --out
   D:\renders\universe-shrinking` → `universe-shrinking_final_1080p.mp4` (1920×1080) and
   `universe-shrinking_final_small.mp4` (1280×720, under 30 MiB).
+- **Rendered 2026-10-25** (RTX 3060 Ti, about 8 minutes of frames), in `D:\renders\universe-shrinking\`:
+  `universe-shrinking_final_1080p.mp4` 1,053.7 MiB, 1920×1080, 284.23 s, −14.3 LUFS, −1.2 dBTP (for YouTube);
+  `universe-shrinking_final_small.mp4` 26.25 MiB, 1280×720, 284.20 s, −14.9 LUFS, −1.5 dBTP (for sending from a phone);
+  `check.jpg` (8 frames, all normal). Not yet watched in full with sound.
