@@ -105,7 +105,6 @@ NT_SETS.stair = (app) => {
     const sign = ntCanvasTex(256, 320, (cx, W, H, st) => {
       cx.fillStyle = '#efece4'; cx.fillRect(0, 0, W, H); cx.fillStyle = '#16181a'; cx.textAlign = 'center';
       cx.font = 'bold 40px sans-serif'; cx.fillText('STAIR C', W / 2, 52); cx.font = 'bold 150px sans-serif'; cx.fillText(String(st.n), W / 2, 200);
-      cx.font = 'bold 22px sans-serif'; cx.fillText(st.n > 1 ? 'NO RE-ENTRY ' + (st.n % 5 ? '' : '· RE-ENTRY HERE') : 'EXIT TO PLAZA', W / 2, 255);
       cx.fillStyle = 'rgba(160,230,140,0.9)'; cx.fillRect(16, 280, W - 32, 14);
     });
     const sm = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.62), new THREE.MeshStandardMaterial({ map: sign.tex, roughness: 0.7, emissive: '#ffffff', emissiveMap: sign.tex, emissiveIntensity: 0.12 }));

@@ -97,4 +97,73 @@ function ntCurve(f, hz = 200) {
   return (t) => { const x = MathX.clamp((t - t0) * hz, 0, n - 1e-6), i = Math.floor(x); return y[i] + (y[i + 1] - y[i]) * (x - i); };
 }
 
-const NT_SOUND_FNS = [ntNoise, ntBed, ntTone, ntChirp, ntCrackle, ntSweep, ntSweepPut, ntEv, ntWn, ntAddAt, ntWhere, ntCurve];
+// people talking low, no words (stereo { L, R }): each voice a glottal buzz with a little breath, through the formants of a
+// vowel that changes every syllable; phrases with pauses. o.voices, o.f0 [lo, hi], o.talk (0…1 how much of the time
+// each voice is talking), o.env(t) the crowd's level over the clip (t from 0, s)
+function ntBabble(fx, dur, o = {}) {
+  const sr = fx.sr, r = fx.r, n = Math.ceil(dur * sr), L = new Float32Array(n), R = new Float32Array(n), V = o.voices || 6, [fa, fb] = o.f0 || [95, 230];
+  const VOW = [[730, 1090, 2440], [270, 2290, 3010], [530, 1840, 2480], [570, 840, 2410], [440, 1020, 2240], [300, 870, 2240], [660, 1720, 2410], [490, 1350, 1690]];
+  for (let v = 0; v < V; v++) {
+    const f0 = r.range(fa, fb), pan = r.range(-0.8, 0.8), gl = Math.cos((pan + 1) * Math.PI / 4), gr = Math.sin((pan + 1) * Math.PI / 4), amp = r.range(0.5, 1);
+    let t = r.range(0, 1.5);
+    while (t < dur - 0.2) {
+      // a phrase: a few syllables, then a pause
+      const ns = r.int(3, 11);
+      for (let k = 0; k < ns && t < dur - 0.2; k++) {
+        const sd = r.range(0.11, 0.3), m = Math.ceil((sd + 0.04) * sr), seg = new Float32Array(m), vw = VOW[r.int(0, VOW.length - 1)], ff = f0 * r.range(0.9, 1.15) * (k === ns - 1 ? 0.88 : 1);
+        let ph = r.next();
+        for (let i = 0; i < m; i++) { ph += ff * (1 + 0.02 * (r.next() - 0.5)) / sr; if (ph >= 1) { ph -= 1; seg[i] = 1; } seg[i] += 0.06 * (r.next() * 2 - 1); }
+        const out = new Float32Array(m);
+        vw.forEach((f, j) => { const z = Float32Array.from(seg); NTX.bq(z, 'bp', f * r.range(0.95, 1.05), 5 + j, sr); for (let i = 0; i < m; i++) out[i] += z[i] * [1, 0.6, 0.25][j]; });
+        const i0 = Math.round(t * sr), a = amp * r.range(0.6, 1) * (o.env ? o.env(t) : 1);
+        for (let i = 0; i < m && i0 + i < n; i++) { const u = i / m, e = Math.pow(Math.sin(Math.PI * u), 0.6) * a; L[i0 + i] += out[i] * e * gl; R[i0 + i] += out[i] * e * gr; }
+        t += sd * r.range(0.8, 1.0);
+      }
+      t += r.range(0.4, 2.2) / Math.max(0.15, o.talk || 0.6);
+    }
+  }
+  return { L, R };
+}
+// a siren (an emergency vehicle somewhere in the streets): o.kind 'wail' (a slow rise and fall) or 'yelp' (fast), its
+// pitch range [lo, hi], o.dist (0 near … 1 far: quieter, duller), env(u) over the clip; mono
+function ntSiren(fx, dur, o = {}) {
+  const sr = fx.sr, r = fx.r, n = Math.ceil(dur * sr), y = new Float32Array(n), [lo, hi] = o.range || [650, 1500];
+  const per = o.kind === 'yelp' ? r.range(0.28, 0.4) : r.range(3.8, 5.5), p0 = r.next();
+  let ph = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / sr, c = ((t / per + p0) % 1), sh = o.kind === 'yelp' ? (c < 0.5 ? c * 2 : 2 - c * 2) : 0.5 - 0.5 * Math.cos(2 * Math.PI * c);
+    ph += 2 * Math.PI * (lo + (hi - lo) * sh) / sr;
+    y[i] = (Math.sin(ph) + 0.35 * Math.sin(2 * ph) + 0.18 * Math.sin(3 * ph) + 0.08 * Math.sin(5 * ph)) * (o.env ? o.env(t / dur) : Math.min(1, t / 1.5, (dur - t) / 1.5));
+  }
+  NTX.bq(y, 'lp', 5500 - 4200 * (o.dist || 0), 0.7, sr);
+  return y;
+}
+// a car alarm far off: a two-tone beep pattern; mono
+function ntCarAlarm(fx, dur, o = {}) {
+  const sr = fx.sr, n = Math.ceil(dur * sr), y = new Float32Array(n), per = o.per || 0.5;
+  for (let i = 0; i < n; i++) { const t = i / sr, c = (t % per) / per, f = (Math.floor(t / per) % 2) ? 1320 : 990; y[i] = (c < 0.55 ? 1 : 0) * Math.sin(2 * Math.PI * f * t) * Math.min(1, t / 0.5, (dur - t) / 0.5); }
+  NTX.bq(y, 'lp', 2500, 0.7, sr);
+  return y;
+}
+// a deep, long roar (a tower coming down, heard from blocks away): a rumble that swells over `rise` s and holds, with
+// crackle (steel), slow thunderous surges, and a wind-like rush on top; stereo { L, R }. o.dist dulls it.
+function ntRoar(fx, dur, o = {}) {
+  const sr = fx.sr, r = fx.r, n = Math.ceil(dur * sr), rise = o.rise || 2.5, hold = o.hold || 8, dist = o.dist || 0;
+  const env = (t) => Math.min(1, Math.pow(t / rise, 1.6)) * (t < rise + hold ? 1 : Math.exp(-(t - rise - hold) / (o.tail || 4)));
+  const mk = (seed) => {
+    const y = new Float32Array(n), br = ntNoise(fx, n, 'brown'), pk = ntNoise(fx, n, 'pink'), w1 = fx.wander(0.35), w2 = fx.wander(1.3);
+    NTX.bq(pk, 'lp', 900 - 600 * dist, 0.7, sr);
+    for (let i = 0; i < n; i++) { const t = i / sr, e = env(t), surge = 1 + 0.45 * w1(t) + 0.25 * w2(t); y[i] = (br[i] * 1.0 + pk[i] * 0.55) * e * surge; }
+    NTX.bq(y, 'lp', 1600 - 1200 * dist, 0.7, sr);
+    // the crackle: steel giving way, thick in the first seconds
+    const cr = ntCrackle(fx, dur, { rate: 160, hp: 700, env: (u) => env(u * dur) * Math.exp(-u * dur / (rise + hold * 0.7)) });
+    NTX.bq(cr, 'lp', 4000 - 3000 * dist, 0.7, sr);
+    for (let i = 0; i < n; i++) y[i] += cr[i] * 0.5;
+    // thuds inside it
+    for (let t = 0.3; t < rise + hold; t += r.range(0.25, 0.9)) { const a = env(t) * r.range(0.3, 1), i0 = Math.round(t * sr), f = r.range(28, 55); for (let i = 0; i < 0.6 * sr && i0 + i < n; i++) y[i0 + i] += a * 0.9 * Math.sin(2 * Math.PI * f * i / sr) * Math.exp(-i / (0.18 * sr)) * Math.min(1, i / (0.01 * sr)); }
+    return y;
+  };
+  return { L: mk(1), R: mk(2) };
+}
+
+const NT_SOUND_FNS = [ntNoise, ntBed, ntTone, ntChirp, ntCrackle, ntSweep, ntSweepPut, ntEv, ntWn, ntAddAt, ntWhere, ntCurve, ntBabble, ntSiren, ntCarAlarm, ntRoar];
