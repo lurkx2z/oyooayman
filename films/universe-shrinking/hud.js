@@ -25,7 +25,8 @@ function ucFmtC(K) {
   const C = K - 273.15;
   if (!isFinite(K)) return 'NO LONGER MEANINGFUL';
   if (C < -100) return '−' + (-C).toFixed(1) + ' °C';
-  if (C < 0) return '−' + Math.round(-C) + ' °C';
+  if (C < -0.5) return '−' + Math.round(-C) + ' °C';
+  if (C < 0.5) return '0 °C';
   if (C < 1000) return Math.round(C) + ' °C';
   if (C < 1e6) return ucThousands(Math.round(C / 10) * 10) + ' °C';
   return ucBig(C) + ' °C';
@@ -66,11 +67,11 @@ function ucFmtAge(s) {
 }
 
 // the milestones the readout looks ahead to: [K, what], each with its night time (or, past the Sun's core, its time left)
-const UC_NEXT = [...UC_MILESTONES, [1e9, 'ATOMIC NUCLEI BURST'], [2e12, 'PROTONS MELT'], [1.42e32, 'PHYSICS RUNS OUT']]
+const UC_NEXT = [...UC_MILESTONES, [5e9, 'ATOMIC NUCLEI BURST'], [1.8e12, 'PROTONS MELT'], [1.42e32, 'KNOWN PHYSICS RUNS OUT']]
   .map(([K, what]) => ({ K, what, n: K / UCP.T0 < 1e5 ? ucNightForS(K / UCP.T0) : null, left: ucLeftForS(K / UCP.T0) }));
 // the brightness of the sky, in words (cd/m²)
 function ucSkyWords(L) {
-  return L < 1.2e-3 ? 'AS DARK AS THE COUNTRYSIDE' : L < 0.04 ? 'AS BRIGHT AS A CITY\'S' : L < 0.6 ? 'TWILIGHT' : L < 300 ? 'DAWN' : L < 3000 ? 'AN OVERCAST DAY' : L < 1.2e4 ? 'A SUNNY DAY' : 'BRIGHTER THAN NOON';
+  return L < 1.2e-3 ? 'AS DARK AS THE COUNTRYSIDE' : L < 0.04 ? 'AS BRIGHT AS A CITY\'S' : L < 300 ? 'TWILIGHT' : L < 3000 ? 'AN OVERCAST DAY' : L < 1.2e4 ? 'A SUNNY DAY' : 'BRIGHTER THAN NOON';
 }
 
 // the scene's context line: [from, to, label, value(t, n)] (value: text, or { l, v, v2 } with HTML)
@@ -78,45 +79,42 @@ const UC_CTX = [
   [UC.titleShot + 0.8, UC.rule - 0.3, 'THE GARDEN, 7:29 PM', (t, n) => ({ v: ucFmtC(ucTempAt('frost', n)) + ' · FROST', v2: 'STARS YOU CAN SEE: ' + ucThousands(Math.round(ucSkyNow(0).stars / 100) * 100) })],
   [UC.rule + 0.6, UC.held - 0.2, 'THE SPACE BETWEEN THE GALAXIES', (t) => ({ v: t < UC.shrinkAt ? 'GROWING' : 'SHRINKING', v2: t < UC.shrinkAt ? 'AS IT HAS FOR 13.8 BILLION YEARS' : 'FROM 7:30 · FASTER AND FASTER' })],
   [UC.held + 0.6, UC.promise - 0.25, 'HELD TOGETHER · THEY KEEP THEIR SIZE', (t) => ({ v: 'ATOMS · YOU · STARS · GALAXIES', v2: t > UC.runout - 0.3 ? 'THE SPACE LEFT BETWEEN THEM: ' + Math.max(0, Math.round(100 * UC_COS.held(t) / UC_COS.held(UC.held))) + '%' : '' })],
-  [UC.promise + 0.5, UC.begin - 0.25, 'THE UNIVERSE, REWOUND', (t) => { const u = MathX.clamp((t - UC.promise) / (UC.begin - 0.6 - UC.promise), 0, 1), s = Math.exp(Math.log(1100) * Math.pow(u, 1.6)); return { l: 'THE UNIVERSE, REWOUND · AGE', v: u > 0.97 ? 'ABOUT 380,000 YEARS' : ucFmtAge(s), v2: 'THE SMALLER IT WAS, THE HOTTER' }; }],
+  [UC.promise + 0.5, UC.begin - 0.25, 'AS HOT AS THE UNIVERSE AT AGE', (t) => { const u = MathX.clamp((t - UC.promise) / (UC.begin - 0.6 - UC.promise), 0, 1), s = Math.exp(Math.log(1100) * Math.pow(u, 1.6)); return { l: 'AS HOT AS THE UNIVERSE AT AGE', v: u > 0.97 ? 'ABOUT 380,000 YEARS' : ucFmtAge(s), v2: 'THE SMALLER IT WAS, THE HOTTER' }; }],
   [UC.mirach + 0.6, UC.squeeze - 0.3, 'MIRACH LOOKS', (t, n) => { const s = ucShrink(n); return { v: ucFmtC(3840 * s), v2: 'ITS LIGHT, SQUEEZED × ' + s.toFixed(2) }; }],
   [UC.squeeze + 0.4, UC.more - 0.3, 'STARLIGHT, SQUEEZED BY', (t, n) => ({ v: '× ' + ucShrink(n).toFixed(2), v2: 'STARS YOU CAN SEE: ' + ucThousands(Math.round(ucSkyNow(n).stars / 100) * 100) })],
   [UC.more + 0.4, UC.glow - 0.3, 'STARS YOU CAN SEE', (t, n) => ({ v: ucThousands(Math.round(ucSkyNow(n).stars / 100) * 100), v2: 'ON A CLEAR NIGHT HERE: 1,900' })],
   [UC.glow + 0.4, UC.city - 0.3, 'THE DARK BETWEEN THE STARS', (t, n) => { const S = ucSkyNow(n), k = S.L / UC_NIGHT_L; return { v: k < 1.05 ? 'AS DARK AS EVER' : '× ' + ucSig(k) + ' BRIGHTER', v2: 'STARS YOU CAN SEE: ' + ucThousands(Math.round(S.stars / 100) * 100) }; }],
-  [UC.city + 0.4, UC.close - 0.3, 'THE SKY', (t, n) => { const S = ucSkyNow(n); return { v: ucSkyWords(S.L), v2: 'STARS YOU CAN SEE: ' + ucThousands(Math.round(S.stars / 10) * 10) }; }],
-  [UC.close + 0.5, UC.frost - 0.3, 'OUT THERE, TONIGHT', (t, n) => ({ v: t < UC.crashAt ? 'GALAXIES CLOSING IN' : 'GALAXIES CRASHING', v2: ucFmtSize(ucShrink(n)) })],
+  [UC.city + 0.4, UC.frost - 0.3, 'THE SKY', (t, n) => { const S = ucSkyNow(n); return { v: ucSkyWords(S.L), v2: 'STARS YOU CAN SEE: ' + ucThousands(Math.round(S.stars / 10) * 10) }; }],
   [UC.frost + 0.4, UC.zero - 0.3, 'YOUR LAWN', (t, n) => ({ v: ucFmtC(ucTempAt('frost', n)), v2: 'SPACE: ' + ucFmtC(ucSpaceK(ucShrink(n))) })],
   [UC.zero + 0.4, UC.warm - 0.3, 'THE MILKY WAY\'S DARK DUST', (t, n) => { const S = ucSkyNow(n), r = S.dust / Math.max(1e-30, S.mw); return { v: r < 1 ? 'DARK' : 'OUTSHINES ITS STARS × ' + ucSig(r), v2: 'ITS LIGHT WAS FAR INFRARED · SQUEEZED × ' + Math.round(S.s) }; }],
   [UC.warm + 0.4, UC.boil - 0.3, 'YOU', (t, n) => ({ v: '37 °C', v2: 'SPACE: ' + ucFmtC(ucSpaceK(ucShrink(n))) })],
   [UC.boil + 0.4, UC.steam - 0.3, 'THE SKY\'S HEAT ON YOUR SKIN', (t, n) => ({ v: ucThousands(Math.round(ucSkyNow(n).flux / 10) * 10) + ' W PER m²', v2: 'THE MIDDAY SUN: ABOUT 1,000' })],
   [UC.steam + 0.3, UC.leaves - 0.2, 'YOUR LAWN', (t, n) => ({ v: ucFmtC(ucTempAt('grass', n)), v2: 'ITS WATER BOILS OFF' })],
-  [UC.leaves + 0.4, UC.lawn - 0.2, 'DEAD LEAVES CATCH FIRE AT', (t, n) => ({ v: 'ABOUT 260 °C', v2: 'YOURS: ' + ucFmtC(ucTempAt('leaves', n)) })],
+  [UC.leaves + 0.4, UC.lawn - 0.2, 'DEAD LEAVES START TO BURN AT', (t, n) => ({ v: 'ABOUT 260 °C', v2: 'YOURS: ' + ucFmtC(ucTempAt('leaves', n)) })],
   [UC.lawn + 0.3, UC.noon - 0.2, 'THE SKY\'S HEAT', (t, n) => ({ v: ucSig(ucSkyNow(n).flux / 1000) + ' kW PER m²', v2: 'A BONFIRE, CLOSE UP: ABOUT 10' })],
   [UC.noon + 0.3, UC.shed - 0.2, 'DAYLIGHT', (t, n) => { const S = ucSkyNow(n), lux = Math.PI * S.Lavg; return { v: ucSig(lux / 1e5, 3) + ' × NOON', v2: t > UC.shedAt - 0.2 ? 'THE SHED: ' + ucFmtC(ucTempAt('shed', n)) + ' · THE FENCE: ' + ucFmtC(ucTempAt('fence', n)) : 'FROM THE LIGHT OF EVERY GALAXY' }; }],
-  [UC.moonGo - 0.2, UC.glass - 0.2, 'THE MOON', (t, n) => ({ v: 'NO BRIGHTER THAN THE SKY', v2: 'ITS SUNLIGHT IS ONLY 8 MINUTES OLD' })],
+  [UC.moonGo - 0.2, UC.glass - 0.2, 'THE MOON', (t, n) => ({ v: 'NO BRIGHTER THAN THE SKY', v2: 'ITS SUNLIGHT IS 8 MINUTES OLD · SQUEEZED ONLY × ' + ucMoonSqueeze(n).toFixed(1) })],
   [UC.glass + 0.4, UC.bath - 0.2, 'WINDOW GLASS SOFTENS AT', (t, n) => ({ v: 'ABOUT 700 °C', v2: 'YOURS: ' + ucFmtC(ucTempAt('glass', n)) })],
   [UC.bath + 0.4, UC.red - 0.2, 'THE BIRD BATH', (t, n) => ({ v: ucFmtC(ucTempAt('water', n)) + (n > ucNightForTemp('water', 373.1) ? ' · BOILING' : ''), v2: 'AT 7:29: −2 °C · ICE' })],
   [UC.red + 0.4, UC.melt - 0.2, 'THE BIG BANG\'S AFTERGLOW', (t, n) => ({ v: 'TONIGHT: ' + ucFmtC(ucSpaceK(ucShrink(n))), v2: 'TODAY: −270 °C · INVISIBLE' })],
   [UC.melt + 0.3, UC.vanish - 0.2, 'BRICK STARTS TO MELT AT', (t, n) => ({ v: 'ABOUT 1,300 °C', v2: 'YOUR WALLS: ' + ucFmtC(ucTempAt('brick', n)) })],
   [UC.vanish + 0.4, UC.bigbang - 0.2, 'EVERYTHING IN THE GARDEN', (t, n) => ({ v: 'AS HOT AS THE SKY', v2: 'LIGHT FROM EVERY DIRECTION · NO SHADOWS' })],
-  [UC.bigbang + 0.4, UC.sun - 0.2, 'THE UNIVERSE, REWOUND · AGE', () => ({ v: 'ABOUT 380,000 YEARS', v2: 'WHEN THE FIRST ATOMS FORMED' })],
+  [UC.bigbang + 0.4, UC.sun - 0.2, 'AS HOT AS THE UNIVERSE AT AGE', () => ({ v: 'ABOUT 380,000 YEARS', v2: 'WHEN THE FIRST ATOMS FORMED' })],
   [UC.sun + 0.3, UC.last - 0.2, 'THE SURFACE OF THE SUN', (t, n) => ({ v: 'ABOUT 5,500 °C', v2: 'SPACE: ' + ucFmtC(ucSpaceK(ucShrink(n))) })],
   [UC.real + 1.0, UC.clue - 0.2, 'THE REAL UNIVERSE', () => ({ v: 'GROWING · FASTER EVERY YEAR', v2: 'FOUND IN 1998 · NOBEL PRIZE 2011' })],
-  [UC.clue + 0.5, UC.turn - 0.2, 'DESI · THE BIGGEST 3D MAP', () => ({ v: '14 MILLION GALAXIES', v2: 'THE PUSH (DARK ENERGY) MAY BE WEAKENING' })],
-  [UC.same + 0.4, UC.question - 0.3, 'THE SAME END', () => ({ v: 'EVERY GALAXY\'S LIGHT, SQUEEZED', v2: 'THEN THE BIG BANG\'S GLOW, HEATING EVERYTHING' })],
+  [UC.clue + 0.5, UC.turn - 0.2, 'DESI · THE BIGGEST 3D MAP', () => ({ v: 'ABOUT 15 MILLION GALAXIES & QUASARS', v2: 'THE PUSH (DARK ENERGY) MAY BE FADING' })],
 ];
 // the honest labels: [from, to, text] (the first match wins)
 const UC_TAGS = [
   [0.3, UC.titleShot, 'LATER TONIGHT · 11:44 PM'],
   [UC.rule + 0.3, UC.held, 'THOUGHT EXPERIMENT · ILLUSTRATION'],
-  [UC.held + 0.2, UC.begin - 0.1, 'ILLUSTRATION'],
-  [UC.close + 0.3, UC.frost - 0.1, 'ILLUSTRATION · OUT THERE, TONIGHT'],
-  [UC.mirach + 0.3, UC.pretend, 'THE NIGHT, SPED UP'],
-  [UC.pretend, UC.last - 0.1, 'FROM HERE, PRETEND NOTHING CAN HURT YOU'],
-  [UC.last + 0.3, UC.midnight - 0.05, 'THE LAST SECOND · SLOWED DOWN'],
+  [UC.held + 0.2, UC.promise, 'THOUGHT EXPERIMENT · OUR RULE'],
+  [UC.promise, UC.begin - 0.1, 'ILLUSTRATION'],
+  [UC.mirach + 0.3, UC.steam, 'THE NIGHT, SPED UP'],
+  [UC.steam, UC.last - 0.1, 'FROM HERE, PRETEND NOTHING CAN HURT YOU'],
+  [UC.last + 0.3, UC.midnight - 0.05, 'THE LAST SECOND · SLOWED DOWN · ITS TIMING FROM OUR RULE'],
   [UC.real + 0.8, UC.turn - 0.1, 'REAL · ILLUSTRATED'],
-  [UC.turn + 0.3, UC.same - 0.1, 'A REAL PREDICTION · ONE OF SEVERAL · ILLUSTRATED'],
-  [UC.same + 0.3, UC.question - 0.1, 'TONIGHT · 11:49 PM'],
+  [UC.turn + 0.3, UC.question - 0.1, 'ONE MODEL\'S ESTIMATE · ONE OF SEVERAL · ILLUSTRATED'],
 ];
 // a caption's text with its numbers in amber
 function ucCapHtml(s) {
@@ -136,6 +134,7 @@ class UcHud {
     this.cap = mk('uc-cap');
     this.caps = UCT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: ucCapHtml(c.text), q: g.id === 'question' })));
     this.inset = mk('uc-inset');
+    this.eye = mk('uc-eye'); root.insertBefore(this.eye, root.firstChild);   // (the telescope's eyepiece, for Mirach: under the text)
     this.labels = [];
     this.root = root;
     this._last = {};
@@ -144,16 +143,19 @@ class UcHud {
   _set(k, el, prop, v) { if (this._last[k] === v) return; this._last[k] = v; el.style[prop] = v; }
   _txt(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.textContent = v; }
   _html(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.innerHTML = v; }
+  _cls(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.className = v; }
 
   update(t, shot, set, app) {
     const W = StoryHUD.win, n = ucNight(t);
     // ---- the readout: the cold open; 7:29 on, except over the illustrations; to midnight
-    const ra = Math.max(W(t, 0.4, UC.titleShot - 0.1, 0.5, 0.3), W(t, ucS('frozen') - 0.2, UC.rule - 0.1, 0.5, 0.3), W(t, UC.begin + 0.2, UC.close - 0.1, 0.5, 0.3), W(t, UC.frost + 0.2, UC.midnight - 0.05, 0.5, 0.05));
+    const ra = Math.max(W(t, 0.4, UC.titleShot - 0.1, 0.5, 0.3), W(t, ucS('frozen') - 0.2, UC.rule - 0.1, 0.5, 0.3), W(t, UC.begin + 0.2, UC.midnight - 0.05, 0.5, 0.05));
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
       const last = t >= UC.last, left = last ? ucLeft(t) : UCP.R - n, s = last ? (left > 0 ? Math.exp(ucLnSLeft(left)) : Infinity) : ucShrink(Math.max(0, n)), K = UCP.T0 * s;
-      this._html('rov', this.roV, ucFmtC(K)); this._html('ros', this.roS, ucFmtSize(s));
-      const nx = UC_NEXT.find((m) => m.K > K * 1.0001);
+      // (past the Planck temperature the numbers stop meaning anything: the readout freezes there)
+      const KP = 1.42e32, planck = K >= KP;
+      this._html('rov', this.roV, ucFmtC(Math.min(K, KP))); this._html('ros', this.roS, planck ? 'KNOWN PHYSICS RUNS OUT' : ucFmtSize(s));
+      const nx = planck ? null : UC_NEXT.find((m) => m.K > K * 1.0001);
       let nt = '';
       if (nx) nt = 'NEXT · ' + nx.what + ' · ' + (nx.n !== null && nx.left > 60 ? 'AT ' + ucHM(nx.n) : 'IN ' + ucFrac(Math.max(0, left - nx.left)) + ' s');
       if (t < UC.titleShot) nt = 'NEXT · ' + UC_NEXT.find((m) => m.K > K * 1.0001).what + ' · AT ' + ucHM(UC_NEXT.find((m) => m.K > K * 1.0001).n);
@@ -173,7 +175,7 @@ class UcHud {
     this._set('tg', this.tag, 'opacity', tg ? W(t, tg[0], tg[1], 0.5, 0.4).toFixed(3) : '0');
     if (tg) this._txt('tgt', this.tag, tg[2]);
     // ---- the time tonight (and in the last second, how long is left)
-    const ca = Math.max(W(t, 0.4, UC.titleShot - 0.1, 0.5, 0.3), W(t, ucS('frozen') - 0.2, UC.rule - 0.1, 0.5, 0.3), W(t, UC.begin + 0.2, UC.close - 0.1, 0.5, 0.3), W(t, UC.frost + 0.2, UC.midnight - 0.05, 0.5, 0.05));
+    const ca = Math.max(W(t, 0.4, UC.titleShot - 0.1, 0.5, 0.3), W(t, ucS('frozen') - 0.2, UC.rule - 0.1, 0.5, 0.3), W(t, UC.begin + 0.2, UC.midnight - 0.05, 0.5, 0.05));
     this._set('ck', this.clock, 'opacity', ca.toFixed(3));
     if (ca > 0) {
       const c = ucClockParts(t < UC.midnight ? Math.min(n, UCP.R - 1e-3) : n);   // (until midnight it is still 11:59:59)
@@ -183,9 +185,11 @@ class UcHud {
     // ---- the caption
     const cp = this.caps.find((x) => t >= x.show - 0.01 && t < x.hide);
     if (cp) {
-      this._html('cap', this.cap, cp.html); this._set('capq', this.cap, 'className', cp.q ? 'uc-cap q' : 'uc-cap');
+      this._html('cap', this.cap, cp.html); this._cls('capq', this.cap, cp.q ? 'uc-cap q' : 'uc-cap');
       this._set('capa', this.cap, 'opacity', W(t, cp.show, cp.hide, 0.22, 0.3).toFixed(3));
     } else this._set('capa', this.cap, 'opacity', '0');
+    // ---- the eyepiece (Mirach, through your telescope)
+    this._set('eye', this.eye, 'opacity', W(t, UC.mirach, UC.squeeze + 0.5, 0.25, 0.6).toFixed(3));
     // ---- the diagrams
     this._insets(t, n);
     // ---- labels pinned in the scene
@@ -206,16 +210,16 @@ class UcHud {
     });
   }
 
-  // the diagrams (SVG, 760×470 design px, right of centre; 'crunch' large)
+  // the diagrams (SVG, 760×470 design px, right of centre; 'squeeze' larger, 'crunch' large and centred)
   _insets(t, n) {
     const W = StoryHUD.win;
     const which = [
-      ['squeeze', ucCap('squeeze', 0).show + 0.3, UC.half - 0.2], ['spectrum', ucS('ebl') - 0.1, UC.city - 0.2],
-      ['ladder', UC.last + 0.4, UC.midnight - 0.05], ['crunch', UC.turn + 0.2, UC.same - 0.2],
+      ['squeeze', ucCap('squeeze', 0).show + 0.3, UC.half - 0.2],
+      ['ladder', UC.last + 0.4, UC.midnight - 0.05], ['crunch', UC.turn + 0.2, UC.question - 0.2],
     ].find((x) => t >= x[1] && t < x[2]);
     const a = which ? W(t, which[1], which[2], 0.5, which[0] === 'ladder' ? 0.05 : 0.5) : 0;
     this._set('ina', this.inset, 'opacity', a.toFixed(3));
-    this._set('inb', this.inset, 'className', which && which[0] === 'crunch' ? 'uc-inset big' : 'uc-inset');
+    this._cls('inb', this.inset, !which ? 'uc-inset' : which[0] === 'crunch' ? 'uc-inset big' : which[0] === 'squeeze' ? 'uc-inset mid' : 'uc-inset');   // (the squeeze shares the screen with the readout)
     if (!which) return;
     const k = which[0], u = t - which[1], key = k + '|' + Math.round(u * 30);
     if (key === this._insetKey) return;
@@ -264,7 +268,7 @@ class UcHud {
   // the last second, on a ladder of temperature (each step ×1,000): what each one does
   static ladder(u, t) {
     const left = ucLeft(t), K = left > 0 ? UCP.T0 * Math.exp(ucLnSLeft(left)) : 1e40, Y = (k) => 430 - (Math.log10(k) - 3.5) / (32.5 - 3.5) * 360, yNow = Math.max(62, Y(Math.min(1.5e32, K)));
-    const marks = [[5772, 'THE SUN\'S SURFACE', '5,500 °C'], [1.57e7, 'THE SUN\'S CORE', '15 MILLION °C'], [1e9, 'NUCLEI BURST', '1 BILLION °C'], [2e12, 'PROTONS MELT', '2 TRILLION °C'], [1.42e32, 'PHYSICS RUNS OUT', '10<tspan dy="-10" font-size="15">32</tspan><tspan dy="10"> °C</tspan>']];
+    const marks = [[5772, 'THE SUN\'S SURFACE', '5,500 °C'], [1.57e7, 'THE SUN\'S CORE', '15 MILLION °C'], [5e9, 'NUCLEI BURST', '5 BILLION °C'], [1.8e12, 'PROTONS MELT', '2 TRILLION °C'], [1.42e32, 'KNOWN PHYSICS RUNS OUT', '10<tspan dy="-10" font-size="15">32</tspan><tspan dy="10"> °C</tspan>']];
     let m = '';
     for (const [k, name, val] of marks) {
       const y = Y(k), hit = K >= k;

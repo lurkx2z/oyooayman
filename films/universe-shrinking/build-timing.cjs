@@ -17,16 +17,16 @@ const DIR = __dirname;
 const PAUSE = [
   0.5, 0.9, 0.9, 1.0, 0.8, 0.8,       // 01–06 the cold open, the title, 7:29, the rule, held together, the promise
   1.1, 1.3, 0.9, 1.2, 1.0, 1.5,       // 07–12 the squeeze: 7:30, Mirach, why, half the size, more stars, the best sky
-  1.7, 0.9, 1.5, 1.1, 1.2,            // 13–17 the glow: the dark glows, every galaxy, a city's sky, drowned, out there
-  1.3, 1.3, 1.1, 1.0,                 // 18–21 the heat: frost, 0 °C (inside out), warmer than you, boiling
-  1.5, 1.0, 1.7, 1.3, 1.0, 1.3,       // 22–27 the fire: steam, the leaves, the lawn, noon, the shed, the windows
-  1.5, 1.7, 1.6, 1.4, 1.6, 1.5,       // 28–33 the afterglow: the bird bath, the red sky, the house, no edges, 2,700 °C, the Sun
-  1.7, 1.6,                           // 34–35 the last second, midnight
-  2.1, 0.9, 0.9, 0.9, 1.3,            // 36–40 is this real, the clue, a Big Crunch, the same sky, the question
+  1.7, 0.9, 1.5, 1.1,                 // 13–16 the glow: the dark glows, every galaxy, a city's sky, drowned
+  1.6, 1.3, 1.1, 1.0,                 // 17–20 the heat: frost, 0 °C (inside out), warmer than you, boiling
+  1.5, 1.0, 1.7, 1.3, 1.0, 1.3,       // 21–26 the fire: steam, the leaves, the lawn, noon, the shed, the windows
+  1.5, 1.7, 1.6, 1.4, 1.6, 1.5,       // 27–32 the afterglow: the bird bath, the red sky, the house, no edges, 2,700 °C, the Sun
+  1.7, 1.6,                           // 33–34 the last second, midnight
+  1.7, 0.7, 0.7, 1.1,                 // 35–38 is this real, the clue, a Big Crunch, the question
 ];
 const GAP = 0.65;                     // between captions inside a beat
 const TAIL = 4.2;                     // the question held, then the cut
-const SECTION = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 8, 8, 8, 8, 8];
+const SECTION = [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 8, 8, 8, 8];
 const hold = (s) => Math.min(4.2, Math.max(1.5, 1.0 + 0.05 * s.length));
 const TITLE_HOLD = 3.4;
 const r3 = (x) => Math.round(x * 1000) / 1000;

@@ -18,7 +18,7 @@
      bath      the bird bath boils                              red       the afterglow floods the sky
      melt      the house melts                                  bigbang   2,700 °C: the Big Bang's light
      vanish    everything as hot as the sky: no edges           sun       as hot as the Sun's surface
-     last      the last second, slowed down                     same      (the end) the sky would end like this
+     last      the last second, slowed down
      after     the closing question: the garden at 7:29 again
    How a surface is drawn (ucPatch): lit by the sky (a hemisphere light, π × the sky's display luminance), the Milky Way
    overhead and the Moon (directional lights); frost on what faces up while it is below 0 °C; wet, then dry; the fire
@@ -52,7 +52,7 @@ const UC_N = (() => {
   return o;
 })();
 // the fire: how long each kind's front takes to cross (span) and how long a flame lasts (dur), night s
-const UC_BURN = { grass: { span: 80, dur: 26 }, leaves: { span: 60, dur: 95 }, tree: { span: 46, dur: 64 }, shed: { span: 70, dur: 150 }, fence: { span: 64, dur: 130 } };
+const UC_BURN = { grass: { span: 110, dur: 32 }, leaves: { span: 60, dur: 130 }, tree: { span: 46, dur: 64 }, shed: { span: 70, dur: 150 }, fence: { span: 64, dur: 130 } };
 // the fire front's shape over the garden (range ≈ 0…1; the shader has the same function)
 function ucFront(x, y, z) { return 0.5 + 0.22 * Math.sin(0.9 * x + 1.3) * Math.cos(0.7 * z + 0.4) + 0.16 * Math.sin(1.7 * x - 2.1 * z) + 0.1 * Math.sin(0.33 * z - 0.5 * y); }
 // the moment the front reaches a place where the front function is f, and the char level at night time n
@@ -269,6 +269,17 @@ UC_SETS.garden = (app) => {
     c.fillStyle = 'rgba(255,255,255,0.95)'; c.beginPath(); c.arc(w * 0.37, w * 0.31, w * 0.065, 0, 6.283); c.fill();
   }), { repeat: false });
   const drops = new THREE.InstancedMesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ map: dropTex, transparent: true, alphaTest: 0.02, depthWrite: false }), NCR); drops.castShadow = false; drops.renderOrder = 2; scene.add(drops);
+  // (Mirach through your telescope: a bright core and a halo in the star's own colour; its colour follows the squeeze)
+  const mirTex = ucTex(ucCanvas(128, 128, (c, w) => {
+    const im = c.createImageData(w, w);
+    for (let y = 0; y < w; y++) for (let x = 0; x < w; x++) {
+      const r = Math.hypot(x + 0.5 - w / 2, y + 0.5 - w / 2) / (w / 2), a = Math.min(1, Math.exp(-r * r / 0.0035) + 0.32 * Math.exp(-r * r / 0.03) + 0.07 * Math.exp(-r * r / 0.22)) * (1 - MathX.smooth(r, 0.85, 1));
+      const i = 4 * (y * w + x); im.data[i] = im.data[i + 1] = im.data[i + 2] = 255; im.data[i + 3] = Math.round(255 * a);
+    }
+    c.putImageData(im, 0, 0);
+  }), { repeat: false });
+  const mirach = new THREE.Sprite(new THREE.SpriteMaterial({ map: mirTex, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, transparent: true }));
+  mirach.visible = false; mirach.renderOrder = 3; scene.add(mirach);
   // ---- particles: flames (additive), smoke and steam (normal)
   const flames = ucFlames(scene, 5000), fire = ucPuffs(scene, 3000, { additive: true, soft: 2.2 });
   const smoke = ucPuffs(scene, 9000, { soft: 1.6 });
@@ -327,6 +338,7 @@ UC_SETS.garden = (app) => {
   P.scopeHead.updateMatrixWorld(true); const scopePivot = new THREE.Vector3().setFromMatrixPosition(P.scopeHead.matrixWorld);
   const houseDef = ucDeformer((() => { const a = []; P.house.traverse((o) => { if (o.isMesh && !P.panes.includes(o) && !under(o, P.door)) a.push(o); }); return a; })());
   const puddle = new THREE.Mesh(new THREE.CircleGeometry(1, 28), ucStd('#c8ccd0', 0.18, 0.9)); puddle.rotation.x = -Math.PI / 2; puddle.position.set(G.scope[0], 0.012, G.scope[2]); scene.add(puddle);
+  ucPatch(puddle.material, KU.scope, inOff);   // (the aluminium puddle glows and fades into the sky like the tube did)
   const state = { scopeOn: false, houseOn: false };
 
   // ---- the frame's lights, for a white surface, in display units (the Sky's E × luminance)
@@ -374,7 +386,7 @@ UC_SETS.garden = (app) => {
     // ---- the fog: the sky's colour at the horizon; with the smoke a little thicker, and the colour of smoke in it
     const smokeK = MathX.smooth(n, ucAt(23, 38), ucAt(23, 43)) * (1 - MathX.smooth(n, ucAt(23, 47), ucAt(23, 50)));
     { const sk = 1 - 0.4 * smokeK; scene.fog.color.setRGB(skyD * rgb[0] * sk * 1.02 + 0.06 * fill, skyD * rgb[1] * sk * 0.97 + 0.07 * fill, skyD * rgb[2] * sk * 0.9 + 0.1 * fill); }
-    scene.fog.density = 0.004 + 0.005 * smokeK;
+    scene.fog.density = KITCHEN.includes(shot.mode) ? 0.0025 + 0.0025 * smokeK : 0.004 + 0.005 * smokeK;
     // the far ground (below the dome's horizon): the sky's light off it, later its own glow
     { const eq = KU.grass.uEq.value, gl = 0.15 * E * Ss.Lavg + gB; sky.domeU.uGround.value.setRGB(ucLerp(gl * gc[0] * 0.3 + 0.15 * E * Ss.Lavg * rgb[0], skyD * rgb[0], eq), ucLerp(gl * gc[1] * 0.3 + 0.15 * E * Ss.Lavg * rgb[1], skyD * rgb[1], eq), ucLerp(gl * gc[2] * 0.3 + 0.15 * E * Ss.Lavg * rgb[2], skyD * rgb[2], eq)); }
 
@@ -404,6 +416,7 @@ UC_SETS.garden = (app) => {
         });
         state.scopeOn = true;
       } else if (state.scopeOn) { scopeDef.reset(); state.scopeOn = false; }
+      P.scope.visible = m2 < 0.9;   // (once it has run flat, the puddle alone stands for it)
       puddle.visible = m1 > 0.3; puddle.scale.setScalar(0.08 + 0.25 * m1 + 0.4 * m2); }
     // ---- the panes sag (the glass softens at 950 K: it flows down, a gap opens at the top)
     { const a = MathX.smooth(n, UC_N.glassSoft - 8, UC_N.glassSoft + 110) * 0.9 + 0.1 * MathX.smooth(n, UC_N.glassSoft + 110, UC_N.glassSoft + 300);
@@ -525,7 +538,7 @@ UC_SETS.garden = (app) => {
   const k01 = (t, a, b, e = Ease.inOutSine) => ucK(t, a, b, e);
   const CAM = {
     cold(t) { const k = k01(t, 0, UC.titleShot, Ease.outSine), d = dr(t, 0.006, 2); look(add(ucV([-1.2, 1.62, 3.15], [-1.52, 1.58, 1.3], k), d), [-1.1, 1.05 + 0.2 * k, -9], 50 - 4 * k); },
-    title(t) { const k = k01(t, UC.titleShot, UC.frost0, Ease.linear), d = dr(t); look(add([0.5 - 0.2 * k, 1.66, -1.1 - 0.9 * k], d), [-0.5, 4.0 - 0.3 * k, -17], 58); },
+    title(t) { const k = k01(t, UC.titleShot, UC.frost0, Ease.linear), d = dr(t); look(add([0.5 - 0.2 * k, 1.66, -1.1 - 0.9 * k], d), [-0.5, 6.3 - 0.3 * k, -17], 58); },
     frost0(t) { const k = k01(t, UC.frost0, UC.rule, Ease.linear), b = G.bath, d = dr(t, 0.004, 4); look(add([b[0] - 0.62 + 0.08 * k, 1.42 - 0.08 * k, b[2] + 0.95 - 0.12 * k], d), [b[0] + 0.05, 0.9, b[2] - 0.15], 40); },
     begin(t) { const k = k01(t, UC.begin, UC.mirach, Ease.linear), p = [2.15, 1.5, -4.75], d = dr(t, 0.004, 5); look(add(p, d), skyAt(104 - 3 * k, 27 + 3 * k, p), 56); },
     mirach(t) { const k = k01(t, UC.mirach, UC.squeeze, Ease.linear), p = [0.6, 1.62, -5]; look(p, skyAt(UC_SKY.named[6][1] - 1.0 + 0.6 * k, UC_SKY.named[6][2] - 0.6, p), 24 - 2 * k); },
@@ -536,9 +549,9 @@ UC_SETS.garden = (app) => {
     glow(t) { const k = k01(t, UC.glow, UC.ebl, Ease.linear), p = [0.2, 1.3, -8.2]; look(p, skyAt(276 + 6 * k, 68 - 2 * k, p), 82 - 2 * k); },
     ebl(t) { const k = k01(t, UC.ebl, UC.city, Ease.linear), p = [0.2, 1.62, -6.2], d = dr(t, 0.004, 7); look(add(p, d), skyAt(160 - 8 * k, 26 - 2 * k, p), 60); },
     city(t) { const k = k01(t, UC.city, UC.drown, Ease.linear), d = dr(t, 0.008, 8); look(add([-1.1 + 0.2 * k, 1.62, -0.9 - 0.8 * k], d), [0.6, 1.8, -16], 56); },
-    drown(t) { const k = k01(t, UC.drown, UC.close, Ease.linear), p = [0.3, 1.62, -5.2]; look(p, skyAt(118 + 6 * k, 23 + 3 * k, p), 58); },
+    drown(t) { const k = k01(t, UC.drown, UC.frost, Ease.linear), p = [0.3, 1.62, -5.2]; look(p, skyAt(118 + 6 * k, 23 + 3 * k, p), 58); },
     frost(t) { const k = k01(t, UC.frost, UC.zero, Ease.linear), f = G.frostAt; look([f[0] + 0.17 - 0.03 * k, 0.085 - 0.01 * k, f[2] + 0.2 - 0.04 * k], [f[0] - 0.02, 0.045, f[2] - 0.02], 30); },
-    zero(t) { const k = k01(t, UC.zero, UC.warm, Ease.inOutSine), p = [0.6, 1.45, -9.2 + 0.4 * k]; look(p, skyAt(292 + 4 * k, 63 + 5 * k, p), 66); },
+    zero(t) { const k = k01(t, UC.zero, UC.warm, Ease.inOutSine), p = [0.6, 1.45, -9.2 + 0.4 * k]; look(p, skyAt(262 + 8 * k, 38 + 6 * k, p), 70); },
     warm(t) {
       const k = k01(t, UC.catRun - 0.2, UC.catRun + 1.5, Ease.inOutSine), d = dr(t, 0.006, 9);
       look(add([0.25, 0.95, -1.75], d), ucV([-0.3, 0.35, -7.5], [1.6, 0.25, -0.2], k), 52 - 4 * k);
@@ -560,16 +573,14 @@ UC_SETS.garden = (app) => {
     melt(t) { const k = k01(t, UC.melt, UC.vanish, Ease.linear), d = dr(t, 0.006, 18); look(add([0.9 - 0.2 * k, 1.6, -10.2 + 0.6 * k], d), [-0.6, 3.0, 0], 50); },
     vanish(t) { const k = k01(t, UC.vanish, UC.bigbang, Ease.linear), d = dr(t, 0.008, 20); look(add([2.3 - 0.6 * k, 1.65, -9.6 + 1.2 * k], d), [-0.6, 1.9, -0.5], 60); },
     // (up, where nothing is left: only the light)
-    bigbang(t) { const k = k01(t, UC.bigbang, UC.sun, Ease.linear), p = [0.2, 1.6, -7], d = dr(t, 0.006, 19); look(add(p, d), skyAt(148 + 4 * k, 52 + 8 * k, p), 62); },
+    bigbang(t) { const k = k01(t, UC.bigbang, UC.sun, Ease.linear), p = [0.2, 1.6, -7], d = dr(t, 0.006, 19); look(add(p, d), skyAt(148 + 4 * k, 52 + 8 * k, p), 62 - 14 * k); },
     sun(t) { const k = k01(t, UC.sun, UC.last, Ease.linear), p = [0.2, 1.6, -7]; look(p, skyAt(170 + 10 * k, 18 + 30 * k, p), 64); },
     last(t) { const k = k01(t, UC.last, UC.midnight, Ease.linear), p = [0.2, 1.6, -7]; look(p, skyAt(180 + 6 * k, 48 + 10 * k, p), 64 - 10 * k); },
-    same(t) { const k = k01(t, UC.same, UC.question, Ease.linear), d = dr(t, 0.008, 21); look(add([0.6 - 0.3 * k, 1.6, -2.4 - 0.8 * k], d), [-0.2, 2.6, -17], 58); },
     after(t) { const k = k01(t, UC.question, UC.end, Ease.linear), d = dr(t); look(add([0.3 - 0.15 * k, 1.64, -1.5 - 0.6 * k], d), [-0.4, 4.2, -17], 58); },
   };
   // the night time each shot shows
   function nightFor(t, shot) {
     if (shot.mode === 'after') return ucAt(19, 29, 25) + (t - UC.question);
-    if (shot.mode === 'same') return ucAt(23, 49, 35) + (t - UC.same) * 3;
     return ucNight(t);
   }
 
@@ -578,8 +589,15 @@ UC_SETS.garden = (app) => {
     frame(t, shot, app) {
       const n = nightFor(t, shot), vt = ucVis(t);
       (CAM[shot.mode] || CAM.title)(t);
-      sky.update(Math.max(0, n), vt, cam, app.renderH || 1080, { lens: shot.mode === 'mirach' ? 3 : 1, glow: lampFade(ucSkyNow(Math.max(0, n)).E) });
-      sky.domeU.uRip.value = shot.mode === 'bigbang' ? MathX.smooth(t, UC.ripples - 0.3, UC.ripples + 1.6) : 0;
+      sky.update(Math.max(0, n), vt, cam, app.renderH || 1080, { lens: shot.mode === 'mirach' ? 3 : 1, starSize: shot.mode === 'mirach' ? 3.2 : 1, starGain: shot.mode === 'mirach' ? 1.5 : 1, glow: lampFade(ucSkyNow(Math.max(0, n)).E) });
+      sky.domeU.uRip.value = shot.mode === 'bigbang' ? MathX.smooth(t, UC.bigbang + 0.2, UC.bigbang + 2.5) * (0.55 + 0.45 * MathX.smooth(t, UC.ripples - 0.3, UC.ripples + 1.2)) : 0;
+      // Mirach's glow (the eyepiece shot only): 3,840 K red at first, white once its light is squeezed ×1.5
+      mirach.visible = shot.mode === 'mirach';
+      if (mirach.visible) {
+        const c = ucBBRGB(3840 * ucShrink(Math.max(0, n))), mx = Math.max(c[0], c[1], c[2]), tw = 1 + 0.06 * Math.sin(vt * 23) + 0.04 * Math.sin(vt * 37 + 1);
+        mirach.position.set(...sky.at('MIRACH', 300)); mirach.scale.setScalar(13 * tw);
+        mirach.material.color.setRGB(2.6 * Math.pow(c[0] / mx, 1.5), 2.6 * Math.pow(c[1] / mx, 1.5), 2.6 * Math.pow(c[2] / mx, 1.5));
+      }
       const W = world(t, n, vt, shot);
       frostMacro(n, shot.mode === 'frost');
       poseCat(t, n, vt, shot);
@@ -600,7 +618,12 @@ UC_SETS.garden = (app) => {
       if (KITCHEN.includes(shot.mode)) { p.vignette = 0.6; p.bloom = 0.5; }
       // (the long look at the Moon: your eyes adapt to the bright sky around it, so the last of its contrast shows)
       if (shot.mode === 'shed') { const k = k01(t, UC.moonGo - 1.5, UC.moonGo + 0.1, Ease.inOutSine); p.exposure *= ucLerp(1, 0.32, k); p.vignette = ucLerp(0.6, 0.35, k); }
-      if (shot.mode === 'cold') { p.fade = Math.max(p.fade, 1 - MathX.smooth(t, 0, 0.6)); }
+      // (the cold open: the window blazes, brighter than noon; the kitchen is lit by it)
+      if (shot.mode === 'cold') { p.fade = Math.max(p.fade, 1 - MathX.smooth(t, 0, 0.6)); p.exposure *= 1.75; p.bloomThreshold = 1.0; p.bloom = 0.65; }
+      if (shot.mode === 'noon') p.exposure *= 1.3;
+      // (from 11:47 the light is the afterglow's: your eyes adapt to it, so its colour shows, deep orange, then white)
+      { const hot = MathX.smooth(n, ucAt(23, 46, 30), ucAt(23, 49, 30)) * (shot.mode === 'sun' ? 0.3 : shot.mode === 'last' ? 0.4 : 1);
+        p.exposure *= ucLerp(1, 0.3, hot); p.saturation = ucLerp(p.saturation, 1.3, hot); p.contrast += 0.06 * hot; }   // (dim enough that red never clips: orange stays orange, not lemon)
       if (['bigbang', 'sun', 'last'].includes(shot.mode)) { p.vignette = 0.25; p.contrast = 1.0; p.uneven = 0.12; }
       if (shot.mode === 'last') {
         // the last second: the light shimmers; at the end, physics runs out (a flash, then black)
@@ -619,11 +642,10 @@ function ucGardenLabels(t, set) {
   const s = ucShotAt(t), sky = set.sky, n = set._n ?? ucNight(t), W = StoryHUD.win, ss = ucShrink(Math.max(0, n));
   const looks = (name) => { const st = sky.starNow(name, ss); return 'LOOKS ' + ucThousands(Math.round((st.T - 273.15) / 10) * 10) + ' °C'; };
   if (s.mode === 'mirach') return [{ p: sky.at('MIRACH', 300), text: 'MIRACH', sub: n < ucAt(20, 30) ? 'A RED STAR · ' + looks('MIRACH') : looks('MIRACH'), a: W(t, UC.mirach + 0.4, UC.squeeze, 0.5, 0.3) }];
-  if (s.mode === 'squeeze') return [{ p: sky.at('MIRACH', 300), text: 'MIRACH', sub: looks('MIRACH'), a: W(t, UC.squeeze, UC.half - 0.3, 0.2, 0.4) * (1 - MathX.smooth(t, UC.squeeze + 2.5, UC.squeeze + 3.5)) }];
+  if (s.mode === 'squeeze') return [{ p: sky.at('MIRACH', 300), text: 'MIRACH', sub: looks('MIRACH'), a: W(t, UC.squeeze, UC.half - 0.3, 0.2, 0.4) * (1 - MathX.smooth(t, UC.squeeze + 0.2, UC.squeeze + 0.8)) }];
   if (s.mode === 'half') return ['SCHEAT', 'MARKAB', 'ENIF'].map((k, i) => ({ p: sky.at(k, 300), text: k, sub: looks(k), a: W(t, ucCap('half', 1).show - 0.2 + i * 0.25, UC.more - 0.2, 0.4, 0.3) }));
   if (s.mode === 'zero') return [{ p: sky.at('SADR', 300), text: 'THE MILKY WAY', sub: 'ITS DARK DUST, GLOWING', a: W(t, ucCap('zero', 1).show + 0.3, UC.warm - 0.2, 0.5, 0.3) }];
   if (s.mode === 'shed' && t < UC.moonGo - 0.6) return [{ p: [UC_G.scope[0], 1.45, UC_G.scope[2]], text: 'YOUR TELESCOPE', sub: 'ALUMINIUM · MELTS AT 660 °C', a: W(t, UC.shed + 0.3, UC.moonGo - 0.6, 0.4, 0.3) }];
-  if (s.mode === 'bath') return [{ p: [UC_G.bath[0], 1.25, UC_G.bath[2]], text: 'THE BIRD BATH', sub: '100 °C · BOILING', a: W(t, UC.bath + 0.5, UC.red - 0.3, 0.4, 0.3) }];
   if (s.mode === 'bigbang') { const c = set.camera, f = new THREE.Vector3(0, 0, -1).applyQuaternion(c.quaternion), u = new THREE.Vector3(0, 1, 0).applyQuaternion(c.quaternion);
     return [{ p: [c.position.x + 50 * f.x + 9 * u.x, c.position.y + 50 * f.y + 9 * u.y, c.position.z + 50 * f.z + 9 * u.z], text: 'ITS RIPPLES', sub: 'SHOWN 10,000× STRONGER · REALLY 1 PART IN 100,000', a: W(t, UC.ripples + 0.6, UC.sun - 0.3, 0.5, 0.3) }]; }
   return [];

@@ -163,8 +163,9 @@ class UcSky {
           // the afterglow's ripples (one part in 100,000), drawn exaggerated when uRip > 0, in the colours of the
           // published maps: cooler blue, warmer red
           if (uRip > 0.0) { float v = fbm(d * 5.0 + 11.0) + 0.55 * fbm(d * 16.0 + 4.0) - 0.78;
-            vec3 pc = v < 0.0 ? mix(vec3(1.0, 0.95, 0.85), vec3(0.25, 0.45, 1.0), smoothstep(0.0, 0.3, -v)) : mix(vec3(1.0, 0.95, 0.85), vec3(1.0, 0.38, 0.12), smoothstep(0.0, 0.3, v));
-            col = mix(col, dot(col, vec3(0.2126, 0.7152, 0.0722)) * pc * 1.1, uRip * 0.85); }
+            // (a tint on the sky's own colour, so the orange stays orange: cooler patches bluer, warmer ones redder)
+            vec3 pc = v < 0.0 ? mix(vec3(1.0), vec3(0.5, 0.7, 1.8), smoothstep(0.0, 0.2, -v)) : mix(vec3(1.0), vec3(1.3, 0.75, 0.45), smoothstep(0.0, 0.2, v));
+            col *= mix(vec3(1.0), pc, uRip); }
           // below the horizon: the ground far off (lit by the sky)
           if (h < 0.0) col = mix(col, uGround, smoothstep(0.0, -0.06, h));
           gl_FragColor = vec4(col * uK, 1.0);

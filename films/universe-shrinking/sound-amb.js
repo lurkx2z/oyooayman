@@ -27,7 +27,6 @@ function ucPl() {
 function ucSoundNight(t) {
   const s = ucShotAt(t);
   if (s.mode === 'after') return ucAt(19, 29, 25) + (t - UC.question);
-  if (s.mode === 'same') return ucAt(23, 49, 35) + (t - UC.same) * 3;
   return Math.max(0, ucNight(t));
 }
 // the last second slowed down: how much of the sound is stretched into a throb

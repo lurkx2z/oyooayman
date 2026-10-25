@@ -64,6 +64,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Long-form (16:9, voiceless): *What if the universe kept shrinking and couldn't stop?*** — open
+> `universe-shrinking.html` (4:44). One freezing night in your back garden: from 7:30 the universe shrinks, faster and
+> faster, to a Big Crunch at midnight. Starlight is squeezed (red Mirach turns white), the dark between the stars
+> glows, the frost melts, space passes body heat and boiling, the garden catches fire with no spark, your house melts
+> and everything vanishes into the light, the Big Bang's light, the last second, midnight, then what's real (DESI 2025).
+> Every clock time is the moment it really happens under the rule. Physics, shot list and reviews:
+> [`films/universe-shrinking/PLAN.md`](films/universe-shrinking/PLAN.md),
+> [`films/universe-shrinking/EPISODE_REPORT.md`](films/universe-shrinking/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
@@ -345,6 +354,19 @@ films/sim/aware.js       NPC_AWARE_01: the hero head (eyes that aim at the lens,
 films/sim/glitch.js      wireframe, debug labels, LOD pop, flat tree, checker, the ripple, the crack and the void
 films/sim/audio.js       the world's sound on its own clock (repeated, paused, reversed, replayed) + the film's sounds
 films/sim/film.js        FILM hooks: the fake pause, the exact replay of the opening, the composite, the interface, the grade
+```
+
+Film: *What if the universe kept shrinking and couldn't stop?* (`universe-shrinking.html`, 16:9):
+
+```
+films/universe-shrinking/PLAN.md        the idea, every number (physics.js), honesty labels, retention design, sound
+films/universe-shrinking/CAPTIONS.md    the captions (the film is told by them); build-timing.cjs times them into timing.js
+films/universe-shrinking/script.js      ★ every beat from the captions; film time → night time (the clock, the last second)
+films/universe-shrinking/physics.js     the shrink, the sky's light and heat, what warms, burns and melts, and when
+films/universe-shrinking/garden*.js     your back garden (build + what the sky does to it: frost, fire, melting, vanishing)
+films/universe-shrinking/sky.js         the sky (stars squeezed, the galaxies' glow, the afterglow and its ripples)
+films/universe-shrinking/cosmos.js      the galaxies (illustrated), hud.js the readouts and diagrams, cat.js the cat
+films/universe-shrinking/sound-*.js     score, ambience, effects (mix.js levels); render-gpu.cjs the final render on a PC
 ```
 
 Film: *What if oxygen suddenly disappeared?* (`index.html`):

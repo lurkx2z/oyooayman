@@ -23,8 +23,7 @@ const UC_SHOTS = [
   { id: 'C1', t0: UC.glow, t1: UC.ebl, set: 'garden', mode: 'glow' },
   { id: 'C2', t0: UC.ebl, t1: UC.city, set: 'garden', mode: 'ebl' },
   { id: 'C3', t0: UC.city, t1: UC.drown, set: 'garden', mode: 'city' },
-  { id: 'C4', t0: UC.drown, t1: UC.close, set: 'garden', mode: 'drown' },
-  { id: 'C5', t0: UC.close, t1: UC.frost, set: 'cosmos', mode: 'close' },
+  { id: 'C4', t0: UC.drown, t1: UC.frost, set: 'garden', mode: 'drown' },
   // 4 — the heat
   { id: 'D1', t0: UC.frost, t1: UC.zero, set: 'garden', mode: 'frost' },
   { id: 'D2', t0: UC.zero, t1: UC.warm, set: 'garden', mode: 'zero' },
@@ -50,8 +49,7 @@ const UC_SHOTS = [
   // 8 — is any of this real; the question
   { id: 'H1', t0: UC.real, t1: UC.clue, set: 'cosmos', mode: 'real' },
   { id: 'H2', t0: UC.clue, t1: UC.turn, set: 'cosmos', mode: 'map' },
-  { id: 'H3', t0: UC.turn, t1: UC.same, set: 'cosmos', mode: 'turn' },
-  { id: 'H4', t0: UC.same, t1: UC.question, set: 'garden', mode: 'same' },
+  { id: 'H3', t0: UC.turn, t1: UC.question, set: 'cosmos', mode: 'turn' },
   { id: 'H5', t0: UC.question, t1: 1e9, set: 'garden', mode: 'after' },
 ];
 // every cut, for the 2-frame dip (the shot starts, plus a set's own cuts())

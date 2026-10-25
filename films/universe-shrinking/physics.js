@@ -252,7 +252,7 @@ function ucSkyNow(n) {
 }
 
 // ---- the milestones of the temperature of space (for the readout's NEXT line): [K, what]
-const UC_MILESTONES = [[273.15, 'ICE MELTS'], [310.15, 'BODY HEAT'], [373.15, 'WATER BOILS'], [933.47, 'ALUMINIUM MELTS'], [1811, 'IRON MELTS'],
+const UC_MILESTONES = [[273.15, 'ABOVE FREEZING'], [310.15, 'BODY HEAT'], [373.15, 'HOT ENOUGH TO BOIL WATER'], [933.47, 'HOT ENOUGH TO MELT ALUMINIUM'], [1811, 'HOT ENOUGH TO MELT IRON'],
   [3000, 'THE BIG BANG\'S LIGHT, AS IT WAS MADE'], [5772, 'THE SURFACE OF THE SUN'], [1.57e7, 'THE CORE OF THE SUN']];
 // the night time space reaches temperature T (K)
 function ucNightForK(T) { const S = T / UCP.T0; return S < 1e5 ? ucNightForS(S) : UCP.R - ucLeftForS(S); }

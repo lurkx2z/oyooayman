@@ -1,12 +1,11 @@
 /* =====================================================================
-   COSMOS — the galaxies, illustrated (a god's-eye view; everything here is labelled ILLUSTRATION). One set, seven
+   COSMOS — the galaxies, illustrated (a god's-eye view; everything here is labelled ILLUSTRATION). One set, six
    shots (modes):
      rule     space today, growing (a field of galaxies drifting apart; a ruler between two of them); at 7:30 it turns
               round and shrinks, faster and faster
      held     in on one galaxy: it keeps its size while the gaps close; then everything runs together (midnight)
      promise  the history of the universe, rewound: the galaxies crowd together, turn young and blue, and dissolve into
               the glow everything came from (the Big Bang's light, 380,000 years in)
-     close    out there tonight: the galaxies close in and crash together; light leaving them now can't reach you
      real     the real universe: growing, a little faster every year
      map      the biggest 3D map of the universe (DESI, 2025): two fans of galaxies, you at the point
      turn     a quiet field under the HUD's diagram (the size of the universe, past and future)
@@ -84,12 +83,11 @@ function ucGalaxies(scene, atlas, max) {
   };
 }
 
-// the growth in the illustrations (the size of space, × today's): rule, held, promise, close, real
+// the growth in the illustrations (the size of space, × today's): rule, held, promise, real
 const UC_COS = {
   rule(t) { const g = Math.exp(0.025 * Math.max(0, Math.min(t, UC.shrinkAt) - UC.rule)), u = Math.max(0, t - UC.shrinkAt); return g * Math.exp(-(0.03 * u + 0.0045 * u * u * u)); },
   held(t) { const a0 = UC_COS.rule(UC.held), end = UC.promise - 0.25, u = MathX.clamp((t - UC.held) / (end - UC.held), 0, 1); return a0 * Math.pow(1 - u, 1.33) + 1e-4; },
   promise(t) { const u = MathX.clamp((t - UC.promise) / (UC.begin - UC.promise), 0, 1); return Math.exp(-4.2 * Math.pow(u, 1.3)); },
-  close(t) { const u = Math.max(0, t - UC.close); return Math.exp(-(0.045 * u + 0.0012 * u * u * u)); },
   real(t) { const u = Math.max(0, t - UC.real); return Math.exp(0.012 * u + 0.0004 * u * u); },
 };
 
@@ -104,17 +102,10 @@ UC_SETS.cosmos = (app) => {
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
     bg.add(new THREE.Points(g, new THREE.PointsMaterial({ size: 1.6, sizeAttenuation: false, vertexColors: true, transparent: true, depthWrite: false, fog: false }))); }
   const bgMat = bg.children[0].material;
-  // the ruler (rule), the light leaving a galaxy (close), the afterglow in front of the lens (promise)
+  // the ruler (rule), the afterglow in front of the lens (promise)
   const rulerM = new THREE.LineDashedMaterial({ color: '#ffd7a8', dashSize: 0.06, gapSize: 0.05, transparent: true, depthWrite: false });
   const rulerG = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(1, 0, 0)]);
   const ruler = new THREE.Line(rulerG, rulerM); ruler.renderOrder = 7; scene.add(ruler);
-  const ringU = { uA: { value: 0 }, uC: { value: new THREE.Color('#bfe0ff') } };
-  const ring = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 32), new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, uniforms: ringU,
-    vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * mv; }',
-    fragmentShader: 'uniform float uA; uniform vec3 uC; varying vec3 vN; varying vec3 vV; void main(){ float f = 1.0 - abs(dot(vN, vV)); gl_FragColor = vec4(uC * (0.01 + 0.6 * pow(f, 6.0)) * uA, 1.0); }',
-  }));
-  ring.renderOrder = 4; scene.add(ring);
   const glowMat = new THREE.MeshBasicMaterial({ map: ucGlowTex(), transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, color: new THREE.Color(0, 0, 0) });
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), glowMat); glow.renderOrder = 9; glow.position.set(0, 0, -2); cam.add(glow);
   // ---- the DESI map: two fans of points (galaxies by distance: bright nearby galaxies, red galaxies, young blue galaxies,
@@ -151,10 +142,12 @@ UC_SETS.cosmos = (app) => {
   // draw the field at scale a; o.young: bluer, brighter (the young universe); o.merge: brighter where they crowd
   function field(a, o = {}) {
     gal.begin();
-    const cx = cam.position.x, cy = cam.position.y, cz = cam.position.z, yg = o.young || 0;
+    const cx = cam.position.x, cy = cam.position.y, cz = cam.position.z, yg = o.young || 0, ball = MathX.smooth(a, 0.35, 0.06);
     for (const f of FIELD) {
       const x = f.p[0] * a, y = f.p[1] * a, z = f.p[2] * a;
-      const d = Math.hypot(x - cx, y - cy, z - cz), near = MathX.smooth(d, 0.08, 0.45), far = 1 - MathX.smooth(d, 14, 22);
+      // (as it all runs together, only a round patch of the lattice is drawn, so the crowd is a ball, not the lattice's box)
+      const rc = Math.hypot(f.p[0], f.p[1], f.p[2]), inBall = 1 - ball * MathX.smooth(rc, 3.5, 7);
+      const d = Math.hypot(x - cx, y - cy, z - cz), near = MathX.smooth(d, 0.08, 0.45), far = (1 - MathX.smooth(d, 14, 22)) * inBall;
       const r = 1 - 0.3 * yg, g = (0.96 + 0.06 * f.warm) * (1 - 0.1 * yg), b = (0.92 + 0.14 * (1 - f.warm)) * (1 + 0.25 * yg);
       gal.add(x, y, z, f.s * (1 - 0.35 * yg), f.b * near * far * (o.k ?? 1), r, g, b, f.tile, f.rot);
     }
@@ -168,11 +161,10 @@ UC_SETS.cosmos = (app) => {
       ucCam(cam, ucV(ucV(p0, p1, k), p2, out), ucV(ucV([0, 0, -6], A, k), [0, 0, 0], out), ucLerp(ucLerp(52, 34, k), 46, out));
     },
     promise(t) { const k = ucK(t, UC.promise, UC.begin, Ease.inOutSine), d = ucDrift(t, 0.03, 0.2, 7); ucCam(cam, [0.2 + d[0], 0.3 + d[1], 2.4 - 1.6 * k], [0, 0, -4], 50 + 6 * k, -4 * k); },
-    close(t) { const k = ucK(t, UC.close, UC.frost, Ease.linear), d = ucDrift(t, 0.04, 0.2, 8); ucCam(cam, [0.5 + d[0] - 0.6 * k, 0.4 + d[1], 1.9 - 1.1 * k], [0, 0, -3], 50); },
     real(t) { const k = ucK(t, UC.real, UC.clue, Ease.linear), d = ucDrift(t, 0.05, 0.2, 9); ucCam(cam, [0.6 + d[0] - 1.0 * k, 0.3 + d[1], 2.6 - 1.2 * k], [0.2 - 0.6 * k, 0, -8], 50); },
     // (from above, the way the map is published: a slow drift in, turning a little)
     map(t) { const k = ucK(t, UC.clue, UC.turn, Ease.inOutSine), a = 0.25 - 0.3 * k; ucCam(cam, [Math.sin(a) * 6.5, 25 - 7 * k, Math.cos(a) * 6.5], [0, 0, 0], 50); },
-    turn(t) { const k = ucK(t, UC.turn, UC.same, Ease.linear), d = ucDrift(t, 0.03, 0.2, 11); ucCam(cam, [0.3 + d[0], 0.4 + d[1], 3.0 - 0.6 * k], [0, 0, -6], 52); },
+    turn(t) { const k = ucK(t, UC.turn, UC.question, Ease.linear), d = ucDrift(t, 0.03, 0.2, 11); ucCam(cam, [0.3 + d[0], 0.4 + d[1], 3.0 - 0.6 * k], [0, 0, -6], 52); },
   };
 
   return {
@@ -180,24 +172,19 @@ UC_SETS.cosmos = (app) => {
     frame(t, shot) {
       (CAM[shot.mode] || CAM.rule)(t);
       bg.position.copy(cam.position);
-      ruler.visible = false; ring.visible = false; glow.visible = false; map.visible = false; youDot.visible = false; bgMat.opacity = 1;
+      ruler.visible = false; glow.visible = false; map.visible = false; youDot.visible = false; bgMat.opacity = 1;
       const m = shot.mode;
       if (m === 'rule' || m === 'held') {
-        const a = UC_COS[m](t); field(a, { k: m === 'held' ? 1 + 1.5 * MathX.smooth(t, UC.promise - 1.6, UC.promise - 0.2) : 1 });
+        const a = UC_COS[m](t); field(a, { k: m === 'held' ? 1 + 0.7 * MathX.smooth(t, UC.promise - 1.6, UC.promise - 0.2) : 1 });
         const A = new THREE.Vector3(...RA.p).multiplyScalar(a), B = new THREE.Vector3(...RB.p).multiplyScalar(a);
         if (m === 'rule') { rulerG.setFromPoints([A, B]); ruler.computeLineDistances(); ruler.visible = true; rulerM.opacity = ucWin(t, UC.rule + 0.6, UC.held + 0.1, 0.5, 0.3); }
         state.ruler = [(A.x + B.x) / 2, (A.y + B.y) / 2 + 0.22, (A.z + B.z) / 2]; state.rulerLy = 100 * a; state.hero = [A.x, A.y + 0.2 * Math.max(0.3, a), A.z]; state.a = a;
       } else if (m === 'promise') {
         const a = UC_COS.promise(t), u = MathX.clamp((t - UC.promise) / (UC.begin - UC.promise), 0, 1);
-        field(a, { young: MathX.smooth(u, 0.2, 0.8), k: 1 + 1.2 * MathX.smooth(u, 0.4, 0.9) });
         // the afterglow: everything dissolves into it (it fills the lens in the last seconds)
         const gk = MathX.smooth(t, ucCap('promise', 1).show - 0.6, UC.begin - 0.4);
+        field(a, { young: MathX.smooth(u, 0.2, 0.8), k: (1 + 0.6 * MathX.smooth(u, 0.4, 0.8)) * (1 - 0.85 * gk) });
         glow.visible = gk > 0; glow.scale.set(5, 3, 1); glowMat.color.setRGB(1.25 * gk, 1.0 * gk, 0.9 * gk); bgMat.opacity = 1 - gk;
-      } else if (m === 'close') {
-        const a = UC_COS.close(t); field(a, { k: 1 + 0.8 * MathX.smooth(t, UC.crashAt - 1, UC.crashAt + 2) });
-        // the light leaving one galaxy now: a shell that grows far slower than the galaxies close in
-        const lt = ucCap('close', 2).show - 0.6;
-        if (t > lt) { const g = FIELD[300 % FIELD.length]; ring.visible = true; ring.position.set(g.p[0] * a, g.p[1] * a, g.p[2] * a); ring.scale.setScalar(0.08 + 0.06 * (t - lt)); ringU.uA.value = MathX.smooth(t, lt, lt + 0.6); state.ring = [g.p[0] * a, g.p[1] * a + 0.3, g.p[2] * a]; }
       } else if (m === 'real') {
         field(UC_COS.real(t), { k: MathX.smooth(t, UC.real, UC.real + 1.0) });
       } else if (m === 'map') {
@@ -216,7 +203,6 @@ UC_SETS.cosmos = (app) => {
       const s = ucShotAt(t), W = StoryHUD.win;
       if (s.mode === 'rule' && state.ruler) return [{ p: state.ruler, text: ucThousands(state.rulerLy) + ' MILLION LIGHT YEARS', a: W(t, UC.rule + 0.6, UC.held + 0.1, 0.5, 0.3) }];
       if (s.mode === 'held' && state.hero) return [{ p: state.hero, text: 'A GALAXY', sub: 'HELD TOGETHER · SAME SIZE', a: W(t, UC.held + 1.2, UC.runout - 0.3, 0.5, 0.4) }];
-      if (s.mode === 'close' && state.ring && t > ucCap('close', 2).show - 0.3) return [{ p: state.ring, text: 'ITS LIGHT, LEAVING NOW', sub: 'NEEDS MILLIONS OF YEARS · MIDNIGHT IS MINUTES AWAY', a: W(t, ucCap('close', 2).show, UC.frost - 0.2, 0.4, 0.3) }];
       if (s.mode === 'map') return [{ p: [0, 0.15, 0], text: 'YOU', a: W(t, UC.clue + 0.8, UC.turn - 0.2, 0.4, 0.3) }];
       return [];
     },

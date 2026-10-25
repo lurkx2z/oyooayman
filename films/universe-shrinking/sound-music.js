@@ -245,22 +245,12 @@ ucSound('music', 'score', function (ctx, bus, K) {
   for (let t = UC.ebl + 0.8, i = 0; t < UC.city - 0.3; i++, t += 0.9) M.bell(t, ['F6', 'D6', 'Bb5', 'A5'][i % 4], 0.07, Math.sin(i * 2.1) * 0.6);
   // ---- the city-bright sky; twilight at 11 p.m.: a pulse starts; the stars drowned out: their bells drop away
   {
-    const t0 = UC.city, t1 = UC.close + 0.3;
-    M.prog([[t0, C.Dm9], [cap('city', 1) - 0.2, C.Bbmaj7], [UC.drown, C.Gm9]], t1, 0.48, { cut: 900, cutTo: 3200, cutAt: UC.close });
-    ucPulse(ctx, M.bus, cap('city', 1) - 0.1, UC.close, ['D3', 'A3'], 0.36, 0.3, { cut: 500, cutTo: 1200, acc: 4, decay: 0.3, ramp: (u) => 0.4 + 0.6 * u });
-    arp(t0 + 0.3, UC.close - 0.2, ['D', 'F', 'A', 'C', 'E'], 0.3, (t) => 0.1 * (1 - ucEv(t, UC.drown, cap('drown', 1) + 1.5)), [6, 7]);
-    M.strings(UC.drown + 0.4, UC.close + 0.2, ['D6', 'E6', 'A6'], 0.04, { att: 3.0, rel: 0.5, cut: 9000, wave: 'sine', vib: 1 });   // the sky's glow, rising over them
+    const t0 = UC.city, t1 = UC.frost + 0.3;
+    M.prog([[t0, C.Dm9], [cap('city', 1) - 0.2, C.Bbmaj7], [UC.drown, C.Gm9]], t1, 0.48, { cut: 900, cutTo: 3200, cutAt: UC.frost });
+    ucPulse(ctx, M.bus, cap('city', 1) - 0.1, UC.frost - 0.2, ['D3', 'A3'], 0.36, 0.3, { cut: 500, cutTo: 1200, acc: 4, decay: 0.3, ramp: (u) => 0.4 + 0.6 * u });
+    arp(t0 + 0.3, UC.frost - 0.4, ['D', 'F', 'A', 'C', 'E'], 0.3, (t) => 0.1 * (1 - ucEv(t, UC.drown, cap('drown', 1) + 1.5)), [6, 7]);
+    M.strings(UC.drown + 0.4, UC.frost + 0.2, ['D6', 'E6', 'A6'], 0.04, { att: 3.0, rel: 0.5, cut: 9000, wave: 'sine', vib: 1 });   // the sky's glow, rising over them
   }
-  // ---- out there: the galaxies close in (drums, a roll); they crash; "their light will never reach you"
-  {
-    const tc = UC.crashAt;
-    M.strings(UC.close, UC.frost + 0.4, ['D1', 'A1', 'D2', 'Eb2'], 0.55, { att: 0.6, rel: 0.6, cut: 500, cutTo: 1100, cutAt: tc });
-    M.roll(UC.close + 0.6, tc, [[UC.close + 0.6, 0.04], [tc, 0.5]], 73);
-    M.drum(tc, 0.95, 36.7, 1.0, 1.4); M.drum(tc, 0.45, 49); M.piano(tc, 'D1', 0.42, 4, 0); M.piano(tc, 'Eb2', 0.28, 4, 0);
-    ucPulse(ctx, M.bus, tc, cap('close', 2), ['D2', 'Eb2'], 0.42, 0.38, { cut: 400, cutTo: 900, acc: 2, decay: 0.35 });
-    M.bellCut(cap('close', 2) + 0.2, 'A5', 0.26, 0.35, 0); M.bellCut(cap('close', 2) + 0.9, 'D5', 0.2, 0.35, 0);
-  }
-
   // ---- 4 · the frost melting: a sparse, falling piano; "that cold is gone": a low D
   M.strings(UC.frost, UC.zero + 0.4, ['D3', 'A3', 'E4'], 0.32, { att: 1.0, rel: 0.6, cut: 1200 });
   [['E6', 0.4], ['D6', 1.1], ['A5', 1.9], ['F5', 2.9]].forEach(([n, dt]) => M.piano(UC.frost + dt, n, 0.13, 2.4, 0.2, 0.6));
@@ -286,7 +276,7 @@ ucSound('music', 'score', function (ctx, bus, K) {
   // ---- 5 · the fire, from the kitchen: a low ostinato that grows; a hit as the leaves catch; "brighter than noon":
   //      a high bright cluster; the telescope: a dark low note; the Moon fading: a high note sinking into the pad
   {
-    const t0 = UC.steam, tp = UC.pretend, tl = ucW('leaves', 'fire').start;
+    const t0 = UC.steam, tp = UC.pretend, tl = ucW('leaves', 'burn').start;
     M.prog([[t0, C.Dm], [UC.leaves, C.Dm9], [UC.lawn, C.Bbmaj7], [UC.noon, C.Gm9], [UC.shed, C.Dm], [UC.glass, C.Gm9], [cap('glass', 0) + 1.6, C.Asus]], tp + 0.3, 0.5, { cut: 700, cutTo: 1600 });
     ucPulse(ctx, M.bus, t0 + 0.3, tp, ['D2', 'A2'], 0.42, 0.42, { cut: 380, cutTo: 1100, acc: 4, decay: 0.32, ramp: (u) => 0.45 + 0.55 * u });
     M.drum(tl, 0.75, 36.7, 1.2); M.piano(tl, 'D1', 0.36, 3.5, 0);
@@ -365,17 +355,14 @@ ucSound('music', 'score', function (ctx, bus, K) {
   M.strings(UC.real + 0.3, cap('real', 1) + 0.4, C.Dm9, 0.42, { att: 2.5, rel: 0.6, cut: 500, cutTo: 1400 });
   M.prog([[cap('real', 1) - 0.2, C.Bbmaj7], [cap('real', 1) + 1.8, C.F]], UC.clue + 0.4, 0.48, { cut: 1300 });
   M.bell(cap('real', 1) + 0.1, 'F5', 0.18, -0.2);
-  // ---- the clue: a question in the music (a soft pulse, an unresolved chord); "may be weakening": it thins
+  // ---- the clue: a question in the music (a soft pulse, an unresolved chord); "may be fading": it thins
   M.prog([[UC.clue, C.Gm9], [cap('clue', 1) - 0.2, C.Am7]], UC.turn + 0.4, 0.46, { cut: 1100, cutTo: 800, cutAt: UC.turn });
   ucPulse(ctx, M.bus, UC.clue + 0.4, UC.turn, ['G3', 'D4'], 0.4, 0.24, { cut: 1200, cutTo: 600, q: 2, acc: 4, decay: 0.3, ramp: (u) => 1 - 0.6 * u });
   ['D6', 'A5', 'F5'].forEach((n, i) => M.bell(cap('clue', 1) + 0.3 + i * 0.6, n, 0.16 - 0.03 * i, -0.3 + 0.3 * i));
-  // ---- the growth turns around: the theme's first notes, falling back; a Big Crunch in 20 billion years: a low D
-  M.prog([[UC.turn, C.Bbmaj7], [cap('turn', 1) - 0.2, C.Asus]], UC.same + 0.4, 0.48, { cut: 1100 });
+  // ---- the push becomes a pull: the theme's first notes, falling back; a Big Crunch in 20 billion years: a low D
+  M.prog([[UC.turn, C.Bbmaj7], [cap('turn', 1) - 0.2, C.Asus]], UC.question + 0.4, 0.48, { cut: 1100 });
   ['D5', 'A5', 'G5', 'E5', 'D5', 'A4'].forEach((n, i) => M.piano(UC.turn + 0.6 + i * 0.5, n, 0.15, 2, i % 2 ? 0.2 : -0.2, 0.4));
   M.drum(cap('turn', 1) + 0.1, 0.5, 36.7, 1.6); M.piano(cap('turn', 1) + 0.1, 'D2', 0.3, 3.5, 0);
-  // ---- billions of years, not four hours; the sky would end just like this: the theme slow, on the piano
-  M.prog([[UC.same, C.Dm9], [cap('same', 1) - 0.2, C.Bbmaj7]], UC.question + 0.4, 0.45, { cut: 1200, cutTo: 800 });
-  theme(UC.same + 0.6, [1.4, 1.2, 1.8], 0.2, { piano: true, dur: 2.8 });
 
   // ---- the question (7:29 again): light, the theme whole once more, and this time it lands on the octave, warm
   M.prog([[UC.question, C.F], [ucS('question') + 2.0, C.C], [cap('question', 1), C.Bbmaj7], [cap('question', 1) + 2.0, C.DmajBig]], UC.end + 1.4, 0.55, { cut: 1500, lastRel: 2.2 });

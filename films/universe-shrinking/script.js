@@ -47,8 +47,6 @@ UC.glow = ucS('glow') - 0.7;
 UC.ebl = ucS('ebl') - 0.3;
 UC.city = ucS('city') - 0.5;
 UC.drown = ucS('drown') - 0.45;
-UC.close = ucS('close') - 0.45;                        // out there (illustrated)
-UC.crashAt = ucCap('close', 1).show;
 // 4 — the heat
 UC.frost = ucS('frost') - 0.55;                        // macro: the frost melting
 UC.zero = ucS('zero') - 0.45;                          // the Milky Way, inside out
@@ -67,7 +65,7 @@ UC.shed = ucS('shed') - 0.4;
 UC.scopeAt = ucW('shed', 'melts').start;               // ★ the telescope melts
 UC.moonGo = ucCap('shed', 1).show;                     // the Moon fades into the sky
 UC.glass = ucS('glass') - 0.5;
-UC.pretend = ucCap('glass', 1).show - 0.2;
+UC.pretend = ucCap('glass', 1).show - 0.2;              // "Real glass would have cracked by now." (the music opens up)
 // 6 — the afterglow
 UC.bath = ucS('bath') - 0.6;
 UC.red = ucS('red') - 0.7;
@@ -79,8 +77,8 @@ UC.sun = ucS('sun') - 0.6;
 // 7 — the last second
 UC.last = ucS('last') - 0.6;
 UC.core = ucCap('last', 1).show;                       // 0.87 s to midnight: hotter than the Sun's core
-UC.nuclei = ucCap('last', 2).show;                     // 0.039 s: nuclei come apart
-UC.protons = ucCap('last', 3).show;                    // 0.0002 s: protons melt
+UC.nuclei = ucCap('last', 2).show;                     // 0.012 s: nuclei come apart (5 billion K)
+UC.protons = ucCap('last', 3).show;                    // 0.00014 s: protons melt (1.8 trillion K)
 UC.planck = ucCap('last', 4).show;                     // 10⁻¹⁹ s: physics runs out
 UC.midnight = ucE('last') + 0.75;                      // ★ black
 // 8 — is any of this real; the question
@@ -88,7 +86,6 @@ UC.real = ucS('real') - 1.0;
 UC.map = ucCap('real', 1).show - 0.3;                  // today's universe (illustrated)
 UC.clue = ucS('clue') - 0.4;                           // the 3D map
 UC.turn = ucS('turn') - 0.4;                           // the size of the universe, past and future
-UC.same = ucS('same') - 0.4;
 UC.question = ucS('question') - 0.6;
 UC.end = UCT.duration;
 
@@ -117,8 +114,7 @@ const UC_NKEYS = [
   [ucCap('city', 0).hide, ucAt(22, 32), 'lin'],
   [ucCap('city', 1).show + 0.1, ucAt(23, 0, 0), 'lin'],
   [ucE('city') + 0.5, ucAt(23, 1, 30), 'lin'],
-  [ucE('drown') + 0.5, ucAt(23, 12), 'lin'],
-  [ucE('close') + 0.6, ucAt(23, 24, 50), 'lin'],                  // (out there: the clock is off screen)
+  [ucE('drown') + 0.4, ucAt(23, 18), 'lin'],                      // (then a dash to 11:25, on the cut to the frost)
   [ucS('frost') + 0.1, ucAt(23, 25, 10), 'lin'],
   [ucCap('frost', 1).show, ucAt(23, 25, 44), 'lin'],              // the frost melts at 23:25:37
   [ucE('frost') + 0.4, ucAt(23, 26, 40), 'lin'],
@@ -156,8 +152,8 @@ const UC_NKEYS = [
   [UC.last - 0.1, UCP.R - 3, 'lin'],
   [UC.last + 0.7, UCP.R - 1.2, 'rip', 1.2],                       // the last second, slowed down
   [UC.core + 0.2, UCP.R - 0.873, 'rip', 0.873],                   // 15.7 million K
-  [UC.nuclei + 0.2, UCP.R - 0.0387, 'rip', 0.0387],               // 1 billion K
-  [UC.protons + 0.2, UCP.R, 'rip', 2.18e-4],                      // 1 trillion K
+  [UC.nuclei + 0.2, UCP.R - 0.0116, 'rip', 0.0116],               // 5 billion K: helium and heavier nuclei come apart
+  [UC.protons + 0.2, UCP.R, 'rip', 1.4e-4],                       // 1.8 trillion K: protons and neutrons melt into quarks
   [UC.planck + 0.3, UCP.R, 'rip', 1.69e-19],                      // the Planck temperature
   [UC.midnight - 0.2, UCP.R, 'lin', 1e-40],
   [UC.midnight, UCP.R, 'lin', 0],
@@ -200,7 +196,7 @@ const SCRIPT = {
   events: [
     { id: 's1', time: 0, label: '1 · 11:44 tonight' }, { id: 'title', time: UC.title[0], label: 'title' }, { id: 'rule', time: UC.rule, label: 'the rule' },
     { id: 'begin', time: UC.begin, label: '★ 7:30' }, { id: 's2', time: UC.mirach, label: '2 · the squeeze' }, { id: 'best', time: UC.best, label: 'the best sky' },
-    { id: 's3', time: UC.glow, label: '3 · the glow' }, { id: 'close', time: UC.close, label: 'out there' },
+    { id: 's3', time: UC.glow, label: '3 · the glow' },
     { id: 's4', time: UC.frost, label: '4 · the heat' }, { id: 'zero', time: UC.zeroAt, label: '0 °C' }, { id: 'in', time: UC.goIn, label: 'inside' },
     { id: 's5', time: UC.steam, label: '5 · the fire' }, { id: 'pretend', time: UC.pretend, label: 'pretend' },
     { id: 's6', time: UC.bath, label: '6 · the afterglow' }, { id: 'red', time: UC.red, label: 'the red sky' }, { id: 'bb', time: UC.bigbang, label: '3,000 K' },

@@ -1,6 +1,6 @@
 # PLAN — *What if the universe kept shrinking and couldn't stop?*
 
-16:9 long-form, 1920×1080, 30 fps, 5:04 (303.9 s). Voiceless, in the Slower light / Universe faster format (the
+16:9 long-form, 1920×1080, 30 fps, 4:44 (284.2 s). Voiceless, in the Slower light / Universe faster format (the
 owner's brief on 2026-10-25: the exact formula of those two films, a fresh escalation, and **retention first**: "people's
 watch time are almost half of the video length"). One quantity that keeps getting worse and can't stop (**the
 temperature of space**), a corner readout, short second-person serif captions with empty screen between them, one night
@@ -22,23 +22,24 @@ the Big Bang.
    white; at 9:14 the universe is half its size and every star looks twice as hot; stars you've never seen come out;
    at 10:00, 131,000 stars, the most beautiful sky anyone has ever seen.
 2. **The glow** (10:00–11:15): the dark between the stars glows (the light of every galaxy that ever shone, squeezed
-   into colours you can see); 10:30, a city's sky; 11:00, twilight at 11 p.m.; the stars drown. Out there the galaxies
-   close in and crash together.
+   into colours you can see); 10:30, a city's sky; 11:00, twilight at 11 p.m.; the stars drown.
 3. **The heat** (11:25–11:35): the frost melts; space reaches 0 °C and the Milky Way turns inside out (its dark dust
    lanes, warmed, outshine its stars); space passes body heat, then boiling. The cat goes in; so do you.
-4. **The fire** (11:36–11:46, from the kitchen window): the lawn steams; the dead leaves catch fire with no spark;
-   the lawn, the apple tree, the shed and the fence; brighter than noon; your telescope melts; the Moon fades into the
-   sky; the windows start to sag. "From here, pretend nothing can hurt you."
+4. **The fire** (11:36–11:46, from the kitchen window; labelled "from here, pretend nothing can hurt you"): the lawn
+   steams; the dead leaves start to burn with no spark; the lawn, the apple tree, the shed and the fence; brighter than
+   noon; your telescope melts; the Moon fades into the sky; the windows start to sag ("real glass would have cracked
+   by now").
 5. **The afterglow** (11:47–11:55): the bird bath boils (at 7:29 it was ice); the Big Bang's afterglow floods the sky;
-   your house melts; everything is as hot as the sky, so it vanishes into it (no shadows, no edges); 11:52, space is
+   your house starts to melt; everything becomes as hot as the sky, so it vanishes into it (no shadows, no edges); 11:52, space is
    2,700 °C: the light of the universe at 380,000 years, the way it looked when it was made; 11:55, the surface of the
    Sun in every direction.
-6. **The last second** (slowed down): hotter than the Sun's core, nuclei burst, protons melt, then physics runs out.
+6. **The last second** (slowed down): hotter than the Sun's core, nuclei burst, protons melt, then known physics runs
+   out (the readout freezes at the Planck temperature, 1.4 × 10³² °C).
    Midnight.
-7. **Is any of this real?** The universe is growing, faster every year (1998). But in 2025 the biggest 3D map (DESI)
-   found a clue that the push behind that growth may be weakening; if it weakens enough, the growth turns around; one
-   2025 study puts a Big Crunch about 20 billion years from now. "Billions of years, not four hours. But the sky would
-   end just like this." Then the garden at 7:29 again: "If the sky caught fire at midnight… what would you do at 7:29?"
+7. **Is any of this real?** Space is growing, faster every year (1998). But in 2025 a giant map of space (DESI) found
+   a clue that the push behind that growth may be fading; if it becomes a pull, growth reverses; one study puts a Big
+   Crunch about 20 billion years from now. Then the garden at 7:29 again: "If the sky caught fire at midnight… what
+   would you do at 7:29?"
 
 ## 2 · The physics (physics.js)
 
@@ -82,13 +83,12 @@ keeps full precision in the last second).
   sky"; it turns the sky from blue-white to orange-red).
 - **The Milky Way turns inside out.** Its dark lanes are cold dust (≈ 20 K) that glows in the far infrared. Squeezed
   ×100 (11:27) that glow lands in the visible and outshines the stars behind it: ×169 at 11:27:58 (`ucDust0`).
-- **Out there.** Typical spacing between big galaxies ÷ s reaches the size of a galaxy at s ≈ 150 (11:34): they crash.
-  Light leaving them at 11:17 needs far longer than the 43 minutes left: it will never reach you.
 - **Heat** (`ucThermal`). The sky radiates σT⁴ of its effective temperature onto everything; each kind of thing warms
   towards it at a rate set by how much heat it holds per square metre and what it loses into the ground, the wall or
   the air behind it (`UC_STUFF`). Before tonight the sky is effectively −35 °C through the air, which is why there is
   frost. Results: the frost melts at 11:25:37 (while space is still about −35 °C: the sky's light on it plus the warmer soil underneath);
-  the lawn steams at 11:36; dry leaves reach 257 °C (they ignite with no flame nearby) at 11:37:34; the apple tree
+  the lawn steams at 11:36; dry leaves reach 257 °C (the low end for catching with no flame nearby: they would
+  smoulder first and flame by about 11:39) at 11:37:34; the apple tree
   11:40:31, the lawn 11:40:39 (it had to dry first), the shed 11:42:48, the fence 11:43:37; the telescope's aluminium
   tube reaches 660 °C at 11:43:49; window glass softens (≈ 680 °C) at 11:45:44; the bird bath (8 cm of water under 5 mm
   of ice) loses its ice at 11:39:53 and boils at 11:47:46; the steel table melts at 11:49; the outer brick starts to
@@ -106,12 +106,25 @@ keeps full precision in the last second).
 - **The past, rewound.** Space at shrink s is as hot as the universe was when it was 1/s of today's size (redshift
   z = s − 1); the readout's age comes from ΛCDM (Planck 2018): 380,000 years at z ≈ 1,100 (11:52), when the first atoms
   formed and the afterglow was released.
-- **The last second.** Timed from the time left (`ucLnSLeft`): 15.7 million K at 0.873 s, 1 billion K at 0.0387 s,
-  1 trillion K at 0.00022 s, the Planck temperature at 1.7×10⁻¹⁹ s.
+- **The last second.** Timed from the time left (`ucLnSLeft`): 15.7 million K at 0.873 s, 5 billion K at 0.0116 s
+  (helium and heavier nuclei come apart; only fragile ones like deuterium go at 1 billion K), 1.8 trillion K at
+  0.00014 s (protons and neutrons melt into quarks and gluons), the Planck temperature (1.4 × 10³² K) at 1.7×10⁻¹⁹ s,
+  where the readout freezes.
 
 **What the film adds or exaggerates (and says so on screen):**
-- The cosmos shots (the rule, held together, the promise, out there, what's real, the 3D map, the future) are labelled
-  ILLUSTRATION or REAL · ILLUSTRATED.
+- The cosmos shots (the rule, held together, the promise, what's real, the 3D map, the future) are labelled THOUGHT
+  EXPERIMENT · OUR RULE, ILLUSTRATION or REAL · ILLUSTRATED.
+- **The rule itself is impossible at this speed** (a thought experiment): a crunch in four and a half hours means a
+  pull of about 5 km/s² across 1 AU at the start, far more than the Sun's grip on the Earth; nothing bigger than the
+  solar system could really hold together. The last second's timing (the speed-up near midnight) comes from our rule
+  too; a real crunch would reach the Planck temperature about 10⁻⁴³ s before the end. The labels say "our rule".
+- **In a real crunch** over billions of years, light from the stars of our own galaxy (only centuries in flight) would
+  barely be squeezed; the galaxies' light and the afterglow would do what the film shows. That is why the ending no
+  longer says the real end would look "just like this".
+- **The heating** is a lumped model (each kind of thing warms towards the sky); it ignores the air soaking up and
+  re-emitting heat. Real window panes crack at about 150–200 °C (about 11:41), and the hot glass and the light through
+  it would burn you: from 11:36 the film is labelled "from here, pretend nothing can hurt you", and the windows caption
+  says real glass would have cracked.
 - The afterglow's ripples are 1 part in 100,000; the film shows them 10,000× stronger, and the label says so.
 - The DESI map is a bow-tie of points, not the survey's real data.
 - The flames, smoke and embers are drawn (a stylised fire), but their timing, temperature and colour come from the
@@ -119,12 +132,12 @@ keeps full precision in the last second).
 - Readouts are rounded; the stars-you-can-see count is a model of a town garden's sky (limit ≈ 6.2 mag tonight).
 
 **The real science at the end.** The universe is growing, faster every year (supernovae, 1998; Nobel Prize 2011).
-DESI's second data release (March 2025, ~14 million galaxies and quasars), combined with the afterglow and supernovae,
-prefers dark energy that weakens over time (2.8–4.2σ depending on the data combined: a clue, not a discovery). If it
-keeps weakening and turns negative, the growth reverses into a Big Crunch; one 2025 study (Luu, Qiu & Tye) estimates
+DESI's second data release (March 2025, about 15 million galaxies and quasars), combined with the afterglow and supernovae,
+prefers dark energy that weakens over time (2.8–4.2σ depending on the data combined: a clue, not a discovery). Fading
+alone is not enough (a push that fades to zero still leaves space growing forever); if the push becomes a pull (a
+negative cosmological constant), the growth reverses into a Big Crunch; one 2025 study (Luu, Qiu & Tye) estimates
 a total lifespan of about 33 billion years, i.e. a crunch about 20 billion years from now. Other fits allow no crunch at
-all; the film says "one 2025 study" and "a real prediction · one of several". In a real crunch the sky would heat up in
-the same order (stars squeezed blue, the background light, the afterglow), just over billions of years.
+all; the film says "one study" and "one model's estimate · one of several".
 
 ## 3 · The clock (script.js)
 
@@ -139,14 +152,18 @@ down (log of the time left). Every pinned time above is checked against `physics
   the cat a silhouette at the window: "11:44 tonight. The night sky is brighter than noon. / And it's setting your
   garden on fire." The title follows at 0:08 (one line, 3.4 s).
 - **The promise at 0:40:** "By midnight, you'll see the light of the Big Bang": the payoff is named early and arrives
-  at 3:44.
-- **A new reveal every 5–8 s**, each with its own clock time and readout change (81 captions in 5:04). No section
+  at 3:34.
+- **A new reveal every 5–8 s**, each with its own clock time and readout change (76 captions in 4:44). No section
   longer than ~25 s without a new kind of event; the fire section is a chain of ignitions.
 - **Escalation ladder:** colour → brightness → glow → heat → fire → melting → vanishing → the Big Bang → the last
   second. Each step is a different kind of change, not just "more".
-- **Signature moments:** the Milky Way inside out (2:12); the fire with no spark (2:39); the Moon fading into the sky
-  (3:00); the garden vanishing into the light, then the Big Bang's light with its ripples (3:33–3:56); the last second.
-- **Shorter:** 5:04 against the faster film's 5:56; no recap, no outro card.
+- **Signature moments:** the Milky Way inside out (2:01); the fire with no spark (2:28); the Moon fading into the sky
+  (2:49); the garden vanishing into the light, then the Big Bang's light with its ripples (3:23–3:46); the last second.
+- **Shorter:** 4:44 against the faster film's 5:56; no recap, no outro card.
+- **After the first reviews** (viewer: enjoyment 6, retention 5, clarity 6, visuals 5): the galaxies-crashing
+  side-track is cut (the clock dashes from 11:18 to 11:25 on the cut to the frost), the ending is 33 s instead of 43 s
+  (no "the same end" beat), the hook window blazes, the hot sky is graded deep gold-orange instead of washed out, Mirach
+  is a big red star in the telescope's eyepiece, and the squeeze diagram is large.
 
 ## 5 · Sound
 
