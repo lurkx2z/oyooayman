@@ -212,7 +212,7 @@ const ntNearWTC = (x, z) => x > -160 && x < 175 && z > -175 && z < 240;
 function ntPlume(P, t, src, o = {}) {
   if (t < src.t0) return;
   const T = NT_TW[src.tower], hw = T.w / 2, rate = src.rate || 6, dt = 1 / rate, life = src.life || 50;
-  const i1 = Math.floor((t - src.t0) / dt), i0 = Math.max(0, i1 - Math.ceil(life / dt));
+  const i1 = Math.floor((Math.min(t, src.stop ?? 1e9) - src.t0) / dt), i0 = Math.max(0, Math.floor((t - src.t0) / dt) - Math.ceil(life / dt));   // (after `stop` nothing new; what's out drifts on)
   const sp = (src.speed || 1) * (o.speed || 1);
   for (let i = i0; i <= i1; i++) {
     const a = (t - src.t0 - i * dt) * sp, h = hash1(i * 31 + (src.seed || 7)), h2 = hash1(i * 57 + 3), h3 = hash1(i * 91 + 11);

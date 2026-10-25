@@ -60,7 +60,7 @@ NT_SETS.street = (app) => {
   const wb = ntBox(22, 0.1, 1200, ntStd('#3a3a3c', 0.9), NT_WB, 0.0, -840); wb.castShadow = false;
   for (const sx of [-1, 1]) { const sw = ntBox(5, 0.18, 1200, ntStd('#8b8780', 0.9), NT_WB + sx * 12.5, 0.09, -840); sw.castShadow = false; }
   // the ground (sidewalk concrete) under everything
-  const gnd = new THREE.Mesh(new THREE.PlaneGeometry(5000, 5000), ntStd('#6d6a65', 0.95, 0, { map: ntTex(ntCanvas(256, 256, (g2, W, H) => { g2.fillStyle = '#9a968f'; g2.fillRect(0, 0, W, H); g2.strokeStyle = 'rgba(40,38,36,0.35)'; g2.lineWidth = 3; for (let k = 0; k <= 4; k++) { g2.beginPath(); g2.moveTo(k * 64, 0); g2.lineTo(k * 64, H); g2.stroke(); g2.beginPath(); g2.moveTo(0, k * 64); g2.lineTo(W, k * 64); g2.stroke(); } })) }));
+  const gnd = new THREE.Mesh(new THREE.PlaneGeometry(5000, 5000), ntStd('#6d6a65', 0.95, 0, { map: ntTex(ntCanvas(256, 256, (g2, W, H) => { g2.fillStyle = '#9a968f'; g2.fillRect(0, 0, W, H); g2.strokeStyle = 'rgba(40,38,36,0.14)'; g2.lineWidth = 3; for (let k = 0; k <= 4; k++) { g2.beginPath(); g2.moveTo(k * 64, 0); g2.lineTo(k * 64, H); g2.stroke(); g2.beginPath(); g2.moveTo(0, k * 64); g2.lineTo(W, k * 64); g2.stroke(); } })) }));
   gnd.material.map.repeat.set(1250, 1250); gnd.rotation.x = -Math.PI / 2; gnd.position.y = 0.012; gnd.receiveShadow = true; scene.add(gnd);
   // the stairs up out of the concourse by 5 WTC (you come up them): 24 risers in a concrete well, rails
   const stM = ntStd('#8e8a84', 0.85), wlM = ntStd('#a29d94', 0.9);
@@ -133,7 +133,7 @@ NT_SETS.street = (app) => {
   const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(1, 1, 1);
 
   // the towers coming down: the body is cut at the falling top; the cloud grows round the front and spreads
-  const tS = NT.roar + 1.2, tN = NT.fall + 0.6, DUR_S = 10, DUR_N = 12;
+  const tS = NT.roar + 1.2, tN = NT.fall + 0.6, DUR_S = 10, DUR_N = 10.5;
   function towerTop(T, m, t, t0, dur) {
     const drop = ntDropAt(t, t0, T.roof, dur), top = T.roof - drop;
     const hb = Math.max(0.01, top - 22);
@@ -150,7 +150,7 @@ NT_SETS.street = (app) => {
   // debris arcing out ahead of it with dust trailing; at the foot, a ground cloud rolling out between the buildings
   function collapseCloud(P, t, T, t0, k, dur) {
     const a = t - t0; if (a < 0) return;
-    const hw = T.w / 2, fade = 1 - MathX.smooth(a, 26, 44), top = T.roof - ntDropAt(t, t0, T.roof, dur);
+    const hw = T.w / 2, fade = 1 - MathX.smooth(a, 16, 32), top = T.roof - ntDropAt(t, t0, T.roof, dur);   // (it drifts off south-east, away from you)
     // the collar: the front itself was never seen, only the dust bursting out round it, boiling
     if (top > 6) for (let i = 0; i < 170; i++) {
       const h = hash1(i * 43 + 5 + T.x), h2 = hash1(i * 47 + 6), h3 = hash1(i * 53 + 7), ang = h * 6.2832 + 0.4 * noise1(t * 0.5 + i, 8);
@@ -168,7 +168,7 @@ NT_SETS.street = (app) => {
       let y = h2 < 0.3 ? y0 - b * 1.5 : y0 - b * (7 + 10 * h2) - 1.4 * b * b;
       y = Math.max(sz * 0.4, Math.min(y + 4 * Math.sin(b * 0.3 + i), y0 + 4 - sz * 0.3, T.roof + 6 - sz * 0.4));
       const c = h3 < 0.72 ? 0.12 + 0.1 * h3 : 0.3 + 0.12 * h3;    // (grey-brown concrete and gypsum dust, a few sunlit tops)
-      P.add(T.x + Math.cos(ang) * out + NT_WIND[0] * b * 0.6, y, T.z + Math.sin(ang) * out + NT_WIND[2] * b * 0.6, sz, 0.95 * k * MathX.smooth(b, 0, 0.5) * fade, c, c * 0.93, c * 0.84);
+      P.add(T.x + Math.cos(ang) * out + NT_WIND[0] * b * 1.1, y, T.z + Math.sin(ang) * out + NT_WIND[2] * b * 1.1, sz, 0.95 * k * MathX.smooth(b, 0, 0.5) * fade, c, c * 0.93, c * 0.84);
     }
     // the debris: pieces of the outer wall thrown out and falling, each with a dust trail
     for (let i = 0; i < 250; i++) {
@@ -192,7 +192,9 @@ NT_SETS.street = (app) => {
     }
   }
   // the surge up Church Street: a rolling wall, its front at zf (m) by the time t; ~ 14 m/s, slowing
-  const surgeFront = (t) => { const a = t - (tS + 4); return a < 0 ? 200 : 100 - 420 * (1 - Math.exp(-a / 22)) - a * 2; };
+  // (it reaches the corner as the shot cuts into it; after that it rolls on north)
+  const roarZ = (t) => { const run = MathX.smooth(t, NT.run, NT.run + 1.4); return Math.min(-212, -212 - run * (t - NT.run + 0.3) * 3.0); };
+  const surgeFront = (t) => { const a = t - (tS + 2), A = NT.cloud - (tS + 2), z1 = roarZ(NT.cloud) + 14; return a < 0 ? 200 : a < A ? 60 + (z1 - 60) * Math.pow(a / A, 0.9) : z1 - (a - A) * 6; };
 
   const nightAt = (t, s) => (s.mode === 'cloud' || s.mode === 'grey') ? MathX.smooth(t, NT.cloud + 3.5, NT.cloud + 6.5) * (1 - MathX.smooth(t, NT.grey - 0.6, NT.grey + 6)) : 0;
   function view(t, s) {
@@ -207,10 +209,10 @@ NT_SETS.street = (app) => {
         return [[P[0], P[1] + 1.6 + bob, P[2]], Q, 60];
       }
       case 'back': { const k = u(NT.back, NT.roarShot); return [[NT_CH - 7, 1.6, -206 - 4 * k], ntV([NT_CH - 3, 1.5, -330], [20, 215 + 30 * k, 50], Ease.inOutSine(MathX.smooth(k, 0, 0.16))), 64]; }
-      case 'roar': { const run = MathX.smooth(t, NT.run, NT.run + 1.4), z = -212 - run * (t - NT.run + 0.3) * 3.4; return [[NT_CH - 7 + 5 * run, 1.6, Math.min(-212, z)], ntV([52, 240 - 110 * Ease.inOutSine(MathX.smooth(t, NT.roar + 1.2, NT.roar + 9)), 128], [NT_CH - 2, 1.4, -500], run), 50 + 12 * run]; }
+      case 'roar': { const run = MathX.smooth(t, NT.run, NT.run + 1.4); return [[NT_CH - 7 + 4 * run, 1.6, roarZ(t)], ntV([52, 240 - 110 * Ease.inOutSine(MathX.smooth(t, NT.roar + 1.2, NT.roar + 9)), 128], [NT_CH - 5, 9, -90], run), 50 + 8 * run]; }
       case 'cloud': { const z = -262 - (t - NT.cloud) * 1.2; return [[NT_CH - 2, 1.55, z], [NT_CH - 1, 1.4, z - 10], 62]; }
       case 'grey': { const k = u(NT.grey, NT.walk), z = -280 - k * 9; return [[NT_CH - 3 + 1.5 * k, 1.6, z], [NT_CH - 7 + 9 * Ease.inOutSine(k), 2.5 + 7 * MathX.smooth(k, 0.35, 1), z - 30], 60]; }
-      case 'walk': { const k = u(NT.walk, NT.fallShot), z = -760 - k * 7, look = MathX.smooth(k, 0.3, 0.75); return [[NT_WB + 3, 1.6, z], ntV([NT_WB + 3, 1.6, z - 40], [0, 210, 0], look), 56]; }
+      case 'walk': { const k = u(NT.walk, NT.fallShot), z = -760 - k * 7, look = Ease.inOutSine(MathX.smooth(k, 0.32, 0.6)), yaw = Math.PI * 0.97 * look, pitch = Math.atan2(208, -z) * look; return [[NT_WB + 3, 1.6, z], [NT_WB + 3 - Math.sin(yaw) * Math.cos(pitch) * 100, 1.6 + Math.sin(pitch) * 100, z - Math.cos(yaw) * Math.cos(pitch) * 100], 56]; }
       case 'fall': return [[NT_WB + 4, 1.6, -1080], [0, 196, 0], 31];
     }
     return [[NT_CH, 1.6, -300], [0, 100, 0], 60];
@@ -236,9 +238,8 @@ NT_SETS.street = (app) => {
       // smoke, fire; after 9:59 the dust over everything
       puffs.begin(); fire.begin();
       for (const src of smoke) {
-        if (src.tower === 'S' && t > tS) continue;
-        if (src.tower === 'N' && t > tN) continue;
-        ntPlume(puffs, t, src, { fire, alpha: 1.6 });
+        src.stop = src.tower === 'S' ? tS + 1.5 : tN + 1.5;
+        ntPlume(puffs, t, src, { fire: t < src.stop ? fire : null, alpha: 1.6 });
       }
       collapseCloud(puffs, t, NT_TW.S, tS, 1, DUR_S);
       collapseCloud(puffs, t, NT_TW.N, tN, 1.1, DUR_N);
@@ -246,11 +247,12 @@ NT_SETS.street = (app) => {
       // the surge at street level (Church Street): a rolling grey-brown wall, and inside it, thick dark dust
       near.begin();
       const zf = surgeFront(t);
-      if (t > tS + 3) for (let i = 0; i < 1400; i++) {
+      // (a rolling wall as tall as the buildings, densest at its front, grey-brown)
+      if (t > tS + 2) for (let i = 0; i < 1400; i++) {
         const h = hash1(i * 17 + 1), h2 = hash1(i * 19 + 2), h3 = hash1(i * 23 + 3);
-        const z = zf + h * 140, x = NT_CH + (h2 - 0.5) * 44, y = 1 + Math.pow(h3, 1.5) * (14 + (z - zf) * 0.35), sz = 6 + h3 * 10 + (z - zf) * 0.05;
-        const c = 0.52 + 0.14 * h2;
-        near.add(x + noise1(t * 0.3 + i, 2) * 3, y + Math.sin(t * 0.8 + i) * 1.2, z, sz, 0.55 * MathX.smooth(t, tS + 3, tS + 5), c, c * 0.94, c * 0.85);
+        const z = zf + Math.pow(h, 1.8) * 140, x = NT_CH + (h2 - 0.5) * 46, y = 1 + Math.pow(h3, 1.2) * (34 + (z - zf) * 0.4), sz = 7 + h3 * 12 + (z - zf) * 0.06;
+        const c = 0.3 + 0.13 * h2 - 0.08 * Math.max(0, 1 - (y / 30));
+        near.add(x + noise1(t * 0.3 + i, 2) * 3, y + Math.sin(t * 0.8 + i) * 1.5, z - 3 * Math.abs(noise1(t * 0.6 + i, 9)), sz, 0.75 * MathX.smooth(t, tS + 2, tS + 4), c, c * 0.94, c * 0.85);
       }
       // the dark inside, then the slow settling (the grey)
       const inside = s.mode === 'cloud' ? 1 : s.mode === 'grey' ? 1 - MathX.smooth(t, NT.grey, NT.grey + 8) * 0.7 : s.mode === 'walk' ? 0.06 : 0;
@@ -266,7 +268,7 @@ NT_SETS.street = (app) => {
       const ashK = s.mode === 'cloud' ? 1 : s.mode === 'grey' ? 1 : s.mode === 'walk' ? 0.6 : s.mode === 'fall' ? 0.3 : 0;
       if (ashK > 0) for (let i = 0; i < 1200; i++) {
         const h = hash1(i * 41 + 9), h2 = hash1(i * 43 + 10), h3 = hash1(i * 47 + 11), per = 9 + h * 6, a = ((t + h2 * per) % per) / per;
-        flakes.add(cam.position.x + (h - 0.5) * 30, 12 - a * 12 + Math.sin(t + i) * 0.2, cam.position.z - 1 - h3 * 30, 0.02 + 0.03 * h2, 0.75 * ashK, 0.86, 0.85, 0.82);
+        { const fc = 0.86 * (1 - 0.85 * nightAt(t, s)); flakes.add(cam.position.x + (h - 0.5) * 30, 12 - a * 12 + Math.sin(t + i) * 0.2, cam.position.z - 1 - h3 * 30, 0.02 + 0.03 * h2, 0.75 * ashK, fc, fc * 0.98, fc * 0.94); }
       }
       flakes.end();
       const pK = s.mode === 'grey' ? MathX.smooth(t, NT.grey, NT.grey + 3) : s.mode === 'walk' ? 0.4 : s.mode === 'back' || s.mode === 'five' ? 0.25 : 0;
@@ -313,16 +315,17 @@ NT_SETS.street = (app) => {
         ntPlace(pp, x, 0.1, z, MathX.lerp(0, Math.PI + (h2 - 0.5) * 0.5, turn), 'walk', t + i, wk * 1.15 / 1.32 * Math.PI * 2, i % 4 === 1 ? 'ntGasp' : 'ntWatch', turn);
       });
       // (nobody walks through the lens)
-      for (const pp of [...crowd, ...grey, ...ves, cop]) if (pp.root.visible && Math.hypot(pp.root.position.x - cam.position.x, pp.root.position.z - cam.position.z) < 0.7) pp.root.visible = false;
+      const guard = s.mode === 'roar' ? 2.2 : 1.4;   // (looking up at the towers: a head just in front fills the bottom of the frame)
+      for (const pp of [...crowd, ...grey, ...ves, cop]) if (pp.root.visible && Math.hypot(pp.root.position.x - cam.position.x, pp.root.position.z - cam.position.z) < guard) pp.root.visible = false;
       // the light: the sun goes behind the dust
-      const dark = s.mode === 'cloud' ? 1 : s.mode === 'grey' ? 1 - 0.6 * MathX.smooth(t, NT.grey, NT.grey + 9) : s.mode === 'walk' || s.mode === 'fall' ? 0.3 : s.mode === 'roar' ? MathX.smooth(t, NT.cloudHit - 1.5, NT.cloudHit + 0.4) : 0;
+      const dark = s.mode === 'cloud' ? 1 : s.mode === 'grey' ? 1 - 0.6 * MathX.smooth(t, NT.grey, NT.grey + 9) : s.mode === 'walk' || s.mode === 'fall' ? 0.3 : s.mode === 'roar' ? 0.55 * MathX.smooth(t, NT.cloud - 2.2, NT.cloud) : 0;
       S.sun.intensity = 2.8 * (1 - 0.9 * dark); S.hemi.intensity = 0.8 * (1 - 0.6 * dark);
       scene.fog.color.setRGB(MathX.lerp(0.79 - 0.4 * dark, 0.022, night), MathX.lerp(0.84 - 0.43 * dark, 0.021, night), MathX.lerp(0.89 - 0.5 * dark, 0.019, night));
       S.hemi.intensity *= 1 - 0.75 * night; S.sun.intensity *= 1 - 0.9 * night;
-      scene.fog.density = 0.0004 + 0.09 * (s.mode === 'cloud' ? 1 : 0) + (s.mode === 'grey' ? 0.04 * (1 - MathX.smooth(t, NT.grey, NT.grey + 9)) + 0.004 : 0) + (s.mode === 'walk' ? 0.0001 : 0) + (s.mode === 'roar' ? 0.09 * MathX.smooth(t, NT.cloudHit - 1, NT.cloudHit + 0.3) : 0);
+      scene.fog.density = 0.0004 + 0.09 * (s.mode === 'cloud' ? 1 : 0) + (s.mode === 'grey' ? 0.04 * (1 - MathX.smooth(t, NT.grey, NT.grey + 9)) + 0.004 : 0) + (s.mode === 'walk' ? 0.0001 : 0) + (s.mode === 'roar' ? 0.006 * MathX.smooth(t, NT.cloud - 2.2, NT.cloud) : 0);
       scene.background.setRGB(MathX.lerp(0.44 - 0.2 * dark, 0.02, night), MathX.lerp(0.62 - 0.35 * dark, 0.019, night), MathX.lerp(0.82 - 0.5 * dark, 0.017, night));
 
-      sky.material.uniforms.k.value = 1 - 0.75 * dark;
+      sky.material.uniforms.k.value = (1 - 0.75 * dark) * (1 - 0.97 * night);
     },
     grade(t, p, s) {
       p.exposure = 1.0; p.saturation = 0.98; p.contrast = 1.04; p.warmth = 0.03; p.bloom = 0.3; p.bloomThreshold = 0.9; p.vignette = 0.5; p.grain = 0.032;
@@ -330,7 +333,7 @@ NT_SETS.street = (app) => {
       if (s.mode === 'cloud') { p.saturation = 0.35; p.exposure -= 0.2; p.vignette = 0.8; p.grain = 0.06; p.warmth = 0.06; }
       if (s.mode === 'grey') { p.saturation = 0.25 + 0.15 * MathX.smooth(t, NT.grey, NT.walk); p.exposure -= 0.08; p.grain = 0.045; }
       if (s.mode === 'walk' || s.mode === 'fall') { p.saturation = 0.55; p.grain = 0.04; }
-      if (s.mode === 'roar') { const k = MathX.smooth(t, NT.cloudHit - 1.2, NT.cloudHit + 0.3); p.saturation = 0.98 - 0.6 * k; p.exposure = 1 - 0.25 * k; }
+      if (s.mode === 'roar') { const k = MathX.smooth(t, NT.cloud - 2.2, NT.cloud); p.saturation = 0.98 - 0.5 * k; p.exposure = 1 - 0.2 * k; }
       if (s.mode === 'fall') p.fade = Math.max(p.fade, MathX.smooth(t, NT.out - 1.4, NT.out));
     },
     labels(t) {

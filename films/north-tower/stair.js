@@ -33,7 +33,7 @@ function ntStairLocal(t, s) {
     let v = 1; for (const [s0, d] of stops) v = Math.min(v, 1 - MathX.smooth(x, s0 - 0.6, s0) * (1 - MathX.smooth(x, s0 + d, s0 + d + 0.8)));
     p += v * dt * Math.min(1, (x + dt) / 0.6 + (s.mode === 'enter' ? 0 : 1));
   }
-  const sp = { enter: 0.85, thin: 1.6, water: 1.05, empty: 0.9, right: 0.8 }[s.mode] || 1;
+  const sp = { enter: 0.85, thin: 1.6, water: 1.05, empty: 0.2, right: 0.8 }[s.mode] || 1;
   return p * NT_PACE * sp;
 }
 // the shot's starting point, in floors down from 73
@@ -197,7 +197,7 @@ NT_SETS.stair = (app) => {
       });
       // the camera: your eye 1.6 m over your lane, looking a couple of metres down the flight (about 25° down; more
       // where the steps themselves are the point: the glow, the water); the steps in the bob
-      const lane = s.mode === 'ff' || s.mode === 'right' ? RI - 0.06 : RI + 0.1;
+      const lane = s.mode === 'ff' ? RI - 0.12 : s.mode === 'right' ? RI - 0.06 : RI + 0.1;
       const look = s.mode === 'glow' ? [0.12, 0.95] : s.mode === 'water' ? [0.1, 0.45] : [0.21, 1.3];
       let E, ahead;
       {
@@ -210,7 +210,7 @@ NT_SETS.stair = (app) => {
         E = ntV([0.6, 1.6, -2.0], E, k); ahead = ntV([0.3, 1.2, 0.6], ahead, k);
       }
       // the firefighters: look down the outer lane they come up; the injured man: turn to him as he passes
-      if (s.mode === 'ff') { const q = ntStairAt(Pc + 0.22, RO); ahead = ntV(ahead, [q[0], q[1] + 1.75, q[2]], 0.6); }
+      if (s.mode === 'ff') { const q = ntStairAt(Pc + 0.22, RO); ahead = ntV(ahead, [q[0], q[1] + 1.75, q[2]], 0.4); }
       if (s.mode === 'right') {
         const rel = hurtAt(t) - Pc, w = MathX.smooth(rel, -0.02, 0.07) * (1 - MathX.smooth(rel, 0.3, 0.45));   // (only once they're past you: no swing round)
         if (w > 0) { const q = ntStairAt(Math.max(0, hurtAt(t)), RO + 0.05); ahead = ntV(ahead, [q[0], q[1] + 1.35, q[2]], 0.75 * w); }
@@ -218,7 +218,7 @@ NT_SETS.stair = (app) => {
       const step = Math.sin(Pc * LI / NT_TREAD * Math.PI) * 0.018;
       const shk = ntJolt(t, NT.shake, s.mode === 'shake' ? 2.2 : 0, 1.6), sw = ntSway(t, NT.shake + 0.3, s.mode === 'shake' ? 0.7 : 0, 6.5, 8);
       const d = ntDrift(t, 0.01, 0.5, 9);
-      ntCam(cam, [E[0] + d[0] + shk[0] + sw[0], E[1] + step + d[1] + shk[1], E[2] + d[2]], ahead, 58, shk[2] + sw[1] + 0.8 * noise1(t * 0.3, 2));
+      ntCam(cam, [E[0] + d[0] + shk[0] + sw[0], E[1] + (empty ? 0 : step) + d[1] + shk[1], E[2] + d[2]], ahead, 58, shk[2] + sw[1] + (empty ? 0.15 : 0.8) * noise1(t * 0.3, 2));
       // the lights: the landing just below, the half landing, the one above
       const lvl = (k) => { const mm = Math.floor(Pc) + k; return [0.5, -mm * Hf + 2.3, -0.9]; }, half = (k) => { const mm = Math.floor(Pc) + k; return [0, -mm * Hf - Hf / 2 + 2.3, 3.6]; };
       L1.position.set(...lvl(1)); L2.position.set(...half(0)); L3.position.set(...lvl(0));
@@ -287,9 +287,9 @@ NT_SETS.stair = (app) => {
         const a = t - s.t0;
         ffs.forEach((p, i) => {
           if (i === 10) { const q = [0.95, -(Math.floor(Pc) + 1) * Hf, -0.75]; ntPlace(p, q[0], q[1], q[2], -Math.PI / 2 - 0.4, 'ntRest', t); return; }
-          const pp = 0.42 + i * 0.13 + (i > 5 ? 0.35 : 0) - a * 0.042;
+          const pp = ntStairBase(s) + 0.42 + i * 0.13 + (i > 5 ? 0.35 : 0) - a * 0.042;   // (floors down from 73, like Pc)
           if (pp < Pc - 0.3 || pp > Pc + 1.4) { p.root.visible = false; return; }
-          const q = ntStairAt(Math.max(0, pp), RO + 0.04), ph = -(pp * LO) / 0.7 * Math.PI * 2 + i * 2;
+          const q = ntStairAt(Math.max(0, pp), RO + 0.1), ph = -(pp * LO) / 0.7 * Math.PI * 2 + i * 2;
           ntPlace(p, q[0], q[1], q[2], q[3] + Math.PI, 'ntClimb', t + i, ph);
         });
       } else hide(ffs);
@@ -303,10 +303,12 @@ NT_SETS.stair = (app) => {
         ntPlace(hurt[2], q3[0], q3[1], q3[2], q3[3], 'ntHelper', t, ph + 3.1);
       } else hide(hurt);
       // nobody walks through the lens: anyone whose body is within half a metre of your eye is not drawn
+      // (the firefighters' helmets: 1.1 m, or a brim fills the corner of the frame as they pass)
       for (const list of [inner, outer, ffs, hurt]) for (const p of list) {
         if (!p.root.visible) continue;
-        const dx = p.root.position.x - cam.position.x, dz = p.root.position.z - cam.position.z, dy = cam.position.y - p.root.position.y;
-        if (dx * dx + dz * dz < 0.5 * 0.5 && dy > -0.3 && dy < 2.0) p.root.visible = false;
+        const dx = p.root.position.x - cam.position.x, dz = p.root.position.z - cam.position.z, dy = cam.position.y - p.root.position.y, r = list === ffs ? 1.1 : 0.5;
+        if (dx * dx + dz * dz < r * r && dy > -0.3 && dy < 2.0) p.root.visible = false;
+        else if (list === ffs) { p.j.head.getWorldPosition(_v); if (_v.distanceTo(cam.position) < 1.25) p.root.visible = false; }   // (they lean into the climb: the head is well ahead of the feet)
       }
     },
     grade(t, p, s) {

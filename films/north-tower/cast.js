@@ -100,9 +100,11 @@ Object.assign(BLEND, { ntGive: 0.4, ntTake: 0.4, ntDown: 0.5, ntWait: 0.6, ntCli
 function ntFireGear(p, i) {
   const head = p.j.head, spine = p.j.spine;
   head.traverse((o) => { if (o.isMesh && o.geometry.type === 'BoxGeometry' && o.position.z > 0.12) o.visible = false; });   // (the rig's visor)
-  const hm = new THREE.MeshStandardMaterial({ color: i % 2 ? '#4a2e1c' : '#17181a', roughness: 0.35 });
-  const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.19, 0.018, 18), hm); brim.scale.set(1, 1, 1.35); brim.position.set(0, -0.005, -0.045); head.add(brim);
-  const shield = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.1, 0.012), new THREE.MeshStandardMaterial({ color: i % 3 === 1 ? '#a8231c' : '#121212', roughness: 0.4 }));
+  const hm = new THREE.MeshStandardMaterial({ color: i % 2 ? '#4a2e1c' : '#17181a', roughness: 0.6 });
+  // (the rig's helmet dome: matte like an old leather helmet, not two bright highlights seen from above)
+  head.traverse((o) => { if (o.isMesh && o.material && o.material.color && ['1c1d20', '4a2e1c'].includes(o.material.color.getHexString())) { o.material = o.material.clone(); o.material.roughness = 0.65; o.material.metalness = 0; } });
+  const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.2, 0.022, 18), hm); brim.scale.set(1, 1, 1.4); brim.position.set(0, -0.005, -0.06); head.add(brim);
+  const shield = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.13, 0.014), new THREE.MeshStandardMaterial({ color: i % 3 === 1 ? '#a8231c' : '#121212', roughness: 0.4 }));
   shield.position.set(0, 0.1, 0.135); shield.rotation.x = -0.35; head.add(shield);
   const num = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.002), new THREE.MeshStandardMaterial({ color: '#f2f0ea', emissive: '#555', roughness: 0.4 }));
   num.position.set(0, 0.0, 0.007); shield.add(num);

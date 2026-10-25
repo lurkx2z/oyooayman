@@ -197,17 +197,19 @@ NT_SETS.office = (app) => {
   const dust = ntPuffs(scene, 400, { additive: true });
   // and the black smoke that pours down close past your windows a minute later (survivors on the floors below the
   // impact saw it: the fire's smoke caught in the wind against the face of the tower)
-  const pour = ntPuffs(scene, 1000, { soft: 0.7 });
+  const pour = ntPuffs(scene, 1400, { soft: 1.15 });
   function pourAt(t) {
     pour.begin();
-    if (t > NT.hit + 8) for (let i = 0; i < 950; i++) {
-      const a = t - (NT.hit + 8 + i * 0.036), h = hash1(i * 13 + 41), h2 = hash1(i * 19 + 43), h3 = hash1(i * 31 + 47);
-      if (a < 0 || a > 20) continue;
-      const x = -18 + h * 32 + NT_WIND[0] * 0.3 * a + noise1(a * 0.2 + i, 3) * 2;
-      const y = Y + 16 - (0.9 + 0.8 * h2) * a + noise1(a * 0.15 + i, 5) * 1.5, z = O.zWall + 1.0 + h3 * 7 + 0.2 * a;
-      const c = 0.012 + 0.03 * h3;
-      const clump = 0.4 + 0.6 * MathX.smooth(noise1((NT.hit + 8 + i * 0.036) * 0.35, 17) + 0.25 * noise1(i * 0.37, 19), -0.3, 0.3);   // (it comes in gusts)
-      pour.add(x, y, z, 1.3 + 0.24 * a + 1.3 * h2, Math.min(1, 1.25 * clump) * MathX.smooth(a, 0, 2) * (1 - MathX.smooth(a, 14, 20)), c, c * 0.98, c * 0.95);
+    // (a stream a few metres out, crossing the middle of the frame: down and away to the east with the wind, in gusts;
+    // many soft overlapping puffs so it reads as one stream of smoke going past, not a dark haze on the lens)
+    if (t > NT.hit + 8) for (let i = 0; i < 1380; i++) {
+      const t0 = NT.hit + 8 + i * 0.018, a = t - t0, h = hash1(i * 13 + 41), h2 = hash1(i * 19 + 43), h3 = hash1(i * 31 + 47);
+      if (a < 0 || a > 16) continue;
+      const x = -26 + h * 30 + 2.4 * a + noise1(a * 0.25 + i, 3) * 2.5;
+      const y = Y + 18 - (1.6 + 1.6 * h2) * a + noise1(a * 0.2 + i, 5) * 1.5, z = O.zWall + 2.5 + h3 * h3 * 9 + 0.35 * a;
+      const c = 0.018 + 0.035 * h3;
+      const clump = 0.55 + 0.45 * MathX.smooth(noise1(t0 * 0.35, 17) + 0.25 * noise1(i * 0.37, 19), -0.3, 0.3);   // (it comes in gusts)
+      pour.add(x, y, z, 1.4 + 0.22 * a + 1.5 * h2, 0.95 * clump * MathX.smooth(a, 0, 1.5) * (1 - MathX.smooth(a, 11, 16)), c, c * 0.98, c * 0.95);
     }
     pour.end();
   }

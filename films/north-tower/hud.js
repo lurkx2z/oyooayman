@@ -39,7 +39,7 @@ const NT_CTX = [
 ];
 // the honest labels: [from, to, text]
 const NT_TAGS = [
-  [NT.morning + 0.5, NT.impactShot - 0.2, 'YOU ARE A COMPOSITE OF SURVIVORS’ ACCOUNTS · THE TIMES ARE REAL'],
+  [NT.morning + 0.5, NT.impactShot - 0.2, 'YOU ARE A COMPOSITE OF SURVIVORS’ ACCOUNTS · REAL TIMES, SPED UP'],
   [NT.impactShot + 0.3, NT.hit - 0.1, 'THE MORNING, SPED UP'],
   [NT.after + 0.3, NT.known - 0.1, 'THE MORNING, SPED UP · SOUND, LIGHT AND SMOKE ARE FROM SURVIVORS’ ACCOUNTS'],
   [NT.stair + 0.4, NT.mezz - 0.1, 'THE DESCENT, SPED UP · ABOUT ONE FLOOR A MINUTE'],
@@ -136,10 +136,10 @@ class NtHud {
     this.tower.innerHTML = `<svg viewBox="0 0 290 640" xmlns="http://www.w3.org/2000/svg">
       <rect x="${x}" y="${top}" width="${w}" height="${H}" fill="rgba(200,206,214,0.16)" stroke="rgba(246,239,226,0.55)" stroke-width="2"/>
       ${gone ? `<rect x="${x}" y="${top}" width="${w}" height="${(Y(91) - top).toFixed(1)}" fill="rgba(40,40,44,0.75)"/>` : ''}
-      <rect x="${x}" y="${Y(99).toFixed(1)}" width="${w}" height="${(Y(93) - Y(99)).toFixed(1)}" fill="#e0703a"/>
+      <rect x="${x}" y="${Y(99).toFixed(1)}" width="${w}" height="${(Y(93) - Y(99)).toFixed(1)}" fill="#9c6a55"/>
       ${[110, 99, 93, 78, 44, 1].map(tick).join('')}
       <circle cx="${x + w / 2}" cy="${Y(f).toFixed(1)}" r="9" fill="#ffffff"/><circle cx="${x + w / 2}" cy="${Y(f).toFixed(1)}" r="17" fill="rgba(255,255,255,0.25)"/>
-      <text x="${x + w + 14}" y="${(Y(96) + 7).toFixed(1)}" class="t" style="fill:#ffb38a">IMPACT</text>
+      <text x="${x + w + 14}" y="${(Y(96) + 7).toFixed(1)}" class="t" style="fill:#e3c2b2">IMPACT</text>
       <text x="${x + w + 14}" y="${(Y(f) + 7).toFixed(1)}" class="t">YOU</text>
     </svg>`;
   }

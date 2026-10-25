@@ -108,12 +108,12 @@ const NT_CKEYS = [
   [NT.five, ntAt(9, 52, 0)],
   [NT.back, ntAt(9, 56, 0)],
   [ntS('nine59') - 0.05, ntAt(9, 58, 59)],                         // ★ the South Tower (it starts to fall a second later)
-  [NT.cloudHit, ntAt(9, 59, 25)],
+  [NT.cloudHit, ntAt(9, 59, 14)],                                  // (about real time: the tower is down in 10 s)
   [NT.grey, ntAt(10, 0, 30)],
   [NT.walk, ntAt(10, 6, 0)],
   [NT.fallShot, ntAt(10, 28, 0)],
-  [NT.fall, ntAt(10, 28, 25)],                                     // ★ the North Tower
-  [NT.out, ntAt(10, 29, 30)],
+  [NT.fall + 0.6, ntAt(10, 28, 25)],                               // ★ the North Tower (real time from here)
+  [NT.out, ntAt(10, 28, 25) + (NT.out - NT.fall - 0.6)],
 ];
 function ntClock(t) {
   const K = NT_CKEYS;

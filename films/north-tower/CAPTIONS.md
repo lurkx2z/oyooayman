@@ -21,9 +21,9 @@ status: voiceless
 
 [after] Ceiling tiles fall. The lights flicker. / Then it's quiet.
 
-[outside] Outside, paper is falling. Thousands of sheets. / Smoke pours down past the windows.
+[outside] Outside, paper is falling. Thousands of sheets. / Black smoke streams past the windows.
 
-[nobody] The speakers are silent. Nobody tells you anything. / Some people want to wait. / You take your bag. You go.
+[nobody] The speakers are silent. No announcement comes. / Some people want to wait. / You take your bag. You go.
 
 [known] You don't know it yet. / A plane has hit floors 93 to 99. / From the 92nd floor up, all three stairways are blocked.
 
@@ -69,10 +69,10 @@ status: voiceless
 
 [ten28] 10:28. / The North Tower falls. / It stood for 102 minutes after it was hit.
 
-[out] About 7,500 people got out of the North Tower. / Almost everyone below the impact got out.
+[out] About 7,500 people got out of the North Tower. / Below the impact, nearly everyone got out. / Above it, no one could get down.
 
 [how] Down the stairs. Helping each other. / Past the people who were climbing up.
 
-[cost] 2,977 people were killed on September 11, 2001. / 2,753 of them in New York. / 343 were firefighters. 60 were police officers.
+[cost] 2,977 people were killed on September 11, 2001. / 2,753 of them in New York. / 441 were first responders. / 343 were firefighters. 60 were police officers.
 
 [light] Every September 11, two beams of light rise over Lower Manhattan.
