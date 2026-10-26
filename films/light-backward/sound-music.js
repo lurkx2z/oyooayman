@@ -174,10 +174,10 @@ lbSound('music', 'score', function (ctx, bus, K) {
 
   // ---- 3 · after 10:00:00: a low drone; a glassy note for the sliver; the theme backwards as the old light heads home
   M.strings(LB.t0 + 1.4, LB.mirror + 0.4, ['E1', 'B1', 'E2'], 0.34, { att: 3.0, rel: 1.0, cut: 240, wave: 'sine', vib: 1 });
-  M.strings(cap('crescent', 0) - 0.2, LB.old + 3, ['B5'], 0.05, { att: 1.5, rel: 2.0, cut: 6000, wave: 'sine', vib: 3 });
-  back(cap('old', 1) + 1.2, 1.05, 0.22, { oct: -1 });
+  M.strings(cap('crescent', 0) - 0.2, LB.lights + 3, ['B5'], 0.05, { att: 1.5, rel: 2.0, cut: 6000, wave: 'sine', vib: 3 });
+  back(cap('lights', 2) + 0.8, 1.05, 0.22, { oct: -1 });
   M.strings(LB.siriusCut, LB.mirror + 0.4, ['C2', 'G2', 'E3', 'B3'], 0.26, { att: 2.0, rel: 1.0, cut: 900 });
-  M.bell(lbStory(20.0), 'B5', 0.32, -0.4);                                         // Sirius
+  M.bell(lbStory(20.5), 'B5', 0.32, -0.4);                                         // Sirius
   // the mirror: the stars come back on the wrong side, more every second
   M.prog([[LB.mirror, C.Cmaj7], [cap('mirror', 1), C.G], [cap('mirror', 2), C.Em9]], LB.replay + 0.3, 0.32, { cut: 1300 });
   arp(LB.mirror + 1.2, LB.replay - 0.4, ['E', 'G', 'B', 'D', 'F#'], 0.45, (t) => 0.025 + 0.05 * MathX.clamp((t - LB.mirror) / 11, 0, 1));
@@ -185,10 +185,10 @@ lbSound('music', 'score', function (ctx, bus, K) {
   M.strings(LB.replay, LB.replayEnd + 0.3, ['E1', 'B1', 'G2'], 0.36, { att: 1.2, rel: 0.8, cut: 320, glide: -500, glideAt: LB.replayEnd, wave: 'triangle', vib: 0 });
   M.rpiano(cap('replay', 1) + 2.6, 'E3', 0.3, 2.6); M.rpiano(cap('replay', 1) + 2.6, 'B3', 0.24, 2.6); M.rpiano(cap('replay', 1) + 2.6, 'G4', 0.2, 2.6);
   M.bell(cap('replay', 2) + 0.6, 'E6', 0.2, 0.3);
-  // Canopus, never seen from Britain: wonder
-  M.prog([[LB.replayEnd, C.Amaj9], [LB.canopusCut + 3, C.Clyd]], LB.north + 0.3, 0.32, { cut: 1500 });
-  M.bell(lbStory(57.3), 'E6', 0.34, 0.4); M.bell(lbStory(57.3) + 0.42, 'B5', 0.24, 0.4);
-  // ---- 10:01: the glow; the build to the second Sun (10:01:20): a roll, a swell, then the chord
+  // Europe, upside down and shrinking away: wonder
+  M.prog([[LB.replayEnd, C.Amaj9], [cap('europe', 1), C.Clyd]], LB.north + 0.3, 0.32, { cut: 1500 });
+  M.bell(LB.europeCut + 0.6, 'E6', 0.34, 0.4); M.bell(LB.europeCut + 1.02, 'B5', 0.24, 0.4);
+  // ---- 10:01: the glow; the build to the second Sun (10:01:21): a roll, a swell, then the chord
   M.strings(LB.north, LB.switchCut + 0.4, C.Em9, 0.3, { att: 2.5, rel: 0.6, cut: 500, cutTo: 1800, cutAt: LB.switchCut });
   lbPulse(ctx, M.bus, LB.north + 3, sun2 - 0.05, ['E2', 'B2'], 0.5, 0.24, { cut: 400, cutTo: 2400, acc: 2, decay: 0.3, stepAt: (t) => (t < LB.switchCut ? 0.5 : 0.25), ramp: (u) => 0.3 + 0.7 * u });
   M.strings(LB.switchCut, sun2 + 0.02, C.Bsus, 0.42, { att: 2.5, rel: 0.02, cut: 800, cutTo: 4000, cutAt: sun2 });
@@ -223,7 +223,7 @@ lbSound('music', 'score', function (ctx, bus, K) {
   M.prog([[LB.wait, C.Am9], [cap('wait', 1), C.Bsus]], LB.voyager + 0.3, 0.28, { cut: 900 });
   M.strings(LB.voyager, LB.ret + 0.3, C.Cmaj7, 0.28, { att: 2.5, rel: 1.0, cut: 1100 });
   back(cap('voyager', 1) + 2.2, 0.8, 0.2, { oct: 0, dur: 1.2 });
-  // ---- 10:08:16, the Sun comes back: a single note (the dot), then the chord (the disc); brighter and brighter
+  // ---- 10:08:13.5, the Sun comes back: a single note (the dot), then the chord (the disc); brighter and brighter
   M.strings(LB.ret, LB.back + 0.02, C.Bsus, 0.36, { att: 1.0, rel: 0.02, cut: 700, cutTo: 2000, cutAt: LB.back });
   M.strings(LB.back, cap('return', 1) + 0.5, ['E5'], 0.06, { att: 0.6, rel: 0.4, cut: 6000, wave: 'sine', vib: 2 });
   M.drum(cap('return', 1) + 0.1, 0.55, 41.2, 1.3);
@@ -239,7 +239,7 @@ lbSound('music', 'score', function (ctx, bus, K) {
   M.strings(LB.midnight, LB.sunrise + 0.3, C.Clyd, 0.26, { att: 2.0, rel: 1.0, cut: 1600 });
   M.strings(LB.midnight + 1.0, LB.sunrise, ['E5', 'B5'], 0.04, { att: 2.5, rel: 1.5, cut: 7000, wave: 'sine', vib: 4 });
   keys(LB.midnight + 2.0, LB.sunrise - 0.5, 3.1, ['B4', 'F#4', 'E5', 'G4'], 0.08);
-  // 6:47: the theme forwards (the real Sun rising, right) and backwards (the second setting, left) at once
+  // 6:45: the theme forwards (the real Sun rising, right) and backwards (the second setting, left) at once
   M.prog([[LB.sunrise, C.E], [LB.bothDown, C.Csm7], [cap('sunrise', 2), C.Amaj9]], LB.noon + 0.3, 0.34, { cut: 1400 });
   theme(LB.sunrise + 1.0, [1.0, 1.0, 1.4], 0.22, { piano: true, oct: -1, dur: 3.0, pan: 0.45 });
   back(LB.bothDown + 1.6, 1.0, 0.24, { oct: -1, pan: -0.45, dur: 1.4 });
@@ -248,12 +248,10 @@ lbSound('music', 'score', function (ctx, bus, K) {
   M.strings(LB.noon, LB.never + 0.3, C.Elyd, 0.34, { att: 0.8, rel: 0.8, cut: 3200 });
   M.strings(LB.noon + 0.5, LB.never, ['A#5', 'E6'], 0.035, { att: 1.0, rel: 1.0, cut: 9000, wave: 'sine', vib: 6 });
   // it never gets dark again: the theme backwards, low, for the night that is gone
-  M.prog([[LB.never, C.Em9], [cap('never', 2), C.Cmaj7]], LB.space + 0.4, 0.3, { cut: 1000 });
+  M.prog([[LB.never, C.Em9], [cap('never', 2), C.Cmaj7]], LB.summer + 0.4, 0.3, { cut: 1000 });
   back(cap('never', 1) + 1.4, 1.3, 0.2, { oct: -1, dur: 1.7 });
 
-  // ---- 7 · the planet: big and steady; the heat: dread, quickening; the oceans; the Sun being born
-  M.prog([[LB.space, C.Ebig], [cap('space', 1), C.Emaj9]], LB.summer + 0.3, 0.4, { cut: 1800 });
-  arp(LB.space + 0.6, LB.summer - 0.4, ['E', 'G#', 'B', 'D#', 'F#'], 0.38, 0.05, [5, 6]);
+  // ---- 7 · the years: endless summer; the heat: dread, quickening; the oceans; the old light still coming back
   M.prog([[LB.summer, C.E], [cap('summer', 1), C.Amaj9], [cap('summer', 2), C.B]], LB.heat + 0.3, 0.34, { cut: 1500 });
   keys(LB.summer + 0.5, LB.heat - 0.2, 1.6, ['B4', 'E5', 'G#4', 'C#5', 'A4', 'E5'], 0.09);
   M.strings(LB.heat, LB.birth + 0.4, ['E1', 'B1', 'E2'], 0.36, { att: 1.0, rel: 1.2, cut: 300, cutTo: 700, cutAt: LB.birth });
@@ -262,17 +260,17 @@ lbSound('music', 'score', function (ctx, bus, K) {
   M.drum(cap('boil', 1), 0.65, 36.7, 1.2); M.piano(cap('boil', 1), 'E1', 0.45, 3);
   M.strings(cap('boil', 1), LB.birth + 0.3, ['E1', 'B1', 'F2', 'C3'], 0.34, { att: 0.2, rel: 1.5, cut: 500 });
   M.drum(cap('boil', 2) + 0.2, 0.45, 30.9, 2.0, 1.4);
-  // the second Sun running back to the Sun's birth: rising, opening out; then it fades and the night comes back
+  // the second Sun running back through time: rising, opening out; then the last starry night comes back
   M.strings(LB.birth, LB.nightBack + 1.5, C.Em9, 0.34, { att: 2.5, rel: 1.8, cut: 600, cutTo: 2600, cutAt: LB.nightBack });
   M.strings(cap('birth', 1), LB.nightBack + 1.0, ['B4', 'E5', 'B5'], 0.06, { att: 2.5, rel: 1.6, cut: 6000, wave: 'sine', vib: 3 });
   arp(cap('birth', 1) + 0.4, LB.nightBack, ['E', 'G', 'B', 'D', 'F#'], (t) => 0.5 - 0.3 * MathX.clamp((t - cap('birth', 1)) / 5, 0, 1), 0.05, [5, 6, 7]);
   M.bell(LB.nightBack + 2.4, 'E5', 0.3, 0);
 
   // ---- 8 · is any of this real: warm and plain (the night garden again); the question: the theme whole
-  M.prog([[LB.real, C.Em9], [LB.real2, C.Cmaj7], [LB.real3, C.G], [LB.real4, C.Dsus], [LB.real5, C.Asus]], LB.question + 0.2, 0.3, { cut: 1300 });
+  M.prog([[LB.real, C.Em9], [LB.real2, C.Cmaj7], [LB.real3, C.G], [LB.real4, C.Dsus], [cap('real4', 2), C.Asus]], LB.question + 0.2, 0.3, { cut: 1300 });
   keys(LB.real2 + 0.8, LB.real4 - 0.6, 2.4, ['B4', 'G4', 'E5', 'D5', 'B4', 'F#4', 'G4', 'A4'], 0.09);
   back(cap('real4', 1) + 1.0, 0.9, 0.2, { oct: 0, dur: 1.2 });
-  keys(LB.real5 + 0.6, LB.question - 0.6, 2.8, ['E5', 'C#5', 'A4', 'B4'], 0.08);
+  keys(cap('real4', 2) + 0.4, LB.question - 0.6, 2.8, ['E5', 'C#5', 'A4', 'B4'], 0.08);
   M.strings(LB.question - 0.2, LB.end + 0.05, C.Ebig, 0.48, { att: 1.0, rel: 1.2, cut: 1800, keys: [[LB.question + 2, 1], [LB.end - 3, 0.55], [LB.end - 0.6, 0.4]] });
   M.drum(LB.question, 0.5, 41.2, 1.4);
   M.bell(theme(LB.question + 0.3, 0.42, 0.42), LB_THEME_END, 0.5, 0);

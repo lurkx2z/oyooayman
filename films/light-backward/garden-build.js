@@ -358,7 +358,7 @@ function lbBuildGarden(app, S) {
   for (const [x, y, z, s] of [[0, 3.0, 0, 1.25], [0.9, 2.7, 0.2, 0.9], [-0.9, 2.8, -0.2, 0.95], [0.2, 3.6, -0.3, 0.85], [-0.3, 2.5, 0.6, 0.8]]) P.foliage.push(lbMesh(lbBlob(s, r.int(0, 999)), r.next() < 0.5 ? M.leaf : M.leaf2, x, y, z, tree));
   const shed = P.shed = new THREE.Group(); shed.position.set(G.shed[0], 0, G.shed[2]); B.add(shed);
   lbBox(2.2, 2.0, 1.8, M.shed, 0, 1.0, 0, shed);
-  const sr = P.shedRoof = lbGable(2.4, 2.1, 0.55, M.roof); sr.position.set(0, 2.0, 0); sr.rotation.y = Math.PI / 2; sr.castShadow = true; shed.add(sr);
+  const sr = P.shedRoof = lbGable(2.4, 2.1, 0.55, lbStd('#2b2927', 1.0, 0, { envMapIntensity: 0.2 }));   // (roofing felt: no grazing sheen) sr.position.set(0, 2.0, 0); sr.rotation.y = Math.PI / 2; sr.castShadow = true; shed.add(sr);
   lbBox(0.8, 1.7, 0.04, lbStd('#3d4638', 0.9), -0.4, 0.9, 0.92, shed);
   // ---------------------------------------------------------------- the telescope (on A, loose: it can float)
   const scope = P.scope = new THREE.Group(); scope.position.set(...G.scope); A.add(scope);

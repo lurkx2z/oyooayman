@@ -1,7 +1,9 @@
 /* =====================================================================
    PHYSICS — "What if light started moving backward?" Every number the film shows comes from here (PLAN.md § 2).
-   THE RULE: at 10:00:00 PM GMT every photon in the universe reverses its direction, once (in the Sun's frame, the
-   solar system's own). Matter is untouched: lamps, fires and the Sun go on shining as before.
+   THE RULE: at 10:00:00 PM GMT every photon in the universe reverses its direction, once (in the frame of the solar
+   system's centre of mass: the Sun itself wobbles round it at ~13 m/s, so in the Sun's own frame the old light would
+   come back to a point drifting 0.27 AU per 50 years away from it). Matter is untouched: lamps, fires and the Sun go
+   on shining as before.
    Story time s = seconds after 10:00:00 PM GMT (negative before). Directions are unit vectors in the equatorial frame
    (x: the March equinox, z: the north celestial pole) until lbToGarden() turns them into the garden's frame
    (metres, y up, −z down the garden, which faces SSE: azimuth LBP.az0).
@@ -19,12 +21,13 @@ const LBP = {
   lat: 51.5, lon: -0.1,                         // your garden (southern England)
   hawaii: { lat: 21.28, lon: -157.83 },         // Waikiki
   gm0: 2.298, utc0: 22,                         // GMST at 0h UT (late October, h); the reversal at 22:00:00 UT
-  lam0: 213, eps: 23.44,                        // the Sun's ecliptic longitude tonight (°), the obliquity
+  lam0: 213.5, eps: 23.44,                      // the Sun's ecliptic longitude tonight (°; 26 Oct 2026, 22h UT), the obliquity
   moonElong: 135, moonBeta: 2, moonDist: 384400, Rmoon: 1737.4, vMoon: 1.02,   // a waxing gibbous Moon
   az0: 150,                                     // the garden looks down to azimuth 150° (SSE)
   hgt: 0.002,                                   // your eyes: 2 m up (km)
 };
 LBP.tMoon = LBP.moonDist / LBP.c;               // moonlight's trip: 1.28 s
+LBP.tFirst = LBP.tSun - LBP.tLimb;              // the first new sunlight (the middle of the disc, 2.3 light-s closer): 10:08:13.5
 
 // ---- vectors (plain arrays)
 const lbDot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -97,7 +100,7 @@ const lbEarthU = () => lbSc(lbVelDir(0), 2 * LBP.v);
 const lbSunGain = (tau) => (tau <= 0 ? 1 : 1 + (1 - Math.exp(-tau / LBP.tResp)));
 function lbSunSeen(s) {
   if (s < 0) return { k: 1, r: 1, on: 1 };
-  const tau = s - LBP.tSun;                                       // since the first new light reached the Earth
+  const tau = s - LBP.tFirst;                                     // since the first new light reached the Earth
   if (tau <= 0) return { k: 0, r: 0, on: 0 };
   const u = Math.min(1, tau / LBP.tLimb), r = Math.sqrt(Math.max(0, 1 - (1 - u) * (1 - u)));   // (the centre is closest)
   return { k: lbSunGain(tau), r, on: 1 };
@@ -139,6 +142,14 @@ const LB_MOON = (() => {
   const extra = -lbDot(M, S) * LBP.moonDist / LBP.c;              // the Moon is this much further from the Sun (s)
   return { U: lbSc(vel, 2), dayBack: LBP.tSun + extra + LBP.tMoon, extra };
 })();
+// the Moon's day side between 10:00:00 and 10:08:18: lit only by its own reflected light falling back (its albedo,
+// ≈ 11 %, while the Moon still sits where that light left from; less as it moves on at 2 × 30.8 km/s), seen 1.28 s later
+function lbMoonGhost(s) {
+  const tau = s - LBP.tMoon; if (tau <= 0) return 0;
+  const k = 2 * (LBP.v + LBP.vMoon) * tau / LBP.Rmoon; return 0.11 / (1 + k * k);
+}
+// the same for the Earth's day side seen from space: lit by its own reflected sunlight (albedo ≈ 0.3) falling back
+function lbEarthGhost(s) { if (s <= 0) return 0; const k = 2 * LBP.v * s / LBP.R; return 0.3 / (1 + k * k); }
 function lbMoonPoint(n) {                                          // n: unit normal (equatorial) → { day, t (seen here) }
   const S = LB_SKY.S;
   if (lbDot(n, S) >= 0) return { day: 1, t: LB_MOON.dayBack };

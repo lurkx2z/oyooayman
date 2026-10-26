@@ -19,24 +19,24 @@ const path = require('path');
 const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 1.0
 const PAUSE = {
-  open: 0.5, title: 0.9, before: 0.9, rule: 0.9, vanish: 2.6, crescent: 0.4, old: 0.8, mirror: 0.9, replay: 1.0,
+  open: 0.5, title: 0.9, before: 0.9, rule: 0.9, vanish: 2.6, crescent: 0.4, lights: 0.5, mirror: 0.9, replay: 0.6,
   day: 2.4, why: 1.2, shadow: 0.7, wave: 1.1, moonwhy: 0.9, project: 1.3, past: 1.0,
-  hawaii: 1.6, black: 1.4, half: 1.0, wait: 1.0, voyager: 1.3, return: 1.6, double: 1.4, full: 1.4, three: 1.0,
-  midnight: 2.0, sunrise: 2.0, noon: 1.4, never: 1.6, space: 1.8, summer: 1.2, heat: 0.9, boil: 1.2, birth: 1.6,
-  real: 2.2, real2: 0.7, real3: 0.8, real4: 0.9, real5: 0.9, question: 1.6,
+  hawaii: 1.6, black: 1.6, shrink: 1.4, half: 1.0, wait: 1.0, voyager: 1.3, return: 1.6, double: 1.4, full: 1.4, three: 1.0,
+  midnight: 2.0, sunrise: 2.0, little: 1.4, noon: 1.4, never: 1.6, summer: 1.4, heat: 0.9, boil: 1.2, birth: 1.6,
+  real: 2.2, real2: 0.7, real3: 0.8, real4: 0.9, question: 1.6,
 };
 // the real-time beats: the story second (after 10:00:00) at which the beat's first caption appears
-const STORY_AT = { sirius: 20.7, canopus: 57.7, north: 66.4, switch: 80.7 };
+const STORY_AT = { sirius: 20.7, europe: 58.7, north: 66.6, switch: 81.0 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'open:1': 0.4, 'mirror:2': 0.3, 'canopus:1': 0.4,
+  'open:1': 0.4, 'lights:1': 0.4, 'mirror:3': 0.3,
   'north:1': 0.6, 'switch:1': 0.25, 'day:1': 0.8, 'day:2': 1.0, 'why:2': 0.5, 'project:1': 1.2, 'project:2': 0.4,
   'shadow:2': 0.3, 'wave:1': 0.3, 'wave:2': 0.4, 'half:1': 0.4, 'voyager:2': 0.5,
-  'black:1': 1.0, 'black:2': 0.6, 'return:1': 1.6, 'double:1': 0.6, 'double:2': 0.3, 'double:3': 0.3, 'full:1': 0.6,
-  'midnight:2': 0.6, 'sunrise:1': 0.6, 'sunrise:2': 1.0, 'never:1': 0.6, 'never:2': 0.8, 'space:1': 0.6, 'summer:2': 0.6, 'heat:2': 0.5, 'boil:1': 0.4, 'boil:2': 0.6,
-  'birth:1': 0.8, 'birth:2': 1.0, 'real3:1': 0.3,
+  'black:1': 1.0, 'black:2': 0.6, 'shrink:1': 0.8, 'little:1': 0.4, 'little:2': 0.6, 'voyager:3': 0.4, 'return:1': 1.6, 'double:1': 0.6, 'double:2': 0.3, 'double:3': 0.3, 'full:1': 0.6,
+  'midnight:2': 0.6, 'sunrise:1': 0.6, 'sunrise:2': 1.0, 'never:1': 0.6, 'never:2': 0.8, 'summer:2': 0.6, 'heat:2': 0.5, 'boil:1': 0.4, 'boil:2': 0.6,
+  'birth:1': 0.8, 'birth:2': 1.4, 'real3:1': 0.3,
 };
-const SECTION_OF = { open: 1, title: 1, before: 2, vanish: 3, switch: 4, hawaii: 5, full: 6, space: 7, real: 8 };
+const SECTION_OF = { open: 1, title: 1, before: 2, vanish: 3, switch: 4, hawaii: 5, full: 6, summer: 7, real: 8 };
 const GAP = 0.65;                     // between captions inside a beat
 const TAIL = 4.4;                     // the question held, then the cut
 const hold = (s) => Math.min(4.2, Math.max(1.5, 1.0 + 0.05 * s.length));

@@ -3,18 +3,21 @@
    the garden; sky.js draws the sky; physics.js says when everything happens). One set, many shots (modes, shots.js):
      open      10:02:30 PM: daylight; the camera finds the second Sun     title     the garden under the title
      before    9:59:39: the night, the Moon, the cat on the wall          rule      the rule (the HUD's diagram)
-     vanish    the whole sky; at 10:00:00 it goes out                      crescent  the Moon (long lens): the sliver
-     old       the black sky; the first mirror images                      sirius    west: Sirius appears
-     mirror    the sky filling up, back to front                           replay    the lantern, a billion times slower
-     mirror2   the sky                                                     canopus   over the roof: Canopus appears
-     north     the glow low in the south-west                                switch    down the garden: the second Sun
+     vanish    the Moon and the stars; at 10:00:00 they go out             crescent  the Moon (long lens): the sliver
+     lights    the sky lights up again: town lights, upside down (the mirror Earth: sky.js), labelled as they pass
+     sirius    west: Sirius appears                                        mirror    the sky filling up, back to front
+     replay    the lantern, a billion times slower                         mirror2   the sky
+     europe    a crane up over the rooftops: the upside-down Europe shrinking to the north-east, Moscow's lights
+     north     still up there, round to the north: the glow low over the town   switch    down the garden: the second Sun
      day       daylight; a robin sings; the streetlight goes off           moonwhy   the Moon by day, its night side lit
      project   the telescope's card: the spots back to front               past      the second Sun through a filter
      full      10:08:18: the Moon's day side, twice as bright              three     triple sunlight (the HUD's chart)
      midnight  the second Sun high in the south; next door's solar panels
-     sunrise   6:47 AM in the park: two suns, two shadows                  noon      the real Sun, twice as bright
-     never     three days in twelve seconds: no night                      summer    the garden that never sees winter
-     nightback the night comes back                                        real / question   9:59 PM, tonight
+     sunrise   6:45 AM in the park: two suns, two shadows                  little    the mirror Earth (long lens), shrunk
+                                                                           to the Moon's size, turning backwards
+     noon      the real Sun, twice as bright                               never     three days in twelve seconds: no night
+     summer    the garden that never sees winter                           nightback the last starry night: 9:56 PM tonight
+     real / question   9:59 PM, tonight
    Layout (metres): the house's back wall is z = 0, the garden runs to −z (SSE, azimuth 150°), +x is WSW, −x ENE.
    ===================================================================== */
 
@@ -57,10 +60,12 @@ function lbStreetlight(scene, at) {
   lbBox(0.34, 0.1, 0.56, grey, 0, 5.92, 1.08, g);
   lbBox(0.05, 0.05, 0.05, lbStd('#2a2c2e', 0.5), 0, 6.0, 0.86, g);                  // (the sensor)
   const lensM = new THREE.MeshBasicMaterial({ color: '#ffe6c0' });
-  const lens = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 0.46), lensM); lens.rotation.x = Math.PI / 2; lens.position.set(0, 5.866, 1.08); g.add(lens);
+  const lens = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 8), lensM); lens.scale.set(0.15, 0.03, 0.25); lens.position.set(0, 5.87, 1.08); g.add(lens);
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: lbDotTex(0.2), color: '#ffcf98', transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+  halo.scale.setScalar(1.3); halo.position.set(0, 5.84, 1.08); g.add(halo);
   const light = new THREE.SpotLight('#ffdcb0', 0, 30, 1.05, 0.75, 1.3);
   light.position.set(at[0], 5.8, at[2] + 1.1); light.target.position.set(at[0] - 0.5, 0, at[2] + 4.0); scene.add(light, light.target);
-  return { g, lensM, light };
+  return { g, lensM, light, halo };
 }
 // solar panels on next door's roof (its south-facing slope, 29°)
 function lbSolarPanels(scene) {
@@ -71,7 +76,8 @@ function lbSolarPanels(scene) {
     for (let x = 6; x <= w - 6; x += (w - 12) / 6) { g.beginPath(); g.moveTo(x, 6); g.lineTo(x, h - 6); g.stroke(); }
     for (let y = 6; y <= h - 6; y += (h - 12) / 10) { g.beginPath(); g.moveTo(6, y); g.lineTo(w - 6, y); g.stroke(); }
   }), { repeat: false });
-  const m = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.18, metalness: 0.35, envMapIntensity: 1.4 });
+  const top = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.18, metalness: 0.35, envMapIntensity: 1.4 });
+  const side = lbStd('#202328', 0.7, 0.3), m = [side, side, top, side, side, side];   // (only the top is glass: edge-on from below they read as a dark line, not a pale sliver)
   const grp = new THREE.Group(); grp.position.set(12.2, 7.4 + 0.08, 1.87); grp.rotation.x = -Math.atan2(2.4, 4.3); scene.add(grp);
   for (let r = 0; r < 2; r++) for (let c = 0; c < 6; c++) {
     const p = lbBox(1.0, 0.04, 1.65, m, -2.75 + c * 1.1, 0, -0.9 + r * 1.75, grp); p.castShadow = true;
@@ -105,7 +111,7 @@ LB_SETS.garden = (app) => {
   const scene = S.scene, cam = S.camera, K = lbK, G = LB_G;
   scene.environment = lbEnv(app.renderer, '#9fb8d8', '#d6d2ca', '#5a544a');
   const P = lbBuildGarden(app, S), M = P.M;
-  const sky = new LbSky(scene, { F: LB_SKY.F, X: LB_SKY.X, az0: LBP.az0, moon: true, second: true, town: '#3a2c22' });
+  const sky = new LbSky(scene, { F: LB_SKY.F, X: LB_SKY.X, az0: LBP.az0, moon: true, second: true, earth: true, town: '#3a2c22' });
   // ---- light: the two suns (each with its shadow), the Moon, the sky; the lamps
   const sun2L = S.sun, sun1L = new THREE.DirectionalLight('#fff4e6', 0);
   sun1L.castShadow = true; sun1L.shadow.mapSize.set(2048, 2048); sun1L.shadow.bias = -0.0004; sun1L.shadow.normalBias = 0.03;
@@ -118,6 +124,8 @@ LB_SETS.garden = (app) => {
   const pendant = new THREE.PointLight('#ffcf96', 0, 9, 1.6); pendant.position.set(...P.lampAt); scene.add(pendant);
   const candle = new THREE.PointLight('#ffad5a', 0, 7, 1.8); scene.add(candle);
   const street = lbStreetlight(scene, LB_GD.lamp);
+  // (the telescope's tube satin grey, not white: it sits at the edge of many night shots; the bird bath just dark water)
+  { const tubeM = lbStd('#a9adb2', 0.45, 0.35); P.tube.traverse((o) => { if (o.isMesh && o.material === M.white) o.material = tubeM; }); if (P.bathIce) P.bathIce.visible = false; }
   // ---- the candle's flame (the lantern on the patio table)
   const flame = new THREE.Group(); flame.position.set(...P.wickAt); flame.position.y += 0.018; P.lantern.add(flame);
   const flameM = new THREE.MeshBasicMaterial({ color: '#ffd28a' });
@@ -169,7 +177,7 @@ LB_SETS.garden = (app) => {
 
   // ---- the story clock per mode (the end: tonight again, at 9:59 PM, ticking towards 10)
   const nightS = (t) => t - LB.end - 0.5;
-  const skyTime = (t, m) => (m === 'real' || m === 'question' ? nightS(t) : m === 'nightback' ? -200 : lbStoryAt(t));
+  const skyTime = (t, m) => (m === 'real' || m === 'question' ? nightS(t) : m === 'nightback' ? -200 + (t - LB.nightBack) : lbStoryAt(t));
   LB_GARDEN.skyTime = skyTime;
 
   const look = (p, at, fov, t, drift = 0.004, roll = 0) => { const d = lbDrift(t, drift, 0.3, 11); lbCam(cam, [p[0] + d[0], p[1] + d[1], p[2] + d[2]], at, fov, roll); };
@@ -196,6 +204,7 @@ LB_SETS.garden = (app) => {
       let lamps = 1, house = 1, lantern = 1, fade2 = 1, dim = 0, shadowC = null, shadowR = 22, lift = 0.0, gain = 1, amb = 1;
       cam.near = 0.02; cam.far = 6000;
       card.visible = shade.visible = false; you.root.visible = false; park.visible = false;
+      P.scope.visible = !(m === 'lights' || m === 'mirror' || m === 'mirror2');   // (from under it, its tube reads as a floating sliver)
       catRoot.visible = true; robin.g.visible = true; photons.begin();
       // (where the suns are now: the sky's state from the last frame is fine for aiming, it moves slowly)
       const L1 = lbLocal(lbSunDir(s), sk.F, LBP.az0), L2 = lbSc(L1, -1);
@@ -227,14 +236,18 @@ LB_SETS.garden = (app) => {
       } else if (m === 'rule') {
         const k = K(t, LB.rule, LB.count, (x) => x);
         pos = [-1.4, 1.62, -6.5]; at = lbAim(pos, lbLerp(222, 214, k), lbLerp(24, 27, k)); fov = 58; drift = 0.003;
-      } else if (m === 'vanish' || m === 'old' || m === 'mirror2') {
-        // the whole sky, roofs along the bottom
-        const k = m === 'old' ? K(t, LB.old, LB.siriusCut, (x) => x) : m === 'vanish' ? K(t, LB.count, LB.moonCut, (x) => x) : K(t, LB.replayEnd, LB.canopusCut, (x) => x);
-        pos = [0.0, 1.45, -8.0]; at = lbAim(pos, m === 'old' ? lbLerp(178, 160, k) : m === 'vanish' ? lbLerp(182, 178, k) : lbLerp(160, 150, k), 38); fov = 82; drift = 0.002;
+      } else if (m === 'vanish') {
+        // the Moon, big, among the stars; at 10:00:00 all of it goes out
+        const k = K(t, LB.count, LB.moonCut, (x) => x), md = [moonD.x, moonD.y, moonD.z];
+        pos = [-0.8, 1.6, -6.4]; at = [pos[0] + md[0] * 40, pos[1] + (md[1] - 0.06) * 40, pos[2] + md[2] * 40]; fov = lbLerp(30, 20, k); drift = 0.0012;
+      } else if (m === 'lights' || m === 'mirror2') {
+        // the whole sky, roofs along the bottom (lights: up at the sky as it lights up again, town lights upside down)
+        const k = m === 'lights' ? K(t, LB.lights, LB.siriusCut, (x) => x) : K(t, LB.replayEnd, LB.europeCut, (x) => x);
+        pos = [0.0, 1.45, -8.0]; at = m === 'lights' ? lbAim(pos, lbLerp(200, 222, k), lbLerp(30, 36, k)) : lbAim(pos, lbLerp(160, 150, k), 38); fov = m === 'lights' ? 84 : 82; drift = 0.002;
       } else if (m === 'crescent' || m === 'moonwhy' || m === 'full') {
         // the Moon through a long lens
         pos = LB_GD.you; const md = [moonD.x, moonD.y, moonD.z];
-        const k = m === 'crescent' ? K(t, LB.moonCut, LB.old, (x) => x) : m === 'moonwhy' ? K(t, LB.moonwhy, LB.project, (x) => x) : K(t, LB.full, LB.three, (x) => x);
+        const k = m === 'crescent' ? K(t, LB.moonCut, LB.lights, (x) => x) : m === 'moonwhy' ? K(t, LB.moonwhy, LB.project, (x) => x) : K(t, LB.full, LB.three, (x) => x);
         at = [pos[0] + md[0] * 40, pos[1] + md[1] * 40, pos[2] + md[2] * 40]; fov = lbLerp(1.05, 0.95, k); drift = 0.00002;
         cam.near = 1;
       } else if (m === 'sirius') {
@@ -257,12 +270,14 @@ LB_SETS.garden = (app) => {
           photons.add(ph.p[0], ph.p[1], ph.p[2], 0.011, a, 1.0, 0.78, 0.46);
           for (let j = 1; j <= 3; j++) photons.add(ph.p[0] - ph.d[0] * 0.012 * j, ph.p[1] - ph.d[1] * 0.012 * j, ph.p[2] - ph.d[2] * 0.012 * j, 0.008, a * (0.5 - 0.12 * j), 1.0, 0.7, 0.4);
         }
-      } else if (m === 'canopus' || m === 'north') {
-        // the bottom of the garden, looking back over the house
-        pos = [-1.4, 1.62, -15.8];
-        if (m === 'canopus') { const k = K(t, lbCap('canopus', 0).show + 0.4, lbCap('canopus', 1).show); at = lbAim(pos, 309, lbLerp(32, 38.8, k)); fov = lbLerp(62, 40, k); }
-        else { const k = K(t, LB.north, LB.north + 6.0); pos = [-2.6, 1.62, -10.0]; at = lbAim(pos, lbLerp(242, 228, k), lbLerp(26, 8, k)); fov = lbLerp(56, 70, k); }
-        drift = 0.002;
+      } else if (m === 'europe' || m === 'north') {
+        // a crane up from the bottom of the garden, over the rooftops: the upside-down Europe to the north-east; then
+        // round to the north, down to the glow low over the town (the house hides that part of the sky from the lawn)
+        const up = Ease.inOutSine(K(t, LB.europeCut, LB.europeCut + 5.5));
+        pos = [-1.4, lbLerp(1.62, 12.5, up), lbLerp(-15.8, -15.0, up)];
+        if (m === 'europe') { at = lbAim(pos, lbLerp(52, 42, up), lbLerp(40, 26, up)); fov = 80; }
+        else { const k = Ease.inOutSine(K(t, LB.north, LB.north + 5.0)); at = lbAim(pos, lbLerp(42, 12, k), lbLerp(26, 7, k)); fov = lbLerp(80, 66, k); }
+        drift = 0.0015;
       } else if (m === 'switch') {
         pos = [0.4, 1.62, -2.6]; const a = lbGardenAltAz(L2);
         at = lbAim(pos, a.az + 2, a.alt - 14); fov = 72; drift = 0.0025;
@@ -286,9 +301,9 @@ LB_SETS.garden = (app) => {
       } else if (m === 'midnight') {
         lamps = 0; sk.moonK = 0;
         if (t < lbCap('midnight', 2).show - 0.4) { const k = K(t, LB.midnight, LB.sunrise, (x) => x); pos = [-0.6, 1.62, -5.5]; at = toward(L2, pos, 40, lbLerp(-20, -16, k)); fov = 70; }
-        else { const k = K(t, lbCap('midnight', 2).show - 0.4, LB.sunrise, (x) => x); pos = [lbLerp(2.0, 2.3, k), 2.3, -5.4]; at = [10.6, 7.25, 1.6]; fov = 30; drift = 0.0015; }
+        else { const k = K(t, lbCap('midnight', 2).show - 0.4, LB.sunrise, (x) => x); pos = [lbLerp(2.6, 3.2, k), lbLerp(9.0, 9.6, k), -14.0]; at = [11.6, 7.3, 1.6]; fov = 24; drift = 0.0012; }   // (from up high: the panels face the garden at 29°)
       } else if (m === 'sunrise') {
-        // the park, 6:47 AM: the real Sun rising in the east, the second setting in the west, your two shadows
+        // the park, 6:45 AM: the real Sun rising in the east, the second setting in the west, your two shadows
         lamps = 0; house = 0; lantern = 0; sk.moonK = 0; park.visible = true; you.root.visible = true; you.update(t);
         catRoot.visible = false; robin.g.visible = false;
         const E = lbGardenDir(111, 0), side = lbN3([-E[2], 0, E[0]]), Y = [PK[0], 1.0, PK[2]];
@@ -300,8 +315,14 @@ LB_SETS.garden = (app) => {
           pos = [PK[0] + side[0] * 7, 1.5, PK[2] + side[2] * 7];
           const dir = lbN3([E[0] * Math.cos(ang) - side[0] * Math.sin(ang), 0.0, E[2] * Math.cos(ang) - side[2] * Math.sin(ang)]);
           at = [pos[0] + dir[0] * 400, 6, pos[2] + dir[2] * 400]; fov = 46;
-        } else { const k = K(t, c2, c2 + 5); pos = [PK[0] + side[0] * lbLerp(4.0, 5.5, k) - E[0] * 1.2, lbLerp(3.0, 5.0, k), PK[2] + side[2] * lbLerp(4.0, 5.5, k) - E[2] * 1.2]; at = [PK[0], 0.5, PK[2]]; fov = lbLerp(60, 66, k); drift = 0.004; }
+        } else { const k = K(t, c2, c2 + 5); pos = [PK[0] + side[0] * lbLerp(6.0, 6.8, k), lbLerp(2.1, 2.5, k), PK[2] + side[2] * lbLerp(6.0, 6.8, k)]; at = [PK[0], 0.35, PK[2]]; fov = lbLerp(74, 78, k); drift = 0.003; }   // (low, from the side: one shadow each way)
         shadowC = [PK[0], 0, PK[2]]; shadowR = 60; lift = t < c2 ? 0.06 : 0.2; gain = t < c2 ? 1 : 1.8; amb = t < c2 ? 0.45 : 0.22; sk.lens = 40;   // (the discs drawn larger than life; the light lifted so the shadows read)
+      } else if (m === 'little') {
+        // the mirror Earth, from the park: about the Moon's size at dawn, shrinking, turning backwards (it shows yesterday)
+        lamps = 0; house = 0; lantern = 0; sk.moonK = 0; park.visible = true; catRoot.visible = false; robin.g.visible = false;
+        const me = lbMirrorEarth(lbEarthPoint(sk.F), s), E = lbLocal(lbNrm(me.P), sk.F, LBP.az0);
+        pos = [PK[0], 1.6, PK[2]]; at = [pos[0] + E[0] * 40, pos[1] + E[1] * 40, pos[2] + E[2] * 40];
+        fov = lbLerp(2.0, 1.4, K(t, LB.little, LB.noon, (x) => x)); drift = 0.00002; cam.near = 1; sk.lens = 1; this._me = me;
       } else if (m === 'noon') {
         lamps = 0; house = 0; lantern = 0; sk.moonK = 0;
         const k = K(t, LB.noon, LB.never, (x) => x);
@@ -314,9 +335,8 @@ LB_SETS.garden = (app) => {
         const k = K(t, LB.summer, LB.heat, (x) => x);
         pos = [lbLerp(1.2, 0.8, k), 1.62, lbLerp(-13.6, -12.6, k)]; at = [-0.4, 2.8, 0]; fov = 60;
       } else if (m === 'nightback') {
-        // far in the future: the second Sun shows the Sun being born, fades; the night comes back
-        const k = K(t, LB.nightBack + 0.2, LB.nightBack + 2.6);
-        fade2 = 1 - k; sk.on = -1e9; sk.moonK = 0; sk.F = LB_SKY.F; lamps = 0; house = 0; lantern = 0; sk.starSize = 1.7; sk.mw = 2.0;
+        // the last starry night: 9:56 PM tonight, the real sky (the Milky Way overhead)
+        sk.starSize = 1.35; sk.mw = 1.3;
         pos = [0.4, 1.62, -6.0]; at = lbAim(pos, lbLerp(236, 250, K(t, LB.nightBack, LB.real, (x) => x)), 44); fov = 74;
       } else if (m === 'real') {
         // 9:59 PM tonight: how old the light is; then the sky; then the night garden under the diagrams
@@ -347,7 +367,7 @@ LB_SETS.garden = (app) => {
       spill.intensity = 9 * house; pendant.intensity = 5.5 * house; M.glassLit.emissiveIntensity = 1.25 * house;
       for (const f of P.neighbours || []) f.material.emissiveIntensity = house;
       for (const p of strings) p.intensity = 1.1 * lamps; for (const b of P.bulbs) b.visible = lamps > 0.5;
-      street.light.intensity = 26 * lamps; street.lensM.color.set(lamps > 0.5 ? '#ffe6c0' : '#3a3c3e');
+      street.light.intensity = 26 * lamps; street.lensM.color.set(lamps > 0.5 ? '#ffe6c0' : '#3a3c3e'); street.halo.visible = lamps > 0.5;
       candle.intensity = 1.1 * lantern * flick * (dim ? 1.6 : 1); flame.visible = lantern > 0; fl.scale.set(0.007, 0.018 * flick, 0.007);
       { const W = new THREE.Vector3(); fl.getWorldPosition(W); candle.position.copy(W); }
       // (the replay: everything but the candle down to almost nothing)
@@ -370,8 +390,15 @@ LB_SETS.garden = (app) => {
       const star = (n, mir = true) => sky.at(n, 400, mir);
       if (m === 'sirius') out.push({ p: star('SIRIUS'), text: 'SIRIUS', sub: 'THE BRIGHTEST STAR', a: W(t, lbCap('sirius', 1).show, LB.mirror - 0.3, 0.3, 0.2) });
       if (m === 'mirror') out.push({ p: star('ARCTURUS'), text: 'ARCTURUS', sub: 'IT SET AT 7:40 PM, IN THE NORTH-WEST', a: W(t, lbCap('mirror', 1).show + 0.3, LB.replay - 0.3, 0.3, 0.2) });
-      if (m === 'canopus') out.push({ p: star('CANOPUS'), text: 'CANOPUS', sub: 'NEVER SEEN FROM BRITAIN', a: W(t, lbCap('canopus', 0).show + 0.3, LB.north - 0.3, 0.3, 0.2) });
-      if (m === 'north') out.push({ p: lbAim([0, 0, 0], 226, 13, 400), text: 'SOUTH-WEST', sub: 'THE FIRST AIR TO GET THE LIGHT BACK', a: W(t, LB.north + 0.8, LB.switchCut - 0.3, 0.3, 0.2) });
+      // (towns in the mirror Earth: where each one's light comes back from, while it is in sight)
+      const town = (lat, lon) => { const s = this._s, F = lbFrame(s), P = lbAdd(lbEarthPoint(F), LB_SKY.U, s), C = lbEarthPoint(lbFrame(-s, lat, lon), 0), V = lbAdd(P, C, -1);
+        if (lbDot(lbNrm(C), V) <= 0) return null; const L = lbLocal(lbNrm(V), F, LBP.az0); if (L[1] < 0.02) return null; const c = cam.position; return [c.x + L[0] * 400, c.y + L[1] * 400, c.z + L[2] * 400]; };
+      if (m === 'lights') for (const [n, lat, lon, a0, a1] of [['COPENHAGEN', 55.68, 12.57, 11.6, 15.2], ['STOCKHOLM', 59.33, 18.07, 15.8, 18.2]]) {
+        const p = t > lbStory(a0) - 0.3 && t < lbStory(a1) + 0.3 ? town(lat, lon) : null; if (p) out.push({ p, text: n, sub: 'UPSIDE DOWN', a: W(t, lbStory(a0), lbStory(a1), 0.3, 0.2) }); }
+      if (m === 'europe') { const p = town(55.75, 37.6); if (p) out.push({ p, text: 'MOSCOW', sub: '2,500 km AWAY · UPSIDE DOWN', a: W(t, LB.europeCut + 1.0, LB.north - 0.2, 0.3, 0.2) }); }
+      if (m === 'north') out.push({ p: lbAim(cam.position.toArray(), 14, 4, 400), text: 'NORTH', sub: 'THE FIRST AIR TO GET THE LIGHT BACK', a: W(t, LB.north + 1.4, LB.switchCut - 0.3, 0.3, 0.2) });
+      if (m === 'little' && this._me) { const E = lbLocal(lbNrm(this._me.P), lbFrame(this._s), LBP.az0), A = lbNrm(lbAdd(E, [0, 1, 0], this._me.rad * 1.5));
+        out.push({ p: lbAdd(cam.position.toArray(), A, 400), text: 'THE EARTH', sub: 'SHOWING YESTERDAY, BACKWARDS', a: W(t, LB.little + 0.8, LB.noon - 0.3, 0.3, 0.2) }); }
       if (m === 'midnight' && t > lbCap('midnight', 2).show) out.push({ p: [10.2, 7.9, 1.2], text: 'SOLAR PANELS', sub: 'MIDNIGHT · MAKING POWER', a: W(t, lbCap('midnight', 2).show + 0.2, LB.sunrise - 0.3, 0.3, 0.2) });
       if (m === 'real' && t < lbCap('real2', 0).show + 2.6) out.push({ p: sky.at('MOON', 400), text: 'MOONLIGHT', sub: '1.3 SECONDS OLD', a: W(t, lbCap('real2', 1).show - 0.6, lbCap('real2', 0).show + 2.5, 0.3, 0.15) });
       if (m === 'real' && t > lbCap('real2', 0).show + 2.6 && t < LB.real3) {
@@ -384,6 +411,12 @@ LB_SETS.garden = (app) => {
         out.push({ p: sky.at('SUN', 400), text: 'THE SUN', sub: 'RISING', a: W(t, LB.sunrise + 0.8, lbCap('sunrise', 2).show - 0.5, 0.3, 0.2) });
         out.push({ p: sky.at('SUN2', 400), text: 'THE 2ND SUN', sub: 'SETTING', a: W(t, lbCap('sunrise', 1).show + 2.6, lbCap('sunrise', 2).show - 0.5, 0.3, 0.2) });
       }
+      if (m === 'sunrise' && t > lbCap('sunrise', 2).show - 0.4) {
+        // (your two shadows: one from each sun, pointing opposite ways along the ground)
+        const E = lbGardenDir(111, 0), PKp = LB_GD.park, a = W(t, lbCap('sunrise', 2).show + 0.4, LB.little - 0.3, 0.3, 0.2);
+        out.push({ p: [PKp[0] - E[0] * 5, 0.05, PKp[2] - E[2] * 5], text: 'SHADOW', sub: 'FROM THE SUN', a });
+        out.push({ p: [PKp[0] + E[0] * 5, 0.05, PKp[2] + E[2] * 5], text: 'SHADOW', sub: 'FROM THE 2ND SUN', a });
+      }
       return out;
     },
     grade(t, p, shot) {
@@ -395,6 +428,7 @@ LB_SETS.garden = (app) => {
       if (m === 'replay') { p.exposure = 1.25; p.bloom = 0.6; p.bloomThreshold = 0.6; p.vignette = 0.75; }
       if (m === 'noon') { p.exposure = 0.94; p.bloom = 0.5; p.saturation = 0.96; p.contrast = 1.02; }
       if (m === 'sunrise') { p.warmth = 0.03; p.exposure = 0.8; p.saturation = 1.12; }
+      if (m === 'little') { p.exposure = 0.74; p.bloom = 0.1; p.saturation = 1.15; p.vignette = 0.3; }   // (a deeper blue sky: the faint Earth reads)
     },
   };
   return set;

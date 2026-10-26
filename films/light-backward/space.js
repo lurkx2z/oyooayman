@@ -5,18 +5,17 @@
               towards the Sun; the Earth is in the way, its night side lights up — except in the gap behind it
      shadow   ILLUSTRATION: from behind the Earth: the gap (its old shadow) comes back too; the Earth slides out
      wave     the real Earth (physics.js's exit time for every place): the light sweeping across the night side
-              (sped up 20×), your garden lit at 10:01:20
+              (sped up 20×), your garden lit at 10:01:21
      half     the day side at 10:00:00: dark everywhere at once
      voyager  ILLUSTRATION: Voyager 1's radio signal, turned round
-     twosuns  three days later: no night side, just a thin dim ring where both suns are setting
-     ice      over the Arctic: the sea ice going (months)        boil   the oceans boiling away (a thousand years)
-     birth    the second Sun showing the Sun's past: younger, redder, then a star being born in its disc
+     ice      over the Arctic: the sea ice going (within a year)  boil   the oceans boiling into a steam sky (thousands of years)
+     birth    ILLUSTRATION: shells of the Sun's old light, sent out over thousands of years, still closing in on it
    Frames: the real-Earth shots use the Earth-fixed frame (lon/lat as in EarthScene: x = lon 0, y = north); the
    illustrations put the Sun far off along −x and the Earth moving along +y.
    ===================================================================== */
 
 const LB_SP = {
-  u: 0.11, c: 2.2, Lh: 9,                  // the illustration: the Earth's speed, light's speed (Earth radii / s), the stream's half-length
+  u: 0.11, c: 2.2, Lh: 12,                 // the illustration: the Earth's speed, light's speed (Earth radii / s), the stream's half-length
 };
 // equatorial → the Earth-fixed scene frame at story time s
 function lbGeoScene(v, s) {
@@ -63,7 +62,7 @@ LB_SETS.space = (app) => {
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     const st = new THREE.Points(g, new THREE.PointsMaterial({ size: 2.0, sizeAttenuation: false, vertexColors: true, depthWrite: false, fog: false })); st.renderOrder = -9; st.frustumCulled = false; scene.add(st); }
   // ---- the Earth: the shared textures, this film's two-sun lighting
-  const ES = new EarthScene();
+  const ES = lbEarthScene();
   const exitTex = lbExitMap();
   const cloudT = ES.clouds.material.uniforms.uMap.value;
   const EU = {
@@ -106,6 +105,8 @@ LB_SETS.space = (app) => {
         float c1 = dot(n, uSun), o2 = on2(vUv, n);
         float l1 = max(c1, 0.0) * uK1, l2 = max(-c1, 0.0) * uK2 * o2;
         vec3 col = alb * (0.05 * uLights + 1.12 * (l1 + l2));
+        // (where both suns sit on the horizon: a thin ring of warm twilight, not a black seam)
+        col += alb * vec3(1.0, 0.7, 0.48) * 0.15 * exp(-c1 * c1 / 0.003) * min(uK1, uK2 * o2);
         // (the front of the returning light, sweeping over the night side: a thin bright edge)
         col += vec3(1.0, 0.86, 0.62) * 0.5 * o2 * (1.0 - o2) * 4.0 * uK2 * step(c1, 0.0) * (1.0 - step(0.5, uMode));
         // sun glints on the sea, one per sun
@@ -134,10 +135,13 @@ LB_SETS.space = (app) => {
       void main() {
         vec3 n = normalize(vN); float a = texture2D(uCloud, vUv + vec2(uOff, 0.0)).r;
         a *= 1.0 - 0.9 * uPoleClear * smoothstep(0.62, 0.75, vUv.y);
-        a = mix(a, 0.95, uSteam);
+        a = mix(a, 1.0, uSteam);
         float c1 = dot(n, uSun), o2 = on2(vUv, n);
         float l = smoothstep(-0.07, 0.62, c1) * uK1 + smoothstep(-0.07, 0.62, -c1) * uK2 * o2;
         vec3 col = vec3(0.01 + 0.92 * l) * mix(vec3(1.0, 0.8, 0.68), vec3(1.0), smoothstep(0.0, 0.16, abs(c1)));
+        // (a steam sky: cream and ochre, in bands like Venus's)
+        float band = 0.5 + 0.5 * sin(vUv.y * 46.0 + 3.0 * texture2D(uCloud, vUv * vec2(1.0, 2.0) + vec2(uOff * 3.0, 0.0)).r);
+        col *= mix(vec3(1.0), vec3(0.86, 0.72, 0.5) * (0.82 + 0.16 * band), uSteam);
         gl_FragColor = vec4(col * (0.84 + 0.16 * a), a * 0.92);
       }`,
   });
@@ -157,19 +161,32 @@ LB_SETS.space = (app) => {
   const london = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 8), dotM('#ffd27a')); london.position.set(...lbSc(lbLonLatScene(LBP.lon, LBP.lat), 1.004)); earthG.add(london);
   const hawaii = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 8), dotM('#ffd27a')); hawaii.position.set(...lbSc(lbLonLatScene(LBP.hawaii.lon, LBP.hawaii.lat), 1.004)); earthG.add(hawaii);
   // ---- the Sun (a far glare) and the stream of light
-  const glow = lbDotTex(0.18);
+  // (the Sun's glow: a steep falloff, so it reads as light, not as a pale ball)
+  const glow = lbTex(lbCanvas(256, 256, (g, w) => {
+    const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+    for (const [u, a] of [[0, 1], [0.04, 0.62], [0.1, 0.3], [0.2, 0.12], [0.35, 0.045], [0.55, 0.015], [0.8, 0.004], [1, 0]]) gr.addColorStop(u, `rgba(255,255,255,${a})`);
+    g.fillStyle = gr; g.fillRect(0, 0, w, w);
+  }), { repeat: false });
   const sunSpr = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: '#fff1d6', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
   sunSpr.renderOrder = -5; scene.add(sunSpr);
   const sunCore = new THREE.Sprite(new THREE.SpriteMaterial({ map: lbDotTex(0.9), color: '#ffffff', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
   sunCore.renderOrder = -4; scene.add(sunCore);
-  const stream = lbPuffs(scene, 26000, { additive: true, soft: 1.2 });
-  const LANES = Array.from({ length: 240 }, (_, i) => ({ y: -2.8 + 6.8 * lbR(i, 21), z: -2.8 + 5.6 * lbR(i, 22), n: 26, p: lbR(i, 23) }));
+  // (few lanes, long streaks: the direction of the flow must read at a glance)
+  const stream = lbPuffs(scene, 16000, { additive: true, soft: 1.2 });
+  const LANES = Array.from({ length: 110 }, (_, i) => ({ y: -2.6 + 6.2 * lbR(i, 21), z: -2.4 + 4.8 * lbR(i, 22), n: 4, p: lbR(i, 23) }));
+  // the gap: the Earth's own shadow in the stream (a ghost tube, so the empty space reads)
+  const gapM = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, uniforms: { uA: { value: 0 } },
+    vertexShader: 'varying vec3 vN; varying vec3 vW; varying float vX; void main(){ vX = position.y; vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: 'uniform float uA; varying vec3 vN; varying vec3 vW; varying float vX; void main(){ vec3 v = normalize(cameraPosition - vW); float f = pow(1.0 - abs(dot(normalize(vN), v)), 4.0); float e = smoothstep(0.5, 0.42, abs(vX)); gl_FragColor = vec4(vec3(0.55, 0.7, 1.0) * f * uA * e, 1.0); }' });
+  const gap = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 64, 1, true), gapM); gap.renderOrder = 2; scene.add(gap);
+  const placeGap = (x0, x1, y0, y1, a) => { gap.visible = a > 0.001 && x1 > x0; if (!gap.visible) return; const L = Math.hypot(x1 - x0, y1 - y0);
+    gap.position.set((x0 + x1) / 2, (y0 + y1) / 2, 0); gap.scale.set(1, L, 1); gap.rotation.set(0, 0, Math.atan2(y1 - y0, x1 - x0) - Math.PI / 2); gapM.uniforms.uA.value = a; };
   // ---- Voyager 1 and its signal
   const voy = new THREE.Group(); scene.add(voy); const vg = lbVoyager(voy); vg.rotation.y = -Math.PI / 2 + 0.25;
   const rings = Array.from({ length: 24 }, () => { const m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.012, 6, 64), new THREE.MeshBasicMaterial({ color: '#9fd0ff', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })); m.rotation.y = Math.PI / 2; voy.add(m); return m; });
-  // ---- the second Sun's past (the birth shot): the disc of gas and dust it formed in
-  const nursery = lbPuffs(scene, 4000, { additive: true, soft: 1.6 });
-  const NUR = Array.from({ length: 1600 }, (_, i) => ({ r: 1.4 + 9 * Math.pow(lbR(i, 31), 0.7), a: lbR(i, 32) * 6.2832, h: (lbR(i, 33) - 0.5) * 0.5, s: 0.25 + 0.9 * lbR(i, 34) }));
+  // ---- the old sunlight still coming back (the birth shot): shells of light closing in on the Sun
+  const shells = new THREE.Group(); scene.add(shells);
+  const SH = Array.from({ length: 18 }, () => { const m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.008, 6, 128), new THREE.MeshBasicMaterial({ color: '#ffd9a0', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending })); shells.add(m); return m; });
 
   // the illustration's stream: the particle positions and who survives (see the header)
   const yE = (tau, tf) => LB_SP.u * (tau - tf);
@@ -192,7 +209,7 @@ LB_SETS.space = (app) => {
           if (ok) { const r = Math.hypot(ln.y - yE(t, tf), ln.z); if (r < 1) { const s = Math.sqrt(1 - r * r); if (x < s && Xf > -s) ok = false; } }
         }
         if (!ok) continue;
-        for (let j = 0; j < 3; j++) stream.add(x - dir * 0.07 * j, ln.y, ln.z, 0.05 - 0.01 * j, alpha * (0.55 - 0.15 * j), 1.0, 0.9, 0.72);
+        for (let j = 0; j < 14; j++) stream.add(x - dir * 0.045 * j, ln.y, ln.z, 0.042 - 0.0018 * j, alpha * 0.62 * (1 - j / 14), 1.0, 0.9, 0.72);
       }
     }
   };
@@ -203,8 +220,8 @@ LB_SETS.space = (app) => {
     frame(t, shot) {
       const m = shot.mode;
       let pos = [0, 0, 4], at = [0, 0, 0], fov = 35, drift = 0.002;
-      stream.begin(); nursery.begin();
-      earthG.visible = true; voy.visible = false; sunSpr.visible = sunCore.visible = false; london.visible = hawaii.visible = false;
+      stream.begin();
+      earthG.visible = true; voy.visible = false; sunSpr.visible = sunCore.visible = false; london.visible = hawaii.visible = false; gap.visible = false; shells.visible = false;
       earthG.position.set(0, 0, 0); earthG.rotation.set(0, 0, 0);
       let k1 = 1, k2 = 0, s = lbStoryAt(t), mode = 0, shift = 0, ice = 1, sea = 0, steam = 0, lights = 1, a2 = 0;
       const sunAt = (p, size) => { sunSpr.visible = sunCore.visible = true; sunSpr.position.set(...p); sunCore.position.set(...p); sunSpr.scale.setScalar(size * 9); sunCore.scale.setScalar(size); };
@@ -216,27 +233,29 @@ LB_SETS.space = (app) => {
         shift = 2 * LB_SP.u * Math.max(0, dt); earthG.position.y = yE(t, tf);
         earthG.rotation.set(0.41, m === 'why' ? 2.2 : 1.4, 0);
         drawStream(t, tf, 0.9);
-        if (m === 'why') { const k = K(t, LB.why, LB.shadow, (x) => x); pos = [lbLerp(1.6, 2.2, k), lbLerp(1.4, 1.6, k), lbLerp(10.5, 9.5, k)]; at = [0.8, 0.4, 0]; fov = 42; sunAt([-30, 0, 0], 2.0); }
+        // (the gap behind the Earth: before the turn it trails behind it; after, it heads back to the Sun at light speed)
+        { const { c, u, Lh } = LB_SP; if (dt < 0) placeGap(1, Lh, yE(t - 1 / c, tf), yE(t - Lh / c, tf), m === 'why' ? 0.5 : 0.7);
+          else { const b = c * dt, x0 = Math.max(-Lh, 1 - b), x1 = Lh - b, yo = (x) => yE(tf - (x + b) / c, tf); placeGap(x0, x1, yo(x0), yo(x1), 0.7 * (1 - MathX.smooth(dt, 4, 7))); } }
+        if (m === 'why') { const k = K(t, LB.why, LB.shadow, (x) => x); pos = [lbLerp(3.0, 2.6, k), lbLerp(3.2, 2.8, k), lbLerp(14.5, 13.2, k)]; at = [-3.0, 0.3, 0]; fov = 52; sunAt([-13, 0, 0], 1.6); }
         else { const k = K(t, LB.shadow, LB.wave, (x) => x); pos = [lbLerp(7.5, 6.8, k), lbLerp(2.6, 2.9, k), lbLerp(4.4, 4.0, k)]; at = [0, earthG.position.y * 0.6, 0]; fov = 38; sunAt([-60, 0, 0], 3.5); }
       } else if (m === 'wave' || m === 'half') {
         // the real Earth at the real moment (the wave sped up 20×; the day side: the moment it went out)
         if (m === 'wave') { s = 20 * (t - (LB.wave + 0.7)); } else { s = t - (lbCap('half', 1).show + 0.6); }
         Ssc = lbGeoScene(lbSunDir(s), s);
         const V = lbGeoScene(lbVelDir(s), s), N = [0, 1, 0];
-        const sn = lbSunSeen(s); k1 = sn.on ? sn.k * sn.r * sn.r : 0; k2 = 1; a2 = MathX.clamp(s / 214, 0, 1);
+        const sn = lbSunSeen(s); k1 = sn.on ? sn.k * sn.r * sn.r : lbEarthGhost(s); k2 = 1; a2 = MathX.clamp(s / 214, 0, 1);   // (out: lit only by its own light falling back)
         if (m === 'wave') { london.visible = true; const k = K(t, LB.wave, LB.moonwhy, (x) => x); const d = lbN3([-Ssc[0] * 3.0 + V[0] * 1.9 + N[0] * 1.1, -Ssc[1] * 3.0 + V[1] * 1.9 + N[1] * 1.1, -Ssc[2] * 3.0 + V[2] * 1.9 + N[2] * 1.1]);
           const r = lbLerp(4.4, 4.0, k); pos = [d[0] * r, d[1] * r, d[2] * r]; fov = 36; }
         else { hawaii.visible = true; const hw = lbLonLatScene(LBP.hawaii.lon, LBP.hawaii.lat), d = lbN3([Ssc[0] * 0.75 + hw[0] * 0.5, Ssc[1] * 0.75 + hw[1] * 0.5 + 0.1, Ssc[2] * 0.75 + hw[2] * 0.5]); const k = K(t, LB.half, LB.wait, (x) => x), r = lbLerp(4.3, 3.9, k); pos = [d[0] * r, d[1] * r, d[2] * r]; fov = 36; }
         lights = 1;
-      } else if (m === 'twosuns' || m === 'ice' || m === 'boil') {
+      } else if (m === 'ice' || m === 'boil') {
         // after the first days: both suns everywhere (the Earth turning: a day every few seconds)
-        const days = m === 'twosuns' ? (t - LB.space) * 0.1 : m === 'ice' ? (t - LB.heat) * 0.6 : (t - LB.boil) * 0.8;
+        const days = m === 'ice' ? (t - LB.heat) * 0.6 : (t - LB.boil) * 0.8;
         s = lbAt(12, 0) + 86400 * (3 + days); Ssc = lbGeoScene(lbSunDir(s), s);
-        const sn = lbSunSeen(s); k1 = sn.k; k2 = 1; a2 = 1; lights = 1;
-        if (m === 'twosuns') { const k = K(t, LB.space, LB.summer, (x) => x), side = lbN3(lbCross(Ssc, [0, 1, 0])), d = lbN3([side[0] + Ssc[0] * 0.12, 0.2, side[2] + Ssc[2] * 0.12]), r = lbLerp(4.2, 3.7, k); pos = [d[0] * r, d[1] * r, d[2] * r]; fov = 36; }
-        else if (m === 'ice') { ice = 1 - K(t, LB.ice + 0.6, LB.ice + 4.2); const k = K(t, LB.heat, LB.boil, (x) => x), d = lbN3([0.35, 1.1, 0.6]), r = lbLerp(3.5, 3.15, k); pos = [d[0] * r, d[1] * r, d[2] * r]; at = [0, 0.3, 0]; fov = 38; }
-        else { const k = K(t, LB.boil, LB.birth, (x) => x), c3 = lbCap('boil', 2).show; steam = K(t, lbCap('boil', 1).show, c3 + 1.5) * (1 - K(t, c3 + 3.5, c3 + 6.5)) ; sea = K(t, c3 + 2.0, c3 + 6.0);
-          const d = lbN3([0.9, 0.3, 0.3]); pos = [d[0] * lbLerp(4.3, 3.9, k), d[1] * lbLerp(4.3, 3.9, k), d[2] * lbLerp(4.3, 3.9, k)]; fov = 36; }
+        const sn = lbSunSeen(s); k1 = sn.k; k2 = 1; a2 = 1; lights = 0;
+        if (m === 'ice') { ice = 1 - K(t, LB.ice + 0.6, LB.ice + 4.2); const k = K(t, LB.heat, LB.boil, (x) => x), d = lbN3([0.25, 1.25, 0.45]), r = lbLerp(3.5, 3.2, k); pos = [d[0] * r, d[1] * r, d[2] * r]; at = [-0.3, 0.35, 0.1]; fov = 38; }   // (the pole in view all the time, clear of the readout)
+        else { const k = K(t, LB.boil, LB.birth, (x) => x), c3 = lbCap('boil', 2).show; steam = K(t, lbCap('boil', 1).show + 0.5, c3 + 2.5); sea = 0;   // (the oceans become a steam sky, like Venus's)
+          const d = lbN3([0.9, 0.3, 0.3]); pos = [d[0] * lbLerp(4.6, 4.2, k), d[1] * lbLerp(4.6, 4.2, k), d[2] * lbLerp(4.6, 4.2, k)]; at = [0, -0.42, 0]; fov = 36; }
       } else if (m === 'voyager') {
         // ILLUSTRATION: Voyager 1; its signal (rings) heading for Earth (off to the left) turns round at 10:00
         earthG.visible = false; voy.visible = true; voy.position.set(0, 0, 0);
@@ -255,30 +274,30 @@ LB_SETS.space = (app) => {
         });
         S.sun.position.set(-500, 30, -120); S.sun.intensity = 2.4;
       } else if (m === 'birth') {
-        // the second Sun, showing the Sun further and further back: younger, then a star being born in its disc
-        earthG.visible = false;
-        const k = K(t, lbCap('birth', 1).show - 0.2, LB.nightBack - 0.2, (x) => x), red = MathX.smooth(k, 0.55, 0.95);
-        sunAt([0, 0, 0], lbLerp(1.0, 1.5, red));
-        sunCore.material.color.setRGB(1.0, lbLerp(0.97, 0.62, red), lbLerp(0.92, 0.42, red)); sunSpr.material.color.setRGB(1.0, lbLerp(0.9, 0.55, red), lbLerp(0.8, 0.35, red));
-        sunCore.material.opacity = lbLerp(1, 0.75, red);
-        pos = [0, lbLerp(1.2, 3.2, k), lbLerp(16, 13, k)]; at = [0, 0, 0]; fov = 34;
-        const dk = MathX.smooth(k, 0.45, 0.95), tw = t * 0.05;
-        if (dk > 0) for (const q of NUR) { const a = q.a + tw / Math.sqrt(q.r); nursery.add(Math.cos(a) * q.r, q.h * q.r * 0.3, Math.sin(a) * q.r, q.s * (0.6 + q.r * 0.12), 0.06 * dk * (1.1 - q.r / 11), 0.9, 0.55, 0.32); }
+        // ILLUSTRATION: the Sun, and shells of its old light (sent out years, centuries, thousands of years ago) still
+        // closing in on it, the solar system far too small to see
+        earthG.visible = false; shells.visible = true;
+        const k = K(t, LB.birth, LB.nightBack, (x) => x);
+        sunAt([0, 0, 0], 0.9);
+        pos = [0, lbLerp(1.0, 2.2, k), lbLerp(17, 14, k)]; at = [0, 0, 0]; fov = 38;
+        SH.forEach((rg, i) => { const f = ((i / SH.length - (t - LB.birth) * 0.045) % 1 + 1) % 1, r = 0.35 + 9.5 * f;
+          rg.scale.setScalar(r); rg.position.set(0, 0, 0); rg.quaternion.copy(cam.quaternion);
+          rg.material.opacity = 0.5 * MathX.smooth(r, 0.35, 1.6) * (1 - MathX.smooth(r, 7.5, 9.8)) * MathX.smooth(t, LB.birth, LB.birth + 1.2); });
       }
       if (m !== 'voyager' && m !== 'birth') { sunSpr.material.color.set('#fff1d6'); sunCore.material.color.set('#ffffff'); sunCore.material.opacity = 1; }
       EU.uSun.value.set(...Ssc); EU.uK1.value = k1; EU.uK2.value = k2; EU.uS.value = s; EU.uMode.value = mode; EU.uShift.value = shift; EU.uAb.value = mode ? LB_SP.u / LB_SP.c : 0;
       EU.uIce.value = ice; EU.uPoleClear.value = m === 'ice' ? 1 : 0; EU.uSea.value = sea; EU.uSteam.value = steam; EU.uLights.value = lights; EU.uOff.value = t * 0.0004; atmoU.uA2.value = mode ? (k2 > 0 ? 0.6 : 0) : a2;
       if (m !== 'voyager') { S.sun.intensity = 0; }
       { const d = lbDrift(t, drift, 0.25, 5); lbCam(cam, [pos[0] + d[0], pos[1] + d[1], pos[2] + d[2]], at, fov); }
-      stream.end(); nursery.end();
+      stream.end();
       this._mode = m; this._s = s;
     },
     labels(t) {
       const m = lbShotAt(t).mode, out = [], W = StoryHUD.win, wp = (o) => { const v = new THREE.Vector3(); o.getWorldPosition(v); return [v.x, v.y, v.z]; };
-      if (m === 'wave') out.push({ p: wp(london), text: 'YOUR GARDEN', sub: t < LB.wave + 0.7 + 80.36 / 20 ? 'STILL IN THE GAP' : 'LIT AT 10:01:20', a: W(t, LB.wave + 0.6, LB.moonwhy - 0.3, 0.3, 0.2) });
+      if (m === 'wave') out.push({ p: wp(london), text: 'YOUR GARDEN', sub: t < LB.wave + 0.7 + LB_SKY.on / 20 ? 'STILL IN THE GAP' : 'LIT AT 10:01:21', a: W(t, LB.wave + 0.6, LB.moonwhy - 0.3, 0.3, 0.2) });
       if (m === 'half') out.push({ p: wp(hawaii), text: 'HAWAII', sub: 'NOON', a: W(t, LB.half + 0.5, LB.wait - 0.3, 0.3, 0.2) });
       if (m === 'shadow') out.push({ p: [2.8, -0.1, 0], text: 'THE GAP', sub: 'WHERE THE EARTH’S SHADOW WAS', a: W(t, lbS('shadow') + 0.6, LB.wave - 0.3, 0.3, 0.2) });
-      if (m === 'voyager') out.push({ p: [0.4, 2.2, 0], text: 'VOYAGER 1', sub: '25 BILLION km FROM EARTH', a: W(t, LB.voyager + 0.6, LB.ret - 0.3, 0.3, 0.2) });
+      if (m === 'voyager') out.push({ p: [0.4, 2.2, 0], text: 'VOYAGER 1', sub: '25.8 BILLION km FROM EARTH', a: W(t, LB.voyager + 0.6, LB.ret - 0.3, 0.3, 0.2) });
       return out;
     },
     grade(t, p, shot) {

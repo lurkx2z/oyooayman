@@ -13,8 +13,27 @@
      · the dome: the night (dark blue, the town's glow low down), the glow of distant high air lit before the second
        Sun reaches you, the daylight of each sun gated per direction by when that air gets the light (a time map), the
        Milky Way
+     · the mirror Earth (garden, Waikiki): the light the Earth itself sent out (sunlight off its day side, its towns'
+       lights by night) turned round too. What reaches you from direction d at story time s is what the point
+       P = X + U·s (where you were, relative to the old Earth) saw in direction −d: the old Earth, back to front and
+       upside down, filling the sky at first and shrinking away towards the direction the Earth is moving
    Local frame: y up; a place looks along azimuth az0 (−z). lbLocal(v, F, az0) turns an equatorial vector into it.
    ===================================================================== */
+
+// the Earth's textures (land, colour, towns' lights, clouds): one shared copy for every sky and the globe
+let LB_EARTH_SCENE = null;
+const lbEarthScene = () => LB_EARTH_SCENE || (LB_EARTH_SCENE = new EarthScene());
+// how much the mirror Earth lights the ground at a place, relative to a clear noon (≈ albedo × the lit part of the
+// image × its solid angle), and the image itself: P (units of the Earth's radius), its angular radius
+function lbMirrorEarth(X, s) {
+  const P = lbSc(lbAdd(X, LB_SKY.U, s), 1 / LBP.R), D = lbLen(P);
+  if (D <= 1) return { P, D, rad: 0, lit: 0, k: 0 };
+  // (lit: how much of the part of the Earth P could see was in sunlight: P sees a cap of half-angle γ = acos(1/D) round
+  // the point under it, which is φ from the point under the Sun; the day side ends 90° from that)
+  const rad = Math.asin(1 / D), S = lbSunDir(-s), g = Math.acos(1 / D), phi = Math.acos(MathX.clamp(lbDot(lbNrm(P), S), -1, 1));
+  const lit = g < 1e-4 ? (phi < Math.PI / 2 ? 1 : 0) : MathX.clamp((Math.PI / 2 - (phi - g)) / (2 * g), 0, 1);
+  return { P, D, rad, lit, k: 0.3 * lit * (1 - Math.cos(rad)) };
+}
 
 // atmospheric refraction (Saemundsson): a direction (y up) at true altitude h is seen R higher, R = 1.02′ / tan(h + 10.3/(h + 5.11))
 function lbRefract(L) {
@@ -139,16 +158,18 @@ class LbSky {
           float ext = 0.25 / max(0.07, sin(max(alt, 0.0) + 0.04));
           float tw = 0.2 * sin(uT * (5.0 + 9.0 * aSeed) + aSeed * 80.0) * smoothstep(0.7, 0.05, alt);
           float m = aMag + ext + tw, I = pow(10.0, -0.4 * (m - 1.0));
+          // (a mirror image flares as it arrives, so you see it pop in: brighter stars, longer)
+          float fl = aOn > -1e8 ? step(aOn, uS) * exp(-max(uS - aOn, 0.0) / 1.4) * smoothstep(3.5, 0.5, aMag) : 0.0;
           vA = vis * uK * smoothstep(uLim + 0.4, uLim - 0.9, m) * smoothstep(-0.02, 0.03, d.y);
-          vC = aCol * clamp(0.06 + 1.05 * pow(I, 0.45), 0.0, 3.2);
+          vC = aCol * clamp(0.06 + 1.05 * pow(I, 0.45), 0.0, 3.2) * (1.0 + 2.2 * fl);
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = uPx * uSize * clamp(2.2 + 3.4 * pow(I, 0.3), 2.1, 15.0);
+          gl_PointSize = uPx * uSize * clamp(2.6 + 7.0 * pow(I, 0.4), 2.3, 36.0) * (1.0 + 0.9 * fl);
           if (vA < 0.003) gl_PointSize = 0.0;
         }`,
       fragmentShader: /* glsl */`
         varying vec3 vC; varying float vA;
         void main() { vec2 q = gl_PointCoord * 2.0 - 1.0; float r = dot(q, q); if (r > 1.0) discard;
-          float a = (exp(-r * 3.4) * 0.8 + exp(-r * 14.0) * 0.6) * vA; gl_FragColor = vec4(vC * a, a); }`,
+          float a = (exp(-r * 6.0) * 0.85 + exp(-r * 22.0) * 0.6 + exp(-r * 2.2) * 0.12) * vA; gl_FragColor = vec4(vC * a, a); }`,
     }));
     this.stars.frustumCulled = false; this.stars.renderOrder = -8; g.add(this.stars);
     // ---- the dome
@@ -160,18 +181,25 @@ class LbSky {
       uL1: { value: new THREE.Vector3(0, -1, 0) }, uK1: { value: 0 }, uL2: { value: new THREE.Vector3(0, 1, 0) }, uK2: { value: 0 }, uGate2: { value: o.second ? 1 : 0 },
       uNight: { value: new THREE.Color('#05070f') }, uNightHor: { value: new THREE.Color('#1c1e26') }, uTown: { value: new THREE.Color(o.town || '#3a2c22') }, uNightK: { value: 1 },
       uMw: { value: 1 }, uGlow: { value: 1 }, uK: { value: 1 }, uGround: { value: new THREE.Color('#050505') }, uBlackDay: { value: 0 },
+      uEK: { value: 0 }, uToEqE: { value: new THREE.Matrix3() }, uP: { value: new THREE.Vector3(0, 0, 2) }, uRot: { value: 0 }, uSunE: { value: new THREE.Vector3(1, 0, 0) }, uMoonE: { value: new THREE.Vector3(...LB_SKY.M) },
+      uELit: { value: 1 }, uECity: { value: 0.3 }, uEMoon: { value: 0.06 }, uEGlow: { value: 0 },
+      uEDay: { value: null }, uEMask: { value: null }, uENight: { value: null }, uECloud: { value: null },
     };
+    if (o.earth) { const ES = lbEarthScene(), D = this.domeU; D.uEDay.value = ES.uniforms.uDay.value; D.uEMask.value = ES.uniforms.uMask.value; D.uENight.value = ES.uniforms.uNight.value; D.uECloud.value = ES.clouds.material.uniforms.uMap.value; }
     this.dome = new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 64, 32), new THREE.ShaderMaterial({
       side: THREE.BackSide, depthWrite: false, fog: false, uniforms: this.domeU,
       vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
       fragmentShader: /* glsl */`
         uniform sampler2D uMap; uniform mat3 uToEq; uniform vec3 uPole, uCen, uL1, uL2, uNight, uNightHor, uTown, uGround;
         uniform float uS, uK1, uK2, uGate2, uNightK, uMw, uGlow, uK, uBlackDay; varying vec3 vD;
+        uniform sampler2D uEDay, uEMask, uENight, uECloud; uniform mat3 uToEqE; uniform vec3 uP, uSunE, uMoonE; uniform float uEK, uRot, uELit, uECity, uEMoon, uEGlow;
         float h3(vec3 p) { return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
         float n3(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
           return mix(mix(mix(h3(i), h3(i + vec3(1,0,0)), f.x), mix(h3(i + vec3(0,1,0)), h3(i + vec3(1,1,0)), f.x), f.y),
                      mix(mix(h3(i + vec3(0,0,1)), h3(i + vec3(1,0,1)), f.x), mix(h3(i + vec3(0,1,1)), h3(i + vec3(1,1,1)), f.x), f.y), f.z); }
         float fbm(vec3 p) { float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { s += a * n3(p); p *= 2.03; a *= 0.5; } return s; }
+        // the same, with the octaves finer than a pixel faded to their mean (fw: one pixel, in units of p): no speckle
+        float fbmA(vec3 p, float fw) { float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { s += a * mix(0.5, n3(p), 1.0 - smoothstep(0.15, 0.45, fw)); p *= 2.03; fw *= 2.03; a *= 0.5; } return s; }
         // the daylight one sun gives a direction d (its light everywhere in the air)
         vec3 sky(vec3 d, vec3 L) {
           float h = L.y, e = max(d.y, 0.0), day = smoothstep(-0.2, 0.1, h) * (0.4 + 0.6 * smoothstep(-0.02, 0.2, h));   // (the sky dims fast as its sun nears the horizon)
@@ -189,6 +217,33 @@ class LbSky {
           float w = exp(-b * b / 0.012) * (0.55 + 0.45 * smoothstep(-0.3, 1.0, c)) + 0.15 * exp(-b * b / 0.06) * (0.4 + 0.6 * smoothstep(0.2, 1.0, c));
           float cl = fbm(q * 7.0) * 0.7 + fbm(q * 23.0) * 0.4 + fbm(q * 61.0) * 0.35, lane = smoothstep(0.45, 0.8, fbm(q * vec3(11.0, 15.0, 13.0) + 3.1)) * exp(-b * b / 0.004);
           return w * (0.25 + 0.9 * cl) * (1.0 - 0.5 * lane); }
+        // the mirror Earth: from P, looking along −q (q: this direction, equatorial), the old Earth (units of its radius)
+        vec3 mirrorEarth(vec3 q) {
+          // (no early returns: the texture gradients below need every pixel to run the same code)
+          vec3 r = -q, pr = cross(uP, r); float b = dot(uP, r), c = dot(uP, uP) - 1.0, D = 1.0 - dot(pr, pr);   // (b² − c, kept precise far away)
+          float tt = -b - sqrt(max(D, 0.0)), hit = step(0.0, D) * step(0.0, c) * step(0.0, tt);
+          vec3 Q = normalize(uP + r * max(tt, 0.0));
+          float lon = atan(Q.y, Q.x) - uRot, lat = asin(clamp(Q.z, -1.0, 1.0));
+          vec2 euv = vec2(fract(lon / 6.2831853 + 0.5), lat / 3.1415927 + 0.5);
+          // (the map's edge at 180°: take the gradient of whichever longitude is smooth here, or the mipmaps draw a seam)
+          float u2 = fract(lon / 6.2831853); vec2 dx = dFdx(euv), dy = dFdy(euv); float dx2 = dFdx(u2), dy2 = dFdy(u2);
+          vec2 gX = vec2(abs(dx.x) < abs(dx2) ? dx.x : dx2, dx.y), gY = vec2(abs(dy.x) < abs(dy2) ? dy.x : dy2, dy.y);
+          float fq = min(length(dFdx(Q)) + length(dFdy(Q)), 1.0);           // (one pixel on the surface, in Earth radii)
+          float land = textureGrad(uEMask, euv, gX, gY).r, cl = textureGrad(uECloud, euv, gX, gY).r;
+          { float w = (1.0 - smoothstep(0.1, 0.45, tt)) * hit;              // (a few km of detail, only up close: trade-wind cumulus)
+            if (w > 0.0) { float det = fbmA(Q * 700.0, 700.0 * fq) * 0.65 + fbmA(Q * 2600.0, 2600.0 * fq) * 0.35, cu = smoothstep(0.56, 0.72, fbmA(Q * 1500.0 + 7.0, 1500.0 * fq)) * (0.55 + 0.45 * det);
+              cl = mix(cl, max(clamp((cl - 0.18) * 1.6 + (det - 0.5) * 1.3 * (0.35 + cl), 0.0, 1.0), cu * 0.9), w); } }
+          vec3 surf = mix(textureGrad(uEDay, euv, gX, gY).rgb * vec3(0.55, 0.75, 0.95), vec3(0.95), cl * 0.92);
+          float mu0 = dot(Q, uSunE), mu = max(dot(Q, -r), 0.0);
+          vec3 col = surf * max(mu0, 0.0) * 1.15 * uELit;
+          vec3 h = normalize(uSunE - r);
+          col += vec3(1.0, 0.95, 0.86) * pow(max(dot(Q, h), 0.0), 90.0) * 0.8 * (1.0 - land) * (1.0 - cl) * step(0.0, mu0) * uELit;   // (the sun's glint on the sea)
+          float dark = 1.0 - smoothstep(-0.06, 0.06, mu0);
+          col += textureGrad(uENight, euv, gX, gY).rgb * dark * uECity * (1.0 - 0.7 * cl);   // (the towns' lights)
+          col += surf * max(dot(Q, uMoonE), 0.0) * uEMoon * dark;                  // (moonlit clouds)
+          col += vec3(0.3, 0.52, 0.95) * pow(1.0 - mu, 5.0) * smoothstep(-0.3, 0.25, mu0) * 0.7 * uELit;   // (its air, at the edge)
+          return col * smoothstep(0.0, 0.004, D) * hit;
+        }
         void main() {
           vec3 d = normalize(vD); float e = d.y;
           vec2 uv = vec2(atan(d.x, -d.z) / 6.2831853 + 0.5, clamp((asin(clamp(e, -1.0, 1.0)) * 57.29578 + 10.0) / 100.0, 0.0, 1.0));
@@ -205,6 +260,8 @@ class LbSky {
           // the daylight of each sun (the second one only where its light has got to the air)
           col += sky(d, uL1) * uK1;
           col += sky(d, uL2) * uK2 * mix(1.0, smoothstep(T.g - 0.8, T.g + 0.8, uS), uGate2);
+          // the mirror Earth (behind the air), and the air lit by it
+          if (uEK > 0.0) { col += mirrorEarth(normalize(uToEqE * d)) * uEK; col += vec3(0.32, 0.46, 0.7) * uEGlow * (0.5 + 0.5 * (1.0 - max(e, 0.0))); }
           if (e < 0.0) col = mix(col, uGround, smoothstep(0.0, -0.05, e));
           gl_FragColor = vec4(col * uK, 1.0);
         }`,
@@ -227,7 +284,7 @@ class LbSky {
           vec3 c = uCol * face * disc * cut * 6.0 * uK;
           // the glow round it (falls off fast; the bloom does the rest), and the red glow before it rises
           float lit = max(uFrac * uR, 0.0);
-          c += uCol * (0.5 * exp(-max(r - 1.0, 0.0) * 1.6) + 0.18 * exp(-max(r - 1.0, 0.0) * 0.35)) * step(1.0, r) * uK * uGlow * lit;
+          c += uCol * (0.5 * exp(-max(r - uR, 0.0) * 1.6) + 0.18 * exp(-max(r - uR, 0.0) * 0.35)) * step(uR, r) * uK * uGlow * lit;   // (round the part that has arrived)
           c += vec3(1.0, 0.25, 0.08) * uRed * (0.9 * exp(-r * r * 0.25) + 0.25 * exp(-r * 0.4));
           gl_FragColor = vec4(c, 1.0);
         }`,
@@ -292,6 +349,17 @@ class LbSky {
     const D = this.domeU;
     D.uS.value = skyS; D.uL1.value.set(...L1); D.uL2.value.set(...L2); D.uK1.value = k1 * (o.sky1 ?? 1); D.uK2.value = k2 * (o.sky2 ?? 1);
     D.uK.value = o.k ?? 1; D.uNightK.value = o.nightK ?? 1; D.uMw.value = o.mw ?? 1; D.uGlow.value = o.glow ?? 1;
+    // the mirror Earth (from 10:00:00 on, while it is more than a speck)
+    const Xs = o.X || (o.F ? lbEarthPoint(Fs) : this.o.X);           // (where this place is now: the Earth turns)
+    const me = this.o.earth && skyS > 0 && !o.noEarth ? lbMirrorEarth(Xs, skyS) : null;
+    D.uEK.value = me && me.D > 1 && me.rad > 1e-4 ? (o.earthK ?? 1) : 0;
+    if (D.uEK.value) {
+      // (the dome's own sky frame is fixed at 10 PM; the Earth image needs this moment's, hours later)
+      { const ex = lbUnLocal([1, 0, 0], Fs, az0), ey = lbUnLocal([0, 1, 0], Fs, az0), ez = lbUnLocal([0, 0, 1], Fs, az0); D.uToEqE.value.set(ex[0], ey[0], ez[0], ex[1], ey[1], ez[1], ex[2], ey[2], ez[2]); }
+      D.uP.value.set(...me.P); D.uRot.value = lbGmst(-skyS) * 15 * LB_D2R; D.uSunE.value.set(...lbSunDir(-skyS));
+      D.uELit.value = o.eLit ?? 1; D.uEGlow.value = (o.eGlow ?? 1) * 0.35 * me.k;
+    }
+    this.state.earth = me;
     // the suns' discs
     const place = (mesh, L, rad) => { mesh.position.set(L[0] * R * 0.97, L[1] * R * 0.97, L[2] * R * 0.97); mesh.lookAt(cam.position);
       const ang = 0.2665 * LB_D2R, sz = Math.max(2 * R * 0.97 * Math.tan(ang), R * 0.97 * (o.lens || 0) * 0.0009) * 8; mesh.scale.setScalar(sz * (rad || 1)); };
@@ -309,7 +377,7 @@ class LbSky {
       U2.uEdge.value.set(-lbDot(e, x), -lbDot(e, y)).normalize(); }
     this.sun1.visible = (k1 > 0) && L1[1] > -0.05; this.sun2.visible = (frac > 0 || red > 0) && L2[1] > -0.05;
     // the stars: drowned by the daylight
-    const lum = 0.7 * (k1 * day1 + k2 * day2);
+    const lum = 0.7 * (k1 * day1 + k2 * day2) + (D.uEK.value ? 8 * me.k * (o.eLit ?? 1) : 0);   // (…and by the sunlit mirror Earth)
     const U = this.starU; U.uS.value = skyS; U.uT.value = o.t ?? 0; U.uPx.value = px; U.uSize.value = o.starSize ?? 1;
     U.uK.value = (o.starK ?? 1) * MathX.clamp(1 - lum * 30, 0, 1); U.uLim.value = 6.0 - 4 * MathX.clamp(lum * 6, 0, 1);
     // the Moon
@@ -318,7 +386,9 @@ class LbSky {
       this.moon.position.set(md.x * Rm, md.y * Rm, md.z * Rm);
       this.moon.updateMatrixWorld(); this.moon.lookAt(cam.position);
       this.moon.scale.setScalar(Math.max(2 * Rm * Math.tan(0.259 * LB_D2R), Rm * (o.lens || 0) * 0.0009));
-      this.moonU.uS.value = skyS; this.moonU.uDay.value = skyS < LB_MOON.dayBack ? 0 : lbSunGain(skyS - LB_MOON.dayBack);   // (its day side: dark until new sunlight is back)
+      // (its day side: from 10:00:01.3 a ghost, lit only by its own moonlight falling back, ≈ 11 % and fading as the
+      // Moon moves off it; bright again once new sunlight is back)
+      this.moonU.uS.value = skyS; this.moonU.uDay.value = skyS < LB_MOON.dayBack ? lbMoonGhost(skyS) : lbSunGain(skyS - LB_MOON.dayBack);
       this.moonU.uK.value = (o.moonK ?? 1) * 1.15;
     }
     this.state = Object.assign(this.state, { k1, k2, frac, red, lum, day1, day2, sun });

@@ -1,9 +1,12 @@
 /* =====================================================================
    HAWAII — Waikiki beach at noon (10 PM in your garden): the day side of the Earth. Modes:
-     noon     a bright beach, the Sun high in the south; at 10:00:00 it goes out, and the sky with it
-     black    the sky black, stars at noon (mirror images: Orion in the east, sped up), the beach in the dark
-     wait     people on the dark beach looking up, phones out (the 8 minutes 16 seconds)
-     return   12:08:16 their time: the Sun comes back, a dot (the centre of its disc) first, then the disc
+     noon     a bright beach, the Sun high in the south, in frame; at 10:00:00 it goes out
+     black    looking up: the sky fills with the sea and the clouds, upside down (the mirror Earth: the sunlight the
+              Earth had sent back into space, falling back; sky.js), about a quarter of noon's light
+     shrink   25× faster: it shrinks away to the west-north-west, and noon turns to dusk
+     wait     people on the dusky beach looking up at it, phones out (the 8 minutes 16 seconds)
+     return   12:08:13.5 their time: the Sun comes back (long lens), a dot (the middle of its disc) first, then the
+              disc; then the beach in daylight again
      sun      the Sun through a filter: brighter and brighter, whiter (its surface heating up)
    Local frame (metres): −z looks out to sea (SSW, azimuth 200°), +x is WNW along the beach (the hotels), −x towards
    Diamond Head; the water's edge is at z ≈ −8.
@@ -67,7 +70,7 @@ LB_SETS.hawaii = (app) => {
   scene.environment = lbEnv(app.renderer, '#8fb4e0', '#dfe6ee', '#b8a888');
   scene.fog = new THREE.FogExp2('#c8d8e8', 0.00011);
   const HF = lbFrame(0, LBP.hawaii.lat, LBP.hawaii.lon), HX = lbEarthPoint(HF), AZ = LB_HW.az0;
-  const sky = new LbSky(scene, { F: HF, X: HX, az0: AZ, moon: false, second: false, town: '#1c2026' });
+  const sky = new LbSky(scene, { F: HF, X: HX, az0: AZ, moon: false, second: false, earth: true, town: '#1c2026' });
   // ---- the beach, the sea
   const st = lbTex(lbSandCanvas(3)); st.repeat.set(120, 60);
   const sand = new THREE.Mesh(new THREE.PlaneGeometry(1200, 400, 1, 1), lbStd('#ffffff', 0.95, 0, { map: st })); sand.rotation.x = -Math.PI / 2; sand.position.set(0, 0, 192); sand.receiveShadow = true; scene.add(sand);
@@ -146,35 +149,49 @@ LB_SETS.hawaii = (app) => {
 
   const set = {
     scene, camera: cam, sky,
-    cuts() { return [lbCap('black', 2).show - 0.4]; },
+    cuts() { return [LB.back + 3.6]; },
     frame(t, shot) {
       const m = shot.mode, s = lbStoryAt(t);
       let pos = [1.5, 1.6, 4.5], at = lbAimH(pos, 192, 22), fov = 72, drift = 0.004, sk = { t, F: lbFrame(s, LBP.hawaii.lat, LBP.hawaii.lon) };
       cam.near = 0.05; cam.far = 7000;
-      const Ls = lbLocal(lbSunDir(s), sk.F, AZ);
-      if (m === 'noon') { const k = K(t, LB.hawaii, LB.black, (x) => x); pos = [lbLerp(1.6, 1.2, k), 1.62, lbLerp(5.5, 4.2, k)]; at = lbAimH(pos, lbLerp(190, 186, k), lbLerp(20, 24, k)); fov = 76; }
+      const Ls = lbLocal(lbSunDir(s), sk.F, AZ), sunAz = (Math.atan2(Ls[0], -Ls[2]) / LB_D2R + AZ + 360) % 360, sunAlt = Math.asin(Ls[1]) / LB_D2R;
+      const me = s > 0 ? lbMirrorEarth(lbEarthPoint(sk.F), s) : null, eC = me ? lbLocal(lbNrm(me.P), sk.F, AZ) : [0, 1, 0];
+      const eAz = (Math.atan2(eC[0], -eC[2]) / LB_D2R + AZ + 360) % 360, eAlt = Math.asin(MathX.clamp(eC[1], -1, 1)) / LB_D2R;
+      sk.X = lbEarthPoint(sk.F);
+      if (m === 'noon') {
+        // (out to sea, the Sun high in the frame)
+        const k = K(t, LB.hawaii, LB.black, (x) => x); pos = [lbLerp(1.6, 1.3, k), 1.5, lbLerp(5.2, 4.4, k)]; at = lbAimH(pos, lbLerp(184, 180, k), lbLerp(31, 33, k)); fov = 74; }
       else if (m === 'black') {
-        const c2 = lbCap('black', 2).show - 0.4;
-        if (t < c2) {
-          // (from over the dark sea round to the east, where Orion's mirror image comes out)
-          const k = K(t, LB.black, c2); pos = [0.5, 1.5, 3.0]; at = lbAimH(pos, lbLerp(165, 114, k), lbLerp(18, 22, k)); fov = 64; sk.starSize = 1.5; }
-        else { const k = K(t, c2, LB.half, (x) => x); pos = [lbLerp(-1.0, -1.6, k), 1.55, -6.5]; at = lbAimH(pos, lbLerp(25, 15, k), 8); fov = 66; }
-      } else if (m === 'wait') { const k = K(t, LB.wait, LB.voyager, (x) => x); pos = [lbLerp(-3.6, -3.2, k), 0.55, lbLerp(-6.4, -6.9, k)]; at = lbAimH(pos, 30, 18); fov = 62; drift = 0.003; sk.starSize = 1.5; }
-      else if (m === 'return') { const k = K(t, LB.ret, LB.sunClose, (x) => x);
-        const a = (Math.atan2(Ls[0], -Ls[2]) / LB_D2R + AZ + 360) % 360, e = Math.asin(Ls[1]) / LB_D2R;
-        pos = [lbLerp(-0.6, -0.4, k), 1.3, lbLerp(1.0, 0.6, k)]; at = lbAimH(pos, a, e - lbLerp(18, 12, k)); fov = 70; }
+        // (looking up past the palms at the sea and the clouds overhead)
+        const k = K(t, LB.black, LB.shrink, (x) => x); pos = [lbLerp(-2.0, -2.4, k), 1.25, lbLerp(9.0, 8.6, k)]; at = lbAimH(pos, lbLerp(250, 268, k), lbLerp(48, 56, k)); fov = 86; drift = 0.0025; }
+      else if (m === 'shrink') {
+        // (the WNW sky: the mirror Earth shrinking, its edge coming into view; noon going to dusk)
+        const k = K(t, LB.shrink, LB.half, (x) => x); pos = [lbLerp(-4.0, -4.6, k), 1.6, -3.4]; at = lbAimH(pos, eAz - 6, lbLerp(52, eAlt - 2, Ease.inOutSine(k))); fov = lbLerp(86, 70, k); drift = 0.002; }
+      else if (m === 'wait') { const k = K(t, LB.wait, LB.voyager, (x) => x); pos = [lbLerp(-11.5, -11.0, k), 0.7, lbLerp(-6.2, -6.5, k)]; at = lbAimH(pos, eAz + 6, eAlt - 8); fov = 60; drift = 0.003; }
+      else if (m === 'return') {
+        if (t < LB.back + 3.6) { pos = [0, 1.6, 0]; at = lbAimH(pos, sunAz, sunAlt, 40); fov = 4.2; drift = 0.00004; cam.near = 1; Object.assign(sk, { lens: 4.2, starK: 0 }); }
+        else { const k = K(t, LB.back + 3.6, LB.sunClose, (x) => x); pos = [lbLerp(-0.6, -0.4, k), 1.3, lbLerp(1.0, 0.6, k)]; at = lbAimH(pos, sunAz + 4, sunAlt - lbLerp(22, 16, k)); fov = 78; } }
       else if (m === 'sun') { pos = [0, 1.6, 0]; at = [Ls[0] * 40, 1.6 + Ls[1] * 40, Ls[2] * 40]; fov = 0.8; drift = 0.00001; cam.near = 1; Object.assign(sk, { k: 0, discK: 0.07, face1: 1, starK: 0 }); }
       { const d = lbDrift(t, drift, 0.3, 17); lbCam(cam, [pos[0] + d[0], pos[1] + d[1], pos[2] + d[2]], at, fov); }
       const stt = sky.update(s, cam, app.renderH || 1080, sk);
-      const L1 = stt.L1, k1 = stt.k1 * stt.day1, dayK = MathX.clamp(k1, 0, 2.2);
-      // the light: the Sun (out from 10:00:00), the sky; when it's dark only the hotels' rooms and the phones
-      S.sun.intensity = 2.7 * k1; { const c = [cam.position.x, 0, cam.position.z - 6]; S.sun.position.set(c[0] + L1[0] * 150, L1[1] * 150, c[2] + L1[2] * 150); S.sun.target.position.set(...c); S.sun.target.updateMatrixWorld(); S.sun.castShadow = k1 > 0.02; }
-      { const T = 5772 * Math.pow(Math.max(1, stt.sun.k), 0.25), c = lbStarRGB(T); S.sun.color.setRGB(c[0], c[1], c[2]); }
+      // the light: the Sun (out from 10:00:00 until 12:08:13 their time); meanwhile the mirror Earth overhead, a huge
+      // dim lamp (its light on level ground: k × the sine of its height), shrinking away
+      const L1 = stt.L1, k1 = stt.k1 * stt.day1, kE = me ? me.k * Math.max(0, Math.sin(eAlt * LB_D2R)) : 0, dayK = MathX.clamp(k1 + 1.25 * kE, 0, 2.2);
+      const eLight = MathX.clamp(kE * 3.2, 0, 1);
+      if (k1 > 0.02 || !me) {
+        S.sun.intensity = 2.7 * k1; { const c = [cam.position.x, 0, cam.position.z - 6]; S.sun.position.set(c[0] + L1[0] * 150, L1[1] * 150, c[2] + L1[2] * 150); S.sun.target.position.set(...c); S.sun.target.updateMatrixWorld(); S.sun.castShadow = k1 > 0.02; }
+        const T = 5772 * Math.pow(Math.max(1, stt.sun.k), 0.25), c = lbStarRGB(T); S.sun.color.setRGB(c[0], c[1], c[2]);
+      } else {
+        // (the Earth-light: from the middle of the image, soft, a little blue)
+        const c = [cam.position.x, 0, cam.position.z - 6], E = lbN3(eC); S.sun.intensity = 1.1 * kE; S.sun.position.set(c[0] + E[0] * 150, E[1] * 150, c[2] + E[2] * 150); S.sun.target.position.set(...c); S.sun.target.updateMatrixWorld(); S.sun.castShadow = kE > 0.02; S.sun.color.setRGB(0.82, 0.9, 1.0);
+      }
       S.hemi.intensity = 0.035 + 0.55 * Math.min(dayK, 1.6); scene.environmentIntensity = 0.01 + 0.6 * Math.min(dayK, 1.6);
+      S.hemi.color.setRGB(0.74 + 0.0 * eLight, 0.83, 0.93);
       scene.fog.color.setRGB(0.78 * Math.min(1, dayK), 0.85 * Math.min(1, dayK), 0.91 * Math.min(1, dayK));
       seaU.uT.value = t; seaU.uK.value = Math.min(dayK, 1.8); seaU.uSun.value.set(...L1); seaU.uLamp.value = 1 - Math.min(1, dayK);
-      seaU.uTop.value.setRGB(0.24 * dayK, 0.47 * dayK, 0.75 * dayK).multiplyScalar(1 / Math.max(1, dayK)); seaU.uHor.value.setRGB(0.72, 0.82, 0.9);
-      const night = 1 - MathX.smooth(dayK, 0.0, 0.25);
+      seaU.uTop.value.setRGB(0.24 * dayK, 0.47 * dayK, 0.75 * dayK).multiplyScalar(1 / Math.max(1, dayK));
+      if (k1 > 0.02 || !me) seaU.uHor.value.setRGB(0.72, 0.82, 0.9); else seaU.uHor.value.setRGB(0.5, 0.62, 0.74);
+      const night = 1 - MathX.smooth(dayK, 0.0, 0.12);
       for (const h of hotels) h.emissiveIntensity = 0.15 + 0.75 * night;
       torches.begin();
       for (const p of people) {
@@ -184,18 +201,25 @@ LB_SETS.hawaii = (app) => {
         if (on && p.lbAct === 'lbLookUp') { const w = new THREE.Vector3(); p.j.ra.hand.getWorldPosition(w); torches.add(w.x, w.y + 0.05, w.z, 0.16, 0.22 * night, 1, 0.97, 0.9); torches.add(w.x, w.y + 0.05, w.z, 0.04, 0.8 * night, 1, 1, 1); }
       }
       torches.end();
-      this._k = dayK; this._s = s; this._st = stt;
+      this._k = dayK; this._s = s; this._st = stt; this._eAz = eAz; this._eAlt = eAlt; this._me = me;
     },
     labels(t) {
       const m = lbShotAt(t).mode, out = [], W = StoryHUD.win;
-      if (m === 'black' && t < lbCap('black', 2).show - 0.4 && sky.named.ALNILAM) out.push({ p: sky.at('ALNILAM', 400), text: 'ORION', sub: 'AT NOON', a: W(t, lbFilmAt(sky.named.ALNITAK.t, LB.black, lbCap('black', 2).show) + 0.5, lbCap('black', 2).show - 0.6, 0.3, 0.2) });
-      if (m === 'return') out.push({ p: sky.at('SUN', 400), text: 'THE SUN', sub: 'BACK AFTER 8 MIN 16 s', a: W(t, LB.back + 0.6, LB.sunClose - 0.3, 0.3, 0.2) });
+      // (a label beside a direction, not on it: off by `off` degrees of altitude)
+      const dirAt = (az, alt) => lbAimH([0, 1.6, 0], az, alt, 400);
+      if (m === 'shrink' && this._me) out.push({ p: dirAt(this._eAz + 2, this._eAlt + Math.asin(1 / this._me.D) / LB_D2R * 1.06), text: 'THE EARTH', sub: 'ITS OWN LIGHT, COMING BACK', a: W(t, LB.shrink + 1.0, LB.half - 0.3, 0.3, 0.2) });
+      if (m === 'return') {
+        const L = this._st && this._st.L1, a = L ? (Math.atan2(L[0], -L[2]) / LB_D2R + LB_HW.az0 + 360) % 360 : 180, e = L ? Math.asin(L[1]) / LB_D2R : 56;
+        if (t < LB.back + 3.6) out.push({ p: dirAt(a, e - 0.75), text: 'THE SUN', sub: 'ITS NEAREST PART FIRST', a: W(t, LB.back + 0.5, LB.back + 3.4, 0.3, 0.2) });
+      }
       return out;
     },
     grade(t, p, shot) {
       const k = this._k || 0, m = shot.mode;
-      p.exposure = lbLerp(1.4, 1.0, MathX.clamp(k, 0, 1)) - 0.12 * MathX.clamp(k - 1, 0, 1); p.bloom = lbLerp(0.3, 0.3, MathX.clamp(k, 0, 1)); p.saturation = lbLerp(0.85, 1.08, MathX.clamp(k, 0, 1));
+      // (the eye adapts, but not all the way: a doubled Sun still looks brighter and whiter)
+      p.exposure = k <= 1 ? lbLerp(1.5, 1.0, MathX.clamp(k * 1.6, 0, 1)) : 1 / (0.7 + 0.3 * k); p.bloom = 0.3 + 0.1 * MathX.clamp(k - 1, 0, 1.5); p.saturation = lbLerp(0.85, 1.06, MathX.clamp(k, 0, 1));
       if (m === 'sun') { p.exposure = 1.0; p.bloom = 0.25; p.vignette = 0.3; }
+      if (m === 'return' && t < LB.back + 3.6) { const k1 = this._st ? this._st.k1 : 0; p.exposure = lbLerp(0.9, 0.14, Math.pow(MathX.clamp(k1 / 0.9, 0, 1), 0.6)); p.bloom = 0.22; p.vignette = 0.35; }
     },
   };
   return set;

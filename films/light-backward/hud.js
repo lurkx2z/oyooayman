@@ -36,10 +36,9 @@ function lbSince(t, shot, set) {
     if (m === 'why' || m === 'shadow') return null;
     if (m === 'wave' || m === 'half') return { s: S ?? lbStoryAt(t) };
     if (m === 'voyager') return { s: lbStoryAt(t) };
-    if (m === 'twosuns') return { s: lbAt(12, 0) + 86400 * (3 + (t - LB.space) * 0.1) };
     if (m === 'ice') { const k = MathX.smooth(t, LB.ice + 0.6, LB.ice + 4.2), mo = 0.15 * Math.pow(4 / 0.15, k); return { s: mo * 30.4 * 86400, txt: mo < 1 ? Math.round(mo * 30.4) + ' DAYS' : mo < 1.5 ? '1 MONTH' : Math.round(mo) + ' MONTHS' }; }
-    if (m === 'boil') { const k = MathX.smooth(t, lbCap('boil', 0).show, lbCap('boil', 2).show + 6), y = Math.pow(10, 3 * k); return { s: y * 3.156e7, txt: lbThousands(y) + (y < 1.5 ? ' YEAR' : ' YEARS') }; }
-    if (m === 'birth') { const k = MathX.smooth(t, LB.birth + 0.5, LB.nightBack - 0.2), y = 1000 * Math.pow(4.6e9 / 1000, k); return { s: y * 3.156e7, txt: lbThousands(y) + ' YEARS', y }; }
+    if (m === 'boil') { const k = MathX.smooth(t, lbCap('boil', 0).show, lbCap('boil', 2).show + 6), y = Math.pow(10, 3.48 * k); return { s: y * 3.156e7, txt: lbThousands(y) + (y < 1.5 ? ' YEAR' : ' YEARS') }; }
+    if (m === 'birth') { const k = MathX.smooth(t, LB.birth + 0.5, LB.nightBack - 0.2), y = 3000 * Math.pow(10000 / 3000, k); return { s: y * 3.156e7, txt: lbThousands(y) + ' YEARS', y }; }
     return null;
   }
   if (m === 'open' || m === 'title' || m === 'replay' || m === 'nightback' || m === 'real') return null;
@@ -47,23 +46,27 @@ function lbSince(t, shot, set) {
   return { s: lbStoryAt(t) };
 }
 // the next thing that will happen (story s), for the readout's NEXT line
-const LB_NEXT = [[LB_SKY.on, 'A SECOND SUN'], [LBP.tSun, 'THE SUN COMES BACK'], [LB_SUNRISE.s, 'TWO SUNS AT ONCE']];
+const LB_NEXT = [[LB_SKY.on, 'A SECOND SUN'], [LBP.tFirst, 'THE SUN COMES BACK'], [LB_SUNRISE.s, 'TWO SUNS AT ONCE']];
 
 // the scene's context line: [from, to, label, value(t, s)] (value: { v, v2 } with HTML)
 const LB_CTX = [
   [lbCap('past', 1).show, LB.hawaii - 0.2, 'THE SECOND SUN SHOWS THE SUN AT', (t, s) => ({ v: lbClockText(lbSecondShows(s), true) + ' PM', v2: 'ONE SECOND FURTHER BACK EVERY SECOND' })],
-  [LB.wait + 0.3, LB.voyager - 0.2, 'NEW SUNLIGHT ARRIVES IN', (t, s) => ({ v: lbMinSec(LBP.tSun - s), v2: 'IT LEAVES THE SUN AT 10:00:00' })],
-  [LB.voyager + 0.3, LB.ret - 0.2, 'VOYAGER 1', () => ({ v: '25.7 BILLION km AWAY', v2: 'ITS RADIO SIGNAL: 23.8 HOURS OLD' })],
-  [LB.ret + 0.2, LB.back - 0.05, 'NEW SUNLIGHT ARRIVES IN', (t, s) => ({ v: lbMinSec(LBP.tSun - s) })],
-  [lbCap('double', 2).show, LB.full - 0.2, 'THE SUN\'S SURFACE', (t, s) => { const g = lbSunGain(s - LBP.tSun); return { v: lbThousands(Math.round(lbSurfaceC(g) / 100) * 100) + ' °C', v2: 'BRIGHTNESS × ' + g.toFixed(2) }; }],
+  [LB.wait + 0.3, LB.voyager - 0.2, 'NEW SUNLIGHT ARRIVES IN', (t, s) => ({ v: lbMinSec(LBP.tFirst - s), v2: 'IT LEAVES THE SUN AT 10:00:00' })],
+  [LB.voyager + 0.3, LB.ret - 0.2, 'VOYAGER 1', () => ({ v: '25.8 BILLION km AWAY', v2: 'ITS RADIO SIGNAL: 23.9 HOURS OLD' })],
+  [LB.ret + 0.2, LB.back - 0.05, 'NEW SUNLIGHT ARRIVES IN', (t, s) => ({ v: lbMinSec(LBP.tFirst - s) })],
+  [lbCap('double', 2).show, LB.full - 0.2, 'THE SUN\'S SURFACE', (t, s) => { const g = lbSunGain(s - LBP.tFirst); return { v: lbThousands(Math.round(lbSurfaceC(g) / 100) * 100) + ' °C', v2: 'BRIGHTNESS × ' + g.toFixed(2) }; }],
   [lbCap('midnight', 1).show, lbCap('midnight', 2).show - 0.3, 'THE SECOND SUN', (t, s) => ({ v: lbAltAz(lbSc(lbSunDir(s), -1), lbFrame(s)).alt.toFixed(0) + '° ABOVE THE HORIZON', v2: 'THE REAL SUN AT NOON TODAY: ' + LB_NOON_ALT.toFixed(0) + '°' })],
   [lbCap('noon', 1).show, LB.never - 0.2, 'ULTRAVIOLET FROM THE SUN', () => ({ v: 'ABOUT × 3.6', v2: 'A HOTTER SUN IS A BLUER SUN' })],
-  [LB.heat + 0.3, LB.boil - 0.2, 'EXTRA HEAT THE EARTH SOAKS UP', () => ({ v: '476 W PER m²', v2: 'CLIMATE CHANGE TODAY: ABOUT 1 TO 2 W PER m²' })],
-  [lbCap('birth', 1).show, LB.nightBack - 0.2, 'THE SECOND SUN SHOWS THE SUN', (t, s, o) => ({ v: (o && o.y >= 1e9 ? (o.y / 1e9).toFixed(1) + ' BILLION' : lbThousands(o ? o.y : 0)) + ' YEARS AGO' })],
+  [LB.heat + 0.3, LB.boil - 0.2, 'EXTRA HEAT THE EARTH SOAKS UP', () => ({ v: 'ABOUT 300 TO 480 W PER m²', v2: 'CLIMATE CHANGE TODAY: ABOUT 1 TO 2 W PER m²' })],
+  [lbCap('birth', 1).show, LB.nightBack - 0.2, 'THE SECOND SUN SHOWS THE SUN AS IT WAS', (t, s, o) => ({ v: lbThousands(o ? Math.round(o.y / 10) * 10 : 0) + ' YEARS BEFORE TONIGHT' })],
 ];
 const LB_NOON_ALT = lbAltAz(lbSunDir(lbAt(12, 0) - 86400), lbFrame(lbAt(12, 0) - 86400)).alt;
 // the honest labels: [from, to, text] (the first match wins); a time-lapse says so on its own
 const LB_TAGS = [
+  [LB.wave, LB.wave + 2.6, 'REWIND · BACK TO 10:00:00'],
+  [LB.hawaii, LB.hawaii + 2.6, 'REWIND · BACK TO 10:00:00'],
+  [LB.half, LB.half + 2.6, 'REWIND · BACK TO 10:00:00'],
+  [LB.nightBack, LB.nightBack + 2.6, 'REWIND · BACK TO TONIGHT'],
   [LB.rule + 0.3, LB.count, 'THOUGHT EXPERIMENT · ONLY THE DIRECTION OF LIGHT CHANGES'],
   [LB.replay, LB.replayEnd, 'ILLUSTRATION · SLOWED DOWN A BILLION TIMES'],
   [LB.why, LB.wave, 'ILLUSTRATION · NOT TO SCALE'],
@@ -72,16 +75,16 @@ const LB_TAGS = [
   [LB.past, LB.hawaii, 'THROUGH A SOLAR FILTER'],
   [LB.half, LB.wait, 'ILLUSTRATION'],
   [LB.voyager, LB.ret, 'ILLUSTRATION · NOT TO SCALE'],
+  [LB.back, LB.back + LB_SLOW_T, 'SLOWED DOWN 8×'],
   [LB.sunClose, LB.full, 'THROUGH A SOLAR FILTER'],
-  [LB.space, LB.summer, 'ILLUSTRATION · TIME-LAPSE'],
   [LB.heat, LB.nightBack, 'ILLUSTRATION · TIME-LAPSE'],
-  [LB.nightBack, LB.real, 'BILLIONS OF YEARS FROM NOW'],
+  [LB.nightBack, LB.real, 'TONIGHT · 9:56 PM · THE LAST STARRY NIGHT'],
   [LB.real2, LB.question - 0.1, 'REAL'],
 ];
 // a caption's text with its numbers in amber
 function lbCapHtml(s) {
   const esc = s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  return esc.replace(/\d(?:[\d,]|[.:%]\d|%)*(?:\s?%|\s?°C|\s?(?:AM|PM)|\s(?:and a half\s)?(?:billion\s)?(?:kilometres|minutes|seconds|hours|times|years)(?:\s\d+\sseconds)?)?|\b(?:Midnight|Noon|twice|ten minutes|a thousand years|Billions of years|hundreds of times|1\.3 seconds)\b/g, (m) => `<span class="n">${m}</span>`);
+  return esc.replace(/\d(?:[\d,]|[.:%]\d|%)*(?:\s?%|\s?°C|\s?(?:AM|PM)|\s(?:and a half\s)?(?:billion\s)?(?:kilometres|minutes|seconds|hours|times|years)(?:\s\d+\sseconds)?)?|\b(?:Midnight|Noon|twice|ten minutes|a few thousand years|Thousands of years|a billion times|a millionth of a second|Billions of years|hundreds of times|1\.3 seconds)\b/g, (m) => `<span class="n">${m}</span>`);
 }
 
 class LbHud {
@@ -132,12 +135,12 @@ class LbHud {
         this._html('rov', this.roV, (since.txt || lbFmtSince(s)).replace(/ ([A-Z]+)$/, '<small> $1</small>').replace(/ (min|s) /g, '<small> $1 </small>').replace(/ s$/, '<small> s</small>'));
         let sub;
         if (shot.set === 'garden' && s < LB_SKY.on) sub = 'MIRROR-IMAGE STARS BACK: ' + lbThousands(this._starsBack(s, set));
-        else if (s < LBP.tSun) sub = shot.set === 'space' && m === 'wave' ? 'THE NIGHT SIDE IS LIGHTING UP' : 'THE REAL SUN: OUT';
-        else sub = 'SUNLIGHT HITTING THE EARTH: × ' + (1 + lbSunGain(s - LBP.tSun)).toFixed(2);
+        else if (s < LBP.tFirst) sub = shot.set === 'space' && m === 'wave' ? 'THE NIGHT SIDE IS LIGHTING UP' : 'THE REAL SUN: OUT';
+        else sub = 'SUNLIGHT HITTING THE EARTH: × ' + (1 + lbSunGain(s - LBP.tFirst)).toFixed(2);
         if (m === 'birth') sub = 'THE SECOND SUN: STILL RUNNING BACKWARDS';
         this._txt('ros', this.roS, sub);
         const nx = shot.set === 'space' && m !== 'voyager' ? null : LB_NEXT.find(([at]) => at > s + 0.5);
-        this._txt('ron', this.roN, nx ? 'NEXT · ' + nx[1] + ' · ' + lbClockText(Math.round(nx[0]), true) + ' ' + lbAmPm(nx[0]) : '');
+        this._txt('ron', this.roN, nx ? 'NEXT · ' + nx[1] + ' · ' + lbClockText(Math.floor(nx[0]), true) + ' ' + lbAmPm(nx[0]) : '');
       }
     }
     // ---- the context line
@@ -207,8 +210,8 @@ class LbHud {
       ['project', lbCap('project', 1).show - 0.3, LB.past - 0.2],
       ['three', LB.three + 0.3, LB.midnight - 0.2],
       ['summer', LB.summer + 0.4, LB.heat - 0.2],
-      ['pcm', LB.real4 + 0.3, LB.real5 - 0.2],
-      ['wave', LB.real5 + 0.3, LB.question - 0.2],
+      ['pcm', LB.real4 + 0.3, lbCap('real4', 2).show - 0.4],
+      ['wave', lbCap('real4', 2).show - 0.1, LB.question - 0.2],
     ].find((x) => t >= x[1] && t < x[2]);
     const a = which ? W(t, which[1], which[2], 0.5, 0.5) : 0;
     this._set('ina', this.inset, 'opacity', a.toFixed(3));

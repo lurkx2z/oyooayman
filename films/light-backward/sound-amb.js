@@ -41,7 +41,7 @@ lbSound('amb', 'places', function (ctx, bus, K) {
   // 4 AM, two days on, broad daylight: a tawny owl calling anyway
   K.put(lbOwl(fx, { f: 580 }), lbCap('never', 2).show + 0.4, { vol: 0.07, norm: true, pan: -0.5, room, wet: 1 });
 
-  // ---- the park at 6:47 AM: a dawn chorus, a breeze
+  // ---- the park at 6:45 AM: a dawn chorus, a breeze
   lbBed(K, LB.sunrise - 0.3, LB.noon + 0.3, { colour: 'pink', f: [['lp', 900], ['hp', 60]], env: (u, t) => park(t), vol: 0.07, fi: 0.3, fo: 0.3, am: 0.4, wr: 0.2 });
   { const r = new RNG(97); for (let t = LB.sunrise; t < LB.noon - 0.3; t += 0.18 + 0.5 * r.next()) K.put(r.next() < 0.5 ? lbRobinSong(fx, { n: r.int(5, 10) }) : lbChirp(fx, { f0: r.range(2400, 5200) }), t, { vol: 0.02 + 0.025 * r.next(), pan: r.range(-0.95, 0.95), room }); }
 
