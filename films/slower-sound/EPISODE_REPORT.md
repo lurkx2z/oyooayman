@@ -118,3 +118,8 @@ night lifted 4–6 dB after a first measurement at −15.5 LUFS with LRA 13.0 an
 - Final render (on the PC, GPU): `node films/slower-sound/render-gpu.cjs --channel chrome --workers 2 --out
   D:\renders\slower-sound` → `slower-sound_final_1080p.mp4` (1920×1080) and `slower-sound_final_small.mp4` (1280×720,
   under 30 MiB).
+- **Final render done 2026-10-26** on the owner's PC (RTX 3060 Ti, Chrome headless on the GPU, 2 workers; frames about
+  12 min at about 19.6 frames/s, the whole job 15 min 28 s, no errors), from branch commit 277a3ab, in
+  `D:\renders\slower-sound\`: `slower-sound_final_1080p.mp4` 1,555 MiB, 8:04.53, 14,536 frames, −15.9 LUFS, LRA
+  10.3, −1.0 dBTP; `slower-sound_final_small.mp4` 25.8 MiB, 1280×720, 8:04.50, −16.2 LUFS, LRA 9.6, −1.6 dBTP. All 8
+  frames of `check.jpg` show the picture.
