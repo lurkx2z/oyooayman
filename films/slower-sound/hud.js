@@ -63,7 +63,7 @@ const SS_CTX = [
 // the honest labels: [from, to, text] (the first match wins); a time-lapse says so on its own
 const SS_TAGS = [
   [0.3, SS.titleShot, 'LATER TODAY · 3 PM'],
-  [SS.seven + 0.3, SS.bird, 'THOUGHT EXPERIMENT · OUR RULE'],
+  [SS.seven + 0.3, SS.bird, 'THOUGHT EXPERIMENT · ONLY THE SPEED OF SOUND CHANGES'],
   [SS.plane + 0.3, SS.eight, 'RINGS: WHERE ITS SOUND HAS REACHED · ILLUSTRATION'],
   [SS.carpet, SS.eight, 'ILLUSTRATION'],
   [SS.throat, SS.kettle, 'ILLUSTRATION'],
@@ -167,7 +167,6 @@ class SsHud {
       ['throat', SS.throat + 0.2, SS.kettle - 0.2],
       ['carpet', SS.carpet + 0.3, SS.eight - 0.2],
       ['backwards', ssCap('backwards', 1).show - 0.2, SS.noon - 0.2],
-      ['horizon', SS.horizon + 0.2, SS.one - 0.2],
       ['ears', SS.ears + 0.3, SS.three - 0.2],
       ['real', SS.real2 + 0.2, ssCap('real5', 1).show - 0.2],
     ].find((x) => t >= x[1] && t < x[2]);
@@ -255,7 +254,7 @@ class SsHud {
   }
   // the real speeds of sound (a log scale): air, Mars, sulphur hexafluoride, bubbly water, an atom cloud
   static real(u, t) {
-    const rows = [[343, 'AIR, 20 °C', '343 m/s', SS.real2], [240, 'MARS', 'ABOUT 240 m/s', ssCap('real2', 1).show], [130, 'SULPHUR HEXAFLUORIDE', 'ABOUT 130 m/s', SS.real3], [20, 'BUBBLY WATER', 'DOWN TO ~20 m/s', ssCap('real3', 1).show], [0.004, 'ATOMS NEAR ABSOLUTE ZERO', 'A FEW mm/s', SS.real4]];
+    const rows = [[343, 'AIR, 20 °C', '343 m/s', SS.real2], [240, 'MARS', 'ABOUT 240 m/s', ssCap('real2', 1).show], [130, 'SULPHUR HEXAFLUORIDE', 'ABOUT 130 m/s', SS.real3], [20, 'BUBBLY WATER', 'DOWN TO ~20 m/s', ssCap('real3', 1).show], [0.004, 'ULTRACOLD ATOMS', 'A FEW mm/s', SS.real4]];
     const X = (v) => 330 + (Math.log10(v) + 3) / 6 * 210;
     let s = '';
     rows.forEach(([v, name, val, at], i) => {

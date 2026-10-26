@@ -91,7 +91,8 @@ function ssBoltGeo(x, z, top, seed) {
   let px = x, pz = z;
   for (let y = top; y > 0; y -= top / 26) { pts.push([px, y, pz]); px += r.range(-1, 1) * top * 0.03; pz += r.range(-1, 1) * top * 0.02; }
   pts.push([x + r.range(-10, 10), 0, z]);
-  const pos = []; for (let i = 0; i < pts.length - 1; i++) pos.push(...pts[i], ...pts[i + 1]);
+  const pos = [], w = top * 0.01; for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1];
+    pos.push(a[0] - w, a[1], a[2], a[0] + w, a[1], a[2], b[0] + w, b[1], b[2], a[0] - w, a[1], a[2], b[0] + w, b[1], b[2], b[0] - w, b[1], b[2]); }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); return g;
 }
 
@@ -173,9 +174,17 @@ SS_SETS.garden = (app) => {
   const planes = [0, 1, 2, 3].map(() => ssAirliner(scene));
   const trail = ssPuffs(scene, 2400, { soft: 1.2 }); trail.mesh.renderOrder = 4;
   const steam = ssPuffs(scene, 600, { soft: 1.8 });
-  const boltM = new THREE.LineBasicMaterial({ color: '#f4f6ff', transparent: true, opacity: 0, fog: false });
-  const bolt = new THREE.LineSegments(ssBoltGeo(-320, -950, 620, 7), boltM); bolt.frustumCulled = false; scene.add(bolt);
-  const bolt2 = new THREE.LineSegments(ssBoltGeo(-320, -950, 620, 8), boltM); bolt2.position.x = 1.5; scene.add(bolt2);
+  const boltM = new THREE.MeshBasicMaterial({ color: '#f4f6ff', transparent: true, opacity: 0, fog: false, side: THREE.DoubleSide, depthWrite: false });
+  const bolt = new THREE.Mesh(ssBoltGeo(-40, -950, 420, 7), boltM); bolt.frustumCulled = false; scene.add(bolt);
+  const bolt2 = new THREE.Mesh(ssBoltGeo(-40, -950, 420, 8), boltM); bolt2.position.x = 6; bolt2.scale.x = 0.5; scene.add(bolt2);
+  // ---- the motorway, 3.2 km away along the hills to the south; its cars (both ways, about 70 mph)
+  const ridge = ssMesh(new THREE.SphereGeometry(1, 48, 16), ssStd('#5d6b4e', 0.95), 0, -20, -3900, scene); ridge.scale.set(9000, 760, 1200); ridge.castShadow = false; ridge.visible = false;
+  const mway = new THREE.Group(); mway.visible = false; scene.add(mway);
+  ssBox(9000, 2, 34, ssStd('#55565a', 0.85), 0, 615, -3200, mway); ssBox(9000, 1.2, 1, ssStd('#c8c8c0', 0.6), 0, 616.5, -3200, mway);
+  const MW = Array.from({ length: 36 }, (_, i) => ({ dir: i % 2 ? 1 : -1, lane: (i % 6 >> 1), off: 1600 * ssR(i, 91), v: 29.5 + 3.5 * ssR(i, 92) }));
+  const mwCar = new THREE.InstancedMesh(new THREE.BoxGeometry(4.6, 1.6, 1.9), ssStd('#ffffff', 0.5), MW.length); mwCar.castShadow = false; mway.add(mwCar);
+  MW.forEach((c, i) => mwCar.setColorAt(i, new THREE.Color(['#e8e6e0', '#1f2226', '#8a8f94', '#2e3a4c', '#a8322c', '#c9c6be'][i % 6])));
+  const mwAt = (c, te) => [((c.dir * c.v * te + c.off) % 1600 + 1600) % 1600 - 800, 617.4, -3200 + c.dir * (4 + 3.6 * c.lane)];
   const rain = ssRain(scene, { n: 3000, r: 10, h: 8, opacity: 0.28 });
   // ---- the cat
   const catRoot = new THREE.Group(); scene.add(catRoot);
@@ -256,7 +265,7 @@ SS_SETS.garden = (app) => {
       let pos = SS_GD.you, at = [-0.6, 1.2, -12], fov = 55, drift = 0.006, roll = 0, show = null, phone = null;
       R.begin(); trail.begin(); steam.begin();
       for (const p of planes) p.visible = false;
-      boltM.opacity = 0; flash.intensity = 0; rain.lines.visible = false; horizon.visible = false;
+      boltM.opacity = 0; flash.intensity = 0; ridge.visible = false; mway.visible = false; scene.fog.density = 0.0016; rain.lines.visible = false; horizon.visible = false;
       catRoot.visible = false; nb.root.visible = false; mum.root.visible = false; spoon.visible = false; you.root.visible = false;
       cam.near = 0.02; cam.far = 30000;
       // the bird (on the fence in the morning and at dawn)
@@ -272,7 +281,7 @@ SS_SETS.garden = (app) => {
         // telephoto on the airliner: its sound (rings) piles up at its nose as it reaches the speed of sound up there
         const p = plane1(t), k = K(t, SS.plane, SS.plane + 2.2);
         planes[0].visible = true; planes[0].position.set(...p); planes[0].rotation.y = -Math.atan2(PL.dir[2], PL.dir[0]);
-        pos = [0, 1.6, -2]; at = ssV([p[0] - 3000, 3000, p[2] * 0.5], [p[0] + 120, p[1], p[2]], Ease.inOutSine(k)); fov = ssLerp(40, 5.2, Ease.inOutSine(k)); drift = 0.0006;
+        pos = [0, 1.6, -2]; at = ssV([p[0] - 700, p[1] * 0.92, p[2]], [p[0] + 120, p[1], p[2]], Ease.inOutSine(k)); fov = ssLerp(16, 5.2, Ease.inOutSine(k)); drift = 0.0006;
         ssShells(R, t, { src: plane1, every: 0.35, from: SS.plane - 9, life: 9, alpha: 0.55, scale: SSP.cAlt0 / SSP.c0 });
         for (const q of ssContrailPts(p, PL.dir, 2400, 90)) trail.add(q[0] - 40, q[1] - 2, q[2], 18 + 60 * q[3], 0.5 * (1 - q[3]), 1, 1, 1);
         cam.near = 5;
@@ -285,21 +294,21 @@ SS_SETS.garden = (app) => {
         const others = K(t, SS.others, SS.others + 4);
         otherTrails.forEach((o, i) => {
           if (others <= 0) return;
-          const pl = planes[1 + i], d = [Math.cos(o[3]), 0, Math.sin(o[3])], c0 = [o[0] * 9000, 10500 + 600 * i, -6000 + o[2] * 5000], s = (t - SS.others) * SSP.plane - 4000;
+          const pl = planes[1 + i], d = [Math.cos(o[3]), 0, Math.sin(o[3])], c0 = [o[0] * 9000, 10500 + 600 * i, -1500 + o[2] * 2500], s = (t - SS.others) * SSP.plane - 4000;
           const pp = [c0[0] + d[0] * s, c0[1], c0[2] + d[2] * s];
           pl.visible = true; pl.position.set(...pp); pl.rotation.y = -o[3];
           for (const q of ssContrailPts(pp, d, 5000, 50)) trail.add(q[0], q[1], q[2], 30 + 120 * q[3], 0.4 * others * (1 - q[3]), 1, 1, 1);
           ssShells(R, t, { src: (te) => [c0[0] + d[0] * ((te - SS.others) * SSP.plane - 4000), c0[1], c0[2] + d[2] * ((te - SS.others) * SSP.plane - 4000)], every: 0.8, from: SS.others - 10, life: 24, alpha: 0.32 * others });
         });
         const kb = K(t, SS.boomAt - 6, SS.boomAt + 1.5), kc = K(t, SS.carpet, SS.eight - 1);
-        pos = [0.2, 1.62, -3.0]; { const q = boomPlane(SS.boomAt), d = ssN3([q[0] - pos[0], q[1] - pos[1], q[2] - pos[2]]); const el = Math.max(d[1], 0.42); at = ssV(ssV([-2, 2.6, -14], [pos[0] + d[0] * 20, pos[1] + el * 20, pos[2] + d[2] * 20], Ease.inOutSine(K(t, SS.boom, SS.boom + 3))), [pos[0] + d[0] * 20, pos[1] + el * 20 - 2, pos[2] + d[2] * 20], kb); } fov = ssLerp(ssLerp(50, 64, kb), 72, kc); drift = 0.004;
+        pos = [0.2, 1.62, -3.0]; { const q = boomPlane(SS.boomAt), d = ssN3([q[0] - pos[0], q[1] - pos[1], q[2] - pos[2]]); const el = Math.max(d[1], 0.8); at = ssV(ssV([-2, 7, -14], [pos[0] + d[0] * 20, pos[1] + el * 20, pos[2] + d[2] * 20], Ease.inOutSine(K(t, SS.boom, SS.boom + 3))), [pos[0] + d[0] * 20, pos[1] + el * 20 - 2, pos[2] + d[2] * 20], kb); } fov = ssLerp(ssLerp(50, 64, kb), 72, kc); drift = 0.004;
         // the boom: a hard double knock of the camera
         const db = t - SS.boomAt; if (db > 0 && db < 1.2) { const s = Math.exp(-db * 5) * (Math.sin(db * 70) + 0.6 * Math.sin(db * 113)); at = [at[0] + 0.12 * s, at[1] + 0.2 * s, at[2]]; roll = 0.6 * s; }
         cam.near = 0.5;
       } else if (m === 'neighbour') {
         nb.root.visible = true; nb.update(t);
         const k = K(t, SS.eight, SS.throat + 1);
-        pos = [0.4, 1.62, -3.0]; at = ssV([3.5, 1.7, -6], [SS_GD.nb[0] - 0.2, 1.95, SS_GD.nb[2]], k); fov = ssLerp(46, 32, k);
+        pos = [0.4, 1.62, -3.0]; at = ssV([3.5, 1.7, -6], [SS_GD.nb[0] - 0.2, 1.95, SS_GD.nb[2]], k); fov = ssLerp(46, 13, Ease.inOutSine(k));
       } else if (m === 'kettle') {
         const kk = [-3.05, 1.01, 0.61], k = K(t, SS.kettle, SS.radio);
         pos = ssV([-1.95, 1.58, 2.3], [-2.25, 1.5, 2.0], k); at = [kk[0], 1.08, kk[2]]; fov = 42;
@@ -326,7 +335,12 @@ SS_SETS.garden = (app) => {
         pos = [T[0] + 1.25, 1.3, T[1] + 1.15]; at = ssV([T[0] - 0.1, 1.05, T[1] - 0.6], [T[0] + 0.15, 0.62, T[1] + 0.2], k); fov = 48;
         if (t > SS.text - 0.6) { show = 'phone'; phone = 'chat'; }
       } else if (m === 'motorway') {
-        pos = [0.2, 1.62, -5]; at = [-6, 3, -120]; fov = 34; drift = 0.003;
+        ridge.visible = true; mway.visible = true; scene.fog.density = 0.00002;
+        const m4 = new THREE.Matrix4(); MW.forEach((c, i) => { const q = mwAt(c, t); m4.makeTranslation(q[0], q[1], q[2]); mwCar.setMatrixAt(i, m4); }); mwCar.instanceMatrix.needsUpdate = true;
+        // (every car's rings: they pile up into a cone behind it; each cone's crack takes 1 min 43 s to reach you)
+        MW.forEach((c) => { const x = mwAt(c, t)[0]; if (Math.abs(x) < 150) ssShells(R, t, { src: (te) => mwAt(c, te), every: 0.2, from: t - 3, life: 3, alpha: 0.4, maxR: 120 }); });
+        const k = K(t, SS.motorway, SS.eleven);
+        pos = [0.3, 5.6, 0.2]; at = [ssLerp(-40, 20, k), 612, -3200]; fov = ssLerp(3.2, 2.6, k); drift = 0.0005; cam.near = 1;
       } else if (m === 'tv' || m === 'clap' || m === 'earbuds' || m === 'box' || m === 'wait' || m === 'walkinto') {
         // seated at the table, your ears 3 m from the TV / the music box
         const E = SS_K.ear;
@@ -374,12 +388,12 @@ SS_SETS.garden = (app) => {
         const walking = t > go && t < arrive, gp = (t - go) * 1.6;
         cat.pose(walking ? ssCatGallop(gp, 0.45) : t < go ? ssCatBlend(SS_CAT_POSES.sit, SS_CAT_POSES.alert, 0.5 + 0.5 * MathX.smooth(t, SS.meow - 0.5, SS.meow)) : ssCatBlend(SS_CAT_POSES.sit, SS_CAT_POSES.alert, 0.8), t);
         pos = m === 'cat' ? [0.4, 0.62, -2.85] : [0.3, 1.0, -2.6];
-        cat.lookAt([pos[0], 0.6, pos[2]], 0.8); at = m === 'cat' ? ssV([SS_GD.cat0[0], 0.2, SS_GD.cat0[2]], [cp[0], 0.18, cp[2]], 0.7) : [0.2, 0.6, -5.5]; fov = m === 'cat' ? 46 : 50;
+        cat.lookAt([pos[0], 0.6, pos[2]], 0.8); at = m === 'cat' ? ssV([SS_GD.cat0[0], 0.2, SS_GD.cat0[2]], [cp[0], 0.18, cp[2]], 0.7) : [cp[0], 0.25, cp[2]]; fov = m === 'cat' ? 46 : ssLerp(40, 30, K(t, SS.hum, SS.storm));
         if (m === 'cat') ssShells(R, t, { src: () => [SS_GD.cat0[0], 0.26, SS_GD.cat0[2] + 0.12], every: 0.12, from: SS.meow, to: SS.meow + 0.6, life: 30, alpha: 0.4 });
       } else if (m === 'storm') {
         // from the kitchen: rain on the garden, lightning a kilometre away over the town
         rain.lines.visible = true; rain.update(t, [-1.6, 1.5, -7]);
-        pos = [-1.6, 1.62, 1.95]; at = [-2.6, 2.6, -40]; fov = 52;
+        pos = [-1.6, 1.5, 1.2]; at = [-2.2, 5.2, -40]; fov = 56;
         const fl = t - SS.flash; boltM.opacity = fl > 0 && fl < 0.5 ? (Math.sin(fl * 40) > -0.3 ? 1 : 0.2) * (1 - fl * 1.6) : 0;
         flash.intensity = fl > 0 && fl < 0.6 ? 4 * Math.exp(-fl * 6) : 0;
         if (flash.intensity > 0) S.hemi.intensity += 1.5 * Math.exp(-fl * 6);
@@ -398,8 +412,8 @@ SS_SETS.garden = (app) => {
         { const w = MathX.clamp(0.06 / Math.max(0.05, Hr), 0.002, 0.5); if (Math.abs(w - horizonW) > 0.0005) { horizonW = w; horizon.geometry.dispose(); horizon.geometry = new THREE.RingGeometry(1 - w, 1, 200); } }
         if (m === 'night') {
           const k = K(t, SS.midnight, SS.stop);
-          pos = ssV([2.2, 4.5, 2.5], [1.4, 3.2, -0.6], k); at = [0, 0, -9]; fov = 66;
-          if (t > SS.stop) { pos = ssV([1.4, 3.2, -0.6], [0.35, 1.62, -6.4], K(t, SS.stop, ssCap('stop', 2).show + 0.6)); at = ssV([0, 0, -9], [0.0, 0.0, -7.05], down); fov = ssLerp(66, 50, down); }
+          pos = ssV([1.6, 4.2, -0.8], [1.4, 3.2, -1.4], k); at = [0, 0, -9]; fov = 66;
+          if (t > SS.stop) { pos = ssV([1.4, 3.2, -1.4], [0.35, 1.62, -6.4], K(t, SS.stop, ssCap('stop', 2).show + 0.6)); at = ssV([0, 0, -9], [0.0, 0.0, -7.05], down); fov = ssLerp(66, 50, down); }
         } else if (m === 'dawn') {
           const k = K(t, SS.last, SS.real);
           pos = ssV([0.6, 1.62, -3.4], [0.2, 1.62, -4.2], k); at = ssV([-2.5, 1.6, -7.5], [SS_GD.bird[0], SS_GD.bird[1], SS_GD.bird[2]], K(t, ssCap('last', 0).show, ssCap('last', 1).show + 1)); fov = ssLerp(54, 34, K(t, ssCap('last', 0).show, ssCap('last', 1).show + 1));
@@ -426,8 +440,8 @@ SS_SETS.garden = (app) => {
     },
     labels(t) {
       const m = ssShotAt(t).mode, out = [];
-      if (m === 'motorway') out.push({ p: [-60, 4, -1200], text: 'THE MOTORWAY', sub: '3.2 km · EVERY CAR FASTER THAN SOUND', a: StoryHUD.win(t, ssS('motorway') + 0.8, SS.eleven - 0.3, 0.3, 0.2) });
-      if (m === 'storm') out.push({ p: [-320, 40, -950], text: 'LIGHTNING', sub: '1.0 km AWAY', a: StoryHUD.win(t, SS.flash + 0.3, SS.eight2 - 0.4, 0.3, 0.2) });
+      if (m === 'motorway') out.push({ p: [-10, 650, -3200], text: 'THE MOTORWAY', sub: '3.2 km · EVERY CAR AT 70 FASTER THAN SOUND', a: StoryHUD.win(t, ssS('motorway') + 0.8, SS.eleven - 0.3, 0.3, 0.2) });
+      if (m === 'storm') out.push({ p: [-40, 60, -950], text: 'LIGHTNING', sub: '1.0 km AWAY', a: StoryHUD.win(t, SS.flash + 0.3, SS.eight2 - 0.4, 0.3, 0.2) });
       if (m === 'tv') out.push({ p: [SS_K.tv[0], SS_K.tv[1] + 0.62, SS_K.tv[2]], text: 'PICTURE: NOW', sub: 'ITS SOUND: 4.5 s LATE', a: StoryHUD.win(t, ssCap('four', 1).show, SS.clap - 0.2, 0.3, 0.2) });
       if (m === 'box' || m === 'walkinto') out.push({ p: [SS_K.box[0], SS_K.box[1] + 0.2, SS_K.box[2]], text: 'ITS TUNE', sub: t < SS.boxGo ? 'NOT PLAYING YET' : ssFmtDist(ssDist(ssH(SS.boxGo), ssH(t))) + ' FROM THE BOX', a: StoryHUD.win(t, SS.boxGo - 0.2, SS.wait - 0.2, 0.3, 0.2) });
       if (m === 'wait') out.push({ p: [SS_K.box[0], SS_K.box[1] + 0.2, SS_K.box[2]], text: 'ITS TUNE', sub: ssFmtDist(ssDist(ssH(SS.boxGo), ssH(t))) + ' FROM THE BOX · YOU: 3.0 m', a: StoryHUD.win(t, SS.wait + 0.3, SS.tuneHere + 3, 0.3, 0.3) });
@@ -440,10 +454,11 @@ SS_SETS.garden = (app) => {
     grade(t, p, shot) {
       const m = shot.mode, H = 7 + ssH(t);
       p.warmth = H < 8 || H > 29 ? 0.08 : H > 16 && H < 18 ? 0.06 : 0.02;
-      if (m === 'storm') { p.exposure = 1.05; p.saturation = 0.8; p.contrast = 1.1; }
+      if (m === 'storm') { p.exposure = 1.05; p.saturation = 0.8; p.contrast = 1.1; const fl = t - SS.flash; if (fl > 0 && fl < 0.6) { p.flash = 0.45 * Math.exp(-fl * 7) * (Math.sin(fl * 40) > -0.3 ? 1 : 0.4); p.flashColor.setRGB(0.85, 0.9, 1); } }
       if (H > 20.5 && H < 29) { p.exposure = 1.25; p.saturation = 0.9; p.bloom = 0.5; }
       if (m === 'box' || m === 'walkinto' || m === 'wait') { p.exposure = 1.05; p.warmth = 0.08; }
-      if (m === 'plane') { p.bloom = 0.2; p.contrast = 1.04; }
+      if (m === 'plane') { p.bloom = 0.2; p.contrast = 1.04; p.exposure = 0.92; }
+      if (m === 'boom' || m === 'carpet') { p.exposure = 0.86; p.bloom = 0.12; p.contrast = 1.06; }
     },
   };
   return set;

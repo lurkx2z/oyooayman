@@ -55,7 +55,7 @@ const FILM = {
   view(app, t) {
     const set = FILM._set || app.sets.garden;
     if (set.prerender) set.prerender(app);
-    return [set.scene, set.camera];
+    return set.view ? set.view() : [set.scene, set.camera];
   },
 
   grade(t, p) {

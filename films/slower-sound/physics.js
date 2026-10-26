@@ -68,9 +68,9 @@ function ssFmtDist(d) {
 // what the speed is as fast as (for the readout's comparison line)
 const SS_LIKE = [
   [300, 'FASTER THAN AN AIRLINER'], [200, 'AS FAST AS AN AIRLINER'], [110, 'A RACING PLANE'], [70, 'A BULLET TRAIN'],
-  [35, 'A CAR ON THE MOTORWAY'], [17, 'A CAR IN TOWN'], [9, 'A CYCLIST SPRINTING'], [4, 'A MODERATE BREEZE'], [2, 'SOMEONE JOGGING'],
+  [35, 'A CAR ON THE MOTORWAY'], [17, 'A CAR IN TOWN'], [9, 'A CYCLIST SPRINTING'], [5.5, 'A MODERATE BREEZE'], [3.4, 'A GENTLE BREEZE'], [2, 'SOMEONE JOGGING'],
   [1, 'SOMEONE WALKING'], [0.45, 'A SLOW STROLL'], [0.2, 'A CAT CREEPING'], [0.06, 'SLOWER THAN A TORTOISE'], [0.015, 'A BEETLE'],
-  [0.0045, 'AN ANT CARRYING A LEAF'], [0.0015, 'A CHAMPION RACING SNAIL'], [0.0002, 'A GARDEN SNAIL'], [0, 'A GROWING PLANT'],
+  [0.0045, 'AN ANT CARRYING A LEAF'], [0.0024, 'A CHAMPION RACING SNAIL'], [0.0008, 'A GARDEN SNAIL'], [0, 'SLOWER THAN A SNAIL'],
 ];
 function ssLike(c) { for (const [v, w] of SS_LIKE) if (c >= v) return w; return SS_LIKE[SS_LIKE.length - 1][1]; }
 // the landmarks the readout looks ahead to: [h, what]
@@ -86,7 +86,7 @@ SS_NEXT.push(
   [ssHourAt(5.5), 'A BREEZE OUTRUNS SOUND'],
   [ssHourAt(2.7), 'JOGGERS BREAK THE SOUND BARRIER'],
   [ssHourAt(1.35), 'WALKERS BREAK THE SOUND BARRIER'],
-  [ssHourAt(0.5), 'CATS OUTRUN THEIR MEOWS'],
+  [ssHourAt(0.72), 'CATS OUTRUN THEIR MEOWS'],
   [ssHourAt(0.06), 'SLOWER THAN A TORTOISE'],
   [ssHourAt(0.011), '1 CENTIMETRE A SECOND'],
   [ssHourAt(0.0028), 'SNAIL SPEED'],

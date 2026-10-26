@@ -19,6 +19,9 @@
 
 const SS_SS = { HR: 4.2, PV: 3.6, x: 4.2 + 1.4, church: [0, 0, -805], bell: [0, 27, -797], wind: [0, -6] };
 const SS_SS_KID = [-4.6, 0, -14];                       // the boy who kicks the ball (far pavement)
+// the kick: 25 m/s down the street towards you (+z), a low arc that passes you at head height, 1.4 m to your right
+const SS_BALL = { v: 25, dir: ssN3([0.05, 0, 1]), vy: 5.4, you: [-5.6, 1.5, 8] };
+function ssBallAt(te) { const d = Math.max(0, te - SS.kick), s = SS_BALL.v * d; return [SS_SS_KID[0] + 0.3 + SS_BALL.dir[0] * s, 0.26 + Math.max(0, SS_BALL.vy * d - 4.9 * d * d), SS_SS_KID[2] + 0.4 + SS_BALL.dir[2] * s]; }
 const SS_SS_FRIEND = [SS_SS.x + 0.4, 0, -15];           // your friend, 15 m down the pavement (downwind)
 // cars that matter (lane x, speed m/s (+z: towards you), the film time it passes z = 0)
 const SS_SS_CARS = {
@@ -65,6 +68,9 @@ function ssGroundRing(scene, col = '#ffd7a8', w = 0.012) {
   m.rotation.x = -Math.PI / 2; m.renderOrder = 7; scene.add(m); return m;
 }
 
+// a flat, unlit colour (for the map from 150 km up)
+function ssFlat(col) { const m = ssStd('#000000', 1, 0, { emissive: new THREE.Color(col), emissiveIntensity: 1 }); return m; }
+
 SS_SETS.street = (app) => {
   const S = ssSet(app, { sky: '#9ab4d4', fov: 55, near: 0.03, far: 20000, fog: 0.0006, fogColor: '#c4ced8', hemi: ['#d6e2f0', '#8a7a66', 0.7],
     sun: [-35, 80, -45], sunColor: '#fff1dc', sunI: 2.6, shadow: 2048, shadowR: 40, shadowFar: 260 });
@@ -75,7 +81,20 @@ SS_SETS.street = (app) => {
   const VF = new VehicleFactory();
   // ---- the high street (to z = −690), a green square, the church; the land around (for the view from above)
   const ST = ssStreet(scene, { len: 860, zMid: -269.5, kind: 'terrace', seed: 33, night: false, crossingZ: 60, halfRoad: A.HR, pave: A.PV, parked: false });
-  const land = ssMesh(new THREE.PlaneGeometry(30000, 30000), ssStd('#6f7a5a', 0.95), 0, -0.4, 0, scene); land.rotation.x = -Math.PI / 2; land.castShadow = false;
+  const land = ssMesh(new THREE.PlaneGeometry(30000, 30000), ssStd('#6f7a5a', 0.95), 0, -3, 0, scene); land.rotation.x = -Math.PI / 2; land.castShadow = false;
+  // (the country round the town, for the view from 150 km up: its own little scene at 1:100 — the main one's depth
+  //  and contact shading fall apart at that height — with the land, other towns, the bell's ring and its horizon)
+  const MAP = { scene: new THREE.Scene(), cam: new THREE.PerspectiveCamera(56, 16 / 9, 1, 20000), on: false, k: 0.01 };
+  { const sc = MAP.scene; sc.background = new THREE.Color('#7d8a63'); sc.add(new THREE.HemisphereLight('#ffffff', '#ffffff', 1.0));
+    const flat = (c) => new THREE.MeshBasicMaterial({ color: c });
+    const land = new THREE.Mesh(new THREE.CircleGeometry(4000, 64), flat('#7d8a63')); land.rotation.x = -Math.PI / 2; sc.add(land);
+    const towns = new THREE.InstancedMesh(new THREE.CircleGeometry(1, 24), flat('#66625a'), 260), m4 = new THREE.Matrix4(), q = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)); let n = 0;
+    for (let i = 0; i < 2000 && n < 260; i++) { const x = (ssR(i, 71) - 0.5) * 3600, z = (ssR(i, 72) - 0.5) * 3600; if (Math.hypot(x, z) < 60) continue;
+      const r = 4 + 26 * Math.pow(ssR(i, 73), 3); m4.compose(new THREE.Vector3(x, 0.05, z), q, new THREE.Vector3(r, r * (0.6 + 0.6 * ssR(i, 74)), 1)); towns.setMatrixAt(n++, m4); }
+    towns.count = n; sc.add(towns);
+    const home = new THREE.Mesh(new THREE.CircleGeometry(15, 32), flat('#66625a')); home.rotation.x = -Math.PI / 2; home.position.set(0, 0.05, -4); sc.add(home);
+    const ring = (col, w) => { const m = new THREE.Mesh(new THREE.RingGeometry(1 - w, 1, 256), new THREE.MeshBasicMaterial({ color: col, transparent: true, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(0, 0.2, -7.97); sc.add(m); return m; };
+    MAP.now = ring('#ffd7a8', 0.05); MAP.far = ring('#ffb35c', 0.012); MAP.far.scale.setScalar(ssHorizon(5) * MAP.k); }
   const sq = ssMesh(new THREE.PlaneGeometry(80, 120), ssStd('#5f7a44', 0.95), 0, -0.05, -770, scene); sq.rotation.x = -Math.PI / 2; sq.castShadow = false;
   const roadOn = ssMesh(new THREE.PlaneGeometry(2 * A.HR, 90), ssStd('#3a3a3c', 0.8), 0, -0.02, -720, scene); roadOn.rotation.x = -Math.PI / 2; roadOn.castShadow = false;
   ssChurch(scene).position.set(...A.church);
@@ -123,13 +142,13 @@ SS_SETS.street = (app) => {
   const friend = ssPerson({ id: 'ssFr', look: 'ssFriend', y: 0.15, path: [[0, SS_SS_FRIEND[0], SS_SS_FRIEND[2]]], face: 180, states: [[0, 'idle'], [SS.shout - 0.4, 'ssShout'], [SS.shout + 3.2, 'idle']] }, scene);
   const kid = ssPerson({ id: 'ssKid', look: 'ssKid', y: 0.15, path: [[0, SS_SS_KID[0], SS_SS_KID[2]]], face: 120, states: [[0, 'idle'], [SS.kick - 0.3, 'ssKick'], [SS.kick + 1.2, 'idle']] }, scene);
   for (const p of [friend, kid]) p.root.traverse((m) => { if (m.isMesh) m.castShadow = true; });
-  const ball = ssMesh(new THREE.IcosahedronGeometry(0.11, 2), ssStd('#f4f2ec', 0.5), 0, 0, 0, scene);
+  const ball = ssMesh(new THREE.IcosahedronGeometry(0.13, 2), ssStd('#ff6a1a', 0.5, 0, { emissive: new THREE.Color('#ff5a10'), emissiveIntensity: 0.6 }), 0, 0, 0, scene);
   // the kick: from the boy's foot up the street (−z) and across, 25 m/s, a gentle arc
-  const BALL = { v: 25, dir: ssN3([0.35, 0, -1]) };
-  const ballAt = (te) => { const d = Math.max(0, te - SS.kick); const s = BALL.v * d; return [SS_SS_KID[0] + 0.3 + BALL.dir[0] * s, 0.26 + Math.max(0, 3.2 * d - 4.9 * d * d), SS_SS_KID[2] - 0.2 + BALL.dir[2] * s]; };
+  const ballAt = ssBallAt;
   // ---- the rings, the bell's ring on the ground, leaves in the wind
   const R = ssRings(scene, 1400);
   const bellRing = ssGroundRing(scene, '#ffd7a8', 0.01);
+  const farRing = ssGroundRing(scene, '#ffb35c', 0.012); farRing.material.opacity = 0;
   const leaves = ssPuffs(scene, 400, { soft: 0.6 });
 
   // where a walker is (and the moments they put a foot down)
@@ -149,7 +168,7 @@ SS_SETS.street = (app) => {
       const m = shot.mode, h = ssH(t);
       let pos = [A.x, 1.62, 0], at = [A.x - 1.5, 1.4, -40], fov = 55, drift = 0.006, roll = 0;
       R.begin(); leaves.begin();
-      bellRing.visible = false; ball.visible = false; friend.root.visible = false; kid.root.visible = false;
+      bellRing.visible = false; farRing.visible = false; MAP.on = false; ball.visible = false; friend.root.visible = false; kid.root.visible = false;
       amb.group.visible = false; closeCar.group.visible = false; musicCar.group.visible = false; van.group.visible = m === 'van' || m === 'ears' || m === 'walkers';
       amb.blue.emissiveIntensity = 0;
       cam.near = 0.1; cam.far = 20000; scene.fog.density = 0.0006;
@@ -195,7 +214,7 @@ SS_SETS.street = (app) => {
         pos = [A.x + 0.2, 1.62, 1.5]; at = ssV([C.x, 1.3, Math.min(-6, z - 4)], [C.x - 1, 1.2, z + 20], k); fov = ssLerp(40, 58, K(t, SS.siren, SS.sirenPass - 1.5));
       } else if (m === 'silent' || m === 'after' || m === 'backwards') {
         const C = m === 'backwards' ? SS_SS_CARS.music : SS_SS_CARS.close, cc = m === 'backwards' ? musicCar : closeCar, z = ssCarZ(C, t);
-        if (m !== 'silent') { cc.group.visible = true; placeCar(cc, C.x, z, 1); carShells(C, t, { every: m === 'backwards' ? 0.12 : 0.18, alpha: 0.5, col: m === 'backwards' ? SS_RING_BLUE : SS_RING_COL }); }
+        if (m !== 'silent') { cc.group.visible = true; placeCar(cc, C.x, z, 1); carShells(C, t, { every: m === 'backwards' ? 0.12 : 0.18, alpha: 0.42, from: t - 6, life: 6, col: m === 'backwards' ? SS_RING_BLUE : SS_RING_COL }); }
         if (m === 'silent') { pos = [A.x + 0.2, 1.62, 1.5]; at = [0.5, 1.2, -60]; fov = 46; }
         else {
           const pass = m === 'backwards' ? SS.musicPass : SS.carPass, k = K(t, pass - 0.5, pass + 1.2);
@@ -206,7 +225,7 @@ SS_SETS.street = (app) => {
         // the bell's ring: a ring on the ground (where its sound front meets the ground) and the shell above it
         if (t >= SS.bell) {
           const r = ssDist(ssH(SS.bell), h);
-          bellRing.visible = true; bellRing.scale.setScalar(Math.max(0.5, r)); bellRing.position.set(A.bell[0], 0.25, A.bell[2]);
+          bellRing.visible = true; bellRing.scale.setScalar(Math.max(0.5, r)); bellRing.material.opacity = m === 'horizon' ? 1 : 0.8; bellRing.position.set(A.bell[0], 0.25, A.bell[2]);
           ssShells(R, t, { src: () => A.bell, every: 0.8, from: SS.bell, to: SS.bell + 4, life: 1e9, alpha: 0.5 });
         }
         if (m === 'noon') {
@@ -214,15 +233,20 @@ SS_SETS.street = (app) => {
           pos = [3.0, 1.62, 1]; at = ssV([1, 3, -200], [0, 38, -805], k); at = ssV(at, [0, 6, -120], back); fov = ssLerp(ssLerp(50, 14, k), 54, back); drift = 0.002;
           const hit = t - SS.bellHeard; if (hit > 0 && hit < 1.2) roll = 0.25 * Math.exp(-hit * 4) * Math.sin(hit * 30);
         } else {
-          const k = K(t, SS.flying, SS.one);
-          pos = ssV([300, 1400, 600], [500, 4200, 900], Ease.inOutSine(k)); at = ssV([0, 0, -700], [0, 0, -800], k); fov = 56; cam.near = 5; drift = 0; scene.fog.density = 0.00004;
+          // (from the town up to 150 km: the ring so far, and the farthest it can ever get, 55.7 km)
+          const k1 = K(t, SS.flying, ssS('horizon')), k2 = K(t, ssS('horizon') - 0.6, ssCap('horizon', 1).show + 1.2);
+          const alt = 1400 * Math.pow(3, Ease.inOutSine(k1)) * Math.pow(150000 / 4200, Ease.inOutSine(k2));
+          pos = [0.12 * alt, alt, -800 + 0.3 * alt]; at = [0, 0, -800]; fov = 56; cam.near = Math.max(5, alt / 30); cam.far = Math.max(20000, alt * 3); drift = 0; scene.fog.density = 0.00004 * 1400 / alt;
+          MAP.on = alt > 5000; MAP.now.scale.setScalar(Math.max(1, ssDist(ssH(SS.bell), h) * MAP.k)); MAP.far.material.opacity = 0.95 * K(t, ssCap('horizon', 1).show - 0.6, ssCap('horizon', 1).show + 0.4);
+          farRing.visible = true; farRing.scale.setScalar(ssHorizon(5)); farRing.position.set(A.bell[0], 0, A.bell[2]); farRing.material.opacity = 0.9 * K(t, ssCap('horizon', 1).show - 0.6, ssCap('horizon', 1).show + 0.4);
         }
       } else if (m === 'ball') {
         kid.root.visible = true; kid.update(t);
         ball.visible = true; ball.position.set(...ballAt(t)); ball.rotation.set(t * 20, t * 13, 0);
-        ssShells(R, t, { src: ballAt, every: 0.04, from: SS.kick, to: SS.kick + 1.6, life: 8, alpha: 0.42, maxR: 60 });
+        ssShells(R, t, { src: ballAt, every: 0.08, from: SS.kick, to: SS.kick + 1.6, life: 8, alpha: 0.3, maxR: 60 });
         const k = K(t, SS.kick - 0.1, SS.kick + 1.4);
-        pos = [A.x - 0.3, 1.62, 3]; at = ssV([SS_SS_KID[0], 0.8, SS_SS_KID[2]], [SS_SS_KID[0] + 4, 1, SS_SS_KID[2] - 30], k); fov = 54;
+        // (down the street from the boy: the ball comes at you, ahead of its own sound, and flashes past)
+        pos = SS_BALL.you; at = ssV([SS_SS_KID[0] + 0.4, 1.0, SS_SS_KID[2]], [SS_SS_KID[0] + 0.8, 1.2, SS_SS_KID[2] + 6], K(t, SS.kick + 0.2, SS.kick + 0.75)); fov = ssLerp(30, 40, K(t, SS.kick + 0.2, SS.kick + 0.8));
       } else if (m === 'wind') {
         // the wind blows from you towards her: every ring she makes drifts away faster than it spreads
         friend.root.visible = true; friend.update(t);
@@ -233,7 +257,7 @@ SS_SETS.street = (app) => {
       } else if (m === 'van') {
         // you walk along and step in behind the van (the street's noise now goes past it, not round it)
         const k = K(t, SS.behind - 1.6, SS.behind + 0.4);
-        pos = ssV([A.x + 0.4, 1.62, 6], [A.HR + 0.35, 1.62, -3.4], k); at = ssV([A.x - 1, 1.4, -30], [A.HR - 0.6, 1.3, -6.5], k); fov = 56;
+        pos = ssV([A.x + 0.4, 1.62, 6], [A.HR + 0.65, 1.62, -0.6], k); at = ssV([A.x - 1, 1.4, -30], [A.HR - 0.4, 1.35, -30], k); fov = 56;   // (2.7 m behind the van, looking past its side)
       }
       ssCam(cam, (() => { const d = ssDrift(t, drift, 0.3, 17); return [pos[0] + d[0], pos[1] + d[1], pos[2] + d[2]]; })(), at, fov, roll);
       // the sun: a little lower as the afternoon goes on; the shadow box follows you
@@ -241,20 +265,25 @@ SS_SETS.street = (app) => {
       S.sun.position.set(pos[0] + sd[0] * 90, Math.max(20, sd[1] * 90), pos[2] + sd[2] * 90); S.sun.target.position.set(pos[0], 0, pos[2] - 10); S.sun.target.updateMatrixWorld();
       sky.material.uniforms.sd.value.set(...sd).normalize();
       R.end(); leaves.end();
+      if (MAP.on) { MAP.cam.position.copy(cam.position).multiplyScalar(MAP.k); MAP.cam.quaternion.copy(cam.quaternion); MAP.cam.fov = cam.fov; MAP.cam.aspect = cam.aspect; MAP.cam.near = 1; MAP.cam.far = 20000; MAP.cam.updateProjectionMatrix(); MAP.cam.updateMatrixWorld(true); }
     },
+    view() { return MAP.on ? [MAP.scene, MAP.cam] : [scene, cam]; },
     labels(t) {
       const m = ssShotAt(t).mode, out = [], W = StoryHUD.win;
       if (m === 'noon') out.push({ p: [A.bell[0] + 6, A.bell[1] + 8, A.bell[2]], text: 'THE CHURCH', sub: '800 m AWAY', a: W(t, SS.noon + 1.5, SS.bellHeard - 2, 0.3, 0.3) });
       if (m === 'siren') { const z = ssCarZ(SS_SS_CARS.amb, t); out.push({ p: [SS_SS_CARS.amb.x, 3.4, z], text: 'AMBULANCE', sub: '13 m/s', a: W(t, SS.siren + 0.5, SS.sirenPass - 2.2, 0.3, 0.3) }); }
       if (m === 'wind') out.push({ p: [SS_SS_FRIEND[0], 2.4, SS_SS_FRIEND[2]], text: 'YOUR FRIEND', sub: '15 m · DOWNWIND', a: W(t, SS.one + 0.8, SS.two - 0.4, 0.3, 0.3) });
-      if (m === 'ball') out.push({ p: ballAt(Math.max(t, SS.kick + 0.15)), text: 'THE BALL', sub: '25 m/s', a: W(t, SS.kick + 0.3, SS.flying - 0.3, 0.2, 0.3) });
-      if (m === 'horizon') out.push({ p: [A.bell[0], 40, A.bell[2]], text: 'THE NOON BELL', sub: ssFmtDist(ssDist(5, ssH(t))) + ' SO FAR', a: W(t, SS.flying + 0.5, SS.one - 0.3, 0.3, 0.3) });
+      if (m === 'ball') out.push({ p: (() => { const q = ballAt(Math.max(t, SS.kick + 0.15)); return [q[0], q[1] + 1.4, q[2]]; })(), text: 'THE BALL', sub: '25 m/s', a: W(t, SS.kick + 0.3, SS.flying - 0.3, 0.2, 0.3) });
+      if (m === 'horizon') {
+        out.push({ p: [A.bell[0], 40, A.bell[2]], text: 'THE NOON BELL', sub: ssFmtDist(ssDist(5, ssH(t))) + ' SO FAR', a: W(t, SS.flying + 0.5, SS.one - 0.3, 0.3, 0.3) });
+        const H5 = ssHorizon(5) * Math.SQRT1_2; out.push({ p: [A.bell[0] + H5, 0, A.bell[2] - H5], text: 'THE FARTHEST IT CAN EVER GET', sub: ssFmtDist(ssHorizon(5)) + ' · EVER', a: W(t, ssCap('horizon', 1).show + 0.2, SS.one - 0.3, 0.3, 0.3) });
+      }
       return out;
     },
     grade(t, p, shot) {
       const H = 7 + ssH(t);
       p.warmth = H > 14.5 ? 0.06 : 0.03;
-      if (shot.mode === 'horizon') { p.contrast = 1.05; p.saturation = 0.95; }
+      if (shot.mode === 'horizon') { p.contrast = 1.05; p.saturation = 0.95; p.ao = 0; }
     },
   };
   return set;

@@ -1,14 +1,18 @@
 # What if sound kept getting slower and couldn't stop?
 
-Voiceless 16:9 long-form (1920×1080, 30 fps, 7:58), the Slower light / Time-on-your-feet formula: one ordinary day,
+Voiceless 16:9 long-form (1920×1080, 30 fps, 8:05), the Slower light / Time-on-your-feet formula: one ordinary day,
 a rule that keeps getting worse, told by captions, a readout, a clock, illustrative rings and the sound itself.
 Page: `slower-sound.html`. Captions: `CAPTIONS.md` → `build-timing.cjs` → `timing.js`. Fresh film (the old 9:16
 "Slow sound" short is a different idea: a constant slow speed; this one keeps halving).
 
 ## 1. The rule
 
-From **7:00:00 on a Saturday** the speed of sound in air **halves every hour**, everywhere at once. Nothing else about
-the air changes (pressure, density, temperature, wind stay as they were; light, bodies and solids are untouched).
+From **7:00:00 on a Saturday** the speed of sound in air (any gas) **halves every hour**, everywhere at once. Nothing
+else about the air changes (pressure, density, temperature, wind stay as they were; light, bodies and solids are
+untouched), and **sound fades no faster than it does today**. That last part is a choice: with viscosity and heat
+conduction unchanged, absorption per metre scales as 1/c³, so by noon a bell 800 m away would lose thousands of dB and
+by 4 PM a 1 kHz sound would die within a millimetre. The film says so at the end ("And sound that slow would fade away
+almost at once.") and tags the rule ONLY THE SPEED OF SOUND CHANGES. (The premise is impossible anyway: c² = γp/ρ.)
 
 ## 2. The physics (physics.js computes every number on screen)
 
@@ -24,16 +28,16 @@ the air changes (pressure, density, temperature, wind stay as they were; light, 
 | 8:00 | 171.5 m/s | voices: vocal folds unchanged, vocal-tract resonances (formants) ∝ c → an octave lower (what SF6 does, ~0.39×) |
 | 9:00 | 85.75 m/s | reverberation time ∝ 1/c: a 0.5 s kitchen rings 2 s |
 | 10:00 | 42.9 m/s | formants three octaves down: vowels gone |
-| 10:27:14 | 31.3 m/s | 70 mph motorway cars supersonic; their noise takes 1 min 43 s to cross 3.2 km |
-| 10:47 | 25 m/s | a hard-kicked ball supersonic |
+| 10:27:14 | 31.3 m/s | 70 mph motorway cars supersonic; their first cracks take 1 min 43 s to cross 3.2 km and arrive 10:28:57 ("10:29"; 60 mph cars only at 10:41) |
+| 10:47 | 25 m/s | a hard-kicked ball supersonic (at 12:03 it comes at you down the street, ahead of its own sound) |
 | 11:00 | 21.4 m/s | ambulance at 13.2 m/s: f′/f = 1/(1−13.2/21.4) = 2.6 coming, 1/(1+0.62) = 0.62 going |
 | 11:40:36 | 13.4 m/s | 30 mph town cars supersonic: silent coming, a crack, then the engine from both sides; a supersonic source approaching is heard in reverse order |
 | 12:00 | 10.7 m/s | the bell 800 m away rings 12:00:00, heard 12:01:15 (75.2 s); its horizon is 55.7 km |
 | 12:57:45 | 5.5 m/s | a moderate breeze outruns sound: a shout from downwind can never arrive upwind |
-| 14:00 | 2.7 m/s | λ of a 300 Hz voice = 9 mm (was 1.1 m): no more diffraction round a van; interaural delay 0.2 m / c ≈ 0.075 s |
-| 14:59:20 | 1.34 m/s | walkers supersonic: every step a tiny boom |
+| 14:00 | 2.7 m/s | λ of a 300 Hz voice = 9 mm (was 1.1 m; already 14 cm at 10:00, so the shadow came on through the morning): no more diffraction round a van; interaural delay 0.2 m / c ≈ 0.075 s ("about a fourteenth of a second") |
+| 14:59:20 | 1.34 m/s | walkers supersonic: every stride a tiny boom (the swinging foot, 3–5 m/s, already from about 1 PM) |
 | 16:00 | 0.67 m/s | TV 3 m away: 4.48 s late (picture now, sound later); a clap rings 0.5 s × 512 ≈ 4 min 16 s |
-| 16:25 | 0.5 m/s | cats outrun their meows |
+| 15:56 | 0.72 m/s | a trotting cat (about 70 cm/s) outruns her meow |
 | 18:00 | 16.7 cm/s | horizon 870 m: lightning 1 km away is never heard |
 | 19:28 | 6 cm/s | slower than a tortoise |
 | 22:00 | 1.05 cm/s | music box 3 m away: arrives 4 min 55 s later (22:04:55), × c(arr)/c(emit) = 0.945 (lower and slower); walking into it at 1.4 m/s: × 135 |

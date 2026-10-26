@@ -19,15 +19,15 @@ function ssRings(scene, max = 900) {
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.NormalBlending,
     uniforms: { boost: { value: 1 } },
-    vertexShader: `attribute vec4 iCR; attribute vec4 iCol; varying vec3 vN; varying vec3 vV; varying vec4 vC; varying float vY; varying float vR; varying float vDc;
+    vertexShader: `attribute vec4 iCR; attribute vec4 iCol; varying vec3 vN; varying vec3 vV; varying vec4 vC; varying float vY; varying float vR; varying float vDc; varying float vDw;
       void main(){ vec3 w = iCR.xyz + position * iCR.w; vY = w.y; vC = iCol; vN = normalize(position); vR = iCR.w;
-        vDc = abs(length(cameraPosition - iCR.xyz) - iCR.w);
+        vDc = abs(length(cameraPosition - iCR.xyz) - iCR.w); vDw = length(cameraPosition - w);
         vec4 mv = viewMatrix * vec4(w, 1.0); vV = normalize(cameraPosition - w); gl_Position = projectionMatrix * mv; }`,
-    // (the rim of the shell, plus a brighter line where it meets the ground; a shell you are standing at the edge of
-    // fades out, so it never smears across the whole frame)
-    fragmentShader: `uniform float boost; varying vec3 vN; varying vec3 vV; varying vec4 vC; varying float vY; varying float vR; varying float vDc;
+    // (the rim of the shell, plus a brighter line where it meets the ground, fading with distance so far traces don't
+    // stack into a wall; a shell you are standing at the edge of fades out, so it never smears across the whole frame)
+    fragmentShader: `uniform float boost; varying vec3 vN; varying vec3 vV; varying vec4 vC; varying float vY; varying float vR; varying float vDc; varying float vDw;
       void main(){ if (vY < -0.02) discard; float f = 1.0 - abs(dot(normalize(vN), vV));
-        float gw = 0.012 * vR + 0.008; float band = exp(-vY * vY / (gw * gw));
+        float gw = 0.012 * vR + 0.008; float band = exp(-vY * vY / (gw * gw)) * 1600.0 / (1600.0 + vDw * vDw);
         float a = vC.a * (pow(f, 6.0) * 1.0 + 0.8 * band) * boost * smoothstep(0.0, 0.06 * vR + 0.05, vDc);
         if (a < 0.003) discard; gl_FragColor = vec4(vC.rgb, min(a, 0.85)); }`,
   });

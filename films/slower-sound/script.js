@@ -127,7 +127,7 @@ const SS_LAPSE = 1.3;
     [SS.eight, SS.nine, ssS('eight'), 1],
     [SS.nine, SS.ten, ssS('nine'), 2],
     [SS.ten, SS.motorway, ssS('ten'), 3],
-    [SS.motorway, SS.eleven, ssS('motorway'), ssHourAt(SSP.motorway) - 2 * hr],
+    [SS.motorway, SS.eleven, ssS('motorway'), ssArriveH(ssHourAt(SSP.motorway), 3200) - 1.5 * hr],   // the first cracks arrive (10:28:57)
     [SS.eleven, SS.silent, ssS('eleven'), 4],
     [SS.silent, SS.noon, ssS('silent'), at(11, 41)],
     // (the noon scene: real time to the bell, then a lapse to the bell's arrival, then real time)

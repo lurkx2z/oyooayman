@@ -7,7 +7,7 @@ status: voiceless
 # Numbers in a caption are drawn amber. build-timing.cjs times them at reading pace; script.js keys every beat off
 # their words. Every number: PLAN.md § 2 (physics.js computes them).
 
-[open] 3 PM today. The high street. / Every footstep is a sonic boom. / And by midnight, it gets much stranger.
+[open] 3 PM today. The high street. / Every stride is a sonic boom. / And by midnight, it gets much stranger.
 
 [title] What if sound kept getting slower and couldn't stop?
 
@@ -27,7 +27,7 @@ status: voiceless
 
 [kettle] Inside, the kettle's whistle sinks too. / A whistle is just a little pocket of ringing air.
 
-[radio] The radio sounds perfectly normal. / That song was recorded before today. / Strings and speakers don't care. Only air does.
+[radio] The radio still plays at its normal pitch. / That song was recorded before today. / Strings and speakers don't care. Only air does.
 
 [nine] 9:00. 86 metres a second. A bullet train. / Every echo in the kitchen now lasts 4 times longer.
 
@@ -35,13 +35,13 @@ status: voiceless
 
 [ten] 10:00. 43 metres a second. / Voices sink below their own vowels. / Words stop sounding like words. / So everyone starts texting.
 
-[motorway] 10:27. The motorway, two miles away, starts to crackle. / Every car on it is now faster than sound.
+[motorway] 10:29. The motorway, two miles away, starts to crackle. / Every car doing 70 is now faster than sound.
 
 [eleven] 11:00. 21 metres a second. / You walk to the shops.
 
 [siren] An ambulance comes towards you. / Its siren screams 2.6 times higher. / Then it passes, and groans.
 
-[silent] 11:41. 13 metres a second. / Now every car in town is faster than sound. / You can't hear them coming.
+[silent] 11:41. 13 metres a second. / Now every car doing 30 is faster than sound. / You can't hear them coming.
 
 [after] You only hear a car once it's passed. / A crack. Then its engine, from both directions at once.
 
@@ -57,11 +57,11 @@ status: voiceless
 
 [one] 1:00 PM. 5.4 metres a second. / A moderate breeze is now faster than sound. / Your friend shouts from downwind. / Nothing ever reaches you.
 
-[two] 2:00 PM. 2.7 metres a second. Jogging speed. / Sound stops bending round corners. / Step behind a van, and the street goes quiet.
+[two] 2:00 PM. 2.7 metres a second. Jogging speed. / Sound has stopped bending round corners. / Step behind a van, and the street goes quiet.
 
-[ears] Every sound now reaches one ear, / then, almost a tenth of a second later, the other.
+[ears] Every sound now reaches one ear, / then, about a fourteenth of a second later, the other.
 
-[three] 3:00 PM. 1.3 metres a second. / Walking pace. / Every step breaks the sound barrier.
+[three] 3:00 PM. 1.3 metres a second. / Walking pace. / Every stride breaks the sound barrier.
 
 [popcorn] The whole high street / crackles like popcorn.
 
@@ -69,7 +69,7 @@ status: voiceless
 
 [clap] Clap once, / and the room will ring for more than 4 minutes.
 
-[earbuds] The last normal sound / is in your earbuds, a centimetre from your eardrum.
+[earbuds] The last sound that still arrives on time / is in your earbuds, a centimetre from your eardrum.
 
 [five] 5:00 PM. 33 centimetres a second. / Your cat now walks faster than her own meow. / She arrives first. Then the meow.
 
@@ -101,6 +101,6 @@ status: voiceless
 
 [real4] And in a cloud of atoms near absolute zero, / scientists watched sound crawl at a few millimetres a second.
 
-[real5] But air can't do this. / To slow sound to half its speed, / air would have to be colder than liquid nitrogen.
+[real5] But air can't do this. / To slow sound to half its speed, / air would have to be colder than liquid nitrogen. / And sound that slow would fade away almost at once.
 
 [question] So what's the first sound you'd miss?

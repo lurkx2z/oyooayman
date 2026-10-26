@@ -87,7 +87,10 @@ ssSound('sfx', 'kitchen', function (ctx, bus, K) {
   // the phones: taps, a sent-message swoosh, replies arriving
   for (let t = SS.text - 0.2, i = 0; t < SS.motorway - 1.2; i++, t += 0.16 + 0.12 * ssR(i, 5)) K.put(fx.hit([[2600, 0.004, 1], [5200, 0.002, 0.4]], { width: 0.0006 }), t, { vol: 0.05, pan: 0.15 });
   for (const t of [SS.text + 1.6, SS.text + 3.1, SS.text + 4.4]) K.put(fx.beep(1320, 0.06), t, { vol: 0.07, pan: -0.2 });
-  // 10:27 the motorway: still its old hum (its first crackles are 1 min 43 s away)
+  // 10:29 the motorway: the first cones (made at 10:27:14) arrive, 3.2 km away: dull far cracks, more and more of them
+  { const t0 = ssFilmAtH(ssArriveH(ssHourAt(SSP.motorway), 3200)), r = new RNG(29), room = K.verb('garden', 1.4, { bright: 0.5, damp: 4, wet: 0.18 });
+    for (let t = t0; t < SS.eleven - 0.3; t += -Math.log(1 - r.next() * 0.999) / (1.2 + 2.5 * MathX.clamp((t - t0) / 6, 0, 1)))
+      K.put(ssCrack(fx, { len: 0.002 + 0.003 * r.next(), body: 45 + 30 * r.next(), decay: 0.05 }), t, { vol: 0.07 + 0.08 * r.next(), norm: true, pan: r.range(-0.5, 0.5), room, wet: 0.5 }); }
 });
 
 ssSound('sfx', 'street', function (ctx, bus, K) {
@@ -136,10 +139,10 @@ ssSound('sfx', 'street', function (ctx, bus, K) {
   }
   // 12:03 the kick (a thud from the boy, 2 s later at 10 m/s) and the ball: faster than sound, it cracks
   {
-    const kickAt = [SS_SS_KID[0], 0.2, SS_SS_KID[2]], youK = [A.x - 0.3, 1.62, 3], d = Math.hypot(kickAt[0] - youK[0], kickAt[1] - youK[1], kickAt[2] - youK[2]);
+    const kickAt = [SS_SS_KID[0], 0.2, SS_SS_KID[2]], youK = SS_BALL.you, d = Math.hypot(kickAt[0] - youK[0], kickAt[1] - youK[1], kickAt[2] - youK[2]);
     ssHeardStill(K, fx.hit([[95, 0.05, 1], [160, 0.03, 0.6], [310, 0.015, 0.3]], { width: 0.004, noise: 0.4, nhp: 600 }), SS.kick, d, { put: { vol: 0.3, norm: true, pan: -0.5, room: street } });
     // (the ball's flight: as street.js; its sound a soft rush)
-    const BALL = { v: 25, dir: ssN3([0.35, 0, -1]) }, ballAt = (te) => { const q = Math.max(0, te - SS.kick), s = BALL.v * q; return [SS_SS_KID[0] + 0.3 + BALL.dir[0] * s, 0.26 + Math.max(0, 3.2 * q - 4.9 * q * q), SS_SS_KID[2] - 0.2 + BALL.dir[2] * s]; };
+    const ballAt = ssBallAt;
     const xt0 = SS.kick, x = fx.white(Math.ceil(3 * sr)); SSX.bq(x, 'bp', 900, 0.8, sr); for (let i = 0; i < x.length; i++) x[i] *= 0.15 * Math.min(1, i / (0.01 * sr)) * Math.exp(-i / (2 * sr));
     ssMoving(K, SS.kick, SS.flying - 0.2, (te) => (te < SS.kick ? [99, -99, 99] : ballAt(te)), x, xt0, { at: youK, look: 10, vol: 0.4, crack: 0.4, crackLen: 0.0015, room: street });
   }
