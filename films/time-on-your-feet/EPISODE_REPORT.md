@@ -120,3 +120,8 @@ at once. A cloud render of this soundtrack takes about 25 minutes.
 - Final render (on the PC, GPU): `node films/time-on-your-feet/render-gpu.cjs --channel chrome --workers 2 --out
   D:\renders\time-on-your-feet` → `time-on-your-feet_final_1080p.mp4` (1920×1080) and `time-on-your-feet_final_small.mp4`
   (1280×720, under 30 MiB).
+- **Final render done 2026-10-26** on the owner's PC (RTX 3060 Ti, Chrome on the GPU, 2 workers; frames 13 min, the
+  whole job about 17 min, no restarts), from branch commit d1a8b46, in `D:\renders\time-on-your-feet\`:
+  `time-on-your-feet_final_1080p.mp4` 1,671 MiB, 7:43.00, −14.8 LUFS, LRA 6.6, −1.1 dBTP;
+  `time-on-your-feet_final_small.mp4` 25.8 MiB, 7:42.97, −15.3 LUFS, LRA 5.4, −2.7 dBTP. All 8 frames of `check.jpg`
+  show the picture.
