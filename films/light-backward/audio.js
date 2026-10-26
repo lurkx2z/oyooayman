@@ -2,11 +2,10 @@
    AUDIO — "What if light started moving backward?" js/audio/audioEngine.js is unchanged (this is a
    subclass); the DSP and generators come from audiokit.js (via the Slower light film). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
-     music  an original score (sound-music.js)
-     amb    the garden at night (the town, an owl, dogs, a dawn chorus at 11 p.m.), the hot wind, the fire as much as
-            is alight at that moment, the kitchen, the last second slowed into a throb (sound-amb.js)
-     sfx    the events: the cat, the ice, the church clock, the frost melting, the cat flap, the door, each place
-            catching fire, the telescope, the window glass, the bird bath, the house, the last second (sound-sfx.js)
+     music  an original score in E; at 10:00:00 its theme starts turning up backwards (sound-music.js)
+     amb    the garden at night and by day, the park's dawn chorus, Hawaii's beach and crowd, space (sound-amb.js)
+     sfx    the events: the clock, the stars going out, the mirror sky, the lantern, the cat, the streetlights, the
+            gasp and the cheer in Hawaii, Voyager 1, the inverter, the ice, the boiling seas (sound-sfx.js)
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
 

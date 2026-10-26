@@ -1,78 +1,88 @@
-# What if sound kept getting slower and couldn't stop?
+# What if light started moving backward?
 
-Voiceless 16:9 long-form (1920×1080, 30 fps, 8:05), the Slower light / Time-on-your-feet formula: one ordinary day,
-a rule that keeps getting worse, told by captions, a readout, a clock, illustrative rings and the sound itself.
-Page: `slower-sound.html`. Captions: `CAPTIONS.md` → `build-timing.cjs` → `timing.js`. Fresh film (the old 9:16
-"Slow sound" short is a different idea: a constant slow speed; this one keeps halving).
+Voiceless 16:9 long-form (1920×1080, 30 fps, 7:37), the Slower light / Slower sound formula: one ordinary night, one
+rule, told by captions, a readout, a clock, a few honest illustrations and the sound. Page: `light-backward.html`.
+Captions: `CAPTIONS.md` → `node build-timing.cjs` → `timing.js`. Every number on screen: `physics.js` (§ 2).
 
 ## 1. The rule
 
-From **7:00:00 on a Saturday** the speed of sound in air (any gas) **halves every hour**, everywhere at once. Nothing
-else about the air changes (pressure, density, temperature, wind stay as they were; light, bodies and solids are
-untouched), and **sound fades no faster than it does today**. That last part is a choice: with viscosity and heat
-conduction unchanged, absorption per metre scales as 1/c³, so by noon a bell 800 m away would lose thousands of dB and
-by 4 PM a 1 kHz sound would die within a millimetre. The film says so at the end ("And sound that slow would fade away
-almost at once.") and tags the rule ONLY THE SPEED OF SOUND CHANGES. (The premise is impossible anyway: c² = γp/ρ.)
+At **10:00:00 PM GMT tonight** (late October) every photon in the universe reverses its direction, **once** (in the
+Sun's frame). Matter is untouched: lamps, fires and the Sun go on shining as normal afterwards, and new light goes the
+normal way. Tagged THOUGHT EXPERIMENT · ONLY THE DIRECTION OF LIGHT CHANGES. Real time reversal of a light wave flips
+its magnetic field (E stays, B → −B), which the film says in the real section.
 
-## 2. The physics (physics.js computes every number on screen)
+## 2. The physics (physics.js)
 
-- c(h) = 343 m/s × 2^−h at the ground (20 °C); 295 m/s × 2^−h at 11 km (−56.5 °C), h = hours after 7:00.
-- Sound already in flight slows too: a sound made at h0 has gone D = c0·τ·(2^−h0 − 2^−h1) by h1, τ = 3600/ln 2 = 5,194 s.
-  So every sound has a **horizon**, the farthest it can ever get: H(h) = c(h)·τ.
+The one idea: light reversed at 10:00 retraces its path, so what reaches a point at time t is the light that passed
+that point at −t, sent back. The Earth has moved 2·v·t since then (v = 29.78 km/s), so a source's reversed light only
+reaches you once your spot is out of the Earth's body and out of its shadow for that source (lbExitTime, exact).
 
-| when | c | what |
+| when | what | where it comes from |
 |---|---|---|
-| 7:00 | 343 m/s | a blackbird 5.5 m away is heard 0.016 s (≈1/60 s) late |
-| 7:14:19 | 295·2^−h < 250 at 11 km | airliners (250 m/s) are supersonic up there |
-| 7:27:22 | ground c < 250 | their booms reach the ground (cutoff Mach: before this the boom refracts upward and never lands) |
-| 8:00 | 171.5 m/s | voices: vocal folds unchanged, vocal-tract resonances (formants) ∝ c → an octave lower (what SF6 does, ~0.39×) |
-| 9:00 | 85.75 m/s | reverberation time ∝ 1/c: a 0.5 s kitchen rings 2 s |
-| 10:00 | 42.9 m/s | formants three octaves down: vowels gone |
-| 10:27:14 | 31.3 m/s | 70 mph motorway cars supersonic; their first cracks take 1 min 43 s to cross 3.2 km and arrive 10:28:57 ("10:29"; 60 mph cars only at 10:41) |
-| 10:47 | 25 m/s | a hard-kicked ball supersonic (at 12:03 it comes at you down the street, ahead of its own sound) |
-| 11:00 | 21.4 m/s | ambulance at 13.2 m/s: f′/f = 1/(1−13.2/21.4) = 2.6 coming, 1/(1+0.62) = 0.62 going |
-| 11:40:36 | 13.4 m/s | 30 mph town cars supersonic: silent coming, a crack, then the engine from both sides; a supersonic source approaching is heard in reverse order |
-| 12:00 | 10.7 m/s | the bell 800 m away rings 12:00:00, heard 12:01:15 (75.2 s); its horizon is 55.7 km |
-| 12:57:45 | 5.5 m/s | a moderate breeze outruns sound: a shout from downwind can never arrive upwind |
-| 14:00 | 2.7 m/s | λ of a 300 Hz voice = 9 mm (was 1.1 m; already 14 cm at 10:00, so the shadow came on through the morning): no more diffraction round a van; interaural delay 0.2 m / c ≈ 0.075 s ("about a fourteenth of a second") |
-| 14:59:20 | 1.34 m/s | walkers supersonic: every stride a tiny boom (the swinging foot, 3–5 m/s, already from about 1 PM) |
-| 16:00 | 0.67 m/s | TV 3 m away: 4.48 s late (picture now, sound later); a clap rings 0.5 s × 512 ≈ 4 min 16 s |
-| 15:56 | 0.72 m/s | a trotting cat (about 70 cm/s) outruns her meow |
-| 18:00 | 16.7 cm/s | horizon 870 m: lightning 1 km away is never heard |
-| 19:28 | 6 cm/s | slower than a tortoise |
-| 22:00 | 1.05 cm/s | music box 3 m away: arrives 4 min 55 s later (22:04:55), × c(arr)/c(emit) = 0.945 (lower and slower); walking into it at 1.4 m/s: × 135 |
-| 0:00 | 2.6 mm/s | horizon 13.6 m (a champion racing snail ≈ 2.75 mm/s) |
-| 3:00 / 6:00 | | horizons 1.7 m / 21 cm |
+| 10:00:00 | every star and the Moon go out (their light in flight turned round) | |
+| 10:00:01.3 | a sliver of the Moon's NIGHT side lights (old sunlight that missed the Moon, coming back), seen 1.28 s later | lbMoonPoint |
+| 10:00:10 → | mirror-image stars: light that had already passed the Earth comes back from the opposite direction; 35 of the 937 stars brighter than mag 5 by 10 s, 136 by 20 s, 502 by 80 s | lbStarTable |
+| 10:00:20 | Sirius's mirror image, alt 17° in the WEST (az 276°); the real Sirius rises in the east about 2 h later | |
+| 10:00:57 | Canopus (dec −52.7°), alt 39° in the north-west: never above the horizon from 51.5° N | |
+| 10:01:08 → | the south-west sky glows first: the air 40 km up and 600 km away leaves the Earth's shadow 10–15 s before you | lbAirOn |
+| 10:01:20 | the second Sun: your garden leaves the Earth's shadow (80.36 s), alt 46°, az 143° (the anti-solar point) | LB_SKY.on |
+| | the shadow sweeps across the night side at 2v = 60 km/s; all of it lit in R/v = 214 s ("3 and a half minutes") | |
+| | the second Sun shows the Sun as it was at −(s + 495.85) s: 9:49 PM at 10:02:35, one second further back every second | lbSecondShows |
+| 10:00:00 (noon in Hawaii) | the Sun goes out on the whole day side; new light needs 495.85 s (0.9937 AU) | LBP.tSun |
+| | Voyager 1, ~25 billion km out: its signal in flight (≈23.5 h old) turns round; the next one reaches Earth ~23.5 h later | |
+| 10:08:16 | the Sun comes back, the disc's centre first (2.3 light-seconds closer than its edge) | lbSunSeen |
+| 10:08:16 → | its own old light lands back on it: surface ×2 output, T = 5,772 K × 2^¼ = 6,864 K (5,500 → 6,600 °C); e-folding 4 s is a guess | lbSunGain |
+| 10:08:18 | the Moon's day side lights again (0.91 s further from the Sun + 1.28 s); twice as bright as the night side | LB_MOON.dayBack |
+| | Earth gets 3× sunlight (2× real Sun + 1× second Sun) — Venus gets 1.9× | |
+| midnight | the second Sun (dec +12.5°) at alt 51° in the south; the real Sun's October noon is ≈ 26° | |
+| 6:47 AM | the real Sun rises in the east as the second Sun sets in the west (geometric, refraction ignored) | LB_SUNRISE |
+| noon | UV-B at 310 nm: blackbody ratio 6,864 / 5,772 K = 3.6× → sunburn "more than 3 times faster" | |
+| per day | Britain, late October: 61.7 MJ/m² at the top of the air, midsummer was 41.5 MJ/m² | lbnum (scratch) |
+| | extra absorbed ≈ 2 × 340 × 0.7 ≈ 476 W/m² vs today's imbalance ≈ 1–2 W/m²: "hundreds of times faster" | |
+| | 2 m of sea ice at 150 W/m²: ~47 days ("within months") | |
+| | ~10 % more sunlight → moist/runaway greenhouse (the far future Sun); here +200 %: the oceans' 1.4 × 10²¹ kg boiled off in ~500–1,000 years at albedo 0.3–0.5 ("about a thousand") | |
+| +4.6 billion years | the second Sun shows the Sun's birth; after that there is no old light left, and night comes back | |
 
-Real section: Mars ~240 m/s, ~250 m/s above 240 Hz (Maurice et al., Nature, 1 Apr 2022); SF6 ~130–134 m/s; bubbly
-water down to ~20 m/s (Wood's equation), the hot chocolate effect (Crawford, Am. J. Phys. 1982); sound in a
-Bose–Einstein condensate at a few mm/s (Andrews et al., PRL 79, 553, 1997); c ∝ √T so half speed needs T/4 = 73 K
-(−200 °C), colder than liquid nitrogen (77 K, −196 °C).
+Real section: moonlight 1.28 s, sunlight 8 min 16 s; most naked-eye stars are hundreds of light-years away; phase-
+conjugate mirrors; the 2023 temporal reflection ("time mirror") for microwaves (Moussa et al., Nature Physics 19, 863,
+2023); no way to reverse all light: you'd have to flip every wave's magnetic field at once.
+
+Honest limits: the second Sun's glow and the sky are drawn, not radiative-transfer; the Sun's ×2 assumes it absorbs
+and re-emits its own returning light (steady state reached in seconds is a guess); 6:47 AM ignores refraction.
 
 ## 3. Story time
 
-script.js maps film time to story time: real time inside every scene (so every delay, echo and Doppler shift is the
-real one), a 1.3 s time-lapse into each new hour, on-screen lapses for the bell, the music box wait and the night.
+script.js maps film time to story time (lbStoryAt; lbStory and lbFilmAt invert it): real time from 9:59:39 to 10:02:40
+(every appearance at its true second), Hawaii in real time then 6× over the black sky, a lapse to 10:08:14, real time
+over the Sun's return, lapses over the night (×30 at midnight, ×20 at sunrise), real time at noon, then days.
 
-## 4. Shots (shots.js)
+## 4. Shots (shots.js, 42)
 
-Two sets: **garden** (garden-build.js: the house, the garden, the kitchen; garden.js) and **street** (street.js: a
-terrace high street running 800 m to a church). 39 shots: cold open (3 PM, every step a boom) → title → 7:00 garden,
-blackbird, airliner, the boom, the boom carpets → 8:00 neighbour, kettle, radio → 9:00 spoon → 10:00 Mum, texting →
-motorway → 11:00 street, ambulance, silent cars, the close pass, the music car → noon bell, the kick, the bell's
-horizon from above → 1 PM wind, 2 PM van, ears, 3 PM crowd → 4 PM TV, clap, earbuds → 5 PM cat, hum → 6 PM storm →
-8 PM dusk → 10 PM music box, walking into it, the wait → midnight, 3 AM, 6 AM → silence, heartbeat → real → question.
+Three sets: **garden** (garden-build.js + garden.js: a terrace back garden facing SSE, the telescope, the lantern, the
+cat, the park at sunrise), **space** (space.js: illustrations: the stream of old sunlight, the shadow, the wave, the
+half-planet, Voyager 1, two suns, the ice, the boil, the birth), **hawaii** (hawaii.js: Waikiki at noon). Cold open
+(10:02:30, the second Sun) → title → 9:59 → the rule → 10:00:00 → the Moon's sliver → the mirror sky, Sirius,
+Canopus → the lantern replayed a billion times slower → the south-west glow → the second Sun → daylight, the robin,
+the streetlights → why (space) → the shadow, the wave → the Moon → the telescope's card → the Sun's past → Hawaii's
+noon goes black → half the planet → the wait, Voyager → 10:08:16 → twice as bright → the Moon → ×3 → midnight →
+sunrise, two shadows → noon → never dark → space → summer → heat, ice → boil → birth → night again → real → question.
 
 ## 5. Look and HUD
 
-House style (STYLE_BIBLE, the voiceless films): serif captions low centre, numbers amber; readout top left (SPEED OF
-SOUND · value · "as fast as …" · NEXT landmark and its time); clock top right (day + time); a context line; an honest
-tag bottom left (THOUGHT EXPERIMENT / RINGS: ILLUSTRATION / TIME-LAPSE / REAL). Rings (rings.js): a translucent shell
-at the radius each sound has really reached, brighter where it meets the ground.
+House style (STYLE_BIBLE, the voiceless films): serif captions low centre, numbers amber; readout top left (LIGHT
+TURNED AROUND · time since · mirror-image stars back · NEXT); clock top right (TONIGHT / TOMORROW / n DAYS LATER, plus
+IN HAWAII); labels on named stars and places; honest tags bottom left (THOUGHT EXPERIMENT / ILLUSTRATION · NOT TO
+SCALE / TIME-LAPSE / REAL).
 
 ## 6. Sound
 
-Synthesised and seeded (audiokit.js, sound-*.js). Diegetic sounds are rendered physically: ssHeardStill (delay by the
-slowing air + the frequency drop c(arr)/c(emit)) and ssMoving (for each moment you hear, which emission moments are
-reaching you: Doppler, reversed order and the crack of a supersonic source all fall out). Score: the hour chime drops
-an octave each hour until it is below hearing. Mix −16 to −14 LUFS, ≤ −1 dBTP.
+Synthesised and seeded (audiokit.js, sound-lib.js, sound-music.js, sound-amb.js, sound-sfx.js; mix.js). Score in E:
+the theme (E–B–A–F♯ → E) over the title, the second Sun and the question; from 10:00:00 it keeps coming back
+BACKWARDS on a reversed piano. Places: the garden at night/by day, the park's dawn chorus, Waikiki's surf and crowd.
+Effects: the clock's last five seconds, the stars going out (a reversed swell cut dead), the mirror sky's tings, the
+lantern, the cat, the streetlights' relays, the gasp and the cheer, Voyager's pips (backwards after the turn), the
+inverter, the ice, the boil. Mix −16 to −14 LUFS, ≤ −1 dBTP.
+
+## 7. Review log
+
+(filled in after the independent reviews)

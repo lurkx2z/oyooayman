@@ -1,7 +1,7 @@
 /* =====================================================================
-   SOUND · LIB — the noise and filter generators the ambience and effects share (from the Slower light film, renamed
-   uc*), and a few creatures. Every function here is listed in LB_SOUND_FNS at the end, so the baked
-   soundtrack's fingerprint sees a change to any of them.
+   SOUND · LIB — the noise and filter generators the ambience and effects share (from the Slower sound film, renamed
+   lb*), and a few creatures (a cricket, a tawny owl, the cat, the birds). Every function here is listed in
+   LB_SOUND_FNS at the end, so the baked soundtrack's fingerprint sees a change to any of them.
    ===================================================================== */
 
 // ---- shared generators -------------------------------------------------------------------------------------------
@@ -124,79 +124,52 @@ function lbMeow(fx, o = {}) {
 }
 
 
-// ---- this film: sound that really travels -----------------------------------------------------------------------
-// the film time at which the story clock reads h (bisection between the title and the real section, where the clock
-// only ever runs forwards)
-function lbFilmAtH(h, a = LB.titleShot, b = LB.real) {
-  let lo = a, hi = b; for (let i = 0; i < 64; i++) { const m = 0.5 * (lo + hi); if (lbH(m) < h) lo = m; else hi = m; } return 0.5 * (lo + hi);
-}
-// a still source: a sound x made at film time te, d metres from you, reaches you when its front has gone d metres (the
-// air slowing all the way); it arrives lower by c(arrival)/c(made) (the wave pattern in the air is frozen, the speed
-// that carries it past you is not). Played only if it lands in real time (not inside a time-lapse) and inside [w0, w1].
-// Returns the film time it arrives (or null).
-function lbHeardStill(K, x, te, d, o = {}) {
-  const h0 = lbH(te), h1 = lbArriveH(h0, d); if (!isFinite(h1)) return null;
-  const ta = o.t !== undefined ? o.t : (te >= LB.titleShot ? lbFilmAtH(h1, Math.max(LB.titleShot, te - 0.5)) : te + (h1 - h0) * 3600);
-  if (o.w0 !== undefined && (ta < o.w0 || ta > o.w1)) return null;
-  if (!o.lapseOk && lbLapsing(ta + 0.05)) return null;
-  const rate = lbC(h1) / lbC(h0);
-  K.put(x, ta, Object.assign({}, o.put || {}, { rate: Math.abs(rate - 1) > 1e-4 ? rate : undefined }));
-  return ta;
-}
-// a value-noise sample at time te (seeded, continuous): for engines and rumbles defined by emission time
-function lbTNoise(te, rate, seed = 1) { const u = te * rate, i = Math.floor(u), f = u - i, a = hash1(i * 7919 + seed * 104729), b = hash1((i + 1) * 7919 + seed * 104729), s = f * f * (3 - 2 * f); return (a + (b - a) * s) * 2 - 1; }
-// a sonic crack: a sharp N-wave (up, a straight fall, back up) with a little hiss, o.len (s)
-function lbCrack(fx, o = {}) {
-  const sr = fx.sr, L = Math.max(8, Math.round((o.len || 0.004) * sr)), y = fx.arr((o.len || 0.004) + (o.tail || 0.25));
-  for (let i = 0; i < L; i++) y[i] = 1 - 2 * i / L;
-  const z = fx.white(y.length); LBX.bq(z, 'hp', o.hp || 1800, 0.7, sr);
-  for (let i = 0; i < y.length; i++) y[i] += z[i] * 0.25 * Math.exp(-i / (0.01 * sr));
-  for (let i = 0; i < y.length; i++) y[i] += 0.3 * Math.sin(2 * Math.PI * (o.body || 90) * i / sr) * Math.exp(-i / ((o.decay || 0.05) * sr));
+// ---- this film's creatures and crowd -----------------------------------------------------------------------------
+// a robin's song: a thin, liquid, quick phrase of 8–15 notes leaping about between ~2.6 and 7 kHz, some of them trilled
+function lbRobinSong(fx, o = {}) {
+  const sr = fx.sr, r = fx.r, N = o.n || r.int(8, 15), y = fx.arr(N * 0.17 + 0.1); let t = 0, ph = 0;
+  for (let k = 0; k < N; k++) {
+    const nd = r.range(0.035, 0.11), fa = r.range(2600, 7000) * (o.p || 1), fb = fa * r.range(0.75, 1.3), tr = r.next() < 0.35 ? r.range(40, 90) : 0;
+    const i0 = Math.round(t * sr), n = Math.round(nd * sr);
+    for (let i = 0; i < n && i0 + i < y.length; i++) { const u = i / n, w = tr ? Math.sin(2 * Math.PI * tr * i / sr) : 0, f = fa + (fb - fa) * u + 400 * w; ph += 2 * Math.PI * f / sr; y[i0 + i] += Math.sin(ph) * Math.sin(Math.PI * u) * (tr ? 0.6 + 0.4 * w : 1); }
+    t += nd + r.range(0.015, 0.06);
+  }
   return y;
 }
-// a MOVING source, exactly: for every moment you hear (t0…t1), which moments of the source's sound are reaching you
-// (lbHeardFrom: one, or for a source faster than sound two or none), read from x (the sound as it was made, starting at
-// film time xt0). The pitch shift, the order (backwards for a supersonic approach) and the silence ahead of the cone
-// all fall out of that. Gain: the compression of emission time (dte/dt, capped) over the distance. When the cone
-// reaches you (two arrivals appear where there were none) a crack. o: look (s), steps, jmax, dmin, vol, crack (level),
-// right [x, z] (the listener's right, for panning), L(t) the listener (default a fixed point o.at)
-function lbMoving(K, t0, t1, src, x, xt0, o = {}) {
-  const { fx, sr } = K, n = Math.ceil((t1 - t0) * sr), Lb = new Float32Array(n), Rb = new Float32Array(n);
-  const cr = o.cr || 200, nc = Math.ceil((t1 - t0) * cr), look = o.look || 12, steps = o.steps || 600, Lf = o.L || (() => o.at), right = o.right || [1, 0];
-  const xs = (te) => { const u = (te - xt0) * sr, i = Math.floor(u); if (i < 0 || i + 1 >= x.length) return 0; return x[i] + (x[i + 1] - x[i]) * (u - i); };
-  const ctl = [];
-  for (let c = 0; c <= nc; c++) { const t = t0 + c / cr, L = Lf(t); ctl.push({ t, L, r: lbHeardFrom(src, L, t, look, steps).sort((a, b) => b - a) }); }
-  const crack = lbCrack(fx, { len: o.crackLen || 0.004 });
-  for (let c = 0; c < nc; c++) {
-    const A = ctl[c], B = ctl[c + 1];
-    if (B.r.length > A.r.length && A.r.length === 0 && o.crack) { const i0 = Math.round((B.t - t0) * sr); LBX.mixIn(Lb, Rb, crack, i0, o.crack, 0); }
-    if (A.r.length !== B.r.length) continue;
-    for (let k = 0; k < A.r.length; k++) {
-      const ta = A.r[k], tb = B.r[k], J = Math.min(o.jmax || 4, Math.abs(tb - ta) * cr), p = src(ta), L = A.L;
-      const dx = p[0] - L[0], dy = p[1] - L[1], dz = p[2] - L[2], d = Math.hypot(dx, dy, dz), g = (o.vol ?? 1) * J / Math.max(d, o.dmin || 1);
-      const pan = MathX.clamp((dx * right[0] + dz * right[1]) / Math.max(d, 0.5), -1, 1) * 0.8, a = (pan + 1) * Math.PI / 4, gl = Math.cos(a) * g, gr = Math.sin(a) * g;
-      const i0 = Math.round((A.t - t0) * sr), i1 = Math.min(n, Math.round((B.t - t0) * sr));
-      for (let i = i0; i < i1; i++) { const u = (i - i0) / Math.max(1, i1 - i0), v = xs(ta + (tb - ta) * u); Lb[i] += v * gl; Rb[i] += v * gr; }
+// a wave breaking and running up the sand (stereo [L, R], d seconds): a swell of low noise, the crash, the hiss back
+function lbSurf(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), out = [];
+  for (let c = 0; c < 2; c++) {
+    const lo = lbNoise(fx, n, 'brown'), hi = lbNoise(fx, n, 'pink'); LBX.bq(lo, 'lp', 420, 0.7, sr); LBX.bq(hi, 'bp', 2200, 0.6, sr);
+    const y = new Float32Array(n), pk = (o.peak || 0.25) * d;
+    for (let i = 0; i < n; i++) { const t = i / sr, a = t < pk ? Math.pow(t / pk, 2) : Math.exp(-(t - pk) / (0.35 * d)), b = t < pk ? 0 : Math.exp(-(t - pk) / (0.5 * d)) * Math.min(1, (t - pk) / 0.15); y[i] = lo[i] * 2.2 * a + hi[i] * 0.8 * b; }
+    out.push(y);
+  }
+  return out;
+}
+// a crowd's gasp: many short in-breaths at once (o.n people, spread over o.spread s), [L, R]
+function lbGasp(fx, o = {}) {
+  const sr = fx.sr, r = fx.r, d = (o.spread || 0.35) + 0.8, L = fx.arr(d), R = fx.arr(d);
+  for (let k = 0; k < (o.n || 14); k++) { const b = fx.breath(r.range(0.25, 0.55), { inhale: true }), i0 = Math.round(r.range(0, o.spread || 0.35) * sr), pan = r.range(-0.9, 0.9), a = (pan + 1) * Math.PI / 4, g = r.range(0.5, 1); for (let i = 0; i < b.length && i0 + i < L.length; i++) { L[i0 + i] += b[i] * Math.cos(a) * g; R[i0 + i] += b[i] * Math.sin(a) * g; } }
+  return [L, R];
+}
+// applause and cheering-ish noise: o.n clappers for d seconds, each clap a 6 ms burst through a hand's resonance
+function lbClaps(fx, d, o = {}) {
+  const sr = fx.sr, r = fx.r, L = fx.arr(d + 0.1), R = fx.arr(d + 0.1);
+  for (let k = 0; k < (o.n || 30); k++) {
+    const rate = r.range(3.5, 6), pan = r.range(-1, 1), a = (pan + 1) * Math.PI / 4, f = r.range(900, 2400), g = r.range(0.4, 1);
+    for (let t = r.range(0, 0.4); t < d; t += 1 / rate * r.range(0.85, 1.15)) {
+      const env = o.env ? o.env(t / d) : 1, i0 = Math.round(t * sr), n = Math.round(0.012 * sr), z = fx.white(n); LBX.bq(z, 'bp', f, 1.5, sr);
+      for (let i = 0; i < n && i0 + i < L.length; i++) { const v = z[i] * Math.exp(-i / (0.0025 * sr)) * g * env; L[i0 + i] += v * Math.cos(a); R[i0 + i] += v * Math.sin(a); }
     }
   }
-  return K.putLR(Lb, Rb, t0, { vol: o.out || 1, room: o.room, wet: o.wet });
+  return [L, R];
 }
-// a voice: glottal pulses at f0 through the vowel resonances of a throat, the resonances × scale (the speed of sound
-// over today's: 0.5 an octave down, 1/8 three octaves). env(te) the syllables (0…1), vowel(te) 0…4 which vowel
-function lbVoice(fx, d, o = {}) {
-  const sr = fx.sr, r = fx.r, n = Math.ceil(d * sr), src = new Float32Array(n), wv = fx.wander(2.5), sc = o.scale || 1;
-  let ph = 0;
-  for (let i = 0; i < n; i++) { const t = i / sr, f0 = (o.f0 || 120) * (1 + 0.06 * wv(t) + (o.glide ? o.glide(t) : 0)); ph += f0 / sr; if (ph >= 1) { ph -= 1; src[i] = 1; } }
-  const V = [[[730, 1090, 2440]], [[530, 1840, 2480]], [[270, 2290, 3010]], [[570, 840, 2410]], [[300, 870, 2240]]];
-  const y = fx.arr(d + 0.05), seg = 0.05, ns = Math.ceil(d / seg);
-  for (let k = 0; k < 3; k++) {
-    const curve = Array.from({ length: ns + 1 }, (_, j) => Math.max(40, V[Math.floor((o.vowel ? o.vowel(j * seg) : j * 0.3) % 5)][0][k] * sc));
-    const z = lbSweep(src, sr, 'bandpass', [6, 8, 10][k], curve);
-    for (let i = 0; i < n; i++) y[i] += z[i] * [1, 0.6, 0.3][k];
-  }
-  const br = fx.white(n); LBX.bq(br, 'bp', 1500 * Math.max(0.25, sc), 1, sr);
-  for (let i = 0; i < n; i++) { const t = i / sr; y[i] = (y[i] + 0.04 * br[i]) * (o.env ? o.env(t) : 1); }
+// a short click (a relay, a phone's shutter, a clock's tick): o.f its ring, o.len, o.hp
+function lbClick(fx, o = {}) {
+  const sr = fx.sr, y = fx.hit([[o.f || 2400, o.tau || 0.006, 1], [(o.f || 2400) * 1.7, (o.tau || 0.006) * 0.6, 0.5], [(o.f || 2400) * 0.45, (o.tau || 0.006) * 1.5, 0.4]], { width: 0.0003, len: o.len || 0.06 });
+  if (o.hp) LBX.bq(y, 'hp', o.hp, 0.7, sr);
   return y;
 }
 
-const LB_SOUND_FNS = [lbFilmAtH, lbHeardStill, lbTNoise, lbCrack, lbMoving, lbVoice, lbNoise, lbBed, lbTone, lbChirp, lbCrackle, lbSweep, lbSweepPut, lbEv, lbWn, lbAddAt, lbPlace, lbCurve, lbCricket, lbOwl, lbMeow];
+const LB_SOUND_FNS = [lbNoise, lbBed, lbTone, lbChirp, lbCrackle, lbSweep, lbSweepPut, lbEv, lbWn, lbAddAt, lbPlace, lbCurve, lbCricket, lbOwl, lbMeow, lbRobinSong, lbSurf, lbGasp, lbClaps, lbClick];
