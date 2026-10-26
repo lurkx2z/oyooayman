@@ -109,7 +109,9 @@ const LB_SKEYS = [];
   const K = LB_SKEYS, real = (t0, t1, tp, sp) => { K.push([t0, sp + (t0 - tp)], [t1, sp + (t1 - tp)]); };
   real(-1, LB.before, 0, 150);                                         // the cold open: 10:02:30
   real(LB.before, LB.hawaii, LB.t0, 0);                               // 9:59:39 → 10:02:40, real time
-  real(LB.hawaii, LB.wait + 2.2, LB.out, 0);                          // Hawaii: 11:59:52 → the Sun out at noon → 12:00:28
+  // Hawaii: 11:59:52 → the Sun out at noon; the black sky 6× faster (the mirror-image stars coming out); then real time
+  const hB = lbCap('black', 2).show - 0.4, sB = LB.black - LB.out, sB2 = sB + 6 * (hB - LB.black);
+  real(LB.hawaii, LB.black, LB.out, 0); K.push([hB, sB2]); real(hB + 1e-3, LB.wait + 2.2, hB, sB2);
   // (the wait: a time-lapse to just before the Sun's return, then real time)
   const sRet = LBP.tSun - (LB.back - (LB.ret - 0.4));
   K.push([LB.ret - 0.4, sRet]);
@@ -131,6 +133,8 @@ function lbStoryAt(t) {
   for (let i = 1; i < K.length; i++) if (t <= K[i][0]) { const [t0, s0] = K[i - 1], [t1, s1] = K[i]; return s0 + (s1 - s0) * (t - t0) / (t1 - t0); }
   const L = K[K.length - 1]; return L[1] + (t - L[0]);
 }
+// the film time in [a, b] at which the story clock reads s (it only runs forwards there)
+function lbFilmAt(s, a, b) { let lo = a, hi = b; for (let i = 0; i < 50; i++) { const m = 0.5 * (lo + hi); if (lbStoryAt(m) < s) lo = m; else hi = m; } return 0.5 * (lo + hi); }
 // is the clock lapsing at t (faster than real time)?
 function lbLapsing(t) { const a = lbStoryAt(t - 0.02), b = lbStoryAt(t + 0.02); return (b - a) / 0.04 > 1.5; }
 const lbInHawaii = (t) => t >= LB.hawaii && t < LB.full;

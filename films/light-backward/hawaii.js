@@ -1,7 +1,7 @@
 /* =====================================================================
    HAWAII — Waikiki beach at noon (10 PM in your garden): the day side of the Earth. Modes:
      noon     a bright beach, the Sun high in the south; at 10:00:00 it goes out, and the sky with it
-     black    the sky black, stars at noon (mirror images, over Diamond Head), the beach in the dark
+     black    the sky black, stars at noon (mirror images: Orion in the east, sped up), the beach in the dark
      wait     people on the dark beach looking up, phones out (the 8 minutes 16 seconds)
      return   12:08:16 their time: the Sun comes back, a dot (the centre of its disc) first, then the disc
      sun      the Sun through a filter: brighter and brighter, whiter (its surface heating up)
@@ -155,9 +155,11 @@ LB_SETS.hawaii = (app) => {
       if (m === 'noon') { const k = K(t, LB.hawaii, LB.black, (x) => x); pos = [lbLerp(1.6, 1.2, k), 1.62, lbLerp(5.5, 4.2, k)]; at = lbAimH(pos, lbLerp(190, 186, k), lbLerp(20, 24, k)); fov = 76; }
       else if (m === 'black') {
         const c2 = lbCap('black', 2).show - 0.4;
-        if (t < c2) { const k = K(t, LB.black, c2, (x) => x); pos = [0.5, 1.5, 3.0]; at = lbAimH(pos, lbLerp(150, 112, k), lbLerp(22, 26, k)); fov = 70; }
+        if (t < c2) {
+          // (from over the dark sea round to the east, where Orion's mirror image comes out)
+          const k = K(t, LB.black, c2); pos = [0.5, 1.5, 3.0]; at = lbAimH(pos, lbLerp(165, 114, k), lbLerp(18, 22, k)); fov = 64; sk.starSize = 1.5; }
         else { const k = K(t, c2, LB.half, (x) => x); pos = [lbLerp(-1.0, -1.6, k), 1.55, -6.5]; at = lbAimH(pos, lbLerp(25, 15, k), 8); fov = 66; }
-      } else if (m === 'wait') { const k = K(t, LB.wait, LB.voyager, (x) => x); pos = [lbLerp(-3.6, -3.2, k), 0.55, lbLerp(-6.4, -6.9, k)]; at = lbAimH(pos, 30, 24); fov = 68; drift = 0.003; }
+      } else if (m === 'wait') { const k = K(t, LB.wait, LB.voyager, (x) => x); pos = [lbLerp(-3.6, -3.2, k), 0.55, lbLerp(-6.4, -6.9, k)]; at = lbAimH(pos, 30, 18); fov = 62; drift = 0.003; sk.starSize = 1.5; }
       else if (m === 'return') { const k = K(t, LB.ret, LB.sunClose, (x) => x);
         const a = (Math.atan2(Ls[0], -Ls[2]) / LB_D2R + AZ + 360) % 360, e = Math.asin(Ls[1]) / LB_D2R;
         pos = [lbLerp(-0.6, -0.4, k), 1.3, lbLerp(1.0, 0.6, k)]; at = lbAimH(pos, a, e - lbLerp(18, 12, k)); fov = 70; }
@@ -173,26 +175,26 @@ LB_SETS.hawaii = (app) => {
       seaU.uT.value = t; seaU.uK.value = Math.min(dayK, 1.8); seaU.uSun.value.set(...L1); seaU.uLamp.value = 1 - Math.min(1, dayK);
       seaU.uTop.value.setRGB(0.24 * dayK, 0.47 * dayK, 0.75 * dayK).multiplyScalar(1 / Math.max(1, dayK)); seaU.uHor.value.setRGB(0.72, 0.82, 0.9);
       const night = 1 - MathX.smooth(dayK, 0.0, 0.25);
-      for (const h of hotels) h.emissiveIntensity = 0.15 + 1.0 * night;
+      for (const h of hotels) h.emissiveIntensity = 0.15 + 0.75 * night;
       torches.begin();
       for (const p of people) {
         p.update(t);
         const on = night > 0.5 && s > 1.5;
         p.phone.material.color.set(on ? '#dbe8ff' : '#1a1c20');
-        if (on && p.lbAct === 'lbLookUp') { const w = new THREE.Vector3(); p.j.ra.hand.getWorldPosition(w); torches.add(w.x, w.y + 0.05, w.z, 0.5, 0.35 * night, 1, 0.97, 0.9); torches.add(w.x, w.y + 0.05, w.z, 0.12, 0.9 * night, 1, 1, 1); }
+        if (on && p.lbAct === 'lbLookUp') { const w = new THREE.Vector3(); p.j.ra.hand.getWorldPosition(w); torches.add(w.x, w.y + 0.05, w.z, 0.16, 0.22 * night, 1, 0.97, 0.9); torches.add(w.x, w.y + 0.05, w.z, 0.04, 0.8 * night, 1, 1, 1); }
       }
       torches.end();
       this._k = dayK; this._s = s; this._st = stt;
     },
     labels(t) {
       const m = lbShotAt(t).mode, out = [], W = StoryHUD.win;
-      if (m === 'black' && t < lbCap('black', 2).show - 0.4 && sky.named.SIRIUS) out.push({ p: sky.at('SIRIUS', 400), text: 'SIRIUS', sub: 'AT NOON', a: W(t, LB.out + sky.named.SIRIUS.t + 0.6, lbCap('black', 2).show - 0.6, 0.3, 0.2) });
+      if (m === 'black' && t < lbCap('black', 2).show - 0.4 && sky.named.ALNILAM) out.push({ p: sky.at('ALNILAM', 400), text: 'ORION', sub: 'AT NOON', a: W(t, lbFilmAt(sky.named.ALNITAK.t, LB.black, lbCap('black', 2).show) + 0.5, lbCap('black', 2).show - 0.6, 0.3, 0.2) });
       if (m === 'return') out.push({ p: sky.at('SUN', 400), text: 'THE SUN', sub: 'BACK AFTER 8 MIN 16 s', a: W(t, LB.back + 0.6, LB.sunClose - 0.3, 0.3, 0.2) });
       return out;
     },
     grade(t, p, shot) {
       const k = this._k || 0, m = shot.mode;
-      p.exposure = lbLerp(1.75, 1.0, MathX.clamp(k, 0, 1)) - 0.12 * MathX.clamp(k - 1, 0, 1); p.bloom = lbLerp(0.5, 0.3, MathX.clamp(k, 0, 1)); p.saturation = lbLerp(0.85, 1.08, MathX.clamp(k, 0, 1));
+      p.exposure = lbLerp(1.4, 1.0, MathX.clamp(k, 0, 1)) - 0.12 * MathX.clamp(k - 1, 0, 1); p.bloom = lbLerp(0.3, 0.3, MathX.clamp(k, 0, 1)); p.saturation = lbLerp(0.85, 1.08, MathX.clamp(k, 0, 1));
       if (m === 'sun') { p.exposure = 1.0; p.bloom = 0.25; p.vignette = 0.3; }
     },
   };

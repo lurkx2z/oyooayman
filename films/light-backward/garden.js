@@ -217,7 +217,13 @@ LB_SETS.garden = (app) => {
       } else if (m === 'before' || m === 'question' || (m === 'real' && t < LB.real2 + 0.4)) {
         // the night: the Moon, the stars, your cat on the back wall
         const k = m === 'before' ? K(t, LB.before, LB.rule, (x) => x) : m === 'question' ? K(t, LB.question, LB.end, (x) => x) : K(t, LB.real, LB.real2 + 0.4, (x) => x);
-        pos = lbV([0.7, 1.64, -1.9], [0.5, 1.64, -2.8], k); at = lbAim(pos, 172, 13); fov = 62;
+        if (m === 'before') {
+          // (from the Moon, down over the stars, to the cat asleep on the back wall)
+          const e = Ease.inOutSine(MathX.clamp((t - lbCap('before', 1).show + 0.6) / 4.2, 0, 1)), cat = lbAdd(G.catAt, [0, 0.12, 0]);
+          pos = lbV([-0.8, 1.6, -6.0], [-1.6, 1.6, -7.6], k);
+          const a = lbN3(lbAdd(lbAim(pos, 196, 30), pos, -1)), b = lbN3(lbAdd(cat, pos, -1)), d = lbN3(lbV(a, b, e));
+          at = lbAdd(pos, d, 40); fov = lbLerp(40, 12, e);
+        } else { pos = lbV([0.7, 1.64, -1.9], [0.5, 1.64, -2.8], k); at = lbAim(pos, 172, 13); fov = 62; }
       } else if (m === 'rule') {
         const k = K(t, LB.rule, LB.count, (x) => x);
         pos = [-1.4, 1.62, -6.5]; at = lbAim(pos, lbLerp(222, 214, k), lbLerp(24, 27, k)); fov = 58; drift = 0.003;

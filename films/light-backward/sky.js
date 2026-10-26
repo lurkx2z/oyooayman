@@ -174,7 +174,7 @@ class LbSky {
         float fbm(vec3 p) { float s = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { s += a * n3(p); p *= 2.03; a *= 0.5; } return s; }
         // the daylight one sun gives a direction d (its light everywhere in the air)
         vec3 sky(vec3 d, vec3 L) {
-          float h = L.y, e = max(d.y, 0.0), day = smoothstep(-0.2, 0.1, h);
+          float h = L.y, e = max(d.y, 0.0), day = smoothstep(-0.2, 0.1, h) * (0.4 + 0.6 * smoothstep(-0.02, 0.2, h));   // (the sky dims fast as its sun nears the horizon)
           vec3 zen = mix(vec3(0.025, 0.04, 0.1), vec3(0.075, 0.21, 0.58), smoothstep(-0.12, 0.35, h));
           vec3 hor = mix(vec3(0.62, 0.36, 0.2), vec3(0.52, 0.66, 0.84), smoothstep(-0.03, 0.3, h));
           vec3 col = mix(hor, zen, pow(smoothstep(0.0, 1.0, e), 0.4));
@@ -186,7 +186,7 @@ class LbSky {
           return col * day;
         }
         float band(vec3 q) { float b = dot(q, uPole), c = max(dot(q, uCen), -1.0);
-          float w = exp(-b * b / 0.012) * (0.55 + 0.45 * smoothstep(-0.3, 1.0, c)) + 0.3 * exp(-b * b / 0.06) * (0.4 + 0.6 * smoothstep(0.2, 1.0, c));
+          float w = exp(-b * b / 0.012) * (0.55 + 0.45 * smoothstep(-0.3, 1.0, c)) + 0.15 * exp(-b * b / 0.06) * (0.4 + 0.6 * smoothstep(0.2, 1.0, c));
           float cl = fbm(q * 7.0) * 0.7 + fbm(q * 23.0) * 0.4 + fbm(q * 61.0) * 0.35, lane = smoothstep(0.45, 0.8, fbm(q * vec3(11.0, 15.0, 13.0) + 3.1)) * exp(-b * b / 0.004);
           return w * (0.25 + 0.9 * cl) * (1.0 - 0.5 * lane); }
         void main() {
@@ -197,7 +197,7 @@ class LbSky {
           vec3 col = (mix(uNightHor, uNight, smoothstep(0.0, 0.5, e)) + uTown * exp(-max(e, 0.0) * 10.0)) * uNightK;
           // the Milky Way: its real band until 10:00, its mirror image where that has come back
           vec3 q = normalize(uToEq * d);
-          float mw = uS < 0.0 ? band(q) : band(-q) * smoothstep(T.b, T.b + 0.6, uS);
+          float mw = uS < 0.0 ? band(q) : band(-q) * smoothstep(T.b, T.b + 8.0, uS);   // (its glow fills in softly behind the stars)
           col += vec3(0.62, 0.64, 0.7) * 0.05 * mw * uMw * smoothstep(-0.02, 0.25, e);
           // the glow: far, high air lit before the second Sun gets here (thin air: faint, like deep twilight)
           float gl = smoothstep(T.r - 1.5, T.r + 9.0, uS) * (1.0 - smoothstep(T.g - 1.0, T.g + 1.0, uS)) * uGate2;
@@ -300,7 +300,7 @@ class LbSky {
     U1.uK.value = k1 > 0 ? sun.k * (o.discK ?? 1) : 0; U1.uR.value = sun.r; U1.uFrac.value = 1; U1.uRed.value = 0; U1.uFace2.value = o.face1 ?? 0;
     // (a hotter Sun is whiter: 5,772 K → 6,864 K as its surface doubles its output)
     // (a low sun is reddened and dimmed by the long path through the air)
-    const ext = (y) => { const a = MathX.smooth(y, -0.01, 0.14); return [1, 0.4 + 0.6 * a, 0.14 + 0.86 * a, 0.3 + 0.7 * a]; }, e1 = ext(L1[1]), e2 = ext(L2[1]);
+    const ext = (y) => { const a = MathX.smooth(y, -0.01, 0.14); return [1, 0.4 + 0.6 * a, 0.14 + 0.86 * a, (0.3 + 0.7 * a) * (1 + 2.5 * (1 - a))]; }, e1 = ext(L1[1]), e2 = ext(L2[1]);   // (…but still far brighter than the sky round it)
     { const Tk = 5772 * Math.pow(Math.max(1, sun.k), 0.25), c = lbStarRGB(Tk); U1.uCol.value.setRGB(c[0] * e1[0], c[1] * e1[1], c[2] * e1[2]); U1.uK.value *= e1[3]; }
     U2.uCol.value.setRGB(e2[0], 0.97 * e2[1], 0.92 * e2[2]);
     U2.uK.value = frac > 0 ? (o.discK ?? 1) * f2 * e2[3] : 0; U2.uR.value = 1; U2.uFrac.value = frac; U2.uRed.value = red * 0.9 * f2; U2.uFace2.value = o.face2 ?? 0;
@@ -318,7 +318,8 @@ class LbSky {
       this.moon.position.set(md.x * Rm, md.y * Rm, md.z * Rm);
       this.moon.updateMatrixWorld(); this.moon.lookAt(cam.position);
       this.moon.scale.setScalar(Math.max(2 * Rm * Math.tan(0.259 * LB_D2R), Rm * (o.lens || 0) * 0.0009));
-      this.moonU.uS.value = skyS; this.moonU.uDay.value = skyS < LB_MOON.dayBack ? 0 : lbSunGain(skyS - LB_MOON.dayBack);   // (its day side: dark until new sunlight is back) this.moonU.uK.value = (o.moonK ?? 1) * 1.15;
+      this.moonU.uS.value = skyS; this.moonU.uDay.value = skyS < LB_MOON.dayBack ? 0 : lbSunGain(skyS - LB_MOON.dayBack);   // (its day side: dark until new sunlight is back)
+      this.moonU.uK.value = (o.moonK ?? 1) * 1.15;
     }
     this.state = Object.assign(this.state, { k1, k2, frac, red, lum, day1, day2, sun });
     return this.state;

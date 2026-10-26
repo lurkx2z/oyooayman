@@ -99,6 +99,7 @@ LB_SETS.space = (app) => {
         alb = mix(alb, vec3(0.014, 0.06, 0.13), smoothstep(76.0, 81.0, lat) * (1.0 - land));
         float edge = mix(90.5, 71.0, uIce) + 8.0 * (lbN3(vP * 7.0) * 0.5 + lbN3(vP * 19.0) * 0.3 + lbN3(vP * 53.0) * 0.2 - 0.5);
         alb = mix(alb, vec3(0.86, 0.9, 0.94), smoothstep(edge - 1.2, edge + 1.2, lat) * (1.0 - land));
+        alb = mix(alb, vec3(0.84, 0.87, 0.9), 0.85 * smoothstep(66.0, 74.0, lat) * land);   // (Greenland's ice, the Arctic islands' snow)
         // the oceans boiled away: the sea floor
         vec3 bed = vec3(0.46, 0.38, 0.29) * (0.75 + 0.5 * lbN3(vP * 14.0));
         alb = mix(alb, bed, (1.0 - land) * uSea);
@@ -233,7 +234,7 @@ LB_SETS.space = (app) => {
         s = lbAt(12, 0) + 86400 * (3 + days); Ssc = lbGeoScene(lbSunDir(s), s);
         const sn = lbSunSeen(s); k1 = sn.k; k2 = 1; a2 = 1; lights = 1;
         if (m === 'twosuns') { const k = K(t, LB.space, LB.summer, (x) => x), side = lbN3(lbCross(Ssc, [0, 1, 0])), d = lbN3([side[0] + Ssc[0] * 0.12, 0.2, side[2] + Ssc[2] * 0.12]), r = lbLerp(4.2, 3.7, k); pos = [d[0] * r, d[1] * r, d[2] * r]; fov = 36; }
-        else if (m === 'ice') { ice = 1 - K(t, LB.ice + 0.6, LB.ice + 4.2); const k = K(t, LB.heat, LB.boil, (x) => x); pos = [0.35, lbLerp(3.5, 3.1, k), 0.5]; at = [0, 0.75, 0]; fov = 38; }
+        else if (m === 'ice') { ice = 1 - K(t, LB.ice + 0.6, LB.ice + 4.2); const k = K(t, LB.heat, LB.boil, (x) => x), d = lbN3([0.35, 1.1, 0.6]), r = lbLerp(3.5, 3.15, k); pos = [d[0] * r, d[1] * r, d[2] * r]; at = [0, 0.3, 0]; fov = 38; }
         else { const k = K(t, LB.boil, LB.birth, (x) => x), c3 = lbCap('boil', 2).show; steam = K(t, lbCap('boil', 1).show, c3 + 1.5) * (1 - K(t, c3 + 3.5, c3 + 6.5)) ; sea = K(t, c3 + 2.0, c3 + 6.0);
           const d = lbN3([0.9, 0.3, 0.3]); pos = [d[0] * lbLerp(4.3, 3.9, k), d[1] * lbLerp(4.3, 3.9, k), d[2] * lbLerp(4.3, 3.9, k)]; fov = 36; }
       } else if (m === 'voyager') {
@@ -276,7 +277,7 @@ LB_SETS.space = (app) => {
       const m = lbShotAt(t).mode, out = [], W = StoryHUD.win, wp = (o) => { const v = new THREE.Vector3(); o.getWorldPosition(v); return [v.x, v.y, v.z]; };
       if (m === 'wave') out.push({ p: wp(london), text: 'YOUR GARDEN', sub: t < LB.wave + 0.7 + 80.36 / 20 ? 'STILL IN THE GAP' : 'LIT AT 10:01:20', a: W(t, LB.wave + 0.6, LB.moonwhy - 0.3, 0.3, 0.2) });
       if (m === 'half') out.push({ p: wp(hawaii), text: 'HAWAII', sub: 'NOON', a: W(t, LB.half + 0.5, LB.wait - 0.3, 0.3, 0.2) });
-      if (m === 'shadow') out.push({ p: [4.2, -0.2, 0], text: 'THE GAP', sub: 'WHERE THE EARTH’S SHADOW WAS', a: W(t, lbS('shadow') + 0.6, LB.wave - 0.3, 0.3, 0.2) });
+      if (m === 'shadow') out.push({ p: [2.8, -0.1, 0], text: 'THE GAP', sub: 'WHERE THE EARTH’S SHADOW WAS', a: W(t, lbS('shadow') + 0.6, LB.wave - 0.3, 0.3, 0.2) });
       if (m === 'voyager') out.push({ p: [0.4, 2.2, 0], text: 'VOYAGER 1', sub: '25 BILLION km FROM EARTH', a: W(t, LB.voyager + 0.6, LB.ret - 0.3, 0.3, 0.2) });
       return out;
     },
