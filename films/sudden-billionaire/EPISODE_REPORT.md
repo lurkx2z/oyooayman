@@ -113,3 +113,8 @@ A cloud render of this soundtrack takes about 11 minutes.
 - Final render (on the PC, GPU): `node films/sudden-billionaire/render-gpu.cjs --channel chrome --workers 2 --out
   D:\renders\sudden-billionaire` → `sudden-billionaire_final_1080p.mp4` (1920×1080) and
   `sudden-billionaire_final_small.mp4` (1280×720, under 30 MiB).
+- **Final render done 2026-10-26** on the owner's PC (RTX 3060 Ti, Chrome on the GPU, 2 workers; frames 13 min at about
+  15 fps, no errors), from branch commit 0f12e51, in `D:\renders\sudden-billionaire\`:
+  `sudden-billionaire_final_1080p.mp4` 1,701 MiB, 7:52.4, −15.2 LUFS, −1.3 dBTP;
+  `sudden-billionaire_final_small.mp4` 25.9 MiB, 7:52.4, −15.5 LUFS, −3.3 dBTP. All 8 frames of `check.jpg` show the
+  picture.
