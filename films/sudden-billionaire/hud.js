@@ -55,7 +55,7 @@ const SB_WHERE = [
   [SB.letters + 0.3, SB.video, 'THE STUDY', () => 'THE NETHERLANDS, 2021', () => '360 LETTERS, WRONG ADDRESSES'],
   [SB.video + 0.3, SB.feeney, 'THE STUDY', () => 'BERKELEY, 2010', () => 'A 46-SECOND VIDEO'],
   [SB.feeney + 0.3, SB.point, 'A REAL MAN', () => 'CHUCK FEENEY', () => '1931–2023 · SAN FRANCISCO'],
-  [SB.point + 0.3, SB.question, 'WHEN', () => 'TEN YEARS FROM NOW', () => 'THE CROSSING · 9:36 PM · RAIN'],
+  [SB.point + 0.3, SB.herLook + 0.8, 'WHEN', () => 'TEN YEARS FROM NOW', () => 'THE CROSSING · 9:36 PM · RAIN'],
 ];
 // the readout's NEXT: [until, text]
 const SB_NEXT = [
@@ -66,7 +66,7 @@ const SB_NEXT = [
   [SB.real, 'NEXT · IS ANY OF THIS REAL?'], [SB.feeney, 'NEXT · A MAN WHO GAVE IT ALL AWAY'], [SB.point, 'NEXT · THE SAME CROSSING'], [1e9, ''],
 ];
 function sbReadoutAt(t) {
-  const a = Math.max(SB_W(t, 0.3, SB.titleShot - 0.1, 0.5, 0.3), SB_W(t, SB.rent - 0.2, SB.question - 0.3, 0.5, 0.6));
+  const a = Math.max(SB_W(t, 0.3, SB.titleShot - 0.1, 0.5, 0.3), SB_W(t, SB.rent - 0.2, SB.herLook + 0.8, 0.5, 1.4));   // (for the first time in the film, it goes away: when she thanks you)
   if (a <= 0) return null;
   const w = sbMoney(t), pre = t >= SB.titleShot && t < SB.billion;
   const promised = t < SB.titleShot || t >= SB.stick;
@@ -147,7 +147,7 @@ const SB_TAGS = [
   [sbCap('letters', 2).show, SB.video, 'REAL · LARGE SURVEYS · US TAX DATA, 2008'],
   [SB.video + 0.3, SB.feeney, 'REAL STUDY · 2010 · ITS MAIN RESULT FAILED TO REPEAT IN 2020'],
   [SB.feeney + 0.3, SB.point, 'REAL · ILLUSTRATED'],
-  [SB.point + 0.3, SB.question, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
+  [SB.point + 0.3, SB.herLook + 0.8, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
 ];
 // a caption's text with its numbers in amber
 function sbCapHtml(s) {

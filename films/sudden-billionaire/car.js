@@ -11,20 +11,24 @@
    The car's own parts are children of `car` (its origin on the road under its middle; your eye at SB_CAR.eye).
    ===================================================================== */
 
-const SB_CAR = { eye: [-0.37, 1.13, 0.1], lane: 1.8, vNight: 8.9, vDay: 9.6, half: 2.3, kerb: 5.6 };
+const SB_CAR = { eye: [-0.37, 1.13, 0.1], lane: 1.8, vNight: 8.9, vCold: 6.2, vDay: 6.6, half: 2.3, kerb: 5.6, replay: 0.9 };
 SB_CAR.stopZ = 1.6 + 2.0 + SB_CAR.half;                 // (the car's middle when its nose is 2 m short of the stripes)
 SB_CAR.decel = 3.2;
 SB_CAR.brakeZ = SB_CAR.stopZ + SB_CAR.vNight * SB_CAR.vNight / (2 * SB_CAR.decel);
 // where the car's middle is (z) at film time t, and its speed
 function sbCarZ(t) {
   const v = SB_CAR.vNight, e = SB_CAR.eye[2];
-  if (t < SB.titleShot) return -e + v * (SB.coldPass - t);                  // (your eye is over the crossing at coldPass)
+  if (t < SB.titleShot) return -e + SB_CAR.vCold * (SB.coldPass - t);      // (your eye is over the crossing at coldPass)
   if (t < SB.point) return -e + SB_CAR.vDay * (SB.dayPass - t);
   if (t < SB.brakeAt) return SB_CAR.brakeZ + v * (SB.brakeAt - t);
   const u = Math.min(t - SB.brakeAt, v / SB_CAR.decel);
   return SB_CAR.brakeZ - (v * u - 0.5 * SB_CAR.decel * u * u);
 }
-function sbCarV(t) { if (t < SB.titleShot) return SB_CAR.vNight; if (t < SB.point) return SB_CAR.vDay; if (t < SB.brakeAt) return SB_CAR.vNight; return Math.max(0, SB_CAR.vNight - SB_CAR.decel * (t - SB.brakeAt)); }
+// where she stands (x) in the cold open: at the kerb; she steps out onto the stripes; you don't slow; she jumps back.
+// The woman at the day crossing does the same (sbHimX)
+function sbHerX(t) { const T = SB.coldPass, g = sbCap('open', 1).show + 0.1; return SB_CAR.kerb + 0.4 - 0.95 * sbK(t, g, g + 1.1) + 1.4 * sbK(t, T - 0.5, T + 0.2); }
+function sbHimX(t) { const T = SB.dayPass; return SB_CAR.kerb + 0.4 - 0.95 * sbK(t, T - 2.4, T - 1.3) + 1.4 * sbK(t, T - 0.5, T + 0.2); }
+function sbCarV(t) { if (t < SB.titleShot) return SB_CAR.vCold; if (t < SB.point) return SB_CAR.vDay; if (t < SB.brakeAt) return SB_CAR.vNight; return Math.max(0, SB_CAR.vNight - SB_CAR.decel * (t - SB.brakeAt)); }
 
 // the windscreen: rain drops that gather and the wipers that clear them (a shader on a plane, metric coords)
 function sbScreenMat(W, H) {
@@ -201,6 +205,9 @@ SB_SETS.car = (app) => {
       P.p = [_hp.x * sx, _hp.y, _hp.z]; P.F = [_hf.x * sx, _hf.y, _hf.z]; P.N = [_hn.x * sx, _hn.y, _hn.z];
     }
   };
+  // (from outside, for the two shots on the pavement: the car's body; the inside is hidden then)
+  const inside = car.children.filter((o) => !o.isLight && o !== head.target);
+  const body = F.build('sedan', '#0c0d10'); if (body.tail) body.tail.emissiveIntensity = 2.4; body.group.rotation.y = Math.PI / 2; body.group.visible = false; car.add(body.group);
   car.add(cam);
 
   const W = SB_W, K = sbK;
@@ -220,17 +227,21 @@ SB_SETS.car = (app) => {
     ST.headM.emissiveIntensity = day ? 0 : 2.4; for (const L of ST.lamps) L.intensity = day ? 0 : 30;
     ST.road.material.roughness = day ? 0.62 : 0.2; ST.road.material.envMapIntensity = day ? 0.5 : 1.3;
     rain.lines.visible = !day; wsMat.uniforms.uRain.value = day ? 0 : 1; wsMat.uniforms.uWet.value = day ? 0 : 1; wsMat.uniforms.uLight.value = day ? 1.6 : 1;
-    head.intensity = day ? 0 : 90; crossL.intensity = day ? 0 : 60; glowL.intensity = day ? 0.05 : 0.25;
+    head.intensity = day ? 0 : 90; crossL.intensity = day ? 0 : 60; glowL.intensity = day ? 0.05 : 0.7;
     F.m.head.emissiveIntensity = day ? 0.4 : 2.2;
     mirrorTex.update({ day }); mirrorM.color.set(day ? '#d0d4da' : '#7a808a');
   };
 
   const set = {
     scene, camera: cam, _v: new THREE.Vector3(),
+    cuts() { return [SB.coldPass + 0.35, SB.dayPass + 0.35]; },
     frame(t, shot) {
       const m = shot.mode, day = m === 'drive' || m === 'nostop';
       setLight(day);
-      const z = sbCarZ(t), v = sbCarV(t);
+      // (the two shots from the pavement replay the last second, so you see the car reach her)
+      const ext = (m === 'cold' && t >= SB.coldPass + 0.35) || (m === 'nostop' && t >= SB.dayPass + 0.35), tt = ext ? t - SB_CAR.replay : t;
+      const z = sbCarZ(tt), v = sbCarV(tt);
+      if (!day) head.intensity = (m === 'again' || m === 'question') ? 90 - 55 * K(t, SB.brakeAt + 1, SB.herCross) : 90;   // (dipped once you've stopped, so she isn't a white blur)
       car.position.set(SB_CAR.lane, 0, z);
       // (a little life in the ride: the road under the wheels)
       const bump = v > 0.1 ? 0.004 * Math.sin(t * 9.1) + 0.003 * noise1(t * 3, 4) : 0, dive = m === 'again' ? 0.02 * Math.exp(-Math.pow((t - SB.brakeAt - 2.6) * 2.2, 2)) : 0;
@@ -242,30 +253,41 @@ SB_SETS.car = (app) => {
       if (m === 'cold') {
         // ahead at the crossing, then down to the phone as you reach her
         const k = K(t, sbCap('open', 2).show - 0.8, sbCap('open', 2).show + 0.2);
-        // (your eyes drift to her while she waits; then the phone)
-        const kh = W(t, sbCap('open', 1).show - 0.4, sbCap('open', 2).show - 0.8, 1.2, 0.3);
-        yaw = sbLerp(0.02 - 0.12 * kh, PH_YAW, k); pitch = sbLerp(-0.05, PH_PITCH, k);
-        fov = sbLerp(50, 34, k);
+        // (your eyes go to her as she steps out; then to the phone)
+        const kh = W(t, sbCap('open', 1).show - 0.6, sbCap('open', 2).show - 0.8, 1.0, 0.3), aim = Math.atan2(-(sbHerX(t) - SB_CAR.lane - E[0]), -(-0.2 - z - E[2]));
+        yaw = sbLerp(sbLerp(0.02, MathX.clamp(aim * 0.7, -0.4, 0), kh), PH_YAW, k); pitch = sbLerp(-0.05, PH_PITCH, k);
+        fov = sbLerp(sbLerp(52, 44, kh), 34, k);
       } else if (m === 'drive') {
         yaw = 0.03 * Math.sin(t * 0.3);
       } else if (m === 'nostop') {
-        const k = K(t, sbCap('nostop', 1).show - 0.4, sbCap('nostop', 1).show + 0.8);
-        yaw = sbLerp(0.0, PH_YAW, k); pitch = sbLerp(-0.06, PH_PITCH, k); fov = sbLerp(58, 34, k);
+        const k = K(t, SB.dayPass - 0.9, SB.dayPass + 0.1), kh = W(t, SB.nostop - 0.3, SB.dayPass - 0.9, 0.5, 0.3), aim = Math.atan2(-(sbHimX(t) - SB_CAR.lane - E[0]), -(0.3 - z - E[2]));
+        yaw = sbLerp(sbLerp(0.0, MathX.clamp(aim * 0.7, -0.4, 0), kh), PH_YAW, k); pitch = sbLerp(-0.06, PH_PITCH, k); fov = sbLerp(sbLerp(58, 48, kh), 34, k);
       } else if (m === 'point') {
         yaw = 0.02 * Math.sin(t * 0.25); pitch = -0.05;
       } else if (m === 'again' || m === 'question') {
         // stopped: you watch her cross (right to left), she looks at you, then you watch her go
         const hx = her.root.position.x, hz = her.root.position.z, ex = SB_CAR.lane + E[0], ez = z + E[2];
         const aim = Math.atan2(-(hx - ex), -(hz - ez));
-        const k = K(t, SB.herCross - 0.4, SB.herCross + 1.0);
-        yaw = sbLerp(0.0, MathX.clamp(aim * 0.7, -0.5, 0.5), k); pitch = sbLerp(-0.05, -0.02, k); fov = sbLerp(58, 50, K(t, SB.herCross, SB.herLook + 1));
+        const k = K(t, SB.herCross - 0.4, SB.herCross + 1.0) * (1 - K(t, SB.herLook + 2.2, SB.herLook + 4.2));
+        yaw = sbLerp(0.0, MathX.clamp(aim * 0.8, -0.5, 0.5), k); pitch = sbLerp(-0.05, -0.02, k); fov = sbLerp(58, 46, K(t, SB.herCross, SB.herLook) * (1 - K(t, SB.herLook + 2.2, SB.herLook + 4.2)));
       }
+      for (const o of inside) o.visible = !ext;
+      body.group.visible = ext; hands.root.visible = !ext;
+      if (ext) {
+        // on the pavement behind her: the car comes out of the rain, passes her, goes
+        if (cam.parent !== scene) scene.add(cam);
+        const t0 = m === 'cold' ? SB.coldPass + 0.35 : SB.dayPass + 0.35, k = K(t, t0, t0 + 5, Ease.inOutSine), bz = m === 'cold' ? -0.2 : 0.3;
+        sbCam(cam, [SB_CAR.kerb + 3.1 + dr[0] * 4, 1.2 + dr[1] * 4, bz - 2.3], [2.0, 0.95, bz + 2.6 - 3.2 * k], 44);
+        for (const w of body.wheels) w.rotation.z = -tt * v / body.r;
+      } else {
+      if (cam.parent !== car) car.add(cam);
       // (the camera is a child of the car: its position is in the car's own coordinates, its aim in the world's)
       const d = sbDir(yaw, pitch);
       car.updateMatrixWorld(true);
       cam.position.set(E[0] + dr[0], E[1] + dr[1], E[2] + dr[2]); cam.up.set(0, 1, 0);
       cam.lookAt(car.localToWorld(set._v.set(E[0] + d[0], E[1] + d[1], E[2] + d[2])));
       if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
+      }
       cam.updateMatrixWorld(true);
       // ---- the wheel (a little steering), the screens, the phone, the note
       wheel.rotation.z = 0.04 * noise1(t * 0.4, 6);
@@ -275,31 +297,33 @@ SB_SETS.car = (app) => {
       note.visible = m === 'point' || m === 'again' || m === 'question';
       // ---- the rain, the wipers' clock
       wsMat.uniforms.uT.value = t;
-      rain.update(t, [car.position.x, 0, z - 4], v);
+      rain.update(t, ext ? [cam.position.x - 3, 0, cam.position.z + 2] : [car.position.x, 0, z - 4], ext ? 0 : v);
       // ---- her (night), the other woman (day)
       her.root.visible = !day; him.root.visible = day;
       if (!day) {
         if (m === 'cold') {
-          // she waits at the kerb; as you come she steps to the edge; you don't stop: she steps back
-          const step = K(t, SB.coldPass - 1.6, SB.coldPass - 0.9), back = K(t, SB.coldPass - 0.35, SB.coldPass + 0.3);
-          her.spec.path = [[0, SB_CAR.kerb + 0.4 - 0.45 * step + 0.6 * back, -0.2]];
-          her.states = [[0, 'sbUmbrella'], [SB.coldPass - 0.4, 'sbStartle'], [SB.coldPass + 1.6, 'sbUmbrella']];
+          // she waits at the kerb; she steps out onto the stripes; you don't slow down: she jumps back
+          const g = sbCap('open', 1).show + 0.1;
+          her.spec.path = [[0, sbHerX(tt), -0.2]];
+          her.states = [[0, 'sbUmbrella'], [g, 'sbUmbrellaWalk'], [g + 1.1, 'sbUmbrella'], [SB.coldPass - 0.5, 'sbStartle'], [SB.coldPass + 1.8, 'sbUmbrella']];
           her.spec.face = 90;
         } else {
           // she waits; you stop; she crosses, looks at you, lifts a hand; walks on
-          const x0 = SB_CAR.kerb + 0.4, x1 = -SB_CAR.kerb - 0.4, t0 = SB.herCross, t1 = t0 + (x0 - x1) / 1.45;
-          her.spec.path = [[0, x0, -0.2], [t0, x0, -0.2], [t1, x1, -0.2], [t1 + 0.6, x1 - 0.5, -0.6], [t1 + 30, x1 - 0.8, -40]];
+          // (she stops in your headlights to thank you, then walks on)
+          const x0 = SB_CAR.kerb + 0.4, x1 = -SB_CAR.kerb - 0.4, t0 = SB.herCross, tL = SB.herLook, xL = Math.max(x1 + 1, x0 - 1.45 * (tL - t0)), t2 = tL + 1.6, t1 = t2 + (xL - x1) / 1.45;
+          her.spec.path = [[0, x0, -0.2], [t0, x0, -0.2], [tL, xL, -0.2], [t2, xL, -0.2], [t1, x1, -0.2], [t1 + 0.6, x1 - 0.5, -0.6], [t1 + 30, x1 - 0.8, -40]];
           her.states = [[0, 'sbUmbrella'], [t0, 'sbUmbrellaWalk'], [SB.herLook, 'sbThanks'], [SB.herLook + 1.6, 'sbUmbrellaWalk']];
           her.spec.face = undefined;
         }
-        her._preparePath(); her.update(t);
+        her._preparePath(); her.update(tt);
         // (her head turns to you while she thanks you)
         if (m !== 'cold') { const k = W(t, SB.herLook - 0.2, SB.herLook + 1.8, 0.4, 0.5); her.j.head.rotation.y += 1.0 * k; her.j.neck.rotation.y += 0.5 * k; }
+        else { const k = W(tt, sbCap('open', 1).show - 0.5, SB.coldPass + 0.4, 0.4, 0.4), k2 = W(tt, SB.coldPass + 0.5, SB.titleShot, 0.4, 0.3); her.j.head.rotation.y += 0.9 * k - 0.9 * k2; her.j.neck.rotation.y += 0.4 * (k - k2); }
       } else {
-        const step = K(t, SB.dayPass - 1.5, SB.dayPass - 0.9), back = K(t, SB.dayPass - 0.35, SB.dayPass + 0.3);
-        him.spec.path = [[0, SB_CAR.kerb + 0.4 - 0.45 * step + 0.6 * back, 0.3]];
-        him.states = [[0, 'idle'], [SB.dayPass - 0.4, 'recoil'], [SB.dayPass + 1.4, 'idle']];
-        him._preparePath(); him.update(t);
+        him.spec.path = [[0, sbHimX(tt), 0.3]];
+        him.states = [[0, 'idle'], [SB.dayPass - 2.4, 'walk'], [SB.dayPass - 1.3, 'idle'], [SB.dayPass - 0.5, 'recoil'], [SB.dayPass + 1.6, 'idle']];
+        him._preparePath(); him.update(tt);
+        { const k = W(tt, SB.dayPass - 3, SB.dayPass + 0.4, 0.4, 0.4), k2 = W(tt, SB.dayPass + 0.5, SB.years, 0.4, 0.3); him.j.head.rotation.y += 0.9 * k - 0.9 * k2; him.j.neck.rotation.y += 0.4 * (k - k2); }
       }
       for (const p of walkers) { p.update(t); if (p.umbrella) p.umbrella.visible = !day; }
       // ---- traffic in the far lane (towards you), headlights on at night
@@ -310,7 +334,7 @@ SB_SETS.car = (app) => {
       }
       // ---- glows: streetlights, their reflections on the wet road, the crossing's amber globes, the traffic's lamps
       puffs.begin();
-      const ex = car.position.x + E[0], ey = E[1], ez = z + E[2];
+      const ex = ext ? cam.position.x : car.position.x + E[0], ey = ext ? cam.position.y : E[1], ez = ext ? cam.position.z : z + E[2];
       const blink = (Math.floor(t * 1.1) % 2) ? 1 : 0.08;
       ST.globeM.emissiveIntensity = day ? 0.6 * blink : 2.2 * blink;
       if (!day) {
@@ -329,6 +353,7 @@ SB_SETS.car = (app) => {
         // the shops' windows on the road
         for (const bd of ST.buildings) if (bd.shop && Math.abs(bd.z - z) < 90) refl(bd.sx * (ST.HR + ST.PV), 1.6, bd.z, 2.2, 0.25, 1, 0.85, 0.65);
       }
+      if (ext && v > 0.5) { const tz = z + 2.2; for (let k = 0; k < 18; k++) { const u = k / 18; for (const sx of [-0.8, 0.8]) puffs.add(SB_CAR.lane + sx * (1 + 0.6 * u), 0.15 + 0.5 * u, tz + 4 * u, 0.5 + 1.2 * u, (day ? 0.05 : 0.09) * (1 - u), 0.8, 0.85, 0.9); } }
       puffs.end();
       placeGrip();
       hands.update(t);
