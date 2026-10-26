@@ -1,5 +1,5 @@
 /* =====================================================================
-   AUDIO — "What if the universe kept shrinking and couldn't stop?" js/audio/audioEngine.js is unchanged (this is a
+   AUDIO — "What if light started moving backward?" js/audio/audioEngine.js is unchanged (this is a
    subclass); the DSP and generators come from audiokit.js (via the Slower light film). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
      music  an original score (sound-music.js)
@@ -62,9 +62,9 @@ function lbLimit(buf, ceilDb) {
 class LbAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'light-backward-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
-    return [LB, LB_HKEYS, LBT, window.LB_MIX, Object.values(LBX).map(String).join(''), LbFx.toString(), Object.getOwnPropertyNames(LbFx.prototype).map((k) => String(LbFx.prototype[k])).join(''),
-      Object.values(LB_SOUND).flat().map((b) => b.name + b.fn).join(''), lbDynDb.toString(), LbAudio.toString(), lbLimit.toString(), lbH.toString(), JSON.stringify([LBP, LB_SHOTS, LB_K, LB_GD, LB_SS, LB_SS_CARS]),
-      (window.LB_SOUND_FNS || []).map(String).join(''), [lbDist, lbArriveH, lbHeardFrom, lbShotAt, lbCarZ].map(String).join('')];
+    return [LB, LB_SKEYS, LBT, window.LB_MIX, Object.values(LBX).map(String).join(''), LbFx.toString(), Object.getOwnPropertyNames(LbFx.prototype).map((k) => String(LbFx.prototype[k])).join(''),
+      Object.values(LB_SOUND).flat().map((b) => b.name + b.fn).join(''), lbDynDb.toString(), LbAudio.toString(), lbLimit.toString(), lbStoryAt.toString(), JSON.stringify([LBP, LB_SHOTS]),
+      (window.LB_SOUND_FNS || []).map(String).join(''), [lbShotAt, lbSunGain, lbSunSeen].map(String).join('')];
   }
   async renderOffline() {
     if (this.solo) return super.renderOffline();

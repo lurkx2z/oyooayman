@@ -16,6 +16,12 @@
    Local frame: y up; a place looks along azimuth az0 (−z). lbLocal(v, F, az0) turns an equatorial vector into it.
    ===================================================================== */
 
+// atmospheric refraction (Saemundsson): a direction (y up) at true altitude h is seen R higher, R = 1.02′ / tan(h + 10.3/(h + 5.11))
+function lbRefract(L) {
+  const h = Math.asin(MathX.clamp(L[1], -1, 1)) / LB_D2R; if (h < -1.6 || h > 89) return L;
+  const R = 1.02 / Math.tan((h + 10.3 / (h + 5.11)) * LB_D2R) / 60, a = (h + R) * LB_D2R, c = Math.hypot(L[0], L[2]) || 1;
+  return [L[0] / c * Math.cos(a), Math.sin(a), L[2] / c * Math.cos(a)];
+}
 function lbLocal(v, F, az0) {
   const u = lbDot(v, F.up), n = lbDot(v, F.north), e = lbDot(v, F.east), a = az0 * LB_D2R;
   return [e * Math.cos(a) - n * Math.sin(a), u, -(n * Math.cos(a) + e * Math.sin(a))];
@@ -169,20 +175,20 @@ class LbSky {
         // the daylight one sun gives a direction d (its light everywhere in the air)
         vec3 sky(vec3 d, vec3 L) {
           float h = L.y, e = max(d.y, 0.0), day = smoothstep(-0.2, 0.1, h);
-          vec3 zen = mix(vec3(0.025, 0.04, 0.1), vec3(0.15, 0.34, 0.76), smoothstep(-0.12, 0.35, h));
-          vec3 hor = mix(vec3(0.62, 0.36, 0.2), vec3(0.72, 0.82, 0.93), smoothstep(-0.03, 0.3, h));
-          vec3 col = mix(hor, zen, pow(smoothstep(0.0, 1.0, e), 0.5));
+          vec3 zen = mix(vec3(0.025, 0.04, 0.1), vec3(0.075, 0.21, 0.58), smoothstep(-0.12, 0.35, h));
+          vec3 hor = mix(vec3(0.62, 0.36, 0.2), vec3(0.52, 0.66, 0.84), smoothstep(-0.03, 0.3, h));
+          vec3 col = mix(hor, zen, pow(smoothstep(0.0, 1.0, e), 0.4));
           float c = max(dot(d, L), 0.0);
           vec3 sc = mix(vec3(1.0, 0.55, 0.25), vec3(1.0, 0.95, 0.88), smoothstep(-0.02, 0.25, h));
-          col += sc * (0.3 * pow(c, 6.0) + 0.9 * pow(c, 64.0)) * smoothstep(-0.12, 0.04, h);
+          col += sc * (0.09 * pow(c, 8.0) + 0.32 * pow(c, 80.0) + 1.2 * pow(c, 1200.0)) * smoothstep(-0.12, 0.04, h) * (0.35 + 0.65 * smoothstep(0.0, 0.2, h));
           vec2 dh = normalize(vec2(d.x, d.z) + 1e-5), lh = normalize(vec2(L.x, L.z) + 1e-5);
           col += vec3(1.0, 0.48, 0.2) * pow(max(dot(dh, lh), 0.0), 3.0) * exp(-e * 7.0) * (1.0 - smoothstep(0.0, 0.25, h)) * smoothstep(-0.2, -0.02, h) * 0.9;
           return col * day;
         }
         float band(vec3 q) { float b = dot(q, uPole), c = max(dot(q, uCen), -1.0);
           float w = exp(-b * b / 0.012) * (0.55 + 0.45 * smoothstep(-0.3, 1.0, c)) + 0.3 * exp(-b * b / 0.06) * (0.4 + 0.6 * smoothstep(0.2, 1.0, c));
-          float cl = fbm(q * 7.0) * 0.8 + fbm(q * 23.0) * 0.4, lane = smoothstep(0.42, 0.75, fbm(q * 11.0 + 3.1)) * exp(-b * b / 0.004);
-          return w * (0.3 + 0.9 * cl) * (1.0 - 0.7 * lane); }
+          float cl = fbm(q * 7.0) * 0.7 + fbm(q * 23.0) * 0.4 + fbm(q * 61.0) * 0.35, lane = smoothstep(0.45, 0.8, fbm(q * vec3(11.0, 15.0, 13.0) + 3.1)) * exp(-b * b / 0.004);
+          return w * (0.25 + 0.9 * cl) * (1.0 - 0.5 * lane); }
         void main() {
           vec3 d = normalize(vD); float e = d.y;
           vec2 uv = vec2(atan(d.x, -d.z) / 6.2831853 + 0.5, clamp((asin(clamp(e, -1.0, 1.0)) * 57.29578 + 10.0) / 100.0, 0.0, 1.0));
@@ -195,7 +201,7 @@ class LbSky {
           col += vec3(0.62, 0.64, 0.7) * 0.05 * mw * uMw * smoothstep(-0.02, 0.25, e);
           // the glow: far, high air lit before the second Sun gets here (thin air: faint, like deep twilight)
           float gl = smoothstep(T.r - 1.5, T.r + 9.0, uS) * (1.0 - smoothstep(T.g - 1.0, T.g + 1.0, uS)) * uGate2;
-          col += vec3(0.1, 0.2, 0.36) * 0.38 * gl * uGlow * (0.4 + 0.6 * exp(-max(e, 0.0) * 3.0)) * uK2;
+          col += vec3(0.16, 0.27, 0.44) * 2.8 * gl * uGlow * (0.3 + 0.7 * exp(-max(e, 0.0) * 1.8));
           // the daylight of each sun (the second one only where its light has got to the air)
           col += sky(d, uL1) * uK1;
           col += sky(d, uL2) * uK2 * mix(1.0, smoothstep(T.g - 0.8, T.g + 0.8, uS), uGate2);
@@ -266,12 +272,13 @@ class LbSky {
   mirrored(s) { const A = this.mirTimes; let lo = 0, hi = A.length; while (lo < hi) { const m = (lo + hi) >> 1; if (A[m] <= s) lo = m + 1; else hi = m; } return lo; }
   // s: story time; cam; o: { skyS (the stars' / Moon's clock: default s), t (twinkle), sunS (where the suns are: default s),
   //   F (this place's frame at sunS), k, lens (a long lens: the discs are drawn at least this many pixels), black (Hawaii's
-  //   dark noon), sun1 { k, r, on, col }, starK }
+  //   dark noon), sun1 { k, r, on, col }, starK, on (the second Sun's moment here), fade2 (the second Sun ×, 0…1) }
   update(s, cam, renderH, o = {}) {
     this.g.position.copy(cam.position);
     const R = this.R, px = renderH / 1080, az0 = this.o.az0, skyS = o.skyS ?? s;
     const Fs = o.F || this.o.F;
-    const S = lbSunDir(o.sunS ?? s), L1 = lbLocal(S, Fs, az0), L2 = lbSc(L1, -1);
+    // (each sun where you see it: the air lifts a low sun, by about half a degree at the horizon)
+    const S = lbSunDir(o.sunS ?? s), L0 = lbLocal(S, Fs, az0), L1 = lbRefract(L0), L2 = lbRefract(lbSc(L0, -1));
     this.state.L1 = L1; this.state.L2 = L2;
     // the real Sun as seen here: out from 10:00:00 until its new light arrives
     const sun = o.sun1 || lbSunSeen(o.sunS ?? s);
@@ -280,20 +287,23 @@ class LbSky {
     // red light that grazed the old Earth's air; then the disc, from one edge, in 0.75 s
     const on = this.o.second ? (o.on ?? LB_SKY.on) : Infinity, ds = skyS - on;
     const frac = this.o.second ? MathX.clamp(ds / 0.75, 0, 1) : 0, red = this.o.second ? MathX.smooth(ds, -1.8, -0.1) * (1 - MathX.smooth(ds, 0.2, 1.2)) : 0;
-    const k2 = this.o.second ? MathX.smooth(ds, -0.3, 0.8) : 0;
+    const f2 = o.fade2 ?? 1, k2 = this.o.second ? MathX.smooth(ds, -0.3, 0.8) * f2 : 0;
     const k1 = sun.on ? sun.k * sun.r * sun.r : 0;
     const D = this.domeU;
     D.uS.value = skyS; D.uL1.value.set(...L1); D.uL2.value.set(...L2); D.uK1.value = k1 * (o.sky1 ?? 1); D.uK2.value = k2 * (o.sky2 ?? 1);
     D.uK.value = o.k ?? 1; D.uNightK.value = o.nightK ?? 1; D.uMw.value = o.mw ?? 1; D.uGlow.value = o.glow ?? 1;
     // the suns' discs
-    const place = (mesh, L, rad) => { mesh.position.set(L[0] * R * 0.97, L[1] * R * 0.97, L[2] * R * 0.97); mesh.lookAt(cam.position.x - this.g.position.x, cam.position.y - this.g.position.y, cam.position.z - this.g.position.z);
+    const place = (mesh, L, rad) => { mesh.position.set(L[0] * R * 0.97, L[1] * R * 0.97, L[2] * R * 0.97); mesh.lookAt(cam.position);
       const ang = 0.2665 * LB_D2R, sz = Math.max(2 * R * 0.97 * Math.tan(ang), R * 0.97 * (o.lens || 0) * 0.0009) * 8; mesh.scale.setScalar(sz * (rad || 1)); };
     place(this.sun1, L1); place(this.sun2, L2);
     const U1 = this.sun1.material.uniforms, U2 = this.sun2.material.uniforms;
     U1.uK.value = k1 > 0 ? sun.k * (o.discK ?? 1) : 0; U1.uR.value = sun.r; U1.uFrac.value = 1; U1.uRed.value = 0; U1.uFace2.value = o.face1 ?? 0;
     // (a hotter Sun is whiter: 5,772 K → 6,864 K as its surface doubles its output)
-    { const Tk = 5772 * Math.pow(Math.max(1, sun.k), 0.25), c = lbStarRGB(Tk); U1.uCol.value.setRGB(c[0], c[1], c[2]); }
-    U2.uK.value = frac > 0 ? (o.discK ?? 1) : 0; U2.uR.value = 1; U2.uFrac.value = frac; U2.uRed.value = red * 0.9; U2.uFace2.value = o.face2 ?? 0;
+    // (a low sun is reddened and dimmed by the long path through the air)
+    const ext = (y) => { const a = MathX.smooth(y, -0.01, 0.14); return [1, 0.4 + 0.6 * a, 0.14 + 0.86 * a, 0.3 + 0.7 * a]; }, e1 = ext(L1[1]), e2 = ext(L2[1]);
+    { const Tk = 5772 * Math.pow(Math.max(1, sun.k), 0.25), c = lbStarRGB(Tk); U1.uCol.value.setRGB(c[0] * e1[0], c[1] * e1[1], c[2] * e1[2]); U1.uK.value *= e1[3]; }
+    U2.uCol.value.setRGB(e2[0], 0.97 * e2[1], 0.92 * e2[2]);
+    U2.uK.value = frac > 0 ? (o.discK ?? 1) * f2 * e2[3] : 0; U2.uR.value = 1; U2.uFrac.value = frac; U2.uRed.value = red * 0.9 * f2; U2.uFace2.value = o.face2 ?? 0;
     // (the disc arrives from the side away from where the old Earth's limb was: −e, seen in the sprite's own axes)
     if (this.o.second) { const x = lbNrm(lbCross(L2, [0, 1, 0])), y = lbNrm(lbAdd([0, 1, 0], L2, -L2[1])), e = lbLocal(LB_SKY.edge, Fs, az0);
       U2.uEdge.value.set(-lbDot(e, x), -lbDot(e, y)).normalize(); }
@@ -306,9 +316,9 @@ class LbSky {
     if (this.moon) {
       const md = this.moonDir, Rm = R * 0.96;
       this.moon.position.set(md.x * Rm, md.y * Rm, md.z * Rm);
-      this.moon.lookAt(cam.position.x - this.g.position.x, cam.position.y - this.g.position.y, cam.position.z - this.g.position.z);
+      this.moon.updateMatrixWorld(); this.moon.lookAt(cam.position);
       this.moon.scale.setScalar(Math.max(2 * Rm * Math.tan(0.259 * LB_D2R), Rm * (o.lens || 0) * 0.0009));
-      this.moonU.uS.value = skyS; this.moonU.uDay.value = lbSunGain(skyS - LB_MOON.dayBack); this.moonU.uK.value = (o.moonK ?? 1) * 1.15;
+      this.moonU.uS.value = skyS; this.moonU.uDay.value = skyS < LB_MOON.dayBack ? 0 : lbSunGain(skyS - LB_MOON.dayBack);   // (its day side: dark until new sunlight is back) this.moonU.uK.value = (o.moonK ?? 1) * 1.15;
     }
     this.state = Object.assign(this.state, { k1, k2, frac, red, lum, day1, day2, sun });
     return this.state;

@@ -29,7 +29,7 @@ status: voiceless
 
 [canopus] 10:00:57. Canopus, the second brightest star of all. / You can't see it from Britain. Ever. Until now.
 
-[north] 10:01. The northern sky starts to glow. / Like dawn. But dawn is 9 hours away.
+[north] 10:01. The sky in the south-west starts to glow. / Like dawn. But dawn is 9 hours away.
 
 [switch] 10:01:20. / A second Sun switches on.
 
@@ -37,7 +37,7 @@ status: voiceless
 
 [why] All the sunlight that ever shot past the Earth turned around. / It's flooding back towards the Sun. / And the Earth is in the way.
 
-[shadow] But right behind the Earth, there was a gap: its own shadow. / The gap came back too. / It took 80 seconds for the Earth to slide out of it.
+[shadow] But right behind the Earth, there was a gap: its own shadow. / The gap came back too. / Your garden slid out of it after 80 seconds.
 
 [wave] From space, you'd see the light sweep across the night side. / 60 kilometres every second. / In 3 and a half minutes, the whole night side is lit.
 
@@ -67,9 +67,9 @@ status: voiceless
 
 [midnight] Midnight. The second Sun stands high in the south. / Higher than the real Sun ever gets in October. / Your neighbour's solar panels are working.
 
-[sunrise] 6:56 AM. The real Sun rises in the east, / at the same moment the second Sun sets in the west. / For a few minutes, you have two shadows.
+[sunrise] 6:47 AM. The real Sun rises in the east, / at the same moment the second Sun sets in the west. / For about ten minutes, you have two shadows.
 
-[noon] Noon. The Sun is twice as bright, and whiter. / You'd get sunburnt 3 times faster.
+[noon] Noon. The Sun is twice as bright, and whiter. / You'd get sunburnt more than 3 times faster.
 
 [never] And it never gets dark again. / Not here. Not anywhere on Earth. / Owls, bats and moths lose the dark for good.
 

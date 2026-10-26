@@ -1,5 +1,5 @@
 /* =====================================================================
-   FILM — "What if sound kept getting slower and couldn't stop?"
+   FILM — "What if light started moving backward?"
      build(app)    every set (each its own THREE.Scene + camera), the HUD, the soundtrack
      update(app,t) the shot's set and camera (shots.js), the HUD (hud.js)
      view(app,t)   [the shot's scene, its camera]
@@ -74,5 +74,5 @@ const FILM = {
     p.fade = Math.max(p.fade, MathX.smooth(t, LB.end - 0.6, LB.end - 0.05));
   },
 
-  debug(app, t) { const s = FILM._shot, h = lbH(t); return `shot ${s ? s.id : '-'} · set ${s ? s.set : '-'} · mode ${s ? s.mode : '-'} · ${lbClockText(h, true)} ${lbAmPm(h)} · h ${h.toFixed(5)} · c ${lbFmtSpeed(lbC(h))}`; },
+  debug(app, t) { const s = FILM._shot, st = lbStoryAt(t); return `shot ${s ? s.id : '-'} · set ${s ? s.set : '-'} · mode ${s ? s.mode : '-'} · story ${lbClockText(st, true)} ${lbAmPm(st)} · s ${st.toFixed(2)}`; },
 };

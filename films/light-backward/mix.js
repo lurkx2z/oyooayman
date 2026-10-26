@@ -9,13 +9,7 @@ window.LB_MIX = {
     amb: { gain: 8, hp: 28 },
     sfx: { gain: 9, hp: 25 },
   },
-  dyn: {
-    // (the score steps back wherever the picture is about a sound)
-    music: [['sirenPass', -5, 0], ['sirenPass', -4, -7], ['sirenPass', 3, -7], ['sirenPass', 4.5, 0], ['carPass', -3, 0], ['carPass', -2, -7], ['carPass', 4, -7], ['carPass', 5.5, 0], ['musicPass', -4, 0], ['musicPass', -3, -7], ['musicPass', 4, -7], ['musicPass', 5.5, 0], ['bellHeard', -2.5, 0], ['bellHeard', -1.5, -7], ['bellHeard', 3, -7], ['bellHeard', 4.5, 0], ['kick', -1.5, 0], ['kick', -0.5, -7], ['kick', 3, -7], ['kick', 4.5, 0], ['clapAt', -1.5, 0], ['clapAt', -0.5, -7], ['clapAt', 8, -7], ['clapAt', 9.5, 0], ['eight2', -1, 0], ['eight2', 1.5, 4], ['tuneHere', -2, 4], ['tuneHere', -1, -3], ['tuneHere', 8, -3], ['tuneHere', 9.5, 4], ['last', -1.5, 4], ['last', 0.5, 0], ['meow', -1, 0], ['meow', -0, -7], ['meow', 12, -7], ['meow', 13.5, 0]],
-    // (the evening and the night are quiet by design; lifted a little so they stay audible on a phone; the tune's arrival not too loud)
-    amb: [['box', -1, 0], ['box', 1, 6], ['last', -1.5, 6], ['last', 0.5, 0]],
-    sfx: [['tuneHere', -1, 0], ['tuneHere', -0.2, -4], ['tuneHere', 8, -4], ['tuneHere', 10, 0]],
-  },
+  dyn: { music: [], amb: [], sfx: [] },
   master: 6,
   eq: [['lowshelf', 110, -2.5], ['highshelf', 3500, 2]],
   ceiling: -1.5,   // dBTP, the limiter's ceiling (lbLimit)

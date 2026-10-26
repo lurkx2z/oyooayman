@@ -1,466 +1,396 @@
 /* =====================================================================
-   GARDEN — your back garden, the sky over it and the kitchen behind the window (garden-build.js builds them; the
-   house and garden are the universe-shrinking film's, lit here by an ordinary Saturday from 7 AM to the next dawn).
-   One set, many shots (modes):
-     title     6:59 AM: the garden under the title          seven     7:00: by the back door, down the garden
-     bird      the blackbird on the fence                    plane     an airliner 11 km up (telephoto): its sound
-                                                                       piles up at its nose (the sound barrier)
-     boom      7:27: the cone sweeps the sky; the boom; more contrails      carpet   the sky (the HUD's map)
-     neighbour 8:00: next door, over the fence ("Good morning")            kettle / radio   the kitchen
-     echo      9:00: the kitchen; the spoon                  vowels    10:00: Mum at the table; the group chat
-     motorway  10:27: over the back wall to the motorway     tv        4 PM: the TV, its words crawling to you
-     clap      the clap and its echoes off every wall        earbuds   your phone, a song
-     cat       5 PM: the cat outruns her meow                hum       you hum (the HUD's mouth)
-     storm     6 PM: from the kitchen window, rain, lightning a kilometre away
-     dusk      8 PM: the day's sounds hanging in the air     box / walkinto / wait   10 PM: the music box
-     night     midnight → dawn: the farthest your voice can ever reach, a circle on the lawn, shrinking
-     dawn      silence; the blackbird sings and you hear nothing; your heartbeat
-     real      the hot chocolate on the patio table         question  sunrise
-   Layout (metres, garden-build.js): the house's back wall is z = 0, the garden runs to −z (the back wall at −16.8);
-   the kitchen is inside (x −4.6…0.95, z 0.36…3.7), its window over the sink. East is −x, south −z, west +x.
+   GARDEN — your back garden on a clear late-October night and the sky over it (garden-build.js builds the house and
+   the garden; sky.js draws the sky; physics.js says when everything happens). One set, many shots (modes, shots.js):
+     open      10:02:30 PM: daylight; the camera finds the second Sun     title     the garden under the title
+     before    9:59:39: the night, the Moon, the cat on the wall          rule      the rule (the HUD's diagram)
+     vanish    the whole sky; at 10:00:00 it goes out                      crescent  the Moon (long lens): the sliver
+     old       the black sky; the first mirror images                      sirius    west: Sirius appears
+     mirror    the sky filling up, back to front                           replay    the lantern, a billion times slower
+     mirror2   the sky                                                     canopus   over the roof: Canopus appears
+     north     the glow low in the south-west                                switch    down the garden: the second Sun
+     day       daylight; a robin sings; the streetlight goes off           moonwhy   the Moon by day, its night side lit
+     project   the telescope's card: the spots back to front               past      the second Sun through a filter
+     full      10:08:18: the Moon's day side, twice as bright              three     triple sunlight (the HUD's chart)
+     midnight  the second Sun high in the south; next door's solar panels
+     sunrise   6:47 AM in the park: two suns, two shadows                  noon      the real Sun, twice as bright
+     never     three days in twelve seconds: no night                      summer    the garden that never sees winter
+     nightback the night comes back                                        real / question   9:59 PM, tonight
+   Layout (metres): the house's back wall is z = 0, the garden runs to −z (SSE, azimuth 150°), +x is WSW, −x ENE.
    ===================================================================== */
 
-// the kitchen's furniture and where you sit (your ears at SS_K.ear)
-const SS_K = { table: [-1.9, 2.25], ear: [-1.9, 1.22, 2.95], tvX: -3.62, worktopY: 0.9, worktopZ: 0.64, radio: [-2.45, 0.9, 0.6] };
-// the music box sits on the worktop exactly SSP.box metres from your ears
-SS_K.box = (() => { const dz = SS_K.worktopZ - SS_K.ear[2], dy = SS_K.worktopY + 0.06 - SS_K.ear[1]; return [SS_K.ear[0] + Math.sqrt(SSP.box * SSP.box - dz * dz - dy * dy), SS_K.worktopY, SS_K.worktopZ]; })();
-SS_K.tv = [SS_K.tvX, SS_K.worktopY, SS_K.worktopZ - 0.05];
-SS_K.tvDist = Math.hypot(SS_K.tv[0] - SS_K.ear[0], SS_K.tv[1] + 0.25 - SS_K.ear[1], SS_K.tv[2] - SS_K.ear[2]);
-const SS_GD = { you: [-0.4, 1.62, -2.6], bird: [-4.62, 1.86, -7.4], nb: [5.6, 0.4, -4.6], cat0: [0.15, 0, -6.0], catEnd: [0.35, 0, -3.55] };
+const LB_GD = {
+  you: [0.3, 1.62, -2.6],
+  robin: [4.62, 1.8, -7.3],          // on the right-hand fence
+  lamp: [3.6, 0, -18.6],             // the streetlight in the lane behind the back wall
+  park: [3000, 0, 0],                // the park (the sunrise): far from the garden, under the same sky
+};
+// a direction in the garden from azimuth / altitude, d metres from p
+const lbAim = (p, az, alt, d = 40) => { const g = lbGardenDir(az, alt); return [p[0] + g[0] * d, p[1] + g[1] * d, p[2] + g[2] * d]; };
 
-// the light of the day by the story clock H (hours, 7 = 7 AM … 31 = 7 AM next day): keys [H, top, horizon, sun dir,
-// sun colour, sun I, hemi I, stars 0…1, lamps 0…1]
-const SS_DAY = [
-  [6.8, '#4a6a98', '#e8b890', [-0.92, 0.12, -0.38], '#ffb070', 1.2, 0.42, 0, 0.3],
-  [7.5, '#5f8fc4', '#f0d2ae', [-0.86, 0.3, -0.42], '#ffd2a0', 2.3, 0.55, 0, 0],
-  [10, '#4d80bd', '#d4dfe9', [-0.5, 0.65, -0.58], '#fff0dc', 2.8, 0.62, 0, 0],
-  [13, '#4a7ebc', '#cfdbe8', [-0.05, 0.8, -0.6], '#fff4e6', 3.0, 0.65, 0, 0],
-  [16, '#5585c0', '#dcdcd6', [0.55, 0.55, -0.62], '#ffe6c4', 2.6, 0.6, 0, 0],
-  [17.3, '#5a7fb2', '#e8c8a0', [0.8, 0.32, -0.5], '#ffc890', 2.1, 0.52, 0, 0],
-  [18, '#3a4652', '#6a7078', [0.85, 0.25, -0.45], '#c8c0b4', 0.35, 0.34, 0, 0.4],       // the storm
-  [19.2, '#3c4a62', '#b88a72', [0.9, 0.08, -0.4], '#ff9a60', 0.6, 0.3, 0, 0.6],
-  [20.2, '#1a2440', '#5a5a78', [0.9, -0.05, -0.4], '#8090c0', 0.12, 0.2, 0.25, 1],
-  [21.5, '#060a16', '#1a2236', [0.4, 0.5, -0.75], '#9aa8c8', 0.22, 0.12, 0.9, 1],      // (the moon)
-  [28.5, '#070b18', '#1c2438', [-0.2, 0.55, -0.8], '#9aa8c8', 0.22, 0.12, 1, 1],
-  [29.6, '#2a3a62', '#d49a80', [-0.95, 0.02, -0.3], '#ff9a60', 0.5, 0.26, 0.3, 0.8],
-  [30.2, '#5a84b8', '#f2c69a', [-0.92, 0.14, -0.36], '#ffb070', 1.4, 0.45, 0, 0.2],
-];
-function ssDayAt(H) {
-  const K = SS_DAY, c1 = new THREE.Color(), c2 = new THREE.Color();
-  let i = 0; while (i + 1 < K.length && K[i + 1][0] <= H) i++;
-  const a = K[i], b = K[Math.min(K.length - 1, i + 1)], u = b === a ? 0 : MathX.clamp((H - a[0]) / (b[0] - a[0]), 0, 1), k = Ease.inOutSine(u);
-  const mix = (x, y) => '#' + c1.set(x).lerp(c2.set(y), k).getHexString();
-  return { top: mix(a[1], b[1]), hor: mix(a[2], b[2]), sd: ssN3(ssV(a[3], b[3], k)), sunC: mix(a[4], b[4]), sunI: ssLerp(a[5], b[5], k), hemi: ssLerp(a[6], b[6], k), stars: ssLerp(a[7], b[7], k), lamps: ssLerp(a[8], b[8], k) };
-}
-
-// a blackbird (low-poly): body, head, orange beak (upper and lower: it opens), tail
-function ssBlackbird(parent) {
-  const g = new THREE.Group(), black = ssStd('#141416', 0.55, 0, { flatShading: true }), beakM = ssStd('#f0a020', 0.4);
-  const body = ssMesh(new THREE.IcosahedronGeometry(0.06, 1), black, 0, 0.07, 0, g); body.scale.set(0.85, 0.85, 1.35);
-  const head = new THREE.Group(); head.position.set(0, 0.12, 0.065); g.add(head);
-  ssMesh(new THREE.IcosahedronGeometry(0.036, 1), black, 0, 0, 0, head);
-  const up = new THREE.Group(); up.position.set(0, 0.002, 0.03); head.add(up);
-  const b1 = ssMesh(new THREE.ConeGeometry(0.009, 0.035, 6), beakM, 0, 0, 0.016, up); b1.rotation.x = Math.PI / 2;
-  const lo = new THREE.Group(); lo.position.set(0, -0.006, 0.03); head.add(lo);
-  const b2 = ssMesh(new THREE.ConeGeometry(0.007, 0.03, 6), beakM, 0, 0, 0.014, lo); b2.rotation.x = Math.PI / 2;
-  const eye = ssMesh(new THREE.SphereGeometry(0.008, 8, 6), ssStd('#f0a020', 0.4), 0.025, 0.01, 0.018, head); ssMesh(new THREE.SphereGeometry(0.008, 8, 6), ssStd('#f0a020', 0.4), -0.025, 0.01, 0.018, head);
-  const tail = ssBox(0.05, 0.012, 0.11, black, 0, 0.07, -0.11, g); tail.rotation.x = -0.35;
-  for (const sx of [-1, 1]) { const l = ssCyl(0.004, 0.004, 0.05, beakM, sx * 0.02, 0.02, 0, g, 5); }
+// a robin: brown back, orange face and breast, a thin dark beak (it opens when it sings)
+function lbRobin(parent) {
+  const g = new THREE.Group(), fl = { flatShading: true };
+  const brown = lbStd('#6b5a44', 0.8, 0, fl), orange = lbStd('#d0642c', 0.75, 0, fl), pale = lbStd('#d8d0c2', 0.8, 0, fl), dark = lbStd('#1c1814', 0.4);
+  const body = lbMesh(new THREE.IcosahedronGeometry(0.046, 1), brown, 0, 0.066, 0, g); body.scale.set(0.95, 0.95, 1.25);
+  const breast = lbMesh(new THREE.IcosahedronGeometry(0.04, 1), orange, 0, 0.072, 0.024, g); breast.scale.set(0.95, 1.0, 0.8);
+  lbMesh(new THREE.IcosahedronGeometry(0.03, 1), pale, 0, 0.045, 0.012, g);
+  const head = new THREE.Group(); head.position.set(0, 0.114, 0.04); g.add(head);
+  lbMesh(new THREE.IcosahedronGeometry(0.031, 1), brown, 0, 0, 0, head);
+  lbMesh(new THREE.IcosahedronGeometry(0.025, 1), orange, 0, -0.005, 0.013, head);
+  const up = new THREE.Group(); up.position.set(0, 0, 0.027); head.add(up);
+  lbMesh(new THREE.ConeGeometry(0.006, 0.022, 6), dark, 0, 0, 0.01, up).rotation.x = Math.PI / 2;
+  const lo = new THREE.Group(); lo.position.set(0, -0.004, 0.027); head.add(lo);
+  lbMesh(new THREE.ConeGeometry(0.005, 0.018, 6), dark, 0, 0, 0.008, lo).rotation.x = Math.PI / 2;
+  for (const sx of [-1, 1]) lbMesh(new THREE.SphereGeometry(0.006, 8, 6), dark, sx * 0.02, 0.006, 0.017, head);
+  lbBox(0.036, 0.008, 0.07, brown, 0, 0.062, -0.075, g).rotation.x = -0.4;
+  for (const sx of [-1, 1]) lbCyl(0.003, 0.003, 0.04, dark, sx * 0.015, 0.02, 0, g, 5);
   g.traverse((m) => { if (m.isMesh) m.castShadow = true; });
   parent.add(g);
-  return { g, head, lo, open(k) { lo.rotation.x = 0.55 * k; up.rotation.x = -0.15 * k; }, eye };
+  return { g, head, open(k) { lo.rotation.x = 0.5 * k; up.rotation.x = -0.12 * k; } };
 }
-// an airliner (about 60 m): fuselage, wings, tail, engines — seen from 11 km, so simple
-function ssAirliner(parent) {
-  const g = new THREE.Group(), white = ssStd('#e8ecf0', 0.4, 0.2), grey = ssStd('#9aa2ac', 0.5, 0.3);
-  const f = ssMesh(new THREE.CylinderGeometry(2.0, 2.0, 60, 12), white, 0, 0, 0, g); f.rotation.z = Math.PI / 2;
-  const n = ssMesh(new THREE.ConeGeometry(2.0, 6, 12), white, 33, 0, 0, g); n.rotation.z = -Math.PI / 2;
-  const w = ssBox(14, 0.6, 58, grey, 2, -0.6, 0, g); w.rotation.y = 0;
-  const ts = ssBox(6, 0.4, 20, grey, -27, 0.5, 0, g); const tf = ssBox(7, 9, 0.5, white, -27, 5, 0, g);
-  for (const z of [-11, 11]) { const e = ssMesh(new THREE.CylinderGeometry(1.4, 1.4, 5, 10), grey, 4, -2.2, z, g); e.rotation.z = Math.PI / 2; }
-  g.traverse((m) => { if (m.isMesh) { m.castShadow = false; m.receiveShadow = false; } });
-  parent.add(g);
+// the streetlight in the lane (a light sensor switches it off in daylight)
+function lbStreetlight(scene, at) {
+  const g = new THREE.Group(); g.position.set(...at); scene.add(g);
+  const grey = lbStd('#5a5e62', 0.6, 0.5);
+  lbCyl(0.07, 0.09, 6.0, grey, 0, 3.0, 0, g, 10);
+  lbBox(0.08, 0.08, 1.1, grey, 0, 5.96, 0.5, g);
+  lbBox(0.34, 0.1, 0.56, grey, 0, 5.92, 1.08, g);
+  lbBox(0.05, 0.05, 0.05, lbStd('#2a2c2e', 0.5), 0, 6.0, 0.86, g);                  // (the sensor)
+  const lensM = new THREE.MeshBasicMaterial({ color: '#ffe6c0' });
+  const lens = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 0.46), lensM); lens.rotation.x = Math.PI / 2; lens.position.set(0, 5.866, 1.08); g.add(lens);
+  const light = new THREE.SpotLight('#ffdcb0', 0, 30, 1.05, 0.75, 1.3);
+  light.position.set(at[0], 5.8, at[2] + 1.1); light.target.position.set(at[0] - 0.5, 0, at[2] + 4.0); scene.add(light, light.target);
+  return { g, lensM, light };
+}
+// solar panels on next door's roof (its south-facing slope, 29°)
+function lbSolarPanels(scene) {
+  const tex = lbTex(lbCanvas(256, 512, (g, w, h) => {
+    g.fillStyle = '#c8ccd0'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#16213a'; g.fillRect(6, 6, w - 12, h - 12);
+    g.strokeStyle = 'rgba(170,185,210,0.55)'; g.lineWidth = 2;
+    for (let x = 6; x <= w - 6; x += (w - 12) / 6) { g.beginPath(); g.moveTo(x, 6); g.lineTo(x, h - 6); g.stroke(); }
+    for (let y = 6; y <= h - 6; y += (h - 12) / 10) { g.beginPath(); g.moveTo(6, y); g.lineTo(w - 6, y); g.stroke(); }
+  }), { repeat: false });
+  const m = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.18, metalness: 0.35, envMapIntensity: 1.4 });
+  const grp = new THREE.Group(); grp.position.set(12.2, 7.4 + 0.08, 1.87); grp.rotation.x = -Math.atan2(2.4, 4.3); scene.add(grp);
+  for (let r = 0; r < 2; r++) for (let c = 0; c < 6; c++) {
+    const p = lbBox(1.0, 0.04, 1.65, m, -2.75 + c * 1.1, 0, -0.9 + r * 1.75, grp); p.castShadow = true;
+  }
+  return grp;
+}
+// the park for the sunrise: open grass to the horizon, a few far hedges and trees (none where the suns are)
+function lbBuildPark(scene, at) {
+  const g = new THREE.Group(); g.position.set(...at); scene.add(g);
+  const gt = lbTex(lbGrassCanvas(77)); gt.repeat.set(380, 380);
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(2300, 96), lbStd('#ffffff', 0.96, 0, { map: gt })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; g.add(ground);
+  const r = new RNG(907), leaf = lbStd('#24361f', 0.9, 0, { flatShading: true }), bark = lbStd('#33281f', 0.95);
+  for (let i = 0; i < 70; i++) {
+    const az = r.range(0, 360);
+    if (Math.abs(((az - 111 + 540) % 360) - 180) < 22 || Math.abs(((az - 291 + 540) % 360) - 180) < 22) continue;
+    const d = r.range(160, 650), dir = lbGardenDir(az, 0), x = dir[0] * d, z = dir[2] * d, s = r.range(3, 7);
+    if (r.next() < 0.5) { lbCyl(s * 0.07, s * 0.1, s * 0.9, bark, x, s * 0.45, z, g, 6); lbMesh(lbBlob(s * 0.75, r.int(0, 999)), leaf, x, s * 1.25, z, g); }
+    else { const h = lbMesh(lbBlob(s * 0.6, r.int(0, 999)), leaf, x, s * 0.35, z, g); h.scale.set(3.5, 0.9, 1.2); h.rotation.y = r.range(0, 3); }
+  }
+  // a path and a bench
+  const path = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 600), lbStd('#8a8172', 0.95)); path.rotation.x = -Math.PI / 2; path.rotation.z = 0.5; path.position.set(-14, 0.01, -40); path.receiveShadow = true; g.add(path);
+  const bench = new THREE.Group(); bench.position.set(-9, 0, -18); bench.rotation.y = 0.5; g.add(bench);
+  const wood = lbStd('#6a4a30', 0.8);
+  lbBox(1.8, 0.05, 0.45, wood, 0, 0.45, 0, bench); lbBox(1.8, 0.4, 0.05, wood, 0, 0.75, -0.22, bench);
+  for (const x of [-0.8, 0.8]) lbBox(0.06, 0.45, 0.45, lbStd('#2a2a2a', 0.5, 0.6), x, 0.22, 0, bench);
   return g;
 }
-// a contrail: a long soft tube behind the plane (grows with time), as a camera-facing ribbon of puffs
-function ssContrailPts(p0, dir, len, n = 60) { const out = []; for (let i = 0; i < n; i++) { const u = i / (n - 1); out.push([p0[0] - dir[0] * len * u, p0[1] - dir[1] * len * u, p0[2] - dir[2] * len * u, u]); } return out; }
 
-// a jagged lightning bolt from (x, top, z) to the ground: a seeded polyline, drawn as a thin ribbon
-function ssBoltGeo(x, z, top, seed) {
-  const r = new RNG(seed), pts = [];
-  let px = x, pz = z;
-  for (let y = top; y > 0; y -= top / 26) { pts.push([px, y, pz]); px += r.range(-1, 1) * top * 0.03; pz += r.range(-1, 1) * top * 0.02; }
-  pts.push([x + r.range(-10, 10), 0, z]);
-  const pos = [], w = top * 0.01; for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1];
-    pos.push(a[0] - w, a[1], a[2], a[0] + w, a[1], a[2], b[0] + w, b[1], b[2], a[0] - w, a[1], a[2], b[0] + w, b[1], b[2], b[0] - w, b[1], b[2]); }
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); return g;
-}
-
-SS_SETS.garden = (app) => {
-  const S = ssSet(app, { sky: '#cfdce8', fov: 55, near: 0.02, far: 30000, hemi: ['#d6e2f0', '#7a6a56', 0.6], sun: [-40, 30, -30], sunColor: '#fff0dc', sunI: 2.6, shadow: 2048, shadowR: 22, shadowFar: 200,
-    env: ['#a8c0dc', '#e2dcd2', '#7a6e60'] });
-  const scene = S.scene, cam = S.camera, G = SS_G, K = ssK;
-  scene.fog = new THREE.FogExp2('#cfdce8', 0.0016);
-  const P = ssBuildGarden(app, S), M = P.M;
-  P.scope.visible = false;                                   // (no telescope this time)
-  P.bathIce.visible = false;
-  const sky = ssSky(scene, '#4f7fb8', '#c6d6e6', '#6a6a60', { sunDir: [-0.8, 0.3, -0.4], sunGlow: '#fff2d8', hw: 0.3, r: 25000 });
-  sky.material.fog = false;
-  // the far town in daylight colours (it was a night silhouette)
-  P.far.traverse((m) => { if (m.isMesh) m.material = ssStd('#6a6e74', 0.9); });
-  // ---- stars (night)
-  const starGeo = new THREE.BufferGeometry(), sp = [], sc = [];
-  for (let i = 0; i < 2600; i++) { const u = ssR(i, 3), v = ssR(i, 4), az = u * 6.283, el = Math.asin(0.05 + 0.95 * v), R = 20000; sp.push(Math.cos(el) * Math.sin(az) * R, Math.sin(el) * R, -Math.cos(el) * Math.cos(az) * R); const b = Math.pow(ssR(i, 5), 3); sc.push(b, b, b * 0.95); }
-  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); starGeo.setAttribute('color', new THREE.Float32BufferAttribute(sc, 3));
-  const starMat = new THREE.PointsMaterial({ size: 2.2, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false });
-  const stars = new THREE.Points(starGeo, starMat); stars.renderOrder = -9; stars.frustumCulled = false; scene.add(stars);
-  // ---- the lamps: the kitchen's spill on the patio, the string lights, the pendant over the table, a soft fill indoors
+LB_SETS.garden = (app) => {
+  const S = lbSet(app, { sky: '#000000', fov: 55, near: 0.02, far: 6000, hemi: ['#2a3550', '#16120e', 0.2], sun: [0, 60, -60], sunI: 0, shadow: 2048, shadowR: 22, shadowFar: 400 });
+  const scene = S.scene, cam = S.camera, K = lbK, G = LB_G;
+  scene.environment = lbEnv(app.renderer, '#9fb8d8', '#d6d2ca', '#5a544a');
+  const P = lbBuildGarden(app, S), M = P.M;
+  const sky = new LbSky(scene, { F: LB_SKY.F, X: LB_SKY.X, az0: LBP.az0, moon: true, second: true, town: '#3a2c22' });
+  // ---- light: the two suns (each with its shadow), the Moon, the sky; the lamps
+  const sun2L = S.sun, sun1L = new THREE.DirectionalLight('#fff4e6', 0);
+  sun1L.castShadow = true; sun1L.shadow.mapSize.set(2048, 2048); sun1L.shadow.bias = -0.0004; sun1L.shadow.normalBias = 0.03;
+  { const c = sun1L.shadow.camera; c.left = -22; c.right = 22; c.top = 22; c.bottom = -22; c.near = 1; c.far = 400; }
+  scene.add(sun1L, sun1L.target);
+  const moonL = new THREE.DirectionalLight('#a8b8d8', 0); scene.add(moonL, moonL.target);
   const warm = '#ffb468';
   const spill = new THREE.SpotLight(warm, 0, 16, 0.95, 0.85, 1.6); spill.position.set(-1.6, 1.7, 0.6); spill.target.position.set(-1.4, 0, -5); scene.add(spill, spill.target);
   const strings = [-2.5, -8, -13.5].map((z) => { const p = new THREE.PointLight('#ffc070', 0, 6, 1.8); p.position.set(-G.lawnW / 2 + 0.25, 1.75, z); scene.add(p); return p; });
   const pendant = new THREE.PointLight('#ffcf96', 0, 9, 1.6); pendant.position.set(...P.lampAt); scene.add(pendant);
-  const fill = new THREE.PointLight('#e8eef6', 0, 9, 1.4); fill.position.set(-1.8, 2.3, 2.6); scene.add(fill);
-  const flash = new THREE.DirectionalLight('#dfe6ff', 0); flash.position.set(-300, 800, -900); scene.add(flash);
-
-  // ---- the kitchen: a table and chairs, the radio, a small TV, the music box, a spoon, a mug
-  const KR = P.kitchenRoom, ind = (m) => { m.userData.indoor = true; return m; };
-  const oak = ind(ssStd('#9a7448', 0.6)), dark = ind(ssStd('#2a2826', 0.6)), cream = ind(ssStd('#e8e0cc', 0.5));
-  const T = SS_K.table;
-  ssBox(1.5, 0.04, 0.85, oak, T[0], 0.74, T[1], KR); for (const [dx, dz] of [[-0.68, -0.36], [0.68, -0.36], [-0.68, 0.36], [0.68, 0.36]]) ssBox(0.05, 0.72, 0.05, oak, T[0] + dx, 0.36, T[1] + dz, KR);
-  const chair = (x, z, ry) => { const c = new THREE.Group(); c.position.set(x, 0, z); c.rotation.y = ry; KR.add(c); ssBox(0.42, 0.04, 0.42, oak, 0, 0.46, 0, c); for (const [a, b] of [[-0.18, -0.18], [0.18, -0.18], [-0.18, 0.18], [0.18, 0.18]]) ssBox(0.035, 0.46, 0.035, oak, a, 0.23, b, c); ssBox(0.42, 0.45, 0.03, oak, 0, 0.7, 0.2, c); return c; };
-  chair(T[0], T[1] + 0.62, 0); chair(T[0], T[1] - 0.62, Math.PI); chair(T[0] - 0.95, T[1], Math.PI / 2);
-  // the radio (on the worktop by the window)
-  const radio = new THREE.Group(); radio.position.set(...SS_K.radio); KR.add(radio);
-  ssMesh(ssRoundBox(0.28, 0.16, 0.1, 0.02, 0.006), ind(ssStd('#b8452e', 0.5)), 0, 0, 0, radio);
-  { const gr = ssMesh(new THREE.CylinderGeometry(0.045, 0.045, 0.01, 18), dark, -0.06, 0.08, 0.052, radio); gr.rotation.x = Math.PI / 2; ssBox(0.08, 0.04, 0.01, cream, 0.07, 0.1, 0.052, radio); const ant = ssCyl(0.003, 0.003, 0.32, ind(ssStd('#c8c8c8', 0.3, 0.9)), 0.1, 0.3, -0.02, radio, 5); ant.rotation.z = -0.4; }
-  // the TV (the afternoon's news: its picture is a canvas, the presenter's mouth moves with what she says)
-  const tvScr = ssCanvasTex(480, 270, (g, w, h, s) => {
-    g.fillStyle = '#1c2a44'; g.fillRect(0, 0, w, h); g.fillStyle = '#2c4470'; g.fillRect(0, h * 0.55, w, h * 0.45);
-    g.fillStyle = '#c8402e'; g.fillRect(0, h - 44, w, 44); g.fillStyle = '#fff'; g.font = 'bold 22px Inter, Arial'; g.fillText('LIVE · SOUND SLOWS AGAIN', 14, h - 15);
-    g.fillStyle = '#e0b090'; g.beginPath(); g.ellipse(w / 2, 108, 40, 50, 0, 0, 7); g.fill();
-    g.fillStyle = '#2a1a12'; g.beginPath(); g.ellipse(w / 2, 82, 44, 34, 0, Math.PI, 0); g.fill();
-    g.fillStyle = '#3a3a52'; g.beginPath(); g.moveTo(w / 2 - 95, h - 44); g.quadraticCurveTo(w / 2, 140, w / 2 + 95, h - 44); g.fill();
-    g.fillStyle = '#5a1e1e'; g.beginPath(); g.ellipse(w / 2, 132, 13, 2 + 10 * s.m, 0, 0, 7); g.fill();
-    g.fillStyle = '#1a1a1a'; g.beginPath(); g.arc(w / 2 - 14, 104, 4, 0, 7); g.arc(w / 2 + 14, 104, 4, 0, 7); g.fill();
-  });
-  const tv = new THREE.Group(); tv.position.set(...SS_K.tv); tv.rotation.y = Math.atan2(SS_K.ear[0] - SS_K.tv[0], SS_K.ear[2] - SS_K.tv[2]); KR.add(tv);
-  ssBox(0.62, 0.38, 0.05, dark, 0, 0.3, 0, tv); ssBox(0.14, 0.1, 0.12, dark, 0, 0.05, 0, tv);
-  const tvFace = ssMesh(new THREE.PlaneGeometry(0.57, 0.32), new THREE.MeshBasicMaterial({ map: tvScr.tex, toneMapped: false }), 0, 0.3, 0.027, tv);
-  // the music box (walnut, lid up, a little brass crank)
-  const box = new THREE.Group(); box.position.set(...SS_K.box); box.rotation.y = Math.atan2(SS_K.ear[0] - SS_K.box[0], SS_K.ear[2] - SS_K.box[2]); KR.add(box);
-  ssMesh(ssRoundBox(0.16, 0.07, 0.11, 0.01, 0.004), ind(ssStd('#5a3622', 0.4)), 0, 0, 0, box);
-  const lid = new THREE.Group(); lid.position.set(0, 0.07, -0.055); box.add(lid); ssMesh(ssRoundBox(0.16, 0.012, 0.11, 0.01, 0.003), ind(ssStd('#5a3622', 0.4)), 0, 0, 0.055, lid); lid.rotation.x = -1.9;
-  ssBox(0.13, 0.004, 0.08, ind(ssStd('#c8a050', 0.25, 0.9)), 0, 0.07, 0, box);
-  const crank = ssCyl(0.004, 0.004, 0.05, ind(ssStd('#c8a050', 0.25, 0.9)), 0.09, 0.035, 0, box, 6); crank.rotation.z = Math.PI / 2;
-  // the spoon (falls in the echo shot) and the mug of hot chocolate (the real shot: the patio table's mug)
-  const spoon = new THREE.Group(); scene.add(spoon); { const st = ssStd('#c8ccd2', 0.2, 0.9); const h = ssBox(0.012, 0.004, 0.15, st, 0, 0, -0.04, spoon); const bw = ssMesh(new THREE.SphereGeometry(0.022, 10, 6), st, 0, 0, 0.05, spoon); bw.scale.set(0.8, 0.3, 1.1); }
-  spoon.traverse((m) => { if (m.isMesh) m.castShadow = true; });
-  P.teaTop.material = ssStd('#4a2a16', 0.25);
-  // ---- people: next door (over the right fence), Mum at the kitchen table, your friend (none here)
-  Object.assign(ACTIONS, {
-    ssWave(τ, c) { const p = ACTIONS.idle(τ, c), k = Math.min(1, τ / 0.4); p.rSh = [1.2 * k + 0.1, 0.5 * k]; p.rEl = 1.0 + 0.3 * Math.sin(τ * 8) * k; p.neck = -0.05; p.headYaw = 0; return p; },
-    ssTalkSit(τ, c) { const p = ACTIONS.sit(τ, c), a = τ * 2.3; p.rSh = [0.75 + 0.15 * Math.sin(a), 0.15]; p.rEl = 1.2 + 0.25 * Math.sin(a * 1.3); p.lSh = [0.6, 0.08]; p.lEl = 1.3; p.neck = 0.05 + 0.05 * Math.sin(a * 0.7); p.headYaw = 0.1 * Math.sin(a * 0.4); p.spine = 0.08; return p; },
-    ssShrugSit(τ, c) { const p = ACTIONS.sit(τ, c), k = Math.min(1, τ / 0.35); p.lSh = [0.5, 0.35 * k]; p.rSh = [0.5, 0.35 * k]; p.lEl = 1.4; p.rEl = 1.4; p.neck = -0.1 * k; return p; },
-    ssPhoneSit(τ, c) { const p = ACTIONS.sit(τ, c); p.rSh = [0.9, 0.12]; p.rEl = 1.7; p.lSh = [0.85, 0.1]; p.lEl = 1.7; p.neck = 0.45; p.spine = 0.12; return p; },
-  });
-  Object.assign(BLEND, { ssWave: 0.4, ssTalkSit: 0.5, ssShrugSit: 0.3, ssPhoneSit: 0.5 });
-  const nb = ssPerson({ id: 'ssNbr', look: 'ssNeighbour', y: SS_GD.nb[1], path: [[0, SS_GD.nb[0], SS_GD.nb[2]]], face: 70, states: [[0, 'idle'], [SS.morning - 0.5, 'ssWave'], [SS.morning + 2.6, 'idle']] }, scene);
-  const mum = ssPerson({ id: 'ssMum', look: 'casual6', path: [[0, T[0], T[1] - 0.62]], face: 180, seat: 0.46, states: [[0, 'ssTalkSit'], [SS.text - 1.2, 'ssShrugSit'], [SS.text - 0.3, 'ssPhoneSit']] }, scene);
-  // you, seen from the corner of the kitchen while you wait for the tune
-  const you = ssPerson({ id: 'ssYou', look: 'ssVisitor', path: [[0, T[0], T[1] + 0.62]], face: 0, seat: 0.46, states: [[0, 'sit']] }, scene);
+  const candle = new THREE.PointLight('#ffad5a', 0, 7, 1.8); scene.add(candle);
+  const street = lbStreetlight(scene, LB_GD.lamp);
+  // ---- the candle's flame (the lantern on the patio table)
+  const flame = new THREE.Group(); flame.position.set(...P.wickAt); flame.position.y += 0.018; P.lantern.add(flame);
+  const flameM = new THREE.MeshBasicMaterial({ color: '#ffd28a' });
+  const fl = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 10), flameM); fl.scale.set(0.007, 0.018, 0.007); flame.add(fl);
+  const flCore = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshBasicMaterial({ color: '#fff4dc' })); flCore.scale.set(0.004, 0.009, 0.004); flCore.position.y = -0.006; flame.add(flCore);
+  // ---- the telescope: a sun shade on the tube and a white card behind the eyepiece (its projected image)
+  const card = new THREE.Group(); card.position.set(0, 0.0, -0.84); P.tube.add(card);
+  lbBox(0.22, 0.22, 0.004, lbStd('#f2efe8', 0.9), 0, 0, 0, card);
+  const cardImgM = new THREE.MeshBasicMaterial({ map: sky.sun2.material.uniforms.uFace.value, transparent: true, depthWrite: false });
+  const cardImg = new THREE.Mesh(new THREE.CircleGeometry(0.068, 64), cardImgM); cardImg.position.z = 0.0035; cardImg.rotation.z = Math.PI; card.add(cardImg);
+  for (const x of [-0.06, 0.06]) lbRod([x, -0.05, -0.38], [x, -0.05, -0.84], 0.004, M.black, P.tube, 5);
+  const shade = lbCyl(0.17, 0.17, 0.006, lbStd('#e8e4da', 0.9), 0, 0, -0.16, P.tube, 36); shade.rotation.x = Math.PI / 2;
+  card.visible = false; shade.visible = false;
+  // ---- the cat on the back wall, the robin, the solar panels, the park
+  const catRoot = new THREE.Group(); catRoot.position.set(...G.catAt); catRoot.rotation.y = 0.35; scene.add(catRoot);
+  const cat = lbBuildCat(catRoot);
+  const robin = lbRobin(scene); robin.g.position.set(...LB_GD.robin); robin.g.rotation.y = -Math.PI / 2 - 0.3;
+  const panels = lbSolarPanels(scene);
+  const park = lbBuildPark(scene, LB_GD.park);
+  // you, in the park (watching the sunrise)
+  const PK = LB_GD.park, east = lbGardenDir(111, 0);
+  const you = lbPerson({ id: 'lbYou', look: 'lbVisitor', path: [[0, PK[0], PK[2]]], face: Math.atan2(-east[0], -east[2]) / LB_D2R, states: [[0, 'idle']] }, scene);
   you.root.traverse((m) => { if (m.isMesh) m.castShadow = true; });
-  // ---- the blackbird, the airliners, the bolt, rain
-  const bird = ssBlackbird(scene); bird.g.position.set(...SS_GD.bird); bird.g.rotation.y = 1.2;
-  const planes = [0, 1, 2, 3].map(() => ssAirliner(scene));
-  const trail = ssPuffs(scene, 2400, { soft: 1.2 }); trail.mesh.renderOrder = 4;
-  const steam = ssPuffs(scene, 600, { soft: 1.8 });
-  const boltM = new THREE.MeshBasicMaterial({ color: '#f4f6ff', transparent: true, opacity: 0, fog: false, side: THREE.DoubleSide, depthWrite: false });
-  const bolt = new THREE.Mesh(ssBoltGeo(-40, -950, 420, 7), boltM); bolt.frustumCulled = false; scene.add(bolt);
-  const bolt2 = new THREE.Mesh(ssBoltGeo(-40, -950, 420, 8), boltM); bolt2.position.x = 6; bolt2.scale.x = 0.5; scene.add(bolt2);
-  // ---- the motorway, 3.2 km away along the hills to the south; its cars (both ways, about 70 mph)
-  const ridge = ssMesh(new THREE.SphereGeometry(1, 48, 16), ssStd('#5d6b4e', 0.95), 0, -20, -3900, scene); ridge.scale.set(9000, 760, 1200); ridge.castShadow = false; ridge.visible = false;
-  const mway = new THREE.Group(); mway.visible = false; scene.add(mway);
-  ssBox(9000, 2, 34, ssStd('#55565a', 0.85), 0, 615, -3200, mway); ssBox(9000, 1.2, 1, ssStd('#c8c8c0', 0.6), 0, 616.5, -3200, mway);
-  const MW = Array.from({ length: 36 }, (_, i) => ({ dir: i % 2 ? 1 : -1, lane: (i % 6 >> 1), off: 1600 * ssR(i, 91), v: 29.5 + 3.5 * ssR(i, 92) }));
-  const mwCar = new THREE.InstancedMesh(new THREE.BoxGeometry(4.6, 1.6, 1.9), ssStd('#ffffff', 0.5), MW.length); mwCar.castShadow = false; mway.add(mwCar);
-  MW.forEach((c, i) => mwCar.setColorAt(i, new THREE.Color(['#e8e6e0', '#1f2226', '#8a8f94', '#2e3a4c', '#a8322c', '#c9c6be'][i % 6])));
-  const mwAt = (c, te) => [((c.dir * c.v * te + c.off) % 1600 + 1600) % 1600 - 800, 617.4, -3200 + c.dir * (4 + 3.6 * c.lane)];
-  const rain = ssRain(scene, { n: 3000, r: 10, h: 8, opacity: 0.28 });
-  // ---- the cat
-  const catRoot = new THREE.Group(); scene.add(catRoot);
-  const cat = ssBuildCat(catRoot);
-  // ---- the rings, and the horizon circle on the lawn (the farthest your voice can ever reach)
-  const R = ssRings(scene, 1400);
-  const horizon = new THREE.Mesh(new THREE.RingGeometry(0.98, 1, 200), new THREE.MeshBasicMaterial({ color: '#ffd7a8', transparent: true, opacity: 0.85, fog: false, depthWrite: false, side: THREE.DoubleSide }));
-  horizon.rotation.x = -Math.PI / 2; horizon.renderOrder = 7; scene.add(horizon);
-  let horizonW = 0.02;
-  // ---- the day's sounds, hanging in the air at 8 PM (made between 7 PM and 8 PM, so 0–2.5 m across now)
-  const HANG = Array.from({ length: 70 }, (_, i) => ({ p: [-4 + 8 * ssR(i, 61), 0.2 + 2.2 * ssR(i, 62), -1.5 - 14 * ssR(i, 63)], h0: 12 + 0.98 * ssR(i, 64) }));
-
-  // ---- your hands
-  const hands = ssHands(cam, {
-    right: [[-1, 'hidden'],
-      [SS.spoon - 0.2, 'hold'], [SS.drop + 0.05, 'ssLetGo'], [SS.drop + 0.9, 'hidden'],
-      [SS.text - 0.6, 'phone'], [SS.motorway - 0.2, 'hidden'],
-      [SS.clapAt - 0.6, 'ssClapOpen'], [SS.clapAt - 0.08, 'ssClapShut'], [SS.clapAt + 0.25, 'ssClapOpen'], [SS.clapAt + 1.0, 'hidden'],
-      [SS.earbuds - 0.3, 'phone'], [SS.five - 0.2, 'hidden'],
-      [SS.box - 0.2, 'ssCrank'], [ssCap('box', 1).show - 0.4, 'hidden'],
-      [SS.real3 + 1.0, 'ssSpoonTap'], [SS.real4 - 0.2, 'hidden']],
-    left: [[-1, 'hidden'], [SS.clapAt - 0.6, 'ssClapOpen'], [SS.clapAt - 0.08, 'ssClapShut'], [SS.clapAt + 0.25, 'ssClapOpen'], [SS.clapAt + 1.0, 'hidden']],
-  }, { sleeve: '#3c4a5a', cuff: '#2c3642', watch: true });
-  Object.assign(hands.poses, {
-    ssLetGo: { p: [0.07, -0.14, -0.34], F: [-0.3, 0.6, -0.75], N: [-0.2, -0.8, 0.5], curl: [0.25, 0.3, 0.4, 0.45], thumb: [0.6, 0.3] },
-    ssClapOpen: { p: [0.12, -0.12, -0.36], F: [-0.25, 1, -0.35], N: [-1, 0, -0.1], curl: [0.1, 0.12, 0.15, 0.2], thumb: [0.35, 0.15] },
-    ssClapShut: { p: [0.022, -0.1, -0.36], F: [-0.1, 1, -0.35], N: [-1, 0, 0], curl: [0.08, 0.1, 0.12, 0.15], thumb: [0.3, 0.1] },
-    ssCrank: { p: [0.08, -0.16, -0.36], F: [-0.2, 0.2, -1], N: [-1, 0, -0.1], curl: [0.9, 1.1, 1.25, 1.3], thumb: [0.3, 0.7] },
-    ssSpoonTap: { p: [0.08, -0.16, -0.4], F: [-0.4, -0.3, -0.85], N: [-0.2, -1, 0.2], curl: [0.75, 0.85, 1.05, 1.15], thumb: [0.35, 0.75] },
+  // ---- the lantern's light, slowed down a billion times (1 ns of light = 1 s of film): photons from the flame,
+  // some off the table top; at the reversal every one in flight turns round and goes back the way it came
+  const photons = lbPuffs(scene, 6000, { additive: true, soft: 1.4 });
+  const PH = Array.from({ length: 1400 }, (_, i) => {
+    const u = lbR(i, 1) * 1.9 - 0.95, a = lbR(i, 2) * 6.2832, r = Math.sqrt(1 - u * u);
+    return { d: [r * Math.cos(a), u, r * Math.sin(a)], e: -16 + 30 * lbR(i, 3) };
   });
-  Object.assign(hands.blends, { ssLetGo: 0.08, ssClapOpen: 0.2, ssClapShut: 0.08, ssCrank: 0.4, ssSpoonTap: 0.3 });
-  const handSpoon = new THREE.Group(); { const st = ssStd('#c8ccd2', 0.2, 0.9); ssBox(0.012, 0.004, 0.15, st, 0, 0, 0.04, handSpoon); const bw = ssMesh(new THREE.SphereGeometry(0.022, 10, 6), st, 0, 0, 0.13, handSpoon); bw.scale.set(0.8, 0.3, 1.1); }
-  handSpoon.position.set(0.0, 0.06, 0.03); handSpoon.rotation.set(-1.2, 0, 0); hands.right.g.add(handSpoon); hands.props.spoon = handSpoon;
-  handSpoon.traverse((m) => { if (m.isMesh) { m.frustumCulled = false; m.castShadow = false; } });
-
-  // ---- light
-  const lightAt = (t, mode) => {
-    const H = 7 + ssH(t), D = ssDayAt(H);
-    sky.material.uniforms.a.value.set(D.top); sky.material.uniforms.b.value.set(D.hor); sky.material.uniforms.sd.value.set(...D.sd).normalize();
-    sky.material.uniforms.sc.value.set(D.sd[1] > -0.02 && D.sunI > 0.8 ? '#fff0d0' : '#000000');
-    S.sun.color.set(D.sunC); S.sun.intensity = D.sunI; S.hemi.intensity = D.hemi; S.hemi.color.set(D.top).lerp(new THREE.Color('#ffffff'), 0.4);
-    scene.fog.color.set(D.hor); scene.background = new THREE.Color(D.hor);
-    starMat.opacity = D.stars;
-    const L = D.lamps;
-    spill.intensity = 10 * L; for (const s of strings) s.intensity = 1.2 * L; for (const b of P.bulbs) b.visible = L > 0.3;
-    M.glassLit.emissiveIntensity = 1.25 * L;
-    for (const f of P.neighbours || []) f.material.emissiveIntensity = L;
-    pendant.intensity = mode === 'box' || mode === 'walkinto' || mode === 'wait' || mode === 'storm' ? 5.5 : 0;
-    const inside = ['kettle', 'radio', 'echo', 'vowels', 'tv', 'clap', 'earbuds', 'storm', 'box', 'walkinto', 'wait'].includes(mode);
-    fill.intensity = inside ? (L > 0.5 ? 0.6 : 2.2) : 0;
-    return D;
+  const LB_C = 0.3;                                        // light: 0.3 m per nanosecond (per second of film here)
+  const tauOf = (t) => t - (lbCap('replay', 1).show + 0.4); // replay time (ns): the reversal at 0
+  // where a photon is at replay time τ (null: not out yet / back in the flame), and which way it is going
+  const photonAt = (q, tau, W) => {
+    let dist, back = false;
+    if (q.e < 0 && tau >= 0) { dist = LB_C * (-q.e - tau); back = true; } else dist = LB_C * (tau - q.e);
+    if (!(dist > 0.004) || dist > 3.2) return null;
+    const hTab = 0.113;                                    // (the flame is 11 cm above the table top)
+    let p, d = q.d;
+    const L = q.d[1] < -0.05 ? hTab / -q.d[1] : 1e9;
+    if (dist < L) p = [W[0] + d[0] * dist, W[1] + d[1] * dist, W[2] + d[2] * dist];
+    else {
+      const hit = [W[0] + d[0] * L, W[1] - hTab, W[2] + d[2] * L];
+      if (Math.hypot(hit[0] - LB_G.table[0], hit[2] - LB_G.table[2]) > 0.36) p = [W[0] + d[0] * dist, W[1] + d[1] * dist, W[2] + d[2] * dist];
+      else { d = [d[0], -d[1], d[2]]; const r2 = dist - L; p = [hit[0] + d[0] * r2, hit[1] + d[1] * r2, hit[2] + d[2] * r2]; }
+    }
+    return { p, d: back ? lbSc(d, -1) : d, back };
   };
-  const look = (p, at, fov, t, drift = 0.006, roll = 0) => { const d = ssDrift(t, drift, 0.3, 11); ssCam(cam, [p[0] + d[0], p[1] + d[1], p[2] + d[2]], at, fov, roll); };
-  const placeSun = (D, c, R0 = 22) => { const d = D.sd; S.sun.position.set(c[0] + d[0] * 80, c[1] + Math.max(0.05, d[1]) * 80, c[2] + d[2] * 80); S.sun.target.position.set(c[0], 0, c[2]); S.sun.target.updateMatrixWorld();
-    const sc = S.sun.shadow.camera; if (sc.right !== R0) { sc.left = -R0; sc.right = R0; sc.top = R0; sc.bottom = -R0; sc.updateProjectionMatrix(); } };
 
-  // the airliner's path (story h → world): in the plane shot, 11 km up, crossing from east to west south of you;
-  // in the boom shot a second pass, timed so that its cone reaches you at SS.boomAt (exactly: solved below)
-  const PL = { dir: [1, 0, 0.08], alt: 11000, zOff: -5500 };
-  const plane1 = (te) => { const s = (te - SS.plane) * SSP.plane; return [-2600 + s * PL.dir[0], PL.alt, PL.zOff + s * PL.dir[2]]; };
-  const boomPlane = (() => {
-    const zOff = -3200, you = SS_GD.you;
-    const make = (x0) => (te) => [x0 + (te - SS.boom) * SSP.plane, PL.alt, zOff];
-    // (the first moment its sound reaches you, for a start x0: bisection on x0 so that it is SS.boomAt)
-    const firstHeard = (src) => { for (let t = SS.boom - 2; t < SS.boom + 40; t += 0.05) { if (ssHeardFrom(src, you, t, 120, 600).length) return t; } return Infinity; };
-    let a = -30000, b = 0;
-    for (let i = 0; i < 40; i++) { const m = (a + b) / 2, f = firstHeard(make(m)); if (f > SS.boomAt) a = m; else b = m; }
-    return make((a + b) / 2);
-  })();
-  SS_GARDEN.boomPlane = boomPlane; SS_GARDEN.plane1 = plane1;
-  const otherTrails = [[-0.3, 0.55, -1, 1.0], [0.7, 0.5, -0.6, -0.4], [-0.9, 0.62, 0.3, 0.2]];
+  // ---- the story clock per mode (the end: tonight again, at 9:59 PM, ticking towards 10)
+  const nightS = (t) => t - LB.end - 0.5;
+  const skyTime = (t, m) => (m === 'real' || m === 'question' ? nightS(t) : m === 'nightback' ? -200 : lbStoryAt(t));
+  LB_GARDEN.skyTime = skyTime;
+
+  const look = (p, at, fov, t, drift = 0.004, roll = 0) => { const d = lbDrift(t, drift, 0.3, 11); lbCam(cam, [p[0] + d[0], p[1] + d[1], p[2] + d[2]], at, fov, roll); };
+  const tmp = new THREE.Color(), cLow = new THREE.Color('#ff8a48'), cHigh = new THREE.Color('#fff6ea');
+  // a sun's light: from direction L (garden), brightness k; very low suns light from at least `lift` up (so that
+  // the ground still reads at sunrise); its shadow box (half-size R0) round `c`
+  const sunLight = (light, L, k, c, R0, lift = 0.0, gain = 1) => {
+    const up = Math.max(MathX.smooth(L[1], -0.012, 0.03), gain > 1 ? 0.85 * (L[1] > -0.01) : 0);
+    light.intensity = 2.6 * k * up * gain;
+    tmp.copy(cLow).lerp(cHigh, MathX.smooth(L[1], 0.0, 0.3)); light.color.copy(tmp);
+    const d = lbN3([L[0], Math.max(L[1], lift), L[2]]);
+    light.position.set(c[0] + d[0] * 150, c[1] + d[1] * 150, c[2] + d[2] * 150); light.target.position.set(c[0], c[1], c[2]); light.target.updateMatrixWorld();
+    light.castShadow = light.intensity > 0.02;
+    const sc = light.shadow.camera; if (sc.right !== R0) { sc.left = -R0; sc.right = R0; sc.top = R0; sc.bottom = -R0; sc.updateProjectionMatrix(); }
+  };
 
   const set = {
-    scene, camera: cam,
-    cuts() { return [ssCap('box', 1).show - 0.4, ssCap('wait', 0).show - 0.5]; },
+    scene, camera: cam, sky,
+    cuts() { return [LB.robin, LB.lampsOff - 1.0, lbCap('midnight', 2).show - 0.4, lbCap('sunrise', 2).show - 0.4, lbCap('real2', 0).show + 2.6, lbCap('real2', 2).show - 0.3, LB.real3, LB.real4]; },
     frame(t, shot) {
-      const m = shot.mode, D = lightAt(t, m), h = ssH(t), H = 7 + h;
-      let pos = SS_GD.you, at = [-0.6, 1.2, -12], fov = 55, drift = 0.006, roll = 0, show = null, phone = null;
-      R.begin(); trail.begin(); steam.begin();
-      for (const p of planes) p.visible = false;
-      boltM.opacity = 0; flash.intensity = 0; ridge.visible = false; mway.visible = false; scene.fog.density = 0.0016; rain.lines.visible = false; horizon.visible = false;
-      catRoot.visible = false; nb.root.visible = false; mum.root.visible = false; spoon.visible = false; you.root.visible = false;
-      cam.near = 0.02; cam.far = 30000;
-      // the bird (on the fence in the morning and at dawn)
-      bird.g.visible = H < 8.2 || H > 29;
-      { const ph = (t - SS.song) % 3.1, sing = ph > 0 && ph < 1.6 ? Math.max(0, Math.sin(ph * 26)) : 0; bird.open(sing); bird.head.rotation.y = 0.3 * Math.sin(t * 0.7); bird.head.rotation.x = -0.15 * sing; }
-      if (m === 'title' || m === 'seven') {
-        const k = K(t, SS.titleShot, SS.bird, (x) => x);
-        pos = ssV([0.6, 1.66, -0.9], [-0.2, 1.64, -2.4], k); at = ssV([-0.9, 1.5, -14], [-1.4, 1.35, -14], k); fov = 56;
-      } else if (m === 'bird') {
-        const k = K(t, SS.bird, SS.plane - 0.3);
-        pos = [-1.0, 1.62, -3.2]; at = ssV([-3.6, 1.6, -7.2], [SS_GD.bird[0] + 0.1, SS_GD.bird[1] + 0.05, SS_GD.bird[2]], Ease.outCubic(k)); fov = ssLerp(48, 26, Ease.inOutSine(k));
-      } else if (m === 'plane') {
-        // telephoto on the airliner: its sound (rings) piles up at its nose as it reaches the speed of sound up there
-        const p = plane1(t), k = K(t, SS.plane, SS.plane + 2.2);
-        planes[0].visible = true; planes[0].position.set(...p); planes[0].rotation.y = -Math.atan2(PL.dir[2], PL.dir[0]);
-        pos = [0, 1.6, -2]; at = ssV([p[0] - 700, p[1] * 0.92, p[2]], [p[0] + 120, p[1], p[2]], Ease.inOutSine(k)); fov = ssLerp(16, 5.2, Ease.inOutSine(k)); drift = 0.0006;
-        ssShells(R, t, { src: plane1, every: 0.35, from: SS.plane - 9, life: 9, alpha: 0.55, scale: SSP.cAlt0 / SSP.c0 });
-        for (const q of ssContrailPts(p, PL.dir, 2400, 90)) trail.add(q[0] - 40, q[1] - 2, q[2], 18 + 60 * q[3], 0.5 * (1 - q[3]), 1, 1, 1);
-        cam.near = 5;
-      } else if (m === 'boom' || m === 'carpet') {
-        // the wide sky: the cone sweeps over the garden; then more airliners, more cones
-        const p = boomPlane(t);
-        planes[0].visible = true; planes[0].position.set(...p); planes[0].rotation.y = 0;
-        ssShells(R, t, { src: boomPlane, every: 0.5, from: SS.boom - 30, life: 30, alpha: 0.5, maxR: 16000 });
-        for (const q of ssContrailPts(p, [1, 0, 0], 6000, 80)) trail.add(q[0] - 40, q[1] - 2, q[2], 30 + 120 * q[3], 0.45 * (1 - q[3]), 1, 1, 1);
-        const others = K(t, SS.others, SS.others + 4);
-        otherTrails.forEach((o, i) => {
-          if (others <= 0) return;
-          const pl = planes[1 + i], d = [Math.cos(o[3]), 0, Math.sin(o[3])], c0 = [o[0] * 9000, 10500 + 600 * i, -1500 + o[2] * 2500], s = (t - SS.others) * SSP.plane - 4000;
-          const pp = [c0[0] + d[0] * s, c0[1], c0[2] + d[2] * s];
-          pl.visible = true; pl.position.set(...pp); pl.rotation.y = -o[3];
-          for (const q of ssContrailPts(pp, d, 5000, 50)) trail.add(q[0], q[1], q[2], 30 + 120 * q[3], 0.4 * others * (1 - q[3]), 1, 1, 1);
-          ssShells(R, t, { src: (te) => [c0[0] + d[0] * ((te - SS.others) * SSP.plane - 4000), c0[1], c0[2] + d[2] * ((te - SS.others) * SSP.plane - 4000)], every: 0.8, from: SS.others - 10, life: 24, alpha: 0.32 * others });
-        });
-        const kb = K(t, SS.boomAt - 6, SS.boomAt + 1.5), kc = K(t, SS.carpet, SS.eight - 1);
-        pos = [0.2, 1.62, -3.0]; { const q = boomPlane(SS.boomAt), d = ssN3([q[0] - pos[0], q[1] - pos[1], q[2] - pos[2]]); const el = Math.max(d[1], 0.8); at = ssV(ssV([-2, 7, -14], [pos[0] + d[0] * 20, pos[1] + el * 20, pos[2] + d[2] * 20], Ease.inOutSine(K(t, SS.boom, SS.boom + 3))), [pos[0] + d[0] * 20, pos[1] + el * 20 - 2, pos[2] + d[2] * 20], kb); } fov = ssLerp(ssLerp(50, 64, kb), 72, kc); drift = 0.004;
-        // the boom: a hard double knock of the camera
-        const db = t - SS.boomAt; if (db > 0 && db < 1.2) { const s = Math.exp(-db * 5) * (Math.sin(db * 70) + 0.6 * Math.sin(db * 113)); at = [at[0] + 0.12 * s, at[1] + 0.2 * s, at[2]]; roll = 0.6 * s; }
-        cam.near = 0.5;
-      } else if (m === 'neighbour') {
-        nb.root.visible = true; nb.update(t);
-        const k = K(t, SS.eight, SS.throat + 1);
-        pos = [0.4, 1.62, -3.0]; at = ssV([3.5, 1.7, -6], [SS_GD.nb[0] - 0.2, 1.95, SS_GD.nb[2]], k); fov = ssLerp(46, 13, Ease.inOutSine(k));
-      } else if (m === 'kettle') {
-        const kk = [-3.05, 1.01, 0.61], k = K(t, SS.kettle, SS.radio);
-        pos = ssV([-1.95, 1.58, 2.3], [-2.25, 1.5, 2.0], k); at = [kk[0], 1.08, kk[2]]; fov = 42;
-        for (let i = 0; i < 70; i++) { const a = ((t * 0.9 + i / 70) % 1), x = kk[0] + 0.12 + a * 0.25 + 0.05 * Math.sin(i * 3 + t * 2), y = kk[1] + 0.15 + a * 0.55; steam.add(x, y, kk[2] + 0.04 * Math.sin(i), 0.03 + 0.12 * a, 0.22 * (1 - a), 1, 1, 1); }
-      } else if (m === 'radio') {
-        const k = K(t, SS.radio, SS.nine);
-        pos = ssV([-1.8, 1.5, 1.9], [-1.95, 1.45, 1.7], k); at = [SS_K.radio[0], 1.0, SS_K.radio[2]]; fov = 40;
-      } else if (m === 'echo') {
-        // the kitchen; the spoon slips from your hand and hits the floor
-        const k = K(t, SS.spoon, SS.drop + 0.4);
-        pos = [-1.5, 1.62, 2.7]; at = ssV([-1.7, 1.2, 0.3], [-1.55, 0.25, 1.85], Ease.inOutSine(k)); fov = 52;
-        if (t >= SS.drop) {
-          // (from your hand to the floor: free fall, one bounce)
-          spoon.visible = true; const dt = t - SS.drop, y0 = 1.02, tf = Math.sqrt(2 * (y0 - 0.02) / 9.81);
-          let y = y0 - 4.9 * dt * dt, spin = dt * 9;
-          if (dt > tf) { const d2 = dt - tf; y = 0.02 + Math.max(0, 0.9 * d2 - 4.9 * d2 * d2); spin = tf * 9 + d2 * 3; if (d2 > 0.2) { y = 0.015; spin = tf * 9 + 0.6; } }
-          spoon.position.set(-1.52, y, 2.12); spoon.rotation.set(spin * 0.4, spin, 0.2);
-          if (dt > tf) ssShells(R, t, { src: () => [-1.52, 0.02, 2.12], every: 1, from: SS.drop + tf, to: SS.drop + tf, life: 2, alpha: 0.5 });
+      const m = shot.mode, s = skyTime(t, m);
+      let pos = LB_GD.you, at = [0, 1.2, -14], fov = 55, drift = 0.004, roll = 0;
+      let sk = { t, F: lbFrame(s), moonK: 1, lens: 0 };      // (sky options)
+      let lamps = 1, house = 1, lantern = 1, fade2 = 1, dim = 0, shadowC = null, shadowR = 22, lift = 0.0, gain = 1, amb = 1;
+      cam.near = 0.02; cam.far = 6000;
+      card.visible = shade.visible = false; you.root.visible = false; park.visible = false;
+      catRoot.visible = true; robin.g.visible = true; photons.begin();
+      // (where the suns are now: the sky's state from the last frame is fine for aiming, it moves slowly)
+      const L1 = lbLocal(lbSunDir(s), sk.F, LBP.az0), L2 = lbSc(L1, -1);
+      const toward = (L, p, d = 40, dAlt = 0) => { const a = lbGardenAltAz(L); return lbAim(p, a.az, a.alt + dAlt, d); };
+      const moonD = sky.moonDir;
+      // the telescope: on the Moon at night, on the second Sun once it is up (aimed first: the card shot frames on it)
+      { const L = s > LB_SKY.on + 1 && L2[1] > 0.05 ? L2 : [moonD.x, moonD.y, moonD.z];
+        P.scopeHead.rotation.y = Math.atan2(L[0], L[2]); P.tube.rotation.x = -Math.asin(MathX.clamp(L[1], -1, 1)); }
+      // ------------------------------------------------------------------ the shots
+      if (m === 'open') {
+        pos = lbV([1.2, 1.64, -1.3], [0.9, 1.64, -2.2], K(t, -1, LB.titleShot, (x) => x));
+        const k = K(t, LB.secondSun, LB.secondSun + 2.6);
+        at = lbV([-0.6, 0.9, -15], toward(L2, pos, 40, -19), k); fov = 62;
+        lamps = 0;
+      } else if (m === 'title') {
+        const k = K(t, LB.titleShot, LB.before, (x) => x);
+        pos = lbV([0.3, 3.0, -0.9], [0.3, 3.25, -2.0], k); at = toward(L2, pos, 40, -24); fov = 62; drift = 0.002;
+        lamps = 0;
+      } else if (m === 'before' || m === 'question' || (m === 'real' && t < LB.real2 + 0.4)) {
+        // the night: the Moon, the stars, your cat on the back wall
+        const k = m === 'before' ? K(t, LB.before, LB.rule, (x) => x) : m === 'question' ? K(t, LB.question, LB.end, (x) => x) : K(t, LB.real, LB.real2 + 0.4, (x) => x);
+        pos = lbV([0.7, 1.64, -1.9], [0.5, 1.64, -2.8], k); at = lbAim(pos, 172, 13); fov = 62;
+      } else if (m === 'rule') {
+        const k = K(t, LB.rule, LB.count, (x) => x);
+        pos = [-1.4, 1.62, -6.5]; at = lbAim(pos, lbLerp(222, 214, k), lbLerp(24, 27, k)); fov = 58; drift = 0.003;
+      } else if (m === 'vanish' || m === 'old' || m === 'mirror2') {
+        // the whole sky, roofs along the bottom
+        const k = m === 'old' ? K(t, LB.old, LB.siriusCut, (x) => x) : m === 'vanish' ? K(t, LB.count, LB.moonCut, (x) => x) : K(t, LB.replayEnd, LB.canopusCut, (x) => x);
+        pos = [0.0, 1.45, -8.0]; at = lbAim(pos, m === 'old' ? lbLerp(178, 160, k) : m === 'vanish' ? lbLerp(182, 178, k) : lbLerp(160, 150, k), 38); fov = 82; drift = 0.002;
+      } else if (m === 'crescent' || m === 'moonwhy' || m === 'full') {
+        // the Moon through a long lens
+        pos = LB_GD.you; const md = [moonD.x, moonD.y, moonD.z];
+        const k = m === 'crescent' ? K(t, LB.moonCut, LB.old, (x) => x) : m === 'moonwhy' ? K(t, LB.moonwhy, LB.project, (x) => x) : K(t, LB.full, LB.three, (x) => x);
+        at = [pos[0] + md[0] * 40, pos[1] + md[1] * 40, pos[2] + md[2] * 40]; fov = lbLerp(1.05, 0.95, k); drift = 0.00002;
+        cam.near = 1;
+      } else if (m === 'sirius') {
+        // the bottom left of the garden, looking west over next door's roof
+        const k = K(t, lbCap('sirius', 1).show - 0.6, lbCap('sirius', 1).show + 2.4);
+        pos = [-3.3, 1.62, -15.0]; at = lbAim(pos, 276, lbLerp(13, 16.7, k)); fov = lbLerp(56, 26, k); drift = lbLerp(0.004, 0.001, k);
+      } else if (m === 'mirror') {
+        const k = K(t, LB.mirror, LB.replay, (x) => x);
+        pos = [0.3, 1.62, -4.0]; at = lbAim(pos, lbLerp(158, 148, k), lbLerp(17, 26, k)); fov = 52; drift = 0.003;
+      } else if (m === 'replay') {
+        // the lantern on the table, lit only by itself
+        const W = new THREE.Vector3(); fl.getWorldPosition(W);
+        const k = K(t, LB.replay, LB.replayEnd, (x) => x);
+        pos = [W.x + lbLerp(0.95, 0.8, k), W.y + 0.32, W.z + lbLerp(1.15, 0.95, k)]; at = [W.x, W.y - 0.05, W.z]; fov = 50; drift = 0.0015;
+        dim = 1;
+        const tau = tauOf(t), Wp = [W.x, W.y, W.z];
+        for (const q of PH) {
+          const ph = photonAt(q, tau, Wp); if (!ph) continue;
+          const a = ph.back ? 0.95 : 0.7;
+          photons.add(ph.p[0], ph.p[1], ph.p[2], 0.011, a, 1.0, 0.78, 0.46);
+          for (let j = 1; j <= 3; j++) photons.add(ph.p[0] - ph.d[0] * 0.012 * j, ph.p[1] - ph.d[1] * 0.012 * j, ph.p[2] - ph.d[2] * 0.012 * j, 0.008, a * (0.5 - 0.12 * j), 1.0, 0.7, 0.4);
         }
-        show = t < SS.drop + 0.05 ? 'spoon' : null;
-      } else if (m === 'vowels') {
-        mum.root.visible = true; mum.update(t);
-        const k = K(t, SS.text - 0.8, SS.text + 0.3);
-        pos = [T[0] + 1.25, 1.3, T[1] + 1.15]; at = ssV([T[0] - 0.1, 1.05, T[1] - 0.6], [T[0] + 0.15, 0.62, T[1] + 0.2], k); fov = 48;
-        if (t > SS.text - 0.6) { show = 'phone'; phone = 'chat'; }
-      } else if (m === 'motorway') {
-        ridge.visible = true; mway.visible = true; scene.fog.density = 0.00002;
-        const m4 = new THREE.Matrix4(); MW.forEach((c, i) => { const q = mwAt(c, t); m4.makeTranslation(q[0], q[1], q[2]); mwCar.setMatrixAt(i, m4); }); mwCar.instanceMatrix.needsUpdate = true;
-        // (every car's rings: they pile up into a cone behind it; each cone's crack takes 1 min 43 s to reach you)
-        MW.forEach((c) => { const x = mwAt(c, t)[0]; if (Math.abs(x) < 150) ssShells(R, t, { src: (te) => mwAt(c, te), every: 0.2, from: t - 3, life: 3, alpha: 0.4, maxR: 120 }); });
-        const k = K(t, SS.motorway, SS.eleven);
-        pos = [0.3, 5.6, 0.2]; at = [ssLerp(-40, 20, k), 612, -3200]; fov = ssLerp(3.2, 2.6, k); drift = 0.0005; cam.near = 1;
-      } else if (m === 'tv' || m === 'clap' || m === 'earbuds' || m === 'box' || m === 'wait' || m === 'walkinto') {
-        // seated at the table, your ears 3 m from the TV / the music box
-        const E = SS_K.ear;
-        pos = E; at = [SS_K.tv[0], 1.1, SS_K.tv[2]]; fov = 50;
-        if (m === 'tv') {
-          const k = K(t, SS.four, SS.four + 3); at = ssV([-1.9, 1.15, 0.4], [SS_K.tv[0] + 0.3, 1.1, SS_K.tv[2]], k);
-          // (her words: a ring for every syllable she says, crawling to you at 67 cm/s)
-          tvScr.update({ m: Math.round(4 * Math.max(0, Math.sin(t * 9.1) * Math.sin(t * 3.3))) / 4 });
-          ssShells(R, t, { src: () => [SS_K.tv[0], SS_K.tv[1] + 0.3, SS_K.tv[2] + 0.05], every: 0.28, from: SS.four - 8, life: 9, alpha: 0.45, maxR: SS_K.tvDist + 0.4 });
-        }
-        if (m === 'clap') {
-          at = [-1.9, 1.15, 0.3];
-          // the clap and its first echoes (image sources in the six walls)
-          const c = [E[0], E[1] - 0.1, E[2] - 0.36], KD = SS_G.kitchen, wl = [[KD[0], 0], [KD[1], 0], [0.36, 2], [KD[2], 2], [0, 1], [2.5, 1]];
-          const srcs = [c, ...wl.map(([w, ax]) => { const q = c.slice(); q[ax] = 2 * w - q[ax]; return q; })];
-          srcs.forEach((q, i) => ssShells(R, t, { src: () => q, every: 1, from: SS.clapAt, to: SS.clapAt, life: 30, alpha: i ? 0.3 : 0.6 }));
-        }
-        if (m === 'earbuds') { at = [-1.9, 0.9, 1.2]; show = 'phone'; phone = 'music'; }
-        if (m === 'box' && t < ssCap('box', 1).show - 0.4) { pos = [SS_K.box[0] - 0.05, 1.35, SS_K.box[2] + 0.55]; at = [SS_K.box[0], 0.95, SS_K.box[2]]; fov = 44; show = null; }
-        if (m === 'box' || m === 'walkinto' || m === 'wait') {
-          if (pos === E) at = [SS_K.box[0], 1.0, SS_K.box[2]];
-          if (m === 'wait') {
-            // (from the corner of the kitchen: you at the table, the box on the worktop, its tune crawling between)
-            you.root.visible = true; you.update(t);
-            const k = K(t, SS.wait, SS.wait + 6);
-            pos = ssV([0.6, 1.95, 3.4], [0.8, 2.35, 3.55], k); at = ssV([-0.6, 1.0, 1.6], [-0.95, 0.95, 1.75], k); fov = 58;
-          }
-          if (m === 'walkinto') {
-            const k = K(t, SS.walkinto + 0.3, ssCap('walkinto', 1).show + 0.5);
-            pos = ssV([E[0], 1.22, E[2]], [SS_K.box[0] - 0.12, 1.25, SS_K.box[2] + 0.45], k); at = [SS_K.box[0], 0.98, SS_K.box[2]]; fov = ssLerp(50, 46, k);
-            // (stood up: a little bob as you walk)
-            pos = [pos[0], pos[1] + 0.3 * K(t, SS.walkinto, SS.walkinto + 0.6) + 0.012 * Math.sin(t * 11) * k * (1 - k) * 4, pos[2]];
-          }
-          // the tune: one ring per note, made in 6.4 s from 22:00:00, crawling at 1 cm/s
-          const bp = [SS_K.box[0], SS_K.box[1] + 0.07, SS_K.box[2]];
-          ssShells(R, t, { src: () => bp, every: SS.boxTune / 24, from: SS.boxGo, to: SS.boxGo + SS.boxTune, life: 1e9, alpha: 0.6 });
-        }
-        lid.rotation.x = -1.9; crank.rotation.x = t * (t < SS.boxGo + SS.boxTune ? 6 : 0);
-      } else if (m === 'cat' || m === 'hum') {
-        // low on the patio step: the cat sets off as she meows, and outruns it
-        catRoot.visible = true;
-        const go = SS.meow + 0.35, v = 0.72, L = Math.hypot(SS_GD.catEnd[0] - SS_GD.cat0[0], SS_GD.catEnd[2] - SS_GD.cat0[2]), arrive = go + L / v;
-        const u = MathX.clamp((t - go) / (arrive - go), 0, 1), cp = ssV(SS_GD.cat0, SS_GD.catEnd, u);
-        catRoot.position.set(cp[0], 0, cp[2]); catRoot.rotation.y = Math.atan2(SS_GD.catEnd[0] - SS_GD.cat0[0], SS_GD.catEnd[2] - SS_GD.cat0[2]);
-        const walking = t > go && t < arrive, gp = (t - go) * 1.6;
-        cat.pose(walking ? ssCatGallop(gp, 0.45) : t < go ? ssCatBlend(SS_CAT_POSES.sit, SS_CAT_POSES.alert, 0.5 + 0.5 * MathX.smooth(t, SS.meow - 0.5, SS.meow)) : ssCatBlend(SS_CAT_POSES.sit, SS_CAT_POSES.alert, 0.8), t);
-        pos = m === 'cat' ? [0.4, 0.62, -2.85] : [0.3, 1.0, -2.6];
-        cat.lookAt([pos[0], 0.6, pos[2]], 0.8); at = m === 'cat' ? ssV([SS_GD.cat0[0], 0.2, SS_GD.cat0[2]], [cp[0], 0.18, cp[2]], 0.7) : [cp[0], 0.25, cp[2]]; fov = m === 'cat' ? 46 : ssLerp(40, 30, K(t, SS.hum, SS.storm));
-        if (m === 'cat') ssShells(R, t, { src: () => [SS_GD.cat0[0], 0.26, SS_GD.cat0[2] + 0.12], every: 0.12, from: SS.meow, to: SS.meow + 0.6, life: 30, alpha: 0.4 });
-      } else if (m === 'storm') {
-        // from the kitchen: rain on the garden, lightning a kilometre away over the town
-        rain.lines.visible = true; rain.update(t, [-1.6, 1.5, -7]);
-        pos = [-1.6, 1.5, 1.2]; at = [-2.2, 5.2, -40]; fov = 56;
-        const fl = t - SS.flash; boltM.opacity = fl > 0 && fl < 0.5 ? (Math.sin(fl * 40) > -0.3 ? 1 : 0.2) * (1 - fl * 1.6) : 0;
-        flash.intensity = fl > 0 && fl < 0.6 ? 4 * Math.exp(-fl * 6) : 0;
-        if (flash.intensity > 0) S.hemi.intensity += 1.5 * Math.exp(-fl * 6);
-      } else if (m === 'dusk') {
-        catRoot.visible = true; catRoot.position.set(...G.catAt); catRoot.rotation.y = 0.4; cat.pose(SS_CAT_POSES.loaf, t);
-        const k = K(t, SS.eight2, SS.box);
-        pos = ssV([1.2, 1.62, -1.2], [0.2, 1.62, -4.0], k); at = [-1.0, 1.3, -14]; fov = 58;
-        for (const q of HANG) { const r = ssDist(q.h0, h); R.add(q.p[0], q.p[1], q.p[2], r, 0.32 * (1 - MathX.smooth(r, 2.5, 6))); }
-      } else if (m === 'night' || m === 'dawn' || m === 'question') {
-        // the farthest a word you say now could ever reach: a circle on the lawn round you
-        const you = [0.0, 0, -7.0];
-        catRoot.visible = m !== 'night' || t < SS.stop; catRoot.position.set(...G.catAt); catRoot.rotation.y = 0.4; cat.pose(SS_CAT_POSES.loaf, t);
-        const Hr = ssHorizon(h), down = K(t, ssCap('stop', 2).show - 1, ssCap('stop', 2).show + 0.8);
-        horizon.visible = m === 'night'; horizon.scale.setScalar(Math.max(0.05, Hr)); horizon.position.set(you[0], 0.02, you[2]);
-        // (a line about 6 cm wide whatever the radius: rebuild the ring when its relative width changes)
-        { const w = MathX.clamp(0.06 / Math.max(0.05, Hr), 0.002, 0.5); if (Math.abs(w - horizonW) > 0.0005) { horizonW = w; horizon.geometry.dispose(); horizon.geometry = new THREE.RingGeometry(1 - w, 1, 200); } }
-        if (m === 'night') {
-          const k = K(t, SS.midnight, SS.stop);
-          pos = ssV([1.6, 4.2, -0.8], [1.4, 3.2, -1.4], k); at = [0, 0, -9]; fov = 66;
-          if (t > SS.stop) { pos = ssV([1.4, 3.2, -1.4], [0.35, 1.62, -6.4], K(t, SS.stop, ssCap('stop', 2).show + 0.6)); at = ssV([0, 0, -9], [0.0, 0.0, -7.05], down); fov = ssLerp(66, 50, down); }
-        } else if (m === 'dawn') {
-          const k = K(t, SS.last, SS.real);
-          pos = ssV([0.6, 1.62, -3.4], [0.2, 1.62, -4.2], k); at = ssV([-2.5, 1.6, -7.5], [SS_GD.bird[0], SS_GD.bird[1], SS_GD.bird[2]], K(t, ssCap('last', 0).show, ssCap('last', 1).show + 1)); fov = ssLerp(54, 34, K(t, ssCap('last', 0).show, ssCap('last', 1).show + 1));
-          bird.g.visible = true;
-          const ph = (t - SS.last) % 2.6, sing = ph > 0.3 && ph < 1.6 ? Math.max(0, Math.sin(ph * 24)) : 0; bird.open(sing);
-        } else {
-          const k = K(t, SS.question, SS.end);
-          pos = ssV([0.8, 1.66, -1.0], [0.4, 1.66, -2.2], k); at = [-0.8, 1.6, -14]; fov = 58;
-        }
+      } else if (m === 'canopus' || m === 'north') {
+        // the bottom of the garden, looking back over the house
+        pos = [-1.4, 1.62, -15.8];
+        if (m === 'canopus') { const k = K(t, lbCap('canopus', 0).show + 0.4, lbCap('canopus', 1).show); at = lbAim(pos, 309, lbLerp(32, 38.8, k)); fov = lbLerp(62, 40, k); }
+        else { const k = K(t, LB.north, LB.north + 6.0); pos = [-2.6, 1.62, -10.0]; at = lbAim(pos, lbLerp(242, 228, k), lbLerp(26, 8, k)); fov = lbLerp(56, 70, k); }
+        drift = 0.002;
+      } else if (m === 'switch') {
+        pos = [0.4, 1.62, -2.6]; const a = lbGardenAltAz(L2);
+        at = lbAim(pos, a.az + 2, a.alt - 14); fov = 72; drift = 0.0025;
+      } else if (m === 'day') {
+        lamps = t < LB.lampsOff ? 1 : 0;
+        if (t < LB.robin) { pos = [-0.8, 1.62, -2.2]; at = lbAim(pos, 152, 9); fov = 64; }
+        else if (t < LB.lampsOff - 1.0) { const k = K(t, LB.robin, LB.lampsOff - 1.0, (x) => x); pos = [2.4, 1.55, lbLerp(-5.2, -5.5, k)]; at = [LB_GD.robin[0], LB_GD.robin[1] + 0.08, LB_GD.robin[2]]; fov = 16; drift = 0.0008; }
+        else { const k = K(t, LB.lampsOff - 1.0, LB.why, (x) => x); pos = [0.2, 1.62, lbLerp(-8.6, -9.4, k)]; at = [0.2, 2.9, -18]; fov = 60; }
+      } else if (m === 'project') {
+        card.visible = shade.visible = true;
+        const C = new THREE.Vector3(), A = new THREE.Vector3(0, 0, 1); card.getWorldPosition(C); A.applyQuaternion(card.getWorldQuaternion(new THREE.Quaternion()));
+        const side = new THREE.Vector3().crossVectors(A, new THREE.Vector3(0, 1, 0)).normalize(), k = K(t, LB.project, LB.past, (x) => x);
+        pos = [C.x + A.x * 0.42 + side.x * lbLerp(0.3, 0.22, k), C.y + 0.16, C.z + A.z * 0.42 + side.z * lbLerp(0.3, 0.22, k)]; at = [C.x, C.y, C.z]; fov = 44; drift = 0.0012;
+      } else if (m === 'past') {
+        // the second Sun through a solar filter
+        pos = LB_GD.you; at = [pos[0] + L2[0] * 40, pos[1] + L2[1] * 40, pos[2] + L2[2] * 40]; fov = 0.78; drift = 0.00001; cam.near = 1;
+        Object.assign(sk, { k: 0, discK: 0.075, face2: 1, starK: 0 });
+      } else if (m === 'three') {
+        const k = K(t, LB.three, LB.midnight, (x) => x);
+        pos = [-2.6, 1.62, lbLerp(-3.4, -4.0, k)]; at = lbAim(pos, 196, 12); fov = 58; lamps = 0;
+      } else if (m === 'midnight') {
+        lamps = 0; sk.moonK = 0;
+        if (t < lbCap('midnight', 2).show - 0.4) { const k = K(t, LB.midnight, LB.sunrise, (x) => x); pos = [-0.6, 1.62, -5.5]; at = toward(L2, pos, 40, lbLerp(-20, -16, k)); fov = 70; }
+        else { const k = K(t, lbCap('midnight', 2).show - 0.4, LB.sunrise, (x) => x); pos = [lbLerp(2.0, 2.3, k), 2.3, -5.4]; at = [10.6, 7.25, 1.6]; fov = 30; drift = 0.0015; }
+      } else if (m === 'sunrise') {
+        // the park, 6:47 AM: the real Sun rising in the east, the second setting in the west, your two shadows
+        lamps = 0; house = 0; lantern = 0; sk.moonK = 0; park.visible = true; you.root.visible = true; you.update(t);
+        catRoot.visible = false; robin.g.visible = false;
+        const E = lbGardenDir(111, 0), side = lbN3([-E[2], 0, E[0]]), Y = [PK[0], 1.0, PK[2]];
+        const c1 = lbCap('sunrise', 1).show - 0.4, c2 = lbCap('sunrise', 2).show - 0.4;
+        if (t < c1) { const k = K(t, LB.sunrise, c1, (x) => x); pos = [PK[0] - E[0] * lbLerp(9, 7.5, k) + side[0] * 1.2, 1.5, PK[2] - E[2] * lbLerp(9, 7.5, k) + side[2] * 1.2]; at = [PK[0] + E[0] * 400, 6, PK[2] + E[2] * 400]; fov = 34; }
+        else if (t < c2) {
+          // a pan from the rising Sun, past you, to the setting one
+          const k = Ease.inOutSine(MathX.clamp((t - c1 - 0.2) / 3.4, 0, 1)), ang = k * Math.PI;
+          pos = [PK[0] + side[0] * 7, 1.5, PK[2] + side[2] * 7];
+          const dir = lbN3([E[0] * Math.cos(ang) - side[0] * Math.sin(ang), 0.0, E[2] * Math.cos(ang) - side[2] * Math.sin(ang)]);
+          at = [pos[0] + dir[0] * 400, 6, pos[2] + dir[2] * 400]; fov = 46;
+        } else { const k = K(t, c2, c2 + 5); pos = [PK[0] + side[0] * lbLerp(4.0, 5.5, k) - E[0] * 1.2, lbLerp(3.0, 5.0, k), PK[2] + side[2] * lbLerp(4.0, 5.5, k) - E[2] * 1.2]; at = [PK[0], 0.5, PK[2]]; fov = lbLerp(60, 66, k); drift = 0.004; }
+        shadowC = [PK[0], 0, PK[2]]; shadowR = 60; lift = t < c2 ? 0.06 : 0.2; gain = t < c2 ? 1 : 1.8; amb = t < c2 ? 0.45 : 0.22; sk.lens = 40;   // (the discs drawn larger than life; the light lifted so the shadows read)
+      } else if (m === 'noon') {
+        lamps = 0; house = 0; lantern = 0; sk.moonK = 0;
+        const k = K(t, LB.noon, LB.never, (x) => x);
+        pos = [0.6, 1.62, lbLerp(-4.2, -5.0, k)]; at = toward(L1, pos, 40, -9); fov = 62;
+      } else if (m === 'never') {
+        lamps = 0; house = 0; lantern = 0; sk.moonK = 0; catRoot.visible = false;
+        pos = [0.0, 4.4, -0.9]; at = [0.0, 0.4, -14]; fov = 68; drift = 0.0015;
+      } else if (m === 'summer') {
+        lamps = 0; house = 0; lantern = 0; sk.moonK = 0; catRoot.visible = false;
+        const k = K(t, LB.summer, LB.heat, (x) => x);
+        pos = [lbLerp(1.2, 0.8, k), 1.62, lbLerp(-13.6, -12.6, k)]; at = [-0.4, 2.8, 0]; fov = 60;
+      } else if (m === 'nightback') {
+        // far in the future: the second Sun shows the Sun being born, fades; the night comes back
+        const k = K(t, LB.nightBack + 0.2, LB.nightBack + 2.6);
+        fade2 = 1 - k; sk.on = -1e9; sk.moonK = 0; sk.F = LB_SKY.F; lamps = 0; house = 0; lantern = 0; sk.starSize = 1.7; sk.mw = 2.0;
+        pos = [0.4, 1.62, -6.0]; at = lbAim(pos, lbLerp(236, 250, K(t, LB.nightBack, LB.real, (x) => x)), 44); fov = 74;
       } else if (m === 'real') {
-        // the patio table: a fresh mug of hot chocolate; a spoon taps it
-        const mg = new THREE.Vector3(); P.mug.getWorldPosition(mg);
-        const k = K(t, SS.real, SS.real + 4);
-        pos = ssV([mg.x + 0.8, 1.35, mg.z + 1.0], [mg.x + 0.35, 1.12, mg.z + 0.5], k); at = [mg.x, mg.y + 0.05, mg.z]; fov = 44;
-        if (t > SS.real3 + 1.0 && t < SS.real4) show = 'spoon';
-        for (let i = 0; i < 26; i++) { const a = ((t * 0.5 + i / 26) % 1); steam.add(mg.x + 0.01 * Math.sin(i * 2 + t), mg.y + 0.1 + a * 0.28, mg.z + 0.01 * Math.cos(i * 3), 0.02 + 0.05 * a, 0.16 * (1 - a), 1, 1, 1); }
+        // 9:59 PM tonight: how old the light is; then the sky; then the night garden under the diagrams
+        if (t < lbCap('real2', 0).show + 2.6) { pos = LB_GD.you; const md = [moonD.x, moonD.y, moonD.z]; at = [pos[0] + md[0] * 40, pos[1] + md[1] * 40, pos[2] + md[2] * 40]; fov = 8; drift = 0.0006; }
+        else if (t < lbCap('real2', 2).show - 0.3) { const k = K(t, lbCap('real2', 0).show + 2.6, lbCap('real2', 2).show - 0.3, (x) => x); pos = [-1.2, 1.62, -15.6]; at = lbAim(pos, lbLerp(285, 275, k), 22); fov = 58; }
+        else if (t < LB.real3) { pos = [-1.2, 1.62, -15.6]; at = lbAim(pos, 265, 28); fov = 64; }
+        else if (t < LB.real4) { const k = K(t, LB.real3, LB.real4, (x) => x); pos = [0, 1.45, -8]; at = lbAim(pos, lbLerp(240, 255, k), 52); fov = 80; }
+        else { const k = K(t, LB.real4, LB.question, (x) => x); pos = lbV([-0.8, 1.62, -6.0], [-1.0, 1.62, -6.8], k); at = lbAim(pos, 222, 22); fov = 58; }
       }
       look(pos, at, fov, t, drift, roll);
-      placeSun(D, [pos[0], 0, pos[2] - 4], m === 'plane' || m === 'boom' || m === 'carpet' ? 26 : 16);
-      R.end(); trail.end(); steam.end();
-      if (show === 'phone' && phone) hands.props.phone.update(ssPhoneState(t, phone));
-      hands.update(t); hands.show(show);
-      this._t = t;
+      // ------------------------------------------------------------------ the sky, then the light
+      const st = sky.update(s, cam, app.renderH || 1080, Object.assign({ fade2 }, sk));
+      const c = shadowC || [cam.position.x, 0, cam.position.z - 3];
+      const k1 = st.k1, k2 = st.k2;
+      sunLight(sun1L, st.L1 || L1, k1, c, shadowR, lift, gain);
+      sunLight(sun2L, st.L2 || L2, k2, c, shadowR, lift, gain);
+      const day = MathX.clamp(k1 * st.day1 + k2 * st.day2, 0, 3);
+      // the Moon's light: before 10, a gibbous Moon; then its dark side's sliver; from 10:08:18 its day side, ×2
+      const moonOn = sk.moonK ? (s < 0 ? 1 : s < LB_MOON.dayBack ? 0.15 * MathX.smooth(s, 1.5, 8) : 0.15 + 0.85 * lbSunGain(s - LB_MOON.dayBack)) : 0;
+      moonL.intensity = 0.32 * moonOn * MathX.smooth(moonD.y, -0.02, 0.1);
+      moonL.position.set(c[0] + moonD.x * 100, c[1] + moonD.y * 100, c[2] + moonD.z * 100); moonL.target.position.set(...c); moonL.target.updateMatrixWorld();
+      S.hemi.intensity = (0.07 + 0.5 * Math.min(day, 2)) * amb;
+      S.hemi.color.set('#2a3a5c').lerp(tmp.set('#b4c8e2'), MathX.clamp(day, 0, 1));
+      S.hemi.groundColor.set('#120f0c').lerp(tmp.set('#5a5040'), MathX.clamp(day, 0, 1));
+      scene.environmentIntensity = (0.03 + 0.55 * Math.min(day, 2)) * amb;
+      // the lamps
+      const flick = 0.9 + 0.1 * noise1(t * 7, 3) + 0.05 * noise1(t * 23, 5);
+      spill.intensity = 9 * house; pendant.intensity = 5.5 * house; M.glassLit.emissiveIntensity = 1.25 * house;
+      for (const f of P.neighbours || []) f.material.emissiveIntensity = house;
+      for (const p of strings) p.intensity = 1.1 * lamps; for (const b of P.bulbs) b.visible = lamps > 0.5;
+      street.light.intensity = 26 * lamps; street.lensM.color.set(lamps > 0.5 ? '#ffe6c0' : '#3a3c3e');
+      candle.intensity = 1.1 * lantern * flick * (dim ? 1.6 : 1); flame.visible = lantern > 0; fl.scale.set(0.007, 0.018 * flick, 0.007);
+      { const W = new THREE.Vector3(); fl.getWorldPosition(W); candle.position.copy(W); }
+      // (the replay: everything but the candle down to almost nothing)
+      if (dim) {
+        sun1L.intensity = sun2L.intensity = moonL.intensity = 0; S.hemi.intensity = 0.015; scene.environmentIntensity = 0.0;
+        spill.intensity = pendant.intensity = 0; for (const p of strings) p.intensity = 0; street.light.intensity = 0;
+        sky.domeU.uK.value = 0.04; sky.starU.uK.value = 0; if (sky.moon) sky.moonU.uK.value = 0;
+      }
+      // the solar panels: next door's roof (the glint when a sun is on it)
+      panels.visible = true;
+      // the cat: asleep on the wall at night, sat up and squinting by day; the robin sings in daylight
+      if (catRoot.visible) { const dz = day > 0.3; cat.pose(dz ? lbCatBlend(LB_CAT_POSES.sit, LB_CAT_POSES.alert, 0.6) : LB_CAT_POSES.loaf, t); }
+      if (robin.g.visible) { const ph = ((t - LB.robin) % 2.7 + 2.7) % 2.7, sing = day > 0.3 && ph > 0.2 && ph < 1.6 ? Math.max(0, Math.sin(ph * 27)) : 0; robin.open(sing); robin.head.rotation.y = 0.3 * Math.sin(t * 0.8); robin.head.rotation.x = -0.2 * sing; }
+      cardImgM.color.setScalar(1.6 * k2 * (shade.visible ? 1 : 0) + 0.001);
+      photons.end();
+      this._st = st; this._s = s; this._day = day; this._dim = dim;
     },
     labels(t) {
-      const m = ssShotAt(t).mode, out = [];
-      if (m === 'motorway') out.push({ p: [-10, 650, -3200], text: 'THE MOTORWAY', sub: '3.2 km · EVERY CAR AT 70 FASTER THAN SOUND', a: StoryHUD.win(t, ssS('motorway') + 0.8, SS.eleven - 0.3, 0.3, 0.2) });
-      if (m === 'storm') out.push({ p: [-40, 60, -950], text: 'LIGHTNING', sub: '1.0 km AWAY', a: StoryHUD.win(t, SS.flash + 0.3, SS.eight2 - 0.4, 0.3, 0.2) });
-      if (m === 'tv') out.push({ p: [SS_K.tv[0], SS_K.tv[1] + 0.62, SS_K.tv[2]], text: 'PICTURE: NOW', sub: 'ITS SOUND: 4.5 s LATE', a: StoryHUD.win(t, ssCap('four', 1).show, SS.clap - 0.2, 0.3, 0.2) });
-      if (m === 'box' || m === 'walkinto') out.push({ p: [SS_K.box[0], SS_K.box[1] + 0.2, SS_K.box[2]], text: 'ITS TUNE', sub: t < SS.boxGo ? 'NOT PLAYING YET' : ssFmtDist(ssDist(ssH(SS.boxGo), ssH(t))) + ' FROM THE BOX', a: StoryHUD.win(t, SS.boxGo - 0.2, SS.wait - 0.2, 0.3, 0.2) });
-      if (m === 'wait') out.push({ p: [SS_K.box[0], SS_K.box[1] + 0.2, SS_K.box[2]], text: 'ITS TUNE', sub: ssFmtDist(ssDist(ssH(SS.boxGo), ssH(t))) + ' FROM THE BOX · YOU: 3.0 m', a: StoryHUD.win(t, SS.wait + 0.3, SS.tuneHere + 3, 0.3, 0.3) });
-      if (m === 'night') out.push({ p: [0.0 + Math.max(0.12, ssHorizon(ssH(t))) * 0.7, 0.05, -7 + Math.max(0.12, ssHorizon(ssH(t))) * 0.7], text: 'YOUR VOICE CAN NEVER GO FURTHER', sub: ssFmtDist(ssHorizon(ssH(t))), a: StoryHUD.win(t, ssCap('midnight', 2).show, SS.last - 0.3, 0.3, 0.2) });
-      if (m === 'neighbour') out.push({ p: [SS_GD.nb[0], 2.2, SS_GD.nb[2]], text: 'NEXT DOOR', sub: '"GOOD MORNING!"', a: StoryHUD.win(t, SS.morning, SS.morning + 3.2, 0.2, 0.3) });
-      if (m === 'cat') out.push({ p: [SS_GD.cat0[0], 0.55, SS_GD.cat0[2]], text: 'HER MEOW', sub: ssFmtDist(ssDist(ssH(SS.meow), ssH(t))) + ' SO FAR', a: StoryHUD.win(t, SS.meow + 0.6, SS.hum - 0.3, 0.3, 0.2) });
-      if (m === 'bird') out.push({ p: [SS_GD.bird[0], SS_GD.bird[1] + 0.16, SS_GD.bird[2]], text: 'BLACKBIRD', sub: '5.5 m · HEARD 0.016 s LATE', a: StoryHUD.win(t, ssCap('bird', 1).show, SS.plane - 0.3, 0.3, 0.2) });
+      const m = lbShotAt(t).mode, out = [], W = StoryHUD.win;
+      const star = (n, mir = true) => sky.at(n, 400, mir);
+      if (m === 'sirius') out.push({ p: star('SIRIUS'), text: 'SIRIUS', sub: 'THE BRIGHTEST STAR', a: W(t, lbCap('sirius', 1).show, LB.mirror - 0.3, 0.3, 0.2) });
+      if (m === 'mirror') out.push({ p: star('ARCTURUS'), text: 'ARCTURUS', sub: 'IT SET AT 7:40 PM, IN THE NORTH-WEST', a: W(t, lbCap('mirror', 1).show + 0.3, LB.replay - 0.3, 0.3, 0.2) });
+      if (m === 'canopus') out.push({ p: star('CANOPUS'), text: 'CANOPUS', sub: 'NEVER SEEN FROM BRITAIN', a: W(t, lbCap('canopus', 0).show + 0.3, LB.north - 0.3, 0.3, 0.2) });
+      if (m === 'north') out.push({ p: lbAim([0, 0, 0], 226, 13, 400), text: 'SOUTH-WEST', sub: 'THE FIRST AIR TO GET THE LIGHT BACK', a: W(t, LB.north + 0.8, LB.switchCut - 0.3, 0.3, 0.2) });
+      if (m === 'midnight' && t > lbCap('midnight', 2).show) out.push({ p: [10.2, 7.9, 1.2], text: 'SOLAR PANELS', sub: 'MIDNIGHT · MAKING POWER', a: W(t, lbCap('midnight', 2).show + 0.2, LB.sunrise - 0.3, 0.3, 0.2) });
+      if (m === 'real' && t < lbCap('real2', 0).show + 2.6) out.push({ p: sky.at('MOON', 400), text: 'MOONLIGHT', sub: '1.3 SECONDS OLD', a: W(t, lbCap('real2', 1).show - 0.6, lbCap('real2', 0).show + 2.5, 0.3, 0.15) });
+      if (m === 'real' && t > lbCap('real2', 0).show + 2.6 && t < LB.real3) {
+        const a = W(t, lbCap('real2', 0).show + 2.9, LB.real3 - 0.2, 0.3, 0.2);
+        out.push({ p: star('VEGA', false), text: 'VEGA', sub: 'LEFT IT 25 YEARS AGO', a });
+        out.push({ p: star('ALTAIR', false), text: 'ALTAIR', sub: '17 YEARS AGO', a });
+        out.push({ p: star('DENEB', false), text: 'DENEB', sub: 'OVER 1,000 YEARS AGO', a });
+      }
+      if (m === 'sunrise' && t < lbCap('sunrise', 2).show - 0.4) {
+        out.push({ p: sky.at('SUN', 400), text: 'THE SUN', sub: 'RISING', a: W(t, LB.sunrise + 0.8, lbCap('sunrise', 2).show - 0.5, 0.3, 0.2) });
+        out.push({ p: sky.at('SUN2', 400), text: 'THE 2ND SUN', sub: 'SETTING', a: W(t, lbCap('sunrise', 1).show + 2.6, lbCap('sunrise', 2).show - 0.5, 0.3, 0.2) });
+      }
       return out;
     },
     grade(t, p, shot) {
-      const m = shot.mode, H = 7 + ssH(t);
-      p.warmth = H < 8 || H > 29 ? 0.08 : H > 16 && H < 18 ? 0.06 : 0.02;
-      if (m === 'storm') { p.exposure = 1.05; p.saturation = 0.8; p.contrast = 1.1; const fl = t - SS.flash; if (fl > 0 && fl < 0.6) { p.flash = 0.45 * Math.exp(-fl * 7) * (Math.sin(fl * 40) > -0.3 ? 1 : 0.4); p.flashColor.setRGB(0.85, 0.9, 1); } }
-      if (H > 20.5 && H < 29) { p.exposure = 1.25; p.saturation = 0.9; p.bloom = 0.5; }
-      if (m === 'box' || m === 'walkinto' || m === 'wait') { p.exposure = 1.05; p.warmth = 0.08; }
-      if (m === 'plane') { p.bloom = 0.2; p.contrast = 1.04; p.exposure = 0.92; }
-      if (m === 'boom' || m === 'carpet') { p.exposure = 0.86; p.bloom = 0.12; p.contrast = 1.06; }
+      const m = shot.mode, day = this._day || 0;
+      p.exposure = lbLerp(1.55, 1.0, MathX.clamp(day, 0, 1)) - 0.08 * MathX.clamp(day - 1, 0, 2);
+      p.bloom = lbLerp(0.42, 0.3, MathX.clamp(day, 0, 1)); p.warmth = day > 0.3 ? 0.01 : -0.02; p.saturation = lbLerp(0.9, 1.04, MathX.clamp(day, 0, 1));
+      if (m === 'crescent' || m === 'moonwhy' || m === 'full') { p.vignette = 0.35; p.bloom = 0.2; p.exposure = day > 0.3 ? 1.0 : 1.2; }
+      if (m === 'past') { p.exposure = 1.0; p.bloom = 0.22; p.vignette = 0.3; p.saturation = 1.1; }
+      if (m === 'replay') { p.exposure = 1.25; p.bloom = 0.6; p.bloomThreshold = 0.6; p.vignette = 0.75; }
+      if (m === 'noon') { p.exposure = 0.94; p.bloom = 0.5; p.saturation = 0.96; p.contrast = 1.02; }
+      if (m === 'sunrise') { p.warmth = 0.03; p.exposure = 0.8; p.saturation = 1.12; }
     },
   };
   return set;
 };
-const SS_GARDEN = {};
+const LB_GARDEN = {};

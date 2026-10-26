@@ -74,7 +74,7 @@ LB.moonFull = lbS('full') + 0.45;                        // ★ 10:08:18: the Mo
 LB.three = lbS('three') - 0.4;
 LB.midnight = lbS('midnight') - 0.6;
 LB.sunrise = lbS('sunrise') - 0.6;
-LB.bothDown = lbCap('sunrise', 1).show + 0.2;            // ★ 6:56 AM: one rises as the other sets
+LB.bothDown = lbCap('sunrise', 1).show + 0.2;            // ★ 6:47 AM: one rises as the other sets
 LB.noon = lbS('noon') - 0.5;
 LB.never = lbS('never') - 0.5;
 // 7 — the planet, the years
@@ -97,10 +97,11 @@ LB.end = LBT.duration;
 // ---------------------------------------------------------------------------------------------------------------------
 // FILM TIME → STORY TIME s. Keys [film t, s], linear between them (slope 1 = real time).
 // ---------------------------------------------------------------------------------------------------------------------
-// 6:56 AM tomorrow: the real Sun rises in the east as the second Sun sets in the west (both centres on the horizon)
+// 6:47 AM tomorrow: the real Sun rises in the east as the second Sun sets in the west (both centres on the horizon;
+// with the air's refraction both are in sight from 6:41:50 to 6:53:15)
 const LB_SUNRISE = (() => {
   let lo = lbAt(6, 0), hi = lbAt(8, 0);
-  for (let i = 0; i < 50; i++) { const m = (lo + hi) / 2; if (lbAltAz(lbSunDir(m), lbFrame(m)).alt > -0.833 + 0.0) hi = m; else lo = m; }
+  for (let i = 0; i < 50; i++) { const m = (lo + hi) / 2; if (lbAltAz(lbSunDir(m), lbFrame(m)).alt > 0) hi = m; else lo = m; }
   return { s: hi };
 })();
 const LB_SKEYS = [];
@@ -114,12 +115,13 @@ const LB_SKEYS = [];
   K.push([LB.ret - 0.4, sRet]);
   real(LB.ret - 0.4 + 1e-3, LB.full, LB.back, LBP.tSun);
   real(LB.full, LB.three + 2.5, LB.moonFull, LB_MOON.dayBack);         // home: 10:08:18 on the Moon's return
-  // (the night: a time-lapse to midnight, slow over it; to 6:56 AM, slow over it; to noon; then the days)
-  K.push([LB.midnight + 1.2, lbAt(0, 0, 0)], [LB.sunrise - 0.3, lbAt(0, 0, 0) + 30 * (LB.sunrise - 0.3 - LB.midnight - 1.2)]);
-  const sRise = LB_SUNRISE.s;
-  K.push([LB.sunrise + 0.4, sRise - 20 * (LB.bothDown - LB.sunrise - 0.4)], [LB.noon - 0.6, sRise + 20 * (LB.noon - 0.6 - LB.bothDown)]);
-  K.push([LB.noon + 0.3, lbAt(12, 0, 0)], [LB.never + 0.8, lbAt(12, 0, 0) + 40 * (LB.never + 0.8 - LB.noon - 0.3)]);
-  K.push([LB.space - 0.2, lbAt(12, 0, 0) + 86400 * 3]);
+  // (the night: a time-lapse to midnight, slow over it; to 6:47 AM, slow over it; to noon; then the days)
+  // (each lapse speed holds for a whole shot, so no shot opens with a jump)
+  const mid = lbAt(0, 0, 0), sRise = LB_SUNRISE.s, noon = lbAt(12, 0, 0);
+  K.push([LB.midnight, mid - 30 * 1.2], [LB.sunrise - 1e-3, mid + 30 * (LB.sunrise - LB.midnight - 1.2)]);
+  K.push([LB.sunrise, sRise - 20 * (LB.bothDown - LB.sunrise)], [LB.noon - 1e-3, sRise + 20 * (LB.noon - LB.bothDown)]);
+  real(LB.noon, LB.never, lbCap('noon', 0).show, noon);               // noon tomorrow, real time
+  K.push([LB.space - 0.2, noon + 86400 * 3]);                         // three days in a few seconds
   real(LB.space - 0.2 + 1e-3, LB.end + 2, LB.space - 0.2 + 1e-3, lbAt(12, 0, 0) + 86400 * 3);
   for (let i = 1; i < K.length; i++) if (K[i][0] <= K[i - 1][0]) K[i][0] = K[i - 1][0] + 1e-3;
 }
