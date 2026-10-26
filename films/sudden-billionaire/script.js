@@ -105,7 +105,8 @@ SB.pledge = sbS('pledge') - 0.45;
 // 9 — is any of this real; the counter-evidence; Feeney
 SB.real = sbS('real') - 0.7;
 SB.letters = sbS('letters') - 0.6;
-SB.video = sbS('video') - 0.45;
+SB.scott = sbS('scott') - 0.6;
+SB.scottGive = sbCap('scott', 2).show - 0.2;               // her gifts light the wall
 SB.feeney = sbS('feeney') - 0.6;
 // 10 — the crossing again; the question
 SB.point = sbS('point') - 0.7;

@@ -34,7 +34,9 @@ Object.assign(ACTIONS, {
   // a thank-you: the left hand up, a small wave
   sbThanks(τ, c) { const p = ACTIONS.sbUmbrella(τ, c), k = Math.min(1, τ / 0.4); p.lSh = [1.3 * k + 0.05, 0.35 * k]; p.lEl = 1.0 + 0.15 * Math.sin(τ * 7) * k; p.headYaw = 0; return p; },
   // seated, laughing (shoulders shake, head back a little)
-  sbLaugh(τ, c) { const p = ACTIONS.sit(τ, c), s = Math.sin(τ * 15 + c.seed * 9), k = 0.6 + 0.4 * Math.sin(τ * 1.7 + c.seed * 4); p.spine = -0.08 + 0.05 * s * k; p.neck = -0.22 * k; p.lSh = [0.45 + 0.05 * s, 0.12]; p.rSh = [0.55 + 0.05 * s, 0.12]; p.headYaw = 0.1 * Math.sin(c.seed * 20); return p; },
+  // (a big laugh: the head thrown back, the shoulders shaking, a hand slapping the table, now and then doubling forward)
+  sbLaugh(τ, c) { const p = ACTIONS.sit(τ, c), s = Math.sin(τ * 13 + c.seed * 9), k = 0.65 + 0.35 * Math.sin(τ * 1.9 + c.seed * 4), fwd = Math.max(0, Math.sin(τ * 2.3 + c.seed * 7)) ** 3, slap = Math.abs(Math.sin(τ * 4.2 + c.seed * 3));
+    p.spine = -0.14 + 0.1 * s * k + 0.42 * fwd; p.neck = -0.5 * k * (1 - fwd) + 0.2 * fwd; p.lSh = [0.5 + 0.12 * s, 0.14]; p.rSh = [0.55 + 0.5 * slap, 0.1]; p.lEl = 1.2; p.rEl = 0.5 + 0.5 * slap; p.headYaw = 0.15 * Math.sin(c.seed * 20); return p; },
   // seated, turned to you, attentive (a slow nod)
   sbListen(τ, c) { const p = ACTIONS.sit(τ, c); p.neck = 0.12 + 0.06 * Math.sin(τ * 1.3 + c.seed * 5); p.headYaw = 0; p.lSh = [0.6, 0.08]; p.rSh = [0.62, 0.08]; p.lEl = 1.3; p.rEl = 1.3; p.spine = 0.05; return p; },
   // seated at a table, hands on it, looking down at it (or at you)

@@ -257,6 +257,8 @@ SB_SETS.flat = (app) => {
   const ucL = new THREE.PointLight('#ffd6a0', 0, 2.2, 2); ucL.position.set(0.85, 1.48, Z - 0.3); scene.add(ucL);
   // the street's light from below the window, up onto the ceiling (night)
   const winL = new THREE.SpotLight('#9fb4dc', 0, 9, 0.5, 0.7, 1.2); winL.position.set(0.35, -0.6, -4.2); winL.target.position.set(0.55, H, 0.6); winL.castShadow = true; winL.shadow.mapSize.set(1024, 1024); winL.shadow.bias = -0.001; scene.add(winL, winL.target);
+  // the moon through the window, onto the bed (the dark: the window frame's shadow across the duvet)
+  const moonL = new THREE.SpotLight('#9cb2e0', 0, 9, 0.55, 0.6, 1.2); moonL.position.set(0.2, 2.6, -3.4); moonL.target.position.set(1.15, 0.45, -0.3); moonL.castShadow = true; moonL.shadow.mapSize.set(1024, 1024); moonL.shadow.bias = -0.001; scene.add(moonL, moonL.target);
   const FX = SB_FL.fridge[0], FZ = SB_FL.fridge[1], FH = 1.62;
   B(0.6, FH, Z - FZ, sbStd('#eeece6', 0.35, 0.1), FX, FH / 2, (FZ + Z) / 2);
   B(0.012, 0.32, 0.03, steelM, FX + 0.24, 1.15, FZ - 0.02); B(0.58, 0.004, 0.004, sbStd('#bdb8ac', 0.6), FX, 1.05, FZ - 0.001);
@@ -273,8 +275,10 @@ SB_SETS.flat = (app) => {
   const noteFridge = sbMesh(new THREE.PlaneGeometry(0.076, 0.076), noteM, FX + 0.06, 1.38, FZ - 0.004); noteFridge.rotation.set(0, Math.PI, -0.04); noteFridge.castShadow = false;
 
   // ---- the door (peephole, chain, hooks, a jacket); the corridor outside
-  const doorM = sbStd('#cfcbc2', 0.5, 0), brassM = sbStd('#b79358', 0.3, 0.9);
+  const doorM = sbStd('#2f4652', 0.55, 0), brassM = sbStd('#b79358', 0.3, 0.9), panelM = sbStd('#38525f', 0.5, 0);
   const door = B(DX1 - DX0 - 0.02, DH - 0.01, 0.045, doorM, (DX0 + DX1) / 2, DH / 2, Z + 0.02);
+  for (const [y, h] of [[0.55, 0.75], [1.48, 0.78]]) B(DX1 - DX0 - 0.24, h, 0.02, panelM, (DX0 + DX1) / 2, y, Z - 0.01);
+  for (const [w, h, x, y] of [[0.06, DH + 0.06, DX0 - 0.03, DH / 2], [0.06, DH + 0.06, DX1 + 0.03, DH / 2], [DX1 - DX0 + 0.12, 0.06, (DX0 + DX1) / 2, DH + 0.03]]) B(w, h, 0.03, whiteM, x, y, Z - 0.01);
   sbMesh(new THREE.CylinderGeometry(0.009, 0.009, 0.06, 14).rotateX(Math.PI / 2), brassM, SB_FL.door, 1.55, Z + 0.02);
   sbMesh(new THREE.SphereGeometry(0.03, 14, 10), brassM, DX1 - 0.09, 1.0, Z - 0.02);
   for (let i = 0; i < 7; i++) sbMesh(new THREE.TorusGeometry(0.008, 0.002, 4, 8), steelM, DX1 - 0.12 - i * 0.016, 1.42 - Math.sin(i / 6 * Math.PI) * 0.05, Z - 0.01);
@@ -296,9 +300,24 @@ SB_SETS.flat = (app) => {
   const peepGlow = new THREE.Mesh(new THREE.RingGeometry(0.078, 0.096, 72), new THREE.MeshBasicMaterial({ color: '#000', depthTest: false, depthWrite: false, transparent: true, opacity: 0.55 }));
   peepGlow.position.z = -0.1; peepGlow.renderOrder = 998; peepGlow.visible = false; cam.add(peepGlow);
 
-  // ---- the cash, rising (the top of the pile: life-size bundles)
-  const cashTex = sbTex(cashCanvas); cashTex.repeat.set(2 * X / 0.78, 2 * Z / 0.66);
-  const cash = sbMesh(new THREE.PlaneGeometry(2 * X - 0.004, 2 * Z - 0.004).rotateX(-Math.PI / 2), sbStd('#ffffff', 0.85, 0, { map: cashTex }), 0, 0, 0); cash.visible = false; cash.castShadow = false;
+  // ---- the cash, rising: its top is life-size $10,000 bundles (one instanced mesh, each a little askew, a loose layer
+  //      tumbled on top), over a solid fill of the same texture just below them
+  const cash = new THREE.Group(); cash.visible = false; scene.add(cash);
+  { const side = sbStd('#e2e2d4', 0.9, 0), band = sbStd('#ffffff', 0.8, 0, { map: bundleTex }), cols = 21, rows = 39, loose = 260;
+    const bG = new THREE.BoxGeometry(0.156, 0.011, 0.066), im = new THREE.InstancedMesh(bG, [side, side, band, side, side, side], cols * rows + loose), o = new THREE.Object3D();
+    let n = 0;
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+      const h = i * 31 + j * 7;
+      o.position.set(-X + 0.08 + i * (2 * X - 0.16) / (cols - 1) + (sbR(h, 1) - 0.5) * 0.03, -0.006 + 0.008 * sbR(h, 2), -Z + 0.035 + j * (2 * Z - 0.07) / (rows - 1) + (sbR(h, 3) - 0.5) * 0.012);
+      o.rotation.set((sbR(h, 4) - 0.5) * 0.12, (sbR(h, 5) - 0.5) * 0.3, (sbR(h, 6) - 0.5) * 0.12); o.updateMatrix(); im.setMatrixAt(n++, o.matrix);
+    }
+    for (let k = 0; k < loose; k++) {
+      o.position.set((sbR(k, 11) - 0.5) * (2 * X - 0.2), 0.008 + 0.012 * sbR(k, 12), (sbR(k, 13) - 0.5) * (2 * Z - 0.12));
+      o.rotation.set((sbR(k, 14) - 0.5) * 0.5, sbR(k, 15) * Math.PI, (sbR(k, 16) - 0.5) * 0.5); o.updateMatrix(); im.setMatrixAt(n++, o.matrix);
+    }
+    im.castShadow = false; im.receiveShadow = true; cash.add(im);
+    const cashTex = sbTex(cashCanvas); cashTex.repeat.set(2 * X / 0.78, 2 * Z / 0.66);
+    const fill = sbMesh(new THREE.PlaneGeometry(2 * X - 0.004, 2 * Z - 0.004).rotateX(-Math.PI / 2), sbStd('#c8c8b8', 0.9, 0, { map: cashTex }), 0, -0.012, 0, cash); fill.castShadow = false; }
 
   // ---- Feeney's table: a $10 watch, reading glasses, a folded paper
   const watch = new THREE.Group(); watch.position.set(SB_FL.table[0] + 0.05, 0.75, SB_FL.table[2] + 0.06); watch.rotation.y = -0.4; G.feeney.add(watch);
@@ -313,7 +332,7 @@ SB_SETS.flat = (app) => {
   const hs = {
     right: [[-1, 'hidden'], [SB.rent - 0.7, 'phone'], [SB.draw + 0.1, 'hidden'], [SB.ticket, 'ticket'], [SB.won + 2.2, 'sbTicketShake'], [SB.scale, 'hidden'],
       [SB.write - 0.5, 'pen'], [SB.stick - 0.9, 'hidden'], [SB.stick - 0.25, 'press'], [SB.stick + 1.5, 'hidden'], [SB.mum, 'phone'], [sbCap('mum', 2).show - 0.2, 'phoneLow'], [SB.dunn, 'phone'],
-      [SB.out + 0.3, 'sbPhoneBuzz'], [SB.who, 'phone'], [SB.trust + 0.9, 'phoneLow'], [SB.knock + 0.1, 'hidden']],
+      [SB.out + 0.3, 'sbPhoneBuzz'], [SB.who, 'phoneLow'], [sbCap('who', 1).show - 0.4, 'phone'], [SB.trust + 0.9, 'phoneLow'], [SB.knock + 0.1, 'hidden']],
     left: [[-1, 'hidden']],
   };
   const hands = sbHands(cam, hs, { sleeve: '#3a4250', cuff: '#2c333e' });
@@ -335,11 +354,11 @@ SB_SETS.flat = (app) => {
     cityTex.update({ day });
     scene.background = new THREE.Color(day ? '#c8d6e6' : '#05070d');
     scene.environment = day ? envD : envN;
-    hemi.color.set(day ? '#dfe8f2' : '#58606e'); hemi.groundColor.set(day ? '#a08a70' : '#2a2420'); hemi.intensity = day ? 0.75 : key === 'dark' ? 0.05 : 0.12;
+    hemi.color.set(day ? '#dfe8f2' : key === 'dark' ? '#6a78a0' : '#58606e'); hemi.groundColor.set(day ? '#a08a70' : '#2a2420'); hemi.intensity = day ? 0.75 : key === 'dark' ? 0.16 : 0.12;
     sun.intensity = day ? (key === 'feeney' ? 3.4 : 3.0) : 0; sun.castShadow = day;
     lampL.intensity = key === 'night' ? 2.2 : 0; lampM.emissiveIntensity = key === 'night' ? 0.22 : 0;
     ucL.intensity = key === 'night' ? 1.4 : 0;
-    phoneL.intensity = 0; winL.intensity = key === 'night' ? 9 : key === 'dark' ? 6 : 0;
+    phoneL.intensity = key === 'dark' ? 1.1 : 0; winL.intensity = key === 'night' ? 9 : key === 'dark' ? 10 : 0; moonL.intensity = key === 'dark' ? 26 : 0;
     G.clutter.visible = key !== 'feeney'; G.tv.visible = key !== 'feeney'; G.feeney.visible = key === 'feeney';
     duvet.visible = key !== 'feeney'; pillow.visible = true; letter.visible = key !== 'feeney' && key !== 'day';
   };
@@ -363,7 +382,7 @@ SB_SETS.flat = (app) => {
       if (m === 'balls' || (m === 'won' && t < SB.won + 0.9)) { const n = balls(t), nb = SB.ball[n]; tvS = { mode: 'draw', f, n, roll: nb ? MathX.clamp(1 - (nb - t) / 0.7, 0, 1) : 0 }; }
       if (m === 'won' && t >= SB.won + 0.9) tvS = { mode: 'won', f, n: 6 };
       if (m === 'scale' || m === 'promise') tvS = { mode: 'won', f, n: 6 };
-      if (key === 'day') tvS = { mode: 'news', f, head: m === 'mum' ? 'ONE TICKET WINS $3.4 BILLION JACKPOT' : 'JACKPOT WINNER NAMED', tick: m === 'mum' ? 'THE WINNING TICKET WAS SOLD AT A CORNER SHOP  ·  THE WINNER HAS NOT COME FORWARD  ·  ' : 'THE $3.4 BILLION WINNER IS A LOCAL RESIDENT  ·  HUNDREDS GATHER OUTSIDE  ·  "WE JUST WANT TO SAY CONGRATULATIONS"  ·  ' };
+      if (key === 'day') tvS = { mode: 'news', f, head: m === 'mum' ? 'ONE TICKET WINS $3.4 BILLION JACKPOT' : 'JACKPOT WINNER NAMED', tick: m === 'mum' ? 'THE WINNING TICKET WAS SOLD AT A CORNER SHOP  ·  THE WINNER HAS NOT COME FORWARD  ·  ' : 'THE $3.4 BILLION WINNER LIVES IN A RENTED FLAT  ·  HUNDREDS GATHER OUTSIDE  ·  "WE JUST WANT TO SAY CONGRATULATIONS"  ·  ' };
       if (key === 'dark') tvS = { mode: 'off' };
       if (tvS.mode === 'off') { tv.userData.scr.material.color.set('#050505'); } else { tv.userData.scr.material.color.set('#ffffff'); if (G.tv.visible) tvTex.update(tvS); }
       const tvFlicker = 0.75 + 0.25 * noise1(t * 3.1, 11);
@@ -401,7 +420,9 @@ SB_SETS.flat = (app) => {
       } else if (m === 'balls') {
         // you lean in to the TV
         const k = K(t, SB.balls, SB.ball[2]);
-        pos = sbV([0.8, 1.06, -0.24], [0.15, 1.0, -0.28], k); at = [TV[0], TV[1] - 0.02, TV[2]]; fov = 46; drift = 0.004 + 0.01 * K(t, SB.ball[4], SB.ball[5]);
+        pos = sbV([0.8, 1.06, -0.24], [0.15, 1.0, -0.28], k); at = [TV[0], TV[1] - 0.02, TV[2] - 0.26]; fov = 46; drift = 0.004 + 0.01 * K(t, SB.ball[4], SB.ball[5]);
+        // (the last ball: a snap in on the screen, a jolt, as if you'd flinched)
+        if (t >= SB.ball[5]) { const u = t - SB.ball[5]; fov = 46 - 9 * MathX.smooth(u, 0, 0.18); const j = 0.02 * Math.exp(-u * 6) * Math.sin(u * 48); pos = [pos[0], pos[1] + j, pos[2] + 0.04 * MathX.smooth(u, 0, 0.2)]; }
         show = 'ticket';
       } else if (m === 'won') {
         // you stand up; the ticket shakes
@@ -411,8 +432,8 @@ SB_SETS.flat = (app) => {
       } else if (m === 'scale') {
         // the bundle on the table, then the room filling up
         const k1 = K(t, SB.cashUp - 1.2, SB.cashUp + 0.4), k2 = K(t, SB.cashUp + 0.4, SB.cashTop + 2.0);
-        pos = sbV([0.55, 1.62, 0.55], [0.9, 1.64, 0.85], k2); at = sbV([SB_FL.table[0] + 0.02, 0.76, SB_FL.table[2] + 0.02], sbV([-0.6, 0.95, -0.6], [-0.9, 1.1, -0.9], k2), k1);
-        fov = sbLerp(44, 64, k1);
+        pos = sbV([0.55, 1.62, 0.55], [0.9, 1.64, 0.85], k2); at = sbV([SB_FL.table[0] + 0.02, 0.76, SB_FL.table[2] + 0.02], sbV([-0.55, 0.95, -0.75], [-0.6, 1.0, -1.15], k2), k1);
+        fov = sbLerp(44, sbLerp(64, 58, k2), k1);
       } else if (m === 'promise') {
         if (t < SB.stick - 0.35) {
           // the fridge's clutter, then down to the pad; the pen writes
@@ -425,8 +446,16 @@ SB_SETS.flat = (app) => {
         }
       } else if (m === 'mum' || m === 'out' || m === 'who') {
         // on the bed by day, the phone in your hand (for "it feels incredible": the window)
+        // (day three: a slow push in on the phone as the messages pour in, a jolt at each jump; then the news on the TV,
+        //  your name on it, and back down to the phone)
         const kw = m === 'mum' ? K(t, sbCap('mum', 2).show - 0.3, sbCap('mum', 2).show + 0.9) : 0;
-        at = sbV([0.1, 0.78, -0.8], [0.35, 1.45, -1.3], kw); fov = m === 'who' ? sbLerp(50, 44, K(t, SB.who, SB.trust)) : 50;
+        at = sbV([0.1, 0.78, -0.8], [0.35, 1.45, -1.3], kw); fov = 50;
+        if (m === 'out') {
+          fov = sbLerp(50, 33, K(t, SB.out, SB.who, Ease.inOutSine));
+          let j = 0; for (let i = 1; i <= 3; i++) { const t0 = sbCap('out', i).show - 0.1; if (t >= t0) j += 0.012 * Math.exp(-(t - t0) * 7) * Math.sin((t - t0) * 55); }
+          pos = [SEAT[0] + j * 0.4, SEAT[1] + j, SEAT[2]];
+        }
+        if (m === 'who') { const kt = K(t, SB.who, SB.who + 0.6) * (1 - K(t, sbCap('who', 0).hide - 0.2, sbCap('who', 1).show + 0.3)); at = sbV(at, [TV[0], TV[1] + 0.02, TV[2]], kt); fov = sbLerp(sbLerp(46, 44, K(t, sbCap('who', 1).show, SB.trust)), 40, kt); }
         show = 'phone';
       } else if (m === 'trust') {
         if (t < SB.knock + 2.05) {
@@ -439,11 +468,13 @@ SB_SETS.flat = (app) => {
           pos = [SB_FL.door, 1.55, Z + 0.06]; at = [SB_FL.door + 0.05, 1.42, Z + 1.0]; fov = 100; drift = 0.002;
         }
       } else if (m === 'interest') {
-        // on your back in the dark; then your head turns to the phone on its stand
-        const k = K(t, sbCap('interest', 1).show - 0.6, sbCap('interest', 1).show + 0.6);
-        pos = [X - 0.5, 0.74, -Z + 0.42]; at = sbV([X - 0.6, H, -Z + 1.3], [SB_FL.stand[0], SB_FL.stand[1] + 0.05, SB_FL.stand[2]], k); fov = sbLerp(60, 34, k); roll = sbLerp(0, 14, k); drift = 0.003;
+        // in bed in the dark, the moonlit window; then down to the phone on its stand, lit, the interest ticking; closer
+        const k = K(t, sbCap('interest', 0).show + 1.2, sbCap('interest', 1).show + 0.3), k2 = K(t, sbCap('interest', 2).show - 0.5, SB.house + 0.3);
+        pos = sbV([X - 0.5, 0.76, -Z + 0.42], [X - 0.62, 0.74, -Z + 0.36], k); at = sbV([X - 0.75, H, -Z + 1.25], [SB_FL.stand[0], SB_FL.stand[1] + 0.07, SB_FL.stand[2]], k);
+        fov = sbLerp(sbLerp(64, 30, k), 21, k2); roll = sbLerp(-6, 9, k); drift = 0.003;
+        phoneL.intensity = 0.5 + 1.6 * K(t, sbCap('interest', 0).show + 0.6, sbCap('interest', 0).show + 1.2);
       } else if (m === 'feeney') {
-        const k = K(t, SB.feeney, sbCap('feeney', 2).show), k2 = K(t, sbCap('feeney', 2).show + 0.5, SB.point);
+        const k = K(t, SB.feeney, sbCap('feeney', 1).show), k2 = K(t, sbCap('feeney', 1).show + 0.5, SB.point);
         pos = sbV(sbV([0.35, 1.5, 0.25], [0.0, 1.2, -0.42], k), [0.45, 1.6, 0.6], k2); at = sbV([SB_FL.table[0] + 0.05, 0.75, SB_FL.table[2] + 0.06], [-0.2, 1.0, -1.0], k2); fov = sbLerp(sbLerp(46, 36, k), 60, k2);
       }
       look(pos, at, fov, roll, drift, 0.3, t);
@@ -468,6 +499,7 @@ SB_SETS.flat = (app) => {
       else if (m === 'interest') { p.exposure = 1.25; p.warmth = -0.05; p.saturation = 0.85; p.vignette = 0.7; p.bloom = 0.5; p.bloomThreshold = 0.7; }
       else { p.exposure = 1.18; p.warmth = 0.02; p.bloom = 0.45; p.bloomThreshold = 0.8; p.vignette = 0.6; }
       if (m === 'won') p.flash = Math.max(p.flash, 0.18 * Math.exp(-Math.pow((t - SB.billion) * 3, 2)));
+      if (m === 'balls' && t >= SB.ball[5]) { p.flash = Math.max(p.flash, 0.3 * Math.exp(-(t - SB.ball[5]) * 5)); p.flashColor.setRGB(1, 0.92, 0.75); }
       if (m === 'trust' && t >= SB.knock + 2.05) { p.vignette = 0.9; p.saturation = 0.85; p.edgeBlur = 0.6; }
     },
     labels(t) {
@@ -478,7 +510,7 @@ SB_SETS.flat = (app) => {
       }
       if (m === 'promise') out.push({ p: [FX + 0.06, 1.45, FZ], text: 'YOUR PROMISE', a: W(t, SB.stick + 1.5, SB.mum, 0.4, 0.2) });
       if (m === 'trust') out.push({ p: [SB_FL.door + 0.08, 1.95, Z + 0.95], text: 'HE SAYS HE\'S AN OLD FRIEND', a: W(t, SB.knock + 2.4, SB.interest, 0.4, 0.2) });
-      if (m === 'feeney') out.push({ p: [SB_FL.table[0] + 0.05, 0.8, SB_FL.table[2] + 0.06], text: 'A $10 WATCH', a: W(t, sbCap('feeney', 2).show + 1.0, SB.point - 0.4, 0.4, 0.3) });
+      if (m === 'feeney') out.push({ p: [SB_FL.table[0] + 0.05, 0.8, SB_FL.table[2] + 0.06], text: 'A CHEAP WATCH', sub: 'ABOUT $10 TO $15', a: W(t, sbCap('feeney', 1).show + 1.0, SB.point - 0.4, 0.4, 0.3) });
       return out;
     },
   };

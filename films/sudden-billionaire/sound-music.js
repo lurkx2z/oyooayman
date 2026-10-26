@@ -313,18 +313,23 @@ sbSound('music', 'score', function (ctx, bus, K) {
     sbPulse(ctx, M.bus, cap('pledge', 1), p1 - 0.3, ['D2', 'A2'], 0.5, 0.5, { cut: 250, cutTo: 600, acc: 2 });
     for (const k of [1, 2, 3, 4]) M.drum(cap('pledge', k) + 0.05, 0.35 + 0.06 * k, 41.2, 1.4);
   }
-  // ---- 9 · is any of this real: light. The letters, the video: hopeful plucks. Chuck Feeney: plain piano
+  // ---- 9 · is any of this real: light. The letters: hopeful plucks. MacKenzie Scott: a quiet hall, then the wall lights
+  //      and the music opens out with it (an arpeggio that quickens, a bell for the last envelopes). Chuck Feeney: plain piano
   {
     M.prog([[SB.real + 0.3, C.Fadd9], [cap('real', 1), C.Csus], [cap('real', 2), C.Dm7]], SB.letters + 0.4, 0.22, { cut: 1100 });
-    const t0 = SB.letters + 0.2, t1 = SB.video + 0.3;
+    const t0 = SB.letters + 0.2, t1 = SB.scott + 0.3;
     M.prog([[t0, C.F], [cap('letters', 1), C.CE], [cap('letters', 2), C.Dm7], [cap('letters', 3), C.Bbmaj7]], t1, 0.26, { cut: 1500 });
     pluck(t0 + 0.4, t1 - 0.3, ['F4', 'C5', 'A4', 'C5', 'G4', 'C5', 'A4', 'F5'], 0.3, 0.06, { acc: 4 });
-    M.prog([[SB.video + 0.2, C.Fmaj7], [cap('video', 1), C.Bbmaj7], [cap('video', 1) + 2.0, C.Csus]], SB.feeney + 0.5, 0.3, { cut: 1600 });
-    arp(cap('video', 1), SB.feeney - 0.2, C.Fmaj7, 0.3, 0.07, { oct: 1 });
+    M.prog([[SB.scott + 0.2, C.Dm7], [cap('scott', 1), C.Bbmaj7], [SB.scottGive, C.Fmaj7], [SB.scottGive + 2.2, C.Csus]], SB.feeney + 0.5, 0.22, { cut: 1600 });
+    M.strings(SB.scottGive, SB.feeney + 0.6, ['F3', 'C4', 'A4', 'C5'], 0.16, { att: 2.6, rel: 0.8, cut: 1200, cutTo: 3200, cutAt: SB.scottGive + 3.6 });   // (opening out)
+    M.piano(cap('scott', 0) + 0.3, 'A3', 0.12, 2.4, 0); M.piano(cap('scott', 1) + 0.4, 'D4', 0.12, 2.4, 0);
+    // (the quickening: each step a little shorter as the envelopes light)
+    for (let t = SB.scottGive, i = 0; t < SB.feeney - 0.15; i++) { const u = sbScottK(t), n = sbOct(C.Fmaj7[[0, 2, 3, 4, 2, 3][i % 6] % 5], 2); M.piano(t, n, 0.05 + 0.06 * u, 0.5, Math.sin(i * 1.3) * 0.4, 0.25); t += 0.3 - 0.17 * u; }
+    M.bell(SB.scottGive + 3.6, 'C6', 0.2, 0.1); M.bell(SB.scottGive + 3.9, 'F6', 0.16, -0.1);
     // Feeney: the promise's shape, low and plain, under his story
     M.strings(SB.feeney + 0.2, SB.point + 0.6, C.FA, 0.2, { att: 1.5, rel: 1.0, cut: 900 });
-    for (const [t, n, v] of [[cap('feeney', 0) + 0.4, 'C4', 0.16], [cap('feeney', 0) + 1.0, 'A3', 0.13], [cap('feeney', 1) + 0.3, 'C4', 0.14], [cap('feeney', 1) + 0.9, 'D4', 0.16],
-      [cap('feeney', 2) + 0.6, 'C4', 0.13], [cap('feeney', 2) + 1.2, 'A3', 0.12], [cap('feeney', 2) + 2.4, 'F3', 0.15]]) M.piano(t, n, v, 2.0, -0.1);
+    for (const [t, n, v] of [[cap('feeney', 0) + 0.4, 'C4', 0.16], [cap('feeney', 0) + 1.0, 'A3', 0.13], [cap('feeney', 0) + 2.2, 'C4', 0.14], [cap('feeney', 0) + 2.8, 'D4', 0.16],
+      [cap('feeney', 1) + 0.6, 'C4', 0.13], [cap('feeney', 1) + 1.2, 'A3', 0.12], [cap('feeney', 1) + 2.4, 'F3', 0.15]]) M.piano(t, n, v, 2.0, -0.1);
   }
   // ---- 10 · the crossing again: strings gathering; you stop; she crosses; the promise, to its last note
   {

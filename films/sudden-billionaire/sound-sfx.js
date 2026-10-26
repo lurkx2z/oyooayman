@@ -210,12 +210,12 @@ sbSound('sfx', 'events', function (ctx, bus, K) {
   }
   // ================= years five to nine: each day and night a soft rush; the note in its box
   {
-    for (let t = SB.years + 0.2; t < SB.note - 0.4; t += 0.85) { const x = sbNoise(fx, Math.round(0.6 * sr), 'pink'); for (let i = 0; i < x.length; i++) x[i] *= Math.sin(Math.PI * i / x.length); sbSweepPut(K, x, t, 'bandpass', 1.2, [300, 900, 2400, 700], { vol: 0.012 * sbEv(t, SB.years, SB.years + 2) }); }
+    for (let t = SB.years + 0.2; t < SB.note - 0.4; t += SB_HO.lapse) { const x = sbNoise(fx, Math.round(0.6 * sr), 'pink'); for (let i = 0; i < x.length; i++) x[i] *= Math.sin(Math.PI * i / x.length); sbSweepPut(K, x, t, 'bandpass', 1.2, [300, 900, 2400, 700], { vol: 0.012 * sbEv(t, SB.years, SB.years + 2) }); }
     put(fx.rustle(0.8, { density: 140, rub: 0.6, lo: 250, hi: 2600, grain: 0.025 }), SB.note + 0.6, 0.035, { room: hall, wet: 0.4 });     // the box's flaps
     put(fx.slap(fx.woodModes(120, 0.8), { width: 0.006, skin: 0.1 }), SB.note + 1.4, 0.025, { room: hall, wet: 0.4 });
     put(paper(0.7, { density: 200, rub: 0.4 }), SB.note + 1.9, 0.025, { room: hall, wet: 0.3 });                   // the note unfolded
   }
-  // ================= is any of this real: the stamps; the letters; the video; the papers
+  // ================= is any of this real: the stamps; the letters; MacKenzie Scott's wall
   {
     const s0 = cap('real', 2) + 0.25;
     for (let k = 0; k < 6; k++) { const t = s0 + 0.42 * k; put(fx.slap(fx.woodModes(170, 0.9), { width: 0.005, skin: 0.25 }), t, 0.045, { room, wet: 0.3 }); }
@@ -227,12 +227,9 @@ sbSound('sfx', 'events', function (ctx, bus, K) {
     put(fx.creak(0.8, [[150, 0.03, 1], [310, 0.02, 0.6]], { rate: [10, 26] }), tOut, 0.018, { pan: 0.1, room: out, wet: 0.5 });
     steps(tOut + 0.6, tOut + 4.8, 0.55, (t, i) => put(fx.step({ weight: 0.35, s: 1.2 }), t, 0.016, { pan: 0.1 * Math.sin(i), room: out, wet: 0.4 }));
     put(paper(0.3), tOut + 5.0, 0.012, { room: out, wet: 0.4 }); put(fx.hit(fx.metalModes(600, 0.8), { width: 0.0008 }), tOut + 5.3, 0.018, { room: out, wet: 0.5 });
-    // the video on the laptop: a soft piano and a child's voice you can't make out, very small
-    { const y = tvf(voice('every night, she goes to bed hungry', 230, { fs: 1.2, rate: 0.95, breathy: 0.4 })); SBX.bq(y, 'lp', 3000, 0.7, sr); put(y, SB.video + 1.4, 0.016, { pan: -0.2, room, wet: 0.4 }); }
-    const tDrop = cap('video', 1) + 0.6;
-    put(fx.rustle(0.6, { density: 500, rub: 0.5, lo: 700, hi: 6500, grain: 0.006, env: (u) => Math.exp(-u * 3) }), tDrop + 0.15, 0.04, { pan: 0.3, room, wet: 0.3 });
-    put(fx.slap(fx.woodModes(130, 0.6), { width: 0.006, skin: 0.4 }), tDrop + 0.32, 0.03, { pan: 0.3, room, wet: 0.3 });
-    put(paper(1.6, { density: 160 }), tDrop + 0.9, 0.022, { pan: 0.2, room, wet: 0.3 });
+    // MacKenzie Scott's wall: a big quiet hall; as the envelopes light, a soft patter of paper ticks that thickens
+    { const tk = (t, v, pan) => put(fx.hit(fx.saucerModes(1.6), { width: 0.0003 }), t, v, { pan, room: hall, wet: 0.55, hp: 1500 });
+      for (let t = SB.scottGive + 0.05, i = 0; t < SB.feeney - 0.2; i++) { const u = sbScottK(t); tk(t, 0.004 + 0.008 * u, Math.sin(i * 2.3) * 0.7); t += 0.16 - 0.13 * u + 0.03 * sbR(i, 3); } }
   }
   // ================= the crossing again: you brake; she crosses in your headlights; you lift a hand
   {

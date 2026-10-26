@@ -25,11 +25,11 @@ const PAUSE = [
   1.4, 1.0,                                // 28–29 the yacht, the wall
   1.6, 0.9, 0.6, 1.2, 0.8,                 // 30–34 downtown, the glasses, the crossing
   1.6, 1.2, 1.2,                           // 35–37 years, the note, the pledge
-  1.8, 1.0, 1.0, 1.2, 1.0,                 // 38–42 is any of this real, letters, the video, Feeney, the point
+  1.8, 1.0, 1.1, 1.0, 1.0,                 // 38–42 is any of this real, letters, MacKenzie Scott, Feeney, the point
   2.4, 1.4,                                // 43–44 the same crossing, the question
 ];
 // extra empty screen before one caption inside a beat: 'beat:index' → s
-const EXTRA = { 'balls:1': 1.0, 'balls:2': 1.2, 'won:1': 0.5, 'scale:1': 0.6, 'scale:2': 1.6, 'promise:2': 0.6, 'out:1': 0.4, 'out:2': 0.2, 'out:3': 0.2,
+const EXTRA = { 'balls:1': 0.6, 'balls:2': 0.9, 'won:1': 0.5, 'scale:1': 0.6, 'scale:2': 1.6, 'promise:2': 0.6, 'out:1': 0.4, 'out:2': 0.2, 'out:3': 0.2,
   'interest:2': 0.5, 'house:2': 0.8, 'cookie2:1': 0.4, 'nostop:1': 0.3, 'note:1': 0.5, 'again:1': 1.4, 'again:2': 1.0 };
 const GAP = 0.65;                        // between captions inside a beat
 const TAIL = 5.0;                        // the question held, then the cut

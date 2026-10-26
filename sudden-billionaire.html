@@ -31,10 +31,13 @@
     .sb-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
       font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
     .sb-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
-    .sb-ro .nx { color: #f6efe2; opacity: 0.85; font-size: calc(var(--u) * 22); letter-spacing: 0.12em; }
+    .sb-ro .nx { color: #f6efe2; opacity: 0.9; font-size: calc(var(--u) * 25); letter-spacing: 0.12em; }
+    .sb-ro .ow { color: #ff9b86; }
+    .sb-ro .ow b { color: #ffb4a4; }
+    .sb-ro .ow:empty { display: none; }
     .sb-ro .nx:empty { display: none; }
     .sb-ctx { position: absolute; left: calc(var(--u) * 52); top: calc(var(--u) * 312); pointer-events: none; padding: calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * 14); border-radius: calc(var(--u) * 14);
-      background: rgba(6, 8, 12, 0.62); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
+      background: rgba(6, 8, 12, 0.78); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
     .sb-ctx .l { display: block; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.16em; color: #fff; opacity: 0.8; }
     .sb-ctx .v { display: block; font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 40); margin-top: calc(var(--u) * 2); color: #ffd7a8; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
     .sb-ctx .v2 { display: block; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #f6efe2; white-space: nowrap; }
@@ -44,8 +47,8 @@
     .sb-ctx .chip.hit { opacity: 1; color: #fff; text-shadow: 0 0 calc(var(--u) * 16) rgba(255, 220, 160, 0.95); }
     .sb-ctx .dim { opacity: 0.55; }
     /* the honest label (bottom left, under the caption line) */
-    .sb-tag { position: absolute; left: calc(var(--u) * 52); bottom: calc(var(--u) * 26); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 22); letter-spacing: 0.16em;
-      color: #e9e2d4; padding: calc(var(--u) * 7) calc(var(--u) * 16); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
+    .sb-tag { position: absolute; left: calc(var(--u) * 52); bottom: calc(var(--u) * 22); font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 28); letter-spacing: 0.12em;
+      color: #f4ede0; padding: calc(var(--u) * 8) calc(var(--u) * 18); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.8); pointer-events: none; }
     /* where you are (top right) and the gravity there */
     .sb-where { right: calc(var(--u) * 60); text-align: right; }
     .sb-where .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 46); line-height: 1.05; margin-top: calc(var(--u) * 6); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
@@ -67,13 +70,14 @@
     .sb-gaze .t { position: absolute; left: calc(var(--u) * 100); top: 50%; transform: translateY(-50%); white-space: nowrap; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 26); letter-spacing: 0.12em; color: #ffe2a8;
       text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9); }
     /* the diagrams (illustrations): right of centre, or large in the middle of the frame */
-    .sb-inset { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 372); width: calc(var(--u) * 800); height: calc(var(--u) * 495); pointer-events: none; }
-    .sb-inset.mid { top: calc(var(--u) * 225); width: calc(var(--u) * 1100); height: calc(var(--u) * 680); }
-    .sb-inset.big { right: auto; left: 50%; margin-left: calc(var(--u) * -620); top: calc(var(--u) * 110); width: calc(var(--u) * 1240); height: calc(var(--u) * 767); }
+    .sb-inset { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 318); width: calc(var(--u) * 792); height: calc(var(--u) * 490); pointer-events: none; }
+    /* (every panel ends 800 px down: clear of a two-line caption, which starts about 860) */
+    .sb-inset.mid { top: calc(var(--u) * 222); width: calc(var(--u) * 937); height: calc(var(--u) * 580); }
+    .sb-inset.big { right: auto; left: 50%; margin-left: calc(var(--u) * -560); top: calc(var(--u) * 108); width: calc(var(--u) * 1120); height: calc(var(--u) * 693); }
     .sb-inset svg { width: 100%; height: 100%; display: block; }
-    .sb-inset .t { font-family: var(--hud-font); font-weight: 700; font-size: 25px; letter-spacing: 0.1em; fill: #f6efe2; }
-    .sb-inset .s { font-family: var(--hud-font); font-weight: 600; font-size: 21px; letter-spacing: 0.12em; fill: #ffd7a8; }
-    .sb-inset .b { font-family: var(--hud-font); font-weight: 600; font-size: 22px; fill: #fff; }
+    .sb-inset .t { font-family: var(--hud-font); font-weight: 700; font-size: 27px; letter-spacing: 0.1em; fill: #f6efe2; }
+    .sb-inset .s { font-family: var(--hud-font); font-weight: 600; font-size: 23px; letter-spacing: 0.1em; fill: #ffd7a8; }
+    .sb-inset .b { font-family: var(--hud-font); font-weight: 600; font-size: 24px; fill: #fff; }
     .sb-inset .eq { font-family: var(--book); font-weight: 500; font-size: 46px; fill: #f6efe2; }
     .sb-inset .eq.big { font-size: 64px; fill: #ffcf8a; }
     /* labels pinned to places */

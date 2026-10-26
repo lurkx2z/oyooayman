@@ -55,8 +55,8 @@ const SB_SHOTS = [
   { id: 'H3', t0: SB.pledge, t1: SB.real, set: 'house', mode: 'pledge' },
   // 9 — is any of this real
   { id: 'I1', t0: SB.real, t1: SB.letters, set: 'lab', mode: 'real' },
-  { id: 'I2', t0: SB.letters, t1: SB.video, set: 'street', mode: 'letters' },
-  { id: 'I3', t0: SB.video, t1: SB.feeney, set: 'lab', mode: 'video' },
+  { id: 'I2', t0: SB.letters, t1: SB.scott, set: 'street', mode: 'letters' },
+  { id: 'I3', t0: SB.scott, t1: SB.feeney, set: 'lab', mode: 'scott' },
   { id: 'I4', t0: SB.feeney, t1: SB.point, set: 'flat', mode: 'feeney' },
   // 10 — the crossing again; the question
   { id: 'J1', t0: SB.point, t1: SB.again, set: 'car', mode: 'point' },

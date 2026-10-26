@@ -24,7 +24,7 @@ CAR_PROFILES.sbSuper = {
   win: [[[2.0, 1.0], [2.08, 1.15], [2.55, 1.17], [3.1, 1.0]]],
   rearGlass: [0, 1], windshield: [2, 3], head: 0.6, tail: 0.72, grille: false, lightBar: true,
 };
-const SB_HO = { glassZ: -6, garage: [26, 0, 0], gateZ: 36, rival: [-330, -12, -420] };
+const SB_HO = { glassZ: -6, garage: [26, 0, 0], gateZ: 36, rival: [-330, -12, -420], lapse: 2.1 };
 
 // ---- textures ---------------------------------------------------------------------------------------------------------
 function sbHoStoneCanvas(base, line, seed) {
@@ -64,12 +64,17 @@ function sbHoTvDraw(g, w, h, s) {
     g.fillStyle = '#b8332a'; g.fillRect(0, h - 120, 200, 56); T('DEBATE', 100, h - 92, 30, '#fff', 800, 'center');
     g.fillStyle = '#f2f0ea'; g.fillRect(200, h - 120, w - 200, 56); T('SHOULD THE RICHEST PAY MORE TAX?', 220, h - 92, 30, '#14181f', 800);
   } else {
-    // markets: a ticker and a line going up
-    g.fillStyle = '#0a0e14'; g.fillRect(0, 0, w, h);
-    T('MARKETS', 40, 50, 34, '#8fe0a8', 800); T('ALL-TIME HIGH', 40, 92, 26, '#ffffff', 700);
-    g.strokeStyle = 'rgba(255,255,255,0.1)'; g.lineWidth = 2; for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(40, 150 + i * 55); g.lineTo(w - 40, 150 + i * 55); g.stroke(); }
-    g.beginPath(); for (let i = 0; i <= 80; i++) { const u = i / 80, y = 430 - 260 * Math.pow(u, 1.4) - 18 * Math.sin(u * 19 + 1); if (i) g.lineTo(40 + (w - 80) * u, y); else g.moveTo(40, y); } g.strokeStyle = '#3ccf78'; g.lineWidth = 6; g.stroke();
-    g.fillStyle = '#121a26'; g.fillRect(0, h - 56, w, 56); T('S&P +1.2%   ·   TECH +2.4%   ·   YACHTS +7%   ·   GOLD +0.3%   ·   ', 30 - (s.f * 3) % 400, h - 28, 22, '#c8d0dc', 600);
+    // the channel you switch to: an opinion show, a man at a desk, "lower taxes at the top", a phone-in poll
+    const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, '#3a2a22'); gr.addColorStop(1, '#14100e'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.fillStyle = 'rgba(255,200,120,0.08)'; for (let i = 0; i < 7; i++) g.fillRect(80 + i * 130, 0, 60, h * 0.7);
+    g.fillStyle = '#1a1e26'; g.beginPath(); g.arc(w * 0.36, h * 0.33, 52, 0, 7); g.fill(); g.beginPath(); g.ellipse(w * 0.36, h * 0.6, 130, 90, 0, Math.PI, 0); g.fill(); g.fillRect(w * 0.36 - 130, h * 0.6, 260, 40);
+    g.fillStyle = '#5a3a2a'; g.fillRect(w * 0.12, h * 0.62, w * 0.5, 60); g.fillStyle = '#c9a24a'; g.fillRect(w * 0.12, h * 0.62, w * 0.5, 6);
+    // the poll
+    g.fillStyle = 'rgba(10,12,16,0.85)'; g.fillRect(w * 0.66, 70, 300, 210); T('VIEWERS\' POLL', w * 0.66 + 20, 104, 24, '#ffcf8a', 800);
+    T('AGREE', w * 0.66 + 20, 160, 26, '#fff', 700); g.fillStyle = '#3a6ae8'; g.fillRect(w * 0.66 + 130, 146, 150 * 0.71, 28); T('71%', w * 0.66 + 130 + 150 * 0.71 + 8, 160, 22, '#fff', 700);
+    T('DISAGREE', w * 0.66 + 20, 224, 26, '#fff', 700); g.fillStyle = '#8a8c90'; g.fillRect(w * 0.66 + 130, 210, 150 * 0.29, 28); T('29%', w * 0.66 + 130 + 150 * 0.29 + 8, 224, 22, '#fff', 700);
+    g.fillStyle = '#2a4ab0'; g.fillRect(0, h - 120, 220, 56); T('OPINION', 110, h - 92, 30, '#fff', 800, 'center');
+    g.fillStyle = '#f2f0ea'; g.fillRect(220, h - 120, w - 220, 56); T('LOWER TAXES AT THE TOP HELP EVERYONE', 240, h - 92, 30, '#14181f', 800);
   }
 }
 // the box from the old flat
@@ -81,6 +86,22 @@ function sbHoBoxCanvas() {
     g.fillStyle = '#1e1e28'; g.font = '700 64px "Permanent Marker", "Comic Sans MS", cursive'; g.textAlign = 'center'; g.fillText('OLD FLAT', w / 2, h * 0.36);
     g.font = '700 30px "Comic Sans MS", cursive'; g.fillText('misc · kitchen', w / 2, h * 0.82);
   });
+}
+
+// a tree: round clumps of leaves on a trunk (as on the streets); a potted plant: long leaves round a stem
+function sbHoTree(x, y, z, s, parent) {
+  const t = new THREE.Group(), bark = sbStd('#4a3a2c', 0.9), leaf = sbStd('#46602f', 0.85), leaf2 = sbStd('#5f7a3a', 0.85);
+  sbCyl(0.12 * s, 0.17 * s, 3.2 * s, bark, 0, 1.6 * s, 0, t, 8);
+  for (let i = 0; i < 7; i++) { const a = i * 2.4, r = (i ? 1.1 : 0) * s; sbMesh(new THREE.IcosahedronGeometry((1.35 - 0.1 * (i % 3)) * s, 1), i % 2 ? leaf : leaf2, Math.cos(a) * r, (4.0 + 0.6 * (i % 3)) * s, Math.sin(a) * r, t); }
+  t.position.set(x, y, z); parent.add(t); return t;
+}
+function sbHoPlant(x, z, s, parent) {
+  const g = new THREE.Group(), leafM = sbStd('#3e5a2c', 0.7), leafM2 = sbStd('#557236', 0.7);
+  sbCyl(0.26 * s, 0.2 * s, 0.55 * s, sbStd('#2a2826', 0.5, 0.1), 0, 0.275 * s, 0, g, 20);
+  sbCyl(0.015 * s, 0.02 * s, 1.1 * s, sbStd('#5a4430', 0.8), 0, 1.0 * s, 0, g, 6);
+  for (let i = 0; i < 16; i++) { const a = i * 2.39, h = (0.75 + 0.75 * (i / 16)) * s, r = (0.18 + 0.1 * sbR(i, 4)) * s;
+    const l = sbMesh(new THREE.SphereGeometry(1, 10, 6), i % 2 ? leafM : leafM2, Math.cos(a) * r, h, Math.sin(a) * r, g); l.scale.set(0.16 * s, 0.025 * s, 0.09 * s); l.rotation.set(0.3 * Math.sin(i), -a, -0.5 + 0.3 * sbR(i, 7)); }
+  g.position.set(x, 0, z); parent.add(g); return g;
 }
 
 SB_SETS.house = (app) => {
@@ -96,9 +117,11 @@ SB_SETS.house = (app) => {
   const puffs = sbPuffs(scene, 4200, { additive: true, soft: 1.5 });
 
   // ---- materials
-  const stoneTex = sbTex(sbHoStoneCanvas('#e8e2d8', 'rgba(150,140,128,0.5)', CONFIG.seed + 600)); stoneTex.repeat.set(14 / 2.4, 9 / 2.4);
-  const floorM = sbStd('#ffffff', 0.18, 0, { map: stoneTex, envMapIntensity: 0.9 });
-  const deckTex = sbTex(sbHoStoneCanvas('#cfc6b6', 'rgba(110,100,90,0.6)', CONFIG.seed + 601)); deckTex.repeat.set(20 / 2.4, 8 / 2.4);
+  const oakTex = sbTex(sbWoodCanvas(CONFIG.seed + 605, 256, 1024, [138, 100, 70])); oakTex.repeat.set(7, 2.2);
+  const floorM = sbStd('#ffffff', 0.32, 0, { map: oakTex, envMapIntensity: 0.6 });
+  const travTex = sbTex(sbHoStoneCanvas('#c9bba6', 'rgba(120,104,86,0.55)', CONFIG.seed + 602)); travTex.repeat.set(2.5, 3);
+  const travM = sbStd('#ffffff', 0.7, 0, { map: travTex });
+  const deckTex = sbTex(sbHoStoneCanvas('#a89e8e', 'rgba(80,72,64,0.6)', CONFIG.seed + 601)); deckTex.repeat.set(20 / 2.4, 8 / 2.4);
   const deckM = sbStd('#ffffff', 0.7, 0, { map: deckTex });
   const plasterM = sbStd('#f0ede6', 0.9, 0), ceilM = sbStd('#f6f4ef', 0.95, 0), darkWood = sbStd('#ffffff', 0.45, 0, { map: sbTex(sbWoodCanvas(CONFIG.seed + 620, 256, 1024, [70, 48, 34])) });
   const marbleM = sbStd('#ffffff', 0.12, 0, { map: sbTex(sbHoMarbleCanvas(), { repeat: false }), envMapIntensity: 1.1 }), blackM = sbStd('#141416', 0.4, 0.3), brassM = sbStd('#c4a060', 0.28, 0.9);
@@ -128,7 +151,7 @@ SB_SETS.house = (app) => {
   const ISL = [1.4, 0.5];
   B(3.6, 0.88, 1.1, darkWood, ISL[0], 0.44, ISL[1]); B(3.8, 0.06, 1.25, sbStd('#1c1b1d', 0.22, 0.1, { envMapIntensity: 1.2 }), ISL[0], 0.91, ISL[1]);  // a black stone top
   for (const dx of [-1.1, 1.1]) { sbCyl(0.2, 0.2, 0.06, sbStd('#2a2420', 0.6), ISL[0] + dx, 0.72, ISL[1] + 0.95); sbCyl(0.02, 0.02, 0.7, brassM, ISL[0] + dx, 0.36, ISL[1] + 0.95); sbCyl(0.18, 0.2, 0.02, brassM, ISL[0] + dx, 0.01, ISL[1] + 0.95); }
-  { const fb = sbMesh(new THREE.SphereGeometry(0.16, 20, 10, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), sbStd('#e8e4dc', 0.3), ISL[0] + 1.1, 1.1, ISL[1] + 0.1); fb.rotation.x = Math.PI;
+  { const fb = sbMesh(new THREE.SphereGeometry(0.16, 20, 10, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), sbStd('#e8e4dc', 0.3), ISL[0] + 1.1, 1.1, ISL[1] + 0.1);
     for (let i = 0; i < 6; i++) sbMesh(new THREE.SphereGeometry(0.045, 12, 8), sbStd(['#d84a2a', '#e8b23a', '#7aa83a'][i % 3], 0.5), ISL[0] + 1.1 + Math.cos(i) * 0.07, 1.0, ISL[1] + 0.1 + Math.sin(i) * 0.07); }
   B(0.3, 0.38, 0.35, sbStd('#c8ccd0', 0.25, 0.9), 3.2, 1.13, LZ1 - 0.5);
   // breakfast at the island: a plate (eggs, toast), a fork, a cup with its steam
@@ -159,7 +182,8 @@ SB_SETS.house = (app) => {
   const HX0 = 5, HX1 = 11, HZ0 = -4, HZ1 = 4, HH = 7;
   sbMesh(new THREE.PlaneGeometry(HX1 - HX0, HZ1 - HZ0).rotateX(-Math.PI / 2), floorM, (HX0 + HX1) / 2, 0.001, 0).castShadow = false;
   B(HX1 - HX0, 0.2, HZ1 - HZ0, ceilM, (HX0 + HX1) / 2, HH + 0.1, 0);
-  B(0.2, HH, HZ1 - HZ0, plasterM, HX1 + 0.1, HH / 2, 0); B(HX1 - HX0, HH, 0.2, plasterM, (HX0 + HX1) / 2, HH / 2, HZ0 - 0.1);
+  B(0.2, HH, HZ1 - HZ0, plasterM, HX1 + 0.1, HH / 2, 0); B(HX1 - HX0, HH, 0.2, travM, (HX0 + HX1) / 2, HH / 2, HZ0 - 0.1);
+  sbMesh(new THREE.PlaneGeometry(2.2, 6.6).rotateX(-Math.PI / 2), sbStd('#5a2e2a', 0.98, 0, { map: sbTex(sbCanvas(128, 384, (g, w, h) => { g.fillStyle = '#6a3430'; g.fillRect(0, 0, w, h); g.strokeStyle = '#c9a26a'; g.lineWidth = 6; g.strokeRect(10, 10, w - 20, h - 20); g.lineWidth = 2; g.strokeRect(22, 22, w - 44, h - 44); }), { repeat: false }) }), 7.6, 0.006, 0.2).castShadow = false;
   B(0.25, HH - LH, HZ1 - HZ0, plasterM, HX0, LH + (HH - LH) / 2, 0);
   B(2.5, HH, 0.2, plasterM, HX0 + 1.25, HH / 2, HZ1 + 0.1); B(1.5, HH, 0.2, plasterM, HX1 - 0.75, HH / 2, HZ1 + 0.1); B(2.0, HH - 3.2, 0.2, plasterM, HX0 + 3.5, 3.2 + (HH - 3.2) / 2, HZ1 + 0.1);
   // the front door (tall, dark wood) and the light outside it
@@ -167,7 +191,12 @@ SB_SETS.house = (app) => {
   // the gallery upstairs (a walkway along the back wall) and its doors; doors downstairs (the bathrooms, among them)
   B(HX1 - HX0, 0.25, 1.8, plasterM, (HX0 + HX1) / 2, 3.5, HZ0 + 0.9); B(HX1 - HX0, 1.0, 0.04, glassM, (HX0 + HX1) / 2, 4.12, HZ0 + 1.8); B(HX1 - HX0, 0.05, 0.06, brassM, (HX0 + HX1) / 2, 4.62, HZ0 + 1.8);
   const doorM = darkWood;
-  for (let i = 0; i < 4; i++) { B(0.9, 2.2, 0.06, doorM, HX0 + 0.9 + i * 1.45, 3.62 + 1.1, HZ0 + 0.03); sbMesh(new THREE.SphereGeometry(0.03, 10, 8), brassM, HX0 + 1.2 + i * 1.45, 4.65, HZ0 + 0.08); B(0.14, 0.05, 0.01, brassM, HX0 + 0.9 + i * 1.45, 5.3, HZ0 + 0.07); }
+  const sconceM = sbStd('#fff4e0', 0.4, 0, { emissive: '#ffd9a0', emissiveIntensity: 1.6 });
+  for (let i = 0; i < 4; i++) { B(0.9, 2.2, 0.06, doorM, HX0 + 0.9 + i * 1.45, 3.62 + 1.1, HZ0 + 0.03); sbMesh(new THREE.SphereGeometry(0.03, 10, 8), brassM, HX0 + 1.2 + i * 1.45, 4.65, HZ0 + 0.08); B(0.14, 0.05, 0.01, brassM, HX0 + 0.9 + i * 1.45, 5.3, HZ0 + 0.07);
+    if (i < 3) { B(0.1, 0.3, 0.08, sconceM, HX0 + 1.62 + i * 1.45, 4.9, HZ0 + 0.05).castShadow = false; B(0.1, 0.3, 0.08, sconceM, HX0 + 1.62 + i * 1.45, 1.9, HZ0 + 0.05).castShadow = false; } }
+  // (downstairs, along the right wall: three more doors)
+  for (let i = 0; i < 3; i++) { const d = B(0.06, 2.3, 0.95, doorM, HX1 - 0.03, 1.15, -2.9 + i * 1.5); d.castShadow = false; sbMesh(new THREE.SphereGeometry(0.03, 10, 8), brassM, HX1 - 0.08, 1.05, -2.6 + i * 1.5); }
+  const hallSconceL = new THREE.PointLight('#ffd9a0', 0, 7, 1.6); hallSconceL.position.set((HX0 + HX1) / 2, 4.6, HZ0 + 0.8); scene.add(hallSconceL);
   // the stairs up to the gallery (floating oak treads)
   for (let i = 0; i < 16; i++) B(1.2, 0.06, 0.34, darkWood, HX1 - 0.65, 0.22 * (i + 1), HZ1 - 0.9 - i * 0.34);
   // the chandelier
@@ -190,13 +219,15 @@ SB_SETS.house = (app) => {
   // the deck's edge: a glass balustrade (the pool runs to the edge: an infinity edge), planters, two loungers
   B(9, 1.05, 0.03, glassM, 6.5, 0.52, -13.45); B(8, 1.05, 0.03, glassM, -11, 0.52, -13.45);
   B(26, 1.4, 0.4, sbStd('#bfb6a6', 0.85), -2, -0.78, -13.7);
-  for (const x of [-10.5, 4.5, 8.5]) { B(1.1, 0.6, 1.1, sbStd('#3a3632', 0.7), x, 0.3, GZ - 1.2); sbMesh(new THREE.ConeGeometry(0.45, 1.8, 7), sbStd('#3a5a32', 0.9), x, 1.5, GZ - 1.2); }
+  for (const x of [-10.5, 4.5, 8.5]) { B(1.1, 0.6, 1.1, sbStd('#3a3632', 0.7), x, 0.3, GZ - 1.2); sbHoTree(x, 0.6, GZ - 1.2, 0.42, scene); }
+  for (const [x, z] of [[-8.3, GZ + 0.7], [4.2, GZ + 0.8], [-1.2, 2.3]]) sbHoPlant(x, z, 1.25, scene);
   for (const x of [3.6, 5.2]) { B(0.7, 0.3, 1.9, sbStd('#ece6da', 0.9), x, 0.25, GZ - 4.5); B(0.7, 0.06, 0.7, sbStd('#ece6da', 0.9), x, 0.55, GZ - 3.8).rotation.x = -0.6; }
   // the hill under the house, the valley, the hills across it
-  sbMesh(new THREE.ConeGeometry(220, 95, 24, 1, true), sbStd('#6a6a50', 0.95), -2, -47.5, -30).castShadow = false;
+  sbMesh(new THREE.ConeGeometry(230, 92, 32, 1, true), sbStd('#56583f', 0.95), -2, -46.6, 12).castShadow = false;   // (its top under the house: from the terrace, only the slope falls away)
   const groundM = sbStd('#4a5040', 0.95, 0);
   const valley = sbMesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), groundM, 0, -92, -1500); valley.castShadow = false;
-  for (const [x, z, r, h] of [[-900, -2200, 700, 260], [700, -2600, 900, 320], [1800, -1200, 600, 200], [-1900, -900, 600, 240], [-330, -440, 220, 85]]) sbMesh(new THREE.ConeGeometry(r, h, 12), sbStd('#5a6048', 0.95), x, -92 + h / 2, z).castShadow = false;
+  const moundG = new THREE.SphereGeometry(1, 40, 14, 0, Math.PI * 2, 0, Math.PI / 2);
+  for (const [x, z, r, h] of [[-900, -2200, 700, 220], [700, -2600, 900, 260], [1800, -1200, 600, 170], [-1900, -900, 600, 200], [-330, -440, 230, 80]]) { const m = sbMesh(moundG, sbStd('#4e5642', 0.95), x, -92, z); m.scale.set(r, h, r * 0.8); m.castShadow = false; }
   // the city: towers (one instanced mesh, a facade map and lit windows), street lights (puffs)
   const facadeM = new THREE.MeshStandardMaterial({ color: '#ffffff', map: sbTex(sbHoFacadeCanvas(false)), emissiveMap: sbTex(sbHoFacadeCanvas(true)), emissive: '#ffffff', emissiveIntensity: 0, roughness: 0.6, metalness: 0.2 });
   const NC = 1300, towers = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), facadeM, NC), lamps = [];
@@ -236,7 +267,8 @@ SB_SETS.house = (app) => {
     const add = (w, h, d, x, y, z, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m || card); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; box.add(o); return o; };
     add(0.6, 0.012, 0.42, 0, 0.006, 0); add(0.6, 0.42, 0.012, 0, 0.21, -0.21); add(0.012, 0.42, 0.42, -0.3, 0.21, 0); add(0.012, 0.42, 0.42, 0.3, 0.21, 0);
     const front = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.42), side); front.position.set(0, 0.21, 0.212); box.add(front); add(0.6, 0.42, 0.006, 0, 0.21, 0.208);
-    for (const [x, rz] of [[-0.3, 0.9], [0.3, -0.9]]) { const fl = add(0.3, 0.008, 0.42, x + (x < 0 ? -0.13 : 0.13), 0.47, 0); fl.rotation.z = rz; }
+    for (const sx of [-1, 1]) { const hinge = new THREE.Group(); hinge.position.set(sx * 0.3, 0.42, 0); hinge.rotation.z = -sx * 0.55; box.add(hinge);
+      const fl = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.008, 0.42), card); fl.position.set(sx * 0.105, 0.004, 0); fl.castShadow = fl.receiveShadow = true; hinge.add(fl); }
     // inside: a mug, a folded tea towel, a takeaway menu, the note
     add(0.5, 0.18, 0.36, 0, 0.1, 0, sbStd('#8a7a66', 0.95));
     const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.036, 0.09, 16), sbStd('#c94a3a', 0.4)); mug.position.set(0.15, 0.235, -0.08); box.add(mug); }
@@ -257,8 +289,9 @@ SB_SETS.house = (app) => {
     // the guardhouse, cameras on a pole, the road's trees and a lamp
     B(2.4, 2.6, 2.4, wallM, -7.2, 1.3, GZt - 2.4, drive); B(1.6, 0.9, 0.04, glassM, -7.2, 1.6, GZt - 3.62, drive); B(2.8, 0.15, 2.8, ironM, -7.2, 2.67, GZt - 2.4, drive);
     sbCyl(0.06, 0.06, 4.2, ironM, 5.5, 2.1, GZt - 0.8, drive); for (const s of [-1, 1]) B(0.3, 0.14, 0.14, sbStd('#e8e8e8', 0.4), 5.5 + s * 0.2, 4.1, GZt - 0.8, drive).rotation.y = s * 0.6;
-    for (let i = 0; i < 9; i++) { sbCyl(0.12, 0.16, 2.4, sbStd('#4a3a2a', 0.9), -28 + i * 7, 1.2, GZt + 17, drive); sbMesh(new THREE.SphereGeometry(2.1, 10, 8), sbStd('#3e5a30', 0.9), -28 + i * 7, 3.8, GZt + 17, drive); }
-    for (let i = 0; i < 12; i++) { sbMesh(new THREE.ConeGeometry(0.5, 2.2, 7), sbStd('#38502e', 0.9), -16 + i * 3 + (i > 5 ? 2 : -2), 1.1, GZt - 1.2, drive); } }
+    for (let i = 0; i < 9; i++) sbHoTree(-28 + i * 7 + 1.5 * sbR(i, 3), 0, GZt + 17 + sbR(i, 5), 0.85 + 0.2 * sbR(i, 7), drive);
+    const hedgeM = sbStd('#3a5230', 0.9), hedgeM2 = sbStd('#46602f', 0.9);
+    for (let i = 0; i < 26; i++) { const x = -18 + i * 1.45 + (i > 12 ? 2.6 : -2.6); if (Math.abs(x) < 5.5) continue; const b = sbMesh(new THREE.IcosahedronGeometry(0.85, 1), i % 2 ? hedgeM : hedgeM2, x, 0.7, GZt - 1.25, drive); b.scale.set(1.1, 0.85 + 0.15 * sbR(i, 9), 0.8); } }
   const guard = sbPerson({ id: 'sbGuard1', look: 'sbGuard', path: [[0, -4.6, SB_HO.gateZ - 2.0]], face: 20, states: [[0, 'sbGuard']] }, scene);
   const passer = sbPerson({ id: 'sbPasser', look: 'casual6', path: [[SB.wall - 2, -30, SB_HO.gateZ + 4.5], [SB.wall + 30, 14, SB_HO.gateZ + 4.5]], states: [[SB.wall - 2, 'walk']] }, scene);
   // the housekeeper (in the kitchen, mornings)
@@ -266,7 +299,7 @@ SB_SETS.house = (app) => {
 
   // ---- the light: day, morning, dusk, night, the time-lapse, the garage
   const SKY = {
-    day: ['#4f7fb8', '#c6d6e6', '#8a8680', '#fff2d8', [-0.6, 0.6, -0.5]], morning: ['#6a8ab8', '#f2d8b8', '#8a7a68', '#ffd8a0', [0.7, 0.18, -0.7]],
+    day: ['#4f7fb8', '#c6d6e6', '#8a8680', '#fff2d8', [-0.55, 0.42, -0.72]], morning: ['#6a8ab8', '#f2d8b8', '#8a7a68', '#ffd8a0', [0.62, 0.2, -0.76]],
     dusk: ['#2a3a6a', '#f0905a', '#3a2e2a', '#ff9a5a', [0.2, 0.03, -1]], night: ['#03050c', '#141c30', '#05060a', '#000000', [0, -0.3, -1]],
   };
   let litKey = null;
@@ -282,11 +315,11 @@ SB_SETS.house = (app) => {
     scene.fog.color.set(night ? '#0a0e18' : dusk ? '#c8907a' : morning ? '#e8d8c4' : '#b8c6d4'); scene.fog.density = night ? 0.0003 : dusk ? 0.00026 : 0.00042;
     hemi.color.set(night ? '#2a3450' : dusk ? '#e0a888' : '#d6e2f0'); hemi.groundColor.set(night ? '#14100c' : '#8a7a66'); hemi.intensity = night ? 0.12 : dusk ? 0.45 : 0.7;
     sun.intensity = night ? 0 : dusk ? 1.1 : morning ? 2.2 : 2.6; sun.castShadow = !night;
-    sun.color.set(dusk ? '#ffae70' : morning ? '#ffe2b8' : '#fff1dc');
+    sun.color.set(dusk ? '#ffae70' : morning ? '#ffdcaa' : '#ffe6c4');
     const sd = SKY[night || inside ? 'day' : key === 'lapse' ? 'day' : key][4]; sun.position.set(sd[0] * 120 - 2, Math.max(8, sd[1] * 120), sd[2] * 120 - 3);
     facadeM.emissiveIntensity = night ? 1.3 : dusk ? 0.7 : 0; rivalM.emissiveIntensity = night ? 0.9 : dusk ? 0.3 : 0;
     for (const L of roomL) L.intensity = night ? 9 : dusk ? 4 : 0;
-    lightM.emissiveIntensity = night || dusk || inside ? 1.6 : 0.3; hallL.intensity = key === 'day' ? 2.5 : 10;
+    lightM.emissiveIntensity = inside ? 0.9 : night || dusk ? 1.6 : 0.3; hallL.intensity = key === 'day' ? 2.5 : 10; hallSconceL.intensity = key === 'day' ? 3 : 6;
     for (const L of garL) L.intensity = inside ? 14 : 0;
     scene.userData.floorShade.material.emissiveIntensity = night ? 0.9 : 0;
     scene.background = new THREE.Color(night ? '#03050c' : '#9ab4d4');
@@ -301,7 +334,7 @@ SB_SETS.house = (app) => {
       setLight(key);
       // ---- the time-lapse: days flick past (the sky, the sun, the city's lights)
       if (key === 'lapse') {
-        const ph = ((t - SB.years) / 0.85) % 1, el = Math.sin(ph * Math.PI * 2), sd = [Math.cos(ph * Math.PI * 2) * 0.8, el, -0.6];
+        const ph = ((t - SB.years) / SB_HO.lapse) % 1, el = Math.sin(ph * Math.PI * 2), sd = [Math.cos(ph * Math.PI * 2) * 0.8, el, -0.6];
         const dayK = MathX.smooth(el, -0.15, 0.25), duskK = Math.exp(-Math.pow(el / 0.18, 2));
         const c = (a, b, d, k1, k2) => new THREE.Color(a).lerp(new THREE.Color(d), k2).lerp(new THREE.Color(b), k1);
         sky.material.uniforms.a.value.copy(c('#03050c', '#4f7fb8', '#2a3a6a', dayK, duskK)); sky.material.uniforms.b.value.copy(c('#141c30', '#c6d6e6', '#f0905a', dayK, duskK));
@@ -326,7 +359,7 @@ SB_SETS.house = (app) => {
       bfast.visible = m === 'six' || m === 'brick';
       // ---- the city's street lights (dusk, night, the dark half of the time-lapse)
       puffs.begin();
-      const la = key === 'night' ? 1 : key === 'dusk' ? 0.55 : key === 'lapse' ? 1 - MathX.smooth(Math.sin(((t - SB.years) / 0.85) % 1 * Math.PI * 2), -0.15, 0.25) : 0;
+      const la = key === 'night' ? 1 : key === 'dusk' ? 0.55 : key === 'lapse' ? 1 - MathX.smooth(Math.sin(((t - SB.years) / SB_HO.lapse) % 1 * Math.PI * 2), -0.15, 0.25) : 0;
       if (la > 0.01 && (m === 'enough' || m === 'compare' || m === 'pledge' || m === 'years' || m === 'views')) {
         for (const [x, y, z, v] of lamps) puffs.add(x, y, z, 7 + 6 * v, la * (0.35 + 0.4 * v) * (0.85 + 0.15 * Math.sin(t * 2 + v * 40)), 1, 0.8 + 0.1 * v, 0.55 + 0.2 * v);
         if (m === 'compare') for (let i = 0; i < 40; i++) puffs.add(SB_HO.rival[0] - 50 + i * 2.6, SB_HO.rival[1] + 4 + 14 * (i % 3), SB_HO.rival[2] + 22, 5, 0.5 * la, 1, 0.85, 0.6);
@@ -388,10 +421,12 @@ SB_SETS.house = (app) => {
       else if (m === 'six' || m === 'brick') { p.exposure = 0.84; p.warmth = 0.05; p.bloom = 0.3; p.contrast = 1.12; }
       else if (m === 'garage' || m === 'note') { p.exposure = 1.1; p.warmth = m === 'note' ? 0.03 : -0.03; p.contrast = 1.1; p.vignette = 0.6; }
       else { p.exposure = m === 'house' ? 0.8 : 0.95; p.warmth = 0.03; p.contrast = 1.1; }
-      if (m === 'years') p.flash = Math.max(p.flash, 0.04 * Math.max(0, Math.sin(((t - SB.years) / 0.85) * Math.PI * 2)));
+      if (m === 'years') p.flash = Math.max(p.flash, 0.015 * Math.max(0, Math.sin(((t - SB.years) / SB_HO.lapse) * Math.PI * 2)));
     },
     labels(t) {
       const m = sbShotAt(t).mode, out = [];
+      if (m === 'house') { const a = W(t, sbCap('house', 1).show + 0.5, SB.garage - 0.1, 0.3, 0.2); out.push({ p: [HX0 + 0.9 + 1.45, 5.95, HZ0 + 0.1], text: 'BATHROOM 6', sub: 'NEVER USED', a, side: 'l' }, { p: [HX0 + 0.9 + 3 * 1.45, 5.95, HZ0 + 0.1], text: 'BATHROOM 8', sub: 'NEVER USED', a }); }
+      if (m === 'six' || m === 'brick') out.push({ p: [keeper.root.position.x, 1.95, GZ + 0.55], text: 'YOUR HOUSEKEEPER', a: W(t, SB.six + 0.8, SB.brick + 4, 0.4, 0.3) });
       if (m === 'garage') out.push({ p: [G0[0] - 1.6, 1.45, G0[2] + 0.4], text: 'THE CAR', sub: '$420,000', a: W(t, SB.buyCar - 0.2, SB.neighbours, 0.3, 0.2) });
       if (m === 'compare') out.push({ p: [SB_HO.rival[0], SB_HO.rival[1] + 34, SB_HO.rival[2]], text: 'THE NEIGHBOURS\' HOUSE', sub: 'BIGGER', a: W(t, sbCap('compare', 1).show + 0.6, SB.boss - 0.2, 0.4, 0.3) });
       if (m === 'wall') out.push({ p: [-4.6, 2.15, SB_HO.gateZ - 2.0], text: 'A GUARD', sub: '$3 MILLION: THE WALL, THE GATE, HIM', a: W(t, SB.buyWall + 0.4, SB.walk - 0.3, 0.3, 0.2) });
@@ -403,7 +438,7 @@ SB_SETS.house = (app) => {
 };
 
 // the housekeeper's look (a film-side addition, like the others in cast.js)
-LOOKS.sbKeeper = { skin: 3, build: 'avg', shirt: '#2a2c34', sleeves: 'long', pants: '#2a2c34', shoes: '#141414', sole: '#0c0c0c', hair: '#1a120c', hairStyle: 'bun', apron: '#e8e4dc' };
+LOOKS.sbKeeper = { skin: 3, build: 'slim', shirt: '#cfd6dc', sleeves: 'short', pants: '#3a3e48', shoes: '#141414', sole: '#0c0c0c', hair: '#1a120c', hairStyle: 'bun', apron: '#f4f2ee' };
 // cleaning a window: standing, the right hand circling at shoulder height
 ACTIONS.sbWipe = function (τ, c) { const p = ACTIONS.idle(τ, c), a = τ * 4.2; p.rSh = [1.35 + 0.2 * Math.sin(a), 0.25 + 0.2 * Math.cos(a)]; p.rEl = 0.5 + 0.1 * Math.sin(a); p.headYaw = 0; p.neck = -0.05; return p; };
 BLEND.sbWipe = 0.4;

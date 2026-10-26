@@ -369,7 +369,7 @@ SB_SETS.street = (app) => {
         if (t < tB) {
           pos = [DX - 1.02, 1.62 + 0.15, DZ + 0.22]; at = [DX, 0.15 + 0.17 + LB + 0.06, DZ - 0.02]; fov = 52; drift = 0.004;
         } else {
-          const k1 = K(t, tB, tPost + 1.2, Ease.inOutSine), k2 = K(t, tPost + 0.6, SB.video, Ease.inOutSine);
+          const k1 = K(t, tB, tPost + 1.2, Ease.inOutSine), k2 = K(t, tPost + 0.6, SB.scott, Ease.inOutSine);
           // (up above the trees first, then out over the water)
           const p1 = sbV([-7.75, 2.3, DZ - 4.5], [-7.6, 2.9, DZ - 6.0], k1);
           pos = [sbLerp(p1[0], 0.0, k2), sbLerp(p1[1], 13, Ease.outQuad(k2)), sbLerp(p1[2], DZ - 22, k2)];
