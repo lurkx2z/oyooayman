@@ -37,8 +37,8 @@ const SB_SHOTS = [
   { id: 'E2', t0: SB.cookies, t1: SB.cookie2, set: 'lab', mode: 'cookies' },
   { id: 'E3', t0: SB.cookie2, t1: SB.game, set: 'lab', mode: 'cookie2' },
   { id: 'E4', t0: SB.game, t1: SB.game2, set: 'lab', mode: 'game' },
-  { id: 'E5', t0: SB.game2, t1: SB.candy, set: 'lab', mode: 'game2' },
-  { id: 'E6', t0: SB.candy, t1: SB.views, set: 'lab', mode: 'candy' },
+  { id: 'E5', t0: SB.game2, t1: SB.genius, set: 'lab', mode: 'game2' },
+  { id: 'E6', t0: SB.genius, t1: SB.views, set: 'house', mode: 'genius' },
   { id: 'E7', t0: SB.views, t1: SB.yacht, set: 'house', mode: 'views' },
   // 6 — year two
   { id: 'F1', t0: SB.yacht, t1: SB.wall, set: 'sea', mode: 'yacht' },

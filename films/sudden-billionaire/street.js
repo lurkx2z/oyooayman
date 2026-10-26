@@ -261,7 +261,7 @@ SB_SETS.street = (app) => {
   const flapPivot = new THREE.Group(); flapPivot.position.set(-0.166 - PX, 0.17 + LB + 0.018, 0.58); doorG.add(flapPivot);
   sbBox(0.006, 0.04, 0.27, brass, 0, -0.02, 0, flapPivot);
   { const np = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.11), new THREE.MeshStandardMaterial({ roughness: 0.3, map: sbTex(sbCanvas(160, 110, (g, w, h) => { g.fillStyle = '#f4f2ee'; g.fillRect(0, 0, w, h); g.strokeStyle = '#1f3a7a'; g.lineWidth = 6; g.strokeRect(5, 5, w - 10, h - 10); g.fillStyle = '#1f3a7a'; g.font = 'bold 74px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('14', w / 2, h / 2 + 4); }), { repeat: false }) }));
-    np.position.set(-0.165 - PX, 0.17 + 1.52, 0.58); np.rotation.y = -Math.PI / 2; doorG.add(np); }
+    np.position.set(-0.165 - PX, 0.17 + 2.02, 0.58); np.rotation.y = -Math.PI / 2; doorG.add(np); }
   const slot = new THREE.Vector3(DX - 0.155, 0.15 + 0.17 + LB, DZ);    // (world: the slot's mouth)
   // the envelope: in your hand (a prop on the right hand), then sliding in on its own
   const envTex = sbTex(sbStEnvelopeCanvas(), { repeat: false });

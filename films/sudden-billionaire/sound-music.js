@@ -266,14 +266,20 @@ sbSound('music', 'score', function (ctx, bus, K) {
     sbPulse(ctx, M.bus, SB.boss + 0.2, SB.cookies + 0.2, ['D2', 'A2', 'D3', 'F3'], 0.25, 0.75, { cut: 500, cutTo: 900, acc: 4 });
     M.strings(SB.boss, SB.cookies + 0.4, ['D2', 'A2', 'D3', 'A3'], 0.36, { att: 0.4, rel: 0.4, cut: 800, wave: 'square', vib: 2 });
     M.drum(cap('boss', 1), 0.55, 36.7, 1.3);                                             // "nobody tells you no"
-    const studies = [[SB.cookies, SB.game], [SB.game, SB.candy], [SB.candy, SB.views]];
+    const studies = [[SB.cookies, SB.game], [SB.game, SB.genius]];
     studies.forEach(([a, b], k) => {
       M.drum(a + 0.1, 0.45 + 0.1 * k, 41.2, 1.3);
       pluck(a + 0.4, b - 0.2, ['D4', 'A3', 'F4', 'A3', 'E4', 'A3', 'C#4', 'A3'], 0.3, (t) => 0.055 + 0.02 * k + 0.03 * sbEv(t, a + 4, b - 2), { acc: 4 });
       M.prog([[a, C.Dm], [a + (b - a) * 0.5, C.Gm], [a + (b - a) * 0.8, C.A]], b + 0.3, 0.18 + 0.04 * k, { cut: 900 });
     });
-    pluck(SB.game2 + 0.3, SB.candy - 0.3, ['D2', null, 'A2', null], 0.3, 0.12, { dur: 0.2 });   // (the rich player gets louder)
+    pluck(SB.game2 + 0.3, SB.genius - 0.3, ['D2', null, 'A2', null], 0.3, 0.12, { dur: 0.2 });   // (the rich player gets louder)
     M.drum(SB.winGame + 0.2, 0.5, 36.7, 1.4);
+    // the magazine: a bright, hollow fanfare for the cover; it sours on "you start to believe you earned it"
+    M.drum(SB.genius + 0.15, 0.5, 34.6, 1.4);
+    M.strings(SB.genius + 0.1, cap('genius', 2) + 0.3, C.Bbmaj7, 0.26, { att: 0.3, rel: 0.5, cut: 2200 });
+    M.prog([[SB.genius + 0.2, C.Bb], [cap('genius', 1), C.F], [cap('genius', 2), C.Db]], SB.views + 0.4, 0.2, { cut: 1200 });
+    M.bell(SB.genius + 0.5, 'F5', 0.12, 0.2); M.bell(SB.genius + 0.8, 'Bb5', 0.1, -0.2);
+    M.piano(cap('genius', 2) + 0.2, 'Db2', 0.18, 3.0, 0); M.piano(cap('genius', 2) + 0.2, 'Ab2', 0.12, 3.0, 0);
     // views: the pulse thins to a drone; the TV's on
     M.strings(SB.views, SB.yacht + 0.4, ['D2', 'A2', 'E3'], 0.22, { att: 0.8, rel: 0.5, cut: 600 });
   }

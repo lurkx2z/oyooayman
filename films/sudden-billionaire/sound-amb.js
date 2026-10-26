@@ -33,10 +33,10 @@ sbSound('amb', 'places', function (ctx, bus, K) {
     carN: is('car', ['cold', 'point', 'again', 'question']), carD: is('car', ['drive', 'nostop']),
     flatN: is('flat', ['title', 'flat', 'draw', 'balls', 'won', 'scale', 'promise']), flatD: is('flat', ['mum', 'out', 'who', 'trust']),
     flat3: is('flat', ['interest']), feeney: is('flat', ['feeney']),
-    houseIn: is('house', ['house', 'views', 'years', 'pledge']), morning: is('house', ['six', 'brick']), garage: is('house', ['garage', 'note']),
+    houseIn: is('house', ['house', 'genius', 'views', 'years', 'pledge']), morning: is('house', ['six', 'brick']), garage: is('house', ['garage', 'note']),
     dusk: is('house', ['enough']), night: is('house', ['compare']), gate: is('house', ['wall']),
     old: is('street', ['old']), town: is('street', ['walk', 'glass', 'glass2']), canal: is('street', ['letters']),
-    lab: is('lab', ['dunn', 'cookies', 'cookie2', 'game', 'game2', 'candy', 'real']), hallS: is('lab', ['scott']), board: is('lab', ['boss']), sea: is('sea'),
+    lab: is('lab', ['dunn', 'cookies', 'cookie2', 'game', 'game2', 'real']), hallS: is('lab', ['scott']), board: is('lab', ['boss']), sea: is('sea'),
   };
   const P = {}; for (const k in PR) P[k] = sbCurve(sbPlace(PR[k]));
   const W = {}; for (const k in PR) W[k] = sbWins(PR[k]);

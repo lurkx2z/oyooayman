@@ -64,6 +64,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> **Long-form (16:9, voiceless): *Would you actually be generous if you suddenly became a billionaire?*** — open
+> `sudden-billionaire.html` (7:52). Psychology, told as your own story over ten years: $412 in the bank, one lottery
+> ticket, a billion dollars after tax and a sticky note that says *give half away*. Then what the research says sudden
+> money and power do (giving feels good, everyone wants some, the house, the neighbours, wanting more, the cookie study,
+> the rigged Monopoly game, your politics, camera glasses, the crossing study that failed to repeat), the Giving Pledge,
+> the opposite evidence (lost letters, payday, the surveys), MacKenzie Scott and Chuck Feeney. A readout ticks your money
+> to the cent the whole time, with STILL TO GIVE climbing beside it; every study carries an honest label.
+> [`films/sudden-billionaire/PLAN.md`](films/sudden-billionaire/PLAN.md).
 
 | Time | Beat |
 |---|---|

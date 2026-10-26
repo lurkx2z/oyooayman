@@ -21,7 +21,7 @@ const PAUSE = [
   0.9, 0.7, 0.9, 1.6, 1.0, 1.2,            // 03–08 the flat, the draw, the balls, a billion, its size, the promise
   1.3, 0.9, 1.1, 0.7, 0.8, 1.0,            // 09–14 day one, giving feels good, the messages, who, trust, interest
   1.6, 1.2, 1.2, 0.8, 0.9, 1.0,           // 15–20 the house, the neighbours, month six, 1978, enough, poorer but ahead
-  1.4, 1.0, 0.9, 1.1, 0.8, 1.0, 1.0,       // 21–27 the boss, cookies, the game, the sweets, opinions
+  1.4, 1.0, 0.9, 1.1, 0.8, 1.0, 1.0,       // 21–27 the boss, cookies, the game, the magazine, opinions
   1.4, 1.0,                                // 28–29 the yacht, the wall
   1.6, 0.9, 0.6, 1.2, 0.8,                 // 30–34 downtown, the glasses, the crossing
   1.6, 1.2, 1.2,                           // 35–37 years, the note, the pledge

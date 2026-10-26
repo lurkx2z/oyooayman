@@ -59,7 +59,7 @@ status: voiceless
 
 [game2] The rich players got louder. / They ate more of the pretzels. / And when they won, they said it was skill.
 
-[candy] Another study left out a jar of sweets meant for children. / People made to feel rich took twice as many.
+[genius] A business magazine puts you on its cover. / You won a lottery. / But you start to believe you earned it.
 
 [views] Even your opinions change. / In Britain, lottery winners drifted right. The bigger the win, the bigger the shift.
 
@@ -81,13 +81,13 @@ status: voiceless
 
 [note] Then you find the note. / Half would be $627 million now.
 
-[pledge] You're not the only one. / In 2010, 57 American billionaires promised to give at least half away. / 15 years later, the 32 still billionaires are 283% richer. / Most of what they gave went to private foundations, often their own. / Of all 22 pledgers who have died, only 8 gave half away.
+[pledge] You're not the only one. / In 2010, 57 American billionaires promised to give at least half away. / 15 years later, the 32 still billionaires are 283% richer. / Most of what they gave went to private foundations, often their own. / Of the 22 pledgers who have died, only 8 gave half away.
 
 [real] Is any of this real? / Your story is made up. The studies are real. / Some were small. Some failed when repeated, like the crossing study.
 
-[letters] In a Dutch city, researchers delivered letters to the wrong homes on purpose. / Rich homes sent back 81%. Poor homes, 38%. / Big surveys agree: richer people give more dollars. / Whether they give a bigger share is still argued over.
+[letters] In a Dutch city, researchers delivered letters with money inside to the wrong homes on purpose. / Rich homes sent back 81%. Poor homes, 38%. / But just after payday, poor homes sent back almost as many. / Big surveys agree: richer people give more dollars. / Whether they give a bigger share is still argued over.
 
-[scott] And one woman lived almost exactly this story. / In 2019, a divorce suddenly made MacKenzie Scott worth about $36 billion. / Since then, she has given away $26 billion, with no strings attached.
+[scott] And one real woman's story began a lot like yours. / In 2019, a divorce suddenly made MacKenzie Scott worth about $36 billion. / Since then, she has given away $26 billion, with no strings attached.
 
 [feeney] Chuck Feeney gave away about $8 billion, mostly in secret. / He kept about $2 million, rented a flat, and wore a cheap watch.
 

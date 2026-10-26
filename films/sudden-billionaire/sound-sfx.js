@@ -14,7 +14,7 @@
      the streets     the neighbour's cloth on the new car, a camera; your steps downtown, the phone; a letterbox,
                      the door, her steps to the postbox
      the lab         the envelope, the $20 into the tin; the folder, the chairs, the laughing; the card, the plate,
-                     the cookies; the coin, the dice, the money slapped down, the pretzels; the sweets; the stamps;
+                     the cookies; the coin, the dice, the money slapped down, the pretzels; the magazine; the stamps;
                      the papers dropped and picked up
      the marina      a tender passing
    ===================================================================== */
@@ -181,9 +181,9 @@ sbSound('sfx', 'events', function (ctx, bus, K) {
     for (let t = SB.pretzel, i = 0; i < 5; t += 0.4, i++) put(crunch({ d: 0.09, lo: 1200, hi: 7000 }), t, 0.02, { room, wet: 0.2 });
     dice(SB.winGame - 0.3, 2);
     { const y = fx.breath(0.9, {}); put(y, SB.winGame + 0.9, 0.015, { pan: -0.2, room, wet: 0.4 }); }
-    // the sweets: the lid, the grab
-    put(fx.hit(fx.glassModes().map(([f, tau, a]) => [f * 2.2, tau, a]), { width: 0.0004 }), SB.grab - 0.6, 0.025, { room, wet: 0.3 });
-    for (let t = SB.grab, i = 0; i < 26; t += r.range(0.01, 0.05), i++) put(fx.hit([[r.range(2500, 5200), 0.02, 1], [r.range(5500, 8000), 0.01, 0.4]], { width: 0.0001 }), t, 0.012 * r.range(0.3, 1), { pan: r.range(-0.3, 0.3), room, wet: 0.3 });
+    // the magazine: the glossy cover slid across the table, a page lifted and let fall
+    put(fx.rustle(0.7, { density: 260, rub: 0.5, lo: 900, hi: 6000, grain: 0.02 }), SB.genius + 0.25, 0.02, { room, wet: 0.25 });
+    put(paper(0.35, { lo: 1500 }), cap('genius', 1) - 0.2, 0.018, { pan: 0.15, room, wet: 0.25 });
   }
   // ================= year two: the tender passing; the gate
   {

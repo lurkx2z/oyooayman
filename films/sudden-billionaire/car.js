@@ -164,7 +164,7 @@ SB_SETS.car = (app) => {
   const phone = sbPhone(); phone.g.scale.setScalar(1.25); phone.g.position.set(0.14, 0.99, -0.78); phone.g.rotation.set(-0.42, -0.2, 0); car.add(phone.g);
   P(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.06, 0.03), dark), 0.14, 0.94, -0.79);
   const noteTex = sbNoteTex(1);
-  const note = P(new THREE.Mesh(new THREE.PlaneGeometry(0.076, 0.076), new THREE.MeshStandardMaterial({ map: noteTex, roughness: 0.85 })), -0.1, 0.958, -0.72); note.rotation.x = -Math.PI / 2 + 0.25; note.rotation.z = 0.08;
+  const note = P(new THREE.Mesh(new THREE.PlaneGeometry(0.09, 0.09), new THREE.MeshStandardMaterial({ map: noteTex, roughness: 0.85, emissive: '#fff4c0', emissiveMap: noteTex, emissiveIntensity: 0.35 })), 0.3, 0.985, -0.79); note.rotation.set(-0.42, -0.24, 0.07);   // (stuck up beside the phone, facing you)
   // the interior's light: the screens' glow, and what the street gives
   const glowL = new THREE.PointLight('#8fb0ff', 0.25, 1.4, 2); glowL.position.set(0.0, 0.95, -0.5); car.add(glowL);
   const dome = new THREE.PointLight('#ffe2c0', 0, 1.6, 2); dome.position.set(0, 1.38, 0.0); car.add(dome);
@@ -176,7 +176,7 @@ SB_SETS.car = (app) => {
   const crossL = new THREE.SpotLight('#ffd9a8', 0, 18, 0.55, 0.6, 1.4); crossL.position.set(SB_CAR.kerb + 1.2, 6.2, 2.5); crossL.target.position.set(SB_CAR.kerb + 0.2, 0, -0.2); scene.add(crossL, crossL.target);
   // ---- the people: her (night), another woman (day), people on the pavements
   const her = sbPerson({ id: 'sbHer', look: 'sbWoman', path: [[0, SB_CAR.kerb + 0.4, -0.2]], face: 90, states: [[0, 'sbUmbrella']] }, scene, { umbrella: '#1d2a44' });
-  const him = sbPerson({ id: 'sbHim', look: 'sbShopper', path: [[0, SB_CAR.kerb + 0.4, 0.3]], face: 90, states: [[0, 'idle']] }, scene);
+  const him = sbPerson({ id: 'sbHim', look: 'sbWoman', path: [[0, SB_CAR.kerb + 0.4, 0.3]], face: 90, states: [[0, 'idle']] }, scene);
   const walkers = [];
   for (let i = 0; i < 14; i++) {
     const sx = i % 2 ? 1 : -1, x = sx * (ST.HR + 1.2 + (i % 3) * 0.9), z0 = -120 + i * 23, dir = i % 3 ? -1 : 1, looks = ['casual1', 'casual2', 'casual5', 'casual6', 'casual7', 'sbVisitor', 'casual3'];

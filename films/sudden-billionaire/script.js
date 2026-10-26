@@ -78,8 +78,7 @@ SB.game2 = sbS('game2') - 0.45;
 SB.slap = sbCap('game2', 0).show + 0.5;
 SB.pretzel = sbCap('game2', 1).show + 0.3;
 SB.winGame = sbCap('game2', 2).show + 0.2;
-SB.candy = sbS('candy') - 0.5;
-SB.grab = sbCap('candy', 1).show + 0.2;
+SB.genius = sbS('genius') - 0.5;                      // the magazine cover on your table
 SB.views = sbS('views') - 0.5;
 SB.channel = sbCap('views', 1).show + 1.2;             // you change the channel
 // 6 — year two: the yacht, the wall

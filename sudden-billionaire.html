@@ -21,12 +21,13 @@
       font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 52); line-height: 1.2; color: #f6f1e7; pointer-events: none;
       text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.85), 0 0 calc(var(--u) * 4) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
     .sb-cap::before { content: ''; position: absolute; left: -14%; right: -14%; top: -55%; bottom: -55%; z-index: -1;
-      background: radial-gradient(closest-side, rgba(0, 0, 0, 0.56), rgba(0, 0, 0, 0)); }
+      background: radial-gradient(closest-side, rgba(0, 0, 0, 0.64), rgba(0, 0, 0, 0)); }
+    .sb-cap.pl::before { left: -90%; right: -90%; top: -70%; bottom: -70%; background: radial-gradient(closest-side, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0)); }
     .sb-cap .n { color: #ffcf8a; }
     .sb-cap.q { bottom: calc(var(--u) * 430); font-size: calc(var(--u) * 82); font-weight: 600; max-width: calc(var(--u) * 1600); }
     /* the counter (top left, on a soft plate) and the scene's context line under it */
     .sb-ro, .sb-where { position: absolute; top: calc(var(--u) * 44); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.6); }
-    .sb-ro { left: calc(var(--u) * 52); padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 18); border-radius: calc(var(--u) * 16); background: rgba(6, 8, 12, 0.55); }
+    .sb-ro { left: calc(var(--u) * 52); padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 18); border-radius: calc(var(--u) * 16); background: rgba(6, 8, 12, 0.64); }
     .sb-ro .l, .sb-where .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.18em; color: #ffffff; opacity: 0.92; }
     .sb-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
       font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }

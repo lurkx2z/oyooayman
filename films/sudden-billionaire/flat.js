@@ -407,7 +407,7 @@ SB_SETS.flat = (app) => {
       let pos = SEAT, at = TV, fov = 55, roll = 0, drift = 0.006, show = null;
       if (m === 'title') {
         const k = K(t, SB.titleShot, SB.flat + 0.5);
-        pos = sbV([-1.3, 1.7, 0.42], [-1.1, 1.64, 0.25], k); at = sbV([0.6, 0.82, -1.15], [0.55, 0.8, -1.1], k); fov = 62;
+        pos = sbV([-1.45, 1.74, 0.5], [-1.0, 1.6, 0.18], Ease.inOutSine(k)); at = sbV([0.6, 0.86, -1.15], [0.55, 0.8, -1.1], k); fov = sbLerp(64, 55, k);
       } else if (m === 'flat') {
         // the TV (the ad), the letter on the table, then your phone
         const k1 = K(t, sbCap('flat', 0).show + 0.4, sbCap('flat', 0).hide + 0.2), k2 = K(t, SB.rent - 0.9, SB.rent + 0.2);
@@ -496,7 +496,8 @@ SB_SETS.flat = (app) => {
       p.grain = 0.03;
       if (m === 'mum' || m === 'out' || m === 'who' || m === 'trust') { p.exposure = 1.08; p.warmth = 0.03; p.bloom = 0.3; p.bloomThreshold = 0.95; }
       else if (m === 'feeney') { p.exposure = 1.12; p.warmth = 0.06; p.saturation = 0.92; p.bloom = 0.35; }
-      else if (m === 'interest') { p.exposure = 1.25; p.warmth = -0.05; p.saturation = 0.85; p.vignette = 0.7; p.bloom = 0.5; p.bloomThreshold = 0.7; }
+      else if (m === 'scale') { p.exposure = 1.12; p.warmth = 0.02; p.bloom = 0.28; p.bloomThreshold = 0.92; p.vignette = 0.6; }
+      else if (m === 'interest') { p.exposure = 1.4; p.warmth = -0.05; p.saturation = 0.85; p.vignette = 0.7; p.bloom = 0.5; p.bloomThreshold = 0.7; }
       else { p.exposure = 1.18; p.warmth = 0.02; p.bloom = 0.45; p.bloomThreshold = 0.8; p.vignette = 0.6; }
       if (m === 'won') p.flash = Math.max(p.flash, 0.18 * Math.exp(-Math.pow((t - SB.billion) * 3, 2)));
       if (m === 'balls' && t >= SB.ball[5]) { p.flash = Math.max(p.flash, 0.3 * Math.exp(-(t - SB.ball[5]) * 5)); p.flashColor.setRGB(1, 0.92, 0.75); }

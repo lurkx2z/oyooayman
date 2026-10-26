@@ -27,14 +27,14 @@ function sbWhenStr(d) {
 // [from, to, label, value, sub(t)]: the story's places (WHEN), the studies' (THE STUDY)
 const SB_WHERE = [
   [0.3, SB.titleShot, 'WHEN', () => 'TEN YEARS FROM NOW', () => 'THE CROSSING · 9:36 PM · RAIN'],
-  [SB.flat + 0.3, SB.mum, 'WHEN', () => 'SATURDAY NIGHT', (t) => 'YOUR FLAT · ' + sbClockTime(sbDay(t))],
-  [SB.mum + 0.3, SB.dunn, 'WHEN', null, (t) => 'YOUR FLAT · ' + sbClockTime(sbDay(t))],
+  [SB.flat + 0.3, SB.mum, 'WHEN', () => 'SATURDAY NIGHT', (t) => 'YOUR FLAT · ' + sbClockTime(sbWhenDay(t))],
+  [SB.mum + 0.3, SB.dunn, 'WHEN', null, (t) => 'YOUR FLAT · ' + sbClockTime(sbWhenDay(t))],
   [SB.dunn + 0.3, SB.out, 'THE STUDY', () => 'VANCOUVER, 2008', () => 'A UNIVERSITY CAMPUS · 46 PEOPLE'],
-  [SB.out + 0.3, SB.house, 'WHEN', null, (t) => 'YOUR FLAT · ' + sbClockTime(sbDay(t))],
+  [SB.out + 0.3, SB.house, 'WHEN', null, (t) => 'YOUR FLAT · ' + sbClockTime(sbWhenDay(t))],
   [SB.house + 0.3, SB.garage, 'WHEN', null, () => 'THE HOUSE'],
   [SB.garage + 0.2, SB.neighbours, 'WHEN', null, () => 'THE GARAGE'],
   [SB.neighbours + 0.3, SB.six, 'WHEN', null, () => 'YOUR OLD STREET'],
-  [SB.six + 0.3, SB.brick, 'WHEN', null, (t) => 'THE KITCHEN · ' + sbClockTime(sbDay(t))],
+  [SB.six + 0.3, SB.brick, 'WHEN', null, (t) => 'THE KITCHEN · ' + sbClockTime(sbWhenDay(t))],
   [SB.brick + 0.3, SB.sweden, 'THE STUDY', () => 'ILLINOIS, 1978', () => '22 LOTTERY WINNERS · 22 OTHERS'],
   [SB.sweden + 0.2, SB.enough, 'THE STUDY', () => 'SWEDEN, 2020', () => '3,300 LOTTERY PLAYERS'],
   [SB.enough + 0.3, sbCap('enough', 1).show - 0.1, 'WHEN', null, () => 'THE TERRACE'],
@@ -42,9 +42,8 @@ const SB_WHERE = [
   [SB.compare + 0.3, SB.boss, 'THE SURVEY', () => 'HARVARD, 1998', () => '257 STUDENTS AND STAFF'],
   [SB.boss + 0.3, SB.cookies, 'WHEN', null, () => 'YOUR COMPANY'],
   [SB.cookies + 0.3, SB.game, 'THE STUDY', () => 'BERKELEY, 1998', () => 'GROUPS OF THREE STUDENTS'],
-  [SB.game + 0.3, SB.candy, 'THE GAME', () => 'BERKELEY', () => '100+ PAIRS · SHOWN IN A 2013 TALK'],
-  [SB.candy + 0.3, SB.views, 'THE STUDY', () => 'BERKELEY, 2012', () => 'A JAR OF SWEETS FOR CHILDREN'],
-  [SB.views + 0.3, sbCap('views', 1).show - 0.1, 'WHEN', null, () => 'THE HOUSE'],
+  [SB.game + 0.3, SB.genius, 'THE GAME', () => 'BERKELEY', () => '100+ PAIRS · SHOWN IN A 2013 TALK'],
+  [SB.genius + 0.3, sbCap('views', 1).show - 0.1, 'WHEN', null, () => 'THE HOUSE'],
   [sbCap('views', 1).show, SB.yacht, 'THE STUDY', () => 'BRITAIN, 2014', () => 'LOTTERY WINNERS, OVER YEARS'],
   [SB.yacht + 0.3, SB.wall, 'WHEN', null, () => 'THE MARINA'],
   [SB.wall + 0.3, SB.walk, 'WHEN', null, () => 'THE GATE'],
@@ -56,9 +55,9 @@ const SB_WHERE = [
   [SB.years + 0.3, SB.note, 'WHEN', null, () => 'THE HOUSE'],
   [SB.note + 0.3, SB.pledge, 'WHEN', null, () => 'THE GARAGE'],
   [SB.pledge + 0.3, SB.real, 'THE GIVING PLEDGE', () => '2010 → 2025', () => 'THE ORIGINAL 57 AMERICANS'],
-  [SB.letters + 0.3, sbCap('letters', 2).show - 0.1, 'THE STUDY', () => 'THE NETHERLANDS, 2021', () => '360 LETTERS, WRONG ADDRESSES'],
-  [sbCap('letters', 2).show, SB.scott, 'THE SURVEYS', () => 'TAX RECORDS, POLLS', () => 'MILLIONS OF HOUSEHOLDS'],
-  [SB.scott + 0.3, SB.feeney, 'A REAL WOMAN', () => 'MACKENZIE SCOTT', () => '2019 → 2025'],
+  [SB.letters + 0.3, sbCap('letters', 3).show - 0.1, 'THE STUDY', () => 'THE NETHERLANDS, 2021', () => '360 LETTERS, WRONG ADDRESSES'],
+  [sbCap('letters', 3).show, SB.scott, 'THE SURVEYS', () => 'TAX RECORDS, POLLS', () => 'MILLIONS OF HOUSEHOLDS'],
+  [SB.scott + 0.3, SB.scottGive + 2.4, 'A REAL WOMAN', () => 'MACKENZIE SCOTT', () => '2019 → 2025'],
   [SB.feeney + 0.3, SB.point, 'A REAL MAN', () => 'CHUCK FEENEY', () => '1931–2023 · SAN FRANCISCO'],
   [SB.point + 0.3, SB.herLook + 0.8, 'WHEN', () => 'TEN YEARS FROM NOW', () => 'THE CROSSING · 9:36 PM · RAIN'],
 ];
@@ -97,7 +96,8 @@ const SB_CTX = [
   [sbCap('interest', 1).show + 0.2, sbCap('interest', 2).show - 0.05, 'AT 5% A YEAR', () => ({ v: '$137,000 A DAY', v2: '$1.59 A SECOND' })],
   [sbCap('interest', 2).show, SB.house - 0.2, 'SINCE THIS SENTENCE APPEARED', (t) => ({ v: '+' + sbDollars(Math.max(0, sbMoney(Math.min(t, sbCap('interest', 2).hide)) - sbMoney(sbCap('interest', 2).show))), v2: '' })],
   [sbCap('house', 1).show + 0.2, SB.garage - 0.1, 'BATHROOMS', () => ({ v: '11 · USED 2', v2: '' })],
-  [sbCap('neighbours', 1).show + 0.2, SB.six - 0.2, 'EVERY C$1,000 MORE A NEIGHBOUR WON', () => ({ v: '+2.4% RISK OF BANKRUPTCY', v2: 'NEXT DOOR · IN THE 2016 DRAFT' })],
+  [sbCap('neighbours', 1).show + 0.2, SB.six - 0.2, 'EVERY C$1,000 MORE A NEIGHBOUR WON', () => ({ v: '2.4% MORE BANKRUPTCIES', v2: 'AMONG THE CLOSEST NEIGHBOURS' })],
+  [sbCap('genius', 1).show + 0.3, SB.views - 0.2, 'HOW YOU GOT RICH', () => ({ v: 'ONE LOTTERY TICKET', v2: 'THE ODDS: 1 IN 292 MILLION' })],
   [SB.sweden + 0.5, SB.enough - 0.2, 'BIG WINNERS, 10+ YEARS ON', () => ({ v: 'MORE SATISFIED WITH LIFE', v2: 'NOT CLEARLY HAPPIER DAY TO DAY' })],
   [SB.plate + 0.4, SB.extra - 0.1, 'THE PLATE', () => ({ v: '5 COOKIES · 3 PEOPLE', v2: '' })],
   [SB.extra - 0.1, SB.game - 0.2, 'LEFT ON THE PLATE', (t) => ({ v: t < SB.extra + 0.5 ? '2 COOKIES' : '1 COOKIE', v2: t < SB.extra + 0.5 ? 'ONE EACH, SO FAR' : 'YOU TOOK THE EXTRA ONE' })],
@@ -133,8 +133,8 @@ const SB_TAGS = [
   [0.3, SB.titleShot, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
   [SB.flat + 0.4, SB.dunn, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
   [SB.dunn + 0.3, SB.out, 'REAL STUDY · 2008 · 46 PEOPLE · REPEATS: SMALLER, MIXED'],
-  [SB.out + 0.3, SB.neighbours, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
-  [SB.neighbours + 0.3, SB.six, 'REAL STUDY · CANADA · 2020 · WINS UNDER C$150,000'],
+  [SB.out + 0.3, sbCap('neighbours', 1).show - 0.1, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
+  [sbCap('neighbours', 1).show, SB.six, 'REAL STUDY · CANADA · 2020 · WINS UNDER C$150,000'],
   [SB.six + 0.3, SB.brick, 'ILLUSTRATION'],
   [SB.brick + 0.3, SB.sweden, 'REAL STUDY · 1978 · ONLY 22 WINNERS'],
   [SB.sweden + 0.2, SB.enough, 'REAL STUDY · SWEDEN · 2020 · 3,300 PLAYERS'],
@@ -142,16 +142,16 @@ const SB_TAGS = [
   [SB.compare + 0.3, SB.boss, 'REAL SURVEY · 1998 · 257 PEOPLE'],
   [SB.boss + 0.3, SB.cookies, 'ILLUSTRATION'],
   [SB.cookies + 0.3, SB.game, 'UNPUBLISHED LAB STUDY · 1998 · ILLUSTRATED'],
-  [SB.game + 0.3, SB.candy, 'FROM A TALK, NOT A PUBLISHED PAPER · ILLUSTRATED'],
-  [SB.candy + 0.3, SB.views, 'REAL STUDY · 2012 · SMALL · LATER CRITICISED'],
+  [SB.game + 0.3, SB.genius, 'FROM A TALK, NOT A PUBLISHED PAPER · ILLUSTRATED'],
+  [SB.genius + 0.3, sbCap('views', 1).show - 0.1, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
   [sbCap('views', 1).show, SB.yacht, 'REAL STUDY · BRITAIN · 2014 · MOSTLY SMALL WINS, MAINLY MEN'],
   [SB.yacht + 0.3, SB.glass, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
   [SB.glass + 0.3, SB.drive, 'REAL STUDY · 2016 · 61 PEOPLE · CLASS WAS SELF-RATED'],
   [sbCap('drive', 1).show, SB.nostop, 'REAL STUDY · 2012 · SMALL · A 2023 REPEAT FOUND NO LINK'],
   [SB.nostop + 0.3, SB.pledge, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
   [SB.pledge + 0.3, SB.real, 'REAL · ESTIMATES BY A CAMPAIGNING THINK TANK (IPS) · 2025'],
-  [SB.letters + 0.3, sbCap('letters', 2).show - 0.1, 'REAL FIELD EXPERIMENT · 2021 · 360 LETTERS'],
-  [sbCap('letters', 2).show, SB.scott, 'REAL · LARGE SURVEYS · THEY DISAGREE ON THE SHARE'],
+  [SB.letters + 0.3, sbCap('letters', 3).show - 0.1, 'REAL FIELD EXPERIMENT · 2021 · 360 LETTERS'],
+  [sbCap('letters', 3).show, SB.scott, 'REAL · LARGE SURVEYS · THEY DISAGREE ON THE SHARE'],
   [SB.scott + 0.3, SB.feeney, 'REAL · HER OWN REPORTS, FORBES · ILLUSTRATED'],
   [SB.feeney + 0.3, SB.point, 'REAL · ILLUSTRATED'],
   [SB.point + 0.3, SB.herLook + 0.8, 'ILLUSTRATION · YOUR STORY IS MADE UP'],
@@ -172,7 +172,7 @@ class SbHud {
     this.tag = mk('sb-tag');
     this.where = mk('sb-where', '<div class="l"></div><div class="v"></div><div class="f"></div>'); this.whereL = this.where.querySelector('.l'); this.whereV = this.where.querySelector('.v'); this.whereF = this.where.querySelector('.f');
     this.cap = mk('sb-cap');
-    this.caps = SBT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: g.id === 'question' ? SB.end - 0.2 : c.hide, html: sbCapHtml(c.text), q: g.id === 'question' })));   // (the question stays to the end)
+    this.caps = SBT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: g.id === 'question' ? SB.end - 0.2 : c.hide, html: sbCapHtml(c.text), q: g.id === 'question', pl: g.id === 'out' })));   // (the message counts sit over the phone: a darker backing)   // (the question stays to the end)
     this.inset = mk('sb-inset');
     this.rec = mk('sb-rec', 'REC · CAMERA GLASSES');
     this.gaze = mk('sb-gaze', '<span class="t"></span>'); this.gazeT = this.gaze.querySelector('.t');
@@ -214,7 +214,7 @@ class SbHud {
     // ---- the caption
     const cp = this.caps.find((x) => t >= x.show - 0.01 && t < x.hide);
     if (cp) {
-      this._html('cap', this.cap, cp.html); this._cls('capq', this.cap, cp.q ? 'sb-cap q' : 'sb-cap');
+      this._html('cap', this.cap, cp.html); this._cls('capq', this.cap, cp.q ? 'sb-cap q' : cp.pl ? 'sb-cap pl' : 'sb-cap');
       this._set('capa', this.cap, 'opacity', W(t, cp.show, cp.hide, 0.22, 0.3).toFixed(3));
     } else this._set('capa', this.cap, 'opacity', '0');
     // ---- the camera glasses: REC and the gaze ring
@@ -235,7 +235,10 @@ class SbHud {
       if (!l || !cam) { d.style.opacity = '0'; return; }
       _p.set(l.p[0], l.p[1], l.p[2]).project(cam);
       const vis = _p.z < 1 && Math.abs(_p.x) < 1.1 && Math.abs(_p.y) < 1.1;
-      d.style.opacity = vis ? String(l.a ?? 1) : '0';
+      // (a label under an open diagram steps aside: hidden while the diagram is up)
+      const ia = this._inA || 0, R0 = this._inK === 'mid' ? [47, 20, 98, 75] : this._inK === 'big' ? [20, 9, 80, 75] : [54.5, 28, 98, 76];
+      const under = ia > 0.02 && (_p.x * 0.5 + 0.5) * 100 > R0[0] && (-_p.y * 0.5 + 0.5) * 100 > R0[1] - 6 && (-_p.y * 0.5 + 0.5) * 100 < R0[3];
+      d.style.opacity = vis ? String((l.a ?? 1) * (under ? 1 - ia : 1)) : '0';
       const lx = (_p.x * 0.5 + 0.5) * 100, ly = (-_p.y * 0.5 + 0.5) * 100;
       const r = l.side ? l.side === 'l' : lx > 72; if (d._r !== r) { d._r = r; d.classList.toggle('r', r); }
       // (kept clear of the panels: the readout and context line top left, WHERE top right)
@@ -256,16 +259,16 @@ class SbHud {
       ['brick', c('brick', 2).show - 0.3, SB.sweden + 0.2, ''],
       ['enough', c('enough', 2).show - 0.2, SB.compare - 0.2, ''],
       ['compare', c('compare', 0).show + 0.2, SB.boss - 0.2, 'mid'],
-      ['candy', c('candy', 1).show + 0.4, SB.views - 0.2, ''],
       ['drive', c('drive', 2).show - 0.2, c('drive', 3).hide - 0.3, ''],
       ['years', c('years', 1).show - 0.2, SB.note - 0.2, ''],
       ['pledge', c('pledge', 1).show - 0.2, SB.real - 0.3, 'mid'],
-      ['letters', c('letters', 1).show - 0.2, c('letters', 2).show - 0.15, ''],
-      ['share', c('letters', 3).show - 0.1, SB.scott - 0.2, ''],
+      ['letters', c('letters', 1).show - 0.2, c('letters', 3).show - 0.15, ''],
+      ['share', c('letters', 4).show - 0.1, SB.scott - 0.2, ''],
     ].find((x) => t >= x[1] && t < x[2]);
     const a = which ? W(t, which[1], which[2], 0.5, 0.5) : 0;
     this._set('ina', this.inset, 'opacity', a.toFixed(3));
     this._cls('inb', this.inset, which && which[3] ? 'sb-inset ' + which[3] : 'sb-inset');
+    this._inA = a; this._inK = which ? which[3] : '';
     if (!which) return 0;
     const k = which[0], u = t - which[1], key = k + '|' + Math.round(u * 30);
     if (key !== this._insetKey) { this._insetKey = key; this.inset.innerHTML = SbHud[k](u, t); }
@@ -301,7 +304,7 @@ class SbHud {
   static brick(u, t) {
     const k = MathX.smooth(u, 0.2, 1.4);
     return SbHud.svg(`${SbHud.plate()}
-      <text x="40" y="58" class="t">HOW MUCH THEY ENJOYED EVERYDAY THINGS</text>
+      ${SbHud.fit('HOW MUCH THEY ENJOYED EVERYDAY THINGS', 't', 40, 58, 680)}
       <text x="40" y="94" class="s">0 = NOT AT ALL · 5 = A GREAT DEAL</text>
       ${SbHud.bar(170, 'LOTTERY WINNERS', '3.33', 3.33 / 5, '#ffcf8a', k)}
       ${SbHud.bar(250, 'EVERYONE ELSE', '3.82', 3.82 / 5, '#8fa0b8', k)}
@@ -327,26 +330,15 @@ class SbHud {
     const sc = 230 / 200000, col = (x, v, c, lab, k) => `<rect x="${x}" y="${(380 - v * sc * k).toFixed(1)}" width="74" height="${(v * sc * k).toFixed(1)}" rx="6" fill="${c}"/><text x="${x + 37}" y="${(368 - v * sc * k).toFixed(1)}" class="b" text-anchor="middle" opacity="${k}">${lab}</text>`;
     return SbHud.svg(`${SbHud.plate(0.74)}
       <g opacity="${k1}"><text x="200" y="64" class="t" text-anchor="middle">WORLD A</text>
-      ${col(110, 50000, '#ffcf8a', '$50k', k1)}${col(210, 25000, '#8fa0b8', '$25k', k1)}
-      <text x="147" y="414" class="s" text-anchor="middle">YOU</text><text x="247" y="414" class="s" text-anchor="middle">EVERYONE</text></g>
+      ${col(80, 50000, '#ffcf8a', '$50k', k1)}${col(240, 25000, '#8fa0b8', '$25k', k1)}
+      <text x="117" y="414" class="s" text-anchor="middle">YOU</text><text x="277" y="414" class="s" text-anchor="middle">EVERYONE</text></g>
       <g opacity="${k2}"><text x="560" y="64" class="t" text-anchor="middle">WORLD B</text>
-      ${col(470, 100000, '#ffcf8a', '$100k', k2)}${col(570, 200000, '#8fa0b8', '$200k', k2)}
-      <text x="507" y="414" class="s" text-anchor="middle">YOU</text><text x="607" y="414" class="s" text-anchor="middle">EVERYONE</text></g>
+      ${col(440, 100000, '#ffcf8a', '$100k', k2)}${col(600, 200000, '#8fa0b8', '$200k', k2)}
+      <text x="477" y="414" class="s" text-anchor="middle">YOU</text><text x="637" y="414" class="s" text-anchor="middle">EVERYONE</text></g>
       <line x1="380" y1="80" x2="380" y2="420" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
       <g opacity="${k3}"><rect x="40" y="86" width="320" height="42" rx="21" fill="rgba(255,207,138,0.18)" stroke="#ffcf8a" stroke-width="2"/>
       <text x="200" y="115" class="b" text-anchor="middle">ABOUT HALF CHOSE THIS</text>
       <text x="380" y="454" class="s" text-anchor="middle">PRICES THE SAME IN BOTH WORLDS</text></g>`);
-  }
-  // Piff 2012: candy meant for children
-  static candy(u, t) {
-    const k = MathX.smooth(u, 0.2, 1.2);
-    return SbHud.svg(`${SbHud.plate()}
-      <text x="40" y="58" class="t">SWEETS TAKEN (AVERAGE PIECES)</text>
-      ${SbHud.bar(140, 'FELT RICHER', '1.17', 1.17 / 1.4, '#ffcf8a', k)}
-      ${SbHud.bar(220, 'FELT POORER', '0.60', 0.6 / 1.4, '#8fa0b8', k)}
-      <text x="40" y="350" class="s">THEY WERE TOLD THE JAR WAS FOR CHILDREN</text>
-      <text x="40" y="386" class="s">IN A NEARBY LAB</text>
-      <text x="40" y="440" class="s" opacity="0.8">MADE TO FEEL RICH: BY COMPARING THEMSELVES</text>`);
   }
   // Piff 2012: the crossing (13 top cars, 6 drove through; 5 cheapest, none did)
   static drive(u, t) {
@@ -377,8 +369,10 @@ class SbHud {
       SbHud._yrs = pts;
     }
     const P = SbHud._yrs, X = (y) => 80 + y * 62, Y = (v) => 390 - v / 1.5e9 * 300, upto = Math.min(10, sbDay(t) / 365);
-    const path = (j) => P.filter((p) => p[0] <= upto + 1e-6).map((p, i) => `${i ? 'L' : 'M'} ${X(p[0]).toFixed(1)} ${Y(p[j]).toFixed(1)}`).join(' ');
-    const last = P.filter((p) => p[0] <= upto + 1e-6).pop();
+    // (the curves end at the readout's own numbers, so a gift shows on the chart the moment you give it)
+    const Q = P.filter((p) => p[0] < upto - 1e-6).concat([[upto, sbMoney(t), sbGiven(t)]]);
+    const path = (j) => Q.map((p, i) => `${i ? 'L' : 'M'} ${X(p[0]).toFixed(1)} ${Y(p[j]).toFixed(1)}`).join(' ');
+    const last = Q[Q.length - 1];
     return SbHud.svg(`${SbHud.plate()}
       <text x="40" y="58" class="t">YOUR MONEY · AND WHAT YOU GAVE</text>
       <line x1="80" y1="390" x2="700" y2="390" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
@@ -389,7 +383,7 @@ class SbHud {
       ${last ? `<text x="${(X(last[0]) - 8).toFixed(1)}" y="${(Y(last[1]) - 14).toFixed(1)}" class="b" text-anchor="end">${sbWords(last[1])}</text><text x="${(X(last[0]) - 8).toFixed(1)}" y="${(Y(last[2]) - 14).toFixed(1)}" class="b" text-anchor="end" fill="#9fe0b0">GIVEN ${sbWords(last[2])}</text>` : ''}
       ${[0, 2, 4, 6, 8, 10].map((y) => `<text x="${X(y)}" y="424" class="s" text-anchor="middle">${y ? 'YEAR ' + y : 'THE WIN'}</text>`).join('')}`);
   }
-  // the Giving Pledge at 15 (IPS, 2025): the 57 original US signers; then the 22 of all 256 signers who have died
+  // the Giving Pledge at 15 (IPS, 2025): the 57 original US signers; then the 22 pledgers who have died
   static pledge(u, t) {
     const c = (k) => sbCap('pledge', k).show, ph = t < c(2) - 0.1 ? 1 : t < c(3) - 0.1 ? 2 : t < c(4) - 0.1 ? 3 : 4, kin = (k) => MathX.smooth(t, c(k) - 0.1, c(k) + 0.25);
     let dots = '', body = '';
@@ -405,20 +399,22 @@ class SbHud {
     } else {
       const k4 = kin(4);
       for (let i = 0; i < 22; i++) { const x = 90 + (i % 11) * 58, y = 150 + Math.floor(i / 11) * 62, kept = i < 8; dots += `<circle cx="${x}" cy="${y}" r="20" fill="${kept ? '#9fe0b0' : 'rgba(255,255,255,0.28)'}"/>`; }
-      body = `<g opacity="${k4}">${SbHud.fit('ALL 256 SIGNERS: THE 22 WHO HAVE DIED', 't', 40, 66, 680)}${dots}
+      body = `<g opacity="${k4}">${SbHud.fit('THE 22 PLEDGERS WHO HAVE DIED', 't', 40, 66, 680)}${dots}
         <text x="40" y="330" class="eq"><tspan fill="#9fe0b0">8</tspan> OF <tspan fill="#ffcf8a">22</tspan> GAVE AT LEAST HALF</text>
         ${SbHud.fit('SOME ESTATES ARE STILL BEING SETTLED', 's', 40, 376, 680, 'opacity="0.85"')}</g>`;
     }
     return SbHud.svg(`${SbHud.plate(0.8)}${body}`);
   }
-  // Andreoni et al. 2021: misdelivered letters returned
+  // Andreoni et al. 2021: misdelivered letters (with money inside) returned; just after payday, poor homes nearly as often
   static letters(u, t) {
-    const k1 = MathX.smooth(u, 0.2, 1.3);
+    const k1 = MathX.smooth(u, 0.2, 1.3), k2 = MathX.smooth(t, sbCap('letters', 2).show - 0.1, sbCap('letters', 2).show + 0.6);
     return SbHud.svg(`${SbHud.plate()}
-      ${SbHud.fit('LOST LETTERS POSTED BACK', 't', 40, 58, 680)}
-      ${SbHud.bar(130, 'RICH HOMES', '81%', 0.81, '#ffcf8a', k1)}
-      ${SbHud.bar(210, 'POOR HOMES', '38%', 0.38, '#8fa0b8', k1)}
-      ${SbHud.fit('ENVELOPES DELIVERED TO THE WRONG ADDRESS', 's', 40, 360, 680)}${SbHud.fit('ON PURPOSE, ACROSS A DUTCH CITY', 's', 40, 396, 680)}`);
+      ${SbHud.fit('LOST LETTERS, MONEY INSIDE, POSTED BACK', 't', 40, 58, 680)}
+      ${SbHud.bar(110, 'RICH HOMES', '81%', 0.81, '#ffcf8a', k1)}
+      ${SbHud.bar(186, 'POOR HOMES', '38%', 0.38, '#8fa0b8', k1)}
+      <g opacity="${k2}">${SbHud.fit('JUST AFTER PAYDAY:', 'b', 40, 314, 680, 'fill="#9fe0b0"')}
+      ${SbHud.fit('POOR HOMES SENT BACK ALMOST AS MANY', 'b', 40, 350, 680, 'fill="#9fe0b0"')}</g>
+      ${SbHud.fit('EACH WORTH €5 OR €20: CASH OR A TRANSFER CARD', 's', 40, 436, 680, 'opacity="0.85"')}`);
   }
   // the share of income given: one measure (US tax data, 2008); other big surveys find the opposite
   static share(u, t) {

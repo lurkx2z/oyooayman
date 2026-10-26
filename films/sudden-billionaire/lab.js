@@ -8,8 +8,6 @@
      cookie2       … you take the extra one, and eat it with your mouth open (they stare)
      game, game2   the rigged board game: a coin makes you rich (double money, two dice); you slap the board, take the
                    pretzels, win
-     candy         a ladder form ("compare yourself with the people who have the least") and a jar of sweets for the
-                   children next door: your hand takes a fistful
      real          the board of study cards; stamps on the weak ones
      scott         MacKenzie Scott's gifts (an illustration, no people): a dark hall, a wall of 1,664 pigeonholes, one
                    envelope in each (one charity each: "over 1,600"); they light up, faster and faster, as you pull back
@@ -51,18 +49,6 @@ function sbLbCardCanvas(lines, big) {
     lines.forEach((ln, i) => { g.font = `${i === 0 && big ? 'bold 64' : i === 0 ? 'bold 40' : '30'}px Georgia, serif`; g.fillText(ln, w / 2, (i === 0 && big ? 110 : 70) + i * (big ? 70 : 52)); });
   });
 }
-function sbLbLadderCanvas() {
-  return sbCanvas(400, 560, (g, w, h) => {
-    g.fillStyle = '#f8f6ef'; g.fillRect(0, 0, w, h);
-    g.fillStyle = '#222'; g.textAlign = 'center'; g.font = 'bold 26px Georgia, serif'; g.fillText('WHERE DO YOU STAND?', w / 2, 40);
-    g.font = '17px Georgia, serif'; g.fillText('Compare yourself with the people', w / 2, 70); g.fillText('who have the least money.', w / 2, 92);
-    g.strokeStyle = '#333'; g.lineWidth = 4; g.beginPath(); g.moveTo(140, 120); g.lineTo(140, 530); g.moveTo(260, 120); g.lineTo(260, 530); g.stroke();
-    for (let i = 0; i < 10; i++) { const y = 140 + i * 42; g.lineWidth = 3; g.beginPath(); g.moveTo(140, y); g.lineTo(260, y); g.stroke(); g.font = '15px Georgia, serif'; g.fillText(String(10 - i), 116, y + 5); }
-    g.font = '14px Georgia, serif'; g.fillText('the most', 318, 146); g.fillText('the least', 318, 524);
-    g.strokeStyle = '#1e3aa0'; g.lineWidth = 5; g.beginPath(); g.moveTo(180, 168); g.lineTo(222, 196); g.moveTo(222, 168); g.lineTo(180, 196); g.stroke();
-  });
-}
-function sbLbJarLabel() { return sbCanvas(360, 160, (g, w, h) => { g.fillStyle = '#fbf7ec'; g.fillRect(0, 0, w, h); g.fillStyle = '#7a2a2a'; g.textAlign = 'center'; g.font = 'bold 34px "Comic Sans MS", cursive'; g.fillText('FOR THE CHILDREN', w / 2, 62); g.font = '26px "Comic Sans MS", cursive'; g.fillText('in the lab next door', w / 2, 112); }); }
 function sbLbBoardCanvas() {
   return sbCanvas(1024, 1024, (g, w, h) => {
     g.fillStyle = '#d8e6d0'; g.fillRect(0, 0, w, h);
@@ -129,7 +115,7 @@ SB_SETS.lab = (app) => {
   }
   const roomL = [];
   for (const [x, z] of [[-1.2, -1.2], [1.2, -1.2], [0, 1.6]]) { const l = new THREE.PointLight('#f0f2ff', 2.2, 9, 1.6); l.position.set(x, 2.8, z); gR.add(l); roomL.push(l); }
-  // the table (shared by the cookies, the game, the sweets) and its chairs
+  // the table (shared by the cookies and the game) and its chairs
   const gT = grp('table');
   sbBox(1.6, 0.04, 0.9, sbStd('#d8cdb8', 0.55, 0, { map: sbTex(sbWoodCanvas(CONFIG.seed + 700, 256, 1024, [196, 176, 146])) }), TB[0], TB[1] - 0.02, TB[2], gT);
   for (const [a, b] of [[-0.74, -0.38], [0.74, -0.38], [-0.74, 0.38], [0.74, 0.38]]) sbCyl(0.022, 0.022, TB[1] - 0.04, sbStd('#6a6c70', 0.3, 0.8), TB[0] + a, (TB[1] - 0.04) / 2, TB[2] + b, gT, 8);
@@ -180,18 +166,6 @@ SB_SETS.lab = (app) => {
     face.rotation.x = -Math.PI / 2; face.position.y = 0.0016; coin.add(face); }
   const opp = person({ id: 'sbOpp', look: 'sbOpponent', path: [[0, ...seatC]], face: 180, seat: L.seat, states: [[0, 'sbTable']] }, gG);
 
-  // ---- the sweets: the ladder form, a pen, the jar
-  const gC = grp('candy');
-  { const f = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.28), sbStd('#ffffff', 0.9, 0, { map: sbTex(sbLbLadderCanvas(), { repeat: false }) })); f.rotation.x = -Math.PI / 2; f.rotation.z = -0.12; f.position.set(0.1, TB[1] + 0.002, TB[2] + 0.22); gC.add(f);
-    sbCyl(0.004, 0.004, 0.14, sbStd('#1c2a4a', 0.4), 0.26, TB[1] + 0.005, TB[2] + 0.25, gC, 6).rotation.set(Math.PI / 2, 0, 0.5); }
-  const jar = new THREE.Group(); jar.position.set(-0.3, TB[1], TB[2] + 0.02); gC.add(jar);
-  { const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.22, 28, 1, true), new THREE.MeshPhysicalMaterial({ color: '#ffffff', roughness: 0.05, transmission: 0.0, transparent: true, opacity: 0.22, side: THREE.DoubleSide, envMapIntensity: 1.5 }));
-    glass.position.y = 0.11; jar.add(glass); sbCyl(0.09, 0.09, 0.006, sbStd('#ffffff', 0.1, 0, { transparent: true, opacity: 0.3 }), 0, 0.003, 0, jar, 28);
-    sbCyl(0.075, 0.075, 0.02, sbStd('#c8302a', 0.4), 0.16, 0.01, 0.06, jar, 24);
-    const swM = ['#e83a3a', '#f0c020', '#3ab04a', '#3a6ae8', '#e86ac8', '#f08a2a'].map((c) => sbStd(c, 0.25, 0, { emissive: new THREE.Color(c), emissiveIntensity: 0.05 }));
-    for (let i = 0; i < 70; i++) { const a = hash1(i * 3) * 7, r = 0.075 * Math.sqrt(hash1(i * 5)); const s = sbMesh(new THREE.SphereGeometry(0.014, 10, 6), swM[i % 6], Math.cos(a) * r, 0.016 + 0.13 * hash1(i * 7) * (0.6 + 0.4 * (i / 70)), Math.sin(a) * r, jar); s.scale.set(1.3, 0.8, 1); s.castShadow = false; }
-    const lab = new THREE.Mesh(new THREE.CylinderGeometry(0.0905, 0.0905, 0.07, 28, 1, true, -0.9, 1.8), sbStd('#ffffff', 0.8, 0, { map: sbTex(sbLbJarLabel(), { repeat: false }) })); lab.position.y = 0.09; lab.rotation.y = 0; jar.add(lab); }
-
   // ---- the board of study cards (on the far wall), the stamps on the weak ones
   const gS = grp('real');
   const STUDIES = [
@@ -202,11 +176,11 @@ SB_SETS.lab = (app) => {
     [['Winners in Sweden', 'more satisfied, for years'], 'SWEDEN · 2020', '3,300 players'],
     [['The leader took', 'the extra cookie'], 'BERKELEY · 1998', 'never published', 'UNPUBLISHED'],
     [['The rich player', 'slapped the board'], 'BERKELEY · 2013', 'from a talk', 'NOT A PAPER'],
-    [['Feeling rich, people', 'took more sweets'], 'BERKELEY · 2012', '129 people', 'CRITICISED'],
     [['Bigger wins, views', 'moved right'], 'BRITAIN · 2014', 'national survey'],
     [['Higher-class walkers', 'looked more briefly'], 'NEW YORK · 2016', '61 people'],
     [['Expensive cars stopped', 'less at crossings'], 'BERKELEY · 2012', 'only 5 cheap cars', 'FAILED TO REPEAT'],
     [['Poorer people', 'gave more'], 'BERKELEY · 2010', '115 people', 'FAILED TO REPEAT'],
+    [['Rich homes returned', 'more lost letters'], 'NETHERLANDS · 2021', '360 letters'],
     [['The billionaires\'', 'giving pledge'], 'USA · 2010–2025', '57 people'],
   ];
   const BZ = -3.48;
@@ -242,7 +216,7 @@ SB_SETS.lab = (app) => {
       // (the order: out from the middle, a little at random)
       const d = Math.hypot((c - SC.cols / 2) / (SC.cols / 2), (r - SC.rows / 2) / (SC.rows / 2) * 0.55) / 1.15;
       envTh[i] = 0.06 + 0.72 * Math.min(1, d) + 0.2 * hash1(i * 11.3);
-      envIM.setColorAt(i, envCol.setRGB(0.05, 0.043, 0.034));
+      envIM.setColorAt(i, envCol.setRGB(0.13, 0.122, 0.108));
     }
     envIM.frustumCulled = false; gV.add(envIM); }
   const scottL = new THREE.PointLight('#ffd8a0', 0, 18, 1.6); scottL.position.set(SX, 2.4, SZ + 2.2); gV.add(scottL);
@@ -306,9 +280,8 @@ SB_SETS.lab = (app) => {
       [tHand - 0.6, 'sbAim'], [tHand + 0.05, 'sbRead'], [tGive - 0.6, 'sbAim2'], [tGive + 0.35, 'hidden'],
       [SB.cookies - 0.1, 'sbRest'], [tTakeMe - 0.55, 'sbAim'], [tTakeMe + 0.05, 'sbBite'], [tTakeMe + 1.1, 'sbRest'], [SB.extra - 0.6, 'sbAim2'], [SB.extra + 0.05, 'sbHoldUp'], [tEat - 0.35, 'sbMouth'], [tEat + 1.7, 'sbHoldUp'],
       [SB.game - 0.1, 'sbRest'], [SB.slap - 0.45, 'slapUp'], [SB.slap - 0.06, 'sbSlap'], [SB.slap + 0.5, 'sbRest'], [SB.pretzel - 0.6, 'sbAim'], [SB.pretzel + 0.05, 'sbHoldUp'], [SB.pretzel + 1.1, 'sbMouth'], [SB.pretzel + 2.0, 'sbRest'], 
-      [SB.candy - 0.1, 'sbRest'], [SB.grab - 0.65, 'sbAim'], [SB.grab + 0.05, 'sbHoldUp'],
-      [SB.views - 0.2, 'hidden']],
-    left: [[-1, 'hidden'], [SB.cookies - 0.1, 'sbRest'], [SB.views - 0.2, 'hidden']],
+      [SB.genius - 0.2, 'hidden']],
+    left: [[-1, 'hidden'], [SB.cookies - 0.1, 'sbRest'], [SB.genius - 0.2, 'hidden']],
   };
   const hands = sbHands(cam, hs, { sleeve: '#2a2c30', cuff: '#1e2024', watch: true });
   const P = hands.poses, Bl = hands.blends;
@@ -320,14 +293,13 @@ SB_SETS.lab = (app) => {
   P.sbRead = { p: [-0.035, -0.125, -0.4], F: [-0.25, 1, 0.1], N: [-0.1, -0.1, 1], curl: [0.55, 0.85, 1.1, 1.25], thumb: [0.55, 0.55] };
   P.sbSlap = Object.assign({}, SB_HPOSE.slap); P.slapUp = Object.assign({}, SB_HPOSE.slapUp); P.sbFist = Object.assign({}, SB_HPOSE.fist, { p: [0.12, -0.08, -0.38], F: [-0.2, 1, -0.3], N: [-0.4, -0.1, -1], trem: 0.004 });
   Object.assign(Bl, { sbRest: 0.6, sbAim: 0.55, sbAim2: 0.55, sbBite: 0.4, sbHoldUp: 0.45, sbMouth: 0.35, sbRead: 0.5, sbSlap: 0.06, sbFist: 0.25 });
-  // (props on the right hand: a cookie, a bitten one, pretzels, sweets, the envelope with its $20 and card)
+  // (props on the right hand: a cookie, a bitten one, pretzels, the envelope with its $20 and card)
   const R = hands.right.g, props = hands.props;
   const addProp = (name, obj) => { obj.visible = false; obj.traverse((m) => { if (m.isMesh) { m.frustumCulled = false; m.castShadow = false; } }); R.add(obj); props[name] = obj; return obj; };
   const GRIP = new THREE.Vector3(0.0, 0.105, 0.04);
   { const g = new THREE.Group(), c = new THREE.Mesh(cookieG, cookieM); c.rotation.x = Math.PI / 2; c.position.copy(GRIP).add(new THREE.Vector3(0, 0.03, 0)); g.add(c); addProp('cookie', g); }
   { const g = new THREE.Group(), c = new THREE.Mesh(bittenG, cookieM); c.rotation.set(Math.PI / 2, 0, 0); c.position.copy(GRIP).add(new THREE.Vector3(0, 0.03, 0)); g.add(c); addProp('bitten', g); }
   { const g = new THREE.Group(); for (let i = 0; i < 3; i++) { const pz = new THREE.Mesh(pretzelG, pretzelM); pz.position.copy(GRIP).add(new THREE.Vector3((i - 1) * 0.012, 0.012 + 0.008 * i, 0.004)); pz.rotation.set(i, i * 2, 0); g.add(pz); } addProp('pretzels', g); }
-  { const g = new THREE.Group(), swM = ['#e83a3a', '#3ab04a', '#f0c020', '#3a6ae8']; for (let i = 0; i < 4; i++) { const s = new THREE.Mesh(new THREE.SphereGeometry(0.014, 10, 6), sbStd(swM[i], 0.25)); s.position.copy(GRIP).add(new THREE.Vector3((i % 2 - 0.5) * 0.024, 0.01 + 0.014 * (i >> 1), 0.008)); s.scale.set(1.3, 0.8, 1); g.add(s); } addProp('sweets', g); }
   { const g = new THREE.Group(); const e = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.2), envM); e.position.set(0.0, 0.16, 0.03); g.add(e); addProp('env', g); }
   { const g = new THREE.Group();
     const n = new THREE.Mesh(new THREE.PlaneGeometry(0.156, 0.066), sbStd('#ffffff', 0.85, 0, { map: sbTex(sbLbNote20(), { repeat: false }), side: THREE.DoubleSide })); n.position.set(0.01, 0.2, 0.05); n.rotation.z = 0.12; g.add(n);
@@ -360,11 +332,11 @@ SB_SETS.lab = (app) => {
     scene, camera: cam,
     frame(t, shot) {
       const m = shot.mode;
-      const place = m === 'boss' ? 'boss' : m === 'real' ? 'real' : m === 'scott' ? 'scott' : m === 'dunn' ? 'dunn' : (m === 'game' || m === 'game2') ? 'game' : m === 'candy' ? 'candy' : 'cookies';
+      const place = m === 'boss' ? 'boss' : m === 'real' ? 'real' : m === 'scott' ? 'scott' : m === 'dunn' ? 'dunn' : (m === 'game' || m === 'game2') ? 'game' : 'cookies';
       setLight(place);
       gB.visible = place === 'boss'; gR.visible = place !== 'boss';
-      gT.visible = place === 'cookies' || place === 'game' || place === 'candy';
-      gK.visible = place === 'cookies'; gG.visible = place === 'game'; gC.visible = place === 'candy'; gS.visible = place === 'real'; gV.visible = place === 'scott'; gR.visible = place !== 'boss' && place !== 'scott'; gD.visible = place === 'dunn';
+      gT.visible = place === 'cookies' || place === 'game';
+      gK.visible = place === 'cookies'; gG.visible = place === 'game'; gS.visible = place === 'real'; gV.visible = place === 'scott'; gR.visible = place !== 'boss' && place !== 'scott'; gD.visible = place === 'dunn';
       chairL.visible = chairR.visible = place === 'cookies'; chairC.visible = place === 'game'; stuL.root.visible = stuR.root.visible = place === 'cookies'; chairMe.visible = place !== 'dunn';
       for (const p of people) p.root.visible = p.group.visible && ((p !== stuL && p !== stuR) || place === 'cookies');
       let pos, at, fov = 55, drift = 0.004, roll = 0, show = null;
@@ -420,26 +392,22 @@ SB_SETS.lab = (app) => {
         aim(P.sbSlap, [0.08, TB[1] + 0.03, TB[2] + 0.12], [-0.1, -0.15, -1], [0, -1, 0.1], new THREE.Vector3(0, 0.08, 0.02)); aim(P.slapUp, [0.1, TB[1] + 0.3, TB[2] + 0.2], [-0.1, 0.2, -1], [0, -1, 0.3], new THREE.Vector3(0, 0.08, 0.02));
         aim(P.sbRest, [0.15, TB[1] + 0.03, 0.02], [-0.1, -0.2, -1], [0, -1, 0.15], new THREE.Vector3(0, 0.07, 0.02));
         show = t >= SB.pretzel && t < SB.pretzel + 1.4 ? 'pretzels' : null;
-      } else if (place === 'candy') {
-        pos = [0.05, L.eye + 0.08, 0.4]; at = sbV([-0.18, 0.8, -0.45], [-0.1, 0.78, -0.4], K(t, SB.candy, SB.views)); fov = 46;
-        aim(P.sbAim, [jar.position.x, TB[1] + 0.16, jar.position.z], [0.1, -1, -0.5], [0, -0.3, 1]);
-        aim(P.sbRest, [0.2, TB[1] + 0.03, 0.02], [-0.1, -0.2, -1], [0, -1, 0.15], new THREE.Vector3(0, 0.07, 0.02));
-        show = t >= SB.grab ? 'sweets' : null;
       } else if (place === 'real') {
         const k = K(t, SB.real, SB.letters, (x) => x);
-        pos = [0, 1.6, sbLerp(0.0, -1.1, k)]; at = [0, 1.5, BZ]; fov = 48; drift = 0.006;
+        pos = [-0.1, 1.6, sbLerp(0.0, -0.6, k)]; at = [-0.25, 1.78, BZ]; fov = 48; drift = 0.006;
         stamps.forEach((s, i) => { const t0 = tStamp0 + i * 0.42, k2 = K(t, t0, t0 + 0.12, Ease.inQuad); s.visible = t >= t0; s.scale.setScalar(1.35 - 0.35 * k2); s.material.opacity = k2; });
         let sh = 0; stamps.forEach((s, i) => { sh += shake(tStamp0 + i * 0.42 + 0.12, 0.004); }); pos[1] += sh;
       } else if (place === 'scott') {
         // close on a few dark pigeonholes; her money; then the envelopes light, out from the middle, as you pull back
         const k = sbScottK(t);
         if (Math.abs(k - scottK) > 1e-4) { scottK = k;
-          for (let i = 0; i < envN; i++) { const a = MathX.smooth(k, envTh[i], envTh[i] + 0.06); envIM.setColorAt(i, envCol.setRGB(0.05 + 1.75 * a, 0.043 + 1.4 * a, 0.034 + 0.85 * a)); }
+          for (let i = 0; i < envN; i++) { const a = MathX.smooth(k, envTh[i], envTh[i] + 0.06); envIM.setColorAt(i, envCol.setRGB(0.13 + 1.67 * a, 0.122 + 1.32 * a, 0.108 + 0.78 * a)); }
           envIM.instanceColor.needsUpdate = true; }
         scottL.intensity = 9 * k;
         const kb = K(t, SB.scott, SB.scottGive, Ease.inOutSine), kp = K(t, SB.scottGive - 0.3, SB.feeney + 0.3, Ease.inOutSine);
-        pos = sbV(sbV([SX + 0.55, 1.62, SZ + 1.15], [SX + 0.3, 1.6, SZ + 2.0], kb), [SX - 0.4, 1.7, SZ + 10.5], kp);
+        pos = sbV(sbV([SX + 0.55, 1.62, SZ + 1.15], [SX + 0.3, 1.62, SZ + 3.0], kb), [SX - 0.4, 1.7, SZ + 10.5], kp);
         at = sbV(sbV([SX + 0.2, 1.52, SZ], [SX + 0.1, 1.5, SZ], kb), [SX, 2.3, SZ], kp); fov = sbLerp(44, 52, kp); drift = 0.004;
+        scottKey.intensity = 3.4 - 1.2 * kp;
       } else if (place === 'dunn') {
         // standing at her table: the envelope; inside, $20 and a card; into the food-bank tin
         rsch2.update(t); offerEnv.visible = t < tHand;
@@ -461,13 +429,12 @@ SB_SETS.lab = (app) => {
       if (m === 'boss') { p.exposure = 1.0; p.warmth = 0.04; p.contrast = 1.1; p.bloom = 0.3; }
       else if (m === 'scott') { p.exposure = 1.1; p.warmth = 0.06; p.vignette = 0.66; p.bloom = 0.6; p.bloomThreshold = 0.85; p.contrast = 1.12; }
       else if (m === 'real') { p.exposure = 1.02; p.warmth = 0.03; p.contrast = 1.08; }
-      else { p.exposure = 1.02; p.warmth = m === 'dunn' ? 0.05 : 0.0; p.contrast = 1.08; p.saturation = 0.96; }
+      else { p.exposure = m === 'dunn' ? 0.86 : 1.02; p.warmth = m === 'dunn' ? 0.05 : 0.0; p.contrast = 1.08; p.saturation = 0.96; }
     },
     labels(t) {
       const m = sbShotAt(t).mode, out = [];
       if (m === 'game') { const a = W(t, sbCap('game', 2).show + 0.4, SB.game2 - 0.1, 0.3, 0.3); out.push({ p: [-0.46, TB[1] + 0.1, -0.36], text: 'YOU', sub: 'RICH, BY A COIN', a }, { p: [0.05, TB[1] + 0.08, -0.885], text: 'THEM', a }); }
-      if (m === 'scott') out.push({ p: [SX - 0.02, SC.y0 + SC.rows * SC.h + 0.32, SZ + 0.1], text: 'ONE ENVELOPE = ONE CHARITY', sub: 'OVER 1,600 OF THEM', side: 'c', a: W(t, SB.scottGive + 2.6, SB.feeney - 0.1, 0.4, 0.2) });
-      if (m === 'candy') out.push({ p: [jar.position.x, TB[1] + 0.3, jar.position.z], text: 'FOR CHILDREN', sub: 'IN THE LAB NEXT DOOR', a: W(t, SB.candy + 0.6, sbCap('candy', 1).show + 0.2, 0.3, 0.3) });
+      if (m === 'scott') out.push({ p: [SX - 0.02, SC.y0 + SC.rows * SC.h + 0.32, SZ + 0.1], text: 'ONE ENVELOPE = ONE CHARITY', sub: 'OVER 1,600 BY 2022', side: 'c', a: W(t, SB.scottGive + 2.6, SB.feeney - 0.1, 0.4, 0.2) });
       return out;
     },
   };

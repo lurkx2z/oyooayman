@@ -6,6 +6,7 @@
      brick     (the same morning, slower: a housekeeper wipes the island; the study's numbers on the right)
      enough    the terrace at dusk, the pool's edge, the city lighting up
      compare   night on the terrace: across the valley, a bigger house
+     genius    the same night, leaning over the low table: a business magazine with you on its cover ("SELF-MADE")
      views     the sofa at night: the TV, the remote; you change the channel
      wall      the gate: it slides shut; a guard; the road outside
      years     years five to nine, sped up: days and nights flick past the glass
@@ -48,10 +49,11 @@ function sbHoFacadeCanvas(lit) {
   const r = new RNG(CONFIG.seed + (lit ? 651 : 650));
   return sbCanvas(256, 512, (g, w, h) => {
     g.fillStyle = lit ? '#000' : '#8a8c90'; g.fillRect(0, 0, w, h);
-    for (let y = 6; y < h; y += 12) for (let x = 5; x < w; x += 10) {
+    // (big windows, few of them: small ones shimmered into noise at a distance)
+    for (let y = 8; y < h; y += 21) for (let x = 6; x < w; x += 16) {
       const v = r.next();
-      if (lit) { if (v < 0.36) { g.fillStyle = v < 0.07 ? '#c8d8ff' : `rgb(255,${190 + Math.floor(40 * r.next())},${110 + Math.floor(50 * r.next())})`; g.fillRect(x, y, 6, 7); } }
-      else { g.fillStyle = `rgba(40,52,66,${0.5 + 0.35 * v})`; g.fillRect(x, y, 6, 7); }
+      if (lit) { if (v < 0.3) { g.fillStyle = v < 0.05 ? '#a8b8e0' : `rgb(${215 + Math.floor(30 * r.next())},${165 + Math.floor(35 * r.next())},${100 + Math.floor(40 * r.next())})`; g.fillRect(x, y, 10, 12); } }
+      else { g.fillStyle = `rgba(40,52,66,${0.5 + 0.35 * v})`; g.fillRect(x, y, 10, 12); }
     }
   });
 }
@@ -85,6 +87,29 @@ function sbHoBoxCanvas() {
     g.fillStyle = 'rgba(200,180,120,0.5)'; g.fillRect(0, h * 0.45, w, 30);
     g.fillStyle = '#1e1e28'; g.font = '700 64px "Permanent Marker", "Comic Sans MS", cursive'; g.textAlign = 'center'; g.fillText('OLD FLAT', w / 2, h * 0.36);
     g.font = '700 30px "Comic Sans MS", cursive'; g.fillText('misc · kitchen', w / 2, h * 0.82);
+  });
+}
+// the magazine with you on the cover (a made-up title; you are a dark suit, arms folded, no face)
+function sbHoMagCanvas() {
+  return sbCanvas(600, 800, (g, w, h) => {
+    const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#f4ecdc'); bg.addColorStop(1, '#d9c7a4'); g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#14213d'; g.textAlign = 'center'; g.font = 'bold 108px Georgia, serif'; g.fillText('MAGNATE', w / 2, 126);
+    g.fillRect(40, 150, w - 80, 4); g.font = 'bold 24px Georgia, serif'; g.fillText('THE MONEY ISSUE  ·  YEAR ONE', w / 2, 186);
+    // you: a dark suit, a white shirt, a red tie, arms folded (to the right of the headline)
+    g.save(); g.translate(95, 0);
+    g.fillStyle = '#1c2230'; g.beginPath(); g.moveTo(150, h); g.lineTo(170, 520); g.quadraticCurveTo(250, 450, 390, 470); g.quadraticCurveTo(470, 490, 500, 560); g.lineTo(530, h); g.fill();
+    g.fillStyle = '#f2efe8'; g.beginPath(); g.moveTo(300, 470); g.lineTo(360, 470); g.lineTo(335, 600); g.fill();
+    g.fillStyle = '#b02a2a'; g.beginPath(); g.moveTo(322, 482); g.lineTo(340, 482); g.lineTo(346, 590); g.lineTo(331, 610); g.lineTo(318, 590); g.fill();
+    g.fillStyle = '#c9a07a'; g.fillRect(310, 410, 42, 66); g.beginPath(); g.ellipse(331, 352, 62, 76, 0, 0, 7); g.fill();
+    g.fillStyle = '#2a1e16'; g.beginPath(); g.ellipse(331, 300, 64, 34, 0, Math.PI, 0); g.fill();
+    g.fillStyle = '#262d3e'; g.beginPath(); g.moveTo(190, 640); g.quadraticCurveTo(340, 600, 500, 650); g.lineTo(505, 700); g.quadraticCurveTo(340, 660, 185, 700); g.fill();
+    g.restore();
+    g.fillStyle = '#efe4cc'; g.fillRect(0, 692, w, h - 692);
+    // the headline
+    g.textAlign = 'left'; g.lineWidth = 10; g.strokeStyle = '#f4ecdc'; g.font = 'bold 104px Georgia, serif'; g.strokeText('SELF-', 30, 566); g.strokeText('MADE', 30, 668); g.fillStyle = '#c0392b'; g.fillText('SELF-', 30, 566); g.fillText('MADE', 30, 668);
+    g.fillStyle = '#14213d'; g.font = 'bold 27px Georgia, serif'; g.fillText('HOW THE NEW BILLIONAIRES', 36, 724); g.fillText('BUILT IT THEMSELVES', 36, 760);
+    g.save(); g.translate(108, 300); g.rotate(-0.18); g.fillStyle = '#e0b84a'; g.beginPath(); g.arc(0, 0, 66, 0, 7); g.fill();
+    g.fillStyle = '#14213d'; g.textAlign = 'center'; g.font = 'bold 26px Georgia, serif'; g.fillText('THE', 0, -14); g.fillText('GENIUS', 0, 14); g.fillText('ISSUE', 0, 42); g.restore();
   });
 }
 
@@ -175,6 +200,11 @@ SB_SETS.house = (app) => {
   const artTex = sbTex(sbCanvas(512, 340, (g, w, h) => { g.fillStyle = '#e9e2d4'; g.fillRect(0, 0, w, h); const c = ['#c2452a', '#1f3a5a', '#d8a83a', '#2a2a2a']; for (let i = 0; i < 9; i++) { g.fillStyle = c[i % 4]; g.globalAlpha = 0.85; g.beginPath(); g.arc(hash1(i * 3) * w, hash1(i * 5) * h, 30 + 70 * hash1(i * 7), 0, 7); g.fill(); } g.globalAlpha = 1; }), { repeat: false });
   sbMesh(new THREE.PlaneGeometry(2.4, 1.6), sbStd('#ffffff', 0.8, 0, { map: artTex }), -3.5, 2.2, LZ1 - 0.01).rotation.y = Math.PI;
   { sbCyl(0.015, 0.015, 1.7, brassM, -7.8, 0.85, -4.4); const sh = sbMesh(new THREE.CylinderGeometry(0.2, 0.26, 0.3, 24, 1, true), sbStd('#f2e8d4', 0.8, 0, { emissive: '#ffd9a0', emissiveIntensity: 0, side: THREE.DoubleSide }), -7.8, 1.75, -4.4); scene.userData.floorShade = sh; }
+  // the magazine on the low table (the genius beat; still there for the TV)
+  const mag = new THREE.Group(); mag.position.set(-5.92, 0.322, -1.42); scene.add(mag);
+  { const c = new THREE.Mesh(new THREE.PlaneGeometry(0.21, 0.28), sbStd('#ffffff', 0.5, 0, { map: sbTex(sbHoMagCanvas(), { repeat: false }) })); c.rotation.set(-Math.PI / 2, 0, Math.PI / 2 + 0.16); c.position.y = 0.0062; mag.add(c);
+    const u = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.006, 0.21), sbStd('#e6dccb', 0.8)); u.rotation.y = -0.12; u.position.set(0.025, 0.003, 0.03); mag.add(u); }
+  const magL = new THREE.PointLight('#ffd8a8', 0, 3.4, 1.5); magL.position.set(-5.3, 1.6, -1.0); scene.add(magL);
   // the remote (in your hand at night)
   const hands = sbHands(cam, { right: [[-1, 'hidden'], [SB.views + 0.2, 'remote'], [SB.channel - 0.2, 'remoteP'], [SB.channel + 0.3, 'remote'], [SB.yacht, 'hidden']], left: [[-1, 'hidden']] }, { sleeve: '#2a2c34', cuff: '#1e2026' });
 
@@ -330,7 +360,7 @@ SB_SETS.house = (app) => {
     scene, camera: cam,
     frame(t, shot) {
       const m = shot.mode;
-      const key = (m === 'garage' || m === 'note') ? 'garage' : (m === 'six' || m === 'brick') ? 'morning' : m === 'enough' ? 'dusk' : (m === 'compare' || m === 'views' || m === 'pledge') ? 'night' : m === 'years' ? 'lapse' : 'day';
+      const key = (m === 'garage' || m === 'note') ? 'garage' : (m === 'six' || m === 'brick') ? 'morning' : m === 'enough' ? 'dusk' : (m === 'compare' || m === 'views' || m === 'genius' || m === 'pledge') ? 'night' : m === 'years' ? 'lapse' : 'day';
       setLight(key);
       // ---- the time-lapse: days flick past (the sky, the sun, the city's lights)
       if (key === 'lapse') {
@@ -347,6 +377,7 @@ SB_SETS.house = (app) => {
       tv.userData.sc.material.color.set(m === 'views' ? '#ffffff' : '#060606');
       if (m === 'views') tvTex.update({ ch: t < SB.channel ? 1 : 2, f: Math.floor(t * 30) });
       tvL.intensity = m === 'views' ? 2.2 * (0.8 + 0.2 * noise1(t * 3, 4)) : 0;
+      mag.visible = m === 'genius' || m === 'views'; magL.intensity = m === 'genius' ? 3.2 : 0;
       waterTex.offset.set(t * 0.012, t * 0.008);
       const gate = drive.userData.gate; gate.position.x = 7.8 * K(t, SB.gateShut - 2.4, SB.gateShut + 0.4, Ease.inOutSine) - 7.8 + (m === 'wall' ? 0 : 7.8);
       guard.root.visible = m === 'wall'; passer.root.visible = m === 'wall'; keeper.root.visible = m === 'brick' || m === 'six';
@@ -360,7 +391,7 @@ SB_SETS.house = (app) => {
       // ---- the city's street lights (dusk, night, the dark half of the time-lapse)
       puffs.begin();
       const la = key === 'night' ? 1 : key === 'dusk' ? 0.55 : key === 'lapse' ? 1 - MathX.smooth(Math.sin(((t - SB.years) / SB_HO.lapse) % 1 * Math.PI * 2), -0.15, 0.25) : 0;
-      if (la > 0.01 && (m === 'enough' || m === 'compare' || m === 'pledge' || m === 'years' || m === 'views')) {
+      if (la > 0.01 && (m === 'enough' || m === 'compare' || m === 'pledge' || m === 'years' || m === 'views' || m === 'genius')) {
         for (const [x, y, z, v] of lamps) puffs.add(x, y, z, 7 + 6 * v, la * (0.35 + 0.4 * v) * (0.85 + 0.15 * Math.sin(t * 2 + v * 40)), 1, 0.8 + 0.1 * v, 0.55 + 0.2 * v);
         if (m === 'compare') for (let i = 0; i < 40; i++) puffs.add(SB_HO.rival[0] - 50 + i * 2.6, SB_HO.rival[1] + 4 + 14 * (i % 3), SB_HO.rival[2] + 22, 5, 0.5 * la, 1, 0.85, 0.6);
       }
@@ -390,6 +421,10 @@ SB_SETS.house = (app) => {
         // night: you turn from the city to the big house across the valley
         const k = K(t, SB.compare + 0.5, sbCap('compare', 1).show + 0.5);
         pos = [-7.7, 1.62, -12.4]; at = sbV([-1.0, -10, -300], [SB_HO.rival[0], SB_HO.rival[1] + 10, SB_HO.rival[2]], k); fov = sbLerp(50, 30, K(t, sbCap('compare', 1).show, SB.boss));
+      } else if (m === 'genius') {
+        // leaning over the low table: the cover, closer as it sinks in
+        const k = K(t, SB.genius, SB.views, (x) => x);
+        pos = sbV([-5.36, 1.07, -1.42], [-5.56, 0.9, -1.42], k); at = [-5.95, 0.32, -1.42]; fov = sbLerp(40, 29, k); drift = 0.004;
       } else if (m === 'views') {
         pos = [-4.25, 1.12, -1.5]; at = [LX0, 1.55, -1.6]; fov = 50; drift = 0.006;
       } else if (m === 'wall') {
@@ -402,7 +437,7 @@ SB_SETS.house = (app) => {
         // you find the box; you look in; the note
         const k1 = K(t, SB.note, SB.note + 1.6), k2 = K(t, sbCap('note', 1).show - 0.4, sbCap('note', 1).show + 0.8);
         const bp = box.position;
-        pos = sbV(sbV([G0[0] - 1.5, 1.65, G0[2] - 1.0], [bp.x + 0.1, 1.25, bp.z + 0.75], k1), [bp.x + 0.02, 0.85, bp.z + 0.35], k2); at = sbV([bp.x, 0.3, bp.z], [bp.x - 0.05, 0.19, bp.z + 0.03], k2); fov = sbLerp(55, 40, k2);
+        pos = sbV(sbV([G0[0] - 4.7, 1.65, G0[2] - 0.6], [bp.x + 0.1, 1.25, bp.z + 0.75], k1), [bp.x + 0.02, 0.85, bp.z + 0.35], k2); at = sbV([bp.x, 0.3, bp.z], [bp.x - 0.05, 0.19, bp.z + 0.03], k2); fov = sbLerp(55, 40, k2);
       } else if (m === 'pledge') {
         const k = K(t, SB.pledge, SB.real);
         pos = sbV([0.5, 1.62, -2.6], [-0.5, 1.62, -4.6], k); at = [-2.0, 0.0, -400]; fov = 58; drift = 0.006;
@@ -417,9 +452,9 @@ SB_SETS.house = (app) => {
       const m = shot.mode;
       p.grain = 0.026;
       if (m === 'enough') { p.exposure = 1.08; p.warmth = 0.08; p.bloom = 0.45; p.bloomThreshold = 0.8; p.saturation = 1.08; }
-      else if (m === 'compare' || m === 'pledge' || m === 'views') { p.exposure = m === 'views' ? 1.0 : 1.2; p.warmth = 0.0; p.bloom = 0.55; p.bloomThreshold = 0.7; p.vignette = 0.62; }
+      else if (m === 'compare' || m === 'pledge' || m === 'views' || m === 'genius') { p.exposure = m === 'views' || m === 'genius' ? 1.0 : 1.2; p.warmth = 0.0; p.bloom = 0.55; p.bloomThreshold = 0.7; p.vignette = 0.62; }
       else if (m === 'six' || m === 'brick') { p.exposure = 0.84; p.warmth = 0.05; p.bloom = 0.3; p.contrast = 1.12; }
-      else if (m === 'garage' || m === 'note') { p.exposure = 1.1; p.warmth = m === 'note' ? 0.03 : -0.03; p.contrast = 1.1; p.vignette = 0.6; }
+      else if (m === 'garage' || m === 'note') { p.exposure = 1.1; p.warmth = m === 'note' ? 0.03 : -0.03; p.contrast = 1.1; p.vignette = 0.6; if (m === 'note') { p.bloom = 0.2; p.bloomThreshold = 0.95; } }
       else { p.exposure = m === 'house' ? 0.8 : 0.95; p.warmth = 0.03; p.contrast = 1.1; }
       if (m === 'years') p.flash = Math.max(p.flash, 0.015 * Math.max(0, Math.sin(((t - SB.years) / SB_HO.lapse) * Math.PI * 2)));
     },
