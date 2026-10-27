@@ -91,7 +91,7 @@ reversed swell cut dead, the ambience dropping 14 dB), the mirror sky's tings, t
 relays, the gasp and the cheer, Voyager's pips (backwards after the turn), the inverter, the ice, the boil.
 
 Mix (rendered fresh from the final cut): **−15.5 LUFS integrated, −1.4 dBTP, LRA 7.4 LU**. Encoded: the 1080p master's
-soundtrack AAC 256k (−15.6 LUFS, −1.3 dBTP); the phone copy's AAC 128k through a limiter (−15.6 LUFS, −1.5 dBTP). The
+soundtrack AAC 256k (−15.6 LUFS, −1.3 dBTP); a limited AAC 128k for a phone copy (−15.6 LUFS, −1.5 dBTP), not used. The
 same audio is baked into the page (`soundtrack.js`), so the ZIP plays it at once.
 
 ## Delivery
@@ -103,9 +103,11 @@ same audio is baked into the page (`soundtrack.js`), so the ZIP plays it at once
   upside down in your night sky).
 - **Runnable ZIP:** `light-backward-film.zip`: unzip, open `light-backward.html` in Chrome or Edge, press Space
   (F for full screen).
-- **Final films** (rendered on the PC's graphics card from the pushed branch, `films/light-backward/render-gpu.cjs`):
-  `D:\renders\light-backward\light-backward_final_1080p.mp4` (1920×1080, 30 fps, H.264 CRF 18) and
-  `light-backward_final_small.mp4` (1280×720, under 30 MiB, for sending from a phone).
+- **Final film** (rendered on the PC's graphics card from the pushed branch, `films/light-backward/render-gpu.cjs`,
+  2026-10-27): `D:\renders\light-backward\light-backward_final_1080p.mp4`, 1920×1080, 30 fps, H.264 CRF 18,
+  468.93 s, 1,548 MiB, −15.6 LUFS, −1.3 dBTP; check strip `check.jpg` (8 frames, all clean). The phone copy was
+  dropped at the owner's request. Also: a fourth thumbnail, `thumb-earth-from-earth.jpg` (the Hawaii frame, "Earth
+  from Earth"), made on the owner's request; the current favourite.
 - Branch `claude/project-thread-1pxj6q`; every number in `films/light-backward/PLAN.md`.
 
 ## What is still weak
