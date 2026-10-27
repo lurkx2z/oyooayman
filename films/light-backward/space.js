@@ -6,7 +6,8 @@
      shadow   ILLUSTRATION: from behind the Earth: the gap (its old shadow) comes back too; the Earth slides out
      wave     the real Earth (physics.js's exit time for every place): the light sweeping across the night side
               (sped up 20×), your garden lit at 10:01:21
-     half     the day side at 10:00:00: dark everywhere at once
+     half     a few minutes after 10: the day side dark (only its own light falling back), the night side lit
+     real3    ILLUSTRATION (the real section): the sunlight that missed the Earth, still streaming away into space
      voyager  ILLUSTRATION: Voyager 1's radio signal, turned round
      ice      over the Arctic: the sea ice going (within a year)  boil   the oceans boiling into a steam sky (thousands of years)
      birth    ILLUSTRATION: shells of the Sun's old light, sent out over thousands of years, still closing in on it
@@ -226,21 +227,23 @@ LB_SETS.space = (app) => {
       let k1 = 1, k2 = 0, s = lbStoryAt(t), mode = 0, shift = 0, ice = 1, sea = 0, steam = 0, lights = 1, a2 = 0;
       const sunAt = (p, size) => { sunSpr.visible = sunCore.visible = true; sunSpr.position.set(...p); sunCore.position.set(...p); sunSpr.scale.setScalar(size * 9); sunCore.scale.setScalar(size); };
       let Ssc = lbGeoScene(lbSunDir(s), s);
-      if (m === 'why' || m === 'shadow') {
-        // ILLUSTRATION: the Sun far off along −x, the Earth moving along +y
-        const tf = m === 'why' ? LB.flip : lbCap('shadow', 1).show - 0.3, dt = t - tf;
+      if (m === 'why' || m === 'shadow' || m === 'real3') {
+        // ILLUSTRATION: the Sun far off along −x, the Earth moving along +y (real3: tonight, before the turn: the Earth
+        // on its own clock, the turn never comes)
+        const tf = m === 'why' ? LB.flip : m === 'real3' ? t : lbCap('shadow', 1).show - 0.3, dt = m === 'real3' ? -1 : t - tf;
         mode = 1; Ssc = [-1, 0, 0]; k1 = dt < 0 ? 1 : 0; k2 = dt < 0 ? 0 : MathX.smooth(dt, 0, 0.25);
         shift = 2 * LB_SP.u * Math.max(0, dt); earthG.position.y = yE(t, tf);
-        earthG.rotation.set(0.41, m === 'why' ? 2.2 : 1.4, 0);
+        earthG.rotation.set(0.41, m === 'shadow' ? 1.4 : 2.2, 0);
         drawStream(t, tf, 0.9);
         // (the gap behind the Earth: before the turn it trails behind it; after, it heads back to the Sun at light speed)
         { const { c, u, Lh } = LB_SP; if (dt < 0) placeGap(1, Lh, yE(t - 1 / c, tf), yE(t - Lh / c, tf), m === 'why' ? 0.5 : 0.7);
           else { const b = c * dt, x0 = Math.max(-Lh, 1 - b), x1 = Lh - b, yo = (x) => yE(tf - (x + b) / c, tf); placeGap(x0, x1, yo(x0), yo(x1), 0.7 * (1 - MathX.smooth(dt, 4, 7))); } }
         if (m === 'why') { const k = K(t, LB.why, LB.shadow, (x) => x); pos = [lbLerp(3.0, 2.6, k), lbLerp(3.2, 2.8, k), lbLerp(14.5, 13.2, k)]; at = [-3.0, 0.3, 0]; fov = 52; sunAt([-13, 0, 0], 1.6); }
+        else if (m === 'real3') { const k = K(t, LB.real3, LB.real4, (x) => x); pos = [lbLerp(-1.0, 1.5, k), lbLerp(3.0, 2.6, k), lbLerp(15.5, 14.5, k)]; at = [lbLerp(0.5, 3.5, k), 0.2, 0]; fov = 56; sunAt([-13, 0, 0], 1.6); }
         else { const k = K(t, LB.shadow, LB.wave, (x) => x); pos = [lbLerp(7.5, 6.8, k), lbLerp(2.6, 2.9, k), lbLerp(4.4, 4.0, k)]; at = [0, earthG.position.y * 0.6, 0]; fov = 38; sunAt([-60, 0, 0], 3.5); }
       } else if (m === 'wave' || m === 'half') {
-        // the real Earth at the real moment (the wave sped up 20×; the day side: the moment it went out)
-        if (m === 'wave') { s = 20 * (t - (LB.wave + 0.7)); } else { s = t - (lbCap('half', 1).show + 0.6); }
+        // the real Earth at the real moment (the wave sped up 20×; half: a few minutes after 10, on the film's clock)
+        if (m === 'wave') s = 20 * (t - (LB.wave + 0.7));
         Ssc = lbGeoScene(lbSunDir(s), s);
         const V = lbGeoScene(lbVelDir(s), s), N = [0, 1, 0];
         const sn = lbSunSeen(s); k1 = sn.on ? sn.k * sn.r * sn.r : lbEarthGhost(s); k2 = 1; a2 = MathX.clamp(s / 214, 0, 1);   // (out: lit only by its own light falling back)
@@ -260,7 +263,7 @@ LB_SETS.space = (app) => {
         // ILLUSTRATION: Voyager 1; its signal (rings) heading for Earth (off to the left) turns round at 10:00
         earthG.visible = false; voy.visible = true; voy.position.set(0, 0, 0);
         const tf = lbCap('voyager', 1).show + 1.4, k = K(t, LB.voyager, LB.ret, (x) => x);
-        pos = [lbLerp(4.5, 3.6, k), lbLerp(2.2, 1.8, k), lbLerp(13, 11.5, k)]; at = [-3.2, 0, 0]; fov = 42;
+        pos = [lbLerp(-2.4, -3.2, k), lbLerp(2.6, 2.2, k), lbLerp(10.5, 9.4, k)]; at = [lbLerp(-3.6, -4.4, k), -0.2, 0]; fov = 46;   // (from the Earth's side: the dish faces you)
         sunAt([-500, 30, -120], 3.2);
         const v = 1.6, every = 0.55, L = 26;
         rings.forEach((rg, i) => {
@@ -295,9 +298,10 @@ LB_SETS.space = (app) => {
     labels(t) {
       const m = lbShotAt(t).mode, out = [], W = StoryHUD.win, wp = (o) => { const v = new THREE.Vector3(); o.getWorldPosition(v); return [v.x, v.y, v.z]; };
       if (m === 'wave') out.push({ p: wp(london), text: 'YOUR GARDEN', sub: t < LB.wave + 0.7 + LB_SKY.on / 20 ? 'STILL IN THE GAP' : 'LIT AT 10:01:21', a: W(t, LB.wave + 0.6, LB.moonwhy - 0.3, 0.3, 0.2) });
-      if (m === 'half') out.push({ p: wp(hawaii), text: 'HAWAII', sub: 'NOON', a: W(t, LB.half + 0.5, LB.wait - 0.3, 0.3, 0.2) });
+      if (m === 'half') out.push({ p: wp(hawaii), text: 'HAWAII', sub: 'NOON · NO SUN', a: W(t, LB.half + 0.5, LB.wait - 0.3, 0.3, 0.2) });
       if (m === 'shadow') out.push({ p: [2.8, -0.1, 0], text: 'THE GAP', sub: 'WHERE THE EARTH’S SHADOW WAS', a: W(t, lbS('shadow') + 0.6, LB.wave - 0.3, 0.3, 0.2) });
-      if (m === 'voyager') out.push({ p: [0.4, 2.2, 0], text: 'VOYAGER 1', sub: '25.8 BILLION km FROM EARTH', a: W(t, LB.voyager + 0.6, LB.ret - 0.3, 0.3, 0.2) });
+      if (m === 'voyager') out.push({ p: [0, 2.3, 0], text: 'VOYAGER 1', sub: 'THE FARTHEST SPACECRAFT', a: W(t, LB.voyager + 0.6, LB.ret - 0.3, 0.3, 0.2) });
+      if (m === 'real3') out.push({ p: [9.0, 1.4, 0], text: 'SUNLIGHT THAT MISSED THE EARTH', sub: 'STILL FLYING AWAY', a: W(t, LB.real3 + 0.8, LB.real4 - 0.3, 0.3, 0.2) });
       return out;
     },
     grade(t, p, shot) {

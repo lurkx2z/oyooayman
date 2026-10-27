@@ -5,9 +5,9 @@
               Earth had sent back into space, falling back; sky.js), about a quarter of noon's light
      shrink   25× faster: it shrinks away to the west-north-west, and noon turns to dusk
      wait     people on the dusky beach looking up at it, phones out (the 8 minutes 16 seconds)
-     return   12:08:13.5 their time: the Sun comes back (long lens), a dot (the middle of its disc) first, then the
-              disc; then the beach in daylight again
-     sun      the Sun through a filter: brighter and brighter, whiter (its surface heating up)
+     return   12:08:13.5 their time: the Sun comes back, through a solar filter on a long lens: black, then a dot (the
+              middle of its disc, the nearest part) that grows into the disc, which then gets brighter and brighter
+     bright   the beach in the doubled sunlight
    Local frame (metres): −z looks out to sea (SSW, azimuth 200°), +x is WNW along the beach (the hotels), −x towards
    Diamond Head; the water's edge is at z ≈ −8.
    ===================================================================== */
@@ -149,7 +149,7 @@ LB_SETS.hawaii = (app) => {
 
   const set = {
     scene, camera: cam, sky,
-    cuts() { return [LB.back + 3.6]; },
+    cuts() { return []; },
     frame(t, shot) {
       const m = shot.mode, s = lbStoryAt(t);
       let pos = [1.5, 1.6, 4.5], at = lbAimH(pos, 192, 22), fov = 72, drift = 0.004, sk = { t, F: lbFrame(s, LBP.hawaii.lat, LBP.hawaii.lon) };
@@ -162,16 +162,17 @@ LB_SETS.hawaii = (app) => {
         // (out to sea, the Sun high in the frame)
         const k = K(t, LB.hawaii, LB.black, (x) => x); pos = [lbLerp(1.6, 1.3, k), 1.5, lbLerp(5.2, 4.4, k)]; at = lbAimH(pos, lbLerp(184, 180, k), lbLerp(31, 33, k)); fov = 74; }
       else if (m === 'black') {
-        // (looking up past the palms at the sea and the clouds overhead)
-        const k = K(t, LB.black, LB.shrink, (x) => x); pos = [lbLerp(-2.0, -2.4, k), 1.25, lbLerp(9.0, 8.6, k)]; at = lbAimH(pos, lbLerp(250, 268, k), lbLerp(48, 56, k)); fov = 86; drift = 0.0025; }
+        // (looking up past the palms, almost straight up: the sea and the clouds overhead, as seen from above)
+        const k = K(t, LB.black, LB.shrink, (x) => x); pos = [lbLerp(-2.0, -2.4, k), 1.25, lbLerp(9.0, 8.6, k)]; at = lbAimH(pos, lbLerp(244, 262, k), lbLerp(64, 70, k)); fov = 86; drift = 0.0025; }
       else if (m === 'shrink') {
         // (the WNW sky: the mirror Earth shrinking, its edge coming into view; noon going to dusk)
         const k = K(t, LB.shrink, LB.half, (x) => x); pos = [lbLerp(-4.0, -4.6, k), 1.6, -3.4]; at = lbAimH(pos, eAz - 6, lbLerp(52, eAlt - 2, Ease.inOutSine(k))); fov = lbLerp(86, 70, k); drift = 0.002; }
       else if (m === 'wait') { const k = K(t, LB.wait, LB.voyager, (x) => x); pos = [lbLerp(-11.5, -11.0, k), 0.7, lbLerp(-6.2, -6.5, k)]; at = lbAimH(pos, eAz + 6, eAlt - 8); fov = 60; drift = 0.003; }
       else if (m === 'return') {
-        if (t < LB.back + 3.6) { pos = [0, 1.6, 0]; at = lbAimH(pos, sunAz, sunAlt, 40); fov = 4.2; drift = 0.00004; cam.near = 1; Object.assign(sk, { lens: 4.2, starK: 0 }); }
-        else { const k = K(t, LB.back + 3.6, LB.sunClose, (x) => x); pos = [lbLerp(-0.6, -0.4, k), 1.3, lbLerp(1.0, 0.6, k)]; at = lbAimH(pos, sunAz + 4, sunAlt - lbLerp(22, 16, k)); fov = 78; } }
-      else if (m === 'sun') { pos = [0, 1.6, 0]; at = [Ls[0] * 40, 1.6 + Ls[1] * 40, Ls[2] * 40]; fov = 0.8; drift = 0.00001; cam.near = 1; Object.assign(sk, { k: 0, discK: 0.07, face1: 1, starK: 0 }); }
+        // (through a solar filter: only the Sun's own disc shows; its brightness on screen is its real brightness)
+        pos = [0, 1.6, 0]; at = [Ls[0] * 40, 1.6 + Ls[1] * 40, Ls[2] * 40]; fov = lbLerp(1.3, 1.15, K(t, LB.ret, LB.sunClose, (x) => x)); drift = 0.00001; cam.near = 1;
+        Object.assign(sk, { k: 0, discK: 0.062, face1: 1, starK: 0 }); }
+      else if (m === 'bright') { const k = K(t, LB.sunClose, LB.full, (x) => x); pos = [lbLerp(-0.6, -0.4, k), 1.3, lbLerp(1.0, 0.6, k)]; at = lbAimH(pos, sunAz + 4, sunAlt - lbLerp(38, 34, k)); fov = 78; }
       { const d = lbDrift(t, drift, 0.3, 17); lbCam(cam, [pos[0] + d[0], pos[1] + d[1], pos[2] + d[2]], at, fov); }
       const stt = sky.update(s, cam, app.renderH || 1080, sk);
       // the light: the Sun (out from 10:00:00 until 12:08:13 their time); meanwhile the mirror Earth overhead, a huge
@@ -208,18 +209,15 @@ LB_SETS.hawaii = (app) => {
       // (a label beside a direction, not on it: off by `off` degrees of altitude)
       const dirAt = (az, alt) => lbAimH([0, 1.6, 0], az, alt, 400);
       if (m === 'shrink' && this._me) out.push({ p: dirAt(this._eAz + 2, this._eAlt + Math.asin(1 / this._me.D) / LB_D2R * 1.06), text: 'THE EARTH', sub: 'ITS OWN LIGHT, COMING BACK', a: W(t, LB.shrink + 1.0, LB.half - 0.3, 0.3, 0.2) });
-      if (m === 'return') {
-        const L = this._st && this._st.L1, a = L ? (Math.atan2(L[0], -L[2]) / LB_D2R + LB_HW.az0 + 360) % 360 : 180, e = L ? Math.asin(L[1]) / LB_D2R : 56;
-        if (t < LB.back + 3.6) out.push({ p: dirAt(a, e - 0.75), text: 'THE SUN', sub: 'ITS NEAREST PART FIRST', a: W(t, LB.back + 0.5, LB.back + 3.4, 0.3, 0.2) });
-      }
+      if (m === 'black' && this._me) out.push({ p: dirAt(this._eAz + 25, this._eAlt - 22), text: 'THE PACIFIC OCEAN', sub: 'AND ITS CLOUDS, SEEN FROM ABOVE, UPSIDE DOWN', a: W(t, lbCap('black', 1).show, LB.shrink - 0.3, 0.3, 0.2) });
       return out;
     },
     grade(t, p, shot) {
       const k = this._k || 0, m = shot.mode;
       // (the eye adapts, but not all the way: a doubled Sun still looks brighter and whiter)
       p.exposure = k <= 1 ? lbLerp(1.5, 1.0, MathX.clamp(k * 1.6, 0, 1)) : 1 / (0.7 + 0.3 * k); p.bloom = 0.3 + 0.1 * MathX.clamp(k - 1, 0, 1.5); p.saturation = lbLerp(0.85, 1.06, MathX.clamp(k, 0, 1));
-      if (m === 'sun') { p.exposure = 1.0; p.bloom = 0.25; p.vignette = 0.3; }
-      if (m === 'return' && t < LB.back + 3.6) { const k1 = this._st ? this._st.k1 : 0; p.exposure = lbLerp(0.9, 0.14, Math.pow(MathX.clamp(k1 / 0.9, 0, 1), 0.6)); p.bloom = 0.22; p.vignette = 0.35; }
+      if (m === 'return') { p.exposure = 1.0; p.bloom = 0.25; p.vignette = 0.3; p.saturation = 1.05; }
+      if (m === 'bright') { p.exposure *= 0.62; p.contrast = 1.14; p.saturation = 1.12; }   // (dazzling, but not a white-out)
     },
   };
   return set;

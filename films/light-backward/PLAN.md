@@ -1,6 +1,6 @@
 # What if light started moving backward?
 
-Voiceless 16:9 long-form (1920×1080, 30 fps, 7:55), the Slower light / Slower sound formula: one ordinary night, one
+Voiceless 16:9 long-form (1920×1080, 30 fps, 7:49), the Slower light / Slower sound formula: one ordinary night, one
 rule, told by captions, a readout, a clock, a few honest illustrations and the sound. Page: `light-backward.html`.
 Captions: `CAPTIONS.md` → `node build-timing.cjs` → `timing.js`. Every number on screen: `physics.js` (§ 2).
 
@@ -33,19 +33,19 @@ on P/|P|, radius asin(R/|P|); a town C at −s is seen in the direction of P −
 | | the shadow sweeps across the night side at 2v = 60 km/s; all of it lit in R/v = 214 s ("3 and a half minutes") | |
 | | the second Sun shows the Sun as it was at −(s + 495.85) s: 9:49 PM at 10:02:35, one second further back every second | lbSecondShows |
 | 10:00:00 (noon in Hawaii) | the Sun goes out on the whole day side; new light needs 495.85 s (0.9937 AU) | LBP.tSun |
-| | Hawaii's sky fills with the sunlit Pacific and its clouds, upside down (the Earth's own reflected sunlight): the image's radius 87° → 52.5° at 60 s → 24° at 214 s → 11.7° at 493 s, its light on the ground (k·sin alt) 0.29 → 0.11 → 0.035 → 0.01 → 0.0014 of the Sun's | lbEarthGhost |
+| | Hawaii's sky fills with the sunlit Pacific and its clouds, upside down (the Earth's own reflected sunlight): the image's radius 87° → 52.5° at 60 s → 24° at 214 s → 11.7° at 493 s, its light k = 0.37 · lit · sin²(radius) (the Earth's geometric albedo × a disc's light on a surface facing it) 0.37 → 0.23 → 0.06 → 0.015 of the Sun's: a gloomy overcast day at 10:02, dusk-like by ~10:07 | lbMirrorEarth |
 | | Voyager 1, 25.8 billion km out: its signal in flight (23.9 h old) turns round; the next reaches Earth 23.9 h after 10:00 | |
 | 10:08:13.5 | the Sun comes back, the disc's centre first, its edge 2.32 s later (shown slowed down 8×) | lbSunSeen, LBP.tFirst |
-| 10:08:13.5 → | its own old light lands back on it: output ×2, T = 5,772 K × 2^¼ = 6,864 K (5,500 → 6,600 °C); e-folding 4 s is a guess | lbSunGain |
+| 10:08:13.5 → | its own old light lands back on it: output up to ×2, T = 5,772 K × 2^¼ = 6,864 K (5,500 → 6,600 °C); e-folding 4 s is a guess. ×2 is an upper limit: the surface is the top of a convection zone, and heating it from outside chokes some of the heat from below, so it may settle at ×1.5–1.9 within hours to days; the captions say "up to" | lbSunGain |
 | 10:08:18 | the Moon's day side lights again (498.04 s); twice as bright as the night side | LB_MOON.dayBack |
-| | Earth gets 3× sunlight (2× real Sun + 1× second Sun); Venus gets 1.9× | |
+| | Earth gets up to 3× sunlight (2× real Sun + 1× second Sun); Venus gets 1.9× | |
 | midnight | the second Sun (dec +12.5°) at alt 51° in the south; the real Sun's October noon is 26° | |
 | 6:44:38 AM | sunrise (the centre 0.83° below the horizon), the second Sun setting opposite; two shadows for ~11 min | LB_SUNRISE |
 | 6:45 → 11:45 | the little Earth: the light it sent up yesterday, back, seen from 1.9 → 3.0 million km; 0.39° → 0.25° across, az 199° alt 57° → az 280° alt 17°; it turns backwards | lbMirrorEarth |
-| noon | UV-B at 310 nm: blackbody ratio 6,864 / 5,772 K = 3.6× → sunburn "more than 3 times faster" | |
+| noon | UV-B at 310 nm: blackbody ratio 6,864 / 5,772 K = 3.6× → sunburn "could … more than 3 times faster" (2.2× if the Sun settles at ×1.5) | |
 | per day | Britain, late October: 61.7 MJ/m² at the top of the air, midsummer was 41.5 MJ/m² | lbnum (scratch) |
-| | the Sun's ×2 lasts about a year: the Sun wobbles 13 m/s round the centre of mass (Jupiter), so after that its old light comes back to where it was, not where it is; long term the Earth gets ~2.3× | |
-| | extra absorbed ≈ (2.3 to 3 − 1) × 340 × 0.7 ≈ 300–480 W/m² vs today's imbalance ≈ 1–2 W/m²: "hundreds of times faster" | |
+| | the Sun's ×2 lasts about a year: the Sun wobbles 13 m/s round the centre of mass (Jupiter), so after that its old light comes back to where it was, not where it is, and passes on outward as a ghost Sun beside it: the Earth stays near ×3 | |
+| | extra absorbed ≈ (3 − 1) × 340 × 0.7 ≈ 480 W/m² vs today's imbalance ≈ 1–2 W/m²: "hundreds of times faster" | |
 | | 2 m of sea ice at 150 W/m²: ~47 days ("within a year") | |
 | | ~10 % more sunlight → runaway greenhouse (the far-future Sun); here +130–200 %: the oceans' 1.4 × 10²¹ kg boiled off in ~850–2,000 years at albedo 0.3–0.5 ("within a few thousand years") | |
 | | the second Sun keeps showing older and older sunlight, steady for ~10,000 years (the galaxy's pull on the Sun is the next limit); the film shows it to 10,000 years | |
@@ -57,7 +57,12 @@ every wave's magnetic field at once.
 
 Honest limits: the glow, the sky and the mirror Earth's brightness are drawn, not radiative transfer (the mirror Earth
 is added on top of the air in front of it, which is right in kind); the Sun's ×2 assumes it absorbs and re-emits its
-own returning light (steady state in seconds is a guess); the boil range depends on the albedo of a steam-shrouded Earth.
+own returning light (steady state in seconds is a guess; ×2 is an upper limit, see above); the boil range depends on the
+albedo of a steam-shrouded Earth. Drawn bigger or brighter for the eye: the Moon is drawn 2.4× its size in the wide night
+shots (a long-lens look; true size in the telephoto shots); the little Earth's day side is drawn 2.4× brighter against
+the blue sky; the mirror Earth's town lights sparkle (a seeded fine-scale mask) so they read as towns, not a glow. The
+film's night is a generic late October: the real 26 Oct 2026 Moon is full (the film's is a waxing gibbous, so its
+wrong-side sliver shows), and the planets are left out.
 
 ## 3. Story time
 
@@ -66,7 +71,7 @@ script.js maps film time to story time (lbStoryAt; lbStory and lbFilmAt invert i
 first 0.4 s slowed 8× (tagged), back to real time by 10:08:18, lapses over the night (×30 at midnight, ×20 at sunrise,
 ~800× over the little Earth), real time at noon, then days, years and thousands of years (space, tagged TIME-LAPSE).
 
-## 4. Shots (shots.js, 43)
+## 4. Shots (shots.js, 45)
 
 Three sets: **garden** (garden-build.js + garden.js: a terrace back garden facing SSE, the telescope, the lantern, the
 cat, a crane up over the rooftops, the park at sunrise), **space** (space.js: illustrations: the stream of old sunlight
@@ -76,7 +81,7 @@ sunlight), **hawaii** (hawaii.js: Waikiki at noon). Cold open (10:02, the second
 west → the mirror diagram → the lantern replayed a billion times slower → Europe from above the rooftops, shrinking →
 the northern glow → the second Sun → daylight, the robin, the streetlights → why (space) → the shadow, the wave → the
 Moon → the telescope's card → the Sun's past → rewind: Hawaii's noon, its sky full of upside-down sea and clouds,
-shrinking away → rewind: half the planet → the wait, Voyager → 10:08:13, a dot then a disc → twice as bright → the
+shrinking away → half the planet → the wait, Voyager → 10:08:13, a dot then a disc → twice as bright → the
 Moon → ×3 → midnight → sunrise, two shadows → the little Earth → noon → never dark → summer → heat, ice → boil → the
 second Sun running back → rewind: the last starry night → real → question.
 
@@ -114,4 +119,22 @@ inverter, the ice, the boil. Mix −16 to −14 LUFS, ≤ −1 dBTP.
   shadow tube); the boil as a cream/ochre steam shroud; a warm twilight ring; the return slowed 8× with a darker
   telephoto; the telescope tube and the solar panels' pale edges no longer float in the night shots; REWIND tags.
 
-**Round 2**: (after the second preview)
+**Round 2** (second preview, 7:55; physics review, plus one reviewer for retention, clarity and visuals):
+- Physics: 8.5/10. The core model re-derived and confirmed (10:00:08, 81.03 s, 20.5 s Sirius, 495.85 s, 10:02:35 →
+  9:49:09, sunrise 6:44:38, the little Earth, 476 W/m², 47 days of ice, the second Sun lasting). Asked for: the Sun's ×2 as
+  an upper limit ("up to"), "sunrise is almost 9 hours away", Sirius "nearly 2 more hours, in the south-east", the
+  30 vs 60 km/s gap explained, the star count limited to mag 5, the long-term ×3 (not 2.3), the mirror Earth's brightness
+  (k ∝ sin²ρ, 2–2.5× more than drawn).
+- Viewer: retention 6/10, clarity 6/10, visuals 6/10. The 10:00 moment had no "before" (the "bright Moon" was a
+  streetlamp, six faint stars); 44–112 s of murky grey sky; an unlabelled giant arc in the cold open; washed-out day
+  shots and the Sun's return landing in the wrong shot; the Hawaii section's third rewind and a garden-time NEXT line in
+  Hawaii; captions claiming what the picture didn't show (brighter and brighter, the Moon ×2/×1, the little Earth, two
+  shadows); labels on top of their subjects; too much HUD and jargon.
+- Fixes: a wide starry sky with the Moon (drawn 2.4×) and the cat before 10:00, then a hard cut to black; the town
+  lights brighter, sparkling and named (Moscow); the arc kept out of the cold open and labelled once ("THE EARTH'S
+  EDGE"); the Sun's return held in one telephoto shot through a solar filter (black → a dot → a disc, its brightness ×
+  readout climbing to ×1.99), then the beach re-graded and reframed; no rewind for the half planet; a clock plate; a
+  soft caption band instead of the ellipse; the Moon's two sides labelled ×2 / ×1; the little Earth brighter; labels
+  beside, not on, the suns, the Moon and the shadows; the shadows shot from higher; a summer day-lapse; the real section
+  with one illustration of the sunlight still flying away and one lab inset; "up to" on every ×2/×3 claim; the
+  readout's star count limited to mag 5; captions trimmed (Voyager, never, summer). New cut 7:49.

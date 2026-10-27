@@ -8,7 +8,7 @@
      top right    the time where you are (in Hawaii, theirs under it); in the lantern replay, billionths of a second
      bottom       one caption at a time (CAPTIONS.md via timing.js; numbers in amber); the last one is the question
      right        the diagrams: the rule, why the stars come back mirrored, the card's sunspots, how much sunlight,
-                  a year of sunlight, a phase-conjugate mirror, a light wave
+                  a year of sunlight, a phase-conjugate mirror
      in the scene labels a set pins to places (set.labels(t) → [{ p, text, sub, a }])
    ===================================================================== */
 
@@ -52,12 +52,12 @@ const LB_NEXT = [[LB_SKY.on, 'A SECOND SUN'], [LBP.tFirst, 'THE SUN COMES BACK']
 const LB_CTX = [
   [lbCap('past', 1).show, LB.hawaii - 0.2, 'THE SECOND SUN SHOWS THE SUN AT', (t, s) => ({ v: lbClockText(lbSecondShows(s), true) + ' PM', v2: 'ONE SECOND FURTHER BACK EVERY SECOND' })],
   [LB.wait + 0.3, LB.voyager - 0.2, 'NEW SUNLIGHT ARRIVES IN', (t, s) => ({ v: lbMinSec(LBP.tFirst - s), v2: 'IT LEAVES THE SUN AT 10:00:00' })],
-  [LB.voyager + 0.3, LB.ret - 0.2, 'VOYAGER 1', () => ({ v: '25.8 BILLION km AWAY', v2: 'ITS RADIO SIGNAL: 23.9 HOURS OLD' })],
+  [LB.voyager + 0.3, LB.ret - 0.2, 'VOYAGER 1', () => ({ v: '23.9 HOURS', v2: 'FOR ITS RADIO SIGNAL TO REACH US' })],
   [LB.ret + 0.2, LB.back - 0.05, 'NEW SUNLIGHT ARRIVES IN', (t, s) => ({ v: lbMinSec(LBP.tFirst - s) })],
-  [lbCap('double', 2).show, LB.full - 0.2, 'THE SUN\'S SURFACE', (t, s) => { const g = lbSunGain(s - LBP.tFirst); return { v: lbThousands(Math.round(lbSurfaceC(g) / 100) * 100) + ' °C', v2: 'BRIGHTNESS × ' + g.toFixed(2) }; }],
+  [LB.back + 0.6, LB.full - 0.2, 'THE SUN\'S BRIGHTNESS (AT MOST)', (t, s) => { const g = lbSunGain(s - LBP.tFirst); return { v: '× ' + g.toFixed(2), v2: 'ITS SURFACE: ' + lbThousands(Math.round(lbSurfaceC(g) / 100) * 100) + ' °C' }; }],
   [lbCap('midnight', 1).show, lbCap('midnight', 2).show - 0.3, 'THE SECOND SUN', (t, s) => ({ v: lbAltAz(lbSc(lbSunDir(s), -1), lbFrame(s)).alt.toFixed(0) + '° ABOVE THE HORIZON', v2: 'THE REAL SUN AT NOON TODAY: ' + LB_NOON_ALT.toFixed(0) + '°' })],
-  [lbCap('noon', 1).show, LB.never - 0.2, 'ULTRAVIOLET FROM THE SUN', () => ({ v: 'ABOUT × 3.6', v2: 'A HOTTER SUN IS A BLUER SUN' })],
-  [LB.heat + 0.3, LB.boil - 0.2, 'EXTRA HEAT THE EARTH SOAKS UP', () => ({ v: 'ABOUT 300 TO 480 W PER m²', v2: 'CLIMATE CHANGE TODAY: ABOUT 1 TO 2 W PER m²' })],
+  [lbCap('noon', 1).show, LB.never - 0.2, 'ULTRAVIOLET FROM THE SUN', () => ({ v: 'UP TO × 3.6', v2: 'A HOTTER SUN IS A BLUER SUN' })],
+  [LB.heat + 0.3, LB.boil - 0.2, 'EXTRA HEAT ON EVERY SQUARE METRE', () => ({ v: 'ABOUT 480 WATTS', v2: 'CLIMATE CHANGE TODAY: ABOUT 1 TO 2 WATTS' })],
   [lbCap('birth', 1).show, LB.nightBack - 0.2, 'THE SECOND SUN SHOWS THE SUN AS IT WAS', (t, s, o) => ({ v: lbThousands(o ? Math.round(o.y / 10) * 10 : 0) + ' YEARS BEFORE TONIGHT' })],
 ];
 const LB_NOON_ALT = lbAltAz(lbSunDir(lbAt(12, 0) - 86400), lbFrame(lbAt(12, 0) - 86400)).alt;
@@ -65,7 +65,6 @@ const LB_NOON_ALT = lbAltAz(lbSunDir(lbAt(12, 0) - 86400), lbFrame(lbAt(12, 0) -
 const LB_TAGS = [
   [LB.wave, LB.wave + 2.6, 'REWIND · BACK TO 10:00:00'],
   [LB.hawaii, LB.hawaii + 2.6, 'REWIND · BACK TO 10:00:00'],
-  [LB.half, LB.half + 2.6, 'REWIND · BACK TO 10:00:00'],
   [LB.nightBack, LB.nightBack + 2.6, 'REWIND · BACK TO TONIGHT'],
   [LB.rule + 0.3, LB.count, 'THOUGHT EXPERIMENT · ONLY THE DIRECTION OF LIGHT CHANGES'],
   [LB.replay, LB.replayEnd, 'ILLUSTRATION · SLOWED DOWN A BILLION TIMES'],
@@ -75,10 +74,11 @@ const LB_TAGS = [
   [LB.past, LB.hawaii, 'THROUGH A SOLAR FILTER'],
   [LB.half, LB.wait, 'ILLUSTRATION'],
   [LB.voyager, LB.ret, 'ILLUSTRATION · NOT TO SCALE'],
-  [LB.back, LB.back + LB_SLOW_T, 'SLOWED DOWN 8×'],
-  [LB.sunClose, LB.full, 'THROUGH A SOLAR FILTER'],
+  [LB.back, LB.back + LB_SLOW_T, 'SLOWED DOWN 8× · THROUGH A SOLAR FILTER'],
+  [LB.ret, LB.sunClose, 'THROUGH A SOLAR FILTER'],
   [LB.heat, LB.nightBack, 'ILLUSTRATION · TIME-LAPSE'],
   [LB.nightBack, LB.real, 'TONIGHT · 9:56 PM · THE LAST STARRY NIGHT'],
+  [LB.real3, LB.real4, 'REAL · DRAWN AS AN ILLUSTRATION'],
   [LB.real2, LB.question - 0.1, 'REAL'],
 ];
 // a caption's text with its numbers in amber
@@ -96,7 +96,7 @@ class LbHud {
     this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
     this.tag = mk('lb-tag');
     this.clock = mk('lb-clock', '<div class="l"></div><div class="v"></div><div class="f"></div>'); this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f');
-    this.cap = mk('lb-cap');
+    this.band = mk('lb-band'); this.cap = mk('lb-cap');
     this.caps = LBT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: lbCapHtml(c.text), q: g.id === 'question' })));
     this.inset = mk('lb-inset');
     this.labels = [];
@@ -108,14 +108,6 @@ class LbHud {
   _txt(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.textContent = v; }
   _html(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.innerHTML = v; }
   _cls(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.className = v; }
-
-  // the mirror-image stars above your horizon whose light has come back (the garden's sky)
-  _starsBack(s, set) {
-    const T = set && set.sky && set.sky.table; if (!T) return 0;
-    const up = lbFrame(s).up; let n = 0;
-    for (const st of T) if (st.t <= s && lbDot(st.d, up) < 0) n++;
-    return n;
-  }
 
   update(t, shot, set, app) {
     const W = StoryHUD.win, lapse = lbLapsing(t) && shot.set !== 'space', m = shot.mode;
@@ -134,12 +126,13 @@ class LbHud {
         this._txt('rol', this.roL, 'SINCE LIGHT TURNED AROUND');
         this._html('rov', this.roV, (since.txt || lbFmtSince(s)).replace(/ ([A-Z]+)$/, '<small> $1</small>').replace(/ (min|s) /g, '<small> $1 </small>').replace(/ s$/, '<small> s</small>'));
         let sub;
-        if (shot.set === 'garden' && s < LB_SKY.on) sub = 'MIRROR-IMAGE STARS BACK: ' + lbThousands(this._starsBack(s, set));
+        if (shot.set === 'garden' && s < LB_SKY.on) sub = 'STARS BACK, ON THE WRONG SIDE: ' + lbThousands(set && set.sky ? set.sky.mirrored(s) : 0);
         else if (s < LBP.tFirst) sub = shot.set === 'space' && m === 'wave' ? 'THE NIGHT SIDE IS LIGHTING UP' : 'THE REAL SUN: OUT';
-        else sub = 'SUNLIGHT HITTING THE EARTH: × ' + (1 + lbSunGain(s - LBP.tFirst)).toFixed(2);
+        else sub = 'SUNLIGHT HITTING THE EARTH: UP TO × ' + (1 + lbSunGain(s - LBP.tFirst)).toFixed(2);
         if (m === 'birth') sub = 'THE SECOND SUN: STILL RUNNING BACKWARDS';
         this._txt('ros', this.roS, sub);
-        const nx = shot.set === 'space' && m !== 'voyager' ? null : LB_NEXT.find(([at]) => at > s + 0.5);
+        // (in Hawaii, on the day side, the second Sun never comes: their next thing is the Sun's return)
+        const nx = shot.set === 'space' && m !== 'voyager' ? null : LB_NEXT.find(([at, what]) => at > s + 0.5 && !(lbInHawaii(t) && what === 'A SECOND SUN'));
         this._txt('ron', this.roN, nx ? 'NEXT · ' + nx[1] + ' · ' + lbClockText(Math.floor(nx[0]), true) + ' ' + lbAmPm(nx[0]) : '');
       }
     }
@@ -174,7 +167,9 @@ class LbHud {
         else this._txt('ckf', this.clockF, '');
       }
     }
-    // ---- the caption
+    // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
+    const gb = LBT.groups.find((g) => !g.title && t >= g.first - 0.6 && t < g.end + 0.6);
+    this._set('band', this.band, 'opacity', gb ? W(t, gb.first - 0.3, gb.end + 0.3, 0.5, 0.6).toFixed(3) : '0');
     const cp = this.caps.find((x) => t >= x.show - 0.01 && t < x.hide);
     if (cp) {
       this._html('cap', this.cap, cp.html); this._cls('capq', this.cap, cp.q ? 'lb-cap q' : 'lb-cap');
@@ -193,8 +188,8 @@ class LbHud {
       const vis = _p.z < 1 && Math.abs(_p.x) < 1.1 && Math.abs(_p.y) < 1.1;
       d.style.opacity = vis ? String(l.a ?? 1) : '0';
       const lx = (_p.x * 0.5 + 0.5) * 100, ly = (-_p.y * 0.5 + 0.5) * 100;
-      const right = lx > 62;
-      d.style.left = lx.toFixed(2) + '%'; d.style.top = ((ra > 0.05 || cx) && lx < 40 ? Math.max(ly, 46) : Math.max(ly, 18)).toFixed(2) + '%';
+      const right = l.side ? l.side === 'l' : lx > 62;
+      d.style.left = lx.toFixed(2) + '%'; d.style.top = Math.min(76, (ra > 0.05 || cx) && lx < 40 ? Math.max(ly, 46) : Math.max(ly, 18)).toFixed(2) + '%';   // (never down on the caption)
       d.className = right ? 'lb-lab r' : 'lb-lab';
       const tx = `<span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`, hh = right ? tx + '<span class="d"></span>' : '<span class="d"></span>' + tx;
       if (d._h !== hh) { d._h = hh; d.innerHTML = hh; }
@@ -210,8 +205,7 @@ class LbHud {
       ['project', lbCap('project', 1).show - 0.3, LB.past - 0.2],
       ['three', LB.three + 0.3, LB.midnight - 0.2],
       ['summer', LB.summer + 0.4, LB.heat - 0.2],
-      ['pcm', LB.real4 + 0.3, lbCap('real4', 2).show - 0.4],
-      ['wave', lbCap('real4', 2).show - 0.1, LB.question - 0.2],
+      ['pcm', LB.real4 + 0.3, lbCap('real4', 1).show - 0.3],
     ].find((x) => t >= x[1] && t < x[2]);
     const a = which ? W(t, which[1], which[2], 0.5, 0.5) : 0;
     this._set('ina', this.inset, 'opacity', a.toFixed(3));
@@ -328,28 +322,9 @@ class LbHud {
     };
     const a1 = MathX.smooth(u, 0, 0.6), a2 = MathX.smooth(u, 2.6, 3.4);
     return LbHud.svg(`${LbHud.plate(0.74)}
-      <text x="40" y="44" class="t">THROUGH FROSTED GLASS, THEN A MIRROR</text>
+      <text x="40" y="44" class="t">REAL, IN LABS: LIGHT SENT BACK</text>
       <text x="40" y="88" class="s" opacity="${a1}">AN ORDINARY MIRROR</text>${row(152, false, a1)}
       <text x="40" y="272" class="s" opacity="${a2}">A PHASE-CONJUGATE MIRROR</text>${row(336, true, a2)}
       <text x="40" y="452" class="b" opacity="${MathX.smooth(u, 4, 5)}">IT COMES BACK EXACTLY THE WAY IT CAME</text>`);
-  }
-  // a light wave: electric (white) and magnetic (amber) fields; flip the magnetic one and the wave goes back
-  static wave(u) {
-    const flip = 3.2, f = MathX.smooth(u, flip, flip + 0.6), dir = u < flip ? 1 : -1, ph = (u < flip ? u : flip - (u - flip)) * 3.2, cx = 380;
-    let e = '', b = '';
-    for (let i = 0; i <= 120; i++) {
-      const x = 80 + i * 5, a = (x - 80) / 600 * 4 * Math.PI - ph, E = Math.sin(a), B = Math.sin(a) * (1 - 2 * f);
-      e += (i ? 'L' : 'M') + x + ' ' + (220 - 95 * E).toFixed(1);
-      b += (i ? 'L' : 'M') + (x - 26 * B * 0.4).toFixed(1) + ' ' + (220 + 40 * B).toFixed(1);
-    }
-    return LbHud.svg(`${LbHud.plate(0.74)}
-      <line x1="80" y1="220" x2="690" y2="220" stroke="rgba(222,214,196,0.4)" stroke-width="2"/>
-      <path d="${e}" fill="none" stroke="#f6efe2" stroke-width="4"/>
-      <path d="${b}" fill="none" stroke="#ffcf8a" stroke-width="4"/>
-      ${LbHud.arrow(cx, 370, dir, '#fff', 120)}
-      <text x="${cx}" y="414" class="s" text-anchor="middle">${dir > 0 ? 'WHICH WAY IT GOES' : 'NOW IT GOES BACK'}</text>
-      <text x="40" y="50" class="t">A LIGHT WAVE</text>
-      <text x="40" y="84" class="s"><tspan style="fill:#f6efe2">WHITE: ELECTRIC FIELD</tspan> · AMBER: MAGNETIC FIELD</text>
-      <text x="40" y="452" class="b" opacity="${f}">FLIP THE MAGNETIC FIELD: THE WAVE TURNS ROUND</text>`);
   }
 }

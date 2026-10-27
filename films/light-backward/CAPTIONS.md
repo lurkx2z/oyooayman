@@ -19,17 +19,17 @@ status: voiceless
 
 [crescent] Then a thin sliver of Moon lights up. On the wrong side.
 
-[lights] 10:00:08. The sky lights up again. / With town lights. Upside down. / It's the light that had shone up into space, coming back down.
+[lights] 10:00:08. The sky starts to glow again. / Then town lights appear. Upside down. / It's light that had shone up into space, coming back down.
 
-[sirius] 10:00:20. The brightest star in the sky appears, in the west. / It's Sirius. It shouldn't rise for 2 more hours, in the east.
+[sirius] 10:00:20. The brightest star in the sky appears, in the west. / It's Sirius. It shouldn't rise for nearly 2 more hours, in the south-east.
 
 [mirror] Starlight on its way to us is heading back to the stars. / But starlight that had already passed the Earth is coming back. / So every star appears on the opposite side of the sky. / Back to front.
 
 [replay] And your lantern? Its light turned around too. / Slowed down a billion times, it pours back into the flame. / Under a millionth of a second, and it's over.
 
-[europe] That's Europe, upside down. And it's shrinking. / The Earth is racing on, 30 kilometres every second.
+[europe] Those are Moscow's lights, upside down. Sent up a minute before 10. / The Earth has raced on since: 30 kilometres every second.
 
-[north] 10:01. The northern sky starts to glow. / Like dawn. But dawn is 9 hours away.
+[north] 10:01. The northern sky starts to glow. / Like dawn. But sunrise is almost 9 hours away.
 
 [switch] 10:01:21. / A second Sun switches on.
 
@@ -39,7 +39,7 @@ status: voiceless
 
 [shadow] But right behind the Earth, there was a gap: its own shadow. / The gap came back too. / Your garden slid out of it after 81 seconds.
 
-[wave] From space, you'd see the light sweep across the night side. / 60 kilometres every second. / In 3 and a half minutes, the whole night side is lit.
+[wave] From space, you'd see the light sweep across the night side. / 60 kilometres every second: twice the Earth's speed. / In 3 and a half minutes, the whole night side is lit.
 
 [moonwhy] That's what lit the Moon's dark side, too.
 
@@ -57,15 +57,15 @@ status: voiceless
 
 [wait] Sunlight takes 8 minutes 16 seconds to get here. / So no new sunlight could arrive until the Sun sent more.
 
-[voyager] Almost 26 billion kilometres away, Voyager 1 was talking to Earth. / Radio is light too. Its signal, almost a day old, turned around. / NASA won't get its next message until tomorrow night. / But a dish pointed the other way could hear its old ones coming back. Backwards.
+[voyager] Almost 26 billion kilometres away, Voyager 1 was talking to Earth. / Radio is light too. Its signal, almost a day old, turned around. / NASA won't get its next message until tomorrow night.
 
-[return] 10:08:13. / The Sun comes back. A dot first, then a disc.
+[return] 10:08:13. The Sun comes back. / A dot first, then a disc.
 
-[double] Then it gets brighter. And brighter. / The Sun is being hit by all its own old light, coming back. / Its surface heats up from 5,500 to 6,600 °C. / It shines twice as bright.
+[double] Then it gets brighter. And brighter. / The Sun is being hit by all its own old light, coming back. / Its surface heats up from 5,500 to as much as 6,600 °C. / It shines up to twice as bright.
 
 [full] 10:08:18. Back home, the Moon lights up again. / One side gets twice as much light as the other.
 
-[three] Earth now gets 3 times as much sunlight. / More than Venus used to get.
+[three] Earth now gets up to 3 times as much sunlight. / More than Venus used to get.
 
 [midnight] Midnight. The second Sun stands high in the south. / Higher than the real Sun ever gets in October. / Your neighbour's solar panels are working.
 
@@ -73,11 +73,11 @@ status: voiceless
 
 [little] And high in the south, a small blue Earth. / It's light our planet sent into space yesterday, coming back. / It turns backwards. It's showing yesterday, in reverse.
 
-[noon] Noon. The Sun is twice as bright, and whiter. / You'd get sunburnt more than 3 times faster.
+[noon] Noon. The Sun is up to twice as bright, and whiter. / You could get sunburnt more than 3 times faster.
 
-[never] And it doesn't get dark again. / Not here. Not anywhere on Earth. / Owls, bats and moths lose the night.
+[never] And it doesn't get dark again. Not anywhere on Earth. / Owls, bats and moths lose the night.
 
-[summer] Every day, Britain now gets more sunlight / than it used to get on midsummer's day. / Winter never comes.
+[summer] Every day, Britain gets more sunlight than it used to on midsummer's day. / Winter never comes.
 
 [heat] Earth is heating up hundreds of times faster / than it is with climate change today. / The Arctic sea ice is gone within a year.
 

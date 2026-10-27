@@ -18,7 +18,6 @@ const LB_SHOTS = [
   { id: 'C3', t0: LB.siriusCut, t1: LB.mirror, set: 'garden', mode: 'sirius' },
   { id: 'C4', t0: LB.mirror, t1: LB.replay, set: 'garden', mode: 'mirror' },
   { id: 'C5', t0: LB.replay, t1: LB.replayEnd, set: 'garden', mode: 'replay' },
-  { id: 'C6', t0: LB.replayEnd, t1: LB.europeCut, set: 'garden', mode: 'mirror2' },
   { id: 'C7', t0: LB.europeCut, t1: LB.north, set: 'garden', mode: 'europe' },
   { id: 'C8', t0: LB.north, t1: LB.switchCut, set: 'garden', mode: 'north' },
   { id: 'C9', t0: LB.switchCut, t1: LB.day, set: 'garden', mode: 'switch' },
@@ -38,7 +37,7 @@ const LB_SHOTS = [
   { id: 'E4', t0: LB.wait, t1: LB.voyager, set: 'hawaii', mode: 'wait' },
   { id: 'E5', t0: LB.voyager, t1: LB.ret, set: 'space', mode: 'voyager' },
   { id: 'E6', t0: LB.ret, t1: LB.sunClose, set: 'hawaii', mode: 'return' },
-  { id: 'E7', t0: LB.sunClose, t1: LB.full, set: 'hawaii', mode: 'sun' },
+  { id: 'E7', t0: LB.sunClose, t1: LB.full, set: 'hawaii', mode: 'bright' },
   // 6 — home
   { id: 'F1', t0: LB.full, t1: LB.three, set: 'garden', mode: 'full' },
   { id: 'F2', t0: LB.three, t1: LB.midnight, set: 'garden', mode: 'three' },
@@ -54,7 +53,9 @@ const LB_SHOTS = [
   { id: 'G5', t0: LB.birth, t1: LB.nightBack, set: 'space', mode: 'birth' },
   { id: 'G6', t0: LB.nightBack, t1: LB.real, set: 'garden', mode: 'nightback' },
   // 8 — is any of this real; the question
-  { id: 'H1', t0: LB.real, t1: LB.question, set: 'garden', mode: 'real' },
+  { id: 'H1', t0: LB.real, t1: LB.real3, set: 'garden', mode: 'real' },
+  { id: 'H1b', t0: LB.real3, t1: LB.real4, set: 'space', mode: 'real3' },
+  { id: 'H1c', t0: LB.real4, t1: LB.question, set: 'garden', mode: 'real' },
   { id: 'H2', t0: LB.question, t1: 1e9, set: 'garden', mode: 'question' },
 ];
 // every cut, for the 2-frame dip (the shot starts, plus a set's own cuts())

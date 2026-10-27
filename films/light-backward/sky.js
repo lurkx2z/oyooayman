@@ -23,8 +23,9 @@
 // the Earth's textures (land, colour, towns' lights, clouds): one shared copy for every sky and the globe
 let LB_EARTH_SCENE = null;
 const lbEarthScene = () => LB_EARTH_SCENE || (LB_EARTH_SCENE = new EarthScene());
-// how much the mirror Earth lights the ground at a place, relative to a clear noon (≈ albedo × the lit part of the
-// image × its solid angle), and the image itself: P (units of the Earth's radius), its angular radius
+// how much the mirror Earth lights the ground at a place, relative to a clear noon (≈ the Earth's albedo 0.37 × the lit
+// part of the image × sin² of its radius: a disc's light on a surface facing it), and the image itself: P (units of the
+// Earth's radius), its angular radius
 function lbMirrorEarth(X, s) {
   const P = lbSc(lbAdd(X, LB_SKY.U, s), 1 / LBP.R), D = lbLen(P);
   if (D <= 1) return { P, D, rad: 0, lit: 0, k: 0 };
@@ -32,7 +33,8 @@ function lbMirrorEarth(X, s) {
   // the point under it, which is φ from the point under the Sun; the day side ends 90° from that)
   const rad = Math.asin(1 / D), S = lbSunDir(-s), g = Math.acos(1 / D), phi = Math.acos(MathX.clamp(lbDot(lbNrm(P), S), -1, 1));
   const lit = g < 1e-4 ? (phi < Math.PI / 2 ? 1 : 0) : MathX.clamp((Math.PI / 2 - (phi - g)) / (2 * g), 0, 1);
-  return { P, D, rad, lit, k: 0.3 * lit * (1 - Math.cos(rad)) };
+  const sr = Math.sin(rad);
+  return { P, D, rad, lit, k: 0.37 * lit * sr * sr };
 }
 
 // atmospheric refraction (Saemundsson): a direction (y up) at true altitude h is seen R higher, R = 1.02′ / tan(h + 10.3/(h + 5.11))
@@ -124,6 +126,15 @@ function lbSunFace(mirror = false, N = 512) {
   }), { repeat: false });
 }
 
+// a bright Moon's glow (the disc is the middle seventh of the sprite): steep, so it reads as light
+function lbMoonGlowTex() {
+  return lbTex(lbCanvas(256, 256, (g, w) => {
+    const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+    for (const [u, a] of [[0, 0.9], [0.14, 0.6], [0.2, 0.25], [0.3, 0.1], [0.5, 0.03], [0.75, 0.008], [1, 0]]) gr.addColorStop(u, `rgba(255,255,255,${a})`);
+    g.fillStyle = gr; g.fillRect(0, 0, w, w);
+  }), { repeat: false });
+}
+
 class LbSky {
   // o = { F, X, az0, r (dome radius), stars: bool, moon: bool, second: bool (the second Sun visible here), town: glow }
   constructor(scene, o) {
@@ -182,7 +193,7 @@ class LbSky {
       uNight: { value: new THREE.Color('#05070f') }, uNightHor: { value: new THREE.Color('#1c1e26') }, uTown: { value: new THREE.Color(o.town || '#3a2c22') }, uNightK: { value: 1 },
       uMw: { value: 1 }, uGlow: { value: 1 }, uK: { value: 1 }, uGround: { value: new THREE.Color('#050505') }, uBlackDay: { value: 0 },
       uEK: { value: 0 }, uToEqE: { value: new THREE.Matrix3() }, uP: { value: new THREE.Vector3(0, 0, 2) }, uRot: { value: 0 }, uSunE: { value: new THREE.Vector3(1, 0, 0) }, uMoonE: { value: new THREE.Vector3(...LB_SKY.M) },
-      uELit: { value: 1 }, uECity: { value: 0.3 }, uEMoon: { value: 0.06 }, uEGlow: { value: 0 },
+      uELit: { value: 1 }, uECity: { value: 0.3 }, uEMoon: { value: 0.06 }, uEGlow: { value: 0 }, uEEdge: { value: 1 },
       uEDay: { value: null }, uEMask: { value: null }, uENight: { value: null }, uECloud: { value: null },
     };
     if (o.earth) { const ES = lbEarthScene(), D = this.domeU; D.uEDay.value = ES.uniforms.uDay.value; D.uEMask.value = ES.uniforms.uMask.value; D.uENight.value = ES.uniforms.uNight.value; D.uECloud.value = ES.clouds.material.uniforms.uMap.value; }
@@ -192,7 +203,7 @@ class LbSky {
       fragmentShader: /* glsl */`
         uniform sampler2D uMap; uniform mat3 uToEq; uniform vec3 uPole, uCen, uL1, uL2, uNight, uNightHor, uTown, uGround;
         uniform float uS, uK1, uK2, uGate2, uNightK, uMw, uGlow, uK, uBlackDay; varying vec3 vD;
-        uniform sampler2D uEDay, uEMask, uENight, uECloud; uniform mat3 uToEqE; uniform vec3 uP, uSunE, uMoonE; uniform float uEK, uRot, uELit, uECity, uEMoon, uEGlow;
+        uniform sampler2D uEDay, uEMask, uENight, uECloud; uniform mat3 uToEqE; uniform vec3 uP, uSunE, uMoonE; uniform float uEK, uRot, uELit, uECity, uEMoon, uEGlow, uEEdge;
         float h3(vec3 p) { return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
         float n3(vec3 p) { vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
           return mix(mix(mix(h3(i), h3(i + vec3(1,0,0)), f.x), mix(h3(i + vec3(0,1,0)), h3(i + vec3(1,1,0)), f.x), f.y),
@@ -239,9 +250,11 @@ class LbSky {
           vec3 h = normalize(uSunE - r);
           col += vec3(1.0, 0.95, 0.86) * pow(max(dot(Q, h), 0.0), 90.0) * 0.8 * (1.0 - land) * (1.0 - cl) * step(0.0, mu0) * uELit;   // (the sun's glint on the sea)
           float dark = 1.0 - smoothstep(-0.06, 0.06, mu0);
-          col += textureGrad(uENight, euv, gX, gY).rgb * dark * uECity * (1.0 - 0.7 * cl);   // (the towns' lights)
+          // (the towns' lights: the map is ~10 km a pixel, so up close they break into points, its mean kept)
+          float tw = (1.0 - smoothstep(0.15, 0.45, 8000.0 * fq)) * hit, sp = fbmA(Q * 8000.0 + 3.0, 8000.0 * fq);
+          col += textureGrad(uENight, euv, gX, gY).rgb * dark * uECity * (1.0 - 0.7 * cl) * mix(1.0, 0.2 + 5.0 * smoothstep(0.58, 0.72, sp), tw);
           col += surf * max(dot(Q, uMoonE), 0.0) * uEMoon * dark;                  // (moonlit clouds)
-          col += vec3(0.3, 0.52, 0.95) * pow(1.0 - mu, 5.0) * smoothstep(-0.3, 0.25, mu0) * 0.7 * uELit;   // (its air, at the edge)
+          col += vec3(0.3, 0.52, 0.95) * pow(1.0 - mu, 5.0) * smoothstep(-0.3, 0.25, mu0) * 0.7 * uELit * uEEdge;   // (its air, at the edge)
           return col * smoothstep(0.0, 0.004, D) * hit;
         }
         void main() {
@@ -311,6 +324,9 @@ class LbSky {
           }`,
       }));
       this.moon.renderOrder = -7; this.moon.frustumCulled = false; g.add(this.moon);
+      // (its glow in the air round it: the way a bright Moon looks to the eye and to a camera)
+      this.moonGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: lbMoonGlowTex(), color: '#c8d4ea', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+      this.moonGlow.renderOrder = -7; this.moonGlow.frustumCulled = false; g.add(this.moonGlow);
       this.moonDir = new THREE.Vector3(...lbLocal(LB_SKY.M, F, az0));
     }
     this.state = {};
@@ -357,7 +373,9 @@ class LbSky {
       // (the dome's own sky frame is fixed at 10 PM; the Earth image needs this moment's, hours later)
       { const ex = lbUnLocal([1, 0, 0], Fs, az0), ey = lbUnLocal([0, 1, 0], Fs, az0), ez = lbUnLocal([0, 0, 1], Fs, az0); D.uToEqE.value.set(ex[0], ey[0], ez[0], ex[1], ey[1], ez[1], ex[2], ey[2], ez[2]); }
       D.uP.value.set(...me.P); D.uRot.value = lbGmst(-skyS) * 15 * LB_D2R; D.uSunE.value.set(...lbSunDir(-skyS));
-      D.uELit.value = o.eLit ?? 1; D.uEGlow.value = (o.eGlow ?? 1) * 0.35 * me.k;
+      D.uELit.value = o.eLit ?? 1; D.uEGlow.value = (o.eGlow ?? 1) * 0.35 * me.k; D.uECity.value = o.city ?? 0.3;
+      // (its rim of sunlit air: faint against our own daylight, so it doesn't read as a ring drawn on the sky)
+      D.uEEdge.value = o.edge ?? (1 - 0.7 * MathX.clamp(k2 * day2 + k1 * day1, 0, 1));
     }
     this.state.earth = me;
     // the suns' discs
@@ -390,6 +408,11 @@ class LbSky {
       // Moon moves off it; bright again once new sunlight is back)
       this.moonU.uS.value = skyS; this.moonU.uDay.value = skyS < LB_MOON.dayBack ? lbMoonGhost(skyS) : lbSunGain(skyS - LB_MOON.dayBack);
       this.moonU.uK.value = (o.moonK ?? 1) * 1.15;
+      // (the glow: from its sunlit side, so it goes at 10:00:00 with the rest; drowned by daylight)
+      const lit = skyS < 0 ? 1 : this.moonU.uDay.value * 0.6;
+      this.moonGlow.position.copy(this.moon.position); this.moonGlow.scale.setScalar(this.moon.scale.x * 7);
+      this.moonGlow.material.opacity = 0.32 * lit * (o.moonK ?? 1) * MathX.clamp(1 - (k1 * day1 + k2 * day2) * 4, 0, 1) * (o.moonGlow ?? 1);
+      this.moonGlow.visible = this.moonGlow.material.opacity > 0.002 && md.y > -0.02;
     }
     this.state = Object.assign(this.state, { k1, k2, frac, red, lum, day1, day2, sun });
     return this.state;

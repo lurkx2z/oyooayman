@@ -8,7 +8,8 @@
      Hawaii                the surf, the palms, the crowd: chatter at noon, the gasp when their Sun goes out, the
                            murmur in the dark, the cheer when it comes back
      space                 almost nothing: a faint low hum under the illustrations (the music carries them)
-   Light turning round does nothing to sound: the garden's sounds carry on straight through 10:00:00.
+   Light turning round does nothing to sound: the garden's sounds carry on straight through 10:00:00 (the mix only
+   holds its breath for a second there: mix.js).
    ===================================================================== */
 
 lbSound('amb', 'places', function (ctx, bus, K) {
@@ -39,7 +40,7 @@ lbSound('amb', 'places', function (ctx, bus, K) {
   const bees = lbCurve((t) => dayG(t) * (lbWn(t, LB.noon, LB.never, 0.4, 0.4) + lbWn(t, LB.summer, LB.heat, 0.4, 0.4)));
   lbTone(K, LB.noon - 0.5, LB.heat - LB.noon + 1, (t) => 215 + 12 * Math.sin(t * 1.3) + 8 * Math.sin(t * 3.1), [[1, 1], [2, 0.5], [3, 0.3], [4, 0.15]], (u, t) => bees(LB.noon - 0.5 + t), { vol: 0.012, f: [['bp', 600, 0.8]], pan: 0.3 });
   // 4 AM, two days on, broad daylight: a tawny owl calling anyway
-  K.put(lbOwl(fx, { f: 580 }), lbCap('never', 2).show + 0.4, { vol: 0.07, norm: true, pan: -0.5, room, wet: 1 });
+  K.put(lbOwl(fx, { f: 580 }), lbCap('never', 1).show + 0.4, { vol: 0.07, norm: true, pan: -0.5, room, wet: 1 });
 
   // ---- the park at 6:45 AM: a dawn chorus, a breeze
   lbBed(K, LB.sunrise - 0.3, LB.noon + 0.3, { colour: 'pink', f: [['lp', 900], ['hp', 60]], env: (u, t) => park(t), vol: 0.07, fi: 0.3, fo: 0.3, am: 0.4, wr: 0.2 });

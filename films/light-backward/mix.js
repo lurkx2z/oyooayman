@@ -14,7 +14,7 @@ window.LB_MIX = {
     // the robins and the streetlights, and for the beach's cheer when the Sun comes back
     music: [['t0', -0.03, 0], ['t0', 0.06, -40], ['t0', 1.3, -40], ['t0', 1.9, 0], ['out', -0.03, 0], ['out', 0.06, -40], ['out', 1.4, -40], ['out', 2.0, 0],
       ['robin', -0.4, 0], ['robin', 0.6, -3], ['lampsOff', 1.2, -3], ['lampsOff', 2.6, 0], ['back', 0, 0], ['back', 0.8, -3.5], ['double', 0.5, -3.5], ['double', 3.0, 0]],
-    amb: [],
+    amb: [['t0', -0.03, 0], ['t0', 0.05, -14], ['t0', 1.2, -14], ['t0', 2.6, 0]],   // (the garden holds its breath as everything goes out)
     sfx: [],
   },
   master: 8,

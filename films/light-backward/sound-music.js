@@ -225,9 +225,9 @@ lbSound('music', 'score', function (ctx, bus, K) {
   back(cap('voyager', 1) + 2.2, 0.8, 0.2, { oct: 0, dur: 1.2 });
   // ---- 10:08:13.5, the Sun comes back: a single note (the dot), then the chord (the disc); brighter and brighter
   M.strings(LB.ret, LB.back + 0.02, C.Bsus, 0.36, { att: 1.0, rel: 0.02, cut: 700, cutTo: 2000, cutAt: LB.back });
-  M.strings(LB.back, cap('return', 1) + 0.5, ['E5'], 0.06, { att: 0.6, rel: 0.4, cut: 6000, wave: 'sine', vib: 2 });
-  M.drum(cap('return', 1) + 0.1, 0.55, 41.2, 1.3);
-  M.strings(cap('return', 1) + 0.1, LB.double + 0.4, C.E, 0.42, { att: 0.4, rel: 0.8, cut: 2000 });
+  M.strings(LB.back, LB.disc + 0.5, ['E5'], 0.06, { att: 0.6, rel: 0.4, cut: 6000, wave: 'sine', vib: 2 });
+  M.drum(LB.disc, 0.55, 41.2, 1.3);
+  M.strings(LB.disc, LB.double + 0.4, C.E, 0.42, { att: 0.4, rel: 0.8, cut: 2000 });
   M.strings(LB.double, LB.full + 0.3, C.Emaj9, 0.3, { att: 1.0, rel: 1.0, cut: 1200, cutTo: 4200, cutAt: cap('double', 3), keys: [[LB.double + 1, 0.6], [cap('double', 3), 1.6], [LB.full - 0.5, 1.0]] });
   lbPulse(ctx, M.bus, LB.double + 0.5, cap('double', 3), ['E2', 'B2', 'E3'], 0.4, 0.24, { cut: 600, cutTo: 2600, acc: 4, decay: 0.28, stepAt: (t) => 0.4 - 0.2 * MathX.clamp((t - LB.double) / (cap('double', 3) - LB.double), 0, 1), ramp: (u) => 0.4 + 0.6 * u });
   M.drum(cap('double', 3), 0.6, 41.2, 1.2); M.bell(cap('double', 3) + 0.1, 'E6', 0.4, 0); M.bell(cap('double', 3) + 0.1, 'B5', 0.3, 0);
@@ -248,11 +248,11 @@ lbSound('music', 'score', function (ctx, bus, K) {
   M.strings(LB.noon, LB.never + 0.3, C.Elyd, 0.34, { att: 0.8, rel: 0.8, cut: 3200 });
   M.strings(LB.noon + 0.5, LB.never, ['A#5', 'E6'], 0.035, { att: 1.0, rel: 1.0, cut: 9000, wave: 'sine', vib: 6 });
   // it never gets dark again: the theme backwards, low, for the night that is gone
-  M.prog([[LB.never, C.Em9], [cap('never', 2), C.Cmaj7]], LB.summer + 0.4, 0.3, { cut: 1000 });
-  back(cap('never', 1) + 1.4, 1.3, 0.2, { oct: -1, dur: 1.7 });
+  M.prog([[LB.never, C.Em9], [cap('never', 1), C.Cmaj7]], LB.summer + 0.4, 0.3, { cut: 1000 });
+  back(cap('never', 0) + 2.4, 1.3, 0.2, { oct: -1, dur: 1.7 });
 
   // ---- 7 · the years: endless summer; the heat: dread, quickening; the oceans; the old light still coming back
-  M.prog([[LB.summer, C.E], [cap('summer', 1), C.Amaj9], [cap('summer', 2), C.B]], LB.heat + 0.3, 0.34, { cut: 1500 });
+  M.prog([[LB.summer, C.E], [cap('summer', 0) + 2.2, C.Amaj9], [cap('summer', 1), C.B]], LB.heat + 0.3, 0.34, { cut: 1500 });
   keys(LB.summer + 0.5, LB.heat - 0.2, 1.6, ['B4', 'E5', 'G#4', 'C#5', 'A4', 'E5'], 0.09);
   M.strings(LB.heat, LB.birth + 0.4, ['E1', 'B1', 'E2'], 0.36, { att: 1.0, rel: 1.2, cut: 300, cutTo: 700, cutAt: LB.birth });
   M.strings(LB.heat + 2, LB.boil + 0.4, ['F2', 'C3', 'E3'], 0.22, { att: 2.5, rel: 0.6, cut: 700, cutTo: 1400, cutAt: LB.boil });

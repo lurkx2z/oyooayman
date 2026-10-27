@@ -37,13 +37,13 @@ LB.flipRule = lbW('rule', 'turns').start + 0.2;          // the diagram's rays t
 LB.count = lbE('rule') + 0.25;                           // the last seconds: the whole sky
 // 3 — real time from 10:00:00
 LB.zero = LB.t0;
-LB.moonCut = LB.t0 + 0.9;                                // the telephoto on the Moon (its sliver lights from 1.3 s)
+LB.moonCut = LB.t0 + 1.6;                                // the telephoto on the Moon (its sliver lights from 1.3 s)
 LB.lights = lbStory(6.2);                               // the sky, just before the mirror Earth appears (7.1 s)
 LB.siriusCut = lbStory(18.3);                            // facing west before Sirius appears (20.5 s)
 LB.mirror = lbS('mirror') - 0.45;
 LB.replay = lbS('replay') - 0.45;                        // the lantern, slowed down a billion times (a cutaway)
 LB.replayEnd = lbE('replay') + 0.35;
-LB.europeCut = lbS('europe') - 0.4;                     // the upside-down Europe, shrinking to the north-east
+LB.europeCut = Math.max(lbS('europe') - 0.4, LB.replayEnd);                   // the upside-down Europe, shrinking to the north-east
 LB.north = lbS('north') - 0.5;
 LB.switchCut = lbStory(75.8);                            // down the garden, up at where the second Sun will be
 // 4 — the second Sun
@@ -68,7 +68,7 @@ LB.voyager = lbS('voyager') - 0.5;
 LB.ret = lbS('return') - 0.6;
 LB.back = lbS('return') + 0.55;                          // ★ 10:08:13.5: the first new sunlight (the middle of the disc)
 LB.double = lbS('double') - 0.4;
-LB.sunClose = lbCap('double', 1).show - 0.3;             // the Sun through a filter
+LB.sunClose = lbCap('double', 1).show - 0.3;             // from the Sun through a filter to the beach in its light
 // 6 — home: the Moon, the night that never comes, the morning, noon, the days
 LB.full = lbS('full') - 0.5;
 LB.moonFull = lbS('full') + 0.45;                        // ★ 10:08:18: the Moon's day side lights again
@@ -128,9 +128,17 @@ const LB_SKEYS = [], LB_SLOW_T = 3.2;                      // (film seconds of t
   real(LB.noon, LB.never, lbCap('noon', 0).show, noon);               // noon tomorrow, real time
   K.push([LB.summer - 0.2, noon + 86400 * 3]);                        // three days in a few seconds
   real(LB.summer - 0.2 + 1e-3, LB.end + 2, LB.summer - 0.2 + 1e-3, lbAt(12, 0, 0) + 86400 * 3);
+  // (the summer shot runs on its own clock: lbStoryAt below)
   for (let i = 1; i < K.length; i++) if (K[i][0] <= K[i - 1][0]) K[i][0] = K[i - 1][0] + 1e-3;
 }
+// the weeks with no winter (the summer shot): a whole day per step, so the date runs on (to day 60) while the light
+// moves only as it would over a slow afternoon (the time of day advances 1.2 hours per second)
+const LB_WEEKS = { t0: 0, t1: 0, d0: 3, d1: 60 };
 function lbStoryAt(t) {
+  if (t >= LB_WEEKS.t0 && t < LB_WEEKS.t1) {
+    const u = (t - LB_WEEKS.t0) / (LB_WEEKS.t1 - LB_WEEKS.t0), d = Math.floor(LB_WEEKS.d0 + (LB_WEEKS.d1 - LB_WEEKS.d0) * u * u);
+    return lbAt(13, 0, 0) + 86400 * d + 3600 * 1.2 * (t - LB_WEEKS.t0);
+  }
   const K = LB_SKEYS;
   if (t <= K[0][0]) return K[0][1] + (t - K[0][0]);
   for (let i = 1; i < K.length; i++) if (t <= K[i][0]) { const [t0, s0] = K[i - 1], [t1, s1] = K[i]; return s0 + (s1 - s0) * (t - t0) / (t1 - t0); }
@@ -141,6 +149,8 @@ function lbFilmAt(s, a, b) { let lo = a, hi = b; for (let i = 0; i < 50; i++) { 
 // is the clock lapsing at t (faster than real time)?
 function lbLapsing(t) { const a = lbStoryAt(t - 0.02), b = lbStoryAt(t + 0.02); return (b - a) / 0.04 > 1.5; }
 const lbInHawaii = (t) => t >= LB.hawaii && t < LB.full;
+LB_WEEKS.t0 = LB.summer; LB_WEEKS.t1 = LB.heat;
+LB.disc = lbFilmAt(LBP.tFirst + LBP.tLimb, LB.back, LB.full);   // the Sun's whole disc is back (slowed down 8×, then catching up)
 
 CONFIG.duration = LB.end;
 CONFIG.seed = 20261026;
