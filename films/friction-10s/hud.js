@@ -63,9 +63,8 @@ class FzHud {
 
   update(t, shot, set, app) {
     const W = StoryHUD.win, m = shot.mode, s = set && set._s != null ? set._s : fzStoryAt(t);
-    const quiet = m === 'question' || m === 'phone3' || m === 'after';
-    // ---- the countdown (from the moment friction goes; off for the closing shots)
-    const ra = quiet ? 0 : Math.max(W(t, FZ.t0 - 0.05, fzS('after') - 0.6, 0.12, 0.5), 0);
+    // ---- the countdown (from the moment friction goes, to the last frame: it keeps counting up after s = 10)
+    const ra = Math.max(W(t, FZ.t0 - 0.05, FZ.end + 1, 0.12, 0.5), 0);
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
       if (s < 0) { this._txt('rol', this.roL, 'FRICTION GOES IN'); this._html('rov', this.roV, (-s).toFixed(2) + '<small> s</small>'); }
@@ -84,7 +83,7 @@ class FzHud {
     this._set('tg', this.tag, 'opacity', tg && !(ra > 0) ? W(t, shot.t0 + 0.05, shot.t1, 0.25, 0.1).toFixed(3) : '0');
     if (tg) this._txt('tgt', this.tag, tg);
     // ---- the time this morning
-    const ca = quiet ? 0 : W(t, FZ.t0 - 0.05, fzS('after') - 0.6, 0.12, 0.5);
+    const ca = W(t, FZ.t0 - 0.05, FZ.end + 1, 0.12, 0.5);
     this._set('ck', this.clock, 'opacity', ca.toFixed(3));
     if (ca > 0) {
       const c = fzClockParts(s), sec = Math.floor(c.sec), cs = Math.floor((c.sec - sec) * 100);

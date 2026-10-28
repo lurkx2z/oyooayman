@@ -18,7 +18,7 @@ const FZ_SHOTS = [];
   const P = FZ_SHOTS, c = (id, k) => fzCap(id, k).show;
   // 1 — the cold open: the first second and a half in real time, then the clock nearly stops (fzOpenS)
   P.push(fzSh('A0', 'open', -1, fzB('gone', 0.35), 'open', { pov: true }));
-  P.push(fzSh('A1', 'floor', fzB('gone', 0.35), c('gone', 1) - 0.35, 'open', { pov: true }));
+  P.push(fzSh('A1', 'floor', fzB('gone', 0.35), c('gone', 1) - 0.35, 'open'));
   P.push(fzSh('A2', 'teaser', c('gone', 1) - 0.35, c('gone', 2) - 0.35, 'open'));
   P.push(fzSh('A3', 'flash', c('gone', 2) - 0.35, fzB('nuance', 0.4), [[c('gone', 2) - 0.35, 10.2], [fzB('nuance', 0.4), 10.42]], { flash: true }));
   P.push(fzSh('A4', 'atoms', fzB('nuance', 0.4), c('nuance', 1) - 0.35, 'open'));
@@ -26,14 +26,18 @@ const FZ_SHOTS = [];
   P.push(fzSh('A6', 'push', c('nuance', 2) - 0.35, c('nuance', 3) - 0.35, 'open'));
   P.push(fzSh('A7', 'fault', c('nuance', 3) - 0.35, fzB('rewind', 0.4), 'open'));
   // 2 — that first second again, 10× slower: the kitchen from every side
-  { const t = fzB('rewind', 0.4); P.push(fzSh('B0', 'replay', t, fzB('cat'), fzRewind(t, fzOpenS(t), -0.41, 1.2, 10), { pov: true, replay: true })); }
+  { const t = fzB('rewind', 0.4), k = fzRewind(t, fzOpenS(t), -0.41, 1.2, 10);
+    P.push(fzSh('B0', 'replay', t, c('phone', 1) + 0.3, k, { pov: true, replay: true }));
+    P.push(fzSh('B0b', 'drop', c('phone', 1) + 0.3, fzB('cat'), k, { replay: true })); }      // (same clock: a cut, not a jump)
   P.push(fzSh('B1', 'cat', fzB('cat'), fzB('mug', 0.5), fzRun(fzB('cat'), -0.22, 10), { replay: true }));
   P.push(fzSh('B2', 'mug', fzB('mug', 0.5), fzB('feet', 0.5), fzRun(fzB('mug', 0.5), 0.3, 5), { replay: true }));
   P.push(fzSh('B3', 'reach', fzB('feet', 0.5), c('feet', 2) - 0.4, fzRun(fzB('feet', 0.5), 0.15, 10), { pov: true, replay: true }));
   P.push(fzSh('B4', 'feet', c('feet', 2) - 0.4, fzB('grip', 0.4), fzRun(c('feet', 2) - 0.4, 0.42, 6), { replay: true }));
   P.push(fzSh('B5', 'slap', fzB('grip', 0.4), c('grip', 2) - 0.45, fzRun(fzB('grip', 0.4), 0.6, 14), { pov: true, replay: true }));
   P.push(fzSh('B6', 'hook', c('grip', 2) - 0.45, fzB('catrun'), fzRun(c('grip', 2) - 0.45, 1.3, 8), { replay: true }));
-  P.push(fzSh('B7', 'catrun', fzB('catrun'), fzB('house', 0.5), fzRun(fzB('catrun'), 1.15, 3), { replay: true }));
+  { const k = fzRun(fzB('catrun'), 1.15, 3);
+    P.push(fzSh('B7', 'catrun', fzB('catrun'), c('catrun', 1) - 0.3, k, { replay: true }));
+    P.push(fzSh('B7b', 'catrun2', c('catrun', 1) - 0.3, fzB('house', 0.5), k, { replay: true })); }
   // 3 — the same second, the rest of the house
   { const t = fzB('house', 0.5); P.push(fzSh('C0', 'house', t, fzB('screws'), fzRewind(t, 1.15 + (t - fzB('catrun')) / 3, -0.1, 0.8, 20), { replay: true })); }
   P.push(fzSh('C1', 'screws', fzB('screws'), fzB('cabinets'), fzRun(fzB('screws'), -0.01, 100), { replay: true }));
@@ -80,6 +84,8 @@ const FZ_SHOTS = [];
 }
 // s = 10 on screen (the blow), and the moment before it when everything stops dead (mix.js: 0.42 s of silence)
 FZ.tB = fzB('back', 0.35); FZ.hold = FZ.tB - 0.42;
+// your phone in the gutter lights up (a notification) a second into its shot
+FZ.phoneLit = fzS('phone3') + 1.0;
 // (the mix's dynamics map keys: the slide's build, real speed, the warning)
 FZ.tSlide = fzB('slide', 0.5); FZ.tRS = fzB('realspeed'); FZ.tWarn = fzB('warn');
 // the count down's quick cuts (inside 'count'): round the house and the street, every ~0.9 s

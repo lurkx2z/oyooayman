@@ -1,9 +1,9 @@
 /* =====================================================================
-   SCRIPT — "What if friction disappeared for 10 seconds?" (16:9, 1920×1080, 30 fps, 5:58, voiceless).
+   SCRIPT — "What if friction disappeared for 10 seconds?" (16:9, 1920×1080, 30 fps, 5:02, voiceless).
    ★ The edit is built AROUND THE CAPTIONS: every beat below comes from the caption times (window.FZT, written by
    build-timing.cjs from CAPTIONS.md). Change a pause → edit PAUSE there and re-run it.
    The physics (physics.js) runs on STORY time s: seconds after friction disappears (at 8:14:07 AM); it comes back at
-   s = 10. This file maps film time t to story time s. The film is ten seconds, told over six minutes:
+   s = 10. This file maps film time t to story time s. The film is ten seconds, told over five minutes:
      1  the cold open: the first second and a half in real time (the cat, the coffee, your feet, the phone), the title
         over it, then the clock all but stops (80× slower) while the rule is set out; a flash-forward to s = 10
      2  that first second again, 10× slower, from angle after angle in the kitchen

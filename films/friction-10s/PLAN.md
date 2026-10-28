@@ -1,6 +1,6 @@
 # What if friction disappeared for 10 seconds?
 
-Voiceless 16:9 long-form (1920×1080, 30 fps, 5:58), in the Slower light / Universe cut formula, built to the owner's
+Voiceless 16:9 long-form (1920×1080, 30 fps, 5:02), in the Slower light / Universe cut formula, built to the owner's
 YouTube lessons and retention playbook of 28 October 2026: an everyday place (your kitchen at 8:14 on a weekday
 morning, and the hill street outside), visual action in the first second, the physics nuance in the first minute,
 escalating phases, a reset every few seconds, sudden silences, tension to the last frame. Page: `friction-10s.html`.
@@ -33,29 +33,33 @@ says so, and stays above ground (tagged THIS FILM: ABOVE GROUND ONLY).
 | 0 → 10 | on a slope everything slides at a = g sin θ whatever its mass. Your floor slopes 0.5° (an old house): 0.0856 m/s²; the street is an 8 % hill: **0.782 m/s²**, so by 10 s everything on it is doing **28 km/h** and has slid **39 m** (cars, bins, people, sand: almost exactly together; light boxy things 5–8 % behind, air drag) | FZP |
 | 5.82 | the sofa reaches the window and the standard lamp | fzSolvePile |
 | 6.11 | the braking car catches the bus's back corner (the bus is still turning: its wheels were turned when it pulled out, so it keeps rotating, 0.085 rad/s, and slides sideways) | FZ_CRASH |
-| 7.03 | your phone leaves the house: down the three steps, across the pavement, into the gutter, screen up | fzPhoneOut |
-| 10 | friction comes back (tyres μ ≈ 0.7, clothes on asphalt 0.55, wood 0.45): everything still moving stops in about a second (28 km/h → 0 in about 1.3 s, like being thrown off a bike); cars sliding sideways lurch (stability factor ≈ 1.3 > μ: no roll); the bus, sliding sideways, goes over (its static stability factor ≈ 0.6 < μ), on its side by 11.25 s; the fridge, still sliding, tips (10.85); the cat's paws grip mid-stride and she shoots onto the sofa | fzBusAt, fzTumble, fzTip, fzCat |
+| 7.03 | your phone leaves the house: it slides along the doorstep, flies off each step's edge and lands on the next (7.44, 7.66, 7.89: three clacks), across the pavement, into the gutter, screen up | fzPhoneOut, fzStepY |
+| 10 | friction comes back (tyres μ ≈ 0.7, clothes on asphalt 0.55, wood 0.45): everything still moving stops in about a second (28 km/h → 0 in about 1.3 s, like being thrown off a bike); cars sliding sideways only rock on their springs (static stability factor ≈ 1.3 > μ: no wheel lifts); the bus, sliding sideways, goes over (its static stability factor ≈ 0.6 < μ), on its side by 11.25 s; the fridge, sliding at 3 km/h, rocks about 5° up on its front edge and drops back with a thud (not enough spin to lift its centre of mass over the edge; a bin, lighter and squatter for its speed, the same check); the cat's paws grip mid-stride and she shoots onto the sofa | fzBusAt, fzTumble, fzTipInfo, fzTip, fzCat |
 
 ## 3. Story time
 
-The film is ten seconds told over six minutes. Every shot has its own clock (shots.js: keys [[t, s], …], straight
+The film is ten seconds told over five minutes. Every shot has its own clock (shots.js: keys [[t, s], …], straight
 lines between); the HUD reads the speed off it (SLOWED DOWN 10×, REAL SPEED, REWIND, REPLAY ·, FLASH-FORWARD ·).
 
-1. the cold open: the first 1.58 s in real time under the title (the brakes, the cat, the phone, the mug, your fall),
-   then the clock slows to 1/80 while the rule is set out; a flash-forward to s = 10.2 (the bus going over)
+1. the cold open: the title is up on frame 1 over the first 1.58 s in real time (the brakes, the cat, the phone, the
+   mug, your fall), then the clock slows to 1/80 while the rule is set out; a flash-forward to s = 10.2 (the bus going
+   over), left open until the end
 2. that first second again, 10× slower, in the kitchen from every side
 3. the same second in the rest of the house; 4. the same second outside
 5. everything slides: one continuous clock from 1.55 s (the floor, the hill, Galileo), the first five seconds again at
-   real speed, faster every second, the warning, the count down (quick cuts), **s = 10**, its replays, then real time
+   real speed, faster every second, the warning, the count down (8 quick cuts round the house and the street, a tick-tock speeding up), **s = 10** (0.42 s
+   of silence, then four hard cuts in 1.6 s: the street, the cat, the walker, wide), its replays, then real time; the last
+   question is cut off mid-shot (no fade, no outro)
 
-## 4. Shots (shots.js; the count down has 8 quick cuts inside one shot)
+## 4. Shots (shots.js; the count down has 8 quick cuts inside one shot, the return 4)
 
-A0 open (POV) · A1 floor (POV) · A2 teaser · A3 flash-forward · A4 atoms · A5 apart · A6 push · A7 faults · B0 replay
-(rewind, POV) · B1 cat · B2 mug · B3 reach (POV) · B4 feet · B5 slap (POV) · B6 hook (close-up) · B7 cat runs · C0 house
-(rewind) · C1 screws (inside the cabinet, 100×) · C2 cabinets · C3 TV · C4 curtains · C5 clothes (POV) · C6 sugar ·
-D0 street (rewind) · D1 brakes · D2 bike · D3 laces · D4 walk · D5 ladder · D6 scaffold · D7 sand · E0 slide · E1 floor ·
-E2 hill · E3 same rate · E4 real speed · E5 faster · E6 sofa · E7 bus · E8 phone · E9/E10 warning · E11 count down ·
-E12 back · E13 stop · E14 bus goes over · E15 cat · E16 after · E17 phone in the gutter · E18 question
+A0 open (POV) · A1 floor (low across the kitchen floor) · A2 teaser · A3 flash-forward · A4 atoms · A5 apart · A6 push
+· A7 faults · B0 replay (rewind, POV) · B0b drop (the phone, at floor level) · B1 cat · B2 mug · B3 reach (POV) · B4
+feet · B5 slap (POV) · B6 hook (close-up) · B7 cat runs · C0 house (rewind) · C1 screws (inside the cabinet, 100×) ·
+C2 cabinets · C3 TV · C4 curtains · C5 clothes (POV) · C6 sugar · D0 street (rewind) · D1 brakes · D2 bike · D3 laces
+· D4 walk · D5 ladder · D6 scaffold · D7 sand · E0 slide · E1 floor · E2 hill · E3 same rate · E4 real speed · E5
+faster · E6 sofa · E7 bus · E8 phone · E9/E10 warning · E11 count down · E12 back · E13 stop · E14 bus goes over · E15
+cat · E16 after · E17 phone in the gutter · E18 question
 
 ## 5. Look and HUD
 

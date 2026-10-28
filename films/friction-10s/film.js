@@ -70,8 +70,7 @@ const FILM = {
     if (set && set.grade) set.grade(t, p, shot);
     // every cut: a 2-frame dip
     for (const c of FILM._cuts) if (Math.abs(t - c) < 0.07) p.fade = Math.max(p.fade, 0.3 * (1 - Math.abs(t - c) / 0.07));
-    // the end: a hard cut to black on the last frames (no fade-out: nothing signals the end)
-    p.fade = Math.max(p.fade, MathX.smooth(t, FZ.end - 0.07, FZ.end - 0.03));
+    // the end: no fade-out and no black (nothing signals the end): the film stops on the question, mid-shot
   },
 
   debug(app, t) { const s = FILM._shot, st = FILM._set && FILM._set._s != null ? FILM._set._s : fzStoryAt(t); return `shot ${s ? s.id : '-'} · set ${s ? s.set : '-'} · mode ${s ? s.mode : '-'} · story ${fzClockText(st, true)} ${fzAmPm(st)} · s ${st.toFixed(2)}`; },

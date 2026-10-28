@@ -64,6 +64,13 @@ Everything is procedural, so there are no models, images or sound files to downl
 > your street, Earth's rotation ticking from 1,674.40 to 1,674.41 km/h, the sea draining 38 m, and a 146 m tsunami
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
+>
+> ***What if friction disappeared for 10 seconds?*** — open `friction-10s.html` (16:9, 5:02, voiceless). At 8:14 on a
+> weekday morning every solid surface above ground loses its grip for exactly ten seconds. Your kitchen, then the hill
+> street outside, one second at a time: the phone squeezed out of your hand, the cat running on the spot, screws
+> unwinding, curtains crumbling, then everything sliding down the 8 % hill at the same rate, 28 km/h by the end. Then
+> friction comes back, all at once. Physics table: [`films/friction-10s/PLAN.md`](films/friction-10s/PLAN.md); reviews:
+> [`films/friction-10s/EPISODE_REPORT.md`](films/friction-10s/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|

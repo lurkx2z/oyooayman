@@ -19,8 +19,8 @@ const PAUSE = {
   title: 0.05, gone: 0.5, nuance: 0.6, rewind: 0.8, phone: 1.2, cat: 0.7, mug: 1.0, feet: 1.0, grip: 0.7, catrun: 0.8,
   house: 1.0, screws: 1.4, cabinets: 0.8, tv: 1.0, cotton: 1.0, clothes: 0.8, sugar: 1.2,
   street: 1.0, brakes: 3.0, bike: 1.0, laces: 1.0, walk: 1.0, ladder: 1.0, scaffold: 1.0, sand: 1.2,
-  slide: 1.0, floor: 0.9, hill: 1.0, same: 1.0, realspeed: 0.8, faster: 3.2, bus: 1.0, sofa: 1.0, phone2: 1.0,
-  warn: 1.0, back: 8.0, stop: 2.4, bus2: 1.0, cat2: 1.0, after: 1.0, phone3: 0.8, question: 1.0,
+  slide: 1.0, floor: 0.7, hill: 1.0, same: 1.0, realspeed: 0.8, faster: 3.2, bus: 1.0, sofa: 1.0, phone2: 1.0,
+  warn: 1.0, back: 8.0, stop: 2.4, bus2: 1.0, cat2: 1.0, after: 1.0, phone3: 0.5, question: 1.0,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
@@ -28,8 +28,8 @@ const EXTRA = {
   'grip:1': 0.2, 'grip:2': 0.3, 'catrun:1': 0.3, 'screws:1': 0.2, 'tv:1': 0.4,
   'cotton:1': 0.3, 'clothes:1': 0.3, 'sugar:1': 0.4, 'brakes:1': 0.4, 'bike:1': 0.5,
   'laces:1': 0.4, 'walk:1': 0.6, 'scaffold:1': 0.8, 'sand:1': 0.9, 'slide:1': 0.4,
-  'floor:1': 0.4, 'hill:1': 0.4, 'same:1': 0.4, 'bus:1': 0.5, 'sofa:1': 0.5,
-  'warn:1': 0.4, 'stop:1': 0.4, 'bus2:1': 0.6, 'bus2:2': 0.4, 'phone3:1': 0.3,
+  'floor:1': 0.2, 'hill:1': 0.4, 'same:1': 0.2, 'bus:1': 0.5, 'sofa:1': 0.5,
+  'warn:1': 0.4, 'stop:1': 0.4, 'bus2:1': 0.6, 'bus2:2': 0.4, 'phone3:1': 0.1,
 };
 const SECTION_OF = { title: 1, rewind: 2, house: 3, street: 4, slide: 5, warn: 6, after: 7 };
 const GAP = 0.6;                     // between captions inside a beat

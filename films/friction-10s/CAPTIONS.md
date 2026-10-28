@@ -12,7 +12,7 @@ status: voiceless
 
 [gone] Friction just disappeared. / It's gone for 10 seconds. / Getting it back is the part that hurts.
 
-[nuance] Friction is electric: atoms on two surfaces, snagging on each other. / The same force holds your atoms together. Switch all of it off, and you'd fall apart. / So only the snag goes. Things still push. Nothing can grip. / Underground, faults would slip everywhere. That's another video.
+[nuance] Friction is electric: atoms on two surfaces, snagging on each other. / The same force holds your atoms together. Switch all of it off, and you'd fall apart. / So only the snag goes. Things still push. Nothing can grip. / Underground, every fault would slip at once.
 
 [rewind] Here's that first second again. 10 times slower.
 

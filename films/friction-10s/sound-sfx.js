@@ -169,5 +169,5 @@ fzSound('sfx', 'events', function (ctx, bus, K) {
   // each quick cut in the count down: a short whoosh
   for (const c of FZ.countCuts) { const y = fzNoise(fx, Math.ceil(0.25 * sr), 'pink'); for (let i = 0; i < y.length; i++) { const u = i / y.length; y[i] *= Math.sin(Math.PI * u) ** 2; } K.put(fzSweep(y, sr, 'bandpass', 1.2, [600, 2400, 900]), c - 0.15, { vol: 0.02, norm: true }); }
   // the phone in the gutter lights up: a notification
-  { const t = fzCap('phone3', 1).show - 0.25, y = mix([fx.beep(1320, 0.09), 0], [fx.beep(1980, 0.12), 0.11, 0.8]); FZX.bq(y, 'lp', 5000, 0.7, sr); K.put(y, t, { vol: 0.035, norm: true, room: street, wet: 0.3 }); }
+  { const t = FZ.phoneLit - 0.05, y = mix([fx.beep(1320, 0.09), 0], [fx.beep(1980, 0.12), 0.11, 0.8]); FZX.bq(y, 'lp', 5000, 0.7, sr); K.put(y, t, { vol: 0.035, norm: true, room: street, wet: 0.3 }); }
 });
