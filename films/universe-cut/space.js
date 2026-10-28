@@ -7,7 +7,8 @@
      edge      the edge in the South Pacific (in daylight): the air pouring off, the sea spilling over
      others    from straight above the half that stays: who gets it when       paris   over France: the ring reaches Paris
      fall      TIME-LAPSE: the half-Earth falls in on itself, melts, boils      moonaway  the half-Moon balls up, drifts off
-     orbit     TIME-LAPSE: the new Earth, a molten crescent, the Sun beside it (still going round it)
+     sun       the half-Earth (its face glowing) and, beyond it, the Sun: on this side of the cut, Mercury and Venus by it
+     orbit     TIME-LAPSE: the new Earth, a crescent of steam, the Sun beside it (still going round it, its path drawn in)
      forever   the new Earth under a sky that is half black
    Frame: Earth-fixed, as EarthScene's textures (x = lon 0 on the equator, y = north, z = lon 90° W); 1 unit = the Earth's
    radius. The cut's normal N points to the half that stays; e1 points along the face towards London, e2 = N × e1.
@@ -22,6 +23,8 @@ const HV_SP = (() => {
   const th = hvGmst(0) * 15 * HV_D2R, geo = (v) => { const x = v[0] * Math.cos(th) + v[1] * Math.sin(th), y = -v[0] * Math.sin(th) + v[1] * Math.cos(th); return [x, v[2], -y]; };
   return { N, e1, e2, L, ll, geo, sun: geo(hvSunDir(0)), C: 0.34, Rb: Math.cbrt(0.5), vKm: 1 / HVP.R };
 })();
+// the planets that stay tonight (on this side of the cut: calc/planets.py), for the space shots: [name, RA (h), Dec (°), mag]
+const HV_PLANETS_KEPT = [['MERCURY', 15.0884, -19.833, 1.9, 5600], ['VENUS', 13.5891, -15.928, -3.7, 5800], ['MARS', 9.3327, 17.188, 0.9, 4200], ['JUPITER', 9.7656, 14.183, -1.9, 5400]];
 const hvRim = (a) => hvAdd(hvSc(HV_SP.e1, Math.cos(a * HV_D2R)), HV_SP.e2, Math.sin(a * HV_D2R));   // a point on the edge, a° round from the one nearest London
 // the inside of the Earth (°C) at a distance r (Earth radii) from the centre: PLAN § 2
 function hvTempC(r) {
@@ -100,12 +103,22 @@ function hvHalfBall(o) {
           // (behind the shock: broken ground, the air full of dust; its towns dark)
           float phi = degrees(asin(clamp(c, 0.0, 1.0)));
           float broke = uS > 0.0 ? smoothstep(uFront + 0.08, uFront - 0.25, phi) : 0.0;
-          float crack = smoothstep(0.52, 0.62, fbm(u * 160.0)) * 0.6 + smoothstep(0.6, 0.7, fbm(u * 47.0 + 3.0)) * 0.4;
-          // (land turns to broken ground and dust; the sea stays sea, darker and churned)
-          alb = mix(alb, vec3(0.26, 0.21, 0.17) * (0.65 + 0.5 * fbm(u * 60.0)) * (1.0 - 0.5 * crack), broke * 0.85 * land);
+          float crack = smoothstep(0.035, 0.0, abs(fbm(u * 70.0) - 0.5)) * 0.8 + smoothstep(0.025, 0.0, abs(fbm(u * 210.0 + 3.0) - 0.5)) * 0.5;
+          // (land turns to dark broken ground under dust; the sea stays sea, darker and churned)
+          alb = mix(alb, vec3(0.15, 0.115, 0.085) * (0.65 + 0.5 * fbm(u * 60.0)) * (1.0 - 0.6 * crack), broke * 0.9 * land);
           alb = mix(alb, alb * 0.75 + vec3(0.03, 0.04, 0.05) * (0.6 + 0.8 * fbm(u * 90.0)), broke * (1.0 - land) * 0.6);
           cl *= 1.0 - broke * 0.6;
-          col = alb * (0.025 + 1.15 * max(ndl, 0.0)) + alb * vec3(0.55, 0.65, 1.0) * 0.3 * smoothstep(0.05, -0.15, ndl) * (1.0 - uMoon) * uMoonlit;   // (the night side, faintly moonlit)
+          col = alb * (0.025 + 1.15 * max(ndl, 0.0)) + alb * vec3(0.55, 0.65, 1.0) * 0.3 * smoothstep(0.05, -0.15, ndl) * (1.0 - uMoon) * uMoonlit * (1.0 - 0.75 * broke * land);   // (the night side, faintly moonlit)
+          col = mix(col, vec3(0.2, 0.14, 0.09) * (0.012 + 0.7 * max(ndl, 0.0)), broke * land * 0.4 * fbm(u * 25.0 + vec3(uT * 0.01)));   // (brown dust over it)
+          // (near the edge the sea is churned white: its water, and the air over it, pouring out of the cut into space)
+          float nearEdge = uS > 0.0 ? smoothstep(2.2, 0.0, phi) * (1.0 - land) * (1.0 - uMoon) : 0.0;
+          if (nearEdge > 0.0) {
+            vec3 b1 = normalize(cross(uN, vec3(0.0, 1.0, 0.0))), b2 = cross(uN, b1); float ang = atan(dot(u, b2), dot(u, b1));
+            float flow = fbm(vec3(ang * 1100.0, phi * 70.0 - uT * 0.35, 0.0)) * 0.65 + fbm(vec3(ang * 3300.0, phi * 210.0 - uT * 1.0, 3.0)) * 0.35;
+            float foam = smoothstep(0.5, 0.78, flow) * smoothstep(1.6, 0.05, phi) + smoothstep(0.22, 0.0, phi) * (0.6 + 0.4 * flow);
+            col *= 0.85 + 0.3 * flow * nearEdge;
+            col = mix(col, vec3(0.86, 0.9, 0.96) * (0.04 + 0.95 * max(ndl, 0.0)), clamp(foam, 0.0, 1.0) * 0.85 * nearEdge);
+          }
           lights *= 0.2 + 2.4 * smoothstep(0.58, 0.85, n3(u * 1400.0)) + 0.8 * smoothstep(0.5, 0.75, n3(u * 520.0 + 7.0));
           vec3 hv = normalize(uSun + v);
           col += vec3(1.0, 0.95, 0.85) * pow(max(dot(n, hv), 0.0), 420.0) * 0.32 * (1.0 - land) * step(0.0, ndl) * (1.0 - broke);
@@ -114,37 +127,60 @@ function hvHalfBall(o) {
           col += lights * night * 1.6 * (1.0 - broke) * (1.0 - 0.6 * cl) * uLights;
           // the ring: the shock front, a line of breaking ground and dust (bright enough to see at night)
           float ring = uS > 0.0 ? exp(-pow((phi - uFront) / 0.28, 2.0)) : 0.0, trail = uS > 0.0 && phi < uFront ? exp(-(uFront - phi) / 1.6) : 0.0;
-          col += vec3(1.0, 0.74, 0.45) * ring * (0.5 + 1.1 * night) * (0.75 + 0.5 * n3(u * 400.0 + uT));
-          col += vec3(0.85, 0.5, 0.25) * trail * 0.02 * (0.4 + night);
-          col += vec3(0.75, 0.6, 0.45) * broke * 0.04 * (0.5 + 0.5 * max(ndl, 0.0));
+          col += vec3(1.0, 0.72, 0.42) * ring * (0.45 + 1.0 * night) * (0.45 + 0.9 * n3(u * 400.0 + uT)) * (0.7 + 0.6 * crack);
+          col += vec3(0.9, 0.45, 0.18) * trail * 0.07 * (0.3 + night) * (0.4 + crack) * land;          // (just behind it: the ground still breaking, dust thrown up)
+          col += vec3(0.6, 0.42, 0.28) * broke * 0.012 * (0.5 + 0.5 * max(ndl, 0.0));
           // the air towards the limb; and at the edge, the air pouring off (lit where the sun is up)
           float rim = pow(1.0 - max(dot(n, v), 0.0), 2.5);
           col = mix(col, vec3(0.45, 0.66, 0.95) * max(ndl + 0.15, 0.0), rim * 0.62 * (1.0 - uMoon) * (1.0 - uK) * uRimK);
           float edgeHaze = uS > 0.0 ? exp(-phi / 0.35) * (1.0 - uMoon) : 0.0;
           col += vec3(0.5, 0.65, 0.95) * edgeHaze * 0.5 * max(ndl + 0.1, 0.03);
         } else {
-          // ---- the face: still as hot as it was inside, then blowing out
+          // ---- the face: still as hot as it was inside, each layer its own look; then blowing out
           float r = sqrt(max(1.0 - c * c, 0.0));
-          float T = uMoon > 0.5 ? mix(1450.0, 200.0, smoothstep(0.2, 0.98, r)) : tempC(r);
-          float cell = fbm(u * 28.0 + vec3(0.0, uT * 0.02, 0.0)) * 0.6 + fbm(u * 90.0 - uT * 0.05) * 0.4;
-          T *= 0.9 + 0.2 * cell * smoothstep(0.1, 0.4, r);                                        // (convection in the mantle)
-          float layer = uMoon > 0.5 ? 0.0 : exp(-pow((r - 0.1917) / 0.004, 2.0)) + exp(-pow((r - 0.5462) / 0.005, 2.0)) + 0.6 * exp(-pow((r - 0.896) / 0.004, 2.0));
-          col = bb(T + 273.0) * glowI(T + 273.0) * (1.0 - 0.25 * layer);
-          col *= 1.0 - 0.35 * uBurst * (0.5 + 0.5 * sin(dot(u, vec3(40.0, 31.0, 23.0)) + uT * 3.0) * cell);
-          col += vec3(0.05, 0.045, 0.04) * (1.0 - smoothstep(0.98, 0.995, r)) * 0.0;
+          vec3 fp = u - c * uN;                                                                    // (the point on the face)
+          if (uMoon > 0.5) {
+            float T = mix(1450.0, 200.0, smoothstep(0.2, 0.98, r)) * (0.9 + 0.2 * fbm(u * 20.0));
+            col = bb(T + 273.0) * glowI(T + 273.0);
+          } else {
+            float T = tempC(r), tex = 1.0;
+            if (r < 0.1917) tex = 0.94 + 0.12 * h3(floor(fp * 260.0));                              // inner core: solid iron, crystalline
+            else if (r < 0.5462) {                                                                  // outer core: liquid iron, swirling
+              float sw = fbm(vec3(r * 22.0 + 1.4 * fbm(fp * 5.0 + vec3(uT * 0.004)), atan(dot(fp, cross(uN, vec3(0.0, 1.0, 0.0))), dot(fp, vec3(0.0, 1.0, 0.0))) * 2.0, uT * 0.003));
+              tex = 0.86 + 0.28 * sw;
+            } else if (r < 0.984) {                                                                 // mantle: rock, slowly churning in cells
+              float cl = fbm(fp * 16.0 + vec3(uT * 0.002)); float edge = smoothstep(0.04, 0.0, abs(fbm(fp * 7.0 + 4.0) - 0.5));
+              T += 260.0 * (cl - 0.5) - 140.0 * edge; tex = 0.92 + 0.16 * cl;
+            } else T *= 0.85 + 0.3 * fbm(fp * 220.0);                                             // crust: cold rock, glowing cracks low down
+            float Tk = T + 273.0, I = (0.22 + 1.25 * pow(clamp((Tk - 600.0) / 5000.0, 0.0, 1.0), 1.5)) * smoothstep(650.0, 1150.0, Tk);
+            float layer = exp(-pow((r - 0.1917) / 0.003, 2.0)) + exp(-pow((r - 0.5462) / 0.004, 2.0)) + 0.5 * exp(-pow((r - 0.896) / 0.003, 2.0)) + 0.8 * exp(-pow((r - 0.984) / 0.002, 2.0));
+            col = bb(Tk) * I * tex * (1.0 - 0.45 * layer) + vec3(0.03, 0.026, 0.024) * (1.0 - smoothstep(0.97, 0.99, r)) * 0.0;
+            col += vec3(0.04, 0.035, 0.03) * smoothstep(0.984, 0.995, r) * (0.02 + max(ndl, 0.0));     // (the crust lit, where the Sun reaches it)
+          }
+          col *= 1.0 - 0.3 * uBurst * (0.5 + 0.5 * sin(dot(u, vec3(40.0, 31.0, 23.0)) + uT * 3.0) * fbm(u * 28.0));
         }
-        // ---- the collapse: molten rock, then a sky of steam
+        // ---- the collapse: a dark crust over molten rock, glowing through its cracks and lava lakes (lit by the Sun on its
+        // day side, a terminator like any planet's); then a sky of steam, in bands and billows, the glow showing through
         if (uMelt > 0.0) {
-          float m = fbm(u * 14.0 + uT * 0.01), cr = smoothstep(0.42, 0.62, m);
-          vec3 lava = mix(bb(1800.0) * glowI(1800.0) * 1.6, vec3(0.05, 0.035, 0.03) * (0.3 + max(ndl, 0.0)), cr);
+          vec3 wq = u * 4.0 + 1.6 * vec3(fbm(u * 2.6 + 5.0), fbm(u * 2.6 + 9.0), fbm(u * 2.6 + 13.0)) + vec3(0.0, uT * 0.003, 0.0);
+          float vein = smoothstep(0.03, 0.0, abs(fbm(wq) - 0.5)) + 0.55 * smoothstep(0.018, 0.0, abs(fbm(u * 15.0 + 3.0) - 0.5));
+          float pool = smoothstep(0.64, 0.76, fbm(u * 2.2 + 11.0));
+          float hot = clamp(vein + pool, 0.0, 1.0) * (1.0 - 0.5 * uSteam);
+          vec3 crust = (uMoon > 0.5 ? vec3(0.2, 0.195, 0.19) : vec3(0.085, 0.07, 0.062)) * (0.6 + 0.6 * fbm(u * 38.0));
+          vec3 lava = crust * (0.02 + 1.1 * max(ndl, 0.0)) + bb(1500.0) * 2.0 * hot + bb(1150.0) * 0.1 * (1.0 - uMoon);
           col = mix(col, lava, uMelt);
         }
+        if (uMoon > 0.5) col += bb(1450.0) * 1.6 * exp(-c * c / 0.0007) * uK;                    // (the half-Moon: a glowing seam where its cut face was)
         if (uSteam > 0.0) {
-          float sc = smoothstep(0.3, 0.7, fbm(u * 6.0 + vec3(uT * 0.003, 0.0, 0.0)) * 0.7 + 0.45 * uSteam);
-          vec3 st = vec3(0.86, 0.87, 0.9) * (0.02 + 1.05 * max(ndl, 0.0)) + bb(1500.0) * 0.06 * (1.0 - max(ndl, 0.0));
-          col = mix(col, st * (0.62 + 0.38 * sc), uSteam * mix(sc, 1.0, 0.8 * uK));                // (a ball again: cloud from pole to pole, in bands and billows)
-          float rim2 = pow(1.0 - max(dot(n, v), 0.0), 2.0);
-          col += vec3(0.7, 0.72, 0.78) * rim2 * 0.35 * uSteam * max(ndl + 0.2, 0.0);
+          float lat = u.y, bill = fbm(u * 6.5 + vec3(uT * 0.002, 0.0, 0.0) + 0.9 * vec3(fbm(u * 2.5 + 2.0)));
+          float bands = 0.5 + 0.5 * sin(lat * 17.0 + 2.2 * fbm(u * 3.5 + vec3(uT * 0.0015, 0.0, 0.0)));
+          float sc = clamp(0.5 * bands + 0.7 * bill - 0.2 + 0.5 * uSteam, 0.0, 1.0);
+          float lit = max(ndl, 0.0);
+          vec3 st = vec3(0.66, 0.67, 0.7) * (0.62 + 0.38 * bill) * (0.85 + 0.15 * bands) * (0.006 + 0.95 * lit)
+                  + bb(1300.0) * 0.045 * smoothstep(0.15, -0.2, ndl) * (1.1 - sc);
+          col = mix(col, st, uSteam * mix(sc, 1.0, 0.72 * uK));
+          float rim2 = pow(1.0 - max(dot(n, v), 0.0), 2.2);
+          col += vec3(0.55, 0.58, 0.66) * rim2 * 0.22 * uSteam * max(ndl + 0.15, 0.0);
         }
         gl_FragColor = vec4(col, 1.0);
       }`,
@@ -158,7 +194,7 @@ HV_SETS.space = (app) => {
   const scene = S.scene, cam = S.camera, K = hvK, SP = HV_SP, N = SP.N, e1 = SP.e1, e2 = SP.e2;
   // ---- the stars (the real sky, as seen from here at 10 PM): the ones beyond the cut go out at 10:00:00
   const starU = { uS: { value: 0 }, uN: { value: new THREE.Vector3(...N) }, uPx: { value: 1 }, uB: { value: 1 } };
-  { const T = hvStarTable(), pos = [], col = [], mag = [];
+  { const T = hvStarTable().concat(HV_PLANETS_KEPT.map(([name, ra, dec, m, Tk]) => ({ name, d: hvRaDec(ra, dec), m, T: Tk, planet: true }))), pos = [], col = [], mag = [];
     for (const st of T) { const d = SP.geo(st.d), c = hvStarRGB(st.T); pos.push(d[0] * 900, d[1] * 900, d[2] * 900); col.push(...c); mag.push(st.m); }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('aCol', new THREE.Float32BufferAttribute(col, 3)); g.setAttribute('aMag', new THREE.Float32BufferAttribute(mag, 1));
     const st = new THREE.Points(g, new THREE.ShaderMaterial({ uniforms: starU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
@@ -221,6 +257,20 @@ HV_SETS.space = (app) => {
     g.fillStyle = gr; g.fillRect(0, 0, w, w); }), { repeat: false });
   const sunSp = new THREE.Sprite(new THREE.SpriteMaterial({ map: sunTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, toneMapped: false }));
   sunSp.material.color.setScalar(2.2); sunSp.visible = false; scene.add(sunSp);
+  // a camera that puts the body at Ec on screen at (ex, ey)° off its axis and the Sun at (sx, sy)°, D from the body
+  // (the sky to the camera is mapped so the Sun's direction and the body's land where asked); side ±1: which way round
+  const twoBody = (Ec, ex, ey, sx, sy, D, sideK = 1) => {
+    const S = SP.sun, side = hvSc(hvNrm(hvCross(S, N)), sideK), tn = (d) => Math.tan(d * HV_D2R);
+    const dE = hvNrm([tn(ex), tn(ey), -1]), dS = hvNrm([tn(sx), tn(sy), -1]), th = Math.acos(hvDot(dE, dS));
+    const v = hvNrm(hvAdd(hvSc(S, Math.cos(th)), side, Math.sin(th)));
+    const a2 = hvNrm(hvAdd(dE, dS, -hvDot(dE, dS))), a3 = hvCross(dS, a2), b2 = hvNrm(hvAdd(v, S, -hvDot(v, S))), b3 = hvCross(S, b2);
+    const toW = (c) => hvAdd(hvAdd(hvSc(S, hvDot(c, dS)), b2, hvDot(c, a2)), b3, hvDot(c, a3));
+    const P = hvAdd(Ec, v, -D); return { pos: P, at: hvAdd(P, toW([0, 0, -1]), 10), up: toW([0, 1, 0]) };
+  };
+  // the new Earth's path round the Sun (drawn in for the 'orbit' shot): a dashed line through it along its motion
+  const Pe = SP.geo([0, -Math.sin(23.44 * HV_D2R), Math.cos(23.44 * HV_D2R)]), vOrb = hvNrm(hvCross(SP.sun, Pe));
+  const path = new THREE.Line(new THREE.BufferGeometry().setFromPoints([-90, 90].map((d) => new THREE.Vector3(...hvAdd(hvSc(N, SP.C), vOrb, d)))), new THREE.LineDashedMaterial({ color: '#ffcf8a', dashSize: 0.5, gapSize: 0.35, transparent: true, opacity: 0.7, depthWrite: false, fog: false }));
+  path.computeLineDistances(); path.visible = false; scene.add(path);
   const look = (p, at, fov, t, drift = 0.0, roll = 0, up = null) => { const d = hvDrift(t, drift, 0.3, 17); cam.up.set(...(up || [0, 1, 0])); cam.position.set(p[0] + d[0], p[1] + d[1], p[2] + d[2]); cam.lookAt(at[0], at[1], at[2]); if (roll) cam.rotateZ(roll * HV_D2R); if (cam.fov !== fov) cam.fov = fov; cam.updateProjectionMatrix(); cam.updateMatrixWorld(true); };
   // the story clock per shot (the space shots after the shock are time-lapses: each its own clock)
   const storyOf = (t, m) => {
@@ -239,7 +289,7 @@ HV_SETS.space = (app) => {
     frame(t, shot, app) {
       const m = shot.mode, s = storyOf(t, m);
       let pos, at = [0, 0, 0], fov = 35, drift = 0, up = null, roll = 0;
-      earth.mesh.visible = true; atmo.visible = true; moonG.visible = false; sunSp.visible = false;
+      earth.mesh.visible = true; atmo.visible = true; moonG.visible = false; sunSp.visible = false; path.visible = false;
       glow.begin(); mist.begin();
       // ------------------------------------------------------------------ the cameras
       if (m === 'gone') {
@@ -248,26 +298,27 @@ HV_SETS.space = (app) => {
         const a0 = hvNrm(hvAdd(hvAdd(hvSc(e1, 0.86), N, 0.1), e2, 0.5)), a1 = hvNrm(hvAdd(hvAdd(hvSc(e1, 0.8), N, -0.3), e2, 0.52));
         pos = hvSc(hvNrm(hvV(a0, a1, k)), hvLerp(4.1, 3.7, k)); at = hvSc(N, hvLerp(0.22, 0.06, k)); fov = 36; up = N;
       } else if (m === 'face') {
-        const k = K(t, HV.face, HV.blow, (x) => x);
-        pos = hvSc(hvNrm(hvAdd(hvAdd(hvSc(e1, 0.5), N, -0.85), e2, hvLerp(0.16, 0.04, k))), hvLerp(3.6, 3.3, k)); at = hvSc(N, -0.1); fov = 38; up = e1;
+        const k = Ease.inOutSine(K(t, HV.face, HV.blow, (x) => x));
+        pos = hvSc(hvNrm(hvAdd(hvAdd(hvSc(e1, hvLerp(0.5, 0.3, k)), N, -0.85), e2, hvLerp(0.22, -0.12, k))), hvLerp(3.7, 2.9, k)); at = hvSc(N, -0.1); fov = 38; up = e1;
       } else if (m === 'blow') {
         // low across the face: its insides blowing out, a glowing wall rising off it
-        const k = K(t, HV.blow, HV.shock, (x) => x);
-        pos = hvAdd(hvAdd(hvSc(e2, hvLerp(1.75, 1.95, k)), N, hvLerp(-0.1, -0.16, k)), e1, 0.25); at = hvAdd(hvSc(N, -0.04), e1, 0.1); fov = 40; up = N;
+        const k = Ease.inOutSine(K(t, HV.blow, HV.shock, (x) => x));
+        pos = hvAdd(hvAdd(hvSc(e2, hvLerp(1.42, 1.22, k)), N, hvLerp(-0.06, -0.1, k)), e1, hvLerp(0.42, 0.1, k)); at = hvAdd(hvAdd(hvSc(N, -0.05), e1, hvLerp(0.2, -0.05, k)), e2, 0.55); fov = 46; up = N;
       } else if (m === 'shock') {
         const k = K(t, HV.shock, HV.calls, (x) => x);
         pos = hvSc(hvNrm(hvAdd(hvSc(e2, -1), e1, 0.15)), hvLerp(4.4, 4.6, k)); at = [0, 0, 0]; fov = 34; up = N;
       } else if (m === 'front') {
         // over Europe, looking down the line from London to the edge
-        const k = K(t, HV.front, HV.edge, (x) => x), Tg = hvNrm(hvAdd(e1, N, 0.24));
-        pos = hvAdd(hvAdd(hvSc(Tg, hvLerp(1.95, 1.85, k)), N, 0.42), e2, 0.05); at = hvSc(hvNrm(hvAdd(e1, N, 0.16)), 1.0); fov = 34; up = N;
+        const k = K(t, HV.front, HV.edge, (x) => x), Tg = hvNrm(hvAdd(e1, N, 0.3));
+        pos = hvAdd(hvAdd(hvSc(Tg, hvLerp(1.62, 1.52, k)), N, hvLerp(0.95, 0.85, k)), e2, hvLerp(0.12, 0.02, k)); at = hvSc(hvNrm(hvAdd(e1, N, 0.24)), 1.0); fov = 34; up = N;
       } else if (m === 'edge') {
-        // the edge in the South Pacific, in sunshine: the ocean ends; beyond it, nothing
-        const k = K(t, HV.edge, HV.moonedge, (x) => x), a = 200, Rp = hvRim(a), tg = hvRim(a + 90);
-        const ph = hvLerp(9.5, 8.0, k) * HV_D2R, P0 = hvAdd(hvSc(Rp, Math.cos(ph)), N, Math.sin(ph));
-        pos = hvAdd(hvSc(P0, 1.032), tg, -0.03); at = hvAdd(hvAdd(hvSc(Rp, 1.0), N, -0.012), tg, 0.02); fov = 44; up = P0;
+        // the edge in the South Pacific, in sunshine, from out beyond it: the ocean above (churned white as it reaches the
+        // lip), the cut face below (cold crust, then glowing rock deeper in), the sea's water and the air pouring off the
+        // corner between them into space
+        const k = Ease.inOutSine(K(t, HV.edge, HV.moonedge, (x) => x)), Rp = hvRim(200), tg = hvRim(290), bis = hvNrm(hvAdd(Rp, N, -1.15));
+        pos = hvAdd(hvAdd(Rp, bis, hvLerp(0.05, 0.036, k)), tg, hvLerp(-0.012, 0.01, k)); at = hvAdd(hvAdd(Rp, bis, -0.004), tg, hvLerp(-0.004, 0.004, k)); fov = 42; up = hvNrm(hvAdd(Rp, N, 0.87));
       } else if (m === 'others') {
-        const k = K(t, HV.others, HV.compass, (x) => x);
+        const k = K(t, HV.others, HV.tea, (x) => x);
         pos = hvAdd(hvAdd(hvSc(N, hvLerp(3.6, 3.4, k)), e1, 0.35), e2, 0.55); at = hvAdd(hvSc(N, 0.2), e2, 0.55); fov = 42; up = hvSc(e1, 1);
       } else if (m === 'paris') {
         const k = K(t, HV.paris, HV.count2, (x) => x);
@@ -277,28 +328,32 @@ HV_SETS.space = (app) => {
         pos = hvSc(hvNrm(hvAdd(hvAdd(hvSc(e1, 0.75), N, -0.45), e2, hvLerp(0.35, 0.05, k))), hvLerp(3.9, 3.6, k)); at = hvSc(N, 0.15); fov = 36;
       } else if (m === 'moonaway') {
         // ILLUSTRATION, not to scale: the half-Moon in front, the new Earth behind it
-        const k = K(t, HV.moonaway, HV.orbit, (x) => x), dir = hvNrm(hvAdd(hvSc(e2, 1), N, 0.25)), away = MathX.smooth(k, 0.55, 1.0);
-        moonG.visible = true; moonG.position.set(...hvSc(dir, 4.2 + 3.5 * away * away));
-        const mp = moonG.position.toArray(); this._moonP = mp;
-        pos = hvAdd(hvAdd(mp, hvSc(dir, 1.1 + 0.6 * away)), hvNrm(hvCross(dir, N)), 0.45); at = hvV(mp, [0, 0, 0], 0.35 + 0.2 * away); fov = 40;
+        // (from behind the new Earth and off to one side: the Earth large in front, the half-Moon beyond it, balling up, then
+        // drifting off past its edge)
+        const k = K(t, HV.moonaway, HV.orbit, (x) => x), dir = hvNrm(hvAdd(hvSc(e2, 1), N, 0.25)), away = MathX.smooth(k, 0.45, 1.0), Ec = hvSc(N, SP.C);
+        moonG.visible = true; moonG.position.set(...hvAdd(Ec, dir, 4.2 + 4.0 * away * away));
+        const mp = moonG.position.toArray(), sd = hvNrm(hvCross(dir, N)); this._moonP = mp;
+        pos = hvAdd(hvAdd(hvAdd(Ec, dir, -hvLerp(2.6, 2.9, k)), sd, 1.55), N, 0.5); at = hvAdd(hvV(Ec, mp, hvLerp(0.42, 0.36, k)), sd, 0.3); fov = 42;
       } else if (m === 'orbit') {
         // the new Earth from its night side, the Sun about 50° from it: a sunlit crescent of steam round a dull red glow
         // (the camera is built so the Earth's middle sits at (−14°, −3°) off the axis and the Sun at (22°, 12°): the sky to
         // the camera is mapped so dS → the Sun's direction, dE → the Earth's)
-        const k = K(t, HV.orbit, HV.forever, (x) => x), Ec = hvSc(N, SP.C), S = SP.sun, side = hvNrm(hvCross(S, N));
-        const tn = (d) => Math.tan(d * HV_D2R), dE = hvNrm([tn(-14 + 1.5 * k), tn(-3), -1]), dS = hvNrm([tn(22), tn(12), -1]), th = Math.acos(hvDot(dE, dS));
-        const v = hvNrm(hvAdd(hvSc(S, Math.cos(th)), side, Math.sin(th)));
-        const a2 = hvNrm(hvAdd(dE, dS, -hvDot(dE, dS))), a3 = hvCross(dS, a2), b2 = hvNrm(hvAdd(v, S, -hvDot(v, S))), b3 = hvCross(S, b2);
-        const toW = (c) => hvAdd(hvAdd(hvSc(S, hvDot(c, dS)), b2, hvDot(c, a2)), b3, hvDot(c, a3));
-        pos = hvAdd(Ec, v, -hvLerp(5.0, 4.6, k)); at = hvAdd(pos, toW([0, 0, -1]), 10); fov = 50; up = toW([0, 1, 0]);
+        const k = Ease.inOutSine(K(t, HV.orbit, HV.forever, (x) => x)), c = twoBody(hvSc(N, SP.C), hvLerp(-16, -11, k), hvLerp(-4, -2, k), 22, 12, hvLerp(5.4, 4.4, k));
+        pos = c.pos; at = c.at; up = c.up; fov = 50;
+        sunSp.visible = true; path.visible = true;
+      } else if (m === 'sun') {
+        // the half-Earth from out beyond its night side, a little below the cut, so its glowing face shows under it; the Sun
+        // beyond, on the starry side of the line, Mercury and Venus beside it
+        const k = Ease.inOutSine(K(t, HV.sun, HV.cat2, (x) => x)), c = twoBody([0, 0, 0], hvLerp(-19, -15, k), hvLerp(-9, -7, k), hvLerp(19, 17, k), 11, hvLerp(4.5, 3.9, k));
+        pos = c.pos; at = c.at; up = c.up; fov = 50;
         sunSp.visible = true;
       } else if (m === 'forever') {
         // the new Earth, a sky with stars on one side of a line and none on the other
         const k = K(t, HV.forever, HV.real, (x) => x);
-        pos = hvAdd(hvAdd(hvSc(N, 0.84), e1, hvLerp(-3.1, -2.9, k)), e2, 1.35); at = hvAdd(hvAdd(pos, e1, 10), e2, -0.6); fov = 46; up = N; roll = 9;
+        pos = hvAdd(hvAdd(hvSc(N, 0.84), e1, hvLerp(-3.3, -2.7, k)), e2, hvLerp(1.5, 1.2, k)); at = hvAdd(hvAdd(pos, e1, 10), e2, hvLerp(-0.75, -0.5, k)); fov = 46; up = N; roll = hvLerp(10, 7, k);
       } else { pos = [0, 0, 4]; }
       look(pos, at, fov, t, drift, roll, up);
-      if (sunSp.visible) { const S = SP.sun, D = 800; sunSp.position.set(cam.position.x + S[0] * D, cam.position.y + S[1] * D, cam.position.z + S[2] * D); sunSp.scale.setScalar(D * 0.3); this._sunP = sunSp.position.toArray(); }
+      if (sunSp.visible) { const S = SP.sun, D = 800; sunSp.position.set(cam.position.x + S[0] * D, cam.position.y + S[1] * D, cam.position.z + S[2] * D); sunSp.scale.setScalar(D * (m === 'sun' ? 0.24 : 0.3)); this._sunP = sunSp.position.toArray(); }
       // ------------------------------------------------------------------ the Earth's state
       const E = earth.U;
       E.uS.value = s; E.uT.value = t; E.uFront.value = hvFrontPhi(s);
@@ -307,6 +362,7 @@ HV_SETS.space = (app) => {
       const collapse = MathX.smooth(s, 300, 3600);
       E.uK.value = collapse; E.uMelt.value = MathX.smooth(s, 500, 3000); E.uSteam.value = MathX.smooth(s, 2400, 5400);
       if (m === 'forever' || m === 'orbit') { E.uK.value = 1; E.uMelt.value = 1; E.uSteam.value = 1; }
+      if (m === 'moonaway') { E.uK.value = 1; E.uMelt.value = 1; E.uSteam.value = MathX.smooth(s, 2400, 40000); }
       atmoU.uA.value = 1 - MathX.smooth(s, 300, 1200);
       starU.uS.value = s; starU.uPx.value = (app.renderH || 1080) / 1080; starU.uB.value = m === 'forever' ? 2.2 : 1.3;
       mw.position.copy(cam.position); mwU.uS.value = s; mwU.uK.value = m === 'forever' ? 2.4 : 1.2;
@@ -357,7 +413,7 @@ HV_SETS.space = (app) => {
         const a = W(t, (m === 'front' ? hvCap('front', 1).show : HV.paris + 0.4), (m === 'front' ? HV.edge : HV.count2) - 0.3, 0.3, 0.2);
         for (const n of m === 'front' ? ['ROME', 'MADRID', 'PARIS', 'LONDON'] : ['PARIS', 'LONDON']) place(n, a, hitSub(n));
       }
-      if (m === 'others') { const a = W(t, HV.others + 0.5, HV.compass - 0.3, 0.3, 0.2); for (const n of ['LONDON', 'NEW YORK', 'TOKYO', 'MOSCOW', 'BEIJING']) place(n, a, hitSub(n), n === 'MOSCOW' ? 'r' : n === 'LONDON' ? 'l' : undefined); }
+      if (m === 'others') { const a = W(t, HV.others + 0.5, HV.tea - 0.3, 0.3, 0.2); for (const n of ['LONDON', 'NEW YORK', 'TOKYO', 'MOSCOW', 'BEIJING']) place(n, a, hitSub(n), n === 'MOSCOW' ? 'r' : n === 'LONDON' ? 'l' : undefined); }
       if (m === 'moonaway') {
         const a = W(t, HV.moonaway + 0.6, hvCap('moonaway', 1).show - 0.2, 0.3, 0.2), mp = this._moonP || [0, 0, 0];
         out.push({ p: hvAdd(mp, N, 0.25), text: 'THE MOON', sub: 'WHAT IS LEFT OF IT', a });
@@ -366,7 +422,7 @@ HV_SETS.space = (app) => {
       if (m === 'orbit') {
         const a = W(t, HV.orbit + 0.7, HV.forever - 0.3, 0.3, 0.2);
         if (this._sunP) out.push({ p: this._sunP, text: 'THE SUN', sub: 'STILL ON THIS SIDE', a });
-        out.push({ p: hvAdd(hvSc(N, SPc.C), N, -SPc.Rb), text: 'THE NEW EARTH', sub: 'HALF THE MASS · 4/5 AS WIDE', a, side: 'r' });
+        out.push({ p: hvAdd(hvSc(N, SPc.C), N, -SPc.Rb), text: 'THE NEW EARTH', sub: 'HALF THE MASS · ABOUT 4/5 AS WIDE', a, side: 'r' });
       }
       if (m === 'edge') { const Rp = hvRim(200); out.push({ p: hvAdd(Rp, N, 0.004), text: 'THE EDGE', sub: 'SOUTH PACIFIC', a: W(t, HV.edge + 0.6, hvCap('edge', 2).show - 0.3, 0.3, 0.2) }); }
       return out;

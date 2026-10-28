@@ -19,22 +19,22 @@ const path = require('path');
 const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 1.0
 const PAUSE = {
-  open: 0.5, title: 0.9, before: 0.9, rule: 0.7, vanish: 2.6, line: 0.6, moon: 0.9, nothing: 1.0, why: 0.8, gone: 1.0, face: 0.9, blow: 0.8, shock: 1.0,
-  calls: 2.5, tv: 1.3, front: 1.4, edge: 1.4, moonedge: 1.5, others: 1.6, compass: 1.3, nowhere: 1.8, saturn: 1.6, cat: 2.0, bath: 1.0, alarms: 1.0,
-  fall: 3.0, moonaway: 1.4, orbit: 1.4, forever: 1.4, real: 2.6, real2: 0.7, real3: 0.8, real4: 0.8, real5: 1.0, question: 2.0,
+  open: 0.5, title: 0.9, before: 0.9, rule: 0.7, vanish: 2.2, line: 0.6, moon: 0.9, nothing: 1.0, why: 0.8, gone: 1.0, face: 0.9, blow: 0.8, shock: 1.0,
+  calls: 2.5, tv: 1.3, front: 1.4, edge: 1.4, moonedge: 1.5, others: 1.6, tea: 1.3, saturn: 1.6, sun: 1.2, cat: 2.0, bath: 1.0, ears: 1.0, alarms: 1.0,
+  fall: 2.0, moonaway: 1.2, orbit: 1.2, forever: 1.2, real: 1.8, real2: 0.7, real3: 0.8, real4: 0.8, real5: 1.0, question: 1.6,
 };
 // the real-time beats: the story second (after 10:00:00) at which the beat's first caption appears
-const STORY_AT = { lighter: 180.0, paris: 198.0, count: 210.0, hit: 222.5 };
+const STORY_AT = { heavier: 180.0, paris: 204.4, count: 217.1, hit: 229.1 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
   'open:1': 0.4, 'open:2': 0.3, 'line:1': 0.3, 'moon:1': 0.6, 'moon:2': 0.4, 'nothing:1': 0.8, 'why:1': 0.4, 'gone:1': 0.4, 'gone:2': 0.3,
   'face:1': 0.3, 'face:2': 0.3, 'shock:1': 0.3, 'shock:2': 0.4, 'tv:1': 0.3, 'front:1': 0.8, 'front:2': 0.7, 'edge:1': 0.6, 'edge:2': 0.9,
-  'moonedge:1': 0.9, 'others:1': 0.8, 'compass:1': 0.3, 'nowhere:1': 1.0, 'saturn:1': 1.0, 'lighter:1': 0.6, 'bath:1': 0.3, 'alarms:1': 0.3,
-  'fall:1': 0.6, 'fall:2': 0.6, 'moonaway:1': 0.4, 'moonaway:2': 0.5, 'orbit:1': 0.4, 'forever:1': 1.1, 'real2:1': 0.3, 'real3:1': 0.3, 'real4:1': 0.3,
+  'moonedge:1': 0.9, 'others:1': 0.8, 'tea:1': 0.3, 'saturn:1': 1.0, 'sun:1': 0.4, 'heavier:1': 0.6, 'bath:1': 0.3, 'ears:1': 0.2, 'alarms:1': 0.3,
+  'fall:1': 0.6, 'fall:2': 0.6, 'moonaway:1': 0.4, 'moonaway:2': 0.5, 'orbit:1': 0.4, 'forever:1': 0.8, 'real2:1': 0.3, 'real3:1': 0.3, 'real4:1': 0.3,
 };
 const SECTION_OF = { open: 1, title: 1, before: 2, vanish: 3, hit: 4, fall: 5, real: 6 };
-const GAP = 0.65;                     // between captions inside a beat
-const TAIL = 4.6;                     // the question held, then the cut
+const GAP = 0.6;                     // between captions inside a beat
+const TAIL = 4.0;                     // the question held, then the cut
 const hold = (s) => Math.min(4.2, Math.max(1.5, 1.0 + 0.05 * s.length));
 const TITLE_HOLD = 3.4;
 const r3 = (x) => Math.round(x * 1000) / 1000;

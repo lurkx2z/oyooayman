@@ -199,19 +199,22 @@ hvSound('music', 'score', function (ctx, bus, K) {
   M.roll(HV.front + 0.3, HV.front + 5.0, [[HV.front + 0.3, 0.12], [HV.front + 4.9, 0.3]], 73.4);
   M.prog([[HV.front, C.Em9], [cap('front', 1), C.Cmaj7], [cap('front', 2), C.Bsus], [HV.edge, C.Em], [cap('edge', 2), C.Cmaj7]], HV.moonedge + 0.3, 0.3, { cut: 1300 });
   hvPulse(ctx, M.bus, HV.front + 5.0, HV.moonedge - 0.1, ['E2', 'B2', 'E3'], 0.42, 0.22, { cut: 600, cutTo: 1500, acc: 4, decay: 0.26, ramp: (u) => 0.5 + 0.5 * u });
-  // the Moon's glowing edge; who gets it when; the compass: quieter, the heartbeat underneath
+  // the Moon's glowing edge; who gets it when; the tea: quieter, the heartbeat underneath
   M.strings(HV.moonedge, HV.others + 0.3, C.Amaj9, 0.24, { att: 1.0, rel: 0.6, cut: 1200 });
   M.bell(cap('moonedge', 0) + 0.6, 'E6', 0.22, 0.3); M.bellCut(cap('moonedge', 1) + 0.5, 'B5', 0.2, 0.14, -0.3);
-  M.prog([[HV.others, C.Em9], [cap('others', 1), C.D], [HV.compass, C.Cmaj7], [HV.nowhere, C.Em], [HV.saturn, C.Am9], [HV.cat2, C.Cmaj7]], HV.lighter + 0.3, 0.24, { cut: 1000 });
-  heart(HV.moonedge + 0.5, HV.lighter, (t) => 1.15 - 0.15 * MathX.clamp((t - HV.moonedge) / (HV.lighter - HV.moonedge), 0, 1), (t) => 0.2 + 0.08 * MathX.clamp((t - HV.moonedge) / 40, 0, 1));
-  keys(HV.others + 0.6, HV.nowhere - 0.4, 2.0, ['E5', 'B4', 'D5', 'A4'], 0.07);
-  M.strings(HV.nowhere + 0.4, HV.cat2 + 0.2, ['F#6'], 0.03, { att: 2.0, rel: 1.0, cut: 9000, wave: 'sine', vib: 4 });   // into the void
+  M.prog([[HV.others, C.Em9], [cap('others', 1), C.D], [HV.tea, C.Cmaj7], [HV.saturn, C.Em], [cap('saturn', 1), C.Am9], [HV.sun, C.Clyd], [cap('sun', 1), C.G], [HV.cat2, C.Cmaj7]], HV.heavier + 0.3, 0.24, { cut: 1000 });
+  heart(HV.moonedge + 0.5, HV.heavier, (t) => 1.15 - 0.15 * MathX.clamp((t - HV.moonedge) / (HV.heavier - HV.moonedge), 0, 1), (t) => 0.2 + 0.08 * MathX.clamp((t - HV.moonedge) / 40, 0, 1));
+  keys(HV.others + 0.6, HV.saturn - 0.4, 2.0, ['E5', 'B4', 'D5', 'A4'], 0.07);
+  M.strings(HV.saturn + 0.4, HV.sun + 0.2, ['F#6'], 0.03, { att: 2.0, rel: 1.0, cut: 9000, wave: 'sine', vib: 4 });   // into the void
+  // the Sun made it: the one warm, open moment of the countdown (the heartbeat keeps going under it)
+  M.strings(HV.sun + 0.2, HV.cat2 + 0.6, ['E4', 'G4', 'B4', 'D5'], 0.08, { att: 1.4, rel: 1.2, cut: 3200, wave: 'sine', vib: 2 });
+  M.piano(HV.sun + 0.9, 'B4', 0.09, 3.5); M.piano(cap('sun', 1) + 0.2, 'G5', 0.07, 3.5);
   M.bellCut(HV.saturn + 0.9, 'E6', 0.22, 0.14, 0.3); M.bellCut(cap('saturn', 1) + 0.7, 'B5', 0.16, 0.12, -0.3);   // (where Saturn was: a bell, cut off)
   M.piano(HV.cat2 + 1.2, 'G4', 0.08, 3); M.piano(HV.cat2 + 3.6, 'D5', 0.07, 3);
-  // 10:03, lighter: the pulse comes back, tighter; then Paris
-  M.strings(HV.lighter, HV.count2 + 0.3, ['E1', 'B1', 'E2'], 0.34, { att: 2.0, rel: 0.4, cut: 300, cutTo: 700, cutAt: HV.count2 });
-  M.prog([[HV.lighter, C.Em9], [cap('lighter', 1), C.Cmaj7], [HV.bath, C.Am9], [HV.paris, C.Bsus]], HV.count2 + 0.3, 0.28, { cut: 900, cutTo: 1800 });
-  hvPulse(ctx, M.bus, HV.lighter + 0.3, HV.count2 - 0.05, ['E2', 'B2'], 0.4, 0.24, { cut: 500, cutTo: 1800, acc: 2, decay: 0.28, stepAt: (t) => 0.4 - 0.12 * MathX.clamp((t - HV.lighter) / (HV.count2 - HV.lighter), 0, 1), ramp: (u) => 0.45 + 0.55 * u });
+  // 10:03, heavier: the pulse comes back, tighter; then Paris
+  M.strings(HV.heavier, HV.count2 + 0.3, ['E1', 'B1', 'E2'], 0.34, { att: 2.0, rel: 0.4, cut: 300, cutTo: 700, cutAt: HV.count2 });
+  M.prog([[HV.heavier, C.Em9], [cap('heavier', 1), C.Cmaj7], [HV.bath, C.Am9], [HV.paris, C.Bsus]], HV.count2 + 0.3, 0.28, { cut: 900, cutTo: 1800 });
+  hvPulse(ctx, M.bus, HV.heavier + 0.3, HV.count2 - 0.05, ['E2', 'B2'], 0.4, 0.24, { cut: 500, cutTo: 1800, acc: 2, decay: 0.28, stepAt: (t) => 0.4 - 0.12 * MathX.clamp((t - HV.heavier) / (HV.count2 - HV.heavier), 0, 1), ramp: (u) => 0.45 + 0.55 * u });
   M.drum(HV.paris + 0.5, 0.45, 41.2, 1.4);
   // twelve seconds: a heartbeat quickening, the strings rising and opening, a roll into the shock
   heart(HV.count2 + 0.3, HV.hit - 0.1, (t) => 0.95 - 0.5 * MathX.clamp((t - HV.count2) / (HV.hit - HV.count2), 0, 1), (t) => 0.3 + 0.25 * MathX.clamp((t - HV.count2) / (HV.hit - HV.count2), 0, 1));

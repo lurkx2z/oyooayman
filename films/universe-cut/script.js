@@ -30,6 +30,7 @@ const hvStory = (s) => HV.t0 + s;                        // the film time of sto
 // 1 — the cold open (10:03:31: it ends as the shock arrives), the title
 HV.titleShot = hvS('title') - 0.55;
 HV.openHit = HV.titleShot - 0.5;                         // (the cold open's own shock: half a second of it, then the title)
+HV.openCuts = [hvCap('open', 1).show - 0.45, hvCap('open', 2).show - 0.4];   // the cold open: wide, the half-Moon through the long lens, wide again
 HV.title = [hvS('title') - 0.3, hvE('title') + 0.6];
 // 2 — 9:59:40: the night, the rule
 HV.before = hvS('before') - 0.5;
@@ -53,18 +54,20 @@ HV.front = hvS('front') - 0.5;                           // space: the front rac
 HV.edge = hvS('edge') - 0.5;
 HV.moonedge = hvS('moonedge') - 0.5;
 HV.others = hvS('others') - 0.5;
-HV.compass = hvS('compass') - 0.5;
-HV.nowhere = hvS('nowhere') - 0.5;
+HV.tea = hvS('tea') - 0.5;
 HV.saturn = hvS('saturn') - 0.5;                         // where Saturn was tonight (it went with the stars)
+HV.sun = hvS('sun') - 0.5;                               // space: the Sun made it (and Mercury, Venus, Mars, Jupiter)
 HV.cat2 = hvS('cat') - 0.5;                              // the cat on the wall, unbothered
-HV.lighter = hvS('lighter') - 0.5;
+HV.heavier = hvS('heavier') - 0.5;
 HV.bath = hvS('bath') - 0.4;
+HV.ears = hvS('ears') - 0.5;                             // your ears pop: the air pressing down harder too
 HV.paris = hvS('paris') - 0.5;
 HV.alarms = hvS('alarms') - 0.5;                         // the car alarms (they started at 10:02:58: their tilt sensors)
 HV.count2 = hvS('count') - 0.5;
 HV.hit = hvStory(HVP.tHit);                              // ★ 10:03:42.5: the shock arrives
 HV.hitShot = HV.hit - 2.2;
 HV.countCuts = [3.4, 5.2, 6.8, 8.2, 9.5].map((u) => HV.count2 + u);   // the last twelve seconds: quick cuts round the garden
+HV.hitCuts = [HV.hit + 0.7, HV.hit + 1.35];             // the shock: down the garden, the feeder swinging, the cat bolting; then black
 // 4 — the planet's next hours, from space
 HV.fall = hvS('fall') - 0.5;
 HV.moonaway = hvS('moonaway') - 0.5;
@@ -105,7 +108,7 @@ const SCRIPT = {
     { id: 's1', time: 0, label: '1 · 10:03:31' }, { id: 'title', time: HV.title[0], label: 'title' },
     { id: 's2', time: HV.before, label: '2 · 9:59:40' }, { id: 'zero', time: HV.zero, label: '★ 10:00' },
     { id: 'gone', time: HV.gone, label: 'space' }, { id: 'tv', time: HV.tv, label: 'tv' },
-    { id: 'front', time: HV.front, label: 'front' }, { id: 'lighter', time: HV.lighter, label: '10:03' },
+    { id: 'front', time: HV.front, label: 'front' }, { id: 'heavier', time: HV.heavier, label: '10:03' },
     { id: 'hit', time: HV.hit, label: '★ 10:03:42' }, { id: 's4', time: HV.fall, label: '4 · after' },
     { id: 's5', time: HV.real, label: '5 · real' }, { id: 'q', time: HV.question, label: 'question' },
   ],

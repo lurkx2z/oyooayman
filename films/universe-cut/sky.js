@@ -143,7 +143,7 @@ class HvSky {
       uS: { value: 0 }, uUp: { value: new THREE.Vector3(0, 0, 1) }, uPole: { value: new THREE.Vector3(...HV_GAL.pole) }, uCen: { value: new THREE.Vector3(...HV_GAL.centre) },
       uN: { value: new THREE.Vector3(...n) }, uB1: { value: new THREE.Vector3(...b1) }, uB2: { value: new THREE.Vector3(...b2) }, uTd: { value: HV_CUT.d / HVP.c },
       uNight: { value: new THREE.Color('#05070f') }, uNightHor: { value: new THREE.Color('#1c1e26') }, uTown: { value: new THREE.Color(o.town || '#3a2c22') },
-      uMw: { value: 1 }, uK: { value: 1 }, uGround: { value: new THREE.Color('#050505') }, uVoid: { value: 0.6 },
+      uMw: { value: 1 }, uK: { value: 1 }, uGround: { value: new THREE.Color('#050505') }, uVoid: { value: 0.85 },
       uLine: { value: 0 }, uLineW: { value: 0.002 }, uLineCol: { value: new THREE.Color('#ffcf8a') },
     };
     this.dome = new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 96, 48), new THREE.ShaderMaterial({
@@ -169,6 +169,8 @@ class HvSky {
           vec3 night = mix(uNightHor, uNight, smoothstep(0.0, 0.5, e)) * (1.0 - uVoid * gone);
           vec3 col = night + uTown * exp(-max(e, 0.0) * 10.0);
           col += vec3(0.62, 0.64, 0.7) * 0.05 * band(q) * uMw * smoothstep(-0.02, 0.25, e) * (1.0 - gone);
+          // (the faint glow of all the unresolved starlight: it stops at the line too)
+          col += vec3(0.55, 0.62, 0.85) * 0.012 * uMw * smoothstep(-0.02, 0.35, e) * (1.0 - gone);
           // the drawn line along the cut (dashed)
           if (uLine > 0.0) { float a = atan(dot(q, uB2), dot(q, uB1)), dash = step(0.42, fract(a * 57.29578 / 2.4));
             col += uLineCol * uLine * dash * (1.0 - smoothstep(uLineW * 0.5, uLineW, abs(dot(q, uN)))) * 0.9; }
@@ -255,7 +257,7 @@ class HvSky {
     this.moonU.uS.value = skyS; this.moonU.uK.value = (o.moonK ?? 1) * 1.15; this.moonU.uT.value = o.t ?? 0;
     // (its hot insides: the face starts blowing out at 10:00:01; about a kilometre a second at first)
     const pl = skyS > 1.2 ? MathX.smooth(skyS, 1.2, 25) : 0;
-    this.moonU.uPlume.value = (o.plume ?? 1) * pl; this.moonU.uH.value = MathX.clamp(0.004 + (skyS - 1.2) * 0.0006, 0.004, 0.16);
+    this.moonU.uPlume.value = (o.plume ?? 1) * pl; this.moonU.uH.value = MathX.clamp(0.003 + (skyS - 1.2) * 0.00025, 0.003, 0.05);   // (really ~10″ by 10:02: drawn wider, and tagged so)
     // (the glow in the air round it: from the lit part that is left)
     const left = skyS < HV_MOON.t0 ? 1 : skyS > HV_MOON.t1 ? 0.5 : 1 - 0.5 * (skyS - HV_MOON.t0) / (HV_MOON.t1 - HV_MOON.t0);
     this.moonGlow.position.copy(this.moon.position); this.moonGlow.scale.setScalar(disc * 7);

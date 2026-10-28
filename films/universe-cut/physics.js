@@ -21,9 +21,9 @@ const HVP = {
   nEF: [-0.497565, -0.230864, 0.836140],        // the same in the Earth-fixed frame (x: lon 0, y: lon 90° E, z: north)
   az0: 150,                                     // the garden looks down to azimuth 150° (SSE)
   hgt: 0.002,                                   // your eyes: 2 m up (km)
-  tHit: 222.5,                                  // ★ the first shock from the cut reaches the garden: 10:03:42.5 (calc/travel.py)
-  g0: 9.82, g1: 6.78, tilt1: 13.1, tiltAz: 346, // gravity here now / the half-Earth's pull here (m/s², calc/grav.py), its tilt (°) and the way "down" tips
-  feltK: 0.3,                                   // how far your felt weight has moved towards the new pull by 10:03:42 (an estimate: PLAN § 2)
+  tHit: 229.1,                                  // ★ the first shock from the cut reaches the garden: 10:03:49 (calc/rays.py)
+  g0: 9.82, g1: 6.78, tilt1: 13.1, tilt1Az: 346, // gravity here now / the half-Earth's pull here (m/s², calc/grav.py), its tilt (°) and which way: what you feel once the shock has passed
+  tiltAz: 166, feltW: 0.045, feltTilt: 4.2,     // before the shock: "down" tips towards the cut (SSE); you get heavier: +4.5 % and 4.2° by the shock (an estimate: PLAN § 2)
 };
 
 // ---- vectors (plain arrays)
@@ -75,19 +75,24 @@ function hvMoonPoint(nm) {
   const path = hvLen(hvAdd(Q, HV_CUT.X, -1)), f = depth / (depth + HV_CUT.d);
   return { keep: false, t: (1 - f) * path / HVP.c };
 }
-// the felt pull in the garden: you, the ground and the air all fall together under the new gravity, so at first you
-// feel exactly what you felt before; as the rock's stresses change your felt pull drifts towards the half-Earth's.
-// k: how far it has drifted (0 → HVP.feltK by the shock, an estimate). Returns weight (fraction) and tilt (°, to tiltAz)
+// the felt pull in the garden. At 10:00:00 gravity changes for you, the ground and the air at once, by the same amount,
+// so you feel exactly what you felt before. Until the shock from the cut arrives the rock feels only the uneven part of
+// the change: the lost half pulled deep rock harder than surface rock, so now the deep rock shoves up and NNW harder
+// than the rock at the surface. The ground pushes up on you a little more (slightly heavier) and drags you NNW, so
+// "down" tips the other way, towards the cut (SSE). How much is an estimate (an elastic estimate grows about linearly
+// with time: +3 to 6 % and 3 to 5° by 10:03); the sign is solid. The drop to the half-Earth's 69 % comes only with the
+// shock. Returns weight (fraction) and tilt (°, towards tiltAz)
 function hvFelt(s) {
-  const k = s <= 0 ? 0 : HVP.feltK * Math.pow(Math.min(s, HVP.tHit) / HVP.tHit, 2);
-  const g1n = HVP.g1 * Math.cos(HVP.tilt1 * HV_D2R), g1t = HVP.g1 * Math.sin(HVP.tilt1 * HV_D2R);
-  const n = HVP.g0 + k * (g1n - HVP.g0), t = k * g1t;
-  return { k, weight: Math.hypot(n, t) / HVP.g0, tilt: Math.atan2(t, n) / HV_D2R };
+  const k = s <= 0 ? 0 : Math.min(s, HVP.tHit) / HVP.tHit;
+  return { k, weight: 1 + HVP.feltW * k, tilt: HVP.feltTilt * k };
 }
-// the first shock from the cut: arrival time (s) at a place φ° from the cut (2-D first arrivals on PREM P speeds,
-// calc/travel.py), every 2° from 0 to 90
-const HV_ARR = [0, 23.4, 50.6, 77.8, 105.1, 129.7, 150.8, 169.4, 186.5, 205.1, 221.6, 237.9, 254.1, 268.8, 283.8, 297.9, 311.0, 324.4, 336.3, 348.6,
-  359.4, 370.0, 379.8, 389.4, 398.5, 407.8, 416.8, 425.2, 435.3, 444.6, 453.3, 462.6, 471.2, 480.9, 488.8, 497.7, 507.5, 515.5, 524.3, 533.0, 541.5, 550.8, 558.5, 567.2, 575.9, 585.3];
+// the small quakes before the shock: that uneven strain grows as T·t²/2 (about 10⁻³ by 10:01, 2 % by the shock: far
+// more than rock can take), so the rock starts breaking about a minute in. How strongly you feel it is a guess: 0 → 1
+const hvTremor = (s) => (s <= 0 ? 0 : 0.3 * MathX.smooth(s, 90, 150) + 0.7 * MathX.smooth(s, 150, HVP.tHit));
+// the first shock from the cut: arrival time (s) at a place φ° from the cut (P rays on PREM speeds, calc/rays.py), every
+// 2° from 0 to 90
+const HV_ARR = [0.0, 29.9, 57.2, 84.5, 111.7, 136.8, 157.7, 175.9, 193.6, 210.9, 227.7, 244.1, 259.8, 275.0, 289.6, 303.6, 317.0, 329.8, 342.1, 353.8,
+  364.8, 375.3, 385.2, 394.5, 403.6, 412.9, 421.9, 430.3, 440.4, 449.7, 458.4, 467.7, 476.3, 486.0, 493.9, 502.8, 512.6, 520.6, 529.4, 538.1, 546.6, 555.9, 563.6, 572.3, 581.0, 590.4];
 function hvArrival(phi) { const x = MathX.clamp(phi / 2, 0, HV_ARR.length - 1.001), i = Math.floor(x), u = x - i; return HV_ARR[i] + (HV_ARR[i + 1] - HV_ARR[i]) * u; }
 // how far the shock has got (φ°, from the cut) at story time s
 function hvFrontPhi(s) { if (s <= 0) return 0; for (let i = 1; i < HV_ARR.length; i++) if (HV_ARR[i] >= s) return 2 * (i - 1 + (s - HV_ARR[i - 1]) / (HV_ARR[i] - HV_ARR[i - 1])); return 90; }

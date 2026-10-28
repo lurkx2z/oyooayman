@@ -7,23 +7,23 @@ status: voiceless
 # Numbers in a caption are drawn amber. build-timing.cjs times them at reading pace; script.js keys every beat off
 # their words. Every number: PLAN.md § 2 (physics.js and calc/ compute them).
 
-[open] 10:03:32 PM tonight. Your back garden. / Half the universe is gone. And you haven't felt a thing. / Not yet.
+[open] 10:03:38 PM tonight. Your back garden. / Half the universe is gone. And you've barely felt a thing. / Not yet.
 
 [title] What if the universe got cut in half?
 
 [before] Four minutes earlier. / A clear night. The Moon, Saturn, the stars, your cat.
 
-[rule] At exactly 10:00, the universe is cut in half. Everything beyond the cut disappears. / The part of the universe we can see is a ball, with us in the middle. / So the cut goes straight through the Earth. And tonight, through the Moon.
+[rule] At exactly 10:00, the universe is cut in half. Everything beyond the cut disappears. / The part of the universe we can see is a ball, with us in the middle. / Cut it in half, and the cut goes right through the Earth. And tonight, through the Moon.
 
-[vanish] 10:00:00. Half the sky goes black.
+[vanish] 10:00:00. More than a third of your sky goes black.
 
-[line] A perfectly straight line, right across the sky. / Their light was still on its way to you. It vanished with them.
+[line] A perfectly straight line, right across the sky. / The light from beyond it was still on its way here. It vanished too.
 
-[moon] And the Moon, slowed down 8 times. / Its far half goes first. / 1.2 seconds after 10, it's cut in half.
+[moon] The Moon, replayed 8 times slower. / Its far half goes first. / 1.2 seconds after 10, it's cut in half.
 
 [nothing] Half the Earth has just disappeared. / And you feel... nothing.
 
-[why] You, the ground, the air, the sea: everything is falling the same way at once. / So nothing pushes on you any differently. Not yet.
+[why] You, the ground, the air: gravity changed for all of it at once, by the same amount. / So nothing pushes on you any differently. Not yet.
 
 [gone] This is what's left of the Earth. / The cut runs 2,240 km south of you, across the Sahara. / Everything beyond it is gone.
 
@@ -31,7 +31,7 @@ status: voiceless
 
 [blow] So the cut face bursts out into space, at several km every second.
 
-[shock] The rock under you doesn't know yet. / The news is coming through it as a shock wave, about 10 km every second. / It reaches you at 10:03:42.
+[shock] Deep down, the rock is already starting to crack. / But the real blow is a shock wave from the cut, coming at about 10 km every second. / It reaches you at 10:03:49.
 
 [calls] All over Europe, calls to the other half of the world just stop.
 
@@ -39,39 +39,41 @@ status: voiceless
 
 [front] From space, you'd see the shock coming. / A ring of breaking ground, racing north. / It's about to hit Rome and Madrid.
 
-[edge] At the edge, the air is pouring off the planet into space. / Faster than sound. / The sea spills over, boiling and freezing at the same time.
+[edge] At the edge, the air is pouring out over the cut. / Faster than sound. / The sea spills over, boiling and freezing at the same time.
 
 [moonedge] Through your telescope, the Moon's cut edge is glowing. / Its insides are bursting out too.
 
-[others] Further from the cut, there's more time. / New York gets it at 10:05:46. Tokyo at 10:06:12.
+[others] Further from the cut, there's more time. / New York gets it 2 minutes after you. Tokyo, 2½.
 
-[compass] Your phone's compass has gone wrong. / Half of the currents in the Earth's core that make its magnetism are gone.
-
-[nowhere] The black half of the sky isn't just dark. / There's nothing there at all.
+[tea] Your tea is shivering. / Small quakes are starting, all over what's left of the Earth.
 
 [saturn] Saturn was right there tonight. / It was on the other side. So were Uranus and Neptune.
 
-[cat] Your cat hasn't noticed a thing either.
+[sun] The Sun made it. It's on this side of the cut. / So are Mercury, Venus, Mars and Jupiter.
 
-[lighter] 10:03. You start to feel lighter. / And very slowly, "down" is tipping north.
+[cat] Your cat has noticed something.
 
-[bath] The water in the bird bath creeps up one side. / The ground hasn't moved. Gravity has.
+[heavier] 10:03. You feel slightly heavier. / And "down" is tipping south, towards the cut.
 
-[paris] 10:03:18. It hits Paris.
+[bath] The water in the bird bath creeps up one side. / The bowl hasn't tilted. "Down" has.
 
-[alarms] All down the street, car alarms are going off. / Their tilt sensors think someone is stealing the wheels.
+[ears] Your ears pop. / The air presses down harder too, like a lift going down.
 
-[count] 10:03:30. Twelve seconds.
+[paris] 10:03:24. It hits Paris.
 
-[hit] 10:03:42.
+[alarms] The ground is trembling now. / All down the street, car alarms are going off.
 
-[fall] Then the half-Earth falls in on itself. / Within about an hour, it's a ball again, four-fifths as wide. / Most of it melts. The oceans boil into the sky.
+[count] 10:03:37. Twelve seconds.
 
-[moonaway] The half-Moon pulls itself into a ball too. / But it's now going faster than the new Earth's escape speed. / It drifts away. For good.
+[hit] 10:03:49.
+
+[fall] Then the half-Earth falls in on itself. / Within an hour or two, it's a ball again, about four-fifths as wide. / Most of it melts. The oceans boil into the sky.
+
+[moonaway] The half-Moon pulls itself into a ball too. / But half an Earth can't hold on to it. / It drifts away. For good.
 
 [orbit] The new Earth stays on almost exactly the same path round the Sun. / An orbit doesn't care how heavy a planet is. Even half of one.
 
-[forever] And half the sky stays black. Forever. / No light will ever come from that side again.
+[forever] And half the sky stays black. Forever. / No starlight will ever come from that side again.
 
 [real] Is any of this real?
 
@@ -79,8 +81,8 @@ status: voiceless
 
 [real3] You really can't feel gravity when everything falls together. / It's why astronauts float.
 
-[real4] And earthquake waves really do travel through rock, at 5 to 13 km a second. / It's how we know the Earth's core is liquid.
+[real4] And earthquake waves really do travel through rock, at up to 13 km a second. / It's how we know the Earth's outer core is liquid.
 
 [real5] But nothing could make half the universe disappear.
 
-[question] You have 3 minutes and 42 seconds. What do you do?
+[question] At 10:00, you'll have 3 minutes and 49 seconds. What do you do?

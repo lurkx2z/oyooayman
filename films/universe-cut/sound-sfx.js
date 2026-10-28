@@ -81,11 +81,14 @@ hvSound('sfx', 'events', function (ctx, bus, K) {
   }
   rumble(HV.shock, HV.calls - HV.shock, (u) => Math.min(1, u / 0.2) * Math.min(1, (1 - u) / 0.06) * 0.7, 120, 0.06);
 
-  // ---- the phone buzzing on the metal table (the failed call); the compass's warning
+  // ---- your ears popping (a soft, muffled click inside your head)
+  K.put(hvClick(fx, { f: 260, tau: 0.018, len: 0.14 }), hvCap('ears', 0).show - 0.15, { vol: 0.07, norm: true });
+    // ---- the phone buzzing on the metal table (the failed call); the spoon in the tea
   {
     const buzz = (d) => { const y = fx.arr(d); let ph = 0; for (let i = 0; i < y.length; i++) { const u = i / sr; ph += 2 * Math.PI * 165 / sr; y[i] = Math.tanh(3 * Math.sin(ph)) * Math.min(1, u / 0.01, (d - u) / 0.02); } HVX.bq(y, 'bp', 900, 0.8, sr); return y; };
     for (const [t, d] of [[HV.calls + 0.6, 0.38], [HV.calls + 1.15, 0.38]]) K.put(buzz(d), t, { vol: 0.06, norm: true, pan: -0.1, room, wet: 0.3 });
-    K.put(buzz(0.25), HV.compass + 0.8, { vol: 0.045, norm: true, pan: -0.1, room, wet: 0.3 });
+    // the tea: the spoon chattering against the mug as the tremors start
+    { const r = new RNG(311); for (let t = HV.tea + 0.3; t < HV.saturn - 0.2; t += 0.07 + 0.22 * r.next()) K.put(hvClick(fx, { f: r.range(3200, 5200), tau: 0.004, len: 0.05 }), t, { vol: 0.012 + 0.012 * r.next() * MathX.smooth(t - HV.tea, 0, 3), norm: true, pan: 0.15, room, wet: 0.3 }); }
   }
 
   // ---- Europe from space: the ring racing north, a rolling rumble (illustration); the edge: the air pouring off
@@ -108,12 +111,12 @@ hvSound('sfx', 'events', function (ctx, bus, K) {
   // ---- 10:03: the house creaks as "down" tips; the feeder's cord; the bird bath's water
   {
     const r = new RNG(231);
-    for (const [t, pan, v] of [[HV.lighter + 0.9, 0.5, 0.05], [HV.lighter + 4.6, -0.4, 0.04], [HV.bath + 1.2, 0.6, 0.045], [hvStory(205), -0.6, 0.05], [HV.count2 + 2.4, 0.4, 0.05], [HV.count2 + 7.0, -0.3, 0.055], [HV.hit - 2.0, 0.2, 0.06]]) {
+    for (const [t, pan, v] of [[HV.heavier + 0.9, 0.5, 0.05], [HV.heavier + 4.6, -0.4, 0.04], [HV.bath + 1.2, 0.6, 0.045], [hvStory(205), -0.6, 0.05], [HV.count2 + 2.4, 0.4, 0.05], [HV.count2 + 7.0, -0.3, 0.055], [HV.hit - 2.0, 0.2, 0.06]]) {
       const y = fx.creak(r.range(0.6, 1.1), [[r.range(90, 130), 0.05, 1], [r.range(220, 300), 0.03, 0.5], [r.range(500, 650), 0.015, 0.25]], { rate: [10, 30], env: (u) => Math.sin(Math.PI * u) });
       K.put(y, t, { vol: v, norm: true, pan, room, wet: 0.6 });
     }
     const cord = fx.creak(0.5, [[1200, 0.01, 1], [2600, 0.006, 0.4]], { rate: [30, 60], env: (u) => Math.sin(Math.PI * u) });
-    K.put(cord, hvCap('lighter', 1).show + 0.6, { vol: 0.012, norm: true, pan: 0.2, room, wet: 0.4 });
+    K.put(cord, hvCap('heavier', 1).show + 0.6, { vol: 0.012, norm: true, pan: 0.2, room, wet: 0.4 });
     const lap = fx.liquid(2.6, (t) => 0.4 * Math.sin(Math.PI * MathX.clamp(t / 2.6, 0, 1)), {});
     if (lap && lap.length) K.put(lap, HV.bath + 0.4, { vol: 0.014, norm: true, pan: 0.3, room, wet: 0.4 });
   }

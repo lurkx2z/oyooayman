@@ -22,19 +22,21 @@ function hvSinceTxt(s) {
 }
 // the story second the HUD reads in this shot (the space shots keep their own clocks)
 function hvHudS(t, shot, set) {
+  if (shot.mode === 'front' && t < HV.front + 5.0) return hvStoryAt(t);       // (the replay runs its own clock: the HUD stays on real time)
   if (shot.set === 'space' && set && set._s != null) return set._s;
   if (shot.mode === 'replay') return hvReplayS(t);
   return hvStoryAt(t);
 }
 // the scene's context line: [from, to, label, value(t, s, set)] (value: { v, v2 } with HTML)
 const HV_CTX = [
-  [hvCap('line', 0).show + 0.3, HV.moon - 0.2, 'STARS YOU CAN SEE', (t, s, set) => ({ v: hvThousands(set && set.sky ? set.sky.starsLeft(s) : 0) + ' <small>OF ' + hvThousands(set && set.sky ? set.sky.count0 : 0) + '</small>', v2: 'THE REST WENT OUT IN 0.04 SECONDS' })],
+  [hvCap('line', 0).show + 0.3, HV.moon - 0.2, 'STARS YOU CAN SEE', (t, s, set) => ({ v: 'ABOUT ' + hvThousands(Math.round((set && set.sky ? set.sky.starsLeft(s) : 0) / 10) * 10) + ' <small>OF ' + hvThousands(Math.round((set && set.sky ? set.sky.count0 : 0) / 100) * 100) + '</small>', v2: 'MOST WENT OUT WITHIN 0.04 SECONDS' })],
   [hvCap('face', 1).show, HV.blow - 0.2, 'AT THE CENTRE OF THE FACE', () => ({ v: '5,400 °C', v2: '3.6 MILLION ATMOSPHERES' })],
   [HV.blow + 0.4, HV.shock - 0.1, 'BLOWING OUT AT', () => ({ v: 'UP TO ABOUT 5 km A SECOND', v2: 'ESCAPE SPEED FROM THE FACE: 10.6 km/s' })],
   [hvCap('front', 1).show, HV.edge - 0.2, 'THE SHOCK HAS REACHED', (t, s) => { const P = HV_PLACES.filter((p) => p.t <= s && p.name !== 'LONDON').sort((a, b) => b.t - a.t)[0]; return { v: P ? P.name.charAt(0) + P.name.slice(1).toLowerCase() : 'the coast', v2: 'IT REACHES YOU AT 10:03:42' }; }],
-  [hvCap('lighter', 0).show + 0.4, HV.paris - 0.2, 'WHAT YOU WEIGH', (t, s) => { const f = hvFelt(s); return { v: (f.weight * 100).toFixed(1) + ' %', v2: '“DOWN” TIPPED ' + f.tilt.toFixed(1) + '° TOWARDS THE NORTH' }; }],
-  [HV.count2 + 0.3, HV.hit - 0.1, 'WHAT YOU WEIGH', (t, s) => { const f = hvFelt(s); return { v: (f.weight * 100).toFixed(1) + ' %', v2: '“DOWN” TIPPED ' + f.tilt.toFixed(1) + '° TOWARDS THE NORTH' }; }],
-  [hvCap('fall', 1).show, HV.moonaway - 0.2, 'THE NEW EARTH', () => ({ v: '4/5 AS WIDE', v2: 'ENOUGH HEAT TO MELT MOST OF IT' })],
+  [hvCap('ears', 0).show + 0.3, HV.paris - 0.2, 'AIR PRESSURE', (t, s) => { const d = 1013 * (hvFelt(s).weight - 1); return { v: '+' + d.toFixed(0) + ' hPa <small>IN 3 MINUTES</small>', v2: 'LIKE A LIFT GOING DOWN ' + (Math.round(d * 8.4 / 10) * 10) + ' m' }; }],
+  [hvCap('heavier', 0).show + 0.4, HV.ears - 0.2, 'WHAT YOU WEIGH', (t, s) => { const f = hvFelt(s); return { v: (f.weight * 100).toFixed(1) + ' %', v2: '“DOWN” TIPPED ' + f.tilt.toFixed(1) + '° TOWARDS THE CUT' }; }],
+  [HV.count2 + 0.3, HV.hit - 0.1, 'WHAT YOU WEIGH', (t, s) => { const f = hvFelt(s); return { v: (f.weight * 100).toFixed(1) + ' %', v2: '“DOWN” TIPPED ' + f.tilt.toFixed(1) + '° TOWARDS THE CUT' }; }],
+  [hvCap('fall', 1).show, HV.moonaway - 0.2, 'THE NEW EARTH', () => ({ v: 'ABOUT 4/5 AS WIDE', v2: 'ENOUGH HEAT TO MELT MOST OF IT' })],
   [hvCap('moonaway', 1).show, HV.orbit - 0.2, 'THE MOON’S SPEED', () => ({ v: '1,144 m/s', v2: 'ESCAPE SPEED FROM THE NEW EARTH: 1,052 m/s' })],
   [hvCap('orbit', 1).show, HV.forever - 0.2, 'THE NEW YEAR', () => ({ v: 'ABOUT 3 DAYS SHORTER', v2: 'THE HALF KEEPS ITS SPIN’S 0.09 km/s, ON TOP OF 30 km/s' })],
 ];
@@ -47,9 +49,12 @@ const HV_TAGS = [
   [HV.front, HV.front + 5.0, 'REPLAY · THE FIRST 2 MINUTES, 25× FASTER'],
   [HV.gone, HV.calls, 'ILLUSTRATION'],
   [HV.front, HV.moonedge, 'ILLUSTRATION'],
-  [HV.moonedge, HV.others, 'THROUGH YOUR TELESCOPE'],
-  [HV.others, HV.compass, 'ILLUSTRATION'],
-  [HV.lighter, HV.paris, 'HOW FAST YOUR WEIGHT CHANGES IS AN ESTIMATE'],
+  [HV.moonedge, HV.others, 'THROUGH YOUR TELESCOPE · THE GLOW DRAWN WIDER'],
+  [HV.others, HV.tea, 'ILLUSTRATION'],
+  [HV.sun, HV.cat2, 'ILLUSTRATION · NOT TO SCALE'],
+  [HV.tea, HV.saturn, 'HOW STRONG THE TREMORS ARE IS A GUESS'],
+  [HV.heavier, HV.paris, 'HOW MUCH YOUR WEIGHT CHANGES IS AN ESTIMATE'],
+  [HV.alarms, HV.count2, 'HOW STRONG THE TREMORS ARE IS A GUESS'],
   [HV.paris, HV.alarms, 'ILLUSTRATION'],
   [HV.fall, HV.moonaway, 'ILLUSTRATION · TIME-LAPSE'],
   [HV.moonaway, HV.orbit, 'ILLUSTRATION · TIME-LAPSE · NOT TO SCALE'],
@@ -61,7 +66,7 @@ const HV_TAGS = [
 // a caption's text with its numbers in amber
 function hvCapHtml(s) {
   const esc = s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  return esc.replace(/\d(?:[\d,]|[.:]\d)*(?:\s?°C|\s?(?:PM|AM)|\s(?:billion light-years|million atmospheres|km every second|km a second|km|seconds|minutes|times))?(?:\s(?:to|and)\s\d+(?:\s(?:km a second|seconds))?)?|\b(?:four-fifths|half|Half|twelve|Twelve|Forever)\b/g, (m) => `<span class="n">${m}</span>`);
+  return esc.replace(/\d(?:[\d,½]|[.:]\d)*(?:\s?°C|\s?(?:PM|AM)|\s(?:billion light-years|million atmospheres|km every second|km a second|km|seconds|minutes|times))?(?:\s(?:to|and)\s\d+(?:\s(?:km a second|seconds))?)?|\b(?:four-fifths|half|Half|twelve|Twelve|Forever)\b/g, (m) => `<span class="n">${m}</span>`);
 }
 
 class HvHud {
@@ -109,7 +114,7 @@ class HvHud {
         this._html('rov', this.roV, s < HVP.tHit ? hvMinSec(HVP.tHit - s) : 'NOW');
         const sky = set && set.sky;
         const weighs = HV_CTX.some((x) => t >= x[0] - 0.5 && t < x[1] + 0.4 && x[2] === 'WHAT YOU WEIGH');   // (the context line shows it then)
-        const sub = s < 30 || weighs ? 'HALF THE UNIVERSE: GONE' : 'WHAT YOU WEIGH: ' + (hvFelt(s).weight * 100).toFixed(0) + ' %';
+        const sub = s < 180 || weighs ? 'HALF THE UNIVERSE: GONE' : 'WHAT YOU WEIGH: ' + (hvFelt(s).weight * 100).toFixed(1) + ' %';   // (your weight only from 10:03, when it starts to show)
         this._txt('ros', this.roS, sub);
       }
     }
@@ -133,6 +138,7 @@ class HvHud {
       this._txt('ckl', this.clockL, 'TONIGHT');
       this._html('ckv', this.clockV, `${c.h12}:${String(c.m).padStart(2, '0')}<small>:${String(c.s).padStart(2, '0')}</small> <i>${c.pm ? 'PM' : 'AM'}</i>`);
       if (m === 'replay') this._txt('ckf', this.clockF, (s >= 0 ? '+ ' : '− ') + Math.abs(s).toFixed(2) + ' s · SLOWED DOWN 8×');
+      else if (m === 'front' && t < HV.front + 5.0 && set && set._s != null) this._txt('ckf', this.clockF, 'REPLAY 25× · ' + hvClockText(set._s, true));
       else this._txt('ckf', this.clockF, '');
     }
     // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
@@ -188,20 +194,21 @@ class HvHud {
   static plate(a = 0.7, w = 760, h = 470) { return `<rect x="0" y="0" width="${w}" height="${h}" rx="22" fill="rgba(6,9,14,${a})"/>`; }
   // the rule: the universe we can see is a ball round us; a plane through its middle; it goes through the Earth, and the Moon
   static rule(u) {
-    const p1 = MathX.smooth(u, 0.2, 1.0), p2 = MathX.smooth(u, 4.6, 5.6), p3 = MathX.smooth(u, 9.0, 10.0), cut = MathX.smooth(u, 1.4, 2.4);
+    const c = (k) => hvCap('rule', k).show - hvCap('rule', 0).show - 0.2, cm = hvW('rule', 'tonight').start - hvCap('rule', 0).show - 0.5;   // (each picture with its words)
+    const p1 = MathX.smooth(u, 0.2, 1.0), p2 = MathX.smooth(u, c(2) - 0.3, c(2) + 0.7), p3 = MathX.smooth(u, cm - 0.3, cm + 0.7), cut = MathX.smooth(u, c(1) + 1.2, c(1) + 2.2);
     let gal = '';
     for (let i = 0; i < 70; i++) { const r = 185 * Math.sqrt(hvR(i, 41)), a = 6.2832 * hvR(i, 42), x = 380 + r * Math.cos(a), y = 245 + r * Math.sin(a) * 0.98, gone = y > 245 && cut > 0.5;
       gal += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="4.5" ry="2" transform="rotate(${(hvR(i, 43) * 180).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})" fill="#f6efe2" opacity="${(gone ? 0.08 : 0.75).toFixed(2)}"/>`; }
     const ball = `<g opacity="${(p1 * (1 - p2)).toFixed(3)}"><circle cx="380" cy="245" r="195" fill="none" stroke="rgba(246,239,226,0.55)" stroke-width="2" stroke-dasharray="6 6"/>${gal}
       <circle cx="380" cy="245" r="6" fill="#ffcf8a"/><text x="392" y="236" class="s">US</text>
       <line x1="150" y1="245" x2="610" y2="245" stroke="#ffcf8a" stroke-width="3" opacity="${cut.toFixed(2)}"/>
-      <text x="40" y="50" class="t">THE UNIVERSE WE CAN SEE: A BALL ROUND US</text>
-      <text x="40" y="446" class="b" opacity="${cut.toFixed(2)}">CUT IN HALF: THE CUT GOES THROUGH THE MIDDLE · US</text></g>`;
+      <text x="40" y="50" class="t">WHAT WE CAN SEE: A BALL ROUND US</text>
+      <text x="40" y="446" class="b" opacity="${cut.toFixed(2)}">CUT IN HALF, IT’S CUT THROUGH US</text></g>`;
     const earth = `<g opacity="${(p2 * (1 - p3)).toFixed(3)}"><circle cx="380" cy="245" r="150" fill="#244c80" stroke="#f6efe2" stroke-width="2.5"/>
       <rect x="226" y="246" width="308" height="152" fill="rgba(6,9,14,0.86)"/><line x1="200" y1="245" x2="560" y2="245" stroke="#ffcf8a" stroke-width="3"/>
       <circle cx="${(380 + 150 * Math.cos(-20.2 * HV_D2R + Math.PI)).toFixed(1)}" cy="${(245 - 150 * Math.sin(20.2 * HV_D2R)).toFixed(1)}" r="6" fill="#fff"/>
       <text x="${(380 - 150 * Math.cos(20.2 * HV_D2R) - 10).toFixed(1)}" y="${(245 - 150 * Math.sin(20.2 * HV_D2R) - 12).toFixed(1)}" class="s" text-anchor="end">YOU</text>
-      <text x="40" y="50" class="t">SO IT GOES THROUGH THE EARTH’S CENTRE</text></g>`;
+      <text x="40" y="50" class="t">SO, THROUGH THE EARTH’S CENTRE</text></g>`;
     const mx = 700, moonP = `<g opacity="${p3.toFixed(3)}"><circle cx="140" cy="245" r="70" fill="#244c80" stroke="#f6efe2" stroke-width="2"/><rect x="66" y="246" width="148" height="72" fill="rgba(6,9,14,0.86)"/>
       <circle cx="${mx - 40}" cy="245" r="22" fill="#c9c6bd"/><rect x="${mx - 64}" y="246" width="48" height="24" fill="rgba(6,9,14,0.9)"/>
       <line x1="40" y1="245" x2="${mx}" y2="245" stroke="#ffcf8a" stroke-width="3"/><text x="${mx - 40}" y="210" class="s" text-anchor="middle">THE MOON</text>
@@ -220,8 +227,8 @@ class HvHud {
       ${arrow(420, 205, f)}${arrow(220, 160, f)}${arrow(560, 175, f)}${arrow(300, 318, f)}${arrow(470, 318, f)}</g>`;
     return HvHud.svg(`${HvHud.plate()}${g}
       <text x="40" y="50" class="t">YOU, THE GROUND, THE AIR</text>
-      <text x="40" y="84" class="s" opacity="${f}">ALL GET THE SAME NEW PULL, AT THE SAME MOMENT</text>
-      <text x="40" y="446" class="b" opacity="${q}">SO NOTHING PRESSES ON YOU ANY DIFFERENTLY</text>`);
+      <text x="40" y="88" class="s" opacity="${f}">THE SAME NEW PULL, ALL AT ONCE</text>
+      <text x="40" y="446" class="b" opacity="${q}">SO NOTHING PRESSES ON YOU DIFFERENTLY</text>`);
   }
   // the shock on its way: a slice through what's left, the face on the left, you on the surface
   static shock(u, t, s) {
@@ -259,7 +266,7 @@ class HvHud {
       <circle cx="380" cy="250" r="6" fill="#ffcf8a"/><text x="392" y="242" class="s">US</text></g>
       <g opacity="${q}"><line x1="184" y1="470" x2="576" y2="470" stroke="#ffcf8a" stroke-width="0"/><line x1="184" y1="455" x2="576" y2="455" stroke="#ffcf8a" stroke-width="3"/>
       <text x="380" y="440" class="b" text-anchor="middle">93 BILLION LIGHT-YEARS</text></g>
-      <text x="40" y="50" class="t">THE UNIVERSE WE CAN SEE</text><text x="40" y="84" class="s">FROM ANYWHERE, YOU’RE IN THE MIDDLE OF YOURS</text>`);
+      <text x="40" y="50" class="t">THE UNIVERSE WE CAN SEE</text><text x="40" y="88" class="s">WHEREVER YOU ARE, YOU’RE IN ITS MIDDLE</text>`);
   }
   // real: astronauts float because they and their station fall together
   static float(u) {
@@ -269,8 +276,8 @@ class HvHud {
     return HvHud.svg(`${HvHud.plate()}<g opacity="${k}">${orbit}
       <rect x="${(sx - 26).toFixed(1)}" y="${(sy - 8).toFixed(1)}" width="52" height="16" rx="4" fill="#d8d4ca"/><rect x="${(sx - 6).toFixed(1)}" y="${(sy - 26).toFixed(1)}" width="12" height="52" fill="#6f86a8"/>
       <line x1="${sx.toFixed(1)}" y1="${(sy + 20).toFixed(1)}" x2="${(380 + 110 * Math.cos(a)).toFixed(1)}" y2="${(250 - 110 * Math.sin(a)).toFixed(1)}" stroke="#ffcf8a" stroke-width="4" opacity="${q}"/></g>
-      <text x="40" y="50" class="t">ON THE SPACE STATION</text><text x="40" y="84" class="s" opacity="${k}">GRAVITY UP THERE: ABOUT 90% OF YOURS</text>
-      <text x="40" y="446" class="b" opacity="${q}">THEY FLOAT: THEY AND THE STATION FALL TOGETHER</text>`);
+      <text x="40" y="50" class="t">ON THE SPACE STATION</text><text x="40" y="88" class="s" opacity="${k}">GRAVITY THERE: ABOUT 90% OF YOURS</text>
+      <text x="40" y="446" class="b" opacity="${q}">THEY AND THE STATION FALL TOGETHER</text>`);
   }
   // real: earthquake waves through the Earth, and the shadow the liquid core makes for the S waves
   static quake(u) {
@@ -279,9 +286,9 @@ class HvHud {
     for (let i = -6; i <= 6; i++) { const a = i * 13 * HV_D2R, ex = cx + R * Math.sin(a), ey = cy + R * Math.cos(a), through = Math.abs(i) <= 3;
       rays += `<path d="M${cx} ${cy - R} Q ${cx + (ex - cx) * 0.25} ${cy} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="${through && q > 0 ? 'rgba(246,239,226,0.25)' : '#ffcf8a'}" stroke-width="2.5" opacity="${k}"/>`; }
     return HvHud.svg(`${HvHud.plate()}<circle cx="${cx}" cy="${cy}" r="${R}" fill="#3a2a1e" stroke="#f6efe2" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="${rc}" fill="rgba(255,150,60,0.35)"/>
-      ${rays}<circle cx="${cx}" cy="${cy - R}" r="8" fill="#fff"/><text x="${cx + 14}" y="${cy - R - 10}" class="s">EARTHQUAKE</text>
+      ${rays}<circle cx="${cx}" cy="${cy - R}" r="8" fill="#fff"/><text x="${cx + 16}" y="${cy - R + 4}" class="s">EARTHQUAKE</text>
       <text x="${cx}" y="${cy + 6}" class="s" text-anchor="middle">LIQUID CORE</text>
       <text x="40" y="50" class="t">WAVES THROUGH THE EARTH</text>
-      <text x="40" y="446" class="b" opacity="${q}">ONE KIND CAN’T CROSS LIQUID: THE CORE CASTS A SHADOW</text>`);
+      <text x="40" y="446" class="b" opacity="${q}">ONE KIND CAN’T CROSS LIQUID: A SHADOW</text>`);
   }
 }

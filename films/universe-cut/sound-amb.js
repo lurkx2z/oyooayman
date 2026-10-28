@@ -44,6 +44,9 @@ hvSound('amb', 'places', function (ctx, bus, K) {
       K.put(y, t0, { vol: v * 0.075, norm: true, pan, room, wet: 1 });
     }
   }
+  // the small quakes before the shock: a low grumble under the garden, growing (from about 10:01:30; hvTremor)
+  hvBed(K, hvStory(80), HV.hit + 0.05, { colour: 'brown', f: [['lp', 70], ['hp', 22]], env: (u, t) => g(t) * hvTremor(hvStoryAt(t)) * (0.6 + 0.4 * Math.abs(noise1(t * 1.7, 3))), vol: 0.16, fi: 0.5, fo: 0.02, am: 0.5, wr: 0.3 });
+  hvBed(K, 0, HV.openHit + 0.05, { colour: 'brown', f: [['lp', 70], ['hp', 22]], env: (u, t) => hvTremor(hvStoryAt(t)) * (0.6 + 0.4 * Math.abs(noise1(t * 1.7, 3))), vol: 0.16, fi: 0.3, fo: 0.02, am: 0.5, wr: 0.3 });   // (the cold open)
   // a dog, a few gardens away, set off by the alarms
   { const r = new RNG(95); for (let t = hvStory(190.5); t < HV.hit - 0.4; t += 1.1 + 2.0 * r.next()) { const v = g(t); if (v < 0.3) continue; const y = fx.arr(0.5); const n = Math.round(r.range(0.12, 0.18) * sr), z = hvNoise(fx, n, 'pink'); HVX.bq(z, 'bp', r.range(550, 750), 2.5, sr); for (let i = 0; i < n; i++) y[i] = z[i] * Math.sin(Math.PI * i / n); K.put(y, t, { vol: 0.045 * v, norm: true, pan: 0.6, room, wet: 1 }); } }
 
