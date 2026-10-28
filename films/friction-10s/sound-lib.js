@@ -1,7 +1,9 @@
 /* =====================================================================
    SOUND · LIB — the noise and filter generators the ambience and effects share (from the Slower sound film, renamed
-   lb*), and a few creatures (a cricket, a tawny owl, the cat, the birds). Every function here is listed in
-   FZ_SOUND_FNS at the end, so the baked soundtrack's fingerprint sees a change to any of them.
+   fz*), the cat and the birds, and this film's own: where the picture is (inside or out, real speed or slowed down),
+   when a story second is on screen (fzWhen, fzSpan: every replay hears the same event, slowed down with it), a tyre's
+   screech, a diesel's idle. Every function here is listed in FZ_SOUND_FNS at the end, so the baked soundtrack's
+   fingerprint sees a change to any of them.
    ===================================================================== */
 
 // ---- shared generators -------------------------------------------------------------------------------------------
@@ -96,20 +98,6 @@ function fzCurve(f, hz = 200) {
   for (let i = 0; i <= n; i++) y[i] = f(t0 + i / hz);
   return (t) => { const x = MathX.clamp((t - t0) * hz, 0, n - 1e-6), i = Math.floor(x); return y[i] + (y[i + 1] - y[i]) * (x - i); };
 }
-// a cricket's chirp: three to five quick pulses of a ~4.6 kHz tone (o.f, o.n, o.pd pulse length, o.gap)
-function fzCricket(fx, o = {}) {
-  const sr = fx.sr, r = fx.r, f = o.f || r.range(4300, 4900), N = o.n || r.int(3, 5), pd = o.pd || 0.016, gap = o.gap || 0.011;
-  const y = fx.arr(N * (pd + gap) + 0.03); let ph = 0;
-  for (let k = 0; k < N; k++) { const i0 = Math.round(k * (pd + gap) * sr), n = Math.round(pd * sr); for (let i = 0; i < n; i++) { const u = i / n; ph += 2 * Math.PI * f * (1 + 0.01 * u) / sr; y[i0 + i] += Math.sin(ph) * Math.pow(Math.sin(Math.PI * u), 0.7) * (1 + 0.25 * Math.sin(ph * 2)); } }
-  return y;
-}
-// a tawny owl's hoot: "hoo … hoo-hoo-hoooo", a breathy, wavering low whistle (o.f around 600 Hz)
-function fzOwl(fx, o = {}) {
-  const sr = fx.sr, r = fx.r, f0 = o.f || r.range(560, 640), parts = [[0, 0.55, 1], [1.4, 0.12, 0.6], [1.62, 0.12, 0.65], [1.85, 1.1, 0.9]];
-  const y = fx.arr(3.2), air = fzNoise(fx, y.length, 'pink'); FZX.bq(air, 'bp', f0 * 1.1, 2.5, sr);
-  for (const [t0, d, a] of parts) { const i0 = Math.round(t0 * sr), n = Math.round(d * sr); let ph = r.range(0, 6); for (let i = 0; i < n; i++) { const u = i / n, f = f0 * (1 + 0.04 * Math.sin(Math.PI * u) - 0.06 * u + 0.012 * Math.sin(2 * Math.PI * 7 * i / sr)); ph += 2 * Math.PI * f / sr; const e = Math.min(1, u / 0.15) * Math.pow(1 - u, 0.8); y[i0 + i] += a * e * (Math.sin(ph) + 0.12 * Math.sin(2 * ph) + 0.6 * air[i0 + i]); } }
-  return y;
-}
 // a cat's voice ("mrrp", "miaow"): glottal pulses at f0(u) through two formants that open and close (o.d length,
 // o.f0 [start, peak, end], o.open: how wide the mouth gets, o.thin: a little more breath than voice)
 function fzMeow(fx, o = {}) {
@@ -136,35 +124,6 @@ function fzRobinSong(fx, o = {}) {
   }
   return y;
 }
-// a wave breaking and running up the sand (stereo [L, R], d seconds): a swell of low noise, the crash, the hiss back
-function fzSurf(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), out = [];
-  for (let c = 0; c < 2; c++) {
-    const lo = fzNoise(fx, n, 'brown'), hi = fzNoise(fx, n, 'pink'); FZX.bq(lo, 'lp', 420, 0.7, sr); FZX.bq(hi, 'bp', 2200, 0.6, sr);
-    const y = new Float32Array(n), pk = (o.peak || 0.25) * d;
-    for (let i = 0; i < n; i++) { const t = i / sr, a = t < pk ? Math.pow(t / pk, 2) : Math.exp(-(t - pk) / (0.35 * d)), b = t < pk ? 0 : Math.exp(-(t - pk) / (0.5 * d)) * Math.min(1, (t - pk) / 0.15); y[i] = lo[i] * 2.2 * a + hi[i] * 0.8 * b; }
-    out.push(y);
-  }
-  return out;
-}
-// a crowd's gasp: many short in-breaths at once (o.n people, spread over o.spread s), [L, R]
-function fzGasp(fx, o = {}) {
-  const sr = fx.sr, r = fx.r, d = (o.spread || 0.35) + 0.8, L = fx.arr(d), R = fx.arr(d);
-  for (let k = 0; k < (o.n || 14); k++) { const b = fx.breath(r.range(0.25, 0.55), { inhale: true }), i0 = Math.round(r.range(0, o.spread || 0.35) * sr), pan = r.range(-0.9, 0.9), a = (pan + 1) * Math.PI / 4, g = r.range(0.5, 1); for (let i = 0; i < b.length && i0 + i < L.length; i++) { L[i0 + i] += b[i] * Math.cos(a) * g; R[i0 + i] += b[i] * Math.sin(a) * g; } }
-  return [L, R];
-}
-// applause and cheering-ish noise: o.n clappers for d seconds, each clap a 6 ms burst through a hand's resonance
-function fzClaps(fx, d, o = {}) {
-  const sr = fx.sr, r = fx.r, L = fx.arr(d + 0.1), R = fx.arr(d + 0.1);
-  for (let k = 0; k < (o.n || 30); k++) {
-    const rate = r.range(3.5, 6), pan = r.range(-1, 1), a = (pan + 1) * Math.PI / 4, f = r.range(900, 2400), g = r.range(0.4, 1);
-    for (let t = r.range(0, 0.4); t < d; t += 1 / rate * r.range(0.85, 1.15)) {
-      const env = o.env ? o.env(t / d) : 1, i0 = Math.round(t * sr), n = Math.round(0.012 * sr), z = fx.white(n); FZX.bq(z, 'bp', f, 1.5, sr);
-      for (let i = 0; i < n && i0 + i < L.length; i++) { const v = z[i] * Math.exp(-i / (0.0025 * sr)) * g * env; L[i0 + i] += v * Math.cos(a); R[i0 + i] += v * Math.sin(a); }
-    }
-  }
-  return [L, R];
-}
 // a short click (a relay, a phone's shutter, a clock's tick): o.f its ring, o.len, o.hp
 function fzClick(fx, o = {}) {
   const sr = fx.sr, y = fx.hit([[o.f || 2400, o.tau || 0.006, 1], [(o.f || 2400) * 1.7, (o.tau || 0.006) * 0.6, 0.5], [(o.f || 2400) * 0.45, (o.tau || 0.006) * 1.5, 0.4]], { width: 0.0003, len: o.len || 0.06 });
@@ -172,4 +131,77 @@ function fzClick(fx, o = {}) {
   return y;
 }
 
-const FZ_SOUND_FNS = [fzNoise, fzBed, fzTone, fzChirp, fzCrackle, fzSweep, fzSweepPut, fzEv, fzWn, fzAddAt, fzPlace, fzCurve, fzCricket, fzOwl, fzMeow, fzRobinSong, fzSurf, fzGasp, fzClaps, fzClick];
+// ---- the story clock in the sound ------------------------------------------------------------------------------
+// is the picture inside the house at film time t (the count down's quick cuts go in and out)
+function fzInsideAt(sh, t) { return fzInside(sh.mode, sh.mode === 'count' ? FZ.countCuts.filter((c) => t >= c).length : 0); }
+// a slowed-down picture plays its sounds slower and lower: the playback rate for a story speed (10× slower → 0.46)
+const fzPitch = (rate) => (rate >= 0.9 ? 1 : MathX.clamp(Math.pow(Math.max(rate, 1e-4), 0.33), 0.32, 1));
+// every film time at which the picture passes story second sE going forwards (rewinds don't count): [{ t, rate, shot,
+// inside }]. pred(shot) picks the shots
+function fzWhen(sE, pred) {
+  const out = [], dt = 1 / 240;
+  for (const sh of FZ_SHOTS) {
+    if (pred && !pred(sh)) continue;
+    const a = Math.max(sh.t0, 0), b = Math.min(sh.t1, FZ.end);
+    let tp = a, sp = fzClock(sh, a);
+    for (let t = a + dt; t < b + dt; t += dt) {
+      const tt = Math.min(t, b), s = fzClock(sh, tt);
+      if (sp <= sE && s > sE && tt > tp) { const tc = tp + (sE - sp) / (s - sp) * (tt - tp); out.push({ t: tc, rate: (s - sp) / (tt - tp), shot: sh, inside: fzInsideAt(sh, tc) }); }
+      tp = tt; sp = s;
+    }
+  }
+  return out;
+}
+// every stretch of film showing story seconds sA … sB going forwards: [{ tA, tB, sA, rate, shot, inside }] (sA: the
+// story second the stretch starts at, later than the span's own start when the shot cuts in part-way)
+function fzSpan(sA, sB, pred) {
+  const out = [], dt = 1 / 240;
+  for (const sh of FZ_SHOTS) {
+    if (pred && !pred(sh)) continue;
+    const a = Math.max(sh.t0, 0), b = Math.min(sh.t1, FZ.end);
+    let cur = null, tp = a, sp = fzClock(sh, a);
+    for (let t = a; t < b + dt; t += dt) {
+      const tt = Math.min(t, b), s = fzClock(sh, tt), fwd = tt === a ? fzRate(sh, a) > 0 : s > sp, inS = s >= sA && s < sB && fwd;
+      if (inS && !cur) cur = { tA: tt, sA: s, rate: Math.max(1e-4, fzRate(sh, tt)), shot: sh, inside: fzInsideAt(sh, tt) };
+      if (!inS && cur) { cur.tB = tt; out.push(cur); cur = null; }
+      tp = tt; sp = s;
+    }
+    if (cur) { cur.tB = b; out.push(cur); }
+  }
+  return out;
+}
+
+// ---- this film's sounds --------------------------------------------------------------------------------------
+// a tyre screeching (stick-slip: the rubber grabbing and letting go ~600 times a second, ringing the tyre's wall and
+// the wheel well) with the road's roar under it; d seconds, o.f its pitch, o.env(u)
+function fzScreech(fx, d, o = {}) {
+  const sr = fx.sr, f = o.f || 1;
+  const y = fx.creak(d, [[1180 * f, 0.012, 1], [2350 * f, 0.009, 0.65], [3520 * f, 0.006, 0.35], [780 * f, 0.014, 0.45]], { rate: [540 * f, 660 * f], jit: 0.06, wrate: 3.2, env: (u) => (o.env ? o.env(u) : Math.min(1, u / 0.04)) });
+  const n = Math.ceil(d * sr), z = fzNoise(fx, n, 'pink'); FZX.bq(z, 'bp', 700 * f, 0.6, sr); FZX.bq(z, 'lp', 3000, 0.7, sr);
+  const zp = FZX.peak(z) || 1, yp = FZX.peak(y) || 1;
+  for (let i = 0; i < n; i++) { const u = i / n; y[i] = y[i] / yp + 0.35 * z[i] / zp * (o.env ? o.env(u) : Math.min(1, u / 0.04)); }
+  return y;
+}
+// a big diesel idling (the bus): firing pulses at f Hz through the body's resonances, a rattle; d seconds (o.low < 1:
+// the body's resonances lowered too, for the slowed-down street)
+function fzDiesel(fx, d, o = {}) {
+  const sr = fx.sr, r = fx.r, n = Math.ceil(d * sr), y = fx.arr(d), f = o.f || 11.5, wv = fx.wander(0.4);
+  let ph = 0;
+  for (let i = 0; i < n; i++) { ph += f * (1 + 0.03 * wv(i / sr)) / sr; if (ph >= 1) { ph -= 1; y[i] = r.range(0.7, 1); } }
+  const lo = o.low || 1, out = FZX.res(fx.arr(d + 0.2), y, [[42, 0.05, 1], [86, 0.03, 0.7], [131, 0.02, 0.45], [260, 0.012, 0.3], [520, 0.006, 0.15]].map(([ff, tau, a]) => [ff * lo, tau / lo, a]), sr);
+  const z = fzNoise(fx, out.length, 'brown'); FZX.bq(z, 'lp', 160, 0.7, sr);
+  const op = FZX.peak(out) || 1, zp = FZX.peak(z) || 1;
+  for (let i = 0; i < out.length; i++) out[i] = out[i] / op + 0.4 * z[i] / zp;
+  return out;
+}
+// metal: a crash of panels (a car hitting the bus, the bus landing): a deep thump, the panels' modes, glass, a scrape
+function fzCrunch(fx, o = {}) {
+  const sr = fx.sr, r = fx.r, d = o.len || 2.2, y = fx.arr(d), big = o.big || 1;
+  for (let k = 0; k < 6; k++) FZX.strike(y, Math.round(r.range(0, 0.06) * sr), Math.round(r.range(0.002, 0.006) * sr), r.range(0.4, 1), fx.metalModes(r.range(180, 520) / big, r.range(0.4, 0.9)), sr);
+  FZX.strike(y, 0, Math.round(0.006 * sr), 1.2, fx.panelModes(1.4).map(([ff, tau, a]) => [ff / big, tau, a]), sr);
+  for (let i = 0; i < 0.6 * sr; i++) y[i] += 1.1 * Math.sin(2 * Math.PI * (44 / Math.sqrt(big)) * i / sr) * Math.exp(-i / (0.16 * sr)) * Math.min(1, i / (0.003 * sr));
+  const sc = fx.rustle(d * 0.7, { density: 900, rub: 0.6, lo: 500, hi: 5000, grain: 0.004, env: (u) => Math.exp(-u * 3) }); fzAddAt(y, sc, 0.02, 0.5 * (o.scrape ?? 1), sr);
+  return y;
+}
+const FZ_SOUND_FNS = [fzNoise, fzBed, fzTone, fzChirp, fzCrackle, fzSweep, fzSweepPut, fzEv, fzWn, fzAddAt, fzPlace, fzCurve, fzMeow, fzRobinSong, fzClick,
+  fzInsideAt, fzPitch, fzWhen, fzSpan, fzScreech, fzDiesel, fzCrunch, fzInside];

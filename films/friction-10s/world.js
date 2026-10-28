@@ -200,9 +200,11 @@ FZ_SETS.world = (app) => {
         case 'stop': { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, 10); pos = P0(w.x + 6, 0.8, -9.95); at = P0(w.x - 0.5, 0.5, -10.7); fov = 46; drift = 0.004; sh = { f: [w.x, 0, -11], R: 10 }; break; }
         case 'bus2': { const b = fzBusAt(10.6); pos = P0(b.x - 24, 3.2, -13.8); at = [bus.x + 2, fzRoadY(bus.x, bus.z) + 1.4, bus.z]; fov = 42; drift = 0.004; sh = { f: [b.x, 0, b.z], R: 14 }; break; }
         case 'cat2': pos = [-0.55, 0.42, -7.45]; at = [-1.62, 0.45, -5.8]; fov = 44; drift = 0.002; sh = { f: [-1.6, 0.4, -6.2], R: 3 }; break;
-        case 'after': pos = fzV([0.4, 1.45, -8.95], [0.6, 1.45, -9.2], k); at = P0(26, -0.3, -17.5); fov = 56; drift = 0.004; sh = { f: [20, 0, -16], R: 40 }; break;
+        // (down the hill, where it all stopped: the bus on its side across the road)
+        case 'after': pos = fzV(P0(66.5, 3.0, -13.6), P0(69, 2.8, -13.8), k); at = P0(92, 1.0, -17.2); fov = 55; drift = 0.004; sh = { f: [82, 0, -16], R: 40 }; break;
         case 'phone3': { const p = fzPhone(s); pos = [p.x + 0.04, p.y + fzLerp(0.62, 0.48, k), p.z + 0.12]; at = [p.x, p.y, p.z]; fov = 40; drift = 0.0012; sh = { f: [p.x, p.y, p.z], R: 2 }; break; }
-        case 'question': pos = fzV(P0(4, 3.5, -12.5), P0(2, 26, -4), Ease.inOutSine(k)); at = P0(22, 0, -17); fov = 55; drift = 0.004; sh = { f: [20, 0, -16], R: 45 }; break;
+        // (from your doorstep, rising until the whole street is in view, down to the bus; to the last frame)
+        case 'question': { const q = Ease.inOutSine(u(shot.t0, FZ.end)); pos = fzV(P0(4, 3.5, -12.5), P0(12, 24, -5), q); at = fzV(P0(26, 0, -17), P0(58, 0, -17), q); fov = 56; drift = 0.004; sh = { f: [45, 0, -16], R: 60 }; break; }
       }
       look(pos, at, fov, t, drift, roll);
       // ------------------------------------------------------------------ your hands (through your eyes only)

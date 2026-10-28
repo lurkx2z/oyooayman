@@ -155,7 +155,7 @@ class FzHud {
     }
     return FzHud.svg(`${FzHud.plate()}<g opacity="${k}">${bot}${top}${snag}</g>
       <text x="40" y="50" class="t">TWO SURFACES, ATOM BY ATOM</text>
-      <text x="40" y="88" class="s" opacity="${(k * (1 - go)).toFixed(2)}">WHERE THEY TOUCH, THEY PULL ON EACH OTHER: THEY SNAG</text>
+      <text x="40" y="88" class="s" opacity="${(k * (1 - go)).toFixed(2)}">WHERE THEY TOUCH, THEY SNAG</text>
       <text x="40" y="446" class="b" opacity="${go.toFixed(2)}">NOW: NO SNAG. THEY SLIDE PAST</text>`);
   }
   // push ✓ grip ✗: a hand pressing straight down on a block, and pulling it sideways
@@ -165,10 +165,10 @@ class FzHud {
     return FzHud.svg(`${FzHud.plate()}
       <rect x="40" y="320" width="300" height="16" fill="#6b5a48"/><rect x="420" y="320" width="300" height="16" fill="#6b5a48"/>
       <g opacity="${k}">${blk(115, 230)}<line x1="190" y1="120" x2="190" y2="214" stroke="#ffcf8a" stroke-width="8"/><path d="M174 206 l16 22 l16 -22 z" fill="#ffcf8a"/>
-      <text x="190" y="390" class="b" text-anchor="middle">PUSH: STILL WORKS</text><text x="190" y="436" class="s" text-anchor="middle">IT DOESN'T GO THROUGH</text></g>
+      <text x="190" y="390" class="b" text-anchor="middle">PUSH: STILL WORKS</text><text x="190" y="436" class="sm" text-anchor="middle">IT CAN'T GO THROUGH</text></g>
       <g opacity="${q}">${blk(495 + slip, 230)}<line x1="${640 + slip}" y1="275" x2="${712 + slip}" y2="275" stroke="#ffcf8a" stroke-width="8"/><path d="M${706 + slip} 259 l22 16 l-22 16 z" fill="#ffcf8a"/>
       <line x1="460" y1="355" x2="720" y2="355" stroke="#ff8a6a" stroke-width="0"/>
-      <text x="570" y="390" class="b" text-anchor="middle">GRIP: GONE</text><text x="570" y="436" class="s" text-anchor="middle">NOTHING HOLDS IT SIDEWAYS</text></g>
+      <text x="570" y="390" class="b" text-anchor="middle">GRIP: GONE</text><text x="570" y="436" class="sm" text-anchor="middle">NOTHING HOLDS IT BACK</text></g>
       <text x="40" y="50" class="t">WHAT CHANGES</text>`);
   }
   // a fault: two blocks of rock locked by friction; unlocked, they lurch
@@ -179,8 +179,8 @@ class FzHud {
       <path d="M40 142 L${380 + 30} 142 L${330} 420 L40 420 Z" fill="#7a6048" transform="translate(${-d} ${d * 0.25})"/>
       <path d="M${410} 142 L720 142 L720 420 L${330} 420 Z" fill="#8c7054" transform="translate(${d} ${-d * 0.25})"/>
       <line x1="410" y1="142" x2="330" y2="420" stroke="#ffcf8a" stroke-width="4" stroke-dasharray="8 6"/>
-      <text x="470" y="300" class="s" opacity="${(1 - go).toFixed(2)}">LOCKED BY FRICTION</text>
-      <text x="470" y="300" class="b" opacity="${go.toFixed(2)}">IT SLIPS: AN EARTHQUAKE</text></g>
+      <text x="40" y="456" class="s" opacity="${(1 - go).toFixed(2)}">LOCKED BY FRICTION</text>
+      <text x="40" y="456" class="b" opacity="${go.toFixed(2)}">IT SLIPS: AN EARTHQUAKE</text></g>
       <text x="40" y="50" class="t">A FAULT, UNDERGROUND</text><text x="40" y="88" class="s">(THIS FILM: ABOVE GROUND ONLY)</text>`);
   }
   // a screw is a ramp wrapped round a pin: unwrap its thread into a slope; a weight on it slides down
@@ -193,10 +193,10 @@ class FzHud {
       <rect x="170" y="110" width="60" height="260" rx="6" fill="#9aa0a6"/>${thread}
       <path d="M150 112 h100 v18 h-100 z" fill="#b8bec4"/>
       <g opacity="${un}"><path d="M400 380 L700 380 L400 140 Z" fill="none" stroke="#ffcf8a" stroke-width="5"/>
-      <text x="430" y="420" class="s">THE THREAD, UNWRAPPED: A RAMP</text>
+      <text x="720" y="432" class="s" text-anchor="end">THE THREAD, UNWRAPPED: A RAMP</text>
       <rect x="${(bx - 24).toFixed(1)}" y="${(by - 40).toFixed(1)}" width="48" height="36" rx="5" fill="#c9b79a" transform="rotate(38.7 ${bx.toFixed(1)} ${by.toFixed(1)})"/></g></g>
       <text x="40" y="50" class="t">A SCREW IS A RAMP</text>
-      <text x="40" y="88" class="s" opacity="${sl.toFixed(2)}">NO FRICTION: THE LOAD SLIDES DOWN IT. THE SCREW TURNS</text>`);
+      <text x="40" y="88" class="s" opacity="${sl.toFixed(2)}">NO FRICTION: THE LOAD SLIDES DOWN IT</text>`);
   }
   // cotton thread: short fibres twisted together; pulled, they slide apart
   static cotton(u) {
@@ -208,7 +208,7 @@ class FzHud {
     }
     return FzHud.svg(`${FzHud.plate()}<g opacity="${k}">${f}
       <path d="M40 250 h${(30 - 20 * pull).toFixed(0)}" stroke="#ffcf8a" stroke-width="6" opacity="${pull.toFixed(2)}"/>
-      </g><text x="40" y="50" class="t">COTTON THREAD, MAGNIFIED</text><text x="40" y="88" class="s">SHORT FIBRES, TWISTED: FRICTION HOLDS THEM</text>
+      </g><text x="40" y="50" class="t">COTTON THREAD, MAGNIFIED</text><text x="40" y="88" class="s">SHORT FIBRES, TWISTED TOGETHER</text>
       <text x="40" y="446" class="b" opacity="${pull.toFixed(2)}">WITHOUT IT, A PULL JUST SLIDES THEM APART</text>`);
   }
   // a pile: grains stack up to a slope (about 30–35° for sugar or sand) because they grip; without friction, flat
@@ -219,7 +219,7 @@ class FzHud {
     return FzHud.svg(`${FzHud.plate()}<rect x="40" y="366" width="680" height="10" fill="#6b5a48"/><g opacity="${k}">${gr}
       <path d="M${380 - 200} 362 L380 ${362 - 190} L${380 + 200} 362" fill="none" stroke="#ffcf8a" stroke-width="3" stroke-dasharray="7 6" opacity="${(1 - flat).toFixed(2)}"/>
       <text x="${380 + 120}" y="250" class="s" opacity="${(1 - flat).toFixed(2)}">ABOUT 35°</text></g>
-      <text x="40" y="50" class="t">A PILE OF GRAINS</text><text x="40" y="88" class="s">THEY GRIP EACH OTHER: THAT HOLDS THE SLOPE</text>
+      <text x="40" y="50" class="t">A PILE OF GRAINS</text><text x="40" y="88" class="s">THEIR GRIP HOLDS THE SLOPE UP</text>
       <text x="40" y="446" class="b" opacity="${flat.toFixed(2)}">NO FRICTION: IT FLOWS FLAT, LIKE WATER</text>`);
   }
   // Galileo: a ball rolling down a gentle ramp is falling, slowed down; he timed it with water clocks

@@ -59,7 +59,7 @@ const FZ_SHOTS = [];
   P.push(fzSh('E2', 'hill', G[2][0], G[3][0], G));
   P.push(fzSh('E3', 'same', G[3][0], G[4][0], G));
   { const t = fzB('realspeed'); P.push(fzSh('E4', 'realspeed', t, t + 5.0, [[t, 0], [t + 5, 5]], { replay: true })); }
-  const H = [[fzB('realspeed') + 5.0, 5.0], [fzB('sofa'), 5.5], [fzB('bus'), 6.0], [fzB('bus') + 4.25, 6.18], [fzB('phone2', 0.5), 6.68], [fzB('warn'), 7.0], [fzE('warn') + 0.3, 7.6], [fzB('back', 0.35), 10.0]];
+  const H = [[fzB('realspeed') + 5.0, 5.0], [fzB('sofa'), 5.5], [fzB('bus'), 6.0], [fzB('bus') + 4.25, 6.18], [fzB('phone2', 0.5), 6.8], [fzB('warn'), 7.15], [fzE('warn') + 0.3, 7.6], [fzB('back', 0.35), 10.0]];
   P.push(fzSh('E5', 'faster', H[0][0], H[1][0], H));
   P.push(fzSh('E6', 'sofa', H[1][0], H[2][0], H));
   P.push(fzSh('E7', 'bus', H[2][0], H[4][0], H));
@@ -78,6 +78,10 @@ const FZ_SHOTS = [];
     P.push(fzSh('E17', 'phone3', fzB('phone3'), fzB('question', 0.5), K));
     P.push(fzSh('E18', 'question', fzB('question', 0.5), 1e9, K)); }
 }
+// s = 10 on screen (the blow), and the moment before it when everything stops dead (mix.js: 0.42 s of silence)
+FZ.tB = fzB('back', 0.35); FZ.hold = FZ.tB - 0.42;
+// (the mix's dynamics map keys: the slide's build, real speed, the warning)
+FZ.tSlide = fzB('slide', 0.5); FZ.tRS = fzB('realspeed'); FZ.tWarn = fzB('warn');
 // the count down's quick cuts (inside 'count'): round the house and the street, every ~0.9 s
 FZ.countCuts = (() => { const sh = FZ_SHOTS.find((s) => s.mode === 'count'), n = 8, d = (sh.t1 - sh.t0) / n; return Array.from({ length: n - 1 }, (_, i) => sh.t0 + d * (i + 1)); })();
 

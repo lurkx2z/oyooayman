@@ -2,10 +2,10 @@
    AUDIO — "What if friction disappeared for 10 seconds?" js/audio/audioEngine.js is unchanged (this is a
    subclass); the DSP and generators come from audiokit.js (via the Slower light film). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
-     music  an original score in E; at 10:00:00 its theme starts turning up backwards (sound-music.js)
-     amb    the garden at night and by day, the park's dawn chorus, Hawaii's beach and crowd, space (sound-amb.js)
-     sfx    the events: the clock, the stars going out, the mirror sky, the lantern, the cat, the streetlights, the
-            gasp and the cheer in Hawaii, Voyager 1, the inverter, the ice, the boiling seas (sound-sfx.js)
+     music  an original score in E minor that slows with the clock and stops dead before s = 10 (sound-music.js)
+     amb    the kitchen and the street, at real speed or slowed down with the picture; after: the car alarms (sound-amb.js)
+     sfx    the events at their story seconds, slowed down in every replay; the brakes' screech cut dead at s = 0; s = 10
+            (every tyre at once; the bus going over); the tape stop, the rewinds, the count down's ticks (sound-sfx.js)
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
 
@@ -62,7 +62,7 @@ class FzAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'friction-10s-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
     return [FZ, FZT, window.FZ_MIX, Object.values(FZX).map(String).join(''), FzFx.toString(), Object.getOwnPropertyNames(FzFx.prototype).map((k) => String(FzFx.prototype[k])).join(''),
-      Object.values(FZ_SOUND).flat().map((b) => b.name + b.fn).join(''), fzDynDb.toString(), FzAudio.toString(), fzLimit.toString(), fzStoryAt.toString(), JSON.stringify([FZP, FZ_SHOTS]),
+      Object.values(FZ_SOUND).flat().map((b) => b.name + b.fn).join(''), fzDynDb.toString(), FzAudio.toString(), fzLimit.toString(), fzStoryAt.toString(), JSON.stringify([FZP, FZ_SHOTS, FZ_SLAP, FZ_HOOK, FZ_CABT, FZ_MUG, FZ_CAT, FZ_FALL, FZ_PHONE, FZ_CAR, FZ_LADDER, FZ_SCAF, FZ_WALKER, FZ_H, FZ_LOOSE_ID.sofa]),
       (window.FZ_SOUND_FNS || []).map(String).join(''), [fzShotAt, fzClock, fzOpenS, fzRate].map(String).join('')];
   }
   async renderOffline() {

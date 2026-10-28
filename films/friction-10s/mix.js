@@ -5,16 +5,18 @@
    ===================================================================== */
 window.FZ_MIX = {
   stems: {
-    music: { gain: 0, hp: 32 },
-    amb: { gain: 8, hp: 28 },
+    music: { gain: 2, hp: 32 },
+    amb: { gain: 5, hp: 28 },
     sfx: { gain: 9, hp: 25 },
   },
+  // the score builds from "Now everything starts to slide" to real speed, stays up through "faster" and settles for the
+  // warning (which builds on its own); everything stops dead for 0.42 s before s = 10, even the reverb tails
   dyn: {
-    music: [],
-    amb: [['t0', -0.3, 0], ['t0', 0.15, -5], ['t0', 2.5, 0]],   // (the garden holds its breath for a moment at 10:00:00)
-    sfx: [],
+    music: [['tSlide', 0, 0], ['tRS', -0.4, 5], ['tRS', 0.3, 2], ['tWarn', -0.5, 3.5], ['tWarn', 1.5, 0], ['hold', -0.02, 0], ['hold', 0.0, -70], ['tB', -0.003, -70], ['tB', 0, 0]],
+    amb: [['hold', -0.02, 0], ['hold', 0.0, -70], ['tB', -0.003, -70], ['tB', 0, 0]],
+    sfx: [['hold', -0.02, 0], ['hold', 0.0, -70], ['tB', -0.003, -70], ['tB', 0, 0]],
   },
-  master: 8,
+  master: 9,
   eq: [['lowshelf', 110, -2.5], ['highshelf', 3500, 2]],
   ceiling: -1.5,   // dBTP, the limiter's ceiling (fzLimit)
 };
