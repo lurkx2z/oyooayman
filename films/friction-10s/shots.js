@@ -31,7 +31,7 @@ const FZ_SHOTS = [];
   P.push(fzSh('B2', 'mug', fzB('mug', 0.5), fzB('feet', 0.5), fzRun(fzB('mug', 0.5), 0.3, 5), { replay: true }));
   P.push(fzSh('B3', 'reach', fzB('feet', 0.5), c('feet', 2) - 0.4, fzRun(fzB('feet', 0.5), 0.15, 10), { pov: true, replay: true }));
   P.push(fzSh('B4', 'feet', c('feet', 2) - 0.4, fzB('grip', 0.4), fzRun(c('feet', 2) - 0.4, 0.42, 6), { replay: true }));
-  P.push(fzSh('B5', 'slap', fzB('grip', 0.4), c('grip', 2) - 0.45, fzRun(fzB('grip', 0.4), 0.6, 8), { pov: true, replay: true }));
+  P.push(fzSh('B5', 'slap', fzB('grip', 0.4), c('grip', 2) - 0.45, fzRun(fzB('grip', 0.4), 0.6, 14), { pov: true, replay: true }));
   P.push(fzSh('B6', 'hook', c('grip', 2) - 0.45, fzB('catrun'), fzRun(c('grip', 2) - 0.45, 1.3, 8), { replay: true }));
   P.push(fzSh('B7', 'catrun', fzB('catrun'), fzB('house', 0.5), fzRun(fzB('catrun'), 1.15, 3), { replay: true }));
   // 3 — the same second, the rest of the house
@@ -49,7 +49,7 @@ const FZ_SHOTS = [];
   P.push(fzSh('D3', 'laces', fzB('laces', 0.5), fzB('walk', 0.5), fzRun(fzB('laces', 0.5), -0.1, 8), { replay: true }));
   P.push(fzSh('D4', 'walk', fzB('walk', 0.5), fzB('ladder', 0.5), fzRun(fzB('walk', 0.5), -0.3, 4), { replay: true }));
   P.push(fzSh('D5', 'ladder', fzB('ladder', 0.5), fzB('scaffold', 0.5), fzRun(fzB('ladder', 0.5), -0.05, 3), { replay: true }));
-  { const t = fzB('scaffold', 0.5), u = c('scaffold', 0) + 3.1;
+  { const t = fzB('scaffold', 0.5), u = c('scaffold', 0) + 1.6;
     P.push(fzSh('D6', 'scaffold', t, fzB('sand', 0.5), [[t, -0.1], [u, 0.02], [u + 1, 0.22]], { replay: true })); }
   P.push(fzSh('D7', 'sand', fzB('sand', 0.5), fzB('slide', 0.5), fzRun(fzB('sand', 0.5), -0.05, 4), { replay: true }));
   // 5 — everything slides (one continuous clock, slowed down, from 1.55 s), the count down, the return
@@ -83,6 +83,9 @@ FZ.tB = fzB('back', 0.35); FZ.hold = FZ.tB - 0.42;
 // (the mix's dynamics map keys: the slide's build, real speed, the warning)
 FZ.tSlide = fzB('slide', 0.5); FZ.tRS = fzB('realspeed'); FZ.tWarn = fzB('warn');
 // the count down's quick cuts (inside 'count'): round the house and the street, every ~0.9 s
+// the return's quick cuts (inside 'back', real speed): the street, the cat (her paws catch), the bus (on its side at
+// 11.25), then wide
+FZ.backCuts = [FZ.tB + 0.32, FZ.tB + 0.86, FZ.tB + 1.62];
 FZ.countCuts = (() => { const sh = FZ_SHOTS.find((s) => s.mode === 'count'), n = 8, d = (sh.t1 - sh.t0) / n; return Array.from({ length: n - 1 }, (_, i) => sh.t0 + d * (i + 1)); })();
 
 // a shot's clock at film time t, and its speed (story seconds per film second)

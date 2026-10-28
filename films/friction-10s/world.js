@@ -139,50 +139,54 @@ FZ_SETS.world = (app) => {
       const u = (a, b) => MathX.clamp((t - a) / (b - a), 0, 1);
       const k = u(shot.t0, shot.t1);
       const cat = fzCat(s), bus = fzBusAt(s), car = fzCarAt(s), bike = fzBike(s);
+      this._sub = 0;
       switch (m) {
         // ---- 1
         case 'open': povCam(); break;
         case 'floor': povCam(fzLerp(0.0, -0.45, k), fzLerp(0.02, -0.05, k)); break;
-        case 'teaser': pos = [-0.1, 1.5, -9.0]; at = fzV([16, -0.3, -21.5], [18, -0.6, -21.8], k); fov = 60; drift = 0.006; sh = { f: [12, 0, -17], R: 30 }; break;
+        case 'teaser': pos = [-2.5, 1.6, -9.0]; at = fzV([16, -0.3, -23.2], [18, -0.6, -23.5], k); fov = 60; drift = 0.006; sh = { f: [12, 0, -17], R: 30 }; break;
         case 'flash': { const b = fzBusAt(10.2); pos = P0(b.x + 13, 0.5, -14.4); at = [b.x + 1.5, fzRoadY(b.x, b.z) + 1.9, b.z]; fov = 44; drift = 0.004; sh = { f: [b.x + 3, 0, b.z], R: 16 }; break; }
         case 'atoms': pos = [-1.42, 0.12, cat.z - 0.6]; at = [cat.x, 0.1, cat.z]; fov = 30; drift = 0.002; sh = { f: [cat.x, 0, cat.z], R: 3 }; break;
         case 'apart': pos = fzV([-1.05, 0.92, -3.55], [-1.05, 0.88, -3.35], k); at = [-1.3, 0.62, -1.75]; fov = 42; drift = 0.003; sh = { f: [-1, 0, -2], R: 5 }; break;
         case 'push': { const p = fzPhone(s); pos = [p.x + 0.55, 0.16, p.z - 0.6]; at = [p.x, 0.02, p.z]; fov = 34; drift = 0.002; sh = { f: [p.x, 0, p.z], R: 3 }; break; }
         case 'fault': pos = fzV([-6, 16, -4], [-4, 17, -5], k); at = [10, -1, -17]; fov = 55; drift = 0.006; sh = { f: [8, 0, -16], R: 40 }; break;
         // ---- 2
-        case 'replay': case 'reach': case 'slap': povCam(); break;
+        case 'replay': povCam(0.12 * fzSm(s, 0.0, 0.45), -0.1 - 0.42 * fzSm(s, 0.0, 0.5)); break;     // (following the phone down)
+        case 'reach': povCam(); break;
+        case 'slap': povCam(0.1 * fzSm(s, 0.6, 0.75), -0.3 * fzSm(s, 0.6, 0.75)); break;          // (down to your hand on the edge)
         case 'hook': pos = fzV([-1.32, 0.98, -2.78], [-1.36, 0.95, -2.7], k); at = [-1.7, 0.81, -2.22]; fov = 30; drift = 0.0012; sh = { f: [-1.7, 0.8, -2.2], R: 2 }; break;
         case 'cat': pos = [-0.98, 1.04, -2.32]; at = fzV([0.45, 0.97, -1.86], [0.0, 0.95, -1.9], k); fov = 40; drift = 0.002; sh = { f: [0, 1, -1.9], R: 3 }; break;
-        case 'mug': pos = [-1.68, 0.22, -2.75]; at = fzV([-0.75, 0.75, -1.95], [-1.0, 0.2, -2.05], u(shot.t0, shot.t0 + 3.2)); fov = 46; drift = 0.002; sh = { f: [-1, 0, -2], R: 3 }; break;
+        case 'mug': pos = fzV([-1.5, 2.0, -3.5], [-1.4, 2.25, -3.4], k); at = fzV([-0.75, 0.85, -1.95], [-1.1, 0.05, -2.3], u(shot.t0, shot.t0 + 3.2)); fov = 50; drift = 0.002; sh = { f: [-1, 0, -2], R: 3 }; break;
         case 'feet': pos = [-1.0, 0.48, -3.35]; at = [-1.12, fzLerp(0.95, 0.6, k), -1.5]; fov = 44; drift = 0.003; sh = { f: [-1.1, 0.5, -1.8], R: 3.5 }; break;
-        case 'catrun': pos = [-0.82, 0.2, cat.z - 0.1]; at = [cat.x, 0.16, cat.z + 0.05]; fov = 36; drift = 0.002; sh = { f: [cat.x, 0, cat.z], R: 3 }; break;
+        case 'catrun': pos = [cat.x + 0.12, 0.26, cat.z - 0.95]; at = [cat.x, 0.14, cat.z]; fov = 40; drift = 0.002; sh = { f: [cat.x, 0, cat.z], R: 3 }; break;
         // ---- 3
         case 'house': pos = fzV([0.35, 2.05, -7.72], [0.3, 2.0, -7.6], k); at = [-0.25, 0.95, -1.6]; fov = 70; drift = 0.003; sh = { f: [0, 1, -4], R: 6 }; break;
         case 'screws': { const cb = H.cabs[0], sc = cb.screws[1]; sc.g.getWorldPosition(_v); cb.g.localToWorld(_w.set(0.075, cb.h - 0.075, sc.u * cb.L + 0.085));
           pos = _w.toArray(); at = [_v.x - 0.005, _v.y - 0.002, _v.z]; fov = 36; drift = 0.0005; cabLight.position.set(_w.x - 0.02, _w.y + 0.04, _w.z - 0.05); sh = { f: _v.toArray(), R: 2 }; break; }
         case 'cabinets': pos = [-0.9, 1.5, -3.6]; at = [-2.1, 1.5, -1.6]; fov = 50; drift = 0.003; sh = { f: [-1.8, 1, -1.9], R: 3.5 }; break;
-        case 'tv': pos = [0.4, 1.15, -4.35]; at = [2.25, 0.95, -5.05]; fov = 42; drift = 0.003; sh = { f: [2, 1, -5], R: 3 }; break;
+        case 'tv': { const d = fzSm(s, 0.4, 0.95); pos = [0.4 + 0.2 * d, 1.15 + 0.75 * d, -4.35 - 0.1 * d]; at = [2.25 - 0.4 * d, 0.95 - 0.9 * d, -5.05]; } fov = 42; drift = 0.003; sh = { f: [2, 1, -5], R: 3 }; break;
         case 'curtains': pos = [-0.45, 1.42, -5.4]; at = [-1.3, 1.45, -8.0]; fov = 46; drift = 0.003; sh = { f: [-1.3, 1.4, -7.6], R: 3 }; break;
         case 'clothes': { const dn = fzSm(t, fzCap('clothes', 1).show - 0.35, fzCap('clothes', 1).show + 0.05) * (1 - fzSm(t, fzCap('clothes', 1).show + 0.25, fzCap('clothes', 1).show + 0.4));
           povCam(fzLerp(0.0, -0.35, k), -0.75 * dn); break; }
         case 'sugar': pos = [0.6, 1.16, -2.0]; at = [0.17, 0.93, -2.3]; fov = 32; drift = 0.0015; sh = { f: [0.2, 0.9, -2.3], R: 2 }; break;
         // ---- 4
-        case 'street': case 'slide': case 'realspeed': pos = fzV(P0(-46, 8.5, -14.6), P0(-44, 8.6, -14.8), k); at = P0(18, 0, -17.5); fov = 50; drift = 0.008; sh = { f: [0, 0, -16], R: 45 }; break;
-        case 'brakes': { const cy = fzRoadY(car.x, car.z); pos = [car.x + 5.2, cy + 1.0, -14.6]; at = [car.x + 0.4, cy + 0.75, car.z]; fov = 46; drift = 0.004; sh = { f: [car.x, 0, car.z], R: 8 }; break; }
-        case 'bike': { const by = fzRoadY(bike.x, bike.z); pos = [bike.x + 6.5, by + 0.55, -17.2]; at = [bike.x, by + 0.75, bike.z]; fov = 42; drift = 0.004; sh = { f: [bike.x, 0, bike.z], R: 7 }; break; }
+        case 'realspeed': pos = P0(31, 0.7, -11.0); at = P0(12, 1.0, -13.8); fov = 50; drift = 0.004; sh = { f: [20, 0, -14], R: 16 }; break;
+        case 'street': case 'slide': pos = fzV(P0(-46, 8.5, -14.6), P0(-44, 8.6, -14.8), k); at = P0(18, 0, -17.5); fov = 50; drift = 0.008; sh = { f: [0, 0, -16], R: 45 }; break;
+        case 'brakes': { const c1 = fzCarAt(1.2), cy = fzRoadY(c1.x, c1.z); pos = [c1.x + 4.0, cy + 1.0, -14.4]; at = [car.x + 0.4, cy + 0.75, car.z]; fov = 46; drift = 0.004; sh = { f: [car.x, 0, car.z], R: 8 }; break; }
+        case 'bike': { const by = fzRoadY(bike.x, bike.z); pos = [bike.x + 6.5, by + 0.55, -17.2]; at = [bike.x, by + 0.75, bike.z]; fov = 28; drift = 0.004; sh = { f: [bike.x, 0, bike.z], R: 7 }; break; }
         case 'laces': { const ft = C.lace.j.ll.ft; ft.updateWorldMatrix(true, false); ft.localToWorld(_v.set(0, 0.054, 0.045)); pos = [_v.x + 0.2, _v.y + 0.1, _v.z + 0.42]; at = [_v.x, _v.y - 0.015, _v.z + 0.01]; fov = 32; drift = 0.0015; sh = { f: at, R: 2.5 }; break; }
-        case 'walk': { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, s); pos = P0(fzLerp(-3.4, -2.9, k), 1.0, -10.1); at = P0(w.x - 0.2, 0.75, -10.4); fov = 46; drift = 0.004; sh = { f: [w.x, 0, -10.4], R: 7 }; break; }
+        case 'walk': { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, s); pos = P0(fzLerp(-3.4, -2.9, k), 1.35, -9.8); at = P0(w.x - 0.2, 0.75, -10.4); fov = 46; drift = 0.004; sh = { f: [w.x, 0, -10.4], R: 7 }; break; }
         case 'ladder': pos = P0(-14.5, 1.6, -22.6); at = P0(-8.6, 2.0, -24.7); fov = 46; drift = 0.004; sh = { f: [-8.8, 1, -24], R: 7 }; break;
-        case 'scaffold': pos = P0(3.2, 1.65, -11.2); at = P0(7.5, 2.8, -24.3); fov = 52; drift = 0.004; sh = { f: [7.5, 2, -23], R: 12 }; break;
-        case 'sand': pos = P0(9.3, 0.7, -22.45); at = P0(fzLerp(13.6, 16.5, k), 0.1, -22.9); fov = 44; drift = 0.003; sh = { f: [15, 0, -22.5], R: 7 }; break;
+        case 'scaffold': pos = P0(3.2, 1.65, -11.2); at = P0(7.5, 3.7, -24.3); fov = 52; drift = 0.004; sh = { f: [7.5, 2, -23], R: 12 }; break;
+        case 'sand': pos = P0(fzLerp(14.6, 15.4, k), 3.3, -21.6); at = P0(fzLerp(13.2, 14.4, k), 0.1, -23.2); fov = 50; drift = 0.003; sh = { f: [14, 0, -23], R: 5 }; break;
         // ---- 5
         case 'floor2': pos = [1.0, 1.78, -0.85]; at = [-0.35, 0.55, -7.4]; fov = 62; drift = 0.003; sh = { f: [0, 0.5, -4.5], R: 6 }; break;
         case 'hill': pos = P0(-4, 1.5, -23.4); at = P0(4, 0.6, -12.7); fov = 52; drift = 0.004; sh = { f: [2, 0, -14], R: 14 }; break;
         case 'same': { const x = fzHalf(FZP.aHill, Math.max(0, s)); pos = P0(x - 2.0, 1.65, -10.7); at = P0(x + 12, 0.4, -16.5); fov = 56; sh = { f: [x + 8, 0, -16], R: 16 }; break; }
         case 'faster': pos = P0(30, 0.5, -11.3); at = P0(10, 0.9, -13.0); fov = 46; drift = 0.004; sh = { f: [18, 0, -14], R: 16 }; break;
         case 'sofa': pos = [0.45, 1.35, -4.5]; at = [-1.3, 0.6, -7.5]; fov = 52; drift = 0.003; sh = { f: [-1.2, 0.5, -6.8], R: 4 }; break;
-        case 'bus': { const b = fzBusAt(6.2); pos = P0(b.x + 16, 4.2, -10.4); at = [b.x - 1, fzRoadY(b.x, b.z) + 1.4, b.z]; fov = 46; drift = 0.005; sh = { f: [b.x, 0, b.z], R: 16 }; break; }
-        case 'phone2': { const px = fzPhone(6.77).x; pos = [px + 0.1, 0.07, -7.2]; at = [px - 0.02, -0.3, -10.6]; fov = 42; drift = 0.002; sh = { f: [px, 0, -8.6], R: 4 }; break; }
+        case 'bus': { const b = fzBusAt(6.2); pos = P0(b.x + 17, 4.2, -12.6); at = [b.x - 1, fzRoadY(b.x, b.z) + 1.4, b.z]; fov = 46; drift = 0.005; sh = { f: [b.x, 0, b.z], R: 16 }; break; }
+        case 'phone2': { const p = fzPhone(s); pos = [p.x + 0.14, p.y + 0.42, p.z + 0.48]; at = [p.x, p.y, p.z - 0.3]; fov = 40; drift = 0.002; sh = { f: [p.x, 0, p.z], R: 3 }; break; }
         case 'warn': pos = fzV(P0(6, 12.5, -12.2), P0(8, 12.8, -12.5), k); at = P0(30, -1, -17.5); fov = 52; drift = 0.006; sh = { f: [24, 0, -16], R: 40 }; break;
         case 'warn2': pos = [1.3, 2.05, -0.7]; at = [-0.5, 0.45, -6.2]; fov = 64; drift = 0.003; sh = { f: [0, 0.5, -4], R: 6 }; break;
         case 'count': {
@@ -196,15 +200,21 @@ FZ_SETS.world = (app) => {
           else if (n === 6) { const X = fzHalf(FZP.aHill, s); pos = P0(X + 3, 1.4, -10.0); at = P0(X + 12, 0.7, -11.8); fov = 50; sh = { f: [X + 9, 0, -12], R: 12 }; }
           else { pos = P0(42, 10.5, -13); at = P0(70, -1, -18); fov = 52; sh = { f: [60, 0, -16], R: 40 }; }
           drift = 0.004; break; }
-        case 'back': pos = fzV(P0(42, 10.5, -13), P0(43, 10.4, -13.2), k); at = P0(70, -0.5, -18); fov = 52; drift = 0.006; sh = { f: [62, 0, -16], R: 42 }; break;
+        case 'back': {
+          const n = FZ.backCuts.filter((c) => t >= c).length; this._sub = n;
+          if (n === 0) { const X = fzHalf(FZP.aHill, 10); pos = P0(X - 1.5, 1.1, -14.2); at = P0(X + 12, 0.7, -16.4); fov = 50; sh = { f: [X + 6, 0, -16], R: 14 }; }
+          else if (n === 1) { pos = [-0.55, 0.78, -7.45]; at = [-1.62, 0.6, -5.8]; fov = 48; sh = { f: [-1.6, 0.4, -6.2], R: 3 }; }
+          else if (n === 2) { const b = fzBusAt(11.25); pos = P0(b.x - 9, 0.6, -13.0); at = [b.x - 1, fzRoadY(b.x, b.z) + 1.3, b.z]; fov = 50; sh = { f: [b.x, 0, b.z], R: 16 }; }
+          else { pos = fzV(P0(28, 4.5, -11.4), P0(29.5, 4.4, -11.6), u(FZ.backCuts[2], shot.t1)); at = P0(62, 0, -17.5); fov = 48; sh = { f: [50, 0, -16], R: 36 }; }
+          drift = 0.004; break; }
         case 'stop': { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, 10); pos = P0(w.x + 6, 0.8, -9.95); at = P0(w.x - 0.5, 0.5, -10.7); fov = 46; drift = 0.004; sh = { f: [w.x, 0, -11], R: 10 }; break; }
-        case 'bus2': { const b = fzBusAt(10.6); pos = P0(b.x - 24, 3.2, -13.8); at = [bus.x + 2, fzRoadY(bus.x, bus.z) + 1.4, bus.z]; fov = 42; drift = 0.004; sh = { f: [b.x, 0, b.z], R: 14 }; break; }
-        case 'cat2': pos = [-0.55, 0.42, -7.45]; at = [-1.62, 0.45, -5.8]; fov = 44; drift = 0.002; sh = { f: [-1.6, 0.4, -6.2], R: 3 }; break;
+        case 'bus2': { const b = fzBusAt(10.2); pos = P0(b.x + 13, 0.5, -14.4); at = [b.x + 1.5, fzRoadY(b.x, b.z) + 1.9, b.z]; fov = 44; drift = 0.004; sh = { f: [b.x, 0, b.z], R: 14 }; break; }
+        case 'cat2': pos = [-0.55, 0.78, -7.45]; at = [-1.62, 0.6, -5.8]; fov = 44; drift = 0.002; sh = { f: [-1.6, 0.4, -6.2], R: 3 }; break;
         // (down the hill, where it all stopped: the bus on its side across the road)
         case 'after': pos = fzV(P0(66.5, 3.0, -13.6), P0(69, 2.8, -13.8), k); at = P0(92, 1.0, -17.2); fov = 55; drift = 0.004; sh = { f: [82, 0, -16], R: 40 }; break;
         case 'phone3': { const p = fzPhone(s); pos = [p.x + 0.04, p.y + fzLerp(0.62, 0.48, k), p.z + 0.12]; at = [p.x, p.y, p.z]; fov = 40; drift = 0.0012; sh = { f: [p.x, p.y, p.z], R: 2 }; break; }
         // (from your doorstep, rising until the whole street is in view, down to the bus; to the last frame)
-        case 'question': { const q = Ease.inOutSine(u(shot.t0, FZ.end)); pos = fzV(P0(4, 3.5, -12.5), P0(12, 24, -5), q); at = fzV(P0(26, 0, -17), P0(58, 0, -17), q); fov = 56; drift = 0.004; sh = { f: [45, 0, -16], R: 60 }; break; }
+        case 'question': { const q = u(shot.t0, FZ.end); pos = fzV(P0(72, 1.7, -14.6), P0(76, 1.6, -14.8), q); at = P0(92, 1.2, -17.0); fov = 50; drift = 0.004; sh = { f: [86, 0, -16], R: 24 }; break; }
       }
       look(pos, at, fov, t, drift, roll);
       // ------------------------------------------------------------------ your hands (through your eyes only)
@@ -258,6 +268,7 @@ FZ_SETS.world = (app) => {
 // is this shot inside the house? (the grade and the lights)
 function fzInside(m, sub) {
   if (m === 'count') return sub === 1 || sub === 5;
+  if (m === 'back') return sub === 1;
   return ['open', 'floor', 'atoms', 'apart', 'push', 'replay', 'cat', 'mug', 'reach', 'feet', 'slap', 'hook', 'catrun', 'house', 'screws', 'cabinets', 'tv', 'curtains', 'clothes', 'sugar', 'floor2', 'sofa', 'warn2', 'cat2'].includes(m);
 }
 const fzAdd = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
@@ -296,11 +307,10 @@ function fzPhoneScreen(H, on) {
 // labels pinned in the scene: [{ p, text, sub, a, side }]
 function fzLabels(set, t) {
   const shot = fzShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s;
-  if (m === 'hook') out.push({ p: [-1.74, 0.8, -2.36], text: 'THE OVEN DOOR HANDLE', a: W(t, fzCap('grip', 3).show + 0.1, shot.t1 - 0.2, 0.3, 0.2), side: 'r' });
-  if (m === 'floor2') out.push({ p: [-0.3, 0.05, -6.8], text: 'THE FLOOR', sub: 'SLOPES 0.5° TOWARDS THE STREET', a: W(t, fzCap('floor', 0).show + 0.6, fzCap('floor', 2).show - 0.2, 0.3, 0.3) });
+  if (m === 'hook') out.push({ p: [-1.74, 0.8, -2.36], text: 'THE OVEN DOOR HANDLE', a: W(t, fzCap('grip', 2).show + 0.8, shot.t1 - 0.2, 0.3, 0.2), side: 'r' });
+  if (m === 'floor2') out.push({ p: [-0.3, 0.05, -6.8], text: 'THE FLOOR', sub: 'SLOPES 0.5° TOWARDS THE STREET', a: W(t, fzCap('floor', 0).show + 0.6, fzCap('floor', 1).show - 0.2, 0.3, 0.3) });
   if (m === 'hill') { const c = FZ_PARKED.find((q) => q.id === 'S3'), r = fzParked(c, s); out.push({ p: [r.x - 1.3, fzRoadY(r.x - 1.3, c.z) + 0.3, c.z + 0.9], text: 'HELD BY ITS TYRES', sub: 'UNTIL NOW', a: W(t, fzCap('hill', 1).show + 0.2, shot.t1 - 0.2, 0.3, 0.2) }); }
-  if (m === 'bus') { const b = fzBusAt(s); out.push({ p: [b.x, fzRoadY(b.x, b.z) + 4.6, b.z], text: 'THE BUS', sub: 'TURNED ' + Math.round((b.yaw - FZ_BUS.yaw0) * 57.3) + '° SINCE 8:14:07', a: W(t, fzCap('bus', 1).show + 0.2, shot.t1 - 0.2, 0.3, 0.2) }); }
-  if (m === 'phone2') { const p = fzPhone(s); out.push({ p: [p.x, p.y + 0.02, p.z], text: 'YOUR PHONE', a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.2) }); }
+  if (m === 'phone2') { const p = fzPhone(s); out.push({ p: [p.x, p.y + 0.11, p.z], text: 'YOUR PHONE', a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.2) }); }
   if (m === 'cabinets') out.push({ p: [-2.4, 2.1, -1.3], text: '3 SCREWS EACH', a: W(t, fzS('cabinets') + 0.3, fzS('cabinets') + 1.6, 0.25, 0.25), side: 'r' });
   return out;
 }

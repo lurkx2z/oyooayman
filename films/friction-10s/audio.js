@@ -63,7 +63,7 @@ class FzAudio extends AudioEngine {
   fingerprintData() {
     return [FZ, FZT, window.FZ_MIX, Object.values(FZX).map(String).join(''), FzFx.toString(), Object.getOwnPropertyNames(FzFx.prototype).map((k) => String(FzFx.prototype[k])).join(''),
       Object.values(FZ_SOUND).flat().map((b) => b.name + b.fn).join(''), fzDynDb.toString(), FzAudio.toString(), fzLimit.toString(), fzStoryAt.toString(), JSON.stringify([FZP, FZ_SHOTS, FZ_SLAP, FZ_HOOK, FZ_CABT, FZ_MUG, FZ_CAT, FZ_FALL, FZ_PHONE, FZ_CAR, FZ_LADDER, FZ_SCAF, FZ_WALKER, FZ_H, FZ_LOOSE_ID.sofa]),
-      (window.FZ_SOUND_FNS || []).map(String).join(''), [fzShotAt, fzClock, fzOpenS, fzRate].map(String).join('')];
+      (window.FZ_SOUND_FNS || []).map(String).join(''), [fzShotAt, fzClock, fzOpenS, fzRate, fzTipInfo, fzInside, fzStepY, FZ_STEPS.lands].map(String).join('')];
   }
   async renderOffline() {
     if (this.solo) return super.renderOffline();

@@ -133,7 +133,7 @@ function fzClick(fx, o = {}) {
 
 // ---- the story clock in the sound ------------------------------------------------------------------------------
 // is the picture inside the house at film time t (the count down's quick cuts go in and out)
-function fzInsideAt(sh, t) { return fzInside(sh.mode, sh.mode === 'count' ? FZ.countCuts.filter((c) => t >= c).length : 0); }
+function fzInsideAt(sh, t) { return fzInside(sh.mode, sh.mode === 'count' ? FZ.countCuts.filter((c) => t >= c).length : sh.mode === 'back' ? FZ.backCuts.filter((c) => t >= c).length : 0); }
 // a slowed-down picture plays its sounds slower and lower: the playback rate for a story speed (10× slower → 0.46)
 const fzPitch = (rate) => (rate >= 0.9 ? 1 : MathX.clamp(Math.pow(Math.max(rate, 1e-4), 0.33), 0.32, 1));
 // every film time at which the picture passes story second sE going forwards (rewinds don't count): [{ t, rate, shot,

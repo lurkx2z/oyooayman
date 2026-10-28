@@ -29,7 +29,7 @@ const fzCap = (id, k) => FZT_ID[id].caps[k];  // a caption: { text, show, hide, 
 // ---------------------------------------------------------------------------------------------------------------------
 const FZ = {};
 FZ.t0 = 0.62;                                            // ★ friction goes (story s = 0), under the title
-FZ.title = [fzS('title') - 0.05, fzE('title') + 0.25];
+FZ.title = [-0.4, fzE('title') + 0.25];                  // (fully up on frame 1)
 FZ.end = FZT.duration;
 // the cold open's clock: real time to t 2.2 (s 1.58: you're down, reaching for the oven handle), then it slows to
 // 1/80 of real speed by t 3.4 and stays there while the rule is set out (section 1)

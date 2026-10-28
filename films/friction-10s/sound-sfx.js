@@ -64,6 +64,8 @@ fzSound('sfx', 'events', function (ctx, bus, K) {
   ev(Mg.hit, 'in', () => fx.hit(fx.cupModes(), { width: 0.0004 }), { vol: 0.04, pan: 0.05 });
   ev(Mg.smash, 'in', () => fx.smash({ v: 4.1, g: FZP.g, pan: -0.25 }), { vol: 0.12 });
   // your phone: squeezed out of your hand, lands screen-up with two little bounces; then slides without a sound
+  // ...and three little clacks as it drops off your doorstep onto each step below, then the path
+  for (const [i, t] of FZ_STEPS.lands().entries()) ev(t, 'out', () => fx.hit([[2900 + 260 * i, 0.016, 1], [4700, 0.01, 0.4], [1100, 0.02, 0.5]], { width: 0.0006, extra: [[0.045, 0.0005, 0.25]] }), { vol: 0.05 - 0.008 * i, pan: 0.1 });
   ev(FZ_PHONE.land, 'in', () => fx.hit([[3150, 0.02, 1], [5100, 0.012, 0.5], [820, 0.03, 0.6], [1650, 0.02, 0.4]], { width: 0.0008, extra: [[0.055, 0.0006, 0.35], [0.1, 0.0005, 0.12]] }), { vol: 0.07, pan: -0.2 });
   // you: the gasp as your feet go, the slap on the island's edge, the floor, the hook on the oven handle
   ev(FZ_FALL.slip, 'in', () => fx.breath(0.32, { inhale: true }), { vol: 0.05 });
@@ -137,9 +139,10 @@ fzSound('sfx', 'events', function (ctx, bus, K) {
   // the bus: its tyres bite, it rolls, lands on its side
   ev(FZP.tBack + 0.02, 'out', () => fzScreech(fx, 1.1, { f: 0.62, env: (u) => Math.min(1, u / 0.03) * Math.pow(1 - u, 0.5) }), { vol: 0.09, pan: 0.4, pred: (s) => s.mode === 'bus2' || s.mode === 'back' || s.mode === 'flash' });
   ev(FZP.tBack + 1.25, 'out', () => mix([fzCrunch(fx, { big: 2.2, len: 3.0 }), 0], [fx.smash({ v: 6, g: FZP.g, pitch: 0.75, len: 2.0 }).L, 0.02, 0.7], [fzCrunch(fx, { big: 1.4, len: 1.5, scrape: 0.4 }), 0.18, 0.5]), { vol: 0.18, pan: 0.3, big: true });
-  // inside: the cat's claws catch (a scrabble) and she's gone; the fridge, still sliding, goes over
+  // inside: the cat's claws catch (a scrabble) and she's gone; the fridge, still sliding at 3 km/h, rocks forward on
+  // its front edge and drops back (a heavy thud, the bottles inside)
   ev(FZP.tBack, 'in', () => mix([fx.rustle(0.25, { density: 2000, rub: 0.3, lo: 2500, hi: 9000, grain: 0.002, env: (u) => Math.pow(1 - u, 1.2) }), 0], [fzMeow(fx, { d: 0.35, f0: [600, 760, 520], open: 0.8 }), 0.1, 0.5]), { vol: 0.05, pan: -0.2 });
-  ev(FZP.tBack + 0.85, 'in', () => mix([fx.hit(fx.panelModes(1.4), { width: 0.008, noise: 0.3 }), 0], [fx.smash({ v: 2, g: FZP.g, pitch: 1.1, len: 1.2 }).L, 0.03, 0.4]), { vol: 0.1, pan: 0.4, big: true });
+  ev(FZP.tBack + 2 * fzTipInfo('fridge').tUp, 'in', () => mix([fx.hit(fx.panelModes(1.0), { width: 0.01, noise: 0.25 }), 0], [fx.hit(fx.glassModes(), { width: 0.002 }), 0.025, 0.3], [fx.hit(fx.glassModes(), { width: 0.002 }), 0.06, 0.2]), { vol: 0.08, pan: 0.4 });
   ev(FZP.tBack + 0.05, 'in', () => fx.creak(0.5, fx.woodModes(170, 0.8), { rate: [30, 70], env: (u) => Math.pow(1 - u, 1.3) }), { vol: 0.04, pan: 0.2 });   // (the furniture: wood dragging to a stop)
 
   // ================================================================================================= film-time marks

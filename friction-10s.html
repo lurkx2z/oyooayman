@@ -10,7 +10,7 @@
   <style>
     /* this film's HUD (page-level only). 16:9 (1920×1080): --u = one design pixel of a 1920-wide frame (set by film.js) */
     #hud::before { height: 26%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)); }
-    #hud .story-title.big.center { top: calc(var(--u) * 330); width: calc(var(--u) * 1400); margin-left: calc(var(--u) * -700); }
+    #hud .story-title.big.center { top: calc(var(--u) * 150); width: calc(var(--u) * 1400); margin-left: calc(var(--u) * -700); }
     #hud .story-title.big.center::before { background: radial-gradient(closest-side, rgba(2, 3, 6, 0.62), rgba(2, 3, 6, 0.28) 62%, rgba(2, 3, 6, 0)); }
     #hud .story-title.big.center .kick { font-family: var(--book); font-size: calc(var(--u) * 54); font-weight: 600; letter-spacing: 0.06em; }
     #hud .story-title.big.center .hero { font-family: var(--book); font-size: calc(var(--u) * 124); font-weight: 700; line-height: 1.02; letter-spacing: 0.02em; }
@@ -34,6 +34,7 @@
     .fz-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
     .fz-ro .nx { color: #f6efe2; opacity: 0.85; font-size: calc(var(--u) * 22); letter-spacing: 0.12em; }
     .fz-ro .nx:empty { display: none; }
+    .fz-ro .s:empty { display: none; }
     .fz-ctx { position: absolute; left: calc(var(--u) * 52); top: calc(var(--u) * 312); pointer-events: none; padding: calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * 14); border-radius: calc(var(--u) * 14);
       background: rgba(6, 8, 12, 0.62); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
     .fz-ctx .l { display: block; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.16em; color: #fff; opacity: 0.8; }

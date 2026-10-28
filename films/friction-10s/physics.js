@@ -127,12 +127,27 @@ function fzLoose(id, s) {
   const r = fzSlide(0, 0, a, s, FZP.decWood);
   return { dz: -r.p, v: r.v, moving: r.v > 0 };
 }
-// a tall thing still sliding when friction returns pitches over the way it was going (angle, radians; 0 = upright)
+// a tall thing still sliding when friction returns: its foot catches and it pivots on its front edge. Angular momentum
+// about that edge: ω = v·(h/2) / ((h² + d²)/3); it goes over only if that spin can lift its centre of mass over the
+// edge. At 3 km/h a fridge (1.86 × 0.68 m) can't: it rocks about 5° and drops back with a thud (angle, radians)
+function fzTipInfo(id) {
+  const it = FZ_LOOSE_ID[id];
+  if (it._tip) return it._tip;
+  const v = it.tStop <= FZP.tBack ? 0 : FZP.aFloor * FZP.tBack, h = it.h, d = Math.abs(it.z[0] - it.z[1]), I = (h * h + d * d) / 3;
+  const w = v * (h / 2) / I, ke = 0.5 * I * w * w, r = Math.hypot(h / 2, d / 2), p0 = Math.atan2(d / 2, h / 2);
+  const c = (r * Math.cos(p0) + ke / FZP.g) / r, over = c >= 1;
+  const th = over ? Math.PI / 2 : p0 - Math.acos(Math.min(1, c));
+  return (it._tip = { v, w, th, over, tUp: w > 0 ? 2 * th / w : 0 });
+}
 function fzTip(id, s, max = Math.PI / 2) {
   const it = FZ_LOOSE_ID[id];
   if (s <= FZP.tBack || it.tStop <= FZP.tBack) return 0;
-  const u = (s - FZP.tBack) / 0.85;
-  return max * (u >= 1 ? 1 : u * u * (3 - 2 * u)) * (1 + 0.04 * Math.exp(-(s - FZP.tBack - 0.85) * 9) * Math.sin(Math.max(0, s - FZP.tBack - 0.85) * 40));
+  const T = fzTipInfo(id), tau = s - FZP.tBack;
+  if (T.over) { const u = tau / 0.85; return max * (u >= 1 ? 1 : u * u * (3 - 2 * u)); }
+  // up to th and back (a pendulum's half swing), then a small bounce
+  const u = tau / (2 * T.tUp);
+  if (u < 1) return T.th * Math.sin(Math.PI * u);
+  const b = tau - 2 * T.tUp; return T.th * 0.18 * Math.exp(-b * 10) * Math.abs(Math.sin(b * 22));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -175,23 +190,38 @@ function fzPhone(s) {
 // outside: off the doorstep at tDoor (speed vDoor, heading −z), down 3 steps (a hop each), across the yard and the
 // pavement; on the pavement the hill pulls it along +x. Stops at s = 10 (it's light: a short skid).
 const FZ_STEPS = { n: 3, rise: 0.155, run: 0.28, z0: FZ_W.front - FZ_W.wallT };
+// the height of something sliding off the doorstep at speed v, zDist past the door: the tread it's on, or its fall
+// from the last edge it went over (whichever is higher); the treads' tops match home.js
+function fzStepY(zDist, v, ground) {
+  const S = FZ_STEPS, top = (k) => (k < S.n ? -(k + 1) * S.rise + 0.16 : ground);
+  const e = Math.min(S.n, Math.max(0, Math.floor(zDist / S.run)));            // edges gone over
+  if (e === 0) return top(0);
+  const dt = (zDist - e * S.run) / v;
+  return Math.max(top(e), top(e - 1) - 0.5 * FZP.g * dt * dt);
+}
+// when it lands on each tread below (and on the path): story seconds
+FZ_STEPS.lands = function () {
+  const P = FZ_PHONE, out = [];
+  for (let e = 1; e <= FZ_STEPS.n; e++) {
+    const drop = e < FZ_STEPS.n ? FZ_STEPS.rise : -(-(e) * FZ_STEPS.rise + 0.16) + fzPavY(0.25);
+    out.push(P.tDoor + e * FZ_STEPS.run / P.vDoor + Math.sqrt(2 * Math.abs(drop) / FZP.g));
+  }
+  return out;
+};
 function fzPhoneOut(s) {
   const P = FZ_PHONE, t0 = P.tDoor, v = P.vDoor, sx = 0.25;
   const se = Math.min(s, FZP.tBack + 0.25);
   const tau = se - t0, zDist = v * tau;                                          // it keeps its −z speed
   const z = FZ_STEPS.z0 - zDist;
   const stepsEnd = FZ_STEPS.n * FZ_STEPS.run;
-  let y;
-  if (zDist < stepsEnd) {                                                        // hopping down the steps
-    const k = Math.floor(zDist / FZ_STEPS.run), u = (zDist % FZ_STEPS.run) / FZ_STEPS.run;
-    y = -k * FZ_STEPS.rise - FZ_STEPS.rise * u * u;
-  } else y = fzPavY(sx);
+  // down the steps: it slides along each tread, then flies off its edge (still going v) and drops onto the next
+  const y = fzStepY(zDist, v, fzPavY(sx));
   // on the yard path and the pavement: the hill's pull along +x from when it leaves the steps
   const tFlat = t0 + stepsEnd / v, tx = Math.max(0, se - tFlat);
   let x = sx + 0.5 * FZP.aHill * tx * tx;
   let zz = z;
   if (zz < FZ_W.road[0] + 0.05) zz = FZ_W.road[0] + 0.05 - 0.15 * (1 - Math.exp(-(FZ_W.road[0] + 0.05 - z) * 3));   // it fetches up in the gutter
-  const yy = zDist < stepsEnd ? y + 0.006 : (zz < FZ_W.road[0] ? fzRoadY(x, zz) : fzPavY(x)) + 0.006;
+  const yy = zDist < stepsEnd + 0.4 ? Math.max(y, zz < FZ_W.road[0] ? fzRoadY(x, zz) : fzPavY(x)) + 0.006 : (zz < FZ_W.road[0] ? fzRoadY(x, zz) : fzPavY(x)) + 0.006;
   return { x, y: yy, z: zz, yaw: 0.8 + 0.12 * (se - P.land) + 0.9 * Math.min(1, tx / 3), pitch: -Math.PI / 2, roll: 0, out: true };
 }
 
@@ -356,6 +386,7 @@ function fzBus(s) {
   const t = s - FZ_CRASH.t;
   const out = Object.assign({}, b);
   out.x += 0.55 * Math.min(t, FZP.tBack - FZ_CRASH.t); out.yaw += 0.02 * Math.min(t, FZP.tBack - FZ_CRASH.t);
+  if (b.vx != null && s < FZP.tBack) out.vx = b.vx + 0.55;                         // (the readout's speed includes the knock)
   return out;
 }
 function fzCar(s) {
@@ -476,7 +507,7 @@ function fzSkid(p10, vx, vz, dec, s) {
   return { x: p10.x + (v ? vx / v : 0) * d, z: p10.z + (v ? vz / v : 0) * d, v: Math.max(0, v - dec * tau), u: ts ? Math.min(1, tau / ts) : 1, ts };
 }
 // the bus and the car, with the return: the bus (sliding ~60° off its heading) tips over over ~1.25 s
-// and slides to a stop on it; the car lurches onto two wheels and drops back while it skids round
+// and slides to a stop on it; the car rolls a few degrees on its springs while it skids round
 function fzBusAt(s) {
   if (s <= FZP.tBack) return Object.assign(fzBus(s), { roll: 0 });
   const b = fzBus(FZP.tBack), b2 = fzBus(FZP.tBack - 0.01);
@@ -491,6 +522,7 @@ function fzCarAt(s) {
   const vx = (c.x - c2.x) / 0.01, vz = (c.z - c2.z) / 0.01, k = fzSkid(c, vx, vz, FZP.decCar, s);
   const wy = (c.yaw - c2.yaw) / 0.01, tau = s - FZP.tBack;
   const yaw = c.yaw + wy * Math.min(tau, k.ts) * (1 - 0.5 * Math.min(1, tau / Math.max(0.01, k.ts)));
-  const lurch = 0.32 * Math.sin(Math.PI * MathX.clamp(tau / 0.9, 0, 1)) * Math.exp(-tau * 0.4);
+  // (a few degrees of body roll: its stability factor ≈ 1.3 > μ 0.7, so no wheels lift)
+  const lurch = 0.085 * Math.sin(Math.PI * MathX.clamp(tau / 0.9, 0, 1)) * Math.exp(-tau * 0.4);
   return { x: k.x, z: k.z, yaw, roll: lurch, v: k.v };
 }

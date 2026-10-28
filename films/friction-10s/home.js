@@ -545,11 +545,15 @@ function fzShelfPose(s) {
 }
 
 function fzHomeUpdate(H, s, o) {
-  // ---- loose furniture (the floor's slope); tall things still sliding at 10 s tip over
+  // ---- loose furniture (the floor's slope); tall things still sliding at 10 s pivot forward (−z) on their front edge:
+  // the slow ones rock and drop back (fzTip)
   for (const [id, L] of Object.entries(H.loose)) {
     const r = fzLoose(id, s);
     L.g.position.z = L.z0 + r.dz;
-    if (L.it.tall) { const a = fzTip(id, s, id === 'fridge' ? 1.45 : Math.PI / 2); L.g.rotation.x = a; }
+    if (L.it.tall) {
+      const a = fzTip(id, s, id === 'fridge' ? 1.45 : Math.PI / 2), hd = Math.abs(L.it.z[0] - L.it.z[1]) / 2;
+      L.g.rotation.x = -a; L.g.position.y = hd * Math.sin(a); L.g.position.z += -hd + hd * Math.cos(a);
+    }
   }
   // the rug carries the coffee table (both from fzLoose)
   // ---- the wall cabinets, their screws, plates, glasses

@@ -42,8 +42,8 @@ function fzCapHtml(s) {
 class FzHud {
   constructor(root) {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; root.appendChild(d); return d; };
-    this.ro = mk('fz-ro', '<div class="l"></div><div class="v"></div>');
-    this.roL = this.ro.querySelector('.l'); this.roV = this.ro.querySelector('.v');
+    this.ro = mk('fz-ro', '<div class="l"></div><div class="v"></div><div class="s"></div>');
+    this.roL = this.ro.querySelector('.l'); this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s');
     this.ctx = mk('fz-ctx', '<span class="l"></span><span class="v"></span><span class="v2"></span>');
     this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
     this.tag = mk('fz-tag');
@@ -77,9 +77,11 @@ class FzHud {
     const cx = FZ_CTX.find((x) => t >= x[0] && t < x[1]);
     this._set('cx', this.ctx, 'opacity', cx ? W(t, cx[0], cx[1], 0.5, 0.4).toFixed(3) : '0');
     if (cx) { const r = cx[3](t, s); this._txt('cxl', this.ctxL, cx[2]); this._html('cxv', this.ctxV, r.v); this._html('cxv2', this.ctxV2, r.v2 || ''); }
-    // ---- the honest label
+    // ---- the honest label: how fast we're watching, inside the countdown's box (so a jump in the countdown reads as a
+    // replay or a rewind); on its own bottom left only when the countdown is off
     const tg = t >= FZ.title[1] - 0.3 ? fzSpeedTag(shot, t) : '';
-    this._set('tg', this.tag, 'opacity', tg ? W(t, shot.t0 + 0.05, shot.t1, 0.25, 0.1).toFixed(3) : '0');
+    this._txt('ros', this.roS, ra > 0 ? tg : '');
+    this._set('tg', this.tag, 'opacity', tg && !(ra > 0) ? W(t, shot.t0 + 0.05, shot.t1, 0.25, 0.1).toFixed(3) : '0');
     if (tg) this._txt('tgt', this.tag, tg);
     // ---- the time this morning
     const ca = quiet ? 0 : W(t, FZ.t0 - 0.05, fzS('after') - 0.6, 0.12, 0.5);
@@ -127,8 +129,8 @@ class FzHud {
       ['atoms', c('nuance', 0) + 0.2, c('nuance', 1) - 0.3, ''],
       ['push', c('nuance', 2) + 0.1, c('nuance', 3) - 0.3, ''],
       ['fault', c('nuance', 3) + 1.0, fzE('nuance') + 0.2, ''],
-      ['screw', c('screws', 0) + 0.2, c('screws', 2) - 0.3, ''],
-      ['cotton', c('cotton', 1) - 0.2, fzE('cotton') + 0.1, ''],
+      ['screw', c('screws', 0) + 0.2, fzE('screws') + 0.2, 'left'],
+      ['cotton', c('cotton', 0) + 0.8, fzE('cotton') + 0.1, 'left'],
       ['pile', c('sugar', 1) - 0.2, fzE('sugar') + 0.2, ''],
       ['galileo', c('same', 1) + 0.1, fzE('same') + 0.2, ''],
     ].find((x) => t >= x[1] && t < x[2]);
@@ -196,7 +198,7 @@ class FzHud {
       <text x="720" y="432" class="s" text-anchor="end">THE THREAD, UNWRAPPED: A RAMP</text>
       <rect x="${(bx - 24).toFixed(1)}" y="${(by - 40).toFixed(1)}" width="48" height="36" rx="5" fill="#c9b79a" transform="rotate(38.7 ${bx.toFixed(1)} ${by.toFixed(1)})"/></g></g>
       <text x="40" y="50" class="t">A SCREW IS A RAMP</text>
-      <text x="40" y="88" class="s" opacity="${sl.toFixed(2)}">NO FRICTION: THE LOAD SLIDES DOWN IT</text>`);
+      <text x="40" y="88" class="s" opacity="${sl.toFixed(2)}">NO FRICTION: ANY PULL UNWINDS IT</text>`);
   }
   // cotton thread: short fibres twisted together; pulled, they slide apart
   static cotton(u) {

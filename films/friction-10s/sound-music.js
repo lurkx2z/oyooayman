@@ -165,7 +165,7 @@ fzSound('music', 'score', function (ctx, bus, K) {
   const tRw = B('rewind', 0.4), t2 = B('cat'), t3 = B('house', 0.5);
   M.rpiano(t2, 'E3', 0.34, 2.4); M.rpiano(t2, 'B3', 0.26, 2.4); M.rpiano(t2, 'E4', 0.2, 2.4);
   M.strings(tRw, t2 + 0.3, ['E2', 'B2', 'E3'], 0.22, { att: 0.3, rel: 0.4, cut: 900, glide: 1200, glideFrom: tRw, glideAt: tRw + 1.2 });
-  M.prog([[t2, C.Em9], [B('mug', 0.5), C.Cmaj7], [B('feet', 0.5), C.Am9], [B('grip', 0.4), C.Bsus], [cap('grip', 2) - 0.45, C.Em], [B('catrun'), C.Cmaj7], [cap('catrun', 2), C.Dsus]], t3 + 0.3, 0.27, { cut: 1200 });
+  M.prog([[t2, C.Em9], [B('mug', 0.5), C.Cmaj7], [B('feet', 0.5), C.Am9], [B('grip', 0.4), C.Bsus], [cap('grip', 2) - 0.45, C.Em], [B('catrun'), C.Cmaj7], [cap('catrun', 1), C.Dsus]], t3 + 0.3, 0.27, { cut: 1200 });
   fzPulse(ctx, M.bus, t2 + 0.2, t3 - 0.05, ['E2', 'B2'], 0.5, 0.2, { cut: 520, cutTo: 1300, acc: 4, decay: 0.26, ramp: (u) => 0.55 + 0.45 * u });
   M.drum(B('feet', 0.5) + 0.02, 0.3, 41.2, 1.4);
   M.bell(cap('grip', 2) + 0.1, 'B5', 0.2, 0.2);                                                // "Don't grip. Hook."
@@ -178,7 +178,7 @@ fzSound('music', 'score', function (ctx, bus, K) {
   fzPulse(ctx, M.bus, t3 + 0.8, cap('clothes', 1), ['A1', 'E2'], 0.5, 0.17, { cut: 480, cutTo: 900, acc: 4, decay: 0.24 });
   M.strings(B('screws') + 0.3, B('cabinets') + 0.1, ['E5', 'F5'], 0.03, { att: 2.0, rel: 0.1, cut: 8000, wave: 'sine', vib: 0, glide: 120 });   // (the screws turning: a rub)
   M.drum(B('cabinets'), 0.36, 49, 1.2);
-  M.bell(cap('cotton', 2) + 0.5, 'E6', 0.16, 0.3); M.bellCut(cap('cotton', 2) + 0.9, 'B5', 0.14, 0.1, -0.3);
+  M.bell(cap('cotton', 1) + 0.5, 'E6', 0.16, 0.3); M.bellCut(cap('cotton', 1) + 0.9, 'B5', 0.14, 0.1, -0.3);
   M.bell(cap('clothes', 1) + 0.9, 'G5', 0.12, 0);                                               // ("Let's not look down." — then one bell)
   M.prog([[B('sugar'), C.Cmaj7], [cap('sugar', 1), C.Em9]], t4 + 0.3, 0.24, { cut: 1200 });
   keys(B('sugar') + 0.3, t4 - 0.3, 0.9, ['G5', 'E5', 'D5', 'B4', 'A4', 'G4'], 0.05, { dur: 0.8 });   // (the sugar pouring: a falling run)
@@ -191,20 +191,20 @@ fzSound('music', 'score', function (ctx, bus, K) {
   const tBack4 = brakeCut.t + 2.2;
   M.prog([[tBack4, C.Am9], [B('bike', 0.5), C.Em9], [B('laces', 0.5), C.Cmaj7], [B('walk', 0.5), C.G], [B('ladder', 0.5), C.Dsus], [B('scaffold', 0.5), C.Am9], [cap('scaffold', 1) - 0.3, C.Bsus], [B('sand', 0.5), C.Em9]], t5 + 0.3, 0.27, { cut: 1250 });
   fzPulse(ctx, M.bus, tBack4 + 0.5, t5 - 0.05, ['E1', 'E2'], 0.42, 0.2, { cut: 420, cutTo: 1100, acc: 4, decay: 0.3, ramp: (u) => 0.6 + 0.4 * u });
-  M.bell(cap('laces', 2) + 0.4, 'B5', 0.16, 0.2); M.bellCut(cap('laces', 2) + 0.8, 'F#5', 0.14, 0.12, -0.2);
+  M.bell(cap('laces', 1) + 0.4, 'B5', 0.16, 0.2); M.bellCut(cap('laces', 1) + 0.8, 'F#5', 0.14, 0.12, -0.2);
   M.roll(cap('scaffold', 0) + 2.2, cap('scaffold', 0) + 3.15, [[cap('scaffold', 0) + 2.2, 0.06], [cap('scaffold', 0) + 3.1, 0.35]], 61.7);
 
   // ---- 5 · everything slides: the build (the pulse quickens, the chords climb), Galileo, real speed, faster
   const tRS = B('realspeed'), tF = tRS + 5.0, tWarn = B('warn'), tCount = FZ_SHOTS.find((s) => s.mode === 'count'), tB = B('back', 0.35);
   M.strings(t5, S('slide') + 0.1, ['E1', 'B1'], 0.36, { att: 0.2, rel: 0.1, cut: 260, wave: 'triangle', vib: 0 });
-  M.prog([[t5, C.Em9], [cap('slide', 2) - 0.2, C.Cmaj7], [B('floor'), C.Am9], [cap('floor', 2), C.Bsus], [B('hill', 0.5), C.Em], [B('same', 0.5), C.Cmaj7], [cap('same', 1), C.G], [cap('same', 2), C.Dsus]], tRS + 0.2, 0.28, { cut: 1100, cutTo: 1800, lastRel: 0.15 });
-  fzPulse(ctx, M.bus, cap('slide', 2), tRS - 0.05, ['E1', 'E2', 'B2'], 0.5, 0.2, { cut: 450, cutTo: 1500, acc: 4, decay: 0.28, stepAt: (t) => 0.5 - 0.12 * MathX.clamp((t - cap('slide', 2)) / (tRS - cap('slide', 2)), 0, 1), ramp: (u) => 0.5 + 0.5 * u });
-  theme(cap('same', 2) + 0.5, [0.55, 0.55, 0.65], 0.32, { slide: 1.6 });                       // (Galileo)
+  M.prog([[t5, C.Em9], [cap('slide', 1) - 0.2, C.Cmaj7], [B('floor'), C.Am9], [cap('floor', 1), C.Bsus], [B('hill', 0.5), C.Em], [B('same', 0.5), C.Cmaj7], [cap('same', 1), C.G], [cap('same', 1) + 2.2, C.Dsus]], tRS + 0.2, 0.28, { cut: 1100, cutTo: 1800, lastRel: 0.15 });
+  fzPulse(ctx, M.bus, cap('slide', 1), tRS - 0.05, ['E1', 'E2', 'B2'], 0.5, 0.2, { cut: 450, cutTo: 1500, acc: 4, decay: 0.28, stepAt: (t) => 0.5 - 0.12 * MathX.clamp((t - cap('slide', 1)) / (tRS - cap('slide', 1)), 0, 1), ramp: (u) => 0.5 + 0.5 * u });
+  theme(cap('same', 1) + 0.5, [0.55, 0.55, 0.65], 0.32, { slide: 1.6 });                       // (Galileo)
   // real speed, from the start: a quick roll and the chord thrown open
   M.drum(tRS, 0.5, 41.2, 1.2); M.roll(tRS + 0.1, tF - 0.05, [[tRS + 0.1, 0.1], [tF - 0.2, 0.32]], 73.4);
   M.strings(tRS, tF + 0.1, C.Embig, 0.3, { att: 0.4, rel: 0.2, cut: 900, cutTo: 3000, cutAt: tF });
   // faster, every second: the pulse doubles; the bus; the phone
-  M.prog([[tF, C.Em9], [B('sofa'), C.Cmaj7], [B('bus'), C.Am9], [cap('bus', 2), C.Bsus], [B('phone2', 0.5), C.Cmaj7]], tWarn + 0.3, 0.3, { cut: 1300, cutTo: 2200 });
+  M.prog([[tF, C.Em9], [B('sofa'), C.Cmaj7], [B('bus'), C.Am9], [cap('bus', 1) + 2.0, C.Bsus], [B('phone2', 0.5), C.Cmaj7]], tWarn + 0.3, 0.3, { cut: 1300, cutTo: 2200 });
   fzPulse(ctx, M.bus, tF, tWarn - 0.02, ['E1', 'E2', 'B2'], 0.25, 0.2, { cut: 600, cutTo: 1800, acc: 4, decay: 0.3, ramp: (u) => 0.6 + 0.4 * u });
   M.drum(B('bus'), 0.32, 41.2, 1.4);
   // the warning and the count down: a heartbeat quickening, the strings rising, a roll; each quick cut on a low hit

@@ -10,9 +10,9 @@ status: voiceless
 
 [title] What if friction disappeared for 10 seconds?
 
-[gone] Friction just disappeared. / It comes back in 10 seconds. / Getting it back is the part that hurts.
+[gone] Friction just disappeared. / It's gone for 10 seconds. / Getting it back is the part that hurts.
 
-[nuance] Friction is electric: atoms on two surfaces, snagging on each other. / Switch that off completely, and you'd fall apart. / So only the snag goes. Things still push. Nothing can grip. / Above ground, anyway. Underground, every fault on Earth would slip. That's another video.
+[nuance] Friction is electric: atoms on two surfaces, snagging on each other. / The same force holds your atoms together. Switch all of it off, and you'd fall apart. / So only the snag goes. Things still push. Nothing can grip. / Underground, faults would slip everywhere. That's another video.
 
 [rewind] Here's that first second again. 10 times slower.
 
@@ -24,31 +24,31 @@ status: voiceless
 
 [feet] You reach for it. / Big mistake. / Standing still is fine. Move, and your feet shoot out.
 
-[grip] Grab the counter. / Your hand slides right off. / Don't grip. Hook. / Fingers over the oven door handle.
+[grip] Grab the counter. / Your hand slides right off. / Don't grip. Hook: fingers over the oven door handle.
 
-[catrun] The cat tries to run. / Every step slides out behind her. / She's running on the spot. Like a cartoon.
+[catrun] The cat tries to run. / She's running on the spot. Like a cartoon.
 
 [house] Same second. The rest of the house.
 
-[screws] A screw is a ramp, wrapped round a pin. / With no friction, anything hanging on it slides down the ramp. / So every screw holding weight starts to turn.
+[screws] A screw is a ramp, wrapped round a pin. / A tightened screw is being pulled along. With no friction, it unwinds.
 
 [cabinets] Your kitchen cabinets hang on 6 of them.
 
 [tv] The TV's wall plugs only hold by friction. / Nothing else.
 
-[cotton] The curtains are cotton. / Cotton thread is short fibres, twisted together. / Only friction holds them. Pull, and it comes apart.
+[cotton] The curtains are cotton: short fibres, twisted together. / Only friction holds them. Pull, and it comes apart.
 
-[clothes] So are most of your clothes. / Let's not look down.
+[clothes] Your clothes are cotton too. / Let's not look down.
 
-[sugar] The sugar pours like water. / A pile of anything only stands up because of friction.
+[sugar] The sugar pours like water. / A dry pile only stands up because of friction.
 
 [street] Same second. Outside.
 
-[brakes] The car was braking hard. / Its wheels are locked. It makes no difference. / Without friction, you can't brake or steer.
+[brakes] The car was braking hard. / Without friction, you can't brake or steer.
 
 [bike] Neither can the cyclist. / And a bike only stays up because you steer it.
 
-[laces] He was tying his shoelaces. / Every knot holds by friction. / They're untying themselves in his hands.
+[laces] Every knot holds by friction. / His shoelaces are untying themselves.
 
 [walk] Anyone walking goes down. / The dog runs on the spot too.
 
@@ -58,13 +58,13 @@ status: voiceless
 
 [sand] And the builders' sand… / …pours down the street like a river.
 
-[slide] That was the first second and a half. / Everything held up by friction has let go. / Now everything starts to slide.
+[slide] That was the first second and a half. / Now everything starts to slide.
 
-[floor] Your house is 120 years old. The floor slopes half a degree towards the street. / You'd never notice. / Until everything in the room starts to move.
+[floor] Your old floor slopes half a degree towards the street. You'd never notice… / …until everything in the room starts to move.
 
 [hill] Outside, the street slopes 8 %. / Every car on it was held by its tyres.
 
-[same] Cars, bins, people, sand: all sliding together, at almost exactly the same rate. / Just like everything falls at the same rate. / A slope is falling, slowed down. It's how Galileo measured falling.
+[same] Cars, bins, people, sand: all sliding at almost exactly the same rate. / Like falling. A slope is just falling, slowed down: it's how Galileo timed it.
 
 [realspeed] At real speed, from the start.
 
@@ -72,15 +72,15 @@ status: voiceless
 
 [sofa] Inside, the sofa reaches the window. / The rest of the room is right behind it.
 
-[bus] The bus was pulling out when it happened. / It's still turning. Even as it slides. / Further sideways every second.
+[bus] The bus was pulling out when it happened. / It's still turning as it slides: further sideways every second.
 
 [phone2] And your phone just left the house.
 
-[warn] Friction comes back in 3 seconds. / Everything still moving stops. All at once.
+[warn] Friction comes back in under 3 seconds. / Everything still moving stops. All at once.
 
 [back] Everything grips.
 
-[stop] Stopping from 28 km/h in a second or two. / Like being thrown off a bike.
+[stop] Stopping from over 20 km/h in a second or two. / Like being thrown off a bike.
 
 [bus2] The bus was sliding sideways. / Its tyres bite… / …and it goes over.
 
