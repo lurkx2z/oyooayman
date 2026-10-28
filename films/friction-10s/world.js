@@ -64,7 +64,7 @@ const FZ_HAND_POSES = {
   slap: { p: [0.14, -0.3, -0.44], F: [-0.3, -0.05, -1], N: [0.05, -1, -0.1], curl: [0.05, 0.06, 0.08, 0.1], thumb: [0.55, 0.1] },
   skid: { p: [0.16, -0.36, -0.42], F: [-0.15, -0.3, -1], N: [0.2, -0.95, 0.1], curl: [0.25, 0.3, 0.32, 0.38], thumb: [0.6, 0.2] },
   reachL: { p: [0.05, -0.24, -0.5], F: [0.5, 0.05, -0.85], N: [0.1, -0.95, 0.2], curl: [0.3, 0.3, 0.35, 0.4], thumb: [0.6, 0.2] },
-  hook: { p: [0.02, -0.2, -0.55], F: [0.79, -0.05, -0.61], N: [0.0, -1, 0.05], curl: [0.95, 1.0, 1.0, 0.95], thumb: [0.3, 0.55] },
+  hook: { p: [0.02, -0.2, -0.55], F: [0.79, -0.05, -0.61], N: [0.0, -1, 0.05], curl: [0.72, 0.76, 0.76, 0.72], thumb: [0.3, 0.55] },
 };
 const FZ_HAND_BLENDS = { phone: 0.3, open: 0.12, reachM: 0.22, flail: 0.1, flailL: 0.12, slap: 0.06, skid: 0.1, reachL: 0.18, hook: 0.2, hidden: 0.2 };
 const FZ_HANDS = {
@@ -74,7 +74,7 @@ const FZ_HANDS = {
 // where the hands go in the world (blended in over the posed position): the slap on the island's edge, skidding
 // along it; the hook over the oven handle
 const FZ_SLAP = { a: [-0.57, 0.942, -1.56], b: [-0.57, 0.942, -2.06], t: [0.7, 0.74, 0.98, 1.08] };
-const FZ_HOOK = { at: [-1.655, 0.825, -2.12], F: [-0.72, 0.25, -0.65], t: [1.42, 1.6] };
+const FZ_HOOK = { at: [-1.653, 0.823, -2.198], F: [-1, 0.12, -0.15], t: [1.42, 1.6] };
 // put a first-person hand in the world: its wrist at p, fingers along F, palm facing N (world vectors), blended in by w
 function fzHandTo(h, cam, p, F, N, w) {
   const Q = fzHandTo, v = Q.v || (Q.v = new THREE.Vector3()), y = Q.y || (Q.y = new THREE.Vector3()), z = Q.z || (Q.z = new THREE.Vector3()), x = Q.x || (Q.x = new THREE.Vector3());
@@ -151,7 +151,7 @@ FZ_SETS.world = (app) => {
         case 'fault': pos = fzV([-6, 16, -4], [-4, 17, -5], k); at = [10, -1, -17]; fov = 55; drift = 0.006; sh = { f: [8, 0, -16], R: 40 }; break;
         // ---- 2
         case 'replay': case 'reach': case 'slap': povCam(); break;
-        case 'hook': pos = fzV([-1.32, 0.98, -2.78], [-1.36, 0.95, -2.7], k); at = [-1.68, 0.8, -2.2]; fov = 30; drift = 0.0012; sh = { f: [-1.7, 0.8, -2.2], R: 2 }; break;
+        case 'hook': pos = fzV([-1.32, 0.98, -2.78], [-1.36, 0.95, -2.7], k); at = [-1.7, 0.81, -2.22]; fov = 30; drift = 0.0012; sh = { f: [-1.7, 0.8, -2.2], R: 2 }; break;
         case 'cat': pos = [-0.98, 1.04, -2.32]; at = fzV([0.45, 0.97, -1.86], [0.0, 0.95, -1.9], k); fov = 40; drift = 0.002; sh = { f: [0, 1, -1.9], R: 3 }; break;
         case 'mug': pos = [-1.68, 0.22, -2.75]; at = fzV([-0.75, 0.75, -1.95], [-1.0, 0.2, -2.05], u(shot.t0, shot.t0 + 3.2)); fov = 46; drift = 0.002; sh = { f: [-1, 0, -2], R: 3 }; break;
         case 'feet': pos = [-1.0, 0.48, -3.35]; at = [-1.12, fzLerp(0.95, 0.6, k), -1.5]; fov = 44; drift = 0.003; sh = { f: [-1.1, 0.5, -1.8], R: 3.5 }; break;
@@ -170,7 +170,7 @@ FZ_SETS.world = (app) => {
         case 'street': case 'slide': case 'realspeed': pos = fzV(P0(-46, 8.5, -14.6), P0(-44, 8.6, -14.8), k); at = P0(18, 0, -17.5); fov = 50; drift = 0.008; sh = { f: [0, 0, -16], R: 45 }; break;
         case 'brakes': { const cy = fzRoadY(car.x, car.z); pos = [car.x + 5.2, cy + 1.0, -14.6]; at = [car.x + 0.4, cy + 0.75, car.z]; fov = 46; drift = 0.004; sh = { f: [car.x, 0, car.z], R: 8 }; break; }
         case 'bike': { const by = fzRoadY(bike.x, bike.z); pos = [bike.x + 6.5, by + 0.55, -17.2]; at = [bike.x, by + 0.75, bike.z]; fov = 42; drift = 0.004; sh = { f: [bike.x, 0, bike.z], R: 7 }; break; }
-        case 'laces': { C.lace.j.ll.ft.getWorldPosition(_v); pos = [_v.x + 0.3, _v.y + 0.2, _v.z + 0.36]; at = [_v.x, _v.y + 0.0, _v.z + 0.06]; fov = 30; drift = 0.0015; sh = { f: _v.toArray(), R: 2.5 }; break; }
+        case 'laces': { const ft = C.lace.j.ll.ft; ft.updateWorldMatrix(true, false); ft.localToWorld(_v.set(0, 0.054, 0.045)); pos = [_v.x + 0.2, _v.y + 0.1, _v.z + 0.42]; at = [_v.x, _v.y - 0.015, _v.z + 0.01]; fov = 32; drift = 0.0015; sh = { f: at, R: 2.5 }; break; }
         case 'walk': { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, s); pos = P0(fzLerp(-3.4, -2.9, k), 1.0, -10.1); at = P0(w.x - 0.2, 0.75, -10.4); fov = 46; drift = 0.004; sh = { f: [w.x, 0, -10.4], R: 7 }; break; }
         case 'ladder': pos = P0(-14.5, 1.6, -22.6); at = P0(-8.6, 2.0, -24.7); fov = 46; drift = 0.004; sh = { f: [-8.8, 1, -24], R: 7 }; break;
         case 'scaffold': pos = P0(3.2, 1.65, -11.2); at = P0(7.5, 2.8, -24.3); fov = 52; drift = 0.004; sh = { f: [7.5, 2, -23], R: 12 }; break;
@@ -180,25 +180,25 @@ FZ_SETS.world = (app) => {
         case 'hill': pos = P0(-4, 1.5, -23.4); at = P0(4, 0.6, -12.7); fov = 52; drift = 0.004; sh = { f: [2, 0, -14], R: 14 }; break;
         case 'same': { const x = fzHalf(FZP.aHill, Math.max(0, s)); pos = P0(x - 2.0, 1.65, -10.7); at = P0(x + 12, 0.4, -16.5); fov = 56; sh = { f: [x + 8, 0, -16], R: 16 }; break; }
         case 'faster': pos = P0(30, 0.5, -11.3); at = P0(10, 0.9, -13.0); fov = 46; drift = 0.004; sh = { f: [18, 0, -14], R: 16 }; break;
-        case 'sofa': pos = [0.75, 1.25, -7.55]; at = [-1.55, 0.55, -6.2]; fov = 50; drift = 0.003; sh = { f: [-1.2, 0.5, -6.8], R: 4 }; break;
+        case 'sofa': pos = [0.45, 1.35, -4.5]; at = [-1.3, 0.6, -7.5]; fov = 52; drift = 0.003; sh = { f: [-1.2, 0.5, -6.8], R: 4 }; break;
         case 'bus': { const b = fzBusAt(6.2); pos = P0(b.x + 16, 4.2, -10.4); at = [b.x - 1, fzRoadY(b.x, b.z) + 1.4, b.z]; fov = 46; drift = 0.005; sh = { f: [b.x, 0, b.z], R: 16 }; break; }
-        case 'phone2': pos = [0.75, -0.18, -9.45]; at = [0.25, -0.02, -8.2]; fov = 40; drift = 0.002; sh = { f: [0.25, 0, -8.6], R: 3 }; break;
-        case 'warn': pos = fzV(P0(8, 15, -4.5), P0(10, 15.5, -5), k); at = P0(26, -1, -17); fov = 52; drift = 0.006; sh = { f: [24, 0, -16], R: 40 }; break;
+        case 'phone2': { const px = fzPhone(6.77).x; pos = [px + 0.1, 0.07, -7.2]; at = [px - 0.02, -0.3, -10.6]; fov = 42; drift = 0.002; sh = { f: [px, 0, -8.6], R: 4 }; break; }
+        case 'warn': pos = fzV(P0(6, 12.5, -12.2), P0(8, 12.8, -12.5), k); at = P0(30, -1, -17.5); fov = 52; drift = 0.006; sh = { f: [24, 0, -16], R: 40 }; break;
         case 'warn2': pos = [1.3, 2.05, -0.7]; at = [-0.5, 0.45, -6.2]; fov = 64; drift = 0.003; sh = { f: [0, 0.5, -4], R: 6 }; break;
         case 'count': {
           const n = FZ.countCuts.filter((c) => t >= c).length; this._sub = n;
-          if (n === 0) { pos = P0(22, 0.45, -11.2); at = P0(4, 0.8, -15); fov = 48; sh = { f: [14, 0, -15], R: 14 }; }
+          if (n === 0) { const X = fzHalf(FZP.aHill, s); pos = P0(X - 4, 2.2, -16.8); at = P0(X + 12, 0.8, -15.5); fov = 50; sh = { f: [X + 8, 0, -16], R: 16 }; }
           else if (n === 1) { pos = [cat.x + 0.6, 0.22, cat.z - 0.9]; at = [cat.x, 0.18, cat.z]; fov = 40; sh = { f: [cat.x, 0, cat.z], R: 3 }; }
-          else if (n === 2) { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, s); pos = P0(w.x + 5, 0.7, -11.0); at = P0(w.x, 0.5, -10.4); fov = 40; sh = { f: [w.x, 0, -10.4], R: 6 }; }
-          else if (n === 3) { pos = P0(bus.x + 14, 1.2, -12.2); at = [bus.x, fzRoadY(bus.x, bus.z) + 1.6, bus.z]; fov = 44; sh = { f: [bus.x, 0, bus.z], R: 14 }; }
+          else if (n === 2) { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, s); pos = P0(w.x + 2.6, 0.9, -9.9); at = P0(w.x, 0.5, -10.6); fov = 44; sh = { f: [w.x, 0, -10.4], R: 6 }; }
+          else if (n === 3) { pos = P0(bus.x + 12, 2.6, -13.6); at = [bus.x, fzRoadY(bus.x, bus.z) + 1.6, bus.z]; fov = 44; sh = { f: [bus.x, 0, bus.z], R: 14 }; }
           else if (n === 4) { const p = fzPhone(s); pos = [p.x + 0.6, p.y + 0.3, p.z + 0.35]; at = [p.x, p.y, p.z]; fov = 38; sh = { f: [p.x, p.y, p.z], R: 3 }; }
           else if (n === 5) { pos = [-0.4, 1.0, -2.75]; at = [-1.3, 0.65, -1.85]; fov = 44; sh = { f: [-1, 0.5, -2], R: 4 }; }
-          else if (n === 6) { pos = P0(36, 0.25, -12.0); at = P0(26, 1.2, -13); fov = 40; sh = { f: [30, 0, -14], R: 12 }; }
-          else { pos = P0(40, 11, -6); at = P0(70, -1, -18); fov = 52; sh = { f: [60, 0, -16], R: 40 }; }
+          else if (n === 6) { const X = fzHalf(FZP.aHill, s); pos = P0(X + 3, 1.4, -10.0); at = P0(X + 12, 0.7, -11.8); fov = 50; sh = { f: [X + 9, 0, -12], R: 12 }; }
+          else { pos = P0(42, 10.5, -13); at = P0(70, -1, -18); fov = 52; sh = { f: [60, 0, -16], R: 40 }; }
           drift = 0.004; break; }
-        case 'back': pos = fzV(P0(40, 10.5, -6), P0(41, 10.4, -6.3), k); at = P0(68, -0.5, -18); fov = 52; drift = 0.006; sh = { f: [62, 0, -16], R: 42 }; break;
-        case 'stop': { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, 10); pos = P0(w.x + 7, 0.6, -11.1); at = P0(w.x - 0.5, 0.6, -10.9); fov = 46; drift = 0.004; sh = { f: [w.x, 0, -11], R: 10 }; break; }
-        case 'bus2': { const b = fzBusAt(10.6); pos = P0(b.x + 13, 0.45, -12.0); at = [b.x - 1.5, fzRoadY(b.x, b.z) + 1.8, b.z]; fov = 42; drift = 0.004; sh = { f: [b.x, 0, b.z], R: 14 }; break; }
+        case 'back': pos = fzV(P0(42, 10.5, -13), P0(43, 10.4, -13.2), k); at = P0(70, -0.5, -18); fov = 52; drift = 0.006; sh = { f: [62, 0, -16], R: 42 }; break;
+        case 'stop': { const w = fzPerson(FZ_WALKER.x0, FZ_WALKER.v0, 10); pos = P0(w.x + 6, 0.8, -9.95); at = P0(w.x - 0.5, 0.5, -10.7); fov = 46; drift = 0.004; sh = { f: [w.x, 0, -11], R: 10 }; break; }
+        case 'bus2': { const b = fzBusAt(10.6); pos = P0(b.x - 24, 3.2, -13.8); at = [bus.x + 2, fzRoadY(bus.x, bus.z) + 1.4, bus.z]; fov = 42; drift = 0.004; sh = { f: [b.x, 0, b.z], R: 14 }; break; }
         case 'cat2': pos = [-0.55, 0.42, -7.45]; at = [-1.62, 0.45, -5.8]; fov = 44; drift = 0.002; sh = { f: [-1.6, 0.4, -6.2], R: 3 }; break;
         case 'after': pos = fzV([0.4, 1.45, -8.95], [0.6, 1.45, -9.2], k); at = P0(26, -0.3, -17.5); fov = 56; drift = 0.004; sh = { f: [20, 0, -16], R: 40 }; break;
         case 'phone3': { const p = fzPhone(s); pos = [p.x + 0.04, p.y + fzLerp(0.62, 0.48, k), p.z + 0.12]; at = [p.x, p.y, p.z]; fov = 40; drift = 0.0012; sh = { f: [p.x, p.y, p.z], R: 2 }; break; }
@@ -294,7 +294,7 @@ function fzPhoneScreen(H, on) {
 // labels pinned in the scene: [{ p, text, sub, a, side }]
 function fzLabels(set, t) {
   const shot = fzShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s;
-  if (m === 'hook') out.push({ p: [-1.74, 0.8, -2.5], text: 'THE OVEN DOOR HANDLE', a: W(t, fzCap('grip', 3).show + 0.1, shot.t1 - 0.2, 0.3, 0.2), side: 'r' });
+  if (m === 'hook') out.push({ p: [-1.74, 0.8, -2.36], text: 'THE OVEN DOOR HANDLE', a: W(t, fzCap('grip', 3).show + 0.1, shot.t1 - 0.2, 0.3, 0.2), side: 'r' });
   if (m === 'floor2') out.push({ p: [-0.3, 0.05, -6.8], text: 'THE FLOOR', sub: 'SLOPES 0.5° TOWARDS THE STREET', a: W(t, fzCap('floor', 0).show + 0.6, fzCap('floor', 2).show - 0.2, 0.3, 0.3) });
   if (m === 'hill') { const c = FZ_PARKED.find((q) => q.id === 'S3'), r = fzParked(c, s); out.push({ p: [r.x - 1.3, fzRoadY(r.x - 1.3, c.z) + 0.3, c.z + 0.9], text: 'HELD BY ITS TYRES', sub: 'UNTIL NOW', a: W(t, fzCap('hill', 1).show + 0.2, shot.t1 - 0.2, 0.3, 0.2) }); }
   if (m === 'bus') { const b = fzBusAt(s); out.push({ p: [b.x, fzRoadY(b.x, b.z) + 4.6, b.z], text: 'THE BUS', sub: 'TURNED ' + Math.round((b.yaw - FZ_BUS.yaw0) * 57.3) + '° SINCE 8:14:07', a: W(t, fzCap('bus', 1).show + 0.2, shot.t1 - 0.2, 0.3, 0.2) }); }
@@ -307,7 +307,7 @@ function fzLabels(set, t) {
 // u 0 → 0.55 the loops are pulled through the knot (the tails grow); 0.55 → 1 the knot opens and the ends fall away
 function fzLaceBow(foot) {
   const g = new THREE.Group(); foot.add(g);
-  const mat = fzStd('#f2efe8', 0.8), K = [0, 0.017, 0.07], tubes = [];
+  const mat = fzStd('#f4f1ea', 0.8), K = [0, 0.054, 0.045], tubes = [];
   for (let i = 0; i < 4; i++) { const m = new THREE.Mesh(new THREE.BufferGeometry(), mat); m.castShadow = true; g.add(m); tubes.push(m); }
   let last = -1;
   const V = (a) => new THREE.Vector3(a[0], a[1], a[2]);
@@ -321,7 +321,7 @@ function fzLaceBow(foot) {
         const sd = i % 2 ? 1 : -1, loop = i < 2;
         let pts;
         if (loop) {
-          const r = 0.032 * L + 0.002;
+          const r = 0.038 * L + 0.002;
           pts = [K, [sd * r * 0.45, K[1] + 0.012 * L, K[2] + 0.012 * L], [sd * r, K[1] + 0.008 * L, K[2] + 0.004], [sd * r * 0.6, K[1] + 0.002, K[2] - 0.012 * L], [sd * 0.002, K[1], K[2] - 0.002]];
           if (L < 0.03) { tubes[i].visible = false; continue; }
         } else {
@@ -330,7 +330,7 @@ function fzLaceBow(foot) {
           pts = [[kx, K[1], K[2] - 0.002], [kx + sd * 0.01, K[1] + 0.002 - 0.01 * drop, K[2] + 0.01], [(kx + end[0]) / 2 + sd * 0.006, (K[1] + end[1]) / 2 + 0.004 * (1 - drop), (K[2] + end[2]) / 2], end];
         }
         tubes[i].visible = true;
-        const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(V)), 18, 0.0021, 6, false);
+        const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(V)), 18, 0.0028, 6, false);
         tubes[i].geometry.dispose(); tubes[i].geometry = geo;
       }
     },

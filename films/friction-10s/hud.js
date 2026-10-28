@@ -109,7 +109,7 @@ class FzHud {
       _p.set(l.p[0], l.p[1], l.p[2]).project(cam);
       const vis = _p.z < 1 && Math.abs(_p.x) < 1.1 && Math.abs(_p.y) < 1.1;
       d.style.opacity = vis ? String(l.a ?? 1) : '0';
-      const lx = (_p.x * 0.5 + 0.5) * 100, ly = (-_p.y * 0.5 + 0.5) * 100;
+      const lx = MathX.clamp((_p.x * 0.5 + 0.5) * 100, 3, 97), ly = (-_p.y * 0.5 + 0.5) * 100;
       let right = l.side ? l.side === 'r' : lx > 62;
       const wPct = vis && this.root.clientWidth ? 100 * (d._w || 0) / this.root.clientWidth : 0;
       if (right && lx - wPct < 1.5) right = false; else if (!right && lx + wPct > 98.5) right = true;

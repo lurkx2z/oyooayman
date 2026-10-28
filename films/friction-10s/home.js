@@ -500,25 +500,27 @@ function fzBuildHome(S) {
 // ---------------------------------------------------------------------------------------------------------------------
 // HOME · UPDATE (story time s)
 // ---------------------------------------------------------------------------------------------------------------------
-// the wall cabinets: screws out by 0.1 s; the cabinet tips off the wall and drops onto the worktop (0.1 → 0.42);
-// rolls back against the wall as its foot slides out (0.42 → 0.95): it ends lying on its back on the worktop, doors
-// flung open; then slides along the worktop with the floor's slope until it reaches the larder
+// the wall cabinets: screws out by 0.1 s; the cabinet drops onto the worktop (0.1 → 0.42), its foot already kicked a
+// little out from the wall; then, like a ladder with nothing to grip, its foot skates out across the worktop while its
+// top slides down the wall (0.42 → 0.95): it ends lying on its back on the worktop (front up, doors flung open, 10 cm
+// over the edge), then slides along the worktop with the floor's slope until it reaches the larder. Its origin is the
+// bottom-back edge; rz > 0 tips the top towards the wall, so with the top touching the wall the foot is h·sin(rz) out
 const FZ_CABT = { out: 0.1, land: 0.42, flat: 0.95 };
 function fzScrewOut(s) { const t = MathX.clamp(s, 0, FZ_CABT.out); return 0.04 * (t / FZ_CABT.out) ** 2; }   // m backed out
 function fzCabPose(i, s) {
-  const T = FZ_CABT, h = FZ_H.cabY[1] - FZ_H.cabY[0], drop = FZ_H.cabY[0] - FZ_H.top;
+  const T = FZ_CABT, h = FZ_H.cabY[1] - FZ_H.cabY[0], drop = FZ_H.cabY[0] - FZ_H.top, r0 = 0.1;
   if (s <= 0) return { x: 0, y: 0, rz: 0, dz: 0, open: 0 };
-  if (s < T.out) { const u = s / T.out; return { x: 0.01 * u * u, y: -0.004 * u, rz: -0.06 * u * u, dz: 0, open: 0 }; }
-  if (s < T.land) { const t = s - T.out, y = -Math.min(drop, 0.5 * FZP.g * t * t), u = t / (T.land - T.out); return { x: 0.01 + 0.07 * u, y, rz: -0.06 - 0.2 * u, dz: 0, open: 0.15 * u }; }
-  const b = s - T.land, bounce = Math.exp(-b * 14) * Math.sin(b * 34) * 0.012;
-  const u = MathX.clamp((s - T.land) / (T.flat - T.land), 0, 1), e = u * u * (3 - 2 * u);
-  // (lying on its back: rotated −90° about z round its back-bottom edge, which slides out from the wall)
-  const rz = -0.26 - (Math.PI / 2 - 0.26) * e, x = 0.08 + h * Math.sin(Math.PI / 2 * e) * 0.0 + 0.0 * e;
-  const tz = Math.max(0, s - T.flat), cab = FZ_H.cab[i], L = cab[0] - cab[1];
+  if (s < T.out) { const u = s / T.out; return { x: 0, y: -0.004 * u, rz: 0, dz: 0, open: 0 }; }
+  if (s < T.land) { const t = s - T.out, y = -Math.min(drop, 0.5 * FZP.g * t * t), u = t / (T.land - T.out), rz = r0 * u * u;
+    return { x: h * Math.sin(rz), y, rz, dz: 0, open: 0.12 * u }; }
+  const b = s - T.land, bounce = Math.exp(-b * 14) * Math.abs(Math.sin(b * 34)) * 0.012 * (b > T.flat - T.land ? 1 : 0.3);
+  const u = MathX.clamp((s - T.land) / (T.flat - T.land), 0, 1), e = u * u;
+  const rz = r0 + (Math.PI / 2 - r0) * e;
+  const tz = Math.max(0, s - T.flat), cab = FZ_H.cab[i];
   // (slides along the worktop towards the front; cabinet B stops at the larder, A against B)
-  const stopB = FZ_H.larder[0] - cab[1], stopA = (FZ_H.cab[0][1] - FZ_H.cab[1][1] - (FZ_H.cab[1][0] - FZ_H.cab[1][1])) * 0 + stopB;
+  const stopB = FZ_H.larder[0] - cab[1], stopA = stopB;
   const dz = -Math.min(i === 1 ? stopB : stopA, fzHalf(FZP.aFloor, Math.min(tz, FZP.tBack - T.flat)));
-  return { x, y: -drop + bounce, rz, dz, open: Math.min(1, 0.15 + 1.4 * u), lying: e };
+  return { x: h * Math.sin(rz), y: -drop + bounce, rz, dz, open: Math.min(1, 0.12 + 1.3 * u), lying: e };
 }
 // the TV: plugs out 0 → 0.12; drops onto the sideboard (0.12 → 0.4); tips over its front edge onto the floor (0.4 → 0.86)
 function fzTvPose(s) {

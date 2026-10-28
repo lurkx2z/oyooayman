@@ -10,7 +10,7 @@
 Object.assign(LOOKS, {
   fzYou: { skin: 1, build: 'avg', shirt: '#55687c', sleeves: 'long', pants: '#2c3a52', shoes: '#d9d4c8', sole: '#cfc9bc', hair: '#3a2a1e' },
   fzWalker: { skin: 3, build: 'slim', shirt: '#c25a46', sleeves: 'short', pants: '#2e3a52', shoes: '#e8e4dc', sole: '#f0ede6', hair: '#1a120c', hairStyle: 'pony' },
-  fzLace: { skin: 0, build: 'avg', shirt: '#3e5a46', sleeves: 'short', pants: '#4a4640', shoes: '#e2ddd2', sole: '#2a2a2a', hair: '#6a4a2a', hat: { type: 'cap', color: '#1f2a3a' }, backpack: '#2a2c30' },
+  fzLace: { skin: 0, build: 'avg', shirt: '#3e5a46', sleeves: 'short', pants: '#4a4640', shoes: '#33405a', sole: '#e8e4dc', hair: '#6a4a2a', hat: { type: 'cap', color: '#1f2a3a' }, backpack: '#2a2c30' },
   fzCleaner: { skin: 2, build: 'broad', shirt: '#2f3a48', sleeves: 'long', pants: '#3a3f46', shoes: '#4a3a2c', sole: '#22201c', hair: '#2a1e14', vest: '#d8a02e' },
   fzRider: { skin: 4, build: 'slim', shirt: '#2a2c30', sleeves: 'short', pants: '#1d2a3a', shoes: '#111', hair: '#111', hat: { type: 'helmet', color: '#e8e4dc' }, backpack: '#c9a23a' },
 });
