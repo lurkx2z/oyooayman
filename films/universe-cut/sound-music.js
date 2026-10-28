@@ -4,7 +4,7 @@
      the theme        E–B–A–F♯, then the E an octave up: whole over the title and the question; CUT (its last note
                       stopped dead) wherever something is cut in half
      10:00:00         the score's upper half stops dead with the sky; only the low half plays on
-     the countdown    from "It reaches you at 10:03:42" a pulse counts down to the shock: a heartbeat at first, a synth
+     the countdown    from "It reaches you at 10:03:49" a pulse counts down to the shock: a heartbeat at first, a synth
                       pulse over Europe, sparse under the quiet minutes, then quicker and quicker; twelve last seconds
      the shock        one blow, then nothing: black, silence
      after            grave and slow from space; the theme played slowly for the Moon leaving; warm for the real part
@@ -190,7 +190,7 @@ hvSound('music', 'score', function (ctx, bus, K) {
   heart(cap('shock', 1), HV.calls + 0.4, 1.25, 0.32);
   M.bell(cap('shock', 2) + 1.2, 'B5', 0.2, -0.2);
 
-  // ---- 5 · the countdown (10:01:25 → 10:03:42.5): heartbeat, pulse, quiet, quicker
+  // ---- 5 · the countdown (10:01:25 → 10:03:49): heartbeat, pulse, quiet, quicker
   // the phone, next door's TV: sparse, the heartbeat going on under them
   M.strings(HV.calls, HV.front + 0.3, ['E2', 'B2', 'D3', 'G3'], 0.22, { att: 1.5, rel: 0.8, cut: 700 });
   heart(HV.calls + 0.4, HV.front, 1.2, (t) => 0.22 + 0.04 * Math.sin(t));
@@ -221,7 +221,7 @@ hvSound('music', 'score', function (ctx, bus, K) {
   M.strings(HV.count2, HV.hit + 0.01, ['B1', 'F#2', 'E3', 'F#3', 'B3', 'C4'], 0.34, { att: 3.0, rel: 0.01, cut: 600, cutTo: 4200, cutAt: HV.hit, keys: [[HV.count2 + 4, 0.6], [HV.hit - 0.2, 1.4]] });
   M.roll(HV.hit - 3.2, HV.hit - 0.04, [[HV.hit - 3.2, 0.08], [HV.hit - 0.1, 0.55]], 61.7);
   HV.countCuts.forEach((c, i) => M.drum(c, 0.16 + 0.05 * i, 49.0, 0.7));                 // (each quick cut lands on a low hit)
-  // ---- the shock (10:03:42.5): one blow; then nothing
+  // ---- the shock (10:03:49): one blow; then nothing
   M.drum(HV.hit, 1.0, 30.9, 1.0, 1.6); M.piano(HV.hit, 'E1', 0.55, 0.9, 0, 0.3); M.piano(HV.hit, 'B0', 0.4, 0.9, 0, 0.3);
 
   // ---- 6 · after, from space: grave and slow; the Moon leaving (the theme, slowly, low); half the sky, forever

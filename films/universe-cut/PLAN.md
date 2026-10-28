@@ -1,6 +1,6 @@
 # What if the universe got cut in half?
 
-Voiceless 16:9 long-form (1920×1080, 30 fps, 5:57), the Slower light formula: one ordinary night, one rule, told by
+Voiceless 16:9 long-form (1920×1080, 30 fps, 5:59), the Slower light formula: one ordinary night, one rule, told by
 captions, a readout, a clock, a few honest illustrations and the sound. Page: `universe-cut.html`.
 Captions: `CAPTIONS.md` → `node build-timing.cjs` → `timing.js`. Every number on screen: `physics.js` and `calc/` (§ 2).
 
@@ -11,7 +11,7 @@ matter, light in flight, everything. What is left behaves normally. Tagged THOUG
 
 "The universe" can only mean the part we can see: it has no known edge or centre, but the **observable** universe is a
 ball 93 billion light-years across centred on us. A cut that halves that ball has to pass through its centre, so it
-goes **through the centre of the Earth** (within a few metres: the ball is centred on the observer). That leaves one
+goes **through the Earth** (through its centre, as near as makes no difference: the ball is centred on the observer). That leaves one
 free choice, the cut's tilt. The film makes it pass through the centre of the Moon (where the real Moon is tonight) and
 picks, of the two such cuts that put your garden 20° from it, the one that keeps the Sun. So:
 
@@ -25,54 +25,59 @@ picks, of the two such cuts that put your garden 20° from it, the one that keep
 | when (story time) | what | how |
 |---|---|---|
 | 10:00:00 | the cut. Half the Earth, half the Moon, half the sky, gone | the rule |
-| 10:00:00 + 7.3 ms / sin β | each star beyond the line goes out when the last of its light that was already on this side reaches you (the stretch from where the line of sight crosses the cut: 2,197 km / sin β). The dark half appears at once and creeps the last fraction of a degree up to the line. 1,843 of the 2,784 stars brighter than magnitude 6 in your sky stay | hvStarGone |
+| 10:00:00 + 7.3 ms / sin β | each star beyond the line goes out when the last of its light that was already on this side reaches you (the stretch from where the line of sight crosses the cut: 2,197 km / sin β). The dark half appears at once and creeps the last fraction of a degree up to the line; most stars go within 0.04 s (about 17 % take longer, so the HUD says MOST). About 1,840 of the 2,800 stars brighter than magnitude 6 in the film's sky stay (a synthetic star field, so the HUD rounds); above the garden about 40 % of the sky goes black, which the captions call "more than a third" | hvStarGone |
 | 10:00:00.015 | Saturn goes out (it was at az 177°, alt 40° in the south; β = 29°); Neptune 0.015 s, Uranus 0.05 s | HV_PLANETS |
 | 10:00:00.67 → 1.20 | the Moon (364,424 km, on the line in your sky, az 92° alt 36°): its far half wipes away from the far limb (each point's last light: the part of its path on this side of the cut). Shown slowed down 8× | hvMoonPoint |
-| 10:00:00 | gravity at the garden becomes the half-Earth's: 6.78 m/s², tilted 13.1° towards azimuth 346° (NNW) (PREM densities, calc/grav.py). You, the ground, the air and the sea all fall together in it, so at first you feel nothing at all | HVP.g1 |
-| 10:00 → 10:03:42 | your **felt** weight drifts towards the new pull as the rock's stresses change (tidal strain across the half-Earth and its new free surface): k = 0.3 (s / 222.5)². 93.6 % and "down" tipped 1.9° at 10:03:00; 92.1 % and 2.4° at 10:03:20; 90.3 % and 3.0° at the shock. **An estimate**: the full change needs the shock to arrive; 0.3 is a guess for how far it has gone. Tagged on screen | hvFelt |
+| 10:00:00 | gravity at the garden becomes the half-Earth's: 6.78 m/s², tilted 13.1° towards azimuth 346° (NNW) (PREM densities, calc/grav.py). It changes for you, the ground, the air and the sea at once and by the same amount (all of it now lurches up, away from the cut, at 3.5 m/s²), so at first nothing pushes on you any differently: you feel nothing at all | HVP.g1 |
+| 10:00 → 10:03:49 | your **felt** weight before the shock. Nothing can make you lighter until the face's wave arrives; until then the rock only feels the *uneven* part of the change. The lost half pulled deep rock harder than surface rock (3.20 m/s² up and 1.51 NNW at the surface, 3.78 and 2.23 at 1,000 km down), so the deep rock now shoves up and NNW harder than the ground you stand on: you get slightly **heavier**, and "down" tips **towards the cut (SSE, azimuth 166°)**. An elastic estimate (≈ 2c·T·t, tidal gradient T ≈ 9 × 10⁻⁷ s⁻²) gives +3–6 % and 3–5° by the shock; the film uses +4.5 % and 4.2°, growing in step with time (103.5 % and 3.3° at 10:03:00, 104.5 % at the shock). **The size is an estimate (tagged on screen); the sign is solid.** The drop to 69 % comes only after the shock | hvFelt |
 | 10:00:00 | all TV satellites over Europe (Astra 28.2° E and 19.2° E, Hot Bird 13° E, Eutelsat 9° E, Intelsat 1° W) are 21,000–23,000 km on the far side; calls to the other half stop | calc/more.py |
+| from 10:01 | the same uneven change stretches the rock by T·t²/2: 10⁻³ (about 50 MPa) by 10:01, about 2 % by the shock. Rock breaks, so small quakes start about a minute in and grow (the tea shivers at 10:02:26; the ground trembles and car alarms go off from 10:03:28). How strong they are is a guess (tagged) | hvTremor |
+| 10:03 | the air presses down with the felt weight: +4 % is about +39 hPa in 3 minutes, like a lift going down 330 m: your ears pop | hud.js |
 | 10:00:00 | the cut face: still at the temperature and pressure it had inside: 5,400 °C at the centre, 3.6 million atmospheres, now with nothing holding it in. It bursts out at up to about 5 km/s (an expansion estimate); escape from the face's centre needs 10.6 km/s, so almost none of it escapes | hvTempC, calc/energy.py |
-| from 10:00:00 | the news that the other half is gone travels through the rock as a shock: first P arrivals on PREM P speeds (5.8–13.7 km/s, "about 10 km every second"), 2-D first-arrival times (calc/travel.py): Athens 60 s, Algiers 68 s, Rome 120 s, Madrid 131 s, Paris 198 s (10:03:18), Berlin 219 s, **London 222.5 s (10:03:42.5)**, Moscow 246 s, New York 346 s (10:05:46), Tokyo 372 s (10:06:12) | HV_ARR |
-| 10:02 | the compass: half of the core's currents (the geodynamo) are gone, so the field at the surface changes at once | |
-| 10:02:58 → | car alarms: their tilt sensors (made to catch a car being jacked up) feel "down" move by about 2°. The threshold is a guess (1–2°) | sound-amb.js |
-| 10:03 | the bird bath's water lies square to the felt pull: a 2–3° tilt raises it 1.3–2 cm on the NNW side of the 0.8 m bowl, above the old scum line; the feeder hangs 2–3° off the true vertical | hvFelt |
-| 10:03:42.5 | the shock reaches the garden | HVP.tHit |
-| first hour | the half-Earth falls in on itself: gravitational energy released 4.8 × 10³⁰ J (1.6 MJ per kg, on top of an interior already near melting): most of it melts and the oceans boil. A ball again, radius ∛½ = 0.794 R ("four-fifths as wide"), centred on the half's centre of mass, 2,152 km (0.34 R) from the old centre (PREM; 3R/8 for a uniform half) | calc/energy.py |
+| from 10:00:00 | the news that the other half is gone travels through the rock as a shock: first P arrivals on PREM P speeds (5.8–13.7 km/s, "about 10 km every second"), by ray theory through PREM (calc/rays.py; it replaces calc/travel.py, whose minimum over a ±30 km box made every time 5–7 s early): Rome 127 s (10:02:07), Madrid 138 s (10:02:18), **Paris 204.4 s (10:03:24)**, **London 229.1 s (10:03:49)**, New York 351 s (10:05:51), Tokyo 377 s (10:06:17). "Twelve seconds" at 10:03:37 | HV_ARR |
+| (not in the film) | the compass: half the geodynamo is gone, but the conducting lower mantle holds the old field at the surface for weeks to months (the "mantle filter"), so tonight the compass would not change. The beat was cut | |
+| 10:03:28 → | car alarms: set off by the tremors (their tilt sensors filter out slow drift, so the slow tilt alone would not do it) | sound-amb.js |
+| 10:03 | the bird bath's water lies square to the felt pull: a 3–4° tilt raises it 2–2.7 cm on the SSE side of the bowl, above the old scum line ("The bowl hasn't tilted. 'Down' has."); the feeder hangs off the true vertical, towards the cut | hvFelt |
+| 10:03:49 | the shock reaches the garden | HVP.tHit |
+| an hour or two | the half-Earth falls in on itself (it sloshes with a period of about 1.5 h): gravitational energy released 4.8 × 10³⁰ J (1.6 MJ per kg, on top of an interior already near melting): most of it melts and the oceans boil. A ball again, radius ∛½ = 0.794 R at the same density (a half-mass body is less squeezed, ~0.83 R: "about four-fifths as wide"), centred on the half's centre of mass, 2,152 km (0.34 R) from the old centre (PREM; 3R/8 for a uniform half) | calc/energy.py |
 | | the half-Moon pulls itself into a ball too. Its speed relative to the new Earth: 1,079 m/s orbital (it is near perigee tonight) plus the new Earth's own 86 m/s → 1,144 m/s; escape speed from half an Earth at 364,424 km: 1,052 m/s. It drifts away for good (calc/moonorb.py) | |
 | days | the new Earth's path round the Sun: a planet's orbit doesn't depend on its mass, only on its speed; the kept half carries the speed its part of the spin gave it, ω × r_cm = 86 m/s, on top of 29.97 km/s. Semi-major axis 0.99939 → 0.99396 AU: the year about 3 days shorter (calc/orbit.py). The blow-out stays bound, so it adds no rocket push | |
-| forever | the void beyond the cut never sends light again: half the sky stays black | |
+| forever | the void beyond the cut never sends starlight again: half the sky stays black (the Sun and the planets do cross into the black half for part of each year, so the caption says "no starlight") | |
 
 Real section: the observable universe is a ball 93 billion light-years across centred on us (but the universe has no
-centre); free fall is why astronauts float; earthquake waves travel through rock at 5–13 km/s, and the S-wave shadow is
-how we know the outer core is liquid; nothing known could make half the universe disappear.
+centre); free fall is why astronauts float; earthquake waves travel through rock at up to 13 km/s, and the S-wave
+shadow is how we know the Earth's outer core is liquid; nothing known could make half the universe disappear.
 
-Honest limits and drawn-for-the-eye: the felt-weight curve and the alarm threshold are estimates (said so on screen
-for the weight); the blow-out, the shock's ring, the air off the edge, the collapse and the Moon leaving are
+Honest limits and drawn-for-the-eye: the felt-weight curve and the tremors are estimates (both tagged on screen); the
+cut face is drawn with a cooler colour scale than its true glow so its layers read (the real face would glow white at
+the core); the telescope's glow on the Moon's edge is drawn wider than the thin thread it would be; the blow-out, the shock's ring, the air off the edge, the collapse and the Moon leaving are
 illustrations (tagged), the Moon-leaving shot NOT TO SCALE; the space shots keep the Sun fixed over the Earth (they do
 not turn the planet through the time-lapses); the Moon is drawn 3.6× its size in the wide night shots (a long-lens
-look; true size through the lens and the telescope); the orbit shot's Sun has a glare drawn round it; the car alarms'
+look; true size through the lens and the telescope); the orbit shot's Sun has a glare drawn round it and its path ahead dotted in; the Sun shot is NOT TO SCALE; the car alarms'
 hazard lights are hidden behind the back wall and seen as amber flashes on the terrace beyond it.
 
 ## 3. Story time
 
-script.js maps film time to story time (hvStoryAt): the cold open at 10:03:31 (it ends as the shock arrives), the
-title over the night before, then **real time from 9:59:40 to the shock at 10:03:42.5** (every event at its true
+script.js maps film time to story time (hvStoryAt): the cold open at 10:03:38 (it ends as the shock arrives), the
+title over the night before, then **real time from 9:59:40 to the shock at 10:03:49** (every event at its true
 second; the Moon's slowed-down replay and the space shots are cutaways inside it, the story clock running behind them;
-build-timing.cjs pins lighter 10:03:00, Paris 10:03:18, the count 10:03:30 and the shock), then the planet's next hours
-and days from space (each shot its own clock, tagged TIME-LAPSE), then tonight again at 9:59.
+build-timing.cjs pins "heavier" 10:03:00, Paris 10:03:24, the count 10:03:37 and the shock), then the planet's next
+hours and days from space (each shot its own clock, tagged TIME-LAPSE), then tonight again at 9:59.
 
-## 4. Shots (shots.js, 35; the twelve seconds have five quick cuts inside one shot)
+## 4. Shots (shots.js, 38; the twelve seconds have quick cuts inside one shot, and the shock two more)
 
 Two sets: **garden** (garden-build.js + garden.js: a terrace back garden facing SSE, the patio table with the mug,
 lantern and phone, the telescope, the bird feeder in the apple tree, the bird bath, the cat on the back wall, next
 door's TV, the terrace beyond the wall) and **space** (space.js: the half-Earth, the face, the shock, the ring, the
-edge, the collapse, the half-Moon, the new Earth by the Sun). Cold open (10:03:32, alarms) → title → 9:59:40 (the Moon,
-Saturn, the cat) → the rule → 10:00:00: half the sky goes black → the line → the Moon slowed 8× → the tea's steam →
-why → what's left (space) → the face → the blow-out → the shock's cross-section → the phone → next door's TV → the ring
-racing north → the edge → the telescope → who gets it when → the compass → into the black → where Saturn was → the
-cat → 10:03, lighter: the feeder → the bird bath → Paris → the car alarms → twelve seconds (quick cuts: the cat, the
-feeder, the bird bath, the Moon, the back wall) → the shock → the collapse → the Moon leaving → the new Earth by the
-Sun → half the sky, forever → is any of this real → the question.
+edge, the half-Earth and the Sun, the collapse, the half-Moon, the new Earth by the Sun). Cold open (10:03:38: the
+half-black sky, the half-Moon through the long lens, the shock) → title → 9:59:40 (the Moon, Saturn, the cat) → the
+rule → 10:00:00: more than a third of the sky goes black → the line → the Moon replayed 8× slower → the tea's steam →
+why → what's left (space) → the face → the blow-out → the shock's cross-section → the phone → next door's TV → the
+ring racing north → the edge (side-on: the sea pouring over the lip) → the telescope → who gets it when → the tea
+shivering (the first quakes) → where Saturn was → the Sun and the planets that stay → the cat → 10:03, heavier: the
+feeder → the bird bath → ears popping → Paris → the car alarms → twelve seconds (quick cuts: the cat, the feeder, the
+bird bath, the Moon, the back wall) → the shock (down the garden; the feeder swinging; the cat bolting) → the
+collapse → the Moon leaving → the new Earth by the Sun → half the sky, forever → is any of this real → the question.
 
 ## 5. Look and HUD
 
@@ -87,8 +92,9 @@ SCALE / ESTIMATE / REAL).
 Synthesised and seeded (audiokit.js, sound-lib.js, sound-music.js, sound-amb.js, sound-sfx.js; mix.js). Score in E:
 the theme over the title (its last note cut off), the Moon leaving and the question; at 10:00:00 the upper strings stop
 dead; a heartbeat under the countdown, quickening into the shock; a cut-off bell for things that are gone. Places: the
-garden at night (far road, leaves, crickets, owls; from 10:02:58 car alarms and a dog), a low hum in space. Effects:
-the clock's ticks, the phone, the creaks, the cat, the rumble of the ring, the boil. Mix −16 to −14 LUFS, ≤ −1 dBTP,
+garden at night (far road, leaves, crickets, owls; a low grumble of tremors growing from about 10:01:30; from 10:03:28
+car alarms and a dog), a low hum in space. Effects: the clock's ticks, the phone, the spoon chattering in the mug, the
+ear-pop, the creaks, the cat, the rumble of the ring, the boil. Mix −16 to −14 LUFS, ≤ −1 dBTP,
 soundtrack baked into soundtrack.js.
 
 ## 7. Review log

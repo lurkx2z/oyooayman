@@ -1,7 +1,7 @@
 /* =====================================================================
    HUD — this film's overlay (DOM, in #hud; a pure function of time). The centred title is the shared StoryHUD. The
    layout is the Slower light film's:
-     top left     the readout: THE CUT IN (the countdown to 10:00), then THE SHOCK REACHES YOU IN (to 10:03:42.5), with
+     top left     the readout: THE CUT IN (the countdown to 10:00), then THE SHOCK REACHES YOU IN (to 10:03:49), with
                   one fact under it (the bright stars left in your sky; what you weigh); after the shock, SINCE THE CUT
                   (the time-lapses); under it one context line for the scene
      bottom left  the honest label (thought experiment / illustration / slowed down / replay / time-lapse / estimate / real)
@@ -32,7 +32,7 @@ const HV_CTX = [
   [hvCap('line', 0).show + 0.3, HV.moon - 0.2, 'STARS YOU CAN SEE', (t, s, set) => ({ v: 'ABOUT ' + hvThousands(Math.round((set && set.sky ? set.sky.starsLeft(s) : 0) / 10) * 10) + ' <small>OF ' + hvThousands(Math.round((set && set.sky ? set.sky.count0 : 0) / 100) * 100) + '</small>', v2: 'MOST WENT OUT WITHIN 0.04 SECONDS' })],
   [hvCap('face', 1).show, HV.blow - 0.2, 'AT THE CENTRE OF THE FACE', () => ({ v: '5,400 °C', v2: '3.6 MILLION ATMOSPHERES' })],
   [HV.blow + 0.4, HV.shock - 0.1, 'BLOWING OUT AT', () => ({ v: 'UP TO ABOUT 5 km A SECOND', v2: 'ESCAPE SPEED FROM THE FACE: 10.6 km/s' })],
-  [hvCap('front', 1).show, HV.edge - 0.2, 'THE SHOCK HAS REACHED', (t, s) => { const P = HV_PLACES.filter((p) => p.t <= s && p.name !== 'LONDON').sort((a, b) => b.t - a.t)[0]; return { v: P ? P.name.charAt(0) + P.name.slice(1).toLowerCase() : 'the coast', v2: 'IT REACHES YOU AT 10:03:42' }; }],
+  [hvCap('front', 1).show, HV.edge - 0.2, 'THE SHOCK HAS REACHED', (t, s) => { const P = HV_PLACES.filter((p) => p.t <= s && p.name !== 'LONDON').sort((a, b) => b.t - a.t)[0]; return { v: P ? P.name.charAt(0) + P.name.slice(1).toLowerCase() : 'the coast', v2: 'IT REACHES YOU AT 10:03:49' }; }],
   [hvCap('ears', 0).show + 0.3, HV.paris - 0.2, 'AIR PRESSURE', (t, s) => { const d = 1013 * (hvFelt(s).weight - 1); return { v: '+' + d.toFixed(0) + ' hPa <small>IN 3 MINUTES</small>', v2: 'LIKE A LIFT GOING DOWN ' + (Math.round(d * 8.4 / 10) * 10) + ' m' }; }],
   [hvCap('heavier', 0).show + 0.4, HV.ears - 0.2, 'WHAT YOU WEIGH', (t, s) => { const f = hvFelt(s); return { v: (f.weight * 100).toFixed(1) + ' %', v2: '“DOWN” TIPPED ' + f.tilt.toFixed(1) + '° TOWARDS THE CUT' }; }],
   [HV.count2 + 0.3, HV.hit - 0.1, 'WHAT YOU WEIGH', (t, s) => { const f = hvFelt(s); return { v: (f.weight * 100).toFixed(1) + ' %', v2: '“DOWN” TIPPED ' + f.tilt.toFixed(1) + '° TOWARDS THE CUT' }; }],
@@ -162,11 +162,14 @@ class HvHud {
       const vis = _p.z < 1 && Math.abs(_p.x) < 1.1 && Math.abs(_p.y) < 1.1;
       d.style.opacity = vis ? String(l.a ?? 1) : '0';
       const lx = (_p.x * 0.5 + 0.5) * 100, ly = (-_p.y * 0.5 + 0.5) * 100;
-      const right = l.side ? l.side === 'r' : lx > 62;
+      let right = l.side ? l.side === 'r' : lx > 62;
+      // (a label that would run off the side of the frame goes the other way)
+      const wPct = vis && this.root.clientWidth ? 100 * (d._w || 0) / this.root.clientWidth : 0;
+      if (right && lx - wPct < 1.5) right = false; else if (!right && lx + wPct > 98.5) right = true;
       d.style.left = lx.toFixed(2) + '%'; d.style.top = Math.min(76, (ra > 0.05 || cx) && lx < 40 ? Math.max(ly, 46) : Math.max(ly, 18)).toFixed(2) + '%';   // (never down on the caption)
       d.className = right ? 'hv-lab r' : 'hv-lab';
       const tx = `<span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`, hh = right ? tx + '<span class="d"></span>' : '<span class="d"></span>' + tx;
-      if (d._h !== hh) { d._h = hh; d.innerHTML = hh; }
+      if (d._h !== hh) { d._h = hh; d.innerHTML = hh; d._w = d.offsetWidth; }
     });
   }
 
@@ -252,7 +255,7 @@ class HvHud {
       <circle cx="${you[0].toFixed(1)}" cy="${you[1].toFixed(1)}" r="9" fill="#fff"/><text x="${(you[0] + 18).toFixed(1)}" y="${(you[1] - 12).toFixed(1)}" class="b">YOU</text>
       <text x="${(cx + 0.36 * R).toFixed(1)}" y="${cy + 8}" class="s" opacity="${k.toFixed(2)}">CORE</text><text x="${(cx + 0.72 * R).toFixed(1)}" y="${cy + 130}" class="s" opacity="${k.toFixed(2)}">MANTLE</text>
       <text x="540" y="96" class="t">A SLICE THROUGH WHAT’S LEFT</text>
-      <text x="540" y="140" class="s" opacity="${k2.toFixed(2)}">AMBER: ROCK THE SHOCK HAS REACHED</text>
+      <text x="540" y="140" class="s" opacity="${k2.toFixed(2)}">AMBER: THE SHOCK SO FAR</text>
       <text x="540" y="560" class="b">THE SHOCK REACHES YOU IN</text>
       <text x="540" y="624" class="t" style="font-size:58px;fill:#ffcf8a">${hvMinSec(HVP.tHit - s)}</text>`, Wd, Hd);
   }
@@ -271,22 +274,22 @@ class HvHud {
   // real: astronauts float because they and their station fall together
   static float(u) {
     const k = MathX.smooth(u, 0.2, 1.0), q = MathX.smooth(u, 3.0, 4.0), a = u * 0.35;
-    const orbit = `<circle cx="380" cy="250" r="150" fill="none" stroke="rgba(246,239,226,0.35)" stroke-width="2" stroke-dasharray="5 7"/><circle cx="380" cy="250" r="70" fill="#244c80" stroke="#f6efe2" stroke-width="2"/>`;
-    const sx = 380 + 150 * Math.cos(a), sy = 250 - 150 * Math.sin(a);
+    const orbit = `<circle cx="380" cy="272" r="128" fill="none" stroke="rgba(246,239,226,0.35)" stroke-width="2" stroke-dasharray="5 7"/><circle cx="380" cy="272" r="62" fill="#244c80" stroke="#f6efe2" stroke-width="2"/>`;
+    const sx = 380 + 128 * Math.cos(a), sy = 272 - 128 * Math.sin(a);
     return HvHud.svg(`${HvHud.plate()}<g opacity="${k}">${orbit}
       <rect x="${(sx - 26).toFixed(1)}" y="${(sy - 8).toFixed(1)}" width="52" height="16" rx="4" fill="#d8d4ca"/><rect x="${(sx - 6).toFixed(1)}" y="${(sy - 26).toFixed(1)}" width="12" height="52" fill="#6f86a8"/>
-      <line x1="${sx.toFixed(1)}" y1="${(sy + 20).toFixed(1)}" x2="${(380 + 110 * Math.cos(a)).toFixed(1)}" y2="${(250 - 110 * Math.sin(a)).toFixed(1)}" stroke="#ffcf8a" stroke-width="4" opacity="${q}"/></g>
+      <line x1="${sx.toFixed(1)}" y1="${(sy + 20).toFixed(1)}" x2="${(380 + 92 * Math.cos(a)).toFixed(1)}" y2="${(272 - 92 * Math.sin(a)).toFixed(1)}" stroke="#ffcf8a" stroke-width="4" opacity="${q}"/></g>
       <text x="40" y="50" class="t">ON THE SPACE STATION</text><text x="40" y="88" class="s" opacity="${k}">GRAVITY THERE: ABOUT 90% OF YOURS</text>
       <text x="40" y="446" class="b" opacity="${q}">THEY AND THE STATION FALL TOGETHER</text>`);
   }
   // real: earthquake waves through the Earth, and the shadow the liquid core makes for the S waves
   static quake(u) {
-    const k = MathX.smooth(u, 0.2, 1.0), q = MathX.smooth(u, 3.2, 4.2), cx = 380, cy = 250, R = 170, rc = 0.5462 * R;
+    const k = MathX.smooth(u, 0.2, 1.0), q = MathX.smooth(u, 3.2, 4.2), cx = 380, cy = 268, R = 150, rc = 0.5462 * R;
     let rays = '';
     for (let i = -6; i <= 6; i++) { const a = i * 13 * HV_D2R, ex = cx + R * Math.sin(a), ey = cy + R * Math.cos(a), through = Math.abs(i) <= 3;
       rays += `<path d="M${cx} ${cy - R} Q ${cx + (ex - cx) * 0.25} ${cy} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="${through && q > 0 ? 'rgba(246,239,226,0.25)' : '#ffcf8a'}" stroke-width="2.5" opacity="${k}"/>`; }
     return HvHud.svg(`${HvHud.plate()}<circle cx="${cx}" cy="${cy}" r="${R}" fill="#3a2a1e" stroke="#f6efe2" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="${rc}" fill="rgba(255,150,60,0.35)"/>
-      ${rays}<circle cx="${cx}" cy="${cy - R}" r="8" fill="#fff"/><text x="${cx + 16}" y="${cy - R + 4}" class="s">EARTHQUAKE</text>
+      ${rays}<circle cx="${cx}" cy="${cy - R}" r="8" fill="#fff"/><text x="${cx + 16}" y="${cy - R - 4}" class="s">EARTHQUAKE</text>
       <text x="${cx}" y="${cy + 6}" class="s" text-anchor="middle">LIQUID CORE</text>
       <text x="40" y="50" class="t">WAVES THROUGH THE EARTH</text>
       <text x="40" y="446" class="b" opacity="${q}">ONE KIND CAN’T CROSS LIQUID: A SHADOW</text>`);

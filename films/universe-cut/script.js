@@ -4,7 +4,7 @@
    build-timing.cjs from CAPTIONS.md). Change a pause → edit PAUSE there and re-run it.
    The physics (physics.js, PLAN.md § 2) runs on STORY time s (seconds after 10:00:00 PM GMT). This file maps film
    time to story time: the cold open at 10:03:31 (it ends as the shock arrives), the title over the night before,
-   then REAL TIME from 9:59:40 to the shock at 10:03:42 (every event at its true second; the Moon's slowed-down replay
+   then REAL TIME from 9:59:40 to the shock at 10:03:49 (every event at its true second; the Moon's slowed-down replay
    is a cutaway inside it), then the planet's next hours from space (each shot its own clock, tagged TIME-LAPSE), then
    tonight again at 9:59.
    Everything is a pure function of film time.
@@ -62,9 +62,9 @@ HV.heavier = hvS('heavier') - 0.5;
 HV.bath = hvS('bath') - 0.4;
 HV.ears = hvS('ears') - 0.5;                             // your ears pop: the air pressing down harder too
 HV.paris = hvS('paris') - 0.5;
-HV.alarms = hvS('alarms') - 0.5;                         // the car alarms (they started at 10:02:58: their tilt sensors)
+HV.alarms = hvS('alarms') - 0.5;                         // the car alarms (from 10:03:28: set off by the tremors)
 HV.count2 = hvS('count') - 0.5;
-HV.hit = hvStory(HVP.tHit);                              // ★ 10:03:42.5: the shock arrives
+HV.hit = hvStory(HVP.tHit);                              // ★ 10:03:49: the shock arrives
 HV.hitShot = HV.hit - 2.2;
 HV.countCuts = [3.4, 5.2, 6.8, 8.2, 9.5].map((u) => HV.count2 + u);   // the last twelve seconds: quick cuts round the garden
 HV.hitCuts = [HV.hit + 0.7, HV.hit + 1.35];             // the shock: down the garden, the feeder swinging, the cat bolting; then black
@@ -109,7 +109,7 @@ const SCRIPT = {
     { id: 's2', time: HV.before, label: '2 · 9:59:40' }, { id: 'zero', time: HV.zero, label: '★ 10:00' },
     { id: 'gone', time: HV.gone, label: 'space' }, { id: 'tv', time: HV.tv, label: 'tv' },
     { id: 'front', time: HV.front, label: 'front' }, { id: 'heavier', time: HV.heavier, label: '10:03' },
-    { id: 'hit', time: HV.hit, label: '★ 10:03:42' }, { id: 's4', time: HV.fall, label: '4 · after' },
+    { id: 'hit', time: HV.hit, label: '★ 10:03:49' }, { id: 's4', time: HV.fall, label: '4 · after' },
     { id: 's5', time: HV.real, label: '5 · real' }, { id: 'q', time: HV.question, label: 'question' },
   ],
   camera: { baseY: 0, x: [[0, 0]], z: [[0, 0]], height: [[0, 1.62]], yaw: [[0, 0]], pitch: [[0, 0]], fov: [[0, 55]], startles: [], shakes: [] },

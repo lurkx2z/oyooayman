@@ -152,9 +152,9 @@ function hvHalfBall(o) {
               float cl = fbm(fp * 16.0 + vec3(uT * 0.002)); float edge = smoothstep(0.04, 0.0, abs(fbm(fp * 7.0 + 4.0) - 0.5));
               T += 260.0 * (cl - 0.5) - 140.0 * edge; tex = 0.92 + 0.16 * cl;
             } else T *= 0.85 + 0.3 * fbm(fp * 220.0);                                             // crust: cold rock, glowing cracks low down
-            float Tk = T + 273.0, I = (0.22 + 1.25 * pow(clamp((Tk - 600.0) / 5000.0, 0.0, 1.0), 1.5)) * smoothstep(650.0, 1150.0, Tk);
+            float Tk = T + 273.0, I = (0.16 + 0.78 * pow(clamp((Tk - 600.0) / 5000.0, 0.0, 1.0), 1.5)) * smoothstep(650.0, 1150.0, Tk);
             float layer = exp(-pow((r - 0.1917) / 0.003, 2.0)) + exp(-pow((r - 0.5462) / 0.004, 2.0)) + 0.5 * exp(-pow((r - 0.896) / 0.003, 2.0)) + 0.8 * exp(-pow((r - 0.984) / 0.002, 2.0));
-            col = bb(Tk) * I * tex * (1.0 - 0.45 * layer) + vec3(0.03, 0.026, 0.024) * (1.0 - smoothstep(0.97, 0.99, r)) * 0.0;
+            col = bb(Tk * 0.7) * I * tex * (1.0 - 0.45 * layer) + vec3(0.03, 0.026, 0.024) * (1.0 - smoothstep(0.97, 0.99, r)) * 0.0;
             col += vec3(0.04, 0.035, 0.03) * smoothstep(0.984, 0.995, r) * (0.02 + max(ndl, 0.0));     // (the crust lit, where the Sun reaches it)
           }
           col *= 1.0 - 0.3 * uBurst * (0.5 + 0.5 * sin(dot(u, vec3(40.0, 31.0, 23.0)) + uT * 3.0) * fbm(u * 28.0));
@@ -174,7 +174,7 @@ function hvHalfBall(o) {
         if (uSteam > 0.0) {
           float lat = u.y, bill = fbm(u * 6.5 + vec3(uT * 0.002, 0.0, 0.0) + 0.9 * vec3(fbm(u * 2.5 + 2.0)));
           float bands = 0.5 + 0.5 * sin(lat * 17.0 + 2.2 * fbm(u * 3.5 + vec3(uT * 0.0015, 0.0, 0.0)));
-          float sc = clamp(0.5 * bands + 0.7 * bill - 0.2 + 0.5 * uSteam, 0.0, 1.0);
+          float sc = clamp(0.22 * bands + 0.7 * bill - 0.08 + 0.45 * uSteam, 0.0, 1.0);
           float lit = max(ndl, 0.0);
           vec3 st = vec3(0.66, 0.67, 0.7) * (0.62 + 0.38 * bill) * (0.85 + 0.15 * bands) * (0.006 + 0.95 * lit)
                   + bb(1300.0) * 0.045 * smoothstep(0.15, -0.2, ndl) * (1.1 - sc);
@@ -283,6 +283,7 @@ HV_SETS.space = (app) => {
   };
   HV_SPACE.storyOf = storyOf;
 
+  const W0 = (t, a, b, fi, fo) => StoryHUD.win(t, a, b, fi, fo);
   const set = {
     scene, camera: cam,
     cuts() { return [HV.front + 5.0]; },
@@ -312,11 +313,12 @@ HV_SETS.space = (app) => {
         const k = K(t, HV.front, HV.edge, (x) => x), Tg = hvNrm(hvAdd(e1, N, 0.3));
         pos = hvAdd(hvAdd(hvSc(Tg, hvLerp(1.62, 1.52, k)), N, hvLerp(0.95, 0.85, k)), e2, hvLerp(0.12, 0.02, k)); at = hvSc(hvNrm(hvAdd(e1, N, 0.24)), 1.0); fov = 34; up = N;
       } else if (m === 'edge') {
-        // the edge in the South Pacific, in sunshine, from out beyond it: the ocean above (churned white as it reaches the
-        // lip), the cut face below (cold crust, then glowing rock deeper in), the sea's water and the air pouring off the
-        // corner between them into space
-        const k = Ease.inOutSine(K(t, HV.edge, HV.moonedge, (x) => x)), Rp = hvRim(200), tg = hvRim(290), bis = hvNrm(hvAdd(Rp, N, -1.15));
-        pos = hvAdd(hvAdd(Rp, bis, hvLerp(0.05, 0.036, k)), tg, hvLerp(-0.012, 0.01, k)); at = hvAdd(hvAdd(Rp, bis, -0.004), tg, hvLerp(-0.004, 0.004, k)); fov = 42; up = hvNrm(hvAdd(Rp, N, 0.87));
+        // the edge in the South Pacific, in sunshine, seen side-on from just off the cliff and looking along the edge: the
+        // ocean on the left (churned white as it reaches the lip), the cut face dropping away below it (cold crust, then
+        // glowing rock deeper in), the sea's water and the air pouring off the corner, out over the void on the right
+        const k = Ease.inOutSine(K(t, HV.edge, HV.moonedge, (x) => x)), Rp = hvRim(200), tg = hvRim(290), oN = hvSc(N, -1);
+        pos = hvAdd(hvAdd(hvAdd(Rp, Rp, hvLerp(0.010, 0.006, k)), oN, hvLerp(0.034, 0.026, k)), tg, hvLerp(-0.085, -0.07, k));
+        at = hvAdd(hvAdd(hvAdd(Rp, Rp, -0.004), oN, 0.006), tg, 0.01); fov = 40; up = Rp;
       } else if (m === 'others') {
         const k = K(t, HV.others, HV.tea, (x) => x);
         pos = hvAdd(hvAdd(hvSc(N, hvLerp(3.6, 3.4, k)), e1, 0.35), e2, 0.55); at = hvAdd(hvSc(N, 0.2), e2, 0.55); fov = 42; up = hvSc(e1, 1);
@@ -340,11 +342,11 @@ HV_SETS.space = (app) => {
         // the camera is mapped so dS → the Sun's direction, dE → the Earth's)
         const k = Ease.inOutSine(K(t, HV.orbit, HV.forever, (x) => x)), c = twoBody(hvSc(N, SP.C), hvLerp(-16, -11, k), hvLerp(-4, -2, k), 22, 12, hvLerp(5.4, 4.4, k));
         pos = c.pos; at = c.at; up = c.up; fov = 50;
-        sunSp.visible = true; path.visible = true;
+        sunSp.visible = true;
       } else if (m === 'sun') {
         // the half-Earth from out beyond its night side, a little below the cut, so its glowing face shows under it; the Sun
         // beyond, on the starry side of the line, Mercury and Venus beside it
-        const k = Ease.inOutSine(K(t, HV.sun, HV.cat2, (x) => x)), c = twoBody([0, 0, 0], hvLerp(-19, -15, k), hvLerp(-9, -7, k), hvLerp(19, 17, k), 11, hvLerp(4.5, 3.9, k));
+        const k = Ease.inOutSine(K(t, HV.sun, HV.cat2, (x) => x)), c = twoBody([0, 0, 0], hvLerp(-19, -15, k), hvLerp(-2, -1, k), hvLerp(19, 17, k), 12, hvLerp(5.6, 5.0, k));
         pos = c.pos; at = c.at; up = c.up; fov = 50;
         sunSp.visible = true;
       } else if (m === 'forever') {
@@ -383,16 +385,18 @@ HV_SETS.space = (app) => {
       }
       // ------------------------------------------------------------------ the air and the sea off the edge
       if (s > 0 && collapse < 0.3 && (m === 'edge' || m === 'gone' || m === 'face' || m === 'blow' || m === 'front')) {
-        const a0 = m === 'edge' ? 186 : 0, a1 = m === 'edge' ? 214 : 360, n = m === 'edge' ? 2400 : 900;
+        const a0 = m === 'edge' ? 200.8 : 0, a1 = m === 'edge' ? 222 : 360, n = m === 'edge' ? 2400 : 900, zS = m === 'edge' ? 0.4 : 1, zA = m === 'edge' ? 0.45 : 1;
         for (let i = 0; i < n; i++) {
           const a = a0 + (a1 - a0) * hvR(i, 7), Rp = hvRim(a), out = hvNrm(hvAdd(hvSc(Rp, 0.55), N, -0.85)), born = hvR(i, 8) * s;
           const sea = seaAt[((Math.round(a) % 360) + 360) % 360] && hvR(i, 9) < 0.45, lit = Math.max(0, hvDot(Rp, SP.sun) + 0.1);
           const v = (sea ? 0.05 + 0.23 * hvR(i, 10) : 0.3 + 1.4 * hvR(i, 10)) * SP.vKm, d = v * (s - born);
           const p = hvAdd(hvAdd(hvSc(Rp, 1.0 + 0.002 * hvR(i, 11)), out, d), hvRim(a + 90), (hvR(i, 12) - 0.5) * 0.004);
-          if (sea) mist.add(p[0], p[1], p[2], 0.0015 + 0.6 * d, 0.5 * (0.2 + lit), 0.85 * (0.15 + lit), 0.88 * (0.15 + lit), 0.92 * (0.15 + lit));
-          else mist.add(p[0], p[1], p[2], 0.003 + 0.8 * d, 0.12 * (0.1 + lit), 0.55 * (0.1 + lit), 0.7 * (0.1 + lit), 1.0 * (0.12 + lit));
+          if (sea) mist.add(p[0], p[1], p[2], (0.0015 + 0.6 * d) * zS, 0.5 * (0.2 + lit) * zA, 0.85 * (0.15 + lit), 0.88 * (0.15 + lit), 0.92 * (0.15 + lit));
+          else mist.add(p[0], p[1], p[2], (0.003 + 0.8 * d) * zS, 0.12 * (0.1 + lit) * zA, 0.55 * (0.1 + lit), 0.7 * (0.1 + lit), 1.0 * (0.12 + lit));
         }
       }
+      // ------------------------------------------------------------------ the new Earth's path ahead of it (drawn in, dotted)
+      if (m === 'orbit') { const Ec = hvSc(N, SP.C), pa = W0(t, HV.orbit + 1.2, HV.forever - 0.3, 0.6, 0.3); for (let d = SP.Rb + 0.12; d <= 70; d += 0.2) { const p = hvAdd(Ec, vOrb, d); glow.add(p[0], p[1], p[2], 0.075, 0.7 * pa, 1.0, 0.72, 0.4); } }   // (the way it is going)
       glow.end(); mist.end();
       this._s = s;
     },
@@ -411,7 +415,7 @@ HV_SETS.space = (app) => {
       }
       if (m === 'front' || m === 'paris') {
         const a = W(t, (m === 'front' ? hvCap('front', 1).show : HV.paris + 0.4), (m === 'front' ? HV.edge : HV.count2) - 0.3, 0.3, 0.2);
-        for (const n of m === 'front' ? ['ROME', 'MADRID', 'PARIS', 'LONDON'] : ['PARIS', 'LONDON']) place(n, a, hitSub(n));
+        for (const n of m === 'front' ? ['ROME', 'MADRID', 'PARIS', 'LONDON'] : ['PARIS', 'LONDON']) place(n, a, hitSub(n), m === 'front' && (n === 'LONDON' || n === 'MADRID') ? 'r' : undefined);
       }
       if (m === 'others') { const a = W(t, HV.others + 0.5, HV.tea - 0.3, 0.3, 0.2); for (const n of ['LONDON', 'NEW YORK', 'TOKYO', 'MOSCOW', 'BEIJING']) place(n, a, hitSub(n), n === 'MOSCOW' ? 'r' : n === 'LONDON' ? 'l' : undefined); }
       if (m === 'moonaway') {
@@ -419,11 +423,21 @@ HV_SETS.space = (app) => {
         out.push({ p: hvAdd(mp, N, 0.25), text: 'THE MOON', sub: 'WHAT IS LEFT OF IT', a });
         out.push({ p: hvAdd(hvSc(N, 0.34), N, 0.6), text: 'THE EARTH', sub: 'WHAT IS LEFT OF IT', a });
       }
+      // (a point on a ball's outline as the camera sees it: ang° round from the camera's right, anticlockwise)
+      const limb = (c, R, ang) => { const cr = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), cu = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 1), a = ang * HV_D2R;
+        return hvAdd(hvAdd(c, cr.toArray(), R * Math.cos(a)), cu.toArray(), R * Math.sin(a)); };
       if (m === 'orbit') {
         const a = W(t, HV.orbit + 0.7, HV.forever - 0.3, 0.3, 0.2);
         if (this._sunP) out.push({ p: this._sunP, text: 'THE SUN', sub: 'STILL ON THIS SIDE', a });
-        out.push({ p: hvAdd(hvSc(N, SPc.C), N, -SPc.Rb), text: 'THE NEW EARTH', sub: 'HALF THE MASS · ABOUT 4/5 AS WIDE', a, side: 'r' });
+        out.push({ p: limb(hvSc(N, SPc.C), SPc.Rb, -35), text: 'THE NEW EARTH', sub: 'HALF THE MASS · ABOUT 4/5 AS WIDE', a, side: 'l' });
       }
+      if (m === 'sun') {
+        const a = (i) => W(t, HV.sun + 0.8 + 0.4 * i, HV.cat2 - 0.3, 0.3, 0.2), pl = (n) => { const P = HV_PLANETS_KEPT.find((x) => x[0] === n); return hvSc(SPc.geo(hvRaDec(P[1], P[2])), 900); };
+        if (this._sunP) out.push({ p: this._sunP, text: 'THE SUN', sub: 'ON THIS SIDE OF THE CUT', a: a(0), side: 'l' });
+        out.push({ p: pl('VENUS'), text: 'VENUS', sub: '', a: a(1), side: 'r' });
+        out.push({ p: pl('MERCURY'), text: 'MERCURY', sub: '', a: a(2) });
+      }
+      if (m === 'forever') out.push({ p: limb(hvSc(N, SPc.C), SPc.Rb * 1.01, 140), text: 'THE NEW EARTH', sub: 'UNDER A SKY OF STEAM', a: W(t, HV.forever + 0.8, HV.real - 0.4, 0.3, 0.3), side: 'r' });
       if (m === 'edge') { const Rp = hvRim(200); out.push({ p: hvAdd(Rp, N, 0.004), text: 'THE EDGE', sub: 'SOUTH PACIFIC', a: W(t, HV.edge + 0.6, hvCap('edge', 2).show - 0.3, 0.3, 0.2) }); }
       return out;
     },

@@ -13,7 +13,7 @@
      heavier   the bird feeder starting to lean (south)                       bath      the bird bath: its water creeping up one side
      ears      down the garden from the patio: your ears pop
      alarms    the cat, alert; car alarms flashing behind the wall            count     twelve seconds: down the garden, then quick cuts
-     hit       10:03:42.5: the shock (down the garden; the feeder swinging; the cat bolting)
+     hit       10:03:49: the shock (down the garden; the feeder swinging; the cat bolting)
      real / question   9:59 PM, tonight (the sky; the feeder; the table)
    Layout (metres): the house's back wall is z = 0, the garden runs to −z (SSE, azimuth 150°), +x is WSW, −x ENE.
    ===================================================================== */
@@ -187,10 +187,10 @@ HV_SETS.garden = (app) => {
     fragmentShader: `uniform float uRip, uTime; uniform vec3 uMoon, uC, uCandle; varying vec3 vW;
       void main() { vec2 d = vW.xz - uC.xz; float r = length(d); vec2 rd = d / max(r, 1e-4);
         float rip = sin(r * 900.0 - uTime * 26.0) * exp(-r * 18.0) * 0.7 + sin((0.036 - r) * 1300.0 - uTime * 21.0) * 0.5;
-        vec3 n = normalize(vec3(0.0, 1.0, 0.0) + vec3(rd.x, 0.0, rd.y) * rip * 0.09 * uRip), v = normalize(cameraPosition - vW), R = reflect(-v, n);
+        vec3 n = normalize(vec3(0.0, 1.0, 0.0) + vec3(rd.x, 0.0, rd.y) * rip * 0.055 * uRip), v = normalize(cameraPosition - vW), R = reflect(-v, n);
         float fr = 0.03 + 0.97 * pow(1.0 - max(dot(n, v), 0.0), 5.0);
         vec3 col = vec3(0.07, 0.035, 0.012) * 0.6 + vec3(0.1, 0.13, 0.2) * fr * 0.5;
-        col += vec3(0.95, 0.97, 1.0) * smoothstep(0.9993, 0.99985, dot(R, normalize(uMoon))) * 2.2;          // (the Moon)
+        col += vec3(0.95, 0.97, 1.0) * smoothstep(0.9993, 0.99985, dot(R, normalize(uMoon))) * 1.25;          // (the Moon)
         col += vec3(1.0, 0.7, 0.35) * pow(max(dot(R, normalize(uCandle - vW)), 0.0), 600.0) * 1.4;            // (the lantern)
         gl_FragColor = vec4(col, 1.0); }` });
   // ---- the cat on the back wall; the phone; next door's TV; the bird feeder; the tea's steam
@@ -203,10 +203,10 @@ HV_SETS.garden = (app) => {
   // the true vertical under the feeder's branch (drawn in for the 'heavier' shot): where it hung before 10:00
   const plumb = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -0.98, 0)]), new THREE.LineDashedMaterial({ color: '#f3d9a8', dashSize: 0.025, gapSize: 0.018, transparent: true, opacity: 0.85, fog: false }));
   plumb.computeLineDistances(); plumb.position.set(...HV_GD.hang); scene.add(plumb);
-  // the car alarms in the street behind (from 10:02:58, when their tilt sensors trip: sound-amb.js): their hazard lights
+  // the car alarms in the street behind (from 10:03:28, set off by the tremors: sound-amb.js): their hazard lights
   // flash amber on the backs of the terrace and the trees beyond the wall (the cars themselves are hidden by it; a dim
   // light high over the lane stands in for what bounces back off the houses). [x, z, story second, flashes a second, phase]
-  const hazards = [[2.2, -21.0, 186.0, 1.30, 0.0], [-5.0, -22.5, 178.5, 1.18, 0.4], [8.0, -24.0, 201.5, 1.42, 0.7]].map(([x, z, s0, hz, ph]) => {
+  const hazards = [[2.2, -21.0, 209.2, 1.30, 0.0], [-5.0, -22.5, 207.6, 1.18, 0.4], [8.0, -24.0, 212.6, 1.42, 0.7]].map(([x, z, s0, hz, ph]) => {
     const L = new THREE.SpotLight('#ff9a2a', 0, 28, 0.62, 0.85, 1.4); L.position.set(x, 0.9, z); L.target.position.set(x, 3.2, -32); scene.add(L, L.target);
     return { L, s0, hz, ph };
   });
@@ -331,7 +331,7 @@ HV_SETS.garden = (app) => {
         subH = m === 'hit' ? HV.hitCuts.filter((c) => t >= c).length : 0;
         this._sub = sub; this._subH = subH;
         if (subH === 1) camFeeder(1);                                                    // (the shock: the feeder swinging)
-        else if (subH === 2) camCatSide(1);                                              // (the cat, gone off the wall)
+        else if (subH === 2) { camCatSide(1); fov = 27; }                                // (the cat, gone off the wall)
         else if (sub === 1) camCatSide(0.5 + 0.5 * u);
         else if (sub === 2) camFeeder(0.6 + 0.4 * u);
         else if (sub === 3) camBath(0.5 + 0.5 * u);
@@ -380,8 +380,8 @@ HV_SETS.garden = (app) => {
       for (const p of strings) p.intensity = 1.1;
       catFill.intensity = m === 'cat' || m === 'alarms' || (m === 'count' && (this._sub === 1 || this._sub === 5)) || (m === 'hit' && subH === 2) || (m === 'before' && t >= HV.cat) ? 1.4 : 0;
       street.light.intensity = 26;
-      { let n = 0; for (const h of hazards) { const on = s >= h.s0 && s < HVP.tHit + 1.0 ? (() => { const f = (((s - h.s0) * h.hz + h.ph) % 1 + 1) % 1; return MathX.smooth(f, 0.0, 0.05) * (1 - MathX.smooth(f, 0.5, 0.56)); })() : 0; h.L.intensity = 34 * on; n += on; }
-        bounce.intensity = 1.6 * n; }
+      { let n = 0; for (const h of hazards) { const on = s >= h.s0 && s < HVP.tHit + 1.0 ? (() => { const f = (((s - h.s0) * h.hz + h.ph) % 1 + 1) % 1; return MathX.smooth(f, 0.0, 0.05) * (1 - MathX.smooth(f, 0.5, 0.56)); })() : 0; h.L.intensity = 110 * on; n += on; }
+        bounce.intensity = 5.0 * n; }
       candle.intensity = 1.1 * flick; fl.scale.set(0.007, 0.018 * flick, 0.007);
       { const W = new THREE.Vector3(); fl.getWorldPosition(W); candle.position.copy(W); }
       // the felt pull: the feeder leans, the bird bath's water tilts (towards the half-Earth's middle, NNW)
@@ -419,7 +419,7 @@ HV_SETS.garden = (app) => {
         if (m === 'hit' && s > HVP.tHit) pose = HV_CAT_POSES.startle;
         cat.pose(pose, t);
         catRoot.position.set(G.catAt[0], G.wallH + 0.08, G.catAt[2]);
-        if (m === 'hit' && subH === 2) { const u = t - HV.hitCuts[1]; catRoot.position.x += 2.8 * u; catRoot.position.y += 0.45 * Math.sin(Math.PI * Math.min(1, u / 0.5)); }   // (it bolts, off along the wall)
+        if (m === 'hit' && subH === 2) { const u = t - HV.hitCuts[1]; catRoot.position.x += 2.6 * u * u / (u + 0.12); catRoot.position.y += 0.14 * Math.sin(Math.PI * Math.min(1, u / 0.45)); }   // (it bolts, off along the wall)
       }
       this._st = st; this._s = s; this._felt = felt;
     },
@@ -434,6 +434,7 @@ HV_SETS.garden = (app) => {
         out.push({ p: star('HAMAL'), text: 'HAMAL', sub: 'GONE AT 10:00:00.04', a: a2 });
       }
       if (m === 'replay') out.push({ p: sky.lineAt(HV_GARDEN.lineNearMoon(F), 400), text: 'THE CUT', sub: 'THE LINE IN THE SKY', a: W(t, HV.moon + 0.6, hvCap('moon', 1).show - 0.3, 0.3, 0.3) });
+      if (m === 'replay') out.push({ p: sky.at('MOON', 400), text: 'THE MOON', sub: 'ITS LIGHT TAKES 1.2 s TO GET HERE', a: W(t, hvCap('moon', 1).show + 0.2, HV.moonEnd - 0.3, 0.3, 0.3) });
       if (m === 'before' && t < HV.cat) out.push({ p: star('SATURN'), text: 'SATURN', sub: '1.3 BILLION km AWAY', a: W(t, hvCap('before', 1).show + 0.3, HV.cat - 0.15, 0.3, 0.15), side: 'r' });
       if (m === 'saturn') {
         out.push({ p: star('SATURN'), text: 'SATURN', sub: 'GONE AT 10:00:00.015', a: W(t, HV.saturn + 0.8, HV.cat2 - 0.2, 0.3, 0.2), side: 'r' });
@@ -441,8 +442,8 @@ HV_SETS.garden = (app) => {
       }
       if (m === 'vanish' && t < HV.t0) out.push({ p: sky.at('MOON', 400), text: 'THE MOON', sub: '360,000 km AWAY', a: W(t, HV.count + 0.2, HV.t0 - 0.2, 0.3, 0.2) });
       if (m === 'heavier') out.push({ p: [HV_GD.hang[0], HV_GD.hang[1] - 0.95, HV_GD.hang[2]], text: 'STRAIGHT DOWN', sub: 'WHERE IT HUNG AT 10:00', a: W(t, hvCap('heavier', 1).show + 0.4, HV.bath - 0.2, 0.3, 0.2), side: 'r' });
-      if (m === 'bath') out.push({ p: hvAdd(G.bath, [0.0, 0.975, 0.36]), text: 'THE OLD WATER LINE', sub: 'THE WATER IS ABOVE IT NOW', a: W(t, HV.bath + 0.8, HV.paris - 0.2, 0.3, 0.2), side: 'r' });
-      if (m === 'tv') out.push({ p: [HV_GD.tv[0] - 0.7, HV_GD.tv[1] + 0.2, HV_GD.tv[2]], text: 'NEXT DOOR', sub: 'SATELLITE TV', a: W(t, HV.tv + 0.6, hvCap('tv', 1).show - 0.2, 0.3, 0.2), side: 'r' });
+      if (m === 'bath') out.push({ p: hvAdd([G.bath[0], 0.975, G.bath[2]], hvN3(hvAdd(hvSc(hvN3(hvCross(HV_TIP, [0, 1, 0])), 0.75), HV_TIP, 0.66)), 0.369), text: 'THE OLD WATER LINE', sub: 'THE WATER IS ABOVE IT NOW', a: W(t, HV.bath + 0.8, HV.paris - 0.2, 0.3, 0.2), side: 'r' });
+      if (m === 'tv') out.push({ p: [HV_GD.tv[0] - 0.45, HV_GD.tv[1] + 0.95, HV_GD.tv[2]], text: 'NEXT DOOR', sub: 'SATELLITE TV', a: W(t, HV.tv + 0.6, hvCap('tv', 1).show - 0.2, 0.3, 0.2), side: 'r' });
       return out;
     },
     grade(t, p, shot) {
@@ -451,7 +452,7 @@ HV_SETS.garden = (app) => {
       if (m === 'replay' || m === 'moonedge' || (m === 'count' && this._sub === 4) || (m === 'open' && this._sub === 1)) { p.vignette = 0.35; p.bloom = 0.2; p.exposure = 1.15; }
       if (m === 'title') { p.exposure = 1.25; p.vignette = 0.5; p.saturation = 1.0; }
       if (m === 'calls') { p.exposure = 1.25; p.bloom = 0.3; p.vignette = 0.45; }
-      if (m === 'tea') { p.exposure = 1.35; p.bloom = 0.35; p.vignette = 0.55; }
+      if (m === 'tea') { p.exposure = 0.85; p.bloom = 0.25; p.vignette = 0.6; p.warmth = -0.05; }
       if (m === 'nothing' && t < hvCap('nothing', 1).show - 0.4) { p.exposure = 1.4; p.vignette = 0.55; }
       // the shock: a hard white kick, then black
       const hit = m === 'hit' ? HV.hit : m === 'open' ? HV.openHit : null;

@@ -65,11 +65,12 @@ Everything is procedural, so there are no models, images or sound files to downl
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
 >
-> ***What if the universe got cut in half?*** — open `universe-cut.html` (16:9, 5:57, voiceless). At 10:00 PM tonight
-> everything beyond a flat cut through the observable universe disappears; the cut runs through the Earth's centre and the
-> Moon. From a London back garden, in real time: half the sky goes black, the Moon is cut in 1.2 seconds, you feel
-> nothing, and the shock from the other half's disappearance takes 3 minutes 42 seconds to reach you through the rock.
-> Physics table and review log: [`films/universe-cut/PLAN.md`](films/universe-cut/PLAN.md).
+> ***What if the universe got cut in half?*** — open `universe-cut.html` (16:9, 5:59, voiceless). At 10:00 PM tonight
+> everything beyond a flat cut through the observable universe disappears; the cut runs through the Earth and the Moon.
+> From a London back garden, in real time: more than a third of the sky goes black, the Moon is cut in 1.2 seconds, you
+> feel nothing, small quakes start, and the shock from the other half's disappearance takes 3 minutes 49 seconds to reach
+> you through the rock. Physics table: [`films/universe-cut/PLAN.md`](films/universe-cut/PLAN.md); reviews:
+> [`films/universe-cut/EPISODE_REPORT.md`](films/universe-cut/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|

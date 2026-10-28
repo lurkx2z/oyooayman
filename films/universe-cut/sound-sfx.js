@@ -41,10 +41,10 @@ hvSound('sfx', 'events', function (ctx, bus, K) {
   // ---- the clock
   const tick = (t, v, pan = 0.15) => K.put(hvClick(fx, { f: 3400, tau: 0.0025, len: 0.04, hp: 1200 }), t, { vol: v, norm: true, pan, room, wet: 0.25 });
   for (let k = 5; k >= 1; k--) tick(HV.t0 - k, 0.035 + 0.01 * (5 - k));
-  for (let k = 0; k <= 12; k++) { const t = hvStory(210 + k); if (t < HV.hit - 0.3) tick(t, 0.03 + 0.004 * k, 0.1); }   // 10:03:30 → 10:03:42
+  for (let k = 0; k <= 12; k++) { const t = hvStory(217 + k); if (t < HV.hit - 0.3) tick(t, 0.03 + 0.004 * k, 0.1); }   // 10:03:37 → 10:03:49
   for (let j = 8; j >= 0; j--) { const t = HV.end - 0.45 - j; if (t > HV.question) tick(t, 0.03 + 0.006 * (8 - j)); }
 
-  // ---- the cold open: 10:03:42.5, the shock (cut short by the title)
+  // ---- the cold open: 10:03:49, the shock (cut short by the title)
   blow(HV.openHit, 0.2, 1.2);
 
   // ---- 10:00:00: everything in the sky swells and stops dead
@@ -121,7 +121,7 @@ hvSound('sfx', 'events', function (ctx, bus, K) {
     if (lap && lap.length) K.put(lap, HV.bath + 0.4, { vol: 0.014, norm: true, pan: 0.3, room, wet: 0.4 });
   }
 
-  // ---- the shock (10:03:42.5): the blow, then nothing
+  // ---- the shock (10:03:49): the blow, then nothing
   blow(HV.hit, 0.32, 1.8);
   rush(HV.hit, 1.4, { vol: 0.05, tau: 0.3, curve: [6000, 3000, 1400, 700, 300] });
 

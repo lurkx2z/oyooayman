@@ -1,9 +1,9 @@
 /* =====================================================================
    SOUND · AMB — the places. Each bed follows the shots it belongs to (hvPlace), with a short crossfade at each cut.
      the garden at night   a distant road, leaves, a few late crickets, a tawny owl: the same before and after
-                           10:00:00 (nothing you can hear changes when half the universe goes); from 10:02:58, as "down"
-                           tips, car alarms start up round the neighbourhood (their tilt sensors) and the house creaks
-                           (they are already going in the cold open, 10:03:32)
+                           10:00:00 (nothing you can hear changes when half the universe goes); from about 10:01:30 a low
+                           grumble of small quakes, growing; from 10:03:28 the tremors set car alarms off round the
+                           neighbourhood (they are already going in the cold open, 10:03:38)
      the telescope / the long lens   the garden, quieter
      space                 almost nothing: a faint low hum under the illustrations (the music and the effects carry
                            them; the face's roar and the air off the edge are illustration, in the effects)
@@ -25,9 +25,9 @@ hvSound('amb', 'places', function (ctx, bus, K) {
   for (const [t, pan] of [[17.2, -0.6], [cap0('nothing') + 3.0, 0.5], [HV.tv + 4.2, -0.4], [HV.real2 + 1.5, -0.5], [HV.real4 + 2.0, 0.4]]) if (g(t) > 0.5) K.put(hvOwl(fx, {}), t, { vol: 0.06, norm: true, pan, room, wet: 1 });
   function cap0(id) { return hvCap(id, 0).show; }
 
-  // ---- 10:03: car alarms going off round the neighbourhood (their tilt sensors feel "down" moving), near and far
+  // ---- 10:03:28: car alarms going off round the neighbourhood (set off by the tremors), near and far
   {
-    const cars = [[hvStory(178.5), -0.7, 0.35, 'whoop'], [hvStory(186.0), 0.55, 0.22, 'beep'], [hvStory(193.0), -0.2, 0.18, 'warble'], [hvStory(201.5), 0.8, 0.14, 'beep'], [hvStory(208.0), -0.85, 0.12, 'whoop']];
+    const cars = [[hvStory(207.6), -0.7, 0.35, 'whoop'], [hvStory(209.2), 0.55, 0.22, 'beep'], [hvStory(210.8), -0.2, 0.18, 'warble'], [hvStory(212.6), 0.8, 0.14, 'beep'], [hvStory(214.5), -0.85, 0.12, 'whoop']];
     // (and in the cold open, 10:03:32 to the shock, all of them already going)
     const inOpen = cars.map(([t0, pan, v, kind]) => [Math.max(0.0, HV.openHit - (HV.hit - t0)), pan, v * 0.5, kind, HV.openHit]);
     for (const [t0, pan, v, kind, tEnd] of cars.map((c) => c.concat([HV.hit])).concat(inOpen)) {
@@ -48,7 +48,7 @@ hvSound('amb', 'places', function (ctx, bus, K) {
   hvBed(K, hvStory(80), HV.hit + 0.05, { colour: 'brown', f: [['lp', 70], ['hp', 22]], env: (u, t) => g(t) * hvTremor(hvStoryAt(t)) * (0.6 + 0.4 * Math.abs(noise1(t * 1.7, 3))), vol: 0.16, fi: 0.5, fo: 0.02, am: 0.5, wr: 0.3 });
   hvBed(K, 0, HV.openHit + 0.05, { colour: 'brown', f: [['lp', 70], ['hp', 22]], env: (u, t) => hvTremor(hvStoryAt(t)) * (0.6 + 0.4 * Math.abs(noise1(t * 1.7, 3))), vol: 0.16, fi: 0.3, fo: 0.02, am: 0.5, wr: 0.3 });   // (the cold open)
   // a dog, a few gardens away, set off by the alarms
-  { const r = new RNG(95); for (let t = hvStory(190.5); t < HV.hit - 0.4; t += 1.1 + 2.0 * r.next()) { const v = g(t); if (v < 0.3) continue; const y = fx.arr(0.5); const n = Math.round(r.range(0.12, 0.18) * sr), z = hvNoise(fx, n, 'pink'); HVX.bq(z, 'bp', r.range(550, 750), 2.5, sr); for (let i = 0; i < n; i++) y[i] = z[i] * Math.sin(Math.PI * i / n); K.put(y, t, { vol: 0.045 * v, norm: true, pan: 0.6, room, wet: 1 }); } }
+  { const r = new RNG(95); for (let t = hvStory(211.5); t < HV.hit - 0.4; t += 1.1 + 2.0 * r.next()) { const v = g(t); if (v < 0.3) continue; const y = fx.arr(0.5); const n = Math.round(r.range(0.12, 0.18) * sr), z = hvNoise(fx, n, 'pink'); HVX.bq(z, 'bp', r.range(550, 750), 2.5, sr); for (let i = 0; i < n; i++) y[i] = z[i] * Math.sin(Math.PI * i / n); K.put(y, t, { vol: 0.045 * v, norm: true, pan: 0.6, room, wet: 1 }); } }
 
   // ---- space: a faint low hum under the illustrations
   hvBed(K, HV.gone - 0.3, HV.real + 0.3, { colour: 'brown', f: [['lp', 110], ['hp', 25]], env: (u, t) => space(t) * (t > HV.hit && t < HV.fall - 0.2 ? 0 : 1), vol: 0.05, fi: 0.4, fo: 0.4, am: 0.3, wr: 0.1 });
