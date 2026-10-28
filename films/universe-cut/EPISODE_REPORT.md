@@ -119,8 +119,10 @@ RMS at 10:03 to −12 at the shock. Encoded for the 1080p master: `final-soundtr
   "3:49 · AND STILL YOU FEEL NOTHING"), `thumb-face.jpg` (the cut face: "5,400 °C · AND STILL NOTHING HOLDS IT IN").
 - **Runnable ZIP:** `universe-cut-film.zip`: unzip, open `universe-cut.html` in Chrome or Edge, press Space (F for
   full screen).
-- **Final film:** rendered on the PC's graphics card from the pushed branch (`films/universe-cut/render-gpu.cjs`) to
-  `D:\renders\universe-cut\universe-cut_final_1080p.mp4`, 1920×1080, 30 fps, H.264 CRF 18. 1080p only (no phone copy).
+- **Final film** (rendered on the PC's graphics card from the pushed branch, `films/universe-cut/render-gpu.cjs`,
+  2026-10-28, 9 minutes at about 19 fps): `D:\renders\universe-cut\universe-cut_final_1080p.mp4`, 1920×1080, 30 fps,
+  H.264 CRF 18, 359.2 s (10,776 frames), 1,292 MiB, −15.8 LUFS, −1.3 dBTP, LRA 8.6 LU; check strip `check.jpg`
+  (8 frames, all clean). 1080p only (no phone copy).
 - Branch `claude/project-thread-bq9o1p`; every number in `films/universe-cut/PLAN.md`.
 
 ## What is still weak
