@@ -141,6 +141,8 @@ the final AAC 256k soundtrack measures −15.5 LUFS and −1.2 dBTP. Target −1
 ## Delivery
 
 - `friction-10s.html` (open it, press Space) with the baked soundtrack; a runnable ZIP in the project files.
-- Final: rendered on the owner's PC with `node films/friction-10s/render-gpu.cjs --channel chrome --out D:\renders\friction-10s`
-  (1080p only; the soundtrack is `final-soundtrack.m4a`, AAC 256k, copied in).
+- Final: rendered on the owner's PC (RTX 3060 Ti, 7 min at about 19 frames/s) with
+  `node films/friction-10s/render-gpu.cjs --channel chrome --out D:\renders\friction-10s`:
+  `D:\renders\friction-10s\friction-10s_final_1080p.mp4`, 1920×1080, 30 fps, H.264 + AAC 256k, 301.83 s, 1040 MiB,
+  −15.5 LUFS, −1.2 dBTP; check.jpg's 8 frames all fine. 1080p only (no phone copy).
 - Thumbnails in the house style (real film frames, 1280×720) in the project files.
