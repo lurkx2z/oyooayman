@@ -149,9 +149,14 @@ final AAC 256k soundtrack (`films/gravity-tilt/final-soundtrack.m4a`) measures �
 
 - `gravity-tilt.html` (open it, press Space) with the baked soundtrack; a runnable ZIP in the project files
   (`gravity-tilt-film.zip`: unzip, double-click `gravity-tilt.html`, press Space).
-- Final 1080p: to render on the owner's PC (about 6–7 minutes on the RTX 3060 Ti) with
-  `node films/gravity-tilt/render-gpu.cjs --channel chrome --out D:\renders\gravity-tilt` →
-  `D:\renders\gravity-tilt\gravity-tilt_final_1080p.mp4` (1920×1080, 30 fps, H.264 + AAC 256k). 1080p only.
+- Final 1080p: **rendered on the owner's PC on 29 October 2026** (9,531 frames in about 9 minutes, ~17 fps on the RTX
+  3060 Ti through Chrome, 2 workers) with
+  `node films/gravity-tilt/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\gravity-tilt` →
+  `D:\renders\gravity-tilt\gravity-tilt_final_1080p.mp4`: 317.7 s, 779 MB, 1920×1080, 30 fps, H.264 + AAC 256k,
+  −15.4 LUFS integrated, −1.2 dBTP true peak; the check frame at 60 s is clean. 1080p only.
+- The ZIP first played silent for the owner: browsers other than Chrome computed a different soundtrack fingerprint
+  (their Math.exp/sin differ in the last bit), refused the baked copy and rendered the sound live. Fixed in 433257e
+  (the fingerprint rounds numbers; same sound, re-baked) and the ZIP replaced.
 - Thumbnails in the house style (real film frames, 1280×720) in the project files: `thumb-lamp-post.jpg` (1 HOUR · AND
   STILL SHE HELD ON), `thumb-window-waterfall.jpg` (150 LITRES · AND STILL 18 MINUTES TO GO), `thumb-rain-wall.jpg`
   (4 KM OF RIVER · AND IT'S FALLING THIS WAY).
