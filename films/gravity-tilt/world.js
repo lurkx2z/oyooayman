@@ -82,7 +82,7 @@ GT_SETS.world = (app) => {
       fillA.intensity = v.inside ? 2.2 : 0; fillB.intensity = v.inside ? 1.4 : 0;
       R.bulb.intensity = v.inside ? 0.0 : 0;
       // ------------------------------------------------------------------ dust, rain, the rainbow
-      gtDust(T, s, cam); gtRainUpdate(T, s, cam); gtBowUpdate(T, s, cam, sd); gtJetUpdate(R, s, cam);
+      T.winAt = R.toWorld(0, 1.5, 0).toArray(); gtDust(T, s, cam); gtRainUpdate(T, s, cam); gtBowUpdate(T, s, cam, sd); gtJetUpdate(R, s, cam); gtFallUpdate(R, s, cam);
     },
     labels(t) { return gtLabels(this, t); },
     grade(t, p, shot) {
@@ -94,7 +94,7 @@ GT_SETS.world = (app) => {
       if (gtRain(s) > 0.05 && !this._inside) { p.saturation = 1.0 - 0.08 * gtRain(s); p.contrast = 1.04; }
       if (m === 'sick') { p.edgeBlur = 0.6 + 0.3 * Math.sin(t * 1.3); p.vignette = 0.62; p.chroma = 0.15; }
       // the bang of the bolt, the window going, the terrace's hit, the return: a kick
-      for (const [tt, a] of [[GT.tBolt, 0.22], [GT.tGlass, 0.16], [GT.tTerHit, 0.18], [GT.tB, 0.28]]) { const u = t - tt; if (u > 0 && u < 0.6) { p.flash = Math.max(p.flash || 0, a * Math.exp(-u / 0.06)); p.chroma = Math.max(p.chroma || 0, 2 * a * Math.exp(-u / 0.2)); } }
+      for (const [tt, a] of [[GT.tBolt, 0.22], [GT.tGlass, 0.16], [GT.tTerHit, 0.18], [GT.tB, 0.28]]) { const u = t - tt; if (u > 0 && u < 0.6) { p.flash = Math.max(p.flash || 0, a * Math.exp(-u / 0.06)); if (u < 0.07) p.chroma = Math.max(p.chroma || 0, 0.6 * a); } }
     },
   };
   return set;
@@ -172,7 +172,8 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
       const yaw = -0.04 + 0.22 * turn, pitch = -0.1 - 0.12 * dip - 0.12 * turn;
       v.p = RL(x, 1.63 - 0.03 * dip, 0.1 - 0.05 * turn); v.at = gtAdd(v.p, [Math.cos(pitch) * Math.cos(yaw), Math.sin(pitch), Math.cos(pitch) * Math.sin(yaw)]);
       v.fov = 58; v.up = [0, Math.cos(0.3 * turn), -Math.sin(0.3 * turn)]; v.drift = 0.002; v.sh = { f: [14, 0, 0], R: 20 }; break; }
-    case 'room0': v.p = RL(-3.3, 2.28, 1.38); v.at = RL(-0.9, 0.85, -0.45); v.fov = 66; v.inside = true; v.sh = { f: RL(-1.5, 1, 0), R: 4 }; break;
+    case 'room0': { const r = gtSm(s, 0.24, 0.52);                     // (the camera falls over with you: up turns to the new up)
+      v.p = RL(-3.3, 2.28, 1.38); v.at = RL(-0.9, 0.85, -0.45); v.fov = 66; v.up = [-Math.sin(r * Math.PI / 2), Math.cos(r * Math.PI / 2), 0]; v.inside = true; v.sh = { f: RL(-1.5, 1, 0), R: 4 }; break; }
     case 'master': v.p = into([1.2, 4.6, -0.3], [2.8, 4.4, -0.3], k); v.at = [200, 1.0, 0.5]; v.fov = 56; v.up = [0, 0, 1]; v.drift = 0.004; v.fog = 0.5; v.sh = { f: [70, 0, 0], R: 80 }; break;   // (the view from your window, turned 90°)
     case 'chair': { const F = GT_FALLERS.find((f) => f.k === 'gchair'), x = gtFaller(F, s).x;
       v.p = [x - 0.4, 2.5, F.z + 0.15]; v.at = [x + 1.1, 0, F.z - 0.25]; v.fov = 70; v.up = W; v.drift = 0.02; v.sh = { f: [x + 2, 0, F.z], R: 14 }; break; }   // (falling with it: the lawn streams past)
@@ -181,18 +182,15 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'front': v.p = into([5.2, 1.6, 1.6], [4.8, 1.8, 1.4], k); v.at = RL(0.0, 1.45, 0.05); v.fov = 46; v.up = W; v.drift = 0.004; v.sh = { f: RL(0, 1.5, 0), R: 4 }; break;
     case 'povglass': v.p = RL(-0.06, 1.5, 0.05); v.at = gtAdd(v.p, [1, -0.42, 0.05]); v.fov = 64; v.up = [0, 0.35, -1]; v.drift = 0.0015; v.sh = { f: [10, 0, 0], R: 16 }; break;
     case 'crawl': v.p = RL(-3.1, 1.9, -1.3); v.at = RL(-0.2, 1.45, 0.55); v.fov = 60; v.up = W; v.inside = true; v.sh = { f: RL(-0.5, 1.3, 0.4), R: 4 }; break;
-    case 'roomroll': { const r = gtSm(t, gtC('nuance', 1) + 0.6, gtC('nuance', 2) - 1.0);
-      v.p = RL(-3.25, 1.35, -1.25); v.at = RL(-0.6, 1.25, 0.5); v.fov = 62; v.up = [-Math.sin(r * Math.PI / 2), Math.cos(r * Math.PI / 2), 0]; v.inside = true; v.drift = 0.002; v.sh = { f: RL(-1, 1, 0), R: 4 }; break; }
+    case 'roomroll': v.p = into(RL(-3.25, 1.35, -1.25), RL(-2.95, 1.38, -1.05), k); v.at = RL(-0.6, 1.25, 0.5); v.fov = 62; v.up = W; v.inside = true; v.drift = 0.002; v.sh = { f: RL(-1, 1, 0), R: 4 }; break;   // (your room as you feel it: the window is the floor)
     case 'tipped': v.p = into([12, 6, -7.6], [11, 5.8, -7.2], k); v.at = [-4.5, 4, 0.5]; v.fov = 48; v.up = W; v.sh = { f: [-4, 3, 0], R: 14 }; break;
     // ---- 3: the air; the river (river.js); the jogger
     case 'dust': v.p = into([168, 2.6, -1.8], [174, 2.7, -1.8], k); v.at = [285, 7, 1]; v.fov = 50; v.fog = 0.7; v.sh = { f: [240, 0, 0], R: 60 }; break;
     case 'dust2': v.p = [262, 3.2, 9.5]; v.at = [282, 6, 0]; v.fov = 50; v.sh = { f: [278, 0, 0], R: 14 }; break;
-    case 'town': v.p = into([-140, 160, 210], [-120, 150, 190], k); v.at = [110, 0, -10]; v.fov = 46; v.drift = 0.02; v.fog = 0.3; v.sh = { f: [120, 0, 0], R: 160 }; break;
     case 'jogger': v.p = into([25.4, 1.9, 1.6], [25.2, 1.8, 1.2], k); v.at = [24.9, 1.4, -3.9]; v.fov = 42; v.up = W; v.sh = { f: [25, 1, -4], R: 5 }; break;
     case 'climb': v.p = [23.2, 2.4, 1.0]; v.at = [24.4, 1.35, -3.9]; v.fov = 44; v.up = W; v.sh = { f: [24.5, 1, -4], R: 5 }; break;
     // ---- 4: the pit; the cat; the bath; the phone; the trees; the sun
     case 'pit': v.p = into(RL(-0.25, 1.2, -0.9), RL(-0.35, 1.25, -0.85), k); v.at = RL(-3.6, 1.1, 0.9); v.fov = 70; v.up = W; v.inside = true; v.sh = { f: RL(-2, 1, 0), R: 4 }; break;
-    case 'house': v.p = into([17, 4.3, 0.8], [13.5, 4.3, 0.8], k); v.at = [0, 4.3, 0]; v.fov = 50; v.up = [0, 0, 1]; v.sh = { f: [-2, 4, 0], R: 12 }; break;   // (your house, face on, turned 90°)
     case 'sick': { const sw = Math.sin(t * 0.9) * 0.05 + Math.sin(t * 0.37) * 0.04, Y = GT_YOU.seatP;
       v.p = RL(-0.78, Y[1] - 0.15, Y[2] - 0.05); v.at = RL(-1.7 + 0.2 * Math.sin(t * 0.5), 0.9, -0.5 + 0.25 * Math.sin(t * 0.31)); v.fov = 62; v.up = [-Math.cos(sw), Math.sin(sw), 0]; v.inside = true; v.drift = 0.004; v.sh = { f: RL(-1, 1, 0), R: 4 }; break; }
     case 'cat': { const C = GT_CAT; v.p = RL(-0.75, C.y + 0.15, C.z + 0.62); v.at = RL(-0.2, C.y, C.z); v.fov = 44; v.up = W; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, C.y, C.z), R: 2 }; break; }
@@ -202,9 +200,10 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'sun': v.p = into([-3, 9.5, 0.2], [-2.6, 9.4, 0.2], k); v.at = [200, 4.0, -2]; v.fov = 46; v.glow = 1.0; v.up = [0, 0, 1]; v.sh = { f: [60, 0, 0], R: 60 }; break;
     // ---- 5: the terrace; the rain
     case 'terrace': v.p = into([62, 1.3, -4.6], [70, 1.3, -4.6], k); v.at = [90, 3.6, 9.5]; v.fov = 50; v.up = W; v.sh = { f: [88, 2, 12], R: 26 }; break;
+    case 'row': v.p = into([20, 7.5, -7.0], [23, 7.2, -6.6], k); v.at = [75, 3, 11]; v.fov = 48; v.sh = { f: [60, 2, 13], R: 40 }; break;   // (the whole row, held on by its mortar)
     case 'dpc': v.p = [13.15, 0.42, 9.0]; v.at = [14.25, 0.13, 9.6]; v.fov = 40; v.sh = { f: [14, 0, 9.5], R: 3 }; break;
     case 'slip': v.p = [13.55, 0.22, 9.25]; v.at = [14.05, 0.15, 9.55]; v.fov = 34; v.drift = 0.0006; v.sh = { f: [14, 0, 9.5], R: 2 }; break;
-    case 'rainfront': v.p = into([96, 1.7, 0.8], [90, 1.7, 0.8], k); v.at = [-20, 13, 0]; v.fov = 50; v.up = GT_UP.old; v.glow = 0.3; v.sh = { f: [40, 0, 0], R: 60 }; break;   // (down the street, the old way up: the rain coming at you like a wall)
+    case 'rainfront': v.p = into([96, 1.7, 0.8], [90, 1.7, 0.8], k); v.at = [-20, 19, 0]; v.fov = 54; v.up = GT_UP.old; v.glow = 0.3; v.sh = { f: [40, 0, 0], R: 60 }; break;   // (down the street, the old way up: the rain coming at you like a wall)
     case 'rainjog': v.p = [23.0, 1.0, 0.7]; v.at = [24.5, 1.45, -3.95]; v.fov = 40; v.up = W; v.drift = 0.0015; v.sh = { f: [24.4, 1.4, -4], R: 5 }; break;   // (her, in the rain)
     case 'rainwin': { const Y = GT_YOU.seatP; v.p = RL(-0.8, Y[1] - 0.1, Y[2] - 0.1); v.at = RL(0.05, 1.4, 0.0); v.fov = 58; v.up = W; v.inside = true; v.drift = 0.0012; v.sh = { f: RL(0, 1.4, 0), R: 3 }; break; }
     case 'bow': v.p = into([60, 2.6, 2.2], [58, 2.6, 2.2], k); v.at = [-20, 9, 0]; v.fov = 62; v.up = [0, 0, -1]; v.sh = { f: [20, 0, 0], R: 40 }; break;
@@ -214,13 +213,13 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'creep': v.p = [-0.15, 0.32, -4.55]; v.at = [-0.6, 0.08, -4.2]; v.fov = 40; v.drift = 0.0006; v.sh = { f: [-0.6, 0, -4.2], R: 2 }; break;
     case 'going': v.p = into([40, 1.0, -3.0], [44, 1.0, -3.0], k); v.at = [60, 1.4, 9.5]; v.fov = 46; v.up = W; v.sh = { f: [60, 1, 10], R: 22 }; break;
     case 'still': v.p = [12.8, 0.5, 8.6]; v.at = [16, 0.3, 9.6]; v.fov = 42; v.drift = 0.001; v.sh = { f: [15, 0, 9.5], R: 4 }; break;
+    case 'empty': v.p = into([7.5, 4.6, -3.2], [9.5, 4.4, -3.0], k); v.at = [62, 0.4, 13.5]; v.fov = 50; v.fog = 0.7; v.sh = { f: [50, 0, 13], R: 40 }; break;   // (where the terrace was: its footings, the plastic strip, the slabs)
     case 'release': v.p = into([7, 14.5, 13.2], [8, 14.2, 13.2], k); v.at = [120, 2.5, 13.5]; v.fov = 60; v.up = [0, 0, 1]; v.drift = 0.004; v.fog = 0.5; v.sh = { f: [60, 0, 13], R: 70 }; break;   // (from above its end: it falls away down the street)
-    case 'impact': v.p = [266, 20, -34]; v.at = [274, 3, 12]; v.fov = 50; v.up = W; v.drift = 0.006 + 0.05 * Math.exp(-Math.max(0, s - GT_TER.hit0) / 0.5) * (s > GT_TER.hit0 ? 1 : 0); v.fog = 0.6; v.sh = { f: [272, 0, 8], R: 40 }; break;
-    case 'cloud': v.p = into([150, 6, -9], [156, 6.2, -9], k); v.at = [250, 14, 6]; v.fov = 54; v.sh = { f: [220, 0, 10], R: 80 }; break;
+    case 'impact': v.p = [258, 8, -7]; v.at = [270, 5, 13]; v.fov = 62; v.up = W; v.drift = 0.006 + 0.05 * Math.exp(-Math.max(0, s - GT_TER.hit0) / 0.5) * (s > GT_TER.hit0 ? 1 : 0); v.fog = 0.6; v.sh = { f: [272, 0, 8], R: 40 }; break;
     // ---- 7: the pool; the window goes
     case 'pool': v.p = RL(-1.5, 1.9, -0.95); v.at = RL(0.0, 1.35, 0.1); v.fov = 54; v.up = W; v.inside = true; v.sh = { f: RL(0, 1.4, 0), R: 3 }; break;
     case 'glassclose': v.p = RL(-0.42, 1.62, 0.32); v.at = RL(0.05, 1.3, -0.05); v.fov = 44; v.up = W; v.inside = true; v.drift = 0.001; v.sh = { f: RL(0, 1.4, 0), R: 2 }; break;
-    case 'glassgo': v.p = [16, 3.2, 3.2]; v.at = RL(0, 1.5, 0); v.fov = 44; v.up = [0, 0, 1]; v.drift = 0.006; v.sh = { f: [4, 3, 0], R: 12 }; break;
+    case 'glassgo': v.p = into([3.4, 2.3, 2.7], [3.7, 2.2, 2.9], k); v.at = gtAdd(RL(0.3, 1.5, 0), [1.4, 0.2, 0]); v.fov = 66; v.drift = 0.004; v.sh = { f: [2, 4, 0], R: 8 }; break;
     // ---- 8: ten minutes; the bolt; the last minute
     case 'ready': v.p = RL(-2.6, 2.1, 0.9); v.at = RL(-0.3, 0.6, 0.0); v.fov = 60; v.up = W; v.inside = true; v.sh = { f: RL(-0.5, 1, 0.8), R: 4 }; break;
     case 'jogdown': v.p = [25.6, 1.3, 0.8]; v.at = [24.2, 0.9, -3.95]; v.fov = 46; v.up = W; v.sh = { f: [24.5, 1, -4], R: 5 }; break;
@@ -230,7 +229,8 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'lastin': v.p = RL(-2.4, 1.6, 1.0); v.at = RL(-0.3, 0.4, 0.0); v.fov = 56; v.up = W; v.inside = true; v.sh = { f: RL(-0.5, 0.5, 0.8), R: 3 }; break;
     case 'count': gtCountCam(set, s, t, v, RL); break;
     // ---- 9: down is down
-    case 'back': v.p = RL(-3.0, 2.1, 0.45); v.at = RL(-0.6, 0.15, 0.0); v.fov = 66; v.inside = true; v.sh = { f: RL(-1.5, 1, 0), R: 4 }; break;
+    case 'back': { const r = gtSm(s, GTP.tBack + 0.06, GTP.tBack + 0.42), dy = 0.18 * gtSm(s, GTP.tBack, GTP.tBack + 0.27);
+      v.p = RL(-2.2, 0.62 - dy, 0.32); v.at = RL(-0.2, 0.5 - 0.5 * dy, -0.3); v.fov = 66; v.up = [-Math.cos(r * Math.PI / 2), Math.sin(r * Math.PI / 2), 0]; v.inside = true; v.drift = 0.002; v.sh = { f: RL(-0.6, 0.5, 0), R: 4 }; break; }
     case 'backstreet': v.p = into([30, 1.8, 2.6], [31, 1.8, 2.6], k); v.at = [20, 1.6, -4.5]; v.fov = 56; v.sh = { f: [24, 0, -4], R: 10 }; break;
     case 'rainfall': v.p = [44, 0.55, 1.2]; v.at = [60, 0.2, -1.5]; v.fov = 50; v.sh = { f: [52, 0, 0], R: 12 }; break;
     case 'after': v.p = into([22, 2.0, -0.6], [19, 2.2, -0.4], k); v.at = [-4, 4.2, 0]; v.fov = 42; v.sh = { f: [-4, 3, 0], R: 14 }; break;
@@ -254,10 +254,12 @@ function gtCountCam(set, s, t, v, RL) {
 function gtLabels(set, t) {
   const shot = gtShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s, R = set.R;
   const RL = (x, y, z) => R.toWorld(x, y, z).toArray();
+  if (m === 'master') out.push({ p: [70, 7.5, 13.5], text: 'THE TERRACE', sub: '30 BRICK HOUSES', a: W(t, gtC('tilt', 2) + 0.2, shot.t1 - 0.2, 0.3, 0.2) });
   if (m === 'master' && t > gtC('tilt', 1) + 0.3) out.push({ p: [GT_W.end - 2, 3, 0], text: 'THE END OF THE STREET', sub: '285 m DOWN', a: W(t, gtC('tilt', 1) + 0.4, shot.t1 - 0.2, 0.3, 0.2) });
   if (m === 'front') out.push({ p: RL(0.06, 1.75, -0.35), text: 'YOU', a: W(t, shot.t0 + 0.5, gtC('glass', 1) - 0.1, 0.3, 0.3) });
   if (m === 'jogger') out.push({ p: [GT_JOG.post.x, 3.5, GT_JOG.post.z], text: 'A LAMP POST', sub: 'SET IN CONCRETE: IT HOLDS', a: W(t, shot.t0 + 0.6, gtC('jogger', 1) - 0.2, 0.3, 0.3) });
-  if (m === 'dust2') out.push({ p: [281, 8.5, 0], text: 'DUST', sub: 'RISING, THE OLD WAY', a: W(t, gtC('air', 2) + 0.3, shot.t1 - 0.2, 0.3, 0.2) });
+  if (m === 'dust2') out.push({ p: [279, 7.5, 0], text: 'STEAM', sub: 'RISING, THE OLD WAY', a: W(t, gtC('air', 1) + 0.3, shot.t1 - 0.2, 0.3, 0.2) });
+  if (m === 'empty') out.push({ p: [70, 0.6, 13.5], text: 'WHERE THE TERRACE WAS', sub: '30 HOUSES', a: W(t, shot.t0 + 0.6, shot.t1 - 0.3, 0.3, 0.3) });
   if (m === 'pit') out.push({ p: RL(-3.58, GT_W.door.h * 0.55, (GT_W.door.z[0] + GT_W.door.z[1]) / 2), text: 'YOUR DOOR', a: W(t, gtC('pit', 1) + 0.2, shot.t1 - 0.2, 0.3, 0.2), side: 'r' });
   if (m === 'dpc') out.push({ p: [16.2, 0.154, 9.5], text: 'DAMP-PROOF COURSE', sub: 'A STRIP OF PLASTIC', a: W(t, shot.t0 + 0.5, shot.t1 - 0.3, 0.3, 0.3), side: 'l' });
   if (m === 'creep') out.push({ p: [-0.6, 0.12, -4.2], text: 'AN ANCHOR BOLT', sub: '1 OF 22', a: W(t, shot.t0 + 0.6, shot.t1 - 0.3, 0.3, 0.3), side: 'r' });

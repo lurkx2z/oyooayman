@@ -1,6 +1,6 @@
 # What if gravity tilted 90° for one hour?
 
-This is a voiceless 16:9 long-form film: 1920×1080, 30 fps, 5:35. It follows the Slower light / Friction 10s formula and
+This is a voiceless 16:9 long-form film: 1920×1080, 30 fps, 5:18. It follows the Slower light / Friction 10s formula and
 the owner's YouTube lessons and retention playbook of 28 October 2026:
 - an everyday place: your bedroom at 7:42 on a weekday morning, and your street;
 - action under the title on frame 1;
@@ -20,15 +20,16 @@ from `physics.js` (§ 2).
 At **7:42:00 AM**, gravity on everything loose turns 90° to point **east**, with its usual strength (9.81 m/s²), for
 exactly **one hour**. At 8:42:00 it turns back.
 
-Three things keep their old down, and the film says so on screen:
+Two things keep their old down, and the film says so on screen:
 - **The air.** If it fell sideways, the wind would pass the speed of sound in about 35 s, and that would be the whole
-  film.
+  film. The proof on screen is the steam off the wrecked engines: hot air still rises the old way, because the air
+  around it still weighs the old way.
 - **The ground.** Rock, soil and anything set in concrete stay put.
-- **The sea.** The film notes once that every ocean would pour sideways, then stays in your town.
 
-Nothing known can turn gravity. The film calls this a thought experiment. The real nuance it uses is Einstein's
-equivalence principle: your body can't tell gravity from acceleration, so to you it is as if your house had been tipped
-on its side.
+The sea is not in the film: your town is inland, further than the ~35 km that falling water could cover in the hour.
+
+Nothing known can turn gravity. The real nuance the film uses is Einstein's: you never feel gravity itself, only what
+stops your fall. So to you it is as if your house had been tipped on its side.
 
 ## 2. The physics (physics.js)
 
@@ -41,15 +42,16 @@ on its side.
 | 0.72 | the jogger, thrown back past a lamp post (she was running uphill at 3 m/s), hooks it at 4 m/s | GT_JOG |
 | 2.4 → 18.8 | everything loose falls the 285 m down your street and piles up against the retaining wall at the end. The parked cars hit at **24–67 m/s** (terminal speed ~180 m/s: almost no drag over 285 m), the bins at 19–27 m/s, and a garden chair at 15 m/s (18.8 s) | GT_FALLERS, gtSolvePile |
 | all hour | 385 roof tiles work loose (most in the first minutes) and flutter down the street at 20–30 m/s | GT_TILES |
-| 0 → 3600 | your house (timber, bolted down by 22 anchor bolts) racks 0.55° east at once, then creeps (wood under a lasting load creeps: log time) | gtLean |
-| 25 → 446 | the river 4 km west falls along its own bed; where it bends, the water doesn't. It breaks into drops that fall east at their terminal speed (~9.5 m/s) and reach your street at **7:49:26** as sideways rain | GT_RIVER, gtRain |
+| 2.4 → ~300 | the wrecked cars' radiators burst onto hot engines: the steam rises the old way, its droplets drifting a little east, and fades as the engines cool | street.js: gtDust |
+| 0 → 3600 | your house (timber, bolted down by 22 anchor bolts) racks 0.55° east at once, then creeps (wood under a lasting load creeps: log time). Many timber houses would rack further; ours holds, and the film says many wouldn't | gtLean |
+| 25 → 446 | the river 4 km west falls along its own bed; where it bends, the water doesn't. It breaks into drops that fall east at their terminal speed (~9.5 m/s) and reach your street at **7:49:26** as sideways rain. The drops drag the air with them: a gust as the front passes (heard, not drawn) | GT_RIVER, gtRain |
 | 100 → 132 | the jogger climbs on top of the post and sits on it like a branch (a grip lasts about a minute) | gtJog |
 | 170 → 380 | next door's bath (150 litres) comes through the edges of your door: 1.9 cm lying on your window | GT_BATH, gtPool |
 | 235 | your phone's emergency alert | GTP.alert |
 | 0 → 3600 | the trees bend 20–35° at the crown and hold (a tree is a branch that grew upright); they whip back at the return | gtTreeBend |
 | 0 → 1620 | the brick terrace opposite (30 houses, 150 m) is held on its damp-proof course only by the mortar's grip. It creeps east in tertiary creep (d = k/(T − s) − k/T, k 88, T 1700): **30 cm at 8:06:10** (s 1450), 1.05 m when it **lets go at 8:09:00** (s 1620) | GT_TER, gtTerSlip |
 | 1620 → 1626.6 | the terrace falls 120 m freely as one block (nothing inside it is loaded) and hits the end of the street at **48.5 m/s = 175 km/h**, then crumples house by house (1.7 m each) | gtTerHouse |
-| 2530 | the cracked window, carrying the pool, the chair, the mug and the books under a load that never stops, lets go at **8:24:10** (static fatigue) | GT_GLASS, gtCrack |
+| 2530 | the cracked window, carrying the pool, the mug and the books under a load that never stops, lets go at **8:24:10** (static fatigue). The water pours out of the hole as a sideways waterfall (x = gτ²/2 from the hole, most of it at once, the rest draining off the wall over ~3 s); teeth of glass stay in the frame. The chair stays: it rests on the wall below the sill | GT_GLASS, gtCrack, room.js: gtFallUpdate |
 | 3000 → 3030 | 10 minutes left: you get down into the corner where the wall meets the old floor | GT_YOU.corner |
 | 3020 → 3080 | the jogger edges down to the foot of her post | GT_JOG.down |
 | 3330 | one anchor bolt snaps (**8:37:30**); the house lurches 0.2° and swings | GT_BOLT |
@@ -75,29 +77,34 @@ In between it runs faster (×1.2 to ×31) and jumps forward, always at a cut. Th
 
 | beat | film t |
 |---|---|
-| title | 1.5 |
-| rain arrives | 184.2 |
-| terrace lets go | 227.7 |
-| terrace hits | 232.65 |
-| window goes | 260.2 |
-| bolt | 281.5 |
-| 0.4 s of silence | 307.6 |
-| the return | 308.0 |
-| end | 334.8 |
+| gravity turns (under the title) | 1.5 |
+| rain arrives | 159.7 |
+| terrace lets go | 206.2 |
+| terrace hits | 211.2 |
+| window goes | 238.7 |
+| bolt | 264.3 |
+| 0.4 s of silence | 290.5 |
+| the return | 290.9 |
+| end | 317.65 |
 
-## 4. Shots (shots.js: 55 shots; the count down has 6 quick cuts inside one shot)
+## 4. Shots (shots.js: 54 shots; the count down has 6 quick cuts inside one shot)
 
-The 55 shots are grouped into nine parts:
+The 54 shots are grouped into nine parts:
 
-1. **The first seconds:** pov0 (your eyes at the window), room0, master (the street, falling), chair (falling with a garden chair), bottom
-2. **The glass:** front, povglass, crawl, roomroll (the nuance), tipped
-3. **Air, sea, river, jogger:** dust, dust2 (dust still rises the old way), town, river, bend, spray, jogger, climb
-4. **The hour settles:** pit, house, sick, cat, bath, phone, trees, sun
-5. **Brick and rain:** terrace, dpc, slip, rainfront, rainjog, bow (the sideways rainbow)
-6. **Wood, and the terrace goes:** wood, creak, creep, going, still, release, impact, cloud
-7. **The window:** pool, glassclose, glassgo
+1. **The first seconds:** pov0 (your eyes at the window: you're thrown onto the glass), room0 (the camera falls over
+   with you as the room falls onto the window), master (the street, falling; the terrace pinned), chair (falling with
+   a garden chair), bottom
+2. **The glass:** front, povglass, crawl, roomroll (your room as you feel it: Einstein), tipped
+3. **Air, river, jogger:** dust, dust2 (the steam still rises the old way), river, bend, spray, jogger, climb
+4. **The hour settles:** pit, sick, cat, bath, phone, trees, sun
+5. **Brick and rain:** terrace, dpc, row, slip, rainfront (the rain coming down the street like a wall), rainjog, bow
+   (the rainbow, where it always is)
+6. **Wood, and the terrace goes:** wood, creak, creep, going, still, release, impact (from the street, the new down
+   down the frame), empty (where the terrace was)
+7. **The window:** pool, glassclose (it goes, from inside), glassgo (from below it outside: the sideways waterfall)
 8. **The last ten minutes:** ready, jogdown, bolt, lurch, last, lastin, count
-9. **Down is down:** back, backstreet, rainfall, after, question (cut on the last frame)
+9. **Down is down:** back (low in your room, as you felt it; the frame falls upright with you and the books), backstreet,
+   rainfall, after, question (cut on the last frame)
 
 ## 5. Look and HUD
 
@@ -109,8 +116,8 @@ This is the house style (STYLE_BIBLE, and § 6 of the hybrid study):
   on a cut that moves the hour on, how far (+8 MIN). After the return it reads GRAVITY · BACK +0:12. Under that, one
   context line for the scene (the fastest car, the terrace's slip, your house's lean…);
 - top right, the time this morning, and a DOWN dial showing which way down is on the screen right now;
-- seven small diagrams: the glass's load, Einstein's equivalence, the air, the pits, the damp-proof course, a river
-  becoming rain, wood under a long load;
+- six small diagrams: the glass's load, Einstein (from inside, a tipped room and a turned gravity feel the same), the
+  pits, the damp-proof course, a river becoming rain, wood under a long load;
 - pinned labels.
 
 When gravity has turned, the camera's up follows the new down in the shots seen "as you feel it", and the old up in
@@ -127,8 +134,8 @@ the ones seen from outside.
 - **The places.** The bedroom's room tone. The street through the walls, and through the hole once the window has gone.
   The air: no gale, because the air keeps its old down. The car alarms of the pile, as loud as the camera is near it
   (the pile is 285 m from your window). Alarms all over town. The rain's roar coming down the street as the falling
-  river's front arrives, then rain everywhere. At the return, the rain hits the ground for ~12 s, and stops. The river's
-  roar.
+  river's front arrives, a gust as it passes (the drops drag the air along), then rain everywhere. At the return, the
+  rain hits the ground for ~12 s, and stops. The river's roar.
 - **The events.** Each is heard once, at the film time its story second comes round; an event that falls in a jump is
   not heard. Long sounds are cut at the next jump. The level and the low-pass follow the camera's distance (gtNear), and
   sounds are muffled through the walls from inside.
@@ -137,4 +144,20 @@ the ones seen from outside.
 
 ## 7. Review log
 
-See EPISODE_REPORT.md.
+**Round 1 (the 5:35 cut, a 480×270 preview, four independent reviewers).** Scores as given: retention **4.5/10**
+(hook 5, first 30 s 6, middle 4, payoff 4, which way is down 5); visuals **4.5/10** and **5/10** (two reviewers; hero
+moments 3 and 3.5); physics **7.5/10** (accuracy 7, honesty 7, clarity 8, learned 8, believability 7). Their main
+points: a 47 s science-and-disclaimer block straight after the hook; the impact, the window and the return fell flat
+(a camera inside a tree after the impact, the window a few pixels, the return read as a reset); no visible rain front;
+crash dust can't rise the old way (steam can); the rainbow isn't sideways; the Einstein caption described rotation;
+the terrace was shown with false precision.
+
+**Fixes (5:35 → 5:18):** the block cut to ~20 s (no "thought experiment", no sea, no town aerial; Einstein as "you
+never feel gravity itself, only what stops your fall"; the room shown as you feel it); steam instead of dust; "a
+rainbow, right where it always is"; the terrace hedged ("Nobody knows for how long."); "Ours holds. Many wouldn't.";
+"She's past that", "the first of it", "over 30 cm", the earthquake line, the glass number; a gust with the rain; the
+opening (the camera falls over with you, the room falls onto the window, the street from 0:03.5, the terrace pinned);
+the impact from the street; where the terrace was; the window from inside, then from below it (a sideways waterfall,
+teeth left in the frame); a rain wall; the return low in your room (the frame falls upright with you); two frames of
+colour split at most; less haze on the river. The full report (shot list, scores, what is still weak, sound, delivery)
+is EPISODE_REPORT.md in the project files.

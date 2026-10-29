@@ -228,7 +228,7 @@ gtSound('sfx', 'events', function (ctx, bus, K) {
   // ---- the bath water: through the edges of your door (170 → 380), falling the 3.6 m onto your window wall
   for (const sp of gtSpan(GT_BATH.t0, GT_BATH.t1)) {
     if (sp.where !== 'in') continue;
-    const flow = (s) => gtSm(s, GT_BATH.t0, GT_BATH.t0 + 12) * (1 - gtSm(s, GT_BATH.t1 - 50, GT_BATH.t1)), d = sp.tB - sp.tA;
+    const flow = (s) => gtSm(s, GT_BATH.t0, GT_BATH.t0 + 6) * (1 - gtLin(s, GT_BATH.t0, GT_BATH.t1)), d = sp.tB - sp.tA;   // (as gtBathIn: fastest while the bathroom is full)
     const b = pour(d + 0.2, (u) => 0.15 + 0.85 * flow(sp.sA + u * (sp.sB - sp.sA)));
     K.putLR(b.L, b.R, sp.tA, { vol: 0.05, norm: true, room, wet: 0.35, stop: sp.tB + 0.06, fade: 0.06 });
   }

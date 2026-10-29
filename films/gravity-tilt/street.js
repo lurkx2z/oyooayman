@@ -256,7 +256,7 @@ function gtBuildStreet(S) {
   // ------------------------------------------------------------------ roof tiles (instanced)
   { const geo = new THREE.BoxGeometry(0.42, 0.014, 0.33), im = new THREE.InstancedMesh(geo, M.tile, GT_TILES.length); im.castShadow = true; im.frustumCulled = false; root.add(im); T.tiles = im; }
   // ------------------------------------------------------------------ dust (rises the old way), rain, the rainbow
-  T.dust = gtPuffs(scene, 2600, { soft: 1.3 });
+  T.dust = gtPuffs(scene, 3600, { soft: 1.3 });
   // the rain: streaks near the camera (thin quads turned to face it), and the rain as a mass far off (a soft grey volume
   // behind the front of the river's water; you see its front coming down the street)
   { const N = 7000, geo = new THREE.BufferGeometry(), pos = new Float32Array(N * 12), uv = new Float32Array(N * 8), idx = new Uint32Array(N * 6);
@@ -275,12 +275,16 @@ function gtBuildStreet(S) {
         float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y); }
         void main(){ float o = vN.z > 0.5 ? vW.y : vW.z, xs = vW.x - sx;
           float st = vN.x > 0.5 ? 0.6 * n(vW.yz * 0.08) + 0.4 * n(vW.yz * 0.35) : 0.6 * n(vec2(xs * 0.012, o * 0.22)) + 0.4 * n(vec2(xs * 0.04, o * 0.9));
-          float m = 0.55 + 0.45 * st;
-          // (most of the water is low: a dense band up to ~40 m with a billowing top, thin drops above it up to the top)
-          float b = 0.36 * top + 9.0 * (n(vec2(vW.z * 0.02, vW.x * 0.004)) - 0.5) + 5.0 * (n(vec2(vW.z * 0.09, vW.x * 0.02)) - 0.5);
-          float hy = mix(0.1, 1.0, 1.0 - smoothstep(b - 6.0, b + 4.0, vW.y)) * (1.0 - smoothstep(0.8 * top, top, vW.y));
-          float a = k * mix(0.85, 0.07, inside) * m * smoothstep(0.0, 40.0, vD) * mix(smoothstep(0.0, 18.0, front - vW.x), 1.0, step(0.5, vN.x)) * hy;
-          gl_FragColor = vec4(col * (0.85 + 0.25 * m), a); }`,
+          float m = 0.4 + 0.6 * st;
+          // (most of the water is low: a dense band up to ~40 m with a billowing top (a hard edge against the sky), thin
+          // drops above it up to the top)
+          float b = 0.38 * top + 14.0 * (n(vec2(vW.z * 0.02, vW.x * 0.004)) - 0.5) + 7.0 * (n(vec2(vW.z * 0.09, vW.x * 0.02)) - 0.5) + 3.0 * (n(vec2(vW.z * 0.3, vW.y * 0.2)) - 0.5);
+          float band = 1.0 - smoothstep(b - 2.5, b + 1.5, vW.y);
+          float hy = mix(0.05, 1.0, band) * (1.0 - smoothstep(0.8 * top, top, vW.y));
+          float a = k * mix(0.96, 0.07, inside) * mix(0.7, 1.0, m) * smoothstep(0.0, 40.0, vD) * mix(smoothstep(0.0, 18.0, front - vW.x), 1.0, step(0.5, vN.x)) * hy;
+          // (lit by the low sun behind you near its top, darker and denser lower down)
+          float lit = smoothstep(0.2 * top, b, vW.y);
+          gl_FragColor = vec4(col * (0.6 + 0.55 * m) * mix(0.8, 1.35, lit), a); }`,
     })); wall.frustumCulled = false; wall.renderOrder = 5; scene.add(wall);
     T.rain = { mesh, geo, pos, mat, N, wall }; }
   { const m = new THREE.Mesh(new THREE.RingGeometry(0.93, 1.0, 128, 1), new THREE.ShaderMaterial({
@@ -293,6 +297,7 @@ function gtBuildStreet(S) {
     })); m.frustumCulled = false; m.renderOrder = 6; scene.add(m); T.bow = m; }
   // (the impacts that raise dust: [s, x, z, size])
   T.impacts = GT_FALLERS.filter((f) => f.k === 'car').map((f) => [f.tHit, f.stop + f.len * f.crush, f.z, 1.0]);
+  T.steam = GT_FALLERS.filter((f) => f.k === 'car' && f.vHit > 30).slice(0, 7);                  // (the hardest hits: their engines steam)
   T.update = (s, o) => gtStreetUpdate(T, s, o || {});
   return T;
 }
@@ -380,7 +385,30 @@ function gtDust(T, s, cam) {
       const tone = 0.58 + 0.2 * c;
       P.add(x, 0.5 + rise, z, 2.2 + 6 * a + 0.22 * Math.sqrt(u) * (2 + 4 * c), al, tone, tone * 0.95, tone * 0.88);
     } }
-  // the window going (the water and what fell with it, hitting the pile): a little spray, later
+  // steam: the wrecked cars' radiators burst onto hot engines; it rises the old way (hot air rises in air that keeps its
+  // old down), its droplets drifting a little east. Each plume fades over the first few minutes as the engines cool
+  for (const [k, f] of T.steam.entries()) {
+    const x0 = f.stop + f.len * f.crush - 0.9, life = 7, dt = 0.16, s0 = f.tHit + 0.4, cool = Math.exp(-Math.max(0, s - s0) / (70 + 40 * gtR(k, 451)));
+    if (s < s0 || cool < 0.02) continue;
+    const i1 = Math.floor((s - s0) / dt), i0 = Math.max(0, i1 - Math.ceil(life / dt));
+    for (let i = i0; i <= i1; i++) {
+      const u = s - (s0 + i * dt); if (u <= 0 || u > life) continue;
+      const a = gtR(i, 460 + k), b = gtR(i, 470 + k), c = gtR(i, 480 + k);
+      const rise = 1.5 * u - 0.05 * u * u, sp = 0.15 + 0.32 * u;
+      const al = 0.34 * cool * Math.min(1, u * 5) * Math.pow(1 - u / life, 1.4) * (0.6 + 0.4 * c);
+      P.add(x0 + 0.12 * u + (a - 0.5) * sp, 1.1 + rise, f.z + (b - 0.5) * 2 * sp, 0.4 + 0.5 * u, al, 1.0, 1.0, 1.0);
+    }
+  }
+  // the window going: a mist off the sideways waterfall (room.js: gtFallUpdate), as it breaks up
+  { const u = s - GT_GLASS.go, o = T.winAt;
+    if (u > 0 && u < 9 && o) for (let i = 0; i < 260; i++) {
+      const a = gtR(i, 491), b = gtR(i, 492), c = gtR(i, 493), lag = 2.6 * a * a, w = u - lag;   // (it leaves over ~2.6 s)
+      if (w <= 0) continue;
+      const x = o[0] + 0.05 + 0.6 * w + 0.5 * GTP.g * w * w; if (x > GT_W.end) continue;
+      const sp = 0.2 + 0.5 * w;
+      const al = 0.16 * Math.min(1, w * 8) * (1 - a) * Math.exp(-w / 2.2) * (w > 0.15 ? 1 : 0);
+      P.add(x, o[1] - 0.55 + 1.1 * b + (b - 0.5) * sp * 0.6, o[2] + (c - 0.5) * (1.1 + sp), 0.18 + 0.25 * w + 0.4 * c, al, 0.84, 0.9, 0.95);
+    } }
   P.end();
 }
 

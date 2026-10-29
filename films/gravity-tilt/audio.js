@@ -66,7 +66,7 @@ class GtAudio extends AudioEngine {
     const consts = { GTP, GT_W, GT_ROOM, GT_BOOKS, GT_YOU, GT_CAT, GT_BATH, GT_GLASS, GT_BOLT, GT_FALLERS, GT_LEN, GT_VT, GT_JOG, GT_TER, GT_RIVER, GT_CLOCK, GT_SHOTS, GT_CAMXY, GT_TILES };
     return [GT, GTT, window.GT_MIX, Object.values(GTX).map(String).join(''), GtFx.toString(), Object.getOwnPropertyNames(GtFx.prototype).map((k) => String(GtFx.prototype[k])).join(''),
       Object.values(GT_SOUND).flat().map((b) => b.name + b.fn).join(''), gtDynDb.toString(), GtAudio.toString(), gtLimit.toString(), gtStoryAt.toString(), gtSegAt.toString(), JSON.stringify(consts),
-      (window.GT_SOUND_FNS || []).map(String).join(''), [gtShotAt, gtFaller, gtFall, gtDrop, gtDropT, gtDropV, gtTerSlip, gtJog, gtBook, gtPool, gtCrack, gtLean].map(String).join('')];
+      (window.GT_SOUND_FNS || []).map(String).join(''), [gtShotAt, gtFaller, gtFall, gtDrop, gtDropT, gtDropV, gtTerSlip, gtJog, gtBook, gtBathIn, gtPool, gtCrack, gtLean].map(String).join('')];
   }
   async renderOffline() {
     if (this.solo) return super.renderOffline();

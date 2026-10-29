@@ -176,7 +176,9 @@ function gtLight(s) {
 // the bath water next door comes through the edges of your door (s 120 → 330), runs down (east) to the window wall and
 // lies there: 150 litres over the 8 m² of wall = 1.9 cm (minus what the bed and the wardrobe stand in)
 const GT_BATH = { t0: 170, t1: 380, litres: 150 };
-const gtPool = (s) => (s < GT_BATH.t0 ? 0 : 0.019 * gtSm(s, GT_BATH.t0 + 4, GT_BATH.t1) * (s < GT_GLASS.go ? 1 : 0));
+// how much of it has come through (0…1): fastest at first, while the bathroom behind the door is full
+const gtBathIn = (s) => { const u = gtLin(s, GT_BATH.t0, GT_BATH.t1); return 1 - (1 - u) * (1 - u); };
+const gtPool = (s) => (s < GT_BATH.t0 ? 0 : 0.019 * gtBathIn(s) * (s < GT_GLASS.go ? 1 : 0));
 
 // the window glass: cracked by the mug (0.19) and the chair's corner (0.62); you off it at 34–52; it carries the pool,
 // the chair, the mug, the books that slid onto it; under a load that never stops cracked glass weakens (static

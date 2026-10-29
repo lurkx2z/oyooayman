@@ -298,14 +298,23 @@ function gtBuildRoom(S) {
     gtCyl(0.042, 0.04, 0.095, M.mug, 0, 0.0475, 0, g, 18); gtCyl(0.037, 0.037, 0.004, M.coffee, 0, 0.08, 0, g, 18);
     const hd2 = gtMesh(new THREE.TorusGeometry(0.026, 0.008, 8, 16, Math.PI), M.mug, 0.042, 0.05, 0, g); hd2.rotation.z = -Math.PI / 2; }
   // the bath water: streams through the door's edges across the room; the layer lying on the window wall
-  { const N = 3 * 70, geo = new THREE.BufferGeometry(), pos = new Float32Array(N * 12), uv = new Float32Array(N * 8), idx = new Uint32Array(N * 6);
-    for (let i = 0; i < N; i++) { uv.set([0, 0, 1, 0, 1, 1, 0, 1], i * 8); idx.set([i * 4, i * 4 + 1, i * 4 + 2, i * 4, i * 4 + 2, i * 4 + 3], i * 6); }
-    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage)); geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); geo.setIndex(new THREE.BufferAttribute(idx, 1));
-    const st = gtCanvas(8, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.4, 'rgba(255,255,255,0.95)'); gr.addColorStop(1, 'rgba(255,255,255,0.5)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
-    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: '#dceaf2', map: gtTex(st, { repeat: false }), transparent: true, opacity: 0.75, depthWrite: false, side: THREE.DoubleSide }));
-    m.frustumCulled = false; m.renderOrder = 6; room.add(m); R.jet = { m, geo, pos, N }; }
+  R.jet = gtStreaks(room, 3 * 70, '#dceaf2', 0.75);
+  // … and pouring out of the hole when the window goes: a sideways waterfall
+  R.fall = gtStreaks(room, 700, '#dfeaf1', 0.8);
   R.pool = new THREE.Mesh(new THREE.PlaneGeometry(Zs - Zn, H), M.water); R.pool.rotation.y = -Math.PI / 2; R.pool.position.set(-0.02, H / 2, 0); R.pool.renderOrder = 6; room.add(R.pool);
   // the window's pieces when it goes (falling out, east)
+  // what's left in the frame when it goes: jagged teeth of glass round the edges of the opening
+  { const pts = [], Wn = GT_W.win, z0 = Wn.z[0] + 0.05, z1 = Wn.z[1] - 0.05, y0 = Wn.y[0] + 0.05, y1 = Wn.y[1] - 0.05;
+    const tooth = (a, b, tip) => pts.push(new THREE.Vector3(0.06, a[1], a[0]), new THREE.Vector3(0.06, b[1], b[0]), new THREE.Vector3(0.06, tip[1], tip[0]));
+    for (let i = 0; i < 18; i++) {
+      const e = i % 4, u0 = hash1(i * 5.3), w = 0.06 + 0.12 * hash1(i * 2.9), h = 0.05 + 0.16 * hash1(i * 7.7), sk = 0.06 * (hash1(i * 3.3) - 0.5);
+      if (e === 0) { const z = z0 + u0 * (z1 - z0 - w); tooth([z, y0], [z + w, y0], [z + w * 0.5 + sk, y0 + h]); }
+      else if (e === 1) { const z = z0 + u0 * (z1 - z0 - w); tooth([z, y1], [z + w, y1], [z + w * 0.5 + sk, y1 - h]); }
+      else if (e === 2) { const y = y0 + u0 * (y1 - y0 - w); tooth([z0, y], [z0, y + w], [z0 + h, y + w * 0.5 + sk]); }
+      else { const y = y0 + u0 * (y1 - y0 - w); tooth([z1, y], [z1, y + w], [z1 - h, y + w * 0.5 + sk]); }
+    }
+    const g = new THREE.BufferGeometry().setFromPoints(pts); g.computeVertexNormals();
+    R.teeth = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: '#e8f1f5', transparent: true, opacity: 0.45, roughness: 0.04, envMapIntensity: 1.6, depthWrite: false, side: THREE.DoubleSide })); R.teeth.renderOrder = 4; R.teeth.visible = false; room.add(R.teeth); }
   R.shards = Array.from({ length: 14 }, (_, i) => { const m = new THREE.Mesh(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0.12 + 0.2 * hash1(i * 3.1), 0.05), new THREE.Vector3(0, 0.03, 0.15 + 0.15 * hash1(i))]), M.glass); m.geometry.setIndex([0, 1, 2]); m.geometry.computeVertexNormals(); room.add(m); m.visible = false; return m; });
 
   R.update = (s, o) => gtRoomUpdate(R, s, o || {});
@@ -355,7 +364,7 @@ function gtRoomUpdate(R, s, o) {
   // ---- the window: cracks, the coffee; the water lying on it; it goes at GT_GLASS.go
   const gone = s >= GT_GLASS.go;
   R.crackTex.update({ k: +gtCrack(s).toFixed(3), coffee: s > GT_YOU.hitGlass ? +Math.min(1, (s - GT_YOU.hitGlass) / 0.15).toFixed(2) : 0, drip: s >= GTP.tBack ? +Math.min(1, (s - GTP.tBack) / 3).toFixed(2) : 0 });
-  R.glass.visible = R.crack.visible = !gone;
+  R.glass.visible = R.crack.visible = !gone; R.teeth.visible = gone;
   R.shards.forEach((m, i) => {
     const u = s - GT_GLASS.go;
     m.visible = gone && u < 6;
@@ -375,6 +384,42 @@ function gtRoomUpdate(R, s, o) {
     if (s > GT_GLASS.go + 8) m.visible = false; }
 }
 
+// streaks of water (quads turned to face the camera each frame; room-local): N of them, a colour, an opacity
+function gtStreaks(room, N, col, op) {
+  const geo = new THREE.BufferGeometry(), pos = new Float32Array(N * 12), uv = new Float32Array(N * 8), idx = new Uint32Array(N * 6);
+  for (let i = 0; i < N; i++) { uv.set([0, 0, 1, 0, 1, 1, 0, 1], i * 8); idx.set([i * 4, i * 4 + 1, i * 4 + 2, i * 4, i * 4 + 2, i * 4 + 3], i * 6); }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage)); geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); geo.setIndex(new THREE.BufferAttribute(idx, 1));
+  const st = gtCanvas(8, 64, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.4, 'rgba(255,255,255,0.95)'); gr.addColorStop(1, 'rgba(255,255,255,0.5)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+  const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: col, map: gtTex(st, { repeat: false }), transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide }));
+  m.frustumCulled = false; m.renderOrder = 6; room.add(m);
+  return { m, geo, pos, N };
+}
+// the window going: the water lying on it (and, over ~3 s, what drains to the hole off the rest of the wall) falls out
+// and away east: x = g τ²/2 from the hole; long streaks, the faster the longer (room-local; after the camera is placed)
+function gtFallUpdate(R, s, cam) {
+  const F = R.fall, u = s - GT_GLASS.go;
+  F.m.visible = u > 0 && u < 10;
+  if (!F.m.visible) return;
+  cam.getWorldPosition(_gtJC); R.room.worldToLocal(_gtJC);
+  const cx = _gtJC.x, cy = _gtJC.y, cz = _gtJC.z, P = F.pos, Wn = GT_W.win, g = GTP.g;
+  let n = 0;
+  for (let i = 0; i < F.N; i++) {
+    const a = gtR(i, 921), b = gtR(i, 922), c = gtR(i, 923), tau = u - 3.0 * a * a * a;    // (most of it at once)
+    if (tau <= 0) continue;
+    const x = 0.01 + 0.5 * g * tau * tau, v = g * tau; if (x > 90) continue;
+    const L = Math.min(5, 0.12 + v * 0.07), ex = Math.max(-0.02, x - L);
+    const sp = 0.25 * tau, z = Wn.z[0] + 0.04 + b * (Wn.z[1] - Wn.z[0] - 0.08) + (b - 0.5) * sp, y = Wn.y[0] + 0.04 + c * (Wn.y[1] - Wn.y[0] - 0.08) + (c - 0.5) * sp;
+    const vx = cx - x, vy = cy - y, vz = cz - z, dist = Math.hypot(vx, vy, vz);
+    if (dist < 0.3) continue;
+    let wy = vz, wz = -vy; const wl = Math.hypot(wy, wz) || 1, hw = (0.01 + 0.016 * gtR(i, 924)) * Math.max(1, dist / 4);
+    wy *= hw / wl; wz *= hw / wl;
+    const o = n * 12;
+    P[o] = x; P[o + 1] = y - wy; P[o + 2] = z - wz; P[o + 3] = x; P[o + 4] = y + wy; P[o + 5] = z + wz;
+    P[o + 6] = ex; P[o + 7] = y + wy; P[o + 8] = z + wz; P[o + 9] = ex; P[o + 10] = y - wy; P[o + 11] = z - wz;
+    n++;
+  }
+  F.geo.setDrawRange(0, n * 6); F.geo.attributes.position.needsUpdate = true;
+}
 // the bath water pouring through the gaps round your door (its two sides and its top), falling the 3.6 m across your
 // room to the window wall: streaks turned to face the camera (room-local; called after the camera is placed)
 const _gtJC = new THREE.Vector3();

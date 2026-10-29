@@ -65,11 +65,11 @@ Everything is procedural, so there are no models, images or sound files to downl
 > coming back up the same avenue. The payoff card: *CAUSE OF GLOBAL CATASTROPHE: SLIPPED ON WET SIDEWALK.* A small note
 > after the joke says it is satire. Shot list, causal chain and review log: [`films/slip/PLAN.md`](films/slip/PLAN.md).
 >
-> ***What if gravity tilted 90° for one hour?*** — open `gravity-tilt.html` (16:9, voiceless, 5:35). At 7:42 on a
+> ***What if gravity tilted 90° for one hour?*** — open `gravity-tilt.html` (16:9, voiceless, 5:18). At 7:42 on a
 > weekday morning down turns east, along your street, for exactly one hour. You land on your bedroom window, everything
 > loose falls the 285 m to the end of the street, a jogger hangs on a lamp post, a river 4 km away arrives as sideways
-> rain with a sideways rainbow, the brick terrace opposite slides off its damp-proof course and hits the end of the
-> street at 175 km/h, your window gives way, a bolt snaps, and at 8:42 down is down again. The story clock only ever
+> rain (and a rainbow, right where it always is), the brick terrace opposite slides off its damp-proof course and hits
+> the end of the street at 175 km/h, your window gives way, a bolt snaps, and at 8:42 down is down again. The story clock only ever
 > runs forward. Physics, clock, shots and review log: [`films/gravity-tilt/PLAN.md`](films/gravity-tilt/PLAN.md).
 
 | Time | Beat |

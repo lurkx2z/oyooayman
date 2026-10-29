@@ -32,7 +32,7 @@ GT_SETS.river = (app) => {
   const sunD = gtSunDir(80);
   const S = gtSet(app, { sky: '#b9cfe2', fov: 50, near: 0.1, far: 6000, hemi: ['#dbe8f5', '#7a6a58', 0.6], sun: [sunD[0] * 80, sunD[1] * 80, sunD[2] * 80], sunI: 3.6, sunColor: '#ffe2bc', shadow: 2048, shadowR: 60, shadowFar: 300, env: ['#9cc0e6', '#e2ddd2', '#6c6256'] });
   const scene = S.scene, cam = S.camera, sun = S.sun;
-  scene.fog = new THREE.FogExp2('#c9d6e0', 0.0006);
+  scene.fog = new THREE.FogExp2('#c9d6e0', 0.00032);
   gtSky(scene, '#4a8ad6', '#d6e2ea', '#8c8a84', { sunDir: sunD, sunGlow: '#ffd9a8', hw: 0.3 });
   const M = {
     field: gtStd('#ffffff', 1.0, 0, { map: (() => { const t = gtTex(gtGrassCanvas(31)); t.repeat.set(220, 220); return t; })() }),
@@ -118,7 +118,7 @@ GT_SETS.river = (app) => {
         if (u > s - 0.5) continue;                                            // (launched before the water left: not yet)
         const z0 = -w + 2 * w * b, x = leaveX(z0) + dropX(u * (0.6 + 0.4 * c) * 1.0), spread = Math.min(1, u / 6);
         const y = -0.8 + (0.5 + 9 * c * c) * spread + 1.2 * Math.sin(i + u * 0.7) * spread, z = z0 + (c - 0.5) * 22 * spread;
-        const al = (0.22 + 0.3 * (1 - spread)) * Math.min(1, u * 4) * (1 - Math.min(1, x / 2600));
+        const al = (0.12 + 0.3 * (1 - spread)) * Math.min(1, u * 4) * (1 - Math.min(1, x / 2600)) * (1 - 0.6 * Math.min(1, x / 900));
         puffs.add(x, y, z, 1.2 + 5 * spread * (0.4 + c), al, 0.94, 0.96, 0.97);
       }
       puffs.end();
@@ -135,7 +135,7 @@ GT_SETS.river = (app) => {
       switch (shot.mode) {
         case 'river': p = gtV([-150, 95, 120], [-120, 85, 108], k); at = [70, -4, -12]; fov = 46; break;
         case 'bend': p = gtV([92, 13, 46], [88, 12, 44], k); at = [24, -1, -8]; fov = 50; break;
-        case 'spray': p = gtV([-40, 34, 46], [-20, 30, 40], k); at = [500, 0, -4]; fov = 50; break;   // (behind it, looking the way it's falling: towards town)
+        case 'spray': p = gtV([8, 42, 30], [24, 38, 26], k); at = [500, 0, -4]; fov = 50; break;   // (behind it, looking the way it's falling: towards town)
         default: p = [-60, 40, 60]; at = [40, 0, 0];
       }
       const d = gtDrift(t, 0.05, 0.3, 21);

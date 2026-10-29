@@ -18,41 +18,39 @@ status: voiceless
 
 [crawl] So, slowly. Off the glass, onto the wall.
 
-[nuance] Nothing we know of can turn gravity. This is a thought experiment. / But Einstein showed your body can't tell gravity from acceleration. / To you, it's as if your house had been tipped on its side.
+[nuance] Einstein: you never feel gravity itself, only what stops your fall. / So to you, it's as if your house had been tipped on its side.
 
-[air] The air and the ground keep their old down. / If the air fell sideways too, the wind would pass the speed of sound in 35 seconds. / Look: the dust still rises the old way.
+[air] The air and the ground keep their old down. / Look: steam from the wrecked engines still rises the old way.
 
-[sea] Out at sea, every ocean would pour sideways. This film stays in your town.
+[river] 4 km west, the river is falling along its own bed. / Where it bends, the water doesn't. And it's falling this way.
 
-[river] 4 km west, the river is falling along its own bed. / Where it bends, the water doesn't. / And it's falling this way.
+[jogger] She caught a lamp post as she fell past it. / Most people can hang on for about a minute. She's past that. / So she climbs on top. Like a branch.
 
-[jogger] She caught a lamp post as she fell past it. / Most people can hang on for about a minute. / So she climbs on top. Like a branch.
+[pit] Your bedroom is a 3.6 metre pit now. / And the only door is in the ceiling.
 
-[pit] Your bedroom is a 3.6 metre pit now. / And the only door is in the ceiling. / Behind it, every room in your house is a pit too.
-
-[sick] Your eyes say the room is upright. Your ears say it's on its side. / That argument is what makes you feel sick.
+[sick] Your eyes say the room is upright. Your ears say it's on its side. / That's why you feel sick.
 
 [cat] The cat has already adjusted.
 
-[bath] Next door, the bath was full. / 150 litres, and the only way down is through your door.
+[bath] Next door, the bath was full: 150 litres. / The only way down is through your door.
 
 [phone] Your phone, finally: stay indoors, stay away from windows. / Thanks.
 
-[trees] The trees bend, but they hold. / A tree is just a branch that grew upright.
+[trees] The trees bend, but they hold: a tree is a branch that grew upright.
 
 [sun] And the sun is at the bottom of your street.
 
-[brick] The houses opposite are brick. / Brick isn't fixed to the ground. It sits on a strip of plastic, held down by its own weight. / Now only the mortar's grip holds them on.
+[brick] The houses opposite are brick, sitting on a strip of plastic. / Their weight held them down. Now only the mortar's grip does. / Nobody knows for how long.
 
-[slip] And it's slipping. A few millimetres a minute.
+[slip] Here, it's slipping. A few millimetres a minute.
 
-[rain] 7 minutes after it left its bed, the river arrives. / Fall 4 km, and even a river breaks up into rain. / Up on her lamp post, it just looks like rain. / And with the sun behind you: a rainbow. Sideways.
+[rain] 7 minutes after the first of it left its bed, the river arrives. / Fall 4 km, and even a river breaks up into rain. / Up on her lamp post, it just looks like rain. / And with the sun behind you: a rainbow, right where it always is.
 
-[wood] Your house is wood: nailed together, and bolted down. / It creaks. It leans. It holds.
+[wood] Your house is wood: nailed together, and bolted down. / It creaks. It leans. Ours holds. Many wouldn't.
 
-[creep] But wood gets weaker the longer a load lasts. / Earthquakes last seconds. This has lasted 15 minutes.
+[creep] But wood gets weaker the longer a load lasts. / An earthquake shakes for seconds. This has pushed for 15 minutes.
 
-[going] The terrace has slipped 30 cm. / It's going.
+[going] The terrace has slipped over 30 cm. / It's going.
 
 [gone] 30 houses. 150 metres of brick. / It hits the end of the street at 175 km/h.
 
@@ -62,7 +60,7 @@ status: voiceless
 
 [glassgo] There it goes.
 
-[ready] 10 minutes left. When gravity comes back, everything off the floor falls again. / So get low: the corner where the wall meets the old floor. / She edges down to the foot of her lamp post.
+[ready] 10 minutes left. / When gravity comes back, everything off the floor falls again. / So get low: the corner where the wall meets the old floor. / She edges down to the foot of her lamp post.
 
 [bolt] That bang was one of the bolts holding your house down. / 21 left.
 

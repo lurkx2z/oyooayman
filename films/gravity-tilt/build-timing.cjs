@@ -16,17 +16,17 @@ const path = require('path');
 const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
-  title: 0.05, tilt: 0.6, street: 0.8, glass: 2.6, crawl: 1.0, nuance: 1.2, air: 0.9, sea: 0.8, river: 3.2, pit: 1.6, sick: 1.0,
-  cat: 1.2, jogger: 1.4, bath: 1.4, phone: 1.4, trees: 1.6, sun: 1.4, brick: 1.4, slip: 0.9, rain: 2.6, wood: 1.4, creep: 1.0,
-  going: 2.6, gone: 9.0, quiet: 2.0, pool: 1.6, glassgo: 3.6, ready: 2.4, bolt: 5.0, last: 2.0, down: 22.0, rainfall: 0.6,
+  title: 0.05, tilt: 0.6, street: 0.8, glass: 2.6, crawl: 1.0, nuance: 1.0, air: 0.8, river: 2.2, pit: 1.4, sick: 1.0,
+  cat: 1.2, jogger: 1.4, bath: 1.4, phone: 1.4, trees: 1.2, sun: 1.4, brick: 1.4, slip: 0.9, rain: 2.6, wood: 1.4, creep: 1.0,
+  going: 2.6, gone: 9.0, quiet: 2.0, pool: 1.6, glassgo: 4.6, ready: 3.4, bolt: 5.0, last: 2.0, down: 22.0, rainfall: 0.6,
   after: 1.4, question: 2.0,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'tilt:1': 0.2, 'street:1': 0.4, 'glass:1': 0.3, 'glass:2': 0.2, 'nuance:1': 0.2, 'nuance:2': 0.2, 'air:1': 0.2, 'air:2': 0.4,
-  'river:1': 0.5, 'river:2': 0.6, 'pit:1': 0.6, 'pit:2': 0.4, 'phone:1': 0.3, 'sick:1': 0.3, 'jogger:1': 0.6, 'jogger:2': 2.6, 'bath:1': 0.5, 'trees:1': 0.4,
-  'brick:1': 0.3, 'brick:2': 0.3, 'rain:1': 0.5, 'rain:2': 0.6, 'rain:3': 0.5, 'wood:1': 0.6, 'creep:1': 0.3, 'going:1': 0.8, 'gone:1': 0.5,
-  'quiet:1': 0.6, 'pool:1': 0.4, 'pool:2': 0.5, 'ready:1': 0.4, 'ready:2': 0.6, 'bolt:1': 0.5, 'after:1': 0.5,
+  'tilt:1': 0.2, 'street:1': 0.4, 'glass:1': 0.3, 'glass:2': 0.2, 'nuance:1': 0.2, 'air:1': 0.4,
+  'river:1': 0.5, 'pit:1': 0.6, 'phone:1': 0.3, 'jogger:1': 0.6, 'jogger:2': 2.6, 'sick:1': 0.2, 'bath:1': 0.3,
+  'brick:1': 0.3, 'brick:2': 0.2, 'rain:1': 0.5, 'rain:2': 0.6, 'rain:3': 0.5, 'wood:1': 0.6, 'creep:1': 0.3, 'going:1': 0.8, 'gone:1': 0.5,
+  'quiet:1': 0.6, 'pool:1': 0.4, 'pool:2': 0.5, 'ready:2': 0.4, 'ready:3': 0.6, 'bolt:1': 0.5, 'after:1': 0.5,
 };
 const SECTION_OF = { title: 1, glass: 2, river: 3, brick: 4, going: 5, quiet: 6, last: 7, down: 8 };
 const GAP = 0.6;                     // between captions inside a beat

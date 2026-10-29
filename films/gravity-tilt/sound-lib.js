@@ -206,10 +206,10 @@ function gtCrunch(fx, o = {}) {
 // ---- where the camera is (for how far away a sound is) ----------------------------------------------------------
 // each outside shot's camera, roughly (world x along the street, height y: world.js has the exact ones); inside, the
 // bedroom (behind its walls). The chair shot falls with the chair; the count down's quick cuts each have their own
-const GT_CAMXY = { master: [2, 4.5], bottom: [260, 16], front: [5, 1.7], tipped: [11.5, 6], dust: [171, 2.6], dust2: [262, 3.2], town: [-130, 155],
-  jogger: [25.3, 1.9], climb: [23.2, 2.4], house: [15, 4.3], trees: [198, 2.6], sun: [-2.8, 9.5], terrace: [66, 1.3], dpc: [13.2, 0.4], slip: [13.6, 0.2],
+const GT_CAMXY = { master: [2, 4.5], bottom: [260, 16], front: [5, 1.7], tipped: [11.5, 6], dust: [171, 2.6], dust2: [262, 3.2],
+  jogger: [25.3, 1.9], climb: [23.2, 2.4], trees: [198, 2.6], sun: [-2.8, 9.5], terrace: [66, 1.3], dpc: [13.2, 0.4], row: [21.5, 7.4], slip: [13.6, 0.2],
   rainfront: [93, 1.7], rainjog: [23, 1.0], bow: [59, 2.6], wood: [15.5, 5.1], creep: [-0.2, 0.3], going: [42, 1.0], still: [12.8, 0.5], release: [7.5, 14.4],
-  impact: [266, 20], cloud: [153, 6], glassgo: [16, 3.2], jogdown: [25.6, 1.3], bolt: [-0.5, 0.2], lurch: [17.8, 3.2], last: [-1, 10.5],
+  impact: [258, 8], empty: [8.5, 4.5], glassgo: [3.5, 2.2], jogdown: [25.6, 1.3], bolt: [-0.5, 0.2], lurch: [17.8, 3.2], last: [-1, 10.5],
   backstreet: [30.5, 1.8], rainfall: [44, 0.55], after: [20.5, 2.1] };
 function gtCamAt(t) {
   const sh = gtShotAt(t), w = gtWhere(t);

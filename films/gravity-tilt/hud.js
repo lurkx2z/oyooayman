@@ -29,7 +29,7 @@ const GT_CTX = (() => {
     [c('tilt', 1) + 0.2, gtB('street', 0.2) - 0.1, 'THE CAR OUTSIDE YOUR HOUSE', (t, s) => { const f = car(), r = gtFaller(f, s); return r.hit ? { v: gtKmh(f.vHit), v2: 'HIT THE BOTTOM AT THAT' } : { v: gtKmh(r.v), v2: 'FALLEN ' + Math.round(r.x - f.x) + ' OF ' + Math.round(f.d) + ' m' }; }],
     [c('street', 0) + 0.2, c('street', 1) - 0.3, 'THE GARDEN CHAIR', (t, s) => { const f = chair(), r = gtFaller(f, s); return { v: gtKmh(r.v), v2: 'FALLEN ' + Math.round(r.x - f.x) + ' OF ' + Math.round(f.d) + ' m' }; }],
     [c('jogger', 1) - 0.4, E('jogger') + 0.3, 'SHE HAS HELD ON FOR', (t, s) => ({ v: gtMmss(s - GT_JOG.catch), v2: s > GT_JOG.climb[0] ? 'CLIMBING' : '' })],
-    [c('bath', 1) - 0.2, E('bath') + 0.3, 'BATH WATER IN YOUR ROOM', (t, s) => ({ v: Math.round(GT_BATH.litres * gtSm(s, GT_BATH.t0 + 4, GT_BATH.t1)) + ' <small>litres</small>', v2: '' })],
+    [c('bath', 0) + 0.6, E('bath') + 0.3, 'BATH WATER IN YOUR ROOM', (t, s) => ({ v: Math.round(GT_BATH.litres * gtBathIn(s)) + ' <small>litres</small>', v2: '' })],
     [c('slip', 0) - 0.2, E('slip') + 1.2, 'THE TERRACE HAS SLIPPED', slip],
     [gtS('going') - 0.4, GT.tRel - 0.1, 'THE TERRACE HAS SLIPPED', slip],
     [GT.tRel, GT.tTerHit + 1.0, 'THE TERRACE', (t, s) => { const r = gtTerHouse(0, s); return { v: gtKmh(r.v || 0), v2: r.hit ? 'HIT' : 'FALLEN ' + Math.round(Math.max(0, r.dx - GT_TER.dRel)) + ' OF 120 m' }; }],
@@ -144,10 +144,9 @@ class GtHud {
     const W = StoryHUD.win, c = gtC, E = gtE;
     const which = [
       ['glassload', c('glass', 1) + 0.2, E('glass') + 0.2, ''],
-      ['einstein', c('nuance', 1) + 0.15, c('nuance', 2) - 0.35, 'left'],
-      ['airwind', c('air', 1) + 0.15, c('air', 2) - 0.35, ''],
-      ['pits', c('pit', 2) + 0.1, E('pit') + 0.3, ''],
-      ['dpc', c('brick', 1) + 0.15, E('brick') + 0.2, 'left'],
+      ['einstein', c('nuance', 1) + 0.15, E('nuance') + 0.3, 'left'],
+      ['pits', c('pit', 1) + 0.1, E('pit') + 0.3, ''],
+      ['dpc', c('brick', 0) + 0.15, E('brick') + 0.2, ''],
       ['rain', c('rain', 1) + 0.15, c('rain', 2) - 0.35, ''],
       ['creep', c('creep', 0) + 0.2, E('creep') + 0.2, ''],
     ].find((x) => t >= x[1] && t < x[2]);
@@ -173,9 +172,9 @@ class GtHud {
       <g opacity="${k1}">${pane(50, 214)}${wind}<text x="155" y="262" class="sm" text-anchor="middle">WIND</text><text x="155" y="288" class="sm" text-anchor="middle">~100 kg/m²</text><text x="155" y="326" class="b" text-anchor="middle">✓ BUILT FOR</text></g>
       <g opacity="${k2}">${pane(290, 214)}<path d="M300 212 q 95 -40 190 0 z" fill="#d8b49a"/><text x="395" y="262" class="sm" text-anchor="middle">YOU, LYING</text><text x="395" y="288" class="sm" text-anchor="middle">~150 kg/m²</text><text x="395" y="326" class="b" text-anchor="middle">? MIGHT HOLD</text></g>
       <g opacity="${k3}">${pane(530, 214)}<path d="M600 212 l 14 -70 l 14 70 z M650 212 l 12 -70 l 12 70 z" fill="#d8b49a"/>${GtHud.arrow(613, 110, 613, 196, '#ff8a6a', 5)}${GtHud.arrow(662, 110, 662, 196, '#ff8a6a', 5)}
-        <text x="635" y="262" class="sm" text-anchor="middle">KNEELING</text><text x="635" y="288" class="sm" text-anchor="middle">~4,000 kg/m²</text><text x="635" y="326" class="b" text-anchor="middle" fill="#ff8a6a">✗ THROUGH</text>
+        <text x="635" y="262" class="sm" text-anchor="middle">KNEELING</text><text x="635" y="288" class="sm" text-anchor="middle">ON TWO KNEES</text><text x="635" y="326" class="b" text-anchor="middle" fill="#ff8a6a">✗ THROUGH</text>
         <path d="M600 228 l 18 30 M 640 228 l -10 40 M 660 228 l 20 26" stroke="#fff" stroke-width="2" opacity="${crack}"/></g>
-      <text x="40" y="420" class="s" opacity="${k3}">THE SAME WEIGHT. LESS GLASS TO SPREAD IT ON</text>`);
+      <text x="40" y="420" class="s" opacity="${k3}">SAME WEIGHT, LESS GLASS UNDER IT</text>`);
   }
   // Einstein: inside a closed room you can't tell a pull to the side from a room tipped on its side
   static einstein(u) {
@@ -227,7 +226,7 @@ class GtHud {
     return GtHud.svg(`${GtHud.plate()}<g opacity="${k}"><rect x="40" y="200" width="50" height="70" fill="#5d8aa0"/>${d}
       ${GtHud.arrow(100, 330, 690, 330, '#ffcf8a', 5)}<text x="395" y="370" class="sm" text-anchor="middle">4 km, FALLING</text>
       <text x="90" y="170" class="sm">A SHEET</text><text x="690" y="170" class="sm" text-anchor="end" opacity="${MathX.smooth(p, 0.8, 1)}">DROPS</text></g>
-      <text x="40" y="50" class="t">WATER THAT FALLS FAR BREAKS UP</text><text x="40" y="430" class="s">ANGEL FALLS (979 m) IS MOSTLY SPRAY AT THE BOTTOM</text>`);
+      <text x="40" y="50" class="t">WATER THAT FALLS FAR BREAKS UP</text><text x="40" y="430" class="s">ANGEL FALLS (979 m) ENDS AS SPRAY</text>`);
   }
   // wood under a load that never stops: the longer it lasts, the less it can take (log time)
   static creep(u) {

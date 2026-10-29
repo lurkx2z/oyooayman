@@ -65,6 +65,8 @@ gtSound('amb', 'places', function (ctx, bus, K) {
   beds((t) => outC(t) * rainK(t), { colour: 'pink', f: [['hp', 350], ['lp', 7000]], vol: 0.1, am: 0.2, wr: 0.25 });
   beds((t) => outC(t) * rainK(t), { colour: 'brown', f: [['lp', 300], ['hp', 40]], vol: 0.06, am: 0.3, wr: 0.2 });
   beds((t) => outC(t) * rainK(t), { colour: 'white', f: [['bp', 5200, 0.7], ['lp', 11000]], vol: 0.022, am: 0.5, wr: 0.6 });
+  // the drops drag the air along with them: a gust as the front goes past, then a steady wind east inside the rain
+  beds((t) => outC(t) * Math.min(1, 4 * rainK(t) * (1 - rainK(t)) + 0.3 * rainK(t)), { colour: 'pink', f: [['bp', 650, 0.5], ['lp', 3200]], vol: 0.07, am: 0.7, wr: 0.3 });
   // 8:42: the rain falls out of the air and hits the ground, for the first time in 53 minutes; ~12 s, then it stops
   beds((t) => outC(t) * rainGround(t), { colour: 'pink', f: [['hp', 500], ['lp', 9000]], vol: 0.13, am: 0.25, wr: 0.3 });
   beds((t) => outC(t) * rainGround(t), { colour: 'white', f: [['bp', 4200, 0.6]], vol: 0.03, am: 0.5, wr: 0.8 });

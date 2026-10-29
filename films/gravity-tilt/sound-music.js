@@ -178,21 +178,20 @@ gtSound('music', 'score', function (ctx, bus, K) {
 
   // ---- 3 · the thought experiment: curious and light; Einstein (the theme); tipped on its side
   const tAir = B('air', 0.4);
-  M.prog([[tNuance, C.Fmaj7], [cap('nuance', 1) - 0.35, C.Csus], [cap('nuance', 2) - 0.35, C.Bbmaj7], [cap('nuance', 2) + 2.6, C.Asus]], tAir + 0.25, 0.25, { cut: 1100 });
-  keys(tNuance + 0.6, cap('nuance', 1) - 0.2, 2.0, ['A4', 'E5', 'C5', 'G4'], 0.07);
-  theme(cap('nuance', 1) + 0.9, [0.5, 0.5, 0.6], 0.3, { bend: 1.6 });                                // (Einstein)
-  M.drum(cap('nuance', 2) + 1.9, 0.3, 41.2, 1.4);                                                  // ("…tipped on its side.")
+  M.prog([[tNuance, C.Csus], [cap('nuance', 1) - 0.35, C.Bbmaj7], [cap('nuance', 1) + 2.6, C.Asus]], tAir + 0.25, 0.25, { cut: 1100 });
+  theme(cap('nuance', 0) + 0.9, [0.5, 0.5, 0.6], 0.3, { bend: 1.6 });                                // (Einstein)
+  M.drum(cap('nuance', 1) + 1.9, 0.3, 41.2, 1.4);                                                  // ("…tipped on its side.")
 
-  // ---- 4 · the air keeps its down (a wide slow pulse); the sea (one big swell); the river (a quicker pulse, a
-  //          hit where it bends, a roll into "falling this way")
-  const tTown = sh('town').t0, tRiver = sh('river').t0, tJog = sh('jogger').t0;
-  M.prog([[tAir, C.Dm9], [cap('air', 1) - 0.3, C.Bbmaj7], [cap('air', 2) - 0.3, C.Gm9]], tTown + 0.3, 0.27, { cut: 1100 });
-  gtPulse(ctx, M.bus, tAir + 0.5, tTown - 0.05, ['D1', 'D2'], 0.6, 0.16, { cut: 380, cutTo: 700, acc: 4, decay: 0.35 });
-  M.drum(tTown, 0.45, 36.7, 1.3); M.strings(tTown, tRiver + 0.25, C.Bbbig, 0.3, { att: 1.4, rel: 0.25, cut: 700, cutTo: 2600, cutAt: tRiver - 0.6 });
-  M.prog([[tRiver, C.Dm9], [cap('river', 1) - 0.25, C.Gm9], [cap('river', 2) - 0.3, C.A7b9]], tJog + 0.02, 0.3, { cut: 1200, cutTo: 2000, lastRel: 0.02 });
+  // ---- 4 · the air keeps its down (a wide slow pulse); the river (a blow, a quicker pulse, a hit where it bends, a
+  //          roll into "falling this way")
+  const tRiver = sh('river').t0, tJog = sh('jogger').t0;
+  M.prog([[tAir, C.Dm9], [cap('air', 1) - 0.3, C.Bbmaj7]], tRiver + 0.3, 0.27, { cut: 1100 });
+  gtPulse(ctx, M.bus, tAir + 0.5, tRiver - 0.05, ['D1', 'D2'], 0.6, 0.16, { cut: 380, cutTo: 700, acc: 4, decay: 0.35 });
+  M.drum(tRiver, 0.45, 36.7, 1.3);
+  M.prog([[tRiver, C.Dm9], [cap('river', 1) - 0.25, C.Gm9], [cap('river', 1) + 2.2, C.A7b9]], tJog + 0.02, 0.3, { cut: 1200, cutTo: 2000, lastRel: 0.02 });
   gtPulse(ctx, M.bus, tRiver + 0.1, tJog - 0.03, ['D1', 'D2', 'A2'], 0.36, 0.22, { cut: 500, cutTo: 1600, acc: 4, decay: 0.28, ramp: (u) => 0.6 + 0.4 * u });
   M.drum(cap('river', 1) - 0.1, 0.5, 41.2, 1.2);                                                   // ("Where it bends, the water doesn't.")
-  M.roll(cap('river', 2) + 0.4, tJog - 0.03, [[cap('river', 2) + 0.4, 0.06], [tJog - 0.1, 0.4]], 61.7);
+  M.roll(cap('river', 1) + 2.4, tJog - 0.03, [[cap('river', 1) + 2.4, 0.06], [tJog - 0.1, 0.4]], 61.7);
 
   // ---- 5 · the jogger: hanging on (a heartbeat, a held tension); she climbs on top (lighter)
   const tClimbCap = cap('jogger', 2), tPit = sh('pit').t0;
@@ -207,7 +206,7 @@ gtSound('music', 'score', function (ctx, bus, K) {
   //          phone (almost nothing, then "Thanks."); the trees (warm); the sun (the theme)
   const tSick = sh('sick').t0, tCat = sh('cat').t0, tBath = sh('bath').t0, tPhone = sh('phone').t0, tTrees = sh('trees').t0, tSun = sh('sun').t0, tTer = sh('terrace').t0;
   M.strings(tPit, tSick + 0.3, ['D1', 'A1', 'D2'], 0.34, { att: 0.8, rel: 0.4, cut: 280, wave: 'triangle', vib: 0 });
-  M.prog([[tPit, C.Dm9], [cap('pit', 1) - 0.3, C.Bbmaj7], [cap('pit', 2) - 0.3, C.Gm9]], tSick + 0.3, 0.22, { cut: 800 });
+  M.prog([[tPit, C.Dm9], [cap('pit', 1) - 0.3, C.Gm9]], tSick + 0.3, 0.22, { cut: 800 });
   for (const [dt, n] of [[0.4, 'D3'], [2.6, 'A2'], [5.0, 'F3'], [7.4, 'E3']]) M.piano(tPit + dt, n, 0.1, 3.0, -0.2);
   M.strings(tSick, tCat + 0.3, C.Dm9, 0.27, { att: 1.0, rel: 0.4, cut: 1000, vib: 14, wob: [38, 0.23] });
   M.strings(tSick + 0.5, tCat + 0.2, ['A4', 'D5'], 0.05, { att: 1.5, rel: 0.3, cut: 4000, wave: 'sine', vib: 25, wob: [60, 0.31] });
@@ -219,7 +218,7 @@ gtSound('music', 'score', function (ctx, bus, K) {
   M.roll(cap('bath', 1) + 1.0, cap('bath', 1) + 2.6, [[cap('bath', 1) + 1.0, 0.05], [cap('bath', 1) + 2.5, 0.25]], 61.7);
   M.strings(tPhone, tTrees + 0.3, ['D2', 'A2'], 0.16, { att: 1.0, rel: 0.3, cut: 500, wave: 'triangle', vib: 0 });
   M.piano(cap('phone', 1) + 0.05, 'D4', 0.1, 1.2); M.bellCut(cap('phone', 1) + 0.05, 'A5', 0.1, 0.12);      // ("Thanks.")
-  M.prog([[tTrees, C.Bbmaj7], [cap('trees', 1) - 0.3, C.Fmaj7]], tSun + 0.3, 0.26, { cut: 1300 });
+  M.prog([[tTrees, C.Bbmaj7], [cap('trees', 0) + 2.2, C.Fmaj7]], tSun + 0.3, 0.26, { cut: 1300 });
   keys(tTrees + 0.4, tSun - 0.2, 1.1, ['F5', 'C5', 'A4', 'D5'], 0.05, { dur: 1.0 });
   M.strings(tSun, tTer + 0.4, C.Gmaj7s11, 0.26, { att: 0.8, rel: 0.4, cut: 1500, cutTo: 2600 });
   M.strings(tSun + 0.2, tTer + 0.3, ['F#5', 'B5', 'C#6'], 0.03, { att: 1.5, rel: 0.3, cut: 9000, wave: 'sine', vib: 3 });
@@ -256,8 +255,8 @@ gtSound('music', 'score', function (ctx, bus, K) {
   M.bell(cap('creep', 1) + 2.2, 'D6', 0.12, 0.2);                                                   // ("…15 minutes.")
 
   // ---- 10 · the terrace goes: the pulse quickens to "It's going."; then the still (nothing but one thin note); the
-  //           release (a roll); the hit (the blow); the cloud (grave)
-  const tRel = GT.tRel, tHit = GT.tTerHit, tCloud = sh('cloud').t0, tPool = sh('pool').t0;
+  //           release (a roll); the hit (the blow); where it was (grave)
+  const tRel = GT.tRel, tHit = GT.tTerHit, tCloud = sh('empty').t0, tPool = sh('pool').t0;
   M.strings(tGoing, tStill + 0.02, C.A7b9, 0.32, { att: 0.5, rel: 0.02, cut: 700, cutTo: 3000, cutAt: tStill, keys: [[tGoing + 2, 0.8], [tStill - 0.3, 1.35]] });
   gtPulse(ctx, M.bus, tGoing + 0.1, tStill - 0.02, ['A1', 'A2', 'E3'], 0.4, 0.22, { cut: 600, cutTo: 2200, acc: 4, decay: 0.28, stepAt: (t) => 0.42 - 0.26 * u01(t, tGoing, tStill), ramp: (u) => 0.5 + 0.5 * u });
   M.strings(tStill + 0.1, tRel + 0.02, ['A5'], 0.03, { att: 1.2, rel: 0.02, cut: 8000, wave: 'sine', vib: 0 });
@@ -282,7 +281,7 @@ gtSound('music', 'score', function (ctx, bus, K) {
   // ---- 12 · ten minutes left: a steady pulse, the chords climbing; the bolt (the music drops out under the bang)
   const tBolt = GT.tBolt, tLurch = sh('lurch').t0, tLast = sh('last').t0, tCount = sh('count').t0, tHold = GT.hold, tB = GT.tB;
   M.drum(tReady, 0.45, 36.7, 1.2);
-  M.prog([[tReady, C.Dm9], [cap('ready', 1) - 0.3, C.Bbmaj7], [cap('ready', 2) - 0.3, C.Fmaj7], [cap('ready', 2) + 2.6, C.Asus]], tBolt - 0.04, 0.28, { cut: 1000, cutTo: 1700, lastRel: 0.04 });
+  M.prog([[tReady, C.Dm9], [cap('ready', 1) - 0.3, C.Bbmaj7], [cap('ready', 2) - 0.3, C.Fmaj7], [cap('ready', 3) - 0.3, C.Asus]], tBolt - 0.04, 0.28, { cut: 1000, cutTo: 1700, lastRel: 0.04 });
   gtPulse(ctx, M.bus, tReady + 0.3, tBolt - 0.06, ['D1', 'D2', 'A2'], 0.42, 0.2, { cut: 480, cutTo: 1300, acc: 4, decay: 0.3, ramp: (u) => 0.6 + 0.4 * u });
   M.strings(tBolt + 0.6, tLast + 0.3, ['D1', 'A1'], 0.26, { att: 1.5, rel: 0.3, cut: 220, wave: 'triangle', vib: 0 });
   M.piano(cap('bolt', 1) + 0.1, 'D2', 0.18, 2.6); M.piano(cap('bolt', 1) + 0.6, 'C#2', 0.12, 2.6);   // ("21 left.")
