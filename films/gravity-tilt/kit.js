@@ -244,3 +244,73 @@ function gtPuffs(scene, max = 6000, o = {}) {
     end() { g.instanceCount = n; for (const x of [iP, iS, iA, iC]) x.needsUpdate = true; },
   };
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// WALLS, PLANES, BRICK, PAVING, GROUND STRIPS, CROWNS (the Friction 10s film's home.js / street.js helpers, renamed)
+// ---------------------------------------------------------------------------------------------------------------------
+// a wall from x0…x1 × y0…y1 with rectangular holes [[x0, x1, y0, y1], …] → the solid cells (vertical runs merged)
+function gtWallCells(x0, x1, y0, y1, holes) {
+  const xs = [x0, x1], ys = [y0, y1];
+  for (const h of holes) { xs.push(h[0], h[1]); ys.push(h[2], h[3]); }
+  const ux = [...new Set(xs)].filter((v) => v >= x0 && v <= x1).sort((a, b) => a - b), uy = [...new Set(ys)].filter((v) => v >= y0 && v <= y1).sort((a, b) => a - b);
+  const cells = [];
+  for (let i = 0; i < ux.length - 1; i++) for (let j = 0; j < uy.length - 1; j++) {
+    const cx = (ux[i] + ux[i + 1]) / 2, cy = (uy[j] + uy[j + 1]) / 2;
+    if (holes.some((h) => cx > h[0] && cx < h[1] && cy > h[2] && cy < h[3])) continue;
+    cells.push([ux[i], ux[i + 1], uy[j], uy[j + 1]]);
+  }
+  const out = [];
+  for (const c of cells) { const o = out.find((q) => q[0] === c[0] && q[1] === c[1] && q[3] === c[2]); if (o) o[3] = c[3]; else out.push(c.slice()); }
+  return out;
+}
+// a plane at (x, y, z) facing direction f: '+x' '-x' '+z' '-z' '+y' '-y'
+function gtPlane(w, h, m, x, y, z, f, parent) {
+  const o = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m);
+  o.position.set(x, y, z);
+  const R = { '+x': [0, Math.PI / 2, 0], '-x': [0, -Math.PI / 2, 0], '+z': [0, 0, 0], '-z': [0, Math.PI, 0], '+y': [-Math.PI / 2, 0, 0], '-y': [Math.PI / 2, 0, 0] }[f];
+  o.rotation.set(R[0], R[1], R[2]); o.receiveShadow = true; o.castShadow = false;
+  (parent || GT_KIT_SCENE).add(o); return o;
+}
+// stretcher-bond brick (16 px courses)
+function gtBrickCanvas(seed, base = [128, 74, 58], w = 512, h = 512, mortar = '#6b645a') {
+  const r = new RNG(seed);
+  return gtCanvas(w, h, (g) => {
+    g.fillStyle = mortar; g.fillRect(0, 0, w, h);
+    const bh = 16, bw = 46;
+    for (let y = 0, row = 0; y < h; y += bh, row++) for (let x = row % 2 ? -bw / 2 : 0; x < w; x += bw) {
+      const k = r.range(-20, 14), c = base.map((v) => MathX.clamp(v + k + r.range(-7, 7), 0, 255));
+      g.fillStyle = `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`; g.fillRect(x + 1.5, y + 1.5, bw - 3, bh - 3);
+      if (r.next() < 0.25) { g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(x + 1.5, y + bh - 5, bw - 3, 3.5); }
+      if (r.next() < 0.15) { g.fillStyle = 'rgba(255,255,255,0.06)'; g.fillRect(x + 4, y + 3, bw - 12, 3); }
+    }
+  });
+}
+// paving slabs, 60 cm
+function gtPavingCanvas(seed, w = 512, h = 512) {
+  const r = new RNG(seed);
+  return gtCanvas(w, h, (g) => {
+    g.fillStyle = '#7d7870'; g.fillRect(0, 0, w, h);
+    const s = 128;
+    for (let y = 0; y < h; y += s) for (let x = 0; x < w; x += s) {
+      const k = r.range(-12, 12); g.fillStyle = `rgb(${158 + k},${152 + k},${142 + k})`; g.fillRect(x + 2, y + 2, s - 4, s - 4);
+      for (let i = 0; i < 90; i++) { g.fillStyle = `rgba(${r.next() < 0.5 ? '255,255,255' : '0,0,0'},0.05)`; g.fillRect(x + r.range(2, s - 4), y + r.range(2, s - 4), 2, 2); }
+      if (r.next() < 0.2) { g.fillStyle = 'rgba(40,36,30,0.12)'; g.beginPath(); g.arc(x + r.range(20, s - 20), y + r.range(20, s - 20), r.range(6, 20), 0, 6.28); g.fill(); }
+    }
+  });
+}
+// mown grass with faint stripes
+function gtGrassCanvas(seed, w = 512, h = 512) {
+  const r = new RNG(seed);
+  return gtCanvas(w, h, (g) => {
+    g.fillStyle = '#5f7f3c'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) { const k = r.range(-1, 1); g.fillStyle = `rgba(${k > 0 ? '150,180,90' : '40,60,25'},${r.range(0.08, 0.22)})`; g.fillRect(r.range(0, w), r.range(0, h), 1.2, r.range(2, 6)); }
+    for (let x = 0; x < w; x += 128) { g.fillStyle = 'rgba(255,255,230,0.05)'; g.fillRect(x, 0, 64, h); }
+  });
+}
+// a lumpy blob geometry (a tree crown)
+function gtBlobGeo(r, seed) {
+  const geo = new THREE.IcosahedronGeometry(r, 1), p = geo.attributes.position, rr = new RNG(Math.round(seed * 13) + 5);
+  const k = [rr.range(0, 9), rr.range(0, 9), rr.range(0, 9)];
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), f = 1 + 0.16 * Math.sin(x * 3.1 + k[0]) * Math.sin(y * 2.7 + k[1]) + 0.1 * Math.sin(z * 4.3 + k[2]); p.setXYZ(i, x * f, y * f * 0.85, z * f); }
+  geo.computeVertexNormals(); return geo;
+}

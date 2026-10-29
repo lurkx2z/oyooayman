@@ -1,7 +1,7 @@
 /* =====================================================================
    PHYSICS — "What if gravity tilted 90° for one hour?" Every motion in the film is a pure function of STORY time s
    (seconds after 7:42:00 AM, when gravity turns; it turns back at s = 3600, 8:42:00 AM).
-   Metres; y up; your street runs along x from your house (its front wall at x = 0) east to the supermarket (x = 300);
+   Metres; y up; your street runs along x from your house (its front wall at x = 0) east to the end of the street (x = 285);
    north is −z. The rule (PLAN.md § 1): for one hour, gravity in your town pulls east (+x) instead of down, just as
    strong (9.81 m/s²). The air and the ground keep their old down (they are the medium and the floor of the story).
    What follows, and is drawn:
@@ -31,12 +31,13 @@ const GT_W = {
   room: { x: [-3.6, 0], z: [-1.6, 1.6], h: 2.5 },    // room-local (floor y 0, east wall x 0)
   win: { z: [-0.6, 0.6], y: [0.9, 2.1] },            // the window (room-local)
   door: { z: [0.45, 1.35], h: 2.05 },                // the door, in the west wall (room-local)
-  // the street
-  x0: 6, end: 300,                                   // from your garden gate to the supermarket's wall
+  // the street: from your garden gate to the end of the street (x 285), where it meets the hillside: a stone retaining
+  // wall and the slope above it are the ground (they keep their old down), so the end of the street is the bottom
+  x0: 6, end: 285,
   road: [-3.5, 3.5], pavN: [-5.5, -3.5], pavS: [3.5, 5.5],
   frontN: -9.5, frontS: 9.5,                         // the house fronts either side
   terrace: [14, 164], terraceZ: [9.5, 17.5],         // the brick terrace (south side): 30 houses of 5 m
-  park: [164, 300],                                  // the green (south side) from the terrace to the supermarket
+  park: [164, 285],                                  // the green (south side) from the terrace to the end
 };
 // room-local → world
 const gtRoomW = (x, y, z) => [x + GT_W.roomX, y + GT_W.floorY, z];
@@ -108,8 +109,9 @@ const GT_ROOM = {
   lamp: { x: [-1.5, -1.36], z: [1.38, 1.52], d: 1.36 },
   chair: { x: [-2.1, -1.55], z: [0.15, 0.7], h: 1.0, d: 1.55 },
   rug: { x: [-2.9, -0.7], z: [-0.6, 0.9], d: 0.7 },
-  // the shelf of books (south wall, 1.5 m up): each book falls out of the shelf's east end to the wall
-  shelf: { x: [-2.8, -1.3], z: [1.32, 1.6], y: 1.5 },
+  // the shelf of books (on the west wall opposite the window, 1.35 m up, north of the door): each book falls the 3.4 m
+  // across the room; the ones in line with the window land on the glass (beside you), the rest on the wall
+  shelf: { x: [-3.6, -3.38], z: [-1.25, -0.28], y: 1.35 },
   // you: standing at the window, 0.32 m from the glass, the mug in your right hand
   you: { x: -0.32, d: 0.17 },
   // the ceiling light: a 0.55 m flex from the middle of the ceiling
@@ -117,21 +119,23 @@ const GT_ROOM = {
   // the clock on the north wall
   clock: { x: -1.6, y: 1.75 },
 };
-// the books: [x0 (room-local, their east face), width, height, colour index]
+// the books: standing on the shelf side by side along z: { z0 (their north face), w (thickness), h, c (colour), d (the
+// fall to the wall or the glass), glass (on the glass?) }
 const GT_BOOKS = (() => {
-  const B = [], r = new RNG(77); let x = GT_ROOM.shelf.x[0] + 0.05;
-  while (x < GT_ROOM.shelf.x[1] - 0.06) { const w = r.range(0.025, 0.055), h = r.range(0.2, 0.3); B.push({ x0: x, w, h, c: r.int(0, 9), lean: r.range(-0.05, 0.05) }); x += w + r.range(0.0, 0.006); }
-  // stacked against the wall in order: the last (eastmost) first
-  let front = 0;
-  for (let i = B.length - 1; i >= 0; i--) { const b = B[i]; b.stop = front - b.w; b.d = b.stop - b.x0; front = b.stop - 0.002; }
+  const B = [], r = new RNG(77), S = GT_ROOM.shelf; let z = S.z[0] + 0.04;
+  while (z < S.z[1] - 0.05) { const w = r.range(0.025, 0.055), h = r.range(0.2, 0.3), dep = r.range(0.14, 0.2); B.push({ z0: z, w, h, dep, c: r.int(0, 9), lean: r.range(-0.08, 0.08) }); z += w + r.range(0.0, 0.006); }
+  for (const b of B) { const zc = b.z0 + b.w / 2; b.glass = zc > GT_W.win.z[0] + 0.02 && zc < GT_W.win.z[1]; b.d = (b.glass ? 0.06 : 0) - (S.x[0] + 0.02) - b.dep; }
   return B;
 })();
+// a book at story time s: its west face's x (room-local), y (its bottom), and the fall
 function gtBook(i, s) {
-  const b = GT_BOOKS[i], f = gtFall(s, b.d, { e: 0.08 });
-  const x = b.x0 + f.x;
-  // after the return they drop from the shelf height (1.5 m) to the floor (they land flat, scattered)
-  const y = gtDownY(s, GT_ROOM.shelf.y);
-  return { x, y, f };
+  const b = GT_BOOKS[i], f = gtFall(s, b.d, { e: 0.1 });
+  let x = GT_ROOM.shelf.x[0] + 0.02 + f.x, y = GT_ROOM.shelf.y, gone = false;
+  // the ones on the glass go out with it (s 2530) and fall down the street
+  if (b.glass && s >= GT_GLASS.go) { x += gtDrop(s - GT_GLASS.go - 0.05 * (i % 4)); gone = x > 300; }
+  // the rest drop to the floor when gravity comes back
+  else if (s >= GTP.tBack) y = gtDownY(s, GT_ROOM.shelf.y);
+  return { x, y, f, gone };
 }
 // the bed, the desk, the chair: a fall of d from rest
 const gtRoomFall = (k, s) => gtFall(s, GT_ROOM[k].d, { e: 0.06 });
@@ -170,13 +174,13 @@ function gtLight(s) {
 
 // the bath water next door comes through the edges of your door (s 120 → 330), runs down (east) to the window wall and
 // lies there: 150 litres over the 8 m² of wall = 1.9 cm (minus what the bed and the wardrobe stand in)
-const GT_BATH = { t0: 118, t1: 330, litres: 150 };
+const GT_BATH = { t0: 170, t1: 380, litres: 150 };
 const gtPool = (s) => (s < GT_BATH.t0 ? 0 : 0.019 * gtSm(s, GT_BATH.t0 + 4, GT_BATH.t1) * (s < GT_GLASS.go ? 1 : 0));
 
 // the window glass: cracked by the mug (0.19) and the chair's corner (0.62); you off it at 34–52; it carries the pool,
 // the chair, the mug, the books that slid onto it; under a load that never stops cracked glass weakens (static
 // fatigue); it lets go at 8:24:10. Everything on it falls out, down the street
-const GT_GLASS = { go: 42 * 60 + 10 };
+const GT_GLASS = { go: 2530 };
 // how far the crack has run (0…1)
 function gtCrack(s) {
   if (s < GT_YOU.hitGlass) return 0;
@@ -200,9 +204,10 @@ function gtLean(s) {                                           // degrees (east)
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-// THE STREET: everything loose falls down it (x → 300), and piles up against the supermarket, band by band (across z)
+// THE STREET: everything loose falls down it (x → 285), and piles up against the retaining wall, band by band (across z)
 // ---------------------------------------------------------------------------------------------------------------------
-// kinds: car (terminal speed ~180 m/s: almost no drag over 300 m), van, bin (light, ~27 m/s), person (~55 m/s), bike
+// kinds: car (terminal speed ~180 m/s: almost no drag over 285 m), bin (light, ~27 m/s), a white garden chair (~15 m/s).
+// (it is 7:42 on a weekday: the cars are parked and empty; out on the street there is only the jogger)
 const GT_FALLERS = [
   // parked cars [x (rear), z (centre), type, colour, faces +x?]
   { k: 'car', x: 17, z: -2.6, type: 'hatch', col: '#a8acb2', dir: 1 },
@@ -220,30 +225,26 @@ const GT_FALLERS = [
   { k: 'car', x: 140, z: 2.6, type: 'hatch', col: '#2d5a7a', dir: 1 },
   { k: 'car', x: 196, z: 2.6, type: 'sedan', col: '#7a6a52', dir: -1 },
   { k: 'car', x: 236, z: 2.6, type: 'hatch', col: '#b8b2a6', dir: -1 },
-  // driving: one coming up the street towards your house (8 m/s west: it rises, stops, falls back), one going down
-  { k: 'car', x: 118, z: -0.9, type: 'hatch', col: '#c8202a', dir: -1, v0: -8, drive: true },
-  { k: 'car', x: 54, z: 0.9, type: 'sedan', col: '#1f2a3a', dir: 1, v0: 6, drive: true },
   // bins (bin day)
   ...[22, 41, 58, 73, 99, 118, 150, 166, 189, 224, 260].map((x, i) => ({ k: 'bin', x, z: i % 2 ? 4.0 : -4.0, col: ['#2a2d30', '#2f5a3a', '#6a4a2a', '#2a4a7a'][i % 4] })),
-  // people: the cyclist (riding up the street, 5 m/s), the dog walker and her dog (walking down)
-  { k: 'bike', x: 86, z: -1.6, walk: -5, id: 'rider' },
-  { k: 'person', x: 66, z: 4.6, walk: 1.2, id: 'walker' },
-  { k: 'dog', x: 67.4, z: 4.4, walk: 1.2, id: 'dog' },
+  // a white plastic garden chair from a front garden opposite (the camera falls with it)
+  { k: 'gchair', x: 18, z: -6.6, id: 'gchair' },
 ];
-const GT_LEN = { car: { hatch: 4.12, sedan: 4.72, suv: 4.78, van: 5.3 }, bin: 0.72, bike: 1.8, person: 0.4, dog: 0.7 };
-const GT_VT = { car: 180, bin: 27, bike: 45, person: 55, dog: 40 };
-// the pile against the supermarket (x 300): bands across the street, each with a front that moves west as things land
+const GT_LEN = { car: { hatch: 4.12, sedan: 4.72, suv: 4.78, van: 5.3 }, bin: 0.72, gchair: 0.6 };
+const GT_VT = { car: 180, bin: 27, gchair: 15 };
+// the pile against the retaining wall (x 285): bands across the street (and one for the gardens opposite), each with a
+// front that moves west as things land
 (function gtSolvePile() {
-  const F = GT_FALLERS, bands = [[-5.5, -3.5], [-3.5, -1.75], [-1.75, 0], [0, 1.75], [1.75, 3.5], [3.5, 5.5]];
+  const F = GT_FALLERS, bands = [[-5.5, -3.5], [-3.5, -1.75], [-1.75, 0], [0, 1.75], [1.75, 3.5], [3.5, 5.5], [-14, -5.5]];
   const front = bands.map(() => GT_W.end);
   for (const f of F) {
     f.len = f.k === 'car' ? GT_LEN.car[f.type] : GT_LEN[f.k];
-    f.w = f.k === 'car' ? 1.9 : f.k === 'bin' ? 0.6 : 0.6;
+    f.w = f.k === 'car' ? 1.9 : 0.6;
     f.vt = f.k === 'car' ? GT_VT.car : GT_VT[f.k];
     f.bands = bands.map((b, i) => (f.z + f.w / 2 > b[0] && f.z - f.w / 2 < b[1] ? i : -1)).filter((i) => i >= 0);
   }
-  // the order of arrival: by distance to the end (the driving car going up arrives later than its distance says)
-  const order = F.map((f, i) => i).sort((a, b) => (GT_W.end - F[a].x - (F[a].v0 || 0) * 3) - (GT_W.end - F[b].x - (F[b].v0 || 0) * 3));
+  // the order of arrival (the light things later than their distance says)
+  const order = F.map((f, i) => i).sort((a, b) => gtDropT(GT_W.end - F[a].x, F[a].vt) - gtDropT(GT_W.end - F[b].x, F[b].vt));
   for (const i of order) {
     const f = F[i], fr = Math.min(...f.bands.map((b) => front[b]));
     const crush = f.k === 'car' ? 0.55 : f.k === 'bin' ? 0.5 : 0.8;          // (crumpled length / length)
@@ -251,21 +252,37 @@ const GT_VT = { car: 180, bin: 27, bike: 45, person: 55, dog: 40 };
     f.d = f.stop - f.x;
     f.crush = crush;
     for (const b of f.bands) front[b] = f.stop - 0.05;
-    if (f.k !== 'car') f.v0 = 0;                                             // (people and bins: drag matters more than their walk)
-    const v0 = f.v0 || 0;
-    f.tHit = v0 ? (-v0 + Math.sqrt(v0 * v0 + 2 * GTP.g * f.d)) / GTP.g : gtDropT(f.d, f.vt);
-    f.vHit = v0 ? v0 + GTP.g * f.tHit : gtDropV(f.tHit, f.vt);
+    f.tHit = gtDropT(f.d, f.vt); f.vHit = gtDropV(f.tHit, f.vt);
   }
   GTP.pileFront = front;
 })();
 // a faller at story time s: { x (rear), v, hit, k (crumple 0…1) }
 function gtFaller(f, s) {
-  const r = gtFall(s, f.d, { v0: f.v0 || 0, vt: f.v0 ? Infinity : f.vt, e: 0.03 });
+  const r = gtFall(s, f.d, { vt: f.vt, e: 0.03 });
   const k = r.hit && s >= r.hit ? MathX.clamp((s - r.hit) / 0.12, 0, 1) : 0;
   return { x: f.x + r.x, v: r.v, hit: r.hit, k };
 }
-// the fastest anything hit the bottom (for the caption): the first parked car's ~ 74 m/s
+// the fastest anything hit the bottom: the first parked car's ~ 72 m/s
 GTP.vMax = Math.max(...GT_FALLERS.map((f) => f.vHit));
+
+// roof tiles: the end tiles of every roof work loose and fall all hour (most in the first minutes): each has a house, a
+// release time and a terminal speed (they flutter: ~25 m/s); they stop at the pile. [x0, y0, z0, s0, vt, spin seed]
+const GT_TILES = (() => {
+  const r = new RNG(311), T = [];
+  for (let i = 0; i < 420; i++) {
+    const north = r.next() < 0.62, x0 = north ? r.range(10, 270) : r.range(GT_W.terrace[0], GT_W.terrace[1]);
+    const z0 = north ? r.range(-17, -10) : r.range(10, 17), y0 = north ? r.range(5.6, 8.4) : r.range(6.6, 9.3);
+    const s0 = i < 120 ? r.range(0.3, 25) : i < 260 ? r.range(25, 400) : r.range(400, 3590);
+    T.push({ x0, y0, z0, s0: north || s0 < 27 * 60 ? s0 : -1, vt: r.range(20, 30), seed: r.next(), d: GT_W.end - 1.5 - r.range(0, 6) - x0 });
+  }
+  return T.filter((t) => t.s0 >= 0);
+})();
+// a tile at story time s: null before it lets go and after it lands (it joins the pile: not drawn)
+function gtTile(T, s) {
+  const u = s - T.s0; if (u < 0) return null;
+  const x = gtDrop(u, T.vt); if (x >= T.d) return null;
+  return { x: T.x0 + x, y: T.y0, z: T.z0, a: u * (4 + 6 * T.seed) };
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE JOGGER: running up the street (west, 3 m/s) on the north pavement, just past a lamp post. She rises (like a
@@ -286,7 +303,7 @@ function gtJog(s) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE TERRACE (south side, x 14 → 164, 30 brick houses): held on its damp-proof course by the mortar's grip alone, it
-// creeps east (tertiary creep: d = k/(T − s) − k/T), lets go at 8:09:00, falls the 136 m to the supermarket's wall as one
+// creeps east (tertiary creep: d = k/(T − s) − k/T), lets go at 8:09:00, falls the 120 m to the end of the street as one
 // block (nothing to stop it: it falls freely, so nothing inside it is loaded), then crumples house by house
 // ---------------------------------------------------------------------------------------------------------------------
 const GT_TER = { n: 30, L: 5, release: 27 * 60, T: 1700, k: 88, crushL: 1.7, depth: 8, eaves: 6.6, ridge: 9.4 };
@@ -306,7 +323,7 @@ function gtTerHouse(i, s) {
   return { dx: stop - x0, k: MathX.clamp((u - tHit) / 0.18, 0, 1), hit: T.release + tHit, v: 0 };
 }
 GT_TER.hit0 = GT_TER.release + gtDropT(GT_W.end - GT_W.terrace[1] - GT_TER.dRel);
-GT_TER.vHit = GTP.g * (GT_TER.hit0 - GT_TER.release);               // 51.6 m/s = 186 km/h
+GT_TER.vHit = GTP.g * (GT_TER.hit0 - GT_TER.release);               // 48.5 m/s = 175 km/h
 GT_TER.hitLast = gtTerHouse(GT_TER.n - 1, 1e9).hit;
 // when it had slipped 30 cm (the caption)
 GT_TER.s30 = GT_TER.T - 1 / (0.3 / GT_TER.k + 1 / GT_TER.T);

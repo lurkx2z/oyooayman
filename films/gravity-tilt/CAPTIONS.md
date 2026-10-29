@@ -26,13 +26,13 @@ status: voiceless
 
 [river] 4 km west, the river is falling along its own bed. / Where it bends, the water doesn't. / And it's falling this way.
 
+[jogger] She caught a lamp post as she fell past it. / Most people can hang on for about a minute. / So she climbs on top. Like a branch.
+
 [pit] Your bedroom is a 3.6 metre pit now. / And the only door is in the ceiling. / Behind it, every room in your house is a pit too.
 
 [sick] Your eyes say the room is upright. Your ears say it's on its side. / That argument is what makes you feel sick.
 
 [cat] The cat has already adjusted.
-
-[jogger] She caught a lamp post as she fell past it. / Most people can hang on for about a minute. / So she climbs on top. Like a branch.
 
 [bath] Next door, the bath was full. / 150 litres, and the only way down is through your door.
 
@@ -46,7 +46,7 @@ status: voiceless
 
 [slip] And it's slipping. A few millimetres a minute.
 
-[rain] 7 minutes after it left its bed, the river arrives. / Fall 4 km, and even a river breaks up into rain. / From where you're lying, it just looks like rain. / The sun is behind it, so: a rainbow. Sideways.
+[rain] 7 minutes after it left its bed, the river arrives. / Fall 4 km, and even a river breaks up into rain. / Up on her lamp post, it just looks like rain. / And with the sun behind you: a rainbow. Sideways.
 
 [wood] Your house is wood: nailed together, and bolted down. / It creaks. It leans. It holds.
 
@@ -54,7 +54,7 @@ status: voiceless
 
 [going] The terrace has slipped 30 cm. / It's going.
 
-[gone] 30 houses. 150 metres of brick. / It hits the end of the street at 185 km/h.
+[gone] 30 houses. 150 metres of brick. / It hits the end of the street at 175 km/h.
 
 [quiet] Half your street is gone. / And there are still 33 minutes to go.
 

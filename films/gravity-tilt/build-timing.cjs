@@ -18,7 +18,7 @@ const DIR = __dirname;
 const PAUSE = {
   title: 0.05, tilt: 0.6, street: 0.8, glass: 2.6, crawl: 1.0, nuance: 1.2, air: 0.9, sea: 0.8, river: 3.2, pit: 1.6, sick: 1.0,
   cat: 1.2, jogger: 1.4, bath: 1.4, phone: 1.4, trees: 1.6, sun: 1.4, brick: 1.4, slip: 0.9, rain: 2.6, wood: 1.4, creep: 1.0,
-  going: 2.6, gone: 9.0, quiet: 2.0, pool: 1.6, glassgo: 3.6, ready: 2.4, bolt: 3.6, last: 2.0, down: 15.0, rainfall: 3.0,
+  going: 2.6, gone: 9.0, quiet: 2.0, pool: 1.6, glassgo: 3.6, ready: 2.4, bolt: 5.0, last: 2.0, down: 22.0, rainfall: 0.6,
   after: 1.4, question: 2.0,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
