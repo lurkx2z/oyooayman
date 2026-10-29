@@ -127,7 +127,7 @@ function gtPhoneDraw(g, w, h, st) {
 }
 function gtPhoneScreen(phone, s) {
   const c = gtClockParts(s);
-  phone.userData.ct.update({ time: `${c.h}:${String(c.m).padStart(2, '0')}`, alert: s > 238 });
+  phone.userData.ct.update({ time: `${c.h}:${String(c.m).padStart(2, '0')}`, alert: s > GTP.alert });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

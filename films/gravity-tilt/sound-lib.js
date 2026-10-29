@@ -202,4 +202,39 @@ function gtCrunch(fx, o = {}) {
   const sc = fx.rustle(d * 0.7, { density: 900, rub: 0.6, lo: 500, hi: 5000, grain: 0.004, env: (u) => Math.exp(-u * 3) }); gtAddAt(y, sc, 0.02, 0.5 * (o.scrape ?? 1), sr);
   return y;
 }
-const GT_SOUND_FNS = [gtNoise, gtBed, gtTone, gtChirp, gtCrackle, gtSweep, gtSweepPut, gtAddAt, gtAt, gtCurve, gtMeow, gtRobinSong, gtClick, gtWhereShot, gtWhere, gtPlaces, gtWhen, gtSpan, gtScreech, gtDiesel, gtCrunch, gtEv, gtWn];
+
+// ---- where the camera is (for how far away a sound is) ----------------------------------------------------------
+// each outside shot's camera, roughly (world x along the street, height y: world.js has the exact ones); inside, the
+// bedroom (behind its walls). The chair shot falls with the chair; the count down's quick cuts each have their own
+const GT_CAMXY = { master: [2, 4.5], bottom: [260, 16], front: [5, 1.7], tipped: [11.5, 6], dust: [171, 2.6], dust2: [262, 3.2], town: [-130, 155],
+  jogger: [25.3, 1.9], climb: [23.2, 2.4], house: [15, 4.3], trees: [198, 2.6], sun: [-2.8, 9.5], terrace: [66, 1.3], dpc: [13.2, 0.4], slip: [13.6, 0.2],
+  rainfront: [93, 1.7], rainjog: [23, 1.0], bow: [59, 2.6], wood: [15.5, 5.1], creep: [-0.2, 0.3], going: [42, 1.0], still: [12.8, 0.5], release: [7.5, 14.4],
+  impact: [266, 20], cloud: [153, 6], glassgo: [16, 3.2], jogdown: [25.6, 1.3], bolt: [-0.5, 0.2], lurch: [17.8, 3.2], last: [-1, 10.5],
+  backstreet: [30.5, 1.8], rainfall: [44, 0.55], after: [20.5, 2.1] };
+function gtCamAt(t) {
+  const sh = gtShotAt(t), w = gtWhere(t);
+  if (w !== 'out') return { x: -1.6, y: 4.5, where: w, mode: sh.mode };
+  if (sh.mode === 'chair') { const F = GT_FALLERS.find((f) => f.k === 'gchair'); return { x: gtFaller(F, gtStoryAt(t)).x - 0.4, y: 2.5, where: w, mode: 'chair' }; }
+  if (sh.mode === 'count') { const n = GT.subCuts.filter((c) => t >= c).length; const p = n === 0 ? [25.4, 1.6] : n === 3 ? [150, 3.5] : [-1.5, 10.4]; return { x: p[0], y: p[1], where: w, mode: 'count' }; }
+  const p = GT_CAMXY[sh.mode] || [20, 2]; return { x: p[0], y: p[1], where: w, mode: sh.mode };
+}
+// how loud a sound at street x (height y) is from the camera at film time t (1 within ~12 m; inside, through the walls,
+// a fixed fraction): { g, lp } (lp: the air and the walls take the top off far sounds)
+function gtNear(t, x, y = 1, o = {}) {
+  const c = gtCamAt(t);
+  if (c.where === 'river') return { g: 0, lp: 0 };
+  if (c.where === 'in') { const d = Math.hypot(x + 1.6, y - 4.5) + 4; return { g: (o.wall ?? 0.35) * Math.min(1, Math.pow(12 / d, 0.75)), lp: 500 }; }
+  const d = Math.hypot(c.x - x, c.y - y) + 1;
+  return { g: Math.min(1, Math.pow(12 / d, o.k ?? 0.75)), lp: d < 40 ? 0 : MathX.clamp(9000 * Math.pow(40 / d, 1.2), 900, 9000) };
+}
+// how hard it is raining where the camera is (0…1): the front of the falling river (9.5 m/s east) reaches each x at
+// its own time and the rain thickens over the 60 m behind it; and how near the front is (its roar, coming down the
+// street). At the return the rain falls out of the air onto the ground for ~12 s (drops from up to 100 m)
+function gtRainAt(t) {
+  const s = gtStoryAt(t), c = gtCamAt(t), x = c.where === 'in' ? 0 : c.x;
+  if (c.where === 'river') return { k: 0, near: 0, ground: 0 };
+  if (s >= GTP.tBack) return { k: 0, near: 0, ground: gtSm(s, GTP.tBack + 0.15, GTP.tBack + 0.8) * (1 - gtSm(s, GTP.tBack + 10.5, GTP.tBack + 12.6)) };
+  const front = -GT_RIVER.dist + GT_RIVER.vDrop * (s - GT_RIVER.leave), wob = 0.85 + 0.15 * Math.sin(s * 0.013);
+  return { k: gtSm(front - x, 0, 60) * wob, near: front < x ? Math.pow(MathX.clamp(1 - (x - front) / 300, 0, 1), 2) : 0, ground: 0 };
+}
+const GT_SOUND_FNS = [gtCamAt, gtNear, gtRainAt, gtNoise, gtBed, gtTone, gtChirp, gtCrackle, gtSweep, gtSweepPut, gtAddAt, gtAt, gtCurve, gtMeow, gtRobinSong, gtClick, gtWhereShot, gtWhere, gtPlaces, gtWhen, gtSpan, gtScreech, gtDiesel, gtCrunch, gtEv, gtWn];
