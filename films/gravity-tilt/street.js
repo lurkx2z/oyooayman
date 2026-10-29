@@ -126,10 +126,14 @@ function gtBuildStreet(S) {
   };
   const B = new Batcher();
   // ------------------------------------------------------------------ the ground (it keeps its old down)
-  { const gm = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), M.grass); gm.rotation.x = -Math.PI / 2; gm.position.set(0, -0.02, 0); gm.receiveShadow = true; root.add(gm); }
+  // (pushed back in depth, and cut into 50 m tiles: in software rendering, huge triangles cut by the near plane lose
+  // the depth precision that keeps the road 2 cm above the grass)
+  Object.assign(M.grass, { polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 8 });
+  { const gm = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000, 60, 60), M.grass); gm.rotation.x = -Math.PI / 2; gm.position.set(0, -0.02, 0); gm.receiveShadow = true; root.add(gm); }
   const X0 = GT_W.x0, X1 = GT_ST.hillX, R = GT_W.road, L = X1 - X0;
-  { const m = new THREE.Mesh(new THREE.PlaneGeometry(L, R[1] - R[0]), M.road); m.rotation.x = -Math.PI / 2; m.position.set((X0 + X1) / 2, 0.0, 0); m.receiveShadow = true; root.add(m); }
-  for (const P of [GT_W.pavN, GT_W.pavS]) { const m = new THREE.Mesh(new THREE.PlaneGeometry(L, P[1] - P[0]), M.pav); m.rotation.x = -Math.PI / 2; m.position.set((X0 + X1) / 2, 0.12, (P[0] + P[1]) / 2); m.receiveShadow = true; root.add(m);
+  Object.assign(M.road, { polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 3 });   // (and the road behind its markings)
+  { const m = new THREE.Mesh(new THREE.PlaneGeometry(L, R[1] - R[0], 56, 1), M.road); m.rotation.x = -Math.PI / 2; m.position.set((X0 + X1) / 2, 0.0, 0); m.receiveShadow = true; root.add(m); }
+  for (const P of [GT_W.pavN, GT_W.pavS]) { const m = new THREE.Mesh(new THREE.PlaneGeometry(L, P[1] - P[0], 56, 1), M.pav); m.rotation.x = -Math.PI / 2; m.position.set((X0 + X1) / 2, 0.12, (P[0] + P[1]) / 2); m.receiveShadow = true; root.add(m);
     B.box(L, 0.12, P[1] - P[0], (X0 + X1) / 2, 0.06, (P[0] + P[1]) / 2, M.kerb); }
   // road markings: the centre line, the edge lines
   { const wm = gtStd('#ecebe4', 0.6);
@@ -262,14 +266,21 @@ function gtBuildStreet(S) {
     const mat = new THREE.MeshBasicMaterial({ color: '#e6edf2', map: gtTex(st, { repeat: false }), transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide, fog: true });
     const mesh = new THREE.Mesh(geo, mat); mesh.frustumCulled = false; mesh.renderOrder = 7; scene.add(mesh);
     const wall = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.ShaderMaterial({
-      transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { k: { value: 0 }, inside: { value: 0 }, front: { value: 0 }, col: { value: new THREE.Color('#8e99a2') } },
-      vertexShader: 'varying vec3 vW; varying float vD; varying float vF; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vF = abs(normal.x); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }',
-      fragmentShader: `uniform float k; uniform float inside; uniform float front; uniform vec3 col; varying vec3 vW; varying float vD; varying float vF;
+      transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { k: { value: 0 }, inside: { value: 0 }, front: { value: 0 }, top: { value: 100 }, sx: { value: 0 }, col: { value: new THREE.Color('#58636e') } },
+      vertexShader: 'varying vec3 vW; varying float vD; varying vec3 vN; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vN = abs(normal); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }',
+      // (a soft grey mass, streaked along its fall (east): the streaks move with the drops; its top thins out; its front
+      // face is solid, its sides fade in over the 60 m behind the front)
+      fragmentShader: `uniform float k; uniform float inside; uniform float front; uniform float top; uniform float sx; uniform vec3 col; varying vec3 vW; varying float vD; varying vec3 vN;
         float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y); }
-        void main(){ float m = 0.7 + 0.3 * n(vW.yz * 0.025 + vW.x * 0.004) + 0.15 * n(vW.yz * 0.11);
-          float a = k * mix(0.62, 0.07, inside) * m * smoothstep(0.0, 40.0, vD) * mix(smoothstep(0.0, 60.0, front - vW.x), 1.0, step(0.5, vF));
-          gl_FragColor = vec4(col * (0.92 + 0.12 * m), a); }`,
+        void main(){ float o = vN.z > 0.5 ? vW.y : vW.z, xs = vW.x - sx;
+          float st = vN.x > 0.5 ? 0.6 * n(vW.yz * 0.08) + 0.4 * n(vW.yz * 0.35) : 0.6 * n(vec2(xs * 0.012, o * 0.22)) + 0.4 * n(vec2(xs * 0.04, o * 0.9));
+          float m = 0.55 + 0.45 * st;
+          // (most of the water is low: a dense band up to ~40 m with a billowing top, thin drops above it up to the top)
+          float b = 0.36 * top + 9.0 * (n(vec2(vW.z * 0.02, vW.x * 0.004)) - 0.5) + 5.0 * (n(vec2(vW.z * 0.09, vW.x * 0.02)) - 0.5);
+          float hy = mix(0.1, 1.0, 1.0 - smoothstep(b - 6.0, b + 4.0, vW.y)) * (1.0 - smoothstep(0.8 * top, top, vW.y));
+          float a = k * mix(0.85, 0.07, inside) * m * smoothstep(0.0, 40.0, vD) * mix(smoothstep(0.0, 18.0, front - vW.x), 1.0, step(0.5, vN.x)) * hy;
+          gl_FragColor = vec4(col * (0.85 + 0.25 * m), a); }`,
     })); wall.frustumCulled = false; wall.renderOrder = 5; scene.add(wall);
     T.rain = { mesh, geo, pos, mat, N, wall }; }
   { const m = new THREE.Mesh(new THREE.RingGeometry(0.93, 1.0, 128, 1), new THREE.ShaderMaterial({
@@ -343,12 +354,22 @@ function gtDust(T, s, cam) {
       const a = gtR(i, seed), b = gtR(i, seed + 1), c = gtR(i, seed + 2), rise = (1.2 + 2.6 * a) * Math.log(1 + u * 0.9) * size;
       const spread = (0.6 + 2.2 * Math.sqrt(u) * 0.35) * size;
       const x0 = x - 0.5 - 2.5 * b * size + 0.6 * Math.log(1 + u);                 // (falling dust drifts east, slowly)
-      const al = 0.11 * Math.min(1, u * 3) * Math.pow(1 - u / life, 1.6) * (0.5 + 0.5 * c);
+      const al = 0.055 * Math.min(1, u * 3) * Math.pow(1 - u / life, 1.6) * (0.5 + 0.5 * c);
       const tone = 0.5 + 0.16 * c;
-      P.add(x0, 0.4 + rise + 1.5 * c * size, z + (b - 0.5) * 2 * spread, (0.8 + 2.2 * a + 0.9 * Math.sqrt(u)) * size, al, tone, tone * 0.96, tone * 0.9);
+      P.add(x0, 0.4 + rise + 1.5 * c * size, z + (b - 0.5) * 2 * spread, (0.7 + 1.8 * a + 0.6 * Math.sqrt(u)) * size, al, tone, tone * 0.96, tone * 0.9);
     }
   };
   for (const [s0, x, z, sz] of T.impacts) add(s0, x, z, sz, 16, Math.round(x * 7 + z), 90);
+  // the pile settles, and what's still arriving (tiles, gutters, garden things) keeps knocking dust off it: a puff every
+  // 0.35 s along the pile, fewer as the minutes pass, each rising ~0.6 m/s (the old way) and spreading for 45 s
+  for (let i = 0; i < 1700; i++) {
+    const s0 = 8 + i * 0.35, u = s - s0; if (u <= 0 || u > 45) continue;
+    const a = gtR(i, 431), b = gtR(i, 432), c = gtR(i, 433); if (a > 0.3 + 0.7 * Math.exp(-s0 / 400)) continue;
+    const al = 0.13 * Math.min(1, u * 0.6) * Math.pow(1 - u / 45, 1.3);
+    const tone = 0.52 + 0.12 * c;
+    P.add(GT_W.end - 2 - 18 * b + 0.05 * u, 0.6 + 0.6 * u + 1.5 * c, (c - 0.5) * 9 + (a - 0.5) * 0.3 * u, 1.3 + 1.8 * a + 0.14 * u, al, tone * 1.04, tone * 0.97, tone * 0.86);
+  }
+
   // the terrace: a cloud along the whole pile, the length of the hit; it rises 40 m and hangs there for minutes
   { const s0 = GT_TER.hit0, u = s - s0;
     if (u > 0 && u < 900) for (let i = 0; i < 900; i++) {
@@ -375,7 +396,7 @@ function gtRainUpdate(T, s, cam) {
   const fallB = back ? 9 * (u - 0.9 * (1 - Math.exp(-u / 0.9))) : 0;
   { const W = R.wall; W.visible = back ? fallB < TOP : front > -2600;
     if (W.visible) { const x0 = back ? -2600 : Math.max(-2600, front - 2400), x1 = back ? 2600 : front, H = TOP - fallB;
-      W.position.set((x0 + x1) / 2, H / 2, 0); W.scale.set(x1 - x0, H, 700); W.material.uniforms.k.value = 1; W.material.uniforms.front.value = back ? 1e6 : front; W.material.uniforms.inside.value = back || cx < front ? 1 : 0; } }
+      W.position.set((x0 + x1) / 2, H / 2, 0); W.scale.set(x1 - x0, H, 700); W.material.uniforms.k.value = 1; W.material.uniforms.front.value = back ? 1e6 : front; W.material.uniforms.top.value = H; W.material.uniforms.sx.value = GT_RIVER.vDrop * s; W.material.uniforms.inside.value = back || cx < front ? 1 : 0; } }
   // ---- the streaks round the camera
   R.mesh.visible = back ? fallB < TOP : front > cx - 40;
   if (!R.mesh.visible) return;

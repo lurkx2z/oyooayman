@@ -20,7 +20,7 @@ const GT_UP = { old: [0, 1, 0], west: [-1, 0, 0] };
 const GT_HAND_POSES = {
   mug: { p: [0.14, -0.27, -0.4], F: [-0.15, 0.95, -0.25], N: [-0.95, 0.1, 0.25], curl: [1.0, 1.05, 1.1, 1.15], thumb: [0.35, 0.85] },
   glassR: { p: [0.2, -0.1, -0.2], F: [0.25, 0.95, -0.15], N: [0.05, 0.1, -1], curl: [0.08, 0.08, 0.1, 0.12], thumb: [0.7, 0.1] },
-  phone: { p: [0.03, -0.13, -0.27], F: [-0.25, 0.85, -0.45], N: [0.1, 0.45, 0.89], curl: [0.95, 1.0, 1.05, 1.1], thumb: [0.25, 0.75] },
+  phone: { p: [0.06, -0.08, -0.27], F: [-0.85, 0.25, -0.3], N: [-0.05, 0.3, 0.95], curl: [0.38, 0.42, 0.46, 0.5], thumb: [0.12, 0.3] },
   brace: { p: [0.2, -0.2, -0.3], F: [0.3, 0.2, -0.95], N: [0.2, -0.95, 0.1], curl: [0.3, 0.32, 0.35, 0.4], thumb: [0.55, 0.25] },
 };
 const GT_HAND_BLENDS = { mug: 0.2, glassR: 0.14, phone: 0.35, brace: 0.3, hidden: 0.25 };
@@ -38,7 +38,7 @@ GT_SETS.world = (app) => {
   // ---- your hands (a T-shirt: bare forearms), the mug and the phone in them
   const hands = new ViewerHands(cam, { script: GT.hands, poses: GT_HAND_POSES, blends: GT_HAND_BLENDS, skin: SKIN[LOOKS.gtYou.skin], nail: '#e0b9a8', sleeve: LOOKS.gtYou.shirt, cuff: '#33465a', watch: false, sleeveLen: 0.2 });
   const mugH = R.mug.clone(true); mugH.position.set(0.0, 0.03, 0.06); mugH.rotation.set(Math.PI / 2, 0, 0); mugH.scale.setScalar(1); hands.right.g.add(mugH);
-  const phone = gtBuildPhone(); phone.position.set(0, 0.075, 0.03); phone.rotation.set(Math.PI / 2, 0, 0); hands.left.g.add(phone);
+  const phone = gtBuildPhone(); phone.position.set(0, 0.1, 0.03); phone.rotation.set(Math.PI / 2, 0, Math.PI / 2, 'ZYX'); hands.left.g.add(phone);
   // ---- the anchor bolt at your house's front corner (the cutaway): concrete footing, the sill plate, the bolt, washer, nut
   const BR = gtBuildBoltRig(scene);
   const set = {
@@ -61,6 +61,9 @@ GT_SETS.world = (app) => {
       const v = { p: [0, 2, -5], at: [0, 1, 0], fov: 50, up: GT_UP.old, drift: 0.004, sh: { f: null, R: 10 }, inside: false, fog: 1, glow: 0.45 };
       gtShotCam(this, m, s, t, k, shot, v, RL);
       const d = v.drift ? gtDrift(t, v.drift, 0.3, 11) : [0, 0, 0];
+      // (the near plane: close for your hands and the room, further out in the street, where the road lies 2 cm above
+      // the grass and a near plane at 2 cm would let them fight)
+      const near = v.near || (pov || v.inside ? 0.02 : 0.12); if (cam.near !== near) cam.near = near;
       gtCamU(cam, gtAdd(v.p, d), v.at, v.fov, v.up);
       scene.fog.density = 0.0009 * v.fog * (1 + 0.3 * gtRain(s));
       sky.material.uniforms.sc.value.copy(GT_GLOW).multiplyScalar(v.glow);
@@ -173,7 +176,7 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'master': v.p = into([1.2, 4.6, -0.3], [2.8, 4.4, -0.3], k); v.at = [200, 1.0, 0.5]; v.fov = 56; v.up = [0, 0, 1]; v.drift = 0.004; v.fog = 0.5; v.sh = { f: [70, 0, 0], R: 80 }; break;   // (the view from your window, turned 90°)
     case 'chair': { const F = GT_FALLERS.find((f) => f.k === 'gchair'), x = gtFaller(F, s).x;
       v.p = [x - 0.4, 2.5, F.z + 0.15]; v.at = [x + 1.1, 0, F.z - 0.25]; v.fov = 70; v.up = W; v.drift = 0.02; v.sh = { f: [x + 2, 0, F.z], R: 14 }; break; }   // (falling with it: the lawn streams past)
-    case 'bottom': v.p = into([258, 16, 24], [261, 15.5, 23], k); v.at = [282, 2, -1]; v.fov = 50; v.up = W; v.drift = 0.006; v.sh = { f: [278, 0, 0], R: 28 }; break;   // (the bottom: the pile against the retaining wall)
+    case 'bottom': v.p = into([258, 16, 24], [261, 15.5, 23], k); v.at = [282, 2, -1]; v.fov = 50; v.up = W; v.drift = 0.006; v.glow = 0.1; v.fog = 0.6; v.sh = { f: [278, 0, 0], R: 28 }; break;   // (the bottom: the pile against the retaining wall)
     // ---- 2: the glass
     case 'front': v.p = into([5.2, 1.6, 1.6], [4.8, 1.8, 1.4], k); v.at = RL(0.0, 1.45, 0.05); v.fov = 46; v.up = W; v.drift = 0.004; v.sh = { f: RL(0, 1.5, 0), R: 4 }; break;
     case 'povglass': v.p = RL(-0.06, 1.5, 0.05); v.at = gtAdd(v.p, [1, -0.42, 0.05]); v.fov = 64; v.up = [0, 0.35, -1]; v.drift = 0.0015; v.sh = { f: [10, 0, 0], R: 16 }; break;
@@ -201,7 +204,7 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'terrace': v.p = into([62, 1.3, -4.6], [70, 1.3, -4.6], k); v.at = [90, 3.6, 9.5]; v.fov = 50; v.up = W; v.sh = { f: [88, 2, 12], R: 26 }; break;
     case 'dpc': v.p = [13.15, 0.42, 9.0]; v.at = [14.25, 0.13, 9.6]; v.fov = 40; v.sh = { f: [14, 0, 9.5], R: 3 }; break;
     case 'slip': v.p = [13.55, 0.22, 9.25]; v.at = [14.05, 0.15, 9.55]; v.fov = 34; v.drift = 0.0006; v.sh = { f: [14, 0, 9.5], R: 2 }; break;
-    case 'rainfront': v.p = into([17, 9, 3], [11, 9, 3], k); v.at = [-120, 10, -2]; v.fov = 58; v.up = [0, 0, -1]; v.sh = { f: [10, 0, 0], R: 40 }; break;   // (up the street: the rain coming down it)
+    case 'rainfront': v.p = into([96, 1.7, 0.8], [90, 1.7, 0.8], k); v.at = [-20, 13, 0]; v.fov = 50; v.up = GT_UP.old; v.glow = 0.3; v.sh = { f: [40, 0, 0], R: 60 }; break;   // (down the street, the old way up: the rain coming at you like a wall)
     case 'rainjog': v.p = [23.0, 1.0, 0.7]; v.at = [24.5, 1.45, -3.95]; v.fov = 40; v.up = W; v.drift = 0.0015; v.sh = { f: [24.4, 1.4, -4], R: 5 }; break;   // (her, in the rain)
     case 'rainwin': { const Y = GT_YOU.seatP; v.p = RL(-0.8, Y[1] - 0.1, Y[2] - 0.1); v.at = RL(0.05, 1.4, 0.0); v.fov = 58; v.up = W; v.inside = true; v.drift = 0.0012; v.sh = { f: RL(0, 1.4, 0), R: 3 }; break; }
     case 'bow': v.p = into([60, 2.6, 2.2], [58, 2.6, 2.2], k); v.at = [-20, 9, 0]; v.fov = 62; v.up = [0, 0, -1]; v.sh = { f: [20, 0, 0], R: 40 }; break;
@@ -219,15 +222,15 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'glassclose': v.p = RL(-0.42, 1.62, 0.32); v.at = RL(0.05, 1.3, -0.05); v.fov = 44; v.up = W; v.inside = true; v.drift = 0.001; v.sh = { f: RL(0, 1.4, 0), R: 2 }; break;
     case 'glassgo': v.p = [16, 3.2, 3.2]; v.at = RL(0, 1.5, 0); v.fov = 44; v.up = [0, 0, 1]; v.drift = 0.006; v.sh = { f: [4, 3, 0], R: 12 }; break;
     // ---- 8: ten minutes; the bolt; the last minute
-    case 'ready': v.p = RL(-2.6, 2.1, -0.4); v.at = RL(-0.2, 0.7, 0.8); v.fov = 60; v.up = W; v.inside = true; v.sh = { f: RL(-0.5, 1, 0.8), R: 4 }; break;
+    case 'ready': v.p = RL(-2.6, 2.1, 0.9); v.at = RL(-0.3, 0.6, 0.0); v.fov = 60; v.up = W; v.inside = true; v.sh = { f: RL(-0.5, 1, 0.8), R: 4 }; break;
     case 'jogdown': v.p = [25.6, 1.3, 0.8]; v.at = [24.2, 0.9, -3.95]; v.fov = 46; v.up = W; v.sh = { f: [24.5, 1, -4], R: 5 }; break;
-    case 'bolt': v.p = [-0.48, 0.2, -4.42]; v.at = [-0.6, 0.1, -4.2]; v.fov = 36; v.drift = 0.0006; v.sh = { f: [-0.6, 0, -4.2], R: 1.5 }; break;
-    case 'lurch': v.p = into([18, 3.2, -11], [17.5, 3.1, -10.6], k); v.at = [-4, 4.0, 0]; v.fov = 44; v.sh = { f: [-4, 3, 0], R: 14 }; break;
+    case 'bolt': v.p = [-0.48, 0.2, -4.42]; v.at = [-0.6, 0.1, -4.2]; v.fov = 36; v.near = 0.03; v.drift = 0.0006; v.sh = { f: [-0.6, 0, -4.2], R: 1.5 }; break;
+    case 'lurch': v.p = into([18, 3.2, -7.6], [17.5, 3.1, -7.2], k); v.at = [-4, 4.0, 0]; v.fov = 44; v.sh = { f: [-4, 3, 0], R: 14 }; break;
     case 'last': v.p = into([-1.5, 10.6, -0.4], [-0.5, 10.2, -0.4], k); v.at = [285, 0.5, 0.5]; v.fov = 58; v.up = [0, 0, 1]; v.drift = 0.004; v.fog = 0.5; v.glow = 0.25; v.sh = { f: [80, 0, 0], R: 90 }; break;
-    case 'lastin': v.p = RL(-2.4, 1.6, -1.0); v.at = RL(-0.15, 0.4, 0.75); v.fov = 56; v.up = W; v.inside = true; v.sh = { f: RL(-0.5, 0.5, 0.8), R: 3 }; break;
+    case 'lastin': v.p = RL(-2.4, 1.6, 1.0); v.at = RL(-0.3, 0.4, 0.0); v.fov = 56; v.up = W; v.inside = true; v.sh = { f: RL(-0.5, 0.5, 0.8), R: 3 }; break;
     case 'count': gtCountCam(set, s, t, v, RL); break;
     // ---- 9: down is down
-    case 'back': v.p = RL(-1.7, 1.95, -1.3); v.at = RL(-0.3, 0.3, 0.75); v.fov = 66; v.inside = true; v.sh = { f: RL(-1.5, 1, 0), R: 4 }; break;
+    case 'back': v.p = RL(-3.0, 2.1, 0.45); v.at = RL(-0.6, 0.15, 0.0); v.fov = 66; v.inside = true; v.sh = { f: RL(-1.5, 1, 0), R: 4 }; break;
     case 'backstreet': v.p = into([30, 1.8, 2.6], [31, 1.8, 2.6], k); v.at = [20, 1.6, -4.5]; v.fov = 56; v.sh = { f: [24, 0, -4], R: 10 }; break;
     case 'rainfall': v.p = [44, 0.55, 1.2]; v.at = [60, 0.2, -1.5]; v.fov = 50; v.sh = { f: [52, 0, 0], R: 12 }; break;
     case 'after': v.p = into([22, 2.0, -0.6], [19, 2.2, -0.4], k); v.at = [-4, 4.2, 0]; v.fov = 42; v.sh = { f: [-4, 3, 0], R: 14 }; break;
@@ -240,9 +243,9 @@ function gtCountCam(set, s, t, v, RL) {
   const W = GT_UP.west;
   if (n === 0) { v.p = [25.4, 1.6, 0.9]; v.at = [24.2, 0.6, -3.95]; v.fov = 42; v.up = W; v.sh = { f: [24, 0.5, -4], R: 4 }; }
   else if (n === 1) { const C = GT_CAT; v.p = RL(-0.7, C.y + 0.1, C.z + 0.55); v.at = RL(-0.15, C.y, C.z); v.fov = 44; v.up = W; v.inside = true; v.sh = { f: RL(0, C.y, C.z), R: 2 }; }
-  else if (n === 2) { v.p = RL(-2.2, 1.9, -0.2); v.at = RL(-1.2, 2.45, 0); v.fov = 50; v.up = W; v.inside = true; v.sh = { f: RL(-1.2, 2.3, 0), R: 3 }; }
+  else if (n === 2) { v.p = RL(-0.45, 0.95, 1.05); v.at = RL(-0.6, 1.0, -1.0); v.fov = 56; v.up = W; v.inside = true; v.sh = { f: RL(-0.5, 1, -0.8), R: 3 }; }   // (the bed and the wardrobe, lying on the window wall beside you)
   else if (n === 3) { v.p = [150, 3.5, 2.5]; v.at = [20, 8, -1]; v.fov = 52; v.up = [0, 0, -1]; v.sh = { f: [80, 0, 0], R: 60 }; }
-  else if (n === 4) { v.p = RL(-1.2, 0.5, 0.0); v.at = RL(-0.15, 0.4, 0.78); v.fov = 50; v.up = W; v.inside = true; v.sh = { f: RL(0, 0.4, 0.8), R: 2 }; }
+  else if (n === 4) { v.p = RL(-1.45, 1.45, 0.45); v.at = RL(-0.45, 0.4, 0.0); v.fov = 50; v.up = W; v.inside = true; v.sh = { f: RL(-0.4, 0.4, 0.8), R: 2 }; }   // (you, braced in the corner, from above)
   else { v.p = [-1.5, 10.4, -0.4]; v.at = [285, 0.5, 0.5]; v.fov = 58; v.up = [0, 0, 1]; v.fog = 0.5; v.sh = { f: [80, 0, 0], R: 90 }; }
   v.drift = 0.004;
 }

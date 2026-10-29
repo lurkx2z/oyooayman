@@ -24,7 +24,7 @@ function gtTiltQ(q, k) { return q.copy(GT_QOLD).slerp(GT_QTILT, MathX.clamp(k, 0
 // at ten to go, down into the corner where the wall meets the old floor; at the return you drop onto the floor
 // ---------------------------------------------------------------------------------------------------------------------
 GT_YOU.seatP = [0.0, 2.08, 1.02];                // (tilted frame: on the wall, against the old ceiling, beside the window)
-GT_YOU.cornerP = [0.0, 0.36, 0.78];              // (on the wall, against the old floor, between the chair and the desk)
+GT_YOU.cornerP = [0.0, 0.36, -0.02];             // (on the wall, against the old floor, under the window, between the bed and the chair)
 function gtYouState(s) {
   const Y = GT_YOU, R = GT_ROOM.you, p = gtPose();
   // ---- before, and thrown onto the glass (old frame, facing east)
@@ -54,15 +54,16 @@ function gtYouState(s) {
   // ---- down into the corner (10 minutes to go), braced; at the return, the drop to the floor
   const brace = gtPose();
   brace.hipY = 0.12; brace.pelvisPitch = -0.15; brace.lHip = [1.9, 0.2]; brace.rHip = [1.85, 0.14]; brace.lKnee = 2.1; brace.rKnee = 2.2; brace.lFoot = 0.3; brace.rFoot = 0.3;
-  brace.spine = 0.35; brace.neck = 0.45; brace.lSh = [1.1, 0.35]; brace.lEl = 1.6; brace.rSh = [1.1, 0.3]; brace.rEl = 1.6;
+  brace.spine = 0.12; brace.neck = 0.3; brace.lSh = [1.1, 0.35]; brace.lEl = 1.6; brace.rSh = [1.1, 0.3]; brace.rEl = 1.6;
   const c = gtEase(s, Y.corner[0], Y.corner[1]), P = c > 0 ? lerpPose(sit, brace, c) : sit;
   const pos = [0, MathX.lerp(GT_YOU.seatP[1], GT_YOU.cornerP[1], c), MathX.lerp(GT_YOU.seatP[2], GT_YOU.cornerP[2], c)];
-  if (s < GTP.tBack) return { p: P, pos, yaw: -Math.PI / 2, tilt: 1 };
+  // (on the way down you turn round: your back to the old floor, knees up, facing the old ceiling)
+  if (s < GTP.tBack) return { p: P, pos, yaw: MathX.lerp(-Math.PI / 2, Math.PI / 2, gtEase(c, 0.15, 0.85)), tilt: 1 };
   // the return: the 0.36 m drop; you land on your back on the floor (old frame), knees up the wall
   const u = s - GTP.tBack, f = MathX.clamp(u / 0.32, 0, 1), y = gtDownY(s, GT_YOU.cornerP[1], 0.15);
   const lie = gtPose(); lie.hipY = 0.12; lie.pelvisPitch = -1.45; lie.lHip = [1.7, 0.2]; lie.rHip = [1.5, 0.12]; lie.lKnee = 1.2; lie.rKnee = 1.0; lie.spine = 0.05; lie.neck = 0.35;
   lie.lSh = [0.4, 0.9]; lie.rSh = [0.5, 0.8]; lie.lEl = 0.3; lie.rEl = 0.4; lie.headYaw = 0.3 * gtEase(s, GTP.tBack + 1, GTP.tBack + 3);
-  return { p: lerpPose(brace, lie, gtEase(u, 0.05, 0.5)), pos: [-0.25 * f, y, GT_YOU.cornerP[2]], yaw: -Math.PI / 2, tilt: 1 - f, drop: true };
+  return { p: lerpPose(brace, lie, gtEase(u, 0.05, 0.5)), pos: [-0.25 * f, y, GT_YOU.cornerP[2]], yaw: Math.PI / 2, tilt: 1 - f, drop: true };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
