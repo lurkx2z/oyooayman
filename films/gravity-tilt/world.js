@@ -92,7 +92,7 @@ GT_SETS.world = (app) => {
       p.saturation = 1.05; p.contrast = 1.07; p.vignette = 0.44;
       const s = this._s;
       if (gtRain(s) > 0.05 && !this._inside) { p.saturation = 1.0 - 0.08 * gtRain(s); p.contrast = 1.04; }
-      if (m === 'sick') { p.edgeBlur = 0.6 + 0.3 * Math.sin(t * 1.3); p.vignette = 0.62; p.chroma = 0.15; }
+      if (m === 'sick') { p.edgeBlur = 0.6 + 0.3 * Math.sin(t * 1.3); p.vignette = 0.62; p.chroma = 0.05; }
       // the bang of the bolt, the window going, the terrace's hit, the return: a kick
       for (const [tt, a] of [[GT.tBolt, 0.22], [GT.tGlass, 0.16], [GT.tTerHit, 0.18], [GT.tB, 0.28]]) { const u = t - tt; if (u > 0 && u < 0.6) { p.flash = Math.max(p.flash || 0, a * Math.exp(-u / 0.06)); if (u < 0.07) p.chroma = Math.max(p.chroma || 0, 0.6 * a); } }
     },
@@ -208,14 +208,14 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'rainwin': { const Y = GT_YOU.seatP; v.p = RL(-0.8, Y[1] - 0.1, Y[2] - 0.1); v.at = RL(0.05, 1.4, 0.0); v.fov = 58; v.up = W; v.inside = true; v.drift = 0.0012; v.sh = { f: RL(0, 1.4, 0), R: 3 }; break; }
     case 'bow': v.p = into([60, 2.6, 2.2], [58, 2.6, 2.2], k); v.at = [-20, 9, 0]; v.fov = 62; v.up = [0, 0, -1]; v.sh = { f: [20, 0, 0], R: 40 }; break;
     // ---- 6: the wood; the terrace goes
-    case 'wood': v.p = into([16, 5.2, -14], [15, 5.0, -13], k); v.at = [-4, 3.6, 0.5]; v.fov = 46; v.sh = { f: [-4, 3, 0], R: 14 }; break;
+    case 'wood': v.p = into([15, 4.4, -8.4], [14, 4.3, -8.0], k); v.at = [-4, 3.6, 0.5]; v.fov = 46; v.sh = { f: [-4, 3, 0], R: 14 }; break;
     case 'creak': v.p = RL(-3.2, 2.3, 1.3); v.at = RL(-1.2, 1.9, -0.3); v.fov = 58; v.up = W; v.inside = true; v.sh = { f: RL(-1.5, 1, 0), R: 4 }; break;
     case 'creep': v.p = [-0.15, 0.32, -4.55]; v.at = [-0.6, 0.08, -4.2]; v.fov = 40; v.drift = 0.0006; v.sh = { f: [-0.6, 0, -4.2], R: 2 }; break;
     case 'going': v.p = into([40, 1.0, -3.0], [44, 1.0, -3.0], k); v.at = [60, 1.4, 9.5]; v.fov = 46; v.up = W; v.sh = { f: [60, 1, 10], R: 22 }; break;
     case 'still': v.p = [12.8, 0.5, 8.6]; v.at = [16, 0.3, 9.6]; v.fov = 42; v.drift = 0.001; v.sh = { f: [15, 0, 9.5], R: 4 }; break;
     case 'empty': v.p = into([7.5, 4.6, -3.2], [9.5, 4.4, -3.0], k); v.at = [62, 0.4, 13.5]; v.fov = 50; v.fog = 0.7; v.sh = { f: [50, 0, 13], R: 40 }; break;   // (where the terrace was: its footings, the plastic strip, the slabs)
     case 'release': v.p = into([7, 14.5, 13.2], [8, 14.2, 13.2], k); v.at = [120, 2.5, 13.5]; v.fov = 60; v.up = [0, 0, 1]; v.drift = 0.004; v.fog = 0.5; v.sh = { f: [60, 0, 13], R: 70 }; break;   // (from above its end: it falls away down the street)
-    case 'impact': v.p = [258, 8, -7]; v.at = [270, 5, 13]; v.fov = 62; v.up = W; v.drift = 0.006 + 0.05 * Math.exp(-Math.max(0, s - GT_TER.hit0) / 0.5) * (s > GT_TER.hit0 ? 1 : 0); v.fog = 0.6; v.sh = { f: [272, 0, 8], R: 40 }; break;
+    case 'impact': v.p = [253, 11, -11]; v.at = [270, 5, 13]; v.fov = 62; v.up = W; v.drift = 0.006 + 0.05 * Math.exp(-Math.max(0, s - GT_TER.hit0) / 0.5) * (s > GT_TER.hit0 ? 1 : 0); v.fog = 0.6; v.sh = { f: [272, 0, 8], R: 40 }; break;
     // ---- 7: the pool; the window goes
     case 'pool': v.p = RL(-1.5, 1.9, -0.95); v.at = RL(0.0, 1.35, 0.1); v.fov = 54; v.up = W; v.inside = true; v.sh = { f: RL(0, 1.4, 0), R: 3 }; break;
     case 'glassclose': v.p = RL(-0.42, 1.62, 0.32); v.at = RL(0.05, 1.3, -0.05); v.fov = 44; v.up = W; v.inside = true; v.drift = 0.001; v.sh = { f: RL(0, 1.4, 0), R: 2 }; break;
@@ -234,7 +234,7 @@ function gtShotCam(set, m, s, t, k, shot, v, RL) {
     case 'backstreet': v.p = into([30, 1.8, 2.6], [31, 1.8, 2.6], k); v.at = [20, 1.6, -4.5]; v.fov = 56; v.sh = { f: [24, 0, -4], R: 10 }; break;
     case 'rainfall': v.p = [44, 0.55, 1.2]; v.at = [60, 0.2, -1.5]; v.fov = 50; v.sh = { f: [52, 0, 0], R: 12 }; break;
     case 'after': v.p = into([22, 2.0, -0.6], [19, 2.2, -0.4], k); v.at = [-4, 4.2, 0]; v.fov = 42; v.sh = { f: [-4, 3, 0], R: 14 }; break;
-    case 'question': v.p = into(RL(-3.3, 1.75, 1.2), RL(-2.6, 1.7, 0.8), k); v.at = RL(0.4, 1.3, -0.05); v.fov = 56; v.inside = true; v.sh = { f: RL(-1, 1, 0), R: 4 }; break;
+    case 'question': v.p = into(RL(-3.0, 1.7, 1.3), RL(-2.4, 1.62, 1.05), k); v.at = RL(0.0, 1.05, -0.45); v.fov = 56; v.inside = true; v.sh = { f: RL(-1, 1, 0), R: 4 }; break;
   }
 }
 // the last ten seconds: quick cuts (GT.subCuts) round everyone
@@ -254,7 +254,7 @@ function gtCountCam(set, s, t, v, RL) {
 function gtLabels(set, t) {
   const shot = gtShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s, R = set.R;
   const RL = (x, y, z) => R.toWorld(x, y, z).toArray();
-  if (m === 'master') out.push({ p: [70, 7.5, 13.5], text: 'THE TERRACE', sub: '30 BRICK HOUSES', a: W(t, gtC('tilt', 2) + 0.2, shot.t1 - 0.2, 0.3, 0.2) });
+  if (m === 'master') out.push({ p: [30, 7.5, 13.5], text: 'THE TERRACE', sub: '30 BRICK HOUSES', a: W(t, gtC('tilt', 2) + 0.2, shot.t1 - 0.2, 0.3, 0.2) });
   if (m === 'master' && t > gtC('tilt', 1) + 0.3) out.push({ p: [GT_W.end - 2, 3, 0], text: 'THE END OF THE STREET', sub: '285 m DOWN', a: W(t, gtC('tilt', 1) + 0.4, shot.t1 - 0.2, 0.3, 0.2) });
   if (m === 'front') out.push({ p: RL(0.06, 1.75, -0.35), text: 'YOU', a: W(t, shot.t0 + 0.5, gtC('glass', 1) - 0.1, 0.3, 0.3) });
   if (m === 'jogger') out.push({ p: [GT_JOG.post.x, 3.5, GT_JOG.post.z], text: 'A LAMP POST', sub: 'SET IN CONCRETE: IT HOLDS', a: W(t, shot.t0 + 0.6, gtC('jogger', 1) - 0.2, 0.3, 0.3) });

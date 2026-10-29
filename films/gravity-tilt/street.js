@@ -256,7 +256,7 @@ function gtBuildStreet(S) {
   // ------------------------------------------------------------------ roof tiles (instanced)
   { const geo = new THREE.BoxGeometry(0.42, 0.014, 0.33), im = new THREE.InstancedMesh(geo, M.tile, GT_TILES.length); im.castShadow = true; im.frustumCulled = false; root.add(im); T.tiles = im; }
   // ------------------------------------------------------------------ dust (rises the old way), rain, the rainbow
-  T.dust = gtPuffs(scene, 3600, { soft: 1.3 });
+  T.dust = gtPuffs(scene, 3600, { soft: 1.3, near: [4, 16] });   // (fading out near the lens: no white-out)
   // the rain: streaks near the camera (thin quads turned to face it), and the rain as a mass far off (a soft grey volume
   // behind the front of the river's water; you see its front coming down the street)
   { const N = 7000, geo = new THREE.BufferGeometry(), pos = new Float32Array(N * 12), uv = new Float32Array(N * 8), idx = new Uint32Array(N * 6);
