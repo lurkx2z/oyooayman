@@ -65,8 +65,27 @@ class GtAudio extends AudioEngine {
   fingerprintData() {
     const consts = { GTP, GT_W, GT_ROOM, GT_BOOKS, GT_YOU, GT_CAT, GT_BATH, GT_GLASS, GT_BOLT, GT_FALLERS, GT_LEN, GT_VT, GT_JOG, GT_TER, GT_RIVER, GT_CLOCK, GT_SHOTS, GT_CAMXY, GT_TILES };
     return [GT, GTT, window.GT_MIX, Object.values(GTX).map(String).join(''), GtFx.toString(), Object.getOwnPropertyNames(GtFx.prototype).map((k) => String(GtFx.prototype[k])).join(''),
-      Object.values(GT_SOUND).flat().map((b) => b.name + b.fn).join(''), gtDynDb.toString(), GtAudio.toString(), gtLimit.toString(), gtStoryAt.toString(), gtSegAt.toString(), JSON.stringify(consts),
+      Object.values(GT_SOUND).flat().map((b) => b.name + b.fn).join(''), gtDynDb.toString(), GtAudio.toString(), gtLimit.toString(), gtStoryAt.toString(), gtSegAt.toString(), consts,
       (window.GT_SOUND_FNS || []).map(String).join(''), [gtShotAt, gtFaller, gtFall, gtDrop, gtDropT, gtDropV, gtTerSlip, gtJog, gtBook, gtBathIn, gtPool, gtCrack, gtLean].map(String).join('')];
+  }
+  // AudioEngine's fingerprint, with every number rounded to 7 significant digits: browsers' Math.exp/sin/acosh… can
+  // differ in the last bit (Safari, Firefox), and then the baked copy was refused and the whole soundtrack rendered
+  // live, minutes of a silent film. Same inputs as the engine's otherwise.
+  fingerprint() {
+    const J = (v) => JSON.stringify(v, (k, x) => (typeof x === 'number' ? +x.toPrecision(7) : x));
+    let s = `${CONFIG.duration}|${CONFIG.seed}|${this.sampleRate}|${J(SCRIPT)}|`;
+    if (CONFIG.edit) s += J(CONFIG.edit) + '|';
+    try { s += J(this.fingerprintData()); } catch (e) { s += 'x'; }
+    const add = (proto) => { for (const k of Object.getOwnPropertyNames(proto)) { const d = Object.getOwnPropertyDescriptor(proto, k); s += k + String(d.value || d.get || ''); } };
+    for (let p = Object.getPrototypeOf(this); p && p !== Object.prototype; p = Object.getPrototypeOf(p)) add(p);
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return h.toString(16).padStart(8, '0');
+  }
+  // iPhones mute Web Audio when the ring switch is on silent; 'playback' makes it play like a video does
+  ensureContext() {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* not supported */ }
+    return super.ensureContext();
   }
   async renderOffline() {
     if (this.solo) return super.renderOffline();
