@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What if gravity kept tilting sideways every second and couldn't stop?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* this film's HUD (page-level only). 16:9 (1920×1080): --u = one design pixel of a 1920-wide frame (set by film.js) */
+    #hud::before { height: 26%; background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)); }
+    #hud .story-title.big.center { top: calc(var(--u) * 150); width: calc(var(--u) * 1400); margin-left: calc(var(--u) * -700); }
+    #hud .story-title.big.center::before { background: radial-gradient(closest-side, rgba(2, 3, 6, 0.62), rgba(2, 3, 6, 0.28) 62%, rgba(2, 3, 6, 0)); }
+    #hud .story-title.big.center .kick { font-family: var(--book); font-size: calc(var(--u) * 54); font-weight: 600; letter-spacing: 0.06em; }
+    #hud .story-title.big.center .hero { font-family: var(--book); font-size: calc(var(--u) * 124); font-weight: 700; line-height: 1.02; letter-spacing: 0.02em; }
+    #hud .story-title.big.center .kick.k2 { margin-top: calc(var(--u) * 6); font-size: calc(var(--u) * 58); color: #ffcf8a; }
+    #hud .story-title.big.center .main { text-shadow: 0 0 calc(var(--u) * 30) rgba(0, 0, 0, 0.8), 0 calc(var(--u) * 3) calc(var(--u) * 12) rgba(0, 0, 0, 0.7); }
+    /* the caption: one line, low, on a soft shadow (no plate); numbers amber; the closing question larger */
+    .gk-cap { position: absolute; left: 50%; bottom: calc(var(--u) * 92); transform: translateX(-50%); width: max-content; max-width: calc(var(--u) * 1500); text-align: center; text-wrap: balance;
+      font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 52); line-height: 1.2; color: #f6f1e7; pointer-events: none;
+      text-shadow: 0 0 calc(var(--u) * 18) rgba(0, 0, 0, 0.85), 0 0 calc(var(--u) * 4) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
+    .gk-band { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--u) * 330); pointer-events: none;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3) 42%, rgba(0, 0, 0, 0)); }
+    .gk-cap .n { color: #ffcf8a; }
+    .gk-cap.q { bottom: calc(var(--u) * 110); font-size: calc(var(--u) * 82); font-weight: 600; max-width: calc(var(--u) * 1600); }
+    /* the counter (top left, on a soft plate) and the scene's context line under it */
+    .gk-ro, .gk-clock { position: absolute; top: calc(var(--u) * 44); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.6); }
+    .gk-ro { left: calc(var(--u) * 52); padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 18); border-radius: calc(var(--u) * 16); background: rgba(6, 8, 12, 0.55); }
+    .gk-ro .l, .gk-clock .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.18em; color: #ffffff; opacity: 0.92; }
+    .gk-ro .v small { font-size: 0.5em; opacity: 0.85; }
+    .gk-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
+      font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+    .gk-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
+    .gk-ro .nx { color: #f6efe2; opacity: 0.85; font-size: calc(var(--u) * 22); letter-spacing: 0.12em; }
+    .gk-ro .nx:empty { display: none; }
+    .gk-ro .s:empty { display: none; }
+    .gk-ctx { position: absolute; left: calc(var(--u) * 52); top: calc(var(--u) * 312); pointer-events: none; padding: calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * 14); border-radius: calc(var(--u) * 14);
+      background: rgba(6, 8, 12, 0.62); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
+    .gk-ctx .l { display: block; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.16em; color: #fff; opacity: 0.8; }
+    .gk-ctx .v { display: block; font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 40); margin-top: calc(var(--u) * 2); color: #ffd7a8; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+    .gk-ctx .v2 { display: block; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #f6efe2; white-space: nowrap; }
+    .gk-ctx .v2:empty { display: none; }
+    .gk-ctx .chip { display: inline-block; margin-right: calc(var(--u) * 18); opacity: 0.38; }
+    .gk-ctx .chip.on { opacity: 1; color: #ffcf8a; }
+    .gk-ctx .chip.hit { opacity: 1; color: #fff; text-shadow: 0 0 calc(var(--u) * 16) rgba(255, 220, 160, 0.95); }
+    .gk-ctx .dim { opacity: 0.55; }
+    /* the honest label (bottom left, under the caption line) */
+    .gk-tag { position: absolute; left: calc(var(--u) * 52); bottom: calc(var(--u) * 26); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 22); letter-spacing: 0.16em;
+      color: #e9e2d4; padding: calc(var(--u) * 7) calc(var(--u) * 16); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
+    /* the time this morning (top right) and, under it, which way is down on the screen */
+    .gk-clock { right: calc(var(--u) * 52); text-align: right; padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 18); border-radius: calc(var(--u) * 16); background: rgba(6, 8, 12, 0.55); }
+    .gk-clock .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 62); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; }
+    .gk-clock .v small { font-size: 0.62em; opacity: 0.85; }
+    .gk-clock .v i { font-style: normal; font-family: var(--hud-font); font-weight: 600; font-size: 0.36em; letter-spacing: 0.12em; opacity: 0.8; vertical-align: 0.6em; }
+    .gk-clock .f { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.08em; margin-top: calc(var(--u) * 8); color: #ffd7a8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .gk-clock .f:empty { display: none; }
+    .gk-ctx sup { font-size: 0.6em; }
+    /* the DOWN dial: an arrow turned to where gravity points on the screen; ⊗ when it points away from you, into the frame */
+    .gk-clock .dn { display: flex; align-items: center; justify-content: flex-end; gap: calc(var(--u) * 14); margin-top: calc(var(--u) * 10); }
+    .gk-clock .dn .dl { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.18em; color: #fff; opacity: 0.75; }
+    .gk-clock .dn svg { width: calc(var(--u) * 84); height: calc(var(--u) * 84); overflow: visible; }
+    .gk-clock .dn .ring { fill: rgba(255, 255, 255, 0.04); stroke: rgba(255, 255, 255, 0.45); stroke-width: 3; }
+    .gk-clock .dn .arr, .gk-clock .dn .into { fill: none; stroke: #f6efe2; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+    .gk-clock .dn .arr { transform-origin: 0 0; transform-box: view-box; }
+    .gk-clock .dn.on .arr, .gk-clock .dn.on .into { stroke: #ffcf8a; }
+    .gk-clock .dn.on .ring { stroke: rgba(255, 207, 138, 0.75); }
+    .gk-clock .dn.on .dl { color: #ffcf8a; opacity: 1; }
+    /* the diagrams (illustrations): right of centre, or large in the middle of the frame */
+    .gk-inset { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 372); width: calc(var(--u) * 800); height: calc(var(--u) * 495); pointer-events: none; }
+    .gk-inset.left { right: auto; left: calc(var(--u) * 52); }
+    .gk-inset.mid svg { width: 100%; height: 100%; }
+    .gk-inset.mid { top: calc(var(--u) * 200); width: calc(var(--u) * 980); height: calc(var(--u) * 606); }
+    .gk-inset.big { right: auto; left: 50%; margin-left: calc(var(--u) * -560); top: calc(var(--u) * 96); width: calc(var(--u) * 1120); height: calc(var(--u) * 693); }
+    .gk-inset svg { width: 100%; height: 100%; display: block; }
+    .gk-inset .t { font-family: var(--hud-font); font-weight: 700; font-size: 28px; letter-spacing: 0.1em; fill: #f6efe2; }
+    .gk-inset .s { font-family: var(--hud-font); font-weight: 600; font-size: 25px; letter-spacing: 0.12em; fill: #ffd7a8; }
+    .gk-inset .b { font-family: var(--hud-font); font-weight: 600; font-size: 26px; fill: #fff; }
+    .gk-inset .sm { font-family: var(--hud-font); font-weight: 600; font-size: 21px; letter-spacing: 0.06em; fill: #ffd7a8; }
+    /* labels pinned to places */
+    .gk-lab { position: absolute; transform: translate(calc(var(--u) * -14), -50%); pointer-events: none; white-space: nowrap; font-family: var(--hud-font); font-weight: 600;
+      font-size: calc(var(--u) * 34); letter-spacing: 0.08em; color: #f6efe2;
+      text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.9); }
+    /* (the plate sits behind the words only: the ring stays clear, so you see the thing it points at inside it) */
+    .gk-lab .t { display: inline-block; vertical-align: middle; padding: calc(var(--u) * 6) calc(var(--u) * 14); border-radius: calc(var(--u) * 10); background: rgba(4, 6, 10, 0.55); }
+    .gk-lab.r { transform: translate(calc(-100% + var(--u) * 14), -50%); text-align: right; }
+    .gk-lab.r .d { margin-right: 0; margin-left: calc(var(--u) * 8); }
+    .gk-lab small { display: block; font-size: 0.75em; opacity: 0.9; color: #ffd7a8; }
+    .gk-lab .d { display: inline-block; width: calc(var(--u) * 28); height: calc(var(--u) * 28); border-radius: 50%; margin-right: calc(var(--u) * 8);
+      box-shadow: 0 0 0 calc(var(--u) * 2.5) rgba(255, 215, 168, 0.85); vertical-align: middle; }
+    .gk-ro .v { color: #ffffff; }
+    .gk-ro.tick .v { color: #ffcf8a; text-shadow: 0 0 calc(var(--u) * 22) rgba(255, 207, 138, 0.8); }
+    .gk-ro.hit .v { color: #ffffff; text-shadow: 0 0 calc(var(--u) * 24) rgba(255, 220, 160, 0.95); }
+    .gk-clock .v small { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="hud"></div>
+    </div>
+  </div>
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What if gravity kept tilting sideways every second and couldn't stop?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">BUILDING YOUR ROOM, THE STREET AND THE PARK…</div>
+  <div id="errorBox"></div>
+
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine (unchanged; this film only configures and extends it from its own folder) -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script>installFog({ bankScale: 0.012, bankAmount: 0.0, lowHeight: 6, lowAmount: 0.0, cap: 0.9 });</script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/fx/mirror.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (plan: films/gravity-keeps-tilting/PLAN.md; captions: films/gravity-keeps-tilting/CAPTIONS.md) -->
+  <script src="films/gravity-keeps-tilting/timing.js"></script>
+  <script src="films/gravity-keeps-tilting/layout.js"></script>
+  <script src="films/gravity-keeps-tilting/simdata.js"></script>
+  <script src="films/gravity-keeps-tilting/physics.js"></script>
+  <script src="films/gravity-keeps-tilting/script.js"></script>
+  <script src="films/gravity-keeps-tilting/kit.js"></script>
+  <script src="films/gravity-keeps-tilting/film.js"></script>
+  <script src="films/gravity-keeps-tilting/room.js"></script>
+  <script src="films/gravity-keeps-tilting/street.js"></script>
+  <script src="films/gravity-keeps-tilting/cast.js"></script>
+  <script src="films/gravity-keeps-tilting/world.js"></script>
+  <script src="films/gravity-keeps-tilting/shots.js"></script>
+  <script src="films/gravity-keeps-tilting/hud.js"></script>
+  <script src="films/gravity-keeps-tilting/audiokit.js"></script>
+  <script src="films/gravity-keeps-tilting/mix.js"></script>
+  <script src="films/gravity-keeps-tilting/audio.js"></script>
+  <script src="films/gravity-keeps-tilting/sound-lib.js"></script>
+  <script src="films/gravity-keeps-tilting/sound-music.js"></script>
+  <script src="films/gravity-keeps-tilting/sound-amb.js"></script>
+  <script src="films/gravity-keeps-tilting/sound-sfx.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
