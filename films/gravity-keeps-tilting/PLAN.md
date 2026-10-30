@@ -140,5 +140,8 @@ written the film). Scores as given:
   tinted so the outside reads from inside; the friction and circle diagrams moved to the left; larger diagram text and
   captions; the dial says AWAY / AT YOU instead of ⊗; you no longer sit inside the furniture pile at the end.
 
+**Second look** (my own, on a new preview; no new scores): the new moments read; the rain-going-up and trees shots were
+re-framed. Still weak: see EPISODE_REPORT.md.
+
 Not done: the church tower falling (we made it concrete instead); a felt 90° shot of the park as a wall (it read as
 haze; we show the water and leaves lifting instead); trails drawn on hero objects; thinner air high up.

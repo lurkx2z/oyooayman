@@ -107,9 +107,59 @@ comes back past where it left, sideways") was wrong by the film's own model. All
 The second cut was checked by me on a new preview and contact sheets; it was not re-reviewed independently, so there
 are no new scores.
 
+**Second look (the 6:15 cut).** A new 480×270 preview with the new soundtrack and contact sheets at one frame every
+2 s, checked by me (not an independent re-review, so no new scores). The new moments read: the football rolling off
+under the title, the pond spilling with the mother and daughter labelled, the spire followed down, the cars sliding
+past you, the two of them close on the dome's bars at 85°, the roof tiles peeling, the balconies hinging up and tearing
+off, the long lens on the car 8 km up, the girl hand over hand at 247°, the big count, you standing for the one second,
+and the countdown to the first car landing. Fixed on that pass: the rain going up (the camera stood against a house)
+and the trees (a blob of crown against the sky).
+
 ## What is still weak
 
-- (filled in after the second preview)
+- 90° (1:30–1:37) is a low, pale shot of the water and leaves starting to leave the park; it marks the moment but is
+  not a hero image.
+- The pond's drops are still the biggest thing in the sky, so a white plume recurs in several shots from 4:16 to
+  6:12 (each now has the tower, a block, the dome or roofs in frame, and none runs much past 6 s).
+- The circle (1:55–2:04) is shown by the diagram over a hazy aerial, not drawn in the world.
+- The pigeon flying belly-up is clear in the frames but small on a phone.
+- The church tower holds because it is concrete with steel inside (said by a label), not shown being tested.
+- Thinner air high up isn't modelled (the cars would go a little higher and faster); the film says "about 10 km".
+- The preview was rendered at 480×270; the final 1080p needs the PC render.
+
+## Sound
+
+All synthesised and seeded (`sound-*.js`, `mix.js`; `js/audio/audioEngine.js` unchanged). Three stems (music, amb,
+sfx), a dynamics map per stem, a true-peak limiter.
+
+- the score (A, 60 bpm, so a soft piano note can land on the ticks): one key per quarter turn (A minor on the ground,
+  A lydian floating up, D minor upside down, the high lydian at 270°, warm F and C coming back down), a blow on the
+  low drum every 90°; the theme (A–E–D–C, falling, like something tipping) at the title, the circle, the girl and the
+  question; A major, wide open, for the one second at 360°, then it slides a semitone down and the film ends on the
+  question, cut on the last frame;
+- the tick: every second, as down jumps 1°, a soft knock through the building;
+- the places: your room's tone, the park through the window, a Saturday town that goes quiet; the pond spilling; the
+  car alarms of the pile, each set off as its car hits and carried up into the sky with it; alarms all over town;
+- the events at their story seconds, each heard once, by material and speed, as loud as the camera is near them and
+  muffled through the walls from inside (the football, the furniture, the spire, the cars into the church, the
+  balconies tearing, the ceiling lamp, the crack).
+
+Measured (EBU R128): **−15.3 LUFS integrated, loudness range 5.9 LU, true peak −1.4 dBTP** (the mastered WAV and the
+final AAC 256k soundtrack `final-soundtrack.m4a`). Target −16 to −14 LUFS, ≤ −1 dBTP: met. The loudness range is
+narrower than film 1's (8.8 LU): the ticks and the alarms keep a floor under the quiet passages.
+
+## Delivery
+
+- `gravity-keeps-tilting.html` (open it, press Space) with the baked soundtrack; a runnable ZIP in the project files
+  (`gravity-keeps-tilting-film.zip`: unzip, double-click `gravity-keeps-tilting.html`, press Space). The unzipped copy
+  was checked: it boots and plays the baked soundtrack (the rounded fingerprint, so other browsers don't fall back to
+  live sound).
+- Final 1080p: to render on the owner's PC with
+  `node films/gravity-keeps-tilting/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\gravity-keeps-tilting`
+  → `gravity-keeps-tilting_final_1080p.mp4` (1920×1080, 30 fps, H.264 + the AAC 256k soundtrack). Not rendered yet.
+- Thumbnails in the house style (real film frames, 1280×720) in the project files: `thumb-ceiling.jpg` (183° · your
+  sofa is on the ceiling), `thumb-church.jpg` (100° · the cars fall sideways), `thumb-block.jpg` (192° · your building
+  hangs from its foundations).
 
 ## Files
 

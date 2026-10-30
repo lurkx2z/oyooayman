@@ -175,7 +175,7 @@ gkSound('sfx', 'events', function (ctx, bus, K) {
   for (const b of GK_BALC) if (b.go) {
     const P = [b.x, b.y, b.z];
     ev(b.go, P, () => mix([crack({ len: 0.3, hp: 500, ring: 0.1 }), 0, 1], [rubble(0.5, { density: 1000, n: 8, lo: 300, hi: 3500, env: (u) => Math.exp(-u * 5) }), 0.01, 0.5]), { vol: 0.08, k: 0.7 });
-    ev(b.go + GK_BALC_FOLD, P, () => mix([crack({ len: 0.4, hp: 400, ring: 0.2 }), 0, 1], [metal(1100), 0.02, 0.5], [metal(1700), 0.05, 0.3], [rubble(1.0, { density: 1500, n: 16, lo: 200, hi: 4000, env: (u) => Math.exp(-u * 3) }), 0.01, 0.6]), { vol: 0.12, k: 0.7 });
+    ev(b.go + GK_BALC_FOLD, P, () => mix([crack({ len: 0.4, hp: 400, ring: 0.2 }), 0, 1], [metal(1100), 0.02, 0.5], [metal(1700), 0.05, 0.3], [rubble(1.0, { density: 1500, n: 16, lo: 200, hi: 4000, env: (u) => Math.exp(-u * 3) }), 0.01, 0.6]), { vol: 0.09, k: 0.7 });
   }
   // the swings' chains, creaking round their bar with each tick
   for (let k = 2; k < 372; k++) ev(k, [GK_ST.swings.x, GK_ST.swings.top, GK_ST.swings.z], () => fx.creak(0.35, [[r.range(900, 1100), 0.01, 1], [r.range(1900, 2300), 0.006, 0.5]], { rate: [30, 60], jit: 0.4, env: (u) => Math.exp(-u * 5) }), { vol: 0.02, k: 1.1 });

@@ -175,19 +175,20 @@ function gkShotCam(set, m, s, t, k, shot, v, RL) {
     case 'up0': v.p = [62, 1.6, -12]; v.at = (() => { const P = [0, 0, 0], Q = [0, 0, 0, 1]; let x = 0, y = 0, z = 0; for (const id of GK_CARS) { gkSimPose('street', id, s, P, Q); x += P[0]; y += P[1]; z += P[2]; } return [x / GK_CARS.length, y / GK_CARS.length, z / GK_CARS.length]; })(); v.fov = 50; v.drift = 0.004; v.fog = 0.3; v.far = 20000; v.sh = { f: [80, 10, -8], R: 40 }; break;
     case 'leaves0': v.p = into([38, 0.9, -44], [40, 1.0, -45], k); v.at = [92, 5, -52]; v.fov = 60; v.drift = 0.002; v.fog = 0.5; v.sh = { f: [60, 0, -48], R: 30 }; break;
     case 'circle': v.p = into([-120, 55, 70], [-110, 60, 62], k); v.at = [30, 60, -50]; v.fov = 52; v.drift = 0.004; v.fog = 0.35; v.far = 12000; v.sh = { f: [0, 0, -40], R: 90 }; break;
-    case 'rainup': v.p = into([84, 2.0, -50], [88, 3.0, -51], k); v.at = [170, 45, -56]; v.fov = 60; v.drift = 0.003; v.fog = 0.4; v.far = 4000; v.sh = { f: [84, 0, -50], R: 30 }; break;
+    case 'rainup': v.p = into([63, 1.5, -54], [65, 1.7, -55], k); v.at = aimEl(v.p, [170, 0, -56], 24); v.fov = 64; v.drift = 0.003; v.fog = 0.35; v.far = 4000; v.sh = { f: [70, 0, -54], R: 30 }; break;
     case 'tiles': v.p = into([2, 5.6, -86], [3, 5.9, -88], k); v.at = [3, 8.4, -104]; v.fov = 52; v.drift = 0.002; v.sh = { f: [3, 8, -104], R: 16 }; break;
     case 'climb': v.p = into([27.2, 2.6, -25.6], [27.8, 2.4, -26.2], k); v.at = [34.6, 1.7, -30]; v.fov = 50; v.drift = 0.003; v.sh = { f: [34, 1, -30], R: 8 }; break;
     case 'balcony': { const b = GK_BALC[1], o = gkBalcony(b, s); v.p = into([43.4, 2.4, -5.4], [43.8, 2.5, -5.2], k); v.at = [b.x + 0.9 * o.off[0], b.y + 0.4 + 0.9 * o.off[1], -0.9]; v.fov = 50; v.drift = 0.0015; v.sh = { f: [46, 3, -1], R: 10 }; break; }
     case 'balcony2': { const b = GK_BALC[12], o = gkBalcony(b, s); v.p = into([51.6, 8.4, -5.6], [52.0, 8.5, -5.4], k); v.at = [b.x + 0.9 * o.off[0], b.y + 0.4 + 0.9 * o.off[1], -0.9]; v.fov = 50; v.drift = 0.0015; v.sh = { f: [54, 9, -1], R: 10 }; break; }
-    case 'trees': { const tr = set.T.trees.reduce((a, b) => (Math.hypot(b.x + 30, b.z + 62) < Math.hypot(a.x + 30, a.z + 62) ? b : a)); v.p = into([tr.x + 4.5, 1.3, tr.z + 4.0], [tr.x + 4.0, 1.3, tr.z + 4.6], k); v.at = [tr.x + 1, tr.h * 0.6 + 9, tr.z - 1]; v.fov = 62; v.drift = 0.002; v.far = 3000; v.sh = { f: [tr.x, 6, tr.z], R: 14 }; break; }
+    case 'trees': v.p = into([-12, 1.3, -40], [-14, 1.3, -41], k); v.at = aimEl(v.p, [-42, 0, -74], 14); v.fov = 62; v.drift = 0.002; v.fog = 0.35; v.far = 3000; v.sh = { f: [-36, 6, -66], R: 40 }; break;
     case 'ten': v.p = into(RL(-2.05, 1.2, 1.2), RL(-1.9, 1.15, 1.1), k); v.at = RL(1.6, 2.0, -0.9); felt(); v.fov = 62; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     // ---- 4: upside down
     case 'ceiling': v.p = into(RL(-1.6, 1.05, 1.5), RL(-1.3, 1.0, 1.3), k); v.at = RL(1.2, 1.7, -1.5); felt(); v.fov = 60; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     case 'block': v.p = into([4, 1.7, -42], [4, 1.8, -38], k); v.at = [4, 9, 0]; felt(); v.fov = 52; v.drift = 0.003; v.sh = { f: [4, 6, 0], R: 30 }; break;
     case 'again': v.p = RL(-2.25, 0.45, 1.75); v.at = RL(0.6, 2.15, -0.5); felt(); v.fov = 66; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     case 'crack': v.p = into(RL(1.05, 1.3, 0.75), RL(0.9, 1.3, 0.85), k); v.at = RL(-0.55, 2.6, 1.72); felt(); v.fov = 52; v.inside = true; v.drift = 0.001; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
-    case 'sky0': { const g = set.T.sim.find((it) => it.b.id === 'car4').g; g.updateMatrixWorld(true); const P = (set._box || (set._box = new THREE.Box3())).setFromObject(g).getCenter(new THREE.Vector3()).toArray();
+    case 'sky0': { const it = set.T.sim.find((x) => x.b.id === 'car4'), P = [0, 0, 0];
+      if (it) { it.g.updateMatrixWorld(true); (set._box || (set._box = new THREE.Box3())).setFromObject(it.g).getCenter(new THREE.Vector3()).toArray(P); } else gkSimPose('street', 'car4', s, P, [0, 0, 0, 1]);
       // a long lens locked on one car 7-8 km up: it fills a third of the frame (near/far hug it for depth precision)
       v.p = [60, 1.6, -9]; v.at = [P[0], P[1], P[2]]; const d = Math.hypot(P[0] - 60, P[1] - 1.6, P[2] + 9);
       v.fov = (414 / d) * gkLerp(3.2, 1.0, Ease.inOutSine(Math.min(1, k * 1.6))); v.drift = 0; v.near = d - 40; v.fog = 0.02; v.far = d + 40; v.glow = 0.2; v.sh = { f: [P[0], P[1], P[2]], R: 6 }; break; }

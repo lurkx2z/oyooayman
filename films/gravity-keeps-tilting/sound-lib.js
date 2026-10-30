@@ -187,7 +187,8 @@ function gkCrunch(fx, o = {}) {
 // ---- where the camera is (for how far away a sound is) ----------------------------------------------------------
 // the camera's position at film time t, from the shots' own cameras (world.js: gkShotCam with a stand-in set; the
 // clouds the sky shots aim at don't move the camera)
-const GK_CAMSTUB = { R: { bodies: { glass: { position: { x: -0.88, z: -0.02 } } } }, _leafC: [0, 100, -50], _dropC: [60, 300, -55] };
+// (a stand-in set for the cameras: no meshes)
+const GK_CAMSTUB = { R: { bodies: { glass: { position: { x: -0.88, z: -0.02 } } } }, T: { sim: [] }, _leafC: [0, 100, -50], _dropC: [60, 300, -55] };
 function gkCamPos(t) {
   const sh = gkShotAt(t), s = gkStoryAt(t), k = MathX.clamp((t - sh.t0) / (sh.t1 - sh.t0), 0, 1), O = GK_ROOM.origin;
   const v = { p: [0, 2, -5], at: [0, 1, 0], fov: 50, up: [0, 1, 0], sh: {} };

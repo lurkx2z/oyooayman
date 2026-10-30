@@ -18,5 +18,5 @@ window.GK_MIX = {
   },
   master: 6,
   eq: [['lowshelf', 110, -2.5], ['highshelf', 3500, 2]],
-  ceiling: -1.5,   // dBTP, the limiter's ceiling (gkLimit)
+  ceiling: -2.0,   // dBTP, the limiter's ceiling (gkLimit)
 };
