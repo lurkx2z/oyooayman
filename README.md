@@ -71,6 +71,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > rain (and a rainbow, right where it always is), the brick terrace opposite slides off its damp-proof course and hits
 > the end of the street at 175 km/h, your window gives way, a bolt snaps, and at 8:42 down is down again. The story clock only ever
 > runs forward. Physics, clock, shots and review log: [`films/gravity-tilt/PLAN.md`](films/gravity-tilt/PLAN.md).
+>
+> ***What if gravity kept tilting sideways every second and couldn't stop?*** — open `gravity-keeps-tilting.html` (16:9,
+> voiceless, 6:15). At 4:00 on a Saturday afternoon down starts to turn, one degree every second, and the film is that
+> turn in real time: nothing sped up, nothing replayed. A football rolls off by itself, the church spire goes at 13°,
+> your furniture slides into each wall in turn, the parked cars pile into the church and then fall off the world, the
+> pond rains up, a mother and her daughter climb round the inside of the playground's dome, your block hangs from its
+> foundations, everything loose goes round in circles of radius speed × 57 s (the cars 10 km up), and at 4:06:00 down
+> is down for one second, with the first car due to land 6 km west at 4:07:05. Physics, shots and review log:
+> [`films/gravity-keeps-tilting/PLAN.md`](films/gravity-keeps-tilting/PLAN.md).
 
 | Time | Beat |
 |---|---|

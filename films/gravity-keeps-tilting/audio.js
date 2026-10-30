@@ -64,10 +64,10 @@ class GkAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'gravity-keeps-tilting-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
     const sim = { hz: GK_SIM.hz, t0: GK_SIM.t0, end: GK_SIM.end, room: GK_SIM.room.events, street: GK_SIM.street.events, n: [GK_SIM.room.tracks, GK_SIM.street.tracks].map((w) => w.map((tr) => tr.length + ':' + tr[tr.length - 1].join(',')).join(';')) };
-    const consts = { GKP, GK_ROOM, GK_ST, GK_CLOCK, GK_SHOTS, GK_LAMPS, GK_KICKS, GK_SPIRE: [GK_SPIRE.s0, GK_SPIRE.hitS], GK_BALC, GK_YOU_KEYS, sim };
+    const consts = { GKP, GK_ROOM, GK_ST, GK_CLOCK, GK_SHOTS, GK_LAMPS, GK_KICKS, GK_SPIRE: [GK_SPIRE.s0, GK_SPIRE.hitS], GK_BALC, GK_BALC_FOLD, GK_BALL: [GK_BALL.x0, GK_BALL.z, GK_BALL.hits], GK_YOU_KEYS, sim };
     return [GK, GKT, window.GK_MIX, Object.values(GKX).map(String).join(''), GkFx.toString(), Object.getOwnPropertyNames(GkFx.prototype).map((k) => String(GkFx.prototype[k])).join(''),
       Object.values(GK_SOUND).flat().map((b) => b.name + b.fn).join(''), gkDynDb.toString(), GkAudio.toString(), gkLimit.toString(), gkStoryAt.toString(), consts,
-      (window.GK_SOUND_FNS || []).map(String).join(''), [gkShotAt, gkDeg, gkRing, gkTickPulse, gkSimPose, gkFly, gkFlight, gkHang, gkSwing, gkSpireAngle, gkBalcony].map(String).join('')];
+      (window.GK_SOUND_FNS || []).map(String).join(''), [gkShotAt, gkDeg, gkRing, gkTickPulse, gkSimPose, gkFly, gkFlight, gkHang, gkSwing, gkSpireAngle, gkBalcony, gkBallX].map(String).join('')];
   }
   // AudioEngine's fingerprint, with every number rounded to 7 significant digits: browsers' Math.exp/sin/acosh… can
   // differ in the last bit (Safari, Firefox), and then the baked copy was refused and the whole soundtrack rendered

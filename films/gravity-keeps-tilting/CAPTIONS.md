@@ -11,11 +11,11 @@ status: voiceless
 
 [title] What if gravity kept tilting sideways every second and couldn't stop?
 
-[tick @2.6] Down just tilted. One degree. / Every second, one more: east, then up, then west.
+[tick @2.6] Down is tilting, one degree a second. / East, then up, then west. It won't stop.
 
 [spire @9.4] This stone spire stands on its weight alone. / @12.95 At 13 degrees, it goes.
 
-[turn @15.8] A full turn takes 6 minutes.
+[turn @15.8] A full turn is 6 minutes: this whole video.
 
 [ear @19.4] Your eyes say the room is level. Your ears say it's tipping. / That fight is why people get seasick.
 
@@ -23,33 +23,35 @@ status: voiceless
 
 [hold @30.4] Hold on to something that's part of the building.
 
-[east @34.4] Everything that isn't fixed down is sliding east. / The cars pile into the church at up to 80 km/h.
+[east @34.4] Everything that isn't fixed down is sliding east. / The cars pile into the church at nearly 80 km/h.
 
 [dome @44.0] She has the right idea: the climbing frame. / Bars on every side, set in concrete.
 
 [follow @53.0] Let the heavy things go first. Then follow them down.
 
-[ski @60.4] 60 degrees: steeper than any ski run.
+[ski @60.4] 60 degrees: steeper than any ski piste.
 
 [pond @66.0] The pond was the first thing to go. Water needs almost no slope.
 
+[promise @71.4] At 4:06:00, down is down again. For one second.
+
 [wall @75.5] Your east wall is turning into your floor.
 
-[ninety @88.6] 90 degrees. / From here on, down points into the sky.
+[ninety @90.0] 90 degrees. / From here on, down points into the sky.
 
 [stack @97.6] The cars were stacked against the church. / Now the stack is falling off the world.
 
-[terminal @107.0] Things fall only as fast as the air lets them: / a leaf 1.5 m/s, a raindrop 9, a car about 90. / And as down turns, the fall turns with it: each one goes round in a circle.
+[terminal @107.0] The air doesn't tilt, so things fall only as fast as it lets them: / a leaf 1.5 m/s, a raindrop 9, a car 60 to 90. / And as down turns, the fall turns with it: each one goes round in a circle.
 
 [rainup @124.0] It's raining up. That's your pond.
 
-[tiles @131.0] Roof tiles are held on by their own weight.
+[tiles @131.0] Many old roof tiles are held on only by their weight.
 
 [climb @138.0] She keeps to the lowest bars, as the lowest bars move round.
 
-[balcony @147.0] Balconies are built to hang down. Their steel is all at the top. / Pull one up, and it snaps.
+[balcony @147.0] Balconies are built to hang down: most of their steel is at the top. / Pull them up, and the weakest snap.
 
-[trees @160.0] The trees hold: their roots are in the ground, and the ground keeps its old down.
+[trees @160.0] Most trees hold: their roots are in the ground, and the ground keeps its old down.
 
 [ten @169.0] Ten degrees to the ceiling.
 
@@ -61,7 +63,7 @@ status: voiceless
 
 [crack @211.0] The ceiling you're standing on was built to carry weight down, not up.
 
-[alarm @218.0] Up there, a car alarm is still going. 7 km up.
+[alarm @218.0] Up there, a car alarm is still going. 8 km up.
 
 [birds @227.0] The pigeons are fine. They just fly upside down.
 
@@ -71,20 +73,20 @@ status: voiceless
 
 [rising @256.0] Everything up there is still climbing.
 
-[high @269.6] 270 degrees. As high as it goes. / The leaves: 170 m. Your pond: 1 km. / The cars: 10 km, as high as airliners fly.
+[high @269.6] 270 degrees. As high as it goes. / The leaves: about 170 m. Your pond: up to 1 km. / The cars: about 10 km, as high as airliners fly.
 
 [back @286.0] Now it's all coming back down.
 
 [home @302.0] Your things head home: down the west wall, onto the floor.
 
-[never @307.0] Nothing up there has hit the ground. / It won't, until it has gone all the way round.
+[never @307.0] Nothing up there has hit the ground yet. / The last things to go up will come down first.
 
 [thirty @330.0] 30 degrees to go.
 
-[straight @340.0] Everything in the sky is falling straight down.
+[straight @340.0] Up there, it's all falling back down, steeper every second.
 
 [down @360.0] Down is down again. / @361.0 For one second.
 
-[comes @363.1] Everything up there comes back past where it left, from about 4:07. / Sideways. At the speed it fell.
+[comes @363.1] Soon it all comes down, kilometres west of where it left. / The cars first, at 4:07, slanting in at 300 km/h.
 
-[question] Where would you be when it comes round?
+[question] Where would you be when it comes down?

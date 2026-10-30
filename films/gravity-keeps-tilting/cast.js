@@ -36,8 +36,8 @@ const GK_POSES = {
 // ---------------------------------------------------------------------------------------------------------------------
 const GKPI = Math.PI;
 const GK_YOU_KEYS = [
-  [-2, 0.25, 0, -1.52, 0, GKPI, 'stand'],                    // at the window, looking out at the park
-  [6.5, 0.25, 0, -1.52, 0, GKPI, 'look'],
+  [-2, 0.25, 0, -1.6, 0, GKPI, 'stand'],                     // at the window, looking out at the park
+  [6.5, 0.25, 0, -1.6, 0, GKPI, 'look'],
   [9.5, 0.3, 0, -1.45, 2, 0.4, 'look'],                    // turn round: the lamp's swinging, the bookcase goes
   [13.5, 0.3, 0, -1.45, 4, 0.2, 'brace'],
   [17.5, 0.32, 0, -1.4, 6, GKPI, 'crouchHold'],              // down to the radiator, hands on its top
@@ -68,12 +68,12 @@ const GK_YOU_KEYS = [
   [290, -2.47, 1.05, -1.48, 288, GKPI, 'stand'],
   [294, -2.47, 1.0, -1.45, 292, GKPI, 'crouchUp'],           // the radiator's west end
   [302.5, -2.47, 1.0, -1.45, 300, GKPI, 'crouchUp'],
-  [304.2, -2.47, 0.5, -1.5, 302, GKPI, 'slide'],             // down onto the floor at the west end
-  [307, -2.4, 0.45, -1.5, 304, GKPI, 'sitBack'],
-  [352, -1.95, 0.08, -1.5, 352, GKPI / 2, 'sitBack'],
-  [358.5, -1.9, 0, -1.5, 359, GKPI / 2, 'crouchHold'],
-  [360.4, -1.9, 0, -1.5, 360, GKPI, 'stand'],                // down is down: up, for one second
-  [366, -1.9, 0, -1.5, 362, GKPI, 'look'],
+  [304.2, -2.0, 0.45, -1.5, 302, GKPI, 'slide'],             // down onto the floor, then clear of the pile at the west wall
+  [307, -1.25, 0.2, -1.5, 304, GKPI, 'sitBack'],
+  [352, -1.15, 0.08, -1.5, 352, GKPI / 2, 'sitBack'],
+  [358.5, -1.1, 0, -1.5, 359, GKPI / 2, 'crouchHold'],
+  [360.4, -1.1, 0, -1.5, 360, GKPI, 'stand'],                // down is down: up, for one second
+  [366, -1.1, 0, -1.5, 362, GKPI, 'look'],
 ];
 function gkKeyAt(K, s) {
   if (s <= K[0][0]) return { a: K[0], b: K[0], u: 0 };
@@ -115,6 +115,8 @@ function gkKidState(s) {
   if (s < 14) { const k = gkEase(s, 8, 14), q = GK_POSES.climb(); return { p: q, pos: [D.x - 0.5 - 1.2 * Math.sin(k * GKPI) * 0.4, (D.r - 0.15) * (1 - k), D.z + 0.3], frame: 0, yaw: -GKPI / 2 + GKPI * k }; }
   const sp = gkDomeSpot(s, [0.3, -0.45]), q = GK_POSES.climb(), w = Math.sin(s * 1.1 + 1) * 0.2;
   q.lSh = [2.5 + w, 0.45]; q.rSh = [2.2 - w, 0.5]; q.headYaw = 0.5 * Math.sin(s * 0.07 + 1);
+  { const A = gkSm(s, 236, 244) * (1 - gkSm(s, 262, 270)), ph = s * 2.6, L = Math.max(0, Math.sin(ph)), R = Math.max(0, -Math.sin(ph));   // (hand over hand)
+    q.lSh[0] += A * 0.6 * L; q.rSh[0] += A * 0.6 * R; q.lEl = 0.7 + A * 0.6 * R; q.rEl = 0.9 + A * 0.6 * L; q.lKnee = 1.2 + A * 0.4 * R; q.rKnee = 0.6 + A * 0.5 * L; q.headYaw = q.headYaw * (1 - A) + A * 0.25 * Math.sin(ph * 0.5); }
   return { p: q, pos: sp.pos, frame: sp.frame, yaw: GKPI / 2 - 0.3 };
 }
 

@@ -49,7 +49,7 @@ function gkSpecks(scene, max) {
   return { pts, mat, begin() { n = 0; }, add(x, y, z, size, c) { if (n >= max) return; P[n * 3] = x; P[n * 3 + 1] = y; P[n * 3 + 2] = z; Sz[n] = size; Cc[n * 3] = c[0]; Cc[n * 3 + 1] = c[1]; Cc[n * 3 + 2] = c[2]; n++; },
     end() { geo.setDrawRange(0, n); for (const a of ['position', 'size', 'color']) geo.attributes[a].needsUpdate = true; } };
 }
-const GK_SPECK_C = { leaf: [0.2, 0.12, 0.06], tile: [0.42, 0.18, 0.12], car: [0.1, 0.1, 0.12], bin: [0.12, 0.14, 0.12], drop: [0.92, 0.96, 1.0] };
+const GK_SPECK_C = { leaf: [0.74, 0.3, 0.07], tile: [0.42, 0.18, 0.12], car: [0.1, 0.1, 0.12], bin: [0.12, 0.14, 0.12], drop: [0.92, 0.96, 1.0] };
 
 GK_SETS.world = (app) => {
   const sun0 = gkSunDir();
@@ -146,20 +146,21 @@ function gkShotCam(set, m, s, t, k, shot, v, RL) {
   // a felt camera looking along (yaw, pitch) in the felt frame (yaw 0 = north, + = west; pitch + = up)
   const feltLook = (p, yaw, pitch, off = 0) => { const a = gkFeltDeg(s) + off; v.p = p; v.at = gkAdd(p, gkRz(gkDir(yaw, pitch), a)); v.up = gkRz([0, 1, 0], a); };
   const E = -Math.PI / 2, W = Math.PI / 2;
+  // a point to look at: towards tgt's bearing, at a given elevation (deg) — for sky shots that keep the ground in frame
+  const aimEl = (p, tgt, el) => { const dx = tgt[0] - p[0], dz = tgt[2] - p[2], h = Math.hypot(dx, dz) || 1, e = el * Math.PI / 180; return [p[0] + dx / h * Math.cos(e) * 100, p[1] + Math.sin(e) * 100, p[2] + dz / h * Math.cos(e) * 100]; };
   switch (m) {
     // ---- 1: the first ticks
     case 'room0': {                                       // your room, as you feel it: it steps round 1° a second
-      v.p = into(RL(2.2, 1.9, 1.75), RL(1.75, 1.78, 1.3), k); v.at = RL(-0.55, 1.35, -1.25); v.fov = 58; felt(); v.inside = true; v.drift = 0.002; v.sh = { f: RL(0, 1, 0), R: 4 }; break; }
-    case 'glass': { const g = set.R.bodies.glass.position, x = g.x, z = g.z;
-      v.p = RL(x + 0.36, 0.56, z + 0.3); v.at = RL(x, 0.47, z); v.fov = 30; v.inside = true; v.drift = 0.0008; v.near = 0.02; v.sh = { f: RL(x, 0.4, z), R: 2 }; break; }
-    case 'win1': feltLook(RL(0.25, 1.62, -1.55), -0.32, -0.2); v.fov = 62; v.drift = 0.0015; v.sh = { f: [14, 0, -30], R: 40 }; v.fog = 0.7; break;
-    case 'spire': v.p = into([80, 1.7, -64], [81.5, 1.8, -61], k); v.at = [90.5, 27, -20.5]; v.fov = 46; v.drift = 0.003; v.fog = 0.6; v.sh = { f: [92, 10, -20], R: 30 }; break;
-    case 'ear': v.p = into(RL(-1.3, 1.75, 1.75), RL(-1.15, 1.7, 1.6), k); v.at = RL(0.35, 1.15, -1.2); v.fov = 56; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
+      v.p = into(RL(-1.95, 1.95, 1.9), RL(-1.6, 1.85, 1.55), k); v.at = RL(0.55, 0.85, -1.3); v.fov = 60; felt(); v.inside = true; v.drift = 0.002; v.sh = { f: RL(0, 1, 0), R: 4 }; break; }
+    case 'ball': v.p = into(RL(2.0, 0.26, -0.9), RL(1.97, 0.28, -0.88), k); v.at = RL(-0.7, 0.12, -1.3); felt(); v.fov = 50; v.inside = true; v.drift = 0.0012; v.near = 0.02; v.sh = { f: RL(0.8, 0.1, -0.9), R: 3 }; break;
+    case 'pond0': v.p = into([5, 1.3, -67], [7, 1.3, -66.2], k); v.at = [24, 0.5, -46]; v.fov = 44; v.drift = 0.002; v.fog = 0.6; v.sh = { f: [22, 0, -44], R: 26 }; break;
+    case 'spire': v.p = into([80, 1.7, -64], [81.5, 1.8, -61], k); v.at = gkV([90.5, 27, -20.5], [103, 5, -20.5], gkSm(s, GK_SPIRE.hitS - 0.6, GK_SPIRE.hitS + 1.7)); v.fov = 46 + 6 * gkSm(s, GK_SPIRE.hitS - 0.6, GK_SPIRE.hitS + 1.7); v.drift = 0.003; v.fog = 0.6; v.sh = { f: [92, 10, -20], R: 30 }; break;
+    case 'ear': v.p = into(RL(-0.6, 1.75, 1.8), RL(-0.45, 1.7, 1.65), k); v.at = RL(0.45, 1.1, -1.3); v.fov = 56; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     case 'cars0': feltLook(into([-14, 1.55, -1.0], [-12.5, 1.55, -1.0], k), -0.8, -0.12); v.fov = 56; v.drift = 0.004; v.fog = 0.7; v.sh = { f: [20, 0, -5], R: 40 }; break;
     case 'slide': v.p = RL(-2.25, 2.05, -1.75); v.at = RL(1.1, 0.35, 0.65); v.fov = 64; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     case 'hold': v.p = into(RL(-0.75, 1.05, -0.55), RL(-0.6, 1.0, -0.65), k); v.at = RL(0.35, 0.55, -1.6); v.fov = 54; felt(); v.inside = true; v.drift = 0.002; v.sh = { f: RL(0.3, 0.5, -1.5), R: 3 }; break;
     // ---- 2: everything slides east
-    case 'street1': v.p = into([-8, 14.4, 1.2], [-5, 14.3, 1.0], k); v.at = [62, 0, -6]; v.fov = 48; v.drift = 0.003; v.fog = 0.6; v.sh = { f: [40, 0, -5], R: 60 }; break;
+    case 'street1': v.p = into([3, 3.2, -12.4], [6, 3.0, -12.4], k); v.at = [62, 0.6, -5.5]; v.fov = 54; v.drift = 0.003; v.fog = 0.6; v.sh = { f: [30, 0, -6], R: 40 }; break;
     case 'church0': v.p = into([64, 3.0, -19], [65.5, 3.1, -18.5], k); v.at = [86, 2.2, -5]; v.fov = 50; v.drift = 0.004; v.sh = { f: [82, 1, -6], R: 22 }; break;
     case 'dome0': v.p = into([28.0, 1.8, -24.6], [29.0, 1.7, -25.4], k); v.at = [34.6, 1.2, -30]; v.fov = 50; v.drift = 0.003; v.sh = { f: [34, 1, -30], R: 8 }; break;
     case 'follow': v.p = RL(-2.15, 1.85, -0.35); v.at = RL(1.4, 0.45, -1.3); v.fov = 60; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0.5, 0.5, -1), R: 4 }; break;
@@ -167,40 +168,49 @@ function gkShotCam(set, m, s, t, k, shot, v, RL) {
     case 'pond': v.p = into([-17, 3.4, -38], [-15, 3.2, -39], k); v.at = [3, -0.4, -52]; v.fov = 50; v.drift = 0.003; v.sh = { f: [0, 0, -52], R: 24 }; break;
     case 'wall': v.p = into(RL(-1.6, 1.55, 1.75), RL(-1.45, 1.5, 1.6), k); v.at = RL(1.6, 0.8, -1.1); felt(); v.fov = 64; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     case 'win2': { const e = RL(0.75, 1.55, -1.25); v.p = e; v.at = RL(0.25, 1.15, -2.4); felt(); v.fov = 66; v.drift = 0.0015; v.sh = { f: [10, 0, -30], R: 40 }; v.fog = 0.7; break; }
-    case 'ninety': feltLook(into([4, 14.2, 0.6], [4, 14.2, 0.0], k), -0.15, -0.28); v.fov = 60; v.drift = 0.003; v.fog = 0.6; v.sh = { f: [10, 0, -40], R: 60 }; break;
+    case 'dome1': { const q = gkKidState(s).pos; v.p = into([q[0] - 1.6, q[1] + 0.7, q[2] + 3.4], [q[0] - 1.3, q[1] + 0.75, q[2] + 3.0], k); v.at = [q[0] - 0.2, q[1] + 0.35, q[2] + 0.2]; felt(); v.fov = 50; v.drift = 0.0015; v.near = 0.05; v.sh = { f: q, R: 8 }; break; }
+    case 'ninety': v.p = into([46, 1.7, -34], [47.5, 1.7, -35], k); v.at = [72, 0.8, -50]; v.fov = 58; v.drift = 0.003; v.fog = 0.5; v.sh = { f: [64, 0, -48], R: 30 }; break;
     // ---- 3: into the sky
     case 'stack': v.p = into([52, 2.0, -7.0], [54, 2.1, -7.0], k); v.at = [86, 13, -6]; v.fov = 54; v.drift = 0.004; v.sh = { f: [84, 6, -6], R: 24 }; break;
     case 'up0': v.p = [62, 1.6, -12]; v.at = (() => { const P = [0, 0, 0], Q = [0, 0, 0, 1]; let x = 0, y = 0, z = 0; for (const id of GK_CARS) { gkSimPose('street', id, s, P, Q); x += P[0]; y += P[1]; z += P[2]; } return [x / GK_CARS.length, y / GK_CARS.length, z / GK_CARS.length]; })(); v.fov = 50; v.drift = 0.004; v.fog = 0.3; v.far = 20000; v.sh = { f: [80, 10, -8], R: 40 }; break;
-    case 'leaves0': v.p = into([-34, 1.6, -49], [-33, 1.8, -48], k); v.at = gkV(set._leafC, [-12, 16, -54], 0.4); v.fov = 58; v.drift = 0.003; v.sh = { f: [-28, 4, -45], R: 30 }; break;
+    case 'leaves0': v.p = into([38, 0.9, -44], [40, 1.0, -45], k); v.at = [92, 5, -52]; v.fov = 60; v.drift = 0.002; v.fog = 0.5; v.sh = { f: [60, 0, -48], R: 30 }; break;
     case 'circle': v.p = into([-120, 55, 70], [-110, 60, 62], k); v.at = [30, 60, -50]; v.fov = 52; v.drift = 0.004; v.fog = 0.35; v.far = 12000; v.sh = { f: [0, 0, -40], R: 90 }; break;
-    case 'rainup': v.p = into([58, 1.4, -30], [59, 1.5, -31], k); v.at = gkV(set._dropC, [74, 6, -56], 0.55); v.fov = 62; v.drift = 0.003; v.fog = 0.5; v.sh = { f: [62, 2, -50], R: 30 }; break;
-    case 'tiles': v.p = into([0, 2.4, -74], [0, 2.6, -77], k); v.at = [0, 13, -106]; v.fov = 54; v.drift = 0.003; v.sh = { f: [0, 6, -104], R: 24 }; break;
+    case 'rainup': v.p = into([84, 2.0, -50], [88, 3.0, -51], k); v.at = [170, 45, -56]; v.fov = 60; v.drift = 0.003; v.fog = 0.4; v.far = 4000; v.sh = { f: [84, 0, -50], R: 30 }; break;
+    case 'tiles': v.p = into([2, 5.6, -86], [3, 5.9, -88], k); v.at = [3, 8.4, -104]; v.fov = 52; v.drift = 0.002; v.sh = { f: [3, 8, -104], R: 16 }; break;
     case 'climb': v.p = into([27.2, 2.6, -25.6], [27.8, 2.4, -26.2], k); v.at = [34.6, 1.7, -30]; v.fov = 50; v.drift = 0.003; v.sh = { f: [34, 1, -30], R: 8 }; break;
-    case 'balcony': v.p = into([48, 2.0, -17], [50, 2.1, -16], k); v.at = [50, 6.2, 0]; v.fov = 50; v.drift = 0.003; v.sh = { f: [54, 6, 0], R: 24 }; break;
-    case 'trees': v.p = into([-31, 1.0, -57], [-32, 1.1, -59], k); v.at = [-38, 9, -70]; v.fov = 56; v.drift = 0.003; v.sh = { f: [-38, 5, -70], R: 20 }; break;
+    case 'balcony': { const b = GK_BALC[1], o = gkBalcony(b, s); v.p = into([43.4, 2.4, -5.4], [43.8, 2.5, -5.2], k); v.at = [b.x + 0.9 * o.off[0], b.y + 0.4 + 0.9 * o.off[1], -0.9]; v.fov = 50; v.drift = 0.0015; v.sh = { f: [46, 3, -1], R: 10 }; break; }
+    case 'balcony2': { const b = GK_BALC[12], o = gkBalcony(b, s); v.p = into([51.6, 8.4, -5.6], [52.0, 8.5, -5.4], k); v.at = [b.x + 0.9 * o.off[0], b.y + 0.4 + 0.9 * o.off[1], -0.9]; v.fov = 50; v.drift = 0.0015; v.sh = { f: [54, 9, -1], R: 10 }; break; }
+    case 'trees': { const tr = set.T.trees.reduce((a, b) => (Math.hypot(b.x + 30, b.z + 62) < Math.hypot(a.x + 30, a.z + 62) ? b : a)); v.p = into([tr.x + 4.5, 1.3, tr.z + 4.0], [tr.x + 4.0, 1.3, tr.z + 4.6], k); v.at = [tr.x + 1, tr.h * 0.6 + 9, tr.z - 1]; v.fov = 62; v.drift = 0.002; v.far = 3000; v.sh = { f: [tr.x, 6, tr.z], R: 14 }; break; }
     case 'ten': v.p = into(RL(-2.05, 1.2, 1.2), RL(-1.9, 1.15, 1.1), k); v.at = RL(1.6, 2.0, -0.9); felt(); v.fov = 62; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     // ---- 4: upside down
     case 'ceiling': v.p = into(RL(-1.6, 1.05, 1.5), RL(-1.3, 1.0, 1.3), k); v.at = RL(1.2, 1.7, -1.5); felt(); v.fov = 60; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     case 'block': v.p = into([4, 1.7, -42], [4, 1.8, -38], k); v.at = [4, 9, 0]; felt(); v.fov = 52; v.drift = 0.003; v.sh = { f: [4, 6, 0], R: 30 }; break;
     case 'again': v.p = RL(-2.25, 0.45, 1.75); v.at = RL(0.6, 2.15, -0.5); felt(); v.fov = 66; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
-    case 'crack': v.p = into(RL(0.35, 1.62, -0.35), RL(0.25, 1.66, -0.2), k); v.at = RL(-0.1, 2.58, 1.75); felt(); v.fov = 54; v.inside = true; v.drift = 0.001; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
-    case 'sky0': { const P = [0, 0, 0], Q = [0, 0, 0, 1]; gkSimPose('street', 'car4', s, P, Q);
-      v.p = [60, 1.6, -9]; v.at = [P[0], P[1], P[2]]; v.fov = gkLerp(0.7, 0.45, Ease.inOutSine(k)); v.drift = 0; v.near = 5; v.fog = 0.02; v.far = 30000; v.glow = 0.2; v.sh = { f: [60, 0, -9], R: 20 }; break; }
-    case 'birds': v.p = into([-5, 17.5, -37], [-4, 17.8, -38], k); v.at = [0, 21.5, -48]; v.fov = 50; v.drift = 0.003; v.fog = 0.6; v.sh = { f: [0, 0, -40], R: 40 }; break;
+    case 'crack': v.p = into(RL(1.05, 1.3, 0.75), RL(0.9, 1.3, 0.85), k); v.at = RL(-0.55, 2.6, 1.72); felt(); v.fov = 52; v.inside = true; v.drift = 0.001; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
+    case 'sky0': { const g = set.T.sim.find((it) => it.b.id === 'car4').g; g.updateMatrixWorld(true); const P = (set._box || (set._box = new THREE.Box3())).setFromObject(g).getCenter(new THREE.Vector3()).toArray();
+      // a long lens locked on one car 7-8 km up: it fills a third of the frame (near/far hug it for depth precision)
+      v.p = [60, 1.6, -9]; v.at = [P[0], P[1], P[2]]; const d = Math.hypot(P[0] - 60, P[1] - 1.6, P[2] + 9);
+      v.fov = (414 / d) * gkLerp(3.2, 1.0, Ease.inOutSine(Math.min(1, k * 1.6))); v.drift = 0; v.near = d - 40; v.fog = 0.02; v.far = d + 40; v.glow = 0.2; v.sh = { f: [P[0], P[1], P[2]], R: 6 }; break; }
+    case 'birds': { const b = gkBirdState(0, s, 'pigeon'), f = b.fwd, fl = Math.hypot(...f); v.p = [b.pos[0] - 2.6 * f[0] / fl + 0.9, b.pos[1] + 0.25, b.pos[2] - 2.6 * f[2] / fl + 0.6]; v.at = [b.pos[0] + 0.4 * f[0] / fl, b.pos[1], b.pos[2] + 0.4 * f[2] / fl]; v.fov = 44; v.drift = 0.001; v.fog = 0.5; v.near = 0.05; v.sh = { f: b.pos, R: 10 }; break; }
     case 'swings': v.p = into([40.5, 1.4, -19.5], [41.2, 1.5, -20.2], k); v.at = [46, 2.6, -24]; v.fov = 50; v.drift = 0.003; v.sh = { f: [46, 1, -24], R: 8 }; break;
-    case 'kid': v.p = into([40.2, 1.0, -33.4], [39.6, 1.1, -33.0], k); v.at = [33.2, 1.0, -30]; v.fov = 46; v.drift = 0.002; v.sh = { f: [34, 1, -30], R: 8 }; break;
-    case 'rising': v.p = into([-10, 1.6, -30], [-12, 1.6, -32], k); v.at = gkV(set._leafC, set._dropC, 0.3); v.fov = 72; v.drift = 0.003; v.fog = 0.08; v.far = 40000; v.sh = { f: [0, 0, -40], R: 120 }; break;
+    case 'kid': { const q = gkKidState(s).pos, a = gkLerp(2.5, 3.5, k); v.p = [q[0] - 2.6 * Math.cos(a) * -1, q[1] + 0.5, q[2] + 2.6 * Math.sin(a)]; v.at = [q[0], q[1] + 0.25, q[2]]; felt(); v.fov = 46; v.drift = 0.0015; v.near = 0.05; v.sh = { f: q, R: 6 }; break; }
+    // the sky shots: always something on the ground in frame for scale (the tower, a block's face, the dome, roofs)
+    case 'rising': v.p = into([82.5, 1.5, -29], [82.8, 1.5, -29.8], k); v.at = gkV([92, 30, -24], set._dropC, 0.55); v.fov = 66; v.drift = 0.002; v.fog = 0.06; v.far = 30000; v.sh = { f: [90, 10, -20], R: 30 }; break;
+    case 'rising2': v.p = into([30.2, 0.6, -26.6], [30.5, 0.65, -27.4], k); v.at = aimEl(v.p, gkV([34, 0, -30], set._leafC, 0.5), 30); v.fov = 72; v.drift = 0.002; v.fog = 0.08; v.far = 30000; v.sh = { f: [34, 1, -30], R: 10 }; break;
     // ---- 5: coming back
-    case 'high': v.p = [-22, 1.5, -44]; v.at = gkV(set._leafC, set._dropC, 0.25); v.fov = 74; v.drift = 0.002; v.fog = 0.1; v.far = 30000; v.sh = { f: [-20, 0, -44], R: 30 }; break;
+    case 'high': v.p = into([50, 1.4, -2.6], [52, 1.4, -2.6], k); v.at = [gkV(set._leafC, set._dropC, 0.4)[0], 900, -60]; v.fov = 76; v.drift = 0.0015; v.fog = 0.06; v.far = 30000; v.sh = { f: [52, 6, 0], R: 30 }; break;
     case 'westwall': v.p = into(RL(-0.55, 1.25, 1.75), RL(-0.6, 1.2, 1.6), k); v.at = RL(-1.95, 1.35, -0.7); felt(); v.fov = 64; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
-    case 'back': v.p = into([30, 1.6, -22], [28, 1.6, -22], k); v.at = gkV(set._leafC, set._dropC, 0.2); v.fov = 64; v.drift = 0.003; v.fog = 0.15; v.far = 30000; v.sh = { f: [30, 0, -22], R: 30 }; break;
+    case 'back': v.p = into([3, 1.4, -2.7], [1, 1.4, -2.7], k); v.at = gkV([-4, 40, 0], set._dropC, 0.7); v.fov = 70; v.drift = 0.0015; v.fog = 0.08; v.far = 30000; v.sh = { f: [0, 8, 0], R: 30 }; break;
+    case 'back2': v.p = into([31.4, 0.6, -33.6], [31.2, 0.65, -33.0], k); v.at = aimEl(v.p, gkV([34, 0, -30], set._leafC, 0.5), 32); v.fov = 72; v.drift = 0.002; v.fog = 0.08; v.far = 30000; v.sh = { f: [34, 1, -30], R: 10 }; break;
     case 'home': v.p = into(RL(2.2, 1.55, 0.35), RL(2.1, 1.5, 0.2), k); v.at = RL(-2.3, 1.0, -0.1); v.fov = 62; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
-    case 'down0': v.p = into([2, 1.6, -22], [0, 1.6, -24], k); v.at = gkV(set._leafC, set._dropC, 0.2); v.fov = 64; v.drift = 0.003; v.fog = 0.1; v.far = 30000; v.sh = { f: [0, 0, -22], R: 30 }; break;
+    case 'down0': v.p = into([72, 1.5, -11], [73, 1.5, -12], k); v.at = aimEl(v.p, [90, 0, -22], 42); v.fov = 70; v.drift = 0.002; v.fog = 0.08; v.far = 30000; v.sh = { f: [90, 10, -20], R: 30 }; break;
+    case 'down1': v.p = into([4, 3.0, -82], [5, 3.2, -84], k); v.at = aimEl(v.p, [-6, 0, -104], 33); v.fov = 70; v.drift = 0.002; v.fog = 0.1; v.far = 30000; v.sh = { f: [3, 8, -104], R: 16 }; break;
     case 'dome2': v.p = into([28.0, 1.5, -34.4], [28.6, 1.4, -34.0], k); v.at = [33.4, 0.9, -30]; v.fov = 48; v.drift = 0.002; v.sh = { f: [34, 1, -30], R: 8 }; break;
-    case 'thirty': { const e = RL(-1.55, 1.05, -1.25); v.p = e; v.at = RL(0.2, 1.45, -2.2); felt(); v.fov = 64; v.drift = 0.0015; v.sh = { f: [0, 0, -30], R: 40 }; v.fog = 0.7; break; }
-    case 'straight': v.p = into([-36, 1.5, -58], [-38, 1.5, -60], k); v.at = set._leafC; v.fov = 62; v.drift = 0.003; v.fog = 0.4; v.far = 12000; v.sh = { f: [-40, 0, -58], R: 40 }; break;
+    case 'thirty': { const e = RL(1.25, 1.2, -0.95); v.p = e; v.at = RL(-0.35, 1.35, -2.2); felt(); v.fov = 64; v.drift = 0.0015; v.sh = { f: [0, 0, -30], R: 40 }; v.fog = 0.7; break; }
+    case 'straight': v.p = into([-36, 1.5, -30], [-38, 1.5, -31], k); v.at = aimEl(v.p, set._leafC, 28); v.fov = 68; v.drift = 0.002; v.fog = 0.3; v.far = 12000; v.sh = { f: [-40, 0, -58], R: 40 }; break;
+    case 'straight2': v.p = into([60, 2.0, -11], [58, 2.0, -11.5], k); v.at = gkV([-60, 10, -104], set._dropC, 0.6); v.fov = 62; v.drift = 0.002; v.fog = 0.15; v.far = 30000; v.sh = { f: [20, 0, -50], R: 60 }; break;
     case 'count': gkCountCam(set, s, t, v, RL); break;
-    case 'down': v.p = into(RL(1.7, 1.6, 1.3), RL(1.4, 1.55, 1.1), k); v.at = RL(-1.9, 1.0, -1.3); v.fov = 56; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
+    case 'down': v.p = into(RL(1.2, 1.45, 0.4), RL(1.0, 1.45, 0.25), k); v.at = RL(-1.1, 1.05, -1.5); v.fov = 54; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
     case 'comes': v.p = into([-8, 1.6, -5.5], [-10, 1.6, -5.5], k); v.at = [-420, 280, -12]; v.fov = 62; v.drift = 0.003; v.fog = 0.12; v.far = 30000; v.sh = { f: [-10, 0, -5], R: 30 }; break;
     case 'question': v.p = into(RL(1.35, 1.55, 0.9), RL(1.1, 1.52, 0.7), k); v.at = RL(-1.6, 1.15, -1.35); v.fov = 56; v.inside = true; v.drift = 0.0015; v.sh = { f: RL(0, 1, 0), R: 4 }; break;
   }
@@ -210,16 +220,16 @@ function gkCountCam(set, s, t, v, RL) {
   const n = GK.subCuts.filter((c) => t >= c).length; set._sub = n;
   const up = gkFeltUp(s);
   if (n === 0) { v.p = [28.4, 1.4, -34.2]; v.at = [33.6, 0.8, -30]; v.fov = 46; }
-  else if (n === 1) { v.p = RL(-0.6, 1.0, -0.4); v.at = RL(-1.95, 0.4, -1.4); v.fov = 52; v.up = up; v.inside = true; }
+  else if (n === 1) { v.p = RL(1.6, 1.3, -0.6); v.at = RL(-2.0, 0.85, 0.2); v.fov = 58; v.up = up; v.inside = true; }
   else if (n === 2) { v.p = [30, 1.7, -2.5]; v.at = [80, 2.0, -6]; v.fov = 50; }
   else if (n === 3) { const P = [0, 0, 0], Q = [0, 0, 0, 1]; gkSimPose('street', 'car4', s, P, Q); v.p = [60, 1.6, -9]; v.at = [P[0], P[1], P[2]]; v.fov = 8; v.fog = 0.02; v.far = 30000; }
-  else if (n === 4) { v.p = RL(-1.55, 1.05, -1.25); v.at = RL(0.2, 1.45, -2.2); v.fov = 64; v.up = up; }
+  else if (n === 4) { v.p = RL(1.25, 1.2, -0.95); v.at = RL(-0.35, 1.35, -2.2); v.fov = 64; v.up = up; }
   else { v.p = RL(2.15, 1.85, 1.6); v.at = RL(-1.2, 0.8, -1.0); v.fov = 62; v.inside = true; }
   v.drift = 0.003; v.sh = { f: v.inside ? RL(0, 1, 0) : v.at, R: v.inside ? 4 : 20 };
 }
 
 // the shots that look up at the sky aim at where things are (the leaves' cloud, the pond's drops): posed first
-const GK_SKY_MODES = ['leaves0', 'rising', 'high', 'back', 'down0', 'straight', 'rainup'];
+const GK_SKY_MODES = ['leaves0', 'rising', 'rising2', 'high', 'back', 'back2', 'down0', 'down1', 'straight', 'straight2', 'rainup', 'sky0'];
 function gkLeafCentroid(T) {
   const e = T.leaves.im.instanceMatrix.array; let x = 0, y = 0, z = 0, n = 0;
   for (let i = 0; i < T.leaves.L.length; i++) if (T.leaves.fly[i]) { x += e[i * 16 + 12]; y += e[i * 16 + 13]; z += e[i * 16 + 14]; n++; }
@@ -232,13 +242,15 @@ function gkDropCentroid(s) { const o = [0, 0]; gkFly(63, 0.3, 97, 6, Math.max(97
 function gkLabels(set, t) {
   const shot = gkShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s, R = set.R;
   const RL = (x, y, z) => R.toWorld(x, y, z).toArray(), sp = GK_ST.church.tower;
+  if (m === 'spire' && s > GK_SPIRE.hitS + 1.0) out.push({ p: [(sp.x[0] + sp.x[1]) / 2 - 2, sp.h * 0.55, sp.z[0]], text: 'THE TOWER', sub: 'CONCRETE, STEEL INSIDE: IT HOLDS', a: W(s, GK_SPIRE.hitS + 1.0, gkStoryAt(shot.t1) - 0.1, 0.3, 0.2), side: 'r' });
   if (m === 'spire' && t < gkC('spire', 1) + 0.4) out.push({ p: [(sp.x[0] + sp.x[1]) / 2, sp.h + 12, (sp.z[0] + sp.z[1]) / 2], text: 'THE SPIRE', sub: '17 m OF STONE', a: W(t, shot.t0 + 0.6, gkC('spire', 1) + 0.3, 0.3, 0.3), side: 'r' });
-  if (m === 'win1') out.push({ p: [GK_ST.dome.x, 2.2, GK_ST.dome.z], text: 'THE CLIMBING DOME', a: W(t, shot.t0 + 0.6, shot.t1 - 0.2, 0.3, 0.2) });
+  if (m === 'pond0') { out.push({ p: [GK_ST.pond.x + GK_ST.pond.rx - 3, 0.8, GK_ST.pond.z + 2], text: 'THE POND', sub: 'SPILLING OVER ITS BANK', a: W(t, shot.t0 + 0.3, shot.t1 - 0.2, 0.3, 0.2) });
+    out.push({ p: [GK_ST.dome.x, 3.0, GK_ST.dome.z], text: 'A MOTHER AND HER DAUGHTER', sub: 'THE CLIMBING DOME', a: W(t, shot.t0 + 0.9, shot.t1 - 0.2, 0.3, 0.2), side: 'r' }); }
   if (m === 'church0') out.push({ p: [86, 9, -6], text: 'THE CHURCH', sub: 'THE END OF THE STREET', a: W(t, shot.t0 + 0.4, shot.t0 + 2.8, 0.3, 0.3), side: 'r' });
   if (m === 'pond') out.push({ p: [GK_ST.pond.x, 0.6, GK_ST.pond.z], text: 'THE POND', sub: 'EMPTY', a: W(t, shot.t0 + 0.6, shot.t1 - 0.3, 0.3, 0.3) });
   if (false && m === 'sky0') out.push({ p: (() => { const P = [0, 0, 0], Q = [0, 0, 0, 1]; gkSimPose('street', 'car4', s, P, Q); return P; })(), text: 'THE CARS', sub: Math.round(gkSimCarY(s) / 100) / 10 + ' km UP', a: W(t, shot.t0 + 0.8, shot.t1 - 0.3, 0.3, 0.3) });
   if (m === 'block') out.push({ p: RL(0.2, 1.6, -2.4), text: 'YOUR WINDOW', a: W(t, shot.t0 + 0.6, shot.t0 + 3.6, 0.3, 0.3) });
-  if (m === 'balcony') for (const b of GK_BALC) if (b.go && s > b.go - 1.2 && s < b.go + 1.5) out.push({ p: [b.x, b.y + 0.5, b.z - 0.7], text: 'SNAP', a: W(s, b.go - 0.1, b.go + 1.3, 0.1, 0.3) });
+  if (m === 'balcony' || m === 'balcony2') for (const b of GK_BALC) if (b.go && s > b.go - 0.5 && s < b.go + GK_BALC_FOLD + 0.2) out.push({ p: [b.x - 1.2, b.y + 0.2, b.z - 0.5], text: 'ITS STEEL', sub: 'GIVING WAY', a: W(s, b.go + 0.2, b.go + GK_BALC_FOLD, 0.2, 0.15), side: 'r' });
   return out;
 }
 // the cars' mean height (m, from the simulation)

@@ -134,7 +134,7 @@ function gkClick(fx, o = {}) {
 // ---- the story clock in the sound ------------------------------------------------------------------------------
 // the room's shots (and the ones looking out through its window from inside); everything else is outside. The count
 // down's six quick cuts: 1, 4 and 5 inside
-const GK_IN_MODES = ['room0', 'glass', 'win1', 'ear', 'slide', 'hold', 'follow', 'wall', 'win2', 'ten', 'ceiling', 'again', 'crack', 'westwall', 'home', 'thirty', 'down', 'question'];
+const GK_IN_MODES = ['room0', 'ball', 'ear', 'slide', 'hold', 'follow', 'wall', 'win2', 'ten', 'ceiling', 'again', 'crack', 'westwall', 'home', 'thirty', 'down', 'question'];
 function gkWhereShot(sh, sub = 0) { if (sh.mode === 'count') return [1, 4, 5].includes(sub) ? 'in' : 'out'; return GK_IN_MODES.includes(sh.mode) ? 'in' : 'out'; }
 function gkWhere(t) { const sh = gkShotAt(t); return gkWhereShot(sh, sh.mode === 'count' ? GK.subCuts.filter((c) => t >= c).length : 0); }
 // the film as places: [{ t0, t1, where, shot }] in order (the count down split at its quick cuts)
@@ -183,4 +183,25 @@ function gkCrunch(fx, o = {}) {
   return y;
 }
 
-const GK_SOUND_FNS = [gkNoise, gkBed, gkTone, gkChirp, gkCrackle, gkSweep, gkSweepPut, gkAddAt, gkAt, gkCurve, gkMeow, gkRobinSong, gkClick, gkWhereShot, gkWhere, gkPlaces, gkScreech, gkDiesel, gkCrunch, gkEv, gkWn];
+
+// ---- where the camera is (for how far away a sound is) ----------------------------------------------------------
+// the camera's position at film time t, from the shots' own cameras (world.js: gkShotCam with a stand-in set; the
+// clouds the sky shots aim at don't move the camera)
+const GK_CAMSTUB = { R: { bodies: { glass: { position: { x: -0.88, z: -0.02 } } } }, _leafC: [0, 100, -50], _dropC: [60, 300, -55] };
+function gkCamPos(t) {
+  const sh = gkShotAt(t), s = gkStoryAt(t), k = MathX.clamp((t - sh.t0) / (sh.t1 - sh.t0), 0, 1), O = GK_ROOM.origin;
+  const v = { p: [0, 2, -5], at: [0, 1, 0], fov: 50, up: [0, 1, 0], sh: {} };
+  gkShotCam(GK_CAMSTUB, sh.mode, s, t, k, sh, v, (x, y, z) => [O[0] + x, O[1] + y, O[2] + z]);
+  return v.p;
+}
+// how loud a sound at P (world) is from the camera at film time t: { g, lp } (lp: the air and the walls take the top
+// off far sounds). From inside your room, outside sounds come through the walls (o.wall); a sound in your room (o.room)
+// is full inside, and from outside only near your window
+function gkNear(t, P, o = {}) {
+  const c = gkCamPos(t), w = gkWhere(t), O = GK_ROOM.origin, RM = [O[0], O[1] + 1.3, O[2]];
+  if (o.room) { if (w === 'in') return { g: 1, lp: 0 }; const d = Math.hypot(c[0] - RM[0], c[1] - RM[1], c[2] - RM[2]) + 1; return { g: 0.25 * Math.min(1, Math.pow(10 / d, 1.0)), lp: 700 }; }
+  if (w === 'in') { const d = Math.hypot(P[0] - RM[0], P[1] - RM[1], P[2] - RM[2]) + 4; return { g: (o.wall ?? 0.3) * Math.min(1, Math.pow(14 / d, o.k ?? 0.75)), lp: 600 }; }
+  const d = Math.hypot(c[0] - P[0], c[1] - P[1], c[2] - P[2]) + 1;
+  return { g: Math.min(1, Math.pow(12 / d, o.k ?? 0.75)), lp: d < 40 ? 0 : MathX.clamp(9000 * Math.pow(40 / d, 1.2), 700, 9000) };
+}
+const GK_SOUND_FNS = [gkCamPos, gkNear, gkShotCam, gkCountCam, gkNoise, gkBed, gkTone, gkChirp, gkCrackle, gkSweep, gkSweepPut, gkAddAt, gkAt, gkCurve, gkMeow, gkRobinSong, gkClick, gkWhereShot, gkWhere, gkPlaces, gkScreech, gkDiesel, gkCrunch, gkEv, gkWn];

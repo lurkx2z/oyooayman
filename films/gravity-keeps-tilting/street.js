@@ -118,9 +118,9 @@ function gkBuildStreet(S) {
     lampGlass: gkStd('#fff4dd', 0.3, 0, { emissive: new THREE.Color('#ffe2a8'), emissiveIntensity: 0.15 }),
     bark: gkStd('#4f4236', 0.95), bench: gkStd('#6a5038', 0.8),
     leafO: gkStd('#c8742c', 0.85, 0, { flatShading: true }), leafY: gkStd('#d9a63a', 0.85, 0, { flatShading: true }), leafR: gkStd('#a8402a', 0.85, 0, { flatShading: true }), leafG: gkStd('#6f7f3a', 0.85, 0, { flatShading: true }),
-    water: new THREE.MeshStandardMaterial({ color: '#5f7f8a', transparent: true, opacity: 0.82, roughness: 0.06, metalness: 0.0, envMapIntensity: 1.5, side: THREE.DoubleSide }),
+    water: new THREE.MeshStandardMaterial({ color: '#2f4f4c', transparent: true, opacity: 0.9, roughness: 0.12, metalness: 0.0, envMapIntensity: 0.8, side: THREE.DoubleSide }),
     sheet: new THREE.MeshStandardMaterial({ color: '#7f9aa2', transparent: true, opacity: 0.5, roughness: 0.05, envMapIntensity: 1.4, depthWrite: false }),
-    tile: gkStd('#7a3d2c', 0.8), glassB: gkStd('#9fb4bf', 0.2, 0.3, { transparent: true, opacity: 0.45 }),
+    tile: gkStd('#7a3d2c', 0.8), batten: gkStd('#3b302a', 0.95), glassB: gkStd('#9fb4bf', 0.2, 0.3, { transparent: true, opacity: 0.45 }),
   };
   const B = new Batcher();
   const S0 = GK_ST, k = S0.kerbH, E = S0.east;
@@ -189,8 +189,7 @@ function gkBuildStreet(S) {
       gkBox(b.w, 0.18, b.d, M.concrete, 0, -0.09, -b.d / 2, g);
       gkBox(b.w, 1.0, 0.02, M.glassB, 0, 0.5, -b.d + 0.02, g); gkBox(0.02, 1.0, b.d, M.glassB, -b.w / 2 + 0.02, 0.5, -b.d / 2, g); gkBox(0.02, 1.0, b.d, M.glassB, b.w / 2 - 0.02, 0.5, -b.d / 2, g);
       gkBox(b.w, 0.04, 0.05, M.post, 0, 1.0, -b.d + 0.02, g);
-      if (b.i % 2 === 0) { gkCyl(0.18, 0.14, 0.35, M.roofT, -0.8, 0.18, -0.6, g, 12); gkMesh(gkBlobGeo(0.3, b.i), M.leafG, -0.8, 0.6, -0.6, g); }
-      if (b.i % 3 === 1) { gkBox(0.45, 0.04, 0.45, M.bench, 0.6, 0.45, -0.7, g); gkBox(0.45, 0.45, 0.04, M.bench, 0.6, 0.7, -0.5, g); }
+      if (b.i % 2 === 0) { gkBox(b.w - 0.1, 0.3, 0.28, M.concrete, 0, 0.15, -b.d + 0.18, g); gkMesh(gkBlobGeo(0.22, b.i), M.leafG, -0.6, 0.38, -b.d + 0.18, g); }   // (a built-in planter)
       return { b, pv, g };
     });
   }
@@ -273,7 +272,7 @@ function gkBuildStreet(S) {
       const fg = new THREE.PlaneGeometry(5, eaves); fg.translate(0, eaves / 2, 0); B.add(fg, fm[v], Geo.matrix(x + 2.5, 0, zf + 0.004));
       const sh = new THREE.Shape(); sh.moveTo(-d / 2 - 0.3, 0); sh.lineTo(d / 2 + 0.3, 0); sh.lineTo(0, ridge - eaves); sh.closePath();
       const rg = new THREE.ExtrudeGeometry(sh, { depth: 5, bevelEnabled: false }); rg.rotateY(Math.PI / 2); rg.translate(-2.5, 0, 0);
-      B.add(rg, M.roofT, Geo.matrix(x + 2.5, eaves, zf - d / 2));
+      B.add(rg, x >= -7 && x <= 8 ? M.batten : M.roofT, Geo.matrix(x + 2.5, eaves, zf - d / 2));
       if (((x + 92) / 5) % 2 === 0) B.box(0.7, 1.3, 0.9, x, ridge + 0.3, zf - d / 2, M.brickSide);
       T.roofs.push({ x0: x, x1: x + 5, zf, d, eaves, ridge });
     } }
@@ -339,10 +338,12 @@ function gkBuildStreet(S) {
     const mesh = new THREE.Mesh(geo, mat); mesh.frustumCulled = false; mesh.renderOrder = 7; root.add(mesh);
     T.drops = { D, mesh, geo, pos, mat };
   }
-  // ---- roof tiles from the terrace (they lift off their battens from ~100°)
-  { const N = 900, r = new RNG(521), Tl = [];
-    for (let i = 0; i < N; i++) { const R = T.roofs[r.int(0, T.roofs.length - 1)], side = r.next() < 0.5 ? -1 : 1, u = r.range(0.05, 0.95);
-      Tl.push({ x: r.range(R.x0 + 0.2, R.x1 - 0.2), y: R.eaves + (R.ridge - R.eaves) * u, z: R.zf - R.d / 2 + side * (R.d / 2 + 0.3) * (1 - u), side, go: 100 + 95 * Math.pow(r.next(), 1.4), vt: r.range(14, 21), spin: r.range(1, 4), ax: r.range(0, 6.28) }); }
+  // ---- roof tiles: the south slopes of the four houses in front of the park's middle, course by course (19 courses of
+  // 12); they lift off their battens from ~100° (held only by their weight and a little grip)
+  { const r = new RNG(521), Tl = [];
+    for (const R of T.roofs) if (R.x0 >= -7 && R.x0 <= 8) for (let j = 0; j < 19; j++) for (let i = 0; i < 12; i++) { const side = 1, u = (j + 0.5) / 19;
+      Tl.push({ x: R.x0 + 0.21 + 0.4 * i + 0.1 + r.range(-0.01, 0.01), y: R.eaves + (R.ridge - R.eaves) * u + 0.02, z: R.zf - R.d / 2 + side * (R.d / 2 + 0.3) * (1 - u) + 0.02, side, go: 100 + 95 * Math.pow(r.next(), 1.4), vt: r.range(14, 21), spin: r.range(1, 4), ax: r.range(0, 6.28) }); }
+    const N = Tl.length;
     const im = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 0.014, 0.3), M.tile, N); im.frustumCulled = false; im.castShadow = true; root.add(im);
     T.tiles = { Tl, im };
   }
@@ -434,8 +435,9 @@ function gkStreetUpdate(T, s, o) {
   }
   // ---- dust from the crashes (it rises the old way and drifts; it fades in ~6 s)
   { const P = T.dust; P.begin();
-    for (const h of T.hits) { const u = s - h.s; if (u < 0 || u > 7) continue;
-      for (let k = 0; k < 14; k++) { const a = k * 2.4, rr = (0.6 + 1.6 * Math.sqrt(u)) * (0.4 + 0.6 * gkR(k, 3)); P.add(h.x + Math.cos(a) * rr, h.y + 0.4 + u * 0.35 * (0.5 + gkR(k, 5)), h.z + Math.sin(a) * rr, 1.2 + 1.4 * u, 0.32 * h.a * (1 - u / 7), 0.62, 0.58, 0.52); } }
+    // (light, and short: the crash itself must stay visible; lighter still once the stack lifts off, from 90°)
+    for (const h of T.hits) { const u = s - h.s; if (u < 0 || u > 5) continue; const al = 0.17 * h.a * (1 - u / 5) * (h.s > 90 ? 0.35 : 1);
+      for (let k = 0; k < 10; k++) { const a = k * 2.4, rr = (0.6 + 1.4 * Math.sqrt(u)) * (0.4 + 0.6 * gkR(k, 3)); P.add(h.x + Math.cos(a) * rr, h.y + 0.3 + u * 0.3 * (0.5 + gkR(k, 5)), h.z + Math.sin(a) * rr, 1.0 + 1.0 * u, al, 0.62, 0.58, 0.52); } }
     { const u = s - GK_SPIRE.hitS - 1.9; if (u > 0 && u < 9) for (let k = 0; k < 40; k++) { const a = k * 2.4, rr = (1 + 3 * Math.sqrt(u)) * (0.4 + 0.6 * gkR(k, 7)); P.add(T.spire.base.x + 8 + Math.cos(a) * rr * 1.6, 1 + u * 0.6 * (0.5 + gkR(k, 9)), T.spire.base.z + Math.sin(a) * rr, 2.5 + 2 * u, 0.4 * (1 - u / 9), 0.66, 0.62, 0.56); } }
     P.end(); }
 }

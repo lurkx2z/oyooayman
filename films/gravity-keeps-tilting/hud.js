@@ -18,19 +18,20 @@ const GK_CARS = GK_ST.bodies.filter((b) => b.kind === 'car').map((b) => b.id);
 // the scene's context line: [from, to, label, value(t, s) → { v, v2 }] (HTML)
 const GK_CTX = (() => {
   const c = gkC, E = gkE, sh = (m) => GK_SHOTS.find((x) => x.mode === m);
-  const fastest = (t, s) => { let best = 0; for (const id of GK_CARS) best = Math.max(best, gkSimSpeed('street', id, s)); return { v: gkKmh(best), v2: best > 0.5 ? 'SLIDING EAST' : 'STILL PARKED' }; };
+  const fastest = (t, s) => { let best = 0; for (let ss = Math.max(18, s - 30); ss <= s + 1e-6; ss += 0.1) for (const id of GK_CARS) best = Math.max(best, gkSimSpeed('street', id, ss)); return { v: gkKmh(best), v2: best < 0.5 ? 'STILL PARKED' : s < 41.4 ? 'SLIDING EAST' : 'INTO THE CHURCH' }; };
   return [
     [c('spire', 1) - 0.2, sh('spire').t1 - 0.2, 'THE SPIRE IS LEANING', (t, s) => { const a = gkSpireAngle(s) * 180 / Math.PI; return s > GK_SPIRE.hitS ? { v: 'GONE', v2: '' } : { v: a.toFixed(1) + '<small>°</small>', v2: a > 3 ? 'AND FALLING' : '' }; }],
-    [sh('cars0').t0 + 0.3, sh('church0').t1 - 0.3, 'THE FASTEST CAR', fastest],
+    [sh('cars0').t0 + 0.3, sh('cars0').t1 - 0.2, 'THE FASTEST CAR SO FAR', fastest],
+    [sh('street1').t0 + 0.3, sh('church0').t1 - 0.3, 'THE FASTEST CAR SO FAR', fastest],
     [sh('ski').t0 + 0.4, sh('ski').t1 - 0.3, 'THE PARK IS A SLOPE OF', (t, s) => ({ v: gkDeg(s) + '<small>°</small>', v2: '' })],
     [sh('pond').t0 + 0.4, sh('pond').t1 - 0.3, 'WATER LEFT IN THE POND', (t, s) => ({ v: Math.max(0, Math.round(100 * GK_POND.left(s))) + '<small>%</small>', v2: '' })],
     [sh('stack').t0 + 1.0, sh('up0').t1 - 0.2, 'THE CARS', (t, s) => { const y = gkSimCarY(s); return { v: gkKm(y), v2: y > 3 ? 'UP, AND FALLING' : 'ON THE CHURCH WALL' }; }],
     [sh('sky0').t0 + 0.6, sh('sky0').t1 - 0.3, 'A CAR, ALARM STILL GOING', (t, s) => { const P = [0, 0, 0], Q = [0, 0, 0, 1]; gkSimPose('street', 'car4', s, P, Q); return { v: gkKm(P[1]), v2: 'UP' }; }],
-    [sh('rising').t0 + 0.5, sh('rising').t1 - 0.3, 'THE CARS', (t, s) => ({ v: gkKm(gkSimCarY(s)), v2: 'UP, AND STILL CLIMBING' })],
-    [sh('back').t0 + 0.4, sh('back').t1 - 0.3, 'THE CARS', (t, s) => ({ v: gkKm(gkSimCarY(s)), v2: 'UP, AND COMING DOWN' })],
-    [sh('down0').t0 + 0.4, sh('straight').t1 - 0.3, 'THE CARS', (t, s) => ({ v: gkKm(gkSimCarY(s)), v2: 'UP' })],
+    [sh('rising').t0 + 0.5, sh('rising2').t1 - 0.3, 'THE CARS', (t, s) => ({ v: gkKm(gkSimCarY(s)), v2: 'UP, AND STILL CLIMBING' })],
+    [sh('back').t0 + 0.4, sh('back2').t1 - 0.3, 'THE CARS', (t, s) => ({ v: gkKm(gkSimCarY(s)), v2: 'UP, AND COMING DOWN' })],
+    [sh('down0').t0 + 0.4, sh('straight2').t1 - 0.3, 'THE CARS', (t, s) => ({ v: gkKm(gkSimCarY(s)), v2: 'UP' })],
     [sh('count').t0, gkFilmAt(360), 'DOWN IS DOWN AGAIN IN', (t, s) => ({ v: Math.max(0, Math.ceil(360 - s - 1e-6)) + ' <small>s</small>', v2: '' })],
-    [sh('comes').t0 + 0.4, GK.end + 1, 'THE CARS', (t, s) => ({ v: gkKm(gkSimCarY(s)), v2: 'UP, ' + (-gkSimCarX(s) / 1000).toFixed(1) + ' km WEST' })],
+    [sh('comes').t0 + 0.4, GK.end + 1, 'THE FIRST CAR LANDS IN', (t, s) => { const r = Math.max(0, Math.ceil(GK_LAND.s - s)); return { v: Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0'), v2: Math.round(-GK_LAND.x / 1000) + ' km WEST' }; }],
   ];
 })();
 function gkSimCarX(s) { const P = [0, 0, 0], Q = [0, 0, 0, 1]; let x = 0; for (const id of GK_CARS) { gkSimPose('street', id, s, P, Q); x += P[0]; } return x / GK_CARS.length; }
@@ -48,9 +49,9 @@ class GkHud {
     this.roL = this.ro.querySelector('.l'); this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s');
     this.ctx = mk('gk-ctx', '<span class="l"></span><span class="v"></span><span class="v2"></span>');
     this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
-    this.clock = mk('gk-clock', '<div class="l"></div><div class="v"></div><div class="dn"><span class="dl">DOWN</span><svg viewBox="-50 -50 100 100"><circle r="44" class="ring"/><g class="arr"><path d="M0 -26 L0 22 M-14 8 L0 24 L14 8"/></g><g class="into"><circle r="9"/><path d="M-20 -20 L20 20 M20 -20 L-20 20"/></g></svg></div>');
-    this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.dn = this.clock.querySelector('.dn'); this.arr = this.clock.querySelector('.arr'); this.into = this.clock.querySelector('.into');
-    this.band = mk('gk-band'); this.cap = mk('gk-cap');
+    this.clock = mk('gk-clock', '<div class="l"></div><div class="v"></div><div class="dn"><span class="dl">DOWN</span><svg viewBox="-50 -50 100 100"><circle r="44" class="ring"/><g class="arr"><path d="M0 -26 L0 22 M-14 8 L0 24 L14 8"/></g><g class="into"><text class="it" x="0" y="7" text-anchor="middle">AWAY</text></g></svg></div>');
+    this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.dn = this.clock.querySelector('.dn'); this.arr = this.clock.querySelector('.arr'); this.into = this.clock.querySelector('.into'); this.intoT = this.clock.querySelector('.it');
+    this.band = mk('gk-band'); this.cap = mk('gk-cap'); this.count = mk('gk-count');
     this.caps = GKT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: gkCapHtml(c.text), q: g.id === 'question' })));
     this.inset = mk('gk-inset');
     this.labels = [];
@@ -97,6 +98,10 @@ class GkHud {
       this._html('cap', this.cap, cp.html); this._cls('capq', this.cap, cp.q ? 'gk-cap q' : 'gk-cap');
       this._set('capa', this.cap, 'opacity', W(t, cp.show, cp.hide, 0.22, 0.3).toFixed(3));
     } else this._set('capa', this.cap, 'opacity', '0');
+    // ---- the last ticks: the count, big (9 … 1), then gone at 360°
+    const n = 360 - Math.floor(s + 1e-9);
+    if (s >= 351 && n >= 1 && n <= 9) { const fr = s - Math.floor(s + 1e-9); this._txt('cnt', this.count, String(n)); this._set('cnta', this.count, 'opacity', (0.92 * (1 - 0.55 * MathX.smooth(fr, 0.55, 0.98))).toFixed(3)); this._set('cnts', this.count, 'transform', `translate(-50%, -50%) scale(${(1.12 - 0.12 * MathX.smooth(fr, 0, 0.25)).toFixed(3)})`); }
+    else this._set('cnta', this.count, 'opacity', '0');
     // ---- the diagrams
     this._insets(t, s);
     // ---- labels pinned in the scene
@@ -129,6 +134,7 @@ class GkHud {
     const flat = Math.hypot(g.x, g.y), into = flat < 0.45;
     const ang = Math.atan2(g.x, -g.y) * 180 / Math.PI;                 // (0 = straight down the screen)
     this._set('dnA', this.arr, 'opacity', into ? '0' : '1'); this._set('dnI', this.into, 'opacity', into ? '1' : '0');
+    this._txt('dnT', this.intoT, g.z < 0 ? 'AWAY' : 'AT YOU');              // (camera space: −z is ahead)
     this._set('dnR', this.arr, 'transform', `rotate(${(-ang).toFixed(1)}deg)`);
     this._cls('dnC', this.dn, s >= 1 ? 'dn on' : 'dn');
   }
@@ -137,9 +143,9 @@ class GkHud {
   _insets(t, s) {
     const W = StoryHUD.win, c = gkC, E = gkE, sh = (m) => GK_SHOTS.find((x) => x.mode === m);
     const which = [
-      ['friction', c('slide', 0) - 0.2, E('slide') + 0.4, ''],
-      ['circle', c('terminal', 2) + 0.1, sh('circle').t1 - 0.3, ''],
-      ['heights', c('high', 1) - 0.1, E('high') + 0.4, ''],
+      ['friction', c('slide', 0) - 0.2, E('slide') + 0.4, 'left'],
+      ['circle', c('terminal', 2) + 0.1, sh('circle').t1 - 0.3, 'left'],
+      ['heights', c('high', 1) - 0.1, Math.min(E('high') + 0.4, sh('high').t1 - 0.15), ''],
     ].find((x) => t >= x[1] && t < x[2]);
     const a = which ? W(t, which[1], which[2], 0.45, 0.4) : 0;
     this._set('ina', this.inset, 'opacity', a.toFixed(3));
@@ -185,20 +191,20 @@ class GkHud {
       <circle cx="${p[0]}" cy="${p[1]}" r="11" fill="#fff"/>
       ${GkHud.arrow(p[0], p[1], p[0] + dn[0] * 70, p[1] - dn[1] * 70, '#ff8a6a', 5)}
       <text x="${p[0] + dn[0] * 70 + 10}" y="${p[1] - dn[1] * 70}" class="sm">DOWN</text>
-      <text x="480" y="150" class="sm">RADIUS = SPEED ÷ TURN</text>
-      <text x="480" y="200" class="b">LEAF  86 m</text><text x="480" y="240" class="b">DROP  516 m</text><text x="480" y="280" class="b">CAR  5.2 km</text></g>
+      <text x="470" y="140" class="sm">RADIUS = SPEED × 57 s</text>
+      <text x="470" y="195" class="b">LEAF  ~90 m</text><text x="470" y="240" class="b">DROP  ~500 m</text><text x="470" y="285" class="b">CAR  ~5 km</text></g>
       <text x="40" y="50" class="t">A FALL THAT TURNS: A CIRCLE</text>`);
   }
   // how high things go at 270° (twice the radius): leaves 170 m, the pond's water 1 km, the cars 10 km (log scale)
   static heights(u) {
     const k = MathX.smooth(u, 0.1, 0.6), Y = (h) => 410 - (Math.log10(h) - 1) / 3.3 * 340;
     const bar = (x, h, lab, col, du) => { const kk = MathX.smooth(u, du, du + 0.8); return `<rect x="${x}" y="${410 - (410 - Y(h)) * kk}" width="90" height="${(410 - Y(h)) * kk}" fill="${col}" rx="6"/><text x="${x + 45}" y="${Y(h) - 14}" class="b" text-anchor="middle" opacity="${kk}">${lab}</text>`; };
-    const ref = (h, lab) => `<line x1="80" y1="${Y(h)}" x2="700" y2="${Y(h)}" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-dasharray="6 8"/><text x="700" y="${Y(h) - 8}" class="sm" text-anchor="end">${lab}</text>`;
+    const ref = (h, lab) => `<line x1="80" y1="${Y(h)}" x2="730" y2="${Y(h)}" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-dasharray="6 8"/><text x="730" y="${Y(h) - 8}" class="sm" text-anchor="end">${lab}</text>`;
     return GkHud.svg(`${GkHud.plate()}<g opacity="${k}">
-      ${ref(330, 'EIFFEL TOWER 330 m')}${ref(8849, 'EVEREST 8.8 km')}${ref(11000, 'AIRLINERS ~11 km')}
-      <line x1="80" y1="410" x2="700" y2="410" stroke="#f6efe2" stroke-width="3"/>
-      ${bar(130, 172, '170 m', '#d9a63a', 0.2)}${bar(300, 1031, '1 km', '#9fc6e6', 1.2)}${bar(470, 9800, '10 km', '#ff8a6a', 2.2)}
-      <text x="175" y="445" class="sm" text-anchor="middle">LEAVES</text><text x="345" y="445" class="sm" text-anchor="middle">YOUR POND</text><text x="515" y="445" class="sm" text-anchor="middle">THE CARS</text></g>
+      ${ref(330, 'EIFFEL TOWER 330 m')}${ref(11000, 'AIRLINERS ~11 km')}
+      <line x1="80" y1="410" x2="730" y2="410" stroke="#f6efe2" stroke-width="3"/>
+      ${bar(95, 172, '~170 m', '#d9a63a', 0.2)}${bar(255, 1031, '≤1 km', '#9fc6e6', 1.2)}${bar(415, 9800, '~10 km', '#ff8a6a', 2.2)}
+      <text x="140" y="447" class="sm" text-anchor="middle">LEAVES</text><text x="300" y="447" class="sm" text-anchor="middle">POND</text><text x="460" y="447" class="sm" text-anchor="middle">CARS</text></g>
       <text x="40" y="50" class="t">AS HIGH AS IT GOES (270°)</text>`);
   }
 }

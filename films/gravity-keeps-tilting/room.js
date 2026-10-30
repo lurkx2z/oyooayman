@@ -100,7 +100,7 @@ function gkBuildRoom(S) {
     wallN: gkStd('#ffffff', 0.92, 0, { map: tex(gkPaintCanvas(4, '#e6dfd2'), 3, 2) }),
     wallW: gkStd('#ffffff', 0.92, 0, { map: tex(gkPaintCanvas(5, '#a9b8b0'), 3, 2) }),     // (a feature wall, sage)
     ceil: gkStd('#f4f2ec', 0.95), skirt: gkStd('#f1efe8', 0.5), frame: gkStd('#f6f4ef', 0.45),
-    glass: new THREE.MeshStandardMaterial({ color: '#dfe9ee', transparent: true, opacity: 0.1, roughness: 0.04, metalness: 0.0, envMapIntensity: 0.9, depthWrite: false, side: THREE.DoubleSide }),
+    glass: new THREE.MeshStandardMaterial({ color: '#2c3338', transparent: true, opacity: 0.3, roughness: 0.04, metalness: 0.0, envMapIntensity: 0.4, depthWrite: false, side: THREE.DoubleSide }),
     rad: gkStd('#f2f1ed', 0.4, 0.2), door: gkStd('#f3f1eb', 0.5), handle: gkStd('#b9b3a6', 0.3, 0.8),
     sofa: gkStd('#ffffff', 0.95, 0, { map: tex(gkFabricCanvas('#5f6e7c', 1), 3, 3) }), sofaD: gkStd('#ffffff', 0.95, 0, { map: tex(gkFabricCanvas('#526170', 2), 3, 3) }),
     arm: gkStd('#ffffff', 0.95, 0, { map: tex(gkFabricCanvas('#b8693f', 3), 2, 2) }),
@@ -227,6 +227,11 @@ function gkBuildRoom(S) {
     }
     bi++;
   }
+  // ---- the football by the window (physics.js GK_BALL): low-poly, black and white panels
+  { const geo = new THREE.IcosahedronGeometry(GK_BALL.r, 1).toNonIndexed(), n = geo.attributes.position.count, col = new Float32Array(n * 3);
+    for (let f = 0; f < n / 3; f++) { const c = f % 5 === 0 ? 0.08 : 0.92; for (let k = 0; k < 3; k++) col.set([c, c, c * 0.98], (f * 3 + k) * 3); }
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals();
+    R.ball = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, flatShading: true })); R.ball.castShadow = true; room.add(R.ball); }
   R.update = (s, o) => gkRoomUpdate(R, s, o || {});
   return R;
 }
@@ -236,6 +241,8 @@ function gkRoomUpdate(R, s, o) {
   const L = GK_ROOM;
   // ---- the simulated things
   for (const id in R.bodies) { const g = R.bodies[id]; gkSimPose('room', id, s, _gkP, _gkQ); g.position.set(_gkP[0], _gkP[1], _gkP[2]); g.quaternion.set(_gkQ[0], _gkQ[1], _gkQ[2], _gkQ[3]); }
+  // ---- the football: rolls east along the floor (its spin follows its roll)
+  { const x = gkBallX(s); R.ball.visible = s < GK_BALL.end; R.ball.position.set(x, GK_BALL.r, GK_BALL.z); R.ball.rotation.set(0.4, 0, -(x - GK_BALL.x0) / GK_BALL.r); }
   // ---- the glass of water: the surface stays level with down (in the glass's own frame) until it has spilled
   if (R.glassWater) {
     const G = R.bodies.glass, d = gkDown(gkDeg(s) + gkRing(s, 0.5, 0.5) * 0.6), wv = new THREE.Vector3(-d[0], -d[1], 0);

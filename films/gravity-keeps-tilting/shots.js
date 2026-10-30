@@ -11,13 +11,14 @@ const GK_SHOTS = [];
 {
   const P = GK_SHOTS, c = gkC, B = gkB, f = gkFilmAt;
   const L = [
-    // 1 — the first ticks: your room turning (as you feel it), the glass, the park from your window; the spire; your
-    //     ears; the street becoming a hill; the first avalanche; holding on
+    // 1 — the first ticks: your room turning (as you feel it) and the football rolling off by itself; the pond spilling
+    //     (the climbing dome behind it); the spire, followed to the ground; your ears; the street becoming a hill; the
+    //     first avalanche; holding on
     ['A0', 'room0', -1, 4.6],
-    ['A1', 'glass', 4.6, 7.2],
-    ['A2', 'win1', 7.2, B('spire', 0.2), { pov: true }],
-    ['A3', 'spire', B('spire', 0.2), f(GK_SPIRE.hitS + 1.9) + 1.2],
-    ['A4', 'ear', f(GK_SPIRE.hitS + 1.9) + 1.2, 24.2],
+    ['A1', 'ball', 4.6, 7.6],
+    ['A2', 'pond0', 7.6, B('spire', 0.2)],
+    ['A3', 'spire', B('spire', 0.2), f(GK_SPIRE.hitS + 1.9) + 0.8],
+    ['A4', 'ear', f(GK_SPIRE.hitS + 1.9) + 0.8, 24.2],
     ['A5', 'cars0', 24.2, B('slide', 0.8)],
     ['A6', 'slide', B('slide', 0.8), B('hold', 0.0)],
     ['A7', 'hold', B('hold', 0.0), B('east', 0.0)],
@@ -30,7 +31,8 @@ const GK_SHOTS = [];
     ['B4', 'ski', gkE('follow') + 0.55, B('pond', 0.6)],
     ['B5', 'pond', B('pond', 0.6), gkE('pond') + 1.2],
     ['B6', 'wall', gkE('pond') + 1.2, gkE('wall') + 0.8],
-    ['B7', 'win2', gkE('wall') + 0.8, B('ninety', 0.4), { pov: true }],
+    ['B7', 'win2', gkE('wall') + 0.8, gkE('wall') + 5.8, { pov: true }],
+    ['B7b', 'dome1', gkE('wall') + 5.8, B('ninety', 0.4)],
     ['B8', 'ninety', B('ninety', 0.4), f(96.0)],
     // 3 — down points into the sky: the stack of cars goes; things fall up, in circles; rain going up; the roof tiles;
     //     the dome; the balconies; the trees; ten degrees to go
@@ -41,7 +43,8 @@ const GK_SHOTS = [];
     ['C4', 'rainup', B('rainup', 0.6), B('tiles', 0.6)],
     ['C5', 'tiles', B('tiles', 0.6), B('climb', 0.6)],
     ['C6', 'climb', B('climb', 0.6), B('balcony', 0.6)],
-    ['C7', 'balcony', B('balcony', 0.6), B('trees', 0.6)],
+    ['C7', 'balcony', B('balcony', 0.6), f(GK_BALC[1].go + GK_BALC_FOLD + 2.6)],
+    ['C7b', 'balcony2', f(GK_BALC[1].go + GK_BALC_FOLD + 2.6), B('trees', 0.6)],
     ['C8', 'trees', B('trees', 0.6), B('ten', 0.6)],
     ['C9', 'ten', B('ten', 0.6), B('ceiling', 0.6)],
     // 4 — upside down: your ceiling; your block, hanging; the furniture goes again (and smashes the lamp); the crack;
@@ -54,17 +57,21 @@ const GK_SHOTS = [];
     ['D5', 'birds', B('birds', 0.6), B('swings', 0.6)],
     ['D6', 'swings', B('swings', 0.6), B('kid', 0.6)],
     ['D7', 'kid', B('kid', 0.6), B('rising', 0.6)],
-    ['D8', 'rising', B('rising', 0.6), B('high', 0.6)],
+    ['D8', 'rising', B('rising', 0.6), f(262.0)],
+    ['D8b', 'rising2', f(262.0), B('high', 0.6)],
     // 5 — as high as it goes; coming back down; your things home; nothing has landed; the last 30 degrees; down is
     //     down for one second; it all comes round again
     ['E0', 'high', B('high', 0.6), f(GK_SOFA_FALL) - 0.6],
     ['E1', 'westwall', f(GK_SOFA_FALL) - 0.6, B('back', 0.6)],
-    ['E2', 'back', B('back', 0.6), B('home', 6.0)],
+    ['E2', 'back', B('back', 0.6), f(290.6)],
+    ['E2b', 'back2', f(290.6), B('home', 6.0)],
     ['E3', 'home', B('home', 6.0), B('never', 0.6)],
-    ['E4', 'down0', B('never', 0.6), gkE('never') + 3.7],
+    ['E4', 'down0', B('never', 0.6), f(312.2)],
+    ['E4b', 'down1', f(312.2), gkE('never') + 3.7],
     ['E5', 'dome2', gkE('never') + 3.7, B('thirty', 0.6)],
     ['E6', 'thirty', B('thirty', 0.6), B('straight', 0.6)],
-    ['E7', 'straight', B('straight', 0.6), f(351.0)],
+    ['E7', 'straight', B('straight', 0.6), f(345.6)],
+    ['E7b', 'straight2', f(345.6), f(351.0)],
     ['E8', 'count', f(351.0), f(360.0)],
     ['E9', 'down', f(360.0), B('comes', 0.1)],
     ['E10', 'comes', B('comes', 0.1), B('question', 0.45)],

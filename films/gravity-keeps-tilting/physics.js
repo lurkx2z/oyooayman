@@ -143,13 +143,14 @@ const GK_BALC = [];
   for (const fl of [1, 2, 3]) for (const x of [38, 46, 54, 62, 70]) {
     const go = { '1:46': 149.4, '3:54': 155.2, '2:62': 166.8, '3:38': 171.5 }[fl + ':' + x];
     GK_BALC.push({ i: i++, x, y: fl * 3.1, z: B.z[0], w: 3.0, d: 1.4, go: go || null }); } }
+const GK_BALC_FOLD = 2.2;                                         // (s: it hinges up as its top steel yields, then tears off)
 function gkBalcony(b, s) {                                     // → { fold (rad, about its root, up), off: [dx, dy, dz], gone }
   if (!b.go || s < b.go) return { fold: 0, off: [0, 0, 0], gone: false };
-  const u = s - b.go;
-  if (u < 0.9) return { fold: 0.5 * gkSm(u, 0, 0.9) ** 1.6, off: [0, 0, 0], gone: false };
-  if (!b.fl) b.fl = gkFlight(0, b.y, b.go + 0.9, 110);
-  const P = gkFlightAt(b.fl, s), k = Math.min(1, (u - 0.9) / 3);
-  return { fold: 0.5 + 1.4 * k, off: [P[0], P[1] - b.y, -1.2 * k], gone: true };
+  const u = s - b.go, F = GK_BALC_FOLD;
+  if (u < F) return { fold: 0.6 * gkSm(u, 0, F) ** 1.6, off: [0, 0, 0], gone: false };
+  if (!b.fl) b.fl = gkFlight(0, b.y, b.go + F, 110);
+  const P = gkFlightAt(b.fl, s), k = Math.min(1, (u - F) / 3);
+  return { fold: 0.6 + 1.3 * k, off: [P[0], P[1] - b.y, -1.2 * k], gone: true };
 }
 // a heavy thing falling from rest at (x1, y1) at story s1 with terminal speed vt: dv/dt = g·down(θ) − (g/vt²)|v|v,
 // integrated once (1/120 s steps) and kept at 10 Hz → gkFlightAt(f, s) = [x, y] (never below the ground)
@@ -185,3 +186,35 @@ const GK_LAMPS = {
   tv: gkSimFirst('room', 'tv', 0.06) + 0.5,
   glassGone: gkSimFirst('room', 'glass', 0.3),
 };
+
+// THE FOOTBALL on your floor by the window (not in the simulation; it is out of every shot by 104 s): a hollow ball
+// (it runs between the pouffe and your heels) rolls once down's slope beats its rolling resistance (about 0.6 % of its weight on a wooden floor: a third of sin 1°), so it sets off on the
+// first tick, east, and fetches up against the sideboard. Pure: integrated once here, sampled at 60 Hz.
+const GK_BALL = (() => {
+  const r = 0.11, x0 = -0.6, z = -1.33, xs = GK_ROOM.bodies.find((b) => b.id === 'sideboard').pos[0] - 0.22 - r, rr = 0.006, dt = 1 / 600, hz = 60;
+  const xs60 = [], hits = []; let x = x0, v = 0, n = 0;
+  for (let s = 0; s < 104; s += dt, n++) {
+    const sn = Math.sin(gkDeg(s) * Math.PI / 180), a = v > 1e-4 ? GKP.g * (sn - rr) / (5 / 3) : Math.max(0, GKP.g * (sn - rr) / (5 / 3));
+    v += a * dt; x += v * dt;
+    if (x > xs) { x = xs; if (v > 0.05) hits.push([s, v]); v = v > 0.05 ? -0.4 * v : 0; }
+    if (n % (600 / hz) === 0) xs60.push(x);
+  }
+  return { r, x0, z, xs60, hz, hits, end: 104 };
+})();
+function gkBallX(s) { const B = GK_BALL; if (s <= 0) return B.x0; const f = s * B.hz, i = Math.min(B.xs60.length - 2, Math.floor(f)), u = f - i; return B.xs60[i] + (B.xs60[i + 1] - B.xs60[i]) * u; }
+
+// THE FIRST CAR DOWN: each car's flight carried on past the end of the simulation (it is recorded to 380 s) with the
+// same drag (its terminal speed) and the same turning down; the first to reach the ground (≈ 4:07:05, ~6 km west)
+const GK_LAND = (() => {
+  const G = GKP.g, P = [0, 0, 0], Q = [0, 0, 0, 1], A = [0, 0, 0], B = [0, 0, 0], s0 = GK_SIM.end - 2; let best = { s: Infinity, x: 0, id: '', v: 0 };
+  for (const b of GK_ST.bodies) if (b.kind === 'car') {
+    gkSimPose('street', b.id, s0 - 0.5, A, Q); gkSimPose('street', b.id, s0 + 0.5, B, Q); gkSimPose('street', b.id, s0, P, Q);
+    let x = P[0], y = P[1], vx = B[0] - A[0], vy = B[1] - A[1]; const k = G / (b.vt * b.vt), dt = 1 / 60;
+    for (let n = 0, s = s0; n < 60 * 300; n++, s += dt) {
+      const th = gkDeg(s) * Math.PI / 180, sp = Math.hypot(vx, vy);
+      vx += (G * Math.sin(th) - k * sp * vx) * dt; vy += (-G * Math.cos(th) - k * sp * vy) * dt; x += vx * dt; y += vy * dt;
+      if (y <= 0) { if (s < best.s) best = { s, x, id: b.id, v: sp }; break; }
+    }
+  }
+  return best;
+})();
