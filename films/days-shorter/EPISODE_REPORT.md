@@ -120,7 +120,9 @@ window wall (the radiator rings), the spire cracking, creaking, falling and land
 the dawn chorus. Score: a D major figure for Sunday, a drone under the quake, an accelerating pulse in B minor through
 the week, bells over the jump, a heartbeat on Saturday, hits on the sofa and the spire, a 9-second swell for the last
 sunset, stars on F minor 9 with bells, a big chord and the theme at the last sunrise, cut on the question.
-Loudness: LOUDNESS_WAV in the WAV; the AAC 256k `final-soundtrack.m4a` for the PC render: LOUDNESS_M4A.
+Loudness: −14.9 LUFS integrated, −2.3 dBTP true peak, 9.0 LU loudness range in the WAV (the score lifted 3 dB through
+the news and the scale/push explainers, which first sat at −23 LUFS); the AAC 256k `final-soundtrack.m4a` for the PC
+render, encoded through a limiter because the plain AAC overshot to −0.8 dBTP: −15.3 LUFS, −2.1 dBTP.
 
 ## Delivery
 
