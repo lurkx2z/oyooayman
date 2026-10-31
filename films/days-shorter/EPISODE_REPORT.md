@@ -131,7 +131,9 @@ render, encoded through a limiter because the plain AAC overshot to −0.8 dBTP:
   Space).
 - Final 1080p: on the owner's PC with
   `node films/days-shorter/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\days-shorter`
-  → `D:\renders\days-shorter\days-shorter_final_1080p.mp4`.
+  → `D:\renders\days-shorter\days-shorter_final_1080p.mp4`. Rendered on 31 October 2026 in about 9 minutes (Chrome on
+  the GPU, 2 workers, no errors): 5:34.6, 1920×1080 30 fps, 988 MiB, −15.3 LUFS, −2.1 dBTP; frames at 4:25 and 5:20
+  checked.
 - Thumbnails in the house style (real film frames, 1280×720): `thumb-cliff.jpg` (74 min · your street is a cliff
   now), `thumb-sunset.jpg` (9 s · the sun sets in nine seconds), `thumb-spire.jpg` (35 % · the church spire).
 
