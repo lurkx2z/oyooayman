@@ -108,9 +108,11 @@ in the deluge, the crash and the froth); the AAC 256k `final-soundtrack.m4a` for
 
 - `liquid-air.html` (open it, press Space) with the baked soundtrack; a runnable ZIP in the project files
   (`liquid-air-film.zip`: extract first, open `liquid-air.html` in Chrome or Edge, wait for SOUND READY, press Space).
-- Final 1080p: on the owner's PC with
+- Final 1080p: **rendered on the owner's PC on 31 October 2026** (10,575 frames in about 10 minutes on the RTX 3060 Ti
+  through Chrome, 2 workers, 24 segments, no errors) with
   `node films/liquid-air/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\liquid-air`
-  → `D:\renders\liquid-air\liquid-air_final_1080p.mp4`.
+  → `D:\renders\liquid-air\liquid-air_final_1080p.mp4`: 352.5 s, 1,290 MiB, 1920×1080, 30 fps, H.264 + AAC,
+  −14.5 LUFS integrated, −1.5 dBTP true peak, 15.7 LU range; the 6 check frames are clean. 1080p only.
 - Thumbnails in the house style (real film frames, 1280×720): `thumb-black-sky.jpg` (11.8 m · the sun comes out into
   a black sky), `thumb-snell-window.jpg` (56° · the whole sky in one circle), `thumb-fizz.jpg` (3.6 L · 4:00).
 
