@@ -89,6 +89,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > window; your flat, 20 cm above the surface, is a vacuum where your glass of water boils and freezes; and at 4:00 it
 > all turns back. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/liquid-air/PLAN.md`](films/liquid-air/PLAN.md).
+>
+> ***What if days kept getting shorter and couldn't stop?*** — open `days-shorter.html` (16:9, voiceless, 5:35). From
+> Sunday noon every hour the day gets 10 minutes shorter, and the film watches one street for a week. Every satellite
+> dish points at empty sky by evening, the sunsets come earlier and earlier, people are out in daylight at 12:25 AM,
+> and the spin's growing push makes down lean south: a marble rolls away on Wednesday, the pond slides to one end and a
+> car rolls off on Thursday, water sits crooked in its glass on Friday, and on Saturday your sofa slides across the
+> room, the church spire falls, the parked cars slide, the sun sets in 9 seconds and sunrise number 18 comes up over a
+> street that is now a cliff. The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/days-shorter/PLAN.md`](films/days-shorter/PLAN.md).
 
 | Time | Beat |
 |---|---|
