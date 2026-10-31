@@ -45,7 +45,9 @@ laSound('sfx', 'events', function (ctx, bus, K) {
   { const t0 = LA.tBack - 0.2, d = LA.end - t0 + 1.0;
     const cr = laCrackle(fx, d, { rate: 9000, env: (u) => Math.min(1, u * d / 2.5), hp: 900 }); K.put(cr, t0, { vol: 0.8, norm: true });
     const [L, R] = laBubbleSnd(fx, d, { rate: 420, env: (u) => Math.min(1, 0.2 + u * d / 2), f0: 200, f1: 1100 }); K.putLR(L, R, t0 + 0.3, { vol: 0.8 });
-    laBed(K, t0, LA.end + 0.5, { colour: 'pink', f: [['bp', 900, 0.5]], vol: 0.6, am: 0.4, wr: 4, env: (u) => Math.min(1, u * 3) }); }
+    laBed(K, t0, LA.end + 0.5, { colour: 'pink', f: [['bp', 900, 0.5]], vol: 0.6, am: 0.4, wr: 4, env: (u) => Math.min(1, u * 3) });
+    // (and the roar of it: more gas than liquid after a second, racing up)
+    laBed(K, t0 + 0.5, LA.end + 0.5, { colour: 'pink', f: [['hp', 150], ['lp', 3200]], vol: 0.85, am: 0.3, wr: 2.5, env: (u, t) => laEv(laStoryAt(t), LAP.back + 0.5, LAP.back + 5) }); }
   void at;
 });
 const c0 = (id, k) => laC(id, k);

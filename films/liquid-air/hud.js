@@ -32,7 +32,7 @@ const LA_CTX = (() => {
     span('moon', 'moon', 'YOUR WEIGHT IN IT', () => ({ v: '12 <small>kg</small>', v2: 'ON THE MOON: 11.6 kg' })),
     span('top', 'top', 'PRESSURE IN THE TOP 70 cm', () => ({ v: '< 6.3 <small>kPa</small>', v2: 'THE ARMSTRONG LIMIT' })),
     span('cold', 'cold', 'THE LIQUID', () => ({ v: '15 <small>°C</small>', v2: '' })),
-    span('back', 'back', 'THE AIR IN YOUR LUNGS WILL BE', () => ({ v: '2,140 <small>litres</small>', v2: 'FROM 3 LITRES OF LIQUID' })),
+    span('back', 'back', 'EVERY SECOND, YOUR LUNGS WILL MAKE', () => ({ v: '3.6 <small>litres of air</small>', v2: 'FROM 3 LITRES OF LIQUID' })),
     [sh('count').t0, laFilmAt(LAP.back), 'IT TURNS BACK IN', (t, s) => ({ v: Math.max(0, Math.ceil(LAP.back - s - 1e-6)) + ' <small>s</small>', v2: '' })],
   ];
 })();
@@ -51,8 +51,8 @@ function laCapHtml(s) {
 class LaHud {
   constructor(root) {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; root.appendChild(d); return d; };
-    this.ro = mk('la-ro', '<div class="l"></div><div class="v"></div><div class="s"></div>');
-    this.roL = this.ro.querySelector('.l'); this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s');
+    this.ro = mk('la-ro', '<div class="l"></div><div class="v"></div><div class="s"></div><div class="s nx"></div>');
+    this.roL = this.ro.querySelector('.l'); this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s'); this.roN = this.ro.querySelector('.nx');
     this.ctx = mk('la-ctx', '<span class="l"></span><span class="v"></span><span class="v2"></span>');
     this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
     this.clock = mk('la-clock', '<div class="l"></div><div class="v"></div><div class="f"></div>');
@@ -81,6 +81,9 @@ class LaHud {
       this._html('rov', this.roV, (f < 10 && f > 0 ? f.toFixed(1) : Math.floor(f)) + '<small>%</small>');
       const d = laDepth(s);
       this._html('ros', this.roS, d < 0.005 ? '' : `LEVEL IN YOUR STREET <b>${d < 1 ? Math.round(d * 100) + ' cm' : d.toFixed(2) + ' m'}</b>`);
+      // the threat that hangs over the second half: at 4:00 it all turns back (from the [deep] caption to 4:00)
+      const nx = t >= laC('deep', 1) - 0.2 && s < LAP.back ? Math.ceil((LAP.back - s) / 60) : 0;
+      this._html('ron', this.roN, nx ? `IT TURNS BACK INTO AIR IN <b>${nx > 1 ? nx + ' MIN' : Math.ceil(LAP.back - s) + ' s'}</b>` : '');
       this._cls('roc', this.ro, s >= 599.5 && s < 612 ? 'la-ro hit' : 'la-ro');
     }
     // ---- the context line

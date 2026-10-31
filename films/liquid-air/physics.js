@@ -1,8 +1,8 @@
 /* =====================================================================
    PHYSICS — "What if the air turned into a breathable liquid for one hour?" Every number on screen comes from here or
    from column.js (build-column.cjs: the sky raining down, computed once). Story time s = seconds after 3:00:00 PM.
-   THE RULE (PLAN.md § 1): from 3:00:00 the air turns into a clear liquid, the same share of what's left every second,
-   all of it by 3:10:00; at 4:00:00 it turns back the same way, by 4:10:00. The liquid is at the air's temperature
+   THE RULE (PLAN.md § 1): from 3:00:00 the air turns into a clear liquid, the same amount every second (1/600 of the
+   original: a growing share of what's left), all of it by 3:10:00; at 4:00:00 it turns back the same way, by 4:10:00. The liquid is at the air's temperature
    (15 °C), weighs 875 kg/m³ (liquid air's density) and holds oxygen you can breathe. Pure functions of s.
    ===================================================================== */
 
@@ -59,16 +59,18 @@ function laSealed(s, pIn) { const f = laF(s), inside = pIn * (1 - f), out = laP0
 const laEarKPa = (s) => 101.325 * MathX.clamp(s, 0, 600) / 600;
 
 // THE CARS (parked; layout LA_ST cars): each lifts off at LAP.carFloat, drifts with the current, fills (minutes) and
-// sinks. A few stay sealed (doors and windows shut, newer cars) and float up to the surface after 3:10
+// sinks. Two fill slowly (newer cars, good seals) and ride the surface up in the crash, then fill and sink. (None stays
+// sealed: a cabin whose air has turned would have ~0 atm inside, and the windows would give.)
 const LA_CARFLOAT = {};
 LA_ST.bodies.filter((b) => b.kind === 'car').forEach((b, i) => {
-  const r = hash1(i * 31 + 7), sealed = b.id === 'car4' || b.id === 'car6';
+  const r = hash1(i * 31 + 7), sealed = false; void sealed;
   LA_CARFLOAT[b.id] = { lift: 0, fill: 140 + 160 * r, sealed, drift: (hash1(i * 13 + 3) - 0.5) * 2, yaw: (hash1(i * 17 + 5) - 0.5) * 0.9 };
 });
 // the story second the level reaches d (bisect: the level only rises until 4:00)
 function laSAtDepth(d) { let a = 0, b = 700; for (let k = 0; k < 40; k++) { const m = (a + b) / 2; if (laDepth(m) < d) a = m; else b = m; } return (a + b) / 2; }
 LAP.sFloat = laSAtDepth(LAP.carFloat);                          // ≈ 3:05:15
 for (const id in LA_CARFLOAT) LA_CARFLOAT[id].lift = LAP.sFloat + 4 * hash1(id.length * 7 + id.charCodeAt(3));
+for (const id of ['car4', 'car6']) LA_CARFLOAT[id].fill = 650 + 25 * (id === 'car6') - LA_CARFLOAT[id].lift;
 LA_CARFLOAT.car3.fill = 524 - LA_CARFLOAT.car3.lift; LA_CARFLOAT.car3.drift = 0.25;              // (the one the film watches go down, at 3:08:44)
 // a car's pose: { x, y, z (offsets from its parked spot), yaw, roll } at s
 function laCarState(id, s) {
@@ -79,8 +81,6 @@ function laCarState(id, s) {
   const ride = Math.max(0, d - 0.45);
   out.y = ride * (1 - sink); out.x = C.drift * Math.min(18, u * 0.06) + 0.6 * Math.sin(u * 0.05 + C.yaw * 9); out.z = 0.4 * Math.sin(u * 0.04 + C.yaw * 4);
   out.yaw = C.yaw * laSm(u, 0, 120); out.roll = 0.04 * Math.sin(u * 0.7 + C.yaw * 5) * (1 - sink); out.pitch = 0.03 * Math.sin(u * 0.53 + C.drift) * (1 - sink) + 0.12 * sink * Math.sin(C.yaw * 7);
-  // the sealed ones: from 3:10 they rise to the top, nose up a little, and lie against the surface
-  if (C.sealed && s > 600) { const k = laSm(s, 604, 640); out.y = laLerpY(out.y, LAP.D - 1.25, k); out.pitch = 0.08 * k; }
   return out;
 }
 const laLerpY = (a, b, k) => a + (b - a) * k;
@@ -88,7 +88,7 @@ const laLerpY = (a, b, k) => a + (b - a) * k;
 // you: the level against your body (your eyes are at 1.62 m on the street); the breath you take
 LAP.sWaist = laSAtDepth(0.95); LAP.sChin = laSAtDepth(1.5); LAP.sOver = laSAtDepth(1.66);
 
-// THE FIZZ (4:00:00 on): every bit turns back at the same share a second; gas bubbles out of all of it (at the bottom,
+// THE FIZZ (4:00:00 on): 1/600 of it turns back every second; gas bubbles out of all of it (at the bottom,
 // at 1 atm, 714 litres of gas from every litre over ten minutes: a gas flow up through the street of ~14 m/s)
 const laFizz = (s) => laSm(s, LAP.back - 0.2, LAP.back + 1.2);
 

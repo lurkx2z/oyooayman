@@ -14,7 +14,7 @@ status: voiceless
 
 [rule] All the air on Earth. A little more of it every second. / By 3:10, all of it.
 
-[real] Real air only turns liquid at −194 °C. This is at 15 °C, and it carries oxygen you can breathe. / That part is real: in 1966, mice breathed an oxygen-rich liquid for hours.
+[real] Real air only turns liquid at −194 °C. This stays at 15 °C, and it carries oxygen you can breathe. / That part is real: in 1966, mice breathed an oxygen-rich liquid for hours.
 
 [dark] And the sun's gone. / The whole sky is falling as rain: kilometres of it, between you and the sun.
 
@@ -30,7 +30,7 @@ status: voiceless
 
 [stairs] Everyone has had the same idea.
 
-[street] Outside, it's raining 5 times harder than any rain ever measured.
+[street] Outside, it's raining 4 times harder than any rain ever measured.
 
 [lamps] 3:03 in the afternoon, and the street lights are on.
 
@@ -54,23 +54,23 @@ status: voiceless
 
 [sink] One by one, the cars fill up and sink.
 
-[last] 3:09. Up there, the last of the air is going. / Above the surface, nobody could breathe now.
+[last] 3:09. Up there, the last of the air is going. / Above the surface, the air is already thinner than on Everest.
 
 [crash] 3:10. The last of the air is gone. / Nothing holds the rain up now. The rest of the sky lands in 10 seconds.
 
 [sun] And the sun comes out. / Into a black sky.
 
-[deep] That's the whole sky now: 11.8 metres deep. / Down here the pressure hasn't changed: same weight, just closer.
+[deep] That's the whole sky now: 11.8 metres deep. / At 4:00 it all turns back into air. Including the litres inside you.
 
-[flat] Your flat is 20 cm above the surface. In a vacuum. / Your glass of water is boiling. At 15 °C. / Now it's freezing.
+[flat] Your flat is just above the surface. In a vacuum. / Your glass of water is boiling. At 15 °C. / Now it's freezing.
 
 [snell] Look up: the whole sky is squeezed into one circle. / Black, with the sun and the stars in it. Around it, the surface is a mirror.
 
-[moon] You weigh 12 kg in it. / Like walking on the Moon.
+[moon] You weigh 12 kg in it. / Like the Moon, in slow motion.
 
-[float] Everything wooden floats up: chairs, tables, branches, all pressed against the surface. / Plastic bins don't. They're heavier than this.
+[float] Everything wooden floats up, for now: chairs, tables, branches, all pressed against the surface. / Plastic bins don't. They're heavier than this.
 
-[pond] Water is heavier too. So the pond is still a pond, at the bottom of the sky. / The ducks never left it.
+[pond] Water is heavier too. So the pond is still a pond, at the bottom of the sky. / The ducks sit low in it, but they never left.
 
 [birds] The pigeons fly in it. Slowly, like penguins.
 
@@ -78,11 +78,11 @@ status: voiceless
 
 [top] Don't swim up. / In the top 70 cm the pressure is so low your blood would boil.
 
-[cold] It's only 15 °C, but it pulls the heat out of you far faster than air. / Everyone is shivering.
+[cold] It's only 15 °C, and every breath of it pulls heat out of your chest. / Everyone is shivering.
 
-[work] And every breath is hard work: it's 700 times heavier than air.
+[work] Every breath is hard work: it's 700 times heavier than air. / And it's slow to wash your CO₂ out.
 
-[back] At 4:00 it turns back into air, the same way: over ten minutes. / And the 3 litres in your lungs will become 2,000 litres of air. / So breathe out. And keep breathing out.
+[back] At 4:00 it turns back into air, the same way: over ten minutes. / Every second, the 3 litres in your lungs will make a full breath of air. / So breathe out. And keep breathing out.
 
 [count] Ten seconds.
 

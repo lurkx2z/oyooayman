@@ -101,7 +101,7 @@ function laBuildRoom(S) {
     wallN: laStd('#ffffff', 0.92, 0, { map: tex(laPaintCanvas(4, '#e6dfd2'), 3, 2) }),
     wallW: laStd('#ffffff', 0.92, 0, { map: tex(laPaintCanvas(5, '#a9b8b0'), 3, 2) }),     // (a feature wall, sage)
     ceil: laStd('#f4f2ec', 0.95), skirt: laStd('#f1efe8', 0.5), frame: laStd('#f6f4ef', 0.45),
-    glass: new THREE.MeshStandardMaterial({ color: '#2c3338', transparent: true, opacity: 0.3, roughness: 0.04, metalness: 0.0, envMapIntensity: 0.4, depthWrite: false, side: THREE.DoubleSide }),
+    glass: new THREE.MeshStandardMaterial({ color: '#2c3338', transparent: true, opacity: 0.3, roughness: 0.45, metalness: 0.0, envMapIntensity: 0.4, depthWrite: false, side: THREE.DoubleSide }),
     rad: laStd('#f2f1ed', 0.4, 0.2), door: laStd('#f3f1eb', 0.5), handle: laStd('#b9b3a6', 0.3, 0.8),
     sofa: laStd('#ffffff', 0.95, 0, { map: tex(laFabricCanvas('#5f6e7c', 1), 3, 3) }), sofaD: laStd('#ffffff', 0.95, 0, { map: tex(laFabricCanvas('#526170', 2), 3, 3) }),
     arm: laStd('#ffffff', 0.95, 0, { map: tex(laFabricCanvas('#b8693f', 3), 2, 2) }),
@@ -295,6 +295,7 @@ function laRoomUpdate(R, s, o) {
   R.film.material.opacity = 0.45 * laSm(s, 4, 90);
   // ---- after 3:10, in the vacuum: the glass and the cat's bowl boil (bubbles: liquid.js), then freeze over
   { const ice = laSm(s, LA_BOIL.freeze0, LA_BOIL.freeze1);
-    R.M.water.color.setRGB(0.74 + 0.2 * ice, 0.84 + 0.12 * ice, 0.88 + 0.1 * ice); R.M.water.opacity = 0.55 + 0.35 * ice; R.M.water.roughness = 0.04 + 0.5 * ice; }
+    R.M.water.color.setRGB(0.74 + 0.24 * ice, 0.84 + 0.15 * ice, 0.88 + 0.12 * ice); R.M.water.opacity = 0.55 + 0.43 * ice; R.M.water.roughness = 0.04 + 0.8 * ice;
+    if (R.M.water.emissive) R.M.water.emissive.setRGB(0.35 * ice, 0.38 * ice, 0.4 * ice); }
   R.room.updateMatrixWorld(true);
 }

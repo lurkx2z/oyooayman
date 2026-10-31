@@ -4,7 +4,7 @@
    the street (its tower and spire stand out of the liquid, into the vacuum), the park (the pond, autumn trees, paths,
    picnic tables, the playground), the terrace beyond it and the town around. (The gravity-keeps-tilting film's street,
    with five floors, a café and a stairwell; nothing here is simulated.)
-   Moving: the parked cars (they float, fill and sink; two stay sealed), the café's chairs and tables, picnic tables and
+   Moving: the parked cars (they float, fill and sink; two ride the surface up first), the café's chairs and tables, picnic tables and
    branches (wood floats), fallen leaves (they ride on the surface), the footballs (they go soft). Posed by update(s).
      laBuildStreet(S) → T
    ===================================================================== */

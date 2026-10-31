@@ -1,7 +1,8 @@
 /* =====================================================================
    BUILD-COLUMN — the sky coming down, computed once (node films/liquid-air/build-column.cjs → column.js).
    One column of the atmosphere, 1-D, metres and seconds, story time s = seconds after 3:00:00 PM:
-   - THE RULE: from s = 0 to 600 every bit of the gas left turns to liquid at the same share per second, so the fraction
+   - THE RULE: from s = 0 to 600 each layer turns 1/(600 − s) of its gas left per second (the same amount, 1/600 of
+     the original, every second), so the fraction
      of the air turned is f = s / 600 (all of it by 3:10:00). The liquid: 875 kg/m³ (liquid air's density).
    - each new bit of liquid is a drop where it formed; it falls with drag in the gas left there: terminal speed
      v0 · √(ρ0 / ρ_gas) (v0 = 5 m/s at sea level: a ~2 mm drop of a liquid lighter than water, with less surface tension)

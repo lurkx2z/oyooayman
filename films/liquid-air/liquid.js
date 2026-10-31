@@ -206,6 +206,7 @@ function laLiquidUpdate(Lq, s, cam, o) {
     }
   }
   // ---- drops forming in your room (from nothing, everywhere at once; they grow and fall)
+  const beads = [];
   if (o.room && s > -0.5 && s < 600) {
     const Rm = o.room, L = LA_ROOM, n = Math.round(MathX.clamp(500 + s * 8, 0, 2600) * (o.dropK ?? 1));
     for (let i = 0; i < n; i++) {
@@ -215,6 +216,8 @@ function laLiquidUpdate(Lq, s, cam, o) {
       const fall = Math.min(0.5 * 9.81 * Math.max(0, age - 0.35) ** 2, 30), ly = ly0 - fall; if (ly < 0.01) continue;
       const w = Rm.toWorld(lx, ly, lz, _laCP), gd = w.distanceTo(cp); if (gd < 0.35) continue;
       const grow = Math.min(1, age / 0.35), v = Math.min(5, 9.81 * Math.max(0, age - 0.35));
+      // (near you, each one is a bead you can see swell out of nothing, hang, and go)
+      if (gd < 2.6 && age < 0.5) beads.push(w.x, w.y, w.z, (0.018 + 0.022 * laR(seed, 9)) * grow * (0.5 + 0.5 * Math.min(1, gd)), Math.min(1, age / 0.12));
       R.add(cp, w.x, w.y, w.z, 0, -1, 0, 0.012 + v * 0.03, 0.0032 * (0.5 + 0.5 * grow), (0.75 + 0.25 * grow) * (o.dropA ?? 1));
     }
   }
@@ -248,6 +251,7 @@ function laLiquidUpdate(Lq, s, cam, o) {
   Sp.end();
   // ---- bubbles: o.bubbles = [{ x, y, z, n, r, rate, life, h }] sources; plus the fizz everywhere from 4:00
   const Bb = Lq.bub; Bb.begin();
+  for (let i = 0; i < beads.length; i += 5) Bb.add(beads[i], beads[i + 1], beads[i + 2], beads[i + 3], 0.9 * beads[i + 4], 0.96, 0.98, 1.0);
   for (const src of o.bubbles || []) {
     for (let i = 0; i < src.n; i++) { const per = src.life, ph = ((s / per + laR(i, src.seed || 81)) % 1), k = Math.floor(s / per + laR(i, src.seed || 81)), j = i * 13 + k;
       const x = src.x + (laR(j, 82) - 0.5) * src.r * 2 + 0.03 * Math.sin(s * 9 + i), z = src.z + (laR(j, 83) - 0.5) * src.r * 2, y = src.y + ph * src.h;
@@ -256,11 +260,13 @@ function laLiquidUpdate(Lq, s, cam, o) {
   }
   if (s > LAP.back - 0.3) {
     const k = laFizz(s), RR = 8, H = level;
-    const age = s - LAP.back, N = Math.round(10500 * k * MathX.clamp(0.35 + age / 4, 0, 1));
-    for (let i = 0; i < N; i++) { const v = 0.6 + 1.6 * laR(i, 91), x = cp.x + (laR(i, 93) - 0.5) * 2 * RR, z = cp.z + (laR(i, 94) - 0.5) * 2 * RR, born = laR(i, 92) * 1.4;
-      // (each starts where it forms, anywhere in the liquid, and rises; near the camera they're big and many)
-      const y0 = laR(i, 96) * H, y = y0 + Math.max(0, age - born) * v * (1 + 0.4 * age); if (age < born || y > H) continue;
-      Bb.add(x + 0.06 * Math.sin(s * 5 + i), y, z, (0.03 + 0.12 * laR(i, 95) ** 2) * (1 + 0.25 * age), 0.75 * laSm(age - born, 0, 0.3), 0.92, 0.97, 1.0); }
+    // (every litre gives 1.2 litres of gas a second: after a second there's more gas than liquid, and it races up,
+    //  faster every second: the street turns to a white froth. Bubbles form everywhere and keep forming)
+    const age = s - LAP.back, N = Math.round(13500 * k * MathX.clamp(0.3 + age / 2.5, 0, 1)), sp = Math.min(14, 1.5 + 2.6 * Math.max(0, age));
+    for (let i = 0; i < N; i++) { const x = cp.x + (laR(i, 93) - 0.5) * 2 * RR, z = cp.z + (laR(i, 94) - 0.5) * 2 * RR, born = laR(i, 92) * 1.2;
+      if (age < born) continue;
+      const y = (laR(i, 96) * H + (0.6 + 0.8 * laR(i, 91)) * sp * (age - born)) % H;
+      Bb.add(x + 0.06 * Math.sin(s * 5 + i), y, z, (0.03 + 0.14 * laR(i, 95) ** 2) * (1 + 0.35 * age), 0.8 * laSm(age - born, 0, 0.3), 0.94, 0.98, 1.0); }
   }
   Bb.end();
   // ---- the sun's shafts and the ripple-light on the bottom (under the surface, sun out)

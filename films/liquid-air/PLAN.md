@@ -18,8 +18,8 @@ Page: `liquid-air.html`. Captions: `CAPTIONS.md` → `node build-timing.cjs` →
 
 ## 1. The rule
 
-At **3:00:00 PM** all the air on Earth starts to turn into a clear liquid: **the same share of what's left, every
-second**, all of it by **3:10:00**. At **4:00:00** it turns back into air the same way, by 4:10:00.
+At **3:00:00 PM** all the air on Earth starts to turn into a clear liquid: **the same amount every second** (1/600 of
+all of it, which is a growing share of what's left), all of it by **3:10:00**. It stays at 15 °C (part of the rule). At **4:00:00** it turns back into air the same way, by 4:10:00.
 
 - The liquid is at the air's temperature (15 °C), as dense as liquid air (**875 kg/m³**), and carries oxygen you can
   breathe. **This is the one impossible thing** (real liquid air boils at −194 °C), and the film says so (HUD tag).
@@ -65,7 +65,8 @@ behind your eardrums turns at 1/600 a second → 10 kPa a minute (swallow).
 **What floats, what sinks.** Wood (~600 kg/m³) floats: café chairs and tables, picnic tables, branches, fallen leaves,
 all pressed against the surface at 11.8 m. Plastic bins (HDPE ~950) stay. Water (1000) is heavier: **the pond stays a
 pond** at the bottom of the sky, with its ducks on it. Parked cars lift at ~70 cm, drift, fill (2–5 minutes) and sink;
-two sealed ones float up and lie against the surface.
+two slow-filling ones ride the surface up in the crash, then fill and sink. (A sealed car can't float on: with its
+air turned, ~0 atm inside against ~1 atm outside, the windows give.)
 
 **The vacuum above.** Your floor is 12.0 m up: **20 cm above the final surface**. After 3:10 your flat is in a vacuum:
 your glass of water boils at 15 °C (water's vapour pressure 1.7 kPa), and evaporation cools it until it freezes.
@@ -76,7 +77,8 @@ surface) strikes in silence; its sound reaches you only through the tower's ston
 **Cold.** 15 °C liquid takes heat from you far faster than 15 °C air (like cold water): everyone shivers.
 
 **4:00.** It turns back at 1/600 a second: every litre gives 1.2 litres of gas a second, everywhere at once. The 3
-litres in your lungs become **2,140 litres** of air over ten minutes: breathe out, and keep breathing out (we end 5 s
+litres in your lungs make **3.6 litres of gas every second**: a full breath a second, 2,140 litres in all. After one
+second there's more gas than liquid everywhere, racing up at ~14 m/s: the street turns to a white froth (we end 5 s
 into it).
 
 **Honest limits (said in PLAN and the report; the first two on screen):**
@@ -125,4 +127,36 @@ roll to 4:00, a wide chord into the fizz, cut on the question.
 
 ## 7. Review log
 
-(see below; filled in as the reviews come in)
+Round 1 (three independent reviewers on 1 fps stills of the whole film, before fixes). Scores as given:
+
+- **Retention** 5.5/10 overall (hook 5, first 30 s 5, middle 7, payoff 5, clarity 6). Top problems: no stakes after
+  3:20 (a list of curiosities until the countdown); the opening undersells the anomaly (rain "from nothing" reads as
+  ordinary rain; the sun still visible under "And the sun's gone"); visuals that don't prove the caption.
+- **Visuals**: image 6, composition 5, phone readability 5, underwater 6.5, hero moments 5. Best: the sun in a black
+  sky (3:11), a car hanging against the surface (2:43), the deluge street (1:20). Worst: the sun disc under "the sun's
+  gone", the packet, the blocky foreground hand (lamps, 4:00 street), the girl only seen from behind, the float shot's
+  mirrored building, the pond, Snell's window a near-repeat of 3:11, tiny HUD boxes.
+- **Physics**: accuracy 7, honesty 6, clarity 8, learning 8, believability 6. Errors: "5 times harder" (4×), caption
+  2,000 vs HUD 2,140 litres, the 4:00 fizz far too gentle (a full breath a second; a froth), sealed cars can't float
+  (windows give), "nobody could breathe" at 3:09 (0.66 atm: thin, not deadly), "20 cm" is false precision, Moon
+  without drag, wood and ducks too certain, no ice, "the same share every second" wording, the cold undersold.
+
+Fixed after round 1:
+1. The sun's gone: the bright disc was the room lamp's highlight on the window glass (rougher glass now), and the
+   shot's exposure falls as the line lands.
+2. Stakes for the second half: the [deep] caption now plants 4:00 ("At 4:00 it all turns back into air. Including the
+   litres inside you.") and the HUD counts it down from there ("IT TURNS BACK INTO AIR IN 45 MIN").
+3. Drops forming: glassy beads swell out of nothing round the camera before they fall.
+4. Snell's window: looking straight up with a wide lens, the whole circle in frame, turning slowly (no longer a repeat).
+5. 4:00: a white froth of gas racing up (more gas than liquid after a second), the water whitens, a roar under it;
+   caption and HUD: "Every second, the 3 litres in your lungs will make a full breath of air" / 3.6 litres.
+6. Sealed cars dropped: two slow-filling ones ride the surface up in the crash, then sink.
+7. Captions: 4 times harder; thinner than on Everest; "just above the surface"; "like the Moon, in slow motion"; wood
+   "for now"; ducks sit low; the cold comes from every breath; CO₂ in the hard-work line; "stays at 15 °C" in the rule.
+8. The girl is seen from the front (her breath, her face); the camera moved off the foreground hands (lamps, 4:00);
+   the float shot looks up through Snell's window at the furniture against the surface; the pond shot follows a duck;
+   the glass ices over white; a jolt at the slam; HUD boxes and the honest tag 1.2–1.25× larger.
+
+Not fixed (still weak): the crash from below could show more mass arriving (columns, a bulge); the crisp packet still
+reads as a blob; extras' poses are stiff; crash damage above the surface (roofs, the tower top) is not shown; CO₂ and
+hypothermia are only lines, not consequences.

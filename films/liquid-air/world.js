@@ -17,7 +17,7 @@ LA_SETS.world = (app) => {
   const scene = S.scene, cam = S.camera, sun = S.sun;
   scene.fog = new THREE.FogExp2('#d9d2c6', 0.0012);
   const sky = laSky(scene, ...LA_COL3.skyDay, { sunDir: LA_SUN, sunGlow: '#ffcf9a', hw: 0.3, r: 4000 });
-  const R = laBuildRoom(S), T = laBuildStreet(S), C = laBuildCast(S), Lq = laBuildLiquid(S);
+    const R = laBuildRoom(S), T = laBuildStreet(S), C = laBuildCast(S), Lq = laBuildLiquid(S);
   const envDay = scene.environment;
   // ---- the street lamps' light where we look (the four posts nearest the camera)
   const lampL = Array.from({ length: 4 }, () => { const l = new THREE.PointLight('#ffd49a', 0, 22, 1.5); scene.add(l); return l; });
@@ -47,6 +47,8 @@ LA_SETS.world = (app) => {
       const v = { p: [0, 2, -5], at: [0, 1, 0], fov: 50, drift: 0.004, sh: { f: null, R: 14 }, inside: false, far: 6000, refl: false, ghost: 0 };
       laShotCam(this, m, s, t, k, shot, v, RL);
       const dr = v.drift ? laDrift(t, v.drift, 0.3, 11) : [0, 0, 0];
+      // the slam at 3:10:10 (the last of the sky landing): a jolt
+      if (s > 610.1 && s < 611.2) { const j = 0.06 * Math.exp(-(s - 610.1) / 0.25); dr[0] += j * Math.sin(s * 91); dr[1] += j * Math.sin(s * 77 + 1); dr[2] += j * Math.sin(s * 83 + 2); }
       const near = v.near || (v.inside ? 0.02 : 0.05); if (cam.near !== near) cam.near = near;
       if (cam.far !== v.far) cam.far = v.far;
       laCam(cam, laAdd(v.p, dr), laAdd(v.at, dr), v.fov, v.roll || 0);
@@ -117,6 +119,8 @@ LA_SETS.world = (app) => {
       if (s > 599.5 && s < 612) { const u = laSm(s, 599.5, 601) * (1 - laSm(s, 609.5, 612)); p.contrast = 1.06 + 0.08 * u; p.smear.set(0, -0.004 * u); if (s > 606 && s < 610) p.chroma = Math.max(p.chroma || 0, 0.25 * u); }
       // under it: a haze of its colour (murky in the deluge, clear blue-green once the sun is out)
       if (this._below) { p.flash = s < 600 ? 0.3 : 0.08; if (s < 600) p.flashColor.setRGB(0.04, 0.17, 0.2); else p.flashColor.setRGB(0.2, 0.5, 0.55); }
+      // 4:00: the froth (more gas than liquid after a second): the water goes white
+      if (s > LAP.back) { const w = 0.55 * laSm(s, LAP.back + 0.6, LAP.back + 5); if (w > (p.flash || 0) * 0.5) { p.flash = Math.max(p.flash || 0, w); p.flashColor.setRGB(0.8, 0.92, 0.94); } }
       if (s > 609 && s < 614) { p.flashColor.setRGB(1, 1, 1); } if (s > 609 && s < 614) p.flash = Math.max(p.flash || 0, 0.35 * Math.exp(-Math.abs(s - 611.2) / 0.5) * (this._below ? 1 : 0.4));
     },
   };
@@ -155,7 +159,7 @@ function laShotCam(set, m, s, t, k, shot, v, RL) {
     case 'drops': room(); v.p = into(RL(-0.42, 0.78, 0.62), RL(-0.48, 0.74, 0.55), k); v.at = RL(-0.86, 0.5, -0.02); v.fov = 38; v.near = 0.02; v.dropK = 1.6; break;
     case 'room1': room(); v.p = into(RL(0.15, 1.6, -1.2), RL(0.2, 1.62, -1.45), k); v.at = [-6, 3, -50]; v.fov = 56; v.sh = { f: [0, 0, -10], R: 30 }; break;
     case 'real': room(); v.p = into(RL(-0.4, 1.62, -1.55), RL(-0.2, 1.6, -1.35), k); v.at = RL(1.1, 1.0, 1.6); v.fov = 60; break;
-    case 'dark': room(); v.p = into(RL(0.3, 1.5, -1.8), RL(0.35, 1.52, -1.86), k); v.at = [-24, 14, -70]; v.fov = 60; v.sh = { f: [0, 0, -12], R: 30 }; break;
+    case 'dark': room(); v.p = into(RL(0.3, 1.5, -1.8), RL(0.35, 1.52, -1.86), k); v.at = [-24, 14, -70]; v.fov = 60; v.sh = { f: [0, 0, -12], R: 30 }; v.expo = 1 - 0.5 * laSm(t, laC('dark', 0) - 0.4, laC('dark', 0) + 1.6); break;
     case 'weight': v.p = into([8, 1.7, -27], [7, 1.75, -25.5], k); v.at = [1.5, 8.2, 0]; v.fov = 58; v.ghost = 0.85 * laSm(t, laC('weight', 1) - 0.3, laC('weight', 1) + 0.6); v.sh = { f: [0, 6, 0], R: 30 }; v.drift = 0.003; v.rainR = 18; break;
     case 'floor': room(); v.p = into(RL(0.25, 1.5, -2.32), RL(0.25, 1.52, -2.36), k); v.at = [2.5, 0, -8.5]; v.fov = 62; v.sh = { f: [3, 0, -5], R: 14 }; break;
     case 'ears': room(); v.p = into(RL(-1.6, 1.42, 0.95), RL(-1.5, 1.38, 0.85), k); v.at = RL(0.5, 1.15, -1.6); v.fov = 54; v.roll = 2.5 * Math.sin(t * 0.7); break;
@@ -164,14 +168,14 @@ function laShotCam(set, m, s, t, k, shot, v, RL) {
     // ---- 2: the street fills
     case 'stairs': v.p = into([-1.2, 1.5, -7.6], [-1.6, 1.5, -7.2], k); v.at = [-4.2, 1.2, -1.0]; v.fov = 50; v.sh = { f: [-4, 1, -2], R: 10 }; break;
     case 'street': v.p = into([9, 1.62, -5.6], [8, 1.62, -5.4], k); v.at = [-30, 1.0, -3.8]; v.fov = 56; v.sh = { f: [0, 0, -4], R: 20 }; break;
-    case 'lamps': v.p = into([-7, 1.75, -5.2], [-5.5, 1.75, -5.2], k); v.at = [86, 7, -12]; v.fov = 48; v.sh = { f: [30, 0, -5], R: 40 }; v.rainR = 20; break;
+    case 'lamps': v.p = into([-7, 2.7, -5.2], [-5.5, 2.7, -5.2], k); v.at = [86, 7, -12]; v.fov = 48; v.sh = { f: [30, 0, -5], R: 40 }; v.rainR = 20; break;
     case 'cars': v.p = into([0.4, 0.75, -5.0], [0.8, 0.8, -5.1], k); v.at = [4.5, 0.6, -7.95]; v.fov = 50; v.sh = { f: [4, 0.5, -8], R: 8 }; break;
     case 'light': v.p = into([-0.6, 1.45, -2.4], [-0.9, 1.4, -2.5], k); v.at = [-3.0, 0.9, -4.3]; v.fov = 50; v.sh = { f: [-3, 1, -4], R: 8 }; break;
     case 'rising': v.p = E(0, 1.62, 0); v.at = into(E(0.4, 0.6, -1.6), E(0.6, 0.7, -2.4), k); v.fov = 62; v.sh = { f: E(0, 1, -1), R: 8 }; break;
     case 'ball': v.p = into(E(0.4, d + 0.45, -0.6), E(0.5, d + 0.4, -0.7), k); v.at = [1.8, d, -4.7]; v.fov = 46; v.sh = { f: [2, d, -5], R: 8 }; break;
     case 'chin': v.p = E(0, 1.6 + 0.01 * Math.sin(t * 1.3), 0); v.at = E(0.2, 1.48, -6); v.fov = 64; v.sh = { f: E(0, 1, -3), R: 10 }; v.rainR = 10; break;
     case 'breathe': v.p = into(E(0, 1.42, 0), E(0, 1.4, -0.1), k); v.at = E(-0.6, 3.4, -3.4); v.fov = 66; v.sh = { f: E(0, 1, -2), R: 8 }; break;
-    case 'first': { const h = head(set.C.kid); v.p = into([h[0] + 0.9, h[1] - 0.15, h[2] - 1.5], [h[0] + 0.8, h[1] - 0.15, h[2] - 1.35], k); v.at = [h[0] - 0.2, h[1] + 0.25, h[2]]; v.fov = 44; v.sh = { f: h, R: 6 }; break; }
+    case 'first': { const h = head(set.C.kid); v.p = into([h[0] - 0.3, h[1] - 0.12, h[2] - 1.35], [h[0] - 0.25, h[1] - 0.1, h[2] - 1.15], k); v.at = [h[0], h[1] + 0.12, h[2]]; v.fov = 44; v.sh = { f: h, R: 6 }; break; }
     case 'under': v.p = into([7.5, 1.3, -6.6], [6.5, 1.3, -6.4], k); v.at = [-20, 2.2, -3.8]; v.fov = 60; v.sh = { f: [0, 1, -5], R: 20 }; break;
     case 'voice': { const h = head(set.C.folk[0]); v.p = into([h[0] + 1.1, h[1] + 0.05, h[2] - 1.0], [h[0] + 1.0, h[1] + 0.04, h[2] - 0.9], k); v.at = [h[0], h[1] - 0.1, h[2]]; v.fov = 42; v.sh = { f: h, R: 6 }; break; }
     case 'sink': { const st = laCarState('car3', s); v.p = into([-8.6, 0.8, -4.0], [-8.9, 0.8, -4.1], k); v.at = [-12 + st.x, st.y + 0.6, -7.95 + st.z]; v.fov = 54; v.sh = { f: [-12, 1, -8], R: 10 }; break; }
@@ -184,11 +188,11 @@ function laShotCam(set, m, s, t, k, shot, v, RL) {
     case 'deep': v.p = into([-6, 2.4, -8.2], [-4, 2.5, -8.0], k); v.at = [30, 6.5, -3]; v.fov = 60; v.sh = { f: [10, 0, -5], R: 30 }; break;
     case 'flat': room(); v.expo = 1.35; v.p = into(RL(1.7, 1.55, 1.3), RL(1.55, 1.5, 1.15), k); v.at = RL(-0.75, 0.55, -0.3); v.fov = 56; v.sh = { f: RL(-0.5, 0.5, -1), R: 4 }; break;
     case 'glass': room(); v.p = into(RL(-0.62, 0.6, 0.2), RL(-0.65, 0.58, 0.17), k); v.at = RL(-0.88, 0.5, -0.02); v.fov = 30; v.near = 0.01; v.sh = { f: RL(-0.88, 0.5, 0), R: 2 }; break;
-    case 'snell': v.p = into([2, 1.4, -15], [2.2, 1.4, -15.6], k); v.at = [-1, 12, -22]; v.fov = 82; v.sh = { f: [2, 0, -15], R: 20 }; v.refl = true; v.fogK = 0.75; break;
+    case 'snell': v.p = into([2, 1.2, -15], [2.1, 1.2, -15.3], k); v.at = [2 + LA_SUN_UW[0] * 1.6, 11, -15 + LA_SUN_UW[2] * 1.6]; v.fov = 104; v.roll = 14 * k; v.sh = { f: [2, 0, -15], R: 20 }; v.refl = true; v.fogK = 0.75; break;
     case 'moon': v.p = into([2.5, 1.1, -9.6], [1.5, 1.1, -9.6], k); v.at = [-0.5, 1.2, -4.8]; v.fov = 56; v.sh = { f: [0, 1, -5], R: 10 }; break;
-    case 'float': v.p = into([39.5, 10.0, -7.5], [40.5, 10.1, -7.3], k); v.at = [47, 11.3, -1.4]; v.fov = 58; v.sh = { f: [46, 6, -1], R: 14 }; break;
+    case 'float': v.p = into([39.5, 7.0, -7.5], [40.3, 7.2, -7.2], k); v.at = [43.5, 11.6, -4.0]; v.fov = 64; v.sh = { f: [46, 6, -1], R: 14 }; break;
     case 'bins': v.p = into([-6.2, 1.0, -3.3], [-6.6, 0.95, -3.1], k); v.at = [-12, 0.5, -0.7]; v.fov = 52; v.sh = { f: [-10, 0, -1], R: 8 }; break;
-    case 'pond': v.p = into([5.5, 0.7, -45.5], [4.8, 0.65, -46.0], k); v.at = [-3, -0.1, -52.5]; v.fov = 52; v.sh = { f: [0, 0, -50], R: 14 }; break;
+    case 'pond': { const q = laBirdState(0, s, 'duck').pos; v.p = into([q[0] + 1.5, 0.5, q[2] + 1.3], [q[0] + 1.2, 0.42, q[2] + 1.0], k); v.at = [q[0], 0.08, q[2]]; v.fov = 44; } v.sh = { f: [-4, 0, -52], R: 14 }; break;
     case 'birds': { const b = laBirdState(0, s, 'pigeon'); v.p = into([-1.0, 2.6, -15.0], [-0.6, 2.7, -15.4], k); v.at = laV([2, 4, -20], b.pos, 0.6); v.fov = 48; v.sh = { f: [2, 3, -20], R: 10 }; break; }
     case 'bell': v.p = into([64, 12.5, -33], [65.5, 12.6, -32], k); v.at = [88, 16.5, -20.5]; v.fov = 44; v.sh = { f: [88, 14, -20], R: 16 }; break;      // (above it, in the vacuum)
     case 'bell2': v.p = into([80.5, 1.2, -25], [81, 1.25, -24.5], k); v.at = [86, 9.5, -20.5]; v.fov = 62; v.sh = { f: [86, 5, -20], R: 14 }; v.fogK = 0.8; break;
@@ -196,7 +200,7 @@ function laShotCam(set, m, s, t, k, shot, v, RL) {
     case 'cold': v.p = into([2.3, 1.35, -1.6], [2.1, 1.35, -1.7], k); v.at = [-1.0, 0.95, -3.8]; v.fov = 52; v.sh = { f: [0, 1, -3], R: 8 }; break;
     case 'work': { const h = head(set.C.folk[9]); v.p = into([h[0] - 1.3, h[1] + 0.02, h[2] + 1.0], [h[0] - 1.2, h[1], h[2] + 0.9], k); v.at = [h[0], h[1] - 0.12, h[2]]; v.fov = 40; v.sh = { f: h, R: 6 }; break; }
     // ---- 4: 4:00
-    case 'back': v.p = into([-12, 1.5, -6.2], [-10.5, 1.5, -6.0], k); v.at = [12, 1.6, -4.2]; v.fov = 56; v.sh = { f: [0, 1, -4], R: 20 }; break;
+    case 'back': v.p = into([-12, 2.5, -6.2], [-10.5, 2.4, -6.0], k); v.at = [12, 1.6, -4.2]; v.fov = 56; v.sh = { f: [0, 1, -4], R: 20 }; break;
     case 'count': laCountCam(set, s, t, v, RL); break;
     case 'fizz': v.p = E(0, 1.45, 0); v.at = into(E(-1, 3.0, -6), E(-1, 6, -4), k); v.fov = 68; v.sh = { f: E(0, 1, -3), R: 12 }; v.refl = true; break;
     case 'question': v.p = into([8, 1.4, -7.0], [7, 1.45, -6.8], k); v.at = [-12, 3.6, -3]; v.fov = 60; v.sh = { f: [0, 1, -4], R: 20 }; break;

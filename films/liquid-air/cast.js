@@ -116,7 +116,7 @@ function laKidState(s) {
 function laBirdState(i, s, kind) {
   if (kind === 'duck') {
     const pd = LA_ST.pond, a0 = i * 1.3, R = 3 + 2.2 * i, w = 0.03 + 0.01 * (i % 3), ang = a0 + s * w;
-    return { pos: [pd.x - 4 + R * Math.cos(ang), -0.02, pd.z + 0.55 * R * Math.sin(ang)], up: [0, 1, 0], fwd: [-Math.sin(ang), 0, 0.55 * Math.cos(ang)], flap: 0 };
+    return { pos: [pd.x - 4 + R * Math.cos(ang), -0.06, pd.z + 0.55 * R * Math.sin(ang)], up: [0, 1, 0], fwd: [-Math.sin(ang), 0, 0.55 * Math.cos(ang)], flap: 0 };
   }
   // pigeons: slow circles 2–6 m up over the near edge of the park (only once it's all down: they shelter before)
   const R = 4 + 1.4 * (i % 5), w = 0.12 + 0.02 * (i % 3), ang = s * w + i * 0.63, c = [2, 3.0 + 0.8 * (i % 4), -20];

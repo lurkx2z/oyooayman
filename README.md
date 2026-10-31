@@ -80,6 +80,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > foundations, everything loose goes round in circles of radius speed × 57 s (the cars 10 km up), and at 4:06:00 down
 > is down for one second, with the first car due to land 6 km west at 4:07:05. Physics, shots and review log:
 > [`films/gravity-keeps-tilting/PLAN.md`](films/gravity-keeps-tilting/PLAN.md).
+>
+> ***What if the air turned into a breathable liquid for one hour?*** — open `liquid-air.html` (16:9, voiceless, 5:47).
+> At 3:00 on a Saturday afternoon all the air on Earth starts turning into a clear liquid you can breathe, a little more
+> every second, all of it by 3:10. It rains in your living room out of nothing, the sun goes out behind kilometres of
+> falling sky, the street fills (the cars float at 70 cm, footballs go soft), you breathe it, and at 3:10 the last 7
+> metres of sky land in ten seconds. Then the sun comes out into a black sky, seen from 11.8 m down through Snell's
+> window; your flat, 20 cm above the surface, is a vacuum where your glass of water boils and freezes; and at 4:00 it
+> all turns back. The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/liquid-air/PLAN.md`](films/liquid-air/PLAN.md).
 
 | Time | Beat |
 |---|---|
