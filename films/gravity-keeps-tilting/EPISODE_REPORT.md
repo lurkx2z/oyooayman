@@ -125,7 +125,6 @@ and the trees (a blob of crown against the sky).
 - The pigeon flying belly-up is clear in the frames but small on a phone.
 - The church tower holds because it is concrete with steel inside (said by a label), not shown being tested.
 - Thinner air high up isn't modelled (the cars would go a little higher and faster); the film says "about 10 km".
-- The preview was rendered at 480×270; the final 1080p needs the PC render.
 
 ## Sound
 
@@ -154,9 +153,11 @@ narrower than film 1's (8.8 LU): the ticks and the alarms keep a floor under the
   (`gravity-keeps-tilting-film.zip`: unzip, double-click `gravity-keeps-tilting.html`, press Space). The unzipped copy
   was checked: it boots and plays the baked soundtrack (the rounded fingerprint, so other browsers don't fall back to
   live sound).
-- Final 1080p: to render on the owner's PC with
+- Final 1080p: **rendered on the owner's PC on 31 October 2026** (11,263 frames in 15 minutes, ~13.4 fps on the RTX
+  3060 Ti through Chrome, 2 workers, one pass, no errors) with
   `node films/gravity-keeps-tilting/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\gravity-keeps-tilting`
-  → `gravity-keeps-tilting_final_1080p.mp4` (1920×1080, 30 fps, H.264 + the AAC 256k soundtrack). Not rendered yet.
+  → `D:\renders\gravity-keeps-tilting\gravity-keeps-tilting_final_1080p.mp4`: 375.4 s, 1,055 MiB, 1920×1080, 30 fps,
+  H.264 + AAC 256k, −15.3 LUFS integrated, −1.4 dBTP true peak; the 8 check frames are clean. 1080p only.
 - Thumbnails in the house style (real film frames, 1280×720) in the project files: `thumb-ceiling.jpg` (183° · your
   sofa is on the ceiling), `thumb-church.jpg` (100° · the cars fall sideways), `thumb-block.jpg` (192° · your building
   hangs from its foundations).
