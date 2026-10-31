@@ -28,7 +28,7 @@ dsSound('sfx', 'events', function (ctx, bus, K) {
   const quake = (s0, d, inRoom) => {
     const t0 = f(s0), n = Math.ceil((d + 2) * sr), y = dsNoise(fx, n, 'brown');
     for (let i = 0; i < n; i++) { const s = s0 + i / sr; y[i] *= dsQuake(s) * 1.4 + (s > s0 + d ? Math.exp(-(s - s0 - d) / 0.6) * 0.3 : 0); }
-    DSX.bq(y, 'lp', 140, 0.7, sr); K.putLR(y, Float32Array.from(y), t0, { vol: 1.0, norm: true });
+    DSX.bq(y, 'lp', 140, 0.7, sr); K.putLR(y, Float32Array.from(y), t0, { vol: 0.6, norm: true });
     for (let k = 0; k < (inRoom ? 70 : 30); k++) { const tt = s0 + fx.r.range(0.3, d - 0.5), q = dsQuake(tt); if (fx.r.next() > q) continue;
       const m = inRoom ? [fx.cupModes(), fx.saucerModes(), fx.glassModes(), fx.panelModes(0.5)][k % 4] : fx.stoneModes(fx.r.range(0.6, 1.2));
       K.put(fx.hit(m, { width: 0.001, amp: 0.5, noise: 0.3, nlen: 0.01, nhp: 800, len: 0.6 }), f(tt), { vol: 0.06 + 0.12 * q, pan: fx.r.range(-0.7, 0.7), room: inRoom ? room : street, wet: 0.5 }); }

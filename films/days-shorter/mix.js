@@ -6,9 +6,9 @@
 const DS_MIXSH = (m) => DS_SHOTS.find((s) => s.mode === m);
 window.DS_MIX = {
   stems: {
-    music: { gain: 2, hp: 32 },
-    amb: { gain: 5, hp: 28 },
-    sfx: { gain: 13, hp: 25 },
+    music: { gain: 10, hp: 32 },   // v2: the score leads (it was buried ~13 dB under the beds: the owner heard "no soundtrack")
+    amb: { gain: -10, hp: 28 },    // the street and room beds sit ~10 dB under the score
+    sfx: { gain: 8, hp: 25 },
   },
   dyn: {
     // the score sits under the big moments (the quakes, the spire's crash) and comes up for the endings; the last frame
@@ -20,7 +20,7 @@ window.DS_MIX = {
     amb: [[0, 0, 0], ['end', -0.04, 0], ['end', 0, -60]],
     sfx: [['end', -0.04, 0], ['end', 0, -60]],
   },
-  master: -6.6,
+  master: -1.6,
   eq: [['lowshelf', 110, -2.5], ['highshelf', 3500, 2]],
   ceiling: -2.5,   // dBTP, the limiter's ceiling (dsLimit)
 };

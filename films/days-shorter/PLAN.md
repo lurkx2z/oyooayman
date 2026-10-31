@@ -174,7 +174,8 @@ creaking, falling, the parked cars' tyres scraping, the dawn chorus. Score: a D 
 the quake, an accelerating pulse in B minor through the week (thinning for the marble), bells over the jump, a
 heartbeat on Saturday, hits on the sofa and the spire, a 9-second swell for the last sunset, stars on F minor 9 with
 bells, a big chord and the theme at the last sunrise, cut on the question. The soundtrack is baked
-(`soundtrack.js`, `final-soundtrack.m4a`) with the shared fingerprint check.
+(`soundtrack.js`, `final-soundtrack.m4a`) with the shared fingerprint check. Mix v2 (after the owner heard no music in the first
+1080p): the score leads, the beds sit about 10 dB under it (stems measured solo; see EPISODE_REPORT.md § Sound).
 
 ## 7. Review log
 

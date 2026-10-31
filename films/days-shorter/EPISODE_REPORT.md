@@ -120,9 +120,13 @@ window wall (the radiator rings), the spire cracking, creaking, falling and land
 the dawn chorus. Score: a D major figure for Sunday, a drone under the quake, an accelerating pulse in B minor through
 the week, bells over the jump, a heartbeat on Saturday, hits on the sofa and the spire, a 9-second swell for the last
 sunset, stars on F minor 9 with bells, a big chord and the theme at the last sunrise, cut on the question.
-Loudness: −14.9 LUFS integrated, −2.3 dBTP true peak, 9.0 LU loudness range in the WAV (the score lifted 3 dB through
-the news and the scale/push explainers, which first sat at −23 LUFS); the AAC 256k `final-soundtrack.m4a` for the PC
-render, encoded through a limiter because the plain AAC overshot to −0.8 dBTP: −15.3 LUFS, −2.1 dBTP.
+**v2 mix (31 October 2026, after the owner heard "no soundtrack" in the first 1080p).** The music was in the first
+mix but buried: measured alone, the stems were music −23.7, beds −13.7, effects −18.8 LUFS, and with the stem gains
+carried over from the liquid-air film (+2 / +5 / +13 dB) the street and wind beds sat about 13 dB above the score, so it
+read as hiss. v2: music +10, beds −10, effects +8 dB, master −1.6, the first quake's rumble 4 dB down. Now the score
+leads and the beds sit about 10 dB under it. Loudness: −15.0 LUFS integrated, −2.2 dBTP, 5.7 LU loudness range in the
+WAV; the AAC 256k `final-soundtrack.m4a` for the PC render, encoded through a limiter (the plain AAC overshoots to
+−1.1 dBTP): −15.3 LUFS, −2.4 dBTP.
 
 ## Delivery
 
@@ -131,9 +135,10 @@ render, encoded through a limiter because the plain AAC overshot to −0.8 dBTP:
   Space).
 - Final 1080p: on the owner's PC with
   `node films/days-shorter/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\days-shorter`
-  → `D:\renders\days-shorter\days-shorter_final_1080p.mp4`. Rendered on 31 October 2026 in about 9 minutes (Chrome on
-  the GPU, 2 workers, no errors): 5:34.6, 1920×1080 30 fps, 988 MiB, −15.3 LUFS, −2.1 dBTP; frames at 4:25 and 5:20
-  checked.
+  → `D:\renders\days-shorter\days-shorter_final_1080p.mp4` (v1, first mix: 5:34.6, 988 MiB, rendered in about 9 minutes,
+  no errors). **The deliverable is v2** (same picture, v2 mix): the v1 picture with the new `final-soundtrack.m4a`
+  (`ffmpeg -i <v1 mp4> -i films/days-shorter/final-soundtrack.m4a -map 0:v -map 1:a -c copy -t 334.55 -movflags +faststart`)
+  → `D:\renders\days-shorter-v2\days-shorter_final_1080p.mp4`.
 - Thumbnails in the house style (real film frames, 1280×720): `thumb-cliff.jpg` (74 min · your street is a cliff
   now), `thumb-sunset.jpg` (9 s · the sun sets in nine seconds), `thumb-spire.jpg` (35 % · the church spire).
 
