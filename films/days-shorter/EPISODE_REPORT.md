@@ -138,7 +138,8 @@ WAV; the AAC 256k `final-soundtrack.m4a` for the PC render, encoded through a li
   → `D:\renders\days-shorter\days-shorter_final_1080p.mp4` (v1, first mix: 5:34.6, 988 MiB, rendered in about 9 minutes,
   no errors). **The deliverable is v2** (same picture, v2 mix): the v1 picture with the new `final-soundtrack.m4a`
   (`ffmpeg -i <v1 mp4> -i films/days-shorter/final-soundtrack.m4a -map 0:v -map 1:a -c copy -t 334.55 -movflags +faststart`)
-  → `D:\renders\days-shorter-v2\days-shorter_final_1080p.mp4`.
+  → `D:\renders\days-shorter-v2\days-shorter_final_1080p.mp4`: made on the owner's PC on 31 October 2026, 5:34.6,
+  988 MiB, one H.264 1920×1080 stream and one AAC stream, −15.3 LUFS, −2.4 dBTP, 5.1 LU.
 - Thumbnails in the house style (real film frames, 1280×720): `thumb-cliff.jpg` (74 min · your street is a cliff
   now), `thumb-sunset.jpg` (9 s · the sun sets in nine seconds), `thumb-spire.jpg` (35 % · the church spire).
 
