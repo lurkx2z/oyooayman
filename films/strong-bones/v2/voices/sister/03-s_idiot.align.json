@@ -1,7 +1,7 @@
 {
  "id": "03-s_idiot",
  "text": "You're such an idiot.",
- "seconds": 1.99,
+ "seconds": 2.14,
  "source": "forced-alignment",
  "words": [
   {
@@ -22,7 +22,7 @@
   {
    "text": "idiot.",
    "start": 1,
-   "end": 1.5
+   "end": 1.52
   }
  ],
  "characters": [
@@ -114,22 +114,22 @@
   {
    "text": "i",
    "start": 1.12,
-   "end": 1.387
+   "end": 1.253
   },
   {
    "text": "o",
-   "start": 1.387,
-   "end": 1.653
+   "start": 1.253,
+   "end": 1.387
   },
   {
    "text": "t",
-   "start": 1.653,
-   "end": 1.92
+   "start": 1.387,
+   "end": 1.52
   },
   {
    "text": ".",
-   "start": 1.92,
-   "end": 2
+   "start": 1.52,
+   "end": 2.08
   }
  ],
  "tts_words": [
@@ -151,7 +151,7 @@
   {
    "text": "idiot.",
    "start": 0.96,
-   "end": 2
+   "end": 2.08
   }
  ],
  "characters_forced": [
@@ -168,16 +168,16 @@
   {
    "text": "u",
    "start": 0.12,
-   "end": 0.12
+   "end": 0.14
   },
   {
    "text": "'",
-   "start": 0.12,
-   "end": 0.12
+   "start": 0.14,
+   "end": 0.14
   },
   {
    "text": "r",
-   "start": 0.16,
+   "start": 0.18,
    "end": 0.2
   },
   {
@@ -198,11 +198,11 @@
   {
    "text": "u",
    "start": 0.48,
-   "end": 0.5
+   "end": 0.52
   },
   {
    "text": "c",
-   "start": 0.5,
+   "start": 0.52,
    "end": 0.58
   },
   {
@@ -238,27 +238,27 @@
   {
    "text": "d",
    "start": 1.06,
-   "end": 1.16
+   "end": 1.14
   },
   {
    "text": "i",
-   "start": 1.16,
-   "end": 1.22
+   "start": 1.14,
+   "end": 1.24
   },
   {
    "text": "o",
-   "start": 1.26,
+   "start": 1.24,
    "end": 1.34
   },
   {
    "text": "t",
-   "start": 1.44,
-   "end": 1.5
+   "start": 1.46,
+   "end": 1.52
   },
   {
    "text": ".",
-   "start": 1.5,
-   "end": 1.5
+   "start": 1.52,
+   "end": 1.52
   }
  ]
 }
