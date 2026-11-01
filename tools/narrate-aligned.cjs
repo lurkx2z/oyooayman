@@ -97,6 +97,8 @@ async function main() {
     stability: parseFloat(args.stability ?? meta.stability ?? N.DEFAULT_SETTINGS.stability),
     similarity_boost: parseFloat(args.similarity ?? meta.similarity ?? N.DEFAULT_SETTINGS.similarity_boost),
   };
+  const speed = args.speed ?? meta.speed;   // optional ElevenLabs speaking rate (0.7-1.2); only sent when set
+  if (speed != null && speed !== '') voiceSettings.speed = parseFloat(speed);
   console.log(`${clips.length} clip(s), ${clips.reduce((n, c) => n + c.text.length, 0)} characters, voice ${voice}, model ${model}, ${format}, stability ${voiceSettings.stability}, similarity ${voiceSettings.similarity_boost}`);
   if (args['dry-run']) { clips.forEach((c) => console.log(`  [${c.id}] ${c.text}`)); console.log('dry run: nothing sent.'); return; }
   const apiKey = N.requireKey();

@@ -12,7 +12,7 @@ on:
         default: false
   push:
     branches: ["claude/project-thread-qptq9u"]
-    paths: ["films/strong-bones/NARRATION*.md", ".github/workflows/narrate-strong-bones.yml"]
+    paths: ["films/strong-bones/v2/VO-*.md", ".github/workflows/narrate-strong-bones.yml"]
 
 permissions:
   contents: write
@@ -43,16 +43,17 @@ jobs:
           FORCE: ${{ inputs.force && '--force' || '' }}
         run: |
           if [ -z "$ELEVENLABS_API_KEY" ]; then echo "::error::The secret ELEVENLABS_API_KEY is missing."; exit 1; fi
-          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION.md" $FORCE
-          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION.md" --realign --summary "$GITHUB_STEP_SUMMARY"
-          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION-SISTER.md" --out "films/$SLUG/narration-sister" $FORCE
-          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION-SISTER.md" --out "films/$SLUG/narration-sister" --realign --summary "$GITHUB_STEP_SUMMARY"
+          for f in films/$SLUG/v2/VO-*.md; do
+            role=$(basename "$f" .md); role=${role#VO-}
+            node tools/narrate-aligned.cjs --script "$f" --out "films/$SLUG/v2/voices/$role" $FORCE
+            node tools/narrate-aligned.cjs --script "$f" --out "films/$SLUG/v2/voices/$role" --realign --summary "$GITHUB_STEP_SUMMARY"
+          done
       - name: Commit the clips back to this branch
         if: always()
         run: |
           git config user.name "narration-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "films/$SLUG/narration" "films/$SLUG/narration-sister" 2>/dev/null || true
+          git add "films/$SLUG/v2/voices" 2>/dev/null || true
           if git diff --cached --quiet; then echo "nothing new to commit"; exit 0; fi
           git commit -m "narration: $SLUG clips / word timestamps (ElevenLabs, run ${GITHUB_RUN_ID})"
           for i in 1 2 3 4; do
