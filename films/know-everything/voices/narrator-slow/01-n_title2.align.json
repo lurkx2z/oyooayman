@@ -1,0 +1,474 @@
+{
+ "id": "01-n_title2",
+ "text": "What if you suddenly knew... everything?",
+ "seconds": 3.19,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "What",
+   "start": 0.14,
+   "end": 0.26
+  },
+  {
+   "text": "if",
+   "start": 0.32,
+   "end": 0.42
+  },
+  {
+   "text": "you",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "suddenly",
+   "start": 0.76,
+   "end": 1.14
+  },
+  {
+   "text": "knew...",
+   "start": 1.24,
+   "end": 1.58
+  },
+  {
+   "text": "everything?",
+   "start": 2.34,
+   "end": 2.84
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.15
+  },
+  {
+   "text": "h",
+   "start": 0.15,
+   "end": 0.18
+  },
+  {
+   "text": "a",
+   "start": 0.18,
+   "end": 0.21
+  },
+  {
+   "text": "t",
+   "start": 0.21,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "i",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "f",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.52
+  },
+  {
+   "text": "y",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "o",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "u",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "s",
+   "start": 0.72,
+   "end": 0.92
+  },
+  {
+   "text": "u",
+   "start": 0.92,
+   "end": 0.949
+  },
+  {
+   "text": "d",
+   "start": 0.949,
+   "end": 0.977
+  },
+  {
+   "text": "d",
+   "start": 0.977,
+   "end": 1.006
+  },
+  {
+   "text": "e",
+   "start": 1.006,
+   "end": 1.034
+  },
+  {
+   "text": "n",
+   "start": 1.034,
+   "end": 1.063
+  },
+  {
+   "text": "l",
+   "start": 1.063,
+   "end": 1.091
+  },
+  {
+   "text": "y",
+   "start": 1.091,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "k",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "n",
+   "start": 1.28,
+   "end": 1.387
+  },
+  {
+   "text": "e",
+   "start": 1.387,
+   "end": 1.493
+  },
+  {
+   "text": "w",
+   "start": 1.493,
+   "end": 1.6
+  },
+  {
+   "text": ".",
+   "start": 1.6,
+   "end": 1.813
+  },
+  {
+   "text": ".",
+   "start": 1.813,
+   "end": 2.027
+  },
+  {
+   "text": ".",
+   "start": 2.027,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.56
+  },
+  {
+   "text": "e",
+   "start": 2.56,
+   "end": 2.592
+  },
+  {
+   "text": "v",
+   "start": 2.592,
+   "end": 2.624
+  },
+  {
+   "text": "e",
+   "start": 2.624,
+   "end": 2.656
+  },
+  {
+   "text": "r",
+   "start": 2.656,
+   "end": 2.688
+  },
+  {
+   "text": "y",
+   "start": 2.688,
+   "end": 2.72
+  },
+  {
+   "text": "t",
+   "start": 2.72,
+   "end": 2.752
+  },
+  {
+   "text": "h",
+   "start": 2.752,
+   "end": 2.784
+  },
+  {
+   "text": "i",
+   "start": 2.784,
+   "end": 2.816
+  },
+  {
+   "text": "n",
+   "start": 2.816,
+   "end": 2.848
+  },
+  {
+   "text": "g",
+   "start": 2.848,
+   "end": 2.88
+  },
+  {
+   "text": "?",
+   "start": 2.88,
+   "end": 3.12
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "What",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "if",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "you",
+   "start": 0.52,
+   "end": 0.64
+  },
+  {
+   "text": "suddenly",
+   "start": 0.72,
+   "end": 1.12
+  },
+  {
+   "text": "knew...",
+   "start": 1.2,
+   "end": 2.24
+  },
+  {
+   "text": "everything?",
+   "start": 2.56,
+   "end": 3.12
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": "h",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "a",
+   "start": 0.2,
+   "end": 0.22
+  },
+  {
+   "text": "t",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.32
+  },
+  {
+   "text": "i",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "f",
+   "start": 0.38,
+   "end": 0.42
+  },
+  {
+   "text": " ",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": "y",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": "o",
+   "start": 0.5,
+   "end": 0.5
+  },
+  {
+   "text": "u",
+   "start": 0.5,
+   "end": 0.54
+  },
+  {
+   "text": " ",
+   "start": 0.54,
+   "end": 0.76
+  },
+  {
+   "text": "s",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "u",
+   "start": 0.82,
+   "end": 0.84
+  },
+  {
+   "text": "d",
+   "start": 0.84,
+   "end": 0.86
+  },
+  {
+   "text": "d",
+   "start": 0.86,
+   "end": 0.9
+  },
+  {
+   "text": "e",
+   "start": 0.9,
+   "end": 0.94
+  },
+  {
+   "text": "n",
+   "start": 0.94,
+   "end": 1.06
+  },
+  {
+   "text": "l",
+   "start": 1.06,
+   "end": 1.12
+  },
+  {
+   "text": "y",
+   "start": 1.12,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.24
+  },
+  {
+   "text": "k",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": "n",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "e",
+   "start": 1.36,
+   "end": 1.38
+  },
+  {
+   "text": "w",
+   "start": 1.38,
+   "end": 1.58
+  },
+  {
+   "text": ".",
+   "start": 1.58,
+   "end": 1.58
+  },
+  {
+   "text": ".",
+   "start": 1.58,
+   "end": 1.58
+  },
+  {
+   "text": ".",
+   "start": 1.58,
+   "end": 1.58
+  },
+  {
+   "text": " ",
+   "start": 1.58,
+   "end": 2.34
+  },
+  {
+   "text": "e",
+   "start": 2.34,
+   "end": 2.42
+  },
+  {
+   "text": "v",
+   "start": 2.42,
+   "end": 2.44
+  },
+  {
+   "text": "e",
+   "start": 2.44,
+   "end": 2.48
+  },
+  {
+   "text": "r",
+   "start": 2.48,
+   "end": 2.54
+  },
+  {
+   "text": "y",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "t",
+   "start": 2.64,
+   "end": 2.66
+  },
+  {
+   "text": "h",
+   "start": 2.66,
+   "end": 2.72
+  },
+  {
+   "text": "i",
+   "start": 2.72,
+   "end": 2.74
+  },
+  {
+   "text": "n",
+   "start": 2.74,
+   "end": 2.82
+  },
+  {
+   "text": "g",
+   "start": 2.82,
+   "end": 2.84
+  },
+  {
+   "text": "?",
+   "start": 2.84,
+   "end": 2.84
+  }
+ ]
+}

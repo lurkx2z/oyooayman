@@ -1,0 +1,48 @@
+{
+  "voice": "uju3wxzG5OhpWcoi3SMy",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.5,
+    "similarity_boost": 0.75,
+    "speed": 0.9
+  },
+  "clips": [
+    {
+      "id": "01-n_title2",
+      "text": "What if you suddenly knew... everything?",
+      "file": "01-n_title2.mp3",
+      "align": "01-n_title2.align.json",
+      "seconds": 3.19,
+      "speech_start": 0.14,
+      "speech_end": 2.84,
+      "hash": "0ba9f4196b358351",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-n_first2",
+      "text": "And for the first time all week... you don't know... what you're going to do.",
+      "file": "02-n_first2.mp3",
+      "align": "02-n_first2.align.json",
+      "seconds": 5.02,
+      "speech_start": 0.02,
+      "speech_end": 4.34,
+      "hash": "eb98291776a728f4",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-n_cta2",
+      "text": "So... what would you have written?",
+      "file": "03-n_cta2.mp3",
+      "align": "03-n_cta2.align.json",
+      "seconds": 2.22,
+      "speech_start": 0.18,
+      "speech_end": 1.9,
+      "hash": "97c308165d0f43bc",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}
