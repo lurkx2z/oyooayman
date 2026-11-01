@@ -17,7 +17,7 @@ const SEQ = [
   ['n', 'final', 0.85],
   ['n', 'scaffold', 0.5],
   ['n', 'cost', 0.3],
-  ['n', 'after', 7.2],      // ★ the choice: no voice, then the run and the catch
+  ['n', 'after', 6.6],      // ★ the choice: no voice, then the run and the catch
   ['s', 'sis2', 0.45],
   ['n', 'letter', 0.7],
   ['n', 'cta', 0.6],
