@@ -45,6 +45,11 @@ you can't predict. That rule decides the ending.
 Narrator Michael (speed 1.06), you Liam, Maya Jessica, Mom Matilda, the teacher Bill, a classmate Will, the news anchor
 Brian, the physicist Alice, the agent Lily. Scripts: `VO-*.md`; clips and word timings land in `voices/<role>/`.
 
+## Final (2026-11-01)
+6:06 (365.97 s), 88 shots, 59 voice clips. MP4 1080p30 two-pass 535k + AAC 128k = 29.4 MiB, −15.2 LUFS, −1.5 dBTP,
+LRA 4.1 LU; music about 18 dB over the ambience. Runnable ZIP (page + films/know-everything + fonts), tested: plays with
+sound on a click. Delivered as `know-everything_1080p.mp4` and `know-everything.zip`.
+
 ## Files
 - `../../know-everything.html` — the page (Space plays). Canvas 2D, no WebGL.
 - `VO-*.md` — one voice script per character; `voices/<role>/` — the clips + word timings (from Actions).
