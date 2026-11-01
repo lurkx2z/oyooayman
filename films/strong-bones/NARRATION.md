@@ -15,17 +15,17 @@ similarity: 0.75
 
 [title] What if you were ten times stronger... but your bones weren't?
 
-[rule] Your muscles got ten times stronger. Your bones, your tendons, your skin... stayed exactly the same.
+[rule] Your muscles got ten times stronger. Your bones... didn't.
 
-[nuance] And that's a real problem. Normal muscles can already pull hard enough to break a bone. Your brain holds them back. Yours has to hold back ten times harder.
+[nuance] And that's a problem. Normal muscles can already pull hard enough to break a bone. Your brain holds them back. Yours has to hold back ten times harder.
 
 [record] So you learn to lift slowly. Smoothly. And you beat the world record by three hundred kilos.
 
 [nick] They call you Glass Hercules.
 
-[final] The Olympic final. Your last lift. Gold is right there.
+[final] The Olympic final. Last lift. Gold is right there.
 
-[scaffold] Then, through the loading door, you see the scaffolding outside start to lean. Your sister is standing right under it.
+[scaffold] Then, through the loading door, you see the scaffolding outside start to lean. Your sister is right under it.
 
 [cost] Catch it, and both your arms break.
 
