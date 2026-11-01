@@ -6,28 +6,28 @@
  "words": [
   {
    "text": "They",
-   "start": 0.08,
-   "end": 0.2
+   "start": 0.1,
+   "end": 0.22
   },
   {
    "text": "call",
-   "start": 0.26,
-   "end": 0.44
+   "start": 0.28,
+   "end": 0.5
   },
   {
    "text": "you",
-   "start": 0.54,
-   "end": 0.62
+   "start": 0.56,
+   "end": 0.66
   },
   {
    "text": "Glass",
-   "start": 0.76,
+   "start": 0.82,
    "end": 1.18
   },
   {
    "text": "Hercules.",
-   "start": 1.3,
-   "end": 2
+   "start": 1.32,
+   "end": 2.02
   }
  ],
  "characters": [
@@ -79,51 +79,51 @@
   {
    "text": " ",
    "start": 0.48,
-   "end": 0.6
+   "end": 0.56
   },
   {
    "text": "y",
-   "start": 0.6,
-   "end": 0.64
+   "start": 0.56,
+   "end": 0.613
   },
   {
    "text": "o",
-   "start": 0.64,
-   "end": 0.68
+   "start": 0.613,
+   "end": 0.667
   },
   {
    "text": "u",
-   "start": 0.68,
+   "start": 0.667,
    "end": 0.72
   },
   {
    "text": " ",
    "start": 0.72,
-   "end": 0.96
+   "end": 0.8
   },
   {
    "text": "G",
-   "start": 0.96,
-   "end": 1.008
+   "start": 0.8,
+   "end": 0.88
   },
   {
    "text": "l",
-   "start": 1.008,
-   "end": 1.056
+   "start": 0.88,
+   "end": 0.96
   },
   {
    "text": "a",
-   "start": 1.056,
-   "end": 1.104
+   "start": 0.96,
+   "end": 1.04
   },
   {
    "text": "s",
-   "start": 1.104,
-   "end": 1.152
+   "start": 1.04,
+   "end": 1.12
   },
   {
    "text": "s",
-   "start": 1.152,
+   "start": 1.12,
    "end": 1.2
   },
   {
@@ -134,21 +134,21 @@
   {
    "text": "H",
    "start": 1.28,
-   "end": 1.4
+   "end": 1.36
   },
   {
    "text": "e",
-   "start": 1.4,
-   "end": 1.44
+   "start": 1.36,
+   "end": 1.413
   },
   {
    "text": "r",
-   "start": 1.44,
-   "end": 1.48
+   "start": 1.413,
+   "end": 1.467
   },
   {
    "text": "c",
-   "start": 1.48,
+   "start": 1.467,
    "end": 1.52
   },
   {
@@ -190,12 +190,12 @@
   },
   {
    "text": "you",
-   "start": 0.6,
+   "start": 0.56,
    "end": 0.72
   },
   {
    "text": "Glass",
-   "start": 0.96,
+   "start": 0.8,
    "end": 1.2
   },
   {
@@ -207,148 +207,148 @@
  "characters_forced": [
   {
    "text": "T",
-   "start": 0.08,
+   "start": 0.1,
    "end": 0.1
   },
   {
    "text": "h",
    "start": 0.1,
-   "end": 0.1
+   "end": 0.12
   },
   {
    "text": "e",
-   "start": 0.1,
-   "end": 0.14
+   "start": 0.12,
+   "end": 0.16
   },
   {
    "text": "y",
-   "start": 0.14,
-   "end": 0.2
+   "start": 0.16,
+   "end": 0.22
   },
   {
    "text": " ",
-   "start": 0.2,
-   "end": 0.26
-  },
-  {
-   "text": "c",
-   "start": 0.26,
+   "start": 0.22,
    "end": 0.28
   },
   {
-   "text": "a",
-   "start": 0.34,
+   "text": "c",
+   "start": 0.28,
    "end": 0.36
   },
   {
-   "text": "l",
+   "text": "a",
    "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": "l",
+   "start": 0.38,
    "end": 0.4
   },
   {
    "text": "l",
    "start": 0.4,
-   "end": 0.44
+   "end": 0.5
   },
   {
    "text": " ",
-   "start": 0.44,
-   "end": 0.54
+   "start": 0.5,
+   "end": 0.56
   },
   {
    "text": "y",
-   "start": 0.54,
-   "end": 0.56
+   "start": 0.56,
+   "end": 0.58
   },
   {
    "text": "o",
-   "start": 0.56,
-   "end": 0.56
+   "start": 0.58,
+   "end": 0.6
   },
   {
    "text": "u",
-   "start": 0.56,
-   "end": 0.62
+   "start": 0.6,
+   "end": 0.66
   },
   {
    "text": " ",
-   "start": 0.62,
-   "end": 0.76
+   "start": 0.66,
+   "end": 0.82
   },
   {
    "text": "G",
-   "start": 0.76,
-   "end": 0.86
+   "start": 0.82,
+   "end": 0.9
   },
   {
    "text": "l",
-   "start": 0.86,
-   "end": 0.96
+   "start": 0.9,
+   "end": 0.98
   },
   {
    "text": "a",
-   "start": 0.96,
-   "end": 1.02
-  },
-  {
-   "text": "s",
-   "start": 1.02,
+   "start": 0.98,
    "end": 1.04
   },
   {
    "text": "s",
-   "start": 1.14,
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "s",
+   "start": 1.16,
    "end": 1.18
   },
   {
    "text": " ",
    "start": 1.18,
-   "end": 1.3
+   "end": 1.32
   },
   {
    "text": "H",
-   "start": 1.3,
-   "end": 1.34
+   "start": 1.32,
+   "end": 1.36
   },
   {
    "text": "e",
-   "start": 1.34,
-   "end": 1.38
+   "start": 1.36,
+   "end": 1.4
   },
   {
    "text": "r",
-   "start": 1.38,
-   "end": 1.48
+   "start": 1.4,
+   "end": 1.5
   },
   {
    "text": "c",
-   "start": 1.48,
+   "start": 1.5,
    "end": 1.52
   },
   {
    "text": "u",
    "start": 1.52,
-   "end": 1.58
+   "end": 1.6
   },
   {
    "text": "l",
-   "start": 1.64,
-   "end": 1.66
+   "start": 1.66,
+   "end": 1.68
   },
   {
    "text": "e",
-   "start": 1.66,
-   "end": 1.8
+   "start": 1.68,
+   "end": 1.82
   },
   {
    "text": "s",
-   "start": 1.8,
-   "end": 2
+   "start": 1.82,
+   "end": 2.02
   },
   {
    "text": ".",
-   "start": 2,
-   "end": 2
+   "start": 2.02,
+   "end": 2.02
   }
  ]
 }

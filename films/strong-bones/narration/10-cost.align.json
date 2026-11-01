@@ -1,7 +1,7 @@
 {
  "id": "10-cost",
  "text": "Catch it, and both your arms break.",
- "seconds": 2.72,
+ "seconds": 2.61,
  "source": "forced-alignment",
  "words": [
   {
@@ -12,7 +12,7 @@
   {
    "text": "it,",
    "start": 0.38,
-   "end": 0.52
+   "end": 0.5
   },
   {
    "text": "and",
@@ -26,7 +26,7 @@
   },
   {
    "text": "your",
-   "start": 1.3,
+   "start": 1.32,
    "end": 1.44
   },
   {
@@ -44,41 +44,41 @@
   {
    "text": "C",
    "start": 0,
-   "end": 0.064
+   "end": 0.048
   },
   {
    "text": "a",
-   "start": 0.064,
-   "end": 0.128
+   "start": 0.048,
+   "end": 0.096
   },
   {
    "text": "t",
-   "start": 0.128,
-   "end": 0.192
+   "start": 0.096,
+   "end": 0.144
   },
   {
    "text": "c",
-   "start": 0.192,
-   "end": 0.256
+   "start": 0.144,
+   "end": 0.192
   },
   {
    "text": "h",
-   "start": 0.256,
-   "end": 0.32
+   "start": 0.192,
+   "end": 0.24
   },
   {
    "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "i",
    "start": 0.32,
    "end": 0.4
   },
   {
-   "text": "i",
-   "start": 0.4,
-   "end": 0.44
-  },
-  {
    "text": "t",
-   "start": 0.44,
+   "start": 0.4,
    "end": 0.48
   },
   {
@@ -214,18 +214,18 @@
   {
    "text": ".",
    "start": 2.16,
-   "end": 2.64
+   "end": 2.56
   }
  ],
  "tts_words": [
   {
    "text": "Catch",
    "start": 0,
-   "end": 0.32
+   "end": 0.24
   },
   {
    "text": "it,",
-   "start": 0.4,
+   "start": 0.32,
    "end": 0.72
   },
   {
@@ -251,7 +251,7 @@
   {
    "text": "break.",
    "start": 1.84,
-   "end": 2.64
+   "end": 2.56
   }
  ],
  "characters_forced": [
@@ -288,21 +288,21 @@
   {
    "text": "i",
    "start": 0.38,
-   "end": 0.44
+   "end": 0.48
   },
   {
    "text": "t",
-   "start": 0.44,
-   "end": 0.52
+   "start": 0.48,
+   "end": 0.5
   },
   {
    "text": ",",
-   "start": 0.52,
-   "end": 0.52
+   "start": 0.5,
+   "end": 0.5
   },
   {
    "text": " ",
-   "start": 0.52,
+   "start": 0.5,
    "end": 0.78
   },
   {
@@ -333,11 +333,11 @@
   {
    "text": "o",
    "start": 1.08,
-   "end": 1.12
+   "end": 1.14
   },
   {
    "text": "t",
-   "start": 1.12,
+   "start": 1.14,
    "end": 1.22
   },
   {
@@ -348,16 +348,16 @@
   {
    "text": " ",
    "start": 1.26,
-   "end": 1.3
-  },
-  {
-   "text": "y",
-   "start": 1.3,
    "end": 1.32
   },
   {
-   "text": "o",
+   "text": "y",
    "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "o",
+   "start": 1.34,
    "end": 1.34
   },
   {
@@ -387,7 +387,7 @@
   },
   {
    "text": "m",
-   "start": 1.66,
+   "start": 1.68,
    "end": 1.74
   },
   {
@@ -408,21 +408,21 @@
   {
    "text": "r",
    "start": 1.9,
-   "end": 1.94
+   "end": 1.92
   },
   {
    "text": "e",
    "start": 1.94,
-   "end": 2
+   "end": 1.98
   },
   {
    "text": "a",
-   "start": 2,
-   "end": 2.14
+   "start": 1.98,
+   "end": 2.12
   },
   {
    "text": "k",
-   "start": 2.14,
+   "start": 2.12,
    "end": 2.16
   },
   {

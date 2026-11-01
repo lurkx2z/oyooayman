@@ -1,7 +1,7 @@
 {
  "id": "03-title",
  "text": "What if you were ten times stronger... but your bones weren't?",
- "seconds": 4.15,
+ "seconds": 4.39,
  "source": "forced-alignment",
  "words": [
   {
@@ -12,7 +12,7 @@
   {
    "text": "if",
    "start": 0.22,
-   "end": 0.32
+   "end": 0.3
   },
   {
    "text": "you",
@@ -27,37 +27,37 @@
   {
    "text": "ten",
    "start": 0.74,
-   "end": 1
+   "end": 0.96
   },
   {
    "text": "times",
    "start": 1.08,
-   "end": 1.42
+   "end": 1.4
   },
   {
    "text": "stronger...",
-   "start": 1.54,
-   "end": 2.06
+   "start": 1.52,
+   "end": 2.04
   },
   {
    "text": "but",
-   "start": 2.56,
-   "end": 2.68
-  },
-  {
-   "text": "your",
-   "start": 2.72,
+   "start": 2.6,
    "end": 2.88
   },
   {
-   "text": "bones",
+   "text": "your",
    "start": 2.92,
-   "end": 3.26
+   "end": 3
+  },
+  {
+   "text": "bones",
+   "start": 3.14,
+   "end": 3.5
   },
   {
    "text": "weren't?",
-   "start": 3.32,
-   "end": 3.62
+   "start": 3.54,
+   "end": 3.84
   }
  ],
  "characters": [
@@ -144,21 +144,21 @@
   {
    "text": " ",
    "start": 0.64,
-   "end": 0.8
+   "end": 0.72
   },
   {
    "text": "t",
-   "start": 0.8,
-   "end": 0.853
+   "start": 0.72,
+   "end": 0.8
   },
   {
    "text": "e",
-   "start": 0.853,
-   "end": 0.907
+   "start": 0.8,
+   "end": 0.88
   },
   {
    "text": "n",
-   "start": 0.907,
+   "start": 0.88,
    "end": 0.96
   },
   {
@@ -169,61 +169,61 @@
   {
    "text": "t",
    "start": 1.04,
-   "end": 1.12
+   "end": 1.104
   },
   {
    "text": "i",
-   "start": 1.12,
-   "end": 1.2
+   "start": 1.104,
+   "end": 1.168
   },
   {
    "text": "m",
-   "start": 1.2,
-   "end": 1.28
+   "start": 1.168,
+   "end": 1.232
   },
   {
    "text": "e",
-   "start": 1.28,
-   "end": 1.36
+   "start": 1.232,
+   "end": 1.296
   },
   {
    "text": "s",
+   "start": 1.296,
+   "end": 1.36
+  },
+  {
+   "text": " ",
    "start": 1.36,
    "end": 1.44
   },
   {
-   "text": " ",
-   "start": 1.44,
-   "end": 1.52
-  },
-  {
    "text": "s",
-   "start": 1.52,
-   "end": 1.573
+   "start": 1.44,
+   "end": 1.507
   },
   {
    "text": "t",
-   "start": 1.573,
-   "end": 1.627
+   "start": 1.507,
+   "end": 1.573
   },
   {
    "text": "r",
-   "start": 1.627,
-   "end": 1.68
+   "start": 1.573,
+   "end": 1.64
   },
   {
    "text": "o",
-   "start": 1.68,
-   "end": 1.733
+   "start": 1.64,
+   "end": 1.707
   },
   {
    "text": "n",
-   "start": 1.733,
-   "end": 1.787
+   "start": 1.707,
+   "end": 1.773
   },
   {
    "text": "g",
-   "start": 1.787,
+   "start": 1.773,
    "end": 1.84
   },
   {
@@ -259,95 +259,55 @@
   {
    "text": "b",
    "start": 2.56,
-   "end": 2.587
+   "end": 2.667
   },
   {
    "text": "u",
-   "start": 2.587,
-   "end": 2.613
+   "start": 2.667,
+   "end": 2.773
   },
   {
    "text": "t",
-   "start": 2.613,
-   "end": 2.64
-  },
-  {
-   "text": " ",
-   "start": 2.64,
-   "end": 2.72
-  },
-  {
-   "text": "y",
-   "start": 2.72,
-   "end": 2.76
-  },
-  {
-   "text": "o",
-   "start": 2.76,
-   "end": 2.8
-  },
-  {
-   "text": "u",
-   "start": 2.8,
-   "end": 2.84
-  },
-  {
-   "text": "r",
-   "start": 2.84,
+   "start": 2.773,
    "end": 2.88
   },
   {
    "text": " ",
    "start": 2.88,
-   "end": 3.08
+   "end": 3
   },
   {
-   "text": "b",
-   "start": 3.08,
-   "end": 3.12
+   "text": "y",
+   "start": 3,
+   "end": 3.03
   },
   {
    "text": "o",
-   "start": 3.12,
-   "end": 3.16
+   "start": 3.03,
+   "end": 3.06
   },
   {
-   "text": "n",
-   "start": 3.16,
-   "end": 3.2
-  },
-  {
-   "text": "e",
-   "start": 3.2,
-   "end": 3.24
-  },
-  {
-   "text": "s",
-   "start": 3.24,
-   "end": 3.28
-  },
-  {
-   "text": " ",
-   "start": 3.28,
-   "end": 3.32
-  },
-  {
-   "text": "w",
-   "start": 3.32,
-   "end": 3.333
-  },
-  {
-   "text": "e",
-   "start": 3.333,
-   "end": 3.347
+   "text": "u",
+   "start": 3.06,
+   "end": 3.09
   },
   {
    "text": "r",
-   "start": 3.347,
+   "start": 3.09,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.32
+  },
+  {
+   "text": "b",
+   "start": 3.32,
    "end": 3.36
   },
   {
-   "text": "e",
+   "text": "o",
    "start": 3.36,
    "end": 3.4
   },
@@ -357,19 +317,59 @@
    "end": 3.44
   },
   {
-   "text": "'",
+   "text": "e",
    "start": 3.44,
-   "end": 3.76
+   "end": 3.48
+  },
+  {
+   "text": "s",
+   "start": 3.48,
+   "end": 3.52
+  },
+  {
+   "text": " ",
+   "start": 3.52,
+   "end": 3.56
+  },
+  {
+   "text": "w",
+   "start": 3.56,
+   "end": 3.573
+  },
+  {
+   "text": "e",
+   "start": 3.573,
+   "end": 3.587
+  },
+  {
+   "text": "r",
+   "start": 3.587,
+   "end": 3.6
+  },
+  {
+   "text": "e",
+   "start": 3.6,
+   "end": 3.64
+  },
+  {
+   "text": "n",
+   "start": 3.64,
+   "end": 3.68
+  },
+  {
+   "text": "'",
+   "start": 3.68,
+   "end": 4
   },
   {
    "text": "t",
-   "start": 3.76,
-   "end": 4.08
+   "start": 4,
+   "end": 4.32
   },
   {
    "text": "?",
-   "start": 4.08,
-   "end": 4.16
+   "start": 4.32,
+   "end": 4.4
   }
  ],
  "tts_words": [
@@ -395,38 +395,38 @@
   },
   {
    "text": "ten",
-   "start": 0.8,
+   "start": 0.72,
    "end": 0.96
   },
   {
    "text": "times",
    "start": 1.04,
-   "end": 1.44
+   "end": 1.36
   },
   {
    "text": "stronger...",
-   "start": 1.52,
+   "start": 1.44,
    "end": 2.52
   },
   {
    "text": "but",
    "start": 2.56,
-   "end": 2.64
-  },
-  {
-   "text": "your",
-   "start": 2.72,
    "end": 2.88
   },
   {
+   "text": "your",
+   "start": 3,
+   "end": 3.12
+  },
+  {
    "text": "bones",
-   "start": 3.08,
-   "end": 3.28
+   "start": 3.32,
+   "end": 3.52
   },
   {
    "text": "weren't?",
-   "start": 3.32,
-   "end": 4.16
+   "start": 3.56,
+   "end": 4.4
   }
  ],
  "characters_forced": [
@@ -463,21 +463,21 @@
   {
    "text": "f",
    "start": 0.28,
-   "end": 0.32
+   "end": 0.3
   },
   {
    "text": " ",
-   "start": 0.32,
+   "start": 0.3,
    "end": 0.36
   },
   {
    "text": "y",
    "start": 0.36,
-   "end": 0.38
+   "end": 0.36
   },
   {
    "text": "o",
-   "start": 0.38,
+   "start": 0.36,
    "end": 0.38
   },
   {
@@ -523,16 +523,16 @@
   {
    "text": "e",
    "start": 0.82,
-   "end": 0.84
+   "end": 0.86
   },
   {
    "text": "n",
-   "start": 0.84,
-   "end": 1
+   "start": 0.86,
+   "end": 0.96
   },
   {
    "text": " ",
-   "start": 1,
+   "start": 0.96,
    "end": 1.08
   },
   {
@@ -548,36 +548,36 @@
   {
    "text": "m",
    "start": 1.24,
-   "end": 1.32
+   "end": 1.26
   },
   {
    "text": "e",
-   "start": 1.32,
+   "start": 1.26,
    "end": 1.32
   },
   {
    "text": "s",
    "start": 1.32,
-   "end": 1.42
+   "end": 1.4
   },
   {
    "text": " ",
-   "start": 1.42,
-   "end": 1.54
+   "start": 1.4,
+   "end": 1.52
   },
   {
    "text": "s",
-   "start": 1.54,
-   "end": 1.58
+   "start": 1.52,
+   "end": 1.54
   },
   {
    "text": "t",
-   "start": 1.58,
-   "end": 1.62
+   "start": 1.54,
+   "end": 1.6
   },
   {
    "text": "r",
-   "start": 1.62,
+   "start": 1.6,
    "end": 1.68
   },
   {
@@ -603,66 +603,41 @@
   {
    "text": "r",
    "start": 2.02,
-   "end": 2.06
+   "end": 2.04
   },
   {
    "text": ".",
-   "start": 2.06,
-   "end": 2.06
+   "start": 2.04,
+   "end": 2.04
   },
   {
    "text": ".",
-   "start": 2.06,
-   "end": 2.06
+   "start": 2.04,
+   "end": 2.04
   },
   {
    "text": ".",
-   "start": 2.06,
-   "end": 2.06
+   "start": 2.04,
+   "end": 2.04
   },
   {
    "text": " ",
-   "start": 2.06,
-   "end": 2.06
+   "start": 2.04,
+   "end": 2.04
   },
   {
    "text": "b",
-   "start": 2.56,
-   "end": 2.58
+   "start": 2.6,
+   "end": 2.6
   },
   {
    "text": "u",
-   "start": 2.58,
-   "end": 2.64
-  },
-  {
-   "text": "t",
-   "start": 2.64,
+   "start": 2.6,
    "end": 2.68
   },
   {
-   "text": " ",
+   "text": "t",
    "start": 2.68,
-   "end": 2.72
-  },
-  {
-   "text": "y",
-   "start": 2.72,
-   "end": 2.74
-  },
-  {
-   "text": "o",
-   "start": 2.74,
-   "end": 2.76
-  },
-  {
-   "text": "u",
-   "start": 2.76,
-   "end": 2.78
-  },
-  {
-   "text": "r",
-   "start": 2.78,
    "end": 2.88
   },
   {
@@ -671,74 +646,99 @@
    "end": 2.92
   },
   {
-   "text": "b",
+   "text": "y",
    "start": 2.92,
-   "end": 2.98
+   "end": 2.94
   },
   {
    "text": "o",
-   "start": 2.98,
-   "end": 3.08
+   "start": 2.94,
+   "end": 2.96
   },
   {
-   "text": "n",
-   "start": 3.08,
+   "text": "u",
+   "start": 2.96,
+   "end": 3
+  },
+  {
+   "text": "r",
+   "start": 3,
+   "end": 3
+  },
+  {
+   "text": " ",
+   "start": 3,
    "end": 3.14
   },
   {
-   "text": "e",
+   "text": "b",
    "start": 3.14,
    "end": 3.2
   },
   {
-   "text": "s",
+   "text": "o",
    "start": 3.2,
-   "end": 3.26
+   "end": 3.3
   },
   {
-   "text": " ",
-   "start": 3.26,
-   "end": 3.32
-  },
-  {
-   "text": "w",
-   "start": 3.32,
+   "text": "n",
+   "start": 3.3,
    "end": 3.36
   },
   {
    "text": "e",
    "start": 3.36,
-   "end": 3.4
+   "end": 3.44
   },
   {
-   "text": "r",
-   "start": 3.4,
-   "end": 3.42
+   "text": "s",
+   "start": 3.44,
+   "end": 3.5
+  },
+  {
+   "text": " ",
+   "start": 3.5,
+   "end": 3.54
+  },
+  {
+   "text": "w",
+   "start": 3.54,
+   "end": 3.56
   },
   {
    "text": "e",
-   "start": 3.42,
-   "end": 3.46
+   "start": 3.56,
+   "end": 3.62
+  },
+  {
+   "text": "r",
+   "start": 3.62,
+   "end": 3.64
+  },
+  {
+   "text": "e",
+   "start": 3.64,
+   "end": 3.68
   },
   {
    "text": "n",
-   "start": 3.46,
-   "end": 3.48
+   "start": 3.68,
+   "end": 3.72
   },
   {
    "text": "'",
-   "start": 3.48,
-   "end": 3.48
+   "start": 3.72,
+   "end": 3.72
   },
   {
    "text": "t",
-   "start": 3.6,
-   "end": 3.62
+   "start": 3.84,
+   "end": 3.84
   },
   {
    "text": "?",
-   "start": 3.62,
-   "end": 3.62
+   "start": 3.84,
+   "end": 3.84
   }
  ]
 }
