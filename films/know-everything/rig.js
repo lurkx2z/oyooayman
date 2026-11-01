@@ -206,7 +206,7 @@ function face(g, c, R, f, o, p) {
     if (open > 0.25) { g.fillStyle = PAL.ink; const pr = R * (0.09 - E.wide * 0.02); const px = ex + (E.lx + f * 0.25) * ew * 0.5, py = cy + E.ly * eh * 0.45; g.beginPath(); g.arc(px, py, pr, 0, Math.PI * 2); g.fill();
       g.fillStyle = '#fff'; g.beginPath(); g.arc(px - pr * 0.35, py - pr * 0.38, pr * 0.34, 0, Math.PI * 2); g.fill(); }
     if (o.brow !== undefined) { const b = o.brow; g.strokeStyle = '#fbf8f2'; g.lineWidth = R * 0.075; g.beginPath(); const by = cy - R * 0.4 - E.wide * R * 0.06;
-      g.moveTo(ex - R * 0.15, by + s * b * R * 0.08 * f * -1); g.lineTo(ex + R * 0.15, by - s * b * R * 0.08 * f * -1); g.stroke(); }
+      g.moveTo(ex - R * 0.15, by - s * b * R * 0.08); g.lineTo(ex + R * 0.15, by + s * b * R * 0.08); g.stroke(); }
   }
   const mx = c[0] + f * R * 0.3, my = c[1] + R * 0.45; g.strokeStyle = '#fbf8f2'; g.fillStyle = '#fbf8f2'; g.lineWidth = R * 0.07; g.lineCap = 'round';
   let m = o.mouth || 'flat';

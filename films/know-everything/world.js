@@ -163,7 +163,6 @@ SETS.street = {
     box(g, 360, 650, 120, 210, '#3d6e74', { r: 4 }); g.fillStyle = '#e9d29a'; g.beginPath(); g.arc(455, 760, 7, 0, Math.PI * 2); g.fill();
     for (const x of [180, 540]) { vgrad(g, x, 560, 130, 120, [[0, '#ffe2a8'], [1, '#f2a65a']]); g.strokeStyle = '#f6f1e8'; g.lineWidth = 10; g.strokeRect(x, 560, 130, 120); }
     box(g, 340, 856, 160, 14, '#bfb6a8', { r: 2 });
-    car(g, 1150, 1000, 0.95, '#d0563f', 1); car(g, 2050, 1010, 0.95, '#3f6f9f', -1);
     // lamp post
     g.fillStyle = '#2b2e38'; g.fillRect(860, 520, 12, 350); g.fillRect(830, 515, 80, 10); g.fillStyle = '#ffe9b8'; g.fillRect(890, 524, 26, 10);
   },
@@ -333,10 +332,10 @@ SETS.lab = {
   k: { far: 0.45, fg: 1.3 },
   far(g) { sky(g, LX, LY, LW, LH, [[0, '#8cb8d8'], [1, '#e2ecef']]); facade(g, 1580, 260, 600, 700, '#b9806a', 71, { lit: 0.06, glass: '#8fb1c9' }); for (let i = 0; i < 3; i++) tree(g, 1660 + i * 180, 800, 1.2, '#5d8f55', 80 + i); },
   back(g) {
-    wall(g, LX, LY, LW, 930 - LY, '#e6e9ec', 31);
+    wall(g, LX, LY, LW, 930 - LY, '#7f8fa3', 31);
     g.globalCompositeOperation = 'destination-out'; g.fillRect(1640, 190, 420, 420); g.globalCompositeOperation = 'source-over'; windowFrame(g, 1640, 190, 420, 420, '#f4f6f4');
     // the whiteboard: thirty years of crossed-out attempts
-    box(g, 200, 170, 1320, 520, '#c9ced4', { r: 6 }); g.fillStyle = '#fbfcfd'; g.fillRect(216, 186, 1288, 488);
+    box(g, 200, 170, 1320, 520, '#5d6670', { r: 6 }); g.fillStyle = '#e4e8ec'; g.fillRect(216, 186, 1288, 488);
     const r = rng(41), syms = ['Ω_dm ≈ 0.27', 'ρ(r) ∝ 1/r²', 'v(r) = √(GM/r)', 'WIMP?', 'axion?', 'm ≈ 10⁻²² eV', '∇²Φ = 4πGρ', 'σ v ≈ 3×10⁻²⁶', 'MOND?', 'L = ½(∂φ)² − V(φ)', 'sterile ν?', 'Λ CDM'];
     for (let i = 0; i < 30; i++) { const x = 240 + r() * 1150, y = 220 + r() * 430, s = syms[i % syms.length], col = ['#2b4fa0', '#1f2430', '#b03a3a'][i % 3]; txt(g, s, x, y, `italic 500 ${22 + r() * 12}px ${SERIF}`, col, 'left', 0.55 + r() * 0.3); if (r() < 0.45) { g.strokeStyle = 'rgba(176,58,58,0.7)'; g.lineWidth = 3; g.beginPath(); g.moveTo(x - 6, y - 8); g.lineTo(x + 170, y - 14); g.stroke(); } }
     g.strokeStyle = '#2b4fa0'; g.lineWidth = 3; g.beginPath(); g.moveTo(1100, 560); g.quadraticCurveTo(1200, 400, 1400, 420); g.stroke(); txt(g, '???', 1420, 430, `700 40px ${SERIF}`, '#b03a3a', 'left');
@@ -345,11 +344,11 @@ SETS.lab = {
     box(g, 1560, 690, 640, 30, '#2f3442', { r: 3 }); box(g, 1580, 720, 600, 210, '#d6dbe0', { r: 3 }); g.fillStyle = '#b7bec6'; for (const x of [1780, 1980]) g.fillRect(x, 730, 4, 190);
     for (let i = 0; i < 6; i++) { const x = 1600 + i * 95; g.fillStyle = 'rgba(200,230,245,0.75)'; g.beginPath(); g.moveTo(x, 690); g.lineTo(x + 50, 690); g.lineTo(x + 40, 620 - (i % 2) * 30); g.lineTo(x + 10, 620 - (i % 2) * 30); g.closePath(); g.fill(); g.fillStyle = ['#5fd0b0', '#f2c230', '#7fa7ff', '#e88a8a', '#5fd0b0', '#c9a6d8'][i]; g.fillRect(x + 6, 664, 38, 24); }
     // floor
-    vgrad(g, LX, 930, LW, LH + LY - 930, [[0, '#9fa7b0'], [1, '#c3c9cf']]); ao(g, LX, 930, LW, 40, 'down', 0.3);
+    vgrad(g, LX, 930, LW, LH + LY - 930, [[0, '#6d7682'], [1, '#8a939e']]); ao(g, LX, 930, LW, 40, 'down', 0.3);
     // her stool
     g.fillStyle = '#3a3f4c'; g.fillRect(1290, 860, 12, 90); g.fillRect(1250, 940, 92, 8); box(g, 1240, 840, 112, 22, '#2fa79a', { r: 10 });
   },
-  glow(g) { shaft(g, [[1640, 200], [2060, 200], [1700, 1150], [1150, 1150]], 'rgba(255,250,235,0.5)', 0.25); glow(g, 860, 120, 700, 'rgba(255,255,255,0.18)'); },
+  glow(g) { shaft(g, [[1640, 200], [2060, 200], [1700, 1150], [1150, 1150]], 'rgba(255,250,235,0.5)', 0.18); },
   fg(g) { box(g, LX - 60, 980, 520, 400, '#2f3442', { r: 6 }); g.fillStyle = 'rgba(200,230,245,0.6)'; g.beginPath(); g.arc(LX + 200, 960, 60, 0, Math.PI * 2); g.fill(); },
 };
 
