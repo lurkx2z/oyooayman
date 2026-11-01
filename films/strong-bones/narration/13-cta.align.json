@@ -1,0 +1,314 @@
+{
+ "id": "13-cta",
+ "text": "Would you have caught it?",
+ "seconds": 1.18,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Would",
+   "start": 0.08,
+   "end": 0.2
+  },
+  {
+   "text": "you",
+   "start": 0.26,
+   "end": 0.32
+  },
+  {
+   "text": "have",
+   "start": 0.36,
+   "end": 0.48
+  },
+  {
+   "text": "caught",
+   "start": 0.54,
+   "end": 0.72
+  },
+  {
+   "text": "it?",
+   "start": 0.76,
+   "end": 0.9
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.032
+  },
+  {
+   "text": "o",
+   "start": 0.032,
+   "end": 0.064
+  },
+  {
+   "text": "u",
+   "start": 0.064,
+   "end": 0.096
+  },
+  {
+   "text": "l",
+   "start": 0.096,
+   "end": 0.128
+  },
+  {
+   "text": "d",
+   "start": 0.128,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "y",
+   "start": 0.24,
+   "end": 0.253
+  },
+  {
+   "text": "o",
+   "start": 0.253,
+   "end": 0.267
+  },
+  {
+   "text": "u",
+   "start": 0.267,
+   "end": 0.28
+  },
+  {
+   "text": " ",
+   "start": 0.28,
+   "end": 0.32
+  },
+  {
+   "text": "h",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "a",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "v",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "e",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.6
+  },
+  {
+   "text": "c",
+   "start": 0.6,
+   "end": 0.62
+  },
+  {
+   "text": "a",
+   "start": 0.62,
+   "end": 0.64
+  },
+  {
+   "text": "u",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "g",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "h",
+   "start": 0.68,
+   "end": 0.7
+  },
+  {
+   "text": "t",
+   "start": 0.7,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "i",
+   "start": 0.8,
+   "end": 0.84
+  },
+  {
+   "text": "t",
+   "start": 0.84,
+   "end": 0.88
+  },
+  {
+   "text": "?",
+   "start": 0.88,
+   "end": 1.12
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Would",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "you",
+   "start": 0.24,
+   "end": 0.28
+  },
+  {
+   "text": "have",
+   "start": 0.32,
+   "end": 0.48
+  },
+  {
+   "text": "caught",
+   "start": 0.6,
+   "end": 0.72
+  },
+  {
+   "text": "it?",
+   "start": 0.8,
+   "end": 1.12
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "o",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "u",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "l",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": "d",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": " ",
+   "start": 0.2,
+   "end": 0.26
+  },
+  {
+   "text": "y",
+   "start": 0.26,
+   "end": 0.26
+  },
+  {
+   "text": "o",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": "u",
+   "start": 0.28,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "h",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": "a",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": "v",
+   "start": 0.4,
+   "end": 0.42
+  },
+  {
+   "text": "e",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "c",
+   "start": 0.54,
+   "end": 0.62
+  },
+  {
+   "text": "a",
+   "start": 0.62,
+   "end": 0.62
+  },
+  {
+   "text": "u",
+   "start": 0.62,
+   "end": 0.64
+  },
+  {
+   "text": "g",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "h",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "t",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "i",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": "t",
+   "start": 0.8,
+   "end": 0.9
+  },
+  {
+   "text": "?",
+   "start": 0.9,
+   "end": 0.9
+  }
+ ]
+}

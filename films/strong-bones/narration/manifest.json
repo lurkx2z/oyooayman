@@ -1,0 +1,167 @@
+{
+  "voice": "uju3wxzG5OhpWcoi3SMy",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75
+  },
+  "clips": [
+    {
+      "id": "01-jar",
+      "text": "You go to open a jar. And the lid comes off... with the top of the glass still on it.",
+      "file": "01-jar.mp3",
+      "align": "01-jar.align.json",
+      "seconds": 5.59,
+      "speech_start": 0.1,
+      "speech_end": 5.32,
+      "hash": "3cb132a41ce46bfa",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-mug",
+      "text": "You pick up your coffee. The handle comes with you.",
+      "file": "02-mug.mp3",
+      "align": "02-mug.align.json",
+      "seconds": 3.27,
+      "speech_start": 0.08,
+      "speech_end": 2.76,
+      "hash": "ac71caf8c290e171",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-title",
+      "text": "What if you were ten times stronger... but your bones weren't?",
+      "file": "03-title.mp3",
+      "align": "03-title.align.json",
+      "seconds": 4.15,
+      "speech_start": 0.08,
+      "speech_end": 3.62,
+      "hash": "21547cc92aa8f710",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-rule",
+      "text": "Your muscles got ten times stronger. Your bones, your tendons, your skin... stayed exactly the same.",
+      "file": "04-rule.mp3",
+      "align": "04-rule.align.json",
+      "seconds": 7.65,
+      "speech_start": 0.06,
+      "speech_end": 7.14,
+      "hash": "0886797980c5e6d7",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "05-nuance",
+      "text": "And that's a real problem. Normal muscles can already pull hard enough to break a bone. Your brain holds them back. Yours has to hold back ten times harder.",
+      "file": "05-nuance.mp3",
+      "align": "05-nuance.align.json",
+      "seconds": 10.95,
+      "speech_start": 0.04,
+      "speech_end": 10.48,
+      "hash": "49e700814e4b7a26",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "06-record",
+      "text": "So you learn to lift slowly. Smoothly. And you beat the world record by three hundred kilos.",
+      "file": "06-record.mp3",
+      "align": "06-record.align.json",
+      "seconds": 6.95,
+      "speech_start": 0.12,
+      "speech_end": 6.54,
+      "hash": "a591dfd0308116d2",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "07-nick",
+      "text": "They call you Glass Hercules.",
+      "file": "07-nick.mp3",
+      "align": "07-nick.align.json",
+      "seconds": 2.46,
+      "speech_start": 0.08,
+      "speech_end": 2,
+      "hash": "d84ce7b1bb84b499",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "08-final",
+      "text": "The Olympic final. Your last lift. Gold is right there.",
+      "file": "08-final.mp3",
+      "align": "08-final.align.json",
+      "seconds": 4.94,
+      "speech_start": 0.08,
+      "speech_end": 4.48,
+      "hash": "1b1bd843269fc8a9",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "09-scaffold",
+      "text": "Then, through the loading door, you see the scaffolding outside start to lean. Your sister is standing right under it.",
+      "file": "09-scaffold.mp3",
+      "align": "09-scaffold.align.json",
+      "seconds": 7.42,
+      "speech_start": 0.1,
+      "speech_end": 6.98,
+      "hash": "10877e5058212915",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "10-cost",
+      "text": "Catch it, and both your arms break.",
+      "file": "10-cost.mp3",
+      "align": "10-cost.align.json",
+      "seconds": 2.72,
+      "speech_start": 0.08,
+      "speech_end": 2.16,
+      "hash": "8de00eb243ac1ad9",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "11-after",
+      "text": "The gold went to someone else. Your sister went home.",
+      "file": "11-after.mp3",
+      "align": "11-after.align.json",
+      "seconds": 3.89,
+      "speech_start": 0.1,
+      "speech_end": 3.24,
+      "hash": "df794055c573c241",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "12-letter",
+      "text": "A week later, a letter. \"We can build you bones that keep up. Interested?\"",
+      "file": "12-letter.mp3",
+      "align": "12-letter.align.json",
+      "seconds": 5.36,
+      "speech_start": 0.08,
+      "speech_end": 4.78,
+      "hash": "a982736bdec3045d",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "13-cta",
+      "text": "Would you have caught it?",
+      "file": "13-cta.mp3",
+      "align": "13-cta.align.json",
+      "seconds": 1.18,
+      "speech_start": 0.08,
+      "speech_end": 0.9,
+      "hash": "ac1eb2af351f4e13",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

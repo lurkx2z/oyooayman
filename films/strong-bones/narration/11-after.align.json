@@ -1,0 +1,644 @@
+{
+ "id": "11-after",
+ "text": "The gold went to someone else. Your sister went home.",
+ "seconds": 3.89,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "The",
+   "start": 0.1,
+   "end": 0.18
+  },
+  {
+   "text": "gold",
+   "start": 0.24,
+   "end": 0.52
+  },
+  {
+   "text": "went",
+   "start": 0.56,
+   "end": 0.7
+  },
+  {
+   "text": "to",
+   "start": 0.74,
+   "end": 0.84
+  },
+  {
+   "text": "someone",
+   "start": 0.9,
+   "end": 1.18
+  },
+  {
+   "text": "else.",
+   "start": 1.26,
+   "end": 1.58
+  },
+  {
+   "text": "Your",
+   "start": 2.12,
+   "end": 2.24
+  },
+  {
+   "text": "sister",
+   "start": 2.3,
+   "end": 2.64
+  },
+  {
+   "text": "went",
+   "start": 2.68,
+   "end": 2.84
+  },
+  {
+   "text": "home.",
+   "start": 2.88,
+   "end": 3.24
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "h",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "e",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "g",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "o",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "l",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "d",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "w",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "e",
+   "start": 0.58,
+   "end": 0.6
+  },
+  {
+   "text": "n",
+   "start": 0.6,
+   "end": 0.62
+  },
+  {
+   "text": "t",
+   "start": 0.62,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "o",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "s",
+   "start": 0.88,
+   "end": 0.914
+  },
+  {
+   "text": "o",
+   "start": 0.914,
+   "end": 0.949
+  },
+  {
+   "text": "m",
+   "start": 0.949,
+   "end": 0.983
+  },
+  {
+   "text": "e",
+   "start": 0.983,
+   "end": 1.017
+  },
+  {
+   "text": "o",
+   "start": 1.017,
+   "end": 1.051
+  },
+  {
+   "text": "n",
+   "start": 1.051,
+   "end": 1.086
+  },
+  {
+   "text": "e",
+   "start": 1.086,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "e",
+   "start": 1.2,
+   "end": 1.3
+  },
+  {
+   "text": "l",
+   "start": 1.3,
+   "end": 1.4
+  },
+  {
+   "text": "s",
+   "start": 1.4,
+   "end": 1.5
+  },
+  {
+   "text": "e",
+   "start": 1.5,
+   "end": 1.6
+  },
+  {
+   "text": ".",
+   "start": 1.6,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "Y",
+   "start": 2.08,
+   "end": 2.1
+  },
+  {
+   "text": "o",
+   "start": 2.1,
+   "end": 2.12
+  },
+  {
+   "text": "u",
+   "start": 2.12,
+   "end": 2.14
+  },
+  {
+   "text": "r",
+   "start": 2.14,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": "s",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "i",
+   "start": 2.32,
+   "end": 2.368
+  },
+  {
+   "text": "s",
+   "start": 2.368,
+   "end": 2.416
+  },
+  {
+   "text": "t",
+   "start": 2.416,
+   "end": 2.464
+  },
+  {
+   "text": "e",
+   "start": 2.464,
+   "end": 2.512
+  },
+  {
+   "text": "r",
+   "start": 2.512,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "w",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": "e",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "n",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "t",
+   "start": 2.76,
+   "end": 2.8
+  },
+  {
+   "text": " ",
+   "start": 2.8,
+   "end": 2.88
+  },
+  {
+   "text": "h",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": "o",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "m",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": "e",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": ".",
+   "start": 3.2,
+   "end": 3.84
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "The",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "gold",
+   "start": 0.16,
+   "end": 0.48
+  },
+  {
+   "text": "went",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "to",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "someone",
+   "start": 0.88,
+   "end": 1.12
+  },
+  {
+   "text": "else.",
+   "start": 1.2,
+   "end": 2
+  },
+  {
+   "text": "Your",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "sister",
+   "start": 2.24,
+   "end": 2.56
+  },
+  {
+   "text": "went",
+   "start": 2.64,
+   "end": 2.8
+  },
+  {
+   "text": "home.",
+   "start": 2.88,
+   "end": 3.84
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": "h",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "g",
+   "start": 0.24,
+   "end": 0.3
+  },
+  {
+   "text": "o",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": "l",
+   "start": 0.34,
+   "end": 0.42
+  },
+  {
+   "text": "d",
+   "start": 0.42,
+   "end": 0.52
+  },
+  {
+   "text": " ",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "w",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "e",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": "n",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": "t",
+   "start": 0.66,
+   "end": 0.7
+  },
+  {
+   "text": " ",
+   "start": 0.7,
+   "end": 0.74
+  },
+  {
+   "text": "t",
+   "start": 0.74,
+   "end": 0.78
+  },
+  {
+   "text": "o",
+   "start": 0.78,
+   "end": 0.84
+  },
+  {
+   "text": " ",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": "s",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": "o",
+   "start": 0.96,
+   "end": 0.98
+  },
+  {
+   "text": "m",
+   "start": 0.98,
+   "end": 1.02
+  },
+  {
+   "text": "e",
+   "start": 1.02,
+   "end": 1.08
+  },
+  {
+   "text": "o",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "n",
+   "start": 1.12,
+   "end": 1.14
+  },
+  {
+   "text": "e",
+   "start": 1.14,
+   "end": 1.18
+  },
+  {
+   "text": " ",
+   "start": 1.18,
+   "end": 1.26
+  },
+  {
+   "text": "e",
+   "start": 1.26,
+   "end": 1.28
+  },
+  {
+   "text": "l",
+   "start": 1.28,
+   "end": 1.28
+  },
+  {
+   "text": "s",
+   "start": 1.28,
+   "end": 1.5
+  },
+  {
+   "text": "e",
+   "start": 1.5,
+   "end": 1.58
+  },
+  {
+   "text": ".",
+   "start": 1.58,
+   "end": 1.58
+  },
+  {
+   "text": " ",
+   "start": 1.58,
+   "end": 1.58
+  },
+  {
+   "text": "Y",
+   "start": 2.12,
+   "end": 2.12
+  },
+  {
+   "text": "o",
+   "start": 2.12,
+   "end": 2.14
+  },
+  {
+   "text": "u",
+   "start": 2.14,
+   "end": 2.18
+  },
+  {
+   "text": "r",
+   "start": 2.18,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.3
+  },
+  {
+   "text": "s",
+   "start": 2.3,
+   "end": 2.36
+  },
+  {
+   "text": "i",
+   "start": 2.36,
+   "end": 2.44
+  },
+  {
+   "text": "s",
+   "start": 2.44,
+   "end": 2.5
+  },
+  {
+   "text": "t",
+   "start": 2.5,
+   "end": 2.52
+  },
+  {
+   "text": "e",
+   "start": 2.52,
+   "end": 2.58
+  },
+  {
+   "text": "r",
+   "start": 2.58,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": "w",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "e",
+   "start": 2.72,
+   "end": 2.74
+  },
+  {
+   "text": "n",
+   "start": 2.74,
+   "end": 2.8
+  },
+  {
+   "text": "t",
+   "start": 2.8,
+   "end": 2.84
+  },
+  {
+   "text": " ",
+   "start": 2.84,
+   "end": 2.88
+  },
+  {
+   "text": "h",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": "o",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "m",
+   "start": 3.04,
+   "end": 3.16
+  },
+  {
+   "text": "e",
+   "start": 3.16,
+   "end": 3.24
+  },
+  {
+   "text": ".",
+   "start": 3.24,
+   "end": 3.24
+  }
+ ]
+}

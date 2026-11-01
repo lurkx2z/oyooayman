@@ -1,0 +1,35 @@
+{
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75
+  },
+  "clips": [
+    {
+      "id": "01-sis1",
+      "text": "Did you just... rip the handle off?",
+      "file": "01-sis1.mp3",
+      "align": "01-sis1.align.json",
+      "seconds": 2.8,
+      "speech_start": 0.1,
+      "speech_end": 2.56,
+      "hash": "9bdfd289a1a08538",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-sis2",
+      "text": "You're such an idiot. ...Thank you.",
+      "file": "02-sis2.mp3",
+      "align": "02-sis2.align.json",
+      "seconds": 3.11,
+      "speech_start": 0.08,
+      "speech_end": 2.58,
+      "hash": "d21b32dde89cfa45",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

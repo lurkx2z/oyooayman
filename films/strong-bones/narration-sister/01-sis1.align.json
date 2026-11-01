@@ -1,0 +1,434 @@
+{
+ "id": "01-sis1",
+ "text": "Did you just... rip the handle off?",
+ "seconds": 2.8,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Did",
+   "start": 0.1,
+   "end": 0.24
+  },
+  {
+   "text": "you",
+   "start": 0.28,
+   "end": 0.36
+  },
+  {
+   "text": "just...",
+   "start": 0.42,
+   "end": 0.76
+  },
+  {
+   "text": "rip",
+   "start": 1.34,
+   "end": 1.52
+  },
+  {
+   "text": "the",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "handle",
+   "start": 1.82,
+   "end": 2.18
+  },
+  {
+   "text": "off?",
+   "start": 2.26,
+   "end": 2.56
+  }
+ ],
+ "characters": [
+  {
+   "text": "D",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "i",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "d",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.28
+  },
+  {
+   "text": "y",
+   "start": 0.28,
+   "end": 0.293
+  },
+  {
+   "text": "o",
+   "start": 0.293,
+   "end": 0.307
+  },
+  {
+   "text": "u",
+   "start": 0.307,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "j",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "u",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "s",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "t",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 0.853
+  },
+  {
+   "text": ".",
+   "start": 0.853,
+   "end": 0.987
+  },
+  {
+   "text": ".",
+   "start": 0.987,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": "r",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "i",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "p",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.64
+  },
+  {
+   "text": "t",
+   "start": 1.64,
+   "end": 1.68
+  },
+  {
+   "text": "h",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": "e",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.96
+  },
+  {
+   "text": "h",
+   "start": 1.96,
+   "end": 1.993
+  },
+  {
+   "text": "a",
+   "start": 1.993,
+   "end": 2.027
+  },
+  {
+   "text": "n",
+   "start": 2.027,
+   "end": 2.06
+  },
+  {
+   "text": "d",
+   "start": 2.06,
+   "end": 2.093
+  },
+  {
+   "text": "l",
+   "start": 2.093,
+   "end": 2.127
+  },
+  {
+   "text": "e",
+   "start": 2.127,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": "o",
+   "start": 2.24,
+   "end": 2.347
+  },
+  {
+   "text": "f",
+   "start": 2.347,
+   "end": 2.453
+  },
+  {
+   "text": "f",
+   "start": 2.453,
+   "end": 2.56
+  },
+  {
+   "text": "?",
+   "start": 2.56,
+   "end": 2.72
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Did",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "you",
+   "start": 0.28,
+   "end": 0.32
+  },
+  {
+   "text": "just...",
+   "start": 0.4,
+   "end": 1.12
+  },
+  {
+   "text": "rip",
+   "start": 1.28,
+   "end": 1.52
+  },
+  {
+   "text": "the",
+   "start": 1.64,
+   "end": 1.76
+  },
+  {
+   "text": "handle",
+   "start": 1.96,
+   "end": 2.16
+  },
+  {
+   "text": "off?",
+   "start": 2.24,
+   "end": 2.72
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "D",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": "i",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "d",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.28
+  },
+  {
+   "text": "y",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "o",
+   "start": 0.3,
+   "end": 0.32
+  },
+  {
+   "text": "u",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": " ",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": "j",
+   "start": 0.42,
+   "end": 0.46
+  },
+  {
+   "text": "u",
+   "start": 0.46,
+   "end": 0.48
+  },
+  {
+   "text": "s",
+   "start": 0.48,
+   "end": 0.64
+  },
+  {
+   "text": "t",
+   "start": 0.64,
+   "end": 0.76
+  },
+  {
+   "text": ".",
+   "start": 0.76,
+   "end": 0.76
+  },
+  {
+   "text": ".",
+   "start": 0.76,
+   "end": 0.76
+  },
+  {
+   "text": ".",
+   "start": 0.76,
+   "end": 0.76
+  },
+  {
+   "text": " ",
+   "start": 0.76,
+   "end": 0.76
+  },
+  {
+   "text": "r",
+   "start": 1.34,
+   "end": 1.4
+  },
+  {
+   "text": "i",
+   "start": 1.4,
+   "end": 1.44
+  },
+  {
+   "text": "p",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "t",
+   "start": 1.6,
+   "end": 1.62
+  },
+  {
+   "text": "h",
+   "start": 1.62,
+   "end": 1.66
+  },
+  {
+   "text": "e",
+   "start": 1.66,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.82
+  },
+  {
+   "text": "h",
+   "start": 1.82,
+   "end": 1.84
+  },
+  {
+   "text": "a",
+   "start": 1.9,
+   "end": 1.94
+  },
+  {
+   "text": "n",
+   "start": 1.94,
+   "end": 2.02
+  },
+  {
+   "text": "d",
+   "start": 2.02,
+   "end": 2.08
+  },
+  {
+   "text": "l",
+   "start": 2.08,
+   "end": 2.12
+  },
+  {
+   "text": "e",
+   "start": 2.12,
+   "end": 2.18
+  },
+  {
+   "text": " ",
+   "start": 2.18,
+   "end": 2.26
+  },
+  {
+   "text": "o",
+   "start": 2.26,
+   "end": 2.3
+  },
+  {
+   "text": "f",
+   "start": 2.3,
+   "end": 2.4
+  },
+  {
+   "text": "f",
+   "start": 2.4,
+   "end": 2.56
+  },
+  {
+   "text": "?",
+   "start": 2.56,
+   "end": 2.56
+  }
+ ]
+}
