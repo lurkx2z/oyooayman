@@ -6,7 +6,7 @@ reference channel, with our own characters. 16:9, 1920×1080, 30 fps.
 - **v1** (2026-11-01, 1:24): narrator-led, simple flat sets. Files in `2d/`, `sound/`, `narration*/`. Owner's verdict:
   "visuals look cheap … make the narration talk faster, we want retention, more showing less explaining and more world
   building, people talking to each other."
-- **v2** (2026-11-01, 1:14, the current page): files in `v2/`. Built to that note:
+- **v2** (2026-11-01, 1:14): files in `v2/`. Built to that note:
   - **Dialogue carries the story.** Seven voices (ElevenLabs via GitHub Actions): narrator Michael (speed 1.15, only
     six short links), you (Liam), Maya your sister (Jessica), the doctor (Alice), the coach (Bill), the stadium
     announcer / TV (Brian), a scaffold worker (Callum). Characters lip-flap on their own words.
@@ -22,7 +22,8 @@ reference channel, with our own characters. 16:9, 1920×1080, 30 fps.
   and doesn't make sense … how did he know the thing was going to fall on her". Fixes: every beat gets a setup and a
   reaction (the clock slap is seen with your arm attached, you stare at your hand; you pick up the jar, it breaks, you
   stare at the lid; then the mug), the x-ray appears on your own arm, the table edge bends in the wide shot, the egg
-  is gone, gaps between lines are longer (37 shots, ~2.3 s each). The ending is set up: the arena's open back door
+  is gone, gaps between lines are longer (37 shots, ~2.3 s each). Final: MP4 2-pass 2300k, 25.4 MiB, −15.3 LUFS,
+  −1.9 dBTP. The ending is set up: the arena's open back door
   (EXIT · LOADING) is visible from the platform, Maya waves from it ("I'm at the back door, I can see him!"), you smile
   at her, the bolt shears, the worker shouts, and you see the scaffold lean over her through the door.
 
