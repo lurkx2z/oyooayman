@@ -85,7 +85,7 @@ CH = {'Dm': [50, 53, 57], 'Bb': [46, 50, 53], 'F': [41, 45, 48], 'C': [48, 52, 5
 # A: morning — a light pizzicato in F (with breaths at the slap, the lid and the mug)
 beat = 60 / 116; t = 0.2; k = 0
 pat = [65, 69, 72, 69, 67, 70, 74, 70, 65, 69, 72, 77, 76, 72, 70, 67]
-while t < sh0('xrayWrist') - 0.1:
+while t < sh0('xrayOn') - 0.1:
     if any(abs(t - T[e]) < 0.35 for e in ('slap', 'lid', 'mug')): k += 1; t += beat / 2; continue
     n = pat[k % len(pat)]; add(mus, pluck(mtof(n), 0.5), t, 0.22 if k % 2 == 0 else 0.15, pan=0.25 * np.sin(k))
     if k % 4 == 0: add(mus, pluck(mtof(n - 24), 0.9, 0.6), t, 0.32, pan=-0.2)
@@ -94,7 +94,7 @@ while t < sh0('xrayWrist') - 0.1:
 for e in ('slap', 'lid', 'mug'):
     for m, dl in ((77, 0), (81, 0.06), (84, 0.12)): add(mus, pluck(mtof(m), 0.7, 1.5), T[e] + 0.12 + dl, 0.2)
 # x-ray: a cold suspended chord
-add(mus, pad([mtof(m) for m in [50, 57, 64]], sh0('title') - sh0('xrayWrist') + 0.6, 0.3, 0.6, 3), sh0('xrayWrist'), 0.4)
+add(mus, pad([mtof(m) for m in [50, 57, 64]], sh0('title') - sh0('xrayOn') + 0.6, 0.3, 0.6, 3), sh0('xrayOn'), 0.4)
 # title: a boom and a big Dm swell
 t0 = sh0('title'); add(mus, kick(1.6, 70, 30), t0 + 0.02, 0.9)
 add(mus, pad([mtof(m) for m in CH['Dm'] + [62, 69]], 4.6, 0.25, 1.4, 6), t0, 0.6)
@@ -112,7 +112,7 @@ while t < t1 - 0.2:
     build = min(1, (t - t0) / max(0.1, T['kilos'] - t0))
     add(mus, kick(), t, 0.45 + 0.35 * build)
     if i % 2 == 1: add(mus, clap(), t, 0.15 + 0.3 * build)
-    if t > sh0('egg'): add(mus, hat(), t + b2 / 2, 0.18)
+    if t > sh0('gymCU'): add(mus, hat(), t + b2 / 2, 0.18)
     t += b2; i += 1
 L = (t1 - t0) / 4
 for i, c in enumerate(['Bb', 'F', 'C', 'Dm']): add(mus, pad([mtof(m + 12) for m in CH[c]] + [mtof(CH[c][0])], L + 0.8, 0.5, 0.8, 6), t0 + i * L, 0.45 + 0.12 * i)
@@ -128,6 +128,8 @@ t = t0 + 0.4
 while t < t1 - 0.1:
     p = 0.8 - 0.5 * np.clip((t - T['bolt']) / (t1 - T['bolt']), 0, 1); add(mus, kick(0.4, 80, 38), t, 0.35 + 0.15 * rise[min(len(rise) - 1, at(t - t0))]); t += p
 add(mus, kick(1.2, 70, 30), sh0('maya'), 0.6)
+for m, dl in ((74, 0), (77, 0.1), (81, 0.2)): add(mus, pluck(mtof(m), 0.8, 1.2), sh0('heroSmile') + 0.2 + dl, 0.14)
+add(mus, kick(1.0, 60, 28), sh0('pov'), 0.5)
 # E: let go — the music stops dead. A riser into the run.
 x = tt(T['catch'] - T['run0'] + 0.05); add(mus, shape(noise(len(x) / SR), 800, 9000) * (x / x[-1]) ** 2.5 * 0.5, T['run0'], 1.0)
 # G: home — a warm piano Bb–F–Gm–F with a melody, an open chord for the question
@@ -173,7 +175,7 @@ add(sfx, shape(noise(0.05), 1500, 8000) * np.exp(-tt(0.05) * 90), T['mug'], 0.5)
 add(sfx, clunk(), T['mugHit'], 0.5); add(sfx, glass(0.4, 8) * 0.6, T['mugHit'], 0.5)
 add(sfx, shape(noise(0.45), 400, 5000) * np.exp(-tt(0.45) * 7) * np.minimum(1, tt(0.45) / 0.01), T['mugHit'] + 0.02, 0.3)
 # x-ray: a hum and crackles as the cracks glow
-x = tt(sh0('title') - sh0('xrayWrist')); add(sfx, (np.sin(2 * np.pi * 120 * x) + 0.3 * np.sin(2 * np.pi * 240 * x)) * np.minimum(1, x / 0.2), sh0('xrayWrist'), 0.05)
+x = tt(sh0('title') - sh0('xrayOn')); add(sfx, (np.sin(2 * np.pi * 120 * x) + 0.3 * np.sin(2 * np.pi * 240 * x)) * np.minimum(1, x / 0.2), sh0('xrayOn'), 0.05)
 for i in range(4): add(sfx, glass(0.15, 3) * 0.6, T['crack'] + i * 0.35, 0.3, (-0.3, 0.3)[i % 2])
 add(sfx, whoosh(1.0), sh0('title') - 0.5, 0.35)
 # doctor: marker squeak, the rail bending (creak), the hand letting go
@@ -181,7 +183,6 @@ add(sfx, squeak(0.5, 1800, 2400), T['circle'] - 0.3, 0.06)
 add(sfx, groan(1.1) * 0.6 + squeak(1.1, 400, 260) * 0.4, T['bend'], 0.3)
 # gym: chalk clap, bar clank; the egg survives (a tiny tap)
 add(sfx, shape(noise(0.15), 600, 5000) * np.exp(-tt(0.15) * 30), sh0('gymWide') + 0.1, 0.3); add(sfx, clang(0.8, 900) * 0.4, sh0('gymWide') + 0.5, 0.25)
-add(sfx, shape(noise(0.03), 3000, 9000) * np.exp(-tt(0.03) * 100), T['egg'], 0.15)
 # the record: a roar, camera clicks; then phone pings
 ta, tb = sh0('recWide'), sh0('phone')
 add(sfx, crowd(T['kilos'] - ta + 0.4, 200, 1800) * adsr(at(T['kilos'] - ta + 0.4), 0.3, 0.1, 1, 0.3), ta, 0.3)
@@ -221,7 +222,7 @@ def birds(t0, t1, n, g=0.05):
         tc = t0 + R.uniform(0.1, max(0.2, t1 - t0 - 0.3)); y = tt(0.12); f = 3500 + 900 * np.sin(np.linspace(0, 3, len(y)))
         add(amb, np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.linspace(0, np.pi, len(y))), tc, g, R.uniform(-0.6, 0.6))
 add(amb, bed(sh0('jar'), 100, 900), 0, 0.15); birds(0.3, sh0('jar'), 4)
-add(amb, bed(sh0('xrayWrist') - sh0('jar'), 120, 1200), sh0('jar'), 0.15)
+add(amb, bed(sh0('xrayOn') - sh0('jar'), 120, 1200), sh0('jar'), 0.15)
 add(amb, bed(sh0('docWide') - sh0('title'), 80, 1500), sh0('title'), 0.2); birds(sh0('title'), sh0('docWide'), 6)
 add(amb, bed(sh0('gymWide') - sh0('docWide'), 100, 800), sh0('docWide'), 0.12)
 add(amb, bed(sh0('recWide') - sh0('gymWide'), 100, 1500), sh0('gymWide'), 0.15)

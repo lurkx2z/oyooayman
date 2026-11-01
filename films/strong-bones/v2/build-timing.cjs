@@ -8,29 +8,29 @@ const ROLE = { n: 'narrator', y: 'you', s: 'sister', d: 'doctor', c: 'coach', a:
 const SEQ = [
   // [who, id, gap before]
   ['n', 'n_wake', 0.15],
-  ['s', 's_handle', 2.7],    // the jar, then the mug
-  ['y', 'y_touch', 0.08],
-  ['y', 'y_ow', 0.35],
-  ['n', 'n_memo', 0.2],
-  ['n', 'n_title', 0.5],
-  ['d', 'd_cracks', 0.7],
-  ['d', 'd_brake', 0.35],
-  ['c', 'c_slow', 0.7],
-  ['a', 'a_record', 1.5],    // the careful lift, then the record
-  ['n', 'n_nick', 0.45],
-  ['a', 'a_final', 0.6],
-  ['s', 's_phone', 0.5],
-  ['w', 'w_going', 1.0],     // the scaffold groans and starts to lean
-  ['y', 'y_maya', 0.1],
-  ['n', 'n_cost', 0.3],
-  ['c', 'c_dare', 0.2],
-  ['a', 'a_tv', 5.4],        // ★ the choice: let go, run, catch, crack, a breath of silence
-  ['s', 's_idiot', 0.5],
-  ['s', 's_thanks', 0.9],
-  ['y', 'y_jar', 0.6],
-  ['n', 'n_cta', 0.9],
+  ['s', 's_handle', 6.4],    // the jar, then the mug
+  ['y', 'y_touch', 0.3],
+  ['y', 'y_ow', 0.5],
+  ['n', 'n_memo', 0.35],
+  ['n', 'n_title', 0.8],
+  ['d', 'd_cracks', 0.9],
+  ['d', 'd_brake', 0.55],
+  ['c', 'c_slow', 1.0],
+  ['a', 'a_record', 1.6],    // the careful lift, then the record
+  ['n', 'n_nick', 0.7],
+  ['a', 'a_final', 0.9],
+  ['s', 's_phone', 0.6],
+  ['w', 'w_going', 3.2],     // the scaffold groans and starts to lean
+  ['y', 'y_maya', 1.2],
+  ['n', 'n_cost', 0.45],
+  ['c', 'c_dare', 0.35],
+  ['a', 'a_tv', 5.8],        // ★ the choice: let go, run, catch, crack, a breath of silence
+  ['s', 's_idiot', 0.7],
+  ['s', 's_thanks', 1.0],
+  ['y', 'y_jar', 0.8],
+  ['n', 'n_cta', 1.0],
 ];
-const TAIL = 2.2;
+const TAIL = 2.4;
 const out = { clips: {}, order: [] };
 let t = 0.35;
 for (const [who, id, gap] of SEQ) {

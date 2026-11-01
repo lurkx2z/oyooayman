@@ -18,6 +18,14 @@ reference channel, with our own characters. 16:9, 1920×1080, 30 fps.
     white coat, worker hard hat), a neighbour, a viral phone feed, a GLASS HERCULES billboard, a TV news ticker.
   - **Pace.** 34 shots, a cut every ~2.2 s; the only pause is the choice (let go, run, catch, a breath of silence).
 
+- **v3** (2026-11-01, 1:25, same `v2/` files, the current page). Owner's v2 note: "the story at times goes too fast
+  and doesn't make sense … how did he know the thing was going to fall on her". Fixes: every beat gets a setup and a
+  reaction (the clock slap is seen with your arm attached, you stare at your hand; you pick up the jar, it breaks, you
+  stare at the lid; then the mug), the x-ray appears on your own arm, the table edge bends in the wide shot, the egg
+  is gone, gaps between lines are longer (37 shots, ~2.3 s each). The ending is set up: the arena's open back door
+  (EXIT · LOADING) is visible from the platform, Maya waves from it ("I'm at the back door, I can see him!"), you smile
+  at her, the bolt shears, the worker shouts, and you see the scaffold lean over her through the door.
+
 ## Story (v2)
 Alarm clock smashed → jar → mug handle ("Did you just rip the handle off?" / "I barely touched it!" / "Ow.") → x-ray
 → title on the street → doctor ("Hairline cracks. From a coffee mug." / "Your brain is the only brake you've got.")

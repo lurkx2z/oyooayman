@@ -114,6 +114,7 @@ SETS.kitchen = {
   },
 };
 const KIT2 = { top: 760 };
+const ADOOR = { x: 1500, y: 560, w: 250, h: 320 };   // the arena's back door
 
 /* ---------- street, morning (title) and the street outside the arena at dusk ---------- */
 function streetFar(g, dusk) {
@@ -261,10 +262,15 @@ SETS.arena = {
     // the platform (wood, chalk marks)
     g.fillStyle = '#b07f52'; g.beginPath(); g.moveTo(560, 940); g.lineTo(1360, 940); g.lineTo(1460, 1010); g.lineTo(460, 1010); g.closePath(); g.fill();
     g.fillStyle = '#7d5638'; g.fillRect(460, 1010, 1000, 22); g.fillStyle = 'rgba(255,255,255,0.2)'; g.beginPath(); g.ellipse(960, 975, 140, 14, 0, 0, Math.PI * 2); g.fill();
+    // the back door (open: the street outside is drawn live into it by doorView), a tunnel under the stands
+    box(g, ADOOR.x - 34, ADOOR.y - 40, ADOOR.w + 68, ADOOR.h + 40, '#3a3448', { r: 4, dark: 0.35 });
+    g.fillStyle = '#0c0a12'; g.fillRect(ADOOR.x, ADOOR.y, ADOOR.w, ADOOR.h);
+    for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#f2c230' : '#1b1b22'; g.beginPath(); const x0 = ADOOR.x - 34 + i * (ADOOR.w + 68) / 8; g.moveTo(x0, ADOOR.y - 40); g.lineTo(x0 + (ADOOR.w + 68) / 8, ADOOR.y - 40); g.lineTo(x0 + (ADOOR.w + 68) / 16, ADOOR.y - 18); g.lineTo(x0 - (ADOOR.w + 68) / 16, ADOOR.y - 18); g.fill(); }
+    txt(g, 'EXIT · LOADING', ADOOR.x + ADOOR.w / 2, ADOOR.y - 52, `700 24px ${COND}`, '#7fe0a0');
     // judges' table on the left, a coach's chair on the right
     box(g, 60, 860, 340, 100, '#20253a', { r: 4 }); for (let i = 0; i < 3; i++) { g.fillStyle = '#f2f2f2'; g.beginPath(); g.arc(120 + i * 110, 880, 9, 0, Math.PI * 2); g.fill(); }
   },
-  glow(g) { glow(g, 960, 760, 600, 'rgba(255,220,170,0.18)'); },
+  glow(g) { glow(g, 960, 760, 600, 'rgba(255,220,170,0.18)'); shaft(g, [[ADOOR.x, ADOOR.y + ADOOR.h], [ADOOR.x + ADOOR.w, ADOOR.y + ADOOR.h], [ADOOR.x + ADOOR.w - 120, 1215], [ADOOR.x - 260, 1215]], 'rgba(255,170,110,0.6)', 0.5); },
   fg(g) { // a TV camera on a tripod and a photographer, close and soft
     g.fillStyle = '#0d0c14'; rr(g, 1780, 760, 260, 150, 14); g.fill(); g.fillRect(1700, 800, 100, 60); g.fillRect(1880, 900, 16, 340); g.beginPath(); g.moveTo(1888, 1000); g.lineTo(1780, 1260); g.lineTo(1800, 1260); g.lineTo(1888, 1030); g.lineTo(1990, 1260); g.lineTo(2010, 1260); g.fill();
     g.fillStyle = '#0d0c14'; g.beginPath(); g.arc(LX + 200, 980, 70, 0, Math.PI * 2); g.fill(); rr(g, LX + 110, 1040, 200, 300, 60); g.fill();

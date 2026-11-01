@@ -1,6 +1,6 @@
 /* =====================================================================
    SHOTS (v2) — the edit, placed on the voices' word times (window.SBT from v2/build-timing.cjs).
-   34 shots, a cut every ~2 s. Characters talk with lip-flap from their own clips:
+   v3 edit: 37 shots, each beat gets a setup and a reaction; the ending is set up through the arena's open back door. Characters talk with lip-flap from their own clips:
    you (teal hoodie), Maya (yellow, ponytail), the doctor (white coat), the coach (green cap), a worker (hard hat).
    ===================================================================== */
 
@@ -11,40 +11,40 @@ function Wd(id, w, n = 0) {
 }
 const T = {};
 T.wake = Wd('n_wake', 'wake');
-T.slap = Wd('n_wake', 'stronger') + 0.14;
-T.lid = S('s_handle') - 1.72;
-T.mugUp = S('s_handle') - 0.95;
-T.mug = S('s_handle') - 0.45;
+T.slap = E('n_wake') + 0.35;
+T.lid = T.slap + 3.6;
+T.mugUp = T.lid + 1.55;
+T.mug = T.mugUp + 0.42;
 T.mugHit = T.mug + 0.3;
 T.crack = Wd('n_memo', 'bones');
 T.circle = Wd('d_cracks', 'cracks');
-T.bend = Wd('d_brake', 'brain') - 0.2;
+T.bend = Wd('d_brake', 'snap') - 0.1;
 T.relax = Wd('d_brake', 'brake');
-T.egg = S('a_record') - 1.2;
 T.kilos = Wd('a_record', 'kilos');
 T.record = Wd('a_record', 'record');
-T.bolt = S('w_going') - 0.45;
+T.bolt = S('w_going') - 1.2;
 T.letGo = E('c_dare') + 0.45;
 T.run0 = E('c_dare') + 1.05;
 T.catch = T.run0 + 1.3;
 T.pop = S('n_cta') - 0.25;
-// the scaffold: a bolt shears, it sags 7°, then (after you let go) it falls to 30° where you catch it
+// the scaffold: a bolt shears, it sags 12°, then (after you let go) it falls to 38° where you catch it
 function leanDeg(t) {
   if (t < T.bolt) return 0;
-  if (t < T.run0) return 7 * eOut((t - T.bolt) / 2.6) + Math.sin(t * 7) * 0.25 * sm(t, T.bolt, T.bolt + 0.5);
-  if (t < T.catch) { const u = (t - T.run0) / (T.catch - T.run0); return 7 + (CATCH_DEG - 7) * u * u; }
+  if (t < T.run0) return 12 * eOut((t - T.bolt) / 3.4) + Math.sin(t * 7) * 0.3 * sm(t, T.bolt, T.bolt + 0.5);
+  if (t < T.catch) { const u = (t - T.run0) / (T.catch - T.run0); return 12 + (CATCH_DEG - 12) * u * u; }
   return CATCH_DEG - 1.2 * Math.exp(-(t - T.catch) * 5) * Math.sin((t - T.catch) * 30);
 }
 const SCAF = { x: 1150, y: 940, s: 1 };
 const CATCH_DEG = 38;
+const MAYA_OUT = 900;   // where Maya stands outside the back door
 
 const SHOTS = [
-  ['bedWide', T.slap - 0.55], ['bedSlap', T.slap + 0.7], ['jar', T.lid + 0.6], ['mug', Wd('y_touch', 'i') - 0.1],
-  ['heroCU', S('y_ow') - 0.25], ['ow', S('n_memo') - 0.1], ['xrayWrist', S('n_title') - 0.25], ['title', S('d_cracks') - 0.3],
-  ['docWide', Wd('d_cracks', 'hairline') - 0.15], ['lightbox', S('d_brake') - 0.2], ['docTwo', T.bend - 0.3], ['rail', S('c_slow') - 0.35],
-  ['gymWide', Wd('c_slow', 'like') - 0.15], ['gymCU', E('c_slow') + 0.1], ['egg', S('a_record') - 0.1], ['recWide', Wd('a_record', 'new') - 0.25],
-  ['recLow', S('n_nick') - 0.15], ['phone', Wd('n_nick', 'glass') - 0.35], ['billboard', S('a_final') - 0.2], ['finalWide', S('s_phone') - 0.3],
-  ['outside', T.bolt - 0.3], ['bolt', S('w_going') - 0.05], ['worker', S('y_maya') - 0.1], ['maya', S('n_cost') - 0.1],
+  ['bedWide', 2.5], ['bedMed', T.slap + 0.8], ['handStare', T.slap + 2.0], ['kitJar', T.lid - 0.45], ['jar', T.lid + 0.75],
+  ['kitLid', T.mugUp - 0.1], ['mug', S('y_touch') - 0.1], ['heroCU', S('y_ow') - 0.25], ['ow', S('n_memo') - 0.1], ['xrayOn', S('n_title') - 0.3],
+  ['title', S('d_cracks') - 0.3], ['docWide', Wd('d_cracks', 'hairline') - 0.15], ['lightbox', S('d_brake') - 0.2], ['docTwo', S('c_slow') - 0.5],
+  ['gymWide', Wd('c_slow', 'like') - 0.15], ['gymCU', S('a_record') - 0.15], ['recWide', Wd('a_record', 'new') - 0.25], ['recLow', S('n_nick') - 0.15],
+  ['phone', Wd('n_nick', 'glass') - 0.35], ['billboard', S('a_final') - 0.2], ['finalWide', S('s_phone') - 0.3], ['outside', E('s_phone') + 0.3],
+  ['heroSmile', T.bolt - 0.3], ['bolt', S('w_going') - 0.1], ['worker', E('w_going') + 0.05], ['pov', S('y_maya') - 0.1], ['maya', S('n_cost') - 0.1],
   ['arms', S('c_dare') - 0.12], ['coach', E('c_dare') + 0.15], ['release', T.run0], ['run', T.catch], ['catch', T.catch + 1.0],
   ['still', S('a_tv') - 0.25], ['tv', S('s_idiot') - 0.25], ['sofa', S('y_jar') - 0.3], ['jarAsk', E('y_jar') + 0.3], ['end', 1e9],
 ].reduce((acc, [id, t1]) => { acc.push({ id, t0: acc.length ? acc[acc.length - 1].t1 : -1, t1 }); return acc; }, []);
@@ -122,13 +122,14 @@ const DRAW = {
   mug(g, t, sh) {
     const snap = t >= T.mug;
     let hand;
-    drawSet(g, 'kitchen', { x: 980, y: 560, z: 1.08 }, t, (q) => {
+    drawSet(g, 'kitchen', { x: 1000, y: 540, z: 1.3 }, t, (q) => {
       const p = t < T.mugUp ? pose(POSES.relaxed) : snap ? pose({ lSh: 0.1, lEl: 0.2, rSh: 1.25, rEl: 0.9, tilt: 0.1 }) : mixPose(pose(POSES.relaxed), pose({ lSh: 0.1, lEl: 0.2, rSh: 1.05, rEl: 1.1 }), eIO((t - T.mugUp) / 0.35));
       const H1 = hero(q, t, { x: 760, y: 1010, h: 600, p, eyes: { wide: snap ? 0.7 : 0, ly: snap ? 0.6 : 0, lx: 0.3 }, mouth: snap ? 'o' : 'smile', brow: snap ? 0.6 : undefined });
       hand = H1.rHand;
       const look = t > T.mug + 0.15;
       maya(q, t, { x: 1250, y: 1010, h: 540, p: look ? pose(POSES.crossed) : pose(POSES.holdFront), eyes: { wide: look ? 0.4 : 0, ly: look ? 0.4 : 0.6 }, brow: look ? -0.5 : undefined, mouth: look ? 'flat' : 'smile' });
       if (!look) { drawMug(q, 1180, 800, 0.9, true, true); steam(q, 1180, 730, 0.8, t); }
+      drawJar(q, 640, KIT2.top + 4, 1.15, true); drawLid(q, 560, KIT2.top - 12, 1.15, true, 0.1);
       // your mug: in your hand until the handle snaps
       if (!snap) { const mx = t < T.mugUp ? 905 : hand[0] - 28, my = t < T.mugUp ? KIT2.top + 4 : hand[1] + 40; drawMug(q, mx, my, 1.1, true, true); steam(q, mx, my - 85, 0.9, t); }
       else drawMug(q, hand[0] - 34, hand[1] + 40, 1.1, true, false, 0.2);
@@ -188,7 +189,7 @@ const DRAW = {
     }, { glow: true });
   },
   docTwo(g, t, sh) {
-    drawSet(g, 'doctor', { x: 700, y: 520, z: 1.55 }, t, (q) => { lightboxXray(q, t); docScene(q, t, true); });
+    drawSet(g, 'doctor', { x: 720, y: 620, z: 1.55 }, t, (q) => { lightboxXray(q, t); docScene(q, t, true); });
   },
   rail(g, t, sh) {
     setBlur(g, 'doctor', { x: 800, y: 700, z: 1.8 }, t, 0.2);
@@ -260,9 +261,9 @@ const DRAW = {
   finalWide(g, t, sh) {
     const u = U(t, sh);
     drawSet(g, 'arena', { x: 960, y: 560, z: 1.0 + 0.14 * eIO(u) }, t, (q) => {
-      arenaScreen(q, t, 'final'); spot(q, 960, 120, 1000, 30, 260, 0.85);
+      arenaScreen(q, t, 'final'); doorView(q, t, 'wave'); spot(q, 960, 120, 1000, 30, 260, 0.85);
       coach(q, t, { x: 330, y: 960, h: 440, p: pose(POSES.crossed), eyes: { lx: 0.4 }, brow: 0.3 });
-      drawStick(q, { x: 1560, y: 960, h: 440, f: -1, col: RIVAL, p: pose(POSES.crossed), t, eyes: { open: 0.6, lx: 0.4 }, brow: -0.6, mouth: 'smirk', rim: -1, blink: blinkAt(t, 9) });
+      drawStick(q, { x: 1290, y: 960, h: 440, f: -1, col: RIVAL, p: pose(POSES.crossed), t, eyes: { open: 0.6, lx: 0.4 }, brow: -0.6, mouth: 'smirk', rim: -1, blink: blinkAt(t, 9) });
       const walkIn = cl((t - sh.t0) / 1.4), x = lerp(640, 960, eOut(walkIn));
       if (walkIn < 1) { hero(q, t, { x, y: 975, h: 420, p: walk(t * 2), eyes: { lx: 0.3 }, brow: -0.3 }); drawBar(q, 960, 975 - 80, 0.42, 0); }
       else liftHero(q, t, 960, 975, 420, 0, { eyes: { ly: 0.2 }, brow: -0.5 });
@@ -271,11 +272,10 @@ const DRAW = {
   },
   /* ---------- outside: Maya under the scaffold ---------- */
   outside(g, t, sh) {
-    drawSet(g, 'arenaOut', { x: 900, y: 600, z: 1.15 }, t, (q) => {
+    drawSet(g, 'arenaOut', { x: 780, y: 560, z: 1.0 + 0.06 * U(t, sh) }, t, (q) => {
       scaffoldTower(q, SCAF.x, SCAF.y, SCAF.s, leanDeg(t), t);
       scaffoldWorkers(q, t);
-      const wk = cl((t - sh.t0) / 2.4), mx = lerp(560, 900, eOut(wk));
-      maya(q, t, { x: mx, y: 940, h: 400, f: 1, rim: -1, p: wk < 1 ? mixPose(walk(t * 1.8), pose(POSES.phone), 0.6) : pose(POSES.phone), mouth: 'smile', eyes: { lx: 0.5, ly: 0.3 } });
+      maya(q, t, { x: MAYA_OUT, y: 940, h: 400, f: -1, rim: -1, p: wavePose(t), mouth: 'smile', eyes: { lx: -0.4 } });
     });
   },
   bolt(g, t, sh) {
@@ -294,7 +294,7 @@ const DRAW = {
     });
   },
   maya(g, t, sh) {
-    drawSet(g, 'arena', { x: 1000, y: 720, z: 2.4 }, t, (q) => { spot(q, 960, 120, 1000, 30, 260, 0.85); liftHero(q, t, 960, 975, 420, 0, { eyes: { wide: 1, lx: -1 }, brow: 1, turn: true, blink: false }); });
+    drawSet(g, 'arena', { x: 1000, y: 720, z: 2.4 }, t, (q) => { spot(q, 960, 120, 1000, 30, 260, 0.85); liftHero(q, t, 960, 975, 420, 0, { eyes: { wide: 1, lx: 1 }, brow: 1, turn: true, blink: false }); });
   },
   arms(g, t, sh) {
     setBlur(g, 'arena', { x: 960, y: 700, z: 1.8 }, t, 0.35);
@@ -320,7 +320,7 @@ const DRAW = {
     const u = U(t, sh), hx = lerp(420, 775, eIn(u) * 0.3 + u * 0.7);
     drawSet(g, 'arenaOut', { x: hx + 120, y: 600, z: 1.2 }, t, (q) => {
       scaffoldTower(q, SCAF.x, SCAF.y, SCAF.s, leanDeg(t), t, { clamp: false });
-      maya(q, t, { x: 950, y: 940, h: 380, f: -1, p: pose(POSES.cower), eyes: { wide: 1, ly: -0.6 }, brow: 1, mouth: 'open', talk: 0 });
+      maya(q, t, { x: MAYA_OUT + 30, y: 940, h: 380, f: -1, p: pose(POSES.cower), eyes: { wide: 1, ly: -0.6 }, brow: 1, mouth: 'open', talk: 0 });
       hero(q, t, { x: hx, y: 940, h: 430, p: runP(t), eyes: { wide: 0.6, ly: -0.4 }, brow: -0.8, mouth: 'grit', talk: 0 });
     });
     speedLines(g, t, 0.8, -1);
@@ -363,12 +363,110 @@ const DRAW = {
   },
 };
 
+
+/* ---------- v3 shots: setups and reactions ---------- */
+Object.assign(DRAW, {
+  bedMed(g, t, sh) {
+    const hit = t >= T.slap, u = t - T.slap;
+    drawSet(g, 'bedroom', { x: 930, y: 730, z: 1.9, shake: hit ? Math.max(0, 0.8 - u * 2) : 0 }, t, (q) => {
+      if (!hit) alarmClock(q, 785, 800, 0.75, t, 1); else alarmClock(q, 785, 800, 0.75, t, 0, u);
+      if (hit) { q.strokeStyle = '#2a1a12'; q.lineWidth = 5; q.beginPath(); q.moveTo(790, 786); q.lineTo(778, 830); q.lineTo(796, 870); q.lineTo(784, 930); q.stroke(); }
+      bedHead(q, t, { open: 0.7, wide: 0, lx: -0.6 }, 'flat', 0.2);
+      // the arm comes out from under the duvet, hovers, and taps the clock
+      const r = sm(t, sh.t0, T.slap - 0.45), d = hit ? 1 : eIn((t - (T.slap - 0.18)) / 0.18);
+      const hand = [lerp(lerp(1060, 820, r), 790, d), lerp(lerp(800, 650, r), 745, d)];
+      sleeve(q, [1110, 790], hand, PAL.hero, 34); fist(q, hand[0], hand[1], 20);
+      bedDuvet(q, t);
+    });
+  },
+  handStare(g, t, sh) {
+    drawSet(g, 'bedroom', { x: 1000, y: 640, z: 1.7 }, t, (q) => {
+      alarmClock(q, 785, 800, 0.75, t, 0, 1.6);
+      hero(q, t, { x: 1080, y: 905, h: 470, f: -1, rim: -1, p: pose({ lHip: 1.45, lKn: 1.45, rHip: 1.35, rKn: 1.4, lSh: 0.2, lEl: 0.3, rSh: 1.45, rEl: 1.55, lean: 0.06, tilt: 0.12 }), eyes: { wide: 0.9, lx: 0.4, ly: 0.2 }, brow: 0.8, mouth: 'o', talk: 0 });
+      bedDuvet(q, t, true);
+    });
+  },
+  kitJar(g, t, sh) {
+    drawSet(g, 'kitchen', { x: 860, y: 540, z: 1.55 }, t, (q) => {
+      maya(q, t, { x: 1300, y: 1010, h: 540, p: pose(POSES.holdFront), eyes: { ly: 0.6 }, mouth: 'smile', talk: 0 });
+      const H1 = hero(q, t, { x: 760, y: 1010, h: 600, p: pose({ lSh: 0.75, lEl: 0.75, rSh: 0.95, rEl: 1.05, tilt: 0.12 }), eyes: { ly: 0.7, lx: 0.4 }, brow: t > T.lid - 1.2 ? -0.3 : undefined, mouth: t > T.lid - 1.2 ? 'grit' : 'flat' });
+      const jx = H1.lHand[0] + 10, jy = H1.lHand[1] + 40, tw = sm(t, T.lid - 1.3, T.lid - 0.6);
+      drawJar(q, jx, jy, 1.15, false); drawLid(q, jx, jy - 92 * 1.15 - 14 * 1.15, 1.15, false, noise(t * 30, 5) * 0.06 * tw);
+      fist(q, H1.lHand[0], H1.lHand[1], 18); fist(q, jx + 4, jy - 92 * 1.15 - 8, 19);
+    });
+  },
+  kitLid(g, t, sh) {
+    drawSet(g, 'kitchen', { x: 900, y: 540, z: 1.55 }, t, (q) => {
+      maya(q, t, { x: 1300, y: 1010, h: 540, p: pose(POSES.holdFront), eyes: { ly: 0.2, lx: -0.4, wide: 0.3 }, mouth: 'o', talk: 0 });
+      const H1 = hero(q, t, { x: 760, y: 1010, h: 600, p: pose({ lSh: 0.3, lEl: 0.4, rSh: 1.7, rEl: 0.6, tilt: -0.12 }), eyes: { wide: 0.9, ly: -0.6, lx: 0.4 }, brow: 0.8, mouth: 'o' });
+      drawLid(q, H1.rHand[0], H1.rHand[1] - 10, 1.15, true, -0.2); fist(q, H1.rHand[0], H1.rHand[1], 18);
+      drawJar(q, 640, KIT2.top + 4, 1.15, true);
+    });
+  },
+  xrayOn(g, t, sh) {
+    const C = { x: 800, y: 640, z: 2.3 };
+    drawSet(g, 'kitchen', C, t, (q) => {
+      const H1 = hero(q, t, { x: 780, y: 1010, h: 600, p: pose(POSES.wristHold), eyes: { open: 0.75, lx: -0.2, ly: 0.6 }, brow: 1, mouth: 'wavy', sweat: (t * 0.8) % 1, talk: 0 });
+      // x-ray vision: the room darkens, the forearm shows its bones, hairline cracks glow in
+      const xa = sm(t, sh.t0 + 0.05, sh.t0 + 0.4);
+      q.save(); q.setTransform(1, 0, 0, 1, 0, 0); q.globalAlpha = 0.6 * xa; q.fillStyle = '#04122a'; q.fillRect(0, 0, W, H); q.restore(); camK(q, C, 1, t);
+      for (const [e, hnd] of [[H1.lElbow, H1.lHand], [H1.rElbow, H1.rHand]]) {
+        const dx = hnd[0] - e[0], dy = hnd[1] - e[1], L = Math.hypot(dx, dy), rot = Math.atan2(-dx, dy);
+        q.globalAlpha = xa; xrayArm(q, e[0] + dx * 0.62, e[1] + dy * 0.62, L / 640, rot, sm(t, T.crack, T.crack + 1.3), t); q.globalAlpha = 1;
+      }
+    });
+  },
+  heroSmile(g, t, sh) {
+    drawSet(g, 'arena', { x: 1250, y: 700, z: 1.75 }, t, (q) => {
+      doorView(q, t, 'wave'); spot(q, 960, 120, 1000, 30, 260, 0.85);
+      liftHero(q, t, 960, 975, 420, 0, { eyes: { lx: 1, ly: -0.2 }, brow: 0.3, mouth: 'smile', turn: true });
+    }, { fg: false });
+  },
+  pov(g, t, sh) {
+    drawSet(g, 'arena', { x: ADOOR.x + ADOOR.w / 2, y: ADOOR.y + ADOOR.h / 2 + 20, z: 3.1 + 0.15 * U(t, sh), shake: 0.15 }, t, (q) => doorView(q, t, 'look'), { fg: false });
+    g.setTransform(1, 0, 0, 1, 0, 0); const gr = g.createRadialGradient(W / 2, H / 2, 300, W / 2, H / 2, 1100); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.6)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  },
+});
+POSES.phoneWave = { lSh: 0.5, lEl: 1.9, rSh: 2.5, rEl: 0.45, tilt: 0.15 };
+const wavePose = (t) => pose(Object.assign({}, POSES.phoneWave, { rEl: 0.45 + 0.35 * Math.sin(t * 9) }));
+function bedHead(q, t, eyes, mouth, brow) {
+  const R = 62, hx = 1040, hy = 700; const gr = q.createRadialGradient(hx + 20, hy - 30, 5, hx, hy, R); gr.addColorStop(0, '#3a3d55'); gr.addColorStop(1, '#0e0f18');
+  q.fillStyle = gr; q.beginPath(); q.arc(hx, hy, R, 0, Math.PI * 2); q.fill(); face(q, [hx, hy], R, -1, { eyes, mouth, brow }, {});
+}
+function bedDuvet(q, t, sitting) {
+  const br = Math.sin(t * 1.6) * 4; const dg = q.createLinearGradient(0, 700, 0, 880); dg.addColorStop(0, '#6f93a8'); dg.addColorStop(1, '#3f5f73'); q.fillStyle = dg;
+  q.beginPath(); if (sitting) { q.moveTo(1000, 860); q.quadraticCurveTo(1010, 790, 1150, 800); } else { q.moveTo(1000, 860); q.quadraticCurveTo(1000, 760, 1110, 750 - br); }
+  q.quadraticCurveTo(1400, 700 - br, 1600, 760); q.quadraticCurveTo(1900, 770, 1930, 860); q.closePath(); q.fill();
+}
+// the street outside, seen through the arena's open back door (live: the scaffold, the worker, Maya)
+function doorView(q, t, mode) {
+  const D = ADOOR, s = D.h / 900, cx = 1040, cy = 600;
+  q.save(); q.beginPath(); q.rect(D.x, D.y, D.w, D.h); q.clip();
+  q.translate(D.x + D.w / 2, D.y + D.h / 2); q.scale(s, s); q.translate(-cx, -cy);
+  const O = SETS.arenaOut;
+  putL(q, LAY('arenaOut.far', O.far, { res: 0.6, blur: 3 }), LX, LY); putL(q, LAY('arenaOut.back', O.back), LX, LY);
+  scaffoldTower(q, SCAF.x, SCAF.y, SCAF.s, leanDeg(t), t); scaffoldWorkers(q, t, t > S('w_going') - 0.2);
+  const look = mode === 'look';
+  maya(q, t, { x: MAYA_OUT, y: 940, h: 400, f: 1, rim: 1, p: look ? pose(POSES.handsUp) : wavePose(t), eyes: look ? { wide: 1, ly: -0.8, lx: 0.4 } : { lx: -0.3 }, mouth: look ? 'open' : 'smile', talk: 0, brow: look ? 1 : undefined });
+  q.globalCompositeOperation = 'lighter'; glow(q, 1040, 500, 700, 'rgba(255,170,110,0.25)'); q.globalCompositeOperation = 'source-over';
+  q.restore();
+  // the door frame's inner shadow
+  const g2 = q.createLinearGradient(D.x, 0, D.x + 40, 0); g2.addColorStop(0, 'rgba(0,0,0,0.6)'); g2.addColorStop(1, 'rgba(0,0,0,0)'); q.fillStyle = g2; q.fillRect(D.x, D.y, 40, D.h);
+}
+
 /* ---------- scene helpers ---------- */
 function lightboxXray(q, t) { q.save(); rr(q, 254, 224, 472, 332, 6); q.clip(); vgrad(q, 254, 224, 472, 332, [[0, '#e8f4ff'], [1, '#bcd8f0']]); q.fillStyle = 'rgba(10,30,60,0.85)'; q.fillRect(254, 224, 472, 332); xrayArm(q, 490, 390, 0.36, Math.PI / 2, 1, t); q.restore(); q.globalCompositeOperation = 'lighter'; glow(q, 490, 390, 330, 'rgba(160,210,255,0.25)'); q.globalCompositeOperation = 'source-over'; }
 function docScene(q, t, close) {
   doctor(q, t, { x: close ? 300 : 180, y: 960, h: 500, f: 1, p: close ? pose({ lSh: 0.5, lEl: 1.4, rSh: 0.9, rEl: 0.6, tilt: -0.05 }) : pose(POSES.point), eyes: { lx: close ? 0.6 : -0.2 }, brow: 0.2 });
   const grip = close && t > T.bend - 0.6;
-  hero(q, t, { x: 860, y: 905, h: 470, f: -1, rim: 1, p: pose(grip ? { lHip: 1.45, lKn: 1.45, rHip: 1.35, rKn: 1.4, lSh: 0.2, lEl: 0.4, rSh: -0.15, rEl: 0.3, lean: 0.05 } : POSES.sitHands), eyes: { lx: -0.5, wide: close ? 0.3 : 0 }, brow: close ? 0.9 : 0.4, mouth: close ? 'sad' : 'flat' });
+  const bend = close ? sm(t, T.bend, T.bend + 0.9) : 0, rel = close ? sm(t, T.relax, T.relax + 0.5) : 0;
+  const Hh = hero(q, t, { x: 860, y: 905, h: 470, f: -1, rim: 1, p: pose(grip && !rel ? { lHip: 1.45, lKn: 1.45, rHip: 1.35, rKn: 1.4, lSh: 0.2, lEl: 0.4, rSh: -0.25, rEl: 0.15, lean: 0.05 } : POSES.sitHands), eyes: { lx: bend > 0.3 && !rel ? 0.3 : -0.5, ly: bend > 0.3 && !rel ? 0.8 : 0, wide: close ? 0.3 + bend * 0.6 : 0 }, brow: close ? 0.9 : 0.4, mouth: bend > 0.3 && !rel ? 'o' : close ? 'sad' : 'flat' });
+  if (close) { // the table's steel edge, bent where you grip it
+    const hx = Hh.rHand[0], ry = 826, d = bend * 46;
+    q.strokeStyle = '#c4ccd4'; q.lineWidth = 16; q.lineCap = 'round'; q.beginPath(); q.moveTo(530, ry); q.lineTo(hx - 70, ry); q.quadraticCurveTo(hx, ry + d * 2, hx + 70, ry); q.lineTo(1070, ry); q.stroke();
+    q.strokeStyle = 'rgba(255,255,255,0.7)'; q.lineWidth = 4; q.beginPath(); q.moveTo(530, ry - 4); q.lineTo(hx - 70, ry - 4); q.quadraticCurveTo(hx, ry - 4 + d * 2, hx + 70, ry - 4); q.lineTo(1070, ry - 4); q.stroke();
+    if (grip && !rel) { fist(q, hx, ry + d, 15); if (bend > 0.1 && bend < 1) { q.strokeStyle = 'rgba(255,255,255,0.8)'; q.lineWidth = 3; for (const k of [-1, 1]) { q.beginPath(); q.moveTo(hx + k * 30, ry - 20); q.lineTo(hx + k * 46, ry - 34); q.stroke(); } } }
+  }
   maya(q, t, { x: 1330, y: 950, h: 420, f: -1, p: pose(POSES.sitStool), eyes: { lx: -0.5, ly: 0.3 }, mouth: 'flat', brow: 0.3 });
 }
 // you lifting: u 0 (bar on the floor, gripped) … 0.5 (racked) … 1 (overhead)
@@ -414,7 +512,7 @@ function scaffoldWorkers(q, t, shout) {
 function catchPose(q, t, u) {
   const L = leanDeg(t), hp = scaffoldPt(SCAF.x, SCAF.y, SCAF.s, L, cl(520 / (820 * Math.cos(L * Math.PI / 180)), 0, 1));
   scaffoldTower(q, SCAF.x, SCAF.y, SCAF.s, L, t, { clamp: false });
-  maya(q, t, { x: 950, y: 940, h: 380, f: -1, p: u > 1 ? pose({ lean: 0.1, lSh: 0.4, lEl: 0.6, rSh: 0.3, rEl: 0.7, lHip: 0.6, lKn: 1.1, rHip: 0.5, rKn: 1.0, tilt: -0.5 }) : pose(POSES.cower), eyes: { wide: 1, ly: -0.6, lx: -0.6 }, brow: 1, mouth: u > 1 ? 'o' : 'open', talk: 0 });
+  maya(q, t, { x: MAYA_OUT + 30, y: 940, h: 380, f: -1, p: u > 1 ? pose({ lean: 0.1, lSh: 0.4, lEl: 0.6, rSh: 0.3, rEl: 0.7, lHip: 0.6, lKn: 1.1, rHip: 0.5, rKn: 1.0, tilt: -0.5 }) : pose(POSES.cower), eyes: { wide: 1, ly: -0.6, lx: -0.6 }, brow: 1, mouth: u > 1 ? 'o' : 'open', talk: 0 });
   const tr = noise(t * 30, 2) * 0.05;
   hero(q, t, { x: hp[0] + 30, y: 940, h: 430, p: pose(Object.assign({}, POSES.catch, { lSh: 2.75 + tr, rSh: 2.55 - tr })), eyes: { open: 0.5, ly: -0.3 }, brow: 1, mouth: 'grit', sweat: (t * 0.8) % 1, talk: 0 });
 }
