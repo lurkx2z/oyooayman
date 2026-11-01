@@ -1,0 +1,62 @@
+# Narrate the "10x stronger, bones weren't" 1-minute test: turns films/strong-bones/NARRATION.md (narrator) and
+# NARRATION-SISTER.md (the sister) into verified MP3 clips plus word timestamps (tools/narrate-aligned.cjs), then
+# commits them back to this branch. Uses the repository secret ELEVENLABS_API_KEY (never printed).
+name: Narrate strong-bones test
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Regenerate every clip even if its text did not change"
+        type: boolean
+        default: false
+  push:
+    branches: ["claude/project-thread-qptq9u"]
+    paths: ["films/strong-bones/NARRATION*.md", ".github/workflows/narrate-strong-bones.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: narrate-strong-bones-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  narrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SLUG: strong-bones
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install ffmpeg (for the playback check)
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg >/dev/null; }
+      - name: Generate, verify and time every clip
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+        run: |
+          if [ -z "$ELEVENLABS_API_KEY" ]; then echo "::error::The secret ELEVENLABS_API_KEY is missing."; exit 1; fi
+          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION.md" $FORCE
+          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION.md" --realign --summary "$GITHUB_STEP_SUMMARY"
+          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION-SISTER.md" --out "films/$SLUG/narration-sister" $FORCE
+          node tools/narrate-aligned.cjs --script "films/$SLUG/NARRATION-SISTER.md" --out "films/$SLUG/narration-sister" --realign --summary "$GITHUB_STEP_SUMMARY"
+      - name: Commit the clips back to this branch
+        if: always()
+        run: |
+          git config user.name "narration-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "films/$SLUG/narration" "films/$SLUG/narration-sister" 2>/dev/null || true
+          if git diff --cached --quiet; then echo "nothing new to commit"; exit 0; fi
+          git commit -m "narration: $SLUG clips / word timestamps (ElevenLabs, run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3))
+          done
+          exit 1
