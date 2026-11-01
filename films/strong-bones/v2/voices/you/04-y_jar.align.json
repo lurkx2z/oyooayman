@@ -1,0 +1,354 @@
+{
+ "id": "04-y_jar",
+ "text": "...Can you open this for me?",
+ "seconds": 1.52,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "...Can",
+   "start": 0.06,
+   "end": 0.2
+  },
+  {
+   "text": "you",
+   "start": 0.26,
+   "end": 0.34
+  },
+  {
+   "text": "open",
+   "start": 0.46,
+   "end": 0.66
+  },
+  {
+   "text": "this",
+   "start": 0.72,
+   "end": 0.86
+  },
+  {
+   "text": "for",
+   "start": 0.9,
+   "end": 1.02
+  },
+  {
+   "text": "me?",
+   "start": 1.1,
+   "end": 1.2
+  }
+ ],
+ "characters": [
+  {
+   "text": ".",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": ".",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": ".",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": "C",
+   "start": 0.08,
+   "end": 0.107
+  },
+  {
+   "text": "a",
+   "start": 0.107,
+   "end": 0.133
+  },
+  {
+   "text": "n",
+   "start": 0.133,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "y",
+   "start": 0.24,
+   "end": 0.267
+  },
+  {
+   "text": "o",
+   "start": 0.267,
+   "end": 0.293
+  },
+  {
+   "text": "u",
+   "start": 0.293,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "o",
+   "start": 0.4,
+   "end": 0.46
+  },
+  {
+   "text": "p",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "e",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": "n",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "h",
+   "start": 0.74,
+   "end": 0.76
+  },
+  {
+   "text": "i",
+   "start": 0.76,
+   "end": 0.78
+  },
+  {
+   "text": "s",
+   "start": 0.78,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "f",
+   "start": 0.88,
+   "end": 0.907
+  },
+  {
+   "text": "o",
+   "start": 0.907,
+   "end": 0.933
+  },
+  {
+   "text": "r",
+   "start": 0.933,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "m",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "e",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "?",
+   "start": 1.2,
+   "end": 1.52
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "...Can",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "you",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "open",
+   "start": 0.4,
+   "end": 0.64
+  },
+  {
+   "text": "this",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "for",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "me?",
+   "start": 1.04,
+   "end": 1.52
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": ".",
+   "start": 0.06,
+   "end": 0.06
+  },
+  {
+   "text": ".",
+   "start": 0.06,
+   "end": 0.06
+  },
+  {
+   "text": ".",
+   "start": 0.06,
+   "end": 0.06
+  },
+  {
+   "text": "C",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "a",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "n",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": " ",
+   "start": 0.2,
+   "end": 0.26
+  },
+  {
+   "text": "y",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": "o",
+   "start": 0.28,
+   "end": 0.28
+  },
+  {
+   "text": "u",
+   "start": 0.28,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.46
+  },
+  {
+   "text": "o",
+   "start": 0.46,
+   "end": 0.56
+  },
+  {
+   "text": "p",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "e",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": "n",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": " ",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.72,
+   "end": 0.72
+  },
+  {
+   "text": "h",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "i",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": "s",
+   "start": 0.82,
+   "end": 0.86
+  },
+  {
+   "text": " ",
+   "start": 0.86,
+   "end": 0.9
+  },
+  {
+   "text": "f",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": "o",
+   "start": 0.96,
+   "end": 0.98
+  },
+  {
+   "text": "r",
+   "start": 0.98,
+   "end": 1.02
+  },
+  {
+   "text": " ",
+   "start": 1.02,
+   "end": 1.1
+  },
+  {
+   "text": "m",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "e",
+   "start": 1.14,
+   "end": 1.2
+  },
+  {
+   "text": "?",
+   "start": 1.2,
+   "end": 1.2
+  }
+ ]
+}

@@ -1,0 +1,164 @@
+{
+ "id": "04-s_thanks",
+ "text": "...Thank you.",
+ "seconds": 1.1,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "...Thank",
+   "start": 0.08,
+   "end": 0.38
+  },
+  {
+   "text": "you.",
+   "start": 0.46,
+   "end": 0.66
+  }
+ ],
+ "characters": [
+  {
+   "text": ".",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": ".",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": ".",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": "T",
+   "start": 0.08,
+   "end": 0.144
+  },
+  {
+   "text": "h",
+   "start": 0.144,
+   "end": 0.208
+  },
+  {
+   "text": "a",
+   "start": 0.208,
+   "end": 0.272
+  },
+  {
+   "text": "n",
+   "start": 0.272,
+   "end": 0.336
+  },
+  {
+   "text": "k",
+   "start": 0.336,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "y",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "o",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "u",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 1.12
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "...Thank",
+   "start": 0,
+   "end": 0.4
+  },
+  {
+   "text": "you.",
+   "start": 0.48,
+   "end": 1.12
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": ".",
+   "start": 0.08,
+   "end": 0.08
+  },
+  {
+   "text": ".",
+   "start": 0.08,
+   "end": 0.08
+  },
+  {
+   "text": ".",
+   "start": 0.08,
+   "end": 0.08
+  },
+  {
+   "text": "T",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": "a",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": "n",
+   "start": 0.24,
+   "end": 0.36
+  },
+  {
+   "text": "k",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": " ",
+   "start": 0.38,
+   "end": 0.46
+  },
+  {
+   "text": "y",
+   "start": 0.46,
+   "end": 0.5
+  },
+  {
+   "text": "o",
+   "start": 0.5,
+   "end": 0.5
+  },
+  {
+   "text": "u",
+   "start": 0.5,
+   "end": 0.66
+  },
+  {
+   "text": ".",
+   "start": 0.66,
+   "end": 0.66
+  }
+ ]
+}

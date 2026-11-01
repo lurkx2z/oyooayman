@@ -1,0 +1,534 @@
+{
+ "id": "01-n_wake",
+ "text": "One morning, you wake up ten times stronger.",
+ "seconds": 3.34,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "One",
+   "start": 0.12,
+   "end": 0.22
+  },
+  {
+   "text": "morning,",
+   "start": 0.3,
+   "end": 0.62
+  },
+  {
+   "text": "you",
+   "start": 1,
+   "end": 1.08
+  },
+  {
+   "text": "wake",
+   "start": 1.12,
+   "end": 1.32
+  },
+  {
+   "text": "up",
+   "start": 1.4,
+   "end": 1.5
+  },
+  {
+   "text": "ten",
+   "start": 1.68,
+   "end": 1.94
+  },
+  {
+   "text": "times",
+   "start": 2.06,
+   "end": 2.44
+  },
+  {
+   "text": "stronger.",
+   "start": 2.56,
+   "end": 3.06
+  }
+ ],
+ "characters": [
+  {
+   "text": "O",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "n",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "m",
+   "start": 0.32,
+   "end": 0.347
+  },
+  {
+   "text": "o",
+   "start": 0.347,
+   "end": 0.373
+  },
+  {
+   "text": "r",
+   "start": 0.373,
+   "end": 0.4
+  },
+  {
+   "text": "n",
+   "start": 0.4,
+   "end": 0.46
+  },
+  {
+   "text": "i",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "n",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": "g",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": ",",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "y",
+   "start": 0.96,
+   "end": 0.987
+  },
+  {
+   "text": "o",
+   "start": 0.987,
+   "end": 1.013
+  },
+  {
+   "text": "u",
+   "start": 1.013,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "w",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "a",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": "k",
+   "start": 1.2,
+   "end": 1.24
+  },
+  {
+   "text": "e",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "u",
+   "start": 1.36,
+   "end": 1.48
+  },
+  {
+   "text": "p",
+   "start": 1.48,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.76
+  },
+  {
+   "text": "t",
+   "start": 1.76,
+   "end": 1.813
+  },
+  {
+   "text": "e",
+   "start": 1.813,
+   "end": 1.867
+  },
+  {
+   "text": "n",
+   "start": 1.867,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "t",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "i",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "m",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": "e",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "s",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": " ",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "s",
+   "start": 2.48,
+   "end": 2.547
+  },
+  {
+   "text": "t",
+   "start": 2.547,
+   "end": 2.613
+  },
+  {
+   "text": "r",
+   "start": 2.613,
+   "end": 2.68
+  },
+  {
+   "text": "o",
+   "start": 2.68,
+   "end": 2.747
+  },
+  {
+   "text": "n",
+   "start": 2.747,
+   "end": 2.813
+  },
+  {
+   "text": "g",
+   "start": 2.813,
+   "end": 2.88
+  },
+  {
+   "text": "e",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": "r",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": ".",
+   "start": 3.04,
+   "end": 3.28
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "One",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "morning,",
+   "start": 0.32,
+   "end": 0.88
+  },
+  {
+   "text": "you",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "wake",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": "up",
+   "start": 1.36,
+   "end": 1.6
+  },
+  {
+   "text": "ten",
+   "start": 1.76,
+   "end": 1.92
+  },
+  {
+   "text": "times",
+   "start": 2,
+   "end": 2.4
+  },
+  {
+   "text": "stronger.",
+   "start": 2.48,
+   "end": 3.28
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "O",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "n",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "e",
+   "start": 0.18,
+   "end": 0.22
+  },
+  {
+   "text": " ",
+   "start": 0.22,
+   "end": 0.3
+  },
+  {
+   "text": "m",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": "o",
+   "start": 0.34,
+   "end": 0.38
+  },
+  {
+   "text": "r",
+   "start": 0.38,
+   "end": 0.42
+  },
+  {
+   "text": "n",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": "i",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "n",
+   "start": 0.52,
+   "end": 0.6
+  },
+  {
+   "text": "g",
+   "start": 0.6,
+   "end": 0.62
+  },
+  {
+   "text": ",",
+   "start": 0.62,
+   "end": 0.62
+  },
+  {
+   "text": " ",
+   "start": 0.62,
+   "end": 1
+  },
+  {
+   "text": "y",
+   "start": 1,
+   "end": 1.02
+  },
+  {
+   "text": "o",
+   "start": 1.02,
+   "end": 1.04
+  },
+  {
+   "text": "u",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": " ",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "w",
+   "start": 1.12,
+   "end": 1.18
+  },
+  {
+   "text": "a",
+   "start": 1.18,
+   "end": 1.22
+  },
+  {
+   "text": "k",
+   "start": 1.22,
+   "end": 1.28
+  },
+  {
+   "text": "e",
+   "start": 1.28,
+   "end": 1.32
+  },
+  {
+   "text": " ",
+   "start": 1.32,
+   "end": 1.4
+  },
+  {
+   "text": "u",
+   "start": 1.4,
+   "end": 1.48
+  },
+  {
+   "text": "p",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": " ",
+   "start": 1.5,
+   "end": 1.68
+  },
+  {
+   "text": "t",
+   "start": 1.68,
+   "end": 1.78
+  },
+  {
+   "text": "e",
+   "start": 1.78,
+   "end": 1.82
+  },
+  {
+   "text": "n",
+   "start": 1.82,
+   "end": 1.94
+  },
+  {
+   "text": " ",
+   "start": 1.94,
+   "end": 2.06
+  },
+  {
+   "text": "t",
+   "start": 2.06,
+   "end": 2.08
+  },
+  {
+   "text": "i",
+   "start": 2.18,
+   "end": 2.24
+  },
+  {
+   "text": "m",
+   "start": 2.24,
+   "end": 2.26
+  },
+  {
+   "text": "e",
+   "start": 2.26,
+   "end": 2.34
+  },
+  {
+   "text": "s",
+   "start": 2.34,
+   "end": 2.44
+  },
+  {
+   "text": " ",
+   "start": 2.44,
+   "end": 2.56
+  },
+  {
+   "text": "s",
+   "start": 2.56,
+   "end": 2.6
+  },
+  {
+   "text": "t",
+   "start": 2.6,
+   "end": 2.66
+  },
+  {
+   "text": "r",
+   "start": 2.66,
+   "end": 2.72
+  },
+  {
+   "text": "o",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "n",
+   "start": 2.76,
+   "end": 2.84
+  },
+  {
+   "text": "g",
+   "start": 2.84,
+   "end": 2.9
+  },
+  {
+   "text": "e",
+   "start": 2.9,
+   "end": 3
+  },
+  {
+   "text": "r",
+   "start": 3,
+   "end": 3.06
+  },
+  {
+   "text": ".",
+   "start": 3.06,
+   "end": 3.06
+  }
+ ]
+}

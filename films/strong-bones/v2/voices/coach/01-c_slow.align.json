@@ -1,0 +1,544 @@
+{
+ "id": "01-c_slow",
+ "text": "Slow. Smooth. Like the bar is made of glass.",
+ "seconds": 4.62,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Slow.",
+   "start": 0.2,
+   "end": 0.64
+  },
+  {
+   "text": "Smooth.",
+   "start": 1.34,
+   "end": 2
+  },
+  {
+   "text": "Like",
+   "start": 2.6,
+   "end": 2.74
+  },
+  {
+   "text": "the",
+   "start": 2.8,
+   "end": 2.86
+  },
+  {
+   "text": "bar",
+   "start": 3,
+   "end": 3.2
+  },
+  {
+   "text": "is",
+   "start": 3.26,
+   "end": 3.38
+  },
+  {
+   "text": "made",
+   "start": 3.42,
+   "end": 3.56
+  },
+  {
+   "text": "of",
+   "start": 3.6,
+   "end": 3.72
+  },
+  {
+   "text": "glass.",
+   "start": 3.8,
+   "end": 4.32
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.4
+  },
+  {
+   "text": "l",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "o",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "w",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": ".",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 1.28
+  },
+  {
+   "text": "S",
+   "start": 1.28,
+   "end": 1.4
+  },
+  {
+   "text": "m",
+   "start": 1.4,
+   "end": 1.52
+  },
+  {
+   "text": "o",
+   "start": 1.52,
+   "end": 1.64
+  },
+  {
+   "text": "o",
+   "start": 1.64,
+   "end": 1.76
+  },
+  {
+   "text": "t",
+   "start": 1.76,
+   "end": 1.88
+  },
+  {
+   "text": "h",
+   "start": 1.88,
+   "end": 2
+  },
+  {
+   "text": ".",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": " ",
+   "start": 2.08,
+   "end": 2.56
+  },
+  {
+   "text": "L",
+   "start": 2.56,
+   "end": 2.6
+  },
+  {
+   "text": "i",
+   "start": 2.6,
+   "end": 2.64
+  },
+  {
+   "text": "k",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": "e",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "t",
+   "start": 2.76,
+   "end": 2.773
+  },
+  {
+   "text": "h",
+   "start": 2.773,
+   "end": 2.787
+  },
+  {
+   "text": "e",
+   "start": 2.787,
+   "end": 2.8
+  },
+  {
+   "text": " ",
+   "start": 2.8,
+   "end": 2.96
+  },
+  {
+   "text": "b",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "a",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": "r",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "i",
+   "start": 3.28,
+   "end": 3.32
+  },
+  {
+   "text": "s",
+   "start": 3.32,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.44
+  },
+  {
+   "text": "m",
+   "start": 3.44,
+   "end": 3.46
+  },
+  {
+   "text": "a",
+   "start": 3.46,
+   "end": 3.48
+  },
+  {
+   "text": "d",
+   "start": 3.48,
+   "end": 3.5
+  },
+  {
+   "text": "e",
+   "start": 3.5,
+   "end": 3.52
+  },
+  {
+   "text": " ",
+   "start": 3.52,
+   "end": 3.56
+  },
+  {
+   "text": "o",
+   "start": 3.56,
+   "end": 3.58
+  },
+  {
+   "text": "f",
+   "start": 3.58,
+   "end": 3.6
+  },
+  {
+   "text": " ",
+   "start": 3.6,
+   "end": 3.76
+  },
+  {
+   "text": "g",
+   "start": 3.76,
+   "end": 3.872
+  },
+  {
+   "text": "l",
+   "start": 3.872,
+   "end": 3.984
+  },
+  {
+   "text": "a",
+   "start": 3.984,
+   "end": 4.096
+  },
+  {
+   "text": "s",
+   "start": 4.096,
+   "end": 4.208
+  },
+  {
+   "text": "s",
+   "start": 4.208,
+   "end": 4.32
+  },
+  {
+   "text": ".",
+   "start": 4.32,
+   "end": 4.56
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Slow.",
+   "start": 0,
+   "end": 0.72
+  },
+  {
+   "text": "Smooth.",
+   "start": 1.28,
+   "end": 2.08
+  },
+  {
+   "text": "Like",
+   "start": 2.56,
+   "end": 2.72
+  },
+  {
+   "text": "the",
+   "start": 2.76,
+   "end": 2.8
+  },
+  {
+   "text": "bar",
+   "start": 2.96,
+   "end": 3.2
+  },
+  {
+   "text": "is",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": "made",
+   "start": 3.44,
+   "end": 3.52
+  },
+  {
+   "text": "of",
+   "start": 3.56,
+   "end": 3.6
+  },
+  {
+   "text": "glass.",
+   "start": 3.76,
+   "end": 4.56
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.2,
+   "end": 0.28
+  },
+  {
+   "text": "l",
+   "start": 0.28,
+   "end": 0.36
+  },
+  {
+   "text": "o",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": "w",
+   "start": 0.42,
+   "end": 0.64
+  },
+  {
+   "text": ".",
+   "start": 0.64,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "S",
+   "start": 1.34,
+   "end": 1.46
+  },
+  {
+   "text": "m",
+   "start": 1.46,
+   "end": 1.56
+  },
+  {
+   "text": "o",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "o",
+   "start": 1.6,
+   "end": 1.7
+  },
+  {
+   "text": "t",
+   "start": 1.7,
+   "end": 1.96
+  },
+  {
+   "text": "h",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": ".",
+   "start": 2,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2
+  },
+  {
+   "text": "L",
+   "start": 2.6,
+   "end": 2.64
+  },
+  {
+   "text": "i",
+   "start": 2.64,
+   "end": 2.66
+  },
+  {
+   "text": "k",
+   "start": 2.66,
+   "end": 2.68
+  },
+  {
+   "text": "e",
+   "start": 2.68,
+   "end": 2.74
+  },
+  {
+   "text": " ",
+   "start": 2.74,
+   "end": 2.8
+  },
+  {
+   "text": "t",
+   "start": 2.8,
+   "end": 2.8
+  },
+  {
+   "text": "h",
+   "start": 2.8,
+   "end": 2.84
+  },
+  {
+   "text": "e",
+   "start": 2.84,
+   "end": 2.86
+  },
+  {
+   "text": " ",
+   "start": 2.86,
+   "end": 3
+  },
+  {
+   "text": "b",
+   "start": 3,
+   "end": 3.06
+  },
+  {
+   "text": "a",
+   "start": 3.06,
+   "end": 3.12
+  },
+  {
+   "text": "r",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.26
+  },
+  {
+   "text": "i",
+   "start": 3.26,
+   "end": 3.34
+  },
+  {
+   "text": "s",
+   "start": 3.34,
+   "end": 3.38
+  },
+  {
+   "text": " ",
+   "start": 3.38,
+   "end": 3.42
+  },
+  {
+   "text": "m",
+   "start": 3.42,
+   "end": 3.46
+  },
+  {
+   "text": "a",
+   "start": 3.46,
+   "end": 3.5
+  },
+  {
+   "text": "d",
+   "start": 3.5,
+   "end": 3.52
+  },
+  {
+   "text": "e",
+   "start": 3.52,
+   "end": 3.56
+  },
+  {
+   "text": " ",
+   "start": 3.56,
+   "end": 3.6
+  },
+  {
+   "text": "o",
+   "start": 3.6,
+   "end": 3.64
+  },
+  {
+   "text": "f",
+   "start": 3.64,
+   "end": 3.72
+  },
+  {
+   "text": " ",
+   "start": 3.72,
+   "end": 3.8
+  },
+  {
+   "text": "g",
+   "start": 3.8,
+   "end": 3.86
+  },
+  {
+   "text": "l",
+   "start": 3.86,
+   "end": 3.96
+  },
+  {
+   "text": "a",
+   "start": 3.96,
+   "end": 4
+  },
+  {
+   "text": "s",
+   "start": 4,
+   "end": 4.14
+  },
+  {
+   "text": "s",
+   "start": 4.28,
+   "end": 4.32
+  },
+  {
+   "text": ".",
+   "start": 4.32,
+   "end": 4.32
+  }
+ ]
+}

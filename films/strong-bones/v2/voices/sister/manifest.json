@@ -1,0 +1,60 @@
+{
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.35,
+    "similarity_boost": 0.75,
+    "speed": 1.08
+  },
+  "clips": [
+    {
+      "id": "01-s_handle",
+      "text": "Did you just rip the handle off?",
+      "file": "01-s_handle.mp3",
+      "align": "01-s_handle.align.json",
+      "seconds": 2.14,
+      "speech_start": 0.12,
+      "speech_end": 1.92,
+      "hash": "a8033ede7c95d7bd",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-s_phone",
+      "text": "Yeah, I'm right outside! He's about to lift!",
+      "file": "02-s_phone.mp3",
+      "align": "02-s_phone.align.json",
+      "seconds": 3.58,
+      "speech_start": 0.1,
+      "speech_end": 3.14,
+      "hash": "15b258cfb3352d1d",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-s_idiot",
+      "text": "You're such an idiot.",
+      "file": "03-s_idiot.mp3",
+      "align": "03-s_idiot.align.json",
+      "seconds": 1.99,
+      "speech_start": 0.08,
+      "speech_end": 1.5,
+      "hash": "c4e8f44b7bb56ebc",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-s_thanks",
+      "text": "...Thank you.",
+      "file": "04-s_thanks.mp3",
+      "align": "04-s_thanks.align.json",
+      "seconds": 1.1,
+      "speech_start": 0.08,
+      "speech_end": 0.66,
+      "hash": "58079d775f92df72",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

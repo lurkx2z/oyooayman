@@ -1,0 +1,264 @@
+{
+ "id": "03-s_idiot",
+ "text": "You're such an idiot.",
+ "seconds": 1.99,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "You're",
+   "start": 0.08,
+   "end": 0.3
+  },
+  {
+   "text": "such",
+   "start": 0.42,
+   "end": 0.62
+  },
+  {
+   "text": "an",
+   "start": 0.66,
+   "end": 0.76
+  },
+  {
+   "text": "idiot.",
+   "start": 1,
+   "end": 1.5
+  }
+ ],
+ "characters": [
+  {
+   "text": "Y",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "o",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "u",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": "'",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "r",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "e",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "s",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "u",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "c",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "h",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "a",
+   "start": 0.64,
+   "end": 0.76
+  },
+  {
+   "text": "n",
+   "start": 0.76,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "i",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "d",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "i",
+   "start": 1.12,
+   "end": 1.387
+  },
+  {
+   "text": "o",
+   "start": 1.387,
+   "end": 1.653
+  },
+  {
+   "text": "t",
+   "start": 1.653,
+   "end": 1.92
+  },
+  {
+   "text": ".",
+   "start": 1.92,
+   "end": 2
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "You're",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "such",
+   "start": 0.4,
+   "end": 0.56
+  },
+  {
+   "text": "an",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": "idiot.",
+   "start": 0.96,
+   "end": 2
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "Y",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "o",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "u",
+   "start": 0.12,
+   "end": 0.12
+  },
+  {
+   "text": "'",
+   "start": 0.12,
+   "end": 0.12
+  },
+  {
+   "text": "r",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.3
+  },
+  {
+   "text": " ",
+   "start": 0.3,
+   "end": 0.42
+  },
+  {
+   "text": "s",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": "u",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": "c",
+   "start": 0.5,
+   "end": 0.58
+  },
+  {
+   "text": "h",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": " ",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": "a",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "n",
+   "start": 0.68,
+   "end": 0.76
+  },
+  {
+   "text": " ",
+   "start": 0.76,
+   "end": 1
+  },
+  {
+   "text": "i",
+   "start": 1,
+   "end": 1.06
+  },
+  {
+   "text": "d",
+   "start": 1.06,
+   "end": 1.16
+  },
+  {
+   "text": "i",
+   "start": 1.16,
+   "end": 1.22
+  },
+  {
+   "text": "o",
+   "start": 1.26,
+   "end": 1.34
+  },
+  {
+   "text": "t",
+   "start": 1.44,
+   "end": 1.5
+  },
+  {
+   "text": ".",
+   "start": 1.5,
+   "end": 1.5
+  }
+ ]
+}

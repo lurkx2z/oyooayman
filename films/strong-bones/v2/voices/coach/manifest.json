@@ -1,0 +1,36 @@
+{
+  "voice": "pqHfZKP75CvOlQylNhV4",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75,
+    "speed": 1.08
+  },
+  "clips": [
+    {
+      "id": "01-c_slow",
+      "text": "Slow. Smooth. Like the bar is made of glass.",
+      "file": "01-c_slow.mp3",
+      "align": "01-c_slow.align.json",
+      "seconds": 4.62,
+      "speech_start": 0.2,
+      "speech_end": 4.32,
+      "hash": "6dab5810356e42c7",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-c_dare",
+      "text": "Don't you dare let go of that bar!",
+      "file": "02-c_dare.mp3",
+      "align": "02-c_dare.align.json",
+      "seconds": 2.53,
+      "speech_start": 0.06,
+      "speech_end": 2.14,
+      "hash": "1a3d6c0a54e38ee5",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

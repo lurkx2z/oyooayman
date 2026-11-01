@@ -1,0 +1,84 @@
+{
+  "voice": "uju3wxzG5OhpWcoi3SMy",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75,
+    "speed": 1.15
+  },
+  "clips": [
+    {
+      "id": "01-n_wake",
+      "text": "One morning, you wake up ten times stronger.",
+      "file": "01-n_wake.mp3",
+      "align": "01-n_wake.align.json",
+      "seconds": 3.34,
+      "speech_start": 0.12,
+      "speech_end": 3.06,
+      "hash": "e554aa978a38e052",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-n_memo",
+      "text": "Your bones... didn't get the memo.",
+      "file": "02-n_memo.mp3",
+      "align": "02-n_memo.align.json",
+      "seconds": 2.87,
+      "speech_start": 0.08,
+      "speech_end": 2.18,
+      "hash": "9e0cfe9fbd8294ca",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-n_title",
+      "text": "What if you were ten times stronger, but your bones weren't?",
+      "file": "03-n_title.mp3",
+      "align": "03-n_title.align.json",
+      "seconds": 4.08,
+      "speech_start": 0.08,
+      "speech_end": 3.5,
+      "hash": "14a169e810940d33",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-n_nick",
+      "text": "Six months later, the internet calls you Glass Hercules.",
+      "file": "04-n_nick.mp3",
+      "align": "04-n_nick.align.json",
+      "seconds": 3.81,
+      "speech_start": 0.1,
+      "speech_end": 3.36,
+      "hash": "71b6d887dce7fb1e",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "05-n_cost",
+      "text": "Catch it, and both your arms snap.",
+      "file": "05-n_cost.mp3",
+      "align": "05-n_cost.align.json",
+      "seconds": 2.8,
+      "speech_start": 0.08,
+      "speech_end": 2.24,
+      "hash": "1e9f2e2ad61acf07",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "06-n_cta",
+      "text": "Would you have caught it?",
+      "file": "06-n_cta.mp3",
+      "align": "06-n_cta.align.json",
+      "seconds": 1.18,
+      "speech_start": 0.12,
+      "speech_end": 0.9,
+      "hash": "8ef4fb84737b9662",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

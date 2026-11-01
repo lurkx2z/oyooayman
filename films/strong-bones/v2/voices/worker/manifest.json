@@ -1,0 +1,24 @@
+{
+  "voice": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.3,
+    "similarity_boost": 0.75,
+    "speed": 1.1
+  },
+  "clips": [
+    {
+      "id": "01-w_going",
+      "text": "It's going! Get clear! Get clear!",
+      "file": "01-w_going.mp3",
+      "align": "01-w_going.align.json",
+      "seconds": 2.8,
+      "speech_start": 0.08,
+      "speech_end": 2.48,
+      "hash": "37af60576d8d3e91",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

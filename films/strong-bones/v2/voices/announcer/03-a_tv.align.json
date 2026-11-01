@@ -1,0 +1,384 @@
+{
+ "id": "03-a_tv",
+ "text": "...and the gold goes to Aranda.",
+ "seconds": 2.22,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "...and",
+   "start": 0.04,
+   "end": 0.14
+  },
+  {
+   "text": "the",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "gold",
+   "start": 0.38,
+   "end": 0.64
+  },
+  {
+   "text": "goes",
+   "start": 0.72,
+   "end": 0.98
+  },
+  {
+   "text": "to",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "Aranda.",
+   "start": 1.16,
+   "end": 1.78
+  }
+ ],
+ "characters": [
+  {
+   "text": ".",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": ".",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": ".",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": "a",
+   "start": 0.08,
+   "end": 0.107
+  },
+  {
+   "text": "n",
+   "start": 0.107,
+   "end": 0.133
+  },
+  {
+   "text": "d",
+   "start": 0.133,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.267
+  },
+  {
+   "text": "h",
+   "start": 0.267,
+   "end": 0.293
+  },
+  {
+   "text": "e",
+   "start": 0.293,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.48
+  },
+  {
+   "text": "g",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "o",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "l",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "d",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "g",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "o",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": "e",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "s",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "t",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "o",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.24
+  },
+  {
+   "text": "A",
+   "start": 1.24,
+   "end": 1.3
+  },
+  {
+   "text": "r",
+   "start": 1.3,
+   "end": 1.36
+  },
+  {
+   "text": "a",
+   "start": 1.36,
+   "end": 1.48
+  },
+  {
+   "text": "n",
+   "start": 1.48,
+   "end": 1.6
+  },
+  {
+   "text": "d",
+   "start": 1.6,
+   "end": 1.72
+  },
+  {
+   "text": "a",
+   "start": 1.72,
+   "end": 1.84
+  },
+  {
+   "text": ".",
+   "start": 1.84,
+   "end": 2.24
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "...and",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "the",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "gold",
+   "start": 0.48,
+   "end": 0.64
+  },
+  {
+   "text": "goes",
+   "start": 0.72,
+   "end": 0.96
+  },
+  {
+   "text": "to",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "Aranda.",
+   "start": 1.24,
+   "end": 2.24
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": ".",
+   "start": 0.04,
+   "end": 0.04
+  },
+  {
+   "text": ".",
+   "start": 0.04,
+   "end": 0.04
+  },
+  {
+   "text": ".",
+   "start": 0.04,
+   "end": 0.04
+  },
+  {
+   "text": "a",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "n",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": "d",
+   "start": 0.14,
+   "end": 0.14
+  },
+  {
+   "text": " ",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "h",
+   "start": 0.2,
+   "end": 0.22
+  },
+  {
+   "text": "e",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.38
+  },
+  {
+   "text": "g",
+   "start": 0.38,
+   "end": 0.44
+  },
+  {
+   "text": "o",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": "l",
+   "start": 0.5,
+   "end": 0.58
+  },
+  {
+   "text": "d",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "g",
+   "start": 0.72,
+   "end": 0.78
+  },
+  {
+   "text": "o",
+   "start": 0.78,
+   "end": 0.86
+  },
+  {
+   "text": "e",
+   "start": 0.86,
+   "end": 0.94
+  },
+  {
+   "text": "s",
+   "start": 0.94,
+   "end": 0.98
+  },
+  {
+   "text": " ",
+   "start": 0.98,
+   "end": 1.04
+  },
+  {
+   "text": "t",
+   "start": 1.04,
+   "end": 1.06
+  },
+  {
+   "text": "o",
+   "start": 1.06,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "A",
+   "start": 1.16,
+   "end": 1.32
+  },
+  {
+   "text": "r",
+   "start": 1.32,
+   "end": 1.36
+  },
+  {
+   "text": "a",
+   "start": 1.36,
+   "end": 1.5
+  },
+  {
+   "text": "n",
+   "start": 1.5,
+   "end": 1.58
+  },
+  {
+   "text": "d",
+   "start": 1.58,
+   "end": 1.64
+  },
+  {
+   "text": "a",
+   "start": 1.64,
+   "end": 1.78
+  },
+  {
+   "text": ".",
+   "start": 1.78,
+   "end": 1.78
+  }
+ ]
+}

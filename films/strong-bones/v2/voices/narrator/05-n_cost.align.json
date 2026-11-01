@@ -1,0 +1,424 @@
+{
+ "id": "05-n_cost",
+ "text": "Catch it, and both your arms snap.",
+ "seconds": 2.8,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Catch",
+   "start": 0.08,
+   "end": 0.32
+  },
+  {
+   "text": "it,",
+   "start": 0.38,
+   "end": 0.5
+  },
+  {
+   "text": "and",
+   "start": 0.76,
+   "end": 0.86
+  },
+  {
+   "text": "both",
+   "start": 1,
+   "end": 1.22
+  },
+  {
+   "text": "your",
+   "start": 1.26,
+   "end": 1.4
+  },
+  {
+   "text": "arms",
+   "start": 1.5,
+   "end": 1.78
+  },
+  {
+   "text": "snap.",
+   "start": 1.88,
+   "end": 2.24
+  }
+ ],
+ "characters": [
+  {
+   "text": "C",
+   "start": 0,
+   "end": 0.064
+  },
+  {
+   "text": "a",
+   "start": 0.064,
+   "end": 0.128
+  },
+  {
+   "text": "t",
+   "start": 0.128,
+   "end": 0.192
+  },
+  {
+   "text": "c",
+   "start": 0.192,
+   "end": 0.256
+  },
+  {
+   "text": "h",
+   "start": 0.256,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.44
+  },
+  {
+   "text": "i",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": "t",
+   "start": 0.5,
+   "end": 0.56
+  },
+  {
+   "text": ",",
+   "start": 0.56,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.84
+  },
+  {
+   "text": "a",
+   "start": 0.84,
+   "end": 0.88
+  },
+  {
+   "text": "n",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "d",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.08
+  },
+  {
+   "text": "b",
+   "start": 1.08,
+   "end": 1.11
+  },
+  {
+   "text": "o",
+   "start": 1.11,
+   "end": 1.14
+  },
+  {
+   "text": "t",
+   "start": 1.14,
+   "end": 1.17
+  },
+  {
+   "text": "h",
+   "start": 1.17,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "y",
+   "start": 1.28,
+   "end": 1.3
+  },
+  {
+   "text": "o",
+   "start": 1.3,
+   "end": 1.32
+  },
+  {
+   "text": "u",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "r",
+   "start": 1.34,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "a",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "r",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "m",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "s",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 2
+  },
+  {
+   "text": "s",
+   "start": 2,
+   "end": 2.06
+  },
+  {
+   "text": "n",
+   "start": 2.06,
+   "end": 2.12
+  },
+  {
+   "text": "a",
+   "start": 2.12,
+   "end": 2.18
+  },
+  {
+   "text": "p",
+   "start": 2.18,
+   "end": 2.24
+  },
+  {
+   "text": ".",
+   "start": 2.24,
+   "end": 2.72
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Catch",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "it,",
+   "start": 0.44,
+   "end": 0.72
+  },
+  {
+   "text": "and",
+   "start": 0.84,
+   "end": 0.96
+  },
+  {
+   "text": "both",
+   "start": 1.08,
+   "end": 1.2
+  },
+  {
+   "text": "your",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "arms",
+   "start": 1.44,
+   "end": 1.76
+  },
+  {
+   "text": "snap.",
+   "start": 2,
+   "end": 2.72
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "C",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "a",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "t",
+   "start": 0.2,
+   "end": 0.28
+  },
+  {
+   "text": "c",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "h",
+   "start": 0.3,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "i",
+   "start": 0.38,
+   "end": 0.44
+  },
+  {
+   "text": "t",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": ",",
+   "start": 0.5,
+   "end": 0.5
+  },
+  {
+   "text": " ",
+   "start": 0.5,
+   "end": 0.76
+  },
+  {
+   "text": "a",
+   "start": 0.76,
+   "end": 0.78
+  },
+  {
+   "text": "n",
+   "start": 0.78,
+   "end": 0.84
+  },
+  {
+   "text": "d",
+   "start": 0.84,
+   "end": 0.86
+  },
+  {
+   "text": " ",
+   "start": 0.86,
+   "end": 1
+  },
+  {
+   "text": "b",
+   "start": 1,
+   "end": 1.06
+  },
+  {
+   "text": "o",
+   "start": 1.06,
+   "end": 1.1
+  },
+  {
+   "text": "t",
+   "start": 1.1,
+   "end": 1.18
+  },
+  {
+   "text": "h",
+   "start": 1.18,
+   "end": 1.22
+  },
+  {
+   "text": " ",
+   "start": 1.22,
+   "end": 1.26
+  },
+  {
+   "text": "y",
+   "start": 1.26,
+   "end": 1.3
+  },
+  {
+   "text": "o",
+   "start": 1.3,
+   "end": 1.3
+  },
+  {
+   "text": "u",
+   "start": 1.3,
+   "end": 1.34
+  },
+  {
+   "text": "r",
+   "start": 1.34,
+   "end": 1.4
+  },
+  {
+   "text": " ",
+   "start": 1.4,
+   "end": 1.5
+  },
+  {
+   "text": "a",
+   "start": 1.5,
+   "end": 1.52
+  },
+  {
+   "text": "r",
+   "start": 1.52,
+   "end": 1.64
+  },
+  {
+   "text": "m",
+   "start": 1.64,
+   "end": 1.68
+  },
+  {
+   "text": "s",
+   "start": 1.68,
+   "end": 1.78
+  },
+  {
+   "text": " ",
+   "start": 1.78,
+   "end": 1.88
+  },
+  {
+   "text": "s",
+   "start": 1.88,
+   "end": 1.94
+  },
+  {
+   "text": "n",
+   "start": 1.94,
+   "end": 2
+  },
+  {
+   "text": "a",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "p",
+   "start": 2.08,
+   "end": 2.24
+  },
+  {
+   "text": ".",
+   "start": 2.24,
+   "end": 2.24
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+{
+  "voice": "Xb7hH8MSUJpSbSDYk0k2",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "speed": 1.1
+  },
+  "clips": [
+    {
+      "id": "01-d_cracks",
+      "text": "See these lines? Hairline cracks. From a coffee mug.",
+      "file": "01-d_cracks.mp3",
+      "align": "01-d_cracks.align.json",
+      "seconds": 4.15,
+      "speech_start": 0.12,
+      "speech_end": 3.96,
+      "hash": "a5bcf7b950b89100",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-d_brake",
+      "text": "Your muscles can snap your own bones now. Your brain is the only brake you've got.",
+      "file": "02-d_brake.mp3",
+      "align": "02-d_brake.align.json",
+      "seconds": 6.06,
+      "speech_start": 0.1,
+      "speech_end": 5.64,
+      "hash": "1de2234788b3fdbf",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

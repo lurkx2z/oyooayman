@@ -1,0 +1,74 @@
+{
+ "id": "03-y_maya",
+ "text": "Maya!",
+ "seconds": 0.86,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Maya!",
+   "start": 0.1,
+   "end": 0.52
+  }
+ ],
+ "characters": [
+  {
+   "text": "M",
+   "start": 0,
+   "end": 0.107
+  },
+  {
+   "text": "a",
+   "start": 0.107,
+   "end": 0.213
+  },
+  {
+   "text": "y",
+   "start": 0.213,
+   "end": 0.32
+  },
+  {
+   "text": "a",
+   "start": 0.32,
+   "end": 0.56
+  },
+  {
+   "text": "!",
+   "start": 0.56,
+   "end": 0.8
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Maya!",
+   "start": 0,
+   "end": 0.8
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "M",
+   "start": 0.1,
+   "end": 0.18
+  },
+  {
+   "text": "a",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "y",
+   "start": 0.24,
+   "end": 0.34
+  },
+  {
+   "text": "a",
+   "start": 0.34,
+   "end": 0.52
+  },
+  {
+   "text": "!",
+   "start": 0.52,
+   "end": 0.52
+  }
+ ]
+}

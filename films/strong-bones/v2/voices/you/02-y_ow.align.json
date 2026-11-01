@@ -1,0 +1,204 @@
+{
+ "id": "02-y_ow",
+ "text": "Ow. Ow, ow, ow.",
+ "seconds": 2.38,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Ow.",
+   "start": 0.14,
+   "end": 0.46
+  },
+  {
+   "text": "Ow,",
+   "start": 0.96,
+   "end": 1.08
+  },
+  {
+   "text": "ow,",
+   "start": 1.22,
+   "end": 1.32
+  },
+  {
+   "text": "ow.",
+   "start": 1.52,
+   "end": 1.86
+  }
+ ],
+ "characters": [
+  {
+   "text": "O",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "w",
+   "start": 0.24,
+   "end": 0.48
+  },
+  {
+   "text": ".",
+   "start": 0.48,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "O",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "w",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": ",",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": " ",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": "o",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "w",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": ",",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "o",
+   "start": 1.52,
+   "end": 1.68
+  },
+  {
+   "text": "w",
+   "start": 1.68,
+   "end": 1.84
+  },
+  {
+   "text": ".",
+   "start": 1.84,
+   "end": 2.32
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Ow.",
+   "start": 0,
+   "end": 0.8
+  },
+  {
+   "text": "Ow,",
+   "start": 0.88,
+   "end": 1.16
+  },
+  {
+   "text": "ow,",
+   "start": 1.2,
+   "end": 1.44
+  },
+  {
+   "text": "ow.",
+   "start": 1.52,
+   "end": 2.32
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "O",
+   "start": 0.14,
+   "end": 0.26
+  },
+  {
+   "text": "w",
+   "start": 0.26,
+   "end": 0.46
+  },
+  {
+   "text": ".",
+   "start": 0.46,
+   "end": 0.46
+  },
+  {
+   "text": " ",
+   "start": 0.46,
+   "end": 0.46
+  },
+  {
+   "text": "O",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "w",
+   "start": 1,
+   "end": 1.08
+  },
+  {
+   "text": ",",
+   "start": 1.08,
+   "end": 1.08
+  },
+  {
+   "text": " ",
+   "start": 1.08,
+   "end": 1.22
+  },
+  {
+   "text": "o",
+   "start": 1.22,
+   "end": 1.26
+  },
+  {
+   "text": "w",
+   "start": 1.26,
+   "end": 1.32
+  },
+  {
+   "text": ",",
+   "start": 1.32,
+   "end": 1.32
+  },
+  {
+   "text": " ",
+   "start": 1.32,
+   "end": 1.52
+  },
+  {
+   "text": "o",
+   "start": 1.52,
+   "end": 1.66
+  },
+  {
+   "text": "w",
+   "start": 1.72,
+   "end": 1.86
+  },
+  {
+   "text": ".",
+   "start": 1.86,
+   "end": 1.86
+  }
+ ]
+}

@@ -1,0 +1,60 @@
+{
+  "voice": "TX3LPaxmHKxFdv7VOQHJ",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.35,
+    "similarity_boost": 0.75,
+    "speed": 1.08
+  },
+  "clips": [
+    {
+      "id": "01-y_touch",
+      "text": "I barely touched it!",
+      "file": "01-y_touch.mp3",
+      "align": "01-y_touch.align.json",
+      "seconds": 1.83,
+      "speech_start": 0.12,
+      "speech_end": 1.52,
+      "hash": "8d7abd039e1284c8",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-y_ow",
+      "text": "Ow. Ow, ow, ow.",
+      "file": "02-y_ow.mp3",
+      "align": "02-y_ow.align.json",
+      "seconds": 2.38,
+      "speech_start": 0.14,
+      "speech_end": 1.86,
+      "hash": "2776b428e37fbdef",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-y_maya",
+      "text": "Maya!",
+      "file": "03-y_maya.mp3",
+      "align": "03-y_maya.align.json",
+      "seconds": 0.86,
+      "speech_start": 0.1,
+      "speech_end": 0.52,
+      "hash": "4e8fc141e3911048",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-y_jar",
+      "text": "...Can you open this for me?",
+      "file": "04-y_jar.mp3",
+      "align": "04-y_jar.align.json",
+      "seconds": 1.52,
+      "speech_start": 0.06,
+      "speech_end": 1.2,
+      "hash": "285010f7e86d799b",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

@@ -1,0 +1,434 @@
+{
+ "id": "02-c_dare",
+ "text": "Don't you dare let go of that bar!",
+ "seconds": 2.53,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Don't",
+   "start": 0.06,
+   "end": 0.28
+  },
+  {
+   "text": "you",
+   "start": 0.34,
+   "end": 0.44
+  },
+  {
+   "text": "dare",
+   "start": 0.68,
+   "end": 0.92
+  },
+  {
+   "text": "let",
+   "start": 0.98,
+   "end": 1.14
+  },
+  {
+   "text": "go",
+   "start": 1.2,
+   "end": 1.32
+  },
+  {
+   "text": "of",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "that",
+   "start": 1.48,
+   "end": 1.66
+  },
+  {
+   "text": "bar!",
+   "start": 1.72,
+   "end": 2.14
+  }
+ ],
+ "characters": [
+  {
+   "text": "D",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "o",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "n",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": "'",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "t",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "y",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "o",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "u",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "d",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "a",
+   "start": 0.72,
+   "end": 0.773
+  },
+  {
+   "text": "r",
+   "start": 0.773,
+   "end": 0.827
+  },
+  {
+   "text": "e",
+   "start": 0.827,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "l",
+   "start": 0.96,
+   "end": 1.013
+  },
+  {
+   "text": "e",
+   "start": 1.013,
+   "end": 1.067
+  },
+  {
+   "text": "t",
+   "start": 1.067,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "g",
+   "start": 1.2,
+   "end": 1.24
+  },
+  {
+   "text": "o",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "o",
+   "start": 1.36,
+   "end": 1.4
+  },
+  {
+   "text": "f",
+   "start": 1.4,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.56
+  },
+  {
+   "text": "t",
+   "start": 1.56,
+   "end": 1.59
+  },
+  {
+   "text": "h",
+   "start": 1.59,
+   "end": 1.62
+  },
+  {
+   "text": "a",
+   "start": 1.62,
+   "end": 1.65
+  },
+  {
+   "text": "t",
+   "start": 1.65,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.88
+  },
+  {
+   "text": "b",
+   "start": 1.88,
+   "end": 1.947
+  },
+  {
+   "text": "a",
+   "start": 1.947,
+   "end": 2.013
+  },
+  {
+   "text": "r",
+   "start": 2.013,
+   "end": 2.08
+  },
+  {
+   "text": "!",
+   "start": 2.08,
+   "end": 2.56
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Don't",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "you",
+   "start": 0.32,
+   "end": 0.56
+  },
+  {
+   "text": "dare",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": "let",
+   "start": 0.96,
+   "end": 1.12
+  },
+  {
+   "text": "go",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "of",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "that",
+   "start": 1.56,
+   "end": 1.68
+  },
+  {
+   "text": "bar!",
+   "start": 1.88,
+   "end": 2.56
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "D",
+   "start": 0.06,
+   "end": 0.1
+  },
+  {
+   "text": "o",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "n",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "'",
+   "start": 0.16,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.28
+  },
+  {
+   "text": " ",
+   "start": 0.28,
+   "end": 0.34
+  },
+  {
+   "text": "y",
+   "start": 0.34,
+   "end": 0.36
+  },
+  {
+   "text": "o",
+   "start": 0.36,
+   "end": 0.36
+  },
+  {
+   "text": "u",
+   "start": 0.36,
+   "end": 0.44
+  },
+  {
+   "text": " ",
+   "start": 0.44,
+   "end": 0.68
+  },
+  {
+   "text": "d",
+   "start": 0.68,
+   "end": 0.76
+  },
+  {
+   "text": "a",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": "r",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "e",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": " ",
+   "start": 0.92,
+   "end": 0.98
+  },
+  {
+   "text": "l",
+   "start": 0.98,
+   "end": 1
+  },
+  {
+   "text": "e",
+   "start": 1,
+   "end": 1.06
+  },
+  {
+   "text": "t",
+   "start": 1.06,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.2
+  },
+  {
+   "text": "g",
+   "start": 1.2,
+   "end": 1.24
+  },
+  {
+   "text": "o",
+   "start": 1.24,
+   "end": 1.32
+  },
+  {
+   "text": " ",
+   "start": 1.32,
+   "end": 1.36
+  },
+  {
+   "text": "o",
+   "start": 1.36,
+   "end": 1.4
+  },
+  {
+   "text": "f",
+   "start": 1.4,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": "t",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": "h",
+   "start": 1.5,
+   "end": 1.52
+  },
+  {
+   "text": "a",
+   "start": 1.52,
+   "end": 1.58
+  },
+  {
+   "text": "t",
+   "start": 1.58,
+   "end": 1.66
+  },
+  {
+   "text": " ",
+   "start": 1.66,
+   "end": 1.72
+  },
+  {
+   "text": "b",
+   "start": 1.72,
+   "end": 1.82
+  },
+  {
+   "text": "a",
+   "start": 1.82,
+   "end": 1.92
+  },
+  {
+   "text": "r",
+   "start": 2.04,
+   "end": 2.14
+  },
+  {
+   "text": "!",
+   "start": 2.14,
+   "end": 2.14
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+  "voice": "nPczCjzI2devNBz1zQrb",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.3,
+    "similarity_boost": 0.75,
+    "speed": 1.1
+  },
+  "clips": [
+    {
+      "id": "01-a_record",
+      "text": "Five hundred and seventy kilos! A new world record!",
+      "file": "01-a_record.mp3",
+      "align": "01-a_record.align.json",
+      "seconds": 4.39,
+      "speech_start": 0.18,
+      "speech_end": 4.14,
+      "hash": "e8bb50a458fd844b",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-a_final",
+      "text": "Last lift of the night. Gold is on the line!",
+      "file": "02-a_final.mp3",
+      "align": "02-a_final.align.json",
+      "seconds": 3.58,
+      "speech_start": 0.1,
+      "speech_end": 2.98,
+      "hash": "aed8b29139843ea8",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-a_tv",
+      "text": "...and the gold goes to Aranda.",
+      "file": "03-a_tv.mp3",
+      "align": "03-a_tv.align.json",
+      "seconds": 2.22,
+      "speech_start": 0.04,
+      "speech_end": 1.78,
+      "hash": "f55d6dd096d0d30f",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}
