@@ -1,0 +1,304 @@
+{
+ "id": "01-s_kill",
+ "text": "I am going to kill you.",
+ "seconds": 2.22,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "I",
+   "start": 0.18,
+   "end": 0.28
+  },
+  {
+   "text": "am",
+   "start": 0.42,
+   "end": 0.52
+  },
+  {
+   "text": "going",
+   "start": 0.66,
+   "end": 0.94
+  },
+  {
+   "text": "to",
+   "start": 1,
+   "end": 1.16
+  },
+  {
+   "text": "kill",
+   "start": 1.26,
+   "end": 1.56
+  },
+  {
+   "text": "you.",
+   "start": 1.7,
+   "end": 1.9
+  }
+ ],
+ "characters": [
+  {
+   "text": "I",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "a",
+   "start": 0.32,
+   "end": 0.44
+  },
+  {
+   "text": "m",
+   "start": 0.44,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "g",
+   "start": 0.64,
+   "end": 0.688
+  },
+  {
+   "text": "o",
+   "start": 0.688,
+   "end": 0.736
+  },
+  {
+   "text": "i",
+   "start": 0.736,
+   "end": 0.784
+  },
+  {
+   "text": "n",
+   "start": 0.784,
+   "end": 0.832
+  },
+  {
+   "text": "g",
+   "start": 0.832,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "t",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "o",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "k",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "i",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "l",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "l",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "y",
+   "start": 1.6,
+   "end": 1.707
+  },
+  {
+   "text": "o",
+   "start": 1.707,
+   "end": 1.813
+  },
+  {
+   "text": "u",
+   "start": 1.813,
+   "end": 1.92
+  },
+  {
+   "text": ".",
+   "start": 1.92,
+   "end": 2.16
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "I",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "am",
+   "start": 0.32,
+   "end": 0.56
+  },
+  {
+   "text": "going",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": "to",
+   "start": 0.96,
+   "end": 1.12
+  },
+  {
+   "text": "kill",
+   "start": 1.2,
+   "end": 1.52
+  },
+  {
+   "text": "you.",
+   "start": 1.6,
+   "end": 2.16
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "I",
+   "start": 0.18,
+   "end": 0.28
+  },
+  {
+   "text": " ",
+   "start": 0.28,
+   "end": 0.42
+  },
+  {
+   "text": "a",
+   "start": 0.42,
+   "end": 0.44
+  },
+  {
+   "text": "m",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": " ",
+   "start": 0.52,
+   "end": 0.66
+  },
+  {
+   "text": "g",
+   "start": 0.66,
+   "end": 0.74
+  },
+  {
+   "text": "o",
+   "start": 0.74,
+   "end": 0.76
+  },
+  {
+   "text": "i",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "n",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": "g",
+   "start": 0.88,
+   "end": 0.94
+  },
+  {
+   "text": " ",
+   "start": 0.94,
+   "end": 1
+  },
+  {
+   "text": "t",
+   "start": 1,
+   "end": 1
+  },
+  {
+   "text": "o",
+   "start": 1,
+   "end": 1.16
+  },
+  {
+   "text": " ",
+   "start": 1.16,
+   "end": 1.26
+  },
+  {
+   "text": "k",
+   "start": 1.26,
+   "end": 1.36
+  },
+  {
+   "text": "i",
+   "start": 1.36,
+   "end": 1.42
+  },
+  {
+   "text": "l",
+   "start": 1.42,
+   "end": 1.52
+  },
+  {
+   "text": "l",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": " ",
+   "start": 1.56,
+   "end": 1.7
+  },
+  {
+   "text": "y",
+   "start": 1.7,
+   "end": 1.74
+  },
+  {
+   "text": "o",
+   "start": 1.74,
+   "end": 1.74
+  },
+  {
+   "text": "u",
+   "start": 1.74,
+   "end": 1.9
+  },
+  {
+   "text": ".",
+   "start": 1.9,
+   "end": 1.9
+  }
+ ]
+}

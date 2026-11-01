@@ -1,0 +1,204 @@
+{
+ "id": "07-y_idea",
+ "text": "I have no idea.",
+ "seconds": 1.67,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "I",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": "have",
+   "start": 0.18,
+   "end": 0.36
+  },
+  {
+   "text": "no",
+   "start": 0.58,
+   "end": 0.76
+  },
+  {
+   "text": "idea.",
+   "start": 0.82,
+   "end": 1.36
+  }
+ ],
+ "characters": [
+  {
+   "text": "I",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": "a",
+   "start": 0.22,
+   "end": 0.28
+  },
+  {
+   "text": "v",
+   "start": 0.28,
+   "end": 0.34
+  },
+  {
+   "text": "e",
+   "start": 0.34,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.56
+  },
+  {
+   "text": "n",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "o",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "i",
+   "start": 0.8,
+   "end": 0.94
+  },
+  {
+   "text": "d",
+   "start": 0.94,
+   "end": 1.08
+  },
+  {
+   "text": "e",
+   "start": 1.08,
+   "end": 1.22
+  },
+  {
+   "text": "a",
+   "start": 1.22,
+   "end": 1.36
+  },
+  {
+   "text": ".",
+   "start": 1.36,
+   "end": 1.68
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "I",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "have",
+   "start": 0.16,
+   "end": 0.4
+  },
+  {
+   "text": "no",
+   "start": 0.56,
+   "end": 0.72
+  },
+  {
+   "text": "idea.",
+   "start": 0.8,
+   "end": 1.68
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "I",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": " ",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": "h",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "a",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": "v",
+   "start": 0.26,
+   "end": 0.32
+  },
+  {
+   "text": "e",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": " ",
+   "start": 0.36,
+   "end": 0.58
+  },
+  {
+   "text": "n",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": "o",
+   "start": 0.66,
+   "end": 0.76
+  },
+  {
+   "text": " ",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "i",
+   "start": 0.82,
+   "end": 0.98
+  },
+  {
+   "text": "d",
+   "start": 0.98,
+   "end": 1.1
+  },
+  {
+   "text": "e",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "a",
+   "start": 1.14,
+   "end": 1.36
+  },
+  {
+   "text": ".",
+   "start": 1.36,
+   "end": 1.36
+  }
+ ]
+}

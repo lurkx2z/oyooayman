@@ -1,0 +1,594 @@
+{
+ "id": "18-n_wed",
+ "text": "Wednesday. There are news vans outside your house.",
+ "seconds": 3.66,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Wednesday.",
+   "start": 0.08,
+   "end": 0.62
+  },
+  {
+   "text": "There",
+   "start": 1.12,
+   "end": 1.22
+  },
+  {
+   "text": "are",
+   "start": 1.24,
+   "end": 1.36
+  },
+  {
+   "text": "news",
+   "start": 1.44,
+   "end": 1.68
+  },
+  {
+   "text": "vans",
+   "start": 1.74,
+   "end": 2.02
+  },
+  {
+   "text": "outside",
+   "start": 2.08,
+   "end": 2.46
+  },
+  {
+   "text": "your",
+   "start": 2.5,
+   "end": 2.6
+  },
+  {
+   "text": "house.",
+   "start": 2.64,
+   "end": 3.04
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.062
+  },
+  {
+   "text": "e",
+   "start": 0.062,
+   "end": 0.124
+  },
+  {
+   "text": "d",
+   "start": 0.124,
+   "end": 0.187
+  },
+  {
+   "text": "n",
+   "start": 0.187,
+   "end": 0.249
+  },
+  {
+   "text": "e",
+   "start": 0.249,
+   "end": 0.311
+  },
+  {
+   "text": "s",
+   "start": 0.311,
+   "end": 0.373
+  },
+  {
+   "text": "d",
+   "start": 0.373,
+   "end": 0.436
+  },
+  {
+   "text": "a",
+   "start": 0.436,
+   "end": 0.498
+  },
+  {
+   "text": "y",
+   "start": 0.498,
+   "end": 0.56
+  },
+  {
+   "text": ".",
+   "start": 0.56,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "T",
+   "start": 1.12,
+   "end": 1.136
+  },
+  {
+   "text": "h",
+   "start": 1.136,
+   "end": 1.152
+  },
+  {
+   "text": "e",
+   "start": 1.152,
+   "end": 1.168
+  },
+  {
+   "text": "r",
+   "start": 1.168,
+   "end": 1.184
+  },
+  {
+   "text": "e",
+   "start": 1.184,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "a",
+   "start": 1.28,
+   "end": 1.307
+  },
+  {
+   "text": "r",
+   "start": 1.307,
+   "end": 1.333
+  },
+  {
+   "text": "e",
+   "start": 1.333,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.52
+  },
+  {
+   "text": "n",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": "e",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "w",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": "s",
+   "start": 1.64,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": "v",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "a",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "n",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "s",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "o",
+   "start": 2.08,
+   "end": 2.126
+  },
+  {
+   "text": "u",
+   "start": 2.126,
+   "end": 2.171
+  },
+  {
+   "text": "t",
+   "start": 2.171,
+   "end": 2.217
+  },
+  {
+   "text": "s",
+   "start": 2.217,
+   "end": 2.263
+  },
+  {
+   "text": "i",
+   "start": 2.263,
+   "end": 2.309
+  },
+  {
+   "text": "d",
+   "start": 2.309,
+   "end": 2.354
+  },
+  {
+   "text": "e",
+   "start": 2.354,
+   "end": 2.4
+  },
+  {
+   "text": " ",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "y",
+   "start": 2.48,
+   "end": 2.5
+  },
+  {
+   "text": "o",
+   "start": 2.5,
+   "end": 2.52
+  },
+  {
+   "text": "u",
+   "start": 2.52,
+   "end": 2.54
+  },
+  {
+   "text": "r",
+   "start": 2.54,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "h",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "o",
+   "start": 2.72,
+   "end": 2.8
+  },
+  {
+   "text": "u",
+   "start": 2.8,
+   "end": 2.88
+  },
+  {
+   "text": "s",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": "e",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": ".",
+   "start": 3.04,
+   "end": 3.6
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Wednesday.",
+   "start": 0,
+   "end": 1.04
+  },
+  {
+   "text": "There",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "are",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "news",
+   "start": 1.52,
+   "end": 1.68
+  },
+  {
+   "text": "vans",
+   "start": 1.72,
+   "end": 2
+  },
+  {
+   "text": "outside",
+   "start": 2.08,
+   "end": 2.4
+  },
+  {
+   "text": "your",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "house.",
+   "start": 2.64,
+   "end": 3.6
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "d",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": "n",
+   "start": 0.22,
+   "end": 0.22
+  },
+  {
+   "text": "e",
+   "start": 0.22,
+   "end": 0.3
+  },
+  {
+   "text": "s",
+   "start": 0.3,
+   "end": 0.36
+  },
+  {
+   "text": "d",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": "a",
+   "start": 0.38,
+   "end": 0.58
+  },
+  {
+   "text": "y",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": ".",
+   "start": 0.62,
+   "end": 0.62
+  },
+  {
+   "text": " ",
+   "start": 0.62,
+   "end": 1.1
+  },
+  {
+   "text": "T",
+   "start": 1.12,
+   "end": 1.12
+  },
+  {
+   "text": "h",
+   "start": 1.12,
+   "end": 1.14
+  },
+  {
+   "text": "e",
+   "start": 1.14,
+   "end": 1.16
+  },
+  {
+   "text": "r",
+   "start": 1.16,
+   "end": 1.18
+  },
+  {
+   "text": "e",
+   "start": 1.18,
+   "end": 1.22
+  },
+  {
+   "text": " ",
+   "start": 1.22,
+   "end": 1.24
+  },
+  {
+   "text": "a",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": "r",
+   "start": 1.28,
+   "end": 1.3
+  },
+  {
+   "text": "e",
+   "start": 1.3,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "n",
+   "start": 1.44,
+   "end": 1.44
+  },
+  {
+   "text": "e",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "w",
+   "start": 1.54,
+   "end": 1.64
+  },
+  {
+   "text": "s",
+   "start": 1.64,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.74
+  },
+  {
+   "text": "v",
+   "start": 1.74,
+   "end": 1.8
+  },
+  {
+   "text": "a",
+   "start": 1.8,
+   "end": 1.86
+  },
+  {
+   "text": "n",
+   "start": 1.86,
+   "end": 1.94
+  },
+  {
+   "text": "s",
+   "start": 1.94,
+   "end": 2.02
+  },
+  {
+   "text": " ",
+   "start": 2.02,
+   "end": 2.08
+  },
+  {
+   "text": "o",
+   "start": 2.08,
+   "end": 2.1
+  },
+  {
+   "text": "u",
+   "start": 2.1,
+   "end": 2.12
+  },
+  {
+   "text": "t",
+   "start": 2.12,
+   "end": 2.24
+  },
+  {
+   "text": "s",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "i",
+   "start": 2.32,
+   "end": 2.36
+  },
+  {
+   "text": "d",
+   "start": 2.36,
+   "end": 2.38
+  },
+  {
+   "text": "e",
+   "start": 2.38,
+   "end": 2.46
+  },
+  {
+   "text": " ",
+   "start": 2.46,
+   "end": 2.48
+  },
+  {
+   "text": "y",
+   "start": 2.5,
+   "end": 2.5
+  },
+  {
+   "text": "o",
+   "start": 2.5,
+   "end": 2.52
+  },
+  {
+   "text": "u",
+   "start": 2.52,
+   "end": 2.54
+  },
+  {
+   "text": "r",
+   "start": 2.54,
+   "end": 2.6
+  },
+  {
+   "text": " ",
+   "start": 2.6,
+   "end": 2.64
+  },
+  {
+   "text": "h",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "o",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "u",
+   "start": 2.76,
+   "end": 2.82
+  },
+  {
+   "text": "s",
+   "start": 2.82,
+   "end": 2.86
+  },
+  {
+   "text": "e",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": ".",
+   "start": 3.04,
+   "end": 3.04
+  }
+ ]
+}

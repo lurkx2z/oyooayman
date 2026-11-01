@@ -1,0 +1,48 @@
+{
+  "voice": "XrExE9yKIg1WjnnlVkGX",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75,
+    "speed": 1
+  },
+  "clips": [
+    {
+      "id": "01-m_what",
+      "text": "What about it?",
+      "file": "01-m_what.mp3",
+      "align": "01-m_what.align.json",
+      "seconds": 1.1,
+      "speech_start": 0.16,
+      "speech_end": 0.74,
+      "hash": "44fd97ecbd41e17c",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-m_how",
+      "text": "...How did you know that?",
+      "file": "02-m_how.mp3",
+      "align": "02-m_how.align.json",
+      "seconds": 1.75,
+      "speech_start": 0.1,
+      "speech_end": 1.22,
+      "hash": "933d1fec01b04ac9",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-m_party",
+      "text": "Jake's party?!",
+      "file": "03-m_party.mp3",
+      "align": "03-m_party.align.json",
+      "seconds": 1.44,
+      "speech_start": 0.08,
+      "speech_end": 0.9,
+      "hash": "6f0abb1147db154b",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

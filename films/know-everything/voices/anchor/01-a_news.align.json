@@ -1,0 +1,614 @@
+{
+ "id": "01-a_news",
+ "text": "They're calling him... the boy who knows everything.",
+ "seconds": 3.5,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "They're",
+   "start": 0.1,
+   "end": 0.26
+  },
+  {
+   "text": "calling",
+   "start": 0.32,
+   "end": 0.66
+  },
+  {
+   "text": "him...",
+   "start": 0.72,
+   "end": 0.96
+  },
+  {
+   "text": "the",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "boy",
+   "start": 1.7,
+   "end": 1.94
+  },
+  {
+   "text": "who",
+   "start": 2.06,
+   "end": 2.12
+  },
+  {
+   "text": "knows",
+   "start": 2.2,
+   "end": 2.44
+  },
+  {
+   "text": "everything.",
+   "start": 2.66,
+   "end": 3.18
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.1
+  },
+  {
+   "text": "h",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "y",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "'",
+   "start": 0.16,
+   "end": 0.187
+  },
+  {
+   "text": "r",
+   "start": 0.187,
+   "end": 0.213
+  },
+  {
+   "text": "e",
+   "start": 0.213,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.44
+  },
+  {
+   "text": "c",
+   "start": 0.44,
+   "end": 0.469
+  },
+  {
+   "text": "a",
+   "start": 0.469,
+   "end": 0.497
+  },
+  {
+   "text": "l",
+   "start": 0.497,
+   "end": 0.526
+  },
+  {
+   "text": "l",
+   "start": 0.526,
+   "end": 0.554
+  },
+  {
+   "text": "i",
+   "start": 0.554,
+   "end": 0.583
+  },
+  {
+   "text": "n",
+   "start": 0.583,
+   "end": 0.611
+  },
+  {
+   "text": "g",
+   "start": 0.611,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.8
+  },
+  {
+   "text": "h",
+   "start": 0.8,
+   "end": 0.853
+  },
+  {
+   "text": "i",
+   "start": 0.853,
+   "end": 0.907
+  },
+  {
+   "text": "m",
+   "start": 0.907,
+   "end": 0.96
+  },
+  {
+   "text": ".",
+   "start": 0.96,
+   "end": 1.12
+  },
+  {
+   "text": ".",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": ".",
+   "start": 1.28,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": "t",
+   "start": 1.48,
+   "end": 1.493
+  },
+  {
+   "text": "h",
+   "start": 1.493,
+   "end": 1.507
+  },
+  {
+   "text": "e",
+   "start": 1.507,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.68
+  },
+  {
+   "text": "b",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "o",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "y",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "w",
+   "start": 2,
+   "end": 2.053
+  },
+  {
+   "text": "h",
+   "start": 2.053,
+   "end": 2.107
+  },
+  {
+   "text": "o",
+   "start": 2.107,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": "k",
+   "start": 2.24,
+   "end": 2.26
+  },
+  {
+   "text": "n",
+   "start": 2.26,
+   "end": 2.28
+  },
+  {
+   "text": "o",
+   "start": 2.28,
+   "end": 2.3
+  },
+  {
+   "text": "w",
+   "start": 2.3,
+   "end": 2.32
+  },
+  {
+   "text": "s",
+   "start": 2.32,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "e",
+   "start": 2.64,
+   "end": 2.696
+  },
+  {
+   "text": "v",
+   "start": 2.696,
+   "end": 2.752
+  },
+  {
+   "text": "e",
+   "start": 2.752,
+   "end": 2.808
+  },
+  {
+   "text": "r",
+   "start": 2.808,
+   "end": 2.864
+  },
+  {
+   "text": "y",
+   "start": 2.864,
+   "end": 2.92
+  },
+  {
+   "text": "t",
+   "start": 2.92,
+   "end": 2.976
+  },
+  {
+   "text": "h",
+   "start": 2.976,
+   "end": 3.032
+  },
+  {
+   "text": "i",
+   "start": 3.032,
+   "end": 3.088
+  },
+  {
+   "text": "n",
+   "start": 3.088,
+   "end": 3.144
+  },
+  {
+   "text": "g",
+   "start": 3.144,
+   "end": 3.2
+  },
+  {
+   "text": ".",
+   "start": 3.2,
+   "end": 3.52
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "They're",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "calling",
+   "start": 0.44,
+   "end": 0.64
+  },
+  {
+   "text": "him...",
+   "start": 0.8,
+   "end": 1.44
+  },
+  {
+   "text": "the",
+   "start": 1.48,
+   "end": 1.52
+  },
+  {
+   "text": "boy",
+   "start": 1.68,
+   "end": 1.92
+  },
+  {
+   "text": "who",
+   "start": 2,
+   "end": 2.16
+  },
+  {
+   "text": "knows",
+   "start": 2.24,
+   "end": 2.56
+  },
+  {
+   "text": "everything.",
+   "start": 2.64,
+   "end": 3.52
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "h",
+   "start": 0.12,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "y",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "'",
+   "start": 0.16,
+   "end": 0.16
+  },
+  {
+   "text": "r",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.26
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.32
+  },
+  {
+   "text": "c",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "a",
+   "start": 0.4,
+   "end": 0.42
+  },
+  {
+   "text": "l",
+   "start": 0.42,
+   "end": 0.46
+  },
+  {
+   "text": "l",
+   "start": 0.46,
+   "end": 0.54
+  },
+  {
+   "text": "i",
+   "start": 0.54,
+   "end": 0.56
+  },
+  {
+   "text": "n",
+   "start": 0.56,
+   "end": 0.62
+  },
+  {
+   "text": "g",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": " ",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": "h",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "i",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "m",
+   "start": 0.82,
+   "end": 0.96
+  },
+  {
+   "text": ".",
+   "start": 0.96,
+   "end": 0.96
+  },
+  {
+   "text": ".",
+   "start": 0.96,
+   "end": 0.96
+  },
+  {
+   "text": ".",
+   "start": 0.96,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.54
+  },
+  {
+   "text": "t",
+   "start": 1.54,
+   "end": 1.54
+  },
+  {
+   "text": "h",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "e",
+   "start": 1.58,
+   "end": 1.58
+  },
+  {
+   "text": " ",
+   "start": 1.58,
+   "end": 1.7
+  },
+  {
+   "text": "b",
+   "start": 1.7,
+   "end": 1.78
+  },
+  {
+   "text": "o",
+   "start": 1.78,
+   "end": 1.86
+  },
+  {
+   "text": "y",
+   "start": 1.86,
+   "end": 1.94
+  },
+  {
+   "text": " ",
+   "start": 1.94,
+   "end": 2.06
+  },
+  {
+   "text": "w",
+   "start": 2.06,
+   "end": 2.08
+  },
+  {
+   "text": "h",
+   "start": 2.08,
+   "end": 2.1
+  },
+  {
+   "text": "o",
+   "start": 2.1,
+   "end": 2.12
+  },
+  {
+   "text": " ",
+   "start": 2.12,
+   "end": 2.2
+  },
+  {
+   "text": "k",
+   "start": 2.2,
+   "end": 2.22
+  },
+  {
+   "text": "n",
+   "start": 2.22,
+   "end": 2.28
+  },
+  {
+   "text": "o",
+   "start": 2.28,
+   "end": 2.3
+  },
+  {
+   "text": "w",
+   "start": 2.3,
+   "end": 2.42
+  },
+  {
+   "text": "s",
+   "start": 2.42,
+   "end": 2.44
+  },
+  {
+   "text": " ",
+   "start": 2.44,
+   "end": 2.66
+  },
+  {
+   "text": "e",
+   "start": 2.66,
+   "end": 2.74
+  },
+  {
+   "text": "v",
+   "start": 2.74,
+   "end": 2.76
+  },
+  {
+   "text": "e",
+   "start": 2.76,
+   "end": 2.78
+  },
+  {
+   "text": "r",
+   "start": 2.78,
+   "end": 2.84
+  },
+  {
+   "text": "y",
+   "start": 2.84,
+   "end": 2.94
+  },
+  {
+   "text": "t",
+   "start": 2.94,
+   "end": 2.98
+  },
+  {
+   "text": "h",
+   "start": 2.98,
+   "end": 3.04
+  },
+  {
+   "text": "i",
+   "start": 3.04,
+   "end": 3.06
+  },
+  {
+   "text": "n",
+   "start": 3.06,
+   "end": 3.16
+  },
+  {
+   "text": "g",
+   "start": 3.16,
+   "end": 3.18
+  },
+  {
+   "text": ".",
+   "start": 3.18,
+   "end": 3.18
+  }
+ ]
+}

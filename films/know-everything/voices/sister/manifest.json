@@ -1,0 +1,108 @@
+{
+  "voice": "cgSgspJ2msm6clMCkdW9",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.35,
+    "similarity_boost": 0.75,
+    "speed": 1.03
+  },
+  "clips": [
+    {
+      "id": "01-s_kill",
+      "text": "I am going to kill you.",
+      "file": "01-s_kill.mp3",
+      "align": "01-s_kill.align.json",
+      "seconds": 2.22,
+      "speech_start": 0.18,
+      "speech_end": 1.9,
+      "hash": "7b8022e82f6fc8b3",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-s_what",
+      "text": "Okay... what are you doing?",
+      "file": "02-s_what.mp3",
+      "align": "02-s_what.align.json",
+      "seconds": 2.87,
+      "speech_start": 0.1,
+      "speech_end": 2.32,
+      "hash": "ffb94e7817ac2e6e",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-s_real",
+      "text": "Are those... real?",
+      "file": "03-s_real.mp3",
+      "align": "03-s_real.align.json",
+      "seconds": 2.14,
+      "speech_start": 0.04,
+      "speech_end": 1.54,
+      "hash": "3ad580170f812da3",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-s_open",
+      "text": "Open it! Open it!",
+      "file": "04-s_open.mp3",
+      "align": "04-s_open.align.json",
+      "seconds": 1.99,
+      "speech_start": 0.08,
+      "speech_end": 1.58,
+      "hash": "3f03f9111fb2a3d5",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "05-s_knew",
+      "text": "You already knew. Didn't you?",
+      "file": "05-s_knew.mp3",
+      "align": "05-s_knew.align.json",
+      "seconds": 2.72,
+      "speech_start": 0.1,
+      "speech_end": 2.06,
+      "hash": "f894db83b48033d2",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "06-s_any",
+      "text": "Is there anything I can give you that you don't already know?",
+      "file": "06-s_any.mp3",
+      "align": "06-s_any.align.json",
+      "seconds": 3.5,
+      "speech_start": 0.08,
+      "speech_end": 2.98,
+      "hash": "d7436bca9df21ab2",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "07-s_hand",
+      "text": "Hey, genius. What's in my hand?",
+      "file": "07-s_hand.mp3",
+      "align": "07-s_hand.align.json",
+      "seconds": 2.61,
+      "speech_start": 0.08,
+      "speech_end": 2.02,
+      "hash": "27761494b04c19c8",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "08-s_good",
+      "text": "Good.",
+      "file": "08-s_good.mp3",
+      "align": "08-s_good.align.json",
+      "seconds": 0.71,
+      "speech_start": 0.06,
+      "speech_end": 0.38,
+      "hash": "468cebf5278ed914",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

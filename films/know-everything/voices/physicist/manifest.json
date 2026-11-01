@@ -1,0 +1,36 @@
+{
+  "voice": "Xb7hH8MSUJpSbSDYk0k2",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75,
+    "speed": 1
+  },
+  "clips": [
+    {
+      "id": "01-p_dark",
+      "text": "What is dark matter?",
+      "file": "01-p_dark.mp3",
+      "align": "01-p_dark.align.json",
+      "seconds": 1.83,
+      "speech_start": 0.12,
+      "speech_end": 1.48,
+      "hash": "63e5cc61d6bec2cf",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-p_simple",
+      "text": "It's... so simple.",
+      "file": "02-p_simple.mp3",
+      "align": "02-p_simple.align.json",
+      "seconds": 2.06,
+      "speech_start": 0.1,
+      "speech_end": 1.74,
+      "hash": "9ab5fec507a6ee2f",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

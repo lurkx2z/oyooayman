@@ -1,0 +1,184 @@
+{
+ "id": "01-m_what",
+ "text": "What about it?",
+ "seconds": 1.1,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "What",
+   "start": 0.16,
+   "end": 0.26
+  },
+  {
+   "text": "about",
+   "start": 0.32,
+   "end": 0.58
+  },
+  {
+   "text": "it?",
+   "start": 0.64,
+   "end": 0.74
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.15
+  },
+  {
+   "text": "h",
+   "start": 0.15,
+   "end": 0.18
+  },
+  {
+   "text": "a",
+   "start": 0.18,
+   "end": 0.21
+  },
+  {
+   "text": "t",
+   "start": 0.21,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "a",
+   "start": 0.32,
+   "end": 0.368
+  },
+  {
+   "text": "b",
+   "start": 0.368,
+   "end": 0.416
+  },
+  {
+   "text": "o",
+   "start": 0.416,
+   "end": 0.464
+  },
+  {
+   "text": "u",
+   "start": 0.464,
+   "end": 0.512
+  },
+  {
+   "text": "t",
+   "start": 0.512,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.68
+  },
+  {
+   "text": "i",
+   "start": 0.68,
+   "end": 0.74
+  },
+  {
+   "text": "t",
+   "start": 0.74,
+   "end": 0.8
+  },
+  {
+   "text": "?",
+   "start": 0.8,
+   "end": 1.04
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "What",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "about",
+   "start": 0.32,
+   "end": 0.56
+  },
+  {
+   "text": "it?",
+   "start": 0.68,
+   "end": 1.04
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "h",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "a",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.32
+  },
+  {
+   "text": "a",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "b",
+   "start": 0.38,
+   "end": 0.46
+  },
+  {
+   "text": "o",
+   "start": 0.46,
+   "end": 0.48
+  },
+  {
+   "text": "u",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "t",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": " ",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": "i",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "?",
+   "start": 0.74,
+   "end": 0.74
+  }
+ ]
+}

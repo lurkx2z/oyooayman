@@ -1,0 +1,194 @@
+{
+ "id": "01-y_toast",
+ "text": "Mom. The toast.",
+ "seconds": 1.91,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Mom.",
+   "start": 0.12,
+   "end": 0.46
+  },
+  {
+   "text": "The",
+   "start": 1.08,
+   "end": 1.16
+  },
+  {
+   "text": "toast.",
+   "start": 1.2,
+   "end": 1.6
+  }
+ ],
+ "characters": [
+  {
+   "text": "M",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "o",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "m",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": ".",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 1.04
+  },
+  {
+   "text": "T",
+   "start": 1.04,
+   "end": 1.067
+  },
+  {
+   "text": "h",
+   "start": 1.067,
+   "end": 1.093
+  },
+  {
+   "text": "e",
+   "start": 1.093,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.36
+  },
+  {
+   "text": "t",
+   "start": 1.36,
+   "end": 1.408
+  },
+  {
+   "text": "o",
+   "start": 1.408,
+   "end": 1.456
+  },
+  {
+   "text": "a",
+   "start": 1.456,
+   "end": 1.504
+  },
+  {
+   "text": "s",
+   "start": 1.504,
+   "end": 1.552
+  },
+  {
+   "text": "t",
+   "start": 1.552,
+   "end": 1.6
+  },
+  {
+   "text": ".",
+   "start": 1.6,
+   "end": 1.84
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Mom.",
+   "start": 0,
+   "end": 0.56
+  },
+  {
+   "text": "The",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "toast.",
+   "start": 1.36,
+   "end": 1.84
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "M",
+   "start": 0.12,
+   "end": 0.2
+  },
+  {
+   "text": "o",
+   "start": 0.2,
+   "end": 0.32
+  },
+  {
+   "text": "m",
+   "start": 0.32,
+   "end": 0.46
+  },
+  {
+   "text": ".",
+   "start": 0.46,
+   "end": 0.46
+  },
+  {
+   "text": " ",
+   "start": 0.46,
+   "end": 0.46
+  },
+  {
+   "text": "T",
+   "start": 1.08,
+   "end": 1.08
+  },
+  {
+   "text": "h",
+   "start": 1.08,
+   "end": 1.1
+  },
+  {
+   "text": "e",
+   "start": 1.1,
+   "end": 1.16
+  },
+  {
+   "text": " ",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": "t",
+   "start": 1.2,
+   "end": 1.26
+  },
+  {
+   "text": "o",
+   "start": 1.26,
+   "end": 1.32
+  },
+  {
+   "text": "a",
+   "start": 1.32,
+   "end": 1.36
+  },
+  {
+   "text": "s",
+   "start": 1.4,
+   "end": 1.52
+  },
+  {
+   "text": "t",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": ".",
+   "start": 1.6,
+   "end": 1.6
+  }
+ ]
+}

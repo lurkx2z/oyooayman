@@ -1,0 +1,344 @@
+{
+ "id": "34-n_cta",
+ "text": "What would you have written?",
+ "seconds": 1.33,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "What",
+   "start": 0.1,
+   "end": 0.24
+  },
+  {
+   "text": "would",
+   "start": 0.26,
+   "end": 0.4
+  },
+  {
+   "text": "you",
+   "start": 0.44,
+   "end": 0.52
+  },
+  {
+   "text": "have",
+   "start": 0.54,
+   "end": 0.66
+  },
+  {
+   "text": "written?",
+   "start": 0.7,
+   "end": 1.06
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "h",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "a",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "w",
+   "start": 0.32,
+   "end": 0.336
+  },
+  {
+   "text": "o",
+   "start": 0.336,
+   "end": 0.352
+  },
+  {
+   "text": "u",
+   "start": 0.352,
+   "end": 0.368
+  },
+  {
+   "text": "l",
+   "start": 0.368,
+   "end": 0.384
+  },
+  {
+   "text": "d",
+   "start": 0.384,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "y",
+   "start": 0.44,
+   "end": 0.453
+  },
+  {
+   "text": "o",
+   "start": 0.453,
+   "end": 0.467
+  },
+  {
+   "text": "u",
+   "start": 0.467,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "h",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "a",
+   "start": 0.58,
+   "end": 0.6
+  },
+  {
+   "text": "v",
+   "start": 0.6,
+   "end": 0.62
+  },
+  {
+   "text": "e",
+   "start": 0.62,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "w",
+   "start": 0.72,
+   "end": 0.766
+  },
+  {
+   "text": "r",
+   "start": 0.766,
+   "end": 0.811
+  },
+  {
+   "text": "i",
+   "start": 0.811,
+   "end": 0.857
+  },
+  {
+   "text": "t",
+   "start": 0.857,
+   "end": 0.903
+  },
+  {
+   "text": "t",
+   "start": 0.903,
+   "end": 0.949
+  },
+  {
+   "text": "e",
+   "start": 0.949,
+   "end": 0.994
+  },
+  {
+   "text": "n",
+   "start": 0.994,
+   "end": 1.04
+  },
+  {
+   "text": "?",
+   "start": 1.04,
+   "end": 1.36
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "What",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "would",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "you",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "have",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "written?",
+   "start": 0.72,
+   "end": 1.36
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "h",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "a",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": "w",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": "o",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "u",
+   "start": 0.3,
+   "end": 0.32
+  },
+  {
+   "text": "l",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "d",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "y",
+   "start": 0.44,
+   "end": 0.46
+  },
+  {
+   "text": "o",
+   "start": 0.46,
+   "end": 0.46
+  },
+  {
+   "text": "u",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": " ",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "h",
+   "start": 0.54,
+   "end": 0.58
+  },
+  {
+   "text": "a",
+   "start": 0.58,
+   "end": 0.6
+  },
+  {
+   "text": "v",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "e",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": " ",
+   "start": 0.66,
+   "end": 0.7
+  },
+  {
+   "text": "w",
+   "start": 0.7,
+   "end": 0.74
+  },
+  {
+   "text": "r",
+   "start": 0.74,
+   "end": 0.78
+  },
+  {
+   "text": "i",
+   "start": 0.78,
+   "end": 0.8
+  },
+  {
+   "text": "t",
+   "start": 0.8,
+   "end": 0.82
+  },
+  {
+   "text": "t",
+   "start": 0.82,
+   "end": 0.86
+  },
+  {
+   "text": "e",
+   "start": 0.86,
+   "end": 0.98
+  },
+  {
+   "text": "n",
+   "start": 0.98,
+   "end": 1.06
+  },
+  {
+   "text": "?",
+   "start": 1.06,
+   "end": 1.06
+  }
+ ]
+}

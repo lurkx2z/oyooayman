@@ -1,0 +1,194 @@
+{
+ "id": "14-n_learn",
+ "text": "You're learning.",
+ "seconds": 1.25,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "You're",
+   "start": 0.08,
+   "end": 0.24
+  },
+  {
+   "text": "learning.",
+   "start": 0.3,
+   "end": 0.72
+  }
+ ],
+ "characters": [
+  {
+   "text": "Y",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "o",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "u",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": "'",
+   "start": 0.08,
+   "end": 0.133
+  },
+  {
+   "text": "r",
+   "start": 0.133,
+   "end": 0.187
+  },
+  {
+   "text": "e",
+   "start": 0.187,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.72
+  },
+  {
+   "text": "l",
+   "start": 0.72,
+   "end": 0.78
+  },
+  {
+   "text": "e",
+   "start": 0.78,
+   "end": 0.84
+  },
+  {
+   "text": "a",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": "r",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": "n",
+   "start": 0.96,
+   "end": 1.02
+  },
+  {
+   "text": "i",
+   "start": 1.02,
+   "end": 1.08
+  },
+  {
+   "text": "n",
+   "start": 1.08,
+   "end": 1.14
+  },
+  {
+   "text": "g",
+   "start": 1.14,
+   "end": 1.2
+  },
+  {
+   "text": ".",
+   "start": 1.2,
+   "end": 1.28
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "You're",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "learning.",
+   "start": 0.72,
+   "end": 1.28
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "Y",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "o",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": "u",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "'",
+   "start": 0.12,
+   "end": 0.12
+  },
+  {
+   "text": "r",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "e",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.3
+  },
+  {
+   "text": "l",
+   "start": 0.3,
+   "end": 0.32
+  },
+  {
+   "text": "e",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "a",
+   "start": 0.38,
+   "end": 0.44
+  },
+  {
+   "text": "r",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": "n",
+   "start": 0.5,
+   "end": 0.56
+  },
+  {
+   "text": "i",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "n",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": "g",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 0.72
+  }
+ ]
+}

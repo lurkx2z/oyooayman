@@ -1,0 +1,36 @@
+{
+  "voice": "pFZP5JQG7iQjIQuC4Bku",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.5,
+    "similarity_boost": 0.75,
+    "speed": 0.98
+  },
+  "clips": [
+    {
+      "id": "01-g_codes",
+      "text": "You know every password on Earth. Every secret. Every launch code.",
+      "file": "01-g_codes.mp3",
+      "align": "01-g_codes.align.json",
+      "seconds": 5.67,
+      "speech_start": 0.14,
+      "speech_end": 5.44,
+      "hash": "13728e97a20b6680",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-g_tonight",
+      "text": "That makes you the most dangerous person alive. You're coming with us. Midnight.",
+      "file": "02-g_tonight.mp3",
+      "align": "02-g_tonight.align.json",
+      "seconds": 6.3,
+      "speech_start": 0.1,
+      "speech_end": 5.82,
+      "hash": "0170d0146dac6fba",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

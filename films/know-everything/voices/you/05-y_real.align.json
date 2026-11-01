@@ -1,0 +1,344 @@
+{
+ "id": "05-y_real",
+ "text": "Eighty thousand dollars real.",
+ "seconds": 2.72,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Eighty",
+   "start": 0.08,
+   "end": 0.32
+  },
+  {
+   "text": "thousand",
+   "start": 0.54,
+   "end": 0.98
+  },
+  {
+   "text": "dollars",
+   "start": 1.08,
+   "end": 1.52
+  },
+  {
+   "text": "real.",
+   "start": 1.74,
+   "end": 2.14
+  }
+ ],
+ "characters": [
+  {
+   "text": "E",
+   "start": 0,
+   "end": 0.064
+  },
+  {
+   "text": "i",
+   "start": 0.064,
+   "end": 0.128
+  },
+  {
+   "text": "g",
+   "start": 0.128,
+   "end": 0.192
+  },
+  {
+   "text": "h",
+   "start": 0.192,
+   "end": 0.256
+  },
+  {
+   "text": "t",
+   "start": 0.256,
+   "end": 0.32
+  },
+  {
+   "text": "y",
+   "start": 0.32,
+   "end": 0.44
+  },
+  {
+   "text": " ",
+   "start": 0.44,
+   "end": 0.56
+  },
+  {
+   "text": "t",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "h",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "o",
+   "start": 0.64,
+   "end": 0.693
+  },
+  {
+   "text": "u",
+   "start": 0.693,
+   "end": 0.747
+  },
+  {
+   "text": "s",
+   "start": 0.747,
+   "end": 0.8
+  },
+  {
+   "text": "a",
+   "start": 0.8,
+   "end": 0.853
+  },
+  {
+   "text": "n",
+   "start": 0.853,
+   "end": 0.907
+  },
+  {
+   "text": "d",
+   "start": 0.907,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "d",
+   "start": 1.04,
+   "end": 1.1
+  },
+  {
+   "text": "o",
+   "start": 1.1,
+   "end": 1.16
+  },
+  {
+   "text": "l",
+   "start": 1.16,
+   "end": 1.22
+  },
+  {
+   "text": "l",
+   "start": 1.22,
+   "end": 1.28
+  },
+  {
+   "text": "a",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "r",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "s",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.68
+  },
+  {
+   "text": "r",
+   "start": 1.68,
+   "end": 1.8
+  },
+  {
+   "text": "e",
+   "start": 1.8,
+   "end": 1.92
+  },
+  {
+   "text": "a",
+   "start": 1.92,
+   "end": 2.04
+  },
+  {
+   "text": "l",
+   "start": 2.04,
+   "end": 2.16
+  },
+  {
+   "text": ".",
+   "start": 2.16,
+   "end": 2.64
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Eighty",
+   "start": 0,
+   "end": 0.44
+  },
+  {
+   "text": "thousand",
+   "start": 0.56,
+   "end": 0.96
+  },
+  {
+   "text": "dollars",
+   "start": 1.04,
+   "end": 1.52
+  },
+  {
+   "text": "real.",
+   "start": 1.68,
+   "end": 2.64
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "E",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "i",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "g",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "t",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "y",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.54
+  },
+  {
+   "text": "t",
+   "start": 0.54,
+   "end": 0.58
+  },
+  {
+   "text": "h",
+   "start": 0.58,
+   "end": 0.68
+  },
+  {
+   "text": "o",
+   "start": 0.68,
+   "end": 0.7
+  },
+  {
+   "text": "u",
+   "start": 0.7,
+   "end": 0.78
+  },
+  {
+   "text": "s",
+   "start": 0.78,
+   "end": 0.86
+  },
+  {
+   "text": "a",
+   "start": 0.86,
+   "end": 0.9
+  },
+  {
+   "text": "n",
+   "start": 0.9,
+   "end": 0.92
+  },
+  {
+   "text": "d",
+   "start": 0.92,
+   "end": 0.98
+  },
+  {
+   "text": " ",
+   "start": 0.98,
+   "end": 1.08
+  },
+  {
+   "text": "d",
+   "start": 1.08,
+   "end": 1.16
+  },
+  {
+   "text": "o",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": "l",
+   "start": 1.2,
+   "end": 1.26
+  },
+  {
+   "text": "l",
+   "start": 1.28,
+   "end": 1.3
+  },
+  {
+   "text": "a",
+   "start": 1.3,
+   "end": 1.4
+  },
+  {
+   "text": "r",
+   "start": 1.4,
+   "end": 1.42
+  },
+  {
+   "text": "s",
+   "start": 1.42,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.74
+  },
+  {
+   "text": "r",
+   "start": 1.74,
+   "end": 1.76
+  },
+  {
+   "text": "e",
+   "start": 1.76,
+   "end": 1.88
+  },
+  {
+   "text": "a",
+   "start": 1.88,
+   "end": 2
+  },
+  {
+   "text": "l",
+   "start": 2.1,
+   "end": 2.14
+  },
+  {
+   "text": ".",
+   "start": 2.14,
+   "end": 2.14
+  }
+ ]
+}

@@ -1,0 +1,354 @@
+{
+ "id": "05-s_knew",
+ "text": "You already knew. Didn't you?",
+ "seconds": 2.72,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "You",
+   "start": 0.1,
+   "end": 0.18
+  },
+  {
+   "text": "already",
+   "start": 0.26,
+   "end": 0.58
+  },
+  {
+   "text": "knew.",
+   "start": 0.66,
+   "end": 1.08
+  },
+  {
+   "text": "Didn't",
+   "start": 1.58,
+   "end": 1.84
+  },
+  {
+   "text": "you?",
+   "start": 1.9,
+   "end": 2.06
+  }
+ ],
+ "characters": [
+  {
+   "text": "Y",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "o",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "u",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "a",
+   "start": 0.24,
+   "end": 0.286
+  },
+  {
+   "text": "l",
+   "start": 0.286,
+   "end": 0.331
+  },
+  {
+   "text": "r",
+   "start": 0.331,
+   "end": 0.377
+  },
+  {
+   "text": "e",
+   "start": 0.377,
+   "end": 0.423
+  },
+  {
+   "text": "a",
+   "start": 0.423,
+   "end": 0.469
+  },
+  {
+   "text": "d",
+   "start": 0.469,
+   "end": 0.514
+  },
+  {
+   "text": "y",
+   "start": 0.514,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.72
+  },
+  {
+   "text": "k",
+   "start": 0.72,
+   "end": 0.92
+  },
+  {
+   "text": "n",
+   "start": 0.92,
+   "end": 0.987
+  },
+  {
+   "text": "e",
+   "start": 0.987,
+   "end": 1.053
+  },
+  {
+   "text": "w",
+   "start": 1.053,
+   "end": 1.12
+  },
+  {
+   "text": ".",
+   "start": 1.12,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.64
+  },
+  {
+   "text": "D",
+   "start": 1.64,
+   "end": 1.67
+  },
+  {
+   "text": "i",
+   "start": 1.67,
+   "end": 1.7
+  },
+  {
+   "text": "d",
+   "start": 1.7,
+   "end": 1.73
+  },
+  {
+   "text": "n",
+   "start": 1.73,
+   "end": 1.76
+  },
+  {
+   "text": "'",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "t",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "y",
+   "start": 1.92,
+   "end": 1.973
+  },
+  {
+   "text": "o",
+   "start": 1.973,
+   "end": 2.027
+  },
+  {
+   "text": "u",
+   "start": 2.027,
+   "end": 2.08
+  },
+  {
+   "text": "?",
+   "start": 2.08,
+   "end": 2.64
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "You",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "already",
+   "start": 0.24,
+   "end": 0.56
+  },
+  {
+   "text": "knew.",
+   "start": 0.72,
+   "end": 1.52
+  },
+  {
+   "text": "Didn't",
+   "start": 1.64,
+   "end": 1.84
+  },
+  {
+   "text": "you?",
+   "start": 1.92,
+   "end": 2.64
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "Y",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.12
+  },
+  {
+   "text": "u",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.26
+  },
+  {
+   "text": "a",
+   "start": 0.26,
+   "end": 0.3
+  },
+  {
+   "text": "l",
+   "start": 0.3,
+   "end": 0.38
+  },
+  {
+   "text": "r",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": "e",
+   "start": 0.42,
+   "end": 0.44
+  },
+  {
+   "text": "a",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "d",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "y",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": " ",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": "k",
+   "start": 0.66,
+   "end": 0.74
+  },
+  {
+   "text": "n",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": "e",
+   "start": 0.82,
+   "end": 0.92
+  },
+  {
+   "text": "w",
+   "start": 0.92,
+   "end": 1.08
+  },
+  {
+   "text": ".",
+   "start": 1.08,
+   "end": 1.08
+  },
+  {
+   "text": " ",
+   "start": 1.08,
+   "end": 1.08
+  },
+  {
+   "text": "D",
+   "start": 1.58,
+   "end": 1.6
+  },
+  {
+   "text": "i",
+   "start": 1.6,
+   "end": 1.66
+  },
+  {
+   "text": "d",
+   "start": 1.66,
+   "end": 1.72
+  },
+  {
+   "text": "n",
+   "start": 1.72,
+   "end": 1.74
+  },
+  {
+   "text": "'",
+   "start": 1.74,
+   "end": 1.74
+  },
+  {
+   "text": "t",
+   "start": 1.78,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.9
+  },
+  {
+   "text": "y",
+   "start": 1.9,
+   "end": 1.94
+  },
+  {
+   "text": "o",
+   "start": 1.94,
+   "end": 1.94
+  },
+  {
+   "text": "u",
+   "start": 1.94,
+   "end": 2.06
+  },
+  {
+   "text": "?",
+   "start": 2.06,
+   "end": 2.06
+  }
+ ]
+}

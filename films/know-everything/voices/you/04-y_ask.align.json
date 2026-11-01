@@ -1,0 +1,214 @@
+{
+ "id": "04-y_ask",
+ "text": "Ask her yourself.",
+ "seconds": 1.52,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Ask",
+   "start": 0.12,
+   "end": 0.34
+  },
+  {
+   "text": "her",
+   "start": 0.36,
+   "end": 0.5
+  },
+  {
+   "text": "yourself.",
+   "start": 0.56,
+   "end": 1.18
+  }
+ ],
+ "characters": [
+  {
+   "text": "A",
+   "start": 0,
+   "end": 0.107
+  },
+  {
+   "text": "s",
+   "start": 0.107,
+   "end": 0.213
+  },
+  {
+   "text": "k",
+   "start": 0.213,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "h",
+   "start": 0.4,
+   "end": 0.427
+  },
+  {
+   "text": "e",
+   "start": 0.427,
+   "end": 0.453
+  },
+  {
+   "text": "r",
+   "start": 0.453,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.6
+  },
+  {
+   "text": "y",
+   "start": 0.6,
+   "end": 0.63
+  },
+  {
+   "text": "o",
+   "start": 0.63,
+   "end": 0.66
+  },
+  {
+   "text": "u",
+   "start": 0.66,
+   "end": 0.69
+  },
+  {
+   "text": "r",
+   "start": 0.69,
+   "end": 0.72
+  },
+  {
+   "text": "s",
+   "start": 0.72,
+   "end": 0.84
+  },
+  {
+   "text": "e",
+   "start": 0.84,
+   "end": 0.96
+  },
+  {
+   "text": "l",
+   "start": 0.96,
+   "end": 1.08
+  },
+  {
+   "text": "f",
+   "start": 1.08,
+   "end": 1.2
+  },
+  {
+   "text": ".",
+   "start": 1.2,
+   "end": 1.44
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Ask",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "her",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "yourself.",
+   "start": 0.6,
+   "end": 1.44
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "A",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "s",
+   "start": 0.16,
+   "end": 0.26
+  },
+  {
+   "text": "k",
+   "start": 0.26,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.36
+  },
+  {
+   "text": "h",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "e",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "r",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": " ",
+   "start": 0.5,
+   "end": 0.54
+  },
+  {
+   "text": "y",
+   "start": 0.56,
+   "end": 0.56
+  },
+  {
+   "text": "o",
+   "start": 0.58,
+   "end": 0.58
+  },
+  {
+   "text": "u",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": "r",
+   "start": 0.62,
+   "end": 0.76
+  },
+  {
+   "text": "s",
+   "start": 0.76,
+   "end": 0.78
+  },
+  {
+   "text": "e",
+   "start": 0.86,
+   "end": 0.9
+  },
+  {
+   "text": "l",
+   "start": 0.9,
+   "end": 1.02
+  },
+  {
+   "text": "f",
+   "start": 1.02,
+   "end": 1.18
+  },
+  {
+   "text": ".",
+   "start": 1.18,
+   "end": 1.18
+  }
+ ]
+}

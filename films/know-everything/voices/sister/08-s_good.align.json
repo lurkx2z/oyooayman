@@ -1,0 +1,74 @@
+{
+ "id": "08-s_good",
+ "text": "Good.",
+ "seconds": 0.71,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Good.",
+   "start": 0.06,
+   "end": 0.38
+  }
+ ],
+ "characters": [
+  {
+   "text": "G",
+   "start": 0,
+   "end": 0.1
+  },
+  {
+   "text": "o",
+   "start": 0.1,
+   "end": 0.2
+  },
+  {
+   "text": "o",
+   "start": 0.2,
+   "end": 0.3
+  },
+  {
+   "text": "d",
+   "start": 0.3,
+   "end": 0.4
+  },
+  {
+   "text": ".",
+   "start": 0.4,
+   "end": 0.72
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Good.",
+   "start": 0,
+   "end": 0.72
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "G",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.2
+  },
+  {
+   "text": "o",
+   "start": 0.2,
+   "end": 0.28
+  },
+  {
+   "text": "d",
+   "start": 0.28,
+   "end": 0.38
+  },
+  {
+   "text": ".",
+   "start": 0.38,
+   "end": 0.38
+  }
+ ]
+}

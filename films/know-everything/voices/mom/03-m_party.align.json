@@ -1,0 +1,174 @@
+{
+ "id": "03-m_party",
+ "text": "Jake's party?!",
+ "seconds": 1.44,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Jake's",
+   "start": 0.08,
+   "end": 0.38
+  },
+  {
+   "text": "party?!",
+   "start": 0.52,
+   "end": 0.9
+  }
+ ],
+ "characters": [
+  {
+   "text": "J",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "a",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "k",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "e",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "'",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "p",
+   "start": 0.48,
+   "end": 0.576
+  },
+  {
+   "text": "a",
+   "start": 0.576,
+   "end": 0.672
+  },
+  {
+   "text": "r",
+   "start": 0.672,
+   "end": 0.768
+  },
+  {
+   "text": "t",
+   "start": 0.768,
+   "end": 0.864
+  },
+  {
+   "text": "y",
+   "start": 0.864,
+   "end": 0.96
+  },
+  {
+   "text": "?",
+   "start": 0.96,
+   "end": 1.2
+  },
+  {
+   "text": "!",
+   "start": 1.2,
+   "end": 1.36
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Jake's",
+   "start": 0,
+   "end": 0.4
+  },
+  {
+   "text": "party?!",
+   "start": 0.48,
+   "end": 1.36
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "J",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "a",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "k",
+   "start": 0.2,
+   "end": 0.26
+  },
+  {
+   "text": "e",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": "'",
+   "start": 0.28,
+   "end": 0.28
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": " ",
+   "start": 0.38,
+   "end": 0.5
+  },
+  {
+   "text": "p",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "a",
+   "start": 0.54,
+   "end": 0.64
+  },
+  {
+   "text": "r",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": "t",
+   "start": 0.74,
+   "end": 0.78
+  },
+  {
+   "text": "y",
+   "start": 0.78,
+   "end": 0.9
+  },
+  {
+   "text": "?",
+   "start": 0.9,
+   "end": 0.9
+  },
+  {
+   "text": "!",
+   "start": 0.9,
+   "end": 0.9
+  }
+ ]
+}

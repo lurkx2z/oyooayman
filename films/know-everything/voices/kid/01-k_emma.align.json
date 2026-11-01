@@ -1,0 +1,234 @@
+{
+ "id": "01-k_emma",
+ "text": "Does Emma like me?",
+ "seconds": 1.52,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Does",
+   "start": 0.1,
+   "end": 0.3
+  },
+  {
+   "text": "Emma",
+   "start": 0.42,
+   "end": 0.66
+  },
+  {
+   "text": "like",
+   "start": 0.74,
+   "end": 0.98
+  },
+  {
+   "text": "me?",
+   "start": 1.06,
+   "end": 1.18
+  }
+ ],
+ "characters": [
+  {
+   "text": "D",
+   "start": 0,
+   "end": 0.15
+  },
+  {
+   "text": "o",
+   "start": 0.15,
+   "end": 0.18
+  },
+  {
+   "text": "e",
+   "start": 0.18,
+   "end": 0.21
+  },
+  {
+   "text": "s",
+   "start": 0.21,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "E",
+   "start": 0.4,
+   "end": 0.46
+  },
+  {
+   "text": "m",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "m",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": "a",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "l",
+   "start": 0.72,
+   "end": 0.78
+  },
+  {
+   "text": "i",
+   "start": 0.78,
+   "end": 0.84
+  },
+  {
+   "text": "k",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": "e",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "m",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "e",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "?",
+   "start": 1.2,
+   "end": 1.52
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Does",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "Emma",
+   "start": 0.4,
+   "end": 0.64
+  },
+  {
+   "text": "like",
+   "start": 0.72,
+   "end": 0.96
+  },
+  {
+   "text": "me?",
+   "start": 1.04,
+   "end": 1.52
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "D",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "o",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.2
+  },
+  {
+   "text": "s",
+   "start": 0.3,
+   "end": 0.3
+  },
+  {
+   "text": " ",
+   "start": 0.3,
+   "end": 0.42
+  },
+  {
+   "text": "E",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": "m",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "m",
+   "start": 0.54,
+   "end": 0.58
+  },
+  {
+   "text": "a",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": " ",
+   "start": 0.66,
+   "end": 0.74
+  },
+  {
+   "text": "l",
+   "start": 0.74,
+   "end": 0.84
+  },
+  {
+   "text": "i",
+   "start": 0.84,
+   "end": 0.88
+  },
+  {
+   "text": "k",
+   "start": 0.88,
+   "end": 0.9
+  },
+  {
+   "text": "e",
+   "start": 0.9,
+   "end": 0.98
+  },
+  {
+   "text": " ",
+   "start": 0.98,
+   "end": 1.06
+  },
+  {
+   "text": "m",
+   "start": 1.06,
+   "end": 1.08
+  },
+  {
+   "text": "e",
+   "start": 1.08,
+   "end": 1.18
+  },
+  {
+   "text": "?",
+   "start": 1.18,
+   "end": 1.18
+  }
+ ]
+}

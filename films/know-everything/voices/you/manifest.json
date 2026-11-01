@@ -1,0 +1,96 @@
+{
+  "voice": "TX3LPaxmHKxFdv7VOQHJ",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.35,
+    "similarity_boost": 0.75,
+    "speed": 1.03
+  },
+  "clips": [
+    {
+      "id": "01-y_toast",
+      "text": "Mom. The toast.",
+      "file": "01-y_toast.mp3",
+      "align": "01-y_toast.align.json",
+      "seconds": 1.91,
+      "speech_start": 0.12,
+      "speech_end": 1.6,
+      "hash": "d8e976560032ccc6",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-y_party",
+      "text": "So... how was Jake's party?",
+      "file": "02-y_party.mp3",
+      "align": "02-y_party.align.json",
+      "seconds": 2.53,
+      "speech_start": 0.18,
+      "speech_end": 2.02,
+      "hash": "bacb0b4e1d3ad2d9",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-y_seven",
+      "text": "Just one. Question seven. Your answer key is wrong.",
+      "file": "03-y_seven.mp3",
+      "align": "03-y_seven.align.json",
+      "seconds": 4.62,
+      "speech_start": 0.12,
+      "speech_end": 4.3,
+      "hash": "d07bc5fa64ed08b2",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-y_ask",
+      "text": "Ask her yourself.",
+      "file": "04-y_ask.mp3",
+      "align": "04-y_ask.align.json",
+      "seconds": 1.52,
+      "speech_start": 0.12,
+      "speech_end": 1.18,
+      "hash": "f81807699dd49316",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "05-y_real",
+      "text": "Eighty thousand dollars real.",
+      "file": "05-y_real.mp3",
+      "align": "05-y_real.align.json",
+      "seconds": 2.72,
+      "speech_start": 0.08,
+      "speech_end": 2.14,
+      "hash": "9afc2f2c67b324f6",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "06-y_wow",
+      "text": "Wow. Headphones. I... love them.",
+      "file": "06-y_wow.mp3",
+      "align": "06-y_wow.align.json",
+      "seconds": 4.23,
+      "speech_start": 0.1,
+      "speech_end": 3.8,
+      "hash": "5f2b216480555c6b",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "07-y_idea",
+      "text": "I have no idea.",
+      "file": "07-y_idea.mp3",
+      "align": "07-y_idea.align.json",
+      "seconds": 1.67,
+      "speech_start": 0.1,
+      "speech_end": 1.36,
+      "hash": "5c5481b10188a451",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

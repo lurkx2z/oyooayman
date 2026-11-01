@@ -1,0 +1,24 @@
+{
+  "voice": "bIHbv24MWmeRgasZH58o",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.35,
+    "similarity_boost": 0.75,
+    "speed": 1.03
+  },
+  "clips": [
+    {
+      "id": "01-k_emma",
+      "text": "Does Emma like me?",
+      "file": "01-k_emma.mp3",
+      "align": "01-k_emma.align.json",
+      "seconds": 1.52,
+      "speech_start": 0.1,
+      "speech_end": 1.18,
+      "hash": "06271389440bb135",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

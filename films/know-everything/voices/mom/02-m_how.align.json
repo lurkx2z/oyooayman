@@ -1,0 +1,314 @@
+{
+ "id": "02-m_how",
+ "text": "...How did you know that?",
+ "seconds": 1.75,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "...How",
+   "start": 0.1,
+   "end": 0.26
+  },
+  {
+   "text": "did",
+   "start": 0.3,
+   "end": 0.42
+  },
+  {
+   "text": "you",
+   "start": 0.5,
+   "end": 0.54
+  },
+  {
+   "text": "know",
+   "start": 0.68,
+   "end": 0.82
+  },
+  {
+   "text": "that?",
+   "start": 0.94,
+   "end": 1.22
+  }
+ ],
+ "characters": [
+  {
+   "text": ".",
+   "start": 0,
+   "end": 0.04
+  },
+  {
+   "text": ".",
+   "start": 0.04,
+   "end": 0.08
+  },
+  {
+   "text": ".",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "H",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "o",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "w",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "d",
+   "start": 0.32,
+   "end": 0.347
+  },
+  {
+   "text": "i",
+   "start": 0.347,
+   "end": 0.373
+  },
+  {
+   "text": "d",
+   "start": 0.373,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "y",
+   "start": 0.48,
+   "end": 0.507
+  },
+  {
+   "text": "o",
+   "start": 0.507,
+   "end": 0.533
+  },
+  {
+   "text": "u",
+   "start": 0.533,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "k",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": "n",
+   "start": 0.7,
+   "end": 0.76
+  },
+  {
+   "text": "o",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "w",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "t",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "h",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "a",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "t",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": "?",
+   "start": 1.2,
+   "end": 1.68
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "...How",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "did",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "you",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "know",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": "that?",
+   "start": 1.04,
+   "end": 1.68
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": ".",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": ".",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": ".",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": "H",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "o",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "w",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.3
+  },
+  {
+   "text": "d",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": "i",
+   "start": 0.34,
+   "end": 0.36
+  },
+  {
+   "text": "d",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": " ",
+   "start": 0.42,
+   "end": 0.5
+  },
+  {
+   "text": "y",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "o",
+   "start": 0.52,
+   "end": 0.52
+  },
+  {
+   "text": "u",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": " ",
+   "start": 0.54,
+   "end": 0.64
+  },
+  {
+   "text": "k",
+   "start": 0.68,
+   "end": 0.7
+  },
+  {
+   "text": "n",
+   "start": 0.7,
+   "end": 0.76
+  },
+  {
+   "text": "o",
+   "start": 0.76,
+   "end": 0.78
+  },
+  {
+   "text": "w",
+   "start": 0.78,
+   "end": 0.82
+  },
+  {
+   "text": " ",
+   "start": 0.82,
+   "end": 0.94
+  },
+  {
+   "text": "t",
+   "start": 0.94,
+   "end": 0.96
+  },
+  {
+   "text": "h",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "a",
+   "start": 1.02,
+   "end": 1.12
+  },
+  {
+   "text": "t",
+   "start": 1.2,
+   "end": 1.22
+  },
+  {
+   "text": "?",
+   "start": 1.22,
+   "end": 1.22
+  }
+ ]
+}

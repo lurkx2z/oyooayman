@@ -1,0 +1,24 @@
+{
+  "voice": "nPczCjzI2devNBz1zQrb",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "speed": 1
+  },
+  "clips": [
+    {
+      "id": "01-a_news",
+      "text": "They're calling him... the boy who knows everything.",
+      "file": "01-a_news.mp3",
+      "align": "01-a_news.align.json",
+      "seconds": 3.5,
+      "speech_start": 0.1,
+      "speech_end": 3.18,
+      "hash": "ed0b2fd15d5a9ee0",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}
