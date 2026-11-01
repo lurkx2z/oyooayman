@@ -10,7 +10,7 @@ speed: 1.08
 
 [s_handle] Did you just rip the handle off?
 
-[s_phone] Yeah, I'm right outside! He's about to lift!
+[s_phone] I'm at the back door, I can see him! He's about to lift!
 
 [s_idiot] You're such an idiot.
 
