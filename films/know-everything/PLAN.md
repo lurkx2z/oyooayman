@@ -44,3 +44,23 @@ you can't predict. That rule decides the ending.
 ## Voices (ElevenLabs via GitHub Actions, `.github/workflows/narrate-know-everything.yml`)
 Narrator Michael (speed 1.06), you Liam, Maya Jessica, Mom Matilda, the teacher Bill, a classmate Will, the news anchor
 Brian, the physicist Alice, the agent Lily. Scripts: `VO-*.md`; clips and word timings land in `voices/<role>/`.
+
+## Files
+- `../../know-everything.html` — the page (Space plays). Canvas 2D, no WebGL.
+- `VO-*.md` — one voice script per character; `voices/<role>/` — the clips + word timings (from Actions).
+- `build-timing.cjs` → `timing.js` (clips placed on measured gaps; the 10 s midnight silence lives here).
+- `core.js` (player, cached layers, parallax camera, bloom, grade), `rig.js` (stickmen, costumes, lip-flap),
+  `props.js` (painted building blocks), `world.js` (the sets: bedroom day/night, kitchen, street, classroom, hallway,
+  backyard, the house front day/night, the lab, the bookshop window, the living room), `items.js` (fact tags, story
+  objects, space), `shots.js` (the edit, ~88 shots placed on word times), `hud.js` (captions with a speaker dot, day
+  cards, title, closing question).
+- `sound/cues.cjs` → `cues.json`; `sound/mix.py` (score, effects, ambience beds, nine voices, ducking);
+  `sound/master.sh` (−15 LUFS, about −1.5 dBTP) → `sound/out/mix.m4a` and `soundtrack.js`.
+- `stills.cjs`, `render.cjs` (parallel cloud render).
+
+## Rebuild
+```bash
+node films/know-everything/build-timing.cjs
+node films/know-everything/sound/cues.cjs && python3 films/know-everything/sound/mix.py && bash films/know-everything/sound/master.sh
+NODE_PATH=$(npm root -g) node films/know-everything/render.cjs --out renders/know-everything --workers 4
+```
