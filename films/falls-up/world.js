@@ -1,0 +1,394 @@
+/* =====================================================================
+   WORLD — the film's main set: your kitchen on the fifth floor (room.js; its window looks south over the park), the
+   street and the park (street.js), the people, the dog and the pigeons (cast.js), what goes up outdoors (things.js),
+   your cat (animals.js), your own hands, and the afternoon sky (Saturday, 3 PM, the sun in the south-west).
+   Every shot (shots.js) is a mode: story time s comes from the one clock (script.js: fuStoryAt), the world is posed
+   with it (pure), and the mode places the camera.
+   Your hands hold things where the things are: each held thing has a fixed place (room-local) until you let go, and
+   the hand is posed onto it every frame (fuGripPose), so a hand and what it holds never drift apart, whatever the
+   camera does.
+   ===================================================================== */
+
+const fuAdd = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
+
+// ---------------------------------------------------------------------------------------------------------------------
+// WHAT YOU HOLD (room-local) and when you let go (story s)
+// ---------------------------------------------------------------------------------------------------------------------
+const FU_HELD = {
+  glass: [0.38, 1.0, 0.3],                                 // the glass of water, over the table (let go at s = 0)
+  spoon: [-0.12, 0.99, 0.3], grape: [0.2, 0.99, 0.3],      // the spoon (left hand) and the grape (right), FU.sSG
+  spoonRest: [0.42, 0.757, 0.24], grapeRest: [0.63, 0.83, -0.03],   // (on the table, in the bowl, until you pick them up)
+  apple: [0.85, 1.3, -2.62],                               // out of the open window (FU.sApple): 37 cm clear of the wall
+  mug: [-1.98, 0.92, -0.06],                               // the mug you pour into (on the counter)
+};
+const FU_EYE = [-0.06, 1.18, 0.6];                         // you, sitting at the table (eye), facing the window
+
+// ---------------------------------------------------------------------------------------------------------------------
+// THE KETTLE (local: its base at the origin, the spout along +x, the handle at −x). In your right hand in the kettle
+// shot: lifted off its base, tipped over the mug (FU.sPour), set upright again
+// ---------------------------------------------------------------------------------------------------------------------
+const FU_KET = { tip: [0.142, 0.212, 0], grip: [-0.122, 0.118, 0], tilt: 0.9 };
+function fuBuildKettle() {
+  const g = new THREE.Group(), body = fuStd('#ece6da', 0.32), dark = fuStd('#26272a', 0.45), steel = fuStd('#c9ccce', 0.25, 0.85);
+  const pts = [[0, 0], [0.078, 0], [0.086, 0.012], [0.088, 0.05], [0.085, 0.13], [0.078, 0.18], [0.066, 0.206], [0.05, 0.214], [0, 0.216]].map(([x, y]) => new THREE.Vector2(x, y));
+  fuMesh(new THREE.LatheGeometry(pts, 32), body, 0, 0, 0, g);
+  fuCyl(0.087, 0.087, 0.014, dark, 0, 0.007, 0, g, 32);                                  // the dark base band
+  fuCyl(0.052, 0.054, 0.012, steel, 0, 0.218, 0, g, 24);                                 // the lid
+  fuMesh(new THREE.SphereGeometry(0.014, 12, 8).scale(1.4, 0.8, 1.0), dark, 0, 0.228, 0, g);
+  // the spout: a tapered tube from the body's shoulder up and out to the tip
+  { const a = new THREE.Vector3(0.062, 0.15, 0), b = new THREE.Vector3(...FU_KET.tip), d = b.clone().sub(a), L = d.length();
+    const sp = fuMesh(new THREE.CylinderGeometry(0.009, 0.019, L, 14, 1, true), body, (a.x + b.x) / 2, (a.y + b.y) / 2, 0, g);
+    sp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); sp.material = body; }
+  // the handle: a vertical grip with two arms back to the body
+  { fuMesh(fuRoundBox(0.022, 0.15, 0.03, 0.009, 0.004), dark, FU_KET.grip[0], FU_KET.grip[1] - 0.075, 0, g);
+    for (const y of [0.04, 0.19]) fuBox(0.05, 0.022, 0.028, dark, FU_KET.grip[0] + 0.03, y, 0, g); }
+  g.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+function fuBuildMug() {
+  const g = new THREE.Group(), m = fuStd('#c8553a', 0.35);
+  const pts = [[0, 0.002], [0.036, 0.002], [0.04, 0.008], [0.042, 0.095], [0.039, 0.095], [0.036, 0.012], [0, 0.012]].map(([x, y]) => new THREE.Vector2(x, y));
+  const b = fuMesh(new THREE.LatheGeometry(pts, 28), m, 0, 0, 0, g); b.material.side = THREE.DoubleSide;
+  const h = fuMesh(new THREE.TorusGeometry(0.026, 0.006, 8, 16, Math.PI * 1.2), m, 0.04, 0.05, 0, g); h.rotation.z = -Math.PI * 0.6;
+  return g;
+}
+// the kettle's pose (room-local position of its base, its tilt) at story s
+function fuKettleAt(s) {
+  const P = FU.sPour, rest = [FU_ROOM.kettle[0], FU_ROOM.counter.top + 0.02, FU_ROOM.kettle[2]];
+  const a = FU_KET.tilt * (fuSm(s, P[0] - 0.55, P[0] + 0.05) - fuSm(s, P[1], P[1] + 0.6));
+  // over the mug: the tip right above its middle when fully tipped (the spout points north, +z: yaw −90°)
+  const tx = FU_KET.tip[0] * Math.cos(FU_KET.tilt) + FU_KET.tip[1] * Math.sin(FU_KET.tilt), ty = -FU_KET.tip[0] * Math.sin(FU_KET.tilt) + FU_KET.tip[1] * Math.cos(FU_KET.tilt);
+  const pour = [FU_HELD.mug[0], FU_HELD.mug[1] + 0.2 - ty, FU_HELD.mug[2] - tx];
+  const lift = [rest[0] + 0.06, rest[1] + 0.13, rest[2] - 0.02];
+  const u1 = fuSm(s, P[0] - 2.6, P[0] - 1.2), u2 = fuSm(s, P[0] - 1.2, P[0] - 0.2), u3 = fuSm(s, P[1] + 0.6, P[1] + 1.8);
+  let p = fuV(rest, lift, u1); p = fuV(p, pour, u2); p = fuV(p, lift, u3);
+  return { p, a };
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// YOUR HANDS. A pose from a grip: g = the world point the hand holds, F = the way the fingers point, N = the way the
+// palm faces (world directions); off = where g sits in the hand's own frame ([toward the thumb, along the fingers,
+// out of the palm], m). Returns the ViewerHands pose for the current camera (camera space; x mirrored for the left)
+// ---------------------------------------------------------------------------------------------------------------------
+const _fuGq = new THREE.Quaternion(), _fuGf = new THREE.Vector3(), _fuGn = new THREE.Vector3(), _fuGx = new THREE.Vector3(), _fuGw = new THREE.Vector3();
+function fuGripPose(cam, g, F, N, off, side, curl, thumb) {
+  const f = _fuGf.set(F[0], F[1], F[2]).normalize(), n = _fuGn.set(N[0], N[1], N[2]); n.addScaledVector(f, -n.dot(f)).normalize();
+  const x = _fuGx.crossVectors(f, n);                                   // toward the thumb (right hand); the left hand's thumb is −x
+  const w = _fuGw.set(g[0], g[1], g[2]).addScaledVector(x, -off[0] * side).addScaledVector(f, -off[1]).addScaledVector(n, -off[2]);
+  cam.updateMatrixWorld(true);
+  const pc = cam.worldToLocal(w.clone()), qi = _fuGq.copy(cam.quaternion).invert();
+  const fc = f.clone().applyQuaternion(qi), nc = n.clone().applyQuaternion(qi);
+  return { p: [pc.x * side, pc.y, pc.z], F: [fc.x * side, fc.y, fc.z], N: [nc.x * side, nc.y, nc.z], curl, thumb, trem: 0.0006 };
+}
+// the hand keyframes (film time) are built once the shots exist: fuHandScript()
+function fuHandScript() {
+  const sh = (m) => fuShot(m), tG = fuFilmAt(0), tSG = fuFilmAt(FU.sSG), tA = fuFilmAt(FU.sApple);
+  const A0 = sh('title'), A2 = sh('sg'), A4 = sh('kettle'), A8 = sh('apple');
+  return {
+    right: [[-9, 'glass'], [tG - 0.02, 'glassOpen'], [A0.t1, 'hidden'], [A2.t0 - 0.6, 'pinchR'], [tSG - 0.02, 'pinchOpenR'], [A2.t1, 'hidden'],
+      [A4.t0 - 0.6, 'kettle'], [A4.t1, 'hidden'], [A8.t0 - 0.6, 'apple'], [tA - 0.02, 'appleOpen'], [A8.t1, 'hidden']],
+    left: [[-9, 'hidden'], [A2.t0 - 0.6, 'pinchL'], [tSG - 0.02, 'pinchOpenL'], [A2.t1, 'hidden']],
+  };
+}
+const FU_HAND_BLENDS = { glass: 0.2, glassOpen: 0.14, pinchR: 0.3, pinchL: 0.3, pinchOpenR: 0.1, pinchOpenL: 0.1, kettle: 0.3, apple: 0.3, appleOpen: 0.22, hidden: 0.45 };
+// the shots in which your hands can be on screen
+const FU_HAND_MODES = new Set(['title', 'sg', 'kettle', 'apple']);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// THE CAT (room-local). It sits on the counter by the hob; at FU.sCat it hops down for the floor and falls up instead,
+// turning over in the air (the righting reflex: front half first) to land on the ceiling on its feet. It tries twice
+// to jump down (FU.sCatHop): each jump takes it 29 cm off the ceiling and back. By 3:08 it has walked over to above the
+// gap between the table and the counter. At 3:10 it falls, turns over again, and lands on the floor on its feet.
+// → { p (its feet: the quad's origin), q, pose }
+// ---------------------------------------------------------------------------------------------------------------------
+const FU_CATP = { sit: [-2.12, FU_ROOM.counter.top, 0.82], vx: 1.6, vy: -0.8, hc: 0.2, later: [-0.78, -0.72], yawLater: 2.6 };
+function fuCatFlight() {
+  const P = FU_CATP, a = 4.905, b = P.vy, c = P.sit[1] + P.hc - (FU_CEIL - P.hc);           // a τ² + b τ + c = 0: centre reaches the ceiling stand
+  return (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+}
+const FU_CAT_LAND = fuCatFlight();                                                         // ≈ 0.60 s after the jump
+function fuCatState(s) {
+  const P = FU_CATP, C = FU_CEIL, s0 = FU.sCat, hc = P.hc, yaw0 = Math.PI / 2;
+  const qOf = (yaw, roll, pitch = 0) => { const q = new THREE.Quaternion().setFromAxisAngle(_fuCy, yaw); q.multiply(new THREE.Quaternion().setFromAxisAngle(_fuCz, roll)); if (pitch) q.multiply(new THREE.Quaternion().setFromAxisAngle(_fuCx, pitch)); return q; };
+  const feetFrom = (c, q) => { const up = new THREE.Vector3(0, hc, 0).applyQuaternion(q); return [c[0] - up.x, c[1] - up.y, c[2] - up.z]; };
+  // sitting on the counter, looking round; it crouches to jump
+  if (s < s0) {
+    const k = fuSm(s, s0 - 0.9, s0 - 0.15);
+    const up = fuSm(s, s0 - 2.4, s0 - 1.6);                                                 // a loaf; it gets up; it crouches to jump
+    return { p: P.sit.slice(), q: qOf(yaw0 + 0.25 * (1 - k) * Math.sin(s * 0.4), 0), pose: fuQuadPose({ crouch: 0.85 * (1 - up) + 0.15 * up + 0.55 * k, head: [0.25 - 0.85 * k, (1 - k) * 0.5 * Math.sin(s * 0.33)], tail: [0.5, 0.6 * Math.sin(s * 1.3)] }) };
+  }
+  const tau = s - s0, L = FU_CAT_LAND;
+  if (tau < L) {                                                                            // in the air: it turns over
+    const c = [P.sit[0] + P.vx * tau, P.sit[1] + hc + P.vy * tau + 4.905 * tau * tau, P.sit[2]];
+    const rf = Math.PI * fuSm(tau, 0.1, 0.38), rb = Math.PI * fuSm(tau, 0.18, 0.48), roll = (rf + rb) / 2;
+    const q = qOf(yaw0, roll);
+    return { p: feetFrom(c, q), q, pose: fuQuadPose({ twistF: rf - roll, twistB: rb - roll, stretch: 0.9 * (1 - fuSm(tau, 0.3, 0.55)), crouch: 0.4 * fuSm(tau, 0.45, L), head: [0.3, 0], tail: [0.1, 1.2 * Math.sin(tau * 14)] }) };
+  }
+  if (s < FUP.T) {                                                                          // on the ceiling, upside down
+    const land = [P.sit[0] + P.vx * L, P.sit[2]];
+    const w = fuSm(s, 95, 140), x = fuLerp(land[0], P.later[0], w), z = fuLerp(land[1], P.later[1], w), yaw = fuLerp(yaw0, P.yawLater, w);
+    let d = 0, crouch = 0.7 * Math.exp(-(s - s0 - L) / 0.5) + 0.45, stretch = 0;
+    for (const h of FU.sCatHop) {
+      const u = s - h;
+      if (u > -0.5 && u < 0) crouch = Math.max(crouch, 0.85 * fuSm(u, -0.5, -0.1));
+      if (u >= 0 && u < 0.489) { d = 2.4 * u - 4.905 * u * u; stretch = 0.8 * Math.sin(Math.PI * u / 0.489); crouch = 0; }
+      if (u >= 0.489 && u < 1.2) crouch = Math.max(crouch, 0.8 * (1 - fuSm(u, 0.6, 1.2)));
+    }
+    const walking = w > 0.01 && w < 0.99;
+    const q = qOf(yaw, Math.PI);
+    const c = [x, C - hc - d, z];
+    return { p: feetFrom(c, q), q, pose: fuQuadPose({ crouch: walking ? 0.2 : crouch, stretch, gait: walking ? s * 9 : null, head: [0.55 + 0.15 * Math.sin(s * 0.5), 0.4 * Math.sin(s * 0.27)], tail: [0.15, 0.9 * Math.sin(s * 2.1)] }) };
+  }
+  // 3:10: it falls, turns over again, and lands on the floor between the table and the counter
+  const u = s - FUP.T, top = C - hc, rest = hc, tf = Math.sqrt(2 * (top - rest) / FUP.g);
+  const x = P.later[0], z = P.later[1];
+  if (u < tf) {
+    const c = [x, top - 4.905 * u * u, z], rf = Math.PI + Math.PI * fuSm(u, 0.06, 0.3), rb = Math.PI + Math.PI * fuSm(u, 0.12, 0.38), roll = (rf + rb) / 2, q = qOf(P.yawLater, roll);
+    return { p: feetFrom(c, q), q, pose: fuQuadPose({ twistF: rf - roll, twistB: rb - roll, stretch: 0.7 * fuSm(u, 0.25, tf), head: [0.3, 0], tail: [0.1, 1.0 * Math.sin(u * 12)] }) };
+  }
+  const v = u - tf, q = qOf(P.yawLater + 0.6 * fuSm(v, 1.0, 2.2), 0);
+  return { p: [x, 0, z], q, pose: fuQuadPose({ crouch: 0.85 * Math.exp(-v / 0.35) + 0.15 * (1 - fuSm(v, 0.8, 1.6)), head: [0.4 * Math.exp(-v / 0.6) + 0.35, 0.5 * Math.sin(v * 0.9)], tail: [0.8, 0.5 * Math.sin(v * 3)] }) };
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// THE SET
+// ---------------------------------------------------------------------------------------------------------------------
+FU_SETS.world = (app) => {
+  const S = fuSet(app, { sky: '#9fbcd8', fov: 50, near: 0.02, far: 6000, hemi: ['#d6e2ef', '#6f6252', 0.6], sun: FU_SUN.map((x) => x * 60), sunI: 3.4, sunColor: '#ffe6c4',
+    shadow: 2048, shadowR: 10, shadowFar: 340, env: ['#8db4dc', '#ead8c0', '#6c6256'] });
+  const scene = S.scene, cam = S.camera, sun = S.sun;
+  scene.fog = new THREE.FogExp2('#cdd8e2', 0.0011);
+  const sky = fuGradSky(scene, '#3a74c0', '#cfdde8', '#7a766c', { sunDir: FU_SUN, sunGlow: '#ffd9a8', hw: 0.3 });
+  const R = fuBuildRoom(S), T = fuBuildStreet(S), C = fuBuildCast(S, T), X = fuBuildThings(S, T);
+  // your kettle and mug; your cat
+  const kettle = fuBuildKettle(); R.room.add(kettle);
+  const mug = fuBuildMug(); mug.position.set(FU_HELD.mug[0], FU_HELD.mug[1], FU_HELD.mug[2]); mug.rotation.y = 2.4; R.room.add(mug);
+  const cat = fuBuildQuad(FU_CAT); R.room.add(cat.root);
+  // your hands
+  const hands = new ViewerHands(cam, { script: fuHandScript(), poses: {}, blends: FU_HAND_BLENDS, skin: '#c9967a', nail: '#e2bba8', sleeve: '#4a5a74', cuff: '#3c4a60', watch: true, sleeveLen: 0.34 });
+  // the light that bounces round your kitchen (off the floor, the table, the walls): it lights the ceiling we keep looking at
+  const fillA = new THREE.PointLight('#fff1dc', 0, 7, 1.4), fillB = new THREE.PointLight('#dce8f6', 0, 7, 1.4), fillC = new THREE.PointLight('#ffe8cc', 0, 5, 1.6);
+  R.room.add(fillA, fillB, fillC); fillA.position.set(0.2, 0.9, -0.4); fillB.position.set(0.3, 1.9, -1.5); fillC.position.set(-1.6, 1.4, 0.3);
+  const drops = fuPuffs(scene, 4200, { soft: 1.2 });
+  const RL = (x, y, z) => R.toWorld(x, y, z).toArray();
+  const rel = { room: null, world: null };
+  // where the people's props are at the moment they let go (each one posed once, then the cast is re-posed per frame)
+  const relWorld = () => { if (!rel.world) { rel.world = {}; for (const k of Object.keys(FU_REL)) rel.world[k] = C.relAt(k); rel.world.apple = RL(...FU_HELD.apple); } return rel.world; };
+  const set = {
+    scene, camera: cam, R, T, C, X, hands, cat, kettle,
+    cuts() { return []; },
+    frame(t, shot) {
+      const m = shot.mode, s = fuStoryAt(t), rate = fuRateAt(t), k = MathX.clamp((t - shot.t0) / (shot.t1 - shot.t0), 0, 1);
+      this._s = s; this._shot = shot; this._rate = rate; this._t = t;
+      const RW = relWorld();
+      // ------------------------------------------------------------------ pose the world first (some cameras follow things)
+      T.update(s, { t, mode: m });
+      C.update(s, { mode: m });
+      // the kettle (on its base, or in your hand), the cat
+      const K = fuKettleAt(s); kettle.position.set(K.p[0], K.p[1], K.p[2]); kettle.quaternion.setFromAxisAngle(_fuCy, -Math.PI / 2).multiply(new THREE.Quaternion().setFromAxisAngle(_fuCz, -K.a));
+      const cs = fuCatState(s); cat.root.position.set(cs.p[0], cs.p[1], cs.p[2]); cat.root.quaternion.copy(cs.q); fuPoseQuad(cat, cs.pose);
+      // the room: what you let go of (held until then), the tea's stream and where it lands on the ceiling
+      const held = {}, H = FU_HELD;
+      if (s < 0) held.glass = new THREE.Vector3(...H.glass);
+      const onTable = s < 12;                                              // (picked up off camera, between two shots)
+      if (s < FU.sSG) { held.spoon = new THREE.Vector3(...(onTable ? H.spoonRest : H.spoon)); held.grape = new THREE.Vector3(...(onTable ? H.grapeRest : H.grape)); }
+      const roomDrops = [], tea = this.teaStream(s, kettle, roomDrops);
+      R.update(s, { rel: { glass: H.glass, spoon: H.spoon, grape: H.grape }, held, teaHit: tea.hit, drops: roomDrops });
+      if (onTable) R.spoon.rotation.set(0, 2.2, 0);
+      // ------------------------------------------------------------------ the camera
+      const v = { p: [0, 2, -5], at: [0, 1, 0], fov: 50, drift: 0.004, sh: { f: null, R: 14 }, inside: false, far: 6000, near: 0.05, roll: 0 };
+      X.update(s, { rel: RW, mode: m });                                  // (positions only: some cameras follow them)
+      fuShotCam(this, m, s, t, k, shot, v, RL);
+      const dr = v.drift ? fuDrift(t, v.drift, 0.3, 11) : [0, 0, 0];
+      if (v.shake) { const j = v.shake; dr[0] += j * Math.sin(t * 71) * Math.sin(t * 13.3); dr[1] += j * 0.6 * Math.sin(t * 57 + 1); dr[2] += j * Math.sin(t * 63 + 2) * Math.sin(t * 9.1); }
+      if (cam.near !== v.near) cam.near = v.near;
+      if (cam.far !== v.far) cam.far = v.far;
+      fuCam(cam, fuAdd(v.p, dr), fuAdd(v.at, dr), v.fov, v.roll || 0);
+      this._inside = v.inside; this._expo = v.expo || 0;
+      // ------------------------------------------------------------------ things outdoors (some follow the camera: puffs)
+      const worldDrops = [];
+      X.update(s, { rel: RW, drops: worldDrops, mode: m, cam });
+      if (m === 'apple' && s < FU.sApple) { X.apple.visible = true; X.apple.position.set(...RW.apple); X.apple.rotation.set(0.3, 0.8, 0); }   // (in your hand)
+      // ------------------------------------------------------------------ your hands (posed onto what they hold)
+      const handsOn = FU_HAND_MODES.has(m);
+      hands.root.visible = handsOn;
+      if (handsOn) { this.posHands(s, t, kettle, RL); hands.update(t); }
+      // ------------------------------------------------------------------ the light
+      const inside = v.inside;
+      sun.intensity = 3.4; S.hemi.intensity = inside ? 0.42 : 0.62;
+      scene.environmentIntensity = inside ? 0.5 : 0.85;
+      fillA.intensity = inside ? 2.2 : 0; fillB.intensity = inside ? 1.4 : 0; fillC.intensity = inside ? 0.9 : 0;
+      scene.fog.density = (inside ? 0.0005 : 0.0011) * (v.fogK ?? 1);
+      const f = v.sh.f || v.at, D = 160;
+      sun.position.set(f[0] + FU_SUN[0] * D, f[1] + FU_SUN[1] * D, f[2] + FU_SUN[2] * D); sun.target.position.set(f[0], f[1], f[2]); sun.target.updateMatrixWorld();
+      { const c = sun.shadow.camera; if (c.right !== v.sh.R) { c.left = -v.sh.R; c.right = v.sh.R; c.top = v.sh.R; c.bottom = -v.sh.R; c.updateProjectionMatrix(); } }
+      sun.shadow.bias = v.sh.R > 20 ? -0.0006 : -0.0003; sun.shadow.normalBias = v.sh.R > 20 ? 0.06 : 0.02;
+      // ------------------------------------------------------------------ the drops (soft points): the room's, then the world's
+      drops.begin();
+      const o = R.room.position;
+      for (const d of roomDrops) drops.add(d[0] + o.x, d[1] + o.y, d[2] + o.z, d[3], d[4], d[5], d[6], d[7]);
+      for (const d of worldDrops) drops.add(d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7]);
+      drops.end();
+      void sky; void tea;
+    },
+    // the tea: a stream from the spout while the kettle is tipped. It leaves the spout at 0.6 m/s and falls up (no drag
+    // over a metre and a half). Rebuilt each frame between the drop that left first and the one that left last (pure)
+    teaStream(s, ket, out) {
+      const P = FU.sPour, mesh = R.stream, K = fuKettleAt(P[0] + 0.3);
+      // the spout's tip and its direction when fully tipped (room-local)
+      const q = new THREE.Quaternion().setFromAxisAngle(_fuCy, -Math.PI / 2).multiply(new THREE.Quaternion().setFromAxisAngle(_fuCz, -FU_KET.tilt));
+      const tip = new THREE.Vector3(...FU_KET.tip).applyQuaternion(q).add(new THREE.Vector3(...K.p));
+      const dir = new THREE.Vector3(0.6, 0.8, 0).normalize().applyQuaternion(q);
+      const v0 = 0.6, path = (tau) => [tip.x + dir.x * v0 * tau, tip.y + dir.y * v0 * tau + 4.905 * tau * tau, tip.z + dir.z * v0 * tau];
+      const top = FU_CEIL - 0.004, a = 4.905, b = dir.y * v0, c = tip.y - top, tH = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a), hp = path(tH);
+      const hit = [hp[0], hp[2], P[0] + tH];
+      const ta = Math.max(0, s - P[1]), tb = Math.min(tH, s - P[0]);
+      mesh.visible = tb > ta + 0.004;
+      if (mesh.visible) {
+        const n = 26, pts = [];
+        for (let i = 0; i <= n; i++) { const tau = ta + (tb - ta) * i / n; pts.push(new THREE.Vector3(...path(tau))); }
+        const curve = new THREE.CatmullRomCurve3(pts), geo = new THREE.TubeGeometry(curve, 40, 1, 8, false);
+        // thinner as it speeds up (the same flow through a smaller section): r ∝ 1/√v
+        const pa = geo.attributes.position, nrm = geo.attributes.normal, segs = 41;
+        for (let i = 0; i < pa.count; i++) { const j = Math.floor(i / 9), u = Math.min(1, j / (segs - 1)), tau = ta + (tb - ta) * u, vv = Math.hypot(v0, 9.81 * tau), r = Math.max(0.0028, 0.0068 * Math.sqrt(v0 / vv));
+          const cp = curve.getPointAt(Math.min(1, u)); pa.setXYZ(i, cp.x + nrm.getX(i) * r, cp.y + nrm.getY(i) * r, cp.z + nrm.getZ(i) * r); }
+        pa.needsUpdate = true; geo.computeVertexNormals();
+        if (mesh.geometry) mesh.geometry.dispose(); mesh.geometry = geo;
+      }
+      // the splash where it hits the ceiling: drops flung out along it, falling back up onto it
+      if (out && s > hit[2] && s < P[1] + tH + 0.3) for (let i = 0; i < 70; i++) { const u = ((s * 3 + fuR(i, 61)) % 1) / 3, a2 = fuR(i, 62) * 6.283, vh = 0.3 + 0.9 * fuR(i, 63), vd = 0.3 + 0.7 * fuR(i, 64);
+        const d = vd * u - 4.905 * u * u; if (d < 0) continue; out.push([hit[0] + Math.cos(a2) * vh * u, FU_CEIL - d - 0.004, hit[1] + Math.sin(a2) * vh * u, 0.005 + 0.006 * fuR(i, 65), 0.8, 0.6, 0.36, 0.14]); }
+      return { hit, tip: tip.toArray(), tH };
+    },
+    // your hands onto what they hold (world points: the room's held places; the kettle's handle; the apple)
+    posHands(s, t, ket, RL) {
+      const P = hands.poses, H = FU_HELD;
+      { const g = RL(...H.glass), F = [-0.3, 0.16, -0.94], N = [-0.96, 0.0, 0.3];
+        P.glass = fuGripPose(cam, g, F, N, [0.0, 0.058, 0.054], 1, [0.82, 0.88, 0.92, 0.98], [0.25, 0.7]);
+        P.glassOpen = fuGripPose(cam, fuAdd(g, [0.03, -0.03, 0.06]), F, N, [0.0, 0.058, 0.07], 1, [0.18, 0.22, 0.26, 0.3], [0.55, 0.15]); }
+      { const F = [-0.12, 0.62, -0.78], N = [-0.92, -0.05, -0.38];
+        P.pinchR = fuGripPose(cam, RL(...H.grape), F, N, [0.022, 0.118, 0.042], 1, [0.55, 1.15, 1.3, 1.4], [0.45, 0.55]);
+        P.pinchOpenR = fuGripPose(cam, fuAdd(RL(...H.grape), [0.01, -0.02, 0.03]), F, N, [0.022, 0.118, 0.05], 1, [0.25, 0.9, 1.1, 1.2], [0.7, 0.2]);
+        const FL = [0.12, 0.62, -0.78], NL = [0.92, -0.05, -0.38];
+        P.pinchL = fuGripPose(cam, RL(...H.spoon), FL, NL, [0.022, 0.118, 0.042], -1, [0.55, 1.15, 1.3, 1.4], [0.45, 0.55]);
+        P.pinchOpenL = fuGripPose(cam, fuAdd(RL(...H.spoon), [-0.01, -0.02, 0.03]), FL, NL, [0.022, 0.118, 0.05], -1, [0.25, 0.9, 1.1, 1.2], [0.7, 0.2]); }
+      { ket.updateMatrixWorld(true); const g = ket.localToWorld(new THREE.Vector3(...FU_KET.grip)).toArray(), qk = ket.getWorldQuaternion(new THREE.Quaternion());
+        const F = new THREE.Vector3(0, 0, 1).applyQuaternion(qk).toArray(), N = new THREE.Vector3(1, 0, 0).applyQuaternion(qk).toArray();
+        P.kettle = fuGripPose(cam, g, F, N, [0.0, 0.07, 0.022], 1, [1.15, 1.2, 1.25, 1.3], [0.35, 0.85]); }
+      { const g = RL(...H.apple), F = [0.05, 0.12, -1], N = [0.0, 1, 0.12];
+        P.apple = fuGripPose(cam, g, F, N, [0.0, 0.07, 0.056], 1, [0.42, 0.45, 0.5, 0.55], [0.55, 0.25]);
+        P.appleOpen = fuGripPose(cam, fuAdd(g, [0, -0.02, 0.03]), F, N, [0.0, 0.07, 0.056], 1, [0.2, 0.22, 0.26, 0.3], [0.65, 0.12]); }
+      void s; void t;
+    },
+    labels(t) { return fuLabels(this, t); },
+    grade(t, p, shot) {
+      p.exposure = (this._inside ? 1.22 : 1.0) * (this._expo || 1);
+      p.saturation = 1.05; p.warmth = 0.03; p.vignette = 0.5; p.bloom = 0.3; p.bloomThreshold = 0.92;
+      if (shot && shot.mode === 'drop') { const u = fuStoryAt(t) - FUP.T; if (u > 0.55 && u < 1.0) p.chroma = Math.max(p.chroma || 0, 0.06 * Math.sin(Math.PI * (u - 0.55) / 0.45)); }
+    },
+  };
+  return set;
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+// THE CAMERAS: one per mode. v = { p, at, fov, drift, sh: { f, R }, inside, far, near, fogK, expo, shake, roll }.
+// RL(x, y, z): room → world. The kitchen's window is in its south wall (z −2); you sit at the table facing it.
+// Outdoors: your block's front is z = 0, the street z −9…−2, the park from z −12.35 (railings), the path z −15.5, the
+// plane tree at (−9, −19.2) with its low branch out over the path, the pond (and its fountain) at (0, −52).
+// ---------------------------------------------------------------------------------------------------------------------
+// look from p towards q, but never steeper than maxEl (rad) above the horizontal (the lintel, the up vector)
+function fuLookCap(p, q, maxEl) {
+  const d = [q[0] - p[0], q[1] - p[1], q[2] - p[2]], hz = Math.hypot(d[0], d[2]) || 1e-6, el = Math.atan2(d[1], hz);
+  if (el <= maxEl) return q;
+  const L = Math.hypot(hz, d[1]); return [p[0] + d[0] / hz * L * Math.cos(maxEl), p[1] + L * Math.sin(maxEl), p[2] + d[2] / hz * L * Math.cos(maxEl)];
+}
+function fuShotCam(set, m, s, t, k, shot, v, RL) {
+  const into = (a, b, u) => fuV(a, b, Ease.inOutSine(u));
+  const room = (R = 5) => { v.inside = true; v.sh = { f: RL(0, 1.2, -0.6), R }; v.drift = 0.0015; v.near = 0.02; };
+  const H = FU_HELD, E = FU_EYE;
+  const X = set.X, C = set.C, T = set.T;
+  const B = T.branchAt(FU_RUN.grabU);
+  switch (m) {
+    // ---- 1: your kitchen
+    // the title: at the table with a glass of water; it slips (slow motion) and falls up; we follow it to the ceiling
+    case 'title': { room(); v.p = into(RL(E[0], E[1], E[2]), RL(E[0] + 0.01, E[1] - 0.01, E[2] - 0.05), k);
+      const w = Ease.inOutSine(fuSm(s, 0.04, 0.62)); v.at = fuV(RL(0.22, 0.88, 0.05), RL(H.glass[0], FU_CEIL, H.glass[2] - 0.05), w); v.fov = 55; break; }
+    // the ceiling: the glass in pieces, its water spreading
+    // (then back and down, out to the whole kitchen: the window, the cat asleep on the counter, the clock)
+    case 'ceiling': { room(); const w = Ease.inOutSine(fuSm(k, 0.12, 1));
+      v.p = fuV(RL(0.95, 1.4, 0.95), RL(1.95, 1.5, 1.78), w); v.at = fuV(RL(H.glass[0] - 0.05, FU_CEIL, H.glass[2] - 0.05), RL(-0.55, 1.72, -0.45), w); v.fov = 56 + 10 * w; break; }
+    // the spoon and the grape: in your hands, let go together, followed up
+    case 'sg': { room(); v.p = into(RL(E[0], E[1], E[2]), RL(E[0], E[1] - 0.01, E[2] - 0.04), k);
+      const w = Ease.inOutSine(fuSm(s, FU.sSG + 0.04, FU.sSG + 0.62)); v.at = fuV(RL(0.04, 0.92, 0.22), RL(0.05, FU_CEIL, 0.26), w); v.fov = 55 - 9 * Ease.inOutSine(fuSm(s, FU.sSG + 0.7, FU.sSG + 2.5)) - 16 * Ease.inOutSine(fuSm(s, FU.sSG + 2.6, FU.sSG + 7.5)); break; }
+    // the window: the park below (leaves going up, the fountain's column), people still out walking
+    case 'window': { room(); v.p = into(RL(0.62, 1.62, -1.62), RL(0.62, 1.62, -1.8), k); v.at = [-2, 4, -60]; v.fov = 54 - 14 * Ease.inOutSine(k); v.sh = { f: RL(0, 1, -1.2), R: 6 }; break; }
+    // the kettle: you lift it, pour, and the tea goes up; the camera follows the stream up, then back down it
+    case 'kettle': { room(); v.p = into(RL(-1.55, 1.6, -0.18), RL(-1.6, 1.6, -0.14), k);
+      const P = FU.sPour, w1 = Ease.inOutSine(fuSm(s, P[0] + 0.1, P[0] + 1.3)), w2 = Ease.inOutSine(fuSm(s, P[0] + 2.4, P[0] + 3.8));
+      v.at = fuV(fuV(RL(-2.0, 1.0, -0.14), RL(-1.98, 2.45, 0.2), w1), RL(-1.98, 1.4, 0.02), w2); v.fov = 64; break; }
+    // the puddle of tea on the ceiling (and the cat on the counter under it)
+    case 'puddle': { room(); v.p = into(RL(-0.95, 1.45, 0.78), RL(-1.0, 1.43, 0.72), k); v.at = RL(-1.95, 2.45, 0.35); v.fov = 62; break; }
+    // the cat: it jumps down from the counter, and lands on the ceiling
+    case 'cat': { room(); v.p = into(RL(0.45, 1.35, 0.45), RL(0.4, 1.36, 0.42), k); const cs = fuCatState(s), c = new THREE.Vector3(0, FU_CATP.hc + 0.08, 0).applyQuaternion(cs.q);
+      v.at = fuLookCap(v.p, RL(cs.p[0] + c.x, cs.p[1] + c.y, cs.p[2] + c.z), 1.0); v.fov = 58; break; }
+    case 'stuck': { room(); v.p = into(RL(-0.3, 1.5, 0.3), RL(-0.34, 1.5, 0.28), k); v.at = RL(-1.12, FU_CEIL - 0.15, 0.82); v.fov = 58; break; }
+    // the apple: held out of the open window; let go; followed up (as far as the lintel lets you look)
+    case 'apple': { room(); v.p = into(RL(0.78, 1.46, -1.88), RL(0.8, 1.45, -1.96), k); v.sh = { f: RL(0.8, 1.2, -2.4), R: 4 };
+      const a0 = RL(1.05, 0.72, -3.7), A = X.apple.visible ? X.apple.position.toArray() : RL(...H.apple), w = Ease.inOutSine(fuSm(s, FU.sApple + 0.05, FU.sApple + 0.7));
+      v.at = fuLookCap(v.p, fuV(a0, fuAdd(A, [0, 0.15, 0]), w), 1.08); v.fov = 56; break; }
+    // the apple from the park: a speck going up past your block
+    // ... and alongside it: just above the apple, looking down past it at your block, the street and the park falling away
+    case 'appleUp': { const A = X.apple.position.toArray(), w = Ease.inOutSine(k);
+      v.p = fuAdd(A, [0.5 + 0.15 * w, 0.62 + 0.2 * w, 0.95 - 0.1 * w]); v.at = fuAdd(A, [-0.3 - 0.2 * w, -1.25, -0.85]); v.fov = 52; v.drift = 0.0008; v.near = 0.03; v.sh = { f: [2, 0, -8], R: 40 }; break; }
+    // the street: keys, coffee, a phone
+    case 'street': { v.p = into([1.0, 1.45, -5.6], [1.15, 1.45, -5.3], k);
+      // on each loss in turn (the keys, the coffee, the phone): on the person, then up after it (no steeper than 0.45 rad)
+      const up = (o, d, s0) => fuV(d, X[o].visible ? fuLookCap(v.p, X[o].position.toArray(), 0.45) : d, Ease.inOutSine(fuSm(s, s0 + 0.05, s0 + 0.45)));
+      const a1 = up('keys', [-2.8, 1.35, -0.9], FU.sKeys), a2 = up('cup', [0.46, 1.35, -1.35], FU.sCoffee), a3 = up('phone', [6.2, 1.35, -0.7], FU.sPhone);
+      v.at = fuV(fuV(a1, a2, Ease.inOutSine(fuSm(s, FU.sCoffee - 0.75, FU.sCoffee - 0.1))), a3, Ease.inOutSine(fuSm(s, FU.sPhone - 0.75, FU.sPhone - 0.1))); v.fov = 58; v.sh = { f: [1, 1, -1.5], R: 12 }; break; }
+    // ---- 2: the park
+    case 'leaves': { v.p = into([-24, 1.55, -14.2], [-23.4, 1.55, -14.4], k); v.at = [-9, 5 + 10 * Ease.inOutSine(k), -19.5]; v.fov = 58; v.sh = { f: [-12, 4, -18], R: 22 }; break; }
+    case 'fountain': { v.p = into([3, 1.6, -39.5], [2.8, 1.6, -39.8], k); v.at = fuLookCap(v.p, [0, 3 + 42 * Ease.inOutSine(fuSm(k, 0.12, 0.85)), -52], 1.2); v.fov = 60; v.sh = { f: [0, 2, -48], R: 18 }; break; }
+    case 'fish': { v.p = into([11.5, 1.5, -34.5], [11.2, 1.5, -34.8], k); const F = X.fish.visible ? X.fish.position.toArray() : [FU_SPOT.fish[0], 0, FU_SPOT.fish[1]]; const w = Ease.inOutSine(fuSm(s, FU.sFish + 0.15, FU.sFish + 1.6));
+      v.at = fuLookCap(v.p, fuV([4, 0.6, -46.3], F, w), 1.0); v.fov = 56; v.sh = { f: [4, 1, -46], R: 10 }; break; }
+    case 'ball': { v.p = into([-26.2, 1.25, -42.4], [-26.4, 1.25, -42.6], k); const b = X.ball.position.toArray(), w = Ease.inOutSine(fuSm(s, FU.sKick + 0.15, FU.sKick + 0.9));
+      v.at = fuLookCap(v.p, fuV([-28, 0.6, -46.5], b, w), 1.15); v.fov = 56; v.sh = { f: [-28, 1, -46], R: 10 }; break; }
+    case 'scoop': { v.p = into([18.7, 1.15, -15.6], [18.6, 1.15, -15.5], k); const sc = X.scoop.visible ? X.scoop.position.toArray() : [20.2, 1.0, -17], w = Ease.inOutSine(fuSm(s, FU.sScoop + 0.15, FU.sScoop + 0.9));
+      v.at = fuLookCap(v.p, fuV([20.2, 0.95, -17], sc, w), 1.1); v.fov = 56; v.sh = { f: [20, 1, -17], R: 8 }; break; }
+    // walking: low, beside the old man's feet as he goes (he walks east, −x, along the path)
+    case 'walk': { const xw = -24 - 0.32 * (s - 228); v.p = [xw - 0.55, 0.78, -13.25]; v.at = [xw - 1.25, 0.55, -15.4]; v.fov = 60; v.drift = 0.002; v.sh = { f: [xw, 0.5, -15.3], R: 6 }; break; }
+    // the runner: stretching, she starts, and on her first stride she falls up into the plane tree
+    case 'jogger': { v.p = into([-0.4, 1.45, -20.6], [-0.75, 1.45, -20.5], k); const r = fuRunner(s, C), w = Ease.inOutSine(fuSm(s, FU.sLift + 0.05, FU.sLift + 0.7));
+      v.at = fuV([r.pos[0] - 0.7, 1.1, FU_RUN.z], [B[0], B[1] + 0.5, B[2]], w); v.fov = 54; v.sh = { f: [-2, 2, -15], R: 10 }; break; }
+    case 'hold': { v.p = into([-2.9, 1.4, -19.8], [-3.15, 1.42, -19.6], k); v.at = [B[0], B[1] + 0.7, B[2]]; v.fov = 52; v.sh = { f: [B[0], B[1], B[2]], R: 8 }; break; }
+    case 'rope': { v.p = into([-1.4, 1.5, -20.2], [-1.6, 1.5, -20.0], k); v.at = [-3.4, 2.5 + 2.4 * Ease.inOutSine(fuSm(s, FU.sCoat + 0.3, FU.sCoat + 1.8)), -14.4]; v.fov = 60; v.sh = { f: [-3, 2, -14], R: 9 }; break; }
+    case 'dog': { v.p = into([14.4, 0.8, -26.0], [14.2, 0.82, -25.9], k); v.at = [12, 1.0 + 1.7 * Ease.inOutSine(fuSm(s, FU.sDog + 0.2, FU.sDog + 1.4)), -24.2]; v.fov = 58; v.sh = { f: [12, 1, -24], R: 8 }; break; }
+    case 'pigeons': { v.p = into([-6.1, 1.3, -13.5], [-6.3, 1.3, -13.6], k); v.at = [-6.4, 3.2, -16.4]; v.fov = 56; v.sh = { f: [-6, 3, -16], R: 7 }; break; }
+    case 'warn': { v.p = into([9, 1.6, -10.6], [8.2, 1.6, -10.7], k); v.at = [-4, 2.5, -14.2]; v.fov = 56; v.sh = { f: [2, 1, -13], R: 16 }; break; }
+    // ---- 3: 3:08 and after
+    // home: your ceiling, full; then down to your table, right under it
+    case 'home': { room(); v.p = into(RL(1.55, 1.62, 1.6), RL(1.45, 1.6, 1.5), k); const c1 = fuC('home', 1), w = Ease.inOutSine(fuSm(t, c1 - 0.2, c1 + 1.6));
+      v.at = fuV(RL(0.15, 2.5, -0.2), RL(0.2, 1.55, -0.15), w); v.fov = 64 + 10 * w; break; }
+    case 'hold2': { v.p = into([-2.6, 3.0, -17.9], [-2.75, 3.05, -17.8], k); v.at = [B[0], B[1] + 0.35, B[2]]; v.fov = 50; v.sh = { f: [B[0], B[1], B[2]], R: 5 }; break; }
+    case 'count': { v.p = into([-2.6, 1.3, -21.0], [-2.8, 1.32, -20.8], k); v.at = [B[0] + 0.9, B[1] + 0.3, B[2]]; v.fov = 58; v.sh = { f: [B[0], 2, B[2]], R: 9 }; break; }
+    // 3:10 in your kitchen: everything on the ceiling comes down at once (slow motion)
+    case 'drop': { room(); v.p = into(RL(1.2, 1.25, 0.95), RL(1.16, 1.22, 0.9), k); const u = s - FUP.T;
+      v.at = fuV(RL(0.2, 1.65, -0.15), RL(0.2, 1.2, -0.15), Ease.inOutSine(fuSm(u, 0.1, 0.8))); v.fov = 74; v.shake = u > 0.5 && u < 1.6 ? 0.006 * Math.exp(-(u - 0.5) / 0.4) : 0; break; }
+    // back in the park: she drops to the path; the fountain's water pours back down
+    case 'down': { v.p = into([-3.4, 1.55, -11.7], [-3.3, 1.55, -11.8], k); const w = Ease.inOutSine(fuSm(s, 609.5, 613.5));
+      v.at = fuV([B[0], 2.2, B[2]], [0, 9, -52], w); v.fov = 56; v.sh = { f: fuV([B[0], 1, B[2]], [0, 2, -40], w), R: 16 }; break; }
+    // the question: people in the park looking up at what is still to come down
+    case 'question': { v.p = into([-0.5, 1.2, -19.5], [-0.6, 1.2, -19.7], k); v.at = [2, 9, -40]; v.fov = 60; v.sh = { f: [0, 0, -26], R: 14 }; break; }
+  }
+}
+
+// labels pinned in the scene: [{ p, text, sub, a, side }]
+function fuLabels(set, t) {
+  const shot = fuShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s, X = set.X;
+  const nz = [FU_ST.fountain.x, FU_ST.fountain.h + 0.16, FU_ST.fountain.z], top = () => fuHt(nz[1] + fuWaterH(0, s));
+  if (m === 'appleUp' && X.apple.visible) out.push({ p: X.apple.position.toArray(), text: 'YOUR APPLE', sub: fuHt(X.apple.position.y) + ' UP', a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
+  if (m === 'window') out.push({ p: [nz[0], 28, nz[2]], text: 'THE FOUNTAIN', sub: 'ITS TOP: ' + top() + ' UP', a: W(t, shot.t0 + 1.0, shot.t1 - 0.3, 0.4, 0.3), side: 'r' });
+  if (m === 'fish' && X.fish.visible && s > FU.sFish + 1.2) out.push({ p: X.fish.position.toArray(), text: 'THE CARP', sub: fuHt(X.fish.position.y) + ' UP', a: W(t, fuFilmAt(FU.sFish + 1.2), shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
+  if (m === 'fountain') out.push({ p: [nz[0], 34, nz[2]], text: 'ITS TOP', sub: top() + ' UP', a: W(t, shot.t0 + 2.5, shot.t1 - 0.3, 0.4, 0.3), side: 'r' });
+  return out;
+}

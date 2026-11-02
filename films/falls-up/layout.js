@@ -1,0 +1,77 @@
+/* =====================================================================
+   LAYOUT — where everything is (classic script: globals). Metres. Axes: x WEST, y up, z NORTH. Your block's street
+   front faces south across the street to the park (−z); the afternoon sun (south-west) shines in at your window.
+   (The days-shorter film's street and park, with a kitchen in your flat, a fountain in the pond and a big plane tree
+   by the path.)
+   ===================================================================== */
+
+// ---------------------------------------------------------------------------------------------------------------------
+// YOUR KITCHEN (room-local: origin at the middle of the floor). The top (fifth) floor of your block, 12.0 m up; the window
+// is in the south wall (z = −2), towards the park. Facing the window, +x is on your right.
+//   the counter run along the left wall (x −2.5…−1.88): the sink by the window, the kettle, the hob; wall cabinets above;
+//   the fridge at the far end. The table in the middle, its pendant lamp over it. Open shelves and the clock on the right.
+// ---------------------------------------------------------------------------------------------------------------------
+const FU_ROOM = {
+  W: 5.0, H: 2.6, D: 4.0,                                  // x −2.5…2.5, y 0…2.6, z −2…2
+  origin: [4.0, 12.0, 2.25],                               // (world: your block's street front is z = 0, its walls 0.25 thick)
+  win: { x: [-1.0, 1.4], y: [0.85, 2.3], hinge: 1.4, split: 0.25 },   // the window (south wall); its right half opens outwards
+  rad: { x: [-0.8, 1.2], y: [0.12, 0.72], z: [-2.0, -1.9] },
+  sill: { x: [-1.05, 1.45], y: [0.83, 0.86], z: [-2.0, -1.88] },
+  door: { x: [1.15, 2.05], h: 2.05 },                      // the door (north wall), to the hall
+  counter: { x: [-2.5, -1.88], z: [-1.95, 1.18], top: 0.92 },
+  wallCab: { x: [-2.5, -2.15], y: [1.5, 2.2], z: [-1.4, 1.18] },
+  fridge: { x: [-2.5, -1.86], z: [1.24, 1.96], h: 1.86 },
+  sink: { z: -1.05, w: 0.5 }, hob: { z: 0.45 },
+  kettle: [-2.1, 0.92, -0.32],                             // on the counter (its base)
+  mug: [-1.98, 0.92, -0.08],
+  table: { x: 0.25, z: -0.1, w: 1.4, d: 0.85, top: 0.75 }, // centre, size (x, z), top height
+  lamp: { x: 0.25, z: -0.1, cord: 0.72 },
+  shelves: { x: 2.5, z: [-1.3, 0.7], y: [1.22, 1.56, 1.9] },
+  clock: { x: 2.47, y: 1.98, z: 1.15 },
+  you: { x: 0.25, z: 0.72 },                               // your chair (north side of the table, facing the window)
+};
+
+// the things that fall up in your kitchen (room-local): where they are let go of, and where they land on the ceiling
+const FU_K = {
+  glass: { at: [0.32, 1.02, 0.18] },                       // in your right hand over the table
+  spoon: { at: [0.47, 0.98, 0.16] }, grape: { at: [0.06, 0.98, 0.16] },
+  spout: [-1.98, 1.13, -0.24],                             // the kettle's spout when you tip it (the stream leaves here)
+  cat: { counter: [-2.12, 0.92, 0.82] },                   // the cat sits on the counter by the hob
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+// THE STREET AND THE PARK (world). Your block (x −22…22, z 0…12) faces south across the street (z −9…−2) to the park
+// (z −12.6…−100). The pond (its fountain in the middle), the path along the railings (z −15.5), the big plane tree by
+// the path (its low branch over it), the playground; the next block west (the café), the church on the corner.
+// ---------------------------------------------------------------------------------------------------------------------
+const FU_ST = {
+  road: { z: [-9, -2] }, pav: [[-2.0, 0.0], [-12.0, -9.0]], kerbH: 0.12, roadEnd: 430,
+  park: { x: [-70, 70], z: [-100, -12.6] },
+  blockA: { x: [-22, 22], z: [0, 12], h: 15.4, floors: 5 },
+  blockB: { x: [34, 74], z: [0, 12], h: 15.4, floors: 5 },
+  church: { nave: { x: [95, 127], z: [-31, -15], h: 12, ridge: 19.5 }, tower: { x: [86, 95], z: [-25, -16], h: 24 }, spire: 17, spireR: 1.05 },
+  pond: { x: 0, z: -52, rx: 17, rz: 10, depth: 0.7 },
+  fountain: { x: 0, z: -52, h: 1.2, v0: 6 },               // the jet's nozzle (1.2 m above the water), 6 m/s
+  dome: { x: 34, z: -30, r: 2.0 },
+  swings: { x: 46, z: -24, top: 2.4, n: 3 },
+  // the plane tree by the path: trunk at (x, z), its long low branch reaching out over the path, east (−x)
+  plane: { x: -9.0, z: -19.2, h: 15, branch: [[-9.0, 2.6, -19.2], [-8.0, 3.0, -17.6], [-6.6, 3.3, -16.0], [-5.0, 3.45, -15.1], [-3.4, 3.7, -14.6]] },
+  path: { z: -15.5 },
+  bodies: [],
+};
+{
+  const B = FU_ST.bodies, add = (o) => B.push(o);
+  // parked cars along both kerbs (they stay put: nothing here leaves the ground)
+  const cars = [
+    ['car0', -54, -7.95, 1, 'hatch', '#8a1f22', 4.12], ['car1', -40, -7.95, 1, 'sedan', '#2d3f55', 4.72],
+    ['car2', -26, -7.95, 1, 'suv', '#cfd2d1', 4.78], ['car3', -12, -7.95, 1, 'hatch', '#2f5a3a', 4.12],
+    ['car4', 4, -7.95, 1, 'ev', '#e8e8e4', 4.72], ['car5', 18, -7.95, 1, 'van', '#d9d4c4', 5.3],
+    ['car6', 46, -7.95, 1, 'sedan', '#4a4d52', 4.72], ['car7', 60, -7.95, 1, 'hatch', '#c9a23a', 4.12],
+    ['car8', -34, -3.05, -1, 'sedan', '#6b2a3a', 4.72], ['car9', 11, -3.05, -1, 'hatch', '#3b6f8f', 4.12],
+  ];
+  for (const [id, x, z, dir, type, col, L] of cars) add({ id, kind: 'car', type, col, dir, L, pos: [x, 0, z] });
+  ['#2f4a2f', '#3a3a3c', '#2c4a6a', '#3a3a3c', '#7a5a2a', '#2f4a2f', '#3a3a3c', '#2c4a6a'].forEach((col, i) =>
+    add({ id: 'bin' + i, kind: 'bin', col, pos: [-15 + i * 4.1, FU_ST.kerbH + 0.0005, -0.75] }));
+}
+
+if (typeof module !== 'undefined') module.exports = { FU_ROOM, FU_ST, FU_K };
