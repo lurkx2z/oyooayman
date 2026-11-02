@@ -15,7 +15,7 @@ similarity: 0.75
 
 [y_mum] Mum? ...Mum, can you hear me?
 
-[y_window] [whispers] Hello? ...Is anyone out there?
+[y_window] [hesitant] Hello? ...Is anyone out there?
 
 [y_okay] [breathing heavily] Okay. Okay...
 
