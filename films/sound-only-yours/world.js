@@ -1,7 +1,7 @@
 /* =====================================================================
    WORLD — the film's main set at night, in the rain: your kitchen on the fifth floor (room.js; its window looks south
    over the park), the street and the park (street.js), the flats across the park, the tower block, the lamps, the rain,
-   the lightning, the bats, the moving cars (night.js), the people and the dogs (cast.js), your cat (animals.js), your
+   the lightning, the moving cars (night.js), the people and the dogs (cast.js), your cat (animals.js), your
    own hands and phone, the city's lights round it all, and the echo pictures in the dark (echo.js).
    Every shot (shots.js) is a mode: story time s comes from the one clock (script.js: soStoryAt), the world is posed
    with it (pure), and the mode places the camera (soShotCam).
@@ -24,9 +24,9 @@ const SO_HAND_POSES = {
 const SO_HAND_BLENDS = { clapOpen: 0.22, clapShut: 0.075, table: 0.5, phone: 0.5, phoneUp: 0.45, sill: 0.45, hidden: 0.4 };
 function soHandScript() {
   const tc = SO.tClap, t2 = SO.tClap2, b = soB, c = soC;
-  const clap = (L) => { L.push([b('clap') - 0.1, 'clapOpen'], [tc - 0.075, 'clapShut'], [tc + 0.04, 'clapOpen'], [t2 - 0.075, 'clapShut'], [t2 + 0.05, 'clapOpen'], [b('body') - 0.3, 'table'], [b('ring') - 0.1, 'hidden']); return L; };
-  const R = clap([[-9, 'hidden']]); R.push([b('mum') - 0.2, 'phone'], [c('mum', 2) - 0.3, 'phoneUp'], [b('window') - 0.1, 'hidden'], [SO.tWin - 0.6, 'sill'], [SO.tWin + 1.2, 'hidden']);
-  const L = clap([[-9, 'hidden']]); L.push([SO.tWin - 0.6, 'sill'], [SO.tWin + 1.2, 'hidden']);
+  const clap = (L) => { L.push([b('clap') - 0.1, 'clapOpen'], [tc - 0.075, 'clapShut'], [tc + 0.04, 'clapOpen'], [t2 - 0.075, 'clapShut'], [t2 + 0.05, 'clapOpen'], [b('body') - 0.3, 'table']); return L; };
+  const R = clap([[-9, 'hidden'], [b('text') - 0.3, 'phoneUp'], [b('room') + 0.05, 'hidden']]); R.push([b('mum') - 0.2, 'phone'], [c('mum', 2) - 0.3, 'phoneUp'], [b('window') - 0.1, 'hidden'], [SO.tWin - 0.6, 'sill'], [SO.tWin + 1.2, 'hidden']);
+  const L = clap([[-9, 'hidden']]); L.push([b('mum') - 0.2, 'hidden'], [SO.tWin - 0.6, 'sill'], [SO.tWin + 1.2, 'hidden']);
   return { right: R, left: L };
 }
 const SO_HAND_MODES = new Set(['clap', 'rule', 'body', 'mum', 'text', 'window']);
@@ -125,10 +125,10 @@ SO_SETS.world = (app) => {
   const sky = soGradSky(scene, '#04060b', '#1d2129', '#0c0d10', { sunDir: [-0.2, 0.08, -1], sunGlow: '#2a2018', hw: 0.25 });
   sky.material.uniforms.k.value = 1;
   const R = soBuildRoom(S), T = soBuildStreet(S), C = soBuildCast(S);
-  // night: the flats across the park, the tower, lamplight, the rain, the lightning, the bats, the cars that move, the city
+  // night: the flats across the park, the tower, lamplight, the rain, the lightning, the cars that move, the city
   soFlatsSchedule();
   const F = soBuildFlats(T.root), TW = soBuildTower(T.root), LP = soBuildLampPools(scene, soLampSpots(T));
-  const rain = soBuildRain(scene, 7000), bolt = soBuildBolt(scene), bats = soBuildBats(scene), MV = soBuildMovers(T.root, T), city = soBuildCity(scene), proc = soBuildProcession(scene);
+  const rain = soBuildRain(scene, 4200), bolt = soBuildBolt(scene), MV = soBuildMovers(T.root, T), city = soBuildCity(scene), proc = soBuildProcession(scene);
   const lamps = [0, 1, 2, 3].map(() => { const l = new THREE.PointLight('#ffc98a', 0, 26, 1.7); scene.add(l); return l; });
   for (const m of SO_LIT) if (!m.userData.keep) m.emissiveIntensity = 0.12;                        // (your block: most of your neighbours' windows dark)
   T.M.lampGlass.emissiveIntensity = 2.2;
@@ -155,9 +155,15 @@ SO_SETS.world = (app) => {
   const shell = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 3), shellM); shell.visible = false; shell.renderOrder = 9; scene.add(shell);
   const EV = soBuildEcho(scene);
   // a cold light that catches the big dog as it comes at you (as if from the lamp behind you)
-  const dogL = new THREE.PointLight('#b8c8e0', 0, 4.5, 1.6); scene.add(dogL);
+  const dogL = new THREE.PointLight('#b8c8e0', 0, 5, 1.6); scene.add(dogL);
+  const hideL = new THREE.PointLight('#93a6c8', 0, 7, 1.5); hideL.position.set(SO_ST.you.hide[0] + 0.6, 0.5, SO_ST.you.hide[2] + 1.4); scene.add(hideL);
+  // the plane tree's low bough hanging into your hiding place (leaves over you, black against the lamps)
+  const bough = (() => { const Hh = SO_ST.you.hide, mL = soStd('#3e3a1c', 0.9, 0, { flatShading: true }), out = [];
+    for (const [dx, y, dz, r, sd] of [[0.9, 1.75, 1.6, 0.55, 3], [1.5, 2.05, 2.4, 0.7, 5], [-0.4, 2.1, 2.1, 0.5, 7], [2.2, 1.65, 1.2, 0.45, 9], [0.2, 2.4, 3.2, 0.8, 11]])
+      out.push(soMesh(soBlobGeo(r, 120 + sd), mL, Hh[0] + dx, y, Hh[2] + dz, scene));
+    return out; })();
   const RL = (x, y, z) => R.toWorld(x, y, z).toArray();
-  const hideInEcho = [sky, LP.pools, LP.glow, rain.ls, bolt.g, city.pts, shell, F.who];
+  const hideInEcho = [sky, LP.pools, LP.glow, rain.ls, bolt.g, city.pts, shell, F.who, ...(T.planeLeaves || []), ...bough];   // (the crown's blobs read as flat cards in echo light)
   const set = {
     scene, camera: cam, R, T, C, hands, cat, F, MV, EV,
     cuts() { return []; },
@@ -172,7 +178,10 @@ SO_SETS.world = (app) => {
       C.update(s, { mode: m, t, you: youAt });
       soMoversUpdate(MV, t, m);
       proc.update(s, m === 'coming');
-      if (m === 'dog') { const d = C.dog2.root.position; dogL.position.set(d.x + 0.6, 1.6, d.z + 1.2); dogL.intensity = 2.2; } else dogL.intensity = 0;
+      // (from behind it as you see it: a cold rim round its back and head, so the shape reads in the dark)
+      if (m === 'dog') { const d = C.dog2.root.position, Hh = SO_ST.you.hide, dx = d.x - Hh[0], dz = d.z - Hh[2], L = Math.max(0.5, Math.hypot(dx, dz)); dogL.position.set(d.x + dx / L * 1.1, 1.3, d.z + dz / L * 1.1); dogL.intensity = 9; } else dogL.intensity = 0;
+      for (const b of bough) b.visible = m === 'hide' || m === 'dog';
+      hideL.intensity = m === 'hide' ? 1.4 : 0;   // (a lamp's spill from across the path: the trunk and the bough over you, just)
       // the casement: shut until you open it
       R.casement.rotation.y = -1.25 * soSm(t, SO.tWin, SO.tWin + 1.1) * (t > soB('window') - 0.01 ? 1 : 0);
       // the cat
@@ -201,7 +210,7 @@ SO_SETS.world = (app) => {
         const c0 = soC('mum', 0) + 0.8, cm = soC('mum', 2) - 0.3;
         if (m === 'mum' && t < cm) PH.scr.update({ mode: 'call', secs: Math.max(0, Math.floor(t - c0)), min: 2 });
         else if (m === 'mum') PH.scr.update({ mode: 'mum', k: Math.floor((t - cm - 0.4) * 5) / 5, min: 2 });
-        else PH.scr.update({ mode: 'unknown', k: Math.floor((t - soC('text', 0) - 0.3) * 5) / 5, min: 3 });
+        else PH.scr.update({ mode: 'unknown', k: Math.floor((t - soC('text', 0) - 0.2) * 5) / 5, min: 1 });
       }
       // ------------------------------------------------------------------ the light
       const inside = v.inside, flash = soBoltAt(t);
@@ -218,8 +227,6 @@ SO_SETS.world = (app) => {
       // the rain (none inside the dark under the trees: it stopped at 10:00)
       rain.update(t, cam, { on: v.rain && m !== 'echo' && m !== 'who' && m !== 'question', box: v.rainBox || 26, h: v.rainH || 18, len: v.rainLen || 0.32 });
       rain.mat.opacity = v.rainA ?? 0.32;
-      // the bats round the lamp in the park
-      soBatsUpdate(bats, t, soS('bats') - 0.8, m === 'bats' || m === 'park');
       // ------------------------------------------------------------------ the rings (what reaches how far)
       ringV.set(youAt, 0); ringS.set(youAt, 0); wave.set(youAt, 0); echoes.forEach((e) => e.set(youAt, 0));
       if (m === 'window' && shot.cam === 'map') { const tv = soC('window', 2); ringV.set(RL(0.2, -12, -2.4), SO_NUM.voiceR * Ease.outCubic(MathX.clamp((t - tv) / 2.2, 0, 1)), 1, 0.012, 1.0); }
@@ -244,7 +251,6 @@ SO_SETS.world = (app) => {
       const fl = soBoltAt(t); if (fl > 0) p.exposure *= 1 + 0.6 * fl;
       if (shot && (shot.mode === 'echo' || shot.mode === 'who' || shot.mode === 'question')) { p.exposure = 1.0; p.saturation = 1.0; p.warmth = 0; p.bloom = 0.8; p.bloomThreshold = 0.35; p.vignette = 0.7; p.grain = 0.05; }
       // the ringing in your ears: the picture breathes (a slow chromatic shimmer)
-      if (shot && shot.mode === 'ring') p.chroma = 0.006 + 0.01 * (0.5 + 0.5 * Math.sin(t * 2.1)) * MathX.clamp((t - shot.t0) / 3, 0, 1);
       // your heartbeat (body): a soft pulse in the vignette
       if (shot && shot.mode === 'body') { const hb = (t * 1.25) % 1; p.vignette += 0.12 * (Math.exp(-hb / 0.06) + 0.6 * Math.exp(-Math.max(0, hb - 0.2) / 0.06) * (hb > 0.2 ? 1 : 0)); }
       void v;
@@ -259,7 +265,7 @@ function soYouAt(m, t, RL) {
   if (m === 'street') return [Y.door[0], 1.62, Y.door[2] - 0.4];
   if (m === 'car' || m === 'warn' || m === 'heads') return [Y.kerb[0], 1.62, Y.kerb[2] - (t > SO.tKerb ? 0.55 * soSm(t, SO.tKerb, SO.tKerb + 0.6) * (1 - soSm(t, SO.tCar - 0.5, SO.tCar + 0.1)) : 0)];
   if (m === 'storm') return [0, 1.62, -12.0];
-  if (m === 'park' || m === 'bats' || m === 'shout' || m === 'far' || m === 'coming') return [Y.park[0], 1.62, Y.park[2]];
+  if (m === 'park' || m === 'shout' || m === 'far' || m === 'coming') return [Y.park[0], 1.62, Y.park[2]];
   if (m === 'hide' || m === 'dog' || m === 'echo' || m === 'who' || m === 'question') return [Y.hide[0], 0.95, Y.hide[2]];
   return RL(...SO_K.you);
 }
@@ -295,7 +301,7 @@ function soShotCam(set, m, s, t, k, shot, v, RL, you) {
     case 'start': { room(); if (shot.cam === 'clock') { const ck = SO_ROOM.clock; v.p = into(RL(ck.x - 0.75, ck.y - 0.08, ck.z - 0.3), RL(ck.x - 0.62, ck.y - 0.05, ck.z - 0.22), k); v.at = RL(ck.x, ck.y, ck.z); v.fov = 34; break; }
       v.p = into(RL(1.6, 1.62, 1.55), RL(1.45, 1.6, 1.4), k); v.at = RL(-0.2, 1.05, -1.2); v.fov = 66; break; }
     // "Hello?": towards the door to the hall (nobody answers)
-    case 'hello': { room(); v.p = into(RL(-0.3, 1.62, -0.6), RL(-0.15, 1.62, -0.35), k); v.at = soV(RL(0.4, 1.4, 1.2), RL(1.6, 1.2, 2.0), Ease.inOutSine(soSm(k, 0.15, 0.7))); v.fov = 60; break; }
+    case 'hello': { room(); v.p = into(RL(-0.2, 1.62, -0.45), RL(0.1, 1.62, 0.05), k); v.at = soV(RL(1.3, 1.3, 1.8), RL(1.55, 1.2, 3.0), Ease.inOutSine(k)); v.fov = 56 - 6 * k; break; }
     // the news, the rain, the cat (miaowing), nothing
     case 'room': { room();
       if (shot.cam === 'news') { const L = K.laptop; v.p = into(RL(L[0] - 0.18, 1.0, L[2] + 0.42), RL(L[0] - 0.14, 0.98, L[2] + 0.36), k); v.at = RL(L[0] + 0.03, 0.85, L[2] - 0.05); v.fov = 34; break; }
@@ -307,8 +313,6 @@ function soShotCam(set, m, s, t, k, shot, v, RL, you) {
     case 'rule': { room(); v.p = into(RL(...K.you), RL(K.you[0], K.you[1], K.you[2] + 0.02), k); v.at = RL(K.you[0] + 0.05, 1.45, K.you[2] - 1.6); v.fov = 56; v.drift = 0.001; break; }
     // sitting at the table, hands flat, facing the black window: your breath, your heart
     case 'body': { room(); v.p = into(RL(...K.sit), RL(K.sit[0], K.sit[1] - 0.01, K.sit[2] - 0.04), k); v.at = RL(0.25, 0.95, -2.0); v.fov = 56 - 6 * k; v.drift = 0.0012; break; }
-    // the ringing: a slow push towards the window
-    case 'ring': { room(); v.p = into(RL(0.25, 1.4, 0.4), RL(0.25, 1.45, -0.9), k); v.at = RL(0.25, 1.5, -3.0); v.fov = 54 - 10 * k; v.drift = 0.0008; break; }
     // your phone: the call (connected, nothing comes through); Mum's texts; the stranger's texts
     case 'mum': case 'text': { room(); v.p = RL(...K.you); v.at = RL(K.you[0] - 0.05, 0.75, K.you[2] - 1.2); v.fov = 50 - (m === 'text' || t > soC('mum', 2) - 0.3 ? 8 : 0); v.drift = 0.0012; break; }
     // the window: open it, lean out into the rain over the street and the park (9:43)
@@ -331,18 +335,18 @@ function soShotCam(set, m, s, t, k, shot, v, RL, you) {
       v.p = soAdd([Y.kerb[0], 1.62 - 0.08 * step * (1 - back), Y.kerb[2]], [0, 0, -0.55 * step * (1 - back) + 0.1 * back]);
       const look = Ease.inOutSine(soSm(t, SO.tKerb - 1.2, SO.tKerb - 0.3)) * (1 - Ease.inOutSine(soSm(t, SO.tKerb + 0.2, SO.tKerb + 0.8)));
       v.at = soAdd(v.p, [-6 * look + 0.4, -0.25, -6 + 2 * look]);
-      if (t > SO.tCar - 0.55) { const ev = set.MV.ev.g.position; v.at = soV(v.at, [ev.x, 1.0, ev.z], 0.35 * soSm(t, SO.tCar - 0.55, SO.tCar - 0.2) * (1 - soSm(t, SO.tCar + 0.6, SO.tCar + 1.6))); }
-      v.fov = 62; v.shake = t > SO.tCar - 0.3 && t < SO.tCar + 0.6 ? 0.006 : 0; v.sh = { f: [0, 1, -4], R: 10 }; break; }
+      // it's past: you watch its tail-lights go, silent, down the wet street ("Now every car is silent.")
+      if (t > SO.tCar - 0.55) { const ev = set.MV.ev.g.position; v.at = soV(v.at, [ev.x + 2.36 + 1.4, 0.8, ev.z], 0.35 * soSm(t, SO.tCar - 0.55, SO.tCar - 0.2) + 0.6 * soSm(t, SO.tCar + 0.3, SO.tCar + 1.8)); }
+      v.fov = 62 - 18 * Ease.inOutSine(soSm(t, SO.tCar + 0.8, SO.tCar + 4.5)); v.shake = t > SO.tCar - 0.3 && t < SO.tCar + 0.6 ? 0.006 : 0; v.sh = { f: [0, 1, -4], R: 10 }; break; }
     // the ambulance, blue lights going, siren on (nothing): people don't move out of its way
     case 'warn': { v.p = into([Y.kerb[0] + 0.3, 1.62, Y.kerb[2] + 0.1], [Y.kerb[0] + 0.25, 1.62, Y.kerb[2] + 0.05], k); const a = set.MV.amb.g.position;
       v.at = soV([-30, 1.5, -7], [a.x, 1.5, a.z], soSm(t, shot.t0 + 0.8, shot.t0 + 2.4)); v.fov = 56; v.sh = { f: [a.x, 1, -6], R: 12 }; break; }
     // "Can anyone hear me?": every head in the street turns to you
-    case 'heads': { v.p = into([Y.kerb[0] + 0.2, 1.62, Y.kerb[2] - 0.2], [Y.kerb[0] + 0.35, 1.62, Y.kerb[2] - 0.25], k); v.at = into([8, 1.4, -2.6], [4, 1.45, -6], k); v.fov = 62; v.sh = { f: [4, 1, -5], R: 14 }; break; }
+    case 'heads': { v.p = into([Y.kerb[0] + 0.2, 1.62, Y.kerb[2] - 0.2], [Y.kerb[0] + 0.45, 1.62, Y.kerb[2] - 0.3], k); v.at = into([12, 1.45, -5.0], [10, 1.5, -6.2], k); v.fov = 58 - 12 * Ease.inOutSine(k); v.sh = { f: [6, 1, -4], R: 14 }; break; }
     // the park gate: lightning over the rooftops 2 km south; you count
     case 'storm': { v.p = into([3.2, 1.62, -13.2], [3.1, 1.62, -13.6], k); v.at = [-120, 120, -1000]; v.fov = 58; v.fogK = 0.6; v.sh = { f: [0, 1, -16], R: 12 }; break; }
     // ---- 4: the park, 9:56
     case 'park': { const a = soLerp(0.5, -0.35, Ease.inOutSine(k)) * Math.PI; v.p = [Y.park[0], 1.62, Y.park[2]]; v.at = [Y.park[0] + Math.sin(a) * 30, 3.5, Y.park[2] - Math.cos(a) * 30]; v.fov = 62; v.fogK = 0.7; v.sh = { f: [Y.park[0], 1, Y.park[2] - 8], R: 20 }; break; }
-    case 'bats': { const L = SO_BATLAMP; v.p = into([L[0] - 2.0, 1.7, L[2] - 1.7], [L[0] - 1.8, 1.7, L[2] - 1.55], k); v.at = [L[0] - 0.2, L[1] - 0.9, L[2]]; v.fov = 50; v.sh = { f: [L[0], 1, L[2]], R: 8 }; break; }
     // "HELLO!": first person, at the tower; the tower block (the echo comes back); from above: the wave and its echoes
     case 'shout': { const Tw = SO_ST.tower, tc = [(Tw.x[0] + Tw.x[1]) / 2, Tw.h * 0.84, Tw.z[1]];
       if (shot.cam === 'tower') { v.p = into([Y.park[0] + 0.3, 1.6, Y.park[2] - 1], [Y.park[0] + 0.25, 1.6, Y.park[2] - 1.4], k); v.at = tc; v.fov = 15; v.fogK = 0.4; v.near = 0.3; v.sh = { f: [Y.park[0], 1, Y.park[2] - 10], R: 20 }; break; }
@@ -355,7 +359,7 @@ function soShotCam(set, m, s, t, k, shot, v, RL, you) {
     case 'coming': { if (shot.cam === 'high') { const w = Ease.inOutSine(k); v.p = [Y.park[0] - 40 - 10 * w, 32 + 6 * w, Y.park[2] + 40]; v.at = [Y.park[0] - 12, 0, Y.park[2] - 4]; v.fov = 54; v.fogK = 0.5; v.rainA = 0.18; v.sh = { f: [Y.park[0] - 15, 0, Y.park[2]], R: 50 }; break; }
       v.p = into([Y.park[0], 1.62, Y.park[2]], [Y.park[0] - 0.1, 1.62, Y.park[2] + 0.3], k); v.at = into([0, 1.4, -12.4], [-10, 1.3, -20], k); v.fov = 58; v.sh = { f: [14, 1, -30], R: 24 }; break; }
     // ---- 5: the dark, 10:09. You crouch under the plane tree; the dog that comes out of nowhere
-    case 'hide': { const H = Y.hide; v.p = into([H[0] + 0.1, 0.95, H[2]], [H[0], 0.92, H[2] + 0.05], k); v.at = into([H[0] - 8, 0.7, H[2] + 4], [H[0] - 9, 0.6, H[2] - 1], k); v.fov = 58; v.expo = 0.5; v.rain = false; v.sh = { f: [H[0], 1, H[2]], R: 10 }; break; }
+    case 'hide': { const H = Y.hide; v.p = into([H[0] + 0.1, 0.95, H[2]], [H[0], 0.92, H[2] + 0.05], k); v.at = into([H[0] - 2.4, 1.3, H[2] + 8], [H[0] - 4.8, 0.9, H[2] + 7], k); v.fov = 58; v.expo = 0.5; v.rain = false; v.sh = { f: [H[0], 1, H[2]], R: 10 }; break; }
     case 'dog': { const H = Y.hide, d = set.C.dog2.root.position; v.p = [H[0], 0.95, H[2]]; v.at = soV([H[0] - 6, 0.4, H[2] - 4], [d.x, 0.45, d.z], soSm(t, SO.tDog - 0.2, SO.tDog + 0.3)); v.fov = 60; v.expo = 0.55; v.rain = false; v.shake = t > SO.tDog + 0.3 && t < SO.tDog + 1.1 ? 0.007 : 0; v.sh = { f: [H[0], 1, H[2]], R: 10 }; break; }
     // the echo pictures: you click; every surface the click reaches lights up as its echo comes back (slowed down)
     case 'echo': case 'who': case 'question': { const H = Y.hide; v.p = [H[0], 0.95, H[2]]; v.rain = false; v.drift = 0.0016; v.fov = 64;
@@ -363,7 +367,9 @@ function soShotCam(set, m, s, t, k, shot, v, RL, you) {
       if (m === 'echo') yaw = -0.3 + 0.55 * Ease.inOutSine(soSm(t, c('echo', 4) - 0.6, c('echo', 4) + 0.6)) - 1.15 * Ease.inOutSine(soSm(t, c('echo', 5) + 0.4, c('echo', 5) + 3.6));
       if (m === 'who') yaw = -1.15 + 1.5 * Ease.inOutSine(soSm(t, c('who', 1) - 0.8, c('who', 2) + 0.4));
       let up = 0.85;
-      if (m === 'question') { const tq = SO.tClicks[SO.tClicks.length - 1], u = Ease.inOutCubic(soSm(t, tq - 0.75, tq + 0.05)); yaw = 0.35 + (Math.PI - 0.35 - 0.12) * u; up = 0.85 + 6.2 * u; v.fov = 60; }
+      // the last click: you turn round, and it finds what's right behind you (0.95 m): you look up at it
+      if (m === 'question') { const tq = SO.tClicks[SO.tClicks.length - 1], u = Ease.inOutCubic(soSm(t, tq - 0.85, tq + 0.05)), B = SO_BEHIND;
+        yaw = 0.35 + (B.a - 0.35) * u; up = 0.85 + (0.95 + (1.56 - 0.95) * 10 / B.d1 - 0.85) * u; v.fov = 62 - 16 * u - 4 * soSm(t, tq + 0.3, SO.end); v.drift = 0.0012; }
       v.at = [H[0] + Math.sin(yaw) * 10, up, H[2] + Math.cos(yaw) * 10]; break; }
   }
 }
@@ -371,13 +377,15 @@ function soShotCam(set, m, s, t, k, shot, v, RL, you) {
 // labels pinned in the scene: [{ p, text, sub, a, side }]
 function soLabels(set, t) {
   const shot = soShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, Y = SO_ST.you;
-  if (m === 'shout' && shot.cam === 'tower') { const Tw = SO_ST.tower; out.push({ p: [(Tw.x[0] + Tw.x[1]) / 2, Tw.h + 2, Tw.z[0]], text: 'THE TOWER BLOCK', sub: '170 m · BACK IN 0.99 s', a: W(t, shot.t0 + 0.4, shot.t1 - 0.2, 0.3, 0.3), side: 'r' }); }
+  if (m === 'shout' && shot.cam === 'tower') { const Tw = SO_ST.tower; out.push({ p: [(Tw.x[0] + Tw.x[1]) / 2, Tw.h + 2, Tw.z[0]], text: 'THE TOWER BLOCK', sub: `170 m · BACK IN ${(2 * 170 / SOP.c).toFixed(2)} s`, a: W(t, shot.t0 + 0.4, shot.t1 - 0.2, 0.3, 0.3), side: 'r' }); }
   if (m === 'shout' && shot.cam === 'map') SO_ECHO.forEach((e, i) => { const p = soEchoPoint(i); out.push({ p: [p[0], 6, p[2]], text: e.name, sub: `${Math.round(e.d)} m · ${e.dt.toFixed(2)} s`, a: W(t, shot.t0 + 0.6 + (shot.t1 - shot.t0 - 1.2) * 0.12 * i, shot.t1 - 0.2, 0.3, 0.3), side: i % 2 ? 'r' : '' }); });
   if (m === 'echo') {
     const H = Y.hide, P = SO_ST.plane;
-    out.push({ p: [P.x, 1.4, P.z], text: 'A TREE', sub: '3 m', a: W(t, soC('echo', 2) + 0.1, soC('echo', 3) + 1.2, 0.25, 0.4), side: '' });
-    out.push({ p: [-8, 0.6, -17.2], text: 'A BENCH', sub: '5 m', a: W(t, soC('echo', 2) + 1.2, soC('echo', 3) + 1.2, 0.25, 0.4), side: 'r' });
-    const p0 = set.C.ring[0].root.position; out.push({ p: [p0.x, 1.9, p0.z], text: '?', sub: '7 m', a: W(t, soC('echo', 3) + 0.4, soC('echo', 4) + 0.2, 0.25, 0.3), side: 'r' });
+    // each label appears as its echo comes back (the click that shows it, plus the distance at the picture's speed)
+    const back = (k, x, z) => SO.tClicks[k] + Math.hypot(x - H[0], z - H[2]) / SO_ECHO_V;
+    out.push({ p: [P.x, 1.4, P.z], text: 'A TREE', sub: '3 m', a: W(t, back(3, P.x, P.z), soC('echo', 3) + 1.2, 0.25, 0.4), side: '' });
+    out.push({ p: [-8, 0.6, -17.2], text: 'A BENCH', sub: '5 m', a: W(t, back(3, -8, -17.2), soC('echo', 3) + 1.2, 0.25, 0.4), side: 'r' });
+    const p0 = set.C.ring[0].root.position; out.push({ p: [p0.x, 1.9, p0.z], text: '?', sub: '7 m', a: W(t, back(4, p0.x, p0.z), soC('echo', 4) + 0.2, 0.25, 0.3), side: 'r' });
     void H;
   }
   return out;

@@ -1,7 +1,7 @@
 /* =====================================================================
    HUD — this film's overlay (DOM, in #hud; a pure function of time). The centred title is the shared StoryHUD. The
    layout is the long-form films' (Slower light, Friction 10s, falls-up):
-     top left     who has heard you tonight (it climbs as your voice spreads at 343 m/s); in the dark: who is round you
+     top left     who could have heard you tonight (it climbs as your voice spreads at 337 m/s); in the dark: who is round you
                   under it, your sound meter: how loud you just were and how far it carried (the horror-game meter)
      top right    Thursday and the time; "+1 min" when the clock jumps at a cut (it only runs forward); slow motion
      bottom       one caption at a time (CAPTIONS.md via timing.js; numbers amber, your own words in italics)
@@ -14,10 +14,11 @@
 // how far your sounds carry where you are (dB lost on the way out: the flat's walls and windows; the stairwell's doors)
 const SO_WALL = { inside: 38, stair: 30 };
 function soReachAt(t, mode) {
-  const m = mode || soShotAt(t).mode, inFlat = ['title', 'what', 'start', 'hello', 'room', 'clap', 'rule', 'body', 'ring', 'mum', 'text'].includes(m) || (m === 'window' && t < SO.tWin + 0.6);
+  const m = mode || soShotAt(t).mode, inFlat = ['title', 'what', 'start', 'hello', 'room', 'clap', 'rule', 'body', 'mum', 'text'].includes(m) || (m === 'window' && t < SO.tWin + 0.6);
   return inFlat ? SO_WALL.inside : m === 'stairs' || m === 'behind' ? SO_WALL.stair : 0;
 }
-// who has heard you so far (people): every sound you made, spreading at 343 m/s out to where it fades below hearing
+// who could have heard you so far (people, nothing in the way): every sound you made, spreading at 337 m/s out to
+// where it fades below hearing
 const SO_HEARD = (() => SO_NOISE.map(([t, dB]) => { const loss = soReachAt(t + 0.01), r = Math.max(0, soHeard(dB - loss)); return { t, r, n: loss ? Math.min(4, soPeople(r) + (r > 3 ? 4 : 0)) : soPeople(r) }; }))();
 function soHeardBy(t) { let n = 0; for (const h of SO_HEARD) { if (t < h.t) break; const r = Math.min(h.r, SOP.c * (t - h.t)); n = Math.max(n, h.r > 0 ? h.n * (r / h.r) ** 2 : 0); } return n; }
 // your sound right now: [label, dB, reach (m)] or null
@@ -29,25 +30,26 @@ function soMeterAt(t) {
   if (m === 'body') return { l: 'YOUR BREATHING', dB: SOP.L.breath, r: soHeard(SOP.L.breath), live: true };
   if (m === 'hide' || m === 'dog' || m === 'echo' || m === 'who' || m === 'question') return { l: 'YOUR BREATHING (SCARED)', dB: 28, r: soHeard(28), live: true };
   if (m === 'stairs' && t < soC('stairs', 3) + 2) return { l: 'YOUR FOOTSTEPS', dB: SOP.L.step, r: soHeard(SOP.L.step - SO_WALL.stair), walls: true, live: true };
-  if (m === 'street' || m === 'car' || m === 'warn') return { l: 'YOUR FOOTSTEPS (WET)', dB: SOP.L.stepWet, r: soHeard(SOP.L.stepWet), live: true };
+  if (m === 'street' && t < soShot('street').t0 + 2.2) return { l: 'YOUR FOOTSTEPS (WET)', dB: SOP.L.stepWet, r: soHeard(SOP.L.stepWet), live: true };
+  if (m === 'street' || m === 'car' || m === 'warn') return { l: 'YOUR BREATHING', dB: SOP.L.breath, r: soHeard(SOP.L.breath), live: true };
   return null;
 }
 // the scene's context line: [from, to, label, value(t, s) → { v, v2 }] (HTML)
 const SO_CTX = (() => {
   const beat = (id, l, f, k0 = 0, k1) => [soC(id, k0) - 0.2, k1 == null ? soE(id) + 0.2 : soC(id, k1) - 0.1, l, f];
   return [
-    beat('storm', 'THE LIGHTNING IS', () => ({ v: '6 <small>s</small> × 343 <small>m/s</small>', v2: '= 2.1 km AWAY · NO THUNDER' }), 2),
-    beat('shout', 'YOUR ECHO FROM THE TOWER', () => ({ v: '0.99 <small>s</small>', v2: '170 m THERE, 170 m BACK' }), 2),
+    beat('storm', 'THE LIGHTNING IS', () => ({ v: `6 <small>s</small> × ${SOP.c} <small>m/s</small>`, v2: `= ${(6 * SOP.c / 1000).toFixed(1)} km AWAY · NO THUNDER` }), 2),
+    beat('shout', 'YOUR ECHO FROM THE TOWER', () => ({ v: `${(2 * 170 / SOP.c).toFixed(2)} <small>s</small>`, v2: '170 m THERE, 170 m BACK' }), 2),
   ];
 })();
 // the honest labels (bottom left): [from, to, text]
 const SO_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [soC(id, k0) - 0.1, k1 == null ? soE(id) + 0.2 : soC(id, k1) + 0.3, text]; return [
   b('start', 'THE ONE IMPOSSIBLE THING: NOTHING MAKES A SOUND BUT YOU'),
-  b('window', 'ASSUMED: NO BACKGROUND NOISE AT ALL · HEARING THRESHOLD 5 dB', 2),
+  b('window', 'ASSUMED: OPEN AIR, NO BACKGROUND NOISE · HEARING THRESHOLD 5 dB', 2),
   b('car', 'EU RULE SINCE 2019 (REG. 540/2014): NEW EVs HUM BELOW 20 km/h', 1),
-  b('shout', 'YOUR ECHOES ARE PLAYED A LITTLE LOUDER THAN REAL, SO YOU HEAR THEM', 1, 2),
-  b('far', 'ASSUMED: 5,000 PEOPLE PER km² · AIR ABSORPTION AT 500 Hz'),
-  b('echo', 'ECHO PICTURE · THE WAVE IS SHOWN ~70× SLOWER THAN SOUND', 1),
+  b('shout', 'YOUR ECHOES ARE PLAYED ABOUT 40 dB LOUDER THAN REAL, SO YOU HEAR THEM', 1, 2),
+  b('far', 'ASSUMED: NOTHING IN THE WAY · 5,000 PEOPLE PER km² · SHUT WINDOWS: ~750 m'),
+  b('echo', 'ECHO PICTURE: STYLISED, AND SHOWN ~67× SLOWER THAN SOUND', 1),
 ]; })();
 
 // a caption's text with its numbers in amber
@@ -89,14 +91,15 @@ class SoHud {
     this._set('ro', this.ro, 'opacity', on.toFixed(3));
     if (on > 0) {
       if (dark) {
-        const n = t < soC('echo', 4) - 0.3 ? null : t < soC('question', 0) - 0.6 ? SO_RING.length : 1;
+        const tR = SO.tClicks[SO.tClicks.length - 1] + SO_BEHIND.d1 / SO_ECHO_V;      // (the last click finds it)
+        const n = t < soC('echo', 4) - 0.3 ? null : t < tR ? SO_RING.length : 1;
         this._txt('rol', this.ro.querySelector('.l'), n === 1 ? 'RIGHT BEHIND YOU' : 'AROUND YOU');
         this._html('rov', this.roV, n == null ? '?' : n === 1 ? '0.95 <small>m</small>' : String(n));
-        this._html('ros', this.roS, n == null ? 'YOU CAN\'T HEAR ANYONE' : n === 1 ? 'IT CAN HEAR YOUR HEART' : t > soC('who', 1) ? 'ONE STEP CLOSER' : 'WITHIN 15 m · NOT MOVING');
+        this._html('ros', this.roS, n == null ? 'YOU CAN\'T HEAR ANYONE' : n === 1 ? 'IT CAN HEAR YOU BREATHE' : t > soC('who', 1) ? 'ONE STEP CLOSER' : 'WITHIN 15 m · NOT MOVING');
         this._cls('roc', this.ro, n == null ? 'so-ro' : 'so-ro tick');
       } else {
         const n = soHeardBy(t);
-        this._txt('rol', this.ro.querySelector('.l'), 'HAVE HEARD YOU TONIGHT');
+        this._txt('rol', this.ro.querySelector('.l'), 'COULD HAVE HEARD YOU');
         this._html('rov', this.roV, n < 0.5 ? '0' : (n >= 20 ? '≈ ' : '') + soRound(n));
         this._html('ros', this.roS, n < 0.5 ? 'NO ONE, YET' : n <= 8 ? 'NEIGHBOURS, THROUGH THE WALLS' : 'PEOPLE · EVERY ONE OF THEM IN SILENCE');
         const grow = SO_HEARD.some((h) => t > h.t && t < h.t + h.r / SOP.c + 0.3 && h.n > 8);
@@ -142,10 +145,10 @@ class SoHud {
       this._set('capa', this.cap, 'opacity', W(t, cp.show, cp.hide, 0.22, 0.3).toFixed(3));
     } else this._set('capa', this.cap, 'opacity', '0');
     // ---- the lightning count, big (one a second from the flash, as you count)
-    { const tb = SO.tBolt, v = soVoice('y_count'), n = m === 'storm' && t >= v.start ? Math.min(6, 1 + Math.floor((t - v.start) / (v.seconds / 6.2))) : 0, a = n && t < v.start + v.seconds + 1.4 ? 1 : 0;
+    { const v = soVoice('y_count'), on = [0, 0.89, 1.81, 2.84, 3.84, 4.80], n = m === 'storm' && t >= v.start ? on.filter((x) => t - v.start >= x).length : 0, a = n && t < v.start + v.seconds + 1.4 ? 1 : 0;
       this._set('cna', this.count, 'opacity', String(a));
       if (a) { this._html('cnt', this.count, `${n}<small> s</small>`); this._cls('cnc', this.count, n === 6 ? 'so-count hit' : 'so-count'); }
-      void tb; }
+    }
     // ---- the decibel ladder
     this._insets(t, s);
     // ---- labels pinned in the scene

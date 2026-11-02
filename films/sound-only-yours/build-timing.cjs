@@ -15,15 +15,15 @@ const VO = (() => { const p = path.join(DIR, 'voices/you/manifest.json'); const 
   return Object.fromEntries(m.clips.map((c) => [c.id.replace(/^\d+-/, ''), { file: c.file, seconds: c.seconds }])); })();
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
-  title: 0.05, what: 0.15, start: 0.3, hello: 0.6, room: 0.6, clap: 1.4, rule: 1.0, body: 1.6, ring: 2.0, mum: 1.8, text: 1.0, window: 2.6, faces: 1.4,
-  stairs: 2.4, behind: 1.6, street: 2.4, car: 1.6, warn: 1.6, heads: 1.8, bats: 2.0, storm: 2.0, park: 2.2, shout: 1.6, far: 1.2, coming: 2.4, hide: 2.6, echo: 2.4, who: 1.6, question: 1.6,
+  title: 0.05, what: 0.15, start: 0.3, hello: 0.6, text: 0.7, room: 1.6, clap: 0.8, rule: 0.5, body: 1.2, mum: 1.4, window: 2.6, faces: 1.4,
+  stairs: 2.4, behind: 1.6, street: 2.4, car: 1.6, warn: 1.6, heads: 1.8, storm: 2.0, park: 2.2, shout: 1.6, far: 1.2, coming: 2.4, hide: 2.6, echo: 2.4, who: 1.6, question: 2.7,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'start:1': 0.4, 'room:1': 1.4, 'clap:1': 0.8, 'rule:1': 0.3, 'body:1': 1.6, 'ring:1': 1.4, 'mum:1': 0.6, 'mum:2': 1.4, 'window:1': 0.6, 'window:2': 1.4, 'window:3': 0.3,
-  'faces:1': 2.6, 'stairs:1': 0.4, 'stairs:2': 0.4, 'stairs:3': 1.0, 'behind:1': 2.2, 'behind:2': 0.6, 'behind:3': 0.6, 'street:1': 1.0, 'car:1': 3.4, 'car:2': 0.4,
-  'heads:1': 0.6, 'heads:2': 1.2, 'storm:1': 0.6, 'storm:2': 0.5, 'storm:3': 1.6, 'shout:1': 0.2, 'shout:2': 0.8, 'shout:3': 0.8, 'far:1': 0.8, 'coming:1': 1.4,
-  'hide:1': 2.6, 'warn:1': 0.6, 'warn:2': 0.6, 'bats:1': 1.0, 'coming:2': 0.6, 'echo:1': 0.4, 'echo:2': 1.0, 'echo:3': 1.6, 'echo:4': 1.4, 'echo:5': 1.2, 'who:1': 1.0, 'who:2': 1.2,
+  'start:1': 0.4, 'room:1': 1.4, 'body:1': 1.6, 'mum:1': 0.6, 'mum:2': 1.4, 'window:1': 0.6, 'window:2': 1.4, 'window:3': 0.3,
+  'faces:1': 2.6, 'stairs:1': 0.4, 'stairs:2': 0.4, 'stairs:3': 1.0, 'behind:1': 2.2, 'behind:2': 0.6, 'behind:3': 0.6, 'street:1': 1.0, 'car:1': 3.4,
+  'heads:1': 0.6, 'heads:2': 1.2, 'storm:2': 0.5, 'storm:3': 1.6, 'park:1': 0.4, 'shout:1': 0.2, 'shout:2': 0.8, 'shout:3': 0.8, 'far:1': 0.8, 'coming:1': 1.4,
+  'hide:1': 0.5, 'hide:2': 2.6, 'warn:1': 0.6, 'warn:2': 0.6, 'coming:2': 0.6, 'echo:1': 0.4, 'echo:2': 1.0, 'echo:3': 1.6, 'echo:4': 1.4, 'echo:5': 1.2, 'who:1': 1.0, 'who:2': 1.0, 'who:3': 0.3,
 };
 const SECTION_OF = { title: 1, stairs: 2, street: 3, park: 4, hide: 5 };
 const GAP = 0.6;                     // between captions inside a beat

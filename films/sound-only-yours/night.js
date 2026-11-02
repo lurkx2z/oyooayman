@@ -1,8 +1,8 @@
 /* =====================================================================
    NIGHT — what this film adds to the falls-up street at night in the rain:
      the flats across the park (their windows one by one: soBuildFlats), the tower block 170 m beyond the middle of the
-     park, pools of lamplight, the rain (streaks round the camera, pure), the lightning 2 km away, the bats round the
-     park lamp, the cars that move (the silent car, the ambulance), your laptop and the phones' screens.
+     park, pools of lamplight, the rain (streaks round the camera, pure), the lightning 2 km away, the park lamp,
+     the cars that move (the silent car, the ambulance), your laptop and the phones' screens.
    All posed from film time t / story time s, pure.
    ===================================================================== */
 
@@ -152,41 +152,6 @@ function soBuildBolt(scene) {
 // the flash at film t: 0…1 (three flickers over 0.45 s, from SO.tBolt)
 function soBoltAt(t) { const u = t - SO.tBolt; if (u < 0 || u > 0.7) return 0; return Math.max(Math.exp(-u / 0.05), 0.8 * Math.exp(-Math.max(0, u - 0.16) / 0.04) * (u > 0.16 ? 1 : 0), 0.6 * Math.exp(-Math.max(0, u - 0.33) / 0.08) * (u > 0.33 ? 1 : 0)); }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// THE BATS round the lamp in the middle of the park: they can't hear their own calls. They flutter in jerky loops, too
-// close to the light; two hit the lamp and drop into the grass
-// ---------------------------------------------------------------------------------------------------------------------
-function soBuildBats(scene) {
-  const m = soStd('#16130f', 0.8, 0, { side: THREE.DoubleSide }), bats = [];
-  for (let i = 0; i < 7; i++) {
-    const g = new THREE.Group(); soMesh(new THREE.SphereGeometry(0.035, 8, 6).scale(1, 0.9, 1.6), m, 0, 0, 0, g);
-    const wing = (sd) => { const p = new THREE.Group(); g.add(p); const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(sd * 0.17, 0.03); sh.lineTo(sd * 0.15, -0.02); sh.lineTo(sd * 0.11, 0.0); sh.lineTo(sd * 0.08, -0.04); sh.lineTo(sd * 0.04, -0.05); sh.closePath();
-      const w = new THREE.Mesh(new THREE.ShapeGeometry(sh), m); w.rotation.x = -Math.PI / 2; p.add(w); return p; };
-    g.userData.w = [wing(-1), wing(1)]; g.scale.setScalar(1.5); g.visible = false; scene.add(g); bats.push(g);
-  }
-  return bats;
-}
-// bat i at film t (relative to the beat's start t0): position, heading, flap; hits: the two that strike the lamp
-function soBatsUpdate(bats, t, t0, on) {
-  const L = SO_BATLAMP;
-  bats.forEach((b, i) => {
-    b.visible = on; if (!on) return;
-    const u = t - t0, ph = i * 1.7, R = 1.2 + 0.9 * fuzz(i), w = 2.3 + 0.6 * fuzz(i + 9);
-    let x = L[0] + R * Math.cos(u * w + ph) + 0.6 * noise1(u * 1.7, i + 3), y = L[1] - 0.3 + 0.8 * Math.sin(u * w * 0.7 + ph) + 0.4 * noise1(u * 2.1, i + 7), z = L[2] + R * Math.sin(u * w * 1.3 + ph) + 0.6 * noise1(u * 1.5, i + 5);
-    // the two that hit the lamp: they fly straight into the glass, then fall, tumbling
-    const hit = i === 1 ? soC('bats', 1) + 0.5 - t0 : i === 4 ? soC('bats', 1) + 2.6 - t0 : null;
-    let flap = Math.sin(u * 38 + i * 2);
-    if (hit != null && u > hit - 0.5) {
-      const pre = MathX.clamp((u - hit + 0.5) / 0.5, 0, 1), from = [x, y, z];
-      if (u < hit) { x = from[0] + (L[0] - from[0]) * pre; y = from[1] + (L[1] - from[1]) * pre; z = from[2] + (L[2] - from[2]) * pre; }
-      else { const v = u - hit; x = L[0] + 0.25 * v; z = L[2] + 0.15 * v; y = Math.max(0.05, L[1] - 4.9 * v * v); flap = 0.6 * Math.sin(v * 9); b.rotation.set(v * 7, v * 3, v * 5); }
-    }
-    b.position.set(x, y, z);
-    if (!(hit != null && u > hit)) { const dx = -R * w * Math.sin(u * w + ph), dz = R * w * 1.3 * Math.cos(u * w * 1.3 + ph); b.rotation.set(0.2 * Math.sin(u * 5 + i), Math.atan2(dx, dz), 0.4 * Math.sin(u * 7 + i)); }
-    b.userData.w[0].rotation.z = 0.9 * flap; b.userData.w[1].rotation.z = -0.9 * flap;
-  });
-}
-function fuzz(i) { return hash1(i * 131 + 7); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE CARS THAT MOVE: the one that glides past you at the kerb (an EV, 30 km/h: you never hear it), the ambulance
@@ -195,12 +160,16 @@ function fuzz(i) { return hash1(i * 131 + 7); }
 function soBuildMovers(root, T) {
   const VF = new VehicleFactory(), out = {};
   const car = VF.build('ev', '#3a3f46'); const g = new THREE.Group(); car.group.position.x = -2.36; g.add(car.group); root.add(g); out.ev = { g, o: car };
+  // its tail-lights, bright in the rain (what you watch go, without a sound), and their red on the wet road
+  car.tail.emissiveIntensity = 3.2; { const l = new THREE.PointLight('#ff2a1a', 4, 9, 1.8); l.position.set(-car.L / 2 - 0.4, 0.7, 0); car.group.add(l); }
   const amb = VF.build('van', '#eceae2'); const ga = new THREE.Group(); amb.group.position.x = -2.65; ga.add(amb.group); root.add(ga); out.amb = { g: ga, o: amb };
   // the ambulance's markings and its light bar (blue, flashing)
   { const chk = soTex(soCanvas(256, 32, (c, w, h) => { for (let x = 0; x < w; x += 32) for (let y = 0; y < h; y += 16) { c.fillStyle = ((x + y) / 16) % 2 ? '#1f8a3a' : '#e8d23a'; c.fillRect(x, y, 32, 16); } }));
-    for (const sd of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.4), soStd('#ffffff', 0.5, 0, { map: chk })); p.position.set(0, 0.95, sd * 1.01); if (sd < 0) p.rotation.y = Math.PI; ga.add(p); }
-    out.amb.blue = [-0.5, 0.5].map((z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.14, 0.32), new THREE.MeshBasicMaterial({ color: '#1a3cff', toneMapped: false })); m.position.set(1.4, 2.42, z); ga.add(m); return m; });
-    out.amb.light = new THREE.PointLight('#3a5cff', 0, 30, 1.6); out.amb.light.position.set(1.4, 3.0, 0); ga.add(out.amb.light); }
+    // (on the van itself: its body sits 2.65 m back from the group's origin)
+    const vx = amb.group.position.x, W2 = (amb.W || 2.0) / 2 + 0.012, Hh = amb.height || 2.4;
+    for (const sd of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(4.2, (amb.L || 5) - 0.8), 0.4), soStd('#ffffff', 0.5, 0, { map: chk })); p.position.set(vx - 0.2, 0.95, sd * W2); if (sd < 0) p.rotation.y = Math.PI; ga.add(p); }
+    out.amb.blue = [-0.5, 0.5].map((z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.14, 0.32), new THREE.MeshBasicMaterial({ color: '#1a3cff', toneMapped: false })); m.position.set(vx + (amb.L || 5) / 2 - 1.1, Hh + 0.07, z); ga.add(m); return m; });
+    out.amb.light = new THREE.PointLight('#3a5cff', 0, 30, 1.6); out.amb.light.position.set(vx + (amb.L || 5) / 2 - 1.1, Hh + 0.6, 0); ga.add(out.amb.light); }
   // the car alarm (the parked hatch along your side: car3)
   out.alarm = T.cars.find((c) => c.b.id === 'car9');
   if (out.alarm) { const parts = []; out.alarm.g.traverse((o) => { if (o.isMesh && o.material && o.material.emissive && o.material.color && o.material.color.getHexString() === '7a4a10') parts.push(o.material); }); out.alarm.haz = [...new Set(parts)]; }
@@ -208,7 +177,7 @@ function soBuildMovers(root, T) {
 }
 // the EV: along the near lane (z −4.7), east to west (+x) at 30 km/h; it passes the kerb where you step out at SO.tCar
 const SO_EV = { z: -4.75, v: 8.33 };
-const SO_AMB = { z: -7.1, v: 11.1, x0: -70 };                 // (the far lane: west, +x)
+const SO_AMB = { z: -7.1, v: 9.5, x0: -46 };                  // (the far lane: west, +x; it passes you 5 s in)
 function soMoversUpdate(M, t, mode) {
   const K = SO_ST.you.kerb;
   M.ev.g.visible = mode === 'car';

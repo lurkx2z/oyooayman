@@ -29,18 +29,18 @@ SO.end = SOT.duration;
 SO.tStop = 0.7;                                          // ★ (film) every sound but yours stops (story s = 0)
 SO.sKnock = 0.55;                                        // (story) the cat's paw sends the glass off the counter's edge
 SO.tClap = soC('clap', 0) + 0.7;                         // you clap
-SO.tClap2 = soC('rule', 1) + 0.4;                        // ...and again, slowly, for the diagram
+SO.tClap2 = soC('rule', 0) + 0.9;                        // ...and again, slowly, for the diagram
 SO.tWin = soC('window', 0) + 0.5;                        // you open the window
 SO.tLightOut = soC('stairs', 3) + 0.7;                   // the stairwell's timer light goes out
 SO.tTurn = soC('behind', 0) + 2.0;                       // you turn round on the stairs
 SO.tKerb = soC('car', 0) + 0.3;                          // you step off the kerb...
 SO.tCar = soC('car', 0) + 1.55;                          // ...and a car glides past 1.2 m in front of you
-SO.tBolt = soC('storm', 0) + 0.5;                        // the lightning (you count from here)
+SO.tBolt = soVoice('y_count').start - 1.0;               // the lightning: you say "One" a second after it
 SO.tShout = soVoice('y_shout').start;
-SO.tDog = soC('hide', 1) - 0.2;                          // the dog lunges out of the dark
+SO.tDog = soC('hide', 2) - 0.2;                          // the dog lunges out of the dark
 SO.tClicks = (() => {                                    // your tongue clicks in the dark (echo pictures)
   const e = (k, d = 0.25) => soC('echo', k) - d;
-  return [e(0, -1.6), e(1, 0.1), e(1, -1.3), e(2, 0.5), e(3, 0.7), e(4, 0.55), e(5, 0.6), e(5, -1.6), soC('who', 1) - 0.4, soC('who', 2) - 0.3, soC('question', 0) - 0.5];
+  return [e(0, -1.6), e(1, 0.1), e(1, -1.3), e(2, 0.5), e(3, 0.7), e(4, 0.55), e(5, 0.6), e(5, -1.6), soC('who', 1) - 0.4, soC('who', 2) + 0.9, soS('question') - 1.4];   // (the last one: behind you)
 })();
 
 // THE CLOCK: segments [film t where it starts, story s there | 'cont', 'real' | ['rate', r]]. Inside a segment time

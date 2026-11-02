@@ -3,8 +3,8 @@
    the cat purring on the counter, traffic far off. At 0.7 s (9:41:00 PM) all of it stops dead, mid-word.
    After that the world makes no sound at all; this stem only carries what is inside you:
      your body   a low rush (blood), almost nothing until "your body gets loud", a faint floor after it
-     the ringing from "Then the ringing starts": a thin high tone (tinnitus), loudest when it starts, then a faint
-                 thread that comes back up in every long silence (the thunder that never comes, the dark)
+     the ringing creeping in under "People inside it hear their own blood moving": a thin high tone (tinnitus), then a
+                 faint thread that comes back up in every long silence (the thunder that never comes, the dark)
    The beds sit well under the score (mix.js; the owner's rule after days-shorter).
    ===================================================================== */
 
@@ -38,26 +38,27 @@ soSound('amb', 'world', function (ctx, bus, K) {
 
 soSound('amb', 'inside', function (ctx, bus, K) {
   const T = SO.tStop, END = SO.end + 0.2, c = soC, B = soB;
-  // your body: a low rush, pulsing faintly with your heart. Level (0…1) over the film:
+  // your body: a low rush, pulsing faintly with your heart (the beds are peak-normalised: vol sets the loudest moment,
+  // kept ~10 dB under the score). Level (0…1) over the film:
   const body = soCurve((t) => {
     let v = 0.06 * soEv(t, T + 1.5, T + 5);                                              // (barely: the room is dead silent)
-    v += 0.9 * soWn(t, B('body') + 0.6, B('ring') + 1.0, 2.5, 3.0);                       // "your body gets loud"
-    v += 0.18 * soEv(t, B('ring') + 1, B('mum'));                                         // ...and stays, a little
+    v += 0.55 * soWn(t, B('body') + 0.6, B('mum') - 0.6, 2.5, 2.5);                       // "your body gets loud" (still well under the score)
+    v += 0.18 * soEv(t, B('mum') - 1.5, B('mum') + 1);                                    // ...and stays, a little
     v += 0.25 * soWn(t, SO.tTurn, B('street'), 0.2, 2.0);                                 // after the man on the stairs
     v += 0.3 * soEv(t, B('hide'), B('hide') + 3) + 0.35 * soEv(t, soC('who', 0), soC('who', 2));   // in the dark
     return v;
   });
-  soBed(K, T + 0.2, END, { colour: 'brown', f: [['lp', 170], ['hp', 28]], vol: 0.5, am: 0.25, wr: 1.2, fi: 1, fo: 0.02, env: (u, t) => body(t) });
-  soBed(K, T + 0.2, END, { colour: 'pink', f: [['bp', 320, 0.8], ['lp', 700]], vol: 0.12, am: 0.4, wr: 1.6, fi: 1, fo: 0.02, env: (u, t) => body(t) });
-  // the ringing: two thin tones that waver; loud when it starts, then a thread that comes back in the long silences
+  soBed(K, T + 0.2, END, { colour: 'brown', f: [['lp', 170], ['hp', 28]], vol: 0.36, am: 0.25, wr: 1.2, fi: 1, fo: 0.02, env: (u, t) => body(t) });
+  soBed(K, T + 0.2, END, { colour: 'pink', f: [['bp', 320, 0.8], ['lp', 700]], vol: 0.086, am: 0.4, wr: 1.6, fi: 1, fo: 0.02, env: (u, t) => body(t) });
+  // the ringing: two thin tones that waver; it creeps in while your body is loud (the quietest room on Earth), then
+  // stays as a thread that comes back up in the long silences
+  const R0 = c('body', 1) + 2.5;
   const ring = soCurve((t) => {
-    const R0 = c('ring', 0) - 0.3;
-    let v = soEv(t, R0, R0 + 2.5) * (1 - 0.75 * soEv(t, c('ring', 1) + 1, B('mum') + 2));
+    let v = 0.7 * soEv(t, R0, R0 + 3.5) * (1 - 0.7 * soEv(t, B('mum'), B('mum') + 3));
     v += 0.25 * soWn(t, c('storm', 3) - 0.4, B('park') + 1.5, 0.6, 2.0);                 // the thunder that never comes
     v += 0.2 * soEv(t, B('hide'), B('hide') + 4) + 0.15 * soEv(t, soC('who', 2), SO.end);    // the dark
     return v;
   });
-  const R0 = c('ring', 0) - 0.3;
   soTone(K, R0, END - R0, (t) => 6720 + 40 * Math.sin(2 * Math.PI * 0.21 * t), [[1, 1], [1.5, 0.08]], (u, t) => ring(R0 + t) * Math.min(1, (END - R0 - t) / 0.02), { vol: 0.055, pan: 0.15 });
   soTone(K, R0 + 0.8, END - R0 - 0.8, (t) => 4180 + 25 * Math.sin(2 * Math.PI * 0.13 * t), [[1, 1]], (u, t) => ring(R0 + 0.8 + t) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 0.17 * t)) * Math.min(1, t / 1.5, (END - R0 - 0.8 - t) / 0.02), { vol: 0.03, pan: -0.2 });
   soBed(K, R0, END, { colour: 'white', f: [['bp', 7200, 3]], vol: 0.02, fi: 2.0, fo: 0.02, env: (u, t) => ring(t) });

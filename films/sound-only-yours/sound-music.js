@@ -203,7 +203,11 @@ soSound('music', 'score', function (ctx, bus, K) {
     theme(c('start', 0) + 0.9, { vol: 0.32, gap: 0.95 });
     knock(c('start', 1) + 0.15, 'D1', 0.42); }
   // "Hello?": nobody answers (the score holds its breath: only a thin high note)
-  glass(soVoice('y_hello').start + 0.6, B('room') + 0.5, 0.07, ['E6'], { att: 0.9 });
+  glass(soVoice('y_hello').start + 0.6, B('text') + 0.6, 0.07, ['E6'], { att: 0.9 });
+  // a text, from a number you don't know ("was that you?"): a low knock, a sour bell, a dread swell cut by the cut
+  { const T0 = B('text'), T1 = B('room');
+    knock(c('text', 0) + 0.1, 'Eb1', 0.5); M.bell(c('text', 0) + 0.12, 'A6', 0.25, 0.3);
+    M.strings(T0, T1 + 0.03, C.dread, 0.4, { att: T1 - T0 - 0.2, rel: 0.03, cut: 600, cutTo: 1400, cutAt: T1 }); }
   // the news, the rain, the cat: a low note on each; "Nothing.": a cold cluster
   { const R0 = B('room');
     M.strings(R0, c('room', 1) + 1.5, C.Gm9, 0.24, { att: 1.0, rel: 1.0, cut: 800 });
@@ -213,38 +217,27 @@ soSound('music', 'score', function (ctx, bus, K) {
   // a dead hush before the clap; after it: "You hear it." (bells, wonder and dread at once)
   { const tC = SO.tClap;
     M.bell(tC + 1.2, 'A5', 0.3, -0.3); M.bell(tC + 1.5, 'Bb5', 0.26, 0.3); M.bell(tC + 2.4, 'D6', 0.22, 0);
-    M.strings(c('clap', 1) - 0.5, B('rule') + 0.5, C.Dm9, 0.3, { att: 1.5, rel: 0.8, cut: 1200 }); }
+    M.strings(SO.tClap + 1.0, B('rule') + 0.5, C.Dm9, 0.3, { att: 1.5, rel: 0.8, cut: 1200 }); }
   // the pulse of air: a soft pulse, the score dipping for the second clap
   { const R0 = B('rule'), R1 = B('body');
-    M.prog([[R0, C.Dm9], [c('rule', 1), C.Bbmaj7]], R1 + 0.3, 0.32, { cut: 1100 });
+    M.prog([[R0, C.Dm9], [SO.tClap2 + 0.5, C.Bbmaj7]], R1 + 0.3, 0.32, { cut: 1100 });
     soPulse(ctx, M.bus, R0 + 0.3, SO.tClap2 - 0.15, ['D3', 'A3'], 0.5, 0.45, { cut: 500, cutTo: 900, acc: 2 });
     soPulse(ctx, M.bus, SO.tClap2 + 0.6, R1, ['Bb2', 'F3'], 0.5, 0.4, { cut: 700, cutTo: 450, acc: 2, ramp: (u) => 1 - 0.7 * u }); }
   // your body: almost nothing in the score (a sub, a faint high cluster for "their own blood moving")
-  { const B0 = B('body'), B1 = B('ring');
+  { const B0 = B('body'), B1 = B('mum');
     sub(B0, B1 + 0.6, 0.42, { att: 2.5 });
     glass(c('body', 1) + 0.6, B1 + 0.8, 0.09, ['Eb6', 'E6'], { att: 2.5, vib: 6 }); }
-  // the ringing: a glassy crescendo into the ringing; "sounds that weren't there": backwards notes, ghosts
-  { const R0 = B('ring'), R1 = B('mum');
-    glass(R0, R1 + 0.5, 0.2, C.ghost, { att: 3.5, rel: 1.4, vib: 9, keys: [[R0 + 3.5, 1], [c('ring', 1), 0.6], [R1, 0.3]] });
-    drone(R0, R1 + 0.4, C.dread, 0.42, { att: 3.0 });
-    const gh = ['B5', 'F5', 'C6', 'E5', 'Bb5', 'F#6'];
-    for (let i = 0, t = c('ring', 1) + 0.8; t < R1 - 0.3; t += 0.9 + 0.55 * Math.sin(i * 2.1), i++) M.rpiano(t, gh[i % gh.length], 0.2, 1.0, i % 2 ? 0.45 : -0.45); }
   // Mum: the sad version (D minor, the lullaby whole); "Neither of you hears a thing": just the piano
-  { const M0 = B('mum'), M1 = B('text');
+  { const M0 = B('mum'), M1 = B('window');
     M.prog([[M0, C.Dm], [c('mum', 1), C.Bbmaj7], [soVoice('y_mum').start + 2.6, C.Gm9], [c('mum', 2), C.Asus]], M1 + 0.3, 0.38, { cut: 1100, att: 1.2 });
     M.piano(M0 + 0.3, 'D3', 0.32, 4); M.piano(c('mum', 1) + 0.1, 'Bb2', 0.3, 4);
     theme(c('mum', 2) + 0.4, { vol: 0.3, gap: 1.05 });
     M.piano(c('mum', 2) + 5.0, 'A2', 0.28, 3); }
-  // a text, from a number you don't know: a low knock, a sour chord, then a swell that's cut off by the window
-  { const T0 = B('text'), T1 = B('window');
-    knock(c('text', 0) + 0.1, 'Eb1', 0.5); M.bell(c('text', 0) + 0.12, 'A6', 0.25, 0.3);
-    M.strings(T0, T1 + 0.2, C.dread, 0.4, { att: 0.8, rel: 0.2, cut: 600, cutTo: 1400, cutAt: T1 });
-    riser(T1 + 0.1, 2.2, 0.16); }
   // ================================================================== 2 · the window: the pads open up
   { const W0 = B('window'), W1 = B('faces');
     M.prog([[W0, C.open], [c('window', 2), C.Dm9], [c('window', 3), C.Bbmaj7]], W1 + 0.5, 0.42, { cut: 900, cutTo: 2200, att: 1.6 });
     glass(soVoice('y_window').start + 1.5, W1 + 0.5, 0.12, ['A5', 'E6'], { att: 2.0 });
-    // the map: the 500 m ring opening out (a rising line of bells); "about 4,000 people": a low note
+    // "about 500 metres" (a rising line of bells, going out); "Anyone with a window open can hear you": a low note
     ['D5', 'E5', 'A5', 'D6', 'E6'].forEach((n, i) => M.bell(c('window', 2) + 0.3 + i * 0.28, n, 0.22 * (1 - 0.1 * i), -0.4 + 0.2 * i));
     knock(c('window', 3) + 0.1, 'D1', 0.4); }
   // the windows across the park light up: a music-box note for each of the first; then a shimmer for the rest
@@ -288,9 +281,10 @@ soSound('music', 'score', function (ctx, bus, K) {
     hit(tC - 0.05, 0.75, { len: 1.8 });
     drone(tC + 0.6, C1 + 0.3, C.dread, 0.42, { att: 1.5 });
     soPulse(ctx, M.bus, c('car', 1), C1, ['D2', 'A2'], 0.55, 0.42, { cut: 400, cutTo: 650, acc: 4 }); }
-  // the ambulance: the ghost of a siren in the strings, wailing; "none of them work": it slides down and dies
+  // the ambulance: a cold high fifth held over it (no wail: nothing here may sound like a siren); "none of them work":
+  // it slides down and dies
   { const A0 = B('warn'), A1 = B('heads'), tDie = c('warn', 2);
-    M.strings(A0 + 0.3, tDie + 2.4, ['A5', 'E6'], 0.36, { wave: 'triangle', att: 1.2, rel: 2.0, cut: 4200, cutTo: 900, cutAt: tDie + 2.4, vib: 0, wob: [260, 0.3], glide: -1500, glideFrom: tDie, glideAt: tDie + 2.4 });
+    M.strings(A0 + 0.3, tDie + 2.4, ['A5', 'E6'], 0.3, { wave: 'triangle', att: 1.6, rel: 2.0, cut: 3000, cutTo: 900, cutAt: tDie + 2.4, vib: 3, glide: -1500, glideFrom: tDie, glideAt: tDie + 2.4 });
     M.prog([[A0, C.Dm9], [c('warn', 1), C.Bbmaj7], [tDie, C.A7b9]], A1 + 0.2, 0.32, { cut: 900 });
     knock(tDie + 0.1, 'A1', 0.35); }
   // "Can anyone hear me?": every head turns (a slow dread swell); the lullaby, high and thin
@@ -298,22 +292,22 @@ soSound('music', 'score', function (ctx, bus, K) {
     drone(c('heads', 1) - 0.4, H1 + 0.3, C.dread, 0.48, { att: 2.6, cut: 300, cutTo: 900, cutAt: c('heads', 2) });
     glass(c('heads', 1), H1 + 0.2, 0.14, ['D6', 'Eb6'], { att: 2.0, vib: 8 });
     theme(c('heads', 2) + 0.4, { vol: 0.22, gap: 0.9, oct: 1 }); }
-  // the storm: a flash of high bells; under the count, one held note; then a roll that builds for the thunder and
-  // stops dead at "It never comes" — and the score with it, for four seconds of nothing
+  // the storm: a flash of high bells; under the count, one held note; then a swell that builds for the thunder and
+  // stops dead at "It never comes" — and the score with it, for four seconds of nothing (no drums: nothing here may
+  // sound like the thunder that never comes)
   { const tB = SO.tBolt, tNever = c('storm', 3);
     ['D7', 'Eb7', 'A6', 'Bb6'].forEach((n, i) => M.bell(tB + 0.02 + i * 0.012, n, 0.32, -0.4 + 0.27 * i));
     M.strings(tB + 0.3, c('storm', 2) + 0.5, ['A2', 'E3', 'A3'], 0.3, { att: 1.5, rel: 0.8, cut: 700 });
     M.strings(c('storm', 2), tNever - 0.02, C.dread, 0.45, { att: tNever - c('storm', 2) - 0.2, rel: 0.02, cut: 300, cutTo: 1100, cutAt: tNever });
-    M.roll(c('storm', 2) + 0.6, tNever - 0.04, [[c('storm', 2) + 0.6, 0.02], [tNever - 0.04, 0.3]], 41); }
+    glass(c('storm', 2) + 0.4, tNever - 0.02, 0.12, ['D6', 'Eb6', 'A6'], { att: tNever - c('storm', 2) - 0.5, rel: 0.02, vib: 10 }); }
   // ================================================================== 5 · the park
-  { const P0 = B('park'), P1 = B('bats');
-    M.strings(P0 + 0.2, P1 + 0.6, C.open, 0.4, { att: 2.6, rel: 1.2, cut: 900, cutTo: 1600 });
-    glass(P0 + 1.0, P1 + 0.4, 0.1, ['A5', 'E6'], { att: 2.0 }); }
-  // the bats, flying blind: bells flitting, too fast and too close; silence before your shout
-  { const B0 = B('bats'), tS = SO.tShout;
-    M.strings(B0, tS - 1.4, C.Dm9, 0.3, { att: 1.0, rel: 1.0, cut: 900 });
-    const bn = ['D7', 'A6', 'Bb6', 'E7', 'F6', 'C7', 'G6'];
-    for (let t = B0 + 0.4, i = 0; t < tS - 1.6; i++) { M.bellCut(t, bn[(i * 3 + (i >> 2)) % bn.length], 0.12 + 0.06 * r.next(), 0.07, r.range(-0.8, 0.8)); t += 0.06 + (r.next() < 0.3 ? 0.35 * r.next() : 0.05); } }
+  // the middle of the park: the pads open out; "If anyone else can still make a sound, they'll answer": hope, then
+  // silence before your shout
+  { const P0 = B('park'), tS = SO.tShout;
+    M.strings(P0 + 0.2, tS - 1.4, C.open, 0.4, { att: 2.6, rel: 1.0, cut: 900, cutTo: 1600 });
+    glass(P0 + 1.0, tS - 1.6, 0.1, ['A5', 'E6'], { att: 2.0 });
+    M.prog([[c('park', 1) - 0.2, C.Dm9]], tS - 1.4, 0.26, { cut: 1000, att: 1.2 });
+    M.bell(c('park', 1) + 0.3, 'A5', 0.22, -0.2); M.bell(c('park', 1) + 1.1, 'D6', 0.2, 0.2); }
   // the shout: nothing but you and your echoes; then a deep swell; "Your own voice is the only answer": the lullaby, low
   { const tS = SO.tShout, X0 = tS + 3.6, X1 = B('far');
     drone(X0, X1 + 0.3, C.low, 0.55, { att: 2.5 });
@@ -324,9 +318,10 @@ soSound('music', 'score', function (ctx, bus, K) {
     M.strings(F0, F1 + 0.4, C.wide, 0.55, { att: 3.5, rel: 1.2, cut: 600, cutTo: 2600, cutAt: c('far', 1) });
     glass(c('far', 0) + 1.5, F1 + 0.3, 0.12, ['D6', 'A6'], { att: 2.0 });
     knock(c('far', 1) + 0.1, 'D1', 0.55); M.drum(c('far', 1) + 0.1, 0.4, 29, 1.6, 2.0); }
-  // they come: a march at walking pace, building; cut dead as you run into the dark
+  // they come: a slow low boom under a building pulse (half walking pace, so it never reads as their steps); cut dead
+  // as you run into the dark
   { const C0 = B('coming'), C1 = B('hide');
-    for (let t = c('coming', 1) - 0.3, i = 0; t < C1 - 0.05; t += 0.56, i++) M.drum(t, (0.18 + 0.32 * soSm(t, c('coming', 1), C1)) * (i % 2 ? 0.7 : 1), 46, 1.5, 0.55);
+    for (let t = c('coming', 1) - 0.3, i = 0; t < C1 - 0.05; t += 1.12, i++) M.drum(t, (0.18 + 0.32 * soSm(t, c('coming', 1), C1)) * (i % 2 ? 0.7 : 1), 46, 1.5, 0.55);
     soPulse(ctx, M.bus, c('coming', 0), C1, ['D2', 'A2', 'D3'], 0.28, 0.6, { cut: 380, cutTo: 1400, acc: 2, ramp: (u) => 0.35 + 0.65 * u });
     M.prog([[C0, C.Dm], [c('coming', 1), C.Bbmaj7], [c('coming', 2), C.A7b9]], C1 + 0.04, 0.42, { cut: 900, cutTo: 2000, att: 1.0, lastRel: 0.03 });
     glass(c('coming', 2), C1 + 0.02, 0.16, C.ghost, { att: 2.0, rel: 0.02, vib: 14 }); }

@@ -17,52 +17,48 @@ status: voiceless (no narrator; your own lines are spoken: VO-you.md)
 
 [hello] {y_hello} “Hello?”
 
+[text] A text, from a number you don't know.
+
 [room] The news. The rain. The cat. / Nothing.
 
-[clap] You clap. / You hear it.
+[clap] You clap. You hear it.
 
-[rule] Sound is just air being pushed. / Your pushes still count. Nobody else's do.
+[rule] Sound is just air being pushed. Only your pushes still count.
 
 [body] With nothing else to hear, your body gets loud. Your breath. Your heartbeat. / The quietest room on Earth measures −20 decibels. People inside it hear their own blood moving.
 
-[ring] Then the ringing starts. / In a 1953 study, 94% of people in a soundproof booth heard sounds that weren't there.
-
 [mum] You call Mum. / {y_mum} “Mum? …Mum, can you hear me?” / The call is connected. Neither of you hears a thing. A speaker's sound isn't yours.
 
-[text] Then a text, from a number you don't know.
-
-[window] You open the window. / {y_window} “Hello? …Is anyone out there?” / With nothing to drown it out, your voice carries about 500 metres. / That's about 4,000 people.
+[window] You open the window. / {y_window} “Hello? …Is anyone out there?” / With nothing to drown it out, your voice carries about 500 metres. / Anyone with a window open can hear you.
 
 [faces] One by one, the windows across the park light up. / They're all looking at yours.
 
 [stairs] 9:47. You go down to find someone. / {y_okay} “Okay. Okay…” / Every step you take, the whole stairwell hears. / The light's timer runs out.
 
-[behind] You'd never hear anyone coming. / {y_scared} “God! …You scared me.” / He can hear you. You can't hear him. / He types something.
+[behind] You feel for the light switch. / {y_scared} “God! …You scared me.” / He can hear you. You can't hear him. / He types something.
 
 [street] 9:52. Outside, it's raining. / The rain makes no sound. Car alarms flash. A dog barks. Nothing.
 
-[car] You step off the kerb. / Silent cars hit people. That's why new electric cars in Europe must hum below 20 km/h. / Now every car is silent.
+[car] You step off the kerb. / Now every car is silent.
 
-[warn] An ambulance, siren on. / Every warning we ever built is a sound. Sirens. Horns. Alarms. / Tonight, none of them work.
+[warn] An ambulance, siren on. / Our most urgent warnings are sounds. Sirens. Horns. Alarms. / Tonight, none of them work.
 
 [heads] {y_street} “Can anyone hear me?” / Every head in the street turns. / You're the only sound they've heard in 11 minutes.
 
-[storm] Lightning over the park. / {y_count} “One… two… three… four… five… six…” / Six seconds: 2 km away. The thunder should be here by now. / It never comes.
+[storm] A storm, over the rooftops. / {y_count} “One… two… three… four… five… six…” / Six seconds: 2 km away. The thunder should be here by now. / It never comes.
 
-[park] 9:56. The middle of the park. Open ground, buildings all round.
+[park] 9:56. The middle of the park. Open ground, buildings all round. / If anyone else can still make a sound, they'll answer.
 
-[bats] Bats find their way with their own echoes. / Theirs are gone too. Tonight, every bat is flying blind.
+[shout] {y_shout} “HELLO!” / Your echo. And again. And again. / Sound travels about 340 metres a second. The tower block is 170 metres away: 1 second there and back. / Your own voice is the only answer.
 
-[shout] {y_shout} “HELLO!” / Your echo. And again. And again. / Sound travels 343 metres a second. The tower block is 170 metres away: 1 second there and back. / Your own voice is the only answer.
-
-[far] On a silent night, a shout carries about 5 km. / About 400,000 people just heard you.
+[far] With nothing in the way, a shout carries about 5 km. / Up to 400,000 people could have heard you.
 
 [coming] They've heard nothing else for 16 minutes. / From every street round the park, people start walking. / Towards the only sound left.
 
-[hide] 10:09. You hide in the dark, under the trees. / You don't hear the dog.
+[hide] 10:09. You ran. Every footstep told them where. / You hide in the dark, under the trees. / You don't hear the dog.
 
 [echo] Some blind people see with echoes: they click, and listen. / In this silence, every echo is perfect. / A tree, 3 metres. A bench, 5 metres. / Something else. 7 metres. / People. / Dozens. All round you. Not moving.
 
-[who] {y_who} “Who's there?” / They all take a step closer. / They can hear every breath you take. You can't hear any of them.
+[who] {y_who} “Who's there?” / They all take a step closer. / To see them, you have to click. / They hear every click 1.6 km away.
 
 [question] Would you make a sound?

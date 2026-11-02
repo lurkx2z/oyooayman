@@ -106,6 +106,16 @@ Everything is procedural, so there are no models, images or sound files to downl
 > space; in the park the leaves, the fountain and a carp go up, and a runner's first stride takes her into a plane tree
 > she has to hold on to for five and a half minutes. At 3:10 your whole ceiling comes down on your table. The story clock
 > only runs forward. Physics, clock, shots and review log: [`films/falls-up/PLAN.md`](films/falls-up/PLAN.md).
+>
+> ***What if every sound vanished except yours?*** — open `sound-only-yours.html` (16:9, no narrator, 5:09). At 9:41 PM
+> on a rainy Thursday every sound in the world stops except the ones you make. Your "Hello?" brings a text from a
+> stranger who heard it; Mum's call connects and carries nothing; your voice from the window lights up every window
+> across the park; a neighbour stands silently right behind you on the dark stairs; a silent car misses you by a metre,
+> an ambulance's siren goes unheard and the thunder never comes. Your shout in the park could reach up to 400,000
+> people, and they start walking towards the only sound left. Hiding in the dark, you can only see them with the echoes
+> of your own clicks, and they can hear every one. The main character's ten lines are the only voice in the film
+> (ElevenLabs). The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/sound-only-yours/PLAN.md`](films/sound-only-yours/PLAN.md).
 
 | Time | Beat |
 |---|---|

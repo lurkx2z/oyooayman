@@ -89,7 +89,7 @@ function soBuildRoom(S) {
     wet: new THREE.MeshStandardMaterial({ color: '#3a3026', transparent: true, opacity: 0.42, roughness: 0.02, metalness: 0.2, envMapIntensity: 2.2, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }),
     tea: new THREE.MeshStandardMaterial({ color: '#9a5a1e', transparent: true, opacity: 0.8, roughness: 0.04, metalness: 0.05, envMapIntensity: 1.8, side: THREE.DoubleSide }),
     teaPool: new THREE.MeshStandardMaterial({ color: '#8a4e18', transparent: true, opacity: 0.74, roughness: 0.02, metalness: 0.1, envMapIntensity: 2.0, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }),
-    shard: new THREE.MeshStandardMaterial({ color: '#f4fbff', transparent: true, opacity: 0.85, roughness: 0.02, metalness: 0.3, envMapIntensity: 2.4, side: THREE.DoubleSide, depthWrite: false }),
+    shard: new THREE.MeshStandardMaterial({ color: '#9fb6bf', transparent: true, opacity: 0.42, roughness: 0.03, metalness: 0.5, envMapIntensity: 3.0, side: THREE.DoubleSide, depthWrite: false }),   // (clear glass: edges and glints, not white paper)
     clock: soStd('#ffffff', 0.5, 0, { map: soTex(soClockFaceCanvas(), { repeat: false }) }),
     grape: soStd('#6e8f2e', 0.28, 0.0, { envMapIntensity: 1.3 }), orange: soStd('#e88a22', 0.55), towel: soStd('#ffffff', 0.95, 0, { map: soTex(soCanvas(64, 64, (g, w, h) => { g.fillStyle = '#f2efe8'; g.fillRect(0, 0, w, h); g.fillStyle = '#b8322a'; for (let x = 0; x < w; x += 16) g.fillRect(x, 0, 5, h); for (let y = 0; y < h; y += 16) g.fillRect(0, y, w, 4); }), { repeat: false }), side: THREE.DoubleSide }),
     bread: soStd('#c88a48', 0.85), crumb: soStd('#d8a868', 0.9),
@@ -112,7 +112,14 @@ function soBuildRoom(S) {
   for (const c of soWallCells(-W - T, W + T, 0, H, [[wi.x[0], wi.x[1], wi.y[0], wi.y[1]]])) soBox(c[1] - c[0], c[3] - c[2], T, M.wall, (c[0] + c[1]) / 2, (c[2] + c[3]) / 2, -D - T / 2, room);
   const dr = L.door;
   for (const c of soWallCells(-W - T, W + T, 0, H, [[dr.x[0], dr.x[1], 0, dr.h]])) soBox(c[1] - c[0], c[3] - c[2], T, M.wall, (c[0] + c[1]) / 2, (c[2] + c[3]) / 2, D + T / 2, room);
-  { const dd = soBox(dr.x[1] - dr.x[0] - 0.02, dr.h - 0.01, 0.04, M.door, (dr.x[0] + dr.x[1]) / 2, dr.h / 2, D + 0.06, room); soBox(0.12, 0.03, 0.05, M.handle, dr.x[0] + 0.12, 1.02, D + 0.02, room); dd.castShadow = true; }
+  // the door stands ajar onto the dark hall (where your "Hello?" goes, and nothing comes back)
+  { const w = dr.x[1] - dr.x[0] - 0.02, hg = new THREE.Group(); hg.position.set(dr.x[0] + 0.01, 0, D + 0.06); hg.rotation.y = -1.42; room.add(hg);
+    const dd = soBox(w, dr.h - 0.01, 0.04, M.door, w / 2, dr.h / 2, 0, hg); soBox(0.12, 0.03, 0.05, M.handle, w - 0.12, 1.02, -0.04, hg); dd.castShadow = true;
+    const hm = soStd('#2a2622', 0.95), hf = soStd('#1c1916', 0.9), x0 = dr.x[0] - 0.25, x1 = dr.x[1] + 0.25, z0 = D + T, z1 = D + T + 4.2, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+    soBox(x1 - x0, 0.05, z1 - z0, hf, cx, -0.025, cz, room); soBox(x1 - x0, 0.05, z1 - z0, hm, cx, 2.5, cz, room);
+    soBox(0.05, 2.5, z1 - z0, hm, x0, 1.25, cz, room); soBox(0.05, 2.5, z1 - z0, hm, x1, 1.25, cz, room); soBox(x1 - x0, 2.5, 0.05, hm, cx, 1.25, z1, room);
+    // (a coat on a hook, half-seen: the only shape in there)
+    soBox(0.42, 0.95, 0.16, soStd('#3a3530', 0.9), x0 + 0.12, 1.35, z0 + 1.6, room); }
   for (const [a, b] of [[dr.x[0] - 0.05, dr.x[0]], [dr.x[1], dr.x[1] + 0.05]]) soBox(b - a, dr.h + 0.05, 0.06, M.frame, (a + b) / 2, dr.h / 2, D - 0.02, room);
   soBox(dr.x[1] - dr.x[0] + 0.1, 0.05, 0.06, M.frame, (dr.x[0] + dr.x[1]) / 2, dr.h + 0.025, D - 0.02, room);
   for (const [x, z, w, d] of [[0.3, -D + 0.01, L.W - 1, 0.02], [W - 0.01, 0, 0.02, L.D]]) soBox(w, 0.1, d, M.skirt, x, 0.05, z, room);

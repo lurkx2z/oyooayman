@@ -5,21 +5,21 @@
    THE RULE: from 9:41:00 PM every sound wave that you did not start dies the instant it starts: voices, rain, engines,
    speakers, animals, alarms. Yours stay: your voice, your breath, your heartbeat, your steps, your clap, anything your
    body strikes, and every echo of them (a reflection of your sound is still your sound). Light, motion and everything
-   else carry on as normal. Sound is air being pushed: your pushes still travel at 343 m/s, spread and fade as always.
+   else carry on as normal. Sound is air being pushed: your pushes still travel at 337 m/s (a 10 °C night), spread and fade as always.
    What follows (and is drawn):
    - with no other sound to mask it, a quiet sound carries much further: a level L (dB at 1 m) falls 6 dB per doubling
      of distance (spreading) and about 2 dB per km (air absorption, speech frequencies); it is heard until it drops to
      the threshold of hearing (≈ 5 dB at speech frequencies). Normal voice 60 dB → ~500 m; a shout 89 dB → ~5 km;
    - everyone inside that circle hears you, and nothing else (5,000 people per km², a big city's average);
-   - echoes come back at 343 m/s, there and back, from every wall in reach: from the middle of the park the tower
-     block (170 m) answers in 0.99 s;
+   - echoes come back at 337 m/s, there and back, from every wall in reach: from the middle of the park the tower
+     block (170 m) answers in 1.01 s;
    - every warning made of sound fails (sirens, horns, alarms); silent cars are why EVs must hum below 20 km/h (EU
      Regulation 540/2014: new types from July 2019, every new EV from July 2021);
    - bats and echolocating people: clicks and their echoes; a person 7 m away answers in 41 ms.
    ===================================================================== */
 
 const SOP = {
-  c: 343,                        // m/s, the speed of sound (20 °C)
+  c: 337,                        // m/s, the speed of sound at 10 °C (the same night as the air absorption below)
   thr: 5,                        // dB: the quietest sound you can hear at speech frequencies (no masking)
   alpha: 0.002,                  // dB per metre: air absorption at ~500 Hz (ISO 9613-1, 10 °C, 80 % humidity)
   density: 5000,                 // people per km² (a big city's average)
@@ -28,7 +28,7 @@ const SOP = {
   quietRoom: -20.35,             // dBA: Microsoft's anechoic chamber, Guinness record 2015
   ring: [1953, 94, 80],          // Heller & Bergman, 1953: 94 % of 80 people with normal hearing heard sounds in a soundproof booth
   evLaw: 20,                     // km/h: EU AVAS rule (EVs must make a sound below it)
-  bolt: 2060,                    // m: the lightning you count to six (6 × 343)
+  bolt: 2022,                    // m: the lightning you count to six (6 × 337)
 };
 const soSm = (x, a, b) => { const u = MathX.clamp((x - a) / (b - a), 0, 1); return u * u * (3 - 2 * u); };
 // the distance at which a sound of level L (dB at 1 m) falls to the threshold of hearing (spreading + absorption)
@@ -41,7 +41,7 @@ function soHeard(L) {
 const soPeople = (r) => Math.PI * (r / 1000) ** 2 * SOP.density;     // people within r metres
 // a count rounded for the HUD: 4,000 / 400,000
 const soRound = (n) => { if (n < 20) return String(Math.round(n)); const p = Math.pow(10, Math.floor(Math.log10(n)) - 1); return (Math.round(n / p) * p).toLocaleString('en-US'); };
-const soDist = (r) => (r < 1000 ? `${Math.round(r / 10) * 10} m` : `${(r / 1000).toFixed(1)} km`);
+const soDist = (r) => (r < 100 ? `${Math.round(r)} m` : r < 1000 ? `${Math.round(r / 10) * 10} m` : `${(r / 1000).toFixed(1)} km`);
 // the numbers the captions say (checked against the formula at load: PLAN.md § 2)
 const SO_NUM = (() => {
   const v = soHeard(SOP.L.voice), sh = soHeard(SOP.L.shout);

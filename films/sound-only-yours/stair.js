@@ -66,13 +66,17 @@ function soBuildStairSet(app) {
   const exit = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.19), new THREE.MeshBasicMaterial({ map: soTex(exitC, { repeat: false }), toneMapped: false }));
   exit.position.set(0, -1.5 + 2.35, z0 + 0.03); root.add(exit);
   const exitL = new THREE.PointLight('#2aff7a', 0.45, 6, 1.6); exitL.position.set(0, -1.5 + 2.1, z0 + 0.4); scene.add(exitL);
+  const exitP = [0, -1.5 + 2.35, z0 + 0.03];
+  // a warm bounce off the painted walls while the timer light is on (no black voids), gone with it
+  const fillL = new THREE.PointLight('#ffe2b8', 0, 16, 1.0); fillL.position.set(0, 1.4, (z0 + z1) / 2); scene.add(fillL);
+  const fillL2 = new THREE.PointLight('#ffe2b8', 0, 12, 1.0); fillL2.position.set(0, -0.6, (z0 + z1) / 2); scene.add(fillL2);
   B.build(root, 'stair');
   root.traverse((o) => { if (o.isMesh) { o.receiveShadow = true; } });
   // the neighbour: behind you on the stairs, his phone lighting his face from below
   const nb = new Person({ id: 'soNb', look: 'soNeigh' }, null); scene.add(nb.root); nb.root.visible = false;
   nb.root.traverse((o) => { if (o.isMesh && o.geometry === PersonGeo.mouth) nb.mouthM = o; });
   const NP = soBuildPhone(nb.j.ra.hand); NP.g.position.set(0, -0.08, 0.05); NP.g.rotation.set(-0.4, 0, 0);
-  const nbL = new THREE.PointLight('#c8dcff', 0, 1.6, 2); scene.add(nbL);
+  const nbL = new THREE.PointLight('#c8dcff', 0, 2.2, 2); scene.add(nbL);
   // the close-up of his phone (a bigger copy in front of the camera)
   const big = soBuildPhone(cam); big.g.visible = false;
   // your hands in the dark? (no: you hold the rail; not seen)
@@ -84,7 +88,9 @@ function soBuildStairSet(app) {
       // the timer light: on until SO.tLightOut (a flicker as it goes)
       const lit = t < SO.tLightOut ? 1 : 0;
       lamps.forEach((l) => { l.intensity = 7.0 * lit; }); bulkM.emissiveIntensity = 2.2 * lit;
-      S.hemi.intensity = lit ? 0.5 : 0.02;
+      S.hemi.intensity = lit ? 1.0 : 0.02; fillL.intensity = 2.2 * lit; fillL2.intensity = 1.6 * lit;
+      // in the dark the green sign is the only light (a little brighter once your eyes adjust)
+      exitL.intensity = lit ? 0.45 : (0.45 + 0.35 * soSm(t, SO.tLightOut + 0.5, SO.tLightOut + 2.5)) * (1 - 0.6 * soSm(t, SO.tTurn - 0.2, SO.tTurn + 0.4));   // (behind you once you turn)
       // you go down the stairs, a step every half second from the beat's first caption; you stop on the half landing below 4
       const P = SO_STAIR_PATH, t0 = soC('stairs', 0) - 0.4, per = (soC('behind', 0) - 0.4 - t0) / (P.length - 1), u = MathX.clamp((t - t0) / per, 0, P.length - 1), i = Math.floor(u), f = u - i;
       const a = P[i], b = P[Math.min(P.length - 1, i + 1)], e = Ease.inOutSine(f);
@@ -95,11 +101,17 @@ function soBuildStairSet(app) {
       const ah = P[Math.min(P.length - 1, i + 3)], dir = [ah[0] - head[0], ah[1] + 0.35 - head[1], ah[2] - head[2]];
       let at = soAdd(head, dir, 1);
       let p = head, fov = 64;
+      // the light goes out: you look up at the only light left, the green EXIT sign on the landing wall
+      if (t > SO.tLightOut) at = soV(at, exitP, Ease.inOutSine(soSm(t, SO.tLightOut + 0.3, SO.tLightOut + 1.6)));
       if (m === 'behind') {
-        // stopped on the landing in the dark; you turn round (SO.tTurn): he is right there, two steps up
-        const turn = Ease.inOutCubic(soSm(t, SO.tTurn - 0.5, SO.tTurn + 0.15)), H = this.nbAt();
-        const fwd = [-0.7, -1.25, -0.9], back = [H[0], H[1] + 1.48, H[2]];
-        at = soV(fwd, back, turn); p = soAdd(head, [0, 0, 0.12 * turn]); fov = 62;
+        // stopped on the landing in the dark, facing the sign; you feel for the light switch and turn round (a full
+        // half turn, to your right): he is right there, three steps up, his phone lighting his face from below
+        const turn = Ease.inOutCubic(soSm(t, SO.tTurn - 1.0, SO.tTurn + 0.2)), H = this.nbAt();
+        const back = [H[0], H[1] + 1.5, H[2]];
+        const yp = (q) => { const d = [q[0] - head[0], q[1] - head[1], q[2] - head[2]], h = Math.hypot(d[0], d[2]); return [Math.atan2(d[0], d[2]), Math.atan2(d[1], h)]; };
+        const [ya, pa] = yp(exitP), [yb0, pb] = yp(back); let yb = yb0; while (yb > ya) yb -= 2 * Math.PI;     // (turning right)
+        const yw = soLerp(ya, yb, turn), pt = soLerp(pa, pb, turn) - 0.12 * Math.sin(Math.PI * turn);
+        at = soAdd(head, [Math.cos(pt) * Math.sin(yw), Math.sin(pt), Math.cos(pt) * Math.cos(yw)]); p = soAdd(head, [0, -0.03 * Math.sin(Math.PI * turn), 0.12 * turn]); fov = 62 - 6 * soSm(t, SO.tTurn + 0.2, SO.tTurn + 3.0);
         if (shot.cam === 'phone') { p = soAdd(head, [0, 0, 0.1]); at = back; fov = 30; }
       }
       const jolt = m === 'behind' ? 0.012 * soSm(t, SO.tTurn + 0.05, SO.tTurn + 0.15) * (1 - soSm(t, SO.tTurn + 0.3, SO.tTurn + 1.2)) : 0;
@@ -108,12 +120,15 @@ function soBuildStairSet(app) {
       // the neighbour (only once you've turned round): his face lit from below by his phone; he types
       nb.root.visible = m === 'behind' && t > SO.tTurn - 0.6 && shot.cam !== 'phone';
       if (nb.root.visible) {
-        const H = this.nbAt(), q = basePose(); q.rSh = [0.85, 0.12]; q.rEl = 1.45; q.lSh = [0.5, 0.1]; q.lEl = 1.3; q.neck = 0.3 - 0.35 * soSm(t, SO.tTurn + 0.3, SO.tTurn + 0.9) + 0.4 * soSm(t, soC('behind', 3) - 0.5, soC('behind', 3));
+        const H = this.nbAt(), q = SO_POSES.phone(); q.neck = 0.3 - 0.35 * soSm(t, SO.tTurn + 0.3, SO.tTurn + 0.9) + 0.4 * soSm(t, soC('behind', 3) - 0.5, soC('behind', 3));
+        // (alive: breathing, a slight sway, his head tilting as he looks at you)
+        q.spine = 0.03 * Math.sin(t * 1.6); q.headYaw = 0.06 * Math.sin(t * 0.7 + 1) - 0.1 * soSm(t, SO.tTurn + 0.6, SO.tTurn + 1.4); q.headRoll = 0.08 * soSm(t, SO.tTurn + 0.8, SO.tTurn + 2.0);
         q.mouth = t > soC('behind', 2) && t < soC('behind', 3) ? 0.5 + 0.5 * Math.sin(t * 13) * Math.sin(t * 4.1) : 0;
         nb.apply(q); nb.root.position.set(H[0], H[1], H[2]); nb.root.rotation.y = soYaw(head[0] - H[0], head[2] - H[2]);
         if (nb.mouthM) nb.mouthM.scale.y = 1 + 6 * q.mouth;
-        nb.root.updateMatrixWorld(true); const hp = NP.g.getWorldPosition(new THREE.Vector3()); nbL.position.set(hp.x, hp.y + 0.12, hp.z) ; nbL.intensity = 0.2;
-        nbL.position.add(new THREE.Vector3(head[0] - H[0], 0, head[2] - H[2]).normalize().multiplyScalar(0.12));
+        // (the screen's light under his chin, a little towards you)
+        nb.root.updateMatrixWorld(true); const hp = nb.root.localToWorld(new THREE.Vector3(0, 1.3, 0.22)); nbL.position.copy(hp); nbL.intensity = 0.55;
+        nbL.position.add(new THREE.Vector3(head[0] - H[0], 0, head[2] - H[2]).normalize().multiplyScalar(0.1));
         NP.scr.update(this.typed(t, false));
       } else nbL.intensity = 0;
       big.g.visible = shot.cam === 'phone';

@@ -82,11 +82,11 @@ function soCurve(f, hz = 200) {
 
 // ---- where you are ------------------------------------------------------------------------------------------------
 const SO_PLACE = {
-  in: ['title', 'what', 'start', 'hello', 'room', 'clap', 'rule', 'body', 'ring', 'mum', 'text'],
+  in: ['title', 'what', 'start', 'hello', 'room', 'clap', 'rule', 'body', 'mum', 'text'],
   win: ['window', 'faces'],
   stair: ['stairs', 'behind'],
   street: ['street', 'car', 'warn', 'heads', 'storm'],
-  park: ['park', 'bats', 'shout', 'far', 'coming'],
+  park: ['park', 'shout', 'far', 'coming'],
   dark: ['hide', 'dog', 'echo', 'who', 'question'],
 };
 function soWhereShot(sh) { if (sh.where) return sh.where; for (const [k, L] of Object.entries(SO_PLACE)) if (L.includes(sh.mode)) return k; throw new Error('SO_PLACE: no place for ' + sh.mode); }

@@ -48,9 +48,9 @@ soSound('sfx', 'yours', function (ctx, bus, K) {
   const lub = fx.hit([[46, 0.075, 1], [92, 0.03, 0.35], [150, 0.014, 0.18]], { width: 0.014, amp: 1, len: 0.5 }), dub = fx.hit([[56, 0.05, 1], [118, 0.022, 0.3]], { width: 0.01, amp: 1, len: 0.4 });
   const pk = SOX.peak(lub); for (const y of [lub, dub]) for (let i = 0; i < y.length; i++) y[i] /= pk;
   const HEART = [   // [film t, bpm, level dB] (−60: none)
-    [B('body') + 0.4, 64, -60], [B('body') + 2.5, 64, 0], [c('ring', 0) + 2, 66, -4], [B('mum'), 68, -60],
+    [B('body') + 0.4, 64, -60], [B('body') + 2.5, 64, 0], [c('body', 1) + 3, 66, -4], [B('mum'), 68, -60],
     [SO.tTurn - 0.1, 70, -60], [SO.tTurn + 0.2, 118, -2], [c('behind', 3), 92, -8], [B('street') - 0.2, 88, -60],
-    [SO.tCar, 80, -60], [SO.tCar + 0.25, 120, -4], [c('car', 2), 92, -12], [B('warn'), 88, -60],
+    [SO.tCar, 80, -60], [SO.tCar + 0.25, 120, -4], [c('car', 1) + 1.5, 92, -12], [B('warn'), 88, -60],
     [c('storm', 3) - 0.6, 80, -60], [c('storm', 3) + 0.4, 80, -10], [B('park') + 1, 80, -60],
     [c('coming', 1), 90, -60], [c('coming', 2), 104, -6], [B('hide') + 0.1, 104, -4], [SO.tDog - 0.05, 100, -6], [SO.tDog + 0.2, 138, 0],
     [B('echo'), 112, -5], [c('echo', 4), 118, -3], [c('who', 0), 126, 0], [c('who', 2), 132, 1], [SO.end, 136, 2],
@@ -69,12 +69,11 @@ soSound('sfx', 'yours', function (ctx, bus, K) {
     for (let i = 0; i < Math.min(y.length, 0.06 * sr); i++) y[i] += 0.5 * Math.sin(2 * Math.PI * 190 * i / sr) * Math.exp(-i / (0.008 * sr));
     put(y, t, { vol: v, norm: true, wet: 1.5, pan: 0.03 }); };
   clap(SO.tClap, 1.0); clap(SO.tClap2, 0.8);
-  breathe(c('clap', 1) + 0.6, B('body') - 0.6, 4.2, 0.03);
+  breathe(SO.tClap2 + 1.0, B('body') - 0.6, 4.2, 0.03);
   // your body: close breathing, loud; a swallow
-  breathe(B('body') + 0.5, c('ring', 0) + 1.5, 4.0, 0.22, { wet: 0.25 });
+  breathe(B('body') + 0.5, B('mum') - 0.4, 4.0, 0.22, { wet: 0.25 });
   { const t = c('body', 1) + 1.8, y = fx.hit([[310, 0.012, 1], [880, 0.006, 0.5], [1900, 0.003, 0.25]], { width: 0.002, amp: 0.6, noise: 0.3, nlen: 0.006, nhp: 1500, len: 0.12 });
     put(y, t, { vol: 0.1, norm: true, wet: 0.2 }); X.put(fx.hit([[120, 0.04, 1], [240, 0.02, 0.4]], { width: 0.02, amp: 0.8, len: 0.25 }), t + 0.12, { vol: 0.16, norm: true }); }
-  breathe(c('ring', 0) + 2.0, B('mum') + 0.5, 4.6, 0.05);
   // Mum: three taps on the screen, your voice; a shaky breath out after it
   for (const dt of [0.5, 0.85, 1.35]) put(fx.hit([[2600, 0.004, 1], [5200, 0.002, 0.4]], { width: 0.0004, amp: 0.6, noise: 0.4, nlen: 0.002, nhp: 3000, len: 0.04 }), c('mum', 0) + dt, { vol: 0.06, norm: true, pan: 0.2 });
   { say('y_mum'); exhale(soVoice('y_mum').start + soVoice('y_mum').seconds + 0.4, 1.4, 0.05, { voice: 0.15 }); }
@@ -84,10 +83,10 @@ soSound('sfx', 'yours', function (ctx, bus, K) {
     put(fx.hit(fx.metalModes(1350, 0.35), { width: 0.0006, amp: 0.7, noise: 0.5, nlen: 0.004, nhp: 1500, len: 0.3 }), t - 0.35, { vol: 0.12, norm: true, pan: 0.15, where: 'in' });   // the handle
     put(fx.hit([[620, 0.02, 1], [1400, 0.01, 0.5]], { width: 0.0015, amp: 0.8, noise: 0.4, nlen: 0.008, nhp: 800, len: 0.15 }), t - 0.2, { vol: 0.1, norm: true, pan: 0.15, where: 'in' });  // the latch
     put(fx.creak(0.7, [[310, 0.02, 1], [720, 0.012, 0.6], [1500, 0.006, 0.3]], { rate: [18, 45] }), t - 0.1, { vol: 0.06, norm: true, pan: 0.15, where: 'in' }); }   // the frame
-  // "Hello? ...Is anyone out there?": out into the night; the flats across the park answer (106 m: 0.62 s), the tower
-  // (228 m: 1.33 s), and the flats again off your own block (1.24 s)
+  // "Hello? ...Is anyone out there?": out into the night; the flats across the park answer (106 m: 0.62 s, about 10 dB
+  // at your ear). The tower and the double bounce would come back below hearing, so they don't
   { const v = say('y_window', { where: 'win' });
-    echo(v.x, v.t, 0.62, -12, -0.25, 2200, { room: V.win, wet: 0.6 }); echo(v.x, v.t, 1.24, -21, 0.3, 1500, { room: V.win, wet: 0.7 }); echo(v.x, v.t, 1.33, -19, 0.05, 1600, { room: V.win, wet: 0.7 }); }
+    echo(v.x, v.t, 0.62, -12, -0.25, 2200, { room: V.win, wet: 0.6 }); }
   breathe(soVoice('y_window').start + 3.5, B('faces') + 2, 4.4, 0.035);
   exhale(c('faces', 1) + 0.9, 1.6, 0.05, { voice: 0.1 });
   // ================================================================== the stairwell
@@ -112,21 +111,22 @@ soSound('sfx', 'yours', function (ctx, bus, K) {
     put(fx.hit(fx.metalModes(480, 0.8), { width: 0.002, amp: 0.9, noise: 0.5, nlen: 0.01, nhp: 400, len: 0.8 }), t, { vol: 0.24, norm: true, pan: -0.2, where: 'street' });
     put(fx.creak(0.9, [[180, 0.03, 1], [410, 0.02, 0.6]], { rate: [10, 30] }), t + 0.15, { vol: 0.05, norm: true, pan: -0.3, where: 'street' }); }
   breathe(B('street') + 1.5, B('car') - 0.2, 4.6, 0.035);
-  // off the kerb (your shoe in the wet); you see it: a gasp; back onto the kerb; the air it pushes moves your jacket
+  // off the kerb (your shoe in the wet); you see it: a gasp; back onto the kerb (the air it pushes is silent: its sound
+  // would be the car's, not yours)
   { const k = SO.tKerb + 0.3, tC = SO.tCar;
     put(fx.step({ weight: 0.6, s: 0.95, scuff: 0.2 }), k, { vol: 0.2, norm: true, where: 'street' });
     put(fx.liquid(0.25, (x) => Math.min(1, x / 0.004) * Math.exp(-x / 0.05), { f: 900 }), k + 0.005, { vol: 0.08, norm: true, where: 'street' });
     gasp(tC - 0.48, 0.38);
     put(fx.step({ weight: 0.7, s: 1.05, scuff: 0.5 }), tC - 0.02, { vol: 0.2, norm: true, where: 'street' });
-    put(fx.rustle(0.45, { density: 380, rub: 0.7, lo: 300, hi: 3500, grain: 0.008, env: (u) => Math.min(1, u * 12) * Math.pow(1 - u, 1.5) }), tC + 0.05, { vol: 0.12, norm: true, where: 'street' });
-    breathe(tC + 0.6, c('car', 2), 1.3, 0.09, { shaky: true }); }
+    breathe(tC + 0.6, c('car', 1) + 2.5, 1.3, 0.09, { shaky: true }); }
   breathe(B('warn') + 0.5, B('heads'), 4.2, 0.03);
   // "Can anyone hear me?": the flats across the park (100 m), the church (70 m)
   { const v = say('y_street', { where: 'street' }); echo(v.x, v.t, 0.41, -16, 0.7, 2000, { room: V.street, wet: 0.6 }); echo(v.x, v.t, 0.58, -13, -0.2, 2200, { room: V.street, wet: 0.6 }); echo(v.x, v.t, 1.17, -24, 0.3, 1500, { room: V.street, wet: 0.7 }); }
   breathe(c('heads', 1), B('storm'), 3.6, 0.045, { ramp: (u) => 0.6 + 0.4 * u });
-  // the storm: a sharp breath at the flash; the count, each number answered by the flats (94 m: 0.55 s)
+  // the storm: a sharp breath at the flash; the count, each number answered by the flats (94 m: 0.55 s; the double
+  // bounce would be below hearing, so there isn't one)
   inhale(SO.tBolt + 0.15, 0.3, 0.12);
-  { const v = say('y_count', { where: 'street' }); echo(v.x, v.t, 0.55, -14, -0.2, 2000, { room: V.street, wet: 0.6 }); echo(v.x, v.t, 1.1, -25, 0.3, 1400, { room: V.street, wet: 0.7 }); }
+  { const v = say('y_count', { where: 'street' }); echo(v.x, v.t, 0.55, -14, -0.2, 2000, { room: V.street, wet: 0.6 }); }
   breathe(soVoice('y_count').start + 6.0, B('park') - 0.3, 3.8, 0.04);
   // ================================================================== the park
   exhale(B('park') + 0.9, 1.8, 0.05, { voice: 0.1 });
@@ -150,7 +150,7 @@ soSound('sfx', 'yours', function (ctx, bus, K) {
     breathe(t + 0.8, B('echo') + 1.0, 0.9, 0.11, { shaky: true }); }
   breathe(B('echo') + 1.0, soVoice('y_who').start - 0.4, 2.6, 0.06, { shaky: true, ramp: (u) => 0.8 + 0.4 * u });
   // your clicks and what answers them. The real echoes come back in milliseconds (a tree 3 m off: 17 ms; the people
-  // round you: 40–100 ms); the echo picture is slowed ~70× (echo.js: 5 m/s), and as its pulse reaches each thing, that
+  // round you: 40–100 ms); the echo picture is slowed ~67× (echo.js: 5 m/s), and as its pulse reaches each thing, that
   // thing rings: the tree (wood), the bench (iron), something soft at 7 m, the people (a glassy rain of them), and the
   // one right behind you (low and close)
   { const H = SO_ST.you.hide, Rng = SO_ECHO_RANGE, Vv = SO_ECHO_V, tw = soVoice('y_who').start;
@@ -159,7 +159,7 @@ soSound('sfx', 'yours', function (ctx, bus, K) {
     const things = (t) => {   // [{ d (m), a (bearing), kind }] at film t
       const out = [{ d: Math.hypot(-9 - H[0], -19.2 - H[2]), a: Math.atan2(-9 - H[0], -19.2 - H[2]), kind: 'tree' }, { d: Math.hypot(-8 - H[0], -17.2 - H[2]), a: Math.atan2(-8 - H[0], -17.2 - H[2]), kind: 'bench' }];
       SO_RING.forEach((e, i) => { const step = soSm(t, tw + e.d / SOP.c + 0.2, tw + e.d / SOP.c + 1.0);
-        const d = i === 1 ? SO_BEHIND.d0 + (SO_BEHIND.d1 - SO_BEHIND.d0) * soSm(t, soC('who', 2), soC('question', 0) - 0.6) : e.d - 0.7 * step;
+        const d = i === 1 ? SO_BEHIND.d0 + (SO_BEHIND.d1 - SO_BEHIND.d0) * soSm(t, soC('who', 2), SO.tClicks[SO.tClicks.length - 1] - 0.15) : e.d - 0.7 * step;
         out.push({ d, a: i === 1 ? SO_BEHIND.a : e.a, kind: i === 0 ? 'it' : i === 1 ? 'behind' : 'person' }); });
       return out; };
     const yawAt = (t) => (t > SO.tClicks[SO.tClicks.length - 1] - 0.3 ? Math.PI : t > c('who', 1) - 0.8 ? 0.35 : t > c('echo', 5) + 0.4 ? -1.15 : t > c('echo', 4) - 0.6 ? 0.25 : -0.3);
@@ -180,9 +180,8 @@ soSound('sfx', 'yours', function (ctx, bus, K) {
         else X.put(ping[o.kind], tp, { vol: { tree: 0.09, bench: 0.08, it: 0.16, behind: k === SO.tClicks.length - 1 ? 0.5 : 0.07 }[o.kind], norm: true, pan: o.kind === 'behind' && k < SO.tClicks.length - 1 ? 0 : pan, lp: o.kind === 'behind' ? 900 : 4000, room: V.dark, wet: 0.5 });
       }
     });
-    // "Who's there?": whispered; the people round you send it back, 40 to 100 ms later, from every side
-    { const v = say('y_who', { where: 'dark' }), list = things(v.t);
-      list.forEach((o, i) => { if (o.kind !== 'person' && o.kind !== 'it') return; echo(v.x, v.t, 2 * o.d / SOP.c, -24 - 0.2 * o.d, MathX.clamp(-Math.sin(o.a - yawAt(v.t)) * 0.85, -0.85, 0.85), 2400, { room: V.dark, wet: 0.3 }); }); }
+    // "Who's there?": whispered (soft bodies send a whisper back below hearing: no echo, nothing answers)
+    say('y_who', { where: 'dark' });
   }
   // they step closer: a catch in your breath; then breathing you can't quiet, held at the very end
   { const tq = SO.tClicks[SO.tClicks.length - 1];

@@ -93,6 +93,10 @@ function soBuildTree(parent, x, z, h, seed, M) {
   soMesh(soBlobGeo(cr * 0.75, seed * 9 + 2), mats[(k0 + 1) % 4], cr * 0.6, cr * 0.35, cr * 0.3, crown);
   soMesh(soBlobGeo(cr * 0.7, seed * 9 + 3), mats[(k0 + 2) % 4], -cr * 0.55, cr * 0.45, -cr * 0.35, crown);
   soMesh(soBlobGeo(cr * 0.6, seed * 9 + 4), mats[k0 % 4], 0.1 * cr, cr * 1.35, -0.2 * cr, crown);
+  // (a wider, lower, uneven crown: not a ball on a stick)
+  soMesh(soBlobGeo(cr * 0.58, seed * 9 + 5), mats[(k0 + 3) % 4], cr * 1.0, cr * 0.05, -cr * 0.25, crown);
+  soMesh(soBlobGeo(cr * 0.52, seed * 9 + 6), mats[(k0 + 1) % 4], -cr * 0.85, -cr * 0.05, cr * 0.55, crown);
+  soMesh(soBlobGeo(cr * 0.5, seed * 9 + 7), mats[(k0 + 2) % 4], cr * 0.25, cr * 0.15, cr * 1.0, crown);
   return { g, segs, crown, h, cr, x, z, stiff: 1.0 + 0.8 * soR(Math.round(seed * 100), 3), seed };
 }
 // a bird (pigeon / duck): a body, a head, two wings that flap
@@ -111,7 +115,7 @@ function soBuildStreet(S) {
   const M = T.M = {
     road: soStd('#ffffff', 0.92, 0, { map: as.map, roughnessMap: as.roughnessMap, bumpMap: as.bumpMap, bumpScale: 0.5 }),
     pav: soStd('#ffffff', 0.85, 0, { map: tex(soPavingCanvas(43), 160, 1) }), kerb: soStd('#9a968c', 0.8),
-    grass: soStd('#ffffff', 1.0, 0, { map: tex(soGrassCanvas(5), 300, 300) }), park: soStd('#ffffff', 1.0, 0, { map: tex(soGrassCanvas(9), 40, 30) }),
+    grass: soStd('#8c9686', 1.0, 0, { map: tex(soGrassCanvas(5), 300, 300) }), park: soStd('#8c9686', 1.0, 0, { map: tex(soGrassCanvas(9), 40, 30) }),   // (wet grass at night: darker, greyer)
     path: soStd('#c2b59c', 0.95), rubber: soStd('#a8473a', 0.95), mud: soStd('#3d3428', 1.0), stoneEdge: soStd('#a39d90', 0.85),
     stone: soStd('#ffffff', 0.95, 0, { map: tex(soStoneCanvas(61), 4, 2) }), slate: soStd('#ffffff', 0.85, 0, { map: tex(soSlateCanvas(3), 8, 4) }),
     roofFlat: soStd('#5a5754', 0.95), concrete: soStd('#b9b2a5', 0.95), roof: soStd('#4a4644', 0.85), roof2: soStd('#5a4a44', 0.85), roofT: soStd('#7a3d2c', 0.85),
@@ -119,7 +123,7 @@ function soBuildStreet(S) {
     post: soStd('#2a2e32', 0.5, 0.5), rail: soStd('#1c1f22', 0.5, 0.4), metal: soStd('#c8463a', 0.5, 0.3), metal2: soStd('#2f6f8a', 0.5, 0.3), chain: soStd('#8d9297', 0.4, 0.8),
     lampGlass: soStd('#fff4dd', 0.3, 0, { emissive: new THREE.Color('#ffe2a8'), emissiveIntensity: 0.15 }),
     bark: soStd('#4f4236', 0.95), bench: soStd('#6a5038', 0.8),
-    leafO: soStd('#c8742c', 0.85, 0, { flatShading: true }), leafY: soStd('#d9a63a', 0.85, 0, { flatShading: true }), leafR: soStd('#a8402a', 0.85, 0, { flatShading: true }), leafG: soStd('#6f7f3a', 0.85, 0, { flatShading: true }),
+    leafO: soStd('#a2622c', 0.85, 0, { flatShading: true }), leafY: soStd('#ac8a3a', 0.85, 0, { flatShading: true }), leafR: soStd('#843c2a', 0.85, 0, { flatShading: true }), leafG: soStd('#5a6534', 0.85, 0, { flatShading: true }),   // (autumn, at night: muted)
     water: new THREE.MeshStandardMaterial({ color: '#284650', transparent: true, opacity: 0.92, roughness: 0.3, metalness: 0.0, envMapIntensity: 0.35, side: THREE.DoubleSide }),
     sheet: new THREE.MeshStandardMaterial({ color: '#7f9aa2', transparent: true, opacity: 0.5, roughness: 0.05, envMapIntensity: 1.4, depthWrite: false }),
     tile: soStd('#7a3d2c', 0.8), batten: soStd('#3b302a', 0.95), glassB: soStd('#9fb4bf', 0.2, 0.3, { transparent: true, opacity: 0.45 }),
@@ -184,7 +188,9 @@ function soBuildStreet(S) {
     const c = M.concrete, rf = M.roofFlat;
     bx(A.x[0], -6.2, 0, A.h, 0.02, 4.5, [c, side, rf, c, c, c]); bx(-1.8, 1.25, 0, A.h, 0.02, 4.5, [c, c, rf, c, c, c]); bx(-6.2, -1.8, 0, A.h, 4.2, 4.5, [c, c, rf, c, c, c]); bx(-6.2, -1.8, A.h - 0.3, A.h, 0.02, 4.2, [c, c, rf, c, c, c]); bx(6.75, A.x[1], 0, A.h, 0.02, 4.5, [side, c, rf, c, c, c]);
     bx(1.25, 6.75, 0, 11.8, 0.02, 4.5, [c, c, c, c, c, c]); bx(1.25, 6.75, 14.85, A.h, 0.02, 4.5, [c, c, rf, c, c, c]);
-    bx(A.x[0], A.x[1], 0, A.h, 4.5, A.z[1], [side, side, rf, c, back, c]);
+    // (its south face at z 4.5 is hidden behind the boxes above, except through your kitchen door: leave it undrawn there,
+    // so the dark hall behind the door shows; room.js builds the hall)
+    bx(A.x[0], A.x[1], 0, A.h, 4.5, A.z[1], [side, side, rf, c, back, new THREE.MeshBasicMaterial({ visible: false })]);
     B.box(A.x[1] - A.x[0] + 0.2, 0.4, 0.25, 0, A.h - 0.2, 0.0, M.kerb);                                  // the parapet
   }
   // ------------------------------------------------------------------ the next block (balconies: each its own group, on its north face)
@@ -278,7 +284,7 @@ function soBuildStreet(S) {
   }
   // ------------------------------------------------------------------ trees in the park (rooted: they bend and hold); their leaves (below)
   T.trees = [];
-  { const r = new RNG(29), spots = [[-58, -24], [-46, -36], [-60, -58], [-38, -70], [-22, -28], [24, -38], [16, -70], [42, -60], [58, -40], [-6, -88], [34, -88], [58, -76], [-52, -92], [-30, -50]];
+  { const r = new RNG(29), spots = [[-58, -24], [-46, -36], [-60, -58], [-38, -70], [-22, -28], [24, -38], [16, -70], [42, -60], [58, -40], [-6, -88], [47, -95], [58, -76], [-52, -92], [-30, -50]];
     for (const [x, z] of spots) T.trees.push(soBuildTree(root, x + r.range(-2, 2), z + r.range(-2, 2), r.range(10, 14), r.next(), M)); }
   T.roofs = [];
   // ------------------------------------------------------------------ the town around (far: static)
@@ -327,7 +333,8 @@ function soBuildStreet(S) {
       soBox(1.9, 0.05, 0.75, wood, 0, 0.75, 0, g); for (const dz of [-0.6, 0.6]) soBox(1.9, 0.05, 0.28, wood, 0, 0.45, dz, g); for (const dx of [-0.7, 0.7]) soBox(0.06, 0.75, 1.5, wood, dx, 0.37, 0, g, 0); }
   }
   // ---- fallen leaves on the grass and the pavements (lying still: on the ground nothing lets go of them)
-  { const N = 2600, r = new RNG(311), geo = new THREE.PlaneGeometry(0.2, 0.15), cols = ['#c8742c', '#d9a63a', '#a8402a', '#8a6a2a'].map((c) => new THREE.Color(c));
+  { const lf = new THREE.Shape(); lf.moveTo(-0.11, 0); lf.quadraticCurveTo(-0.04, 0.085, 0.1, 0.012); lf.lineTo(0.13, 0); lf.lineTo(0.1, -0.012); lf.quadraticCurveTo(-0.04, -0.085, -0.11, 0);   // (a leaf's outline, not a card)
+    const N = 2600, r = new RNG(311), geo = new THREE.ShapeGeometry(lf, 3), cols = ['#c8742c', '#d9a63a', '#a8402a', '#8a6a2a'].map((c) => new THREE.Color(c));
     const im = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.8, side: THREE.DoubleSide }), N); im.castShadow = false; im.receiveShadow = true;
     const M4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1);
     for (let i = 0; i < N; i++) { const P = SO_ST.park, onPark = r.next() < 0.8, x = onPark ? r.range(P.x[0] + 2, P.x[1] - 2) : r.range(-60, 80), z = onPark ? r.range(P.z[0] + 2, P.z[1] - 2) : r.range(-12, -0.3), ph = r.range(0, 6.28);
@@ -353,7 +360,7 @@ function soBuildStreet(S) {
     // the crown: blobs, yellow-brown (late October)
     const cm = [soStd('#c9a23a', 0.85, 0, { flatShading: true }), soStd('#b8862e', 0.85, 0, { flatShading: true }), soStd('#9a8a3a', 0.85, 0, { flatShading: true }), soStd('#d4b04a', 0.85, 0, { flatShading: true })];
     T.planeCrown = [[-1.6, 9.0, -0.8, 3.0], [1.9, 9.6, -0.3, 3.2], [0.3, 11.2, 1.4, 3.1], [-0.5, 8.0, 2.3, 2.4], [0.4, 12.6, 0.0, 2.6], [-2.6, 7.6, 1.0, 2.0], [2.8, 8.0, 1.6, 2.1]];
-    T.planeCrown.forEach(([x, y, z, r], i) => soMesh(soBlobGeo(r, 40 + i * 3), cm[i % 4], x, y, z, g));
+    T.planeLeaves = T.planeCrown.map(([x, y, z, r], i) => soMesh(soBlobGeo(r, 40 + i * 3), cm[i % 4], x, y, z, g));
     // the long low branch (world points in SO_ST.plane.branch), with twigs and a few leaf clusters along it
     const pts = P.branch.map((p) => new THREE.Vector3(p[0] - P.x, p[1], p[2] - P.z)), cv = new THREE.CatmullRomCurve3(pts);
     const tg = new THREE.TubeGeometry(cv, 40, 0.16, 10, false), pa = tg.attributes.position;
@@ -361,7 +368,7 @@ function soBuildStreet(S) {
     { const n = 41, rad = 11; for (let i = 0; i < n; i++) { const c = cv.getPointAt(i / 40), k = 1 - 0.55 * i / 40; for (let j = 0; j < rad; j++) { const id = i * rad + j; pa.setXYZ(id, c.x + (pa.getX(id) - c.x) * k, c.y + (pa.getY(id) - c.y) * k, c.z + (pa.getZ(id) - c.z) * k); } } pa.needsUpdate = true; tg.computeVertexNormals(); }
     const br = new THREE.Mesh(tg, bark); br.castShadow = br.receiveShadow = true; g.add(br); T.branchCurve = { cv, ox: P.x, oz: P.z };
     for (let i = 0; i < 6; i++) { const c = cv.getPointAt([0.33, 0.45, 0.57, 0.67, 0.75, 0.99][i]);   // (none where she hangs, u ≈ 0.86) const tw = soCyl(0.025, 0.04, 1.1, bark, c.x, c.y + 0.4, c.z, g, 6); tw.rotation.set(soR(i, 3) - 0.5, 0, (i % 2 ? 1 : -1) * 0.5);
-      soMesh(soBlobGeo(0.55 + 0.2 * soR(i, 4), 70 + i), cm[i % 4], c.x + (i % 2 ? 0.4 : -0.4), c.y + 1.0, c.z + 0.2 * (i % 3 - 1), g); }
+      T.planeLeaves.push(soMesh(soBlobGeo(0.55 + 0.2 * soR(i, 4), 70 + i), cm[i % 4], c.x + (i % 2 ? 0.4 : -0.4), c.y + 1.0, c.z + 0.2 * (i % 3 - 1), g)); }
     // the branch's world points, for the people hanging from it (t 0…1 → [x, y, z])
     T.branchAt = (u) => { const c = cv.getPointAt(MathX.clamp(u, 0, 1)); return [c.x + P.x, c.y, c.z + P.z]; };
   }

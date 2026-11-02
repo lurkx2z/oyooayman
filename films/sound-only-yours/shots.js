@@ -10,25 +10,23 @@ const SO_SHOTS = [];
 {
   const P = SO_SHOTS, c = soC, B = soB, W = soW;
   const L = [
-    // 1 — your kitchen, 9:41: the glass, "What...?", the clock, "Hello?", the news, the rain, the cat, nothing; you clap;
-    // the pulse of air; your body; the ringing; Mum; the stranger's texts; the window; the windows across the park
+    // 1 — your kitchen, 9:41: the glass, "What...?", the clock, "Hello?", a stranger's texts, the news, the rain, the
+    // cat, nothing; you clap; the pulse of air; your body; Mum; the window; the windows across the park
     ['A0', 'title', -1, soS('what') - 0.35],
     ['A1', 'what', soS('what') - 0.35, B('start')],
     ['A2', 'start', B('start'), c('start', 0) + 2.4, { cam: 'clock' }],
     ['A2b', 'start', c('start', 0) + 2.4, B('hello')],
-    ['A3', 'hello', B('hello'), B('room')],
+    ['A3', 'hello', B('hello'), B('text')],
+    ['A10', 'text', B('text'), B('room')],
     ['A4', 'room', B('room'), W('room', 0, 'rain') - 0.12, { cam: 'news' }],
     ['A4b', 'room', W('room', 0, 'rain') - 0.12, W('room', 0, 'cat') - 0.12, { cam: 'rain' }],
     ['A4c', 'room', W('room', 0, 'cat') - 0.12, c('room', 1) - 0.25, { cam: 'cat' }],
     ['A4d', 'room', c('room', 1) - 0.25, B('clap')],
     ['A5', 'clap', B('clap'), B('rule')],
     ['A6', 'rule', B('rule'), B('body')],
-    ['A7', 'body', B('body'), B('ring')],
-    ['A8', 'ring', B('ring'), B('mum')],
-    ['A9', 'mum', B('mum'), B('text')],
-    ['A10', 'text', B('text'), B('window')],
-    ['A11', 'window', B('window'), c('window', 2) - 0.3],
-    ['A11b', 'window', c('window', 2) - 0.3, B('faces'), { cam: 'map' }],
+    ['A7', 'body', B('body'), B('mum')],
+    ['A9', 'mum', B('mum'), B('window')],
+    ['A11', 'window', B('window'), B('faces')],
     ['A12', 'faces', B('faces'), c('faces', 1) - 0.3],
     ['A12b', 'faces', c('faces', 1) - 0.3, B('stairs'), { cam: 'reverse' }],
     // 2 — the stairwell, 9:47: down in the timer light; it goes out; behind you
@@ -43,21 +41,20 @@ const SO_SHOTS = [];
     ['C2', 'warn', B('warn'), B('heads')],
     ['C3', 'heads', B('heads'), B('storm')],
     ['C4', 'storm', B('storm'), B('park')],
-    // 4 — the park, 9:56: the middle; the bats; the shout and its echoes; 5 km; they come
-    ['D0', 'park', B('park'), B('bats')],
-    ['D1', 'bats', B('bats'), B('shout')],
+    // 4 — the park, 9:56: the middle; the shout and its echoes; 5 km; they come
+    ['D0', 'park', B('park'), B('shout')],
     ['D2', 'shout', B('shout'), c('shout', 1) + 0.9],
     ['D2b', 'shout', c('shout', 1) + 0.9, c('shout', 2) - 0.3, { cam: 'tower' }],
     ['D2c', 'shout', c('shout', 2) - 0.3, B('far'), { cam: 'map' }],
     ['D3', 'far', B('far'), B('coming')],
     ['D4', 'coming', B('coming'), c('coming', 1) - 0.3],
     ['D4b', 'coming', c('coming', 1) - 0.3, B('hide'), { cam: 'high' }],
-    // 5 — the dark under the trees, 10:09: the dog; the echo pictures; "Who's there?"; behind you
+    // 5 — the dark under the trees, 10:09: the dog; the echo pictures; "Who's there?"; the last click: behind you
     ['E0', 'hide', B('hide'), SO.tDog - 0.9],
     ['E0b', 'dog', SO.tDog - 0.9, B('echo')],
     ['E1', 'echo', B('echo'), B('who')],
-    ['E2', 'who', B('who'), B('question', 0.9)],
-    ['E3', 'question', B('question', 0.9), 1e9],
+    ['E2', 'who', B('who'), SO.tClicks[SO.tClicks.length - 1] - 0.95],
+    ['E3', 'question', SO.tClicks[SO.tClicks.length - 1] - 0.95, 1e9],
   ];
   for (const [id, mode, t0, t1, o] of L) P.push(soSh(id, mode, t0, t1, o || {}));
   P.forEach((s, i) => { if (i && Math.abs(s.t0 - P[i - 1].t1) > 1e-6) throw new Error(`SO_SHOTS: a gap or overlap before ${s.id}`); if (!(s.t1 > s.t0)) throw new Error(`SO_SHOTS: ${s.id} has no length`); });

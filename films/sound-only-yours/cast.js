@@ -6,7 +6,7 @@
    ===================================================================== */
 
 Object.assign(LOOKS, {
-  soNeigh: { skin: 0, build: 'avg', shirt: '#5a5246', sleeves: 'long', pants: '#3a3833', shoes: '#2a2018', sole: '#1a1612', hair: '#cfcac0', coat: false, collar: true },
+  soNeigh: { skin: 1, build: 'avg', shirt: '#5a5246', sleeves: 'long', pants: '#3a3833', shoes: '#2a2018', sole: '#1a1612', hair: '#5a544a', coat: false, collar: true },
   soUmb: { skin: 2, build: 'slim', shirt: '#2a3a4a', sleeves: 'long', pants: '#1f2228', shoes: '#1f1a16', sole: '#1a1612', hair: '#1a120c', hairStyle: 'long', coat: true, collar: true },
   soHood: { skin: 4, build: 'avg', shirt: '#3a3e44', sleeves: 'long', pants: '#2a2d33', shoes: '#e8e4dc', sole: '#f2f0ea', hair: '#141010', jacket: true, hood: true },
   soDogW: { skin: 1, build: 'broad', shirt: '#4a3a2e', sleeves: 'long', pants: '#33415a', shoes: '#3a2a20', sole: '#1a1612', hair: '#b8b0a4', coat: true, collar: true, scarf: '#7a2a24' },
@@ -65,21 +65,25 @@ SO_POSES.shout = () => { const p = basePose(); p.lSh = [0.5, 0.35]; p.rSh = [1.6
 
 // ---------------------------------------------------------------------------------------------------------------------
 // WHO IS WHERE. People are [look, x, z, yaw, pose|'walk', o] by scene. They all turn to you when you speak
-// (soTurnTo: a head-and-body turn that starts when your voice reaches them, distance / 343 s after you start).
+// (soTurnTo: a head-and-body turn that starts when your voice reaches them, distance / 337 s after you start).
 // ---------------------------------------------------------------------------------------------------------------------
 // the street, 9:52, in the rain (you come out of your block's door at x −4, z −0.6)
+// (most stand with their backs to you, so that when you call out you see every head come round, nearest first)
 const SO_STREET = [
-  ['soUmb', 3.0, -1.1, -2.2, 'umbrella'], ['casual2', 5.2, -1.4, 2.6, 'lookUp'], ['soHood', 9.6, -0.8, -1.2, 'phone'], ['casual6', 10.6, -1.2, 1.9, 'talk'],
-  ['soMum', -9.0, -1.0, 1.4, 'hug'], ['casual1', -12.4, -1.3, 1.2, 'stand'], ['casual4', -18.5, -10.6, 0.4, 'lookUp'], ['casual8', -6.0, -10.8, 0.2, 'stand'],
-  ['casual3', 7.5, -10.4, -0.6, 'phone'], ['casual5', 15.0, -10.9, -0.2, 'talk'], ['casual7', 21.0, -1.0, -1.7, 'stand'], ['soDogW', -2.0, -10.6, 0.5, 'lead'],
-  ['casual2', 26.0, -10.5, -0.9, 'lookUp'], ['soUmb', -24.0, -1.1, 1.5, 'umbrella'], ['casual6', 30.0, -1.3, -1.6, 'stand'], ['soHood', -30.0, -10.7, 0.9, 'phone'],
+  ['soUmb', 3.0, -1.1, 1.75, 'umbrella'], ['casual2', 5.2, -1.4, 1.45, 'lookUp'], ['soHood', 9.6, -0.8, 1.9, 'phone'], ['casual6', 10.6, -1.2, -1.75, 'talk'],
+  ['soMum', -9.0, -1.0, -1.4, 'hug'], ['casual1', -12.4, -1.3, 1.2, 'stand'], ['casual4', -18.5, -10.6, 0.4, 'lookUp'], ['casual8', -6.0, -10.8, 2.9, 'stand'],
+  ['casual3', 7.5, -10.4, 2.8, 'phone'], ['casual5', 15.0, -10.9, -2.9, 'talk'], ['casual7', 21.0, -1.0, 1.6, 'stand'], ['soDogW', -2.0, -10.6, 0.5, 'lead'],
+  ['casual2', 26.0, -10.5, 2.6, 'lookUp'], ['soUmb', -24.0, -1.1, -1.5, 'umbrella'], ['casual6', 30.0, -1.3, 1.5, 'stand'], ['soHood', -30.0, -10.7, 0.9, 'phone'],
+  ['casual1', 11.0, -10.2, 3.0, 'stand'], ['soMum', 13.2, -9.8, 2.8, 'phone'], ['casual4', 18.8, -10.3, -2.9, 'lookUp'], ['soUmb', 22.0, -9.9, 3.1, 'umbrella'],
 ];
+// the order their heads come round when you call out (nearest to the kerb first: a reaction each, not all at once)
+const SO_STREET_RANK = (() => { const K = SO_ST.you.kerb, d = SO_STREET.map((e, i) => [Math.hypot(e[1] - K[0], e[2] - K[2]), i]).sort((a, b) => a[0] - b[0]), R = []; d.forEach(([, i], r) => { R[i] = r; }); return R; })();
 // the crowd that comes to the only sound left (the park, 10:10): a loose ring round the plane tree where you hide
 const SO_RING = (() => {
   const r = new RNG(907), H = SO_ST.you.hide, out = [], looks = ['casual1', 'casual2', 'casual3', 'casual4', 'casual5', 'casual6', 'casual7', 'casual8', 'soUmb', 'soHood', 'soDogW', 'soMum', 'soMed'];
   for (let i = 0; i < 46; i++) {
-    const ring = i < 2 ? 0 : i < 14 ? 1 : i < 30 ? 2 : 3, a = i < 2 ? [0.4, 2.9][i] : r.range(0, SOPI * 2), d = i === 0 ? 7.0 : [7.0, 7.5, 10.5, 14.5][ring] + r.range(-0.8, 1.2);
-    out.push({ look: looks[i % looks.length], x: H[0] + Math.sin(a) * d, z: H[2] + Math.cos(a) * d, a, d, ring, ph: r.range(0, 6.28) });
+    const ring = i < 2 ? 0 : i < 14 ? 1 : i < 30 ? 2 : 3, a = i < 2 ? [-0.75, 2.9][i] : r.range(0, SOPI * 2), d = i === 0 ? 7.0 : [7.0, 7.5, 10.5, 14.5][ring] + r.range(-0.8, 1.2);
+    out.push({ look: i === 1 ? 'soHood' : looks[i % looks.length], x: H[0] + Math.sin(a) * d, z: H[2] + Math.cos(a) * d, a, d, ring, ph: r.range(0, 6.28) });
   }
   return out;
 })();
@@ -97,7 +101,8 @@ function soBuildCast(S) {
   C.ring = SO_RING.map((e, i) => mk(e.look, 'soR' + i));
   // umbrellas (a canopy and a stick in the right hand)
   const um = soStd('#1c1f26', 0.6, 0, { side: THREE.DoubleSide });
-  SO_STREET.forEach((e, i) => { if (e[4] !== 'umbrella') return; const h = C.street[i].j.ra.hand, g = new THREE.Group(); g.position.set(0, -0.05, 0.04); h.add(g);
+  // (held upright in the world, at the hand: a rig's hand can point anywhere)
+  SO_STREET.forEach((e, i) => { if (e[4] !== 'umbrella') return; const g = new THREE.Group(); scene.add(g); g.visible = false;
     soCyl(0.008, 0.008, 0.9, soStd('#2a2a2a', 0.5), 0, 0.42, 0, g, 6); const c = soMesh(new THREE.ConeGeometry(0.55, 0.22, 10, 1, true), um, 0, 0.92, 0, g); c.castShadow = true; C.street[i].umb = g; });
   // phones (their screens glow) in the hands of everyone in the ring and of the ones on their phones in the street
   const scr = new THREE.MeshBasicMaterial({ color: '#cfe0ff' }), torchTex = soDotTex(0.2);
@@ -134,10 +139,11 @@ function soCastUpdate(C, s, o) {
       let p = SO_POSES[pose === 'lead' ? 'lead' : pose] ? SO_POSES[pose === 'lead' ? 'lead' : pose]() : SO_POSES.stand();
       p = soFidget(p, s, i, 1.4);
       if (pose === 'talk' || pose === 'hug') talk(p, s, i);
-      const d = Math.hypot(x - you[0], z - you[2]), k = soTurn(t, tv, d), yTo = soYaw(you[0] - x, you[2] - z);
+      const d = Math.hypot(x - you[0], z - you[2]), lag = 0.25 + 0.3 * SO_STREET_RANK[i], k = tv == null ? 0 : soEase(t, tv + d / SOP.c + lag, tv + d / SOP.c + lag + 0.8), yTo = soYaw(you[0] - x, you[2] - z);
       const yaw = yaw0 + soAng(yTo - yaw0) * k;
       if (k > 0) { p.headYaw *= (1 - k); p.mouth = (p.mouth || 0) * (1 - k); p.neck = p.neck * (1 - k) + 0.02 * k; }
       soPlace(P, soSt(p, x, z, yaw));
+      if (P.umb) { P.root.updateMatrixWorld(true); const hw = P.j.ra.hand.getWorldPosition(new THREE.Vector3()); P.umb.position.set(hw.x, hw.y - 0.2, hw.z); }
     });
   }
   // the crowd round the tree in the dark (echo pictures): standing still, facing you; at "Who's there?" a step closer
@@ -148,9 +154,10 @@ function soCastUpdate(C, s, o) {
       if (mode === 'hide' || mode === 'dog') { P.root.visible = false; return; }        // (they're not there yet, as far as you know)
       const step = soEase(t, tw + e.d / SOP.c + 0.2 + 0.05 * (i % 5), tw + e.d / SOP.c + 1.0 + 0.05 * (i % 5));
       let d = e.d - 0.7 * step;
-      if (i === 1) d = SO_BEHIND.d0 + (SO_BEHIND.d1 - SO_BEHIND.d0) * soEase(t, soC('who', 2), soC('question', 0) - 0.6);
+      if (i === 1) d = SO_BEHIND.d0 + (SO_BEHIND.d1 - SO_BEHIND.d0) * soEase(t, soC('who', 2), SO.tClicks[SO.tClicks.length - 1] - 0.15);
       const a = i === 1 ? SO_BEHIND.a : e.a, x = H[0] + Math.sin(a) * d, z = H[2] + Math.cos(a) * d;
       const p = SO_POSES.stand(); p.neck = 0.12; p.headYaw = 0.05 * Math.sin(e.ph); p.spine = 0.04;
+      if (i === 1) { p.neck = 0.32; p.headRoll = 0.16; p.spine = 0.08; }               // (the one behind you: looking down at you, head on one side)
       const ph = Math.max(0, step - 0.0) * SOPI * 2;
       if (step > 0 && step < 1) { const w = soWalkPose(ph, 0.6); Object.assign(p, w); }
       soPlace(P, soSt(p, x, z, soYaw(H[0] - x, H[2] - z)));
@@ -169,7 +176,7 @@ function soCastUpdate(C, s, o) {
       soPlace(P, w); if (P.phone) { P.phone.visible = true; P.torch.visible = true; }
     });
   }
-  C.street.forEach((P) => { if (!on.has(P)) P.root.visible = false; });
+  C.street.forEach((P) => { if (!on.has(P)) P.root.visible = false; if (P.umb) P.umb.visible = P.root.visible; });
   C.ring.forEach((P) => { if (!on.has(P)) P.root.visible = false; });
   // the dog on its lead in the street: barking at you (its jaw snaps; no sound)
   const dogOn = mode === 'street' || mode === 'heads';

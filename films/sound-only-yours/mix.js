@@ -17,7 +17,7 @@ window.SO_MIX = {
     music: (t) => {
       const D = (a, b, db, fi = 0.4, fo = 0.6) => db * soSm(t, a - fi, a) * (1 - soSm(t, b, b + fo));
       let v = D(SO.tClap - 0.7, SO.tClap + 1.0, -12, 0.9, 1.6);
-      v += D(soC('body', 0) + 1.5, soB('ring') + 0.5, -7, 2.0, 1.0);
+      v += D(soC('body', 0) + 1.5, soB('mum') - 0.4, -4, 2.0, 1.0);
       for (const c of SO_VOICE) { const d = { y_okay: -9, y_who: -8, y_count: -5, y_street: -4, y_shout: 0 }[c.id] ?? -6; v += D(c.start - 0.1, c.start + c.seconds - 0.1, d, 0.4, 0.7); }
       v += D(soC('stairs', 2) - 0.5, SO.tTurn - 0.4, -5, 1.0, 0.2);
       const tN = soC('storm', 3), P0 = soB('park');
