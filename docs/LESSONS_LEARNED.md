@@ -164,7 +164,7 @@ baking.
 **Bitrate vs texture (2026-11-02, eren-light)**
 - **The 30 MiB cap destroys fine texture.** The "living manga" look covers every frame in screentone dots. At 30 MiB for
   5:49 (565 kbps), x264 smeared the dots and the owner said it "looks like 480p", though the file was a true 1080p.
-  Measured on a hard 12 s clip (SSIM vs the master): 565k → 0.87, CRF 24 (5.6 Mbps) → 0.988, CRF 21 (7.4 Mbps) → 0.992.
+  Measured on a hard 12 s clip (SSIM vs the master): the delivered 565k file → 0.93, CRF 24 (5.6 Mbps) → 0.988, the 8 Mbps two-pass file → 0.990.
   For dotted, grainy or noisy looks, also deliver a **YouTube upload file at ~8 Mbps** (two-pass, `-maxrate 12M`),
   ~350 MB for 6 min, through the project folder. The small file is only a preview.
 
