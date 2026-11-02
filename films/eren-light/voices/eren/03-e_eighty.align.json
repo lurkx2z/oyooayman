@@ -1,158 +1,158 @@
 {
  "id": "03-e_eighty",
  "text": "Eighty percent.",
- "seconds": 1.67,
+ "seconds": 1.59,
  "source": "forced-alignment",
  "words": [
   {
    "text": "Eighty",
-   "start": 0.06,
-   "end": 0.26
+   "start": 0.08,
+   "end": 0.28
   },
   {
    "text": "percent.",
    "start": 0.38,
-   "end": 0.98
+   "end": 0.96
   }
  ],
  "characters": [
   {
    "text": "E",
    "start": 0,
-   "end": 0.032
+   "end": 0.048
   },
   {
    "text": "i",
-   "start": 0.032,
-   "end": 0.064
-  },
-  {
-   "text": "g",
-   "start": 0.064,
+   "start": 0.048,
    "end": 0.096
   },
   {
-   "text": "h",
+   "text": "g",
    "start": 0.096,
-   "end": 0.128
+   "end": 0.144
+  },
+  {
+   "text": "h",
+   "start": 0.144,
+   "end": 0.192
   },
   {
    "text": "t",
-   "start": 0.128,
-   "end": 0.16
+   "start": 0.192,
+   "end": 0.24
   },
   {
    "text": "y",
-   "start": 0.16,
-   "end": 0.32
+   "start": 0.24,
+   "end": 0.28
   },
   {
    "text": " ",
-   "start": 0.32,
-   "end": 0.64
+   "start": 0.28,
+   "end": 0.32
   },
   {
    "text": "p",
-   "start": 0.64,
+   "start": 0.32,
+   "end": 0.411
+  },
+  {
+   "text": "e",
+   "start": 0.411,
+   "end": 0.503
+  },
+  {
+   "text": "r",
+   "start": 0.503,
+   "end": 0.594
+  },
+  {
+   "text": "c",
+   "start": 0.594,
    "end": 0.686
   },
   {
    "text": "e",
    "start": 0.686,
-   "end": 0.731
-  },
-  {
-   "text": "r",
-   "start": 0.731,
    "end": 0.777
   },
   {
-   "text": "c",
+   "text": "n",
    "start": 0.777,
-   "end": 0.823
-  },
-  {
-   "text": "e",
-   "start": 0.823,
    "end": 0.869
   },
   {
-   "text": "n",
-   "start": 0.869,
-   "end": 0.914
-  },
-  {
    "text": "t",
-   "start": 0.914,
+   "start": 0.869,
    "end": 0.96
   },
   {
    "text": ".",
    "start": 0.96,
-   "end": 1.6
+   "end": 1.52
   }
  ],
  "tts_words": [
   {
    "text": "Eighty",
    "start": 0,
-   "end": 0.32
+   "end": 0.28
   },
   {
    "text": "percent.",
-   "start": 0.64,
-   "end": 1.6
+   "start": 0.32,
+   "end": 1.52
   }
  ],
  "characters_forced": [
   {
    "text": "E",
-   "start": 0.06,
-   "end": 0.1
+   "start": 0.08,
+   "end": 0.12
   },
   {
    "text": "i",
-   "start": 0.1,
-   "end": 0.12
+   "start": 0.12,
+   "end": 0.14
   },
   {
    "text": "g",
-   "start": 0.12,
-   "end": 0.12
+   "start": 0.14,
+   "end": 0.14
   },
   {
    "text": "h",
-   "start": 0.12,
-   "end": 0.18
+   "start": 0.14,
+   "end": 0.2
   },
   {
    "text": "t",
-   "start": 0.18,
-   "end": 0.24
-  },
-  {
-   "text": "y",
-   "start": 0.24,
+   "start": 0.2,
    "end": 0.26
   },
   {
-   "text": " ",
+   "text": "y",
    "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": " ",
+   "start": 0.28,
    "end": 0.38
   },
   {
    "text": "p",
    "start": 0.38,
-   "end": 0.4
+   "end": 0.42
   },
   {
    "text": "e",
-   "start": 0.4,
+   "start": 0.42,
    "end": 0.44
   },
   {
    "text": "r",
-   "start": 0.44,
+   "start": 0.46,
    "end": 0.6
   },
   {
@@ -163,22 +163,22 @@
   {
    "text": "e",
    "start": 0.7,
-   "end": 0.72
+   "end": 0.74
   },
   {
    "text": "n",
-   "start": 0.72,
+   "start": 0.74,
    "end": 0.82
   },
   {
    "text": "t",
    "start": 0.82,
-   "end": 0.98
+   "end": 0.96
   },
   {
    "text": ".",
-   "start": 0.98,
-   "end": 0.98
+   "start": 0.96,
+   "end": 0.96
   }
  ]
 }
