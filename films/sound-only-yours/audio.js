@@ -1,23 +1,22 @@
 /* =====================================================================
-   AUDIO — "What if everything you dropped fell up for 10 minutes?" js/audio/audioEngine.js is unchanged (this is a
-   subclass); the SOP and generators come from audiokit.js (via the Friction 10s film). No narrator: the captions are
-   silent and the sound carries the gaps. Three stems:
-     music  an original score: a theme that climbs every time something falls up; the pulse that speeds up with the
-            apple; a drone and a heartbeat for the runner; dread to 3:10; one huge hit; the theme coming back down
-            (sound-music.js)
-     amb    your kitchen (room tone, the fridge, the street through the glass), the street and the park (a murmur,
-            birds, the fountain's hiss), a warning siren far off from 3:07:20 (sound-amb.js)
-     sfx    the events at their story seconds (each heard once: the clock only runs forward; stretched and pitched
-            down in slow motion) (sound-sfx.js)
-   A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
+   AUDIO — "What if every sound vanished except yours?" js/audio/audioEngine.js is unchanged (this is a subclass); the
+   generators come from audiokit.js (via the Friction 10s and falls-up films). No narrator: the captions are silent.
+   The world goes quiet 0.7 s in; from then on the only sounds are yours (your voice: the character's lines, made with
+   ElevenLabs, voices.js) and the score. Three stems:
+     music  an original eerie score that leads the whole way (sound-music.js)
+     amb    the world for its last 0.7 seconds; after that only the room you are in, as your own sounds light it up
+            (reverbs), the tinnitus (sound-amb.js)
+     sfx    your sounds: your voice, claps, steps, breath, heart, clicks and their echoes (sound-yours.js)
+   A dynamics map per stem (mix.js), then a true-peak limiter. Everything but the voice is synthesised from seeded
+   noise and maths.
    ===================================================================== */
 
 const SO_STEMS = ['music', 'amb', 'sfx'];
 const SO_SOUND = { music: [], amb: [], sfx: [] };
 function soSound(stem, name, fn) { SO_SOUND[stem].push({ name, fn }); }
 
-// dynamics map keys: [beat, offset s, dB]; beat = a FU key ('tB') or a number (seconds)
-function soBeat(b) { if (typeof b === 'number') return b; if (FU[b] == null) throw new Error('dyn: unknown beat ' + b); return Array.isArray(FU[b]) ? FU[b][0] : FU[b]; }
+// dynamics map keys: [beat, offset s, dB]; beat = a film second, an SO key ('tShout', 'end') or a caption beat id
+function soBeat(b) { if (typeof b === 'number') return b; if (SO[b] != null) return Array.isArray(SO[b]) ? SO[b][0] : SO[b]; if (SOT_ID[b]) return soS(b); throw new Error('dyn: unknown beat ' + b); }
 function soDynDb(t, keys) {
   if (!keys || !keys.length) return 0;
   const K = keys.map(([b, o, d]) => [soBeat(b) + o, d]).sort((a, b) => a[0] - b[0]);
@@ -62,12 +61,12 @@ function soLimit(buf, ceilDb) {
 }
 
 class SoAudio extends AudioEngine {
-  constructor(tl, app) { super(tl); this.app = app; this.wavName = 'falls-up-soundtrack.wav'; this.solo = null; }
+  constructor(tl, app) { super(tl); this.app = app; this.wavName = 'sound-only-yours-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
-    const consts = { SOP, SO_ROOM, SO_ST, SO_CLOCK, SO_SHOTS, SO_HELD, SO_CATP, SO_CAT_LAND, SO_RUN, SO_DOGP, SO_CLUTTER, SO_CH, SO_THEME, SO_BOUNCE, SO_TAP, SO_CDM, fly: Object.entries(SO_FLY).map(([k, f]) => [k, f.s0, f.sLand, f.hTop]) };
-    return [FU, SOT, window.SO_MIX, Object.values(SOX).map(String).join(''), SoFx.toString(), Object.getOwnPropertyNames(SoFx.prototype).map((k) => String(SoFx.prototype[k])).join(''),
+    const consts = { SOP, SO_ROOM, SO_ST, SO_CLOCK, SO_SHOTS, SO_ECHO, SO_NOISE, SO_VOICE, SO_WALL, voices: Object.entries(window.SO_VOICES || {}).map(([k, v]) => [k, v.n, v.h]) };
+    return [SO, SOT, window.SO_MIX, Object.values(SOX).map(String).join(''), SoFx.toString(), Object.getOwnPropertyNames(SoFx.prototype).map((k) => String(SoFx.prototype[k])).join(''),
       Object.values(SO_SOUND).flat().map((b) => b.name + b.fn).join(''), soDynDb.toString(), SoAudio.toString(), soLimit.toString(), soStoryAt.toString(), consts,
-      (window.SO_SOUND_FNS || SO_SOUND_FNS || []).map(String).join(''), [soShotAt, soFlight, soHop, soDropBack, soWaterH, soCatState, soKettleAt, soRunner, soDogState, soMusicKit, soPulse, soRestY, soOverTable, soSm, soDropBounce, soShot, soCdMach, soMach, soClear].map(String).join('')];
+      (window.SO_SOUND_FNS || []).map(String).join(''), Object.values(window.SO_MIX.dyn || {}).map(String).join(''), [soShotAt, soShot, soSm, soHeard, soEchoDb, soClockParts].map(String).join('')];
   }
   // AudioEngine's fingerprint, with every number rounded to 7 significant digits: browsers' Math.exp/sin/acosh… can
   // differ in the last bit (Safari, Firefox), and then the baked copy was refused and the whole soundtrack rendered
@@ -126,7 +125,7 @@ class SoAudio extends AudioEngine {
       node.connect(trim); trim.connect(dynG); dynG.connect(master);
       const dyn = (M.dyn || {})[id];
       const n = Math.ceil(END * 100) + 1, c = new Float32Array(n);
-      for (let i = 0; i < n; i++) { const t = i / 100; c[i] = Math.pow(10, soDynDb(t, dyn) / 20); }
+      for (let i = 0; i < n; i++) { const t = i / 100; c[i] = Math.pow(10, (typeof dyn === 'function' ? dyn(t) : soDynDb(t, dyn)) / 20); }
       dynG.gain.setValueCurveAtTime(c, 0, END);
       for (const b of SO_SOUND[id]) b.fn.call(this, ctx, bus, this._kit(ctx, id, bus), END);
     }

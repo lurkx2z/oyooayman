@@ -32,6 +32,7 @@ const VO_LEAD = 0.12;                // a spoken line starts this long after its
 const VO_TAIL = 0.45;                // ...and its caption stays this long after the line ends
 const hold = (s) => Math.min(4.4, Math.max(1.6, 1.0 + 0.052 * s.length));
 const TITLE_HOLD = 3.4;
+const LAST_HOLD = 3.6;                // the last question stays up long enough to sit with it
 const r3 = (x) => Math.round(x * 1000) / 1000;
 
 const text = fs.readFileSync(path.join(DIR, 'CAPTIONS.md'), 'utf8').replace(/^---[\s\S]*?\n---\n/, '');
@@ -50,7 +51,7 @@ beats.forEach((B, k) => {
     const vm = /^\{(\w+)\}\s*(.*)$/.exec(s0), s = vm ? vm[2] : s0;
     let d, voice = null;
     if (vm) { const v = VO[vm[1]]; const sec = v ? v.seconds : Math.max(1.0, 0.075 * s.length); voice = { id: vm[1], file: v ? v.file : null, start: r3(c0 + VO_LEAD), seconds: sec }; d = Math.max(1.2, VO_LEAD + sec + VO_TAIL); }
-    else d = B.id === 'title' ? TITLE_HOLD : hold(s);
+    else d = B.id === 'title' ? TITLE_HOLD : k === beats.length - 1 && i === B.caps.length - 1 ? LAST_HOLD : hold(s);
     const ws = s.split(' ');
     const cap = { text: s, show: c0, hide: r3(c0 + d), words: ws.map((w, j) => ({ text: w, start: r3(c0 + 0.7 * d * j / ws.length) })) };
     if (voice) cap.voice = voice;

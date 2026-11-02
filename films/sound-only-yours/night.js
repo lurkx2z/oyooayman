@@ -28,7 +28,7 @@ function soFlatsSchedule() {
   SO_FLATS.forEach((w) => { if (w.lit0 && w.who == null && r.next() < 0.7) w.who = t0 + (t1 - t0) * r.next(); });
 }
 function soBuildFlats(root) {
-  const F = SO_ST.blockS, B = new Batcher(), z = F.z[0];
+  const F = SO_ST.blockS, B = new Batcher(), z = F.z[1];                  // (its north face: towards you)
   const conc = soStd('#ffffff', 0.92, 0, { map: soTex(soBlockFacade(31, F.x[1] - F.x[0], F.h, { cols: [], x0: F.x[0], floors: F.floors, base: '#b7b0a3' }), { repeat: false }) });
   const side = soStd('#a8a296', 0.95);
   const m = new THREE.Mesh(new THREE.BoxGeometry(F.x[1] - F.x[0], F.h, F.z[1] - F.z[0]), [side, side, soStd('#3a3836', 0.95), side, conc, side]);
@@ -50,7 +50,7 @@ function soBuildFlats(root) {
 }
 const _soFc = new THREE.Color(), _soFm = new THREE.Matrix4();
 function soFlatsUpdate(win, who, t) {
-  const z = SO_ST.blockS.z[0], F = SO_ST.blockS;
+  const z = SO_ST.blockS.z[1], F = SO_ST.blockS;
   SO_FLATS.forEach((w, i) => {
     const k = w.on == null ? 0 : MathX.clamp((t - w.on) / 0.12, 0, 1);
     const lit = w.warm < 0.6 ? [1.0, 0.78, 0.48] : w.warm < 0.85 ? [1.0, 0.64, 0.32] : [0.78, 0.86, 1.0], dark = [0.04, 0.05, 0.07], b = 0.85 + 0.15 * w.k;
@@ -69,9 +69,9 @@ function soFlatsUpdate(win, who, t) {
 function soBuildTower(root) {
   const T = SO_ST.tower, w = T.x[1] - T.x[0], d = T.z[1] - T.z[0];
   const fc = soBlockFacade(41, w, T.h, { cols: Array.from({ length: 6 }, (_, i) => T.x[0] + 3 + i * 5.2), x0: T.x[0], floors: T.floors, base: '#9d978c' });
-  const fm = soFacadeMat(fc); fm.emissiveIntensity = 1.0;
-  const sd = soFacadeMat(soBlockFacade(42, d, T.h, { cols: [T.z[0] + 4, T.z[0] + 10], x0: T.z[0], floors: T.floors, base: '#9d978c' })); sd.emissiveIntensity = 1.0;
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, T.h, d), [sd, sd, soStd('#3a3836', 0.95), sd, soStd('#8d877c', 0.95), fm]);
+  const fm = soFacadeMat(fc); fm.emissiveIntensity = 1.0; fm.userData.keep = true;
+  const sd = soFacadeMat(soBlockFacade(42, d, T.h, { cols: [T.z[0] + 4, T.z[0] + 10], x0: T.z[0], floors: T.floors, base: '#9d978c' })); sd.emissiveIntensity = 1.0; sd.userData.keep = true;
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, T.h, d), [sd, sd, soStd('#3a3836', 0.95), sd, fm, soStd('#8d877c', 0.95)]);    // (its windows face the park: +z)
   m.position.set((T.x[0] + T.x[1]) / 2, T.h / 2, (T.z[0] + T.z[1]) / 2); root.add(m);
   // a red aircraft light on the roof
   const red = new THREE.Mesh(new THREE.SphereGeometry(0.35, 10, 8), new THREE.MeshBasicMaterial({ color: '#ff2a1a', toneMapped: false })); red.position.set((T.x[0] + T.x[1]) / 2, T.h + 1.2, (T.z[0] + T.z[1]) / 2); root.add(red);
@@ -162,7 +162,7 @@ function soBuildBats(scene) {
     const g = new THREE.Group(); soMesh(new THREE.SphereGeometry(0.035, 8, 6).scale(1, 0.9, 1.6), m, 0, 0, 0, g);
     const wing = (sd) => { const p = new THREE.Group(); g.add(p); const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(sd * 0.17, 0.03); sh.lineTo(sd * 0.15, -0.02); sh.lineTo(sd * 0.11, 0.0); sh.lineTo(sd * 0.08, -0.04); sh.lineTo(sd * 0.04, -0.05); sh.closePath();
       const w = new THREE.Mesh(new THREE.ShapeGeometry(sh), m); w.rotation.x = -Math.PI / 2; p.add(w); return p; };
-    g.userData.w = [wing(-1), wing(1)]; g.visible = false; scene.add(g); bats.push(g);
+    g.userData.w = [wing(-1), wing(1)]; g.scale.setScalar(1.5); g.visible = false; scene.add(g); bats.push(g);
   }
   return bats;
 }
@@ -194,8 +194,8 @@ function fuzz(i) { return hash1(i * 131 + 7); }
 // ---------------------------------------------------------------------------------------------------------------------
 function soBuildMovers(root, T) {
   const VF = new VehicleFactory(), out = {};
-  const car = VF.build('ev', '#3a3f46'); const g = new THREE.Group(); g.add(car.group); root.add(g); out.ev = { g, o: car };
-  const amb = VF.build('van', '#eceae2'); const ga = new THREE.Group(); ga.add(amb.group); root.add(ga); out.amb = { g: ga, o: amb };
+  const car = VF.build('ev', '#3a3f46'); const g = new THREE.Group(); car.group.position.x = -2.36; g.add(car.group); root.add(g); out.ev = { g, o: car };
+  const amb = VF.build('van', '#eceae2'); const ga = new THREE.Group(); amb.group.position.x = -2.65; ga.add(amb.group); root.add(ga); out.amb = { g: ga, o: amb };
   // the ambulance's markings and its light bar (blue, flashing)
   { const chk = soTex(soCanvas(256, 32, (c, w, h) => { for (let x = 0; x < w; x += 32) for (let y = 0; y < h; y += 16) { c.fillStyle = ((x + y) / 16) % 2 ? '#1f8a3a' : '#e8d23a'; c.fillRect(x, y, 32, 16); } }));
     for (const sd of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.4), soStd('#ffffff', 0.5, 0, { map: chk })); p.position.set(0, 0.95, sd * 1.01); if (sd < 0) p.rotation.y = Math.PI; ga.add(p); }
@@ -208,14 +208,15 @@ function soBuildMovers(root, T) {
 }
 // the EV: along the near lane (z −4.7), east to west (+x) at 30 km/h; it passes the kerb where you step out at SO.tCar
 const SO_EV = { z: -4.75, v: 8.33 };
-const SO_AMB = { z: -7.1, v: 11.1, x0: 70 };
+const SO_AMB = { z: -7.1, v: 11.1, x0: -70 };                 // (the far lane: west, +x)
 function soMoversUpdate(M, t, mode) {
   const K = SO_ST.you.kerb;
   M.ev.g.visible = mode === 'car';
-  if (M.ev.g.visible) { const x = K[0] + SO_EV.v * (t - SO.tCar); M.ev.g.position.set(x, 0, SO_EV.z); M.ev.g.rotation.y = 0; M.ev.o.wheels && M.ev.o.wheels.forEach((w) => { w.rotation.z = -x / M.ev.o.r; }); }
+  // (the near lane carries traffic east, −x: it comes at you from your right)
+  if (M.ev.g.visible) { const x = K[0] - SO_EV.v * (t - SO.tCar); M.ev.g.position.set(x, 0, SO_EV.z); M.ev.g.rotation.y = Math.PI; }
   M.amb.g.visible = mode === 'warn';
   if (M.amb.g.visible) {
-    const x = SO_AMB.x0 - SO_AMB.v * (t - soS('warn')); M.amb.g.position.set(x, 0, SO_AMB.z); M.amb.g.rotation.y = Math.PI;
+    const x = SO_AMB.x0 + SO_AMB.v * (t - soS('warn')); M.amb.g.position.set(x, 0, SO_AMB.z); M.amb.g.rotation.y = 0;
     const ph = (t * 2.6) % 1; M.amb.blue[0].visible = ph < 0.25 || (ph > 0.5 && ph < 0.6); M.amb.blue[1].visible = (ph > 0.25 && ph < 0.4) || ph > 0.75;
     M.amb.light.intensity = (M.amb.blue[0].visible || M.amb.blue[1].visible) ? 60 : 0;
   }
@@ -226,7 +227,7 @@ function soMoversUpdate(M, t, mode) {
 // SCREENS: your laptop (the news, the presenter talking: you can't hear a word), your phone (the call, the texts)
 // ---------------------------------------------------------------------------------------------------------------------
 function soBuildLaptop(R) {
-  const g = new THREE.Group(), P = SO_K.laptop; g.position.set(P[0], P[1], P[2]); g.rotation.y = 0.35 + Math.PI; R.room.add(g);
+  const g = new THREE.Group(), P = SO_K.laptop; g.position.set(P[0], P[1], P[2]); g.rotation.y = -0.45; R.room.add(g);   // (its screen towards where you stand)
   const al = soStd('#9ea3a8', 0.35, 0.7);
   soBox(0.32, 0.014, 0.22, al, 0, 0.007, 0, g);
   const lid = new THREE.Group(); lid.position.set(0, 0.014, -0.11); lid.rotation.x = -0.22; g.add(lid);
@@ -271,6 +272,13 @@ function soDrawPhone(g, w, h, st) {
     g.strokeStyle = 'rgba(159,224,168,0.8)'; g.lineWidth = 4; g.beginPath(); g.moveTo(60, 470); g.lineTo(w - 60, 470); g.stroke();
     g.fillStyle = '#c8322a'; g.beginPath(); g.arc(w / 2, 650, 46, 0, 6.283); g.fill();
     g.textAlign = 'left';
+    return;
+  }
+  // a note he types to you (the notes app: big letters, a blinking cursor)
+  if (st.mode === 'note') {
+    g.fillStyle = '#f4f1ea'; g.fillRect(0, 60, w, h - 60); g.fillStyle = '#c9a54a'; g.fillRect(0, 60, w, 70); g.fillStyle = '#2a2418'; g.font = '700 30px Arial'; g.fillText('Notes', 24, 106);
+    g.fillStyle = '#141414'; g.font = '800 64px Arial'; const L1 = soWrap(g, st.a + (st.b ? '' : (st.cur ? '|' : '')), 310); L1.forEach((l, i) => g.fillText(l, 26, 230 + i * 74));
+    if (st.b) { g.font = '600 40px Arial'; const L2 = soWrap(g, st.b + (st.cur ? '|' : ''), 310); L2.forEach((l, i) => g.fillText(l, 26, 250 + L1.length * 74 + i * 50)); }
     return;
   }
   // a message thread

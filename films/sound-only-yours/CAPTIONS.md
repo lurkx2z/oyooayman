@@ -17,7 +17,7 @@ status: voiceless (no narrator; your own lines are spoken: VO-you.md)
 
 [hello] {y_hello} “Hello?”
 
-[room] The TV. The rain. The cat. / Nothing.
+[room] The news. The rain. The cat. / Nothing.
 
 [clap] You clap. / You hear it.
 
@@ -57,7 +57,7 @@ status: voiceless (no narrator; your own lines are spoken: VO-you.md)
 
 [far] On a silent night, a shout carries about 5 km. / About 400,000 people just heard you.
 
-[coming] They've heard nothing else for 15 minutes. / From every street round the park, people start walking. / Towards the only sound left.
+[coming] They've heard nothing else for 16 minutes. / From every street round the park, people start walking. / Towards the only sound left.
 
 [hide] 10:09. You hide in the dark, under the trees. / You don't hear the dog.
 

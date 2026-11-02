@@ -86,7 +86,7 @@ function soBuildRoom(S) {
     bulb: new THREE.MeshBasicMaterial({ color: '#fff1d0' }), flex: soStd('#1c1c1e', 0.6),
     cup: new THREE.MeshPhysicalMaterial({ color: '#dfeaee', transparent: true, opacity: 0.46, roughness: 0.04, envMapIntensity: 1.6, depthWrite: false, side: THREE.DoubleSide }),
     water: new THREE.MeshStandardMaterial({ color: '#9cc9e4', transparent: true, opacity: 0.6, roughness: 0.02, metalness: 0.15, envMapIntensity: 2.6, depthWrite: false, side: THREE.DoubleSide }),
-    wet: new THREE.MeshStandardMaterial({ color: '#a4bccb', transparent: true, opacity: 0.72, roughness: 0.02, metalness: 0.2, envMapIntensity: 2.2, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }),
+    wet: new THREE.MeshStandardMaterial({ color: '#3a3026', transparent: true, opacity: 0.42, roughness: 0.02, metalness: 0.2, envMapIntensity: 2.2, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }),
     tea: new THREE.MeshStandardMaterial({ color: '#9a5a1e', transparent: true, opacity: 0.8, roughness: 0.04, metalness: 0.05, envMapIntensity: 1.8, side: THREE.DoubleSide }),
     teaPool: new THREE.MeshStandardMaterial({ color: '#8a4e18', transparent: true, opacity: 0.74, roughness: 0.02, metalness: 0.1, envMapIntensity: 2.0, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }),
     shard: new THREE.MeshStandardMaterial({ color: '#f4fbff', transparent: true, opacity: 0.85, roughness: 0.02, metalness: 0.3, envMapIntensity: 2.4, side: THREE.DoubleSide, depthWrite: false }),

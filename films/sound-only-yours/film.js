@@ -1,5 +1,5 @@
 /* =====================================================================
-   FILM — "What if days kept getting shorter and couldn't stop?"
+   FILM — "What if every sound vanished except yours?"
      build(app)    every set (each its own THREE.Scene + camera), the HUD, the soundtrack
      update(app,t) the shot's set and camera (shots.js), the HUD (hud.js)
      view(app,t)   [the shot's scene, its camera]
@@ -65,13 +65,13 @@ const FILM = {
     p.exposure = 1.0; p.saturation = 1.04; p.contrast = 1.06; p.warmth = 0.0; p.blackLift = 0.006;
     p.vignette = 0.52; p.soft = 0.06; p.bloom = 0.34; p.bloomThreshold = 0.95; p.grain = 0.026;
     p.tunnel = 1.25; p.tunnelSoft = 0.5; p.tunnelDark = 0; p.keepWarm = 0; p.uneven = 0;
-    p.flashColor.setRGB(1, 1, 1);
+    p.flashColor.setRGB(0.85, 0.88, 1);
     const set = FILM._set;
     if (set && set.grade) set.grade(t, p, shot);
     // every cut: a 2-frame dip
     for (const c of FILM._cuts) if (Math.abs(t - c) < 0.07) p.fade = Math.max(p.fade, 0.3 * (1 - Math.abs(t - c) / 0.07));
-    // the end: no fade-out and no black (nothing signals the end): the film stops on the question, mid-shot
+    // the end: no fade-out (nothing signals the end): the film stops on the question, on the face behind you
   },
 
-  debug(app, t) { const s = FILM._shot, st = soStoryAt(t), c = soClockParts(st); return `shot ${s ? s.id : '-'} · mode ${s ? s.mode : '-'} · ${c.day} ${c.h}:${String(c.m).padStart(2, '0')}:${String(c.sec).padStart(2, '0')} ${c.pm ? 'PM' : 'AM'} · s ${st.toFixed(1)} · ×${soRateAt(t).toFixed(1)} · day ${(soDay(st) / 60).toFixed(1)} min · down ${soTiltDeg(st).toFixed(2)}°`; },
+  debug(app, t) { const s = FILM._shot, st = soStoryAt(t); return `shot ${s ? s.id : '-'} · mode ${s ? s.mode : '-'} · ${soHMS(st)} PM · s ${st.toFixed(1)} · ×${soRateAt(t).toFixed(2)} · heard by ${Math.round(soHeardBy(t))}`; },
 };

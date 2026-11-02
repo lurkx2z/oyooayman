@@ -58,9 +58,9 @@ const SO_ST = {
   // the plane tree by the path: trunk at (x, z), its long low branch reaching out over the path, east (−x)
   // across the park: a block of flats facing yours (6 floors, its windows one by one), and the tower block beyond
   blockS: { x: [-52, 52], z: [-118, -106], h: 18.6, floors: 6, pitch: 4.0, win: [2.2, 1.5] },
-  tower: { x: [12, 44], z: [-236, -220], h: 46, floors: 15 },
+  tower: { x: [12, 44], z: [-236, -220], h: 76, floors: 25 },               // (it stands over the flats from the park)
   // where you stand in the middle of the park (the shout), and where you hide (under the plane tree)
-  you: { park: [28, 0, -50], hide: [-6.4, 0, -21.2], door: [-4.0, 0, -0.6], kerb: [-1.0, 0, -1.7] },
+  you: { park: [28, 0, -50], hide: [-9.0, 0, -22.2], door: [-4.0, 0, -0.6], kerb: [-1.0, 0, -1.7] },
   plane: { x: -9.0, z: -19.2, h: 15, branch: [[-9.0, 2.6, -19.2], [-8.0, 3.0, -17.6], [-6.6, 3.3, -16.0], [-5.0, 3.45, -15.1], [-3.4, 3.7, -14.6]] },
   path: { z: -15.5 },
   bodies: [],

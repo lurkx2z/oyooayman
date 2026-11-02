@@ -78,7 +78,7 @@ const SO_STREET = [
 const SO_RING = (() => {
   const r = new RNG(907), H = SO_ST.you.hide, out = [], looks = ['casual1', 'casual2', 'casual3', 'casual4', 'casual5', 'casual6', 'casual7', 'casual8', 'soUmb', 'soHood', 'soDogW', 'soMum', 'soMed'];
   for (let i = 0; i < 46; i++) {
-    const ring = i < 2 ? 0 : i < 14 ? 1 : i < 30 ? 2 : 3, a = i < 2 ? [0.4, 2.9][i] : r.range(0, SOPI * 2), d = [7.0, 7.5, 10.5, 14.5][ring] + r.range(-0.8, 1.2);
+    const ring = i < 2 ? 0 : i < 14 ? 1 : i < 30 ? 2 : 3, a = i < 2 ? [0.4, 2.9][i] : r.range(0, SOPI * 2), d = i === 0 ? 7.0 : [7.0, 7.5, 10.5, 14.5][ring] + r.range(-0.8, 1.2);
     out.push({ look: looks[i % looks.length], x: H[0] + Math.sin(a) * d, z: H[2] + Math.cos(a) * d, a, d, ring, ph: r.range(0, 6.28) });
   }
   return out;
@@ -100,14 +100,18 @@ function soBuildCast(S) {
   SO_STREET.forEach((e, i) => { if (e[4] !== 'umbrella') return; const h = C.street[i].j.ra.hand, g = new THREE.Group(); g.position.set(0, -0.05, 0.04); h.add(g);
     soCyl(0.008, 0.008, 0.9, soStd('#2a2a2a', 0.5), 0, 0.42, 0, g, 6); const c = soMesh(new THREE.ConeGeometry(0.55, 0.22, 10, 1, true), um, 0, 0.92, 0, g); c.castShadow = true; C.street[i].umb = g; });
   // phones (their screens glow) in the hands of everyone in the ring and of the ones on their phones in the street
-  const scr = new THREE.MeshBasicMaterial({ color: '#cfe0ff' });
-  const phone = (P) => { const g = new THREE.Group(); g.position.set(0, -0.07, 0.03); g.rotation.x = 0.3; P.j.ra.hand.add(g); soBox(0.07, 0.14, 0.01, soStd('#111', 0.4), 0, 0, 0, g); const sc = soBox(0.062, 0.128, 0.002, scr, 0, 0, 0.006, g); sc.castShadow = false; P.phone = g; return g; };
+  const scr = new THREE.MeshBasicMaterial({ color: '#cfe0ff' }), torchTex = soDotTex(0.2);
+  const phone = (P) => { const g = new THREE.Group(); g.position.set(0, -0.07, 0.03); g.rotation.x = 0.3; P.j.ra.hand.add(g); soBox(0.07, 0.14, 0.01, soStd('#111', 0.4), 0, 0, 0, g); const sc = soBox(0.062, 0.128, 0.002, scr, 0, 0, 0.006, g); sc.castShadow = false; P.phone = g;
+    // (its torch: a glow you can see across the park)
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: torchTex, color: '#e6eeff', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); sp.scale.setScalar(0.9); sp.position.set(0, 0.05, -0.02); sp.visible = false; g.add(sp); P.torch = sp; return g; };
   C.street.forEach((P, i) => { if (SO_STREET[i][4] === 'phone') phone(P); });
   C.ring.forEach((P) => phone(P));
   // the dog on its lead (it barks at you: nothing comes out), and the one that comes out of the dark at you
   C.dog = soBuildQuad(SO_DOG); scene.add(C.dog.root); C.dog.root.visible = false;
   C.dog2 = soBuildQuad(Object.assign({}, SO_DOG, { col: '#1e1a18', col2: '#4a3a30', body: [0.15, 0.17], len: 0.7, hip: 0.56, leg: [0.27, 0.27], head: 0.115, snout: 0.085 })); scene.add(C.dog2.root); C.dog2.root.visible = false;
   for (const D of [C.dog, C.dog2]) { const jaw = new THREE.Group(); jaw.position.set(0, -D.sp.head * 0.38, D.sp.head * 0.45); D.head.add(jaw); soMesh(new THREE.BoxGeometry(D.sp.snout * 1.6, D.sp.snout * 0.35, D.sp.head * 1.0).translate(0, 0, D.sp.head * 0.45), soStd('#2a1a18', 0.7), 0, 0, 0, jaw); soMesh(new THREE.BoxGeometry(D.sp.snout * 1.3, D.sp.snout * 0.2, D.sp.head * 0.8).translate(0, D.sp.snout * 0.2, D.sp.head * 0.5), soStd('#8a3a3a', 0.6), 0, 0, 0, jaw); D.jaw = jaw; }
+  // the big dog's eyes catch the light in the dark (eyeshine: it's all you see of it at first)
+  { const em = new THREE.MeshBasicMaterial({ color: '#e4ff8a', toneMapped: false }); C.dog2.eyes = [-1, 1].map((sd) => { const e = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 6), em); e.position.set(sd * 0.05, 0.02, 0.1); C.dog2.head.add(e); return e; }); }
   C.lead = Array.from({ length: 8 }, () => { const m = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 6).translate(0, 0.5, 0), soStd('#c8322a', 0.6)); scene.add(m); m.visible = false; return m; });
   C.update = (s, o) => soCastUpdate(C, s, o || {});
   return C;
@@ -144,8 +148,8 @@ function soCastUpdate(C, s, o) {
       if (mode === 'hide' || mode === 'dog') { P.root.visible = false; return; }        // (they're not there yet, as far as you know)
       const step = soEase(t, tw + e.d / SOP.c + 0.2 + 0.05 * (i % 5), tw + e.d / SOP.c + 1.0 + 0.05 * (i % 5));
       let d = e.d - 0.7 * step;
-      if (i === 0) d = SO_BEHIND.d0 + (SO_BEHIND.d1 - SO_BEHIND.d0) * soEase(t, soC('who', 2), soC('question', 0) - 0.6);
-      const a = i === 0 ? SO_BEHIND.a : e.a, x = H[0] + Math.sin(a) * d, z = H[2] + Math.cos(a) * d;
+      if (i === 1) d = SO_BEHIND.d0 + (SO_BEHIND.d1 - SO_BEHIND.d0) * soEase(t, soC('who', 2), soC('question', 0) - 0.6);
+      const a = i === 1 ? SO_BEHIND.a : e.a, x = H[0] + Math.sin(a) * d, z = H[2] + Math.cos(a) * d;
       const p = SO_POSES.stand(); p.neck = 0.12; p.headYaw = 0.05 * Math.sin(e.ph); p.spine = 0.04;
       const ph = Math.max(0, step - 0.0) * SOPI * 2;
       if (step > 0 && step < 1) { const w = soWalkPose(ph, 0.6); Object.assign(p, w); }
@@ -158,11 +162,11 @@ function soCastUpdate(C, s, o) {
     const H = SO_ST.you.park;
     SO_RING.forEach((e, i) => {
       const P = C.ring[i]; on.add(P);
-      const g = [[0, -12.4], [-60, -40], [60, -60], [-30, -95], [70, -20]][i % 5], s0 = soStoryAt(soS('coming')) + 4 + (i * 1.7) % 9;
+      const g = [[0, -12.4], [-60, -40], [60, -60], [-30, -95], [70, -20]][i % 5], s0 = soStoryAt(soS('coming')) + 0.5 + (i * 1.3) % 5;
       const dx = H[0] - g[0], dz = H[2] - g[1], L = Math.hypot(dx, dz), yaw = soYaw(dx, dz), w = soWalkSt(s, s0, g[0] + dx / L * (i % 3) * 2, g[1] + dz / L * (i % 3) * 2, yaw, 1.15);
       if (s < s0) { P.root.visible = false; return; }
       w.p.rSh = [0.7, 0.1]; w.p.rEl = 1.2;
-      soPlace(P, w); if (P.phone) P.phone.visible = true;
+      soPlace(P, w); if (P.phone) { P.phone.visible = true; P.torch.visible = true; }
     });
   }
   C.street.forEach((P) => { if (!on.has(P)) P.root.visible = false; });

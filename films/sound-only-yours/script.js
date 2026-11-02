@@ -40,7 +40,7 @@ SO.tShout = soVoice('y_shout').start;
 SO.tDog = soC('hide', 1) - 0.2;                          // the dog lunges out of the dark
 SO.tClicks = (() => {                                    // your tongue clicks in the dark (echo pictures)
   const e = (k, d = 0.25) => soC('echo', k) - d;
-  return [e(1, 0.1), e(1, -1.3), e(2, 0.5), e(3, 0.7), e(4, 0.55), e(5, 0.6), e(5, -1.6), soC('who', 1) - 0.4, soC('who', 2) - 0.3, soC('question', 0) - 0.5];
+  return [e(0, -1.6), e(1, 0.1), e(1, -1.3), e(2, 0.5), e(3, 0.7), e(4, 0.55), e(5, 0.6), e(5, -1.6), soC('who', 1) - 0.4, soC('who', 2) - 0.3, soC('question', 0) - 0.5];
 })();
 
 // THE CLOCK: segments [film t where it starts, story s there | 'cont', 'real' | ['rate', r]]. Inside a segment time
@@ -57,7 +57,7 @@ const SO_CLOCK = (() => {
     [B('storm'), 'skip', 30],                            // (+30 s: to the park gate)
     [B('park'), 900 - (soC('park', 0) - B('park')), 'real'],         // "9:56"
     [B('coming'), 'skip', 50],                           // (+50 s)
-    [B('hide'), 1740 - (soC('hide', 0) - B('hide')), 'real'],        // "10:09"
+    [B('hide'), 1700 - (soC('hide', 0) - B('hide')), 'real'],        // "10:09" (10:09:20)
   ];
   const out = [];
   let prev = null;
@@ -88,7 +88,7 @@ SO.tShatter = soFilmAt(SO.sKnock + 0.43);              // 0.92 m of fall (0.43 s
 // ---------------------------------------------------------------------------------------------------------------------
 const SO_NOISE = (() => {
   const L = SOP.L, out = [], v = (id, dB) => { const c = soVoice(id); out.push([c.start, dB, c.seconds]); };
-  v('y_what', 58); v('y_hello', L.voice); v('y_mum', L.voice); v('y_window', L.call); v('y_okay', 46); v('y_scared', 70); v('y_street', L.call); v('y_count', 54); v('y_shout', L.shout); v('y_who', L.whisper);
+  v('y_what', 58); v('y_hello', L.voice); v('y_mum', L.voice); v('y_window', L.voice); v('y_okay', 46); v('y_scared', 70); v('y_street', L.call); v('y_count', 54); v('y_shout', L.shout); v('y_who', L.whisper);
   out.push([SO.tClap, L.clap, 0.25], [SO.tClap2, L.clap, 0.25]);
   for (const t of SO.tClicks) out.push([t, L.click, 0.12]);
   return out.sort((a, b) => a[0] - b[0]);
