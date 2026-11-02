@@ -1,0 +1,184 @@
+{
+ "id": "03-e_eighty",
+ "text": "Eighty percent.",
+ "seconds": 1.67,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Eighty",
+   "start": 0.06,
+   "end": 0.26
+  },
+  {
+   "text": "percent.",
+   "start": 0.38,
+   "end": 0.98
+  }
+ ],
+ "characters": [
+  {
+   "text": "E",
+   "start": 0,
+   "end": 0.032
+  },
+  {
+   "text": "i",
+   "start": 0.032,
+   "end": 0.064
+  },
+  {
+   "text": "g",
+   "start": 0.064,
+   "end": 0.096
+  },
+  {
+   "text": "h",
+   "start": 0.096,
+   "end": 0.128
+  },
+  {
+   "text": "t",
+   "start": 0.128,
+   "end": 0.16
+  },
+  {
+   "text": "y",
+   "start": 0.16,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.64
+  },
+  {
+   "text": "p",
+   "start": 0.64,
+   "end": 0.686
+  },
+  {
+   "text": "e",
+   "start": 0.686,
+   "end": 0.731
+  },
+  {
+   "text": "r",
+   "start": 0.731,
+   "end": 0.777
+  },
+  {
+   "text": "c",
+   "start": 0.777,
+   "end": 0.823
+  },
+  {
+   "text": "e",
+   "start": 0.823,
+   "end": 0.869
+  },
+  {
+   "text": "n",
+   "start": 0.869,
+   "end": 0.914
+  },
+  {
+   "text": "t",
+   "start": 0.914,
+   "end": 0.96
+  },
+  {
+   "text": ".",
+   "start": 0.96,
+   "end": 1.6
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Eighty",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "percent.",
+   "start": 0.64,
+   "end": 1.6
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "E",
+   "start": 0.06,
+   "end": 0.1
+  },
+  {
+   "text": "i",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "g",
+   "start": 0.12,
+   "end": 0.12
+  },
+  {
+   "text": "h",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "y",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.38
+  },
+  {
+   "text": "p",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": "e",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "r",
+   "start": 0.44,
+   "end": 0.6
+  },
+  {
+   "text": "c",
+   "start": 0.6,
+   "end": 0.7
+  },
+  {
+   "text": "e",
+   "start": 0.7,
+   "end": 0.72
+  },
+  {
+   "text": "n",
+   "start": 0.72,
+   "end": 0.82
+  },
+  {
+   "text": "t",
+   "start": 0.82,
+   "end": 0.98
+  },
+  {
+   "text": ".",
+   "start": 0.98,
+   "end": 0.98
+  }
+ ]
+}

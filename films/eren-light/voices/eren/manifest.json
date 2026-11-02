@@ -1,0 +1,120 @@
+{
+  "voice": "N2lVS1w4EtoT3dr4eOWO",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.4,
+    "similarity_boost": 0.75,
+    "speed": 1
+  },
+  "clips": [
+    {
+      "id": "01-e_knew",
+      "text": "I knew where you'd be sitting.",
+      "file": "01-e_knew.mp3",
+      "align": "01-e_knew.align.json",
+      "seconds": 1.91,
+      "speech_start": 0.16,
+      "speech_end": 1.56,
+      "hash": "58cfffad9a789755",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-e_cage",
+      "text": "I was born in a cage. Walls a hundred meters high. And the whole world outside wanted us dead for something our grandparents did.",
+      "file": "02-e_cage.mp3",
+      "align": "02-e_cage.align.json",
+      "seconds": 10.14,
+      "speech_start": 0.16,
+      "speech_end": 9.52,
+      "hash": "07f8deae2fa47f9c",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-e_eighty",
+      "text": "Eighty percent.",
+      "file": "03-e_eighty.mp3",
+      "align": "03-e_eighty.align.json",
+      "seconds": 1.67,
+      "speech_start": 0.06,
+      "speech_end": 0.98,
+      "hash": "1acf78b687dafe42",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-e_agents",
+      "text": "And the people you killed? The agents who followed you. They weren't criminals.",
+      "file": "04-e_agents.mp3",
+      "align": "04-e_agents.align.json",
+      "seconds": 5.83,
+      "speech_start": 0.08,
+      "speech_end": 5.12,
+      "hash": "e4ce2b546b8f145c",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "05-e_mine",
+      "text": "So were mine.",
+      "file": "05-e_mine.mp3",
+      "align": "05-e_mine.align.json",
+      "seconds": 1.52,
+      "speech_start": 0.12,
+      "speech_end": 0.94,
+      "hash": "6ee144877f8bbc9e",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "06-e_wall",
+      "text": "A world where everyone's too scared to move. Someone sitting above them, deciding who lives. That's not peace. That's a wall... with you on top of it.",
+      "file": "06-e_wall.mp3",
+      "align": "06-e_wall.align.json",
+      "seconds": 11.99,
+      "speech_start": 0.1,
+      "speech_end": 11.42,
+      "hash": "aadb2604d70fce6e",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "07-e_free",
+      "text": "Freedom is freedom.",
+      "file": "07-e_free.mp3",
+      "align": "07-e_free.align.json",
+      "seconds": 2.22,
+      "speech_start": 0.14,
+      "speech_end": 1.52,
+      "hash": "c9d24842ba5ddce5",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "08-e_lose",
+      "text": "I lose. I die. And my friends become the heroes who stopped me.",
+      "file": "08-e_lose.mp3",
+      "align": "08-e_lose.align.json",
+      "seconds": 6.06,
+      "speech_start": 0.12,
+      "speech_end": 5.3,
+      "hash": "2d82f86bbd1c31f1",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "09-e_seen",
+      "text": "I've seen how I die. It isn't here. And it isn't you.",
+      "file": "09-e_seen.mp3",
+      "align": "09-e_seen.align.json",
+      "seconds": 4.78,
+      "speech_start": 0.12,
+      "speech_end": 4.36,
+      "hash": "498921f22fed5ec5",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

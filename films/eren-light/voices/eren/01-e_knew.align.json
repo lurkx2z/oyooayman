@@ -1,0 +1,374 @@
+{
+ "id": "01-e_knew",
+ "text": "I knew where you'd be sitting.",
+ "seconds": 1.91,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "I",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "knew",
+   "start": 0.3,
+   "end": 0.54
+  },
+  {
+   "text": "where",
+   "start": 0.64,
+   "end": 0.82
+  },
+  {
+   "text": "you'd",
+   "start": 0.86,
+   "end": 1
+  },
+  {
+   "text": "be",
+   "start": 1.04,
+   "end": 1.16
+  },
+  {
+   "text": "sitting.",
+   "start": 1.24,
+   "end": 1.56
+  }
+ ],
+ "characters": [
+  {
+   "text": "I",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "k",
+   "start": 0.32,
+   "end": 0.44
+  },
+  {
+   "text": "n",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "e",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "w",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "w",
+   "start": 0.64,
+   "end": 0.656
+  },
+  {
+   "text": "h",
+   "start": 0.656,
+   "end": 0.672
+  },
+  {
+   "text": "e",
+   "start": 0.672,
+   "end": 0.688
+  },
+  {
+   "text": "r",
+   "start": 0.688,
+   "end": 0.704
+  },
+  {
+   "text": "e",
+   "start": 0.704,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "y",
+   "start": 0.8,
+   "end": 0.827
+  },
+  {
+   "text": "o",
+   "start": 0.827,
+   "end": 0.853
+  },
+  {
+   "text": "u",
+   "start": 0.853,
+   "end": 0.88
+  },
+  {
+   "text": "'",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "d",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "b",
+   "start": 1,
+   "end": 1.02
+  },
+  {
+   "text": "e",
+   "start": 1.02,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.2
+  },
+  {
+   "text": "s",
+   "start": 1.2,
+   "end": 1.4
+  },
+  {
+   "text": "i",
+   "start": 1.4,
+   "end": 1.433
+  },
+  {
+   "text": "t",
+   "start": 1.433,
+   "end": 1.467
+  },
+  {
+   "text": "t",
+   "start": 1.467,
+   "end": 1.5
+  },
+  {
+   "text": "i",
+   "start": 1.5,
+   "end": 1.533
+  },
+  {
+   "text": "n",
+   "start": 1.533,
+   "end": 1.567
+  },
+  {
+   "text": "g",
+   "start": 1.567,
+   "end": 1.6
+  },
+  {
+   "text": ".",
+   "start": 1.6,
+   "end": 1.84
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "I",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "knew",
+   "start": 0.32,
+   "end": 0.56
+  },
+  {
+   "text": "where",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "you'd",
+   "start": 0.8,
+   "end": 0.96
+  },
+  {
+   "text": "be",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "sitting.",
+   "start": 1.2,
+   "end": 1.84
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "I",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.3
+  },
+  {
+   "text": "k",
+   "start": 0.3,
+   "end": 0.36
+  },
+  {
+   "text": "n",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": "e",
+   "start": 0.42,
+   "end": 0.44
+  },
+  {
+   "text": "w",
+   "start": 0.44,
+   "end": 0.54
+  },
+  {
+   "text": " ",
+   "start": 0.54,
+   "end": 0.64
+  },
+  {
+   "text": "w",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "h",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "e",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "r",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "e",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": " ",
+   "start": 0.82,
+   "end": 0.86
+  },
+  {
+   "text": "y",
+   "start": 0.86,
+   "end": 0.88
+  },
+  {
+   "text": "o",
+   "start": 0.88,
+   "end": 0.88
+  },
+  {
+   "text": "u",
+   "start": 0.88,
+   "end": 0.9
+  },
+  {
+   "text": "'",
+   "start": 0.9,
+   "end": 0.9
+  },
+  {
+   "text": "d",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": " ",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "b",
+   "start": 1.04,
+   "end": 1.04
+  },
+  {
+   "text": "e",
+   "start": 1.04,
+   "end": 1.16
+  },
+  {
+   "text": " ",
+   "start": 1.16,
+   "end": 1.24
+  },
+  {
+   "text": "s",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": "i",
+   "start": 1.28,
+   "end": 1.32
+  },
+  {
+   "text": "t",
+   "start": 1.32,
+   "end": 1.38
+  },
+  {
+   "text": "t",
+   "start": 1.38,
+   "end": 1.42
+  },
+  {
+   "text": "i",
+   "start": 1.42,
+   "end": 1.44
+  },
+  {
+   "text": "n",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "g",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": ".",
+   "start": 1.56,
+   "end": 1.56
+  }
+ ]
+}

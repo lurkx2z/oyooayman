@@ -1,0 +1,364 @@
+{
+ "id": "01-n_title",
+ "text": "Would Eren and Light... agree?",
+ "seconds": 2.46,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Would",
+   "start": 0.12,
+   "end": 0.22
+  },
+  {
+   "text": "Eren",
+   "start": 0.32,
+   "end": 0.68
+  },
+  {
+   "text": "and",
+   "start": 0.72,
+   "end": 0.84
+  },
+  {
+   "text": "Light...",
+   "start": 0.92,
+   "end": 1.22
+  },
+  {
+   "text": "agree?",
+   "start": 1.76,
+   "end": 2.08
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.144
+  },
+  {
+   "text": "o",
+   "start": 0.144,
+   "end": 0.168
+  },
+  {
+   "text": "u",
+   "start": 0.168,
+   "end": 0.192
+  },
+  {
+   "text": "l",
+   "start": 0.192,
+   "end": 0.216
+  },
+  {
+   "text": "d",
+   "start": 0.216,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "E",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "r",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "e",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "n",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "a",
+   "start": 0.72,
+   "end": 0.747
+  },
+  {
+   "text": "n",
+   "start": 0.747,
+   "end": 0.773
+  },
+  {
+   "text": "d",
+   "start": 0.773,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "L",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "i",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "g",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "h",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "t",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": ".",
+   "start": 1.28,
+   "end": 1.413
+  },
+  {
+   "text": ".",
+   "start": 1.413,
+   "end": 1.547
+  },
+  {
+   "text": ".",
+   "start": 1.547,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.92
+  },
+  {
+   "text": "a",
+   "start": 1.92,
+   "end": 1.968
+  },
+  {
+   "text": "g",
+   "start": 1.968,
+   "end": 2.016
+  },
+  {
+   "text": "r",
+   "start": 2.016,
+   "end": 2.064
+  },
+  {
+   "text": "e",
+   "start": 2.064,
+   "end": 2.112
+  },
+  {
+   "text": "e",
+   "start": 2.112,
+   "end": 2.16
+  },
+  {
+   "text": "?",
+   "start": 2.16,
+   "end": 2.4
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Would",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "Eren",
+   "start": 0.32,
+   "end": 0.64
+  },
+  {
+   "text": "and",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "Light...",
+   "start": 0.88,
+   "end": 1.68
+  },
+  {
+   "text": "agree?",
+   "start": 1.92,
+   "end": 2.4
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "o",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "u",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "l",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "d",
+   "start": 0.2,
+   "end": 0.22
+  },
+  {
+   "text": " ",
+   "start": 0.22,
+   "end": 0.32
+  },
+  {
+   "text": "E",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "r",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "e",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "n",
+   "start": 0.54,
+   "end": 0.68
+  },
+  {
+   "text": " ",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "a",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "n",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": "d",
+   "start": 0.82,
+   "end": 0.84
+  },
+  {
+   "text": " ",
+   "start": 0.84,
+   "end": 0.92
+  },
+  {
+   "text": "L",
+   "start": 0.92,
+   "end": 1
+  },
+  {
+   "text": "i",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "g",
+   "start": 1.04,
+   "end": 1.06
+  },
+  {
+   "text": "h",
+   "start": 1.06,
+   "end": 1.1
+  },
+  {
+   "text": "t",
+   "start": 1.1,
+   "end": 1.22
+  },
+  {
+   "text": ".",
+   "start": 1.22,
+   "end": 1.22
+  },
+  {
+   "text": ".",
+   "start": 1.22,
+   "end": 1.22
+  },
+  {
+   "text": ".",
+   "start": 1.22,
+   "end": 1.22
+  },
+  {
+   "text": " ",
+   "start": 1.22,
+   "end": 1.76
+  },
+  {
+   "text": "a",
+   "start": 1.76,
+   "end": 1.82
+  },
+  {
+   "text": "g",
+   "start": 1.82,
+   "end": 1.9
+  },
+  {
+   "text": "r",
+   "start": 1.9,
+   "end": 1.94
+  },
+  {
+   "text": "e",
+   "start": 1.94,
+   "end": 2
+  },
+  {
+   "text": "e",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "?",
+   "start": 2.08,
+   "end": 2.08
+  }
+ ]
+}

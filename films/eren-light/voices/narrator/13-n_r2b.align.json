@@ -1,0 +1,824 @@
+{
+ "id": "13-n_r2b",
+ "text": "Eren doesn't answer right away. Because his number is so much bigger.",
+ "seconds": 4.86,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Eren",
+   "start": 0.06,
+   "end": 0.32
+  },
+  {
+   "text": "doesn't",
+   "start": 0.42,
+   "end": 0.7
+  },
+  {
+   "text": "answer",
+   "start": 0.8,
+   "end": 1.06
+  },
+  {
+   "text": "right",
+   "start": 1.14,
+   "end": 1.28
+  },
+  {
+   "text": "away.",
+   "start": 1.34,
+   "end": 1.7
+  },
+  {
+   "text": "Because",
+   "start": 2.2,
+   "end": 2.5
+  },
+  {
+   "text": "his",
+   "start": 2.54,
+   "end": 2.7
+  },
+  {
+   "text": "number",
+   "start": 2.76,
+   "end": 3.12
+  },
+  {
+   "text": "is",
+   "start": 3.16,
+   "end": 3.36
+  },
+  {
+   "text": "so",
+   "start": 3.46,
+   "end": 3.66
+  },
+  {
+   "text": "much",
+   "start": 3.7,
+   "end": 3.98
+  },
+  {
+   "text": "bigger.",
+   "start": 4.019,
+   "end": 4.36
+  }
+ ],
+ "characters": [
+  {
+   "text": "E",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "r",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "e",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "n",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "d",
+   "start": 0.4,
+   "end": 0.432
+  },
+  {
+   "text": "o",
+   "start": 0.432,
+   "end": 0.464
+  },
+  {
+   "text": "e",
+   "start": 0.464,
+   "end": 0.496
+  },
+  {
+   "text": "s",
+   "start": 0.496,
+   "end": 0.528
+  },
+  {
+   "text": "n",
+   "start": 0.528,
+   "end": 0.56
+  },
+  {
+   "text": "'",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "t",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.8
+  },
+  {
+   "text": "a",
+   "start": 0.8,
+   "end": 0.84
+  },
+  {
+   "text": "n",
+   "start": 0.84,
+   "end": 0.88
+  },
+  {
+   "text": "s",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "w",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "r",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "r",
+   "start": 1.12,
+   "end": 1.152
+  },
+  {
+   "text": "i",
+   "start": 1.152,
+   "end": 1.184
+  },
+  {
+   "text": "g",
+   "start": 1.184,
+   "end": 1.216
+  },
+  {
+   "text": "h",
+   "start": 1.216,
+   "end": 1.248
+  },
+  {
+   "text": "t",
+   "start": 1.248,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.72
+  },
+  {
+   "text": "a",
+   "start": 1.72,
+   "end": 1.83
+  },
+  {
+   "text": "w",
+   "start": 1.83,
+   "end": 1.94
+  },
+  {
+   "text": "a",
+   "start": 1.94,
+   "end": 2.05
+  },
+  {
+   "text": "y",
+   "start": 2.05,
+   "end": 2.16
+  },
+  {
+   "text": ".",
+   "start": 2.16,
+   "end": 2.267
+  },
+  {
+   "text": " ",
+   "start": 2.267,
+   "end": 2.373
+  },
+  {
+   "text": "B",
+   "start": 2.373,
+   "end": 2.389
+  },
+  {
+   "text": "e",
+   "start": 2.389,
+   "end": 2.404
+  },
+  {
+   "text": "c",
+   "start": 2.404,
+   "end": 2.419
+  },
+  {
+   "text": "a",
+   "start": 2.419,
+   "end": 2.434
+  },
+  {
+   "text": "u",
+   "start": 2.434,
+   "end": 2.45
+  },
+  {
+   "text": "s",
+   "start": 2.45,
+   "end": 2.465
+  },
+  {
+   "text": "e",
+   "start": 2.465,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.6
+  },
+  {
+   "text": "h",
+   "start": 2.6,
+   "end": 2.64
+  },
+  {
+   "text": "i",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": "s",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 2.92
+  },
+  {
+   "text": "n",
+   "start": 2.92,
+   "end": 2.953
+  },
+  {
+   "text": "u",
+   "start": 2.953,
+   "end": 2.987
+  },
+  {
+   "text": "m",
+   "start": 2.987,
+   "end": 3.02
+  },
+  {
+   "text": "b",
+   "start": 3.02,
+   "end": 3.053
+  },
+  {
+   "text": "e",
+   "start": 3.053,
+   "end": 3.087
+  },
+  {
+   "text": "r",
+   "start": 3.087,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.24
+  },
+  {
+   "text": "i",
+   "start": 3.24,
+   "end": 3.3
+  },
+  {
+   "text": "s",
+   "start": 3.3,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.44
+  },
+  {
+   "text": "s",
+   "start": 3.44,
+   "end": 3.52
+  },
+  {
+   "text": "o",
+   "start": 3.52,
+   "end": 3.6
+  },
+  {
+   "text": " ",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "m",
+   "start": 3.68,
+   "end": 3.74
+  },
+  {
+   "text": "u",
+   "start": 3.74,
+   "end": 3.8
+  },
+  {
+   "text": "c",
+   "start": 3.8,
+   "end": 3.86
+  },
+  {
+   "text": "h",
+   "start": 3.86,
+   "end": 3.92
+  },
+  {
+   "text": " ",
+   "start": 3.92,
+   "end": 4
+  },
+  {
+   "text": "b",
+   "start": 4,
+   "end": 4.08
+  },
+  {
+   "text": "i",
+   "start": 4.08,
+   "end": 4.224
+  },
+  {
+   "text": "g",
+   "start": 4.224,
+   "end": 4.368
+  },
+  {
+   "text": "g",
+   "start": 4.368,
+   "end": 4.512
+  },
+  {
+   "text": "e",
+   "start": 4.512,
+   "end": 4.656
+  },
+  {
+   "text": "r",
+   "start": 4.656,
+   "end": 4.8
+  },
+  {
+   "text": ".",
+   "start": 4.8,
+   "end": 4.88
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Eren",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "doesn't",
+   "start": 0.4,
+   "end": 0.64
+  },
+  {
+   "text": "answer",
+   "start": 0.8,
+   "end": 1.04
+  },
+  {
+   "text": "right",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": "away.",
+   "start": 1.72,
+   "end": 2.267
+  },
+  {
+   "text": "Because",
+   "start": 2.373,
+   "end": 2.48
+  },
+  {
+   "text": "his",
+   "start": 2.6,
+   "end": 2.72
+  },
+  {
+   "text": "number",
+   "start": 2.92,
+   "end": 3.12
+  },
+  {
+   "text": "is",
+   "start": 3.24,
+   "end": 3.36
+  },
+  {
+   "text": "so",
+   "start": 3.44,
+   "end": 3.6
+  },
+  {
+   "text": "much",
+   "start": 3.68,
+   "end": 3.92
+  },
+  {
+   "text": "bigger.",
+   "start": 4,
+   "end": 4.88
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "E",
+   "start": 0.06,
+   "end": 0.1
+  },
+  {
+   "text": "r",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "e",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": "n",
+   "start": 0.22,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.42
+  },
+  {
+   "text": "d",
+   "start": 0.42,
+   "end": 0.46
+  },
+  {
+   "text": "o",
+   "start": 0.46,
+   "end": 0.48
+  },
+  {
+   "text": "e",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "s",
+   "start": 0.54,
+   "end": 0.56
+  },
+  {
+   "text": "n",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "'",
+   "start": 0.58,
+   "end": 0.58
+  },
+  {
+   "text": "t",
+   "start": 0.62,
+   "end": 0.7
+  },
+  {
+   "text": " ",
+   "start": 0.7,
+   "end": 0.8
+  },
+  {
+   "text": "a",
+   "start": 0.8,
+   "end": 0.82
+  },
+  {
+   "text": "n",
+   "start": 0.82,
+   "end": 0.92
+  },
+  {
+   "text": "s",
+   "start": 0.92,
+   "end": 0.94
+  },
+  {
+   "text": "w",
+   "start": 0.94,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "r",
+   "start": 1.04,
+   "end": 1.06
+  },
+  {
+   "text": " ",
+   "start": 1.06,
+   "end": 1.14
+  },
+  {
+   "text": "r",
+   "start": 1.14,
+   "end": 1.2
+  },
+  {
+   "text": "i",
+   "start": 1.2,
+   "end": 1.22
+  },
+  {
+   "text": "g",
+   "start": 1.22,
+   "end": 1.24
+  },
+  {
+   "text": "h",
+   "start": 1.24,
+   "end": 1.24
+  },
+  {
+   "text": "t",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.34
+  },
+  {
+   "text": "a",
+   "start": 1.34,
+   "end": 1.42
+  },
+  {
+   "text": "w",
+   "start": 1.42,
+   "end": 1.44
+  },
+  {
+   "text": "a",
+   "start": 1.44,
+   "end": 1.68
+  },
+  {
+   "text": "y",
+   "start": 1.68,
+   "end": 1.7
+  },
+  {
+   "text": ".",
+   "start": 1.7,
+   "end": 1.7
+  },
+  {
+   "text": " ",
+   "start": 1.7,
+   "end": 2.2
+  },
+  {
+   "text": "B",
+   "start": 2.2,
+   "end": 2.22
+  },
+  {
+   "text": "e",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "c",
+   "start": 2.32,
+   "end": 2.36
+  },
+  {
+   "text": "a",
+   "start": 2.36,
+   "end": 2.38
+  },
+  {
+   "text": "u",
+   "start": 2.38,
+   "end": 2.38
+  },
+  {
+   "text": "s",
+   "start": 2.38,
+   "end": 2.48
+  },
+  {
+   "text": "e",
+   "start": 2.48,
+   "end": 2.5
+  },
+  {
+   "text": " ",
+   "start": 2.5,
+   "end": 2.54
+  },
+  {
+   "text": "h",
+   "start": 2.54,
+   "end": 2.56
+  },
+  {
+   "text": "i",
+   "start": 2.56,
+   "end": 2.7
+  },
+  {
+   "text": "s",
+   "start": 2.7,
+   "end": 2.7
+  },
+  {
+   "text": " ",
+   "start": 2.7,
+   "end": 2.76
+  },
+  {
+   "text": "n",
+   "start": 2.76,
+   "end": 2.82
+  },
+  {
+   "text": "u",
+   "start": 2.82,
+   "end": 2.84
+  },
+  {
+   "text": "m",
+   "start": 2.84,
+   "end": 2.94
+  },
+  {
+   "text": "b",
+   "start": 2.94,
+   "end": 2.96
+  },
+  {
+   "text": "e",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "r",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.16
+  },
+  {
+   "text": "i",
+   "start": 3.16,
+   "end": 3.26
+  },
+  {
+   "text": "s",
+   "start": 3.36,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.46
+  },
+  {
+   "text": "s",
+   "start": 3.46,
+   "end": 3.52
+  },
+  {
+   "text": "o",
+   "start": 3.52,
+   "end": 3.66
+  },
+  {
+   "text": " ",
+   "start": 3.66,
+   "end": 3.7
+  },
+  {
+   "text": "m",
+   "start": 3.7,
+   "end": 3.74
+  },
+  {
+   "text": "u",
+   "start": 3.74,
+   "end": 3.76
+  },
+  {
+   "text": "c",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "h",
+   "start": 3.84,
+   "end": 3.98
+  },
+  {
+   "text": " ",
+   "start": 3.98,
+   "end": 4.019
+  },
+  {
+   "text": "b",
+   "start": 4.019,
+   "end": 4.08
+  },
+  {
+   "text": "i",
+   "start": 4.08,
+   "end": 4.1
+  },
+  {
+   "text": "g",
+   "start": 4.1,
+   "end": 4.16
+  },
+  {
+   "text": "g",
+   "start": 4.16,
+   "end": 4.18
+  },
+  {
+   "text": "e",
+   "start": 4.18,
+   "end": 4.3
+  },
+  {
+   "text": "r",
+   "start": 4.34,
+   "end": 4.36
+  },
+  {
+   "text": ".",
+   "start": 4.36,
+   "end": 4.36
+  }
+ ]
+}

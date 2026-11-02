@@ -1,0 +1,174 @@
+{
+ "id": "09-l_forty",
+ "text": "Forty seconds.",
+ "seconds": 1.33,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Forty",
+   "start": 0.1,
+   "end": 0.34
+  },
+  {
+   "text": "seconds.",
+   "start": 0.48,
+   "end": 1
+  }
+ ],
+ "characters": [
+  {
+   "text": "F",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "o",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "r",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "y",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "s",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "c",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "o",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "n",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "d",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "s",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": ".",
+   "start": 1.04,
+   "end": 1.36
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Forty",
+   "start": 0,
+   "end": 0.4
+  },
+  {
+   "text": "seconds.",
+   "start": 0.48,
+   "end": 1.36
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "F",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "o",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "r",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.26,
+   "end": 0.3
+  },
+  {
+   "text": "y",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.48
+  },
+  {
+   "text": "s",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.66
+  },
+  {
+   "text": "c",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "o",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "n",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "d",
+   "start": 0.8,
+   "end": 0.96
+  },
+  {
+   "text": "s",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": ".",
+   "start": 1,
+   "end": 1
+  }
+ ]
+}

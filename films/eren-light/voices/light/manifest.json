@@ -1,0 +1,120 @@
+{
+  "voice": "cjVigY5qzO86Huf0OWal",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.45,
+    "similarity_boost": 0.75,
+    "speed": 1
+  },
+  "clips": [
+    {
+      "id": "01-l_late",
+      "text": "You're late.",
+      "file": "01-l_late.mp3",
+      "align": "01-l_late.align.json",
+      "seconds": 1.02,
+      "speech_start": 0.1,
+      "speech_end": 0.7,
+      "hash": "eeed2f39d3345a5e",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-l_rotten",
+      "text": "The world is rotten. Murderers walk free, and the courts let them. Someone has to do what the law won't.",
+      "file": "02-l_rotten.mp3",
+      "align": "02-l_rotten.align.json",
+      "seconds": 7.26,
+      "speech_start": 0.08,
+      "speech_end": 6.72,
+      "hash": "0293a0e39fd91e6c",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-l_guilty",
+      "text": "Only the guilty. Since I started, crime has dropped all over the world. Wars have stopped. People are finally afraid to do evil.",
+      "file": "03-l_guilty.mp3",
+      "align": "03-l_guilty.align.json",
+      "seconds": 9.74,
+      "speech_start": 0.08,
+      "speech_end": 9.08,
+      "hash": "888f28ea7d9161b6",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-l_monster",
+      "text": "Then you're not a hero. You're the worst criminal who has ever lived.",
+      "file": "04-l_monster.mp3",
+      "align": "04-l_monster.align.json",
+      "seconds": 4.62,
+      "speech_start": 0.06,
+      "speech_end": 4.019,
+      "hash": "1be08033f5556eb9",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "05-l_inway",
+      "text": "They were in the way.",
+      "file": "05-l_inway.mp3",
+      "align": "05-l_inway.align.json",
+      "seconds": 1.75,
+      "speech_start": 0.1,
+      "speech_end": 1.14,
+      "hash": "e47381a2b38048bc",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "06-l_god",
+      "text": "A world where no one dares to do wrong. Everyone honest. Everyone kind. And me, watching over all of it... as its god.",
+      "file": "06-l_god.mp3",
+      "align": "06-l_god.align.json",
+      "seconds": 9.74,
+      "speech_start": 0.04,
+      "speech_end": 9.08,
+      "hash": "c509736835486b61",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "07-l_burn",
+      "text": "And your freedom? Freedom to burn everything down?",
+      "file": "07-l_burn.mp3",
+      "align": "07-l_burn.align.json",
+      "seconds": 3.89,
+      "speech_start": 0.06,
+      "speech_end": 3.24,
+      "hash": "d358c72c31b341b3",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "08-l_win",
+      "text": "I win. I rule. Forever.",
+      "file": "08-l_win.mp3",
+      "align": "08-l_win.align.json",
+      "seconds": 3.58,
+      "speech_start": 0.18,
+      "speech_end": 2.96,
+      "hash": "7e22677166499730",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "09-l_forty",
+      "text": "Forty seconds.",
+      "file": "09-l_forty.mp3",
+      "align": "09-l_forty.align.json",
+      "seconds": 1.33,
+      "speech_start": 0.1,
+      "speech_end": 1,
+      "hash": "ad6910bee68f484d",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}

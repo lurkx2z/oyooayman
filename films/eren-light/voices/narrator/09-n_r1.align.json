@@ -1,0 +1,474 @@
+{
+ "id": "09-n_r1",
+ "text": "Round one. What's wrong with the world?",
+ "seconds": 3.03,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Round",
+   "start": 0.06,
+   "end": 0.28
+  },
+  {
+   "text": "one.",
+   "start": 0.4,
+   "end": 0.72
+  },
+  {
+   "text": "What's",
+   "start": 1.3,
+   "end": 1.52
+  },
+  {
+   "text": "wrong",
+   "start": 1.54,
+   "end": 1.8
+  },
+  {
+   "text": "with",
+   "start": 1.84,
+   "end": 1.94
+  },
+  {
+   "text": "the",
+   "start": 1.98,
+   "end": 2.06
+  },
+  {
+   "text": "world?",
+   "start": 2.1,
+   "end": 2.44
+  }
+ ],
+ "characters": [
+  {
+   "text": "R",
+   "start": 0,
+   "end": 0.048
+  },
+  {
+   "text": "o",
+   "start": 0.048,
+   "end": 0.096
+  },
+  {
+   "text": "u",
+   "start": 0.096,
+   "end": 0.144
+  },
+  {
+   "text": "n",
+   "start": 0.144,
+   "end": 0.192
+  },
+  {
+   "text": "d",
+   "start": 0.192,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "o",
+   "start": 0.4,
+   "end": 0.507
+  },
+  {
+   "text": "n",
+   "start": 0.507,
+   "end": 0.613
+  },
+  {
+   "text": "e",
+   "start": 0.613,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "W",
+   "start": 1.28,
+   "end": 1.3
+  },
+  {
+   "text": "h",
+   "start": 1.3,
+   "end": 1.32
+  },
+  {
+   "text": "a",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "t",
+   "start": 1.34,
+   "end": 1.36
+  },
+  {
+   "text": "'",
+   "start": 1.36,
+   "end": 1.4
+  },
+  {
+   "text": "s",
+   "start": 1.4,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "w",
+   "start": 1.52,
+   "end": 1.568
+  },
+  {
+   "text": "r",
+   "start": 1.568,
+   "end": 1.616
+  },
+  {
+   "text": "o",
+   "start": 1.616,
+   "end": 1.664
+  },
+  {
+   "text": "n",
+   "start": 1.664,
+   "end": 1.712
+  },
+  {
+   "text": "g",
+   "start": 1.712,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "w",
+   "start": 1.84,
+   "end": 1.86
+  },
+  {
+   "text": "i",
+   "start": 1.86,
+   "end": 1.88
+  },
+  {
+   "text": "t",
+   "start": 1.88,
+   "end": 1.9
+  },
+  {
+   "text": "h",
+   "start": 1.9,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "t",
+   "start": 2,
+   "end": 2.027
+  },
+  {
+   "text": "h",
+   "start": 2.027,
+   "end": 2.053
+  },
+  {
+   "text": "e",
+   "start": 2.053,
+   "end": 2.08
+  },
+  {
+   "text": " ",
+   "start": 2.08,
+   "end": 2.28
+  },
+  {
+   "text": "w",
+   "start": 2.28,
+   "end": 2.32
+  },
+  {
+   "text": "o",
+   "start": 2.32,
+   "end": 2.36
+  },
+  {
+   "text": "r",
+   "start": 2.36,
+   "end": 2.4
+  },
+  {
+   "text": "l",
+   "start": 2.4,
+   "end": 2.44
+  },
+  {
+   "text": "d",
+   "start": 2.44,
+   "end": 2.48
+  },
+  {
+   "text": "?",
+   "start": 2.48,
+   "end": 2.96
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Round",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "one.",
+   "start": 0.4,
+   "end": 1.2
+  },
+  {
+   "text": "What's",
+   "start": 1.28,
+   "end": 1.44
+  },
+  {
+   "text": "wrong",
+   "start": 1.52,
+   "end": 1.76
+  },
+  {
+   "text": "with",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "the",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "world?",
+   "start": 2.28,
+   "end": 2.96
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "R",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "u",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": "n",
+   "start": 0.18,
+   "end": 0.26
+  },
+  {
+   "text": "d",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": " ",
+   "start": 0.28,
+   "end": 0.4
+  },
+  {
+   "text": "o",
+   "start": 0.4,
+   "end": 0.52
+  },
+  {
+   "text": "n",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "e",
+   "start": 0.54,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.72
+  },
+  {
+   "text": "W",
+   "start": 1.3,
+   "end": 1.3
+  },
+  {
+   "text": "h",
+   "start": 1.32,
+   "end": 1.32
+  },
+  {
+   "text": "a",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "t",
+   "start": 1.34,
+   "end": 1.4
+  },
+  {
+   "text": "'",
+   "start": 1.4,
+   "end": 1.4
+  },
+  {
+   "text": "s",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.54
+  },
+  {
+   "text": "w",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "r",
+   "start": 1.58,
+   "end": 1.66
+  },
+  {
+   "text": "o",
+   "start": 1.66,
+   "end": 1.68
+  },
+  {
+   "text": "n",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "g",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": " ",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "w",
+   "start": 1.84,
+   "end": 1.84
+  },
+  {
+   "text": "i",
+   "start": 1.86,
+   "end": 1.88
+  },
+  {
+   "text": "t",
+   "start": 1.88,
+   "end": 1.94
+  },
+  {
+   "text": "h",
+   "start": 1.94,
+   "end": 1.94
+  },
+  {
+   "text": " ",
+   "start": 1.94,
+   "end": 1.98
+  },
+  {
+   "text": "t",
+   "start": 1.98,
+   "end": 2
+  },
+  {
+   "text": "h",
+   "start": 2,
+   "end": 2.02
+  },
+  {
+   "text": "e",
+   "start": 2.02,
+   "end": 2.06
+  },
+  {
+   "text": " ",
+   "start": 2.06,
+   "end": 2.1
+  },
+  {
+   "text": "w",
+   "start": 2.1,
+   "end": 2.16
+  },
+  {
+   "text": "o",
+   "start": 2.16,
+   "end": 2.18
+  },
+  {
+   "text": "r",
+   "start": 2.18,
+   "end": 2.28
+  },
+  {
+   "text": "l",
+   "start": 2.28,
+   "end": 2.34
+  },
+  {
+   "text": "d",
+   "start": 2.34,
+   "end": 2.44
+  },
+  {
+   "text": "?",
+   "start": 2.44,
+   "end": 2.44
+  }
+ ]
+}

@@ -1,0 +1,274 @@
+{
+ "id": "11-n_agree1",
+ "text": "On this... they agree.",
+ "seconds": 2.06,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "On",
+   "start": 0.08,
+   "end": 0.2
+  },
+  {
+   "text": "this...",
+   "start": 0.32,
+   "end": 0.64
+  },
+  {
+   "text": "they",
+   "start": 1.22,
+   "end": 1.32
+  },
+  {
+   "text": "agree.",
+   "start": 1.38,
+   "end": 1.78
+  }
+ ],
+ "characters": [
+  {
+   "text": "O",
+   "start": 0,
+   "end": 0.12
+  },
+  {
+   "text": "n",
+   "start": 0.12,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.48
+  },
+  {
+   "text": "t",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "h",
+   "start": 0.54,
+   "end": 0.6
+  },
+  {
+   "text": "i",
+   "start": 0.6,
+   "end": 0.66
+  },
+  {
+   "text": "s",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 0.853
+  },
+  {
+   "text": ".",
+   "start": 0.853,
+   "end": 0.987
+  },
+  {
+   "text": ".",
+   "start": 0.987,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "t",
+   "start": 1.2,
+   "end": 1.22
+  },
+  {
+   "text": "h",
+   "start": 1.22,
+   "end": 1.24
+  },
+  {
+   "text": "e",
+   "start": 1.24,
+   "end": 1.26
+  },
+  {
+   "text": "y",
+   "start": 1.26,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.52
+  },
+  {
+   "text": "a",
+   "start": 1.52,
+   "end": 1.568
+  },
+  {
+   "text": "g",
+   "start": 1.568,
+   "end": 1.616
+  },
+  {
+   "text": "r",
+   "start": 1.616,
+   "end": 1.664
+  },
+  {
+   "text": "e",
+   "start": 1.664,
+   "end": 1.712
+  },
+  {
+   "text": "e",
+   "start": 1.712,
+   "end": 1.76
+  },
+  {
+   "text": ".",
+   "start": 1.76,
+   "end": 2
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "On",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "this...",
+   "start": 0.48,
+   "end": 1.12
+  },
+  {
+   "text": "they",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "agree.",
+   "start": 1.52,
+   "end": 2
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "O",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "n",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": " ",
+   "start": 0.2,
+   "end": 0.32
+  },
+  {
+   "text": "t",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "h",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": "i",
+   "start": 0.38,
+   "end": 0.56
+  },
+  {
+   "text": "s",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": ".",
+   "start": 0.64,
+   "end": 0.64
+  },
+  {
+   "text": ".",
+   "start": 0.64,
+   "end": 0.64
+  },
+  {
+   "text": ".",
+   "start": 0.64,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 1.22
+  },
+  {
+   "text": "t",
+   "start": 1.22,
+   "end": 1.22
+  },
+  {
+   "text": "h",
+   "start": 1.22,
+   "end": 1.24
+  },
+  {
+   "text": "e",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": "y",
+   "start": 1.28,
+   "end": 1.32
+  },
+  {
+   "text": " ",
+   "start": 1.32,
+   "end": 1.38
+  },
+  {
+   "text": "a",
+   "start": 1.38,
+   "end": 1.46
+  },
+  {
+   "text": "g",
+   "start": 1.46,
+   "end": 1.54
+  },
+  {
+   "text": "r",
+   "start": 1.54,
+   "end": 1.56
+  },
+  {
+   "text": "e",
+   "start": 1.56,
+   "end": 1.62
+  },
+  {
+   "text": "e",
+   "start": 1.62,
+   "end": 1.78
+  },
+  {
+   "text": ".",
+   "start": 1.78,
+   "end": 1.78
+  }
+ ]
+}

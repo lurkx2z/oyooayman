@@ -1,0 +1,574 @@
+{
+ "id": "17-n_r3",
+ "text": "Round three. What does the new world look like?",
+ "seconds": 3.34,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Round",
+   "start": 0.08,
+   "end": 0.36
+  },
+  {
+   "text": "three.",
+   "start": 0.4,
+   "end": 0.74
+  },
+  {
+   "text": "What",
+   "start": 1.28,
+   "end": 1.42
+  },
+  {
+   "text": "does",
+   "start": 1.44,
+   "end": 1.58
+  },
+  {
+   "text": "the",
+   "start": 1.62,
+   "end": 1.72
+  },
+  {
+   "text": "new",
+   "start": 1.76,
+   "end": 1.96
+  },
+  {
+   "text": "world",
+   "start": 2,
+   "end": 2.28
+  },
+  {
+   "text": "look",
+   "start": 2.34,
+   "end": 2.52
+  },
+  {
+   "text": "like?",
+   "start": 2.56,
+   "end": 2.84
+  }
+ ],
+ "characters": [
+  {
+   "text": "R",
+   "start": 0,
+   "end": 0.048
+  },
+  {
+   "text": "o",
+   "start": 0.048,
+   "end": 0.096
+  },
+  {
+   "text": "u",
+   "start": 0.096,
+   "end": 0.144
+  },
+  {
+   "text": "n",
+   "start": 0.144,
+   "end": 0.192
+  },
+  {
+   "text": "d",
+   "start": 0.192,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "t",
+   "start": 0.4,
+   "end": 0.464
+  },
+  {
+   "text": "h",
+   "start": 0.464,
+   "end": 0.528
+  },
+  {
+   "text": "r",
+   "start": 0.528,
+   "end": 0.592
+  },
+  {
+   "text": "e",
+   "start": 0.592,
+   "end": 0.656
+  },
+  {
+   "text": "e",
+   "start": 0.656,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "W",
+   "start": 1.28,
+   "end": 1.3
+  },
+  {
+   "text": "h",
+   "start": 1.3,
+   "end": 1.32
+  },
+  {
+   "text": "a",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "t",
+   "start": 1.34,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "d",
+   "start": 1.44,
+   "end": 1.46
+  },
+  {
+   "text": "o",
+   "start": 1.46,
+   "end": 1.48
+  },
+  {
+   "text": "e",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": "s",
+   "start": 1.5,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "t",
+   "start": 1.6,
+   "end": 1.627
+  },
+  {
+   "text": "h",
+   "start": 1.627,
+   "end": 1.653
+  },
+  {
+   "text": "e",
+   "start": 1.653,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "n",
+   "start": 1.76,
+   "end": 1.813
+  },
+  {
+   "text": "e",
+   "start": 1.813,
+   "end": 1.867
+  },
+  {
+   "text": "w",
+   "start": 1.867,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2.08
+  },
+  {
+   "text": "w",
+   "start": 2.08,
+   "end": 2.112
+  },
+  {
+   "text": "o",
+   "start": 2.112,
+   "end": 2.144
+  },
+  {
+   "text": "r",
+   "start": 2.144,
+   "end": 2.176
+  },
+  {
+   "text": "l",
+   "start": 2.176,
+   "end": 2.208
+  },
+  {
+   "text": "d",
+   "start": 2.208,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "l",
+   "start": 2.32,
+   "end": 2.36
+  },
+  {
+   "text": "o",
+   "start": 2.36,
+   "end": 2.4
+  },
+  {
+   "text": "o",
+   "start": 2.4,
+   "end": 2.44
+  },
+  {
+   "text": "k",
+   "start": 2.44,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "l",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "i",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "k",
+   "start": 2.72,
+   "end": 2.8
+  },
+  {
+   "text": "e",
+   "start": 2.8,
+   "end": 2.88
+  },
+  {
+   "text": "?",
+   "start": 2.88,
+   "end": 3.28
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Round",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "three.",
+   "start": 0.4,
+   "end": 1.2
+  },
+  {
+   "text": "What",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "does",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "the",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "new",
+   "start": 1.76,
+   "end": 1.92
+  },
+  {
+   "text": "world",
+   "start": 2.08,
+   "end": 2.24
+  },
+  {
+   "text": "look",
+   "start": 2.32,
+   "end": 2.48
+  },
+  {
+   "text": "like?",
+   "start": 2.56,
+   "end": 3.28
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "R",
+   "start": 0.08,
+   "end": 0.14
+  },
+  {
+   "text": "o",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "u",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "n",
+   "start": 0.2,
+   "end": 0.28
+  },
+  {
+   "text": "d",
+   "start": 0.28,
+   "end": 0.36
+  },
+  {
+   "text": " ",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "t",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "h",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": "r",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "e",
+   "start": 0.54,
+   "end": 0.54
+  },
+  {
+   "text": "e",
+   "start": 0.54,
+   "end": 0.74
+  },
+  {
+   "text": ".",
+   "start": 0.74,
+   "end": 0.74
+  },
+  {
+   "text": " ",
+   "start": 0.74,
+   "end": 1.28
+  },
+  {
+   "text": "W",
+   "start": 1.28,
+   "end": 1.3
+  },
+  {
+   "text": "h",
+   "start": 1.3,
+   "end": 1.32
+  },
+  {
+   "text": "a",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "t",
+   "start": 1.36,
+   "end": 1.42
+  },
+  {
+   "text": " ",
+   "start": 1.42,
+   "end": 1.44
+  },
+  {
+   "text": "d",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": "o",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": "e",
+   "start": 1.5,
+   "end": 1.54
+  },
+  {
+   "text": "s",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": " ",
+   "start": 1.58,
+   "end": 1.62
+  },
+  {
+   "text": "t",
+   "start": 1.62,
+   "end": 1.64
+  },
+  {
+   "text": "h",
+   "start": 1.64,
+   "end": 1.66
+  },
+  {
+   "text": "e",
+   "start": 1.66,
+   "end": 1.72
+  },
+  {
+   "text": " ",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "n",
+   "start": 1.76,
+   "end": 1.82
+  },
+  {
+   "text": "e",
+   "start": 1.82,
+   "end": 1.88
+  },
+  {
+   "text": "w",
+   "start": 1.88,
+   "end": 1.96
+  },
+  {
+   "text": " ",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": "w",
+   "start": 2,
+   "end": 2.06
+  },
+  {
+   "text": "o",
+   "start": 2.06,
+   "end": 2.08
+  },
+  {
+   "text": "r",
+   "start": 2.08,
+   "end": 2.12
+  },
+  {
+   "text": "l",
+   "start": 2.12,
+   "end": 2.16
+  },
+  {
+   "text": "d",
+   "start": 2.16,
+   "end": 2.28
+  },
+  {
+   "text": " ",
+   "start": 2.28,
+   "end": 2.34
+  },
+  {
+   "text": "l",
+   "start": 2.34,
+   "end": 2.36
+  },
+  {
+   "text": "o",
+   "start": 2.36,
+   "end": 2.4
+  },
+  {
+   "text": "o",
+   "start": 2.4,
+   "end": 2.46
+  },
+  {
+   "text": "k",
+   "start": 2.46,
+   "end": 2.52
+  },
+  {
+   "text": " ",
+   "start": 2.52,
+   "end": 2.56
+  },
+  {
+   "text": "l",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "i",
+   "start": 2.64,
+   "end": 2.7
+  },
+  {
+   "text": "k",
+   "start": 2.7,
+   "end": 2.82
+  },
+  {
+   "text": "e",
+   "start": 2.82,
+   "end": 2.84
+  },
+  {
+   "text": "?",
+   "start": 2.84,
+   "end": 2.84
+  }
+ ]
+}

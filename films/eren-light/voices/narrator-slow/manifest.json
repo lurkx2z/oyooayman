@@ -1,0 +1,60 @@
+{
+  "voice": "uju3wxzG5OhpWcoi3SMy",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.5,
+    "similarity_boost": 0.75,
+    "speed": 0.9
+  },
+  "clips": [
+    {
+      "id": "01-n_title",
+      "text": "Would Eren and Light... agree?",
+      "file": "01-n_title.mp3",
+      "align": "01-n_title.align.json",
+      "seconds": 2.46,
+      "speech_start": 0.12,
+      "speech_end": 2.08,
+      "hash": "a3f35891d9c66d78",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "02-n_zero",
+      "text": "Thirty-nine. Forty.",
+      "file": "02-n_zero.mp3",
+      "align": "02-n_zero.align.json",
+      "seconds": 2.38,
+      "speech_start": 0.08,
+      "speech_end": 1.8,
+      "hash": "0b4d966832ea737f",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "03-n_end",
+      "text": "Light waits for him to fall. Eren just looks back at him... and smiles. And then the lights go out.",
+      "file": "03-n_end.mp3",
+      "align": "03-n_end.align.json",
+      "seconds": 7.84,
+      "speech_start": 0.1,
+      "speech_end": 7.36,
+      "hash": "2baec61359e3e5e1",
+      "verified": true,
+      "timing": "forced-alignment"
+    },
+    {
+      "id": "04-n_cta",
+      "text": "So which rule wins? The notebook... or the future?",
+      "file": "04-n_cta.mp3",
+      "align": "04-n_cta.align.json",
+      "seconds": 3.81,
+      "speech_start": 0.12,
+      "speech_end": 3.56,
+      "hash": "b98a928c0d660908",
+      "verified": true,
+      "timing": "forced-alignment"
+    }
+  ]
+}
