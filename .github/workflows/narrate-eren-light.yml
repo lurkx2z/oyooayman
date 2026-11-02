@@ -1,0 +1,63 @@
+# Narrate "Would Eren and Light agree?": turns films/eren-light/VO-*.md (one file per voice)
+# into verified MP3 clips plus word timestamps (tools/narrate-aligned.cjs), then
+# commits them back to this branch. Uses the repository secret ELEVENLABS_API_KEY (never printed).
+name: Narrate eren-light
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Regenerate every clip even if its text did not change"
+        type: boolean
+        default: false
+  push:
+    branches: ["claude/project-thread-dlj9ks"]
+    paths: ["films/eren-light/VO-*.md", ".github/workflows/narrate-eren-light.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: narrate-eren-light-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  narrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SLUG: eren-light
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install ffmpeg (for the playback check)
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg >/dev/null; }
+      - name: Generate, verify and time every clip
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+        run: |
+          if [ -z "$ELEVENLABS_API_KEY" ]; then echo "::error::The secret ELEVENLABS_API_KEY is missing."; exit 1; fi
+          for f in films/$SLUG/VO-*.md; do
+            role=$(basename "$f" .md); role=${role#VO-}
+            node tools/narrate-aligned.cjs --script "$f" --out "films/$SLUG/voices/$role" $FORCE
+            node tools/narrate-aligned.cjs --script "$f" --out "films/$SLUG/voices/$role" --realign --summary "$GITHUB_STEP_SUMMARY"
+          done
+      - name: Commit the clips back to this branch
+        if: always()
+        run: |
+          git config user.name "narration-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "films/$SLUG/voices" 2>/dev/null || true
+          if git diff --cached --quiet; then echo "nothing new to commit"; exit 0; fi
+          git commit -m "narration: $SLUG clips / word timestamps (ElevenLabs, run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3))
+          done
+          exit 1
