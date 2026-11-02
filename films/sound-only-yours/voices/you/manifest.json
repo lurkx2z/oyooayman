@@ -1,0 +1,111 @@
+{
+  "voice": "TX3LPaxmHKxFdv7VOQHJ",
+  "model": "eleven_v3",
+  "format": "mp3_44100_128",
+  "voice_settings": {
+    "stability": 0.5,
+    "similarity_boost": 0.75
+  },
+  "clips": [
+    {
+      "id": "01-y_what",
+      "text": "[gasps] What...?",
+      "sent": "[gasps] What...?",
+      "model": "eleven_v3",
+      "file": "01-y_what.mp3",
+      "seconds": 1.91,
+      "hash": "31debb35473cd5ba",
+      "verified": true
+    },
+    {
+      "id": "02-y_hello",
+      "text": "[nervously] Hello?",
+      "sent": "[nervously] Hello?",
+      "model": "eleven_v3",
+      "file": "02-y_hello.mp3",
+      "seconds": 1.91,
+      "hash": "0bff1b8b0a857213",
+      "verified": true
+    },
+    {
+      "id": "03-y_mum",
+      "text": "Mum? ...Mum, can you hear me?",
+      "sent": "Mum? ...Mum, can you hear me?",
+      "model": "eleven_v3",
+      "file": "03-y_mum.mp3",
+      "seconds": 2.38,
+      "hash": "495c099e427e82d6",
+      "verified": true
+    },
+    {
+      "id": "04-y_window",
+      "text": "[whispers] Hello? ...Is anyone out there?",
+      "sent": "[whispers] Hello? ...Is anyone out there?",
+      "model": "eleven_v3",
+      "file": "04-y_window.mp3",
+      "seconds": 2.53,
+      "hash": "e4b49d8db763f733",
+      "verified": true
+    },
+    {
+      "id": "05-y_okay",
+      "text": "[breathing heavily] Okay. Okay...",
+      "sent": "[breathing heavily] Okay. Okay...",
+      "model": "eleven_v3",
+      "file": "05-y_okay.mp3",
+      "seconds": 3.11,
+      "hash": "9bf90bf253f069bf",
+      "verified": true
+    },
+    {
+      "id": "06-y_scared",
+      "text": "[startled] God! ...You scared me.",
+      "sent": "[startled] God! ...You scared me.",
+      "model": "eleven_v3",
+      "file": "06-y_scared.mp3",
+      "seconds": 2.14,
+      "hash": "88322b8814ad512f",
+      "verified": true
+    },
+    {
+      "id": "07-y_street",
+      "text": "Can anyone hear me?",
+      "sent": "Can anyone hear me?",
+      "model": "eleven_v3",
+      "file": "07-y_street.mp3",
+      "seconds": 0.94,
+      "hash": "17d4a378078c03bc",
+      "verified": true
+    },
+    {
+      "id": "08-y_count",
+      "text": "One... two... three... four... five... six...",
+      "sent": "One... two... three... four... five... six...",
+      "model": "eleven_v3",
+      "file": "08-y_count.mp3",
+      "seconds": 5.51,
+      "hash": "5e62a46789fc00ea",
+      "verified": true
+    },
+    {
+      "id": "09-y_shout",
+      "text": "[shouting] HELLO!",
+      "sent": "[shouting] HELLO!",
+      "model": "eleven_v3",
+      "file": "09-y_shout.mp3",
+      "seconds": 1.67,
+      "hash": "d844eb82bf3bce62",
+      "verified": true
+    },
+    {
+      "id": "10-y_who",
+      "text": "[whispers, terrified] Who's there?",
+      "sent": "[whispers, terrified] Who's there?",
+      "model": "eleven_v3",
+      "file": "10-y_who.mp3",
+      "seconds": 1.52,
+      "hash": "6b5f1f0164098586",
+      "verified": true
+    }
+  ]
+}
