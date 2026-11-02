@@ -216,7 +216,7 @@ DRAW.shake = (g, t, sh) => {
     // a puddle in the street, rippling with each thud
     q.fillStyle = '#5a4a3c'; q.beginPath(); q.ellipse(1000, 1120, 360, 60, 0, 0, Math.PI * 2); q.fill();
     q.fillStyle = '#c9c2b4'; q.beginPath(); q.ellipse(1000, 1120, 330, 50, 0, 0, Math.PI * 2); q.fill();
-    q.strokeStyle = ELK.ink; q.lineWidth = 4; for (let k = 0; k < 4; k++) { const ph = ((t - T.shake) * 1.1 + k * 0.25) % 1; if (t < T.shake - 0.3) break; q.globalAlpha = 1 - ph; q.beginPath(); q.ellipse(1000, 1120, 40 + ph * 300, 6 + ph * 46, 0, 0, Math.PI * 2); q.stroke(); } q.globalAlpha = 1;
+    q.strokeStyle = ELK.ink; q.lineWidth = 4; for (let k = 0; k < 4; k++) { if (t < T.shake - 0.3) break; const ph = (((t - T.shake) * 1.1 + k * 0.25) % 1 + 1) % 1; q.globalAlpha = 1 - ph; q.beginPath(); q.ellipse(1000, 1120, 40 + ph * 300, 6 + ph * 46, 0, 0, Math.PI * 2); q.stroke(); } q.globalAlpha = 1;
     // dust falling from the roofs
     for (let i = 0; i < 30; i++) { const ph = (t * 0.8 + hash(i)) % 1; q.fillStyle = 'rgba(40,30,30,0.7)'; q.fillRect(200 + hash(i * 3) * 1600, 380 + ph * 600, 4, 4); }
   });

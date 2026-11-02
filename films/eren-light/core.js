@@ -9,6 +9,11 @@
      · "impact frames": on the biggest beats the page flips to stark negative for a few frames.
    Captions and cards are drawn after the shader, crisp. Keys: Space play/pause, R restart, ←/→ step, F, M.
    ===================================================================== */
+// a guard for a render that must never stop: a negative radius (say, a ripple a frame before it starts) draws nothing
+(() => { for (const C of [window.CanvasRenderingContext2D, window.OffscreenCanvasRenderingContext2D]) { if (!C) continue; const P = C.prototype, e = P.ellipse, a = P.arc, rg = P.createRadialGradient;
+  P.ellipse = function (x, y, rx, ry, ...r) { return e.call(this, x, y, Math.max(0, rx), Math.max(0, ry), ...r); };
+  P.arc = function (x, y, rr, ...r) { return a.call(this, x, y, Math.max(0, rr), ...r); };
+  P.createRadialGradient = function (x0, y0, r0, x1, y1, r1) { return rg.call(this, x0, y0, Math.max(0, r0), x1, y1, Math.max(0, r1)); }; } })();
 
 const W = 1920, H = 1080, FPS = 30;
 const sbc = { clamp: (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)) };
