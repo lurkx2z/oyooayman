@@ -35,6 +35,9 @@ lines the music sits about 20 dB over the rain (the house rule: music leads, amb
 ## Delivered (2026-11-02, /mnt/project-files/eren-vs-light/)
 - `eren-light_1080p.mp4`: 5:49, 1920×1080 30 fps, two-pass H.264 565k + AAC 128k = **29.3 MiB**, −15.4 LUFS,
   −2.2 dBTP, LRA 4.8 LU. Rendered from a CRF 18 master in the cloud (`render.cjs`, 4 workers, 28 min).
+- **`eren-light_1080p_HQ.mp4` (the file to upload, added 2026-11-02 13:35)**: same film, two-pass H.264 8 Mbps
+  (max 12) + AAC 192k = 341 MiB, −15.4 LUFS, −2.5 dBTP. The 29 MiB file smeared the screentone dots and looked "like
+  480p" to the owner; SSIM against the master on a hard clip: 29 MiB file 0.93, HQ file 0.99.
 - `eren-light.zip`: the runnable page (open `eren-light.html`, click the picture).
 - `thumb-notebook-40.jpg` (pick), `thumb-eighty.jpg`, `thumb-god.jpg`; `TITLE.txt` (pick: "What If Light Wrote
   Eren's Name in the Death Note?").
@@ -51,6 +54,6 @@ lines the music sits about 20 dB over the rain (the house rule: music leads, amb
 - The full-body figures in the wide station shots still use the simpler rig (stiffer limbs and hands than the
   close-ups). The giant is a suit-shaped silhouette, not a detailed titan. Light's hair reads a little dome-shaped
   in some angles.
-- Under 30 MiB the halftone dots soften slightly; the full-quality master is the better upload if size allows.
+- Under 30 MiB the halftone dots smear badly (the owner saw it as 480p). Upload the HQ file; the small one is a preview.
 - The leads are recognisable by design cues only (by choice, no copied art), so a viewer who does not know the two
   series relies on the narration to know who they are.

@@ -67,5 +67,6 @@ loudnorm to −15 LUFS / −1.5 dBTP, limiter, `mix.m4a`, `mix.mp3`, and `../sou
 - `stills.cjs` — stills for review.
 
 ## Final (2026-11-02)
-5:49, 94 shots, 48 voice clips. MP4 29.3 MiB (−15.4 LUFS, −2.2 dBTP) + runnable ZIP + 3 thumbnails, in
+5:49, 94 shots, 48 voice clips. Upload file `eren-light_1080p_HQ.mp4` (8 Mbps, 341 MiB), a 29.3 MiB preview, a
+runnable ZIP and 3 thumbnails, in
 `/mnt/project-files/eren-vs-light/`. Details and weak spots: `EPISODE_REPORT.md`.
