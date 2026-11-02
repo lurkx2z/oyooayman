@@ -16,7 +16,7 @@
 const FU_MARKS = [[1000, '1 km'], [8849, 'EVEREST'], [11000, 'AIRLINERS'], [18300, 'CONCORDE'], [35000, 'WEATHER BALLOONS'], [100000, 'SPACE']];
 // the scene's context line: [from, to, label, value(t, s) → { v, v2 }] (HTML)
 const FU_CTX = (() => {
-  const sh = (m) => FU_SHOTS.find((x) => x.mode === m);
+  const sh = fuShot;
   const span = (a, b, l, f) => [sh(a).t0 + 0.4, sh(b).t1 - 0.25, l, f];
   const beat = (id, l, f, k0 = 0) => [fuC(id, k0) - 0.2, fuE(id) + 0.2, l, f];
   const A = FU_FLY.apple, kmh = (v) => Math.round(Math.abs(v) * 3.6).toLocaleString('en-US');
@@ -26,12 +26,12 @@ const FU_CTX = (() => {
     beat('leaves', 'A LEAF FALLS AT ABOUT', () => ({ v: '1.3 <small>m/s</small>', v2: 'SO IT RISES AT 1.3 m/s' })),
     span('fountain', 'fountain', 'THE WATER LEAVES THE JET AT', () => ({ v: '6 <small>m/s</small>', v2: 'NONE OF IT COMES BACK' })),
     beat('hold', 'IF SHE LETS GO NOW, BY 3:10', (t, s) => { const f = fuFlight(Math.round(s), 55, { h0: 4.5, until: 601, dt: 0.1 }); return { v: Math.round(f(600) / 1000) + ' <small>km up</small>', v2: 'AIRLINERS FLY AT 11 km' }; }, 1),
-    span('dog', 'dog', 'THE DOG PULLS UP ON THE LEAD WITH', () => ({ v: '20 <small>kg</small>', v2: 'ALL OF ITS WEIGHT' })),
+    span('dog', 'dog', 'THE DOG PULLS UP ON THE LEAD WITH', () => ({ v: '200 <small>N</small>', v2: 'ITS WHOLE WEIGHT (20 kg)' })),
     span('height', 'height', 'THE AIR UP HERE', (t, s) => ({ v: Math.round(100 * fuRho(A(s)) / FUP.ref) + ' <small>% as thick</small>', v2: 'LESS AIR, LESS DRAG: ' + Math.round(A.v(s)) + ' m/s' })),
     span('planes', 'planes', 'AIRLINERS CRUISE AT', () => ({ v: '10–12 <small>km</small>', v2: 'LOST PHONES ARE GETTING THERE' })),
     span('space', 'space', 'YOUR APPLE IS GOING', (t, s) => ({ v: (A.v(s) / 1000).toFixed(1) + ' <small>km/s</small>', v2: kmh(A.v(s)) + ' km/h · THE AIR HAS RUN OUT' })),
     beat('down', 'THE FOUNTAIN’S HIGHEST WATER', () => ({ v: '5.5 <small>km up</small>', v2: 'FROZEN · DOWN BY 3:20' }), 1),
-    beat('question', 'YOUR APPLE IS STILL UP AT', (t, s) => ({ v: Math.round(A(s) / 1000) + ' <small>km</small>', v2: 'IT LANDS AT ' + fuHMS(A.sLand) + ' PM' })),
+    beat('question', 'YOUR APPLE IS STILL UP AT', (t, s) => ({ v: Math.round(A(s) / 1000) + ' <small>km</small>', v2: 'STRAIGHT BACK DOWN · LANDS ABOUT 3:21' })),
   ];
 })();
 // the honest labels (bottom left): [from, to, text]
@@ -39,7 +39,7 @@ const FU_TAGS = (() => { const b = (id, text, k0 = 0) => [fuC(id, k0) - 0.1, fuE
   b('real', 'THE ONE IMPOSSIBLE THING: GRAVITY PUSHING WHAT YOU LET GO OF'),
   b('kettle', 'LEFT OUT: THE AIR KEEPS ITS WEIGHT (OR THE SKY WOULD LEAVE TOO)'),
   b('apple', 'AIR DRAG: THE STANDARD ATMOSPHERE, THINNING WITH HEIGHT', 2),
-  b('height', 'TEMPERATURE: THE STANDARD ATMOSPHERE AT 14.6 km', 1),
+  b('height', 'TEMPERATURE: THE STANDARD ATMOSPHERE AT 15.3 km', 1),
 ]; })();
 
 // a caption's text with its numbers in amber
@@ -84,7 +84,8 @@ class FuHud {
         const h = A(s), up = A.v(s) > 0;
         this._html('ros', this.roS, `YOUR APPLE ${up ? '↑' : '↓'} <b>${fuHt(h)}</b>`);
         const nx = FU_MARKS.find((x) => x[0] > h);
-        this._html('ron', this.roN, s >= FUP.T ? (up ? `COASTING UP TO ${fuHt(A.hTop)}` : 'FALLING BACK · LANDS 3:21') : nx ? `NEXT: ${nx[1]}${nx[1] === '1 km' ? '' : ' · ' + fuHt(nx[0])}` : 'IN SPACE');
+        const sky = shot && (shot.mode === 'height' || shot.mode === 'planes' || shot.mode === 'space' || shot.mode === 'appleUp'), M = fuMach(A.v(s), h);
+        this._html('ron', this.roN, s >= FUP.T ? (up ? `COASTING UP TO ${fuHt(A.hTop)}` : 'FALLING BACK · LANDS ABOUT 3:21') : M >= 1 ? `SUPERSONIC · MACH ${M.toFixed(1)}` : sky && nx ? `NEXT: ${nx[1]}${nx[1] === '1 km' ? '' : ' · ' + fuHt(nx[0])}` : h >= 100000 ? 'IN SPACE' : '');
       } else { this._html('ros', this.roS, ''); this._html('ron', this.roN, ''); }
       this._cls('roc', this.ro, !on ? 'fu-ro hit' : left <= 10 ? 'fu-ro tick' : 'fu-ro');
     }
@@ -117,7 +118,7 @@ class FuHud {
       this._set('capa', this.cap, 'opacity', W(t, cp.show, cp.hide, 0.22, 0.3).toFixed(3));
     } else this._set('capa', this.cap, 'opacity', '0');
     // ---- the last ten seconds, big
-    { const n = s >= FU.sCount && s < FUP.T ? Math.ceil(FUP.T - s - 1e-6) : 0, a = n ? 1 : 0;
+    { const n = s >= FU.sCount && s < FUP.T && shot && shot.mode === 'count' ? Math.ceil(FUP.T - s - 1e-6) : 0, a = n ? 1 : 0;
       this._set('cna', this.count, 'opacity', String(a));
       if (n) { this._txt('cnt', this.count, String(n)); const f = (FUP.T - s) % 1; this._cls('cnc', this.count, f > 0.82 ? 'fu-count hit' : 'fu-count'); } }
     // ---- the diagrams
@@ -145,7 +146,7 @@ class FuHud {
 
   // the diagrams (SVG)
   _insets(t, s) {
-    const W = StoryHUD.win, sh = (m) => FU_SHOTS.find((x) => x.mode === m);
+    const W = StoryHUD.win, sh = fuShot;
     const which = [['stride', fuC('walk', 0) - 0.2, sh('walk').t1 - 0.2, 'left'], ['ladder', sh('height').t0 + 0.4, sh('planes').t1 - 0.2, 'ladder'], ['ladder', sh('space').t0 + 0.4, sh('space').t1 - 0.2, 'ladder']].find((x) => t >= x[1] && t < x[2]);
     const a = which ? W(t, which[1], which[2], 0.45, 0.4) : 0;
     this._set('ina', this.inset, 'opacity', a.toFixed(3));

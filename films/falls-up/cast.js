@@ -50,6 +50,8 @@ const FU_POSES = {
   point: () => { const p = basePose(); p.neck = -0.5; p.spine = -0.1; p.rSh = [2.3, 0.2]; p.rEl = 0.15; p.lSh = [0.3, 0.2]; p.lEl = 0.6; return p; },
   armsOut: () => { const p = basePose(); p.lSh = [0.6, 0.9]; p.rSh = [0.7, 0.85]; p.lEl = 0.3; p.rEl = 0.35; p.neck = 0.1; p.lKnee = 0.35; p.rKnee = 0.3; p.lHip = [0.25, 0.12]; p.rHip = [0.2, 0.12]; p.hipY = 0.85; return p; },
   crouch: () => { const p = basePose(); p.hipY = 0.6; p.lHip = [1.1, 0.12]; p.rHip = [1.1, 0.12]; p.lKnee = 1.6; p.rKnee = 1.6; p.lFoot = 0.35; p.rFoot = 0.35; p.spine = 0.35; p.lSh = [0.9, 0.3]; p.rSh = [0.8, 0.3]; p.lEl = 0.4; p.rEl = 0.4; return p; },
+  // lying along the branch on its sky side, arms and legs locked round it (the branch runs along her, under her belly)
+  sloth: () => { const p = basePose(); p.lSh = [2.6, 0.22]; p.rSh = [2.6, 0.22]; p.lEl = 0.25; p.rEl = 0.25; p.neck = 0.35; p.spine = 0.1; p.lHip = [0.95, 0.22]; p.rHip = [0.95, 0.22]; p.lKnee = 1.35; p.rKnee = 1.35; p.lFoot = 0.4; p.rFoot = 0.4; return p; },
   armsUp: () => { const p = basePose(); p.lSh = [2.85, 0.12]; p.rSh = [2.85, 0.12]; p.lEl = 0.1; p.rEl = 0.1; p.neck = -0.3; p.spine = -0.05; return p; },
   reachUp: () => { const p = basePose(); p.lSh = [2.6, 0.3]; p.rSh = [2.4, 0.35]; p.lEl = 0.25; p.rEl = 0.3; p.neck = -0.55; p.spine = -0.12; return p; },
   talk: () => { const p = basePose(); p.lSh = [0.9, 0.3]; p.rSh = [1.2, 0.25]; p.lEl = 1.3; p.rEl = 1.1; p.mouth = 1; p.neck = 0.05; return p; },
@@ -79,7 +81,7 @@ const fuYaw = (fx, fz) => Math.atan2(fx, fz);                         // facing 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE RUNNER (pose and place: special, she ends up upside down). → { p, q (THREE.Quaternion), pos }
 // ---------------------------------------------------------------------------------------------------------------------
-const FU_RUN = { x0: -1.6, z: -15.0, sRun: FU.sRun, sLift: FU.sLift, acc: 3.0, grabU: 0.86, sDrop: 606.4 };
+const FU_RUN = { x0: -1.6, z: -15.0, sRun: FU.sRun, sLift: FU.sLift, acc: 3.0, grabU: 0.86, sDrop: 606.4, sLock: 288 };   // sLock: (off camera) she has got her legs round the branch
 function fuRunner(s, C) {
   const R = FU_RUN, yaw = -FUPI / 2, B = C.T.branchAt(R.grabU), qY = new THREE.Quaternion().setFromAxisAngle(_fuCy, yaw), out = { q: new THREE.Quaternion() };
   const vRun = R.acc * (R.sLift - R.sRun), xLift = R.x0 - 0.5 * R.acc * (R.sLift - R.sRun) ** 2;
@@ -98,11 +100,22 @@ function fuRunner(s, C) {
     const p = lerpPose(fuWalkPose(xLift / 1.2 * -FUPI, 1.6), FU_POSES.armsUp(), k); p.lKnee += 0.6 * Math.sin(tau * 9) * k; p.rKnee += 0.6 * Math.cos(tau * 9) * k; p.neck = -0.6 * k;
     out.p = p; out.pos = [x + (B[0] - (xLift - vRun * tg)) * MathX.smooth(tau, 0, tg), rise(tau), R.z + (B[2] - H[2] - R.z) * MathX.smooth(tau, 0, tg)]; out.q.copy(qY); return out;
   }
+  // from 3:04:48 (off camera) she lies along the branch on its sky side, arms and legs locked round it: nobody can dead-hang
+  // for five minutes. Her body along the branch (towards the trunk), her head by her hands
+  if (s >= R.sLock && s < FUP.T) {
+    const p = FU_POSES.sloth(), br = Math.sin(s * 1.7); p.spine += 0.03 * br; p.neck += 0.2 * Math.sin(s * 0.31) + 0.15 * Math.max(0, Math.sin(s * 0.13)); p.headYaw = 0.3 * Math.sin(s * 0.23);
+    p.lKnee += 0.06 * Math.sin(s * 0.9); p.rKnee += 0.06 * Math.sin(s * 0.9 + 1);
+    const qA = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), new THREE.Vector3(...C.T.branchAt(Math.min(1, R.grabU + 0.08))).sub(new THREE.Vector3(...C.T.branchAt(R.grabU - 0.08))).normalize());
+    const roll = 0.05 * Math.sin(s * 0.7) + 0.03 * Math.sin(s * 1.9);   // she sways round the branch
+    const q = qA.clone().multiply(new THREE.Quaternion().setFromAxisAngle(_fuCx, roll)).multiply(new THREE.Quaternion().setFromAxisAngle(_fuCz, 1.5 * FUPI)).multiply(new THREE.Quaternion().setFromAxisAngle(_fuCy, FUPI / 2));
+    const off = new THREE.Vector3(...C.handOffS).applyQuaternion(q);
+    out.p = p; out.q.copy(q); out.pos = [B[0] - off.x, B[1] - off.y, B[2] - off.z]; return out;
+  }
   // holding the branch: her body turns about her hands (the branch's point B): 0 = hanging below, π = upside down above
   let th, sw = 0;
-  if (s < FUP.T) { const u = s - C.sGrab; th = FUPI - FUPI * Math.exp(-u / 0.32) * Math.cos(5.2 * u); sw = 0.06 * Math.sin(u * 1.1) + 0.03 * Math.sin(u * 2.9); }
+  if (s < FUP.T) { const u = s - C.sGrab; th = FUPI - FUPI * Math.exp(-u / 0.32) * Math.cos(5.2 * u); sw = 0.13 * Math.sin(u * 1.1) + 0.05 * Math.sin(u * 2.9); }
   else { const u = s - FUP.T; th = FUPI + FUPI * (1 - Math.exp(-u / 0.3) * Math.cos(4.6 * u)) + 0.08 * Math.exp(-u / 2) * Math.sin(u * 3); }
-  const p = FU_POSES.armsUp(); p.neck = 0.1; p.lKnee = 0.25 + 0.2 * Math.sin(s * 1.3); p.rKnee = 0.3 + 0.2 * Math.sin(s * 1.1 + 1); p.lHip = [0.15 + 0.1 * Math.sin(s * 0.8), 0.05]; p.rHip = [0.1, 0.05];
+  const p = FU_POSES.armsUp(); p.neck = 0.1 + 0.25 * Math.sin(s * 0.37); p.lKnee = 0.45 + 0.4 * Math.sin(s * 1.3); p.rKnee = 0.5 + 0.4 * Math.sin(s * 1.1 + 1); p.lHip = [0.2 + 0.3 * Math.sin(s * 0.8), 0.08]; p.rHip = [0.15 + 0.3 * Math.sin(s * 0.8 + 2.2), 0.08];
   if (s > FUP.T && s >= R.sDrop) {                                     // she lets go: drops to the path, crouches, stands
     const u = s - R.sDrop, h0 = B[1] - H[1], tf = Math.sqrt(2 * Math.max(0.05, h0) / 9.81), y = Math.max(0, h0 - 4.905 * u * u);
     const pp = u < tf ? FU_POSES.armsUp() : lerpPose(FU_POSES.crouch(), FU_POSES.stand(), MathX.smooth(u - tf, 0.2, 1.2));
@@ -164,7 +177,7 @@ function fuCastScene(mode, s, C) {
         if (s >= s0 - 1.4) { st.pos[0] = 4.6 - 0.9 * 4.6; st.p = s < s0 ? FU_POSES.cup() : after(s0 + 0.1, FU_POSES.cup(), FU_POSES.shield()); } else st.p.rSh = [0.75, 0.12], st.p.rEl = 1.75; void x;
         if (s >= s0 + 1.2) st.p = lerpPose(FU_POSES.shield(), FU_POSES.lookUp(), fuEase(s, s0 + 1.2, s0 + 2.0));
         put(FU_P.coffee, st); }
-      { const s0 = FU_FLY.phone.s0, p = s < s0 ? FU_POSES.phone() : after(s0 + 0.15, FU_POSES.phone(), FU_POSES.reachUp()); if (s > s0 + 1.0) p.neck = -0.7; put(FU_P.phone, fuSt(fuFidget(p, s, 3, 0.3), 6.2, -0.7, -FUPI / 2 - 0.5)); }
+      { const s0 = FU_FLY.phone.s0, p = s < s0 ? FU_POSES.phone() : after(s0 + 0.15, FU_POSES.phone(), FU_POSES.reachUp()); if (s > s0 + 1.0) p.neck = -0.7; put(FU_P.phone, fuSt(fuFidget(p, s, 3, 0.3), 8.6, -0.7, -FUPI / 2 - 0.5)); }
       put(13, fuWalkSt(s, 120, 16, -1.2, -FUPI / 2, 1.1)); F(14, 'talk', 9.5, -0.6, -2.2); F(15, 'stand', 10.3, -0.9, 2.0);
       break;
     }
@@ -188,7 +201,7 @@ function fuCastScene(mode, s, C) {
         const gather = (i, x, z, s0, pose) => { const dx = x - B[0], dz = z - B[2], far = Math.max(0, 1 - (s - s0) / 4); const st = far > 0 ? fuWalkSt(s, s0, x + dx * 2.2 * far, z + dz * 2.2 * far, fuYaw(-dx, -dz), 0) : null;
           if (far > 0) { st.pos = [x + dx * 2.2 * far, 0, z + dz * 2.2 * far]; st.p = fuWalkPose(far * 14, 1.1); put(i, st); } else lookAt(i, pose, x, z, B[0], B[2]); };
         const catchP = mode === 'count' ? 'reachUp' : mode === 'down' ? (s < FU_RUN.sDrop + 0.4 ? 'reachUp' : 'stand') : 'lookUp';
-        gather(10, B[0] + 1.4, B[2] + 1.2, 259.5, catchP); gather(11, B[0] - 1.2, B[2] + 1.5, 260.5, mode === 'hold' ? 'point' : catchP); gather(12, B[0] + 0.3, B[2] - 1.6, 262, catchP);
+        gather(10, B[0] + 1.4, B[2] + 1.2, 259.5, catchP); gather(11, B[0] - 1.2, B[2] + 1.5, 260.5, mode === 'hold' ? 'point' : catchP); gather(12, B[0] - 0.6, B[2] + 1.9, 262, catchP);
         if (mode !== 'hold') { lookAt(13, 'talk', B[0] + 3.2, B[2] + 2.6, B[0], B[2]); lookAt(14, 'lookUp', B[0] - 3.4, B[2] + 0.4, B[0], B[2]); }
         if (mode === 'down' && s > FU_RUN.sDrop + 1.6) { for (const i of [10, 11, 12, 13, 14]) { const e = out.find((o) => o[0] === i); if (e) e[1].p = fuFidget(FU_POSES.lookUp(), s, i); } }
       }
@@ -250,7 +263,9 @@ function fuBuildCast(S, T) {
   C.pigeons = Array.from({ length: 6 }, (_, i) => { const b = fuBuildPigeon(1); scene.add(b); b.visible = false; return b; });
   // the runner's hands, measured once in the armsUp pose (body frame, from her feet)
   { const P = C.people[FU_P.run]; P.root.position.set(0, 0, 0); P.root.quaternion.identity(); P.apply(FU_POSES.armsUp()); P.root.updateMatrixWorld(true);
-    const a = new THREE.Vector3(), b = new THREE.Vector3(); P.j.la.hand.getWorldPosition(a); P.j.ra.hand.getWorldPosition(b); C.handOff = [0, (a.y + b.y) / 2 + 0.04, (a.z + b.z) / 2]; }
+    const a = new THREE.Vector3(), b = new THREE.Vector3(); P.j.la.hand.getWorldPosition(a); P.j.ra.hand.getWorldPosition(b); C.handOff = [0, (a.y + b.y) / 2 + 0.04, (a.z + b.z) / 2];
+    // ... and in the locked pose (the branch is a little further out than her hands' middle: its radius)
+    P.apply(FU_POSES.sloth()); P.root.updateMatrixWorld(true); P.j.la.hand.getWorldPosition(a); P.j.ra.hand.getWorldPosition(b); C.handOffS = [0, (a.y + b.y) / 2, (a.z + b.z) / 2 + 0.06]; }
   C.update = (s, o) => fuCastUpdate(C, s, o || {});
   // where a prop is at the moment it's let go (pose its holder then, read it, and leave the scene to be re-posed)
   C.relAt = (key) => { const R = FU_REL[key]; fuCastUpdate(C, R[3] - 1e-4, { mode: R[2] }); C.props[key].updateWorldMatrix(true, false); return C.props[key].getWorldPosition(new THREE.Vector3()).toArray(); };

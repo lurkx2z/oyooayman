@@ -59,7 +59,7 @@ function fuLabelCanvas(text, bg, fg, w = 128, h = 160) {
 
 // a glass shard (a thin irregular triangle), a seeded one per i
 function fuShardGeo(i) {
-  const a = 0.012 + 0.03 * fuR(i, 3), b = 0.01 + 0.025 * fuR(i, 4), c = fuR(i, 5) * 2 - 1;
+  const a = 0.018 + 0.045 * fuR(i, 3), b = 0.015 + 0.035 * fuR(i, 4), c = fuR(i, 5) * 2 - 1;
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute([-a, 0, -b * 0.4, a * (0.3 + 0.6 * c), 0, -b, a * 0.6, 0, b], 3)); g.computeVertexNormals(); return g;
 }
 
@@ -81,6 +81,21 @@ const FU_CLUTTER = [
   ['remote', 'remote', 0.64, 0.27, -0.3, 370], ['paper', 'paper', 0.12, -0.36, 0.15, 400], ['slipper', 'slipper', 1.2, 0.5, 2.0, 420], ['lid', 'lid', -0.3, 0.26, 0, 440],
   ['cushion', 'cushion', 1.15, -0.95, 0.3, 445], ['phone', 'phone', 0.02, 0.06, 0.9, 450], ['jar', 'jar', 0.82, -0.36, 0, 465], ['sock', 'sock', -0.6, 0.55, 1.7, 470],
 ];
+
+// where the cat comes down at 3:10 (room-local x, z: on the table, clear of the lamp); nothing else lands there
+const FU_CAT_TABLE = [-0.2, 0.1];
+// keep everything that comes down clear of the lamp's shade (it would fall through it) and of the cat's spot
+const fuClear = (x, z) => {
+  for (const [cx, cz, r] of [[FU_ROOM.lamp.x, FU_ROOM.lamp.z, 0.3], [FU_CAT_TABLE[0], FU_CAT_TABLE[1], 0.2]]) {
+    const dx = x - cx, dz = z - cz, d = Math.hypot(dx, dz);
+    if (d < r) { if (d < 1e-4) { x = cx + r; continue; } x = cx + dx * r / d; z = cz + dz * r / d; }
+  }
+  return [x, z];
+};
+FU_CLUTTER.forEach((c) => { const [x, z] = fuClear(c[2], c[3]); c[2] = x; c[3] = z; });
+// how much each kind bounces when it comes down (restitution), and whether it rolls
+const FU_BOUNCE = { orange: [0.35, 1], catball: [0.55, 1], tin: [0.25, 1], bottle: [0.2, 1], jar: [0.2, 1], lid: [0.3, 0], mug: [0.15, 0], pen: [0.3, 1], fork: [0.25, 0], wspoon: [0.3, 0],
+  keys: [0.12, 0], remote: [0.2, 0], phone: [0.2, 0], book: [0.06, 0], cereal: [0.1, 0], board: [0.15, 0], plate: [0.12, 0], roll: [0.15, 1], banana: [0.08, 0] };
 
 function fuBuildRoom(S) {
   const scene = S.scene, R = { M: {}, ceil: [] }, tex = (c, rx, ry) => { const t = fuTex(c); t.repeat.set(rx, ry); return t; };
@@ -104,8 +119,8 @@ function fuBuildRoom(S) {
     shade: fuStd('#2f4a52', 0.5, 0.2, { side: THREE.DoubleSide }), shadeIn: fuStd('#f2e9d6', 0.6, 0, { side: THREE.BackSide, emissive: new THREE.Color('#ffcf8a'), emissiveIntensity: 0.0 }),
     bulb: new THREE.MeshBasicMaterial({ color: '#fff1d0' }), flex: fuStd('#1c1c1e', 0.6),
     cup: new THREE.MeshPhysicalMaterial({ color: '#dfeaee', transparent: true, opacity: 0.46, roughness: 0.04, envMapIntensity: 1.6, depthWrite: false, side: THREE.DoubleSide }),
-    water: new THREE.MeshStandardMaterial({ color: '#5f9fc4', transparent: true, opacity: 0.78, roughness: 0.03, metalness: 0.1, envMapIntensity: 2.0, depthWrite: false, side: THREE.DoubleSide }),
-    wet: new THREE.MeshStandardMaterial({ color: '#8a979e', transparent: true, opacity: 0.72, roughness: 0.02, metalness: 0.2, envMapIntensity: 2.2, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }),
+    water: new THREE.MeshStandardMaterial({ color: '#9cc9e4', transparent: true, opacity: 0.6, roughness: 0.02, metalness: 0.15, envMapIntensity: 2.6, depthWrite: false, side: THREE.DoubleSide }),
+    wet: new THREE.MeshStandardMaterial({ color: '#a4bccb', transparent: true, opacity: 0.72, roughness: 0.02, metalness: 0.2, envMapIntensity: 2.2, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }),
     tea: new THREE.MeshStandardMaterial({ color: '#9a5a1e', transparent: true, opacity: 0.8, roughness: 0.04, metalness: 0.05, envMapIntensity: 1.8, side: THREE.DoubleSide }),
     teaPool: new THREE.MeshStandardMaterial({ color: '#8a4e18', transparent: true, opacity: 0.74, roughness: 0.02, metalness: 0.1, envMapIntensity: 2.0, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 }),
     shard: new THREE.MeshStandardMaterial({ color: '#f4fbff', transparent: true, opacity: 0.85, roughness: 0.02, metalness: 0.3, envMapIntensity: 2.4, side: THREE.DoubleSide, depthWrite: false }),
@@ -335,7 +350,8 @@ function fuRoomUpdate(R, s, o) {
     R.shards.forEach((m, i) => {
       if (u < 0) { m.visible = false; return; }
       const a = fuR(i, 11) * 6.283, d = 0.05 + 0.42 * Math.pow(fuR(i, 12), 1.6), k = 1 - Math.exp(-u / 0.09);
-      const x = rel.glass[0] + Math.cos(a) * d * k, z = rel.glass[2] + Math.sin(a) * d * k;
+      let x = rel.glass[0] + Math.cos(a) * d * k, z = rel.glass[2] + Math.sin(a) * d * k;
+      [x, z] = fuClear(x, z);
       let y = C - 0.002, bounce = fuR(i, 13) < 0.4 ? 0.25 * fuR(i, 14) : 0;
       if (bounce) { const v0 = Math.sqrt(2 * 9.81 * bounce), tb = 2 * v0 / 9.81; if (u < tb) y = C - 0.002 - (v0 * u - 4.905 * u * u); }
       if (s >= FUP.T) { const rest = fuRestY(x, z) + 0.002, f = dropY(C - 0.002, rest); y = f.y(s); }
@@ -380,11 +396,12 @@ function fuRoomUpdate(R, s, o) {
   // ---- the clutter: up there from its moment (we never see it go); at 3:10 it comes down
   for (const K of R.clutter) {
     if (s < K.at) { K.g.visible = false; continue; }
-    K.g.visible = true; let y = C - K.h;
-    const rest = fuRestY(K.x, K.z) + K.h;
-    if (s >= FUP.T) y = dropY(C - K.h, rest).y(s);
+    K.g.visible = true; let y = C - K.h, x = K.x, z = K.z;
+    const rest = fuRestY(K.x, K.z) + K.h, bo = FU_BOUNCE[K.kind] || [0, 0];
+    if (s >= FUP.T) { const f = fuDropBounce(C - K.h, rest, bo[0]); y = f.y(s);
+      if (bo[1] && s > f.land) { const a = fuR(K.at, 7) * 6.283, d = (0.08 + 0.14 * fuR(K.at, 8)) * (1 - Math.exp(-(s - f.land) / 0.45)); x += Math.cos(a) * d; z += Math.sin(a) * d; } }
     const tum = s >= FUP.T ? Math.min(1, (s - FUP.T) / 0.6) : 0;
-    K.g.position.set(K.x, y, K.z); K.g.rotation.set(Math.PI * (1 - tum) + (K.kind === 'cereal' ? 0 : 0), K.ry + 0.4 * tum * fuR(K.at, 5), 0.3 * tum * (fuR(K.at, 6) - 0.5));
+    K.g.position.set(x, y, z); K.g.rotation.set(Math.PI * (1 - tum) + (K.kind === 'cereal' ? 0 : 0), K.ry + 0.4 * tum * fuR(K.at, 5), 0.3 * tum * (fuR(K.at, 6) - 0.5));
     if (K.kind === 'cereal' && s >= FUP.T) { K.g.rotation.set(Math.PI * (1 - tum), K.ry, 0); }
   }
   R.room.updateMatrixWorld(true);

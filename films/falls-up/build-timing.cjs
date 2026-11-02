@@ -16,13 +16,13 @@ const path = require('path');
 const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
-  title: 0.05, start: 0.6, rate: 1.6, real: 2.0, kettle: 2.2, cat: 2.4, stuck: 1.6, apple: 2.4, street: 2.4, leaves: 3.0, fountain: 2.6,
+  title: 0.05, start: 0.6, rate: 1.6, real: 2.0, kettle: 2.2, cat: 1.4, stuck: 1.6, apple: 2.4, street: 2.4, leaves: 3.0, fountain: 2.6,
   fish: 2.4, ball: 2.4, scoop: 1.8, rope: 2.4, planes: 2.4, walk: 2.0, jogger: 2.6, hold: 3.0, dog: 2.6, pigeons: 2.4, height: 3.0, warn: 2.2, home: 3.0, hold2: 2.6, space: 3.0,
   count: 2.0, drop: 9.9, down: 2.0, question: 2.0,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'start:1': 0.6, 'rate:1': 1.6, 'real:1': 0.6, 'kettle:1': 2.0, 'kettle:2': 1.8, 'cat:1': 2.4, 'apple:1': 2.4, 'apple:2': 1.2, 'street:1': 1.4,
+  'start:1': 0.6, 'rate:1': 1.6, 'real:1': 0.6, 'kettle:1': 2.0, 'kettle:2': 1.8, 'cat:1': 2.9, 'apple:1': 2.4, 'apple:2': 1.2, 'street:1': 1.4,
   'leaves:1': 1.6, 'fountain:1': 1.6, 'walk:1': 1.0, 'jogger:1': 0.8, 'hold:1': 1.2, 'hold:2': 1.0, 'dog:1': 2.0, 'height:1': 1.2, 'warn:1': 1.0,
   'home:1': 1.2, 'space:1': 1.8, 'down:1': 1.6, 'question:1': 1.6, 'fish:1': 1.6, 'rope:1': 1.8, 'planes:1': 1.0,
 };

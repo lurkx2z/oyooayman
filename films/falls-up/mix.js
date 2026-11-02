@@ -4,7 +4,7 @@
    Measured solo (pre-trim): music −22.6, amb −17.3, sfx −25.2 LUFS → with the trims music −15.6, amb −28.3, sfx −21.2.
    Targets (docs + owner): −16 to −14 LUFS integrated, true peak ≤ −1 dBTP, a real loudness range (not flat).
    ===================================================================== */
-const FU_MIXSH = (m) => FU_SHOTS.find((s) => s.mode === m);
+const FU_MIXSH = (m) => fuShot(m);
 window.FU_MIX = {
   stems: {
     music: { gain: 7, hp: 32 },    // the score leads: about 13 dB over the beds (the owner's rule after Days shorter)

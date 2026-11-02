@@ -139,7 +139,7 @@ const fuOct = (n, k) => n.replace(/-?\d$/, (d) => String(+d + k));
 
 fuSound('music', 'score', function (ctx, bus, K) {
   const M = fuMusicKit(ctx, K), C = FU_CH, c = fuC, B = fuB, f = fuFilmAt, END = FU.end, CEIL = FUP.ceil;
-  const sh = (mode) => FU_SHOTS.find((s) => s.mode === mode);
+  const sh = fuShot;
   // the theme (bells): up, or back down (o.down); o.n notes, o.gap, o.oct
   const theme = (t, o = {}) => { const ns = FU_THEME.slice(0, o.n || 5), seq = o.down ? ns.slice().reverse() : ns;
     seq.forEach((n, i) => M.bell(t + i * (o.gap || 0.42), fuOct(n, o.oct || 0), (o.vol || 0.45) * (i === seq.length - 1 ? 0.85 : 1), [-0.35, -0.15, 0.05, 0.25, 0.4][i])); };

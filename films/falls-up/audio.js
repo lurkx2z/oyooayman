@@ -64,10 +64,10 @@ function fuLimit(buf, ceilDb) {
 class FuAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'falls-up-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
-    const consts = { FUP, FU_ROOM, FU_ST, FU_CLOCK, FU_SHOTS, FU_HELD, FU_CATP, FU_CAT_LAND, FU_RUN, FU_DOGP, FU_CLUTTER, FU_CH, FU_THEME, fly: Object.entries(FU_FLY).map(([k, f]) => [k, f.s0, f.sLand, f.hTop]) };
+    const consts = { FUP, FU_ROOM, FU_ST, FU_CLOCK, FU_SHOTS, FU_HELD, FU_CATP, FU_CAT_LAND, FU_RUN, FU_DOGP, FU_CLUTTER, FU_CH, FU_THEME, FU_BOUNCE, FU_TAP, FU_CDM, fly: Object.entries(FU_FLY).map(([k, f]) => [k, f.s0, f.sLand, f.hTop]) };
     return [FU, FUT, window.FU_MIX, Object.values(FUX).map(String).join(''), FuFx.toString(), Object.getOwnPropertyNames(FuFx.prototype).map((k) => String(FuFx.prototype[k])).join(''),
       Object.values(FU_SOUND).flat().map((b) => b.name + b.fn).join(''), fuDynDb.toString(), FuAudio.toString(), fuLimit.toString(), fuStoryAt.toString(), consts,
-      (window.FU_SOUND_FNS || FU_SOUND_FNS || []).map(String).join(''), [fuShotAt, fuFlight, fuHop, fuDropBack, fuWaterH, fuCatState, fuKettleAt, fuRunner, fuDogState, fuMusicKit, fuPulse, fuRestY, fuOverTable, fuSm].map(String).join('')];
+      (window.FU_SOUND_FNS || FU_SOUND_FNS || []).map(String).join(''), [fuShotAt, fuFlight, fuHop, fuDropBack, fuWaterH, fuCatState, fuKettleAt, fuRunner, fuDogState, fuMusicKit, fuPulse, fuRestY, fuOverTable, fuSm, fuDropBounce, fuShot, fuCdMach, fuMach, fuClear].map(String).join('')];
   }
   // AudioEngine's fingerprint, with every number rounded to 7 significant digits: browsers' Math.exp/sin/acosh… can
   // differ in the last bit (Safari, Firefox), and then the baked copy was refused and the whole soundtrack rendered

@@ -13,13 +13,13 @@ status: voiceless
 
 [start] 3:00 PM. For the next 10 minutes, anything you let go of falls up. / And it stays up, on whatever stops it.
 
-[rate] A spoon and a grape, let go together. / They hit the ceiling together. Galileo's rule still holds: everything falls at the same rate. Just upwards.
+[rate] A spoon and a grape, let go together. / They hit the ceiling together. Galileo's rule still holds: without air in the way, everything falls at the same rate. Just upwards.
 
-[real] Gravity only ever pulls. Nothing we know of could make it push. / That's the one impossible part. The rest is physics.
+[real] Between masses, gravity only ever pulls. Nothing we know of could make the Earth push. / That, and gravity choosing what to push, is the impossible part. The rest is physics.
 
 [kettle] You pour the tea. / It pours up. / On the ceiling, it's just a puddle. It spreads out and stays there.
 
-[cat] The cat jumps down from the counter. / It lands on the ceiling. On its feet.
+[cat] The cat jumps down from the counter. / It sees the ceiling coming, twists, and lands on its feet.
 
 [stuck] Now it can't get down. Every jump takes it back up.
 
@@ -47,24 +47,24 @@ status: voiceless
 
 [dog] A dog jumps for a stick. / Now its owner is flying a 20 kg balloon.
 
-[pigeons] Pigeons can still fly. But now they land on the undersides of things.
+[pigeons] Pigeons can still fly, upside down. And they land on the undersides of things.
 
-[height] 3:06. Your apple is 14.6 km up: higher than Everest, higher than airliners. / Up there it's −57 °C. Its skin is freezing.
+[height] 3:06. Your apple is 15.3 km up: higher than Everest, higher than airliners. / Up there it's −56 °C. Its skin is freezing.
 
-[planes] 3:07. Lost phones are reaching 11 km, where airliners fly. / Every plane near the city is being turned away.
+[planes] 3:07. The first phones lost at 3:00 are reaching 11 km, where airliners fly. / Every plane near the city is being turned away.
 
-[warn] Everyone is holding on to something now. / At 3:10, it all switches back. And everything that fell up starts falling down.
+[warn] Nobody runs now. Nobody jumps. Most people hold on to something. / At 3:10, it all switches back. And everything that fell up starts falling down.
 
 [home] 3:08. Back home, your ceiling is full. / And all of it is right above your table.
 
 [hold2] 3:09. She's still holding on.
 
-[space] 3:09:40. Your apple crosses 100 km. / It's in space.
+[space] 3:09:39. Your apple crosses 100 km. / It's in space.
 
 [count] Ten seconds.
 
 [drop] 3:10. Everything comes down at once.
 
-[down] Everything that fell up for 10 minutes is coming back down. / The fountain's top is 5.5 km up, and frozen. It will rain ice on the park until 3:20.
+[down] Everything that fell up is falling back. Your apple is still coasting up. / The fountain's top is 5.5 km up, and frozen. It melts on the way down: ice-cold rain until 3:20.
 
-[question] Your apple lands at 3:21. Somewhere. / Where would you stand?
+[question] Your apple lands at about 3:21. Somewhere. / Where would you stand?

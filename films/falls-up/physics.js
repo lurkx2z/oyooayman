@@ -13,7 +13,7 @@
    - every dropped thing accelerates up at the same rate (Galileo's rule, upside down): a spoon and a grape land on the
      ceiling together;
    - air drag limits each thing to its terminal speed (the speed at which it would fall), and the air thins with height
-     (US Standard Atmosphere), so up high nothing slows it: an apple let go of at 3:01:30 is in space (100 km) by 3:09:40;
+     (US Standard Atmosphere), so up high nothing slows it: an apple let go of at 3:01:30 is in space (100 km) by 3:09:39;
    - running is a series of small jumps (both feet off the ground in every stride): a runner falls up.
    ===================================================================== */
 
@@ -46,15 +46,20 @@ const fuRho = (h) => fuAtm(h, 'rho');
 const fuTempC = (h) => fuAtm(h, 'tc');
 
 // ---- a flight: something let go of at story time s0 (height h0 above the ground, moving up at v0), with terminal speed
-// vt (m/s, in sea-level air). Up at gravity's strength until 3:10, then down, with drag (½ρv²CdA, written through vt),
+// vt (m/s, in sea-level air). Up at gravity's strength until 3:10, then down, with drag (½ρv²CdA, written through vt; Cd rises through the sound barrier),
 // until it lands. Integrated once (dt 0.02 s) into a table. f(s) → height (m); f.v(s) speed (m/s, + up); f.sLand,
 // f.hTop (its highest), f.sTop; f.cross(h) the story time it passes height h on the way up (or null)
+// a sphere's drag coefficient against Mach number (relative to its low-speed 0.47): it about doubles through the sound
+// barrier. Only your apple (≈ 34 km, 3:08) and the runner, had she let go, ever get there
+const FU_CDM = [[0, 1], [0.6, 1.02], [0.8, 1.17], [0.9, 1.38], [1.0, 1.7], [1.1, 1.96], [1.3, 2.09], [2, 2.13], [3, 2.02], [5, 1.96]];
+function fuCdMach(M) { const C = FU_CDM; for (let i = 0; i < C.length - 1; i++) if (M < C[i + 1][0]) return C[i][1] + (C[i + 1][1] - C[i][1]) * (M - C[i][0]) / (C[i + 1][0] - C[i][0]); return 1.96; }
+const fuMach = (v, h) => Math.abs(v) / Math.sqrt(1.4 * 287 * Math.max(150, fuTempC(h) + 273.15));
 function fuFlight(s0, vt, o = {}) {
   const dt = o.dt || 0.02, h0 = o.h0 || 0, H = [h0], V = [o.v0 || 0];
   let h = h0, v = o.v0 || 0, s = s0, hTop = h, sTop = s;
   const k0 = FUP.g / (vt * vt * FUP.ref);
   for (let i = 0; i < 400000; i++) {
-    const up = fuUp(s + dt / 2), dir = up ? 1 : -1, a = dir * fuGh(h) - k0 * fuRho(h) * v * Math.abs(v);
+    const up = fuUp(s + dt / 2), dir = up ? 1 : -1, a = dir * fuGh(h) - k0 * fuCdMach(fuMach(v, h)) * fuRho(h) * v * Math.abs(v);
     v += a * dt; h += v * dt; s += dt;
     if (h > hTop) { hTop = h; sTop = s; }
     if (!up && h <= 0) { h = 0; H.push(h); V.push(v); break; }
@@ -79,22 +84,28 @@ function fuHop(s0, y0, stop, v0 = 0) {
   return { s0, y0, stop, v0, hit: s0 + t, vHit: v0 + g * t, y: (s) => (s <= s0 ? y0 : s >= s0 + t ? stop : y0 + v0 * (s - s0) + 0.5 * g * (s - s0) ** 2) };
 }
 // at 3:10:00, from height top down to rest (floor or table) at `rest`: height at s (no drag over 2 m)
+// the same, with up to two bounces (restitution e: 0 for a towel, 0.3 for a tin, 0.5 for the cat's ball) → { land, hits: [s…], y }
+function fuDropBounce(top, rest, e) {
+  const T = FUP.T, g = FUP.g, tf = Math.sqrt(2 * Math.max(0, top - rest) / g), v1 = g * tf * e, t1 = 2 * v1 / g, v2 = v1 * e, t2 = 2 * v2 / g;
+  const hits = [T + tf]; if (e > 0.05) hits.push(T + tf + t1, T + tf + t1 + t2);
+  return { land: T + tf, hits, y: (s) => { const u = s - T; if (u <= 0) return top; if (u < tf) return top - 0.5 * g * u * u; let w = u - tf; if (w < t1) return rest + v1 * w - 0.5 * g * w * w; w -= t1; if (w < t2) return rest + v2 * w - 0.5 * g * w * w; return rest; } };
+}
 function fuDropBack(top, rest) { const T = FUP.T, tf = Math.sqrt(2 * Math.max(0, top - rest) / FUP.g); return { land: T + tf, y: (s) => (s <= T ? top : s >= T + tf ? rest : top - 0.5 * FUP.g * (s - T) ** 2) }; }
 
 // ---- the things that fell up outdoors, and how high they get (PLAN.md § 2: terminal speeds)
 const FU_FLY = {};
 {
   const F = FU_FLY;
-  F.apple = fuFlight(90.0, 38, { h0: 13.4, v0: 0 });       // 3:01:30, out of your 5th-floor window (13.4 m up); 200 g, 7.5 cm: vt ≈ 38 m/s
+  F.apple = fuFlight(90.0, 39.3, { h0: 13.4, v0: 0 });     // 3:01:30, out of your 5th-floor window (13.4 m up); 200 g, 7.5 cm, Cd 0.47: vt ≈ 39.3 m/s
   F.keys = fuFlight(131.5, 22, { h0: 1.1 });                // a bunch of keys, 3:02:11
-  F.phone = fuFlight(135.0, 30, { h0: 1.3 });               // a phone, 3:02:15
+  F.phone = fuFlight(135.0, 20, { h0: 1.3 });               // a phone, 3:02:15 (170 g, tumbling: vt ≈ 20 m/s)
   F.ball = fuFlight(220.0, 27, { h0: 0.3, v0: 9 });         // the kicked football (it leaves the boot at ~9 m/s upward)
   F.drop = fuFlight(0, 8, { h0: 1.8, v0: 6 });              // the fountain's first water (3:00:00): 3 mm drops, vt ≈ 8 m/s
   F.leaf = fuFlight(0, 1.3, { h0: 8 });                     // an autumn leaf (vt ≈ 1.3 m/s, fluttering)
   F.jogger = fuFlight(258.0, 55, { h0: 1.0, v0: 0.8 });     // the runner, if she had not caught the branch (vt ≈ 55 m/s)
   F.coat = fuFlight(309.0, 9, { h0: 1.6, v0: 7 });          // the coat thrown up to her (it opens: vt ≈ 9 m/s)
   F.fish = fuFlight(211.0, 25, { h0: -0.1, v0: 3.2 });      // the carp (1 kg: vt ≈ 25 m/s)
-  F.scoop = fuFlight(225.6, 12, { h0: 1.0, v0: 0.2 });      // a scoop of ice cream (vt ≈ 12 m/s)
+  F.scoop = fuFlight(225.6, 30, { h0: 1.0, v0: 0.2 });      // a scoop of ice cream (a dense ball: vt ≈ 30 m/s)
   F.stick = fuFlight(328.6, 14, { h0: 1.3, v0: 3.0 });      // the dog's stick
   F.coffee = fuFlight(133.0, 9, { h0: 1.2 });               // the coffee (it breaks into drops: vt ≈ 9 m/s); its cup, 7 m/s
   F.cup = fuFlight(133.0, 7, { h0: 1.2 });
@@ -123,7 +134,7 @@ const fuHMS = (s) => { const c = fuClockParts(s); return `${c.h}:${String(c.m).p
 // time left (s) as m:ss
 const fuMS = (x) => { x = Math.max(0, Math.ceil(x - 1e-6)); return `${Math.floor(x / 60)}:${String(x % 60).padStart(2, '0')}`; };
 // a height in words: "38 m" / "1.6 km" / "101 km"
-const fuHt = (h) => (h < 1000 ? `${Math.round(h)} m` : h < 10000 ? `${(h / 1000).toFixed(1)} km` : `${Math.round(h / 1000)} km`);
+const fuHt = (h) => (h < 1000 ? `${Math.round(h)} m` : h < 20000 ? `${(h / 1000).toFixed(1)} km` : `${Math.round(h / 1000)} km`);
 
 // ---- the sun: Saturday, late October, 3 PM, 35° N: south-west, 30° up (world axes: x WEST, y up, z NORTH)
 const FU_SUN = (() => { const alt = 30 * Math.PI / 180, az = 42 * Math.PI / 180; return [Math.cos(alt) * Math.sin(az), Math.sin(alt), -Math.cos(alt) * Math.cos(az)]; })();

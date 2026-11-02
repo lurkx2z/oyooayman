@@ -27,12 +27,12 @@
     /* the counter (top left, on a soft plate) and the scene's context line under it */
     .fu-ro, .fu-clock { position: absolute; top: calc(var(--u) * 44); pointer-events: none; text-shadow: 0 0 calc(var(--u) * 14) rgba(0, 0, 0, 0.75), 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0, 0, 0, 0.6); }
     .fu-ro { left: calc(var(--u) * 52); padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 18); border-radius: calc(var(--u) * 16); background: rgba(6, 8, 12, 0.55); }
-    .fu-ro .l, .fu-clock .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.18em; color: #ffffff; opacity: 0.92; }
+    .fu-ro .l, .fu-clock .l { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 30); letter-spacing: 0.18em; color: #ffffff; opacity: 0.92; }
     .fu-ro .v small { font-size: 0.5em; opacity: 0.85; }
     .fu-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
       font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
-    .fu-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
-    .fu-ro .nx { color: #f6efe2; opacity: 0.95; font-size: calc(var(--u) * 24); letter-spacing: 0.12em; }
+    .fu-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 32); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
+    .fu-ro .nx { color: #f6efe2; opacity: 0.95; font-size: calc(var(--u) * 28); letter-spacing: 0.12em; }
     .fu-ro .nx:empty { display: none; }
     .fu-ro .s b { color: #ffffff; font-weight: 700; }
     .fu-clock .f { transition: none; }
@@ -55,7 +55,7 @@
     .fu-clock .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 62); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; }
     .fu-clock .v small { font-size: 0.62em; opacity: 0.85; }
     .fu-clock .v i { font-style: normal; font-family: var(--hud-font); font-weight: 600; font-size: 0.36em; letter-spacing: 0.12em; opacity: 0.8; vertical-align: 0.6em; }
-    .fu-clock .f { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 26); letter-spacing: 0.08em; margin-top: calc(var(--u) * 8); color: #ffd7a8; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .fu-clock .f { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 30); letter-spacing: 0.08em; margin-top: calc(var(--u) * 8); color: #ffd7a8; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .fu-clock .f:empty { display: none; }
     .fu-ctx sup { font-size: 0.6em; }
     /* the diagrams (illustrations): right of centre, or large in the middle of the frame */
@@ -71,7 +71,7 @@
     .fu-inset.ladder { left: auto; right: calc(var(--u) * 60); top: calc(var(--u) * 262); width: calc(var(--u) * 315); height: calc(var(--u) * 560); }
     .fu-inset .sm { font-family: var(--hud-font); font-weight: 600; font-size: 25px; letter-spacing: 0.05em; fill: #ffd7a8; }
     /* the last ten seconds: the count, big, in the middle */
-    .fu-count { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); pointer-events: none; font-family: var(--book); font-weight: 700;
+    .fu-count { position: absolute; left: 21%; top: 46%; transform: translate(-50%, -50%); pointer-events: none; font-family: var(--book); font-weight: 700;
       font-size: calc(var(--u) * 240); line-height: 1; color: #f6f1e7; text-shadow: 0 0 calc(var(--u) * 50) rgba(0, 0, 0, 0.85), 0 0 calc(var(--u) * 8) rgba(0, 0, 0, 0.9), 0 calc(var(--u) * 4) calc(var(--u) * 14) rgba(0, 0, 0, 0.7); }
     .fu-count.hit { color: #ffcf8a; }
     .fu-clock-unused { font-family: var(--hud-font); font-weight: 700; font-size: 19px; letter-spacing: 0.04em; fill: #f6efe2; }

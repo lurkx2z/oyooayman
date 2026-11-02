@@ -22,7 +22,7 @@ const fuB = (id, d = 0.6) => fuS(id) - d;     // a cut just before beat id's fir
 const FU = {};
 FU.title = [-0.4, fuE('title') + 0.25];
 FU.end = FUT.duration;
-FU.tGlass = 0.6;                                         // ★ (film) the slow motion under the title starts; the glass goes at s = 0
+FU.tGlass = 0.0;                                         // ★ (film) the slow motion under the title starts; the glass goes at s = 0 (film ≈ 0.5)
 FU.sSG = 16.6;                                           // the spoon and the grape are let go of
 FU.sPour = [41.6, 46.2];                                 // the kettle tipped: the stream runs (story s)
 FU.sCat = 70.0;                                          // the cat jumps off the counter
@@ -34,7 +34,7 @@ FU.sRun = 256.9;                                         // she starts her run (
 FU.sLift = FU_FLY.jogger.s0;                             // ...and she leaves the ground
 FU.sCoat = FU_FLY.coat.s0;
 FU.sDog = 329.4;
-FU.sSpace = FU_SPACE_S;                                  // 3:09:40: the apple crosses 100 km
+FU.sSpace = FU_SPACE_S;                                  // 3:09:39: the apple crosses 100 km
 FU.sCount = 590;                                         // "Ten seconds."
 
 // THE CLOCK: segments [film t where it starts, story s there, story s when the next segment starts | 'real' | ['rate', r]].
@@ -45,15 +45,15 @@ const FU_CLOCK = (() => {
   const tLift = c('jogger', 1) + 1.85;                                 // (film) her first stride leaves the ground
   const tCount = c('count', 0);                                        // (film) "Ten seconds." (s = 590)
   const S = [
-    [-2, -3.0, 'real'],
-    [FU.tGlass, FU.tGlass - 3.0 + 2, ['rate', slow]],                  // the glass slips (slow motion: ×0.38)
-    [FU.tGlass + 2.6, 'cont', 'real'],
+    [-2, -2.2, 'real'],
+    [FU.tGlass, -0.2, ['rate', slow]],                                 // the glass slips (slow motion: ×0.38)
+    [FU.tGlass + 2.4, 'cont', 'real'],
     [B('rate'), FU.sSG - (c('rate', 0) + 2.05 - B('rate')), 'real'],   // the spoon and the grape
     [c('rate', 0) + 1.9, 'cont', ['rate', slow]], [c('rate', 0) + 4.1, 'cont', 'real'],
     [B('real'), 26.0, 'real'],
     [B('kettle'), FU.sPour[0] - (fuCap('kettle', 0).hide + 0.25 - B('kettle')), 'real'],
-    [B('cat'), FU.sCat - (fuCap('cat', 0).hide + 0.35 - B('cat')), 'real'],
-    [fuCap('cat', 0).hide + 0.15, 'cont', ['rate', slow]], [fuCap('cat', 0).hide + 2.9, 'cont', 'real'],
+    [B('cat'), FU.sCat - 0.2 - (fuCap('cat', 0).hide - 0.1 - B('cat')), 'real'],
+    [fuCap('cat', 0).hide - 0.1, 'cont', ['rate', 0.25]], [fuCap('cat', 0).hide + 3.6, 'cont', 'real'],   // the cat's jump (slow motion ×0.25)
     [B('stuck'), 76.4, 'real'],                                        // (the cat on the ceiling: its two tries, FU.sCatHop)
     [B('apple'), FU.sApple - (c('apple', 0) + 2.9 - B('apple')), 'real'],
     [B('street'), 126.4, 'real'],
@@ -74,9 +74,9 @@ const FU_CLOCK = (() => {
     [B('warn'), 440.0, 'real'],
     [B('home'), 480.0 - (c('home', 0) - B('home')) + 0.3, 'real'],         // "3:08"
     [B('hold2'), 540.0 - (c('hold2', 0) - B('hold2')) + 0.3, 'real'],      // "3:09"
-    [B('space'), FU.sSpace - (c('space', 0) - B('space')) - 0.15, 'real'], // "3:09:40": the apple crosses 100 km
+    [B('space'), FU.sSpace - (c('space', 0) - B('space')) - 0.15, 'real'], // "3:09:39": the apple crosses 100 km
     [B('count'), FU.sCount - (tCount - B('count')), 'real'],              // "Ten seconds."
-    [tCount + 9.75, 'cont', ['rate', 0.4]], [tCount + 9.75 + 2.6, 'cont', 'real'],   // ★ 3:10:00 in your kitchen: the ceiling comes down (slow motion)
+    [tCount + 9.75, 'cont', ['rate', 0.2]], [tCount + 9.75 + 4.6, 'cont', 'real'],   // ★ 3:10:00 in your kitchen: the ceiling comes down (slow motion ×0.2)
     [B('down'), 604.6, 'real'],                                        // back in the park: she hangs from the branch the normal way
   ];
   const out = [];

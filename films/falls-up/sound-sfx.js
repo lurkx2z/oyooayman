@@ -10,7 +10,7 @@
    ===================================================================== */
 
 fuSound('sfx', 'events', function (ctx, bus, K) {
-  const { fx, sr } = K, f = fuFilmAt, CEIL = FUP.ceil, sh = (m) => { const S = FU_SHOTS.find((x) => x.mode === m); return { t0: S.t0, t1: Math.min(S.t1, FU.end + 0.3), mode: m }; };   // (the last shot runs on: clip it)
+  const { fx, sr } = K, f = fuFilmAt, CEIL = FUP.ceil, sh = (m) => { const S = fuShot(m); return { t0: S.t0, t1: Math.min(S.t1, FU.end + 0.3), mode: m }; };   // (the last shot runs on: clip it)
   const inShot = (t, m) => { const S = sh(m); return t >= S.t0 - 0.02 && t < S.t1; };
   const room = K.verb('room', 0.5, { bright: 0.6, damp: 3.5, wet: 0.25 }), street = K.verb('street', 1.6, { bright: 0.5, damp: 2.2, wet: 0.3 });
   const slow = (t) => 1 / Math.max(0.25, fuRateAt(t + 1e-3));                 // how much slow motion stretches a sound
@@ -44,6 +44,10 @@ fuSound('sfx', 'events', function (ctx, bus, K) {
     K.put(fx.rustle(0.3 * k, { density: 400, rub: 0.2, lo: 1500, hi: 6000, grain: 0.004, env: (u) => Math.exp(-u * 3) }), tL + 0.02, { vol: 0.08, room, wet: 0.3, pan: -0.2 });
     for (const s of FU.sCatHop) { const t = f(s); if (!inShot(t, 'stuck')) continue; K.put(fx.slap([[110, 0.04, 1], [240, 0.02, 0.4]], { width: 0.006, amp: 0.5, skin: 0.1 }), t, { vol: 0.15, room, wet: 0.35 });
       const tb = f(s + 2 * 2.4 / 9.81); K.put(fx.slap([[100, 0.05, 1], [230, 0.025, 0.5]], { width: 0.007, amp: 0.7, skin: 0.12 }), tb, { vol: 0.25, room, wet: 0.35 }); } }
+  // ---- the tap: each drop ticks into the cupboard over it (only heard while we're looking)
+  { const S = sh('tap'), tr = Math.sqrt(2 * (FU_TAP_TOP - FU_TAP[1]) / FUP.g);
+    for (let i = Math.floor(fuStoryAt(S.t0) / FU_TAP_P) - 1; ; i++) { const t = f(i * FU_TAP_P + 0.8 * FU_TAP_P + tr); if (t > S.t1) break; if (t < S.t0) continue;
+      const L = new Float32Array(Math.ceil(0.1 * sr)), R = new Float32Array(L.length); fx.bubble(L, R, 0, fx.r.range(1700, 2600), 0.006, 0.7, 0); for (let j = 0; j < L.length; j++) L[j] += R[j]; K.put(L, t, { vol: 0.1, room, wet: 0.4, pan: -0.35 }); } }
   // ---- the apple: the casement, the apple leaving your hand
   { const tA = f(FU.sApple); whoosh(tA, 0.9, { vol: 0.06, curve: [500, 1100, 2200], pan: 0.3 }); }
   // ---- the street: the keys (a jingle going away up), the coffee (a slosh), the phone (its ringtone, going away up)
@@ -89,17 +93,18 @@ fuSound('sfx', 'events', function (ctx, bus, K) {
   for (let k = 0; k < 10; k++) { const t = f(FU.sCount + k); if (t > sh('count').t1) break; K.put(fx.hit(fx.woodModes(3000, 0.4), { width: 0.0006, amp: 0.8, noise: 0.5, nlen: 0.003, nhp: 2500, len: 0.1 }), t, { vol: 0.18, pan: 0 }); }
   // ---- 3:10, your kitchen: the ceiling comes down onto the table (slow motion: stretched, deeper)
   { const s0 = FUP.T, land = (top, rest) => s0 + Math.sqrt(2 * Math.max(0.05, top - rest) / FUP.g);
-    const items = FU_CLUTTER.map(([id, kind, x, z]) => ({ kind, x, z, s: land(CEIL - 0.03, fuRestY(x, z)), onT: fuRestY(x, z) > 0 }));
+    const items = FU_CLUTTER.map(([id, kind, x, z]) => { const b = fuDropBounce(CEIL - 0.03, fuRestY(x, z), (FU_BOUNCE[kind] || [0])[0]); return { kind, x, z, s: b.land, more: b.hits.slice(1), onT: fuRestY(x, z) > 0 }; });
     items.push({ kind: 'glass', x: 0.3, z: 0.2, s: land(CEIL, FU_ROOM.table.top), onT: true }, { kind: 'spoon', x: 0, z: 0.25, s: land(CEIL, FU_ROOM.table.top), onT: true });
     const modes = { plate: fx.cupModes(), bottle: fx.glassModes(), glass: fx.glassModes(), jar: fx.glassModes(), fork: fx.metalModes(1800, 0.5), spoon: fx.metalModes(2600, 0.5), keys: fx.metalModes(3200, 0.3), lid: fx.metalModes(700, 1.2), tin: fx.metalModes(900, 0.5), mug: fx.cupModes() };
     for (const it of items) { const t = f(it.s), k = slow(t), base = modes[it.kind] || fx.woodModes(it.onT ? 160 + 80 * fx.r.next() : 110, 1.2);
       if (it.kind === 'plate' || it.kind === 'glass' || it.kind === 'jar') { const S = fx.smash({ g: 9.81, v: 5.5, slow: k, pitch: (it.kind === 'plate' ? 1 : 1.3) / Math.sqrt(k), pan: MathX.clamp(it.x * 0.5, -0.8, 0.8) }); K.putLR(S.L, S.R, t, { vol: 0.32, room, wet: 0.35 }); continue; }
-      K.put(fx.hit(sm(base, k), { width: 0.002, amp: 0.8, noise: 0.4, nlen: 0.02, nhp: 300, len: 1.2 * k }), t, { vol: modes[it.kind] ? 0.14 : 0.2, room, wet: 0.35, pan: MathX.clamp(it.x * 0.5, -0.8, 0.8) }); }
+      K.put(fx.hit(sm(base, k), { width: 0.002, amp: 0.8, noise: 0.4, nlen: 0.02, nhp: 300, len: 1.2 * k }), t, { vol: modes[it.kind] ? 0.14 : 0.2, room, wet: 0.35, pan: MathX.clamp(it.x * 0.5, -0.8, 0.8) });
+      (it.more || []).forEach((sb, j) => { const tb = f(sb), kb = slow(tb); K.put(fx.hit(sm(base, kb), { width: 0.0015, amp: 0.5, noise: 0.3, nlen: 0.01, nhp: 400, len: 0.8 * kb }), tb, { vol: (modes[it.kind] ? 0.09 : 0.11) * (j ? 0.45 : 1), room, wet: 0.35, pan: MathX.clamp(it.x * 0.5, -0.8, 0.8) }); }); }
     // the table takes it all: one deep knock under it; the tea and the water rain down
     { const t = f(land(CEIL, FU_ROOM.table.top)), k = slow(t); K.put(fx.hit(sm([[70, 0.12, 1], [140, 0.08, 0.6], [290, 0.04, 0.3]], k), { width: 0.01, amp: 1, noise: 0.5, nlen: 0.05, nhp: 120, len: 2 * k }), t, { vol: 0.6, room, wet: 0.35 });
       fuBed(K, f(s0 + 0.05), t + 0.6, { colour: 'pink', f: [['bp', 1400 / Math.sqrt(k), 0.8], ['lp', 5000]], vol: 0.2, am: 0.5, wr: 6, room, wet: 0.35, fi: 0.2, fo: 0.3 }); }
-    // the cat: down to the floor, on its feet
-    { const t = f(s0 + Math.sqrt(2 * (CEIL - 0.25) / FUP.g)); K.put(fx.slap(sm([[90, 0.05, 1], [200, 0.03, 0.5]], slow(t)), { width: 0.008, amp: 0.6, skin: 0.1 }), t, { vol: 0.2, room, wet: 0.3, pan: -0.5 }); } }
+    // the cat: down onto the table, on its feet
+    { const t = f(s0 + Math.sqrt(2 * (CEIL - FU_CATP.hc - fuRestY(FU_CATP.later[0], FU_CATP.later[1]) - FU_CATP.hc) / FUP.g)); K.put(fx.slap(sm([[90, 0.05, 1], [200, 0.03, 0.5]], slow(t)), { width: 0.008, amp: 0.6, skin: 0.1 }), t, { vol: 0.2, room, wet: 0.3, pan: -0.5 }); } }
   // ---- back in the park: she lets go and drops to the path; the leaves rain down
   { const tD = f(FU_RUN.sDrop + Math.sqrt(2 * 1.45 / FUP.g)); K.put(fx.step({ weight: 1.2, s: 0.9, body: 70 }), tD, { vol: 0.3, room: street, wet: 0.3 }); K.put(fx.step({ weight: 0.9, s: 0.9, body: 72 }), tD + 0.06, { vol: 0.22, room: street, wet: 0.3 });
     for (const m of ['down', 'question']) { const S = sh(m); for (let t = S.t0 + 0.2; t < S.t1; t += 0.1 + 0.25 * fx.r.next()) K.put(fx.rustle(0.2, { density: 250, rub: 0.1, lo: 1800, hi: 7000, grain: 0.003, env: (u) => Math.exp(-u * 3) }), t, { vol: 0.025 + 0.025 * fx.r.next(), pan: fx.r.range(-0.8, 0.8), room: street, wet: 0.3 }); } }

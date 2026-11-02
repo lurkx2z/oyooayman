@@ -3,9 +3,9 @@
    (ray-traced per pixel: land, sea and cloud from noise; the haze thickening to the horizon; the horizon dipping as you
    climb: 3.4° at 11 km, 10° at 100 km), the sky darkening from blue to black with height, the stars when it's dark,
    the sun where it is (south-west, 30° up). The camera rides with the thing (it stays in frame; the world drops away).
-     height   3:06, your apple at 14.6 km: higher than Everest, higher than the airliners; −57 °C
+     height   3:06, your apple at 15.3 km: higher than Everest, higher than the airliners; −56 °C
      planes   3:07, a lost phone passing 11 km, where the airliners fly; one turns away
-     space    3:09:40, your apple crosses 100 km
+     space    3:09:39, your apple crosses 100 km
    ===================================================================== */
 
 function fuSkyShader(scene) {
@@ -97,7 +97,7 @@ FU_SETS.space = (app) => {
       // what we ride with, and its height
       const F = m === 'planes' ? FU_FLY.phone : FU_FLY.apple, h = F(s); this._h = h; this._what = m === 'planes' ? 'phone' : 'apple';
       sky.material.uniforms.h.value = h;
-      const thin = Math.exp(-h / 7500); stars.material.opacity = MathX.clamp((0.25 - thin) * 6, 0, 1) * 0.9;
+      const thin = Math.exp(-h / 7500); stars.material.opacity = MathX.clamp((0.25 - thin) * 6, 0, 1) * 0.22;   // (faint: a camera exposed for the sunlit apple barely sees them)
       apple.visible = m !== 'planes'; phone.visible = m === 'planes'; plane.visible = m === 'planes';
       const obj = m === 'planes' ? phone : apple, sp = s - F.s0;
       obj.position.set(0, 0, 0); obj.rotation.set(0.35 * sp, 0.6 * sp, 0.2 * sp);
@@ -118,7 +118,7 @@ FU_SETS.space = (app) => {
     },
     labels(t) {
       const shot = fuShotAt(t), W = StoryHUD.win, out = [];
-      if (this._what === 'apple') out.push({ p: [0.0, 0.05, 0.0], text: 'YOUR APPLE', sub: fuHt(this._h) + ' UP · ' + Math.round(fuTempC(this._h)) + ' °C', a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
+      if (this._what === 'apple') out.push({ p: [0.0, 0.05, 0.0], text: 'YOUR APPLE', sub: fuHt(this._h) + ' UP' + (this._h < 85000 ? ' · ' + Math.round(fuTempC(this._h)) + ' °C' : ''), a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
       else out.push({ p: [0.0, 0.03, 0.0], text: 'A LOST PHONE', sub: fuHt(this._h) + ' UP', a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
       return out;
     },

@@ -8,30 +8,40 @@ const fuSh = (id, mode, t0, t1, o = {}) => Object.assign({ id, mode, t0, t1, set
 
 const FU_SHOTS = [];
 {
-  const P = FU_SHOTS, c = fuC, B = fuB, cap = fuCap, tCount = c('count', 0);
+  const P = FU_SHOTS, c = fuC, B = fuB, cap = fuCap, tCount = c('count', 0), at = fuFilmAt;
   const L = [
-    // 1 — your kitchen, 3:00–3:02: the glass, the spoon and the grape, the window, the tea, the cat; the apple; the street
+    // 1 — your kitchen, 3:00–3:02: the glass, the spoon and the grape, the tap, the window, the tea, the cat; the apple;
+    // the street
     ['A0', 'title', -1, cap('start', 0).show + 0.4],
-    ['A1', 'ceiling', cap('start', 0).show + 0.4, B('rate')],
+    ['A1', 'ceiling', cap('start', 0).show + 0.4, c('start', 1) - 0.5],
+    ['A1b', 'tap', c('start', 1) - 0.5, B('rate')],
     ['A2', 'sg', B('rate'), B('real')],
     ['A3', 'window', B('real'), B('kettle')],
     ['A4', 'kettle', B('kettle'), c('kettle', 2) - 0.5],
     ['A5', 'puddle', c('kettle', 2) - 0.5, B('cat')],
-    ['A6', 'cat', B('cat'), B('stuck')],
+    ['A6', 'cat', B('cat'), at(FU.sCat + 0.3)],
+    ['A6b', 'cat', at(FU.sCat + 0.3), B('stuck'), { cam: 'land' }],                 // (a cut mid-air: under the ceiling, upside down)
     ['A7', 'stuck', B('stuck'), B('apple')],
     ['A8', 'apple', B('apple'), c('apple', 1) - 0.5],
     ['A9', 'appleUp', c('apple', 1) - 0.5, B('street')],
-    ['A10', 'street', B('street'), B('leaves')],
+    ['A10', 'street', B('street'), at(FU.sKeys - 0.7)],
+    ['A10b', 'street', at(FU.sKeys - 0.7), at(FU.sCoffee - 0.5), { cam: 'keys' }],
+    ['A10c', 'street', at(FU.sCoffee - 0.5), at(FU.sPhone - 0.7), { cam: 'coffee' }],
+    ['A10d', 'street', at(FU.sPhone - 0.7), B('leaves'), { cam: 'phone' }],
     // 2 — the park, 3:03–3:07: leaves, the fountain, a fish, a ball, ice cream; walking and running; the runner in the
     // tree; the coat; the dog; the pigeons; the sky; the planes; everyone holding on
     ['B0', 'leaves', B('leaves'), B('fountain')],
     ['B1', 'fountain', B('fountain'), B('fish')],
-    ['B2', 'fish', B('fish'), B('ball')],
-    ['B3', 'ball', B('ball'), B('scoop')],
+    ['B2', 'fish', B('fish'), at(FU.sFish + 1.7)],
+    ['B2b', 'fish', at(FU.sFish + 1.7), B('ball'), { cam: 'chase' }],                 // riding up beside the carp
+    ['B3', 'ball', B('ball'), at(FU.sKick + 1.0)],
+    ['B3b', 'ball', at(FU.sKick + 1.0), B('scoop'), { cam: 'chase' }],
     ['B4', 'scoop', B('scoop'), B('walk')],
     ['B5', 'walk', B('walk'), B('jogger')],
     ['B6', 'jogger', B('jogger'), B('hold')],
-    ['B7', 'hold', B('hold'), B('rope')],
+    ['B7', 'hold', B('hold'), c('hold', 1) - 0.4],
+    ['B7b', 'hold', c('hold', 1) - 0.4, c('hold', 2) - 0.4, { cam: 'hands' }],      // her hands on the branch
+    ['B7c', 'hold', c('hold', 2) - 0.4, B('rope'), { cam: 'above' }],              // above her: the safe ground she can't reach
     ['B8', 'rope', B('rope'), B('dog')],
     ['B9', 'dog', B('dog'), B('pigeons')],
     ['B10', 'pigeons', B('pigeons'), B('height')],
@@ -43,7 +53,10 @@ const FU_SHOTS = [];
     ['C0', 'home', B('home'), B('hold2')],
     ['C1', 'hold2', B('hold2'), B('space')],
     ['C2', 'space', B('space'), B('count'), { set: 'space' }],
-    ['C3', 'count', B('count'), tCount + 9.75],
+    ['C3', 'count', B('count'), tCount + 2.6],
+    ['C3b', 'count', tCount + 2.6, tCount + 5.0, { cam: 'hands' }],
+    ['C3c', 'count', tCount + 5.0, tCount + 7.4, { cam: 'crowd' }],
+    ['C3d', 'count', tCount + 7.4, tCount + 9.75, { cam: 'ceil', where: 'in' }],   // your kitchen: you, under it
     ['C4', 'drop', tCount + 9.75, B('down')],
     ['C5', 'down', B('down'), B('question', 0.45)],
     ['C6', 'question', B('question', 0.45), 1e9],
@@ -55,7 +68,8 @@ const FU_SHOTS = [];
 }
 
 function fuShotAt(t) { for (const s of FU_SHOTS) if (t >= s.t0 && t < s.t1) return s; return t < 0 ? FU_SHOTS[0] : FU_SHOTS[FU_SHOTS.length - 1]; }
-const fuShot = (mode) => FU_SHOTS.find((s) => s.mode === mode);
+// a mode's whole span (a beat may be cut into several shots of one mode, one after another: { …the first, t1: the last's end })
+const fuShot = (mode) => { const A = FU_SHOTS.filter((s) => s.mode === mode); return A.length ? Object.assign({}, A[0], { t1: A[A.length - 1].t1 }) : undefined; };
 // every cut, for the 2-frame dip (the shot starts, plus a set's own cuts())
 function fuCutTimes(app) {
   const out = FU_SHOTS.map((s) => s.t0).filter((t) => t > 0);

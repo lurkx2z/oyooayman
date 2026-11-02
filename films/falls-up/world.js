@@ -22,6 +22,9 @@ const FU_HELD = {
   mug: [-1.98, 0.92, -0.06],                               // the mug you pour into (on the counter)
 };
 const FU_EYE = [-0.06, 1.18, 0.6];                         // you, sitting at the table (eye), facing the window
+// the tap by the window: it drips. From 3:00 each drop creeps out over the top of the spout and falls up 28 cm into the
+// underside of the wall cupboard, where a wet patch grows (room-local: the spout's tip; the cupboard's underside)
+const FU_TAP = [-2.24, 1.214, -1.05], FU_TAP_TOP = FU_ROOM.wallCab.y[0], FU_TAP_P = 0.42;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE KETTLE (local: its base at the origin, the spout along +x, the handle at −x). In your right hand in the kettle
@@ -98,10 +101,10 @@ const FU_HAND_MODES = new Set(['title', 'sg', 'kettle', 'apple']);
 // THE CAT (room-local). It sits on the counter by the hob; at FU.sCat it hops down for the floor and falls up instead,
 // turning over in the air (the righting reflex: front half first) to land on the ceiling on its feet. It tries twice
 // to jump down (FU.sCatHop): each jump takes it 29 cm off the ceiling and back. By 3:08 it has walked over to above the
-// gap between the table and the counter. At 3:10 it falls, turns over again, and lands on the floor on its feet.
+// middle of your table. At 3:10 it falls, turns over again, and lands on the table on its feet.
 // → { p (its feet: the quad's origin), q, pose }
 // ---------------------------------------------------------------------------------------------------------------------
-const FU_CATP = { sit: [-2.12, FU_ROOM.counter.top, 0.82], vx: 1.6, vy: -0.8, hc: 0.2, later: [-0.78, -0.72], yawLater: 2.6 };
+const FU_CATP = { sit: [-2.12, FU_ROOM.counter.top, 0.82], vx: 1.6, vy: -0.8, hc: 0.2, later: FU_CAT_TABLE, yawLater: 2.2 };
 function fuCatFlight() {
   const P = FU_CATP, a = 4.905, b = P.vy, c = P.sit[1] + P.hc - (FU_CEIL - P.hc);           // a τ² + b τ + c = 0: centre reaches the ceiling stand
   return (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
@@ -139,15 +142,15 @@ function fuCatState(s) {
     const c = [x, C - hc - d, z];
     return { p: feetFrom(c, q), q, pose: fuQuadPose({ crouch: walking ? 0.2 : crouch, stretch, gait: walking ? s * 9 : null, head: [0.55 + 0.15 * Math.sin(s * 0.5), 0.4 * Math.sin(s * 0.27)], tail: [0.15, 0.9 * Math.sin(s * 2.1)] }) };
   }
-  // 3:10: it falls, turns over again, and lands on the floor between the table and the counter
-  const u = s - FUP.T, top = C - hc, rest = hc, tf = Math.sqrt(2 * (top - rest) / FUP.g);
-  const x = P.later[0], z = P.later[1];
+  // 3:10: it falls, turns over again, and lands on your table on its feet
+  const x = P.later[0], z = P.later[1], fy = fuRestY(x, z);
+  const u = s - FUP.T, top = C - hc, rest = fy + hc, tf = Math.sqrt(2 * (top - rest) / FUP.g);
   if (u < tf) {
     const c = [x, top - 4.905 * u * u, z], rf = Math.PI + Math.PI * fuSm(u, 0.06, 0.3), rb = Math.PI + Math.PI * fuSm(u, 0.12, 0.38), roll = (rf + rb) / 2, q = qOf(P.yawLater, roll);
     return { p: feetFrom(c, q), q, pose: fuQuadPose({ twistF: rf - roll, twistB: rb - roll, stretch: 0.7 * fuSm(u, 0.25, tf), head: [0.3, 0], tail: [0.1, 1.0 * Math.sin(u * 12)] }) };
   }
   const v = u - tf, q = qOf(P.yawLater + 0.6 * fuSm(v, 1.0, 2.2), 0);
-  return { p: [x, 0, z], q, pose: fuQuadPose({ crouch: 0.85 * Math.exp(-v / 0.35) + 0.15 * (1 - fuSm(v, 0.8, 1.6)), head: [0.4 * Math.exp(-v / 0.6) + 0.35, 0.5 * Math.sin(v * 0.9)], tail: [0.8, 0.5 * Math.sin(v * 3)] }) };
+  return { p: [x, fy, z], q, pose: fuQuadPose({ crouch: 0.85 * Math.exp(-v / 0.35) + 0.15 * (1 - fuSm(v, 0.8, 1.6)), head: [0.4 * Math.exp(-v / 0.6) + 0.35, 0.5 * Math.sin(v * 0.9)], tail: [0.8, 0.5 * Math.sin(v * 3)] }) };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -164,6 +167,9 @@ FU_SETS.world = (app) => {
   const kettle = fuBuildKettle(); R.room.add(kettle);
   const mug = fuBuildMug(); mug.position.set(FU_HELD.mug[0], FU_HELD.mug[1], FU_HELD.mug[2]); mug.rotation.y = 2.4; R.room.add(mug);
   const cat = fuBuildQuad(FU_CAT); R.room.add(cat.root);
+  // the dripping tap: a few beads, and the wet patch they make on the cupboard's underside
+  const tapDrops = []; for (let i = 0; i < 4; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 9), R.M.water); d.visible = false; R.room.add(d); tapDrops.push(d); }
+  const tapWet = new THREE.Mesh(new THREE.CircleGeometry(1, 32), R.M.wet); tapWet.rotation.x = Math.PI / 2; tapWet.position.set(FU_TAP[0], FU_TAP_TOP - 0.0015, FU_TAP[2]); R.room.add(tapWet);
   // your hands
   const hands = new ViewerHands(cam, { script: fuHandScript(), poses: {}, blends: FU_HAND_BLENDS, skin: '#c9967a', nail: '#e2bba8', sleeve: '#4a5a74', cuff: '#3c4a60', watch: true, sleeveLen: 0.34 });
   // the light that bounces round your kitchen (off the floor, the table, the walls): it lights the ceiling we keep looking at
@@ -187,6 +193,7 @@ FU_SETS.world = (app) => {
       // the kettle (on its base, or in your hand), the cat
       const K = fuKettleAt(s); kettle.position.set(K.p[0], K.p[1], K.p[2]); kettle.quaternion.setFromAxisAngle(_fuCy, -Math.PI / 2).multiply(new THREE.Quaternion().setFromAxisAngle(_fuCz, -K.a));
       const cs = fuCatState(s); cat.root.position.set(cs.p[0], cs.p[1], cs.p[2]); cat.root.quaternion.copy(cs.q); fuPoseQuad(cat, cs.pose);
+      this.tapDrips(s);
       // the room: what you let go of (held until then), the tea's stream and where it lands on the ceiling
       const held = {}, H = FU_HELD;
       if (s < 0) held.glass = new THREE.Vector3(...H.glass);
@@ -260,6 +267,21 @@ FU_SETS.world = (app) => {
         const d = vd * u - 4.905 * u * u; if (d < 0) continue; out.push([hit[0] + Math.cos(a2) * vh * u, FU_CEIL - d - 0.004, hit[1] + Math.sin(a2) * vh * u, 0.005 + 0.006 * fuR(i, 65), 0.8, 0.6, 0.36, 0.14]); }
       return { hit, tip: tip.toArray(), tH };
     },
+    // the tap's drops (pure: drop i forms from i·P, lets go at i·P + 0.8P, falls up to the cupboard)
+    tapDrips(s) {
+      const T = FU_TAP, P = FU_TAP_P, up = s >= 0 && s < FUP.T, g = FUP.g, rise = FU_TAP_TOP - T[1], tr = Math.sqrt(2 * rise / g);
+      tapWet.visible = s > 0.4; const rw = 0.02 + 0.045 * (1 - Math.exp(-Math.max(0, Math.min(s, FUP.T)) / 25)); tapWet.scale.set(rw, rw, 1);
+      tapDrops.forEach((d, j) => { d.visible = false; });
+      if (!up) return;
+      const i0 = Math.floor(s / P);
+      for (let j = 0; j < 2; j++) {
+        const i = i0 - j, s0 = i * P, sr = s0 + 0.8 * P, d = tapDrops[(i % 4 + 4) % 4], r = 0.006 + 0.002 * fuR(i, 71);
+        if (i < 0) continue;
+        if (s < sr) { const gr = (s - s0) / (0.8 * P); d.visible = true; d.scale.set(r * gr, r * gr * (1 + 0.5 * gr), r * gr); d.position.set(T[0], T[1] + r * gr, T[2]); continue; }
+        const u = s - sr; if (u > tr) continue;
+        const v = g * u, y = T[1] + r + 0.5 * g * u * u; d.visible = true; d.scale.set(r * 0.9, r * (1 + 0.12 * v), r * 0.9); d.position.set(T[0], Math.min(y, FU_TAP_TOP - r), T[2]);
+      }
+    },
     // your hands onto what they hold (world points: the room's held places; the kettle's handle; the apple)
     posHands(s, t, ket, RL) {
       const P = hands.poses, H = FU_HELD;
@@ -284,7 +306,7 @@ FU_SETS.world = (app) => {
     grade(t, p, shot) {
       p.exposure = (this._inside ? 1.22 : 1.0) * (this._expo || 1);
       p.saturation = 1.05; p.warmth = 0.03; p.vignette = 0.5; p.bloom = 0.3; p.bloomThreshold = 0.92;
-      if (shot && shot.mode === 'drop') { const u = fuStoryAt(t) - FUP.T; if (u > 0.55 && u < 1.0) p.chroma = Math.max(p.chroma || 0, 0.06 * Math.sin(Math.PI * (u - 0.55) / 0.45)); }
+      if (shot && shot.mode === 'drop') { const u = fuStoryAt(t) - FUP.T; if (u > 0.55 && u < 1.0) p.chroma = Math.max(p.chroma || 0, 0.025 * Math.sin(Math.PI * (u - 0.55) / 0.45)); }
     },
   };
   return set;
@@ -302,6 +324,7 @@ function fuLookCap(p, q, maxEl) {
   if (el <= maxEl) return q;
   const L = Math.hypot(hz, d[1]); return [p[0] + d[0] / hz * L * Math.cos(maxEl), p[1] + L * Math.sin(maxEl), p[2] + d[2] / hz * L * Math.cos(maxEl)];
 }
+function fuHandsCam(v, B, k, into) { v.p = into(fuAdd(B, [0.95, -0.4, -0.95]), fuAdd(B, [0.8, -0.35, -0.8]), k); v.at = fuAdd(B, [0, 0.32, 0.05]); v.fov = 42; v.near = 0.03; }
 function fuShotCam(set, m, s, t, k, shot, v, RL) {
   const into = (a, b, u) => fuV(a, b, Ease.inOutSine(u));
   const room = (R = 5) => { v.inside = true; v.sh = { f: RL(0, 1.2, -0.6), R }; v.drift = 0.0015; v.near = 0.02; };
@@ -312,16 +335,19 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
     // ---- 1: your kitchen
     // the title: at the table with a glass of water; it slips (slow motion) and falls up; we follow it to the ceiling
     case 'title': { room(); v.p = into(RL(E[0], E[1], E[2]), RL(E[0] + 0.01, E[1] - 0.01, E[2] - 0.05), k);
-      const w = Ease.inOutSine(fuSm(s, 0.04, 0.62)); v.at = fuV(RL(0.22, 0.88, 0.05), RL(H.glass[0], FU_CEIL, H.glass[2] - 0.05), w); v.fov = 55; break; }
+      const w = Ease.inOutSine(fuSm(s, 0.04, 0.62)); v.at = fuV(RL(0.22, 0.88, 0.05), RL(H.glass[0], FU_CEIL, H.glass[2] - 0.05), w); v.fov = 48 + 6 * w; break; }
     // the ceiling: the glass in pieces, its water spreading
     // (then back and down, out to the whole kitchen: the window, the cat asleep on the counter, the clock)
-    case 'ceiling': { room(); const w = Ease.inOutSine(fuSm(k, 0.12, 1));
+    case 'ceiling': { room(); const w = Ease.inOutSine(fuSm(k, 0.05, 1));
       v.p = fuV(RL(0.95, 1.4, 0.95), RL(1.95, 1.5, 1.78), w); v.at = fuV(RL(H.glass[0] - 0.05, FU_CEIL, H.glass[2] - 0.05), RL(-0.55, 1.72, -0.45), w); v.fov = 56 + 10 * w; break; }
+    // the tap by the window drips: each drop falls up into the cupboard over it (tilting up after them)
+    case 'tap': { room(); const T = FU_TAP, w = Ease.inOutSine(fuSm(k, 0.25, 0.95));
+      v.p = into(RL(T[0] + 0.44, T[1] + 0.0, T[2] + 0.3), RL(T[0] + 0.38, T[1] + 0.01, T[2] + 0.26), k); v.at = fuV(RL(T[0], T[1] + 0.12, T[2]), RL(T[0], T[1] + 0.15, T[2]), w); v.fov = 46; v.near = 0.01; break; }
     // the spoon and the grape: in your hands, let go together, followed up
     case 'sg': { room(); v.p = into(RL(E[0], E[1], E[2]), RL(E[0], E[1] - 0.01, E[2] - 0.04), k);
       const w = Ease.inOutSine(fuSm(s, FU.sSG + 0.04, FU.sSG + 0.62)); v.at = fuV(RL(0.04, 0.92, 0.22), RL(0.05, FU_CEIL, 0.26), w); v.fov = 55 - 9 * Ease.inOutSine(fuSm(s, FU.sSG + 0.7, FU.sSG + 2.5)) - 16 * Ease.inOutSine(fuSm(s, FU.sSG + 2.6, FU.sSG + 7.5)); break; }
     // the window: the park below (leaves going up, the fountain's column), people still out walking
-    case 'window': { room(); v.p = into(RL(0.62, 1.62, -1.62), RL(0.62, 1.62, -1.8), k); v.at = [-2, 4, -60]; v.fov = 54 - 14 * Ease.inOutSine(k); v.sh = { f: RL(0, 1, -1.2), R: 6 }; break; }
+    case 'window': { room(); v.p = into(RL(0.62, 1.62, -1.62), RL(0.62, 1.62, -1.84), k); const w = Ease.inOutSine(k); v.at = fuV([-1, 5, -60], [0, 16, -52], Ease.inOutSine(fuSm(k, 0.35, 1))); v.fov = 54 - 28 * w; v.sh = { f: RL(0, 1, -1.2), R: 6 }; break; }
     // the kettle: you lift it, pour, and the tea goes up; the camera follows the stream up, then back down it
     case 'kettle': { room(); v.p = into(RL(-1.55, 1.6, -0.18), RL(-1.6, 1.6, -0.14), k);
       const P = FU.sPour, w1 = Ease.inOutSine(fuSm(s, P[0] + 0.1, P[0] + 1.3)), w2 = Ease.inOutSine(fuSm(s, P[0] + 2.4, P[0] + 3.8));
@@ -329,8 +355,12 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
     // the puddle of tea on the ceiling (and the cat on the counter under it)
     case 'puddle': { room(); v.p = into(RL(-0.95, 1.45, 0.78), RL(-1.0, 1.43, 0.72), k); v.at = RL(-1.95, 2.45, 0.35); v.fov = 62; break; }
     // the cat: it jumps down from the counter, and lands on the ceiling
-    case 'cat': { room(); v.p = into(RL(0.45, 1.35, 0.45), RL(0.4, 1.36, 0.42), k); const cs = fuCatState(s), c = new THREE.Vector3(0, FU_CATP.hc + 0.08, 0).applyQuaternion(cs.q);
-      v.at = fuLookCap(v.p, RL(cs.p[0] + c.x, cs.p[1] + c.y, cs.p[2] + c.z), 1.0); v.fov = 58; break; }
+    case 'cat': { room(); const cs = fuCatState(s), c = new THREE.Vector3(0, FU_CATP.hc + 0.04, 0).applyQuaternion(cs.q), cc = RL(cs.p[0] + c.x, cs.p[1] + c.y, cs.p[2] + c.z);
+      if (shot.cam === 'land') {                                        // just under the ceiling, rolled over: the ceiling is its floor
+        const sL = FU.sCat + FU_CAT_LAND, r = Ease.inOutSine(fuSm(s, sL + 0.9, sL + 3.2));
+        const a0 = fuV(RL(-1.4, 1.72, 0.82), RL(-1.25, 2.3, 0.82), Ease.inOutSine(fuSm(s, FU.sCat + 0.32, sL + 0.05)));
+        v.p = into(RL(-0.3, 2.38, 0.42), RL(-0.36, 2.36, 0.46), k); v.at = fuV(a0, RL(-1.2, 2.22, 0.82), r); v.fov = 56; v.roll = 180 * (1 - r); break; }                       // (degrees)
+      v.p = into(RL(-1.58, 1.12, -0.3), RL(-1.52, 1.16, -0.24), k); v.at = fuLookCap(v.p, cc, 1.1); v.fov = 50; break; }
     case 'stuck': { room(); v.p = into(RL(-0.3, 1.5, 0.3), RL(-0.34, 1.5, 0.28), k); v.at = RL(-1.12, FU_CEIL - 0.15, 0.82); v.fov = 58; break; }
     // the apple: held out of the open window; let go; followed up (as far as the lintel lets you look)
     case 'apple': { room(); v.p = into(RL(0.78, 1.46, -1.88), RL(0.8, 1.45, -1.96), k); v.sh = { f: RL(0.8, 1.2, -2.4), R: 4 };
@@ -339,28 +369,38 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
     // the apple from the park: a speck going up past your block
     // ... and alongside it: just above the apple, looking down past it at your block, the street and the park falling away
     case 'appleUp': { const A = X.apple.position.toArray(), w = Ease.inOutSine(k);
-      v.p = fuAdd(A, [0.5 + 0.15 * w, 0.62 + 0.2 * w, 0.95 - 0.1 * w]); v.at = fuAdd(A, [-0.3 - 0.2 * w, -1.25, -0.85]); v.fov = 52; v.drift = 0.0008; v.near = 0.03; v.sh = { f: [2, 0, -8], R: 40 }; break; }
+      v.p = fuAdd(A, [0.5 + 0.15 * w, 0.62 + 0.2 * w, 0.95 - 0.1 * w]); v.at = fuAdd(A, [-0.35 - 0.2 * w, -1.15, -1.0]); v.fov = 52; v.drift = 0.0008; v.near = 0.03; v.fogK = 0.25; v.sh = { f: [2, 0, -8], R: 40 }; break; }
     // the street: keys, coffee, a phone
-    case 'street': { v.p = into([1.0, 1.45, -5.6], [1.15, 1.45, -5.3], k);
-      // on each loss in turn (the keys, the coffee, the phone): on the person, then up after it (no steeper than 0.45 rad)
-      const up = (o, d, s0) => fuV(d, X[o].visible ? fuLookCap(v.p, X[o].position.toArray(), 0.45) : d, Ease.inOutSine(fuSm(s, s0 + 0.05, s0 + 0.45)));
-      const a1 = up('keys', [-2.8, 1.35, -0.9], FU.sKeys), a2 = up('cup', [0.46, 1.35, -1.35], FU.sCoffee), a3 = up('phone', [6.2, 1.35, -0.7], FU.sPhone);
-      v.at = fuV(fuV(a1, a2, Ease.inOutSine(fuSm(s, FU.sCoffee - 0.75, FU.sCoffee - 0.1))), a3, Ease.inOutSine(fuSm(s, FU.sPhone - 0.75, FU.sPhone - 0.1))); v.fov = 58; v.sh = { f: [1, 1, -1.5], R: 12 }; break; }
+    case 'street': {
+      // on the person, then up after what they lost (no steeper than cap rad)
+      const up = (o, d, s0, cap) => fuV(d, X[o].visible ? fuLookCap(v.p, X[o].position.toArray(), cap) : d, Ease.inOutSine(fuSm(s, s0 + 0.05, s0 + 0.55)));
+      v.sh = { f: [1, 1, -1.5], R: 12 };
+      if (shot.cam === 'keys') { v.p = into([-1.75, 1.32, -3.0], [-1.85, 1.34, -2.85], k); v.at = up('keys', [-2.8, 1.2, -0.9], FU.sKeys, 0.95); v.fov = 46; break; }
+      if (shot.cam === 'coffee') { v.p = into([1.55, 1.38, -3.25], [1.45, 1.4, -3.1], k); v.at = up('cup', [0.46, 1.3, -1.35], FU.sCoffee, 0.95); v.fov = 46; break; }
+      if (shot.cam === 'phone') { v.p = into([9.5, 1.42, -2.95], [9.4, 1.44, -2.8], k); v.at = up('phone', [8.6, 1.38, -0.7], FU.sPhone, 0.9); v.fov = 42; break; }
+      v.p = into([1.0, 1.45, -5.6], [1.15, 1.45, -5.3], k); v.at = [-0.4, 1.5, -0.9]; v.fov = 64; break; }
     // ---- 2: the park
-    case 'leaves': { v.p = into([-24, 1.55, -14.2], [-23.4, 1.55, -14.4], k); v.at = [-9, 5 + 10 * Ease.inOutSine(k), -19.5]; v.fov = 58; v.sh = { f: [-12, 4, -18], R: 22 }; break; }
-    case 'fountain': { v.p = into([3, 1.6, -39.5], [2.8, 1.6, -39.8], k); v.at = fuLookCap(v.p, [0, 3 + 42 * Ease.inOutSine(fuSm(k, 0.12, 0.85)), -52], 1.2); v.fov = 60; v.sh = { f: [0, 2, -48], R: 18 }; break; }
-    case 'fish': { v.p = into([11.5, 1.5, -34.5], [11.2, 1.5, -34.8], k); const F = X.fish.visible ? X.fish.position.toArray() : [FU_SPOT.fish[0], 0, FU_SPOT.fish[1]]; const w = Ease.inOutSine(fuSm(s, FU.sFish + 0.15, FU.sFish + 1.6));
+    case 'leaves': { const w = Ease.inOutSine(k); v.p = fuV([-17.5, 1.5, -14.6], [-17.0, 2.4, -14.8], w); v.at = fuV([-9.5, 4.5, -19.2], [-7, 11, -21], w); v.fov = 64; v.sh = { f: [-12, 6, -18], R: 22 }; break; }
+    case 'fountain': { v.p = into([2.4, 1.05, -41.4], [2.2, 1.05, -41.7], k); v.at = fuLookCap(v.p, [0, 3 + 42 * Ease.inOutSine(fuSm(k, 0.12, 0.85)), -52], 0.5); v.fov = 62; v.sh = { f: [0, 2, -48], R: 18 }; break; }
+    case 'fish': { if (shot.cam === 'chase' && X.fish.visible) { const F = X.fish.position.toArray(), w = Ease.inOutSine(k);
+        v.p = fuAdd(F, [0.75 + 0.2 * w, 0.55 + 0.25 * w, 0.9]); v.at = fuAdd(F, [-0.35, -1.0, -1.1]); v.fov = 54; v.near = 0.03; v.fogK = 0.5; v.drift = 0.001; v.sh = { f: [4, 0, -46], R: 30 }; break; }
+      v.p = into([11.5, 1.5, -34.5], [11.2, 1.5, -34.8], k); const F = X.fish.visible ? X.fish.position.toArray() : [FU_SPOT.fish[0], 0, FU_SPOT.fish[1]]; const w = Ease.inOutSine(fuSm(s, FU.sFish + 0.15, FU.sFish + 1.6));
       v.at = fuLookCap(v.p, fuV([4, 0.6, -46.3], F, w), 1.0); v.fov = 56; v.sh = { f: [4, 1, -46], R: 10 }; break; }
-    case 'ball': { v.p = into([-26.2, 1.25, -42.4], [-26.4, 1.25, -42.6], k); const b = X.ball.position.toArray(), w = Ease.inOutSine(fuSm(s, FU.sKick + 0.15, FU.sKick + 0.9));
+    case 'ball': { if (shot.cam === 'chase' && X.ball.visible) { const b = X.ball.position.toArray(), w = Ease.inOutSine(k);
+        v.p = fuAdd(b, [0.7 + 0.2 * w, 0.5 + 0.2 * w, 0.85]); v.at = fuAdd(b, [-0.3, -1.0, -1.0]); v.fov = 54; v.near = 0.03; v.fogK = 0.5; v.drift = 0.001; v.sh = { f: [-28, 0, -46], R: 30 }; break; }
+      v.p = into([-26.2, 1.25, -42.4], [-26.4, 1.25, -42.6], k); const b = X.ball.position.toArray(), w = Ease.inOutSine(fuSm(s, FU.sKick + 0.15, FU.sKick + 0.9));
       v.at = fuLookCap(v.p, fuV([-28, 0.6, -46.5], b, w), 1.15); v.fov = 56; v.sh = { f: [-28, 1, -46], R: 10 }; break; }
-    case 'scoop': { v.p = into([18.7, 1.15, -15.6], [18.6, 1.15, -15.5], k); const sc = X.scoop.visible ? X.scoop.position.toArray() : [20.2, 1.0, -17], w = Ease.inOutSine(fuSm(s, FU.sScoop + 0.15, FU.sScoop + 0.9));
-      v.at = fuLookCap(v.p, fuV([20.2, 0.95, -17], sc, w), 1.1); v.fov = 56; v.sh = { f: [20, 1, -17], R: 8 }; break; }
+    case 'scoop': { v.p = into([19.45, 1.05, -16.05], [19.4, 1.07, -15.98], k); const sc = X.scoop.visible ? X.scoop.position.toArray() : [20.2, 1.0, -17], w = Ease.inOutSine(fuSm(s, FU.sScoop + 0.15, FU.sScoop + 0.9));
+      v.at = fuLookCap(v.p, fuV([20.2, 0.95, -17], sc, w), 0.38); v.fov = 50; v.sh = { f: [20, 1, -17], R: 8 }; break; }
     // walking: low, beside the old man's feet as he goes (he walks east, −x, along the path)
     case 'walk': { const xw = -24 - 0.32 * (s - 228); v.p = [xw - 0.55, 0.78, -13.25]; v.at = [xw - 1.25, 0.55, -15.4]; v.fov = 60; v.drift = 0.002; v.sh = { f: [xw, 0.5, -15.3], R: 6 }; break; }
     // the runner: stretching, she starts, and on her first stride she falls up into the plane tree
     case 'jogger': { v.p = into([-0.4, 1.45, -20.6], [-0.75, 1.45, -20.5], k); const r = fuRunner(s, C), w = Ease.inOutSine(fuSm(s, FU.sLift + 0.05, FU.sLift + 0.7));
       v.at = fuV([r.pos[0] - 0.7, 1.1, FU_RUN.z], [B[0], B[1] + 0.5, B[2]], w); v.fov = 54; v.sh = { f: [-2, 2, -15], R: 10 }; break; }
-    case 'hold': { v.p = into([-2.9, 1.4, -19.8], [-3.15, 1.42, -19.6], k); v.at = [B[0], B[1] + 0.7, B[2]]; v.fov = 52; v.sh = { f: [B[0], B[1], B[2]], R: 8 }; break; }
+    case 'hold': { v.sh = { f: [B[0], B[1], B[2]], R: 8 };
+      if (shot.cam === 'hands') { fuHandsCam(v, B, k, into); break; }
+      if (shot.cam === 'above') { v.p = into(fuAdd(B, [1.3, 3.3, -1.5]), fuAdd(B, [1.1, 3.0, -1.3]), k); v.at = fuAdd(B, [0.1, 0.2, 0.15]); v.fov = 56; v.near = 0.03; break; }
+      v.p = into([-2.9, 1.4, -19.8], [-3.2, 1.55, -18.7], k); v.at = [B[0], B[1] + 0.8, B[2]]; v.fov = 52 - 6 * Ease.inOutSine(k); break; }
     case 'rope': { v.p = into([-1.4, 1.5, -20.2], [-1.6, 1.5, -20.0], k); v.at = [-3.4, 2.5 + 2.4 * Ease.inOutSine(fuSm(s, FU.sCoat + 0.3, FU.sCoat + 1.8)), -14.4]; v.fov = 60; v.sh = { f: [-3, 2, -14], R: 9 }; break; }
     case 'dog': { v.p = into([14.4, 0.8, -26.0], [14.2, 0.82, -25.9], k); v.at = [12, 1.0 + 1.7 * Ease.inOutSine(fuSm(s, FU.sDog + 0.2, FU.sDog + 1.4)), -24.2]; v.fov = 58; v.sh = { f: [12, 1, -24], R: 8 }; break; }
     case 'pigeons': { v.p = into([-6.1, 1.3, -13.5], [-6.3, 1.3, -13.6], k); v.at = [-6.4, 3.2, -16.4]; v.fov = 56; v.sh = { f: [-6, 3, -16], R: 7 }; break; }
@@ -370,10 +410,13 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
     case 'home': { room(); v.p = into(RL(1.55, 1.62, 1.6), RL(1.45, 1.6, 1.5), k); const c1 = fuC('home', 1), w = Ease.inOutSine(fuSm(t, c1 - 0.2, c1 + 1.6));
       v.at = fuV(RL(0.15, 2.5, -0.2), RL(0.2, 1.55, -0.15), w); v.fov = 64 + 10 * w; break; }
     case 'hold2': { v.p = into([-2.6, 3.0, -17.9], [-2.75, 3.05, -17.8], k); v.at = [B[0], B[1] + 0.35, B[2]]; v.fov = 50; v.sh = { f: [B[0], B[1], B[2]], R: 5 }; break; }
-    case 'count': { v.p = into([-2.6, 1.3, -21.0], [-2.8, 1.32, -20.8], k); v.at = [B[0] + 0.9, B[1] + 0.3, B[2]]; v.fov = 58; v.sh = { f: [B[0], 2, B[2]], R: 9 }; break; }
+    case 'count': { if (shot.cam === 'hands') { v.sh = { f: [B[0], B[1], B[2]], R: 8 }; fuHandsCam(v, B, k, into); break; }
+      if (shot.cam === 'crowd') { v.p = into(fuAdd(B, [0.7, -3.05, 2.1]), fuAdd(B, [0.6, -3.0, 1.9]), k); v.at = fuAdd(B, [-0.1, 0.5, -0.1]); v.fov = 64; v.sh = { f: [B[0], 1, B[2]], R: 9 }; break; }
+      if (shot.cam === 'ceil') { room(); v.p = into(RL(FU_EYE[0], FU_EYE[1] - 0.02, FU_EYE[2]), RL(FU_EYE[0], FU_EYE[1] - 0.06, FU_EYE[2] - 0.03), k); v.at = RL(0.12, FU_CEIL, -0.12); v.fov = 72; v.drift = 0.003; break; }
+      v.p = into([-2.6, 1.3, -21.0], [-2.8, 1.32, -20.8], k); v.at = [B[0] + 0.9, B[1] + 0.3, B[2]]; v.fov = 58; v.sh = { f: [B[0], 2, B[2]], R: 9 }; break; }
     // 3:10 in your kitchen: everything on the ceiling comes down at once (slow motion)
-    case 'drop': { room(); v.p = into(RL(1.2, 1.25, 0.95), RL(1.16, 1.22, 0.9), k); const u = s - FUP.T;
-      v.at = fuV(RL(0.2, 1.65, -0.15), RL(0.2, 1.2, -0.15), Ease.inOutSine(fuSm(u, 0.1, 0.8))); v.fov = 74; v.shake = u > 0.5 && u < 1.6 ? 0.006 * Math.exp(-(u - 0.5) / 0.4) : 0; break; }
+    case 'drop': { room(); v.p = into(RL(1.12, 0.96, 0.66), RL(1.1, 0.955, 0.63), k); const u = s - FUP.T;
+      v.at = RL(0.0, 1.5, -0.32); v.fov = 74; v.drift = 0.0005; v.shake = u > 0.56 && u < 2.0 ? 0.009 * Math.exp(-(u - 0.56) / 0.35) : 0; break; }
     // back in the park: she drops to the path; the fountain's water pours back down
     case 'down': { v.p = into([-3.4, 1.55, -11.7], [-3.3, 1.55, -11.8], k); const w = Ease.inOutSine(fuSm(s, 609.5, 613.5));
       v.at = fuV([B[0], 2.2, B[2]], [0, 9, -52], w); v.fov = 56; v.sh = { f: fuV([B[0], 1, B[2]], [0, 2, -40], w), R: 16 }; break; }

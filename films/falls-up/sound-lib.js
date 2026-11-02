@@ -91,8 +91,8 @@ function fuCurve(f, hz = 200) {
 }
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
-const FU_PLACE = { in: ['title', 'ceiling', 'sg', 'window', 'kettle', 'puddle', 'cat', 'stuck', 'apple', 'home', 'drop'] };
-function fuWhereShot(sh) { return FU_PLACE.in.includes(sh.mode) ? 'in' : 'out'; }
+const FU_PLACE = { in: ['title', 'ceiling', 'tap', 'sg', 'window', 'kettle', 'puddle', 'cat', 'stuck', 'apple', 'home', 'drop'] };
+function fuWhereShot(sh) { return sh.where || (FU_PLACE.in.includes(sh.mode) ? 'in' : 'out'); }
 // the film as places: [{ t0, t1, where, shot }] in order
 function fuPlaces() {
   if (fuPlaces._c) return fuPlaces._c;
