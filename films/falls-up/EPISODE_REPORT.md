@@ -147,6 +147,9 @@ street and park beds (unweighted RMS); stem trims music +7, beds −11, effects 
   `node films/falls-up/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\falls-up` →
   `D:\renders\falls-up\falls-up_final_1080p.mp4` (1920×1080, 30 fps, H.264 CRF 18, the mastered soundtrack
   `final-soundtrack.m4a` copied in, about 4:58). Resumable: run it again and finished segments are kept.
+- **Made on 2 November 2026** on the owner's PC (RTX 3060 Ti, about 16 fps, about 9 minutes, no restarts):
+  `D:\renders\falls-up\falls-up_final_1080p.mp4`, 4:58 (298.03 s), 1920×1080, 30 fps, 8,941 frames, AAC about
+  258 kb/s, −15.2 LUFS, −2.6 dBTP, 654 MiB; a full decode reported no errors.
 
 ## Files
 
