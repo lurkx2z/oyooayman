@@ -98,6 +98,14 @@ Everything is procedural, so there are no models, images or sound files to downl
 > room, the church spire falls, the parked cars slide, the sun sets in 9 seconds and sunrise number 18 comes up over a
 > street that is now a cliff. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/days-shorter/PLAN.md`](films/days-shorter/PLAN.md).
+>
+> ***What if everything you dropped fell up for 10 minutes?*** — open `falls-up.html` (16:9, voiceless, 4:58). From 3:00
+> to 3:10 on a Saturday afternoon anything that loses its support falls up at 9.81 m/s² and stays on whatever stops it.
+> Your glass smashes on the ceiling, a spoon and a grape land up there together (Galileo), the tea pours up, the cat
+> lands on its feet on the ceiling and can't get down, your apple leaves the window and goes supersonic on its way to
+> space; in the park the leaves, the fountain and a carp go up, and a runner's first stride takes her into a plane tree
+> she has to hold on to for five and a half minutes. At 3:10 your whole ceiling comes down on your table. The story clock
+> only runs forward. Physics, clock, shots and review log: [`films/falls-up/PLAN.md`](films/falls-up/PLAN.md).
 
 | Time | Beat |
 |---|---|

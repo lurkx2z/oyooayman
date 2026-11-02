@@ -99,6 +99,7 @@ const FU_FLY = {};
   F.apple = fuFlight(90.0, 39.3, { h0: 13.4, v0: 0 });     // 3:01:30, out of your 5th-floor window (13.4 m up); 200 g, 7.5 cm, Cd 0.47: vt ≈ 39.3 m/s
   F.keys = fuFlight(131.5, 22, { h0: 1.1 });                // a bunch of keys, 3:02:11
   F.phone = fuFlight(135.0, 20, { h0: 1.3 });               // a phone, 3:02:15 (170 g, tumbling: vt ≈ 20 m/s)
+  F.phone0 = fuFlight(0.0, 20, { h0: 1.3 });               // one of the first phones lost, at 3:00:00 (the planes shot: 11 km at 3:07)
   F.ball = fuFlight(220.0, 27, { h0: 0.3, v0: 9 });         // the kicked football (it leaves the boot at ~9 m/s upward)
   F.drop = fuFlight(0, 8, { h0: 1.8, v0: 6 });              // the fountain's first water (3:00:00): 3 mm drops, vt ≈ 8 m/s
   F.leaf = fuFlight(0, 1.3, { h0: 8 });                     // an autumn leaf (vt ≈ 1.3 m/s, fluttering)

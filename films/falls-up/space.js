@@ -95,7 +95,7 @@ FU_SETS.space = (app) => {
       const m = shot.mode, s = fuStoryAt(t), k = MathX.clamp((t - shot.t0) / (shot.t1 - shot.t0), 0, 1);
       this._s = s; this._shot = shot;
       // what we ride with, and its height
-      const F = m === 'planes' ? FU_FLY.phone : FU_FLY.apple, h = F(s); this._h = h; this._what = m === 'planes' ? 'phone' : 'apple';
+      const F = m === 'planes' ? FU_FLY.phone0 : FU_FLY.apple, h = F(s); this._h = h; this._what = m === 'planes' ? 'phone' : 'apple';
       sky.material.uniforms.h.value = h;
       const thin = Math.exp(-h / 7500); stars.material.opacity = MathX.clamp((0.25 - thin) * 6, 0, 1) * 0.22;   // (faint: a camera exposed for the sunlit apple barely sees them)
       apple.visible = m !== 'planes'; phone.visible = m === 'planes'; plane.visible = m === 'planes';
@@ -118,8 +118,8 @@ FU_SETS.space = (app) => {
     },
     labels(t) {
       const shot = fuShotAt(t), W = StoryHUD.win, out = [];
-      if (this._what === 'apple') out.push({ p: [0.0, 0.05, 0.0], text: 'YOUR APPLE', sub: fuHt(this._h) + ' UP' + (this._h < 85000 ? ' · ' + Math.round(fuTempC(this._h)) + ' °C' : ''), a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
-      else out.push({ p: [0.0, 0.03, 0.0], text: 'A LOST PHONE', sub: fuHt(this._h) + ' UP', a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
+      if (this._what === 'apple') out.push({ p: [0.0, 0.05, 0.0], text: 'YOUR APPLE', sub: fuHt(this._h) + ' UP' + (this._h < 85000 ? ' · ' + Math.round(fuTempC(this._h)) + ' °C' : ''), a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'l' });   // (to its right: the context line is on the left)
+      else out.push({ p: [0.0, 0.03, 0.0], text: 'A PHONE LOST AT 3:00', sub: fuHt(this._h) + ' UP', a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
       return out;
     },
     grade(t, p) { p.exposure = 1.0; p.saturation = 1.06; p.vignette = 0.6; p.bloom = 0.42; p.bloomThreshold = 0.86; p.warmth = -0.02; },

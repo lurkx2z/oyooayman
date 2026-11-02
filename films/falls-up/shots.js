@@ -15,8 +15,10 @@ const FU_SHOTS = [];
     ['A0', 'title', -1, cap('start', 0).show + 0.4],
     ['A1', 'ceiling', cap('start', 0).show + 0.4, c('start', 1) - 0.5],
     ['A1b', 'tap', c('start', 1) - 0.5, B('rate')],
-    ['A2', 'sg', B('rate'), B('real')],
-    ['A3', 'window', B('real'), B('kettle')],
+    ['A2', 'sg', B('rate'), c('rate', 1) + 1.5],
+    ['A2b', 'sg', c('rate', 1) + 1.5, B('real'), { cam: 'close' }],                // up close: the two of them, side by side on the ceiling
+    ['A3', 'window', B('real'), c('real', 1) - 0.4],
+    ['A3b', 'window', c('real', 1) - 0.4, B('kettle'), { cam: 'tree' }],          // the plane tree across the road, losing its leaves upwards
     ['A4', 'kettle', B('kettle'), c('kettle', 2) - 0.5],
     ['A5', 'puddle', c('kettle', 2) - 0.5, B('cat')],
     ['A6', 'cat', B('cat'), at(FU.sCat + 0.3)],
@@ -30,8 +32,10 @@ const FU_SHOTS = [];
     ['A10d', 'street', at(FU.sPhone - 0.7), B('leaves'), { cam: 'phone' }],
     // 2 — the park, 3:03–3:07: leaves, the fountain, a fish, a ball, ice cream; walking and running; the runner in the
     // tree; the coat; the dog; the pigeons; the sky; the planes; everyone holding on
-    ['B0', 'leaves', B('leaves'), B('fountain')],
-    ['B1', 'fountain', B('fountain'), B('fish')],
+    ['B0', 'leaves', B('leaves'), c('leaves', 1) - 0.5],
+    ['B0b', 'leaves', c('leaves', 1) - 0.5, B('fountain'), { cam: 'close' }],     // in the crown: leaves letting go, past the lens
+    ['B1', 'fountain', B('fountain'), c('fountain', 1) - 0.5],
+    ['B1b', 'fountain', c('fountain', 1) - 0.5, B('fish'), { cam: 'up' }],        // from the jet, straight up the column
     ['B2', 'fish', B('fish'), at(FU.sFish + 1.7)],
     ['B2b', 'fish', at(FU.sFish + 1.7), B('ball'), { cam: 'chase' }],                 // riding up beside the carp
     ['B3', 'ball', B('ball'), at(FU.sKick + 1.0)],
@@ -47,7 +51,8 @@ const FU_SHOTS = [];
     ['B10', 'pigeons', B('pigeons'), B('height')],
     ['B11', 'height', B('height'), B('planes'), { set: 'space' }],
     ['B12', 'planes', B('planes'), B('warn'), { set: 'space' }],
-    ['B13', 'warn', B('warn'), B('home')],
+    ['B13', 'warn', B('warn'), c('warn', 1) - 0.4],
+    ['B13b', 'warn', c('warn', 1) - 0.4, B('home'), { cam: 'post' }],             // an old man holding on to a lamp post
     // 3 — 3:08–3:10 and after: your ceiling; still holding on; the apple in space; the count; the ceiling comes down;
     // everything that went up is coming back
     ['C0', 'home', B('home'), B('hold2')],

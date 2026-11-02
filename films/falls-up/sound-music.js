@@ -261,8 +261,10 @@ fuSound('music', 'score', function (ctx, bus, K) {
     M.strings(T0, tDrop - 0.35, C.Cm9, 0.6, { att: 1.0, rel: 0.1, cut: 600, cutTo: 2600, cutAt: tDrop - 0.4, keys: [[T0 + 1, 0.6], [tDrop - 0.5, 1.2]] });
     for (let k = 0; k < 10; k++) { const t = tC + 0.15 + k * (tDrop - 0.35 - tC - 0.15) / 10; M.beat(t, 0.3 + 0.05 * k); }
     M.roll(tC + 3, tDrop - 0.35, [[tC + 3, 0.03], [tDrop - 0.4, 0.55]], 55); }
-  // 3:10: one huge hit as the ceiling comes down, a low chord ringing out under the slow motion
-  { const tHit = f(FUP.T + 0.35);
+  // 3:10: it lets go (a roll rising through the slow-motion fall), one huge hit as it all lands on your table, a low
+  // chord ringing out
+  { const tHit = f(FUP.T + 0.6);
+    M.roll(tDrop + 0.05, tHit - 0.02, [[tDrop + 0.05, 0.04], [tHit - 0.1, 0.6]], 55);
     blow(tHit, 1.35); M.drum(tHit + 0.02, 0.7, 27.5, 1.5, 1.6);
     M.strings(tHit, sh('drop').t1 + 0.5, C.Dbig, 0.6, { att: 0.05, rel: 0.6, cut: 1600, cutTo: 500, vib: 0 });
     M.piano(tHit, 'D1', 0.6, 5); M.piano(tHit, 'D2', 0.5, 5); }

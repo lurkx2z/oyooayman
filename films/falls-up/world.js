@@ -342,12 +342,16 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
       v.p = fuV(RL(0.95, 1.4, 0.95), RL(1.95, 1.5, 1.78), w); v.at = fuV(RL(H.glass[0] - 0.05, FU_CEIL, H.glass[2] - 0.05), RL(-0.55, 1.72, -0.45), w); v.fov = 56 + 10 * w; break; }
     // the tap by the window drips: each drop falls up into the cupboard over it (tilting up after them)
     case 'tap': { room(); const T = FU_TAP, w = Ease.inOutSine(fuSm(k, 0.25, 0.95));
-      v.p = into(RL(T[0] + 0.44, T[1] + 0.0, T[2] + 0.3), RL(T[0] + 0.38, T[1] + 0.01, T[2] + 0.26), k); v.at = fuV(RL(T[0], T[1] + 0.12, T[2]), RL(T[0], T[1] + 0.15, T[2]), w); v.fov = 46; v.near = 0.01; break; }
+      v.p = into(RL(T[0] + 0.25, T[1] - 0.02, T[2] + 0.17), RL(T[0] + 0.22, T[1] - 0.01, T[2] + 0.15), k); v.at = fuV(RL(T[0], T[1] + 0.07, T[2]), RL(T[0], T[1] + 0.1, T[2]), w); v.fov = 60; v.near = 0.01; break; }
     // the spoon and the grape: in your hands, let go together, followed up
-    case 'sg': { room(); v.p = into(RL(E[0], E[1], E[2]), RL(E[0], E[1] - 0.01, E[2] - 0.04), k);
+    case 'sg': { room();
+      if (shot.cam === 'close') { const sp = H.spoon, gr = H.grape, mx = (sp[0] + gr[0]) / 2; v.p = into(RL(mx + 0.06, 2.18, 0.8), RL(mx + 0.04, 2.24, 0.72), k); v.at = RL(mx, FU_CEIL, sp[2]); v.fov = 36; break; }
+      v.p = into(RL(E[0], E[1], E[2]), RL(E[0], E[1] - 0.01, E[2] - 0.04), k);
       const w = Ease.inOutSine(fuSm(s, FU.sSG + 0.04, FU.sSG + 0.62)); v.at = fuV(RL(0.04, 0.92, 0.22), RL(0.05, FU_CEIL, 0.26), w); v.fov = 55 - 9 * Ease.inOutSine(fuSm(s, FU.sSG + 0.7, FU.sSG + 2.5)) - 16 * Ease.inOutSine(fuSm(s, FU.sSG + 2.6, FU.sSG + 7.5)); break; }
     // the window: the park below (leaves going up, the fountain's column), people still out walking
-    case 'window': { room(); v.p = into(RL(0.62, 1.62, -1.62), RL(0.62, 1.62, -1.84), k); const w = Ease.inOutSine(k); v.at = fuV([-1, 5, -60], [0, 16, -52], Ease.inOutSine(fuSm(k, 0.35, 1))); v.fov = 54 - 28 * w; v.sh = { f: RL(0, 1, -1.2), R: 6 }; break; }
+    case 'window': { room();
+      if (shot.cam === 'tree') { const P = FU_ST.plane; v.p = into(RL(0.0, 1.6, -1.72), RL(-0.04, 1.62, -1.8), k); v.at = fuV([P.x + 0.2, 9.5, P.z + 0.6], [P.x + 0.4, 16.5, P.z + 0.6], Ease.inOutSine(fuSm(k, 0.1, 1))); v.fov = 26; v.sh = { f: RL(0, 1, -1.2), R: 6 }; break; }
+      v.p = into(RL(0.62, 1.62, -1.62), RL(0.62, 1.62, -1.84), k); const w = Ease.inOutSine(k); v.at = fuV([-1, 5, -60], [0, 16, -52], Ease.inOutSine(fuSm(k, 0.35, 1))); v.fov = 54 - 28 * w; v.sh = { f: RL(0, 1, -1.2), R: 6 }; break; }
     // the kettle: you lift it, pour, and the tea goes up; the camera follows the stream up, then back down it
     case 'kettle': { room(); v.p = into(RL(-1.55, 1.6, -0.18), RL(-1.6, 1.6, -0.14), k);
       const P = FU.sPour, w1 = Ease.inOutSine(fuSm(s, P[0] + 0.1, P[0] + 1.3)), w2 = Ease.inOutSine(fuSm(s, P[0] + 2.4, P[0] + 3.8));
@@ -369,7 +373,7 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
     // the apple from the park: a speck going up past your block
     // ... and alongside it: just above the apple, looking down past it at your block, the street and the park falling away
     case 'appleUp': { const A = X.apple.position.toArray(), w = Ease.inOutSine(k);
-      v.p = fuAdd(A, [0.5 + 0.15 * w, 0.62 + 0.2 * w, 0.95 - 0.1 * w]); v.at = fuAdd(A, [-0.35 - 0.2 * w, -1.15, -1.0]); v.fov = 52; v.drift = 0.0008; v.near = 0.03; v.fogK = 0.25; v.sh = { f: [2, 0, -8], R: 40 }; break; }
+      v.p = fuAdd(A, [-0.12 - 0.06 * w, 0.36 + 0.12 * w, 0.52 + 0.08 * w]); v.at = fuAdd(A, [0.1, -0.95, -0.95]); v.fov = 52; v.drift = 0.0008; v.near = 0.03; v.fogK = 0.25; v.sh = { f: [2, 0, -8], R: 40 }; break; }
     // the street: keys, coffee, a phone
     case 'street': {
       // on the person, then up after what they lost (no steeper than cap rad)
@@ -380,8 +384,10 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
       if (shot.cam === 'phone') { v.p = into([9.5, 1.42, -2.95], [9.4, 1.44, -2.8], k); v.at = up('phone', [8.6, 1.38, -0.7], FU.sPhone, 0.9); v.fov = 42; break; }
       v.p = into([1.0, 1.45, -5.6], [1.15, 1.45, -5.3], k); v.at = [-0.4, 1.5, -0.9]; v.fov = 64; break; }
     // ---- 2: the park
-    case 'leaves': { const w = Ease.inOutSine(k); v.p = fuV([-17.5, 1.5, -14.6], [-17.0, 2.4, -14.8], w); v.at = fuV([-9.5, 4.5, -19.2], [-7, 11, -21], w); v.fov = 64; v.sh = { f: [-12, 6, -18], R: 22 }; break; }
-    case 'fountain': { v.p = into([2.4, 1.05, -41.4], [2.2, 1.05, -41.7], k); v.at = fuLookCap(v.p, [0, 3 + 42 * Ease.inOutSine(fuSm(k, 0.12, 0.85)), -52], 0.5); v.fov = 62; v.sh = { f: [0, 2, -48], R: 18 }; break; }
+    case 'leaves': { if (shot.cam === 'close') { const P = FU_ST.plane; v.p = into([P.x + 4.4, 11.0, P.z + 7.2], [P.x + 4.2, 11.4, P.z + 6.9], k); v.at = [P.x + 0.6, 13.2 + 1.6 * Ease.inOutSine(k), P.z + 0.8]; v.fov = 42; v.near = 0.03; v.sh = { f: [P.x, 11, P.z], R: 7 }; break; }
+      const w = Ease.inOutSine(k); v.p = fuV([-17.5, 1.5, -14.6], [-17.0, 2.4, -14.8], w); v.at = fuV([-9.5, 4.5, -19.2], [-7, 11, -21], w); v.fov = 64; v.sh = { f: [-12, 6, -18], R: 22 }; break; }
+    case 'fountain': { if (shot.cam === 'up') { const F = FU_ST.fountain; v.p = into([F.x + 1.3, 0.85, F.z + 0.8], [F.x + 1.2, 0.9, F.z + 0.7], k); v.at = [F.x + 0.12, 30, F.z - 0.25]; v.fov = 62; v.roll = 8 + 10 * Ease.inOutSine(k); v.sh = { f: [F.x, 1, F.z], R: 8 }; break; }
+      v.p = into([2.4, 1.05, -41.4], [2.2, 1.05, -41.7], k); v.at = fuLookCap(v.p, [0, 3 + 42 * Ease.inOutSine(fuSm(k, 0.12, 0.85)), -52], 0.5); v.fov = 62; v.sh = { f: [0, 2, -48], R: 18 }; break; }
     case 'fish': { if (shot.cam === 'chase' && X.fish.visible) { const F = X.fish.position.toArray(), w = Ease.inOutSine(k);
         v.p = fuAdd(F, [0.75 + 0.2 * w, 0.55 + 0.25 * w, 0.9]); v.at = fuAdd(F, [-0.35, -1.0, -1.1]); v.fov = 54; v.near = 0.03; v.fogK = 0.5; v.drift = 0.001; v.sh = { f: [4, 0, -46], R: 30 }; break; }
       v.p = into([11.5, 1.5, -34.5], [11.2, 1.5, -34.8], k); const F = X.fish.visible ? X.fish.position.toArray() : [FU_SPOT.fish[0], 0, FU_SPOT.fish[1]]; const w = Ease.inOutSine(fuSm(s, FU.sFish + 0.15, FU.sFish + 1.6));
@@ -404,7 +410,8 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
     case 'rope': { v.p = into([-1.4, 1.5, -20.2], [-1.6, 1.5, -20.0], k); v.at = [-3.4, 2.5 + 2.4 * Ease.inOutSine(fuSm(s, FU.sCoat + 0.3, FU.sCoat + 1.8)), -14.4]; v.fov = 60; v.sh = { f: [-3, 2, -14], R: 9 }; break; }
     case 'dog': { v.p = into([14.4, 0.8, -26.0], [14.2, 0.82, -25.9], k); v.at = [12, 1.0 + 1.7 * Ease.inOutSine(fuSm(s, FU.sDog + 0.2, FU.sDog + 1.4)), -24.2]; v.fov = 58; v.sh = { f: [12, 1, -24], R: 8 }; break; }
     case 'pigeons': { v.p = into([-6.1, 1.3, -13.5], [-6.3, 1.3, -13.6], k); v.at = [-6.4, 3.2, -16.4]; v.fov = 56; v.sh = { f: [-6, 3, -16], R: 7 }; break; }
-    case 'warn': { v.p = into([9, 1.6, -10.6], [8.2, 1.6, -10.7], k); v.at = [-4, 2.5, -14.2]; v.fov = 56; v.sh = { f: [2, 1, -13], R: 16 }; break; }
+    case 'warn': { if (shot.cam === 'post') { v.p = into([1.75, 1.35, -15.25], [1.55, 1.36, -15.08], k); v.at = [0.0, 1.3, -14.25]; v.fov = 36; v.sh = { f: [0, 1, -14.3], R: 4 }; break; }   // the old man, his arms round a lamp post
+      v.p = into([9, 1.6, -10.6], [8.2, 1.6, -10.7], k); v.at = [-4, 2.5, -14.2]; v.fov = 56; v.sh = { f: [2, 1, -13], R: 16 }; break; }
     // ---- 3: 3:08 and after
     // home: your ceiling, full; then down to your table, right under it
     case 'home': { room(); v.p = into(RL(1.55, 1.62, 1.6), RL(1.45, 1.6, 1.5), k); const c1 = fuC('home', 1), w = Ease.inOutSine(fuSm(t, c1 - 0.2, c1 + 1.6));
@@ -415,8 +422,8 @@ function fuShotCam(set, m, s, t, k, shot, v, RL) {
       if (shot.cam === 'ceil') { room(); v.p = into(RL(FU_EYE[0], FU_EYE[1] - 0.02, FU_EYE[2]), RL(FU_EYE[0], FU_EYE[1] - 0.06, FU_EYE[2] - 0.03), k); v.at = RL(0.12, FU_CEIL, -0.12); v.fov = 72; v.drift = 0.003; break; }
       v.p = into([-2.6, 1.3, -21.0], [-2.8, 1.32, -20.8], k); v.at = [B[0] + 0.9, B[1] + 0.3, B[2]]; v.fov = 58; v.sh = { f: [B[0], 2, B[2]], R: 9 }; break; }
     // 3:10 in your kitchen: everything on the ceiling comes down at once (slow motion)
-    case 'drop': { room(); v.p = into(RL(1.12, 0.96, 0.66), RL(1.1, 0.955, 0.63), k); const u = s - FUP.T;
-      v.at = RL(0.0, 1.5, -0.32); v.fov = 74; v.drift = 0.0005; v.shake = u > 0.56 && u < 2.0 ? 0.009 * Math.exp(-(u - 0.56) / 0.35) : 0; break; }
+    case 'drop': { room(); v.p = into(RL(1.72, 1.5, 1.28), RL(1.66, 1.47, 1.22), k); const u = s - FUP.T;
+      const wd = Ease.inOutSine(fuSm(u, 0.04, 0.72)); v.at = fuV(RL(0.18, 2.1, -0.12), RL(0.1, 0.95, -0.05), wd); v.fov = 64 - 12 * Ease.inOutSine(fuSm(u, 0.3, 1.3)); v.drift = 0.0005; v.shake = u > 0.56 && u < 2.0 ? 0.009 * Math.exp(-(u - 0.56) / 0.35) : 0; break; }
     // back in the park: she drops to the path; the fountain's water pours back down
     case 'down': { v.p = into([-3.4, 1.55, -11.7], [-3.3, 1.55, -11.8], k); const w = Ease.inOutSine(fuSm(s, 609.5, 613.5));
       v.at = fuV([B[0], 2.2, B[2]], [0, 9, -52], w); v.fov = 56; v.sh = { f: fuV([B[0], 1, B[2]], [0, 2, -40], w), R: 16 }; break; }
@@ -430,8 +437,8 @@ function fuLabels(set, t) {
   const shot = fuShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s, X = set.X;
   const nz = [FU_ST.fountain.x, FU_ST.fountain.h + 0.16, FU_ST.fountain.z], top = () => fuHt(nz[1] + fuWaterH(0, s));
   if (m === 'appleUp' && X.apple.visible) out.push({ p: X.apple.position.toArray(), text: 'YOUR APPLE', sub: fuHt(X.apple.position.y) + ' UP', a: W(t, shot.t0 + 0.5, shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
-  if (m === 'window') out.push({ p: [nz[0], 28, nz[2]], text: 'THE FOUNTAIN', sub: 'ITS TOP: ' + top() + ' UP', a: W(t, shot.t0 + 1.0, shot.t1 - 0.3, 0.4, 0.3), side: 'r' });
+  if (m === 'window' && !shot.cam) out.push({ p: [nz[0], 28, nz[2]], text: 'THE FOUNTAIN', sub: 'ITS TOP: ' + top() + ' UP', a: W(t, shot.t0 + 1.0, shot.t1 - 0.3, 0.4, 0.3), side: 'r' });
   if (m === 'fish' && X.fish.visible && s > FU.sFish + 1.2) out.push({ p: X.fish.position.toArray(), text: 'THE CARP', sub: fuHt(X.fish.position.y) + ' UP', a: W(t, fuFilmAt(FU.sFish + 1.2), shot.t1 - 0.2, 0.3, 0.3), side: 'r' });
-  if (m === 'fountain') out.push({ p: [nz[0], 34, nz[2]], text: 'ITS TOP', sub: top() + ' UP', a: W(t, shot.t0 + 2.5, shot.t1 - 0.3, 0.4, 0.3), side: 'r' });
+  if (m === 'fountain') out.push({ p: [nz[0], shot.cam === 'up' ? 260 : 34, nz[2]], text: 'ITS TOP', sub: top() + ' UP', a: W(t, shot.t0 + 2.5, shot.t1 - 0.3, 0.4, 0.3), side: 'r' });
   return out;
 }

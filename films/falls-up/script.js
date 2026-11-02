@@ -76,7 +76,9 @@ const FU_CLOCK = (() => {
     [B('hold2'), 540.0 - (c('hold2', 0) - B('hold2')) + 0.3, 'real'],      // "3:09"
     [B('space'), FU.sSpace - (c('space', 0) - B('space')) - 0.15, 'real'], // "3:09:39": the apple crosses 100 km
     [B('count'), FU.sCount - (tCount - B('count')), 'real'],              // "Ten seconds."
-    [tCount + 9.75, 'cont', ['rate', 0.2]], [tCount + 9.75 + 4.6, 'cont', 'real'],   // ★ 3:10:00 in your kitchen: the ceiling comes down (slow motion ×0.2)
+    // ★ 3:10:00 in your kitchen: the ceiling comes down (slow motion ×0.2). The cut skips the last 0.17 s of 3:09:59 so
+    // everything lets go 0.4 s into the shot (a 2nd review: the release came too long after the cut)
+    [tCount + 9.75, FUP.T - 0.08, ['rate', 0.2]], [tCount + 9.75 + 4.6, 'cont', 'real'],
     [B('down'), 604.6, 'real'],                                        // back in the park: she hangs from the branch the normal way
   ];
   const out = [];

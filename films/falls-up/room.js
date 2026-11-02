@@ -78,8 +78,8 @@ const FU_CLUTTER = [
   ['plate', 'plate', 0.28, -0.12, 0, 455], ['crumbs', 'crumbs', 0.15, -0.2, 0, 460],
   ['book', 'book', -0.22, 0.14, 0.4, 170], ['mug2', 'mug', 0.7, -0.06, 1.1, 210], ['board', 'board', -0.04, -0.2, 0.25, 240], ['roll', 'roll', 0.9, 0.2, 1.4, 280],
   ['orange3', 'orange', 0.48, -0.34, 0, 152], ['orange4', 'orange', -0.1, -0.46, 0, 153], ['banana', 'banana', 0.32, 0.12, 0.8, 310], ['tin', 'tin', -0.38, -0.22, 0.6, 340],
-  ['remote', 'remote', 0.64, 0.27, -0.3, 370], ['paper', 'paper', 0.12, -0.36, 0.15, 400], ['slipper', 'slipper', 1.2, 0.5, 2.0, 420], ['lid', 'lid', -0.3, 0.26, 0, 440],
-  ['cushion', 'cushion', 1.15, -0.95, 0.3, 445], ['phone', 'phone', 0.02, 0.06, 0.9, 450], ['jar', 'jar', 0.82, -0.36, 0, 465], ['sock', 'sock', -0.6, 0.55, 1.7, 470],
+  ['remote', 'remote', 0.64, 0.27, -0.3, 370], ['paper', 'paper', 0.12, -0.36, 0.15, 400], ['slipper', 'slipper', 1.95, -1.25, 2.0, 420], ['lid', 'lid', -0.3, 0.26, 0, 440],
+  ['cushion', 'cushion', 1.8, 1.62, 0.3, 445], ['phone', 'phone', 0.02, 0.06, 0.9, 450], ['jar', 'jar', 0.82, -0.36, 0, 465], ['sock', 'sock', -0.6, 0.55, 1.7, 470],
 ];
 
 // where the cat comes down at 3:10 (room-local x, z: on the table, clear of the lamp); nothing else lands there

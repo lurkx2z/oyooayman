@@ -184,14 +184,15 @@ class FuHud {
   // the height ladder (log scale, 1 km … 150 km): the marks, your apple (and a lost phone)
   static ladder(u, t, s) {
     const w = 360, h = 640, top = 60, bot = 590, lg = (x) => Math.log10(Math.max(1000, x)), y = (x) => bot - (lg(x) - 3) / (lg(150000) - 3) * (bot - top);
-    const A = FU_FLY.apple, ha = A(s), shot = fuShotAt(t), ph = shot.mode === 'planes' ? FU_FLY.phone(s) : null;
+    const A = FU_FLY.apple, ha = A(s), shot = fuShotAt(t), ph = shot.mode === 'planes' ? FU_FLY.phone0(s) : null;
     let marks = '';
-    for (const [m, n] of FU_MARKS.slice(1)) marks += `<line x1="150" y1="${y(m).toFixed(1)}" x2="${w - 24}" y2="${y(m).toFixed(1)}" stroke="rgba(255,255,255,${n === 'SPACE' ? 0.75 : 0.35})" stroke-width="${n === 'SPACE' ? 3 : 2}" stroke-dasharray="${n === 'SPACE' ? '' : '6 6'}"/>
-      <text x="${w - 24}" y="${(y(m) - 8).toFixed(1)}" text-anchor="end" class="sm" style="font-size:21px">${n}</text><text x="140" y="${(y(m) + 7).toFixed(1)}" text-anchor="end" class="sm" style="font-size:21px;fill:#f6efe2">${fuHt(m)}</text>`;
-    const dot = (hh, col, lab) => (hh >= 1000 ? `<circle cx="150" cy="${y(hh).toFixed(1)}" r="12" fill="${col}"/><rect x="170" y="${(y(hh) - 18).toFixed(1)}" width="${w - 182}" height="34" rx="8" fill="rgba(6,9,14,0.92)"/><text x="180" y="${(y(hh) + 8).toFixed(1)}" class="b" style="font-size:24px;fill:${col}">${lab} ${fuHt(hh)}</text>` : '');
+    // (Everest sits too close to the airliners on this scale to read: the caption names it)
+    for (const [m, n] of FU_MARKS.slice(2)) marks += `<line x1="70" y1="${y(m).toFixed(1)}" x2="${w - 20}" y2="${y(m).toFixed(1)}" stroke="rgba(255,255,255,${n === 'SPACE' ? 0.75 : 0.35})" stroke-width="${n === 'SPACE' ? 3 : 2}" stroke-dasharray="${n === 'SPACE' ? '' : '6 6'}"/>
+      <text x="${w - 20}" y="${(y(m) - 9).toFixed(1)}" text-anchor="end" class="sm" style="font-size:24px">${n === 'WEATHER BALLOONS' ? 'BALLOONS' : n} <tspan style="fill:#f6efe2">${fuHt(m)}</tspan></text>`;
+    const dot = (hh, col, lab) => (hh >= 1000 ? `<circle cx="70" cy="${y(hh).toFixed(1)}" r="12" fill="${col}"/><rect x="90" y="${(y(hh) - 18).toFixed(1)}" width="${w - 102}" height="34" rx="8" fill="rgba(6,9,14,0.92)"/><text x="100" y="${(y(hh) + 9).toFixed(1)}" class="b" style="font-size:26px;fill:${col}">${lab} ${fuHt(hh)}</text>` : '');
     return FuHud.svg(`${FuHud.plate(0.62, w, h)}
-      <text x="24" y="40" class="sm" style="font-size:22px;fill:#f6efe2">HEIGHT ABOVE THE PARK</text>
-      <line x1="150" y1="${top}" x2="150" y2="${bot}" stroke="rgba(255,255,255,0.6)" stroke-width="3"/>
+      <text x="24" y="42" class="sm" style="font-size:25px;fill:#f6efe2">HEIGHT ABOVE THE PARK</text>
+      <line x1="70" y1="${top}" x2="70" y2="${bot}" stroke="rgba(255,255,255,0.6)" stroke-width="3"/>
       ${marks}${dot(ha, '#ffcf8a', 'APPLE')}${ph != null ? dot(ph, '#9fc4ff', 'PHONE') : ''}`, w, h);
   }
 }
