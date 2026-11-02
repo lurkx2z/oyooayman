@@ -32,6 +32,13 @@ second, a 60 bpm piano pulse into the countdown, near silence for the last 17 s 
 −25.6 LUFS), the zero boom and a D-major choir under the smile. Master −15.3 LUFS, ≤ −1.5 dBTP. In the gaps between
 lines the music sits about 20 dB over the rain (the house rule: music leads, ambience under it).
 
+## Delivered (2026-11-02, /mnt/project-files/eren-vs-light/)
+- `eren-light_1080p.mp4`: 5:49, 1920×1080 30 fps, two-pass H.264 565k + AAC 128k = **29.3 MiB**, −15.4 LUFS,
+  −2.2 dBTP, LRA 4.8 LU. Rendered from a CRF 18 master in the cloud (`render.cjs`, 4 workers, 28 min).
+- `eren-light.zip`: the runnable page (open `eren-light.html`, click the picture).
+- `thumb-notebook-40.jpg` (pick), `thumb-eighty.jpg`, `thumb-god.jpg`; `TITLE.txt` (pick: "What If Light Wrote
+  Eren's Name in the Death Note?").
+
 ## Checks
 - Every frame (10,473) drawn once without errors; start and end frames of all 94 shots checked on contact sheets.
 - The runnable ZIP was unzipped into a clean folder and played in Chromium: one click starts the picture and the
