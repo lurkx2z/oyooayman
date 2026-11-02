@@ -39,12 +39,12 @@
     },
     {
       "id": "04-y_window",
-      "text": "[whispers] Hello? ...Is anyone out there?",
-      "sent": "[whispers] Hello? ...Is anyone out there?",
+      "text": "[hesitant] Hello? ...Is anyone out there?",
+      "sent": "[hesitant] Hello? ...Is anyone out there?",
       "model": "eleven_v3",
       "file": "04-y_window.mp3",
-      "seconds": 2.53,
-      "hash": "e4b49d8db763f733",
+      "seconds": 2.38,
+      "hash": "fbd0a80e0b8ab875",
       "verified": true
     },
     {
