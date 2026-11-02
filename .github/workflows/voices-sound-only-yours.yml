@@ -1,0 +1,62 @@
+# Voice lines for "What if every sound vanished except yours?": films/sound-only-yours/VO-*.md (one file per voice)
+# → verified MP3s in films/sound-only-yours/voices/<role>/ (tools/voice-lines.cjs), committed back to this branch.
+# Uses the repository secret ELEVENLABS_API_KEY (never printed).
+name: Voices sound-only-yours
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Regenerate every line even if its text did not change"
+        type: boolean
+        default: false
+  push:
+    branches: ["claude/project-thread-gkratg"]
+    paths: ["films/sound-only-yours/VO-*.md", ".github/workflows/voices-sound-only-yours.yml", "tools/voice-lines.cjs"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: voices-sound-only-yours-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  voices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SLUG: sound-only-yours
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install ffmpeg (for the playback check)
+        run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg >/dev/null; }
+      - name: Generate and verify every line
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          FORCE: ${{ inputs.force && '--force' || '' }}
+        run: |
+          if [ -z "$ELEVENLABS_API_KEY" ]; then echo "::error::The secret ELEVENLABS_API_KEY is missing."; exit 1; fi
+          for f in films/$SLUG/VO-*.md; do
+            role=$(basename "$f" .md); role=${role#VO-}
+            node tools/voice-lines.cjs --script "$f" --out "films/$SLUG/voices/$role" --summary "$GITHUB_STEP_SUMMARY" $FORCE
+          done
+      - name: Commit the lines back to this branch
+        if: always()
+        run: |
+          git config user.name "narration-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "films/$SLUG/voices" 2>/dev/null || true
+          if git diff --cached --quiet; then echo "nothing new to commit"; exit 0; fi
+          git commit -m "voices: $SLUG lines (ElevenLabs, run ${GITHUB_RUN_ID})"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 3))
+          done
+          exit 1
