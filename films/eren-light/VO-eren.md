@@ -10,7 +10,7 @@ speed: 1.0
 
 [e_knew] I knew where you'd be sitting.
 
-[e_cage] I was born in a cage. Walls a hundred meters high. And the whole world outside wanted us dead for something our grandparents did.
+[e_cage] I was born in a cage. Walls fifty meters high. And the whole world outside wanted us dead for something our grandparents did.
 
 [e_eighty] Eighty percent.
 
