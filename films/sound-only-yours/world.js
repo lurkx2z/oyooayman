@@ -294,7 +294,7 @@ function soShotCam(set, m, s, t, k, shot, v, RL, you) {
     // ---- 1: your kitchen, 9:41
     // the title: the cat on the counter pats the glass over the edge; it falls (slow motion) and smashes, silently
     case 'title': { room(); const fall = soSm(s, SO.sKnock + 0.05, SO.sKnock + 0.5);
-      v.p = into(RL(-0.95, 1.42, 0.35), RL(-1.02, 1.36, 0.22), k); v.at = soV(RL(-2.02, 1.02, -0.52), RL(-1.72, 0.12, -0.6), Ease.inOutSine(fall)); v.fov = 44 - 4 * k; break; }
+      v.p = into(RL(-0.95, 1.42, 0.35), RL(-1.02, 1.36, 0.22), k); v.at = soV(RL(-2.02, 1.28, -0.52), RL(-1.72, 0.12, -0.6), Ease.inOutSine(fall)); v.fov = 44 - 4 * k; break; }
     // "What...?": the glass in pieces, the water spreading; up to the cat, who heard nothing either
     case 'what': { room(); const w = Ease.inOutSine(soSm(k, 0.45, 1)); v.p = into(RL(-0.85, 1.6, 0.4), RL(-0.9, 1.6, 0.32), k); v.at = soV(RL(-1.7, 0.05, -0.55), RL(-2.1, 1.0, -0.38), w); v.fov = 52; break; }
     // 9:41 PM: the clock; then the whole kitchen: the news on, the rain on the window
