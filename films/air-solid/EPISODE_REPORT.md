@@ -136,6 +136,10 @@ beds at all, and the blood-in-your-ears bed under the heartbeat sits about 11 dB
   `D:\renders\air-solid\air-solid_final_1080p.mp4` (1920×1080, 30 fps, H.264 CRF 18, the mastered soundtrack
   `final-soundtrack.m4a` copied in, 5:29) and `air-solid_final_small.mp4` (1280×720, under 30 MiB). Resumable: run it
   again and finished segments are kept.
+- **Made on 4 November 2026** on the owner's PC (RTX 3060 Ti, about 13 fps, 13 minutes for the frames, from commit
+  b1c87fb): `D:\renders\air-solid\air-solid_final_1080p.mp4`, 5:29 (329.23 s), 1920×1080, 30 fps, 9,877 frames,
+  AAC 256k, −15.6 LUFS, −2.4 dBTP, 719 MiB; `air-solid_final_small.mp4`, 1280×720, 26.2 MiB, −15.7 LUFS, −2.7 dBTP.
+  Full decodes reported no errors; no black stretch of 0.5 s or longer.
 
 ## Files
 
