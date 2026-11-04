@@ -130,8 +130,13 @@ can't breathe" shows you frozen at the table; steam in curls; the swing filmed s
 the runner faces his way, legs apart, 10 cm up, filmed in profile; the cat and the girl filmed from below with the
 gap under them; the caption width and the ladder kept apart; labels moved off heads; the cube's labels one after the
 other; the pigeon from the front; the carp's locked surface (frozen ripples); a police car with flashing lights for
-the sirens; the flag and the smoke reframed.
+the sirens; the flag and the smoke reframed. Last pass: the ladder moved below the clock (it overlapped "110× SLOWER"), the
+motorway row now comes in with its caption, and the airliner row says "NO FALL LANDS THAT HARD" instead of 3.2 km.
 
 **Still weak (honest):** the motorway shot is the main road on a long lens, not a motorway; the cars on the street
 look parked rather than stopped mid-motion (nothing in frame says "moving a moment ago" except the labels); the
 people are the house's simple figures; the second half of the aftermath leans on the same street and park.
+
+**Status (4 November 2026):** sound measured stem by stem (music 10.4 to 23.9 dB over the beds in 10 s windows, median
+13.5) and baked: −15.6 LUFS, −2.5 dBTP, LRA 6.0 LU; `final-soundtrack.m4a` −15.6 LUFS / −2.4 dBTP. Runnable ZIP
+tested (SOUND READY at once). Final 1080p render on the owner's PC: `render-gpu.cjs` (see `EPISODE_REPORT.md`).

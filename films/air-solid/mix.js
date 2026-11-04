@@ -1,14 +1,16 @@
 /* =====================================================================
    MIX — stem levels and the dynamics map for air-solid.html (read by audio.js).
      gain  stem level (dB) · hp  high-pass (Hz) · dyn  [beat, offset s, dB] keys (beat: a SA key or a film second)
-   Measured solo (pre-trim): music −22.6, amb −17.3, sfx −25.2 LUFS → with the trims music −15.6, amb −28.3, sfx −21.2.
+   Measured stem by stem (solo, pre-trim, 2026-11-04): music −23.1, amb −20.9, sfx −29.2 LUFS integrated.
+   With the trims: music −16.1; amb −28.9 (12 dB under the score); sfx −25.2 (the blood bed in the lock sits 11 dB under
+   the score; the busy aftermath, 4:00–5:29, 6 dB under).
    Targets (docs + owner): −16 to −14 LUFS integrated, true peak ≤ −1 dBTP, a real loudness range (not flat).
    ===================================================================== */
 const SA_MIXSH = (m) => saShot(m);
 window.SA_MIX = {
   stems: {
-    music: { gain: 7, hp: 32 },    // the score leads: about 13 dB over the beds (the owner's rule after Days shorter)
-    amb: { gain: -11, hp: 28 },    // the room, street and park beds, well under the score
+    music: { gain: 7, hp: 32 },    // the score leads: about 12 dB over the beds (the owner's rule of 31 October 2026)
+    amb: { gain: -8, hp: 28 },     // the room, street and park beds, well under the score
     sfx: { gain: 4, hp: 25 },
   },
   dyn: {

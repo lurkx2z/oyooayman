@@ -39,7 +39,7 @@ const SA_LADDER = (() => {
     on('cyclist', 0, ['walk', 'cat', 'bike', 'pigeon'], 'bike'),
     on('car', 0, ['walk', 'cat', 'bike', 'car', 'pigeon'], 'car'),
     on('runner', 0, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon'], 'run'),
-    on('road', 0, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon', 'road'], 'road'),
+    [saC('road', 0) - 0.3, saC('road', 2) - 0.3, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon', 'road'], 'road'],   // (ends where the motorway row comes in)
     [saC('road', 2) - 0.3, saE('road') + 0.25, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon', 'road', 'motorway'], 'motorway'],
     on('planes', 1, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon', 'road', 'motorway', 'plane'], 'plane'),
   ];
@@ -178,11 +178,11 @@ class SaHud {
       const y = top + i * rh, isHot = r.k === hot, grow = isHot ? MathX.smooth(u, 0.2, 1.1) : 1, bl = Math.max(6, bw * lg(Math.max(0.05, r.h)) * grow);
       body += `<text x="${x0}" y="${y + 24}" class="sm" style="font-size:23px;fill:${isHot ? '#ffffff' : '#c8c2b6'}">${r.l} <tspan style="fill:${isHot ? '#ffcf8a' : '#c8c2b6'}">${r.kmh === 10.8 ? '3 m/s' : r.kmh.toLocaleString('en-US') + ' km/h'}</tspan></text>
         <rect x="${bx}" y="${y + 33}" width="${bl.toFixed(1)}" height="14" rx="5" fill="${isHot ? '#ffcf8a' : 'rgba(246,239,226,0.55)'}"/>
-        <text x="${(bx + bl + 8 > w - 90 ? w - 24 : bx + bl + 8).toFixed(1)}" y="${y + 46}" text-anchor="${bx + bl + 8 > w - 90 ? 'end' : 'start'}" class="sm" style="font-size:21px;fill:${isHot ? '#ffffff' : '#c8c2b6'};${bx + bl + 8 > w - 90 ? 'paint-order:stroke;stroke:rgba(6,9,14,0.9);stroke-width:5px' : ''}">${saHt(r.h)}</text>`;
+        <text x="${(bx + bl + 8 > w - 90 ? w - 24 : bx + bl + 8).toFixed(1)}" y="${y + 46}" text-anchor="${bx + bl + 8 > w - 90 ? 'end' : 'start'}" class="sm" style="font-size:21px;fill:${isHot ? '#ffffff' : '#c8c2b6'};${bx + bl + 8 > w - 90 ? 'paint-order:stroke;stroke:rgba(6,9,14,0.9);stroke-width:5px' : ''}">${r.k === 'plane' ? 'NO FALL LANDS THAT HARD' : saHt(r.h)}</text>`;   // (the formula says 3.2 km; a real fall tops out near 55 m/s)
     });
     // your kitchen's window, 12 m up (dashed)
     const wx = bx + bw * lg(12);
-    body += `<line x1="${wx.toFixed(1)}" y1="${top - 6}" x2="${wx.toFixed(1)}" y2="${top + rows.length * rh}" stroke="rgba(159,196,255,0.7)" stroke-width="2" stroke-dasharray="5 6"/><text x="${(wx + 6).toFixed(1)}" y="${h - 16}" class="sm" style="font-size:19px;fill:#9fc4ff">YOUR WINDOW 12 m</text>`;
+    body += `<line x1="${wx.toFixed(1)}" y1="${top - 6}" x2="${wx.toFixed(1)}" y2="${top + rows.length * rh}" stroke="rgba(159,196,255,0.7)" stroke-width="2" stroke-dasharray="5 6"/><text x="${wx.toFixed(1)}" y="${h - 14}" text-anchor="middle" class="sm" style="font-size:19px;fill:#9fc4ff">YOUR WINDOW 12 m</text>`;
     return SaHud.svg(body, w, h);
   }
   // a cubic metre of air: what real frozen air is (shrunk 800×), and this air (set where it stood)

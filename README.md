@@ -106,6 +106,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > space; in the park the leaves, the fountain and a carp go up, and a runner's first stride takes her into a plane tree
 > she has to hold on to for five and a half minutes. At 3:10 your whole ceiling comes down on your table. The story clock
 > only runs forward. Physics, clock, shots and review log: [`films/falls-up/PLAN.md`](films/falls-up/PLAN.md).
+>
+> ***What if air became solid for 3 seconds?*** — open `air-solid.html` (16:9, voiceless, 5:29). At 2:00 PM on a
+> Sunday all the air on Earth sets solid where it stands, as light and warm as before. You are pouring a glass of water
+> and your cat is in mid-jump: the stream and the cat hang there, you can't breathe or blink, and the only sound is your
+> heartbeat. Three seconds is nothing, unless you were moving: from your window the film climbs the speeds (a pigeon,
+> walkers, a cyclist, a car, a runner in mid-stride, the main road, motorways) and the belly-flop height each one means,
+> then every wind on Earth stops and the day gets 2 ms shorter. At 2:00:03 everything starts again from a standstill;
+> after it, stalled engines, sirens, no wind, and the planes. The story clock only runs forward (the three seconds take
+> 3 min 45 s). Physics, clock, shots and review log: [`films/air-solid/PLAN.md`](films/air-solid/PLAN.md).
 
 | Time | Beat |
 |---|---|
