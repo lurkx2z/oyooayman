@@ -187,15 +187,15 @@ class SaHud {
   }
   // a cubic metre of air: what real frozen air is (shrunk 800×), and this air (set where it stood)
   static cube(u, t) {
-    const k2 = MathX.smooth(t, saC('real', 1) - 0.4, saC('real', 1) + 0.6), k1 = MathX.smooth(u, 0.3, 1.0);
+    const k2 = MathX.smooth(t, saC('real', 1) - 0.05, saC('real', 1) + 0.5), k1 = MathX.smooth(u, 0.3, 1.0) * (1 - MathX.smooth(t, saC('real', 1) - 0.5, saC('real', 1) - 0.1));
     const cube = (x, y, s, fill, stroke) => { const d = s * 0.35; return `<path d="M${x} ${y} h${s} v${s} h${-s} z" fill="${fill}" stroke="${stroke}" stroke-width="3"/><path d="M${x} ${y} l${d} ${-d} h${s} l${-d} ${d} z M${x + s} ${y} l${d} ${-d} v${s} l${-d} ${d} z" fill="${fill}" stroke="${stroke}" stroke-width="3" opacity="0.85"/>`; };
     return SaHud.svg(`${SaHud.plate()}
       <text x="30" y="56" class="t">1 m³ OF AIR · 1.2 kg</text>
       ${cube(60, 140, 250, 'rgba(159,196,255,0.08)', 'rgba(159,196,255,0.8)')}
       <text x="60" y="430" class="sm">AS AIR</text>
-      <g opacity="${(k1 * (1 - k2)).toFixed(3)}">
+      <g opacity="${k1.toFixed(3)}">
         ${cube(500, 340, 31, 'rgba(255,207,138,0.85)', '#ffcf8a')}
-        <text x="440" y="200" class="s">FROZEN, −210 °C</text><text x="440" y="240" class="sm">11 cm ACROSS: 800× SMALLER</text>
+        <text x="430" y="170" class="s">FROZEN SOLID</text><text x="430" y="208" class="sm">BELOW −210 °C</text><text x="430" y="244" class="sm">800× SMALLER</text>
         <line x1="400" y1="300" x2="490" y2="350" stroke="#ffcf8a" stroke-width="3" marker-end="url(#saAh)"/>
       </g>
       <g opacity="${k2.toFixed(3)}">

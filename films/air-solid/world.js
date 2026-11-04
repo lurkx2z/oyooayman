@@ -57,7 +57,7 @@ function saCatState(s) {
 
 // your hands (first person: only in your own eyes' shots)
 function saHandScript() { return { right: [[-9, 'jug']], left: [[-9, 'rest']] }; }
-const SA_HAND_MODES = new Set(['you', 'countB', 'release']);
+const SA_HAND_MODES = new Set(['start', 'countB', 'release']);
 // the eye shots: you see through your own eyes (your body hidden)
 const SA_EYE_MODES = SA_HAND_MODES;
 
@@ -186,7 +186,8 @@ SA_SETS.world = (app) => {
       const M = SA_MUG, e = s < 0 ? s : s < SAP.T ? 0 : s - SAP.T, top = M[1] + 0.09, K = m === 'steam' ? 2.2 : 1;
       for (let rb = 0; rb < 3; rb++) for (let i = 0; i < 110; i++) {
         const age = i * 0.016, s0 = e - age, h = 0.12 * age + 0.03 * age * age;
-        const sw = 0.008 + 0.03 * age, x = M[0] + 0.018 * Math.cos(rb * 2.1) + sw * Math.sin(s0 * (1.9 + 0.3 * rb) + rb * 2.1 + age * 3.4), z = M[2] + 0.018 * Math.sin(rb * 2.1) + sw * Math.cos(s0 * (1.3 + 0.2 * rb) + rb + age * 2.9);
+        const sw = 0.006 + 0.022 * age, ph = age * (7.5 + 1.3 * rb) + rb * 2.1 + e * (1.9 + 0.3 * rb), x = M[0] + 0.018 * Math.cos(rb * 2.1) + sw * Math.sin(ph) + 0.03 * age * Math.sin(rb * 1.3 + 0.5), z = M[2] + 0.018 * Math.sin(rb * 2.1) + sw * Math.cos(ph * 0.83 + rb);
+        void s0;
         const a = K * 0.07 * Math.min(1, age * 8) * Math.exp(-age / 0.8);
         out.push([x, top + h, z, 0.006 + 0.012 * age, a, 0.97, 0.97, 0.99]); }
     },
@@ -251,17 +252,17 @@ function saShotCam(set, m, s, t, k, shot, v, RL) {
     // the title: low over the table from your left: the stream, the cat jumping (slow motion), the lock
     case 'title': { room(); v.p = into(RL(1.3, 1.5, -1.62), RL(1.08, 1.42, -1.38), MathX.clamp((t + 1) / 5, 0, 1)); v.at = RL(-0.22, 0.86, 0.02); v.fov = 54; break; }
     // the stream from the jug held in the air: round it, close
-    case 'start': { room(); const c = RL(G[0], 0.86, G[2]); v.p = orbit(c, 0.66, 0.0, 2.75, 2.45, k); v.at = saV(RL(G[0] + 0.03, 1.0, G[2]), RL(G[0] - 0.02, 1.02, G[2] + 0.05), E(saSm(k, 0.5, 1))); v.fov = 48; v.drift = 0.0006; break; }
+    case 'start': { room(); v.p = RL(...Y); v.at = RL(G[0] + 0.08, 1.0, G[2] - 0.08); v.fov = 62; v.drift = 0; break; }
     // the whole kitchen, still (from by the door): you, the jug, the cat in the air, the window
     case 'stop': { room(); v.p = into(RL(1.95, 1.62, 1.75), RL(1.75, 1.58, 1.55), k); v.at = RL(-0.15, 0.95, -0.35); v.fov = 58; break; }
     case 'stopW': { room(); v.p = into(RL(0.5, 0.9, G[2] + 0.2), RL(0.44, 0.9, G[2] + 0.18), k); v.at = RL(0.11, 0.9, G[2]); v.fov = 46; v.near = 0.01; v.drift = 0.0003; break; }
-    case 'stopC': { room(); v.p = into(RL(cat.p[0] + 0.48, cat.p[1] + 0.3, cat.p[2] - 1.02), RL(cat.p[0] + 0.4, cat.p[1] + 0.26, cat.p[2] - 0.86), k); v.at = cc; v.fov = 50; v.near = 0.01; v.drift = 0.0004; break; }
+    case 'stopC': { room(); v.p = into(RL(cat.p[0] + 0.56, 0.16, cat.p[2] - 1.0), RL(cat.p[0] + 0.46, 0.17, cat.p[2] - 0.84), k); v.at = cc; v.fov = 50; v.near = 0.01; v.drift = 0.0004; break; }
     // through your own eyes: not a flicker (no drift at all)
-    case 'you': { room(); v.p = RL(...Y); v.at = RL(G[0] + 0.08, 1.0, G[2] - 0.08); v.fov = 62; v.drift = 0; break; }
+    case 'you': { room(); const c = RL(G[0], 0.86, G[2]); v.p = orbit(c, 0.66, 0.0, 2.75, 2.45, k); v.at = saV(RL(G[0] + 0.03, 1.0, G[2]), RL(G[0] - 0.02, 1.02, G[2] + 0.05), E(saSm(k, 0.5, 1))); v.fov = 48; v.drift = 0.0006; break; }
     // the window: the sunny city through the glass
     case 'real': { room(); v.p = into(RL(0.2, 1.5, -0.6), RL(0.22, 1.52, -1.1), k); v.at = RL(0.25, 1.35, -3.5); v.fov = 54; v.drift = 0.0008; break; }
     case 'silence': { room(); const r = SA_RADIO; v.p = into(RL(r[0] - 0.42, r[1] + 0.16, r[2] + 0.55), RL(r[0] - 0.3, r[1] + 0.12, r[2] + 0.42), k); v.at = RL(r[0], r[1] + 0.06, r[2]); v.fov = 34; v.near = 0.01; break; }
-    case 'steam': { room(); const M = SA_MUG; v.p = into(RL(M[0] + 0.04, M[1] + 0.15, M[2] - 0.44), RL(M[0] + 0.03, M[1] + 0.16, M[2] - 0.35), k); v.at = RL(M[0], M[1] + 0.17, M[2]); v.fov = 38; v.near = 0.01; v.drift = 0.0004; break; }
+    case 'steam': { room(); const M = SA_MUG; v.p = into(RL(M[0] - 0.42, M[1] + 0.1, M[2] + 0.04), RL(M[0] - 0.34, M[1] + 0.11, M[2] + 0.03), k); v.at = RL(M[0], M[1] + 0.16, M[2]); v.fov = 40; v.near = 0.01; v.drift = 0.0004; break; }
     case 'dust': { room(); v.p = into(RL(1.0, 1.55, -1.7), RL(0.86, 1.5, -1.52), k); v.at = RL(-0.4, 1.05, 0.5); v.fov = 50; v.drift = 0.0005; break; }
     case 'clock': { room(); const ck = SA_ROOM.clock; v.p = into(RL(ck.x - 0.55, ck.y - 0.05, ck.z - 0.15), RL(ck.x - 0.42, ck.y - 0.03, ck.z - 0.1), k); v.at = RL(ck.x, ck.y, ck.z); v.fov = 32; v.near = 0.01; break; }
     case 'catfine': { room(); const c = RL(cat.p[0], cat.p[1] + 0.15, cat.p[2]); v.p = orbit(c, 0.95, 0.25, -2.0, -1.4, k); v.at = saAdd(c, [0.12, -0.05, 0]); v.fov = 44; break; }
@@ -270,7 +271,7 @@ function saShotCam(set, m, s, t, k, shot, v, RL) {
     case 'window': case 'countA': case 'question': { room(); v.p = into(RL(0.82, 1.6, -1.42), RL(0.84, 1.6, -1.6), k); v.at = m === 'question' ? [9, 2.5, -40] : [3, 0.5, -20]; v.fov = m === 'question' ? 50 : 62; v.sh = { f: [4, 0, -14], R: 30 }; v.drift = 0.0012; break; }
     // every car in the city where the air stopped it: the main road from a roof
     case 'stallB': { v.p = into([64, 20, 4], [65, 19.4, 0], k); v.at = [80, 0.5, -36]; v.fov = 50; v.sh = { f: [80, 0, -30], R: 40 }; break; }
-    case 'pigeon': { const P = SA_WINPIG; v.p = into([P[0] - 0.9, P[1] - 0.1, P[2] - 1.35], [P[0] - 0.7, P[1] - 0.05, P[2] - 1.0], k); v.at = [P[0] + 0.1, P[1] + 0.02, P[2]]; v.fov = 38; v.near = 0.02; v.sh = { f: P, R: 3 }; v.fogK = 0.3; break; }
+    case 'pigeon': { const P = SA_WINPIG; v.p = into([P[0] - 1.5, P[1] + 0.45, P[2] - 1.0], [P[0] - 1.25, P[1] + 0.4, P[2] - 0.85], k); v.at = [P[0] + 0.05, P[1] + 0.05, P[2]]; v.fov = 38; v.near = 0.02; v.sh = { f: P, R: 3 }; v.fogK = 0.3; break; }
     case 'walkers': { const W = SA_CP.w1; v.p = into([W.x - 3.6, 0.95, W.z - 2.3], [W.x - 3.1, 1.0, W.z - 1.95], k); v.at = [W.x + 0.4, 0.95, W.z + 0.1]; v.fov = 48; v.sh = { f: [W.x, 0.5, W.z], R: 6 }; break; }
     case 'cyclist': { const B = SA_BIKE, c = [B.x, 1.0, B.z]; v.p = orbit(c, 3.2, 0.35, 1.25, 0.55, k); v.at = [B.x + 0.1, 0.95, B.z]; v.fov = 46; v.sh = { f: c, R: 6 }; break; }
     case 'car': { const Cr = X.car.g.position, c = [Cr.x, 1.0, Cr.z], w = E(saSm(t, saC('car', 1) - 0.8, saC('car', 1) + 3.0));
@@ -278,8 +279,8 @@ function saShotCam(set, m, s, t, k, shot, v, RL) {
     case 'leaves': { const P = SA_ST.plane; v.p = into([P.x + 4.6, 2.3, P.z + 3.6], [P.x + 3.7, 2.5, P.z + 2.7], k); v.at = [P.x + 1.5, 2.6, P.z - 5.0]; v.fov = 56; v.sh = { f: [P.x, 3, P.z], R: 12 }; break; }
     case 'fountain': { const F = SA_ST.fountain, c = [F.x, F.h + 1.4, F.z]; v.p = orbit(c, 2.7, 0.15, -0.35, 0.25, k); v.at = [F.x, F.h + 1.2, F.z]; v.fov = 42; v.sh = { f: c, R: 6 }; break; }
     case 'carp': { const P = X.fish.position, c = [P.x, -0.1, P.z]; v.p = into([c[0] + 1.0, 0.62, c[2] + 1.15], [c[0] + 0.8, 0.5, c[2] + 0.9], k); v.at = c; v.fov = 44; v.sh = { f: c, R: 5 }; break; }
-    case 'jumper': { const P = SA_CP.girl, c = [P.x, P.y + 0.5, P.z]; v.p = orbit(c, 3.3, -0.25, 1.9, 2.6, k); v.at = c; v.fov = 44; v.sh = { f: c, R: 6 }; break; }
-    case 'swing': { const Sw = SA_ST.swings, c = [Sw.x - 1.6 + SA_SWING.i * 1.6, 1.2, Sw.z]; v.p = into([c[0] + 2.4, 1.3, c[2] - 5.8], [c[0] + 2.0, 1.35, c[2] - 5.2], k); v.at = [c[0], 1.55, c[2] - 1.2]; v.fov = 44; v.sh = { f: c, R: 6 }; break; }
+    case 'jumper': { const P = SA_CP.girl, c = [P.x, P.y + 0.5, P.z]; v.p = orbit(c, 3.4, -1.15, 1.9, 2.5, k); v.at = c; v.fov = 44; v.sh = { f: c, R: 6 }; break; }
+    case 'swing': { const Sw = SA_ST.swings, c = [Sw.x - 1.6 + SA_SWING.i * 1.6, 1.2, Sw.z]; v.p = into([c[0] + 6.2, 1.5, c[2] - 3.2], [c[0] + 5.6, 1.5, c[2] - 3.0], k); v.at = [c[0], 1.7, c[2] - 0.6]; v.fov = 42; v.sh = { f: c, R: 6 }; break; }
     case 'ball': { const B = SA_BALL.p; v.p = into([B[0] - 2.4, 3.0, B[2] + 1.8], [B[0] - 2.0, 3.1, B[2] + 1.45], k); v.at = [B[0] + 1.6, 2.9, B[2] - 1.0]; v.fov = 48; v.sh = { f: [B[0] + 2, 1, B[2] - 1], R: 10 }; break; }
     case 'dog': { const D = SA_CP.dog, c = [D.x - 0.2, D.y + 0.45, D.z]; v.p = into([c[0] - 0.6, 0.8, c[2] - 2.4], [c[0] - 0.5, 0.85, c[2] - 1.9], k); v.at = c; v.fov = 44; v.sh = { f: c, R: 5 }; break; }
     case 'flock': { v.p = into([-6.5, 0.6, -14.2], [-6.0, 0.75, -14.4], k); v.at = [-2.0, 1.1, -16.6]; v.fov = 56; v.sh = { f: [-3, 1, -16], R: 7 }; break; }
@@ -292,8 +293,8 @@ function saShotCam(set, m, s, t, k, shot, v, RL) {
     case 'countB': { room(); v.p = RL(...Y); v.at = RL(G[0] - 0.12, 0.84, G[2] - 0.3); v.fov = 66; v.drift = 0; break; }
     case 'release': { room(); const r = s - SAP.T; v.p = saAdd(RL(...Y), [0, r > 0 ? 0.012 * saSm(r, 0.02, 0.14) - 0.02 * saSm(r, 0.14, 0.33) : 0, 0]); v.at = RL(G[0] - 0.22, 0.75 - 0.05 * saSm(r, 0.1, 0.33), G[2] - 0.38); v.fov = 70; v.drift = r > 0 ? 0.0012 : 0; break; }
     // ---- the park, from rest (slow motion)
-    case 'fallA': { v.p = into([24.5, 1.5, -21.0], [25.0, 1.55, -21.6], k); v.at = [30.5, 1.4, -33.0]; v.fov = 58; v.sh = { f: [30, 1, -32], R: 14 }; break; }
-    case 'fallRun': { const P = SA_RUNP; v.p = into([P.x + 1.8, 0.7, P.z - 3.6], [P.x + 1.6, 0.65, P.z - 3.3], k); v.at = [P.x + 0.8, 0.55, P.z]; v.fov = 50; v.sh = { f: [P.x, 1, P.z], R: 5 }; break; }
+    case 'fallA': { const P = SA_CP.girl; v.p = into([P.x - 3.4, 0.5, P.z + 2.6], [P.x - 3.0, 0.55, P.z + 2.3], k); v.at = [P.x, 0.75, P.z]; v.fov = 50; v.sh = { f: [P.x, 1, P.z], R: 8 }; break; }
+    case 'fallRun': { const P = SA_RUNP; v.p = into([P.x + 1.4, 0.55, P.z - 2.7], [P.x + 1.25, 0.55, P.z - 2.5], k); v.at = [P.x + 0.6, 0.5, P.z]; v.fov = 50; v.sh = { f: [P.x, 1, P.z], R: 5 }; break; }
     case 'fallBike': { const B = SA_BIKE; v.p = into([B.x + 2.2, 1.05, B.z + 3.3], [B.x + 2.0, 1.0, B.z + 3.0], k); v.at = [B.x, 0.6, B.z]; v.fov = 48; v.sh = { f: [B.x, 1, B.z], R: 6 }; break; }
     case 'fallSwing': { const Sw = SA_ST.swings, c = [Sw.x, 1.2, Sw.z]; v.p = into([c[0] + 5.2, 1.3, c[2] - 3.5], [c[0] + 4.9, 1.3, c[2] - 3.2], k); v.at = [c[0], 1.3, c[2] - 0.4]; v.fov = 50; v.sh = { f: c, R: 7 }; break; }
     // ---- after: the bell tower, 20 s, 40 s, a minute, two minutes later
@@ -301,7 +302,7 @@ function saShotCam(set, m, s, t, k, shot, v, RL) {
     case 'fineA': { v.p = into([0.8, 1.4, -4.2], [1.3, 1.42, -3.8], k); v.at = [4.6, 1.0, -1.1]; v.fov = 50; v.sh = { f: [4, 1, -2], R: 8 }; break; }
     case 'fineB': { const B = SA_BIKE; v.p = into([B.x - 3.4, 1.3, B.z + 2.3], [B.x - 3.0, 1.32, B.z + 2.0], k); v.at = [B.x + 0.4, 0.5, B.z + 0.4]; v.fov = 46; v.sh = { f: [B.x, 1, B.z], R: 6 }; break; }
     case 'stallA': { const Cr = X.car.g.position, c = [Cr.x, 1.0, Cr.z]; v.p = into([c[0] - 4.4, 1.25, c[2] + 0.2], [c[0] - 3.6, 1.25, c[2] + 0.35], k); v.at = [c[0] + 0.3, 1.05, c[2] + 0.35]; v.fov = 44; v.sh = { f: c, R: 7 }; break; }
-    case 'sirens': { v.p = into([74.6, 1.55, -50], [74.3, 1.55, -48], k); v.at = [80.5, 1.3, -10]; v.fov = 44; v.sh = { f: [80, 1, -30], R: 26 }; break; }
+    case 'sirens': { v.p = into([83.4, 1.6, -40.5], [83.2, 1.6, -39.2], k); v.at = [80.4, 1.1, -28.5]; v.fov = 42; v.sh = { f: [80, 1, -30], R: 16 }; break; }
     case 'stillA': { v.p = into([8, 1.6, -64], [8, 1.7, -66], k); v.at = [5, 14, -108]; v.fov = 46; v.sh = { f: [0, 3, -90], R: 30 }; break; }
     case 'stillB': { const F = SA_FLAG; v.p = into([F.x - 1.9, 4.4, F.z + 3.9], [F.x - 1.6, 4.6, F.z + 3.3], k); v.at = [F.x, 5.9, F.z]; v.fov = 40; v.sh = { f: [F.x, 5, F.z], R: 8 }; break; }
     case 'planes': { v.p = into([2, 1.6, -30], [2, 1.6, -30.5], k); v.at = [-800, 3600 + 900 * E(k), -9000]; v.fov = 58; v.sh = { f: [0, 0, -40], R: 30 }; v.drift = 0.002; break; }
@@ -314,12 +315,12 @@ function saLabels(set, t) {
   const shot = saShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s, X = set.X, sp = SA_SPD, RL = (x, y, z) => set.R.toWorld(x, y, z).toArray();
   const lab = (p, text, sub, a0 = 0.8, side) => out.push({ p, text, sub, a: W(t, shot.t0 + a0, shot.t1 - 0.25, 0.35, 0.3), side });
   const cat = set._cat;
-  if (m === 'catfine') lab(RL(cat.p[0], cat.p[1] + 0.32, cat.p[2]), 'YOUR CAT', `3 m/s · ${saHt(sp.cat.h)}`, 0.9);
-  if (m === 'pigeon') lab(saAdd(SA_WINPIG, [0, 0.25, 0]), 'PIGEON', `36 km/h · ${saHt(sp.pigeon.h)}`, 1.0);
+  if (m === 'catfine') lab(RL(cat.p[0], cat.p[1] + 0.48, cat.p[2]), 'YOUR CAT', `3 m/s · ${saHt(sp.cat.h)}`, 0.9);
+  if (m === 'pigeon') lab(saAdd(SA_WINPIG, [0, 0.45, 0]), 'PIGEON', `36 km/h · ${saHt(sp.pigeon.h)}`, 1.0);
   if (m === 'walkers') lab(saAdd([SA_CP.w1.x, 0, SA_CP.w1.z], [0, 1.85, 0]), 'WALKING', `5 km/h · ${saHt(sp.walk.h)}`, 1.0);
   if (m === 'cyclist') lab([SA_BIKE.x, 1.95, SA_BIKE.z], 'CYCLING', `20 km/h · ${saHt(sp.bike.h)}`, 1.0);
   if (m === 'car') { const c = X.car.g.position; lab([c.x, 1.75, c.z], 'THE CAR', `30 km/h · ${saHt(sp.car.h)}`, 1.0); }
-  if (m === 'runner') lab([SA_RUNP.x, 2.0, SA_RUNP.z], 'RUNNING', `11 km/h · ${saHt(sp.run.h)}`, 1.0);
+  if (m === 'runner') lab([SA_RUNP.x, 2.4, SA_RUNP.z], 'RUNNING', `11 km/h · ${saHt(sp.run.h)}`, 1.0);
   if (m === 'dog') lab(saAdd(SA_FRIS.p, [0, 0.22, 0]), '30 cm', '', 1.0, 'r');
   if (m === 'road') { const a = X.traffic.find((c) => c.z === -22), b = X.traffic.find((c) => c.z === -14); if (a) lab([a.g.position.x, 2.2, a.g.position.z], '50 km/h', saHt(sp.road.h), 1.2); void b; }
   if (m === 'clock') { const ck = SA_ROOM.clock; lab(RL(ck.x - 0.02, ck.y + 0.2, ck.z), 'STUCK AT 2:00:00', '', 1.2); }

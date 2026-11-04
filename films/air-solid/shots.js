@@ -11,7 +11,7 @@ const SA_SHOTS = [];
 {
   const P = SA_SHOTS, c = saC, B = saB, at = saFilmAt;
   const L = [
-    // 1 — your kitchen, 2:00:00: the pour, the cat, the lock; held
+    // 1 — your kitchen, 2:00:00: the pour, the cat, the lock; held (the first shot after the title through your own eyes)
     ['A0', 'title', -1, B('start')],
     ['A1', 'start', B('start'), B('stop')],
     ['A2', 'stop', B('stop'), c('stop', 1) - 0.5],
@@ -29,20 +29,18 @@ const SA_SHOTS = [];
     ['B1', 'pigeon', B('pigeon'), B('walkers')],
     ['B2', 'walkers', B('walkers'), B('cyclist')],
     ['B3', 'cyclist', B('cyclist'), B('car')],
-    ['B4', 'car', B('car'), B('leaves')],
-    ['B5', 'leaves', B('leaves'), B('fountain')],
+    ['B4', 'car', B('car'), B('fountain')],
     ['B6', 'fountain', B('fountain'), c('fountain', 1) - 0.5],
     ['B6b', 'carp', c('fountain', 1) - 0.5, B('jumper')],
     ['B7', 'jumper', B('jumper'), B('swing')],
-    ['B8', 'swing', B('swing'), B('ball')],
-    ['B9', 'ball', B('ball'), B('dog')],
-    ['B10', 'dog', B('dog'), B('flock')],
-    ['B11', 'flock', B('flock'), B('runner')],
-    ['B12', 'runner', B('runner'), B('wind')],
-    ['B13', 'wind', B('wind'), c('wind', 1) - 0.5],
-    ['B13b', 'windUp', c('wind', 1) - 0.5, B('road')],
+    ['B8', 'swing', B('swing'), B('dog')],
+    ['B10', 'dog', B('dog'), B('runner')],
+    ['B12', 'runner', B('runner'), B('road')],
     ['B14', 'road', B('road'), c('road', 2) - 0.5],
-    ['B14b', 'motorway', c('road', 2) - 0.5, B('count')],
+    ['B14b', 'motorway', c('road', 2) - 0.5, B('wind')],
+    // (the wind: the whole planet, the last step up before the last second)
+    ['B13', 'wind', B('wind'), c('wind', 1) - 0.5],
+    ['B13b', 'windUp', c('wind', 1) - 0.5, B('count')],
     // 3 — the last second; 2:00:03; from rest; after
     ['C0', 'countA', B('count'), B('count') + 4.6],
     ['C0b', 'countB', B('count') + 4.6, SA.tRel],

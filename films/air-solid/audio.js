@@ -1,14 +1,14 @@
 /* =====================================================================
-   AUDIO — "What if air became solid for 3 seconds?" js/audio/audioEngine.js is unchanged (this is a
-   subclass); the SAP and generators come from audiokit.js (via the Friction 10s film). No narrator: the captions are
-   silent and the sound carries the gaps. Three stems:
-     music  an original score: a theme that climbs every time something falls up; the pulse that speeds up with the
-            apple; a drone and a heartbeat for the runner; dread to 3:10; one huge hit; the theme coming back down
-            (sound-music.js)
-     amb    your kitchen (room tone, the fridge, the street through the glass), the street and the park (a murmur,
-            birds, the fountain's hiss), a warning siren far off from 3:07:20 (sound-amb.js)
+   AUDIO — "What if air became solid for 3 seconds?" js/audio/audioEngine.js is unchanged (this is a subclass); the
+   SAP and generators come from audiokit.js (via the Friction 10s film). No narrator: the captions are silent and the
+   sound carries the gaps. Three stems:
+     music  an original score (sound-music.js): the radio cuts, a hit and a glass chord as the air sets; the ice motif
+            over cold D minor pads for the three seconds; a pulse that tightens through the city; a drum on every
+            belly flop; a roll to 2:00:03, a breath of nothing, one huge hit, the first major chord; thinner after
+     amb    your kitchen before 2:00; nothing at all while the air is solid; afterwards the room, a shocked murmur,
+            birds, car alarms and sirens, and no wind (sound-amb.js)
      sfx    the events at their story seconds (each heard once: the clock only runs forward; stretched and pitched
-            down in slow motion) (sound-sfx.js)
+            down in slow motion); during the lock only your heartbeat and the blood in your ears (sound-sfx.js)
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
 

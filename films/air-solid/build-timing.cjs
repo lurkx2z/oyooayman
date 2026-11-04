@@ -17,12 +17,12 @@ const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
   title: 0.05, start: 1.0, stop: 1.0, you: 1.4, real: 1.6, silence: 1.6, steam: 2.4, clock: 2.0, catfine: 2.0, window: 2.6, pigeon: 2.0, walkers: 2.2,
-  cyclist: 2.4, car: 2.4, leaves: 2.8, fountain: 2.6, jumper: 2.4, swing: 2.2, ball: 2.0, dog: 2.0, flock: 2.0, runner: 2.4, wind: 2.8, road: 2.6, count: 1.6, release: 9.6,
+  cyclist: 2.4, car: 2.4, fountain: 2.6, jumper: 2.4, swing: 2.2, dog: 2.0, runner: 2.4, wind: 2.8, road: 2.6, count: 1.6, release: 9.6,
   fall: 0.6, echo: 1.6, fine: 2.4, stalled: 2.4, sirens: 2.6, still: 2.4, planes: 2.6, question: 2.2,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'start:1': 0.8, 'stop:1': 1.0, 'stop:2': 1.6, 'you:1': 1.0, 'real:1': 0.8, 'silence:1': 1.2, 'steam:1': 1.6, 'catfine:1': 0.8, 'clock:1': 1.2, 'swing:1': 1.2, 'fall:1': 0.4, 'fall:2': 0.6, 'fall:3': 0.6, 'stalled:1': 1.0,
+  'start:1': 0.8, 'start:2': 0.8, 'real:2': 0.6, 'silence:2': 1.0, 'stop:1': 1.0, 'stop:2': 1.6, 'you:1': 1.0, 'real:1': 0.8, 'silence:1': 1.2, 'steam:1': 1.6, 'catfine:1': 0.8, 'clock:1': 1.2, 'swing:1': 1.2, 'fall:1': 0.4, 'fall:2': 0.6, 'fall:3': 0.6, 'stalled:1': 1.0,
   'walkers:1': 0.8, 'cyclist:1': 1.4, 'car:1': 1.2, 'fountain:1': 1.6, 'jumper:1': 1.4, 'runner:1': 1.0, 'wind:1': 1.2,
   'road:1': 1.0, 'road:2': 1.4, 'release:1': 1.0, 'echo:1': 1.0, 'fine:1': 1.6, 'sirens:1': 1.6, 'still:1': 1.4,
   'planes:1': 1.4,

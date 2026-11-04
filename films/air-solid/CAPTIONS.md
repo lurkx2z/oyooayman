@@ -11,21 +11,21 @@ status: voiceless
 
 [title] What if air became solid for 3 seconds?
 
-[start] 2:00 PM. All the air on Earth just turned solid. / For the next 3 seconds, nothing can push it.
+[start] 2:00 PM. All the air on Earth just turned solid. / For the next 3 seconds, nothing can push it. / Three seconds is nothing. Unless you were moving.
 
 [stop] So everything that was moving through it stopped dead. / The water you were pouring. / Your cat, halfway to the floor.
 
 [you] You can't breathe. You can't blink. / You can't even move your eyes.
 
-[real] Real air does turn solid: at −210 °C, shrinking 800 times. / This air set where it stood, as light and warm as before. That's the impossible part. The rest is physics.
+[real] Real air does turn solid: below −210 °C, shrinking 800 times. / This air set where it stood, as light and warm as before, and nothing can move it. / That's the impossible part. The rest is physics.
 
-[silence] Sound is air moving. So there is none. / All you can hear is your own heartbeat, through your bones.
+[silence] Sound is air moving. This air can't move. / The church bell just struck two. You didn't hear it. / All you can hear is your own heartbeat, through your bones.
 
 [steam] The steam over your tea hangs like a sculpture. / Every speck of dust in the sunlight is fixed in place.
 
 [clock] Even the clock's second hand is stuck. / Its little motor is still pushing.
 
-[catfine] Your cat hit the air at 3 m/s, every hair of it at once. / Like a belly flop onto the floor from 46 cm. It's fine.
+[catfine] Your cat was falling at 3 m/s when the air caught her, every hair at once. / Like a belly flop onto the floor from 46 cm. She's fine.
 
 [window] Outside, the whole city has stopped mid-move.
 
@@ -37,42 +37,36 @@ status: voiceless
 
 [car] The car was doing 30 km/h. / Seat belts can't help: the air holds the car and the driver at once. Like falling flat from 3.5 m.
 
-[leaves] In the park, every falling leaf hangs where it was.
-
-[fountain] The fountain is a sculpture of glass. / Under the pond's locked surface, the water can still move. The carp hasn't noticed.
+[fountain] In the park, the fountain has turned to glass. / Under the pond's locked surface, the water can still move. The carp hasn't noticed.
 
 [jumper] She jumped off the climbing frame. / She's not touching anything but air.
 
 [swing] He was at the top of his swing. / He's still up there.
 
-[ball] A kicked ball, stopped in mid-air.
-
 [dog] The dog was 30 cm from its frisbee.
-
-[flock] A flock taking off, held between two wingbeats.
 
 [runner] Running at 11 km/h, both feet leave the ground every stride. / Like falling flat from 48 cm.
 
-[wind] Every wind on Earth stopped at the same instant. / All that push went into the planet. For now, a day is 2 thousandths of a second shorter.
+[road] Past the park, the main road. 50 km/h. / For everyone on it, like falling flat from 9.8 m: almost as high as your kitchen window. / On motorways, 110 km/h: 48 m.
 
-[road] Past the park, the main road. 50 km/h. / For everyone on it, like falling flat from 9.8 m: almost the height of your kitchen. / On motorways, 110 km/h: 48 m.
+[wind] Every wind on Earth stopped at the same instant. / All that push went into the planet. For now, a day is 2 thousandths of a second shorter.
 
 [count] One second left.
 
 [release] 2:00:03. It's air again. / Everyone on Earth breathes in at once.
 
-[fall] Everything the air was holding falls, with no speed at all. / The runner just tips over. / The cyclist has nothing left to balance with. / The swing carries on from where it stopped.
+[fall] Everything the air was holding starts falling from a standstill. / The runner just tips over. / The cyclist has nothing left to balance with. / The swing carries on from where it stopped.
 
-[echo] That bell rang at 2:00. Its sound was caught in the air on its way to you. / When the air let go, half of it carried on to you. The other half went back to the tower.
+[echo] The bell's stroke at 2:00 was caught in the air on its way to you. / When the air let go, half of it carried on to you. The other half went back to the tower.
 
 [fine] 20 seconds later. Most people here were walking. A bump and a fright. / He'll have bruises.
 
-[stalled] 40 seconds later. Every engine that was running has stalled: the air in it was solid. / Every car in the city is wherever the air stopped it.
+[stalled] 40 seconds later. Every engine stopped at 2:00: the air inside it set. / On the main road, nobody has started theirs again.
 
-[sirens] A minute later. On the main road, few people have got out of their cars. / The first sirens.
+[sirens] A minute later. Few people have got out of their cars. / The first sirens.
 
-[still] Two minutes later. There's no wind anywhere on Earth. Chimney smoke rises straight up. / It will take hours for the winds to come back.
+[still] Two minutes later. Hardly a breath of wind anywhere. Chimney smoke rises straight up. / It will take hours for the winds to come back.
 
-[planes] At 2:00, about 10,000 planes were in the air. / At 900 km/h. Like falling flat from 3.2 km.
+[planes] At 2:00, about 10,000 planes were in the air. / Most at 900 km/h. No fall from any height lands that hard.
 
 [question] How fast were you going at 2:00?

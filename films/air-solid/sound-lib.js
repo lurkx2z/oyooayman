@@ -91,7 +91,7 @@ function saCurve(f, hz = 200) {
 }
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
-const SA_PLACE = { in: ['title', 'ceiling', 'tap', 'sg', 'window', 'kettle', 'puddle', 'cat', 'stuck', 'apple', 'home', 'drop'] };
+const SA_PLACE = { in: ['title', 'start', 'stop', 'stopW', 'stopC', 'you', 'real', 'silence', 'steam', 'dust', 'clock', 'catfine', 'window', 'countA', 'countB', 'release', 'question'] };
 function saWhereShot(sh) { return sh.where || (SA_PLACE.in.includes(sh.mode) ? 'in' : 'out'); }
 // the film as places: [{ t0, t1, where, shot }] in order
 function saPlaces() {
@@ -138,4 +138,34 @@ function saCrack(fx, o = {}) {
   const b = fx.hit(fx.stoneModes(o.s || 0.7), { width: 0.002, amp: 0.8, noise: 0.2, nlen: 0.05, nhp: 300, len: d }); for (let i = 0; i < Math.min(b.length, y.length); i++) y[i] += b[i] * 0.8;
   return y;
 }
-const SA_SOUND_FNS = [saNoise, saBed, saTone, saChirp, saCrackle, saSweep, saSweepPut, saAddAt, saPlaceAt, saSeen, saCurve, saWhereShot, saPlaces, saRoll, saScrape, saAlarm, saCrack, saEv, saWn];
+// the radio on your sill: a little pop song (G D Em C at 112 bpm: kick, snare, hats, bass, off-beat chords, a tune),
+// through a small speaker. o.offset: where in the song it starts (s)
+function saRadioSong(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), beat = 60 / 112, bar = 4 * beat, t0 = o.offset || 0, r = new RNG(77);
+  const prog = [[55, 62, 67, 71], [50, 57, 62, 66], [52, 59, 64, 67], [48, 55, 60, 64]];
+  const mel = [71, 74, 76, 74, 71, 69, 67, 69, 66, 69, 71, 69, 66, 64, 62, 64, 67, 71, 74, 71, 67, 66, 64, 66, 64, 67, 72, 71, 69, 67, 64, 62];
+  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  let pb = 0, pm = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / sr + t0, b = Math.floor(t / bar) % 4, inBar = t % bar, e8 = t % (beat / 2), ch = prog[b];
+    let v = 0;
+    const kb = inBar % (2 * beat); if (kb < 0.25) v += 0.9 * Math.sin(2 * Math.PI * (50 * kb + 70 / 12 * (1 - Math.exp(-kb * 12)))) * Math.exp(-kb * 14);
+    const sb = (inBar + beat) % (2 * beat); if (sb < 0.2) v += 0.35 * (r.next() * 2 - 1) * Math.exp(-sb * 25);
+    if (e8 < 0.05) v += 0.12 * (r.next() * 2 - 1) * Math.exp(-e8 * 90);
+    pb += 2 * Math.PI * hz(ch[0] - 12) / sr; v += 0.35 * Math.sin(pb) * Math.exp(-e8 * 6);
+    const ob = (t + beat / 2) % beat; if (ob < 0.18) for (const m of ch.slice(1)) v += 0.07 * Math.sign(Math.sin(2 * Math.PI * hz(m) * t)) * Math.exp(-ob * 16);
+    const mi = Math.floor(t / beat) % 32, mt = t % beat; pm += 2 * Math.PI * hz(mel[mi]) / sr; v += 0.2 * (Math.sin(pm) + 0.3 * Math.sin(2 * pm)) * Math.min(1, mt / 0.01) * Math.exp(-mt * 2.5);
+    y[i] = v;
+  }
+  SAX.bq(y, 'hp', 320, 0.7, sr); SAX.bq(y, 'lp', 3600, 0.7, sr); SAX.bq(y, 'pk', 1400, 1.0, sr, 4);
+  for (let i = 0; i < n; i++) y[i] = Math.tanh(1.6 * y[i]);
+  return y;
+}
+// a church bell's stroke (a minor-third bell: hum, prime, tierce, quint, nominal), o.k: slow motion (longer, lower)
+function saBellStroke(fx, o = {}) {
+  const k = o.k || 1, f = (o.f || 233) / Math.sqrt(k), d = Math.min(14, 7 * Math.sqrt(k)), sr = fx.sr, y = fx.arr(d), P = [[0.5, 4.5, 0.6], [1, 3.4, 1], [1.2, 2.6, 0.7], [1.5, 2.0, 0.45], [2, 1.6, 0.6], [2.5, 1.1, 0.3], [3.0, 0.8, 0.2], [4.2, 0.5, 0.12]];
+  for (const [m, tau, a] of P) { const fr = f * m * fx.r.range(0.998, 1.002), T = tau * Math.sqrt(k); for (let i = 0; i < d * sr; i++) { const t = i / sr; y[i] += a * Math.sin(2 * Math.PI * fr * t) * Math.exp(-t / T) * Math.min(1, t / 0.004); } }
+  const cl = fx.hit(fx.metalModes(f * 6, 0.2), { width: 0.0004, amp: 0.4, noise: 0.3, nlen: 0.004, len: 0.3 }); for (let i = 0; i < cl.length; i++) y[i] += cl[i];
+  return y;
+}
+const SA_SOUND_FNS = [saRadioSong, saBellStroke, saNoise, saBed, saTone, saChirp, saCrackle, saSweep, saSweepPut, saAddAt, saPlaceAt, saSeen, saCurve, saWhereShot, saPlaces, saRoll, saScrape, saAlarm, saCrack, saEv, saWn];

@@ -123,10 +123,10 @@ function saCastStates(s, C) {
     }
     put(k, st);
   }
-  // ---- the runner (11 km/h: flight phase at 2:00, 8 cm off the ground); afterwards he lands and tips forward
-  { const P = SA_RUNP, v = P.kmh / 3.6, d = v * Math.min(0, s), ph = d / 1.45 * SAPI;
-    let p = saRunPose(ph), y = 0.08 * Math.abs(Math.cos(ph)), th = 0;
-    if (L) { y = Math.max(0, 0.08 - 4.905 * u * u); th = saTip(P.th0, P.L, SAP.T + 0.13, s, 1.42); p = lerpPose(saRunPose(0), SA_POSES.catch(), saEase(th, 0.2, 1.1)); p.lHip = [0.4 * (1 - saEase(th, 0.6, 1.4)), 0.05]; p.rHip = [-0.2, 0.05]; p.lKnee = 0.3; p.rKnee = 0.4;
+  // ---- the runner (11 km/h: flight phase at 2:00, legs apart, 10 cm off the ground); afterwards he lands and tips forward
+  { const P = SA_RUNP, v = P.kmh / 3.6, d = v * Math.min(0, s), ph = d / 1.45 * SAPI + 1.35;
+    let p = saRunPose(ph), y = 0.1 * Math.abs(Math.sin(ph)), th = 0;
+    if (L) { y = Math.max(0, 0.098 - 4.905 * u * u); th = saTip(P.th0, P.L, SAP.T + 0.14, s, 1.42); p = lerpPose(saRunPose(1.35), SA_POSES.catch(), saEase(th, 0.2, 1.1)); p.lHip = [0.4 * (1 - saEase(th, 0.6, 1.4)), 0.05]; p.rHip = [-0.2, 0.05]; p.lKnee = 0.3; p.rKnee = 0.4;
       if (s > 14) { p = saKeys(s, [[14, SA_POSES.sitGround()], [45, SA_POSES.sitHurt()]], 1.2); th = 0; y = 0; } }
     const x0 = P.x + d;
     put('runner', saSt(p, x0 + (s > 14 ? 0.9 : 0), P.z, P.yaw + (s > 14 ? 0.4 : 0), { y, tip: th })); }

@@ -15,7 +15,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 const SA_CAR = { type: 'hatch', col: '#2f6f86', x: 1.2, z: -4.45, yaw: Math.PI, kmh: 30 };          // heading east (−x), under your window
 const SA_BIKE = { x: -5.4, z: -6.75, yaw: 0, kmh: 20, lean: 0.006, th0: 0.006, L: 1.6 };          // heading west (+x); its lean when it stops
-const SA_RUNP = { x: 7.5, z: -15.6, yaw: 0, kmh: 11, th0: 0.045, L: 1.0 };                           // the runner on the path, heading west
+const SA_RUNP = { x: 7.5, z: -15.6, yaw: Math.PI / 2, kmh: 11, th0: 0.045, L: 1.0 };                           // the runner on the path, heading west
 const SA_BALL = { p: [21.8, 3.9, -38.2], v: [-9.5, 3.2, 4.0], r: 0.11 };                            // the kicked ball at 2:00 (its velocity then)
 const SA_FRIS = { p: [-23.45, 1.12, -31.0], v: [-11, 0.4, -1.5], r: 0.12 };                         // the frisbee (30 cm ahead of the dog's nose)
 const SA_POND_FISH = [4.2, -0.13, -47.4];
@@ -76,6 +76,12 @@ function saBuildThings(S, T) {
   { const g = new THREE.Group(); scene.add(g); const o = VF.build(SA_CAR.type, SA_CAR.col); o.group.position.x = -o.L / 2; const turn = new THREE.Group(); turn.add(o.group); g.add(turn);
     X.car = { g, o, turn }; g.position.set(SA_CAR.x, 0, SA_CAR.z); g.rotation.y = SA_CAR.yaw; }
   X.bike = saBuildBike(); scene.add(X.bike);
+  // ---- a police car that squeezes down the middle of the main road a minute after (its lights flashing)
+  { const g = new THREE.Group(); scene.add(g); const o = VF.build('sedan', '#f2f2ee'); o.group.position.x = -o.L / 2; g.add(o.group);
+    const bb = new THREE.Box3().setFromObject(o.group), top = bb.max.y, mB = new THREE.MeshStandardMaterial({ color: '#2a5cff', emissive: '#2a5cff', emissiveIntensity: 0 }), mR = new THREE.MeshStandardMaterial({ color: '#ff3030', emissive: '#ff2020', emissiveIntensity: 0 });
+    saBox(0.36, 0.14, 0.62, mB, -0.15, top + 0.07, -0.33, g); saBox(0.36, 0.14, 0.62, mR, -0.15, top + 0.07, 0.33, g);
+    saBox(o.L * 0.92, 0.12, 0.02, saStd('#2a4a9a', 0.5), 0, 0.55, -(bb.max.z - bb.min.z) / 2 - 0.005, g); saBox(o.L * 0.92, 0.12, 0.02, saStd('#2a4a9a', 0.5), 0, 0.55, (bb.max.z - bb.min.z) / 2 + 0.005, g);
+    g.position.set(80.4, 0, -28.5); g.rotation.y = -Math.PI / 2; g.visible = false; X.police = { g, mB, mR }; }
   // ---- the main road's traffic
   X.traffic = SA_TRAFFIC.map(([z, lane, type, col]) => { const g = new THREE.Group(); scene.add(g); const o = VF.build(type, col); o.group.position.x = -o.L / 2; const turn = new THREE.Group(); turn.add(o.group); g.add(turn);
     g.position.set(saLaneX(lane), 0, z); g.rotation.y = lane > 0 ? -Math.PI / 2 : Math.PI / 2; return { g, o, z, lane, type }; });
@@ -122,6 +128,13 @@ function saBuildThings(S, T) {
   { const m = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.55, depthWrite: false, fog: false });
     const geo = new THREE.CylinderGeometry(1, 1, 1, 10, 1, true).translate(0, 0.5, 0); const tr = new THREE.Mesh(geo, m); tr.frustumCulled = false; tr.renderOrder = -5; scene.add(tr); X.trail = tr;
     X.trailA = [-5200, 9800, -12000]; X.trailB = [2600, 10600, -9400]; saStrut(tr, X.trailA, X.trailB, 26); }
+  // ---- the pond's surface, locked: the ripples the carp had just made, held (seen from close by)
+  { const geo = new THREE.PlaneGeometry(3.2, 3.2, 140, 140); geo.rotateX(-Math.PI / 2); const pa = geo.attributes.position, F = SA_POND_FISH;
+    for (let i = 0; i < pa.count; i++) { const x = pa.getX(i), z = pa.getZ(i), r = Math.hypot(x + 0.35, z - 0.25), r2 = Math.hypot(x - 0.6, z + 0.5);
+      pa.setY(i, 0.0045 * Math.sin(r * 46) * Math.exp(-r / 0.8) + 0.003 * Math.sin(r2 * 38 + 1) * Math.exp(-r2 / 0.6)); }
+    geo.computeVertexNormals();
+    const m = new THREE.MeshStandardMaterial({ color: '#6f8c96', transparent: true, opacity: 0.2, roughness: 0.05, metalness: 0.1, envMapIntensity: 1.6, depthWrite: false });
+    const rp = new THREE.Mesh(geo, m); rp.position.set(F[0] - 0.6, -0.026, F[2] + 0.5); rp.renderOrder = 3; rp.visible = false; scene.add(rp); X.ripple = rp; }
   X.update = (s, o) => saThingsUpdate(X, s, o || {});
   return X;
 }
@@ -147,6 +160,8 @@ function saSmokeAt(s0, s) {
 }
 function saThingsUpdate(X, s, o) {
   const out = o.drops, m = o.mode || '', cam = o.cam, fr = saFrz(s), rl = saRel(s);
+  X.ripple.visible = m === 'carp';
+  { const P = X.police; P.g.visible = s > 58; const ph = Math.floor(s * 6) % 2; P.mB.emissiveIntensity = ph ? 6 : 0.3; P.mR.emissiveIntensity = ph ? 0.3 : 6; }
   // ---- the car: 30 km/h until 2:00; stopped dead where it was. Its hazard lights, from 2:00:12, blink
   { const C = SA_CAR, v = C.kmh / 3.6, d = saGone(s, v); X.car.g.position.set(C.x + d * Math.cos(C.yaw), 0, C.z);
     X.car.o.wheels.forEach((w) => { w.rotation.z = -d / X.car.o.r; });
