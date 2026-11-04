@@ -71,7 +71,8 @@ the one impossible part**, and the film says so at 0:40 after the real thing: re
 - Teaser Shorts: the cat in mid-air (0:18–0:32), the pigeon and the car (1:50–2:28), 2:00:03 and the park falling
   (3:41–4:18).
 - Thumbnails (house style, real frames): `thumb-cat.jpg` (3 s, "and still your cat hangs there"), `thumb-pigeon.jpg`
-  (36 km/h, "and still in mid-wingbeat"), `thumb-road.jpg` (50 km/h, "and still no one can breathe").
+  (36 km/h, "and still in mid-wingbeat"), `thumb-road.jpg` (50 km/h, "and still no one can breathe"), and on request `thumb-pour.jpg` (3 s, through your
+  eyes: the jug, the stream stopped halfway into the glass, "and still the water won't fall").
 
 ## Reviews
 
