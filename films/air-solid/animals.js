@@ -70,26 +70,58 @@ function saPoseQuad(Q, P) {
 
 // a carp: a long body, tail fin, dorsal fin (origin at its middle, nose along +z)
 function saBuildFish() {
-  const g = new THREE.Group(), m = saStd('#d9822e', 0.35, 0.1, { envMapIntensity: 1.4 }), m2 = saStd('#f2e2c8', 0.4), fin = saStd('#c86a28', 0.5, 0, { side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
-  saMesh(new THREE.SphereGeometry(1, 18, 12).scale(0.07, 0.085, 0.24), m, 0, 0, 0, g);
-  saMesh(new THREE.SphereGeometry(1, 14, 10).scale(0.055, 0.05, 0.18), m2, 0, -0.03, 0.02, g);
-  const tailG = new THREE.Group(); tailG.position.z = -0.22; g.add(tailG);
-  const ts = new THREE.Shape(); ts.moveTo(0, 0); ts.lineTo(0.09, -0.16); ts.lineTo(0.02, -0.12); ts.lineTo(-0.09, -0.16); ts.closePath();
+  // a koi carp (about 48 cm before scaling): a long body, deepest a third of the way back, narrow from side to side;
+  // orange with white patches and a pale belly; a forked tail, a long dorsal fin, two pectoral fins
+  const g = new THREE.Group(), m = saStd('#e0782a', 0.35, 0.1, { envMapIntensity: 1.4 }), mW = saStd('#f4ece0', 0.4, 0.05, { envMapIntensity: 1.2 });
+  const fin = saStd('#e89a52', 0.5, 0, { side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
+  const prof = (k, dy) => { const pts = []; for (let i = 0; i <= 24; i++) { const u = i / 24, x = Math.pow(u, 1.25), r = k * (0.062 * Math.pow(4 * x * (1 - x), 0.65) + 0.012 * (1 - u)); pts.push(new THREE.Vector2(Math.max(0.001, r), -0.24 + 0.48 * u)); } return new THREE.LatheGeometry(pts, 18).rotateX(Math.PI / 2).scale(0.72, 1, 1).translate(0, dy, 0); };
+  saMesh(prof(1, 0), m, 0, 0, 0, g);
+  saMesh(prof(0.93, -0.012), mW, 0, 0, 0, g);   // (the pale belly shows below the orange)
+  for (const [z, x, r] of [[0.08, 0.0, 0.05], [-0.06, 0.01, 0.042], [0.17, -0.005, 0.03]]) saMesh(new THREE.SphereGeometry(r * 0.75, 12, 8).scale(0.9, 0.28, 1.4), mW, x, 0.05, z, g);
+  const tailG = new THREE.Group(); tailG.position.z = -0.235; g.add(tailG);
+  const ts = new THREE.Shape(); ts.moveTo(0, 0.01); ts.lineTo(0.075, -0.13); ts.lineTo(0.0, -0.08); ts.lineTo(-0.075, -0.13); ts.lineTo(0, -0.01); ts.closePath();
   const tf = saMesh(new THREE.ShapeGeometry(ts), fin, 0, 0, 0, tailG); tf.rotation.set(Math.PI / 2, Math.PI / 2, 0);
-  const ds = new THREE.Shape(); ds.moveTo(0, 0); ds.lineTo(0.06, 0.07); ds.lineTo(0.2, 0.0); ds.closePath();
-  const df = saMesh(new THREE.ShapeGeometry(ds), fin, 0, 0.075, -0.1, g); df.rotation.y = -Math.PI / 2;
-  for (const sd of [-1, 1]) { saMesh(new THREE.SphereGeometry(0.012, 8, 6), saStd('#111', 0.2), sd * 0.045, 0.025, 0.17, g); }
+  const ds = new THREE.Shape(); ds.moveTo(0, 0); ds.lineTo(0.05, 0.05); ds.lineTo(0.2, 0.025); ds.lineTo(0.22, 0.0); ds.closePath();
+  const df = saMesh(new THREE.ShapeGeometry(ds), fin, 0, 0.05, -0.1, g); df.rotation.y = -Math.PI / 2;
+  for (const sd of [-1, 1]) { const ps = new THREE.Shape(); ps.moveTo(0, 0); ps.lineTo(0.07, -0.03); ps.lineTo(0.05, -0.06); ps.closePath();
+    const pf = saMesh(new THREE.ShapeGeometry(ps), fin, sd * 0.035, -0.035, 0.1, g); pf.rotation.set(Math.PI / 2 + 0.3, 0, sd > 0 ? -0.5 : Math.PI + 0.5);
+    saMesh(new THREE.SphereGeometry(0.009, 8, 6), saStd('#111', 0.2), sd * 0.03, 0.012, 0.19, g); }
   g.userData.tail = tailG; return g;
 }
 // a pigeon: grey body, darker head, folded or open wings (wings: groups that flap about the body's long axis)
 function saBuildPigeon(s = 1) {
-  const g = new THREE.Group(), m = saStd('#8a8d94', 0.8), mh = saStd('#5a5f6a', 0.7), mw = saStd('#7a7e86', 0.8), beak = saStd('#d8c8a8', 0.6);
-  saMesh(new THREE.SphereGeometry(0.1 * s, 10, 8).scale(0.9, 0.85, 1.6), m, 0, 0.12 * s, 0, g);
-  saMesh(new THREE.SphereGeometry(0.05 * s, 10, 8), mh, 0, 0.21 * s, 0.12 * s, g);
-  saMesh(new THREE.ConeGeometry(0.012 * s, 0.03 * s, 6).rotateX(Math.PI / 2), beak, 0, 0.205 * s, 0.17 * s, g);
-  saMesh(new THREE.BoxGeometry(0.07 * s, 0.02 * s, 0.12 * s), mh, 0, 0.12 * s, -0.19 * s, g);
-  for (const sd of [-1, 1]) saCyl(0.006 * s, 0.006 * s, 0.07 * s, saStd('#c8584a', 0.6), sd * 0.03 * s, 0.035 * s, 0.01 * s, g, 5);
+  // a feral pigeon in flight (body along +z, wings along ±x hinged at the shoulders, ~32 cm long, ~62 cm across):
+  // blue-grey, a green-and-purple sheen on the neck, two black bars on each wing, dark primaries and a dark tail band
+  const g = new THREE.Group(), D = THREE.DoubleSide;
+  const mBody = saStd('#9298a2', 0.75), mHead = saStd('#737985', 0.7), mNeckG = saStd('#5f8676', 0.35, 0.35), mNeckP = saStd('#7d6a8c', 0.35, 0.35);
+  const mWing = saStd('#a3a9b2', 0.8, 0, { side: D }), mDark = saStd('#3e4148', 0.8, 0, { side: D }), mTail = saStd('#878d97', 0.8, 0, { side: D });
+  saMesh(new THREE.SphereGeometry(1, 14, 10).scale(0.072 * s, 0.07 * s, 0.15 * s), mBody, 0, 0.12 * s, -0.01 * s, g);
+  saMesh(new THREE.SphereGeometry(1, 12, 9).scale(0.06 * s, 0.062 * s, 0.07 * s), mBody, 0, 0.125 * s, 0.07 * s, g);   // breast
+  saMesh(new THREE.SphereGeometry(1, 12, 9).scale(0.045 * s, 0.05 * s, 0.05 * s), mNeckP, 0, 0.16 * s, 0.11 * s, g);
+  saMesh(new THREE.SphereGeometry(1, 12, 9).scale(0.04 * s, 0.045 * s, 0.045 * s), mNeckG, 0, 0.18 * s, 0.13 * s, g);
+  saMesh(new THREE.SphereGeometry(0.036 * s, 12, 9), mHead, 0, 0.2 * s, 0.16 * s, g);
+  for (const sd of [-1, 1]) { saMesh(new THREE.SphereGeometry(0.008 * s, 8, 6), saStd('#e07a2a', 0.3), sd * 0.03 * s, 0.207 * s, 0.17 * s, g);
+    saMesh(new THREE.SphereGeometry(0.004 * s, 6, 5), saStd('#111111', 0.2), sd * 0.034 * s, 0.208 * s, 0.174 * s, g); }
+  saMesh(new THREE.ConeGeometry(0.008 * s, 0.026 * s, 6).rotateX(Math.PI / 2), saStd('#2e2f33', 0.5), 0, 0.197 * s, 0.205 * s, g);
+  saMesh(new THREE.SphereGeometry(0.008 * s, 6, 5).scale(1, 0.7, 1.2), saStd('#e8e4dc', 0.6), 0, 0.203 * s, 0.19 * s, g);       // the white cere
+  // the tail: a fan with a dark band at its end
+  const shp = (pts) => { const S = new THREE.Shape(); S.moveTo(pts[0][0] * s, pts[0][1] * s); for (const q of pts.slice(1)) S.lineTo(q[0] * s, q[1] * s); return new THREE.ShapeGeometry(S).rotateX(Math.PI / 2); };
+  const tail = new THREE.Group(); tail.position.set(0, 0.125 * s, -0.13 * s); tail.rotation.x = -0.12; g.add(tail);
+  saMesh(shp([[-0.025, 0], [0.025, 0], [0.05, -0.1], [-0.05, -0.1]]), mTail, 0, 0, 0, tail);
+  saMesh(shp([[-0.05, -0.1], [0.05, -0.1], [0.052, -0.125], [-0.052, -0.125]]), mDark, 0, 0.001, 0, tail);
+  // feet tucked under the tail
+  for (const sd of [-1, 1]) saCyl(0.006 * s, 0.005 * s, 0.05 * s, saStd('#c86a6a', 0.6), sd * 0.022 * s, 0.07 * s, -0.07 * s, g, 5).rotation.x = 1.2;
+  // the wings: one flat outline each (broad at the shoulder, the primaries fingered at the tip)
+  const W = [[0, 0.055], [0.1, 0.07], [0.2, 0.06], [0.27, 0.035], [0.32, 0.0], [0.315, -0.02], [0.29, -0.015], [0.285, -0.035], [0.26, -0.03], [0.25, -0.05], [0.22, -0.045], [0.2, -0.065], [0.13, -0.07], [0.06, -0.08], [0, -0.07]];
+  const TIP = [[0.2, 0.06], [0.27, 0.035], [0.32, 0.0], [0.315, -0.02], [0.29, -0.015], [0.285, -0.035], [0.26, -0.03], [0.25, -0.05], [0.22, -0.045], [0.2, -0.065], [0.215, 0.0]];
   const w = [];
-  for (const sd of [-1, 1]) { const p = new THREE.Group(); p.position.set(sd * 0.07 * s, 0.15 * s, 0); g.add(p); const wing = saBox(0.26 * s, 0.012 * s, 0.14 * s, mw, sd * 0.13 * s, 0, -0.02 * s, p); wing.castShadow = false; w.push(p); }
+  for (const sd of [-1, 1]) {
+    const p = new THREE.Group(); p.position.set(sd * 0.05 * s, 0.15 * s, 0.03 * s); g.add(p);
+    const add = (geo, m, y) => { const o = saMesh(geo, m, 0, y * s, 0, p); o.scale.x = sd; o.castShadow = false; return o; };
+    add(shp(W), mWing, 0); add(shp(TIP), mDark, 0.0015);
+    add(shp([[0.03, -0.012], [0.15, -0.02], [0.15, -0.032], [0.03, -0.026]]), mDark, 0.0015);
+    add(shp([[0.03, -0.042], [0.15, -0.05], [0.15, -0.062], [0.03, -0.056]]), mDark, 0.0015);
+    w.push(p);
+  }
   g.userData.wings = w; return g;
 }

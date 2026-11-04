@@ -1,51 +1,54 @@
 /* =====================================================================
    HUD — this film's overlay (DOM, in #hud; a pure function of time). The centred title is the shared StoryHUD. The
-   layout is the Slower light / Friction 10s / gravity films':
-     top left     the countdown: how long dropped things keep falling up (10:00 → 0:00); from the apple on, where your
-                  apple is (↑ height) and the next height it will pass; under it one context line for the scene
-     top right    Saturday and the time; REAL SPEED / SLOW MOTION ×0.38, "+40 s" when the clock jumps at a cut (it only
-                  ever runs forward)
+   layout is the Slower light / Friction 10s / falls-up films':
+     top left     while the air is solid: how long it stays solid (3.000 s → 0), to the millisecond
+     top right    Sunday and the time, to the millisecond while it's solid; how much slowed down (110× SLOWER) or
+                  REAL SPEED, and "+20 s" when the clock jumps at a cut (it only ever runs forward)
      bottom       one caption at a time (CAPTIONS.md via timing.js; numbers in amber); the last one is the question
-     insets       walking vs running (who has a foot on the ground); the height ladder when we ride with the apple
-     middle       the last ten seconds, counted down big
-     bottom left  the honest labels (what is impossible, what is left out)
+     insets       the ladder: each speed in the film and the height a belly flop would need to hit as hard; a cube of air
+                  (what real frozen air is); the bell's sound, caught and let go
+     middle       the last second, counted down big
+     bottom left  the honest labels (what is impossible, what is a stand-in)
      in the scene labels the set pins to places (set.labels(t) → [{ p, text, sub, a }])
    ===================================================================== */
 
-// heights your apple passes on the way (m)
-const SA_MARKS = [[1000, '1 km'], [8849, 'EVEREST'], [11000, 'AIRLINERS'], [18300, 'CONCORDE'], [35000, 'WEATHER BALLOONS'], [100000, 'SPACE']];
 // the scene's context line: [from, to, label, value(t, s) → { v, v2 }] (HTML)
 const SA_CTX = (() => {
-  const sh = saShot;
-  const span = (a, b, l, f) => [sh(a).t0 + 0.4, sh(b).t1 - 0.25, l, f];
   const beat = (id, l, f, k0 = 0) => [saC(id, k0) - 0.2, saE(id) + 0.2, l, f];
-  const A = SA_FLY.apple, kmh = (v) => Math.round(Math.abs(v) * 3.6).toLocaleString('en-US');
   return [
-    beat('rate', 'EVERYTHING FALLS UP AT', () => ({ v: '9.81 <small>m/s²</small>', v2: 'A SPOON, A GRAPE, A PIANO' })),
-    span('appleUp', 'appleUp', 'YOUR APPLE IS GOING UP AT', (t, s) => ({ v: Math.round(A.v(s)) + ' <small>m/s</small>', v2: kmh(A.v(s)) + ' km/h · STILL SPEEDING UP' })),
-    beat('leaves', 'A LEAF FALLS AT ABOUT', () => ({ v: '1.3 <small>m/s</small>', v2: 'SO IT RISES AT 1.3 m/s' })),
-    span('fountain', 'fountain', 'THE WATER LEAVES THE JET AT', () => ({ v: '6 <small>m/s</small>', v2: 'NONE OF IT COMES BACK' })),
-    beat('hold', 'IF SHE LETS GO NOW, BY 3:10', (t, s) => { const f = saFlight(Math.round(s), 55, { h0: 4.5, until: 601, dt: 0.1 }); return { v: Math.round(f(600) / 1000) + ' <small>km up</small>', v2: 'AIRLINERS FLY AT 11 km' }; }, 1),
-    span('dog', 'dog', 'THE DOG PULLS UP ON THE LEAD WITH', () => ({ v: '200 <small>N</small>', v2: 'ITS WHOLE WEIGHT (20 kg)' })),
-    span('height', 'height', 'THE AIR UP HERE', (t, s) => ({ v: Math.round(100 * saRho(A(s)) / SAP.ref) + ' <small>% as thick</small>', v2: 'LESS AIR, LESS DRAG: ' + Math.round(A.v(s)) + ' m/s' })),
-    span('planes', 'planes', 'AIRLINERS CRUISE AT', () => ({ v: '10–12 <small>km</small>', v2: 'LOST PHONES ARE GETTING THERE' })),
-    span('space', 'space', 'YOUR APPLE IS GOING', (t, s) => ({ v: (A.v(s) / 1000).toFixed(1) + ' <small>km/s</small>', v2: kmh(A.v(s)) + ' km/h · THE AIR HAS RUN OUT' })),
-    beat('down', 'THE FOUNTAIN’S HIGHEST WATER', () => ({ v: '5.5 <small>km up</small>', v2: 'FROZEN · DOWN BY 3:20' }), 1),
-    beat('question', 'YOUR APPLE IS STILL UP AT', (t, s) => ({ v: Math.round(A(s) / 1000) + ' <small>km</small>', v2: 'STRAIGHT BACK DOWN · LANDS ABOUT 3:21' })),
+    beat('wind', 'A DAY ON EARTH, FOR NOW', () => ({ v: '86,399.998 <small>s</small>', v2: '2 ms SHORTER THAN AT 1:59 PM' }), 1),
+    beat('echo', 'THE BELL’S SOUND, WHEN THE AIR SET', () => ({ v: '41 <small>m from the tower</small>', v2: 'YOUR WINDOW: 89 m AWAY' })),
+    beat('planes', 'IN THE AIR AT 2:00', () => ({ v: '≈10,000 <small>planes</small>', v2: 'MOST AT 800–900 km/h' })),
   ];
 })();
 // the honest labels (bottom left): [from, to, text]
 const SA_TAGS = (() => { const b = (id, text, k0 = 0) => [saC(id, k0) - 0.1, saE(id) + 0.2, text]; return [
-  b('real', 'THE ONE IMPOSSIBLE THING: GRAVITY PUSHING WHAT YOU LET GO OF'),
-  b('kettle', 'LEFT OUT: THE AIR KEEPS ITS WEIGHT (OR THE SKY WOULD LEAVE TOO)'),
-  b('apple', 'AIR DRAG: THE STANDARD ATMOSPHERE, THINNING WITH HEIGHT', 2),
-  b('height', 'TEMPERATURE: THE STANDARD ATMOSPHERE AT 15.3 km', 1),
+  b('real', 'THE ONE IMPOSSIBLE THING: AIR THAT SETS AT 12 °C, WITHOUT SHRINKING', 1),
+  b('silence', 'THE MUSIC IS THE FILM’S: IN THE AIR THERE IS NO SOUND'),
+  b('catfine', 'LIKE A BELLY FLOP FROM h: THE SAME SPEED, STOPPED AS FAST · h = v² / 2g', 1),
+  b('wind', 'THE WINDS’ SPIN: ≈1.5 × 10²⁶ kg m²/s, EASTWARD ON BALANCE', 1),
+  b('planes', 'A STAND-IN NUMBER: FLIGHT TRACKERS SHOW 8,000–12,000 AT ONCE'),
 ]; })();
+// the speed ladder: which rows are on (in order of reveal), and which is lit, by beat
+const SA_LADDER = (() => {
+  const on = (id, k0, keys, hot) => [saC(id, k0) - 0.3, saE(id) + 0.25, keys, hot];
+  return [
+    on('catfine', 0, ['walk', 'cat'], 'cat'),
+    on('pigeon', 0, ['walk', 'cat', 'pigeon'], 'pigeon'),
+    on('walkers', 0, ['walk', 'cat', 'pigeon'], 'walk'),
+    on('cyclist', 0, ['walk', 'cat', 'bike', 'pigeon'], 'bike'),
+    on('car', 0, ['walk', 'cat', 'bike', 'car', 'pigeon'], 'car'),
+    on('runner', 0, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon'], 'run'),
+    on('road', 0, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon', 'road'], 'road'),
+    [saC('road', 2) - 0.3, saE('road') + 0.25, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon', 'road', 'motorway'], 'motorway'],
+    on('planes', 1, ['walk', 'cat', 'run', 'bike', 'car', 'pigeon', 'road', 'motorway', 'plane'], 'plane'),
+  ];
+})();
 
 // a caption's text with its numbers in amber
 function saCapHtml(s) {
   const esc = s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  return esc.replace(/[−-]?\d+(?:[.,]\d+)?(?::\d+){0,2}(?:\s?°C?|\s?%|\s(?:hours|hour|minutes|minute|seconds|second|km|kg|cm|m|s)\b)?(?:\s(?:AM|PM))?(?:\s\d+\s(?:seconds|second))?/g, (m) => `<span class="n">${m}</span>`);
+  return esc.replace(/[−-]?\d+(?:[.,]\d+)*(?::\d+){0,2}(?:\s?°C?|\s?%|\s(?:hours|hour|minutes|minute|seconds|second|thousandths|km\/h|m\/s|km|kg|cm|m|s)\b)?(?:\s(?:AM|PM))?/g, (m) => `<span class="n">${m}</span>`);
 }
 
 class SaHud {
@@ -60,11 +63,11 @@ class SaHud {
     this.band = mk('sa-band'); this.cap = mk('sa-cap'); this.tag = mk('sa-tag');
     this.count = mk('sa-count');
     this.caps = SAT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: saCapHtml(c.text), q: g.id === 'question' })));
-    this.inset = mk('sa-inset');
+    this.inset = mk('sa-inset'); this.ladder = mk('sa-inset ladder');
     this.labels = [];
     this.root = root;
     this._last = {};
-    this._insetKey = null;
+    this._insetKey = null; this._ladKey = null;
   }
   _set(k, el, prop, v) { if (this._last[k] === v) return; this._last[k] = v; el.style[prop] = v; }
   _txt(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.textContent = v; }
@@ -72,22 +75,17 @@ class SaHud {
   _cls(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.className = v; }
 
   update(t, shot, set, app) {
-    const W = StoryHUD.win, s = set && set._s != null ? set._s : saStoryAt(t), rate = saRateAt(t), A = SA_FLY.apple;
-    // ---- the countdown; your apple
-    const ra = Math.max(W(t, SA.title[1] - 0.5, SA.end + 1, 0.4, 0.5), 0);
+    const W = StoryHUD.win, s = set && set._s != null ? set._s : saStoryAt(t), rate = saRateAt(t);
+    // ---- how long the air stays solid (from just after the title until a few seconds after it lets go)
+    const tOff = saFilmAt(SAP.T) + 6.5, ra = Math.max(W(t, SA.title[1] - 0.5, tOff, 0.4, 0.8), 0);
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
       const left = SAP.T - s, on = left > 0;
-      this._txt('rol', this.roL, on ? 'DROPPED THINGS FALL UP FOR' : 'BACK TO NORMAL');
-      this._html('rov', this.roV, on ? saMS(left) : '0:00');
-      if (s >= A.s0) {
-        const h = A(s), up = A.v(s) > 0;
-        this._html('ros', this.roS, `YOUR APPLE ${up ? '↑' : '↓'} <b>${saHt(h)}</b>`);
-        const nx = SA_MARKS.find((x) => x[0] > h);
-        const sky = shot && (shot.mode === 'height' || shot.mode === 'planes' || shot.mode === 'space' || shot.mode === 'appleUp'), M = saMach(A.v(s), h);
-        this._html('ron', this.roN, s >= SAP.T ? (up ? `COASTING UP TO ${saHt(A.hTop)}` : 'FALLING BACK · LANDS ABOUT 3:21') : M >= 1 ? `SUPERSONIC · MACH ${M.toFixed(1)}` : sky && nx ? `NEXT: ${nx[1]}${nx[1] === '1 km' ? '' : ' · ' + saHt(nx[0])}` : h >= 100000 ? 'IN SPACE' : '');
-      } else { this._html('ros', this.roS, ''); this._html('ron', this.roN, ''); }
-      this._cls('roc', this.ro, !on ? 'sa-ro hit' : left <= 10 ? 'sa-ro tick' : 'sa-ro');
+      this._txt('rol', this.roL, on ? 'THE AIR IS SOLID FOR' : 'THE AIR IS AIR AGAIN');
+      this._html('rov', this.roV, on ? `${Math.max(0, left).toFixed(3)}<small> s</small>` : '0.000<small> s</small>');
+      this._html('ros', this.roS, on ? 'NOTHING CAN MOVE THROUGH IT' : 'EVERYTHING STARTS AGAIN FROM REST');
+      this._html('ron', this.roN, '');
+      this._cls('roc', this.ro, !on ? 'sa-ro hit' : left <= 1 ? 'sa-ro tick' : 'sa-ro');
     }
     // ---- the context line
     const cx = SA_CTX.find((x) => t >= x[0] && t < x[1]);
@@ -97,16 +95,16 @@ class SaHud {
     const tg = SA_TAGS.find((x) => t >= x[0] && t < x[1]);
     this._set('tga', this.tag, 'opacity', tg ? W(t, tg[0], tg[1], 0.4, 0.4).toFixed(3) : '0');
     if (tg) this._txt('tgt', this.tag, tg[2]);
-    // ---- Saturday and the time; slow motion or a jump
+    // ---- Sunday and the time; how slowed down, or a jump
     const ca = W(t, SA.title[1] - 0.5, SA.end + 1, 0.4, 0.5);
     this._set('ck', this.clock, 'opacity', ca.toFixed(3));
     if (ca > 0) {
-      const c = saClockParts(s);
+      const c = saClockParts(s), ms = saLocked(s) || (s > -1 && s < SAP.T + 4) ? `<small>.${String(c.ms).padStart(3, '0')}</small>` : '';
       this._txt('ckl', this.clockL, c.day);
-      this._html('ckv', this.clockV, `${c.h}:${String(c.m).padStart(2, '0')}<small>:${String(c.sec).padStart(2, '0')}</small> <i>${c.pm ? 'PM' : 'AM'}</i>`);
+      this._html('ckv', this.clockV, `${c.h}:${String(c.m).padStart(2, '0')}<small>:${String(c.sec).padStart(2, '0')}</small>${ms} <i>${c.pm ? 'PM' : 'AM'}</i>`);
       const j = SA_JUMPS.filter((x) => t >= x.t && t < x.t + 2.6).pop();
       const jl = j ? '+' + (j.ds >= 90 ? Math.round(j.ds / 60) + ' min' : Math.round(j.ds) + ' s') : '';
-      const tl = rate < 0.9 ? 'SLOW MOTION ×' + rate.toFixed(2) : 'REAL SPEED';
+      const sl = 1 / rate, tl = rate < 0.9 ? (sl >= 20 ? Math.round(sl / 10) * 10 : Math.round(sl)) + '× SLOWER' : 'REAL SPEED';
       this._txt('ckf', this.clockF, jl ? jl + '  ·  ' + tl : tl);
     }
     // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
@@ -117,12 +115,13 @@ class SaHud {
       this._html('cap', this.cap, cp.html); this._cls('capq', this.cap, cp.q ? 'sa-cap q' : 'sa-cap');
       this._set('capa', this.cap, 'opacity', W(t, cp.show, cp.hide, 0.22, 0.3).toFixed(3));
     } else this._set('capa', this.cap, 'opacity', '0');
-    // ---- the last ten seconds, big
-    { const n = s >= SA.sCount && s < SAP.T && shot && shot.mode === 'count' ? Math.ceil(SAP.T - s - 1e-6) : 0, a = n ? 1 : 0;
-      this._set('cna', this.count, 'opacity', String(a));
-      if (n) { this._txt('cnt', this.count, String(n)); const f = (SAP.T - s) % 1; this._cls('cnc', this.count, f > 0.82 ? 'sa-count hit' : 'sa-count'); } }
+    // ---- the last second, big
+    { const on = s >= SA.sCount && s < SAP.T && shot && (shot.mode === 'countA' || shot.mode === 'countB'), a = on ? W(t, saS('count') - 0.2, SA.tRel, 0.3, 0.2) : 0;
+      this._set('cna', this.count, 'opacity', a.toFixed(3));
+      if (on) { this._txt('cnt', this.count, Math.max(0, SAP.T - s).toFixed(2)); this._cls('cnc', this.count, SAP.T - s < 0.1 ? 'sa-count hit' : 'sa-count'); } }
     // ---- the diagrams
     this._insets(t, s);
+    this._ladderUpd(t);
     // ---- labels pinned in the scene
     const L = set && set.labels ? set.labels(t) || [] : [];
     while (this.labels.length < L.length) { const d = document.createElement('div'); d.className = 'sa-lab'; this.root.appendChild(d); this.labels.push(d); }
@@ -144,10 +143,10 @@ class SaHud {
     });
   }
 
-  // the diagrams (SVG)
+  // the diagrams (SVG): the cube of air (real), the bell's sound (echo)
   _insets(t, s) {
-    const W = StoryHUD.win, sh = saShot;
-    const which = [['stride', saC('walk', 0) - 0.2, sh('walk').t1 - 0.2, 'left'], ['ladder', sh('height').t0 + 0.4, sh('planes').t1 - 0.2, 'ladder'], ['ladder', sh('space').t0 + 0.4, sh('space').t1 - 0.2, 'ladder']].find((x) => t >= x[1] && t < x[2]);
+    const W = StoryHUD.win;
+    const which = [['cube', saC('real', 0) - 0.2, saE('real') + 0.3, 'mid'], ['ring', saC('echo', 0) - 0.2, saE('echo') + 0.3, 'mid']].find((x) => t >= x[1] && t < x[2]);
     const a = which ? W(t, which[1], which[2], 0.45, 0.4) : 0;
     this._set('ina', this.inset, 'opacity', a.toFixed(3));
     this._cls('inb', this.inset, !which ? 'sa-inset' : 'sa-inset ' + which[3]);
@@ -157,42 +156,64 @@ class SaHud {
     this._insetKey = key;
     this.inset.innerHTML = SaHud[k](u, t, s);
   }
+  _ladderUpd(t) {
+    const W = StoryHUD.win, L = SA_LADDER.find((x) => t >= x[0] && t < x[1]);
+    // (one fade over back-to-back beats: the ladder stays up from the cat to the car, and from the runner to the motorway)
+    const a = L ? Math.min(1, W(t, L[0], L[1], 0.45, 0.4) + (SA_LADDER.some((x) => x !== L && Math.abs(x[0] - L[1]) < 3.2 && t > L[1] - 0.4) ? 1 : 0) + (SA_LADDER.some((x) => x !== L && Math.abs(L[0] - x[1]) < 3.2 && t < L[0] + 0.45) ? 1 : 0)) : 0;
+    this._set('lda', this.ladder, 'opacity', a.toFixed(3));
+    if (!L) return;
+    const key = L[2].join(',') + '|' + L[3] + '|' + Math.round((t - L[0]) * 20);
+    if (key === this._ladKey) return;
+    this._ladKey = key;
+    this.ladder.innerHTML = SaHud.ladderSvg(L[2], L[3], t - L[0]);
+  }
   static svg(body, w = 760, h = 470) { return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="saAh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/></marker></defs>${body}</svg>`; }
   static plate(a = 0.72, w = 760, h = 470) { return `<rect x="0" y="0" width="${w}" height="${h}" rx="22" fill="rgba(6,9,14,${a})"/>`; }
-  // walking vs running: when each foot is on the ground (bars), over two strides. Walking: the bars overlap (always a
-  // foot down). Running: gaps where both feet are off the ground (amber). A playhead runs along both
-  static stride(u) {
-    const x0 = 252, x1 = 728, L = x1 - x0, cyc = 2, ph = ((u * 0.45) % 1) * L + x0, k2 = MathX.smooth(u, 3.2, 4.0);
-    const bars = (y, duty, off, col) => { let o = ''; for (let c = 0; c < cyc + 1; c++) { const a = x0 + (c + off) * L / cyc, b = a + duty * L / cyc; const aa = Math.max(x0, a), bb = Math.min(x1, b); if (bb > aa) o += `<rect x="${aa.toFixed(1)}" y="${y}" width="${(bb - aa).toFixed(1)}" height="22" rx="8" fill="${col}"/>`;
-      const a2 = a - L / cyc, b2 = a2 + duty * L / cyc, aa2 = Math.max(x0, a2), bb2 = Math.min(x1, b2); if (c === 0 && bb2 > aa2) o += `<rect x="${aa2.toFixed(1)}" y="${y}" width="${(bb2 - aa2).toFixed(1)}" height="22" rx="8" fill="${col}"/>`; } return o; };
-    const gaps = (y) => { let o = ''; for (let c = -1; c < cyc + 1; c++) for (const st of [0.3, 0.8]) { const a = x0 + (c + st) * L / cyc, b = a + 0.2 * L / cyc, aa = Math.max(x0, a), bb = Math.min(x1, b); if (bb > aa) o += `<rect x="${aa.toFixed(1)}" y="${y}" width="${(bb - aa).toFixed(1)}" height="66" rx="8" fill="rgba(255,207,138,0.28)" stroke="#ffcf8a" stroke-width="2"/>`; } return o; };
-    return SaHud.svg(`${SaHud.plate()}
-      <text x="30" y="60" class="t">WHICH FOOT IS ON THE GROUND</text>
-      <text x="30" y="140" class="s">WALKING</text>
-      <text x="236" y="128" text-anchor="end" class="sm">L</text><text x="236" y="160" text-anchor="end" class="sm">R</text>
-      ${bars(110, 0.6, 0, '#f6efe2')}${bars(142, 0.6, 0.5, '#9fc4ff')}
-      <text x="${x0}" y="200" class="sm">ALWAYS A FOOT DOWN</text>
-      <g opacity="${k2}">
-        <text x="30" y="290" class="s">RUNNING</text>
-        ${gaps(258)}
-        <text x="236" y="282" text-anchor="end" class="sm">L</text><text x="236" y="314" text-anchor="end" class="sm">R</text>
-        ${bars(264, 0.3, 0, '#f6efe2')}${bars(296, 0.3, 0.5, '#9fc4ff')}
-        <text x="${x0}" y="360" class="sm" style="fill:#ffcf8a">BOTH FEET OFF, TWICE A STRIDE</text>
-      </g>
-      <line x1="${ph.toFixed(1)}" y1="96" x2="${ph.toFixed(1)}" y2="${k2 > 0.05 ? 336 : 180}" stroke="#ffffff" stroke-width="3" opacity="0.8"/>`);
+  // the ladder: each speed, and the drop that hits as hard (bars on a log scale, 5 cm … 5 km); your window's height
+  static ladderSvg(keys, hot, u) {
+    const w = 380, h = 676, rows = SA_SPEEDS.filter((x) => keys.includes(x.k)), x0 = 24, bx = 24, bw = w - 48, lg = (m) => (Math.log10(m) - Math.log10(0.05)) / (Math.log10(5000) - Math.log10(0.05));
+    let body = `${SaHud.plate(0.62, w, h)}<text x="${x0}" y="44" class="sm" style="font-size:25px;fill:#f6efe2">STOPPED DEAD FROM…</text><text x="${x0}" y="74" class="sm" style="font-size:22px">…LIKE FALLING FLAT FROM</text>`;
+    const top = 104, rh = Math.min(62, (h - top - 30) / Math.max(rows.length, 1));
+    rows.forEach((r, i) => {
+      const y = top + i * rh, isHot = r.k === hot, grow = isHot ? MathX.smooth(u, 0.2, 1.1) : 1, bl = Math.max(6, bw * lg(Math.max(0.05, r.h)) * grow);
+      body += `<text x="${x0}" y="${y + 24}" class="sm" style="font-size:23px;fill:${isHot ? '#ffffff' : '#c8c2b6'}">${r.l} <tspan style="fill:${isHot ? '#ffcf8a' : '#c8c2b6'}">${r.kmh === 10.8 ? '3 m/s' : r.kmh.toLocaleString('en-US') + ' km/h'}</tspan></text>
+        <rect x="${bx}" y="${y + 33}" width="${bl.toFixed(1)}" height="14" rx="5" fill="${isHot ? '#ffcf8a' : 'rgba(246,239,226,0.55)'}"/>
+        <text x="${(bx + bl + 8 > w - 90 ? w - 24 : bx + bl + 8).toFixed(1)}" y="${y + 46}" text-anchor="${bx + bl + 8 > w - 90 ? 'end' : 'start'}" class="sm" style="font-size:21px;fill:${isHot ? '#ffffff' : '#c8c2b6'};${bx + bl + 8 > w - 90 ? 'paint-order:stroke;stroke:rgba(6,9,14,0.9);stroke-width:5px' : ''}">${saHt(r.h)}</text>`;
+    });
+    // your kitchen's window, 12 m up (dashed)
+    const wx = bx + bw * lg(12);
+    body += `<line x1="${wx.toFixed(1)}" y1="${top - 6}" x2="${wx.toFixed(1)}" y2="${top + rows.length * rh}" stroke="rgba(159,196,255,0.7)" stroke-width="2" stroke-dasharray="5 6"/><text x="${(wx + 6).toFixed(1)}" y="${h - 16}" class="sm" style="font-size:19px;fill:#9fc4ff">YOUR WINDOW 12 m</text>`;
+    return SaHud.svg(body, w, h);
   }
-  // the height ladder (log scale, 1 km … 150 km): the marks, your apple (and a lost phone)
-  static ladder(u, t, s) {
-    const w = 360, h = 640, top = 60, bot = 590, lg = (x) => Math.log10(Math.max(1000, x)), y = (x) => bot - (lg(x) - 3) / (lg(150000) - 3) * (bot - top);
-    const A = SA_FLY.apple, ha = A(s), shot = saShotAt(t), ph = shot.mode === 'planes' ? SA_FLY.phone0(s) : null;
-    let marks = '';
-    // (Everest sits too close to the airliners on this scale to read: the caption names it)
-    for (const [m, n] of SA_MARKS.slice(2)) marks += `<line x1="70" y1="${y(m).toFixed(1)}" x2="${w - 20}" y2="${y(m).toFixed(1)}" stroke="rgba(255,255,255,${n === 'SPACE' ? 0.75 : 0.35})" stroke-width="${n === 'SPACE' ? 3 : 2}" stroke-dasharray="${n === 'SPACE' ? '' : '6 6'}"/>
-      <text x="${w - 20}" y="${(y(m) - 9).toFixed(1)}" text-anchor="end" class="sm" style="font-size:24px">${n === 'WEATHER BALLOONS' ? 'BALLOONS' : n} <tspan style="fill:#f6efe2">${saHt(m)}</tspan></text>`;
-    const dot = (hh, col, lab) => (hh >= 1000 ? `<circle cx="70" cy="${y(hh).toFixed(1)}" r="12" fill="${col}"/><rect x="90" y="${(y(hh) - 18).toFixed(1)}" width="${w - 102}" height="34" rx="8" fill="rgba(6,9,14,0.92)"/><text x="100" y="${(y(hh) + 9).toFixed(1)}" class="b" style="font-size:26px;fill:${col}">${lab} ${saHt(hh)}</text>` : '');
-    return SaHud.svg(`${SaHud.plate(0.62, w, h)}
-      <text x="24" y="42" class="sm" style="font-size:25px;fill:#f6efe2">HEIGHT ABOVE THE PARK</text>
-      <line x1="70" y1="${top}" x2="70" y2="${bot}" stroke="rgba(255,255,255,0.6)" stroke-width="3"/>
-      ${marks}${dot(ha, '#ffcf8a', 'APPLE')}${ph != null ? dot(ph, '#9fc4ff', 'PHONE') : ''}`, w, h);
+  // a cubic metre of air: what real frozen air is (shrunk 800×), and this air (set where it stood)
+  static cube(u, t) {
+    const k2 = MathX.smooth(t, saC('real', 1) - 0.4, saC('real', 1) + 0.6), k1 = MathX.smooth(u, 0.3, 1.0);
+    const cube = (x, y, s, fill, stroke) => { const d = s * 0.35; return `<path d="M${x} ${y} h${s} v${s} h${-s} z" fill="${fill}" stroke="${stroke}" stroke-width="3"/><path d="M${x} ${y} l${d} ${-d} h${s} l${-d} ${d} z M${x + s} ${y} l${d} ${-d} v${s} l${-d} ${d} z" fill="${fill}" stroke="${stroke}" stroke-width="3" opacity="0.85"/>`; };
+    return SaHud.svg(`${SaHud.plate()}
+      <text x="30" y="56" class="t">1 m³ OF AIR · 1.2 kg</text>
+      ${cube(60, 140, 250, 'rgba(159,196,255,0.08)', 'rgba(159,196,255,0.8)')}
+      <text x="60" y="430" class="sm">AS AIR</text>
+      <g opacity="${(k1 * (1 - k2)).toFixed(3)}">
+        ${cube(500, 340, 31, 'rgba(255,207,138,0.85)', '#ffcf8a')}
+        <text x="440" y="200" class="s">FROZEN, −210 °C</text><text x="440" y="240" class="sm">11 cm ACROSS: 800× SMALLER</text>
+        <line x1="400" y1="300" x2="490" y2="350" stroke="#ffcf8a" stroke-width="3" marker-end="url(#saAh)"/>
+      </g>
+      <g opacity="${k2.toFixed(3)}">
+        ${cube(60, 140, 250, 'rgba(255,207,138,0.22)', '#ffcf8a')}
+        <text x="440" y="200" class="s">THIS AIR</text><text x="440" y="240" class="sm">SET WHERE IT STOOD</text><text x="440" y="275" class="sm">STILL 1 m³, 1.2 kg, 12 °C</text>
+      </g>`);
+  }
+  // the bell's sound: a ring 41 m out from the tower when the air set; at 2:00:03 it splits in two (out and back)
+  static ring(u) {
+    const tw = [200, 250], you = [600, 250], px = (m) => m * (400 / 89), r0 = px(338 * 0.12), k = MathX.clamp((u - 1.6) / 3.2, 0, 1), d = px(48.7) * k;
+    const op = (x) => (x > 0 ? 1 : 0);
+    return SaHud.svg(`${SaHud.plate()}
+      <text x="30" y="56" class="t">FROM ABOVE: THE BELL’S SOUND</text>
+      <rect x="${tw[0] - 16}" y="${tw[1] - 16}" width="32" height="32" fill="#c8c2b6"/><text x="${tw[0]}" y="${tw[1] + 56}" text-anchor="middle" class="sm">TOWER</text>
+      <rect x="${you[0] - 12}" y="${you[1] - 12}" width="24" height="24" fill="#9fc4ff"/><text x="${you[0]}" y="${you[1] + 56}" text-anchor="middle" class="sm" style="fill:#9fc4ff">YOU</text>
+      <circle cx="${tw[0]}" cy="${tw[1]}" r="${r0.toFixed(1)}" fill="none" stroke="#ffcf8a" stroke-width="${(5 - 2.5 * op(k)).toFixed(1)}" stroke-dasharray="${k > 0 ? '' : '10 8'}" opacity="${k > 0 ? 0 : 1}"/>
+      <circle cx="${tw[0]}" cy="${tw[1]}" r="${(r0 + d).toFixed(1)}" fill="none" stroke="#ffcf8a" stroke-width="3" opacity="${op(k)}"/>
+      <circle cx="${tw[0]}" cy="${tw[1]}" r="${Math.max(0, r0 - d).toFixed(1)}" fill="none" stroke="#ffcf8a" stroke-width="3" opacity="${op(k) * (r0 - d > 2 ? 1 : 0)}"/>
+      <text x="30" y="440" class="sm">${k > 0 ? '2:00:03 · HALF GOES ON, HALF GOES BACK' : '2:00:00 · CAUGHT IN THE AIR, 41 m OUT'}</text>`);
   }
 }

@@ -272,7 +272,12 @@ function saBuildStreet(S) {
       for (const dx of [-0.22, 0.22]) saCyl(0.008, 0.008, 1.95, M.chain, dx, -0.975, 0, pv, 4);
       saBox(0.5, 0.04, 0.22, saStd('#222', 0.7), 0, -1.97, 0, pv); T.swings.push({ pv, ph: i * 1.9 }); }
     // a slide (fixed)
-    B.box(0.5, 0.06, 3.2, D.x + 12, 1.0, D.z + 8, M.metal, 0); for (const dz of [-1.5]) B.box(0.6, 2.0, 0.06, D.x + 12, 1.0, D.z + 8 + dz, M.metal2);
+    { const sx = D.x - 5.5, sz = D.z + 8.5;   // (west of the dome, clear of the swings)
+      B.box(0.7, 0.06, 0.7, sx, 1.5, sz, M.metal2, 0);
+      for (const [dx, dz] of [[-0.32, -0.32], [0.32, -0.32], [-0.32, 0.32], [0.32, 0.32]]) B.add(new THREE.CylinderGeometry(0.035, 0.035, 1.5, 8), M.metal2, Geo.matrix(sx + dx, 0.75, sz + dz));
+      B.add(new THREE.BoxGeometry(0.5, 0.05, 3.0), M.metal, Geo.matrix(sx, 0.8, sz + 0.35 + 1.3, 0.5, 0, 0));
+      for (const dx of [-0.25, 0.25]) B.add(new THREE.BoxGeometry(0.04, 0.12, 3.0), M.metal2, Geo.matrix(sx + dx, 0.86, sz + 0.35 + 1.3, 0.5, 0, 0));
+      for (let r = 0; r < 4; r++) B.add(new THREE.CylinderGeometry(0.02, 0.02, 0.6, 6).rotateZ(Math.PI / 2), M.metal, Geo.matrix(sx, 0.3 + r * 0.36, sz - 0.34)); }
   }
   // ------------------------------------------------------------------ trees in the park (rooted: they bend and hold); their leaves (below)
   T.trees = [];

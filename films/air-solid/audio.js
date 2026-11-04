@@ -1,5 +1,5 @@
 /* =====================================================================
-   AUDIO — "What if everything you dropped fell up for 10 minutes?" js/audio/audioEngine.js is unchanged (this is a
+   AUDIO — "What if air became solid for 3 seconds?" js/audio/audioEngine.js is unchanged (this is a
    subclass); the SAP and generators come from audiokit.js (via the Friction 10s film). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
      music  an original score: a theme that climbs every time something falls up; the pulse that speeds up with the
@@ -64,10 +64,10 @@ function saLimit(buf, ceilDb) {
 class SaAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'air-solid-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
-    const consts = { SAP, SA_ROOM, SA_ST, SA_CLOCK, SA_SHOTS, SA_HELD, SA_CATP, SA_CAT_LAND, SA_RUN, SA_DOGP, SA_CLUTTER, SA_CH, SA_THEME, SA_BOUNCE, SA_TAP, SA_CDM, fly: Object.entries(SA_FLY).map(([k, f]) => [k, f.s0, f.sLand, f.hTop]) };
+    const consts = { SAP, SA_ROOM, SA_ST, SA_CLOCK, SA_SHOTS, SA_CATP, SA_BELL, SA_SPEEDS, SA_JUG, SA_YOU, SA_CAR, SA_BIKE, SA_RUNP, SA_BALL, SA_FRIS, SA_TRAFFIC, SA_CP, SA_SWING, SA_CH: window.SA_CH || null, SA_THEME: window.SA_THEME || null };
     return [SA, SAT, window.SA_MIX, Object.values(SAX).map(String).join(''), SaFx.toString(), Object.getOwnPropertyNames(SaFx.prototype).map((k) => String(SaFx.prototype[k])).join(''),
       Object.values(SA_SOUND).flat().map((b) => b.name + b.fn).join(''), saDynDb.toString(), SaAudio.toString(), saLimit.toString(), saStoryAt.toString(), consts,
-      (window.SA_SOUND_FNS || SA_SOUND_FNS || []).map(String).join(''), [saShotAt, saFlight, saHop, saDropBack, saWaterH, saCatState, saKettleAt, saRunner, saDogState, saMusicKit, saPulse, saRestY, saOverTable, saSm, saDropBounce, saShot, saCdMach, saMach, saClear].map(String).join('')];
+      (window.SA_SOUND_FNS || SA_SOUND_FNS || []).map(String).join(''), [saShotAt, saCatState, saStreamFall, saGlassLevel, saBikeState, saSwingTh, saTip, saDropFrom, saSm, saShot, saFilmAt, saRateAt].map(String).join('')];
   }
   // AudioEngine's fingerprint, with every number rounded to 7 significant digits: browsers' Math.exp/sin/acosh… can
   // differ in the last bit (Safari, Firefox), and then the baked copy was refused and the whole soundtrack rendered

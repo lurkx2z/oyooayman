@@ -23,7 +23,7 @@ const SA = {};
 SA.title = [-0.4, saE('title') + 0.25];
 SA.end = SAT.duration;
 SA.tLock = 2.85;                                         // ★ (film) the air sets (s = 0), just before the title goes
-SA.sJump = -0.36;                                        // your cat leaves the counter
+SA.sJump = -0.30;                                        // your cat leaves the table
 SA.sCount = 2.0;                                         // "One second left."
 SA.sR0 = 2.98;                                           // (the release shot starts a moment before 2:00:03)
 SA.sFall = 3.34;                                         // the park, in slow motion
@@ -36,7 +36,7 @@ const SA_CLOCK = (() => {
   const B = saB, c = saC;
   const S = [
     [-2, -1.72 - 2, 'real'],
-    [1.4, 'cont', ['to', 0]],                                          // the cat jumps: slow motion into the lock
+    [1.0, 'cont', ['to', 0]],                                          // the cat jumps: slow motion into the lock
     [SA.tLock, 0, ['to', SA.sCount]],                                  // ★ 2:00:00.000 → 2:00:02: three and a half minutes
     [B('count'), SA.sCount, ['to', SA.sR0]],                           // the last second (×0.1)
     [SA.tRel, SA.sR0, ['to', SA.sFall]],                               // home: the air lets go (×0.05)

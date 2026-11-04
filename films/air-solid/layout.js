@@ -57,8 +57,8 @@ const SA_ST = {
   plane: { x: -9.0, z: -19.2, h: 15, branch: [[-9.0, 2.6, -19.2], [-8.0, 3.0, -17.6], [-6.6, 3.3, -16.0], [-5.0, 3.45, -15.1], [-3.4, 3.7, -14.6]] },
   path: { z: -15.5 },
   flag: { x: -13.5, z: -13.6, h: 7.2, w: 1.5, ht: 1.0 },  // a flagpole by the park gate (the flag flies east, −x, in the westerly breeze)
-  mainRoad: { z: [-121, -113] },                           // the main road past the far side of the park
-  smoke: [[-28, -150], [22, -176]],                        // after 2:00:03: where the smoke rises (beyond the main road)
+  mainRoad: { x: [76, 84] },                               // the main road along the park's east side (the church beyond it)
+  smoke: [[-12, 10.25, -108], [18, 10.25, -108], [-52, 10.25, -108]],   // chimneys smoking on the terrace across the park
   bodies: [],
 };
 {

@@ -171,12 +171,12 @@ function saBuildRoom(S) {
     saMesh(saRoundBox(tb.w, 0.04, tb.d, 0.015, 0.008), M.wood, tb.x, t - 0.04, tb.z, room);
     for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) saBox(0.05, t - 0.04, 0.05, M.woodD, tb.x + dx * (tb.w / 2 - 0.08), (t - 0.04) / 2, tb.z + dz * (tb.d / 2 - 0.08), room);
     // a runner and a jug of flowers at the far end
-    saBox(0.36, 0.003, tb.d - 0.1, saStd('#c9b99a', 0.95), tb.x - 0.45, t + 0.0015, tb.z, room);
-    saCyl(0.045, 0.055, 0.16, M.ceramicB, tb.x - 0.45, t + 0.08, tb.z - 0.1, room, 14);
-    for (let k = 0; k < 6; k++) { const a = k * 1.05; saMesh(new THREE.SphereGeometry(0.025, 8, 6), saStd(k % 2 ? '#e8c24a' : '#f2efe6', 0.7), tb.x - 0.45 + Math.cos(a) * 0.05, t + 0.25 + 0.03 * (k % 2), tb.z - 0.1 + Math.sin(a) * 0.05, room); }
+    saBox(0.36, 0.003, tb.d - 0.1, saStd('#c9b99a', 0.95), tb.x + 0.45, t + 0.0015, tb.z, room);
+    saCyl(0.045, 0.055, 0.16, M.ceramicB, tb.x + 0.5, t + 0.08, tb.z - 0.22, room, 14);
+    for (let k = 0; k < 6; k++) { const a = k * 1.05; saMesh(new THREE.SphereGeometry(0.025, 8, 6), saStd(k % 2 ? '#e8c24a' : '#f2efe6', 0.7), tb.x + 0.5 + Math.cos(a) * 0.05, t + 0.25 + 0.03 * (k % 2), tb.z - 0.22 + Math.sin(a) * 0.05, room); }
     // your mug of tea, a bowl of grapes
-    saCyl(0.11, 0.05, 0.06, M.ceramic, tb.x + 0.35, t + 0.03, tb.z + 0.05, room, 20);
-    for (let k = 0; k < 9; k++) saMesh(new THREE.SphereGeometry(0.012, 10, 8).scale(1, 1.15, 1), M.grape, tb.x + 0.35 + 0.035 * Math.cos(k * 2.4) * (k % 3 ? 1 : 0.4), t + 0.06 + 0.012 * (k % 3), tb.z + 0.05 + 0.035 * Math.sin(k * 2.4) * (k % 3 ? 1 : 0.4), room);
+    saCyl(0.11, 0.05, 0.06, M.ceramic, tb.x + 0.42, t + 0.03, tb.z + 0.12, room, 20);
+    for (let k = 0; k < 9; k++) saMesh(new THREE.SphereGeometry(0.012, 10, 8).scale(1, 1.15, 1), M.grape, tb.x + 0.42 + 0.035 * Math.cos(k * 2.4) * (k % 3 ? 1 : 0.4), t + 0.06 + 0.012 * (k % 3), tb.z + 0.12 + 0.035 * Math.sin(k * 2.4) * (k % 3 ? 1 : 0.4), room);
     const chair = (x, z, ry) => { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; room.add(g);
       saMesh(saRoundBox(0.42, 0.035, 0.42, 0.02, 0.01), M.wood, 0, 0.44, 0, g);
       for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) saBox(0.035, 0.44, 0.035, M.woodD, dx * 0.18, 0.22, dz * 0.18, g);

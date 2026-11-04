@@ -1,5 +1,5 @@
 /* =====================================================================
-   FILM — "What if days kept getting shorter and couldn't stop?"
+   FILM — "What if air became solid for 3 seconds?"
      build(app)    every set (each its own THREE.Scene + camera), the HUD, the soundtrack
      update(app,t) the shot's set and camera (shots.js), the HUD (hud.js)
      view(app,t)   [the shot's scene, its camera]
@@ -73,5 +73,5 @@ const FILM = {
     // the end: no fade-out and no black (nothing signals the end): the film stops on the question, mid-shot
   },
 
-  debug(app, t) { const s = FILM._shot, st = saStoryAt(t), c = saClockParts(st); return `shot ${s ? s.id : '-'} · mode ${s ? s.mode : '-'} · ${c.day} ${c.h}:${String(c.m).padStart(2, '0')}:${String(c.sec).padStart(2, '0')} ${c.pm ? 'PM' : 'AM'} · s ${st.toFixed(1)} · ×${saRateAt(t).toFixed(1)} · day ${(saDay(st) / 60).toFixed(1)} min · down ${saTiltDeg(st).toFixed(2)}°`; },
+  debug(app, t) { const s = FILM._shot, st = saStoryAt(t), c = saClockParts(st); return `shot ${s ? s.id : '-'} · mode ${s ? s.mode : '-'} · ${c.day} ${c.h}:${String(c.m).padStart(2, '0')}:${String(c.sec).padStart(2, '0')} ${c.pm ? 'PM' : 'AM'} · s ${st.toFixed(4)} · ×${saRateAt(t).toFixed(4)} · ms ${c.ms} · air ${saLocked(st) ? 'SOLID' : 'air'}`; },
 };
