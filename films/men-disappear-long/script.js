@@ -43,7 +43,7 @@ const MG_CLOCK = (() => {
     [B('cars'), 8.1, 'to'],                               // the cars all round stop themselves, or drift
     [B('radio'), 15.5, 'real'],                           // from here: real speed
     [B('smoke'), MG_AT(7, 51, 2), 'real'],                // 7:51
-    [B('ward'), MG_AT(8, 3, 52), 'real'],                 // 8:04: the boy is born on the third caption
+    [B('ward'), MG_AT(8, 3, 59.6), 'real'],               // 8:04: the boy is born on the third caption, at 8:04:13
     [B('walk'), MG_AT(9, 10, 2), 'real'],                 // 9:10
     [B('alert'), MG_AT(9, 31, 2), 'real'],                // 9:31
     [B('hold'), MG_AT(9, 47, 2), 'real'],                 // 9:47

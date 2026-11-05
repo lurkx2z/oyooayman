@@ -52,7 +52,7 @@ status: voiceless
 
 [alert] 9:31 AM. An emergency alert finally gets through. / It's from a deputy minister. Her boss, and his boss, are gone. / In 166 of 193 countries, the top leaders were all men.
 
-[hold] 9:47 AM. Flight 2207 is circling the airport, with 1 hour 15 minutes of fuel left.
+[hold] 9:47 AM. Flight 2207 is circling the airport, with 1 hour 17 minutes of fuel left.
 
 [many] 24 planes are circling now. / Talking one pilot-less plane down takes about 15 minutes. / The last would land in 6 hours. Most have 2.
 

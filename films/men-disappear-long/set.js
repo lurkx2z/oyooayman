@@ -106,7 +106,7 @@ MG_SETS.world = (app) => {
   const TOWER = new Set(['towerIn', 'radar', 'ctl', 'towerRead', 'finalTower']);
 
   const set = {
-    scene, camera: cam, S, ground, river, trees, town, sky, V, AP, RL, BG, YC, LR, TR, DP, A, IN, PAX, att, others, fx, smoke, hands, myPhone, MYP,
+    scene, camera: cam, S, ground, river, trees, town, sky, V, AP, RL, BG, YC, LR, TR, DP, A, IN, PAX, att, attHs, others, fx, smoke, sparkL, hands, myPhone, MYP,
     cuts() { return []; },
     frame(t, shot) {
       const m = shot.mode, s = mgStoryAt(t), kk = MathX.clamp((t - shot.t0) / (shot.t1 - shot.t0), 0, 1);
@@ -118,6 +118,7 @@ MG_SETS.world = (app) => {
       const q = mgPlaneAt(s), gear = s < MG.sFlap ? 0 : mgGearAt(s);
       A.position.set(q.p[0], q.p[1], q.p[2]); A.rotation.set(q.roll, Math.PI / 2 - q.h, q.pitch); A.updateMatrixWorld(true);
       A.update(s, { gear, lights: s > MG.sFlap - 20 });
+      if (PLANE_IN.has(m)) A.glow.visible = false;                     // (its 14 m glow sprite would wash the cockpit's view)
       this._plane = q;
       IN.visible = PLANE_IN.has(m); if (IN.visible) this.cabin(s, t, m);
       AP.update(s, { radar: TOWER.has(m) && (m === 'radar' || m === 'towerIn' || m === 'ctl' || m === 'towerRead') });
@@ -311,7 +312,7 @@ function mgWorldCam(set, m, s, t, k, v) {
   set.YC.car.updateMatrixWorld(true); set.LR.G.updateMatrixWorld(true);
   switch (m) {
     // ---- 7:42:00: in the car (you sit on the right; your dad drives)
-    case 'title': inCar(into(eye, [eye[0] + 0.02, eye[1] + 0.005, eye[2] - 0.02]), [1.2, 1.0, -0.36], 64); break;
+    case 'title': inCar(into([eye[0] - 0.1, eye[1] + 0.01, eye[2] + 0.1], [eye[0] - 0.08, eye[1] + 0.015, eye[2] + 0.08]), [0.42, 1.08, -0.62], 62); break;   // (your dad on the left, the road on the right)
     case 'empty': inCar(into([eye[0], eye[1] - 0.02, eye[2] - 0.04], [eye[0] + 0.04, eye[1] - 0.05, eye[2] - 0.1]), [0.2, 0.74, -0.32], 56); break;
     case 'ext1': v.p = into([cx - 150, Y + 40, 150], [cx - 120, Y + 36, 132]); v.at = [cx + 30, Y - 4, 0]; v.fov = 42; v.near = 1; v.sh = [cx, Y, 0]; v.shR = 120; break;
     case 'cluster': inCar(into([0.0, 1.13, 0.1], [0.04, 1.12, 0.05]), [0.8, 0.93, -0.38], 36); break;
@@ -329,27 +330,27 @@ function mgWorldCam(set, m, s, t, k, v) {
     // ---- real speed: the radio, the gantry, his phone
     case 'radio': inCar(into([0.0, 1.12, 0.28], [0.03, 1.1, 0.24]), [0.708, 0.72, 0.0], 40); break;
     case 'gantry': v.p = into([262, Y + 1.7, 13.4], [266, Y + 1.75, 13.2]); v.at = [330, Y + 5.6, 6]; v.fov = 50; v.near = 0.2; v.sh = [300, Y, 6]; v.shR = 50; break;
-    case 'phone': inCar(into([0.02, 1.06, 0.06], [0.06, 1.02, 0.0]), [0.86, 0.31, -0.46], 42); break;
+    case 'phone': { const ph = YC.phone.position; inCar(into([ph.x - 0.42, ph.y + 0.62, ph.z + 0.36], [ph.x - 0.36, ph.y + 0.55, ph.z + 0.3]), [ph.x, ph.y, ph.z], 38); break; }
     // ---- the train, the barge
     case 'trainHigh': { const f = P.trainZ(s); v.p = into([152, Y + 1.55, -17.6], [151, Y + 1.5, -17.6]); v.at = [MG_V.railX, MG_RAIL.y + 2, f - 30]; v.fov = 34; v.near = 0.3; v.sh = [MG_V.railX, 0, f - 40]; v.shR = 70; break; }
-    case 'trainCab': { const f = P.trainZ(s); v.p = [MG_V.railX + 3.6, MG_RAIL.y + 3.35, f - 1.25]; v.at = [MG_V.railX - 0.5, MG_RAIL.y + 2.55, f - 1.8]; v.fov = 44; v.near = 0.1; v.sh = [MG_V.railX, 0, f - 3]; v.shR = 14; v.drift = 0.006; break; }
+    case 'trainCab': { const f = P.trainZ(s); v.p = into([MG_V.railX + 2.3, MG_RAIL.y + 3.05, f - 0.9], [MG_V.railX + 2.0, MG_RAIL.y + 3.0, f - 1.05]); v.at = [MG_V.railX - 0.5, MG_RAIL.y + 2.4, f - 1.5]; v.fov = 50; v.near = 0.1; v.sh = [MG_V.railX, 0, f - 3]; v.shR = 14; v.drift = 0.006; break; }
     case 'barge': { const b = P.bargeBow(s); v.p = into([22, Y + 1.55, 17.6], [21, Y + 1.5, 17.6]); v.at = [10, -1, b - 18]; v.fov = 40; v.near = 0.3; v.sh = [14, 0, b - 40]; v.shR = 70; break; }
     case 'bargeHit': { const b = P.bargeBow(s), x0 = 64, z0 = 478; v.p = [x0, gy(x0, z0) + 1.7, z0]; v.at = [12, 0.5, Math.min(b, 440) - 12]; v.fov = 46; v.near = 0.3; v.sh = [20, 0, 420]; v.shR = 60; v.drift = 0.01; break; }
     // ---- flight 2207 at 11,000 m (7:43)
-    case 'skyUp': { const q = set._plane; v.p = [cx + 4, Y + 1.6, 10.5]; v.at = [q.p[0] + 400, q.p[1], q.p[2] + 900]; v.fov = 16; v.near = 0.5; v.far = 60000; v.drift = 0.003; v.fogD = 0.00003; v.sh = [cx, Y, 8]; v.shR = 40; break; }
+    case 'skyUp': { const q = set._plane; v.p = [cx + 4, Y + 1.6, 10.5]; v.at = [q.p[0] + 120, q.p[1], q.p[2] + 260]; v.fov = mgLerp(34, 7, Ease.inOutSine(MathX.clamp(k * 1.6 - 0.2, 0, 1))); v.near = 0.5; v.far = 60000; v.drift = 0.003; v.fogD = 0.00003; v.sh = [cx, Y, 8]; v.shR = 40; break; }
     case 'cockpit': inPlane([13.25, fy + 1.32, 0.0], [16.2, fy + 1.05, 0.0], 64); break;
     case 'planeExt': v.p = AL(into([-34, 7, 30], [-30, 6, 27])); v.at = AL([4, 0, 0]); v.fov = 40; v.near = 0.5; v.far = 60000; v.fogD = 0.00003; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.05; break;
     case 'planeMap': v.p = AL(into([16, -12, -40], [12, -11, -36])); v.at = AL([-6, 0, 0]); v.fov = 44; v.near = 0.5; v.far = 60000; v.fogD = 0.00003; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.05; break;
     case 'cabinAisle': inPlane([-7.5, fy + 1.55, 0.05], [12.6, fy + 1.25, -0.1], 46); break;
-    case 'keypad': inPlane(into([11.35, fy + 1.55, -0.05], [11.45, fy + 1.52, -0.12]), [12.42, fy + 1.25, -0.7], 40); break;
+    case 'keypad': inPlane(into([11.4, fy + 1.62, -1.22], [11.55, fy + 1.6, -1.18]), [12.35, fy + 1.32, -0.5], 46); break;
     case 'cabinPax': inPlane(into([11.6, fy + 1.62, 0.2], [11.4, fy + 1.6, 0.15]), [-12, fy + 0.75, -0.3], 52); break;
     case 'doorWait': inPlane(into([10.9, fy + 1.5, 0.95], [11.1, fy + 1.5, 0.9]), [12.3, fy + 1.45, -0.4], 42); break;
     case 'cockpitDoor': inPlane([15.55, fy + 1.4, 0.5], [12.5, fy + 1.15, -0.35], 60); break;
     case 'fuel': inPlane(into([14.45, fy + 1.32, -0.1], [14.6, fy + 1.25, -0.05]), [15.665, fy + 0.86, 0.15], 30); break;
-    case 'cabinHalf': inPlane(into([11.75, fy + 1.78, -0.15], [11.6, fy + 1.76, -0.1]), [-14, fy + 0.65, 0.3], 50); break;
+    case 'cabinHalf': inPlane(into([10.6, fy + 1.86, 0.55], [10.2, fy + 1.84, 0.5]), [3.0, fy + 0.35, -0.7], 52); break;
     // ---- the tower
     case 'towerExt': v.p = into([900, 1.8, 2905], [905, 2.0, 2910]); v.at = [T[0], H + 1, T[2]]; v.fov = 46; v.near = 0.3; v.sh = [T[0], 20, T[2]]; v.shR = 60; break;
-    case 'towerIn': v.p = into([T[0] - 4.3, H + 1.72, T[2] + 2.4], [T[0] - 4.0, H + 1.7, T[2] + 2.0]); v.at = [T[0] + 3, H + 0.85, T[2] - 1.6]; v.fov = 66; v.near = 0.1; v.sh = [T[0], H, T[2]]; v.shR = 10; v.drift = 0.006; break;
+    case 'towerIn': v.p = into([T[0] + 3.4, H + 1.78, T[2] + 1.0], [T[0] + 3.0, H + 1.74, T[2] + 0.7]); v.at = [T[0] - 4.0, H + 1.0, T[2] - 0.3]; v.fov = 58; v.near = 0.1; v.sh = [T[0], H, T[2]]; v.shR = 10; v.drift = 0.006; break;
     // ---- the town (7:51), the hospital (8:04)
     case 'town': v.p = into([-236, Y + 1.6, 17.8], [-240, Y + 1.62, 17.8]); v.at = [-900, 28, 1100]; v.fov = 46; v.near = 0.3; v.sh = [-600, 0, 700]; v.shR = 500; break;
     case 'house': { const f = set.town.fires[0]; v.p = into([f.x + 34, gy(f.x + 34, f.z + 26) + 1.7, f.z + 26], [f.x + 32, gy(f.x + 32, f.z + 24) + 1.7, f.z + 24]); v.at = [f.x, f.y + 4, f.z]; v.fov = 48; v.near = 0.3; v.sh = [f.x, f.y, f.z]; v.shR = 60; break; }
@@ -367,15 +368,15 @@ function mgWorldCam(set, m, s, t, k, v) {
     case 'ctl': { const p = set.AP.ctl[0], d = p.desk, hd = [d.cxp, H + 1.25, d.czp]; v.p = [hd[0] + d.dx * 0.9 - d.dz * 0.9, H + 1.45, hd[2] + d.dz * 0.9 + d.dx * 0.9]; v.at = hd; v.fov = 40; v.near = 0.05; v.sh = [T[0], H, T[2]]; v.shR = 10; v.drift = 0.004; break; }
     case 'stack': v.p = into([cx + 4, Y + 1.6, -14], [cx + 4, Y + 1.6, -14]); v.at = into([700, 2400, -7000], [500, 2600, -7600]); v.fov = 54; v.near = 0.5; v.far = 50000; v.fogD = 0.00006; v.sh = [cx, Y, -10]; v.shR = 40; break;
     // ---- 10:14: the autoland
-    case 'cockpitApp': inPlane([13.65, fy + 1.45, 0.5], [16.6, fy + 1.15, -0.45], 60); break;
-    case 'flaps': inPlane(into([14.75, fy + 1.25, 0.3], [14.7, fy + 1.2, 0.25]), [15.0, fy + 0.8, 0.0], 36); break;
+    case 'cockpitApp': inPlane(into([14.0, fy + 1.3, 0.78], [14.1, fy + 1.28, 0.72]), [14.75, fy + 1.0, -0.6], 54); break;
+    case 'flaps': inPlane(into([14.45, fy + 1.42, 0.42], [14.5, fy + 1.38, 0.36]), [15.05, fy + 0.86, -0.02], 40); break;
     case 'towerRead': { const p = set.AP.ctl[0], d = p.desk; v.p = [d.cxp - d.dx * 0.9, H + 1.6, d.czp - d.dz * 0.9]; v.at = [d.cxp + d.dx * 6, H + 1.2, d.czp + d.dz * 6]; v.fov = 56; v.near = 0.05; v.sh = [T[0], H, T[2]]; v.shR = 10; v.drift = 0.005; break; }
     case 'land3': inPlane(into([15.05, fy + 0.98, -0.9], [15.15, fy + 0.95, -0.91]), [15.665, fy + 0.86, -0.92], 26); break;
     // ---- 10:21: the landing
-    case 'finalVia': { const q = set._plane; v.p = [R.x - 26, Y + 1.6, 12.6]; v.at = [q.p[0], q.p[1], q.p[2]]; v.fov = 54; v.near = 0.3; v.sh = [R.x - 20, Y, 8]; v.shR = 40; v.drift = 0.008; break; }
+    case 'finalVia': { const q = set._plane, c0 = [R.x - 30, Y + 1.55, 13.4], el = Math.min(Math.atan2(q.p[1] - c0[1], Math.max(1, c0[2] - q.p[2])), 0.62); v.p = c0; v.at = [R.x - 30 + 12 * Math.cos(el) * 0.1, c0[1] + 100 * Math.sin(el), c0[2] - 100 * Math.cos(el)]; v.fov = 58; v.near = 0.3; v.sh = [R.x - 20, Y, 8]; v.shR = 40; v.drift = 0.008; break; }
     case 'finalCock': inPlane([13.95, fy + 1.5, -0.12], [24, fy + 0.6, 0], 62); break;
-    case 'finalTower': { const q = set._plane; v.p = [T[0] - 5.2, H + 1.75, T[2] - 3.2]; v.at = [q.p[0], q.p[1], q.p[2]]; v.fov = 26; v.near = 0.2; v.sh = [T[0], H, T[2]]; v.shR = 14; v.drift = 0.003; break; }
-    case 'touchdown': { const q = set._plane; v.p = [R.x + 72, 1.6, MG_FL.zTD + 140]; v.at = [q.p[0], q.p[1] + 1, q.p[2]]; v.fov = 32; v.near = 0.5; v.sh = [R.x, 0, MG_FL.zTD + 60]; v.shR = 90; v.drift = 0.004; break; }
+    case 'finalTower': { const q = set._plane; v.p = [T[0] - 0.6, H + 1.72, T[2] + 0.7]; v.at = mgV([T[0] - 2.8, H + 1.2, T[2] - 1.9], [q.p[0], q.p[1], q.p[2]], 0.5 + 0.5 * Ease.inOutSine(MathX.clamp(k * 2, 0, 1))); v.fov = 38; v.near = 0.2; v.sh = [T[0], H, T[2]]; v.shR = 14; v.drift = 0.003; break; }
+    case 'touchdown': { const q = set._plane; v.p = [R.x + 46, 1.5, MG_FL.zTD + 70]; v.at = [q.p[0], q.p[1] + 1.5, q.p[2]]; v.fov = 34; v.near = 0.5; v.sh = [R.x, 0, MG_FL.zTD + 60]; v.shR = 90; v.drift = 0.004; break; }
     case 'question': v.p = into([R.x - 24, Y + 1.5, 12.4], [R.x - 24, Y + 1.5, 12.4]); v.at = into([R.x - 80, Y + 300, -900], [R.x - 120, Y + 1400, -3000]); v.fov = 56; v.near = 0.3; v.far = 50000; v.fogD = 0.00008; v.sh = [R.x, Y, 8]; v.shR = 40; v.drift = 0.004; break;
   }
   void lx; void into;

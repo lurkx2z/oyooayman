@@ -32,18 +32,27 @@ function mgRoadCanvas() {
 function mgJerseyShape(h = 0.9) { const s = new THREE.Shape(); s.moveTo(-0.3, -0.02); s.lineTo(0.3, -0.02); s.lineTo(0.27, 0.08); s.lineTo(0.12, 0.32); s.lineTo(0.09, h); s.lineTo(-0.09, h); s.lineTo(-0.12, 0.32); s.lineTo(-0.27, 0.08); s.closePath(); return s; }
 // extrude a cross-section shape (drawn in z, y) along x from x0 to x1
 function mgAlongX(shape, x0, x1) { const g = new THREE.ExtrudeGeometry(shape, { depth: x1 - x0, bevelEnabled: false }); g.rotateY(Math.PI / 2); g.translate(x0, 0, 0); g.computeVertexNormals(); return g; }
+// long things are built in pieces (≤ 60 m): a single triangle kilometres long loses its depth precision where it passes
+// the camera, and a rail 8 km long was drawn over the inside of your car (stills, 5 November 2026)
+const MG_SEG = 60;
+function mgSegs(a, b, L = MG_SEG) { const n = Math.max(1, Math.ceil((b - a) / L)), out = []; for (let i = 0; i < n; i++) out.push([a + (b - a) * i / n, a + (b - a) * (i + 1) / n]); return out; }
+function mgAlongXSeg(B, shape, x0, x1, mat, y = 0, z = 0) { for (const [a, b] of mgSegs(x0, x1)) B.add(mgAlongX(shape, a, b).translate(0, y, z), mat); }
+function mgBoxX(B, x0, x1, h, d, mat, y, z) { for (const [a, b] of mgSegs(x0, x1)) B.box(b - a, h, d, mat, (a + b) / 2, y, z); }
+function mgBoxZ(B, z0, z1, w, h, mat, x, y) { for (const [a, b] of mgSegs(z0, z1)) B.box(w, h, b - a, mat, x, y, (a + b) / 2); }
 
 function mgBuildViaduct(S) {
   const Y = MG_V.deckY, X0 = MG_V.vx[0], X1 = MG_V.vx[1], E0 = X0 - 2600, E1 = X1 + 2600, W = MG_V.deckW;
   const conc = mgStd('#b9b5ab', 0.85), concD = mgStd('#9e9a91', 0.9), steel = mgStd('#9aa2a8', 0.45, 0.6), B = mgBatch();
   // ---- the road: a long slab whose top face is the road (polygon offset over the cutting floor)
-  const rt = mgTex(mgRoadCanvas(), { aniso: 8 }); rt.repeat.set((E1 - E0) / MG_ROAD_TILE, 1);
+  // (in pieces of 2 road tiles; each piece's top face maps the road texture twice)
+  const SL = 2 * MG_ROAD_TILE, rt = mgTex(mgRoadCanvas(), { aniso: 8 }); rt.repeat.set(SL / MG_ROAD_TILE, 1);
   const roadM = new THREE.MeshStandardMaterial({ map: rt, roughness: 0.82, metalness: 0, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -4 });
-  const slab = new THREE.Mesh(new THREE.BoxGeometry(E1 - E0, 2.2, 2 * W), [conc, conc, roadM, concD, conc, conc]);
-  slab.position.set((E0 + E1) / 2, Y - 1.1, 0); slab.receiveShadow = true; slab.castShadow = true; S.scene.add(slab);
+  const slab = new THREE.Group(); S.scene.add(slab);
+  { const nS = Math.ceil((E1 - E0) / SL), geo = new THREE.BoxGeometry(SL, 2.2, 2 * W), mats = [conc, conc, roadM, concD, conc, conc];
+    for (let i = 0; i < nS; i++) { const m = new THREE.Mesh(geo, mats); m.position.set(E0 + (i + 0.5) * SL, Y - 1.1, 0); m.receiveShadow = true; m.castShadow = true; slab.add(m); } }
   // ---- the box girder under the viaduct (a trapezoid), the cantilevers' edge beams
   { const s = new THREE.Shape(); s.moveTo(-8.5, -0.02); s.lineTo(8.5, -0.02); s.lineTo(6.2, -3.1); s.lineTo(-6.2, -3.1); s.closePath();
-    const g = mgAlongX(s, X0 - 2, X1 + 2); g.translate(0, Y - 2.15, 0); B.add(g, concD); }
+    mgAlongXSeg(B, s, X0 - 2, X1 + 2, concD, Y - 2.15, 0); }
   // ---- the piers: twin columns, a cap; standing on the ground (or in the river)
   const piers = [];
   for (let x = X0 + 40; x < X1 - 20; x += MG_V.pierEvery) {
@@ -53,10 +62,10 @@ function mgBuildViaduct(S) {
     B.box(3.4, 1.4, 15.0, conc, x, top - 0.1, 0); piers.push(x);
   }
   // ---- the central barrier (concrete, jersey profile) and the parapets (a concrete upstand with a steel rail on posts)
-  B.add(mgAlongX(mgJerseyShape(0.9), E0, E1).translate(0, Y, 0), conc);
+  mgAlongXSeg(B, mgJerseyShape(0.9), E0, E1, conc, Y, 0);
   for (const sd of [-1, 1]) {
-    B.box(E1 - E0, 0.62, 0.42, conc, (E0 + E1) / 2, Y + 0.29, sd * (W - 0.21));
-    for (const yy of [0.98, 1.22]) B.box(E1 - E0, 0.1, 0.07, steel, (E0 + E1) / 2, Y + yy, sd * (W - 0.18));
+    mgBoxX(B, E0, E1, 0.62, 0.42, conc, Y + 0.29, sd * (W - 0.21));
+    for (const yy of [0.98, 1.22]) mgBoxX(B, E0, E1, 0.1, 0.07, steel, Y + yy, sd * (W - 0.18));
   }
   { const n = Math.floor((E1 - E0) / 2.5) * 2, post = new THREE.InstancedMesh(new THREE.BoxGeometry(0.08, 0.72, 0.1), steel, n), o = new THREE.Object3D(); let i = 0;
     for (let x = E0; x < E1 && i < n; x += 2.5) for (const sd of [-1, 1]) { o.position.set(x, Y + 0.92, sd * (W - 0.2)); o.updateMatrix(); post.setMatrixAt(i++, o.matrix); }

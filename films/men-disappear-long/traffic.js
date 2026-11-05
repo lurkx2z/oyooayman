@@ -91,46 +91,62 @@ function mgBuildYourCar(S) {
   // ---- inside (drawn when you are in it): a cabin of its own (the shared body is a closed solid: from inside its top
   // face at the waistline would hide everything below it), the bonnet and wings seen through the windscreen
   const inn = new THREE.Group(); car.add(inn);
-  const M = { dash: mgStd('#26282c', 0.72), trim: mgStd('#34373c', 0.75), seat: mgStd('#3a3e46', 0.95), liner: mgStd('#bdb8ad', 0.92), carpet: mgStd('#1c1e22', 0.98),
-    paint: mgStd(C.color, 0.32, 0.35, { envMapIntensity: 1.2 }), black: mgStd('#121314', 0.5), chrome: mgStd('#b8bcc0', 0.25, 0.9), mirror: mgStd('#5a6a7a', 0.05, 0.9, { envMapIntensity: 2 }), belt: mgStd('#1f2024', 0.8) };
+  // (fabric and plastic: a faint noise so the big surfaces aren't flat)
+  const grain = (base, k = 10) => mgTex(mgCanvas(128, 128, (g, w, h) => { g.fillStyle = base; g.fillRect(0, 0, w, h); for (let i = 0; i < 2200; i++) { const v = Math.floor(mgR(i, k) * 2) ? 255 : 0; g.fillStyle = `rgba(${v},${v},${v},${0.035 + 0.04 * mgR(i, k + 1)})`; g.fillRect(Math.floor(mgR(i, k + 2) * w), Math.floor(mgR(i, k + 3) * h), 1 + Math.floor(mgR(i, k + 4) * 2), 1); } }), { repeat: true });
+  const M = { dash: mgStd('#ffffff', 0.78, 0, { map: grain('#34373d', 11) }), dashLow: mgStd('#ffffff', 0.8, 0, { map: grain('#5c5f66', 21) }), trim: mgStd('#ffffff', 0.8, 0, { map: grain('#6e7177', 31) }),
+    seat: mgStd('#ffffff', 0.96, 0, { map: grain('#4c525c', 41) }), liner: mgStd('#cdc8bd', 0.94), carpet: mgStd('#26282c', 0.98), visor: mgStd('#b3ad9f', 0.95),
+    paint: mgStd(C.color, 0.32, 0.35, { envMapIntensity: 1.2 }), black: mgStd('#141518', 0.5), chrome: mgStd('#b8bcc0', 0.25, 0.9), mirror: mgStd('#7a8a9a', 0.05, 0.9, { envMapIntensity: 2 }), belt: mgStd('#25262a', 0.8) };
   const B = (w, h, d, m, x, y, z, rz = 0, ry = 0, rx = 0) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); o.rotation.set(rx, ry, rz); o.castShadow = false; o.receiveShadow = true; inn.add(o); return o; };
+  const RB = (w, h, d, r, bv, m, x, y, z, rz = 0) => { const o = new THREE.Mesh(mgRoundBox(w, h, d, r, bv, 3).translate(0, -h / 2, 0), m); o.position.set(x, y, z); o.rotation.z = rz; o.receiveShadow = true; inn.add(o); return o; };
+  // a profile in the car's x–y plane, extruded across the car (z0 → z1)
+  const across = (pts, z0, z1, m) => { const sh = new THREE.Shape(); pts.forEach(([x, y], i) => (i ? sh.lineTo(x, y) : sh.moveTo(x, y))); sh.closePath();
+    const g = new THREE.ExtrudeGeometry(sh, { depth: z1 - z0, bevelEnabled: false, curveSegments: 6 }); g.translate(0, 0, z0); g.computeVertexNormals(); const o = new THREE.Mesh(g, m); o.receiveShadow = true; inn.add(o); return o; };
   B(3.0, 0.06, 1.62, M.carpet, -0.2, 0.27, 0);                                // the floor
   B(0.1, 0.48, 1.6, M.carpet, 1.2, 0.52, 0);                                  // the footwells' front
-  B(0.5, 0.34, 1.6, M.dash, 1.03, 0.8, 0);                                    // the dashboard
-  B(0.48, 0.04, 1.6, M.dash, 1.04, 0.985, 0, -0.06);                          // its top (meets the windscreen's base)
-  B(0.16, 0.075, 0.44, M.dash, 0.86, 1.02, -0.38);                            // the cluster's hood
-  B(0.1, 0.22, 0.36, M.trim, 0.76, 0.72, 0);                                  // the centre stack
-  B(0.96, 0.3, 0.26, M.trim, 0.3, 0.45, 0);                                   // the console between the seats
-  B(0.34, 0.2, 0.26, M.trim, 0.66, 0.66, 0, 0.5);                             // its slope up to the dash
+  // the dashboard: its top sloping down to the windscreen, a rounded lip, the face, the underside
+  { const pr = [[1.31, 0.965], [1.12, 0.99], [0.92, 1.0], [0.86, 0.99], [0.82, 0.965], [0.8, 0.93]];
+    across(pr.concat([[0.8, 0.9], [1.31, 0.9]]), -0.8, 0.8, M.dash);
+    across([[0.8, 0.905], [0.79, 0.86], [0.79, 0.68], [0.86, 0.6], [1.15, 0.56], [1.25, 0.56], [1.25, 0.905]], -0.8, 0.8, M.dashLow); }
+  // the cluster's hood (driver's side), the air vents, the glovebox, the passenger airbag's seam
+  RB(0.2, 0.07, 0.42, 0.06, 0.012, M.dash, 0.87, 1.05, C.wheel[2]);
+  for (const z of [-0.66, -0.1, 0.1, 0.66]) { RB(0.02, 0.06, 0.13, 0.015, 0, M.black, 0.785, 0.865, z); for (let k = 0; k < 3; k++) B(0.012, 0.004, 0.12, M.dashLow, 0.776, 0.85 + k * 0.015, z); }
+  B(0.012, 0.15, 0.42, M.dashLow, 0.784, 0.75, 0.42); B(0.006, 0.006, 0.4, M.black, 0.778, 0.82, 0.42); B(0.006, 0.006, 0.4, M.black, 0.778, 0.68, 0.42);
+  B(0.014, 0.012, 0.08, M.trim, 0.776, 0.76, 0.6);
+  B(0.12, 0.004, 0.42, M.black, 0.9, 1.0, 0.42, -0.02);
+  // the centre stack, the console between the seats, its slope up to the dash
+  RB(0.1, 0.24, 0.34, 0.03, 0.01, M.dash, 0.77, 0.84, 0);
+  RB(0.9, 0.24, 0.26, 0.05, 0.02, M.dashLow, 0.28, 0.6, 0);
+  B(0.34, 0.16, 0.26, M.dashLow, 0.66, 0.64, 0, 0.5);
   B(0.05, 0.022, 0.034, M.black, C.epb[0], C.epb[1] - 0.012, C.epb[2]);        // the parking-brake switch's well
   const epb = B(0.04, 0.018, 0.028, mgStd('#3a3c40', 0.5), C.epb[0], C.epb[1], C.epb[2]);   // the switch (pulled up at the brake)
   { const k = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.07, 12), M.black); k.position.set(C.epb[0] + 0.15, 0.64, 0); inn.add(k); }   // the gear selector
   // the hazard switch (a red triangle on the centre stack)
-  const hz = B(0.012, 0.035, 0.05, new THREE.MeshStandardMaterial({ color: '#7a1a12', emissive: new THREE.Color('#ff3a20'), emissiveIntensity: 0 }), 0.705, 0.84, 0);
-  // the seats: cushion, back (leaning back), headrest; the rear bench
+  const hz = B(0.012, 0.035, 0.05, new THREE.MeshStandardMaterial({ color: '#7a1a12', emissive: new THREE.Color('#ff3a20'), emissiveIntensity: 0 }), 0.718, 0.94, 0);
+  // the seats: a rounded cushion, a back leaning back, a headrest on two posts; the rear bench
   for (const z of [C.seatL[2], C.seatR[2]]) {
-    B(0.52, 0.13, 0.5, M.seat, C.seatL[0] + 0.07, 0.5, z, 0.1);
-    B(0.13, 0.68, 0.52, M.seat, C.seatL[0] - 0.25, 0.87, z, 0.22);
-    B(0.11, 0.2, 0.27, M.seat, C.seatL[0] - 0.36, 1.27, z, 0.12);
-    B(0.04, 0.12, 0.04, M.chrome, C.seatL[0] - 0.33, 1.15, z - 0.07); B(0.04, 0.12, 0.04, M.chrome, C.seatL[0] - 0.33, 1.15, z + 0.07);
+    RB(0.52, 0.14, 0.52, 0.08, 0.03, M.seat, C.seatL[0] + 0.07, 0.505, z, 0.1);
+    RB(0.13, 0.68, 0.52, 0.08, 0.03, M.seat, C.seatL[0] - 0.25, 0.87, z, 0.22);
+    RB(0.11, 0.18, 0.27, 0.06, 0.02, M.seat, C.seatL[0] - 0.36, 1.28, z, 0.12);
+    B(0.015, 0.1, 0.015, M.chrome, C.seatL[0] - 0.33, 1.16, z - 0.07); B(0.015, 0.1, 0.015, M.chrome, C.seatL[0] - 0.33, 1.16, z + 0.07);
   }
-  B(0.52, 0.15, 1.44, M.seat, -0.98, 0.48, 0, 0.08); B(0.13, 0.62, 1.44, M.seat, -1.24, 0.83, 0, 0.22); B(0.06, 0.04, 1.44, M.trim, -1.5, 1.0, 0);
-  // the doors (inner panels, armrests), the outer skins below the windows (seen when you look out and down)
+  RB(0.52, 0.15, 1.44, 0.08, 0.03, M.seat, -0.98, 0.48, 0, 0.08); RB(0.13, 0.62, 1.44, 0.08, 0.03, M.seat, -1.24, 0.83, 0, 0.22); B(0.06, 0.04, 1.44, M.trim, -1.5, 1.0, 0);
+  // the doors (inner panels, armrests, handles), the outer skins below the windows (seen when you look out and down)
   for (const sd of [-1, 1]) {
-    B(2.3, 0.68, 0.06, M.trim, -0.24, 0.64, sd * 0.86); B(0.55, 0.06, 0.09, M.dash, 0.12, 0.72, sd * 0.8); B(2.34, 0.035, 0.12, M.dash, -0.24, 0.985, sd * 0.86);
+    B(2.3, 0.68, 0.06, M.trim, -0.24, 0.64, sd * 0.86); RB(0.55, 0.06, 0.09, 0.03, 0.01, M.dashLow, 0.12, 0.72, sd * 0.8); B(2.34, 0.035, 0.12, M.dash, -0.24, 0.985, sd * 0.86);
+    B(0.1, 0.02, 0.02, M.chrome, 0.42, 0.86, sd * 0.825);
     B(2.6, 0.5, 0.04, M.paint, -0.2, 0.74, sd * 0.93);
     B(0.12, 0.09, 0.22, M.paint, 0.98, 1.04, sd * 1.03); B(0.012, 0.075, 0.19, M.mirror, 0.915, 1.04, sd * 1.03);   // the outside mirrors
   }
-  // the pillars, the roof, the windscreen's header, the rear-view mirror, the sun visors
+  // the pillars, the roof, the windscreen's header, the rear-view mirror, the sun visors (folded up against the roof)
   const [sx0, sy0, sx1, sy1] = C.shield;
   for (const sd of [-1, 1]) {
     mgBeam([sx0, sy0, sd * 0.8], [sx1, sy1, sd * 0.72], 0.08, 0.07, M.trim, inn);
     mgBeam([-0.31, 0.98, sd * 0.85], [-0.36, 1.39, sd * 0.74], 0.07, 0.12, M.trim, inn);
     mgBeam([-1.36, 0.98, sd * 0.84], [-0.86, 1.39, sd * 0.72], 0.08, 0.24, M.trim, inn);
-    B(0.22, 0.016, 0.36, M.liner, 0.6, 1.375, sd * 0.4, 0.15);
+    B(0.2, 0.018, 0.34, M.visor, 0.6, 1.384, sd * 0.4);
   }
-  B(2.12, 0.04, 1.56, M.liner, -0.36, 1.415, 0); B(0.08, 0.06, 1.52, M.trim, sx1 + 0.02, 1.395, 0);
-  B(0.03, 0.07, 0.25, M.mirror, 0.6, 1.3, 0); B(0.05, 0.08, 0.02, M.black, 0.62, 1.35, 0);
+  B(2.12, 0.04, 1.56, M.liner, -0.36, 1.415, 0); B(0.08, 0.05, 1.52, M.trim, sx1 + 0.02, 1.39, 0);
+  RB(0.03, 0.06, 0.24, 0.025, 0, M.black, 0.6, 1.3, 0); B(0.004, 0.048, 0.22, M.mirror, 0.584, 1.3, 0); B(0.03, 0.06, 0.02, M.black, 0.62, 1.36, 0);
   // the bonnet and the wings (seen through the windscreen), the wipers
   B(1.08, 0.05, 1.74, M.paint, 1.84, 0.895, 0, -0.17); for (const sd of [-1, 1]) B(1.05, 0.36, 0.1, M.paint, 1.82, 0.73, sd * 0.88);
   B(0.5, 0.012, 0.025, M.black, 1.36, 1.0, -0.3, 0, 0.12); B(0.5, 0.012, 0.025, M.black, 1.36, 1.0, 0.25, 0, 0.12);
@@ -142,9 +158,11 @@ function mgBuildYourCar(S) {
   // ---- the steering wheel (on its column; it turns by P.wheelTurn)
   const wheelG = new THREE.Group(); wheelG.position.set(...C.wheel); wheelG.rotation.z = -C.wheelTilt; inn.add(wheelG);
   const spin = new THREE.Group(); wheelG.add(spin);
-  { const rim = new THREE.Mesh(new THREE.TorusGeometry(C.wheelR, 0.017, 10, 40), M.black); rim.rotation.y = Math.PI / 2; spin.add(rim);
-    for (const [y, z, h, d] of [[-0.01, -0.1, 0.03, 0.16], [-0.01, 0.1, 0.03, 0.16], [-0.1, 0, 0.13, 0.035]]) { const sp = new THREE.Mesh(new THREE.BoxGeometry(0.02, h, d), M.dash); sp.position.set(0.01, y, z); spin.add(sp); }
-    const hub = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.085, 0.11), M.dash); hub.position.set(0.02, -0.01, 0); spin.add(hub);
+  { const rim = new THREE.Mesh(new THREE.TorusGeometry(C.wheelR, 0.018, 12, 48), M.black); rim.rotation.y = Math.PI / 2; spin.add(rim);
+    // three spokes (9, 3 and 6 o'clock), the airbag hub (a rounded pad), its badge
+    for (const a of [Math.PI / 2, -Math.PI / 2, Math.PI]) { const sp = mgBeam([0.012, 0, 0], [0.004, Math.cos(a) * (C.wheelR - 0.01), Math.sin(a) * (C.wheelR - 0.01)], a === Math.PI ? 0.05 : 0.032, 0.014, M.dash, spin); void sp; }
+    const hub = new THREE.Mesh(mgRoundBox(0.11, 0.035, 0.13, 0.035, 0.012, 3).rotateZ(Math.PI / 2).translate(0.03, -0.012, 0), M.dash); spin.add(hub);
+    const badge = new THREE.Mesh(new THREE.CircleGeometry(0.012, 16), M.chrome); badge.rotation.y = -Math.PI / 2; badge.position.set(-0.0075, -0.012, 0); spin.add(badge);
     const col = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 0.42, 10).rotateZ(Math.PI / 2).translate(0.23, 0, 0), M.dash); wheelG.add(col); }
   // ---- your dad (driving; his right hand on his coffee), his seatbelt
   const dad = mgPerson('mgDad', inn, { id: 'dad' });
@@ -182,7 +200,7 @@ function mgBuildYourCar(S) {
       car.rotation.z = -0.0062 * dec - rock;
       car.position.y = MG_V.deckY - 0.004 * dec;
       ext.group.visible = !o.inside; inn.visible = !!o.inside;
-      fill.intensity = o.inside ? 0.55 : 0;
+      fill.intensity = o.inside ? 1.1 : 0;
       // the wheels roll
       const dist = cx - P.car.x0; for (const w of ext.wheels) w.rotation.z = -dist / ext.r;
       // brake lights, hazards (the emergency brake switches them on), the dash's switch

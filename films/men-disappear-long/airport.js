@@ -69,7 +69,7 @@ function mgBuildAirport(S) {
   const R = MG_V.runway, T = MG_V.tower, B = mgBatch(), AP = {};
   // ---- the runway
   { const L = R.z[1] - R.z[0] + 60, tex = mgTex(mgRunwayCanvas(), { repeat: false, aniso: 16 }); tex.flipY = false; tex.needsUpdate = true;
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(R.w, L), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -8 }));
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(R.w, L, 1, Math.ceil(L / 50)), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -8 }));
     m.rotation.x = -Math.PI / 2; m.position.set(R.x, 0.12, (R.z[0] + R.z[1]) / 2); m.receiveShadow = true; S.scene.add(m);
     // (a plane facing up is drawn with v = 0 at its bottom edge, which after the rotation is its +z end: flip so the map's top row is north)
     const uv = m.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - uv.getY(i)); uv.needsUpdate = true;

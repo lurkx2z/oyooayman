@@ -33,21 +33,20 @@ function mgBuildRail(S) {
   const R = MG_RAIL, X = MG_V.railX, RL = {};
   // ---- the embankment: a trapezoid along z (top 7 m wide at y = R.y, its toes 1.5 m under the valley floor)
   { const s = new THREE.Shape(); s.moveTo(-8.5, -1.6); s.lineTo(8.5, -1.6); s.lineTo(3.5, R.y); s.lineTo(-3.5, R.y); s.closePath();
-    const g = new THREE.ExtrudeGeometry(s, { depth: R.z[1] - R.z[0], bevelEnabled: false }); g.translate(0, 0, R.z[0]); g.translate(X, 0, 0); g.computeVertexNormals();
+    const g = THREE.mergeGeometries(mgSegs(R.z[0], R.z[1]).map(([a, b]) => { const e = new THREE.ExtrudeGeometry(s, { depth: b - a, bevelEnabled: false }); e.translate(X, 0, a); e.computeVertexNormals(); return e.toNonIndexed(); }), false);   // (in pieces: viaduct.js mgSegs)
     // (the top's uv: x across, z along; the side faces: the same texture, darker)
     const tex = mgTex(mgBallastCanvas(), { aniso: 8 }); tex.repeat.set(1, 1);
     const pos = g.attributes.position, uv = g.attributes.uv; for (let i = 0; i < pos.count; i++) uv.setXY(i, (pos.getX(i) - X + 3.5) / 7, pos.getZ(i) / 4.8); uv.needsUpdate = true;
     const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: tex, roughness: 0.97 })); m.receiveShadow = true; S.scene.add(m); RL.bank = m; }
   // ---- the rails (two steel bars just proud of the ballast: 14 cm, no shared plane), the catenary
   const steel = mgStd('#8a8580', 0.35, 0.8), B = mgBatch();
-  for (const sd of [-1, 1]) B.box(0.07, 0.14, R.z[1] - R.z[0], steel, X + sd * R.gauge / 2, R.y + 0.07, (R.z[0] + R.z[1]) / 2);
+  for (const sd of [-1, 1]) mgBoxZ(B, R.z[0], R.z[1], 0.07, 0.14, steel, X + sd * R.gauge / 2, R.y + 0.07);
   const mast = mgStd('#6e7378', 0.5, 0.6);
   for (let z = R.z[0] + 20; z < R.z[1]; z += 50) {
     if (Math.abs(z) < 30) continue;                                                   // (under the viaduct: the wire hangs from its girder)
     B.box(0.28, 7.6, 0.28, mast, X + 3.9, R.y + 3.8, z); B.box(3.6, 0.1, 0.1, mast, X + 2.1, R.y + 6.9, z); B.box(0.06, 0.9, 0.06, mast, X + 0.2, R.y + 6.45, z);
   }
-  B.box(0.03, 0.03, R.z[1] - R.z[0], mgStd('#3a3530', 0.5, 0.7), X + 0.2, R.y + 6.0, (R.z[0] + R.z[1]) / 2);      // the contact wire
-  B.box(0.02, 0.02, R.z[1] - R.z[0], mgStd('#3a3530', 0.5, 0.7), X + 0.2, R.y + 7.05, (R.z[0] + R.z[1]) / 2);     // the catenary above it
+  { const wm = mgStd('#3a3530', 0.5, 0.7); mgBoxZ(B, R.z[0], R.z[1], 0.03, 0.03, wm, X + 0.2, R.y + 6.0); mgBoxZ(B, R.z[0], R.z[1], 0.02, 0.02, wm, X + 0.2, R.y + 7.05); }   // the contact wire, the catenary above it
   B.build(S.scene);
   // ---- the train: four cars (z-local: the front car's nose at +12)
   const T = new THREE.Group(); S.scene.add(T); RL.train = T;
