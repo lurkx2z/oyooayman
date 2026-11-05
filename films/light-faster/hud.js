@@ -232,7 +232,7 @@ class LfHud {
       <text x="30" y="58" class="t">THE DAY SIDE, FROM THE SUN</text>${rays}
       <circle cx="480" cy="235" r="150" fill="#0b1830"/><path d="M480 85 A150 150 0 0 0 480 385 Z" fill="rgba(255,214,150,${gl.toFixed(2)})"/>
       <circle cx="620" cy="190" r="8" fill="#9fc4ff"/><text x="636" y="196" class="sm" style="fill:#9fc4ff">YOU</text>
-      <text x="30" y="440" class="s">${out ? `9:03 · THE OLD LIGHT HAS ARRIVED: ${f >= 1 ? f.toFixed(1) + '×' : lfPct(f)} THE HEAT` : `ARRIVING ${f.toFixed(1)}× AS FAST: ${f.toFixed(1)}× THE HEAT`}</text>`);
+      <text x="30" y="440" class="s">${out ? `AFTER 9:03: ${f >= 1 ? f.toFixed(1) + '×' : lfPct(f)} THE HEAT, AND FALLING` : `ARRIVING ${f.toFixed(1)}× AS FAST: ${f.toFixed(1)}× THE HEAT`}</text>`);
   }
   // green light's wave against your pupil (7 mm): the wave grows as c; past the pupil's width almost none of it gets in
   static wave(u, t, s, k) {

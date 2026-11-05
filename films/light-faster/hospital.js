@@ -158,7 +158,7 @@ LF_SETS.hospital = (app) => {
     scene, camera: cam, cuts() { return []; },
     frame(t, shot) {
       const m = shot.mode, s = lfStoryAt(t), k = LFP.k(s), kk = MathX.clamp((t - shot.t0) / (shot.t1 - shot.t0), 0, 1);
-      this._s = s; this._k = k;
+      this._s = s; this._k = k; this._shot = shot;
       // ---- the light: the mains (with the generators' surges), the battery bulkheads (LEDs)
       const mains = lfHospital(s), em = lfEmerg(s, 0.15);
       for (const p of panels) p.material.color.setScalar(0.06 + 0.94 * mains);
@@ -195,7 +195,7 @@ LF_SETS.hospital = (app) => {
         case 'quench': v.p = into([1.0, 1.62, 6.0], [1.25, 1.6, 5.75], kk); v.at = [3.7, 1.6, 2.3]; v.fov = 52; v.shake = s > LFP.sQuench ? 0.012 * lfSm(s, LFP.sQuench, LFP.sQuench + 0.06) : 0; break;
         case 'gen': v.p = into([31.6, 1.65, 7.2], [31.9, 1.62, 6.9], kk); v.at = [37.2, 1.2, 2.4]; v.fov = 54; break;
         case 'corridor': v.p = into([-2.2, 1.62, 9.7], [-2.6, 1.62, 9.7], kk); v.at = [-20, 1.3, 9.6]; v.fov = 52; break;
-        case 'board': v.p = into([BD[0] + 0.5, 1.5, 9.65], [BD[0] + 0.35, 1.48, 9.45], kk); v.at = [BD[0] - 0.1, BD[1] - 0.05, 8.0]; v.fov = 46; break;
+        case 'board': v.p = into([BD[0] + 0.35, 1.5, 10.85], [BD[0] + 0.2, 1.48, 10.6], kk); v.at = [BD[0] - 0.45, BD[1] - 0.3, 8.0]; v.fov = 46; break;   // (the board right of centre, clear of the HUD and the caption)
       }
       const dr = lfDrift(t, v.drift, 0.3, 21);
       if (v.shake) { dr[0] += v.shake * Math.sin(t * 61); dr[1] += v.shake * Math.sin(t * 53 + 1); }
@@ -219,7 +219,7 @@ LF_SETS.hospital = (app) => {
       if (m === 'gen') lab([37.2, 2.1, 3.2], 'BACKUP GENERATOR', 'its alternator: a magnet', 0.8);
       return out;
     },
-    grade(t, p) { const s = this._s, k = this._k; p.exposure = LFP.eye(k) * lfAdapt(s) * (s > 14.3 ? 1.15 : 0.78); p.saturation = lfSat(s) * 0.95; p.contrast = 1.06; p.warmth = -0.03; p.bloom = 0.38; p.bloomThreshold = 0.85; p.vignette = 0.55; },
+    grade(t, p) { const s = this._s, k = this._k; const mri = s < 14.3 && /^(mriA|mriB|quench)$/.test(this._shot?.mode || ''); p.exposure = LFP.eye(k) * lfAdapt(s) * (s > 14.3 ? 1.15 : mri ? 0.64 : 0.78); p.saturation = lfSat(s) * 0.95; p.contrast = mri ? 1.14 : 1.06; p.warmth = -0.03; p.bloom = 0.38; p.bloomThreshold = 0.85; p.vignette = 0.55; },
   };
   return set;
 };

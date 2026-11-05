@@ -137,7 +137,7 @@ function lfBuildSky(scene, o = {}) {
         float lim = smoothstep(uLim + 0.6, uLim - 0.6, aMag);
         vA = clamp(0.32 + 0.68 * sqrt(f), 0.0, 1.6) * on * tw * ext * lim * uK;
         vC = aCol;
-        float base = uPx * uSize * clamp(2.2 + 1.5 * sqrt(f), 1.5, 9.0), bl = 2.0 * uPx * uBlur, sz = min(sqrt(base * base + bl * bl), 160.0 * uPx);
+        float base = uPx * uSize * clamp(2.2 + 1.5 * sqrt(f), 1.5, 9.0), bl = 2.0 * uPx * max(uBlur - 2.0, 0.0), sz = min(sqrt(base * base + bl * bl), 160.0 * uPx);
         vA *= (base * base) / (sz * sz);   // the eye's blur spreads the same light over a bigger disc
         gl_PointSize = sz; }`,
     fragmentShader: `varying vec3 vC; varying float vA;
@@ -153,7 +153,7 @@ function lfBuildSky(scene, o = {}) {
     update(s, u = {}) {
       const du = dome.material.uniforms, su = mat.uniforms;
       du.uGlow.value = u.glow ?? 0; du.uMw.value = u.mw ?? 1; du.uK.value = u.k ?? 1;
-      su.uPx.value = u.px ?? 1; su.uT.value = s; su.uK.value = u.starK ?? 1; su.uBlur.value = u.blur ?? 0;
+      su.uPx.value = u.px ?? 1; su.uT.value = s; su.uK.value = u.starK ?? 1; su.uBlur.value = u.blur ?? 0; su.uSize.value = u.size ?? (o.size || 1);
       su.uLim.value = u.lim ?? (6.9 - 3.4 * (u.glow ?? 0));
       // a star is out once light has swallowed all the light it sent before 9 PM
       su.uOut.value = s > 0 ? (LFP.k(s) - 1) / LFP.LN / LFP.LY : 0;

@@ -207,11 +207,11 @@ function lfBuildSea(scene, C, o = {}) {
           float shore = 45.5 + 1.5 * sin(P.x * 0.05) + 0.8 * sin(P.x * 0.13 + 1.0);
           float dz = P.z - shore, crest = 0.0;
           for (int k = 0; k < 4; k++) { float ph = fract(t * 0.11 + float(k) * 0.25 + 0.03 * sin(P.x * 0.02)); float zc = mix(70.0, 1.0, ph); float w = smoothstep(3.5, 0.0, abs(dz - zc)) * smoothstep(0.0, 0.25, ph) * (1.0 - smoothstep(0.85, 1.0, ph));
-            crest = max(crest, w * (0.55 + 0.45 * vn(vec2(P.x * 0.25 + float(k) * 13.0, P.z * 0.4)))); }
+            float br = vn(vec2(P.x * 0.16 + float(k) * 13.0, P.z * 0.3 + float(k) * 3.0)); crest = max(crest, w * br * br * 1.5); }   // (crests break up: patches, not lines)
           float wash = smoothstep(2.6, 0.0, dz) * (0.5 + 0.5 * sin(t * 0.7 + P.x * 0.03));
           float foam = max(crest, wash) * bx;
           col += vec3(0.16, 0.17, 0.18) * foam * (0.25 + 1.6 * uFire.w * 900.0 / (dot(uFire.xyz - P, uFire.xyz - P) + 400.0)) * uStarK;
-          col += vec3(0.12, 0.55, 1.0) * foam * uBio * (0.7 + 0.6 * vn(vec2(P.x * 1.7, P.z * 1.7 + t))) * 0.9;
+          float sp = vn(vec2(P.x * 1.7, P.z * 1.7 + t)); col += vec3(0.12, 0.55, 1.0) * foam * uBio * (0.15 + 1.6 * sp * sp * sp) * 0.75;   // (sparkling where the water is churned)
         }
         float f = 1.0 - exp(-uFogD * uFogD * dist * dist);
         gl_FragColor = vec4(mix(col, uFog, f * 0.9), 1.0);

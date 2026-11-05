@@ -93,6 +93,7 @@ LF_SETS.coast = (app) => {
   ring.rotation.x = Math.PI / 2; ring.position.y = 0.017; hands.left.fingers[2][0].add(ring);
   // ---- the soft points: flames, sparks (additive), smoke
   const fx = lfPuffs(scene, 3000, { additive: true, soft: 1.4 }), smoke = lfPuffs(scene, 1200, { soft: 1.8 });
+  const brakeL = new THREE.PointLight('#ff9a40', 0, 26, 1.6); scene.add(brakeL);   // (the brake sparks' light; 0 until 16.6 s)
   // the hospital's roof across the bay (the 'roof' shot): its slab, the plant, the MRI's quench pipe, the red cross's frame
   const HR = lfBuildHospRoof(S);
   // the pole transformer by the road (it hums when the iron saturates)
@@ -116,14 +117,15 @@ LF_SETS.coast = (app) => {
       // ------------------------------------------------------------------ the camera
       const v = { p: [0, 5, 10], at: [0, 4, 0], fov: 50, drift: 0.01, near: 0.08, far: 24000, expo: 1, roll: 0 };
       lfCoastCam(this, m, s, t, kk, shot, v);
-      if (m === 'fireA' || m === 'colB') W.you.root.visible = false;   // (you are the camera: your own neck was in the picture)
+      if (W.you.root.visible) { const r = W.you.root.position, c = v.p; if (Math.hypot(r.x - c[0], r.z - c[2]) < 0.9 && c[1] > r.y - 0.2 && c[1] < r.y + 2.2) W.you.root.visible = false; }   // (the camera is your eyes: your own body isn't drawn round it)
       const dr = v.drift ? lfDrift(t, v.drift, 0.3, 11) : [0, 0, 0];
       if (v.shake) { const j = v.shake; dr[0] += j * Math.sin(t * 61) * Math.sin(t * 11.3); dr[1] += j * 0.7 * Math.sin(t * 53 + 1); dr[2] += j * Math.sin(t * 47 + 2) * Math.sin(t * 7.1); }
       if (cam.near !== v.near) cam.near = v.near; if (cam.far !== v.far) cam.far = v.far;
       lfCam(cam, [v.p[0] + dr[0], v.p[1] + dr[1], v.p[2] + dr[2]], [v.at[0] + dr[0], v.at[1] + dr[1], v.at[2] + dr[2]], v.fov, v.roll);
       this._expo = v.expo; this._inside = !!v.inside;
       // ------------------------------------------------------------------ the sky, the sea (seen from here)
-      sky.update(s, { glow: 0.85 * glowCity, mw: 1, k: old, starK: old, px, at: cam.position, blur: lfEyeBlurPx(k, cam.fov) });
+      const big = m === 'starsA' || m === 'starsB' || m === 'runout';   // (the stars' own shots: drawn a little larger and the Milky Way fuller, so they survive the encode)
+      sky.update(s, { glow: 0.85 * glowCity, mw: big ? 1.5 : 1, size: big ? 1.3 : 1, k: old, starK: old, px, at: cam.position, blur: lfEyeBlurPx(k, cam.fov) });
       sea.update(s, { glow: 0.8 * glowCity, bio: lfBio(s) * 1.0, fire: W.fire * 1.0, fogD: 0.00022, starK: old, train: T.lit > 0.02 ? [T.group.position.x, T.lit] : null });
       // the starlight and sky glow that light the ground (old light too), the train's own light on the track
       S.hemi.intensity = (v.inside ? 0.05 : 0.11) * old + 0.05 * glowCity;
@@ -181,6 +183,7 @@ LF_SETS.coast = (app) => {
     },
     // the brakes: sparks spraying back off the wheels while the train slows (from 16.6 s)
     brake(s, fx) {
+      brakeL.intensity = 0;
       const P = LFP.train; if (s < P.sBrake || s > P.sStop) return;
       const v = lfTrainV(s) / P.v, on = lfSm(s, P.sBrake, P.sBrake + 0.3) * v;
       if (on < 0.02) return;
@@ -189,8 +192,12 @@ LF_SETS.coast = (app) => {
         const x0 = G.x - c * (LF_TR.L + LF_TR.gap) + bx + dx, z0 = G.z + zs * 0.75;
         for (let i = 0; i < 16; i++) { const j = c * 1000 + (bx < -5 ? 500 : 0) + (dx > 0 ? 200 : 0) + (zs > 0 ? 100 : 0) + i, life = 0.18 + 0.2 * lfR(j, 41), ph = ((s / life + lfR(j, 42)) % 1 + 1) % 1;
           const vx = -(4 + 7 * lfR(j, 43)) * v, vy = 1.0 + 2.5 * lfR(j, 44), vz = zs * (0.4 + 1.6 * lfR(j, 45)), tt = ph * life;
-          fx.add(x0 + vx * tt - 0.43, LF_ST.railY + 0.05 + vy * tt - 4.9 * tt * tt, z0 + vz * tt, 0.02 + 0.015 * lfR(j, 46), 0.9 * on * (1 - ph), 1.0, 0.72, 0.32); }
+          for (let q = 0; q < 3; q++) { const u = Math.max(0, tt - q * 0.014);   // (a short streak: the spark and two trailing samples)
+            fx.add(x0 + vx * u - 0.43, LF_ST.railY + 0.05 + vy * u - 4.9 * u * u, z0 + vz * u, (0.055 + 0.035 * lfR(j, 46)) * (1 - 0.25 * q), 0.9 * on * (1 - ph) * (1 - 0.3 * q), 1.0, 0.72 - 0.1 * q, 0.32 - 0.08 * q); } }
       }
+      // their orange flicker on the wheels, the rail and the wall
+      brakeL.position.set(G.x - (LF_TR.L + LF_TR.gap) - 3, LF_ST.railY + 0.4, G.z + 1.6);
+      brakeL.intensity = 9 * on * (0.6 + 0.4 * lfFlick(s, 9, 37));
     },
     // arcs where the pantograph meets the wire (the mains are failing): blue-white flashes
     arcs(s, fx, m) {
@@ -258,7 +265,7 @@ function lfCoastCam(set, m, s, t, k, shot, v) {
     case 'colA': v.p = into([F.x + 2.9, F.y + 1.05, F.z - 2.9], [F.x + 2.6, F.y + 1.0, F.z - 2.6], k); v.at = [F.x - 1.0, F.y + 0.55, F.z + 0.9]; v.fov = 42; v.near = 0.1; v.expo = 1.35; break;
     case 'dayA': v.p = into([766, 7.5, 47], [764, 7.9, 46], k); v.at = [640, 26, -160]; v.fov = 56; v.near = 0.3; v.expo = 1.4; break;
     case 'heat': v.p = into([F.x - 4.6, F.y + 1.5, F.z + 3.9], [F.x - 4.2, F.y + 1.45, F.z + 3.6], k); v.at = [F.x + 0.4, F.y + 0.5, F.z - 0.5]; v.fov = 44; v.near = 0.1; v.expo = 1.6; break;
-    case 'starsA': { const p = [F.x + 1.5, F.y + 1.1, F.z + 6]; v.p = p; v.at = look(p, lfV([0.25, 0.75, -0.6], [0.3, 0.85, -0.42], E(k)), 100); v.fov = 72; v.near = 0.2; v.drift = 0.004; break; }
+    case 'starsA': { const p = [F.x + 1.5, F.y + 1.1, F.z + 6], d0 = set.sky.dir(1.9, -52), d1 = set.sky.dir(4.4, -63); v.p = p; v.at = look(p, lfV(d0, d1, E(k)), 100); v.fov = 72; v.near = 0.2; v.drift = 0.004; v.expo = 1.35; break; }   // (south-east and up: Achernar, then the Magellanic Clouds)
     case 'starsB': { const p = [F.x - 2.3, F.y + 0.38, F.z - 1.4]; v.p = p; v.at = look(p, [0.45, 0.52, 0.72], 100); v.fov = 62; v.near = 0.05; v.expo = 1.5; break; }
     case 'runout': { const p = into([F.x + 0.5, F.y + 1.6, F.z + 9], [F.x + 0.3, F.y + 1.7, F.z + 9.5], k), d = set.sky.dir(0.35, -1.6); v.p = p; v.at = look(p, [d[0], d[1] - 0.18, d[2]], 100); v.fov = 64; v.near = 0.2; break; }
     // ---- 4: light's waves stretch (9:10): from the sand behind the party, their heads against a sky your eyes can't focus

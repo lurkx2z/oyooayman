@@ -115,6 +115,16 @@ Everything is procedural, so there are no models, images or sound files to downl
 > then every wind on Earth stops and the day gets 2 ms shorter. At 2:00:03 everything starts again from a standstill;
 > after it, stalled engines, sirens, no wind, and the planes. The story clock only runs forward (the three seconds take
 > 3 min 45 s). Physics, clock, shots and review log: [`films/air-solid/PLAN.md`](films/air-solid/PLAN.md).
+>
+> ***What if the speed of light increased and couldn't stop?*** — open `light-faster.html` (16:9, voiceless, 5:16). At
+> 9:00 PM on a Saturday, on a night train along a sea wall, light starts getting 1% faster every second, for ever.
+> Light is electricity and magnetism, so every magnet on Earth gets weaker: the grid's transformers choke, the MRI
+> across the bay quenches in a helium plume, the grid and a 40,000-seat stadium go dark, the train brakes, cars stall,
+> mercury freezes in an observatory's barometer and your gold ring turns silver. At the beach the party's music fades,
+> the fire is seven times dimmer and no cooler, the colours drain and the Earth can't cool down. Only the stars stay,
+> on old light that runs out (the Sun's at 9:03, Saturn's at 9:07), until light's own waves are too long for your eyes
+> to focus and then too wide for your pupils. The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/light-faster/PLAN.md`](films/light-faster/PLAN.md).
 
 | Time | Beat |
 |---|---|

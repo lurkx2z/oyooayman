@@ -51,8 +51,8 @@ function lfEyeLook(p, k, fovDeg) {
   p.soft = Math.max(p.soft, MathX.clamp((b - 2.5) / 22, 0, 1));
   if (b > 18) { p.tunnel = -3; p.edgeBlur = Math.max(p.edgeBlur, MathX.clamp((b - 18) / 40, 0, 1)); }   // (a negative tunnel: the heavy blur everywhere)
   const w = MathX.clamp(Math.log(b / 40) / Math.log(12), 0, 1);                                         // 40 → 480 px: detail goes
-  p.contrast *= 1 - 0.96 * w; p.saturation *= 1 - w; p.bloom *= 1 - w;
-  const lt = 0.05 * Math.pow(LFP.through(k), 0.72), base = 0.42 - 0.38 * p.contrast;                   // the glow's level: what gets in, half adapted to
+  p.contrast *= 1 - 0.9 * w; p.saturation *= 1 - w; p.bloom *= 1 - w;   // (a formless glow: only the brightest parts still show, as a smudge)
+  const lt = 0.2 * Math.pow(LFP.through(k), 0.72), base = 0.42 - 0.38 * p.contrast;                   // the glow's level: what gets in, half adapted to
   if (w > 0) p.fade = Math.max(p.fade, w * MathX.clamp(1 - lt / Math.max(0.02, base), 0, 1));
 }
 function lfAdapt(s) { const k = LFP.k(s); return Math.pow(1 / (LFP.eye(k) * LFP.glow(k)), 0.28); }

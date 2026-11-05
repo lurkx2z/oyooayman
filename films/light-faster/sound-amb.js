@@ -89,7 +89,7 @@ lfSound('amb', 'beds', function (ctx, bus, K) {
       }
       default: {   // the beach
         const s0 = lfStoryAt(a + 0.01), party = MathX.clamp(1 - (s0 - 100) / 160, 0, 1), near = ['fireA', 'fireB', 'colA', 'colB', 'heat', 'starsB'].includes(m) ? 1 : 0.6;
-        lfBed(K, a, b, { colour: 'pink', f: [['bp', 600, 0.45], ['lp', 1700]], vol: m === 'waves' ? 0.3 : 0.22, am: 0.4, wr: 0.2, env: (u, t) => surf(t) * end(t), fi, fo });
+        lfBed(K, a, b, { colour: 'pink', f: [['bp', 600, 0.45], ['lp', 1700]], vol: m === 'waves' ? 0.25 : 0.19, am: 0.4, wr: 0.2, env: (u, t) => surf(t) * end(t), fi, fo });
         lfBed(K, a, b, { colour: 'brown', f: [['lp', 300]], vol: 0.12, am: 0.6, wr: 0.15, env: (u, t) => end(t), fi, fo });
         if (party > 0.03 && m !== 'stopX') lfBed(K, a, b, { colour: 'pink', f: [['bp', 480, 0.8], ['lp', 1600]], vol: 0.12 * party * near, am: 0.9, wr: 1.8, env: (u, t) => end(t), fi, fo });   // voices, low
         break;
