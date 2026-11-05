@@ -113,7 +113,7 @@ LF_SETS.obs = (app) => {
     const diag = lfBox(0.09, 0.09, 0.09, brass, 0, -1.31, 0, tube); diag.castShadow = false;
     const ep = lfCyl(0.03, 0.03, 0.12, darkM, 0.0, -1.31, 0.1, tube, 14); ep.rotation.x = Math.PI / 2;
     for (const sx of [-1, 1]) { const ax = lfCyl(0.08, 0.08, 0.2, brass, sx * 0.5, 0, 0, tube, 16); ax.rotation.z = Math.PI / 2; }
-    for (const sx of [-1, 1]) lfBox(0.12, 0.3, 0.2, darkM, sx * 0.3, -0.75, -0.42, tube);
+    for (const sx of [-1, 1]) lfBox(0.12, 0.3, 0.2, darkM, sx * 0.3, -0.74, -0.42, tube);   // (1 cm off the tube's end plane)
     lfCyl(0.06, 0.06, 1.0, darkM, 0.46, 0.5, 0.25, tube, 12); }
   // the eyepiece's world position (for the astronomer and the cameras)
   scene.updateMatrixWorld(true);

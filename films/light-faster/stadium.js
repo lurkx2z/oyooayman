@@ -196,7 +196,7 @@ LF_SETS.stadium = (app) => {
       const mm = netM.clone(); mm.alphaMap = t; const m = new THREE.Mesh(g, mm); m.position.set(x, y, z); m.renderOrder = 2; scene.add(m); };
     net(7.32, 2.44, back, 1.22, 0, (g) => g.rotateY(Math.PI / 2));
     for (const z of [-3.66, 3.66]) net(D, 2.44, gx + sg * D / 2, 1.22, z, () => {});
-    net(D, 7.32, gx + sg * D / 2, 2.44, 0, (g) => g.rotateX(-Math.PI / 2));
+    net(D, 7.32, gx + sg * D / 2, 2.4, 0, (g) => g.rotateX(-Math.PI / 2));   // (the roof net just under the posts' tops)
     for (const z of [-3.66, 3.66]) lfCyl(0.03, 0.03, 2.44, postM, back, 1.2, z, null, 8);
   }
   for (const [x, z] of [[-52.5, -34], [52.5, -34], [-52.5, 34], [52.5, 34]]) { lfCyl(0.02, 0.02, 1.55, lfStd('#e8e030', 0.5), x, 0.73, z, null, 6);
@@ -340,7 +340,7 @@ LF_SETS.stadium = (app) => {
   nearSpec.forEach(([look, r, x, side, t0, torch], i) => {
     const s = seatOf(r, x, side), P = lfPerson(look, scene, { id: 'sd' + i });
     const ph = new THREE.Group(); ph.add(new THREE.Mesh(phoneGeo, phoneBody));
-    const scrM2 = new THREE.MeshBasicMaterial({ color: '#000000' }); const sc = new THREE.Mesh(new THREE.PlaneGeometry(0.064, 0.138), scrM2); sc.position.z = 0.0052; ph.add(sc);
+    const scrM2 = new THREE.MeshBasicMaterial({ color: '#000000' }); const sc = new THREE.Mesh(new THREE.PlaneGeometry(0.064, 0.138), scrM2); sc.position.z = 0.0085; ph.add(sc);   // (4 mm off the body: these are seen from metres away)
     const tm = new THREE.SpriteMaterial({ map: dot, color: '#ffffff', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }); const tsp = new THREE.Sprite(tm); tsp.scale.set(0.07, 0.07, 1); tsp.position.set(0.02, 0.06, -0.012); ph.add(tsp);
     scene.add(ph);
     NEAR.push({ s, P, ph, scrM: scrM2, tm, t0, t1: torch ? t0 + 0.4 + 0.5 * lfR(i, 31) : 1e9, ts: (side > 0 ? 14.72 : 14.9) + (side > 0 ? 0.35 : 0.8) * lfR(i, 32), i, cam: side > 0 ? 'B' : 'C' });

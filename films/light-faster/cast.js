@@ -29,7 +29,20 @@ Object.assign(LOOKS, {
 const LFPI = Math.PI;
 const lfEase = (s, a, b) => { const u = MathX.clamp((s - a) / (b - a), 0, 1); return u * u * (3 - 2 * u); };
 const lfYaw = (fx, fz) => Math.atan2(fx, fz);                         // facing a direction (x, z); the rig faces +z at 0
-function lfPerson(look, parent, o = {}) { const p = new Person({ id: 'lf' + look + (o.id || ''), look }, null); if (o.kid) p.root.scale.setScalar(0.66); (parent || LF_KIT_SCENE).add(p.root); return p; }
+function lfPerson(look, parent, o = {}) { const p = new Person({ id: 'lf' + look + (o.id || ''), look }, null); if (o.kid) p.root.scale.setScalar(0.66); lfPersonNoZ(p); (parent || LF_KIT_SCENE).add(p.root); return p; }
+// (the engine's people have a few surfaces that share a plane: the belt's top with the trousers', the shirt strip
+// under an open jacket 0.3 mm off the chest, a coat's hem flush with the thighs. Nudged here, per person, so nothing
+// flickers (z-fighting); js/world/people.js itself is untouched)
+function lfPersonNoZ(p) {
+  const L = p.look, BG = PersonGeo.forBuild(L.build || 'avg', L);
+  p.root.traverse((m) => {
+    if (!m.isMesh) return; const g = m.geometry, q = g.parameters;
+    if (g.type === 'BoxGeometry' && q.height === 0.035 && Math.abs(q.width - BG.B.waist * 1.02) < 1e-6) m.scale.set(1, 1.6, 1.08);   // the belt
+    else if (g.type === 'BoxGeometry' && q.width === 0.08 && q.depth === 0.01) m.position.z += L.shoulderBag ? 0.0015 : 0.004;   // the strip
+    else if (g.type === 'BoxGeometry' && q.width === 0.03 && q.depth === 0.012) m.position.z += 0.003;   // a shoulder bag's strap
+    else if (L.coat && (g === BG.pelvis || g === BG.thigh)) m.scale.set(0.98, 1, 0.98);                                       // under a coat
+  });
+}
 function lfPose(P, pose, x, y, z, yaw) { P.root.position.set(x, y, z); P.root.rotation.y = yaw; P.apply(pose); P.pose = pose; }
 function lfFidget(p, s, i, a = 1) { p.headYaw += 0.3 * a * noise1(s * 0.11, i + 2); p.spineYaw += 0.06 * a * noise1(s * 0.07, i + 4); p.neck += 0.06 * a * noise1(s * 0.09, i + 6); return p; }
 function lfKeys(s, K, bl = 0.6) { let i = 0; while (i + 1 < K.length && s >= K[i + 1][0]) i++; const p = K[i][1]; if (i && s - K[i][0] < bl) return lerpPose(K[i - 1][1], p, lfEase(s, K[i][0], K[i][0] + bl)); return p; }

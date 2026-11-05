@@ -125,8 +125,8 @@ LF_SETS.hospital = (app) => {
   box(bw, 0.04, 0.09, M.frame, BD[0], BD[1] - bh / 2 - 0.02, 8.0 + 0.065);                                                            // the tray
   const cards = LF_BOARD.map(([txt, c, r], i) => { const g = new THREE.Group(); const m = new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.165), new THREE.MeshBasicMaterial({ map: lfCardTex(txt), color: '#ffffff' })); g.add(m);
     const mg = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.012, 14), lfStd(['#d8281a', '#2a6ad8', '#2a9a4a'][i % 3], 0.4)); mg.rotation.x = Math.PI / 2; mg.position.set(-0.27, 0.035, 0.008); g.add(mg);
-    const x0 = BD[0] - bw / 2 + 0.43 + c * 0.77, y0 = BD[1] + bh / 2 - 0.2 - r * 0.25; g.position.set(x0, y0, 8.0 + 0.052 + 0.0006 * i); scene.add(g); return { g, x0, y0, i }; });
-  const bed = new THREE.Group(); scene.add(bed); bed.position.set(-22, 0, 10.2); lfBox(2.0, 0.08, 0.9, M.white, 0, 0.62, 0, bed); lfBox(2.0, 0.14, 0.88, lfStd('#cfe0ea', 0.8), 0, 0.72, 0, bed); lfBox(0.06, 0.5, 0.9, M.steel, -1.0, 0.85, 0, bed);
+    const x0 = BD[0] - bw / 2 + 0.43 + c * 0.77, y0 = BD[1] + bh / 2 - 0.2 - r * 0.25; g.position.set(x0, y0, 8.0 + 0.053 + 0.0022 * i); scene.add(g); return { g, x0, y0, i }; });
+  const bed = new THREE.Group(); scene.add(bed); bed.position.set(-22, 0, 10.2); lfBox(2.0, 0.08, 0.9, M.white, 0, 0.62, 0, bed); lfBox(1.96, 0.14, 0.88, lfStd('#cfe0ea', 0.8), 0, 0.72, 0, bed); lfBox(0.06, 0.5, 0.93, M.steel, -1.0, 0.85, 0, bed);
   for (const [dx, dz] of [[-0.9, -0.38], [0.9, -0.38], [-0.9, 0.38], [0.9, 0.38]]) lfCyl(0.02, 0.02, 0.6, M.steel, dx, 0.3, dz, bed);
   const n1 = lfPerson('lfNurse', scene, { id: 'n1' }), n2 = lfPerson('lfNurse2', scene, { id: 'n2' });
   const torchL = new THREE.SpotLight('#eaf0ff', 0, 14, 0.45, 0.5, 1.4); scene.add(torchL); scene.add(torchL.target);

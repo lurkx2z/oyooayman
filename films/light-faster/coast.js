@@ -83,7 +83,7 @@ LF_SETS.coast = (app) => {
   const hands = new ViewerHands(cam, { script: { right: [[-9, 'hidden']], left: [[-9, 'hidden']] }, poses: LF_HAND_POSES, blends: LF_HAND_BL, skin: '#c9967a', nail: '#e2bba8', sleeve: '#4a5a4a', cuff: '#3a483a', watch: false, sleeveLen: 0.36 });
   const phone = new THREE.Group(), PT = lfCanvasTex(270, 576, lfDrawPhone);
   phone.add(new THREE.Mesh(new THREE.RoundedBoxGeometry(0.072, 0.152, 0.0085, 3, 0.008), lfStd('#2a2d33', 0.35, 0.4)));
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.1446), new THREE.MeshBasicMaterial({ map: PT.tex })); screen.position.z = 0.0046; phone.add(screen);
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.1446), new THREE.MeshBasicMaterial({ map: PT.tex })); screen.position.z = 0.0058; phone.add(screen);   // (1.5 mm off the glass)
   const phoneL = new THREE.PointLight('#cfe0ff', 0, 1.6, 1.6); phoneL.position.set(0, 0, 0.06); phone.add(phoneL);
   phone.position.set(0.034, 0.074, 0.024); phone.rotation.set(0, 0, -Math.PI / 2); hands.right.g.add(phone);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.0113, 0.0023, 10, 32), new THREE.MeshStandardMaterial({ color: '#ffd27a', metalness: 0.9, roughness: 0.28, envMapIntensity: 2.0 }));

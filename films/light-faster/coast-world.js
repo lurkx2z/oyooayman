@@ -151,11 +151,12 @@ function lfBuildCoast(S) {
   };
   W.M = M;
   // ---- the platform the line runs on (its face is the sea wall), the parapet (with the gap for the beach steps)
-  { const x0 = -830, x1 = ST.x1, g = new THREE.BoxGeometry(x1 - x0, 7, 24), m = new THREE.Mesh(g, [M.wall, M.wall, M.top, M.dark, M.wall, M.wall]);
+  { const x0 = -830, x1 = ST.x1 + 1, g = new THREE.BoxGeometry(x1 - x0, 7, 24),   // (1 m past everything that ends at ST.x1)
+    m = new THREE.Mesh(g, [M.wall, M.wall, M.top, M.dark, M.wall, M.wall]);
     m.position.set((x0 + x1) / 2, ST.wallTop - 3.5, -8); m.receiveShadow = true; scene.add(m); W.platform = m;
     const gx = [ST.beach.stepsX - 2.3, ST.beach.stepsX + 2.3];
-    for (const [a, b] of [[-662, gx[0]], [gx[1], x1]]) lfBox(b - a, 1.12, 0.42, M.parapet, (a + b) / 2, ST.wallTop + 0.5, 3.52);
-    for (const x of gx) lfBox(0.5, 1.3, 0.5, M.parapet, x + (x < ST.beach.stepsX ? -0.25 : 0.25), ST.wallTop + 0.6, 3.52);   // (the gap's piers, a little taller)
+    for (const [a, b] of [[-661.5, gx[0]], [gx[1], x1]]) lfBox(b - a, 1.12, 0.42, M.parapet, (a + b) / 2, ST.wallTop + 0.5, 3.52);
+    for (const x of gx) lfBox(0.5, 1.3, 0.5, M.parapet, x + (x < ST.beach.stepsX ? -0.24 : 0.24), ST.wallTop + 0.6, 3.52);   // (the gap's piers, a little taller; 1 cm past the parapet's ends: no shared face)
   }
   // ---- the tracks: ballast (a trapezoid, its foot inside the platform), sleepers, rails
   { const sh = new THREE.Shape(); sh.moveTo(-1.85, -0.06); sh.lineTo(1.85, -0.06); sh.lineTo(1.35, 0.075); sh.lineTo(-1.35, 0.075); sh.closePath();

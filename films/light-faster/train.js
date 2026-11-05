@@ -50,7 +50,7 @@ function lfBuildTrain(scene) {
     const ox = -ci * (TR.L + TR.gap), car = new THREE.Group(); car.position.x = ox; G.add(car); T.cars.push(car);
     const x0 = -TR.L;
     // underframe, equipment, bogies
-    box(TR.L - 0.2, 0.5, TR.W - 0.16, M.under, -TR.L / 2, 0.85, 0, car);
+    box(TR.L - 0.2, 0.52, TR.W - 0.16, M.under, -TR.L / 2, 0.85, 0, car);   // (its bottom 1 cm under the nose's)
     for (const ex of [-6, -10.5, -14]) box(1.8, 0.4, TR.W - 0.5, M.dark, ex, 0.5, 0, car);
     for (const bx of [-3.4, -TR.L + 3.4]) {
       box(2.8, 0.3, 2.0, M.dark, bx, 0.62, 0, car);
@@ -67,8 +67,8 @@ function lfBuildTrain(scene) {
       const g = new THREE.CylinderGeometry(W2, W2, len, 24, 1, false, 0, Math.PI); g.rotateZ(Math.PI / 2);   // (axis → x; the half with y ≥ 0)
       const p = g.attributes.position; for (let i = 0; i < p.count; i++) p.setY(i, p.getY(i) * (0.6 / W2));
       g.computeVertexNormals(); const rf = new THREE.Mesh(g, M.grey); rf.position.set(cx, 3.35, 0); rf.castShadow = true; car.add(rf); }
-    box(0.06, 2.4, TR.W - 0.02, M.white, -TR.L + 0.03, 2.2, 0, car);                          // the rear end wall (top inside the roof)
-    if (ci > 0) box(0.06, 2.4, TR.W - 0.02, M.white, -0.03, 2.2, 0, car);                      // the front end wall
+    box(0.08, 2.4, TR.W - 0.02, M.white, -TR.L + 0.03, 2.2, 0, car);                          // the rear end wall (top inside the roof; 1 cm past the sides' ends)
+    if (ci > 0) box(0.08, 2.4, TR.W - 0.02, M.white, -0.03, 2.2, 0, car);                      // the front end wall
     if (ci < TR.cars - 1) box(TR.gap + 0.1, 2.2, 1.3, M.dark, -TR.L - TR.gap / 2, 2.2, 0, car); // the gangway's bellows
     // lit window panes (the other cars; the first car has glass and a real inside)
     if (ci > 0) for (const h of winHoles) for (const side of [-1, 1]) { const pl = new THREE.Mesh(new THREE.PlaneGeometry(h[1] - h[0], h[3] - h[2]), M.pane); pl.position.set((h[0] + h[1]) / 2, (h[2] + h[3]) / 2, side * (W2 - 0.03)); pl.rotation.y = side > 0 ? 0 : Math.PI; car.add(pl); T.panes.push(pl); }
@@ -76,7 +76,7 @@ function lfBuildTrain(scene) {
     // the doors (two leaves each side, closed; the first car's sea-side front door opens at the beach)
     T.doorsL = T.doorsL || [];
     for (const [a, b] of TR.doors) for (const side of [-1, 1]) { const w = (b - a) / 2;
-      for (const k of [0, 1]) { const d = box(w, 1.96, 0.05, M.white, a + w / 2 + k * w, TR.floor + 0.98, side * (W2 - 0.03), car); const win = box(w * 0.7, 0.9, 0.056, M.screen, 0, 0.35, 0, d); void win;
+      for (const k of [0, 1]) { const d = box(w, 1.96, 0.05, M.white, a + w / 2 + k * w, TR.floor + 0.98, side * (W2 - 0.03), car); const win = box(w * 0.7, 0.9, 0.07, M.screen, 0, 0.35, 0, d); void win;   // (the window 1 cm proud of the leaf, both sides)
         if (ci === 0 && side > 0 && a === TR.doors[0][0]) T.doorsL.push({ d, x0: d.position.x, dir: k ? 1 : -1, w }); } }
     // the pantograph (middle car)
     if (ci === 1) { const py = LF_ST.wireY - LF_ST.railY; box(1.6, 0.2, 1.4, M.dark, -10, 3.98, 0, car);
@@ -99,7 +99,7 @@ function lfBuildTrain(scene) {
     T.headGlow = [-0.95, 0.95].map((z) => { const sp = new THREE.Sprite(sm); sp.scale.set(2.2, 2.2, 1); sp.position.set(0.9, 1.35, z); G.add(sp); return sp; });
     T.beam = new THREE.SpotLight('#fff1d8', 0, 220, 0.32, 0.6, 1.2); T.beam.position.set(0.8, 1.4, 0); T.beam.target.position.set(60, -2, 0); G.add(T.beam); G.add(T.beam.target);
     // the tail lights (the last car)
-    for (const z of [-1.0, 1.0]) { const tl = new THREE.Mesh(new THREE.CircleGeometry(0.08, 12), M.tail); tl.position.set(-(TR.cars - 1) * (TR.L + TR.gap) - TR.L - 0.001, 1.3, z); tl.rotation.y = -Math.PI / 2; G.add(tl); }
+    for (const z of [-1.0, 1.0]) { const tl = new THREE.Mesh(new THREE.CircleGeometry(0.08, 12), M.tail); tl.position.set(-(TR.cars - 1) * (TR.L + TR.gap) - TR.L - 0.025, 1.3, z); tl.rotation.y = -Math.PI / 2; G.add(tl); }   // (1.5 cm off the end wall)
   }
   // ---- the first car's inside
   const IN = new THREE.Group(); G.add(IN); T.inside = IN;
@@ -113,7 +113,7 @@ function lfBuildTrain(scene) {
     box(0.05, 1.95, 0.7, M.dark, TR.cab - 0.001 - 0.03, TR.floor + 0.975, 0, IN);
     // the seats: 2 + 2 a row, facing forward
     const seat = (x, z) => { box(0.5, 0.12, 0.46, M.seat, x + 0.27, TR.floor + 0.46, z, IN); box(0.09, 0.72, 0.46, M.seat, x + 0.02, TR.floor + 0.92, z, IN);
-      box(0.1, 0.16, 0.36, M.headrest, x + 0.018, TR.floor + 1.225, z, IN); box(0.4, 0.4, 0.06, M.dark, x + 0.27, TR.floor + 0.2, z, IN); };
+      box(0.11, 0.16, 0.36, M.headrest, x + 0.02, TR.floor + 1.225, z, IN); box(0.4, 0.4, 0.06, M.dark, x + 0.27, TR.floor + 0.2, z, IN); };
     for (const r of TR.rows) for (const z of [-0.98, -0.5, 0.5, 0.98]) seat(r, z);
     for (const [a, b] of TR.doors) for (const z of [-0.6, 0.6]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 2.1, 8), M.pole); p.position.set((a + b) / 2, TR.floor + 1.05, z); IN.add(p); }
     // the inside lights (point lights along the car)
