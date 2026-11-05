@@ -18,13 +18,13 @@ Friction 10s formula and the owner's YouTube lessons (28 October 2026), in the e
   60 million drivers can't see the road, and their cars' radar is blind too;
 - **tension to the last frame:** the count ("Whatever is near you, you'll see it in 3 seconds"), a white-out at
   3:30:10 and the reveal (someone in a bear suit was standing right in front of you, its mouth a black hole, paws up),
-  the crash on the motorway, +2 minutes, then 4:42 PM: Saturn's light from 3:30 should arrive now, and there is none
+  the pile-up on the motorway (seen from its verge: cars spun across the lanes, hazards, alarms), +2 minutes, then 4:42 PM: Saturn's light from 3:30 should arrive now, and there is none
   ("Seen from Saturn, the Earth just went dark."). The last caption, "What would you have done?", is cut on the last
   frame. There is no recap.
 
 The owner's rule of 29 October 2026: **the story clock only runs forward**. One clock (`NB_CLOCK`, script.js): real
 speed under the title; the ten seconds 21 times slower to the Moon going out, 37 times slower through the middle, the
-last three seconds about 3 times slower (the count); 9 times slower out of the return until the Moon comes back; then
+last three seconds about 3 times slower (the count); 8 times slower out of the return until the Moon comes back; then
 real speed, jumping forward only at cuts (the HUD says by how much): +2 minutes, then to 4:42 PM.
 `script.js` throws if a segment runs backwards; `shots.js` throws if the clock jumps anywhere but on a cut.
 
@@ -60,8 +60,8 @@ Everything that makes light carries on: the Sun, stars, flames, filaments, LEDs,
 | undersea cables dark | ≈ 600 cables, ≈ 99% of traffic between continents (satellite links need dishes and lasers too: ≈ 0% left) | — | 2:48 |
 | the extra heat | 0.30 × 1361 W/m² × πR² × 10 s = 5.2 × 10¹⁷ J ≈ 8,300 Hiroshima bombs (63 TJ); Earth absorbs ≈ 19,000 every 10 s anyway (+43%) | — | 3:24 |
 | light bounces again; a white-out, then a dazzle while the pupils close (0.2 s) | — | 10 s (3:30:10) | 4:08.9 |
-| the Moon comes back last | 1.24 s late | 11.24 s | 4:19.7 |
-| Saturn's light from 3:30 should arrive (and, seen from Saturn, the Earth goes dark) | 8.77 AU = 4,375 light-seconds ≈ 72.9 min | 4:42:55 PM | 4:52.7 |
+| the Moon comes back last | 1.24 s late | 11.24 s | 4:19.1 |
+| Saturn's light from 3:30 should arrive (and, seen from Saturn, the Earth goes dark) | 8.77 AU = 4,375 light-seconds ≈ 72.9 min | 4:42:55 PM | 4:52.1 |
 
 ## 3. The beats (CAPTIONS.md: 29 beats after the title, 58 captions)
 

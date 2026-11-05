@@ -58,9 +58,9 @@ nbSound('sfx', 'events', function (ctx, bus, K) {
   const horn = (d, f) => { const n = Math.ceil(d * sr), y = new Float32Array(n); for (const [ff, a] of [[f, 1], [f * 1.22, 0.85]]) { let ph = 0; for (let i = 0; i < n; i++) { const t = i / sr; ph += 2 * Math.PI * ff / sr; y[i] += a * (Math.sin(ph) + 0.5 * Math.sin(2 * ph) + 0.35 * Math.sin(3 * ph) + 0.2 * Math.sin(4 * ph)) * Math.min(1, t / 0.03, (d - t) / 0.08); } } NBX.bq(y, 'lp', 3200, 0.7, sr); return y; };
   const squeal = (d) => { const n = Math.ceil(d * sr), y = nbNoise(fx, n, 'white'), w = fx.wander(6); for (let i = 0; i < n; i++) { const u = i / n; y[i] *= Math.min(1, u * 10) * Math.pow(1 - u, 0.6); } return nbSweep(y, sr, 'bp', 9, Array.from({ length: 40 }, (_, k) => 1900 + 260 * w(k / 40 * d))); };
   { const d = sh('driver'), v = sh('verge');
-    putS(horn(2.2, 415), d.t0 + 1.4, { vol: 0.16, pan: 0.15, room: open, wet: 0.3 });
-    putS(squeal(1.4), d.t0 + 4.6, { vol: 0.1, pan: 0.35, room: open, wet: 0.3 });
-    putS(horn(1.6, 350), d.t0 + 6.4, { vol: 0.1, pan: -0.4, room: open, wet: 0.4 });
+    putS(horn(2.2, 415), d.t0 + 1.4, { vol: 0.1, pan: 0.15, room: open, wet: 0.3 });
+    putS(squeal(1.4), d.t0 + 4.6, { vol: 0.065, pan: 0.35, room: open, wet: 0.3 });
+    putS(horn(1.6, 350), d.t0 + 6.4, { vol: 0.065, pan: -0.4, room: open, wet: 0.4 });
     // a car past the verge (a whoosh, slowed), a horn far off
     putS(noiseBurst(1.6, [380, 600, 1200, 700, 420], 0.8), v.t0 + 0.7, { vol: 0.22, pan: 0, room: open, wet: 0.25 });
     putS(horn(1.4, 470), v.t0 + 3.2, { vol: 0.07, pan: 0.5, room: valley, wet: 0.6 }); }

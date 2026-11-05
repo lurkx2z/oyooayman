@@ -126,16 +126,17 @@ Everything is procedural, so there are no models, images or sound files to downl
 > to focus and then too wide for your pupils. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/light-faster/PLAN.md`](films/light-faster/PLAN.md).
 >
-> ***What if light stopped bouncing for 10 seconds?*** — open `light-no-bounce.html` (16:9, voiceless, 5:25). At 3:30 PM
+> ***What if light stopped bouncing for 10 seconds?*** — open `light-no-bounce.html` (16:9, voiceless, 5:01). At 3:30 PM
 > on a Saturday in November, at a hilltop funfair, nothing anywhere reflects or scatters light for ten seconds. Your
-> reflection goes from the Fun House mirror, the Moon shines on for 1.3 seconds on old light and goes out, the sky turns
-> black with the Sun white in it and the stars out at 3:30 in the afternoon. You can't see your hands, or the 400
-> people around you: only their phones, the bulbs and what blocks them, and something passes between you and the
-> lights. In the valley 60 million drivers brake blind, a plane lands on its own lights, the tower's radar hears nothing,
-> the internet's glass fibres go dark, and from the space station the Earth is gone except its cities. At 3:30:10 light
-> floods back, blinding, and someone was standing right in front of you. At 4:42 PM Saturn's light from 3:30 should
-> arrive, and there is nothing to arrive. The story clock only runs forward. Physics, clock, shots and review log:
-> [`films/light-no-bounce/PLAN.md`](films/light-no-bounce/PLAN.md).
+> reflection goes from the Fun House mirror, the Moon shines on for 1.24 seconds on old light and goes out, the sky
+> turns black with the Sun white in it and the stars out at 3:30 in the afternoon. You can't see your hands, or the 400
+> people around you: only their phones, the bulbs and what blocks them, and something with bear's ears is standing
+> between you and the lights, and coming closer. In the valley 60 million drivers can't see the road, a plane lands on
+> the runway's lights alone, the tower's radar gets no echoes, the internet's glass fibres go dark, and from the space
+> station the Earth is gone except the lights that shine upwards. At 3:30:10 light floods back and someone was standing
+> right in front of you. At 4:42 PM Saturn's light from 3:30 should arrive, and there is none. The story clock only
+> runs forward. Physics, clock, shots and review log: [`films/light-no-bounce/PLAN.md`](films/light-no-bounce/PLAN.md)
+> and [`EPISODE_REPORT.md`](films/light-no-bounce/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|

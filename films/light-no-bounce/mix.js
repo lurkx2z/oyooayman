@@ -6,8 +6,11 @@
    Pass 1 (5 November 2026, solo, pre-trim): music −22.9, amb −26.4, sfx −27.1 LUFS integrated; with the old trims the
    beds sat a median 10.6 dB under the score but only 3 to 6 dB in the jet, coaster and motorway shots, and the effects
    (the carousel's organ above all) only 3.9 dB under: those beds and the organ came down, the effects' trim with them.
-   The count and the return (4:00–4:19) are the score's loudest stretch: the map holds them 4 dB down so the limiter
+   The count and the return (3:59–4:19) are the score's loudest stretch: the map holds them 4 dB down so the limiter
    doesn't flatten them; the quiet sky minutes (0:35–1:07) come up 2 dB.
+   Final (5 November 2026, the 5:01 cut, solo stems in 10 s windows with these trims): the music over the beds by a median
+   11.8 dB (7.4 at the closest, the screams at 3:30:10; 18.5 at most), over the effects by a median 12.0 dB (6.1 at the
+   closest, the same screams; the driver's horns came down 4 dB to 7.4). The mix: −15.2 LUFS, −2.4 dBTP, LRA 7.0 LU.
    Targets (docs + owner): −16 to −14 LUFS integrated, true peak ≤ −1 dBTP, a real loudness range (not flat).
    ===================================================================== */
 window.NB_MIX = {

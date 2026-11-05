@@ -217,7 +217,8 @@ function nbFairCam(set, m, s, t, k, shot, v, lstAdd) {
       v.near = 0.2; v.drift = 0.002; break;
     case 'afterWide': v.p = into([5, 9.5, -1], [3, 9.9, -2], k); v.at = [-25, 3, 25]; v.fov = 55; v.near = 0.2; break;
     // ---- 4:42 PM: the hilltop watches Saturn (the sky has turned 73 minutes' worth)
-    case 'echo': { const d = set.sky.turned(set.sky.satDir, lstAdd); v.p = into([60, 1.62, -3], [62, 1.62, -2.4], k); v.fov = 46; v.at = aimAt(v.p, [d.x, d.y, d.z], 0.6, 0.3, v.fov); v.near = 0.3; v.satK = 2.4; v.moonK = 2.4; break; }
+    case 'echo': { const d = set.sky.turned(set.sky.satDir, lstAdd); v.p = into([77, 1.62, -10], [77.8, 1.62, -9.6], k); v.fov = 46;   // (behind the people at the fence, clear of the festoon poles)
+      v.at = aimAt(v.p, [d.x, d.y, d.z], 0.6, 0.3, v.fov); v.near = 0.3; v.satK = 2.4; v.moonK = 2.4; break; }
     // Saturn over the heads and phones at the fence: when it goes out, the people are still there
     case 'echoSat': { const d = set.sky.turned(set.sky.satDir, lstAdd), p = into([66, 1.6, -0.6], [66.6, 1.6, -0.4], k); v.p = p; v.fov = 34; v.at = aimAt(p, [d.x, d.y, d.z], 0.5, 0.25, v.fov); v.near = 0.3; v.drift = 0.0012; v.satK = 3.2; v.moonK = 2.4; break; }   // (the Moon up-left, bright in the dusk: still bouncing)
   }
@@ -245,5 +246,6 @@ function nbFairLabels(set, t) {
   if (m === 'heat') lab(far(sky.sunDir, 3000), 'THE SUN', 'all of its light is absorbed now', 1.0);
   if (m === 'saturn') lab(far(sky.satDir), 'SATURN', 'its light: 73 minutes old', 1.0, 'r');
   if (m === 'echo') { const d = sky.turned(sky.satDir, set._s / 3600 * 1.0027); lab(far(d), 'SATURN', 'its light from 3:30 is due', 1.0, 'r'); }
+  if (m === 'echoSat') { const d = sky.turned(sky.satDir, set._s / 3600 * 1.0027); lab(far(d), 'SATURN', NBP.saturnOn(s) ? 'its light from 3:30: due now' : 'nothing arrived', 0.6); }   // (the label stays on the empty sky)
   return out;
 }
