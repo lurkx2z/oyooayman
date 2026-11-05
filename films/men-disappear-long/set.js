@@ -360,7 +360,7 @@ function mgWorldCam(set, m, s, t, k, v) {
     case 'barge': { const b = P.bargeBow(s); v.p = into([22, Y + 1.55, 17.6], [21, Y + 1.5, 17.6]); v.at = [MGP.barge.x, 1, b - 43]; v.fov = 17; v.near = 0.3; v.sh = [14, 0, b - 40]; v.shR = 70; break; }
     case 'bargeHit': { const b = P.bargeBow(s), x0 = 64, z0 = 478; v.p = [x0, gy(x0, z0) + 9.5, z0]; v.at = [12, 0.5, Math.min(b, 440) - 16]; v.fov = 46; v.near = 0.3; v.sh = [20, 0, 420]; v.shR = 60; v.drift = 0.01; break; }
     // ---- flight 2207 at 11,000 m (7:43)
-    case 'skyUp': { const q = set._plane; v.p = [cx + 4, Y + 1.6, 10.5]; v.at = [q.p[0] - Math.sin(q.h) * 110, q.p[1], q.p[2] + Math.cos(q.h) * 110]; v.fov = mgLerp(34, 3.2, Ease.inOutSine(MathX.clamp(k * 1.6 - 0.2, 0, 1))); v.near = 0.5; v.far = 60000; v.drift = 0.003; v.fogD = 0.00003; v.sh = [cx, Y, 8]; v.shR = 40; break; }
+    case 'skyUp': { const q = set._plane, zk = Ease.inOutSine(MathX.clamp(k * 1.6 - 0.2, 0, 1)), ld = mgLerp(110, 20, zk); v.p = [cx + 4, Y + 1.6, 10.5]; v.at = [q.p[0] - Math.sin(q.h) * ld, q.p[1], q.p[2] + Math.cos(q.h) * ld]; v.fov = mgLerp(34, 2.2, zk); v.near = 0.5; v.far = 60000; v.drift = mgLerp(0.003, 0.0004, zk); v.fogD = 0.00001; v.sh = [cx, Y, 8]; v.shR = 40; break; }
     case 'cockpit': inPlane([13.25, fy + 1.32, 0.0], [16.2, fy + 1.05, 0.0], 64); break;
     case 'planeExt': v.p = AL(into([-34, 7, 30], [-30, 6, 27])); v.at = AL([4, 0, 0]); v.fov = 40; v.near = 0.5; v.far = 60000; v.fogD = 0.00003; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.05; break;
     case 'planeMap': v.p = AL(into([16, -12, -40], [12, -11, -36])); v.at = AL([-6, 9, 0]); v.fov = 44; v.near = 0.5; v.far = 60000; v.fogD = 0.00003; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.05; break;
