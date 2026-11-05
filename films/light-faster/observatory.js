@@ -235,7 +235,7 @@ LF_SETS.obs = (app) => {
       lfObsCam(this, m, s, t, kk, v);
       this._expo = v.expo;
       const old = k / (adapt * v.expo);
-      sky.update(s, { glow: 0, mw: 1, k: old, starK: old, px, at: cam.position });
+      sky.update(s, { glow: 0, mw: 1, k: old, starK: old, px, at: cam.position, blur: lfEyeBlurPx(k, cam.fov) });
       const inside = m === 'eyepiece' || m === 'baro';
       S.hemi.intensity = (m === 'eyepiece' ? 0.55 : inside ? 0.25 : 0.32) * old; slitL.intensity = (m === 'eyepiece' ? 90 : 0) * old;
       // the coast below: battery LEDs and the last car lights, fading

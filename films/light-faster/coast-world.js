@@ -382,10 +382,10 @@ function lfPoseParty(P, i, s) {
   else if (P.what === 'log') { pose = LF_POSES.sit(); py = y + 0.1; if (s > 104 + i) pose = LF_POSES.sitTorch(); }
   else pose = i % 2 ? LF_POSES.warm() : LF_POSES.hugKnees();
   // the stars: lying back, looking up
-  if (s > 238 && s < 1300 && P.what !== 'dance') { pose = P.what === 'stand' ? LF_POSES.lookUpStand() : P.what === 'log' ? LF_POSES.lookUpSit() : LF_POSES.lean(); }
-  if (s > 238 && s < 1300 && P.what === 'dance') pose = LF_POSES.lookUpStand();
+  if (s > 238 && s < 900 && P.what !== 'dance') { pose = P.what === 'stand' ? LF_POSES.lookUpStand() : P.what === 'log' ? LF_POSES.lookUpSit() : LF_POSES.lean(); }
+  if (s > 238 && s < 900 && P.what === 'dance') pose = LF_POSES.lookUpStand();
   // the end: at the water's edge, looking south (each a few metres apart)
-  if (s > 1300) { px = 712 + i * 3.1; pz = 40.5 + 1.2 * Math.sin(i * 1.7); py = lfSandY(px, pz); yaw = sea + 0.2 * Math.sin(i * 2.3); pose = i % 3 === 1 ? LF_POSES.lookUpStand() : LF_POSES.lookUp(); }
+  if (s > 900) { px = 712 + i * 3.1; pz = 40.5 + 1.2 * Math.sin(i * 1.7); py = lfSandY(px, pz); yaw = sea + 0.2 * Math.sin(i * 2.3); pose = i % 3 === 1 ? LF_POSES.lookUpStand() : LF_POSES.lookUp(); }
   P.root.position.set(px, py, pz); P.root.rotation.y = yaw;
   P.apply(lfFidget(Object.assign({}, pose), s, i, 0.6));
 }
@@ -394,6 +394,6 @@ function lfPoseYou(P, s) {
   const [x, z] = LF_YOU_FIRE.p; let px = x, pz = z, py = lfSandY(x, z) + 0.1, yaw = Math.atan2(LF_FIRE.x - x, LF_FIRE.z - z), pose = LF_POSES.sit();
   P.root.visible = s > 78;
   if (s > 238) pose = LF_POSES.lookUpSit();
-  if (s > 1300) { px = 724; pz = 41.5; py = lfSandY(px, pz); yaw = Math.atan2(0.1, 1); pose = LF_POSES.lookUp(); }
+  if (s > 900) { px = 724; pz = 41.5; py = lfSandY(px, pz); yaw = Math.atan2(0.1, 1); pose = LF_POSES.lookUp(); }
   P.root.position.set(px, py, pz); P.root.rotation.y = yaw; P.apply(lfFidget(Object.assign({}, pose), s, 31, 0.4));
 }

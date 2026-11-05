@@ -23,7 +23,7 @@ const LF_HAND_BL = Object.fromEntries(Object.keys(LF_HAND_POSES).concat(['hidden
 // mode → [right, left]
 const LF_HANDS_OF = {
   win: ['phoneLow', 'hidden'], phone: ['phone', 'touch'], bay: ['hidden', 'hidden'], emerg: ['phoneSide', 'hidden'], ring: ['phoneSide', 'ring'],
-  winBeach: ['hidden', 'hidden'], fireA: ['warm', 'warm'], colB: ['knee', 'warm'],
+  winBeach: ['hidden', 'hidden'], fireA: ['warm', 'warm'], colB: ['knee', 'hidden'],
 };
 const LF_EYE_MODES = new Set(Object.keys(LF_HANDS_OF));
 const LF_TRAIN_EYE = new Set(['win', 'phone', 'bay', 'emerg', 'ring', 'winBeach']);
@@ -37,12 +37,12 @@ function lfGoldRGB(k) {
   return out;
 }
 
-// the phone's screen: a night map. The blue dot is where GPS thinks you are: (k − 1) × 10,000 km off, out to sea, so the
-// map keeps zooming out to keep it in view; the status bar's clock; the battery
+// the phone's screen: a night map. GPS times light from space with the old speed (and the satellites' clocks drift):
+// within moments the receiver loses lock: a grey dot where it last knew you, a searching ring; the clock; the battery
 function lfDrawPhone(g, w, h, st) {
   const s = st.s, k = LFP.k(s), E = LFP.gpsKm(k);
   g.fillStyle = '#0d1520'; g.fillRect(0, 0, w, h);
-  const span = Math.max(3, E * 2.6), sc = h * 0.62 / span;                         // km across the map's height → px/km
+  const span = E < 0.05 ? 3 : 5, sc = h * 0.62 / span;                         // km across the map's height → px/km
   const cx = w * 0.5, cy = h * 0.3, R = new RNG(11);
   // the coast (land north, up): a ragged line, its wiggles finer than a pixel fade as the map zooms out
   g.fillStyle = '#1d2a22'; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, cy);
@@ -56,8 +56,11 @@ function lfDrawPhone(g, w, h, st) {
   // where you really are (GPS doesn't know): only the line; the dot: E km south and a little east
   const dx = 0.32 * E * sc, dy = E * sc, px = MathX.clamp(cx + dx, 26, w - 26), py = cy + dy;
   const acc = Math.max(10, Math.min(110, 0.2 * E * sc + 10));
-  g.fillStyle = 'rgba(70,140,255,0.16)'; g.beginPath(); g.arc(px, py, acc, 0, 6.29); g.fill();
-  g.fillStyle = '#ffffff'; g.beginPath(); g.arc(px, py, 11, 0, 6.29); g.fill(); g.fillStyle = '#3d8bff'; g.beginPath(); g.arc(px, py, 8, 0, 6.29); g.fill();
+  if (E < 0.05) { g.fillStyle = 'rgba(70,140,255,0.16)'; g.beginPath(); g.arc(px, py, acc, 0, 6.29); g.fill();
+    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(px, py, 11, 0, 6.29); g.fill(); g.fillStyle = '#3d8bff'; g.beginPath(); g.arc(px, py, 8, 0, 6.29); g.fill(); }
+  else {   // the receiver has lost lock: a grey dot where it last knew you, a searching ring
+    const rr = 26 + 30 * ((s * 1.7) % 1); g.strokeStyle = `rgba(200,210,225,${(0.7 * (1 - ((s * 1.7) % 1))).toFixed(2)})`; g.lineWidth = 3; g.beginPath(); g.arc(cx, cy, rr, 0, 6.29); g.stroke();
+    g.fillStyle = '#9aa3ae'; g.beginPath(); g.arc(cx, cy, 10, 0, 6.29); g.fill(); }
   // the scale bar
   const nice = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000], km = nice.find((v) => v * sc > 60) || 5000, bl = km * sc;
   g.fillStyle = 'rgba(255,255,255,0.85)'; g.fillRect(20, h - 70, bl, 4); g.font = '600 16px sans-serif'; g.fillText(km + ' km', 20, h - 80);
@@ -67,8 +70,8 @@ function lfDrawPhone(g, w, h, st) {
   g.fillStyle = 'rgba(30,40,55,0.92)'; lfRR(g, 14, 40, w - 28, 40, 20); g.fill(); g.fillStyle = 'rgba(255,255,255,0.75)'; g.font = '500 16px sans-serif'; g.fillText('Search here', 34, 66);
   // the location card: how far off it thinks you are
   g.fillStyle = 'rgba(22,30,42,0.95)'; lfRR(g, 14, h - 160, w - 28, 66, 14); g.fill();
-  g.fillStyle = '#ffffff'; g.font = '700 17px sans-serif'; g.fillText(E < 0.05 ? 'Your location' : 'Your location: at sea', 30, h - 132);
-  g.fillStyle = 'rgba(255,255,255,0.7)'; g.font = '500 14px sans-serif'; g.fillText(E < 0.05 ? 'Accuracy ±4 m' : `${Math.round(E)} km offshore`, 30, h - 110);
+  g.fillStyle = '#ffffff'; g.font = '700 17px sans-serif'; g.fillText(E < 0.05 ? 'Your location' : 'GPS signal lost', 30, h - 132);
+  g.fillStyle = 'rgba(255,255,255,0.7)'; g.font = '500 14px sans-serif'; g.fillText(E < 0.05 ? 'Accuracy ±4 m' : 'Searching for satellites…', 30, h - 110);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -113,13 +116,14 @@ LF_SETS.coast = (app) => {
       // ------------------------------------------------------------------ the camera
       const v = { p: [0, 5, 10], at: [0, 4, 0], fov: 50, drift: 0.01, near: 0.08, far: 24000, expo: 1, roll: 0 };
       lfCoastCam(this, m, s, t, kk, shot, v);
+      if (m === 'fireA' || m === 'colB') W.you.root.visible = false;   // (you are the camera: your own neck was in the picture)
       const dr = v.drift ? lfDrift(t, v.drift, 0.3, 11) : [0, 0, 0];
       if (v.shake) { const j = v.shake; dr[0] += j * Math.sin(t * 61) * Math.sin(t * 11.3); dr[1] += j * 0.7 * Math.sin(t * 53 + 1); dr[2] += j * Math.sin(t * 47 + 2) * Math.sin(t * 7.1); }
       if (cam.near !== v.near) cam.near = v.near; if (cam.far !== v.far) cam.far = v.far;
       lfCam(cam, [v.p[0] + dr[0], v.p[1] + dr[1], v.p[2] + dr[2]], [v.at[0] + dr[0], v.at[1] + dr[1], v.at[2] + dr[2]], v.fov, v.roll);
       this._expo = v.expo; this._inside = !!v.inside;
       // ------------------------------------------------------------------ the sky, the sea (seen from here)
-      sky.update(s, { glow: 0.85 * glowCity, mw: 1, k: old, starK: old, px, at: cam.position });
+      sky.update(s, { glow: 0.85 * glowCity, mw: 1, k: old, starK: old, px, at: cam.position, blur: lfEyeBlurPx(k, cam.fov) });
       sea.update(s, { glow: 0.8 * glowCity, bio: lfBio(s) * 1.0, fire: W.fire * 1.0, fogD: 0.00022, starK: old, train: T.lit > 0.02 ? [T.group.position.x, T.lit] : null });
       // the starlight and sky glow that light the ground (old light too), the train's own light on the track
       S.hemi.intensity = (v.inside ? 0.05 : 0.11) * old + 0.05 * glowCity;
@@ -257,7 +261,9 @@ function lfCoastCam(set, m, s, t, k, shot, v) {
     case 'starsA': { const p = [F.x + 1.5, F.y + 1.1, F.z + 6]; v.p = p; v.at = look(p, lfV([0.25, 0.75, -0.6], [0.3, 0.85, -0.42], E(k)), 100); v.fov = 72; v.near = 0.2; v.drift = 0.004; break; }
     case 'starsB': { const p = [F.x - 2.3, F.y + 0.38, F.z - 1.4]; v.p = p; v.at = look(p, [0.45, 0.52, 0.72], 100); v.fov = 62; v.near = 0.05; v.expo = 1.5; break; }
     case 'runout': { const p = into([F.x + 0.5, F.y + 1.6, F.z + 9], [F.x + 0.3, F.y + 1.7, F.z + 9.5], k), d = set.sky.dir(0.35, -1.6); v.p = p; v.at = look(p, [d[0], d[1] - 0.18, d[2]], 100); v.fov = 64; v.near = 0.2; break; }
-    case 'nearest': { const p = [722, sy(722, 43.5) + 1.55, 43.5], d = set.sky.dir(14.66, -60.83); v.p = p; v.at = look(p, [d[0] + 0.06, d[1] + 0.02, d[2]], 100); v.fov = 40; v.near = 0.2; v.drift = 0.002; break; }
+    // ---- 4: light's waves stretch (9:10): from the sand behind the party, their heads against a sky your eyes can't focus
+    case 'stretch': { const p = into([F.x + 0.9, F.y + 0.5, F.z - 3.7], [F.x + 0.8, F.y + 0.46, F.z - 3.9], k); v.p = p; v.at = look(p, [-0.08, 0.36, 1], 100); v.fov = 58; v.near = 0.1; v.drift = 0.003; v.expo = 1.3; break; }
+    case 'pupil': { const p = [722, sy(722, 43.5) + 1.55, 43.5], d = set.sky.dir(14.66, -60.83); v.p = p; v.at = look(p, [d[0] + 0.06, d[1] - 0.1, d[2]], 100); v.fov = 50; v.near = 0.2; v.drift = 0.002; break; }
     case 'question': { const p = into([725, sy(725, 33.5) + 1.8, 33.5], [725, sy(725, 31) + 2.4, 31], k), d = set.sky.dir(14.66, -60.83); v.p = p; v.at = look(p, [d[0] * 0.6, d[1] + 0.12, d[2]], 100); v.fov = 54; v.near = 0.2; break; }
   }
   void into;
@@ -269,11 +275,10 @@ function lfCoastLabels(set, t) {
   const lab = (p, text, sub, a0 = 0.8, side) => out.push({ p, text, sub, a: W(t, shot.t0 + a0, shot.t1 - 0.25, 0.35, 0.3), side });
   if (m === 'bay') { const H = LF_ST.hospital; lab([H[0], lfCityY(H[0], H[2]) + 34, H[2]], 'THE HOSPITAL', 'MRI scanner', 1.0); const D = LF_ST.stadium; lab([D[0], lfCityY(D[0], D[2]) + 42, D[2]], 'THE STADIUM', '40,000 people', 1.4, 'r'); }
   if (m === 'flicker') lab([-267.4, LF_ST.wallTop + 6.6, -10.6], 'TRANSFORMER', 'its iron saturates', 1.0);
-  if (m === 'roadCar') { const c = set.W.cars[1]; lab([c.g.position.x + 1.6, 5.2, -17.25], 'BATTERY', `${LFP.battery(LFP.k(s)).toFixed(1)} V of 12.8`, 0.8); }
+  if (m === 'roadCar') { const c = set.W.cars[1]; lab([c.g.position.x + 1.6, 5.2, -17.25], 'SPARK COIL', `${Math.round(100 / (LFP.k(s) ** 2))}% of its energy`, 0.8); }
   if (m === 'spk') { const K = LF_SPK; lab([K.x, K.y + 1.02, K.z], 'MAGNET + COIL', `pushes ${Math.round(100 / (LFP.k(s) ** 2))}% as hard`, 0.6); }
-  if (m === 'runout') { const d = set.sky.dir(0.35, -1.6), c = set.camera.position; lab([c.x + d[0] * 300, c.y + d[1] * 300, c.z + d[2] * 300], 'SATURN', 'its sunlight: 2½ hours on the way', 1.2); }
+  if (m === 'runout') { const d = set.sky.dir(0.35, -1.6), c = set.camera.position; lab([c.x + d[0] * 300, c.y + d[1] * 300, c.z + d[2] * 300], 'SATURN', 'its sunlight: 2½ hours on the way', 1.2, 'r'); }
   if (m === 'roof') { const V = LF_HR.vent; lab([V[0], V[1] + 0.6, V[2]], 'QUENCH PIPE', 'helium, boiling off', 1.2); }
-  if (m === 'nearest') { const d = set.sky.dir(14.66, -60.83), c = set.camera.position, gone = s > LFP.sAlphaCen; lab([c.x + d[0] * 300, c.y + d[1] * 300, c.z + d[2] * 300], gone ? 'ALPHA CENTAURI · GONE' : 'ALPHA CENTAURI', '4.37 light-years', 0.4); }
   return out;
 }
 

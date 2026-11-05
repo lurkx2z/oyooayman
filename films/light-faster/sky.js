@@ -129,15 +129,17 @@ function lfBuildSky(scene, o = {}) {
   g.setAttribute('aSeed', new THREE.Float32BufferAttribute(S, 1));
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending, fog: false,
-    uniforms: { uPx: { value: 1 }, uLim: { value: 6.8 }, uOut: { value: 0 }, uT: { value: 0 }, uK: { value: 1 }, uSize: { value: o.size || 1 } },
-    vertexShader: `attribute float aMag, aDist, aSeed; attribute vec3 aCol; uniform float uPx, uLim, uOut, uT, uK, uSize; varying vec3 vC; varying float vA;
+    uniforms: { uPx: { value: 1 }, uLim: { value: 6.8 }, uOut: { value: 0 }, uT: { value: 0 }, uK: { value: 1 }, uSize: { value: o.size || 1 }, uBlur: { value: 0 } },
+    vertexShader: `attribute float aMag, aDist, aSeed; attribute vec3 aCol; uniform float uPx, uLim, uOut, uT, uK, uSize, uBlur; varying vec3 vC; varying float vA;
       void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * mv; gl_Position.z = gl_Position.w * 0.99999;
         float alt = normalize(position).y, tw = 1.0 + (0.12 + 0.35 * (1.0 - smoothstep(0.0, 0.5, alt))) * sin(uT * (2.0 + 5.0 * aSeed) + aSeed * 60.0);
         float f = pow(10.0, -0.4 * (aMag - 1.0)), on = aDist > uOut ? 1.0 : 0.0, ext = mix(0.35, 1.0, smoothstep(0.0, 0.35, alt));
         float lim = smoothstep(uLim + 0.6, uLim - 0.6, aMag);
         vA = clamp(0.32 + 0.68 * sqrt(f), 0.0, 1.6) * on * tw * ext * lim * uK;
         vC = aCol;
-        gl_PointSize = uPx * uSize * clamp(2.2 + 1.5 * sqrt(f), 1.5, 9.0); }`,
+        float base = uPx * uSize * clamp(2.2 + 1.5 * sqrt(f), 1.5, 9.0), bl = 2.0 * uPx * uBlur, sz = min(sqrt(base * base + bl * bl), 160.0 * uPx);
+        vA *= (base * base) / (sz * sz);   // the eye's blur spreads the same light over a bigger disc
+        gl_PointSize = sz; }`,
     fragmentShader: `varying vec3 vC; varying float vA;
       void main(){ vec2 q = gl_PointCoord * 2.0 - 1.0; float r = dot(q, q); if (r > 1.0) discard;
         float a = vA * (exp(-r * 5.0) + 0.45 * exp(-r * 22.0)); gl_FragColor = vec4(vC * a, a); }`,
@@ -146,11 +148,12 @@ function lfBuildSky(scene, o = {}) {
   return {
     dome, stars, names,
     dir: lfSkyDir,
-    // s: story s; o.glow 0…1 (light pollution), o.mw (the Milky Way's brightness), o.k (overall), o.px (pixel scale), o.lim (faintest mag)
+    // s: story s; o.glow 0…1 (light pollution), o.mw (the Milky Way's brightness), o.k (overall), o.px (pixel scale), o.lim (faintest mag),
+    // o.blur (the eye's diffraction blur, px at 1080 lines: a star's light spread over a disc that wide)
     update(s, u = {}) {
       const du = dome.material.uniforms, su = mat.uniforms;
       du.uGlow.value = u.glow ?? 0; du.uMw.value = u.mw ?? 1; du.uK.value = u.k ?? 1;
-      su.uPx.value = u.px ?? 1; su.uT.value = s; su.uK.value = u.starK ?? 1;
+      su.uPx.value = u.px ?? 1; su.uT.value = s; su.uK.value = u.starK ?? 1; su.uBlur.value = u.blur ?? 0;
       su.uLim.value = u.lim ?? (6.9 - 3.4 * (u.glow ?? 0));
       // a star is out once light has swallowed all the light it sent before 9 PM
       su.uOut.value = s > 0 ? (LFP.k(s) - 1) / LFP.LN / LFP.LY : 0;

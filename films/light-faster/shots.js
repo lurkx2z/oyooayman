@@ -17,9 +17,9 @@ const LF_SHOTS = [];
     ['A1', 'win', B('start'), B('gps'), 'coast'],
     ['A2', 'phone', B('gps'), B('real'), 'coast'],
     ['A3', 'ext2', B('real'), c('real', 1) - 0.5, 'coast'],
-    ['A3b', 'bay', c('real', 1) - 0.5, c('real', 2) - 0.5, 'coast'],
-    ['A3c', 'ext3', c('real', 2) - 0.5, B('magnet'), 'coast'],
-    ['A4', 'panto', B('magnet'), B('flicker'), 'coast'],
+    ['A3b', 'bay', c('real', 1) - 0.5, B('magnet'), 'coast'],
+    ['A3c', 'ext3', B('magnet'), c('magnet', 1) - 0.5, 'coast'],
+    ['A4', 'panto', c('magnet', 1) - 0.5, B('flicker'), 'coast'],
     ['A5', 'flicker', B('flicker'), B('mri'), 'coast'],
     // the hospital across the bay: the MRI scanner's magnet quenches
     ['H1', 'mriA', B('mri'), c('mri', 1) - 0.5, 'hospital'],
@@ -34,8 +34,8 @@ const LF_SHOTS = [];
     ['H2b', 'corridor', c('generator', 1) - 0.5, B('brake'), 'hospital'],
     ['A7', 'brakeX', B('brake'), c('brake', 1) - 0.5, 'coast'],
     ['A7b', 'emerg', c('brake', 1) - 0.5, B('road'), 'coast'],
-    ['A8', 'road', B('road'), c('road', 1) - 0.5, 'coast'],
-    ['A8b', 'roadCar', c('road', 1) - 0.5, B('mercury'), 'coast'],
+    ['A8', 'road', B('road'), c('road', 0) + 2.6, 'coast'],
+    ['A8b', 'roadCar', c('road', 0) + 2.6, B('mercury'), 'coast'],
     // the observatory on the mountain: the barometer's mercury freezes
     ['O1', 'obsOut', B('mercury'), c('mercury', 1) - 0.5, 'obs'],
     ['O1b', 'baro', c('mercury', 1) - 0.5, B('ring'), 'obs'],
@@ -58,9 +58,11 @@ const LF_SHOTS = [];
     ['C1b', 'starsB', c('stars', 2) - 0.5, B('runout'), 'coast'],
     ['C2', 'runout', B('runout'), B('saturn'), 'coast'],
     ['O2', 'scope', B('saturn'), c('saturn', 1) - 0.5, 'obs'],
-    ['O2b', 'eyepiece', c('saturn', 1) - 0.5, B('nearest'), 'obs'],
-    ['C3', 'nearest', B('nearest'), B('question'), 'coast'],
-    ['C4', 'question', B('question'), 1e9, 'coast'],
+    ['O2b', 'eyepiece', c('saturn', 1) - 0.5, B('stretch'), 'obs'],
+    // 4 — light's waves stretch: your eyes can't focus them, then they no longer fit through your pupils
+    ['C3', 'stretch', B('stretch'), B('pupil'), 'coast'],
+    ['C4', 'pupil', B('pupil'), B('question'), 'coast'],
+    ['C5', 'question', B('question'), 1e9, 'coast'],
   ];
   for (const [id, mode, t0, t1, set] of L) P.push(lfSh(id, mode, t0, t1, set));
   P.forEach((s, i) => { if (i && Math.abs(s.t0 - P[i - 1].t1) > 1e-6) throw new Error(`LF_SHOTS: a gap or overlap before ${s.id}`); if (!(s.t1 > s.t0)) throw new Error(`LF_SHOTS: ${s.id} has no length`); });

@@ -42,6 +42,19 @@ function lfHead(s, i = 0) {
   return Math.pow(v * (s > cut ? 0.94 : 1), 3.4);
 }
 function lfBio(s) { return LFP.led(LFP.k(s)); }
+// the eye's diffraction blur in pixels (at 1080 lines) for a camera of vertical fov (deg): light's waves grow as k
+function lfEyeBlurPx(k, fovDeg) { return LFP.eyeBlur(k) * 1080 / (2 * Math.tan(fovDeg * Math.PI / 360)); }
+// what the eye can still make of the picture once its blur passes a few pixels (film.js grade, every naked-eye shot):
+// softer, then a featureless glow; and past ×12,700 the waves no longer fit through the pupil (LFP.through)
+function lfEyeLook(p, k, fovDeg) {
+  const b = lfEyeBlurPx(k, fovDeg); if (b < 2.5 && k < 1000) return;
+  p.soft = Math.max(p.soft, MathX.clamp((b - 2.5) / 22, 0, 1));
+  if (b > 18) { p.tunnel = -3; p.edgeBlur = Math.max(p.edgeBlur, MathX.clamp((b - 18) / 40, 0, 1)); }   // (a negative tunnel: the heavy blur everywhere)
+  const w = MathX.clamp(Math.log(b / 40) / Math.log(12), 0, 1);                                         // 40 → 480 px: detail goes
+  p.contrast *= 1 - 0.96 * w; p.saturation *= 1 - w; p.bloom *= 1 - w;
+  const lt = 0.05 * Math.pow(LFP.through(k), 0.72), base = 0.42 - 0.38 * p.contrast;                   // the glow's level: what gets in, half adapted to
+  if (w > 0) p.fade = Math.max(p.fade, w * MathX.clamp(1 - lt / Math.max(0.02, base), 0, 1));
+}
 function lfAdapt(s) { const k = LFP.k(s); return Math.pow(1 / (LFP.eye(k) * LFP.glow(k)), 0.28); }
 function lfSat(s) { const k = LFP.k(s); return 1 / (1 + Math.pow(Math.max(0, k - 1) / 5, 1.6)); }
 const lfRs2 = (i) => hash1(i * 7919 + 4421);

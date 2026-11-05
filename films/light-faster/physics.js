@@ -17,7 +17,14 @@
      old light             light that left before 9 PM arrives k× faster (and k× as much per second); together with the
                            eye's catch it looks about as bright as before (starlight ×1.4–1.5). It runs out when light
                            has swallowed the whole column: c₀∫k ds = D → k = 1 + D·ln(1.01)/c₀
-     GPS                   receivers time light with the old c: errors of order (k − 1) × 10,000 km (rough)
+     GPS                   receivers time light with the old c (and the satellites' atomic clocks drift: their
+                           hyperfine splitting ∝ μ₀): they lose lock at once
+     wavelength            a photon keeps its energy, so its frequency stays and its wavelength grows as k: the eye's
+                           diffraction blur 1.22 λ/D (D = 7 mm at night) passes a pixel at about ×10, is 2° at ×400, and
+                           at ×12,700 green light's waves are as wide as the pupil; past that almost none gets in
+                           (an aperture smaller than the wave passes about (D/λ)⁴ of it)
+     the Sun after 9:03    light it sends at k_e arrives squeezed by k/k_e with 1/k_e² of the power: k/k_e³, where
+                           k − k_e = 499 light-s × ln 1.01 (×6 at 9:03:00, about ×1 at 9:03:17, 8% at 9:03:51)
    ===================================================================== */
 
 const LFP = {
@@ -59,6 +66,14 @@ LFP.dSaturn = 4740 + 4330;                                               // ligh
 LFP.sSaturn = LFP.sOut(LFP.dSaturn);                                     // 9:07:33
 LFP.dAlphaCen = 4.37 * LFP.LY;
 LFP.sAlphaCen = LFP.sOut(LFP.dAlphaCen);                                 // 9:23:40
+
+// the waves: λ ∝ k (the frequency stays). The eye's blur angle (rad) and how much light still gets through the pupil
+LFP.pupil = 7e-3;                                                          // m, dark-adapted
+LFP.eyeBlur = (k) => 1.22 * 550e-9 * k / LFP.pupil;                        // rad (green light)
+LFP.kPupil = LFP.pupil / 550e-9;                                           // 12,727: green waves as wide as the pupil
+LFP.through = (k) => 1 / (1 + Math.pow(k / LFP.kPupil, 4));               // the share that still gets in
+// the Sun's light on the day side: the old light (×k) until 9:03, then the new light, squeezed, from a dimmer Sun
+LFP.sunNow = (k) => { const ke = k - 499 * LFP.LN; return ke <= 1 ? k : k / (ke * ke * ke); };
 
 // the train: 120 km/h east along the sea wall; the driver brakes when the grid goes (0.75 m/s²); its front stops by the
 // beach steps (x = LF_ST.stopX)

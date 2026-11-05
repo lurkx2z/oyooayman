@@ -71,7 +71,7 @@ LF_SETS.hospital = (app) => {
     wall: lfStd('#d8dde0', 0.85), wallB: lfStd('#a9c4d8', 0.8), floor: lfStd('#ffffff', 0.6, 0, { map: (() => { const t = lfTex(lfFloorCanvas(3)); t.repeat.set(12, 12); return t; })() }),
     ceil: lfStd('#e8eaea', 0.9), white: lfStd('#f2f3f2', 0.35), trim: lfStd('#3a8ad8', 0.4), dark: lfStd('#24272b', 0.7), steel: lfStd('#a8adb2', 0.35, 0.8),
     pad: lfStd('#3a5a7a', 0.7), desk: lfStd('#b8a890', 0.6), glass: new THREE.MeshStandardMaterial({ color: '#9fb8c8', roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.18, depthWrite: false }),
-    panel: new THREE.MeshBasicMaterial({ color: '#ffffff' }), emerg: new THREE.MeshBasicMaterial({ color: '#ffffff' }), board: lfStd('#f6f6f2', 0.25), frame: lfStd('#9aa0a6', 0.3, 0.7),
+    panel: new THREE.MeshBasicMaterial({ color: '#ffffff' }), emerg: new THREE.MeshBasicMaterial({ color: '#ffffff' }), board: lfStd('#d6d8d4', 0.35), frame: lfStd('#9aa0a6', 0.3, 0.7),
     conc: lfStd('#8a8a86', 0.9), gen: lfStd('#3a6a4a', 0.5, 0.3), genD: lfStd('#2a2c2e', 0.6, 0.4),
   };
   const box = (w, h, d, m, x, y, z) => lfBox(w, h, d, m, x, y, z);
@@ -93,7 +93,7 @@ LF_SETS.hospital = (app) => {
   for (const [x, z] of [[2.0, 2.0], [5.2, 2.0], [2.0, 5.0], [5.2, 5.0], [9.0, 2.0], [9.0, 5.0], ...Array.from({ length: 8 }, (_, i) => [-27 + i * 4.6, 9.6])]) { const p = box(1.2, 0.04, 0.6, M.panel, x, H - 0.03, z); panels.push(p); }
   for (const [x, y, z, ry] of [[0.4, 2.6, 6.38, 0], [9.0, 2.55, 6.38, 0], [-12, 2.6, 11.18, 0], [-24, 2.6, 11.18, 0], [-4, 2.6, 11.18, 0]]) { const e = box(0.34, 0.12, 0.06, M.emerg, x, y, z); e.rotation.y = ry; emerg.push(e); }
   const roomL = [[3.6, 2.7, 2.6], [9.0, 2.6, 3.2], [-6, 2.6, 9.6], [-18, 2.6, 9.6], [-27, 2.6, 9.6]].map((p) => { const L = new THREE.PointLight('#f4f6ff', 0, 12, 1.5); L.position.set(...p); scene.add(L); return L; });
-  const emL = [[0.6, 2.4, 6.0], [9.0, 2.4, 6.0], [-12, 2.4, 10.8], [-24, 2.4, 10.8], [-4, 2.4, 10.8]].map((p) => { const L = new THREE.PointLight('#dfe8ff', 0, 9, 1.6); L.position.set(...p); scene.add(L); return L; });
+  const emL = [[0.6, 2.4, 6.0], [9.0, 2.4, 6.0], [-12, 2.4, 10.8], [-24, 2.4, 10.8], [-4, 2.4, 10.8]].map((p) => { const L = new THREE.PointLight('#dfe8ff', 0, 6, 2.0); L.position.set(...p); scene.add(L); return L; });
   // ---- the magnet: a rounded block with the bore through it (along z), a raised fascia ring, the turret and its vent pipe
   const B = HO.bore, mag = new THREE.Group(); mag.position.set(B[0], B[1], B[2]); scene.add(mag);
   { const sh = new THREE.Shape(); lfRRShape(sh, -1.1, -1.1, 2.2, 2.2, 0.55); const hole = new THREE.Path(); hole.absarc(0, 0, 0.36, 0, Math.PI * 2, true); sh.holes.push(hole);
@@ -130,6 +130,9 @@ LF_SETS.hospital = (app) => {
   for (const [dx, dz] of [[-0.9, -0.38], [0.9, -0.38], [-0.9, 0.38], [0.9, 0.38]]) lfCyl(0.02, 0.02, 0.6, M.steel, dx, 0.3, dz, bed);
   const n1 = lfPerson('lfNurse', scene, { id: 'n1' }), n2 = lfPerson('lfNurse2', scene, { id: 'n2' });
   const torchL = new THREE.SpotLight('#eaf0ff', 0, 14, 0.45, 0.5, 1.4); scene.add(torchL); scene.add(torchL.target);
+  // the corridor's green exit sign, hanging from the ceiling at its far end (free-standing: nothing coplanar), on the batteries
+  const exitM = new THREE.MeshBasicMaterial({ color: '#1a2a1e' }), exitL = new THREE.PointLight('#5aff8a', 0, 3.5, 2); exitL.position.set(-28.6, 2.35, 9.6); scene.add(exitL);
+  lfBox(0.05, 0.18, 0.46, exitM, -28.7, 2.5, 9.6, scene); lfBox(0.012, 0.22, 0.012, M.steel, -28.7, 2.77, 9.6, scene);
   // ---- the generator room (x 30…42, z 0…8): the generator set, its panel, one light
   wallZ(-0.1, 29.8, 42.2, [], M.conc); wallZ(8.1, 29.8, 42.2, [], M.conc); wallX(29.9, -0.2, 8.2, [], M.conc); wallX(42.1, -0.2, 8.2, [], M.conc);
   box(5.6, 0.22, 1.5, M.genD, 35.4, 0.11, 3.2);                                                             // the skid
@@ -161,10 +164,11 @@ LF_SETS.hospital = (app) => {
       for (const p of panels) p.material.color.setScalar(0.06 + 0.94 * mains);
       for (const e of emerg) e.material.color.setRGB(0.08 + 0.9 * em, 0.08 + 0.94 * em, 0.1 + 1.0 * em);
       for (const L of roomL) L.intensity = 7 * mains;
-      for (const L of emL) L.intensity = 3.4 * em;
+      for (const L of emL) L.intensity = 2.6 * em;
+      exitM.color.setRGB(0.1 + 0.25 * em, 0.15 + 0.85 * em, 0.12 + 0.4 * em); exitL.intensity = 0.5 * em;
       genL.intensity = 10 * mains;
       boreL.intensity = 1.4 * mains;
-      S.hemi.intensity = 0.015 + 0.14 * mains + 0.03 * em; scene.environmentIntensity = 0.03 + 0.42 * mains + 0.04 * em;
+      S.hemi.intensity = 0.008 + 0.09 * mains + 0.006 * em; scene.environmentIntensity = 0.015 + 0.26 * mains + 0.008 * em;   // (after the trip: pools of battery light, dark between)
       // ---- the screens
       MT.update({ s: Math.round(s * 60) / 60 }); scr.material.color.setScalar(0.1 + 0.9 * Math.max(mains, 0.9 * lfEmerg(s, 0.05))); scrL.intensity = 0.6 * Math.max(mains, 0.5 * em);
       const gv = s < 15.45 ? 0 : 230 * (0.32 * lfSm(s, 15.45, 15.55) * (1 - lfSm(s, 15.85, 16.0))) / 0.32 * 0.36, run = s > 15.4 && s < 16.1;
@@ -179,7 +183,7 @@ LF_SETS.hospital = (app) => {
       n1.root.position.set(-12.6, 0, 9.4); n1.root.rotation.y = s > 40 ? Math.PI * 1.0 : -0.4; n1.apply(s > 16.2 ? LF_POSES.torch() : LF_POSES.lookAround());
       n2.root.position.set(-15.8, 0, 9.6); n2.root.rotation.y = s > 40 ? Math.PI * 0.85 : 0.6; n2.apply(s > 40 ? LF_POSES.lookUp() : LF_POSES.phone());
       // the nurse's torch (an LED: it fades too)
-      { const tl = lfPhone(s, 16.25); torchL.intensity = 24 * tl; torchL.position.set(-12.4, 1.45, 9.1); torchL.target.position.set(s > 40 ? BD[0] + 0.4 : -12, s > 40 ? BD[1] : 0.4, s > 40 ? 8 : 4); torchL.target.updateMatrixWorld(); }
+      { const tl = lfPhone(s, 16.25); torchL.intensity = 11 * tl; torchL.position.set(-12.4, 1.45, 9.1); torchL.target.position.set(s > 40 ? BD[0] + 0.4 : -12, s > 40 ? BD[1] : 0.4, s > 40 ? 8 : 4); torchL.target.updateMatrixWorld(); }
       // ---- the cards sliding off the board
       for (const c of cards) { const d = lfBoardDrop(c.i, s, c.y0 - (BD[1] - bh / 2 + 0.1)); c.g.position.y = c.y0 - d; c.g.rotation.z = d > 0 ? -0.06 * Math.min(1, d * 3) * (c.i % 2 ? 1 : -1) : 0; }
       // ---- the camera
@@ -215,7 +219,7 @@ LF_SETS.hospital = (app) => {
       if (m === 'gen') lab([37.2, 2.1, 3.2], 'BACKUP GENERATOR', 'its alternator: a magnet', 0.8);
       return out;
     },
-    grade(t, p) { const s = this._s, k = this._k; p.exposure = 1.0 * LFP.eye(k) * lfAdapt(s) * (s > 14.3 ? 1.6 : 1); p.saturation = lfSat(s) * 0.95; p.contrast = 1.06; p.warmth = -0.03; p.bloom = 0.38; p.bloomThreshold = 0.85; p.vignette = 0.55; },
+    grade(t, p) { const s = this._s, k = this._k; p.exposure = LFP.eye(k) * lfAdapt(s) * (s > 14.3 ? 1.15 : 0.78); p.saturation = lfSat(s) * 0.95; p.contrast = 1.06; p.warmth = -0.03; p.bloom = 0.38; p.bloomThreshold = 0.85; p.vignette = 0.55; },
   };
   return set;
 };

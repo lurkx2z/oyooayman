@@ -159,7 +159,7 @@ lfSound('sfx', 'events', function (ctx, bus, K) {
       const i0 = Math.round((a - t0) * sr), i1 = Math.round((b - t0) * sr), x = y.slice(i0, i1); for (let i = 0; i < x.length; i++) x[i] *= Math.min(1, i / (0.03 * sr), (x.length - i) / (0.03 * sr));
       LFX.bq(x, 'lp', g[1], 0.7, sr); K.put(x, a, { vol: 0.32, pan: p.shot.mode === 'spk' ? 0.1 : 0.45, room: open, wet: p.shot.mode === 'spk' ? 0.15 : 0.35 }); } }
   // the fire: it crackles just as loudly all night (just as hot), close or from across the cove
-  { const near = { fireA: 1, fireB: 1, colA: 0.9, colB: 1, heat: 0.9, starsB: 0.8, spk: 0.35, waves: 0.3, dayA: 0.35, starsA: 0.55, runout: 0.5, stopX: 0.2, nearest: 0.25, question: 0.25 };
+  { const near = { fireA: 1, fireB: 1, colA: 0.9, colB: 1, heat: 0.9, starsB: 0.8, spk: 0.35, waves: 0.3, dayA: 0.35, starsA: 0.55, runout: 0.5, stopX: 0.2, stretch: 0.3, pupil: 0.2, question: 0.15 };
     for (const p of lfPlaces()) { const g = near[p.shot.mode]; if (!g) continue; const a = p.t0, b = Math.min(p.t1, END) + 0.04; if (b - a < 0.05) continue;
       const d = b - a, cr = lfCrackle(fx, d, { rate: 60, hp: 900, env: (u) => Math.min(1, u * d / 0.05, (1 - u) * d / 0.05) });
       K.put(cr, a, { vol: 0.12 * g, norm: true, pan: 0.15, room: open, wet: 0.15 });

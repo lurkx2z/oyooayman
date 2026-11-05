@@ -68,6 +68,8 @@ const FILM = {
     p.flashColor.setRGB(1, 1, 1);
     const set = FILM._set;
     if (set && set.grade) set.grade(t, p, shot);
+    // what your eyes can still focus (light's waves grow as c): not through the telescope, whose mirror is 60 cm wide
+    if (set && shot.mode !== 'scope') lfEyeLook(p, LFP.k(lfStoryAt(t)), (set.view ? set.view()[1] : set.camera).fov);
     // every cut: a 2-frame dip
     for (const c of FILM._cuts) if (Math.abs(t - c) < 0.07) p.fade = Math.max(p.fade, 0.3 * (1 - Math.abs(t - c) / 0.07));
     // the end: no fade-out and no black (nothing signals the end): the film stops on the question, mid-shot

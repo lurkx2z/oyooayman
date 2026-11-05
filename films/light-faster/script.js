@@ -38,15 +38,18 @@ const LF_CLOCK = (() => {
     [B('flicker'), 7.85, slow],                           // the transformers saturate at 8.2 s (×1.085)
     [B('mri'), 8.45, slow],                               // the MRI quenches at 9.58 s (×1.1), on its third caption
     [B('blackout'), 13.85, slow],                         // the grid trips at 14.05 s (×1.15); the stadium's own feed at 14.45
-    [B('road'), 25.2, slow],                              // cars cut out around 26.4 s (×1.3)
+    [B('road'), 25.55, slow],                             // cars cut out around 26.4 s (×1.3); the one we follow at 25.9
     [B('mercury'), 26.5, slow],                           // mercury freezes at 28.0 s on the mountain (6 °C), on its third caption
     [B('ring'), 38.3, slow],                              // gold's edge leaves the visible at 38.9 s (×1.47)
     [B('beach'), 55.0, 'real'],                           // from here: real speed (the train stops at 61 s)
+    [B('fire'), 87.5, 'real'],                            // ×2.7 on the fire's third caption
     [B('colour'), 151.5, 'real'],                         // ×5 at 161.7 s
-    [B('day'), 165.0, 'real'],                            // 9:03:00: the Sun's old light runs out (×6)
+    [B('day'), 169.0, 'real'],                            // 9:03:00: the Sun's old light runs out (×6), just before its third caption
     [B('heat'), 230.7, 'real'],                           // ×10 at 231.4 s
-    [B('saturn'), P.sSaturn - 1.6, 'real'],               // 9:07:33: Saturn goes out
-    [B('nearest'), P.sAlphaCen - 2.4, 'real'],            // 9:23:40: the nearest star goes out
+    [B('saturn'), P.sSaturn - 2.4, 'real'],               // 9:07:33: Saturn goes out (seen in the eyepiece for 2.4 s first)
+    [B('stretch'), 600.8, 'real'],                        // 9:10: light's waves 400 times longer: your eyes can't focus them
+    [B('pupil'), 958.8, 'real'],                          // 9:16: green light's waves as wide as a dark-adapted pupil (7 mm)
+    [B('question'), 1080, 'real'],                        // 9:18: almost none of the light gets through your pupils
   ];
   void C;
   const out = [];

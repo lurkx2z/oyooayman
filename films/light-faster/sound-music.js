@@ -9,8 +9,10 @@
      the mountain  ice: a high cluster that never moves; mercury freezes on one bell; gold turns silver, the bells fall
      the beach     warmer, sparse (the party's own song plays from its speaker); the colours drain from the chords
                    down to a bare octave; the Sun's old light: a swell that rises to 9:03 and a hit
-     the stars     high and thin; a roll to Saturn going out, a hit; the nearest star: a hit, then bells cut off one by
-                   one, faster and faster; the question: the motif a note short, cut on the last frame
+     the stars     high and thin; a roll to Saturn going out, a hit
+     the waves     light's waves stretch: a cluster that drifts down and darkens, bells in beating pairs; at the pupils'
+                   width the high strings fall away and a low drone darkens; the question: the motif a note short, cut
+                   on the last frame
    ===================================================================== */
 
 // the kit: string pads (three detuned oscillators per note through low-passes), felt piano (also reversed), bells,
@@ -157,14 +159,14 @@ const lfOct = (n, k) => n.replace(/-?\d$/, (d) => String(+d + k));
 lfSound('music', 'score', function (ctx, bus, K) {
   const M = lfMusicKit(ctx, K), C = LF_CH, c = lfC, B = lfB, F = lfFilmAt, END = LF.end, T0 = LF.tLock;
   const ev = { trans: F(LFP.sTrans), quench: F(LFP.sQuench), grid: F(LFP.sGrid), stad: F(LFP.sGrid + LF_STAD_D), gen: F(15.45), brake: F(LFP.train.sBrake),
-    spark: F(LFP.sSpark), hg: F(LFP.sHgCold), gold: F(LFP.sGold), stop: F(LFP.train.sStop), sun: F(LFP.sSun), saturn: F(LFP.sSaturn), alpha: F(LFP.sAlphaCen) };
+    spark: F(LFP.sSpark), hg: F(LFP.sHgCold), gold: F(LFP.sGold), stop: F(LFP.train.sStop), sun: F(LFP.sSun), saturn: F(LFP.sSaturn) };
   const motif = (t, o = {}) => LF_THEME.slice(0, o.n || 4).forEach((n, i) => M.piano(t + i * (o.gap || 1.2), lfOct(n, o.oct || 0), (o.vel || 0.5) * (i ? 0.88 : 1), o.dur || 3.4, [-0.2, 0.15, -0.1, 0.2, 0][i]));
   const glass = (t, v = 0.36, n = 'E6') => { M.bell(t, n, v, -0.3); M.bell(t + 0.02, lfOct(n, 1).replace('E', 'B'), v * 0.5, 0.3); };
   const fig = (t0, t1, notes, step, vel, durK = 1.8) => { for (let t = t0, i = 0; t < t1 - 0.3; t += step, i++) M.piano(t, notes[i % notes.length], vel * (0.8 + 0.2 * Math.sin(i * 1.3)), step * durK, i % 2 ? 0.25 : -0.25); };
   const hit = (t, v = 0.9, f = 36.7) => { M.drum(t, v, f, 1.1, 1.8); M.drum(t + 0.012, 0.5 * v, f * 1.5, 1.3, 1.0); };
 
   // ================================================================== the endless rise: from 9:00 to the last frame
-  { const t0 = T0 - 0.2, t1 = END + 0.05, e = (t) => 0.06 * lfEv(t, T0, T0 + 9) * (1 - 0.35 * lfWn(t, B('beach'), B('stars'), 3, 3)) * (1 + 0.5 * lfEv(t, B('stars'), B('nearest'))) * (t > END - 0.02 ? 0 : 1);
+  { const t0 = T0 - 0.2, t1 = END + 0.05, e = (t) => 0.06 * lfEv(t, T0, T0 + 9) * (1 - 0.35 * lfWn(t, B('beach'), B('stars'), 3, 3)) * (1 + 0.5 * lfEv(t, B('stars'), B('stretch'))) * (1 - 0.45 * lfEv(t, B('pupil'), B('question') + 2)) * (t > END - 0.02 ? 0 : 1);
     const rate = (t) => (t < B('beach') ? 1 / 30 : t < B('stars') ? 1 / 24 : 1 / 16);
     const [Lx, Rx] = lfShepard(K.fx, t0, t1, { rate, env: e, centre: 300, width: 1.2 });
     K.fx.play(Lx, t0, M.bus, { xr: Rx, vol: 1 }); }
@@ -176,13 +178,13 @@ lfSound('music', 'score', function (ctx, bus, K) {
   // 9:00:00: light starts speeding up: a swell that stops dead, a low hit, glass
   M.rpiano(T0, 'A2', 0.5, 2.2, 0); M.rpiano(T0, 'E3', 0.34, 2.2, 0.2); hit(T0, 0.7); glass(T0, 0.34);
   // the slow minutes: Am9 → F lydian → Dm9 → E7sus, cold and far
-  M.prog([[T0 + 0.3, C.Am9], [B('gps'), C.Flyd], [B('real'), C.Dm9], [c('real', 2), C.E7sus], [B('magnet'), C.Am9]], B('flicker') + 0.6, 0.42, { cut: 1100 });
+  M.prog([[T0 + 0.3, C.Am9], [B('gps'), C.Flyd], [B('real'), C.Dm9], [c('real', 1) + 2.0, C.E7sus], [B('magnet'), C.Am9]], B('flicker') + 0.6, 0.42, { cut: 1100 });
   M.strings(T0 + 0.5, B('flicker') + 0.8, ['E5', 'A5', 'B5'], 0.1, { att: 3, rel: 1.2, cut: 3600, wave: 'triangle', vib: 2 });
   motif(c('start', 0) + 0.5, { gap: 1.6, vel: 0.44 });
   motif(c('gps', 1) + 0.5, { gap: 1.8, vel: 0.36, oct: -1, n: 3 });
   // the one impossible thing: two low notes, held
   M.piano(c('real', 0) + 0.2, 'F2', 0.42, 5); M.piano(c('real', 1) + 0.2, 'B1', 0.4, 5); glass(c('real', 1) + 0.25, 0.22, 'E6');
-  fig(c('real', 2) + 0.3, B('magnet'), ['E5', 'B4', 'C5', 'A4'], 1.3, 0.18);
+  fig(c('real', 1) + 2.2, B('magnet'), ['E5', 'B4', 'C5', 'A4'], 1.3, 0.18);
   // light = electricity + magnetism: a slow pulse starts, and tightens to the blackout
   { const t0 = B('magnet') + 0.4, t1 = ev.grid, stepAt = (t) => 1.1 - 0.6 * MathX.clamp((t - t0) / (t1 - t0), 0, 1) ** 1.2;
     lfPulse(ctx, M.bus, t0, ev.trans, ['A1', 'E2'], 1.1, 0.7, { stepAt, cut: 300, cutTo: 480, acc: 4, ramp: (u) => 0.5 + 0.5 * u });
@@ -207,7 +209,7 @@ lfSound('music', 'score', function (ctx, bus, K) {
     for (let t = t0, i = 0; t < t1; t += 0.42 - 0.3 * MathX.clamp((t - t0) / (t1 - t0), 0, 1) + 0.1 * r.next(), i++) M.bell(t, notes[r.int(0, notes.length - 1)], 0.12 + 0.1 * r.next(), r.range(-0.8, 0.8)); }
   M.strings(c('blackout', 2), B('generator') + 0.6, C.high, 0.1, { att: 1.6, rel: 0.6, cut: 5200, wave: 'triangle', vib: 3 });
   // the hospital's generators: the pulse again, stumbling
-  M.prog([[B('generator'), C.Dm], [c('generator', 1), C.Bblyd], [B('brake'), C.Am9], [c('brake', 1), C.Flyd], [B('road'), C.Dm9], [c('road', 1), C.E7sus]], ev.spark + 0.5, 0.4, { cut: 1000 });
+  M.prog([[B('generator'), C.Dm], [c('generator', 1), C.Bblyd], [B('brake'), C.Am9], [c('brake', 1), C.Flyd], [B('road'), C.Dm9], [c('road', 0) + 2.6, C.E7sus]], ev.spark + 0.5, 0.4, { cut: 1000 });
   lfPulse(ctx, M.bus, B('generator') + 0.3, B('brake'), ['D2', 'A2'], 0.9, 0.7, { cut: 320, cutTo: 260, acc: 3, stepAt: (t) => 0.9 + 0.35 * Math.sin(t * 1.9) * Math.sin(t * 0.7), ramp: (u) => 1 - 0.5 * u });
   M.piano(c('generator', 1) + 0.3, 'D2', 0.4, 4); M.piano(c('generator', 1) + 1.9, 'A1', 0.36, 4);
   // the brakes, the battery lights: the motif low; then the road: a pulse that the stalling engines cut
@@ -226,7 +228,7 @@ lfSound('music', 'score', function (ctx, bus, K) {
   M.strings(ev.gold - 0.5, B('beach') + 0.6, ['C6', 'E6', 'A6'], 0.1, { att: 1.0, rel: 0.6, cut: 5000, wave: 'triangle', glide: -50, glideAt: B('beach') });
 
   // ================================================================== 2 · the beach (real speed from here)
-  M.prog([[B('beach'), C.Cmaj9], [c('beach', 1), C.Am9], [B('speaker'), C.Fmaj9], [c('speaker', 1), C.Gsus], [B('board'), C.Am9], [c('board', 1), C.Flyd], [B('fire'), C.Cmaj7], [c('fire', 1), C.Am9], [c('fire', 2), C.Fmaj9],
+  M.prog([[B('beach'), C.Cmaj9], [c('beach', 1), C.Am9], [B('speaker'), C.Fmaj9], [c('speaker', 1), C.Gsus], [B('board'), C.Am9], [c('board', 0) + 2.2, C.Flyd], [B('fire'), C.Cmaj7], [c('fire', 1), C.Am9], [c('fire', 2), C.Fmaj9],
     [B('waves'), C.Am9], [c('waves', 1), C.Flyd], [B('phones'), C.Bblyd]], B('colour') + 0.5, 0.38, { cut: 1250 });
   motif(c('beach', 0) + 0.6, { gap: 1.4, vel: 0.4 });
   fig(B('speaker') + 0.5, B('board') - 0.2, ['C5', 'G4', 'E5', 'B4'], 1.1, 0.14);
@@ -261,14 +263,17 @@ lfSound('music', 'score', function (ctx, bus, K) {
   M.strings(B('runout'), ev.saturn, ['A3', 'E4', 'A4', 'B4'], 0.3, { att: 2.0, rel: 0.05, cut: 800, cutTo: 3600, cutAt: ev.saturn - 0.2, glide: 120, glideFrom: B('runout') + 2, glideAt: ev.saturn });
   // 9:07: Saturn goes out: the hit, one bell; then nothing but the rise and a low drone
   hit(ev.saturn, 1.0, 32.7); M.bell(ev.saturn + 0.03, 'E6', 0.36, 0);
-  M.strings(ev.saturn + 0.2, B('nearest') + 0.5, ['A1', 'E2'], 0.32, { att: 1.5, rel: 0.6, cut: 230 });
+  M.strings(ev.saturn + 0.2, B('stretch') + 0.5, ['A1', 'E2'], 0.32, { att: 1.5, rel: 0.6, cut: 230 });
   motif(c('saturn', 1) + 0.6, { gap: 1.9, vel: 0.34, oct: -1, n: 4 });
-  // 9:23: the nearest star goes out (a hit), and the rest will follow, nearest first: bells cut off, faster and faster
-  M.strings(B('nearest'), ev.alpha - 0.05, ['E5', 'B5'], 0.1, { att: 1.0, rel: 0.05, cut: 4000, wave: 'triangle' });
-  hit(ev.alpha, 0.9, 36.7);
-  M.prog([[ev.alpha + 0.1, C.Am9], [c('nearest', 1), C.Flyd], [c('nearest', 2), C.Dm9]], B('question') + 0.4, 0.4, { cut: 1100 });
-  { const notes = ['B6', 'E6', 'A6', 'B5', 'E6', 'C7', 'A5', 'E5', 'B5', 'E6', 'A5', 'B5'];
-    let t = ev.alpha + 1.2, i = 0; while (t < B('question') - 0.2) { M.bellCut(t, notes[i % notes.length], 0.2, 0.14 + 0.2 * Math.exp(-i / 6), (i % 2 ? 0.5 : -0.5) * (1 - i / 30)); t += Math.max(0.35, 1.5 * Math.exp(-i / 7)); i++; } }
+  // ================================================================== 4 · light's waves stretch: your eyes can't focus, then no light gets in
+  // 9:10: everything blurs: a slow cluster whose notes drift down and darken; bells in pairs a semitone apart, beating
+  M.prog([[B('stretch'), C.Am9], [c('stretch', 1), C.Flyd]], B('pupil') + 0.4, 0.36, { cut: 900 });
+  M.strings(B('stretch'), B('pupil') + 0.6, ['A3', 'B3', 'E4', 'F4'], 0.24, { att: 2.5, rel: 0.6, cut: 1800, cutTo: 700, cutAt: B('pupil'), glide: -60, glideFrom: B('stretch') + 1, glideAt: B('pupil') });
+  [['E6', 'F6'], ['B5', 'C6'], ['A5', 'Bb5'], ['E5', 'F5']].forEach(([a, b], i) => { const t = c('stretch', 0) + 0.8 + i * 2.4; M.bell(t, a, 0.2 - 0.03 * i, -0.4); M.bell(t + 0.05, b, 0.14 - 0.02 * i, 0.4); });
+  // 9:16: the waves no longer fit through your pupils: the high strings fall away, a low drone darkens
+  M.strings(B('pupil'), B('question') + 0.4, ['A1', 'E2'], 0.36, { att: 1.0, rel: 0.4, cut: 260, cutTo: 140, cutAt: B('question') });
+  M.strings(B('pupil'), B('question'), ['E5', 'B5'], 0.1, { att: 1.0, rel: 0.3, cut: 3000, cutTo: 600, cutAt: B('question'), wave: 'triangle' });
+  motif(c('pupil', 1) + 0.4, { gap: 2.0, vel: 0.3, oct: -1, n: 3 });
   // the question: the motif a note short, over an unresolved chord, cut on the last frame
   M.strings(B('question'), END + 0.05, ['A2', 'E3', 'B3', 'D4'], 0.46, { att: 0.3, rel: 0.02, cut: 1400 });
   M.strings(B('question'), END + 0.05, ['E5', 'B5'], 0.12, { att: 0.4, rel: 0.02, cut: 4000, wave: 'triangle' });

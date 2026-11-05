@@ -18,15 +18,15 @@ const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
   title: 0.05, start: 1.0, gps: 1.6, real: 1.4, magnet: 1.6, flicker: 2.0, mri: 2.8, blackout: 2.8, generator: 2.4, brake: 2.8, road: 2.8, mercury: 3.0,
-  ring: 2.0, beach: 3.4, speaker: 1.8, board: 2.2, fire: 2.6, waves: 2.8, phones: 2.8, colour: 3.0, day: 2.4, heat: 2.6, stars: 3.6,
-  runout: 2.4, saturn: 3.0, nearest: 3.6, question: 2.4,
+  ring: 2.0, beach: 3.4, speaker: 1.8, board: 2.8, fire: 2.6, waves: 2.8, phones: 2.8, colour: 3.0, day: 2.4, heat: 2.6, stars: 3.6,
+  runout: 2.4, saturn: 3.0, stretch: 3.2, pupil: 3.0, question: 2.4,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'start:1': 0.6, 'gps:1': 0.8, 'real:1': 0.6, 'real:2': 0.6, 'magnet:1': 0.6, 'mri:1': 0.8, 'mri:2': 0.8, 'mri:3': 2.2,
-  'blackout:1': 2.4, 'blackout:2': 2.0, 'brake:1': 1.6, 'road:1': 1.2, 'mercury:1': 0.8, 'mercury:2': 0.8, 'ring:1': 1.6,
-  'beach:1': 1.4, 'speaker:1': 0.8, 'board:1': 1.6, 'generator:1': 1.2, 'fire:1': 1.0, 'fire:2': 1.0, 'waves:1': 1.0, 'colour:1': 1.0, 'colour:2': 1.4,
-  'day:1': 0.8, 'day:2': 0.8, 'heat:1': 1.4, 'stars:1': 1.6, 'stars:2': 0.8, 'runout:1': 0.8, 'saturn:1': 1.2, 'nearest:1': 2.2, 'nearest:2': 1.4,
+  'start:1': 0.6, 'gps:1': 0.8, 'real:1': 0.6, 'magnet:1': 0.6, 'mri:1': 0.8, 'mri:2': 0.8, 'mri:3': 2.2,
+  'blackout:1': 2.4, 'blackout:2': 2.0, 'brake:1': 1.6, 'mercury:1': 0.8, 'mercury:2': 0.8, 'ring:1': 1.6,
+  'beach:1': 1.4, 'speaker:1': 0.8, 'generator:1': 1.2, 'fire:1': 1.0, 'fire:2': 1.0, 'waves:1': 1.0, 'colour:1': 1.0, 'colour:2': 1.4,
+  'day:1': 0.8, 'day:2': 0.8, 'heat:1': 1.4, 'stars:1': 1.6, 'stars:2': 0.8, 'runout:1': 0.8, 'saturn:1': 1.2, 'stretch:1': 1.6, 'pupil:1': 1.6,
 };
 const SECTION_OF = { title: 1, beach: 2, runout: 3 };
 const GAP = 0.6;                     // between captions inside a beat

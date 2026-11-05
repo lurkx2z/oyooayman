@@ -16,31 +16,31 @@
 const LF_MARKS = [
   [LFP.kTrans, 'THE GRID’S IRON SATURATES'], [LFP.kQuench, 'MRI MAGNETS QUENCH'], [LFP.kGrid, 'THE GRID TRIPS'], [LFP.kSpark, 'ENGINES STALL'],
   [1.316, 'MERCURY FREEZES (6 °C)'], [LFP.kGold, 'GOLD TURNS SILVER'], [2, 'MAGNETS ¼ AS STRONG'], [2.7, 'FIRES 7× DIMMER'], [3, 'LEDS AT ¼'],
-  [5, 'COLOURS FADE'], [LFP.kOut(499), 'THE SUN’S OLD LIGHT RUNS OUT'], [10, 'EARTH CAN’T COOL'], [LFP.kOut(LFP.dSaturn), 'SATURN GOES OUT'], [LFP.kOut(LFP.dAlphaCen), 'THE NEAREST STAR GOES OUT'],
+  [5, 'COLOURS FADE'], [LFP.kOut(499), 'THE SUN’S OLD LIGHT RUNS OUT'], [10, 'EARTH CAN’T COOL'], [LFP.kOut(LFP.dSaturn), 'SATURN GOES OUT'], [400, 'TOO LONG TO FOCUS'], [LFP.kPupil, 'WAVES AS WIDE AS YOUR PUPILS'], [3e5, 'ALMOST NO LIGHT GETS IN'],
 ];
 const lfPct = (x) => (x >= 0.995 ? Math.round(x * 100) : x >= 0.1 ? Math.round(x * 100) : x >= 0.01 ? (x * 100).toFixed(1) : (x * 100).toFixed(2)) + '%';
 // the scene's context box: [from, to, label, value(t, s, k) → { v, v2 }] (HTML)
 const LF_CTX = (() => {
   const beat = (id, l, f, k0 = 0, k1) => [lfC(id, k0) - 0.2, (k1 != null ? lfCap(id, k1).hide : lfE(id)) + 0.2, l, f];
   return [
-    beat('gps', 'WHERE GPS THINKS YOU ARE', (t, s, k) => ({ v: `${Math.round(LFP.gpsKm(k))} <small>km out to sea</small>`, v2: 'ERROR ≈ (×c − 1) × 10,000 km' })),
+    beat('gps', 'YOUR PHONE’S GPS', (t, s, k) => ({ v: 'NO FIX', v2: `TIMED WITH THE OLD SPEED: ${lfPct(k - 1)} OFF` })),
     beat('magnet', 'EVERY MAGNET’S PULL', (t, s, k) => ({ v: lfPct(1 / (k * k)), v2: 'FALLS AS 1 / (×c)²' }), 1),
     beat('flicker', 'TRANSFORMER IRON CAN HOLD', (t, s, k) => ({ v: `${(2.0 / (k * k)).toFixed(2)} <small>tesla</small>`, v2: 'THE GRID NEEDS 1.70' })),
     beat('mri', 'CURRENT IN THE MRI’S WIRE', (t, s, k) => ({ v: lfPct(k * k), v2: s < LFP.sQuench ? 'IT QUENCHES AT 121%' : 'QUENCHED' }), 1),
-    beat('road', 'A CAR BATTERY', (t, s, k) => ({ v: `${LFP.battery(k).toFixed(1)} <small>volts</small>`, v2: '12.8 V AT 9 PM' })),
+    beat('road', 'A SPARK COIL’S ENERGY', (t, s, k) => ({ v: lfPct(1 / (k * k)), v2: 'A MAGNET: 1 / (×c)²' })),
     beat('mercury', 'MERCURY FREEZES AT', (t, s, k) => ({ v: `${LFP.hgMelt(k).toFixed(1)} <small>°C</small>`, v2: LFP.hgMelt(k) >= LFP.tCold ? 'THE DOME: 6 °C · SOLID' : 'THE DOME: 6 °C' }), 1),
-    beat('ring', 'GOLD SOAKS UP LIGHT BELOW', (t, s, k) => ({ v: `${Math.round(1240 / LFP.goldEdge(k))} <small>nm</small>`, v2: 'YOU SEE 400–700 nm · 517 nm AT 9 PM' })),
+    beat('ring', 'GOLD SOAKS UP', (t, s, k) => { const e = LFP.goldEdge(k); return { v: e < 2.55 ? 'GREEN <small>and bluer</small>' : e < 2.75 ? 'BLUE <small>and bluer</small>' : e < 3.1 ? 'VIOLET <small>only</small>' : 'NO COLOUR <small>you can see</small>', v2: 'AT 9 PM: GREEN AND BLUER' }; }),
     beat('speaker', 'THE SPEAKER’S PUSH', (t, s, k) => ({ v: lfPct(1 / (k * k)), v2: `${LFP.speakerDb(k).toFixed(1)} dB` })),
     beat('board', 'A FRIDGE MAGNET’S GRIP', (t, s, k) => ({ v: lfPct(1 / (k * k)), v2: 'FRICTION HOLDS IT: UNTIL ¼' })),
     beat('fire', 'THE FIRE’S GLOW', (t, s, k) => ({ v: lfPct(1 / (k * k)), v2: 'SAME HEAT: ≈ 900 °C' }), 1),
     beat('waves', 'PLANKTON AND LED LIGHT', (t, s, k) => ({ v: lfPct(LFP.led(k)), v2: 'MORE OF THEIR ENERGY GOES TO HEAT' }), 1),
     beat('phones', 'A PHONE SCREEN', (t, s, k) => ({ v: lfPct(LFP.led(k)), v2: '' })),
     beat('colour', 'LIGHT A DYE CATCHES', (t, s, k) => ({ v: lfPct(1 / k), v2: 'AND YOUR EYES: ' + lfPct(LFP.eye(k)) }), 1),
-    beat('day', 'SUNLIGHT ON THE DAY SIDE', (t, s, k) => (s < LFP.sSun ? { v: `${k.toFixed(1)}× <small>the heat</small>`, v2: 'LIGHT THAT LEFT THE SUN BEFORE 9:00' } : { v: lfPct(1 / (k * k)), v2: 'THE OLD SUNLIGHT HAS ALL ARRIVED' })),
+    beat('day', 'SUNLIGHT ON THE DAY SIDE', (t, s, k) => (s < LFP.sSun ? { v: `${k.toFixed(1)}× <small>the heat</small>`, v2: 'LIGHT THAT LEFT THE SUN BEFORE 9:00' } : { v: LFP.sunNow(k) >= 1 ? `${LFP.sunNow(k).toFixed(1)}× <small>the heat</small>` : lfPct(LFP.sunNow(k)), v2: 'THE OLD SUNLIGHT HAS ALL ARRIVED' })),
     beat('heat', 'HEAT EARTH CAN SHED AS LIGHT', (t, s, k) => ({ v: lfPct(1 / (k * k)), v2: 'IT RADIATES 1 / (×c)² AS MUCH' })),
     beat('stars', 'STARLIGHT, AS YOU SEE IT', (t, s, k) => ({ v: lfPct(LFP.oldLight(k)), v2: `ARRIVING ${Math.round(k)}× FASTER · EYES CATCH ${lfPct(LFP.eye(k))}` }), 1),
-    beat('runout', 'OLD LIGHT ALREADY SWALLOWED', (t, s, k) => ({ v: `${Math.round((k - 1) / LFP.LN).toLocaleString('en-US')} <small>light-seconds</small>`, v2: 'SATURN: 9,070 · THE NEAREST STAR: 4.37 YEARS' }), 1),
-    beat('nearest', 'OLD LIGHT ALREADY SWALLOWED', (t, s, k) => ({ v: `${((k - 1) / LFP.LN / LFP.LY).toFixed(2)} <small>light-years</small>`, v2: 'ALPHA CENTAURI: 4.37' }), 1),
+    beat('runout', 'OLD LIGHT ALREADY SWALLOWED', (t, s, k) => ({ v: `${Math.round((k - 1) / LFP.LN).toLocaleString('en-US')} <small>light-seconds</small>`, v2: 'SATURN’S: 9,070' }), 1),
+    beat('stretch', 'GREEN LIGHT’S WAVES', (t, s, k) => ({ v: `${(0.55 * k / 1000).toFixed(2)} <small>mm</small>`, v2: `0.00055 mm AT 9 PM · YOUR EYE BLURS ${(LFP.eyeBlur(k) * 57.3).toFixed(1)}°` })),
   ];
 })();
 // the honest labels (bottom left): [from, to, text]
@@ -48,20 +48,18 @@ const LF_TAGS = (() => { const b = (id, text, k0 = 0) => [lfC(id, k0) - 0.1, lfE
   b('real', 'THE ONE IMPOSSIBLE THING: c GROWS WHILE THE ELECTRON, ħ, ε₀ AND G STAY', 1),
   b('gps', 'ROUGH: A REAL RECEIVER WOULD FAIL IN MESSIER WAYS', 1),
   b('magnet', 'μ₀ = 1 / ε₀c²: WITH ε₀ FIXED, MAGNETISM WEAKENS AS 1 / c²', 1),
-  b('road', 'LEAD-ACID: 1.7 OF ITS 2.1 V PER CELL ARE RELATIVISTIC (AHUJA ET AL. 2011)', 1),
   b('mercury', 'RELATIVITY LOWERS MERCURY’S MELTING POINT BY 105 K (CALVO ET AL. 2013)', 1),
   b('fire', 'HOW BRIGHT THINGS LOOK HERE: YOUR EYES ADJUSTING (THE FILM’S EXPOSURE), NEVER IN FULL', 1),
   b('stars', 'THE STARS ON SCREEN ARE NOT BOOSTED: k × YOUR EYE’S CATCH', 1),
-  b('nearest', 'EVERY STAR IN THIS SKY IS AT ITS REAL PLACE FOR 9 PM, 7 NOVEMBER 2026, 33.9° S'),
+  b('stretch', 'A PHOTON KEEPS ITS ENERGY, SO ITS WAVE GROWS AS c · BLUR: 1.22 λ / D, D = 7 mm'),
 ]; })();
 // the insets: [from, to, which, where]
 const LF_INSETS = (() => { const b = (id, k0, k1, w, where = '') => [lfC(id, k0) - 0.25, (k1 != null ? lfCap(id, k1).hide : lfE(id)) + 0.3, w, where]; return [
-  b('magnet', 0, null, 'mu', 'mid'), b('ring', 0, null, 'gold'), b('speaker', 0, null, 'spk'), b('day', 0, null, 'globe', 'mid'), b('runout', 0, null, 'column', 'mid'),
+  b('magnet', 0, null, 'mu', 'mid'), b('ring', 0, null, 'gold'), b('speaker', 0, null, 'spk'), b('day', 0, null, 'globe', 'mid'), b('runout', 0, null, 'column', 'mid'), b('pupil', 0, null, 'wave', 'mid'),
 ]; })();
-// the ladder (right): during these beats, with the row this beat is about lit
-const LF_LADDER = (() => { const on = (id, k0, hot) => [lfC(id, k0) - 0.3, lfE(id) + 0.25, hot]; return [
-  on('flicker', 0, 0), on('blackout', 0, 2), on('brake', 0, 2), on('road', 0, 3), on('board', 0, 6), on('fire', 2, 7), on('phones', 0, 8), on('colour', 2, 9), on('heat', 0, 11),
-]; })();
+// the ladder (right): off. Both reviewers (5 November 2026) found it unreadable at phone size and that it made the film
+// read as a checklist; the HUD's NEXT line carries what's coming. (Kept as code: add [from, to, row] entries to use it.)
+const LF_LADDER = [];
 
 // a caption's text with its numbers in amber
 function lfCapHtml(s) {
@@ -130,6 +128,8 @@ class LfHud {
     else this._set('capa', this.cap, 'opacity', '0');
     // ---- the diagrams
     this._insets(t, s, k);
+    this._inRect = null;
+    if (Number(this.inset.style.opacity) > 0.02) { const r = this.inset.getBoundingClientRect(), o = this.root.getBoundingClientRect(); this._inRect = { l: r.left - o.left, r: r.right - o.left, t: r.top - o.top, b: r.bottom - o.top }; }
     this._ladderUpd(t, k);
     // ---- labels pinned in the scene
     const L = set && set.labels ? set.labels(t) || [] : [];
@@ -145,7 +145,11 @@ class LfHud {
       let right = l.side ? l.side === 'r' : lx > 62;
       const wPct = vis && this.root.clientWidth ? 100 * (d._w || 0) / this.root.clientWidth : 0;
       if (right && lx - wPct < 1.5) right = false; else if (!right && lx + wPct > 98.5) right = true;
-      d.style.left = lx.toFixed(2) + '%'; d.style.top = Math.min(74, Math.max(ly, 20)).toFixed(2) + '%';
+      const ty = Math.min(74, Math.max(ly, 24));   // (24%: clear of the clock box)
+      d.style.left = lx.toFixed(2) + '%'; d.style.top = ty.toFixed(2) + '%';
+      // a label never sits on a diagram: while one is up, a label whose box would touch it is hidden
+      if (vis && this._inRect) { const R = this._inRect, W0 = this.root.clientWidth, H0 = this.root.clientHeight, px = lx / 100 * W0, py = ty / 100 * H0, w = d._w || 0, x0 = right ? px - w : px, x1 = right ? px : px + w;
+        if (x1 > R.l - 12 && x0 < R.r + 12 && py + 30 > R.t - 12 && py - 30 < R.b + 12) d.style.opacity = '0'; }
       d.className = right ? 'lf-lab r' : 'lf-lab';
       const tx = `<span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`, hh = right ? tx + '<span class="d"></span>' : '<span class="d"></span>' + tx;
       if (d._h !== hh) { d._h = hh; d.innerHTML = hh; d._w = d.offsetWidth; }
@@ -204,7 +208,7 @@ class LfHud {
     const c0 = lfGoldRGB(1), c1 = lfGoldRGB(k), css = (c) => `rgb(${c.map((v) => Math.round(255 * Math.pow(Math.min(1, v), 1 / 2.2))).join(',')})`;
     return LfHud.svg(`${LfHud.plate()}
       <text x="30" y="58" class="t">HOW MUCH LIGHT GOLD REFLECTS</text>
-      ${spec}<text x="${x(400)}" y="440" text-anchor="middle" class="sm">400</text><text x="${x(700)}" y="440" text-anchor="middle" class="sm">700 nm</text>
+      ${spec}<text x="${x(400)}" y="440" text-anchor="middle" class="sm">VIOLET</text><text x="${x(700)}" y="440" text-anchor="middle" class="sm">RED</text><text x="${x(550)}" y="440" text-anchor="middle" class="sm">THE COLOURS OF 9 PM</text>
       <path d="${curve(le0)}" fill="none" stroke="rgba(246,239,226,0.45)" stroke-width="3" stroke-dasharray="8 7"/>
       <path d="${curve(le)}" fill="none" stroke="#ffcf8a" stroke-width="4"/>
       <circle cx="640" cy="120" r="34" fill="${css(c0)}"/><text x="640" y="182" text-anchor="middle" class="sm">9 PM</text>
@@ -222,13 +226,26 @@ class LfHud {
   }
   // the day side: sunlight already on its way arrives k× faster (k× the heat); at 9:03 it has all arrived
   static globe(u, t, s, k) {
-    const out = s >= LFP.sSun, f = out ? 1 / (k * k) : k, gl = Math.min(1, 0.25 + 0.12 * (out ? 0 : k)), n = out ? 3 : Math.min(14, 3 + Math.round(k * 1.6));
-    let rays = ''; for (let i = 0; i < n; i++) { const y = 120 + i * (230 / Math.max(1, n - 1)); rays += `<line x1="30" y1="${y.toFixed(1)}" x2="${(out ? 120 : 240).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#ffcf8a" stroke-width="3" marker-end="url(#lfAh)" opacity="${out ? 0.25 : 0.9}"/>`; }
+    const out = s >= LFP.sSun, f = LFP.sunNow(k), gl = Math.min(1, 0.1 + 0.15 * Math.min(f, 6)), n = Math.max(1, Math.min(14, 1 + Math.round(f * 2.2))), ro = Math.min(0.9, 0.15 + 0.75 * Math.min(1, f));
+    let rays = ''; for (let i = 0; i < n; i++) { const y = 120 + i * (230 / Math.max(1, n - 1)); rays += `<line x1="30" y1="${y.toFixed(1)}" x2="240" y2="${y.toFixed(1)}" stroke="#ffcf8a" stroke-width="3" marker-end="url(#lfAh)" opacity="${ro.toFixed(2)}"/>`; }
     return LfHud.svg(`${LfHud.plate()}
       <text x="30" y="58" class="t">THE DAY SIDE, FROM THE SUN</text>${rays}
       <circle cx="480" cy="235" r="150" fill="#0b1830"/><path d="M480 85 A150 150 0 0 0 480 385 Z" fill="rgba(255,214,150,${gl.toFixed(2)})"/>
       <circle cx="620" cy="190" r="8" fill="#9fc4ff"/><text x="636" y="196" class="sm" style="fill:#9fc4ff">YOU</text>
-      <text x="30" y="440" class="s">${out ? '9:03 · THE OLD SUNLIGHT HAS ALL ARRIVED' : `SUNLIGHT ARRIVING ${f.toFixed(1)}× AS FAST · ${f.toFixed(1)}× THE HEAT`}</text>`);
+      <text x="30" y="440" class="s">${out ? `9:03 · THE OLD LIGHT HAS ARRIVED: ${f >= 1 ? f.toFixed(1) + '×' : lfPct(f)} THE HEAT` : `ARRIVING ${f.toFixed(1)}× AS FAST: ${f.toFixed(1)}× THE HEAT`}</text>`);
+  }
+  // green light's wave against your pupil (7 mm): the wave grows as c; past the pupil's width almost none of it gets in
+  static wave(u, t, s, k) {
+    const mm = 20, L = 0.55e-3 * k * mm, cy = 250, x0 = 330, ph = (t * 0.9) % 1;
+    let d = ''; for (let x = 40; x <= 720; x += 4) { const y = cy + 46 * Math.sin(2 * Math.PI * ((x - x0) / L - ph)); d += (x === 40 ? 'M' : 'L') + x + ' ' + y.toFixed(1); }
+    return LfHud.svg(`${LfHud.plate()}
+      <text x="30" y="58" class="t">GREEN LIGHT, AND YOUR PUPIL</text>
+      <path d="${d}" fill="none" stroke="#9fe0a8" stroke-width="4" opacity="0.9"/>
+      <ellipse cx="${x0}" cy="${cy}" rx="18" ry="${(3.5 * mm).toFixed(1)}" fill="none" stroke="#f6efe2" stroke-width="4"/>
+      <text x="${x0}" y="${cy + 3.5 * mm + 40}" text-anchor="middle" class="sm">YOUR PUPIL · 7 mm</text>
+      <line x1="${x0 + 60}" y1="132" x2="${(x0 + 60 + L).toFixed(1)}" y2="132" stroke="#9fe0a8" stroke-width="3"/>
+      <text x="${x0 + 60}" y="118" class="sm" style="fill:#9fe0a8">ONE WAVE · ${(L / mm).toFixed(1)} mm</text>
+      <text x="30" y="440" class="s">LIGHT GETTING IN: ${lfPct(LFP.through(k))}</text>`);
   }
   // the old light: a column from each star to you, swallowed at the near end faster and faster
   static column(u, t, s, k) {
@@ -238,7 +255,7 @@ class LfHud {
       <text x="30" y="58" class="t">LIGHT ALREADY ON ITS WAY TO YOU</text>
       <rect x="60" y="200" width="640" height="40" rx="10" fill="rgba(255,207,138,0.75)"/>
       <rect x="60" y="200" width="${(x(D) - 60).toFixed(1)}" height="40" rx="10" fill="#0b0e14" stroke="rgba(246,239,226,0.5)" stroke-width="2"/>
-      ${marks.map(([d, l]) => `<line x1="${x(d).toFixed(1)}" y1="186" x2="${x(d).toFixed(1)}" y2="254" stroke="#f6efe2" stroke-width="2"/><text x="${x(d).toFixed(1)}" y="${l === 'SATURN' ? 290 : 176}" text-anchor="middle" class="sm">${l}</text>`).join('')}
+      ${marks.map(([d, l]) => `<line x1="${x(d).toFixed(1)}" y1="186" x2="${x(d).toFixed(1)}" y2="254" stroke="#f6efe2" stroke-width="2"/><text x="${x(d).toFixed(1)}" y="${l === 'SATURN' ? 290 : 176}" text-anchor="${l === 'NEAREST STAR' ? 'end' : 'middle'}" class="sm">${l}</text>`).join('')}
       <text x="60" y="330" class="sm">YOU</text><text x="700" y="330" text-anchor="end" class="sm">FURTHER OUT (log scale)</text>
       <text x="30" y="420" class="s">SWALLOWED: ${Math.round(D).toLocaleString('en-US')} LIGHT-SECONDS</text>`);
   }
