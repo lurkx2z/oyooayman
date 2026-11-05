@@ -118,7 +118,14 @@ town's smoke alarms, the baby's heartbeat on the monitor and his first cry, foot
 (853 + 960 Hz) on every phone at once, the jet over the motorway (delayed by the sound's travel time, Doppler-shifted)
 and the touchdown.
 
-**Mix.** MIX_NUMBERS
+**Mix.** −15.0 LUFS integrated, −2.4 dBTP, loudness range 7.1 LU (the baked WAV); the mastered
+`final-soundtrack.m4a` (AAC 256k, through a limiter at −3 dB) measures −15.1 LUFS and −2.4 dBTP, and
+`small-soundtrack.m4a` (AAC 128k, for the phone-size copy) −15.1 LUFS and −2.2 dBTP. **The score leads** (the owner's
+rule of 31 October 2026): measured stem by stem in 10-second windows across the whole film, the music sits 9.2 to
+24.1 dB over the beds (median 13.9 dB; the closest is the empty cockpit at 2:20, where the score is at its quietest)
+and 2.0 to 31.6 dB over the effects (median 14.5 dB; the closest are the car radio's song at 1:10, the phone and the
+train's brakes at 1:30 and the emergency alert at 4:20, all meant to cut through). Stem trims music +2.5, beds −8.5,
+effects +2 dB, master +4.5 dB (`mix.js`).
 
 ## Delivery
 
@@ -130,7 +137,11 @@ and the touchdown.
   → `D:\renders\men-disappear-long\men-disappear-long_final_1080p.mp4` (1920×1080, 30 fps, H.264 CRF 18, the mastered
   soundtrack `final-soundtrack.m4a` copied in, 6:09) and `men-disappear-long_final_small.mp4` (1280×720, under
   30 MiB). Resumable: run it again and finished segments are kept.
-- **Thumbnails** (house style, real film frames, 1280×720): THUMBS.
+- **Thumbnails** (house style, real film frames, 1280×720, in the project files): `thumb-seat.jpg` (his empty seat
+  and the falling cup at 0:05: "100 km/h", "and still nobody at the wheel", "Your dad was driving."),
+  `thumb-door.jpg` (the flight attendant at the locked cockpit door at 2:45: "30 seconds", "and still no one can let
+  her in", "She has never flown a plane."), `thumb-planes.jpg` (flight 2207 over the motorway at 5:28: "23 planes",
+  "and still no pilots on board", "Who will talk them all down?").
 
 ## Files
 
