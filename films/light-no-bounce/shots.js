@@ -10,15 +10,15 @@ const NB_SHOTS = [];
 {
   const P = NB_SHOTS, c = nbC, B = nbB;
   const L = [
-    // 1 — 3:29:57 PM: you, in the Fun House's wavy mirror; at 3:30:00 light stops bouncing (26× slower from here)
+    // 1 — 3:29:57 PM: you, in the Fun House's wavy mirror; at 3:30:00 light stops bouncing (26× slower from here, 39× from the sky, 3× for the last three seconds)
     ['A0', 'title', -1, B('start'), 'fair'],
     ['A1', 'wide', B('start'), c('start', 1) - 0.5, 'fair'],
     ['A1b', 'stalls', c('start', 1) - 0.5, B('mirror'), 'fair'],
     ['A2', 'mirror', B('mirror'), c('mirror', 1) - 0.5, 'fair'],
     ['A2b', 'mirror2', c('mirror', 1) - 0.5, B('moon'), 'fair'],
     // the Moon (its light is 1.28 s old: it goes out at 3:30:01.28), the sky, the Sun
-    ['M1', 'moon', B('moon'), B('moongone'), 'fair'],
-    ['M2', 'moongone', B('moongone'), B('sky'), 'fair'],
+    ['M1', 'moon', B('moon'), c('moon', 1) - 0.5, 'fair'],
+    ['M2', 'moongone', c('moon', 1) - 0.5, B('sky'), 'fair'],
     ['K1', 'sky', B('sky'), B('sun'), 'fair'],
     ['K2', 'sun', B('sun'), B('sources'), 'fair'],
     ['K3', 'sources', B('sources'), B('hands'), 'fair'],

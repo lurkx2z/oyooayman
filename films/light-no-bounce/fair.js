@@ -12,11 +12,12 @@
 
 const NB_HAND_POSES = {
   phone: { p: [0.045, -0.125, -0.255], F: [-0.9, 0.22, -0.18], N: [0.02, 0.28, 1], curl: [0.62, 0.68, 0.72, 0.78], thumb: [0.95, 0.42] },
-  phoneLow: { p: [0.07, -0.2, -0.3], F: [-0.86, 0.3, -0.25], N: [0.02, 0.5, 0.86], curl: [0.62, 0.68, 0.72, 0.78], thumb: [0.95, 0.42] },
+  phoneLow: { p: [0.075, -0.115, -0.31], F: [-0.86, 0.3, -0.25], N: [0.02, 0.5, 0.86], curl: [0.62, 0.68, 0.72, 0.78], thumb: [0.95, 0.42] },
+  phoneUp: { p: [0.03, -0.072, -0.27], F: [-0.9, 0.22, -0.18], N: [0.02, 0.28, 1], curl: [0.62, 0.68, 0.72, 0.78], thumb: [0.95, 0.42] },
   raise: { p: [0.07, -0.02, -0.36], F: [-0.1, 1, -0.12], N: [0.12, 0.1, -1], curl: [0.1, 0.08, 0.12, 0.2], thumb: [0.4, 0.12] },
 };
 const NB_HAND_BL = Object.fromEntries(Object.keys(NB_HAND_POSES).concat(['hidden']).map((k) => [k, 0.01]));
-const NB_HANDS_OF = { hands: ['phoneLow', 'raise'], phoneNet: ['phone', 'hidden'], after: ['phone', 'hidden'] };
+const NB_HANDS_OF = { hands: ['phoneLow', 'raise'], phoneNet: ['phoneUp', 'hidden'], after: ['phoneUp', 'hidden'] };
 const NB_PHONE_OF = { hands: 'cam', phoneNet: 'net', after: 'video' };
 
 // the phone's screen: the camera app (black: it sees what you see), an upload stuck, a video of the dark
@@ -25,7 +26,8 @@ function nbDrawPhone(g, w, h, st) {
   g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
   if (st.app === 'cam') {
     // the viewfinder: black, a scatter of bulbs; the record dot and the timer
-    const r = new RNG(5); for (let i = 0; i < 60; i++) { const x = r.range(0, w), y = r.range(h * 0.12, h * 0.8), a = r.range(0.4, 1); g.fillStyle = `rgba(255,${200 + r.int(0, 50)},${120 + r.int(0, 100)},${a})`; g.beginPath(); g.arc(x, y, r.range(1, 2.6), 0, 7); g.fill(); }
+    const r = new RNG(5); for (let i = 0; i < 150; i++) { const x = r.range(0, w), y = r.range(h * 0.12, h * 0.8), a = r.range(0.6, 1), hue = r.int(0, 5); g.fillStyle = [`rgba(255,220,150,${a})`, `rgba(255,90,80,${a})`, `rgba(120,200,255,${a})`, `rgba(255,240,120,${a})`, `rgba(255,120,220,${a})`, `rgba(140,255,140,${a})`][hue]; g.beginPath(); g.arc(x, y, r.range(1.6, 3.8), 0, 7); g.fill(); }
+    g.fillStyle = 'rgba(255,90,180,0.9)'; g.fillRect(w * 0.18, h * 0.3, w * 0.64, 6); g.fillStyle = 'rgba(255,255,255,0.8)'; g.font = '600 18px Arial'; g.fillText('VIDEO   PHOTO   SLO-MO', w * 0.16, h - 118);
     g.fillStyle = '#ff2a2a'; g.beginPath(); g.arc(w / 2 - 44, 30, 7, 0, 7); g.fill(); g.fillStyle = '#ffffff'; g.font = '600 20px Arial'; g.fillText(`00:${String(Math.floor(12 + s)).padStart(2, '0')}`, w / 2 - 30, 37);
     g.strokeStyle = '#ffffff'; g.lineWidth = 5; g.beginPath(); g.arc(w / 2, h - 70, 30, 0, 7); g.stroke(); g.fillStyle = '#ff2a2a'; g.fillRect(w / 2 - 13, h - 83, 26, 26);
   } else if (st.app === 'net') {
@@ -78,7 +80,7 @@ NB_SETS.fair = (app) => {
       const px = (app.renderH || 1080) / 1080, dusk = s > 3000 ? 1 : 0, lstAdd = s / 3600 * 1.0027;
       this._s = s; this._b = b; this._shot = shot; this._t = t; this._dusk = dusk;
       // ------------------------------------------------------------------ the world, moving
-      wheel.update(s); co.update(s); carou.update(s); dg.update(s); V.update(s); PP.update(s);
+      W.update(s); wheel.update(s); co.update(s); carou.update(s); dg.update(s); V.update(s); PP.update(s);
       PP.you.root.visible = m === 'title' || m === 'mirror' || m === 'mirror2';
       // ------------------------------------------------------------------ the camera
       const v = { p: [0, 5, 10], at: [0, 4, 0], fov: 50, drift: 0.008, near: 0.05, far: 30000, expo: 1, roll: 0 };
@@ -99,13 +101,13 @@ NB_SETS.fair = (app) => {
       W.mirror.material.uniforms.uDim.value = b;
       // ------------------------------------------------------------------ the sky
       const gain = NBP.pupilGain(s), dark = b === 0;
-      sky.update(s, { bounce: b, dusk, lstAdd: dusk ? lstAdd : 0, lim: dark ? NBP.limMag(s) : dusk ? 2.6 : -9, px, gain: dark ? 1 : 1, domeK: 1, moonK: 1, glareK: v.glare ?? 1 });
+      sky.update(s, { bounce: b, dusk, lstAdd: dusk ? lstAdd : 0, lim: dark ? NBP.limMag(s) : dusk ? 2.6 : -9, px, gain: dark ? 1 : 1, domeK: 1, moonK: 1, glareK: v.glare ?? 1, satK: v.satK ?? 1 });
       // ------------------------------------------------------------------ the lights (sources: every frame from scratch)
       L.begin(cam, px);
       for (const q of W.static) { const c = NB_BULB[q[4]]; L.add(q[0], q[1], q[2], q[3], c[0], c[1], c[2]); }
-      wheel.lamps(L, s); co.lamps(L, s); carou.lamps(L, s); dg.lamps(L, s); PP.lamps(L, s);
+      W.lamps(L, s); wheel.lamps(L, s); co.lamps(L, s); carou.lamps(L, s); dg.lamps(L, s); PP.lamps(L, s);
       const valley = NB_VALLEY_MODES.has(m) || v.valley;
-      V.carLamps(L, s, valley ? null : { x: 430, z: cam.position.z, r: 9000 }); V.airportLamps(L, s); V.planeLamps(L, s); V.townLampsAdd(L, s, dusk);
+      V.carLamps(L, s, valley ? null : { x: 430, z: cam.position.z, r: 9000 }); V.airportLamps(L, s); V.planeLamps(L, s, cam.position); V.townLampsAdd(L, s, dusk);
       L.end();
       // ------------------------------------------------------------------ flames, coals
       fx.begin(); PP.flames(fx, s);
@@ -122,11 +124,14 @@ NB_SETS.fair = (app) => {
     grade(t, p, shot) {
       const s = this._s, b = this._b, dark = b === 0, gain = NBP.pupilGain(s);
       // your pupils: open in the dark (the picture brightens with them, partly); flooded at the return until they close
-      const open = s >= 0 ? (dark ? Math.pow(gain, 0.45) : gain) : 1;
+      // (at the return the light floods eyes that had adapted to the dark: dazzled for a few seconds, longer than the
+      // pupils take to close: the photoreceptors are saturated; rough)
+      const dz = s >= NBP.T ? 1 + 6 * Math.exp(-(s - NBP.T) / 0.8) : 1;
+      const open = s >= 0 ? (dark ? Math.pow(gain, 0.45) : s >= NBP.T ? Math.pow(dz, 0.8) : gain) : 1;
       p.exposure = 1.0 * (this._expo || 1) * open * (this._dusk ? 1.15 : 1);
       p.blackLift = dark ? 0 : 0.004; p.saturation = dark ? 1.08 : 1.02; p.contrast = 1.07; p.warmth = dark ? 0 : 0.03;
       p.vignette = dark ? 0.4 : 0.5; p.bloom = dark ? 0.6 : 0.36; p.bloomThreshold = dark ? 0.55 : 0.92; p.grain = 0.028;
-      if (!dark && s >= NBP.T && s < NBP.T + 1.5) { const d = Math.max(0, gain - 1); p.bloom = 0.36 + 0.5 * Math.min(1, d / 3); p.bloomThreshold = 0.6; p.saturation = 1.02 - 0.25 * Math.min(1, d / 4); }
+      if (!dark && s >= NBP.T && s < NBP.T + 5) { const d = Math.max(0, dz - 1); p.bloom = 0.36 + 0.6 * Math.min(1, d / 3); p.bloomThreshold = 0.92 - 0.35 * Math.min(1, d / 2); p.saturation = 1.02 - 0.35 * Math.min(1, d / 4); }
       void t; void shot;
     },
   };
@@ -146,54 +151,59 @@ function nbFairCam(set, m, s, t, k, shot, v, lstAdd) {
   const E = Ease.inOutSine, into = (a, b, u) => nbV(a, b, E(u)), Y = [NB_F.you[0], NB_F.eye, NB_F.you[2]];
   const look = (p, d, Ln = 100) => { const n = nbN3(d); return [p[0] + n[0] * Ln, p[1] + n[1] * Ln, p[2] + n[2] * Ln]; };
   const sky = set.sky, sun = sky.sunDir, moon = [sky.moonDir.x, sky.moonDir.y, sky.moonDir.z], sat = [sky.satDir.x, sky.satDir.y, sky.satDir.z];
-  const V = set.V, ry = NB_F.runway.y;
+  const V = set.V, ry = NB_F.runway.y, FX = (z, back = 1.6) => nbEdgeX(z) - back;   // (at the fence, on the hilltop's edge)
+  // aim so that direction d sits at screen fraction (fx from the left, fy from the top) of the frame (0.5, 0.5 = the middle)
+  const aimAt = (p, d, fx, fy, fov) => { const n = new THREE.Vector3(...nbN3(d)), r = new THREE.Vector3().crossVectors(n, new THREE.Vector3(0, 1, 0)).normalize(), u = new THREE.Vector3().crossVectors(r, n);
+    const ty = Math.tan(MathX.deg(fov) / 2), tx = ty * 16 / 9; n.addScaledVector(r, -(fx - 0.5) * 2 * tx).addScaledVector(u, (fy - 0.5) * 2 * ty); return look(p, [n.x, n.y, n.z]); };
   switch (m) {
     // ---- 1: the mirror, 3:29:57 PM; then the fair, black
-    case 'title': case 'mirror': v.p = into([0.05, 1.62, 1.05], [0.02, 1.62, 0.75], m === 'title' ? k : 0.6 + 0.4 * k); v.at = [0, 1.55, -2.18]; v.fov = 50; v.drift = 0.004; break;
+    case 'title': v.p = into([0.05, 1.62, 1.05], [0.02, 1.62, 0.75], k); v.at = [0, 1.55, -2.18]; v.fov = 50; v.drift = 0.004; break;
+    case 'mirror': v.p = into([0.35, 1.66, 6.4], [0.15, 1.64, 5.2], k); v.at = [0, 2.3, -2.18]; v.fov = 56; v.drift = 0.004; break;
     case 'mirror2': v.p = into([2.6, 1.72, 2.2], [2.2, 1.7, 1.75], k); v.at = [-0.7, 1.5, -2.18]; v.fov = 44; v.drift = 0.004; break;
     case 'wide': v.p = into([7.6, 3.5, 1.2], [7.2, 3.6, 1.4], k); v.at = [-31, 8.5, 30]; v.fov = 56; v.drift = 0.01; break;
     case 'stalls': v.p = into([31, 1.55, 4.4], [26, 1.55, 4.6], k); v.at = [-6, 2.0, 9.0]; v.fov = 46; break;
     // ---- the Moon over the valley; the sky; the Sun
-    case 'moon': { const p = [83.2, 1.66, -1.8]; v.p = p; v.at = look(p, [moon[0], moon[1] - 0.1, moon[2]]); v.fov = into([44], [36], k)[0]; v.near = 0.3; v.drift = 0.004; break; }
-    case 'moongone': case 'moonback': { const p = [83.2, 1.66, -1.8]; v.p = p; v.at = look(p, moon); v.fov = m === 'moongone' ? into([9], [6.5], k)[0] : 7; v.near = 1; v.drift = 0.0015; break; }
+    case 'moon': { const p = [FX(-1.8), 1.66, -1.8]; v.p = p; v.fov = into([44], [38], k)[0]; v.at = aimAt(p, moon, 0.36, 0.3, v.fov); v.near = 0.3; v.drift = 0.004; break; }
+    case 'moongone': case 'moonback': { const p = [FX(-1.8), 1.66, -1.8]; v.p = p; v.fov = m === 'moongone' ? into([6.2], [4.2], k)[0] : 5; v.at = m === 'moongone' ? aimAt(p, moon, 0.3, 0.45, v.fov) : look(p, moon); v.near = 1; v.drift = 0.0012; break; }
     case 'sky': v.p = into([-21.5, 1.5, 21.0], [-21.8, 1.5, 21.4], k); v.at = [-33, 31, 32]; v.fov = 64; v.near = 0.2; break;
     case 'sun': case 'sunWarn': v.p = m === 'sun' ? into([0.6, 1.62, 0.7], [0.2, 1.62, 0.6], k) : [-0.2, 1.62, 0.9]; v.at = look(v.p, [sun.x, sun.y + 0.005, sun.z]); v.fov = m === 'sun' ? 30 : 40; v.near = 0.2; v.drift = 0.003; break;
     case 'sources': v.p = into([3, 15.5, -8.0], [0.5, 16.2, -8.6], k); v.at = [-14, 0, 22]; v.fov = 62; v.near = 0.3; break;
     // ---- your hands; the impossible part; the crowd; something passes
-    case 'hands': v.p = Y; v.at = [14, 2.9, 1.8]; v.fov = 54; v.near = 0.02; v.drift = 0.003; break;
-    case 'real': v.p = into([-13.8, 1.8, 9.6], [-14.3, 1.8, 9.9], k); v.at = [-24, 2.6, 8.4]; v.fov = 46; break;
+    case 'hands': v.p = Y; v.at = [1.2, 2.6, 10.4]; v.fov = 54; v.near = 0.02; v.drift = 0.003; break;
+    case 'real': v.p = into([-2.0, 1.75, 2.2], [-2.8, 1.75, 2.5], k); v.fov = 46; v.at = aimAt(v.p, [-24 - v.p[0], 2.6 - v.p[1], 8.5 - v.p[2]], 0.27, 0.5, v.fov); break;
     case 'crowd': v.p = into([7.4, 3.1, 0.6], [7.4, 3.15, 0.9], k); v.at = [-26, 1.3, 2.6]; v.fov = 44; break;
     case 'near': v.p = Y; v.at = [0.9, 1.72, 10]; v.fov = 54; v.near = 0.02; v.drift = 0.002; break;
     // ---- the motorway
-    case 'valley': v.p = into([84.6, 1.72, -8], [84.6, 1.72, -5], k); v.at = [430, -69, -80]; v.fov = 34; v.near = 0.5; v.drift = 0.003; break;
+    case 'valley': v.p = into([FX(-8), 1.72, -8], [FX(-5), 1.72, -5], k); v.at = [430, -69, -80]; v.fov = 34; v.near = 0.5; v.drift = 0.003; break;
     case 'driver': v.p = V.drvEye(s); v.at = V.drvAt(s, 80); v.at[1] -= 0.6; v.fov = 60; v.near = 0.02; v.drift = 0.002; v.shake = 0.002; break;
     case 'verge': v.p = [447.2, -68.6, -160]; v.at = [431, -69.4, 140]; v.fov = 36; v.near = 0.2; v.drift = 0.002; break;
     // ---- the airport and the plane
     case 'planeHill': v.p = [76, 1.7, 52]; v.at = [3300, -20, 1650]; v.fov = 16; v.near = 1; v.drift = 0.0015; break;
-    case 'approach': { const pl = V.planePos(s); v.p = [3420, ry + 1.6, 1663]; v.at = [pl[0], pl[1] - 10, pl[2]]; v.fov = 34; v.near = 0.3; v.drift = 0.002; break; }
-    case 'tower': v.p = into([2186, ry + 2.0, 1160], [2183, ry + 2.0, 1163], k); v.at = [2190, ry + 26, 1300]; v.fov = 56; v.near = 0.3; break;
-    case 'planeSide': { const pl = V.planePos(s); v.p = [pl[0] - 38, pl[1] + 7, pl[2] - 62]; v.at = [pl[0] + 2, pl[1], pl[2]]; v.fov = 40; v.near = 0.5; v.drift = 0.004; break; }
+    case 'approach': { const P = V.plane; P.updateMatrixWorld(true); const E = V.deckEye, e = P.localToWorld(new THREE.Vector3(E[0], E[1], E[2])), a = P.localToWorld(new THREE.Vector3(E[0] - 100, E[1] - 100 * Math.tan(MathX.deg(7.5)), E[2] - 3));
+      v.p = [e.x, e.y, e.z]; v.at = [a.x, a.y, a.z]; v.fov = 56; v.near = 0.02; v.shake = 0.0006; break; }
+    case 'tower': { const C = V.cab; v.p = into(C.eye, [C.eye[0] - 0.3, C.eye[1], C.eye[2] - 0.15], k); v.at = C.at; v.fov = 58; v.near = 0.05; break; }
+    case 'planeSide': { const pl = V.planePos(s); v.p = [pl[0] - 22, pl[1] - 5, pl[2] - 30]; v.at = [pl[0] + 3, pl[1] + 0.5, pl[2]]; v.fov = 44; v.near = 0.5; v.drift = 0.004; break; }
     // ---- the rides
     case 'coaster': { const f = set.co.cars[0].position; v.p = [44, 1.65, 12.5]; v.at = [f.x, f.y + 1, f.z]; v.fov = 50; v.near = 0.1; break; }
     case 'coasterPOV': { const C = set.co, d = C.frontD(s), f = C.at(d), a = C.at(d + 14); v.p = [f.p.x + f.up.x * 1.28 + f.t.x * 0.5, f.p.y + f.up.y * 1.28 + f.t.y * 0.5, f.p.z + f.up.z * 1.28 + f.t.z * 0.5]; v.at = [a.p.x, a.p.y + 0.4, a.p.z]; v.fov = 70; v.near = 0.05; v.shake = 0.004; break; }
-    case 'dodgems': v.p = into([-16.4, 1.7, -10.6], [-17.2, 1.7, -11.0], k); v.at = [-30, 0.9, -20]; v.fov = 52; v.near = 0.1; break;
+    case 'dodgems': v.p = into([-23.4, 1.35, -12.5], [-24.6, 1.35, -12.6], k); v.at = [-33, 2.2, -21]; v.fov = 64; v.near = 0.05; break;
     case 'fire': v.p = into([3.6, 1.55, 2.6], [3.9, 1.55, 2.75], k); v.at = [8.1, 1.65, 5.0]; v.fov = 40; v.near = 0.05; break;
     case 'fireClose': v.p = into([6.4, 1.9, 3.7], [6.55, 1.9, 3.8], k); v.at = [8.2, 1.95, 5.15]; v.fov = 34; v.near = 0.05; break;
     // ---- the internet; the heat; Saturn; your pupils
     case 'phoneNet': case 'after': v.p = Y; v.at = look(Y, [0.3, -0.62, 1]); v.fov = 50; v.near = 0.02; v.drift = 0.002; break;
-    case 'netWide': v.p = into([84.6, 1.72, 26], [84.6, 1.72, 22], k); v.at = [1000, -30, -180]; v.fov = 30; v.near = 0.5; v.drift = 0.002; break;
+    case 'netWide': v.p = into([FX(26), 1.72, 26], [FX(22), 1.72, 22], k); v.at = [1000, -30, -180]; v.fov = 30; v.near = 0.5; v.drift = 0.002; break;
     case 'heat': v.p = into([-38, 1.4, 2.2], [-38.6, 1.4, 2.6], k); v.at = look(v.p, [sun.x, sun.y + 0.02, sun.z]); v.fov = 42; v.near = 0.2; break;
-    case 'saturn': { const p = [83.2, 1.66, 4]; v.p = p; v.at = look(p, [sat[0], sat[1] - 0.08, sat[2]]); v.fov = 24; v.near = 0.5; v.drift = 0.002; break; }
+    case 'saturn': { const p = [FX(4), 1.66, 4]; v.p = p; v.at = look(p, [sat[0], sat[1] - 0.08, sat[2]]); v.fov = 24; v.near = 0.5; v.drift = 0.002; v.satK = 1.8; break; }
     case 'pupils': v.p = [16, 1.6, -2.5]; v.at = look(v.p, into([0.25, 1, 0.2], [0.05, 1, -0.2], k)); v.fov = 78; v.near = 0.3; v.drift = 0.002; break;
     // ---- the last seconds, the return, the reveal
     case 'count': v.p = Y; v.at = [-0.1, 1.85, 10]; v.fov = 54; v.near = 0.02; v.drift = 0.0015; break;
     case 'reveal': { const b = set.PP.bear.p; b.j.head.getWorldPosition(set._hv || (set._hv = new THREE.Vector3())); const h = set._hv;
       v.p = into(Y, [Y[0] + 0.02, Y[1] - 0.03, Y[2] - 0.32], Math.min(1, k * 3)); v.at = [h.x, h.y - 0.05, h.z]; v.fov = 54; v.near = 0.02; v.shake = 0.003 * (1 - k); break; }
-    case 'crash': v.p = [86, 1.72, -46]; v.at = [430, -69.5, -170]; v.fov = 15; v.near = 1; v.drift = 0.0012; break;
+    case 'crash': v.p = [FX(-46), 1.72, -46]; v.at = [430, -69.5, -170]; v.fov = 15; v.near = 1; v.drift = 0.0012; break;
     case 'afterWide': v.p = into([5, 9.5, -1], [3, 9.9, -2], k); v.at = [-25, 3, 25]; v.fov = 55; v.near = 0.2; break;
     // ---- 4:42 PM: the hilltop watches Saturn (the sky has turned 72 minutes' worth)
-    case 'echo': { const d = set.sky.turned(set.sky.satDir, lstAdd); v.p = into([66, 1.6, -2], [67, 1.6, -1.6], k); v.at = look(v.p, [d.x, d.y - 0.06, d.z]); v.fov = 44; v.near = 0.3; break; }
-    case 'echoSat': { const d = set.sky.turned(set.sky.satDir, lstAdd), mn = set.sky.turned(set.sky.moonDir, lstAdd), p = [83.2, 1.66, 4]; v.p = p; v.at = look(p, [d.x * 0.7 + mn.x * 0.3, d.y * 0.7 + mn.y * 0.3, d.z * 0.7 + mn.z * 0.3]); v.fov = into([19], [15], k)[0]; v.near = 0.5; v.drift = 0.0015; break; }
+    case 'echo': { const d = set.sky.turned(set.sky.satDir, lstAdd); v.p = into([62, 1.65, -3], [64, 1.65, -2.4], k); v.fov = 50; v.at = aimAt(v.p, [d.x, d.y, d.z], 0.62, 0.3, v.fov); v.near = 0.3; v.satK = 1.6; break; }
+    case 'echoSat': { const d = set.sky.turned(set.sky.satDir, lstAdd), p = [FX(4), 1.66, 4]; v.p = p; v.fov = into([9], [6.5], k)[0]; v.at = aimAt(p, [d.x, d.y, d.z], 0.5, 0.42, v.fov); v.near = 0.5; v.drift = 0.0012; v.satK = 2.4; break; }
   }
 }
 

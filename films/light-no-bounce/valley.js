@@ -24,7 +24,7 @@ const NB_CAR_COLS = ['#d8d8d4', '#1c1e22', '#8a9096', '#2a3a5a', '#7a1e1e', '#e8
 function nbTrafficSim() {
   const P = NB_MW, r = new RNG(611), cars = [];
   P.lanes.forEach((ln, li) => {
-    for (let u = P.u0 + r.range(0, 40); u < P.u1; u += r.range(42, 105)) {
+    for (let u = P.u0 + r.range(0, 40); u < P.u1; u += r.range(30, 78)) {
       const k = cars.length, type = NB_CAR_TYPES[r.int(0, NB_CAR_TYPES.length - 1)];
       cars.push({
         k, lane: li, u, v: ln.v0 * r.range(0.95, 1.04), v0: ln.v0 * r.range(0.95, 1.05), type, col: NB_CAR_COLS[r.int(0, NB_CAR_COLS.length - 1)],
@@ -148,11 +148,11 @@ function nbBuildValley(S, W) {
         const ox = sx * side * 0.66, oz = sz * side * 0.66;
         // front: running light / headlight
         const fxp = p.x + fx * h + ox, fzp = p.z + fz * h + oz;
-        if (head) Lm.add(fxp, y + 0.68, fzp, 0.14, 3.4, 3.3, 3.0); else Lm.add(fxp, y + 0.7, fzp, 0.07, 1.6, 1.6, 1.6);
+        if (head) Lm.add(fxp, y + 0.68, fzp, 0.24, 4.6, 4.4, 4.0); else Lm.add(fxp, y + 0.7, fzp, 0.11, 2.4, 2.4, 2.4);
         // rear: tail / brake
         const rxp = p.x - fx * h + ox * 1.02, rzp = p.z - fz * h + oz * 1.02;
-        if (braking) Lm.add(rxp, y + 0.86, rzp, 0.12, 4.2, 0.35, 0.2); else if (head) Lm.add(rxp, y + 0.86, rzp, 0.08, 1.9, 0.18, 0.1);
-        if (haz) { Lm.add(rxp, y + 0.74, rzp, 0.08, 3.6, 1.6, 0.2); Lm.add(fxp + fx * 0.02, y + 0.6, fzp + fz * 0.02, 0.07, 3.6, 1.6, 0.2); }
+        if (braking) Lm.add(rxp, y + 0.86, rzp, 0.2, 5.2, 0.4, 0.22); else if (head) Lm.add(rxp, y + 0.86, rzp, 0.13, 2.6, 0.22, 0.12);
+        if (haz) { Lm.add(rxp, y + 0.74, rzp, 0.13, 4.4, 2.0, 0.25); Lm.add(fxp + fx * 0.02, y + 0.6, fzp + fz * 0.02, 0.11, 4.4, 2.0, 0.25); }
       }
       if (braking) Lm.add(p.x - fx * (h - 0.6), y + 1.32, p.z - fz * (h - 0.6), 0.06, 3.6, 0.3, 0.2);       // the high brake light
     }
@@ -254,25 +254,79 @@ function nbBuildValley(S, W) {
   }
   // the plane on final approach (westward, a 3° glide path; it touches down at 3:30:34, after it's all over)
   out.plane = nbBuildPlane(scene, 1);
-  const PL = out.PL = { sTD: 34, v: 70, xTD: R.x[1] - 300, y: ry };
+  // ---- its flight deck (in the plane's frame: the nose is −x, the captain sits on the left, +z). Everything in it is
+  // black now except its screens: the glare shield, the window posts and the roof only hide the lights outside
+  {
+    const P = out.plane, blk = nbStd('#1a1c20', 0.6), E = [-16.3, 1.0, 0.55];
+    out.deckEye = E;
+    nbBox(0.4, 0.06, 2.5, blk, E[0] - 0.76, E[1] - 0.21, 0, P);                                         // the glare shield
+    nbBox(0.08, 0.45, 2.5, blk, E[0] - 0.86, E[1] - 0.47, 0, P);                                         // the panel
+    for (const z of [0, 1.12, -1.12]) nbBox(0.06, 0.75, z ? 0.12 : 0.07, blk, E[0] - 0.92, E[1] + 0.12, z, P);   // the window posts
+    nbBox(1.3, 0.06, 2.6, blk, E[0] - 0.4, E[1] + 0.5, 0, P);                                           // the roof (the overhead panel)
+    const scr = (draw, w, h, x, y, z, sw, sh, ry = Math.PI / 2, tilt = 0.12) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(sw, sh), new THREE.MeshBasicMaterial({ map: nbTex(nbCanvas(w, h, draw), { repeat: false }), color: new THREE.Color(0.9, 0.9, 0.9) }));
+      m.position.set(x, y, z); m.rotation.set(0, ry, 0); m.rotateX(-tilt); P.add(m); return m; };
+    const pfd = (g, w, h) => { g.fillStyle = '#2d6fd8'; g.fillRect(0, 0, w, h * 0.55); g.fillStyle = '#7a4a22'; g.fillRect(0, h * 0.55, w, h); g.strokeStyle = '#fff'; g.lineWidth = 3; g.beginPath(); g.moveTo(0, h * 0.55); g.lineTo(w, h * 0.55); g.stroke();
+      g.lineWidth = 2; for (const k of [-2, -1, 1, 2]) { g.beginPath(); g.moveTo(w * 0.4, h * 0.55 - k * 22); g.lineTo(w * 0.6, h * 0.55 - k * 22); g.stroke(); }
+      g.fillStyle = '#ffd400'; g.fillRect(w * 0.3, h * 0.55 - 3, w * 0.14, 6); g.fillRect(w * 0.56, h * 0.55 - 3, w * 0.14, 6); g.fillRect(w / 2 - 4, h * 0.55 - 4, 8, 8);
+      g.fillStyle = 'rgba(20,20,24,0.85)'; g.fillRect(0, 0, w * 0.17, h); g.fillRect(w * 0.83, 0, w * 0.17, h); g.fillStyle = '#fff'; g.font = '700 22px Arial'; g.fillText('136', 6, h * 0.55 + 8); g.fillText('350', w * 0.84, h * 0.55 + 8);
+      g.fillStyle = '#ff40ff'; g.beginPath(); g.moveTo(w / 2, h - 18); g.lineTo(w / 2 + 9, h - 9); g.lineTo(w / 2, h); g.lineTo(w / 2 - 9, h - 9); g.fill(); g.beginPath(); g.moveTo(w * 0.79, h * 0.55 - 9); g.lineTo(w * 0.81, h * 0.55); g.lineTo(w * 0.79, h * 0.55 + 9); g.lineTo(w * 0.77, h * 0.55); g.fill(); };
+    const nd = (g, w, h) => { g.fillStyle = '#000'; g.fillRect(0, 0, w, h); g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(w / 2, h * 0.88, h * 0.7, Math.PI * 1.2, Math.PI * 1.8); g.stroke();
+      g.strokeStyle = '#ff40ff'; g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2, h * 0.88); g.lineTo(w / 2 + 6, h * 0.2); g.stroke(); g.fillStyle = '#3aff6a'; g.font = '700 18px Arial'; g.fillText('RW27', w / 2 + 12, h * 0.24); g.fillStyle = '#fff'; g.fillText('GS136  TAS138', 8, 22);
+      g.fillStyle = '#ffd400'; g.beginPath(); g.moveTo(w / 2, h * 0.84); g.lineTo(w / 2 + 9, h * 0.94); g.lineTo(w / 2 - 9, h * 0.94); g.fill(); };
+    const eic = (g, w, h) => { g.fillStyle = '#000'; g.fillRect(0, 0, w, h); g.strokeStyle = '#fff'; g.lineWidth = 3; for (const cx of [w * 0.3, w * 0.7]) { g.beginPath(); g.arc(cx, h * 0.3, h * 0.17, Math.PI * 0.8, Math.PI * 2.2); g.stroke(); g.strokeStyle = '#3aff6a'; g.beginPath(); g.moveTo(cx, h * 0.3); g.lineTo(cx + h * 0.12, h * 0.22); g.stroke(); g.strokeStyle = '#fff'; }
+      g.fillStyle = '#3aff6a'; g.font = '700 18px Arial'; g.fillText('N1  54.2   54.0', 12, h * 0.62); g.fillStyle = '#00e0ff'; g.fillText('FLAPS 30  GEAR DOWN', 12, h * 0.8); };
+    const X = E[0] - 0.8, Y = E[1] - 0.47;
+    scr(pfd, 256, 256, X, Y, 0.72, 0.19, 0.19); scr(nd, 256, 256, X, Y, 0.48, 0.19, 0.19); scr(eic, 256, 320, X, Y - 0.02, 0, 0.17, 0.21); scr(nd, 256, 256, X, Y, -0.48, 0.19, 0.19); scr(pfd, 256, 256, X, Y, -0.72, 0.19, 0.19);
+    // the autopilot panel along the glare shield's face: amber digits
+    scr((g, w, h) => { g.fillStyle = '#060606'; g.fillRect(0, 0, w, h); g.fillStyle = '#ffb02a'; g.font = '700 30px monospace'; g.fillText('136      270      V/S -700      2000', 24, h * 0.72); }, 1024, 48, E[0] - 0.555, E[1] - 0.21, 0, 0.9, 0.042, Math.PI / 2, 0);
+  }
+  // ---- the control tower's cab (40 m up): its consoles' screens, a controller (black against the lights outside), the
+  // window posts
+  {
+    const c = [2050, ry + 38.0, R.z - 390], eye = [c[0] - 4.6, c[1] + 1.65, c[2] + 3.2], at = [eye[0] + 766, ry + 20, eye[2] + 643]; out.cab = { eye, at };
+    const blk = nbStd('#1a1c20', 0.6), d = new THREE.Vector3(at[0] - eye[0], 0, at[2] - eye[2]).normalize(), rgt = new THREE.Vector3(-d.z, 0, d.x), yaw = Math.atan2(d.x, d.z);
+    const P = (f, r, y) => [eye[0] + d.x * f + rgt.x * r, y, eye[2] + d.z * f + rgt.z * r];
+    for (let a = 0; a < 12; a++) { const q = a / 12 * Math.PI * 2; nbBox(0.12, 5.6, 0.12, blk, c[0] + 8.7 * Math.cos(q), c[1] + 3, c[2] + 8.7 * Math.sin(q)); }
+    { const p = P(1.25, 0, c[1] + 0.5); nbBox(4.2, 1.0, 0.9, blk, p[0], p[1], p[2], null, yaw); }                   // the desk
+    out.cabScope = nbCanvasTex(384, 384, (g, w, h, st) => { g.fillStyle = '#020a04'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(80,255,120,0.45)'; g.lineWidth = 2;
+      for (let k = 1; k <= 4; k++) { g.beginPath(); g.arc(w / 2, h / 2, k * w * 0.11, 0, 7); g.stroke(); }
+      const a = st.a, grd = g.createConicGradient ? g.createConicGradient(a - 0.6, w / 2, h / 2) : null;
+      if (grd) { grd.addColorStop(0, 'rgba(60,255,110,0)'); grd.addColorStop(0.095, 'rgba(60,255,110,0.35)'); grd.addColorStop(0.0955, 'rgba(60,255,110,0)'); grd.addColorStop(1, 'rgba(60,255,110,0)'); g.fillStyle = grd; g.beginPath(); g.arc(w / 2, h / 2, w * 0.45, 0, 7); g.fill(); }
+      g.strokeStyle = '#7aff9a'; g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2, h / 2); g.lineTo(w / 2 + Math.cos(a) * w * 0.45, h / 2 + Math.sin(a) * w * 0.45); g.stroke();
+      g.fillStyle = '#9affb0'; g.fillRect(w * 0.78, h * 0.47, 8, 8); g.font = '700 18px Arial'; g.fillText('BAW271', w * 0.74, h * 0.44); g.fillText('021  136', w * 0.74, h * 0.56);
+      g.fillStyle = '#ffd04a'; g.fillText('PRIMARY: NO RETURNS', 14, h - 16); });
+    const sm = (tex, f, r, y, w, h) => { const p = P(f, r, y), m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(0.95, 0.95, 0.95) })); m.position.set(...p); m.rotation.set(0, yaw + Math.PI, 0); m.rotateX(-0.45); scene.add(m); return m; };
+    sm(out.cabScope.tex, 0.95, -0.35, c[1] + 1.26, 0.46, 0.46);
+    sm(nbTex(nbCanvas(512, 256, (g, w, h) => { g.fillStyle = '#05080c'; g.fillRect(0, 0, w, h); g.font = '700 24px Arial'; ['BAW271  A320  27  LDG', 'EZY84P  A319  27  HOLD', 'RYR3GK  B738  STAND 14'].forEach((t, i) => { g.fillStyle = i ? '#cfd8e0' : '#ffd04a'; g.fillRect(10, 18 + i * 76, w - 20, 60); g.fillStyle = '#06080a'; g.fillText(t, 22, 56 + i * 76); }); }), { repeat: false }), 0.95, 0.42, c[1] + 1.16, 0.5, 0.25);
+    // the controller, on the right of the desk, looking out (a dark shape) with a headset's tiny green light
+    { const p = P(0.75, 0.95, c[1]); nbCyl(0.2, 0.24, 0.75, blk, p[0], c[1] + 0.95, p[2]); nbMesh(new THREE.SphereGeometry(0.12, 12, 10), blk, p[0], c[1] + 1.5, p[2]); out.cabLed = [p[0] - rgt.x * 0.13, c[1] + 1.52, p[2] - rgt.z * 0.13]; }
+  }
+  const PL = out.PL = { sTD: 24, v: 70, xTD: R.x[1] - 300, y: ry };
   out.planePos = (s) => { const d = Math.max(0, (PL.sTD - s) * PL.v); const x = PL.xTD + d; return [x, ry + 2.6 + Math.max(0, d * Math.tan(MathX.deg(3))), R.z]; };
   out.updatePlane = (s) => { const p = out.planePos(Math.min(s, PL.sTD)), g = out.plane; if (s > PL.sTD) { const dd = 70 * (s - PL.sTD) - 2.2 * (s - PL.sTD) ** 2; p[0] = PL.xTD - Math.max(0, Math.min(dd, 1500)); } g.position.set(p[0], p[1], p[2]); g.rotation.set(0, 0, s < PL.sTD ? -0.05 : 0); };
-  out.planeLamps = (Lm, s) => {
+  out.planeLamps = (Lm, s, cp) => {
     const p = out.plane.position, x = p.x, y = p.y, z = p.z;
     // nav lights: red on the left wingtip (south when flying west), green on the right, white on the tail
     Lm.add(x + 1, y + 1.2, z + 17.0, 0.12, 4.0, 0.3, 0.2); Lm.add(x + 1, y + 1.2, z - 17.0, 0.12, 0.3, 4.0, 0.8); Lm.add(x + 19, y + 3.4, z, 0.09, 3.2, 3.2, 3.0);
     // the landing lights (forward, bright), the anti-collision beacon (red) and strobes (white, double flash)
-    if (s < PL.sTD + 30) for (const sz of [-4.5, 4.5]) Lm.add(x - 4, y - 0.2, z + sz, 0.5, 9, 9, 8.5);
+    // (they shine forward: dim from the side or behind)
+    { const dx = cp ? cp.x - x : -1, dy = cp ? cp.y - y : 0, dz = cp ? cp.z - z : 0, dl = Math.hypot(dx, dy, dz) || 1, fw = Math.max(0, -dx / dl), k = 0.04 + 0.96 * Math.pow(fw, 6);
+      if (s < PL.sTD + 30) for (const sz of [-4.5, 4.5]) Lm.add(x - 4, y - 0.2, z + sz, 1.1, 30 * k, 30 * k, 28 * k); }
     const beacon = Math.max(0, Math.sin(s * 2 * Math.PI * 1.0)) ** 8; if (beacon > 0.05) { Lm.add(x - 2, y + 2.3, z, 0.16, 4 * beacon, 0.25 * beacon, 0.1 * beacon); Lm.add(x - 2, y - 1.9, z, 0.16, 4 * beacon, 0.25 * beacon, 0.1 * beacon); }
     const ph = ((s % 1.1) + 1.1) % 1.1, st = ph < 0.05 || (ph > 0.14 && ph < 0.19); if (st) { for (const sz of [-17, 17]) Lm.add(x + 1.2, y + 1.2, z + sz, 0.3, 9, 9, 9); Lm.add(x + 20, y + 4.2, z, 0.25, 9, 9, 9); }
+    // the cabin: through each window, the lamps along its ceiling (and here and there a seat-back screen)
+    for (let i = 0; i < 44; i++) { const wx = x - 11.5 + i * 0.53, wy = y + 0.45 - 0.026 * (i * 0.53 - 11.5) * 0.05; for (const sz of [-1, 1]) { Lm.add(wx, wy + 0.08, z + sz * 1.97, 0.07, 1.6, 1.45, 1.15); if (hash1(i * 3 + (sz > 0 ? 1 : 0)) < 0.3) Lm.add(wx + 0.1, wy - 0.12, z + sz * 1.96, 0.05, 0.7, 1.2, 2.0); } }
+    // the cab's headset LED (the tower) and the plane's MCP lights
+    if (out.cabLed) Lm.add(out.cabLed[0], out.cabLed[1], out.cabLed[2], 0.006, 0.4, 3.0, 0.6);
   };
   out.airportLamps = (Lm, s) => {
     const x0 = R.x[0], x1 = R.x[1], z = R.z, y = ry + 0.5;
-    for (let x = x0; x <= x1; x += 60) { Lm.add(x, y, z - 23.5, 0.18, 3.0, 2.8, 2.4); Lm.add(x, y, z + 23.5, 0.18, 3.0, 2.8, 2.4); }        // the edges
-    for (let x = x0 + 15; x <= x1; x += 30) Lm.add(x, y - 0.4, z, 0.14, 2.6, 2.6, 2.4);                                                  // the centreline
+    for (let x = x0; x <= x1; x += 30) { Lm.add(x, y, z - 23.5, 0.3, 4.6, 4.3, 3.8); Lm.add(x, y, z + 23.5, 0.3, 4.6, 4.3, 3.8); }        // the edges
+    for (let x = x1 - 900; x <= x1; x += 30) for (const k of [-1, 1]) for (let j = 0; j < 3; j++) Lm.add(x, y - 0.4, z + k * (5 + j * 1.5), 0.13, 2.8, 2.8, 2.5);   // the touchdown zone's bars
+    for (let x = x0 + 15; x <= x1; x += 15) Lm.add(x, y - 0.4, z, 0.16, 3.4, 3.4, 3.1);                                                  // the centreline
     for (let k = -22; k <= 22; k += 3) { Lm.add(x1 + 1, y, z + k, 0.2, 0.4, 3.6, 0.8); Lm.add(x0 - 1, y, z + k, 0.2, 3.6, 0.3, 0.2); }   // threshold green, end red
     // the approach lights: bars of five every 30 m out to 900 m, a crossbar at 300 m; the "rabbit" racing in, twice a second
-    for (let d = 30; d <= 900; d += 30) { const ya = ry + 0.6 + d * 0.004; for (let k = -2; k <= 2; k++) Lm.add(x1 + d, ya, z + k * 1.0, 0.16, 3.2, 3.0, 2.6); if (d === 300) for (let k = -15; k <= 15; k += 1.5) Lm.add(x1 + d, ya, z + k, 0.15, 3.2, 3.0, 2.6); }
+    for (let d = 30; d <= 900; d += 30) { const ya = ry + 0.6 + d * 0.004; for (let k = -2; k <= 2; k++) Lm.add(x1 + d, ya, z + k * 1.0, 0.22, 4.4, 4.2, 3.6); if (d === 300) for (let k = -15; k <= 15; k += 1.5) Lm.add(x1 + d, ya, z + k, 0.15, 3.2, 3.0, 2.6); }
     const ra = ((s * 2) % 1 + 1) % 1, rd = 900 - ra * 870; Lm.add(x1 + rd, ry + 1.2 + rd * 0.004, z, 0.6, 9, 9, 9);
     // the PAPI (left of the runway, 300 m in): two red, two white: on the glide path
     for (let k = 0; k < 4; k++) Lm.add(x1 - 300, y, z + 32 + k * 9, 0.28, k < 2 ? 4.2 : 4.2, k < 2 ? 0.4 : 4.0, k < 2 ? 0.3 : 3.6);
@@ -280,14 +334,13 @@ function nbBuildValley(S, W) {
     for (let x = x0; x <= x1; x += 45) { Lm.add(x, y, z - 178, 0.12, 0.5, 0.9, 3.8); Lm.add(x, y, z - 202, 0.12, 0.5, 0.9, 3.8); }
     for (let x = 1400; x <= 1800; x += 50) Lm.add(x, ry + 24, z - 330, 0.6, 3.6, 3.2, 2.4);
     for (let x = 1395; x <= 1805; x += 6) Lm.add(x, ry + 7, z - 386.8, 0.35, 2.4, 2.2, 1.7);
-    for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2; Lm.add(2050 + 8.6 * Math.cos(a), ry + 41.5, z - 390 + 8.6 * Math.sin(a), 0.3, 1.8, 2.4, 2.2); }
     Lm.add(2050, ry + 46, z - 390, 0.3, 4.0, 0.3, 0.2); Lm.add(2350, ry + 31, z - 330, 0.3, 4.0, 0.3, 0.2);
   };
   out.townLampsAdd = (Lm, s, dusk) => {
     for (const b of out.townLamps) Lm.add(b[0], b[1], b[2], b[3], b[4][0], b[4][1], b[4][2]);
     if (dusk > 0.3) for (const p of out.streets) Lm.add(p[0], p[1], p[2], 0.35, 3.4, 1.9, 0.6);
   };
-  out.update = (s) => { out.updateCars(s); out.updatePlane(s); out.radar.rotation.y = s * 2 * Math.PI / 4.0; out.drvUpdate(s); };
+  out.update = (s) => { out.updateCars(s); out.updatePlane(s); out.radar.rotation.y = s * 2 * Math.PI / 4.0; out.drvUpdate(s); out.cabScope.update({ a: Math.round((s * 2 * Math.PI / 4.0) * 200) / 200 }); };
   return out;
 }
 

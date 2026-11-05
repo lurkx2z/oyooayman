@@ -19,7 +19,7 @@ function nbLamps(scene, max = 6000, o = {}) {
     uniforms: { proj: { value: 600 }, minPx: { value: o.minPx ?? 2.2 }, maxPx: { value: o.maxPx ?? 90 }, px: { value: 1 }, k: { value: 1 }, pull: { value: o.pull ?? 0.003 } },
     vertexShader: `attribute float size; attribute vec3 col; uniform float proj, minPx, maxPx, px, k, pull; varying vec3 vC; varying float vS;
       void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); mv.xyz *= 1.0 - pull; gl_Position = projectionMatrix * mv;   // (pulled 0.3% towards you: a bulb is never buried in its own fitting)
-        float s = size * proj / max(0.05, -mv.z); float ps = clamp(s, minPx * px, maxPx * px);
+        float s = size * proj / max(0.05, -mv.z); float lum = max(col.r, max(col.g, col.b)); float ps = clamp(s, minPx * px * max(1.0, sqrt(lum / 3.2)), maxPx * px);   // (a very bright lamp far off still glares)
         vC = col * k * min(1.0, (s * s) / (ps * ps) * 6.0 + 0.16); vS = ps; gl_PointSize = ps * 2.2; }`,
     fragmentShader: `varying vec3 vC; varying float vS; void main(){ vec2 q = gl_PointCoord * 2.0 - 1.0; float r = length(q) * 2.2;
         float core = 1.0 - smoothstep(0.7, 1.0, r), halo = exp(-r * r * 1.1) * 0.22; float a = core + halo; if (a < 0.004) discard;

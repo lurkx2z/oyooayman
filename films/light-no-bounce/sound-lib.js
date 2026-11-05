@@ -1,7 +1,7 @@
 /* =====================================================================
    SOUND · LIB — the noise and filter generators the ambience and effects share (the gravity films' sound kit, via the
-   Air solid film, renamed lf*), and where the camera is: in the train, beside it, on the hospital's floors, in the
-   stadium, on the mountain, on the road, or on the beach. Every function here is listed in NB_SOUND_FNS at the end,
+   Air solid film), where the camera is (the fair, the fence over the valley, a car, the motorway's verge, a flight deck,
+   the control tower, beside the plane, the rollercoaster, the space station), and how fast the world's own sounds run. Every function here is listed in NB_SOUND_FNS at the end,
    so the baked soundtrack's fingerprint sees a change to any of them.
    ===================================================================== */
 
@@ -93,15 +93,10 @@ function nbCurve(f, hz = 200) {
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
 const NB_PLACE = {
-  trainIn: ['win', 'phone', 'bay', 'emerg', 'ring', 'winBeach'],
-  trainOut: ['title', 'ext2', 'ext3', 'panto', 'flicker', 'brakeX'],
-  bay: ['bayOut', 'roof'],
-  hospital: ['mriA', 'mriB', 'quench', 'gen', 'corridor', 'board'],
-  stadium: ['stadA', 'stadB', 'stadC'],
-  obs: ['obsOut', 'baro', 'scope', 'eyepiece'],
-  road: ['road', 'roadCar'],
+  edge: ['moon', 'moongone', 'valley', 'netWide', 'saturn', 'moonback', 'crash', 'echo', 'echoSat', 'planeHill'],   // the fence over the valley
+  car: ['driver'], verge: ['verge'], cockpit: ['approach'], tower: ['tower'], sky: ['planeSide'], ride: ['coasterPOV'], space: ['space'],
 };
-function nbWhereShot(sh) { if (sh.where) return sh.where; for (const [k, v] of Object.entries(NB_PLACE)) if (v.includes(sh.mode)) return k; return 'beach'; }
+function nbWhereShot(sh) { if (sh.where) return sh.where; for (const [k, v] of Object.entries(NB_PLACE)) if (v.includes(sh.mode)) return k; return 'fair'; }
 // the film as places: [{ t0, t1, where, shot }] in order
 function nbPlaces() {
   if (nbPlaces._c) return nbPlaces._c;
@@ -172,4 +167,67 @@ function nbPartySong(fx, d, o = {}) {
   for (let i = 0; i < n; i++) y[i] = Math.tanh(1.6 * y[i]);
   return y;
 }
-const NB_SOUND_FNS = [nbPartySong, nbNoise, nbBed, nbTone, nbChirp, nbCrackle, nbSweep, nbSweepPut, nbAddAt, nbPlaceAt, nbSeen, nbSlowK, nbCurve, nbWhereShot, nbPlaces, nbRoll, nbScrape, nbAlarm, nbCrack, nbEv, nbWn];
+
+// ---- how fast the world's own sounds run (the picture's slow motion, made audible): 1 at real speed; a quarter while
+// nothing bounces (any slower and they would sink below hearing); rising through the count; snapping back at 3:30:10
+function nbWorldRate(t) {
+  const T0 = NB.tLock, tc = nbB('count'), tb = nbFilmAt(NBP.T);
+  if (t < T0) return 1;
+  if (t < T0 + 1.6) return 1 - 0.75 * MathX.smooth(t, T0, T0 + 1.6);
+  if (t < tc) return 0.25;
+  if (t < tb) return 0.25 + 0.17 * (t - tc) / (tb - tc);
+  if (t < tb + 0.4) return 0.42 + 0.58 * MathX.smooth(t, tb, tb + 0.4);
+  return 1;
+}
+// a reed pipe's wave (one period, 2048 samples): odd harmonics strong, even ones softer (a fairground organ)
+const NB_REED = (() => { const n = 2048, y = new Float32Array(n); for (let i = 0; i < n; i++) { const p = 2 * Math.PI * i / n; let v = 0; for (let k = 1; k <= 12; k++) v += (k % 2 ? 1 : 0.45) * Math.sin(k * p) / Math.pow(k, 0.95); y[i] = v * 0.5; } return y; })();
+// the carousel's band organ: a waltz in C at 168 bpm (an oom-pah-pah bass, reedy chords, a pipe melody, a glockenspiel
+// on the first beat), its clock running at rate(t): slowed, the waltz drags and sinks like a tape running down
+function nbOrgan(fx, t0, t1, rate, o = {}) {
+  const sr = fx.sr, n = Math.ceil((t1 - t0) * sr), L = new Float32Array(n), R = new Float32Array(n), W = NB_REED, WN = W.length;
+  const beat = 60 / 168, prog = [[36, 52, 55, 60], [36, 52, 55, 60], [43, 50, 53, 59], [43, 50, 53, 59], [41, 53, 57, 60], [41, 53, 57, 60], [43, 50, 53, 59], [36, 52, 55, 60]];
+  const mel = [67, 72, 76, 79, 76, 72, 74, 71, 67, 65, 67, 71, 69, 72, 77, 81, 77, 72, 74, 71, 67, 72, 67, 64];   // one note a beat, 8 bars
+  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12), ph = new Float64Array(6);
+  let u = (o.offset || 0), r = rate(t0), glk = 0, gph = 0;
+  for (let i = 0; i < n; i++) {
+    if ((i & 63) === 0) r = rate(t0 + i / sr);
+    u += r / sr;
+    const b = Math.floor(u / beat), w = (u - b * beat) / beat, bar = Math.floor(b / 3) % 8, bb = b % 3, ch = prog[bar];
+    let l = 0, rr = 0;
+    // the bass on one, the chord on two and three ("pah"), short and bright
+    { const f = hz(ch[0] - 12) * r; ph[0] = (ph[0] + f * WN / sr) % WN; const e = bb === 0 ? Math.exp(-w * 2.2) : 0; const v = W[ph[0] | 0] * e * 0.55; l += v; rr += v; }
+    if (bb > 0) { const e = Math.min(1, w * 40) * Math.exp(-w * 5); for (let k = 1; k < 4; k++) { const f = hz(ch[k]) * r; ph[k] = (ph[k] + f * WN / sr) % WN; const v = W[ph[k] | 0] * e * 0.16; l += v * (k === 1 ? 1.2 : 0.8); rr += v * (k === 3 ? 1.2 : 0.8); } }
+    // the melody (a pipe with a slow tremolo), legato
+    { const m = mel[b % 24], f = hz(m) * r; ph[4] = (ph[4] + f * (1 + 0.004 * Math.sin(u * 37)) * WN / sr) % WN; const e = Math.min(1, w * 25) * (0.75 + 0.25 * Math.exp(-w * 3)); const v = W[ph[4] | 0] * e * 0.3; l += v * 0.9; rr += v * 1.1; }
+    // a glockenspiel strike on each bar's first beat
+    if (bb === 0 && w < 0.004) { glk = 1; gph = 0; }
+    if (glk > 0.001) { gph += 2 * Math.PI * hz(mel[b % 24] + 12) * r / sr; const v = Math.sin(gph) * glk * 0.22; l += v; rr += v; glk *= Math.exp(-4 * r / sr); }
+    L[i] = l; R[i] = rr;
+  }
+  NBX.bq(L, 'lp', o.lp || 5200, 0.7, sr); NBX.bq(R, 'lp', o.lp || 5200, 0.7, sr);
+  return [L, R];
+}
+// a voice (a cry, a gasp, a groan): glottal pulses at f0(u) through formants [[f, q, a]] (all scaled by k: a slowed
+// voice drops in pitch), with breath; env(u)
+function nbVoice(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), r = fx.r, src = new Float32Array(n), k = o.k || 1, f0 = o.f0 || (() => 300), wv = fx.wander(3);
+  let ph = 0; for (let i = 0; i < n; i++) { const u = i / n; ph += f0(u) * k * (1 + 0.025 * wv(i / sr)) / sr; if (ph >= 1) { ph -= 1; src[i] = 1; } src[i] += (r.next() * 2 - 1) * (o.breath ?? 0.08); }
+  const y = new Float32Array(n), F = o.formants || [[800, 5, 1], [1250, 6, 0.6], [2700, 7, 0.3]];
+  for (const [f, q, a] of F) { const z = Float32Array.from(src); NBX.bq(z, 'bp', f * k, q, sr); for (let i = 0; i < n; i++) y[i] += z[i] * a; }
+  const env = o.env || ((u) => Math.min(1, u / 0.15) * Math.pow(1 - u, 0.8));
+  for (let i = 0; i < n; i++) y[i] *= env(i / n);
+  return y;
+}
+// a crowd crying out: many voices, staggered, of every pitch (k < 1: slowed), spread across the stereo field
+function nbCrowdCry(K, t, o = {}) {
+  const fx = K.fx, r = fx.r, k = o.k || 1, N = o.n || 16, d = (o.d || 1.6) / k, Ls = fx.arr(d + (o.spread || 0.8) / k + 0.1), Rs = fx.arr(d + (o.spread || 0.8) / k + 0.1);
+  for (let v = 0; v < N; v++) {
+    const f = r.range(o.lo || 260, o.hi || 640), dd = d * r.range(0.6, 1.1), on = r.range(0, (o.spread || 0.8) / k), fm = r.range(0.9, 1.2);
+    const y = nbVoice(fx, dd, { k, f0: (u) => f * (1 + 0.18 * Math.sin(Math.PI * u) * fm - 0.1 * u), formants: [[r.range(700, 950), 5, 1], [r.range(1100, 1500), 6, 0.6], [r.range(2500, 3000), 7, 0.25]], breath: 0.15,
+      env: (u) => Math.min(1, u / 0.12) * Math.pow(1 - u, 1.1) });
+    const pan = r.range(-0.8, 0.8), gL = Math.cos((pan + 1) * Math.PI / 4), gR = Math.sin((pan + 1) * Math.PI / 4), i0 = Math.round(on * fx.sr), a = r.range(0.4, 1);
+    for (let i = 0; i < y.length && i0 + i < Ls.length; i++) { Ls[i0 + i] += y[i] * gL * a; Rs[i0 + i] += y[i] * gR * a; }
+  }
+  return K.putLR(Ls, Rs, t, { vol: o.vol ?? 0.5, norm: true, room: o.room, wet: o.wet });
+}
+const NB_SOUND_FNS = [nbWorldRate, nbOrgan, nbVoice, nbCrowdCry, nbPartySong, nbNoise, nbBed, nbTone, nbChirp, nbCrackle, nbSweep, nbSweepPut, nbAddAt, nbPlaceAt, nbSeen, nbSlowK, nbCurve, nbWhereShot, nbPlaces, nbRoll, nbScrape, nbAlarm, nbCrack, nbEv, nbWn];

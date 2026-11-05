@@ -62,7 +62,7 @@ function nbBuildPeople(S, W) {
     for (let i = 0, tries = 0; i < N && tries < 6000; tries++) {
       const x = rr.range(-70, 75), z = rr.range(-30, 60);
       if (Math.hypot(x, z - 0.6) < 16) continue;                                                    // (the rigged crowd's zone)
-      const zones = [[NB_F.wheel.c, 11], [NB_F.carousel.c, 8.6], [NB_F.dodgems.c, 12.5], [[38, 0, 34], 26], [[0, 0, -10], 10]];
+      const zones = [[NB_F.wheel.c, 11], [NB_F.carousel.c, 8.6], [NB_F.dodgems.c, 12.5], [[38, 0, 34], 26], [[0, 0, -10], 10], [[-54, 0, 14], 6.5], [[50, 0, -24], 4]];
       if (zones.some(([cc, rad]) => Math.hypot(x - cc[0], z - cc[2]) < rad)) continue;
       if (z > 8.5 && z < 13.5 && x > -10 && x < 34) continue;                                       // the stalls
       if (Math.abs(x) < 10 && z < -2) continue;                                                      // the Fun House
@@ -73,7 +73,9 @@ function nbBuildPeople(S, W) {
     }
     iB.count = iH.count = far.length;
     for (const m of [iB, iH]) { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; scene.add(m); }
-    out.far = far;
+    // 4:42 PM: about seventy of them have gone to the fence at the hill's edge to watch Saturn (in two or three rows)
+    { const re = new RNG(4242); far.slice(0, 70).forEach((q, j) => { const z = -36 + j * (68 / 70) + re.range(-0.4, 0.4); q.ez = z; q.ex = nbEdgeX(z) - 1.55 - (j % 3) * 0.75 - re.range(0, 0.4); }); }
+    out.far = far; out.farMesh = [iB, iH]; out._echo = false;
   }
 
   // ---- the bear mascot (a fur suit; the head a big bear's head; three balloons on strings)
@@ -115,6 +117,10 @@ function nbBuildPeople(S, W) {
 
   const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
   out.update = (s) => {
+    // the far crowd: at the fence after 4:42 PM
+    { const echo = s > 3000; if (echo !== out._echo) { out._echo = echo; const m4 = new THREE.Matrix4();
+      out.far.forEach((q, i) => { const x = echo && q.ex != null ? q.ex : q.x, z = echo && q.ex != null ? q.ez : q.z; m4.makeScale(1, q.s, 1).setPosition(x, 0, z); for (const M of out.farMesh) M.setMatrixAt(i, m4); });
+      for (const M of out.farMesh) M.instanceMatrix.needsUpdate = true; } }
     // the crowd: walkers stop dead in the dark; most hold their phones up (screens: sources); some turn their torches on
     for (const q of out.people) {
       const stop = Math.min(s, q.react), moving = q.walk && s < q.react, d = q.walk ? q.v * (stop + 20) : 0;
@@ -148,8 +154,10 @@ function nbBuildPeople(S, W) {
   };
   // phone screens far off and the torches (LEDs: sources that light nothing)
   out.lamps = (L, s) => {
-    for (const q of out.far) { if (!q.ph) continue; const up = s >= 0 && s < NBP.T + 2 ? 1.0 : 0.6; L.add(q.x + 0.18, 1.3 + 0.25 * up * (q.k % 3 === 0 ? 1 : 0.4), q.z + 0.1, 0.05, 1.3, 1.5, 1.9);
-      if (s > 2 + (q.k % 7) * 0.6 && s < NBP.T + 4 && q.k % 4 === 0) L.add(q.x + 0.2, 1.62, q.z + 0.2, 0.05, 6, 6, 5.5); }
+    for (const q of out.far) { if (!q.ph) continue;
+      if (s > 3000 && q.ex != null) { L.add(q.ex - 0.25, 1.55 + 0.12 * (q.k % 2), q.ez + 0.12, 0.05, 1.1, 1.3, 1.6); continue; }   // (filming Saturn)
+      const up = s >= 0 && s < NBP.T + 2 ? 1.0 : 0.6, hi = q.k % 3 !== 1, a = q.k * 2.39996; L.add(q.x + 0.36 * Math.cos(a), 1.3 + 0.3 * up * (hi ? 1 : 0.3), q.z + 0.36 * Math.sin(a), 0.06, 2.3, 2.6, 3.1);
+      if (s > 2 + (q.k % 7) * 0.6 && s < NBP.T + 4 && q.k % 4 === 0) L.add(q.x + 0.38 * Math.cos(q.k * 2.39996), 1.5, q.z + 0.38 * Math.sin(q.k * 2.39996), 0.05, 6, 6, 5.5); }
     for (const q of out.people) { if (!q.ph || !(s > q.torch && s < NBP.T + 3)) continue; q.p.phoneG.updateMatrixWorld(); tmp.set(0, 0.06, -0.008).applyMatrix4(q.p.phoneG.matrixWorld); L.add(tmp.x, tmp.y, tmp.z, 0.03, 7, 7, 6.4); }
   };
   // the juggler's flames (additive soft points): long tongues streaming up off each wick, in slow motion

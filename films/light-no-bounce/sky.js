@@ -86,13 +86,13 @@ function nbBuildSky(scene, o = {}) {
   const SAT = n - 1;
   const starMat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false,
-    uniforms: { lim: { value: -9 }, px: { value: 1 }, gain: { value: 1 }, satOn: { value: 1 }, satIdx: { value: SAT } },
-    vertexShader: `attribute float mag; attribute vec3 col; uniform float lim, px, gain, satOn, satIdx; varying float vA; varying vec3 vC;
+    uniforms: { lim: { value: -9 }, px: { value: 1 }, gain: { value: 1 }, satOn: { value: 1 }, satIdx: { value: SAT }, satK: { value: 1 } },
+    vertexShader: `attribute float mag; attribute vec3 col; uniform float lim, px, gain, satOn, satIdx, satK; varying float vA; varying vec3 vC;
       void main(){ float b = pow(10.0, -0.4 * (mag - lim)); float vis = smoothstep(0.0, 0.9, lim - mag + 0.35);
-        if (abs(float(gl_VertexID) - satIdx) < 0.5) vis *= satOn;
+        float isSat = abs(float(gl_VertexID) - satIdx) < 0.5 ? 1.0 : 0.0; vis *= mix(1.0, satOn, isSat);
         vA = vis * min(1.0, 0.35 + 0.25 * b) * gain; vC = col * (1.0 + 0.6 * min(b, 6.0));
         vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww;
-        gl_PointSize = px * clamp(1.6 + 1.25 * log(1.0 + b), 1.6, 7.5); }`,
+        gl_PointSize = px * clamp(1.6 + 1.25 * log(1.0 + b), 1.6, 7.5) * mix(1.0, satK, isSat); }`,
     fragmentShader: `varying float vA; varying vec3 vC; void main(){ vec2 q = gl_PointCoord * 2.0 - 1.0; float r = dot(q, q); if (r > 1.0) discard;
         float a = vA * (exp(-r * 3.2) + 0.25 * exp(-r * 0.8)); gl_FragColor = vec4(vC * 2.2, a); }`,
   });
@@ -141,7 +141,7 @@ function nbBuildSky(scene, o = {}) {
       dome.material.uniforms.sd.value.copy(sunDir).applyQuaternion(cel.quaternion);
       dome.material.uniforms.k.value = b * (o2.domeK ?? 1); dome.material.uniforms.dusk.value = dusk;
       starMat.uniforms.lim.value = o2.lim ?? -9; starMat.uniforms.px.value = o2.px || 1; starMat.uniforms.gain.value = o2.gain ?? 1;
-      starMat.uniforms.satOn.value = NBP.saturnOn(s) ? 1 : 0;
+      starMat.uniforms.satOn.value = NBP.saturnOn(s) ? 1 : 0; starMat.uniforms.satK.value = o2.satK ?? 1;   // (satK: Saturn's dot bigger in a long lens)
       // the Sun: white and 3× brighter when nothing scatters its light away on the way to you
       const white = 1 - b, sun = sunDisc.material.color;
       sun.setRGB(1.0, 0.62 + 0.38 * white, 0.30 + 0.70 * white).multiplyScalar((dusk > 0.5 ? 0 : 1) * (o2.sunK ?? 1) * 40 * (1 + 2 * white));

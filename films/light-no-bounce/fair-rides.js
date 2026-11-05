@@ -239,9 +239,21 @@ function nbBuildDodgems(S, W) {
     lamps(L, s) {
       for (let x = -hw; x <= hw; x += 0.5) { L.add(F.c[0] + x, H + 0.3, F.c[2] + hd + 0.34, 0.04, ...NB_BULB_SET.map((n) => NB_BULB[n])[Math.round(x * 2 + 40) % 8]); L.add(F.c[0] + x, H - 0.05, F.c[2] - hd - 0.2, 0.04, ...NB_BULB.warm); }
       for (let z = -hd; z <= hd; z += 0.5) { L.add(F.c[0] - hw - 0.2, H - 0.05, F.c[2] + z, 0.04, ...NB_BULB.warm); L.add(F.c[0] + hw + 0.2, H - 0.05, F.c[2] + z, 0.04, ...NB_BULB.warm); }
-      // the sparks where the poles touch the ceiling's mesh: blue-white, a few at a time, a little bigger in the dark
-      cars.forEach((c, k) => { const fl = hash1(Math.floor(s * 18) * 31 + k * 7); if (fl < 0.45) return; c.updateMatrixWorld(); const p = new THREE.Vector3(0, H - 0.32, -0.75).applyMatrix4(c.matrixWorld); const e = (fl - 0.45) * 2.2;
-        L.add(p.x, p.y, p.z, 0.06 + 0.1 * e, 3 + 6 * e, 3.6 + 6 * e, 5 + 8 * e); });
+      // the lamps hung under the roof (a grid of bare bulbs) and a chase of coloured bulbs round the floor's edge
+      for (let i = 0; i < 5; i++) for (let j = 0; j < 3; j++) L.add(F.c[0] - hw + 2.2 + i * (F.w - 4.4) / 4, H - 0.18, F.c[2] - hd + 2.3 + j * (F.d - 4.6) / 2, 0.09, ...NB_BULB.white);
+      for (let x = -hw + 1; x < hw; x += 2) for (let z = -hd + 1; z < hd; z += 2) L.add(F.c[0] + x, H - 0.06, F.c[2] + z, 0.035, ...NB_BULB.warm);   // the bulbs dotted over the ceiling
+      { const ch = Math.floor(s * 6); let n = 0; const edge = (x, z) => { const c = NB_BULB[NB_BULB_SET[((n + ch) % 8 + 8) % 8]]; if (((n + ch) % 3 + 3) % 3 !== 0) L.add(F.c[0] + x, 0.55, F.c[2] + z, 0.035, c[0], c[1], c[2]); n++; };
+        for (let x = -hw; x <= hw; x += 0.6) { edge(x, hd + 0.15); edge(x, -hd - 0.15); } for (let z = -hd + 0.6; z < hd; z += 0.6) { edge(-hw - 0.15, z); edge(hw + 0.15, z); } }
+      cars.forEach((c, k) => { c.updateMatrixWorld(); const M = c.matrixWorld, col = NB_BULB[NB_BULB_SET[k % 8]];
+        // each car: two headlamps, a ring of coloured LEDs round its bumper, a little light on top of its pole
+        for (const sx of [-0.32, 0.32]) { const p = new THREE.Vector3(sx, 0.45, 1.16).applyMatrix4(M); L.add(p.x, p.y, p.z, 0.07, 3.6, 3.4, 3.0); }
+        for (let i = 0; i < 14; i++) { const a = i / 14 * 6.283, p = new THREE.Vector3(Math.sin(a) * 0.86, 0.43, Math.cos(a) * 1.24).applyMatrix4(M); if ((i + Math.floor(s * 8)) % 2) L.add(p.x, p.y, p.z, 0.04, col[0], col[1], col[2]); }
+        const tp = new THREE.Vector3(0, H - 0.95, -0.75).applyMatrix4(M); L.add(tp.x, tp.y, tp.z, 0.045, col[0], col[1], col[2]);
+        // the sparks where the pole touches the ceiling's mesh: blue-white flashes, and a few sparks falling from each
+        for (let e0 = 0; e0 < 4; e0++) { const slot = Math.floor(s * 14) - e0, fl = hash1(slot * 31 + k * 7); if (fl < 0.4) continue; const age = s - slot / 14, p = new THREE.Vector3(0, H - 0.32, -0.75).applyMatrix4(M), e = (fl - 0.4) * 1.7;
+          if (e0 === 0) L.add(p.x, p.y, p.z, 0.07 + 0.12 * e, 3 + 7 * e, 3.8 + 7 * e, 5.5 + 9 * e);
+          for (let j = 0; j < 10; j++) { const vx = (hash1(slot * 13 + j * 5 + k) - 0.5) * 3.2, vz = (hash1(slot * 17 + j * 3 + k) - 0.5) * 3.2, vy = hash1(slot * 7 + j * 11 + k) * 1.2, fall = 4.9 * age * age, f = 1 - age * 2.5;
+            L.add(p.x + vx * age, p.y + vy * age - fall, p.z + vz * age, 0.028, 5 * f, 4.2 * f, 2.6 * f); } } });
     },
   };
   return O;

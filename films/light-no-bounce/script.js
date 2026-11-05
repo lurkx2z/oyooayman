@@ -5,7 +5,7 @@
    The physics (physics.js) runs on STORY time s: seconds after Saturday 3:30:00.000 PM, when light stops bouncing (for
    ten seconds). This file maps film time t to story time s with ONE clock for the whole film (NB_CLOCK): it only ever
    runs forward (the owner's rule of 2026-10-29: no replays; every new angle or place moves the clock on). The ten
-   seconds play about 26 times slower (the HUD says how slowly), then the clock slows out of the return to the Moon's,
+   seconds play 26 then 39 times slower, the last three about 3 times slower (the HUD says how slowly); then the clock slows out of the return to the Moon's,
    runs at real speed, and jumps forward only at cuts (the HUD says how far): two minutes, then to 4:42 PM.
    ===================================================================== */
 
@@ -32,7 +32,9 @@ const NB_CLOCK = (() => {
   const B = nbB, C = nbC, P = NBP;
   const S = [
     [-2, -2.85 - 2, 'real'],
-    [NB.tLock, 0, 'to'],                                  // ★ 3:30:00.000: the ten seconds, one steady slow motion…
+    [NB.tLock, 0, 'to'],                                  // ★ 3:30:00.000: the ten seconds in slow motion (the Moon's last light
+    [B('sky'), P.moonS * (B('sky') - NB.tLock) / (C('moongone', 0) - 0.5 - NB.tLock), 'to'],   //   arrives 0.5 s before "There goes the Moon")…
+    [B('count'), P.T - 3.0, 'to'],                        // …slower still through the middle; the last three seconds faster (the count)…
     [C('back', 0) - 0.6, P.T, 'to'],                      // …to 3:30:10.000, as "Light bounces again" comes up
     [C('moonback', 0) + 0.25, P.T + P.moonS + 0.02, 'real'],   // the Moon's light returns 1.28 s late; then real speed
     [B('after'), 130, 'real'],                            // +2 min

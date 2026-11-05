@@ -20,7 +20,7 @@ const NB_F = {
   dodgems: { c: [-30, 0, -20], w: 22, d: 14 },
   stalls: { z: 10.5, x: [-6, 30], n: 6 },
   juggler: [8.0, 0, 5.0],
-  plateau: 92,                              // the flat hilltop's radius; beyond it the ground falls away
+  plateau: 88,                              // the flat hilltop's 'radius' (a squarish ellipse); beyond it the ground falls away
   // the valley to the east (the hilltop is 70 m above it)
   valleyY: -70,
   motorway: { x: 430, w: 26, z: [-3000, 3000], y: -70 },
@@ -36,10 +36,15 @@ const NB_BODIES = { sun: [15.93, -20.2], moon: [1.32, 6.5], saturn: [0.30, -1.9]
 
 // the ground's height (x east): the flat hilltop, the fall into the valley all round, the far side rising to the east;
 // flattened under the motorway (a shallow cutting) and the airport
+function nbHillR(x, z) { const a = Math.abs(x * 0.9), b = Math.abs(z * 1.1); return Math.sqrt(Math.sqrt(a ** 4 + b ** 4)); }
+// the hilltop's eastern edge at z (where the ground starts to fall): the fence stands a metre inside it
+function nbEdgeX(z) { const b = Math.abs(z * 1.1), P = NB_F.plateau; return Math.sqrt(Math.sqrt(Math.max(0, P ** 4 - b ** 4))) / 0.9; }
 function nbGroundY(x, z) {
-  const r = Math.hypot(x * 0.9, z * 1.1), P = NB_F.plateau;
+  const r = nbHillR(x, z), P = NB_F.plateau;
   if (r < P) return 0.006 * noise1(x * 0.05 + z * 0.03, 5);
-  const u = MathX.clamp((r - P) / 230, 0, 1), fall = NB_F.valleyY * (u * u * (3 - 2 * u));
+  // a bowl: the slope is steepest at the edge and flattens out on the valley floor (so the whole floor is in view
+  // from the fence)
+  const u = MathX.clamp((r - P) / 230, 0, 1), fall = NB_F.valleyY * (2 * u - u * u);
   const far = x > 470 ? Math.min(45, (x - 470) * 0.03) : 0;
   let y = fall + far + 1.5 * noise1(x * 0.01 + z * 0.013, 3) * Math.min(1, u * 3);
   const dm = Math.abs(x - NB_F.motorway.x);

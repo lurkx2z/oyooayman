@@ -67,6 +67,7 @@ function nbBuildFairWorld(S) {
     nbBox(3.2, 0.9, 1.6, nbStd('#5a3a2a', 0.8), 6.2, 0.45, fz + 0.8, g); nbBox(2.6, 2.6, 0.1, nbStd('#121218', 0.4), 6.2, 2.2, fz - 0.05, g);
     nbBox(1.8, 2.6, 1.6, nbStd('#c8324a', 0.6), -6.6, 1.3, fz + 0.85, g); nbBox(2.2, 0.25, 2.0, trimM, -6.6, 2.72, fz + 0.85, g);
     const tk = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.4), nbSign('TICKETS', { w: 512, h: 146, bg: '#fff0c8', ink: '#a01020', k: 1.3 })); tk.position.set(-6.6, 2.3, fz + 1.66); g.add(tk);
+    { const fs = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 1.35), nbSign('FUN HOUSE', { neon: true, color: '#ff3ad8', k: 2.6, w: 1024, h: 192, italic: true, fs: 0.62 })); fs.position.set(0, 5.0, fz + 0.04); g.add(fs); }   // (its neon: a source)
     W.funG = g;
     // the bulbs: round the painted face, along the roof, round the mirrors' opening, the entrance
     const B = [];
@@ -117,6 +118,9 @@ function nbBuildFairWorld(S) {
       // the bulbs along the awning's front edge and the sign's frame
       for (let k = 0; k <= 12; k++) W.static.push([x - 2.8 + k * 0.466, 1.92, z - 2.62, 0.045, NB_BULB_SET[(k + i) % 8]]);
       for (let k = 0; k <= 9; k++) W.static.push([x - 2.3 + k * 0.511, 3.86, z - 0.1, 0.04, 'warm']);
+      for (let k = 0; k <= 9; k++) { W.static.push([x - 2.3 + k * 0.511, 2.84, z + 0.18, 0.04, 'warm']); W.static.push([x - 2.3 + k * 0.511, 2.84, z - 1.48, 0.04, NB_BULB_SET[(k + i + 3) % 8]]); }   // the roof's edges
+      for (const sx of [-1, 1]) { for (let k = 0; k <= 5; k++) W.static.push([x + sx * 2.85, 1.92 + k * 0.17, z - 2.62 + k * 0.2, 0.04, 'warm']); for (let k = 0; k < 6; k++) W.static.push([x + sx * 2.72, 0.3 + k * 0.45, z - 1.5, 0.035, NB_BULB_SET[(k + i) % 8]]); }
+      for (let k = 0; k < 4; k++) W.static.push([x - 1.8 + k * 1.2, 2.35, z - 0.2, 0.06, 'white']);   // bare bulbs hanging inside
       W.stalls.push({ x, z, g, name: names[i][0] });
     }
     // the hot dog stall's grill: coals glowing under the bars (a source: hot enough to glow)
@@ -134,12 +138,35 @@ function nbBuildFairWorld(S) {
       const runs = [[[x, H, zs[0]], [x + 9, H, zs[0]]], [[x, H, zs[1]], [x + 9, H, zs[1]]], [[x, H, zs[0]], [x + 9, H, zs[1]]]];
       runs.forEach((r, j) => {
         if (Math.abs(r[0][0]) < 6 && r[0][2] < 0 || Math.abs(r[1][0]) < 6 && r[1][2] < 0) return;   // (not across the Fun House's front)
-        const L = Math.hypot(r[1][0] - r[0][0], r[1][2] - r[0][2]), n = Math.round(L / 0.75), pts = [];
-        for (let k = 0; k <= n; k++) { const u = k / n, y = H - 0.55 * 4 * u * (1 - u); pts.push(new THREE.Vector3(nbLerp(r[0][0], r[1][0], u), y, nbLerp(r[0][2], r[1][2], u))); if (k && k < n) W.static.push([pts[k].x, pts[k].y - 0.07, pts[k].z, 0.04, j === 2 ? NB_BULB_SET[((k + Math.round(x)) % 8 + 8) % 8] : 'warm']); }
+        const L = Math.hypot(r[1][0] - r[0][0], r[1][2] - r[0][2]), n = Math.round(L / 0.45), pts = [];
+        for (let k = 0; k <= n; k++) { const u = k / n, y = H - 0.55 * 4 * u * (1 - u); pts.push(new THREE.Vector3(nbLerp(r[0][0], r[1][0], u), y, nbLerp(r[0][2], r[1][2], u))); if (k && k < n) W.static.push([pts[k].x, pts[k].y - 0.07, pts[k].z, 0.05, j === 2 ? NB_BULB_SET[((k + Math.round(x)) % 8 + 8) % 8] : 'warm']); }
         const wire = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), n * 2, 0.008, 4, false), M.dark); wire.castShadow = false; scene.add(wire);
       });
     }
   }
+
+  // ---- a helter-skelter (west) and a drop tower (north-east): more shapes drawn in bulbs
+  {
+    const hx = -54, hz = 14, Hh = 13; const g = new THREE.Group(); g.position.set(hx, 0, hz); scene.add(g);
+    const twr = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 3.0, Hh, 24, 1, false), new THREE.MeshStandardMaterial({ map: nbTex(nbStripeCanvas('#d8263a', '#f4ece0', 12), { repeat: false }), roughness: 0.7 })); twr.position.y = Hh / 2; twr.castShadow = true; g.add(twr);
+    nbMesh(new THREE.ConeGeometry(2.6, 3.2, 24), nbStd('#e8b82a', 0.5), 0, Hh + 1.6, 0, g);
+    const pts = []; for (let k = 0; k <= 160; k++) { const u = k / 160, a = u * Math.PI * 2 * 3.0, r = 3.0 + (1 - u) * 0 + 1.4 - 0.9 * (1 - u), y = (Hh - 1.2) * (1 - u) + 0.6; pts.push(new THREE.Vector3(Math.cos(a) * (r + 0.4 * u), y, Math.sin(a) * (r + 0.4 * u))); }
+    const slide = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 320, 0.45, 8, false), nbStd('#e8b82a', 0.45, 0.2)); slide.castShadow = true; g.add(slide);
+    pts.forEach((p, k) => { if (k % 2 === 0) W.static.push([hx + p.x * 1.12, p.y + 0.5, hz + p.z * 1.12, 0.045, NB_BULB_SET[(k / 2) % 8]]); });
+    for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2; W.static.push([hx + Math.cos(a) * 2.75, Hh + 0.05, hz + Math.sin(a) * 2.75, 0.05, 'warm']); }
+    for (let y = 0.6; y < Hh; y += 0.5) for (const a of [0.4, 2.5, 4.6]) W.static.push([hx + Math.cos(a) * (3.0 - y / Hh) * 1.02, y, hz + Math.sin(a) * (3.0 - y / Hh) * 1.02, 0.04, 'warm']);
+    W.static.push([hx, Hh + 3.3, hz, 0.12, 'red']);
+    // the drop tower: a lattice mast 42 m tall, a ring of seats; lights chase up and down it (W.lamps)
+    const dx = 50, dz = -24, DH = 42; nbCyl(0.9, 1.1, DH, nbStd('#c8ccd0', 0.4, 0.5), dx, DH / 2, dz, null, 12); nbBox(3.4, 1.6, 3.4, nbStd('#2a5aa8', 0.5, 0.3), dx, DH + 0.8, dz);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(2.0, 0.35, 8, 24), nbStd('#d8263a', 0.5, 0.3)); ring.rotation.x = Math.PI / 2; ring.position.set(dx, 3, dz); scene.add(ring); W.drop = { x: dx, z: dz, H: DH, ring };
+  }
+  W.lamps = (L, s) => {
+    const D = W.drop, ph = s * 0.9;
+    for (let y = 1; y < D.H; y += 0.8) for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + 0.785, on = ((y * 0.8 - ph * 6) % 6 + 6) % 6 < 2.2; const c = NB_BULB[on ? 'white' : 'blue'];
+      L.add(D.x + Math.cos(a) * 1.05, y, D.z + Math.sin(a) * 1.05, 0.05, c[0] * (on ? 1 : 0.6), c[1] * (on ? 1 : 0.6), c[2] * (on ? 1 : 0.6)); }
+    for (let k = 0; k < 20; k++) { const a = k / 20 * Math.PI * 2, c = NB_BULB[NB_BULB_SET[k % 8]]; L.add(D.x + Math.cos(a) * 2.4, D.ring.position.y - 0.3, D.z + Math.sin(a) * 2.4, 0.06, c[0], c[1], c[2]); }
+    L.add(D.x, D.H + 1.8, D.z, 0.18, 4.0, 0.3, 0.2);
+  };
 
   // ---- behind the fair: trucks and caravans (south of the stalls, north of the Fun House); a generator
   {
@@ -168,10 +195,16 @@ function nbBuildFairWorld(S) {
   }
   // ---- the fence along the top of the slope (east): posts and two rails
   {
-    for (let z = -40; z <= 46; z += 2.5) { nbBox(0.08, 1.1, 0.08, M.fence, 86, 0.55, z); }
-    for (const y of [0.55, 1.05]) nbBox(0.05, 0.05, 86, M.fence, 86, y, 3);
+    // (it follows the hilltop's edge, a metre inside it: posts every 2.5 m, the rails as straight pieces between them)
+    let prev = null;
+    for (let z = -60; z <= 40; z += 2.5) {
+      const x = nbEdgeX(z) - 1.0; nbBox(0.08, 1.1, 0.08, M.fence, x, 0.55, z);
+      if (prev) { const L = Math.hypot(x - prev[0], z - prev[1]), a = Math.atan2(x - prev[0], z - prev[1]);
+        for (const y of [0.55, 1.05]) { const rl = nbBox(0.05, 0.05, L, M.fence, (x + prev[0]) / 2, y, (z + prev[1]) / 2); rl.rotation.y = a; } }
+      prev = [x, z];
+    }
   }
 
-  W.update = (s) => { void s; };
+  W.update = (s) => { const D = W.drop, c = ((s / 16) % 1 + 1) % 1; D.ring.position.y = c < 0.55 ? 3 + 36 * MathX.smooth(c, 0, 0.5) : c < 0.62 ? 39 - 36 * Math.min(1, ((c - 0.55) / 0.07) ** 2) : 3; };
   return W;
 }

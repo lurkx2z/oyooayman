@@ -3,7 +3,7 @@
    layout is the Slower light / Friction 10s / Air solid / Light faster films':
      top left     LIGHT BOUNCING: 100% or 0%; while it's off, how long until it's back (to the hundredth); the next
                   thing due ("NEXT · 3:30:01.28 · THE MOON GOES OUT"); at 4:42 PM, Saturn's ten seconds
-     top right    Saturday and the time (to the millisecond in the slow part); 26× SLOWER or REAL SPEED; "+2 min" when
+     top right    Saturday and the time (to the millisecond in the slow part); 39× SLOWER or REAL SPEED; "+2 min" when
                   the clock jumps at a cut (it only ever runs forward)
      under them   the scene's context box (the number this scene is about)
      bottom       one caption at a time (CAPTIONS.md via timing.js; numbers in amber)
@@ -118,7 +118,7 @@ class NbHud {
       this._txt('ckf', this.clockF, jl ? jl + '  ·  ' + tl : tl);
     }
     // ---- the last three seconds: the count, big
-    { const left = NBP.T - s, on = s >= NBP.T - 3.0 && s < NBP.T + 0.02;
+    { const left = NBP.T - s, on = t >= nbB('count') && s < NBP.T + 0.02;
       this._set('cnta', this.count, 'opacity', on ? '1' : '0');
       if (on) { this._txt('cntv', this.count, left > 0.005 ? String(Math.ceil(left - 1e-6)) : '0'); this._cls('cntc', this.count, left < 0.02 ? 'nb-count hit' : 'nb-count'); } }
     // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
