@@ -1,14 +1,13 @@
 /* =====================================================================
-   AUDIO — "What if air became solid for 3 seconds?" js/audio/audioEngine.js is unchanged (this is a subclass); the
-   LFP and generators come from audiokit.js (via the Friction 10s film). No narrator: the captions are silent and the
-   sound carries the gaps. Three stems:
-     music  an original score (sound-music.js): the radio cuts, a hit and a glass chord as the air sets; the ice motif
-            over cold D minor pads for the three seconds; a pulse that tightens through the city; a drum on every
-            belly flop; a roll to 2:00:03, a breath of nothing, one huge hit, the first major chord; thinner after
-     amb    your kitchen before 2:00; nothing at all while the air is solid; afterwards the room, a shocked murmur,
-            birds, car alarms and sirens, and no wind (sound-amb.js)
-     sfx    the events at their story seconds (each heard once: the clock only runs forward; stretched and pitched
-            down in slow motion); during the lock only your heartbeat and the blood in your ears (sound-sfx.js)
+   AUDIO — "What if the speed of light increased and couldn't stop?" js/audio/audioEngine.js is unchanged (this is a
+   subclass); the LFX and generators come from audiokit.js (via the gravity films). No narrator: the captions are
+   silent and the sound carries the gaps. Three stems:
+     music  an original score (sound-music.js): cold A minor pads, a felt piano's rising motif, glass bells, a low drum,
+            and under everything from 9:00 PM the endless rise (a Shepard–Risset glissando), cut on the last frame
+     amb    where the camera is (sound-amb.js): the train, the bay, the hospital, the stadium, the mountain, the road,
+            the beach; darker and lower in the slow minutes
+     sfx    the events at their story seconds (sound-sfx.js; each heard once: the clock only runs forward; slowed with
+            the picture in the slow minutes), the party's song fading with its speaker's magnet, the fire's crackle
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
 

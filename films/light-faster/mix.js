@@ -1,17 +1,18 @@
 /* =====================================================================
    MIX — stem levels and the dynamics map for light-faster.html (read by audio.js).
      gain  stem level (dB) · hp  high-pass (Hz) · dyn  [beat, offset s, dB] keys (beat: a LF key or a film second)
-   Measured stem by stem (solo, pre-trim, 2026-11-04): music −23.1, amb −20.9, sfx −29.2 LUFS integrated.
-   With the trims: music −16.1; amb −28.9 (12 dB under the score); sfx −25.2 (the blood bed in the lock sits 11 dB under
-   the score; the busy aftermath, 4:00–5:29, 6 dB under).
+   Measured stem by stem (solo, pre-trim, 5 November 2026): music −18.2, amb −24.4, sfx −29.8 LUFS integrated.
+   The owner's rule (31 October 2026): the music clearly leads, the beds about 10 dB under it, stem by stem. With the
+   trims below, in 10 s windows the score sits 9.3 to 22 dB over the beds (median 12.6) and 5.9 to 37 dB over the
+   effects (median 18; the closest are the MRI quench and the grid's bangs, which are meant to cut through).
    Targets (docs + owner): −16 to −14 LUFS integrated, true peak ≤ −1 dBTP, a real loudness range (not flat).
    ===================================================================== */
 const LF_MIXSH = (m) => lfShot(m);
 window.LF_MIX = {
   stems: {
-    music: { gain: 7, hp: 32 },    // the score leads: about 12 dB over the beds (the owner's rule of 31 October 2026)
-    amb: { gain: -8, hp: 28 },     // the room, street and park beds, well under the score
-    sfx: { gain: 4, hp: 25 },
+    music: { gain: 2.5, hp: 32 },  // the score leads: about 10 to 13 dB over the beds (the owner's rule of 31 October 2026)
+    amb: { gain: -5, hp: 28 },     // the train, sea, hospital, crowd and beach beds, well under the score
+    sfx: { gain: 2, hp: 25 },      // the train, the quench, the grid, the crowd, the party's speaker, the fire
   },
   dyn: {
     music: [[0, 0, 0], ['end', -0.04, 1.5], ['end', 0, -60]],
