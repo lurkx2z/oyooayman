@@ -147,6 +147,11 @@ Stem trims music +2.5, beds −6, effects +2 dB (`mix.js`).
   `D:\renders\light-faster\light-faster_final_1080p.mp4` (1920×1080, 30 fps, H.264 CRF 18, the mastered soundtrack
   `final-soundtrack.m4a` copied in, 5:16) and `light-faster_final_small.mp4` (1280×720, under 30 MiB). Resumable: run
   it again and finished segments are kept.
+- **Made on 5 November 2026** on the owner's PC (RTX 3060 Ti, Chrome headless, about 7.3 fps, 19 minutes for the
+  frames, from commit 9c03fbc): `D:\renders\light-faster\light-faster_final_1080p.mp4`, 5:16 (315.70 s), 1920×1080,
+  30 fps, 9,471 frames, AAC 48 kHz stereo, −14.9 LUFS, −2.8 dBTP, 1,327 MiB; `light-faster_final_small.mp4`,
+  1280×720, 26.0 MiB, −14.9 LUFS, −2.3 dBTP. Full decodes reported no errors. The only black stretch (312.40–313.03 s)
+  is the planned cut to black before the last caption.
 
 ## Files
 
