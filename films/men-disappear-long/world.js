@@ -274,7 +274,7 @@ function mgBuildSky(S) {
   // the clouds: fair-weather cumulus at 1,600–2,400 m and a few higher streaks at 7,000 m (each a cluster of puffs)
   const r = new RNG(5150), C = [];
   for (let i = 0; i < 260; i++) { const x = r.range(-30000, 30000), z = r.range(-30000, 30000), hi = r.next() < 0.18; if (Math.hypot(x - 600, z - 1500) < 5000 && !hi) continue; C.push({ x, z, y: hi ? r.range(6800, 7600) : r.range(1600, 2400), s: hi ? r.range(350, 700) : r.range(260, 620), hi, n: hi ? 5 : r.int(5, 10), seed: i }); }
-  const puffs = mgPuffs(S.scene, 2600, { soft: 1.3 });
+  const puffs = mgPuffs(S.scene, 4400, { soft: 1.3 });
   puffs.mesh.renderOrder = 4;
   return {
     sky, sun, puffs, clouds: C,
@@ -293,12 +293,15 @@ function mgBuildSky(S) {
       const P = camPos, sunC = new THREE.Color('#fff4e4').lerp(new THREE.Color('#ffd0a0'), warm);
       for (const c of C) {
         const dx = c.x - P.x, dz = c.z - P.z, dist = Math.hypot(dx, dz, c.y - P.y); if (dist > 42000) continue;
-        for (let k = 0; k < c.n; k++) {
-          const a = mgR(c.seed * 13 + k, 3) * 6.283, rr = c.s * 0.75 * Math.sqrt(mgR(c.seed * 13 + k, 4)), sz = c.s * (0.45 + 0.4 * mgR(c.seed * 13 + k, 5)) * (c.hi ? 1.1 : 1);
-          const x = c.x + Math.cos(a) * rr + (s * 3), z = c.z + Math.sin(a) * rr * (c.hi ? 0.25 : 0.8), y = c.y + (c.hi ? 0 : sz * 0.35 * mgR(c.seed * 13 + k, 6));
-          const lit = 0.78 + 0.22 * ((x - c.x) * d[0] + (z - c.z) * d[2]) / Math.max(1, rr) * 0.5, shade = c.hi ? 1 : 0.86 + 0.14 * (y - c.y) / Math.max(1, sz * 0.35);
+        // (each cloud a wide, flat-bottomed cluster of smaller puffs, taller in the middle; the high ones thin streaks)
+        const N = c.hi ? 9 : c.n * 2, W = c.s * (c.hi ? 1.6 : 1.05);
+        for (let k = 0; k < N; k++) {
+          const q = c.seed * 29 + k, a = mgR(q, 3) * 6.283, rr = W * Math.sqrt(mgR(q, 4)), edge = rr / W;
+          const sz = c.s * (c.hi ? 0.35 + 0.3 * mgR(q, 5) : (0.32 + 0.3 * mgR(q, 5)) * (1 - 0.45 * edge));
+          const x = c.x + Math.cos(a) * rr + (s * 3), z = c.z + Math.sin(a) * rr * (c.hi ? 0.18 : 0.75), y = c.y + (c.hi ? 0 : sz * (0.15 + 0.55 * mgR(q, 6)) * (1 - edge * edge));
+          const lit = 0.8 + 0.2 * MathX.clamp(((x - c.x) * d[0] + (z - c.z) * d[2]) / W, -1, 1), shade = c.hi ? 1 : 0.8 + 0.2 * MathX.clamp((y - c.y) / (c.s * 0.35), 0, 1);
           const near = MathX.clamp((dist - sz) / (sz * 1.5), 0, 1);
-          puffs.add(x, y, z, sz, (c.hi ? 0.32 : 0.72) * near, sunC.r * lit * shade, sunC.g * lit * shade, sunC.b * lit * shade * 1.02);
+          puffs.add(x, y, z, sz, (c.hi ? 0.2 : 0.6) * near, sunC.r * lit * shade, sunC.g * lit * shade, sunC.b * lit * shade * 1.02);
         }
       }
       puffs.end();

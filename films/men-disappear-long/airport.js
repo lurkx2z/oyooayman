@@ -47,9 +47,12 @@ function mgDrawRadar(g, w, h, st) {
   const placed = [], tags = [], hit = (r) => placed.some((q) => r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y);
   for (const p of [...st.planes].sort((a, b) => (b.id === 'NRD2207') - (a.id === 'NRD2207'))) {
     const x = cx + (p.x - T[0]) * sc, y = cy + (p.z - T[2]) * sc; if (x < -20 || x > w + 20 || y < -20 || y > h + 20) continue;
-    const tw = 62, th = 26, offs = [[11, -24], [11, 6], [-11 - tw, -24], [-11 - tw, 6], [11, -52], [11, 34], [-11 - tw, -52], [-11 - tw, 34]];
-    let r = null; for (const [ox, oy] of offs) { const c = { x: x + ox, y: y + oy, w: tw, h: th }; if (!hit(c)) { r = c; break; } }
-    if (!r) r = { x: x + 11, y: y - 24, w: tw, h: th };
+    const tw = 62, th = 26, offs = [];
+    for (let d = 0; d < 6; d++) for (const oy of [-24 - 27 * d, 6 + 27 * d]) for (const ox of [11 + 14 * d, -11 - tw - 14 * d]) offs.push([ox, oy]);
+    for (let d = 1; d < 4; d++) for (const ox of [11 + 66 * d, -11 - tw - 66 * d]) offs.push([ox, -13]);
+    const over = (c) => placed.reduce((a, q) => a + Math.max(0, Math.min(c.x + c.w, q.x + q.w) - Math.max(c.x, q.x)) * Math.max(0, Math.min(c.y + c.h, q.y + q.h) - Math.max(c.y, q.y)), 0)
+      + (c.x < 0 || c.x + c.w > w || c.y < 28 || c.y + c.h > h ? 400 : 0);
+    let r = null, best = 1e9; for (const [ox, oy] of offs) { const c = { x: x + ox, y: y + oy, w: tw, h: th }; if (!hit(c) && over(c) === 0) { r = c; break; } const o = over(c); if (o < best) { best = o; r = c; } }
     placed.push(r); tags.push({ p, x, y, r });
   }
   for (const { p, x, y, r } of tags.reverse()) {

@@ -294,11 +294,11 @@ MG_SETS.world = (app) => {
     contrail(s, m) {
       if (s > 650 || !(m === 'skyUp' || m === 'planeExt' || m === 'planeMap')) return;
       const sm = this.smoke, A = this.A;
-      for (let k = 0; k < 1100; k++) { const age = 0.6 + k * 0.1, q = mgPlaneAt(s - age); if (q.phase !== 'cruise') continue;
-        for (const sd of [-1, 1]) { const off = new THREE.Vector3(-3, -1.9, sd * 5.6), x = q.p[0] - Math.sin(q.h) * 0 + off.z * Math.cos(q.h) * 0, sp = (16 + age * 1.1);
-          // (behind the plane along its path: the path itself carries the trail; the engines' spacing at the start)
-          const fwd = [Math.sin(q.h), 0, -Math.cos(q.h)], rt = [Math.cos(q.h), 0, Math.sin(q.h)];
-          sm.add(q.p[0] + rt[0] * sd * 5.6 * Math.exp(-age / 30) + fwd[0] * -3, q.p[1] - 1.9 + age * 0.05, q.p[2] + rt[2] * sd * 5.6 * Math.exp(-age / 30) + fwd[2] * -3, sp, 0.22 * Math.min(1, age / 2) * (1 - age / 128), 0.97, 0.98, 1.0); void x; void off; } }
+      // the puffs overlap all the way (spacing at most 40% of their size), from just behind the engines
+      for (let age = 0.12; age < 128; age += (16 + age * 1.1) * 0.4 / 230) { const q = mgPlaneAt(s - age); if (q.phase !== 'cruise') continue;
+        const fwd = [Math.sin(q.h), 0, -Math.cos(q.h)], rt = [Math.cos(q.h), 0, Math.sin(q.h)], sp = (4 + Math.min(age, 1) * 12 + age * 1.1), sw = 5.6 * Math.exp(-age / 30);
+        const al = 0.2 * Math.min(1, age / 1.2) * (1 - age / 128);
+        for (const sd of [-1, 1]) sm.add(q.p[0] + rt[0] * sd * sw + fwd[0] * -3, q.p[1] - 1.9 + age * 0.05, q.p[2] + rt[2] * sd * sw + fwd[2] * -3, sp, al, 0.97, 0.98, 1.0); }
       void A;
     },
     // ---- the tyres' smoke at touchdown
@@ -353,14 +353,14 @@ function mgWorldCam(set, m, s, t, k, v) {
     // ---- real speed: the radio, the gantry, his phone
     case 'radio': inCar(into([0.0, 1.12, 0.28], [0.03, 1.1, 0.24]), [0.708, 0.72, 0.0], 24); break;
     case 'gantry': v.p = into([262, Y + 1.7, 13.4], [266, Y + 1.75, 13.2]); v.at = [330, Y + 5.6, 6]; v.fov = 50; v.near = 0.2; v.sh = [300, Y, 6]; v.shR = 50; break;
-    case 'phone': { const ph = YC.phone.position; inCar(into([ph.x - 0.09, ph.y + 0.44, ph.z + 0.08], [ph.x - 0.07, ph.y + 0.4, ph.z + 0.06]), [ph.x, ph.y, ph.z], 30); break; }
+    case 'phone': { const ph = YC.phone.position; inCar(into([0.08, 1.04, -0.02], [0.12, 1.0, -0.06]), [ph.x + 0.03, ph.y + 0.02, ph.z + 0.07], 25); break; }   // (you lean over: his phone on the floor of his footwell)
     // ---- the train, the barge
     case 'trainHigh': { const f = P.trainZ(s); v.p = into([152, Y + 1.55, -17.6], [151, Y + 1.5, -17.6]); v.at = [MG_V.railX, MG_RAIL.y + 2, f - 30]; v.fov = 34; v.near = 0.3; v.sh = [MG_V.railX, 0, f - 40]; v.shR = 70; break; }
     case 'trainCab': { const f = P.trainZ(s); v.p = into([MG_V.railX + 0.8, MG_RAIL.y + 3.25, f - 2.75], [MG_V.railX + 0.7, MG_RAIL.y + 3.2, f - 2.6]); v.at = [MG_V.railX - 0.45, MG_RAIL.y + 2.45, f - 0.9]; v.fov = 62; v.near = 0.1; v.sh = [MG_V.railX, 0, f - 3]; v.shR = 14; v.drift = 0.006; break; }
     case 'barge': { const b = P.bargeBow(s); v.p = into([22, Y + 1.55, 17.6], [21, Y + 1.5, 17.6]); v.at = [MGP.barge.x, 1, b - 43]; v.fov = 17; v.near = 0.3; v.sh = [14, 0, b - 40]; v.shR = 70; break; }
     case 'bargeHit': { const b = P.bargeBow(s), x0 = 64, z0 = 478; v.p = [x0, gy(x0, z0) + 9.5, z0]; v.at = [12, 0.5, Math.min(b, 440) - 16]; v.fov = 46; v.near = 0.3; v.sh = [20, 0, 420]; v.shR = 60; v.drift = 0.01; break; }
     // ---- flight 2207 at 11,000 m (7:43)
-    case 'skyUp': { const q = set._plane; v.p = [cx + 4, Y + 1.6, 10.5]; v.at = [q.p[0] + 120, q.p[1], q.p[2] + 260]; v.fov = mgLerp(34, 3.2, Ease.inOutSine(MathX.clamp(k * 1.6 - 0.2, 0, 1))); v.near = 0.5; v.far = 60000; v.drift = 0.003; v.fogD = 0.00003; v.sh = [cx, Y, 8]; v.shR = 40; break; }
+    case 'skyUp': { const q = set._plane; v.p = [cx + 4, Y + 1.6, 10.5]; v.at = [q.p[0] - Math.sin(q.h) * 110, q.p[1], q.p[2] + Math.cos(q.h) * 110]; v.fov = mgLerp(34, 3.2, Ease.inOutSine(MathX.clamp(k * 1.6 - 0.2, 0, 1))); v.near = 0.5; v.far = 60000; v.drift = 0.003; v.fogD = 0.00003; v.sh = [cx, Y, 8]; v.shR = 40; break; }
     case 'cockpit': inPlane([13.25, fy + 1.32, 0.0], [16.2, fy + 1.05, 0.0], 64); break;
     case 'planeExt': v.p = AL(into([-34, 7, 30], [-30, 6, 27])); v.at = AL([4, 0, 0]); v.fov = 40; v.near = 0.5; v.far = 60000; v.fogD = 0.00003; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.05; break;
     case 'planeMap': v.p = AL(into([16, -12, -40], [12, -11, -36])); v.at = AL([-6, 9, 0]); v.fov = 44; v.near = 0.5; v.far = 60000; v.fogD = 0.00003; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.05; break;

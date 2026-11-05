@@ -179,10 +179,10 @@ function mgBuildYourCar(S) {
   const stain = new THREE.Mesh(new THREE.CircleGeometry(1, 24), new THREE.MeshStandardMaterial({ color: '#2a1a10', roughness: 0.3, transparent: true, opacity: 0.85, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -6 }));
   stain.rotation.set(-Math.PI / 2 + 0.1, 0, 0); stain.rotation.order = 'ZXY'; stain.position.set(C.seatL[0] + 0.2, 0.572, C.seatL[2] + 0.12); stain.visible = false; inn.add(stain);
   const belt = [mgBeam([0, 0, 0], [1, 0, 0], 0.048, 0.004, M.belt, inn), mgBeam([0, 0, 0], [1, 0, 0], 0.048, 0.004, M.belt, inn), mgBeam([0, 0, 0], [1, 0, 0], 0.048, 0.004, M.belt, inn)];
-  // ---- his phone (on the console's tray; it slides into his footwell when you brake)
+  // ---- his phone (on the console's tray; it falls into his footwell when you brake)
   const PH = mgCanvasTex(400, 840, mgDrawPhone), phone = new THREE.Group(); inn.add(phone);
   phone.add(new THREE.Mesh(new THREE.BoxGeometry(0.152, 0.008, 0.072), mgStd('#1c1e22', 0.35, 0.4)));
-  { const sc = new THREE.Mesh(new THREE.PlaneGeometry(0.145, 0.066), new THREE.MeshBasicMaterial({ map: PH.tex, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 })); sc.rotation.set(-Math.PI / 2, 0, Math.PI / 2); sc.position.y = 0.0042; phone.add(sc); phone.screen = sc; }
+  { const sc = new THREE.Mesh(new THREE.PlaneGeometry(0.066, 0.145), new THREE.MeshBasicMaterial({ map: PH.tex, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 })); sc.rotation.set(-Math.PI / 2, 0, Math.PI / 2); sc.position.y = 0.0042; phone.add(sc); phone.screen = sc; }
   const phLight = new THREE.PointLight('#cfe0ff', 0, 0.9, 1.6); phLight.position.y = 0.08; phone.add(phLight);
   // the interior's own light (the sky through the glass; a soft fill so the cabin isn't black against the bright day)
   const fill = new THREE.PointLight('#e6edf5', 0.0, 3.2, 1.4); fill.position.set(0.2, 1.3, 0); inn.add(fill);
@@ -241,7 +241,7 @@ function mgBuildYourCar(S) {
     },
     phoneAt(s, o) {
       const slide = MathX.smooth(s, MGP.car.sBrake + 0.35, MGP.car.sBrake + 1.2);
-      phone.position.set(mgLerp(0.56, 0.86, slide), mgLerp(0.615, 0.3 + 0.004, slide) + 0.06 * Math.sin(Math.PI * slide), mgLerp(-0.02, C.seatL[2] - 0.08, slide));
+      phone.position.set(mgLerp(0.56, 0.41, slide), mgLerp(0.615, 0.3 + 0.004, slide) + 0.06 * Math.sin(Math.PI * slide), mgLerp(-0.02, C.seatL[2] - 0.13, slide));   // (off the tray, onto the floor in front of his seat)
       phone.rotation.set(0, mgLerp(0.1, 0.75 + Math.PI, slide), mgLerp(0.3, 0, slide) * (1 - slide));
       phone.visible = !!o.inside;
       // its screen: ringing (MUM) from 7:42:24; the call fails at 7:42:30, and again

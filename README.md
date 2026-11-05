@@ -125,6 +125,16 @@ Everything is procedural, so there are no models, images or sound files to downl
 > on old light that runs out (the Sun's at 9:03, Saturn's at 9:07), until light's own waves are too long for your eyes
 > to focus and then too wide for your pupils. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/light-faster/PLAN.md`](films/light-faster/PLAN.md).
+>
+> ***What if all men suddenly disappeared?*** — open `men-disappear-long.html` (16:9, voiceless, 6:09). At 7:42 AM on
+> a Tuesday you are in the passenger seat of your dad's car on a motorway viaduct, at 100 km/h, when every man and boy
+> on Earth vanishes: his seat is empty, the cup falls, nobody is steering. You hold the parking-brake switch and stop
+> 3 m behind a driverless lorry grinding along the barrier. From the viaduct: cars stopping themselves or drifting,
+> a train that stops itself, a barge running aground, and flight 2207 at 11,000 m with no pilots. A flight attendant
+> who has never flown a plane gets through the cockpit door; 2 of the tower's 9 controllers are left; fires start in
+> kitchens across town; in the maternity ward a boy is born, and stays. At 10:21 the tower talks her through setting up the
+> autoland and the plane lands itself over the motorway, with 23 more still circling. The story clock only runs
+> forward. Numbers, clock, shots and review log: [`films/men-disappear-long/PLAN.md`](films/men-disappear-long/PLAN.md).
 
 | Time | Beat |
 |---|---|
