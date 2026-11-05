@@ -89,21 +89,25 @@ LF_SETS.coast = (app) => {
   const ring = new THREE.Mesh(new THREE.TorusGeometry(0.0113, 0.0023, 10, 32), new THREE.MeshStandardMaterial({ color: '#ffd27a', metalness: 0.9, roughness: 0.28, envMapIntensity: 2.0 }));
   ring.rotation.x = Math.PI / 2; ring.position.y = 0.017; hands.left.fingers[2][0].add(ring);
   // ---- the soft points: flames, sparks (additive), smoke
-  const fx = lfPuffs(scene, 3000, { additive: true, soft: 1.4 }), smoke = lfPuffs(scene, 600, { soft: 1.8 });
+  const fx = lfPuffs(scene, 3000, { additive: true, soft: 1.4 }), smoke = lfPuffs(scene, 1200, { soft: 1.8 });
+  // the hospital's roof across the bay (the 'roof' shot): its slab, the plant, the MRI's quench pipe, the red cross's frame
+  const HR = lfBuildHospRoof(S);
   // the pole transformer by the road (it hums when the iron saturates)
   { const x = -268, z = -10.6; lfCyl(0.13, 0.16, 9.0, W.M.wood, x, LF_ST.wallTop + 4.5, z); lfBox(0.2, 0.2, 2.2, W.M.wood, x, LF_ST.wallTop + 8.6, z);
     W.xfmr = lfCyl(0.42, 0.42, 1.25, lfStd('#6a6e70', 0.55, 0.5), x + 0.6, LF_ST.wallTop + 6.6, z); lfBox(0.12, 0.6, 0.12, W.M.pole, x + 0.3, LF_ST.wallTop + 6.6, z);
     for (const dz of [-0.2, 0, 0.2]) lfCyl(0.05, 0.07, 0.3, lfStd('#6a4a3a', 0.4), x + 0.6, LF_ST.wallTop + 7.35, z + dz); }
   const set = {
-    scene, camera: cam, sky, city, sea, W, T, hands, phone, ring,
+    scene, camera: cam, sky, city, sea, W, T, hands, phone, ring, HR,
     cuts() { return []; },
     frame(t, shot) {
       const m = shot.mode, s = lfStoryAt(t), k = LFP.k(s), kk = MathX.clamp((t - shot.t0) / (shot.t1 - shot.t0), 0, 1);
       this._s = s; this._k = k; this._shot = shot; this._t = t;
       const px = (app.renderH || 1080) / 1080;
       // ------------------------------------------------------------------ the world
-      T.update(s); W.update(s, { px });
+      T.update(s); W.update(s, { px }); HR.update(s);
+      city.crossGlow.visible = m !== 'roof';
       city.update(s, { fogD: 0.00026, px });
+      if (m === 'roof') for (const c of city.cross) c.material.color.multiplyScalar(0.38);   // close up, the lightbox's own red
       const glowCity = city.districts.reduce((a, b) => a + b, 0) / 8, adapt = lfAdapt(s), old = k / adapt;
       this._adapt = adapt;
       // ------------------------------------------------------------------ the camera
@@ -115,7 +119,7 @@ LF_SETS.coast = (app) => {
       lfCam(cam, [v.p[0] + dr[0], v.p[1] + dr[1], v.p[2] + dr[2]], [v.at[0] + dr[0], v.at[1] + dr[1], v.at[2] + dr[2]], v.fov, v.roll);
       this._expo = v.expo; this._inside = !!v.inside;
       // ------------------------------------------------------------------ the sky, the sea (seen from here)
-      sky.update(s, { glow: 0.85 * glowCity, mw: old, k: old, starK: old, px, at: cam.position });
+      sky.update(s, { glow: 0.85 * glowCity, mw: 1, k: old, starK: old, px, at: cam.position });
       sea.update(s, { glow: 0.8 * glowCity, bio: lfBio(s) * 1.0, fire: W.fire * 1.0, fogD: 0.00022, starK: old, train: T.lit > 0.02 ? [T.group.position.x, T.lit] : null });
       // the starlight and sky glow that light the ground (old light too), the train's own light on the track
       S.hemi.intensity = (v.inside ? 0.05 : 0.11) * old + 0.05 * glowCity;
@@ -132,6 +136,7 @@ LF_SETS.coast = (app) => {
       fx.begin(); smoke.begin();
       if (m !== 'win' && m !== 'phone' && m !== 'ring' && m !== 'emerg') this.fire(s, fx, smoke);
       this.brake(s, fx); this.arcs(s, fx, m);
+      if (m === 'roof' || m === 'bay' || m === 'bayOut') this.plume(s, smoke, m === 'roof' ? 1 : 0.35);
       fx.end(); smoke.end();
     },
     // the bonfire's flames (their light 1/k² at the same heat), the embers, the smoke
@@ -150,8 +155,25 @@ LF_SETS.coast = (app) => {
         fx.add(x, y, z, 0.035, 0.9 * (1 - ph) * fl * (0.5 + 0.5 * Math.sin(s * 17 + i * 3)), 1.0, 0.5, 0.15); }
       for (let i = 0; i < 70; i++) { const life = 6 + 3 * lfR(i, 95), ph = ((s / life + lfR(i, 96)) % 1 + 1) % 1;
         const x = F.x + 2.2 * ph + 0.6 * ph * Math.sin(s * 0.3 + i), z = F.z + 1.1 * ph + 0.4 * Math.sin(s * 0.27 + i * 1.7), y = F.y + 1.0 + ph * 5.5;
-        const lit = 0.06 + 0.5 * fl * Math.max(0, 1 - ph * 1.6);
-        smoke.add(x, y, z, 0.5 + 1.6 * ph, 0.1 * Math.sin(Math.PI * ph), lit * 1.0, lit * 0.7, lit * 0.5); }
+        const lit = 0.06 + 0.5 * fl * Math.max(0, 1 - ph * 1.6), sz = 0.5 + 1.6 * ph, P = cam.position, dc = Math.hypot(x - P.x, y - P.y, z - P.z);
+        smoke.add(x, y, z, sz, 0.1 * Math.sin(Math.PI * ph) * MathX.clamp((dc - sz) / (2.5 * sz), 0, 1), lit * 1.0, lit * 0.7, lit * 0.5); }   // a puff fades as you get into it
+    },
+    // the MRI's helium venting through the quench pipe on the roof (from 9.58 s): a jet of cold gas that turns the air's
+    // moisture into a white cloud, rising (helium is light) and drifting east on the sea breeze
+    plume(s, smoke, q) {
+      const s0 = LFP.sQuench; if (s < s0) return;
+      const V = LF_HR.vent, lit = 0.1 + 0.55 * HR.lamp, red = HR.cross, n = Math.round(520 * q);
+      for (let i = 0; i < n; i++) {
+        const life = 2.6 + 1.4 * lfR(i, 61), a = (((s / life + lfR(i, 62)) % 1 + 1) % 1) * life, born = s - a;
+        if (born < s0) continue;
+        const ramp = lfSm(born, s0, s0 + 0.25), u = a / life;
+        // the jet leaves the mouth fast, slows within a few metres and billows out; the breeze carries it east
+        const h = 5.0 * (1 - Math.exp(-a / 0.22)) + 1.3 * a, rad = (0.15 + 1.9 * Math.pow(a, 0.8)) * Math.sqrt(lfR(i, 63));
+        const an = lfR(i, 64) * 6.283 + a * 0.8, x = V[0] + Math.cos(an) * rad + 1.4 * a * a, z = V[2] + Math.sin(an) * rad + 0.4 * a, y = V[1] + h * (0.7 + 0.3 * ramp) + 0.45 * rad * Math.sin(an * 1.7);
+        const sz = (0.3 + 1.9 * Math.pow(a, 0.8)) * (0.7 + 0.6 * lfR(i, 65)), al = 0.55 * Math.pow(1 - u, 1.4) * Math.min(1, a * 14) * ramp;
+        const low = Math.exp(-h / 6), c = lit * (0.62 + 0.3 * lfR(i, 66));
+        smoke.add(x, y, z, sz, al, c * 0.92 + 0.22 * red * low, c * 0.96 + 0.03 * red * low, c * 1.04 + 0.03 * red * low);
+      }
     },
     // the brakes: sparks spraying back off the wheels while the train slows (from 16.6 s)
     brake(s, fx) {
@@ -210,6 +232,8 @@ function lfCoastCam(set, m, s, t, k, shot, v) {
     case 'ext3': v.p = [-404, 4.55, 2.9]; v.at = [-482, 4.9, 0.4]; v.fov = 40; v.near = 0.2; break;
     case 'panto': { const p = TL([-31.6 + 7.2, 7.6, -4.6]), a = TL([-31.6, 5.3, 0]); v.p = p; v.at = a; v.fov = 44; v.near = 0.2; v.drift = 0.02; break; }
     case 'flicker': v.p = into([-262, 4.75, -10.0], [-261, 4.8, -9.6], k); v.at = [-330, 6.6, -12.2]; v.fov = 46; v.near = 0.2; break;
+    // ---- the hospital's roof across the bay: the quench pipe roaring helium (9:00:10 PM)
+    case 'roof': { const R = LF_HR; v.p = into([R.x + 1.5, R.y + 1.85, R.z + 9.5], [R.x + 1.0, R.y + 1.8, R.z + 8.6], k); v.at = [R.x - 3.6, R.y + 6.8, R.z - 12]; v.fov = 60; v.near = 0.1; v.drift = 0.02; v.shake = 0.003; v.expo = 1.15; break; }
     // ---- the grid trips: the coast goes dark in a wave from the substation; the city across the bay district by district
     case 'bayOut': v.p = [686, 4.85, 2.75]; v.at = [-300, -4, 700]; v.fov = 56; v.near = 0.3; v.drift = 0.004; break;
     case 'brakeX': v.p = [-28.5, 3.55, 2.7]; v.at = [-72, 3.95, 0.8]; v.fov = 42; v.near = 0.1; v.shake = 0.004 * lfTrainV(s) / LFP.train.v; break;
@@ -219,7 +243,7 @@ function lfCoastCam(set, m, s, t, k, shot, v) {
     case 'ring': v.at = look(v.p, [1, -0.33, 0.06]); v.fov = 50; break;
     // ---- the beach (real speed from here)
     case 'stopX': v.p = into([738, sy(738, 33) + 1.45, 33], [737, sy(737, 32.5) + 1.5, 32.5], k); v.at = [702, 5.1, 0.6]; v.fov = 40; v.near = 0.2; break;
-    case 'winBeach': v.at = look(v.p, [F.x - eye[0], F.y + 0.6 - eye[1], F.z - eye[2]]); v.fov = 48; break;
+    case 'winBeach': { const q = [eye[0] + 0.12, eye[1] + 0.03, eye[2] + 0.3]; v.p = q; v.at = look(q, [F.x - q[0], F.y + 0.6 - q[1], F.z - q[2]]); v.fov = 48; break; }   // you lean to the glass
     case 'spk': { const K = LF_SPK, f = [Math.sin(K.yaw), 0, Math.cos(K.yaw)], sd = [f[2], 0, -f[0]], c = [K.x + f[0] * 0.14, K.y + 0.64, K.z + f[2] * 0.14];
       v.p = into([c[0] + f[0] * 1.0 + sd[0] * 0.42, c[1] + 0.2, c[2] + f[2] * 1.0 + sd[2] * 0.42], [c[0] + f[0] * 0.85 + sd[0] * 0.36, c[1] + 0.16, c[2] + f[2] * 0.85 + sd[2] * 0.36], k);
       v.at = c; v.fov = 38; v.near = 0.05; v.drift = 0.004; v.expo = 1.15; break; }
@@ -247,7 +271,62 @@ function lfCoastLabels(set, t) {
   if (m === 'flicker') lab([-267.4, LF_ST.wallTop + 6.6, -10.6], 'TRANSFORMER', 'its iron saturates', 1.0);
   if (m === 'roadCar') { const c = set.W.cars[1]; lab([c.g.position.x + 1.6, 5.2, -17.25], 'BATTERY', `${LFP.battery(LFP.k(s)).toFixed(1)} V of 12.8`, 0.8); }
   if (m === 'spk') { const K = LF_SPK; lab([K.x, K.y + 1.02, K.z], 'MAGNET + COIL', `pushes ${Math.round(100 / (LFP.k(s) ** 2))}% as hard`, 0.6); }
-  if (m === 'runout') { const d = set.sky.dir(0.35, -1.6), c = set.camera.position; lab([c.x + d[0] * 300, c.y + d[1] * 300, c.z + d[2] * 300], 'SATURN', '4,330 light-seconds of old light', 1.2); }
+  if (m === 'runout') { const d = set.sky.dir(0.35, -1.6), c = set.camera.position; lab([c.x + d[0] * 300, c.y + d[1] * 300, c.z + d[2] * 300], 'SATURN', 'its sunlight: 2½ hours on the way', 1.2); }
+  if (m === 'roof') { const V = LF_HR.vent; lab([V[0], V[1] + 0.6, V[2]], 'QUENCH PIPE', 'helium, boiling off', 1.2); }
   if (m === 'nearest') { const d = set.sky.dir(14.66, -60.83), c = set.camera.position, gone = s > LFP.sAlphaCen; lab([c.x + d[0] * 300, c.y + d[1] * 300, c.z + d[2] * 300], gone ? 'ALPHA CENTAURI · GONE' : 'ALPHA CENTAURI', '4.37 light-years', 0.4); }
   return out;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// THE HOSPITAL'S ROOF (city.js builds the block: 70 × 26 × 26 m on its hill; this is what stands on top of it)
+// ---------------------------------------------------------------------------------------------------------------------
+const LF_HR = (() => { const H = LF_ST.hospital, y = lfCityY(H[0], H[2]) - 0.5 + 26; return { x: H[0], z: H[2], y, vent: [H[0] - 7, y + 5.9, H[2] - 3.5] }; })();
+function lfBuildHospRoof(S) {
+  const R = LF_HR, top = R.y + 0.2;
+  const M = { par: lfStd('#7c7e7a', 0.9), plant: lfStd('#5e6266', 0.6, 0.35), steel: lfStd('#aeb2b6', 0.32, 0.9), dark: lfStd('#24262a', 0.8), door: lfStd('#3a4a5a', 0.6, 0.3) };
+  // the slab: embedded 10 cm into the block's top (no shared plane); the helipad's circle and H are in its texture
+  const tex = lfTex(lfCanvas(1400, 512, (g, w, h) => {
+    g.fillStyle = '#4c4e52'; g.fillRect(0, 0, w, h);
+    const r = new RNG(77); for (let i = 0; i < 9000; i++) { const v = 60 + r.next() * 28; g.fillStyle = `rgba(${v},${v},${v + 3},0.35)`; g.fillRect(r.next() * w, r.next() * h, 2 + r.next() * 5, 2 + r.next() * 5); }
+    g.strokeStyle = 'rgba(30,30,32,0.5)'; g.lineWidth = 2; for (let x = 0; x < w; x += 70) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+    const cx = w * 0.79, cy = h * 0.5, rr = h * 0.36; g.lineWidth = 16; g.strokeStyle = '#d8d4c4'; g.beginPath(); g.arc(cx, cy, rr, 0, 6.29); g.stroke();
+    g.fillStyle = '#d8d4c4'; g.fillRect(cx - rr * 0.42, cy - rr * 0.55, rr * 0.18, rr * 1.1); g.fillRect(cx + rr * 0.24, cy - rr * 0.55, rr * 0.18, rr * 1.1); g.fillRect(cx - rr * 0.3, cy - rr * 0.09, rr * 0.6, rr * 0.18);
+  }), { repeat: false, aniso: 8 });
+  const slab = lfBox(69.4, 0.3, 25.4, lfStd('#ffffff', 0.95, 0, { map: tex }), R.x, R.y + 0.05, R.z); slab.castShadow = false;
+  // the parapet (its outer faces overhang the slab's edge by 5 cm; it sits 5 cm into the slab)
+  for (const [w, d, x, z] of [[69.5, 0.25, 0, -12.625], [69.5, 0.25, 0, 12.625], [0.25, 25.0, -34.625, 0], [0.25, 25.0, 34.625, 0]]) lfBox(w, 1.1, d, M.par, R.x + x, top - 0.05 + 0.55, R.z + z);
+  // the lift room and the stair house (a door, its lamp), the air handlers
+  lfBox(8, 3.4, 6, M.par, R.x + 18, top - 0.05 + 1.7, R.z + 5);
+  lfBox(4.2, 2.9, 3.6, M.par, R.x + 11, top - 0.05 + 1.45, R.z + 6.4);
+  lfBox(1.0, 2.1, 0.08, M.door, R.x + 11, top + 1.05, R.z + 4.58);
+  const lampM = new THREE.MeshBasicMaterial({ color: '#ffd9a0' }); lfBox(0.3, 0.16, 0.12, lampM, R.x + 11, top + 2.45, R.z + 4.58);
+  const lamp = new THREE.PointLight('#ffcf90', 0, 30, 1.6); lamp.position.set(R.x + 11, top + 2.4, R.z + 4.1); S.scene.add(lamp);
+  for (const [x, z] of [[-24, 7], [-17, 7], [-24, -6]]) { lfBox(3.4, 1.7, 2.2, M.plant, R.x + x, top - 0.05 + 0.85, R.z + z);
+    lfCyl(0.7, 0.7, 0.12, M.dark, R.x + x, top - 0.05 + 1.74, R.z + z, null, 20); }
+  // the aviation lights on the lift room (mains)
+  const av = []; for (const [x, z] of [[14.2, 2.2], [21.8, 7.8]]) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), new THREE.MeshBasicMaterial({ color: '#ff2a1a' })); m.position.set(R.x + x, top + 3.45, R.z + z); S.scene.add(m); av.push(m); }
+  // the MRI's quench pipe: out of its plant housing, up 3.4 m to an open mouth with a mesh guard; frost creeps up it
+  const V = R.vent;
+  lfBox(2.4, 2.3, 2.4, M.plant, V[0], top - 0.05 + 1.15, V[2]);
+  const bulkM = new THREE.MeshBasicMaterial({ color: '#ffe2b8' }); lfBox(0.28, 0.14, 0.1, bulkM, V[0] + 0.5, top + 1.9, V[2] + 1.25);
+  const bulk = new THREE.PointLight('#ffd8a8', 0, 22, 1.5); bulk.position.set(V[0] + 0.5, top + 1.85, V[2] + 1.7); S.scene.add(bulk);
+  const frostM = lfStd('#aeb2b6', 0.32, 0.9);
+  const pipe = lfCyl(0.2, 0.2, V[1] - (top + 2.2), frostM, V[0], (V[1] + top + 2.2) / 2, V[2], null, 24);
+  lfCyl(0.27, 0.27, 0.12, M.steel, V[0], top + 2.3, V[2], null, 24);
+  const mouth = lfMesh(new THREE.CylinderGeometry(0.34, 0.21, 0.4, 24, 1, true), M.steel, V[0], V[1] + 0.12, V[2]); mouth.material = mouth.material.clone(); mouth.material.side = THREE.DoubleSide;
+  for (const a of [0, 1, 2]) { const st = lfCyl(0.025, 0.025, 2.0, M.steel, V[0] + 0.55 * Math.cos(a * 2.09), top + 2.3 + 1.0, V[2] + 0.55 * Math.sin(a * 2.09), null, 6); st.castShadow = false;
+    const br = lfBox(0.55, 0.04, 0.04, M.steel, V[0] + 0.33 * Math.cos(a * 2.09), top + 3.25, V[2] + 0.33 * Math.sin(a * 2.09)); br.rotation.y = -a * 2.09; }
+  // the red cross's frame: two posts down the block's front, brackets into the cross's back (city.js draws the cross)
+  for (const x of [-1.6, 1.6]) { lfBox(0.2, 11.0, 0.2, M.steel, R.x + x, R.y + 3.6, R.z - 12.95);
+    for (const y of [2.6, 5.5, 8.3]) lfBox(0.12, 0.12, 0.3, M.steel, R.x + x, R.y + y, R.z - 13.15); }
+  return {
+    lamp: 1, cross: 1,
+    update(s) {
+      const on = lfHospital(s), em = 0.35 * lfEmerg(s, 0.15); this.lamp = on; this.cross = Math.max(on, em);
+      lamp.intensity = 26 * on; bulk.intensity = 30 * on; bulkM.color.setRGB(on + 0.04, 0.88 * on + 0.03, 0.72 * on + 0.03); lampM.color.setRGB(1.0 * on + 0.04, 0.85 * on + 0.03, 0.62 * on + 0.03);
+      for (const m of av) m.material.color.setRGB(0.05 + 0.95 * on, 0.04 + 0.12 * on, 0.03 + 0.08 * on);
+      // frost: the cold gas freezes the air's moisture onto the pipe, from the bottom up, in the seconds after the quench
+      const f = lfSm(s, LFP.sQuench + 0.05, LFP.sQuench + 0.9); frostM.color.setRGB(0.68 + 0.27 * f, 0.7 + 0.26 * f, 0.72 + 0.26 * f); frostM.roughness = 0.32 + 0.6 * f; frostM.metalness = 0.9 * (1 - f);
+    },
+  };
 }

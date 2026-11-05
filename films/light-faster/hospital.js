@@ -132,8 +132,17 @@ LF_SETS.hospital = (app) => {
   const torchL = new THREE.SpotLight('#eaf0ff', 0, 14, 0.45, 0.5, 1.4); scene.add(torchL); scene.add(torchL.target);
   // ---- the generator room (x 30…42, z 0…8): the generator set, its panel, one light
   wallZ(-0.1, 29.8, 42.2, [], M.conc); wallZ(8.1, 29.8, 42.2, [], M.conc); wallX(29.9, -0.2, 8.2, [], M.conc); wallX(42.1, -0.2, 8.2, [], M.conc);
-  box(4.2, 1.5, 1.6, M.gen, 35.2, 0.95, 3.2); box(1.6, 1.6, 1.7, M.gen, 38.0, 1.0, 3.2); box(0.3, 1.9, 1.7, M.genD, 33.0, 1.1, 3.2); box(4.6, 0.2, 2.0, M.genD, 35.6, 0.1, 3.2);
-  lfCyl(0.12, 0.12, 2.0, M.steel, 36.0, 2.0 + 0.7, 3.2);
+  box(5.6, 0.22, 1.5, M.genD, 35.4, 0.11, 3.2);                                                             // the skid
+  box(2.3, 1.15, 1.05, M.gen, 35.6, 0.79, 3.2); box(2.1, 0.22, 0.85, M.gen, 35.6, 1.47, 3.2);                // the engine block, its rocker covers
+  for (let i = 0; i < 6; i++) lfCyl(0.05, 0.05, 0.12, M.steel, 34.75 + i * 0.34, 1.62, 3.2 - 0.25);         // the injectors
+  box(0.32, 1.55, 1.36, M.genD, 33.3, 0.99, 3.2);                                                            // the radiator
+  const grille = lfTex(lfCanvas(64, 256, (g, w, h) => { g.fillStyle = '#141618'; g.fillRect(0, 0, w, h); g.fillStyle = '#3a3e42'; for (let y = 0; y < h; y += 8) g.fillRect(0, y, w, 3); }));
+  { const gm = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.4), lfStd('#ffffff', 0.6, 0.4, { map: grille })); gm.position.set(33.3 - 0.165, 0.99, 3.2); gm.rotation.y = -Math.PI / 2; scene.add(gm); }
+  { const alt = lfCyl(0.62, 0.62, 1.5, M.gen, 37.65, 0.9, 3.2, null, 32); alt.rotation.z = Math.PI / 2;
+    const ring = lfCyl(0.66, 0.66, 0.1, M.genD, 37.0, 0.9, 3.2, null, 32); ring.rotation.z = Math.PI / 2;
+    const end = lfCyl(0.5, 0.5, 0.12, M.genD, 38.42, 0.9, 3.2, null, 32); end.rotation.z = Math.PI / 2;
+    box(0.5, 0.55, 0.4, M.genD, 37.6, 1.75, 3.2); }                                                         // the alternator: a spinning electromagnet in a drum
+  lfCyl(0.12, 0.12, 2.0, M.steel, 36.0, 2.0 + 0.7, 3.2 + 0.2); lfCyl(0.16, 0.16, 0.3, M.steel, 36.0, 1.72, 3.2 + 0.2);
   const GT = lfCanvasTex(420, 220, lfGenDraw);
   const gp = lfBox(0.9, 0.6, 0.12, M.genD, 39.2, 1.5, 0.3); void gp;
   const gs = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.42), new THREE.MeshBasicMaterial({ map: GT.tex })); gs.position.set(39.2, 1.5, 0.37); scene.add(gs);
@@ -151,11 +160,11 @@ LF_SETS.hospital = (app) => {
       const mains = lfHospital(s), em = lfEmerg(s, 0.15);
       for (const p of panels) p.material.color.setScalar(0.06 + 0.94 * mains);
       for (const e of emerg) e.material.color.setRGB(0.08 + 0.9 * em, 0.08 + 0.94 * em, 0.1 + 1.0 * em);
-      for (const L of roomL) L.intensity = 9 * mains;
+      for (const L of roomL) L.intensity = 7 * mains;
       for (const L of emL) L.intensity = 3.4 * em;
       genL.intensity = 10 * mains;
       boreL.intensity = 1.4 * mains;
-      S.hemi.intensity = 0.04 + 0.3 * mains + 0.08 * em;
+      S.hemi.intensity = 0.015 + 0.14 * mains + 0.03 * em; scene.environmentIntensity = 0.03 + 0.42 * mains + 0.04 * em;
       // ---- the screens
       MT.update({ s: Math.round(s * 60) / 60 }); scr.material.color.setScalar(0.1 + 0.9 * Math.max(mains, 0.9 * lfEmerg(s, 0.05))); scrL.intensity = 0.6 * Math.max(mains, 0.5 * em);
       const gv = s < 15.45 ? 0 : 230 * (0.32 * lfSm(s, 15.45, 15.55) * (1 - lfSm(s, 15.85, 16.0))) / 0.32 * 0.36, run = s > 15.4 && s < 16.1;
@@ -163,9 +172,9 @@ LF_SETS.hospital = (app) => {
       gs.material.color.setScalar(0.25 + 0.75 * Math.max(mains, 0.6 * em));
       // ---- people
       tech.root.position.set(8.75, 0, 2.5); tech.root.rotation.y = -Math.PI / 2 - 0.15;
-      const tp = s < LFP.sQuench ? LF_POSES.desk() : lfKeys(s - LFP.sQuench, [[-1, LF_POSES.desk()], [0.06, LF_POSES.armsOut()]], 0.1);
+      const tp = s < LFP.sQuench ? LF_POSES.desk() : lfKeys(s - LFP.sQuench, [[-1, LF_POSES.desk()], [0.06, (() => { const p = LF_POSES.desk(); p.spine = -0.25; p.neck = -0.35; p.lSh = [0.5, 0.3]; p.rSh = [1.2, 0.1]; p.rEl = 1.6; p.lEl = 0.8; return p; })()]], 0.14);
       tech.apply(lfFidget(Object.assign({}, tp), s * 3, 2, 0.5));
-      { const pp = basePose(); if (s > LFP.sQuench + 0.1) { pp.lSh = [0.9, 0.4]; pp.rSh = [0.6, 0.3]; pp.lEl = 1.2; pp.neck = 0.3; } pat.apply(pp); }
+      { const pp = basePose(), u = lfSm(s, LFP.sQuench + 0.06, LFP.sQuench + 0.3); pp.neck = 0.38 * u; pp.lSh = [0.12 * u, 0.12]; pp.rSh = [0.1 * u, 0.12]; pp.lEl = 0.5 * u; pp.rEl = 0.4 * u; pat.apply(pp); }
       gtech.root.position.set(39.0, 0, 1.6); gtech.root.rotation.y = Math.PI; gtech.apply(s > 15.6 ? LF_POSES.torch() : LF_POSES.lookAround());
       n1.root.position.set(-12.6, 0, 9.4); n1.root.rotation.y = s > 40 ? Math.PI * 1.0 : -0.4; n1.apply(s > 16.2 ? LF_POSES.torch() : LF_POSES.lookAround());
       n2.root.position.set(-15.8, 0, 9.6); n2.root.rotation.y = s > 40 ? Math.PI * 0.85 : 0.6; n2.apply(s > 40 ? LF_POSES.lookUp() : LF_POSES.phone());

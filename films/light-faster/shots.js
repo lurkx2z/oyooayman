@@ -1,7 +1,8 @@
 /* =====================================================================
    SHOTS — every shot of the film, in order: { id, mode, t0, t1, set }. Cut points come from the captions (script.js:
    lfS, lfC, lfB, lfE) and the story clock may only jump forward at a cut (the owner's rule of 2026-10-29: no replays).
-   Sets: coast (the train, the road, the beach, the sky), hospital (the MRI, the corridor, the roof), stadium, obs (the
+   Sets: coast (the train, the road, the beach, the sky, the hospital's roof across the bay), hospital (the MRI, the
+   corridor, the generator room), stadium, obs (the
    observatory on the mountain).
    ===================================================================== */
 
@@ -24,7 +25,7 @@ const LF_SHOTS = [];
     ['H1', 'mriA', B('mri'), c('mri', 1) - 0.5, 'hospital'],
     ['H1b', 'mriB', c('mri', 1) - 0.5, c('mri', 2) - 0.5, 'hospital'],
     ['H1c', 'quench', c('mri', 2) - 0.5, c('mri', 3) - 0.5, 'hospital'],
-    ['H1d', 'roof', c('mri', 3) - 0.5, B('blackout'), 'hospital'],
+    ['H1d', 'roof', c('mri', 3) - 0.5, B('blackout'), 'coast'],
     // the grid trips: the coast, the stadium
     ['A6', 'bayOut', B('blackout'), c('blackout', 1) - 0.5, 'coast'],
     ['S1', 'stadA', c('blackout', 1) - 0.5, c('blackout', 2) - 0.5, 'stadium'],

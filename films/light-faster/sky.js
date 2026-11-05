@@ -82,14 +82,20 @@ function lfBuildSky(scene, o = {}) {
         float mw = (band * (0.8 + 1.6 * bulge) + 0.9 * bulge) * dust * clumps;
         vec3 mwc = mix(vec3(0.55, 0.62, 0.78), vec3(0.92, 0.82, 0.66), smoothstep(0.0, 0.6, bulge + 0.2 * n));
         // the Magellanic Clouds
-        float lmc = exp(-pow(acos(clamp(dot(d, uLmc), -1.0, 1.0)) / 0.055, 2.0)) * (0.6 + 0.6 * n2);
-        float smc = exp(-pow(acos(clamp(dot(d, uSmc), -1.0, 1.0)) / 0.03, 2.0)) * (0.6 + 0.5 * n);
+        // (faint, ragged smudges, not discs: the Large one ~10° with its bar, the Small one ~5° and lopsided)
+        vec3 tL = normalize(cross(uLmc, vec3(0.0, 1.0, 0.0))), bL = cross(uLmc, tL), dl = d - uLmc;
+        float lx = dot(dl, tL), ly = dot(dl, bL), lx2 = 0.8 * lx + 0.6 * ly, ly2 = -0.6 * lx + 0.8 * ly;
+        float nm = fbm(g * 38.0 + 7.3), rag = 0.25 + 1.1 * smoothstep(0.38, 0.78, nm);
+        float lmc = (exp(-(lx * lx / 0.0049 + ly * ly / 0.0021)) * rag + 0.7 * exp(-(lx2 * lx2 / 0.0011 + ly2 * ly2 / 0.00012)) * (0.5 + 0.5 * nm)) * step(0.0, dot(d, uLmc));
+        vec3 tS = normalize(cross(uSmc, vec3(0.0, 1.0, 0.0))), bS = cross(uSmc, tS), ds = d - uSmc;
+        float sx = dot(ds, tS) + 0.25 * dot(ds, bS), sy2 = dot(ds, bS);
+        float smc = exp(-(sx * sx / 0.0012 + sy2 * sy2 / 0.00045)) * (0.3 + 0.9 * smoothstep(0.35, 0.8, fbm(g * 44.0 + 1.7))) * step(0.0, dot(d, uSmc));
         float hz = smoothstep(-0.02, 0.18, h);
         // light pollution (low in the south, over the city), which hides the faint sky
         vec2 hd = normalize(vec2(d.x, d.z) + 1e-5);
         float lp = uGlow * exp(-max(h, 0.0) / 0.13) * (0.3 + 0.7 * pow(max(dot(hd, normalize(uCity.xz)), 0.0), 2.0)) * smoothstep(-0.05, 0.02, h);
         float vis = uMw * (1.0 - 0.8 * uGlow);
-        col += vis * hz * (mwc * mw * 0.085 + vec3(0.8, 0.82, 0.9) * (lmc * 0.07 + smc * 0.05));
+        col += vis * hz * (mwc * mw * 0.085 + vec3(0.8, 0.82, 0.9) * (lmc * 0.045 + smc * 0.035));
         col += uGlowC * lp * 0.26;
         // faint airglow near the horizon
         col += vec3(0.02, 0.035, 0.03) * exp(-max(h, 0.0) / 0.2) * hz * 0.6;

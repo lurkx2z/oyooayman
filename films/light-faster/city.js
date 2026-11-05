@@ -109,7 +109,8 @@ function lfBuildCity(scene, o = {}) {
   const glow = lfDotTex(0.35);
   const sprite = (col, sz, x, y, z) => { const sm = new THREE.SpriteMaterial({ map: glow, color: col, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }); const sp = new THREE.Sprite(sm); sp.scale.set(sz, sz, 1); sp.position.set(x, y, z); scene.add(sp); return sp; };
   const hy = lfCityY(H[0], H[2]);
-  C.cross = []; for (const [dx, dy, w, h] of [[0, 0, 7, 2.2], [0, 0, 2.2, 7]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.4), new THREE.MeshBasicMaterial({ color: '#ff2a2a' })); m.position.set(H[0] + dx, hy + 26 + 5 + dy, H[2] - 13.4); scene.add(m); C.cross.push(m); }
+  C.cross = []; for (const [dx, dy, w, h, d] of [[0, 0, 7, 2.2, 0.4], [0, 0, 2.2, 7, 0.46]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d),   // the two bars' faces never coincide
+    new THREE.MeshBasicMaterial({ color: '#ff2a2a' })); m.position.set(H[0] + dx, hy + 26 + 5 + dy, H[2] - 13.4); scene.add(m); C.cross.push(m); }
   C.crossGlow = sprite('#ff3a2a', 26, H[0], hy + 31, H[2] - 14);
   const sy = lfCityY(SD[0], SD[2]);
   { const ring = new THREE.Mesh(new THREE.CylinderGeometry(1, 1.12, 1, 64, 1, true), new THREE.MeshStandardMaterial({ color: '#1a1d22', roughness: 0.9, side: THREE.DoubleSide, emissive: new THREE.Color('#ffffff'), emissiveIntensity: 0 }));
