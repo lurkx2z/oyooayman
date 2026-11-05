@@ -93,8 +93,8 @@ function nbCurve(f, hz = 200) {
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
 const NB_PLACE = {
-  edge: ['moon', 'moongone', 'valley', 'netWide', 'saturn', 'moonback', 'crash', 'echo', 'echoSat', 'planeHill'],   // the fence over the valley
-  car: ['driver'], verge: ['verge'], cockpit: ['approach'], tower: ['tower'], sky: ['planeSide'], ride: ['coasterPOV'], space: ['space'],
+  edge: ['moon', 'moongone', 'valley', 'netWide', 'saturn', 'moonback', 'echo', 'echoSat', 'planeHill'],   // the fence over the valley
+  car: ['driver'], verge: ['verge', 'crash'], cockpit: ['approach'], tower: ['tower'], sky: ['planeSide'], ride: ['coasterPOV'], space: ['space'],
 };
 function nbWhereShot(sh) { if (sh.where) return sh.where; for (const [k, v] of Object.entries(NB_PLACE)) if (v.includes(sh.mode)) return k; return 'fair'; }
 // the film as places: [{ t0, t1, where, shot }] in order

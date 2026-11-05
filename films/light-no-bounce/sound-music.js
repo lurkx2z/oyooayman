@@ -177,9 +177,9 @@ nbSound('music', 'score', function (ctx, bus, K) {
   // the ten seconds begin: a drone and a cold cluster of glass, the motif falling, far away
   M.strings(T0 + 0.6, B('sky') + 0.6, C.low, 0.36, { att: 3.0, rel: 1.0, cut: 240 });
   M.strings(T0 + 1.5, ev.moon + 0.1, C.glass, 0.07, { att: 4.0, rel: 0.1, cut: 6000, wave: 'triangle', vib: 1 });
-  M.prog([[c('start', 1), C.Am9], [B('mirror'), C.Flyd], [c('mirror', 1), C.Am9]], B('moon') + 0.5, 0.34, { cut: 900 });
+  M.prog([[c('start', 0), C.Am9], [c('start', 1), C.Flyd], [c('start', 2), C.Am9]], B('moon') + 0.5, 0.34, { cut: 900 });
   motif(c('start', 1) + 0.6, { gap: 1.7, vel: 0.36, n: 5, dur: 4 });
-  M.piano(c('mirror', 0) + 0.3, 'A2', 0.36, 5); M.piano(c('mirror', 1) + 0.4, 'F2', 0.34, 5);
+  M.piano(c('start', 0) + 0.3, 'A2', 0.36, 5); M.piano(c('start', 2) + 0.4, 'F2', 0.34, 5);
   // the Moon: its last light on its way; a swell that stops dead as it arrives
   M.prog([[B('moon'), C.Dm9], [c('moon', 1), C.E7sus]], ev.moon + 0.1, 0.36, { cut: 1000, lastRel: 0.05 });
   M.strings(c('moon', 1), ev.moon + 0.02, ['A3', 'E4', 'A4', 'B4'], 0.26, { att: 4.0, rel: 0.03, cut: 700, cutTo: 3000, cutAt: ev.moon, glide: 60, glideFrom: c('moon', 1) + 2, glideAt: ev.moon });
@@ -212,33 +212,39 @@ nbSound('music', 'score', function (ctx, bus, K) {
   nbPulse(ctx, M.bus, B('road') + 0.3, B('plane'), ['A1', 'E2', 'Bb2'], 0.75, 0.8, { cut: 320, cutTo: 800, acc: 4, ramp: (u) => 0.55 + 0.45 * u });
   M.piano(c('road', 3) + 0.3, 'A2', 0.42, 4); M.piano(c('road', 3) + 0.32, 'E3', 0.3, 4);
   // ================================================================== the plane: radar pings that never come back
-  M.prog([[B('plane'), C.Cmaj9], [c('plane', 1), C.Am9], [c('plane', 2), C.Fmaj9], [c('plane', 3), C.Am9]], B('coaster') + 0.5, 0.32, { cut: 1300 });
-  M.strings(B('plane'), B('coaster') + 0.4, ['E5', 'B5'], 0.07, { att: 2, rel: 1, cut: 5000, wave: 'triangle', vib: 2 });
+  M.prog([[B('plane'), C.Cmaj9], [c('plane', 1), C.Am9], [c('plane', 2), C.Fmaj9]], B('still') + 0.4, 0.32, { cut: 1300, lastRel: 0.4 });
+  M.strings(B('plane'), B('still') + 0.3, ['E5', 'B5'], 0.07, { att: 2, rel: 0.6, cut: 5000, wave: 'triangle', vib: 2 });
   for (let k = 0; k < 4; k++) { const t = c('plane', 2) + 0.4 + k * 1.3; M.bellCut(t, 'B6', 0.22, 0.09, k % 2 ? 0.3 : -0.3); }      // ping … (no echo)
-  for (let k = 0; k < 3; k++) { const t = c('plane', 3) + 0.4 + k * 1.1; M.bell(t, 'E6', 0.14, 0.4); M.bell(t + 0.18, 'A6', 0.12, 0.4); }   // the transponder answers
   motif(c('plane', 1) + 0.5, { gap: 1.5, vel: 0.3, n: 4 });
+  // ================================================================== back to you: it hasn't moved (a held breath of a chord, the heartbeat)
+  { const t = B('still'); M.strings(t, B('coaster') + 0.4, ['A2', 'Bb2', 'E3', 'F3'], 0.3, { att: 0.8, rel: 0.5, cut: 520 }); M.strings(t + 0.4, B('coaster') + 0.3, ['F6'], 0.04, { att: 1.5, rel: 0.4, cut: 7000, wave: 'sawtooth', vib: 12 });
+    for (let k = 0; k * 1.0 + 0.5 < B('coaster') - t; k++) M.beat(t + 0.5 + k * 1.0, 0.42); }
 
   // ================================================================== the rides: the motif slowed and out of tune
-  M.prog([[B('coaster'), C.Am9], [c('coaster', 1), C.Flyd], [B('dodgems'), C.Bblyd], [B('fire'), C.Dm9], [c('fire', 1), C.E7sus]], B('net') + 0.5, 0.34, { cut: 900 });
+  M.prog([[B('coaster'), C.Am9], [c('coaster', 1), C.Flyd], [B('fire'), C.Dm9], [c('fire', 1), C.E7sus]], B('net') + 0.5, 0.34, { cut: 900 });
   { const notes = ['E5', 'A5', 'C6', 'B5', 'A5', 'E5', 'G5', 'F5']; let t = B('coaster') + 0.6, i = 0;
     while (t < B('net') - 0.5) { M.bell(t, notes[i % notes.length], 0.16, -0.3); M.bell(t + 0.03, nbOct(notes[i % notes.length], 0).replace(/^([A-G])/, '$1'), 0.08, 0.3); t += 1.15 + 0.25 * Math.sin(i * 0.9); i++; } }
   M.strings(B('coaster'), B('net') + 0.3, ['A4', 'Bb4'], 0.06, { att: 2, rel: 0.6, cut: 3000, wave: 'triangle', wob: [30, 0.13] });
   { const t = c('fire', 1) + 0.2; M.piano(t, 'D2', 0.4, 4); M.piano(t + 0.02, 'A2', 0.3, 4); }
 
   // ================================================================== the internet: a pulse that stops dead
-  { const tStop = c('net', 3) + 1.6;
+  { const tStop = c('net', 2) + 2.4;
     M.prog([[B('net'), C.Am9], [c('net', 1), C.Cmaj9], [c('net', 2), C.Fmaj9]], tStop + 0.05, 0.34, { cut: 1300, lastRel: 0.05 });
     nbPulse(ctx, M.bus, B('net') + 0.4, tStop, ['A2', 'E3', 'B3'], 0.21, 0.55, { cut: 900, cutTo: 2200, acc: 4, decay: 0.4, ramp: (u) => 0.5 + 0.5 * u });
     hit(tStop, 0.6, 41.2); M.strings(tStop + 0.05, B('space') + 0.5, ['A1', 'E2'], 0.3, { att: 1.2, rel: 0.5, cut: 220 }); }
   // ================================================================== space: vast and still
-  M.strings(B('space'), B('heat') + 0.6, ['A1', 'E2', 'B2'], 0.36, { att: 2.0, rel: 1.0, cut: 260 });
-  M.strings(B('space'), B('heat') + 0.6, ['E5', 'B5', 'E6'], 0.09, { att: 3.0, rel: 1.0, cut: 5000, wave: 'triangle', vib: 1.5 });
+  M.strings(B('space'), B('closer') + 0.5, ['A1', 'E2', 'B2'], 0.36, { att: 2.0, rel: 0.6, cut: 260 });
+  M.strings(B('space'), B('closer') + 0.4, ['E5', 'B5', 'E6'], 0.09, { att: 3.0, rel: 0.5, cut: 5000, wave: 'triangle', vib: 1.5 });
   motif(c('space', 0) + 0.6, { gap: 2.0, vel: 0.32, oct: -1, n: 5, dur: 5 });
-  twinkle(c('space', 1), B('heat'), 0.9, 0.6, ['E6', 'B6', 'E7'], 0.09);
+  twinkle(c('space', 1), B('closer'), 0.9, 0.6, ['E6', 'B6', 'E7'], 0.09);
+  // ================================================================== back to you: it's closer; you can hear it breathing (the score thins to let it through)
+  { const t = B('closer'); hit(t + 0.05, 0.55, 30.9); M.strings(t, B('heat') + 0.4, ['E2', 'F2', 'Bb2'], 0.32, { att: 0.3, rel: 0.6, cut: 420 });
+    M.strings(t + 0.3, B('heat') + 0.3, ['E6', 'F6'], 0.05, { att: 1.0, rel: 0.4, cut: 7000, wave: 'sawtooth', vib: 16 });
+    for (let k = 0; k * 0.85 + 0.4 < B('heat') - t; k++) M.beat(t + 0.4 + k * 0.85, 0.5); }
   // ================================================================== the heat: a heavy pulse
-  M.prog([[B('heat'), C.Dm9], [c('heat', 1), C.Bblyd], [c('heat', 2), C.E7sus]], B('saturn') + 0.5, 0.4, { cut: 900 });
+  M.prog([[B('heat'), C.Dm9], [c('heat', 1), C.Bblyd], [c('heat', 1) + 2.4, C.E7sus]], B('saturn') + 0.5, 0.4, { cut: 900 });
   nbPulse(ctx, M.bus, B('heat') + 0.3, B('saturn'), ['A1', 'E2', 'Bb2'], 1.15, 0.85, { cut: 280, cutTo: 560, acc: 2, ramp: (u) => 0.6 + 0.4 * u });
-  hit(c('heat', 2) + 0.1, 0.6, 32.7);
+  hit(c('heat', 1) + 0.1, 0.6, 32.7);
   // ================================================================== Saturn: high and thin; it will go out at 4:42
   M.prog([[B('saturn'), C.Am9], [c('saturn', 1), C.Cmaj9], [c('saturn', 2), C.Flyd]], B('pupils') + 0.5, 0.32, { cut: 1300 });
   M.strings(B('saturn'), B('pupils') + 0.5, ['E6', 'B6'], 0.07, { att: 3, rel: 1, cut: 6000, wave: 'triangle', vib: 2 });
@@ -264,10 +270,10 @@ nbSound('music', 'score', function (ctx, bus, K) {
   M.strings(ev.back, B('reveal') + 0.3, C.Amaj, 0.5, { att: 0.04, rel: 1.6, cut: 5200, cutTo: 1400, cutAt: B('reveal'), keys: [[ev.back + 0.05, 1], [ev.back + 3, 0.6], [B('reveal') - 1, 0.35]] });
   M.strings(ev.back, B('reveal') + 0.3, ['C#6', 'E6', 'A6'], 0.12, { att: 0.04, rel: 1.4, cut: 9000, cutTo: 3000, cutAt: B('reveal'), wave: 'triangle', vib: 3 });
   ['A6', 'E6', 'C#7', 'A5', 'E7', 'C#6', 'B6', 'E6'].forEach((n, i) => M.bell(ev.back + 0.03 + i * 0.09, n, 0.3 - 0.025 * i, -0.7 + 0.2 * i));
-  motif(c('back', 1) + 0.2, { notes: NB_THEME_UP, gap: 0.8, vel: 0.4, n: 5, dur: 3 });
+  motif(c('back', 0) + 1.6, { notes: NB_THEME_UP, gap: 0.8, vel: 0.4, n: 5, dur: 3 });
 
   // ================================================================== the reveal: a stinger; the Moon comes back: one bell
-  { const t = B('reveal') + 0.05;
+  { const t = ev.back + 1.7;   // (as its face comes out of the white)
     hit(t, 1.0, 29.1); M.drum(t + 0.01, 0.7, 43.7, 1.0, 1.0);
     M.strings(t, t + 3.6, ['Bb2', 'A3', 'Eb4', 'E4'], 0.42, { att: 0.02, rel: 2.0, cut: 3000, cutTo: 700, cutAt: t + 3.4 });
     M.strings(t, t + 2.6, ['F6', 'E6'], 0.09, { att: 0.02, rel: 1.6, cut: 8000, wave: 'sawtooth', vib: 18 }); }
@@ -279,9 +285,9 @@ nbSound('music', 'score', function (ctx, bus, K) {
   nbPulse(ctx, M.bus, B('crash') + 0.2, B('after'), ['D2', 'A2'], 1.3, 0.6, { cut: 260, cutTo: 220, acc: 2 });
   M.piano(c('crash', 0) + 0.2, 'D3', 0.36, 4); M.piano(c('crash', 0) + 1.5, 'A2', 0.32, 4);
   // ================================================================== +2 minutes: what it was like (a sad progression)
-  M.prog([[B('after'), C.Am], [c('after', 0) + 2.4, C.F], [c('after', 1), C.C], [c('after', 1) + 2.4, C.G], [c('after', 2), C.Am], [c('after', 2) + 2.2, C.F]], B('echo') + 0.6, 0.4, { cut: 1300, lastRel: 1.2 });
-  fig(B('after') + 0.5, c('after', 2) - 0.4, ['A4', 'E5', 'C5', 'B4', 'G4', 'C5'], 0.95, 0.16, 1.5);
-  motif(c('after', 2) + 0.2, { gap: 1.0, vel: 0.42, n: 5, dur: 3.6 });
+  M.prog([[B('after'), C.Am], [c('after', 0) + 2.4, C.F], [c('after', 1), C.C], [c('after', 1) + 2.4, C.G], [B('echo') - 2.2, C.Am]], B('echo') + 0.6, 0.4, { cut: 1300, lastRel: 1.2 });
+  fig(B('after') + 0.5, c('after', 1) + 2.0, ['A4', 'E5', 'C5', 'B4', 'G4', 'C5'], 0.95, 0.16, 1.5);
+  motif(c('after', 1) + 2.4, { gap: 1.0, vel: 0.42, n: 4, dur: 3.0 });
 
   // ================================================================== 4:42 PM: Saturn's light should arrive now; there is none
   M.prog([[B('echo'), C.Am9], [c('echo', 1), C.Flyd]], ev.sat + 0.05, 0.34, { cut: 1200, lastRel: 0.05 });

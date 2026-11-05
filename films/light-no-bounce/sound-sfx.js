@@ -7,11 +7,12 @@
                   you (a footstep, cloth, a breath, slowed)
      the road     horns and a tyre's squeal, slowed; a car going past the verge
      the plane    the flight deck's chime; the tower's radio squelch and its radar's warning, slowed
-     the rides    the rollercoaster's riders and its wheels; the dodgems' sparks and bumps; the juggler's torches
+     back to you  it hasn't moved (cloth); it's closer: a step, and its breathing, slowed
+     the rides    the rollercoaster's riders and its wheels; the juggler's torches
      the internet your video's "not sent", slowed; the heat: metal roofs ticking as they warm
      the count    a breath right in front of you, a shuffle; the world speeding back up (a riser) into 3:30:10
      3:30:10      a flash of sound; 400 people screaming at real speed; the person in front of you gasps and stumbles
-     the motorway car alarms and horns echoing up the valley, a late crash, a tyre's scream
+     the motorway  car alarms echoing up the valley; on the verge by the pile-up, its alarms and horns close by, a tyre's scream, one more crash up the road
      +2 minutes   your phone filling up with messages; sirens far off
      4:42 PM      Saturn goes out: a soft "oh" from the crowd
    ===================================================================== */
@@ -27,8 +28,8 @@ nbSound('sfx', 'events', function (ctx, bus, K) {
 
   // ================================================================== 3:29:57: the carousel's organ, all film long
   // (one performance, its clock at the world's speed; heard by how near each shot is to the carousel)
-  { const lv = { title: 0.32, wide: 0.5, stalls: 0.42, mirror: 0.26, mirror2: 0.28, sky: 0.45, sun: 0.35, sources: 0.3, hands: 0.32, real: 0.5, crowd: 0.45, near: 0.3,
-      coaster: 0.2, dodgems: 0.32, fire: 0.28, fireClose: 0.24, phoneNet: 0.3, heat: 0.36, pupils: 0.3, sunWarn: 0.32, count: 0.32, reveal: 0.34 };
+  { const lv = { title: 0.32, wide: 0.5, stalls: 0.42, sky: 0.45, sun: 0.35, sources: 0.3, hands: 0.32, real: 0.5, crowd: 0.45, near: 0.3, still: 0.16,
+      coaster: 0.2, fire: 0.28, fireClose: 0.24, phoneNet: 0.3, closer: 0.12, heat: 0.36, pupils: 0.3, sunWarn: 0.32, count: 0.32, reveal: 0.34 };
     const t0 = -1, t1 = tA + 0.1, [L, R] = nbOrgan(fx, t0, t1, wr, { offset: 3.2 });
     const g = nbCurve((t) => { let v = 0; for (const s of NB_SHOTS) { if (s.t0 >= tA) continue; const l = lv[s.mode] ?? (nbWhereShot(s) === 'edge' ? 0.08 : 0); if (l) v += l * nbWn(t, s.t0, s.t1, 0.04, 0.04); } return Math.min(v, 0.6) * (t < tA ? 1 : 0); });
     const pk = NBX.peak(L, R);   // (the level is set from the organ itself, before the shots' levels: a quieter shot stays quieter)
@@ -81,14 +82,18 @@ nbSound('sfx', 'events', function (ctx, bus, K) {
     { const y = nbVoice(fx, 2.0, { f0: (u) => 700 + 160 * Math.sin(Math.PI * u), formants: [[900, 5, 1], [1450, 6, 0.6], [3000, 7, 0.3]], breath: 0.2, env: (u) => Math.min(1, u / 0.06) * Math.pow(1 - u, 0.7) });
       putS(y, cp.t0 + 0.5, { vol: 0.17, pan: 0.35, room: dark, wet: 0.25 }); }
     for (let t = cp.t0 + 0.2; t < cp.t1 - 0.1; t += 1.05) putS(fx.hit(fx.metalModes(220, 0.5), { width: 0.0015, amp: 1, noise: 0.5, nlen: 0.02, nhp: 500, len: 0.5 }), t, { vol: 0.09, pan: -0.1, lp: 2400 }); }
-  { const dg = sh('dodgems');
-    // the poles' sparks on the ceiling grid (crackles, slowed), and two cars bumping blind
-    for (let t = dg.t0 + 0.3; t < dg.t1 - 0.3; t += r.range(0.5, 1.1)) putS(nbCrackle(fx, 0.22, { rate: 1600, hp: 1800, env: (u) => Math.exp(-u * 4) }), t, { vol: r.range(0.05, 0.11), pan: r.range(-0.6, 0.6), room: open, wet: 0.3 });
-    for (const [dt, pan] of [[1.5, -0.3], [4.4, 0.25]]) putS(fx.hit(fx.panelModes(0.8), { width: 0.004, amp: 1, noise: 0.5, nlen: 0.03, nhp: 300, len: 0.6 }), dg.t0 + dt, { vol: 0.22, pan, room: open, wet: 0.3 }); }
   { const f1 = sh('fire'), f2 = sh('fireClose');
     // the torches: their roar, and a whoosh each time one swings past, slowed
     for (const s of [f1, f2]) nbBedW(K, s.t0, s.t1 + 0.04, { colour: 'pink', f: [['bp', 520, 0.6], ['lp', 1800]], vol: s === f2 ? 0.13 : 0.09, am: 0.6, wr: 1.5, mono: true, pan: 0.2 });
     let k = 0; for (let t = f1.t0 + 0.6; t < f2.t1 - 0.6; t += 2.4, k++) putS(noiseBurst(0.55, [300, 950, 300], 0.9), t, { vol: t > f2.t0 ? 0.2 : 0.15, pan: k % 2 ? 0.45 : -0.05, room: open, wet: 0.25 }); }
+
+  // ================================================================== back to you: it hasn't moved; it's closer, and you can hear it breathing
+  // (sound still bounces: its breath reaches you, slowed with the world)
+  { const st = sh('still'), cl = sh('closer');
+    putS(fx.rustle(1.2, { density: 160, lo: 400, hi: 3000 }), st.t0 + 1.0, { vol: 0.07, pan: 0.1, room: dark, wet: 0.25 });
+    putS(fx.step({ weight: 0.8, scuff: 0.5 }), cl.t0 + 0.4, { vol: 0.24, pan: 0.05, room: dark, wet: 0.25 });
+    putS(fx.breath(1.5, { inhale: true }), cl.t0 + 1.3, { vol: 0.16, pan: 0.02, room, wet: 0.12 });
+    putS(fx.breath(1.6, { voice: 0.25, f0: 100 }), cl.t0 + 4.3, { vol: 0.17, pan: 0.02, room, wet: 0.12 }); }
 
   // ================================================================== the internet; the heat
   { const p = sh('phoneNet'); putS(fx.beep(880, 0.14), p.t0 + 1.4, { vol: 0.07, pan: 0.05, room, wet: 0.2 }); putS(fx.beep(660, 0.2), p.t0 + 2.1, { vol: 0.07, pan: 0.05, room, wet: 0.2 }); }
@@ -109,21 +114,24 @@ nbSound('sfx', 'events', function (ctx, bus, K) {
     const t = tb + dt, w = where(t), g = w === 'fair' ? 1 : w === 'edge' ? 0.4 : 0; if (g) nbCrowdCry(K, t, Object.assign({ k: 1, lo: 300, hi: 820, room: open, wet: 0.4 }, o, { vol: o.vol * g })); }
   // the reveal: the person in the bear suit gasps and stumbles back; so do you
   { const rv = sh('reveal');
-    K.put(fx.breath(0.35, { inhale: true }), rv.t0 + 0.35, { vol: 0.14, norm: true, pan: 0, room, wet: 0.15 });
-    K.put(nbVoice(fx, 0.5, { f0: (u) => 170 + 90 * u, formants: [[650, 5, 1], [1150, 6, 0.6], [2500, 7, 0.25]], breath: 0.35, env: (u) => Math.min(1, u / 0.05) * Math.pow(1 - u, 1.4) }), rv.t0 + 0.55, { vol: 0.2, norm: true, pan: 0.05, room, wet: 0.2 });
-    K.put(fx.step({ weight: 0.8, scuff: 0.6 }), rv.t0 + 1.0, { vol: 0.2, norm: true, pan: 0.1, room: open, wet: 0.2 });
-    K.put(fx.step({ weight: 0.7, scuff: 0.4 }), rv.t0 + 1.5, { vol: 0.16, norm: true, pan: 0.15, room: open, wet: 0.2 }); }
+    // (rv.t0 is 3:30:10 itself, in the white-out: it gasps as its face comes out of the white, at the world's slowed speed)
+    K.put(fx.breath(0.35, { inhale: true }), rv.t0 + 1.4, { vol: 0.14, norm: true, pan: 0, room, wet: 0.15, rate: wr(rv.t0 + 1.4) });
+    K.put(nbVoice(fx, 0.5, { f0: (u) => 170 + 90 * u, formants: [[650, 5, 1], [1150, 6, 0.6], [2500, 7, 0.25]], breath: 0.35, env: (u) => Math.min(1, u / 0.05) * Math.pow(1 - u, 1.4) }), rv.t0 + 1.65, { vol: 0.2, norm: true, pan: 0.05, room, wet: 0.2 });
+    K.put(fx.step({ weight: 0.8, scuff: 0.6 }), rv.t0 + 2.3, { vol: 0.2, norm: true, pan: 0.1, room: open, wet: 0.2 });
+    K.put(fx.step({ weight: 0.7, scuff: 0.4 }), rv.t0 + 2.9, { vol: 0.16, norm: true, pan: 0.15, room: open, wet: 0.2 }); }
 
-  // ================================================================== the motorway, from the hill: alarms, horns, one more crash
+  // ================================================================== the motorway: alarms up the valley (from the hill), then on the
+  // verge by the pile-up: its car alarm and hazards close by, horns, one more crash further up the road
   { const mb = sh('moonback'), cr = sh('crash');
-    K.put(nbAlarm(fx, cr.t1 - mb.t0 - 1.2, { f1: 980, f2: 780, per: 0.32 }), mb.t0 + 1.2, { vol: 0.045, norm: true, pan: 0.45, room: valley, wet: 0.7, lp: 1600, stop: cr.t1 + 0.03 });
-    K.put(nbAlarm(fx, cr.t1 - cr.t0, { f1: 1150, f2: 900, per: 0.45 }), cr.t0, { vol: 0.05, norm: true, pan: 0.2, room: valley, wet: 0.7, lp: 1700, stop: cr.t1 + 0.03 });
-    K.put(horn(2.6, 380), cr.t0 + 0.3, { vol: 0.06, norm: true, pan: 0.3, room: valley, wet: 0.7, lp: 1800 });
-    K.put(squeal(0.9), cr.t0 + 1.4, { vol: 0.06, norm: true, pan: 0.25, room: valley, wet: 0.6, lp: 2600 });
-    // the crash reaches the hill 1.4 s after it happens (480 m)
-    { const t = cr.t0 + 2.6, y = nbCrack(fx, { len: 1.4, s: 0.55 }), gl = fx.smash({ v: 4.43, len: 1.6 });
-      K.put(y, t, { vol: 0.13, norm: true, pan: 0.25, room: valley, wet: 0.8, lp: 1500 }); K.putLR(gl.L, gl.R, t + 0.03, { vol: 0.035, norm: true, room: valley, wet: 0.8 }); }
-    K.put(horn(3.0, 440), cr.t0 + 3.3, { vol: 0.05, norm: true, pan: 0.15, room: valley, wet: 0.7, lp: 1800 }); }
+    K.put(nbAlarm(fx, cr.t0 - mb.t0 - 1.2, { f1: 980, f2: 780, per: 0.32 }), mb.t0 + 1.2, { vol: 0.045, norm: true, pan: 0.45, room: valley, wet: 0.7, lp: 1600, stop: cr.t0 + 0.03 });
+    K.put(nbAlarm(fx, cr.t1 - cr.t0, { f1: 1150, f2: 900, per: 0.45 }), cr.t0, { vol: 0.07, norm: true, pan: 0.45, room: open, wet: 0.2, lp: 4500, stop: cr.t1 + 0.03 });
+    K.put(nbAlarm(fx, cr.t1 - cr.t0, { f1: 980, f2: 780, per: 0.32 }), cr.t0 + 0.4, { vol: 0.035, norm: true, pan: -0.2, room: open, wet: 0.4, lp: 3000, stop: cr.t1 + 0.03 });
+    K.put(horn(2.6, 380), cr.t0 + 0.3, { vol: 0.07, norm: true, pan: -0.1, room: open, wet: 0.35, lp: 3500 });
+    K.put(squeal(0.9), cr.t0 + 1.4, { vol: 0.06, norm: true, pan: -0.3, room: valley, wet: 0.5, lp: 3000 });
+    // one more crash, 150 m up the road (0.45 s later)
+    { const t = cr.t0 + 2.3, y = nbCrack(fx, { len: 1.4, s: 0.55 }), gl = fx.smash({ v: 4.43, len: 1.6 });
+      K.put(y, t, { vol: 0.15, norm: true, pan: -0.25, room: valley, wet: 0.55, lp: 3000 }); K.putLR(gl.L, gl.R, t + 0.03, { vol: 0.045, norm: true, room: valley, wet: 0.5 }); }
+    K.put(horn(3.0, 440), cr.t0 + 3.3, { vol: 0.06, norm: true, pan: 0.15, room: open, wet: 0.35, lp: 3500 }); }
 
   // ================================================================== +2 minutes: your phone, the sirens
   { const af = sh('after'), aw = sh('afterWide');

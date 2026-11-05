@@ -11,11 +11,9 @@ status: voiceless
 
 [title] What if light stopped bouncing for 10 seconds?
 
-[start] 3:30 PM. Light just stopped bouncing. / For 10 seconds, nothing reflects it. Nothing scatters it.
+[start] Your reflection is gone. / 3:30 PM. Light just stopped bouncing. / For 10 seconds, nothing reflects it. Nothing scatters it.
 
-[mirror] Your reflection is gone. / A mirror bounces back almost all the light that hits it. Now it bounces none.
-
-[moon] The Moon is still there. / It's 1.3 light-seconds away. The light it bounced before 3:30 is still on its way.
+[moon] The Moon is still there. / It's 1.2 light-seconds away. The light it bounced before 3:30 is still on its way.
 
 [moongone] There goes the Moon. That was the last of its light.
 
@@ -33,38 +31,40 @@ status: voiceless
 
 [near] Something just passed between you and the lights.
 
-[road] Right now, about 60 million cars are moving. / For 10 seconds, none of their drivers can see the road. / Only each other's lights. / At 110 km/h, 10 seconds is 300 metres with your eyes shut.
+[road] Right now, about 60 million cars are moving. / None of their drivers can see the road. Only each other's lights. / Even their cars' radar is blind. Nothing brakes for them. / At 110 km/h, 10 seconds is 300 metres with your eyes shut.
 
-[plane] A plane is landing at the airport across the valley. / Its pilots can't see the runway. Only its lights: that's how they land at night anyway. / Radio is light too. The control tower's radar gets nothing back. / The plane still shows. It radios its own position.
+[plane] A plane is landing at the airport across the valley. / Its pilots are landing on the runway's lights alone. / Radio is light too. The tower's radar gets no echoes back.
 
-[coaster] Your friend is on the rollercoaster. / It runs by itself. All she can see are the lights along the track.
+[still] It hasn't moved.
 
-[dodgems] The dodgems can't see each other. Only the sparks on their poles.
+[coaster] Your friend is on the rollercoaster. / It runs on rails, so it carries on. She's flying through the dark between its lights.
 
 [fire] The fire juggler can see his flames. Not his hands. / Fire makes its own light.
 
-[net] Your video just stopped sending. / The internet is light, bouncing along threads of glass. / About 600 cables under the sea carry almost everything between continents. All dark. / Even the lasers that send it have stopped. A laser is light bouncing between two mirrors.
+[net] Your video just stopped sending. / The internet is light, bouncing along threads of glass. / About 600 cables under the sea carry almost everything between continents. All dark.
 
-[space] On the space station, the Earth has disappeared. / Only the lights of cities on its night side are left.
+[space] On the space station, the Earth has disappeared. / Only the lights that shine upwards are left.
 
-[heat] Everything is soaking up the sunlight it used to bounce. / White things heat up like black ones. / In 10 seconds, Earth soaks up as much extra energy as 8,000 atomic bombs. Spread over half a planet.
+[closer] It's closer. / Sound still bounces. You can hear it breathing.
 
-[saturn] That bright dot is Saturn. / Its light left it 72 minutes ago, so it shines on. / At 4:42 PM, Saturn will go out for 10 seconds.
+[heat] Everything is soaking up the sunlight it used to bounce. / In 10 seconds, Earth soaks up 8,300 atomic bombs' worth of extra energy.
+
+[saturn] That bright dot is Saturn. / Its light left it 73 minutes ago, so it shines on. / At 4:42 PM, Saturn will go out for 10 seconds.
 
 [pupils] Your pupils are opening. More stars every second. / Don't look at the Sun. More of it is getting in too.
 
-[count] 3 seconds left. / Whatever is near you, you'll see it in 3 seconds.
+[count] Whatever is near you, you'll see it in 3 seconds.
 
-[back] 3:30:10 PM. Light bounces again. / Your pupils had opened wide. It's blinding.
+[back] 3:30:10 PM. Light bounces again. It's dazzling.
 
 [reveal] Someone was standing right in front of you.
 
-[moonback] The Moon comes back last. 1.3 seconds late.
+[moonback] The Moon comes back last. 1.2 seconds late.
 
-[crash] On the motorway, 10 seconds was 300 metres blind.
+[crash] Down on the motorway, not everyone got through 300 metres blind.
 
-[after] Every video of it is black, with dots of light. / The internet is still finding its way back. / For 10 seconds, nobody on Earth could see anybody.
+[after] Every video of it is black, with dots of light. / The internet is still finding its way back.
 
-[echo] 4:42 PM. Everyone is watching Saturn. / Right now, the light it didn't bounce at 3:30 should be arriving. / There's nothing to arrive.
+[echo] 4:42 PM. Everyone is watching Saturn. / Right now, the light it would have bounced at 3:30 should be arriving. / There is none. / Seen from Saturn, the Earth just went dark.
 
 [question] What would you have done?

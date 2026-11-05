@@ -48,7 +48,7 @@
     .nb-ctx .chip.hit { opacity: 1; color: #fff; text-shadow: 0 0 calc(var(--u) * 16) rgba(255, 220, 160, 0.95); }
     .nb-ctx .dim { opacity: 0.55; }
     /* the honest label (bottom left, under the caption line) */
-    .nb-tag { position: absolute; left: calc(var(--u) * 52); bottom: calc(var(--u) * 26); font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 28); letter-spacing: 0.16em;
+    .nb-tag { position: absolute; left: calc(var(--u) * 52); bottom: calc(var(--u) * 26); white-space: nowrap; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 28); letter-spacing: 0.16em;
       color: #e9e2d4; padding: calc(var(--u) * 7) calc(var(--u) * 16); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.55); pointer-events: none; }
     /* the time this morning (top right) and, under it, which way is down on the screen */
     .nb-clock { right: calc(var(--u) * 52); text-align: right; padding: calc(var(--u) * 16) calc(var(--u) * 26) calc(var(--u) * 18); border-radius: calc(var(--u) * 16); background: rgba(6, 8, 12, 0.55); }
@@ -59,10 +59,10 @@
     .nb-clock .f:empty { display: none; }
     .nb-ctx sup { font-size: 0.6em; }
     /* the diagrams (illustrations): right of centre, or large in the middle of the frame */
-    .nb-inset { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 372); width: calc(var(--u) * 800); height: calc(var(--u) * 495); pointer-events: none; }
+    .nb-inset { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 300); width: calc(var(--u) * 760); height: calc(var(--u) * 470); pointer-events: none; }
     .nb-inset.left { right: auto; left: calc(var(--u) * 52); }
     .nb-inset.mid svg { width: 100%; height: 100%; }
-    .nb-inset.mid { top: calc(var(--u) * 262); width: calc(var(--u) * 940); height: calc(var(--u) * 581); }
+    .nb-inset.mid { top: calc(var(--u) * 250); width: calc(var(--u) * 841); height: calc(var(--u) * 520); }
     .nb-inset.big { right: auto; left: 50%; margin-left: calc(var(--u) * -560); top: calc(var(--u) * 96); width: calc(var(--u) * 1120); height: calc(var(--u) * 693); }
     .nb-inset svg { width: 100%; height: 100%; display: block; }
     .nb-inset .t { font-family: var(--hud-font); font-weight: 700; font-size: 32px; letter-spacing: 0.1em; fill: #f6efe2; }
@@ -92,7 +92,7 @@
     .nb-clock .v small { font-variant-numeric: tabular-nums; }
     .nb-ro.dark .v { color: #ff8a6a; }
     .nb-ro.dark.tick .v { color: #ffcf8a; text-shadow: 0 0 calc(var(--u) * 22) rgba(255, 207, 138, 0.8); }
-    .nb-count { left: 50%; top: 40%; color: #f6f1e7; opacity: 0.92; }
+    .nb-count { left: 17%; top: 54%; font-size: calc(var(--u) * 200); color: #f6f1e7; opacity: 0.92; }
     .nb-count.hit { color: #ffffff; }
   </style>
 </head>

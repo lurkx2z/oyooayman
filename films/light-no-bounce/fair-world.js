@@ -76,6 +76,7 @@ function nbBuildFairWorld(S) {
     for (let x = -3.6; x <= 3.6; x += 0.4) B.push([x, 2.98, fz + 0.26, 'white']);
     for (let y = 0.5; y < 2.9; y += 0.4) { B.push([-3.78, y, fz + 0.26, 'white']); B.push([3.78, y, fz + 0.26, 'white']); }
     for (let x = 4.8; x <= 7.6; x += 0.45) B.push([x, 3.25, fz + 0.06, 'amber']);
+    for (const x of [-1.225, 1.225]) for (let y = 0.5; y < 2.75; y += 0.3) B.push([x, y, fz + 0.25, 'white']);   // up the pillars between the mirrors
     W.static.push(...B.map((b) => [b[0], b[1], b[2], 0.05, b[3]]));
     // the mirrors: one reflector across the three panels (they share a plane), each panel bent differently
     const mir = new Mirror(7.34, my[1] - my[0], { resolution: 1100, tint: '#dfe6ea', see: [0, 1], smudge: 0.035, clipBias: 0.01 });
@@ -83,7 +84,7 @@ function nbBuildFairWorld(S) {
           vec4 pp = vUvP; float pu = vUv.x * 3.0, pi = floor(pu), lu = fract(pu) - 0.5, lv = vUv.y - 0.5;
           float dx = 0.0, dy = 0.0;
           if (pi < 0.5) { dx = -lu * 0.42 * (1.0 - 1.6 * lv * lv); dy = 0.03 * sin(vUv.y * 9.0); }        // thin and tall
-          else if (pi < 1.5) { dx = 0.035 * sin(vUv.y * 13.0 + 1.0); dy = -lv * 0.28 + 0.02 * sin(vUv.x * 20.0); }   // wavy, squashed
+          else if (pi < 1.5) { dx = 0.13 * sin(vUv.y * 11.0 + 1.0); dy = -lv * 0.3 + 0.04 * sin(vUv.x * 20.0); }   // wavy, squashed
           else { dx = lu * 0.35; dy = lv * 0.18 * cos(lu * 3.0); }                                       // short and wide
           pp.xy += vec2(dx * 0.16, dy * 0.12) * pp.w;
           vec3 c = texture2DProj(tDiffuse, pp).rgb * uTint * uDim;`);
@@ -121,6 +122,7 @@ function nbBuildFairWorld(S) {
       for (let k = 0; k <= 9; k++) { W.static.push([x - 2.3 + k * 0.511, 2.84, z + 0.18, 0.04, 'warm']); W.static.push([x - 2.3 + k * 0.511, 2.84, z - 1.48, 0.04, NB_BULB_SET[(k + i + 3) % 8]]); }   // the roof's edges
       for (const sx of [-1, 1]) { for (let k = 0; k <= 5; k++) W.static.push([x + sx * 2.85, 1.92 + k * 0.17, z - 2.62 + k * 0.2, 0.04, 'warm']); for (let k = 0; k < 6; k++) W.static.push([x + sx * 2.72, 0.3 + k * 0.45, z - 1.5, 0.035, NB_BULB_SET[(k + i) % 8]]); }
       for (let k = 0; k < 4; k++) W.static.push([x - 1.8 + k * 1.2, 2.35, z - 0.2, 0.06, 'white']);   // bare bulbs hanging inside
+      for (let k = 0; k <= 24; k++) { const u = -2.4 + k * 0.2; W.static.push([x + u, 1.84 + 0.012 * u * u, z + 1.0, 0.035, (k + i) % 3 ? 'warm' : 'yellow']); }   // fairy lights across the back shelves (seen under the awning)
       W.stalls.push({ x, z, g, name: names[i][0] });
     }
     // the hot dog stall's grill: coals glowing under the bars (a source: hot enough to glow)

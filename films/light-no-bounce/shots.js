@@ -10,13 +10,12 @@ const NB_SHOTS = [];
 {
   const P = NB_SHOTS, c = nbC, B = nbB;
   const L = [
-    // 1 — 3:29:57 PM: you, in the Fun House's wavy mirror; at 3:30:00 light stops bouncing (26× slower from here, 39× from the sky, 3× for the last three seconds)
-    ['A0', 'title', -1, B('start'), 'fair'],
-    ['A1', 'wide', B('start'), c('start', 1) - 0.5, 'fair'],
-    ['A1b', 'stalls', c('start', 1) - 0.5, B('mirror'), 'fair'],
-    ['A2', 'mirror', B('mirror'), c('mirror', 1) - 0.5, 'fair'],
-    ['A2b', 'mirror2', c('mirror', 1) - 0.5, B('moon'), 'fair'],
-    // the Moon (its light is 1.28 s old: it goes out at 3:30:01.28), the sky, the Sun
+    // 1 — 3:29:57 PM: you, close up in the Fun House's wavy mirror (and something coming up behind you); at 3:30:00 light
+    // stops bouncing (26× slower from here, 39× from the sky, 3× for the last three seconds)
+    ['A0', 'title', -1, c('start', 0) + 1.8, 'fair'],
+    ['A1', 'wide', c('start', 0) + 1.8, c('start', 2) - 0.5, 'fair'],
+    ['A1b', 'stalls', c('start', 2) - 0.5, B('moon'), 'fair'],
+    // the Moon (its light is 1.24 s old: it goes out at 3:30:01.24), the sky, the Sun
     ['M1', 'moon', B('moon'), c('moon', 1) - 0.5, 'fair'],
     ['M2', 'moongone', c('moon', 1) - 0.5, B('sky'), 'fair'],
     ['K1', 'sky', B('sky'), B('sun'), 'fair'],
@@ -34,31 +33,33 @@ const NB_SHOTS = [];
     // the airport: a plane on final approach
     ['P1', 'planeHill', B('plane'), c('plane', 1) - 0.5, 'fair'],
     ['P2', 'approach', c('plane', 1) - 0.5, c('plane', 2) - 0.5, 'fair'],
-    ['P3', 'tower', c('plane', 2) - 0.5, c('plane', 3) - 0.5, 'fair'],
-    ['P4', 'planeSide', c('plane', 3) - 0.5, B('coaster'), 'fair'],
+    ['P3', 'tower', c('plane', 2) - 0.5, B('still'), 'fair'],
+    // back to you: the shape in front of the lights is still there
+    ['Y5', 'still', B('still'), B('coaster'), 'fair'],
     // the rides
     ['C1', 'coaster', B('coaster'), c('coaster', 1) - 0.5, 'fair'],
-    ['C2', 'coasterPOV', c('coaster', 1) - 0.5, B('dodgems'), 'fair'],
-    ['D1', 'dodgems', B('dodgems'), B('fire'), 'fair'],
+    ['C2', 'coasterPOV', c('coaster', 1) - 0.5, B('fire'), 'fair'],
     ['F1', 'fire', B('fire'), c('fire', 1) - 0.5, 'fair'],
     ['F2', 'fireClose', c('fire', 1) - 0.5, B('net'), 'fair'],
-    // the internet; space; the heat
+    // the internet; space
     ['N1', 'phoneNet', B('net'), c('net', 1) - 0.5, 'fair'],
     ['N2', 'netWide', c('net', 1) - 0.5, B('space'), 'fair'],
-    ['X1', 'space', B('space'), B('heat'), 'space'],
+    ['X1', 'space', B('space'), B('closer'), 'space'],
+    // back to you: it's closer (and you can hear it)
+    ['Y6', 'closer', B('closer'), B('heat'), 'fair'],
+    // the heat; Saturn (the open loop: 4:42 PM); your pupils; the count
     ['H1', 'heat', B('heat'), B('saturn'), 'fair'],
-    // Saturn (the open loop: 4:42 PM); your pupils; the count
     ['S1', 'saturn', B('saturn'), B('pupils'), 'fair'],
     ['U1', 'pupils', B('pupils'), c('pupils', 1) - 0.5, 'fair'],
     ['U2', 'sunWarn', c('pupils', 1) - 0.5, B('count'), 'fair'],
-    ['Z1', 'count', B('count'), B('reveal'), 'fair'],
-    // 2 — 3:30:10 PM: light bounces again
-    ['Z2', 'reveal', B('reveal'), B('moonback'), 'fair'],
+    ['Z1', 'count', B('count'), c('back', 0) - 0.6, 'fair'],
+    // 2 — 3:30:10 PM: light bounces again (the cut is hidden in the white-out)
+    ['Z2', 'reveal', c('back', 0) - 0.6, B('moonback'), 'fair'],
     ['Z3', 'moonback', B('moonback'), B('crash'), 'fair'],
     ['Z4', 'crash', B('crash'), B('after'), 'fair'],
     // +2 min
-    ['G1', 'after', B('after'), c('after', 2) - 0.5, 'fair'],
-    ['G2', 'afterWide', c('after', 2) - 0.5, B('echo'), 'fair'],
+    ['G1', 'after', B('after'), c('after', 1) - 0.5, 'fair'],
+    ['G2', 'afterWide', c('after', 1) - 0.5, B('echo'), 'fair'],
     // 3 — 4:42 PM: Saturn's light from 3:30 should arrive now
     ['E1', 'echo', B('echo'), c('echo', 1) - 0.5, 'fair'],
     ['E2', 'echoSat', c('echo', 1) - 0.5, 1e9, 'fair'],

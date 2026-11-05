@@ -36,7 +36,7 @@ const NB_CLOCK = (() => {
     [B('sky'), P.moonS * (B('sky') - NB.tLock) / (C('moongone', 0) - 0.5 - NB.tLock), 'to'],   //   arrives 0.5 s before "There goes the Moon")…
     [B('count'), P.T - 3.0, 'to'],                        // …slower still through the middle; the last three seconds faster (the count)…
     [C('back', 0) - 0.6, P.T, 'to'],                      // …to 3:30:10.000, as "Light bounces again" comes up
-    [C('moonback', 0) + 0.25, P.T + P.moonS + 0.02, 'real'],   // the Moon's light returns 1.28 s late; then real speed
+    [C('moonback', 0) + 0.25, P.T + P.moonS + 0.02, 'real'],   // the Moon's light returns 1.24 s late; then real speed
     [B('after'), 130, 'real'],                            // +2 min
     [B('echo'), P.sEcho - (C('echo', 2) - 1.0 - B('echo')), 'real'],   // 4:42 PM: everyone watching Saturn (it goes out 1 s before "There's nothing to arrive")
   ];

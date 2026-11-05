@@ -149,10 +149,10 @@ function nbBuildCoaster(S, W) {
         nbPose(p, pose, k ? 0.33 : -0.33, 0.18, 0.15, 0); }));
     },
     speed(s) { return Math.abs(distAt(s + 0.05) - distAt(s - 0.05)) / 0.1; },
-    // LEDs along both rails (every metre, cyan and white), a headlight pair on the front car, the station's bulbs
+    // LEDs along both rails (every 60 cm, cyan and white), a headlight pair on the front car, the station's bulbs
     lamps(Lm, s) {
-      for (let dd = 0, i = 0; dd < L; dd += 1.0, i++) { const f = fr[Math.floor(dd / L * NS)], c = i % 2 ? NB_BULB.cyan : NB_BULB.white;
-        for (const sx of [-0.62, 0.62]) Lm.add(f.p.x + f.side.x * sx, f.p.y + f.side.y * sx + 0.05, f.p.z + f.side.z * sx, 0.035, c[0] * 0.8, c[1] * 0.8, c[2] * 0.8); }
+      for (let dd = 0, i = 0; dd < L; dd += 0.6, i++) { const f = fr[Math.floor(dd / L * NS)], c = i % 2 ? NB_BULB.cyan : NB_BULB.white;
+        for (const sx of [-0.62, 0.62]) Lm.add(f.p.x + f.side.x * sx, f.p.y + f.side.y * sx + 0.05, f.p.z + f.side.z * sx, 0.05, c[0] * 1.3, c[1] * 1.3, c[2] * 1.3); }
       const fc = cars[0]; fc.updateMatrixWorld();
       for (const sx of [-0.45, 0.45]) { const p = new THREE.Vector3(sx, 0.45, 1.55).applyMatrix4(fc.matrixWorld); Lm.add(p.x, p.y, p.z, 0.06, 3.2, 3.0, 2.6); }
       for (let x = 16.4; x <= 25.6; x += 0.46) Lm.add(x, 4.2, 18.6, 0.04, ...NB_BULB.amber);

@@ -31,10 +31,18 @@ function nbTrafficSim() {
         len: type === 'van' ? 5.3 : type === 'pickup' ? 5.5 : 4.5,
         react: r.range(0.7, 1.7), mode: r.next() < 0.52 ? 'hard' : r.next() < 0.7 ? 'soft' : 'coast',
         lit: r.next() < 0.35, auto: r.range(1.2, 3.2), haz: r.next() < 0.45 ? r.range(2.5, 7) : 99, latA: r.range(0.3, 1.15) * (r.next() < 0.5 ? -1 : 1),
-        hit: 99, yaw: 0, yawK: r.range(0.12, 0.5) * (r.next() < 0.5 ? -1 : 1), stopS: 99,
+        hit: 99, yaw: 0, yawK: r.range(0.5, 1.25) * (r.next() < 0.5 ? -1 : 1), stopS: 99,
       });
     }
   });
+  // the car you ride in (lane 1, about 60 m north of the fence's line at 3:30:04), at 110 km/h: one car 70 m ahead at
+  // the same speed (it brakes hard, blind), then a clear lane for half a kilometre, so nothing slows them before 3:30.
+  // Its driver only lifts off (the speedometer stays near 110 km/h while the car ahead brakes blind)
+  { const V0 = 30.6; let best = null, bd = 1e9; for (const c of cars) if (c.lane === 1) { const d = Math.abs(c.u + V0 * (4.4 - P.S0) - 60); if (d < bd) { bd = d; best = c; } }
+    best.mode = 'coast'; best.react = 1.7; best.drv = true; best.v = best.v0 = V0;
+    let lead = null, ld = 1e9; for (const c of cars) { const ah = c.u - best.u; if (c.lane === 1 && ah > 0 && Math.abs(ah - 70) < ld) { ld = Math.abs(ah - 70); lead = c; } }
+    for (let i = cars.length - 1; i >= 0; i--) { const c = cars[i], ah = c.u - best.u; if (c.lane === 1 && c !== lead && ah > 0 && ah < 600) cars.splice(i, 1); }
+    lead.u = best.u + 70; lead.v = lead.v0 = V0; lead.mode = 'hard'; lead.react = 1.0; }
   const n = Math.round((P.S1 - P.S0) / P.SAMPLE) + 1, every = Math.round(P.SAMPLE / P.DT);
   for (const c of cars) { c.U = new Float32Array(n); c.V = new Float32Array(n); }
   const byLane = P.lanes.map((_, li) => cars.filter((c) => c.lane === li).sort((a, b) => b.u - a.u));   // leader first
@@ -45,7 +53,7 @@ function nbTrafficSim() {
     if (step % every === 0) { const i = step / every; for (const c of cars) { c.U[i] = c.u; c.V[i] = c.v; } }
     for (const L of byLane) L.forEach((c, j) => {
       const lead = j ? L[j - 1] : null; let acc;
-      if (s < c.react) acc = idm(c, lead, c.v0);                                   // seeing (or not yet reacting)
+      if (s < c.react) acc = c.drv ? 0 : idm(c, lead, c.v0);                       // seeing (or not yet reacting; your driver holds 110)
       else if (s < NBP.T + 0.7) acc = c.mode === 'hard' ? -7.2 : c.mode === 'soft' ? -2.6 : -0.5;   // blind
       else acc = Math.min(-4.5, idm(c, lead, 0.1));                                // seeing again: stop
       if (s >= NBP.T + 0.7 && lead) acc = Math.max(-9, Math.min(acc, idm(c, lead, 0.1)));
@@ -110,14 +118,15 @@ function nbBuildValley(S, W) {
     const ln = P.lanes[c.lane], u = carU(c, s), sd = Math.min(s, NBP.T + 0.7);
     const lat = c.latA * noise1(sd * 0.21 + c.k * 1.7, 9) * nbEase(sd, c.react, c.react + 4.5) * 1.6;
     const yaw = c.hit < 90 ? c.yawK * nbEase(s, c.hit, c.hit + 0.6) : 0.02 * c.latA * Math.cos(sd * 0.21 + c.k);
-    return { x: ln.x + lat * -ln.dir, z: ln.dir * u, yaw: (ln.dir < 0 ? Math.PI / 2 : -Math.PI / 2) + yaw, dir: ln.dir };
+    const push = c.hit < 90 ? 0.7 * c.yawK * nbEase(s, c.hit, c.hit + 0.8) : 0;   // (a shunt knocks it sideways as it spins)
+    return { x: ln.x + (lat + push) * -ln.dir, z: ln.dir * u, yaw: (ln.dir < 0 ? Math.PI / 2 : -Math.PI / 2) + yaw, dir: ln.dir };
   };
   out.carPose = carPose; out.carV = carV;
   // the cars you see close up get full bodies; the rest are simple blocks (far below you)
   const VF = new VehicleFactory(), hero = [];
   cars.forEach((c) => { const z5 = P.lanes[c.lane].dir * carU(c, 5); c.hero = z5 > -420 && z5 < 260; });
   // the car you ride in (the driver's view): northbound, the middle lane, near z −60 at 3:30:04
-  { let best = null; for (const c of cars) if (c.lane === 1) { const z = -carU(c, 4.4); if (!best || Math.abs(z + 60) < Math.abs(-carU(best, 4.4) + 60)) best = c; } out.drv = best; best.hero = false; }
+  { const best = cars.find((c) => c.drv); out.drv = best; best.hero = false; }
   for (const c of cars) if (c.hero) { const v = VF.build(c.type, c.col); v.c = c; c.bodyL = v.L; scene.add(v.group); hero.push(v); }
   const blocks = cars.filter((c) => !c.hero && c !== out.drv);
   const bodyG = new THREE.BoxGeometry(4.4, 0.75, 1.8); bodyG.translate(0, 0.62, 0);
@@ -143,12 +152,12 @@ function nbBuildValley(S, W) {
       const head = c.lit || s > c.auto || s > 600;                                // the auto headlights see night at 3:30 (and dusk at 4:42)
       const braking = (s >= c.react && s < NBP.T + 0.7 && c.mode !== 'coast' && v > 0.2) || (s >= NBP.T + 0.7 && v > 0.2) || (s < c.react && c.acc < -1.5);
       const haz = (s > c.haz || (s > NBP.T && c.hit < 90) || (s > c.stopS + 1.5 && s < 600)) && blink;
-      void dark;
       for (const side of [-1, 1]) {
         const ox = sx * side * 0.66, oz = sz * side * 0.66;
         // front: running light / headlight
         const fxp = p.x + fx * h + ox, fzp = p.z + fz * h + oz;
-        if (head) Lm.add(fxp, y + 0.68, fzp, 0.24, 4.6, 4.4, 4.0); else Lm.add(fxp, y + 0.7, fzp, 0.11, 2.4, 2.4, 2.4);
+        // (a headlight is a bulb in a mirror: while nothing bounces it is a bare bulb, far dimmer)
+        if (head) { if (dark) Lm.add(fxp, y + 0.68, fzp, 0.15, 2.4, 2.3, 2.1); else Lm.add(fxp, y + 0.68, fzp, 0.24, 4.6, 4.4, 4.0); } else Lm.add(fxp, y + 0.7, fzp, 0.11, 2.4, 2.4, 2.4);
         // rear: tail / brake
         const rxp = p.x - fx * h + ox * 1.02, rzp = p.z - fz * h + oz * 1.02;
         if (braking) Lm.add(rxp, y + 0.86, rzp, 0.2, 5.2, 0.4, 0.22); else if (head) Lm.add(rxp, y + 0.86, rzp, 0.13, 2.6, 0.22, 0.12);
@@ -187,10 +196,10 @@ function nbBuildValley(S, W) {
     const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.14), new THREE.MeshBasicMaterial({ map: nbTex(nbCanvas(256, 150, (gg, w, h) => {
       gg.fillStyle = '#0e1a14'; gg.fillRect(0, 0, w, h); gg.strokeStyle = '#d8d0b0'; gg.lineWidth = 9; gg.beginPath(); gg.moveTo(w * 0.5, h); gg.lineTo(w * 0.52, 0); gg.stroke();
       gg.strokeStyle = '#4a8aff'; gg.lineWidth = 5; gg.beginPath(); gg.moveTo(w * 0.5, h); gg.lineTo(w * 0.52, 0); gg.stroke(); gg.fillStyle = '#ffffff'; gg.beginPath(); gg.moveTo(w * 0.5, h * 0.6); gg.lineTo(w * 0.46, h * 0.75); gg.lineTo(w * 0.54, h * 0.75); gg.fill();
-      gg.fillStyle = '#e8e8e8'; gg.font = '600 15px Arial'; gg.fillText('M4  ·  London 62 mi', 8, 20); }), { repeat: false }), color: new THREE.Color(0.9, 0.9, 0.9) }));
-    scr.position.set(0.66, 1.03, -0.02); scr.rotation.y = -Math.PI / 2 - 0.12; g.add(scr);
+      gg.fillStyle = '#e8e8e8'; gg.font = '600 15px Arial'; gg.fillText('NEXT EXIT  3 km', 8, 20); }), { repeat: false }), color: new THREE.Color(0.9, 0.9, 0.9) }));
+    scr.position.set(0.66, 1.03, -0.02); scr.rotation.y = -Math.PI / 2 - 0.12; g.add(scr); out.lcd = [scr];   // (an LCD: its backlight is bounced through a light guide: dark while nothing bounces)
     out.drvPose = (s) => { const p = carPose(c, s); g.position.set(p.x, P.y + 0.02, p.z); g.rotation.y = p.yaw; return p; };
-    out.drvUpdate = (s) => { out.drvPose(s); out.cluster.update({ v: Math.round(carV(c, s) * 3.6) / 3.6, head: s > c.auto || c.lit }); };
+    out.drvUpdate = (s) => { out.drvPose(s); for (const m of out.lcd) m.visible = NBP.bounce(s) > 0; out.cluster.update({ v: Math.round(carV(c, s) * 3.6) / 3.6, head: s > c.auto || c.lit }); };
     // the driver's eye (right-hand drive), and a point ahead along the road
     out.drvEye = (s) => { const p = carPose(c, s), fx = Math.cos(p.yaw), fz = -Math.sin(p.yaw), sx = -fz, sz = fx; return [p.x + fx * 0.05 + sx * 0.37, P.y + 1.22, p.z + fz * 0.05 + sz * 0.37]; };
     out.drvAt = (s, d = 60) => { const p = carPose(c, s), fx = Math.cos(p.yaw), fz = -Math.sin(p.yaw), sx = -fz, sz = fx; return [p.x + fx * d + sx * 0.37, P.y + 0.9, p.z + fz * d + sz * 0.37]; };
@@ -276,14 +285,15 @@ function nbBuildValley(S, W) {
     const eic = (g, w, h) => { g.fillStyle = '#000'; g.fillRect(0, 0, w, h); g.strokeStyle = '#fff'; g.lineWidth = 3; for (const cx of [w * 0.3, w * 0.7]) { g.beginPath(); g.arc(cx, h * 0.3, h * 0.17, Math.PI * 0.8, Math.PI * 2.2); g.stroke(); g.strokeStyle = '#3aff6a'; g.beginPath(); g.moveTo(cx, h * 0.3); g.lineTo(cx + h * 0.12, h * 0.22); g.stroke(); g.strokeStyle = '#fff'; }
       g.fillStyle = '#3aff6a'; g.font = '700 18px Arial'; g.fillText('N1  54.2   54.0', 12, h * 0.62); g.fillStyle = '#00e0ff'; g.fillText('FLAPS 30  GEAR DOWN', 12, h * 0.8); };
     const X = E[0] - 0.8, Y = E[1] - 0.47;
-    scr(pfd, 256, 256, X, Y, 0.72, 0.19, 0.19); scr(nd, 256, 256, X, Y, 0.48, 0.19, 0.19); scr(eic, 256, 320, X, Y - 0.02, 0, 0.17, 0.21); scr(nd, 256, 256, X, Y, -0.48, 0.19, 0.19); scr(pfd, 256, 256, X, Y, -0.72, 0.19, 0.19);
+    // the five display units are LCDs (backlight spread by a light guide: by bouncing): dark while nothing bounces
+    out.lcd.push(scr(pfd, 256, 256, X, Y, 0.72, 0.19, 0.19), scr(nd, 256, 256, X, Y, 0.48, 0.19, 0.19), scr(eic, 256, 320, X, Y - 0.02, 0, 0.17, 0.21), scr(nd, 256, 256, X, Y, -0.48, 0.19, 0.19), scr(pfd, 256, 256, X, Y, -0.72, 0.19, 0.19));
     // the autopilot panel along the glare shield's face: amber digits
     scr((g, w, h) => { g.fillStyle = '#060606'; g.fillRect(0, 0, w, h); g.fillStyle = '#ffb02a'; g.font = '700 30px monospace'; g.fillText('136      270      V/S -700      2000', 24, h * 0.72); }, 1024, 48, E[0] - 0.555, E[1] - 0.21, 0, 0.9, 0.042, Math.PI / 2, 0);
   }
   // ---- the control tower's cab (40 m up): its consoles' screens, a controller (black against the lights outside), the
   // window posts
   {
-    const c = [2050, ry + 38.0, R.z - 390], eye = [c[0] - 4.6, c[1] + 1.65, c[2] + 3.2], at = [eye[0] + 766, ry - 105, eye[2] + 643]; out.cab = { eye, at };
+    const c = [2050, ry + 38.0, R.z - 390], eye = [c[0] - 4.6, c[1] + 1.65, c[2] + 3.2], at = [eye[0] + 766, ry - 200, eye[2] + 643]; out.cab = { eye, at };   // (tilted down: the scope and the strips clear of the captions)
     const blk = nbStd('#1a1c20', 0.6), d = new THREE.Vector3(at[0] - eye[0], 0, at[2] - eye[2]).normalize(), rgt = new THREE.Vector3(-d.z, 0, d.x), yaw = Math.atan2(d.x, d.z);
     const P = (f, r, y) => [eye[0] + d.x * f + rgt.x * r, y, eye[2] + d.z * f + rgt.z * r];
     for (let a = 0; a < 12; a++) { const q = a / 12 * Math.PI * 2; nbBox(0.12, 5.6, 0.12, blk, c[0] + 8.7 * Math.cos(q), c[1] + 3, c[2] + 8.7 * Math.sin(q)); }
@@ -321,12 +331,12 @@ function nbBuildValley(S, W) {
   };
   out.airportLamps = (Lm, s) => {
     const x0 = R.x[0], x1 = R.x[1], z = R.z, y = ry + 0.5;
-    for (let x = x0; x <= x1; x += 30) { Lm.add(x, y, z - 23.5, 0.3, 4.6, 4.3, 3.8); Lm.add(x, y, z + 23.5, 0.3, 4.6, 4.3, 3.8); }        // the edges
+    for (let x = x0; x <= x1; x += 30) { Lm.add(x, y, z - 23.5, 0.55, 6.4, 6.0, 5.3); Lm.add(x, y, z + 23.5, 0.55, 6.4, 6.0, 5.3); }        // the edges
     for (let x = x1 - 900; x <= x1; x += 30) for (const k of [-1, 1]) for (let j = 0; j < 3; j++) Lm.add(x, y - 0.4, z + k * (5 + j * 1.5), 0.13, 2.8, 2.8, 2.5);   // the touchdown zone's bars
-    for (let x = x0 + 15; x <= x1; x += 15) Lm.add(x, y - 0.4, z, 0.16, 3.4, 3.4, 3.1);                                                  // the centreline
+    for (let x = x0 + 15; x <= x1; x += 15) Lm.add(x, y - 0.4, z, 0.3, 4.8, 4.8, 4.3);                                                  // the centreline
     for (let k = -22; k <= 22; k += 3) { Lm.add(x1 + 1, y, z + k, 0.2, 0.4, 3.6, 0.8); Lm.add(x0 - 1, y, z + k, 0.2, 3.6, 0.3, 0.2); }   // threshold green, end red
     // the approach lights: bars of five every 30 m out to 900 m, a crossbar at 300 m; the "rabbit" racing in, twice a second
-    for (let d = 30; d <= 900; d += 30) { const ya = ry + 0.6 + d * 0.004; for (let k = -2; k <= 2; k++) Lm.add(x1 + d, ya, z + k * 1.0, 0.22, 4.4, 4.2, 3.6); if (d === 300) for (let k = -15; k <= 15; k += 1.5) Lm.add(x1 + d, ya, z + k, 0.15, 3.2, 3.0, 2.6); }
+    for (let d = 30; d <= 900; d += 30) { const ya = ry + 0.6 + d * 0.004; for (let k = -2; k <= 2; k++) Lm.add(x1 + d, ya, z + k * 1.0, 0.4, 6.0, 5.7, 4.9); if (d === 300) for (let k = -15; k <= 15; k += 1.5) Lm.add(x1 + d, ya, z + k, 0.15, 3.2, 3.0, 2.6); }
     const ra = ((s * 2) % 1 + 1) % 1, rd = 900 - ra * 870; Lm.add(x1 + rd, ry + 1.2 + rd * 0.004, z, 0.6, 9, 9, 9);
     // the PAPI (left of the runway, 300 m in): two red, two white: on the glide path
     for (let k = 0; k < 4; k++) Lm.add(x1 - 300, y, z + 32 + k * 9, 0.28, k < 2 ? 4.2 : 4.2, k < 2 ? 0.4 : 4.0, k < 2 ? 0.3 : 3.6);

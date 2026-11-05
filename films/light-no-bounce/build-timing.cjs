@@ -1,15 +1,14 @@
 /* =====================================================================
-   BUILD-TIMING — the caption half of the master timeline for "What if the speed of light increased and couldn't
-   seconds?" (voiceless, like the Slower light film: captions and sound only).
+   BUILD-TIMING — the caption half of the master timeline for "What if light stopped bouncing for 10 seconds?"
+   (voiceless, like the Slower light film: captions and sound only).
      node films/light-no-bounce/build-timing.cjs
    Reads CAPTIONS.md and places every caption at reading pace: PAUSE[k] = the empty screen before beat k's first
    caption; inside a beat each caption holds for hold(chars) and the next follows after GAP. Every beat in script.js
    keys off these captions' words (each word gets an anchor time inside its caption), and so does the story clock (which
-   which second after 9 PM we are watching, and how slowly), so changing a pause or a line here re-times the whole film.
+   second after 3:30 PM we are watching, and how slowly), so changing a pause or a line here re-times the whole film.
    Writes timing.js (window.NBT). Pure data: no clock, no randomness.
    Retention (the owner's playbook, 2026-10-28): no dead air, a new thing to see every few seconds; the long pauses are
-   only where the picture itself is the reveal (the city going dark, the helium plume, the stadium, the Milky Way, the
-   stars going out).
+   only where the picture itself is the reveal (the Moon going out, the black sky, the shape in front of you, Saturn).
    ===================================================================== */
 const fs = require('fs');
 const path = require('path');
@@ -17,14 +16,14 @@ const path = require('path');
 const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
-  title: 0.05, start: 1.0, moon: 1.4, sources: 2.0, mirror: 2.2, hands: 1.8, sky: 2.0, moongone: 4.4, sun: 2.2, real: 1.6, crowd: 2.2, near: 2.6, road: 2.6, plane: 2.6, coaster: 2.6, dodgems: 2.4, space: 2.8,
-  fire: 2.4, net: 2.6, heat: 2.4, saturn: 2.6, pupils: 2.0, count: 2.4, back: 1.6, reveal: 2.0, moonback: 2.0, crash: 2.6, after: 2.6, echo: 3.0, question: 1.0,
+  title: 0.05, start: 0.9, moon: 1.4, sources: 2.0, hands: 1.8, sky: 2.0, moongone: 4.4, sun: 2.2, real: 1.6, crowd: 2.2, near: 2.6, road: 2.4, plane: 2.4, still: 3.0, coaster: 2.4, space: 2.6,
+  fire: 2.2, net: 2.4, closer: 3.0, heat: 2.2, saturn: 2.4, pupils: 2.0, count: 1.4, back: 6.2, reveal: 0.4, moonback: 2.6, crash: 2.2, after: 2.4, echo: 3.0, question: 1.0,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'start:1': 0.6, 'moon:1': 2.0, 'sources:1': 1.2, 'mirror:1': 0.8, 'hands:1': 1.0, 'sky:1': 1.0, 'sun:1': 1.2, 'real:1': 0.6,
-  'crowd:1': 1.0, 'road:1': 0.8, 'road:2': 1.2, 'road:3': 0.8, 'coaster:1': 1.2, 'plane:1': 1.0, 'plane:2': 1.0, 'plane:3': 1.0, 'space:1': 1.4, 'pupils:1': 0.8, 'fire:1': 1.0, 'net:1': 0.8, 'net:2': 0.8, 'net:3': 1.0,
-  'heat:1': 0.8, 'heat:2': 0.8, 'saturn:1': 1.0, 'saturn:2': 0.8, 'count:1': 1.2, 'back:1': 1.0, 'after:1': 1.0, 'echo:1': 1.2, 'echo:2': 1.6, 'after:2': 1.0,
+  'start:1': 0.6, 'moon:1': 2.0, 'sources:1': 1.2, 'hands:1': 1.0, 'sky:1': 1.0, 'sun:1': 1.2, 'real:1': 0.6,
+  'crowd:1': 1.0, 'road:1': 0.8, 'road:2': 0.8, 'road:3': 1.0, 'closer:1': 1.2, 'coaster:1': 1.0, 'plane:1': 0.8, 'plane:2': 0.8, 'space:1': 1.2, 'pupils:1': 0.8, 'fire:1': 0.8, 'net:1': 0.6, 'net:2': 0.8,
+  'heat:1': 0.8, 'saturn:1': 1.0, 'saturn:2': 0.8, 'after:1': 1.0, 'echo:1': 1.2, 'echo:2': 1.6,
 };
 const SECTION_OF = { title: 1, back: 2, echo: 3 };
 const GAP = 0.6;                     // between captions inside a beat

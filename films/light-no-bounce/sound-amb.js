@@ -8,7 +8,7 @@
      the fence      wind over the valley, the motorway far below (jammed after the crash), the fair behind you; a jet far
                     off while the plane comes in
      a car          the engine, the road, the wind on the glass
-     the verge      the motorway's rumble and the cars going past
+     the verge      the motorway's rumble and the cars going past; after the crash, the jam: idling engines and wind
      the flight deck  the air conditioning, the engines, the avionics fans; the tower: a quiet room, fans, the wind
      beside the plane  the jet's roar and its fan's whine
      the coaster    the wind of the ride and the track's rumble
@@ -42,6 +42,12 @@ nbSound('amb', 'beds', function (ctx, bus, K) {
         break;
       }
       case 'verge': {
+        if (m === 'crash') {   // the jam after the crash: nothing going past, engines idling, the wind
+          nbBedW(K, a, b, { colour: 'pink', f: [['bp', 420, 0.5], ['lp', 1300]], vol: 0.1, am: 0.6, wr: 0.3, fi, fo });
+          nbTone(K, a, d, W(32), [[1, 1], [2, 0.6], [3, 0.3], [4, 0.15]], ed, { vol: 0.03, pan: 0.35 });
+          nbBedW(K, a, b, { colour: 'brown', f: [['lp', 220]], vol: 0.06, am: 0.2, fi, fo });
+          break;
+        }
         nbBedW(K, a, b, { colour: 'brown', f: [['lp', 520]], vol: 0.11, am: 0.4, wr: 0.5, fi, fo });
         nbBedW(K, a, b, { colour: 'pink', f: [['bp', 800, 0.5], ['lp', 2500]], vol: 0.07, am: 0.8, wr: 0.6, fi, fo });
         nbBedW(K, a, b, { colour: 'pink', f: [['bp', 400, 0.5], ['lp', 1200]], vol: 0.07, am: 0.6, wr: 0.3, fi, fo });

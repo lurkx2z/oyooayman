@@ -18,17 +18,21 @@ Object.assign(NB_POSES, {
   freeze: () => { const p = basePose(); p.lSh = [0.45, 0.25]; p.rSh = [0.5, 0.25]; p.lEl = 0.9; p.rEl = 0.85; p.neck = -0.05; p.lKnee = 0.12; p.rKnee = 0.1; return p; },
 });
 
-// the bear's walk (x, z, facing; a pose): along the path towards you, startled still in the dark, then groping across in
-// front of you (between you and the stalls' lights) and, from 3:30:05, turning to the sound of you and shuffling closer
+// the bear's walk (x, z, facing): along the path behind you (in the mirror, over your shoulder, at 3:29:59), startled
+// still in the dark; then groping away and back across in front of the DOUGHNUTS stall (its ears over the lit sign, from
+// where you stand, as "something passed" at 3:30:03.2), standing there ("It hasn't moved", 3:30:04.4), closer
+// (3:30:05.8), and through the count right up to you (1.25 m away at 3:30:09.2). Story times: script.js / timing.js.
 const NB_BEAR_K = [
-  // s, x, z, yaw (0 faces south, +z)
-  [-12, 19.4, 1.75, -Math.PI / 2], [0.6, 3.02, 1.75, -Math.PI / 2], [1.3, 3.0, 1.75, -Math.PI / 2], [4.6, 0.12, 1.85, -Math.PI / 2 - 0.25],
-  [5.6, -0.12, 1.8, -2.5], [6.4, -0.1, 1.72, Math.PI], [9.2, 0.06, 1.3, Math.PI - 0.06], [30, 0.06, 1.3, Math.PI - 0.06],
+  // s, x, z, yaw (0 faces south, +z; −π faces north, towards you)
+  [-12, 14.0, 2.5, -Math.PI / 2], [-0.6, 0.95, 2.45, -Math.PI / 2], [0.6, 0.95, 2.45, -2.9], [1.3, 0.95, 2.45, -2.9],
+  [2.5, 1.9, 4.1, -Math.PI / 2 - 0.2], [3.6, 0.45, 4.1, -Math.PI / 2 - 0.35], [4.1, 0.45, 4.1, -Math.PI], [4.7, 0.45, 4.1, -Math.PI],
+  [5.75, 0.3, 3.0, -Math.PI], [6.1, 0.3, 2.9, -Math.PI], [6.9, 0.3, 2.9, -Math.PI], [9.2, 0.1, 1.85, -Math.PI + 0.05], [30, 0.1, 1.85, -Math.PI + 0.05],
 ];
 function nbBearAt(s) {
   const K = NB_BEAR_K; let i = 0; while (i < K.length - 2 && s >= K[i + 1][0]) i++;
   const a = K[i], b = K[i + 1], u = MathX.clamp((s - a[0]) / (b[0] - a[0]), 0, 1), e = i === 0 ? u : u * u * (3 - 2 * u);
-  return { x: nbLerp(a[1], b[1], e), z: nbLerp(a[2], b[2], e), yaw: nbLerp(a[3], b[3], e), moving: i !== 1 && i < K.length - 2 && u < 1 ? 1 : 0, walk: i === 0 };
+  const moving = i > 0 && u < 1 && Math.hypot(b[1] - a[1], b[2] - a[2]) > 0.05 ? 1 : 0;
+  return { x: nbLerp(a[1], b[1], e), z: nbLerp(a[2], b[2], e), yaw: nbLerp(a[3], b[3], e), moving, walk: i === 0 };
 }
 
 function nbBuildPeople(S, W) {
@@ -90,7 +94,8 @@ function nbBuildPeople(S, W) {
       nbMesh(new THREE.SphereGeometry(0.028, 12, 8), black, sx * 0.085, 0.09, 0.2, H); nbMesh(new THREE.SphereGeometry(0.008, 6, 4), nbStd('#ffffff', 0.2), sx * 0.085 + 0.008, 0.1, 0.226, H); }
     nbMesh(new THREE.SphereGeometry(0.11, 18, 12), cream, 0, -0.02, 0.19, H).scale.set(1.1, 0.8, 0.9);
     nbMesh(new THREE.SphereGeometry(0.035, 12, 8), black, 0, 0.02, 0.29, H).scale.set(1.3, 0.9, 0.8);
-    const smile = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.008, 6, 16, Math.PI), black); smile.position.set(0, -0.045, 0.27); smile.rotation.z = Math.PI; H.add(smile);
+    // the mouth: a slack, open black hole in the costume's face (no smile: up close, a mascot's head is a mask)
+    nbMesh(new THREE.SphereGeometry(0.042, 14, 10), nbStd('#050506', 0.9), 0, -0.075, 0.245, H).scale.set(1.05, 0.8, 0.45);
     // a red bow tie, a cream tummy
     for (const sx of [-1, 1]) { const b = nbMesh(new THREE.ConeGeometry(0.06, 0.1, 4), nbStd('#c8202a', 0.6), sx * 0.05, 0.47, 0.12, p.j.spine); b.rotation.z = sx * Math.PI / 2; }
     nbMesh(new THREE.SphereGeometry(0.17, 16, 12), cream, 0, 0.2, 0.06, p.j.spine).scale.set(1, 1.2, 0.5);
@@ -110,7 +115,8 @@ function nbBuildPeople(S, W) {
 
   // ---- you: only ever seen in the mirror (layer 1), filming yourself with your phone
   {
-    const p = nbPerson('nbYou', scene, { id: 'you' }); nbPose(p, NB_POSES.film(), NB_F.you[0], 0, NB_F.you[2], Math.PI);
+    const p = nbPerson('nbYou', scene, { id: 'you' }), yp = NB_POSES.film(); yp.rSh = [0.85, -0.25]; yp.rEl = 1.25; yp.neck = 0.04;   // (the phone at your chest: your face shows)
+    nbPose(p, yp, NB_F.you[0], 0, NB_F.you[2], Math.PI);
     givePhone(p); p.root.traverse((m) => m.layers.set(1));
     out.you = p;
   }
@@ -136,7 +142,7 @@ function nbBuildPeople(S, W) {
     }
     // the bear
     { const B = out.bear, b = nbBearAt(s), pose = b.walk ? nbWalkPose(s * 1.3 / 1.32 * Math.PI * 2 * 1.0, 0.9) : (s < 0.6 ? basePose() : NB_POSES.grope(s * 2.1));
-      if (s > NBP.T) { pose.lSh = [0.4, 0.3]; pose.rSh = [0.5, 0.3]; pose.neck = 0.1; }
+      if (s > NBP.T) { pose.lSh = [1.05, 0.22]; pose.rSh = [1.15, 0.2]; pose.lEl = 0.55; pose.rEl = 0.5; pose.neck = 0.06; }   // paws up, reaching: it was groping for you
       if (b.moving && !b.walk) { const ph = s * 2.4; pose.lHip = [0.22 * Math.sin(ph), 0.05]; pose.rHip = [-0.22 * Math.sin(ph), 0.05]; pose.lKnee = 0.1 + 0.3 * Math.max(0, Math.cos(ph)); pose.rKnee = 0.1 + 0.3 * Math.max(0, -Math.cos(ph)); }
       nbPose(B.p, pose, b.x, 0, b.z, b.yaw); B.p.root.updateMatrixWorld(true);
       B.p.j.la.hand.getWorldPosition(tmp);
@@ -155,9 +161,11 @@ function nbBuildPeople(S, W) {
   // phone screens far off and the torches (LEDs: sources that light nothing)
   out.lamps = (L, s) => {
     for (const q of out.far) { if (!q.ph) continue;
-      if (s > 3000 && q.ex != null) { L.add(q.ex - 0.25, 1.55 + 0.12 * (q.k % 2), q.ez + 0.12, 0.05, 1.1, 1.3, 1.6); continue; }   // (filming Saturn)
-      const up = s >= 0 && s < NBP.T + 2 ? 1.0 : 0.6, hi = q.k % 3 !== 1, a = q.k * 2.39996; L.add(q.x + 0.36 * Math.cos(a), 1.3 + 0.3 * up * (hi ? 1 : 0.3), q.z + 0.36 * Math.sin(a), 0.06, 2.3, 2.6, 3.1);
+      if (s > 3000 && q.ex != null) { L.add(q.ex - 0.22, 1.95 + 0.1 * (q.k % 3), q.ez + 0.12, 0.06, 1.5, 1.8, 2.2); continue; }   // (held up, filming Saturn)
+      const up = s >= 0 && s < NBP.T + 2 ? 1.0 : 0.6, hi = q.k % 3 !== 1, a = q.k * 2.39996; L.add(q.x + 0.36 * Math.cos(a), 1.3 + 0.3 * up * (hi ? 1 : 0.3), q.z + 0.36 * Math.sin(a), up > 0.9 ? 0.26 : 0.12, 2.2, 2.7, 3.6);   // (cool white: a screen, held up in the dark, glares bigger than a bulb)
       if (s > 2 + (q.k % 7) * 0.6 && s < NBP.T + 4 && q.k % 4 === 0) L.add(q.x + 0.38 * Math.cos(q.k * 2.39996), 1.5, q.z + 0.38 * Math.sin(q.k * 2.39996), 0.05, 6, 6, 5.5); }
+    // the screens of the phones held up near you (an OLED screen makes its own light): a bright point each
+    for (const q of out.people) { if (!q.ph || s < 0 || s > NBP.T + 3) continue; q.p.phoneG.updateMatrixWorld(); tmp.set(0, 0, 0.006).applyMatrix4(q.p.phoneG.matrixWorld); L.add(tmp.x, tmp.y, tmp.z, 0.14, 1.9, 2.3, 3.0); }
     for (const q of out.people) { if (!q.ph || !(s > q.torch && s < NBP.T + 3)) continue; q.p.phoneG.updateMatrixWorld(); tmp.set(0, 0.06, -0.008).applyMatrix4(q.p.phoneG.matrixWorld); L.add(tmp.x, tmp.y, tmp.z, 0.03, 7, 7, 6.4); }
   };
   // the juggler's flames (additive soft points): long tongues streaming up off each wick, in slow motion

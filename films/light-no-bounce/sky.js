@@ -4,10 +4,10 @@
    21 November 2026 from 51.5° N (local sidereal time 19.6 h), approximately.
    While nothing scatters (physics.js), the dome is black: what is left is what makes or carries its own light.
      the dome        scattered sunlight: × bounce (and the dusk colours at 4:42 PM)
-     the Sun        a disc and a small glare; orange through 11 air masses when the air scatters, white and 3× brighter
+     the Sun        a disc and a small glare; orange through ~12 air masses when the air scatters, white and 3–10× brighter
                      when it doesn't
-     the Moon       sunlit (an 11.6-day gibbous), its light 1.28 s old: NBP.moonOn
-     Saturn         0.7 mag, its light 72 minutes old: NBP.saturnOn
+     the Moon       sunlit (an 11.6-day gibbous), its light 1.24 s old: NBP.moonOn
+     Saturn         0.7 mag, its light 73 minutes old: NBP.saturnOn
      the stars      shown down to the limiting magnitude of your eyes at that moment (NBP.limMag): the bright ones
                      first, more as your pupils open
      nbBuildSky(scene, o) → { dirOf(raH, decDeg), sunDir, update(s, { bounce, dusk, lim, px }) }
@@ -148,7 +148,7 @@ function nbBuildSky(scene, o = {}) {
       sunG.visible = dusk < 0.5;
       const gs = R * (0.11 * b + 0.035 * white) * (o2.glareK ?? 1);
       glare.scale.set(gs, gs, 1); glare.material.color.setRGB(1.0, 0.78 + 0.2 * white, 0.5 + 0.45 * white).multiplyScalar((0.9 * b + 0.5 * white) * (o2.glareI ?? 1));
-      // the Moon: its light is 1.28 s old
+      // the Moon: its light is 1.24 s old
       moon.visible = NBP.moonOn(s);
       moon.material.uniforms.day.value = b * (1 - dusk); moon.material.uniforms.k.value = o2.moonK ?? 1;
     },

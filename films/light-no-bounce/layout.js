@@ -1,7 +1,7 @@
 /* =====================================================================
    LAYOUT — where everything is (classic script: globals). Metres. Axes: x EAST, y up, z SOUTH (north is −z).
    A travelling funfair on a hilltop common above a market town in southern England (51.5° N), Saturday 21 November
-   2026, 3:30 PM: the Sun 3.8° up in the south-west (azimuth 230°), the waxing gibbous Moon rising in the east with Saturn
+   2026, 3:30 PM: the Sun 3.9° up in the south-west (azimuth 230°), the waxing gibbous Moon rising in the east with Saturn
    near it. The hill falls away to the east into a valley: the motorway along its floor, the town beyond, the airport's
    runway to the south-east. You stand on the fair's main path in front of the Fun House's mirrors.
    ===================================================================== */
@@ -30,9 +30,10 @@ const NB_F = {
 
 // the sky at 3:30 PM, 21 November 2026, 51.5° N: local sidereal time 19.6 h (Vega and Altair high in the south-west,
 // Capella in the north-east, the Plough low in the north)
-const NB_SKY = { lat: 51.5, lst: 19.58 };
-// sun, moon, planet (RA hours, Dec degrees; the Sun's is 3:30 PM's; the Moon 11.6 days old, 85% lit)
-const NB_BODIES = { sun: [15.93, -20.2], moon: [1.32, 6.5], saturn: [0.30, -1.9] };
+const NB_SKY = { lat: 51.5, lst: 19.476 };
+// sun, moon, planet (RA hours, Dec degrees, as seen from the hilltop at 3:30 PM, from an ephemeris: the Sun 3.9° up at
+// azimuth 230°; the Moon 12 days old, 88% lit, 11.6° up at azimuth 88°; Saturn 9.1° up at azimuth 100°, 12.5° from it)
+const NB_BODIES = { sun: [15.808, -20.01], moon: [1.107, 10.47], saturn: [0.575, 0.87] };
 
 // the ground's height (x east): the flat hilltop, the fall into the valley all round, the far side rising to the east;
 // flattened under the motorway (a shallow cutting) and the airport
