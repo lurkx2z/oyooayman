@@ -98,7 +98,7 @@ const MG_PLACE = {
   deck: ['ext1', 'lorryExt', 'cabIn', 'cabWide', 'carsWide', 'carsNew', 'carsOld', 'gantry', 'skyUp', 'walkDeck', 'walkLong', 'walkPOV', 'alertPhone', 'alertRead', 'finalVia', 'question'],
   river: ['trainHigh', 'trainCab', 'barge', 'bargeHit', 'leaders'],
   high: ['planeExt', 'planeMap', 'hold'],
-  cockpit: ['cockpit', 'cockpitDoor', 'fuel', 'cockpitApp', 'flaps', 'land3', 'finalCock'],
+  cockpit: ['cockpit', 'seats', 'cockpitDoor', 'fuel', 'cockpitApp', 'flaps', 'land3', 'finalCock'],
   cabin: ['cabinAisle', 'keypad', 'cabinPax', 'doorWait', 'cabinHalf'],
   tower: ['towerIn', 'radar', 'ctl', 'towerRead', 'finalTower'],
   field: ['towerExt', 'stack', 'touchdown'],

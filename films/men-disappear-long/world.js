@@ -145,7 +145,7 @@ function mgBuildRiver(S) {
   const zs = mgRange(-30000, 30000, 1200), pos = [], idx = [], w = MG_V.riverW + 9;
   zs.forEach((z, i) => { const x = mgRiverX(z); pos.push(x - w, -1.25, z, x + w, -1.25, z); if (i) { const a = 2 * (i - 1); idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } });
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
-  const mat = new THREE.MeshStandardMaterial({ color: '#3b4c4e', roughness: 0.18, metalness: 0.0, envMapIntensity: 1.6, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -6 });
+  const mat = new THREE.MeshStandardMaterial({ color: '#2a5560', roughness: 0.26, metalness: 0.0, envMapIntensity: 0.9, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -6 });
   // ripples: a slow normal wobble in the shader (a pure function of the uniform time)
   const U = { uT: { value: 0 } };
   mat.onBeforeCompile = (sh) => {

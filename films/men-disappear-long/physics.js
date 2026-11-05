@@ -6,15 +6,16 @@
    (and falls). Babies not yet born stay (that is the twist of the maternity ward).
 
    SOURCES (rounded; PLAN.md § 2):
-   - world population mid-2026 ≈ 8.25 billion, 50.0–50.3% male (UN World Population Prospects 2024): 4.12 billion
+   - world population mid-2026 ≈ 8.30 billion, about 101 men to 100 women (UN World Population Prospects 2024): 4.17 billion
+     men and boys, 4.13 billion women and girls
    - births ≈ 132 million a year (UN WPP 2024), 105 boys to 100 girls: 132e6 × 0.512 / 31.56e6 s = 2.14 boys a second;
      pregnancies that end in a birth within 9 months ≈ 132e6 × 0.75 ≈ 99 million, half boys: ≈ 50 million boys
    - airline pilots: about 5% are women (ISWAP / IATA, 2023-24): 19 in 20 are men; both pilots men: 0.95² ≈ 9 in 10
-   - airliners airborne at once: about 9,000–10,000 at the daily peak (flight trackers)
+   - airliners airborne at once: about 9,000 (rough; flight trackers)
    - the cockpit door: the cabin crew's emergency code unlocks it after a 30-second delay unless someone inside denies it
-   - firefighters: about 9% women (UK Home Office 2024, US NFPA); air traffic controllers ≈ 18–25% women
-   - lorry drivers in Europe: about 3% women (IRU 2023); heads of state or government: 27 of 193 countries are led by
-     a woman (UN Women, 2025), so 166 of 193 were led by a man
+   - firefighters: about 9% women (England, Home Office 2024; US NFPA); air traffic controllers about 1 in 5 women (ICAO)
+   - lorry drivers in Europe: about 3% women (IRU 2023); heads of state or government: 28 of 193 countries are led by
+     a woman (UN Women, "Women in politics: 2026", 1 January 2026), so 165 of 193 were led by a man
    - an electronic parking brake held while driving brakes the car hard through its stability system (owner's manuals:
      Hyundai, Kia, VW, BMW); about 6.5 m/s² here
    ===================================================================== */
@@ -25,8 +26,9 @@ const MGP = (() => {
   const P = {};
 
   // ---- people
-  P.men0 = 4121384560;                    // men and boys alive at 7:41:59 AM
+  P.men0 = 4171482560;                    // men and boys alive at 7:41:59 AM
   P.women0 = 4128702340;                  // women and girls
+  P.menGone = P.men0 + 2;                 // the count the instant before 7:42 (what vanished)
   P.boysPerS = 2.14;                      // boys born per second, worldwide
   P.boysDue = 50e6;                       // boys not yet born, due in the next nine months
   // the counter: men and boys on Earth (before 7:42 it creeps up: births minus deaths ≈ 0.9 a second)
@@ -99,7 +101,7 @@ const MGP = (() => {
   P.landMin = 15;                                                   // minutes to talk one plane down
   P.pilotsMale = 0.95;
   P.airborne = 9000;
-  P.leadersMan = [166, 193];
+  P.leadersMan = [165, 193];
   return P;
 })();
 if (typeof module !== 'undefined') module.exports = { MGP };

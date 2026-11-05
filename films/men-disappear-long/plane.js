@@ -135,15 +135,17 @@ function mgBuildCabin(A) {
     const win = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.24, 0.34), M.sky, 80), o = new THREE.Object3D(); let i = 0;
     for (let x = L0 + 1; x < L1 - 0.6; x += P.pitch) for (const sd of [-1, 1]) { o.position.set(x, 0.42, sd * 1.8); o.rotation.set(0, sd > 0 ? Math.PI : 0, 0); o.lookAt(x, 0.42, 0); o.updateMatrix(); if (i < 80) win.setMatrixAt(i++, o.matrix); }
     win.count = i; IN.add(win); IN.win = win; }
-  // ---- the seats: 28 rows, 3 + 3 (seat pan, back, headrest cover), facing forward (+x)
+  // ---- the seats: 28 rows, 3 + 3 (seat pan, back, headrest cover), facing forward (+x); the cover wraps the back by
+  // 1 cm on every side (no shared faces: no flicker)
   { const rows = [];
     for (let r = 0; r < P.rows; r++) { const x = P.row0 - r * P.pitch; rows.push(x);
-      for (const z of [-1.28, -0.8, -0.32, 0.32, 0.8, 1.28]) { B.box(0.46, 0.12, 0.44, M.seat, x, fy + 0.46, z); B.box(0.1, 0.62, 0.44, M.seat, x - 0.24, fy + 0.8, z); B.box(0.11, 0.16, 0.36, M.head, x - 0.245, fy + 1.03, z); } }
+      for (const z of [-1.28, -0.8, -0.32, 0.32, 0.8, 1.28]) { B.box(0.46, 0.12, 0.44, M.seat, x, fy + 0.46, z); B.box(0.1, 0.62, 0.44, M.seat, x - 0.24, fy + 0.8, z); B.box(0.12, 0.17, 0.37, M.head, x - 0.24, fy + 1.035, z); } }
     IN.rows = rows; }
   // ---- the galley and the cockpit door (with its keypad) at x = P.door; the door swings open into the cockpit
   { B.box(0.12, 2.1, 1.2, M.wall2, P.door, fy + 1.05, -1.25); B.box(0.12, 2.1, 1.2, M.wall2, P.door, fy + 1.05, 1.25); B.box(0.12, 0.3, 1.4, M.wall2, P.door, fy + 2.0, 0);
-    const door = new THREE.Group(); door.position.set(P.door, fy, -0.55); IN.add(door); IN.door = door;
-    const dp = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.86, 1.08), M.door); dp.position.set(0, 0.93, 0.54); door.add(dp);
+    // (hung 11 cm on the cockpit side of the bulkhead and 3 cm wider than the opening each side: no gap when it's shut)
+    const door = new THREE.Group(); door.position.set(P.door + 0.11, fy, -0.68); IN.add(door); IN.door = door;
+    const dp = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.9, 1.36), M.door); dp.position.set(0, 0.95, 0.68); door.add(dp);
     const kp = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.16, 0.1), M.black); kp.position.set(-0.18, 1.25, -0.72); IN.add(kp);
     IN.keyLed = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.025, 0.025), new THREE.MeshBasicMaterial({ color: '#ff3020' })); IN.keyLed.position.set(-0.2, 1.32, -0.72); IN.keyLed.position.x += P.door; IN.add(IN.keyLed);
     kp.position.x += P.door; }
@@ -212,7 +214,7 @@ function mgDrawScreen(g, w, h, st) {
     g.fillStyle = '#ffd400'; g.fillRect(118, 146, 30, 7); g.fillRect(172, 146, 30, 7); g.fillRect(157, 146, 7, 7);
     g.fillStyle = '#111'; g.fillRect(4, 50, 60, 200); g.fillRect(256, 50, 60, 200);
     g.fillStyle = '#fff'; g.fillText(String(kt), 10, 158); g.fillText(String(Math.round(ft / 10) * 10), 258, 158);
-    g.fillStyle = '#7cff9a'; g.font = '600 18px monospace'; g.fillText(st.land3 ? 'LAND 3' : 'CMD', 120, 30); g.fillText(st.mode || 'LNAV  VNAV', 70, 282);
+    g.fillStyle = '#7cff9a'; g.font = '600 18px monospace'; g.fillText(st.land3 ? 'CAT 3 DUAL' : 'CMD', 95, 30); g.fillText(st.mode || 'LNAV  VNAV', 70, 282);
     g.fillStyle = '#fff'; g.fillText(String(Math.round(((st.hdg * 57.3) % 360 + 360) % 360)).padStart(3, '0'), 140, 308);
   } else if (st.what === 'nd') {
     g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(160, 230, 150, Math.PI * 1.15, Math.PI * 1.85); g.stroke();

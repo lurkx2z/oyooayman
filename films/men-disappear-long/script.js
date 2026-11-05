@@ -82,7 +82,7 @@ MG.sBirth = mgStoryAt(mgC('ward', 2) + 0.2);              // the boy is born
 MG.sOverViaduct = mgStoryAt(mgC('final', 0) + 3.5);       // flight 2207 crosses the motorway (2,120 m before touchdown)
 MG.sTD = MG.sOverViaduct + 2120 / 72;                     // and touches down 29 s later (72 m/s down the beam)
 MG.sFlap = mgStoryAt(mgC('autoland', 1) + 1.0);           // she sets the flaps, the wheels
-MG.sLand3 = mgStoryAt(mgC('autoland', 3) + 0.3);          // the three autopilots lock on to the beam
+MG.sLand3 = mgStoryAt(mgC('autoland', 3) + 0.3);          // both autopilots lock on to the beam
 MG.sOverhead = mgStoryAt(mgC('plane', 0) + 0.4);          // flight 2207 passes overhead at 11,000 m
 MGP.sEmpty = Math.round(mgStoryAt(mgC('alone', 0) + 0.5) + 3 * 3600 + 20 * 60 + 25);   // "3 hours 20 minutes of fuel"
 if (MG.sDoor > mgStoryAt(mgS('alone'))) throw new Error('the cockpit door opens after the "alone" beat starts');

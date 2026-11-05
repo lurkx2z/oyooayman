@@ -52,8 +52,9 @@ function mgGroundY(x, z) {
   { const R = MG_V.runway, ax = Math.min(x - (R.x - 230), MG_V.apron.x[1] + 160 - x), az = Math.min(z - (R.z[0] - 900), R.z[1] + 600 - z), a = Math.min(ax, az);
     if (a > -60) y = MathX.lerp(y, 0.0, MathX.smooth(a, -60, 20)); }
   // the motorway's corridor beyond the viaduct: a cutting at road level
-  // (it runs on 2.6 km each way, as far as the road does, and closes over it beyond: no slot through the hills)
-  if (x < MG_V.vx[0] + 20 || x > MG_V.vx[1] - 20) { const out = Math.max(MG_V.vx[0] - x, x - MG_V.vx[1]), c = (1 - MathX.smooth(Math.abs(z), 24, 90)) * (1 - MathX.smooth(out, 1800, 2500)); y = MathX.lerp(y, MG_V.deckY - 1.6, c); }
+  // (it runs on 2.6 km each way, as far as the road does, and closes over it beyond: no slot through the hills; its sides
+  // are wide and gentle, so seen end-on it is a broad dip, not a pale slot)
+  if (x < MG_V.vx[0] + 20 || x > MG_V.vx[1] - 20) { const out = Math.max(MG_V.vx[0] - x, x - MG_V.vx[1]), c = (1 - MathX.smooth(Math.abs(z), 26, 230)) * (1 - MathX.smooth(out, 1800, 2500)); y = MathX.lerp(y, MG_V.deckY - 1.6, c); }
   return y;
 }
 

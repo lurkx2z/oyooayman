@@ -38,7 +38,8 @@ const MG_SHOTS = [];
     ['B8', 'skyUp', B('plane'), c('plane', 1) - 0.5, 'world'],
     ['B9', 'cockpit', c('plane', 1) - 0.5, c('plane', 2) - 0.5, 'world'],
     ['B10', 'planeExt', c('plane', 2) - 0.5, B('world'), 'world'],
-    ['B11', 'planeMap', B('world'), B('door'), 'world'],
+    ['B11', 'planeMap', B('world'), c('world', 2) - 0.5, 'world'],
+    ['B11b', 'seats', c('world', 2) - 0.5, B('door'), 'world'],   // the two empty seats, their headsets hanging
     ['B12', 'cabinAisle', B('door'), c('door', 1) - 0.5, 'world'],
     ['B13', 'keypad', c('door', 1) - 0.5, c('door', 2) - 0.5, 'world'],
     ['B14', 'cabinPax', c('door', 2) - 0.5, c('door', 3) - 0.5, 'world'],

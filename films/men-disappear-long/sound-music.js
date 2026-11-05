@@ -265,8 +265,8 @@ mgSound('music', 'score', function (ctx, bus, K) {
   M.prog([[B('autoland'), C.Fmaj9], [c('autoland', 1), C.Cadd9], [c('autoland', 2), C.Bblyd], [c('autoland', 3), C.Gm9]], B('final') + 0.6, 0.4, { cut: 1400 });
   M.strings(B('autoland') + 1, B('final') + 0.6, ['A5', 'E6'], 0.08, { att: 2.5, rel: 0.6, cut: 4800, wave: 'triangle', vib: 2 });
   fig(c('autoland', 1) + 0.3, c('autoland', 3) - 0.3, ['C5', 'G4', 'D5', 'A4'], 0.95, 0.15, 1.2);
-  // three autopilots lock on: three bells rising
-  ['D5', 'F5', 'A5'].forEach((n, i) => M.bell(ev.land3 + i * 0.55, n, 0.3, -0.4 + 0.4 * i));
+  // both autopilots lock on: two bells rising, then the fifth
+  ['D5', 'A5', 'D6'].forEach((n, i) => M.bell(ev.land3 + i * 0.55, n, 0.3 - 0.06 * i, -0.4 + 0.4 * i));
 
   // ================================================================== 10:21 the final approach, and the landing
   M.prog([[B('final'), C.Dm9], [c('final', 1), C.Bblyd], [c('final', 2), C.Gm9], [c('final', 3), C.A7sus]], ev.td + 0.05, 0.44, { cut: 1000, cutTo: 2600, cutAt: ev.td - 0.5, lastRel: 0.05 });

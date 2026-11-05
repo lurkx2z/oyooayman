@@ -248,7 +248,7 @@ function mgBuildYourCar(S) {
       const what = s < 24 ? 'lock' : (s - 24) % 22 < 6 ? 'call' : 'failed';
       if (phone.visible && o.phone) PH.update({ s: Math.floor(s * 4) / 4, what, bars: 1 });
       phone.screen.material.color.setScalar(s < 24 ? 0.5 : 1);
-      phLight.intensity = o.inside && s >= 24 ? 0.35 : 0;
+      phLight.intensity = o.inside && s >= 24 ? 0.12 : 0;
     },
   };
   return YC;

@@ -1,8 +1,9 @@
 /* =====================================================================
    HUD — this film's overlay (DOM, in #hud; a pure function of time). The centred title is the shared StoryHUD. The
    layout is the Slower light / Friction 10s / Air solid / Speed of light films':
-     top left     MEN AND BOYS ON EARTH: 4,121,384,56x until 7:42:00.000, then 0, and from then on only the boys
-                  born since (about 2 a second)
+     top left     MEN AND BOYS ON EARTH: 4,171,482,56x until 7:42:00.000; then MEN AND BOYS VANISHED: 4,171,482,562;
+                  from the ward's "He's still here" on, MEN AND BOYS ON EARTH again: the boys born since (about 2 a second)
+     under the clock  from "She's alone up front": flight 2207's fuel, to the second, until it lands
      top right    Tuesday and the time (to the millisecond in the slow part); 9× SLOWER or REAL SPEED; "+6 min" when
                   the clock jumps at a cut (it only ever runs forward)
      under them   the scene's context box (the number this scene is about: a speed, a countdown, the fuel)
@@ -19,7 +20,7 @@ const MG_CTX = (() => {
   const kmh = (v) => `${Math.round(v * 3.6)} <small>km/h</small>`;
   const car = (t, s) => ({ v: kmh(MGP.carV(s)), v2: MGP.carDecel(s) > 0.3 ? `BRAKING · ${(MGP.carDecel(s) / 9.81).toFixed(2)} g` : s < MGP.car.sGrab ? 'CRUISE CONTROL · NOBODY STEERING' : s < MGP.car.sBrake ? 'CRUISE CONTROL · YOUR HANDS ON THE WHEEL' : MGP.carV(s) > 0 ? 'BRAKING' : 'STOPPED' });
   const lorry = (t, s) => ({ v: kmh(MGP.lorryV(s)), v2: s < MGP.lorry.sHit ? 'NOBODY AT THE WHEEL' : MGP.lorryV(s) > 0 ? 'GRINDING ALONG THE BARRIER' : 'STOPPED' });
-  const fuel = (t, s) => ({ v: `${MGP.hms(MGP.fuel(s))} <small>of fuel</small>`, v2: s > MG.sLand3 ? 'AUTOLAND: LAND 3' : s > MG.sFlap ? 'FLAPS SET · WHEELS DOWN' : 'ON AUTOPILOT · 64 PASSENGERS' });
+  const fuel = (t, s) => ({ v: `${MGP.hms(MGP.fuel(s))} <small>of fuel</small>`, v2: s > MG.sLand3 ? 'AUTOLAND · BOTH AUTOPILOTS' : s > MG.sFlap ? (mgGearAt(s) >= 1 ? 'FLAPS SET · WHEELS DOWN' : s > MG.sFlap + 3.4 ? 'FLAPS SET · WHEELS GOING DOWN' : 'FLAPS SET · WHEELS UP') : 'ON AUTOPILOT · 64 PASSENGERS' });
   const plane = (t, s) => {
     const q = mgPlaneAt(s), toGo = MG_FL.zTD - q.p[2], h = Math.max(0, q.p[1] - MG_PL.gear);
     if (s < MG.sTD) return { v: `${mgNum(h)} <small>m up</small>`, v2: `${Math.round(q.v * 3.6)} km/h · ${toGo >= 1000 ? (toGo / 1000).toFixed(1) + ' km' : Math.max(0, Math.round(toGo / 10) * 10) + ' m'} TO TOUCHDOWN` };
@@ -32,7 +33,7 @@ const MG_CTX = (() => {
     beat('cab', 'THE LORRY · 40 TONNES', lorry),
     beat('stop', 'YOUR CAR', (t, s) => ({ v: kmh(MGP.carV(s)), v2: 'THE LORRY: 3.0 m AHEAD' })),
     beat('cars', 'CARS ON THIS STRETCH', () => ({ v: `${MG_TRAFFIC.nEmpty} <small>with nobody at the wheel</small>`, v2: `${MG_TRAFFIC.nOk} STILL HAVE A DRIVER` })),
-    beat('phone', 'THE MOBILE NETWORK', (t, s) => ({ v: 'JAMMED', v2: `${(1 + 0.4 * Math.sin(s * 0.7)).toFixed(1)} BILLION CALLS AT ONCE` }), 1),
+    beat('phone', 'THE MOBILE NETWORK', (t, s) => ({ v: 'JAMMED', v2: 'FAR MORE CALLS THAN IT CAN CARRY' }), 1),
     beat('train', 'THE TRAIN', (t, s) => ({ v: kmh(MGP.trainV(s)), v2: s < MGP.train.sWarn ? 'THE PEDAL’S ALARM: 4 s' : MGP.trainV(s) > 0 ? 'EMERGENCY BRAKES ON' : 'STOPPED' })),
     beat('barge', 'THE BARGE · 86 m LONG', (t, s) => ({ v: s < MGP.barge.sHit ? kmh(MGP.barge.v) : '0 <small>km/h</small>', v2: s < MGP.barge.sHit ? 'AUTOPILOT: HEADING 180°' : 'AGROUND ON THE BANK' })),
     beat('plane', 'FLIGHT 2207', () => ({ v: '11,000 <small>m up</small>', v2: '830 km/h · AUTOPILOT ON' })),
@@ -41,14 +42,14 @@ const MG_CTX = (() => {
     // (the countdown stays up through the silent wait, until the door has opened)
     beat('alone', 'FLIGHT 2207', fuel),
     beat('tower', 'CONTROLLERS ON DUTY', () => ({ v: '2 <small>of 9</small>', v2: 'EVERY PLANE IN RANGE CALLING' })),
-    beat('smoke', 'FIREFIGHTERS LEFT', () => ({ v: '≈ 1 <small>in 10</small>', v2: 'KITCHENS BURNING: THOUSANDS' }), 2),
+    beat('smoke', 'FIREFIGHTERS LEFT', () => ({ v: '≈ 1 <small>in 10</small>', v2: 'FIRES ACROSS TOWN' }), 2),
     beat('ward', 'BOYS STILL TO BE BORN', () => ({ v: '≈ 50 <small>million</small>', v2: 'DUE IN THE NEXT 9 MONTHS' }), 4),
     beat('walk', 'CARS MOVED ON THE MOTORWAY', () => ({ v: '0', v2: 'SINCE 7:42' }), 1),
-    beat('alert', 'COUNTRIES LED ONLY BY MEN', () => ({ v: '166 <small>of 193</small>', v2: 'UNTIL 7:42' }), 2),
+    beat('alert', 'COUNTRIES LED ONLY BY MEN', () => ({ v: '165 <small>of 193</small>', v2: 'UNTIL 7:42' }), 2),
     beat('hold', 'FLIGHT 2207', fuel),
     beat('autoland', 'FLIGHT 2207', fuel),
     beat('final', 'FLIGHT 2207', plane),
-    beat('question', 'PLANES STILL CIRCLING', () => ({ v: '23', v2: 'CONTROLLERS LEFT: 2' })),
+    beat('question', 'PLANES STILL CIRCLING', () => ({ v: '23', v2: 'MOST HAVE ABOUT 1½ h OF FUEL' })),
   ];
   const d = out.find((x) => x[2] === 'THE COCKPIT DOOR'); d[1] = Math.max(d[1], Math.min(mgB('alone') - 0.1, mgFilmAt(MG.sDoor) + 3));
   return out;
@@ -56,19 +57,20 @@ const MG_CTX = (() => {
 // the honest labels (bottom left): [from, to, text]
 const MG_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [mgC(id, k0) - 0.1, (k1 != null ? mgCap(id, k1).hide : mgE(id)) + 0.2, text]; return [
   b('start', 'THE ONE IMPOSSIBLE THING: EVERY MAN AND BOY VANISHES AT 7:42. THE REST FOLLOWS FROM IT', 0),
-  b('brake', 'REAL: HELD WHILE MOVING, AN ELECTRONIC PARKING BRAKE STOPS THE CAR HARD (CAR MANUALS)', 0),
+  b('brake', 'REAL: HELD WHILE MOVING, AN ELECTRONIC PARKING BRAKE STOPS THE CAR HARD (CAR MANUALS)', 1),
   b('cab', 'LORRY DRIVERS IN EUROPE: ABOUT 3% ARE WOMEN (IRU 2023)', 1),
   b('cars', 'ROUGH: ABOUT 6 IN 10 RUSH-HOUR DRIVERS ARE MEN. ONLY NEWER CARS STOP THEMSELVES', 1),
   b('train', 'REAL: A DRIVER’S VIGILANCE PEDAL STOPS THE TRAIN IF IT IS LET GO', 1),
-  b('world', 'AIRLINE PILOTS: ABOUT 5% WOMEN (ISWAP). AIRLINERS UP AT THE DAILY PEAK: 9,000–10,000', 1),
+  b('world', 'ROUGH: ABOUT 9,000 AIRLINERS ARE UP AT ONCE. AIRLINE PILOTS: ABOUT 5% WOMEN (ISWAP)', 1),
   b('door', 'REAL: THE CREW’S CODE OPENS THE COCKPIT DOOR AFTER A DELAY UNLESS A PILOT DENIES IT', 1),
-  b('tower', 'AIR TRAFFIC CONTROLLERS: ABOUT 1 IN 5 ARE WOMEN', 0),
-  b('smoke', 'FIREFIGHTERS: ABOUT 9% WOMEN (UK HOME OFFICE 2024)', 2),
+  b('tower', 'AIR TRAFFIC CONTROLLERS: ABOUT 1 IN 5 ARE WOMEN (ICAO 2021)', 0),
+  b('smoke', 'FIREFIGHTERS: ABOUT 9% WOMEN (ENGLAND, HOME OFFICE 2024)', 2),
   b('ward', 'MIDWIVES WORLDWIDE: MORE THAN 9 IN 10 ARE WOMEN (UNFPA / WHO 2021)', 1, 1),
   b('ward', 'BIRTHS: ABOUT 132 MILLION A YEAR, 105 BOYS TO EVERY 100 GIRLS (UN 2024)', 4),
-  b('alert', 'HEADS OF STATE OR GOVERNMENT: WOMEN IN 27 OF 193 COUNTRIES (UN WOMEN 2025)', 2),
-  b('autoland', 'REAL: AUTOLAND FLIES THE APPROACH, FLARE AND ROLLOUT. A PILOT HAS TO SET IT UP', 1),
-  b('final', 'ROUGH: NO ONE HAS EVER TALKED A NON-PILOT THROUGH AN AIRLINER’S AUTOLAND', 3),
+  b('alert', 'HEADS OF STATE OR GOVERNMENT: WOMEN IN 28 OF 193 COUNTRIES (UN WOMEN, JAN 2026)', 2),
+  b('many', 'ROUGH: 15 MINUTES A PLANE AND 2 HOURS OF FUEL ARE OUR ESTIMATES', 1),
+  b('autoland', 'REAL: AUTOLAND FLIES THE APPROACH AND FLARE (OFTEN THE ROLLOUT). A PILOT SETS IT UP', 1),
+  b('final', 'AS FAR AS WE KNOW, NO NON-PILOT HAS EVER BEEN TALKED THROUGH AN AIRLINER’S AUTOLAND', 3),
 ]; })();
 // the insets: [from, to, which, where]
 const MG_INSETS = (() => { const b = (id, k0, k1, w, where = '') => [mgC(id, k0) - 0.25, (k1 != null ? mgCap(id, k1).hide : mgE(id)) + 0.3, w, where]; return [
@@ -85,11 +87,11 @@ class MgHud {
   constructor(root) {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; root.appendChild(d); return d; };
     this.ro = mk('mg-ro', '<div class="l">MEN AND BOYS ON EARTH</div><div class="v"></div><div class="s"></div>');
-    this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s');
+    this.roL = this.ro.querySelector('.l'); this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s');
     this.ctx = mk('mg-ctx', '<span class="l"></span><span class="v"></span><span class="v2"></span>');
     this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
-    this.clock = mk('mg-clock', '<div class="l"></div><div class="v"></div><div class="f"></div>');
-    this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f');
+    this.clock = mk('mg-clock', '<div class="l"></div><div class="v"></div><div class="f"></div><div class="fu"></div>');
+    this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f'); this.clockU = this.clock.querySelector('.fu');
     this.band = mk('mg-band'); this.cap = mk('mg-cap'); this.tag = mk('mg-tag');
     this.caps = MGT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: mgCapHtml(c.text), q: g.id === 'question' })));
     this.inset = mk('mg-inset');
@@ -107,9 +109,12 @@ class MgHud {
     const ra = W(t, MG.title[1] - 0.5, MG.end + 1, 0.4, 0.5);
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
-      this._html('rov', this.roV, mgNum(MGP.men(s)));
-      this._html('ros', this.roS, s < 0 ? 'HALF OF EVERYONE ALIVE' : s < 1.2 ? '<b>ALL GONE AT 7:42:00</b>' : 'BORN SINCE 7:42 · ABOUT 2 A SECOND');
-      this._cls('roc', this.ro, s >= 0 && s < 1.2 ? 'mg-ro hit' : 'mg-ro');
+      // before 7:42 the count; then what vanished; from the ward's "He's still here" the boys born since (the twist)
+      const tR = mgCap('ward', 3).show, born = t >= tR;
+      this._txt('rol', this.roL, s >= 0 && !born ? 'MEN AND BOYS VANISHED' : 'MEN AND BOYS ON EARTH');
+      this._html('rov', this.roV, mgNum(s < 0 ? MGP.men(s) : born ? MGP.men(s) : MGP.menGone));
+      this._html('ros', this.roS, s < 0 ? 'JUST OVER HALF OF EVERYONE' : !born ? (s < 1.2 ? '<b>ALL AT 7:42:00</b>' : 'ALL AT 7:42:00 · NOT ONE LEFT') : 'BORN SINCE 7:42 · ABOUT 2 A SECOND');
+      this._cls('roc', this.ro, (s >= 0 && s < 1.2) || (born && t < tR + 1.5) ? 'mg-ro hit' : 'mg-ro');
     }
     // ---- the context box
     const cx = MG_CTX.find((x) => t >= x[0] && t < x[1]);
@@ -130,6 +135,8 @@ class MgHud {
       const jl = j ? '+' + (j.ds >= 90 ? Math.round(j.ds / 60) + ' min' : Math.round(j.ds) + ' s') : '';
       const tl = rate < 0.9 ? Math.round(1 / rate) + '× SLOWER' : 'REAL SPEED';
       this._txt('ckf', this.clockF, jl ? jl + '  ·  ' + tl : tl);
+      // flight 2207's fuel stays on screen from "She's alone up front" until it lands
+      this._txt('cku', this.clockU, t < mgC('alone', 0) ? '' : s < MG.sTD ? `FLIGHT 2207 · FUEL ${MGP.hms(MGP.fuel(s))}` : 'FLIGHT 2207 · LANDED');
     }
     // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
     const gb = MGT.groups.find((g) => !g.title && t >= g.first - 0.6 && t < g.end + 0.6);
@@ -184,10 +191,10 @@ class MgHud {
   static half(u) {
     const k = MathX.smooth(u, 0.5, 1.6);
     let b = `${MgHud.plate()}<text x="30" y="56" class="t">EVERYONE ALIVE AT 7:41</text><text x="30" y="96" class="sm">WOMEN AND GIRLS · 4.13 BILLION</text>
-      <text x="30" y="256" class="sm" opacity="${(0.5 + 0.5 * k).toFixed(2)}">MEN AND BOYS · 4.12 BILLION${k > 0.5 ? ' · GONE' : ''}</text>`;
+      <text x="30" y="256" class="sm" opacity="${(0.5 + 0.5 * k).toFixed(2)}">MEN AND BOYS · 4.17 BILLION${k > 0.5 ? ' · GONE' : ''}</text>`;
     for (let i = 0; i < 20; i++) { const x = 70 + (i % 10) * 68, y = i < 10 ? 222 : 382, man = i >= 10;
       b += man ? `<g opacity="${(1 - 0.75 * k).toFixed(3)}">${MgHud.fig(x, y, 110, k > 0.5 ? 'none' : 'rgba(170,190,220,0.85)', 'rgba(246,239,226,0.6)')}</g>` : MgHud.fig(x, y, 110, '#ffcf8a'); }
-    b += `<text x="30" y="444" class="s">HALF OF EVERYONE · GONE AT 7:42</text>`;
+    b += `<text x="30" y="444" class="s">JUST OVER HALF OF EVERYONE · GONE AT 7:42</text>`;
     return MgHud.svg(b);
   }
   // 20 airline pilots: 19 men, gone; 10 cockpits, 9 empty
@@ -200,13 +207,13 @@ class MgHud {
     b += `<text x="30" y="440" class="s">9 IN 10 COCKPITS: NO ONE LEFT</text>`;
     return MgHud.svg(b);
   }
-  // 193 countries: 27 with a woman at the top
+  // 193 countries: 28 with a woman at the top
   static leaders(u) {
     const k = MathX.smooth(u, 0.3, 1.5), n = Math.round(193 * k);
     let b = `${MgHud.plate()}<text x="30" y="58" class="t">193 COUNTRIES, THEIR TOP LEADERS</text>`;
-    for (let i = 0; i < n; i++) { const c = i % 20, r = Math.floor(i / 20), x = 52 + c * 34.5, y = 110 + r * 30, w = (i * 7 + 3) % 193 < 27;
+    for (let i = 0; i < n; i++) { const c = i % 20, r = Math.floor(i / 20), x = 52 + c * 34.5, y = 110 + r * 30, w = (i * 7 + 3) % 193 < 28;
       b += w ? `<circle cx="${x.toFixed(1)}" cy="${y}" r="11" fill="#ffcf8a"/>` : `<circle cx="${x.toFixed(1)}" cy="${y}" r="10" fill="none" stroke="rgba(246,239,226,0.55)" stroke-width="2.5"/>`; }
-    b += `<circle cx="44" cy="428" r="11" fill="#ffcf8a"/><text x="66" y="437" class="sm">A WOMAN: 27</text><circle cx="330" cy="428" r="10" fill="none" stroke="rgba(246,239,226,0.55)" stroke-width="2.5"/><text x="352" y="437" class="sm">ONLY MEN: 166 · NOW GONE</text>`;
+    b += `<circle cx="44" cy="428" r="11" fill="#ffcf8a"/><text x="66" y="437" class="sm">A WOMAN: 28</text><circle cx="330" cy="428" r="10" fill="none" stroke="rgba(246,239,226,0.55)" stroke-width="2.5"/><text x="352" y="437" class="sm">ONLY MEN: 165 · NOW GONE</text>`;
     return MgHud.svg(b);
   }
   // the landing queue: 24 planes, one every 15 minutes; most have 2 hours of fuel
