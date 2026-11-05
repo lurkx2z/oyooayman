@@ -30,7 +30,7 @@ const MGP = (() => {
   P.boysPerS = 2.14;                      // boys born per second, worldwide
   P.boysDue = 50e6;                       // boys not yet born, due in the next nine months
   // the counter: men and boys on Earth (before 7:42 it creeps up: births minus deaths ≈ 0.9 a second)
-  P.men = (s) => (s < 0 ? P.men0 + Math.floor(0.9 * (s + 3)) : Math.floor(P.boysPerS * s + 0.35));
+  P.men = (s) => (s < 0 ? P.men0 + Math.floor(0.9 * (s + 3)) : Math.floor(P.boysPerS * s));
 
   // ---- your car: on cruise control at 100 km/h in the middle lane, eastbound; your dad vanishes; you grab the wheel
   // at sGrab and hold the parking-brake switch at sBrake (the brake builds up over 0.4 s, then 6.5 m/s²)

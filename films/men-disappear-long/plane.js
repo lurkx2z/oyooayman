@@ -181,7 +181,17 @@ function mgBuildCabin(A) {
     const wh = new THREE.Group(); wh.position.set(-0.04, 0.52, 0); y.add(wh); y.wheel = wh;
     for (const dz of [-0.13, 0.13]) { const h = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.14, 0.04), M.black); h.position.set(0, 0.03, dz); wh.add(h); }
     const bar = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.3), M.panel); wh.add(bar); return y; });
-  IN.levers = [-0.06, 0.06].map((z) => { const l = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.22, 0.03), M.metal); l.position.set(15.0, fy + 0.8, z); IN.add(l); return l; });
+  IN.levers = [-0.06, 0.06].map((z) => { const l = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.22, 0.03), M.metal); l.position.set(15.0, fy + 0.8, z); l.rotation.z = 0.25; IN.add(l); return l; });
+  // the flap lever (right of the thrust levers: a white T-handle that is pulled back a notch at a time) and the gear
+  // lever on the centre panel (a wheel-shaped knob), its three lights going green when the wheels are down and locked
+  { const fl = new THREE.Group(); fl.position.set(15.05, fy + 0.7, 0.2); IN.add(fl); IN.flap = fl;
+    const st = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.13, 0.018), M.metal); st.position.y = 0.065; fl.add(st);
+    const kn = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.032, 0.09), mgStd('#e8e4da', 0.5)); kn.position.y = 0.135; fl.add(kn); IN.flapKnob = kn;
+    for (let k = 0; k < 5; k++) { const d = new THREE.Mesh(new THREE.BoxGeometry(0.004, 0.002, 0.03), M.metal); d.position.set(-0.06 + k * 0.03, 0.001, 0.035); fl.add(d); } }
+  { const gr = new THREE.Group(); gr.position.set(15.6, fy + 0.62, 0.0); IN.add(gr); IN.gear = gr;
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.016, 0.016), M.metal); arm.position.x = -0.05; gr.add(arm);
+    const kn = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.02, 18).rotateZ(Math.PI / 2), mgStd('#e8e4da', 0.5)); kn.position.x = -0.1; gr.add(kn); IN.gearKnob = kn;
+    IN.gearLights = [-0.035, 0, 0.035].map((z) => { const l = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.022, 0.022), new THREE.MeshBasicMaterial({ color: '#1a2a1c' })); l.position.set(15.63, fy + 0.7, z); IN.add(l); return l; }); }
   // ---- the cockpit's light: the screens' glow, the sky through the windscreen
   IN.light = new THREE.PointLight('#dfe9ff', 0.6, 4, 1.5); IN.light.position.set(15.2, fy + 1.4, 0); IN.add(IN.light);
   return IN;

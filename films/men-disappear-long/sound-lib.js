@@ -1,8 +1,9 @@
 /* =====================================================================
    SOUND · LIB — the noise and filter generators the ambience and effects share (the gravity films' sound kit, via the
-   Air solid film, renamed mg*), and where the camera is: in the train, beside it, on the hospital's floors, in the
-   stadium, on the mountain, on the road, or on the beach. Every function here is listed in MG_SOUND_FNS at the end,
-   so the baked soundtrack's fingerprint sees a change to any of them.
+   Air solid film, renamed mg*), and where the camera is: in your car, on the viaduct's deck, down by the river, beside
+   flight 2207 in the air, in its cockpit or cabin, in the control tower, on the airfield, in the town, in the maternity
+   ward. Every function here is listed in MG_SOUND_FNS at the end, so the baked soundtrack's fingerprint sees a change to
+   any of them.
    ===================================================================== */
 
 // ---- shared generators -------------------------------------------------------------------------------------------
@@ -93,15 +94,18 @@ function mgCurve(f, hz = 200) {
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
 const MG_PLACE = {
-  trainIn: ['win', 'phone', 'bay', 'emerg', 'ring', 'winBeach'],
-  trainOut: ['title', 'ext2', 'ext3', 'panto', 'flicker', 'brakeX'],
-  bay: ['bayOut', 'roof'],
-  hospital: ['mriA', 'mriB', 'quench', 'gen', 'corridor', 'board'],
-  stadium: ['stadA', 'stadB', 'stadC'],
-  obs: ['obsOut', 'baro', 'scope', 'eyepiece'],
-  road: ['road', 'roadCar'],
+  car: ['title', 'empty', 'cluster', 'grab', 'hands', 'epb', 'lorryPOV', 'stopPOV', 'radio', 'phone'],
+  deck: ['ext1', 'lorryExt', 'cabIn', 'cabWide', 'carsWide', 'carsNew', 'carsOld', 'gantry', 'skyUp', 'walkDeck', 'walkLong', 'walkPOV', 'alertPhone', 'alertRead', 'finalVia', 'question'],
+  river: ['trainHigh', 'trainCab', 'barge', 'bargeHit', 'leaders'],
+  high: ['planeExt', 'planeMap', 'hold'],
+  cockpit: ['cockpit', 'cockpitDoor', 'fuel', 'cockpitApp', 'flaps', 'land3', 'finalCock'],
+  cabin: ['cabinAisle', 'keypad', 'cabinPax', 'doorWait', 'cabinHalf'],
+  tower: ['towerIn', 'radar', 'ctl', 'towerRead', 'finalTower'],
+  field: ['towerExt', 'stack', 'touchdown'],
+  town: ['town', 'house', 'townHigh', 'hospital'],
+  ward: ['wardIn', 'birth', 'baby', 'wardWin'],
 };
-function mgWhereShot(sh) { if (sh.where) return sh.where; for (const [k, v] of Object.entries(MG_PLACE)) if (v.includes(sh.mode)) return k; return 'beach'; }
+function mgWhereShot(sh) { if (sh.where) return sh.where; for (const [k, v] of Object.entries(MG_PLACE)) if (v.includes(sh.mode)) return k; return 'deck'; }
 // the film as places: [{ t0, t1, where, shot }] in order
 function mgPlaces() {
   if (mgPlaces._c) return mgPlaces._c;
@@ -149,27 +153,97 @@ function mgCrack(fx, o = {}) {
   const b = fx.hit(fx.stoneModes(o.s || 0.7), { width: 0.002, amp: 0.8, noise: 0.2, nlen: 0.05, nhp: 300, len: d }); for (let i = 0; i < Math.min(b.length, y.length); i++) y[i] += b[i] * 0.8;
   return y;
 }
-// the beach party's song: a little pop song (G D Em C at 112 bpm: kick, snare, hats, bass, off-beat chords, a tune),
-// through a small speaker. o.offset: where in the song it starts (s)
-function mgPartySong(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), beat = 60 / 112, bar = 4 * beat, t0 = o.offset || 0, r = new RNG(77);
-  const prog = [[55, 62, 67, 71], [50, 57, 62, 66], [52, 59, 64, 67], [48, 55, 60, 64]];
-  const mel = [71, 74, 76, 74, 71, 69, 67, 69, 66, 69, 71, 69, 66, 64, 62, 64, 67, 71, 74, 71, 67, 66, 64, 66, 64, 67, 72, 71, 69, 67, 64, 62];
+// the car radio's song: a bright little pop song (F C Dm Bb at 104 bpm: kick, snare, hats, bass, off-beat chords, a
+// tune) through the car's speakers. rate(t) is the song's speed at film time t (1 at real speed; slowed with the
+// picture like tape in the slow minutes: pitch and tempo together). t0: the film time of sample 0; off: song time then
+function mgRadioSong(fx, d, t0, rate, off = 0) {
+  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), beat = 60 / 104, bar = 4 * beat, r = new RNG(91);
+  const prog = [[53, 60, 65, 69], [48, 55, 60, 64], [50, 57, 62, 65], [46, 53, 58, 62]];
+  const mel = [72, 74, 76, 77, 76, 74, 72, 69, 67, 69, 72, 74, 72, 69, 67, 65, 69, 72, 74, 72, 74, 76, 74, 72, 70, 69, 67, 69, 65, 67, 69, 72];
   const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
-  let pb = 0, pm = 0;
+  let tau = off, pb = 0, pm = 0, pc = [0, 0, 0];
   for (let i = 0; i < n; i++) {
-    const t = i / sr + t0, b = Math.floor(t / bar) % 4, inBar = t % bar, e8 = t % (beat / 2), ch = prog[b];
+    const k = rate(t0 + i / sr); tau += k / sr;
+    const t = tau, b = Math.floor(t / bar) % 4, inBar = t % bar, e8 = t % (beat / 2), ch = prog[b];
     let v = 0;
-    const kb = inBar % (2 * beat); if (kb < 0.25) v += 0.9 * Math.sin(2 * Math.PI * (50 * kb + 70 / 12 * (1 - Math.exp(-kb * 12)))) * Math.exp(-kb * 14);
-    const sb = (inBar + beat) % (2 * beat); if (sb < 0.2) v += 0.35 * (r.next() * 2 - 1) * Math.exp(-sb * 25);
-    if (e8 < 0.05) v += 0.12 * (r.next() * 2 - 1) * Math.exp(-e8 * 90);
-    pb += 2 * Math.PI * hz(ch[0] - 12) / sr; v += 0.35 * Math.sin(pb) * Math.exp(-e8 * 6);
-    const ob = (t + beat / 2) % beat; if (ob < 0.18) for (const m of ch.slice(1)) v += 0.07 * Math.sign(Math.sin(2 * Math.PI * hz(m) * t)) * Math.exp(-ob * 16);
-    const mi = Math.floor(t / beat) % 32, mt = t % beat; pm += 2 * Math.PI * hz(mel[mi]) / sr; v += 0.2 * (Math.sin(pm) + 0.3 * Math.sin(2 * pm)) * Math.min(1, mt / 0.01) * Math.exp(-mt * 2.5);
+    const kb = inBar % (2 * beat); if (kb < 0.25) v += 0.8 * Math.sin(2 * Math.PI * (52 * kb + 70 / 12 * (1 - Math.exp(-kb * 12)))) * Math.exp(-kb * 14);
+    const sb = (inBar + beat) % (2 * beat); if (sb < 0.2) v += 0.3 * (r.next() * 2 - 1) * Math.exp(-sb * 25);
+    if (e8 < 0.05) v += 0.1 * (r.next() * 2 - 1) * Math.exp(-e8 * 90);
+    pb += 2 * Math.PI * hz(ch[0] - 12) * k / sr; v += 0.32 * Math.sin(pb) * Math.exp(-e8 * 5);
+    const ob = (t + beat / 2) % beat; if (ob < 0.2) ch.slice(1).forEach((m, j) => { pc[j] += 2 * Math.PI * hz(m) * k / sr; v += 0.06 * (Math.sin(pc[j]) + 0.4 * Math.sin(3 * pc[j])) * Math.exp(-ob * 12); });
+    const mi = Math.floor(t / beat) % 32, mt = t % beat; pm += 2 * Math.PI * hz(mel[mi]) * k / sr; v += 0.18 * (Math.sin(pm) + 0.25 * Math.sin(2 * pm)) * Math.min(1, mt / 0.012) * Math.exp(-mt * 2.2);
     y[i] = v;
   }
-  MGX.bq(y, 'hp', 320, 0.7, sr); MGX.bq(y, 'lp', 3600, 0.7, sr); MGX.bq(y, 'pk', 1400, 1.0, sr, 4);
-  for (let i = 0; i < n; i++) y[i] = Math.tanh(1.6 * y[i]);
+  MGX.bq(y, 'hp', 110, 0.7, sr); MGX.bq(y, 'lp', 5200, 0.7, sr); MGX.bq(y, 'pk', 900, 0.9, sr, 3);
+  for (let i = 0; i < n; i++) y[i] = Math.tanh(1.3 * y[i]);
   return y;
 }
-const MG_SOUND_FNS = [mgPartySong, mgNoise, mgBed, mgTone, mgChirp, mgCrackle, mgSweep, mgSweepPut, mgAddAt, mgPlaceAt, mgSeen, mgSlowK, mgCurve, mgWhereShot, mgPlaces, mgRoll, mgScrape, mgAlarm, mgCrack, mgEv, mgWn];
+// a voice on the radio, its words not made out: syllables (a pulse train through two vowel formants, a consonant's hiss
+// before some), a pitch line that falls at the end of a phrase, band-limited to the radio's 300–3,000 Hz, a little
+// distortion and hiss, the squelch's rush at the end. o.f0: pitch (Hz); o.syl: syllables per second
+function mgRadioVoice(fx, d, o = {}) {
+  const sr = fx.sr, r = fx.r, n = Math.ceil((d + 0.2) * sr), y = new Float32Array(n), f0 = o.f0 || 210, rate = o.syl || 5.2;
+  const V = [[750, 1250], [420, 2100], [330, 900], [600, 1750], [520, 1050], [300, 2300], [680, 1500]];
+  let t = 0.04, ph = 0;
+  while (t < d - 0.12) {
+    const L = r.range(0.7, 1.3) / rate, m = Math.round(L * sr), i0 = Math.round(t * sr), [F1, F2] = V[r.int(0, V.length - 1)], u0 = t / d;
+    const z = new Float32Array(m);
+    for (let i = 0; i < m; i++) { const u = i / m, f = f0 * (1 + 0.12 * Math.sin(Math.PI * u) - 0.18 * u0 * u0 + 0.03 * Math.sin(i / sr * 31)); ph += f / sr; z[i] = ((ph % 1) * 2 - 1) * Math.sin(Math.PI * Math.min(1, u * 1.25)) ** 0.7; }
+    const a = Float32Array.from(z), b = Float32Array.from(z); MGX.bq(a, 'bp', F1, 4, sr); MGX.bq(b, 'bp', F2, 5, sr);
+    for (let i = 0; i < m && i0 + i < n; i++) y[i0 + i] += a[i] + 0.7 * b[i];
+    if (r.next() < 0.45) { const c = Math.round(0.04 * sr), w = fx.white(c); MGX.bq(w, 'hp', 2600, 0.7, sr); for (let i = 0; i < c && i0 + i < n; i++) y[i0 + i] += 0.35 * w[i] * Math.sin(Math.PI * i / c); }
+    t += L + (r.next() < 0.18 ? r.range(0.12, 0.3) : 0.01);
+  }
+  const hiss = fx.white(n); for (let i = 0; i < n; i++) { const tt = i / sr; y[i] += 0.05 * hiss[i] + (tt > d ? 0.5 * hiss[i] * Math.exp(-(tt - d) / 0.06) : 0); }
+  MGX.bq(y, 'hp', 340, 0.7, sr); MGX.bq(y, 'lp', 2900, 0.7, sr); MGX.bq(y, 'pk', 1700, 1, sr, 4);
+  let pk = 0; for (let i = 0; i < n; i++) pk = Math.max(pk, Math.abs(y[i])); for (let i = 0; i < n; i++) y[i] = Math.tanh(2.2 * y[i] / pk);
+  const on = Math.round(0.006 * sr); for (let i = 0; i < on; i++) y[i] *= i / on;
+  return y;
+}
+// a newborn's cry: breaths of crying (a bright harmonic voice near 450 Hz, its pitch arching up and down, a fast
+// vibrato, a little roughness) with short catches of breath between them. Soft: he is a minute old
+function mgCry(fx, d, o = {}) {
+  const sr = fx.sr, r = fx.r, n = Math.ceil(d * sr), y = new Float32Array(n);
+  let t = o.delay || 0.1;
+  while (t < d - 0.5) {
+    const L = Math.min(d - t - 0.1, r.range(0.75, 1.25)), m = Math.round(L * sr), i0 = Math.round(t * sr), f0 = r.range(420, 500), z = new Float32Array(m), ph = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    for (let i = 0; i < m; i++) { const u = i / m, f = f0 * (1 + 0.16 * Math.sin(Math.PI * Math.pow(u, 0.7)) - 0.1 * u) * (1 + 0.025 * Math.sin(2 * Math.PI * 7.3 * i / sr)), e = Math.min(1, u / 0.08) * Math.min(1, (1 - u) / 0.15);
+      let v = 0; for (let k = 0; k < 10; k++) { ph[k] += 2 * Math.PI * f * (k + 1) / sr; v += Math.sin(ph[k]) / (k + 1) ** 0.8; }
+      z[i] = v * e * (0.85 + 0.15 * Math.sin(2 * Math.PI * f * 0.5 * i / sr)); }
+    const a = Float32Array.from(z); MGX.bq(z, 'bp', 1150, 1.6, sr); MGX.bq(a, 'bp', 3200, 2.2, sr);
+    for (let i = 0; i < m && i0 + i < n; i++) y[i0 + i] += z[i] + 0.5 * a[i];
+    // the catch of breath
+    const bi = i0 + m, bm = Math.round(0.28 * sr), w = fx.white(bm); MGX.bq(w, 'bp', 1800, 1.2, sr);
+    for (let i = 0; i < bm && bi + i < n; i++) y[bi + i] += 0.12 * w[i] * Math.sin(Math.PI * i / bm);
+    t += L + r.range(0.35, 0.55);
+  }
+  return y;
+}
+// an airliner going past a listener: its roar (rumble behind it, a broad hiss), its fans' whine (heard more ahead of
+// it), each delayed by the sound's travel time, Doppler-shifted, quieter and duller with distance. at(s) → the plane's
+// position [x, y, z] at story time s; L the listener; t0…t1 film time; o.glass: through a window (duller, quieter)
+function mgJetBy(K, t0, t1, at, L, o = {}) {
+  const { fx, sr } = K, d = t1 - t0, n = Math.ceil(d * sr), C = 343, hz = 200, m = Math.ceil(d * hz) + 2;
+  const G = new Float32Array(m), W = new Float32Array(m), R = new Float32Array(m), D = new Float32Array(m), F = new Float32Array(m);
+  for (let j = 0; j < m; j++) {
+    const s = mgStoryAt(t0 + j / hz); let te = s;
+    for (let k = 0; k < 3; k++) { const p = at(te); te = s - Math.hypot(p[0] - L[0], p[1] - L[1], p[2] - L[2]) / C; }
+    const p = at(te), q = at(te + 0.05), dist = Math.max(25, Math.hypot(p[0] - L[0], p[1] - L[1], p[2] - L[2]));
+    const ux = (L[0] - p[0]) / dist, uy = (L[1] - p[1]) / dist, uz = (L[2] - p[2]) / dist, vr = ((q[0] - p[0]) * ux + (q[1] - p[1]) * uy + (q[2] - p[2]) * uz) / 0.05;
+    const g = Math.min(1, 70 / dist) * (o.gain || 1);
+    G[j] = g; D[j] = C / Math.max(80, C - vr); W[j] = g * (vr > 0 ? 1 : 0.35); R[j] = g * (vr > 0 ? 0.55 : 1); F[j] = Math.min(9000, 700 + 7000 * Math.min(1, 220 / dist)) * (o.glass ? 0.25 : 1);
+  }
+  const at2 = (A, i) => { const x = i / sr * hz, j = Math.min(m - 2, Math.floor(x)); return A[j] + (A[j + 1] - A[j]) * (x - j); };
+  const roar = mgNoise(fx, n, 'pink'), rum = mgNoise(fx, n, 'brown'), y = new Float32Array(n);
+  const curve = []; for (let j = 0; j < m; j += 4) curve.push(F[j]);
+  const rf = mgSweep(roar, sr, 'lowpass', 0.7, curve); MGX.bq(rum, 'lp', 140, 0.7, sr);
+  let p1 = 0, p2 = 0;
+  for (let i = 0; i < n; i++) {
+    const g = at2(G, i), w = at2(W, i), rr = at2(R, i), dd = at2(D, i); p1 += 2 * Math.PI * 2380 * dd / sr; p2 += 2 * Math.PI * 1190 * dd / sr;
+    const e = Math.min(1, i / (0.08 * sr), (n - i) / (0.08 * sr));
+    y[i] = e * (0.55 * g * rf[i] + 1.1 * rr * rum[i] + 0.06 * w * (Math.sin(p1) + 0.6 * Math.sin(p2) + 0.3 * Math.sin(1.5 * p1)));
+  }
+  if (o.glass) { MGX.bq(y, 'lp', 900, 0.7, sr); }
+  return K.put(y, t0, { vol: o.vol ?? 0.5, norm: o.norm ?? 1, pan: o.pan || 0, room: o.room, wet: o.wet });
+}
+const MG_SOUND_FNS = [mgRadioSong, mgRadioVoice, mgCry, mgJetBy, mgNoise, mgBed, mgTone, mgChirp, mgCrackle, mgSweep, mgSweepPut, mgAddAt, mgPlaceAt, mgSeen, mgSlowK, mgCurve, mgWhereShot, mgPlaces, mgRoll, mgScrape, mgAlarm, mgCrack, mgEv, mgWn];

@@ -66,7 +66,7 @@ const MG_CAR = {
   seatL: [-0.12, 0.56, -0.38], seatR: [-0.12, 0.56, 0.38],  // the seats' hip points (H-points)
   eye: [-0.06, 1.18, 0.38],                          // your eyes (passenger seat)
   wheel: [0.4, 0.97, -0.38], wheelR: 0.185, wheelTilt: 0.42,
-  epb: [0.3, 0.64, 0.0],                             // the parking-brake switch on the console
+  epb: [0.3, 0.73, 0.0],                             // the parking-brake switch on the console
   cup: [0.12, 0.93, -0.2],                           // your dad's coffee (in his right hand)
   dash: 0.78,                                        // the dashboard's back edge (x)
   shield: [1.3, 0.98, 0.7, 1.4],                     // the windscreen: base (x, y), top (x, y)

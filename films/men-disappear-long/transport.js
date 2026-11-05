@@ -66,7 +66,9 @@ function mgBuildRail(S) {
       // the cab: the nose (a sloped front), the windscreen, the side windows open (you can see in: the empty seat, the desk)
       const cz = L / 2 - 3.2, n = new THREE.Group(); n.position.z = cz; c.add(n);
       const Bn = (w, h, d, m, x, y, z, rx = 0) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); o.rotation.x = rx; o.castShadow = true; n.add(o); return o; };
-      Bn(R.w, 1.25, 3.2, Mt.red, 0, R.y + 1.15 + 0.63, 1.6);                         // below the windows
+      Bn(R.w, 0.9, 3.2, Mt.red, 0, R.y + 1.6, 1.6);                                    // below the cab's floor
+      for (const sd of [-1, 1]) Bn(0.08, 0.6, 3.2, Mt.red, sd * (R.w / 2 - 0.04), R.y + 2.33, 1.6);   // the cab's sides, below the windows
+      Bn(R.w, 0.6, 0.1, Mt.red, 0, R.y + 2.33, 3.12);                                // and its front, under the windscreen
       Bn(R.w, 0.9, 1.0, Mt.red, 0, R.y + 2.55, 3.05, -0.35);                         // the nose's slope under the windscreen
       Bn(R.w, 0.55, 3.0, Mt.white, 0, R.y + 3.95, 1.4);                              // the roof
       Bn(0.12, 1.1, 0.12, Mt.white, -R.w / 2 + 0.06, R.y + 3.15, 2.9); Bn(0.12, 1.1, 0.12, Mt.white, R.w / 2 - 0.06, R.y + 3.15, 2.9);

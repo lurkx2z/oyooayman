@@ -119,7 +119,7 @@ function mgBuildYourCar(S) {
   B(0.34, 0.16, 0.26, M.dashLow, 0.66, 0.64, 0, 0.5);
   B(0.05, 0.022, 0.034, M.black, C.epb[0], C.epb[1] - 0.012, C.epb[2]);        // the parking-brake switch's well
   const epb = B(0.04, 0.018, 0.028, mgStd('#3a3c40', 0.5), C.epb[0], C.epb[1], C.epb[2]);   // the switch (pulled up at the brake)
-  { const k = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.07, 12), M.black); k.position.set(C.epb[0] + 0.15, 0.64, 0); inn.add(k); }   // the gear selector
+  { const k = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.026, 0.07, 12), M.black); k.position.set(C.epb[0] + 0.15, 0.755, 0); inn.add(k); }   // the gear selector
   // the hazard switch (a red triangle on the centre stack)
   const hz = B(0.012, 0.035, 0.05, new THREE.MeshStandardMaterial({ color: '#7a1a12', emissive: new THREE.Color('#ff3a20'), emissiveIntensity: 0 }), 0.718, 0.94, 0);
   // the seats: a rounded cushion, a back leaning back, a headrest on two posts; the rear bench
@@ -242,7 +242,7 @@ function mgBuildYourCar(S) {
     phoneAt(s, o) {
       const slide = MathX.smooth(s, MGP.car.sBrake + 0.35, MGP.car.sBrake + 1.2);
       phone.position.set(mgLerp(0.56, 0.86, slide), mgLerp(0.615, 0.3 + 0.004, slide) + 0.06 * Math.sin(Math.PI * slide), mgLerp(-0.02, C.seatL[2] - 0.08, slide));
-      phone.rotation.set(0, mgLerp(0.1, 0.75, slide), mgLerp(0.3, 0, slide) * (1 - slide));
+      phone.rotation.set(0, mgLerp(0.1, 0.75 + Math.PI, slide), mgLerp(0.3, 0, slide) * (1 - slide));
       phone.visible = !!o.inside;
       // its screen: ringing (MUM) from 7:42:24; the call fails at 7:42:30, and again
       const what = s < 24 ? 'lock' : (s - 24) % 22 < 6 ? 'call' : 'failed';
@@ -393,7 +393,7 @@ const MG_TRAFFIC = (() => {
     const d = r.next() < 0.5 ? 1 : -1, lane = r.int(0, 2), T = types[r.next() < 0.08 ? 4 : r.int(0, 3)];
     // ('ok': a woman is driving: she brakes, hard, a second or two after the cars round her go wrong; 'aeb': nobody
     // is, and the car's lane assist stops it; 'drift': nobody is, and nothing stops it but a barrier)
-    const q = r.next(), kind = q < 0.36 ? 'ok' : q < 0.72 ? 'aeb' : 'drift', v0 = [24, 29, 33][lane] + r.range(-2, 2);
+    const q = r.next(), kind = q < 0.52 ? 'ok' : q < 0.79 ? 'aeb' : 'drift', v0 = [24, 29, 33][lane] + r.range(-2, 2);
     const c = mk({ id: 'c' + i, kind, d, z0: MG_V.lanes[lane] + r.range(-0.25, 0.25), type: T[0], col: cols[r.int(0, cols.length - 1)], v0, sB: kind === 'ok' ? r.range(0.9, 2.6) : r.range(1.5, 9), a: kind === 'ok' ? r.range(5, 7.5) : r.range(3, 6), sD: r.range(0.3, 3), vz: r.range(0.35, 0.9),
       toward: lane === 0 ? -1 : lane === 2 ? 1 : (r.next() < 0.5 ? -1 : 1), x0: d > 0 ? r.range(-640, 420) : r.range(-150, 1150) });
     // (the stop must be on the viaduct, in the stretch the camera sees)
@@ -436,13 +436,26 @@ function mgBuildTraffic(S) {
 // shoulders, towards the town; a few stay by their cars. At 10:21 the ones still there look up at the plane.
 // ---------------------------------------------------------------------------------------------------------------------
 const MG_DECK_PEOPLE = (() => {
-  const r = new RNG(910), out = [], s0 = MG_AT(9, 10, 0);
-  // walkers: [x at 9:10, z, speed, look, kid, start delay]
-  for (let i = 0; i < 18; i++) { const d = r.next() < 0.7 ? 1 : -1, z = d * (12.25 + r.range(-0.35, 0.45)), kid = r.next() < 0.3;
-    out.push({ kind: 'walk', x: r.range(-40, 260), z, v: kid ? 1.15 : r.range(1.15, 1.45), look: kid ? MG_GIRLS[r.int(0, 3)] : MG_WOMEN[r.int(0, 7)], kid, s0: s0 + r.range(-200, 40), ph: r.range(0, 6.28), id: i }); }
-  // the ones who stay: standing by the barrier or a car (they look up at 10:21)
-  for (let i = 0; i < 12; i++) { const d = r.next() < 0.5 ? 1 : -1, z = d * (12.0 + r.range(0, 1.6));
+  const r = new RNG(910), out = [], S0 = MG_AT(9, 10, 0);
+  // walkers, in four foot-lanes on each hard shoulder, each lane at one pace (nobody walks through anybody): in a
+  // lane the ones further west set off first, so no one catches up with someone still standing
+  const LZ = [12.2, 13.0, 13.8, 14.6], LV = [1.32, 1.22, 1.4, 1.15];
+  let id = 0;
+  for (const sd of [1, -1]) LZ.forEach((lz, li) => {
+    const xs = []; for (let x = r.range(-40, 20); x < 260; x += sd > 0 ? r.range(30, 70) : r.range(60, 120)) xs.push(x);
+    const t0 = xs.map(() => S0 + r.range(-200, 40)).sort((a, b) => a - b);
+    xs.forEach((x, k) => { const kid = r.next() < 0.3;
+      out.push({ kind: 'walk', x, z: sd * (lz + r.range(-0.12, 0.12)), v: LV[li], look: kid ? MG_GIRLS[r.int(0, 3)] : MG_WOMEN[r.int(0, 7)], kid, s0: t0[k], ph: r.range(0, 6.28), id: id++ }); });
+  });
+  // the ones who stay by the parapet (they look up at 10:21)
+  for (let i = 0; i < 12; i++) { const d = r.next() < 0.5 ? 1 : -1, z = d * r.range(15.2, 15.8);
     out.push({ kind: 'stay', x: r.range(30, 200), z, look: (i % 4 === 3) ? MG_GIRLS[r.int(0, 3)] : MG_WOMEN[r.int(0, 7)], kid: i % 4 === 3, yaw: r.range(-3.1, 3.1), id: 100 + i }); }
+  // and the ones near the runway's line who have got out of their cars to watch (seen from 10:00): clear of every car
+  const cars = (typeof MG_TRAFFIC !== 'undefined') ? MG_TRAFFIC.cars.map((c) => MG_TRAFFIC.place(c, 1e4)) : [];
+  const free = (x, z) => cars.every((q) => Math.hypot(q.x - x, q.z - z) > 3.2);
+  for (let i = 0, tries = 0; i < 14 && tries < 600; tries++) { const x = r.range(574, 612), z = r.range(5, 15.6);
+    if (!free(x, z) || out.some((o) => o.late && Math.hypot(o.x - x, o.z - z) < 1.1)) continue;
+    out.push({ kind: 'stay', late: true, x, z, look: (i % 4 === 2) ? MG_GIRLS[r.int(0, 3)] : MG_WOMEN[r.int(0, 7)], kid: i % 4 === 2, yaw: r.range(-3.1, 3.1), id: 200 + i }); i++; }
   return out;
 })();
 function mgBuildDeckPeople(S) {
@@ -457,12 +470,12 @@ function mgBuildDeckPeople(S) {
         const u = Math.max(0, s - q.s0), x = q.x - q.v * u, dir = -1;
         if (x < MG_V.vx[0] + 30) { p.root.visible = false; continue; }
         const walking = s > q.s0, ph = q.ph + u * q.v / (q.kid ? 0.9 : 1.3) * Math.PI * 2;
-        mgPose(p, walking ? mgWalkPose(ph, q.kid ? 0.9 : 1) : MG_POSES.standStill(), x, MG_V.deckY, q.z + 0.12 * Math.sin(u * 0.05 + q.id), dir > 0 ? Math.PI / 2 : -Math.PI / 2);
+        mgPose(p, walking ? mgWalkPose(ph, q.kid ? 0.9 : 1) : MG_POSES.standStill(), x, MG_V.deckY, q.z + 0.08 * Math.sin(u * 0.05 + q.id), dir > 0 ? Math.PI / 2 : -Math.PI / 2);
         p.root.visible = s > q.s0 - 120 && (s - q.s0) < 1400;
       } else {
         let pose = MG_POSES.standStill(), yaw = q.yaw;
         if (look) { const dx = look[0] - q.x, dz = look[2] - q.z, dy = look[1] - MG_V.deckY - 1.5; yaw = mgYaw(dx, dz); pose = MG_POSES.lookUpStand(); pose.neck = -MathX.clamp(Math.atan2(dy, Math.hypot(dx, dz)) * 0.85, 0, 0.9); }
-        mgFidget(pose, s, q.id, 0.4); mgPose(p, pose, q.x, MG_V.deckY, q.z, yaw); p.root.visible = true;
+        mgFidget(pose, s, q.id, 0.4); mgPose(p, pose, q.x, MG_V.deckY, q.z, yaw); p.root.visible = !q.late || s > MG_AT(10, 0);
       }
     }
   };

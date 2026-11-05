@@ -25,8 +25,7 @@ const MG_CTX = (() => {
     if (s < MG.sTD) return { v: `${mgNum(h)} <small>m up</small>`, v2: `${Math.round(q.v * 3.6)} km/h · ${toGo >= 1000 ? (toGo / 1000).toFixed(1) + ' km' : Math.max(0, Math.round(toGo / 10) * 10) + ' m'} TO TOUCHDOWN` };
     return { v: kmh(q.v), v2: q.v > 0.5 ? 'ON THE RUNWAY · BRAKING ITSELF' : 'STOPPED ON THE RUNWAY' };
   };
-  return [
-    beat('start', 'WOMEN AND GIRLS ON EARTH', () => ({ v: mgNum(MGP.women0), v2: 'ALL STILL HERE' }), 1),
+  const out = [
     beat('wheel', 'YOUR CAR', car),
     beat('brake', 'YOUR CAR', car),
     beat('lorry', 'THE LORRY · 40 TONNES', lorry),
@@ -39,6 +38,7 @@ const MG_CTX = (() => {
     beat('plane', 'FLIGHT 2207', () => ({ v: '11,000 <small>m up</small>', v2: '830 km/h · AUTOPILOT ON' })),
     beat('world', 'AIRLINERS IN THE AIR', () => ({ v: '≈ 9,000', v2: '≈ 8,100 WITH NO ONE AT THE CONTROLS' })),
     beat('door', 'THE COCKPIT DOOR', (t, s) => (s < MG.sCode ? { v: 'LOCKED', v2: 'FROM INSIDE' } : s < MG.sDoor ? { v: `${Math.ceil(MG.sDoor - s)} <small>s</small>`, v2: 'EMERGENCY CODE ENTERED' } : { v: 'OPEN', v2: 'NOBODY INSIDE DENIED IT' }), 1),
+    // (the countdown stays up through the silent wait, until the door has opened)
     beat('alone', 'FLIGHT 2207', fuel),
     beat('tower', 'CONTROLLERS ON DUTY', () => ({ v: '2 <small>of 9</small>', v2: 'EVERY PLANE IN RANGE CALLING' })),
     beat('smoke', 'FIREFIGHTERS LEFT', () => ({ v: '≈ 1 <small>in 10</small>', v2: 'KITCHENS BURNING: THOUSANDS' }), 2),
@@ -50,27 +50,29 @@ const MG_CTX = (() => {
     beat('final', 'FLIGHT 2207', plane),
     beat('question', 'PLANES STILL CIRCLING', () => ({ v: '23', v2: 'CONTROLLERS LEFT: 2' })),
   ];
+  const d = out.find((x) => x[2] === 'THE COCKPIT DOOR'); d[1] = Math.max(d[1], Math.min(mgB('alone') - 0.1, mgFilmAt(MG.sDoor) + 3));
+  return out;
 })();
 // the honest labels (bottom left): [from, to, text]
 const MG_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [mgC(id, k0) - 0.1, (k1 != null ? mgCap(id, k1).hide : mgE(id)) + 0.2, text]; return [
   b('start', 'THE ONE IMPOSSIBLE THING: EVERY MAN AND BOY VANISHES AT 7:42. THE REST FOLLOWS FROM IT', 0),
-  b('brake', 'REAL: HOLD AN ELECTRONIC PARKING BRAKE WHILE MOVING AND THE CAR BRAKES HARD (SEE YOUR MANUAL)', 0),
+  b('brake', 'REAL: HELD WHILE MOVING, AN ELECTRONIC PARKING BRAKE STOPS THE CAR HARD (CAR MANUALS)', 0),
   b('cab', 'LORRY DRIVERS IN EUROPE: ABOUT 3% ARE WOMEN (IRU 2023)', 1),
-  b('cars', 'ROUGH: WHICH CARS STOP THEMSELVES DEPENDS ON THEIR LANE ASSIST. AT RUSH HOUR, ABOUT 6 IN 10 DRIVERS ARE MEN', 1),
+  b('cars', 'ROUGH: ABOUT 6 IN 10 RUSH-HOUR DRIVERS ARE MEN. ONLY NEWER CARS STOP THEMSELVES', 1),
   b('train', 'REAL: A DRIVER’S VIGILANCE PEDAL STOPS THE TRAIN IF IT IS LET GO', 1),
-  b('world', 'AIRLINE PILOTS: ABOUT 5% WOMEN (ISWAP). AIRLINERS IN THE AIR AT THE DAILY PEAK: ABOUT 9,000–10,000', 1),
-  b('door', 'REAL: THE CREW’S CODE OPENS THE COCKPIT DOOR AFTER A DELAY, UNLESS SOMEONE INSIDE DENIES IT', 1),
+  b('world', 'AIRLINE PILOTS: ABOUT 5% WOMEN (ISWAP). AIRLINERS UP AT THE DAILY PEAK: 9,000–10,000', 1),
+  b('door', 'REAL: THE CREW’S CODE OPENS THE COCKPIT DOOR AFTER A DELAY UNLESS A PILOT DENIES IT', 1),
   b('tower', 'AIR TRAFFIC CONTROLLERS: ABOUT 1 IN 5 ARE WOMEN', 0),
   b('smoke', 'FIREFIGHTERS: ABOUT 9% WOMEN (UK HOME OFFICE 2024)', 2),
   b('ward', 'MIDWIVES WORLDWIDE: MORE THAN 9 IN 10 ARE WOMEN (UNFPA / WHO 2021)', 1, 1),
   b('ward', 'BIRTHS: ABOUT 132 MILLION A YEAR, 105 BOYS TO EVERY 100 GIRLS (UN 2024)', 4),
   b('alert', 'HEADS OF STATE OR GOVERNMENT: WOMEN IN 27 OF 193 COUNTRIES (UN WOMEN 2025)', 2),
-  b('autoland', 'REAL: AN AIRLINER’S AUTOLAND FLIES THE APPROACH, FLARE AND ROLLOUT. SETTING IT UP IS A PILOT’S JOB', 1),
+  b('autoland', 'REAL: AUTOLAND FLIES THE APPROACH, FLARE AND ROLLOUT. A PILOT HAS TO SET IT UP', 1),
   b('final', 'ROUGH: NO ONE HAS EVER TALKED A NON-PILOT THROUGH AN AIRLINER’S AUTOLAND', 3),
 ]; })();
 // the insets: [from, to, which, where]
 const MG_INSETS = (() => { const b = (id, k0, k1, w, where = '') => [mgC(id, k0) - 0.25, (k1 != null ? mgCap(id, k1).hide : mgE(id)) + 0.3, w, where]; return [
-  b('start', 1, 1, 'half'), b('world', 1, 1, 'pilots'), b('alert', 2, 2, 'leaders'), b('many', 1, 2, 'queue', 'mid'),
+  b('start', 1, 1, 'half'), b('world', 1, 1, 'pilots'), b('alert', 2, 2, 'leaders'), b('many', 1, 2, 'queue'),
 ]; })();
 
 // a caption's text with its numbers in amber
@@ -181,10 +183,11 @@ class MgHud {
   // half of everyone: 20 figures, the men's 10 fading to outlines
   static half(u) {
     const k = MathX.smooth(u, 0.5, 1.6);
-    let b = `${MgHud.plate()}<text x="30" y="58" class="t">EVERYONE ALIVE AT 7:41</text>`;
-    for (let i = 0; i < 20; i++) { const x = 70 + (i % 10) * 68, y = i < 10 ? 220 : 360, man = i >= 10;
+    let b = `${MgHud.plate()}<text x="30" y="56" class="t">EVERYONE ALIVE AT 7:41</text><text x="30" y="96" class="sm">WOMEN AND GIRLS · 4.13 BILLION</text>
+      <text x="30" y="256" class="sm" opacity="${(0.5 + 0.5 * k).toFixed(2)}">MEN AND BOYS · 4.12 BILLION${k > 0.5 ? ' · GONE' : ''}</text>`;
+    for (let i = 0; i < 20; i++) { const x = 70 + (i % 10) * 68, y = i < 10 ? 222 : 382, man = i >= 10;
       b += man ? `<g opacity="${(1 - 0.75 * k).toFixed(3)}">${MgHud.fig(x, y, 110, k > 0.5 ? 'none' : 'rgba(170,190,220,0.85)', 'rgba(246,239,226,0.6)')}</g>` : MgHud.fig(x, y, 110, '#ffcf8a'); }
-    b += `<text x="30" y="420" class="s">WOMEN AND GIRLS 4.13 BILLION</text><text x="730" y="420" text-anchor="end" class="s" opacity="${(0.4 + 0.6 * k).toFixed(2)}">MEN AND BOYS 4.12 BILLION</text>`;
+    b += `<text x="30" y="444" class="s">HALF OF EVERYONE · GONE AT 7:42</text>`;
     return MgHud.svg(b);
   }
   // 20 airline pilots: 19 men, gone; 10 cockpits, 9 empty

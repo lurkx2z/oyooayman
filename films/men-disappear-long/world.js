@@ -200,7 +200,7 @@ function mgBuildTrees(S) {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE TOWN: houses (instanced bodies and roofs), a few blocks of flats, the hospital, the church; the fires (houses
-// whose kitchens were left with breakfast on: their smoke from 7:44, a window glowing)
+// whose kitchens were left with breakfast on: their smoke from 7:46, a window glowing)
 // ---------------------------------------------------------------------------------------------------------------------
 function mgBuildTown(S) {
   const r = new RNG(1234), T = MG_V.town, H = [], fires = [];
@@ -226,12 +226,29 @@ function mgBuildTown(S) {
     c.set(rc[r.int(0, rc.length - 1)]); roof.setColorAt(i, c);
   });
   body.castShadow = roof.castShadow = true; body.receiveShadow = roof.receiveShadow = true; S.scene.add(body, roof);
-  // the fires: kitchens left with breakfast on (7:44 onwards); more by 9:10
-  const fr = new RNG(77);
-  for (let k = 0; k < 9; k++) { const h = H[fr.int(0, n - 1)]; fires.push({ x: h.x, y: mgGroundY(h.x, h.z) + h.h * 0.6, z: h.z, s0: 120 + k * 150 + fr.range(0, 200), big: fr.range(0.6, 1.4) }); }
-  // window glows for the burning houses (small emissive boxes just proud of the wall, 5 cm out)
-  const glowM = new THREE.MeshBasicMaterial({ color: '#ff8a3a', transparent: true, opacity: 0.0 });
-  for (const f of fires) { const g = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.6, 0.4), glowM.clone()); g.position.set(f.x, f.y - 1, f.z); S.scene.add(g); f.glow = g; }
+  // the fires: kitchens left with breakfast on. The first eight start between 7:46 and 7:51 in the houses the viaduct
+  // looks at (so the smoke is there at 7:51); 22 more by 9:10. Each burns in a ground-floor window on the house's +z
+  // face (local), the glow a plane 8 cm proud of the wall, the smoke leaving that window.
+  const fr = new RNG(77), V0 = [-236, 17.8], VD = Math.atan2(1100 - 17.8, -900 + 236);
+  const seen = H.filter((h) => { const dx = h.x - V0[0], dz = h.z - V0[1], d = Math.hypot(dx, dz), a = Math.atan2(dz, dx) - VD;
+    return d > 380 && d < 1500 && Math.abs(Math.atan2(Math.sin(a), Math.cos(a))) < 0.3 && !h.big; });
+  seen.sort((a, b) => Math.hypot(a.x + 600, a.z - 600) - Math.hypot(b.x + 600, b.z - 600));
+  // the first (the close-up's house) needs a clear patch 30 m in front of its kitchen wall for the camera
+  const clear = (h) => { const cx = h.x + Math.sin(h.ry) * (h.d / 2 + 30) + Math.cos(h.ry) * 12, cz = h.z + Math.cos(h.ry) * (h.d / 2 + 30) - Math.sin(h.ry) * 12;
+    return H.every((o) => o === h || Math.hypot(o.x - cx, o.z - cz) > Math.max(o.w, o.d) * 0.75 + 3); };
+  const pick = [seen.find(clear) || seen[0]], used = new Set(pick);
+  for (let k = 1; k < 8 && seen.length > 8; k++) { let h; do h = seen[fr.int(1, seen.length - 1)]; while (used.has(h)); used.add(h); pick.push(h); }
+  for (let k = 8; k < 30; k++) { let h; do h = H[fr.int(0, n - 1)]; while (used.has(h) || h.big); used.add(h); pick.push(h); }
+  pick.forEach((h, k) => {
+    const nx = Math.sin(h.ry), nz = Math.cos(h.ry), tx = nz, tz = -nx, gy = mgGroundY(h.x, h.z), side = (fr.next() - 0.5) * h.w * 0.5;
+    const wx = h.x + nx * (h.d / 2) + tx * side, wz = h.z + nz * (h.d / 2) + tz * side, wy = gy + 1.9;
+    fires.push({ h, x: wx + nx * 0.6, y: wy + 0.4, z: wz + nz * 0.6, wx, wy, wz, nx, nz, s0: k === 0 ? 236 : k < 8 ? fr.range(260, 520) : fr.range(600, 4000), big: k === 0 ? 1.15 : fr.range(0.7, 1.35) });
+  });
+  const glowG = new THREE.PlaneGeometry(1.7, 1.25);
+  for (const f of fires) {
+    const g = new THREE.Mesh(glowG, new THREE.MeshBasicMaterial({ color: '#ff8a3a', transparent: true, opacity: 0, fog: true }));
+    g.position.set(f.wx + f.nx * 0.08, f.wy, f.wz + f.nz * 0.08); g.rotation.y = f.h.ry; S.scene.add(g); f.glow = g;
+  }
   // the hospital: a 4-storey L block with ribbon windows and a red cross, a helipad on the roof
   const B = mgBatch(), hm = mgStd('#e8e6e0', 0.7), hw = mgStd('#3d4a58', 0.25, 0.3), hr = mgStd('#b03028', 0.5);
   { const [x, , z] = MG_V.hospital, y = mgGroundY(x, z) - 0.5;
@@ -256,7 +273,7 @@ function mgBuildSky(S) {
   sun.scale.set(5200, 5200, 1); sun.renderOrder = -9; S.scene.add(sun);
   // the clouds: fair-weather cumulus at 1,600–2,400 m and a few higher streaks at 7,000 m (each a cluster of puffs)
   const r = new RNG(5150), C = [];
-  for (let i = 0; i < 260; i++) { const x = r.range(-30000, 30000), z = r.range(-30000, 30000), hi = r.next() < 0.18; if (Math.hypot(x - 600, z - 1500) < 5000 && !hi) continue; C.push({ x, z, y: hi ? r.range(6800, 7600) : r.range(1600, 2400), s: hi ? r.range(900, 1600) : r.range(260, 620), hi, n: hi ? 5 : r.int(5, 10), seed: i }); }
+  for (let i = 0; i < 260; i++) { const x = r.range(-30000, 30000), z = r.range(-30000, 30000), hi = r.next() < 0.18; if (Math.hypot(x - 600, z - 1500) < 5000 && !hi) continue; C.push({ x, z, y: hi ? r.range(6800, 7600) : r.range(1600, 2400), s: hi ? r.range(350, 700) : r.range(260, 620), hi, n: hi ? 5 : r.int(5, 10), seed: i }); }
   const puffs = mgPuffs(S.scene, 2600, { soft: 1.3 });
   puffs.mesh.renderOrder = 4;
   return {
@@ -277,7 +294,7 @@ function mgBuildSky(S) {
       for (const c of C) {
         const dx = c.x - P.x, dz = c.z - P.z, dist = Math.hypot(dx, dz, c.y - P.y); if (dist > 42000) continue;
         for (let k = 0; k < c.n; k++) {
-          const a = mgR(c.seed * 13 + k, 3) * 6.283, rr = c.s * 0.75 * Math.sqrt(mgR(c.seed * 13 + k, 4)), sz = c.s * (0.45 + 0.4 * mgR(c.seed * 13 + k, 5)) * (c.hi ? 1.6 : 1);
+          const a = mgR(c.seed * 13 + k, 3) * 6.283, rr = c.s * 0.75 * Math.sqrt(mgR(c.seed * 13 + k, 4)), sz = c.s * (0.45 + 0.4 * mgR(c.seed * 13 + k, 5)) * (c.hi ? 1.1 : 1);
           const x = c.x + Math.cos(a) * rr + (s * 3), z = c.z + Math.sin(a) * rr * (c.hi ? 0.25 : 0.8), y = c.y + (c.hi ? 0 : sz * 0.35 * mgR(c.seed * 13 + k, 6));
           const lit = 0.78 + 0.22 * ((x - c.x) * d[0] + (z - c.z) * d[2]) / Math.max(1, rr) * 0.5, shade = c.hi ? 1 : 0.86 + 0.14 * (y - c.y) / Math.max(1, sz * 0.35);
           const near = MathX.clamp((dist - sz) / (sz * 1.5), 0, 1);

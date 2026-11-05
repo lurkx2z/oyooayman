@@ -34,20 +34,21 @@ function mgRunwayCanvas() {
 // the radar: range rings, the runway and its extended centreline, the planes (2207 highlighted), their tags
 function mgDrawRadar(g, w, h, st) {
   g.fillStyle = '#04110c'; g.fillRect(0, 0, w, h);
-  const cx = w * 0.5, cy = h * 0.62, sc = (h * 0.55) / 40000;       // 40 km to the top
+  const cx = w * 0.5, cy = h * 0.52, sc = (h * 0.45) / 25000;       // 25 km to the top
   const T = MG_V.tower;
   g.strokeStyle = 'rgba(80,200,140,0.25)'; g.lineWidth = 1;
   for (let r = 10000; r <= 50000; r += 10000) { g.beginPath(); g.arc(cx, cy, r * sc, 0, 6.29); g.stroke(); }
   g.strokeStyle = 'rgba(200,230,210,0.6)'; g.lineWidth = 2; const R = MG_V.runway;
   g.beginPath(); g.moveTo(cx + (R.x - T[0]) * sc, cy + (R.z[0] - T[2]) * sc); g.lineTo(cx + (R.x - T[0]) * sc, cy + (R.z[1] - T[2]) * sc); g.stroke();
   g.setLineDash([6, 8]); g.strokeStyle = 'rgba(120,200,160,0.4)'; g.beginPath(); g.moveTo(cx + (R.x - T[0]) * sc, cy + (R.z[0] - T[2]) * sc); g.lineTo(cx + (R.x - T[0]) * sc, cy + (R.z[0] - 30000 - T[2]) * sc); g.stroke(); g.setLineDash([]);
-  g.font = '600 13px monospace';
-  for (const p of st.planes) {
+  g.font = '600 11px monospace';
+  for (const p of [...st.planes].sort((a, b) => (a.id === 'NRD2207') - (b.id === 'NRD2207'))) {   // (2207 drawn last, on top)
     const x = cx + (p.x - T[0]) * sc, y = cy + (p.z - T[2]) * sc; if (x < -20 || x > w + 20 || y < -20 || y > h + 20) continue;
     const hot = p.id === 'NRD2207';
+    if (hot) { g.fillStyle = 'rgba(4,17,12,0.92)'; g.fillRect(x + 8, y - 24, 64, 30); }
     g.fillStyle = hot ? '#ffcf5a' : '#7cf0b0'; g.fillRect(x - 3, y - 3, 6, 6);
-    g.strokeStyle = hot ? '#ffcf5a' : 'rgba(124,240,176,0.6)'; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 14, y - 14); g.stroke();
-    g.fillText(p.id, x + 16, y - 16); g.fillText(String(Math.round(p.y * 3.281 / 100)).padStart(3, '0') + (p.noPilot ? ' ⚠' : ''), x + 16, y - 2);
+    g.strokeStyle = hot ? '#ffcf5a' : 'rgba(124,240,176,0.6)'; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 9, y - 9); g.stroke();
+    g.fillText(p.id, x + 11, y - 11); g.fillText(String(Math.round(p.y * 3.281 / 100)).padStart(3, '0') + (p.noPilot ? ' ⚠' : ''), x + 11, y + 1);
   }
   g.fillStyle = '#7cf0b0'; g.font = '600 15px monospace'; g.fillText(st.clock, 12, 22); g.fillText(`TRAFFIC ${st.planes.length}`, w - 140, 22);
 }
@@ -59,7 +60,7 @@ function mgTraffic(s) {
   const n = s < 3000 ? 11 : MGP.circling - 1, ids = ['EZR4421', 'LUX817', 'SKY290', 'ALP5520', 'TRN112', 'BLT733', 'VRN61', 'KLR908', 'NRD415', 'HLV226', 'ATX19', 'MRL350', 'SWR184', 'OBR772', 'DNB45', 'FRA600', 'CTL321', 'NRD118', 'IBX902', 'WND77', 'PLZ410', 'GRV12', 'TAU881'];
   for (let i = 0; i < n; i++) {
     if (s < 3000) { const a = r(i, 1) * 6.28, v = 200 + 40 * r(i, 2), x0 = -40000 + 80000 * r(i, 3), z0 = -40000 + 80000 * r(i, 4); out.push({ id: ids[i], x: x0 + Math.sin(a) * v * s * 0.2 % 60000, z: z0 - Math.cos(a) * v * s * 0.2 % 60000, y: 8000 + 4000 * r(i, 5), noPilot: r(i, 6) < 0.9 }); }
-    else { const c = [600 + (r(i, 1) - 0.5) * 18000, 0, -9000 + (r(i, 2) - 0.5) * 14000], per = 260 + 120 * r(i, 3), a = (s / per + r(i, 4)) * 6.283, R = 2500 + 1500 * r(i, 5);   // (the holding stacks round the airport)
+    else { const c = [600 + (r(i, 1) - 0.5) * 36000, 0, 3000 + (r(i, 2) - 0.5) * 26000], per = 240 + 100 * r(i, 3), a = (s / per + r(i, 4)) * 6.283, R = 1600 + 800 * r(i, 5);   // (the holding stacks round the airport)
       out.push({ id: ids[i], x: c[0] + R * Math.cos(a), z: c[2] + 2.2 * R * Math.sin(a), y: 1800 + 300 * (i % 12), h: Math.atan2(-R * Math.sin(a), -2.2 * R * Math.cos(a)), noPilot: true }); }
   }
   return out;

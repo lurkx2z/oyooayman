@@ -99,14 +99,14 @@ MG_SETS.ward = (app) => {
     cuts() { return []; },
     frame(t, shot) {
       const s = mgStoryAt(t), m = shot.mode, kk = MathX.clamp((t - shot.t0) / (shot.t1 - shot.t0), 0, 1); this._s = s;
-      const sb = MG.sBirth, born = s >= sb, up = MathX.smooth(s, sb, sb + 3.2), held = MathX.smooth(s, sb + 2.6, sb + 4.4);
+      const sb = MG.sBirth, born = s >= sb, up = MathX.smooth(s, sb, sb + 2.6), held = MathX.smooth(s, sb + 2.0, sb + 3.4);
       // the mother: reclined against the raised backrest, knees up (under the sheet); after the birth, her arms round him
       { const p = MG_POSES.sit(); p.hipY = 0.47; p.lHip = [1.95, 0.22]; p.rHip = [1.95, 0.22]; p.lKnee = 1.7; p.rKnee = 1.7; p.spine = 0.18; p.neck = 0.25 + (born ? 0.15 : 0);
         p.lSh = [0.3, 0.35]; p.rSh = [0.3, 0.35]; p.lEl = 0.6; p.rEl = 0.6; p.mouth = born ? 0.3 : 0.6 + 0.4 * Math.sin(s * 1.7);
         const hug = MG_POSES.hug(); const q = lerpPose(p, Object.assign({}, p, { lSh: hug.lSh, rSh: hug.rSh, lEl: hug.lEl, rEl: hug.rEl }), held);
         mgPose(mum, q, bx, 0.24, bz - 0.55, 0); mum.root.rotation.x = -0.72; }
       // midwife 1: at the foot of the bed; she lifts him and lays him on his mother's chest, then steps to the side
-      { const step = MathX.smooth(s, sb + 4.2, sb + 6), p = lerpPose(born ? MG_POSES.hug() : MG_POSES.crouch(), MG_POSES.standStill(), step);
+      { const step = MathX.smooth(s, sb + 2.6, sb + 4.2), p = lerpPose(born ? MG_POSES.hug() : MG_POSES.crouch(), MG_POSES.standStill(), step);
         if (!born) { p.hipY = 0.86; p.lKnee = 0.3; p.rKnee = 0.3; p.lHip = [0.3, 0.1]; p.rHip = [0.3, 0.1]; p.spine = 0.45; p.neck = 0.2; p.lSh = [0.9, 0.2]; p.rSh = [0.9, 0.2]; p.lEl = 0.6; p.rEl = 0.6; }
         mgFidget(p, s, 3, 0.3); mgPose(m1, p, bx + 0.25 * up + 0.55 * step, 0, bz + 1.45 - 0.55 * up + 0.2 * step, Math.PI + 0.35 * step); }
       // midwife 2: by the monitor, then at the bedside (a hand on the mother's shoulder)
@@ -120,8 +120,8 @@ MG_SETS.ward = (app) => {
       const v = { p: [6.2, 1.6, 5.4], at: [3.3, 0.95, 2.2], fov: 46 };
       const into = (a, b) => mgV(a, b, Ease.inOutSine(kk));
       if (m === 'wardIn') { v.p = into([6.3, 1.65, 5.5], [6.0, 1.6, 5.2]); v.at = [3.2, 0.95, 2.2]; v.fov = 50; }
-      else if (m === 'birth') { v.p = into([5.0, 1.45, 4.6], [4.8, 1.42, 4.3]); v.at = [3.4, 1.05, 2.6]; v.fov = 40; }
-      else if (m === 'baby') { v.p = into([4.25, 1.42, 1.62], [4.15, 1.4, 1.7]); v.at = [3.42, 1.12, 2.15]; v.fov = 34; }
+      else if (m === 'birth') { v.p = into([5.3, 1.6, 3.7], [5.1, 1.55, 3.5]); v.at = [3.4, 0.98, 2.5]; v.fov = 42; }
+      else if (m === 'baby') { v.p = into([4.55, 1.55, 1.5], [4.45, 1.52, 1.6]); v.at = [3.42, 1.12, 2.2]; v.fov = 36; }
       else if (m === 'wardWin') { v.p = into([1.0, 1.55, 0.9], [1.2, 1.55, 1.0]); v.at = [3.6, 1.1, 4.6]; v.fov = 52; }
       const dr = mgDrift(t, 0.006, 0.3, 21);
       mgCam(cam, [v.p[0] + dr[0], v.p[1] + dr[1], v.p[2] + dr[2]], [v.at[0] + dr[0], v.at[1] + dr[1], v.at[2] + dr[2]], v.fov);

@@ -1,13 +1,16 @@
 /* =====================================================================
-   AUDIO — "What if the speed of light increased and couldn't stop?" js/audio/audioEngine.js is unchanged (this is a
-   subclass); the MGX and generators come from audiokit.js (via the gravity films). No narrator: the captions are
-   silent and the sound carries the gaps. Three stems:
-     music  an original score (sound-music.js): cold A minor pads, a felt piano's rising motif, glass bells, a low drum,
-            and under everything from 9:00 PM the endless rise (a Shepard–Risset glissando), cut on the last frame
-     amb    where the camera is (sound-amb.js): the train, the bay, the hospital, the stadium, the mountain, the road,
-            the beach; darker and lower in the slow minutes
+   AUDIO — "What if all men suddenly disappeared?" js/audio/audioEngine.js is unchanged (this is a subclass); the MGX
+   and generators come from audiokit.js (via the gravity films). No narrator: the captions are silent and the sound
+   carries the gaps. Three stems:
+     music  an original score (sound-music.js): D minor, eerie and sparse; a felt piano, glass bells, low strings, a
+            heartbeat into the lorry; a hit for each event; under everything from 9:47 a slow endless rise (a
+            Shepard–Risset glissando), cut on the last frame
+     amb    where the camera is (sound-amb.js): your car, the viaduct's deck, the river, flight 2207 outside, its
+            cockpit and cabin, the control tower, the airfield, the town, the maternity ward; darker and lower in the
+            slow minutes
      sfx    the events at their story seconds (sound-sfx.js; each heard once: the clock only runs forward; slowed with
-            the picture in the slow minutes), the party's song fading with its speaker's magnet, the fire's crackle
+            the picture in the slow minutes): the car radio, the brake, the lorry, the phones, the train, the barge,
+            the cockpit door, the radio calls, the alarms, a newborn's cry, the emergency alert, the jet, touchdown
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
 

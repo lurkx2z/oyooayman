@@ -74,7 +74,8 @@ function mgBuildPax(A) {
 function mgBuildOtherPlanes(S, n) {
   const g = new THREE.BoxGeometry(38, 3.8, 3.8), w = new THREE.BoxGeometry(6, 0.5, 34).translate(2, -0.8, 0), f = new THREE.BoxGeometry(5, 6, 0.4).translate(-16, 3.5, 0), tp = new THREE.BoxGeometry(3, 0.3, 12).translate(-17, 0.6, 0);
   const geo = THREE.mergeGeometries([g, w, f, tp].map((x) => x.toNonIndexed()), false);
-  const m = new THREE.InstancedMesh(geo, mgStd('#dcdad4', 0.45, 0.2), n); m.count = 0; m.frustumCulled = false; S.scene.add(m); return m;
+  const mat = mgStd('#b4b8bd', 0.45, 0.2); mat.fog = false;   // (far off in the haze a white plane vanishes: these read as grey shapes against the sky)
+  const m = new THREE.InstancedMesh(geo, mat, n); m.count = 0; m.frustumCulled = false; S.scene.add(m); return m;
 }
 
 MG_SETS.world = (app) => {
@@ -148,7 +149,7 @@ MG_SETS.world = (app) => {
       this.handsFor(m, s, t);
       // ------------------------------------------------------------------ the other planes (9:47 on: circling in their stacks round the airport)
       { let n = 0; const o = mgBuildOtherPlanes._o || (mgBuildOtherPlanes._o = new THREE.Object3D());
-        if (s > 3000 && !PLANE_IN.has(m) && !inside) for (const p of mgTraffic(s)) { if (p.id === 'NRD2207') continue; o.position.set(p.x, p.y, p.z); o.rotation.set(0.35, Math.PI / 2 - (p.h || 0), 0); o.rotation.order = 'YZX'; o.updateMatrix(); others.setMatrixAt(n++, o.matrix); if (n >= 30) break; }
+        if (s > 3000 && !PLANE_IN.has(m) && !inside) for (const p of mgTraffic(s)) { if (p.id === 'NRD2207') continue; o.position.set(p.x, p.y, p.z); o.rotation.set(0.35, Math.PI / 2 - (p.h || 0), 0); o.rotation.order = 'YZX'; o.scale.setScalar(Math.max(1, cam.position.distanceTo(o.position) / 1300)); o.updateMatrix(); others.setMatrixAt(n++, o.matrix); if (n >= 30) break; }
         others.count = n; others.instanceMatrix.needsUpdate = true; }
       // ------------------------------------------------------------------ sparks, smoke
       fx.begin(); smoke.begin(); sparkL.intensity = 0;
@@ -192,7 +193,9 @@ MG_SETS.world = (app) => {
       // the yokes move by themselves (the autopilot), the screens
       const q = this._plane;
       D.yokes.forEach((y, i) => { y.wheel.rotation.x = -q.roll * 1.2 + 0.02 * Math.sin(s * 0.7 + i); y.rotation.z = -0.03 * Math.sin(s * 0.31); });
-      D.levers.forEach((l, i) => { l.rotation.z = i === 0 ? -0.5 * mgFlapAt(s) : 0.6 * mgGearAt(s) * (s > MG.sFlap ? 1 : 0); });
+      D.flap.position.x = 15.05 - 0.09 * MathX.smooth(s, MG.sFlap - 0.4, MG.sFlap);
+      { const kg = MathX.smooth(s, MG.sFlap + 3.2, MG.sFlap + 3.6); D.gear.position.y = MG_PL.floorY + 0.62 + 0.035 - 0.07 * kg; D.gear.rotation.z = 0.35 - 0.7 * kg; }
+      D.gearLights.forEach((l) => l.material.color.set(mgGearAt(s) >= 1 ? '#3aff6a' : s > MG.sFlap + 3.6 ? '#ff4a2a' : '#1a2a1c'));
       const land3 = s > MG.sLand3, apOn = (b) => b.material.color.set(land3 || b.userData.i !== 4 ? '#7cff9a' : '#22402a');
       D.ap.forEach(apOn);
       if (m === 'cockpit' || m === 'cockpitDoor' || m === 'fuel' || m === 'cockpitApp' || m === 'flaps' || m === 'land3' || m === 'finalCock') {
@@ -246,16 +249,28 @@ MG_SETS.world = (app) => {
     },
     // ---- the kitchen fires: each house's smoke (from its s0), a window glowing
     fires(s) {
-      const sm = this.smoke, P = this.camera.position;
+      const sm = this.smoke, fx = this.fx, P = this.camera.position;
       for (const f of this.town.fires) {
-        const on = MathX.smooth(s, f.s0, f.s0 + 240); f.glow.material.opacity = 0.85 * on * (0.75 + 0.25 * Math.sin(s * 7 + f.x));
-        if (on <= 0) continue;
-        const n = Math.round(46 * f.big);
+        const age = s - f.s0, on = MathX.smooth(age, 0, 60);
+        f.glow.material.opacity = 0.9 * on * (0.7 + 0.18 * Math.sin(s * 9 + f.x) + 0.12 * Math.sin(s * 23 + f.z));
+        if (age <= 0) continue;
+        const near = Math.hypot(f.x - P.x, f.y - P.y, f.z - P.z) < 260;
+        // flames in the window (additive), only seen up close
+        if (near) for (let i = 0; i < 10; i++) { const ph = ((s * (1.6 + 0.5 * mgR(i, 84)) + mgR(i, 85)) % 1 + 1) % 1;
+          fx.add(f.wx + f.nx * (0.15 + 0.3 * ph) + (mgR(i, 86) - 0.5) * 1.2, f.wy - 0.4 + 1.3 * ph, f.wz + f.nz * (0.15 + 0.3 * ph) + (mgR(i, 87) - 0.5) * 1.2,
+            0.5 + 0.5 * (1 - ph), 0.5 * on * (1 - ph), 1.0, 0.45 + 0.2 * (1 - ph), 0.12); }
+        // close up: a thick dark plume pouring out of the window and up the wall
+        if (near) for (let i = 0; i < 24; i++) { const ph = ((s / 9 + mgR(i, 88)) % 1 + 1) % 1, a = ph * 9;
+          const x = f.wx + f.nx * (0.4 + a * 0.35) + a * 0.25, z = f.wz + f.nz * (0.4 + a * 0.35), y = f.wy + 0.5 + a * 1.4, sz = 0.6 + a * 0.45;
+          sm.add(x, y, z, sz, 0.8 * on * Math.min(1, ph * 10) * (1 - ph), 0.07 + 0.08 * ph, 0.07 + 0.08 * ph, 0.075 + 0.08 * ph); }
+        // the smoke: puffs leave the window at their birth time (so a new fire's column grows), rise, drift east
+        const n = Math.round(52 * f.big);
         for (let i = 0; i < n; i++) { const life = 70 + 50 * mgR(i, 81), ph = ((s / life + mgR(i, 82)) % 1 + 1) % 1, a = ph * life;
-          const h = 6 + a * 1.4 * (0.8 + 0.4 * mgR(i, 83)), wind = a * 0.9;
-          const x = f.x + wind * 1.0 + 4 * Math.sin(a * 0.05 + i), z = f.z - wind * 0.35 + 4 * Math.cos(a * 0.04 + i * 2), y = f.y + h;
-          const sz = (3 + a * 0.55) * f.big, dk = 0.18 + 0.32 * ph, dist = Math.hypot(x - P.x, y - P.y, z - P.z);
-          sm.add(x, y, z, sz, 0.55 * on * (1 - ph) * Math.min(1, ph * 12) * MathX.clamp((dist - sz) / (2 * sz), 0, 1), dk, dk, dk * 1.04); }
+          if (a > age) continue;
+          const h = 1.5 + a * 1.35 * (0.8 + 0.4 * mgR(i, 83)), wind = a * 0.9 * MathX.smooth(h, 2, 14), out = Math.min(3, a * 0.8);
+          const x = f.x + f.nx * out + wind + 3 * Math.sin(a * 0.05 + i) * ph, z = f.z + f.nz * out - wind * 0.35 + 3 * Math.cos(a * 0.04 + i * 2) * ph, y = f.y + h;
+          const sz = (1.4 + a * 0.6) * f.big, dk = 0.08 + 0.26 * ph, dist = Math.hypot(x - P.x, y - P.y, z - P.z);
+          sm.add(x, y, z, sz, 0.72 * on * (1 - ph) * Math.min(1, ph * 14) * MathX.clamp((dist - sz) / (2 * sz), 0, 1), dk, dk * 0.98, dk * 1.02); }
       }
     },
     // ---- the coffee (7:42:00.3: the cup lands on the seat; the coffee splashes, in slow motion)
@@ -271,11 +286,11 @@ MG_SETS.world = (app) => {
     contrail(s, m) {
       if (s > 650 || !(m === 'skyUp' || m === 'planeExt' || m === 'planeMap')) return;
       const sm = this.smoke, A = this.A;
-      for (let k = 0; k < 150; k++) { const age = 0.6 + k * 0.9, q = mgPlaneAt(s - age); if (q.phase !== 'cruise') continue;
+      for (let k = 0; k < 420; k++) { const age = 0.6 + k * 0.3, q = mgPlaneAt(s - age); if (q.phase !== 'cruise') continue;
         for (const sd of [-1, 1]) { const off = new THREE.Vector3(-3, -1.9, sd * 5.6), x = q.p[0] - Math.sin(q.h) * 0 + off.z * Math.cos(q.h) * 0, sp = (6 + age * 1.1);
           // (behind the plane along its path: the path itself carries the trail; the engines' spacing at the start)
           const fwd = [Math.sin(q.h), 0, -Math.cos(q.h)], rt = [Math.cos(q.h), 0, Math.sin(q.h)];
-          sm.add(q.p[0] + rt[0] * sd * 5.6 * Math.exp(-age / 30) + fwd[0] * -3, q.p[1] - 1.9 + age * 0.05, q.p[2] + rt[2] * sd * 5.6 * Math.exp(-age / 30) + fwd[2] * -3, sp, 0.6 * Math.min(1, age / 2) * (1 - age / 140), 0.96, 0.97, 1.0); void x; void off; } }
+          sm.add(q.p[0] + rt[0] * sd * 5.6 * Math.exp(-age / 30) + fwd[0] * -3, q.p[1] - 1.9 + age * 0.05, q.p[2] + rt[2] * sd * 5.6 * Math.exp(-age / 30) + fwd[2] * -3, sp, 0.45 * Math.min(1, age / 2) * (1 - age / 128), 0.97, 0.98, 1.0); void x; void off; } }
       void A;
     },
     // ---- the tyres' smoke at touchdown
@@ -330,18 +345,18 @@ function mgWorldCam(set, m, s, t, k, v) {
     // ---- real speed: the radio, the gantry, his phone
     case 'radio': inCar(into([0.0, 1.12, 0.28], [0.03, 1.1, 0.24]), [0.708, 0.72, 0.0], 40); break;
     case 'gantry': v.p = into([262, Y + 1.7, 13.4], [266, Y + 1.75, 13.2]); v.at = [330, Y + 5.6, 6]; v.fov = 50; v.near = 0.2; v.sh = [300, Y, 6]; v.shR = 50; break;
-    case 'phone': { const ph = YC.phone.position; inCar(into([ph.x - 0.42, ph.y + 0.62, ph.z + 0.36], [ph.x - 0.36, ph.y + 0.55, ph.z + 0.3]), [ph.x, ph.y, ph.z], 38); break; }
+    case 'phone': { const ph = YC.phone.position; inCar(into([ph.x - 0.24, ph.y + 0.36, ph.z + 0.2], [ph.x - 0.2, ph.y + 0.31, ph.z + 0.16]), [ph.x, ph.y, ph.z], 36); break; }
     // ---- the train, the barge
     case 'trainHigh': { const f = P.trainZ(s); v.p = into([152, Y + 1.55, -17.6], [151, Y + 1.5, -17.6]); v.at = [MG_V.railX, MG_RAIL.y + 2, f - 30]; v.fov = 34; v.near = 0.3; v.sh = [MG_V.railX, 0, f - 40]; v.shR = 70; break; }
-    case 'trainCab': { const f = P.trainZ(s); v.p = into([MG_V.railX + 2.3, MG_RAIL.y + 3.05, f - 0.9], [MG_V.railX + 2.0, MG_RAIL.y + 3.0, f - 1.05]); v.at = [MG_V.railX - 0.5, MG_RAIL.y + 2.4, f - 1.5]; v.fov = 50; v.near = 0.1; v.sh = [MG_V.railX, 0, f - 3]; v.shR = 14; v.drift = 0.006; break; }
+    case 'trainCab': { const f = P.trainZ(s); v.p = into([MG_V.railX + 0.8, MG_RAIL.y + 3.25, f - 2.75], [MG_V.railX + 0.7, MG_RAIL.y + 3.2, f - 2.6]); v.at = [MG_V.railX - 0.45, MG_RAIL.y + 2.45, f - 0.9]; v.fov = 62; v.near = 0.1; v.sh = [MG_V.railX, 0, f - 3]; v.shR = 14; v.drift = 0.006; break; }
     case 'barge': { const b = P.bargeBow(s); v.p = into([22, Y + 1.55, 17.6], [21, Y + 1.5, 17.6]); v.at = [10, -1, b - 18]; v.fov = 40; v.near = 0.3; v.sh = [14, 0, b - 40]; v.shR = 70; break; }
     case 'bargeHit': { const b = P.bargeBow(s), x0 = 64, z0 = 478; v.p = [x0, gy(x0, z0) + 1.7, z0]; v.at = [12, 0.5, Math.min(b, 440) - 12]; v.fov = 46; v.near = 0.3; v.sh = [20, 0, 420]; v.shR = 60; v.drift = 0.01; break; }
     // ---- flight 2207 at 11,000 m (7:43)
-    case 'skyUp': { const q = set._plane; v.p = [cx + 4, Y + 1.6, 10.5]; v.at = [q.p[0] + 120, q.p[1], q.p[2] + 260]; v.fov = mgLerp(34, 7, Ease.inOutSine(MathX.clamp(k * 1.6 - 0.2, 0, 1))); v.near = 0.5; v.far = 60000; v.drift = 0.003; v.fogD = 0.00003; v.sh = [cx, Y, 8]; v.shR = 40; break; }
+    case 'skyUp': { const q = set._plane; v.p = [cx + 4, Y + 1.6, 10.5]; v.at = [q.p[0] + 120, q.p[1], q.p[2] + 260]; v.fov = mgLerp(34, 3.2, Ease.inOutSine(MathX.clamp(k * 1.6 - 0.2, 0, 1))); v.near = 0.5; v.far = 60000; v.drift = 0.003; v.fogD = 0.00003; v.sh = [cx, Y, 8]; v.shR = 40; break; }
     case 'cockpit': inPlane([13.25, fy + 1.32, 0.0], [16.2, fy + 1.05, 0.0], 64); break;
     case 'planeExt': v.p = AL(into([-34, 7, 30], [-30, 6, 27])); v.at = AL([4, 0, 0]); v.fov = 40; v.near = 0.5; v.far = 60000; v.fogD = 0.00003; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.05; break;
     case 'planeMap': v.p = AL(into([16, -12, -40], [12, -11, -36])); v.at = AL([-6, 0, 0]); v.fov = 44; v.near = 0.5; v.far = 60000; v.fogD = 0.00003; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.05; break;
-    case 'cabinAisle': inPlane([-7.5, fy + 1.55, 0.05], [12.6, fy + 1.25, -0.1], 46); break;
+    case 'cabinAisle': inPlane([-8.6, fy + 1.72, 0.0], [12.6, fy + 1.2, -0.1], 46); break;
     case 'keypad': inPlane(into([11.4, fy + 1.62, -1.22], [11.55, fy + 1.6, -1.18]), [12.35, fy + 1.32, -0.5], 46); break;
     case 'cabinPax': inPlane(into([11.6, fy + 1.62, 0.2], [11.4, fy + 1.6, 0.15]), [-12, fy + 0.75, -0.3], 52); break;
     case 'doorWait': inPlane(into([10.9, fy + 1.5, 0.95], [11.1, fy + 1.5, 0.9]), [12.3, fy + 1.45, -0.4], 42); break;
@@ -353,7 +368,8 @@ function mgWorldCam(set, m, s, t, k, v) {
     case 'towerIn': v.p = into([T[0] + 3.4, H + 1.78, T[2] + 1.0], [T[0] + 3.0, H + 1.74, T[2] + 0.7]); v.at = [T[0] - 4.0, H + 1.0, T[2] - 0.3]; v.fov = 58; v.near = 0.1; v.sh = [T[0], H, T[2]]; v.shR = 10; v.drift = 0.006; break;
     // ---- the town (7:51), the hospital (8:04)
     case 'town': v.p = into([-236, Y + 1.6, 17.8], [-240, Y + 1.62, 17.8]); v.at = [-900, 28, 1100]; v.fov = 46; v.near = 0.3; v.sh = [-600, 0, 700]; v.shR = 500; break;
-    case 'house': { const f = set.town.fires[0]; v.p = into([f.x + 34, gy(f.x + 34, f.z + 26) + 1.7, f.z + 26], [f.x + 32, gy(f.x + 32, f.z + 24) + 1.7, f.z + 24]); v.at = [f.x, f.y + 4, f.z]; v.fov = 48; v.near = 0.3; v.sh = [f.x, f.y, f.z]; v.shR = 60; break; }
+    case 'house': { const f = set.town.fires[0], tx = f.nz, tz = -f.nx, cx = f.wx + f.nx * 30 + tx * 12, cz = f.wz + f.nz * 30 + tz * 12;
+      v.p = into([cx, gy(cx, cz) + 1.7, cz], [cx - f.nx * 2 - tx * 1.2, gy(cx, cz) + 1.7, cz - f.nz * 2 - tz * 1.2]); v.at = [f.wx, f.wy + 3.5, f.wz]; v.fov = 50; v.near = 0.3; v.sh = [f.wx, f.wy, f.wz]; v.shR = 60; break; }
     case 'townHigh': v.p = into([260, 190, 260], [240, 186, 300]); v.at = [-1100, 0, 1500]; v.fov = 50; v.near = 1; v.sh = [-800, 0, 1200]; v.shR = 900; break;
     case 'hospital': { const [x, , z] = MG_V.hospital; v.p = into([x + 74, gy(x + 74, z - 64) + 1.7, z - 64], [x + 70, gy(x + 70, z - 60) + 1.7, z - 60]); v.at = [x + 5, 9, z]; v.fov = 52; v.near = 0.3; v.sh = [x, 0, z]; v.shR = 80; break; }
     // ---- 9:10: walking home; 9:31: the alert
@@ -366,18 +382,28 @@ function mgWorldCam(set, m, s, t, k, v) {
     case 'hold': v.p = AL(into([-26, 5, -24], [-22, 4, -21])); v.at = AL([6, 0, 0]); v.fov = 42; v.near = 0.5; v.far = 50000; v.fogD = 0.00008; v.sh = AL([0, 0, 0]); v.shR = 30; v.drift = 0.04; break;
     case 'radar': { const r = set.AP.radarMesh.position, d = set.AP.desks[4]; v.p = into([r.x - d.dx * 0.95 + d.dz * 0.15, r.y + 0.12, r.z - d.dz * 0.95 - d.dx * 0.15], [r.x - d.dx * 0.8 + d.dz * 0.1, r.y + 0.08, r.z - d.dz * 0.8 - d.dx * 0.1]); v.at = [r.x, r.y, r.z]; v.fov = 42; v.near = 0.05; v.sh = [T[0], H, T[2]]; v.shR = 10; v.drift = 0.004; break; }
     case 'ctl': { const p = set.AP.ctl[0], d = p.desk, hd = [d.cxp, H + 1.25, d.czp]; v.p = [hd[0] + d.dx * 0.9 - d.dz * 0.9, H + 1.45, hd[2] + d.dz * 0.9 + d.dx * 0.9]; v.at = hd; v.fov = 40; v.near = 0.05; v.sh = [T[0], H, T[2]]; v.shR = 10; v.drift = 0.004; break; }
-    case 'stack': v.p = into([cx + 4, Y + 1.6, -14], [cx + 4, Y + 1.6, -14]); v.at = into([700, 2400, -7000], [500, 2600, -7600]); v.fov = 54; v.near = 0.5; v.far = 50000; v.fogD = 0.00006; v.sh = [cx, Y, -10]; v.shR = 40; break;
+    case 'stack': {   // (on the airfield, west of the tower, looking up past it: about 10 of the 23 in view)
+      const p0 = [T[0] - 113, 1.7, T[2] + 65], p1 = [T[0] - 111, 1.7, T[2] + 63]; v.p = into(p0, p1);
+      v.at = into([p0[0] + 926, 1.7 + 342, p0[2] - 163], [p1[0] + 885, 1.7 + 438, p1[2] - 156]); v.fov = 60; v.near = 0.5; v.far = 50000; v.fogD = 0.00006; v.sh = [T[0] - 60, 0, T[2] + 40]; v.shR = 90; v.drift = 0.004; break; }
     // ---- 10:14: the autoland
     case 'cockpitApp': inPlane(into([14.0, fy + 1.3, 0.78], [14.1, fy + 1.28, 0.72]), [14.75, fy + 1.0, -0.6], 54); break;
-    case 'flaps': inPlane(into([14.45, fy + 1.42, 0.42], [14.5, fy + 1.38, 0.36]), [15.05, fy + 0.86, -0.02], 40); break;
+    case 'flaps': inPlane(into([14.45, fy + 1.42, 0.42], [14.5, fy + 1.38, 0.36]), [15.2, fy + 0.8, 0.08], 44); break;
     case 'towerRead': { const p = set.AP.ctl[0], d = p.desk; v.p = [d.cxp - d.dx * 0.9, H + 1.6, d.czp - d.dz * 0.9]; v.at = [d.cxp + d.dx * 6, H + 1.2, d.czp + d.dz * 6]; v.fov = 56; v.near = 0.05; v.sh = [T[0], H, T[2]]; v.shR = 10; v.drift = 0.005; break; }
     case 'land3': inPlane(into([15.05, fy + 0.98, -0.9], [15.15, fy + 0.95, -0.91]), [15.665, fy + 0.86, -0.92], 26); break;
     // ---- 10:21: the landing
-    case 'finalVia': { const q = set._plane, c0 = [R.x - 30, Y + 1.55, 13.4], el = Math.min(Math.atan2(q.p[1] - c0[1], Math.max(1, c0[2] - q.p[2])), 0.62); v.p = c0; v.at = [R.x - 30 + 12 * Math.cos(el) * 0.1, c0[1] + 100 * Math.sin(el), c0[2] - 100 * Math.cos(el)]; v.fov = 58; v.near = 0.3; v.sh = [R.x - 20, Y, 8]; v.shR = 40; v.drift = 0.008; break; }
+    case 'finalVia': { const q = set._plane, c0 = [R.x - 70, Y + 1.6, -14.6], a0 = [R.x + 30, Y + 12, -30], kk2 = 0.72; v.p = c0; v.at = [mgLerp(a0[0], q.p[0], kk2), mgLerp(a0[1], q.p[1], kk2), mgLerp(a0[2], q.p[2], kk2)]; v.fov = 60; v.near = 0.3; v.sh = [R.x - 20, Y, 8]; v.shR = 40; v.drift = 0.008; break; }
     case 'finalCock': inPlane([13.95, fy + 1.5, -0.12], [24, fy + 0.6, 0], 62); break;
-    case 'finalTower': { const q = set._plane; v.p = [T[0] - 0.6, H + 1.72, T[2] + 0.7]; v.at = mgV([T[0] - 2.8, H + 1.2, T[2] - 1.9], [q.p[0], q.p[1], q.p[2]], 0.5 + 0.5 * Ease.inOutSine(MathX.clamp(k * 2, 0, 1))); v.fov = 38; v.near = 0.2; v.sh = [T[0], H, T[2]]; v.shR = 14; v.drift = 0.003; break; }
+    case 'finalTower': {
+      // from the middle of the cab (clear of the window posts and the radar screen), past a controller, then a long lens
+      // on the plane: a 40 m airliner fills about a fifth of the frame's width all the way in
+      const q = set._plane; v.p = [T[0] - 0.19, H + 1.75, T[2] - 0.46];   // (checked by ray: nothing in the cab crosses the line to the plane)
+      const on = Ease.inOutSine(MathX.clamp(k * 2.2 - 0.1, 0, 1)), d = Math.hypot(q.p[0] - v.p[0], q.p[1] - v.p[1], q.p[2] - v.p[2]);
+      const tight = 2 * Math.atan(Math.tan(Math.min(0.7, 40 / d / 0.2) / 2) * 9 / 16) * 180 / Math.PI;
+      v.at = mgV([T[0] - 2.8, H + 1.2, T[2] - 1.9], [q.p[0], q.p[1], q.p[2]], 0.45 + 0.55 * on); v.fov = mgLerp(40, tight, Ease.inOutSine(MathX.clamp(k * 1.8 - 0.25, 0, 1)));
+      v.fogD = 0.00003; v.near = 0.2; v.sh = [T[0], H, T[2]]; v.shR = 14; v.drift = 0.002; break; }
     case 'touchdown': { const q = set._plane; v.p = [R.x + 46, 1.5, MG_FL.zTD + 70]; v.at = [q.p[0], q.p[1] + 1.5, q.p[2]]; v.fov = 34; v.near = 0.5; v.sh = [R.x, 0, MG_FL.zTD + 60]; v.shR = 90; v.drift = 0.004; break; }
-    case 'question': v.p = into([R.x - 24, Y + 1.5, 12.4], [R.x - 24, Y + 1.5, 12.4]); v.at = into([R.x - 80, Y + 300, -900], [R.x - 120, Y + 1400, -3000]); v.fov = 56; v.near = 0.3; v.far = 50000; v.fogD = 0.00008; v.sh = [R.x, Y, 8]; v.shR = 40; v.drift = 0.004; break;
+    case 'question': v.p = into([R.x - 40, Y + 1.7, 15.4], [R.x - 38, Y + 1.72, 15.3]); v.at = into([R.x - 40 + 978, Y + 1.7 + 208, 15.4], [R.x - 38 + 927, Y + 1.72 + 375, 15.3]); v.fov = 62;   // (east, down the stopped motorway: 8 of the 23 in view)
+      v.near = 0.3; v.far = 50000; v.fogD = 0.00008; v.sh = [R.x, Y, 8]; v.shR = 40; v.drift = 0.004; break;
   }
   void lx; void into;
 }
@@ -387,8 +413,10 @@ function mgWorldLabels(set, t) {
   const shot = mgShotAt(t), m = shot.mode, out = [], W = StoryHUD.win, s = set._s;
   const lab = (p, text, sub, a0 = 0.8, side) => out.push({ p, text, sub, a: W(t, shot.t0 + a0, shot.t1 - 0.25, 0.35, 0.3), side });
   if (m === 'cabIn') { const w = new THREE.Vector3(6.95, 2.3, -0.62); set.LR.G.localToWorld(w); lab([w.x, w.y, w.z], 'THE DRIVER’S SEAT', 'empty', 1.0); }
-  if (m === 'trainCab') lab([MG_V.railX - 0.55, MG_RAIL.y + 2.3, MGP.trainZ(s) - 1.6], 'THE SAFETY PEDAL', 'released: the brakes come on', 1.0);
-  if (m === 'carsNew') { const c = MG_TRAFFIC.place(MG_TRAFFIC.heroNew, s); lab([c.x, MG_V.deckY + 1.9, c.z], 'NO ONE STEERING', 'it brakes itself, hazards on', 0.8, 'r'); }
+  if (m === 'trainCab') lab([MG_V.railX - 0.55, MG_RAIL.y + 2.2, MGP.trainZ(s) - 1.2], 'THE SAFETY PEDAL', 'released: the brakes come on', 1.0);
+  if (m === 'carsNew') { const c = MG_TRAFFIC.place(MG_TRAFFIC.heroNew, s); lab([c.x, MG_V.deckY + 1.9, c.z], 'NO ONE STEERING', 'it brakes itself, hazards on', 0.8); }
+  if (m === 'flaps') { const IN = set.IN, a = IN.flapKnob.getWorldPosition(new THREE.Vector3()), b = IN.gearKnob.getWorldPosition(new THREE.Vector3());
+    lab([a.x, a.y + 0.03, a.z], 'FLAPS', s > MG.sFlap ? 'set for landing' : 'up', 0.6, 'r'); lab([b.x, b.y + 0.03, b.z], 'THE WHEELS', mgGearAt(s) >= 1 ? 'down: 3 green' : s > MG.sFlap + 3.4 ? 'going down' : 'up', 1.2); }
   if (m === 'carsOld') { const c = MG_TRAFFIC.place(MG_TRAFFIC.heroOld, s); lab([c.x, MG_V.deckY + 1.8, c.z], 'NO ASSISTANT', 'it drifts until it hits', 0.8); }
   if (m === 'skyUp') { const q = set._plane; lab([q.p[0], q.p[1], q.p[2]], 'FLIGHT 2207', '11,000 m up', 1.0); }
   if (m === 'keypad') { const w = new THREE.Vector3(12.42, MG_PL.floorY + 1.25, -0.72); set.A.localToWorld(w); lab([w.x, w.y, w.z], 'EMERGENCY ACCESS', 'opens after 30 s', 1.2, 'r'); }
@@ -396,6 +424,6 @@ function mgWorldLabels(set, t) {
   if (m === 'barge') lab([MGP.barge.x, 3, MGP.bargeBow(s) - 40], 'BARGE ON AUTOPILOT', 'heading held: 180°', 1.0);
   if (m === 'hospital') lab([MG_V.hospital[0] + 30, 19, MG_V.hospital[2] - 13], 'THE HOSPITAL', 'maternity ward, 2nd floor', 1.0);
   if (m === 'hold') { const q = set._plane; lab([q.p[0], q.p[1] + 6, q.p[2]], 'FLIGHT 2207', 'circling at 1,200 m', 1.0, 'r'); }
-  if (m === 'finalVia' || m === 'finalTower') { const q = set._plane; lab([q.p[0], q.p[1] + 8, q.p[2]], 'FLIGHT 2207', 'landing itself', 1.0, 'r'); }
+  if (m === 'finalVia') { const q = set._plane; lab([q.p[0], q.p[1] + 8, q.p[2]], 'FLIGHT 2207', 'landing itself', 1.0, 'r'); }
   return out;
 }
