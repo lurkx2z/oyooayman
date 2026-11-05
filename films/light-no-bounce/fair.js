@@ -186,7 +186,7 @@ function nbFairCam(set, m, s, t, k, shot, v, lstAdd) {
     // ---- the rides
     case 'coaster': { const f = set.co.cars[0].position; v.p = [44, 1.65, 12.5]; v.at = [f.x, f.y + 1, f.z]; v.fov = 50; v.near = 0.1; break; }
     case 'coasterPOV': { const C = set.co, d = C.frontD(s), f = C.at(d), a = C.at(d + 14); v.p = [f.p.x + f.up.x * 1.28 + f.t.x * 0.5, f.p.y + f.up.y * 1.28 + f.t.y * 0.5, f.p.z + f.up.z * 1.28 + f.t.z * 0.5]; v.at = [a.p.x, a.p.y + 0.4, a.p.z]; v.fov = 70; v.near = 0.05; v.shake = 0.004; break; }
-    case 'dodgems': v.p = into([-23.4, 1.35, -12.5], [-24.6, 1.35, -12.6], k); v.at = [-33, 2.2, -21]; v.fov = 64; v.near = 0.05; break;
+    case 'dodgems': v.p = into([-26.6, 1.45, -12.6], [-27.6, 1.45, -12.6], k); v.at = [-31, 2.5, -19.5]; v.fov = 60; v.near = 0.05; break;
     case 'fire': v.p = into([3.6, 1.55, 2.6], [3.9, 1.55, 2.75], k); v.at = [8.1, 1.65, 5.0]; v.fov = 40; v.near = 0.05; break;
     case 'fireClose': v.p = into([6.4, 1.9, 3.7], [6.55, 1.9, 3.8], k); v.at = [8.2, 1.95, 5.15]; v.fov = 34; v.near = 0.05; break;
     // ---- the internet; the heat; Saturn; your pupils
@@ -217,10 +217,12 @@ function nbFairLabels(set, t) {
   if (m === 'sky') { const d = sky.dirOf(18.615, 38.78); lab(far(d), 'VEGA', 'a star: its own light', 2.0, 'r'); }
   if (m === 'sun') lab(far(sky.sunDir), 'THE SUN', 'white: nothing scatters its blue', 1.2, 'r');
   if (m === 'hands') { set.hands.left.g.getWorldPosition(set._lh || (set._lh = new THREE.Vector3())); const h = set._lh; lab([h.x, h.y + 0.08, h.z], 'YOUR HAND', 'only its outline, against the bulbs', 2.6); }
-  if (m === 'driver') { const a = set.V.drvAt(s, 25); lab(a, 'HEADLIGHTS ON (AUTOMATIC)', 'the road sends nothing back', 1.2); }
+  if (m === 'driver') {   // the nearest car ahead (either lane): only its brake lights show
+    const V = set.V, D = V.drv, d = V.carPose(D, s), dir = NB_MW.lanes[D.lane].dir; let best = null, bd = 1e9;
+    for (const c of V.cars) { if (c === D || NB_MW.lanes[c.lane].dir !== dir) continue; const p = V.carPose(c, s), dd = (p.z - d.z) * dir; if (dd > 5 && dd < bd) { bd = dd; best = p; } }
+    if (best) lab([best.x, NB_MW.y + 1.7, best.z], 'A CAR AHEAD', `braking blind · ${Math.round(bd)} m`, 1.2); }
   if (m === 'valley') lab([430, -66, -260], 'THE MOTORWAY', '70 m below you', 0.8);
   if (m === 'planeHill') { const p = set.V.plane.position; lab([p.x, p.y + 6, p.z], 'A PLANE, LANDING', 'its own lights', 1.0, 'r'); lab([2000, NB_F.runway.y + 30, NB_F.runway.z], 'THE RUNWAY', 'lit edges, nothing between', 1.6); }
-  if (m === 'tower') lab([2350, NB_F.runway.y + 30, NB_F.runway.z - 330], 'RADAR', 'its pulses don’t come back', 1.0, 'r');
   if (m === 'coaster') { const f = set.co.cars[0].position; lab([f.x, f.y + 1.6, f.z], 'YOUR FRIEND', 'front row', 0.8); }
   if (m === 'dodgems') lab([-30, 4.6, -24], 'SPARKS', 'a spark makes its own light', 1.0);
   if (m === 'fireClose') { set.PP.juggler.p.j.ra.hand.getWorldPosition(set._jh || (set._jh = new THREE.Vector3())); const h = set._jh; lab([h.x, h.y, h.z], 'HIS HAND', 'holding the torch', 1.0); }

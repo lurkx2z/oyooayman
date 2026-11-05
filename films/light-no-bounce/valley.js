@@ -118,7 +118,7 @@ function nbBuildValley(S, W) {
   cars.forEach((c) => { const z5 = P.lanes[c.lane].dir * carU(c, 5); c.hero = z5 > -420 && z5 < 260; });
   // the car you ride in (the driver's view): northbound, the middle lane, near z −60 at 3:30:04
   { let best = null; for (const c of cars) if (c.lane === 1) { const z = -carU(c, 4.4); if (!best || Math.abs(z + 60) < Math.abs(-carU(best, 4.4) + 60)) best = c; } out.drv = best; best.hero = false; }
-  for (const c of cars) if (c.hero) { const v = VF.build(c.type, c.col); v.c = c; scene.add(v.group); hero.push(v); }
+  for (const c of cars) if (c.hero) { const v = VF.build(c.type, c.col); v.c = c; c.bodyL = v.L; scene.add(v.group); hero.push(v); }
   const blocks = cars.filter((c) => !c.hero && c !== out.drv);
   const bodyG = new THREE.BoxGeometry(4.4, 0.75, 1.8); bodyG.translate(0, 0.62, 0);
   const cabG = new THREE.BoxGeometry(2.3, 0.62, 1.6); cabG.translate(-0.2, 1.3, 0);
@@ -138,7 +138,7 @@ function nbBuildValley(S, W) {
     for (const c of cars) {
       const p = carPose(c, s); if (Math.abs(p.z) > P.vis) continue;
       if (near && Math.hypot(p.x - near.x, p.z - near.z) > near.r) continue;
-      const h = c.len / 2, fx = -Math.sin(p.yaw - Math.PI / 2) * 0 + Math.cos(p.yaw), fz = -Math.sin(p.yaw), sx = -fz, sz = fx;   // forward (the car's +x), side
+      const h = Math.max(c.len, c.bodyL || 0) / 2 + 0.06, fx = -Math.sin(p.yaw - Math.PI / 2) * 0 + Math.cos(p.yaw), fz = -Math.sin(p.yaw), sx = -fz, sz = fx;   // forward (the car's +x), side
       const y = P.y, v = carV(c, s), dark = s >= 0 && s < NBP.T;
       const head = c.lit || s > c.auto || s > 600;                                // the auto headlights see night at 3:30 (and dusk at 4:42)
       const braking = (s >= c.react && s < NBP.T + 0.7 && c.mode !== 'coast' && v > 0.2) || (s >= NBP.T + 0.7 && v > 0.2) || (s < c.react && c.acc < -1.5);
@@ -283,7 +283,7 @@ function nbBuildValley(S, W) {
   // ---- the control tower's cab (40 m up): its consoles' screens, a controller (black against the lights outside), the
   // window posts
   {
-    const c = [2050, ry + 38.0, R.z - 390], eye = [c[0] - 4.6, c[1] + 1.65, c[2] + 3.2], at = [eye[0] + 766, ry + 20, eye[2] + 643]; out.cab = { eye, at };
+    const c = [2050, ry + 38.0, R.z - 390], eye = [c[0] - 4.6, c[1] + 1.65, c[2] + 3.2], at = [eye[0] + 766, ry - 105, eye[2] + 643]; out.cab = { eye, at };
     const blk = nbStd('#1a1c20', 0.6), d = new THREE.Vector3(at[0] - eye[0], 0, at[2] - eye[2]).normalize(), rgt = new THREE.Vector3(-d.z, 0, d.x), yaw = Math.atan2(d.x, d.z);
     const P = (f, r, y) => [eye[0] + d.x * f + rgt.x * r, y, eye[2] + d.z * f + rgt.z * r];
     for (let a = 0; a < 12; a++) { const q = a / 12 * Math.PI * 2; nbBox(0.12, 5.6, 0.12, blk, c[0] + 8.7 * Math.cos(q), c[1] + 3, c[2] + 8.7 * Math.sin(q)); }
@@ -293,11 +293,11 @@ function nbBuildValley(S, W) {
       const a = st.a, grd = g.createConicGradient ? g.createConicGradient(a - 0.6, w / 2, h / 2) : null;
       if (grd) { grd.addColorStop(0, 'rgba(60,255,110,0)'); grd.addColorStop(0.095, 'rgba(60,255,110,0.35)'); grd.addColorStop(0.0955, 'rgba(60,255,110,0)'); grd.addColorStop(1, 'rgba(60,255,110,0)'); g.fillStyle = grd; g.beginPath(); g.arc(w / 2, h / 2, w * 0.45, 0, 7); g.fill(); }
       g.strokeStyle = '#7aff9a'; g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2, h / 2); g.lineTo(w / 2 + Math.cos(a) * w * 0.45, h / 2 + Math.sin(a) * w * 0.45); g.stroke();
-      g.fillStyle = '#9affb0'; g.fillRect(w * 0.78, h * 0.47, 8, 8); g.font = '700 18px Arial'; g.fillText('BAW271', w * 0.74, h * 0.44); g.fillText('021  136', w * 0.74, h * 0.56);
+      g.fillStyle = '#9affb0'; g.fillRect(w * 0.78, h * 0.47, 8, 8); g.font = '700 18px Arial'; g.fillText('FLT271', w * 0.74, h * 0.44); g.fillText('002  136', w * 0.74, h * 0.56);
       g.fillStyle = '#ffd04a'; g.fillText('PRIMARY: NO RETURNS', 14, h - 16); });
     const sm = (tex, f, r, y, w, h) => { const p = P(f, r, y), m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(0.95, 0.95, 0.95) })); m.position.set(...p); m.rotation.set(0, yaw + Math.PI, 0); m.rotateX(-0.45); scene.add(m); return m; };
-    sm(out.cabScope.tex, 0.95, -0.35, c[1] + 1.26, 0.46, 0.46);
-    sm(nbTex(nbCanvas(512, 256, (g, w, h) => { g.fillStyle = '#05080c'; g.fillRect(0, 0, w, h); g.font = '700 24px Arial'; ['BAW271  A320  27  LDG', 'EZY84P  A319  27  HOLD', 'RYR3GK  B738  STAND 14'].forEach((t, i) => { g.fillStyle = i ? '#cfd8e0' : '#ffd04a'; g.fillRect(10, 18 + i * 76, w - 20, 60); g.fillStyle = '#06080a'; g.fillText(t, 22, 56 + i * 76); }); }), { repeat: false }), 0.95, 0.42, c[1] + 1.16, 0.5, 0.25);
+    sm(out.cabScope.tex, 0.95, -0.62, c[1] + 1.26, 0.46, 0.46);
+    sm(nbTex(nbCanvas(512, 256, (g, w, h) => { g.fillStyle = '#05080c'; g.fillRect(0, 0, w, h); g.font = '700 24px Arial'; ['FLT271  A320  27  LDG', 'FLT84P  A319  27  HOLD', 'FLT3GK  B738  STAND 14'].forEach((t, i) => { g.fillStyle = i ? '#cfd8e0' : '#ffd04a'; g.fillRect(10, 18 + i * 76, w - 20, 60); g.fillStyle = '#06080a'; g.fillText(t, 22, 56 + i * 76); }); }), { repeat: false }), 0.95, 0.42, c[1] + 1.16, 0.5, 0.25);
     // the controller, on the right of the desk, looking out (a dark shape) with a headset's tiny green light
     { const p = P(0.75, 0.95, c[1]); nbCyl(0.2, 0.24, 0.75, blk, p[0], c[1] + 0.95, p[2]); nbMesh(new THREE.SphereGeometry(0.12, 12, 10), blk, p[0], c[1] + 1.5, p[2]); out.cabLed = [p[0] - rgt.x * 0.13, c[1] + 1.52, p[2] - rgt.z * 0.13]; }
   }

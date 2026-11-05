@@ -16,7 +16,7 @@
      light-time            light already bounced before 3:30 is still on its way: the Moon (1.28 light-seconds) shines
                            on for 1.28 s, then goes; it comes back 1.28 s after everything else. Saturn (72 light-minutes)
                            shines on through the whole ten seconds, and goes out for ten seconds at 4:42:10 PM
-     your pupils           in the dark they open from about 2.5 mm towards 7 mm over seconds (×5 the light by s = 10:
+     your pupils           in the dark they open from about 2.5 mm towards 7 mm over seconds (×7 the light by s = 10:
                            more stars appear); when light returns you are dazzled until they close (about half a second)
      glass fibres          light is kept inside a fibre by total internal reflection (a bounce): every fibre goes dark,
                            and with it the internet's ~600 undersea cables (≈ 99% of traffic between continents)

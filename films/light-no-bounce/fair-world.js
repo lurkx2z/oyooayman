@@ -100,9 +100,9 @@ function nbBuildFairWorld(S) {
     for (let i = 0; i < F.stalls.n; i++) {
       const x = F.stalls.x[0] + i * (F.stalls.x[1] - F.stalls.x[0]) / (F.stalls.n - 1), z = F.stalls.z, g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
       const hut = nbStd(['#f0e8da', '#e8d8c0', '#dfe6ee'][i % 3], 0.7);
-      nbBox(5.4, 2.7, 0.12, hut, 0, 1.35, 1.5, g);                       // back wall
+      nbBox(5.3, 2.7, 0.12, hut, 0, 1.35, 1.5, g);                       // back wall (its ends inside the side walls: no coplanar faces)
       for (const sx of [-1, 1]) nbBox(0.12, 2.7, 3.0, hut, sx * 2.64, 1.35, 0, g);
-      nbBox(5.4, 1.05, 0.5, nbStd(stripes[i][0], 0.6), 0, 0.525, -1.22, g);   // the counter
+      nbBox(5.3, 1.05, 0.5, nbStd(stripes[i][0], 0.6), 0, 0.525, -1.22, g);   // the counter (its ends inside the side walls)
       nbBox(5.6, 0.06, 0.62, nbStd('#f4f0e8', 0.5), 0, 1.08, -1.24, g);
       nbBox(5.4, 0.12, 3.0, hut, 0, 2.76, 0, g);                         // the roof
       // the awning: a sloping striped sheet out over the counter

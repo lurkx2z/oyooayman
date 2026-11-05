@@ -2,12 +2,12 @@
    AUDIO — "What if light stopped bouncing for 10 seconds?" js/audio/audioEngine.js is unchanged (this is a
    subclass); the NBX and generators come from audiokit.js (via the gravity films). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
-     music  an original score (sound-music.js): cold A minor pads, a felt piano's rising motif, glass bells, a low drum,
-            and under everything from 9:00 PM the endless rise (a Shepard–Risset glissando), cut on the last frame
-     amb    where the camera is (sound-amb.js): the train, the bay, the hospital, the stadium, the mountain, the road,
-            the beach; darker and lower in the slow minutes
-     sfx    the events at their story seconds (sound-sfx.js; each heard once: the clock only runs forward; slowed with
-            the picture in the slow minutes), the party's song fading with its speaker's magnet, the fire's crackle
+     music  an original score (sound-music.js): cold A minor pads, a felt piano (also backwards), glass bells, a low
+            drum, a heartbeat; the endless rise under the count; a blinding A major chord at 3:30:10; cut on the last frame
+     amb    where the camera is (sound-amb.js): the fair, the fence over the valley, a car, the verge, a flight deck, the
+            tower, beside the plane, the rollercoaster, the space station; at the world's own speed (a quarter in the dark)
+     sfx    the events at their story moments (sound-sfx.js; each heard once: the clock only runs forward): the carousel's
+            organ running down like tape, the crowd's slowed cries, horns, the riser into 3:30:10, the screams, the crash
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
 

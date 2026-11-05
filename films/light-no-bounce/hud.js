@@ -226,9 +226,9 @@ class NbHud {
     return NbHud.svg(`${NbHud.plate()}<text x="30" y="58" class="t">THE AIRPORT’S RADAR</text>
       <circle cx="${cx}" cy="${cy}" r="${R}" fill="#03140a" stroke="#2a8a4a" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="${R * 0.5}" fill="none" stroke="#1a5a2a" stroke-width="1.5"/>
       <line x1="${cx}" y1="${cy}" x2="${(cx + R * Math.cos(a)).toFixed(1)}" y2="${(cy + R * Math.sin(a)).toFixed(1)}" stroke="#6aff8a" stroke-width="3"/>
-      <rect x="${(px - 8).toFixed(1)}" y="${(py - 8).toFixed(1)}" width="16" height="16" fill="none" stroke="#ffcf8a" stroke-width="3"/><text x="${(px - 150).toFixed(1)}" y="${(py - 18).toFixed(1)}" class="sm" style="font-size:22px">BAW271 · 2100 ft</text>
+      <rect x="${(px - 8).toFixed(1)}" y="${(py - 8).toFixed(1)}" width="16" height="16" fill="none" stroke="#ffcf8a" stroke-width="3"/><text x="${(px - 190).toFixed(1)}" y="${(py - 18).toFixed(1)}" class="sm" style="font-size:22px">FLIGHT 271 · ${nbN(Math.max(0, pl[1] - NB_F.runway.y) * 3.281)} ft</text>
       <text x="610" y="160" class="sm">ECHOES</text><text x="610" y="194" class="b" style="font-size:40px">0</text>
-      <text x="30" y="440" class="s">ONLY THE PLANE’S OWN SIGNAL: ITS TRANSPONDER</text>`);
+      <text x="30" y="440" class="s">ONLY ITS TRANSPONDER’S OWN SIGNAL</text>`);
   }
   // a glass fibre: light kept in by total internal reflection; now it leaks out at the first bounce
   static fibre(u, t) {

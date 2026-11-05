@@ -218,16 +218,37 @@ function nbVoice(fx, d, o = {}) {
   for (let i = 0; i < n; i++) y[i] *= env(i / n);
   return y;
 }
-// a crowd crying out: many voices, staggered, of every pitch (k < 1: slowed), spread across the stereo field
+// a crowd crying out: many voices, staggered, of every pitch (k < 1: slowed), spread across the stereo field; o.form(r)
+// their vowels ([[f, q, a]]), o.env(u) each voice's shape
 function nbCrowdCry(K, t, o = {}) {
   const fx = K.fx, r = fx.r, k = o.k || 1, N = o.n || 16, d = (o.d || 1.6) / k, Ls = fx.arr(d + (o.spread || 0.8) / k + 0.1), Rs = fx.arr(d + (o.spread || 0.8) / k + 0.1);
   for (let v = 0; v < N; v++) {
     const f = r.range(o.lo || 260, o.hi || 640), dd = d * r.range(0.6, 1.1), on = r.range(0, (o.spread || 0.8) / k), fm = r.range(0.9, 1.2);
-    const y = nbVoice(fx, dd, { k, f0: (u) => f * (1 + 0.18 * Math.sin(Math.PI * u) * fm - 0.1 * u), formants: [[r.range(700, 950), 5, 1], [r.range(1100, 1500), 6, 0.6], [r.range(2500, 3000), 7, 0.25]], breath: 0.15,
-      env: (u) => Math.min(1, u / 0.12) * Math.pow(1 - u, 1.1) });
+    const y = nbVoice(fx, dd, { k, f0: (u) => f * (1 + 0.18 * Math.sin(Math.PI * u) * fm - 0.1 * u), formants: o.form ? o.form(r) : [[r.range(700, 950), 5, 1], [r.range(1100, 1500), 6, 0.6], [r.range(2500, 3000), 7, 0.25]], breath: o.breath ?? 0.15,
+      env: o.env || ((u) => Math.min(1, u / 0.12) * Math.pow(1 - u, 1.1)) });
     const pan = r.range(-0.8, 0.8), gL = Math.cos((pan + 1) * Math.PI / 4), gR = Math.sin((pan + 1) * Math.PI / 4), i0 = Math.round(on * fx.sr), a = r.range(0.4, 1);
     for (let i = 0; i < y.length && i0 + i < Ls.length; i++) { Ls[i0 + i] += y[i] * gL * a; Rs[i0 + i] += y[i] * gR * a; }
   }
   return K.putLR(Ls, Rs, t, { vol: o.vol ?? 0.5, norm: true, room: o.room, wet: o.wet });
 }
-const NB_SOUND_FNS = [nbWorldRate, nbOrgan, nbVoice, nbCrowdCry, nbPartySong, nbNoise, nbBed, nbTone, nbChirp, nbCrackle, nbSweep, nbSweepPut, nbAddAt, nbPlaceAt, nbSeen, nbSlowK, nbCurve, nbWhereShot, nbPlaces, nbRoll, nbScrape, nbAlarm, nbCrack, nbEv, nbWn];
+// a bed whose filters follow the world's speed (nbWorldRate, or o.rate): slowed, the same noise sinks and darkens, and
+// its flutter slows with it. o.f: [[type, f, q]] (f at real speed), the rest as nbBed
+function nbBedW(K, t0, t1, o = {}) {
+  const { fx, sr } = K, d = t1 - t0; if (d <= 0.02) return;
+  const n = Math.ceil(d * sr), fi = o.fi ?? 0.04, fo = o.fo ?? 0.04, rate = o.rate || nbWorldRate, N = Math.ceil(d * 25) + 2;
+  const R = Array.from({ length: N }, (_, i) => rate(t0 + d * i / (N - 1)));
+  const mk = () => {
+    let y = nbNoise(fx, n, o.colour || 'pink');
+    for (const f of (o.f || [])) y = nbSweep(y, sr, f[0], f[2] || 0.7, R.map((r) => Math.max(20, f[1] * r)));
+    const w = fx.wander(o.wr || 0.35); let tau = 0;
+    for (let i = 0; i < n; i++) { const t = i / sr; tau += R[Math.floor(i / n * (N - 1))] / sr; y[i] *= (o.env ? o.env(t / d, t0 + t) : 1) * Math.min(1, t / fi, (d - t) / fo) * (1 + (o.am || 0) * w(tau)); }
+    return y;
+  };
+  // (env is absolute here: the bed's peak is vol × env's largest value, so a quiet stretch stays quiet)
+  let eMax = 1; if (o.env) { eMax = 0; for (let k = 0; k <= Math.ceil(d * 50); k++) { const u = Math.min(1, k / (d * 50)); eMax = Math.max(eMax, o.env(u, t0 + u * d)); } }
+  if (eMax < 1e-4) return;
+  const vol = (o.vol ?? 1) * eMax;
+  if (o.mono) return K.put(mk(), t0, { vol, norm: true, pan: o.pan || 0, room: o.room, wet: o.wet });
+  return K.putLR(mk(), mk(), t0, { vol, norm: true, room: o.room, wet: o.wet });
+}
+const NB_SOUND_FNS = [nbBedW, nbWorldRate, nbOrgan, nbVoice, nbCrowdCry, nbPartySong, nbNoise, nbBed, nbTone, nbChirp, nbCrackle, nbSweep, nbSweepPut, nbAddAt, nbPlaceAt, nbSeen, nbSlowK, nbCurve, nbWhereShot, nbPlaces, nbRoll, nbScrape, nbAlarm, nbCrack, nbEv, nbWn];
