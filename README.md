@@ -149,6 +149,19 @@ Everything is procedural, so there are no models, images or sound files to downl
 > 10:42:10 everything lets go. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/magnets-1000x/PLAN.md`](films/magnets-1000x/PLAN.md) and
 > [`EPISODE_REPORT.md`](films/magnets-1000x/EPISODE_REPORT.md).
+>
+> ***What if your shadow lagged 1 second behind you?*** — open `shadow-lag.html` (16:9, voiceless, 4:50). At 11:58 PM
+> on Friday the 13th you step out of the stair door onto level 4 of a car park, and your shadow stays in the doorway.
+> A second later it follows. A normal shadow is 5 billionths of a second late; yours is more than 100 million times
+> later. Raise your hand and its shadow waits; stop walking and it walks right into you; jump and it jumps after you've
+> landed. The mirror shows you on time; four lamps give you four shadows, all late. At midnight half the lamps go off,
+> there are footsteps, and standing still behind a pillar you learn what a late shadow is good for: any shadow still
+> moving isn't yours. The night guard's torch throws your shadow onto a van, it shields its eyes a second after you
+> do, and he backs away radioing it in. You run for your car with your shadow 5 metres behind you, take the ramp at
+> three times the limit with your shadow sitting on nothing 7 metres behind the car, and stop at the exit barrier,
+> where nothing in your car should be moving. The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/shadow-lag/PLAN.md`](films/shadow-lag/PLAN.md) and
+> [`EPISODE_REPORT.md`](films/shadow-lag/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
