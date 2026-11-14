@@ -36,7 +36,7 @@ const SH_SHOTS = [];
     ['R3', 'parapetWalk', c('where', 3) - 0.5, B('midnight'), 'deck'],
     // 2 — 12:00 AM: half the lamps go off; footsteps; the pillar
     ['D1', 'midnight', B('midnight'), c('midnight', 1) - 0.5, 'deck'],
-    ['D2', 'top', c('midnight', 1) - 0.5, B('steps'), 'deck'],
+    ['D2', 'darker', c('midnight', 1) - 0.5, B('steps'), 'deck'],
     ['P1', 'stepsPOV', B('steps'), B('hide'), 'deck'],
     ['K1', 'hide', B('hide'), B('still'), 'deck'],
     ['Q1', 'still', B('still'), B('moving'), 'deck'],
@@ -50,7 +50,7 @@ const SH_SHOTS = [];
     ['U1', 'runStart', B('run'), c('run', 2) - 0.5, 'deck'],
     ['U2', 'runSide', c('run', 2) - 0.5, B('lock'), 'deck'],
     // 3 — in your car: the lock, out of the bay, away, the ramp
-    ['O1', 'lockPOV', B('lock'), B('car'), 'deck'],
+    ['O1', 'lockOut', B('lock'), B('car'), 'deck'],
     ['C1', 'reverse', B('car'), c('car', 1) - 0.5, 'deck'],
     ['C2', 'drive', c('car', 1) - 0.5, B('speed'), 'deck'],
     ['Z1', 'ramp', B('speed'), B('cctv'), 'deck'],
@@ -59,7 +59,7 @@ const SH_SHOTS = [];
     // the exit lane (+27 s): the barrier; the wall beside you; the back seat
     ['X1', 'exitWide', B('exit'), c('exit', 1) - 0.4, 'exit'],
     ['X2', 'exitWall', c('exit', 1) - 0.4, c('exit', 2) - 0.4, 'exit'],
-    ['X3', 'exitPOV', c('exit', 2) - 0.4, 1e9, 'exit'],
+    ['X3', 'exitClose', c('exit', 2) - 0.4, 1e9, 'exit'],
   ];
   for (const [id, mode, t0, t1, set] of L) P.push(shSh(id, mode, t0, t1, set));
   P.forEach((s, i) => { if (i && Math.abs(s.t0 - P[i - 1].t1) > 1e-6) throw new Error(`SH_SHOTS: a gap or overlap before ${s.id}`); if (!(s.t1 > s.t0)) throw new Error(`SH_SHOTS: ${s.id} has no length`); });

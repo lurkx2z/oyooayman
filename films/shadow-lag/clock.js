@@ -43,7 +43,7 @@ const SH_CLOCK = (() => {
     [C('run', 1) + 1.8, null, ['rate', 1 / 2.5]],           // …then runs too
     [C('run', 2) + 1.0, null, 'real'],
     ...slow(C('car', 1) - 2.9, shE('car') + 0.3, 2.5),     // your car pulls away; your seated shadow a second behind it
-    ...slow(C('speed', 0) - 0.5, shE('speed') + 0.3, 3),   // the ramp at 25 km/h
+    ...slow(C('speed', 0) - 0.5, shE('speed') + 0.3, 5),   // the ramp at 25 km/h (5× slower: 7 m behind, on the wall)
     [B('cctv'), null, 'jumpTo', 34],                       // the ramps down: +34 s at the cut to level 2
     ...slow(C('cctv', 1) - 1.0, C('cctv', 2) + 2.2, 3),    // camera 7: your car, then you
     [B('exit'), null, 'jumpTo', 27],                       // the exit lane: +27 s at the cut

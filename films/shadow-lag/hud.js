@@ -36,7 +36,7 @@ const SH_CTX = (() => {
     beat('midnight', 'LAMPS ON, LEVEL 4', (t, s) => ({ v: `${SH_LAMPS.filter((L) => shLampOn(L.i, s, 4) > 0.5).length} <small>of ${SH_LAMPS.length}</small>`, v2: 'NIGHT MODE FROM 12:00 AM' })),
     beat('run', 'YOUR SPEED', (t, s, set) => ({ v: `${shSpeedAt(s, set).toFixed(1)} <small>m/s</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND` }), 1),
     beat('car', 'YOUR CAR', (t, s, set) => ({ v: `${(shSpeedAt(s, set) * 3.6).toFixed(0)} <small>km/h</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND IT` }), 1),
-    beat('speed', 'YOUR CAR', (t, s, set) => ({ v: `${(shSpeedAt(s, set) * 3.6).toFixed(0)} <small>km/h</small>`, v2: `LIMIT: 5 mph (8 km/h) · YOUR SHADOW ${gap(s, set).toFixed(1)} m BEHIND` })),
+    beat('speed', 'YOUR CAR', (t, s, set) => ({ v: `${(shSpeedAt(s, set) * 3.6).toFixed(0)} <small>km/h</small>`, v2: 'THE LIMIT: 5 mph (8 km/h)' }), 0, 0),
     beat('exit', 'YOUR CAR', (t, s, set) => { const v = shSpeedAt(s, set); return { v: v < 0.02 ? 'STOPPED' : `${(v * 3.6).toFixed(0)} <small>km/h</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND` }; }, 0, 1),
   ];
 })();

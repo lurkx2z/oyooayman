@@ -128,14 +128,14 @@ const SHE = (() => {
 const SHY = (() => {
   const E = SHE, F = SH_F, Wz = -6.1;                    // your line along the white wall (1.1 m off it)
   const door = [-38.25, -8.2], wall0 = [-32.2, Wz], stopX = wall0[0] + 11.8, mirror = [stopX + 9.9, Wz];
-  const lamps = [-3.0, -7.6], parapet = [-1.2, -16.05], car = SH_F.car;
+  const lamps = [-7.2, -10.2], parapet = [-1.2, -16.05], car = SH_F.car;     // (lamps: inside four lamps, 4.1 and 5.4 m away, clear of the column at z −11.6)
   const carDoor = SH_RUN.door;
   const legs = [
     [E.step, E.atWall, [[-36.6, -7.9], [-34.0, -6.6], wall0], 0.9],
     [E.walk0, E.stop, [[stopX, Wz]], 0.5],
     [E.walk1, E.atMirror, [mirror], 0.5],
-    [E.walk2, E.walk2 + 6.6, [lamps], 0.6],
-    [E.walk3, E.atParapet, [[-2.0, -11.5], parapet], 0.8],
+    [E.walk2, E.walk2 + 5.0, [lamps], 0.6],
+    [E.walk3, E.atParapet, [[-4.5, -13.6], parapet], 0.8],
     [E.hide0, E.hidden, [[-0.6, -10.2], [0.55, -6.2], [0.9, -4.7], [F.hide[0], F.hide[1] - 0.1]], 0.7],
     [E.shuffle, E.shuffle + 0.6, [[F.hide[0] + 0.03, F.hide[1]]], 0.25],
     [E.run, E.atCar, SH_RUN.P.slice(1), 0.6],
@@ -148,7 +148,7 @@ const SHY = (() => {
     [E.face - 0.6, E2], [E.face + 0.3, 0.12], [E.walk0 - 0.6, 0.12], [E.walk0 + 0.1, E2],
     [E.turn, E2], [E.turn + 0.55, E2 + Math.PI],                   // turning round, through north (the aisle)
     [E.turnBack, E2 + Math.PI], [E.turnBack + 0.7, E2],
-    [E.walk2, E2], [E.walk2 + 0.6, shYawTo(mirror[0], mirror[1], lamps[0], lamps[1])], [E.walk2 + 6.0, shYawTo(mirror[0], mirror[1], lamps[0], lamps[1])], [E.walk2 + 7.0, E2 + 0.3],
+    [E.walk2, E2], [E.walk2 + 0.6, shYawTo(mirror[0], mirror[1], lamps[0], lamps[1])], [E.walk2 + 4.4, shYawTo(mirror[0], mirror[1], lamps[0], lamps[1])], [E.walk2 + 5.4, E2 + 0.3],
     [E.walk3, E2 + 0.3], [E.walk3 + 0.7, Math.PI], [E.atParapet + 0.5, Math.PI],
     [E.react, Math.PI], [E.react + 0.7, Math.PI + 1.25],              // toward the footsteps (west)
     [E.hide0 + 0.4, Math.PI + 1.25], [E.hide0 + 1.2, 2 * Math.PI + 0.12], [E.hidden - 0.8, 2 * Math.PI + 0.25], [E.hidden + 0.4, 2 * Math.PI - 1.1],   // to the pillar; back to it, facing west-ish
@@ -256,14 +256,14 @@ const SHC = (() => {
   return { l4, l2, ex, acc, R, exStopX };
 })();
 // the seat you sit in, in the car's frame (right-hand drive: the car faces +z, its right is −x)
-const SH_SEAT = { x: -0.36, y: 0.30, z: -0.22 };
-const SH_BACKSEAT = { x: 0.05, y: 0.26, z: -1.05 };
+const SH_SEAT = { x: -0.36, y: 0.08, z: -0.22 };
+const SH_BACKSEAT = { x: 0.05, y: -0.02, z: -1.05 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE LAMPS (level 4): which are lit. One tube is failing (it flickers); at midnight the car park's night mode turns
 // every other lamp off, row by row from the west end, about 0.11 s apart.
 // ---------------------------------------------------------------------------------------------------------------------
-const SH_LAMPS = (() => { const L = []; SH_F.lampRows.forEach((z, r) => SH_F.lampX.forEach((x, k) => L.push({ x, z, r, k, i: L.length, night: (k + r) % 2 === 0 }))); return L; })();
+const SH_LAMPS = (() => { const L = []; SH_F.lampRows.forEach((z, r) => SH_F.lampX.forEach((x, k) => L.push({ x, z, r, k, i: L.length, night: ((k + r) % 2 === 0) !== (r === 1 && k >= 8) }))); return L; })();   // (night mode: a checkerboard, except the aisle's last two swap: the one over your car's way out stays on)
 const SH_FAILING = SH_LAMPS.find((l) => l.x === -18.0 && l.z === -14.2).i;
 function shLampOn(i, s, level = 4) {
   const L = SH_LAMPS[i];

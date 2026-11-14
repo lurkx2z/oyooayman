@@ -46,6 +46,9 @@ function shBuildCar(colour, o = {}) {
   shMesh(new THREE.BoxGeometry(0.9, 0.12, 0.04), shStd('#0c0d0f', 0.5), 0, 0.58, 2.035, g);
   const headM = new THREE.MeshStandardMaterial({ color: '#d8dde2', roughness: 0.2, emissive: '#fff4e0', emissiveIntensity: 0 });
   const tailM = new THREE.MeshStandardMaterial({ color: '#5a1012', roughness: 0.3, emissive: '#ff2016', emissiveIntensity: 0.0 });
+  // the indicators (amber, at the four corners: they flash twice when the car locks)
+  const indM = new THREE.MeshStandardMaterial({ color: '#7a4a10', roughness: 0.3, emissive: '#ffa21a', emissiveIntensity: 0 });
+  for (const sd of [-1, 1]) for (const [z, y] of [[1.965, 0.56], [-2.04, 0.6]]) shMesh(new THREE.BoxGeometry(0.1, 0.06, 0.05), indM, sd * 0.72, y, z, g).castShadow = false;
   for (const sd of [-1, 1]) {
     shMesh(new THREE.BoxGeometry(0.34, 0.11, 0.06), headM, sd * 0.62, 0.66, 1.955, g).castShadow = false;
     shMesh(new THREE.BoxGeometry(0.12, 0.24, 0.06), tailM, sd * 0.76, 0.76, -2.03, g).castShadow = false;
@@ -58,7 +61,11 @@ function shBuildCar(colour, o = {}) {
     const tyre = new THREE.Mesh(new THREE.CylinderGeometry(0.31, 0.31, 0.2, 22), rubber); tyre.rotation.z = Math.PI / 2; tyre.castShadow = true; w.add(tyre);
     const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.205, 16), chrome); hub.rotation.z = Math.PI / 2; w.add(hub);
   }
-  // inside: the dashboard, the wheel (right-hand drive), two front seats, the back bench
+  // inside: a dark cap over the body's top within the cabin (door cards, the parcel shelf; casts nothing, seen only from
+  // inside), the dashboard, the wheel (right-hand drive), two front seats, the back bench
+  // (the lock knob on the driver's door card)
+  { const kb = new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.009, 0.03, 10), shStd('#3a3c40', 0.4, 0.5)); kb.position.set(-0.64, 1.04, 0.35); kb.castShadow = false; g.add(kb); }
+  { const cap = new THREE.Mesh(new THREE.BoxGeometry(2 * xb - 0.2, 0.06, 2.23), shStd('#1d1f22', 0.9)); cap.position.set(0, 1.0, -0.665); cap.castShadow = false; cap.receiveShadow = true; g.add(cap); }
   shMesh(new THREE.BoxGeometry(1.5, 0.22, 0.42), inner, 0, 0.86, 0.72, g);
   const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.025, 8, 24), trim); wheel.position.set(SH_SEAT.x, 0.98, 0.42); wheel.rotation.x = -0.45; wheel.castShadow = true; g.add(wheel);
   const seat = (x, z, back = false) => {
@@ -66,7 +73,8 @@ function shBuildCar(colour, o = {}) {
     const w2 = back ? 1.32 : 0.52;
     shMesh(new THREE.BoxGeometry(w2, 0.14, 0.5), seatM, 0, 0.36, 0.05, sg);
     const bk = shMesh(new THREE.BoxGeometry(w2, 0.62, 0.12), seatM, 0, 0.72, -0.22, sg); bk.rotation.x = -0.18;
-    for (const hx of back ? [-0.4, 0.4] : [0]) { const h = shMesh(new THREE.BoxGeometry(0.26, 0.18, 0.1), seatM, hx, 1.14, -0.31, sg); h.rotation.x = -0.12; }
+    // (headrests cast nothing: in the shadow on a wall, the only shapes inside the windows are the people)
+    for (const hx of back ? [-0.4, 0.4] : [0]) { const h = shMesh(new THREE.BoxGeometry(0.26, 0.18, 0.1), seatM, hx, 1.14, -0.31, sg); h.rotation.x = -0.12; h.castShadow = false; }
     return sg;
   };
   seat(SH_SEAT.x, SH_SEAT.z); seat(-SH_SEAT.x, SH_SEAT.z); seat(0, -1.12, true);
@@ -74,12 +82,14 @@ function shBuildCar(colour, o = {}) {
   const door = new THREE.Group(); door.position.set(-W / 2 - 0.005, 0, 0.95); g.add(door);
   const dl = shMesh(new THREE.BoxGeometry(0.05, 0.58, 1.26), paint, -0.01, 0.62, -0.66, door); dl.castShadow = true;
   shMesh(new THREE.BoxGeometry(0.03, 0.04, 0.2), chrome, -0.045, 0.82, -1.12, door);
+  // the courtesy light (on while the door is open, fading after): unshadowed, warm
+  const dome = new THREE.PointLight('#ffd9a8', 0, 2.6, 2); dome.position.set(0, 1.3, -0.35); g.add(dome);
   // anchors: where you sit (and the back seat), for the people
   const seatA = new THREE.Object3D(); seatA.position.set(SH_SEAT.x, SH_SEAT.y, SH_SEAT.z); g.add(seatA);
   const backA = new THREE.Object3D(); backA.position.set(SH_BACKSEAT.x, SH_BACKSEAT.y, SH_BACKSEAT.z); g.add(backA);
   return {
-    g, door, seat: seatA, back: backA, headM, tailM, wheel,
-    setLights(head, tail) { headM.emissiveIntensity = 2.4 * head; tailM.emissiveIntensity = 1.6 * tail; },
+    g, door, seat: seatA, back: backA, headM, tailM, wheel, dome,
+    setLights(head, tail, ind = 0) { headM.emissiveIntensity = 2.4 * head; tailM.emissiveIntensity = 1.6 * tail; indM.emissiveIntensity = 3.0 * ind; },
   };
 }
 

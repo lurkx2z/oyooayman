@@ -161,6 +161,12 @@ function shBuildDeck(app, level) {
     }
     const ceil = shMesh(new THREE.BoxGeometry(L + 0.6, 0.3, 7.4), shStd('#4c4b48', 0.95), (R.x[0] + R.x[1]) / 2, -R.drop / 2 + H + 0.15 + 0.02, -8.2, S); ceil.rotation.z = -slope;
     out.rampSlope = slope;
+    // three bulkhead lamps on the ramp's north wall, 1.85 m above its slope (their light: the lights pool, deckset.js)
+    out.rampLamps = [38.2, 44.0, 49.8].map((x) => { const y = shFloorY(x, -8.2) + 1.85, g = new THREE.Group(); g.position.set(x, y, -11.6 + 0.005); S.add(g);
+      const lens = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#fff', emissive: '#fff1d8', emissiveIntensity: 3 }));
+      lens.scale.set(1.3, 0.8, 0.5); lens.rotation.x = Math.PI / 2; lens.castShadow = false; g.add(lens);
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.016, 8, 24), shStd('#2a2c30', 0.5, 0.4)); rim.scale.set(1.3, 0.8, 1); rim.castShadow = false; g.add(rim);
+      return [x, y, -11.45]; });
   }
   // ---------------------------------------------------------------- soffit, beams, columns, pipes
   const soffTex = shTex(shConcreteCanvas(44 + level, [92, 91, 88], 512, 512, { k: 0.18, boards: 6 })); soffTex.repeat.set(20, 9);
@@ -288,6 +294,25 @@ function shBuildDeck(app, level) {
       const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowT, color: '#ffb060', transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
       sp.position.set(x, gy + 7, z); sp.scale.setScalar(r.range(2.5, 4.5)); S.add(sp); glows.push(sp); }
     out.town = { ground, glows };
+    // the car park's own north face below this level (seen from the street): a slab edge and a parapet per level, and
+    // through each open storey a glimpse of the lit deck inside (a painted plane set back 4 m)
+    if (level === 4) {
+      const inT = shTex(shCanvas(2048, 256, (g, w, h) => {
+        const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2c2f33'); gr.addColorStop(1, '#141517'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+        for (let i = 0; i < 11; i++) { const x = (i + 0.5) / 11 * w; g.fillStyle = '#0c0d0e'; g.fillRect(x - 10, 20, 20, h); }
+        for (let i = 0; i < 10; i++) { const x = (i + 1) / 11 * w; g.fillStyle = 'rgba(235,244,255,0.95)'; g.fillRect(x - 36, 30, 72, 7); const gl = g.createRadialGradient(x, 34, 0, x, 34, 90); gl.addColorStop(0, 'rgba(200,220,240,0.35)'); gl.addColorStop(1, 'rgba(200,220,240,0)'); g.fillStyle = gl; g.fillRect(x - 90, 0, 180, 140); }
+      }), { repeat: false });
+      const inM = new THREE.MeshBasicMaterial({ map: inT, color: '#9aa0a8', fog: true });
+      const bandM = shStd('#6e6c66', 0.9), w = D.x[1] - D.x[0] + 0.4, cx = (D.x[0] + D.x[1]) / 2;
+      for (let k = 0; k <= 4; k++) {
+        const y0 = -3.25 * k;
+        shMesh(new THREE.BoxGeometry(w, 0.62, 0.24), bandM, cx, y0 - 0.16, D.z[0] - 0.14, S).castShadow = false;
+        if (k === 0) continue;
+        if (k === 4) { shMesh(new THREE.BoxGeometry(w, 3.0, 0.3), bandM, cx, y0 + 1.5, D.z[0] - 0.1, S).castShadow = false; continue; }
+        shMesh(new THREE.BoxGeometry(w, D.parapet, 0.25), parM, cx, y0 + D.parapet / 2, D.z[0] + 0.105, S).castShadow = false;
+        const ip = new THREE.Mesh(new THREE.PlaneGeometry(w, 2.4), inM); ip.position.set(cx, y0 + 1.6, D.z[0] + 4.0); S.add(ip);
+      }
+    }
   }
   return out;
 }
@@ -312,7 +337,7 @@ function shDeckLights(scene, nShadow = 6, nFill = 14) {
       spots.forEach((L, i) => {
         const a = A[i];
         if (!a || i >= nS) { L.intensity = 0; shShadowOn(L, false); return; }
-        shShadowOn(L, true); L.position.set(a.l.L.x, SH_F.lampY - 0.03, a.l.L.z); L.target.position.set(a.l.L.x, 0, a.l.L.z + 0.001);
+        shShadowOn(L, true); L.angle = 1.3; L.position.set(a.l.L.x, SH_F.lampY - 0.03, a.l.L.z); L.target.position.set(a.l.L.x, 0, a.l.L.z + 0.001);
         L.intensity = I * a.on * (o.fade === false ? 1 : MathX.clamp((edgeS - a.d) / 1.6, 0.25, 1));
       });
       fills.forEach((P, k) => {

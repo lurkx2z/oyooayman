@@ -112,7 +112,7 @@ function shExitSet(app) {
   for (const k of [-1, 0, 1]) { const b = shMesh(new THREE.BoxGeometry(0.012, 0.012, 0.1), shStd('#2a2c30', 0.5, 0.4), 0, 0, 0.05, bh); b.position.set(0, k * 0.06, 0.07); b.scale.set(25 * (1 - 0.35 * Math.abs(k)), 1, 1); b.castShadow = false; }
   const lamp = new THREE.SpotLight('#fff0d6', 0, 0, 1.18, 0.55, 2);
   lamp.position.set(E.lamp[0], E.lamp[1], E.lamp[2] + 0.12); lamp.target.position.set(-4.4, 0.9, E.zR);
-  lamp.castShadow = true; lamp.shadow.mapSize.set(2048, 2048); lamp.shadow.camera.near = 0.3; lamp.shadow.camera.far = 16; lamp.shadow.bias = -0.0004; lamp.shadow.normalBias = 0.02; lamp.shadow.radius = 3;
+  lamp.castShadow = true; lamp.shadow.mapSize.set(2048, 2048); lamp.shadow.camera.near = 0.3; lamp.shadow.camera.far = 16; lamp.shadow.bias = -0.0004; lamp.shadow.normalBias = 0.02; lamp.shadow.radius = 1.5;
   S.add(lamp); S.add(lamp.target);
   const lampFill = new THREE.PointLight('#fff0d6', 0.9, 5, 2); lampFill.position.set(E.lamp[0], E.lamp[1] + 0.2, E.zL + 0.5); S.add(lampFill);
   // ---- the street beyond the barrier: pavement, road (wet), the far side's shut shops, a sodium lamp
@@ -159,6 +159,8 @@ function shExitSet(app) {
     exitWide: (t, s, k) => { const d = shDrift(t, 0.015, 0.3, 5); shCam(camera, [-12.4 + d[0], 1.42 + d[1], 2.75 + d[2]], [-2.6, 0.82, 2.2], 44); },
     // the wall, side on, from just ahead of the car: the car's shadow, its window patches, your head a second late
     exitWall: (t, s, k) => { const d = shDrift(t, 0.01, 0.3, 6); shCam(camera, [-0.9 + d[0], 1.3 + d[1], 1.6 + d[2]], [-5.2, 0.72, 3.6], 50); },
+    // between your car and the wall, close on the window patches: your head; the back seat
+    exitClose: (t, s, k) => { const d = shDrift(t, 0.006, 0.25, 7); shCam(camera, [-2.2 + d[0], 1.2 + d[1], 1.55 + d[2]], [-4.45 - 0.1 * k, 0.72, E.zR], 48 - 3 * k); },
     // in your seat, looking out of your window at the wall (your body isn't drawn; your shadow is)
     exitPOV: (t, s, k) => { const h = eyeAt(); const d = shDrift(t, 0.006, 0.25, 8); shCam(camera, [h[0] + d[0], h[1] + d[1], h[2] + d[2]], [-4.15 - 0.15 * k, 0.86, E.zR], 60 - 4 * k); },
   };
