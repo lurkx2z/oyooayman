@@ -150,7 +150,7 @@ function shDeckSet(app, level) {
     const foc = set.focus(m, s);
     const wk = wallKeyFor(m), dim = wk >= 0 && wk < 2, aMid = s > SHE.mid + 0.5;
     lights.place(deck, foc, lampOn, { I: m === 'top' ? 34 : dim ? 12 : aMid ? 30 : 26, max: m === 'top' ? 4 : dim ? 3 : 6, fill: m === 'top' ? 0.12 : m === 'ramp' ? 0.3 : dim ? 0.22 : aMid ? 0.28 : 0.42 });
-    wallKeys.forEach((L, i) => { const on = i === wk; L.intensity = on ? (i < 2 ? 70 : 60) : 0; shShadowOn(L, on); L.lensM.emissiveIntensity = on ? 3 : 0.2; });
+    wallKeys.forEach((L, i) => { const on = i === wk; L.intensity = on ? (i < 2 ? 42 : 60) : 0; shShadowOn(L, on); L.lensM.emissiveIntensity = on ? 3 : 0.2; });
     // on the ramp, the last three of the pool's casting lights are its wall bulkheads (they throw the car's shadow, and
     // yours, onto the south wall)
     if (lv === 4 && deck.rampLamps && (m === 'ramp' || (m === 'drive' && SHC.l4(s).x > 28))) deck.rampLamps.forEach((q, i) => {

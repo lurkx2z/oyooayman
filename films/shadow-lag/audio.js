@@ -3,7 +3,8 @@
    subclass); the SHX and generators come from audiokit.js (via the gravity films). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
      music  an original score (sound-music.js); it leads
-     amb    where the camera is (sound-amb.js): the river and the yard, the boat, the hospital, the bridge, the hill
+     amb    where the camera is (sound-amb.js): level 4's lamps and concrete, the open edge and the town, camera 7's
+            feed, the exit lane at street level
      sfx    the events at their story moments (sound-sfx.js; each heard once: the clock only runs forward)
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
