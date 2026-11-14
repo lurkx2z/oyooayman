@@ -1,8 +1,8 @@
 /* =====================================================================
    SOUND · LIB — the noise and filter generators the ambience and effects share (the gravity films' sound kit, via the
-   light films), where the camera is (the river and the yard, inside your boat, the hospital, the bridge, the hill of
-   wind turbines, high over the river), and how fast the world's own sounds run. Every function here is listed in
-   SH_SOUND_FNS at the end, so the baked soundtrack's fingerprint sees a change to any of them.
+   light films and the magnets film), where the camera is (level 4 under the soffit, the open edge with the town below,
+   level 2's camera, the exit lane at street level), and how the slowed stretches sound. Every function here is listed
+   in SH_SOUND_FNS at the end, so the baked soundtrack's fingerprint sees a change to any of them.
    ===================================================================== */
 
 // ---- shared generators -------------------------------------------------------------------------------------------
@@ -17,22 +17,7 @@ function shNoise(fx, n, colour = 'white') {
   }
   return y;
 }
-// a stereo bed of filtered noise from t0 to t1. o: colour, f: [[type, f, q, db]], env(u, t) level (t = film time),
-// am: depth of a slow random flutter (wr its rate), vol (peak), fi/fo fades, room/wet, mono+pan
-function shBed(K, t0, t1, o = {}) {
-  const { fx, sr } = K, d = t1 - t0; if (d <= 0.02) return;
-  const n = Math.ceil(d * sr), fi = o.fi ?? 0.04, fo = o.fo ?? 0.04;
-  const mk = () => {
-    const y = shNoise(fx, n, o.colour || 'pink');
-    for (const f of (o.f || [])) SHX.bq(y, f[0], f[1], f[2] || 0.7, sr, f[3] || 0);
-    const w = fx.wander(o.wr || 0.35);
-    for (let i = 0; i < n; i++) { const t = i / sr; y[i] *= (o.env ? o.env(t / d, t0 + t) : 1) * Math.min(1, t / fi, (d - t) / fo) * (1 + (o.am || 0) * w(t)); }
-    return y;
-  };
-  if (o.mono) return K.put(mk(), t0, { vol: o.vol, norm: true, pan: o.pan || 0, room: o.room, wet: o.wet });
-  return K.putLR(mk(), mk(), t0, { vol: o.vol, norm: true, room: o.room, wet: o.wet });
-}
-// a tone with harmonics (hum, horn, motor): f(t) the pitch over the event (t from 0), harm [[k, a]], env(u)
+// a tone with harmonics (hum, engine, motor): f(t) the pitch over the event (t from 0), harm [[k, a]], env(u, t)
 function shTone(K, t0, d, f, harm, env, o = {}) {
   const { fx, sr } = K, n = Math.ceil(d * sr), y = fx.arr(d);
   const F = typeof f === 'function' ? f : () => f, ph = harm.map(() => fx.r.range(0, 6.283));
@@ -42,27 +27,8 @@ function shTone(K, t0, d, f, harm, env, o = {}) {
     y[i] = v * e;
   }
   for (const fl of (o.f || [])) SHX.bq(y, fl[0], fl[1], fl[2] || 0.7, sr, fl[3] || 0);
-  return K.put(y, t0, { vol: o.vol, norm: true, pan: o.pan || 0, room: o.room, wet: o.wet });
+  return K.put(y, t0, { vol: o.vol, norm: o.norm ?? true, pan: o.pan || 0, room: o.room, wet: o.wet });
 }
-// a bird: a quick chirp phrase (FM sine sweeps), o.f0 base pitch, o.n notes
-function shChirp(fx, o = {}) {
-  const sr = fx.sr, r = fx.r, notes = o.n || r.int(2, 6), f0 = o.f0 || r.range(2400, 4200), gap = o.gap || r.range(0.05, 0.12), nd = o.nd || r.range(0.04, 0.09);
-  const y = fx.arr(notes * (nd + gap) + 0.05); let ph = 0;
-  const shape = r.int(0, 2);
-  for (let k = 0; k < notes; k++) {
-    const i0 = Math.round(k * (nd + gap) * sr), n = Math.round(nd * sr), fa = f0 * r.range(0.9, 1.15), fb = fa * (shape === 0 ? 1.4 : shape === 1 ? 0.7 : r.range(0.85, 1.3));
-    for (let i = 0; i < n; i++) { const u = i / n, f = fa + (fb - fa) * u + 120 * Math.sin(2 * Math.PI * 38 * i / sr); ph += 2 * Math.PI * f / sr; y[i0 + i] += Math.sin(ph) * Math.sin(Math.PI * u) * (0.8 + 0.2 * Math.sin(ph * 2)); }
-  }
-  return y;
-}
-// an electric fizz: dense crackle with random sizes, o.env(u) shapes it, o.rate (clicks/s), o.hp
-function shCrackle(fx, d, o = {}) {
-  const sr = fx.sr, r = fx.r, y = fx.arr(d + 0.02), n = Math.ceil(d * sr);
-  for (let i = 0; i < n; i++) { const u = i / n; if (r.next() < (o.rate || 300) * (o.env ? o.env(u) : 1) / sr) { const a = Math.pow(r.next(), 3), L = r.int(8, 60); for (let k = 0; k < L && i + k < y.length; k++) y[i + k] += a * (r.next() * 2 - 1) * Math.exp(-k / (L * 0.3)); } }
-  SHX.bq(y, 'hp', o.hp || 1500, 0.7, sr);
-  return y;
-}
-
 // play x at t through a filter whose frequency follows curve (Hz, evenly spaced over x's length). The filter runs
 // here (a biquad whose coefficients follow the curve every 32 samples), so the level is set from what comes OUT of it
 function shSweep(x, sr, type, q, curve) {
@@ -77,13 +43,9 @@ function shSweep(x, sr, type, q, curve) {
   }
   return y;
 }
-function shSweepPut(K, x, t, type, q, curve, o = {}) {
-  return K.put(shSweep(x, K.sr, type, q, curve), t, { vol: (o.vol ?? 1) * (o.gain || 1), norm: true, pan: o.pan || 0, room: o.room, wet: o.wet });
-}
 
 const shEv = (t, a, b) => MathX.smooth(t, a, b);                                       // 0 → 1 from a to b
 const shWn = (t, a, b, fi = 0.3, fo = 0.3) => shEv(t, a - fi, a) * (1 - shEv(t, b, b + fo));   // 1 inside [a, b]
-function shAddAt(dst, src, t, g, sr) { const i0 = Math.round(t * sr); for (let i = 0; i < src.length && i0 + i < dst.length; i++) if (i0 + i >= 0) dst[i0 + i] += src[i] * g; }
 // a level curve sampled once (200 Hz) and read back by linear interpolation: the beds read their envelopes per sample
 function shCurve(f, hz = 200) {
   const t0 = -2, n = Math.ceil((SH.end + 6 - t0) * hz), y = new Float32Array(n + 1);
@@ -91,147 +53,33 @@ function shCurve(f, hz = 200) {
   return (t) => { const x = MathX.clamp((t - t0) * hz, 0, n - 1e-6), i = Math.floor(x); return y[i] + (y[i + 1] - y[i]) * (x - i); };
 }
 
+// ---- how the slowed stretches sound: the world's own sounds drop and stretch with the picture, but only part of the
+// way (k: 0.5 for the beds, 0.6 for the effects), so a 3× slower second is a darker, longer one, not a growl
+const shWorldRate = (t, k = 0.5) => Math.pow(MathX.clamp(shRateAt(t + 1e-3), 0.2, 1), k);
+
 // ---- where the camera is ----------------------------------------------------------------------------------------
-const SH_PLACE = {
-  inside: ['inside'], bridge: ['bridge', 'bridgeWide'], hill: ['turbines', 'blades'], high: ['reach', 'boatAir', 'close'],
-};
-function shWhereShot(sh) { if (sh.where) return sh.where; if (sh.set === 'mri') return 'hospital'; for (const [k, v] of Object.entries(SH_PLACE)) if (v.includes(sh.mode)) return k; return 'river'; }
+//   deck   level 4, under the soffit: the lamps' hum, the concrete's room tone, the town through the open sides
+//   edge   at the open side: the town below, the wind, the hum far behind
+//   cctv   level 2 seen by camera 7: the camera's own hiss and mains hum (a CCTV feed has no sound of the deck)
+//   exit   the exit lane at street level: the sodium lamps, the street, the terminal's whine
+const SH_PLACE = { edge: ['parapetWalk', 'town', 'outside', 'stepsPOV'], cctv: ['cctv'] };
+function shWhereShot(sh) { if (sh.set === 'exit') return 'exit'; for (const [k, v] of Object.entries(SH_PLACE)) if (v.includes(sh.mode)) return k; return 'deck'; }
 // the film as places: [{ t0, t1, where, shot }] in order
 function shPlaces() {
   if (shPlaces._c) return shPlaces._c;
   return (shPlaces._c = SH_SHOTS.map((sh) => ({ t0: Math.max(-2, sh.t0), t1: Math.min(sh.t1, SH.end + 5), where: shWhereShot(sh), shot: sh })));
 }
-// 0…1 over the shots at a place (or a list of modes), with a short crossfade at each cut
+// 0…1 over the shots at a place, with a short crossfade at each cut
 function shPlaceAt(where, xf = 0.05) {
-  const W = shPlaces().filter((p) => (Array.isArray(where) ? where.includes(p.shot.mode) : p.where === where)).map((p) => [p.t0, p.t1]);
+  const W = shPlaces().filter((p) => p.where === where).map((p) => [p.t0, p.t1]);
   return (t) => { let v = 0; for (const [a, b] of W) v += shWn(t, a, b, xf, xf); return Math.min(1, v); };
 }
 // is story moment s on screen (the clock doesn't skip it), and when
 function shSeen(s) { const t = shFilmAt(s); return Math.abs(shStoryAt(t) - s) < 0.5 ? t : null; }
-// how much an event is stretched (and lowered) while the clock runs slowly: 1 at real speed, 4× at most
-const shSlowK = (t) => Math.min(4, 1 / Math.max(0.25, shRateAt(t + 1e-3)));
 
-// ---- this film's sounds ------------------------------------------------------------------------------------------
-// a roll (a marble on floorboards, tyres on asphalt): low rumbling noise whose level and brightness follow v(u) (0…1),
-// with a tick at every seam (o.seam: seams per unit of distance)
-function shRoll(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), y = shNoise(fx, n, 'brown'), w = fx.white(n), v = o.v || (() => 1);
-  let x = 0, next = 0.3;
-  for (let i = 0; i < n; i++) { const u = i / n, vv = v(u); y[i] = y[i] * vv * (0.6 + 0.4 * Math.sin(i / sr * 30 * (1 + vv))) + w[i] * 0.05 * vv * vv; x += vv / sr * (o.seam || 4);
-    if (x > next && o.seam) { next += 1; for (let k = 0; k < 300 && i + k < n; k++) y[i + k] += 0.6 * vv * Math.sin(2 * Math.PI * (o.tick || 900) * k / sr) * Math.exp(-k / 60); } }
-  SHX.bq(y, 'lp', o.lp || 1600, 0.7, sr); if (o.hp) SHX.bq(y, 'hp', o.hp, 0.7, sr);
-  return y;
-}
-// a scrape (heavy furniture across a floor, a tyre dragged sideways): stick-slip bursts, o.f the band (Hz), o.rate (Hz)
-function shScrape(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), y = shNoise(fx, n, 'pink'), r = fx.r, env = o.env || ((u) => Math.min(1, u * 8) * Math.min(1, (1 - u) * 6));
-  let ph = 0, rate = o.rate || 18;
-  for (let i = 0; i < n; i++) { ph += (rate * (0.8 + 0.4 * r.next())) / sr; const g = 0.35 + 0.65 * Math.pow(Math.abs(Math.sin(Math.PI * ph)), 6); y[i] *= g * env(i / n); }
-  SHX.bq(y, 'bp', o.f || 700, o.q || 0.9, sr); SHX.bq(y, 'lp', (o.f || 700) * 3.5, 0.7, sr);
-  return y;
-}
-// a car alarm: two tones swapping (o.f1, o.f2), on a pulse
-function shAlarm(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), f1 = o.f1 || 960, f2 = o.f2 || 760, per = o.per || 0.36;
-  let ph = 0; for (let i = 0; i < n; i++) { const t = i / sr, k = Math.floor(t / per) % 2, f = k ? f1 : f2; ph += 2 * Math.PI * f / sr; y[i] = (Math.sin(ph) + 0.3 * Math.sin(3 * ph)) * Math.min(1, t / 0.05, (d - t) / 0.2) * (0.85 + 0.15 * Math.sin(2 * Math.PI * t / per)); }
-  SHX.bq(y, 'bp', 1100, 0.6, sr); return y;
-}
-// a crack (stone, masonry): a broadband snap, a splintering crackle, a ringing body
-function shCrack(fx, o = {}) {
-  const sr = fx.sr, d = o.len || 1.6, y = fx.arr(d), r = fx.r;
-  for (let i = 0; i < d * sr; i++) { const t = i / sr; y[i] = (r.next() * 2 - 1) * (Math.exp(-t / 0.006) + 0.25 * Math.exp(-t / 0.15) * (r.next() < 0.08 ? 1 : 0.2)); }
-  const b = fx.hit(fx.stoneModes(o.s || 0.7), { width: 0.002, amp: 0.8, noise: 0.2, nlen: 0.05, nhp: 300, len: d }); for (let i = 0; i < Math.min(b.length, y.length); i++) y[i] += b[i] * 0.8;
-  return y;
-}
-// the beach party's song: a little pop song (G D Em C at 112 bpm: kick, snare, hats, bass, off-beat chords, a tune),
-// through a small speaker. o.offset: where in the song it starts (s)
-function shPartySong(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), beat = 60 / 112, bar = 4 * beat, t0 = o.offset || 0, r = new RNG(77);
-  const prog = [[55, 62, 67, 71], [50, 57, 62, 66], [52, 59, 64, 67], [48, 55, 60, 64]];
-  const mel = [71, 74, 76, 74, 71, 69, 67, 69, 66, 69, 71, 69, 66, 64, 62, 64, 67, 71, 74, 71, 67, 66, 64, 66, 64, 67, 72, 71, 69, 67, 64, 62];
-  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
-  let pb = 0, pm = 0;
-  for (let i = 0; i < n; i++) {
-    const t = i / sr + t0, b = Math.floor(t / bar) % 4, inBar = t % bar, e8 = t % (beat / 2), ch = prog[b];
-    let v = 0;
-    const kb = inBar % (2 * beat); if (kb < 0.25) v += 0.9 * Math.sin(2 * Math.PI * (50 * kb + 70 / 12 * (1 - Math.exp(-kb * 12)))) * Math.exp(-kb * 14);
-    const sb = (inBar + beat) % (2 * beat); if (sb < 0.2) v += 0.35 * (r.next() * 2 - 1) * Math.exp(-sb * 25);
-    if (e8 < 0.05) v += 0.12 * (r.next() * 2 - 1) * Math.exp(-e8 * 90);
-    pb += 2 * Math.PI * hz(ch[0] - 12) / sr; v += 0.35 * Math.sin(pb) * Math.exp(-e8 * 6);
-    const ob = (t + beat / 2) % beat; if (ob < 0.18) for (const m of ch.slice(1)) v += 0.07 * Math.sign(Math.sin(2 * Math.PI * hz(m) * t)) * Math.exp(-ob * 16);
-    const mi = Math.floor(t / beat) % 32, mt = t % beat; pm += 2 * Math.PI * hz(mel[mi]) / sr; v += 0.2 * (Math.sin(pm) + 0.3 * Math.sin(2 * pm)) * Math.min(1, mt / 0.01) * Math.exp(-mt * 2.5);
-    y[i] = v;
-  }
-  SHX.bq(y, 'hp', 320, 0.7, sr); SHX.bq(y, 'lp', 3600, 0.7, sr); SHX.bq(y, 'pk', 1400, 1.0, sr, 4);
-  for (let i = 0; i < n; i++) y[i] = Math.tanh(1.6 * y[i]);
-  return y;
-}
-
-// ---- how fast the world's own sounds run (the picture's slow motion, made audible): 1 at real speed; a quarter while
-// the clock crawls (any slower and they would sink below hearing); rising through the count; snapping back at 10:42:10
-function shWorldRate(t) {
-  const T0 = SH.tOn, tc = shB('count'), tb = shFilmAt(SHP.T);
-  if (t < T0) return 1;
-  if (t < T0 + 1.6) return 1 - 0.75 * MathX.smooth(t, T0, T0 + 1.6);
-  if (t < tc) return 0.25;
-  if (t < tb) return 0.25 + 0.17 * (t - tc) / (tb - tc);
-  if (t < tb + 0.4) return 0.42 + 0.58 * MathX.smooth(t, tb, tb + 0.4);
-  return 1;
-}
-// a reed pipe's wave (one period, 2048 samples): odd harmonics strong, even ones softer (a fairground organ)
-const SH_REED = (() => { const n = 2048, y = new Float32Array(n); for (let i = 0; i < n; i++) { const p = 2 * Math.PI * i / n; let v = 0; for (let k = 1; k <= 12; k++) v += (k % 2 ? 1 : 0.45) * Math.sin(k * p) / Math.pow(k, 0.95); y[i] = v * 0.5; } return y; })();
-// the carousel's band organ: a waltz in C at 168 bpm (an oom-pah-pah bass, reedy chords, a pipe melody, a glockenspiel
-// on the first beat), its clock running at rate(t): slowed, the waltz drags and sinks like a tape running down
-function shOrgan(fx, t0, t1, rate, o = {}) {
-  const sr = fx.sr, n = Math.ceil((t1 - t0) * sr), L = new Float32Array(n), R = new Float32Array(n), W = SH_REED, WN = W.length;
-  const beat = 60 / 168, prog = [[36, 52, 55, 60], [36, 52, 55, 60], [43, 50, 53, 59], [43, 50, 53, 59], [41, 53, 57, 60], [41, 53, 57, 60], [43, 50, 53, 59], [36, 52, 55, 60]];
-  const mel = [67, 72, 76, 79, 76, 72, 74, 71, 67, 65, 67, 71, 69, 72, 77, 81, 77, 72, 74, 71, 67, 72, 67, 64];   // one note a beat, 8 bars
-  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12), ph = new Float64Array(6);
-  let u = (o.offset || 0), r = rate(t0), glk = 0, gph = 0;
-  for (let i = 0; i < n; i++) {
-    if ((i & 63) === 0) r = rate(t0 + i / sr);
-    u += r / sr;
-    const b = Math.floor(u / beat), w = (u - b * beat) / beat, bar = Math.floor(b / 3) % 8, bb = b % 3, ch = prog[bar];
-    let l = 0, rr = 0;
-    // the bass on one, the chord on two and three ("pah"), short and bright
-    { const f = hz(ch[0] - 12) * r; ph[0] = (ph[0] + f * WN / sr) % WN; const e = bb === 0 ? Math.exp(-w * 2.2) : 0; const v = W[ph[0] | 0] * e * 0.55; l += v; rr += v; }
-    if (bb > 0) { const e = Math.min(1, w * 40) * Math.exp(-w * 5); for (let k = 1; k < 4; k++) { const f = hz(ch[k]) * r; ph[k] = (ph[k] + f * WN / sr) % WN; const v = W[ph[k] | 0] * e * 0.16; l += v * (k === 1 ? 1.2 : 0.8); rr += v * (k === 3 ? 1.2 : 0.8); } }
-    // the melody (a pipe with a slow tremolo), legato
-    { const m = mel[b % 24], f = hz(m) * r; ph[4] = (ph[4] + f * (1 + 0.004 * Math.sin(u * 37)) * WN / sr) % WN; const e = Math.min(1, w * 25) * (0.75 + 0.25 * Math.exp(-w * 3)); const v = W[ph[4] | 0] * e * 0.3; l += v * 0.9; rr += v * 1.1; }
-    // a glockenspiel strike on each bar's first beat
-    if (bb === 0 && w < 0.004) { glk = 1; gph = 0; }
-    if (glk > 0.001) { gph += 2 * Math.PI * hz(mel[b % 24] + 12) * r / sr; const v = Math.sin(gph) * glk * 0.22; l += v; rr += v; glk *= Math.exp(-4 * r / sr); }
-    L[i] = l; R[i] = rr;
-  }
-  SHX.bq(L, 'lp', o.lp || 5200, 0.7, sr); SHX.bq(R, 'lp', o.lp || 5200, 0.7, sr);
-  return [L, R];
-}
-// a voice (a cry, a gasp, a groan): glottal pulses at f0(u) through formants [[f, q, a]] (all scaled by k: a slowed
-// voice drops in pitch), with breath; env(u)
-function shVoice(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), r = fx.r, src = new Float32Array(n), k = o.k || 1, f0 = o.f0 || (() => 300), wv = fx.wander(3);
-  let ph = 0; for (let i = 0; i < n; i++) { const u = i / n; ph += f0(u) * k * (1 + 0.025 * wv(i / sr)) / sr; if (ph >= 1) { ph -= 1; src[i] = 1; } src[i] += (r.next() * 2 - 1) * (o.breath ?? 0.08); }
-  const y = new Float32Array(n), F = o.formants || [[800, 5, 1], [1250, 6, 0.6], [2700, 7, 0.3]];
-  for (const [f, q, a] of F) { const z = Float32Array.from(src); SHX.bq(z, 'bp', f * k, q, sr); for (let i = 0; i < n; i++) y[i] += z[i] * a; }
-  const env = o.env || ((u) => Math.min(1, u / 0.15) * Math.pow(1 - u, 0.8));
-  for (let i = 0; i < n; i++) y[i] *= env(i / n);
-  return y;
-}
-// a crowd crying out: many voices, staggered, of every pitch (k < 1: slowed), spread across the stereo field; o.form(r)
-// their vowels ([[f, q, a]]), o.env(u) each voice's shape
-function shCrowdCry(K, t, o = {}) {
-  const fx = K.fx, r = fx.r, k = o.k || 1, N = o.n || 16, d = (o.d || 1.6) / k, Ls = fx.arr(d + (o.spread || 0.8) / k + 0.1), Rs = fx.arr(d + (o.spread || 0.8) / k + 0.1);
-  for (let v = 0; v < N; v++) {
-    const f = r.range(o.lo || 260, o.hi || 640), dd = d * r.range(0.6, 1.1), on = r.range(0, (o.spread || 0.8) / k), fm = r.range(0.9, 1.2);
-    const y = shVoice(fx, dd, { k, f0: (u) => f * (1 + 0.18 * Math.sin(Math.PI * u) * fm - 0.1 * u), formants: o.form ? o.form(r) : [[r.range(700, 950), 5, 1], [r.range(1100, 1500), 6, 0.6], [r.range(2500, 3000), 7, 0.25]], breath: o.breath ?? 0.15,
-      env: o.env || ((u) => Math.min(1, u / 0.12) * Math.pow(1 - u, 1.1)) });
-    const pan = r.range(-0.8, 0.8), gL = Math.cos((pan + 1) * Math.PI / 4), gR = Math.sin((pan + 1) * Math.PI / 4), i0 = Math.round(on * fx.sr), a = r.range(0.4, 1);
-    for (let i = 0; i < y.length && i0 + i < Ls.length; i++) { Ls[i0 + i] += y[i] * gL * a; Rs[i0 + i] += y[i] * gR * a; }
-  }
-  return K.putLR(Ls, Rs, t, { vol: o.vol ?? 0.5, norm: true, room: o.room, wet: o.wet });
-}
 // a bed whose filters follow the world's speed (shWorldRate, or o.rate): slowed, the same noise sinks and darkens, and
-// its flutter slows with it. o.f: [[type, f, q]] (f at real speed), the rest as shBed
+// its flutter slows with it. o.f: [[type, f, q]] (f at real speed), env(u, t) absolute level (t = film time), vol
+// (peak), fi/fo fades, room/wet, mono+pan
 function shBedW(K, t0, t1, o = {}) {
   const { fx, sr } = K, d = t1 - t0; if (d <= 0.02) return;
   const n = Math.ceil(d * sr), fi = o.fi ?? 0.04, fo = o.fo ?? 0.04, rate = o.rate || shWorldRate, N = Math.ceil(d * 25) + 2;
@@ -243,11 +91,32 @@ function shBedW(K, t0, t1, o = {}) {
     for (let i = 0; i < n; i++) { const t = i / sr; tau += R[Math.floor(i / n * (N - 1))] / sr; y[i] *= (o.env ? o.env(t / d, t0 + t) : 1) * Math.min(1, t / fi, (d - t) / fo) * (1 + (o.am || 0) * w(tau)); }
     return y;
   };
-  // (env is absolute here: the bed's peak is vol × env's largest value, so a quiet stretch stays quiet)
   let eMax = 1; if (o.env) { eMax = 0; for (let k = 0; k <= Math.ceil(d * 50); k++) { const u = Math.min(1, k / (d * 50)); eMax = Math.max(eMax, o.env(u, t0 + u * d)); } }
   if (eMax < 1e-4) return;
   const vol = (o.vol ?? 1) * eMax;
   if (o.mono) return K.put(mk(), t0, { vol, norm: true, pan: o.pan || 0, room: o.room, wet: o.wet });
   return K.putLR(mk(), mk(), t0, { vol, norm: true, room: o.room, wet: o.wet });
 }
-const SH_SOUND_FNS = [shBedW, shWorldRate, shOrgan, shVoice, shCrowdCry, shPartySong, shNoise, shBed, shTone, shChirp, shCrackle, shSweep, shSweepPut, shAddAt, shPlaceAt, shSeen, shSlowK, shCurve, shWhereShot, shPlaces, shRoll, shScrape, shAlarm, shCrack, shEv, shWn];
+// a voice (a gasp, a radio's garble): glottal pulses at f0(u) through formants [[f, q, a]] (all scaled by k), with
+// breath; env(u)
+function shVoice(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), r = fx.r, src = new Float32Array(n), k = o.k || 1, f0 = o.f0 || (() => 300), wv = fx.wander(3);
+  let ph = 0; for (let i = 0; i < n; i++) { const u = i / n; ph += f0(u) * k * (1 + 0.025 * wv(i / sr)) / sr; if (ph >= 1) { ph -= 1; src[i] = 1; } src[i] += (r.next() * 2 - 1) * (o.breath ?? 0.08); }
+  const y = new Float32Array(n), F = o.formants || [[800, 5, 1], [1250, 6, 0.6], [2700, 7, 0.3]];
+  for (const [f, q, a] of F) { const z = Float32Array.from(src); SHX.bq(z, 'bp', f * k, q, sr); for (let i = 0; i < n; i++) y[i] += z[i] * a; }
+  const env = o.env || ((u) => Math.min(1, u / 0.15) * Math.pow(1 - u, 0.8));
+  for (let i = 0; i < n; i++) y[i] *= env(i / n);
+  return y;
+}
+// footfalls of a mover (SHY.M, SHG.M: legs with dist) between story times s0 and s1: one every `stride` metres
+// (half a gait cycle), at the story moment it lands → [{ s, v }] (v = the speed then)
+function shFootfalls(M, s0, s1, stride, off = 0.25) {
+  const out = [];
+  for (const g of M.legs) {
+    const a = Math.max(s0, g.s0), b = Math.min(s1, g.s1); if (b <= a) continue;
+    let prev = Math.floor(M.dist(a) / stride + off);
+    for (let s = a + 0.01; s <= b + 0.2; s += 0.01) { const i = Math.floor(M.dist(s) / stride + off); if (i > prev) { out.push({ s, v: M.speed(s) }); prev = i; } }
+  }
+  return out;
+}
+const SH_SOUND_FNS = [shNoise, shTone, shSweep, shEv, shWn, shCurve, shWorldRate, shWhereShot, shPlaces, shPlaceAt, shSeen, shBedW, shVoice, shFootfalls];

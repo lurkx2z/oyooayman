@@ -51,7 +51,7 @@ const SH_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [shC(id, k0) - 0.1,
   b('still', 'A SHADOW THAT STOPS 1 s AFTER YOU IS YOURS · ONE THAT DOESN’T IS SOMEONE ELSE’S', 2),
   b('guard', 'HIS SHADOW IS ON TIME: THE RULE IS ONLY YOURS', 0, 0),
   b('speed', 'CAR PARK LIMITS IN THE UK: USUALLY 5 mph', 0),
-  b('cctv', 'A CAMERA SEES LIGHT · YOUR SHADOW IS WHERE THE LIGHT ISN’T', 2),
+  b('cctv', 'A CAMERA SEES LIGHT · YOUR SHADOW IS WHERE THE LIGHT ISN’T', 1),
 ]; })();
 // the insets: [from, to, which, where]
 const SH_INSETS = (() => { const b = (id, k0, k1, w, where = '') => [shC(id, k0) - 0.25, (k1 != null ? shCap(id, k1).hide : shE(id)) + 0.3, w, where]; return [
@@ -178,16 +178,17 @@ class ShHud {
   // the lamp, the floor, light's trip (2.70 m in 9 ns); then the two delays side by side on a log scale (9 ns · 1 s)
   static lamp(u) {
     const T = ShHud.tx, lx = 150, ly = 120, fy = 395, a1 = MathX.smooth(u, 0.4, 1.6), a2 = MathX.smooth(u, 4.6, 5.8), a3 = MathX.smooth(u, 9.4, 10.4);
-    const yRay = ly + 14 + (fy - ly - 14) * a1;
+    const yRay = ly + 14 + (fy - ly - 14) * a1, yYou = fy - (fy - ly - 14) * SHP.youH / SHP.lampH;
     // log scale: 1 ns … 10 s across 330 px
     const X0 = 330, X1 = 720, lo = 1e-9, hi = 10, X = (v) => X0 + (X1 - X0) * (Math.log10(v) - Math.log10(lo)) / (Math.log10(hi) - Math.log10(lo));
     const ticks = [[1e-9, '1 ns'], [1e-6, '1 µs'], [1e-3, '1 ms'], [1, '1 s']].map(([v, l]) => `<line x1="${X(v)}" y1="300" x2="${X(v)}" y2="312" stroke="#9aa" stroke-width="2"/><text x="${X(v)}" y="340" text-anchor="middle" class="sm">${l}</text>`).join('');
     return ShHud.svg(`${ShHud.plate()}${T(30, 56, 't', 'HOW LATE A SHADOW IS')}
       <rect x="${lx - 60}" y="${ly - 10}" width="120" height="16" rx="4" fill="#e9f1ff"/><line x1="${lx - 70}" y1="${fy}" x2="${lx + 70}" y2="${fy}" stroke="#9aa" stroke-width="3"/>
       <line x1="${lx}" y1="${ly + 14}" x2="${lx}" y2="${yRay}" stroke="#ffe7a8" stroke-width="5" marker-end="url(#shAh)"/>
-      ${T(lx + 18, (ly + fy) / 2 - 6, 'sm', `${SHP.lampH.toFixed(2)} m`, 120)}${T(lx - 66, fy + 40, 's', `${SHP.lightNs.toFixed(1)} ns`, 160)}
+      <line x1="${lx - 30}" y1="${yYou}" x2="${lx + 30}" y2="${yYou}" stroke="#9aa" stroke-width="2" stroke-dasharray="6 5" opacity="${a1.toFixed(2)}"/>${T(lx + 40, yYou - 8, 'sm', 'YOUR SHOULDERS', 200)}
+      ${T(lx + 18, (yYou + fy) / 2 + 6, 'sm', `${SHP.youH.toFixed(2)} m`, 120)}${T(lx - 66, fy + 40, 's', `${SHP.lightNs.toFixed(1)} ns`, 160)}
       <g opacity="${a2.toFixed(2)}"><line x1="${X0}" y1="306" x2="${X1}" y2="306" stroke="#9aa" stroke-width="2"/>${ticks}
-      <rect x="${X0}" y="196" width="${(X(SHP.lightS) - X0 + 6).toFixed(1)}" height="30" rx="5" fill="#9fc4ff"/>${T(X0, 186, 'sm', 'A SHADOW, NORMALLY: 9 BILLIONTHS OF A SECOND', 400)}</g>
+      <rect x="${X0}" y="196" width="${(X(SHP.lightS) - X0 + 6).toFixed(1)}" height="30" rx="5" fill="#9fc4ff"/>${T(X0, 186, 'sm', `A SHADOW, NORMALLY: ${SHP.lightNs.toFixed(0)} BILLIONTHS OF A SECOND`, 400)}</g>
       <g opacity="${a3.toFixed(2)}"><rect x="${X0}" y="240" width="${(X(1) - X0).toFixed(1)}" height="30" rx="5" fill="#ff8a6a"/>${T(X(1) - 150, 290, 'sm', 'YOURS: 1 s', 150)}
       ${T(X0, 410, 's', `${(SHP.ratio / 1e6).toFixed(0)} MILLION TIMES LATER`, 400)}</g>`);
   }

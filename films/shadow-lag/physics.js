@@ -13,9 +13,10 @@
 
 const SHP = (() => {
   const c = 299792458, P = { c, lag: 1.0, lampH: SH_F.lampY };
-  P.lightS = P.lampH / c;                               // the lamp-to-floor trip: 9.0 ns
+  P.youH = 1.5;                                         // light that just misses your shoulders, on its way to the floor
+  P.lightS = P.youH / c;                                // how late a shadow normally is: that last 1.5 m, 5.0 ns
   P.lightNs = P.lightS * 1e9;
-  P.ratio = P.lag / P.lightS;                           // 1 s / 9 ns: 111 million
+  P.ratio = P.lag / P.lightS;                           // 1 s / 5 ns: 200 million
   P.walk = 1.4; P.run = 5.0;                            // m/s (cruise speeds of the walk and the run below)
   P.rampKmh = 25; P.ramp = P.rampKmh / 3.6;             // 6.94 m/s
   P.limitKmh = 5 * 1.609344;                            // the sign: 5 mph = 8.05 km/h
@@ -116,7 +117,7 @@ const SHE = (() => {
   E.reverse = [shSC('car', 0, -1.8), shSC('car', 0, 1.6)];   // out of the bay
   E.ramp = shSC('speed', 0, 0.35);                       // the car reaches the top of the ramp at 25 km/h…
   { const d = SH_F.ramp.x[0] - (SH_F.car.x - 5.8), v = SHP.ramp; E.go = E.ramp - (d / v + v / (2 * 2.2)); }   // …from rest at 2.2 m/s²
-  E.cctv = shSC('cctv', 1, 0.15);                        // level 2: the car passes the camera's centre line
+  E.cctv = shSC('cctv', 0, 1.6);                         // level 2: the car passes the camera's centre line
   E.exitStop = shSC('exit', 1, -2.6);                    // the car stops at the barrier (your shadow: just before exit:1)
   E.rise = [shSC('exit', 2, 2.4), shSC('question', 0, -0.3)];   // the shadow rising behind your seat
   return E;
@@ -182,13 +183,13 @@ const SHY = (() => {
 // THE NIGHT GUARD: in through the stair door after midnight, along the aisle with his torch, toward the noise
 // ---------------------------------------------------------------------------------------------------------------------
 const SHG = (() => {
-  const E = SHE, stand = [-2.6, -8.1];
+  const E = SHE, stand = [-2.9, -5.6];   // (round the pillar's south side: his torch finds you past it, and throws your shadow onto the van)
   // (he waits by the plant room, listening, then walks on at a steady pace, timed so that he passes x = −7.8 (where his
   // shadow reaches the floor by your pillar) just before "That one hasn't" comes up)
   const legsFrom = (ta) => [
     [E.guardIn + 0.6, E.guardIn + 21, [[-36.8, -8.3], [-18.5, -8.6]], 0.8],
     [ta, E.guardSeen + 3.0, [[-6.5, -8.3], stand], 0.8],
-    [E.recoil, E.recoil + 0.7, [[-3.5, -8.35]], 0.3],
+    [E.recoil, E.recoil + 0.7, [[-3.6, -5.95]], 0.3],
     [E.radio - 1.2, E.radio + 8.5, [[-9.5, -8.7]], 1.2],
   ];
   const sx = shSC('moving', 1, -0.3);
@@ -256,8 +257,8 @@ const SHC = (() => {
   return { l4, l2, ex, acc, R, exStopX };
 })();
 // the seat you sit in, in the car's frame (right-hand drive: the car faces +z, its right is −x)
-const SH_SEAT = { x: -0.36, y: 0.08, z: -0.22 };
-const SH_BACKSEAT = { x: 0.05, y: -0.02, z: -1.05 };
+const SH_SEAT = { x: -0.36, y: 0.15, z: -0.22 };
+const SH_BACKSEAT = { x: 0.05, y: 0.06, z: -1.05 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE LAMPS (level 4): which are lit. One tube is failing (it flickers); at midnight the car park's night mode turns

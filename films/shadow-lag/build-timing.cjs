@@ -24,7 +24,7 @@ const PAUSE = {
 const EXTRA = {
   'start:1': 0.8, 'light:1': 0.6, 'light:2': 0.4, 'light:3': 0.6, 'hand:1': 1.4, 'hand:2': 1.0, 'walk:1': 1.0, 'stop:1': 1.2, 'mirror:1': 0.8, 'lamps:1': 1.2,
   'impossible:1': 0.8, 'impossible:2': 0.8, 'where:1': 0.6, 'where:2': 0.6, 'where:3': 0.8, 'midnight:1': 1.4, 'hide:1': 1.2, 'still:1': 0.8, 'still:2': 1.2,
-  'moving:1': 2.4, 'guard:1': 1.6, 'guard:2': 1.6, 'seen:1': 1.4, 'run:2': 0.8, 'run:3': 0.6, 'car:1': 1.4, 'speed:1': 1.4, 'cctv:1': 1.2, 'cctv:2': 1.6,
+  'moving:1': 2.4, 'guard:1': 1.6, 'guard:2': 1.6, 'seen:1': 1.4, 'run:2': 0.8, 'run:3': 0.6, 'car:1': 1.4, 'speed:1': 1.4, 'cctv:1': 1.0,
   'exit:1': 1.4, 'exit:2': 1.6, 'film:1': 1.6, 'jump:1': 1.2,
 };
 const SECTION_OF = { title: 1, midnight: 2, car: 3 };

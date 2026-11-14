@@ -18,7 +18,7 @@ status: voiceless
 
 [warn] Before you leave this car park, it will warn you about something.
 
-[light] A shadow isn't a thing. It's just where light can't reach. / Light from that lamp reaches the floor in 9 billionths of a second. / So a shadow is normally 9 billionths of a second late. / Yours is more than 100 million times later.
+[light] A shadow isn't a thing. It's just where light can't reach. / Light that just misses you hits the floor 5 billionths of a second later. / So a shadow is normally 5 billionths of a second late. / Yours is more than 100 million times later.
 
 [hand] Raise your hand. / Its shadow waits. / Then it copies you.
 
@@ -36,9 +36,9 @@ status: voiceless
 
 [lamps] Each lamp gives you a shadow. Right now you have 4. / All 4 are a second late.
 
-[impossible] Officially, this is impossible. / Behind you, light lands on the floor as if you weren't there. / Where you were a second ago, it never lands at all.
+[impossible] Officially, this is impossible. / Where your shadow should be, light lands as if you weren't there. / Where you were a second ago, it never lands at all.
 
-[where] And 1 second behind you... compared to what? / Earth's spin carries you at 280 metres a second, and its orbit at 30 km a second. / If your shadow lagged in space, it would be 30 km from here. / It lags along the ground instead. Like it's following you.
+[where] And 1 second behind you... compared to what? / Earth's spin carries you at 280 metres a second, and its orbit at 30 km a second. / Left behind in space, it would be 30 km back along Earth's orbit. / It lags along the ground instead. Like it's following you.
 
 [midnight] 12:00 AM. Half the lamps switch off for the night. / Fewer lamps. Fewer shadows. Darker ones.
 
@@ -64,7 +64,7 @@ status: voiceless
 
 [speed] You take the ramp at 25 km/h. Three times the limit. / Your shadow is 7 metres behind the car, sitting on nothing.
 
-[cctv] Camera 7, level 2. / It sees your car go past. / 1 second later, it sees you go past.
+[cctv] Camera 7, level 2, sees your car go past. / 1 second later, it sees your shadow go past.
 
 [exit] The exit barrier. You stop. / 1 second later, your shadow stops too. / Now nothing in your car should be moving.
 

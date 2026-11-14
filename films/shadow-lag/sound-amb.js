@@ -1,71 +1,61 @@
 /* =====================================================================
    SOUND · AMBIENCE — where the camera is (sound-lib.js: shPlaces). The beds sit well under the score (mix.js; the
-   owner's rule: the music clearly leads, beds about 10 dB under it). From 10:42:00 every bed runs at the world's own
-   speed (shWorldRate: a quarter, so it sinks two octaves and its flutter drags), rising through the count and snapping
-   back at 10:42:10.
-     the river      the water against the hull, a light wind, the town far off, your boat's engine (idling; from
-                    10:42:01 your mum pushes it flat out); birds before 10:42 and after
-     inside         the hull's water and the engine through it, close and muffled
-     the hospital   the ventilation, the mains hum, the MRI's cold-head pump chuffing
-     the bridge     the traffic's roar and the wind over the deck
-     the hill       wind over the grass, the turbines' swish (until they stop dead)
-     high up        wind; the river far below
+   owner's rule: the music clearly leads, beds about 10 dB under it). In the slowed stretches they sink and stretch a
+   little (shWorldRate).
+     deck   level 4 under the concrete: the lamps' mains hum (100 Hz and its harmonics, an LED driver's thin whine),
+            the room tone of a big concrete box, the town through the open sides; from 12:00 AM, with half the lamps
+            off, the hum is lower and darker
+     edge   at the open side: the town below (traffic, a far siren once), a light wind, the hum behind you
+     cctv   camera 7's feed: its hiss and a mains hum, nothing of the deck
+     exit   street level: the sodium lamps' buzz, the street, the ticket terminal's whine
    ===================================================================== */
 
 shSound('amb', 'beds', function (ctx, bus, K) {
-  const T0 = SH.tOn, tb = shFilmAt(SHP.T), tA = shB('after'), W = (f0) => (tt) => f0, fi = 0.04, fo = 0.04;
-  // your boat's engine: idling, then flat out from 10:42:01 (your mum), then idling again after 10:42:10
-  const onBoat = ['check2', 'check3', 'title', 'yard', 'radio', 'phone', 'hospitalExt', 'real', 'mum', 'rip', 'count', 'bike', 'question', 'hull'];
-  const rev = (t) => (t < T0 + 1 ? 0.55 : t < tb ? 1 : t < tA ? 0.5 : 0.4);
+  const F = shFilmAt, tm = F(SHE.mid), fi = 0.04, fo = 0.04;
+  // how many lamps are lit (1 before midnight, about half after), as the hum's level
+  const lit = (t) => 1 - 0.45 * shEv(t, tm, tm + 1.4);
+  const room = K.verb('adeck', 2.6, { bright: 0.45, damp: 2.0, wet: 0.35, pre: 0.02, early: [[0.045, 0.3], [0.11, 0.2], [0.19, 0.12]] });
   for (const p of shPlaces()) {
-    const a = p.t0, b = p.t1 + 0.06, m = p.shot.mode, d = b - a;
+    const a = p.t0, b = p.t1 + 0.06, d = b - a;
     if (d < 0.05 || a > SH.end + 1) continue;
-    const ed = (u, tt) => Math.min(1, tt / fi, (d - tt) / fo), Wr = (f0) => (tt) => f0 * shWorldRate(a + tt) * (0.8 + 0.4 * rev(a + tt));
+    const ed = (u, tt) => Math.min(1, tt / fi, (d - tt) / fo);
     switch (p.where) {
-      case 'inside': {
-        shBedW(K, a, b, { colour: 'brown', f: [['lp', 240]], vol: 0.14, am: 0.3, wr: 0.5, fi, fo });
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 320, 0.7], ['lp', 700]], vol: 0.07, am: 0.6, wr: 0.7, fi, fo });
-        shTone(K, a, d, Wr(15), [[2, 1], [3, 0.7], [4, 0.5], [6, 0.3], [8, 0.15]], ed, { vol: 0.05, f: [['lp', 500]] });
+      case 'deck': case 'edge': {
+        const edge = p.where === 'edge' ? 1 : 0;
+        // the lamps' hum: 100 Hz and its harmonics (brighter with more lamps lit), the drivers' whine
+        shTone(K, a, d, (tt) => 100 * shWorldRate(a + tt), [[1, 1], [2, 0.55], [3, 0.4], [4, 0.22], [5, 0.12], [7, 0.06]], (u, tt) => ed(u, tt) * lit(a + tt) * (edge ? 0.35 : 1), { vol: 0.03, norm: 1.8, pan: -0.1, f: [['lp', 900]] });
+        shTone(K, a, d, (tt) => 7800 * shWorldRate(a + tt), [[1, 1]], (u, tt) => ed(u, tt) * lit(a + tt) * (edge ? 0.2 : 1) * (a + tt < tm ? 1 : 0.5), { vol: 0.0035, norm: 1, pan: 0.3 });
+        // the concrete box's room tone and the town through the open sides
+        shBedW(K, a, b, { colour: 'pink', f: [['bp', 420, 0.6], ['lp', 1400]], vol: 0.05 + 0.03 * edge, am: 0.35, wr: 0.25, fi, fo });
+        shBedW(K, a, b, { colour: 'brown', f: [['lp', 240]], vol: 0.07 + 0.05 * edge, am: 0.45, wr: 0.15, fi, fo });
+        if (edge) shBedW(K, a, b, { colour: 'pink', f: [['bp', 650, 0.45], ['lp', 2200]], vol: 0.07, am: 0.7, wr: 0.3, fi, fo });   // the wind at the edge
         break;
       }
-      case 'hospital': {
-        shBedW(K, a, b, { colour: 'pink', f: [['hp', 200], ['lp', 2400]], vol: 0.06, am: 0.1, fi, fo });
-        shTone(K, a, d, (tt) => 100 * shWorldRate(a + tt), [[1, 0.6], [2, 1], [3, 0.35], [4, 0.2]], ed, { vol: 0.016, pan: -0.2 });
-        // the MRI's cold-head pump: a soft chuff every 1.2 s (slowed with the world)
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 700, 1.2]], vol: 0.05, mono: true, pan: 0.25, fi, fo,
-          env: (u, t) => { let ph = 0; ph = ((t - a) * shWorldRate(t) / 1.2) % 1; return Math.exp(-ph / 0.12) * (1 - Math.exp(-ph / 0.01)); } });
+      case 'cctv': {
+        shBedW(K, a, b, { colour: 'white', f: [['hp', 2600], ['lp', 9000]], vol: 0.03, am: 0.1, fi: 0.01, fo: 0.01 });
+        shTone(K, a, d, 50, [[1, 0.5], [2, 1], [3, 0.6], [5, 0.3], [7, 0.15]], ed, { vol: 0.02, f: [['lp', 700]] });
         break;
       }
-      case 'bridge': {
-        shBedW(K, a, b, { colour: 'brown', f: [['lp', 520]], vol: 0.13, am: 0.35, wr: 0.5, fi, fo });
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 900, 0.5], ['lp', 2600]], vol: 0.07, am: 0.7, wr: 0.6, fi, fo });
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 380, 0.5], ['lp', 1100]], vol: 0.07, am: 0.6, wr: 0.3, fi, fo });
-        break;
-      }
-      case 'hill': {
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 420, 0.5], ['lp', 1300]], vol: 0.13, am: 0.7, wr: 0.25, fi, fo });
-        shBedW(K, a, b, { colour: 'brown', f: [['lp', 180]], vol: 0.07, am: 0.4, wr: 0.3, fi, fo });
-        break;
-      }
-      case 'high': {
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 500, 0.5], ['lp', 1500]], vol: 0.1, am: 0.6, wr: 0.3, fi, fo });
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 600, 0.6], ['lp', 1600]], vol: 0.05, am: 0.5, wr: 0.8, fi, fo });
-        break;
-      }
-      default: {   // the river
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 520, 0.55], ['lp', 1700]], vol: 0.11, am: 0.65, wr: 0.8, fi, fo });
-        shBedW(K, a, b, { colour: 'pink', f: [['bp', 320, 0.5], ['lp', 950]], vol: 0.07, am: 0.5, wr: 0.3, fi, fo });
-        shBedW(K, a, b, { colour: 'brown', f: [['lp', 260]], vol: 0.06, am: 0.3, wr: 0.4, fi, fo });
-        const near = onBoat.includes(m) ? 1 : 0.35;
-        shTone(K, a, d, Wr(15), [[2, 1], [3, 0.7], [4, 0.55], [6, 0.3], [8, 0.18], [10, 0.08]], ed, { vol: 0.045 * near, pan: 0.15, f: [['lp', 900]] });
+      case 'exit': {
+        // the sodium lamps' buzz (a raspy 100 Hz), the street's traffic, the terminal's whine
+        shTone(K, a, d, (tt) => 100 * shWorldRate(a + tt), [[1, 0.6], [2, 1], [3, 0.7], [4, 0.5], [6, 0.35], [8, 0.2], [10, 0.12]], ed, { vol: 0.022, norm: 2.6, pan: -0.25, f: [['lp', 2400]] });
+        shTone(K, a, d, 4100, [[1, 1]], ed, { vol: 0.003, norm: 1, pan: 0.4 });
+        shBedW(K, a, b, { colour: 'brown', f: [['lp', 320]], vol: 0.1, am: 0.5, wr: 0.2, fi, fo });
+        shBedW(K, a, b, { colour: 'pink', f: [['bp', 900, 0.5], ['lp', 3000]], vol: 0.045, am: 0.6, wr: 0.25, fi, fo });
+        shBedW(K, a, b, { colour: 'pink', f: [['bp', 300, 0.6], ['lp', 800]], vol: 0.04, am: 0.3, wr: 0.4, fi, fo, room, wet: 0.3 });
         break;
       }
     }
   }
-  // birds over the river before 10:42 and after (none in the slowed seconds: they would sink below hearing)
-  { const r = new RNG(CONFIG.seed + 4401), open = K.verb('aopen', 1.8, { bright: 0.45, damp: 2.2, wet: 0.3 });
-    for (const [t0, t1] of [[-1, T0 - 0.1], [tA, SH.end + 0.5]]) for (let t = t0 + r.range(0.2, 1); t < t1 - 0.4; t += r.range(1.2, 3.2)) {
-      const sh = shShotAt(t), w = shWhereShot(sh); if (w === 'inside' || w === 'hospital') continue;
-      K.put(shChirp(K.fx), t, { vol: r.range(0.02, 0.045), norm: true, pan: r.range(-0.8, 0.8), room: open, wet: 0.4 });
-    } }
+  // the town, now and then: a car passing far below (on the deck and at the edge), a siren once, far off
+  { const r = new RNG(CONFIG.seed + 4401);
+    for (let t = 6 + r.range(0, 5); t < SH.end - 3; t += r.range(9, 17)) {
+      const w = shWhereShot(shShotAt(t)); if (w === 'cctv' || w === 'exit') continue;
+      const d = r.range(4, 6.5), lvl = (w === 'edge' ? 0.06 : 0.03) * r.range(0.7, 1);
+      shBedW(K, t, t + d, { colour: 'pink', f: [['bp', r.range(350, 520), 0.8], ['lp', 1600]], vol: lvl, mono: true, pan: r.range(-0.7, 0.7), env: (u) => Math.pow(Math.sin(Math.PI * u), 2.2), fi: 0.3, fo: 0.3 });
+    }
+    // a siren far off across the town (under "compared to what?")
+    { const t0 = shC('where', 0) + 0.8, d = 9;
+      shTone(K, t0, d, (tt) => 720 + 230 * Math.sin(2 * Math.PI * tt / 1.6), [[1, 1], [2, 0.25]], (u) => Math.pow(Math.sin(Math.PI * u), 1.5), { vol: 0.012, norm: 1.25, pan: 0.6, f: [['lp', 1800]], room, wet: 0.6 }); }
+  }
 });
