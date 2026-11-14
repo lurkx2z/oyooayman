@@ -8,11 +8,11 @@
 window.MG_MIX = {
   stems: {
     music: { gain: 2.5, hp: 32 },  // the score leads (the owner's rule of 31 October 2026)
-    amb: { gain: -6.5, hp: 28 },   // the river, the boat's engine, the hospital, the bridge, the hill: under the score
+    amb: { gain: -4.5, hp: 28 },   // the river, the boat's engine, the hospital, the bridge, the hill: under the score
     sfx: { gain: -4.5, hp: 25 },   // the radio, the hum, the steel, the cylinder, your phone, the crash
   },
   dyn: {
-    music: [[0, 0, 0], ['end', -0.04, 0], ['end', 0, -60]],
+    music: [[0, 0, 0], [mgB('count') - 0.4, 0, 0], [mgB('count') + 2, 0, -3.5], [mgB('back'), 0, -3.5], [mgB('back') + 3, 0, 0], ['end', -0.04, 0], ['end', 0, -60]],   // (the count's climax sat 10 dB over the rest: 3.5 dB down)
     amb: [[0, 0, 0], ['end', -0.04, 0], ['end', 0, -60]],
     sfx: [['end', -0.04, 0], ['end', 0, -60]],
   },

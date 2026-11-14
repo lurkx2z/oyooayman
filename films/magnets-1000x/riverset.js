@@ -82,7 +82,7 @@ MG_SETS.river = (app) => {
         } else if (open) hands.update(t);
         if (!eye) { phone.position.set(...P0); phone.rotation.set(0.4 + 7 * a, 1.2 + 3 * a, 0.3); }
         phone.visible = (eye || gone) && s < hit && s < MGP.T;
-        phone.scale.setScalar(eye ? 1 : m === 'phonehit' ? 1.3 : 2.2);   // (in the wide shots a little bigger, or it would be a single pixel)
+        phone.scale.setScalar(eye ? 1 : m === 'phonehit' ? 1.8 : 2.2);   // (in the wide shots a little bigger, or it would be a single pixel)
       }
     },
     labels(t) { return mgRiverLabels(this, t); },
@@ -124,7 +124,7 @@ function mgRiverCam(set, m, s, t, kk, u, shot, v) {
     case 'phonehit': {
       // side-on to the phone's last 4 metres: it streaks in and strikes the ball
       const ph = MG_SMALL.phone, hp = ph.at(ph.hit), a = ph.at(ph.hit - 0.02), d = mgN3([hp[0] - a[0], hp[1] - a[1], hp[2] - a[2]]), sd = mgN3([-d[2], 0, d[0]]);
-      v.p = [hp[0] - d[0] * 2.2 + sd[0] * 6.8, hp[1] + 1.6, hp[2] - d[2] * 2.2 + sd[2] * 6.8]; v.at = [hp[0] - d[0] * 1.7, hp[1] - 0.1, hp[2] - d[2] * 1.7]; v.fov = 38; v.drift = 0.006;
+      v.p = [hp[0] - d[0] * 1.6 + sd[0] * 3.6, hp[1] + 0.9, hp[2] - d[2] * 1.6 + sd[2] * 3.6]; v.at = [hp[0] - d[0] * 1.2, hp[1] - 0.05, hp[2] - d[2] * 1.2]; v.fov = 40; v.drift = 0.006;
       if (s > ph.hit) v.shake = 0.03 * Math.exp(-(s - ph.hit) / 0.02);
       break;
     }
@@ -195,8 +195,8 @@ function mgRiverFx(set, s, du, sp) {
     if (s > ph.rel + 0.01 && s < h + 0.03) {
       const q0 = Math.min(s, h), P1 = ph.at(q0), P2 = ph.at(q0 - 0.001), vel = Math.hypot(P1[0] - P2[0], P1[1] - P2[1], P1[2] - P2[2]) / 0.001;
       const fade = s < h ? MathX.clamp((s - ph.rel - 0.01) / 0.05, 0, 1) : Math.exp(-(s - h) / 0.004), Lt = Math.min(2, 0.3 + vel * 0.004), dq = Lt / Math.max(1, vel) / 26;
-      for (let i = 0; i < 26; i++) { const q = q0 - i * dq; if (q < ph.rel) break; const p = ph.at(q); sp.add(p[0], p[1], p[2], 0.04 + 0.08 * (1 - i / 26), 0.55 * (1 - i / 26) * fade, 1, 0.86, 0.62); }
-      if (s >= h) { const u = s - h; for (let i = 0; i < 50; i++) { const r = mgRand(i * 7 + 911), d = mgN3([r() - 0.5, r() - 0.25, r() - 0.5]), v2 = 40 + 110 * r(); sp.add(P1[0] + d[0] * v2 * u, P1[1] + d[1] * v2 * u - 4.9 * u * u, P1[2] + d[2] * v2 * u, 0.08 + 0.09 * r(), 0.95 * Math.exp(-u / 0.012), 1, 0.78, 0.42); } sp.add(P1[0], P1[1], P1[2], 0.5 + 40 * u, 0.9 * Math.exp(-u / 0.003), 1, 0.9, 0.7); }
+      for (let i = 0; i < 26; i++) { const q = q0 - i * dq; if (q < ph.rel) break; const p = ph.at(q); sp.add(p[0], p[1], p[2], 0.05 + 0.1 * (1 - i / 26), 0.8 * (1 - i / 26) * fade, 1, 0.86, 0.62); }
+      if (s >= h) { const u = s - h; for (let i = 0; i < 50; i++) { const r = mgRand(i * 7 + 911), d = mgN3([r() - 0.5, r() - 0.25, r() - 0.5]), v2 = 40 + 110 * r(); sp.add(P1[0] + d[0] * v2 * u, P1[1] + d[1] * v2 * u - 4.9 * u * u, P1[2] + d[2] * v2 * u, 0.1 + 0.14 * r(), 0.95 * Math.exp(-u / 0.02), 1, 0.78, 0.42); } sp.add(P1[0], P1[1], P1[2], 0.5 + 40 * u, 0.9 * Math.exp(-u / 0.003), 1, 0.9, 0.7); }
     }
   }
   // the bridge's skidding electric cars: tyre smoke behind each locked wheel

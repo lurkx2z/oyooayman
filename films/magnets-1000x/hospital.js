@@ -356,7 +356,7 @@ MG_SETS.mri = (app) => {
     switch (m) {
       case 'mriRoom': { const k = mgK(u, 0, 5); v.p = [mgLerp(3.25, 2.95, k), 1.55, mgLerp(2.75, 2.45, k)]; v.at = [-0.2, 1.25, 0]; v.fov = 50; break; }
       case 'plan': { const k = mgK(u, 0, 6); v.p = [mgLerp(-1.5, -1.0, k), mgLerp(25, 24, k), mgLerp(14.5, 13.8, k)]; v.at = [0.2, 0, 3.4]; v.fov = 44; v.drift = 0.02; break; }
-      case 'corridor': { const k = mgK(u, 0, 6.5); v.p = [-4.45, 1.2, mgLerp(1.55, 1.3, k)]; v.at = [-3.85, 0.95, -0.1]; v.fov = 50; break; }
+      case 'corridor': { const k = mgK(u, 0, 6.5); v.p = [-5.32, 1.4, mgLerp(-4.3, -3.9, k)]; v.at = [-4.0, 1.0, 0.15]; v.fov = 50; break; }   // (down the corridor, level: the cylinder crosses to the wall on the right)
       case 'burst': { v.p = [-1.25, 1.55, 3.05]; v.at = [-2.35, 0.95, -0.25]; v.fov = 52; if (s > Cy.wall) v.shake = 0.012 * Math.exp(-(s - Cy.wall) / 0.02); if (s > hit) v.shake = 0.03 * Math.exp(-(s - hit) / 0.01); break; }
       case 'water': { const k = mgK(u, 1.5, 16); v.p = [mgLerp(0.98, 2.4, k), mgLerp(2.3, 2.5, k), mgLerp(0.88, 2.7, k)]; v.at = mgV([H.cup[0], H.cup[1] + 0.16, H.cup[2]], [-0.2, 1.5, 0], k * 0.6); v.fov = mgLerp(30, 46, k); v.drift = 0.003; break; }
       case 'waiting': { const k = mgK(u, 0, 10); v.p = [mgLerp(5.4, 5.0, k), 1.5, mgLerp(13.0, 12.6, k)]; v.at = [-0.6, 1.0, 7.2]; v.fov = 52; break; }

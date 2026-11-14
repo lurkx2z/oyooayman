@@ -4,11 +4,11 @@
    on the GPU, and the frames go straight into H.264 segments instead of 15,000 files on disk.
 
      npm install --no-save playwright && npx playwright install chromium        (once; ffmpeg must be on PATH)
-     node films/light-no-bounce/render-gpu.cjs
+     node films/magnets-1000x/render-gpu.cjs
 
-   Writes to renders/light-no-bounce/:
-     light-no-bounce_final_1080p.mp4   1920×1080 30 fps, H.264 CRF 18 + the mastered soundtrack (AAC 256k, copied)
-     light-no-bounce_final_small.mp4   only with --small: 1280×720 two-pass, under 30 MiB (for a phone), AAC 128k copied
+   Writes to renders/magnets-1000x/:
+     magnets-1000x_final_1080p.mp4   1920×1080 30 fps, H.264 CRF 18 + the mastered soundtrack (AAC 256k, copied)
+     magnets-1000x_final_small.mp4   only with --small: 1280×720 two-pass, under 30 MiB (for a phone), AAC 128k copied
      check.jpg                            8 frames across the film
    Resumable: re-run the same command and finished 15-second segments are kept.
    Options: --workers 4  --out <dir>  --gpu auto|headless|headed|software  --channel msedge|chrome  --from <frame> --to <frame>  --w 1920 --h 1080
@@ -30,17 +30,17 @@ const ARGS = process.argv.slice(2).reduce((o, a, i, arr) => {
   return o;
 }, {});
 const ROOT = path.resolve(__dirname, '../..');
-const PAGE = path.join(ROOT, 'light-no-bounce.html');
+const PAGE = path.join(ROOT, 'magnets-1000x.html');
 const SOUND = path.join(__dirname, 'final-soundtrack.m4a');         // AAC 256k (loudness: EPISODE_REPORT.md)
 const SMALL_SOUND = path.join(__dirname, 'small-soundtrack.m4a');   // AAC 128k (measured; low-bitrate
                                                                     // AAC adds peaks, so it is encoded once and copied)
-const OUT = path.resolve(ROOT, ARGS.out || 'renders/light-no-bounce');
+const OUT = path.resolve(ROOT, ARGS.out || 'renders/magnets-1000x');
 const SEGDIR = path.join(OUT, 'segments');
 const W = +(ARGS.w || 1920), H = +(ARGS.h || 1080), FPS = 30, SEG = +(ARGS.seg || 450);
 const WORKERS = Math.max(1, +(ARGS.workers || 4));
 const FFMPEG = ARGS.ffmpeg || process.env.FFMPEG || 'ffmpeg';
-const FINAL = path.join(OUT, 'light-no-bounce_final_1080p.mp4');
-const SMALL = path.join(OUT, 'light-no-bounce_final_small.mp4');
+const FINAL = path.join(OUT, 'magnets-1000x_final_1080p.mp4');
+const SMALL = path.join(OUT, 'magnets-1000x_final_small.mp4');
 const url = pathToFileURL(PAGE).href + `?capture&w=${W}&h=${H}`;
 const hms = (s) => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 3600)}h${String(Math.floor(s / 60) % 60).padStart(2, '0')}m`; };
 

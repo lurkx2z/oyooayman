@@ -137,6 +137,18 @@ Everything is procedural, so there are no models, images or sound files to downl
 > right in front of you. At 4:42 PM Saturn's light from 3:30 should arrive, and there is none. The story clock only
 > runs forward. Physics, clock, shots and review log: [`films/light-no-bounce/PLAN.md`](films/light-no-bounce/PLAN.md)
 > and [`EPISODE_REPORT.md`](films/light-no-bounce/EPISODE_REPORT.md).
+>
+> ***What if magnets got 1,000 times stronger for 10 seconds?*** — open `magnets-1000x.html` (16:9, voiceless, 5:08). At
+> 10:42 AM on a Saturday, on your family's narrowboat beside a scrapyard, every magnet's field becomes 1,000 times
+> stronger. Your radio goes silent though it's still on, your phone pulls at your hand, and the yard's lifting magnet
+> pulls the whole pile into a ball of steel, reaching ten times as far as before. Across the river the hospital's MRI
+> jumps to 3,000 tesla: an oxygen cylinder comes through the wall, the water leaps out of a cup and the waiting room's
+> phones are wrenched out of people's hands. Electric cars brake themselves on the bridge, the wind turbines lock and
+> drop their blades, and your boat, 20 metres from the ball, slides toward it while your mum runs the engine flat out.
+> Your phone is torn away and hits the ball at 1,800 km/h, the boat hits the wall and is lifted out of the river, and at
+> 10:42:10 everything lets go. The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/magnets-1000x/PLAN.md`](films/magnets-1000x/PLAN.md) and
+> [`EPISODE_REPORT.md`](films/magnets-1000x/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|

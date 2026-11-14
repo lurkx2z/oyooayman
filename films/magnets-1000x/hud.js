@@ -28,7 +28,7 @@ const mgT = (kg) => mgN(kg / 1000);
 // the scene's context box: [from, to, label, value(t, s, set) → { v, v2 }] (HTML)
 const MG_CTX = (() => {
   const beat = (id, l, f, k0 = 0, k1) => [mgC(id, k0) - 0.2, (k1 != null ? mgCap(id, k1).hide : mgE(id)) + 0.2, l, f];
-  const cylV = (s) => { const C = MG_SMALL.cyl, a = Math.max(0, s), d = 0.004; return Math.max(0, (C.at(a) - C.at(a + d)) / d); };
+  const cylV = (s) => { const C = MG_SMALL.cyl, a = Math.max(0.005, s), d = 0.005; return Math.max(0, (C.at(a - d) - C.at(a + d)) / (2 * d)); };   // (centred over 10 ms: the track is stored in steps)
   const phoneV = (s) => {
     const ph = MG_SMALL.phone, P = MGP;
     if (s < ph.rel) { const h = mgOnBoat(s, ...MG_SMALL.hand), M = MGY.magAt(s), r = Math.hypot(M[0] - h[0], M[1] - h[1], M[2] - h[2]); return { v: `${(P.phoneM * P.K * P.G(r) / P.phoneKg / P.g).toFixed(2)}× <small>its weight</small>`, v2: `YOUR GRIP HOLDS ABOUT ${P.phoneGrip}×` }; }
