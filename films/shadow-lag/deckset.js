@@ -243,8 +243,10 @@ function shDeckSet(app, level) {
       A.forEach((L, i) => { const dx = q.x - L.position.x, dz = q.z - L.position.z, d = Math.hypot(dx, dz) || 1; lab([q.x + dx / d * 1.5, 0.02, q.z + dz / d * 1.5], String(i + 1), '', shWin(t, shC('lamps', 0) + 0.3 * i, shE('lamps') + 0.3, 0.3, 0.3)); });
     }
     if (m === 'parapetWalk' && !p.car) {
-      lab([p.x, 0.02, p.z + 0.9], 'LIT', 'SHOULD BE YOUR SHADOW', shWin(t, shC('impossible', 1) - 0.2, 1e9, 0.4, 0.3), 'r');
-      lab([q.x, 0.02, q.z], 'DARK', 'NOTHING THERE TO BLOCK THE LIGHT', shWin(t, shC('impossible', 2) - 0.2, 1e9, 0.4, 0.3));
+      // (only while you move: standing still, your shadow catches up and both spots are the same one)
+      const mv = MathX.smooth(Math.hypot(p.x - q.x, p.z - q.z), 0.35, 0.7);
+      lab([p.x, 0.02, p.z + 0.9], 'LIT', 'SHOULD BE YOUR SHADOW', shWin(t, shC('impossible', 1) - 0.2, 1e9, 0.4, 0.3) * mv, 'r');
+      lab([q.x, 0.02, q.z], 'DARK', 'NOTHING THERE TO BLOCK THE LIGHT', shWin(t, shC('impossible', 2) - 0.2, 1e9, 0.4, 0.3) * mv);
     }
     if (m === 'drive' || m === 'cctv') {
       const c = set.carAt(s), ca = set.carAt(s - 1), lead = new THREE.Vector3(SH_SEAT.x, 1.0, SH_SEAT.z).applyAxisAngle(new THREE.Vector3(0, 1, 0), ca.yaw);

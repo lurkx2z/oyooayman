@@ -28,14 +28,16 @@ const shSpeedAt = (s, set) => { if (!SHY.inCar(s)) return SHY.speed(s); const c 
 const SH_CTX = (() => {
   const beat = (id, l, f, k0 = 0, k1) => [shC(id, k0) - 0.2, (k1 != null ? shCap(id, k1).hide : shE(id)) + 0.2, l, f];
   const gap = (s, set) => shGapAt(s, set);
+  // (speeding up, the gap is what you covered in the last second, less than your speed now: say so)
+  const acc = (s, set) => (shSpeedAt(s, set) - shSpeedAt(s - 1, set) > 0.35 ? ' · SPEEDING UP' : '');
   return [
     beat('walk', 'YOUR SPEED', (t, s, set) => ({ v: `${shSpeedAt(s, set).toFixed(1)} <small>m/s</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND` })),
     beat('stop', 'YOUR SHADOW', (t, s, set) => ({ v: `${gap(s, set).toFixed(2)} <small>m behind you</small>`, v2: SHY.speed(s) < 0.05 ? 'YOU: STOPPED' : 'YOU: WALKING' })),
     beat('lamps', 'YOUR SHADOWS', () => ({ v: '4 <small>dark ones</small>', v2: 'ALL OF THEM 1 s LATE' })),
     beat('where', 'THE EARTH’S SPIN CARRIES YOU AT', () => ({ v: `${shN(SHP.spin)} <small>m/s</small>`, v2: `ITS ORBIT: ${SHP.orbitKms.toFixed(1)} km/s` }), 0, 0),
     beat('midnight', 'LAMPS ON, LEVEL 4', (t, s) => ({ v: `${SH_LAMPS.filter((L) => shLampOn(L.i, s, 4) > 0.5).length} <small>of ${SH_LAMPS.length}</small>`, v2: 'NIGHT MODE FROM 12:00 AM' })),
-    beat('run', 'YOUR SPEED', (t, s, set) => ({ v: `${shSpeedAt(s, set).toFixed(1)} <small>m/s</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND` }), 1),
-    beat('car', 'YOUR CAR', (t, s, set) => ({ v: `${(shSpeedAt(s, set) * 3.6).toFixed(0)} <small>km/h</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND IT` }), 1),
+    beat('run', 'YOUR SPEED', (t, s, set) => ({ v: `${shSpeedAt(s, set).toFixed(1)} <small>m/s</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND${acc(s, set)}` }), 1),
+    beat('car', 'YOUR CAR', (t, s, set) => ({ v: `${(shSpeedAt(s, set) * 3.6).toFixed(0)} <small>km/h</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND IT${acc(s, set)}` }), 1),
     beat('speed', 'YOUR CAR', (t, s, set) => ({ v: `${(shSpeedAt(s, set) * 3.6).toFixed(0)} <small>km/h</small>`, v2: 'THE LIMIT: 5 mph (8 km/h)' }), 0, 0),
     beat('exit', 'YOUR CAR', (t, s, set) => { const v = shSpeedAt(s, set); return { v: v < 0.02 ? 'STOPPED' : `${(v * 3.6).toFixed(0)} <small>km/h</small>`, v2: `YOUR SHADOW: ${gap(s, set).toFixed(1)} m BEHIND` }; }, 0, 1),
   ];
