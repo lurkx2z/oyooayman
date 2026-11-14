@@ -5,7 +5,7 @@
    own shadow. Every note of the motif comes back 1 second later (in story time: slowed, the echo comes later still),
    an octave down and muffled, like a shadow of the note.
      11:58 PM      a low drone; a backwards piano into the moment your shadow stays behind; the motif and its echoes
-     the light     cold glass strings; a bell on "9 billionths", a low chord on "100 million"
+     the light     cold glass strings; a bell on "5 billionths", a low chord on "100 million"
      the tests     a walking pulse (it stops when you stop; its echo walks on for 1 second); the jump: your landing,
                    then the shadow's, muffled; the mirror's bells; four bells for four lamps, each echoed
      impossible    a stinger and a dark held chord; the Earth: wide strings and a slow rise

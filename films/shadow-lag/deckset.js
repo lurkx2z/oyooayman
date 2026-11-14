@@ -36,15 +36,18 @@ function shDeckSet(app, level) {
   // (the battens dimmed), so your late shadow lands on the wall hard and dark, beside you
   // (and a third on the west face of the column at x = 7.2, aimed west along the aisle past your pillar: the open floor
   // where your shadow is left behind, and where the guard's comes)
-  const wallKeys = level === 4 ? [[[-25.2, 2.15, -11.22], [-25.2, 0.9, -5.0], 0], [[-21.6, 1.85, -11.12], [-21.6, 0.9, -5.0], 0], [[6.82, 1.85, -4.8], [-3.0, 0, -6.2], -Math.PI / 2]].map(([P, tg, ry]) => {
+  const wallKeys = level === 4 ? [[[-25.2, 2.15, -11.22], [-25.2, 0.9, -5.0], 0], [[-21.6, 1.85, -11.12], [-21.6, 0.9, -5.0], 0], [[6.82, 1.85, -4.8], [-3.0, 0, -6.2], -Math.PI / 2], [[-14.4, 2.05, -10.74], [3.9, 1.2, -4.95], 1.25]].map(([P, tg, ry]) => {
     const L = new THREE.SpotLight('#f2f6ff', 0, 26, 0.8, 0.35, 1.5); L.position.set(P[0], P[1], P[2]); L.target.position.set(tg[0], tg[1], tg[2]);
     L.castShadow = true; L.shadow.mapSize.set(2048, 2048); L.shadow.camera.near = 0.2; L.shadow.camera.far = 24; L.shadow.bias = -0.0005; L.shadow.normalBias = 0.02; L.shadow.radius = 1.5;
     scene.add(L); scene.add(L.target); shShadowOn(L, false);
     const lensM = new THREE.MeshStandardMaterial({ color: '#fff', emissive: '#f4f8ff', emissiveIntensity: 0.2 }), g = new THREE.Group(); g.position.set(P[0] + (ry ? 0.08 : 0), P[1], ry ? P[2] : P[0] === -25.2 ? -11.395 : -11.3 + 0.005);   // (the first hangs on the edge beam, the others on columns) g.rotation.y = ry; scene.add(g);
     const lens = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), lensM); lens.scale.set(1.3, 0.8, 0.5); lens.rotation.x = Math.PI / 2; lens.castShadow = false; g.add(lens);
     const rim = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.014, 8, 24), shStd('#2a2c30', 0.5, 0.4)); rim.scale.set(1.3, 0.8, 1); rim.castShadow = false; g.add(rim);
-    L.lensM = lensM; return L; }) : [];
-  const wallKeyFor = (m) => (level === 4 ? { walkSide: 0, stop: 1, turn: 1, jump: 1, hide: 2, runStart: 2 }[m] ?? -1 : -1);
+    L.lensM = lensM; L.lensG = g; return L; }) : [];
+  // (the fourth hangs on a short conduit drop under the beam at x −14.4, aimed across the aisle at the van's back doors: the
+  // night guard walks between them, so his shadow lands on the van behind you)
+  if (wallKeys[3]) { wallKeys[3].position.x = -14.3; const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.42, 8), shStd('#3a3d42', 0.6, 0.5)); rod.position.set(-14.4, 2.25, -10.74); rod.castShadow = false; scene.add(rod); }
+  const wallKeyFor = (m) => (level === 4 ? { walkSide: 0, stop: 1, turn: 1, jump: 1, hide: 2, runStart: 2, moving: 3 }[m] ?? -1 : -1);
   const stairFill = new THREE.PointLight('#e8f2ff', 0, 8, 2); stairFill.position.set(-41.6, 2.4, -8.2); scene.add(stairFill);
   // the guard's torch (a narrow, bright cone; it casts), and its beam (a faint additive cone)
   const torch = new THREE.SpotLight('#fff6e6', 0, 32, 0.24, 0.55, 1.4); torch.castShadow = true; torch.shadow.mapSize.set(1024, 1024); torch.shadow.camera.near = 0.2; torch.shadow.camera.far = 32; torch.shadow.bias = -0.0006; torch.shadow.normalBias = 0.02;
@@ -148,9 +151,9 @@ function shDeckSet(app, level) {
     stair.intensity = lv === 4 ? 70 * MathX.clamp(doorOpen * 1.6, 0, 1) : 0; shShadowOn(stair, stair.intensity > 0); stairFill.intensity = lv === 4 ? 3.5 : 0;
     // the lamps' real lights near the action (focus per shot)
     const foc = set.focus(m, s);
-    const wk = wallKeyFor(m), dim = wk >= 0 && wk < 2, aMid = s > SHE.mid + 0.5;
+    const wk = wallKeyFor(m), dim = wk >= 0 && wk !== 2, aMid = s > SHE.mid + 0.5;
     lights.place(deck, foc, lampOn, { I: m === 'top' ? 34 : dim ? 12 : aMid ? 30 : 26, max: m === 'top' ? 4 : dim ? 3 : 6, fill: m === 'top' ? 0.12 : m === 'ramp' ? 0.3 : dim ? 0.22 : aMid ? 0.28 : 0.42 });
-    wallKeys.forEach((L, i) => { const on = i === wk; L.intensity = on ? (i < 2 ? 42 : 60) : 0; shShadowOn(L, on); L.lensM.emissiveIntensity = on ? 3 : 0.2; });
+    wallKeys.forEach((L, i) => { const on = i === wk; L.intensity = on ? [42, 42, 60, 95][i] : 0; shShadowOn(L, on); L.lensM.emissiveIntensity = on ? 3 : 0.2; });
     // on the ramp, the last three of the pool's casting lights are its wall bulkheads (they throw the car's shadow, and
     // yours, onto the south wall)
     if (lv === 4 && deck.rampLamps && (m === 'ramp' || (m === 'drive' && SHC.l4(s).x > 28))) deck.rampLamps.forEach((q, i) => {
@@ -208,7 +211,9 @@ function shDeckSet(app, level) {
     stepsPOV: (t, s, k) => { const h = headAt(s); const yaw = SHY.yaw(s); const d = shDir(yaw + Math.PI, -0.04); shCam(camera, h, [h[0] + d[0] * 10, h[1] + d[1] * 10, h[2] + d[2] * 10], 50); },
     hide: (t, s, k) => shCam(camera, [-3.6, 2.32, -11.4], [1.0, 0.0, -5.6], 52),
     still: (t, s, k) => shCam(camera, [2.6, 0.42, -6.6], [0.75, 0.35, -4.5], 48),
-    moving: (t, s, k) => shCam(camera, [1.9, 0.9, -4.0], [-2.4, 0.0, -8.2], 50),
+    // (the night guard stays out of frame, behind the camera; a lamp hanging behind him throws his shadow onto the van's
+    // back doors, right behind you, as he turns toward your pillar)
+    moving: (t, s, k) => shCam(camera, [-2.6 + 0.25 * k, 1.15, -2.4 - 0.1 * k], [0.2, 0.75, -4.6], 50),
     guard: (t, s, k) => shCam(camera, [0.95, 1.58, -5.55], [-2.6, 1.0, -8.2], 46),
     // from beside the guard: his torch on you, and your shadow thrown onto the van behind you (a second late)
     torch: (t, s, k) => shCam(camera, [-3.5, 1.7, -5.15], [2.2, 1.0, -3.6], 50),

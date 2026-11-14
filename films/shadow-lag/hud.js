@@ -6,7 +6,7 @@
                   clock jumps at a cut (it only ever runs forward)
      under them   the scene's context box (the number this scene is about)
      bottom       one caption at a time (CAPTIONS.md via timing.js; numbers in amber)
-     insets       light's trip from the lamp to the floor (9 ns against 1 s); the Earth carrying you (spin, orbit)
+     insets       light's last 1.5 m to the floor (5 ns against 1 s); the Earth carrying you (spin, orbit)
      bottom left  the honest labels (what is impossible, what is rough)
      camera 7     the CCTV picture's own overlay (camera, level, date and time, REC) instead of the panels
      in the scene labels the set pins to places (set.labels(t) → [{ p, text, sub, a }])
@@ -177,7 +177,7 @@ class ShHud {
     const fs = est > maxW ? ` style="font-size:${(K[0] * maxW / est).toFixed(1)}px"` : '';
     return `<text x="${x}" y="${y}" class="${cls}"${fs} ${extra}>${text}</text>`;
   }
-  // the lamp, the floor, light's trip (2.70 m in 9 ns); then the two delays side by side on a log scale (9 ns · 1 s)
+  // the lamp, the floor, light's last 1.5 m (5 ns); then the two delays side by side on a log scale (5 ns · 1 s)
   static lamp(u) {
     const T = ShHud.tx, lx = 150, ly = 120, fy = 395, a1 = MathX.smooth(u, 0.4, 1.6), a2 = MathX.smooth(u, 4.6, 5.8), a3 = MathX.smooth(u, 9.4, 10.4);
     const yRay = ly + 14 + (fy - ly - 14) * a1, yYou = fy - (fy - ly - 14) * SHP.youH / SHP.lampH;

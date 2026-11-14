@@ -14,7 +14,7 @@ const SH_SHOTS = [];
     ['A0', 'door', -1, c('start', 1) + 2.2, 'deck'],
     ['A1', 'overview', c('start', 1) + 2.2, B('warn'), 'deck'],
     ['A2', 'aislePOV', B('warn'), B('light'), 'deck'],
-    // what a shadow is; the lamp; 9 billionths of a second
+    // what a shadow is; the lamp; 5 billionths of a second
     ['L1', 'floorSide', B('light'), c('light', 1) - 0.5, 'deck'],
     ['L2', 'lampPOV', c('light', 1) - 0.5, c('light', 3) - 0.5, 'deck'],
     ['L3', 'floorSide', c('light', 3) - 0.5, B('hand'), 'deck'],
