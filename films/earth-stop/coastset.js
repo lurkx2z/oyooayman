@@ -106,7 +106,12 @@ function esCoastCam(set, m, s, t, kk, u, shot, v) {
     case 'title': {
       const b = t - ES.tOn;
       v.p = [-3.0, PH + 1.62, -2.35]; v.at = [-60, 2.7, -3.5]; v.fov = 54; v.near = 0.1; v.drift = 0.012; v.shadowR = 50; v.sat = [-22, 0, -3];
-      if (b > 0) { const k2 = esK(b, 0.3, 5.3); v.shake = 0.05 * Math.exp(-b / 0.4); v.at = [-60, L(2.7, 3.6, k2), L(-3.5, -2.7, k2)]; v.p = [L(-3.0, -2.3, k2), PH + L(1.62, 1.52, k2), -2.35]; }
+      // …and the camera turns with it, the way your head would: by 0:05 it looks east, after the train, down the line
+      if (b > 0) {
+        const k2 = esK(b, 0.3, 5.3), kp = esK(b, 0.7, 5.2), yaw = L(Math.PI + 0.02, 2 * Math.PI - 0.13, kp);
+        v.shake = 0.05 * Math.exp(-b / 0.4); v.p = [L(-3.0, -2.3, k2), PH + L(1.62, 1.52, k2), -2.35];
+        v.at = [v.p[0] + 50 * Math.cos(yaw), L(2.7, 2.0, kp), v.p[2] + 50 * Math.sin(yaw)]; v.sat = [L(-22, 14, kp), 0, -3];
+      }
       break;
     }
     // ---- the hill east of town: it stopped too. From the plain; then along its rock face, where the palms arrive

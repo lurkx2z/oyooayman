@@ -162,6 +162,19 @@ Everything is procedural, so there are no models, images or sound files to downl
 > where nothing in your car should be moving. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/shadow-lag/PLAN.md`](films/shadow-lag/PLAN.md) and
 > [`EPISODE_REPORT.md`](films/shadow-lag/EPISODE_REPORT.md).
+>
+> ***What if Earth stopped spinning for 1 second?*** — open `earth-stop.html` (16:9, voiceless, 4:09). At 5:42 PM on a
+> Sunday, at a small railway station on the equator, the solid ground stops turning for exactly one second. Nothing
+> else does: the station, the town, the people on the platform, your train, the air and the sea all keep the
+> 1,670 km/h they always had. The whole film is that one second and the third of a second after it. No bolt can hold
+> (steel would have to be 50 times stronger than steel is), so the station slides off its own floor; the people leave
+> the platform's end already toppling; your train skids east carrying the energy of almost 5 tonnes of TNT. A hill
+> 600 metres down the line is ground, so it stopped: a house, the palms, the depot's shed and six wagons of fuel run
+> into its rock, and a wind at 1.3 times the speed of sound pins the fire to it. Behind the station the sea climbs
+> the quay as a wall of water, 349 metres high by 5:42:01. Then the ground turns again, your train is at rest
+> 150 metres short of the hill, and everything the hill stopped is coming west at 1,670 km/h. The story clock only
+> runs forward. Physics, clock, shots and review log: [`films/earth-stop/PLAN.md`](films/earth-stop/PLAN.md) and
+> [`EPISODE_REPORT.md`](films/earth-stop/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
