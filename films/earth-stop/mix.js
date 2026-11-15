@@ -16,7 +16,7 @@ window.ES_MIX = (() => {
     // dB over time, per stem ([film s, 0, dB] or ['end', seconds before the end, dB])
     dyn: {
       music: byT([[0, 0, 0], [tW - 0.33, 0, 0], [tW - 0.27, 0, -30], [tW - 0.02, 0, -30], [tW, 0, 0], [B('people') - 0.5, 0, 0], [B('people') + 1.5, 0, 2], [B('train') - 1, 0, 2], [B('train') + 0.5, 0, 0], [B('fall') - 0.5, 0, 0], [B('fall') + 1.5, 0, 4], [B('count') - 0.8, 0, 4], [B('count'), 0, 0],
-        [tb - 0.004, 0, 0], [tb + 0.004, 0, -50], [tb + 0.8, 0, -50], [tb + 1.6, 0, 0],   // 5:42:01.000: not even the hall's echo is left
+        [tb - 0.004, 0, 0], [tb + 0.004, 0, -50], [tb + 2.6, 0, -50], [tb + 3.4, 0, 0],   // 5:42:01.000: not even the hall's echo is left
         [tLast, 0, 0], ['end', -0.3, 0], ['end', 0, -60]]),
       amb: byT([[0, 0, 0], [B('fall'), 0, 0], [B('fall') + 2, 0, -3], [B('count') - 1, 0, -3], [B('count') + 0.5, 0, 0]].concat(gaps, end)),
       sfx: byT([[0, 0, 0], [tb - 0.004, 0, 0], [tb + 0.004, 0, -40], [tb + 0.6, 0, -40], [tb + 1.0, 0, 0]].concat(gaps.slice(0, 4), end)),
