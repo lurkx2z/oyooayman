@@ -64,8 +64,8 @@ const ES_PALMS = (() => {
   const add = (x, z, h) => { if (Math.abs(z) < 7 && x > -215) return; if (z > -22 && z < 13 && x > -215 && x < 5) return; out.push([x, z, h ?? r.range(7, 11), r.next()]); };
   for (let x = -200; x < 560; x += r.range(14, 30)) { add(x + r.range(-3, 3), -r.range(26, 44)); add(x + r.range(-3, 3), r.range(18, 40)); }
   for (let i = 0; i < 46; i++) add(r.range(-240, 560), (r.next() < 0.5 ? -1 : 1) * r.range(50, 190));
-  // the row along the foot of the hill (the first things to reach the rock)
-  for (let z = -170; z <= 170; z += r.range(9, 17)) { if (Math.abs(z) < 12) continue; add(esHillX(z) - r.range(6, 26), z, r.range(8, 12)); }
+  // the belt along the foot of the hill, 14 to 27 m from the rock: the first things to reach it, in a volley (s 0.03 to 0.058)
+  for (let z = -176; z <= 176; z += r.range(6.5, 11)) { if (Math.abs(z) < 12) continue; add(esHillX(z) - r.range(14.5, 27), z, r.range(8, 12)); }
   return out;
 })();
 

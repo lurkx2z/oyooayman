@@ -87,6 +87,7 @@ const ESP = (() => {
   P.womanV = P.g * (P.womanLand - P.womanFree);                               // 10.7 m/s: a 5.9 m fall
   // the tank wagons: wagon k's front is at wagons.front − k·L; it meets the rock at:
   P.wagonHit = (k) => (esHillX(F.wagons.z) - (F.wagons.front - k * F.wagons.L)) / P.v;
+  P.shed = (esHillX(F.shed.z) - (F.shed.x + F.shed.w / 2)) / P.v;               // 0.387 s: the depot's shed reaches the rock
   P.wagon0 = P.wagonHit(0); P.wagonEnd = P.wagonHit(F.wagons.n);              // 0.449 … 0.643 s
   P.parked = esHillX(F.wagons.z) - F.wagons.front;                            // 209 m
   // the sea's wall at the quay: its height

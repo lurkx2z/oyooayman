@@ -111,10 +111,12 @@ ES_SETS.sky = (app) => {
       this._s = s; this._shot = shot;
       // (in 0.06 s the airliner covers 40 m more than the air around it: it hangs there; only the camera drifts)
       plane.rotation.z = 0.018 * Math.sin(u * 0.5); plane.rotation.x = 0.012 * Math.sin(u * 0.37 + 1);
-      const p = [esLerp(-33, -27, k), esLerp(13.5, 11, k), esLerp(-30, -34, k)], at = [5, -2.5, 3];
+      // 'sky': beside it, drawing level; 'skyB': over it, looking down past its wing at the coast
+      const B = shot.mode === 'skyB';
+      const p = B ? [esLerp(-30, -12, k), esLerp(34, 44, k), esLerp(-16, -9, k)] : [esLerp(-46, -24, k), esLerp(15, 8, k), esLerp(-34, -30, k)], at = B ? [esLerp(60, 110, k), esLerp(-40, -70, k), 14] : [5, -2.5, 3];
       const dr = esDrift(t, 0.25, 0.25, 5);
       cam.near = 1; cam.far = 90000;
-      esCam(cam, [p[0] + dr[0], p[1] + dr[1], p[2] + dr[2]], at, esLerp(40, 37, k));
+      esCam(cam, [p[0] + dr[0], p[1] + dr[1], p[2] + dr[2]], at, B ? esLerp(44, 40, k) : esLerp(40, 37, k));
       S.sun.target.position.set(0, 0, 0); S.sun.target.updateMatrixWorld();
       // the contrails: two lines of ice behind the engines
       fx.begin();

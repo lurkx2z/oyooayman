@@ -63,7 +63,7 @@ class EsAudio extends AudioEngine {
     const consts = { ESP, ES_F, ES_CLOCK, ES_SHOTS, ES_HITS, ES_THEME: window.ES_THEME || null };
     return [ES, EST, window.ES_MIX, Object.values(ESX).map(String).join(''), EsFx.toString(), Object.getOwnPropertyNames(EsFx.prototype).map((k) => String(EsFx.prototype[k])).join(''),
       Object.values(ES_SOUND).flat().map((b) => b.name + b.fn).join(''), esDynDb.toString(), EsAudio.toString(), esLimit.toString(), esStoryAt.toString(), consts,
-      (window.ES_SOUND_FNS || []).map(String).join(''), [esShotAt, esShot, esFilmAt, esRateAt, esSegAt].map(String).join('')];
+      (window.ES_SOUND_FNS || []).map(String).join(''), [esShotAt, esShot, esFilmAt, esRateAt, esSegAt, esStoryAt].map(String).join('')];
   }
   // AudioEngine's fingerprint, with every number rounded to 7 significant digits: browsers' Math.exp/sin/acosh… can
   // differ in the last bit (Safari, Firefox), and then the baked copy was refused and the whole soundtrack rendered

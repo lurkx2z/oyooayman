@@ -95,13 +95,23 @@ function esBuildStation(S) {
     trunks.castShadow = crowns.castShadow = true; trunks.frustumCulled = crowns.frustumCulled = false; root.add(trunks); root.add(crowns);
     const hits = ES_PALMS.map((p) => { const s = (esHillX(p[1]) - p[0]) / P.v; return s > 0 && s < P.T ? s : null; });
     const mt = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), ps = new THREE.Vector3(), sc = new THREE.Vector3(), up = new THREE.Vector3();
+    // (a palm that reaches the rock does not vanish: it folds flat against it, its crown crushed, and goes under the dust)
     out.palms = (s) => {
+      const X = P.X(s);
       for (let i = 0; i < N; i++) {
-        const [x, z, h, r] = ES_PALMS[i], gone = hits[i] != null && s >= hits[i];
-        const th = -(0.25 + 0.5 * r) * Math.min(1.3, Math.max(0, s)) ** 2, y0 = 0.5 - Math.min(0.5, P.fall(s));
+        const [x, z, h, r] = ES_PALMS[i], u = hits[i] != null ? s - hits[i] : -1, y0 = 0.5 - Math.min(0.5, P.fall(s));
+        if (u >= 0) {
+          // pinned at the rock (root-relative: the rock is at hx − X), folding up against it over 5 ms, sinking as it breaks up
+          const hx = esHillX(z) - X, f = Math.min(1, u / 0.005), g = 1 - 0.55 * MathX.smooth(u, 0.004, 0.06);
+          e.set(0.12 * Math.sin(r * 40), r * 6.28, 0.12 + 0.2 * (r - 0.5)); q.setFromEuler(e);
+          ps.set(hx - 0.5, y0, z); sc.set(1.6 - 0.4 * f, h * g * (1 - 0.25 * f), 1.6); mt.compose(ps, q, sc); trunks.setMatrixAt(i, mt);
+          up.set(0, h * g * (1 - 0.25 * f), 0).applyQuaternion(q); ps.set(hx - 0.7 + up.x * 0.3, y0 + up.y, z + up.z); sc.set((0.8 + 0.4 * r) * (1 - 0.8 * f), (0.8 + 0.4 * r) * (1 + 0.3 * f) * g, (0.8 + 0.4 * r) * (1 + 0.5 * f)); mt.compose(ps, q, sc); crowns.setMatrixAt(i, mt);
+          continue;
+        }
+        const th = -(0.25 + 0.5 * r) * Math.min(1.3, Math.max(0, s)) ** 2;
         e.set(0.12 * Math.sin(r * 40), r * 6.28, th + 0.1 * Math.sin(r * 23)); q.setFromEuler(e);
-        ps.set(x, y0, z); sc.set(gone ? 0 : 1, gone ? 0 : h, gone ? 0 : 1); mt.compose(ps, q, sc); trunks.setMatrixAt(i, mt);
-        up.set(0, h, 0).applyQuaternion(q); ps.set(x + up.x, y0 + up.y, z + up.z); sc.setScalar(gone ? 0 : 0.8 + 0.4 * r); mt.compose(ps, q, sc); crowns.setMatrixAt(i, mt);
+        ps.set(x, y0, z); sc.set(1, h, 1); mt.compose(ps, q, sc); trunks.setMatrixAt(i, mt);
+        up.set(0, h, 0).applyQuaternion(q); ps.set(x + up.x, y0 + up.y, z + up.z); sc.setScalar(0.8 + 0.4 * r); mt.compose(ps, q, sc); crowns.setMatrixAt(i, mt);
       }
       trunks.instanceMatrix.needsUpdate = crowns.instanceMatrix.needsUpdate = true;
     };
@@ -200,12 +210,12 @@ function esBuildStation(S) {
     { const g = grp(F.sigbox.x, 0, F.sigbox.z), wm = new THREE.MeshStandardMaterial({ map: esTex(esFacadeCanvas(71, [150, 60, 44], { trim: '#e9e2d0' })), roughness: 0.9 });
       const b = new THREE.Mesh(esBayBox(6, 3, 4), [wm, wm, wh, wh, wm, wm]); b.position.y = 1.5; b.castShadow = true; g.add(b);
       const u = new THREE.Mesh(esBayBox(6.4, 2.6, 4.4, 1.6, 2.6), [wm, wm, wh, wh, wm, wm]); u.position.y = 4.3; u.castShadow = true; g.add(u);
-      const rf = new THREE.Mesh(esGableGeo(7.2, 5.4, 1.4), esStd('#4a4e52', 0.7)); rf.position.y = 5.6; rf.castShadow = true; g.add(rf); east.push([g, hitOf('box'), 0.1]); emit.push([F.sigbox.x + 3, F.sigbox.x - 3, F.sigbox.z - 2, F.sigbox.z + 2, 0.7]); }
+      const rf = new THREE.Mesh(esGableGeo(7.2, 5.4, 1.4), esStd('#4a4e52', 0.7)); rf.position.y = 5.6; rf.castShadow = true; g.add(rf); east.push([g, hitOf('box'), 0.1, 6]); emit.push([F.sigbox.x + 3, F.sigbox.x - 3, F.sigbox.z - 2, F.sigbox.z + 2, 0.7]); }
     { const g = grp(F.wtower.x, 0, F.wtower.z); for (const [dx, dz] of [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]]) esBox(0.22, 8, 0.22, iron, dx, 4, dz, g); for (const y of [2.6, 5.4]) { esBox(3.4, 0.12, 0.12, iron, 0, y, -1.6, g); esBox(3.4, 0.12, 0.12, iron, 0, y, 1.6, g); esBox(0.12, 0.12, 3.4, iron, -1.6, y, 0, g); esBox(0.12, 0.12, 3.4, iron, 1.6, y, 0, g); }
-      esCyl(2.6, 2.6, 3.4, esStd('#7a4a36', 0.7, 0.3), 0, 9.7, 0, g, 16); const c = esMesh(new THREE.ConeGeometry(2.8, 1.2, 16), esStd('#5a3a2c', 0.7, 0.3), 0, 12, 0, g); void c; east.push([g, hitOf('tower'), 0.16]); }
+      esCyl(2.6, 2.6, 3.4, esStd('#7a4a36', 0.7, 0.3), 0, 9.7, 0, g, 16); const c = esMesh(new THREE.ConeGeometry(2.8, 1.2, 16), esStd('#5a3a2c', 0.7, 0.3), 0, 12, 0, g); void c; east.push([g, hitOf('tower'), 0.16, 4]); }
     { const Sh = F.shed, g = grp(Sh.x, 0, Sh.z), wm = new THREE.MeshStandardMaterial({ map: (() => { const t = esTex(esStripeCanvas('#9aa3a6', '#8a9396', 32, 11)); t.repeat.set(8, 1); t.rotation = Math.PI / 2; return t; })(), roughness: 0.6, metalness: 0.4 });
       esBox(Sh.w, Sh.h, Sh.d, wm, 0, Sh.h / 2, 0, g); const rf = new THREE.Mesh(esGableGeo(Sh.w + 0.6, Sh.d + 0.8, 2.2), esStd('#6a5a52', 0.6, 0.4)); rf.position.y = Sh.h; rf.castShadow = true; g.add(rf);
-      esBox(0.1, 4.2, 5, esStd('#3a3f44', 0.6), Sh.w / 2 + 0.03, 2.1, 0, g); east.push([g, hitOf('shed'), 0.08]); emit.push([Sh.x + Sh.w / 2, Sh.x - Sh.w / 2, Sh.z - Sh.d / 2, Sh.z + Sh.d / 2, 1.0]);
+      esBox(0.1, 4.2, 5, esStd('#3a3f44', 0.6), Sh.w / 2 + 0.03, 2.1, 0, g); east.push([g, hitOf('shed'), 0.08, F.shed.w]); emit.push([Sh.x + Sh.w / 2, Sh.x - Sh.w / 2, Sh.z - Sh.d / 2, Sh.z + Sh.d / 2, 1.0]);
       // the fuel stand beside the siding: two upright tanks and pipes
       for (const dx of [-16, -10]) { const t = grp(Sh.x + dx, 0, Sh.z + 9.5); esCyl(1.5, 1.5, 5.2, esStd('#d8d4c8', 0.5, 0.3), 0, 2.9, 0, t, 16); esCyl(1.52, 1.52, 0.3, red, 0, 4.4, 0, t, 16); east.push([t, (esHillX(Sh.z + 9.5) - (Sh.x + dx + 1.5)) / P.v, 0.1]); } }
     // the quay's crane and crates, lamp posts along the apron
@@ -219,7 +229,7 @@ function esBuildStation(S) {
   {
     const mk = (look, x, z, yaw, pose, o = {}) => { const p = esPerson(look, root, { id: o.id || '' }); return Object.assign({ p, x, z, yaw, pose, y: Pl.h }, o); };
     // the passengers stand where the platform's end is 12 to 30 m ahead when "it ends in 20 metres" comes up
-    const sCap = esStoryAt(esC('people', 2)), xl = -(12 + P.v * sCap);
+    const sCap = esStoryAt(esC('people', 1)), xl = -(12 + P.v * sCap);
     out.leadX = xl;
     out.people = [
       mk('esMaster', -24, -3.4, Math.PI / 2, 'flag'),
@@ -270,7 +280,15 @@ function esBuildStation(S) {
     out.bridge.position.y = P.womanY(s) - F.bridge.y; out.bridge.rotation.z = -0.05 * MathX.smooth(s, 0.1, 1); out.bridge.rotation.x = 0.03 * MathX.smooth(s, 0.2, 1);
     // furniture: each thing falls off the platform's end in its turn (and trips forward on the way)
     for (const [g, x0, y0] of things) { const sEnd = x0 > 9000 ? 0.004 : (Pl.x[1] - x0) / P.v, dy = Math.min(y0 - 0.02, P.fall(s, sEnd)); g.position.y = y0 - dy; g.rotation.z = -Math.min(1.4, 2.4 * sc * sc); }
-    for (const [g, hit, tilt] of east) { g.visible = !(hit != null && s >= hit); g.rotation.z = -tilt * sc * sc; }
+    // (what reaches the rock is fed into it: its length shortens against the face; small things are simply gone)
+    for (const e of east) {
+      const [g, hit, tilt, len] = e; if (e.x0 == null) e.x0 = g.position.x;
+      g.rotation.z = -tilt * sc * sc;
+      if (hit == null || s < hit) { g.visible = true; g.scale.x = 1; g.position.x = e.x0; continue; }
+      if (!len) { g.visible = false; continue; }
+      const left = Math.max(0, len - P.v * (Math.min(s, 1) - hit));
+      g.visible = left > 0.05; g.scale.x = Math.max(0.001, left / len); g.position.x = e.x0 + len / 2 + P.X(hit) - X - left / 2; g.rotation.z = 0;
+    }
     // the people: standing still at 1,670 km/h; the platform drags their feet back, so they tip forward; then its end
     for (const q of out.people) {
       const sEnd = (Pl.x[1] - q.x) / P.v, dy = P.fall(s, sEnd), gone = dy > q.y - 0.1;

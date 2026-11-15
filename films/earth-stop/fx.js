@@ -13,6 +13,9 @@
                    in its spray, and it throws a real shadow (an unseen sheet in the sun's shadow map) that crosses
                    the station, the town and the plain within a third of a second. lit(x, y) is that shadow for
                    everything drawn without the lights (dust, smoke, spray)
+     debris        what the rock makes of what reaches it: splinters, sheet metal, plate (tumbling boxes), up the face
+                   and out along it, then carried over the top by the wind. The same at the quay for the ferry
+     the Eiffel    its outline, 330 m, standing beside the sea's wall in the one shot that needs a scale (mode 'up')
      5:42:01       everything the ground stopped is thrown west at 465 m/s (ESP.blastX): the fire, the dust, the wall
      esBuildFx(S, { W, St, Tr }) → { update(s, t, mode, camera) , fire(s) → 0…1 , light , lit(x, y, s) → 0…1 , firePos(s) }
    ===================================================================== */
@@ -164,22 +167,25 @@ function esBuildFx(S, parts) {
     for (let j = 0; j < NZ; j++) for (let i = 0; i < NA; i++) { const k = j * (NA + 1) + i; idx.push(k, k + 1, k + NA + 1, k + 1, k + NA + 2, k + NA + 1); }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('aA', new THREE.Float32BufferAttribute(aa, 1)); g.setIndex(idx);
     const m = new THREE.ShaderMaterial({
-      transparent: true, depthWrite: false, side: THREE.DoubleSide,
+      transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -60,
       uniforms: Object.assign({ uR: { value: 5 }, uFire: { value: 0 }, uT: { value: 0 }, uShift: { value: 0 }, uZc: { value: F.wagons.z }, uSmoke: { value: 0 }, uA: { value: 1 } }, fogU),
       vertexShader: `attribute float aA; uniform float uShift; varying vec3 vW; varying float vA, vD; void main(){ vec3 w = position; w.x -= uShift; vW = w; vA = aA; vec4 mv = viewMatrix * vec4(w, 1.0); vD = -mv.z; gl_Position = projectionMatrix * mv; }`,
       fragmentShader: `uniform float uR, uFire, uT, uZc, uSmoke, uA, fogDen; uniform vec3 fogCol; varying vec3 vW; varying float vA, vD; ${ES_FXGLSL}
         void main(){
-          float zr = (vW.z - uZc) / (uR * 1.3), ar = (vA - 2.0) / (uR * 2.5 + 8.0);
+          // tongues at the scale of the rock face (they run up it), on top of the slow shapes that run over the slope
+          vec2 q3 = vec2(vW.z * 0.19, vA * 0.075 - uT * 2.4);
+          float n3 = 0.6 * vn(q3) + 0.4 * vn(q3 * 2.03 + 1.7), n4 = vn(vec2(vW.z * 0.6 + 7.0, vA * 0.22 - uT * 4.1));
+          float zr = (vW.z + (n3 - 0.5) * 16.0 + (n4 - 0.5) * 4.0 - uZc) / (uR * 1.3), ar = (vA + (n3 - 0.5) * 10.0 - 2.0) / (uR * 2.5 + 8.0);
           vec2 q = vec2(vW.z * 0.034, vA * 0.017 - uT * 1.15);                         // tongues, running up and over
           float w1 = fbm(q * 0.6 + vec2(0.0, uT * 0.23)), n = fbm(q + vec2(w1 * 1.5, w1 * 0.7)), n2 = fbm(q * 3.4 + vec2(3.0, -uT * 1.9));
           float d = length(vec2(zr, ar));
           float core = uFire * (1.0 - smoothstep(0.1, 1.0, d + (n - 0.5) * 0.75));
-          float heat = clamp(core * (0.1 + 2.1 * n * n2 + 0.25 * n2), 0.0, 1.0);
+          float heat = clamp(core * (0.1 + 2.1 * n * n2 + 0.25 * n2) * (0.45 + 1.2 * n3) + 0.3 * core * (n4 - 0.5), 0.0, 1.0);
           // its smoke: wider, and far longer down the wind
           float ds = length(vec2(zr * 0.75, (vA - 2.0) / (uR * 5.5 + 30.0)));
           float smoke = uSmoke * (1.0 - smoothstep(0.25, 1.0, ds + (n - 0.5) * 0.6)) * (0.55 + 0.6 * n2);
           vec3 col = fireCol(heat);
-          float a = max(smoothstep(0.03, 0.22, core) * (0.72 + 0.28 * n2), smoothstep(0.08, 0.5, smoke) * 0.9);
+          float a = max(smoothstep(0.03, 0.3, core) * (0.5 + 0.5 * smoothstep(0.2, 0.62, heat + 0.4 * n3)) * smoothstep(0.0, 1.2 + 3.0 * n4, vA), smoothstep(0.08, 0.5, smoke) * 0.9);
           float f = (1.0 - exp(-fogDen * vD)) * (1.0 - 0.8 * heat); gl_FragColor = vec4(mix(col, fogCol, f), a * uA); }`,
     });
     const o = new THREE.Mesh(g, m); o.frustumCulled = false; o.renderOrder = 4; o.visible = false; scene.add(o); return o;
@@ -207,6 +213,36 @@ function esBuildFx(S, parts) {
           float f = (1.0 - exp(-fogDen * vD)) * (1.0 - 0.75 * heat); gl_FragColor = vec4(mix(col, fogCol, f), a); }`,
     });
     const o = new THREE.Mesh(g, m); o.frustumCulled = false; o.renderOrder = 4.5; o.visible = false; scene.add(o); return o;
+  })();
+  // ------------------------------------------------------------------ debris: tumbling pieces of what reached the rock
+  const NDEB = 1500;
+  const deb = (() => {
+    const o = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ roughness: 0.8, metalness: 0.1 }), NDEB);
+    const c = new THREE.Color('#444444'); for (let i = 0; i < NDEB; i++) o.setColorAt(i, c);
+    o.frustumCulled = false; o.count = 0; scene.add(o); return o;
+  })();
+  // per kind: [pieces, biggest piece (m), how wide it arrives (m along the rock), colours]
+  const DEB = {
+    palm: [7, 0.7, 3, [[0.36, 0.3, 0.2], [0.25, 0.36, 0.14], [0.3, 0.4, 0.16]]], shed: [80, 2.8, 22, [[0.42, 0.44, 0.46], [0.5, 0.3, 0.2], [0.62, 0.62, 0.6]]],
+    wagon: [46, 2.2, 3.4, [[0.1, 0.11, 0.12], [0.16, 0.16, 0.17], [0.7, 0.36, 0.12]]], box: [36, 1.6, 6, [[0.6, 0.55, 0.48], [0.5, 0.3, 0.24]]],
+    tower: [36, 1.8, 5, [[0.45, 0.28, 0.2], [0.3, 0.3, 0.32]]], truck: [14, 1.0, 2, [[0.6, 0.2, 0.14], [0.15, 0.15, 0.16]]], ferry: [90, 3.2, 12, [[0.92, 0.9, 0.86], [0.14, 0.3, 0.56], [0.5, 0.52, 0.5]]],
+  };
+  const _mt = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _ps = new THREE.Vector3(), _sc = new THREE.Vector3(), _col = new THREE.Color();
+  // ------------------------------------------------------------------ the Eiffel Tower's outline (330 m), for scale
+  const eiffel = (() => {
+    const pts = [], w = (y) => (y < 276 ? 3 + 59.5 * Math.exp(-y / 86) : 3 * (1 - (y - 276) / 60)), seg = (a, b) => pts.push(a[0], a[1], a[2], b[0], b[1], b[2]);
+    const ys = []; for (let y = 0; y <= 276; y += 11.5) ys.push(y); ys.push(300, 330);
+    for (let i = 0; i < ys.length - 1; i++) {
+      const y0 = ys[i], y1 = ys[i + 1], a = w(y0), b = Math.max(0.1, w(y1));
+      for (const [sx, sz] of [[1, 1], [1, -1], [-1, -1], [-1, 1]]) seg([sx * a, y0, sz * a], [sx * b, y1, sz * b]);                    // the four legs
+      if (i % 2 === 0 && y0 < 280) for (const [p, q2] of [[[1, 1], [-1, 1]], [[1, -1], [-1, -1]], [[1, 1], [1, -1]], [[-1, 1], [-1, -1]]]) { seg([p[0] * a, y0, p[1] * a], [q2[0] * b, y1, q2[1] * b]); seg([q2[0] * a, y0, q2[1] * a], [p[0] * b, y1, p[1] * b]); }   // lattice
+    }
+    for (const y of [57, 115, 276]) { const a = w(y) + 2; for (const [p, q2] of [[[1, 1], [-1, 1]], [[-1, 1], [-1, -1]], [[-1, -1], [1, -1]], [[1, -1], [1, 1]]]) for (const dy of [0, 3.5]) seg([p[0] * a, y + dy, p[1] * a], [q2[0] * a, y + dy, q2[1] * a]); }   // its platforms
+    // (the arches between the legs)
+    for (const [ax, az] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) for (let i = 0; i < 12; i++) { const f = (u) => { const t2 = -1 + 2 * u, r = w(0) * 0.92; return [ax ? ax * w(40 * (1 - t2 * t2)) : t2 * r, 40 * (1 - t2 * t2), az ? az * w(40 * (1 - t2 * t2)) : t2 * r]; }; seg(f(i / 12), f((i + 1) / 12)); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    const o = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: '#fff0d0', transparent: true, opacity: 0.9, fog: false, depthWrite: false }));
+    o.position.set(ES_EIFFEL[0], 0, ES_EIFFEL[1]); o.rotation.y = 0.5; o.visible = false; o.frustumCulled = false; o.renderOrder = 8; scene.add(o); return o;
   })();
   // the fire's light on everything (no fall-off of its own: the set gives it one from how far its subject is)
   const light = new THREE.PointLight('#ff7a2e', 0, 0, 0); light.position.set(590, 30, -9); scene.add(light); out.light = light;
@@ -306,7 +342,7 @@ function esBuildFx(S, parts) {
         const u = s - h.s; if (u <= 0 || u > 0.9) continue;
         if (far(h.x, h.z) > 900) continue;
         const palm = h.kind === 'palm', n = palm ? 6 : 18, Rm = palm ? 8 : 26, grow = 1 - Math.exp(-u / 0.07);
-        if (u < 0.008) sp.add(h.x - 1.5 - shift, h.y, h.z, (palm ? 5 : 16) * (1 + u * 260), 0.9 * (1 - u / 0.008), 1, 0.8, 0.5);
+        if (!palm && u < 0.005) sp.add(h.x - 1.5 - shift, h.y, h.z, 14 * (1 + u * 300), 0.9 * (1 - u / 0.005), 1, 0.8, 0.5);   // (steel and masonry flash; timber does not)
         for (let j = 0; j < n; j++) {
           const id = hI * 29 + j, ang = Math.PI * H(id, 31), rad = Rm * Math.sqrt(H(id, 32)) * grow, rise = 42 * u * (0.4 + H(id, 33));
           pin(h.x - 1 - 4 * H(id, 34) * grow, h.y + Math.sin(ang) * rad * 0.8 + rise, h.z + Math.cos(ang) * rad, _o);
@@ -335,6 +371,19 @@ function esBuildFx(S, parts) {
           const T = heat * (1 - 0.7 * rf) + 0.12 * noise1(t * 0.9 + j, id + 5), sz = 2.2 + Rk * (0.14 + 0.2 * H(id, 45));
           // (added light: deep orange, so only where many overlap does it go to yellow)
           fi.add(_o[0] - shift * (0.94 + 0.06 * H(id, 46)), _o[1], _o[2], sz, (0.1 + 0.16 * H(id, 47)) * (0.5 + 0.8 * Math.max(0, T)) * Math.min(1, u / 0.004) * U.uA.value, 1, 0.34 + 0.2 * Math.max(0, T), 0.04 + 0.1 * Math.max(0, T), H(id, 48));
+        }
+        // its fireball: out from the rock (toward the wagons still coming), rolling up; white-hot at first, then
+        // orange inside a rind of black smoke; the wind folds it back onto the face within a tenth of a second
+        if (u < 0.3) {
+          const g1 = 1 - Math.exp(-u / 0.035), fold = Math.exp(-u / 0.12), Rb = 3 + 15 * g1, cxb = hz - 3 - 13 * g1 * fold, cyb = 3.5 + 9 * g1 + 40 * u, age = MathX.clamp(u / 0.16, 0, 1), aa = Math.min(1, u / 0.002) * (1 - MathX.smooth(u, 0.18, 0.3));
+          for (let j = 0; j < 34; j++) {
+            const id = k * 131 + j, th = 6.283 * H(id, 141), ph = Math.acos(2 * H(id, 142) - 1), rr = Rb * Math.pow(H(id, 143), 0.4) * (0.75 + 0.25 * noise1(t * 0.6 + j, id));
+            const x = Math.min(hz - 0.5, cxb + rr * Math.sin(ph) * Math.cos(th) * 0.8), y = Math.max(0.6, cyb + rr * Math.cos(ph)), z = zc + rr * Math.sin(ph) * Math.sin(th) * 1.15, rim = rr / Rb;
+            if (H(id, 144) < 0.72 - 0.3 * age) fi.add(x - shift, y, z, Rb * (0.34 + 0.3 * H(id, 145)), (0.2 + 0.16 * H(id, 146)) * aa * (1 - 0.5 * age * rim), 1, 0.84 - 0.5 * age - 0.2 * rim, 0.5 - 0.44 * age - 0.06 * rim, H(id, 147));
+            else du.add(x - shift - 0.5, y + 1, z, Rb * (0.4 + 0.3 * H(id, 145)), 0.75 * aa * (0.35 + 0.65 * age), 0.08, 0.07, 0.065, H(id, 147));
+          }
+          // a ring of dust tearing out along the ground from under it
+          for (let j = 0; j < 26; j++) { const id = k * 137 + j, ang = Math.PI * (0.5 + H(id, 151)), rad = 3 + 58 * (1 - Math.exp(-u / 0.06)) * (0.8 + 0.2 * H(id, 152)); du.add(Math.min(hz - 1, hz - 2 + Math.cos(ang) * rad * 0.7) - shift, 0.7 + 1.5 * H(id, 153), zc + Math.sin(ang) * rad, 2.2 + 4 * (rad / 60), 0.5 * aa * Math.exp(-u / 0.2), 0.6, 0.5, 0.38, H(id, 154)); }
         }
       }
       // the smoke: black, boiling up off the fire, driven up the slope and over the top by the wind (its top comes
@@ -400,6 +449,30 @@ function esBuildFx(S, parts) {
       }
       for (let i = 0; i < 110; i++) { const z = cz * 0.5 + (H(i, 91) - 0.5) * 300, ph = H(i, 92); du.add(xf - 2 - 11 * ph + 2 * noise1(t + i, i), 0.8 + 3.5 * ph * H(i, 93), z, 3 + 5 * ph, 0.55 * A * (1 - ph * 0.6), 0.7, 0.58, 0.44, H(i, 94)); }
     }
+    // ---------------------------------------------------------------- debris
+    {
+      let n = 0;
+      const piece = (id, kind, a, x0, y0, z0, east) => {
+        const D = DEB[kind], tau = 0.06 + 0.2 * H(id, 102), k = tau * (1 - Math.exp(-a / tau)), life = MathX.clamp(1 - (a - 0.42) / 0.25, 0, 1);
+        const vy = V * (0.03 + 0.42 * H(id, 103) * H(id, 103)), vz = V * 0.5 * (H(id, 104) - 0.5), back = (4 + 34 * H(id, 105)) * (1 - Math.exp(-a / 0.012)) * Math.exp(-a / 0.35);
+        const y = Math.max(0.15, y0 * (0.3 + 0.9 * H(id, 106)) + vy * k - 0.5 * G * a * a), z = z0 + (H(id, 107) - 0.5) * D[2] + vz * k;
+        if (east) { _o[0] = x0 + 2 + 60 * H(id, 105) * k * 4; _o[1] = y; _o[2] = z; } else pin(x0 - 0.8 - back, y, z, _o);
+        const big = D[1] * (0.25 + 0.75 * H(id, 108) * H(id, 108)) * life;
+        _e.set(H(id, 109) * 6.28 + a * 300 * (H(id, 110) - 0.5), H(id, 111) * 6.28 + a * 240 * (H(id, 112) - 0.5), a * 300 * (H(id, 113) - 0.5)); _q.setFromEuler(_e);
+        // (through the very long lens at the tunnel's mouth a scrap near the camera would cover the whole picture)
+        if (m === 'mouth' && Math.hypot(_o[0] - shift - cx, _o[2] - cz) < 70) return;
+        _ps.set(_o[0] - shift, _o[1], _o[2]); _sc.set(big, big * (0.2 + 0.5 * H(id, 114)), Math.max(0.03, big * (kind === 'palm' ? 0.14 : 0.06))); _mt.compose(_ps, _q, _sc); deb.setMatrixAt(n, _mt);
+        const c = D[3][(id * 7) % D[3].length], sh = 0.4 + 0.6 * litAt(_o[0], _o[1]); deb.setColorAt(n, _col.setRGB(c[0] * sh, c[1] * sh, c[2] * sh)); n++;
+      };
+      for (let hI = 0; hI < ES_HITS.length; hI++) {
+        const h = ES_HITS[hI], u = s - h.s; if (u <= 0) break; if (u > 0.7 || far(h.x, h.z) > 520) continue;
+        const D = DEB[h.kind], spread = h.kind === 'palm' ? 0 : h.kind === 'shed' ? 0.05 : 0.03;     // (a long thing breaks up as it is fed in)
+        for (let j = 0; j < D[0] && n < NDEB - 100; j++) { const id = hI * 61 + j, a = u - spread * H(id, 101); if (a > 0) piece(id, h.kind, a, h.x, h.y, h.z, false); }
+      }
+      { const u = s - P.ferryHit; if (u > 0 && u < 0.7 && far(F.quay.x, F.ferry.z) < 520) for (let j = 0; j < DEB.ferry[0] && n < NDEB; j++) { const id = 9001 + j, a = u - 0.12 * H(id, 101); if (a > 0) piece(id, 'ferry', a, F.quay.x - 1.5, 9, F.ferry.z, true); } }
+      deb.count = n; deb.instanceMatrix.needsUpdate = true; if (deb.instanceColor) deb.instanceColor.needsUpdate = true;
+    }
+    eiffel.visible = m === 'up';
     du.end(); fi.end(); sp.end();
   };
   return out;

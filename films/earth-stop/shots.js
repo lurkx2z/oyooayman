@@ -11,54 +11,62 @@ const ES_SHOTS = [];
   const P = ES_SHOTS, c = esC, B = esB;
   const L = [
     // 1 — 5:41:57 PM on platform 1. At 5:42:00.000 the ground stops turning: everything else slides east past the camera
-    ['A0', 'title', -1, c('start', 0) + 1.4],
-    ['A1', 'lurch', c('start', 0) + 1.4, B('speed')],                  // the whole station gliding off its floor
-    ['S1', 'globe', B('speed'), c('speed', 1) - 0.5],                  // from high up: the harbour, the town, the line, the hill
-    ['S2', 'glide', c('speed', 1) - 0.5, c('speed', 2) - 0.5],         // travelling with it: nothing looks wrong but the ground
-    ['S3', 'sun', c('speed', 2) - 0.5, B('bolts')],
+    ['A0', 'title', -1, B('first')],
+    ['A1', 'first', B('first'), c('first', 1) - 0.8],                  // the hill east of town, from the plain: it stopped too
+    ['A2', 'firstB', c('first', 1) - 0.8, B('speed')],                 // along its rock face: palm after palm arrives
+    ['S2', 'glide', B('speed'), c('speed', 1) - 0.6],                  // travelling with the station: nothing looks wrong but the ground
+    ['S3', 'sun', c('speed', 1) - 0.6, B('bolts')],
     ['B1', 'bolt', B('bolts'), c('bolts', 1) - 0.5],                   // a base plate, its four bolts sheared
     ['B2', 'feet', c('bolts', 1) - 0.5, c('bolts', 2) - 0.8],          // the column feet, skating
     ['B3', 'floor', c('bolts', 2) - 0.8, B('town')],                   // the building, off its floor
     ['T1', 'town', B('town'), c('town', 1) - 0.6],
-    ['T2', 'townAir', c('town', 1) - 0.6, B('people')],
-    ['P1', 'people', B('people'), c('people', 2) - 0.6],
-    ['P2', 'platEnd', c('people', 2) - 0.6, c('people', 3) - 0.8],
-    ['P3', 'pigeons', c('people', 3) - 0.8, B('train')],
+    ['T2', 'townAir', c('town', 1) - 0.6, c('town', 2) - 0.6],
+    ['T3', 'cars', c('town', 2) - 0.6, B('people')],                  // the car park behind the station
+    ['P1', 'people', B('people'), c('people', 1) - 0.6],
+    ['P2', 'platEnd', c('people', 1) - 0.6, c('people', 2) - 0.6],
+    ['P3', 'fly', c('people', 2) - 0.6, c('people', 3) - 0.8],         // past the platform's end, still standing up
+    ['P4', 'pigeons', c('people', 3) - 0.8, B('train')],
     // your train
     ['R1', 'wheels', B('train'), c('train', 1) - 0.5],
-    ['R2', 'inside', c('train', 1) - 0.5, c('train', 3) - 0.5],
-    ['R3', 'pass', c('train', 3) - 0.5, B('energy')],
-    ['E1', 'energy', B('energy'), c('energy', 2) - 0.5],
-    ['E2', 'ahead', c('energy', 2) - 0.5, B('hill')],
+    ['R2', 'inside', c('train', 1) - 0.5, c('train', 2) - 0.5],
+    ['R3', 'pass', c('train', 2) - 0.5, B('energy')],
+    ['E1', 'energy', B('energy'), c('energy', 1) - 0.5],
+    ['E2', 'ahead', c('energy', 1) - 0.5, B('hill')],
     // the hill: the anvil
-    ['H1', 'hill', B('hill'), c('hill', 2) - 0.8],
-    ['H2', 'palms', c('hill', 2) - 0.8, B('depot')],
-    ['D1', 'wagons', B('depot'), c('depot', 2) - 1.4],
-    ['D2', 'impact', c('depot', 2) - 1.4, B('wind')],
-    ['W1', 'wind', B('wind'), c('wind', 1) - 0.5],
-    ['W2', 'heat', c('wind', 1) - 0.5, c('wind', 2) - 0.6],
+    ['H1', 'hill', B('hill'), c('hill', 1) - 0.6],
+    ['H1b', 'rock', c('hill', 1) - 0.6, c('hill', 2) - 1.2],          // under its rock face
+    ['H2', 'shed', c('hill', 2) - 1.2, B('depot')],                    // the depot's shed reaches the rock
+    ['D1', 'siding', B('depot'), c('depot', 1) - 0.5],                 // travelling with the six wagons
+    ['D1b', 'wagons', c('depot', 1) - 0.5, c('depot', 2) - 1.4],      // from the rock: they are coming
+    ['D2', 'impact', c('depot', 2) - 1.4, c('depot', 2) + 2.1],        // the first wagon
+    ['D3', 'impact2', c('depot', 2) + 2.1, B('wind')],                 // the second, from the line
+    ['W1', 'wind', B('wind'), c('wind', 1) - 0.5],                     // the third, from the air
+    ['W2', 'heat', c('wind', 1) - 0.5, c('wind', 2) - 0.6],            // the fourth, from the foot of the rock
     ['W3', 'over', c('wind', 2) - 0.6, B('sea')],
     // the sea
-    ['Q1', 'sea', B('sea'), c('sea', 2) - 0.6],
-    ['Q2', 'quay', c('sea', 2) - 0.6, c('sea', 4) - 0.7],
-    ['Q3', 'ferry', c('sea', 4) - 0.7, B('up')],
+    ['Q1', 'sea', B('sea'), c('sea', 1) - 0.8],
+    ['Q1b', 'seaLit', c('sea', 1) - 0.8, c('sea', 2) - 0.6],          // rising to its top: the Sun is behind it
+    ['Q2', 'quay', c('sea', 2) - 0.6, c('sea', 3) - 0.7],
+    ['Q3', 'ferry', c('sea', 3) - 0.7, B('up')],
     ['U1', 'up', B('up'), c('up', 1) - 0.8],
     ['U2', 'shores', c('up', 1) - 0.8, B('fall')],
     // what a second is not long enough for
-    ['F1', 'roof', B('fall'), c('fall', 2) - 0.8],
+    ['F0', 'under', B('fall'), c('fall', 1) - 0.6],                    // under the station's roof
+    ['F1', 'roof', c('fall', 1) - 0.6, c('fall', 2) - 0.8],
     ['F2', 'woman', c('fall', 2) - 0.8, B('sky')],
-    ['K1', 'sky', B('sky'), B('count'), 'sky'],
+    ['K1', 'sky', B('sky'), c('sky', 1) - 0.6, 'sky'],
+    ['K2', 'skyB', c('sky', 1) - 0.6, B('count'), 'sky'],
     // the last 0.14 s; 2 — 5:42:01: the ground turns again
     ['C1', 'count', B('count'), c('count', 1) - 0.5],
-    ['C2', 'cab', c('count', 1) - 0.5, c('back', 1) - 0.5],
-    ['Z1', 'still', c('back', 1) - 0.5, c('back', 2) - 0.6],
-    ['Z2', 'short', c('back', 2) - 0.6, c('back', 3) - 0.6],
-    ['Z3', 'roofDown', c('back', 3) - 0.6, B('twist')],
+    ['C1b', 'mouth', c('count', 1) - 0.5, c('count', 2) - 0.5],       // from the tunnel's mouth: your train
+    ['C2', 'cab', c('count', 2) - 0.5, c('back', 0) + 1.3],
+    ['Z1', 'still', c('back', 0) + 1.3, c('back', 1) - 0.6],
+    ['Z1b', 'grip', c('back', 1) - 0.6, c('back', 2) - 0.6],          // its wheels: gripping again
+    ['Z2', 'short', c('back', 2) - 0.6, B('twist')],
     // 3 — everything the ground stopped is thrown west
-    ['V1', 'twist', B('twist'), c('twist', 2) - 0.6],
-    ['V2', 'twistSea', c('twist', 2) - 0.6, B('second')],
-    ['X1', 'second', B('second'), c('second', 1) - 0.5],
-    ['X2', 'reach', c('second', 1) - 0.5, B('question')],
+    ['V1', 'twist', B('twist'), c('twist', 1) - 0.6],
+    ['V2', 'twistSea', c('twist', 1) - 0.6, c('twist', 2) - 0.5],
+    ['X2', 'reach', c('twist', 2) - 0.5, B('question')],
     ['G1', 'question', B('question'), 1e9],
   ];
   for (const [id, mode, t0, t1, set] of L) P.push(esSh(id, mode, t0, t1, set || 'coast'));

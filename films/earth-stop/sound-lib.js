@@ -93,11 +93,9 @@ function esCurve(f, hz = 200) {
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
 const ES_PLACE = {
-  inside: ['inside', 'question'],
-  train: ['wheels', 'pass', 'energy', 'ahead', 'count', 'cab', 'still', 'second', 'reach'],
-  hill: ['hill', 'palms', 'wagons', 'impact', 'wind', 'heat', 'over', 'twist'],
-  sea: ['sea', 'quay', 'ferry', 'up', 'twistSea'],
-  high: ['globe', 'townAir', 'shores', 'short'],
+  inside: ['inside', 'question'], train: ['wheels', 'pass', 'energy', 'ahead', 'count', 'cab', 'still', 'grip', 'reach'],
+  hill: ['first', 'firstB', 'hill', 'rock', 'shed', 'siding', 'wagons', 'impact', 'impact2', 'wind', 'heat', 'over', 'mouth', 'twist'],
+  sea: ['sea', 'seaLit', 'quay', 'ferry', 'up', 'twistSea'], high: ['townAir', 'shores', 'short'],
 };
 function esWhereShot(sh) { if (sh.where) return sh.where; if (sh.set === 'sky') return 'cabin'; for (const [k, v] of Object.entries(ES_PLACE)) if (v.includes(sh.mode)) return k; return 'station'; }
 // the film as places: [{ t0, t1, where, shot }] in order

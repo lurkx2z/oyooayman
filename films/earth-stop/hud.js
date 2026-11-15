@@ -2,14 +2,13 @@
    HUD — this film's overlay (DOM, in #hud; a pure function of time). The centred title is the shared StoryHUD. The
    layout is the Slower light / Friction 10s / Magnets films':
      top left     THE GROUND: TURNING or STOPPED; while it's stopped, how long until it turns again (to the
-                  millisecond); the next thing due ("NEXT · 5:42:00.449 · THE FIRST FUEL WAGON REACHES THE ROCK");
-                  your train's distance to the hill (after 5:42:01: the blast's distance to your train)
+                  millisecond). Nothing else (the first review: too many cards)
      top right    Sunday and the time, to the millisecond; 300× SLOWER (the clock only ever runs forward)
      under them   the scene's context box (the number this scene is about)
      bottom       one caption at a time (CAPTIONS.md via timing.js; numbers in amber)
      insets       how fast the ground moves east, by latitude; what steel would have to carry
      bottom left  the honest labels (what is impossible, what is rough, what is generous)
-     middle left  the last 0.14 s, counted down, big
+     middle left  the last 0.14 s, counted down, big; in the last 0.2 s, how many metres away it is
      in the scene labels the set pins to places (set.labels(t) → [{ p, text, sub, a }])
    ===================================================================== */
 
@@ -29,48 +28,48 @@ const ES_CTX = (() => {
   const gone = (t, s) => ({ v: `${P.X(s).toFixed(1)} <small>m</small>`, v2: 'EAST, SINCE 5:42:00' });
   const gap = (t, s) => ({ v: `${esN(P.gap(s))} <small>m</small>`, v2: `CLOSING AT ${esN(Math.max(0, P.trainV(s)) * 3.6)} km/h` });
   const wagonsIn = (s) => { let n = 0; for (let k = 0; k < F.wagons.n; k++) if (s >= P.wagonHit(k)) n++; return n; };
+  const palmsIn = (s) => { let n = 0; for (const h of ES_HITS) if (h.kind === 'palm' && h.s <= s) n++; return n; };
   return [
-    beat('speed', 'EVERYTHING LOOSE HAS GONE', gone, 1, 1),
-    beat('speed', 'TO STOP THE EARTH’S SPIN', () => ({ v: '2.1 × 10<sup>29</sup> <small>joules</small>', v2: `THE SUN’S WHOLE OUTPUT FOR ${P.sunMin.toFixed(1)} MINUTES` }), 2, 2),
-    beat('speed', 'THE SUN', () => ({ v: 'GONE', v2: 'AND SUNSET IS STILL TO COME' }), 3, 3),
+    beat('first', 'PALM TREES IN THE ROCK', (t, s) => ({ v: `${palmsIn(s)}`, v2: `EVERYTHING LOOSE HAS GONE ${P.X(s).toFixed(1)} m EAST` })),
+    beat('speed', 'EVERYTHING LOOSE HAS GONE', gone, 0, 0),
+    beat('speed', 'THE SUN', () => ({ v: 'GONE', v2: 'AND SUNSET IS STILL TO COME' }), 1, 1),
     beat('bolts', 'EVERYTHING LOOSE HAS GONE', gone, 0, 0),
     beat('bolts', 'THE BUILDING HAS SLID', (t, s) => ({ v: `${P.X(s).toFixed(1)} <small>m</small>`, v2: `ITS FLOOR IS ${F.bldg.x[1] - F.bldg.x[0]} m LONG` }), 2, 2),
     beat('town', 'EVERYTHING LOOSE HAS GONE', gone),
-    beat('people', 'THE PEOPLE ON THE PLATFORM', () => ({ v: `${esN(P.kmh)} <small>km/h</small>`, v2: 'AND NOT ONE OF THEM HAS MOVED' }), 0, 1),
-    beat('people', 'TO THE PLATFORM’S END', (t, s, set) => { const d = -(set.St.leadX + P.X(s)); return d > 0 ? { v: `${d.toFixed(1)} <small>m</small>`, v2: `THEN ${F.plat.h} m TO FALL: 0.47 s` } : { v: 'PAST IT', v2: `${F.plat.h} m TO FALL: 0.47 s` }; }, 2, 2),
+    beat('people', 'THE PEOPLE ON THE PLATFORM', () => ({ v: `${esN(P.kmh)} <small>km/h</small>`, v2: 'AND NOT ONE OF THEM HAS MOVED' }), 0, 0),
+    beat('people', 'TO THE PLATFORM’S END', (t, s, set) => { const d = -(set.St.leadX + P.X(s)); return d > 0 ? { v: `${d.toFixed(1)} <small>m</small>`, v2: `THEN ${F.plat.h} m TO FALL: 0.47 s` } : { v: 'PAST IT', v2: `${F.plat.h} m TO FALL: 0.47 s` }; }, 1, 1),
+    beat('people', 'PAST THE PLATFORM’S END', (t, s, set) => ({ v: `${Math.max(0, set.St.leadX + P.X(s)).toFixed(1)} <small>m</small>`, v2: `STILL ${F.plat.h} m UP · 0.47 s TO FALL IT` }), 2, 2),
     beat('train', 'YOUR TRAIN, OVER THE GROUND', (t, s) => ({ v: `${(Math.max(0, P.trainV(s)) * 3.6).toFixed(1)} <small>km/h</small>`, v2: `BRAKING AT ${P.muTrain} g · YOUR COFFEE TILTS ${Math.round(Math.atan(P.muTrain) * 180 / Math.PI)}°` })),
     beat('energy', 'ENERGY OF MOTION', () => ({ v: `${Math.round(P.keKg / 1000)} <small>kJ per kilogram</small>`, v2: `= ${P.tntG.toFixed(0)} g OF TNT PER KILOGRAM` }), 0, 0),
-    beat('energy', 'YOUR TRAIN CARRIES', () => ({ v: `${P.tntT(P.trainT).toFixed(1)} <small>tonnes of TNT</small>`, v2: `${P.trainT} TONNES AT ${esN(P.kmh)} km/h` }), 1, 2),
+    beat('energy', 'YOUR TRAIN CARRIES', () => ({ v: `${P.tntT(P.trainT).toFixed(1)} <small>tonnes of TNT</small>`, v2: `${P.trainT} TONNES AT ${esN(P.kmh)} km/h` }), 1, 1),
     beat('hill', 'YOUR TRAIN TO THE HILL', gap),
     beat('depot', 'THE FIRST WAGON TO THE ROCK', (t, s) => { const g = esHillX(F.wagons.z) - (F.wagons.front + P.X(s)); return g > 0 ? { v: `${g.toFixed(1)} <small>m</small>`, v2: `6 WAGONS × ${P.wagonT} TONNES` } : { v: `${wagonsIn(s)} <small>of 6 in the rock</small>`, v2: `${P.tntT(P.wagonT).toFixed(1)} t OF TNT EACH, BEFORE THE FUEL` }; }),
     beat('wind', 'THE WIND AGAINST THE HILL', () => ({ v: `Mach ${P.mach.toFixed(2)}`, v2: `${esN(P.v)} m/s · SOUND HERE: ${esN(P.sound)} m/s` }), 0, 0),
     beat('wind', 'THE AIR AT THE ROCK', () => ({ v: `30 → ${Math.round(30 + P.heat)} <small>°C</small>`, v2: 'SQUEEZED TO A STOP' }), 1, 1),
     beat('wind', 'FUEL WAGONS IN THE ROCK', (t, s) => ({ v: `${wagonsIn(s)} <small>of 6</small>`, v2: 'THE FIRE CAN ONLY GO UP AND SIDEWAYS' }), 2, 2),
-    beat('sea', 'ON EVERY METRE OF QUAY, SO FAR', (t, s) => ({ v: `${esN(P.waterT * Math.min(s, 1))} <small>tonnes</small>`, v2: `THE WATER IS ${esN(P.wallH(s))} m HIGH` }), 0, 3),
-    beat('sea', 'THE FERRY', (t, s) => { const g = F.quay.x - (F.ferry.bow + P.X(s)); return g > 0 ? { v: `${g.toFixed(1)} <small>m to the quay</small>`, v2: `${esN(P.ferryT)} TONNES · ${esN(P.kmh)} km/h` } : { v: 'AT THE QUAY', v2: `${esN(P.ferryT)} TONNES = ${P.tntT(P.ferryT).toFixed(0)} t OF TNT` }; }, 4, 4),
+    beat('sea', 'ON EVERY METRE OF QUAY, SO FAR', (t, s) => ({ v: `${esN(P.waterT * Math.min(s, 1))} <small>tonnes</small>`, v2: `THE WATER IS ${esN(P.wallH(s))} m HIGH` }), 0, 2),
+    beat('sea', 'THE FERRY', (t, s) => { const g = F.quay.x - (F.ferry.bow + P.X(s)); return g > 0 ? { v: `${g.toFixed(1)} <small>m to the quay</small>`, v2: `${esN(P.ferryT)} TONNES · ${esN(P.kmh)} km/h` } : { v: 'AT THE QUAY', v2: `${esN(P.ferryT)} TONNES = ${P.tntT(P.ferryT).toFixed(0)} t OF TNT` }; }, 3, 3),
     beat('up', 'THE WATER’S HEIGHT', (t, s) => ({ v: `${esN(P.wallH(s))} <small>m</small>`, v2: `CLIMBING AT ${esN(P.wallKmh)} km/h` })),
     beat('fall', 'EVERYTHING IN THE AIR HAS FALLEN', (t, s) => ({ v: `${P.fall(s).toFixed(2)} <small>m</small>`, v2: `IN ${s.toFixed(3)} s` }), 0, 0),
     beat('sky', 'AT 10 km', () => ({ v: 'NOTHING', v2: 'PLANE AND AIR STILL MOVE TOGETHER' }), 1, 1),
     beat('count', 'YOUR TRAIN TO THE HILL', gap),
     beat('back', 'YOUR TRAIN, OVER THE GROUND', (t, s) => ({ v: `${(Math.abs(P.trainV(s)) * 3.6).toFixed(1)} <small>km/h</small>`, v2: s < P.T ? '' : 'BACKWARDS NOW, AND BRAKING' }), 0, 2),
-    beat('twist', 'FROM THE HILL TO YOUR TRAIN', (t, s) => ({ v: `${esN(Math.max(0, P.blastX(s) - P.nose(s)))} <small>m</small>`, v2: `${Math.max(0, (P.blastX(s) - P.nose(s)) / P.v).toFixed(3)} s AWAY` })),
-    beat('second', 'FROM THE HILL TO YOUR TRAIN', (t, s) => ({ v: `${esN(Math.max(0, P.blastX(s) - P.nose(s)))} <small>m</small>`, v2: `${Math.max(0, (P.blastX(s) - P.nose(s)) / P.v).toFixed(3)} s AWAY` })),
+    beat('twist', 'FROM THE HILL TO YOUR TRAIN', (t, s) => ({ v: `${esN(Math.max(0, P.blastX(s) - P.nose(s)))} <small>m</small>`, v2: `${Math.max(0, (P.blastX(s) - P.nose(s)) / P.v).toFixed(3)} s AWAY` }), 0, 1),
   ];
 })();
 // the honest labels (bottom left): [from, to, text]
 const ES_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [esC(id, k0) - 0.1, (k1 != null ? esCap(id, k1).hide : esE(id)) + 0.2, text]; return [
   b('start', 'THE RULE: FOR 1 SECOND THE SOLID EARTH DOES NOT TURN · EVERYTHING LOOSE KEEPS ITS 465 m/s', 0),
-  b('speed', 'THE IMPOSSIBLE PART: THE SPIN’S ENERGY GOES AND COMES BACK · WHAT FORCE DOES IT IS NOT SAID', 2, 2),
+  b('first', `THE IMPOSSIBLE PART: STOPPING THE SPIN TAKES THE SUN’S WHOLE OUTPUT FOR ${ESP.sunMin.toFixed(0)} MINUTES · NEVER MIND WHERE IT WENT`, 0, 0),
   b('bolts', 'TO STOP DEAD FROM 465 m/s, STEEL MUST CARRY DENSITY × ITS SOUND SPEED × 465 m/s ≈ 18 GPa', 1, 1),
-  b('people', 'APPROX.: SHOES ON PAVING, FRICTION 0.7', 2, 2),
+  b('people', 'APPROX.: SHOES ON PAVING, FRICTION 0.7', 1, 1),
   b('train', 'GENEROUS: THE TRAIN STAYS ON ITS RAILS, AND THE RAILS STAY PUT · STEEL ON STEEL, FRICTION 0.2', 0, 1),
-  b('energy', '½ × SPEED² = 108 kJ PER KILOGRAM · TNT: 4.2 MJ PER KILOGRAM', 0, 1),
-  b('depot', 'APPROX.: THE FIRE’S SIZE AND SHAPE ARE DRAWN, NOT SIMULATED', 1),
-  b('wind', 'AIR AT 30 °C: SOUND AT 349 m/s · AIR BROUGHT TO REST HEATS BY SPEED² / 2cp', 0, 1),
-  b('sea', 'APPROX.: THE HARBOUR IS 10 m DEEP · THE WATER IS DRAWN CLIMBING AT ¾ OF ITS SPEED', 2, 3),
+  b('energy', '½ × SPEED² = 108 kJ PER KILOGRAM · TNT: 4.2 MJ PER KILOGRAM', 0, 0),
+  b('wind', 'AIR AT 30 °C: SOUND AT 349 m/s · APPROX.: THE FIRE’S SIZE AND SHAPE ARE DRAWN, NOT SIMULATED', 0, 1),
+  b('sea', 'APPROX.: THE HARBOUR IS 10 m DEEP · THE WATER IS DRAWN CLIMBING AT ¾ OF ITS SPEED', 2, 2),
   b('fall', '½ × g × t² = 4.9 m IN ONE SECOND', 0, 1),
-  b('back', 'AFTER 5:42:01 THE GROUND MOVES WITH EVERYTHING THAT NEVER STOPPED', 1, 2),
-  b('twist', 'WHAT THE GROUND STOPPED HAS NO SPEED LEFT: THE GROUND NOW LEAVES IT BEHIND AT 465 m/s', 1),
+  b('count', 'SOUND CROSSES THE AIR AT 349 m/s · THE HILL IS COMING THROUGH IT AT 465 m/s', 1, 1),
+  b('twist', 'WHAT THE GROUND STOPPED HAS NO SPEED LEFT: THE GROUND NOW LEAVES IT BEHIND AT 465 m/s', 0, 1),
 ]; })();
 // the insets: [from, to, which, where]
 const ES_INSETS = (() => { const b = (id, k0, k1, w, where = '') => [esC(id, k0) - 0.25, (k1 != null ? esCap(id, k1).hide : esE(id)) + 0.3, w, where]; return [
@@ -107,39 +106,38 @@ class EsHud {
     const W = StoryHUD.win, P = ESP, s = set && set._s != null ? set._s : esStoryAt(t), rate = esRateAt(t), stopped = s >= 0 && s < P.T;
     void app;
     // ---- the ground: turning / stopped, the time left, what's next, your train
-    const ra = W(t, ES.title[1] - 0.5, ES.end + 1, 0.4, 0.5);
+    // (the cards step back while the first wagon lands: nothing but the picture and the caption for a second and a half)
+    const quiet = 1 - W(t, EsHud.tW - 0.25, EsHud.tW + 1.6, 0.15, 0.5);
+    const ra = W(t, ES.title[1] - 0.5, ES.end + 1, 0.4, 0.5) * quiet;
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
       this._html('rov', this.roV, stopped ? 'STOPPED' : 'TURNING');
       const left = P.T - s;
       this._html('ros', this.roS, s < 0 ? `${esN(P.kmh)} km/h EAST, AS ALWAYS` : stopped ? `TURNS AGAIN IN <b>${left.toFixed(3)} s</b>` : `AGAIN, AT ${esN(P.kmh)} km/h · SINCE 5:42:01`);
-      const nx = ES_NEXT.find((x) => x[0] > s + 1e-5);
-      this._html('ron', this.roN, nx && s >= -4 ? `NEXT · ${esClockStr(nx[0], true)} · ${nx[1]}` : '');
-      // (your train, from its beat on: never out of mind; after the twist: what is coming for it)
-      const bt = t < esB('train') ? '' : t < esB('twist') ? `YOUR TRAIN · <b>${esN(P.gap(s))} m</b> FROM THE HILL` : `YOUR TRAIN · <b>${Math.max(0, P.blastX(s) - P.nose(s)).toFixed(0)} m</b> FROM WHAT THE HILL STOPPED`;
-      this._html('rob', this.roB, bt);
       this._cls('roc', this.ro, !stopped ? 'es-ro' : (left < 0.1405 ? 'es-ro dark tick' : 'es-ro dark'));
     }
     // ---- the context box
     const cx = ES_CTX.find((x) => t >= x[0] && t < x[1]), inA = (() => { const w = ES_INSETS.find((x) => t >= x[0] - 0.3 && t < x[1] + 0.3); return w ? W(t, w[0] - 0.3, w[1] + 0.3, 0.4, 0.4) : 0; })();
-    this._set('cx', this.ctx, 'opacity', cx ? (W(t, cx[0], cx[1], 0.4, 0.4) * (1 - inA)).toFixed(3) : '0');
+    this._set('cx', this.ctx, 'opacity', cx ? (W(t, cx[0], cx[1], 0.4, 0.4) * (1 - inA) * quiet).toFixed(3) : '0');
     if (cx) { const r = cx[3](t, s, set); this._txt('cxl', this.ctxL, cx[2]); this._html('cxv', this.ctxV, r.v); this._html('cxv2', this.ctxV2, r.v2 || ''); }
     // ---- the honest label
     const tg = ES_TAGS.find((x) => t >= x[0] && t < x[1]);
     if (tg) this._txt('tgt', this.tag, tg[2]);
     // ---- Sunday and the time; how slowed down
-    const ca = W(t, ES.title[1] - 0.5, ES.end + 1, 0.4, 0.5);
+    const ca = W(t, ES.title[1] - 0.5, ES.end + 1, 0.4, 0.5) * quiet;
     this._set('ck', this.clock, 'opacity', ca.toFixed(3));
     if (ca > 0) {
       const c = esClockParts(s), ms = rate < 0.9 ? `<small>.${String(c.ms).padStart(3, '0')}</small>` : '';
       this._txt('ckl', this.clockL, c.day);
       this._html('ckv', this.clockV, `${c.h}:${String(c.m).padStart(2, '0')}<small>:${String(c.sec).padStart(2, '0')}</small>${ms} <i>${c.pm ? 'PM' : 'AM'}</i>`);
-      this._txt('ckf', this.clockF, rate < 0.9 ? esN(1 / rate) + '× SLOWER' : 'REAL SPEED');
+      const sl = 1 / rate, slr = sl >= 1000 ? Math.round(sl / 100) * 100 : sl >= 100 ? Math.round(sl / 10) * 10 : Math.round(sl);
+      this._txt('ckf', this.clockF, rate < 0.9 ? esN(slr) + '× SLOWER' : 'REAL SPEED');
     }
     // ---- the last 0.14 s: the count, big
-    { const left = P.T - s, on = t >= esB('count') && s < P.T + 0.006;
-      this._set('cnta', this.count, 'opacity', on ? '1' : '0');
-      if (on) { this._txt('cntv', this.count, Math.max(0, left).toFixed(2)); this._cls('cntc', this.count, left < 0.0005 ? 'es-count hit' : 'es-count'); } }
+    { const left = P.T - s, on = t >= esB('count') && s < P.T + 0.006, last = t >= esC('twist', 2) - 0.5;
+      this._set('cnta', this.count, 'opacity', on || last ? '1' : '0');
+      if (on) { this._txt('cntv', this.count, Math.max(0, left).toFixed(2)); this._cls('cntc', this.count, left < 0.0005 ? 'es-count hit' : 'es-count'); }
+      else if (last) { this._html('cntv', this.count, `${Math.max(0, P.blastX(s) - P.nose(s)).toFixed(0)}<small> m</small>`); this._cls('cntc', this.count, 'es-count far'); } }
     // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
     const gb = EST.groups.find((g) => !g.title && t >= g.first - 0.6 && t < g.end + 0.6);
     this._set('band', this.band, 'opacity', gb ? W(t, gb.first - 0.3, gb.end + 0.3, 0.5, 0.6).toFixed(3) : '0');
@@ -148,7 +146,7 @@ class EsHud {
     else this._set('capa', this.cap, 'opacity', '0');
     // (the tag steps aside while a caption runs to two lines: it would touch it)
     const two = cp && this.root.clientHeight ? this.cap.offsetHeight / this.root.clientHeight > 0.095 : false;
-    this._set('tga', this.tag, 'opacity', tg && !two ? W(t, tg[0], tg[1], 0.4, 0.4).toFixed(3) : '0');
+    this._set('tga', this.tag, 'opacity', tg && !two ? (W(t, tg[0], tg[1], 0.4, 0.4) * quiet).toFixed(3) : '0');
     // ---- the diagrams
     this._insets(t, s, set);
     this._inRect = null;
@@ -187,6 +185,7 @@ class EsHud {
     this._insetKey = key;
     this.inset.innerHTML = EsHud[which[2]](u, t, s, set);
   }
+  static get tW() { return EsHud._tW != null ? EsHud._tW : (EsHud._tW = esFilmAt(ESP.wagon0)); }
   static svg(body, w = 760, h = 470) { return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="esAh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/></marker></defs>${body}</svg>`; }
   static plate(a = 0.86, w = 760, h = 470) { return `<rect x="0" y="0" width="${w}" height="${h}" rx="22" fill="rgba(6,9,14,${a})"/>`; }
   // a line of text that always fits: past maxW (its width estimated from the class's capitals) its font shrinks to fit

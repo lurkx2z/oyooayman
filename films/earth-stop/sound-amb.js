@@ -16,7 +16,7 @@
    ===================================================================== */
 
 esSound('amb', 'beds', function (ctx, bus, K) {
-  const { fx } = K, T0 = ES.tOn, F = esFilmAt, P = ESP, tb = F(P.T), tW = F(P.wagon0), tTw = esB('twist'), tSun = esC('speed', 3), fi = 0.04, fo = 0.04;
+  const { fx } = K, T0 = ES.tOn, F = esFilmAt, P = ESP, tb = F(P.T), tW = F(P.wagon0), tTw = esB('twist'), tSun = esC('speed', 1), fi = 0.04, fo = 0.04;
   const open = K.verb('aopen', 1.8, { bright: 0.45, damp: 2.2, wet: 0.3 });
   // the hush after 5:42:01, lifting again as the blast comes
   const lv = esCurve((t) => 1 - 0.78 * esEv(t, tb - 0.005, tb + 0.02) * (1 - esEv(t, tTw - 0.5, tTw + 6)));
