@@ -58,8 +58,10 @@ ES_SETS.coast = (app) => {
       fl(0, 0.55, 0.0016);
       if (m === 'impact' || m === 'wagons') fl(P.wagon0, 1.0, 0.0035);
       if (m === 'impact2') fl(P.wagonHit(1), 0.6, 0.003);
-      if (m === 'wind') fl(P.wagonHit(2), 0.35, 0.003);
-      if (m === 'heat') fl(P.wagonHit(3), 0.6, 0.003);
+      if (m === 'heat') fl(P.wagonHit(2), 0.6, 0.003);
+      if (m === 'wind') fl(P.wagonHit(3), 0.45, 0.003);
+      if (m === 'over') fl(P.wagonHit(4), 0.25, 0.003);
+      if (m === 'first') fl(P.house0, 0.3, 0.0015);
       if (m === 'shed') fl(P.shed, 0.4, 0.002);
       if (m === 'ferry') fl(P.ferryHit, 0.5, 0.003);
       fl(P.T, 0.5, 0.0012);
@@ -68,11 +70,15 @@ ES_SETS.coast = (app) => {
       const f = Math.min(1, (this._fireL || 0) / 2);
       p.warmth += 0.05 * f; p.bloom += 0.1 * f;
       if (m === 'sun') { const k = MathX.smooth(t, this._shot.t0 + 1.5, this._shot.t1 - 0.5); p.exposure = 0.5 + 0.14 * k; p.bloom = 0.42; p.bloomThreshold = 0.9; p.saturation = 1.2; p.vignette = 0.56; }
-      if (m === 'seaLit') { p.exposure = 0.74; p.bloom = 0.46; p.bloomThreshold = 0.9; p.vignette = 0.52; }
-      // the last frame: it arrives (the picture burns out)
-      if (m === 'question') { const k = MathX.smooth(t, this._shot.t0, ES.end), w = MathX.smooth(t, ES.end - 0.45, ES.end - 0.03); p.warmth += 0.06 * k; p.bloom += 0.12 * k + 0.5 * w; p.flash = Math.max(p.flash, 0.96 * w * w); p.flashColor.setRGB(1, 0.9, 0.72); }
+      // it arrives: the picture burns out to white at ES.tHit, and then there is nothing: black, and the question
+      if (m === 'question') {
+        const k = MathX.smooth(t, this._shot.t0, ES.tHit), w = MathX.smooth(t, ES.tHit - 0.55, ES.tHit - 0.02), aft = t - ES.tHit;
+        p.warmth += 0.06 * k; p.bloom += 0.12 * k + 0.5 * w; p.flash = Math.max(p.flash, 0.94 * w * w); p.flashColor.setRGB(1, 0.9, 0.72);
+        if (aft >= 0) { p.flash = 1; p.fade = MathX.smooth(aft, 0.1, 0.42); p.bloom = 0.3; p.grain = 0.024 * (1 - p.fade); }
+      }
       if (m === 'inside' || m === 'question') { p.vignette = 0.5; }
-      if (m === 'wheels') p.exposure += 0.22;
+      if (m === 'wheels') p.exposure += 0.3;
+      if (m === 'pass') p.exposure += 0.4;                     // (the train's shaded side)
     },
   };
   return set;
@@ -104,7 +110,7 @@ function esCoastCam(set, m, s, t, kk, u, shot, v) {
       break;
     }
     // ---- the hill east of town: it stopped too. From the plain; then along its rock face, where the palms arrive
-    case 'first': { const k = K(); v.p = [L(498, 524, k), L(15, 8.5, k), L(78, 58, k)]; v.at = [601, L(14, 11, k), L(-30, -14, k)]; v.fov = 38; v.near = 0.5; v.drift = 0.012; v.shadowR = 150; v.sat = [585, 0, 0]; v.shake = 0.012 * esHitShake(s, 585, 30); break; }
+    case 'first': { const k = K(), k2 = esK(u, 0, 1.7); v.p = [L(546, 557, k), L(4.6, 2.8, k), L(-20, -27, k)]; v.at = [L(592, 599, k2), L(6.5, 5, k), L(-45, -46, k)]; v.fov = L(30, 24, k); v.near = 0.5; v.drift = 0.01; v.shadowR = 110; v.sat = [588, 0, -40]; v.shake = hitAt(P.house0, 0.12, 0.006) + 0.012 * esHitShake(s, 590, -44); break; }
     case 'firstB': { const k = K(); v.p = [L(588.2, 587.4, k), L(4.6, 3.8, k), L(-11, -17, k)]; v.at = [L(598.5, 598, k), 7.4, -150]; v.fov = L(32, 27, k); v.near = 0.3; v.drift = 0.006; v.shadowR = 110; v.sat = [592, 0, -50]; v.shake = 0.02 * esHitShake(s, 590, -40); break; }
     // travelling with the station, from above: the roofs, the train and the people look as they always did; only the
     // ground is going by underneath
@@ -119,19 +125,16 @@ function esCoastCam(set, m, s, t, kk, u, shot, v) {
       v.p = p; v.at = [p[0] + Math.cos(az) * 400, y + 400 * Math.tan(ce), p[2] + Math.sin(az) * 400]; v.fov = L(10, 8, k); v.near = 1; v.drift = 0.002; v.shadowR = 120; v.sat = [p[0], y, p[2]]; break;
     }
     // ---- the bolts
-    case 'bolt': { const k = K(); v.p = [L(-43.6, -44.0, k), PH + L(0.46, 0.27, k), L(-3.4, -3.65, k)]; v.at = [-45.25, PH + 0.06, -4.72]; v.fov = 40; v.near = 0.03; v.drift = 0.003; v.shadowR = 14; break; }
-    case 'feet': { const k = K(); v.p = [-62 + X, PH + L(0.34, 0.56, k), L(-3.3, -3.6, k)]; v.at = [-110 + X, PH + 1.0, -4.95]; v.fov = 36; v.near = 0.08; v.drift = 0.006; v.shadowR = 40; v.sat = [-75 + X, 0, -4.5]; break; }
+    case 'bolt': { const k = K(); v.p = [L(-42.7, -44.3, k), PH + L(0.85, 0.25, k), L(-2.9, -3.7, k)]; v.at = [-45.25, PH + 0.06, -4.72]; v.fov = 40; v.near = 0.03; v.drift = 0.003; v.shadowR = 14; break; }
     case 'floor': { const k = K(); v.p = [L(-186, -160, k), L(38, 26, k), L(44, 30, k)]; v.at = [L(-96, -84, k), 2, -13]; v.fov = 40; v.near = 1; v.shadowR = 110; v.drift = 0.02; break; }
     // ---- the town
-    case 'town': { const k = K(); v.p = [L(-34, -41, k), L(1.6, 2.3, k), -58.2]; v.at = [-140, 5, -58.6]; v.fov = 50; v.near = 0.2; v.drift = 0.012; v.shadowR = 70; v.sat = [-70, 0, -58]; break; }
-    case 'townAir': { const k = K(); v.p = [L(-236, -206, k), L(134, 104, k), L(-256, -226, k)]; v.at = [-10, 0, -50]; v.fov = 42; v.near = 2; v.shadowR = 300; v.drift = 0.03; v.sat = [-60, 0, -70]; break; }
+    case 'town': { const k = K(); v.p = [L(-30, -50, k), L(1.5, 2.6, k), -58.2]; v.at = [-140, 5, -58.6]; v.fov = 50; v.near = 0.2; v.drift = 0.012; v.shadowR = 70; v.sat = [-70, 0, -58]; break; }
     // the car park behind the station: three parked cars, coming
-    case 'cars': { const x0 = P.X(esStoryAt(shot.t0)) - 84 + 13, k = K(); v.p = [x0, L(0.62, 0.95, k), L(-23.2, -22.8, k)]; v.at = [x0 - 30, 1.5, -26.2]; v.fov = 46; v.near = 0.1; v.drift = 0.006; v.shadowR = 50; v.sat = [x0 - 14, 0, -25]; break; }
+    case 'cars': { const x0 = P.X(esStoryAt(shot.t0)) - 84 + 13, k = K(); v.p = [x0 + L(3, -3.5, k), L(0.55, 1.1, k), L(-23.3, -22.6, k)]; v.at = [x0 - 30, 1.5, -26.2]; v.fov = 46; v.near = 0.1; v.drift = 0.006; v.shadowR = 50; v.sat = [x0 - 14, 0, -25]; break; }
     // ---- the people on the platform; its end; past it; the pigeons
     case 'people': { const k = K(), x = St.leadX + X; v.p = [x + L(9.5, 8.0, k), PH + 1.52, -2.25]; v.at = [x - 5, PH + 1.28, -4.6]; v.fov = 30; v.near = 0.1; v.drift = 0.006; v.shadowR = 30; break; }
     case 'platEnd': { const k = K(), lx = Math.min(St.leadX + X, 3); v.p = [L(15, 13.5, k), L(3.3, 2.8, k), L(-3.0, -3.8, k)]; v.at = [lx - 2.5, PH + 0.8, -4.4]; v.fov = L(23, 33, k); v.near = 0.1; v.drift = 0.006; v.shadowR = 40; v.sat = [-4, 0, -4]; break; }
     case 'fly': { const k = K(), x = St.leadX + X; v.p = [x - L(3.2, 2.2, k), L(0.55, 0.75, k), L(1.4, 0.7, k)]; v.at = [x - 1.2, 2.05, -3.9]; v.fov = 50; v.near = 0.08; v.drift = 0.005; v.shadowR = 30; break; }
-    case 'pigeons': { const k = K(); v.p = [-58 + X + L(0, -1.5, k), L(6.3, 6.0, k), L(3.8, 3.0, k)]; v.at = [-70 + X, 5.3, -1.4]; v.fov = 32; v.near = 0.1; v.drift = 0.008; v.shadowR = 40; break; }
     // ---- your train
     case 'wheels': { const bx = N - 37.5 + 8.4, k = K(); v.p = [bx + L(3.9, 3.3, k), 0.44, 2.75]; v.at = [bx - 0.8, 0.52, 0.55]; v.fov = 40; v.near = 0.05; v.drift = 0.003; v.shake = 0.0015; v.shadowR = 20; break; }
     case 'inside': {
@@ -143,49 +146,46 @@ function esCoastCam(set, m, s, t, kk, u, shot, v) {
     case 'pass': { const s0 = esStoryAt(shot.t0), x0 = P.nose(s0) + 7.5; v.p = [x0, 0.85, -3.3]; v.at = [Math.min(N - 6, x0 - 3), 2.1, -0.4]; v.fov = 52; v.near = 0.1; v.drift = 0.006; v.shake = 0.004 * esK(N, x0 - 12, x0 - 1); v.shadowR = 50; break; }
     case 'energy': { const k = K(); v.p = [N + L(46, 22, k), L(11, 4.5, k), L(26, 13, k)]; v.at = [N - L(36, 46, k), 2.6, -2]; v.fov = 40; v.near = 0.5; v.drift = 0.012; v.shadowR = 110; break; }
     // down the line, fast, to the hill
-    case 'ahead': { const k = K(0.2, d), k2 = k * k; v.p = [L(N - 40, 505, k2), L(11, 6, k), 1.6]; v.at = [606, L(12, 9, k), 0]; v.fov = L(34, 40, k); v.near = 0.5; v.drift = 0.006; v.shadowR = 110; v.sat = [L(N - 20, 540, k2), 0, 0]; break; }
+    case 'ahead': { const k = K(0.2, d), k2 = k * k; v.p = [L(N - 40, 505, k2), L(11, 9.8, k), 1.6]; v.at = [606, L(12, 10, k), 0]; v.fov = L(34, 40, k); v.near = 0.5; v.drift = 0.006; v.shadowR = 110; v.sat = [L(N - 20, 540, k2), 0, 0]; break; }
     // ---- the hill
     case 'hill': { const k = K(); v.p = [L(548, 566, k), L(2.2, 15, k), L(15, 22, k)]; v.at = [601, L(7, 15, k), -2]; v.fov = 40; v.near = 0.5; v.drift = 0.008; v.shadowR = 110; v.sat = [585, 0, 0]; v.shake = 0.008 * esHitShake(s, 585, 10); break; }
-    case 'rock': { const k = K(); v.p = [L(590.5, 589.5, k), L(1.8, 2.6, k), L(34, 24, k)]; v.at = [L(600, 601, k), L(10, 20, k), -4]; v.fov = 52; v.near = 0.2; v.drift = 0.006; v.shadowR = 90; v.shake = 0.008 + 0.02 * esHitShake(s, 592, 20); break; }
     case 'shed': { const k = K(); v.p = [L(577, 580, k), L(25, 21, k), L(-51, -47, k)]; v.at = [L(596.5, 598, k), 3, -27]; v.fov = 40; v.near = 0.2; v.drift = 0.008; v.shadowR = 80; v.shake = hitAt(P.shed, 0.08) + 0.008; break; }
     case 'siding': { const fr = F.wagons.front + X, k = K(); v.p = [fr - L(104, 96, k), L(7, 4.2, k), F.wagons.z + L(9, 5.5, k)]; v.at = [fr + 30, 5.5, F.wagons.z - 1]; v.fov = 44; v.near = 0.3; v.drift = 0.006; v.shadowR = 90; v.sat = [fr - 40, 0, F.wagons.z]; break; }
     case 'wagons': { const fr = F.wagons.front + X, k = K(); v.p = [L(596.4, 595.8, k), L(2.5, 2.2, k), L(3.6, 2.6, k)]; v.at = [Math.min(fr, 598) - 7, 2.7, -8.6]; v.fov = 46; v.near = 0.15; v.drift = 0.006; v.shadowR = 50; break; }
-    case 'impact': { const k2 = esK(u, 1.2, 3.4); v.p = [L(575, 572, k2), L(2.3, 3.0, k2), L(13, 17, k2)]; v.at = [600, L(4.5, 10, k2), -9]; v.fov = L(46, 56, k2); v.near = 0.3; v.drift = 0.01; v.shadowR = 80; v.shake = hitAt(P.wagon0, 0.14) + (s > P.wagon0 ? 0.02 : 0); break; }
-    case 'impact2': { const k = K(); v.p = [L(512, 524, k), L(5.5, 4.5, k), L(4, 2.5, k)]; v.at = [600, L(10, 16, k), -8]; v.fov = L(30, 26, k); v.near = 0.5; v.drift = 0.008; v.shadowR = 110; v.sat = [585, 0, -8]; v.shake = hitAt(P.wagonHit(1), 0.07) + 0.012; break; }
-    case 'wind': { const k = K(); v.p = [L(436, 474, k), L(46, 30, k), L(136, 100, k)]; v.at = [612, L(34, 40, k), -18]; v.fov = 42; v.near = 2; v.drift = 0.03; v.shadowR = 200; v.shake = 0.012 + hitAt(P.wagonHit(2), 0.04, 0.012); break; }
-    case 'heat': { const k = K(); v.p = [L(577, 580, k), L(2.6, 3.4, k), L(44, 36, k)]; v.at = [L(604, 606, k), L(20, 34, k), 2]; v.fov = 56; v.near = 0.3; v.drift = 0.012; v.shadowR = 100; v.shake = 0.01 + hitAt(P.wagonHit(3), 0.06, 0.012); break; }
-    case 'over': { const k = K(); v.p = [L(460, 500, k), L(70, 124, k), L(214, 176, k)]; v.at = [L(640, 660, k), L(50, 70, k), -24]; v.fov = 40; v.near = 3; v.drift = 0.04; v.shadowR = 420; v.fog = 0.0002; break; }
+    case 'impact': { const k2 = esK(u, 1.2, 3.4); v.p = [L(575, 572, k2), L(2.3, 3.0, k2), L(13, 17, k2)]; v.at = [600, L(4.5, 10, k2), -9]; v.fov = L(46, 56, k2); v.near = 0.3; v.drift = 0.01; v.shadowR = 80; v.shake = hitAt(P.wagon0, 0.14) + (s > P.wagon0 ? 0.02 : 0); v.fire = 0.6; break; }
+    case 'impact2': { const k = K(); v.p = [L(512, 524, k), L(5.5, 4.5, k), L(4, 2.5, k)]; v.at = [600, L(10, 16, k), -8]; v.fov = L(30, 26, k); v.near = 0.5; v.drift = 0.008; v.shadowR = 110; v.sat = [585, 0, -8]; v.shake = hitAt(P.wagonHit(1), 0.07) + 0.012; v.fire = 0.6; break; }
+    case 'wind': { const k = K(); v.p = [L(538, 551, k), L(15, 9, k), L(-62, -49, k)]; v.at = [602, L(17, 26, k), -7]; v.fov = 42; v.near = 0.5; v.drift = 0.015; v.shadowR = 130; v.shake = 0.012 + hitAt(P.wagonHit(3), 0.08, 0.012); v.fire = 0.55; break; }
+    case 'heat': { const k = K(), k2 = esK(u, 2.4, d); v.p = [L(570, 579, k), L(2.0, 3.2, k), L(22, 31, k)]; v.at = [L(600, 606, k2), L(5.5, 32, k2), L(-9, 0, k2)]; v.fov = L(46, 56, k2); v.near = 0.3; v.drift = 0.012; v.shadowR = 100; v.shake = 0.012 + hitAt(P.wagonHit(2), 0.1, 0.012); v.fire = 0.55; break; }
+    case 'over': { const k = K(); v.p = [L(516, 546, k), L(30, 66, k), L(104, 76, k)]; v.at = [L(610, 632, k), L(30, 46, k), -14]; v.fov = 46; v.near = 2; v.drift = 0.03; v.shadowR = 260; v.fog = 0.0002; v.shake = 0.008 + hitAt(P.wagonHit(4), 0.05, 0.012); v.fire = 0.6; break; }
     // ---- the sea
-    case 'sea': { const k = esK(u, 0.3, 3.8); v.p = [-66, PH + 1.6, -4.4]; v.at = [-250, L(4, 150, k), L(-6, -2, k)]; v.fov = L(54, 66, k); v.near = 0.2; v.drift = 0.01; v.shadowR = 80; v.shake = 0.008; break; }
-    case 'seaLit': {
-      // rising in front of the wall to its torn top: the Sun comes through it
-      const k = K(), Hh = P.wallH(s), y = Hh * L(0.74, 0.985, k), az = Math.atan2(ES_SUN[2], ES_SUN[0]), p = [F.quay.x + 0.3 * Hh + 150, y, 30];
-      v.p = p; v.at = [p[0] + Math.cos(az) * 300, y + L(10, 26, k), p[2] + Math.sin(az) * 300]; v.fov = 46; v.near = 2; v.drift = 0.03; v.shadowR = 200; v.sat = [p[0], 0, 30]; break;
-    }
-    case 'quay': { const k = K(); v.p = [L(-276, -268, k), L(5, 12, k), L(160, 128, k)]; v.at = [-252, L(22, 70, k), -60]; v.fov = 52; v.near = 0.5; v.drift = 0.02; v.shadowR = 150; v.shake = 0.008; break; }
+    // from the platform (bare now: everything on it has gone east): the harbour, and what stands in it
+    case 'quay': { const k = esK(u, 0.5, 7.0), kp = K(); v.p = [L(-58, -76, kp), PH + 1.6, -4.4]; v.at = [-250, L(4, 175, k), L(-6, -2, k)]; v.fov = L(52, 66, k); v.near = 0.2; v.drift = 0.01; v.shadowR = 80; v.shake = 0.008; break; }
+    // along the foot of it, in profile, toward the ferry
+    case 'foot': { const k = K(); v.p = [L(-273, -263, k), L(4.5, 9, k), L(176, 58, k)]; v.at = [-252, L(20, 44, k), -70]; v.fov = 52; v.near = 0.5; v.drift = 0.015; v.shadowR = 150; v.shake = 0.008; break; }
     case 'ferry': { const k = K(); v.p = [L(-289, -286, k), 4.2, L(-72, -68, k)]; v.at = [-259, L(8, 16, esK(u, 1.2, 5)), -32]; v.fov = 47; v.near = 0.5; v.drift = 0.012; v.shadowR = 120; v.shake = hitAt(P.ferryHit, 0.12) + 0.01; break; }
-    case 'up': { const k = K(); v.p = [L(-40, -64, k), L(14, 40, k), L(300, 270, k)]; v.at = [-250, L(110, 165, k), 20]; v.fov = 54; v.near = 1; v.drift = 0.02; v.shadowR = 200; v.shake = 0.006; break; }
-    case 'shores': { const k = K(); v.p = [L(1180, 1080, k), L(560, 500, k), L(1540, 1440, k)]; v.at = [-250, 120, -400]; v.fov = 36; v.near = 6; v.drift = 0.06; v.shadowR = 600; v.fog = 0.00012; break; }
+    // beside the Eiffel Tower's outline, rising; then back and up: the same wall along the whole coast
+    case 'up': { const k = esK(u, 0, 6.2), k2 = esK(u, 5.2, d); v.p = [L(-16, -84, k) + 380 * k2, L(8, 64, k) + 330 * k2, L(336, 262, k) + 560 * k2]; v.at = [-250, L(96, 186, k) - 70 * k2, L(24, -260, k2)]; v.fov = L(54, 46, k2); v.near = 1; v.drift = 0.02; v.shadowR = 200 + 400 * k2; v.fog = L(0.0003, 0.00014, k2); v.shake = 0.006 * (1 - k2); break; }
     // ---- one second is not long enough to fall: under the station's roof; behind it (ahead: the fire); the woman
-    case 'under': { const k = K(), ry = P.roofY(s); v.p = [-58 + X - 6 * k, L(0.9, 1.3, k), -3.6]; v.at = [-110 + X, ry + L(1.5, 0.2, k), -4.9]; v.fov = 58; v.near = 0.1; v.drift = 0.008; v.shadowR = 90; v.sat = [-80 + X, 0, -5]; break; }
     case 'roof': { const k = K(), ry = P.roofY(s); v.p = [-193 + X - 3 * k, L(1.1, 1.7, k), L(1.6, 0.4, k)]; v.at = [-120 + X, ry - 0.8, -3.2]; v.fov = 54; v.near = 0.2; v.drift = 0.01; v.shadowR = 90; v.sat = [-150 + X, 0, -5]; v.fire = 1.6; break; }
     case 'woman': { const y = P.womanY(s), x = F.bridge.x + X, k = K(); v.p = [x - L(5.2, 3.6, k), y + L(2.6, 1.2, k), L(6.4, 5.4, k)]; v.at = [x + 0.4, y + 0.9, 2.4]; v.fov = 38; v.near = 0.1; v.drift = 0.006; v.shadowR = 30; break; }
     // ---- the last 0.14 s; 5:42:01
     case 'count': { const k = K(); v.p = [N - L(8, 5, k), L(1.2, 0.9, k), L(4.2, 3.5, k)]; v.at = [600, L(16, 12, k), -3]; v.fov = 52; v.near = 0.15; v.drift = 0.006; v.shake = 0.008; v.shadowR = 90; v.sat = [N + 20, 0, 0]; break; }
     // from the tunnel's mouth, a very long lens: your train, head-on (behind it, the sea)
     case 'mouth': { const k = K(); v.p = [L(586, 584, k), L(3.4, 2.6, k), L(7.5, 5.5, k)]; v.at = [N, 3.2, 0]; v.fov = L(5, 3.6, k); v.near = 0.5; v.drift = 0.004; v.shake = 0.004; v.shadowR = 110; v.sat = [N + 40, 0, 0]; v.fire = 1.5; break; }
-    case 'cab': { const z = s < P.T ? 1 : 0; v.p = [N + 13, 2.7, 0]; v.at = [600, 9, 0]; v.fov = 58; v.near = 0.2; v.drift = 0.003; v.shake = 0.006 * z + 0.05 * (s >= P.T ? Math.exp(-(s - P.T) / 0.002) : 0); v.shadowR = 80; v.sat = [N + 50, 0, 0]; break; }
-    case 'still': { const k = K(); v.p = [N + L(44, 34, k), L(14, 19, k), L(70, 60, k)]; v.at = [N - 56, 5, -14]; v.fov = 42; v.near = 1; v.drift = 0.02; v.shadowR = 170; break; }
+    // the driver's view: the last 0.05 s in a rush (20 m/s), then 5:42:01: everything stops dead
+    case 'cab': { const aft = t - esFilmAt(P.T), rush = Math.min(1, esRateAt(t) * P.v / 20), j = aft < 0 ? rush : Math.exp(-aft / 0.14); v.p = [N + 13, 2.7, 0]; v.at = [600, 9, 0]; v.fov = 58 + 7 * j; v.near = 0.2; v.drift = 0.003; v.shake = aft < 0 ? 0.004 + 0.035 * rush : 0.08 * Math.exp(-aft / 0.22); v.shadowR = 80; v.sat = [N + 50, 0, 0]; break; }
+    case 'still': { const k = K(); v.p = [N + L(64, 30, k), L(9, 21, k), L(84, 58, k)]; v.at = [N - 56, L(8, 5, k), -14]; v.fov = 42; v.near = 1; v.drift = 0.02; v.shadowR = 170; break; }
     case 'grip': { const k = K(); v.p = [N - L(31, 29, k), L(0.5, 0.7, k), L(3.1, 2.6, k)]; v.at = [N + 40, L(3, 5, k), 0.4]; v.fov = 44; v.near = 0.08; v.drift = 0.003; v.shadowR = 40; v.sat = [N - 20, 0, 0]; v.fire = 1.4; break; }
-    case 'short': { const k = K(), mid = (N + 600) / 2; v.p = [mid - L(80, 56, k), L(70, 52, k), L(160, 140, k)]; v.at = [mid + 16, 6, -4]; v.fov = 44; v.near = 2; v.drift = 0.03; v.shadowR = 200; v.sat = [mid, 0, 0]; break; }
+    case 'short': { const k = K(); v.p = [N - L(62, 42, k), L(8.5, 5, k), L(17, 9.5, k)]; v.at = [N + 100, L(10, 8.5, k), -2]; v.fov = 40; v.near = 0.3; v.drift = 0.012; v.shadowR = 140; v.sat = [N + 10, 0, 0]; v.fire = 1.4; break; }
     // ---- everything the ground stopped, thrown west
     case 'twist': { const k = K(); v.p = [N - L(36, 30, k), L(18, 23, k), L(30, 24, k)]; v.at = [L(598, 572, k), 26, -6]; v.fov = L(36, 32, k); v.near = 0.5; v.drift = 0.012; v.shake = 0.006 + 0.01 * k; v.shadowR = 130; v.sat = [N, 0, 0]; break; }
-    case 'twistSea': { const k = K(); v.p = [L(-64, -52, k), L(70, 62, k), 170]; v.at = [-268, 130, -10]; v.fov = 54; v.near = 1; v.drift = 0.03; v.shadowR = 220; break; }
+    // travelling with the fire, over the roofs (it stands still; the ground runs under it): your train comes in from the left
+    case 'sweep': { const k = K(), bx = P.blastX(s); v.p = [bx - L(58, 50, k), L(34, 26, k), L(86, 70, k)]; v.at = [bx - L(52, 44, k), 6, 0]; v.fov = 50; v.near = 0.5; v.drift = 0.012; v.shake = 0.01 + 0.012 * k; v.shadowR = 170; v.sat = [bx - 40, 0, 0]; break; }
     case 'reach': { const k = K(); v.p = [N - L(13, 11, k), L(2.0, 2.3, k), 6.2]; v.at = [N + 34, L(13, 16, k), -1]; v.fov = 56; v.near = 0.2; v.drift = 0.004; v.shake = 0.02 + 0.06 * k; v.shadowR = 80; break; }
     case 'question': {
-      // your seat: your window, and what is coming along the line
-      const k = K(), e = eye(4.9, 1.36, -0.78), a = eye(8.5, 1.3, -3.2), b = eye(12.5, 1.75, -5.6);
-      v.p = [e[0] + 0.25 * k, e[1], e[2] - 0.12 * k]; v.at = esV(a, b, esK(u, 0, 1.5)); v.fov = L(60, 70, k); v.near = 0.03; v.drift = 0.002; v.shake = 0.006 + 0.05 * k * k; v.shadowR = 40; v.fire = 1 + 2.2 * k * k; break;
+      // your seat: your window, and what is coming along the line (it arrives at ES.tHit; after that the picture is black)
+      const k = esK(t, shot.t0, ES.tHit), e = eye(4.9, 1.36, -0.78), a = eye(8.5, 1.3, -3.2), b = eye(12.5, 1.75, -5.6);
+      v.p = [e[0] + 0.25 * k, e[1], e[2] - 0.12 * k]; v.at = esV(a, b, esK(u, 0, 1.5)); v.fov = L(60, 70, k); v.near = 0.03; v.drift = 0.002; v.shake = 0.006 + 0.07 * k * k; v.shadowR = 40; v.fire = 1 + 2.2 * k * k; break;
     }
     default: { v.p = [60, 30, 100]; v.at = [-40, 4, 0]; v.near = 1; }
   }
@@ -199,10 +199,9 @@ function esCoastLabels(set, t) {
   const P = ESP, F = ES_F, s = set._s, m = sh.mode, X = P.X(s), N = P.nose(s), a = esWin(t, sh.t0 + 0.6, sh.t1 - 0.1, 0.4, 0.3), n = (x) => Math.round(x).toLocaleString('en-US');
   const out = [], L = (p, text, sub, side, k = 1) => out.push({ p, text, sub, a: a * k, side });
   switch (m) {
-    case 'first': L([608, 44, 74], 'THE HILL', '600 m EAST OF THE STATION', 'l'); break;
+    case 'first': L([606, 27, -30], 'THE HILL', '600 m EAST OF THE STATION', 'l'); break;
     case 'glide': L([-118, 3, -13], 'WHERE THE STATION STOOD', `${X.toFixed(0)} m AGO`, 'r'); break;
     case 'floor': L([-124, 2.4, -14], 'ITS FLOOR', 'STILL BOLTED DOWN', 'r'); break;
-    case 'townAir': L([-214, 3, -76], 'THE FLOORS THEY LEFT', `${X.toFixed(0)} m BEHIND THEM`, 'r'); break;
     case 'platEnd': L([0, F.plat.h + 0.1, -5.2], 'THE PLATFORM’S END', null, 'r', esWin(t, sh.t0 + 0.4, sh.t0 + 3.2, 0.3, 0.4)); break;
     case 'fly': { const x = set.St.leadX + X; if (x > 0.5) L([x, 3.2, -3.6], `${F.plat.h} m UP`, `FALLEN SO FAR: ${(P.fall(s, -set.St.leadX / P.v) * 1000).toFixed(0)} mm`, 'r'); break; }
     case 'pass': L([N + 2, 4.6, 0], 'YOUR TRAIN', `${n(P.kmh - P.trainA * Math.min(s, 1) * 3.6)} km/h OVER THE GROUND`, null); break;
@@ -210,16 +209,16 @@ function esCoastLabels(set, t) {
     case 'ahead': L([604, 34, 0], 'THE HILL', `${n(P.gap(s))} m AHEAD OF YOUR TRAIN`, null); break;
     case 'hill': L([600, 9.6, 0], 'THE TUNNEL', null, 'r'); break;
     case 'siding': case 'wagons': { const fr = F.wagons.front + X, g = esHillX(F.wagons.z) - fr; if (g > 0) L([fr, 5.4, F.wagons.z], `${g.toFixed(1)} m`, 'TO THE ROCK', 'r'); break; }
-    case 'sea': case 'quay': L([F.quay.x - 2, Math.min(P.wallH(s) * 0.45, 90), m === 'quay' ? -40 : 0], `${n(P.wallH(s))} m HIGH`, 'AND CLIMBING', m === 'quay' ? 'r' : null); break;
-    case 'up': L([ES_EIFFEL[0], 300, ES_EIFFEL[1]], 'THE EIFFEL TOWER', '330 m, FOR SCALE', 'r'); L([F.quay.x, P.wallH(s) * 0.8, -60], `${n(P.wallH(s))} m HIGH`, 'AND CLIMBING', null); break;
-    case 'under': L([-104 + X, P.roofY(s) - 0.2, -4.6], 'THE STATION’S ROOF', `${P.roofY(s).toFixed(1)} m UP`, null); break;
+    case 'quay': L([F.quay.x - 2, Math.min(P.wallH(s) * 0.45, 90), 0], `${n(P.wallH(s))} m HIGH`, 'AND CLIMBING', null, esWin(t, sh.t0 + 3.4, sh.t1 - 0.1, 0.4, 0.3)); break;
+    case 'foot': L([F.quay.x - 2, 34, -40], `${n(P.wallH(s))} m HIGH`, 'AND CLIMBING', 'r'); break;
+    case 'up': { const k = 1 - MathX.smooth(t, sh.t0 + 5.0, sh.t0 + 6.0); L([ES_EIFFEL[0], 300, ES_EIFFEL[1]], 'THE EIFFEL TOWER', '330 m, FOR SCALE', 'r', k); L([F.quay.x, P.wallH(s) * 0.8, -60], `${n(P.wallH(s))} m HIGH`, 'AND CLIMBING', null, k); break; }
     case 'roof': L([-150 + X, P.roofY(s) + 0.4, -4.5], 'THE STATION’S ROOF', `${P.roofY(s).toFixed(1)} m UP · ${X.toFixed(0)} m FROM ITS PLATFORM`, null); break;
     case 'woman': L([F.bridge.x + X + 0.5, P.womanY(s) + 1.75, 2.4], `${P.womanY(s).toFixed(1)} m UP`, `FALLING AT ${(P.g * Math.max(0, s - P.womanFree) * 3.6).toFixed(0)} km/h`, 'l'); break;
     case 'count': L([604, 40, 0], 'THE HILL', `${n(P.gap(s))} m`, null); break;
     case 'mouth': L([N, 5.2, 0], 'YOUR TRAIN', `${n(P.gap(s))} m FROM THE ROCK`, null); break;
     case 'short': L([(N + 600) / 2, 13, 0], `${n(P.gap(s))} m`, 'YOUR TRAIN TO THE ROCK', null); break;
-    case 'twist': L([P.blastX(s) - 2, 30, -9], 'THROWN WEST', `${n(P.kmh)} km/h`, 'r'); break;
-    case 'reach': L([P.blastX(s) - 2, 22, 0], `${Math.max(0, P.blastX(s) - N).toFixed(0)} m`, 'FROM YOUR TRAIN', 'r'); break;
+    case 'twist': L([P.blastX(s) - 2, 30, -9], 'THE FIRE AND THE AIR', 'NO SPEED LEFT', 'r'); break;
+    case 'sweep': L([N + 2, 5.4, 0], 'YOUR TRAIN', '1,670 km/h EAST, WITH THE GROUND', null); L([P.blastX(s) + 4, 26, -4], 'THE FIRE', 'STANDING STILL', 'l'); break;
     default: break;
   }
   return out;

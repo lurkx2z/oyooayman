@@ -31,7 +31,7 @@ function esBuildTrain(S) {
   const bogie = (parent, x) => {
     const g = new THREE.Group(); g.position.set(x, 0, 0); parent.add(g);
     esBox(3.0, 0.3, 2.2, steel, 0, 0.62, 0, g);
-    for (const ax of [-1.25, 1.25]) { for (const sz of [-1, 1]) { const w = new THREE.Mesh(wheelG, esStd('#55585c', 0.35, 0.8)); w.position.set(ax, C.wheelR, sz * F.track.gauge / 2); w.castShadow = true; g.add(w); } esCyl(0.09, 0.09, 1.6, steel, ax, C.wheelR, 0, g, 8).rotation.x = Math.PI / 2; }
+    for (const ax of [-1.25, 1.25]) { for (const sz of [-1, 1]) { const w = new THREE.Mesh(wheelG, esStd('#2b2d30', 0.72, 0.4)); w.position.set(ax, C.wheelR, sz * F.track.gauge / 2); w.castShadow = true; g.add(w); } esCyl(0.09, 0.09, 1.6, steel, ax, C.wheelR, 0, g, 8).rotation.x = Math.PI / 2; }
     return g;
   };
   out.cars = [];
@@ -135,16 +135,16 @@ function esBuildTrain(S) {
     out.wagons = [];
     for (let k = 0; k < W.n; k++) {
       const g = new THREE.Group(); scene.add(g);
-      const L = W.L - 1.0;
+      const L = W.L - 1.0, tm = tankM.clone(); tm.emissive = new THREE.Color('#ff5a14'); tm.emissiveIntensity = 0;      // (its own steel: it glows as it is crushed)
       esBox(L, 0.3, 2.4, under, 0, 0.95, 0, g);
-      const tk = esMesh(new THREE.CylinderGeometry(1.45, 1.45, L - 1.6, 18), tankM, 0, 2.6, 0, g); tk.rotation.z = Math.PI / 2;
-      for (const sx of [-1, 1]) { const cap = esMesh(new THREE.SphereGeometry(1.45, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), tankM, sx * (L - 1.6) / 2, 2.6, 0, g); cap.rotation.z = -sx * Math.PI / 2; cap.scale.y = 0.45; }
+      const tk = esMesh(new THREE.CylinderGeometry(1.45, 1.45, L - 1.6, 18), tm, 0, 2.6, 0, g); tk.rotation.z = Math.PI / 2;
+      for (const sx of [-1, 1]) { const cap = esMesh(new THREE.SphereGeometry(1.45, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), tm, sx * (L - 1.6) / 2, 2.6, 0, g); cap.rotation.z = -sx * Math.PI / 2; cap.scale.y = 0.45; }
       const bd = esMesh(new THREE.CylinderGeometry(1.47, 1.47, 0.7, 18), bandM, 0, 2.6, 0, g); bd.rotation.z = Math.PI / 2;
       esCyl(0.5, 0.5, 0.5, tankM, 0, 4.2, 0, g, 12);
       for (const sx of [-1, 1]) { esBox(1.0, 1.7, 0.08, steel, sx * 3.2, 1.8, 1.48, g); esBox(0.6, 0.6, 0.02, esStd('#e8e4d8', 0.6), sx * 3.2, 2.5, 1.53, g).castShadow = false; }
       for (const bx of [-L / 2 + 2.2, L / 2 - 2.2]) bogie(g, bx);
       esBox(0.5, 0.3, 0.4, steel, L / 2 + 0.3, 1.0, 0, g); esBox(0.5, 0.3, 0.4, steel, -L / 2 - 0.3, 1.0, 0, g);
-      out.wagons.push({ g, front0: W.front - k * W.L, L: W.L });
+      out.wagons.push({ g, front0: W.front - k * W.L, L: W.L, m: tm });
     }
   }
   // ------------------------------------------------------------------ the pickup at the crossing; parked cars
@@ -159,15 +159,16 @@ function esBuildTrain(S) {
   {
     const Fy = F.ferry, hullM = esStd('#f0ece2', 0.5, 0.1), blue = esStd('#1f4a8a', 0.5, 0.2), deckM = esStd('#8a8f8a', 0.8), glass = esStd('#16303a', 0.2, 0.4);
     const hullGeo = (L, B, h, bow = 0.3) => { const s = new THREE.Shape(); s.moveTo(-L / 2, -B / 2); s.lineTo(L / 2 - L * bow, -B / 2); s.quadraticCurveTo(L / 2 - L * bow * 0.3, -B / 2 * 0.8, L / 2, 0); s.quadraticCurveTo(L / 2 - L * bow * 0.3, B / 2 * 0.8, L / 2 - L * bow, B / 2); s.lineTo(-L / 2, B / 2); s.closePath(); const g = new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: false, curveSegments: 8 }); g.rotateX(-Math.PI / 2); return g; };
-    const g = new THREE.Group(); scene.add(g);
+    // (the hull, below the quay's level, is what the quay stops; everything above the deck is in its own group: it tears off and rides on)
+    const g = new THREE.Group(); scene.add(g); const up = new THREE.Group(); scene.add(up);
     const hl = new THREE.Mesh(hullGeo(Fy.L, Fy.B, 6.2), [deckM, hullM]); hl.position.y = F.sea.level - 2.2; hl.castShadow = hl.receiveShadow = true; g.add(hl);
     const st = new THREE.Mesh(hullGeo(Fy.L, Fy.B + 0.04, 1.2), blue); st.position.y = F.sea.level - 0.4; g.add(st);
-    esBox(Fy.L * 0.62, 2.7, Fy.B - 1.6, hullM, -Fy.L * 0.1, F.sea.level + 5.35, 0, g); esBox(Fy.L * 0.6, 0.9, Fy.B - 1.5, glass, -Fy.L * 0.1, F.sea.level + 5.6, 0, g).scale.set(1, 1, 1.004);
-    esBox(Fy.L * 0.46, 2.6, Fy.B - 3.4, hullM, -Fy.L * 0.12, F.sea.level + 8.0, 0, g); esBox(Fy.L * 0.44, 0.9, Fy.B - 3.3, glass, -Fy.L * 0.12, F.sea.level + 8.2, 0, g).scale.set(1, 1, 1.004);
-    esBox(7, 2.4, Fy.B - 5, hullM, Fy.L * 0.1, F.sea.level + 10.5, 0, g); esBox(7.1, 0.9, Fy.B - 4.9, glass, Fy.L * 0.1, F.sea.level + 10.8, 0, g);
-    const fn = esCyl(1.5, 1.8, 4.6, blue, -Fy.L * 0.2, F.sea.level + 11.6, 0, g, 14); fn.scale.z = 0.7; esCyl(1.52, 1.56, 0.8, esStd('#e8e4d8', 0.5), -Fy.L * 0.2, F.sea.level + 12.8, 0, g, 14).scale.z = 0.7;
-    esCyl(0.08, 0.1, 6, steel, Fy.L * 0.12, F.sea.level + 14.6, 0, g, 8);
-    out.ferry = { g, bow0: Fy.bow, L: Fy.L };
+    esBox(Fy.L * 0.62, 2.7, Fy.B - 1.6, hullM, -Fy.L * 0.1, F.sea.level + 5.35, 0, up); esBox(Fy.L * 0.6, 0.9, Fy.B - 1.5, glass, -Fy.L * 0.1, F.sea.level + 5.6, 0, up).scale.set(1, 1, 1.004);
+    esBox(Fy.L * 0.46, 2.6, Fy.B - 3.4, hullM, -Fy.L * 0.12, F.sea.level + 8.0, 0, up); esBox(Fy.L * 0.44, 0.9, Fy.B - 3.3, glass, -Fy.L * 0.12, F.sea.level + 8.2, 0, up).scale.set(1, 1, 1.004);
+    esBox(7, 2.4, Fy.B - 5, hullM, Fy.L * 0.1, F.sea.level + 10.5, 0, up); esBox(7.1, 0.9, Fy.B - 4.9, glass, Fy.L * 0.1, F.sea.level + 10.8, 0, up);
+    const fn = esCyl(1.5, 1.8, 4.6, blue, -Fy.L * 0.2, F.sea.level + 11.6, 0, up, 14); fn.scale.z = 0.7; esCyl(1.52, 1.56, 0.8, esStd('#e8e4d8', 0.5), -Fy.L * 0.2, F.sea.level + 12.8, 0, up, 14).scale.z = 0.7;
+    esCyl(0.08, 0.1, 6, steel, Fy.L * 0.12, F.sea.level + 14.6, 0, up, 8);
+    out.ferry = { g, up, bow0: Fy.bow, L: Fy.L };
     out.boats = F.boats.map(([x, z, ry], i) => {
       const b = new THREE.Group(); scene.add(b);
       const h = new THREE.Mesh(hullGeo(9, 3, 1.5, 0.35), [esStd('#7a5a3a', 0.8), esStd(['#b8462e', '#2f6a8a', '#e8e4d8', '#3a7a4a'][i % 4], 0.6)]); h.position.y = F.sea.level - 0.5; h.castShadow = true; b.add(h);
@@ -189,10 +190,14 @@ function esBuildTrain(S) {
     { const a = s <= 0 ? 0 : s <= P.T ? Math.atan(P.muTrain) * MathX.smooth(s, 0, 0.012) : -Math.atan(P.muTrain) * MathX.smooth(s, 1, 1.01) + Math.atan(P.muTrain) * (1 - MathX.smooth(s, 1, 1.004));
       out.coffee.rotation.z = -a; out.coffee.scale.x = 1 / Math.cos(a); out.coffee.position.y = 0.088; }
     // the wagons: until the rock
-    out.wagons.forEach((w) => crush(w.g, w.front0 + X - 0.5, w.L - 1.0, esHillX(F.wagons.z), RAIL, F.wagons.z));
+    // (a tank is not fed in whole: it bursts as it shortens, swelling and glowing where it folds)
+    out.wagons.forEach((w) => { crush(w.g, w.front0 + X - 0.5, w.L - 1.0, esHillX(F.wagons.z), RAIL, F.wagons.z); const c = 1 - w.g.scale.x, b = 1 + 0.75 * Math.pow(c, 0.6); w.g.scale.y = b; w.g.scale.z = b * (1 + 0.25 * c); w.g.rotation.z = 0.1 * c; w.m.emissiveIntensity = 2.6 * Math.pow(c, 0.5); });
     for (const v of out.vehicles) { v.g.position.x = v.x + X; v.g.visible = !(v.hit != null && s >= v.hit); v.g.position.y = 0; }
     // the ferry and the boats: until the quay wall
     crush(out.ferry.g, out.ferry.bow0 + X, out.ferry.L, F.quay.x - 1.2, 0, F.ferry.z);
+    // what stood above its deck is above the quay too: nothing stops it. It tears off, noses down and rides on over the quay
+    { const u = Math.max(0, s - P.ferryHit), k = MathX.smooth(u, 0, 0.05), f = out.ferry.up;
+      f.position.set(out.ferry.bow0 + X - out.ferry.L / 2 - 2.5 * k, 1.6 * k, F.ferry.z); f.rotation.z = -0.16 * k; f.rotation.x = 0.07 * k; f.visible = u < 0.16; }
     for (const b of out.boats) { const front = b.x + b.L / 2 + X, vis = Math.max(0, Math.min(b.L, b.L - (front - (F.quay.x - 1.2)))); b.g.visible = vis > 0.05; b.g.rotation.y = vis < b.L ? 0 : b.ry; b.g.scale.x = Math.max(0.001, vis / b.L); b.g.position.set(Math.min(front, F.quay.x - 1.2) - vis / 2, 0, b.z); }
   };
   return out;

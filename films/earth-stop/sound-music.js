@@ -245,7 +245,7 @@ function esDrive(M, t0, t1, chords, lv, o = {}) {
 esSound('music', 'score', function (ctx, bus, K) {
   const M = esMusicKit(ctx, K), CH = ES_CH, c = esC, B = esB, E = esE, F = esFilmAt, END = ES.end, T0 = ES.tOn, P = ESP;
   const tW = []; for (let k = 0; k < ES_F.wagons.n; k++) tW.push(F(P.wagonHit(k)));
-  const tFerry = F(P.ferryHit), tBack = F(P.T), tSunA = c('speed', 1) - 0.6, tSun = tSunA + 0.7 * (B('bolts') - tSunA), tShed = F(P.shed);
+  const tFerry = F(P.ferryHit), tBack = F(P.T), tSunA = c('speed', 1) - 0.6, tSun = tSunA + 0.7 * (B('bolts') - tSunA), tShed = F(P.shed), tH0 = F(P.house0), tH1 = F(P.house1), tHit = ES.tHit;
   const hold = (t0, t1, ch, vol, o = {}) => M.strings(t0, t1, CH[ch].h, vol, o);
   const motif = (t, o = {}) => ES_THEME.slice(0, o.n || 5).forEach((n, i) => M.piano(t + i * (o.gap || 1.1), esOct(n, o.oct || 0), (o.vel || 0.5) * (i ? 0.88 : 1), o.dur || 3.4, [-0.2, 0.15, -0.1, 0.2, 0][i]));
   const beats = (t0, t1, p0, p1, v0, v1) => { for (let t = t0; t < t1 - 0.2;) { const u = (t - t0) / (t1 - t0); M.beat(t, v0 + (v1 - v0) * u); t += p0 + (p1 - p0) * u; } };
@@ -264,6 +264,8 @@ esSound('music', 'score', function (ctx, bus, K) {
   // the hill: it stopped too
   M.blow(B('first'), 0.7, 36.7); M.brass(B('first'), c('first', 1) - 0.6, ['D1', 'D2', 'A2'], 0.8, { cut: 380, rel: 1.0 });
   esDrive(M, B('first') + 0.1, c('first', 1) - 0.9, ['Dm', 'Bb'], 2, { vol: 0.8, ramp: (u) => 0.7 + 0.3 * u });
+  // a house reaches its rock
+  M.blow(tH0, 0.95, 30.9); M.crash(tH0, 0.7, 1.4); M.boom(tH0 + 0.02, 0.6, 80, 26, 1.2);
   // "Nothing else did.": palm after palm into the rock
   M.blow(c('first', 1) - 0.8, 0.85, 32.7); M.brass(c('first', 1) - 0.8, B('speed') + 0.3, ['Bb0', 'Bb1', 'F2', 'Bb2'], 1.0, { cut: 420, open: 1700, rel: 0.8 });
   esDrive(M, c('first', 1) - 0.8, B('speed') - 0.05, ['Bb', 'A'], 3, { vol: 0.9, fill: true });
@@ -295,20 +297,16 @@ esSound('music', 'score', function (ctx, bus, K) {
   esDrive(M, B('town'), B('people') - 0.1, ['Dm', 'Dm', 'Bb', 'Bb'], 3, { vol: 0.8, fill: true });
   M.blow(c('town', 1) - 0.6, 0.7, 29.1);
 
-  // ================================================================== the people: pulled right back; the pigeons
+  // ================================================================== the people: pulled right back
   M.blow(B('people'), 0.5, 36.7);
-  hold(B('people'), c('people', 3) - 0.6, 'Dm9', 0.26, { cut: 800, att: 1.2 });
-  M.strings(B('people'), c('people', 3) - 0.8, ['A5', 'E6'], 0.05, { att: 2, rel: 0.6, cut: 5000, wave: 'triangle', vib: 3 });
+  hold(B('people'), B('train') + 0.3, 'Dm9', 0.26, { cut: 800, att: 1.2 });
+  M.strings(B('people'), B('train'), ['A5', 'E6'], 0.05, { att: 2, rel: 0.6, cut: 5000, wave: 'triangle', vib: 3 });
   beats(B('people') + 0.5, c('people', 1) - 0.7, 1.05, 0.9, 0.34, 0.44);
   M.piano(c('people', 0) + 2.3, 'D2', 0.42, 5); M.piano(c('people', 0) + 2.32, 'A2', 0.3, 5);
   // the platform's end: the pulse quickens under them
-  esDrive(M, c('people', 1) - 0.6, c('people', 3) - 0.9, ['Dm', 'Gm', 'Bb', 'A'], 2, { vol: 0.7, oct: -1, ramp: (u) => 0.5 + 0.5 * u });
-  beats(c('people', 1) - 0.6, c('people', 3) - 1.0, 0.75, 0.5, 0.4, 0.6);
+  esDrive(M, c('people', 1) - 0.6, B('train') - 0.15, ['Dm', 'Gm', 'Bb', 'A'], 2, { vol: 0.7, oct: -1, ramp: (u) => 0.5 + 0.5 * u });
+  beats(c('people', 1) - 0.6, B('train') - 0.3, 0.75, 0.5, 0.4, 0.6);
   M.blow(c('people', 2) - 0.6, 0.55, 36.7);
-  M.blow(c('people', 3) - 0.8, 0.45, 43.7);
-  // the pigeons: a breath of F major
-  M.prog([[c('people', 3) - 0.8, CH.Fmaj9.h], [c('people', 3) + 2.4, CH.Bblyd.h]], B('train') + 0.4, 0.3, { cut: 1700, att: 0.8 });
-  twinkle(c('people', 3) - 0.3, B('train') - 0.3, 0.5, 0.3, ['A5', 'C6', 'E6', 'G6', 'A6'], 0.13);
 
   // ================================================================== your train: the drive at full stride
   M.blow(B('train'), 0.7);
@@ -337,24 +335,23 @@ esSound('music', 'score', function (ctx, bus, K) {
   // ================================================================== the hill: a slow march
   { const a = B('hill'), b = B('depot');
     M.blow(a, 0.7, 29.1);
-    M.brass(a, c('hill', 1) - 0.3, ['D1', 'D2', 'A2'], 0.85, { att: 0.5, cut: 380, open: 1000, rel: 0.6 });
-    M.brass(c('hill', 1) - 0.4, c('hill', 2) - 0.6, ['Eb1', 'Eb2', 'Bb2'], 0.95, { att: 0.4, cut: 400, open: 1100, rel: 0.6 });
-    M.brass(c('hill', 2) - 0.8, b + 0.2, ['D1', 'D2', 'A2', 'D3'], 1.0, { att: 0.3, cut: 420, open: 1300, rel: 0.5 });
+    M.brass(a, c('hill', 1) - 1.2, ['D1', 'D2', 'A2'], 0.85, { att: 0.5, cut: 380, open: 1000, rel: 0.6 });
+    M.brass(c('hill', 1) - 1.4, b + 0.2, ['Eb1', 'Eb2', 'Bb2'], 1.0, { att: 0.4, cut: 400, open: 1200, rel: 0.6 });
     for (let t = a + 1, i = 0; t < b - 0.3; t += 1, i++) { M.taiko(t, 0.85, 52, -0.2); M.taiko(t + 0.5, 0.5, 62, 0.25); if (i % 2) M.taiko(t + 0.75, 0.4, 70, 0.3); M.bass(t, 'D2', 0.8, 0.4); }
-    // "The hill is part of the ground. It stopped."
-    { const t = esWord('hill', 1, -2); M.blow(t, 0.8, 32.7); M.anvil(t, 0.4, 0, 880); }
+    // a house on the road under it reaches the rock
+    M.blow(tH1, 0.85, 32.7); M.crash(tH1, 0.55, 1.2);
     // the depot's shed reaches the rock
     M.blow(tShed, 0.9, 30.9); M.crash(tShed, 0.6, 1.4); M.anvil(tShed + 0.01, 0.5, -0.3, 520);
-    M.strings(c('hill', 2), b + 0.3, ['A5', 'Bb5'], 0.05, { att: 2, rel: 0.4, cut: 6000, vib: 12 }); }
+    M.strings(c('hill', 1), b + 0.3, ['A5', 'Bb5'], 0.05, { att: 2, rel: 0.4, cut: 6000, vib: 12 }); }
 
   // ================================================================== the six wagons: a ticking, a roll, a beat of nothing, the blow
-  { const a = B('depot'), t0w = tW[0];
+  { const a = B('depot'), t0w = tW[0], tD = esCap('depot', 0).hide - 1.2;
     M.strings(a, t0w - 0.3, ['D2', 'A2', 'D3'], 0.34, { att: 1.0, rel: 0.05, cut: 280, cutTo: 700, cutAt: t0w - 0.3 });
     for (let t = a + 0.25, i = 0; t < t0w - 0.35; t += 0.25, i++) { M.tick(t, 1.2, i % 2 ? 0.4 : -0.4); if (i % 2 === 0) M.clack(t, 0.5); if (i % 4 === 0) M.bass(t, 'D2', 0.7, 0.3); }
-    esDrive(M, c('depot', 1) - 0.3, t0w - 0.35, ['Dm', 'Eb'], 2, { vol: 0.7, oct: -1, ramp: (u) => 0.5 + 0.5 * u });
-    M.strings(c('depot', 1), t0w - 0.3, ['D4', 'Eb4', 'A4'], 0.26, { att: 2, rel: 0.02, cut: 800, cutTo: 4200, cutAt: t0w - 0.3, glide: 200, glideFrom: c('depot', 1) + 1, glideAt: t0w - 0.3 });
+    esDrive(M, tD, t0w - 0.35, ['Dm', 'Eb'], 2, { vol: 0.7, oct: -1, ramp: (u) => 0.5 + 0.5 * u });
+    M.strings(tD, t0w - 0.3, ['D4', 'Eb4', 'A4'], 0.26, { att: 2, rel: 0.02, cut: 800, cutTo: 4200, cutAt: t0w - 0.3, glide: 200, glideFrom: tD + 1, glideAt: t0w - 0.3 });
     M.roll(t0w - 3.2, t0w - 0.33, [[t0w - 3.2, 0.06], [t0w - 0.5, 0.75]], 55); M.swell(t0w - 0.3, 2.4, 0.8);
-    beats(c('depot', 1), t0w - 0.6, 0.7, 0.36, 0.4, 0.7);
+    beats(tD, t0w - 0.6, 0.7, 0.36, 0.4, 0.7);
     // (0.3 s of nothing) … the first wagon
     M.blow(t0w, 1.15, 27.5); M.boom(t0w + 0.02, 0.9, 90, 24, 1.6); M.crash(t0w, 1.0, 2.2);
     M.brass(t0w, B('wind') + 0.4, ['D1', 'A1', 'D2', 'F2', 'A2'], 1.25, { cut: 560, open: 3000, rel: 0.8, settle: 0.8 });
@@ -414,14 +411,14 @@ esSound('music', 'score', function (ctx, bus, K) {
     M.strings(a, b, ['A5', 'D6'], 0.05, { att: 2, rel: 0.6, cut: 5000, wave: 'triangle', vib: 2 });
     beats(a + 0.6, b - 0.3, 1.15, 1.0, 0.3, 0.36);
     twinkle(a + 1, b - 0.5, 1.2, 0.7, ['A5', 'D6', 'E6', 'A6'], 0.1);
-    M.bell(c('fall', 1) + 0.1, 'F5', 0.26, -0.2); M.bell(c('fall', 2) + 0.1, 'E5', 0.26, 0.2);
-    motif(c('fall', 2) + 0.5, { gap: 0.8, vel: 0.28, n: 3, oct: 1, dur: 3 }); }
+    M.bell(c('fall', 1) + 0.1, 'F5', 0.26, -0.2); M.bell(c('fall', 1) + 1.0, 'E5', 0.26, 0.2);
+    motif(c('fall', 1) + 1.3, { gap: 0.7, vel: 0.28, n: 3, oct: 1, dur: 3 }); }
   // ================================================================== the sky: calm and high
   { const a = B('sky'), b = B('count');
-    M.prog([[a, CH.Fmaj9.h], [c('sky', 1) - 0.3, CH.Bblyd.h]], b + 0.3, 0.32, { cut: 2200, att: 1.0 });
+    M.prog([[a, CH.Fmaj9.h], [a + 3.2, CH.Bblyd.h]], b + 0.3, 0.32, { cut: 2200, att: 1.0 });
     M.strings(a, b, ['C6', 'E6', 'A6'], 0.05, { att: 2, rel: 0.5, cut: 7000, wave: 'triangle', vib: 3 });
     twinkle(a + 0.6, b - 0.4, 0.7, 0.4, ['A5', 'C6', 'E6', 'G6', 'A6', 'C7'], 0.12);
-    M.piano(a + 0.1, 'F2', 0.4, 6); M.piano(c('sky', 1) - 0.2, 'Bb1', 0.42, 6); }
+    M.piano(a + 0.1, 'F2', 0.4, 6); M.piano(a + 3.3, 'Bb1', 0.42, 6); }
 
   // ================================================================== the count: the endless rise, cut dead at 5:42:01.000
   { const a = B('count'), b = tBack;
@@ -453,7 +450,7 @@ esSound('music', 'score', function (ctx, bus, K) {
     M.strings(a, b, ['A4', 'D5'], 0.14, { att: 2, rel: 0.2, cut: 1800, cutTo: 3600, cutAt: b, vib: 9, glide: 200, glideFrom: a, glideAt: b });
     rise(a + 1, b, 0.03, 0.1, { rate: () => 1 / 8, fade: 0.2 }); }
   // ================================================================== 0.2 seconds; the question: everything, to the cut
-  { const a = c('twist', 2) - 0.5, b = END + 0.02, tq = B('question');
+  { const a = c('twist', 2) - 0.5, b = tHit, tq = B('question');
     M.blow(a, 1.0, 27.5); M.crash(a, 0.9, 1.6);
     esDrive(M, a, tq - 0.05, ['F', 'E', 'F', 'E'], 4, { vol: 1.0, fill: true });
     esDrive(M, tq, b, ['Dm'], 4, { vol: 1.05, oct: 1 });
@@ -463,7 +460,10 @@ esSound('music', 'score', function (ctx, bus, K) {
     M.strings(a, b, ['D4', 'F4', 'A4', 'D5', 'F5'], 0.4, { att: 1.0, rel: 0.005, cut: 1500, cutTo: 5200, cutAt: b, vib: 10, glide: 200, glideFrom: tq - 2, glideAt: b });
     rise(a, b, 0.07, 0.18, { rate: (t) => (t < tq ? 1 / 5 : 1 / 2.4), fade: 0.004 });
     beats(a + 0.2, b - 0.1, 0.5, 0.22, 0.6, 0.95);
-    M.roll(tq - 1.6, b - 0.02, [[tq - 1.6, 0.2], [b - 0.3, 1.0]], 55); }
+    M.roll(tq - 1.6, b - 0.02, [[tq - 1.6, 0.2], [b - 0.3, 1.0]], 55);
+    // ★ it arrives: one blow; then, over the black, the first two notes of the five, low, and nothing else
+    M.blow(b, 1.2, 27.5); M.boom(b + 0.01, 1.0, 70, 20, 3.0);
+    M.piano(b + 1.5, 'D3', 0.3, 5, -0.1); M.piano(b + 2.35, 'F3', 0.22, 5, 0.1); }
   M.flush();
 });
 ES_SOUND_FNS.push(esShepard, esMusicKit, esWord, esDrive);

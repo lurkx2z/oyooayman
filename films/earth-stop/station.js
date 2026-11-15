@@ -95,17 +95,17 @@ function esBuildStation(S) {
     trunks.castShadow = crowns.castShadow = true; trunks.frustumCulled = crowns.frustumCulled = false; root.add(trunks); root.add(crowns);
     const hits = ES_PALMS.map((p) => { const s = (esHillX(p[1]) - p[0]) / P.v; return s > 0 && s < P.T ? s : null; });
     const mt = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), ps = new THREE.Vector3(), sc = new THREE.Vector3(), up = new THREE.Vector3();
-    // (a palm that reaches the rock does not vanish: it folds flat against it, its crown crushed, and goes under the dust)
+    // (a palm that reaches the rock breaks up against it: its crown is gone in 3 ms, its trunk in 6; fx.js throws the pieces)
     out.palms = (s) => {
       const X = P.X(s);
       for (let i = 0; i < N; i++) {
         const [x, z, h, r] = ES_PALMS[i], u = hits[i] != null ? s - hits[i] : -1, y0 = 0.5 - Math.min(0.5, P.fall(s));
         if (u >= 0) {
           // pinned at the rock (root-relative: the rock is at hx − X), folding up against it over 5 ms, sinking as it breaks up
-          const hx = esHillX(z) - X, f = Math.min(1, u / 0.005), g = 1 - 0.55 * MathX.smooth(u, 0.004, 0.06);
+          const hx = esHillX(z) - X, f = Math.min(1, u / 0.005), g = (1 - 0.55 * MathX.smooth(u, 0.004, 0.06)) * (1 - MathX.smooth(u, 0.0015, 0.006)), cg = 1 - MathX.smooth(u, 0.0005, 0.003);
           e.set(0.12 * Math.sin(r * 40), r * 6.28, 0.12 + 0.2 * (r - 0.5)); q.setFromEuler(e);
           ps.set(hx - 0.5, y0, z); sc.set(1.6 - 0.4 * f, h * g * (1 - 0.25 * f), 1.6); mt.compose(ps, q, sc); trunks.setMatrixAt(i, mt);
-          up.set(0, h * g * (1 - 0.25 * f), 0).applyQuaternion(q); ps.set(hx - 0.7 + up.x * 0.3, y0 + up.y, z + up.z); sc.set((0.8 + 0.4 * r) * (1 - 0.8 * f), (0.8 + 0.4 * r) * (1 + 0.3 * f) * g, (0.8 + 0.4 * r) * (1 + 0.5 * f)); mt.compose(ps, q, sc); crowns.setMatrixAt(i, mt);
+          up.set(0, h * g * (1 - 0.25 * f), 0).applyQuaternion(q); ps.set(hx - 0.7 + up.x * 0.3, y0 + up.y, z + up.z); sc.set((0.8 + 0.4 * r) * (1 - 0.8 * f) * cg, (0.8 + 0.4 * r) * (1 + 0.3 * f) * g * cg, (0.8 + 0.4 * r) * (1 + 0.5 * f) * cg); mt.compose(ps, q, sc); crowns.setMatrixAt(i, mt);
           continue;
         }
         const th = -(0.25 + 0.5 * r) * Math.min(1.3, Math.max(0, s)) ** 2;
@@ -141,7 +141,7 @@ function esBuildStation(S) {
     esBox(T.w + 0.7, 0.5, T.w + 0.7, esStd('#c98a4a', 0.9), 0, T.h - 0.1, 0, tg);
     const CK = esCanvasTex(256, 256, esClockDraw); out.clockTex = CK;
     const cm = new THREE.MeshStandardMaterial({ map: CK.tex, roughness: 0.6 });
-    for (const [dx, dz, ry] of [[0, T.w / 2 + 0.04, 0], [0, -T.w / 2 - 0.04, Math.PI], [T.w / 2 + 0.04, 0, Math.PI / 2], [-T.w / 2 - 0.04, 0, -Math.PI / 2]]) { const c = new THREE.Mesh(new THREE.CircleGeometry(1.7, 28), cm); c.position.set(dx, T.h - 3.2, dz); c.rotation.y = ry; tg.add(c); }
+    for (const [dx, dz, ry] of [[0, T.w / 2 + 0.14, 0], [0, -T.w / 2 - 0.14, Math.PI], [T.w / 2 + 0.14, 0, Math.PI / 2], [-T.w / 2 - 0.14, 0, -Math.PI / 2]]) { const c = new THREE.Mesh(new THREE.CircleGeometry(1.7, 28), cm); c.position.set(dx, T.h - 3.2, dz); c.rotation.y = ry; tg.add(c); }
     out.tower = tg;
   }
   // ------------------------------------------------------------------ the platform canopies
@@ -167,8 +167,8 @@ function esBuildStation(S) {
     out.colFeet = cols;
     const c1 = out.canopies[0], ck = grp(-36 - (F.can1.x[0] + F.can1.x[1]) / 2, -1.5, 1.6, c1.g);
     esBox(0.9, 0.9, 0.22, esStd('#2a2a2c', 0.5, 0.4), 0, 0, 0, ck); esBox(0.05, 0.7, 0.05, iron, 0, 0.75, 0, ck);
-    const cf = new THREE.MeshStandardMaterial({ map: out.clockTex.tex, roughness: 0.5 });
-    for (const sgn of [-1, 1]) { const c = new THREE.Mesh(new THREE.CircleGeometry(0.4, 24), cf); c.position.set(sgn * 0.0, 0, 0); c.rotation.y = sgn * Math.PI / 2; c.position.x = sgn * 0.46; ck.add(c); esBox(0.02, 0.9, 0.9, esStd('#2a2a2c', 0.5), sgn * 0.45, 0, 0, ck); }
+    const cf = new THREE.MeshStandardMaterial({ map: out.clockTex.tex, roughness: 0.5 });   // (the faces stand 3 cm proud of the case: no z-fighting)
+    for (const sgn of [-1, 1]) { const c = new THREE.Mesh(new THREE.CircleGeometry(0.4, 24), cf); c.position.set(sgn * 0.0, 0, 0); c.rotation.y = sgn * Math.PI / 2; c.position.x = sgn * 0.49; ck.add(c); esBox(0.02, 0.9, 0.9, esStd('#2a2a2c', 0.5), sgn * 0.45, 0, 0, ck); }
   }
   // ------------------------------------------------------------------ the footbridge at the platforms' east end
   {
@@ -218,6 +218,14 @@ function esBuildStation(S) {
       esBox(0.1, 4.2, 5, esStd('#3a3f44', 0.6), Sh.w / 2 + 0.03, 2.1, 0, g); east.push([g, hitOf('shed'), 0.08, F.shed.w]); emit.push([Sh.x + Sh.w / 2, Sh.x - Sh.w / 2, Sh.z - Sh.d / 2, Sh.z + Sh.d / 2, 1.0]);
       // the fuel stand beside the siding: two upright tanks and pipes
       for (const dx of [-16, -10]) { const t = grp(Sh.x + dx, 0, Sh.z + 9.5); esCyl(1.5, 1.5, 5.2, esStd('#d8d4c8', 0.5, 0.3), 0, 2.9, 0, t, 16); esCyl(1.52, 1.52, 0.3, red, 0, 4.4, 0, t, 16); east.push([t, (esHillX(Sh.z + 9.5) - (Sh.x + dx + 1.5)) / P.v, 0.1]); } }
+    // two houses on the road under the hill (the first big things to reach the rock)
+    F.hillHouses.forEach(([x, z, w, d, h], i) => {
+      const g = grp(x, 0, z), wm = new THREE.MeshStandardMaterial({ map: esTex(esFacadeCanvas(140 + i, i ? [214, 180, 140] : [232, 224, 208], { shutter: i ? '#2f4a6a' : '#3a6a5a' })), roughness: 0.9 });
+      const b = new THREE.Mesh(esBayBox(w, h, d), [wm, wm, wh, wh, wm, wm]); b.position.y = h / 2; b.castShadow = b.receiveShadow = true; g.add(b);
+      const rf = new THREE.Mesh(esGableGeo(w + 0.8, d + 0.8, 1.2 + 0.12 * d), esStd(i ? '#7d8a8c' : '#a8543a', 0.85)); rf.position.y = h; rf.castShadow = true; g.add(rf);
+      esBox(0.7, 1.6, 0.7, esStd('#8a4a3a', 0.9), -w * 0.25, h + 1.9, d * 0.2, g);
+      east.push([g, (esHillX(z) - (x + w / 2)) / P.v, 0.05, w]); emit.push([x + w / 2, x - w / 2, z - d / 2, z + d / 2, 0.9]);
+    });
     // the quay's crane and crates, lamp posts along the apron
     { const g = grp(F.quay.x + 16, 0, 58), ye = esStd('#d8a82a', 0.6, 0.3);
       for (const [dx, dz] of [[-4, -4], [4, -4], [-4, 4], [4, 4]]) esBox(0.5, 11, 0.5, ye, dx, 5.5, dz, g); esBox(9, 0.6, 9, ye, 0, 11, 0, g); esBox(3.4, 3, 3.4, esStd('#e8e4d8', 0.6), 0, 12.8, 0, g);

@@ -29,6 +29,9 @@ const ES_F = {
   hill: { x: 600, cliff: 26, top: 140 },
   wagons: { front: 391, n: 6, L: 15, z: -9 },
   shed: { x: 408, z: -26, w: 26, d: 12, h: 6.5 },
+  // two houses on the road under the hill: [x of its middle, z, w (east–west), d, h]. The first stands 25 m from the
+  // rock (the first big thing to reach it, at s 0.054); the second reaches it as the line's view arrives (s 0.361)
+  hillHouses: [[570.0, -44, 10, 8, 5.6], [427.0, 16, 11, 8, 6.2]],
   sigbox: { x: 250, z: 9.5 },
   wtower: { x: 160, z: -16 },
   crossing: { x: 200, w: 7 },
@@ -49,7 +52,7 @@ function esGroundY(x, z) {
   if (x < F.quay.x) return F.sea.bed;
   const hx = esHillX(z);
   if (x > hx - 0.6) {
-    const k = MathX.clamp((x - (hx - 0.6)) / 3.6, 0, 1), cl = F.hill.cliff * (0.92 + 0.08 * noise1(z * 0.05, 9));
+    const k = MathX.clamp((x - (hx - 0.6)) / 3.6, 0, 1), cl = F.hill.cliff * (0.92 + 0.08 * noise1(z * 0.05, 9) + 0.05 * noise1(z * 0.14, 17) * MathX.smooth(Math.abs(z), 12, 30));   // (a ragged top, away from the tunnel)
     if (k < 1) return cl * (k * k * (3 - 2 * k));
     const u = x - hx - 3;
     return cl + (F.hill.top - cl) * (1 - Math.exp(-u / 150)) + 7 * noise1(x * 0.012 + z * 0.017, 11) * Math.min(1, u / 60) + 3 * noise1(z * 0.04 - x * 0.03, 13) * Math.min(1, u / 30);
@@ -61,11 +64,16 @@ function esGroundY(x, z) {
 // the palms: [x, z, height, lean seed]: along the line, around the town, along the foot of the hill
 const ES_PALMS = (() => {
   const r = new RNG(5421), out = [];
-  const add = (x, z, h) => { if (Math.abs(z) < 7 && x > -215) return; if (z > -22 && z < 13 && x > -215 && x < 5) return; out.push([x, z, h ?? r.range(7, 11), r.next()]); };
+  const add = (x, z, h) => {
+    if (Math.abs(z) < 7 && x > -215) return; if (z > -22 && z < 13 && x > -215 && x < 5) return;
+    const hh = h ?? r.range(7, 11), seed = r.next();
+    for (const [hx, hz, hw, hd] of ES_F.hillHouses) if (Math.abs(z - hz) < hd / 2 + 3.5 && x > hx - hw / 2 - 4) return;      // (not in a house, nor in its way)
+    out.push([x, z, hh, seed]);
+  };
   for (let x = -200; x < 560; x += r.range(14, 30)) { add(x + r.range(-3, 3), -r.range(26, 44)); add(x + r.range(-3, 3), r.range(18, 40)); }
   for (let i = 0; i < 46; i++) add(r.range(-240, 560), (r.next() < 0.5 ? -1 : 1) * r.range(50, 190));
-  // the belt along the foot of the hill, 14 to 27 m from the rock: the first things to reach it, in a volley (s 0.03 to 0.058)
-  for (let z = -176; z <= 176; z += r.range(6.5, 11)) { if (Math.abs(z) < 12) continue; add(esHillX(z) - r.range(14.5, 27), z, r.range(8, 12)); }
+  // the belt along the foot of the hill, 22 to 44 m from the rock: they reach it in a volley (s 0.047 to 0.095)
+  for (let z = -176; z <= 176; z += r.range(6.5, 11)) { if (Math.abs(z) < 12) continue; add(esHillX(z) - r.range(22, 44), z, r.range(8, 12)); }
   return out;
 })();
 

@@ -88,6 +88,9 @@ const ESP = (() => {
   // the tank wagons: wagon k's front is at wagons.front − k·L; it meets the rock at:
   P.wagonHit = (k) => (esHillX(F.wagons.z) - (F.wagons.front - k * F.wagons.L)) / P.v;
   P.shed = (esHillX(F.shed.z) - (F.shed.x + F.shed.w / 2)) / P.v;               // 0.387 s: the depot's shed reaches the rock
+  // the two houses on the road under the hill: 0.052 s and 0.361 s
+  P.house0 = (esHillX(F.hillHouses[0][1]) - (F.hillHouses[0][0] + F.hillHouses[0][2] / 2)) / P.v;
+  P.house1 = (esHillX(F.hillHouses[1][1]) - (F.hillHouses[1][0] + F.hillHouses[1][2] / 2)) / P.v;
   P.wagon0 = P.wagonHit(0); P.wagonEnd = P.wagonHit(F.wagons.n);              // 0.449 … 0.643 s
   P.parked = esHillX(F.wagons.z) - F.wagons.front;                            // 209 m
   // the sea's wall at the quay: its height
@@ -108,6 +111,7 @@ const ES_HITS = (() => {
   ES_PALMS.forEach((p, i) => add(p[0], p[1], p[2] * 0.75, 'palm', 0.4, 2.5 + (i % 3)));
   for (let k = 0; k < F.wagons.n; k++) add(F.wagons.front - k * F.wagons.L, F.wagons.z, 2.2, 'wagon', P.wagonT, 9);
   add(F.shed.x + F.shed.w / 2, F.shed.z, 3, 'shed', 40, 8);
+  for (const [x, z, w, d, h] of F.hillHouses) add(x + w / 2, z, h * 0.6, 'house', 60, 8);
   add(F.sigbox.x + 3, F.sigbox.z, 3.5, 'box', 30, 6);
   add(F.wtower.x + 2, F.wtower.z, 9, 'tower', 25, 6);
   add(F.crossing.x + 2, -13.5, 1, 'truck', 2, 4);

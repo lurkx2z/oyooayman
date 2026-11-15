@@ -22,7 +22,7 @@
    ===================================================================== */
 
 esSound('sfx', 'events', function (ctx, bus, K) {
-  const { fx, sr } = K, r = new RNG(CONFIG.seed + 909), wr = esWorldRate, T0 = ES.tOn, F = esFilmAt, P = ESP, tb = F(P.T), tW = F(P.wagon0), tF = F(P.ferryHit), c = esC, B = esB, END = ES.end;
+  const { fx, sr } = K, r = new RNG(CONFIG.seed + 909), wr = esWorldRate, T0 = ES.tOn, F = esFilmAt, P = ESP, tb = F(P.T), tW = F(P.wagon0), tF = F(P.ferryHit), c = esC, B = esB, END = ES.tHit;   // (END: it arrives; after it, black)
   const open = K.verb('sopen', 2.2, { bright: 0.45, damp: 2.0, wet: 0.3 }), big = K.verb('sbig', 4.2, { bright: 0.35, damp: 1.6, wet: 0.4, pre: 0.03 });
   const room = K.verb('sroom', 0.7, { bright: 0.6, damp: 3.2, wet: 0.25 }), far = K.verb('sfar', 3.6, { bright: 0.3, damp: 1.8, wet: 0.65, pre: 0.08, early: [[0.3, 0.4], [0.7, 0.25]] });
   const sh = (m) => esShot(m), whereAt = (t) => esWhereShot(esShotAt(t)), len = (p) => p.t1 - p.t0;
@@ -61,10 +61,6 @@ esSound('sfx', 'events', function (ctx, bus, K) {
   { const p = sh('bolt');
     [0.3, 1.9].forEach((dt, i) => putS(fx.hit(fx.metalModes(860 + 90 * i, 1.6), { width: 0.0006, amp: 1, noise: 0.5, nlen: 0.008, nhp: 900, len: 1.2 }), p.t0 + dt, { vol: 0.09, pan: -0.25 + 0.4 * i, room: open, wet: 0.4 }));
     over(esScrape(fx, len(p), { f: 320, rate: 8 }), p, { vol: 0.06, pan: 0.2, room: open, wet: 0.3 }); }
-  { const p = sh('feet'), d = len(p);
-    over(esScrape(fx, d, { f: 380, rate: 9 }), p, { vol: 0.14, pan: -0.1, room: open, wet: 0.3 });
-    over(esCrackle(fx, d, { rate: 90, hp: 1600 }), p, { vol: 0.035, pan: 0.15 });
-    over(groan(d, 58, { rate: [5, 12] }), p, { vol: 0.08, pan: 0.3, room: big, wet: 0.4 }); }
   { const p = sh('floor');
     over(groan(len(p), 36, { rate: [5, 12] }), p, { vol: 0.18, room: big, wet: 0.4 });
     for (let t = p.t0 + 0.5; t < p.t1 - 1; t += r.range(0.9, 1.7)) putS(esCrack(fx, { len: 1.2, s: r.range(0.5, 0.9) }), t, { vol: r.range(0.1, 0.17), pan: r.range(-0.5, 0.5), room: big, wet: 0.4 }); }
@@ -73,21 +69,14 @@ esSound('sfx', 'events', function (ctx, bus, K) {
   { const p = sh('town');
     over(burst(len(p), [80, 140, 120], 0.7, (u) => Math.pow(Math.sin(Math.PI * u), 0.5), 'brown'), p, { vol: 0.18, room: big, wet: 0.35 });
     for (let t = p.t0 + 0.3; t < p.t1 - 0.8; t += r.range(0.6, 1.1)) putS(esCrack(fx, { len: 1.2, s: r.range(0.5, 0.9) }), t, { vol: r.range(0.12, 0.2), pan: r.range(-0.6, 0.6), room: big, wet: 0.4 }); }
-  { const p = sh('townAir');
-    over(burst(len(p), [70, 120, 100], 0.7, (u) => Math.pow(Math.sin(Math.PI * u), 0.5), 'brown'), p, { vol: 0.1, room: far, wet: 0.5 });
-    for (let t = p.t0 + 0.4; t < p.t1 - 1; t += r.range(0.7, 1.4)) putS(esCrack(fx, { len: 1.2, s: r.range(0.4, 0.7) }), t, { vol: r.range(0.05, 0.09), pan: r.range(-0.7, 0.7), room: far, wet: 0.7 }); }
-
   { const p = sh('cars'), d = len(p); over(esScrape(fx, d, { f: 300, rate: 7 }), p, { vol: 0.1, pan: -0.2, room: open, wet: 0.3 }); over(esScrape(fx, d, { f: 210, rate: 5 }), p, { vol: 0.07, pan: 0.3, room: open, wet: 0.3 }); }
 
-  // ================================================================== the people; the platform's end; the pigeons
+  // ================================================================== the people; the platform's end
   { const p = sh('people'); over(fx.rustle(len(p), { density: 60, rub: 0.5, lo: 250, hi: 1800, grain: 0.05, env: () => 1 }), p, { vol: 0.03, pan: 0.2, room: open, wet: 0.3 }); }
   { const p = sh('platEnd'), d = len(p);
     over(esScrape(fx, d, { f: 520, rate: 11, q: 0.7 }), p, { vol: 0.08, pan: -0.1, room: open, wet: 0.3 });
     over(fx.rustle(d, { density: 90, rub: 0.4, lo: 300, hi: 2200, grain: 0.04, env: () => 1 }), p, { vol: 0.03, pan: 0.3 }); }
   { const p = sh('fly'); over(fx.rustle(len(p), { density: 70, rub: 0.5, lo: 260, hi: 2000, grain: 0.05, env: () => 1 }), p, { vol: 0.035, pan: -0.2, room: open, wet: 0.3 }); }
-  { const p = sh('pigeons'); let k = 0;
-    for (let t = p.t0 + 0.3; t < p.t1 - 0.5; t += r.range(0.42, 0.62), k++) K.put(burst(0.36, [420, 260, 170], 0.9, (u) => Math.pow(Math.sin(Math.PI * u), 1.5)), t, { vol: r.range(0.05, 0.085), norm: true, pan: (k % 2 ? 1 : -1) * r.range(0.2, 0.6), room: open, wet: 0.3 }); }
-
   // ================================================================== your train: steel skidding on steel
   { const p = sh('wheels'), d = len(p);
     over(esScreech(fx, d, { f: 480, rate: 34 }), p, { vol: 0.15, pan: 0.1, room: open, wet: 0.25 });
@@ -109,14 +98,16 @@ esSound('sfx', 'events', function (ctx, bus, K) {
   // ================================================================== the hill: everything that reaches the rock
   for (const h of ES_HITS) {
     const t = F(h.s); if (t < T0 || t > END || whereAt(t) !== 'hill' && h.kind === 'palm') continue;
-    const m = esShotAt(t).mode, near = m === 'over' || m === 'wind' ? 0.45 : 1;
+    const m = esShotAt(t).mode, near = m === 'over' ? 0.45 : 1;
     if (h.kind === 'palm') putS(wood(r.range(110, 240)), t, { vol: r.range(0.11, 0.18) * near, pan: r.range(-0.5, 0.5), room: open, wet: 0.35 });
     if (h.kind === 'palm' && (m === 'first' || m === 'firstB')) K.put(esBoom(fx, { len: 1.3, f0: r.range(80, 110), f1: 38, bright: 900, crack: 0.5 }), t, { vol: m === 'first' ? 0.07 : 0.13, norm: true, pan: r.range(-0.5, 0.5), room: open, wet: 0.3, stop: esShotAt(t).t1 + 0.03, fade: 0.05 });
+    else if (h.kind === 'house' && whereAt(t) === 'hill') { putS(crash(74, 2.2), t, { vol: 0.3, rate: 0.45, pan: -0.15, room: big, wet: 0.4 }); K.put(esBoom(fx, { len: 3, f0: 72, f1: 28, bright: 2400 }), t, { vol: 0.34, norm: true, room: big, wet: 0.35, stop: esShotAt(t).t1 + 0.03, fade: 0.05 });
+      for (let i = 0; i < 5; i++) putS(esCrack(fx, { len: 1.2, s: r.range(0.5, 0.9) }), t + r.range(0.1, 1.3), { vol: r.range(0.1, 0.16), pan: r.range(-0.5, 0.5), room: big, wet: 0.4 }); }   // a house: masonry
     else if (h.kind === 'shed' && whereAt(t) === 'hill') { putS(crash(60, 2.6), t, { vol: 0.3, rate: 0.4, pan: 0.2, room: big, wet: 0.4 }); K.put(esBoom(fx, { len: 3, f0: 60, f1: 26, bright: 1800 }), t, { vol: 0.22, norm: true, room: big, wet: 0.35, stop: esShotAt(t).t1 + 0.03, fade: 0.05 }); }
-    else if (h.kind !== 'wagon' && h.kind !== 'shed' && whereAt(t) === 'train') K.put(esBoom(fx, { len: 3, f0: 56, f1: 26, bright: 600, crack: 0 }), t, { vol: 0.12, norm: true, room: far, wet: 0.6 });
+    else if (h.kind !== 'wagon' && h.kind !== 'shed' && h.kind !== 'palm' && whereAt(t) === 'train') K.put(esBoom(fx, { len: 3, f0: 56, f1: 26, bright: 600, crack: 0 }), t, { vol: 0.12, norm: true, room: far, wet: 0.6 });
   }
   { const p = sh('hill'); over(burst(len(p), wander(10, 420, 720), 5, () => 1), p, { vol: 0.045, pan: -0.2, room: open, wet: 0.4 }); }
-  for (const m of ['rock', 'shed']) { const p = sh(m); over(groan(len(p), 92, { rate: [10, 26] }), p, { vol: 0.07, pan: -0.2, room: open, wet: 0.35 }); over(burst(len(p), wander(8, 420, 720), 5, () => 1), p, { vol: 0.045, pan: 0.2, room: open, wet: 0.4 }); }   // the air on the rock; timber and sheet steel folding
+  for (const m of ['shed']) { const p = sh(m); over(groan(len(p), 92, { rate: [10, 26] }), p, { vol: 0.07, pan: -0.2, room: open, wet: 0.35 }); over(burst(len(p), wander(8, 420, 720), 5, () => 1), p, { vol: 0.045, pan: 0.2, room: open, wet: 0.4 }); }   // the air on the rock; timber and sheet steel folding
   // the wagons skidding to the rock
   for (const m of ['siding', 'wagons']) { const p = sh(m), d = len(p);
     over(esScreech(fx, d, { f: 400, rate: 30, env: (u) => 0.3 + 0.7 * u * u, bend: (u) => 0.9 + 0.2 * u }), p, { vol: 0.14, pan: -0.2, room: open, wet: 0.3 });
@@ -142,13 +133,15 @@ esSound('sfx', 'events', function (ctx, bus, K) {
     for (let t = p.t0 + r.range(0.9, 1.6); t < p.t1 - 1.2; t += r.range(1.9, 3.2)) K.put(esBoom(fx, { len: 3, f0: r.range(52, 70), f1: 26, bright: 1500, crack: 0.3 }), t, { vol: r.range(0.14, 0.22) * near, norm: true, pan: r.range(-0.5, 0.5), room: big, wet: 0.4, stop: p.t1 + 0.03, fade: 0.05 }); }
 
   // ================================================================== the sea
-  { const p = sh('sea'), d = len(p);
-    over(burst(d, [90, 150, 260, 340, 380], 0.5, (u) => 0.4 + 0.6 * u, 'brown'), p, { vol: 0.24, room: big, wet: 0.35 });
-    over(burst(d, [500, 900, 1600, 2200], 0.5, (u) => 0.3 + 0.7 * u), p, { vol: 0.08, pan: -0.2, room: open, wet: 0.3 }); }
-  { const p = sh('seaLit'), d = len(p);
+  // from the platform: the surge, growing as you look up it
+  { const p = sh('quay'), d = len(p);
+    over(burst(d, [90, 150, 260, 340, 380], 0.5, (u) => 0.4 + 0.6 * u, 'brown'), p, { vol: 0.26, room: big, wet: 0.35 });
+    over(burst(d, [500, 900, 1600, 2200], 0.5, (u) => 0.3 + 0.7 * u), p, { vol: 0.09, pan: -0.2, room: open, wet: 0.3 });
+    K.put(esBoom(fx, { len: 4, f0: 54, f1: 24, bright: 1400, crack: 0, noise: 1.3 }), p.t0 + 0.05, { vol: 0.3, norm: true, room: big, wet: 0.4, stop: p.t1 + 0.03, fade: 0.05 }); }
+  // along its foot: the quay cracking under it
+  { const p = sh('foot'), d = len(p);
     over(burst(d, [80, 120, 170, 210], 0.6, (u) => 0.5 + 0.5 * u, 'brown'), p, { vol: 0.22, room: big, wet: 0.35 });
-    over(burst(d, [400, 800, 1500, 2400], 0.5, (u) => 0.2 + 0.8 * u * u), p, { vol: 0.1, pan: 0.2, room: open, wet: 0.3 }); }
-  { const p = sh('quay');
+    over(burst(d, [400, 800, 1500, 2400], 0.5, (u) => 0.3 + 0.7 * u * u), p, { vol: 0.1, pan: 0.2, room: open, wet: 0.3 });
     for (let t = p.t0 + 0.4; t < p.t1 - 1.2; t += r.range(1.0, 1.9)) putS(esCrack(fx, { len: 1.4, s: r.range(0.4, 0.7) }), t, { vol: r.range(0.12, 0.2), pan: r.range(-0.5, 0.5), room: big, wet: 0.4 });
     for (const dt of [0.9, 3.7]) K.put(esBoom(fx, { len: 4, f0: 54, f1: 24, bright: 1400, crack: 0, noise: 1.3 }), p.t0 + dt, { vol: 0.26, norm: true, pan: r.range(-0.4, 0.4), room: big, wet: 0.4, stop: p.t1 + 0.03, fade: 0.05 }); }
   // the ferry: its last 6 metres, then the quay
@@ -159,10 +152,9 @@ esSound('sfx', 'events', function (ctx, bus, K) {
   { const p = sh('up'), d = len(p);
     over(burst(d, [260, 500, 900, 1500, 2100], 0.5, (u) => 0.35 + 0.65 * u), p, { vol: 0.2, pan: -0.1, room: open, wet: 0.3 });
     over(burst(d, [70, 100, 150, 190], 0.6, (u) => 0.5 + 0.5 * u, 'brown'), p, { vol: 0.2, room: big, wet: 0.35 }); }
-  { const p = sh('shores'); over(burst(len(p), [100, 130, 110], 0.6, (u) => Math.pow(Math.sin(Math.PI * u), 0.5), 'brown'), p, { vol: 0.1, room: far, wet: 0.5 }); }
 
   // ================================================================== still in the air: the station's roof, the woman from the footbridge
-  for (const m of ['under', 'roof']) { const p = sh(m), d = len(p);
+  for (const m of ['roof']) { const p = sh(m), d = len(p);
     over(fx.creak(d, fx.panelModes(2.5).map(([f, tau, a]) => [f * 0.5, tau, a]), { rate: [3, 9], jit: 0.6, wrate: 0.4, env: (u) => Math.min(1, u * 12, (1 - u) * 12) }), p, { vol: 0.09, pan: -0.15, room: open, wet: 0.4 });
     for (let t = p.t0 + 0.6; t < p.t1 - 1; t += r.range(1.1, 1.9)) K.put(burst(0.7, [240, 140, 110], 0.8, (u) => Math.pow(Math.sin(Math.PI * u), 1.5), 'brown'), t, { vol: r.range(0.05, 0.08), norm: true, pan: r.range(-0.4, 0.4), room: open, wet: 0.3 }); }
   { const p = sh('woman'); over(fx.rustle(len(p), { density: 40, rub: 0.6, lo: 220, hi: 1600, grain: 0.06, env: () => 1 }), p, { vol: 0.045, pan: 0.1, room: open, wet: 0.3 }); }
@@ -176,6 +168,8 @@ esSound('sfx', 'events', function (ctx, bus, K) {
     K.put(esScreech(fx, d, { f: 470, rate: 36, env: (u) => 0.25 + 0.75 * u * u, bend: (u) => 0.9 + 0.5 * u * u }), a, { vol: 0.2, norm: true, pan: 0.1, fadeIn: 0.04, stop: tb, fade: 0.004 });
     K.put(esRoll(fx, d, { v: (u) => 0.4 + 0.6 * u, lp: 520 }), a, { vol: 0.14, norm: true, fadeIn: 0.04, stop: tb, fade: 0.004 });
     K.put(esCrackle(fx, d, { rate: 160, hp: 1800, env: (u) => 0.3 + 0.7 * u }), a, { vol: 0.05, norm: true, pan: -0.2, stop: tb, fade: 0.004 });
+    // the last 0.025 s go by in a rush: the air tearing past, rising, cut with everything else
+    K.put(burst(1.3, [180, 320, 700, 1500, 2600], 0.6, (u) => u * u * u), tb - 1.3, { vol: 0.34, norm: true, stop: tb, fade: 0.004 });
     // the wheels grip: one hard, dry knock, and nothing after it
     K.put(fx.hit(fx.metalModes(86, 0.5), { width: 0.003, amp: 1, noise: 0.5, nlen: 0.02, nhp: 300, len: 0.5 }), tb, { vol: 0.3, norm: true }); }
   // hot steel ticking in the stillness
@@ -184,11 +178,10 @@ esSound('sfx', 'events', function (ctx, bus, K) {
   // ================================================================== the twist: everything the ground stopped, coming back west
   { const a = B('twist') - 0.2, d = END - a + 0.05, n = Math.ceil(d * sr), k = (u) => 0.06 + 0.94 * Math.pow(u, 2.2);
     const mk = (col) => { const y = esNoise(fx, n, col); for (let i = 0; i < n; i++) y[i] *= k(i / n); return y; };
-    K.put(esSweep(mk('brown'), sr, 'lp', 0.7, [160, 220, 320, 520, 900, 1700, 3200]), a, { vol: 0.5, norm: true, room: big, wet: 0.3, fadeIn: 0.5 });
-    K.putLR(esSweep(mk('pink'), sr, 'bp', 0.5, [500, 700, 1000, 1500, 2200, 3000]), esSweep(mk('pink'), sr, 'bp', 0.5, [500, 700, 1000, 1500, 2200, 3000]), a, { vol: 0.14, norm: true, fadeIn: 0.5 }); }
-  { const p = sh('twistSea'), d = len(p);
-    over(burst(d, [110, 200, 300, 380], 0.5, (u) => 0.4 + 0.6 * u, 'brown'), p, { vol: 0.2, room: big, wet: 0.35 });
-    over(burst(d, [500, 900, 1500], 0.5, (u) => 0.3 + 0.7 * u), p, { vol: 0.06, pan: -0.2, room: open, wet: 0.3 }); }
+    K.put(esSweep(mk('brown'), sr, 'lp', 0.7, [160, 220, 320, 520, 900, 1700, 3200]), a, { vol: 0.5, norm: true, room: big, wet: 0.3, fadeIn: 0.5, stop: END + 0.01, fade: 0.006 });
+    K.putLR(esSweep(mk('pink'), sr, 'bp', 0.5, [500, 700, 1000, 1500, 2200, 3000]), esSweep(mk('pink'), sr, 'bp', 0.5, [500, 700, 1000, 1500, 2200, 3000]), a, { vol: 0.14, norm: true, fadeIn: 0.5, stop: END + 0.01, fade: 0.006 }); }
+  // ★ it arrives: one blast, and then nothing
+  K.put(esBoom(fx, { len: 3.6, f0: 96, f1: 19, bright: 5200, tau: 0.8 }), END, { vol: 0.85, norm: true, room: big, wet: 0.4 });
   // your carriage's windows start to rattle
   { const p = sh('question'), d = END - p.t0 + 0.05, y = fx.arr(d), modes = fx.glassModes();
     for (let t = 0.1; t < d - 0.08;) { const u = t / d; ESX.strike(y, Math.round(t * sr), Math.round(0.0006 * sr), 0.3 + 0.7 * u, modes, sr); t += r.range(0.8, 1.2) / (14 + 22 * u); }

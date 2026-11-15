@@ -138,7 +138,7 @@ function esBuildFx(S, parts) {
   })();
   // foam where the sea meets the quay (a strip on the surface)
   const foam = (() => {
-    const g = new THREE.PlaneGeometry(1, 9000, 1, 1); g.rotateX(-Math.PI / 2);
+    const g = new THREE.PlaneGeometry(1, 9000, 4, 360); g.rotateX(-Math.PI / 2);   // (in short lengths: one 9 km triangle was dropped whole on some frames)
     const m = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -16,
       uniforms: Object.assign({ uA: { value: 0 }, uX: { value: 0 }, uW: { value: 100 }, uX0: { value: F.quay.x } }, fogU),
@@ -180,7 +180,9 @@ function esBuildFx(S, parts) {
           float w1 = fbm(q * 0.6 + vec2(0.0, uT * 0.23)), n = fbm(q + vec2(w1 * 1.5, w1 * 0.7)), n2 = fbm(q * 3.4 + vec2(3.0, -uT * 1.9));
           float d = length(vec2(zr, ar));
           float core = uFire * (1.0 - smoothstep(0.1, 1.0, d + (n - 0.5) * 0.75));
-          float heat = clamp(core * (0.1 + 2.1 * n * n2 + 0.25 * n2) * (0.45 + 1.2 * n3) + 0.3 * core * (n4 - 0.5), 0.0, 1.0);
+          // jets streaking out from where the wagons went in; white-hot in the middle, red and then soot at the rim
+          float ang = atan(abs(ar) + 0.02, zr), jet = 0.55 * vn(vec2(ang * 5.0, d * 1.6 - uT * 2.2)) + 0.45 * vn(vec2(ang * 13.0 + 4.0, d * 4.0 - uT * 3.6));
+          float heat = clamp(core * (0.25 + 1.5 * n * n2 + 0.2 * n2 + 0.75 * jet * jet) * (0.45 + 1.2 * n3) + 0.3 * core * (n4 - 0.5) + 0.35 * core * core * core, 0.0, 1.0);
           // its smoke: wider, and far longer down the wind
           float ds = length(vec2(zr * 0.75, (vA - 2.0) / (uR * 5.5 + 30.0)));
           float smoke = uSmoke * (1.0 - smoothstep(0.25, 1.0, ds + (n - 0.5) * 0.6)) * (0.55 + 0.6 * n2);
@@ -215,7 +217,7 @@ function esBuildFx(S, parts) {
     const o = new THREE.Mesh(g, m); o.frustumCulled = false; o.renderOrder = 4.5; o.visible = false; scene.add(o); return o;
   })();
   // ------------------------------------------------------------------ debris: tumbling pieces of what reached the rock
-  const NDEB = 1500;
+  const NDEB = 2600;
   const deb = (() => {
     const o = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ roughness: 0.8, metalness: 0.1 }), NDEB);
     const c = new THREE.Color('#444444'); for (let i = 0; i < NDEB; i++) o.setColorAt(i, c);
@@ -223,7 +225,7 @@ function esBuildFx(S, parts) {
   })();
   // per kind: [pieces, biggest piece (m), how wide it arrives (m along the rock), colours]
   const DEB = {
-    palm: [7, 0.7, 3, [[0.36, 0.3, 0.2], [0.25, 0.36, 0.14], [0.3, 0.4, 0.16]]], shed: [80, 2.8, 22, [[0.42, 0.44, 0.46], [0.5, 0.3, 0.2], [0.62, 0.62, 0.6]]],
+    palm: [16, 2.4, 3, [[0.4, 0.33, 0.23], [0.25, 0.36, 0.14], [0.3, 0.42, 0.16]]], house: [90, 2.6, 9, [[0.9, 0.87, 0.8], [0.66, 0.33, 0.23], [0.52, 0.5, 0.47], [0.8, 0.76, 0.68]]], shed: [80, 2.8, 22, [[0.42, 0.44, 0.46], [0.5, 0.3, 0.2], [0.62, 0.62, 0.6]]],
     wagon: [46, 2.2, 3.4, [[0.1, 0.11, 0.12], [0.16, 0.16, 0.17], [0.7, 0.36, 0.12]]], box: [36, 1.6, 6, [[0.6, 0.55, 0.48], [0.5, 0.3, 0.24]]],
     tower: [36, 1.8, 5, [[0.45, 0.28, 0.2], [0.3, 0.3, 0.32]]], truck: [14, 1.0, 2, [[0.6, 0.2, 0.14], [0.15, 0.15, 0.16]]], ferry: [90, 3.2, 12, [[0.92, 0.9, 0.86], [0.14, 0.3, 0.56], [0.5, 0.52, 0.5]]],
   };
@@ -346,7 +348,7 @@ function esBuildFx(S, parts) {
         for (let j = 0; j < n; j++) {
           const id = hI * 29 + j, ang = Math.PI * H(id, 31), rad = Rm * Math.sqrt(H(id, 32)) * grow, rise = 42 * u * (0.4 + H(id, 33));
           pin(h.x - 1 - 4 * H(id, 34) * grow, h.y + Math.sin(ang) * rad * 0.8 + rise, h.z + Math.cos(ang) * rad, _o);
-          const c = palm ? [0.33, 0.35, 0.22] : h.kind === 'truck' ? [0.26, 0.24, 0.23] : [0.46, 0.4, 0.33];
+          const c = palm ? [0.43, 0.38, 0.29] : h.kind === 'truck' ? [0.26, 0.24, 0.23] : [0.46, 0.4, 0.33];
           du.add(_o[0] - shift, _o[1], _o[2], (1.6 + 4.6 * grow) * (palm ? 1 : 2.1) * (0.7 + 0.6 * H(id, 35)), 0.55 * Math.exp(-u / 0.5) * Math.min(1, u / 0.0015), c[0], c[1], c[2], H(id, 36));
         }
         // splinters and scraps thrown back off the rock (glowing where they were steel)
@@ -419,7 +421,7 @@ function esBuildFx(S, parts) {
       if (s > 0 && Math.abs(cx - F.quay.x) < 420) {
         for (let i = 0; i < 150; i++) {
           const z = cz + (H(i, 61) - 0.5) * 500, hh = H(i, 62), y = hh * hh * Math.min(Hh, 120), ph = (H(i, 63) + s * 3 + t * 0.02) % 1;
-          du.add(F.quay.x + 2 + ph * (20 + 0.5 * y) - shift + 0.3 * Hh * Math.pow(y / Hh, 1.7), y + 1, z, 7 + 11 * ph + 0.05 * y, 0.1 * on * (1 - ph), 0.9, 0.92, 0.92, H(i, 64));
+          du.add(F.quay.x + 2 + ph * (20 + 0.5 * y) - shift + 0.3 * Hh * Math.pow(y / Hh, 1.7), y + 1, z, 22 + 30 * ph + 0.12 * y, 0.05 * on * (1 - ph), 0.9, 0.92, 0.92, H(i, 64));   // (wide and faint: mist, not balls)
         }
       }
       // the ferry (and the boats) reaching the quay: a burst of spray and torn steel
@@ -460,13 +462,16 @@ function esBuildFx(S, parts) {
         const big = D[1] * (0.25 + 0.75 * H(id, 108) * H(id, 108)) * life;
         _e.set(H(id, 109) * 6.28 + a * 300 * (H(id, 110) - 0.5), H(id, 111) * 6.28 + a * 240 * (H(id, 112) - 0.5), a * 300 * (H(id, 113) - 0.5)); _q.setFromEuler(_e);
         // (through the very long lens at the tunnel's mouth a scrap near the camera would cover the whole picture)
-        if (m === 'mouth' && Math.hypot(_o[0] - shift - cx, _o[2] - cz) < 70) return;
-        _ps.set(_o[0] - shift, _o[1], _o[2]); _sc.set(big, big * (0.2 + 0.5 * H(id, 114)), Math.max(0.03, big * (kind === 'palm' ? 0.14 : 0.06))); _mt.compose(_ps, _q, _sc); deb.setMatrixAt(n, _mt);
-        const c = D[3][(id * 7) % D[3].length], sh = 0.4 + 0.6 * litAt(_o[0], _o[1]); deb.setColorAt(n, _col.setRGB(c[0] * sh, c[1] * sh, c[2] * sh)); n++;
+        // (and a plate close to any camera is a blur across the picture)
+        if (Math.hypot(_o[0] - shift - cx, _o[1] - cy, _o[2] - cz) < (m === 'mouth' ? 70 : m === 'heat' || m === 'wind' ? 20 : 7)) return;
+        _ps.set(_o[0] - shift, _o[1], _o[2]); // (a palm: lengths of trunk and torn fronds; everything else: plates)
+        if (kind === 'palm') { if (id % 3 === 0) _sc.set(big, 0.24, 0.24); else _sc.set(big * 0.9, 0.42, 0.04); } else _sc.set(big, big * (0.2 + 0.5 * H(id, 114)), Math.max(0.03, big * 0.06));
+        _mt.compose(_ps, _q, _sc); deb.setMatrixAt(n, _mt);
+        const c = kind === 'palm' ? D[3][id % 3 === 0 ? 0 : 1 + (id % 2)] : D[3][(id * 7) % D[3].length], sh = 0.4 + 0.6 * litAt(_o[0], _o[1]); deb.setColorAt(n, _col.setRGB(c[0] * sh, c[1] * sh, c[2] * sh)); n++;
       };
       for (let hI = 0; hI < ES_HITS.length; hI++) {
-        const h = ES_HITS[hI], u = s - h.s; if (u <= 0) break; if (u > 0.7 || far(h.x, h.z) > 520) continue;
-        const D = DEB[h.kind], spread = h.kind === 'palm' ? 0 : h.kind === 'shed' ? 0.05 : 0.03;     // (a long thing breaks up as it is fed in)
+        const h = ES_HITS[hI], u = s - h.s; if (u <= 0) break; if (u > (h.kind === 'palm' ? 0.3 : 0.7) || far(h.x, h.z) > 520) continue;
+        const D = DEB[h.kind], spread = h.kind === 'palm' ? 0.004 : h.kind === 'shed' ? 0.05 : h.kind === 'house' ? 0.02 : 0.03;     // (a long thing breaks up as it is fed in)
         for (let j = 0; j < D[0] && n < NDEB - 100; j++) { const id = hI * 61 + j, a = u - spread * H(id, 101); if (a > 0) piece(id, h.kind, a, h.x, h.y, h.z, false); }
       }
       { const u = s - P.ferryHit; if (u > 0 && u < 0.7 && far(F.quay.x, F.ferry.z) < 520) for (let j = 0; j < DEB.ferry[0] && n < NDEB; j++) { const id = 9001 + j, a = u - 0.12 * H(id, 101); if (a > 0) piece(id, 'ferry', a, F.quay.x - 1.5, 9, F.ferry.z, true); } }

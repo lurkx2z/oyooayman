@@ -1,5 +1,5 @@
 /* =====================================================================
-   SKY SET — an airliner at 10 km, heading east, 0.8 s into the second. The air never stopped, so nothing has happened
+   SKY SET — an airliner at 10 km, heading east, 0.85 s into the second. The air never stopped, so nothing has happened
    to it: plane and air still move together. Far below: the coast (the sea's wall is a white line with a shadow 2.6 km
    long behind it), the town's dust, the hill's fire.
    Set coordinates: the airliner at the origin, nose to +x (east); the ground at y = −10,000.
@@ -111,12 +111,11 @@ ES_SETS.sky = (app) => {
       this._s = s; this._shot = shot;
       // (in 0.06 s the airliner covers 40 m more than the air around it: it hangs there; only the camera drifts)
       plane.rotation.z = 0.018 * Math.sin(u * 0.5); plane.rotation.x = 0.012 * Math.sin(u * 0.37 + 1);
-      // 'sky': beside it, drawing level; 'skyB': over it, looking down past its wing at the coast
-      const B = shot.mode === 'skyB';
-      const p = B ? [esLerp(-30, -12, k), esLerp(34, 44, k), esLerp(-16, -9, k)] : [esLerp(-46, -24, k), esLerp(15, 8, k), esLerp(-34, -30, k)], at = B ? [esLerp(60, 110, k), esLerp(-40, -70, k), 14] : [5, -2.5, 3];
+      // beside it, drawing level
+      const p = [esLerp(-54, -22, k), esLerp(18, 7, k), esLerp(-40, -28, k)], at = [2, 4.5, 3];      // (the airliner sits low and right, clear of the boxes)
       const dr = esDrift(t, 0.25, 0.25, 5);
       cam.near = 1; cam.far = 90000;
-      esCam(cam, [p[0] + dr[0], p[1] + dr[1], p[2] + dr[2]], at, B ? esLerp(44, 40, k) : esLerp(40, 37, k));
+      esCam(cam, [p[0] + dr[0], p[1] + dr[1], p[2] + dr[2]], at, esLerp(41, 36, k));
       S.sun.target.position.set(0, 0, 0); S.sun.target.updateMatrixWorld();
       // the contrails: two lines of ice behind the engines
       fx.begin();

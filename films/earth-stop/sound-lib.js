@@ -93,15 +93,15 @@ function esCurve(f, hz = 200) {
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
 const ES_PLACE = {
-  inside: ['inside', 'question'], train: ['wheels', 'pass', 'energy', 'ahead', 'count', 'cab', 'still', 'grip', 'reach'],
-  hill: ['first', 'firstB', 'hill', 'rock', 'shed', 'siding', 'wagons', 'impact', 'impact2', 'wind', 'heat', 'over', 'mouth', 'twist'],
-  sea: ['sea', 'seaLit', 'quay', 'ferry', 'up', 'twistSea'], high: ['townAir', 'shores', 'short'],
+  inside: ['inside', 'question'], train: ['wheels', 'pass', 'energy', 'ahead', 'count', 'cab', 'still', 'grip', 'reach', 'short'],
+  hill: ['first', 'firstB', 'hill', 'shed', 'siding', 'wagons', 'impact', 'impact2', 'wind', 'heat', 'over', 'mouth', 'twist', 'sweep'],
+  sea: ['quay', 'foot', 'ferry', 'up'],
 };
 function esWhereShot(sh) { if (sh.where) return sh.where; if (sh.set === 'sky') return 'cabin'; for (const [k, v] of Object.entries(ES_PLACE)) if (v.includes(sh.mode)) return k; return 'station'; }
 // the film as places: [{ t0, t1, where, shot }] in order
 function esPlaces() {
   if (esPlaces._c) return esPlaces._c;
-  return (esPlaces._c = ES_SHOTS.map((sh) => ({ t0: Math.max(-2, sh.t0), t1: Math.min(sh.t1, ES.end + 5), where: esWhereShot(sh), shot: sh })));
+  return (esPlaces._c = ES_SHOTS.map((sh) => ({ t0: Math.max(-2, sh.t0), t1: Math.min(sh.t1, ES.tHit), where: esWhereShot(sh), shot: sh })));
 }
 // 0…1 over the shots at a place (or a list of modes), with a short crossfade at each cut
 function esPlaceAt(where, xf = 0.05) {

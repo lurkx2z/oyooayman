@@ -16,20 +16,21 @@ const path = require('path');
 const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
-  title: 0.05, start: 0.9, first: 0.7, speed: 1.4, people: 1.4, bolts: 1.4, town: 1.4, train: 1.6, energy: 1.4, hill: 1.4, depot: 1.4, wind: 3.0, sea: 2.0, up: 1.6,
-  fall: 1.4, sky: 1.4, count: 1.2, back: 1.6, twist: 2.4, question: 1.2,
+  title: 0.05, start: 0.5, first: 0.7, speed: 1.2, bolts: 1.2, town: 1.2, people: 1.2, train: 1.4, energy: 1.2, hill: 1.2, depot: 1.2, wind: 2.6, sea: 1.6, up: 1.4,
+  fall: 1.2, sky: 1.0, count: 1.0, back: 1.6, twist: 2.0, question: 1.0,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'first:1': 0.8, 'speed:1': 1.6, 'people:1': 0.8, 'people:2': 1.0, 'people:3': 1.2, 'town:1': 0.6, 'town:2': 0.6, 'bolts:1': 0.6, 'bolts:2': 0.8, 'train:1': 0.8, 'train:2': 1.2,
-  'energy:1': 0.6, 'hill:1': 0.6, 'hill:2': 1.2, 'depot:1': 0.4, 'depot:2': 1.8, 'wind:1': 1.0, 'wind:2': 1.0,
-  'sea:1': 1.0, 'sea:2': 1.0, 'sea:3': 1.4, 'up:1': 1.4, 'fall:1': 0.8, 'fall:2': 1.0, 'sky:1': 0.6, 'count:1': 0.6, 'count:2': 1.2,
-  'back:1': 1.2, 'back:2': 0.8, 'twist:1': 0.6, 'twist:2': 0.8,
+  'first:1': 0.8, 'speed:1': 1.4, 'bolts:1': 0.6, 'bolts:2': 0.4, 'town:1': 0.6, 'people:1': 0.6, 'people:2': 0.8, 'train:1': 0.6, 'train:2': 0.8,
+  'energy:1': 0.5, 'hill:1': 1.6, 'depot:1': 3.2, 'wind:1': 0.8, 'wind:2': 0.8, 'sea:1': 0.6, 'sea:2': 0.8, 'sea:3': 1.2, 'up:1': 1.0, 'fall:1': 0.8,
+  'count:1': 0.5, 'count:2': 1.0, 'back:1': 1.4, 'back:2': 0.6, 'twist:1': 0.6, 'twist:2': 0.6,
 };
+// a caption that stays longer than its reading time: 'beat:index' → extra s (the question holds over the black after the blast)
+const LONGER = { 'question:0': 2.9 };
 const SECTION_OF = { title: 1, back: 2, twist: 3 };
 const GAP = 0.6;                     // between captions inside a beat
-const TAIL = -0.4;                   // a hard cut while the question is still on screen (nothing signals the end)
-const hold = (s) => Math.min(4.2, Math.max(1.5, 1.0 + 0.05 * s.length));
+const TAIL = 0;                      // the film ends as the question goes
+const hold = (s) => Math.min(5.4, Math.max(1.5, 1.0 + 0.05 * s.length));      // (about 20 characters a second, and a second to find the line)
 const TITLE_HOLD = 3.3;
 const r3 = (x) => Math.round(x * 1000) / 1000;
 
@@ -46,7 +47,7 @@ beats.forEach((B, k) => {
   let c0 = r3(t + (PAUSE[B.id] ?? 0.8));
   const caps = B.caps.map((s, i) => {
     c0 = r3(c0 + (EXTRA[B.id + ':' + i] || 0));
-    const d = B.id === 'title' ? TITLE_HOLD : hold(s), ws = s.split(' ');
+    const d = B.id === 'title' ? TITLE_HOLD : hold(s) + (LONGER[B.id + ':' + i] || 0), ws = s.split(' ');
     const cap = { text: s, show: c0, hide: r3(c0 + d), words: ws.map((w, j) => ({ text: w, start: r3(c0 + 0.7 * d * j / ws.length) })) };
     c0 = r3(c0 + d + GAP);
     return cap;
