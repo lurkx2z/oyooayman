@@ -34,7 +34,8 @@ const ES_CLOCK = (() => {
     [ES.tOn + 0.3, 0.012, 'to'],                           // …slowing…
     [ES.tOn + 1.2, 0.020, 'to'],
     [C('start', 0) + 1.4, 0.026, 'to'],                    // the whole station, gliding off its floor (200 times slower)
-    [B('speed'), 0.062, 'to'],
+    [B('speed'), 0.050, 'to'],
+    [C('speed', 2) - 0.5, 0.065, 'to'],                    // the sea's wall climbing across the Sun (340 times slower)
     [B('bolts'), 0.0975, 'to'],                            // a column's foot skating over the next column's sheared bolts
     [C('bolts', 1) - 0.5, 0.106, 'to'],
     [C('bolts', 2) - 0.8, 0.112, 'to'],                    // the building sliding off its floor

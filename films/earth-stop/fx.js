@@ -68,26 +68,27 @@ function esBuildFx(S, parts) {
 
   // ------------------------------------------------------------------ the sea's wall: three sheets (a shader each)
   const fogU = { fogCol: { value: new THREE.Color('#e8c8a0') }, fogDen: { value: 0.0003 } };
-  const sunU = { value: new THREE.Vector3(...ES_SUN).normalize() }, backU = { value: 1 };
-  const sheet = (seed, a, order) => {
+  const sunU = { value: new THREE.Vector3(...ES_SUN).normalize() }, backU = { value: 1 }, sharpU = { value: 0 };   // (sharpU: 1 on the long lens of the Sun's shot: a harder, finer edge)
+  const sheet = (seed, a, order, rim = 1) => {
     const g = new THREE.PlaneGeometry(9000, 1, 180, 28); g.translate(0, 0.5, 0);
     const m = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
-      uniforms: Object.assign({ uH: { value: 1 }, uX0: { value: F.quay.x }, uLean: { value: 0.3 }, uT: { value: 0 }, uA: { value: a }, uSeed: { value: seed }, uRise: { value: 0 }, uSun: sunU, uBack: backU }, fogU),
+      uniforms: Object.assign({ uH: { value: 1 }, uX0: { value: F.quay.x }, uLean: { value: 0.3 }, uT: { value: 0 }, uA: { value: a }, uSeed: { value: seed }, uRise: { value: 0 }, uSun: sunU, uBack: backU, uSharp: sharpU, uRim: { value: rim } }, fogU),
       vertexShader: `uniform float uH, uX0, uLean, uT, uSeed; varying vec2 vUv; varying vec3 vW; varying float vD;
         void main(){ vUv = uv; float h = uv.y * uH, zz = position.x;
           float wob = (sin(zz * 0.013 + uv.y * 5.0 + uT * 0.7 + uSeed) * 0.012 + sin(zz * 0.041 + uT + uSeed * 3.0) * 0.006) * uH * (0.3 + uv.y);
           vec3 w = vec3(uX0 + uLean * pow(uv.y, 1.7) * uH + wob, h - 4.0, zz);
           vW = w; vec4 mv = viewMatrix * vec4(w, 1.0); vD = -mv.z; gl_Position = projectionMatrix * mv; }`,
-      fragmentShader: `uniform float uH, uT, uA, uSeed, uRise, uBack, fogDen; uniform vec3 fogCol, uSun; varying vec2 vUv; varying vec3 vW; varying float vD; ${ES_FXGLSL}
+      fragmentShader: `uniform float uH, uT, uA, uSeed, uRise, uBack, uSharp, uRim, fogDen; uniform vec3 fogCol, uSun; varying vec2 vUv; varying vec3 vW; varying float vD; ${ES_FXGLSL}
         void main(){
           float yy = vW.y - uRise;                                                    // (the pattern is carried up with the water)
           vec2 q = vec2(vW.z * 0.021 + uSeed * 7.0, yy * 0.0055);
           float n = fbm(q), n2 = fbm(q * vec2(3.3, 0.5) + 5.0 + uSeed), n3 = fbm(vec2(vW.z * 0.17, yy * 0.028) + uSeed * 3.0), n4 = fbm(vec2(vW.z * 0.6, yy * 0.05) + 9.0);
           float crest = fbm(vec2(vW.z * 0.0045 + uSeed * 3.0, 0.3)) - 0.5;            // (its top's height wanders along the shore)
-          float rag = vUv.y + crest * 0.3 + (n - 0.5) * 0.12 + (n3 - 0.5) * 0.08 + (n4 - 0.5) * 0.04;
-          float top = 1.0 - smoothstep(0.86, 0.97, rag);                              // torn at the top
-          float thick = 1.0 - smoothstep(0.74, 0.9, rag);                            // 1: the body of water · 0: spray
+          float n5 = fbm(vec2(vW.z * 2.6 + uSeed * 11.0, yy * 0.33));                         // (fine teeth: they only show on the long lens)
+          float rag = vUv.y + crest * 0.3 + (n - 0.5) * 0.12 + (n3 - 0.5) * 0.08 + (n4 - 0.5) * 0.04 + (n5 - 0.5) * 0.022 * uSharp;
+          float top = 1.0 - smoothstep(mix(0.86, 0.9, uSharp), mix(0.97, 0.908, uSharp), rag);                              // torn at the top
+          float thick = 1.0 - smoothstep(mix(0.74, 0.878, uSharp), mix(0.9, 0.9, uSharp), rag);                            // 1: the body of water · 0: spray
           float veins = smoothstep(0.5, 0.78, n2 * 0.62 + n3 * 0.4 + n4 * 0.12);      // white water running up it
           float mist = 1.0 - smoothstep(0.0, 0.16, vUv.y + (n3 - 0.5) * 0.1);         // white water at its foot
           vec3 body = mix(vec3(0.03, 0.115, 0.125), vec3(0.11, 0.3, 0.3), n * 0.9);
@@ -100,7 +101,7 @@ function esBuildFx(S, parts) {
           // the dark side: slate water, its foam grey; only the spray torn off its top is full of the sun
           vec3 dark = mix(body * 0.2, vec3(0.1, 0.125, 0.15), veins * (0.5 + 0.5 * n4));
           dark = mix(dark, vec3(0.2, 0.235, 0.27), mist * 0.8);
-          dark = mix(dark, sunC * (0.8 + 2.8 * toSun) * (0.5 + 0.7 * n3), (1.0 - thick) * 0.95);
+          dark = mix(dark, mix(vec3(0.17, 0.2, 0.235), sunC * (0.8 + 2.8 * toSun) * (0.5 + 0.7 * n3), uRim), (1.0 - thick) * 0.95);   // (uRim: only the tallest sheet's top is in the sun)
           vec3 col = mix(lit, dark, back);
           float a = uA * top * mix(0.5, 1.0, thick) * smoothstep(0.0, 0.004, vUv.y);
           a = min(1.0, a + back * thick * top * 0.3);
@@ -110,7 +111,7 @@ function esBuildFx(S, parts) {
     return o;
   };
   // (the sheets' geometry runs along x: the shader lays it out along z itself)
-  const wall = [sheet(0.11, 0.96, 3), sheet(0.57, 0.8, 3.2), sheet(0.83, 0.7, 2.8)];
+  const wall = [sheet(0.11, 0.96, 3), sheet(0.57, 0.8, 3.2, 0.12), sheet(0.83, 0.7, 2.8, 0.12)];
   // what throws the wall's shadow: an unseen sheet standing where the wall stands (it writes no colour and no depth;
   // the sun's shadow map draws it), with a ragged top
   const caster = (() => {
@@ -361,6 +362,7 @@ function esBuildFx(S, parts) {
         o.visible = s > 0.0005;
       });
       caster.visible = s > 0.0005; caster.scale.y = Hh; caster.position.x = _xw;
+      sharpU.value = m === 'sun' ? 1 : 0;
       backU.value = MathX.smooth(cx - (F.quay.x - shift + 0.3 * Hh * Math.pow(MathX.clamp(cy / Hh, 0, 1), 1.7)), -8, 8);
       foam.material.uniforms.uA.value = 0.8 * MathX.smooth(s, 0, 0.05) * (1 - MathX.smooth(s, 1, 1.2)); foam.material.uniforms.uX.value = X; foam.material.uniforms.uW.value = 30 + 130 * MathX.smooth(s, 0, 0.4);
       foam.visible = s > 0;

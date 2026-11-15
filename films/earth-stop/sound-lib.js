@@ -1,8 +1,8 @@
 /* =====================================================================
    SOUND · LIB — the noise and filter generators the ambience and effects share (the gravity films' sound kit, via the
-   light films), where the camera is (the river and the yard, inside your boat, the hospital, the bridge, the hill of
-   wind turbines, high over the river), and how fast the world's own sounds run. Every function here is listed in
-   ES_SOUND_FNS at the end, so the baked soundtrack's fingerprint sees a change to any of them.
+   light films), where the camera is (the platform, beside your train, inside it, the hill, the harbour, high up, the
+   airliner's cabin), and how fast the world's own sounds run. Every function here is listed in ES_SOUND_FNS at the
+   end, so the baked soundtrack's fingerprint sees a change to any of them.
    ===================================================================== */
 
 // ---- shared generators -------------------------------------------------------------------------------------------
@@ -93,9 +93,13 @@ function esCurve(f, hz = 200) {
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
 const ES_PLACE = {
-  inside: ['inside'], bridge: ['bridge', 'bridgeWide'], hill: ['turbines', 'blades'], high: ['reach', 'boatAir', 'close'],
+  inside: ['inside', 'question'],
+  train: ['wheels', 'pass', 'energy', 'ahead', 'count', 'cab', 'still', 'second', 'reach'],
+  hill: ['hill', 'palms', 'wagons', 'impact', 'wind', 'heat', 'over', 'twist'],
+  sea: ['sea', 'quay', 'ferry', 'up', 'twistSea'],
+  high: ['globe', 'townAir', 'shores', 'short'],
 };
-function esWhereShot(sh) { if (sh.where) return sh.where; if (sh.set === 'mri') return 'hospital'; for (const [k, v] of Object.entries(ES_PLACE)) if (v.includes(sh.mode)) return k; return 'river'; }
+function esWhereShot(sh) { if (sh.where) return sh.where; if (sh.set === 'sky') return 'cabin'; for (const [k, v] of Object.entries(ES_PLACE)) if (v.includes(sh.mode)) return k; return 'station'; }
 // the film as places: [{ t0, t1, where, shot }] in order
 function esPlaces() {
   if (esPlaces._c) return esPlaces._c;
@@ -130,12 +134,6 @@ function esScrape(fx, d, o = {}) {
   ESX.bq(y, 'bp', o.f || 700, o.q || 0.9, sr); ESX.bq(y, 'lp', (o.f || 700) * 3.5, 0.7, sr);
   return y;
 }
-// a car alarm: two tones swapping (o.f1, o.f2), on a pulse
-function esAlarm(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), f1 = o.f1 || 960, f2 = o.f2 || 760, per = o.per || 0.36;
-  let ph = 0; for (let i = 0; i < n; i++) { const t = i / sr, k = Math.floor(t / per) % 2, f = k ? f1 : f2; ph += 2 * Math.PI * f / sr; y[i] = (Math.sin(ph) + 0.3 * Math.sin(3 * ph)) * Math.min(1, t / 0.05, (d - t) / 0.2) * (0.85 + 0.15 * Math.sin(2 * Math.PI * t / per)); }
-  ESX.bq(y, 'bp', 1100, 0.6, sr); return y;
-}
 // a crack (stone, masonry): a broadband snap, a splintering crackle, a ringing body
 function esCrack(fx, o = {}) {
   const sr = fx.sr, d = o.len || 1.6, y = fx.arr(d), r = fx.r;
@@ -143,92 +141,46 @@ function esCrack(fx, o = {}) {
   const b = fx.hit(fx.stoneModes(o.s || 0.7), { width: 0.002, amp: 0.8, noise: 0.2, nlen: 0.05, nhp: 300, len: d }); for (let i = 0; i < Math.min(b.length, y.length); i++) y[i] += b[i] * 0.8;
   return y;
 }
-// the beach party's song: a little pop song (G D Em C at 112 bpm: kick, snare, hats, bass, off-beat chords, a tune),
-// through a small speaker. o.offset: where in the song it starts (s)
-function esPartySong(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), beat = 60 / 112, bar = 4 * beat, t0 = o.offset || 0, r = new RNG(77);
-  const prog = [[55, 62, 67, 71], [50, 57, 62, 66], [52, 59, 64, 67], [48, 55, 60, 64]];
-  const mel = [71, 74, 76, 74, 71, 69, 67, 69, 66, 69, 71, 69, 66, 64, 62, 64, 67, 71, 74, 71, 67, 66, 64, 66, 64, 67, 72, 71, 69, 67, 64, 62];
-  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
-  let pb = 0, pm = 0;
-  for (let i = 0; i < n; i++) {
-    const t = i / sr + t0, b = Math.floor(t / bar) % 4, inBar = t % bar, e8 = t % (beat / 2), ch = prog[b];
-    let v = 0;
-    const kb = inBar % (2 * beat); if (kb < 0.25) v += 0.9 * Math.sin(2 * Math.PI * (50 * kb + 70 / 12 * (1 - Math.exp(-kb * 12)))) * Math.exp(-kb * 14);
-    const sb = (inBar + beat) % (2 * beat); if (sb < 0.2) v += 0.35 * (r.next() * 2 - 1) * Math.exp(-sb * 25);
-    if (e8 < 0.05) v += 0.12 * (r.next() * 2 - 1) * Math.exp(-e8 * 90);
-    pb += 2 * Math.PI * hz(ch[0] - 12) / sr; v += 0.35 * Math.sin(pb) * Math.exp(-e8 * 6);
-    const ob = (t + beat / 2) % beat; if (ob < 0.18) for (const m of ch.slice(1)) v += 0.07 * Math.sign(Math.sin(2 * Math.PI * hz(m) * t)) * Math.exp(-ob * 16);
-    const mi = Math.floor(t / beat) % 32, mt = t % beat; pm += 2 * Math.PI * hz(mel[mi]) / sr; v += 0.2 * (Math.sin(pm) + 0.3 * Math.sin(2 * pm)) * Math.min(1, mt / 0.01) * Math.exp(-mt * 2.5);
-    y[i] = v;
-  }
-  ESX.bq(y, 'hp', 320, 0.7, sr); ESX.bq(y, 'lp', 3600, 0.7, sr); ESX.bq(y, 'pk', 1400, 1.0, sr, 4);
-  for (let i = 0; i < n; i++) y[i] = Math.tanh(1.6 * y[i]);
-  return y;
-}
-
-// ---- how fast the world's own sounds run (the picture's slow motion, made audible): 1 at real speed; a quarter while
-// the clock crawls (any slower and they would sink below hearing); rising through the count; snapping back at 10:42:10
+// ---- how fast the world's own sounds run (the picture's slow motion, made audible): 1 at real speed before 5:42:00;
+// from then on the film runs hundreds of times slower than life, and a sound that slow would sink far below hearing,
+// so the world's sounds play at three tenths of their speed (1.7 octaves down, three times longer) to the last frame
 function esWorldRate(t) {
-  const T0 = ES.tOn, tc = esB('count'), tb = esFilmAt(ESP.T);
+  const T0 = ES.tOn;
   if (t < T0) return 1;
-  if (t < T0 + 1.6) return 1 - 0.75 * MathX.smooth(t, T0, T0 + 1.6);
-  if (t < tc) return 0.25;
-  if (t < tb) return 0.25 + 0.17 * (t - tc) / (tb - tc);
-  if (t < tb + 0.4) return 0.42 + 0.58 * MathX.smooth(t, tb, tb + 0.4);
-  return 1;
+  if (t < T0 + 0.8) return 1 - 0.7 * MathX.smooth(t, T0, T0 + 0.8);
+  return 0.3;
 }
-// a reed pipe's wave (one period, 2048 samples): odd harmonics strong, even ones softer (a fairground organ)
-const ES_REED = (() => { const n = 2048, y = new Float32Array(n); for (let i = 0; i < n; i++) { const p = 2 * Math.PI * i / n; let v = 0; for (let k = 1; k <= 12; k++) v += (k % 2 ? 1 : 0.45) * Math.sin(k * p) / Math.pow(k, 0.95); y[i] = v * 0.5; } return y; })();
-// the carousel's band organ: a waltz in C at 168 bpm (an oom-pah-pah bass, reedy chords, a pipe melody, a glockenspiel
-// on the first beat), its clock running at rate(t): slowed, the waltz drags and sinks like a tape running down
-function esOrgan(fx, t0, t1, rate, o = {}) {
-  const sr = fx.sr, n = Math.ceil((t1 - t0) * sr), L = new Float32Array(n), R = new Float32Array(n), W = ES_REED, WN = W.length;
-  const beat = 60 / 168, prog = [[36, 52, 55, 60], [36, 52, 55, 60], [43, 50, 53, 59], [43, 50, 53, 59], [41, 53, 57, 60], [41, 53, 57, 60], [43, 50, 53, 59], [36, 52, 55, 60]];
-  const mel = [67, 72, 76, 79, 76, 72, 74, 71, 67, 65, 67, 71, 69, 72, 77, 81, 77, 72, 74, 71, 67, 72, 67, 64];   // one note a beat, 8 bars
-  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12), ph = new Float64Array(6);
-  let u = (o.offset || 0), r = rate(t0), glk = 0, gph = 0;
-  for (let i = 0; i < n; i++) {
-    if ((i & 63) === 0) r = rate(t0 + i / sr);
-    u += r / sr;
-    const b = Math.floor(u / beat), w = (u - b * beat) / beat, bar = Math.floor(b / 3) % 8, bb = b % 3, ch = prog[bar];
-    let l = 0, rr = 0;
-    // the bass on one, the chord on two and three ("pah"), short and bright
-    { const f = hz(ch[0] - 12) * r; ph[0] = (ph[0] + f * WN / sr) % WN; const e = bb === 0 ? Math.exp(-w * 2.2) : 0; const v = W[ph[0] | 0] * e * 0.55; l += v; rr += v; }
-    if (bb > 0) { const e = Math.min(1, w * 40) * Math.exp(-w * 5); for (let k = 1; k < 4; k++) { const f = hz(ch[k]) * r; ph[k] = (ph[k] + f * WN / sr) % WN; const v = W[ph[k] | 0] * e * 0.16; l += v * (k === 1 ? 1.2 : 0.8); rr += v * (k === 3 ? 1.2 : 0.8); } }
-    // the melody (a pipe with a slow tremolo), legato
-    { const m = mel[b % 24], f = hz(m) * r; ph[4] = (ph[4] + f * (1 + 0.004 * Math.sin(u * 37)) * WN / sr) % WN; const e = Math.min(1, w * 25) * (0.75 + 0.25 * Math.exp(-w * 3)); const v = W[ph[4] | 0] * e * 0.3; l += v * 0.9; rr += v * 1.1; }
-    // a glockenspiel strike on each bar's first beat
-    if (bb === 0 && w < 0.004) { glk = 1; gph = 0; }
-    if (glk > 0.001) { gph += 2 * Math.PI * hz(mel[b % 24] + 12) * r / sr; const v = Math.sin(gph) * glk * 0.22; l += v; rr += v; glk *= Math.exp(-4 * r / sr); }
-    L[i] = l; R[i] = rr;
-  }
-  ESX.bq(L, 'lp', o.lp || 5200, 0.7, sr); ESX.bq(R, 'lp', o.lp || 5200, 0.7, sr);
-  return [L, R];
-}
-// a voice (a cry, a gasp, a groan): glottal pulses at f0(u) through formants [[f, q, a]] (all scaled by k: a slowed
-// voice drops in pitch), with breath; env(u)
-function esVoice(fx, d, o = {}) {
-  const sr = fx.sr, n = Math.ceil(d * sr), r = fx.r, src = new Float32Array(n), k = o.k || 1, f0 = o.f0 || (() => 300), wv = fx.wander(3);
-  let ph = 0; for (let i = 0; i < n; i++) { const u = i / n; ph += f0(u) * k * (1 + 0.025 * wv(i / sr)) / sr; if (ph >= 1) { ph -= 1; src[i] = 1; } src[i] += (r.next() * 2 - 1) * (o.breath ?? 0.08); }
-  const y = new Float32Array(n), F = o.formants || [[800, 5, 1], [1250, 6, 0.6], [2700, 7, 0.3]];
-  for (const [f, q, a] of F) { const z = Float32Array.from(src); ESX.bq(z, 'bp', f * k, q, sr); for (let i = 0; i < n; i++) y[i] += z[i] * a; }
-  const env = o.env || ((u) => Math.min(1, u / 0.15) * Math.pow(1 - u, 0.8));
-  for (let i = 0; i < n; i++) y[i] *= env(i / n);
+// a blast (a wagon of fuel meeting rock, a hull meeting a quay, the ground stopping): a thump that falls from o.f0 to
+// o.f1, a burst of dark noise whose brightness closes (o.bright Hz at the start), a crack on top; o.len, o.tau
+function esBoom(fx, o = {}) {
+  const sr = fx.sr, d = o.len || 5, n = Math.ceil(d * sr), y = new Float32Array(n), f0 = o.f0 || 62, f1 = o.f1 || 24, tau = o.tau || d * 0.22;
+  let ph = 0; for (let i = 0; i < n; i++) { const t = i / sr, f = f1 + (f0 - f1) * Math.exp(-t / 0.18); ph += 2 * Math.PI * f / sr; y[i] = Math.sin(ph) * Math.exp(-t / tau) * Math.min(1, t / 0.004); }
+  const b = o.bright || 2600, z = esSweep(esNoise(fx, n, 'brown'), sr, 'lp', 0.7, [b, b * 0.35, b * 0.15, 200, 120, 90]), pz = ESX.peak(z) || 1;
+  for (let i = 0; i < n; i++) { const t = i / sr; y[i] += (o.noise ?? 0.9) * z[i] / pz * (Math.exp(-t / (tau * 0.6)) + 0.35 * Math.exp(-t / (tau * 2))) * Math.min(1, t / 0.002) * Math.min(1, (d - t) / 0.3); }
+  if (o.crack !== 0) { const c = fx.white(Math.ceil(0.06 * sr)); ESX.bq(c, 'hp', 500, 0.7, sr); for (let i = 0; i < c.length; i++) y[i] += (o.crack ?? 0.6) * c[i] * Math.exp(-i / (0.007 * sr)); }
   return y;
 }
-// a crowd crying out: many voices, staggered, of every pitch (k < 1: slowed), spread across the stereo field; o.form(r)
-// their vowels ([[f, q, a]]), o.env(u) each voice's shape
-function esCrowdCry(K, t, o = {}) {
-  const fx = K.fx, r = fx.r, k = o.k || 1, N = o.n || 16, d = (o.d || 1.6) / k, Ls = fx.arr(d + (o.spread || 0.8) / k + 0.1), Rs = fx.arr(d + (o.spread || 0.8) / k + 0.1);
-  for (let v = 0; v < N; v++) {
-    const f = r.range(o.lo || 260, o.hi || 640), dd = d * r.range(0.6, 1.1), on = r.range(0, (o.spread || 0.8) / k), fm = r.range(0.9, 1.2);
-    const y = esVoice(fx, dd, { k, f0: (u) => f * (1 + 0.18 * Math.sin(Math.PI * u) * fm - 0.1 * u), formants: o.form ? o.form(r) : [[r.range(700, 950), 5, 1], [r.range(1100, 1500), 6, 0.6], [r.range(2500, 3000), 7, 0.25]], breath: o.breath ?? 0.15,
-      env: o.env || ((u) => Math.min(1, u / 0.12) * Math.pow(1 - u, 1.1)) });
-    const pan = r.range(-0.8, 0.8), gL = Math.cos((pan + 1) * Math.PI / 4), gR = Math.sin((pan + 1) * Math.PI / 4), i0 = Math.round(on * fx.sr), a = r.range(0.4, 1);
-    for (let i = 0; i < y.length && i0 + i < Ls.length; i++) { Ls[i0 + i] += y[i] * gL * a; Rs[i0 + i] += y[i] * gR * a; }
+// steel skidding on steel: noise chopped by stick-slip (o.rate Hz, wandering) through a few narrow inharmonic
+// resonances on o.f (Hz); o.env(u) its level, o.bend(u) its pitch (1 = o.f)
+function esScreech(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), src = esNoise(fx, n, 'pink'), y = new Float32Array(n), w = fx.wander(o.wr || 0.5), f = o.f || 900, env = o.env || (() => 1);
+  let ph = 0; for (let i = 0; i < n; i++) { ph += (o.rate || 60) * (1 + 0.3 * w(i / sr)) / sr; src[i] *= 0.3 + 0.7 * Math.pow(Math.abs(Math.sin(Math.PI * ph)), 3); }
+  const N = 24, bend = o.bend || (() => 1);
+  for (const [k, q, a] of (o.modes || [[1, 28, 1], [1.37, 36, 0.7], [2.09, 40, 0.5], [2.93, 44, 0.35], [4.2, 36, 0.2]])) {
+    const z = esSweep(src, sr, 'bp', q, Array.from({ length: N }, (_, j) => f * k * bend(j / (N - 1))));
+    for (let i = 0; i < n; i++) y[i] += z[i] * a;
   }
-  return K.putLR(Ls, Rs, t, { vol: o.vol ?? 0.5, norm: true, room: o.room, wet: o.wet });
+  for (let i = 0; i < n; i++) y[i] *= env(i / n) * Math.min(1, i / (0.03 * sr), (n - i) / (0.03 * sr));
+  return y;
+}
+// something huge going by (your train, a wall of air): band noise whose band and level rise and fall, crossing from
+// one side to the other. Stereo [L, R]; o.f [f at the start, at the middle, at the end], o.from/o.to pans
+function esPassBy(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), f = o.f || [220, 700, 240], N = 32;
+  const cv = Array.from({ length: N }, (_, j) => { const u = j / (N - 1); return u < 0.5 ? f[0] + (f[1] - f[0]) * MathX.smooth(u, 0, 0.5) : f[1] + (f[2] - f[1]) * MathX.smooth(u, 0.5, 1); });
+  const x = esSweep(esNoise(fx, n, o.colour || 'pink'), sr, 'bp', o.q || 0.8, cv), L = new Float32Array(n), R = new Float32Array(n), a = o.from ?? -0.8, b = o.to ?? 0.8, pk = o.peak ?? 0.5;
+  for (let i = 0; i < n; i++) { const u = i / n, e = Math.exp(-Math.pow((u - pk) / (o.w || 0.22), 2)), pan = a + (b - a) * MathX.smooth(u, pk - 0.25, pk + 0.25), th = (pan + 1) * Math.PI / 4; L[i] = x[i] * e * Math.cos(th); R[i] = x[i] * e * Math.sin(th); }
+  return [L, R];
 }
 // a bed whose filters follow the world's speed (esWorldRate, or o.rate): slowed, the same noise sinks and darkens, and
 // its flutter slows with it. o.f: [[type, f, q]] (f at real speed), the rest as esBed
@@ -250,4 +202,4 @@ function esBedW(K, t0, t1, o = {}) {
   if (o.mono) return K.put(mk(), t0, { vol, norm: true, pan: o.pan || 0, room: o.room, wet: o.wet });
   return K.putLR(mk(), mk(), t0, { vol, norm: true, room: o.room, wet: o.wet });
 }
-const ES_SOUND_FNS = [esBedW, esWorldRate, esOrgan, esVoice, esCrowdCry, esPartySong, esNoise, esBed, esTone, esChirp, esCrackle, esSweep, esSweepPut, esAddAt, esPlaceAt, esSeen, esSlowK, esCurve, esWhereShot, esPlaces, esRoll, esScrape, esAlarm, esCrack, esEv, esWn];
+const ES_SOUND_FNS = [esBedW, esWorldRate, esBoom, esScreech, esPassBy, esNoise, esBed, esTone, esChirp, esCrackle, esSweep, esSweepPut, esAddAt, esPlaceAt, esSeen, esSlowK, esCurve, esWhereShot, esPlaces, esRoll, esScrape, esCrack, esEv, esWn];

@@ -63,7 +63,7 @@ ES_SETS.coast = (app) => {
       // in the fire's light
       const f = Math.min(1, (this._fireL || 0) / 2);
       p.warmth += 0.05 * f; p.bloom += 0.1 * f;
-      if (m === 'sun') { const k = MathX.smooth(t, this._shot.t0 + 1.5, this._shot.t1 - 0.5); p.exposure = 0.42 + 0.5 * k; p.bloom = 0.5 - 0.2 * k; p.bloomThreshold = 0.9; p.saturation = 1.2; }
+      if (m === 'sun') { const k = MathX.smooth(t, this._shot.t0 + 1.5, this._shot.t1 - 0.5); p.exposure = 0.5 + 0.14 * k; p.bloom = 0.42; p.bloomThreshold = 0.9; p.saturation = 1.2; p.vignette = 0.56; }
       if (m === 'question') { const k = MathX.smooth(t, this._shot.t0, ES.end); p.warmth += 0.06 * k; p.bloom += 0.12 * k; }
       if (m === 'inside' || m === 'question') { p.vignette = 0.5; }
       if (m === 'wheels') p.exposure += 0.22;
@@ -75,6 +75,8 @@ ES_SETS.coast = (app) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // THE CAMERAS (v: p, at, fov, drift, shake, near, far, shadowR, sat = where the shadow box sits if not at `at`)
 // ---------------------------------------------------------------------------------------------------------------------
+// the Sun's shot: the share of the wall's height that is solid where the camera's line to the Sun meets it; the camera's z
+const ES_SUNSHOT = { top: 0.86, z: 2.2, turn: -2.1 };
 function esCoastCam(set, m, s, t, kk, u, shot, v) {
   const P = ESP, F = ES_F, X = P.X(s), N = P.nose(s), Tr = set.Tr, St = set.St, d = Math.min(shot.t1, ES.end) - shot.t0, K = (a = 0, b = d) => esK(u, a, b);
   const eye = (lx = 4.9, ly = 1.22, lz = -0.78) => Tr.seat(lx, ly, lz);
@@ -89,12 +91,17 @@ function esCoastCam(set, m, s, t, kk, u, shot, v) {
     }
     case 'lurch': { const k = K(); v.p = [L(58, 74, k), L(21, 25, k), 96]; v.at = [-44, 5, -6]; v.fov = 40; v.near = 1; v.shadowR = 150; v.drift = 0.02; break; }
     case 'globe': { const k = K(); v.p = [L(330, 300, k), L(300, 284, k), L(430, 400, k)]; v.at = [-90, 0, -20]; v.fov = 40; v.near = 5; v.shadowR = 480; v.drift = 0.05; v.fog = 0.0001; break; }
-    case 'glide': { v.p = [-3.0 + X, PH + 1.62, -2.35]; v.at = [-60 + X, 3.0, -3.5]; v.fov = 54; v.near = 0.1; v.drift = 0.012; v.shadowR = 50; v.sat = [-22 + X, 0, -3]; break; }
+    // travelling with the station, from above: the roofs, the train and the people look as they always did; only the
+    // ground is going by underneath
+    case 'glide': { const k = K(); v.p = [-38 + X, L(19, 17, k), 27]; v.at = [-68 + X, 2.5, -4.5]; v.fov = 42; v.near = 0.5; v.drift = 0.012; v.shadowR = 90; v.sat = [-60 + X, 0, -4]; break; }
     case 'sun': {
-      // from 9 m up over the tracks the train has left, straight at the sun: at the shot's start the sea's wall is just
-      // under its lower limb; by its end the sun is gone
-      const s0 = esStoryAt(shot.t0), y = 9, d = (0.75 * P.wallH(s0) - y) / Math.tan(MathX.deg(5.1)), p = [F.quay.x + d * -ES_SUN[0] / Math.hypot(ES_SUN[0], ES_SUN[2]), y, 2.2];
-      v.p = p; v.at = [p[0] + ES_SUN[0] * 400, p[1] + ES_SUN[1] * 400 + L(2, 10, K()), p[2] + ES_SUN[2] * 400]; v.fov = L(22, 19, K()); v.near = 1; v.drift = 0.004; v.shadowR = 120; v.sat = [p[0] - 40, 0, 4]; break;
+      // a long lens from 9 m up over the tracks the train has left, straight at the Sun: the sea's wall climbs across
+      // it (the camera stands where the wall's top crosses the Sun's middle halfway through the shot)
+      const sc = esStoryAt(shot.t0 + 0.47 * d), y = 9, hz = Math.hypot(ES_SUN[0], ES_SUN[2]), el = Math.atan2(ES_SUN[1], hz), k = K();
+      const dh = (ES_SUNSHOT.top * P.wallH(sc) - y) / Math.tan(el), p = [F.quay.x + 0.26 * P.wallH(sc) + dh * -ES_SUN[0] / hz, y, ES_SUNSHOT.z];
+      // (the Sun sits right of the middle, clear of the cards on the left)
+      const ce = el - MathX.deg(L(0.9, 0.3, k)), az = Math.atan2(ES_SUN[2], ES_SUN[0]) + MathX.deg(ES_SUNSHOT.turn);
+      v.p = p; v.at = [p[0] + Math.cos(az) * 400, y + 400 * Math.tan(ce), p[2] + Math.sin(az) * 400]; v.fov = L(10, 8, k); v.near = 1; v.drift = 0.002; v.shadowR = 120; v.sat = [p[0], y, p[2]]; break;
     }
     // ---- the bolts
     case 'bolt': { const k = K(); v.p = [L(-43.75, -43.9, k), PH + L(0.36, 0.3, k), -3.55]; v.at = [-45.25, PH + 0.06, -4.72]; v.fov = 40; v.near = 0.03; v.drift = 0.003; v.shadowR = 14; break; }
@@ -125,7 +132,7 @@ function esCoastCam(set, m, s, t, kk, u, shot, v) {
     case 'impact': { const h = s - P.wagon0; v.p = [569, 3.2, 25]; v.at = [600, L(5, 9, esK(u, 1.5, 5.5)), -9]; v.fov = L(46, 52, esK(u, 1.2, 5.5)); v.near = 0.3; v.drift = 0.01; v.shadowR = 80; if (h > 0) v.shake = 0.09 * Math.exp(-h / 0.012) + 0.012; break; }
     case 'wind': { const k = K(); v.p = [L(452, 460, k), 34, 112]; v.at = [612, 36, -18]; v.fov = 42; v.near = 2; v.drift = 0.03; v.shadowR = 200; v.shake = 0.012; break; }
     case 'heat': { const k = K(); v.p = [L(573, 575, k), 16, 72]; v.at = [604, 23, 12]; v.fov = 40; v.near = 0.5; v.drift = 0.012; v.shadowR = 100; v.shake = 0.008; break; }
-    case 'over': { const k = K(); v.p = [L(320, 340, k), L(150, 160, k), 340]; v.at = [650, 70, -30]; v.fov = 40; v.near = 3; v.drift = 0.04; v.shadowR = 420; v.fog = 0.0002; break; }
+    case 'over': { const k = K(); v.p = [L(440, 456, k), L(92, 100, k), 236]; v.at = [650, 62, -24]; v.fov = 40; v.near = 3; v.drift = 0.04; v.shadowR = 420; v.fog = 0.0002; break; }
     // ---- the sea
     case 'sea': { const k = K(); v.p = [-66, PH + 1.6, -4.4]; v.at = [-250, L(40, 110, k), -2]; v.fov = 58; v.near = 0.2; v.drift = 0.01; v.shadowR = 80; v.shake = 0.006; break; }
     case 'quay': { const k = K(); v.p = [L(-272, -266, k), L(8, 11, k), 150]; v.at = [-253, L(30, 60, k), -60]; v.fov = 52; v.near = 0.5; v.drift = 0.02; v.shadowR = 150; v.shake = 0.008; break; }
