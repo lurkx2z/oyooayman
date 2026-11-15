@@ -16,6 +16,7 @@ ES_SETS.coast = (app) => {
   S.sun.shadow.bias = -0.0006; S.sun.shadow.normalBias = 0.06;
   const W = esBuildWorld(S), St = esBuildStation(S), Tr = esBuildTrain(S), Fx = esBuildFx(S, { W, St, Tr });
   const sunV = new THREE.Vector3(...ES_SUN);
+  const shX = new THREE.Vector3(0, 1, 0).cross(sunV).normalize(), shY = sunV.clone().normalize().cross(shX);   // (the shadow map's own axes)
   const skyWarm = new THREE.Color('#f1d2ae'), skyCool = new THREE.Color('#b4b9c6'), gndWarm = new THREE.Color('#7a573f'), gndCool = new THREE.Color('#5c5148');
   const fogWarm = new THREE.Color('#e6c19a'), fogCool = new THREE.Color('#b9ad9e');
 
@@ -36,6 +37,8 @@ ES_SETS.coast = (app) => {
       // the sun's shadow box follows what the camera looks at (never farther than 1.2 box widths from the camera); the
       // sun stands far enough back for the box to hold the sea's wall, which is what shades the land
       const R = v.shadowR, lim = R * 1.2, sb = v.sat || v.at, tg = new THREE.Vector3(MathX.clamp(sb[0], cam.position.x - lim, cam.position.x + lim), 0, MathX.clamp(sb[2], cam.position.z - lim, cam.position.z + lim));
+      // (the box moves in whole texels of the shadow map, so a shadow's edge doesn't crawl while the camera travels)
+      { const tx = 2 * R / S.sun.shadow.mapSize.x; tg.addScaledVector(shX, -(tg.dot(shX) % tx)).addScaledVector(shY, -(tg.dot(shY) % tx)); }
       const D = MathX.clamp((tg.x - ES_F.quay.x + 160) / -ES_SUN[0] + 120, 800, 1700);
       const sc = S.sun.shadow.camera; sc.left = -R; sc.right = R; sc.top = R; sc.bottom = -R; sc.far = D + 700; sc.updateProjectionMatrix();
       S.sun.target.position.copy(tg); S.sun.position.copy(tg).addScaledVector(sunV, D); S.sun.target.updateMatrixWorld();
@@ -72,9 +75,10 @@ ES_SETS.coast = (app) => {
       if (m === 'sun') { const k = MathX.smooth(t, this._shot.t0 + 1.5, this._shot.t1 - 0.5); p.exposure = 0.5 + 0.14 * k; p.bloom = 0.42; p.bloomThreshold = 0.9; p.saturation = 1.2; p.vignette = 0.56; }
       // it arrives: the picture burns out to white at ES.tHit, and then there is nothing: black, and the question
       if (m === 'question') {
-        const k = MathX.smooth(t, this._shot.t0, ES.tHit), w = MathX.smooth(t, ES.tHit - 0.55, ES.tHit - 0.02), aft = t - ES.tHit;
-        p.warmth += 0.06 * k; p.bloom += 0.12 * k + 0.5 * w; p.flash = Math.max(p.flash, 0.94 * w * w); p.flashColor.setRGB(1, 0.9, 0.72);
-        if (aft >= 0) { p.flash = 1; p.fade = MathX.smooth(aft, 0.1, 0.42); p.bloom = 0.3; p.grain = 0.024 * (1 - p.fade); }
+        // the glare floods the carriage: orange for a second, white in the last four frames; two white frames; black
+        const k = MathX.smooth(t, this._shot.t0, ES.tHit), g = MathX.smooth(t, ES.tHit - 1.3, ES.tHit - 0.1), w = MathX.smooth(t, ES.tHit - 0.14, ES.tHit), aft = t - ES.tHit;
+        p.warmth += 0.06 * k; p.bloom += 0.12 * k + 0.3 * g + 0.5 * w; p.flash = Math.max(p.flash, 0.6 * g * g + 0.4 * w); p.flashColor.setRGB(1, 0.42 + 0.56 * w, 0.08 + 0.84 * w);
+        if (aft >= 0) { p.flash = 1; p.flashColor.setRGB(1, 0.98, 0.92); p.fade = aft < 0.066 ? 0 : 1; p.bloom = 0.3; p.grain = 0; }
       }
       if (m === 'inside' || m === 'question') { p.vignette = 0.5; }
       if (m === 'wheels') p.exposure += 0.3;

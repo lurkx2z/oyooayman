@@ -44,7 +44,8 @@ function esBuildFx(S, parts) {
   out.lit = (x, y, s) => { const h = P.wallH(s) * WTOP; return h < 1 || x < F.quay.x + 0.1 * h ? 1 : MathX.smooth(y + SLOPE * (x - F.quay.x) - h, -0.2 * h / WTOP, 0.1 * h / WTOP); };
   // dust, smoke and spray are drawn without the lights: in the shadow they go to 40% and cooler
   const du = {
-    add(x, y, z, size, a, r, g, b, seed) { const k = litAt(x, y); duP.add(x, y, z, size, a, r * (0.36 + 0.64 * k), g * (0.4 + 0.6 * k), b * (0.47 + 0.53 * k), seed); },
+    // (dark puffs are smoke: in the shadow the fire lights them, so they go warm and not cool)
+    add(x, y, z, size, a, r, g, b, seed) { const k = litAt(x, y), w = 1 - MathX.smooth(Math.max(r, g, b), 0.12, 0.4), mr = 0.36 + 0.18 * w, mb = 0.47 - 0.16 * w; duP.add(x, y, z, size, a, r * (mr + (1 - mr) * k), g * (0.4 + 0.6 * k), b * (mb + (1 - mb) * k), seed); },
     begin() { duP.begin(); }, end() { duP.end(); },
   };
 
@@ -408,7 +409,8 @@ function esBuildFx(S, parts) {
       const tt = t * 0.25 + s * 30, rise = P.wallK * V * Math.min(s, P.T);
       wall.forEach((o, i) => {
         const U = o.material.uniforms;
-        U.uH.value = Hh * [1, 0.9, 0.72][i]; U.uX0.value = F.quay.x + [-1.5, 3.5, -5][i] - shift; U.uT.value = tt; U.uRise.value = rise * [1, 0.92, 0.8][i];
+        // (the two sheets in front stand clear of the quay's cap however far they sway)
+        U.uH.value = Hh * [1, 0.9, 0.72][i]; U.uX0.value = F.quay.x + [-4, 3.5, -5][i] - shift; U.uT.value = tt; U.uRise.value = rise * [1, 0.92, 0.8][i];
         U.uLean.value = [0.3, 0.38, 0.22][i] * (1 - Math.min(1.5, w1 * 3));
         o.visible = s > 0.0005;
       });

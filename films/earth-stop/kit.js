@@ -230,12 +230,15 @@ function esPuffs(scene, max = 6000, o = {}) {
     vertexShader: `attribute vec3 iPos; attribute float iSize; attribute float iAlpha; attribute vec3 iCol; attribute float iSeed; varying float vA; varying vec3 vC; varying float vD; varying vec2 vQ; varying float vS;
       void main(){ vA = iAlpha; vC = iCol; vS = iSeed; vQ = position.xy * 2.0; vec4 mv = viewMatrix * vec4(iPos, 1.0); mv.xy += position.xy * iSize; vD = -mv.z; gl_Position = projectionMatrix * mv; }`,
     // (billow: the disc's alpha is broken up by two octaves of value noise, different for every puff, so smoke, fire
-    // and spray have ragged edges and not the outline of a disc)
+    // and spray have ragged edges and not the outline of a disc. It can lift a puff's alpha over 1: on the float
+    // target that takes light away from what is behind, and dark smoke in front of fire came out teal and navy,
+    // so a puff that is not additive stops at 1)
     fragmentShader: `uniform vec3 fogCol; uniform float fogDen, soft, nearA, nearB, billow, fogK; varying float vA; varying vec3 vC; varying float vD; varying vec2 vQ; varying float vS;
       float h2(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h2(i), h2(i + vec2(1.0, 0.0)), f.x), mix(h2(i + vec2(0.0, 1.0)), h2(i + vec2(1.0, 1.0)), f.x), f.y); }
       void main(){ float r = dot(vQ, vQ); if (r > 1.0) discard; float a = vA * pow(1.0 - r, soft) * (nearA < 0.0 ? 1.0 : smoothstep(nearA, nearB, vD));
         if (billow > 0.0) { vec2 q = vQ * 1.7 + vec2(vS * 17.3, vS * 9.1); float n = 0.62 * vn(q) + 0.38 * vn(q * 2.7 + 3.1); a *= mix(1.0, 1.9 * smoothstep(0.22, 0.8, n), billow); }
+        ${o.additive ? '' : 'a = min(a, 1.0);'}
         float f = (1.0 - exp(-fogDen * vD)) * fogK; gl_FragColor = vec4(mix(vC, fogCol, f), a * (1.0 - 0.6 * f)); }`,
   });
   const mesh = new THREE.Mesh(g, mat); mesh.frustumCulled = false; mesh.renderOrder = 5; scene.add(mesh);

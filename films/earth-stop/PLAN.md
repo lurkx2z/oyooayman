@@ -19,7 +19,9 @@ Three cuts were made. The first (4:55, 56 captions, a clock that ran at one stea
 clock that bursts and settles) was reviewed at 5.5/10 for retention, 7.5/10 for physics and script and 5.5/10 for
 picture: the slow stretches were where a viewer would leave, and two glitches were on screen. This is the third (4:09,
 44 captions, 43 shots): it is shorter than the owner's five to six minutes on purpose, because every stretch that was
-cut was one a reviewer marked as a place to leave (§ 6).
+cut was one a reviewer marked as a place to leave (§ 6). It was reviewed at 6/10 for retention and 6/10 for picture
+("publishable, but only just": pacing is still the weak point); after that round the opening got its turn of the
+camera and the ending its glare, and neither was scored again.
 
 ## 1. The rule
 
@@ -57,7 +59,7 @@ stopping the spin takes the Sun's whole output for 9 minutes; where it goes is n
 - 5:42:01: the ground turns again. What is still moving east at 465 m/s is suddenly at rest on it. What the ground
   stopped during the second (the wagons, the fire, the air against the hill) stands still while the ground leaves: seen
   from your seat it comes west at 1,670 km/h and reaches your train 0.32 s later (s 1.322, film 4:04.95). The picture
-  goes white there, then black, with the question.
+  fills with an orange glare, goes white there, then black, and only then comes the question.
 
 ## 3. The beats (CAPTIONS.md: 19 beats after the title, 44 captions)
 

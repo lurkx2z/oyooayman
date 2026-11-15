@@ -96,7 +96,8 @@ class EsHud {
     this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f');
     this.band = mk('es-band'); this.cap = mk('es-cap'); this.tag = mk('es-tag');
     this.count = mk('es-count');
-    this.caps = EST.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: esCapHtml(c.text), q: g.id === 'question' })));
+    // (the question waits for the black: the third review found it on screen before the fire arrived)
+    this.caps = EST.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: g.id === 'question' ? ES.tHit + 0.35 : c.show, hide: c.hide, html: esCapHtml(c.text), q: g.id === 'question' })));
     this.inset = mk('es-inset');
     this.labels = []; this.root = root; this._last = {}; this._insetKey = null;
   }
@@ -111,7 +112,7 @@ class EsHud {
     // ---- the ground: turning / stopped, the time left, what's next, your train
     // (the cards step back while the first wagon lands: nothing but the picture and the caption for a second and a half)
     const quiet = 1 - W(t, EsHud.tW - 0.25, EsHud.tW + 1.6, 0.15, 0.5);
-    const ra = W(t, ES.title[1] + 0.1, ES.tHit + 0.12, 0.4, 0.12) * quiet;   // (not under the title; gone when it arrives)
+    const ra = W(t, ES.title[1] + 0.1, ES.tHit + 0.03, 0.4, 0.1) * quiet;   // (not under the title; gone when it arrives)
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
       this._html('rov', this.roV, stopped ? 'STOPPED' : 'TURNING');
@@ -137,7 +138,7 @@ class EsHud {
       this._txt('ckf', this.clockF, '');                   // (the second review: "N× SLOWER" confused; the clock itself shows it)
     }
     // ---- the last 0.14 s: the count, big
-    { const left = P.T - s, on = t >= esB('count') && s < P.T + 0.006, last = t >= esC('twist', 2) - 0.5 && t < ES.tHit + 0.1;
+    { const left = P.T - s, on = t >= esB('count') && s < P.T + 0.006, last = t >= esC('twist', 2) - 0.5 && t < ES.tHit + 0.03;
       this._set('cnta', this.count, 'opacity', on || last ? '1' : '0');
       if (on) { this._txt('cntv', this.count, Math.max(0, left).toFixed(2)); this._cls('cntc', this.count, left < 0.0005 ? 'es-count hit' : 'es-count'); }
       else if (last) { this._html('cntv', this.count, `${Math.max(0, P.blastX(s) - P.nose(s)).toFixed(0)}<small> m</small>`); this._cls('cntc', this.count, 'es-count far'); } }
@@ -166,6 +167,9 @@ class EsHud {
       const vis = _p.z < 1 && Math.abs(_p.x) < 1.1 && Math.abs(_p.y) < 1.1;
       d.style.opacity = vis ? String(l.a ?? 1) : '0';
       const lx = MathX.clamp((_p.x * 0.5 + 0.5) * 100, 3, 97), ly = (-_p.y * 0.5 + 0.5) * 100;
+      // (its width is measured before its side is chosen: a new text on a reused label would sit on the wrong side for a frame)
+      const tx = `<span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`;
+      if (d._tx !== tx) { d._tx = tx; d._h = '<span class="d"></span>' + tx; d.innerHTML = d._h; d._w = d.offsetWidth; }
       let right = l.side ? l.side === 'r' : lx > 62;
       const wPct = vis && this.root.clientWidth ? 100 * (d._w || 0) / this.root.clientWidth : 0;
       if (right && lx - wPct < 1.5) right = false; else if (!right && lx + wPct > 98.5) right = true;
@@ -176,8 +180,8 @@ class EsHud {
       if (vis && this._inRect) { const R = this._inRect, W0 = this.root.clientWidth, H0 = this.root.clientHeight, px = lx / 100 * W0, py = ty / 100 * H0, w = d._w || 0, x0 = right ? px - w : px, x1 = right ? px : px + w;
         if (x1 > R.l - 12 && x0 < R.r + 12 && py + 30 > R.t - 12 && py - 30 < R.b + 12) d.style.opacity = '0'; }
       d.className = right ? 'es-lab r' : 'es-lab';
-      const tx = `<span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`, hh = right ? tx + '<span class="d"></span>' : '<span class="d"></span>' + tx;
-      if (d._h !== hh) { d._h = hh; d.innerHTML = hh; d._w = d.offsetWidth; }
+      const hh = right ? tx + '<span class="d"></span>' : '<span class="d"></span>' + tx;
+      if (d._h !== hh) { d._h = hh; d.innerHTML = hh; }
     });
   }
 

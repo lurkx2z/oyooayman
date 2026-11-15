@@ -139,7 +139,7 @@ function esBuildWorld(S) {
     });
     const nt = esTex(nc, { srgb: false }); nt.repeat.set(220, 440);
     const wm = new THREE.MeshStandardMaterial({ color: '#1d4a52', roughness: 0.22, metalness: 0.0, normalMap: nt, normalScale: new THREE.Vector2(0.9, 0.9), envMapIntensity: 0.55 });
-    const water = new THREE.Mesh(new THREE.PlaneGeometry(8800, 17600), wm);
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(8800, 17600, 88, 176), wm);   // (in 100 m squares: the depth of a triangle kilometres long is not exact, and the sea then cut through the foot of its own wall for a frame)
     water.rotation.x = -Math.PI / 2; water.position.set(F.quay.x - 4400, F.sea.level, 0); water.receiveShadow = true; scene.add(water);
     out.water = water; out.waterTex = nt;
   }
@@ -153,8 +153,9 @@ function esBuildWorld(S) {
     }));
     wt.repeat.set(1600, 1);
     const wallM = new THREE.MeshStandardMaterial({ map: wt, roughness: 0.85 });
-    esBox(1.2, -F.sea.bed + 0.02, 8000, wallM, F.quay.x - 0.6, F.sea.bed / 2, 0);
-    esBox(1.6, 0.4, 8000, esStd('#9a958a', 0.9), F.quay.x - 0.5, 0.2, 0);
+    // (both in 25 m lengths, for the same reason as the sea: the cap's edge showed through the water as a thin line)
+    esMesh(new THREE.BoxGeometry(1.2, -F.sea.bed + 0.02, 8000, 1, 1, 320), wallM, F.quay.x - 0.6, F.sea.bed / 2, 0);
+    esMesh(new THREE.BoxGeometry(1.6, 0.4, 8000, 1, 1, 320), esStd('#9a958a', 0.9), F.quay.x - 0.5, 0.2, 0);
     const bm = esStd('#1c1d1f', 0.5, 0.6);
     for (let z = -150; z <= 150; z += 25) { esCyl(0.22, 0.27, 0.6, bm, F.quay.x + 1.4, 0.3, z); esCyl(0.32, 0.32, 0.09, bm, F.quay.x + 1.4, 0.62, z); }
   }
