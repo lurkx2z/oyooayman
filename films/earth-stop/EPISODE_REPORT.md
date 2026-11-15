@@ -216,8 +216,10 @@ In the order a viewer would feel them:
 - **Not reviewed again.** The third round's scores are for the cut before the new opening and the new ending. Those,
   and the fixes to the label, the quay and the smoke, were checked in stills and short low-resolution stretches (about
   60 frames across the film), not by a reviewer.
-- **The final 1080p render has not been watched.** Everything above was judged on low-resolution software renders in
-  the cloud; the PC render should be watched once before upload.
+- **The final render has been scanned, not watched.** The reviews were of low-resolution software renders in the
+  cloud. The PC render's 720p copy was checked frame by frame for one-frame faults (none found at the label, the quay
+  or in the fire) and on a contact sheet, but nobody has watched it in motion with its sound: watch it once before
+  upload.
 
 ## Sound
 
@@ -258,12 +260,13 @@ windows across the whole film, with the stem trims added in:
 - **Runnable ZIP** `earth-stop-film.zip` (in the project files): extract it, open `earth-stop.html` in Chrome or Edge on
   a computer, wait for SOUND READY, press Space. The soundtrack is baked in and checked against the code's fingerprint
   (`tools/check-page.cjs`: SOUND READY at once, no console errors).
-- **Final 1080p MP4** on the owner's PC (graphics card), one command in the repo folder after pulling this branch:
-  `node films/earth-stop/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\earth-stop --small`.
-  - It makes `D:\renders\earth-stop\earth-stop_final_1080p.mp4`: 1920×1080, 30 fps, H.264 CRF 18, 4:09, with the
-    mastered soundtrack `final-soundtrack.m4a` copied in.
-  - With `--small` it also makes `earth-stop_final_small.mp4` (1280×720, under 30 MiB).
-  - It is resumable: run it again and finished segments are kept.
+- **Final 1080p MP4**, rendered on the owner's PC (graphics card) on 15 November 2026 from commit 1f7b621, in 5
+  minutes: `node films/earth-stop/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\earth-stop --small`.
+  - `D:\renders\earth-stop\earth-stop_final_1080p.mp4`: 1920×1080, 30 fps, H.264 CRF 18, 248.63 s (7,459 frames),
+    673 MiB, with the mastered soundtrack `final-soundtrack.m4a` copied in: −14.2 LUFS, −2.4 dBTP. **This is the file
+    to upload.**
+  - `earth-stop_final_small.mp4`: 1280×720, 26.5 MiB (a preview copy, also in the project files).
+  - The command is resumable: run it again and finished segments are kept.
 - **Thumbnails** (house style) in the project files: `thumb-fire.jpg` (the six wagons at the hill), `thumb-wave.jpg`
   (the wall of water against the Eiffel Tower's outline), `thumb-train.jpg` (your train and the fire coming west).
 
