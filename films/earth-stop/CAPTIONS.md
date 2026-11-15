@@ -13,7 +13,7 @@ status: voiceless
 
 [start] 5:42 PM, on the equator. The ground just stopped turning. / Nothing else did.
 
-[speed] This station always moves east at 1,670 km/h. You never feel it, because everything moves together. / For one second the ground isn't moving. The station, the train, the air and you still are. / Stopping the Earth takes all the energy the Sun gives off in 9 minutes. Never mind where it went.
+[speed] This station always moves east at 1,670 km/h. You never feel it, because everything moves together. / For one second the ground isn't moving. The station, the train, the air and you still are. / Stopping the Earth takes all the energy the Sun gives off in 9 minutes. Never mind where it went. / And something just got in front of the Sun.
 
 [bolts] The station was bolted to the ground. It didn't matter. / To stop with the ground, its steel would have to be 50 times stronger than steel is. / So every bolt sheared. The building is sliding off its own floor.
 
@@ -31,7 +31,7 @@ status: voiceless
 
 [wind] The air didn't stop either. Against the hill it's a wind at 1.3 times the speed of sound. / Where the rock stops it, the air heats by 108 °C. / It's pinning the fire to the hill and driving it over the top.
 
-[sea] Behind the station is the harbour. The sea didn't stop either. / Every metre of this quay is being hit by 4,800 tonnes of water. / That's the energy of 120 tonnes of TNT, on every single metre. / The ferry was 290 metres out. It weighs 2,000 tonnes.
+[sea] Behind the station is the harbour. The sea didn't stop either. / This is what got in front of the Sun. / Every metre of this quay is being hit by 4,800 tonnes of water. / That's the energy of 120 tonnes of TNT, on every single metre. / The ferry was 290 metres out. It weighs 2,000 tonnes.
 
 [up] The water can only go up. It's climbing at over 1,000 km/h. / This is happening on every west-facing shore on Earth.
 

@@ -63,8 +63,8 @@ function esScourMat(m) {
       .replace('#include <map_fragment>', `#include <map_fragment>
         { vec2 q = vec2((vEsW.x - uSX) * 0.011, vEsW.z * 0.12);
           float n = texture2D(tStreak, q).r, n2 = texture2D(tStreak, q * vec2(0.31, 2.7) + 0.37).r;
-          float k = uSA * smoothstep(0.4, 0.95, n * 0.7 + n2 * 0.5) * (1.0 - smoothstep(592.0, 600.0, vEsW.x));
-          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.85, 0.74, 0.58), k); }`);
+          float k = uSA * smoothstep(0.52, 0.98, n * 0.7 + n2 * 0.5) * (1.0 - smoothstep(592.0, 600.0, vEsW.x));
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.68, 0.56, 0.42), k); }`);
   };
   return m;
 }
@@ -76,7 +76,7 @@ function esBuildWorld(S) {
   const scene = S.scene, F = ES_F, P = ESP, out = {};
   const RAIL = F.rail;
   // ------------------------------------------------------------------ the sky: an hour before sunset
-  out.sky = esGradSky(scene, '#3d6fb4', '#f3c38c', '#8a765e', { sunDir: ES_SUN, sunGlow: '#ffb060', hw: 0.3, r: 8000 });
+  out.sky = esGradSky(scene, '#7c93b6', '#f3c38c', '#8a765e', { sunDir: ES_SUN, sunGlow: '#ffb060', hw: 0.3, r: 8000 });
   {
     const sd = new THREE.Vector3(...ES_SUN).normalize();
     const disc = new THREE.Mesh(new THREE.CircleGeometry(46, 32), new THREE.MeshBasicMaterial({ color: new THREE.Color(10, 7.6, 4.6), fog: false, depthWrite: false }));
@@ -198,9 +198,9 @@ function esBuildWorld(S) {
   // ------------------------------------------------------------------ the platforms (earth-filled concrete: ground)
   {
     const Pl = F.plat, top = esTex(esCanvas(256, 256, (g, w, h) => {
-      g.fillStyle = '#b3aea2'; g.fillRect(0, 0, w, h);
+      g.fillStyle = '#857c6e'; g.fillRect(0, 0, w, h);
       const r = new RNG(3);
-      for (let y = 0; y < h; y += 32) for (let x = 0; x < w; x += 32) { const k = r.range(-9, 9); g.fillStyle = `rgb(${176 + k},${170 + k},${158 + k})`; g.fillRect(x + 1, y + 1, 30, 30); }
+      for (let y = 0; y < h; y += 32) for (let x = 0; x < w; x += 32) { const k = r.range(-9, 9); g.fillStyle = `rgb(${150 + k},${140 + k},${124 + k})`; g.fillRect(x + 1, y + 1, 30, 30); }
     }));
     top.repeat.set(1, 1);
     const side = esStd('#8f8a80', 0.9);
@@ -258,7 +258,7 @@ function esBuildWorld(S) {
     const X = P.X(s), rep = out.waterTex.repeat.x / 8800;
     out.waterTex.offset.set(-(X * rep) % 1, (s * 0.3 * rep) % 1);
     // the scour: the dust streaks run east with the air; after 5:42:01 they stand where they are, thinning
-    ES_SCOUR.uSX.value = X; ES_SCOUR.uSA.value = 0.8 * MathX.smooth(s, 0, 0.03) * (1 - 0.45 * MathX.smooth(s, 1, 1.3));
+    ES_SCOUR.uSX.value = X; ES_SCOUR.uSA.value = 0.52 * MathX.smooth(s, 0, 0.03) * (1 - 0.45 * MathX.smooth(s, 1, 1.3));
   };
   return out;
 }

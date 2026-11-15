@@ -16,14 +16,14 @@ const path = require('path');
 const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
-  title: 0.05, start: 0.9, speed: 1.6, people: 1.6, bolts: 1.6, town: 1.8, train: 1.8, energy: 1.6, hill: 1.6, depot: 1.6, wind: 2.4, sea: 1.8, up: 1.8,
-  fall: 1.6, sky: 1.6, count: 1.4, back: 1.6, twist: 2.2, second: 1.4, question: 1.3,
+  title: 0.05, start: 0.9, speed: 1.6, people: 1.6, bolts: 1.6, town: 1.8, train: 1.8, energy: 1.6, hill: 1.6, depot: 1.6, wind: 3.0, sea: 2.2, up: 1.8,
+  fall: 1.6, sky: 1.6, count: 1.4, back: 1.6, twist: 2.8, second: 1.6, question: 1.8,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
   'start:1': 1.2, 'speed:1': 0.6, 'people:1': 0.8, 'people:2': 0.8, 'people:3': 1.2, 'speed:2': 0.6, 'town:1': 1.0, 'bolts:1': 0.8, 'bolts:2': 1.0, 'train:1': 0.8, 'train:2': 1.2, 'train:3': 0.5,
   'energy:1': 0.6, 'energy:2': 0.6, 'hill:1': 0.8, 'hill:2': 1.0, 'depot:1': 0.6, 'depot:2': 1.8, 'wind:1': 0.8, 'wind:2': 0.8,
-  'sea:1': 1.0, 'sea:2': 0.6, 'sea:3': 1.4, 'up:1': 1.6, 'fall:1': 0.8, 'fall:2': 1.0, 'sky:1': 0.8, 'count:1': 1.6,
+  'speed:3': 1.6, 'sea:1': 1.0, 'sea:2': 1.0, 'sea:3': 0.6, 'sea:4': 1.4, 'up:1': 1.6, 'fall:1': 0.8, 'fall:2': 1.0, 'sky:1': 0.8, 'count:1': 1.6,
   'back:1': 1.4, 'back:2': 1.0, 'back:3': 1.4, 'twist:1': 0.8, 'twist:2': 0.8, 'second:1': 1.6,
 };
 const SECTION_OF = { title: 1, back: 2, twist: 3 };

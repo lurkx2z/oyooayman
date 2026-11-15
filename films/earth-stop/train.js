@@ -51,13 +51,29 @@ function esBuildTrain(S) {
     // the gangway to the next car
     if (i < F.train.cars - 1) esBox(0.62, 2.3, 1.5, esStd('#1a1a1c', 0.9), -C.L / 2 - 0.3, C.floor + 1.2, 0, car);
     if (i === 0) {
-      // the cab: a raked nose, the windscreen, the lights, the coupler
-      const nose = esBox(1.4, 1.5, C.W - 0.1, teal, C.L / 2 + 0.25, C.floor + 0.72, 0, car); void nose;
-      const ws = esBox(0.1, 1.25, C.W - 0.5, esStd('#16303a', 0.2, 0.5), C.L / 2 + 0.36, C.floor + 2.02, 0, car); ws.rotation.z = -0.38;
-      const top = esBox(1.0, 0.5, C.W - 0.1, cream, C.L / 2 - 0.1, C.roof - 0.42, 0, car); void top;
-      for (const sz of [-1, 1]) { const l = esMesh(new THREE.SphereGeometry(0.14, 10, 8), new THREE.MeshStandardMaterial({ color: '#fff6dc', emissive: '#ffe9b0', emissiveIntensity: 2.4 }), C.L / 2 + 0.96, C.floor + 0.55, sz * 0.95, car); l.castShadow = false; }
-      esBox(0.5, 0.3, 0.4, steel, C.L / 2 + 1.1, 0.95, 0, car);
-      esBox(1.0, 0.5, C.W - 0.3, esStd('#e0a82a', 0.5, 0.2), C.L / 2 + 0.55, C.floor - 0.1, 0, car);
+      // the cab: a raked nose (side profiles extruded across the car), the windscreen, the lights, the coupler
+      const ext = (pts, m, w = C.W, dx = 0) => {
+        const sh = new THREE.Shape(); pts.forEach(([x, y], k) => (k ? sh.lineTo(x, y) : sh.moveTo(x, y)));
+        const g = new THREE.ExtrudeGeometry(sh, { depth: w, bevelEnabled: false }); g.translate(C.L / 2 + dx, 0, -w / 2);
+        const o = new THREE.Mesh(g, m); o.castShadow = o.receiveShadow = true; car.add(o); return o;
+      };
+      const y0 = C.floor - 0.3, yb = C.floor + 0.93, yr = C.roof, yellow = esStd('#e0a82a', 0.5, 0.2), glass = esStd('#10242c', 0.12, 0.6);
+      ext([[-0.02, y0], [1.95, y0], [2.3, y0 + 0.42], [2.32, yb - 0.12], [2.24, yb], [-0.02, yb]], teal);                                   // below the band
+      ext([[-0.02, yb], [2.24, yb], [1.96, yb + 0.36], [0.86, yr - 0.24], [0.34, yr + 0.02], [-0.02, yr + 0.02]], cream);                    // above it
+      ext([[-0.02, yb - 0.05], [2.27, yb - 0.05], [2.25, yb + 0.07], [-0.02, yb + 0.07]], yellow, C.W + 0.03);                               // the band
+      // the windscreen: two panes on the rake, a pillar between them; a visor over them
+      { const ax = 1.96, ay = yb + 0.36, bx = 0.86, by = yr - 0.24, len = Math.hypot(bx - ax, by - ay), ang = Math.atan2(by - ay, bx - ax);
+        for (const sz of [-1, 1]) { const w = esBox(len * 0.8, 0.05, C.W / 2 - 0.34, glass, C.L / 2 + (ax + bx) / 2 + 0.035, (ay + by) / 2 + 0.03, sz * (C.W / 4 - 0.02), car); w.rotation.z = ang; w.castShadow = false; }
+        esBox(0.5, 0.05, C.W - 0.3, cream, C.L / 2 + bx - 0.02, by + 0.1, 0, car).rotation.z = ang * 0.35; }
+      for (const sz of [-1, 1]) {
+        const l = esMesh(new THREE.SphereGeometry(0.15, 12, 8), new THREE.MeshStandardMaterial({ color: '#fff6dc', emissive: '#ffe9b0', emissiveIntensity: 2.6 }), C.L / 2 + 2.29, y0 + 0.78, sz * 0.98, car); l.castShadow = false; l.scale.x = 0.5;
+        const r = esMesh(new THREE.SphereGeometry(0.09, 10, 8), new THREE.MeshStandardMaterial({ color: '#ff5a3a', emissive: '#c8301a', emissiveIntensity: 0.6 }), C.L / 2 + 2.3, y0 + 0.78, sz * 0.66, car); r.castShadow = false; r.scale.x = 0.5;
+      }
+      { const l = esMesh(new THREE.SphereGeometry(0.11, 10, 8), new THREE.MeshStandardMaterial({ color: '#fff6dc', emissive: '#ffe9b0', emissiveIntensity: 2.2 }), C.L / 2 + 0.6, yr - 0.02, 0, car); l.castShadow = false; }
+      esBox(0.55, 0.3, 0.4, steel, C.L / 2 + 2.4, 0.95, 0, car);                                                                             // the coupler
+      { const pl = esBox(0.5, 0.5, C.W - 0.5, esStd('#2a2c2e', 0.6, 0.5), C.L / 2 + 2.0, y0 - 0.2, 0, car); pl.rotation.z = 0.5; }         // the plough under it
+      // the destination blind over the windscreen
+      esBox(0.04, 0.2, 1.3, new THREE.MeshStandardMaterial({ color: '#ffb84a', emissive: '#ff9a2a', emissiveIntensity: 1.2 }), C.L / 2 + 0.66, yr - 0.2, 0, car).rotation.z = 0.9;
     }
   }
   // ---- your car: real walls with window openings, a floor, seats and tables
@@ -107,7 +123,7 @@ function esBuildTrain(S) {
     // two more passengers
     out.riders = [esPerson('esYouSeat', car), esPerson('esP6', car, { id: 'r' }), esPerson('esP4', car, { id: 'r' })];
     esPose(out.riders[0], ES_POSES.sitPhone(), 0.72, fl - 0.03, -F.you.side * (hw - 0.62), Math.PI / 2);        // across the aisle, a bay behind you
-    esPose(out.riders[1], ES_POSES.sitLook(), tx + 1.28, fl - 0.03, F.you.side * (hw - 0.62), -Math.PI / 2);     // facing you, across your table
+    esPose(out.riders[1], ES_POSES.sitLook(), tx + 3.28, fl - 0.03, -F.you.side * (hw - 0.62), -Math.PI / 2);    // across the aisle, a bay ahead, facing back
     esPose(out.riders[2], ES_POSES.sitPhone(), -7.28, fl - 0.03, F.you.side * (hw - 0.62), Math.PI / 2);
   }
   // a point in your car (lx along the car from its middle, ly above the floor, lz across) → world

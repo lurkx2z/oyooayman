@@ -263,7 +263,7 @@ function esBuildStation(S) {
     // the canopies: carried on their sliding columns, then falling; the columns fold back once their feet catch the ground
     const sFold = P.roofFree + Math.sqrt(2 * Pl.h / P.g);
     out.canopies.forEach(({ g, cs, C }, ci) => {
-      g.position.y = C.y + (P.roofY(s) - F.can1.y) + 0.05 * MathX.smooth(s, 0, 0.002); g.rotation.z = -0.035 * MathX.smooth(s, P.roofFree, 1.0); g.rotation.x = (ci ? -1 : 1) * 0.03 * MathX.smooth(s, P.roofFree, 1.1);
+      g.position.y = C.y + (P.roofY(s) - F.can1.y) + 0.05 * MathX.smooth(s, 0, 0.002); g.rotation.z = -0.006 * MathX.smooth(s, P.roofFree, 1.0); g.rotation.x = (ci ? -1 : 1) * 0.03 * MathX.smooth(s, P.roofFree, 1.1);
       cs.forEach((pv, i) => { const f = MathX.smooth(s, sFold + 0.03 * (i % 4), P.roofLand + 0.02); pv.rotation.z = -1.25 * f * (0.8 + 0.4 * hash1(i * 7 + ci)); pv.rotation.x = 0.5 * f * (hash1(i * 3 + ci * 5) - 0.5); });
     });
     // the footbridge: in free fall once it has left the platforms

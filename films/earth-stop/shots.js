@@ -39,9 +39,9 @@ const ES_SHOTS = [];
     ['W2', 'heat', c('wind', 1) - 0.5, c('wind', 2) - 0.6],
     ['W3', 'over', c('wind', 2) - 0.6, B('sea')],
     // the sea
-    ['Q1', 'sea', B('sea'), c('sea', 1) - 0.6],
-    ['Q2', 'quay', c('sea', 1) - 0.6, c('sea', 3) - 0.7],
-    ['Q3', 'ferry', c('sea', 3) - 0.7, B('up')],
+    ['Q1', 'sea', B('sea'), c('sea', 2) - 0.6],
+    ['Q2', 'quay', c('sea', 2) - 0.6, c('sea', 4) - 0.7],
+    ['Q3', 'ferry', c('sea', 4) - 0.7, B('up')],
     ['U1', 'up', B('up'), c('up', 1) - 0.8],
     ['U2', 'shores', c('up', 1) - 0.8, B('fall')],
     // what a second is not long enough for

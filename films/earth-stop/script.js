@@ -53,8 +53,8 @@ const ES_CLOCK = (() => {
     [C('depot', 2) + 0.75, P.wagon0 + 0.024, 'to'],        // a burst (38 times slower)
     [B('wind'), 0.5, 'to'],
     [B('sea'), 0.555, 'to'],
-    [C('sea', 3) - 0.7, P.ferryHit - 0.012, 'to'],         // the ferry's last 6 metres
-    [C('sea', 3) + 0.2, P.ferryHit + 0.004, 'to'],
+    [C('sea', 4) - 0.7, P.ferryHit - 0.012, 'to'],         // the ferry's last 6 metres
+    [C('sea', 4) + 0.2, P.ferryHit + 0.004, 'to'],
     [B('up'), 0.665, 'to'],
     [B('fall'), 0.72, 'to'],
     [B('sky'), 0.8, 'to'],
@@ -114,10 +114,10 @@ function esFilmAt(s) { let a = -2, b = ES.end + 1; for (let k = 0; k < 60; k++) 
   num('depot', 1, /That's ([\d.]+) tonnes/, P.tntT(P.wagonT), 0.15);
   num('wind', 0, /at ([\d.]+) times/, P.mach, 0.04);
   num('wind', 1, /by ([\d.]+) °C/, P.heat, 0.6);
-  num('sea', 1, /by ([\d,]+) tonnes/, P.waterT, 60);
-  num('sea', 2, /of ([\d,]+) tonnes/, P.waterTnt, 5);
-  num('sea', 3, /was ([\d,]+) metres/, P.ferryOut, 1);
-  num('sea', 3, /weighs ([\d,]+) tonnes/, P.ferryT, 1);
+  num('sea', 2, /by ([\d,]+) tonnes/, P.waterT, 60);
+  num('sea', 3, /of ([\d,]+) tonnes/, P.waterTnt, 5);
+  num('sea', 4, /was ([\d,]+) metres/, P.ferryOut, 1);
+  num('sea', 4, /weighs ([\d,]+) tonnes/, P.ferryT, 1);
   if (!(P.wallKmh > 1000)) throw new Error('up:0 says over 1,000 km/h');
   num('fall', 0, /fall ([\d.]+) metres/, P.drop, 0.02);
   num('fall', 1, /was ([\d.]+) metres/, F.can1.y, 0.01);
