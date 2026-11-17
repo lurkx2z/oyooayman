@@ -1,6 +1,6 @@
 # What if there was no light in the universe?
 
-Voiceless 16:9 long-form, 4:43 (282.6 s), slug `no-light`, page `no-light.html`. Built like Gravity tilts 90°,
+Voiceless 16:9 long-form, 4:46 (285.8 s), slug `no-light`, page `no-light.html`. Built like Gravity tilts 90°,
 Friction 10 s and Gravity keeps tilting, to the owner's YouTube lessons of 2026-10-28, in the eerie horror tone of
 Slower light (the channel's best):
 - an everyday, human-scale place with new scenery: a frozen lake near Lillehammer, Norway, on a Sunday afternoon in January, 240
@@ -10,7 +10,8 @@ Slower light (the channel's best):
   and the honest rule: take away all electromagnetism and atoms come apart, so only the band eyes use is gone);
 - under 5 minutes on purpose (the owner called the last two slow: one rescue drives the second half), no filler; the
   story clock only runs forward, jumping ahead three times at cuts (+40 s, +5 min 52 s, +2 min);
-- tension to the last frame, no recap: your fingers on his sleeve, the ice bending under your chest, "Would you let go?";
+- tension to the last frame, no recap: your fingers on his sleeve, the ice bending under your chest, she still holding
+  your ankles, "Would you let go?" held 3.4 s over black to the end;
 - the music clearly leads, beds about 10 dB under it, measured stem by stem (2026-10-31);
 - no z-fighting, and the picture pitfalls list (no particle alpha over 1, no kilometre-long triangles).
 
@@ -31,7 +32,8 @@ eyes use.
 - The Sun at 61.1° N, 10.45° E on Sunday 10 January 2027: 2.6° up while the sun caption shows, sets at 3:29 PM
   (NOAA's formulas).
 - −12 °C air; sound at 331.3·√(1 − 12/273.15) = 323.9 m/s, so the bang from the road (497 m) takes 1.53 s (caption 1.5).
-- A plane 12 km from its runway on a 3° glide path is 629 m up (caption 630), at 72 m/s.
+- A plane 12 km from its runway on a 3° glide path is 629 m up (caption 630), at 72 m/s. Flying on blind, it comes
+  down in the hills 4 km from you; its boom reaches you while the ice sings (215.7 s; HUD tag, `NL_BOOM`).
 - Clear ice: 5 cm holds a person, 20 cm a car, 8 cm where the stream comes in (Norwegian rules of thumb).
 - The car: shoved at 4.2 m/s, down the bank, sliding on ice (µ 0.07) 36 m to a stop over the thin ice by the inlet.
 - Water at 0 °C under the ice, 12 degrees warmer than the air: the hole glows on a heat camera.
@@ -39,10 +41,10 @@ eyes use.
   8.99 minutes when the caption says 9.
 - Lying flat you crawl 0.28 m/s; 40 m from him at the caption (39.8), 3 m from the edge at the caption (2.8).
 
-## 3. The beats (CAPTIONS.md: 22 beats after the title, 52 captions)
+## 3. The beats (CAPTIONS.md: 22 beats after the title, 53 captions)
 
 start (the light goes) · skaters (still gliding, nobody can see; you hit someone) · heat (the heat camera) · rule
-(why only the eyes' band) · body (your skin glows; your palm print on the ice) · count (240 people, −12 °C) · grab
+(why only the eyes' band) · body (your skin glows; your palm print on the ice) · count (240 people, −12 °C, far-off car horns: the engines you will head for) · grab
 (someone grabs your arm) · help (five presses; nobody is coming) · sun (you can feel it; it sets unseen) · fire (800 °C,
 no light; a man walks towards it and stops a metre short) · world (8 billion blind; plants stop; planes still flying) ·
 plane (630 m up, its pilots can't read an instrument) · road (cars stopped, a lorry creeping, the bang 1.5 s late) ·
@@ -75,4 +77,5 @@ the ice bending to the last frame.
 ## 6. Checks and review log
 
 - script.js throws if a caption's moment or number drifts from physics.js (11 caption moments, 24 caption numbers).
-- Review round 1 (story; picture) and the fixes, review round 2: EPISODE_REPORT.md.
+- Review round 1 (story; picture) and the fixes, review round 2 and its fixes: EPISODE_REPORT.md § Reviews.
+- The music's dynamics (mix.js) are keyed to beats and physics events, so a caption change moves them with the picture.

@@ -175,6 +175,18 @@ Everything is procedural, so there are no models, images or sound files to downl
 > 150 metres short of the hill, and everything the hill stopped is coming west at 1,670 km/h. The story clock only
 > runs forward. Physics, clock, shots and review log: [`films/earth-stop/PLAN.md`](films/earth-stop/PLAN.md) and
 > [`EPISODE_REPORT.md`](films/earth-stop/EPISODE_REPORT.md).
+>
+> ***What if there was no light in the universe?*** — open `no-light.html` (16:9, voiceless, 4:46). At 2:40 PM on a
+> Sunday in January, on a frozen lake in Norway with 240 people skating, every bit of visible light stops existing
+> (only 380 to 750 nanometres: take away all of electromagnetism and your atoms come apart). Everyone is blind at once,
+> you too. The film is shown the only way left, as a heat camera would see it, and in pure black. You hit someone
+> sitting on the ice; your own skin glows at 9.5 micrometres; a woman grabs your arm; nobody is coming; a bonfire at
+> 800 °C makes no light at all and a man stops a metre short of it; a plane flies over 630 metres up with pilots who
+> can't read an instrument. On the shore road a lorry creeping by feel shoves a car out onto the lake, the bang
+> arriving 1.5 seconds after you see it. The car goes through where the stream keeps the ice thin, and its driver is
+> holding on to the edge in 0 °C water, his arms giving out. You crawl flat towards his voice while she holds your
+> ankles, and the ice bends under your chest. The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/no-light/PLAN.md`](films/no-light/PLAN.md) and [`EPISODE_REPORT.md`](films/no-light/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
