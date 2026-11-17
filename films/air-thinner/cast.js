@@ -20,8 +20,8 @@ Object.assign(LOOKS, {
   atOld: { skin: 5, build: 'broad', shirt: '#e9e3d2', sleeves: 'short', pants: '#7c8794', shoes: '#c9b89a', sole: '#555', hair: '#e6e2dc', hat: { type: 'cap', color: '#f4f1ea' } },
   atWife: { skin: 5, build: 'slim', shirt: '#4e8fc4', sleeves: 'short', pants: '#f2efe6', shoes: '#e9e0d0', sole: '#bbb', hair: '#d8d2c8', hairStyle: 'bun' },
   atBarman: { skin: 3, build: 'avg', shirt: '#f4f4f0', sleeves: 'short', pants: '#16181b', shoes: '#111', sole: '#111', hair: '#141010', apron: '#1a1c20' },
-  atOfficer: { skin: 0, build: 'avg', shirt: '#f6f6f2', sleeves: 'short', pants: '#f2f2ee', shoes: '#111', sole: '#111', hair: '#3a2a1a', collar: true },
-  atJaw: { skin: 0, build: 'broad', shirt: AT_SKIN(0), sleeves: 'short', pants: '#2a6ab0', shoes: '#333', sole: '#222', hair: '#6a4a2a' },
+  atOfficer: { skin: 0, build: 'avg', shirt: '#f6f6f2', sleeves: 'short', pants: '#1f2b45', shoes: '#111', sole: '#111', hair: '#3a2a1a', collar: true },
+  atJaw: { skin: 0, build: 'broad', shirt: '#e0783c', sleeves: 'short', pants: '#2a6ab0', shoes: '#333', sole: '#222', hair: '#6a4a2a' },
 });
 // the people round the pool: swimwear and resort clothes (a bare chest is a shirt the colour of the skin)
 const AT_CROWD_LOOKS = (() => {
@@ -106,7 +106,7 @@ const AT_P = {
   handsKnees: (t, i) => { const p = basePose(); p.hipY = 0.86; p.lHip = [0.55, 0.12]; p.rHip = [0.5, 0.12]; p.lKnee = 0.45; p.rKnee = 0.5; p.spine = 0.85; p.neck = -0.35; p.lSh = [0.75, 0.15]; p.rSh = [0.75, 0.15]; p.lEl = 0.15; p.rEl = 0.15; return p; },
   slumpSit: (t, i) => { const p = basePose(); p.hipY = 0.13; p.lHip = [1.45, 0.3]; p.rHip = [1.3, 0.22]; p.lKnee = 0.6; p.rKnee = 1.1; p.spine = 0.35; p.neck = 0.75; p.headRoll = 0.25 * ((i % 2) * 2 - 1); p.lSh = [0.12, 0.2]; p.rSh = [0.1, 0.25]; p.lEl = 0.2; p.rEl = 0.3; return p; },
   slumpEdge: (t, i) => { const p = AT_P.sitEdge(t, i); p.spine = 0.65; p.neck = 0.8; p.lSh = [0.2, 0.2]; p.rSh = [0.25, 0.25]; p.lEl = 0.3; p.rEl = 0.2; p.headYaw = 0.0; p.headRoll = 0.3; return p; },
-  slumpRecline: (t, i) => { const p = AT_P.recline(t, i); p.neck = 0.05; p.headYaw = 0.0; p.headRoll = (i % 2 ? 0.6 : -0.6); p.rSh = [0.25, 0.55]; p.rEl = 0.15; p.lSh = [0.2, 0.55]; p.lEl = 0.2; p.mouth = 0.4; return p; },
+  slumpRecline: (t, i) => { const p = AT_P.recline(t, i); p.spine = -0.98; p.neck = 0.35; p.headYaw = (i % 2 ? 0.5 : -0.5); p.headRoll = (i % 2 ? 0.7 : -0.7); p.rSh = [0.1, 0.4]; p.rEl = 0.12; p.lSh = [0.08, 0.38]; p.lEl = 0.15; p.lKnee = 0.3; p.rKnee = 0.25; p.mouth = 0.4; return p; },
   slumpStool: (t, i) => { const p = AT_P.stool(t, i); p.spine = 0.95; p.neck = 0.5; p.lSh = [1.35, 0.25]; p.rSh = [1.4, 0.2]; p.lEl = 0.4; p.rEl = 0.5; p.headYaw = 0.4; return p; },
   lieLimp: (t, i) => { const p = AT_P.lieFlat(t, i); p.headYaw = i % 2 ? 0.7 : -0.6; p.lSh = [0.2, 0.55]; p.rSh = [0.1, 0.45]; p.mouth = 0.3; return p; },
   // the man who can't get his breath: sitting up on the lounger's edge, hunched, a hand on his chest
@@ -143,6 +143,24 @@ const AT_P = {
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
+// FACES: the people seen close get a real face (the engine's HeroFace: eyes, lids, brows, lips); it rebuilds the head,
+// so the cap and the ponytail go back on after it. atFaceSet(P, t, F): blinking (staggered), and F's expression.
+// ---------------------------------------------------------------------------------------------------------------------
+function atFace(P, o = {}) {
+  const H = P.j.head, G = PersonGeo, keep = H.children.filter((c) => c.geometry && [G.cap, G.brim, G.pony].includes(c.geometry));
+  const L = P.look;
+  P.face = new HeroFace(H, Object.assign({ skin: AT_SKIN(L.skin), hair: L.hair, hairStyle: L.hairStyle, seed: 7 }, o));
+  for (const c of keep) H.add(c);
+  P._faceSeed = (o.seed || 7) * 0.37;
+  return P.face;
+}
+function atFaceSet(P, t, F = {}) {
+  if (!P.face) return;
+  const per = 3.4 + (P._faceSeed % 1.7), ph = (t + P._faceSeed * 5.3) % per, bl = ph < 0.16 ? Math.sin(ph / 0.16 * ATPI) : 0;
+  P.face.set({ blink: Math.max(bl, F.shut || 0), mouth: F.mouth || 0, worry: F.worry || 0, frown: F.frown || 0, brow: F.brow || 0, wide: F.wide || 0 });
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // PROPS ON PEOPLE: a diving mask, a regulator's mouthpiece, fins, a weight belt; an oxygen mask
 // ---------------------------------------------------------------------------------------------------------------------
 function atDiveGear(P, o = {}) {
@@ -150,13 +168,19 @@ function atDiveGear(P, o = {}) {
   const mask = new THREE.Group(); head.add(mask); mask.position.set(0, 0.025, 0.088);
   atMesh(new THREE.BoxGeometry(0.16, 0.07, 0.04), frame, 0, 0, 0, mask); atMesh(new THREE.BoxGeometry(0.15, 0.058, 0.01), lens, 0, 0.002, 0.022, mask);
   atMesh(new THREE.TorusGeometry(0.105, 0.008, 4, 18), frame, 0, 0.0, -0.085, mask).rotation.y = ATPI / 2;     // the strap
-  const reg = atMesh(new THREE.BoxGeometry(0.05, 0.035, 0.04), atStd('#202326', 0.5), 0, -0.065, 0.11, head);
+  // the regulator: a round second stage in the mouth (a grey purge cover on its face), its hose over the right shoulder
+  const reg = new THREE.Group(); head.add(reg); reg.position.set(0, -0.062, 0.1);
+  const rb = atMesh(new THREE.CylinderGeometry(0.026, 0.028, 0.034, 16), atStd('#202326', 0.5), 0, 0, 0.012, reg); rb.rotation.x = ATPI / 2;
+  const rc = atMesh(new THREE.CylinderGeometry(0.02, 0.022, 0.006, 16), atStd('#8a9096', 0.45), 0, 0, 0.031, reg); rc.rotation.x = ATPI / 2;
+  atMesh(new THREE.BoxGeometry(0.03, 0.014, 0.02), atStd('#202326', 0.5), 0, -0.022, 0.012, reg);
+  const hose = new THREE.CatmullRomCurve3([[0.022, 0, 0.008], [0.07, -0.02, -0.01], [0.1, -0.08, -0.07], [0.1, -0.17, -0.15]].map((q) => new THREE.Vector3(...q)));
+  atMesh(new THREE.TubeGeometry(hose, 12, 0.008, 6), atStd('#16181b', 0.6), 0, 0, 0, reg);
   const fins = [];
   if (o.fins !== false) for (const lg of [P.j.ll, P.j.rl]) { const f = atMesh(new THREE.BoxGeometry(0.17, 0.015, 0.55), atStd(o.finCol || '#f2c21a', 0.55), 0, -0.05, 0.26, lg.ft); f.rotation.x = 0.0; fins.push(f); }
   const belt = atMesh(new THREE.BoxGeometry(0.36, 0.05, 0.25), atStd('#2a2e33', 0.6), 0, 0.06, 0, P.j.hips);
   return { mask, reg, fins, belt };
 }
 function atO2Mask(P) {
-  const m = atMesh(new THREE.ConeGeometry(0.05, 0.07, 12, 1, true), new THREE.MeshStandardMaterial({ color: '#f0e3a8', roughness: 0.4, transparent: true, opacity: 0.85 }), 0, -0.05, 0.11, P.j.head); m.rotation.x = -ATPI / 2;
+  const m = atMesh(new THREE.ConeGeometry(0.062, 0.085, 14, 1, true), new THREE.MeshStandardMaterial({ color: '#f2df8a', roughness: 0.35, side: THREE.DoubleSide }), 0, -0.06, 0.13, P.j.head); m.rotation.x = -ATPI / 2;
   return m;
 }

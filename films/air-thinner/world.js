@@ -1,6 +1,6 @@
 /* =====================================================================
    WORLD — the open Atlantic round the ship: the sky (it darkens as the air goes: overhead first, the horizon's band
-   last; the clouds dry away; stars come out beside the Sun), the Sun, the sea (swell, ripples, sun glitter, the ship's
+   last; the clouds dry away; stars come out in full sunshine), the Sun, the sea (swell, ripples, sun glitter, the ship's
    bow wave and wake while it moves, the boil at the end) and the sea seen from below (Snell's window).
      atSky(scene) → { mesh, set(s, cam) }       a dome centred on the camera
      atSea(scene) → { mesh, set(s, t, cam) }     a polar grid centred under the camera (no triangle over ~150 m)
@@ -11,10 +11,10 @@
 function atSkyCols(a) {
   const z = ATL.zenith(a), h = ATL.horizon(a);
   // overhead: a clear tropical blue, deepening to indigo as it thins (less light scattered twice), then black
-  const blue = [0.16, 0.36, 0.78], deep = [0.05, 0.08, 0.32];
-  const zc = blue.map((v, i) => MathX.lerp(deep[i], v, MathX.smooth(a, 0.15, 0.9)) * Math.pow(z, 0.9) * 1.0);
+  const blue = [0.14, 0.34, 0.8], deep = [0.05, 0.08, 0.32];
+  const zc = blue.map((v, i) => MathX.lerp(deep[i], v, MathX.smooth(a, 0.15, 0.9)) * Math.pow(z, 1.2) * 1.15);
   // low: pale, hazy (through 30× more air), turning a thin cobalt band, then dark
-  const pale = [0.62, 0.74, 0.88], band = [0.18, 0.3, 0.62];
+  const pale = [0.5, 0.68, 0.92], band = [0.18, 0.3, 0.62];
   const hc = pale.map((v, i) => MathX.lerp(band[i], v, MathX.smooth(a, 0.12, 0.6)) * h);
   return { zen: zc, hor: hc };
 }
@@ -36,7 +36,7 @@ function atSky(scene) {
       void main(){
         vec3 D = normalize(vD); float h = D.y;
         // under water the far distance is the water itself (the surface overhead is the sea's mesh)
-        if (uUnder > 0.5) { gl_FragColor = vec4(uUnderC * (0.55 + 0.6 * smoothstep(-0.6, 0.4, h)), 1.0); return; }
+        if (uUnder > 0.5) { gl_FragColor = vec4(uUnderC * (0.55 + 0.45 * smoothstep(-0.6, 0.0, h)), 1.0); return; }
         float up = clamp(h, 0.0, 1.0);
         // the gradient: the horizon's band hugs the sea; overhead takes over above ~20°
         vec3 col = mix(uHor, uZen, pow(smoothstep(-0.02, 0.55, up), 0.65));
@@ -47,8 +47,9 @@ function atSky(scene) {
         col += vec3(1.0, 0.98, 0.94) * smoothstep(0.99991, 0.99996, g) * 30.0 * uSunK;
         // stars (fixed in the sky: cells on a sphere), only where the sky is dark enough
         if (uStars > 0.001 && h > 0.0) {
-          vec3 q = D * 180.0, c = floor(q), f = fract(q) - 0.5; float r = h2(c);
-          if (r > 0.9965) { float b = (r - 0.9965) / 0.0035; float s = smoothstep(0.17, 0.0, length(f)) * (0.35 + 1.6 * b * b);
+          // (cells ~0.5° across; a star ~2 px wide at 1080p so it survives the video's compression)
+          vec3 q = D * 115.0, c = floor(q), f = fract(q) - 0.5; float r = h2(c);
+          if (r > 0.991) { float b = (r - 0.991) / 0.009; vec3 o = vec3(h2(c + 7.7), h2(c + 9.1), h2(c + 4.3)) - 0.5; float s = smoothstep(0.2, 0.02, length(f - o * 0.5)) * (0.9 + 2.6 * b * b * b);
             col += vec3(0.9 + 0.1 * h2(c + 3.1), 0.92, 1.0) * s * uStars * smoothstep(0.0, 0.08, h); }
         }
         // fair-weather cumulus at ~1.2 km, drifting; they dry away as the air (and its vapour) goes
@@ -177,10 +178,11 @@ function atSea(scene) {
         }
         // ---- the boil: the surface seethes white, cells bursting
         if (uBoil > 0.001) {
-          vec2 B = P * (cameraPosition.y >= -0.05 ? 1.3 : 3.1) + vec2(0.0, uBoilT * 1.3);
-          float cells = smoothstep(0.55, 0.9, n2(B) * 0.6 + n2(B * 2.7 - uBoilT * 4.0) * 0.4);
-          float k = uBoil * (0.55 + 0.45 * cells);
-          col = mix(col, vec3(0.8, 0.86, 0.9) * (cameraPosition.y >= -0.05 ? (0.3 + 0.7 * max(uSun.y, 0.3)) : 0.55), k * (cameraPosition.y >= -0.05 ? 0.8 : 0.45));
+          vec2 B = P * (cameraPosition.y >= -0.05 ? 1.3 : 0.32) + vec2(0.0, uBoilT * 1.3);
+          float cells = smoothstep(0.5, 0.78, n2(B + vec2(uBoilT * 0.9, 0.0)) * 0.55 + n2(B * 2.7 - uBoilT * 5.0) * 0.45);
+          float k = uBoil * (cameraPosition.y >= -0.05 ? 0.2 + 0.8 * cells : 0.65 + 0.35 * cells);
+          // (from below: the froth lit by the sun through it, a bright churning ceiling)
+          col = mix(col, cameraPosition.y >= -0.05 ? vec3(0.8, 0.86, 0.9) * (0.3 + 0.7 * max(uSun.y, 0.3)) : vec3(0.72, 0.86, 0.95) * (0.8 + 0.5 * cells), k * (cameraPosition.y >= -0.05 ? 0.6 : 0.9));
         }
         gl_FragColor = vec4(col, 1.0);
         ${THREE.ShaderChunk.fog_fragment}

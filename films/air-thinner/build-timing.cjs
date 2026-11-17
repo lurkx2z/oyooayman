@@ -16,14 +16,14 @@ const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
   title: 0.05, start: 0.4, weight: 1.0, boil: 1.0, ears: 1.4, storm: 2.4, cabin: 1.4, stairs: 1.4, tanks: 1.4, down: 1.4, engines: 2.6,
-  marina: 1.4, dive: 1.2, under: 4.2, fizz: 1.4, shark: 2.0, everest: 2.0, oxygen: 1.4, rise: 1.6, sky: 1.8, tubs: 3.0, stars: 3.0, sea: 2.8, last: 1.6, question: 2.2,
+  marina: 1.4, dive: 1.2, under: 4.2, fizz: 1.4, shark: 2.0, everest: 2.0, oxygen: 1.4, rise: 1.6, sky: 1.8, tubs: 3.65, stars: 3.0, sea: 2.8, last: 1.6, question: 2.2,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
   'start:1': 0.6, 'start:2': 0.3, 'weight:1': 0.4, 'weight:2': 0.6, 'boil:1': 0.8, 'ears:1': 1.4, 'storm:1': 0.8, 'cabin:1': 0.6, 'cabin:2': 1.0,
-  'stairs:1': 0.8, 'stairs:2': 0.6, 'tanks:1': 0.6, 'tanks:2': 0.6, 'tanks:3': 0.4, 'down:1': 1.0, 'down:2': 0.8, 'engines:1': 3.0, 'fizz:1': 0.6, 'shark:1': 1.4, 'shark:2': 1.6,
+  'stairs:1': 0.8, 'stairs:2': 0.6, 'tanks:1': 0.6, 'tanks:2': 0.6, 'tanks:3': 0.4, 'down:1': 1.0, 'down:2': 0.8, 'engines:1': 2.8, 'fizz:1': 0.6, 'shark:1': 1.4, 'shark:2': 1.6,
   'marina:1': 0.8, 'marina:2': 0.6, 'dive:1': 1.0, 'under:1': 1.2, 'under:2': 1.0, 'everest:1': 1.2, 'rise:1': 0.8, 'rise:2': 1.2,
-  'tubs:1': 1.4, 'tubs:2': 0.8, 'stars:1': 1.0, 'sea:1': 3.0, 'sea:2': 1.0, 'last:1': 1.2,
+  'tubs:1': 1.4, 'tubs:2': 0.8, 'stars:1': 0.9, 'sea:1': 3.0, 'sea:2': 1.0, 'last:1': 1.2,
 };
 const SECTION_OF = { title: 1, tanks: 2, under: 3 };
 const GAP = 0.6;                     // between captions inside a beat

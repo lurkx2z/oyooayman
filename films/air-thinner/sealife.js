@@ -31,12 +31,14 @@ function atShark(scene) {
   // the body: rings along z (head +1.3 … tail −1.3): blunt round snout, deep body, a slim tail stock
   const rings = []; const N = 26;
   for (let i = 0; i <= N; i++) { const u = i / N, z = 1.3 - 2.6 * u;
-    const r = u < 0.12 ? 0.08 + 1.55 * Math.sqrt(u) * 0.19 : u < 0.5 ? 0.24 + 0.02 * Math.sin(u * 6) : 0.24 * Math.pow(1 - (u - 0.5) / 0.5, 1.1) + 0.035;
-    rings.push([0, 0, z, r * 0.92, r * 1.08]); }
+    // (a pointed, flattened snout; the body deepest a third of the way back; a long taper to a slim tail stock)
+    const r = u < 0.32 ? 0.01 + 0.24 * Math.pow(Math.sin(u / 0.32 * ATPI / 2), 0.8) : u < 0.5 ? 0.25 : 0.25 * Math.pow(1 - (u - 0.5) / 0.5, 1.3) + 0.028;
+    const flat = 1 - 0.35 * (1 - MathX.smooth(u, 0.02, 0.2));
+    rings.push([0, -0.02 * (1 - MathX.smooth(u, 0, 0.2)), z, r * 0.86, r * 1.1 * flat]); }
   const bg = atLoft(rings, 16, 0.7);
   // (u around, v along: colour by the ring's angle: the belly white, the back dark)
-  { const p = bg.attributes.position, uv = bg.attributes.uv, col = new Float32Array(p.count * 3), c0 = new THREE.Color('#ecefea'), c1 = new THREE.Color('#5c594e');
-    for (let i = 0; i < p.count; i++) { const yv = p.getY(i), xv = p.getX(i), a = Math.atan2(yv, Math.abs(xv) + 1e-4), k = MathX.smooth(a, -0.25, 0.25); const c = c0.clone().lerp(c1, k); col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b; }
+  { const p = bg.attributes.position, uv = bg.attributes.uv, col = new Float32Array(p.count * 3), c0 = new THREE.Color('#e4e7e2'), c1 = new THREE.Color('#403e36');
+    for (let i = 0; i < p.count; i++) { const yv = p.getY(i), xv = p.getX(i), a = Math.atan2(yv, Math.abs(xv) + 1e-4), k = MathX.smooth(a, -0.45, 0.05); const c = c0.clone().lerp(c1, k); col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b; }
     bg.setAttribute('color', new THREE.BufferAttribute(col, 3)); bodyM.vertexColors = true; void uv; void tex; }
   const body = new THREE.Mesh(bg, bodyM); body.castShadow = true; g.add(body);
   // fins: flat shapes (the whitetip's are long and rounded, their tips white)
@@ -89,13 +91,15 @@ function atFish(scene, n = 260) {
   const o = new THREE.Object3D();
   return {
     m,
-    set(s, c, show, k = 1) {
+    set(s, c, show, k = 1, cam = null) {
       m.visible = show; if (!show) return;
       L.forEach((f, i) => {
         const a = f.ph + s * f.sp, rr = f.R * (0.85 + 0.15 * Math.sin(s * 0.3 + f.wob)) * k;
         const x = c[0] + Math.cos(a) * rr, z = c[2] + Math.sin(a) * rr * 0.7, y = c[1] + f.y + 0.25 * Math.sin(s * 0.7 + f.wob);
         o.position.set(x, y, z);
-        const dx = -Math.sin(a), dz = Math.cos(a) * 0.7; o.rotation.set(0.1 * Math.sin(s * 2 + i), Math.atan2(dx, dz), 0, 'YXZ'); o.scale.setScalar(f.sc);
+        // (none within 2.2 m of the lens: up close a 13 cm fish fills the frame like a blimp)
+        const near = cam ? Math.hypot(x - cam.x, y - cam.y, z - cam.z) : 9, fade = MathX.smooth(near, 1.6, 2.4);
+        const dx = -Math.sin(a), dz = Math.cos(a) * 0.7; o.rotation.set(0.1 * Math.sin(s * 2 + i), Math.atan2(dx, dz), 0, 'YXZ'); o.scale.setScalar(f.sc * Math.max(1e-3, fade));
         o.updateMatrix(); m.setMatrixAt(i, o.matrix);
       });
       m.instanceMatrix.needsUpdate = true;

@@ -19,7 +19,7 @@ const AT_CTX = (() => {
   const beat = (id, l, f, k0 = 0, k1) => [atC(id, k0) - 0.2, (k1 != null ? atCap(id, k1).hide : atE(id)) + 0.2, l, f];
   const P = ATP;
   return [
-    beat('start', 'THE NEAREST LAND', () => ({ v: `${atN(Math.round(P.kmToLand / 10) * 10)} <small>km</small>`, v2: `ON BOARD: ${atN(P.passengers)} PASSENGERS · ${atN(P.crew)} CREW` }), 0, 1),
+    beat('start', 'THE NEAREST LAND', () => ({ v: `${atN(Math.round(P.kmToLand / 100) * 100)} <small>km</small>`, v2: `ON BOARD: ${atN(P.passengers)} PASSENGERS · ${atN(P.crew)} CREW` }), 0, 1),
     beat('weight', 'THE FIRST 1%', () => ({ v: `${Math.round(P.climb1)} <small>m up</small>`, v2: 'THE FUNNEL’S TOP: 64 m OVER THE SEA' }), 2),
     beat('boil', 'THE SEA: 26 °C', () => ({ v: `boils below ${P.pvap(P.seaC).toFixed(0)} <small>hPa</small>`, v2: 'WATER BOILS WHEN THE AIR PRESSES ON IT LESS THAN ITS VAPOUR DOES' })),
     beat('cabin', 'LIKE BEING', (t, s) => ({ v: `${atAlt(s)} <small>m up</small>`, v2: 'AN AIRLINER’S CABIN: 2,438 m (8,000 ft)' }), 0, 0),
@@ -46,7 +46,7 @@ const AT_CTX = (() => {
 })();
 // the honest labels (bottom left): [from, to, text]
 const AT_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [atC(id, k0) - 0.1, (k1 != null ? atCap(id, k1).hide : atE(id)) + 0.2, text]; return [
-  b('start', 'THE RULE: AT THE TOP OF EVERY MINUTE, 1% OF THE AIR LEFT STOPS EXISTING · NOTHING ELSE CHANGES', 0, 2),
+  b('start', 'THE RULE: EVERY MINUTE, 1% OF THE AIR THAT’S LEFT IS GONE · NOTHING ELSE CHANGES', 0, 2),
   b('weight', 'LIKE CLIMBING: THE HEIGHT WHERE A STANDARD SKY IS THIS THIN (ICAO STANDARD ATMOSPHERE)', 2),
   b('ears', 'A BALLOON’S GAS SWELLS AS THE AIR AROUND IT THINS (BOYLE’S LAW)', 1),
   b('fizz', 'CARBON DIOXIDE COMES OUT OF A DRINK FASTER WHEN THE AIR PRESSING ON IT IS THINNER', 1),
@@ -207,10 +207,11 @@ class AtHud {
     const below = ATP.hpa(s) < ATP.tip;
     return AtHud.svg(`${AtHud.plate()}${T(30, 56, 't', 'THE SHIP’S BAROMETER')}
       <path d="M ${pt(lo, R)[0]} ${pt(lo, R)[1]} A ${R} ${R} 0 0 1 ${pt(hi, R)[0]} ${pt(hi, R)[1]}" fill="none" stroke="#5a6470" stroke-width="3"/>${ticks.join('')}
-      <line x1="${tx}" y1="${ty}" x2="${tx2}" y2="${ty2}" stroke="#ff6a4a" stroke-width="6"/>${T(tx - 250, ty + 6, 's', 'TYPHOON TIP · 870', 240)}
-      <circle cx="${nx0}" cy="${ny0}" r="7" fill="#9fd0ff"/>${T(nx0 + 14, ny0 - 6, 'sm', 'A NORMAL DAY', 200)}
+      <line x1="${tx}" y1="${ty}" x2="${tx2}" y2="${ty2}" stroke="#ff6a4a" stroke-width="6"/>
+      <circle cx="${nx0}" cy="${ny0}" r="7" fill="#9fd0ff"/>
+      ${T(30, 452, 'sm', '<tspan fill="#9fd0ff">●</tspan> A NORMAL DAY · 1013 &#160;&#160; <tspan fill="#ff6a4a">▌</tspan> TYPHOON TIP, 1979 · 870', 700)}
       <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${below ? '#ffcf8a' : '#ffffff'}" stroke-width="6" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="12" fill="#ffffff"/>
-      ${T(cx - 70, cy + 80, 'b', `${Math.round(ATP.hpa(s))} hPa`, 220)}${below ? T(cx - 150, cy + 128, 's', 'LOWER THAN ANY STORM', 320) : ''}`);
+      ${T(cx - 70, cy + 70, 'b', `${Math.round(ATP.hpa(s))} hPa`, 220)}${below ? T(cx - 150, cy + 108, 's', 'LOWER THAN ANY STORM', 320) : ''}`);
   }
   // the regulator: it gives you air at the pressure round you (up here: thin; at 10 m: the sea's weight + the air's)
   static reg(u, t, s) {

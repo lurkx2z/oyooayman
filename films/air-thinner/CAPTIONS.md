@@ -22,7 +22,7 @@ status: voiceless
 
 [cabin] 10:29. The air is as thin as inside a plane at cruising height. / Everything sealed is swelling: crisp packets, sun cream, the pool toys. / Her balloon just burst.
 
-[fizz] 10:35. Every fizzy drink at the bar is foaming over. / The gas in them is escaping, like a bottle opened again and again.
+[fizz] 10:35. Every fizzy drink at the bar is foaming over. / The gas comes out of them faster as less air presses down on them.
 
 [stairs] 10:44. One flight of stairs leaves people gasping. / A man by the pool can't get his breath back. / The ship's doctor is 13 decks down.
 
@@ -30,7 +30,7 @@ status: voiceless
 
 [down] The lifts are jammed. You take the stairs: 13 decks down. / The girl with the balloon is on the stairs. She's lost her parents. / You take her hand.
 
-[engines] 11:08. Half the air is gone. The engines can't burn their fuel. / 11:13. The power fails all over the ship.
+[engines] 11:08. Half the air is gone. The engines can't burn all their fuel. / 11:13. The power fails all over the ship.
 
 [marina] 11:20. Deck 2. The air is as thin as 6,400 metres up a mountain. / Your hands are clumsy. Your sight is closing in. / At this height, people pass out within minutes.
 
@@ -46,11 +46,11 @@ status: voiceless
 
 [rise] She sees it, and lets go of the line. / She's kicking for the light. Up there, she'd pass out in 15 seconds. / You catch her fin.
 
-[sky] 1:40 PM. The sky is going dark. There's too little air left to scatter sunlight blue.
+[sky] 1:40 PM. The sky is going dark. There's too little air left to light it.
 
 [tubs] 2:26 PM. The hot tubs on deck start to boil. They're only 39 °C. / 2:37. Now even water at body temperature boils. / Nothing up there will wake up again.
 
-[stars] 3:00 PM. Stars, in the middle of the afternoon, beside the Sun. / Only 5% of the air is left.
+[stars] 3:00 PM. Stars, in the middle of the afternoon, in full sunshine. / Only 5% of the air is left.
 
 [sea] 3:27. The pool is boiling. / 3:39. The ocean starts to boil. / Only the top. Down here, the sea's weight keeps the water around you liquid.
 

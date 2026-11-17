@@ -170,7 +170,7 @@ function atDeck(set, ship) {
         const rr = g.r * (0.93 + 0.2 * over), hh = Math.max(0.004, lift * 0.62);
         ob.position.set(g.x, g.y + lift - hh, g.z); ob.rotation.set(0, i, 0); ob.scale.set(rr, hh, rr); ob.updateMatrix(); heads.setMatrixAt(i, ob.matrix);
         for (let j = 0; j < 3; j++) { const a = i * 2.3 + j * 2.1, L = 0.004 + 0.11 * over * (0.4 + 0.6 * atR(i * 3 + j, 61)) * MathX.clamp(fk * 1.4 - 0.2 * j, 0, 1), w = 0.0045 + 0.002 * atR(i * 3 + j, 62);
-          ob.position.set(g.x + Math.cos(a) * g.r * 1.03, g.rim - L / 2, g.z + Math.sin(a) * g.r * 1.03); ob.rotation.set(0, 0, 0); ob.scale.set(w, Math.max(0.001, L), w); ob.updateMatrix(); drips.setMatrixAt(i * 3 + j, ob.matrix); }
+          ob.position.set(g.x + Math.cos(a) * g.r * 1.03, g.rim - L / 2, g.z + Math.sin(a) * g.r * 1.03); ob.rotation.set(0, 0, 0); ob.scale.set(w, Math.max(0.001, L) / 3, w); ob.updateMatrix(); drips.setMatrixAt(i * 3 + j, ob.matrix); }   // (the unit capsule is 3 tall: scaled to L, rim down to rim − L)
       });
       heads.instanceMatrix.needsUpdate = true; drips.instanceMatrix.needsUpdate = true;
     } };
@@ -229,6 +229,11 @@ function atDeck(set, ship) {
       B.add(new THREE.CylinderGeometry(0.1, 0.1, 0.55, 16), tankM, Geo.matrix(x, yb + 0.33, z)); B.add(new THREE.SphereGeometry(0.1, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), tankM, Geo.matrix(x, yb + 0.605, z));
       B.add(new THREE.CylinderGeometry(0.03, 0.03, 0.08, 8), valveM, Geo.matrix(x, yb + 0.73, z)); out.shop.rack.push([x, yb, z]); }
     B.box(2.3, 0.05, 0.03, x0 + 2.3, yb + 0.5, zw - 0.13, atStd('#222', 0.6));
+    // the port wall's dressing: a coral stripe, six BC jackets on hooks above the tanks, masks on pegs further aft
+    B.box(x1 - x0 - 0.1, 0.12, 0.02, (x0 + x1) / 2, yb + 1.05, zw - 0.015, atStd('#e8603c', 0.6));
+    const bcM = atStd('#1b1f24', 0.8), bcT = atStd('#1d5d6e', 0.75), maskM = atStd('#2a2e33', 0.5), lensM = atStd('#9fb8c4', 0.15, 0.4);
+    for (let i = 0; i < 6; i++) { const x = x0 + 1.4 + i * 0.36; B.box(0.27, 0.5, 0.1, x, yb + 1.56, zw - 0.07, i % 2 ? bcT : bcM); B.box(0.04, 0.06, 0.06, x, yb + 1.86, zw - 0.03, steel); }
+    for (let i = 0; i < 5; i++) { const x = x0 + 3.85 + i * 0.32; B.box(0.2, 0.09, 0.05, x, yb + 1.5, zw - 0.035, maskM); B.box(0.16, 0.06, 0.012, x, yb + 1.5, zw - 0.066, lensM); B.box(0.03, 0.05, 0.05, x, yb + 1.58, zw - 0.025, steel); }
   }
   const grp = new THREE.Group(); B.build(grp, 'deck'); S.add(grp); out.group = grp;
   return out;

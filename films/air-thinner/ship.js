@@ -231,7 +231,8 @@ function atShip(set) {
     for (let z = -zh; z < zh - 0.01; z += 12) { const e = Math.min(zh, z + 12); B.box(0.04, 1.1, e - z, b - 0.25, y1 + 0.6, (z + e) / 2, glassM, 0, { noShadow: true }); B.box(0.08, 0.06, e - z, b - 0.25, y1 + 1.17, (z + e) / 2, steel); }
     out.aftBlock = { a, b, y0, y1 };
   }
-  // ---- the funnel: a raked, rounded stack (navy, a coral wave on it), two exhausts
+  // ---- the funnel: a raked, rounded stack (navy, a coral band round it: straight, since the wrap's seam would saw a
+  // wave), two exhausts
   { const fx0 = F.funnel.x0, fx1 = F.funnel.x1, yb = D(17), yt = F.funnel.top, L = fx1 - fx0, W = 11;
     const sh = new THREE.Shape(); const r = 4.2; sh.moveTo(-L / 2 + r, -W / 2); sh.lineTo(L / 2 - r, -W / 2); sh.quadraticCurveTo(L / 2, -W / 2, L / 2, -W / 2 + r); sh.lineTo(L / 2, W / 2 - r); sh.quadraticCurveTo(L / 2, W / 2, L / 2 - r, W / 2);
     sh.lineTo(-L / 2 + r, W / 2); sh.quadraticCurveTo(-L / 2, W / 2, -L / 2, W / 2 - r); sh.lineTo(-L / 2, -W / 2 + r); sh.quadraticCurveTo(-L / 2, -W / 2, -L / 2 + r, -W / 2);
@@ -239,7 +240,7 @@ function atShip(set) {
     // rake it aft (x grows with height) and taper
     const p = fg.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i), k = y / (yt - yb); p.setX(i, p.getX(i) * (1 - 0.18 * k) + 5 * k); p.setZ(i, p.getZ(i) * (1 - 0.12 * k)); }
     fg.computeVertexNormals();
-    const ftex = atTex(atCanvas(512, 256, (g, w, h) => { g.fillStyle = '#14233a'; g.fillRect(0, 0, w, h); g.fillStyle = '#f06a4a'; g.beginPath(); g.moveTo(0, h * 0.62); for (let x = 0; x <= w; x += 8) g.lineTo(x, h * 0.55 + Math.sin(x / w * Math.PI * 4) * h * 0.06); g.lineTo(w, h * 0.72); for (let x = w; x >= 0; x -= 8) g.lineTo(x, h * 0.66 + Math.sin(x / w * Math.PI * 4) * h * 0.06); g.fill();
+    const ftex = atTex(atCanvas(512, 256, (g, w, h) => { g.fillStyle = '#14233a'; g.fillRect(0, 0, w, h); g.fillStyle = '#f06a4a'; g.fillRect(0, h * 0.56, w, h * 0.1); g.fillStyle = '#f6f2ea'; g.fillRect(0, h * 0.68, w, h * 0.025);
       g.fillStyle = '#f2f2ee'; g.fillRect(0, h * 0.86, w, h * 0.14); g.fillStyle = '#0d1522'; g.fillRect(0, 0, w, h * 0.05); }), { repeat: false });
     const fuv = new Float32Array(p.count * 2); for (let i = 0; i < p.count; i++) { fuv[i * 2] = (Math.atan2(p.getZ(i), p.getX(i)) / (Math.PI * 2) + 0.5) * 2; fuv[i * 2 + 1] = p.getY(i) / (yt - yb); } fg.setAttribute('uv', new THREE.BufferAttribute(fuv, 2));
     const fm = new THREE.Mesh(fg, new THREE.MeshStandardMaterial({ map: ftex, roughness: 0.45 })); fm.position.set((fx0 + fx1) / 2, yb, 0); fm.castShadow = fm.receiveShadow = true; S.add(fm);

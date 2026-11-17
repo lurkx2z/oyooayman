@@ -86,7 +86,7 @@ const AT_SHOTS = [];
     ['Tb2', 'tubWide', c('tubs', 0) + 2.4, J('tubs', 1)],
     ['Tb3', 'bodyTemp', J('tubs', 1), c('tubs', 2) - 0.5],
     ['Tb4', 'calm', c('tubs', 2) - 0.5, J('stars', 0)],
-    // 3:00: stars beside the Sun
+    // 3:00: stars in full sunshine
     ['Sr4', 'stars', J('stars', 0), c('stars', 1) - 0.5],
     ['Sr5', 'starsFunnel', c('stars', 1) - 0.5, J('sea', 0)],
     // 3:27 the pool boils; 3:39 the ocean

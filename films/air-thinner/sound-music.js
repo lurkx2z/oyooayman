@@ -307,7 +307,7 @@ atSound('music', 'score', function (ctx, bus, K) {
     M.strings(F(E.body), t1 + 0.5, C.Eblyd, 0.18, { att: 2.0, rel: 1.0, cut: 700 });
     motif(c('tubs', 2) + 0.3, { oct: -1, vel: 0.3, gap: 1.7, n: 4, dur: 3.5 }); }
 
-  // ================================================================== 3:00 stars beside the Sun
+  // ================================================================== 3:00 stars in full sunshine
   { const t0 = B('stars'), t1 = B('sea');
     M.strings(t0, t1 + 0.6, C.Flyd, 0.2, { att: 2.0, rel: 1.0, cut: 2400 });
     M.strings(t0, t1 + 0.6, ['B5', 'E6', 'A6'], 0.05, { att: 2.5, rel: 1.0, cut: 9000, wave: 'triangle', vib: 2 });
