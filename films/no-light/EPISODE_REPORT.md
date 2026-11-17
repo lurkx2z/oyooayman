@@ -186,11 +186,13 @@ windows across the whole film, with the stem gains added in:
 - **Runnable ZIP** `no-light-film.zip` (in the project files, 8 MB): extract it, open `no-light.html` in Chrome or Edge
   on a computer, wait for SOUND READY, press Space. Tested from a fresh unzip with `tools/check-page.cjs`: SOUND READY
   at once, no console errors.
-- **Final 1080p MP4**, to be rendered on the owner's PC (graphics card):
-  `node films/no-light/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\no-light --small`.
-  - `D:\renders\no-light\no-light_final_1080p.mp4`: 1920×1080, 30 fps, H.264 CRF 18, 285.8 s, with the mastered
-    soundtrack copied in. **This is the file to upload.**
-  - `no-light_final_small.mp4`: 1280×720, under 30 MiB (a preview copy).
+- **Final 1080p MP4**, rendered on the owner's PC (graphics card) on 17 November 2026 from commit 6b049f3, the frames
+  in 9 minutes: `node films/no-light/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\no-light --small`.
+  - `D:\renders\no-light\no-light_final_1080p.mp4`: 1920×1080, 30 fps, H.264 CRF 18, 285.83 s (8,575 frames),
+    1,378 MiB, with the mastered soundtrack `final-soundtrack.m4a` copied in: −14.8 LUFS, loudness range 7.0 LU,
+    −2.3 dB peak. **This is the file to upload.**
+  - `no-light_final_small.mp4`: 1280×720, 26.4 MiB, 285.8 s (8,574 frames; one frame shorter than the 1080p file, the
+    last black frame), −2.6 dBTP (a preview copy).
   - The command is resumable: run it again and finished segments are kept.
 - **Thumbnails** (house style) in the project files: `thumb-fire.jpg` (800 °C, the man by the bonfire), `thumb-plane.jpg`
   (630 metres up, the airliner from below), `thumb-ice.jpg` (9 minutes, the crack web under your hands).
