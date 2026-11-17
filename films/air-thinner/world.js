@@ -22,19 +22,21 @@ function atSkyCols(a) {
 function atSky(scene) {
   const U = {
     uZen: { value: new THREE.Color() }, uHor: { value: new THREE.Color() }, uSun: { value: new THREE.Vector3(0, 1, 0) }, uSunK: { value: 1 },
-    uGlow: { value: 1 }, uStars: { value: 0 }, uCloud: { value: 1 }, uFlow: { value: 0 }, uCloudLit: { value: 1 }, uUnder: { value: 0 },
+    uGlow: { value: 1 }, uStars: { value: 0 }, uCloud: { value: 1 }, uFlow: { value: 0 }, uCloudLit: { value: 1 }, uUnder: { value: 0 }, uUnderC: { value: new THREE.Color('#0a2f4a') },
   };
   const m = new THREE.Mesh(new THREE.SphereGeometry(4500, 64, 32), new THREE.ShaderMaterial({
     side: THREE.BackSide, depthWrite: false, fog: false, uniforms: U,
     vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }',
     fragmentShader: /* glsl */`
-      uniform vec3 uZen, uHor, uSun; uniform float uSunK, uGlow, uStars, uCloud, uFlow, uCloudLit, uUnder; varying vec3 vD;
+      uniform vec3 uZen, uHor, uSun; uniform float uSunK, uGlow, uStars, uCloud, uFlow, uCloudLit, uUnder; uniform vec3 uUnderC; varying vec3 vD;
       float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float h2(vec3 p){ return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
       float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h1(i), h1(i + vec2(1, 0)), f.x), mix(h1(i + vec2(0, 1)), h1(i + vec2(1, 1)), f.x), f.y); }
       float fbm(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { v += a * n2(p); p = p * 2.03 + 7.1; a *= 0.5; } return v; }
       void main(){
         vec3 D = normalize(vD); float h = D.y;
+        // under water the far distance is the water itself (the surface overhead is the sea's mesh)
+        if (uUnder > 0.5) { gl_FragColor = vec4(uUnderC * (0.55 + 0.6 * smoothstep(-0.6, 0.4, h)), 1.0); return; }
         float up = clamp(h, 0.0, 1.0);
         // the gradient: the horizon's band hugs the sea; overhead takes over above ~20°
         vec3 col = mix(uHor, uZen, pow(smoothstep(-0.02, 0.55, up), 0.65));
@@ -144,7 +146,7 @@ function atSea(scene) {
         // ---- the ship's foam: along the hull while it moves, the bow wave, and the wake's V behind the stern
         float sp = clamp(uSpeed / 10.0, 0.0, 1.0), foam = 0.0;
         float side = abs(P.y) - hullHalf(clamp(P.x, uHull.x, uHull.y));
-        if (P.x > uHull.x - 4.0 && P.x < uHull.y) foam += sp * smoothstep(3.0 + 3.0 * sp, 0.0, side) * (0.4 + 0.6 * n2(Q * 0.8)) * (P.x < uHull.x + 50.0 ? 1.0 : 0.65);
+        if (P.x > uHull.x - 4.0 && P.x < uHull.y) foam += sp * smoothstep(0.8 + 1.6 * sp, 0.0, side) * smoothstep(0.35, 0.75, n2(Q * 0.6) * 0.6 + n2(Q * 2.3) * 0.4) * (P.x < uHull.x + 40.0 ? 1.0 : 0.5);
         if (P.x > uHull.y - 6.0) {
           float behind = P.x - uHull.y, wide = 13.0 + behind * 0.36, core = smoothstep(wide, wide * 0.25, abs(P.y));
           float arms = smoothstep(4.0, 0.0, abs(abs(P.y) - (12.0 + behind * 0.34)));
@@ -175,10 +177,10 @@ function atSea(scene) {
         }
         // ---- the boil: the surface seethes white, cells bursting
         if (uBoil > 0.001) {
-          vec2 B = P * 3.1 + vec2(0.0, uBoilT * 1.3);
+          vec2 B = P * (cameraPosition.y >= -0.05 ? 1.3 : 3.1) + vec2(0.0, uBoilT * 1.3);
           float cells = smoothstep(0.55, 0.9, n2(B) * 0.6 + n2(B * 2.7 - uBoilT * 4.0) * 0.4);
           float k = uBoil * (0.55 + 0.45 * cells);
-          col = mix(col, vec3(0.8, 0.86, 0.9) * (cameraPosition.y >= -0.05 ? (0.3 + 0.7 * max(uSun.y, 0.3)) : 1.1), k * 0.8);
+          col = mix(col, vec3(0.8, 0.86, 0.9) * (cameraPosition.y >= -0.05 ? (0.3 + 0.7 * max(uSun.y, 0.3)) : 0.55), k * (cameraPosition.y >= -0.05 ? 0.8 : 0.45));
         }
         gl_FragColor = vec4(col, 1.0);
         ${THREE.ShaderChunk.fog_fragment}
@@ -192,7 +194,7 @@ function atSea(scene) {
       U.uTime.value = t; U.uFlow.value = ATV.dist(s) % 100000; U.uSpeed.value = ATV.v(s);
       U.uSun.value.set(...sun.v); U.uSunCol.value.setRGB(1.0, 0.97, 0.9).multiplyScalar(ATL.sunK(a));
       U.uZen.value.copy(sky.zen); U.uHor.value.copy(sky.hor); U.uSkyK.value = ATL.zenith(a);
-      U.uBoil.value = MathX.smooth(s, ATE.sea, ATE.sea + 14) * (0.85 + 0.15 * Math.sin(s * 3.1)); U.uBoilT.value = s;
+      U.uBoil.value = MathX.smooth(s, ATE.sea - 0.5, ATE.sea + 6) * (0.85 + 0.15 * Math.sin(s * 3.1)); U.uBoilT.value = s;
       // (centred under the camera, snapped to 25 m so the grid doesn't swim)
       mesh.position.set(Math.round(cam.position.x / 25) * 25, 0, Math.round(cam.position.z / 25) * 25);
     },

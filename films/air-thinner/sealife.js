@@ -77,13 +77,15 @@ function atShark(scene) {
 
 // the school: small silver fish (a body and a tail), wheeling round a centre that drifts; each fish its own lane
 function atFish(scene, n = 260) {
-  const fg = new THREE.ConeGeometry(0.035, 0.2, 6); fg.rotateX(ATPI / 2); fg.scale(0.55, 1.2, 1);
-  const tg = new THREE.ConeGeometry(0.03, 0.07, 3); tg.rotateX(-ATPI / 2); tg.scale(0.15, 1.4, 1); tg.translate(0, 0, -0.12);
-  const geo = THREE.mergeGeometries([fg.toNonIndexed(), tg.toNonIndexed()]);
-  const mat = new THREE.MeshStandardMaterial({ color: '#c8d4dc', roughness: 0.25, metalness: 0.75 });
+  // a slim body (13 cm, a little deeper than wide), a forked tail; dark blue-grey backs, the silver only where the light
+  // catches them (they read as fish at a few metres, not as white darts)
+  const fg = new THREE.SphereGeometry(1, 10, 6); fg.scale(0.012, 0.022, 0.065);
+  const tg = new THREE.BufferGeometry(); tg.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, -0.055, 0, 0.028, -0.09, 0, 0.004, -0.075, 0, 0, -0.055, 0, -0.004, -0.075, 0, -0.028, -0.09], 3)); tg.computeVertexNormals();
+  const fgn = fg.toNonIndexed(); fgn.deleteAttribute('uv'); const geo = THREE.mergeGeometries([fgn, tg]);
+  const mat = new THREE.MeshStandardMaterial({ color: '#5d7584', roughness: 0.35, metalness: 0.45, side: THREE.DoubleSide });
   const m = new THREE.InstancedMesh(geo, mat, n); m.frustumCulled = false; scene.add(m);
   const r = new RNG(888), L = [];
-  for (let i = 0; i < n; i++) L.push({ R: r.range(1.6, 3.4), y: r.range(-0.9, 0.9), ph: r.range(0, 6.28), sp: r.range(0.42, 0.55), wob: r.range(0, 6.28), sc: r.range(0.8, 1.25) });
+  for (let i = 0; i < n; i++) L.push({ R: r.range(2.6, 5.2), y: r.range(-1.2, 1.2), ph: r.range(0, 6.28), sp: r.range(0.42, 0.55), wob: r.range(0, 6.28), sc: r.range(0.8, 1.25) });
   const o = new THREE.Object3D();
   return {
     m,

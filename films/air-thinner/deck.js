@@ -25,7 +25,7 @@ function atWaterMat(o = {}) {
         vec2 P = vW.xz * uScale + uSeed * 13.1;
         vec2 rip = vec2(n2(P * 1.3 + vec2(0.0, uTime * 0.5)) - 0.5, n2(P * 1.3 + vec2(5.2, -uTime * 0.45)) - 0.5) * 0.35 + vec2(n2(P * 4.0 + uTime) - 0.5, n2(P * 4.0 - uTime * 0.9) - 0.5) * 0.12;
         // the jets (hot tubs) and the boil roughen it
-        float ch = uBubbles * smoothstep(0.55, 0.8, n2(P * 5.0 + vec2(uTime * 1.7, 0.0))) + uBoil * smoothstep(0.35, 0.75, n2(P * 3.0 + vec2(0.0, uBoilT * 2.3)) * 0.6 + n2(P * 7.0 - uBoilT * 5.0) * 0.4);
+        float ch = uBubbles * smoothstep(0.55, 0.8, n2(P * 5.0 + vec2(uTime * 1.7, 0.0))) + uBoil * (0.25 + 0.75 * smoothstep(0.45, 0.82, n2(P * 9.0 + vec2(0.0, uBoilT * 3.1)) * 0.55 + n2(P * 23.0 - uBoilT * 7.3) * 0.45));
         vec3 N = normalize(vec3(-rip.x * (1.0 + 3.0 * ch), 1.0, -rip.y * (1.0 + 3.0 * ch)));
         vec3 V = normalize(cameraPosition - vW), R = reflect(-V, N); R.y = abs(R.y);
         float fres = 0.03 + 0.97 * pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 5.0);
@@ -35,7 +35,7 @@ function atWaterMat(o = {}) {
         vec3 col = mix(body, sky, fres);
         col += vec3(1.0, 0.97, 0.9) * pow(max(dot(R, uSun), 0.0), 600.0) * 18.0;
         float foam = clamp(ch * 1.3, 0.0, 1.0);
-        col = mix(col, vec3(0.88, 0.92, 0.95) * (0.35 + 0.65 * max(uSun.y, 0.2)), foam * 0.75);
+        col = mix(col, vec3(0.88, 0.92, 0.95) * (0.35 + 0.65 * max(uSun.y, 0.2)), foam * (0.75 - 0.3 * uBoil));
         gl_FragColor = vec4(col, mix(0.72, 0.95, max(fres, foam)));
       }`,
   });
@@ -126,7 +126,7 @@ function atDeck(set, ship) {
   }
   out.seats = seats;
   // ---- parasols over the outer rows: a pole, a striped canopy (eight panels)
-  { const cA = atStd('#f6f2e8', 0.85), cB = atStd('#1d6fa8', 0.85), pole = atStd('#d8d2c4', 0.5);
+  { const cA = atStd('#f6f2e8', 0.85), cB = atStd('#1d6fa8', 0.85), pole = atStd('#d8d2c4', 0.5); cA.side = cB.side = THREE.DoubleSide;   // (seen from under them too)
     for (const sd of [1, -1]) for (let x = F.open.x0 + 5; x < F.open.x1 - 3; x += 5.6) { if (!free(x, sd * 15, 1.5)) continue;
       const z = sd * 13.9; B.add(new THREE.CylinderGeometry(0.03, 0.03, 2.5, 6), pole, Geo.matrix(x, y + 1.28, z));
       for (let i = 0; i < 8; i++) { const g = new THREE.ConeGeometry(1.45, 0.42, 2, 1, true, i / 8 * Math.PI * 2, Math.PI / 4); B.add(g, i % 2 ? cA : cB, Geo.matrix(x, y + 2.42, z)); } } }
@@ -155,7 +155,25 @@ function atDeck(set, ship) {
     for (let i = 0; i < 14; i++) { const sd = i % 2 ? 1 : -1, x = F.bar.x - 3.6 + (i >> 1) * 1.05 + (i % 3) * 0.12, z = F.bar.z + sd * 2.12, kind = i % 3, h = kind === 1 ? 0.18 : 0.15, r0 = kind === 1 ? 0.042 : 0.036;
       B.add(new THREE.CylinderGeometry(r0, r0 * 0.85, h, 14, 1, true), gl, Geo.matrix(x, y + 1.15 + h / 2, z), { noShadow: true });
       B.add(new THREE.CylinderGeometry(r0 * 0.94, r0 * 0.82, h * 0.82, 14), drink[kind], Geo.matrix(x, y + 1.15 + h * 0.41, z), { noShadow: true });
-      out.glasses.push({ x, y: y + 1.15 + h * 0.82, z, r: r0, kind }); }
+      out.glasses.push({ x, y: y + 1.15 + h * 0.82, z, r: r0, kind, rim: y + 1.15 + h }); }
+    // the foam: a head rising out of each glass (the gas comes out of the drink as the air over it thins), spilling over
+    // the rim; drips running down the outside (instanced; set(f, t) with f the strength 0…1)
+    const N = out.glasses.length, foamM = atStd('#f3ede0', 0.85), dripM = atStd('#efe6d4', 0.7);
+    const heads = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 18, 10), foamM, N), drips = new THREE.InstancedMesh(new THREE.CapsuleGeometry(1, 1, 3, 6), dripM, N * 3);
+    for (const m of [heads, drips]) { m.castShadow = false; m.frustumCulled = false; S.add(m); }
+    const ob = new THREE.Object3D();
+    out.foam = { heads, drips, set(f, t) {
+      heads.visible = drips.visible = f > 0.01; if (!heads.visible) return;
+      out.glasses.forEach((g, i) => {
+        const fk = g.kind === 1 ? f : Math.max(0, f - 0.15) / 0.85, lift = (g.rim - g.y) + 0.004 + 0.045 * fk * (0.92 + 0.08 * Math.sin(t * 2.1 + i)), over = MathX.clamp((lift - (g.rim - g.y)) / 0.04, 0, 1);
+        // the head: an ellipsoid whose top is lift over the drink; wider than the glass once it's over the rim
+        const rr = g.r * (0.93 + 0.2 * over), hh = Math.max(0.004, lift * 0.62);
+        ob.position.set(g.x, g.y + lift - hh, g.z); ob.rotation.set(0, i, 0); ob.scale.set(rr, hh, rr); ob.updateMatrix(); heads.setMatrixAt(i, ob.matrix);
+        for (let j = 0; j < 3; j++) { const a = i * 2.3 + j * 2.1, L = 0.004 + 0.11 * over * (0.4 + 0.6 * atR(i * 3 + j, 61)) * MathX.clamp(fk * 1.4 - 0.2 * j, 0, 1), w = 0.0045 + 0.002 * atR(i * 3 + j, 62);
+          ob.position.set(g.x + Math.cos(a) * g.r * 1.03, g.rim - L / 2, g.z + Math.sin(a) * g.r * 1.03); ob.rotation.set(0, 0, 0); ob.scale.set(w, Math.max(0.001, L), w); ob.updateMatrix(); drips.setMatrixAt(i * 3 + j, ob.matrix); }
+      });
+      heads.instanceMatrix.needsUpdate = true; drips.instanceMatrix.needsUpdate = true;
+    } };
   }
   // ---- the big screen on the forward block's aft face (it shows the sea and the ship's name; off with the power)
   { const Sc = F.screen, tex = atTex(atCanvas(1024, 572, (g, w, h) => {
@@ -174,8 +192,11 @@ function atDeck(set, ship) {
     const creamM = atStd('#f3a51c', 0.35), capM = atStd('#ffffff', 0.4);
     const sw = [];
     tables.forEach(([x, z], i) => {
-      const cg = new THREE.SphereGeometry(1, 16, 10); cg.scale(0.12, 0.035, 0.16);
-      const c = atMesh(cg, crispM, x - 0.06, y + 0.56, z + 0.02, S); c.rotation.y = i * 0.9;
+      const cg = new THREE.BoxGeometry(1, 1, 1, 10, 2, 12), cp = cg.attributes.position;
+      for (let v = 0; v < cp.count; v++) { const px = cp.getX(v), py = cp.getY(v), pz = cp.getZ(v), puff = Math.pow(Math.max(0, 1 - Math.pow(2 * px, 4)), 0.5) * Math.pow(Math.max(0, 1 - Math.pow(2 * pz, 6)), 0.6);
+        cp.setXYZ(v, px * 0.15 * (1 - 0.06 * puff), py * 2 * (0.003 + 0.03 * puff), pz * 0.21); }
+      cg.computeVertexNormals();
+      const c = atMesh(cg, crispM, x - 0.06, y + 0.562, z + 0.02, S); c.rotation.y = i * 0.9; c.userData.y0 = y + 0.562;
       const bg = new THREE.CylinderGeometry(0.03, 0.035, 0.16, 12); const b = atMesh(bg, creamM, x + 0.1, y + 0.61, z - 0.06, S); const cap = atMesh(new THREE.CylinderGeometry(0.018, 0.018, 0.03, 10), capM, 0, 0.095, 0, b);
       sw.push({ c, b, cap, k: i });
     });

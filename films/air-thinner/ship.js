@@ -66,7 +66,7 @@ function atTeakTex() {
   const r = new RNG(77);
   return atTex(atCanvas(512, 512, (g, w, h) => {
     const n = 32, ph = h / n;
-    for (let i = 0; i < n; i++) { const k = r.range(-12, 12); g.fillStyle = `rgb(${176 + k},${128 + k * 0.8},${84 + k * 0.6})`; g.fillRect(0, i * ph, w, ph);
+    for (let i = 0; i < n; i++) { const k = r.range(-12, 12); g.fillStyle = `rgb(${156 + k},${122 + k * 0.8},${92 + k * 0.6})`; g.fillRect(0, i * ph, w, ph);
       for (let x = r.range(0, 200); x < w; x += r.range(180, 300)) { g.fillStyle = 'rgba(40,24,10,0.35)'; g.fillRect(x, i * ph, 2, ph); }
       g.fillStyle = 'rgba(30,20,12,0.55)'; g.fillRect(0, i * ph + ph - 2, w, 2);
       for (let j = 0; j < 40; j++) { g.fillStyle = `rgba(${r.next() < 0.5 ? '255,230,200' : '60,40,20'},0.06)`; g.fillRect(r.range(0, w), i * ph + r.range(1, ph - 3), r.range(10, 50), 1); } }
@@ -193,9 +193,9 @@ function atShip(set) {
     for (const sd of [1, -1]) { for (let x = a; x < b - 0.01; x += 25) { const e = Math.min(b, x + 25); B.box(e - x, 0.26, 0.5, (x + e) / 2, y0 + 0.1, sd * (zh + 0.27), white); }
       B.box(0.5, y1 - y0, 0.9, a + 0.5, (y0 + y1) / 2, sd * (zh + 0.2), white); B.box(0.5, y1 - y0, 0.9, b - 0.5, (y0 + y1) / 2, sd * (zh + 0.2), white); }
     // the front face: a band of lounge windows (UV in 8 m)
-    B.add(Geo.quad([a - 0.03, y0, zh], [a - 0.03, y0, -zh], [a - 0.03, y1, -zh], [a - 0.03, y1, zh], 0, 0, (2 * zh) / 8, 1), winM, null);
+    B.add(Geo.quad([a - 0.03, y0, -zh], [a - 0.03, y0, zh], [a - 0.03, y1, zh], [a - 0.03, y1, -zh], 0, 0, (2 * zh) / 8, 1), winM, null);
     // the aft face (the terrace's back wall): windows; the terrace floor is the deck below's roof (teak)
-    B.add(Geo.quad([b + 0.03, y0, -zh], [b + 0.03, y0, zh], [b + 0.03, y1, zh], [b + 0.03, y1, -zh], 0, 0, (2 * zh) / 8, 1), winM, null);
+    B.add(Geo.quad([b + 0.03, y0, zh], [b + 0.03, y0, -zh], [b + 0.03, y1, -zh], [b + 0.03, y1, zh], 0, 0, (2 * zh) / 8, 1), winM, null);
     if (k < 14) { const t1 = x1(k + 1); B.add(atUVMetres(Geo.flat(t1, b, -zh - 0.4, zh + 0.4, y1 + 0.03), 4, 'y'), teak, null);
       // the terrace's glass railing on its aft edge and its sides
       // (an opening at z 11.5…13.7 for the stairs down to the next terrace)
@@ -204,7 +204,7 @@ function atShip(set) {
   // the roof of deck 14 at its front (the bridge's top) and the forward lounge's roof
   // ---- the bridge: the front of decks 13–14, raked dark windows across the whole width, wings out to ±21.5 m
   { const y0 = D(13), y1 = D(15), xf = x0(13) - 0.6;
-    B.add(Geo.quad([xf, y0 + 0.9, zh], [xf, y0 + 0.9, -zh], [xf + 0.8, y1 - 0.3, -zh], [xf + 0.8, y1 - 0.3, zh], 0, 0, 1, 1), dark, null);
+    B.add(Geo.quad([xf, y0 + 0.9, -zh], [xf, y0 + 0.9, zh], [xf + 0.8, y1 - 0.3, zh], [xf + 0.8, y1 - 0.3, -zh], 0, 0, 1, 1), dark, null);
     for (const sd of [1, -1]) { B.box(7, 0.4, 4.2, xf + 4.5, D(14) + 0.2, sd * (zh + 2.1), white); B.box(7, 1.1, 0.3, xf + 4.5, D(14) + 0.95, sd * (zh + 4.05), white);
       B.box(4.5, 2.2, 3.6, xf + 4.2, D(14) + 1.5, sd * (zh + 1.85), white); B.box(4.4, 1.0, 0.04, xf + 4.2, D(14) + 2.0, sd * (zh + 3.68), dark); }
     out.bridgeWing = [xf + 4.5, D(14) + 0.4, -(zh + 2.1)];
@@ -213,7 +213,7 @@ function atShip(set) {
   { const a = x0(14), b = F.open.x0, y0 = D(15), y1 = D(18);
     B.box(b - a, y1 - y0, zh * 2, (a + b) / 2, (y0 + y1) / 2, 0, whiteM);
     for (const sd of [1, -1]) B.add(sd > 0 ? Geo.quad([a, y0, zh + 0.03], [b, y0, zh + 0.03], [b, y1, zh + 0.03], [a, y1, zh + 0.03], 0, 0, (b - a) / 8, (y1 - y0) / 3) : Geo.quad([b, y0, -zh - 0.03], [a, y0, -zh - 0.03], [a, y1, -zh - 0.03], [b, y1, -zh - 0.03], 0, 0, (b - a) / 8, (y1 - y0) / 3), winM, null);
-    B.add(Geo.quad([a - 0.03, y0, zh], [a - 0.03, y0, -zh], [a - 0.03, y1, -zh], [a - 0.03, y1, zh], 0, 0, (2 * zh) / 8, (y1 - y0) / 3), winM, null);
+    B.add(Geo.quad([a - 0.03, y0, -zh], [a - 0.03, y0, zh], [a - 0.03, y1, zh], [a - 0.03, y1, -zh], 0, 0, (2 * zh) / 8, (y1 - y0) / 3), winM, null);
     // its aft face is plain (the screen hangs on it)
     // the mast on top: a tapering post, a cross-tree, two radar domes
     B.add(new THREE.CylinderGeometry(0.5, 0.9, 12, 10), white, Geo.matrix(a + 8, y1 + 6, 0)); B.box(0.6, 0.6, 9, a + 8, y1 + 10, 0, white);
@@ -224,8 +224,8 @@ function atShip(set) {
   { const a = F.open.x1, b = x1(15), y0 = D(15), y1 = D(17);
     for (let x = a; x < b - 0.01; x += 25) { const e = Math.min(b, x + 25); B.box(e - x, y1 - y0, zh * 2, (x + e) / 2, (y0 + y1) / 2, 0, whiteM); }
     for (const sd of [1, -1]) B.add(sd > 0 ? Geo.quad([a, y0, zh + 0.03], [b, y0, zh + 0.03], [b, y1, zh + 0.03], [a, y1, zh + 0.03], 0, 0, (b - a) / 8, (y1 - y0) / 3) : Geo.quad([b, y0, -zh - 0.03], [a, y0, -zh - 0.03], [a, y1, -zh - 0.03], [b, y1, -zh - 0.03], 0, 0, (b - a) / 8, (y1 - y0) / 3), winM, null);
-    B.add(Geo.quad([a - 0.03, y0, zh], [a - 0.03, y0, -zh], [a - 0.03, y1, -zh], [a - 0.03, y1, zh], 0, 0, (2 * zh) / 8, (y1 - y0) / 3), winM, null);
-    B.add(Geo.quad([b + 0.03, y0, -zh], [b + 0.03, y0, zh], [b + 0.03, y1, zh], [b + 0.03, y1, -zh], 0, 0, (2 * zh) / 8, (y1 - y0) / 3), winM, null);
+    B.add(Geo.quad([a - 0.03, y0, -zh], [a - 0.03, y0, zh], [a - 0.03, y1, zh], [a - 0.03, y1, -zh], 0, 0, (2 * zh) / 8, (y1 - y0) / 3), winM, null);
+    B.add(Geo.quad([b + 0.03, y0, zh], [b + 0.03, y0, -zh], [b + 0.03, y1, -zh], [b + 0.03, y1, zh], 0, 0, (2 * zh) / 8, (y1 - y0) / 3), winM, null);
     B.add(atUVMetres(Geo.flat(a, b, -zh, zh, y1 + 0.03), 4, 'y'), teak, null);
     B.add(atUVMetres(Geo.flat(x1(15), x1(14), -zh - 0.4, zh + 0.4, D(15) + 0.03), 4, 'y'), teak, null);   // deck 14's terrace, under the aft block's end
     for (let z = -zh; z < zh - 0.01; z += 12) { const e = Math.min(zh, z + 12); B.box(0.04, 1.1, e - z, b - 0.25, y1 + 0.6, (z + e) / 2, glassM, 0, { noShadow: true }); B.box(0.08, 0.06, e - z, b - 0.25, y1 + 1.17, (z + e) / 2, steel); }
@@ -286,7 +286,7 @@ function atShip(set) {
   { const M = F.marina, y = M.y;
     B.box(M.x1 - M.x0, 0.32, M.w, (M.x0 + M.x1) / 2, y - 0.16, 0, atStd('#c9ccc6', 0.75));
     B.box(M.x1 - M.x0 - 0.2, 0.03, M.w - 0.2, (M.x0 + M.x1) / 2, y + 0.015, 0, atStd('#4d5a63', 0.9));        // the grey non-slip mat
-    B.add(Geo.quad([F.stern + 0.03, y, -3.2], [F.stern + 0.03, y, 3.2], [F.stern + 0.03, y + 2.6, 3.2], [F.stern + 0.03, y + 2.6, -3.2]), atStd('#1a2026', 0.9), null);   // the doorway (dark)
+    B.add(Geo.quad([F.stern + 0.03, y, 3.2], [F.stern + 0.03, y, -3.2], [F.stern + 0.03, y + 2.6, -3.2], [F.stern + 0.03, y + 2.6, 3.2]), atStd('#1a2026', 0.9), null);   // the doorway (dark)
     for (const sd of [1, -1]) { B.box(M.x1 - M.x0, 0.05, 0.05, (M.x0 + M.x1) / 2, y + 1.05, sd * (M.w / 2 - 0.1), steel); for (let x = M.x0 + 0.5; x < M.x1; x += 1.4) B.box(0.05, 1.05, 0.05, x, y + 0.52, sd * (M.w / 2 - 0.1), steel); }
     // the davit: a post on the platform's port corner, an arm out over the line
     B.box(0.25, 3.4, 0.25, M.x1 - 0.5, y + 1.7, 1.6, steel); B.box(1.6, 0.2, 0.2, M.x1 + 0.1, y + 3.3, 0.8, steel);
