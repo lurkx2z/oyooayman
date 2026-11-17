@@ -210,26 +210,25 @@ sfSound('music', 'score', function (ctx, bus, K) {
 
   // ================================================================== the flash: thunder comes with it
   { const t0 = B('flash'), ts = strike('flash3');
-    M.prog([[t0, C.Dm9], [c('flash', 1), C.Bbmaj7], [c('flash', 2), C.A7sus]], B('rule') + 0.3, 0.26, { cut: 900 });
+    M.prog([[t0, C.Dm9], [c('flash', 1), C.Bbmaj7], [c('flash', 1) + 2.2, C.A7sus]], B('rule') + 0.3, 0.26, { cut: 900 });
     sfPulse(ctx, M.bus, t0 + 0.4, B('rule'), ['D2', 'A2', 'D3'], 0.42, 0.7, { cut: 420, cutTo: 1100, acc: 4, decay: 0.3, ramp: (u) => 0.55 + 0.45 * u });
-    hit(ts + 0.004, 0.7, 32.7);
-    M.bellCut(sfWord('flash', 2, 12), 'E7', 0.3, 0.1, 0.4); }
+    hit(ts + 0.004, 0.7, 32.7); }
 
   // ================================================================== the rule: only sound's speed changes
   { const t0 = B('rule');
-    M.prog([[t0, C.Eblyd], [c('rule', 1), C.Bbmaj7]], B('rumble') - 1.4, 0.24, { cut: 1300, lastRel: 1.0 });
+    M.prog([[t0, C.Eblyd], [t0 + 3.2, C.Bbmaj7]], B('rumble') - 1.4, 0.24, { cut: 1300, lastRel: 1.0 });
     twinkle(t0 + 0.5, B('rumble') - 2, 1.6, 2.2, ['D6', 'A5', 'G6', 'Bb5'], 0.14);
-    motif(c('rule', 1) + 0.4, { gap: 1.5, vel: 0.3, n: 4, dur: 3 }); }
+    motif(t0 + 2.0, { gap: 1.5, vel: 0.3, n: 4, dur: 3 }); }
 
   // ================================================================== the rumble: the 6 km bolt, all of it at once
   { const ts = strike('long');
     hit(ts + 0.004, 0.95, 27.5); atOnce(ts + 0.01, 0.42, -1);
-    M.prog([[ts, C.Gm9], [c('rumble', 1), C.Dm9], [c('rumble', 2), C.Bbmaj7]], B('call') + 0.2, 0.26, { cut: 800, lastRel: 0.8 });
-    sfPulse(ctx, M.bus, ts + 0.6, c('rumble', 1) - 0.2, ['D2', 'A2'], 0.5, 0.6, { cut: 380, acc: 2, decay: 0.3 });
+    M.prog([[ts, C.Gm9], [c('rumble', 0), C.Dm9], [c('rumble', 1), C.Bbmaj7]], B('call') + 0.2, 0.26, { cut: 800, lastRel: 0.8 });
+    sfPulse(ctx, M.bus, ts + 0.6, c('rumble', 0) + 0.4, ['D2', 'A2'], 0.5, 0.6, { cut: 380, acc: 2, decay: 0.3 });
     // "used to roll on for 13 seconds": a roll swells… and "all of it lands at once": one blow
-    { const r0 = c('rumble', 1) + 0.6, r1 = c('rumble', 2) - 0.02;
+    { const r0 = c('rumble', 0) + 0.6, r1 = c('rumble', 1) - 0.02;
       M.roll(r0, r1, [[r0, 0.05], [r1 - 0.4, 0.42]], 55);
-      hit(c('rumble', 2) + 0.01, 0.95, 27.5); atOnce(c('rumble', 2) + 0.02, 0.36); } }
+      hit(c('rumble', 1) + 0.01, 0.95, 27.5); atOnce(c('rumble', 1) + 0.02, 0.36); } }
 
   // ================================================================== the call: no echo
   { const tc = F(E.call);
@@ -302,8 +301,7 @@ sfSound('music', 'score', function (ctx, bus, K) {
     M.strings(t1, B('wind') + 0.3, C.low, 0.32, { att: 1.2, rel: 0.8, cut: 220, cutTo: 480, cutAt: B('wind') });
     M.strings(t1 + 0.5, B('wind') + 0.3, C.semi, 0.18, { att: 2.5, rel: 0.8, cut: 420 });
     beats(t1 + 0.4, B('wind'), 0.8, 0.68, 0.35, 0.48);
-    motif(c('strike', 1) + 0.3, { gap: 1.0, vel: 0.34, n: 4, oct: -1 });
-    { const t = c('strike', 2) + 0.02; hit(t, 0.8, 30.9); atOnce(t + 0.01, 0.36); } }
+    motif(ty + 3.0, { gap: 1.0, vel: 0.34, n: 4, oct: -1 }); }
 
   // ================================================================== the wind: everything pointing west
   { const t0 = B('wind'), tn = F(E.hansen);

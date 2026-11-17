@@ -14,14 +14,14 @@ const path = require('path');
 
 const DIR = __dirname;
 const PAUSE = {
-  title: 0.05, start: 0.9, flash: 1.4, rule: 1.0, rumble: 2.2, call: 1.6, answer: 2.0, ears: 1.2, head: 1.6, far: 1.6, siren: 2.2, wind: 1.8,
-  tornado: 2.6, phone: 1.6, corn: 1.8, strike: 1.8, neighbour: 2.2, found: 1.3, back: 1.6, question: 1.6,
+  title: 0.05, start: 0.9, flash: 1.4, rule: 1.0, rumble: 2.8, call: 1.6, answer: 2.0, ears: 1.2, head: 1.6, far: 1.6, siren: 2.2, wind: 4.2,
+  tornado: 2.6, phone: 1.6, corn: 1.8, strike: 1.8, neighbour: 3.4, found: 1.3, back: 1.6, question: 1.6,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
-  'start:1': 0.4, 'start:2': 0.4, 'flash:1': 0.8, 'flash:2': 0.6, 'rule:1': 0.4, 'rumble:1': 0.6, 'rumble:2': 1.0, 'call:1': 1.4,
+  'start:1': 0.4, 'start:2': 0.4, 'flash:1': 0.8, 'rumble:1': 1.0, 'call:1': 1.4,
   'answer:1': 1.0, 'ears:1': 0.6, 'ears:2': 0.6, 'head:1': 0.8, 'head:2': 1.0, 'siren:1': 1.4, 'siren:2': 0.8,
-  'tornado:1': 0.6, 'tornado:2': 1.0, 'phone:1': 1.2, 'phone:2': 0.8, 'corn:1': 1.2, 'strike:1': 0.6, 'strike:2': 0.6, 'neighbour:1': 0.8,
+  'tornado:1': 0.6, 'tornado:2': 1.0, 'phone:1': 1.2, 'phone:2': 0.8, 'corn:1': 1.2, 'neighbour:1': 0.8,
   'found:1': 1.0, 'far:1': 0.8, 'far:2': 0.8, 'phone:3': 0.6, 'corn:2': 1.4, 'wind:1': 1.0, 'back:1': 1.0, 'back:2': 0.8,
 };
 const SECTION_OF = { title: 1, siren: 2, phone: 3 };

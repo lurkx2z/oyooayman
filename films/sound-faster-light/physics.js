@@ -32,7 +32,7 @@ const SFP = (() => {
   P.inflow = 90;                                     // km/h, the wind rushing in towards the tornado, near it
   P.carryV = 2.4;                                   // m/s: you, running with her in your arms over flattened corn
   P.tornadoV = 16.7;                                 // m/s: 60 km/h, east-north-east
-  P.runV = 2.06;                                     // m/s: you, running blind through 2.4 m corn
+  P.runV = 2.28;                                     // m/s: you, running blind through 2.4 m corn
   P.phoneLag = 0.25;                                 // s: a phone call's delay (the network and the codecs)
   return P;
 })();
@@ -43,7 +43,7 @@ const SFP = (() => {
 const SFE = (() => {
   const E = {}, S = sfSC, st = sfStoryAt;
   E.on = 0;                                          // ★ 8:52:00 PM
-  E.walk = [7, 55];                                  // you walk from the porch to the corn, looking for her
+  E.walk = [6, S('call', 0, -1.8)];                  // you walk from the porch to the corn, looking for her (there before you call)
   E.call = S('call', 0, 3.4);                        // you call her name (heard by her 0.0000001 s later)
   E.answer = S('answer', 0, -1.4);                   // she calls back
   E.away = [S('head', 2, -1.6), S('head', 2, 6.0)];  // you walk north along the corn: the wrong way
@@ -57,7 +57,7 @@ const SFE = (() => {
   E.pickUp = S('phone', 1, -0.9);                    // she answers
   E.run = st(sfB('corn'));                           // you run into the corn (just after the clock's jump)
   E.yardHit = S('strike', 0, -0.5);                  // ★ lightning hits the yard light
-  E.hansen = S('neighbour', 0, -1.4);                // the tornado's centre crosses the Hansen farm
+  E.hansen = S('neighbour', 0, -1.4);                // the tornado's centre passes the Hansen farm (150 m beside it)
   E.found = S('found', 0, -0.25);                    // a flash: her raincoat, 6 m away
   E.hold = S('found', 1, -1.2);                      // you have her
   return E;
@@ -111,7 +111,8 @@ const SF_PLACES = (() => {
   Q.kidIn = [F.field.westX - 0.5, -10];                      // where she ran into the corn
   Q.track = sfDirOf(68);                                     // the tornado's heading: east-north-east (68°)
   Q.hansenD = 1300;                                          // the Hansen farm: on the track, this far before K
-  Q.hansen = [Q.kid[0] - Q.track[0] * Q.hansenD, Q.kid[1] - Q.track[1] * Q.hansenD];
+  Q.hansenSide = 150;                                        // …and this far to the north of it: the funnel passes beside the farm and its winds
+  Q.hansen = (() => { const sd = sfDirOf(338); return [Q.kid[0] - Q.track[0] * Q.hansenD + sd[0] * Q.hansenSide, Q.kid[1] - Q.track[1] * Q.hansenD + sd[1] * Q.hansenSide]; })();   // tear it apart (you see it next to the funnel, not inside it)
   return Q;
 })();
 
@@ -182,7 +183,7 @@ const SF_STRIKES = (() => {
     [-20.2, 3200, 258], [-33.0, 2600, 302], [-50.0, 8000, 270], [-58.0, 12000, 240]]) at(s, d, b, { amp: d < 5000 ? 1 : 0.6 });
   // ---- after: the scripted ones
   at(sfSC('flash', 1, -0.55), 3000, 272, { amp: 1.2, key: 'flash3' });                 // "Now it comes with the flash" (3 km)
-  at(sfSC('rumble', 0, -1.7), 1600, 300, { amp: 1.5, key: 'long', top: 1300, spider: 4330 });   // the 6 km bolt
+  at(sfSC('rumble', 0, -1.7), 1600, 300, { amp: 1.5, key: 'long', top: 1300, spider: 4600 });   // the 6 km bolt
   at(sfSC('tornado', 0, -1.8), 2600, 244, { amp: 1.6, kind: 'ic', top: 1500, key: 'tornado' });  // lights the tornado
   at(SFE.yardHit, 0, 0, { amp: 2.4, key: 'yard', top: 1100 });                                     // the yard light (placed below)
   at(sfSC('neighbour', 0, -1.6), 1500, 250, { amp: 1.6, kind: 'cg', key: 'hansen' });
@@ -220,11 +221,11 @@ const SF_STRIKES = (() => {
 // the strikes whose thunder was in the air at 8:52:00
 SFP.inAir = SF_STRIKES.filter((k) => k.inAir).length;
 // the long one: its channel (vertical from the cloud base to the ground, then the spider along the cloud base, away
-// from you) and the thunder it used to make: from the nearest point to the farthest, at 343 m/s
+// from you and across) and the thunder it used to make: from the nearest point to the farthest, at 343 m/s
 SFP.longBolt = (() => {
-  const k = SF_STRIKES.find((q) => q.key === 'long'), you = SFY.at(k.s), away = [k.x - you.x, k.z - you.z], L = Math.hypot(...away), u = [away[0] / L, away[1] / L], pts = [];
+  const k = SF_STRIKES.find((q) => q.key === 'long'), you = SFY.at(k.s), away = [k.x - you.x, k.z - you.z], L = Math.hypot(...away), a0 = [away[0] / L, away[1] / L], th = 0.6, u = [a0[0] * Math.cos(th) - a0[1] * Math.sin(th), a0[0] * Math.sin(th) + a0[1] * Math.cos(th)], pts = [];   // (34° off straight away, so its length shows across the sky)
   for (let i = 0; i <= 60; i++) pts.push([k.x, k.top * i / 60, k.z]);
-  for (let i = 1; i <= 200; i++) { const h = k.spider * i / 200; pts.push([k.x + u[0] * h, k.top + 120 * Math.sin(i * 0.11), k.z + u[1] * h]); }
+  for (let i = 1; i <= 200; i++) { const h = k.spider * i / 200; pts.push([k.x + u[0] * h, k.top + 60 * Math.sin(i * 0.11), k.z + u[1] * h]); }
   const ds = pts.map((p) => Math.hypot(p[0] - you.x, p[1] - 1.7, p[2] - you.z));
   let len = 0; for (let i = 1; i < pts.length; i++) len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1], pts[i][2] - pts[i - 1][2]);
   return { pts, len, near: Math.min(...ds), far: Math.max(...ds), rumble: (Math.max(...ds) - Math.min(...ds)) / SFP.c0, u };

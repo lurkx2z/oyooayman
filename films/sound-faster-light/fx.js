@@ -33,6 +33,8 @@ function sfFarmFx(set, s, t, o) {
     light(far, p[0], y, p[1], 6, 1.0, 1.0, 0.95, 0.85, 8); for (const k of [-1, 1]) { const fl = 0.55 + 0.45 * Math.max(0, Math.sin(t * Math.PI * 1.5 + (k > 0 ? 0 : Math.PI))); light(far, p[0] + sd[0] * k * 1.2, y - 2.6, p[1] + sd[1] * k * 1.2, 2, fl, 1.0, 0.92, 0.8, 4.5); } }
   // ---- the near lamps' halos in the wet air
   if (yardOn) { const [x, y, z] = set.yard.yardLight.lamp; glow.add(x, y - 0.05, z, 1.4, 0.32, 1.0, 0.7, 0.38); glow.add(x, y - 0.05, z, 0.4, 0.8, 1.0, 0.85, 0.6); }
+  // (the yard light after the strike: its head glowing orange and dying, so the dead pole still reads)
+  if (!yardOn && s > yardHit && s < yardHit + 10) { const [x, y, z] = set.yard.yardLight.lamp, e = Math.exp(-(s - yardHit) / 3.5) * (0.75 + 0.25 * Math.sin(t * 19) * Math.sin(t * 7.3)); glow.add(x, y - 0.05, z, 1.1, 0.5 * e, 1.0, 0.42, 0.12); glow.add(x, y - 0.05, z, 0.3, 0.9 * e, 1.0, 0.62, 0.28); }
   { const [x, y, z] = set.house.porchLight; glow.add(x, y, z, 0.9, 0.35, 1.0, 0.75, 0.45); }
   { const [x, y, z] = set.barn.lamp; glow.add(x, y, z, 1.0, 0.32, 1.0, 0.78, 0.5); }
   // ---- the torch's lens (seen from in front), the phones' screens

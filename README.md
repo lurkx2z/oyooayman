@@ -187,6 +187,20 @@ Everything is procedural, so there are no models, images or sound files to downl
 > holding on to the edge in 0 °C water, his arms giving out. You crawl flat towards his voice while she holds your
 > ankles, and the ice bends under your chest. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/no-light/PLAN.md`](films/no-light/PLAN.md) and [`EPISODE_REPORT.md`](films/no-light/EPISODE_REPORT.md).
+>
+> ***What if sound travelled faster than light?*** — open `sound-faster-light.html` (16:9, voiceless, 4:17). At 8:52 PM
+> on a corn farm in Iowa, with a thunderstorm coming in and your 9-year-old daughter just gone into the 2.4-metre corn
+> after the dog, sound starts travelling at a million kilometres a second (3.3 times light; only its speed changes).
+> The thunder of nine strikes still on its way lands at once; every thunder now comes with its flash, a hair before it.
+> You call her name and the barn gives no echo; she calls back as loud as if she were beside you, and you can't tell
+> where she is: the gap between your two ears is now 44,000 times too short for a brain to use, so every sound seems to
+> come from inside your head. A freight train 11 km away and the neighbours' dogs 1.4 km away arrive together; the
+> sheriff's siren passes without dropping in pitch; a flash shows a tornado 3 km west. Her phone says she is 120 metres
+> into the corn, towards it. You run in with a torch; the yard light is struck behind you; the wind lays the corn down;
+> the Hansen farm comes apart. A flash finds her yellow raincoat 6 metres away, and you can hear the tornado everywhere
+> and can't hear which way it's moving. The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/sound-faster-light/PLAN.md`](films/sound-faster-light/PLAN.md) and
+> [`EPISODE_REPORT.md`](films/sound-faster-light/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|

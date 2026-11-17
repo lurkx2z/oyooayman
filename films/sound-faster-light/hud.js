@@ -26,26 +26,25 @@ const SF_CTX = (() => {
     beat('flash', 'THE STRIKE', () => ({ v: `${sfKm(d3)} <small>km</small>`, v2: `ITS THUNDER USED TO TAKE ${(d3 / SFP.c0).toFixed(1)} s` }), 0, 1),
     beat('rumble', 'THE BOLT', () => ({ v: `${sfKm(SFP.longBolt.len)} <small>km long</small>`, v2: `NEAR END ${sfKm(SFP.longBolt.near)} km · FAR END ${sfKm(SFP.longBolt.far)} km` }), 0, 0),
     beat('call', 'YOUR VOICE TO THE BARN AND BACK', () => ({ v: `${Math.round(2 * barnD)} <small>m</small>`, v2: `USED TO TAKE ${(2 * barnD / SFP.c0).toFixed(2)} s · NOW 0.000 000 1 s` })),
-    beat('answer', 'HER VOICE REACHES YOU IN', () => ({ v: '0.000 000 1 <small>s</small>', v2: `SHE’S ${Math.round(kidD)} m AWAY · WHICH WAY?` })),
+    beat('answer', 'HER VOICE REACHES YOU IN', () => ({ v: '0.000 000 1 <small>s</small>', v2: 'HOW FAR? WHICH WAY? · HER PHONE: NO ANSWER' })),
     beat('far', 'EVERYTHING ARRIVES AT ONCE', () => ({ v: `${sfKm(rail)} <small>km</small>`, v2: `THE TRAIN’S HORN USED TO TAKE ${Math.round(rail / SFP.c0)} s` }), 0, 0),
     beat('siren', 'THE TOWN', () => ({ v: `${sfKm(town)} <small>km</small>`, v2: `ITS SIRENS USED TO TAKE ${Math.round(town / SFP.c0)} s TO REACH YOU` }), 0, 0),
     beat('tornado', 'THE TORNADO', (t, s) => ({ v: `${sfKm(sfToTornado(s))} <small>km</small>`, v2: 'WHICH WAY IS IT GOING? YOU CAN’T TELL' }), 1),
     beat('phone', 'HER PHONE', () => ({ v: `${Math.round(kidD)} <small>m west</small>`, v2: 'SHE SOUNDS RIGHT BESIDE YOU' }), 2),
     beat('corn', 'TO HER', (t, s) => ({ v: `${Math.round(sfToKid(s))} <small>m</small>`, v2: `THE TORNADO: ${sfKm(sfToTornado(s))} km` })),
-    beat('strike', 'TO HER', (t, s) => ({ v: `${Math.round(sfToKid(s))} <small>m</small>`, v2: `THE TORNADO: ${sfKm(sfToTornado(s))} km` }), 1),
+    beat('strike', 'TO HER', (t, s) => ({ v: `${Math.round(sfToKid(s))} <small>m</small>`, v2: `THE TORNADO: ${sfKm(sfToTornado(s))} km` }), 0),
     beat('wind', 'THE WIND', () => ({ v: `${SFP.inflow} <small>km/h</small>`, v2: 'BLOWING WEST, INTO THE TORNADO' })),
     beat('neighbour', 'THE TORNADO', (t, s) => ({ v: `${sfKm(sfToTornado(s))} <small>km</small>`, v2: `TO HER: ${Math.round(sfToKid(s))} m` })),
-    beat('found', 'TO HER', (t, s) => ({ v: `${Math.max(0, sfToKid(s)).toFixed(1)} <small>m</small>`, v2: `THE TORNADO: ${sfKm(sfToTornado(s))} km` })),
-    beat('back', 'THE TORNADO', (t, s) => ({ v: `${sfKm(sfToTornado(s))} <small>km</small>`, v2: `THE STORM CELLAR: ${Math.round(sfDist(sfYouXZ(s), [SF_F.cellar.x, SF_F.cellar.z]))} m EAST` }), 1),
+    beat('found', 'TO HER', (t, s) => ({ v: `${Math.round(Math.max(0, sfToKid(s)))} <small>m</small>`, v2: `THE TORNADO: ${sfKm(sfToTornado(s))} km` })),
+    beat('back', 'THE TORNADO', (t, s) => ({ v: `${sfKm(sfToTornado(s))} <small>km</small>`, v2: 'WHICH WAY IS IT MOVING? YOU CAN’T HEAR IT' }), 1),
   ];
 })();
 // the speed box goes compact at the cut to the 6 km bolt; the tornado warning comes up at 8:52:18; she ran into the corn at 8:51:59
 const SF_RO_COMPACT = sfFilmAt(SF_STRIKES.find((k) => k.key === 'long').s) - 0.6, SF_WARN = sfFilmAt(18), SF_KID_IN = -1;
 // the honest labels (bottom left): [from, to, text]
 const SF_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [sfC(id, k0) - 0.1, (k1 != null ? sfCap(id, k1).hide : sfE(id)) + 0.2, text]; return [
-  b('rule', 'IN REAL PHYSICS IT CAN’T HAPPEN: NOTHING CARRIES A SIGNAL FASTER THAN LIGHT', 0, 0),
-  b('rule', 'THE RULE HERE: ONLY SOUND’S SPEED CHANGES · LOUDNESS AND HOW FAR IT CARRIES STAY', 1),
-  b('flash', 'IT WINS BY 7 MILLIONTHS OF A SECOND: FAR TOO SHORT FOR ANYONE TO NOTICE', 2),
+  b('rule', 'THE RULE HERE: ONLY SOUND’S SPEED CHANGES · LOUDNESS AND RANGE STAY THE SAME', 0),
+  b('flash', `STRICTLY, IT COMES FIRST: ${(((3000 / SFP.light) - (3000 / SFP.c1)) * 1e6).toFixed(0)} MILLIONTHS OF A SECOND AHEAD OF THE LIGHT FROM 3 km`, 1),
   b('ears', 'A BRAIN USES GAPS DOWN TO ABOUT 10 MILLIONTHS OF A SECOND', 1, 1),
   b('phone', 'A PHONE CALL STILL LAGS ABOUT 0.25 s: RADIO, A NETWORK, CODECS', 1, 1),
   b('phone', 'A PHONE’S LOCATION: GPS, GOOD TO A FEW METRES', 2, 2),
@@ -54,7 +53,7 @@ const SF_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [sfC(id, k0) - 0.1,
 ]; })();
 // the insets: [from, to, which, where]
 const SF_INSETS = (() => { const b = (id, k0, id1, k1, w, where = '') => [sfC(id, k0) - 0.25, sfCap(id1, k1).hide + 0.3, w, where]; return [
-  b('start', 2, 'start', 2, 'rings'), b('flash', 2, 'flash', 2, 'race'), b('rumble', 1, 'rumble', 2, 'rumble'), b('ears', 0, 'ears', 2, 'ears'),
+  b('start', 2, 'start', 2, 'rings'), b('rumble', 0, 'rumble', 1, 'rumble'), b('ears', 0, 'ears', 2, 'ears'),
   b('far', 1, 'far', 2, 'far'), b('phone', 2, 'phone', 3, 'phone'), b('back', 0, 'back', 0, 'escape'),
 ]; })();
 
@@ -178,7 +177,7 @@ class SfHud {
     const fs = est > maxW ? ` style="font-size:${(K[0] * maxW / est).toFixed(1)}px"` : '';
     return `<text x="${x}" y="${y}" class="${cls}"${fs} ${extra}>${text}</text>`;
   }
-  static you(x, y, lab = 'YOU') { return `<circle cx="${x}" cy="${y}" r="9" fill="#ffcf8a"/>${SfHud.tx(x + 16, y + 9, 'sm', lab, 200)}`; }
+  static you(x, y, lab = 'YOU', below = false) { return `<circle cx="${x}" cy="${y}" r="9" fill="#ffcf8a"/>${below ? SfHud.tx(x - 44, y + 36, 'sm', lab, 200) : SfHud.tx(x + 16, y + 9, 'sm', lab, 200)}`; }
   // 8:52:00: the thunder of nine strikes still on its way (rings at 343 m/s); then every one of them at you at once
   static rings(u) {
     const T = SfHud.tx, cx = 380, cy = 270, sc = 190 / 16500, k1 = MathX.smooth(u, 0.2, 2.6), snap = MathX.smooth(u, 2.7, 3.2), tau = -3.5 + 3.5 * k1;
@@ -270,11 +269,11 @@ class SfHud {
     const sc = 0.22, ox = 540, oy = 250, map = (q) => [ox + (q[0] - P[0]) * sc, oy + (q[1] - P[1]) * sc];
     const c2 = map(C), n2 = map(N), nd = sfDist(P, N), q = '?';
     return SfHud.svg(`${SfHud.plate()}${T(30, 56, 't', 'WHERE YOU ARE')}
-      <g opacity="${a.toFixed(2)}"><rect x="${(c2[0] - 10).toFixed(1)}" y="${(c2[1] - 10).toFixed(1)}" width="20" height="20" fill="#d8dcff"/>${T(c2[0] - 90, c2[1] + 44, 'sm', `THE CELLAR · ${Math.round(sfDist(P, C))} m`, 230)}
-        <line x1="${ox}" y1="${oy}" x2="${c2[0].toFixed(1)}" y2="${c2[1].toFixed(1)}" stroke="#d8dcff" stroke-width="2.5" stroke-dasharray="6 5"/>${SfHud.you(ox, oy, 'YOU + HER')}</g>
+      <g opacity="${a.toFixed(2)}"><rect x="${(c2[0] - 10).toFixed(1)}" y="${(c2[1] - 10).toFixed(1)}" width="20" height="20" fill="#d8dcff"/>${T(c2[0] - 20, c2[1] - 22, 'sm', `THE CELLAR · ${Math.round(sfDist(P, C))} m`, 230)}
+        <line x1="${ox}" y1="${oy}" x2="${c2[0].toFixed(1)}" y2="${c2[1].toFixed(1)}" stroke="#d8dcff" stroke-width="2.5" stroke-dasharray="6 5"/>${SfHud.you(ox, oy, 'YOU + HER', true)}</g>
       <g opacity="${b.toFixed(2)}"><circle cx="${n2[0].toFixed(1)}" cy="${n2[1].toFixed(1)}" r="${(SFN.r(s) * sc).toFixed(1)}" fill="#4a3a32" stroke="#ff6a4a" stroke-width="3"/>${T(n2[0] - 20, n2[1] + 80, 'sm', `${sfKm(nd)} km`, 200)}</g>
       <g opacity="${c.toFixed(2)}">${[0, 1, 2, 3].map((i) => { const ang = i * Math.PI / 2 + 0.4; return `<line x1="${n2[0]}" y1="${n2[1]}" x2="${(n2[0] + Math.cos(ang) * 70).toFixed(1)}" y2="${(n2[1] + Math.sin(ang) * 70).toFixed(1)}" stroke="#ff6a4a" stroke-width="3" marker-end="url(#sfAh)" opacity="0.8"/>`; }).join('')}
         ${T(n2[0] - 14, n2[1] - 70, 'big', q, 80)}${T(30, 440, 'b', 'WHICH WAY IS IT GOING?', 700)}</g>
-      <g opacity="${b.toFixed(2)}">${T(30, 104, 'sm', `THE CELLAR: ${Math.round(sfDist(P, C) / SFP.carryV)} s, CARRYING HER`, 700)}${T(30, 140, 'sm', `THE TORNADO: ${Math.round(nd / SFP.tornadoV)} s, IF IT’S COMING AT YOU`, 700)}</g>`);
+      <g opacity="${b.toFixed(2)}">${T(30, 104, 'sm', `THE CELLAR: ${Math.round(sfDist(P, C) / SFP.carryV)} s, CARRYING HER`, 700)}${T(30, 140, 'sm', `ITS WINDS AT THE CELLAR: ${Math.round((sfDist(N, C) - SFN.r(s)) / SFP.tornadoV)} s, IF IT’S COMING AT YOU`, 700)}</g>`);
   }
 }

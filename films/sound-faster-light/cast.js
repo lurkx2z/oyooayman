@@ -70,7 +70,9 @@ const SF_P = {
   kneel: (s, i) => { const p = basePose(); p.hipY = 0.5; p.lHip = [0.05, 0.08]; p.rHip = [0.05, 0.08]; p.lKnee = 1.75; p.rKnee = 1.75; p.lFoot = 0.5; p.rFoot = 0.5; p.spine = 0.18;
     p.lSh = [0.95, 0.3]; p.rSh = [0.9, 0.25]; p.lEl = 0.5; p.rEl = 0.5; p.headYaw = 0.25 * Math.sin(s * 0.5 + i); return p; },
   // holding her: kneeling, both arms round her
-  hug: (s) => { const p = SF_P.kneel(s, 0); p.lSh = [1.3, -0.4]; p.rSh = [1.25, -0.38]; p.lEl = 1.05; p.rEl = 1.1; p.spine = 0.3; p.neck = 0.25; p.headYaw = 0.4 * Math.sin(s * 0.6); return p; },
+  // her, up on her knees in your arms, hers round your neck
+  kidHug: (s) => { const p = SF_P.kneel(s, 0); p.lSh = [1.35, -0.55]; p.rSh = [1.3, -0.55]; p.lEl = 1.3; p.rEl = 1.35; p.spine = 0.1; p.neck = -0.15; return p; },
+  hug: (s) => { const p = SF_P.kneel(s, 0); p.lSh = [0.6, -0.9]; p.rSh = [0.58, -0.88]; p.lEl = 1.75; p.rEl = 1.8; p.spine = 0.5; p.neck = 0.45; p.headYaw = 0.4 * Math.sin(s * 0.6); return p; },
   // her, held: her arms round the dog (crouched), then round your neck
   kidHold: (s) => { const p = SF_P.crouch(s, 3); p.lSh = [1.1, -0.35]; p.rSh = [1.05, -0.3]; p.lEl = 1.7; p.rEl = 1.75; p.spine = 0.45; p.neck = 0.3; p.headYaw = 0.1 * Math.sin(s * 0.9); return p; },
   flinch: (s) => { const p = basePose(); p.lSh = [1.6, 0.3]; p.rSh = [1.5, 0.35]; p.lEl = 2.1; p.rEl = 2.0; p.spine = 0.25; p.neck = 0.35; p.lKnee = 0.3; p.rKnee = 0.3; p.hipY = 0.88; return p; },

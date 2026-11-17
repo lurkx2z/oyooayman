@@ -71,7 +71,7 @@ function sfBoltPath(k) {
   if (k.key === 'long') {
     const P = SFP.longBolt.pts, pts = P.map((p, i) => [p[0] + (i < 61 ? r.range(-14, 14) * Math.sin(i * 0.4) : r.range(-30, 30)), p[1] + (i < 61 ? 0 : r.range(-20, 20)), p[2] + (i < 61 ? r.range(-14, 14) : r.range(-30, 30))]);
     pts[0] = [k.x, gy, k.z];
-    for (let i = 1; i < pts.length; i++) { if (i % 2 && i > 61) continue; segs.push([...pts[i - 1], ...pts[i], i < 61 ? 1 : 0.7]); }
+    for (let i = 1; i < pts.length; i++) segs.push([...pts[i - 1], ...pts[i], i < 61 ? 1 : 0.7]);
     for (let b = 0; b < 9; b++) { const i = 70 + b * 20, p = pts[Math.min(i, pts.length - 1)]; walk(p, [r.range(-1, 1), -0.25, r.range(-1, 1)], 10, 40, 0.5, 0.4, true); }
     return segs;
   }
@@ -81,9 +81,10 @@ function sfBoltPath(k) {
   }
   const top = [k.x + r.range(-120, 120), k.top, k.z + r.range(-120, 120)], end = k.key === 'yard' ? [SF_F.yardLight.x, SF_F.yardLight.h + 0.2, SF_F.yardLight.z + 1.4] : [k.x, gy, k.z];
   // the main channel: a random walk down, pulled so it ends exactly on its ground point
-  const n = 46, pts = [top]; let ox = 0, oz = 0;
+  const yd = k.key === 'yard', n = yd ? 170 : 46, pts = [top]; let ox = 0, oz = 0;   // (the yard one is seen from 90 m: finer steps, and kinked all the way down)
   for (let i = 1; i <= n; i++) { ox += r.range(-1, 1) * 22; oz += r.range(-1, 1) * 22; ox *= 0.9; oz *= 0.9; const u = i / n, w = Math.sin(Math.PI * u); pts.push([top[0] + (end[0] - top[0]) * u + ox * w, top[1] + (end[1] - top[1]) * u + r.range(-6, 6) * w, top[2] + (end[2] - top[2]) * u + oz * w]); }
   pts[n] = end;
+  if (yd) for (let i = 1; i < n; i++) { const f = Math.min(1, (n - i) / 4); pts[i][0] += r.range(-2.2, 2.2) * f; pts[i][2] += r.range(-2.2, 2.2) * f; }
   for (let i = 1; i <= n; i++) segs.push([...pts[i - 1], ...pts[i], 1]);
   const nb = 3 + r.int(0, 4);
   for (let b = 0; b < nb; b++) { const i = r.int(3, Math.floor(n * 0.7)), p = pts[i], a = r.range(0, 6.283); walk(p, [Math.cos(a) * 0.7, -0.8, Math.sin(a) * 0.7], 6 + r.int(0, 10), 26, 0.5, 0.45, true); }
@@ -97,7 +98,7 @@ function sfBolts(scene) {
       if (pa.w < 0.5 && pb.w < 0.5) { gl_Position = vec4(0.0, 0.0, -2.0, 1.0); return; }
       if (pa.w < 0.5) pa = mix(pb, pa, (pb.w - 0.5) / (pb.w - pa.w)); if (pb.w < 0.5) pb = mix(pa, pb, (pa.w - 0.5) / (pa.w - pb.w));
       vec4 p = aS.y < 0.5 ? pa : pb; vec2 sa = pa.xy / pa.w * uRes, sb = pb.xy / pb.w * uRes; vec2 d = sb - sa; float L = length(d); vec2 dir = L > 1e-4 ? d / L : vec2(1.0, 0.0), nrm = vec2(-dir.y, dir.x);
-      float focal = projectionMatrix[1][1] * uRes.y; float px = max(uMinPx, aS.z * 2.2 * focal / p.w) * 3.0;
+      float focal = projectionMatrix[1][1] * uRes.y; float px = clamp(aS.z * 2.2 * focal / p.w, uMinPx, 6.0) * 3.0;
       vec2 off = nrm * aS.x * px + dir * (aS.y < 0.5 ? -1.0 : 1.0) * px * 0.3; p.xy += off / uRes * p.w; vS = aS.x; vW = aS.z; gl_Position = p; }`;
   const fs = `uniform float uI; uniform vec3 uCol; varying float vS; varying float vW;
     void main(){ float a = abs(vS); float core = exp(-a * a * 30.0), glow = exp(-a * 4.0) * 0.22; gl_FragColor = vec4(uCol * uI * (core * 1.6 + glow) * (0.45 + 0.55 * vW), 1.0); }`;
@@ -118,9 +119,10 @@ function sfBolts(scene) {
       res.set(rh * 16 / 9, rh);
       for (const m of meshes.values()) m.visible = false;
       for (const k of SF_STRIKES) {
-        if (k.s > s + 0.01) break; const u = s - k.s; if (u > k.dur + 0.25) continue;
-        let v = 0; for (const [dt, a] of k.pulses) { const w = u - dt; if (w >= -0.005) v = Math.max(v, a * Math.exp(-Math.max(0, w) / 0.075)); }
-        v = Math.max(v, 0.2 * (1 - MathX.smooth(u, k.dur - 0.1, k.dur + 0.2)));
+        if (k.s > s + 0.01) break; const u = s - k.s; if (u > Math.max(k.dur, k.key === 'long' ? 0.85 : 0) + 0.25) continue;
+        const lg = k.key === 'long', tau = lg ? 0.2 : 0.075, end = lg ? Math.max(k.dur, 0.85) : k.dur;   // (the 6 km one glows on for longer: its length has to read)
+        let v = 0; for (const [dt, a] of k.pulses) { const w = u - dt; if (w >= -0.005) v = Math.max(v, a * Math.exp(-Math.max(0, w) / tau)); }
+        v = Math.max(v, (lg ? 0.35 : 0.2) * (1 - MathX.smooth(u, end - 0.1, end + 0.2)));
         if (v < 0.01) continue;
         const m = get(k); m.visible = true; m.material.uniforms.uI.value = v * (k.kind === 'ic' ? 0.7 : 2.4) * Math.min(1.5, k.amp);
       }
@@ -148,11 +150,11 @@ function sfRain(scene, N = 3000) {
         vec4 pa = projectionMatrix * viewMatrix * vec4(p, 1.0), pb = projectionMatrix * viewMatrix * vec4(b, 1.0);
         if (pa.w < 0.2 || pb.w < 0.2) { gl_Position = vec4(0.0, 0.0, -2.0, 1.0); return; }
         vec4 P = position.y > 0.0 ? pa : pb; vec2 d = (pb.xy / pb.w - pa.xy / pa.w) * uRes; float L = length(d); vec2 n = L > 1e-4 ? vec2(-d.y, d.x) / L : vec2(1.0, 0.0);
-        float focal = projectionMatrix[1][1] * uRes.y * 0.5, px = max(0.9, 0.004 * focal / P.w);
+        float focal = projectionMatrix[1][1] * uRes.y * 0.5, px = clamp(0.004 * focal / P.w, 0.9, 2.6), kn = max(1.0, focal / 1060.0);   // (long lenses: no fat streaks right at the lens)
         P.xy += n * position.x * px * 2.0 / uRes * P.w; gl_Position = P;
         vec3 tv = p - uTP; float tl = length(tv), tc = dot(tv / max(tl, 1e-3), uTD);
         vL = uTI * smoothstep(0.93, 0.985, tc) / (1.0 + tl * tl * 0.02);
-        vA = smoothstep(0.3, 1.5, P.w) * (1.0 - smoothstep(10.0, 13.0, P.w)); vS = position.x; }`,
+        vA = smoothstep(0.3 * kn, 1.5 * kn, P.w) * (1.0 - smoothstep(10.0, 13.0, P.w)); vS = position.x; }`,
     fragmentShader: `uniform vec3 uLight; uniform float uFlash, uA; varying float vA; varying float vS; varying float vL;
       void main(){ float a = 1.0 - abs(vS) * 2.0; gl_FragColor = vec4((uLight * 3.0 + vec3(0.6, 0.62, 0.8) * uFlash + vec3(1.0, 0.92, 0.75) * vL) * uA * vA * a, 1.0); }`,
   });

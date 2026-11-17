@@ -149,7 +149,7 @@ function sfHouse(set) {
   const C = SF_F.cellar, cg = new THREE.Group(); cg.position.set(C.x, 0, C.z); S.add(cg);
   sfBox(2.6, 0.5, 2.8, sfStd('#8c8880', 0.95), 0, 0.25, 0, cg);
   for (const sx of [-1, 1]) { const d = sfBox(1.2, 0.06, 2.4, sfStd('#5a6a5a', 0.5, 0.5), sx * 0.62, 0.62, 0, cg); d.rotation.z = -sx * 0.22; }
-  return { g, lit, porchLight: [H.x - 0.6, 2.75, H.z + front + 0.12] };
+  return { g, lit, cellar: cg, porchLight: [H.x - 0.6, 2.75, H.z + front + 0.12] };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -278,6 +278,8 @@ function sfHansen(set) {
   add(sfBox(9, 5, 7, wall, -10, 2.5, 6, g)); add(sfBox(9.6, 0.3, 7.8, roof, -10, 5.6, 6, g));
   const win = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.6, 0.8) });
   for (const x of [-12.5, -8]) { const w = sfMesh(new THREE.PlaneGeometry(0.9, 1.2), win, x, 2.2, 9.52, g); w.castShadow = false; add(w); }
+  // (the east side, towards you: two lit windows and the barn's lit door)
+  for (const [x, z, y, ww, hh] of [[-5.48, 4.3, 2.4, 1.1, 1.3], [-5.48, 7.6, 2.4, 1.1, 1.3], [21.02, -6.5, 1.6, 2.6, 3.0]]) { const w = sfMesh(new THREE.PlaneGeometry(ww, hh), win, x, y, z, g); w.rotation.y = Math.PI / 2; w.castShadow = false; add(w); }
   add(sfBox(14, 6, 22, red, 14, 3, -8, g)); add(sfBox(15, 0.4, 23, roof, 14, 6.6, -8, g)); add(sfBox(10, 0.4, 23, roof, 14, 8.4, -8, g));
   for (const [x, z, r, h] of [[30, 6, 4, 7], [30, 16, 3.5, 6]]) { add(sfCyl(r, r, h, steel, x, h / 2, z, g, 24)); add(sfMesh(new THREE.ConeGeometry(r + 0.1, r * 0.5, 24), steel, x, h + r * 0.25, z, g)); }
   add(sfCyl(0.12, 0.14, 9, sfStd('#3a2c22', 0.9), 4, 4.5, 4, g, 6));

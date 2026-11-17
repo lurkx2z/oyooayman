@@ -34,14 +34,12 @@ const SF_CHECKS = (() => {
   num('start', 2, /^([\d]+) thunderclaps/, P.inAir, 0, 'strikes whose thunder was in the air at 8:52:00');
   num('flash', 0, /at ([\d.]+) m\/s/, P.c0, 0.5, 'the speed of sound in 20 °C air');
   num('flash', 0, /: ([\d.]+) seconds for every/, P.sPerKm, 0.1, 'seconds per kilometre');
-  num('flash', 2, /From ([\d.]+) km away/, sfDist(you(key('flash3').s), [key('flash3').x, key('flash3').z]) / 1000, 0.06, 'the strike from you');
-  num('flash', 2, /away, ([\d.]+) millionths/, (3000 / P.light - 3000 / P.c1) * 1e6, 0.1, 'thunder ahead of light from 3 km (µs)');
   num('rule', 0, /be ([\d.]+) million times stiffer/, Math.floor(P.stiff / 1e6), 0, 'air stiffness needed / steel (millions)');
-  num('rumble', 1, /That one was ([\d.]+) km long/, SFP.longBolt.len / 1000, 0.1, 'the bolt\'s channel');
-  num('rumble', 1, /roll on for ([\d.]+) seconds/, SFP.longBolt.rumble, 0.3, 'its rumble at 343 m/s');
+  num('rumble', 0, /That one was ([\d.]+) km long/, SFP.longBolt.len / 1000, 0.1, 'the bolt\'s channel');
+  num('rumble', 0, /roll on for ([\d.]+) seconds/, SFP.longBolt.rumble, 0.3, 'its rumble at 343 m/s');
   num('ears', 0, /up to ([\d.]+) thousandths/, P.itd0 * 1000, 0.01, 'the gap between your ears before (ms)');
   num('ears', 1, /it's ([\d.]+) billionths/, P.itd1 * 1e9, 0.05, 'the gap now (ns)');
-  num('ears', 1, /is ([\d,]+) times longer/, P.itdTimes, 600, 'the smallest gap a brain uses over the gap now');
+  num('ears', 1, /: ([\d,]+) times too short/, P.itdTimes, 600, 'the smallest gap a brain uses over the gap now');
   num('ears', 2, /now ([\d,]+) km long/, P.voiceLambda / 1000, 40, 'her voice\'s wavelength');
   num('far', 0, /horn ([\d.]+) km away/, sfDist(you(E.train), SF_F.rail) / 1000, 0.3, 'the railway crossing');
   num('far', 1, /dogs, ([\d.]+) km away/, sfDist(you(sfSC('far', 1)), Q.hansen) / 1000, 0.05, 'the Hansen farm');
@@ -52,12 +50,12 @@ const SF_CHECKS = (() => {
   { const b = sfBearing(you(sfSC('phone', 3)), Q.kid); is(b > 240 && b < 300, `phone:3 says west: bearing ${b.toFixed(0)}°`); const bt = sfBearing(you(sfSC('phone', 3)), SFN.at(sfSC('phone', 3))); is(Math.abs(b - bt) < 25, `phone:3 says towards the tornado: ${b.toFixed(0)}° vs ${bt.toFixed(0)}°`); }
   num('corn', 0, /It's ([\d.]+) metres tall/, P.cornH, 0, 'the corn');
   num('corn', 2, /She's ([\d.]+) metres away/, sfDist(you(sfSC('corn', 2)), Q.kid), 3, 'you to her');
-  { const d = sfDist(you(E.yardHit), [SF_F.yardLight.x, SF_F.yardLight.z]) / P.c0; is(/a quarter of a second/.test(sfCap('strike', 1).text) && d > 0.22 && d < 0.3, `strike:1 says a quarter of a second: ${d.toFixed(3)} s`); }
   num('wind', 0, /at ([\d.]+) km\/h/, P.inflow, 0, 'the inflow');
   num('neighbour', 0, /farm, ([\d.]+) km west/, sfDist(you(sfSC('neighbour', 0)), Q.hansen) / 1000, 0.05, 'the Hansen farm');
   num('found', 0, /raincoat, ([\d.]+) metres away/, sfDist(you(sfSC('found', 0)), Q.kid), 0.5, 'you to her');
   num('back', 0, /cellar is ([\d.]+) metres/, sfDist(you(sfSC('back', 0)), [SF_F.cellar.x, SF_F.cellar.z]), 3, 'you to the storm cellar');
-  { const d = sfDist(you(sfSC('back', 0)), SFN.at(sfSC('back', 0))); is(d < 1000 && d > 800, `back:0 says less than a kilometre: ${d.toFixed(0)} m`); }
+  num('back', 0, /that's ([\d.]+) seconds/, sfDist(you(sfSC('back', 0)), [SF_F.cellar.x, SF_F.cellar.z]) / P.carryV, 1, 'carrying her to the cellar (s)');
+  { const s1 = sfSC('back', 1); num('back', 1, /the cellar in ([\d.]+)/, (sfDist(SFN.at(s1), [SF_F.cellar.x, SF_F.cellar.z]) - SFN.r(s1)) / P.tornadoV, 1.5, 'its winds to the cellar (s)'); }
   if (bad.length) throw new Error('script.js: ' + bad.join(' · '));
   return out;
 })();

@@ -22,7 +22,7 @@ function sfTornado(scene) {
         float st = sfF(vec2(a * 6.0 + sp * 3.0 + y * 0.006, y * 0.012)), st2 = sfF(vec2(a * 18.0 + sp * 6.0, y * 0.05 + 4.0));
         vec3 V = normalize(cameraPosition - vW); float ed = abs(dot(normalize(vN), V));
         // ragged sides and a soft, dusty base; the top dissolves into the wall cloud
-        float alpha = (0.55 + 0.4 * st) * smoothstep(0.02, 0.35, ed + 0.25 * st2) * smoothstep(-2.0, 25.0, y + 25.0 * st2) * (1.0 - smoothstep(620.0, 805.0, y + 60.0 * st));
+        float alpha = (0.55 + 0.4 * st) * smoothstep(0.02, 0.35, ed + 0.25 * st2) * smoothstep(-2.0, 25.0, y + 25.0 * st2) * (1.0 - smoothstep(380.0, 660.0, y + 90.0 * st));   // (the flare dissolves into the cloud: no goblet rim)
         alpha = clamp(alpha * 1.35, 0.0, 0.97) * uA;
         vec3 base = mix(vec3(0.055, 0.05, 0.048), vec3(0.11, 0.1, 0.09), st) ;
         float lit = max(dot(normalize(vN), uFlDir), 0.0) * 0.8 + 0.2;
@@ -37,7 +37,7 @@ function sfTornado(scene) {
     uniforms: U, transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false,
     vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
     fragmentShader: `uniform float uT, uFl, uAmb, uBack; varying vec3 vP; ${SF_NOISE_GLSL}
-      void main(){ float a = atan(vP.z, vP.x), n = sfF(vec2(a * 5.0 + uT * 0.12, vP.y * 0.01)); float al = (0.35 + 0.5 * n) * smoothstep(-80.0, -20.0, vP.y + 60.0 * n) * (1.0 - smoothstep(30.0, 80.0, vP.y));
+      void main(){ float a = atan(vP.z, vP.x), n = sfF(vec2(a * 5.0 + uT * 0.12, vP.y * 0.01)); float n2 = sfF(vec2(a * 23.0 - uT * 0.2, vP.y * 0.04 + 7.0)); float al = 0.22 * (0.3 + 0.55 * n) * smoothstep(-80.0, 10.0, vP.y + 70.0 * n + 40.0 * n2) * (1.0 - smoothstep(0.0, 80.0, vP.y + 30.0 * n2));
         vec3 c = vec3(0.04, 0.045, 0.05) * (0.6 + n) * (uAmb * 10.0) + uFl * vec3(0.35, 0.36, 0.42) * (0.4 + 0.8 * n) * (1.0 - 0.7 * uBack); gl_FragColor = vec4(c, al); }`,
   }));
   wc.position.y = 860; wc.renderOrder = 1; wc.frustumCulled = false; g.add(wc);

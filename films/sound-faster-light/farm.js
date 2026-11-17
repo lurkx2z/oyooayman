@@ -11,7 +11,7 @@ const SF_POV = new Set(['run', 'found', 'turn', 'question']);
 // who the soft fill light is on, per camera (none: the shot is about the place)
 const SF_FILL = { title: 'kid', high: 'you', thunder: 'you', walk: 'you', race: 'you', rumble: 'you', stare: 'you', call: 'you', echo: 'you', answer: 'you', search: 'you', ears1: 'you', ears2: 'you',
   insideHead: 'you', louder: 'you', wrongWay: 'you', goingAway: 'you', louderT: 'you', dial: 'you', kidPhone: 'kid', phoneMap: 'you', runFront: 'you', stumble: 'you',
-  lyingDown: 'you', found: 'kid', hold: 'kid', everywhere: 'you' };
+  lyingDown: 'you', found: 'kid', hold: 'kid', everywhere: 'you', above: 'you' };
 
 function sfFarmSet(app) {
   const F = SF_F, E = SFE, Q = SF_PLACES;
@@ -84,7 +84,7 @@ function sfFarmSet(app) {
     // running: the torch held out in your left hand
     if (st.state === 'run') { q.p.lSh = [1.05, 0.15]; q.p.lEl = 0.5; }
     // with her: kneeling, then holding her
-    if (s > SFY.runEnd) { q = { p: s > E.hold ? SF_P.hug(s) : SF_P.kneel(s, 0), lay: 0, y: 0.02 }; const u = SFY.u; const kk = sfEase(s, E.hold - 0.6, E.hold + 0.4); yaw = Math.atan2(u[0], u[1]); return { st: Object.assign({}, st, { x: st.x + u[0] * 0.3 * kk, z: st.z + u[1] * 0.3 * kk }), q, yaw, y0 }; }
+    if (s > SFY.runEnd) { q = { p: s > E.hold ? SF_P.hug(s) : SF_P.kneel(s, 0), lay: 0, y: 0.02 }; const u = SFY.u; const kk = sfEase(s, E.hold - 0.6, E.hold + 0.4); yaw = Math.atan2(u[0], u[1]); return { st: Object.assign({}, st, { x: st.x + u[0] * 0.5 * kk, z: st.z + u[1] * 0.5 * kk }), q, yaw, y0 }; }
     return { st, q, yaw, y0 };
   };
   const kidPose = (s) => {
@@ -92,7 +92,8 @@ function sfFarmSet(app) {
     if (st.state === 'crouch') { const dg = [Q.kid[0] - 0.5 - Q.kid[0], Q.kid[1] + 0.45 - Q.kid[1]]; yaw = Math.atan2(dg[0], dg[1]);
       q = { p: SF_P.kidHold(s), lay: 0, y: 0 };
       if (s > E.pickUp - 0.6 && s < E.run + 30) { const p = SF_P.kidHold(s); p.rSh = [0.85, -0.1]; p.rEl = 2.4; p.neck = 0.2; q = { p, lay: 0, y: 0 }; }
-      if (s > SFY.runEnd - 0.5) { const u = SFY.u; yaw = Math.atan2(-u[0], -u[1]) + 0.6; } }
+      if (s > SFY.runEnd - 0.5) { const u = SFY.u; yaw = Math.atan2(-u[0], -u[1]) + 0.6 * (1 - sfEase(s, E.hold - 0.6, E.hold + 0.4)); }
+      if (s > E.hold - 0.3) q = { p: SF_P.kidHug(s), lay: 0, y: 0 }; }
     return { st, q, yaw };
   };
   // the farm's power: on until lightning hits the yard light
@@ -106,6 +107,7 @@ function sfFarmSet(app) {
 
   set.frame = (t, shot) => {
     const s = sfStoryAt(t), m = shot.mode, k = (t - shot.t0) / Math.max(1e-6, shot.t1 - shot.t0);
+    set.house.cellar.visible = m !== 'title';   // (the storm cellar's box read as a glitch at the edge of the title shot)
     set._s = s; set._mode = m; set.renderH = (FILM._app && FILM._app.renderH) || 1080;
     SF_CORN_U.uT.value = t;
     // ---- you, her, the dog
@@ -153,7 +155,7 @@ function sfFarmSet(app) {
       td.set((hk[0] + hy[0]) / 2 - tp.x, (hk[1] + hy[1]) / 2 - 0.1 - tp.y, (hk[2] + hy[2]) / 2 - tp.z).normalize(); torch.position.copy(tp); torch.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), td); }
     else if (SF_POV.has(m)) { camera.getWorldDirection(td); tp.copy(cp).addScaledVector(td, 0.25); tp.y -= 0.28; tp.x += -td.z * 0.18; tp.z += td.x * 0.18; td.y -= 0.12; td.normalize(); }
     if (!grounded && !SF_POV.has(m)) { torch.getWorldPosition(tp); const a = yp.yaw + (yp.q.p.headYaw || 0) * 0.6; td.set(Math.sin(a), -0.2, Math.cos(a)).normalize(); if (yp.st.state === 'run') td.y = -0.12; }
-    torchL.intensity = tOn ? (SF_POV.has(m) ? 70 : grounded ? 22 : 170) : 0; torchL.position.copy(tp).addScaledVector(td, 0.3); torchL.target.position.copy(tp).addScaledVector(td, 10); torchL.target.updateMatrixWorld();
+    torchL.intensity = tOn ? (SF_POV.has(m) ? 70 * (m === 'found' ? MathX.clamp(Math.pow(sfDist([cp.x, cp.z], [kid.root.position.x, kid.root.position.z]) / 3.0, 2), 0.12, 1) : 1) : grounded ? 22 : 170) : 0;   // (close to her, the torch would burn her out) torchL.position.copy(tp).addScaledVector(td, 0.3); torchL.target.position.copy(tp).addScaledVector(td, 10); torchL.target.updateMatrixWorld();
     bounceL.intensity = tOn && !SF_POV.has(m) && !grounded ? 0.6 : 0; bounceL.position.copy(tp).addScaledVector(td, 1.6); bounceL.position.y -= 0.3;
     // the fill on the shot's subject: a light between it and the camera, its level such that the subject gets about the same
     { const sub = SF_FILL[m], P = sub === 'kid' ? kid : sub === 'you' ? you : null;
@@ -182,7 +184,7 @@ function sfFarmSet(app) {
     // ---- the Hansen farm comes apart
     { const H = set.hansen, u = s - E.hansen + 0.35, on = s < E.hansen - 0.55; H.lampM.color.setRGB(on ? 8 : 0, on ? 5.5 : 0, on ? 2.8 : 0); H.win.color.setRGB(on ? 2.4 : 0, on ? 1.6 : 0, on ? 0.8 : 0);
       H.parts.forEach((q, i) => { if (u <= 0) { q.m.position.copy(q.p0); q.m.rotation.copy(q.r0); q.m.visible = true; return; }
-        const w = Math.max(0, u - 0.4 * sfH(i, 3)), a = w * (1.2 + sfH(i, 4)); q.m.position.set(q.p0.x + Math.cos(a + i) * 25 * w, q.p0.y + 18 * w * w, q.p0.z + Math.sin(a + i) * 25 * w); q.m.rotation.set(q.r0.x + w * 3 * sfH(i, 5), q.r0.y + w * 4, q.r0.z + w * 2 * sfH(i, 6)); q.m.visible = w < 7; }); }
+        const w = Math.max(0, u - 0.4 * sfH(i, 3)), a = w * (1.2 + sfH(i, 4)), fc = SFN.at(s), dk = Math.min(1, 0.45 * w * w); q.m.position.set(q.p0.x + (fc[0] - H.at[0]) * dk + Math.cos(a + i) * 25 * w, q.p0.y + 14 * w * w, q.p0.z + (fc[1] - H.at[1]) * dk + Math.sin(a + i) * 25 * w); q.m.rotation.set(q.r0.x + w * 3 * sfH(i, 5), q.r0.y + w * 4, q.r0.z + w * 2 * sfH(i, 6)); q.m.visible = w < 7; }); }
     // ---- the corn the camera needs; the bolts; the glows
     set.corn.update(cp, set.cornOpt || {}); set.cornOpt = null;
     set.bolts.update(s, set.renderH);
@@ -232,11 +234,11 @@ function sfFarmSet(app) {
     // you at the edge, from the side (the diagram on the right)
     rumble: (t, s, k) => { const h = head(you), d = dr(t, 0.01, 0.3, 10), C = [h[0] + 2.4 + d[0], 1.45 + d[1], h[2] + 3.3 - 0.3 * k]; cam(C, aim(C, h, -0.4, 0.1, 42), 42); },
     // close: you, staring at the corn, the torch on it
-    stare: (t, s, k) => { const b = yb(s), d = dr(t, 0.006, 0.3, 11), C = off(b.h, b.f, b.r, 1.0 - 0.1 * k, 1.0, 1.6 + d[1]); C[0] += d[0]; cam(C, aim(C, b.h, 0.36, 0.12, 40), 40); },
+    stare: (t, s, k) => { const b = yb(s), d = dr(t, 0.006, 0.3, 11), C = off(b.h, b.f, b.r, 1.0 - 0.1 * k, -1.0, 1.6 + d[1]); C[0] += d[0]; cam(C, aim(C, b.h, -0.4, 0.0, 40), 40); },
     // from a few rows into the corn: you calling, the yard and the barn behind you
     call: (t, s, k) => { const b = yb(s), d = dr(t, 0.008, 0.3, 12), C = off(b.h, b.f, b.r, 4.2, 0.5, 1.45 + d[1]); C[0] += d[0]; clear(C, b.h, 0.6); cam(C, aim(C, b.h, 0.0, 0.02, 40), 40, 0.05); },
     // over your shoulder, east, across the yard to the barn: nothing comes back
-    echo: (t, s, k) => { const h = head(you), d = dr(t, 0.008, 0.3, 13); cam([h[0] - 1.6 + d[0], 1.85 + d[1], h[2] - 0.7], [F.barn.x - 8, 4.5, F.barn.z + 4], 34, 0.05); },
+    echo: (t, s, k) => { const h = head(you), d = dr(t, 0.008, 0.3, 13); cam([h[0] - 1.6 + d[0], 1.45 + d[1], h[2] - 0.7], [F.barn.x - 8, 3.2, F.barn.z + 4], 34, 0.05); },
     // over your shoulder into the wall of corn, the torch on it
     answer: (t, s, k) => { const b = yb(s), d = dr(t, 0.006, 0.3, 14), C = off(b.h, b.f, b.r, -1.0, 0.6, 1.82 + d[1]); C[0] += d[0]; cam(C, off(b.h, b.f, b.r, 6, 1.5 * Math.sin(t * 0.4), 1.3), 46); },
     // your face, from the corn, eyes searching
@@ -277,7 +279,7 @@ function sfFarmSet(app) {
     run: (t, s, k) => { const y = SFY.at(s), ph = y.d / 2.3 * 2 * Math.PI, a = y.yaw + 0.06 * Math.sin(t * 1.3); const f = fwd(a);
       set.cornOpt = { clear: [y.x, y.z, y.x + f[0] * 7, y.z + f[1] * 7, 0.33] }; cam([y.x + 0.08 * Math.sin(ph), 1.62 + 0.035 * Math.abs(Math.sin(ph)), y.z], [y.x + f[0] * 10, 1.35, y.z + f[1] * 10], 62, 0.03, 1.8 * Math.sin(ph * 0.5)); },
     // high over the corn: your torch beam moving through it; the flashes; the tornado beyond
-    above: (t, s, k) => { const b = yb(s), C = off(b.h, b.f, b.r, -6.5 + 1.5 * k, 2.5, 8.5 - k); cam(C, aim(C, b.h, 0.05, 0.12, 50), 50, 0.5); },
+    above: (t, s, k) => { const b = yb(s), C = off(b.h, b.f, b.r, -4.5 + 1.5 * k, 5.5, 10.5 - k); clear(C, b.h, 0.7); cam(C, aim(C, b.h, -0.38, -0.32, 50), 50, 0.5); },
     // ahead of you in the row, low: you run at us, the torch flaring
     runFront: (t, s, k) => { const y = SFY.at(s), f = fwd(y.yaw), d = dr(t, 0.02, 0.6, 31), C = [y.x + f[0] * 3.4 + d[0], 1.25 + d[1], y.z + f[1] * 3.4], h = head(you); clear(C, h, 0.5); cam(C, aim(C, h, 0.0, 0.0, 50), 50, 0.03); },
     // up behind you over the corn, looking back east to the farm: lightning hits the yard light
@@ -289,19 +291,19 @@ function sfFarmSet(app) {
     windAbove: (t, s, k) => { const y = SFY.at(s), d = dr(t, 0.1, 0.6, 34); cam([y.x + 7 + d[0], 4.6 + d[1], y.z + 3.5], [y.x - 9, 0.4, y.z - 2.5], 50, 0.2); },
     lyingDown: (t, s, k) => { const b = yb(s), d = dr(t, 0.03, 0.6, 35), C = off(b.h, b.f, b.r, -2.3, -1.15, 1.0 + d[1]); C[0] += d[0]; clear(C, b.h, 0.5); cam(C, aim(C, b.h, 0.3, 0.12, 56), 56, 0.03); },
     // a long lens west from over the corn: the tornado on the Hansen farm
-    hansenHit: (t, s, k) => { const y = SFY.at(s), Hq = Q.hansen, d = dr(t, 0.25, 0.5, 36); cam([y.x, 4.2, y.z], [Hq[0] + d[0] * 4, sfGroundY(...Hq) + 38 + 20 * k + d[1] * 4, Hq[1]], 12.5 + 4 * k, 1.0); },
+    hansenHit: (t, s, k) => { const y = SFY.at(s), Hq = Q.hansen, d = dr(t, 0.25, 0.5, 36), C = [y.x, 6.0 + d[1] * 0.05, y.z], fv = 8.5 + 2.5 * k; cam(C, aim(C, [Hq[0] + 5, sfGroundY(...Hq) + 4, Hq[1] - 4], 0.3 + d[0] * 0.01, -0.3, fv), fv, 1.0); },
     debris: (t, s, k) => { const y = SFY.at(s), p = SFN.at(s), d = dr(t, 0.03, 0.6, 37); cam([y.x + 2.0 + d[0], 2.0 + d[1], y.z + 2.4], [p[0], 420, p[1]], 50, 0.05); },
     // POV: the torch down the row; a flash; the raincoat
     found: (t, s, k) => { const y = SFY.at(s), u = SFY.u, ph = y.d / 2.3 * 2 * Math.PI, hk = head(kid), C = [y.x + 0.05 * Math.sin(ph), 1.58 + 0.03 * Math.abs(Math.sin(ph)) - 0.25 * MathX.smooth(s, SFY.runEnd - 0.4, SFY.runEnd + 0.6), y.z]; clear(C, hk, 0.5); cam(C, aim(C, [hk[0], hk[1] - 0.2, hk[2]], 0.0, -0.1, 54), 54, 0.03, 1.2 * Math.sin(ph * 0.5)); },
     // close: you holding her, she holding the dog
     hold: (t, s, k) => { const h = head(kid), u = SFY.u, r = [-u[1], u[0]], d = dr(t, 0.005, 0.3, 38), C = [h[0] + r[0] * 1.5 - u[0] * 0.2 + d[0], 1.05 + d[1], h[2] + r[1] * 1.5 - u[1] * 0.2]; clear(C, h, 0.6); cam(C, aim(C, h, 0.15, 0.05, 42), 42, 0.03); },
     // high, behind you two: west to the tornado (the map on the right)
-    escape: (t, s, k) => { const y = SFY.at(s), p = SFN.at(s); cam([y.x + 30, 26 + 4 * k, y.z + 34], [p[0] + 160, 120, p[1] + 260], 56, 0.5); },
+    escape: (t, s, k) => { const y = SFY.at(s), C = [y.x + 5.2 - 0.8 * k, 3.3 + 0.5 * k, y.z - 1.6]; clear(C, [y.x, 0.9, y.z], 0.9); cam(C, aim(C, [y.x, 0.9, y.z], -0.34, -0.3, 56), 56, 0.3); },
     everywhere: (t, s, k) => { const h = head(you), u = SFY.u, d = dr(t, 0.008, 0.4, 39), C = [h[0] - u[0] * 1.6 + u[1] * 0.9 + d[0], 1.2 + d[1], h[2] - u[1] * 1.6 - u[0] * 0.9]; clear(C, h, 0.55); cam(C, aim(C, h, -0.3, 0.05, 44), 44, 0.03); },
     // POV: turning round in the corn with the torch
-    turn: (t, s, k) => { const y = SFY.at(s), h = head(kid), a = Math.atan2(SFY.u[0], SFY.u[1]) + Math.PI * 2 * MathX.smooth(k, 0, 1) * 0.85, f = fwd(a); set.cornOpt = { clear: [y.x, y.z, y.x + f[0] * 5, y.z + f[1] * 5, 0.3] }; cam([y.x + SFY.u[0] * 0.35, 1.1, y.z + SFY.u[1] * 0.35], [y.x + f[0] * 8, 1.2, y.z + f[1] * 8], 56, 0.03); void h; },
+    turn: (t, s, k) => { const y = SFY.at(s), h = head(kid), a = Math.atan2(SFY.u[0], SFY.u[1]) + Math.PI * 2 * MathX.smooth(k, 0, 1) * 0.85, f = fwd(a); set.cornOpt = { clear: [y.x, y.z, y.x + f[0] * 5, y.z + f[1] * 5, 1.2] }; cam([y.x + SFY.u[0] * 0.35, 1.1, y.z + SFY.u[1] * 0.35], [y.x + f[0] * 8, 1.2, y.z + f[1] * 8], 56, 0.15); void h; },
     // POV, low: west down the row; the last flash: the funnel over the corn
-    question: (t, s, k) => { const y = SFY.at(s), p = SFN.at(s), b = sfBearing([y.x, y.z], p) * Math.PI / 180; set.cornOpt = { clear: [y.x, y.z, y.x + Math.sin(b) * 6, y.z - Math.cos(b) * 6, 0.3] }; cam([y.x + SFY.u[0] * 0.35, 1.15, y.z + SFY.u[1] * 0.35], [y.x + Math.sin(b) * 20, 3.5 + 1.5 * k, y.z - Math.cos(b) * 20], 60, 0.03); },
+    question: (t, s, k) => { const y = SFY.at(s), p = SFN.at(s), b = sfBearing([y.x, y.z], p) * Math.PI / 180; set.cornOpt = { clear: [y.x, y.z, y.x + Math.sin(b) * 6, y.z - Math.cos(b) * 6, 0.3] }; cam([y.x - SFY.u[0] * 0.15, 1.2, y.z - SFY.u[1] * 0.15], [y.x + Math.sin(b) * 20, 2.6 + 1.2 * k, y.z - Math.cos(b) * 20], 60, 0.03); },   // (her yellow hood at the bottom of the frame)
   };
 
   // ---- labels pinned to things: (t) → [{ p, text, sub, a, side }]
@@ -317,7 +319,7 @@ function sfFarmSet(app) {
     if (m === 'sirens') { const T = set.town.tower; return [Lb(T, 'THE TOWN’S SIRENS', `${(dYou(T) / 1000).toFixed(1)} km`, w, 'l')]; }
     if (m === 'funnel') { const p = SFN.at(s); return [Lb([p[0], 260, p[1]], 'THE TORNADO', `${(dYou([p[0], 0, p[1]]) / 1000).toFixed(1)} km · ${Math.round(SFP.tornadoV * 3.6)} km/h`, w)]; }
     if (m === 'yardDead') { const p = [F.yardLight.x, F.yardLight.h - 0.4, F.yardLight.z + 1.4], q = Y(SFE.yardHit).st, d = Math.hypot(F.yardLight.x - q.x, F.yardLight.z - q.z); return [Lb(p, 'THE YARD LIGHT', `${Math.round(d / 10) * 10} m · ITS BANG WAS ${(d / SFP.c0).toFixed(2)} s LATE · NOW 0`, w)]; }   // the distance when it hit (as the caption)
-    if (m === 'hansenHit') { const q = Q.hansen; return [Lb([q[0] + 4, sfGroundY(...q) + 12, q[1] + 4.8], 'THE HANSEN FARM', `${(dYou([q[0], 0, q[1]]) / 1000).toFixed(1)} km`, w)]; }
+    if (m === 'hansenHit') { const q = Q.hansen; return [Lb([q[0] - 4, sfGroundY(...q) + 26, q[1] - 4], 'THE HANSEN FARM', `${(dYou([q[0], 0, q[1]]) / 1000).toFixed(1)} km`, w)]; }
     if (m === 'kidPhone') return [Lb((() => { const h = head(kid); return [h[0], h[1] + 0.42, h[2]]; })(), 'HER', `${Math.round(dYou(head(kid)))} m AWAY`, w)];
     if (m === 'above') return [Lb(yh, 'YOU', 'YOUR TORCH', w)];
     return [];
@@ -328,7 +330,7 @@ function sfFarmSet(app) {
     p.exposure = 1.32 + (SF_POV.has(m) ? 0.1 : 0); p.saturation = 0.92; p.contrast = 1.08; p.warmth = -0.12; p.blackLift = 0.012; p.vignette = 0.6; p.soft = 0.06; p.bloom = 0.5; p.bloomThreshold = 0.85; p.grain = 0.03;
     if (m === 'title') { p.exposure = 1.38; p.saturation = 0.98; }
     p.exposure /= 1 + 0.35 * A;   // (a flash: the eye stops down, so it doesn't burn out)
-    { const u = sfStoryAt(t); if (u > -0.01 && u < 0.6) { const k = Math.exp(-Math.max(0, u) / 0.08); p.flash = Math.max(p.flash || 0, 0.85 * k); p.flashColor.setRGB(0.95, 0.94, 0.9); } }   // the boom at 8:52:00: the picture jolts white
+    { const u = sfStoryAt(t); if (u > -0.01 && u < 1.2) { const k = u < 0.13 ? 1 : Math.exp(-(u - 0.13) / 0.2); p.flash = Math.max(p.flash || 0, 0.95 * k); p.flashColor.setRGB(1, 1, 0.97); } }   // the boom at 8:52:00: the picture jolts white
   };
   return set;
 }
