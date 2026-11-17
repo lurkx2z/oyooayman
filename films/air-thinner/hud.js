@@ -13,7 +13,7 @@
 
 const atN = (x) => Math.round(x).toLocaleString('en-US');
 const atMMSS = (x) => { x = Math.max(0, x); return `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, '0')}`; };
-const atAlt = (s) => atN(Math.round(ATP.altAt(s) / 10) * 10);
+const atAlt = (s) => { const h = ATP.altAt(s); return atN(h < 1000 ? Math.round(h / 5) * 5 : Math.round(h / 10) * 10); };   // (85 m under 1 km, as the caption says)
 // the scene's context box: [from, to, label, value(t, s) → { v, v2 }] (HTML)
 const AT_CTX = (() => {
   const beat = (id, l, f, k0 = 0, k1) => [atC(id, k0) - 0.2, (k1 != null ? atCap(id, k1).hide : atE(id)) + 0.2, l, f];
@@ -75,8 +75,8 @@ class AtHud {
     this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s'); this.roN = this.ro.querySelector('.nx');
     this.ctx = mk('at-ctx', '<span class="l"></span><span class="v"></span><span class="v2"></span>');
     this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
-    this.clock = mk('at-clock', '<div class="l"></div><div class="v"></div><div class="f"></div>');
-    this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f');
+    this.clock = mk('at-clock', '<div class="l"></div><div class="v"></div><div class="f"></div><div class="cd"></div>');
+    this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f'); this.clockC = this.clock.querySelector('.cd');
     this.band = mk('at-band'); this.cap = mk('at-cap'); this.tag = mk('at-tag');
     this.caps = ATT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: atCapHtml(c.text), q: g.id === 'question' })));
     this.inset = mk('at-inset');
@@ -122,6 +122,12 @@ class AtHud {
       this._cls('ckj', this.clockF, j ? 'f jump' : 'f');
       const jl = j ? '+' + (j.ds >= 90 ? Math.round(j.ds / 60) + ' MIN' : Math.round(j.ds) + ' s') : '';
       this._txt('ckf', this.clockF, jl ? jl + ' LATER' : 'REAL SPEED');
+      // the two deadlines: the sea boiling (from the first caption; it drops at every jump), and, once you are under, your air
+      const hms = (x) => { x = Math.max(0, Math.floor(x)); return `${Math.floor(x / 3600)}:${String(Math.floor(x / 60) % 60).padStart(2, '0')}:${String(x % 60).padStart(2, '0')}`; };
+      const L = [];
+      if (t >= atC('start', 0) - 0.2) L.push(s < ATE.sea ? `THE SEA BOILS IN <b>${hms(ATE.sea - s)}</b>` : '<span class="hot">THE SEA IS BOILING</span>');
+      if (t >= atC('under', 1) - 0.2) L.push(`YOUR AIR RUNS OUT IN <b>${hms(ATK.out - s)}</b>`);
+      this._html('ckc', this.clockC, L.map((x) => `<div>${x}</div>`).join(''));
     }
     // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
     const gb = ATT.groups.find((g) => !g.title && t >= g.first - 0.6 && t < g.end + 0.6);
