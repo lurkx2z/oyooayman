@@ -1,6 +1,6 @@
 # What if the air got 1% thinner every minute?
 
-Voiceless 16:9 long-form, 5:08 (307.75 s), slug `air-thinner`, page `air-thinner.html`. Built like Gravity tilts 90°,
+Voiceless 16:9 long-form, 5:14 (313.8 s), slug `air-thinner`, page `air-thinner.html`. Built like Gravity tilts 90°,
 Friction 10 s and Gravity keeps tilting, to the owner's YouTube lessons of 2026-10-28, in the eerie horror tone of
 Slower light (the channel's best):
 - an everyday, human-scale place with new scenery: a cruise ship (the fictional "Coral Meridian", 290 m, 17 decks,
