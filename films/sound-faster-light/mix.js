@@ -22,11 +22,11 @@ window.SF_MIX = {
         [B('corn') + 6, 0, 1], [B('corn') + 9, 0, 3], [ty - 0.3, 0, 3], [ty, 0, 1], [B('wind') + 4, 0, 1], [B('wind') + 6, 0, 4], [tn + 2, 0, 4], [tn + 4, 0, 1],
         [tf - 0.2, 0, 1], [tf + 2, 0, 4], [B('back') - 0.5, 0, 4], [B('back') + 1, 0, 1], ['end', -0.04, 1], ['end', 0, -60]];
     })(),
-    amb: (() => { const B = sfB;   // the beds up 3 dB in the quiet first half, down 2 dB under the found / back cues
-      return [[0, 0, 0], [B('start') + 3, 0, 0], [B('start') + 6, 0, 3], [B('siren') - 4, 0, 3], [B('siren'), 0, 0], [B('wind') - 2, 0, 0], [B('wind') + 2, 0, -2], [B('back') + 6, 0, -2], [B('back') + 10, 0, 0], ['end', -0.04, 0], ['end', 0, -60]]; })(),
+    amb: (() => { const B = sfB;   // the beds up 3 dB in the quiet first half (not under the hush before your call), down 2 dB under the found / back cues
+      return [[0, 0, 0], [B('start') + 3, 0, 0], [B('start') + 6, 0, 3], [B('call') - 4, 0, 3], [B('call') - 2, 0, 0], [B('answer'), 0, 0], [B('answer') + 2, 0, 3], [B('siren') - 4, 0, 3], [B('siren'), 0, 0], [B('wind') - 2, 0, 0], [B('wind') + 2, 0, -2], [B('back') + 6, 0, -2], [B('back') + 10, 0, 0], ['end', -0.04, 0], ['end', 0, -60]]; })(),
     sfx: [['end', -0.04, 0], ['end', 0, -60]],
   },
-  master: 5.8,
+  master: 5.0,
   eq: [['lowshelf', 110, -2.0], ['highshelf', 3500, 2]],
   ceiling: -2.5,   // dBTP, the limiter's ceiling (sfLimit)
 };

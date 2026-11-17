@@ -190,11 +190,36 @@ code (`sound-*.js`), so the soundtrack is a pure function of the film:
   sheriff's siren with no change of pitch, her ringtone as if in your pocket and her voice twice (the air, then the
   phone 0.25 s later), the run, the yard light (the loudest sound in the film), the Hansen farm coming apart.
 
-MIX
+**Mix.** −14.4 LUFS integrated, −2.4 dBTP, loudness range 8.0 LU (the baked WAV). The mastered `final-soundtrack.m4a`
+(AAC 256k, through a limiter at −3 dB) measures −14.5 LUFS and −2.4 dBTP; `small-soundtrack.m4a` (AAC 128k, for the
+phone-size copy) measures −14.5 LUFS and −2.6 dBTP.
+
+**The score leads** (the owner's rule of 31 October 2026), measured stem by stem (solo renders, ebur128) in 10-second
+windows across the whole 4:17 cut, with the stem trims added in:
+- over the beds: 9.4 to 21.3 dB (median 14.3 dB). The closest are 3:00 to 3:10 (the run through the corn, 9.4 dB) and
+  3:20 to 3:30 (the gale, 9.4 dB). 0:50 to 1:00, the hush before your call, measured 6.7 dB; the beds now dip 3 dB
+  there, which makes it about 9.7 dB (worked out, not re-measured).
+- over the effects: median about 10.7 dB. The effects come within 2.7 to 6.3 dB of the score in three places, as
+  intended: the train's horn and the dogs (1:50 to 2:00, 2.7 dB), the sheriff's siren (2:10 to 2:20, 2.9 dB) and the
+  gale (3:20 to 3:30, 6.3 dB).
+- stem trims: music +3.5, beds −1, effects −3 dB; master 5.0; a limiter at −2.5 dB (`mix.js`).
+- The baked soundtrack (`soundtrack.js`, 6.9 MB, fingerprint `c1b1b74d`) is loaded by the page, so the ZIP plays sound
+  in any browser; `tools/check-page.cjs` reports SOUND READY after 3 s and no console errors.
 
 ## Delivery
 
-DELIVERY
+- **Runnable ZIP** `sound-faster-light-film.zip` (in the project files, 7.6 MB): extract it, open
+  `sound-faster-light.html` in Chrome or Edge on a computer, wait for SOUND READY, press Space. Tested from a fresh
+  unzip with `tools/check-page.cjs`: SOUND READY after 3 s, no console errors.
+- **Final 1080p MP4**, to be rendered on the owner's PC (graphics card): `node films/sound-faster-light/render-gpu.cjs
+  --channel chrome --workers 2 --out D:\renders\sound-faster-light --small`. The file to upload will be
+  `D:\renders\sound-faster-light\sound-faster-light_final_1080p.mp4` (1920×1080, 30 fps, with the mastered
+  `final-soundtrack.m4a` copied in), plus `sound-faster-light_final_small.mp4` (1280×720, a preview copy). The command
+  is resumable: run it again and finished segments are kept.
+- **Thumbnails** (house style) in the project files: `thumb-thunder.jpg` ("1,000,000 km/s / AND STILL YOU CAN'T FIND
+  HER", the 6 km bolt over the farm), `thumb-tornado.jpg` ("3 km away / AND STILL ITS ROAR IS INSIDE YOUR HEAD", the
+  funnel lit by a flash), `thumb-raincoat.jpg` ("120 metres / AND STILL SHE SOUNDS RIGHT BESIDE YOU", her yellow
+  raincoat in the corn).
 
 ## Files
 
