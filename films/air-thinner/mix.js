@@ -13,7 +13,9 @@ window.AT_MIX = {
   },
   dyn: {
     music: [[0, 0, 0], ['end', -0.04, 0], ['end', 0, -60]],
-    amb: [[0, 0, 0], ['end', -0.04, 0], ['end', 0, -60]],
+    // (a little lower where the score is quiet: his jaw, the swelling, the bar)
+    amb: [[0, 0, 0], [atB('ears'), -0.3, 0], [atB('ears'), 0.2, -3], [atB('ears'), 5.8, -3], [atB('ears'), 6.3, 0],
+      [atB('cabin'), -0.3, 0], [atB('cabin'), 0.2, -2.5], [atB('fizz'), 4.6, -3], [atB('fizz'), 5.1, 0], ['end', -0.04, 0], ['end', 0, -60]],
     sfx: [['end', -0.04, 0], ['end', 0, -60]],
   },
   master: 7.5,

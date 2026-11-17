@@ -64,7 +64,8 @@ class AtAudio extends AudioEngine {
     const consts = { ATP, AT_F, AT_CLOCK, AT_SHOTS, ATE, AT_THEME: window.AT_THEME || null };
     return [AT, ATT, window.AT_MIX, Object.values(ATX).map(String).join(''), AtFx.toString(), Object.getOwnPropertyNames(AtFx.prototype).map((k) => String(AtFx.prototype[k])).join(''),
       Object.values(AT_SOUND).flat().map((b) => b.name + b.fn).join(''), atDynDb.toString(), AtAudio.toString(), atLimit.toString(), atStoryAt.toString(), consts,
-      (window.AT_SOUND_FNS || []).map(String).join(''), [atShotAt, atFilmAt, atRateAt, atSegAt, ATV.v, ATP.steps, ATP.air, ATP.alt, ATK.used, ATL.loud, ATL.zenith].map(String).join('')];
+      (typeof AT_SOUND_FNS !== 'undefined' ? AT_SOUND_FNS : []).map(String).join(''),   // (a top-level const is not on window)
+       [atShotAt, atFilmAt, atRateAt, atSegAt, ATV.v, ATP.steps, ATP.air, ATP.alt, ATK.used, ATL.loud, ATL.zenith].map(String).join('')];
   }
   // AudioEngine's fingerprint, with every number rounded to 7 significant digits: browsers' Math.exp/sin/acosh… can
   // differ in the last bit (Safari, Firefox), and then the baked copy was refused and the whole soundtrack rendered
