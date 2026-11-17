@@ -139,15 +139,20 @@ function nlShore(set) {
   nlReg(set, nlMesh(new THREE.BoxGeometry(3.9, 0.25, 3.1), nlStd('#eef0f2', 0.9), 0, 2.72, 0, kg), nlHeatMat(-12));
   const kw = nlMesh(new THREE.PlaneGeometry(1.8, 0.9), new THREE.MeshStandardMaterial({ color: '#40362a', emissive: '#ffcf8a', emissiveIntensity: 1.0 }), 0, 1.45, 1.33, kg); kw.castShadow = false; nlReg(set, kw, nlHeatMat(3));
   nlReg(set, nlMesh(new THREE.CylinderGeometry(0.08, 0.08, 1.4, 8), nlStd('#333', 0.5, 0.5), 1.1, 3.4, -0.6, kg), nlHeatMat(55, { over: 1.2 }));
-  for (const [bx, bz, by] of [[-3.5, 4.2, 0.4], [3.6, 4.6, -0.5]]) { const b = nlMesh(new THREE.BoxGeometry(2.2, 0.45, 0.5), wood, bx, 0.22, bz, kg); b.rotation.y = by; nlReg(set, b, nlHeatMat(-8)); }
+  for (const [bx, bz, by] of [[-3.5, 4.2, 0.4], [3.6, 4.6, -0.5]]) {                       // (a seat on two legs, on the ground where it stands)
+    const gy = nlGroundY(K.x + bx * Math.cos(0.15) + bz * Math.sin(0.15), K.z - bx * Math.sin(0.15) + bz * Math.cos(0.15)) - ky, bg = new THREE.Group();
+    bg.position.set(bx, gy, bz); bg.rotation.y = by; kg.add(bg);
+    nlReg(set, nlMesh(new THREE.BoxGeometry(2.2, 0.07, 0.42), wood, 0, 0.46, 0, bg), nlHeatMat(-8));
+    for (const lx of [-0.9, 0.9]) nlReg(set, nlMesh(new THREE.BoxGeometry(0.08, 0.43, 0.38), wood, lx, 0.21, 0, bg), nlHeatMat(-8));
+  }
   const fx = F.fire.x, fz = F.fire.z, fy = nlGroundY(fx, fz), fr = new RNG(66);
-  for (let i = 0; i < 11; i++) { const a = i / 11 * Math.PI * 2, st = nlMesh(new THREE.DodecahedronGeometry(fr.range(0.17, 0.26), 0), nlStd('#6a6866', 0.9), fx + Math.cos(a) * 0.95, fy + 0.1, fz + Math.sin(a) * 0.95, S); nlReg(set, st, nlHeatMat(fr.range(60, 140), { over: 1.2 })); }
+  for (let i = 0; i < 11; i++) { const a = i / 11 * Math.PI * 2, st = nlMesh(new THREE.DodecahedronGeometry(fr.range(0.17, 0.26), 0), nlStd('#6a6866', 0.9), fx + Math.cos(a) * 0.95, fy + 0.1, fz + Math.sin(a) * 0.95, S); nlReg(set, st, nlHeatMat(fr.range(2, 9), { var: 2 })); }   // (the ring stones: warm, not glowing, so the flames read as the hot thing)
   for (let i = 0; i < 6; i++) { const lg = nlMesh(new THREE.CylinderGeometry(0.08, 0.1, 1.3, 7), nlStd('#2a1a10', 0.9), fx, fy + 0.35, fz, S); lg.rotation.set(0.9, i * 1.05, 0); nlReg(set, lg, nlHeatMat(fr.range(250, 450), { over: 1.0 })); }
   out.fire = [fx, fy, fz];
   return out;
 }
 
-// spruce everywhere on land (instanced cones: two tiers), a few near the shore and the houses, dense on the hills
+// spruce everywhere on land (instanced: three narrow tiers), a few near the shore and the houses, dense on the hills
 function nlTrees(set) {
   const r = new RNG(9001), M = [], F = NL_F;
   const tryAt = (x, z, hMin, hMax) => {
@@ -163,8 +168,8 @@ function nlTrees(set) {
   // a stand of spruce on the bank west of the kiosk, close to the ice (seen up close in the world beat)
   for (const [x, h] of [[-132, 11], [-126.5, 14], [-121, 9.5], [-116.5, 13], [-111, 10.5], [-137.5, 8.5]]) { const z = nlShoreZ(x) - 5.5 - 1.5 * Math.sin(x); M.push([x, nlGroundY(x, z), z, h, x * 0.7, 0.5]); }
   for (let i = 0; i < 9000; i++) { const a = r.range(0, Math.PI * 2), rad = r.range(1100, 2500); tryAt(rad * Math.cos(a) * 1.05, 300 + rad * Math.sin(a) * 1.1, 12, 24); }
-  const g1 = new THREE.ConeGeometry(1, 1, 7, 1, true); g1.translate(0, 0.5, 0);
-  const geo = THREE.mergeGeometries([g1.clone().scale(0.42, 0.62, 0.42).translate(0, 0.08, 0), g1.clone().scale(0.3, 0.55, 0.3).translate(0, 0.45, 0), new THREE.CylinderGeometry(0.03, 0.04, 0.2, 5).translate(0, 0.1, 0)].map((x) => x.toNonIndexed()));
+  const g1 = new THREE.ConeGeometry(1, 1, 9, 1, true); g1.translate(0, 0.5, 0);
+  const geo = THREE.mergeGeometries([g1.clone().scale(0.26, 0.42, 0.26).translate(0, 0.1, 0), g1.clone().scale(0.2, 0.4, 0.2).translate(0, 0.36, 0), g1.clone().scale(0.13, 0.36, 0.13).translate(0, 0.64, 0), new THREE.CylinderGeometry(0.02, 0.03, 0.16, 5).translate(0, 0.08, 0)].map((x) => x.toNonIndexed()));
   const mesh = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ color: '#22311f', roughness: 0.95, side: THREE.DoubleSide }), M.length);
   const o = new THREE.Object3D(), c = new THREE.Color();
   M.forEach(([x, y, z, h, ry, v], i) => { o.position.set(x, y - 0.2, z); o.rotation.set(0, ry, 0); o.scale.set(h * 0.9, h, h * 0.9); o.updateMatrix(); mesh.setMatrixAt(i, o.matrix); c.setRGB(0.5 + (v - 0.5) * 0.06, 0.5, 0.5); mesh.setColorAt(i, c); });

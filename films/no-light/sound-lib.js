@@ -60,8 +60,9 @@ const nlWorldRate = (t, k = 0.5) => Math.pow(MathX.clamp(nlRateAt(t + 1e-3), 0.2
 //   ice    out on the lake (most of the film): the huge open quiet, the ice's own sounds, the town far off
 //   fire   by the bonfire on the beach: its crackle and roar close
 //   road   on the road or close to it: idling engines, a lorry
-//   dark   the black shots: what you hear (the same place as the shot before, closer and drier)
-const NL_PLACE = { fire: ['fire', 'man', 'feel'], road: ['road', 'window'] };
+//   day    the title: the lake in daylight, before (a crowd skating, chatting)
+//   dark   the black shots: what you hear (the open lake, closer and drier: the wind down, the voices near)
+const NL_PLACE = { day: ['title'], fire: ['fire', 'man', 'feel'], road: ['road', 'window'], dark: [...NL_DARK] };
 function nlWhereShot(sh) { for (const [k, v] of Object.entries(NL_PLACE)) if (v.includes(sh.mode)) return k; return 'ice'; }
 // the film as places: [{ t0, t1, where, shot }] in order
 function nlPlaces() {
@@ -118,4 +119,66 @@ function nlFootfalls(M, s0, s1, stride, off = 0.25) {
   }
   return out;
 }
-const NL_SOUND_FNS = [nlNoise, nlTone, nlSweep, nlEv, nlWn, nlCurve, nlWorldRate, nlWhereShot, nlPlaces, nlPlaceAt, nlSeen, nlBedW, nlVoice, nlFootfalls];
+// ---- the lake's own voices ----------------------------------------------------------------------------------------
+// a voice calling out in the dark: two syllables ("hal-lo?", "hjel-p!"), the second higher (a question) or lower (a
+// shout); o.f0 (Hz), o.d (s), o.up (the second syllable's pitch over the first), o.v1/o.v2 the vowels' formants
+const NL_VOWEL = { a: [[730, 6, 1], [1150, 7, 0.55], [2650, 8, 0.25]], o: [[470, 6, 1], [820, 7, 0.5], [2600, 8, 0.15]], e: [[520, 6, 1], [1800, 7, 0.5], [2500, 8, 0.3]], u: [[320, 6, 1], [800, 7, 0.4], [2400, 8, 0.12]] };
+function nlCall(fx, o = {}) {
+  const sr = fx.sr, d = o.d || 0.75, f0 = o.f0 || 220, up = o.up ?? 1.2, k = o.k || 1, d1 = d * 0.42, d2 = d * 0.58, gap = Math.round(0.03 * sr);
+  const fm = (V) => V.map(([f, q, a]) => [f * k, q, a]);
+  const a = nlVoice(fx, d1, { f0: (u) => f0 * (1 + 0.04 * u), formants: fm(NL_VOWEL[o.v1 || 'a']), breath: 0.1, env: (u) => Math.min(1, u / 0.12) * Math.pow(1 - u, 0.5) });
+  const b = nlVoice(fx, d2, { f0: (u) => f0 * up * (1 + (up > 1 ? 0.06 : -0.08) * u), formants: fm(NL_VOWEL[o.v2 || 'o']), breath: 0.12, env: (u) => Math.min(1, u / 0.1) * Math.pow(1 - u, 0.9) });
+  const y = new Float32Array(a.length + gap + b.length); y.set(a, 0); y.set(b, a.length + gap);
+  return y;
+}
+// a scream: a high, wavering 'a', o.f0 (Hz), o.d (s)
+function nlScream(fx, o = {}) {
+  const f0 = o.f0 || 620, d = o.d || 1.1, wv = fx.wander(6);
+  return nlVoice(fx, d, { f0: (u) => f0 * (1 + 0.12 * Math.sin(Math.PI * Math.min(1, u * 1.4)) - 0.25 * u * u) * (1 + 0.02 * wv(u * d)), formants: [[950, 5, 1], [1500, 6, 0.7], [3000, 7, 0.35]], breath: 0.25, env: (u) => Math.min(1, u / 0.06) * Math.pow(1 - u, 0.7) });
+}
+// lake ice "singing": a crack runs through the sheet and its sound arrives high notes first (the ice is a dispersive
+// waveguide), a falling whistle — pew — with a dull thump under it. o.f0 → o.f1 (Hz) over o.d (s), o.thump
+function nlPew(fx, o = {}) {
+  const sr = fx.sr, d = o.d || 0.5, n = Math.ceil((d + 0.25) * sr), y = new Float32Array(n), f0 = o.f0 || 3200, f1 = o.f1 || 260, r = fx.r;
+  let ph = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / sr, u = Math.min(1, t / d), f = f0 * Math.pow(f1 / f0, Math.pow(u, 0.55));
+    ph += 2 * Math.PI * f / sr;
+    const e = Math.min(1, t / 0.004) * Math.exp(-t / (d * 0.45));
+    y[i] = (Math.sin(ph) + 0.3 * Math.sin(2 * ph + 0.5) + 0.25 * (r.next() * 2 - 1) * Math.exp(-t / 0.02)) * e;
+  }
+  if (o.thump) { const z = fx.hit([[62, 0.12, 1], [101, 0.08, 0.6], [167, 0.05, 0.4]], { width: 0.003, amp: o.thump, noise: 0.3, nlen: 0.02, nhp: 300, len: 0.6 }); for (let i = 0; i < z.length && i < n; i++) y[i] += z[i]; }
+  NLX.bq(y, 'hp', 60, 0.7, sr);
+  return y;
+}
+// a fire's crackle: sparse pops (resin, sap boiling out) and the occasional snap; d (s), o.rate (pops per second)
+function nlCrackle(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), r = fx.r, rate = o.rate || 9;
+  for (let t = r.range(0, 0.1); t < d - 0.05; t += -Math.log(1 - r.next() * 0.999) / rate) {
+    const i0 = Math.round(t * sr), big = r.next() < 0.12, len = Math.round((big ? 0.02 : 0.006) * sr), a = (big ? 1 : 0.35) * r.range(0.4, 1), f = r.range(1800, 5200);
+    for (let i = 0; i < len && i0 + i < n; i++) y[i0 + i] += a * (r.next() * 2 - 1) * Math.exp(-i / (len * 0.3)) * (0.6 + 0.4 * Math.sin(2 * Math.PI * f * i / sr));
+  }
+  NLX.bq(y, 'hp', 700, 0.7, sr);
+  return y;
+}
+// an engine idling or pulling: a four-cylinder's firing pulses at rpm/30 Hz through an intake/exhaust body
+function nlEngine(fx, d, rpm, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), w = fx.white(n), R = typeof rpm === 'function' ? rpm : () => rpm;
+  let ph = 0, rr = R(0);
+  for (let i = 0; i < n; i++) {
+    if ((i & 63) === 0) rr = R(i / sr);
+    const f = rr / 30 * (o.cyl ? o.cyl / 4 : 1); ph += f / sr; const p = ph - Math.floor(ph), load = MathX.clamp((rr - 800) / 3000, 0, 1);
+    y[i] = (Math.exp(-p * 7) - 0.14) * (0.7 + 0.3 * load) + w[i] * 0.08 * Math.exp(-p * 4) * (0.5 + load) + 0.25 * Math.sin(2 * Math.PI * ph * 0.5);
+  }
+  NLX.bq(y, 'lp', o.lp || 700, 0.8, sr); NLX.bq(y, 'hp', 28, 0.7, sr);
+  for (let i = 0; i < n; i++) y[i] *= Math.min(1, i / (0.05 * sr), (n - i) / (0.05 * sr));
+  return y;
+}
+// a car horn: two reed tones (a major third apart), square-ish, d (s)
+function nlHorn(fx, d, f = 420) {
+  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const t = i / sr, e = Math.min(1, t / 0.015, (d - t) / 0.03); let v = 0; for (const [ff, a] of [[f, 1], [f * 1.26, 0.8]]) for (let h = 1; h <= 7; h += 2) v += a * Math.sin(2 * Math.PI * ff * h * t) / h; y[i] = Math.tanh(1.6 * v) * e; }
+  NLX.bq(y, 'bp', 1100, 0.6, sr);
+  return y;
+}
+const NL_SOUND_FNS = [nlNoise, nlTone, nlSweep, nlEv, nlWn, nlCurve, nlWorldRate, nlWhereShot, nlPlaces, nlPlaceAt, nlSeen, nlBedW, nlVoice, nlFootfalls, nlCall, nlScream, nlPew, nlCrackle, nlEngine, nlHorn];

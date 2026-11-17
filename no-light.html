@@ -32,16 +32,18 @@
     .nl-ro .v { font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 78); line-height: 1.05; margin-top: calc(var(--u) * 4); color: var(--paper);
       font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
     .nl-ro .s { font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 32); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #ffd7a8; white-space: nowrap; }
-    .nl-ro .nx { color: #f6efe2; opacity: 0.95; font-size: calc(var(--u) * 28); letter-spacing: 0.12em; }
+    .nl-ro .nx { color: #f6efe2; opacity: 0.95; font-size: calc(var(--u) * 30); letter-spacing: 0.12em; }
     .nl-ro .nx:empty { display: none; }
     .nl-ro .s b { color: #ffffff; font-weight: 700; }
     .nl-clock .f { transition: none; }
     .nl-ro .s:empty { display: none; }
+    .nl-ro.compact .v { font-size: calc(var(--u) * 58); }
+    .nl-ctx.compact { top: calc(var(--u) * 262); }
     .nl-ctx { position: absolute; left: calc(var(--u) * 52); top: calc(var(--u) * 330); pointer-events: none; padding: calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * 14); border-radius: calc(var(--u) * 14);
       background: rgba(6, 8, 12, 0.62); text-shadow: 0 0 calc(var(--u) * 10) rgba(0, 0, 0, 0.7); }
     .nl-ctx .l { display: block; font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 29); letter-spacing: 0.16em; color: #fff; opacity: 0.85; }
     .nl-ctx .v { display: block; font-family: var(--book); font-weight: 500; font-size: calc(var(--u) * 50); margin-top: calc(var(--u) * 2); color: #ffd7a8; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
-    .nl-ctx .v2 { display: block; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 31); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #f6efe2; white-space: nowrap; }
+    .nl-ctx .v2 { display: block; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 33); letter-spacing: 0.1em; margin-top: calc(var(--u) * 6); color: #f6efe2; white-space: nowrap; }
     .nl-ctx .v2:empty { display: none; }
     .nl-ctx .chip { display: inline-block; margin-right: calc(var(--u) * 18); opacity: 0.38; }
     .nl-ctx .chip.on { opacity: 1; color: #ffcf8a; }

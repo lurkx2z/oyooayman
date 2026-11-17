@@ -50,7 +50,7 @@ const NLE = (() => {
   E.sinkHear = 0;                               // (set below)
   E.crack = S('ice', 1, -0.4);
   E.sink = S('ice', 2, -0.7);                   // ★ the ice under the car gives way
-  E.out = S('water', 0, -1.7);                  // the driver surfaces at the edge of the hole
+  E.out = E.sink + 3.0;                         // the driver gets out of the window as it goes nose-down, and surfaces at the edge
   E.plane = S('plane', 0, 0.6);                 // the plane passes overhead (12 km from its runway, 629 m up)
   E.lie = st(nlB('crawl') + 1.0);               // you lie flat
   E.iceCrack = S('edge', 0, -0.2);               // the ice cracks under your hands (heard in the black)
@@ -156,10 +156,10 @@ const NLY = (() => {
   E.crawl40 = nlSC('crawl', 2);
   E.edge3 = nlSC('edge', 2);
   const rFin = 2.9;                                            // the hole's radius by then
-  Y.dDriver = 2.4;                                             // the driver's chest from the hole's centre
+  Y.dDriver = 2.55;                                            // the driver's chest from the hole's centre
   Y.head = 0.85;                                               // lying flat, your head is this far ahead of your middle
   const d40 = 40 + Y.dDriver + Y.head, d3 = 3 + rFin + Y.head; // (the captions' distances are your head's)
-  Y.dFin = 4.75;                                               // where you stop: your fingers on his sleeve
+  Y.dFin = 4.4;                                                // where you stop: your fingers on his sleeve
   Y.crawlV = (d40 - d3) / (E.edge3 - E.crawl40);               // m/s, lying flat
   E.lieD = d40 + Y.crawlV * (E.crawl40 - E.lie);              // where you lie down
   // the walk: from Y1 (after the crash) to where you lie down; you stop to listen at the sing beat
@@ -279,6 +279,8 @@ const NLD = {
   at: (s) => { const p = NLY.driver(NLY.dDriver); const yaw = Math.atan2(NLY.toYou[0], NLY.toYou[1]); return { x: p[0], y: -1.18 + 0.05 * Math.sin(s * 1.7) - 0.25 * MathX.smooth(s - NLE.out, 200, 400), z: p[1], yaw, k: MathX.smooth(s - NLE.out, 0, 420) }; },
   inWater: (s) => s - NLE.out,
 };
+// the crawl's arm stroke: one full cycle (left, right) every 2π / NL_CRAWL_PH metres (≈ 1.1 m: an arm's reach each)
+const NL_CRAWL_PH = 5.5;
 const NLM = {
   // walks towards the fire from the kiosk's side, arms out; feels it a metre away; stops; steps back
   at: (s) => {

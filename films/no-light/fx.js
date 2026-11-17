@@ -17,12 +17,22 @@ function nlLakeFx(set, s, t, o) {
   // ---- the bonfire: flames (hot, added), sparks, then smoke
   { const [fx, fy, fz] = shore.fire;
     if (near(fx, fy, fz, 700)) {
-      for (let i = 0; i < 90; i++) {
-        const L = 0.7 + 0.6 * nlH(i), u = nlFrac(t / L + nlH(i, 1)), a = nlH(i, 2) * 6.283, r0 = 0.45 * Math.sqrt(nlH(i, 3)) * (1 - 0.7 * u);
-        const sw = 0.12 * Math.sin(t * 3.1 + i) * u;
-        const x = fx + Math.cos(a) * r0 + sw, y = fy + 0.25 + u * (1.3 + 0.8 * nlH(i, 4)), z = fz + Math.sin(a) * r0;
-        const T = 820 * (1 - u) ** 1.4 + 60, c = tc(T, 1.0, 0.45 + 0.3 * (1 - u), 0.12);
-        hot.add(x, y, z, 0.36 * (1 - 0.55 * u), (heat ? 0.22 : 0.5) * (1 - u) * MathX.smooth(u, 0, 0.12), c[0], c[1], c[2]);
+      // flames: nine tongues licking up off the logs, each flickering in height and thinning to a point (a heat camera
+      // sees a fire as ragged white tongues, not a ball), over a bed of embers
+      for (let k = 0; k < 9; k++) {
+        const fl = 0.5 + 0.5 * Math.sin(t * (5.3 + 0.7 * k) + 2.6 * Math.sin(t * (1.7 + 0.3 * k) + k));
+        const a0 = nlH(k, 20) * 6.283, r0 = 0.1 + 0.3 * nlH(k, 21), H = 0.55 + 0.8 * nlH(k, 22) + 0.55 * fl, lean = 0.12 * Math.sin(t * 1.3 + k * 1.9);
+        const bx = fx + Math.cos(a0) * r0, bz = fz + Math.sin(a0) * r0, rate = 1.7 + 0.5 * nlH(k, 23);
+        for (let i = 0; i < 28; i++) {
+          const u = nlFrac(t * rate + i / 28 + nlH(k, 24)), w = 0.07 * Math.sin(t * 9.1 + i * 1.7 + k * 2.3) * u;
+          const x = bx + lean * u + w - Math.cos(a0) * r0 * 0.7 * u, y = fy + 0.28 + u * H, z = bz + 0.7 * w - Math.sin(a0) * r0 * 0.7 * u;
+          const c = tc(860 * (1 - u) ** 1.3 + 70, 1.0, 0.45 + 0.35 * (1 - u), 0.12);
+          hot.add(x, y, z, 0.2 * (1 - 0.7 * u) + 0.04, (heat ? 0.15 : 0.45) * (1 - u) ** 0.7 * MathX.smooth(u, 0, 0.06), c[0], c[1], c[2]);
+        }
+      }
+      for (let i = 0; i < 16; i++) {
+        const a = nlH(i, 25) * 6.283, rr = 0.55 * Math.sqrt(nlH(i, 26)), fl = 0.75 + 0.25 * Math.sin(t * (3 + nlH(i, 27) * 4) + i), c = tc(700, 1.0, 0.5, 0.15);
+        hot.add(fx + Math.cos(a) * rr, fy + 0.2, fz + Math.sin(a) * rr, 0.2, (heat ? 0.13 : 0.4) * fl, c[0], c[1], c[2]);
       }
       for (let i = 0; i < 24; i++) {
         const L = 1.6 + nlH(i, 5), u = nlFrac(t / L + nlH(i, 6)), x = fx + (nlH(i, 7) - 0.5) * 0.8 + 0.6 * u * (nlH(i, 8) - 0.5), y = fy + 0.4 + u * (3.5 + 2 * nlH(i, 9)), z = fz + (nlH(i, 10) - 0.5) * 0.8;
@@ -76,17 +86,17 @@ function nlLakeFx(set, s, t, o) {
   });
   // ---- the hole: frost smoke off water at 0 °C into air at −12 °C
   { const R = NLV.holeR(s), H = NLV.hole;
-    if (R > 0.1 && near(H[0], 0, H[1], 600)) for (let i = 0; i < 70; i++) {
+    if (R > 0.1 && near(H[0], 0, H[1], 600)) for (let i = 0; i < 110; i++) {
       const u = nlFrac(t / 5 + nlH(i, 70)), a = nlH(i, 71) * 6.283, rr = R * Math.sqrt(nlH(i, 72)) * 0.95;
-      const c = tc(5 * (1 - u) - 10, 0.9, 0.92, 0.95);
-      soft.add(H[0] + Math.cos(a) * rr + 0.3 * u * Math.sin(t * 0.3 + i), 0.1 + u * 1.6, H[1] + Math.sin(a) * rr, 0.25 + 0.9 * u, 0.2 * (1 - u) * MathX.smooth(u, 0, 0.15) * MathX.smooth(s - E.sink, 0, 6), c[0], c[1], c[2]);
+      const c = tc(10 * (1 - u) ** 1.5 - 9, 0.9, 0.92, 0.95);
+      soft.add(H[0] + Math.cos(a) * rr + 0.4 * u * Math.sin(t * 0.3 + i), 0.1 + u * 2.6, H[1] + Math.sin(a) * rr, 0.3 + 1.1 * u, 0.3 * (1 - u) * MathX.smooth(u, 0, 0.12) * MathX.smooth(s - E.sink, 0, 6), c[0], c[1], c[2]);
     }
   }
   // ---- the plane: two hot exhaust trails
   if (plane.g.visible) { const g = plane.g, yw = g.rotation.y, f = [Math.sin(yw), Math.cos(yw)], sd = [Math.cos(yw), -Math.sin(yw)];
-    for (const e of [-4.2, 4.2]) for (let i = 0; i < 30; i++) {
-      const d = 2.8 + i * 1.6, x = g.position.x + sd[0] * e - f[0] * d, y = g.position.y + 0.7, z = g.position.z + sd[1] * e - f[1] * d, c = tc(260 * Math.exp(-i / 7) + 0, 1, 1, 1);
-      hot.add(x, y, z, 0.7 + 0.08 * i, heat ? 0.12 * Math.exp(-i / 12) : 0, c[0], c[1], c[2]);
+    for (const e of [-4.2, 4.2]) for (let i = 0; i < 56; i++) {
+      const d = 2.8 + i * 0.75, x = g.position.x + sd[0] * e - f[0] * d, y = g.position.y + 0.7 - 0.004 * i * i, z = g.position.z + sd[1] * e - f[1] * d, c = tc(240 * Math.exp(-i / 14) + 0, 1, 1, 1);
+      hot.add(x, y, z, 0.8 + 0.06 * i, heat ? 0.075 * Math.exp(-i / 24) : 0, c[0], c[1], c[2]);
     }
   }
   hot.end(); soft.end();

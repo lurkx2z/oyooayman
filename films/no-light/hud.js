@@ -16,6 +16,7 @@ const nlN = (x) => Math.round(x).toLocaleString('en-US');
 const nlMMSS = (x) => { x = Math.max(0, x); return `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, '0')}`; };
 // your speed (km/h): gliding, then sliding after the fall, then still
 function nlYouKmh(s) { const P = NLP, E = NLE; if (s < E.fall) return (P.v0 - P.glide * Math.max(0, s)) * 3.6; if (s < E.rest) { const v = P.v0 - P.glide * E.fall, u = (s - E.fall) / (E.rest - E.fall); return v * (1 - u) * 3.6; } return 0; }
+const nlArms = (s) => nlMMSS(60 * NLP.coldMin[1] - NLD.inWater(s));     // the 1-10-1 rule's ten minutes, counting down
 const nlHeadToDriver = (s) => NLY.dist(s) - NLY.head - NLY.dDriver;
 const nlHeadToEdge = (s) => NLY.dist(s) - NLY.head - NLV.holeR(s);
 // the scene's context box: [from, to, label, value(t, s, set) → { v, v2 }] (HTML)
@@ -25,18 +26,16 @@ const NL_CTX = (() => {
   return [
     beat('skaters', 'YOUR SPEED', (t, s) => ({ v: `${nlYouKmh(s).toFixed(0)} <small>km/h</small>`, v2: 'EYES OPEN · SEEING NOTHING' })),
     beat('count', 'ON THE ICE', () => ({ v: `${NLP.skaters} <small>people</small>`, v2: `AIR −12 °C · NEAREST SHORE ${Math.round((NLY.y1[1] - nlShoreZ(NLY.y1[0])) / 10) * 10} m` })),
-    beat('sun', 'THE SUN', (t, s) => ({ v: `${NLP.sunAlt(s).toFixed(1)}° <small>up</small>`, v2: `SETS IN ${Math.ceil((NLP.sunsetS - s) / 60)} min · NOBODY WILL SEE IT` }), 0, 0),
-    beat('sun', 'THE SUN', (t, s) => ({ v: `${NLP.sunAlt(s).toFixed(1)}° <small>up</small>`, v2: `SETS IN ${Math.ceil((NLP.sunsetS - s) / 60)} min · NOBODY WILL SEE IT` }), 2),
+    beat('sun', 'THE SUN', (t, s) => ({ v: `${NLP.sunAlt(s).toFixed(1)}° <small>up</small>`, v2: `SETS IN ${Math.ceil((NLP.sunsetS - s) / 60)} min · NOBODY WILL SEE IT` }), 1),
     beat('fire', 'THE BONFIRE', () => ({ v: `${NLP.fireC} <small>°C</small>`, v2: 'LIGHT FROM IT: NONE' })),
-    beat('town', 'STREET LAMPS ON', () => ({ v: `${NL_F.lamps.length} <small>of ${NL_F.lamps.length}</small>`, v2: 'LIGHT FROM THEM: NONE' })),
     beat('road', 'FROM THE ROAD TO YOU', () => ({ v: `${Math.round(youRoad / 10) * 10} <small>m</small>`, v2: `SOUND IN −12 °C AIR: ${Math.round(NLP.sound)} m/s` })),
     beat('steam', 'OPEN WATER', () => ({ v: '0 <small>°C</small>', v2: 'THE AIR: −12 °C · THE SNOW: −14 °C' })),
     beat('world', 'PEOPLE WHO CAN SEE', () => ({ v: '0', v2: 'OF 8.2 BILLION' }), 0, 1),
     beat('plane', 'THE PLANE', (t, s) => { const A = NLA.at(s); return { v: `${Math.round(A.y)} <small>m up</small>`, v2: `${(A.y / Math.tan(NLP.plane.glide * Math.PI / 180) / 1000).toFixed(1)} km FROM ITS RUNWAY` }; }),
-    beat('water', 'HE’S BEEN IN THE WATER', (t, s) => ({ v: nlMMSS(NLD.inWater(s)), v2: 'THE WATER: 0 °C' }), 1),
-    beat('crawl', 'TO HIM', (t, s) => ({ v: `${Math.max(0, nlHeadToDriver(s)).toFixed(1)} <small>m</small>`, v2: `HE’S BEEN IN THE WATER ${nlMMSS(NLD.inWater(s))}` }), 1),
-    beat('edge', 'TO THE EDGE', (t, s) => ({ v: `${Math.max(0, nlHeadToEdge(s)).toFixed(1)} <small>m</small>`, v2: `HE’S BEEN IN THE WATER ${nlMMSS(NLD.inWater(s))}` }), 1),
-    beat('reach', 'TO THE EDGE', (t, s) => ({ v: `${Math.max(0, nlHeadToEdge(s)).toFixed(1)} <small>m</small>`, v2: `HE’S BEEN IN THE WATER ${nlMMSS(NLD.inWater(s))}` })),
+    beat('water', 'HE’S BEEN IN THE WATER', (t, s) => ({ v: nlMMSS(NLD.inWater(s)), v2: `HIS ARMS GIVE OUT IN ABOUT ${nlArms(s)}` }), 1),
+    beat('crawl', 'TO HIM', (t, s) => ({ v: `${Math.max(0, nlHeadToDriver(s)).toFixed(1)} <small>m</small>`, v2: `IN THE WATER ${nlMMSS(NLD.inWater(s))} · ARMS: ABOUT ${nlArms(s)} LEFT` }), 1),
+    beat('edge', 'TO THE EDGE', (t, s) => ({ v: `${Math.max(0, nlHeadToEdge(s)).toFixed(1)} <small>m</small>`, v2: `IN THE WATER ${nlMMSS(NLD.inWater(s))} · ARMS: ABOUT ${nlArms(s)} LEFT` }), 1),
+    beat('reach', 'TO THE EDGE', (t, s) => ({ v: `${Math.max(0, nlHeadToEdge(s)).toFixed(1)} <small>m</small>`, v2: `IN THE WATER ${nlMMSS(NLD.inWater(s))} · ARMS: ABOUT ${nlArms(s)} LEFT` })),
   ];
 })();
 // the honest labels (bottom left): [from, to, text]
@@ -44,14 +43,13 @@ const NL_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [nlC(id, k0) - 0.1,
   b('start', 'THE RULE: ONLY VISIBLE LIGHT (380–750 nm) STOPS EXISTING · EVERY OTHER KIND STILL WORKS', 1),
   b('heat', 'A HEAT CAMERA SEES 8–14 µm · BLACK IS COLD, WHITE IS HOT', 1),
   b('help', 'PHONES STILL WORK: RADIO IS LIGHT TOO, JUST NOT THE KIND EYES USE', 0),
-  b('town', 'THE IMPOSSIBLE PART: A SCREEN STILL DRAWS POWER, AND ALL OF IT BECOMES HEAT', 1),
   b('ice', 'ROUGH RULES FOR CLEAR BLACK ICE · SNOW ICE IS WEAKER', 0, 1),
   b('water', 'THE 1-10-1 RULE: 1 MIN TO GET YOUR BREATH · ~10 MIN OF MOVEMENT · ~1 HOUR TO HYPOTHERMIA', 2),
   b('crawl', 'ON THIN ICE THE ADVICE IS: LIE FLAT, SPREAD YOUR WEIGHT', 0),
 ]; })();
 // the insets: [from, to, which, where]
 const NL_INSETS = (() => { const b = (id, k0, id1, k1, w, where = '') => [nlC(id, k0) - 0.25, nlCap(id1, k1).hide + 0.3, w, where]; return [
-  b('rule', 2, 'body', 0, 'spectrum'), b('sun', 1, 'sun', 1, 'sunbar'), b('ice', 0, 'ice', 1, 'ice'),
+  b('rule', 2, 'body', 0, 'spectrum'), b('sun', 0, 'sun', 0, 'sunbar'), b('ice', 0, 'ice', 1, 'ice'),
 ]; })();
 
 // a caption's text with its numbers in amber
@@ -89,9 +87,11 @@ class NlHud {
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
       this._html('rov', this.roV, s < 0 ? 'ON' : 'NONE');
-      this._html('ros', this.roS, s < 0 ? '' : '380–750 nm · GONE SINCE <b>2:40:00 PM</b>');
       this._html('ron', this.roN, s < 0 ? '' : dark ? 'ON SCREEN: WHAT YOU SEE' : 'ON SCREEN: A HEAT CAMERA · NOBODY HAS ONE');
-      this._cls('roc', this.ro, s < 0 ? 'nl-ro' : dark ? 'nl-ro dark black' : 'nl-ro dark');
+      const cp0 = t > nlE('body') ? ' compact' : '';
+      this._html('ros', this.roS, s < 0 || cp0 ? '' : '380–750 nm · GONE SINCE <b>2:40:00 PM</b>');
+      this._cls('roc', this.ro, (s < 0 ? 'nl-ro' : dark ? 'nl-ro dark black' : 'nl-ro dark') + cp0);
+      this._cls('cxc', this.ctx, 'nl-ctx' + cp0);
     }
     // ---- the heat camera's scale
     const inA0 = (() => { const w = NL_INSETS.find((x) => t >= x[0] - 0.3 && t < x[1] + 0.3); return w ? W(t, w[0] - 0.3, w[1] + 0.3, 0.4, 0.4) : 0; })();

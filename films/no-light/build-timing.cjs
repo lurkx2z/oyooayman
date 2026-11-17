@@ -15,19 +15,19 @@ const path = require('path');
 const DIR = __dirname;
 // empty screen before each beat's first caption (s); default 0.8
 const PAUSE = {
-  title: 0.05, start: 0.5, skaters: 0.8, heat: 2.4, rule: 1.2, body: 1.4, count: 1.4, grab: 2.6, help: 1.4, sun: 1.6, fire: 1.6, town: 1.4, road: 1.4, slide: 1.2,
+  title: 0.05, start: 0.5, skaters: 0.8, heat: 2.4, rule: 1.2, body: 1.4, count: 1.4, grab: 2.6, help: 1.4, sun: 1.6, fire: 1.6, road: 1.4, slide: 1.2,
   ice: 1.2, steam: 2.0, world: 1.8, plane: 1.4, sing: 1.6, water: 2.4, crawl: 1.6, edge: 1.6, reach: 1.6, question: 1.6,
 };
 // extra empty screen before one caption inside a beat: 'beat:index' → s (where the picture itself is the reveal)
 const EXTRA = {
   'start:1': 0.4, 'start:2': 0.4, 'skaters:1': 1.0, 'heat:1': 0.8, 'rule:1': 0.4, 'rule:2': 0.4, 'body:1': 1.0, 'count:1': 0.6, 'grab:1': 1.2,
-  'sun:1': 0.6, 'sun:2': 0.6, 'fire:1': 0.8, 'fire:2': 2.6, 'town:1': 0.8, 'road:1': 1.0, 'road:2': 2.2, 'slide:1': 1.6, 'ice:1': 0.8, 'ice:2': 2.4, 'help:1': 0.8, 'steam:1': 1.0, 'reach:1': 1.4,
+  'sun:1': 0.6, 'fire:1': 0.8, 'fire:2': 2.6, 'road:1': 1.0, 'road:2': 2.2, 'slide:1': 1.6, 'ice:1': 0.8, 'ice:2': 2.4, 'help:1': 0.8, 'steam:1': 1.0, 'reach:1': 1.4,
   'world:1': 0.6, 'world:2': 0.6, 'plane:1': 1.6, 'sing:1': 1.0, 'water:1': 1.2, 'water:2': 0.8, 'crawl:1': 1.0, 'crawl:2': 1.4,
   'edge:1': 1.4, 'edge:2': 1.2,
 };
 const SECTION_OF = { title: 1, road: 2, water: 3 };
 const GAP = 0.6;                     // between captions inside a beat
-const TAIL = -0.4;                   // a hard cut while the question is still on screen (nothing signals the end)
+const TAIL = -0.2;                   // a hard cut while the question is still on screen (nothing signals the end)
 const hold = (s) => Math.min(5.4, Math.max(1.5, 1.0 + 0.05 * s.length));
 const TITLE_HOLD = 3.3;
 const r3 = (x) => Math.round(x * 1000) / 1000;

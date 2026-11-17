@@ -16,11 +16,12 @@ const NL_SHOTS = [];
     ['K0', 'dark', NL.tOn, c('start', 1) - 0.4],
     ['K1', 'sky', c('start', 1) - 0.4, c('start', 2) - 0.5],
     ['K2', 'dark', c('start', 2) - 0.5, B('skaters')],
-    // still gliding at 21 km/h, everyone round you; you hit someone sitting on the ice and go down
+    // still gliding at 20 km/h, everyone round you; you hit someone sitting on the ice and go down (black: you tumble)
     ['G1', 'glide', B('skaters'), c('skaters', 1) - 1.4],
-    ['G2', 'fall', c('skaters', 1) - 1.4, B('heat')],
-    // the heat camera; why only visible light (the rule); your skin's own light; your handprint
-    ['H1', 'wide', B('heat'), c('heat', 1) - 0.5],
+    ['G2', 'fall', c('skaters', 1) - 1.4, nlFilmAt(NLE.fall) + 0.18],
+    ['G3', 'fallDark', nlFilmAt(NLE.fall) + 0.18, nlFilmAt(NLE.fall) + 1.25],
+    // down on the ice among the others; the heat camera; why only visible light (the rule); your skin's own light
+    ['H1', 'down', nlFilmAt(NLE.fall) + 1.25, c('heat', 1) - 0.5],
     ['H2', 'low', c('heat', 1) - 0.5, B('rule')],
     ['R1', 'you', B('rule'), c('rule', 1) - 0.5],
     ['R2', 'spec', c('rule', 1) - 0.5, B('body')],
@@ -32,16 +33,19 @@ const NL_SHOTS = [];
     ['D2', 'her', c('grab', 1) - 0.5, B('help')],
     ['P1', 'phone', B('help'), c('help', 1) - 0.5],
     ['P2', 'shoreRoad', c('help', 1) - 0.5, B('sun')],
-    // the Sun, still up, still warm; the bonfire nobody can see; the town's lamps and screens
+    // the Sun, still up, still warm; the bonfire nobody can see
     ['U1', 'sun', B('sun'), c('sun', 1) - 0.5],
-    ['U2', 'sunset', c('sun', 1) - 0.5, c('sun', 2) - 0.5],
-    ['U3', 'sunWide', c('sun', 2) - 0.5, B('fire')],
+    ['U3', 'sunWide', c('sun', 1) - 0.5, B('fire')],
     ['F1', 'fire', B('fire'), c('fire', 1) - 0.5],
     ['F2', 'man', c('fire', 1) - 0.5, c('fire', 2) - 0.9],
-    ['F3', 'feel', c('fire', 2) - 0.9, B('town')],
-    ['N1', 'town', B('town'), c('town', 1) - 0.5],
-    ['N2', 'window', c('town', 1) - 0.5, B('road')],
-    // the road: the lorry creeping blind, the hit you see 1.5 s before you hear it; the car onto the lake; through
+    ['F3', 'feel', c('fire', 2) - 0.9, B('world')],
+    // (+40 s) the world; the plane over the town
+    ['W1', 'world', B('world'), c('world', 1) - 0.5],
+    ['W2', 'forest', c('world', 1) - 0.5, c('world', 2) - 0.5],
+    ['W3', 'skyup', c('world', 2) - 0.5, B('plane')],
+    ['A1', 'plane', B('plane'), c('plane', 1) - 0.5],
+    ['A2', 'planeAway', c('plane', 1) - 0.5, B('road')],
+    // the road: you head for the engines; the lorry creeping blind, the hit you see 1.5 s before you hear it; the car onto the lake; through
     ['O1', 'road', B('road'), c('road', 1) - 0.5],
     ['O2', 'lorry', c('road', 1) - 0.5, c('road', 2) + 1.4],
     ['O3', 'turn', c('road', 2) + 1.4, B('slide')],
@@ -50,20 +54,14 @@ const NL_SHOTS = [];
     ['I1', 'ice', B('ice'), c('ice', 2) - 1.1],
     ['I2', 'sink', c('ice', 2) - 1.1, B('steam')],
     ['M1', 'steam', B('steam'), c('steam', 1) - 0.5],
-    ['M2', 'behind', c('steam', 1) - 0.5, B('world')],
-    // (+40 s) the world; the plane
-    ['W1', 'world', B('world'), c('world', 1) - 0.5],
-    ['W2', 'forest', c('world', 1) - 0.5, c('world', 2) - 0.5],
-    ['W3', 'skyup', c('world', 2) - 0.5, B('plane')],
-    ['A1', 'plane', B('plane'), c('plane', 1) - 0.5],
-    ['A2', 'planeAway', c('plane', 1) - 0.5, B('sing')],
-    // the ice sings; someone in the water
-    ['Q1', 'singDark', B('sing'), c('sing', 1) - 0.5],
-    ['Q2', 'listen', c('sing', 1) - 0.5, B('water')],
+    ['M2', 'behind', c('steam', 1) - 0.5, B('sing')],
+    // the ice sings (black, then the cracks' pulses); his voice: someone in the water
+    ['Q1', 'singDark', B('sing'), c('sing', 0) + 2.2],
+    ['Q2', 'listen', c('sing', 0) + 2.2, B('water')],
     ['V1', 'waterDark', B('water'), c('water', 1) - 0.5],
     ['V2', 'driver', c('water', 1) - 0.5, c('water', 2) - 0.5],
     ['V3', 'cold', c('water', 2) - 0.5, B('crawl')],
-    // (+200 s) flat on the ice, her hands on your ankles; (+120 s) the ice cracks; the reach
+    // (+5.9 min) flat on the ice, her hands on your ankles; (+2 min) the ice cracks; the reach
     ['X1', 'prone', B('crawl'), c('crawl', 1) - 0.5],
     ['X2', 'chain', c('crawl', 1) - 0.5, c('crawl', 2) - 0.6],
     ['X3', 'edge', c('crawl', 2) - 0.6, B('edge')],

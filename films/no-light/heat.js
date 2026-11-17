@@ -56,7 +56,7 @@ const NL_HEAT_GLSL = {
       Te = mix(Te, uFogT, 1.0 - exp(-uFogD * dist));
       float v = (Te - uLo) / (uHi - uLo);
       float g = clamp(v, 0.0, 1.0);
-      vec3 col = mix(vec3(0.010, 0.014, 0.024), vec3(1.0, 0.985, 0.955), pow(g, 1.08));
+      vec3 col = mix(vec3(0.010, 0.014, 0.024), vec3(1.0, 0.985, 0.955), pow(g, 1.45));
       col = mix(col, col * vec3(0.93, 0.97, 1.06), 1.0 - g);              // the coldest a little blue
       vec3 lin = acesInv(pow(col, vec3(2.2)));
       lin += vec3(1.0, 0.96, 0.9) * max(0.0, v - 1.0) * uOver;            // hotter than the range: glare
@@ -106,7 +106,7 @@ function nlHeatPerson(set, person, o = {}) {
     else if (c === hatHex) T = 2;
     else if (c === glovesHex) T = 6;
     else if (c === shoesHex) T = -7;
-    if (o.wet) T = Math.min(T, 3);
+    if (o.wet && c !== skinHex) T = Math.min(T, 3);                  // (wet clothes and hair at the water's temperature; the face still warm)
     nlReg(set, m, nlHeatMat(T, op));
     m.userData.nlHeat = true;
   });
@@ -144,7 +144,7 @@ function nlHeatSky(scene) {
       void main(){ vec3 D = normalize(vD); float h = max(D.y, 0.0);
         float T = mix(-21.0, -52.0, pow(smoothstep(0.0, 0.5, h), 0.6));
         float g = clamp((T - uLo) / (uHi - uLo), 0.0, 1.0);
-        vec3 col = mix(vec3(0.010, 0.014, 0.024), vec3(1.0), pow(g, 1.08));
+        vec3 col = mix(vec3(0.010, 0.014, 0.024), vec3(1.0), pow(g, 1.45));
         vec3 lin = acesInv(pow(col, vec3(2.2)));
         float a = dot(D, sd);   // (vD is interpolated across the sphere's faces: renormalised, or the disc never reaches 1)
         lin += vec3(1.0, 0.98, 0.95) * sunK * (smoothstep(0.99992, 0.99996, a) * 6.0 + pow(max(a, 0.0), 2400.0) * 1.2 + pow(max(a, 0.0), 300.0) * 0.12);
@@ -156,7 +156,7 @@ function nlHeatSky(scene) {
 // a heat-view puff colour for a temperature (for the particle pools: rgb = the linear value the post turns into it)
 function nlHeatRGB(T) {
   const lo = NL_HU.uLo.value, hi = NL_HU.uHi.value, v = (T - lo) / (hi - lo), g = MathX.clamp(v, 0, 1);
-  const y = Math.pow(0.01 + 0.99 * Math.pow(g, 1.08), 2.2), a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14, yy = Math.min(y, 0.985);
+  const y = Math.pow(0.01 + 0.99 * Math.pow(g, 1.45), 2.2), a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14, yy = Math.min(y, 0.985);
   const A = a - c * yy, B = b - d * yy, C = -e * yy;
   return (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A) + Math.max(0, v - 1) * 1.2;
 }

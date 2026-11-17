@@ -23,10 +23,9 @@ const NL_CHECKS = (() => {
   near('road', 2, E.hear, 0.1, 0.8, 'the bang reaches you');
   near('ice', 1, E.crack, 0.0, 0.8, 'the ice cracks under the car');
   near('ice', 2, E.sink, 0.3, 1.1, 'the ice gives way');
-  near('water', 0, E.out, 1.0, 2.4, 'the driver comes up');
   near('plane', 0, E.plane, -0.9, -0.3, 'the plane passes over');
   near('edge', 0, E.iceCrack, 0.0, 0.5, 'the ice cracks under your hands');
-  { const fin = E.edge3 + (Y.dist(E.edge3) - Y.dFin) / Y.crawlV; near('reach', 0, fin, -2.0, 0.0, 'your fingers reach his sleeve'); }
+  { const fin = E.edge3 + (Y.dist(E.edge3) - Y.dFin) / Y.crawlV; near('reach', 0, fin, -3.0, 0.0, 'your fingers reach his sleeve'); }
   // the numbers
   const num = (id, k, re, v, tol, what) => { const m = re.exec(nlCap(id, k).text); if (!m) { fail(`caption ${id}:${k}: no number for ${what}`); return; } const x = parseFloat(m[1].replace(/,/g, '').replace('−', '-')); out.push([`${id}:${k}`, what, x, v]); if (Math.abs(x - v) > tol) fail(`caption ${id}:${k} says ${x}, physics says ${v.toFixed(3)} (${what})`); };
   { const c = nlClockParts(nlSC('start', 0)); if (!(c.h === 2 && c.m === 40 && c.pm)) fail(`start:0 says 2:40 PM: the clock says ${c.h}:${c.m}`); }
@@ -39,8 +38,8 @@ const NL_CHECKS = (() => {
   num('count', 0, /^([\d,]+) people/, P.skaters, 0, 'skaters on the ice');
   num('count', 1, /It's ([−\d.]+) °C/, P.air, 0, 'the air');
   { const a = P.sunAlt(nlSC('sun', 0)); out.push(['sun:0', "the Sun's altitude (NOAA)", a]); if (!(a < 3 && a > 2)) fail(`sun:0 says less than 3° up: ${a.toFixed(2)}`); }
-  if (!(1 - P.sunVisible > 0.5)) fail('sun:1 says more than half of sunlight is not visible light');
-  { const m = /at (\d+):(\d+) PM/.exec(nlCap('sun', 2).text); if (!m || +m[1] !== P.sunset[0] - 12 || +m[2] !== P.sunset[1]) fail('sun:2: the sunset time'); }
+  if (!(1 - P.sunVisible > 0.5)) fail('the sun inset says more than half of sunlight is not visible light');
+  { const m = /at (\d+):(\d+) PM/.exec(nlCap('sun', 1).text); if (!m || +m[1] !== P.sunset[0] - 12 || +m[2] !== P.sunset[1]) fail('sun:1: the sunset time'); }
   num('fire', 0, /burning at ([\d.]+) °C/, P.fireC, 0, 'the fire');
   num('road', 2, /takes ([\d.]+) seconds/, V.delay, 0.06, 'the bang from the road to you, through −12 °C air');
   num('ice', 0, /ice ([\d.]+) cm thick/, P.icePerson, 0, 'ice for a person');

@@ -117,7 +117,15 @@ const NL_P = {
   stopping: () => { const p = basePose(); p.hipY = 0.8; p.lKnee = 0.7; p.rKnee = 0.75; p.lHip = [0.55, 0.3]; p.rHip = [0.5, 0.3]; p.spine = -0.05; p.lSh = [1.25, 0.55]; p.rSh = [1.2, 0.5]; p.lEl = 0.2; p.rEl = 0.25; p.neck = 0.05; return p; },
   standBlind: (t, i) => { const p = basePose(); p.hipY = 0.9; p.lKnee = 0.2; p.rKnee = 0.18; p.lSh = [1.25 + 0.2 * Math.sin(t * 0.7 + i), 0.35]; p.rSh = [1.1 + 0.2 * Math.sin(t * 0.6 + i * 2), 0.4]; p.lEl = 0.35; p.rEl = 0.3;
     p.headYaw = 0.7 * Math.sin(t * 0.45 + i); p.neck = 0.05 + 0.1 * Math.sin(t * 0.3 + i); return p; },
-  sit: (t, i) => { const p = NL_POSES.sitGround(); p.headYaw = 0.6 * Math.sin(t * 0.25 + i); p.neck = 0.05; p.lSh = [0.3, 0.35]; p.lEl = 0.2; p.rSh = [0.35, 0.3]; p.rEl = 0.25; return p; },
+  // sitting on the ice, three ways: leaning back on both hands (you are one of these), hugging the knees, head in hands
+  sit: (t, i) => {
+    const p = NL_POSES.sitGround(), v = i % 3;
+    if (v === 0) { p.headYaw = 0.6 * Math.sin(t * 0.25 + i); p.neck = 0.05; p.lSh = [0.3, 0.35]; p.lEl = 0.2; p.rSh = [0.35, 0.3]; p.rEl = 0.25; return p; }
+    p.lHip = [2.2, 0.14]; p.rHip = [2.2, 0.04]; p.lKnee = 2.45; p.rKnee = 2.45;
+    if (v === 1) { p.spine = 0.42 + 0.03 * Math.sin(t * 0.7 + i); p.neck = 0.35; p.headYaw = 0.25 * Math.sin(t * 0.2 + i); p.lSh = [1.05, -0.3]; p.rSh = [1.05, -0.3]; p.lEl = 1.75; p.rEl = 1.75; return p; }
+    p.lHip = [2.0, 0.3]; p.rHip = [2.0, 0.24]; p.lKnee = 2.2; p.rKnee = 2.2;
+    p.spine = 0.55; p.neck = 0.55 + 0.05 * Math.sin(t * 0.5 + i); p.lSh = [1.3, -0.12]; p.rSh = [1.3, -0.12]; p.lEl = 2.35; p.rEl = 2.35; return p;
+  },
   kneel: (t, i) => { const p = basePose(); p.hipY = 0.5; p.lHip = [0.05, 0.08]; p.rHip = [0.05, 0.08]; p.lKnee = 1.75; p.rKnee = 1.75; p.lFoot = 0.5; p.rFoot = 0.5; p.spine = 0.15;
     p.lSh = [0.9, 0.35]; p.rSh = [0.85, 0.3]; p.lEl = 0.4; p.rEl = 0.5; p.headYaw = 0.6 * Math.sin(t * 0.3 + i); return p; },
   allFours: (t, i, ph = 0) => { const p = basePose(); const a = Math.sin(ph); p.hipY = 0.52; p.lHip = [0.05 + 0.25 * a, 0.08]; p.rHip = [0.05 - 0.25 * a, 0.08]; p.lKnee = 1.55; p.rKnee = 1.55; p.lFoot = 0.3; p.rFoot = 0.3;
@@ -134,8 +142,8 @@ const NL_P = {
     p.lHip = [0.1 + 0.25 * Math.max(0, -a), 0.18]; p.rHip = [0.1 + 0.25 * Math.max(0, a), 0.18]; p.lKnee = 0.2 + 0.5 * Math.max(0, -a); p.rKnee = 0.2 + 0.5 * Math.max(0, a); p.neck = -0.55; p.lFoot = 0.4; p.rFoot = 0.4; return p; },
   // holding your ankles: flat, arms forward, still
   proneHold: () => { const p = basePose(); p.lSh = [2.95, 0.12]; p.rSh = [2.95, 0.12]; p.lEl = 0.15; p.rEl = 0.15; p.neck = -0.5; p.lHip = [0.05, 0.15]; p.rHip = [0.05, 0.15]; p.lFoot = 0.4; p.rFoot = 0.4; return p; },
-  // in the water at the edge: forearms on the ice, the head up (k: how tired, 0…1)
-  edge: (t, k) => { const p = basePose(); p.lSh = [1.45 + 0.05 * Math.sin(t * 1.3), 0.32]; p.rSh = [1.42 + 0.05 * Math.sin(t * 1.1 + 1), 0.3]; p.lEl = 0.55; p.rEl = 0.6; p.spine = 0.2 + 0.2 * k; p.neck = -0.35 + 0.35 * k;
+  // in the water at the edge: forearms on the ice, the head up (k: how tired, 0…1); r: his arm reaching out to your voice
+  edge: (t, k, r = 0) => { const p = basePose(); p.lSh = [1.45 + 0.05 * Math.sin(t * 1.3) * (1 - r) + 0.8 * r, 0.32 - 0.22 * r]; p.rSh = [1.42 + 0.05 * Math.sin(t * 1.1 + 1), 0.3]; p.lEl = 0.55 - 0.5 * r; p.rEl = 0.6; p.spine = 0.2 + 0.2 * k; p.neck = -0.35 + 0.35 * k;
     p.lHip = [0.4 + 0.3 * Math.sin(t * 2.3), 0.1]; p.rHip = [0.4 - 0.3 * Math.sin(t * 2.3), 0.1]; p.lKnee = 0.8; p.rKnee = 0.8; p.headYaw = 0.2 * Math.sin(t * 0.7); return p; },
   // the man: walking with his arms out in front; the step back
   feel: (d, back) => { const p = nlWalkPose(d / 1.2 * 2 * Math.PI, 0.6); p.lSh = [1.35, 0.25]; p.rSh = [1.3, 0.2]; p.lEl = 0.25; p.rEl = 0.3; if (back > 0) { p.spine -= 0.3 * back; p.neck -= 0.2 * back; p.lSh = [1.7, 0.4]; p.rSh = [1.65, 0.4]; p.lEl = 1.4 * back; p.rEl = 1.4 * back; } return p; },
