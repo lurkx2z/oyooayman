@@ -248,10 +248,14 @@ windows across the whole film, with the stem gains added in:
 - **Runnable ZIP** `air-thinner-film.zip` (in the project files, 8.4 MB): extract it, open `air-thinner.html` in Chrome
   or Edge on a computer, wait for SOUND READY, press Space. Tested from a fresh unzip with `tools/check-page.cjs`:
   SOUND READY after 2 s, no console errors.
-- **Final 1080p MP4**, rendered on the owner's PC (graphics card):
-  `node films/air-thinner/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\air-thinner --small`.
-  It writes `D:\renders\air-thinner\air-thinner_final_1080p.mp4` (the file to upload) and a 720p preview copy
-  `air-thinner_final_small.mp4`. The command is resumable: run it again and finished segments are kept.
+- **Final 1080p MP4**, rendered on the owner's PC (graphics card) on 17 November 2026 from commit 5b923c9, the frames
+  in 8 minutes (about 19 frames a second): `node films/air-thinner/render-gpu.cjs --channel chrome --workers 2 --out
+  D:\renders\air-thinner --small`.
+  - `D:\renders\air-thinner\air-thinner_final_1080p.mp4`: 1920×1080, 30 fps, H.264 CRF 18, 313.83 s (9,415 frames),
+    981 MiB, with the mastered soundtrack `final-soundtrack.m4a` copied in: −14.7 LUFS, loudness range 9.6 LU,
+    −2.7 dB peak. **This is the file to upload.**
+  - `air-thinner_final_small.mp4`: 1280×720, 26.3 MiB, 313.81 s, −15.2 LUFS, −3.5 dBTP (a preview copy).
+  - The command is resumable: run it again and finished segments are kept.
 - **Thumbnails** (house style) in the project files: `thumb-boil.jpg` ("26 °C / AND STILL THE SEA BOILS", the sea
   boiling against the hull), `thumb-stars.jpg` ("5 % left / AND STILL THE SUN IS UP", stars and the Sun over the ship
   at 3 in the afternoon), `thumb-under.jpg` ("10 m down / AND STILL YOU CAN BREATHE", you and the girl on the tank
