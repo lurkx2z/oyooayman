@@ -5,7 +5,6 @@
      sfPerson(look, parent, o) → Person ; sfPlace(person, q, x, z, yaw, y0)
      sfStatePose(state, s, i, v) → { p, lay, y }   a body state from physics.js (walk, run, stand, crouch, kneel …)
      sfDog(parent) → { g, pose(st, s) }            the dog (a black-and-white collie)
-     sfBats(scene) → { update(s) }                 the bats (instanced bodies and wings)
    ===================================================================== */
 
 Object.assign(LOOKS, {
@@ -71,7 +70,7 @@ const SF_P = {
   kneel: (s, i) => { const p = basePose(); p.hipY = 0.5; p.lHip = [0.05, 0.08]; p.rHip = [0.05, 0.08]; p.lKnee = 1.75; p.rKnee = 1.75; p.lFoot = 0.5; p.rFoot = 0.5; p.spine = 0.18;
     p.lSh = [0.95, 0.3]; p.rSh = [0.9, 0.25]; p.lEl = 0.5; p.rEl = 0.5; p.headYaw = 0.25 * Math.sin(s * 0.5 + i); return p; },
   // holding her: kneeling, both arms round her
-  hug: (s) => { const p = SF_P.kneel(s, 0); p.lSh = [1.15, -0.2]; p.rSh = [1.1, -0.18]; p.lEl = 2.0; p.rEl = 2.05; p.spine = 0.3; p.neck = 0.25; p.headYaw = 0.4 * Math.sin(s * 0.6); return p; },
+  hug: (s) => { const p = SF_P.kneel(s, 0); p.lSh = [1.3, -0.4]; p.rSh = [1.25, -0.38]; p.lEl = 1.05; p.rEl = 1.1; p.spine = 0.3; p.neck = 0.25; p.headYaw = 0.4 * Math.sin(s * 0.6); return p; },
   // her, held: her arms round the dog (crouched), then round your neck
   kidHold: (s) => { const p = SF_P.crouch(s, 3); p.lSh = [1.1, -0.35]; p.rSh = [1.05, -0.3]; p.lEl = 1.7; p.rEl = 1.75; p.spine = 0.45; p.neck = 0.3; p.headYaw = 0.1 * Math.sin(s * 0.9); return p; },
   flinch: (s) => { const p = basePose(); p.lSh = [1.6, 0.3]; p.rSh = [1.5, 0.35]; p.lEl = 2.1; p.rEl = 2.0; p.spine = 0.25; p.neck = 0.35; p.lKnee = 0.3; p.rKnee = 0.3; p.hipY = 0.88; return p; },
@@ -142,39 +141,3 @@ function sfDog(parent) {
   return D;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// THE BATS: instanced (a body and two wings each); flapping; the fallen ones lie on the ground with their wings out
-// ---------------------------------------------------------------------------------------------------------------------
-function sfBats(scene) {
-  const n = SFBAT.length, m = sfStd('#2a221e', 0.9, 0, { side: THREE.DoubleSide });
-  const body = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.025, 0.06, 3, 6), m, n);
-  const wg = new THREE.BufferGeometry();
-  // a wing: a membrane from the body out to the wrist and the tip, scalloped at the back
-  wg.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0.04, 0.15, 0.01, 0.03, 0, 0, -0.03, 0.15, 0.01, 0.03, 0.21, -0.01, -0.03, 0, 0, -0.03, 0.15, 0.01, 0.03, 0.17, 0, -0.06, 0.21, -0.01, -0.03, 0, 0, -0.03, 0.21, -0.01, -0.03, 0.09, -0.005, -0.07], 3));
-  wg.computeVertexNormals();
-  const wl = new THREE.InstancedMesh(wg, m, n), wr = new THREE.InstancedMesh(wg, m, n);
-  for (const q of [body, wl, wr]) { q.frustumCulled = false; q.castShadow = false; scene.add(q); }
-  const o = new THREE.Object3D(), w = new THREE.Object3D(), Z = new THREE.Matrix4().makeScale(0, 0, 0);
-  return {
-    body, wl, wr,
-    update(s) {
-      for (let i = 0; i < n; i++) {
-        const b = SFBAT[i], a = sfBatAt(b, s);
-        if (a.state === 'gone') { body.setMatrixAt(i, Z); wl.setMatrixAt(i, Z); wr.setMatrixAt(i, Z); continue; }
-        o.position.set(a.p[0], a.p[1], a.p[2]); o.rotation.set(0, a.yaw, 0); o.scale.setScalar(1);
-        let flap = 0;
-        if (a.state === 'fly') flap = Math.sin(s * b.flap * 2 * Math.PI + b.seed * 9) * 0.9;
-        else if (a.state === 'fall') { o.rotation.set(s * 7 + b.seed * 4, a.yaw, s * 5); flap = 0.4 * Math.sin(s * 30); }
-        else { o.rotation.set(0, a.yaw, 0); o.position.y += 0.01; flap = -0.05; }
-        o.updateMatrix();
-        const mb = new THREE.Matrix4().copy(o.matrix).multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
-        body.setMatrixAt(i, mb);
-        for (const [mesh, sd] of [[wl, -1], [wr, 1]]) {
-          w.position.set(0, 0, 0); w.rotation.set(0, sd < 0 ? Math.PI : 0, sd * flap, 'YZX'); w.scale.set(1, 1, sd < 0 ? -1 : 1); w.updateMatrix();
-          mesh.setMatrixAt(i, new THREE.Matrix4().copy(o.matrix).multiply(w.matrix));
-        }
-      }
-      for (const q of [body, wl, wr]) q.instanceMatrix.needsUpdate = true;
-    },
-  };
-}

@@ -21,7 +21,6 @@ const SF_CHECKS = (() => {
   near('rumble', 0, key('long').s, 0.8, 2.5, 'the 6 km bolt');
   near('call', 1, E.call, 0.3, 3.5, 'you call her name');
   near('answer', 0, E.answer, 0.6, 2.0, 'she calls back');
-  near('bats', 0, E.bats, 0.3, 2.0, 'the first bats come out');
   near('siren', 0, E.siren, 0.8, 2.5, 'the sirens start');
   near('tornado', 0, E.tornado, 0.8, 2.5, 'the flash that shows the tornado');
   near('strike', 0, E.yardHit, 0.2, 1.0, 'lightning hits the yard light');
@@ -32,19 +31,18 @@ const SF_CHECKS = (() => {
   const is = (cond, msg) => { if (!cond) fail(msg); };
   { const c = sfClockParts(sfSC('start', 0)); is(c.h === 8 && c.m === 52 && c.pm, `start:0 says 8:52 PM: the clock says ${c.h}:${c.m}`); }
   num('start', 1, /at ([\d.]+) million km/, P.c1 / 1e9, 0, 'the new speed of sound (million km/s)');
-  num('start', 2, /thunder of ([\d]+) lightning/, P.inAir, 0, 'strikes whose thunder was in the air at 8:52:00');
+  num('start', 2, /^([\d]+) thunderclaps/, P.inAir, 0, 'strikes whose thunder was in the air at 8:52:00');
   num('flash', 0, /at ([\d.]+) m\/s/, P.c0, 0.5, 'the speed of sound in 20 °C air');
   num('flash', 0, /: ([\d.]+) seconds for every/, P.sPerKm, 0.1, 'seconds per kilometre');
   num('flash', 2, /From ([\d.]+) km away/, sfDist(you(key('flash3').s), [key('flash3').x, key('flash3').z]) / 1000, 0.06, 'the strike from you');
   num('flash', 2, /away, ([\d.]+) millionths/, (3000 / P.light - 3000 / P.c1) * 1e6, 0.1, 'thunder ahead of light from 3 km (µs)');
   num('rule', 0, /be ([\d.]+) million times stiffer/, Math.floor(P.stiff / 1e6), 0, 'air stiffness needed / steel (millions)');
-  num('rumble', 1, /This one is ([\d.]+) km long/, SFP.longBolt.len / 1000, 0.1, 'the bolt\'s channel');
+  num('rumble', 1, /That one was ([\d.]+) km long/, SFP.longBolt.len / 1000, 0.1, 'the bolt\'s channel');
   num('rumble', 1, /roll on for ([\d.]+) seconds/, SFP.longBolt.rumble, 0.3, 'its rumble at 343 m/s');
   num('ears', 0, /up to ([\d.]+) thousandths/, P.itd0 * 1000, 0.01, 'the gap between your ears before (ms)');
-  num('ears', 1, /gap is ([\d.]+) billionths/, P.itd1 * 1e9, 0.05, 'the gap now (ns)');
-  num('ears', 1, /([\d,]+) times too short/, P.itdTimes, 600, 'the smallest gap a brain uses over the gap now');
+  num('ears', 1, /it's ([\d.]+) billionths/, P.itd1 * 1e9, 0.05, 'the gap now (ns)');
+  num('ears', 1, /is ([\d,]+) times longer/, P.itdTimes, 600, 'the smallest gap a brain uses over the gap now');
   num('ears', 2, /now ([\d,]+) km long/, P.voiceLambda / 1000, 40, 'her voice\'s wavelength');
-  num('bats', 1, /every ([\d.]+) cm/, P.batMm * 100, 0.3, 'a bat\'s echo: cm per thousandth of a second');
   num('far', 0, /horn ([\d.]+) km away/, sfDist(you(E.train), SF_F.rail) / 1000, 0.3, 'the railway crossing');
   num('far', 1, /dogs, ([\d.]+) km away/, sfDist(you(sfSC('far', 1)), Q.hansen) / 1000, 0.05, 'the Hansen farm');
   num('siren', 0, /in town, ([\d.]+) km away/, sfDist(you(E.siren), SF_F.town) / 1000, 0.3, 'the town');
@@ -54,7 +52,6 @@ const SF_CHECKS = (() => {
   { const b = sfBearing(you(sfSC('phone', 3)), Q.kid); is(b > 240 && b < 300, `phone:3 says west: bearing ${b.toFixed(0)}°`); const bt = sfBearing(you(sfSC('phone', 3)), SFN.at(sfSC('phone', 3))); is(Math.abs(b - bt) < 25, `phone:3 says towards the tornado: ${b.toFixed(0)}° vs ${bt.toFixed(0)}°`); }
   num('corn', 0, /It's ([\d.]+) metres tall/, P.cornH, 0, 'the corn');
   num('corn', 2, /She's ([\d.]+) metres away/, sfDist(you(sfSC('corn', 2)), Q.kid), 3, 'you to her');
-  num('strike', 0, /light, ([\d.]+) metres behind/, sfDist(you(E.yardHit), [SF_F.yardLight.x, SF_F.yardLight.z]), 3, 'you to the yard light');
   { const d = sfDist(you(E.yardHit), [SF_F.yardLight.x, SF_F.yardLight.z]) / P.c0; is(/a quarter of a second/.test(sfCap('strike', 1).text) && d > 0.22 && d < 0.3, `strike:1 says a quarter of a second: ${d.toFixed(3)} s`); }
   num('wind', 0, /at ([\d.]+) km\/h/, P.inflow, 0, 'the inflow');
   num('neighbour', 0, /farm, ([\d.]+) km west/, sfDist(you(sfSC('neighbour', 0)), Q.hansen) / 1000, 0.05, 'the Hansen farm');

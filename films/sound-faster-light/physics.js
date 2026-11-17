@@ -4,7 +4,7 @@
      SFP         the constants (sound then and now, light, steel, your ears, a bat, the corn, the tornado)
      SF_STRIKES  every lightning strike (where, when, how long its channel is, its flicker)
      SFE         the story's moments (placed on the captions through the clock)
-     SFY you · SFK your daughter · SFD the dog · SFN the tornado · SFC the sheriff's car · SFBAT the bats
+     SFY you · SFK your daughter · SFD the dog · SFN the tornado · SFC the sheriff's car
    ===================================================================== */
 
 const SFP = (() => {
@@ -30,6 +30,7 @@ const SFP = (() => {
   P.batMm = P.c0 / 2 * 0.001;                        // a bat's echo: 1 thousandth of a second for every 17 cm
   P.cornH = SF_F.cornH;                              // 2.4 m in late July
   P.inflow = 90;                                     // km/h, the wind rushing in towards the tornado, near it
+  P.carryV = 2.4;                                   // m/s: you, running with her in your arms over flattened corn
   P.tornadoV = 16.7;                                 // m/s: 60 km/h, east-north-east
   P.runV = 2.06;                                     // m/s: you, running blind through 2.4 m corn
   P.phoneLag = 0.25;                                 // s: a phone call's delay (the network and the codecs)
@@ -46,9 +47,7 @@ const SFE = (() => {
   E.call = S('call', 0, 3.4);                        // you call her name (heard by her 0.0000001 s later)
   E.answer = S('answer', 0, -1.4);                   // she calls back
   E.away = [S('head', 2, -1.6), S('head', 2, 6.0)];  // you walk north along the corn: the wrong way
-  E.back = [S('bats', 0, 1.0), S('siren', 0, -1.0)]; // you walk back down the edge while the bats come out
-  E.bats = S('bats', 0, -1.2);                       // the first bats come out of the loft door
-  E.batYou = S('bats', 2, 1.0);                      // one flies into your face
+  E.back = [S('far', 1, 0.5), S('siren', 0, -1.0)];  // you walk back down the edge (heard: the train, the dogs)
   E.train = S('far', 0, 2.6);                        // the freight train's horn, 11 km away
   E.dogs = S('far', 1, -0.6);                        // the Hansens' dogs
   E.siren = S('siren', 0, -1.6);                     // the town's tornado sirens start
@@ -186,7 +185,7 @@ const SF_STRIKES = (() => {
   at(sfSC('rumble', 0, -1.7), 1600, 300, { amp: 1.5, key: 'long', top: 1300, spider: 4330 });   // the 6 km bolt
   at(sfSC('tornado', 0, -1.8), 2600, 244, { amp: 1.6, kind: 'ic', top: 1500, key: 'tornado' });  // lights the tornado
   at(SFE.yardHit, 0, 0, { amp: 2.4, key: 'yard', top: 1100 });                                     // the yard light (placed below)
-  at(sfSC('neighbour', 0, -1.6), 1500, 250, { amp: 1.4, kind: 'ic', key: 'hansen' });
+  at(sfSC('neighbour', 0, -1.6), 1500, 250, { amp: 1.6, kind: 'cg', key: 'hansen' });
   at(SFE.found, 900, 205, { amp: 1.5, kind: 'ic', key: 'found' });
   at(sfSC('back', 1, -0.6), 650, 270, { amp: 1.6, key: 'back' });
   at(sfSC('question', 0, -0.3), 400, 236, { amp: 1.8, kind: 'ic', key: 'last' });
@@ -240,35 +239,3 @@ function sfFlash(k, s) {
 }
 // the strikes lit at s (for the picture: the sky, the light, the bolts)
 function sfFlashesAt(s) { const out = []; for (const k of SF_STRIKES) { if (k.s > s + 0.02) break; const v = sfFlash(k, s); if (v > 0.002) out.push([k, v]); } return out; }
-
-// ---------------------------------------------------------------------------------------------------------------------
-// THE BATS: out of the loft door, every evening; tonight they can't judge a distance. [{ s0, path(u) → [x, y, z],
-// crash (story s, or null), at (what they hit) }]
-// ---------------------------------------------------------------------------------------------------------------------
-const SFBAT = (() => {
-  const r = new RNG(82727), B = SF_F.barn, door = [B.x, B.ridge - 3.0, B.z + B.d / 2 + 0.3], out = [];
-  const W = SF_F.windmill, L = SF_F.yardLight, H = SF_F.house;
-  // what they fly into: [x, y, z, name]
-  const targets = [[W.x, 8.5, W.z, 'the windmill'], [L.x, 7.5, L.z, 'the yard light'], [H.x + 3, 4.8, H.z - H.d / 2, 'the house'], [B.x - B.w / 2, 4.2, B.z + 6, 'the barn'], [W.x + 0.3, 11.5, W.z, 'the windmill'], [L.x, 8.6, L.z, 'the yard light'], [-6, 1.2, 14, 'the pickup']];
-  for (let i = 0; i < 46; i++) {
-    const s0 = SFE.bats + r.range(0, 11) * (i < 8 ? 0.25 : 1), v = r.range(5.5, 8.5), crash = i < targets.length;
-    const T = crash ? targets[i] : null;
-    const dir = sfDirOf(r.range(185, 300)), far = [door[0] + dir[0] * 160, r.range(6, 20), door[2] + dir[1] * 160];
-    const to = T ? [T[0], T[1], T[2]] : far, len = Math.hypot(to[0] - door[0], to[1] - door[1], to[2] - door[2]), T1 = len / v;
-    const w = [r.range(0, 6), r.range(0, 6), r.range(1.5, 3.5)];
-    const path = (s) => {
-      const u = MathX.clamp((s - s0) / T1, 0, 1), k = Math.sin(Math.PI * u) * (T ? 1 - u * 0.9 : 1);
-      return [door[0] + (to[0] - door[0]) * u + 2.5 * k * Math.sin(w[0] + s * w[2]), door[1] + (to[1] - door[1]) * u + 1.2 * k * Math.sin(w[1] + s * w[2] * 1.3) + 1.8 * Math.sin(Math.PI * u) * (T ? 0.3 : 1), door[2] + (to[2] - door[2]) * u + 2.5 * k * Math.cos(w[0] + s * w[2] * 0.9)];
-    };
-    out.push({ i, s0, s1: s0 + T1, path, crash: T ? s0 + T1 : null, at: T ? T[3] : null, hit: T ? [T[0], T[1], T[2]] : null, flap: r.range(9, 13), seed: r.next() });
-  }
-  return out;
-})();
-// where bat b is at s: { p: [x, y, z], state: 'fly' | 'fall' | 'down' | 'gone', yaw }
-function sfBatAt(b, s) {
-  if (s < b.s0) return { state: 'gone' };
-  if (!b.crash) { if (s > b.s1) return { state: 'gone' }; const p = b.path(s), q = b.path(s + 0.05); return { p, state: 'fly', yaw: Math.atan2(q[0] - p[0], q[2] - p[2]) }; }
-  if (s < b.crash) { const p = b.path(s), q = b.path(Math.min(s + 0.05, b.crash)); return { p, state: 'fly', yaw: Math.atan2(q[0] - p[0], q[2] - p[2]) }; }
-  const u = s - b.crash, h = b.hit, g = sfGroundY(h[0], h[2]) + 0.03, y = Math.max(g, h[1] - 0.5 * 9.81 * u * u);
-  return { p: [h[0] + 0.4 * Math.min(u, 0.4), y, h[2] + 0.3 * Math.min(u, 0.4)], state: y > g + 0.01 ? 'fall' : 'down', yaw: b.seed * 6 };
-}

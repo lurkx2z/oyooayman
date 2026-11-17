@@ -8,7 +8,6 @@
      your steps; your call (no echo); her voice (everywhere, as loud as if she were beside you)
      the ears: a click arriving left then right (0.66 thousandths of a second), then both at once (a diagram's sound)
      the freight train's horn 11 km off and the Hansens' dogs 1.4 km off, at the same instant
-     the bats: wings, and the ones that fly into the windmill, the yard light, the house, the barn; the one at your face
      the town's tornado sirens (6 km, the instant they start); the sheriff's car: its siren never drops in pitch
      the phone: the keys, her ringtone (as if in your pocket), her voice first through the air, then through the phone
      the run: your steps in the corn, the leaves, your breath; the yard light hit: the loudest sound in the film
@@ -183,16 +182,6 @@ sfSound('sfx', 'events', function (ctx, bus, K) {
   now(sfFreightHorn(fx, 1.9), E.train, 0.14); now(sfFreightHorn(fx, 2.6), E.train + 2.35, 0.14);
   for (const [dt, f, k] of [[0, 480, 1.3], [0.32, 520, 1.3], [0.9, 640, 1.0], [1.15, 470, 1.3], [1.8, 620, 1.0]]) now(sfBark(fx, { f0: f, k }), E.dogs + dt, 0.07, { lp: 2600 });
 
-  // ================================================================== the bats: wings pouring out; the ones that fly into things
-  { const s0 = E.bats, d = 17, t0 = seen(s0);
-    if (t0 != null) K.put(sfFlutter(fx, d, (t) => Math.min(1, t / 1.5) * (1 - MathX.smooth(t, d - 5, d)) * (0.6 + 0.4 * Math.sin(t * 0.7))), t0, { vol: 0.05, norm: true, pan: 0 });
-    for (const b of SFBAT) { if (!b.crash) continue; const metal = /windmill|yard light/.test(b.at);
-      const x = metal ? fx.hit(fx.metalModes(r.range(1500, 2400), 0.3), { width: 0.0004, amp: 1, noise: 0.3, nlen: 0.004, nhp: 2500, len: 0.5 }) : fx.hit(fx.woodModes(r.range(250, 400), 0.6), { width: 0.002, amp: 1, noise: 0.2, len: 0.3 });
-      now(x, b.crash, metal ? 0.07 : 0.06); now(sfVoice(fx, 0.05, { f0: () => 3200, formants: [[4200, 8, 1]], breath: 0.1 }), b.crash + 0.01, 0.03); }
-    // the one at your face: wings right at you, your gasp
-    now(sfFlutter(fx, 0.9, (t) => Math.sin(Math.PI * Math.min(1, t / 0.9))), E.batYou - 0.35, 0.16);
-    now(fx.breath(0.5, { inhale: true, voice: 0.3, f0: 160 }), E.batYou + 0.05, 0.12); }
-
   // ================================================================== the town's tornado sirens (6 km), from the instant they start, to the end
   { const t0 = seen(E.siren); if (t0 != null) K.put(sfTornadoSiren(fx, END + 0.5 - t0, { up: 5, rot: 9 }), t0, { vol: 0.05, norm: true, pan: 0, lp: 2200 }); }
   // ================================================================== the sheriff's car: its siren (no drop in pitch), its engine and tyres
@@ -226,7 +215,7 @@ sfSound('sfx', 'events', function (ctx, bus, K) {
     now(sfFizz(fx, 3.0), s + 0.05, 0.12); }
 
   // ================================================================== the Hansen farm comes apart (1.3 km), at the instant it happens
-  { const s = E.hansen;
+  { const s = E.hansen - 0.25;   // (the picture: its lights die at −0.55 s, the roofs go at −0.35 s)
     now(sfTear(fx, 2.6, { f: 140 }), s - 0.1, 0.16); now(sfTear(fx, 2.0, { metal: true, f: 300 }), s + 0.4, 0.12); now(sfTear(fx, 1.6, { f: 210 }), s + 1.6, 0.12);
     for (let j = 0; j < 7; j++) now(fx.hit(fx.woodModes(r.range(90, 180), 1.6), { width: 0.004, amp: 1, noise: 0.25, len: 0.6 }), s + r.range(0, 4.5), 0.1 * r.range(0.6, 1), { lp: 2200 });
     now(sfMono(fx.smash({ v: 5, len: 1.5, pitch: 1.1 })), s + 0.8, 0.07, { lp: 3000 }); }

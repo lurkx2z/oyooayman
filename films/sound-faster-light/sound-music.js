@@ -14,7 +14,6 @@
      the ears      a high ticking pulse; "44,000 times": a cluster of bells, cut
      the head      the heartbeat close; the theme fades as she gets quieter
      far           wide strings; the endless rise begins, very slow
-     the bats      a fluttering pulse, bells; the bat at your face: a stinger
      the sirens    a low ostinato and a semitone cluster
      the tornado   a stinger; the rise grows
      the phone     the pulse and the heartbeat; "West. Towards the tornado.": a stinger
@@ -261,18 +260,10 @@ sfSound('music', 'score', function (ctx, bus, K) {
 
   // ================================================================== far: everything for kilometres, right now
   { const t0 = B('far');
-    M.prog([[t0, C.Gm9], [c('far', 1), C.Bbmaj7], [c('far', 2), C.Fmaj7]], B('bats') + 0.2, 0.3, { cut: 1300, lastRel: 0.6 });
-    M.strings(t0 + 1, B('bats'), C.cold, 0.035, { att: 3, rel: 1, cut: 9000, wave: 'triangle', vib: 3 });
-    rise(c('far', 1), B('bats') + 0.3, 0.008, 1 / 34, 300);
+    M.prog([[t0, C.Gm9], [c('far', 1), C.Bbmaj7], [c('far', 2), C.Fmaj7]], B('siren') + 0.2, 0.3, { cut: 1300, lastRel: 0.6 });
+    M.strings(t0 + 1, B('siren'), C.cold, 0.035, { att: 3, rel: 1, cut: 9000, wave: 'triangle', vib: 3 });
+    rise(c('far', 1), B('siren') + 0.3, 0.008, 1 / 34, 300);
     glass(c('far', 2) + 0.3, 0.12, 'A6'); }
-
-  // ================================================================== the bats: flying blind
-  { const t0 = F(E.bats), tb = F(E.batYou);
-    M.prog([[t0, C.Dm9], [c('bats', 1), C.A7sus], [c('bats', 2), C.Gm9]], B('siren') + 0.2, 0.26, { cut: 900 });
-    sfPulse(ctx, M.bus, t0, tb - 0.1, ['D3', 'A3', 'D4'], 0.21, 0.42, { cut: 1500, cutTo: 2600, acc: 4, decay: 0.2 });
-    twinkle(t0 + 0.2, tb - 0.4, 0.18, 0.12, ['D6', 'Eb6', 'A6', 'D7'], 0.1);
-    stab(tb + 0.004, c('bats', 2) + 0.5, 0.3);
-    beats(tb + 1.5, B('siren'), 0.8, 0.75, 0.3, 0.4); }
 
   // ================================================================== the sirens: coming or going?
   { const t0 = B('siren');

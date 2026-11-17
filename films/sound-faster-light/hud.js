@@ -28,7 +28,6 @@ const SF_CTX = (() => {
     beat('call', 'YOUR VOICE TO THE BARN AND BACK', () => ({ v: `${Math.round(2 * barnD)} <small>m</small>`, v2: `USED TO TAKE ${(2 * barnD / SFP.c0).toFixed(2)} s · NOW 0.000 000 1 s` })),
     beat('answer', 'HER VOICE REACHES YOU IN', () => ({ v: '0.000 000 1 <small>s</small>', v2: `SHE’S ${Math.round(kidD)} m AWAY · WHICH WAY?` })),
     beat('far', 'EVERYTHING ARRIVES AT ONCE', () => ({ v: `${sfKm(rail)} <small>km</small>`, v2: `THE TRAIN’S HORN USED TO TAKE ${Math.round(rail / SFP.c0)} s` }), 0, 0),
-    beat('bats', 'A BAT’S ECHO OFF A MOTH 1 m AWAY', () => ({ v: `${(2 / SFP.c0 * 1000).toFixed(1)} <small>thousandths of a second</small>`, v2: 'NOW: 0.000 000 002 s · TOO FAST TO USE' }), 1, 1),
     beat('siren', 'THE TOWN', () => ({ v: `${sfKm(town)} <small>km</small>`, v2: `ITS SIRENS USED TO TAKE ${Math.round(town / SFP.c0)} s TO REACH YOU` }), 0, 0),
     beat('tornado', 'THE TORNADO', (t, s) => ({ v: `${sfKm(sfToTornado(s))} <small>km</small>`, v2: 'WHICH WAY IS IT GOING? YOU CAN’T TELL' }), 1),
     beat('phone', 'HER PHONE', () => ({ v: `${Math.round(kidD)} <small>m west</small>`, v2: 'SHE SOUNDS RIGHT BESIDE YOU' }), 2),
@@ -40,6 +39,8 @@ const SF_CTX = (() => {
     beat('back', 'THE TORNADO', (t, s) => ({ v: `${sfKm(sfToTornado(s))} <small>km</small>`, v2: `THE STORM CELLAR: ${Math.round(sfDist(sfYouXZ(s), [SF_F.cellar.x, SF_F.cellar.z]))} m EAST` }), 1),
   ];
 })();
+// the speed box goes compact at the cut to the 6 km bolt; the tornado warning comes up at 8:52:18; she ran into the corn at 8:51:59
+const SF_RO_COMPACT = sfFilmAt(SF_STRIKES.find((k) => k.key === 'long').s) - 0.6, SF_WARN = sfFilmAt(18), SF_KID_IN = -1;
 // the honest labels (bottom left): [from, to, text]
 const SF_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [sfC(id, k0) - 0.1, (k1 != null ? sfCap(id, k1).hide : sfE(id)) + 0.2, text]; return [
   b('rule', 'IN REAL PHYSICS IT CAN’T HAPPEN: NOTHING CARRIES A SIGNAL FASTER THAN LIGHT', 0, 0),
@@ -66,12 +67,12 @@ function sfCapHtml(s) {
 class SfHud {
   constructor(root) {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; root.appendChild(d); return d; };
-    this.ro = mk('sf-ro', '<div class="l">THE SPEED OF SOUND</div><div class="v"></div><div class="s"></div>');
-    this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s');
+    this.ro = mk('sf-ro', '<div class="l">THE SPEED OF SOUND</div><div class="v"></div><div class="s"></div><div class="w"></div>');
+    this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s'); this.roW = this.ro.querySelector('.w');
     this.ctx = mk('sf-ctx', '<span class="l"></span><span class="v"></span><span class="v2"></span>');
     this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
-    this.clock = mk('sf-clock', '<div class="l"></div><div class="v"></div><div class="f"></div>');
-    this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f');
+    this.clock = mk('sf-clock', '<div class="l"></div><div class="v"></div><div class="f"></div><div class="k"></div>');
+    this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f'); this.clockK = this.clock.querySelector('.k');
     this.band = mk('sf-band'); this.cap = mk('sf-cap'); this.tag = mk('sf-tag');
     this.caps = SFT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: sfCapHtml(c.text), q: g.id === 'question' })));
     this.inset = mk('sf-inset');
@@ -89,10 +90,14 @@ class SfHud {
     const ra = W(t, SF.title[1] - 0.5, SF.end + 1, 0.4, 0.5);
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
-      const cp = t > sfE('rule') ? ' compact' : '', hit = s >= 0 && s < 1.2;
+      const cp = t > SF_RO_COMPACT ? ' compact' : '', hit = s >= 0 && s < 1.2;
       this._html('rov', this.roV, s < 0 ? '343 <small>m/s</small>' : '1,000,000 <small>km/s</small>');
       this._html('ros', this.roS, s < 0 ? '' : cp ? `${SFP.timesLight.toFixed(1)} × LIGHT` : `${SFP.timesLight.toFixed(1)} × LIGHT · SINCE <b>8:52:00 PM</b>`);
       this._cls('roc', this.ro, 'sf-ro' + (s >= 0 ? ' on' : '') + (hit ? ' hit' : '') + cp);
+      // the county's tornado warning, from 8:52:18 to the end (it blinks in)
+      const wa = t >= SF_WARN ? 0.55 + 0.45 * Math.cos(Math.min(t - SF_WARN, 2.4) * Math.PI * 2.5) : 0;
+      this._html('row', this.roW, t >= SF_WARN ? 'TORNADO WARNING · UNTIL 9:30 PM' : '');
+      this._set('rowa', this.roW, 'opacity', (t - SF_WARN < 2.4 ? wa : 1).toFixed(2));
       this._cls('cxc', this.ctx, 'sf-ctx' + cp);
     }
     // ---- the context box
@@ -113,6 +118,9 @@ class SfHud {
       const j = SF_JUMPS.filter((x) => t >= x.t && t < x.t + 3.5).pop();
       this._cls('ckj', this.clockF, j ? 'f jump' : 'f');
       this._txt('ckf', this.clockF, j ? `+${Math.round(j.ds)} s LATER` : 'REAL SPEED');
+      // how long she has been in the corn (the story never lets go of her)
+      const g = Math.max(0, Math.floor(s - SF_KID_IN));
+      this._html('ckk', this.clockK, s < 0 ? '' : s < SFE.found ? `MAISIE IN THE CORN <b>${Math.floor(g / 60)}:${String(g % 60).padStart(2, '0')}</b>` : 'MAISIE · WITH YOU');
     }
     // ---- the caption (on a soft band along the bottom, there for the whole beat)
     const gb = SFT.groups.find((g) => !g.title && t >= g.first - 0.6 && t < g.end + 0.6);
@@ -121,7 +129,7 @@ class SfHud {
     if (cp) { this._html('cap', this.cap, cp.html); this._cls('capq', this.cap, cp.q ? 'sf-cap q' : 'sf-cap'); this._set('capa', this.cap, 'opacity', W(t, cp.show, cp.hide, 0.22, 0.3).toFixed(3)); }
     else this._set('capa', this.cap, 'opacity', '0');
     const two = cp && this.root.clientHeight ? this.cap.offsetHeight / this.root.clientHeight > 0.095 : false;
-    this._set('tga', this.tag, 'opacity', tg && !two ? W(t, tg[0], tg[1], 0.4, 0.4).toFixed(3) : '0');
+    this._set('tga', this.tag, 'opacity', tg ? W(t, tg[0], tg[1], 0.4, 0.4).toFixed(3) : '0');
     // ---- the diagrams
     this._insets(t, s, set);
     this._inRect = null;
@@ -259,13 +267,14 @@ class SfHud {
   // the way out: the cellar 130 m east; the tornado less than a kilometre west; which way is it going?
   static escape(u, t, s) {
     const T = SfHud.tx, a = MathX.smooth(u, 0.2, 0.8), b = MathX.smooth(u, 1.6, 2.2), c = MathX.smooth(u, 3.0, 3.6), P = sfYouXZ(s), N = SFN.at(s), C = [SF_F.cellar.x, SF_F.cellar.z];
-    const sc = 0.4, ox = 470, oy = 250, map = (q) => [ox + (q[0] - P[0]) * sc, oy + (q[1] - P[1]) * sc];
+    const sc = 0.22, ox = 540, oy = 250, map = (q) => [ox + (q[0] - P[0]) * sc, oy + (q[1] - P[1]) * sc];
     const c2 = map(C), n2 = map(N), nd = sfDist(P, N), q = '?';
     return SfHud.svg(`${SfHud.plate()}${T(30, 56, 't', 'WHERE YOU ARE')}
       <g opacity="${a.toFixed(2)}"><rect x="${(c2[0] - 10).toFixed(1)}" y="${(c2[1] - 10).toFixed(1)}" width="20" height="20" fill="#d8dcff"/>${T(c2[0] - 90, c2[1] + 44, 'sm', `THE CELLAR · ${Math.round(sfDist(P, C))} m`, 230)}
         <line x1="${ox}" y1="${oy}" x2="${c2[0].toFixed(1)}" y2="${c2[1].toFixed(1)}" stroke="#d8dcff" stroke-width="2.5" stroke-dasharray="6 5"/>${SfHud.you(ox, oy, 'YOU + HER')}</g>
       <g opacity="${b.toFixed(2)}"><circle cx="${n2[0].toFixed(1)}" cy="${n2[1].toFixed(1)}" r="${(SFN.r(s) * sc).toFixed(1)}" fill="#4a3a32" stroke="#ff6a4a" stroke-width="3"/>${T(n2[0] - 20, n2[1] + 80, 'sm', `${sfKm(nd)} km`, 200)}</g>
       <g opacity="${c.toFixed(2)}">${[0, 1, 2, 3].map((i) => { const ang = i * Math.PI / 2 + 0.4; return `<line x1="${n2[0]}" y1="${n2[1]}" x2="${(n2[0] + Math.cos(ang) * 70).toFixed(1)}" y2="${(n2[1] + Math.sin(ang) * 70).toFixed(1)}" stroke="#ff6a4a" stroke-width="3" marker-end="url(#sfAh)" opacity="0.8"/>`; }).join('')}
-        ${T(n2[0] - 14, n2[1] - 70, 'big', q, 80)}${T(30, 440, 'b', 'WHICH WAY IS IT GOING?', 700)}</g>`);
+        ${T(n2[0] - 14, n2[1] - 70, 'big', q, 80)}${T(30, 440, 'b', 'WHICH WAY IS IT GOING?', 700)}</g>
+      <g opacity="${b.toFixed(2)}">${T(30, 104, 'sm', `THE CELLAR: ${Math.round(sfDist(P, C) / SFP.carryV)} s, CARRYING HER`, 700)}${T(30, 140, 'sm', `THE TORNADO: ${Math.round(nd / SFP.tornadoV)} s, IF IT’S COMING AT YOU`, 700)}</g>`);
   }
 }

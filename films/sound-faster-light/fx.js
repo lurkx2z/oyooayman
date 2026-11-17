@@ -27,7 +27,7 @@ function sfFarmFx(set, s, t, o) {
   // ---- other farms' yard lights over the plain
   SF_FARMS.forEach(([x, z], i) => { const y = sfGroundY(x, z) + 9, out = (i % 7 === 3) && s > 175; if (!out) light(far, x, y, z, 4, 0.85, 1.0, 0.72 + 0.2 * sfH(i, 2), 0.4 + 0.3 * sfH(i, 3), 2.4); });
   // ---- the Hansen farm: its yard light and a window, until the tornado takes them
-  if (hansen.alive(s)) { const [x, z] = SF_PLACES.hansen, y = sfGroundY(x, z); light(far, x + 4, y + 8.8, z + 4.8, 3, 0.9, 1.0, 0.75, 0.45, 2.4); light(far, x - 10, y + 2.2, z + 9.6, 1.5, 0.6, 1.0, 0.7, 0.4, 1.6); }
+  if (hansen.alive(s)) { const [x, z] = SF_PLACES.hansen, y = sfGroundY(x, z); light(far, x + 4, y + 8.8, z + 4.8, 6, 1.0, 1.0, 0.75, 0.45, 4.0); light(far, x - 10, y + 2.2, z + 9.6, 2.5, 0.8, 1.0, 0.7, 0.4, 2.6); }
   // ---- the freight train: the headlight and two ditch lights, a few minutes either side of its horn
   if (Math.abs(s - E.train) < 200) { const p = SF_TRAIN.at(s), y = sfGroundY(p[0], p[1]) + 4.5, sd = [-SF_TRAIN.dir[1], SF_TRAIN.dir[0]];
     light(far, p[0], y, p[1], 6, 1.0, 1.0, 0.95, 0.85, 8); for (const k of [-1, 1]) { const fl = 0.55 + 0.45 * Math.max(0, Math.sin(t * Math.PI * 1.5 + (k > 0 ? 0 : Math.PI))); light(far, p[0] + sd[0] * k * 1.2, y - 2.6, p[1] + sd[1] * k * 1.2, 2, fl, 1.0, 0.92, 0.8, 4.5); } }
@@ -38,12 +38,12 @@ function sfFarmFx(set, s, t, o) {
   // ---- the torch's lens (seen from in front), the phones' screens
   if (torch.on) { const [x, y, z] = torch.p, fc = torch.face; glow.add(x, y, z, 0.05 + 0.04 * fc, 0.25 + 0.6 * fc, 1.0, 0.95, 0.85); glow.add(x, y, z, 0.3, 0.14 * fc * fc, 1.0, 0.9, 0.75); }
   // ---- seen from above: where your torch lights the corn, a pool of warm light moving through it
-  if (o.torchTop) { const [x, y, z] = o.torchTop; glow.add(x, y, z, 6.0, 0.4, 1.0, 0.82, 0.55); glow.add(x, y, z, 2.2, 0.55, 1.0, 0.9, 0.7); }
+  if (o.torchTop) { const [x, y, z] = o.torchTop; glow.add(x, y, z, 2.6, 0.22, 1.0, 0.82, 0.55); glow.add(x, y, z, 1.0, 0.4, 1.0, 0.9, 0.7); }
   for (const ph of o.phones) if (ph.on) glow.add(ph.p[0], ph.p[1], ph.p[2], 0.09, 0.22, 0.75, 0.85, 1.0);
   // ---- the sheriff's car: its light bar (red and blue, alternating, soft-edged) and headlights
   if (o.car.on) { const c = o.car; const ph = t * Math.PI * 2 * 1.4, a = 0.5 + 0.5 * Math.sin(ph), b = 1 - a;
     glow.add(c.bar[0] - c.side[0] * 0.4, c.bar[1], c.bar[2] - c.side[1] * 0.4, 0.7 + 1.1 * a, 0.5 * a + 0.05, 1.0, 0.1, 0.06); glow.add(c.bar[0] + c.side[0] * 0.4, c.bar[1], c.bar[2] + c.side[1] * 0.4, 0.7 + 1.1 * b, 0.5 * b + 0.05, 0.12, 0.25, 1.0);
-    for (const k of [-1, 1]) glow.add(c.head[0] + c.side[0] * 0.65 * k, c.head[1], c.head[2] + c.side[1] * 0.65 * k, 0.5, 0.6, 1.0, 0.95, 0.85); }
+    for (const k of [-1, 1]) glow.add(c.head[0] + c.side[0] * 0.62 * k, c.head[1], c.head[2] + c.side[1] * 0.62 * k, 0.32, 0.6, 1.0, 0.95, 0.85); }
   // ---- lightning hits the yard light: a burst of sparks, then molten drips and smoke from the dead lamp
   { const u = s - yardHit; if (u > -0.02 && u < 30) { const [x, y, z] = set.yard.yardLight.lamp;
       for (let i = 0; i < 160; i++) { const L = 0.6 + 1.4 * sfH(i, 1), w = u - 0.02 * sfH(i, 9); if (w < 0 || w > L) continue; const a = sfH(i, 2) * 6.283, v = 3 + 9 * sfH(i, 3), up = -2 + 8 * sfH(i, 4);

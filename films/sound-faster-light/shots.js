@@ -38,11 +38,7 @@ const SF_SHOTS = [];
     // far off: the train, the Hansens' dogs, everything at once
     ['W1', 'train', B('far'), c('far', 1) - 0.5],
     ['W2', 'hansen', c('far', 1) - 0.5, c('far', 2) - 0.5],
-    ['W3', 'plain', c('far', 2) - 0.5, B('bats')],
-    // the bats, blind
-    ['B1', 'bats1', B('bats'), c('bats', 1) - 0.5],
-    ['B2', 'batsHit', c('bats', 1) - 0.5, c('bats', 2) - 0.5],
-    ['B3', 'batsYou', c('bats', 2) - 0.5, B('siren')],
+    ['W3', 'plain', c('far', 2) - 0.5, B('siren')],
     // the sirens; the sheriff's car (no drop in pitch)
     ['S1', 'sirens', B('siren'), c('siren', 1) - 0.5],
     ['S2', 'sheriff', c('siren', 1) - 0.5, c('siren', 2) - 0.5],

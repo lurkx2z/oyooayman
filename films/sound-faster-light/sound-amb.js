@@ -40,7 +40,7 @@ sfSound('amb', 'beds', function (ctx, bus, K) {
       K.putLR(L, R, a, { vol: 0.02, norm: true, room: open, wet: 0.5 }); } }
 
   // ---- from 8:52:00: the same world, mono, dry, in the middle; then the storm builds
-  const cuts = [T0 - 0.01, 40, 80, 120, 160, F(E.tornado) - 9, tRun, 250, END + 1.2];
+  const cuts = [T0 - 0.01, 40, 80, 120, F(E.tornado) - 9, tRun, tRun + 45, END + 1.2];   // (in order: the tornado's roar starts its own segment)
   for (let i = 0; i + 1 < cuts.length; i++) {
     const a = cuts[i], b = cuts[i + 1] + (i + 2 < cuts.length ? 0.04 : 0), fi = i ? 0.04 : 0.008, fo = 0.04;
     const corn = a >= tRun - 0.1;

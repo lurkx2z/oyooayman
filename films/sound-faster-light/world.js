@@ -243,7 +243,7 @@ function sfYard(set) {
   // the pickup
   { const VF = new VehicleFactory(), v = VF.build('pickup', '#6e1c18'), g = new THREE.Group(); g.position.set(F.pickup.x, 0.02, F.pickup.z); g.rotation.y = F.pickup.yaw; g.add(v.group); S.add(g); out.pickup = { g, v }; }
   // trees: [x, z, height, kind] (kind 0 maple, 1 spruce)
-  const trees = [[-26, 18, 13, 0], [-2, 2, 11, 0], [-6, 32, 10, 0], [12, 36, 9, 0], [42, 28, 11, 0], [-30, 40, 11, 0]];
+  const trees = [[-29.5, 20.5, 13, 0], [-2, 2, 11, 0], [-6, 32, 10, 0], [12, 36, 9, 0], [42, 28, 11, 0], [-30, 40, 11, 0]];
   for (let i = 0; i < 10; i++) trees.push([6 + i * 3.8, -38 - (i % 2) * 2.4, 9 + (i % 3), 1]);   // the windbreak, north of the barn
   const trunk = sfStd('#3a2e24', 0.95), leafM = sfStd('#2f4a22', 0.9), spruceM = sfStd('#1e3020', 0.9);
   out.crowns = [];
