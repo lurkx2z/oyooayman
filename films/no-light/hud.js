@@ -33,9 +33,9 @@ const NL_CTX = (() => {
     beat('world', 'PEOPLE WHO CAN SEE', () => ({ v: '0', v2: 'OF 8.2 BILLION' }), 0, 1),
     beat('plane', 'THE PLANE', (t, s) => { const A = NLA.at(s); return { v: `${Math.round(A.y)} <small>m up</small>`, v2: `${(A.y / Math.tan(NLP.plane.glide * Math.PI / 180) / 1000).toFixed(1)} km FROM ITS RUNWAY` }; }),
     beat('water', 'HE’S BEEN IN THE WATER', (t, s) => ({ v: nlMMSS(NLD.inWater(s)), v2: `HIS ARMS GIVE OUT IN ABOUT ${nlArms(s)}` }), 1),
-    beat('crawl', 'TO HIM', (t, s) => ({ v: `${Math.max(0, nlHeadToDriver(s)).toFixed(1)} <small>m</small>`, v2: `IN THE WATER ${nlMMSS(NLD.inWater(s))} · ARMS: ABOUT ${nlArms(s)} LEFT` }), 1),
-    beat('edge', 'TO THE EDGE', (t, s) => ({ v: `${Math.max(0, nlHeadToEdge(s)).toFixed(1)} <small>m</small>`, v2: `IN THE WATER ${nlMMSS(NLD.inWater(s))} · ARMS: ABOUT ${nlArms(s)} LEFT` }), 1),
-    beat('reach', 'TO THE EDGE', (t, s) => ({ v: `${Math.max(0, nlHeadToEdge(s)).toFixed(1)} <small>m</small>`, v2: `IN THE WATER ${nlMMSS(NLD.inWater(s))} · ARMS: ABOUT ${nlArms(s)} LEFT` })),
+    beat('crawl', 'HIS ARMS GIVE OUT IN ABOUT', (t, s) => ({ v: nlArms(s), v2: `TO HIM ${Math.max(0, nlHeadToDriver(s)).toFixed(1)} m · IN THE WATER ${nlMMSS(NLD.inWater(s))}` }), 0),
+    beat('edge', 'HIS ARMS GIVE OUT IN ABOUT', (t, s) => ({ v: nlArms(s), v2: `TO THE EDGE ${Math.max(0, nlHeadToEdge(s)).toFixed(1)} m · IN THE WATER ${nlMMSS(NLD.inWater(s))}` }), 1),
+    beat('reach', 'HIS ARMS GIVE OUT IN ABOUT', (t, s) => ({ v: nlArms(s), v2: `TO THE EDGE ${Math.max(0, nlHeadToEdge(s)).toFixed(1)} m · IN THE WATER ${nlMMSS(NLD.inWater(s))}` })),
   ];
 })();
 // the honest labels (bottom left): [from, to, text]
@@ -46,6 +46,7 @@ const NL_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [nlC(id, k0) - 0.1,
   b('ice', 'ROUGH RULES FOR CLEAR BLACK ICE · SNOW ICE IS WEAKER', 0, 1),
   b('water', 'THE 1-10-1 RULE: 1 MIN TO GET YOUR BREATH · ~10 MIN OF MOVEMENT · ~1 HOUR TO HYPOTHERMIA', 2),
   b('crawl', 'ON THIN ICE THE ADVICE IS: LIE FLAT, SPREAD YOUR WEIGHT', 0),
+  [NL_BOOM.t + 0.4, nlE('sing') + 0.2, `THAT BOOM, FAR OFF: THE PLANE · ${(NL_BOOM.d / 1000).toFixed(0)} km AWAY, IN THE HILLS`],
 ]; })();
 // the insets: [from, to, which, where]
 const NL_INSETS = (() => { const b = (id, k0, id1, k1, w, where = '') => [nlC(id, k0) - 0.25, nlCap(id1, k1).hide + 0.3, w, where]; return [
@@ -110,9 +111,10 @@ class NlHud {
       const c = nlClockParts(s);
       this._txt('ckl', this.clockL, c.day);
       this._html('ckv', this.clockV, `${c.h}:${String(c.m).padStart(2, '0')}<small>:${String(c.sec).padStart(2, '0')}</small> <i>${c.pm ? 'PM' : 'AM'}</i>`);
-      const j = NL_JUMPS.filter((x) => t >= x.t && t < x.t + 2.6).pop();
+      const j = NL_JUMPS.filter((x) => t >= x.t && t < x.t + 3.5).pop();
+      this._cls('ckj', this.clockF, j ? 'f jump' : 'f');
       const jl = j ? '+' + (j.ds >= 90 ? (Math.round(j.ds / 60 * 10) / 10) + ' min' : Math.round(j.ds) + ' s') : '';
-      this._txt('ckf', this.clockF, jl ? jl + '  ·  REAL SPEED' : 'REAL SPEED');
+      this._txt('ckf', this.clockF, jl ? jl + ' LATER' : 'REAL SPEED');
     }
     // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
     const gb = NLT.groups.find((g) => !g.title && t >= g.first - 0.6 && t < g.end + 0.6);

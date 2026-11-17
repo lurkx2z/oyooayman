@@ -298,3 +298,12 @@ const NLA = {
     return { x: y0.x + 60 + dx * u, y: P.plane.alt - u * Math.tan(P.plane.glide * Math.PI / 180), z: y0.z + 120 + dz * u, yaw: hd, pitch: -0.03 };
   },
 };
+// the plane, flying on blind down its glide path, hits the hills west of the lake; its boom reaches you while you stand
+// listening in the dark (heard 3.4 s after "Lake ice cracks as it cools…"): { s (the crash), t (film, heard), d (m) }
+const NL_BOOM = (() => {
+  const sH = nlStoryAt(nlC('sing', 0) + 3.4), k = 1 + NLP.plane.v / NLP.sound;
+  let T = (sH - NLE.plane) / k;
+  for (let i = 0; i < 4; i++) { const A = NLA.at(NLE.plane + T), y = NLY.at2(NLE.plane + T), d = Math.hypot(A.x - y.x, A.y, A.z - y.z); T = sH - NLE.plane - d / NLP.sound; }
+  const A = NLA.at(NLE.plane + T), y = NLY.at2(NLE.plane + T);
+  return { s: NLE.plane + T, t: nlC('sing', 0) + 3.4, d: Math.hypot(A.x - y.x, A.y, A.z - y.z), alt: A.y };
+})();

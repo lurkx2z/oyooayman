@@ -15,9 +15,9 @@ const NL_SHOTS = [];
     ['T1', 'title', -1, NL.tOn],
     ['K0', 'dark', NL.tOn, c('start', 1) - 0.4],
     ['K1', 'sky', c('start', 1) - 0.4, c('start', 2) - 0.5],
-    ['K2', 'dark', c('start', 2) - 0.5, B('skaters')],
+    ['K2', 'dark', c('start', 2) - 0.5, c('start', 2) + 2.3],
     // still gliding at 20 km/h, everyone round you; you hit someone sitting on the ice and go down (black: you tumble)
-    ['G1', 'glide', B('skaters'), c('skaters', 1) - 1.4],
+    ['G1', 'glide', c('start', 2) + 2.3, c('skaters', 1) - 1.4],
     ['G2', 'fall', c('skaters', 1) - 1.4, nlFilmAt(NLE.fall) + 0.18],
     ['G3', 'fallDark', nlFilmAt(NLE.fall) + 0.18, nlFilmAt(NLE.fall) + 1.25],
     // down on the ice among the others; the heat camera; why only visible light (the rule); your skin's own light

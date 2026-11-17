@@ -180,7 +180,7 @@ nlSound('sfx', 'events', function (ctx, bus, K) {
       const buzz = (Math.sin(p3) + 0.5 * Math.sin(2 * p3 + 0.4) + 0.3 * Math.sin(3 * p3 + 1.1)) * 0.12;
       y[i] = (ro[i] * (0.8 + 0.25 * Math.max(0, -fw)) * (1 + 0.15 * w(t)) + whine + buzz) * g * Math.min(1, t / 3, (n / sr - t) / 2.5);
     }
-    K.put(y, tA, { vol: 0.3, norm: true, room: open, wet: 0.35 }); }
+    K.put(y, tA, { vol: 0.2, norm: true, room: open, wet: 0.35 }); }
 
   // ==== THE ROAD: the lorry's diesel creeping along 500 m away; the hit (seen first, heard 1.5 s later); the railing;
   // the car over the bank and onto the ice; its engine still running out there
@@ -188,7 +188,7 @@ nlSound('sfx', 'events', function (ctx, bus, K) {
     const s0 = nlStoryAt(shot('O1').t0) - 2, s1 = nlStoryAt(shot('S1').t0) + 10, d0 = dl(s0) / C;
     const eng = nlEngine(fx, s1 - s0, (tt) => { const s = s0 + tt, u = s - E.hit; return u < 0 ? 720 : u < 0.4 ? 720 - 260 * (u / 0.4) : 560 + 60 * Math.exp(-(u - 0.4) / 1.5); }, { lp: 420, cyl: 6 });
     for (let i = 0; i < eng.length; i++) { const tt = i / sr; eng[i] *= Math.min(1, tt / 1.5); }
-    K.put(eng, F(s0) + d0, { vol: 0.05, norm: true, pan: 0.3, room: open, wet: 0.7 });
+    K.put(eng, F(s0) + d0, { vol: 0.035, norm: true, pan: 0.3, room: open, wet: 0.7 });
     // the hit: a dull crump of steel, the car's glass, metal tearing as it's shoved
     const tH = F(E.hear);
     const boom = fx.hit(fx.panelModes(1.6), { width: 0.012, amp: 1, noise: 0.6, nlen: 0.06, nhp: 250, len: 1.6 });
@@ -280,6 +280,13 @@ nlSound('sfx', 'events', function (ctx, bus, K) {
       K.put(nlPew(fx, { f0: r.range(1800, 5200), f1: r.range(120, 520), d: r.range(0.35, 1.4), thump: r.range(0.1, 0.7) }), t, { vol: (far ? 0.03 : 0.07) * r.range(0.5, 1), norm: true, pan: r.range(-0.9, 0.9), room: open, wet: far ? 1.0 : 0.55, lp: far ? 3000 : 9000 });
     }
     seq(5, (k) => K.put(nlIceBend(fx, r.range(1.5, 3), { rate: [3, 10] }), a + 0.4 + k * (b - a - 3) / 5 + r.range(0, 1), { vol: 0.06, norm: true, pan: r.range(-0.6, 0.6), room: open, wet: 0.8 })); }
+
+  // ==== THE PLANE'S END, 4 km off beyond the hills: a deep boom that rolls round the valley while you stand listening
+  { const t = NL_BOOM.t, d = 6, n = Math.ceil(d * sr), y = nlNoise(fx, n, 'brown'), w = fx.wander(1.2);
+    NLX.bq(y, 'lp', 160, 0.8, sr); NLX.bq(y, 'hp', 22, 0.7, sr);
+    for (let i = 0; i < n; i++) { const tt = i / sr; y[i] *= Math.min(1, tt / 0.04) * (Math.exp(-tt / 0.5) + 0.45 * Math.exp(-tt / 2.2) * (1 + 0.5 * w(tt))) * Math.min(1, (d - tt) / 0.5); }
+    NLX.strike(y, 0, Math.round(0.03 * sr), 0.4, [[34, 0.6, 1], [52, 0.4, 0.7], [77, 0.25, 0.4]], sr);
+    K.put(y, t, { vol: 0.2, norm: true, pan: -0.5, room: open, wet: 1.0, lp: 500 }); }
 
   // ==== YOUR CRAWL: each arm's reach drags your body over the ice (one stroke per π of the crawl phase), her knees
   // behind, your breath; and the ice creaking more the closer you get to the hole

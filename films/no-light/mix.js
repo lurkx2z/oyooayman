@@ -8,12 +8,22 @@
 window.NL_MIX = {
   stems: {
     music: { gain: 2.5, hp: 32 },  // the score leads (the owner's rule of 31 October 2026)
-    amb: { gain: -4.5, hp: 28 },   // the lamps' hum, the concrete, the town below, the street: under the score
-    sfx: { gain: -2.5, hp: 25 },   // footsteps, the guard, the torch, the radio, your car, the barrier
+    amb: { gain: 0.5, hp: 28 },    // the wind over the snow, the town, the fire, the road; the crowd in the dark
+    sfx: { gain: -0.5, hp: 25 },   // blades, falls, breathing, the phone, the plane, the crash, the car, the driver, the ice
   },
   dyn: {
-    // the ramp's climax (4:13 to 4:21) sat 7 dB over the rest of the score in solo renders: brought down 3.5 dB
-    music: [[0, 0, 0], [251, 0, 0], [253.5, 0, -3.5], [261.5, 0, -3.5], [263.5, 0, 0], ['end', -0.04, 0], ['end', 0, -60]],
+    // the score is sparse by the fire, under the plane, on the road (a pulse, then silence before the bang) and by the
+    // glowing hole: lifted 2–3 dB there so it still leads the fire's roar, the jet and the idling engines; the sink sat
+    // 8 dB over the rest: down 4 dB. Keyed to the beats (film seconds from timing.js and physics.js), so a caption
+    // change moves them with the picture.
+    music: (() => {
+      const fire = nlB('fire'), stop = nlFilmAt(NLE.manStop), plane = nlB('plane'), road = nlB('road'), hit = nlFilmAt(NLE.hit),
+        crack = nlFilmAt(NLE.crack), sink = nlFilmAt(NLE.sink), steam = nlB('steam'), sing = nlB('sing');
+      return [[0, 0, 0], [fire - 1.4, 0, 0], [nlC('fire', 0) - 0.45, 0, 3], [stop - 0.6, 0, 3], [stop + 1.4, 0, 0],
+        [plane - 0.5, 0, 0], [plane + 0.5, 0, 2], [road - 1.5, 0, 2], [road, 0, 3], [hit - 0.3, 0, 3], [hit, 0, 0],
+        [crack - 1.4, 0, 0], [crack + 0.6, 0, -4], [sink + 1.6, 0, -4], [sink + 4.1, 0, 0],
+        [steam - 0.5, 0, 0], [steam + 0.5, 0, 2.5], [sing, 0, 2.5], [sing + 1, 0, 0], ['end', -0.04, 0], ['end', 0, -60]];
+    })(),
     amb: [[0, 0, 0], ['end', -0.04, 0], ['end', 0, -60]],
     sfx: [['end', -0.04, 0], ['end', 0, -60]],
   },

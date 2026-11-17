@@ -119,7 +119,7 @@ function nlHeatCar(set, v, o = {}) {
     const mats = Array.isArray(m.material) ? m.material : [m.material];
     const hs = mats.map((mt) => {
       const n = (mt && mt.name) || '';
-      if (/^paint/.test(n)) return nlHeatMat(-7, { hot: [L / 2 - 0.7, 0.75, 0, 1.25, eng], var: 1.2, emis: 0.9 });
+      if (/^paint/.test(n)) return nlHeatMat(-7, { hot: [L / 2 - 0.7, 0.75, 0, o.hotR ?? 1.25, eng], var: 1.2, emis: 0.9 });
       if (n === 'carGlass') return nlHeatMat(-4, { emis: 0.85 });          // glass is opaque to heat: it shows the glass's own temperature
       if (n === 'chrome') return nlHeatMat(-8, { emis: 0.12 });
       if (n === 'headlight') return nlHeatMat(o.lights === false ? -5 : 70, { emis: 0.9 });

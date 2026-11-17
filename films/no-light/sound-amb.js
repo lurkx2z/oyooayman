@@ -19,18 +19,18 @@ nlSound('amb', 'beds', function (ctx, bus, K) {
     const ed = (u, tt) => Math.min(1, tt / fi, (d - tt) / fo);
     // the wind over the snow and the town's low murmur (closer by the road)
     nlBedW(K, a, b, { colour: 'pink', f: [['bp', 560, 0.5], ['lp', 2600]], vol: w === 'dark' ? 0.035 : w === 'fire' ? 0.04 : 0.06, am: 0.7, wr: 0.22, fi, fo });
-    nlBedW(K, a, b, { colour: 'brown', f: [['lp', 220]], vol: w === 'road' ? 0.1 : w === 'dark' ? 0.045 : 0.06, am: 0.4, wr: 0.15, fi, fo });
+    nlBedW(K, a, b, { colour: 'brown', f: [['lp', 220]], vol: w === 'road' ? 0.07 : w === 'dark' ? 0.045 : 0.06, am: 0.4, wr: 0.15, fi, fo });
     if (w === 'dark') nlBedW(K, a, b, { colour: 'pink', f: [['bp', 1600, 0.7], ['lp', 4000]], vol: 0.012, am: 0.3, wr: 0.5, fi, fo });   // the snow's hiss, close
     if (w === 'fire') {
       // the roar (a big wood fire: low, breathing) and its crackle
-      nlBedW(K, a, b, { colour: 'brown', f: [['lp', 380], ['hp', 45]], vol: 0.13, am: 0.55, wr: 0.6, fi, fo });
-      nlBedW(K, a, b, { colour: 'pink', f: [['bp', 900, 0.6], ['lp', 2200]], vol: 0.035, am: 0.8, wr: 0.9, fi, fo });
+      nlBedW(K, a, b, { colour: 'brown', f: [['lp', 380], ['hp', 45]], vol: 0.075, am: 0.55, wr: 0.6, fi, fo });
+      nlBedW(K, a, b, { colour: 'pink', f: [['bp', 900, 0.6], ['lp', 2200]], vol: 0.025, am: 0.8, wr: 0.9, fi, fo });
       const c = nlCrackle(fx, d, { rate: 11 }); for (let i = 0; i < c.length; i++) c[i] *= ed(0, i / fx.sr);
-      K.put(c, a, { vol: 0.09, norm: true, pan: 0.1 });
+      K.put(c, a, { vol: 0.065, norm: true, pan: 0.1 });
     }
     if (w === 'road') {
       // two or three cars idling near (each a little different), the rest a low rumble
-      [[760, -0.4, 0.07], [880, 0.35, 0.05], [700, 0.1, 0.04]].forEach(([rpm, pan, v], k) => { const y = nlEngine(fx, d, (tt) => rpm * (1 + 0.012 * Math.sin(tt * (1.3 + k))), { lp: 600 }); for (let i = 0; i < y.length; i++) y[i] *= ed(0, i / fx.sr); K.put(y, a, { vol: v, norm: true, pan }); });
+      [[760, -0.4, 0.042], [880, 0.35, 0.03], [700, 0.1, 0.024]].forEach(([rpm, pan, v], k) => { const y = nlEngine(fx, d, (tt) => rpm * (1 + 0.012 * Math.sin(tt * (1.3 + k))), { lp: 600 }); for (let i = 0; i < y.length; i++) y[i] *= ed(0, i / fx.sr); K.put(y, a, { vol: v, norm: true, pan }); });
     }
     if (w === 'day') {
       // a crowd skating in the sun: many voices chatting at once, far and near; it stops dead when the light goes
@@ -72,6 +72,8 @@ nlSound('amb', 'beds', function (ctx, bus, K) {
       }
       t += gapAt(t) * r.range(0.5, 1.5);
     }
+    // two horns, clear, while "Far off, car horns." is read: the way to the shore
+    for (const [dt, f, d] of [[0.5, 410, 1.1], [2.4, 455, 0.7]]) K.put(nlHorn(fx, d, f), nlC('count', 1) + dt, { vol: 0.03, norm: true, pan: -0.6, room: open, wet: 0.9, lp: 1800 });
     // far off, horns from the road and the town (blind drivers), every 7 to 20 s
     for (let t = T0 + 5 + r.range(0, 4); t < END - 2; t += r.range(7, 20)) {
       const w = nlWhereShot(nlShotAt(t)); if (w === 'day') continue;

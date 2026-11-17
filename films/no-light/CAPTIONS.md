@@ -20,7 +20,7 @@ status: voiceless
 
 [body] Your skin glows brightest at 9.5 micrometres: a wave 13 times too long for any eye. / Where your hand touched the ice, the ice is still glowing.
 
-[count] 240 people were skating here. Every one of them is out on the ice, in the dark. / It's −12 °C. Nobody knows which way the shore is.
+[count] 240 people were skating here. Every one of them is out on the ice, in the dark. / It's −12 °C. Nobody knows which way the shore is. Far off, car horns.
 
 [grab] Someone just grabbed your arm. / She was skating behind you. She can't see you either.
 
@@ -50,6 +50,6 @@ status: voiceless
 
 [edge] The ice cracks under your hands. / Cracking isn't breaking. Not yet. / He's been in the water for 9 minutes. You're 3 metres from the edge.
 
-[reach] You reach out. Your fingers find his sleeve. / And the ice under your chest starts to bend.
+[reach] You reach out. Your fingers find his sleeve. / And the ice under your chest starts to bend. She's still holding your ankles.
 
 [question] Would you let go?
