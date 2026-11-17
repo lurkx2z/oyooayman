@@ -245,8 +245,9 @@ windows across the whole film, with the stem gains added in:
 
 ## Delivery
 
-- **Runnable ZIP** `air-thinner-film.zip` (in the project files): extract it, open `air-thinner.html` in Chrome or Edge
-  on a computer, wait for SOUND READY, press Space.
+- **Runnable ZIP** `air-thinner-film.zip` (in the project files, 8.4 MB): extract it, open `air-thinner.html` in Chrome
+  or Edge on a computer, wait for SOUND READY, press Space. Tested from a fresh unzip with `tools/check-page.cjs`:
+  SOUND READY after 2 s, no console errors.
 - **Final 1080p MP4**, rendered on the owner's PC (graphics card):
   `node films/air-thinner/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\air-thinner --small`.
   It writes `D:\renders\air-thinner\air-thinner_final_1080p.mp4` (the file to upload) and a 720p preview copy
