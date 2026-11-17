@@ -9,7 +9,7 @@
    ===================================================================== */
 
 const NL_DARK = new Set(['dark', 'grabDark', 'singDark', 'waterDark', 'crackDark', 'question']);
-const NL_POV = new Set(['title', 'hand', 'edge', 'reach']);
+const NL_POV = new Set(['title', 'edge', 'reach']);
 
 function nlLakeSet(app) {
   const F = NL_F, E = NLE, V = NLV;
@@ -30,6 +30,7 @@ function nlLakeSet(app) {
   const mkP = (look, i, kid) => { const p = nlBlades(nlPerson(look, scene, { id: String(i), kid })); nlHeatPerson(set, p); return p; };
   const you = mkP('nlYou', 'you'), her = mkP('nlHer', 'her');
   const sk = NLK.list.map((k, n) => ({ k, P: mkP('nlSk' + (k.look % 9), 'k' + n, k.kid) }));
+  set.cast = { you, her };
   const driver = nlPerson('nlDriver', scene, { id: 'drv' }); nlHeatPerson(set, driver, { wet: true, skin: 24 });
   const man = nlPerson('nlMan', scene, { id: 'man' }); nlHeatPerson(set, man);
   const byFire = [['nlSk2', -3.2, -3.0, 0.7], ['nlSk7', 3.6, -2.4, -0.6], ['nlSk5', -1.0, -4.6, 0.1]].map(([l, dx, dz, yw], i) => { const p = nlPerson(l, scene, { id: 'bf' + i }); nlHeatPerson(set, p); return { P: p, x: F.fire.x + dx, z: F.fire.z + dz, yaw: yw }; });
@@ -37,13 +38,18 @@ function nlLakeSet(app) {
   const phoneLady = nlPerson('nlSk4', scene, { id: 'pl' }); nlHeatPerson(set, phoneLady);
   const ph = nlMesh(new THREE.BoxGeometry(0.075, 0.15, 0.012), nlStd('#111418', 0.2), 0, -0.07, 0.05, phoneLady.j.ra.hand); nlReg(set, ph, nlHeatMat(27, { hot: [0, 0, 0.006, 0.06, 31] }));
   const phHer = nlMesh(new THREE.BoxGeometry(0.075, 0.15, 0.012), nlStd('#111418', 0.2), 0, -0.07, 0.05, her.j.ra.hand); nlReg(set, phHer, nlHeatMat(27, { hot: [0, 0, 0.006, 0.06, 31] }));
-  // the far skaters: simple figures (a body and a head), instanced
-  const farB = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.2, 0.9, 3, 8), nlStd('#2a3038', 0.8), NL_FAR.length), farH = new THREE.InstancedMesh(new THREE.SphereGeometry(0.12, 10, 8), nlStd('#d9b090', 0.7), NL_FAR.length);
-  { const ob = new THREE.Object3D(); NL_FAR.forEach(([x, z, yaw, up, sc], i) => {
-      if (up) { ob.position.set(x, 0.75 * sc + 0.07, z); ob.rotation.set(0, yaw, 0); } else { ob.position.set(x, 0.24, z); ob.rotation.set(Math.PI / 2 * 0.85, yaw, 0); }
-      ob.scale.setScalar(sc); ob.updateMatrix(); farB.setMatrixAt(i, ob.matrix);
-      const hp = up ? [x, 1.45 * sc + 0.07, z] : [x + Math.sin(yaw) * 0.7, 0.28, z + Math.cos(yaw) * 0.7]; ob.position.set(...hp); ob.rotation.set(0, 0, 0); ob.updateMatrix(); farH.setMatrixAt(i, ob.matrix); });
-    for (const m of [farB, farH]) { m.castShadow = true; scene.add(m); } nlReg(set, farB, nlHeatMat(-3, { var: 1.5 })); nlReg(set, farH, nlHeatMat(30)); }
+  // the far skaters: simple figures (a torso, legs, a head), instanced; standing with their arms in, or sitting on the
+  // ice with their legs out in front
+  { const n = NL_FAR.length, torso = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.19, 0.42, 3, 8), nlStd('#2a3038', 0.8), n),
+      legs = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.13, 0.62, 3, 8), nlStd('#1d2026', 0.8), n), headI = new THREE.InstancedMesh(new THREE.SphereGeometry(0.115, 10, 8), nlStd('#d9b090', 0.7), n);
+    const ob = new THREE.Object3D(), put = (m, i, x, y, z, rx, ry, sc) => { ob.position.set(x, y, z); ob.rotation.set(rx, ry, 0, 'YXZ'); ob.scale.setScalar(sc); ob.updateMatrix(); m.setMatrixAt(i, ob.matrix); };
+    NL_FAR.forEach(([x, z, yaw, up, sc], i) => {
+      const f = [Math.sin(yaw), Math.cos(yaw)];
+      if (up) { put(legs, i, x, 0.5 * sc + 0.07, z, 0, yaw, sc); put(torso, i, x, 1.2 * sc + 0.07, z, 0.08, yaw, sc); put(headI, i, x + f[0] * 0.04, 1.62 * sc + 0.07, z + f[1] * 0.04, 0, 0, sc); }
+      else { put(legs, i, x + f[0] * 0.42 * sc, 0.12 * sc, z + f[1] * 0.42 * sc, Math.PI / 2, yaw, sc); put(torso, i, x - f[0] * 0.05, 0.42 * sc, z - f[1] * 0.05, -0.25, yaw, sc); put(headI, i, x - f[0] * 0.14 * sc, 0.86 * sc, z - f[1] * 0.14 * sc, 0, 0, sc); }
+    });
+    for (const m of [torso, legs, headI]) { m.castShadow = true; scene.add(m); }
+    nlReg(set, torso, nlHeatMat(-3, { var: 1.5 })); nlReg(set, legs, nlHeatMat(-6, { var: 1.5 })); nlReg(set, headI, nlHeatMat(24, { var: 2 })); }
   // ---- the road's cars (stopped, engines running, lights on), the lorry, the car that goes onto the lake
   const VF = new VehicleFactory(), roadCars = [];
   for (const [x, z, yaw, type, col] of NL_ROADCARS) { const v = VF.build(type, col); const g = new THREE.Group(); g.position.set(x, F.road.y + 0.03, z); g.rotation.y = yaw - Math.PI / 2; g.add(v.group); scene.add(g); nlHeatCar(set, v, { running: true }); roadCars.push({ g, v, x, z, yaw }); }
@@ -53,20 +59,28 @@ function nlLakeSet(app) {
   // ---- the hole: open water (at 0 °C, warmer than everything round it), broken ice at its rim, slabs afloat
   const hole = new THREE.Group(); hole.position.set(V.hole[0], 0, V.hole[1]); scene.add(hole);
   const waterM = new THREE.MeshStandardMaterial({ color: '#0d151b', roughness: 0.08, metalness: 0.1, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -10 });
-  const water = new THREE.Mesh(new THREE.CircleGeometry(1, 48), waterM); water.rotation.x = -Math.PI / 2; water.position.y = 0.05; hole.add(water); nlReg(set, water, nlHeatMat(0.4, { var: 0.9, po: [-4, -10] }));
+  const water = new THREE.Mesh(new THREE.CircleGeometry(1, 48), waterM); water.rotation.x = -Math.PI / 2; water.position.y = 0.05; hole.add(water); nlReg(set, water, nlHeatMat(1.0, { var: 0.9, po: [-4, -10] }));
   const rim = [], hr = new RNG(313);
-  for (let i = 0; i < 46; i++) { const a = i / 46 * Math.PI * 2 + hr.range(-0.05, 0.05), m = nlMesh(new THREE.BoxGeometry(hr.range(0.3, 0.8), hr.range(0.06, 0.1), hr.range(0.25, 0.6)), nlStd('#cfd9e2', 0.35), 0, 0, 0, hole); m.rotation.set(hr.range(-0.3, 0.3), a, hr.range(-0.3, 0.3)); nlReg(set, m, nlHeatMat(-3.5, { var: 1 })); rim.push({ m, a, k: hr.range(0.9, 1.08), y: hr.range(0.04, 0.09) }); }
-  const slabs = []; for (let i = 0; i < 9; i++) { const m = nlMesh(new THREE.BoxGeometry(hr.range(0.4, 0.9), 0.07, hr.range(0.3, 0.7)), nlStd('#c8d4de', 0.3), 0, 0.07, 0, hole); nlReg(set, m, nlHeatMat(-1.5)); slabs.push({ m, a: hr.range(0, 6.28), r: hr.range(0.2, 0.75), sp: hr.range(-0.05, 0.05) }); }
+  for (let i = 0; i < 64; i++) { const a = i / 64 * Math.PI * 2 + hr.range(-0.04, 0.04), g = new THREE.CylinderGeometry(1, 1, 1, 5); g.scale(hr.range(0.12, 0.3), hr.range(0.05, 0.08), hr.range(0.1, 0.24)); const m = nlMesh(g, nlStd('#cfd9e2', 0.35), 0, 0, 0, hole); m.rotation.set(hr.range(-0.12, 0.12), a + hr.range(-0.6, 0.6), hr.range(-0.12, 0.12)); nlReg(set, m, nlHeatMat(-2.5, { var: 1 })); rim.push({ m, a, k: hr.range(0.92, 1.04), y: hr.range(0.02, 0.05) }); }
+  const slabs = []; for (let i = 0; i < 7; i++) { const g = new THREE.CylinderGeometry(1, 1, 0.06, 6); g.scale(hr.range(0.25, 0.5), 1, hr.range(0.2, 0.4)); const m = nlMesh(g, nlStd('#c8d4de', 0.3), 0, 0.07, 0, hole); nlReg(set, m, nlHeatMat(-1.0)); slabs.push({ m, a: hr.range(0, 6.28), r: hr.range(0.25, 0.7), sp: hr.range(-0.05, 0.05) }); }
   // ---- your handprint on the ice: the heat your palm left (fades over half a minute)
   const printTex = nlTex(nlCanvas(128, 128, (g) => { g.fillStyle = '#fff'; g.beginPath(); g.ellipse(64, 78, 26, 30, 0, 0, 6.28); g.fill(); for (const [x, y, rx, ry, a] of [[40, 36, 7, 20, -0.25], [56, 28, 7, 22, -0.08], [72, 30, 7, 21, 0.06], [87, 40, 6, 17, 0.22], [96, 80, 7, 15, 0.9]]) { g.beginPath(); g.ellipse(x, y, rx, ry, a, 0, 6.28); g.fill(); } }), { repeat: false });
   const printM = new THREE.MeshBasicMaterial({ map: printTex, transparent: true, depthWrite: false, color: new THREE.Color(0, 0, 0), polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -12 });
-  const print = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.2), printM); print.rotation.x = -Math.PI / 2; scene.add(print);
+  const print = new THREE.Mesh(new THREE.PlaneGeometry(0.24, 0.24), printM); print.rotation.x = -Math.PI / 2; scene.add(print);
+  // ---- the cracks that open under your hands at the edge (a decal: lines branching from under you)
+  const crackTex = nlTex(nlCanvas(512, 512, (g) => { const r = new RNG(7171); g.strokeStyle = '#fff'; g.lineCap = 'round';
+    const br = (x, y, a, len, w, d) => { if (d > 5 || len < 8) return; let px = x, py = y; const n = Math.ceil(len / 9); g.lineWidth = w; g.beginPath(); g.moveTo(px, py);
+      for (let i = 0; i < n; i++) { a += r.range(-0.35, 0.35); px += Math.cos(a) * 9; py += Math.sin(a) * 9; g.lineTo(px, py); if (r.next() < 0.08) { g.stroke(); br(px, py, a + r.range(-1.2, 1.2), len * 0.5, w * 0.7, d + 1); g.lineWidth = w; g.beginPath(); g.moveTo(px, py); } } g.stroke(); };
+    for (let i = 0; i < 7; i++) br(256 + r.range(-30, 30), 256 + r.range(-30, 30), i / 7 * 6.283 + r.range(-0.3, 0.3), r.range(160, 260), 3.6, 0); }), { repeat: false });
+  const crackM = new THREE.MeshBasicMaterial({ map: crackTex, transparent: true, depthWrite: false, color: new THREE.Color(0, 0, 0), polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -12 });
+  const cracks = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), crackM); cracks.rotation.x = -Math.PI / 2; scene.add(cracks); set.cracks = cracks;
+  { const p = NLY.at(NLY.dist(nlSC('edge', 1, 1.5)) - NLY.head - 0.4); cracks.position.set(p[0], 0.034, p[1]); cracks.visible = false; }   // (under your hands and ahead of them, while we look)
   // ---- the plane
   const plane = nlPlane(set);
   // ---- particles: hot (added: fire, sparks, engines) and soft (smoke, exhaust, breath, steam)
   const hot = nlPuffs(scene, 2400, { additive: true, soft: 1.4, billow: 0.6 }), soft = nlPuffs(scene, 5000, { soft: 1.7, billow: 0.7 });
   // where your hand rests on the ice (posed once: the print goes there)
-  const youPose = (s) => { const st = NLY.at2(s); let q = nlStatePose(st, s, 0); if (s >= E.hand[0] - 1.2 && s < E.hand[1] + 2.5) q = { p: nlHandPose(s), lay: 0, y: 0.02 }; if (s >= E.lie) q = { p: NL_P.prone(NLY.dist(s) * 1.6, nlReachK(s)), lay: 1, y: 0.13 }; return { st, q }; };
+  const youPose = (s) => { const st = NLY.at2(s); let q = nlStatePose(st, s, 0); if (s >= E.hand[0] - 1.2 && s < E.hand[1] + 8) q = { p: nlHandPose(s), lay: 0, y: 0.02 }; if (s >= E.lie) q = { p: NL_P.prone(NLY.dist(s) * 1.6, nlReachK(s)), lay: 1, y: 0.13 }; return { st, q }; };
   { const s = E.hand[1] - 0.2, { st, q } = youPose(s); nlPlace(you, q, st.x, st.z, st.yaw); you.root.updateMatrixWorld(true); const v = new THREE.Vector3(); you.j.ra.hand.getWorldPosition(v); set.printAt = [v.x, v.z]; print.position.set(v.x, 0.036, v.z); print.rotation.z = -st.yaw; }
 
   set.frame = (t, shot) => {
@@ -86,7 +100,7 @@ function nlLakeSet(app) {
     byFire.forEach((b, i) => nlPlace(b.P, { p: NL_P.standBlind(s, i + 7), lay: 0, y: 0 }, b.x, b.z, b.yaw, nlGroundY(b.x, b.z)));
     { const c = roadCars[7]; const q = NL_P.standBlind(s, 2); q.rSh = [1.2, -0.3]; q.rEl = 2.1; q.neck = 0.25; q.headYaw = -0.1; nlPlace(phoneLady, { p: q, lay: 0, y: 0 }, c.x + 1.2, c.z + 2.4, Math.PI, F.road.y + 0.03); }
     // the lorry and the car
-    { const L = NLV.lorry(s); lorry.g.position.set(L.x, L.y + 0.03, L.z); lorry.g.rotation.y = L.yaw + Math.PI / 2; }
+    { const L = NLV.lorry(s); lorry.g.position.set(L.x, L.y + 0.03, L.z); lorry.g.rotation.y = L.yaw; lorry.g.visible = s > NLE.lorry0 - 60; }
     { const c = NLV.car(s); car.position.set(c.x, c.y + (c.y > -0.01 && NLV.carD(s) < V.shoreD ? 0.03 : 0.0), c.z); car.rotation.set(c.pitch, c.yaw, c.roll); car.visible = c.y > -3.2; }
     shore.rails.forEach((r) => { const kk = MathX.smooth(s - E.hit - (V.edgeD - 1.5) / V.carV, 0, 0.5); r.m.rotation.set(0, 0.9 * kk, -0.5 * kk); r.m.position.set(r.x0 + NLV.dir[0] * 1.6 * kk, r.y0 - 0.5 * kk, r.z0 + NLV.dir[1] * 1.6 * kk); });
     // the hole
@@ -95,11 +109,15 @@ function nlLakeSet(app) {
     driver.root.visible = s >= E.out;
     if (s >= E.out) { const d = NLD.at(s); nlPlace(driver, { p: NL_P.edge(s, d.k), lay: 0, y: 0 }, d.x, d.z, d.yaw, d.y); }
     // the handprint (the heat view only)
-    { const tp = s - E.hand[1]; print.visible = heat && tp > -0.3 && tp < 40; const T = -2.5 - 11 * (1 - Math.exp(-Math.max(0, tp) / 11)); const v = nlHeatRGB(T); printM.color.setRGB(v, v, v); printM.opacity = 0.9 * MathX.smooth(tp, -0.3, 0.1); }
+    { const tp = s - E.hand[1]; print.visible = heat && tp > -0.3 && tp < 40; const v = nlHeatRGB(NLP.printT(tp)); printM.color.setRGB(v, v, v); printM.opacity = 0.9 * MathX.smooth(tp, -0.3, 0.1); }
     // the plane
     { const A = NLA.at(s); plane.g.position.set(A.x, A.y, A.z); plane.g.rotation.set(0, A.yaw, 0); plane.g.visible = Math.abs(s - E.plane) < 60; }
-    nlLakeFx(set, s, t, { hot, soft, shore, roadCars, car, lorry, plane, heat, people: [you, her, man, phoneLady, ...byFire.map((b) => b.P), ...sk.map((q) => q.P)] });
     set.cams[m](t, s, k, shot);
+    // the skies are centred on the camera (the Sun's direction must not shift with where the camera stands)
+    daySky.position.copy(camera.position); heatSky.position.copy(camera.position); sunDisc.position.set(camera.position.x + NL_SUN[0] * 4400, camera.position.y + NL_SUN[1] * 4400, camera.position.z + NL_SUN[2] * 4400);
+    nlLakeFx(set, s, t, { hot, soft, shore, roadCars, car, lorry, plane, heat, people: [you, her, man, phoneLady, driver, ...byFire.map((b) => b.P), ...sk.map((q) => q.P)] });
+    // the cracks under your hands: water seeping up into them (0 °C) draws them warm on the −14 °C snow
+    { const tc = s - NLE.iceCrack; cracks.visible = heat && tc > 0; if (tc > 0) { const v = nlHeatRGB(-7 + 3 * MathX.smooth(tc, 0, 6)); crackM.color.setRGB(v, v, v); crackM.opacity = MathX.smooth(tc, 0, 1.2); } }
     // the Sun's shadows only in daylight: keep the shadow box on the camera's ground, moved in whole texels
     if (!heat) { const tx = 90 / 2048, cx = Math.round((camera.position.x - 25) / tx) * tx, cz = Math.round(camera.position.z / tx) * tx; sun.target.position.set(cx, 0, cz); sun.position.set(cx + NL_SUN[0] * 400, NL_SUN[1] * 400, cz + NL_SUN[2] * 400); sun.target.updateMatrixWorld(); }
   };
@@ -109,14 +127,14 @@ function nlLakeSet(app) {
   // ---- the cameras
   const cam = (p, at, fov, near = 0.05, roll = 0) => { if (camera.near !== near) { camera.near = near; camera.updateProjectionMatrix(); } nlCam(camera, p, at, fov, roll); };
   const head = (P) => { const v = new THREE.Vector3(); P.root.updateMatrixWorld(true); P.j.head.getWorldPosition(v); return [v.x, v.y, v.z]; };
-  const Y1 = NLY.y1, toH = [-NLY.toYou[0], -NLY.toYou[1]], H = V.hole;
+  const Y1 = NLY.y1, toH = [-NLY.toYou[0], -NLY.toYou[1]], H = V.hole, d0 = (t) => nlDrift(t, 0.3, 0.2, 36);
   set.cams = {
     // POV: skating west on the track's north straight, the low Sun ahead and to the left
-    title: (t, s) => { const y = NLY.at2(s), ph = s * 2.6; cam([y.x, 1.62 + NL_SK + 0.03 * Math.sin(ph * 2), y.z + 0.09 * Math.sin(ph)], [y.x - 30, 1.25, y.z + 6.5 + 0.6 * Math.sin(ph)], 62, 0.05, 1.6 * Math.sin(ph)); },
+    title: (t, s) => { const y = NLY.at2(s), ph = s * 2.6; cam([y.x, 1.62 + NL_SK + 0.03 * Math.sin(ph * 2), y.z + 0.09 * Math.sin(ph)], [y.x - 30, 1.6, y.z + 13 + 0.6 * Math.sin(ph)], 62, 0.05, 1.6 * Math.sin(ph)); },
     // beside you on your right (north), travelling with you: the skaters round you glide on, and fall
-    glide: (t, s) => { const y = NLY.at2(s), d = nlDrift(t, 0.05, 0.4, 2); cam([y.x - 2.5 + d[0], 1.25 + d[1], y.z - 6.2], [y.x - 3.6, 0.95, y.z + 0.5], 50); },
+    glide: (t, s) => { const y = NLY.at2(s), d = nlDrift(t, 0.05, 0.4, 2); cam([y.x - 3.2 + d[0], 1.35 + d[1], y.z - 5.6], [y.x - 1.6, 1.0, y.z + 0.4], 50); },
     // ahead of where you fall, low: you come in, hit someone sitting on the ice, go down and slide at us
-    fall: (t, s, k) => { const f = NL_YFALL(), d = nlDrift(t, 0.03, 0.5, 3); cam([f[0] - 13 + d[0], 0.55 + d[1], f[1] + 3.2], [f[0] + 3 - 3 * k, 0.55, f[1] - 0.5], 42); },
+    fall: (t, s, k) => { const f = NL_YFALL(), d = nlDrift(t, 0.03, 0.5, 3); cam([f[0] - 8 + d[0], 0.75 + d[1], f[1] + 7.5], [f[0] + 4 - 4 * k, 0.6, f[1] - 0.3], 40); },
     // high over the track: everyone down, the whole lake, the shore far off
     wide: (t, s, k) => { cam([Y1[0] + 48 - 8 * k, 24 - 3 * k, Y1[1] + 64 - 6 * k], [Y1[0] - 12, 0, Y1[1] - 46], 46, 0.5); },
     // low among them: on hands and knees, sitting, standing with their arms out
@@ -124,11 +142,12 @@ function nlLakeSet(app) {
     // you, sitting on the ice; the woman behind you, further off
     you: (t, s, k) => { const h = head(you), d = nlDrift(t, 0.012, 0.3, 5); cam([h[0] - 3.4 + d[0], 1.0 + d[1], h[2] + 2.6 - 0.3 * k], [h[0] + 0.4, h[1] - 0.15, h[2] - 0.3], 40); },
     // behind you, low: the hills, the black sky, the Sun's disc
-    sky: (t, s, k) => { const h = head(you); cam([h[0] + 2.2, 0.9, h[2] - 3.4], [h[0] + NL_SUN[0] * 400, 10 + 12 * k, h[2] + NL_SUN[2] * 400], 54, 0.05); },
+    sky: (t, s, k) => { const h = head(you), S = NL_SUN, P = [S[2], -S[0]], d = nlDrift(t, 0.01, 0.3, 33); cam([h[0] - S[0] * 3.4 + P[0] * 2.0 + d[0], 1.0 + d[1], h[2] - S[2] * 3.4 + P[1] * 2.0], [h[0] + S[0] * 400 - P[0] * 60, 16 + 6 * k, h[2] + S[2] * 400 - P[1] * 60], 54, 0.05); },
     // behind you, looking north over the lake at the town's lights
     spec: (t, s, k) => { const h = head(you), d = nlDrift(t, 0.01, 0.3, 6); cam([h[0] + 1.6 + d[0], 1.45 + d[1], h[2] + 3.6], [h[0] - 8 - 4 * k, 0.4, h[2] - 70], 46, 0.05); },
-    // your eyes: your right hand on the ice, lifted; its print
-    hand: (t, s, k) => { const h = head(you), p = set.printAt; cam([h[0], h[1] + 0.06, h[2]], [p[0] + (h[0] - p[0]) * 0.1, 0.05, p[1] + (h[2] - p[1]) * 0.1], 54, 0.03); },
+    // low and close: your right hand on the ice, lifted; its print
+    hand: (t, s, k) => { const p = set.printAt, h = head(you), dx = p[0] - h[0], dz = p[1] - h[2], L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L, d = nlDrift(t, 0.004, 0.3, 32);
+      cam([p[0] + ux * 0.62 - uz * 0.3 + d[0], 0.95 + d[1] - 0.08 * k, p[1] + uz * 0.62 + ux * 0.3], [p[0] - ux * 0.12, 0.02, p[1] - uz * 0.12], 40, 0.03); },
     // a slow look round from where you sit: figures all over the ice
     count: (t, s, k) => { const a = -0.55 + 0.9 * k; cam([Y1[0] + 1.5, 2.0, Y1[1] - 1.5], [Y1[0] + 1.5 + Math.cos(a) * 60, 0.6, Y1[1] - 1.5 + Math.sin(a) * 60], 40, 0.05); },
     // ground level: standing people facing every way, the shore's lights small behind them
@@ -136,17 +155,21 @@ function nlLakeSet(app) {
     // you and her: she's holding your sleeve
     her: (t, s, k) => { const a = head(you), b = head(her), m2 = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2], d = nlDrift(t, 0.01, 0.3, 8); cam([m2[0] - 1.9 + d[0], 0.95 + d[1], m2[2] + 1.6 + 0.2 * k], [m2[0], m2[1] - 0.12, m2[2]], 42); },
     // her phone, at her ear
-    phone: (t, s, k) => { const b = head(her), d = nlDrift(t, 0.008, 0.3, 9); cam([b[0] + 0.2 + d[0], b[1] + 0.05 + d[1], b[2] - 1.35 + 0.2 * k], [b[0] - 0.05, b[1] - 0.05, b[2]], 40); },
+    phone: (t, s, k) => { const b = head(her), d = nlDrift(t, 0.008, 0.3, 9); cam([b[0] + 0.5 + d[0], b[1] + 0.1 + d[1], b[2] - 2.1 + 0.2 * k], [b[0] - 0.05, b[1] - 0.15, b[2]], 40); },
     // long lens from the ice to the road: stopped cars, their engines and lamps, the town
     shoreRoad: (t, s, k) => { cam([Y1[0] + 5, 1.6, Y1[1] - 2], [NLV.car0[0] - 120 + 40 * k, 4, F.road.z], 15, 1.0); },
     // you two from behind and below: the hills, the Sun's disc above them
     sun: (t, s, k) => { const a = head(you), d = nlDrift(t, 0.01, 0.3, 10); cam([a[0] - NL_SUN[0] * 3.2 + d[0], 0.75 + d[1], a[2] - NL_SUN[2] * 3.2 + 1.2], [a[0] + NL_SUN[0] * 500, 18, a[2] + NL_SUN[2] * 500], 50, 0.05); },
     // the Sun on the ridge: a hot disc, close
     sunset: (t, s, k) => { const a = head(you); const d = nlDrift(t, 0.4, 0.5, 11); cam([a[0], 1.6, a[2]], [a[0] + NL_SUN[0] * 1000 + d[0] * 30, NL_SUN[1] * 1000 - 8 + d[1] * 30, a[2] + NL_SUN[2] * 1000], 7, 1.0); },
+    // low on the ice, a long lens into the Sun: people standing on the lake against the hills and the Sun's disc
+    sunWide: (t, s, k) => { const d = nlDrift(t, 0.05, 0.3, 27); cam([Y1[0] - NL_SUN[0] * 75 + d[0], 0.7 + d[1], Y1[1] - NL_SUN[2] * 75], [Y1[0] + NL_SUN[0] * 900, 34 + 4 * k, Y1[1] + NL_SUN[2] * 900], 12, 0.5); },
     // the bonfire on the beach, from the ice
     fire: (t, s, k) => { const d = nlDrift(t, 0.02, 0.3, 12); cam([F.fire.x + 9 + d[0], 1.4 + d[1], F.fire.z + 16 - 2 * k], [F.fire.x - 1, 1.2, F.fire.z - 2], 38); },
     // side on: the man walks up to it with his arms out, stops a metre short, steps back
     man: (t, s, k) => { const d = nlDrift(t, 0.01, 0.3, 13), a = NLM.at(s); cam([F.fire.x + 7.5 + d[0], 1.5 + d[1], F.fire.z - 4.5], [(a.x + F.fire.x) / 2, 1.1, (a.z + F.fire.z) / 2], 38); },
+    // close: his hands out in front of him, a metre from the fire; he stops, steps back
+    feel: (t, s, k) => { const a = NLM.at(s), d = nlDrift(t, 0.008, 0.3, 28); cam([F.fire.x + 2.6 + d[0], shore.fire[1] + 1.25 + d[1], F.fire.z + 1.2], [a.x + 0.3, shore.fire[1] + 1.25, a.z + 0.3], 40); },
     // the town from the ice: lamp posts, warm windows, chimneys
     town: (t, s, k) => { cam([40 - 10 * k, 2.2, -360], [10 - 10 * k, 9, -520], 34, 0.5); },
     // on the road: a driver beside her car, her phone to her face
@@ -154,21 +177,29 @@ function nlLakeSet(app) {
     // along the road from the bank: stopped cars, engines and lamps hot, the red-hot exhaust
     road: (t, s, k) => { cam([NLV.car0[0] - 70 + 50 * k, F.road.y + 2.0, F.road.z + 22], [NLV.car0[0] - 50 + 50 * k, F.road.y + 0.9, F.road.z - 2], 40, 0.2); },
     // from where you are, across the ice: the lorry creeping, the hit (the sound comes later)
-    lorry: (t, s, k) => { const y = NLY.at2(s), d = nlDrift(t, 0.15, 0.4, 15); cam([y.x + d[0] * 0.1, 1.6, y.z], [NLV.car0[0] + 8 + d[0], F.road.y + 1.2 + d[1] * 0.4, NLV.car0[1]], 8.5, 1.0); },
+    lorry: (t, s, k) => { const d = nlDrift(t, 0.05, 0.4, 15), c = NLV.car0; cam([c[0] - 34, 2.4, F.road.z + 150], [c[0] + 4 + d[0] * 0.3, F.road.y + 1.0 + d[1] * 0.15, c[1] + 3], 7.5, 1.0); },
+    // you two, from the lake side: the bang has just reached you; heads turn to it
+    turn: (t, s, k) => { const a = head(you), d = nlDrift(t, 0.01, 0.3, 29); cam([a[0] + toH[0] * 4.0 - toH[1] * 1.6 + d[0], 1.45 + d[1], a[2] + toH[1] * 4.0 + toH[0] * 1.6], [a[0] - toH[1] * 0.4, a[1] - 0.15, a[2] + toH[0] * 0.4], 40); },
     // from the ice: through the railing, down the bank, out onto the lake
-    slide: (t, s, k) => { const d = nlDrift(t, 0.03, 0.4, 16); cam([NLV.car0[0] + 36 + d[0], 1.3 + d[1], H[1] + 26], [NLV.car0[0] - 2, 1.0, (NLV.car0[1] + H[1]) / 2 + 4], 34, 0.2); },
+    slide: (t, s, k) => { const d = nlDrift(t, 0.03, 0.4, 16), D = V.dir, c = V.car(s); cam([H[0] + D[0] * 24 + D[1] * 7 + d[0], 1.3 + d[1], H[1] + D[1] * 24 - D[0] * 7], [c.x, c.y + 0.7, c.z], 24, 0.2); },        // on the car's line, ahead of it: it slides at you and stops
     // the car on the lake, low: the engine still running
     out: (t, s, k) => { const d = nlDrift(t, 0.02, 0.3, 17); cam([H[0] + 9 + d[0], 0.7 + d[1], H[1] + 11 - k], [H[0], 0.6, H[1]], 36, 0.1); },
     ice: (t, s, k) => { const d = nlDrift(t, 0.015, 0.3, 18); cam([H[0] - 7 + d[0], 0.45 + d[1], H[1] + 8 - 0.6 * k], [H[0] + 0.5, 0.4, H[1] - 0.5], 38, 0.05); },
     sink: (t, s, k) => { const d = nlDrift(t, 0.04, 0.5, 19); cam([H[0] + 12 + d[0], 1.3 + d[1], H[1] + 15], [H[0], 0.3 - 0.4 * k, H[1]], 30, 0.1); },
     // the hole, glowing; the vapour; you two far off
-    steam: (t, s, k) => { cam([H[0] + 16 - 3 * k, 1.1, H[1] - 8], [H[0] - 10, 0.3, H[1] + 40], 40, 0.1); },
+    steam: (t, s, k) => { const d = nlDrift(t, 0.01, 0.3, 34); cam([H[0] + 5.5 - 0.8 * k + d[0], 1.7 + d[1], H[1] - 6.5 + 0.5 * k], [H[0] - 1.5, 0.25, H[1] + 2], 44, 0.1); },
+    // behind you two, a long lens: the hole far ahead, its glow and its frost smoke; you walk towards it
+    behind: (t, s, k) => { const y = NLY.at2(s), d = nlDrift(t, 0.03, 0.3, 30); cam([y.x - toH[0] * 18 + toH[1] * 2.6 + d[0], 2.1 + d[1], y.z - toH[1] * 18 - toH[0] * 2.6], [H[0], 0.6, H[1]], 13, 0.3); },
     // rising over the lake: the town, the forest, every figure on the ice
-    world: (t, s, k) => { const u = MathX.smooth(k, 0, 1); cam([-60 + 40 * u, 30 + 260 * u, 260 + 260 * u], [-40, 0, -200 + 60 * u], 48, 1.0); },
+    world: (t, s, k) => { const u = MathX.smooth(k, 0, 1); cam([-60 + 40 * u, 22 + 120 * u, -395 + 90 * u], [10, 4 - 10 * u, -560], 44, 1.0); },        // up and back over the town
+    // the forest on the far shore: a slow pan along the spruce
+    forest: (t, s, k) => { const d = nlDrift(t, 0.02, 0.3, 35); cam([-128 + 10 * k + d[0], 1.1 + d[1], -404], [-122 + 12 * k, 9, -446], 44, 0.1); },
     // from you, up: the plane coming in from the east
-    skyup: (t, s, k) => { const y = NLY.at2(s), A = NLA.at(s); cam([y.x, 1.5, y.z], [A.x, A.y, A.z], 34, 0.3); },
+    skyup: (t, s, k) => { const y = NLY.at2(s), A = NLA.at(s); cam([y.x, 1.5, y.z], [A.x, A.y, A.z], 11, 0.3); },
     // it passes over: you look up and follow it
-    plane: (t, s, k) => { const y = NLY.at2(s), A = NLA.at(s); cam([y.x + 1, 1.2, y.z + 1.5], [A.x, A.y, A.z], 60, 0.3); },
+    plane: (t, s, k) => { const y = NLY.at2(s), A = NLA.at(s); cam([y.x + 1, 1.2, y.z + 1.5], [A.x, A.y, A.z], 26, 0.3); },
+    // it goes on west, low over the town and the hills
+    planeAway: (t, s, k) => { const y = NLY.at2(s), A = NLA.at(s); cam([y.x + 0.6, 1.5, y.z + 1.4], [A.x, A.y - 12 * k, A.z], 14, 0.3); },
     // standing, listening: heads turning
     listen: (t, s, k) => { const a = head(you), d = nlDrift(t, 0.012, 0.3, 20); cam([a[0] - toH[0] * 3.6 + toH[1] * 2.2 + d[0], 1.25 + d[1], a[2] - toH[1] * 3.6 - toH[0] * 2.2], [a[0], a[1] - 0.25, a[2]], 44); },
     // the driver at the edge: his arms on the ice, his breath
@@ -178,9 +209,11 @@ function nlLakeSet(app) {
     prone: (t, s, k) => { const y = NLY.at2(s), d = nlDrift(t, 0.01, 0.3, 23); cam([y.x + toH[1] * 4.2 - toH[0] * 1.2 + d[0], 0.6 + d[1], y.z - toH[0] * 4.2 - toH[1] * 1.2], [y.x - toH[0] * 0.8, 0.2, y.z - toH[1] * 0.8], 44, 0.05); },
     // from behind her feet: the two of you in a line, the hole glowing ahead
     chain: (t, s, k) => { const y = NLY.at2(s), d = nlDrift(t, 0.01, 0.3, 24); cam([y.x - toH[0] * 5.5 + d[0], 0.75 + d[1], y.z - toH[1] * 5.5], [H[0], 0.2, H[1]], 30, 0.05); },
+    // low, from beside your head: the cracks running out from under your hands
+    cracks: (t, s, k) => { const h = head(you), d = nlDrift(t, 0.006, 0.3, 31); cam([h[0] + toH[1] * 1.7 - toH[0] * 0.2 + d[0], 0.55 + d[1], h[2] - toH[0] * 1.7 - toH[1] * 0.2], [h[0] + toH[0] * 0.9, 0.0, h[2] + toH[1] * 0.9], 50, 0.05); },
     // your eyes, a hand's width over the ice: the edge, the water, him
     edge: (t, s, k) => { const y = NLY.at2(s), h = head(you), dd = NLD.at(s), d = nlDrift(t, 0.006, 0.3, 25); cam([h[0] + d[0], h[1] + 0.08 + d[1], h[2]], [dd.x, 0.35, dd.z], 52, 0.03); void y; },
-    reach: (t, s, k) => { const h = head(you), dd = NLD.at(s), d = nlDrift(t, 0.006, 0.3, 26), dip = 0.05 * MathX.smooth(k, 0.55, 1); cam([h[0] + d[0], h[1] + 0.06 + d[1] - dip, h[2]], [dd.x, 0.3 - 0.3 * MathX.smooth(k, 0.55, 1), dd.z], 52, 0.03, 2 * MathX.smooth(k, 0.55, 1)); },
+    reach: (t, s, k) => { const h = head(you), dd = NLD.at(s), d = nlDrift(t, 0.006, 0.3, 26), dip = 0.05 * MathX.smooth(k, 0.55, 1); cam([h[0] + d[0], h[1] + 0.06 + d[1] - dip, h[2]], [dd.x - toH[0] * 0.6, 0.12 - 0.25 * MathX.smooth(k, 0.55, 1), dd.z - toH[1] * 0.6], 56, 0.03, 2 * MathX.smooth(k, 0.55, 1)); },
   };
   for (const md of NL_DARK) set.cams[md] = () => {};
 
@@ -191,7 +224,7 @@ function nlLakeSet(app) {
     if (!w) return [];
     if (m === 'you') return [L(head(you), 'YOUR FACE', '+33 °C', w), L([Y1[0] + 1.5, 0.0, Y1[1] + 1.2], 'THE ICE', '−14 °C', w)];
     if (m === 'sky') return [L([head(you)[0] + NL_SUN[0] * 400, NL_SUN[1] * 400 + 2, head(you)[2] + NL_SUN[2] * 400], 'THE SUN', 'STILL UP. STILL WARM', w)];
-    if (m === 'hand' && s > E.hand[1] + 0.6) return [L([set.printAt[0], 0.04, set.printAt[1]], 'YOUR HANDPRINT', `${Math.round(-2.5 - 11 * (1 - Math.exp(-(s - E.hand[1]) / 11)))} °C`, w)];
+    if (m === 'hand' && s > E.hand[1] + 0.6) return [L([set.printAt[0], 0.04, set.printAt[1]], 'YOUR HANDPRINT', `${Math.round(NLP.printT(s - E.hand[1]))} °C`, w)];
     if (m === 'fire') return [L([F.fire.x, 1.6, F.fire.z], 'THE BONFIRE', '800 °C · NO LIGHT', w)];
     if (m === 'town') return [L(shore.lamps[11], 'A STREET LAMP', 'ON · ONLY HEAT', w)];
     if (m === 'window') { const v = new THREE.Vector3(); phoneLady.j.ra.hand.getWorldPosition(v); return [L([v.x, v.y, v.z], 'HER PHONE', 'SCREEN ON', w)]; }
@@ -214,18 +247,18 @@ function nlLakeSet(app) {
 // the lorry: a cab and a box body; its engine (under the cab, at the front) and its lamps hot
 function nlLorry(set) {
   const g = new THREE.Group(), S = set.scene; S.add(g);
-  const cab = nlMesh(new THREE.BoxGeometry(2.5, 2.9, 2.3), nlStd('#d9dbdc', 0.5, 0.2), 0, 1.75, 4.6, g); nlReg(set, cab, nlHeatMat(-5, { hot: [0, -0.8, 0.9, 1.4, 85], var: 1.5 }));
-  const box = nlMesh(new THREE.BoxGeometry(2.55, 3.4, 9.2), nlStd('#2a4a7a', 0.6), 0, 2.15, -1.6, g); nlReg(set, box, nlHeatMat(-10, { var: 1 }));
+  const cab = nlMesh(new THREE.BoxGeometry(2.5, 2.9, 2.3), nlStd('#d9dbdc', 0.5, 0.2), 0, 1.75, 4.6, g); nlReg(set, cab, nlHeatMat(-3, { hot: [0, -1.0, 1.0, 0.7, 60], var: 1.5 }));
+  const box = nlMesh(new THREE.BoxGeometry(2.55, 3.4, 9.2), nlStd('#2a4a7a', 0.6), 0, 2.15, -1.6, g); nlReg(set, box, nlHeatMat(-15, { var: 1 }));
   const grill = nlMesh(new THREE.BoxGeometry(2.2, 0.8, 0.05), nlStd('#222', 0.5), 0, 0.95, 5.78, g); nlReg(set, grill, nlHeatMat(60, { over: 1.2 }));
   const ws = nlMesh(new THREE.BoxGeometry(2.3, 1.1, 0.04), nlStd('#26323d', 0.15, 0.4), 0, 2.45, 5.77, g); nlReg(set, ws, nlHeatMat(-3));
   for (const x of [-0.95, 0.95]) { const l = nlMesh(new THREE.BoxGeometry(0.35, 0.22, 0.05), new THREE.MeshStandardMaterial({ color: '#fff', emissive: '#fff4dd', emissiveIntensity: 2 }), x, 0.85, 5.8, g); nlReg(set, l, nlHeatMat(70, { over: 1.2 })); }
-  for (const [z, w] of [[4.4, 2.3], [-3.6, 2.3], [-5.0, 2.3]]) for (const sd of [-1, 1]) { const wh = nlCyl(0.52, 0.52, 0.4, nlStd('#151515', 0.9), sd * (w / 2 - 0.1), 0.52, z, g, 16); wh.rotation.z = Math.PI / 2; nlReg(set, wh, nlHeatMat(6)); }
+  for (const [z, w] of [[4.4, 2.3], [-3.6, 2.3], [-5.0, 2.3]]) for (const sd of [-1, 1]) { const wh = nlCyl(0.52, 0.52, 0.4, nlStd('#151515', 0.9), sd * (w / 2 - 0.1), 0.52, z, g, 16); wh.rotation.z = Math.PI / 2; nlReg(set, wh, nlHeatMat(14)); }
   return { g };
 }
 // the plane: a twin turboprop on its approach (fuselage, wings, tail, two engines hot, lamps on)
 function nlPlane(set) {
   const g = new THREE.Group(), S = set.scene; S.add(g);
-  const white = nlStd('#eef0f2', 0.4, 0.2), hb = nlHeatMat(-26, { var: 1 });
+  const white = nlStd('#eef0f2', 0.4, 0.2), hb = nlHeatMat(-14, { var: 1 });
   const fus = nlMesh(new THREE.CapsuleGeometry(1.35, 22, 6, 16), white, 0, 0, 0, g); fus.rotation.x = Math.PI / 2; nlReg(set, fus, hb);
   const wing = nlMesh(new THREE.BoxGeometry(27, 0.35, 2.4), white, 0, 1.1, -1, g); nlReg(set, wing, hb);
   const tp = nlMesh(new THREE.BoxGeometry(8.5, 0.25, 1.6), white, 0, 5.0, -11.5, g); nlReg(set, tp, hb);

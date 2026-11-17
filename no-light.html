@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>What if your shadow lagged 1 second behind you?</title>
+  <title>What if there was no light in the universe?</title>
   <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
   <link rel="stylesheet" href="fonts/fonts.css">
   <link rel="stylesheet" href="style.css">
@@ -88,12 +88,13 @@
     .nl-clock .v small { font-variant-numeric: tabular-nums; }
     .nl-ro.dark .v { color: #ff8a6a; }
     .nl-ro.dark.tick .v { color: #ffcf8a; text-shadow: 0 0 calc(var(--u) * 22) rgba(255, 207, 138, 0.8); }
-    /* camera 7's own overlay (white monospace, on the picture: no plates) */
-    .nl-cctv { position: absolute; inset: 0; pointer-events: none; font-family: 'Courier New', monospace; font-weight: 700; color: #f4f4f4; font-size: calc(var(--u) * 38); letter-spacing: 0.06em;
-      text-shadow: 0 0 calc(var(--u) * 3) rgba(0, 0, 0, 0.9), calc(var(--u) * 2) calc(var(--u) * 2) 0 rgba(0, 0, 0, 0.8); }
-    .nl-cctv .a { position: absolute; left: calc(var(--u) * 60); top: calc(var(--u) * 50); }
-    .nl-cctv .b { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 50); }
-    .nl-cctv .r { position: absolute; right: calc(var(--u) * 60); top: calc(var(--u) * 104); color: #ff4a3a; }
+    /* no light at all: the box goes cold; the heat camera's scale (right edge, as on a real thermal camera) */
+    .nl-ro.black .v { color: #ffffff; }
+    .nl-ro .nx { color: #cfd6de; }
+    .nl-scale { position: absolute; right: calc(var(--u) * 58); top: calc(var(--u) * 300); width: calc(var(--u) * 110); pointer-events: none; text-align: right;
+      font-family: var(--hud-font); font-weight: 600; font-size: calc(var(--u) * 24); letter-spacing: 0.06em; color: #e6e8ea; text-shadow: 0 0 calc(var(--u) * 8) rgba(0, 0, 0, 0.9); }
+    .nl-scale .bar { margin: calc(var(--u) * 8) 0 calc(var(--u) * 8) auto; width: calc(var(--u) * 20); height: calc(var(--u) * 300); border-radius: calc(var(--u) * 4);
+      background: linear-gradient(to bottom, #ffffff, #b9bcc0 40%, #5e6166 70%, #050810); box-shadow: 0 0 0 calc(var(--u) * 1.5) rgba(255, 255, 255, 0.45); }
   </style>
 </head>
 <body>
@@ -117,12 +118,12 @@
   </div>
   <div id="debug"></div>
   <div id="startOverlay">
-    <div class="big">What if your shadow lagged 1 second behind you?</div>
+    <div class="big">What if there was no light in the universe?</div>
     <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
     <div id="soundStatus" style="opacity:.75"></div>
     <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
   </div>
-  <div id="loading">BUILDING THE CAR PARK…</div>
+  <div id="loading">FREEZING THE LAKE…</div>
   <div id="errorBox"></div>
 
   <script>
@@ -161,10 +162,10 @@
   <script src="films/no-light/kit.js"></script>
   <script src="films/no-light/film.js"></script>
   <script src="films/no-light/cast.js"></script>
-  <script src="films/no-light/car.js"></script>
-  <script src="films/no-light/deck.js"></script>
-  <script src="films/no-light/deckset.js"></script>
-  <script src="films/no-light/exit.js"></script>
+  <script src="films/no-light/heat.js"></script>
+  <script src="films/no-light/world.js"></script>
+  <script src="films/no-light/fx.js"></script>
+  <script src="films/no-light/lake.js"></script>
   <script src="films/no-light/shots.js"></script>
   <script src="films/no-light/hud.js"></script>
   <script src="films/no-light/audiokit.js"></script>

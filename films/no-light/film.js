@@ -1,5 +1,5 @@
 /* =====================================================================
-   FILM — "What if your shadow lagged 1 second behind you?"
+   FILM — "What if there was no light in the universe?"
      build(app)    every set (each its own THREE.Scene + camera), the HUD, the soundtrack
      update(app,t) the shot's set and camera (shots.js), the HUD (hud.js)
      view(app,t)   [the shot's scene, its camera]
@@ -53,7 +53,7 @@ const FILM = {
   },
 
   view(app, t) {
-    const set = FILM._set || app.sets.world;
+    const set = FILM._set || app.sets.lake;
     if (set.prerender) set.prerender(app);
     return set.view ? set.view() : [set.scene, set.camera];
   },
@@ -73,5 +73,5 @@ const FILM = {
     // the end: no fade-out and no black (nothing signals the end): the film stops on the question, mid-shot
   },
 
-  debug(app, t) { const s = FILM._shot, st = nlStoryAt(t), c = nlClockParts(st); return `shot ${s ? s.id : '-'} · mode ${s ? s.mode : '-'} · ${c.day} ${c.h}:${String(c.m).padStart(2, '0')}:${String(c.sec).padStart(2, '0')} ${c.pm ? 'PM' : 'AM'} · s ${st.toFixed(4)} · ×${nlRateAt(t).toFixed(4)} · ms ${c.ms} · gap ${nlGapAt(st, FILM._set).toFixed(2)} m`; },
+  debug(app, t) { const s = FILM._shot, st = nlStoryAt(t), c = nlClockParts(st); return `shot ${s ? s.id : '-'} · mode ${s ? s.mode : '-'} · ${c.day} ${c.h}:${String(c.m).padStart(2, '0')}:${String(c.sec).padStart(2, '0')} ${c.pm ? 'PM' : 'AM'} · s ${st.toFixed(4)} · ×${nlRateAt(t).toFixed(4)} · ms ${c.ms}`; },
 };

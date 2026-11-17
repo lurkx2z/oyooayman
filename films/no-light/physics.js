@@ -14,7 +14,9 @@ const NLP = (() => {
   P.peakUm = P.wien / (P.skinC + 273.15);      // 9.47 µm
   P.timesRed = P.peakUm / (P.band[1] / 1000);  // 12.6 times the reddest light you could see
   P.sunVisible = 0.44;                         // the share of sunlight's energy between 380 and 750 nm (at the ground, about)
-  P.sunAlt = 2.5; P.sunset = [15, 26];         // °, and 3:26 PM
+  P.sunAlt = (s) => nlSunAt(s).alt;            // ° (geometric), NOAA's formulas (layout.js)
+  P.sunsetS = (() => { let a = 0, b = 4000; for (let k = 0; k < 50; k++) { const m = (a + b) / 2; if (nlSunAt(m).alt > -0.833) a = m; else b = m; } return a; })();
+  P.sunset = [15, Math.round(40 + P.sunsetS / 60 - 60)];   // 3:29 PM
   P.v0Kmh = 24; P.v0 = P.v0Kmh / 3.6;          // your speed when it went dark
   P.glide = 0.06;                              // m/s²: a skate gliding on its own (friction about 0.006)
   P.skaters = 240;
@@ -27,6 +29,7 @@ const NLP = (() => {
   P.plane.alt = P.plane.dist * Math.tan(P.plane.glide * Math.PI / 180) - 0;   // 629 m above the runway
   P.plane.v = 72;                              // m/s on the approach (140 knots)
   P.fireC = 800;
+  P.printT = (tp) => -14 + 13 * Math.exp(-Math.max(0, tp) / 11);   // °C: the ice where your palm was, tp s after you lift it
   P.coldMin = [1, 10];                          // the 1-10 rule: a minute to get your breath, ten of useful movement
   return P;
 })();
@@ -48,18 +51,27 @@ const NLE = (() => {
   E.crack = S('ice', 1, -0.4);
   E.sink = S('ice', 2, -0.7);                   // ★ the ice under the car gives way
   E.out = S('water', 0, -1.7);                  // the driver surfaces at the edge of the hole
-  E.plane = S('plane', 0, 2.4);                 // the plane passes overhead
+  E.plane = S('plane', 0, 0.6);                 // the plane passes overhead (12 km from its runway, 629 m up)
   E.lie = st(nlB('crawl') + 1.0);               // you lie flat
+  E.iceCrack = S('edge', 0, -0.2);               // the ice cracks under your hands (heard in the black)
   return E;
 })();
+
+// where you are at s = 0, and heading (west along the track's north straight)
+const NL_Y0 = [60, NL_F.track.cz - NL_F.track.b];
+function nlGlideX(s) { const P = NLP; const t = Math.min(s, P.v0 / P.glide); return P.v0 * t - 0.5 * P.glide * t * t; }
+const NL_YFALL = () => [NL_Y0[0] - nlGlideX(NLE.fall), NL_Y0[1]];
+// where you come to rest after the fall (you slide on, turning)
+function NL_Y1() { const f = NL_YFALL(), v = NLP.v0 - NLP.glide * NLE.fall; return [f[0] - v * v / (2 * 1.9), f[1] + 1.2]; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // THE ROAD: the lorry, the car it hits, its slide onto the lake (and so where the hole is)
 // ---------------------------------------------------------------------------------------------------------------------
 const NLV = (() => {
   const F = NL_F, V = {};
-  V.car0 = [F.inlet.x - 8, F.road.z + 1.3];      // the car stopped where its driver went blind, nose to the lake
-  V.dir = (() => { const a = -0.22; return [Math.sin(a), Math.cos(a)]; })();   // its heading (mostly south, a little west)
+  V.car0 = [F.inlet.x + 30, F.road.z + 0.2];     // the car stopped where its driver went blind: half turned off the road
+  // (it was turning down to the boat ramp), nose to the lake, its back still in the westbound lane
+  V.dir = (() => { const a = -0.6; return [Math.sin(a), Math.cos(a)]; })();   // its heading (mostly south, a little west)
   V.yaw = Math.atan2(V.dir[0], V.dir[1]);
   // where the lorry's front hits the car's back: the moment comes from the caption "Sound takes … to cross the ice"
   // (the caption shows 0.3 s after the sound arrives)
@@ -105,7 +117,8 @@ NLV.car = (s) => {
   if (s > NLE.crack) roll = 0.015 * Math.sin((s - NLE.crack) * 9) * Math.exp(-(s - NLE.crack) * 2);
   // sinking: the nose (the engine) goes first
   const k = MathX.clamp((s - NLE.sink) / 55, 0, 1);
-  if (s > NLE.sink) { pitch = 0.62 * MathX.smooth(s - NLE.sink, 0, 8) - 0.25 * MathX.smooth(s - NLE.sink, 30, 60); y = -0.35 * MathX.smooth(s - NLE.sink, 0, 2.5) - 3.4 * k * k; roll = 0.08 * MathX.smooth(s - NLE.sink, 2, 12); }
+  // (the ice gives way under the engine: the nose drops in the first seconds; the car floats nose-down a while, then goes)
+  if (s > NLE.sink) { const u = s - NLE.sink; pitch = 0.55 * MathX.smooth(u, 0, 3.5) + 0.12 * MathX.smooth(u, 6, 20) - 0.3 * MathX.smooth(u, 30, 60); y = -0.6 * MathX.smooth(u, 0, 3) - 3.4 * k * k; roll = 0.08 * MathX.smooth(u, 2, 12); }
   void F;
   return { x, y, z, yaw: V.yaw, pitch, roll };
 };
@@ -113,16 +126,16 @@ NLV.car = (s) => {
 NLV.holeR = (s) => (s < NLE.sink ? 0 : 1.6 + 1.3 * MathX.smooth(s - NLE.sink, 0, 4));
 // the lorry: creeping west along the road; it stops dead against the car, then rolls on another 3 m
 NLV.lorry = (s) => {
-  const V = NLV, F = NL_F, xHit = V.car0[0] + 2.6, z = F.road.z - 1.9;
+  const V = NLV, F = NL_F, xHit = V.car0[0] - V.dir[0] * 2.25 + 5.9, z = F.road.z - 1.9;   // (its front, 5.9 m ahead of its middle, meets the car's back)
   const x = s < NLE.hit ? xHit + V.lorryV * (NLE.hit - s) : xHit - 3.0 * MathX.smooth(s - NLE.hit, 0, 2.2);
   return { x, y: F.road.y, z, yaw: -Math.PI / 2, v: s < NLE.hit ? V.lorryV : 0 };
 };
 // the parked or stopped cars on the road (they stopped when their drivers went blind): [x, lane z, yaw, type, colour]
 const NL_ROADCARS = (() => {
   const r = new RNG(907), out = [], F = NL_F;
-  for (const x of [-310, -262, -205, -150, -96, -12, 38, 96, 212, 268, 330]) {
-    const lane = r.next() < 0.5 ? -1 : 1;
-    out.push([x + r.range(-6, 6), F.road.z + lane * 2.0 + r.range(-0.6, 0.6), (lane < 0 ? Math.PI / 2 : -Math.PI / 2) + r.range(-0.5, 0.5), ['sedan', 'hatch', 'suv', 'van'][r.int(0, 3)], ['#2a3a4a', '#8a1f22', '#c9c6bd', '#1f2a24', '#5a5f66', '#0f1012'][r.int(0, 5)]]);
+  for (const x of [-310, -262, -205, -150, -96, -12, 38, 96, 222, 268, 330]) {
+    const lane = x > 150 ? 1 : r.next() < 0.5 ? -1 : 1;           // (east of the car, only the eastbound lane: the lorry comes along the other)
+    out.push([x + r.range(-6, 6), F.road.z + lane * 2.0 + r.range(-0.6, 0.6), (lane < 0 ? -Math.PI / 2 : Math.PI / 2) + r.range(-0.5, 0.5), ['sedan', 'hatch', 'suv', 'van'][r.int(0, 3)], ['#2a3a4a', '#8a1f22', '#c9c6bd', '#1f2a24', '#5a5f66', '#0f1012'][r.int(0, 5)]]);
   }
   return out;
 })();
@@ -130,12 +143,6 @@ const NL_ROADCARS = (() => {
 // ---------------------------------------------------------------------------------------------------------------------
 // YOU (and the woman): positions over the ice
 // ---------------------------------------------------------------------------------------------------------------------
-// where you are at s = 0, and heading (west along the track's north straight)
-const NL_Y0 = [-30, NL_F.track.cz - NL_F.track.b];
-function nlGlideX(s) { const P = NLP; const t = Math.min(s, P.v0 / P.glide); return P.v0 * t - 0.5 * P.glide * t * t; }
-const NL_YFALL = () => [NL_Y0[0] - nlGlideX(NLE.fall), NL_Y0[1]];
-// where you come to rest after the fall (you slide on, turning)
-function NL_Y1() { const f = NL_YFALL(), v = NLP.v0 - NLP.glide * NLE.fall; return [f[0] - v * v / (2 * 1.9), f[1] + 1.2]; }
 // the walk to the sound: [s, x, z] keys (you); the crawl is the last stretch (towards the driver)
 const NLY = (() => {
   const Y = {}, V = NLV, E = NLE;
@@ -150,7 +157,9 @@ const NLY = (() => {
   E.edge3 = nlSC('edge', 2);
   const rFin = 2.9;                                            // the hole's radius by then
   Y.dDriver = 2.4;                                             // the driver's chest from the hole's centre
-  const d40 = 40 + Y.dDriver, d3 = 3 + rFin;
+  Y.head = 0.85;                                               // lying flat, your head is this far ahead of your middle
+  const d40 = 40 + Y.dDriver + Y.head, d3 = 3 + rFin + Y.head; // (the captions' distances are your head's)
+  Y.dFin = 4.75;                                               // where you stop: your fingers on his sleeve
   Y.crawlV = (d40 - d3) / (E.edge3 - E.crawl40);               // m/s, lying flat
   E.lieD = d40 + Y.crawlV * (E.crawl40 - E.lie);              // where you lie down
   // the walk: from Y1 (after the crash) to where you lie down; you stop to listen at the sing beat
@@ -165,7 +174,7 @@ const NLY = (() => {
     let w = Math.min(s, E.listen[0]) - E.walk0;
     if (s > E.listen[1]) w += Math.min(s, E.lie) - E.listen[1];
     if (s <= E.lie) return L - Y.walkV * w;
-    return Math.max(d3 - 0.3, E.lieD - Y.crawlV * (s - E.lie));
+    return Math.max(Y.dFin, E.lieD - Y.crawlV * (s - E.lie));
   };
   Y.L = L;
   return Y;
@@ -252,7 +261,7 @@ const NLK = (() => {
 // the far skaters (simple figures, round the oval and spread over the ice): 240 in all with the near ones
 const NL_FAR = (() => {
   const r = new RNG(5150), out = [], T = NL_F.track;
-  for (let i = 0; i < 190; i++) {
+  for (let i = 0; out.length < NLP.skaters - NLK.list.length && i < 4000; i++) {                // (240 on the ice in all)
     const a = r.range(0, Math.PI * 2), p = nlTrackP(a), lane = r.range(-6, 6), sp = r.next() < 0.3 ? r.range(8, 60) : 0;
     const x = p[0] + lane * Math.cos(a) + sp * r.range(-1, 1), z = p[1] - lane * Math.sin(a) * 0.4 + sp * r.range(-1, 1);
     if (Math.hypot(x - NL_Y0[0], z - NL_Y0[1]) < 70) continue;

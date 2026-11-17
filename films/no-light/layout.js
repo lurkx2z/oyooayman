@@ -1,7 +1,7 @@
 /* =====================================================================
    LAYOUT — where everything is (classic script: globals). Metres. Axes: x EAST, y up, z SOUTH (north is −z).
-   A frozen lake in Norway (61.1° N, near Lillehammer), Sunday 10 January 2027, 2:40 PM. The Sun is 2.5° up in the
-   south-south-west (azimuth 211°) and sets at 3:26 PM. −12 °C, clear and still.
+   A frozen lake in Norway (61.1° N, near Lillehammer), Sunday 10 January 2027, 2:40 PM. The Sun is 2.7° up in the
+   south-south-west (azimuth 211°) and sets at 3:29 PM. −12 °C, clear and still.
      the lake    ice at y = 0, snow on it; a ploughed skating track (an oval, clear ice) in the middle of the north half
      north shore a bank up to the shore road (y = 3), a railing, a boat ramp; a stream comes in under the road at
                  x = 150 (the ice by its mouth is thin); the kiosk and its bonfire on a little beach at x = −66; the town
@@ -21,12 +21,30 @@ const NL_F = {
   lake: { x: [-1500, 1400], zS: 1060 },
   lamps: Array.from({ length: 22 }, (_, k) => -330 + 30 * k),  // lamp posts along the road (north side)
 };
-// the Sun at 2:40 PM on 10 January 2027 from 61.1° N, 10.45° E: altitude 2.5°, azimuth 211.0° (NOAA's formulas;
-// it sets, upper limb with refraction, at 3:26 PM)
-const NL_SUN = (() => { const alt = 2.5 * Math.PI / 180, az = 211.0 * Math.PI / 180; return [Math.sin(az) * Math.cos(alt), Math.sin(alt), -Math.cos(az) * Math.cos(alt)]; })();
+// NOAA solar position (geometric altitude °, azimuth °) at lat, lon, UTC date and hour
+function nlSunPos(lat, lon, y, mo, d, hUTC) {
+  const rad = Math.PI / 180;
+  let Y = y, M0 = mo; if (M0 <= 2) { Y--; M0 += 12; }
+  const A = Math.floor(Y / 100), B = 2 - A + Math.floor(A / 4), JD = Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M0 + 1)) + d + B - 1524.5 + hUTC / 24;
+  const T = (JD - 2451545) / 36525, L0 = (280.46646 + T * (36000.76983 + T * 0.0003032)) % 360, M = 357.52911 + T * (35999.05029 - 0.0001537 * T);
+  const e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T), C = Math.sin(M * rad) * (1.914602 - T * (0.004817 + 0.000014 * T)) + Math.sin(2 * M * rad) * (0.019993 - 0.000101 * T) + Math.sin(3 * M * rad) * 0.000289;
+  const om = 125.04 - 1934.136 * T, lam = L0 + C - 0.00569 - 0.00478 * Math.sin(om * rad);
+  const eps = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60 + 0.00256 * Math.cos(om * rad);
+  const dec = Math.asin(Math.sin(eps * rad) * Math.sin(lam * rad)) / rad, yv = Math.tan(eps / 2 * rad) ** 2;
+  const Eq = 4 * (yv * Math.sin(2 * L0 * rad) - 2 * e * Math.sin(M * rad) + 4 * e * yv * Math.sin(M * rad) * Math.cos(2 * L0 * rad) - 0.5 * yv * yv * Math.sin(4 * L0 * rad) - 1.25 * e * e * Math.sin(2 * M * rad)) / rad;
+  const tst = (hUTC * 60 + Eq + 4 * lon) % 1440, ha = tst / 4 < 0 ? tst / 4 + 180 : tst / 4 - 180;
+  const zen = Math.acos(Math.sin(lat * rad) * Math.sin(dec * rad) + Math.cos(lat * rad) * Math.cos(dec * rad) * Math.cos(ha * rad)) / rad;
+  let az = Math.acos((Math.sin(lat * rad) * Math.cos(zen * rad) - Math.sin(dec * rad)) / (Math.cos(lat * rad) * Math.sin(zen * rad))) / rad;
+  az = ha > 0 ? (az + 180) % 360 : (540 - az) % 360;
+  return { alt: 90 - zen, az };
+}
+// the Sun from the lake (61.1° N, 10.45° E) at story time s (s = 0 is 2:40:00 PM CET = 13:40 UTC, 10 January 2027):
+// at 2:40 PM it is 2.66° up (geometric), azimuth 210.9°; it sets (upper limb, with refraction: −0.833°) at 3:28:56 PM
+const nlSunAt = (s) => nlSunPos(NL_F.lat, 10.45, 2027, 1, 10, 13 + 40 / 60 + s / 3600);
+const NL_SUN = (() => { const p = nlSunAt(0), alt = p.alt * Math.PI / 180, az = p.az * Math.PI / 180; return [Math.sin(az) * Math.cos(alt), Math.sin(alt), -Math.cos(az) * Math.cos(alt)]; })();
 
 // the north shore's line z at x
-function nlShoreZ(x) { return NL_F.shoreZ + 5 * noise1(x * 0.011, 3) + 3 * Math.sin(x * 0.0047 + 1) - 4 * Math.exp(-((x - NL_F.kiosk.x) / 30) ** 2); }
+function nlShoreZ(x) { return NL_F.shoreZ + 5 * noise1(x * 0.011, 3) + 3 * Math.sin(x * 0.0047 + 1) - 4 * Math.exp(-(((x - NL_F.kiosk.x) / 30) ** 2)); }
 // how far outside the lake (x, z) is (m; < 0 = on the lake)
 function nlOut(x, z) {
   const F = NL_F;
@@ -49,8 +67,9 @@ function nlGroundY(x, z) {
     return top + u * 0.07 + 0.012 * u * u * MathX.smooth(u, 80, 400) * 0.06 + 2.5 * noise1(x * 0.02 + z * 0.013, 11) * MathX.smooth(u, 10, 60) + 60 * MathX.smooth(u, 250, 900);
   }
   // other shores: a short bank, then forested hills
-  const k = MathX.smooth(d, 0, 40);
-  return k * (2 + d * 0.05) + MathX.smooth(d, 60, 700) * (55 + 45 * noise1(x * 0.0021 + z * 0.0017, 13) + 30 * noise1(x * 0.007 - z * 0.005, 17));
+  // (lower towards the Sun, south-south-west of the track: from the ice it sits just above that ridge, under 3° up)
+  const k = MathX.smooth(d, 0, 40), da = Math.atan2(x - F.track.cx, z - F.track.cz) - Math.atan2(NL_SUN[0], NL_SUN[2]), low = 1 - 0.82 * Math.exp(-((da / 0.5) ** 2));
+  return k * (2 + d * 0.05) + low * MathX.smooth(d, 60, 700) * (55 + 45 * noise1(x * 0.0021 + z * 0.0017, 13) + 30 * noise1(x * 0.007 - z * 0.005, 17));
 }
 // the oval track's centre line at angle a (0 = east, counter-clockwise seen from above with north up)
 function nlTrackP(a) { const T = NL_F.track; return [T.cx + T.a * Math.cos(a), T.cz - T.b * Math.sin(a)]; }
@@ -73,4 +92,4 @@ const NL_HOUSES = (() => {
   return out;
 })();
 
-if (typeof module !== 'undefined') module.exports = { NL_F, NL_SUN, nlShoreZ, nlOut, nlGroundY, nlTrackP, nlTrackD, NL_HOUSES };
+if (typeof module !== 'undefined') module.exports = { NL_F, NL_SUN, nlSunPos, nlSunAt, nlShoreZ, nlOut, nlGroundY, nlTrackP, nlTrackD, NL_HOUSES };

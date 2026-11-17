@@ -137,7 +137,7 @@ function nlShore(set) {
   const wood = nlStd('#6a3420', 0.85);
   nlReg(set, nlMesh(new THREE.BoxGeometry(3.4, 2.6, 2.6), wood, 0, 1.3, 0, kg), nlHeatMat(-3, { var: 2.5, hot: [0, 1.3, 1.2, 1.2, 9] }));
   nlReg(set, nlMesh(new THREE.BoxGeometry(3.9, 0.25, 3.1), nlStd('#eef0f2', 0.9), 0, 2.72, 0, kg), nlHeatMat(-12));
-  const kw = nlMesh(new THREE.PlaneGeometry(1.8, 0.9), new THREE.MeshStandardMaterial({ color: '#40362a', emissive: '#ffcf8a', emissiveIntensity: 1.0 }), 0, 1.45, 1.33, kg); kw.castShadow = false; nlReg(set, kw, nlHeatMat(16));
+  const kw = nlMesh(new THREE.PlaneGeometry(1.8, 0.9), new THREE.MeshStandardMaterial({ color: '#40362a', emissive: '#ffcf8a', emissiveIntensity: 1.0 }), 0, 1.45, 1.33, kg); kw.castShadow = false; nlReg(set, kw, nlHeatMat(3));
   nlReg(set, nlMesh(new THREE.CylinderGeometry(0.08, 0.08, 1.4, 8), nlStd('#333', 0.5, 0.5), 1.1, 3.4, -0.6, kg), nlHeatMat(55, { over: 1.2 }));
   for (const [bx, bz, by] of [[-3.5, 4.2, 0.4], [3.6, 4.6, -0.5]]) { const b = nlMesh(new THREE.BoxGeometry(2.2, 0.45, 0.5), wood, bx, 0.22, bz, kg); b.rotation.y = by; nlReg(set, b, nlHeatMat(-8)); }
   const fx = F.fire.x, fz = F.fire.z, fy = nlGroundY(fx, fz), fr = new RNG(66);
@@ -155,9 +155,13 @@ function nlTrees(set) {
     if (z > F.road.z - F.road.w / 2 - 6 && z < nlShoreZ(x) + 6 && Math.abs(x) < 900) return;                 // not on the road or the bank
     for (const h of NL_HOUSES) if (Math.abs(x - h[0]) < h[2] / 2 + 3 && Math.abs(z - h[1]) < h[3] / 2 + 3) return;
     if (Math.hypot(x - F.kiosk.x, z - F.kiosk.z) < 14) return;
+    // (a felled strip on the far hills, just where the low Sun sets: from the ice it stays above the treeline)
+    if (z > F.lake.zS - 200 && Math.abs(Math.atan2(x - F.track.cx, z - F.track.cz) - Math.atan2(NL_SUN[0], NL_SUN[2])) < 0.12) return;
     M.push([x, nlGroundY(x, z), z, r.range(hMin, hMax), r.range(0, 6.28), r.next()]);
   };
   for (let i = 0; i < 900; i++) tryAt(r.range(-700, 700), r.range(-470, -760), 5, 14);
+  // a stand of spruce on the bank west of the kiosk, close to the ice (seen up close in the world beat)
+  for (const [x, h] of [[-132, 11], [-126.5, 14], [-121, 9.5], [-116.5, 13], [-111, 10.5], [-137.5, 8.5]]) { const z = nlShoreZ(x) - 5.5 - 1.5 * Math.sin(x); M.push([x, nlGroundY(x, z), z, h, x * 0.7, 0.5]); }
   for (let i = 0; i < 9000; i++) { const a = r.range(0, Math.PI * 2), rad = r.range(1100, 2500); tryAt(rad * Math.cos(a) * 1.05, 300 + rad * Math.sin(a) * 1.1, 12, 24); }
   const g1 = new THREE.ConeGeometry(1, 1, 7, 1, true); g1.translate(0, 0.5, 0);
   const geo = THREE.mergeGeometries([g1.clone().scale(0.42, 0.62, 0.42).translate(0, 0.08, 0), g1.clone().scale(0.3, 0.55, 0.3).translate(0, 0.45, 0), new THREE.CylinderGeometry(0.03, 0.04, 0.2, 5).translate(0, 0.1, 0)].map((x) => x.toNonIndexed()));
@@ -167,7 +171,7 @@ function nlTrees(set) {
   // (instanceColor.r carries a temperature offset for the heat view: ±2 °C; in daylight it would tint, so the colour
   // material ignores it)
   mesh.castShadow = true; mesh.receiveShadow = true; set.scene.add(mesh);
-  mesh.material.onBeforeCompile = (sh) => { sh.vertexShader = sh.vertexShader.replace('#include <color_vertex>', '#include <color_vertex>\n#ifdef USE_INSTANCING_COLOR\nvColor = vec3(1.0);\n#endif'); };
+  mesh.material.onBeforeCompile = (sh) => { sh.vertexShader = sh.vertexShader.replace('#include <color_vertex>', '#include <color_vertex>\n#ifdef USE_INSTANCING_COLOR\nvColor = vColor * 0.0 + 1.0;\n#endif'); };
   nlReg(set, mesh, nlHeatMat(-10.5, { var: 1.6, side: 1 }));
   return mesh;
 }

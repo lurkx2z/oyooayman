@@ -3,9 +3,9 @@
    cast, renamed), this film's looks (you, the woman, the driver, the man at the bonfire, the skaters), and helpers.
    Every person is posed as a pure function of story time s.
      nlPerson(look, parent, kid) → Person ; nlPose(person, pose, x, y, z, yaw)
-     nlAsShadow(person)  every part casts a shadow and nothing is drawn (the late copy of you; the back seat)
-     nlNoShadow(person)  drawn, casting nothing (your body: its shadow is the copy's)
-     nlYouPose(s) → { x, y, z, yaw, pose } your body at story time s (on foot; in the car frame once seated)
+     nlStatePose(state, t, i) → { p, lay, y }   a body state from physics.js (skate, glide, fall, sit, walk, prone …)
+     nlPlace(person, q, x, z, yaw, y0)          put a person there in that pose (laid flat if q.lay)
+     nlHandPose(s), nlReachK(s)                 your hand on the ice (the handprint); your reach at the end
    ===================================================================== */
 
 Object.assign(LOOKS, {
@@ -130,7 +130,7 @@ const NL_P = {
   phone: (t, i) => { const p = NL_P.kneel(t, i); p.rSh = [1.15, -0.35]; p.rEl = 2.35; p.headYaw = -0.2; p.neck = 0.2; return p; },
   holdArm: (t, i) => { const p = NL_P.kneel(t, i); p.lSh = [1.0, -0.15]; p.lEl = 0.35; p.rSh = [0.95, -0.25]; p.rEl = 0.55; p.headYaw = 0.3 * Math.sin(t * 0.4); p.spine = 0.3; return p; },
   // flat on the ice, face down, arms forward; the crawl: an arm reaches, the opposite knee draws up (ph)
-  prone: (ph = 0, reach = 0) => { const p = basePose(); const a = Math.sin(ph); p.lSh = [2.85 + 0.2 * a + 0.15 * reach, 0.28]; p.rSh = [2.85 - 0.2 * a + 0.15 * reach, 0.28]; p.lEl = 0.35 - 0.2 * a; p.rEl = 0.35 + 0.2 * a;
+  prone: (ph = 0, reach = 0) => { const p = basePose(); const a = Math.sin(ph) * (1 - reach); p.lSh = [2.85 + 0.2 * a, 0.28 + 0.1 * reach]; p.rSh = [2.85 - 0.2 * a + 0.25 * reach, 0.28 - 0.3 * reach]; p.lEl = 0.35 - 0.2 * a; p.rEl = (0.35 + 0.2 * a) * (1 - reach);
     p.lHip = [0.1 + 0.25 * Math.max(0, -a), 0.18]; p.rHip = [0.1 + 0.25 * Math.max(0, a), 0.18]; p.lKnee = 0.2 + 0.5 * Math.max(0, -a); p.rKnee = 0.2 + 0.5 * Math.max(0, a); p.neck = -0.55; p.lFoot = 0.4; p.rFoot = 0.4; return p; },
   // holding your ankles: flat, arms forward, still
   proneHold: () => { const p = basePose(); p.lSh = [2.95, 0.12]; p.rSh = [2.95, 0.12]; p.lEl = 0.15; p.rEl = 0.15; p.neck = -0.5; p.lHip = [0.05, 0.15]; p.rHip = [0.05, 0.15]; p.lFoot = 0.4; p.rFoot = 0.4; return p; },
@@ -165,3 +165,14 @@ function nlPlace(P, q, x, z, yaw, y0 = 0) {
   if (q.lay !== 0) { const back = Math.abs(q.lay) * 0.9; P.root.position.x -= Math.sin(yaw) * back; P.root.position.z -= Math.cos(yaw) * back; }   // (lying, the body's middle stays where the person was)
   P.apply(q.p); P.pose = q.p;
 }
+
+// sitting on the ice: you lean and put your right hand flat on it (NLE.hand[0]), lift it (NLE.hand[1]), look at it
+function nlHandPose(s) {
+  const E = NLE, k = nlEase(s, E.hand[0] - 1.2, E.hand[0] - 0.1), up = nlEase(s, E.hand[1], E.hand[1] + 0.9), back = nlEase(s, E.hand[1] + 6.2, E.hand[1] + 7.8);   // (lowered again once the shot has cut away)
+  const base = NL_P.sit(s, 0), p = NL_P.sit(s, 0), down = k * (1 - up);
+  p.spine = 0.25 + 0.42 * down + 0.12 * up; p.neck = 0.05 + 0.35 * down + 0.3 * up; p.headYaw = -0.2 * (down + up);
+  p.rSh = [0.35 + 0.33 * down + 0.75 * up, 0.3 - 0.05 * down]; p.rEl = 0.25 - 0.23 * down + 1.25 * up;
+  return back > 0 ? lerpPose(p, base, back) : p;
+}
+// lying flat at the edge: your right arm reaching out to him (0…1)
+const nlReachK = (s) => nlEase(s, nlSC('reach', 0) - 0.3, nlSC('reach', 0) + 1.8);

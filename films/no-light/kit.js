@@ -205,8 +205,8 @@ function nlGradSky(scene, top, hor, low, o = {}) {
     uniforms: { a: { value: new THREE.Color(top) }, b: { value: new THREE.Color(hor) }, c: { value: new THREE.Color(low) }, sd: { value: new THREE.Vector3(...(o.sunDir || [0, 0.2, -1])).normalize() }, sc: { value: new THREE.Color(o.sunGlow || '#000000') }, hw: { value: o.hw || 0.25 }, k: { value: 1 } },
     vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }',
     fragmentShader: `uniform vec3 a, b, c, sc, sd; uniform float hw, k; varying vec3 vD;
-      void main(){ float h = vD.y; vec3 col = h > 0.0 ? mix(b, a, pow(smoothstep(0.0, 1.0, h / hw * 0.25 + h * 0.75), 0.7)) : mix(b, c, smoothstep(0.0, -0.12, h));
-        float g = max(dot(vD, sd), 0.0); col += sc * (pow(g, 8.0) * 0.5 + pow(g, 90.0) * 1.5);
+      void main(){ vec3 D = normalize(vD); float h = D.y; vec3 col = h > 0.0 ? mix(b, a, pow(smoothstep(0.0, 1.0, h / hw * 0.25 + h * 0.75), 0.7)) : mix(b, c, smoothstep(0.0, -0.12, h));
+        float g = max(dot(D, sd), 0.0); col += sc * (pow(g, 8.0) * 0.5 + pow(g, 90.0) * 1.5);
         gl_FragColor = vec4(col * k, 1.0); }`,
   }));
   m.renderOrder = -10; m.frustumCulled = false; scene.add(m);

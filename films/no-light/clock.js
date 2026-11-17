@@ -19,7 +19,7 @@ const NL = {};
 NL.title = [-0.4, nlE('title') + 0.25];
 NL.end = NLT.duration;
 NL.tOn = nlE('title') + 0.2;                   // ★ (film) 2:40:00 PM: the light stops (s = 0)
-NL.jumps = { world: 40, crawl: 100, edge: 150 };
+NL.jumps = { world: 40, crawl: 200, edge: 120 };
 
 // [film t where a segment starts, story s there (null = carry on), how it runs]: real speed, or a jump of d seconds
 const NL_CLOCK = (() => {

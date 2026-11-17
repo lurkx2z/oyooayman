@@ -1,5 +1,5 @@
 /* =====================================================================
-   SCRIPT — "What if your shadow lagged 1 second behind you?" (16:9, 1920×1080, 30 fps, voiceless).
+   SCRIPT — "What if there was no light in the universe?" (16:9, 1920×1080, 30 fps, voiceless).
    ★ The edit is built AROUND THE CAPTIONS (window.NLT, written by build-timing.cjs from CAPTIONS.md); the story clock
    (clock.js) and everything that moves (physics.js) are placed on them. This file checks that every caption that names
    a moment sits on it (the clock only runs forward: there is no second chance) and that every number in a caption is
@@ -14,65 +14,65 @@ const NL_CHECKS = (() => {
   const fail = (m) => bad.push(m);
   // a caption must come up between lo and hi film seconds after story moment s is on screen
   const near = (id, k, s, lo, hi, what) => { const d = nlC(id, k) - nlFilmAt(s); out.push([`${id}:${k}`, what, d]); if (d < lo || d > hi) fail(`caption ${id}:${k} shows ${d.toFixed(2)} s after ${what} (want ${lo}…${hi})`); };
-  const E = NLE, Y = NLY;
-  near('start', 1, E.step + 1, -0.2, 1.4, 'your shadow steps out');
-  near('hand', 1, E.hand + 0.45, -0.3, 0.6, 'your hand is up');
-  near('hand', 2, E.hand + 1.45, -0.6, 0.4, "the shadow's hand is up");
-  if (nlFilmAt(E.hand + 1) < nlC('hand', 1) + 1.0) fail('hand:1 "Its shadow waits": the shadow starts to move too soon after it');
-  near('stop', 1, E.stop + 1, -1.2, 0.0, 'the shadow reaches you');
-  near('turn', 0, E.turn, -0.6, 0.1, 'you turn');
-  near('jump', 1, E.jump + 1, -0.6, 0.1, "the shadow's take-off");
-  if (nlFilmAt(E.jump + 0.45) > nlC('jump', 1)) fail('jump:1: you have not landed yet');
-  near('hide', 1, E.hidden, 0.2, 1.2, 'you are behind the pillar');
-  if (nlFilmAt(E.hidden + 1) < nlC('hide', 1) + 1.6) fail('hide:1: your shadow goes behind the pillar before the caption can be read');
-  near('still', 1, E.shuffle + 0.6, -0.5, 0.4, 'you stand still');
-  near('guard', 2, E.shield, -0.4, 0.2, 'you shield your eyes');
-  near('run', 0, E.run, -1.6, 0.0, 'you start to run');
-  if (!(nlC('run', 1) > nlFilmAt(E.run) && nlC('run', 1) < nlFilmAt(E.run + 1) - 0.8)) fail('run:1 "For 1 second, your shadow just stands there" is not shown while it stands');
-  near('run', 2, E.run + 1, -0.5, 2.4, 'your shadow starts to run');
-  near('exit', 0, E.exitStop, -2.2, 0.2, 'your car stops');
-  near('exit', 1, E.exitStop + 1, -0.8, 0.8, 'your shadow stops');
-  near('question', 0, E.rise[1], 0.0, 0.8, 'the one in the back has sat up');
+  const E = NLE, Y = NLY, V = NLV, P = NLP;
+  near('start', 0, 0, 0.1, 0.8, 'the light goes');
+  near('skaters', 1, E.fall, -1.4, -0.6, 'you hit someone on the ice');
+  near('body', 1, E.hand[1], 0.6, 6, 'you lift your hand');
+  near('grab', 0, E.grab, 0.2, 0.8, 'she grabs your arm');
+  near('fire', 2, E.manStop, 0.2, 1.2, 'the man stops');
+  near('road', 2, E.hear, 0.1, 0.8, 'the bang reaches you');
+  near('ice', 1, E.crack, 0.0, 0.8, 'the ice cracks under the car');
+  near('ice', 2, E.sink, 0.3, 1.1, 'the ice gives way');
+  near('water', 0, E.out, 1.0, 2.4, 'the driver comes up');
+  near('plane', 0, E.plane, -0.9, -0.3, 'the plane passes over');
+  near('edge', 0, E.iceCrack, 0.0, 0.5, 'the ice cracks under your hands');
+  { const fin = E.edge3 + (Y.dist(E.edge3) - Y.dFin) / Y.crawlV; near('reach', 0, fin, -2.0, 0.0, 'your fingers reach his sleeve'); }
   // the numbers
-  const num = (id, k, re, v, tol, what) => { const m = re.exec(nlCap(id, k).text); if (!m) fail(`caption ${id}:${k}: no number`); const x = parseFloat(m[1].replace(/,/g, '')); out.push([`${id}:${k}`, what, x, v]); if (Math.abs(x - v) > tol) fail(`caption ${id}:${k} says ${x}, physics says ${v.toFixed(3)} (${what})`); };
-  const P = NLP;
-  num('only', 0, /Of ([\d.]+) billion/, P.people / 1e9, 0.5, 'people on Earth');
-  num('light', 1, /floor ([\d.]+) billionths/, P.lightNs, 0.5, 'from your shoulders to the floor, ns');
-  num('light', 2, /normally ([\d.]+) billionths/, P.lightNs, 0.5, 'from your shoulders to the floor, ns');
-  num('light', 3, /more than ([\d.]+) million/, Math.floor(P.ratio / 1e8) * 100, 0, '1 s / 5 ns (more than 100 million)');
-  const sW = nlSC('walk', 1, 0.5);
-  num('walk', 0, /at ([\d.]+) metres a second/, Y.speed(nlSC('walk', 0, 0.8)), 0.05, 'your walking speed');
-  num('walk', 1, /walks ([\d.]+) metres behind/, Y.dist(sW) - Y.dist(sW - 1), 0.05, 'how far behind your shadow walks');
-  num('where', 1, /at ([\d,]+) metres a second/, P.spin, 5, "the Earth's spin here");
-  num('where', 1, /orbit at ([\d.]+) km a second/, P.orbitKms, 0.5, "the Earth's orbit");
-  num('where', 2, /be ([\d.]+) km back/, P.orbitKms * P.lag, 0.5, 'how far the orbit carries you in 1 s');
-  const sR = nlSC('run', 2, 0.6);
-  num('run', 2, /too, ([\d.]+) metres behind/, Y.dist(sR) - Y.dist(sR - 1), 0.3, 'how far behind your running shadow is');
-  num('speed', 0, /at ([\d.]+) km\/h/, NLC.l4(E.ramp).v * 3.6, 0.5, 'your speed at the top of the ramp');
-  num('speed', 1, /is ([\d.]+) metres behind/, NLC.l4(E.ramp).v * P.lag, 0.5, 'how far behind the car your shadow is');
-  if (Math.round(P.overLimit) !== 3) fail(`speed:0 says three times the limit: ${P.overLimit.toFixed(2)}`);
-  // "Right now you have 4" (the four strongest: the 'top' shot casts from the four nearest lit lamps)
-  num('lamps', 0, /you have (\d+)/, 4, 0, 'lamps casting your shadow in the top shot');
-  // the wall clock: "11:58 PM" when the first caption comes up; midnight 0.8 s before "12:00 AM"
-  { const c = nlClockParts(nlSC('start', 0)); if (!(c.h === 11 && c.m === 58 && c.pm)) fail(`start:0 says 11:58 PM: the clock says ${c.h}:${c.m}`); }
-  { const c = nlClockParts(nlSC('midnight', 0)); if (!(c.h === 12 && c.m === 0 && !c.pm)) fail(`midnight:0 says 12:00 AM: the clock says ${c.h}:${c.m}`); }
+  const num = (id, k, re, v, tol, what) => { const m = re.exec(nlCap(id, k).text); if (!m) { fail(`caption ${id}:${k}: no number for ${what}`); return; } const x = parseFloat(m[1].replace(/,/g, '').replace('−', '-')); out.push([`${id}:${k}`, what, x, v]); if (Math.abs(x - v) > tol) fail(`caption ${id}:${k} says ${x}, physics says ${v.toFixed(3)} (${what})`); };
+  { const c = nlClockParts(nlSC('start', 0)); if (!(c.h === 2 && c.m === 40 && c.pm)) fail(`start:0 says 2:40 PM: the clock says ${c.h}:${c.m}`); }
+  num('skaters', 0, /at ([\d.]+) km\/h/, (P.v0 - P.glide * nlSC('skaters', 0, 1.0)) * 3.6, 0.6, 'your speed while the caption is read');
+  num('rule', 2, /([\d.]+) to \d+ nanometres/, P.band[0], 0, 'violet end of the visible band');
+  num('rule', 2, /to ([\d.]+) nanometres/, P.band[1], 0, 'red end of the visible band');
+  num('body', 0, /at ([\d.]+) micrometres/, P.peakUm, 0.06, "the peak of your skin's glow (Wien)");
+  num('body', 0, /([\d.]+) times too long/, P.timesRed, 0.5, 'the peak over the reddest visible light');
+  num('count', 0, /^([\d,]+) people/, NLK.list.length + NL_FAR.length, 0, 'skaters on the ice (the set)');
+  num('count', 0, /^([\d,]+) people/, P.skaters, 0, 'skaters on the ice');
+  num('count', 1, /It's ([−\d.]+) °C/, P.air, 0, 'the air');
+  { const a = P.sunAlt(nlSC('sun', 0)); out.push(['sun:0', "the Sun's altitude (NOAA)", a]); if (!(a < 3 && a > 2)) fail(`sun:0 says less than 3° up: ${a.toFixed(2)}`); }
+  if (!(1 - P.sunVisible > 0.5)) fail('sun:1 says more than half of sunlight is not visible light');
+  { const m = /at (\d+):(\d+) PM/.exec(nlCap('sun', 2).text); if (!m || +m[1] !== P.sunset[0] - 12 || +m[2] !== P.sunset[1]) fail('sun:2: the sunset time'); }
+  num('fire', 0, /burning at ([\d.]+) °C/, P.fireC, 0, 'the fire');
+  num('road', 2, /takes ([\d.]+) seconds/, V.delay, 0.06, 'the bang from the road to you, through −12 °C air');
+  num('ice', 0, /ice ([\d.]+) cm thick/, P.icePerson, 0, 'ice for a person');
+  num('ice', 0, /needs about ([\d.]+)/, P.iceCar, 0, 'ice for a car');
+  num('ice', 1, /only ([\d.]+)/, P.iceInlet, 0, 'the ice by the stream');
+  num('steam', 0, /at ([\d.]+) °C/, P.water, 0, 'the water');
+  num('steam', 0, /That's ([\d.]+) degrees warmer/, P.water - P.air, 0, 'water minus air');
+  num('world', 0, /Right now, ([\d.]+) billion/, P.people / 1e9, 0.5, 'people on Earth');
+  num('plane', 0, /is ([\d.]+) km from/, P.plane.dist / 1000, 0, 'the plane from its runway');
+  num('plane', 0, /, ([\d.]+) metres up/, P.plane.alt, 5, 'its height on a 3° glide path');
+  num('water', 2, /have ([\d.]+) minute/, P.coldMin[0], 0, 'cold shock');
+  num('water', 2, /About ([\d.]+) before/, P.coldMin[1], 0, 'useful movement');
+  num('crawl', 2, /He's ([\d.]+) metres away/, Y.dist(nlSC('crawl', 2, 0.6)) - Y.head - Y.dDriver, 0.6, 'your head to him');
+  num('edge', 2, /water for ([\d.]+) minutes/, NLD.inWater(nlSC('edge', 2)) / 60, 0.3, 'the driver in the water');
+  num('edge', 2, /You're ([\d.]+) metres from the edge/, Y.dist(nlSC('edge', 2, 0.6)) - Y.head - NLV.holeR(nlSC('edge', 2)), 0.25, 'your head to the edge');
   if (bad.length) throw new Error('script.js: ' + bad.join(' · '));
   return out;
 })();
 
 CONFIG.duration = NL.end;
-CONFIG.seed = 20261113;
+CONFIG.seed = 20270110;
 Object.assign(CONFIG.camera, { cameraHeight: 1.63, walkSpeed: 1.2, bobStrength: 0.0, bobFrequency: 1.7, breathingStrength: 0.0, breathRate: 15, fov: 50, shakeStrength: 1.0 });
-CONFIG.render.shadowMapSize = 1024;
+CONFIG.render.shadowMapSize = 2048;
 
 const SCRIPT = {
-  meta: { title: 'What if your shadow lagged 1 second behind you?', wav: 'no-light-soundtrack.wav' },
+  meta: { title: 'What if there was no light in the universe?', wav: 'no-light-soundtrack.wav' },
   events: [],                                            // (filled from the shots by shots.js)
   camera: { baseY: 0, x: [[0, 0]], z: [[0, 0]], height: [[0, 1.63]], yaw: [[0, 0]], pitch: [[0, 0]], fov: [[0, 50]], startles: [], shakes: [] },
   hands: { right: [[0, 'hidden']], left: [[0, 'hidden']] },
   tracks: {},
   hud: {
-    title: { in: NL.title[0], out: NL.title[1], fi: 0.25, fo: 0.5, cls: 'big center', html: '<span class="kick">WHAT IF YOUR NLADOW</span><span class="hero">LAGGED 1 SECOND</span><span class="kick k2">BEHIND YOU?</span>' },
+    title: { in: NL.title[0], out: NL.title[1], fi: 0.25, fo: 0.4, cls: 'big center', html: '<span class="kick">WHAT IF THERE WAS</span><span class="hero">NO LIGHT</span><span class="kick k2">IN THE UNIVERSE?</span>' },
     captions: [],
     readouts: [],
   },

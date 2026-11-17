@@ -1,82 +1,75 @@
 /* =====================================================================
    HUD — this film's overlay (DOM, in #hud; a pure function of time). The centred title is the shared StoryHUD. The
    layout is the long-form films' (Slower light, Friction 10 s, Magnets 1,000×):
-     top left     YOUR NLADOW · 1.00 s LATE; how far behind you it is right now (metres); "everyone else's: on time"
-     top right    the day and the time (to the millisecond while slowed); 3× SLOWER or REAL SPEED; "+34 s" when the
-                  clock jumps at a cut (it only ever runs forward)
+     top left     VISIBLE LIGHT: NONE (since 2:40:00 PM); what the picture is: a heat camera nobody has, or what you see
+     top right    the day and the time; REAL SPEED, or "+40 s" when the clock jumps at a cut (it only runs forward)
      under them   the scene's context box (the number this scene is about)
+     right edge   the heat camera's scale (−24 °C black … +12 °C white), in the heat shots only
      bottom       one caption at a time (CAPTIONS.md via timing.js; numbers in amber)
-     insets       light's last 1.5 m to the floor (5 ns against 1 s); the Earth carrying you (spin, orbit)
+     insets       light by wavelength (the eyes' band gone; your skin's glow); sunlight's energy; ice thickness
      bottom left  the honest labels (what is impossible, what is rough)
-     camera 7     the CCTV picture's own overlay (camera, level, date and time, REC) instead of the panels
-     in the scene labels the set pins to places (set.labels(t) → [{ p, text, sub, a }])
+     in the scene labels the set pins to things (set.labels(t) → [{ p, text, sub, a }])
    ===================================================================== */
 
 const nlClockStr = (s, ms = true) => { const c = nlClockParts(s); return `${c.h}:${String(c.m).padStart(2, '0')}:${String(c.sec).padStart(2, '0')}${ms ? '.' + String(c.ms).padStart(3, '0') : ''}`; };
 const nlN = (x) => Math.round(x).toLocaleString('en-US');
-// how far behind you your shadow is (story s): on foot, your position 1 s ago; in your car, your seat 1 s ago
-function nlGapAt(s, set) {
-  if (s < 0) return 0;
-  const Y = NLY;
-  if (!Y.inCar(s - 1)) { const a = Y.pos(s), b = Y.pos(s - 1); if (Y.inCar(s)) { const c = nlCarFn(set)(s); return Math.hypot(c.x - b[0], c.z - b[1]); } return Math.hypot(a[0] - b[0], a[1] - b[1]); }
-  const car = nlCarFn(set), a = car(s), b = car(s - 1);
-  return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
-}
-const nlCarFn = (set) => (set && set._exit ? NLC.ex : set && set.carAt ? set.carAt : NLC.l4);
-const nlSpeedAt = (s, set) => { if (!NLY.inCar(s)) return NLY.speed(s); const c = nlCarFn(set), h = 0.05, a = c(s - h), b = c(s + h); return Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z) / (2 * h); };
+const nlMMSS = (x) => { x = Math.max(0, x); return `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, '0')}`; };
+// your speed (km/h): gliding, then sliding after the fall, then still
+function nlYouKmh(s) { const P = NLP, E = NLE; if (s < E.fall) return (P.v0 - P.glide * Math.max(0, s)) * 3.6; if (s < E.rest) { const v = P.v0 - P.glide * E.fall, u = (s - E.fall) / (E.rest - E.fall); return v * (1 - u) * 3.6; } return 0; }
+const nlHeadToDriver = (s) => NLY.dist(s) - NLY.head - NLY.dDriver;
+const nlHeadToEdge = (s) => NLY.dist(s) - NLY.head - NLV.holeR(s);
 // the scene's context box: [from, to, label, value(t, s, set) → { v, v2 }] (HTML)
 const NL_CTX = (() => {
   const beat = (id, l, f, k0 = 0, k1) => [nlC(id, k0) - 0.2, (k1 != null ? nlCap(id, k1).hide : nlE(id)) + 0.2, l, f];
-  const gap = (s, set) => nlGapAt(s, set);
-  // (speeding up, the gap is what you covered in the last second, less than your speed now: say so)
-  const acc = (s, set) => (nlSpeedAt(s, set) - nlSpeedAt(s - 1, set) > 0.35 ? ' · SPEEDING UP' : '');
+  const youRoad = Math.hypot(NLV.car0[0] - NLY.y1[0], NLV.car0[1] - NLY.y1[1]);
   return [
-    beat('walk', 'YOUR SPEED', (t, s, set) => ({ v: `${nlSpeedAt(s, set).toFixed(1)} <small>m/s</small>`, v2: `YOUR NLADOW: ${gap(s, set).toFixed(1)} m BEHIND` })),
-    beat('stop', 'YOUR NLADOW', (t, s, set) => ({ v: `${gap(s, set).toFixed(2)} <small>m behind you</small>`, v2: NLY.speed(s) < 0.05 ? 'YOU: STOPPED' : 'YOU: WALKING' })),
-    beat('lamps', 'YOUR NLADOWS', () => ({ v: '4 <small>dark ones</small>', v2: 'ALL OF THEM 1 s LATE' })),
-    beat('where', 'THE EARTH’S SPIN CARRIES YOU AT', () => ({ v: `${nlN(NLP.spin)} <small>m/s</small>`, v2: `ITS ORBIT: ${NLP.orbitKms.toFixed(1)} km/s` }), 0, 0),
-    beat('midnight', 'LAMPS ON, LEVEL 4', (t, s) => ({ v: `${NL_LAMPS.filter((L) => nlLampOn(L.i, s, 4) > 0.5).length} <small>of ${NL_LAMPS.length}</small>`, v2: 'NIGHT MODE FROM 12:00 AM' })),
-    beat('run', 'YOUR SPEED', (t, s, set) => ({ v: `${nlSpeedAt(s, set).toFixed(1)} <small>m/s</small>`, v2: `YOUR NLADOW: ${gap(s, set).toFixed(1)} m BEHIND${acc(s, set)}` }), 1),
-    beat('car', 'YOUR CAR', (t, s, set) => ({ v: `${(nlSpeedAt(s, set) * 3.6).toFixed(0)} <small>km/h</small>`, v2: `YOUR NLADOW: ${gap(s, set).toFixed(1)} m BEHIND IT${acc(s, set)}` }), 1),
-    beat('speed', 'YOUR CAR', (t, s, set) => ({ v: `${(nlSpeedAt(s, set) * 3.6).toFixed(0)} <small>km/h</small>`, v2: 'THE LIMIT: 5 mph (8 km/h)' }), 0, 0),
-    beat('exit', 'YOUR CAR', (t, s, set) => { const v = nlSpeedAt(s, set); return { v: v < 0.02 ? 'STOPPED' : `${(v * 3.6).toFixed(0)} <small>km/h</small>`, v2: `YOUR NLADOW: ${gap(s, set).toFixed(1)} m BEHIND` }; }, 0, 1),
+    beat('skaters', 'YOUR SPEED', (t, s) => ({ v: `${nlYouKmh(s).toFixed(0)} <small>km/h</small>`, v2: 'EYES OPEN · SEEING NOTHING' })),
+    beat('count', 'ON THE ICE', () => ({ v: `${NLP.skaters} <small>people</small>`, v2: `AIR −12 °C · NEAREST SHORE ${Math.round((NLY.y1[1] - nlShoreZ(NLY.y1[0])) / 10) * 10} m` })),
+    beat('sun', 'THE SUN', (t, s) => ({ v: `${NLP.sunAlt(s).toFixed(1)}° <small>up</small>`, v2: `SETS IN ${Math.ceil((NLP.sunsetS - s) / 60)} min · NOBODY WILL SEE IT` }), 0, 0),
+    beat('sun', 'THE SUN', (t, s) => ({ v: `${NLP.sunAlt(s).toFixed(1)}° <small>up</small>`, v2: `SETS IN ${Math.ceil((NLP.sunsetS - s) / 60)} min · NOBODY WILL SEE IT` }), 2),
+    beat('fire', 'THE BONFIRE', () => ({ v: `${NLP.fireC} <small>°C</small>`, v2: 'LIGHT FROM IT: NONE' })),
+    beat('town', 'STREET LAMPS ON', () => ({ v: `${NL_F.lamps.length} <small>of ${NL_F.lamps.length}</small>`, v2: 'LIGHT FROM THEM: NONE' })),
+    beat('road', 'FROM THE ROAD TO YOU', () => ({ v: `${Math.round(youRoad / 10) * 10} <small>m</small>`, v2: `SOUND IN −12 °C AIR: ${Math.round(NLP.sound)} m/s` })),
+    beat('steam', 'OPEN WATER', () => ({ v: '0 <small>°C</small>', v2: 'THE AIR: −12 °C · THE SNOW: −14 °C' })),
+    beat('world', 'PEOPLE WHO CAN SEE', () => ({ v: '0', v2: 'OF 8.2 BILLION' }), 0, 1),
+    beat('plane', 'THE PLANE', (t, s) => { const A = NLA.at(s); return { v: `${Math.round(A.y)} <small>m up</small>`, v2: `${(A.y / Math.tan(NLP.plane.glide * Math.PI / 180) / 1000).toFixed(1)} km FROM ITS RUNWAY` }; }),
+    beat('water', 'HE’S BEEN IN THE WATER', (t, s) => ({ v: nlMMSS(NLD.inWater(s)), v2: 'THE WATER: 0 °C' }), 1),
+    beat('crawl', 'TO HIM', (t, s) => ({ v: `${Math.max(0, nlHeadToDriver(s)).toFixed(1)} <small>m</small>`, v2: `HE’S BEEN IN THE WATER ${nlMMSS(NLD.inWater(s))}` }), 1),
+    beat('edge', 'TO THE EDGE', (t, s) => ({ v: `${Math.max(0, nlHeadToEdge(s)).toFixed(1)} <small>m</small>`, v2: `HE’S BEEN IN THE WATER ${nlMMSS(NLD.inWater(s))}` }), 1),
+    beat('reach', 'TO THE EDGE', (t, s) => ({ v: `${Math.max(0, nlHeadToEdge(s)).toFixed(1)} <small>m</small>`, v2: `HE’S BEEN IN THE WATER ${nlMMSS(NLD.inWater(s))}` })),
   ];
 })();
 // the honest labels (bottom left): [from, to, text]
 const NL_TAGS = (() => { const b = (id, text, k0 = 0, k1) => [nlC(id, k0) - 0.1, (k1 != null ? nlCap(id, k1).hide : nlE(id)) + 0.2, text]; return [
-  b('start', 'THE RULE: YOUR NLADOW IS 1 s LATE · LIGHT, REFLECTIONS AND EVERYONE ELSE’S NLADOWS ARE ON TIME', 1),
-  b('light', 'LIGHT GOES 30 cm IN A BILLIONTH OF A SECOND', 1, 2),
-  b('mirror', 'A MIRROR NLOWS LIGHT THAT BOUNCED OFF YOU: IT ARRIVES ON TIME', 0),
-  b('lamps', 'EVERY LAMP CASTS ONE: THE FOUR NEAREST ARE THE DARKEST', 0),
-  b('impossible', 'THE IMPOSSIBLE PART: LIGHT BEHAVES AS IF YOU WERE STILL WHERE YOU WERE 1 s AGO', 1),
-  b('where', 'THE LATE NLADOW KEEPS TO THE GROUND: IT LAGS IN THE CAR PARK’S FRAME, NOT SPACE’S', 3),
-  b('still', 'A NLADOW THAT STOPS 1 s AFTER YOU IS YOURS · ONE THAT DOESN’T IS SOMEONE ELSE’S', 2),
-  b('guard', 'HIS NLADOW IS ON TIME: THE RULE IS ONLY YOURS', 0, 0),
-  b('speed', 'CAR PARK LIMITS IN THE UK: USUALLY 5 mph', 0),
-  b('cctv', 'A CAMERA SEES LIGHT · YOUR NLADOW IS WHERE THE LIGHT ISN’T', 1),
+  b('start', 'THE RULE: ONLY VISIBLE LIGHT (380–750 nm) STOPS EXISTING · EVERY OTHER KIND STILL WORKS', 1),
+  b('heat', 'A HEAT CAMERA SEES 8–14 µm · BLACK IS COLD, WHITE IS HOT', 1),
+  b('help', 'PHONES STILL WORK: RADIO IS LIGHT TOO, JUST NOT THE KIND EYES USE', 0),
+  b('town', 'THE IMPOSSIBLE PART: A SCREEN STILL DRAWS POWER, AND ALL OF IT BECOMES HEAT', 1),
+  b('ice', 'ROUGH RULES FOR CLEAR BLACK ICE · SNOW ICE IS WEAKER', 0, 1),
+  b('water', 'THE 1-10-1 RULE: 1 MIN TO GET YOUR BREATH · ~10 MIN OF MOVEMENT · ~1 HOUR TO HYPOTHERMIA', 2),
+  b('crawl', 'ON THIN ICE THE ADVICE IS: LIE FLAT, SPREAD YOUR WEIGHT', 0),
 ]; })();
 // the insets: [from, to, which, where]
-const NL_INSETS = (() => { const b = (id, k0, k1, w, where = '') => [nlC(id, k0) - 0.25, (k1 != null ? nlCap(id, k1).hide : nlE(id)) + 0.3, w, where]; return [
-  b('light', 1, 3, 'lamp'), b('where', 1, 2, 'earth'),
+const NL_INSETS = (() => { const b = (id, k0, id1, k1, w, where = '') => [nlC(id, k0) - 0.25, nlCap(id1, k1).hide + 0.3, w, where]; return [
+  b('rule', 2, 'body', 0, 'spectrum'), b('sun', 1, 'sun', 1, 'sunbar'), b('ice', 0, 'ice', 1, 'ice'),
 ]; })();
 
 // a caption's text with its numbers in amber
 function nlCapHtml(s) {
   const esc = s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  return esc.replace(/[−-]?\d+(?:[.,]\d+)*(?::\d+){0,2}(?:\s(?:billionths|billion|million|metres|metre|seconds|second|times|km\/h|km|m\/s|m)\b)?(?:\s(?:AM|PM))?/g, (m) => `<span class="n">${m}</span>`);
+  return esc.replace(/[−-]?\d+(?:[.,]\d+)*(?::\d+){0,2}(?:\s?°\s?C|°)?(?:\s(?:billion|million|metres|metre|seconds|second|minutes|minute|times|km\/h|km|cm|m\/s|m|nanometres|micrometres|degrees)\b)?(?:\s(?:AM|PM))?/g, (m) => `<span class="n">${m}</span>`);
 }
 
 class NlHud {
   constructor(root) {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; root.appendChild(d); return d; };
-    this.ro = mk('nl-ro', '<div class="l">YOUR NLADOW</div><div class="v"></div><div class="s"></div><div class="s nx"></div>');
+    this.ro = mk('nl-ro', '<div class="l">VISIBLE LIGHT</div><div class="v"></div><div class="s"></div><div class="s nx"></div>');
     this.roV = this.ro.querySelector('.v'); this.roS = this.ro.querySelector('.s'); this.roN = this.ro.querySelector('.nx');
     this.ctx = mk('nl-ctx', '<span class="l"></span><span class="v"></span><span class="v2"></span>');
     this.ctxL = this.ctx.querySelector('.l'); this.ctxV = this.ctx.querySelector('.v'); this.ctxV2 = this.ctx.querySelector('.v2');
     this.clock = mk('nl-clock', '<div class="l"></div><div class="v"></div><div class="f"></div>');
     this.clockL = this.clock.querySelector('.l'); this.clockV = this.clock.querySelector('.v'); this.clockF = this.clock.querySelector('.f');
-    this.cctv = mk('nl-cctv', '<div class="a">CAM 07 · LEVEL 2 NORTH</div><div class="b"></div><div class="r">● REC</div>');
-    this.cctvB = this.cctv.querySelector('.b'); this.cctvR = this.cctv.querySelector('.r');
+    this.scale = mk('nl-scale', '<div class="h">+12 °C</div><div class="bar"></div><div class="c">−24 °C</div>');
     this.band = mk('nl-band'); this.cap = mk('nl-cap'); this.tag = mk('nl-tag');
     this.caps = NLT.groups.filter((g) => !g.title).flatMap((g) => g.caps.map((c) => ({ show: c.show, hide: c.hide, html: nlCapHtml(c.text), q: g.id === 'question' })));
     this.inset = mk('nl-inset');
@@ -88,41 +81,39 @@ class NlHud {
   _cls(k, el, v) { if (this._last[k] === v) return; this._last[k] = v; el.className = v; }
 
   update(t, shot, set, app) {
-    const W = StoryHUD.win, s = set && set._s != null ? set._s : nlStoryAt(t), rate = nlRateAt(t);
+    const W = StoryHUD.win, s = set && set._s != null ? set._s : nlStoryAt(t);
     void app;
-    const cc = shot && shot.mode === 'cctv';
-    // ---- your shadow: 1.00 s late; how far behind you
-    const ra = W(t, NL.title[1] - 0.5, NL.end + 1, 0.4, 0.5) * (cc ? 0 : 1);
+    const dark = shot && NL_DARK.has(shot.mode), heatView = shot && !dark && shot.mode !== 'title';
+    // ---- visible light: none; what the picture is
+    const ra = W(t, NL.title[1] - 0.5, NL.end + 1, 0.4, 0.5);
     this._set('ro', this.ro, 'opacity', ra.toFixed(3));
     if (ra > 0) {
-      this._html('rov', this.roV, s < 0 ? 'ON TIME' : '1.00 s <small>LATE</small>');
-      const g = nlGapAt(s, set);
-      this._html('ros', this.roS, s < 0 ? '' : `<b>${g.toFixed(g < 10 ? 2 : 1)} m</b> BEHIND YOU`);
-      this._html('ron', this.roN, s < 0 ? '' : 'EVERYONE ELSE’S: ON TIME');
-      this._cls('roc', this.ro, s < 0 ? 'nl-ro' : 'nl-ro dark');
+      this._html('rov', this.roV, s < 0 ? 'ON' : 'NONE');
+      this._html('ros', this.roS, s < 0 ? '' : '380–750 nm · GONE SINCE <b>2:40:00 PM</b>');
+      this._html('ron', this.roN, s < 0 ? '' : dark ? 'ON SCREEN: WHAT YOU SEE' : 'ON SCREEN: A HEAT CAMERA · NOBODY HAS ONE');
+      this._cls('roc', this.ro, s < 0 ? 'nl-ro' : dark ? 'nl-ro dark black' : 'nl-ro dark');
     }
+    // ---- the heat camera's scale
+    const inA0 = (() => { const w = NL_INSETS.find((x) => t >= x[0] - 0.3 && t < x[1] + 0.3); return w ? W(t, w[0] - 0.3, w[1] + 0.3, 0.4, 0.4) : 0; })();
+    this._set('sca', this.scale, 'opacity', heatView ? (0.9 * (1 - inA0) * W(t, NL.title[1] - 0.2, NL.end + 1, 0.4, 0.5)).toFixed(3) : '0');
     // ---- the context box
     const cx = NL_CTX.find((x) => t >= x[0] && t < x[1]), inA = (() => { const w = NL_INSETS.find((x) => t >= x[0] - 0.3 && t < x[1] + 0.3); return w ? W(t, w[0] - 0.3, w[1] + 0.3, 0.4, 0.4) : 0; })();
-    this._set('cx', this.ctx, 'opacity', cx && !cc ? (W(t, cx[0], cx[1], 0.4, 0.4) * (1 - inA)).toFixed(3) : '0');
+    this._set('cx', this.ctx, 'opacity', cx ? (W(t, cx[0], cx[1], 0.4, 0.4) * (1 - inA)).toFixed(3) : '0');
     if (cx) { const r = cx[3](t, s, set); this._txt('cxl', this.ctxL, cx[2]); this._html('cxv', this.ctxV, r.v); this._html('cxv2', this.ctxV2, r.v2 || ''); }
     // ---- the honest label
     const tg = NL_TAGS.find((x) => t >= x[0] && t < x[1]);
     if (tg) this._txt('tgt', this.tag, tg[2]);
-    // ---- the day and the time; how slowed down, or a jump
-    const ca = W(t, NL.title[1] - 0.5, NL.end + 1, 0.4, 0.5) * (cc ? 0 : 1);
+    // ---- the day and the time; a jump
+    const ca = W(t, NL.title[1] - 0.5, NL.end + 1, 0.4, 0.5);
     this._set('ck', this.clock, 'opacity', ca.toFixed(3));
     if (ca > 0) {
-      const c = nlClockParts(s), ms = rate < 0.9 ? `<small>.${String(c.ms).padStart(3, '0')}</small>` : '';
+      const c = nlClockParts(s);
       this._txt('ckl', this.clockL, c.day);
-      this._html('ckv', this.clockV, `${c.h}:${String(c.m).padStart(2, '0')}<small>:${String(c.sec).padStart(2, '0')}</small>${ms} <i>${c.pm ? 'PM' : 'AM'}</i>`);
+      this._html('ckv', this.clockV, `${c.h}:${String(c.m).padStart(2, '0')}<small>:${String(c.sec).padStart(2, '0')}</small> <i>${c.pm ? 'PM' : 'AM'}</i>`);
       const j = NL_JUMPS.filter((x) => t >= x.t && t < x.t + 2.6).pop();
-      const jl = j ? '+' + (j.ds >= 90 ? Math.round(j.ds / 60) + ' min' : Math.round(j.ds) + ' s') : '';
-      const tl = rate < 0.9 ? (Math.round(10 / rate) / 10) + '× SLOWER' : 'REAL SPEED';
-      this._txt('ckf', this.clockF, jl ? jl + '  ·  ' + tl : tl);
+      const jl = j ? '+' + (j.ds >= 90 ? (Math.round(j.ds / 60 * 10) / 10) + ' min' : Math.round(j.ds) + ' s') : '';
+      this._txt('ckf', this.clockF, jl ? jl + '  ·  REAL SPEED' : 'REAL SPEED');
     }
-    // ---- camera 7's own overlay
-    this._set('cca', this.cctv, 'opacity', cc ? '1' : '0');
-    if (cc) { const c = nlClockParts(s), H = (c.h % 12) + (c.pm ? 12 : 0); this._txt('ccb', this.cctvB, `14/11/2026  ${String(H).padStart(2, '0')}:${String(c.m).padStart(2, '0')}:${String(c.sec).padStart(2, '0')}`); this._set('ccr', this.cctvR, 'opacity', Math.floor(t * 1.2) % 2 ? '0.25' : '1'); }
     // ---- the caption (on a soft band along the bottom, there for the whole beat so it doesn't pump)
     const gb = NLT.groups.find((g) => !g.title && t >= g.first - 0.6 && t < g.end + 0.6);
     this._set('band', this.band, 'opacity', gb ? W(t, gb.first - 0.3, gb.end + 0.3, 0.5, 0.6).toFixed(3) : '0');
@@ -135,27 +126,30 @@ class NlHud {
     this._insets(t, s, set);
     this._inRect = null;
     if (Number(this.inset.style.opacity) > 0.02) { const r = this.inset.getBoundingClientRect(), o = this.root.getBoundingClientRect(); this._inRect = { l: r.left - o.left, r: r.right - o.left, t: r.top - o.top, b: r.bottom - o.top }; }
-    // ---- labels pinned in the scene
+    // ---- labels pinned in the scene (the side is chosen from this frame's measured width: measure first, then place)
     const L = set && set.labels ? set.labels(t) || [] : [];
     while (this.labels.length < L.length) { const d = document.createElement('div'); d.className = 'nl-lab'; this.root.appendChild(d); this.labels.push(d); }
     const cam = set ? set.camera : null, _p = NlHud._p || (NlHud._p = new THREE.Vector3());
     this.labels.forEach((d, i) => {
       const l = L[i];
       if (!l || !cam || !(l.a > 0)) { d.style.opacity = '0'; return; }
+      const tx = `<span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`;
       _p.set(l.p[0], l.p[1], l.p[2]).project(cam);
       const vis = _p.z < 1 && Math.abs(_p.x) < 1.1 && Math.abs(_p.y) < 1.1;
-      d.style.opacity = vis ? String(l.a ?? 1) : '0';
       const lx = MathX.clamp((_p.x * 0.5 + 0.5) * 100, 3, 97), ly = (-_p.y * 0.5 + 0.5) * 100;
+      if (d._tx !== tx) { d._tx = tx; d.className = 'nl-lab'; d.innerHTML = '<span class="d"></span>' + tx; d._w = d.offsetWidth; }
       let right = l.side ? l.side === 'r' : lx > 62;
-      const wPct = vis && this.root.clientWidth ? 100 * (d._w || 0) / this.root.clientWidth : 0;
+      const wPct = this.root.clientWidth ? 100 * (d._w || 0) / this.root.clientWidth : 0;
       if (right && lx - wPct < 1.5) right = false; else if (!right && lx + wPct > 98.5) right = true;
       const ty = Math.min(74, Math.max(ly, 24));   // (24%: clear of the clock box)
       d.style.left = lx.toFixed(2) + '%'; d.style.top = ty.toFixed(2) + '%';
+      let op = vis ? (l.a ?? 1) : 0;
       if (vis && this._inRect) { const R = this._inRect, W0 = this.root.clientWidth, H0 = this.root.clientHeight, px = lx / 100 * W0, py = ty / 100 * H0, w = d._w || 0, x0 = right ? px - w : px, x1 = right ? px : px + w;
-        if (x1 > R.l - 12 && x0 < R.r + 12 && py + 30 > R.t - 12 && py - 30 < R.b + 12) d.style.opacity = '0'; }
-      d.className = right ? 'nl-lab r' : 'nl-lab';
-      const tx = `<span class="t">${l.text}${l.sub ? `<small>${l.sub}</small>` : ''}</span>`, hh = right ? tx + '<span class="d"></span>' : '<span class="d"></span>' + tx;
-      if (d._h !== hh) { d._h = hh; d.innerHTML = hh; d._w = d.offsetWidth; }
+        if (x1 > R.l - 12 && x0 < R.r + 12 && py + 30 > R.t - 12 && py - 30 < R.b + 12) op = 0; }
+      d.style.opacity = String(op);
+      const hh = right ? tx + '<span class="d"></span>' : '<span class="d"></span>' + tx, cl = right ? 'nl-lab r' : 'nl-lab';
+      if (d._h !== hh) { d._h = hh; d.innerHTML = hh; }
+      if (d.className !== cl) d.className = cl;
     });
   }
 
@@ -169,7 +163,8 @@ class NlHud {
     this._insetKey = key;
     this.inset.innerHTML = NlHud[which[2]](u, t, s, set);
   }
-  static svg(body, w = 760, h = 470) { return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="nlAh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/></marker></defs>${body}</svg>`; }
+  static svg(body, w = 760, h = 470) { return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="nlAh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/></marker>
+    <linearGradient id="nlVis" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#7a3cff"/><stop offset="0.2" stop-color="#2a5cff"/><stop offset="0.38" stop-color="#22c0e0"/><stop offset="0.5" stop-color="#3ad04a"/><stop offset="0.66" stop-color="#f0e030"/><stop offset="0.8" stop-color="#ff9a20"/><stop offset="1" stop-color="#e82a1a"/></linearGradient></defs>${body}</svg>`; }
   static plate(a = 0.86, w = 760, h = 470) { return `<rect x="0" y="0" width="${w}" height="${h}" rx="22" fill="rgba(6,9,14,${a})"/>`; }
   // a line of text that always fits: past maxW (its width estimated from the class's capitals) its font shrinks to fit
   static tx(x, y, cls, text, maxW = 700, extra = '') {
@@ -177,33 +172,44 @@ class NlHud {
     const fs = est > maxW ? ` style="font-size:${(K[0] * maxW / est).toFixed(1)}px"` : '';
     return `<text x="${x}" y="${y}" class="${cls}"${fs} ${extra}>${text}</text>`;
   }
-  // the lamp, the floor, light's last 1.5 m (5 ns); then the two delays side by side on a log scale (5 ns · 1 s)
-  static lamp(u) {
-    const T = NlHud.tx, lx = 150, ly = 120, fy = 395, a1 = MathX.smooth(u, 0.4, 1.6), a2 = MathX.smooth(u, 4.6, 5.8), a3 = MathX.smooth(u, 9.4, 10.4);
-    const yRay = ly + 14 + (fy - ly - 14) * a1, yYou = fy - (fy - ly - 14) * NLP.youH / NLP.lampH;
-    // log scale: 1 ns … 10 s across 330 px
-    const X0 = 330, X1 = 720, lo = 1e-9, hi = 10, X = (v) => X0 + (X1 - X0) * (Math.log10(v) - Math.log10(lo)) / (Math.log10(hi) - Math.log10(lo));
-    const ticks = [[1e-9, '1 ns'], [1e-6, '1 µs'], [1e-3, '1 ms'], [1, '1 s']].map(([v, l]) => `<line x1="${X(v)}" y1="300" x2="${X(v)}" y2="312" stroke="#9aa" stroke-width="2"/><text x="${X(v)}" y="340" text-anchor="middle" class="sm">${l}</text>`).join('');
-    return NlHud.svg(`${NlHud.plate()}${T(30, 56, 't', 'HOW LATE A NLADOW IS')}
-      <rect x="${lx - 60}" y="${ly - 10}" width="120" height="16" rx="4" fill="#e9f1ff"/><line x1="${lx - 70}" y1="${fy}" x2="${lx + 70}" y2="${fy}" stroke="#9aa" stroke-width="3"/>
-      <line x1="${lx}" y1="${ly + 14}" x2="${lx}" y2="${yRay}" stroke="#ffe7a8" stroke-width="5" marker-end="url(#nlAh)"/>
-      <line x1="${lx - 30}" y1="${yYou}" x2="${lx + 30}" y2="${yYou}" stroke="#9aa" stroke-width="2" stroke-dasharray="6 5" opacity="${a1.toFixed(2)}"/>${T(lx + 40, yYou - 8, 'sm', 'YOUR NLOULDERS', 200)}
-      ${T(lx + 18, (yYou + fy) / 2 + 6, 'sm', `${NLP.youH.toFixed(2)} m`, 120)}${T(lx - 66, fy + 40, 's', `${NLP.lightNs.toFixed(1)} ns`, 160)}
-      <g opacity="${a2.toFixed(2)}"><line x1="${X0}" y1="306" x2="${X1}" y2="306" stroke="#9aa" stroke-width="2"/>${ticks}
-      <rect x="${X0}" y="196" width="${(X(NLP.lightS) - X0 + 6).toFixed(1)}" height="30" rx="5" fill="#9fc4ff"/>${T(X0, 186, 'sm', `A NLADOW, NORMALLY: ${NLP.lightNs.toFixed(0)} BILLIONTHS OF A SECOND`, 400)}</g>
-      <g opacity="${a3.toFixed(2)}"><rect x="${X0}" y="240" width="${(X(1) - X0).toFixed(1)}" height="30" rx="5" fill="#ff8a6a"/>${T(X(1) - 150, 290, 'sm', 'YOURS: 1 s', 150)}
-      ${T(X0, 410, 's', `${(NLP.ratio / 1e6).toFixed(0)} MILLION TIMES LATER`, 400)}</g>`);
+  // light by wavelength (log scale, 0.1…100 µm): the eyes' band, struck out; the Sun's light (most of it still
+  // arrives); your skin's glow, peaking at 9.5 µm; the heat camera's band
+  static spectrum(u) {
+    const T = NlHud.tx, X0 = 50, X1 = 720, lo = Math.log10(0.1), hi = Math.log10(100), X = (um) => X0 + (X1 - X0) * (Math.log10(um) - lo) / (hi - lo), Y0 = 360;
+    const a1 = MathX.smooth(u, 0.2, 1.0), a2 = MathX.smooth(u, 1.6, 2.4), a3 = MathX.smooth(u, 6.0, 7.0), a4 = MathX.smooth(u, 8.0, 9.0);
+    // Planck curves, normalised to their own peaks (x in µm)
+    const planck = (um, K) => { const l = um * 1e-6, c2 = 0.014388; return 1 / (Math.pow(l, 5) * (Math.exp(c2 / (l * K)) - 1)); };
+    const curve = (K, peak, h, x0, x1) => { const pk = planck(peak, K); let d = ''; for (let i = 0; i <= 120; i++) { const um = Math.pow(10, Math.log10(x0) + (Math.log10(x1) - Math.log10(x0)) * i / 120), y = Y0 - h * planck(um, K) / pk; d += (i ? 'L' : 'M') + X(um).toFixed(1) + ' ' + y.toFixed(1); } return d; };
+    const ticks = [[0.1, '0.1 µm'], [1, '1 µm'], [10, '10 µm'], [100, '100 µm']].map(([v, l]) => `<line x1="${X(v)}" y1="${Y0}" x2="${X(v)}" y2="${Y0 + 10}" stroke="#9aa" stroke-width="2"/>${T(X(v) - 34, Y0 + 40, 'sm', l, 120)}`).join('');
+    const v0 = X(NLP.band[0] / 1000), v1 = X(NLP.band[1] / 1000);
+    return NlHud.svg(`${NlHud.plate()}${T(30, 56, 't', 'LIGHT, BY WAVELENGTH')}
+      <line x1="${X0}" y1="${Y0}" x2="${X1}" y2="${Y0}" stroke="#9aa" stroke-width="2"/>${ticks}
+      <path d="${curve(5772, 0.5, 190, 0.2, 5)}" fill="none" stroke="#ffe7a8" stroke-width="4" opacity="${(0.9 * a1).toFixed(2)}"/>
+      <g opacity="${a1.toFixed(2)}">${T(X(0.105), Y0 - 120, 'sm', 'THE SUN', 160)}</g>
+      <rect x="${v0.toFixed(1)}" y="${Y0 - 230}" width="${(v1 - v0).toFixed(1)}" height="230" fill="url(#nlVis)" opacity="${(0.55 * (1 - 0.75 * a2)).toFixed(2)}"/>
+      <g opacity="${a2.toFixed(2)}"><line x1="${v0 - 6}" y1="${Y0 - 236}" x2="${v1 + 6}" y2="${Y0 + 4}" stroke="#ff6a4a" stroke-width="5"/><line x1="${v1 + 6}" y1="${Y0 - 236}" x2="${v0 - 6}" y2="${Y0 + 4}" stroke="#ff6a4a" stroke-width="5"/>
+        ${T(v0 - 6, Y0 - 248, 's', 'EYES: 380–750 nm · GONE', 330)}</g>
+      <g opacity="${a3.toFixed(2)}"><path d="${curve(306, NLP.peakUm, 150, 2.5, 80)}" fill="none" stroke="#ff9a7a" stroke-width="4"/>
+        <line x1="${X(NLP.peakUm)}" y1="${Y0 - 150}" x2="${X(NLP.peakUm)}" y2="${Y0}" stroke="#ff9a7a" stroke-width="2" stroke-dasharray="6 5"/>${T(X(NLP.peakUm) - 70, Y0 - 166, 's', 'YOUR SKIN: 9.5 µm', 260)}</g>
+      <g opacity="${a4.toFixed(2)}"><rect x="${X(8)}" y="${Y0 + 52}" width="${X(14) - X(8)}" height="14" rx="4" fill="#d8dde4"/>${T(X(8) - 150, Y0 + 92, 'sm', 'A HEAT CAMERA SEES 8–14 µm', 330)}</g>`);
   }
-  // the Earth turning (the car park on it, east at 282 m/s) and going round the Sun (30 km/s): 1 s of each
-  static earth(u) {
-    const T = NlHud.tx, cx = 210, cy = 260, R = 130, a = MathX.smooth(u, 0.3, 1.2), b = MathX.smooth(u, 4.0, 5.0), lat = NL_LAT, ang = -0.4 + 0.12 * u;
-    const px = cx + R * Math.cos(lat) * Math.sin(ang), py = cy - R * Math.sin(lat);
-    return NlHud.svg(`${NlHud.plate()}${T(30, 56, 't', 'IN 1 SECOND, THE EARTH CARRIES YOU')}
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="#16304a" stroke="#6f9fd0" stroke-width="3"/>
-      <ellipse cx="${cx}" cy="${py}" rx="${(R * Math.cos(lat)).toFixed(1)}" ry="${(R * Math.cos(lat) * 0.18).toFixed(1)}" fill="none" stroke="#6f9fd0" stroke-width="2" stroke-dasharray="6 6"/>
-      <circle cx="${px.toFixed(1)}" cy="${(py + R * Math.cos(lat) * 0.18 * Math.cos(ang)).toFixed(1)}" r="9" fill="#ffcf8a"/>
-      <g opacity="${a.toFixed(2)}">${T(380, 170, 'sm', 'SPINNING EAST (52.6° N)', 360)}${T(380, 210, 's', `${nlN(NLP.spin)} m`, 360)}</g>
-      <g opacity="${b.toFixed(2)}">${T(380, 290, 'sm', 'ROUND THE SUN', 360)}${T(380, 330, 's', `${NLP.orbitKms.toFixed(1)} km`, 360)}
-      ${T(380, 400, 'sm', 'YOUR NLADOW KEEPS UP WITH BOTH', 360)}</g>`);
+  // sunlight's energy at the ground: ultraviolet, visible (gone), infrared (still here)
+  static sunbar(u) {
+    const T = NlHud.tx, a = MathX.smooth(u, 0.3, 1.0), b = MathX.smooth(u, 1.6, 2.4), uv = 0.03, vis = NLP.sunVisible, ir = 1 - uv - vis, X0 = 40, Wd = 680, Y = 190;
+    const x1 = X0 + Wd * uv, x2 = x1 + Wd * vis;
+    return NlHud.svg(`${NlHud.plate()}${T(30, 56, 't', 'SUNLIGHT REACHING THE GROUND')}
+      <g opacity="${a.toFixed(2)}"><rect x="${X0}" y="${Y}" width="${Wd * uv}" height="80" fill="#8a7aff"/><rect x="${x1}" y="${Y}" width="${Wd * vis}" height="80" fill="url(#nlVis)"/><rect x="${x2}" y="${Y}" width="${Wd * ir}" height="80" fill="#c0503a"/>
+        ${T(x1 + 10, Y - 18, 's', `VISIBLE ${Math.round(vis * 100)}%`, 300)}${T(x2 + 10, Y - 18, 's', `INFRARED ${Math.round(ir * 100)}%`, 300)}</g>
+      <g opacity="${b.toFixed(2)}"><rect x="${x1}" y="${Y}" width="${Wd * vis}" height="80" fill="rgba(6,9,14,0.82)"/><line x1="${x1}" y1="${Y + 40}" x2="${x2}" y2="${Y + 40}" stroke="#ff6a4a" stroke-width="5"/>
+        ${T(x1 + 10, Y + 130, 'b', 'GONE', 300)}${T(x2 + 10, Y + 130, 'b', 'STILL HERE: YOU FEEL IT', 330)}${T(X0, Y + 200, 'sm', 'ULTRAVIOLET ' + Math.round(uv * 100) + '% · VALUES ROUGH, FOR A LOW SUN', 680)}</g>`);
+  }
+  // clear ice: how thick for a person, for a car, and what is by the stream (to scale)
+  static ice(u) {
+    const T = NlHud.tx, P = NLP, k = 8, base = 236, a = MathX.smooth(u, 0.2, 0.9), b = MathX.smooth(u, 0.9, 1.6), c = MathX.smooth(u, 5.6, 6.4);
+    const slab = (x, cm, col, lab, sub, op) => `<g opacity="${op.toFixed(2)}"><rect x="${x}" y="${base - 6}" width="190" height="${cm * k}" rx="4" fill="${col}"/><rect x="${x}" y="${base - 6 + cm * k}" width="190" height="${Math.max(6, 120 - cm * k)}" fill="#0d2233"/>
+      ${T(x, base - 64, 'b', lab, 190)}${T(x, base - 26, 's', sub, 190)}</g>`;
+    return NlHud.svg(`${NlHud.plate()}${T(30, 56, 't', 'CLEAR ICE, TO SCALE')}
+      <line x1="30" y1="${base - 6}" x2="730" y2="${base - 6}" stroke="#9aa" stroke-width="2" stroke-dasharray="6 6"/>
+      ${slab(40, P.icePerson, '#cfe3f2', 'A PERSON', `${P.icePerson} cm`, a)}${slab(285, P.iceCar, '#cfe3f2', 'A CAR', `${P.iceCar} cm`, b)}${slab(530, P.iceInlet, '#ffcf8a', 'BY THE STREAM', `${P.iceInlet} cm`, c)}`);
   }
 }

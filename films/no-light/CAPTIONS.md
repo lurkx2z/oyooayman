@@ -12,7 +12,7 @@ status: voiceless
 
 [start] 2:40 PM, on a frozen lake in Norway. Every light in the universe just went out. / Not a power cut. The Sun is still in the sky. / Your eyes are wide open. There's nothing left for them to catch.
 
-[skaters] You're doing 24 km/h on two thin blades. So is everyone around you. / And nobody can see.
+[skaters] You're still gliding at 21 km/h on two thin blades. So is everyone around you. / And nobody can see.
 
 [heat] But everything still glows, in a light no eye can see: infrared. / This is what a heat camera would see. Nobody on this lake can see any of it.
 
@@ -24,9 +24,9 @@ status: voiceless
 
 [grab] Someone just grabbed your arm. / She was skating behind you. She can't see you either.
 
-[help] You could still dial 112 by feel. So is everyone else in Norway. / Every ambulance driver is blind too. Nobody is coming.
+[help] She's calling for help by feel: five presses on the side button. So is everyone else in Norway. / Every ambulance driver is blind too. Nobody is coming.
 
-[sun] The Sun is 2.5° above the hills. You can still feel it on your face. / More than half of its energy still gets here, as infrared. Only the part you could see is gone. / It sets at 3:26 PM. Nobody will see it.
+[sun] The Sun is less than 3° above the hills. You can still feel it on your face. / More than half of its energy still gets here, as infrared. Only the part you could see is gone. / It sets at 3:29 PM. Nobody will see it.
 
 [fire] The bonfire by the kiosk is still burning at 800 °C. It makes no light at all. / A man is walking straight towards it. / He feels it a metre away, and stops. Fire you can't see is still fire.
 

@@ -1,7 +1,6 @@
 /* =====================================================================
    SOUND · LIB — the noise and filter generators the ambience and effects share (the gravity films' sound kit, via the
-   light films and the magnets film), where the camera is (level 4 under the soffit, the open edge with the town below,
-   level 2's camera, the exit lane at street level), and how the slowed stretches sound. Every function here is listed
+   light films and the magnets film) and where the camera is (out on the ice, by the bonfire, by the road). Every function here is listed
    in NL_SOUND_FNS at the end, so the baked soundtrack's fingerprint sees a change to any of them.
    ===================================================================== */
 
@@ -58,12 +57,12 @@ function nlCurve(f, hz = 200) {
 const nlWorldRate = (t, k = 0.5) => Math.pow(MathX.clamp(nlRateAt(t + 1e-3), 0.2, 1), k);
 
 // ---- where the camera is ----------------------------------------------------------------------------------------
-//   deck   level 4, under the soffit: the lamps' hum, the concrete's room tone, the town through the open sides
-//   edge   at the open side: the town below, the wind, the hum far behind
-//   cctv   level 2 seen by camera 7: the camera's own hiss and mains hum (a CCTV feed has no sound of the deck)
-//   exit   the exit lane at street level: the sodium lamps, the street, the terminal's whine
-const NL_PLACE = { edge: ['parapetWalk', 'town', 'outside', 'stepsPOV'], cctv: ['cctv'] };
-function nlWhereShot(sh) { if (sh.set === 'exit') return 'exit'; for (const [k, v] of Object.entries(NL_PLACE)) if (v.includes(sh.mode)) return k; return 'deck'; }
+//   ice    out on the lake (most of the film): the huge open quiet, the ice's own sounds, the town far off
+//   fire   by the bonfire on the beach: its crackle and roar close
+//   road   on the road or close to it: idling engines, a lorry
+//   dark   the black shots: what you hear (the same place as the shot before, closer and drier)
+const NL_PLACE = { fire: ['fire', 'man', 'feel'], road: ['road', 'window'] };
+function nlWhereShot(sh) { for (const [k, v] of Object.entries(NL_PLACE)) if (v.includes(sh.mode)) return k; return 'ice'; }
 // the film as places: [{ t0, t1, where, shot }] in order
 function nlPlaces() {
   if (nlPlaces._c) return nlPlaces._c;

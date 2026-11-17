@@ -1,5 +1,5 @@
 /* =====================================================================
-   AUDIO — "What if your shadow lagged 1 second behind you?" js/audio/audioEngine.js is unchanged (this is a
+   AUDIO — "What if there was no light in the universe?" js/audio/audioEngine.js is unchanged (this is a
    subclass); the NLX and generators come from audiokit.js (via the gravity films). No narrator: the captions are
    silent and the sound carries the gaps. Three stems:
      music  an original score (sound-music.js); it leads
@@ -61,10 +61,10 @@ function nlLimit(buf, ceilDb) {
 class NlAudio extends AudioEngine {
   constructor(tl, app) { super(tl); this.app = app; this.wavName = 'no-light-soundtrack.wav'; this.solo = null; }
   fingerprintData() {
-    const consts = { NLP, NL_F, NL_CLOCK, NL_SHOTS, NLE, run: NL_RUN, guard: NLG.M.legs.map((g) => [g.s0, g.s1, g.len]), you: NLY.M.legs.map((g) => [g.s0, g.s1, g.len]), car: [NLC.acc, NLC.R, NLC.exStopX], NL_THEME: window.NL_THEME || null };
+    const consts = { NLP, NL_F, NL_CLOCK, NL_SHOTS, NLE, V: [NLV.car0, NLV.dir, NLV.hole, NLV.delay, NLV.carStop], Y: [NLY.y1, NLY.L, NLY.walkV, NLY.crawlV, NLY.dFin], NL_THEME: window.NL_THEME || null };
     return [NL, NLT, window.NL_MIX, Object.values(NLX).map(String).join(''), NlFx.toString(), Object.getOwnPropertyNames(NlFx.prototype).map((k) => String(NlFx.prototype[k])).join(''),
       Object.values(NL_SOUND).flat().map((b) => b.name + b.fn).join(''), nlDynDb.toString(), NlAudio.toString(), nlLimit.toString(), nlStoryAt.toString(), consts,
-      (window.NL_SOUND_FNS || []).map(String).join(''), [nlShotAt, nlFilmAt, nlRateAt, nlSegAt, nlLampOn].map(String).join('')];
+      (window.NL_SOUND_FNS || []).map(String).join(''), [nlShotAt, nlFilmAt, nlRateAt, nlSegAt, NLY.dist, NLY.at2, NLW.at2, NLV.carD, NLV.holeR, NLA.at, NLD.at].map(String).join('')];
   }
   // AudioEngine's fingerprint, with every number rounded to 7 significant digits: browsers' Math.exp/sin/acosh… can
   // differ in the last bit (Safari, Firefox), and then the baked copy was refused and the whole soundtrack rendered

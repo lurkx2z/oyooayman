@@ -6,13 +6,13 @@
                            shows the cold sky instead), vT (use the geometry's own aT attribute), dyn (its own uniform) }
      nlReg(set, mesh, heatMat)   the mesh's colour material is kept; nlMode(set, 'heat' | 'colour') swaps them all
      nlHeatPerson(set, person, o) / nlHeatCar(set, vehicle, o)   temperatures for the engine's people and cars
-   The palette: −22 °C black, +38 °C white (a fixed range, as a camera on manual), with a little cold blue in the
-   blacks; above +38 the values go past 1 and the post's bloom makes them glare (fire, lamps, engines, the Sun).
+   The palette: −24 °C black, +12 °C white (a fixed range, as a camera on manual, set for a winter scene), with a
+   little cold blue in the blacks; above +12 the values go past 1 and the post's bloom makes them glare (fire, lamps, engines, the Sun).
    The grazing-angle fall-off of emissivity (surfaces seen edge-on reflect the cold sky) gives things their shape.
    ===================================================================== */
 
 const NL_HU = {
-  uLo: { value: -22 }, uHi: { value: 38 }, uSky: { value: -40 }, uFogD: { value: 0.0012 }, uFogT: { value: -26 }, uTime: { value: 0 },
+  uLo: { value: -24 }, uHi: { value: 12 }, uSky: { value: -40 }, uFogD: { value: 0.0009 }, uFogT: { value: -12 }, uTime: { value: 0 },
 };
 const NL_HEAT_GLSL = {
   vert: `varying vec3 vL; varying vec3 vWN; varying vec3 vWP; varying float vAT; varying float vIT;
@@ -50,7 +50,7 @@ const NL_HEAT_GLSL = {
       if (uVar > 0.0) T += uVar * (vn3(vWP * 0.9) - 0.5) + uVar * 0.5 * (vn3(vWP * 3.7 + 7.0) - 0.5);
       vec3 V = normalize(cameraPosition - vWP), N = normalize(vWN);
       float c = abs(dot(N, V));
-      float e = uEmis * (0.5 + 0.5 * pow(c, 0.4));
+      float e = uEmis * (0.8 + 0.2 * pow(c, 0.3));
       float Te = mix(uSky, T, e);
       float dist = length(cameraPosition - vWP);
       Te = mix(Te, uFogT, 1.0 - exp(-uFogD * dist));
@@ -65,11 +65,11 @@ const NL_HEAT_GLSL = {
 };
 const NL_HEAT_CACHE = new Map();
 function nlHeatMat(T, o = {}) {
-  const key = o.dyn ? null : JSON.stringify([T, o.hot || 0, o.var || 0, o.emis ?? 0.95, o.vT || 0, o.side || 0, o.over ?? 2.4]);
+  const key = o.dyn ? null : JSON.stringify([T, o.hot || 0, o.var || 0, o.emis ?? 0.95, o.vT || 0, o.side || 0, o.over ?? 1.2]);
   if (key && NL_HEAT_CACHE.has(key)) return NL_HEAT_CACHE.get(key);
   const h = o.hot || [0, 0, 0, 0, T];
   const m = new THREE.ShaderMaterial({
-    uniforms: Object.assign({ uT: { value: T }, uHot: { value: new THREE.Vector4(h[0], h[1], h[2], h[3]) }, uHotT: { value: h[4] }, uVar: { value: o.var || 0 }, uEmis: { value: o.emis ?? 0.95 }, uOver: { value: o.over ?? 2.4 } }, NL_HU),
+    uniforms: Object.assign({ uT: { value: T }, uHot: { value: new THREE.Vector4(h[0], h[1], h[2], h[3]) }, uHotT: { value: h[4] }, uVar: { value: o.var || 0 }, uEmis: { value: o.emis ?? 0.95 }, uOver: { value: o.over ?? 1.2 } }, NL_HU),
     vertexShader: NL_HEAT_GLSL.vert, fragmentShader: NL_HEAT_GLSL.frag,
     defines: o.vT ? { USE_AT: '' } : {}, side: o.side ? THREE.DoubleSide : THREE.FrontSide,
     polygonOffset: !!o.po, polygonOffsetFactor: o.po ? o.po[0] : 0, polygonOffsetUnits: o.po ? o.po[1] : 0,
@@ -141,12 +141,12 @@ function nlHeatSky(scene) {
     vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }',
     fragmentShader: `uniform vec3 sd; uniform float sunK, uLo, uHi; varying vec3 vD;
       vec3 acesInv(vec3 y){ const float a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14; y = min(y, vec3(0.985)); vec3 A = a - c * y, B = b - d * y, C = -e * y; return (-B + sqrt(B * B - 4.0 * A * C)) / (2.0 * A); }
-      void main(){ float h = max(vD.y, 0.0);
+      void main(){ vec3 D = normalize(vD); float h = max(D.y, 0.0);
         float T = mix(-21.0, -52.0, pow(smoothstep(0.0, 0.5, h), 0.6));
         float g = clamp((T - uLo) / (uHi - uLo), 0.0, 1.0);
         vec3 col = mix(vec3(0.010, 0.014, 0.024), vec3(1.0), pow(g, 1.08));
         vec3 lin = acesInv(pow(col, vec3(2.2)));
-        float a = dot(vD, sd);
+        float a = dot(D, sd);   // (vD is interpolated across the sphere's faces: renormalised, or the disc never reaches 1)
         lin += vec3(1.0, 0.98, 0.95) * sunK * (smoothstep(0.99992, 0.99996, a) * 6.0 + pow(max(a, 0.0), 2400.0) * 1.2 + pow(max(a, 0.0), 300.0) * 0.12);
         gl_FragColor = vec4(lin, 1.0); }`,
   }));
@@ -158,5 +158,5 @@ function nlHeatRGB(T) {
   const lo = NL_HU.uLo.value, hi = NL_HU.uHi.value, v = (T - lo) / (hi - lo), g = MathX.clamp(v, 0, 1);
   const y = Math.pow(0.01 + 0.99 * Math.pow(g, 1.08), 2.2), a = 2.51, b = 0.03, c = 2.43, d = 0.59, e = 0.14, yy = Math.min(y, 0.985);
   const A = a - c * yy, B = b - d * yy, C = -e * yy;
-  return (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A) + Math.max(0, v - 1) * 2.4;
+  return (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A) + Math.max(0, v - 1) * 1.2;
 }
