@@ -15,8 +15,8 @@ const AT_SHOTS = [];
     // 9:59:56 AM: the pool deck, a boy's cannonball; at 10:00:00 the first 1% goes. Nobody notices.
     ['T1', 'title', -1, AT.tOn],
     ['S1', 'aerial', AT.tOn, c('start', 1) - 0.5],
-    ['S2', 'deck', c('start', 1) - 0.5, c('start', 2) - 0.5],
-    ['S3', 'girl', c('start', 2) - 0.5, B('weight')],
+    ['S2', 'girl', c('start', 1) - 0.5, c('start', 2) - 0.5],
+    ['S3', 'deck', c('start', 2) - 0.5, B('weight')],
     // the weight of the air; 1% = 85 m
     ['W1', 'sky', B('weight'), c('weight', 1) - 0.5],
     ['W2', 'terrace', c('weight', 1) - 0.5, c('weight', 2) - 0.5],

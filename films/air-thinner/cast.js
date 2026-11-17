@@ -164,10 +164,14 @@ function atFaceSet(P, t, F = {}) {
 // PROPS ON PEOPLE: a diving mask, a regulator's mouthpiece, fins, a weight belt; an oxygen mask
 // ---------------------------------------------------------------------------------------------------------------------
 function atDiveGear(P, o = {}) {
-  const head = P.j.head, frame = atStd('#1a1d21', 0.5), lens = new THREE.MeshStandardMaterial({ color: '#b8d8e8', roughness: 0.05, metalness: 0.3, transparent: true, opacity: 0.45 });
+  const head = P.j.head, frame = atStd('#1a1d21', 0.5), lens = new THREE.MeshStandardMaterial({ color: '#cfe6f0', roughness: 0.04, metalness: 0.2, transparent: true, opacity: 0.28, depthWrite: false });
   const mask = new THREE.Group(); head.add(mask); mask.position.set(0, 0.025, 0.088);
-  atMesh(new THREE.BoxGeometry(0.16, 0.07, 0.04), frame, 0, 0, 0, mask); atMesh(new THREE.BoxGeometry(0.15, 0.058, 0.01), lens, 0, 0.002, 0.022, mask);
-  atMesh(new THREE.TorusGeometry(0.105, 0.008, 4, 18), frame, 0, 0.0, -0.085, mask).rotation.y = ATPI / 2;     // the strap
+  // a thin frame round a clear lens (the eyes show through it), a strap round the back of the head
+  for (const y of [-0.031, 0.031]) atMesh(new THREE.BoxGeometry(0.16, 0.012, 0.04), frame, 0, y, 0, mask);
+  for (const x of [-0.074, 0.074]) atMesh(new THREE.BoxGeometry(0.014, 0.07, 0.04), frame, x, 0, 0, mask);
+  atMesh(new THREE.BoxGeometry(0.03, 0.03, 0.035), frame, 0, -0.03, 0.004, mask);                                  // the nose pocket
+  atMesh(new THREE.BoxGeometry(0.15, 0.058, 0.006), lens, 0, 0.002, 0.02, mask);
+  atMesh(new THREE.TorusGeometry(0.105, 0.008, 4, 18), frame, 0, 0.0, -0.085, mask).rotation.x = ATPI / 2;     // the strap
   // the regulator: a round second stage in the mouth (a grey purge cover on its face), its hose over the right shoulder
   const reg = new THREE.Group(); head.add(reg); reg.position.set(0, -0.062, 0.1);
   const rb = atMesh(new THREE.CylinderGeometry(0.026, 0.028, 0.034, 16), atStd('#202326', 0.5), 0, 0, 0.012, reg); rb.rotation.x = ATPI / 2;

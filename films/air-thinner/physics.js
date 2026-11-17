@@ -115,7 +115,7 @@ const ATL = {
   horizon: (a) => 1 - Math.exp(-3.2 * a) * 1.0,          // the low sky, through 30× more air (saturated until it's thin)
   stars: (a) => MathX.smooth(-Math.log(Math.max(a, 1e-4)), -Math.log(0.075), -Math.log(0.04)),   // visible from ~6 % down
   loud: (a) => a,                                         // sound pressure (amplitude) of the world's own sounds
-  sunK: (a) => 1 + 0.12 * (1 - a),                        // direct sunlight: a little stronger with no air to scatter it
+  sunK: (a) => 1 + 0.3 * (1 - a),                         // direct sunlight: stronger with no air to scatter it (sea-level air takes ~25% of the beam)
 };
 
 if (typeof module !== 'undefined') module.exports = { ATP, ATE, ATK };

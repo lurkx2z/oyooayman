@@ -204,7 +204,7 @@ function atShip(set) {
   // the roof of deck 14 at its front (the bridge's top) and the forward lounge's roof
   // ---- the bridge: the front of decks 13–14, raked dark windows across the whole width, wings out to ±21.5 m
   { const y0 = D(13), y1 = D(15), xf = x0(13) - 0.6;
-    B.add(Geo.quad([xf, y0 + 0.9, -zh], [xf, y0 + 0.9, zh], [xf + 0.8, y1 - 0.3, zh], [xf + 0.8, y1 - 0.3, -zh], 0, 0, 1, 1), dark, null);
+    B.add(Geo.quad([xf, y0 + 0.9, -zh], [xf, y0 + 0.9, zh], [xf + 0.52, y1 - 0.3, zh], [xf + 0.52, y1 - 0.3, -zh], 0, 0, 1, 1), dark, null);   // (raked, but its top stays 8 cm in front of the windows behind it)
     for (const sd of [1, -1]) { B.box(7, 0.4, 4.2, xf + 4.5, D(14) + 0.2, sd * (zh + 2.1), white); B.box(7, 1.1, 0.3, xf + 4.5, D(14) + 0.95, sd * (zh + 4.05), white);
       B.box(4.5, 2.2, 3.6, xf + 4.2, D(14) + 1.5, sd * (zh + 1.85), white); B.box(4.4, 1.0, 0.04, xf + 4.2, D(14) + 2.0, sd * (zh + 3.68), dark); }
     out.bridgeWing = [xf + 4.5, D(14) + 0.4, -(zh + 2.1)];

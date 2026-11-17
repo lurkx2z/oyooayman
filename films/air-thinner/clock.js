@@ -34,7 +34,7 @@ const AT_ANCHORS = [
   ['tanks', 0, atHMS(10, 46, 2)],
   ['down', 0, atHMS(10, 52, 10)],
   ['engines', 0, atHMS(11, 8, 1.2), 2.2],   // the 11:08 step on screen: under half (49.98 %)
-  ['engines', 1, atHMS(11, 13, 1.0), 2.0],  // the power fails on the 11:13 step
+  ['engines', 1, atHMS(11, 13, 1.0), 3.2],  // the power fails on the 11:13 step (the screen is seen lit for 2 s first)
   ['marina', 0, atHMS(11, 20, 8)],
   ['dive', 0, atHMS(11, 23, 20)],
   ['under', 0, atHMS(11, 25, 40)],

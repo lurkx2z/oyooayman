@@ -183,7 +183,7 @@ function atDeck(set, ship) {
       g.fillStyle = '#ffffff'; g.font = '600 64px sans-serif'; g.textAlign = 'center'; g.fillText('CORAL MERIDIAN', w / 2, h * 0.84);
       g.font = '500 30px sans-serif'; g.fillText('SEA DAY · POOL PARTY 11:00', w / 2, h * 0.93); }), { repeat: false });
     const mat = new THREE.MeshStandardMaterial({ map: tex, emissiveMap: tex, emissive: new THREE.Color(1, 1, 1), emissiveIntensity: 1.1, roughness: 0.3, color: '#111' });
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(Sc.w, Sc.h), mat); m.position.set(Sc.x + 0.12, Sc.y, 0); m.rotation.y = Math.PI / 2; S.add(m);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(Sc.w, Sc.h), mat); m.position.set(Sc.x + 0.14, Sc.y, 0); m.receiveShadow = false; m.rotation.y = Math.PI / 2; S.add(m);   // (2 cm proud of its housing's face: no z-fighting)
     B.box(0.2, Sc.h + 0.5, Sc.w + 0.5, Sc.x + 0.02, Sc.y, 0, atStd('#14181c', 0.4));
     out.screen = { mat, mesh: m, tex };
   }
@@ -226,8 +226,10 @@ function atDeck(set, ship) {
     const tankM = atStd('#f2c21a', 0.35, 0.3), valveM = atStd('#c8ccd0', 0.25, 0.9);
     out.shop = { x0, x1, yb, yt, light, rack: [] };
     for (let i = 0; i < 6; i++) { const x = x0 + 1.4 + i * 0.36, z = zw - 0.25;
-      B.add(new THREE.CylinderGeometry(0.1, 0.1, 0.55, 16), tankM, Geo.matrix(x, yb + 0.33, z)); B.add(new THREE.SphereGeometry(0.1, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), tankM, Geo.matrix(x, yb + 0.605, z));
-      B.add(new THREE.CylinderGeometry(0.03, 0.03, 0.08, 8), valveM, Geo.matrix(x, yb + 0.73, z)); out.shop.rack.push([x, yb, z]); }
+      B.add(new THREE.CylinderGeometry(0.1, 0.1, 0.55, 16), tankM, Geo.matrix(x, yb + 0.355, z)); B.add(new THREE.SphereGeometry(0.1, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), tankM, Geo.matrix(x, yb + 0.63, z));
+      B.add(new THREE.CylinderGeometry(0.03, 0.03, 0.08, 8), valveM, Geo.matrix(x, yb + 0.755, z)); out.shop.rack.push([x, yb, z]); }
+    // the rack they stand in: a low base on the floor, two posts, the rail
+    B.box(2.4, 0.05, 0.3, x0 + 2.3, yb + 0.055, zw - 0.2, atStd('#3a4048', 0.6)); for (const px of [x0 + 1.12, x0 + 3.48]) B.box(0.05, 0.62, 0.05, px, yb + 0.36, zw - 0.13, steel);
     B.box(2.3, 0.05, 0.03, x0 + 2.3, yb + 0.5, zw - 0.13, atStd('#222', 0.6));
     // the port wall's dressing: a coral stripe, six BC jackets on hooks above the tanks, masks on pegs further aft
     B.box(x1 - x0 - 0.1, 0.12, 0.02, (x0 + x1) / 2, yb + 1.05, zw - 0.015, atStd('#e8603c', 0.6));

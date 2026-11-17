@@ -1,6 +1,6 @@
 # What if the air got 1% thinner every minute?
 
-Voiceless 16:9 long-form, 5:07 (307.2 s), slug `air-thinner`, page `air-thinner.html`. Built like Gravity tilts 90°,
+Voiceless 16:9 long-form, 5:08 (307.75 s), slug `air-thinner`, page `air-thinner.html`. Built like Gravity tilts 90°,
 Friction 10 s and Gravity keeps tilting, to the owner's YouTube lessons of 2026-10-28, in the eerie horror tone of
 Slower light (the channel's best):
 - an everyday, human-scale place with new scenery: a cruise ship (the fictional "Coral Meridian", 290 m, 17 decks,
@@ -10,8 +10,8 @@ Slower light (the channel's best):
   85 metres; at this rate the ocean boils at 3:39 this afternoon, and you are already at sea level);
 - about 5 minutes, no filler; the story clock only runs forward and jumps only at cuts (23 jumps, 10:00 AM → 3:39 PM);
 - one thread through the second half (you, the ship's dive instructor, take a lost girl and six tanks under the ship);
-- tension to the last frame, no recap: the last tank runs out tonight, the stars are out in the afternoon, "Would you
-  go up to see them?";
+- tension to the last frame, no recap: the last tank runs out tonight; up there, stars in the afternoon and her parents;
+  "Would you take her up to see them?" (at the top she'd pass out in 15 s);
 - the music clearly leads, beds about 10 dB under it, measured stem by stem (2026-10-31);
 - no z-fighting, and the picture pitfalls list (no particle alpha over 1, no kilometre-long triangles).
 
@@ -59,8 +59,8 @@ her hand) · engines (11:08 half the air, the engines choke; 11:13 the power fai
 closing in) · dive (the tanks on a line; you go in) · under (10 m down; you can breathe; 4,300 can't) · everest (11:56;
 nobody awake) · shark (12:30; a whitetip circling) · oxygen (1:11 PM) · rise (she lets go; 15 s up there; you catch her
 fin) · sky (1:40, going dark) · tubs (2:26 the hot tubs boil; 2:37 body temperature) · stars (3:00, stars by the Sun;
-5% left) · sea (3:27 the pool; 3:39 the ocean; only the top) · last (the last tank at 8:57 tonight) · question ("Would
-you go up to see them?").
+5% left) · sea (3:27 the pool; 3:39 the ocean; only the top) · last (the last tank at 8:57 tonight; up there,
+stars and her parents) · question ("Would you take her up to see them?").
 
 ## 4. Sets and shots (shots.js: 62 shots)
 

@@ -160,7 +160,7 @@ function atShipSet(app) {
     // along the side row at deck height: people on loungers in the sun
     deck: (t, s, k) => { const d = dr(t, 0.03, 0.3, 2); cam([-44 + 3 * k + d[0], y15 + 1.25 + d[1], 9.2], [-10, y15 + 0.6, 12.6], 40, 0, [-28, y15, 11], 22); },
     // the girl and her balloon, from over the pool
-    girl: (t, s, k) => { const d = dr(t, 0.02, 0.3, 3); cam([G0[0] + 1.1 + d[0], y15 + 1.05 + d[1], G0[1] - 2.6 + 0.3 * k], [G0[0] - 0.1, y15 + 1.45, G0[1]], 40, 0, [G0[0], y15, G0[1]], 12); },
+    girl: (t, s, k) => { const d = dr(t, 0.02, 0.3, 3); cam([G0[0] + 0.95 + d[0], y15 + 1.2 + d[1], G0[1] - 2.0 + 0.2 * k], [G0[0] - 0.05, y15 + 1.12, G0[1]], 44, 0, [G0[0], y15 + 1.1, G0[1]], 8); },
     // lying on the deck, looking up past a parasol at the sky (a square metre marked under it)
     sky: (t, s, k) => { cam([-50.4, y15 + 0.4, 12.1], [-49.0 + 1.5 * k, y15 + 24, 21.0], 62, 0, [-50, y15, 13], 16); },
     // the bar's terrace: people at the counter, the sea beyond the glass
@@ -209,14 +209,14 @@ function atShipSet(app) {
     hand: (t, s, k) => { const p = set.stairAt(ST, W.stair.step), h = [p[0] + 0.54, p[1] + 0.39, p[2] - 0.2], d = dr(t, 0.004, 0.3, 23); cam([h[0] + 0.2 + d[0], h[1] + 0.05 + d[1], h[2] - 1.25 + 0.1 * k], [h[0] - 0.05, h[1] - 0.05, h[2]], 40, 0, [h[0], h[1], h[2]], 5); },
     // the funnel from the sun deck: black smoke
     funnel: (t, s, k) => { const d = dr(t, 0.05, 0.3, 24); cam([112 - 6 * k + d[0], 74 + d[1], 44], [73, 66, 0], 44, 0, [70, 50, 0], 40); },
-    smokeAerial: (t, s, k) => { cam([260 - 40 * k, 120, -260], [20, 30, 0], 36, 0, [40, 30, 0], 150); },
+    smokeAerial: (t, s, k) => { cam([-60 + 30 * k, 110, 330], [60, 35, 0], 40, 0, [40, 30, 0], 150); },   // (from port: the plume streams clear to the right)
     // the pool deck at 11:13: the big screen dies
     screen: (t, s, k) => { const d = dr(t, 0.02, 0.3, 25); cam([-36 + d[0], y15 + 1.55 + d[1], -8.5], [-77, F.screen.y - 0.8, 0.8], 40, 0, [-55, y15, -3], 30); },
     // the platform on deck 2, from off the stern: you, the girl, the tanks
     marina: (t, s, k) => { const d = dr(t, 0.04, 0.3, 26); cam([Mr.x1 + 5.5 + d[0], Mr.y + 3.4 + d[1], -6.5 + 0.5 * k], [Mr.x1 - 1.8, Mr.y + 0.6, 0.2], 42, 0, [148, 1, 0], 12); },
     // what you see: your hands on the tank's strap, the edges going dark
     pov: (t, s, k) => { const h = head(youS), g = head(girlS), yw = youS.root.rotation.y, d = dr(t, 0.015, 0.6, 27); cam([h[0] + Math.sin(yw) * 0.17 + d[0], h[1] + 0.06 + d[1], h[2] + Math.cos(yw) * 0.17], [g[0], g[1] - 0.3, g[2]], 56, 2.5 * Math.sin(t * 0.7), [h[0], Mr.y, h[2]], 6); },
-    girlMask: (t, s, k) => { const h = head(girlS), d = dr(t, 0.006, 0.3, 28); cam([h[0] + 0.95 + d[0], h[1] + 0.06 + d[1], h[2] - 0.4 + 0.08 * k], [h[0], h[1] - 0.03, h[2]], 32, 0, [h[0], h[1], h[2]], 5); },
+    girlMask: (t, s, k) => { const h = head(girlS), d = dr(t, 0.006, 0.3, 28); cam([h[0] + 0.95 + d[0], h[1] - 0.3 + d[1], h[2] - 0.4 + 0.08 * k], [h[0], h[1] + 0.02, h[2]], 34, 0, [h[0], h[1], h[2]], 5); },   // (from a little below: her face, not her crown)
     // under water: the line with its six tanks, down into the blue; the stern above
     lineUW: (t, s, k) => { cam([L.x + 4.5, -13.5 + 1.5 * k, L.z + 3.8], [L.x, -7.0, L.z], 48, 0, [L.x, -6, 0], 20); },
     // the backward roll off the platform's end
@@ -242,7 +242,7 @@ function atShipSet(app) {
     kick: (t, s, k) => { const h = W.her(s), d = dr(t, 0.02, 0.4, 37); cam([h[0] + 0.6 + d[0], h[1] + 3.6 + d[1], h[2] + 1.0], [h[0], h[1] - 1.4, h[2]], 50, 0, [h[0], h[1], h[2]], 10); },
     catch: (t, s, k) => { const h = W.her(s), d = dr(t, 0.01, 0.4, 38); cam([h[0] + 2.8 + d[0], h[1] - 1.9 + d[1], h[2] + 2.4], [h[0], h[1] - 1.2, h[2]], 46, 0, [h[0], h[1], h[2]], 8); },
     // the ship under a deep blue sky, from a drone ahead and above
-    darkSky: (t, s, k) => { cam([-330 + 20 * k, 70 - 6 * k, 210], [10, 165 + 10 * k, 0], 50, 0, [0, 20, 0], 160); },
+    darkSky: (t, s, k) => { cam([-240 + 15 * k, 50, 200], [20, 72 + 6 * k, 0], 46, 0, [0, 20, 0], 160); },   // (the ship above the caption, the darkening sky over it)
     // a hot tub starting to boil; then the deck, the tubs steaming
     tub: (t, s, k) => { const tb = deck.tubs[1], d = dr(t, 0.006, 0.3, 39); cam([tb.x + 1.7 + d[0], tb.y + 1.05 + d[1], tb.z - 2.4 + 0.2 * k], [tb.x - 0.1, tb.y, tb.z], 38, 0, [tb.x, tb.y, tb.z], 8); },
     tubWide: (t, s, k) => { cam([12 - 2 * k, y15 + 6.5, -14], [-16, y15, 6], 42, 0, [-14, y15, 2], 30); },
@@ -266,7 +266,8 @@ function atShipSet(app) {
       cam([h[0] - lz * D - lx * 0.12 + d[0], h[1] - 0.25 + 0.05 * k + d[1], h[2] + lx * D - lz * 0.12], [h[0] - lx * 0.12, h[1] + 0.12, h[2] - lz * 0.12], 48, 0, [h[0], h[1], h[2]], 6); },
     // the last shot: the two of you from below, small against the white ceiling, the hull over you
     question: (t, s, k) => { const a = head(youS), b = head(girlS), p = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
-      cam([p[0] - 0.9 - 0.5 * k, p[1] - 1.6 - 0.8 * k, p[2] + 1.3 + 0.6 * k], [p[0] - 0.1, p[1] + 2.4, p[2] - 0.2], 56, 0, [p[0], p[1], p[2]], 14); },
+      // from 4.5 m below: the two of you small and dark in the middle of the frame, the hull's edge and the light over you
+      cam([p[0] - 1.2 - 0.4 * k, p[1] - 4.5 - 0.6 * k, p[2] + 1.8 + 0.4 * k], [p[0], p[1] + 0.4, p[2]], 60, 0, [p[0], p[1], p[2]], 14); },
   };
   set.under = AT_UNDER;
 
@@ -274,7 +275,8 @@ function atShipSet(app) {
   // you two, on the open side away from the hull (an ellipse 4.5 × 3 m whose near edge passes 2.5 m behind you); at the
   // rise it lifts to her height, still 2.5 m off
   const sharkAt = (s) => {
-    const c = [PM[0] + 1.0, PM[1] + 1.2, PM[2] - 5.5], RX = 4.5, RZ = 3.0, s0 = atSC('shark', 1, -0.8), s1 = s0 + 6.5, w = 2 * ATPI / 20, aj = ATPI / 2 + 0.6;
+    const c = [PM[0] + 1.0, PM[1] + 1.2, PM[2] - 6.6], RX = 5.0, RZ = 3.0,   // (never nearer than 3.6 m to you two)
+      s0 = atSC('shark', 1, -0.8), s1 = s0 + 6.5, w = 2 * ATPI / 20, aj = ATPI / 2 + 0.6;
     const lift = s > E.letGo - 6 && s < E.catch + 8 ? atEase(s, E.letGo - 6, E.letGo + 2) * (1 - atEase(s, E.catch + 2, E.catch + 8)) : 0;
     const on = (a, ss) => [c[0] + RX * Math.cos(a), c[1] + 0.4 * Math.sin((ss - s1) * 0.13) + 4.0 * lift, c[2] + RZ * Math.sin(a)];
     if (s < s0 - 60) return null;
@@ -333,7 +335,7 @@ function atShipSet(app) {
     // ---- the big screen: on until the power fails
     // (it flickers for the last half second, then the picture collapses to a dim glow and goes)
     { const u = s - E.blackout, fl = u > -0.6 && u < 0 ? (Math.sin(t * 47) > -0.2 ? 1 : 0.15) * (0.6 + 0.4 * Math.sin(t * 13)) : 1;
-      deck.screen.mat.emissiveIntensity = power ? 1.1 * fl : 0.5 * Math.max(0, 1 - u / 0.3); deck.screen.mat.color.set(power || u < 0.3 ? '#111' : '#050607'); }
+      deck.screen.mat.emissiveIntensity = power ? 1.5 * fl : 0.5 * Math.max(0, 1 - u / 0.3); deck.screen.mat.color.set(power || u < 0.3 ? '#111' : '#050607'); }
     deck.shop.light.emissiveIntensity = power ? 1.4 : 0; shopL.intensity = power && m === 'rack' ? 5 : 0;
     // ---- the drinks' foam (from 10:20, strongest at 10:35, still at 11:00)
     deck.foam.set(!under && (m === 'bar' || m === 'glass' || m === 'terrace') ? MathX.smooth(s, atHMS(10, 20), atHMS(10, 34)) * (1 - MathX.smooth(s, atHMS(11, 5), atHMS(11, 30))) : 0, t);
@@ -575,9 +577,9 @@ function atShipSet(app) {
     if (m === 'down13') return [Lb([F.marina.x1 - 2, F.marina.y + 0.6, 0], 'DECK 2', 'THE DIVE SHOP', w)];
     if (m === 'funnel') return [Lb([ship.funnelTop[0][0] + 1, ship.funnelTop[0][1] + 2, ship.funnelTop[0][2]], 'THE FUNNEL', 'TOO LITTLE OXYGEN TO BURN THE FUEL', w, 'r')];
     if (m === 'lineUW') { const p = line.at(s, line.dep[2]); return [Lb([p[0] + 0.3, p[1], p[2]], 'YOUR 6 TANKS', '8.6 TO 11.6 m DOWN', w)]; }
-    if (m === 'sharkIn') { const q = set.sharkAt(s); if (q) return [Lb([q.p[0], q.p[1] + 0.3, q.p[2]], 'OCEANIC WHITETIP', 'ABOUT 2.6 m', w)]; }
-    if (m === 'stars') { const v = atSunAt(s).v, c = camera.position; return [Lb([c.x + v[0] * 2000, c.y + v[1] * 2000, c.z + v[2] * 2000], 'THE SUN', 'THE SKY AROUND IT: BLACK', w)]; }
-    if (m === 'officer') { const o = set.ofAt; return [Lb([o[0] + 0.35, o[1] + 0.66, o[2] - 0.62], 'PURE OXYGEN', 'NOT ENOUGH ABOVE 13,700 m', w, 'r')]; }
+    if (m === 'sharkIn') { const q = set.sharkAt(s); if (q) return [Lb([q.p[0], q.p[1] - 0.7, q.p[2]], 'OCEANIC WHITETIP', 'ABOUT 2.6 m', w, 'r')]; }   // (under it: clear of the air panel)
+    if (m === 'stars') { const v = atSunAt(s).v, c = camera.position; return [Lb([c.x + v[0] * 2000, c.y + v[1] * 2000, c.z + v[2] * 2000], 'THE SUN', 'THE SKY AROUND IT: ALMOST BLACK', w)]; }
+    // (the officer's shot has no label: the HUD's panel says it, and a label there printed over it)
     if (m === 'tub') { const tb = deck.tubs[1]; return [Lb([tb.x, tb.y + 0.1, tb.z], 'HOT TUB', '39 °C · BOILING', w)]; }
     return [];
   };

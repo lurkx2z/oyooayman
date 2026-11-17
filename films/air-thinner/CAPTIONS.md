@@ -10,11 +10,11 @@ status: voiceless
 
 [title] What if the air got 1% thinner every minute?
 
-[start] 10:00 AM, on a cruise ship 1,500 km from land. The air just got 1% thinner. / Nobody on deck felt a thing. / In 60 seconds it happens again. Then again. Every minute.
+[start] 10:00 AM, on a cruise ship 1,500 km from land. The air just got 1% thinner. / You're the ship's dive instructor. Before noon, you and this girl will be the only two from this ship still awake. / In 60 seconds it happens again. Then again. Every minute.
 
 [weight] Air has weight. Above every square metre of this deck: 10 tonnes of it. / You never feel it, because it presses on you from every side. / Losing 1% of it is like climbing 85 metres.
 
-[boil] At this rate, the ocean itself starts to boil at 3:39 this afternoon. / And there's nowhere lower to go. You're already at sea level.
+[boil] At this rate, the ocean itself starts to boil at 3:39 this afternoon. / It's the same everywhere on Earth. And you're already at sea level: there's nowhere lower to go.
 
 [ears] 10:10. Your ears pop. Everyone's do, every few minutes now. / Her balloon is getting bigger. The gas inside is pushing against less air.
 
@@ -38,11 +38,11 @@ status: voiceless
 
 [under] 10 metres down. The water presses on you like the whole sky used to. / You can breathe again. / Above you, 4,300 people can't.
 
-[everest] 11:56. Up there, the air is as thin as on top of Everest. / Nobody on board is awake.
+[everest] 11:56. Up there, the air is as thin as on top of Everest. / Nobody on board without oxygen is still awake.
 
 [shark] 12:30. Nothing that breathes water has noticed a thing. / An oceanic whitetip has found the two of you. / It's circling.
 
-[oxygen] 1:11 PM. Up there, even pure oxygen wouldn't keep anyone awake now.
+[oxygen] 1:11 PM. Even pure oxygen isn't enough now. The officer breathing it is out too.
 
 [rise] She sees it, and lets go of the line. / She's kicking for the light. Up there, she'd pass out in 15 seconds. / You catch her fin.
 
@@ -54,6 +54,6 @@ status: voiceless
 
 [sea] 3:27. The pool is boiling. / 3:39. The ocean starts to boil. / Only the top. Down here, the sea's weight keeps the water around you liquid.
 
-[last] Your last tank runs out at 8:57 tonight. The air isn't coming back. / Up there, the stars are out in the afternoon.
+[last] Your last tank runs out at 8:57 tonight. The air isn't coming back. / Up there: stars in the afternoon. And her parents.
 
-[question] Would you go up to see them?
+[question] Would you take her up to see them?
