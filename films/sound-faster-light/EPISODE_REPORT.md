@@ -211,11 +211,17 @@ windows across the whole 4:17 cut, with the stem trims added in:
 - **Runnable ZIP** `sound-faster-light-film.zip` (in the project files, 7.6 MB): extract it, open
   `sound-faster-light.html` in Chrome or Edge on a computer, wait for SOUND READY, press Space. Tested from a fresh
   unzip with `tools/check-page.cjs`: SOUND READY after 3 s, no console errors.
-- **Final 1080p MP4**, to be rendered on the owner's PC (graphics card): `node films/sound-faster-light/render-gpu.cjs
-  --channel chrome --workers 2 --out D:\renders\sound-faster-light --small`. The file to upload will be
-  `D:\renders\sound-faster-light\sound-faster-light_final_1080p.mp4` (1920×1080, 30 fps, with the mastered
-  `final-soundtrack.m4a` copied in), plus `sound-faster-light_final_small.mp4` (1280×720, a preview copy). The command
-  is resumable: run it again and finished segments are kept.
+- **Final 1080p MP4**, rendered on the owner's PC (graphics card) on 19 November 2026 from commit 1e8827f, entirely on
+  D: (C: was full: a fresh copy of the branch at `D:\oyooayman-render-src`, temp files in `D:\render-tmp`), the
+  frames in 8 minutes (about 16 frames a second), 11 minutes in all: `node films/sound-faster-light/render-gpu.cjs
+  --channel chrome --workers 2 --out D:\renders\sound-faster-light --small`.
+  - `D:\renders\sound-faster-light\sound-faster-light_final_1080p.mp4`: 1920×1080, 30 fps, 257.50 s (7,725 frames),
+    1,286 MiB, with the mastered soundtrack `final-soundtrack.m4a` copied in: −14.5 LUFS, loudness range 7.8 LU,
+    −2.4 dBTP. **This is the file to upload.**
+  - `sound-faster-light_final_small.mp4`: 1280×720, 26.5 MiB, 257.47 s (one frame fewer than the film), −14.5 LUFS,
+    −2.6 dBTP (a preview copy).
+  - Check frames at 4, 140, 226 and 254 s (`check_*.jpg` beside the MP4) were looked at: none black or broken.
+  - The command is resumable: run it again and finished segments are kept.
 - **Thumbnails** (house style) in the project files: `thumb-thunder.jpg` ("1,000,000 km/s / AND STILL YOU CAN'T FIND
   HER", the 6 km bolt over the farm), `thumb-tornado.jpg` ("3 km away / AND STILL ITS ROAR IS INSIDE YOUR HEAD", the
   funnel lit by a flash), `thumb-raincoat.jpg` ("120 metres / AND STILL SHE SOUNDS RIGHT BESIDE YOU", her yellow
