@@ -188,6 +188,18 @@ Everything is procedural, so there are no models, images or sound files to downl
 > ankles, and the ice bends under your chest. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/no-light/PLAN.md`](films/no-light/PLAN.md) and [`EPISODE_REPORT.md`](films/no-light/EPISODE_REPORT.md).
 >
+> ***What if the air got 1% thinner every minute?*** — open `air-thinner.html` (16:9, voiceless, 5:14). At 10:00 AM
+> on a cruise ship 1,500 km out in the Atlantic, 1% of the air that's left stops existing, and again every minute.
+> Air has weight (10 tonnes over every square metre), so each step is like climbing 85 metres, and there's nowhere lower
+> to go. Ears pop, a girl's balloon swells and bursts, every sealed packet puffs up, the drinks foam over, one flight of
+> stairs leaves people gasping. At 11:08 half the air is gone, the engines choke on their own fuel and the power fails.
+> You, the ship's dive instructor, take a lost girl and six scuba tanks under 10 metres of sea, where the water's
+> weight gives you the pressure the sky used to. Above you 4,300 people pass out; an oceanic whitetip circles; she
+> lets go and kicks for the light. By the afternoon the sky is black with the Sun in it, the hot tubs boil at 39 °C,
+> then water at body temperature, then the pool, then the ocean itself at 3:39 PM. Your last tank runs out at 8:57
+> tonight. The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/air-thinner/PLAN.md`](films/air-thinner/PLAN.md) and [`EPISODE_REPORT.md`](films/air-thinner/EPISODE_REPORT.md).
+>
 > ***What if sound travelled faster than light?*** — open `sound-faster-light.html` (16:9, voiceless, 4:17). At 8:52 PM
 > on a corn farm in Iowa, with a thunderstorm coming in and your 9-year-old daughter just gone into the 2.4-metre corn
 > after the dog, sound starts travelling at a million kilometres a second (3.3 times light; only its speed changes).
