@@ -157,8 +157,10 @@ the land patch's mismatched colours; a grading line that had switched off the bl
   in Chrome or Edge on a computer, wait for SOUND READY, press Space.
 - **Final 1080p MP4, v2 (no breathing): the upload file** is
   `D:\renders\everything-shrinking-v2\everything-shrinking_final_1080p.mp4` (and `everything-shrinking_final_small.mp4`
-  for a phone). The picture is unchanged, so v2 reuses v1's video segments and adds the new soundtrack:
+  for a phone). The picture is unchanged, so v2 reused all 20 of v1's video segments (0 frames rendered) and added the
+  new soundtrack, from commit 27b9bc2 on 2026-11-20:
   `node films/everything-shrinking/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\everything-shrinking-v2 --small`.
+  1080p: 1920×1080, 286.93 s, 1,078 MiB, −15.9 LUFS, −2.4 dBTP. Small: 1280×720, 26.3 MiB, −16.0 LUFS, −3.1 dBTP.
 - v1 (with the breathing; don't upload): rendered 2026-11-20 on the owner's PC from commit 283c1bb, 8,608 frames in
   8 min at about 17 fps, `D:\renders\everything-shrinking\`: 1920×1080, 286.93 s, 1,078 MiB, −15.8 LUFS, −2.3 dBTP;
   small copy 26.3 MiB.
