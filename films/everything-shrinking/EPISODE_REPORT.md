@@ -55,7 +55,7 @@ later, it runs on. In 4:47 the story runs from 6:49:00 to 7:02 AM.
 | 1:25 | neighbours | the people at the next campsite scream; you're 30 m tall to them; you stand still |
 | 1:39 | rumble | your call reaches them below 20 Hz: they feel it as an earthquake |
 | 1:52 | hush | Leo's voice: a bird, a whistle, nothing |
-| 2:07 | quiet | the valley is silent; all you hear is you (breath, heartbeat) |
+| 2:07 | quiet | the valley is silent; all you hear is you (your heartbeat, the blood in your ears) |
 | 2:21 | sunrise | the Sun comes up for you first; the valley is still dark |
 | 2:29 | shadow | the gold peaks; seen from them, you stand between them and the Sun |
 | 2:41 | peaks | the lake a puddle; the peaks at your waist |
@@ -79,28 +79,32 @@ No narrator: the captions are silent and the sound carries the film. Three stems
   world, so it plays an octave higher every 30 s until it is out of hearing (gone by 2:05); your own score (strings,
   piano, drums, an endless rise from the airliner on) never changes pitch;
 - **the beds**: the river, the wind in the spruce and the dawn chorus, all at the world's pitch, climbing and thinning
-  out of hearing; then only you: your breath, your heartbeat from the quiet on, the blood in your ears;
+  out of hearing; then only you: your heartbeat from the quiet on, the blood in your ears (no breathing: v2);
 - **the effects**, at the world's pitch (×1/s, faded past 17 kHz) or your own: Leo asleep, the tent creaking and
   tearing, Leo's calls (a voice, then a bird, a whistle, nothing), the neighbours' screams, your own deep call, the
-  quake as a far crackle, your knuckles on the meadow, your grip, your breath at the lift, your palms on the Earth.
+  quake as a far crackle, your knuckles on the meadow, your grip, your palms on the Earth.
 
-**Mix.** −15.7 LUFS integrated, loudness range 7.8 LU, −1.9 dB peak (the rendered WAV, limiter at −2 dBTP). The
-mastered `final-soundtrack.m4a` (AAC 256k, limiter at −3 dB) measures −15.8 LUFS, −2.3 dBTP; `small-soundtrack.m4a`
-(AAC 128k) −15.9 LUFS, −3.0 dBTP.
+**v2 (2026-11-20): no breathing.** After watching the 1080p film the owner found the breathing that ran under almost
+the whole film annoying. Your breathing track is gone, and so are your four one-off breaths (at the rip, as your boots
+lift, as you hold on, at the lift). The only breathing left is Leo asleep in the tent in the first seconds.
+
+**Mix (v2).** −15.8 LUFS integrated, loudness range 8.4 LU, −1.9 dB peak (the rendered WAV, limiter at −2 dBTP). The
+mastered `final-soundtrack.m4a` (AAC 256k, limiter at −3 dB) measures −15.9 LUFS, −2.4 dBTP; `small-soundtrack.m4a`
+(AAC 128k) −16.0 LUFS, −3.1 dBTP.
 
 **The score leads** (the owner's rule of 31 October 2026), measured stem by stem (solo renders, ebur128) in 10-second
 windows across the whole film, with the stem gains added in:
-- over the beds: 7.5 to 25.9 dB (median 12.5 dB). The two closest windows are 2:10–2:20 (the quiet beat, where your
-  breath and heartbeat are the point: "All you can hear is you") and 2:50–3:00 (your breath as you kneel), both 7.5 dB.
+- over the beds (v2, without the breathing): 9.3 dB or more (median 15.9 dB); the closest window is 0:30–0:40 (the
+  valley as you rise through the roof). v1 had the beds at 7.5 dB (median 12.5), the closest two being your breath.
 - over the effects: median 13.4 dB, closest 8.0 dB (Leo's calls at 1:10 and 1:50). The effects are silent in long
-  stretches of the second half, where the score and your breath carry it.
+  stretches of the second half, where the score and your heartbeat carry it.
 - stem gains: music +5, beds −14, effects −8 dB, master +4 dB (`mix.js`). The score is lifted 3–5 dB through its
   sparse stretches (the rule, the weight, the hush and quiet, the air, the escape, the sky, the ball, the end), and the
   beds are lowered 5 dB under Poincaré and 3 dB as you kneel; these moves are keyed to the beats, not to film seconds.
 - The first measurement had the beds only ~2 dB under the score and Leo's bird and whistle calls silent (a frequency
   check cut them as if they still had a child's formants); both were fixed before the bake.
-- The baked soundtrack (`soundtrack.js`, MP3 160k) carries the code's fingerprint (`bef5dcf7`); `tools/check-page.cjs`
-  reports SOUND READY after 4 s with no console errors, so the baked copy is accepted.
+- The baked soundtrack (`soundtrack.js`, MP3 160k) carries the code's fingerprint (`ccbcaa0a`, v2); `tools/check-page.cjs`
+  reports SOUND READY after 3 s with no console errors, so the baked copy is accepted.
 
 ## Reviews
 
@@ -151,13 +155,13 @@ the land patch's mismatched colours; a grading line that had switched off the bl
 
 - **Runnable ZIP** `everything-shrinking-film.zip` (in the project files): extract it, open `everything-shrinking.html`
   in Chrome or Edge on a computer, wait for SOUND READY, press Space.
-- **Final 1080p MP4** (rendered 2026-11-20 on the owner's PC, graphics card, all on D:, from commit 283c1bb; 8,608 frames
-  in 8 min at about 17 fps) with
-  `node films/everything-shrinking/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\everything-shrinking --small`:
-  - `D:\renders\everything-shrinking\everything-shrinking_final_1080p.mp4`: 1920×1080, 286.93 s, 1,078 MiB,
-    −15.8 LUFS, −2.3 dBTP. **This is the upload file.**
-  - `D:\renders\everything-shrinking\everything-shrinking_final_small.mp4`: 1280×720, 26.3 MiB, −15.9 LUFS, −3.0 dBTP
-    (for a phone).
+- **Final 1080p MP4, v2 (no breathing): the upload file** is
+  `D:\renders\everything-shrinking-v2\everything-shrinking_final_1080p.mp4` (and `everything-shrinking_final_small.mp4`
+  for a phone). The picture is unchanged, so v2 reuses v1's video segments and adds the new soundtrack:
+  `node films/everything-shrinking/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\everything-shrinking-v2 --small`.
+- v1 (with the breathing; don't upload): rendered 2026-11-20 on the owner's PC from commit 283c1bb, 8,608 frames in
+  8 min at about 17 fps, `D:\renders\everything-shrinking\`: 1920×1080, 286.93 s, 1,078 MiB, −15.8 LUFS, −2.3 dBTP;
+  small copy 26.3 MiB.
 - **Thumbnails** (house style) in the project files: `thumb-earth.jpg` (30 cm, the Earth in your hands),
   `thumb-giant.jpg` (30 m tall, over the neighbours), `thumb-house.jpg` (11 m across, the size of a house).
 

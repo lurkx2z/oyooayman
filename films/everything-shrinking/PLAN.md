@@ -61,7 +61,8 @@ your body is not drawn, but it still casts its shadow.
   drums, the endless rise) never changes pitch. The music leads (the owner's rule of 31 October 2026).
 - **World sounds** (river, wind in the spruce, dawn chorus, Leo, the neighbours, the quake) are played at
   ekWorldRate = 1/s and fade past 17 kHz.
-- **Your sounds** (your breath, your heartbeat from the quiet on, your blood in your ears) stay at your own pitch.
+- **Your sounds** (your heartbeat from the quiet on, your blood in your ears) stay at your own pitch. No breathing
+  (v2: the owner found it annoying).
 
 ## 6. Checks and review log
 - `script.js` refuses to run if any caption number or moment drifts from `physics.js`. The clock anchors throw if

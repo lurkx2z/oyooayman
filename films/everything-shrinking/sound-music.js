@@ -15,7 +15,7 @@
      weight        weightless strings; the pick-up: a warm chord
      neighbours    a low ostinato, a semitone cluster; the quake: a timpani roll and blows
      hush          the music box climbs out of hearing (bird, whistle, nothing); the score thins to a thread
-     quiet         nothing but a low drone (the amb stem has your breath and heart)
+     quiet         nothing but a low drone (the amb stem has your heart)
      sunrise       the score opens: E major, the first big swell, gold
      shadow        it slides down a semitone into minor as your shadow falls on the peaks
      peaks/air     huge low strings; then the lullaby on your piano, alone, while you put him down; it stops unresolved
@@ -255,7 +255,7 @@ ekSound('music', 'score', function (ctx, bus, K) {
     box(t0 + 0.2, c('hush', 2) + 2.0, 0.45, 0.75);
     M.piano(c('hush', 2) + 0.3, 'E2', 0.32, 5); M.piano(c('hush', 2) + 0.31, 'F2', 0.18, 5); }
 
-  // ================================================================== quiet: only you (the drone; your breath and heart are in the amb stem)
+  // ================================================================== quiet: only you (the drone; your heart is in the amb stem)
   { const t0 = B('quiet');
     M.strings(t0, B('sunrise') + 0.3, ['E1', 'B1'], 0.22, { att: 2.5, rel: 0.4, cut: 160 });
     M.strings(c('quiet', 1), B('sunrise') + 0.3, ['B4', 'F#5'], 0.03, { att: 3, rel: 0.4, cut: 3000, wave: 'triangle', vib: 3 });

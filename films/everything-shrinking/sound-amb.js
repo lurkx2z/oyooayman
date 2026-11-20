@@ -4,8 +4,8 @@
    octave up every 30 s (ekWorldRate). The beds' filters climb with it and fade as they pass the top of your hearing
    (ekAudible): first the low river and the wind in the spruce thin and brighten, then the birds become a fizz, then
    nothing. By 2:07 ("Every sound the valley makes is now too high for you to hear") the world is silent.
-   Your own sounds stay where they are: your breath (always), your heartbeat (from the quiet on: "All you can hear is
-   you"), your blood in your ears in the silence.
+   Your own sounds stay where they are: your heartbeat (from the quiet on: "All you can hear is you"), your blood in
+   your ears in the silence. (No breathing: the owner found it annoying.)
      the tent      the valley muffled through the fabric
      outside       the outflow over its rocks, the wind in the spruce, the dawn chorus (seeded, a few birds a second)
    ===================================================================== */
@@ -37,25 +37,7 @@ ekSound('amb', 'valley', function (ctx, bus, K) {
   void END;
 });
 
-// your breath: in through the nose, out through the mouth; calm at first, quicker in the tense beats, held at the
-// biggest moments; close and dry (it is inside your head), louder once the world has gone silent
-ekSound('amb', 'breath', function (ctx, bus, K) {
-  const fx = K.fx, r = new RNG(CONFIG.seed + 91), c = ekC, B = ekB, END = EK.end;
-  // the breathing period (s) and level over the film
-  const per = ekCurve((t) => 4.2 - 1.2 * ekWn(t, B('neighbours'), B('hush'), 2, 2) - 1.4 * ekWn(t, B('escape'), B('plane'), 1, 2) - 1.0 * ekWn(t, B('lift'), B('moon'), 1, 2)
-    - 1.3 * ekWn(t, B('house'), B('ball'), 1, 1) - 0.8 * ekWn(t, c('end', 1), END, 1, 0));
-  const lvl = ekCurve((t) => 0.22 + 0.5 * ekEv(t, B('quiet') - 1, c('quiet', 1)) - 0.25 * ekWn(t, B('sunrise'), B('peaks'), 1, 2));
-  // (held: the breath you hold as the Sun comes up, and on the ball)
-  const held = (t) => ekWn(t, c('sunrise', 0) - 0.2, c('sunrise', 0) + 3.5, 0.1, 0.1) + ekWn(t, B('ball') + 0.2, B('ball') + 3.4, 0.1, 0.1);
-  for (let t = 1.0; t < END - 0.6;) {
-    const p = per(t), ti = p * 0.42, te = p * 0.5;
-    if (held(t) > 0.5) { t += 0.4; continue; }
-    const a = lvl(t) * r.range(0.85, 1.1);
-    K.put(fx.breath(ti, { inhale: true }), t, { vol: a * 0.75, norm: true, pan: 0 });
-    K.put(fx.breath(te, { voice: 0.04, f0: 110 }), t + ti + 0.08, { vol: a, norm: true, pan: 0 });
-    t += p * r.range(0.93, 1.07);
-  }
-});
+// (no breathing track: the owner found a breath under the whole film annoying, 2026-11-20)
 
 // your heartbeat (from the quiet on: everything else is too high to hear), and the blood in your ears in the silence
 ekSound('amb', 'heart', function (ctx, bus, K) {

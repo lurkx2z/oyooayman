@@ -7,7 +7,7 @@
      the neighbours their screams (tiny, high); your call to them (your own voice, deep, inside your head)
      the quake     to you: a crackle, high and far below (the rocks of their valley, grinding at their pitch × 20)
      the touch     your knuckles on the meadow (your own skin and bones: a soft, dull knock)
-     the hold      your fingers' tendons straining; the lift: a sharp breath in
+     the hold      your fingers' tendons straining; the lift: your grip again
      the ball      your palms round it (skin on stone)
    ===================================================================== */
 
@@ -55,8 +55,7 @@ ekSound('sfx', 'events', function (ctx, bus, K) {
   // the rip: the fly tears across your hands (nylon, at the world's pitch × 1.6)
   { const t = sh('O1').t0 + (sh('O1').t1 - sh('O1').t0) * 0.14, w = W(t);
     const y = fx.rustle(1.0, { density: 2600, rub: 0.7, lo: 900 * w, hi: Math.min(16000, 7000 * w), grain: 0.002, env: (u) => Math.min(1, u / 0.05) * Math.pow(1 - u, 1.6) });
-    K.put(y, t, { vol: 0.42, norm: true, pan: -0.1 }); K.put(fx.rustle(0.6, { density: 1800, rub: 0.5, lo: 1200 * w, hi: Math.min(16000, 8000 * w), grain: 0.002 }), t + 0.35, { vol: 0.28, norm: true, pan: 0.3 });
-    K.put(fx.breath(0.5, { voice: 0.25, f0: 130 }), t - 0.1, { vol: 0.32, norm: true }); }
+    K.put(y, t, { vol: 0.42, norm: true, pan: -0.1 }); K.put(fx.rustle(0.6, { density: 1800, rub: 0.5, lo: 1200 * w, hi: Math.min(16000, 8000 * w), grain: 0.002 }), t + 0.35, { vol: 0.28, norm: true, pan: 0.3 }); }
   // ---- Leo: his calls (from out in front of you, then from your hand)
   { const calls = [
       [sh('L2').t0 + 1.0, 0.7, 0.2], [sh('V1').t0 + 0.6, 0.75, 0.2], [sh('V1').t0 + 3.4, 0.9, 0.2], [sh('V2').t0 + 1.2, 0.8, 0.15],
@@ -75,18 +74,16 @@ ekSound('sfx', 'events', function (ctx, bus, K) {
     EKX.bq(y, 'hp', Math.min(12000, 400 * w), 0.7, fx.sr);
     for (let i = 0; i < y.length; i++) y[i] *= Math.min(1, i / (0.3 * fx.sr)) * Math.pow(1 - i / y.length, 1.4);
     K.put(y, t0, { vol: 0.16 * ekAudible(t0, 500), norm: true, pan: 0.2 }); }
-  // ---- your boots lift off the grass (the grass at the world's pitch: a faint hiss); your breath catches
-  { const t = sh('W2').t0 + 0.6; K.put(fx.rustle(0.5, { density: 600, rub: 0.3, lo: 3000, hi: 14000, grain: 0.003 }), t, { vol: 0.08, norm: true });
-    K.put(fx.breath(0.45, { inhale: true }), t + 0.1, { vol: 0.25, norm: true }); }
+  // ---- your boots lift off the grass (the grass at the world's pitch: a faint hiss)
+  { const t = sh('W2').t0 + 0.6; K.put(fx.rustle(0.5, { density: 600, rub: 0.3, lo: 3000, hi: 14000, grain: 0.003 }), t, { vol: 0.08, norm: true }); }
   // ---- the touch: your knuckles on the meadow (your skin and bones: a soft, dull knock)
   { const t = sh('A3').t0 + (sh('A3').t1 - sh('A3').t0) * 0.3;
     K.put(fx.hit([[68, 0.07, 1], [140, 0.04, 0.5], [310, 0.02, 0.2]], { width: 0.01, amp: 1, len: 0.5 }), t, { vol: 0.4, norm: true, lp: 600 }); }
   // ---- holding on: your fingers' tendons straining, your grip
   { const t0 = sh('E2').t0 + 0.3;
-    K.put(fx.creak(1.6, [[95, 0.03, 1], [210, 0.02, 0.5], [430, 0.012, 0.2]], { rate: [12, 30], env: (u) => Math.sin(Math.PI * u) }), t0, { vol: 0.2, norm: true, lp: 900 });
-    K.put(fx.breath(0.9, { voice: 0.15, f0: 120, teeth: true }), t0 + 0.4, { vol: 0.3, norm: true }); }
-  // ---- the lift: a sharp breath in; your grip again
-  { const t = B('lift') + 0.4; K.put(fx.breath(0.55, { inhale: true }), t, { vol: 0.45, norm: true });
+    K.put(fx.creak(1.6, [[95, 0.03, 1], [210, 0.02, 0.5], [430, 0.012, 0.2]], { rate: [12, 30], env: (u) => Math.sin(Math.PI * u) }), t0, { vol: 0.2, norm: true, lp: 900 }); }
+  // ---- the lift: your grip again
+  { const t = B('lift') + 0.4;
     K.put(fx.creak(1.2, [[90, 0.03, 1], [200, 0.02, 0.5]], { rate: [10, 26] }), t + 0.5, { vol: 0.18, norm: true, lp: 800 }); }
   // ---- the ball in your hands: palms on stone
   { const t = B('ball') + 0.2; K.put(fx.rustle(1.4, { density: 120, rub: 0.6, lo: 200, hi: 2500, grain: 0.02, env: (u) => Math.sin(Math.PI * u) }), t, { vol: 0.18, norm: true });

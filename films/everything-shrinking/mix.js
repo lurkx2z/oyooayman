@@ -13,7 +13,7 @@ window.EK_MIX = {
   },
   dyn: {
     // the score lifted through its sparse stretches (the rule, the weight, the hush and the quiet, the air, the escape,
-    // the sky, the ball), so it still leads the valley and your breath there
+    // the sky, the ball), so it still leads the valley and your heart there
     music: [[0, 0, 0], ['rule', -1, 0], ['rule', 1.5, 4], ['rule', 9, 4], ['leo', -1, 0], ['weight', -0.5, 0], ['weight', 1.5, 4], ['weight', 11, 4], ['neighbours', -1, 0],
       ['hush', -1, 0], ['hush', 1.5, 4], ['quiet', 9, 5], ['sunrise', -1, 1], ['sunrise', 3, 0], ['peaks', -1, 0], ['peaks', 1, 2], ['air', 0, 2], ['air', 4, 1], ['air', 6, 3], ['air', 20, 3], ['escape', 2, 3], ['plane', 2, 4], ['plane', 9, 3], ['curve', 0, 0],
       ['sky', 0, 0], ['sky', 2, 3], ['lift', 1, 3], ['lift', 3, 0], ['ball', -1, 0], ['ball', 1, 3], [266.8, 0, 3], [270, 0, 0], [EKT.duration - 0.04, 0, 0], [EKT.duration, 0, -60]],

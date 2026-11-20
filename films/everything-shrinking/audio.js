@@ -4,7 +4,7 @@
    silent and the sound carries the gaps. Three stems:
      music  an original score (sound-music.js); it leads
      amb    the valley at dawn (the river, the wind in the spruce, the birds); every sound of the world goes up an octave
-            every 30 s, so the valley climbs out of your hearing; then only you: your breath, your heart (sound-amb.js)
+            every 30 s, so the valley climbs out of your hearing; then only you: your heart (sound-amb.js)
      sfx    the events at their story moments (sound-sfx.js; each heard once: the clock only runs forward)
    A dynamics map per stem (mix.js), then a true-peak limiter. Everything is synthesised from seeded noise and maths.
    ===================================================================== */
