@@ -151,8 +151,13 @@ the land patch's mismatched colours; a grading line that had switched off the bl
 
 - **Runnable ZIP** `everything-shrinking-film.zip` (in the project files): extract it, open `everything-shrinking.html`
   in Chrome or Edge on a computer, wait for SOUND READY, press Space.
-- **Final 1080p MP4**: to be rendered on the owner's PC (graphics card), all on D:, with
-  `node films/everything-shrinking/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\everything-shrinking --small`.
+- **Final 1080p MP4** (rendered 2026-11-20 on the owner's PC, graphics card, all on D:, from commit 283c1bb; 8,608 frames
+  in 8 min at about 17 fps) with
+  `node films/everything-shrinking/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\everything-shrinking --small`:
+  - `D:\renders\everything-shrinking\everything-shrinking_final_1080p.mp4`: 1920×1080, 286.93 s, 1,078 MiB,
+    −15.8 LUFS, −2.3 dBTP. **This is the upload file.**
+  - `D:\renders\everything-shrinking\everything-shrinking_final_small.mp4`: 1280×720, 26.3 MiB, −15.9 LUFS, −3.0 dBTP
+    (for a phone).
 - **Thumbnails** (house style) in the project files: `thumb-earth.jpg` (30 cm, the Earth in your hands),
   `thumb-giant.jpg` (30 m tall, over the neighbours), `thumb-house.jpg` (11 m across, the size of a house).
 
