@@ -1,0 +1,138 @@
+/* =====================================================================
+   SOUND · LIB — the noise and filter generators the ambience and effects share (the gravity films' sound kit, via the
+   light films and the magnets film) and where the camera is. Every function here is listed
+   in EK_SOUND_FNS at the end, so the baked soundtrack's fingerprint sees a change to any of them.
+   ===================================================================== */
+
+// ---- shared generators -------------------------------------------------------------------------------------------
+// noise of a colour: 'white' | 'pink' | 'brown'
+function ekNoise(fx, n, colour = 'white') {
+  const y = fx.white(n);
+  if (colour === 'pink') {
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < n; i++) { const w = y[i]; b0 = 0.99886 * b0 + w * 0.0555179; b1 = 0.99332 * b1 + w * 0.0750759; b2 = 0.969 * b2 + w * 0.153852; b3 = 0.8665 * b3 + w * 0.3104856; b4 = 0.55 * b4 + w * 0.5329522; b5 = -0.7616 * b5 - w * 0.016898; y[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362) * 0.11; b6 = w * 0.115926; }
+  } else if (colour === 'brown') {
+    let b = 0; for (let i = 0; i < n; i++) { b = (b + 0.02 * y[i]) / 1.02; y[i] = b * 3.5; }
+  }
+  return y;
+}
+// a tone with harmonics (hum, engine, motor): f(t) the pitch over the event (t from 0), harm [[k, a]], env(u, t)
+function ekTone(K, t0, d, f, harm, env, o = {}) {
+  const { fx, sr } = K, n = Math.ceil(d * sr), y = fx.arr(d);
+  const F = typeof f === 'function' ? f : () => f, ph = harm.map(() => fx.r.range(0, 6.283));
+  for (let i = 0; i < n; i++) {
+    const t = i / sr, fr = F(t), e = env ? env(t / d, t) : Math.min(1, t / 0.05, (d - t) / 0.05);
+    let v = 0; for (let k = 0; k < harm.length; k++) { ph[k] += 2 * Math.PI * fr * harm[k][0] / sr; v += harm[k][1] * Math.sin(ph[k]); }
+    y[i] = v * e;
+  }
+  for (const fl of (o.f || [])) EKX.bq(y, fl[0], fl[1], fl[2] || 0.7, sr, fl[3] || 0);
+  return K.put(y, t0, { vol: o.vol, norm: o.norm ?? true, pan: o.pan || 0, room: o.room, wet: o.wet });
+}
+// play x at t through a filter whose frequency follows curve (Hz, evenly spaced over x's length). The filter runs
+// here (a biquad whose coefficients follow the curve every 32 samples), so the level is set from what comes OUT of it
+function ekSweep(x, sr, type, q, curve) {
+  const y = new Float32Array(x.length), B = 32, T = { lowpass: 'lp', highpass: 'hp', bandpass: 'bp' }[type] || type;
+  let x1 = 0, x2 = 0, y1 = 0, y2 = 0, b0, b1, b2, a1, a2;
+  for (let i0 = 0; i0 < x.length; i0 += B) {
+    const u = i0 / Math.max(1, x.length - 1) * (curve.length - 1), j = Math.min(curve.length - 2, Math.floor(u)), f = curve[j] + (curve[j + 1] - curve[j]) * (u - j);
+    const w = 2 * Math.PI * Math.min(f, sr * 0.45) / sr, cs = Math.cos(w), al = Math.sin(w) / (2 * q), a0 = 1 + al;
+    if (T === 'lp') { b0 = (1 - cs) / 2; b1 = 1 - cs; b2 = b0; } else if (T === 'hp') { b0 = (1 + cs) / 2; b1 = -(1 + cs); b2 = b0; } else { b0 = al; b1 = 0; b2 = -al; }
+    b0 /= a0; b1 /= a0; b2 /= a0; a1 = -2 * cs / a0; a2 = (1 - al) / a0;
+    for (let i = i0; i < Math.min(x.length, i0 + B); i++) { const xi = x[i], v = b0 * xi + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = xi; y2 = y1; y1 = v; y[i] = v; }
+  }
+  return y;
+}
+
+const ekEv = (t, a, b) => MathX.smooth(t, a, b);                                       // 0 → 1 from a to b
+const ekWn = (t, a, b, fi = 0.3, fo = 0.3) => ekEv(t, a - fi, a) * (1 - ekEv(t, b, b + fo));   // 1 inside [a, b]
+// a level curve sampled once (200 Hz) and read back by linear interpolation: the beds read their envelopes per sample
+function ekCurve(f, hz = 200) {
+  const t0 = -2, n = Math.ceil((EK.end + 6 - t0) * hz), y = new Float32Array(n + 1);
+  for (let i = 0; i <= n; i++) y[i] = f(t0 + i / hz);
+  return (t) => { const x = MathX.clamp((t - t0) * hz, 0, n - 1e-6), i = Math.floor(x); return y[i] + (y[i + 1] - y[i]) * (x - i); };
+}
+
+// a bed whose filters follow the world's pitch (ekWorldRate, or o.rate): the same noise climbs and thins as the world
+// shrinks, and its flutter quickens with it. o.f: [[type, f, q]] (f at real speed), env(u, t) absolute level (t = film time), vol
+// (peak), fi/fo fades, room/wet, mono+pan
+function ekBedW(K, t0, t1, o = {}) {
+  const { fx, sr } = K, d = t1 - t0; if (d <= 0.02) return;
+  const n = Math.ceil(d * sr), fi = o.fi ?? 0.04, fo = o.fo ?? 0.04, rate = o.rate || ekWorldRate, N = Math.ceil(d * 25) + 2;
+  const R = Array.from({ length: N }, (_, i) => rate(t0 + d * i / (N - 1)));
+  const mk = () => {
+    let y = ekNoise(fx, n, o.colour || 'pink');
+    for (const f of (o.f || [])) y = ekSweep(y, sr, f[0], f[2] || 0.7, R.map((r) => Math.max(20, f[1] * r)));
+    const w = fx.wander(o.wr || 0.35); let tau = 0;
+    for (let i = 0; i < n; i++) { const t = i / sr; tau += R[Math.floor(i / n * (N - 1))] / sr; y[i] *= (o.env ? o.env(t / d, t0 + t) : 1) * Math.min(1, t / fi, (d - t) / fo) * (1 + (o.am || 0) * w(tau)); }
+    return y;
+  };
+  let eMax = 1; if (o.env) { eMax = 0; for (let k = 0; k <= Math.ceil(d * 50); k++) { const u = Math.min(1, k / (d * 50)); eMax = Math.max(eMax, o.env(u, t0 + u * d)); } }
+  if (eMax < 1e-4) return;
+  const vol = (o.vol ?? 1) * eMax;
+  if (o.mono) return K.put(mk(), t0, { vol, norm: true, pan: o.pan || 0, room: o.room, wet: o.wet });
+  return K.putLR(mk(), mk(), t0, { vol, norm: true, room: o.room, wet: o.wet });
+}
+// a voice (a gasp, a radio's garble): glottal pulses at f0(u) through formants [[f, q, a]] (all scaled by k), with
+// breath; env(u)
+function ekVoice(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), r = fx.r, src = new Float32Array(n), k = o.k || 1, f0 = o.f0 || (() => 300), wv = fx.wander(3);
+  let ph = 0; for (let i = 0; i < n; i++) { const u = i / n; ph += f0(u) * k * (1 + 0.025 * wv(i / sr)) / sr; if (ph >= 1) { ph -= 1; src[i] = 1; } src[i] += (r.next() * 2 - 1) * (o.breath ?? 0.08); }
+  const y = new Float32Array(n), F = o.formants || [[800, 5, 1], [1250, 6, 0.6], [2700, 7, 0.3]];
+  for (const [f, q, a] of F) { const z = Float32Array.from(src); EKX.bq(z, 'bp', f * k, q, sr); for (let i = 0; i < n; i++) y[i] += z[i] * a; }
+  const env = o.env || ((u) => Math.min(1, u / 0.15) * Math.pow(1 - u, 0.8));
+  for (let i = 0; i < n; i++) y[i] *= env(i / n);
+  return y;
+}
+// ---- voices ----------------------------------------------------------------------------------------
+// a voice calling out in the dark: two syllables ("hal-lo?", "hjel-p!"), the second higher (a question) or lower (a
+// shout); o.f0 (Hz), o.d (s), o.up (the second syllable's pitch over the first), o.v1/o.v2 the vowels' formants
+const EK_VOWEL = { a: [[730, 6, 1], [1150, 7, 0.55], [2650, 8, 0.25]], o: [[470, 6, 1], [820, 7, 0.5], [2600, 8, 0.15]], e: [[520, 6, 1], [1800, 7, 0.5], [2500, 8, 0.3]], u: [[320, 6, 1], [800, 7, 0.4], [2400, 8, 0.12]] };
+function ekCall(fx, o = {}) {
+  const sr = fx.sr, d = o.d || 0.75, f0 = o.f0 || 220, up = o.up ?? 1.2, k = o.k || 1, d1 = d * 0.42, d2 = d * 0.58, gap = Math.round(0.03 * sr);
+  const fm = (V) => V.map(([f, q, a]) => [f * k, q, a]);
+  const a = ekVoice(fx, d1, { f0: (u) => f0 * (1 + 0.04 * u), formants: fm(EK_VOWEL[o.v1 || 'a']), breath: 0.1, env: (u) => Math.min(1, u / 0.12) * Math.pow(1 - u, 0.5) });
+  const b = ekVoice(fx, d2, { f0: (u) => f0 * up * (1 + (up > 1 ? 0.06 : -0.08) * u), formants: fm(EK_VOWEL[o.v2 || 'o']), breath: 0.12, env: (u) => Math.min(1, u / 0.1) * Math.pow(1 - u, 0.9) });
+  const y = new Float32Array(a.length + gap + b.length); y.set(a, 0); y.set(b, a.length + gap);
+  return y;
+}
+// a scream: a high, wavering 'a', o.f0 (Hz), o.d (s)
+function ekScream(fx, o = {}) {
+  const f0 = o.f0 || 620, d = o.d || 1.1, wv = fx.wander(6);
+  return ekVoice(fx, d, { f0: (u) => f0 * (1 + 0.12 * Math.sin(Math.PI * Math.min(1, u * 1.4)) - 0.25 * u * u) * (1 + 0.02 * wv(u * d)), formants: [[950, 5, 1], [1500, 6, 0.7], [3000, 7, 0.35]], breath: 0.25, env: (u) => Math.min(1, u / 0.06) * Math.pow(1 - u, 0.7) });
+}
+// a fire's crackle: sparse pops (resin, sap boiling out) and the occasional snap; d (s), o.rate (pops per second)
+function ekCrackle(fx, d, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), r = fx.r, rate = o.rate || 9;
+  for (let t = r.range(0, 0.1); t < d - 0.05; t += -Math.log(1 - r.next() * 0.999) / rate) {
+    const i0 = Math.round(t * sr), big = r.next() < 0.12, len = Math.round((big ? 0.02 : 0.006) * sr), a = (big ? 1 : 0.35) * r.range(0.4, 1), f = r.range(1800, 5200);
+    for (let i = 0; i < len && i0 + i < n; i++) y[i0 + i] += a * (r.next() * 2 - 1) * Math.exp(-i / (len * 0.3)) * (0.6 + 0.4 * Math.sin(2 * Math.PI * f * i / sr));
+  }
+  EKX.bq(y, 'hp', 700, 0.7, sr);
+  return y;
+}
+// an engine idling or pulling: a four-cylinder's firing pulses at rpm/30 Hz through an intake/exhaust body
+function ekEngine(fx, d, rpm, o = {}) {
+  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n), w = fx.white(n), R = typeof rpm === 'function' ? rpm : () => rpm;
+  let ph = 0, rr = R(0);
+  for (let i = 0; i < n; i++) {
+    if ((i & 63) === 0) rr = R(i / sr);
+    const f = rr / 30 * (o.cyl ? o.cyl / 4 : 1); ph += f / sr; const p = ph - Math.floor(ph), load = MathX.clamp((rr - 800) / 3000, 0, 1);
+    y[i] = (Math.exp(-p * 7) - 0.14) * (0.7 + 0.3 * load) + w[i] * 0.08 * Math.exp(-p * 4) * (0.5 + load) + 0.25 * Math.sin(2 * Math.PI * ph * 0.5);
+  }
+  EKX.bq(y, 'lp', o.lp || 700, 0.8, sr); EKX.bq(y, 'hp', 28, 0.7, sr);
+  for (let i = 0; i < n; i++) y[i] *= Math.min(1, i / (0.05 * sr), (n - i) / (0.05 * sr));
+  return y;
+}
+// a car horn: two reed tones (a major third apart), square-ish, d (s)
+function ekHorn(fx, d, f = 420) {
+  const sr = fx.sr, n = Math.ceil(d * sr), y = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const t = i / sr, e = Math.min(1, t / 0.015, (d - t) / 0.03); let v = 0; for (const [ff, a] of [[f, 1], [f * 1.26, 0.8]]) for (let h = 1; h <= 7; h += 2) v += a * Math.sin(2 * Math.PI * ff * h * t) / h; y[i] = Math.tanh(1.6 * v) * e; }
+  EKX.bq(y, 'bp', 1100, 0.6, sr);
+  return y;
+}
+
+// ---- the world's pitch: 1 / s (an octave up every 30 s), at film time t (the clock's jumps jump it too)
+const ekWorldRate = (t) => Math.min(4096, 1 / EKP.sAt(ekStoryAt(t)));
+// how much of a sound at f Hz (at full size) you still hear at film time t: it fades over the top of your hearing
+const ekAudible = (t, f) => 1 - MathX.smooth(f * ekWorldRate(t), EKP.hear * 0.62, EKP.hear);
+const EK_SOUND_FNS = [ekNoise, ekTone, ekSweep, ekEv, ekWn, ekCurve, ekBedW, ekVoice, ekCall, ekScream, ekCrackle, ekEngine, ekHorn, ekWorldRate, ekAudible];

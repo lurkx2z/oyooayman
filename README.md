@@ -213,6 +213,18 @@ Everything is procedural, so there are no models, images or sound files to downl
 > and can't hear which way it's moving. The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/sound-faster-light/PLAN.md`](films/sound-faster-light/PLAN.md) and
 > [`EPISODE_REPORT.md`](films/sound-faster-light/EPISODE_REPORT.md).
+>
+> ***What if everything kept shrinking and couldn't stop?*** — open `everything-shrinking.html` (16:9, voiceless,
+> 4:47). At 6:49 AM at a lake campsite in the Canadian Rockies, everything except you starts shrinking towards your
+> tent, atoms and all, halving every 30 seconds. Your six-year-old son Leo climbs out of the tent: to him you are
+> growing. Gravity shrinks with the world (you weigh 9 kg, then 14 grams); every sound of the world climbs an octave
+> per halving, so Leo's voice becomes a bird, a whistle, then nothing, and your own call reaches the screaming
+> neighbours as an earthquake. You see the Sun rise first, the peaks come up to your waist, you put Leo down on the
+> meadow and lose him, an airliner 5 mm long crawls past your face, the air ends below your eyes, and the Earth
+> becomes the size of a house, a car, then 30 cm across with your own mass, in your hands, with Leo still on it.
+> The story clock only runs forward. Physics, clock, shots and review log:
+> [`films/everything-shrinking/PLAN.md`](films/everything-shrinking/PLAN.md) and
+> [`EPISODE_REPORT.md`](films/everything-shrinking/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
