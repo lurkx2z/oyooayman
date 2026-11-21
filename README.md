@@ -225,6 +225,16 @@ Everything is procedural, so there are no models, images or sound files to downl
 > The story clock only runs forward. Physics, clock, shots and review log:
 > [`films/everything-shrinking/PLAN.md`](films/everything-shrinking/PLAN.md) and
 > [`EPISODE_REPORT.md`](films/everything-shrinking/EPISODE_REPORT.md).
+>
+> ***What if the ocean kept rising and couldn't stop?*** — open `ocean-rising.html` (16:9, voiceless, 4:47). You are
+> the keeper of a lighthouse on a granite rock 22 km off the coast of Maine. At 6:42 PM, high tide, the tide should
+> turn. It doesn't: the sea everywhere rises 1 metre every minute (361,000 km³ of water from nowhere, every minute).
+> Your boat floods on its short rope; your daughter Isla texts from the harbour town; the orange lichen, the bell
+> buoy's chain, the fog signal and your house go under; the tower door gives at 10 tonnes and the sea follows you up
+> the stairs, a step every 11 seconds. The coast goes dark, a ship you call needs 50 minutes, and from her hill 24 km
+> away Isla can still see your light. You tell her you're fine. The story clock only runs forward. Physics, clock,
+> shots and review log: [`films/ocean-rising/PLAN.md`](films/ocean-rising/PLAN.md) and
+> [`EPISODE_REPORT.md`](films/ocean-rising/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
