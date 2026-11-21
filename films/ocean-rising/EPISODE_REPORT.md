@@ -175,9 +175,13 @@ and `physics.js`. Scores as given:
 
 - **Runnable ZIP** `ocean-rising-film.zip` (in the project files): extract it, open `ocean-rising.html` in Chrome or Edge
   on a computer, wait for SOUND READY, press Space.
-- **Final 1080p MP4: the upload file** will be `D:\renders\ocean-rising\ocean-rising_final_1080p.mp4` (and
-  `ocean-rising_final_small.mp4` for a phone), rendered on the owner's PC:
+- **Final 1080p MP4: the upload file** is `D:\renders\ocean-rising\ocean-rising_final_1080p.mp4` (and
+  `ocean-rising_final_small.mp4` for a phone), rendered on the owner's PC on 2026-11-21 from commit 4a02d64 (RTX 3060
+  Ti, Chrome, 2 workers, everything on D:):
   `node films/ocean-rising/render-gpu.cjs --channel chrome --workers 2 --out D:\renders\ocean-rising --small`.
+  8,620 frames in 20 segments, about 25 minutes in all (one segment hung from the start; re-running the same resumable
+  command rendered only that segment). 1080p: 1920×1080, 30 fps, 287.33 s, 1,237 MiB, −15.4 LUFS, −2.8 dBTP.
+  Small: 1280×720, 287.30 s, 26.3 MiB, −15.5 LUFS, −2.7 dBTP.
 - **Thumbnails** (house style) in the project files: `thumb-lamp.jpg` (+47 m, the lamp glowing under the sea),
   `thumb-gallery.jpg` (+45 m, the lantern alone on the open sea), `thumb-rock.jpg` (1 m a minute, the rock at 6:42).
 
