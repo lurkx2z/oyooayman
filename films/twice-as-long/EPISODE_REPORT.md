@@ -75,8 +75,10 @@ tag corrects it).
   once, no console errors).
 - **Thumbnails**: `thumb-step90.jpg` (step ninety, 98 billion light years), `thumb-mach9.jpg` (step thirteen, the air
   on fire), `thumb-moon.jpg` (step twenty-nine, half light speed).
-- **Final render** on the owner's PC: `node films/twice-as-long/render-gpu.cjs --channel chrome --out
-  D:\renders\twice-as-long` → `twice-as-long_final_1080p.mp4`.
+- **Final render** on the owner's PC (27 November 2026, from commit bd97d54, Chrome on the GPU, 2 workers, 15 min in
+  all): **upload `D:\renders\twice-as-long\twice-as-long_final_1080p.mp4`** (1920×1080, 499.3 s, 957.5 MiB, −15.3
+  LUFS, −2.6 dBTP); the small copy `twice-as-long_final_small.mp4` (1280×720, 26.1 MiB, −15.4 LUFS, −2.7 dBTP). The 8
+  check frames (steps 5 to 86) are all correct.
 
 ## Files
 `twice-as-long.html`; `films/twice-as-long/`: `PLAN.md`, `NARRATION.md`, `narration/` (the 79 clips and their word timings), `narration-timing.js`,
