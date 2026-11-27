@@ -1,0 +1,294 @@
+{
+ "id": "43-problem",
+ "text": "Now you have a problem.",
+ "seconds": 1.67,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Now",
+   "start": 0.1,
+   "end": 0.3
+  },
+  {
+   "text": "you",
+   "start": 0.34,
+   "end": 0.42
+  },
+  {
+   "text": "have",
+   "start": 0.48,
+   "end": 0.6
+  },
+  {
+   "text": "a",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": "problem.",
+   "start": 0.76,
+   "end": 1.22
+  }
+ ],
+ "characters": [
+  {
+   "text": "N",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "o",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "w",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "y",
+   "start": 0.32,
+   "end": 0.347
+  },
+  {
+   "text": "o",
+   "start": 0.347,
+   "end": 0.373
+  },
+  {
+   "text": "u",
+   "start": 0.373,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "h",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": "a",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "v",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "e",
+   "start": 0.54,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "a",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "p",
+   "start": 0.72,
+   "end": 0.789
+  },
+  {
+   "text": "r",
+   "start": 0.789,
+   "end": 0.857
+  },
+  {
+   "text": "o",
+   "start": 0.857,
+   "end": 0.926
+  },
+  {
+   "text": "b",
+   "start": 0.926,
+   "end": 0.994
+  },
+  {
+   "text": "l",
+   "start": 0.994,
+   "end": 1.063
+  },
+  {
+   "text": "e",
+   "start": 1.063,
+   "end": 1.131
+  },
+  {
+   "text": "m",
+   "start": 1.131,
+   "end": 1.2
+  },
+  {
+   "text": ".",
+   "start": 1.2,
+   "end": 1.6
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Now",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "you",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "have",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "a",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "problem.",
+   "start": 0.72,
+   "end": 1.6
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "N",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "o",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "w",
+   "start": 0.2,
+   "end": 0.3
+  },
+  {
+   "text": " ",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": "y",
+   "start": 0.34,
+   "end": 0.36
+  },
+  {
+   "text": "o",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": "u",
+   "start": 0.38,
+   "end": 0.42
+  },
+  {
+   "text": " ",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": "h",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "a",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "v",
+   "start": 0.54,
+   "end": 0.58
+  },
+  {
+   "text": "e",
+   "start": 0.58,
+   "end": 0.6
+  },
+  {
+   "text": " ",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "a",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": " ",
+   "start": 0.7,
+   "end": 0.76
+  },
+  {
+   "text": "p",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "r",
+   "start": 0.82,
+   "end": 0.9
+  },
+  {
+   "text": "o",
+   "start": 0.9,
+   "end": 0.94
+  },
+  {
+   "text": "b",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "l",
+   "start": 1.04,
+   "end": 1.06
+  },
+  {
+   "text": "e",
+   "start": 1.06,
+   "end": 1.1
+  },
+  {
+   "text": "m",
+   "start": 1.1,
+   "end": 1.22
+  },
+  {
+   "text": ".",
+   "start": 1.22,
+   "end": 1.22
+  }
+ ]
+}

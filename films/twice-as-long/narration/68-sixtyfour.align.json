@@ -1,0 +1,534 @@
+{
+ "id": "68-sixtyfour",
+ "text": "Step sixty-four. Almost fifteen hundred years.",
+ "seconds": 4.55,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.14,
+   "end": 0.34
+  },
+  {
+   "text": "sixty-four.",
+   "start": 0.46,
+   "end": 1.22
+  },
+  {
+   "text": "Almost",
+   "start": 1.82,
+   "end": 2.18
+  },
+  {
+   "text": "fifteen",
+   "start": 2.34,
+   "end": 2.84
+  },
+  {
+   "text": "hundred",
+   "start": 2.98,
+   "end": 3.38
+  },
+  {
+   "text": "years.",
+   "start": 3.5,
+   "end": 4
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "t",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "p",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "s",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "i",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "x",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "t",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": "y",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "-",
+   "start": 0.72,
+   "end": 0.816
+  },
+  {
+   "text": "f",
+   "start": 0.816,
+   "end": 0.912
+  },
+  {
+   "text": "o",
+   "start": 0.912,
+   "end": 1.008
+  },
+  {
+   "text": "u",
+   "start": 1.008,
+   "end": 1.104
+  },
+  {
+   "text": "r",
+   "start": 1.104,
+   "end": 1.2
+  },
+  {
+   "text": ".",
+   "start": 1.2,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "A",
+   "start": 1.76,
+   "end": 1.827
+  },
+  {
+   "text": "l",
+   "start": 1.827,
+   "end": 1.893
+  },
+  {
+   "text": "m",
+   "start": 1.893,
+   "end": 1.96
+  },
+  {
+   "text": "o",
+   "start": 1.96,
+   "end": 2.027
+  },
+  {
+   "text": "s",
+   "start": 2.027,
+   "end": 2.093
+  },
+  {
+   "text": "t",
+   "start": 2.093,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.32
+  },
+  {
+   "text": "f",
+   "start": 2.32,
+   "end": 2.44
+  },
+  {
+   "text": "i",
+   "start": 2.44,
+   "end": 2.5
+  },
+  {
+   "text": "f",
+   "start": 2.5,
+   "end": 2.56
+  },
+  {
+   "text": "t",
+   "start": 2.56,
+   "end": 2.62
+  },
+  {
+   "text": "e",
+   "start": 2.62,
+   "end": 2.68
+  },
+  {
+   "text": "e",
+   "start": 2.68,
+   "end": 2.74
+  },
+  {
+   "text": "n",
+   "start": 2.74,
+   "end": 2.8
+  },
+  {
+   "text": " ",
+   "start": 2.8,
+   "end": 2.96
+  },
+  {
+   "text": "h",
+   "start": 2.96,
+   "end": 3.16
+  },
+  {
+   "text": "u",
+   "start": 3.16,
+   "end": 3.193
+  },
+  {
+   "text": "n",
+   "start": 3.193,
+   "end": 3.227
+  },
+  {
+   "text": "d",
+   "start": 3.227,
+   "end": 3.26
+  },
+  {
+   "text": "r",
+   "start": 3.26,
+   "end": 3.293
+  },
+  {
+   "text": "e",
+   "start": 3.293,
+   "end": 3.327
+  },
+  {
+   "text": "d",
+   "start": 3.327,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.44
+  },
+  {
+   "text": "y",
+   "start": 3.44,
+   "end": 3.552
+  },
+  {
+   "text": "e",
+   "start": 3.552,
+   "end": 3.664
+  },
+  {
+   "text": "a",
+   "start": 3.664,
+   "end": 3.776
+  },
+  {
+   "text": "r",
+   "start": 3.776,
+   "end": 3.888
+  },
+  {
+   "text": "s",
+   "start": 3.888,
+   "end": 4
+  },
+  {
+   "text": ".",
+   "start": 4,
+   "end": 4.48
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "sixty-four.",
+   "start": 0.4,
+   "end": 1.68
+  },
+  {
+   "text": "Almost",
+   "start": 1.76,
+   "end": 2.16
+  },
+  {
+   "text": "fifteen",
+   "start": 2.32,
+   "end": 2.8
+  },
+  {
+   "text": "hundred",
+   "start": 2.96,
+   "end": 3.36
+  },
+  {
+   "text": "years.",
+   "start": 3.44,
+   "end": 4.48
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.46
+  },
+  {
+   "text": "s",
+   "start": 0.46,
+   "end": 0.5
+  },
+  {
+   "text": "i",
+   "start": 0.5,
+   "end": 0.58
+  },
+  {
+   "text": "x",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": "t",
+   "start": 0.66,
+   "end": 0.74
+  },
+  {
+   "text": "y",
+   "start": 0.74,
+   "end": 0.78
+  },
+  {
+   "text": "-",
+   "start": 0.78,
+   "end": 0.78
+  },
+  {
+   "text": "f",
+   "start": 0.9,
+   "end": 0.98
+  },
+  {
+   "text": "o",
+   "start": 0.98,
+   "end": 1
+  },
+  {
+   "text": "u",
+   "start": 1,
+   "end": 1.1
+  },
+  {
+   "text": "r",
+   "start": 1.1,
+   "end": 1.22
+  },
+  {
+   "text": ".",
+   "start": 1.22,
+   "end": 1.22
+  },
+  {
+   "text": " ",
+   "start": 1.22,
+   "end": 1.82
+  },
+  {
+   "text": "A",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": "l",
+   "start": 1.86,
+   "end": 1.94
+  },
+  {
+   "text": "m",
+   "start": 1.94,
+   "end": 1.98
+  },
+  {
+   "text": "o",
+   "start": 1.98,
+   "end": 2.02
+  },
+  {
+   "text": "s",
+   "start": 2.02,
+   "end": 2.1
+  },
+  {
+   "text": "t",
+   "start": 2.1,
+   "end": 2.18
+  },
+  {
+   "text": " ",
+   "start": 2.18,
+   "end": 2.34
+  },
+  {
+   "text": "f",
+   "start": 2.34,
+   "end": 2.4
+  },
+  {
+   "text": "i",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "f",
+   "start": 2.48,
+   "end": 2.5
+  },
+  {
+   "text": "t",
+   "start": 2.5,
+   "end": 2.62
+  },
+  {
+   "text": "e",
+   "start": 2.62,
+   "end": 2.68
+  },
+  {
+   "text": "e",
+   "start": 2.68,
+   "end": 2.76
+  },
+  {
+   "text": "n",
+   "start": 2.76,
+   "end": 2.84
+  },
+  {
+   "text": " ",
+   "start": 2.84,
+   "end": 2.98
+  },
+  {
+   "text": "h",
+   "start": 2.98,
+   "end": 3.04
+  },
+  {
+   "text": "u",
+   "start": 3.04,
+   "end": 3.08
+  },
+  {
+   "text": "n",
+   "start": 3.08,
+   "end": 3.18
+  },
+  {
+   "text": "d",
+   "start": 3.18,
+   "end": 3.24
+  },
+  {
+   "text": "r",
+   "start": 3.24,
+   "end": 3.26
+  },
+  {
+   "text": "e",
+   "start": 3.26,
+   "end": 3.3
+  },
+  {
+   "text": "d",
+   "start": 3.3,
+   "end": 3.38
+  },
+  {
+   "text": " ",
+   "start": 3.38,
+   "end": 3.5
+  },
+  {
+   "text": "y",
+   "start": 3.5,
+   "end": 3.58
+  },
+  {
+   "text": "e",
+   "start": 3.58,
+   "end": 3.6
+  },
+  {
+   "text": "a",
+   "start": 3.6,
+   "end": 3.74
+  },
+  {
+   "text": "r",
+   "start": 3.74,
+   "end": 3.78
+  },
+  {
+   "text": "s",
+   "start": 3.94,
+   "end": 4
+  },
+  {
+   "text": ".",
+   "start": 4,
+   "end": 4
+  }
+ ]
+}

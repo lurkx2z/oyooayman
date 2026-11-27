@@ -1,0 +1,624 @@
+{
+ "id": "67-sixty",
+ "text": "Step sixty. Ninety years. Everyone you knew is gone.",
+ "seconds": 5.36,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.1,
+   "end": 0.34
+  },
+  {
+   "text": "sixty.",
+   "start": 0.42,
+   "end": 0.9
+  },
+  {
+   "text": "Ninety",
+   "start": 1.46,
+   "end": 1.86
+  },
+  {
+   "text": "years.",
+   "start": 2,
+   "end": 2.46
+  },
+  {
+   "text": "Everyone",
+   "start": 3.06,
+   "end": 3.46
+  },
+  {
+   "text": "you",
+   "start": 3.52,
+   "end": 3.58
+  },
+  {
+   "text": "knew",
+   "start": 3.66,
+   "end": 3.94
+  },
+  {
+   "text": "is",
+   "start": 4.12,
+   "end": 4.26
+  },
+  {
+   "text": "gone.",
+   "start": 4.32,
+   "end": 4.74
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "t",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "p",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "s",
+   "start": 0.4,
+   "end": 0.507
+  },
+  {
+   "text": "i",
+   "start": 0.507,
+   "end": 0.613
+  },
+  {
+   "text": "x",
+   "start": 0.613,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "y",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": ".",
+   "start": 0.88,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "N",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "i",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": "n",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "e",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "t",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "y",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "y",
+   "start": 1.92,
+   "end": 2.032
+  },
+  {
+   "text": "e",
+   "start": 2.032,
+   "end": 2.144
+  },
+  {
+   "text": "a",
+   "start": 2.144,
+   "end": 2.256
+  },
+  {
+   "text": "r",
+   "start": 2.256,
+   "end": 2.368
+  },
+  {
+   "text": "s",
+   "start": 2.368,
+   "end": 2.48
+  },
+  {
+   "text": ".",
+   "start": 2.48,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "E",
+   "start": 3.04,
+   "end": 3.09
+  },
+  {
+   "text": "v",
+   "start": 3.09,
+   "end": 3.14
+  },
+  {
+   "text": "e",
+   "start": 3.14,
+   "end": 3.19
+  },
+  {
+   "text": "r",
+   "start": 3.19,
+   "end": 3.24
+  },
+  {
+   "text": "y",
+   "start": 3.24,
+   "end": 3.29
+  },
+  {
+   "text": "o",
+   "start": 3.29,
+   "end": 3.34
+  },
+  {
+   "text": "n",
+   "start": 3.34,
+   "end": 3.39
+  },
+  {
+   "text": "e",
+   "start": 3.39,
+   "end": 3.44
+  },
+  {
+   "text": " ",
+   "start": 3.44,
+   "end": 3.52
+  },
+  {
+   "text": "y",
+   "start": 3.52,
+   "end": 3.547
+  },
+  {
+   "text": "o",
+   "start": 3.547,
+   "end": 3.573
+  },
+  {
+   "text": "u",
+   "start": 3.573,
+   "end": 3.6
+  },
+  {
+   "text": " ",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "k",
+   "start": 3.68,
+   "end": 3.84
+  },
+  {
+   "text": "n",
+   "start": 3.84,
+   "end": 3.893
+  },
+  {
+   "text": "e",
+   "start": 3.893,
+   "end": 3.947
+  },
+  {
+   "text": "w",
+   "start": 3.947,
+   "end": 4
+  },
+  {
+   "text": " ",
+   "start": 4,
+   "end": 4.08
+  },
+  {
+   "text": "i",
+   "start": 4.08,
+   "end": 4.16
+  },
+  {
+   "text": "s",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": " ",
+   "start": 4.24,
+   "end": 4.32
+  },
+  {
+   "text": "g",
+   "start": 4.32,
+   "end": 4.42
+  },
+  {
+   "text": "o",
+   "start": 4.42,
+   "end": 4.52
+  },
+  {
+   "text": "n",
+   "start": 4.52,
+   "end": 4.62
+  },
+  {
+   "text": "e",
+   "start": 4.62,
+   "end": 4.72
+  },
+  {
+   "text": ".",
+   "start": 4.72,
+   "end": 5.28
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "sixty.",
+   "start": 0.4,
+   "end": 1.36
+  },
+  {
+   "text": "Ninety",
+   "start": 1.44,
+   "end": 1.84
+  },
+  {
+   "text": "years.",
+   "start": 1.92,
+   "end": 2.96
+  },
+  {
+   "text": "Everyone",
+   "start": 3.04,
+   "end": 3.44
+  },
+  {
+   "text": "you",
+   "start": 3.52,
+   "end": 3.6
+  },
+  {
+   "text": "knew",
+   "start": 3.68,
+   "end": 4
+  },
+  {
+   "text": "is",
+   "start": 4.08,
+   "end": 4.24
+  },
+  {
+   "text": "gone.",
+   "start": 4.32,
+   "end": 5.28
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": "e",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": "p",
+   "start": 0.26,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.42
+  },
+  {
+   "text": "s",
+   "start": 0.42,
+   "end": 0.5
+  },
+  {
+   "text": "i",
+   "start": 0.5,
+   "end": 0.62
+  },
+  {
+   "text": "x",
+   "start": 0.62,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "y",
+   "start": 0.76,
+   "end": 0.9
+  },
+  {
+   "text": ".",
+   "start": 0.9,
+   "end": 0.9
+  },
+  {
+   "text": " ",
+   "start": 0.9,
+   "end": 1.46
+  },
+  {
+   "text": "N",
+   "start": 1.46,
+   "end": 1.54
+  },
+  {
+   "text": "i",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "n",
+   "start": 1.58,
+   "end": 1.64
+  },
+  {
+   "text": "e",
+   "start": 1.64,
+   "end": 1.72
+  },
+  {
+   "text": "t",
+   "start": 1.72,
+   "end": 1.82
+  },
+  {
+   "text": "y",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": " ",
+   "start": 1.86,
+   "end": 2
+  },
+  {
+   "text": "y",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "e",
+   "start": 2.08,
+   "end": 2.1
+  },
+  {
+   "text": "a",
+   "start": 2.1,
+   "end": 2.22
+  },
+  {
+   "text": "r",
+   "start": 2.22,
+   "end": 2.28
+  },
+  {
+   "text": "s",
+   "start": 2.28,
+   "end": 2.46
+  },
+  {
+   "text": ".",
+   "start": 2.46,
+   "end": 2.46
+  },
+  {
+   "text": " ",
+   "start": 2.46,
+   "end": 3.06
+  },
+  {
+   "text": "E",
+   "start": 3.06,
+   "end": 3.12
+  },
+  {
+   "text": "v",
+   "start": 3.12,
+   "end": 3.14
+  },
+  {
+   "text": "e",
+   "start": 3.14,
+   "end": 3.16
+  },
+  {
+   "text": "r",
+   "start": 3.16,
+   "end": 3.22
+  },
+  {
+   "text": "y",
+   "start": 3.22,
+   "end": 3.32
+  },
+  {
+   "text": "o",
+   "start": 3.32,
+   "end": 3.36
+  },
+  {
+   "text": "n",
+   "start": 3.36,
+   "end": 3.38
+  },
+  {
+   "text": "e",
+   "start": 3.38,
+   "end": 3.46
+  },
+  {
+   "text": " ",
+   "start": 3.46,
+   "end": 3.52
+  },
+  {
+   "text": "y",
+   "start": 3.52,
+   "end": 3.52
+  },
+  {
+   "text": "o",
+   "start": 3.52,
+   "end": 3.54
+  },
+  {
+   "text": "u",
+   "start": 3.54,
+   "end": 3.58
+  },
+  {
+   "text": " ",
+   "start": 3.58,
+   "end": 3.64
+  },
+  {
+   "text": "k",
+   "start": 3.66,
+   "end": 3.7
+  },
+  {
+   "text": "n",
+   "start": 3.7,
+   "end": 3.76
+  },
+  {
+   "text": "e",
+   "start": 3.76,
+   "end": 3.8
+  },
+  {
+   "text": "w",
+   "start": 3.8,
+   "end": 3.94
+  },
+  {
+   "text": " ",
+   "start": 3.94,
+   "end": 4.12
+  },
+  {
+   "text": "i",
+   "start": 4.12,
+   "end": 4.2
+  },
+  {
+   "text": "s",
+   "start": 4.2,
+   "end": 4.26
+  },
+  {
+   "text": " ",
+   "start": 4.26,
+   "end": 4.32
+  },
+  {
+   "text": "g",
+   "start": 4.32,
+   "end": 4.4
+  },
+  {
+   "text": "o",
+   "start": 4.4,
+   "end": 4.5
+  },
+  {
+   "text": "n",
+   "start": 4.5,
+   "end": 4.68
+  },
+  {
+   "text": "e",
+   "start": 4.68,
+   "end": 4.74
+  },
+  {
+   "text": ".",
+   "start": 4.74,
+   "end": 4.74
+  }
+ ]
+}

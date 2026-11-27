@@ -1,0 +1,604 @@
+{
+ "id": "40-look",
+ "text": "Look back. Everyone you've ever met is down there.",
+ "seconds": 3.89,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Look",
+   "start": 0.1,
+   "end": 0.24
+  },
+  {
+   "text": "back.",
+   "start": 0.36,
+   "end": 0.7
+  },
+  {
+   "text": "Everyone",
+   "start": 1.28,
+   "end": 1.68
+  },
+  {
+   "text": "you've",
+   "start": 1.72,
+   "end": 1.94
+  },
+  {
+   "text": "ever",
+   "start": 2.02,
+   "end": 2.26
+  },
+  {
+   "text": "met",
+   "start": 2.34,
+   "end": 2.54
+  },
+  {
+   "text": "is",
+   "start": 2.6,
+   "end": 2.72
+  },
+  {
+   "text": "down",
+   "start": 2.78,
+   "end": 3
+  },
+  {
+   "text": "there.",
+   "start": 3.04,
+   "end": 3.28
+  }
+ ],
+ "characters": [
+  {
+   "text": "L",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "o",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "k",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "b",
+   "start": 0.32,
+   "end": 0.42
+  },
+  {
+   "text": "a",
+   "start": 0.42,
+   "end": 0.52
+  },
+  {
+   "text": "c",
+   "start": 0.52,
+   "end": 0.62
+  },
+  {
+   "text": "k",
+   "start": 0.62,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.4
+  },
+  {
+   "text": "E",
+   "start": 1.4,
+   "end": 1.425
+  },
+  {
+   "text": "v",
+   "start": 1.425,
+   "end": 1.45
+  },
+  {
+   "text": "e",
+   "start": 1.45,
+   "end": 1.475
+  },
+  {
+   "text": "r",
+   "start": 1.475,
+   "end": 1.5
+  },
+  {
+   "text": "y",
+   "start": 1.5,
+   "end": 1.525
+  },
+  {
+   "text": "o",
+   "start": 1.525,
+   "end": 1.55
+  },
+  {
+   "text": "n",
+   "start": 1.55,
+   "end": 1.575
+  },
+  {
+   "text": "e",
+   "start": 1.575,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "y",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": "o",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "u",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "'",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "v",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "e",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "e",
+   "start": 2,
+   "end": 2.06
+  },
+  {
+   "text": "v",
+   "start": 2.06,
+   "end": 2.12
+  },
+  {
+   "text": "e",
+   "start": 2.12,
+   "end": 2.18
+  },
+  {
+   "text": "r",
+   "start": 2.18,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "m",
+   "start": 2.32,
+   "end": 2.373
+  },
+  {
+   "text": "e",
+   "start": 2.373,
+   "end": 2.427
+  },
+  {
+   "text": "t",
+   "start": 2.427,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "i",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "s",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 2.84
+  },
+  {
+   "text": "d",
+   "start": 2.84,
+   "end": 2.87
+  },
+  {
+   "text": "o",
+   "start": 2.87,
+   "end": 2.9
+  },
+  {
+   "text": "w",
+   "start": 2.9,
+   "end": 2.93
+  },
+  {
+   "text": "n",
+   "start": 2.93,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.12
+  },
+  {
+   "text": "t",
+   "start": 3.12,
+   "end": 3.152
+  },
+  {
+   "text": "h",
+   "start": 3.152,
+   "end": 3.184
+  },
+  {
+   "text": "e",
+   "start": 3.184,
+   "end": 3.216
+  },
+  {
+   "text": "r",
+   "start": 3.216,
+   "end": 3.248
+  },
+  {
+   "text": "e",
+   "start": 3.248,
+   "end": 3.28
+  },
+  {
+   "text": ".",
+   "start": 3.28,
+   "end": 3.84
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Look",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "back.",
+   "start": 0.32,
+   "end": 1.2
+  },
+  {
+   "text": "Everyone",
+   "start": 1.4,
+   "end": 1.6
+  },
+  {
+   "text": "you've",
+   "start": 1.68,
+   "end": 1.92
+  },
+  {
+   "text": "ever",
+   "start": 2,
+   "end": 2.24
+  },
+  {
+   "text": "met",
+   "start": 2.32,
+   "end": 2.48
+  },
+  {
+   "text": "is",
+   "start": 2.56,
+   "end": 2.72
+  },
+  {
+   "text": "down",
+   "start": 2.84,
+   "end": 2.96
+  },
+  {
+   "text": "there.",
+   "start": 3.12,
+   "end": 3.84
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "L",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "o",
+   "start": 0.14,
+   "end": 0.22
+  },
+  {
+   "text": "k",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.36
+  },
+  {
+   "text": "b",
+   "start": 0.36,
+   "end": 0.44
+  },
+  {
+   "text": "a",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": "c",
+   "start": 0.5,
+   "end": 0.66
+  },
+  {
+   "text": "k",
+   "start": 0.66,
+   "end": 0.7
+  },
+  {
+   "text": ".",
+   "start": 0.7,
+   "end": 0.7
+  },
+  {
+   "text": " ",
+   "start": 0.7,
+   "end": 1.28
+  },
+  {
+   "text": "E",
+   "start": 1.28,
+   "end": 1.34
+  },
+  {
+   "text": "v",
+   "start": 1.34,
+   "end": 1.36
+  },
+  {
+   "text": "e",
+   "start": 1.36,
+   "end": 1.38
+  },
+  {
+   "text": "r",
+   "start": 1.38,
+   "end": 1.44
+  },
+  {
+   "text": "y",
+   "start": 1.44,
+   "end": 1.54
+  },
+  {
+   "text": "o",
+   "start": 1.54,
+   "end": 1.56
+  },
+  {
+   "text": "n",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "e",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": "y",
+   "start": 1.72,
+   "end": 1.74
+  },
+  {
+   "text": "o",
+   "start": 1.74,
+   "end": 1.74
+  },
+  {
+   "text": "u",
+   "start": 1.74,
+   "end": 1.76
+  },
+  {
+   "text": "'",
+   "start": 1.76,
+   "end": 1.76
+  },
+  {
+   "text": "v",
+   "start": 1.82,
+   "end": 1.84
+  },
+  {
+   "text": "e",
+   "start": 1.84,
+   "end": 1.94
+  },
+  {
+   "text": " ",
+   "start": 1.94,
+   "end": 2.02
+  },
+  {
+   "text": "e",
+   "start": 2.02,
+   "end": 2.1
+  },
+  {
+   "text": "v",
+   "start": 2.1,
+   "end": 2.12
+  },
+  {
+   "text": "e",
+   "start": 2.12,
+   "end": 2.18
+  },
+  {
+   "text": "r",
+   "start": 2.18,
+   "end": 2.26
+  },
+  {
+   "text": " ",
+   "start": 2.26,
+   "end": 2.34
+  },
+  {
+   "text": "m",
+   "start": 2.34,
+   "end": 2.38
+  },
+  {
+   "text": "e",
+   "start": 2.38,
+   "end": 2.44
+  },
+  {
+   "text": "t",
+   "start": 2.44,
+   "end": 2.54
+  },
+  {
+   "text": " ",
+   "start": 2.54,
+   "end": 2.6
+  },
+  {
+   "text": "i",
+   "start": 2.6,
+   "end": 2.66
+  },
+  {
+   "text": "s",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 2.78
+  },
+  {
+   "text": "d",
+   "start": 2.78,
+   "end": 2.84
+  },
+  {
+   "text": "o",
+   "start": 2.84,
+   "end": 2.86
+  },
+  {
+   "text": "w",
+   "start": 2.86,
+   "end": 2.92
+  },
+  {
+   "text": "n",
+   "start": 2.96,
+   "end": 3
+  },
+  {
+   "text": " ",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": "t",
+   "start": 3.04,
+   "end": 3.06
+  },
+  {
+   "text": "h",
+   "start": 3.06,
+   "end": 3.08
+  },
+  {
+   "text": "e",
+   "start": 3.08,
+   "end": 3.14
+  },
+  {
+   "text": "r",
+   "start": 3.14,
+   "end": 3.22
+  },
+  {
+   "text": "e",
+   "start": 3.22,
+   "end": 3.28
+  },
+  {
+   "text": ".",
+   "start": 3.28,
+   "end": 3.28
+  }
+ ]
+}

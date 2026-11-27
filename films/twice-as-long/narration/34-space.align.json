@@ -1,0 +1,394 @@
+{
+ "id": "34-space",
+ "text": "Step twenty-one. You're in space.",
+ "seconds": 3.11,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.14,
+   "end": 0.34
+  },
+  {
+   "text": "twenty-one.",
+   "start": 0.44,
+   "end": 1.06
+  },
+  {
+   "text": "You're",
+   "start": 1.68,
+   "end": 1.8
+  },
+  {
+   "text": "in",
+   "start": 1.82,
+   "end": 1.96
+  },
+  {
+   "text": "space.",
+   "start": 2.08,
+   "end": 2.56
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "t",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "e",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "t",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "w",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "e",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "n",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "t",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "y",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "-",
+   "start": 0.64,
+   "end": 0.74
+  },
+  {
+   "text": "o",
+   "start": 0.74,
+   "end": 0.84
+  },
+  {
+   "text": "n",
+   "start": 0.84,
+   "end": 0.94
+  },
+  {
+   "text": "e",
+   "start": 0.94,
+   "end": 1.04
+  },
+  {
+   "text": ".",
+   "start": 1.04,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": "Y",
+   "start": 1.64,
+   "end": 1.653
+  },
+  {
+   "text": "o",
+   "start": 1.653,
+   "end": 1.667
+  },
+  {
+   "text": "u",
+   "start": 1.667,
+   "end": 1.68
+  },
+  {
+   "text": "'",
+   "start": 1.68,
+   "end": 1.707
+  },
+  {
+   "text": "r",
+   "start": 1.707,
+   "end": 1.733
+  },
+  {
+   "text": "e",
+   "start": 1.733,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "i",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "n",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "s",
+   "start": 2,
+   "end": 2.112
+  },
+  {
+   "text": "p",
+   "start": 2.112,
+   "end": 2.224
+  },
+  {
+   "text": "a",
+   "start": 2.224,
+   "end": 2.336
+  },
+  {
+   "text": "c",
+   "start": 2.336,
+   "end": 2.448
+  },
+  {
+   "text": "e",
+   "start": 2.448,
+   "end": 2.56
+  },
+  {
+   "text": ".",
+   "start": 2.56,
+   "end": 3.04
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "twenty-one.",
+   "start": 0.4,
+   "end": 1.6
+  },
+  {
+   "text": "You're",
+   "start": 1.64,
+   "end": 1.76
+  },
+  {
+   "text": "in",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "space.",
+   "start": 2,
+   "end": 3.04
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.22
+  },
+  {
+   "text": "e",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": "p",
+   "start": 0.26,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.44
+  },
+  {
+   "text": "t",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": "w",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "e",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "n",
+   "start": 0.54,
+   "end": 0.6
+  },
+  {
+   "text": "t",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "y",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": "-",
+   "start": 0.68,
+   "end": 0.68
+  },
+  {
+   "text": "o",
+   "start": 0.8,
+   "end": 0.86
+  },
+  {
+   "text": "n",
+   "start": 0.86,
+   "end": 0.9
+  },
+  {
+   "text": "e",
+   "start": 0.9,
+   "end": 1.06
+  },
+  {
+   "text": ".",
+   "start": 1.06,
+   "end": 1.06
+  },
+  {
+   "text": " ",
+   "start": 1.06,
+   "end": 1.06
+  },
+  {
+   "text": "Y",
+   "start": 1.68,
+   "end": 1.7
+  },
+  {
+   "text": "o",
+   "start": 1.7,
+   "end": 1.72
+  },
+  {
+   "text": "u",
+   "start": 1.72,
+   "end": 1.72
+  },
+  {
+   "text": "'",
+   "start": 1.72,
+   "end": 1.72
+  },
+  {
+   "text": "r",
+   "start": 1.76,
+   "end": 1.78
+  },
+  {
+   "text": "e",
+   "start": 1.78,
+   "end": 1.8
+  },
+  {
+   "text": " ",
+   "start": 1.8,
+   "end": 1.82
+  },
+  {
+   "text": "i",
+   "start": 1.82,
+   "end": 1.88
+  },
+  {
+   "text": "n",
+   "start": 1.88,
+   "end": 1.96
+  },
+  {
+   "text": " ",
+   "start": 1.96,
+   "end": 2.08
+  },
+  {
+   "text": "s",
+   "start": 2.08,
+   "end": 2.12
+  },
+  {
+   "text": "p",
+   "start": 2.12,
+   "end": 2.18
+  },
+  {
+   "text": "a",
+   "start": 2.18,
+   "end": 2.3
+  },
+  {
+   "text": "c",
+   "start": 2.3,
+   "end": 2.48
+  },
+  {
+   "text": "e",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": ".",
+   "start": 2.56,
+   "end": 2.56
+  }
+ ]
+}

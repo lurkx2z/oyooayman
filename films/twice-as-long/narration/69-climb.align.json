@@ -1,0 +1,654 @@
+{
+ "id": "69-climb",
+ "text": "Step sixty-seven. You're climbing out of the Milky Way.",
+ "seconds": 3.89,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.12,
+   "end": 0.34
+  },
+  {
+   "text": "sixty-seven.",
+   "start": 0.46,
+   "end": 1.28
+  },
+  {
+   "text": "You're",
+   "start": 1.74,
+   "end": 1.86
+  },
+  {
+   "text": "climbing",
+   "start": 1.92,
+   "end": 2.28
+  },
+  {
+   "text": "out",
+   "start": 2.34,
+   "end": 2.44
+  },
+  {
+   "text": "of",
+   "start": 2.48,
+   "end": 2.54
+  },
+  {
+   "text": "the",
+   "start": 2.58,
+   "end": 2.66
+  },
+  {
+   "text": "Milky",
+   "start": 2.72,
+   "end": 3.02
+  },
+  {
+   "text": "Way.",
+   "start": 3.12,
+   "end": 3.36
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "t",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "p",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "s",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "i",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "x",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "t",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": "y",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "-",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "s",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "e",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "v",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "e",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "n",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": ".",
+   "start": 1.2,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": "Y",
+   "start": 1.72,
+   "end": 1.733
+  },
+  {
+   "text": "o",
+   "start": 1.733,
+   "end": 1.747
+  },
+  {
+   "text": "u",
+   "start": 1.747,
+   "end": 1.76
+  },
+  {
+   "text": "'",
+   "start": 1.76,
+   "end": 1.787
+  },
+  {
+   "text": "r",
+   "start": 1.787,
+   "end": 1.813
+  },
+  {
+   "text": "e",
+   "start": 1.813,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "c",
+   "start": 1.92,
+   "end": 1.96
+  },
+  {
+   "text": "l",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": "i",
+   "start": 2,
+   "end": 2.04
+  },
+  {
+   "text": "m",
+   "start": 2.04,
+   "end": 2.08
+  },
+  {
+   "text": "b",
+   "start": 2.08,
+   "end": 2.12
+  },
+  {
+   "text": "i",
+   "start": 2.12,
+   "end": 2.16
+  },
+  {
+   "text": "n",
+   "start": 2.16,
+   "end": 2.2
+  },
+  {
+   "text": "g",
+   "start": 2.2,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "o",
+   "start": 2.32,
+   "end": 2.347
+  },
+  {
+   "text": "u",
+   "start": 2.347,
+   "end": 2.373
+  },
+  {
+   "text": "t",
+   "start": 2.373,
+   "end": 2.4
+  },
+  {
+   "text": " ",
+   "start": 2.4,
+   "end": 2.44
+  },
+  {
+   "text": "o",
+   "start": 2.44,
+   "end": 2.46
+  },
+  {
+   "text": "f",
+   "start": 2.46,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "t",
+   "start": 2.56,
+   "end": 2.587
+  },
+  {
+   "text": "h",
+   "start": 2.587,
+   "end": 2.613
+  },
+  {
+   "text": "e",
+   "start": 2.613,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "M",
+   "start": 2.72,
+   "end": 2.773
+  },
+  {
+   "text": "i",
+   "start": 2.773,
+   "end": 2.827
+  },
+  {
+   "text": "l",
+   "start": 2.827,
+   "end": 2.88
+  },
+  {
+   "text": "k",
+   "start": 2.88,
+   "end": 2.92
+  },
+  {
+   "text": "y",
+   "start": 2.92,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.12
+  },
+  {
+   "text": "W",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": "a",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "y",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": ".",
+   "start": 3.36,
+   "end": 3.84
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "sixty-seven.",
+   "start": 0.4,
+   "end": 1.68
+  },
+  {
+   "text": "You're",
+   "start": 1.72,
+   "end": 1.84
+  },
+  {
+   "text": "climbing",
+   "start": 1.92,
+   "end": 2.24
+  },
+  {
+   "text": "out",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": "of",
+   "start": 2.44,
+   "end": 2.48
+  },
+  {
+   "text": "the",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "Milky",
+   "start": 2.72,
+   "end": 2.96
+  },
+  {
+   "text": "Way.",
+   "start": 3.12,
+   "end": 3.84
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.46
+  },
+  {
+   "text": "s",
+   "start": 0.46,
+   "end": 0.5
+  },
+  {
+   "text": "i",
+   "start": 0.5,
+   "end": 0.58
+  },
+  {
+   "text": "x",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": "t",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": "y",
+   "start": 0.74,
+   "end": 0.76
+  },
+  {
+   "text": "-",
+   "start": 0.76,
+   "end": 0.76
+  },
+  {
+   "text": "s",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "v",
+   "start": 1,
+   "end": 1.08
+  },
+  {
+   "text": "e",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "n",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": ".",
+   "start": 1.28,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.74
+  },
+  {
+   "text": "Y",
+   "start": 1.74,
+   "end": 1.76
+  },
+  {
+   "text": "o",
+   "start": 1.76,
+   "end": 1.78
+  },
+  {
+   "text": "u",
+   "start": 1.78,
+   "end": 1.78
+  },
+  {
+   "text": "'",
+   "start": 1.78,
+   "end": 1.78
+  },
+  {
+   "text": "r",
+   "start": 1.8,
+   "end": 1.82
+  },
+  {
+   "text": "e",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": " ",
+   "start": 1.86,
+   "end": 1.92
+  },
+  {
+   "text": "c",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "l",
+   "start": 2,
+   "end": 2.06
+  },
+  {
+   "text": "i",
+   "start": 2.06,
+   "end": 2.1
+  },
+  {
+   "text": "m",
+   "start": 2.1,
+   "end": 2.16
+  },
+  {
+   "text": "b",
+   "start": 2.16,
+   "end": 2.2
+  },
+  {
+   "text": "i",
+   "start": 2.2,
+   "end": 2.22
+  },
+  {
+   "text": "n",
+   "start": 2.22,
+   "end": 2.24
+  },
+  {
+   "text": "g",
+   "start": 2.24,
+   "end": 2.28
+  },
+  {
+   "text": " ",
+   "start": 2.28,
+   "end": 2.34
+  },
+  {
+   "text": "o",
+   "start": 2.34,
+   "end": 2.36
+  },
+  {
+   "text": "u",
+   "start": 2.36,
+   "end": 2.4
+  },
+  {
+   "text": "t",
+   "start": 2.4,
+   "end": 2.44
+  },
+  {
+   "text": " ",
+   "start": 2.44,
+   "end": 2.48
+  },
+  {
+   "text": "o",
+   "start": 2.48,
+   "end": 2.52
+  },
+  {
+   "text": "f",
+   "start": 2.52,
+   "end": 2.54
+  },
+  {
+   "text": " ",
+   "start": 2.54,
+   "end": 2.58
+  },
+  {
+   "text": "t",
+   "start": 2.58,
+   "end": 2.6
+  },
+  {
+   "text": "h",
+   "start": 2.6,
+   "end": 2.6
+  },
+  {
+   "text": "e",
+   "start": 2.6,
+   "end": 2.66
+  },
+  {
+   "text": " ",
+   "start": 2.66,
+   "end": 2.72
+  },
+  {
+   "text": "M",
+   "start": 2.72,
+   "end": 2.78
+  },
+  {
+   "text": "i",
+   "start": 2.78,
+   "end": 2.8
+  },
+  {
+   "text": "l",
+   "start": 2.82,
+   "end": 2.9
+  },
+  {
+   "text": "k",
+   "start": 2.9,
+   "end": 2.94
+  },
+  {
+   "text": "y",
+   "start": 2.96,
+   "end": 3.02
+  },
+  {
+   "text": " ",
+   "start": 3.02,
+   "end": 3.12
+  },
+  {
+   "text": "W",
+   "start": 3.12,
+   "end": 3.18
+  },
+  {
+   "text": "a",
+   "start": 3.18,
+   "end": 3.22
+  },
+  {
+   "text": "y",
+   "start": 3.22,
+   "end": 3.36
+  },
+  {
+   "text": ".",
+   "start": 3.36,
+   "end": 3.36
+  }
+ ]
+}

@@ -1,0 +1,854 @@
+{
+ "id": "11-sum",
+ "text": "So every new step is longer than all of your other steps put together.",
+ "seconds": 4.55,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "So",
+   "start": 0.1,
+   "end": 0.28
+  },
+  {
+   "text": "every",
+   "start": 0.36,
+   "end": 0.58
+  },
+  {
+   "text": "new",
+   "start": 0.7,
+   "end": 0.9
+  },
+  {
+   "text": "step",
+   "start": 0.98,
+   "end": 1.28
+  },
+  {
+   "text": "is",
+   "start": 1.42,
+   "end": 1.54
+  },
+  {
+   "text": "longer",
+   "start": 1.62,
+   "end": 1.96
+  },
+  {
+   "text": "than",
+   "start": 2,
+   "end": 2.24
+  },
+  {
+   "text": "all",
+   "start": 2.34,
+   "end": 2.5
+  },
+  {
+   "text": "of",
+   "start": 2.54,
+   "end": 2.62
+  },
+  {
+   "text": "your",
+   "start": 2.66,
+   "end": 2.76
+  },
+  {
+   "text": "other",
+   "start": 2.82,
+   "end": 2.96
+  },
+  {
+   "text": "steps",
+   "start": 3.1,
+   "end": 3.36
+  },
+  {
+   "text": "put",
+   "start": 3.46,
+   "end": 3.6
+  },
+  {
+   "text": "together.",
+   "start": 3.64,
+   "end": 4.12
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "e",
+   "start": 0.32,
+   "end": 0.368
+  },
+  {
+   "text": "v",
+   "start": 0.368,
+   "end": 0.416
+  },
+  {
+   "text": "e",
+   "start": 0.416,
+   "end": 0.464
+  },
+  {
+   "text": "r",
+   "start": 0.464,
+   "end": 0.512
+  },
+  {
+   "text": "y",
+   "start": 0.512,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "n",
+   "start": 0.64,
+   "end": 0.693
+  },
+  {
+   "text": "e",
+   "start": 0.693,
+   "end": 0.747
+  },
+  {
+   "text": "w",
+   "start": 0.747,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.96
+  },
+  {
+   "text": "s",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "t",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "e",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "p",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "i",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "s",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "l",
+   "start": 1.6,
+   "end": 1.66
+  },
+  {
+   "text": "o",
+   "start": 1.66,
+   "end": 1.72
+  },
+  {
+   "text": "n",
+   "start": 1.72,
+   "end": 1.78
+  },
+  {
+   "text": "g",
+   "start": 1.78,
+   "end": 1.84
+  },
+  {
+   "text": "e",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "r",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "t",
+   "start": 2,
+   "end": 2.06
+  },
+  {
+   "text": "h",
+   "start": 2.06,
+   "end": 2.12
+  },
+  {
+   "text": "a",
+   "start": 2.12,
+   "end": 2.18
+  },
+  {
+   "text": "n",
+   "start": 2.18,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "a",
+   "start": 2.32,
+   "end": 2.373
+  },
+  {
+   "text": "l",
+   "start": 2.373,
+   "end": 2.427
+  },
+  {
+   "text": "l",
+   "start": 2.427,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.52
+  },
+  {
+   "text": "o",
+   "start": 2.52,
+   "end": 2.54
+  },
+  {
+   "text": "f",
+   "start": 2.54,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "y",
+   "start": 2.64,
+   "end": 2.66
+  },
+  {
+   "text": "o",
+   "start": 2.66,
+   "end": 2.68
+  },
+  {
+   "text": "u",
+   "start": 2.68,
+   "end": 2.7
+  },
+  {
+   "text": "r",
+   "start": 2.7,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 2.8
+  },
+  {
+   "text": "o",
+   "start": 2.8,
+   "end": 2.848
+  },
+  {
+   "text": "t",
+   "start": 2.848,
+   "end": 2.896
+  },
+  {
+   "text": "h",
+   "start": 2.896,
+   "end": 2.944
+  },
+  {
+   "text": "e",
+   "start": 2.944,
+   "end": 2.992
+  },
+  {
+   "text": "r",
+   "start": 2.992,
+   "end": 3.04
+  },
+  {
+   "text": " ",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": "s",
+   "start": 3.12,
+   "end": 3.168
+  },
+  {
+   "text": "t",
+   "start": 3.168,
+   "end": 3.216
+  },
+  {
+   "text": "e",
+   "start": 3.216,
+   "end": 3.264
+  },
+  {
+   "text": "p",
+   "start": 3.264,
+   "end": 3.312
+  },
+  {
+   "text": "s",
+   "start": 3.312,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.44
+  },
+  {
+   "text": "p",
+   "start": 3.44,
+   "end": 3.493
+  },
+  {
+   "text": "u",
+   "start": 3.493,
+   "end": 3.547
+  },
+  {
+   "text": "t",
+   "start": 3.547,
+   "end": 3.6
+  },
+  {
+   "text": " ",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "t",
+   "start": 3.68,
+   "end": 3.72
+  },
+  {
+   "text": "o",
+   "start": 3.72,
+   "end": 3.76
+  },
+  {
+   "text": "g",
+   "start": 3.76,
+   "end": 3.88
+  },
+  {
+   "text": "e",
+   "start": 3.88,
+   "end": 4
+  },
+  {
+   "text": "t",
+   "start": 4,
+   "end": 4.12
+  },
+  {
+   "text": "h",
+   "start": 4.12,
+   "end": 4.24
+  },
+  {
+   "text": "e",
+   "start": 4.24,
+   "end": 4.36
+  },
+  {
+   "text": "r",
+   "start": 4.36,
+   "end": 4.48
+  },
+  {
+   "text": ".",
+   "start": 4.48,
+   "end": 4.56
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "So",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "every",
+   "start": 0.32,
+   "end": 0.56
+  },
+  {
+   "text": "new",
+   "start": 0.64,
+   "end": 0.8
+  },
+  {
+   "text": "step",
+   "start": 0.96,
+   "end": 1.28
+  },
+  {
+   "text": "is",
+   "start": 1.36,
+   "end": 1.52
+  },
+  {
+   "text": "longer",
+   "start": 1.6,
+   "end": 1.92
+  },
+  {
+   "text": "than",
+   "start": 2,
+   "end": 2.24
+  },
+  {
+   "text": "all",
+   "start": 2.32,
+   "end": 2.48
+  },
+  {
+   "text": "of",
+   "start": 2.52,
+   "end": 2.56
+  },
+  {
+   "text": "your",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "other",
+   "start": 2.8,
+   "end": 3.04
+  },
+  {
+   "text": "steps",
+   "start": 3.12,
+   "end": 3.36
+  },
+  {
+   "text": "put",
+   "start": 3.44,
+   "end": 3.6
+  },
+  {
+   "text": "together.",
+   "start": 3.68,
+   "end": 4.56
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.28
+  },
+  {
+   "text": " ",
+   "start": 0.28,
+   "end": 0.34
+  },
+  {
+   "text": "e",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": "v",
+   "start": 0.42,
+   "end": 0.44
+  },
+  {
+   "text": "e",
+   "start": 0.44,
+   "end": 0.46
+  },
+  {
+   "text": "r",
+   "start": 0.46,
+   "end": 0.56
+  },
+  {
+   "text": "y",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": " ",
+   "start": 0.58,
+   "end": 0.7
+  },
+  {
+   "text": "n",
+   "start": 0.7,
+   "end": 0.74
+  },
+  {
+   "text": "e",
+   "start": 0.74,
+   "end": 0.8
+  },
+  {
+   "text": "w",
+   "start": 0.8,
+   "end": 0.9
+  },
+  {
+   "text": " ",
+   "start": 0.9,
+   "end": 0.98
+  },
+  {
+   "text": "s",
+   "start": 0.98,
+   "end": 1.02
+  },
+  {
+   "text": "t",
+   "start": 1.02,
+   "end": 1.08
+  },
+  {
+   "text": "e",
+   "start": 1.08,
+   "end": 1.14
+  },
+  {
+   "text": "p",
+   "start": 1.14,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.42
+  },
+  {
+   "text": "i",
+   "start": 1.42,
+   "end": 1.5
+  },
+  {
+   "text": "s",
+   "start": 1.5,
+   "end": 1.54
+  },
+  {
+   "text": " ",
+   "start": 1.54,
+   "end": 1.62
+  },
+  {
+   "text": "l",
+   "start": 1.62,
+   "end": 1.7
+  },
+  {
+   "text": "o",
+   "start": 1.7,
+   "end": 1.72
+  },
+  {
+   "text": "n",
+   "start": 1.72,
+   "end": 1.8
+  },
+  {
+   "text": "g",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "e",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "r",
+   "start": 1.92,
+   "end": 1.96
+  },
+  {
+   "text": " ",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": "t",
+   "start": 2,
+   "end": 2.02
+  },
+  {
+   "text": "h",
+   "start": 2.02,
+   "end": 2.02
+  },
+  {
+   "text": "a",
+   "start": 2.02,
+   "end": 2.04
+  },
+  {
+   "text": "n",
+   "start": 2.08,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.34
+  },
+  {
+   "text": "a",
+   "start": 2.34,
+   "end": 2.36
+  },
+  {
+   "text": "l",
+   "start": 2.38,
+   "end": 2.42
+  },
+  {
+   "text": "l",
+   "start": 2.42,
+   "end": 2.5
+  },
+  {
+   "text": " ",
+   "start": 2.5,
+   "end": 2.54
+  },
+  {
+   "text": "o",
+   "start": 2.54,
+   "end": 2.58
+  },
+  {
+   "text": "f",
+   "start": 2.58,
+   "end": 2.62
+  },
+  {
+   "text": " ",
+   "start": 2.62,
+   "end": 2.66
+  },
+  {
+   "text": "y",
+   "start": 2.66,
+   "end": 2.68
+  },
+  {
+   "text": "o",
+   "start": 2.68,
+   "end": 2.68
+  },
+  {
+   "text": "u",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "r",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": " ",
+   "start": 2.76,
+   "end": 2.82
+  },
+  {
+   "text": "o",
+   "start": 2.82,
+   "end": 2.86
+  },
+  {
+   "text": "t",
+   "start": 2.86,
+   "end": 2.88
+  },
+  {
+   "text": "h",
+   "start": 2.88,
+   "end": 2.9
+  },
+  {
+   "text": "e",
+   "start": 2.9,
+   "end": 2.94
+  },
+  {
+   "text": "r",
+   "start": 2.94,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.1
+  },
+  {
+   "text": "s",
+   "start": 3.1,
+   "end": 3.14
+  },
+  {
+   "text": "t",
+   "start": 3.14,
+   "end": 3.18
+  },
+  {
+   "text": "e",
+   "start": 3.18,
+   "end": 3.22
+  },
+  {
+   "text": "p",
+   "start": 3.22,
+   "end": 3.3
+  },
+  {
+   "text": "s",
+   "start": 3.34,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.46
+  },
+  {
+   "text": "p",
+   "start": 3.46,
+   "end": 3.5
+  },
+  {
+   "text": "u",
+   "start": 3.5,
+   "end": 3.52
+  },
+  {
+   "text": "t",
+   "start": 3.54,
+   "end": 3.6
+  },
+  {
+   "text": " ",
+   "start": 3.6,
+   "end": 3.64
+  },
+  {
+   "text": "t",
+   "start": 3.64,
+   "end": 3.68
+  },
+  {
+   "text": "o",
+   "start": 3.68,
+   "end": 3.78
+  },
+  {
+   "text": "g",
+   "start": 3.78,
+   "end": 3.84
+  },
+  {
+   "text": "e",
+   "start": 3.84,
+   "end": 3.88
+  },
+  {
+   "text": "t",
+   "start": 3.88,
+   "end": 3.94
+  },
+  {
+   "text": "h",
+   "start": 3.94,
+   "end": 3.96
+  },
+  {
+   "text": "e",
+   "start": 3.96,
+   "end": 4.08
+  },
+  {
+   "text": "r",
+   "start": 4.08,
+   "end": 4.12
+  },
+  {
+   "text": ".",
+   "start": 4.12,
+   "end": 4.12
+  }
+ ]
+}

@@ -1,0 +1,434 @@
+{
+ "id": "61-ninemonths",
+ "text": "Step fifty-three. Almost nine months.",
+ "seconds": 3.74,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.14,
+   "end": 0.34
+  },
+  {
+   "text": "fifty-three.",
+   "start": 0.46,
+   "end": 1.18
+  },
+  {
+   "text": "Almost",
+   "start": 1.72,
+   "end": 2.14
+  },
+  {
+   "text": "nine",
+   "start": 2.24,
+   "end": 2.52
+  },
+  {
+   "text": "months.",
+   "start": 2.62,
+   "end": 3.06
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "t",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "e",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "f",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "i",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "f",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "t",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "y",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "-",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "h",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "r",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "e",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": ".",
+   "start": 1.12,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "A",
+   "start": 1.68,
+   "end": 1.747
+  },
+  {
+   "text": "l",
+   "start": 1.747,
+   "end": 1.813
+  },
+  {
+   "text": "m",
+   "start": 1.813,
+   "end": 1.88
+  },
+  {
+   "text": "o",
+   "start": 1.88,
+   "end": 1.947
+  },
+  {
+   "text": "s",
+   "start": 1.947,
+   "end": 2.013
+  },
+  {
+   "text": "t",
+   "start": 2.013,
+   "end": 2.08
+  },
+  {
+   "text": " ",
+   "start": 2.08,
+   "end": 2.24
+  },
+  {
+   "text": "n",
+   "start": 2.24,
+   "end": 2.3
+  },
+  {
+   "text": "i",
+   "start": 2.3,
+   "end": 2.36
+  },
+  {
+   "text": "n",
+   "start": 2.36,
+   "end": 2.42
+  },
+  {
+   "text": "e",
+   "start": 2.42,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "m",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "o",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "n",
+   "start": 2.72,
+   "end": 2.8
+  },
+  {
+   "text": "t",
+   "start": 2.8,
+   "end": 2.88
+  },
+  {
+   "text": "h",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": "s",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": ".",
+   "start": 3.04,
+   "end": 3.68
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "fifty-three.",
+   "start": 0.4,
+   "end": 1.6
+  },
+  {
+   "text": "Almost",
+   "start": 1.68,
+   "end": 2.08
+  },
+  {
+   "text": "nine",
+   "start": 2.24,
+   "end": 2.48
+  },
+  {
+   "text": "months.",
+   "start": 2.56,
+   "end": 3.68
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.26
+  },
+  {
+   "text": "p",
+   "start": 0.26,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.46
+  },
+  {
+   "text": "f",
+   "start": 0.46,
+   "end": 0.5
+  },
+  {
+   "text": "i",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "f",
+   "start": 0.56,
+   "end": 0.62
+  },
+  {
+   "text": "t",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": "y",
+   "start": 0.7,
+   "end": 0.72
+  },
+  {
+   "text": "-",
+   "start": 0.72,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.82,
+   "end": 0.84
+  },
+  {
+   "text": "h",
+   "start": 0.86,
+   "end": 0.92
+  },
+  {
+   "text": "r",
+   "start": 0.92,
+   "end": 0.94
+  },
+  {
+   "text": "e",
+   "start": 0.94,
+   "end": 1
+  },
+  {
+   "text": "e",
+   "start": 1,
+   "end": 1.18
+  },
+  {
+   "text": ".",
+   "start": 1.18,
+   "end": 1.18
+  },
+  {
+   "text": " ",
+   "start": 1.18,
+   "end": 1.72
+  },
+  {
+   "text": "A",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "l",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "m",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "o",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": "s",
+   "start": 1.92,
+   "end": 2.02
+  },
+  {
+   "text": "t",
+   "start": 2.04,
+   "end": 2.14
+  },
+  {
+   "text": " ",
+   "start": 2.14,
+   "end": 2.24
+  },
+  {
+   "text": "n",
+   "start": 2.24,
+   "end": 2.34
+  },
+  {
+   "text": "i",
+   "start": 2.34,
+   "end": 2.38
+  },
+  {
+   "text": "n",
+   "start": 2.38,
+   "end": 2.44
+  },
+  {
+   "text": "e",
+   "start": 2.44,
+   "end": 2.52
+  },
+  {
+   "text": " ",
+   "start": 2.52,
+   "end": 2.62
+  },
+  {
+   "text": "m",
+   "start": 2.62,
+   "end": 2.68
+  },
+  {
+   "text": "o",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "n",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "t",
+   "start": 2.76,
+   "end": 2.86
+  },
+  {
+   "text": "h",
+   "start": 2.86,
+   "end": 3
+  },
+  {
+   "text": "s",
+   "start": 3,
+   "end": 3.06
+  },
+  {
+   "text": ".",
+   "start": 3.06,
+   "end": 3.06
+  }
+ ]
+}

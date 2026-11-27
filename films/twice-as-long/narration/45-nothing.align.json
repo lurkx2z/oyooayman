@@ -1,0 +1,424 @@
+{
+ "id": "45-nothing",
+ "text": "Nothing can do that. Not even you.",
+ "seconds": 2.87,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Nothing",
+   "start": 0.14,
+   "end": 0.44
+  },
+  {
+   "text": "can",
+   "start": 0.5,
+   "end": 0.64
+  },
+  {
+   "text": "do",
+   "start": 0.7,
+   "end": 0.82
+  },
+  {
+   "text": "that.",
+   "start": 0.9,
+   "end": 1.14
+  },
+  {
+   "text": "Not",
+   "start": 1.56,
+   "end": 1.7
+  },
+  {
+   "text": "even",
+   "start": 1.74,
+   "end": 1.98
+  },
+  {
+   "text": "you.",
+   "start": 2.06,
+   "end": 2.34
+  }
+ ],
+ "characters": [
+  {
+   "text": "N",
+   "start": 0,
+   "end": 0.057
+  },
+  {
+   "text": "o",
+   "start": 0.057,
+   "end": 0.114
+  },
+  {
+   "text": "t",
+   "start": 0.114,
+   "end": 0.171
+  },
+  {
+   "text": "h",
+   "start": 0.171,
+   "end": 0.229
+  },
+  {
+   "text": "i",
+   "start": 0.229,
+   "end": 0.286
+  },
+  {
+   "text": "n",
+   "start": 0.286,
+   "end": 0.343
+  },
+  {
+   "text": "g",
+   "start": 0.343,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "c",
+   "start": 0.48,
+   "end": 0.533
+  },
+  {
+   "text": "a",
+   "start": 0.533,
+   "end": 0.587
+  },
+  {
+   "text": "n",
+   "start": 0.587,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "d",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "o",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "t",
+   "start": 0.88,
+   "end": 0.94
+  },
+  {
+   "text": "h",
+   "start": 0.94,
+   "end": 1
+  },
+  {
+   "text": "a",
+   "start": 1,
+   "end": 1.06
+  },
+  {
+   "text": "t",
+   "start": 1.06,
+   "end": 1.12
+  },
+  {
+   "text": ".",
+   "start": 1.12,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "N",
+   "start": 1.6,
+   "end": 1.627
+  },
+  {
+   "text": "o",
+   "start": 1.627,
+   "end": 1.653
+  },
+  {
+   "text": "t",
+   "start": 1.653,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.8
+  },
+  {
+   "text": "e",
+   "start": 1.8,
+   "end": 1.83
+  },
+  {
+   "text": "v",
+   "start": 1.83,
+   "end": 1.86
+  },
+  {
+   "text": "e",
+   "start": 1.86,
+   "end": 1.89
+  },
+  {
+   "text": "n",
+   "start": 1.89,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "y",
+   "start": 2,
+   "end": 2.107
+  },
+  {
+   "text": "o",
+   "start": 2.107,
+   "end": 2.213
+  },
+  {
+   "text": "u",
+   "start": 2.213,
+   "end": 2.32
+  },
+  {
+   "text": ".",
+   "start": 2.32,
+   "end": 2.8
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Nothing",
+   "start": 0,
+   "end": 0.4
+  },
+  {
+   "text": "can",
+   "start": 0.48,
+   "end": 0.64
+  },
+  {
+   "text": "do",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "that.",
+   "start": 0.88,
+   "end": 1.52
+  },
+  {
+   "text": "Not",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "even",
+   "start": 1.8,
+   "end": 1.92
+  },
+  {
+   "text": "you.",
+   "start": 2,
+   "end": 2.8
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "N",
+   "start": 0.14,
+   "end": 0.2
+  },
+  {
+   "text": "o",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.3
+  },
+  {
+   "text": "h",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": "i",
+   "start": 0.34,
+   "end": 0.38
+  },
+  {
+   "text": "n",
+   "start": 0.38,
+   "end": 0.4
+  },
+  {
+   "text": "g",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": " ",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": "c",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "a",
+   "start": 0.52,
+   "end": 0.6
+  },
+  {
+   "text": "n",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": "d",
+   "start": 0.7,
+   "end": 0.74
+  },
+  {
+   "text": "o",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": " ",
+   "start": 0.82,
+   "end": 0.9
+  },
+  {
+   "text": "t",
+   "start": 0.9,
+   "end": 0.9
+  },
+  {
+   "text": "h",
+   "start": 0.92,
+   "end": 0.94
+  },
+  {
+   "text": "a",
+   "start": 0.94,
+   "end": 1.1
+  },
+  {
+   "text": "t",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": ".",
+   "start": 1.14,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.56
+  },
+  {
+   "text": "N",
+   "start": 1.56,
+   "end": 1.58
+  },
+  {
+   "text": "o",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": "t",
+   "start": 1.66,
+   "end": 1.7
+  },
+  {
+   "text": " ",
+   "start": 1.7,
+   "end": 1.74
+  },
+  {
+   "text": "e",
+   "start": 1.74,
+   "end": 1.8
+  },
+  {
+   "text": "v",
+   "start": 1.82,
+   "end": 1.82
+  },
+  {
+   "text": "e",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": "n",
+   "start": 1.86,
+   "end": 1.98
+  },
+  {
+   "text": " ",
+   "start": 1.98,
+   "end": 2.06
+  },
+  {
+   "text": "y",
+   "start": 2.06,
+   "end": 2.1
+  },
+  {
+   "text": "o",
+   "start": 2.1,
+   "end": 2.12
+  },
+  {
+   "text": "u",
+   "start": 2.12,
+   "end": 2.34
+  },
+  {
+   "text": ".",
+   "start": 2.34,
+   "end": 2.34
+  }
+ ]
+}

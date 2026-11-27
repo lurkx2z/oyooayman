@@ -1,0 +1,754 @@
+{
+ "id": "53-jupiter",
+ "text": "Step forty-one. One step, farther than Jupiter is from the Sun.",
+ "seconds": 5.02,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.14,
+   "end": 0.34
+  },
+  {
+   "text": "forty-one.",
+   "start": 0.48,
+   "end": 1.14
+  },
+  {
+   "text": "One",
+   "start": 1.7,
+   "end": 1.86
+  },
+  {
+   "text": "step,",
+   "start": 2.02,
+   "end": 2.32
+  },
+  {
+   "text": "farther",
+   "start": 2.86,
+   "end": 3.16
+  },
+  {
+   "text": "than",
+   "start": 3.2,
+   "end": 3.34
+  },
+  {
+   "text": "Jupiter",
+   "start": 3.42,
+   "end": 3.82
+  },
+  {
+   "text": "is",
+   "start": 3.9,
+   "end": 4.08
+  },
+  {
+   "text": "from",
+   "start": 4.12,
+   "end": 4.26
+  },
+  {
+   "text": "the",
+   "start": 4.3,
+   "end": 4.42
+  },
+  {
+   "text": "Sun.",
+   "start": 4.48,
+   "end": 4.82
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "t",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "p",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "f",
+   "start": 0.4,
+   "end": 0.46
+  },
+  {
+   "text": "o",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "r",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": "t",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": "y",
+   "start": 0.64,
+   "end": 0.88
+  },
+  {
+   "text": "-",
+   "start": 0.88,
+   "end": 0.94
+  },
+  {
+   "text": "o",
+   "start": 0.94,
+   "end": 1
+  },
+  {
+   "text": "n",
+   "start": 1,
+   "end": 1.06
+  },
+  {
+   "text": "e",
+   "start": 1.06,
+   "end": 1.12
+  },
+  {
+   "text": ".",
+   "start": 1.12,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.72
+  },
+  {
+   "text": "O",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "n",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "e",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "s",
+   "start": 1.92,
+   "end": 2.02
+  },
+  {
+   "text": "t",
+   "start": 2.02,
+   "end": 2.12
+  },
+  {
+   "text": "e",
+   "start": 2.12,
+   "end": 2.22
+  },
+  {
+   "text": "p",
+   "start": 2.22,
+   "end": 2.32
+  },
+  {
+   "text": ",",
+   "start": 2.32,
+   "end": 2.72
+  },
+  {
+   "text": " ",
+   "start": 2.72,
+   "end": 2.8
+  },
+  {
+   "text": "f",
+   "start": 2.8,
+   "end": 2.853
+  },
+  {
+   "text": "a",
+   "start": 2.853,
+   "end": 2.907
+  },
+  {
+   "text": "r",
+   "start": 2.907,
+   "end": 2.96
+  },
+  {
+   "text": "t",
+   "start": 2.96,
+   "end": 3
+  },
+  {
+   "text": "h",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": "e",
+   "start": 3.04,
+   "end": 3.08
+  },
+  {
+   "text": "r",
+   "start": 3.08,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": "t",
+   "start": 3.2,
+   "end": 3.22
+  },
+  {
+   "text": "h",
+   "start": 3.22,
+   "end": 3.24
+  },
+  {
+   "text": "a",
+   "start": 3.24,
+   "end": 3.26
+  },
+  {
+   "text": "n",
+   "start": 3.26,
+   "end": 3.28
+  },
+  {
+   "text": " ",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": "J",
+   "start": 3.36,
+   "end": 3.44
+  },
+  {
+   "text": "u",
+   "start": 3.44,
+   "end": 3.493
+  },
+  {
+   "text": "p",
+   "start": 3.493,
+   "end": 3.547
+  },
+  {
+   "text": "i",
+   "start": 3.547,
+   "end": 3.6
+  },
+  {
+   "text": "t",
+   "start": 3.6,
+   "end": 3.653
+  },
+  {
+   "text": "e",
+   "start": 3.653,
+   "end": 3.707
+  },
+  {
+   "text": "r",
+   "start": 3.707,
+   "end": 3.76
+  },
+  {
+   "text": " ",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "i",
+   "start": 3.84,
+   "end": 3.92
+  },
+  {
+   "text": "s",
+   "start": 3.92,
+   "end": 4
+  },
+  {
+   "text": " ",
+   "start": 4,
+   "end": 4.08
+  },
+  {
+   "text": "f",
+   "start": 4.08,
+   "end": 4.12
+  },
+  {
+   "text": "r",
+   "start": 4.12,
+   "end": 4.16
+  },
+  {
+   "text": "o",
+   "start": 4.16,
+   "end": 4.2
+  },
+  {
+   "text": "m",
+   "start": 4.2,
+   "end": 4.24
+  },
+  {
+   "text": " ",
+   "start": 4.24,
+   "end": 4.28
+  },
+  {
+   "text": "t",
+   "start": 4.28,
+   "end": 4.293
+  },
+  {
+   "text": "h",
+   "start": 4.293,
+   "end": 4.307
+  },
+  {
+   "text": "e",
+   "start": 4.307,
+   "end": 4.32
+  },
+  {
+   "text": " ",
+   "start": 4.32,
+   "end": 4.48
+  },
+  {
+   "text": "S",
+   "start": 4.48,
+   "end": 4.587
+  },
+  {
+   "text": "u",
+   "start": 4.587,
+   "end": 4.693
+  },
+  {
+   "text": "n",
+   "start": 4.693,
+   "end": 4.8
+  },
+  {
+   "text": ".",
+   "start": 4.8,
+   "end": 4.96
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "forty-one.",
+   "start": 0.4,
+   "end": 1.6
+  },
+  {
+   "text": "One",
+   "start": 1.72,
+   "end": 1.84
+  },
+  {
+   "text": "step,",
+   "start": 1.92,
+   "end": 2.72
+  },
+  {
+   "text": "farther",
+   "start": 2.8,
+   "end": 3.12
+  },
+  {
+   "text": "than",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "Jupiter",
+   "start": 3.36,
+   "end": 3.76
+  },
+  {
+   "text": "is",
+   "start": 3.84,
+   "end": 4
+  },
+  {
+   "text": "from",
+   "start": 4.08,
+   "end": 4.24
+  },
+  {
+   "text": "the",
+   "start": 4.28,
+   "end": 4.32
+  },
+  {
+   "text": "Sun.",
+   "start": 4.48,
+   "end": 4.96
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.18,
+   "end": 0.22
+  },
+  {
+   "text": "e",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": "p",
+   "start": 0.26,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.48
+  },
+  {
+   "text": "f",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "o",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "r",
+   "start": 0.54,
+   "end": 0.62
+  },
+  {
+   "text": "t",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": "y",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": "-",
+   "start": 0.72,
+   "end": 0.72
+  },
+  {
+   "text": "o",
+   "start": 0.86,
+   "end": 0.94
+  },
+  {
+   "text": "n",
+   "start": 0.94,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1.14
+  },
+  {
+   "text": ".",
+   "start": 1.14,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.7
+  },
+  {
+   "text": "O",
+   "start": 1.7,
+   "end": 1.76
+  },
+  {
+   "text": "n",
+   "start": 1.76,
+   "end": 1.78
+  },
+  {
+   "text": "e",
+   "start": 1.78,
+   "end": 1.86
+  },
+  {
+   "text": " ",
+   "start": 1.86,
+   "end": 2.02
+  },
+  {
+   "text": "s",
+   "start": 2.02,
+   "end": 2.06
+  },
+  {
+   "text": "t",
+   "start": 2.06,
+   "end": 2.1
+  },
+  {
+   "text": "e",
+   "start": 2.1,
+   "end": 2.18
+  },
+  {
+   "text": "p",
+   "start": 2.18,
+   "end": 2.32
+  },
+  {
+   "text": ",",
+   "start": 2.32,
+   "end": 2.32
+  },
+  {
+   "text": " ",
+   "start": 2.32,
+   "end": 2.86
+  },
+  {
+   "text": "f",
+   "start": 2.86,
+   "end": 2.9
+  },
+  {
+   "text": "a",
+   "start": 2.9,
+   "end": 2.94
+  },
+  {
+   "text": "r",
+   "start": 2.94,
+   "end": 2.98
+  },
+  {
+   "text": "t",
+   "start": 2.98,
+   "end": 3.04
+  },
+  {
+   "text": "h",
+   "start": 3.04,
+   "end": 3.06
+  },
+  {
+   "text": "e",
+   "start": 3.06,
+   "end": 3.12
+  },
+  {
+   "text": "r",
+   "start": 3.12,
+   "end": 3.16
+  },
+  {
+   "text": " ",
+   "start": 3.16,
+   "end": 3.2
+  },
+  {
+   "text": "t",
+   "start": 3.2,
+   "end": 3.22
+  },
+  {
+   "text": "h",
+   "start": 3.22,
+   "end": 3.22
+  },
+  {
+   "text": "a",
+   "start": 3.22,
+   "end": 3.24
+  },
+  {
+   "text": "n",
+   "start": 3.28,
+   "end": 3.34
+  },
+  {
+   "text": " ",
+   "start": 3.34,
+   "end": 3.42
+  },
+  {
+   "text": "J",
+   "start": 3.42,
+   "end": 3.48
+  },
+  {
+   "text": "u",
+   "start": 3.48,
+   "end": 3.56
+  },
+  {
+   "text": "p",
+   "start": 3.56,
+   "end": 3.6
+  },
+  {
+   "text": "i",
+   "start": 3.6,
+   "end": 3.64
+  },
+  {
+   "text": "t",
+   "start": 3.64,
+   "end": 3.68
+  },
+  {
+   "text": "e",
+   "start": 3.68,
+   "end": 3.76
+  },
+  {
+   "text": "r",
+   "start": 3.76,
+   "end": 3.82
+  },
+  {
+   "text": " ",
+   "start": 3.82,
+   "end": 3.9
+  },
+  {
+   "text": "i",
+   "start": 3.9,
+   "end": 4.019
+  },
+  {
+   "text": "s",
+   "start": 4.019,
+   "end": 4.08
+  },
+  {
+   "text": " ",
+   "start": 4.08,
+   "end": 4.12
+  },
+  {
+   "text": "f",
+   "start": 4.12,
+   "end": 4.16
+  },
+  {
+   "text": "r",
+   "start": 4.16,
+   "end": 4.18
+  },
+  {
+   "text": "o",
+   "start": 4.18,
+   "end": 4.24
+  },
+  {
+   "text": "m",
+   "start": 4.24,
+   "end": 4.26
+  },
+  {
+   "text": " ",
+   "start": 4.26,
+   "end": 4.3
+  },
+  {
+   "text": "t",
+   "start": 4.3,
+   "end": 4.32
+  },
+  {
+   "text": "h",
+   "start": 4.32,
+   "end": 4.34
+  },
+  {
+   "text": "e",
+   "start": 4.34,
+   "end": 4.42
+  },
+  {
+   "text": " ",
+   "start": 4.42,
+   "end": 4.48
+  },
+  {
+   "text": "S",
+   "start": 4.48,
+   "end": 4.58
+  },
+  {
+   "text": "u",
+   "start": 4.58,
+   "end": 4.64
+  },
+  {
+   "text": "n",
+   "start": 4.64,
+   "end": 4.82
+  },
+  {
+   "text": ".",
+   "start": 4.82,
+   "end": 4.82
+  }
+ ]
+}

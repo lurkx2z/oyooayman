@@ -1,0 +1,444 @@
+{
+ "id": "46-give",
+ "text": "So something else has to give. Time.",
+ "seconds": 3.42,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "So",
+   "start": 0.1,
+   "end": 0.2
+  },
+  {
+   "text": "something",
+   "start": 0.32,
+   "end": 0.64
+  },
+  {
+   "text": "else",
+   "start": 0.76,
+   "end": 1.02
+  },
+  {
+   "text": "has",
+   "start": 1.08,
+   "end": 1.26
+  },
+  {
+   "text": "to",
+   "start": 1.3,
+   "end": 1.4
+  },
+  {
+   "text": "give.",
+   "start": 1.46,
+   "end": 1.82
+  },
+  {
+   "text": "Time.",
+   "start": 2.52,
+   "end": 2.98
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.12
+  },
+  {
+   "text": "o",
+   "start": 0.12,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.44
+  },
+  {
+   "text": "s",
+   "start": 0.44,
+   "end": 0.462
+  },
+  {
+   "text": "o",
+   "start": 0.462,
+   "end": 0.484
+  },
+  {
+   "text": "m",
+   "start": 0.484,
+   "end": 0.507
+  },
+  {
+   "text": "e",
+   "start": 0.507,
+   "end": 0.529
+  },
+  {
+   "text": "t",
+   "start": 0.529,
+   "end": 0.551
+  },
+  {
+   "text": "h",
+   "start": 0.551,
+   "end": 0.573
+  },
+  {
+   "text": "i",
+   "start": 0.573,
+   "end": 0.596
+  },
+  {
+   "text": "n",
+   "start": 0.596,
+   "end": 0.618
+  },
+  {
+   "text": "g",
+   "start": 0.618,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "e",
+   "start": 0.72,
+   "end": 0.78
+  },
+  {
+   "text": "l",
+   "start": 0.78,
+   "end": 0.84
+  },
+  {
+   "text": "s",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": "e",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "h",
+   "start": 1.04,
+   "end": 1.093
+  },
+  {
+   "text": "a",
+   "start": 1.093,
+   "end": 1.147
+  },
+  {
+   "text": "s",
+   "start": 1.147,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "t",
+   "start": 1.28,
+   "end": 1.32
+  },
+  {
+   "text": "o",
+   "start": 1.32,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "g",
+   "start": 1.44,
+   "end": 1.54
+  },
+  {
+   "text": "i",
+   "start": 1.54,
+   "end": 1.64
+  },
+  {
+   "text": "v",
+   "start": 1.64,
+   "end": 1.74
+  },
+  {
+   "text": "e",
+   "start": 1.74,
+   "end": 1.84
+  },
+  {
+   "text": ".",
+   "start": 1.84,
+   "end": 2.4
+  },
+  {
+   "text": " ",
+   "start": 2.4,
+   "end": 2.88
+  },
+  {
+   "text": "T",
+   "start": 2.88,
+   "end": 3
+  },
+  {
+   "text": "i",
+   "start": 3,
+   "end": 3.12
+  },
+  {
+   "text": "m",
+   "start": 3.12,
+   "end": 3.24
+  },
+  {
+   "text": "e",
+   "start": 3.24,
+   "end": 3.36
+  },
+  {
+   "text": ".",
+   "start": 3.36,
+   "end": 3.44
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "So",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "something",
+   "start": 0.44,
+   "end": 0.64
+  },
+  {
+   "text": "else",
+   "start": 0.72,
+   "end": 0.96
+  },
+  {
+   "text": "has",
+   "start": 1.04,
+   "end": 1.2
+  },
+  {
+   "text": "to",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "give.",
+   "start": 1.44,
+   "end": 2.4
+  },
+  {
+   "text": "Time.",
+   "start": 2.88,
+   "end": 3.44
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": "o",
+   "start": 0.14,
+   "end": 0.2
+  },
+  {
+   "text": " ",
+   "start": 0.2,
+   "end": 0.32
+  },
+  {
+   "text": "s",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "o",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "m",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "e",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "t",
+   "start": 0.5,
+   "end": 0.5
+  },
+  {
+   "text": "h",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "i",
+   "start": 0.54,
+   "end": 0.56
+  },
+  {
+   "text": "n",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "g",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.76
+  },
+  {
+   "text": "e",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": "l",
+   "start": 0.8,
+   "end": 0.84
+  },
+  {
+   "text": "s",
+   "start": 0.84,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1.02
+  },
+  {
+   "text": " ",
+   "start": 1.02,
+   "end": 1.08
+  },
+  {
+   "text": "h",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "a",
+   "start": 1.12,
+   "end": 1.22
+  },
+  {
+   "text": "s",
+   "start": 1.22,
+   "end": 1.26
+  },
+  {
+   "text": " ",
+   "start": 1.26,
+   "end": 1.3
+  },
+  {
+   "text": "t",
+   "start": 1.3,
+   "end": 1.32
+  },
+  {
+   "text": "o",
+   "start": 1.32,
+   "end": 1.4
+  },
+  {
+   "text": " ",
+   "start": 1.4,
+   "end": 1.46
+  },
+  {
+   "text": "g",
+   "start": 1.46,
+   "end": 1.54
+  },
+  {
+   "text": "i",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "v",
+   "start": 1.58,
+   "end": 1.76
+  },
+  {
+   "text": "e",
+   "start": 1.76,
+   "end": 1.82
+  },
+  {
+   "text": ".",
+   "start": 1.82,
+   "end": 1.82
+  },
+  {
+   "text": " ",
+   "start": 1.82,
+   "end": 1.82
+  },
+  {
+   "text": "T",
+   "start": 2.52,
+   "end": 2.66
+  },
+  {
+   "text": "i",
+   "start": 2.66,
+   "end": 2.8
+  },
+  {
+   "text": "m",
+   "start": 2.8,
+   "end": 2.82
+  },
+  {
+   "text": "e",
+   "start": 2.82,
+   "end": 2.98
+  },
+  {
+   "text": ".",
+   "start": 2.98,
+   "end": 2.98
+  }
+ ]
+}

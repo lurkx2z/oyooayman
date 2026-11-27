@@ -1,0 +1,314 @@
+{
+ "id": "79-question",
+ "text": "Which way would you step?",
+ "seconds": 1.52,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Which",
+   "start": 0.08,
+   "end": 0.26
+  },
+  {
+   "text": "way",
+   "start": 0.32,
+   "end": 0.46
+  },
+  {
+   "text": "would",
+   "start": 0.5,
+   "end": 0.64
+  },
+  {
+   "text": "you",
+   "start": 0.7,
+   "end": 0.82
+  },
+  {
+   "text": "step?",
+   "start": 0.92,
+   "end": 1.22
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.048
+  },
+  {
+   "text": "h",
+   "start": 0.048,
+   "end": 0.096
+  },
+  {
+   "text": "i",
+   "start": 0.096,
+   "end": 0.144
+  },
+  {
+   "text": "c",
+   "start": 0.144,
+   "end": 0.192
+  },
+  {
+   "text": "h",
+   "start": 0.192,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "w",
+   "start": 0.32,
+   "end": 0.347
+  },
+  {
+   "text": "a",
+   "start": 0.347,
+   "end": 0.373
+  },
+  {
+   "text": "y",
+   "start": 0.373,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "w",
+   "start": 0.48,
+   "end": 0.512
+  },
+  {
+   "text": "o",
+   "start": 0.512,
+   "end": 0.544
+  },
+  {
+   "text": "u",
+   "start": 0.544,
+   "end": 0.576
+  },
+  {
+   "text": "l",
+   "start": 0.576,
+   "end": 0.608
+  },
+  {
+   "text": "d",
+   "start": 0.608,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "y",
+   "start": 0.72,
+   "end": 0.747
+  },
+  {
+   "text": "o",
+   "start": 0.747,
+   "end": 0.773
+  },
+  {
+   "text": "u",
+   "start": 0.773,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "s",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "t",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "e",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "p",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "?",
+   "start": 1.2,
+   "end": 1.52
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Which",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "way",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "would",
+   "start": 0.48,
+   "end": 0.64
+  },
+  {
+   "text": "you",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "step?",
+   "start": 0.88,
+   "end": 1.52
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "h",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": "i",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "c",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "h",
+   "start": 0.2,
+   "end": 0.26
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.32
+  },
+  {
+   "text": "w",
+   "start": 0.32,
+   "end": 0.34
+  },
+  {
+   "text": "a",
+   "start": 0.34,
+   "end": 0.4
+  },
+  {
+   "text": "y",
+   "start": 0.42,
+   "end": 0.46
+  },
+  {
+   "text": " ",
+   "start": 0.46,
+   "end": 0.48
+  },
+  {
+   "text": "w",
+   "start": 0.5,
+   "end": 0.52
+  },
+  {
+   "text": "o",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "u",
+   "start": 0.54,
+   "end": 0.56
+  },
+  {
+   "text": "l",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "d",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": "y",
+   "start": 0.7,
+   "end": 0.72
+  },
+  {
+   "text": "o",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "u",
+   "start": 0.74,
+   "end": 0.82
+  },
+  {
+   "text": " ",
+   "start": 0.82,
+   "end": 0.92
+  },
+  {
+   "text": "s",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": "t",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "e",
+   "start": 1.02,
+   "end": 1.08
+  },
+  {
+   "text": "p",
+   "start": 1.08,
+   "end": 1.22
+  },
+  {
+   "text": "?",
+   "start": 1.22,
+   "end": 1.22
+  }
+ ]
+}

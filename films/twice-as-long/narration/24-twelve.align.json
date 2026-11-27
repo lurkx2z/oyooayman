@@ -1,0 +1,974 @@
+{
+ "id": "24-twelve",
+ "text": "Step twelve. One and a half kilometres. Most of the Brooklyn Bridge, in one step.",
+ "seconds": 6.3,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.14,
+   "end": 0.32
+  },
+  {
+   "text": "twelve.",
+   "start": 0.42,
+   "end": 0.92
+  },
+  {
+   "text": "One",
+   "start": 1.46,
+   "end": 1.56
+  },
+  {
+   "text": "and",
+   "start": 1.6,
+   "end": 1.66
+  },
+  {
+   "text": "a",
+   "start": 1.7,
+   "end": 1.76
+  },
+  {
+   "text": "half",
+   "start": 1.82,
+   "end": 2.04
+  },
+  {
+   "text": "kilometres.",
+   "start": 2.1,
+   "end": 2.78
+  },
+  {
+   "text": "Most",
+   "start": 3.32,
+   "end": 3.54
+  },
+  {
+   "text": "of",
+   "start": 3.58,
+   "end": 3.64
+  },
+  {
+   "text": "the",
+   "start": 3.68,
+   "end": 3.76
+  },
+  {
+   "text": "Brooklyn",
+   "start": 3.8,
+   "end": 4.1
+  },
+  {
+   "text": "Bridge,",
+   "start": 4.18,
+   "end": 4.56
+  },
+  {
+   "text": "in",
+   "start": 4.86,
+   "end": 5
+  },
+  {
+   "text": "one",
+   "start": 5.12,
+   "end": 5.28
+  },
+  {
+   "text": "step.",
+   "start": 5.46,
+   "end": 5.78
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "t",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "p",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "t",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "w",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.66
+  },
+  {
+   "text": "l",
+   "start": 0.66,
+   "end": 0.76
+  },
+  {
+   "text": "v",
+   "start": 0.76,
+   "end": 0.86
+  },
+  {
+   "text": "e",
+   "start": 0.86,
+   "end": 0.96
+  },
+  {
+   "text": ".",
+   "start": 0.96,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "O",
+   "start": 1.44,
+   "end": 1.467
+  },
+  {
+   "text": "n",
+   "start": 1.467,
+   "end": 1.493
+  },
+  {
+   "text": "e",
+   "start": 1.493,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "a",
+   "start": 1.6,
+   "end": 1.613
+  },
+  {
+   "text": "n",
+   "start": 1.613,
+   "end": 1.627
+  },
+  {
+   "text": "d",
+   "start": 1.627,
+   "end": 1.64
+  },
+  {
+   "text": " ",
+   "start": 1.64,
+   "end": 1.68
+  },
+  {
+   "text": "a",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.88
+  },
+  {
+   "text": "h",
+   "start": 1.88,
+   "end": 1.91
+  },
+  {
+   "text": "a",
+   "start": 1.91,
+   "end": 1.94
+  },
+  {
+   "text": "l",
+   "start": 1.94,
+   "end": 1.97
+  },
+  {
+   "text": "f",
+   "start": 1.97,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "k",
+   "start": 2.08,
+   "end": 2.133
+  },
+  {
+   "text": "i",
+   "start": 2.133,
+   "end": 2.187
+  },
+  {
+   "text": "l",
+   "start": 2.187,
+   "end": 2.24
+  },
+  {
+   "text": "o",
+   "start": 2.24,
+   "end": 2.3
+  },
+  {
+   "text": "m",
+   "start": 2.3,
+   "end": 2.36
+  },
+  {
+   "text": "e",
+   "start": 2.36,
+   "end": 2.42
+  },
+  {
+   "text": "t",
+   "start": 2.42,
+   "end": 2.48
+  },
+  {
+   "text": "r",
+   "start": 2.48,
+   "end": 2.587
+  },
+  {
+   "text": "e",
+   "start": 2.587,
+   "end": 2.693
+  },
+  {
+   "text": "s",
+   "start": 2.693,
+   "end": 2.8
+  },
+  {
+   "text": ".",
+   "start": 2.8,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "M",
+   "start": 3.28,
+   "end": 3.34
+  },
+  {
+   "text": "o",
+   "start": 3.34,
+   "end": 3.4
+  },
+  {
+   "text": "s",
+   "start": 3.4,
+   "end": 3.46
+  },
+  {
+   "text": "t",
+   "start": 3.46,
+   "end": 3.52
+  },
+  {
+   "text": " ",
+   "start": 3.52,
+   "end": 3.56
+  },
+  {
+   "text": "o",
+   "start": 3.56,
+   "end": 3.58
+  },
+  {
+   "text": "f",
+   "start": 3.58,
+   "end": 3.6
+  },
+  {
+   "text": " ",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "t",
+   "start": 3.68,
+   "end": 3.693
+  },
+  {
+   "text": "h",
+   "start": 3.693,
+   "end": 3.707
+  },
+  {
+   "text": "e",
+   "start": 3.707,
+   "end": 3.72
+  },
+  {
+   "text": " ",
+   "start": 3.72,
+   "end": 3.76
+  },
+  {
+   "text": "B",
+   "start": 3.76,
+   "end": 3.787
+  },
+  {
+   "text": "r",
+   "start": 3.787,
+   "end": 3.813
+  },
+  {
+   "text": "o",
+   "start": 3.813,
+   "end": 3.84
+  },
+  {
+   "text": "o",
+   "start": 3.84,
+   "end": 3.888
+  },
+  {
+   "text": "k",
+   "start": 3.888,
+   "end": 3.936
+  },
+  {
+   "text": "l",
+   "start": 3.936,
+   "end": 3.984
+  },
+  {
+   "text": "y",
+   "start": 3.984,
+   "end": 4.032
+  },
+  {
+   "text": "n",
+   "start": 4.032,
+   "end": 4.08
+  },
+  {
+   "text": " ",
+   "start": 4.08,
+   "end": 4.16
+  },
+  {
+   "text": "B",
+   "start": 4.16,
+   "end": 4.227
+  },
+  {
+   "text": "r",
+   "start": 4.227,
+   "end": 4.293
+  },
+  {
+   "text": "i",
+   "start": 4.293,
+   "end": 4.36
+  },
+  {
+   "text": "d",
+   "start": 4.36,
+   "end": 4.427
+  },
+  {
+   "text": "g",
+   "start": 4.427,
+   "end": 4.493
+  },
+  {
+   "text": "e",
+   "start": 4.493,
+   "end": 4.56
+  },
+  {
+   "text": ",",
+   "start": 4.56,
+   "end": 4.8
+  },
+  {
+   "text": " ",
+   "start": 4.8,
+   "end": 4.92
+  },
+  {
+   "text": "i",
+   "start": 4.92,
+   "end": 4.98
+  },
+  {
+   "text": "n",
+   "start": 4.98,
+   "end": 5.04
+  },
+  {
+   "text": " ",
+   "start": 5.04,
+   "end": 5.12
+  },
+  {
+   "text": "o",
+   "start": 5.12,
+   "end": 5.173
+  },
+  {
+   "text": "n",
+   "start": 5.173,
+   "end": 5.227
+  },
+  {
+   "text": "e",
+   "start": 5.227,
+   "end": 5.28
+  },
+  {
+   "text": " ",
+   "start": 5.28,
+   "end": 5.44
+  },
+  {
+   "text": "s",
+   "start": 5.44,
+   "end": 5.52
+  },
+  {
+   "text": "t",
+   "start": 5.52,
+   "end": 5.6
+  },
+  {
+   "text": "e",
+   "start": 5.6,
+   "end": 5.68
+  },
+  {
+   "text": "p",
+   "start": 5.68,
+   "end": 5.76
+  },
+  {
+   "text": ".",
+   "start": 5.76,
+   "end": 6.24
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "twelve.",
+   "start": 0.4,
+   "end": 1.36
+  },
+  {
+   "text": "One",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "and",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": "a",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "half",
+   "start": 1.88,
+   "end": 2
+  },
+  {
+   "text": "kilometres.",
+   "start": 2.08,
+   "end": 3.2
+  },
+  {
+   "text": "Most",
+   "start": 3.28,
+   "end": 3.52
+  },
+  {
+   "text": "of",
+   "start": 3.56,
+   "end": 3.6
+  },
+  {
+   "text": "the",
+   "start": 3.68,
+   "end": 3.72
+  },
+  {
+   "text": "Brooklyn",
+   "start": 3.76,
+   "end": 4.08
+  },
+  {
+   "text": "Bridge,",
+   "start": 4.16,
+   "end": 4.8
+  },
+  {
+   "text": "in",
+   "start": 4.92,
+   "end": 5.04
+  },
+  {
+   "text": "one",
+   "start": 5.12,
+   "end": 5.28
+  },
+  {
+   "text": "step.",
+   "start": 5.44,
+   "end": 6.24
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.42
+  },
+  {
+   "text": "t",
+   "start": 0.42,
+   "end": 0.5
+  },
+  {
+   "text": "w",
+   "start": 0.5,
+   "end": 0.56
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "l",
+   "start": 0.6,
+   "end": 0.72
+  },
+  {
+   "text": "v",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "e",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": ".",
+   "start": 0.92,
+   "end": 0.92
+  },
+  {
+   "text": " ",
+   "start": 0.92,
+   "end": 1.46
+  },
+  {
+   "text": "O",
+   "start": 1.46,
+   "end": 1.5
+  },
+  {
+   "text": "n",
+   "start": 1.5,
+   "end": 1.52
+  },
+  {
+   "text": "e",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": " ",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "a",
+   "start": 1.6,
+   "end": 1.62
+  },
+  {
+   "text": "n",
+   "start": 1.62,
+   "end": 1.64
+  },
+  {
+   "text": "d",
+   "start": 1.64,
+   "end": 1.66
+  },
+  {
+   "text": " ",
+   "start": 1.66,
+   "end": 1.7
+  },
+  {
+   "text": "a",
+   "start": 1.7,
+   "end": 1.76
+  },
+  {
+   "text": " ",
+   "start": 1.76,
+   "end": 1.82
+  },
+  {
+   "text": "h",
+   "start": 1.82,
+   "end": 1.88
+  },
+  {
+   "text": "a",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": "l",
+   "start": 1.92,
+   "end": 1.98
+  },
+  {
+   "text": "f",
+   "start": 1.98,
+   "end": 2.04
+  },
+  {
+   "text": " ",
+   "start": 2.04,
+   "end": 2.1
+  },
+  {
+   "text": "k",
+   "start": 2.1,
+   "end": 2.14
+  },
+  {
+   "text": "i",
+   "start": 2.14,
+   "end": 2.2
+  },
+  {
+   "text": "l",
+   "start": 2.2,
+   "end": 2.28
+  },
+  {
+   "text": "o",
+   "start": 2.28,
+   "end": 2.34
+  },
+  {
+   "text": "m",
+   "start": 2.34,
+   "end": 2.4
+  },
+  {
+   "text": "e",
+   "start": 2.4,
+   "end": 2.46
+  },
+  {
+   "text": "t",
+   "start": 2.46,
+   "end": 2.5
+  },
+  {
+   "text": "r",
+   "start": 2.5,
+   "end": 2.56
+  },
+  {
+   "text": "e",
+   "start": 2.56,
+   "end": 2.74
+  },
+  {
+   "text": "s",
+   "start": 2.74,
+   "end": 2.78
+  },
+  {
+   "text": ".",
+   "start": 2.78,
+   "end": 2.78
+  },
+  {
+   "text": " ",
+   "start": 2.78,
+   "end": 3.32
+  },
+  {
+   "text": "M",
+   "start": 3.32,
+   "end": 3.36
+  },
+  {
+   "text": "o",
+   "start": 3.36,
+   "end": 3.4
+  },
+  {
+   "text": "s",
+   "start": 3.4,
+   "end": 3.48
+  },
+  {
+   "text": "t",
+   "start": 3.48,
+   "end": 3.54
+  },
+  {
+   "text": " ",
+   "start": 3.54,
+   "end": 3.58
+  },
+  {
+   "text": "o",
+   "start": 3.58,
+   "end": 3.62
+  },
+  {
+   "text": "f",
+   "start": 3.62,
+   "end": 3.64
+  },
+  {
+   "text": " ",
+   "start": 3.64,
+   "end": 3.68
+  },
+  {
+   "text": "t",
+   "start": 3.68,
+   "end": 3.7
+  },
+  {
+   "text": "h",
+   "start": 3.7,
+   "end": 3.72
+  },
+  {
+   "text": "e",
+   "start": 3.72,
+   "end": 3.76
+  },
+  {
+   "text": " ",
+   "start": 3.76,
+   "end": 3.78
+  },
+  {
+   "text": "B",
+   "start": 3.8,
+   "end": 3.82
+  },
+  {
+   "text": "r",
+   "start": 3.82,
+   "end": 3.84
+  },
+  {
+   "text": "o",
+   "start": 3.84,
+   "end": 3.88
+  },
+  {
+   "text": "o",
+   "start": 3.88,
+   "end": 3.92
+  },
+  {
+   "text": "k",
+   "start": 3.92,
+   "end": 3.98
+  },
+  {
+   "text": "l",
+   "start": 3.98,
+   "end": 4
+  },
+  {
+   "text": "y",
+   "start": 4,
+   "end": 4.04
+  },
+  {
+   "text": "n",
+   "start": 4.04,
+   "end": 4.1
+  },
+  {
+   "text": " ",
+   "start": 4.1,
+   "end": 4.18
+  },
+  {
+   "text": "B",
+   "start": 4.18,
+   "end": 4.24
+  },
+  {
+   "text": "r",
+   "start": 4.24,
+   "end": 4.3
+  },
+  {
+   "text": "i",
+   "start": 4.3,
+   "end": 4.36
+  },
+  {
+   "text": "d",
+   "start": 4.36,
+   "end": 4.4
+  },
+  {
+   "text": "g",
+   "start": 4.4,
+   "end": 4.54
+  },
+  {
+   "text": "e",
+   "start": 4.54,
+   "end": 4.56
+  },
+  {
+   "text": ",",
+   "start": 4.56,
+   "end": 4.56
+  },
+  {
+   "text": " ",
+   "start": 4.56,
+   "end": 4.86
+  },
+  {
+   "text": "i",
+   "start": 4.86,
+   "end": 4.92
+  },
+  {
+   "text": "n",
+   "start": 4.92,
+   "end": 5
+  },
+  {
+   "text": " ",
+   "start": 5,
+   "end": 5.12
+  },
+  {
+   "text": "o",
+   "start": 5.12,
+   "end": 5.16
+  },
+  {
+   "text": "n",
+   "start": 5.18,
+   "end": 5.22
+  },
+  {
+   "text": "e",
+   "start": 5.24,
+   "end": 5.28
+  },
+  {
+   "text": " ",
+   "start": 5.28,
+   "end": 5.46
+  },
+  {
+   "text": "s",
+   "start": 5.46,
+   "end": 5.48
+  },
+  {
+   "text": "t",
+   "start": 5.48,
+   "end": 5.54
+  },
+  {
+   "text": "e",
+   "start": 5.54,
+   "end": 5.62
+  },
+  {
+   "text": "p",
+   "start": 5.62,
+   "end": 5.78
+  },
+  {
+   "text": ".",
+   "start": 5.78,
+   "end": 5.78
+  }
+ ]
+}

@@ -1,0 +1,1114 @@
+{
+ "id": "26-thirteen",
+ "text": "Step thirteen. Three kilometres. Nine times the speed of sound. The air around you is glowing.",
+ "seconds": 7.5,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.14,
+   "end": 0.34
+  },
+  {
+   "text": "thirteen.",
+   "start": 0.44,
+   "end": 1.08
+  },
+  {
+   "text": "Three",
+   "start": 1.5,
+   "end": 1.7
+  },
+  {
+   "text": "kilometres.",
+   "start": 1.8,
+   "end": 2.48
+  },
+  {
+   "text": "Nine",
+   "start": 2.94,
+   "end": 3.28
+  },
+  {
+   "text": "times",
+   "start": 3.38,
+   "end": 3.8
+  },
+  {
+   "text": "the",
+   "start": 3.84,
+   "end": 3.92
+  },
+  {
+   "text": "speed",
+   "start": 4.019,
+   "end": 4.18
+  },
+  {
+   "text": "of",
+   "start": 4.22,
+   "end": 4.3
+  },
+  {
+   "text": "sound.",
+   "start": 4.38,
+   "end": 4.82
+  },
+  {
+   "text": "The",
+   "start": 5.26,
+   "end": 5.38
+  },
+  {
+   "text": "air",
+   "start": 5.46,
+   "end": 5.62
+  },
+  {
+   "text": "around",
+   "start": 5.7,
+   "end": 6.04
+  },
+  {
+   "text": "you",
+   "start": 6.1,
+   "end": 6.26
+  },
+  {
+   "text": "is",
+   "start": 6.32,
+   "end": 6.46
+  },
+  {
+   "text": "glowing.",
+   "start": 6.54,
+   "end": 7.08
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "t",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "e",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "t",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "h",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "i",
+   "start": 0.48,
+   "end": 0.573
+  },
+  {
+   "text": "r",
+   "start": 0.573,
+   "end": 0.667
+  },
+  {
+   "text": "t",
+   "start": 0.667,
+   "end": 0.76
+  },
+  {
+   "text": "e",
+   "start": 0.76,
+   "end": 0.853
+  },
+  {
+   "text": "e",
+   "start": 0.853,
+   "end": 0.947
+  },
+  {
+   "text": "n",
+   "start": 0.947,
+   "end": 1.04
+  },
+  {
+   "text": ".",
+   "start": 1.04,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "T",
+   "start": 1.52,
+   "end": 1.536
+  },
+  {
+   "text": "h",
+   "start": 1.536,
+   "end": 1.552
+  },
+  {
+   "text": "r",
+   "start": 1.552,
+   "end": 1.568
+  },
+  {
+   "text": "e",
+   "start": 1.568,
+   "end": 1.584
+  },
+  {
+   "text": "e",
+   "start": 1.584,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.76
+  },
+  {
+   "text": "k",
+   "start": 1.76,
+   "end": 1.813
+  },
+  {
+   "text": "i",
+   "start": 1.813,
+   "end": 1.867
+  },
+  {
+   "text": "l",
+   "start": 1.867,
+   "end": 1.92
+  },
+  {
+   "text": "o",
+   "start": 1.92,
+   "end": 1.98
+  },
+  {
+   "text": "m",
+   "start": 1.98,
+   "end": 2.04
+  },
+  {
+   "text": "e",
+   "start": 2.04,
+   "end": 2.1
+  },
+  {
+   "text": "t",
+   "start": 2.1,
+   "end": 2.16
+  },
+  {
+   "text": "r",
+   "start": 2.16,
+   "end": 2.267
+  },
+  {
+   "text": "e",
+   "start": 2.267,
+   "end": 2.373
+  },
+  {
+   "text": "s",
+   "start": 2.373,
+   "end": 2.48
+  },
+  {
+   "text": ".",
+   "start": 2.48,
+   "end": 2.88
+  },
+  {
+   "text": " ",
+   "start": 2.88,
+   "end": 3.04
+  },
+  {
+   "text": "N",
+   "start": 3.04,
+   "end": 3.08
+  },
+  {
+   "text": "i",
+   "start": 3.08,
+   "end": 3.12
+  },
+  {
+   "text": "n",
+   "start": 3.12,
+   "end": 3.16
+  },
+  {
+   "text": "e",
+   "start": 3.16,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "t",
+   "start": 3.28,
+   "end": 3.376
+  },
+  {
+   "text": "i",
+   "start": 3.376,
+   "end": 3.472
+  },
+  {
+   "text": "m",
+   "start": 3.472,
+   "end": 3.568
+  },
+  {
+   "text": "e",
+   "start": 3.568,
+   "end": 3.664
+  },
+  {
+   "text": "s",
+   "start": 3.664,
+   "end": 3.76
+  },
+  {
+   "text": " ",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "t",
+   "start": 3.84,
+   "end": 3.853
+  },
+  {
+   "text": "h",
+   "start": 3.853,
+   "end": 3.867
+  },
+  {
+   "text": "e",
+   "start": 3.867,
+   "end": 3.88
+  },
+  {
+   "text": " ",
+   "start": 3.88,
+   "end": 3.92
+  },
+  {
+   "text": "s",
+   "start": 3.92,
+   "end": 3.968
+  },
+  {
+   "text": "p",
+   "start": 3.968,
+   "end": 4.016
+  },
+  {
+   "text": "e",
+   "start": 4.016,
+   "end": 4.064
+  },
+  {
+   "text": "e",
+   "start": 4.064,
+   "end": 4.112
+  },
+  {
+   "text": "d",
+   "start": 4.112,
+   "end": 4.16
+  },
+  {
+   "text": " ",
+   "start": 4.16,
+   "end": 4.2
+  },
+  {
+   "text": "o",
+   "start": 4.2,
+   "end": 4.22
+  },
+  {
+   "text": "f",
+   "start": 4.22,
+   "end": 4.24
+  },
+  {
+   "text": " ",
+   "start": 4.24,
+   "end": 4.32
+  },
+  {
+   "text": "s",
+   "start": 4.32,
+   "end": 4.416
+  },
+  {
+   "text": "o",
+   "start": 4.416,
+   "end": 4.512
+  },
+  {
+   "text": "u",
+   "start": 4.512,
+   "end": 4.608
+  },
+  {
+   "text": "n",
+   "start": 4.608,
+   "end": 4.704
+  },
+  {
+   "text": "d",
+   "start": 4.704,
+   "end": 4.8
+  },
+  {
+   "text": ".",
+   "start": 4.8,
+   "end": 5.2
+  },
+  {
+   "text": " ",
+   "start": 5.2,
+   "end": 5.28
+  },
+  {
+   "text": "T",
+   "start": 5.28,
+   "end": 5.307
+  },
+  {
+   "text": "h",
+   "start": 5.307,
+   "end": 5.333
+  },
+  {
+   "text": "e",
+   "start": 5.333,
+   "end": 5.36
+  },
+  {
+   "text": " ",
+   "start": 5.36,
+   "end": 5.48
+  },
+  {
+   "text": "a",
+   "start": 5.48,
+   "end": 5.52
+  },
+  {
+   "text": "i",
+   "start": 5.52,
+   "end": 5.56
+  },
+  {
+   "text": "r",
+   "start": 5.56,
+   "end": 5.6
+  },
+  {
+   "text": " ",
+   "start": 5.6,
+   "end": 5.8
+  },
+  {
+   "text": "a",
+   "start": 5.8,
+   "end": 5.833
+  },
+  {
+   "text": "r",
+   "start": 5.833,
+   "end": 5.867
+  },
+  {
+   "text": "o",
+   "start": 5.867,
+   "end": 5.9
+  },
+  {
+   "text": "u",
+   "start": 5.9,
+   "end": 5.933
+  },
+  {
+   "text": "n",
+   "start": 5.933,
+   "end": 5.967
+  },
+  {
+   "text": "d",
+   "start": 5.967,
+   "end": 6
+  },
+  {
+   "text": " ",
+   "start": 6,
+   "end": 6.08
+  },
+  {
+   "text": "y",
+   "start": 6.08,
+   "end": 6.133
+  },
+  {
+   "text": "o",
+   "start": 6.133,
+   "end": 6.187
+  },
+  {
+   "text": "u",
+   "start": 6.187,
+   "end": 6.24
+  },
+  {
+   "text": " ",
+   "start": 6.24,
+   "end": 6.32
+  },
+  {
+   "text": "i",
+   "start": 6.32,
+   "end": 6.4
+  },
+  {
+   "text": "s",
+   "start": 6.4,
+   "end": 6.48
+  },
+  {
+   "text": " ",
+   "start": 6.48,
+   "end": 6.6
+  },
+  {
+   "text": "g",
+   "start": 6.6,
+   "end": 6.66
+  },
+  {
+   "text": "l",
+   "start": 6.66,
+   "end": 6.72
+  },
+  {
+   "text": "o",
+   "start": 6.72,
+   "end": 6.784
+  },
+  {
+   "text": "w",
+   "start": 6.784,
+   "end": 6.848
+  },
+  {
+   "text": "i",
+   "start": 6.848,
+   "end": 6.912
+  },
+  {
+   "text": "n",
+   "start": 6.912,
+   "end": 6.976
+  },
+  {
+   "text": "g",
+   "start": 6.976,
+   "end": 7.04
+  },
+  {
+   "text": ".",
+   "start": 7.04,
+   "end": 7.44
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "thirteen.",
+   "start": 0.4,
+   "end": 1.44
+  },
+  {
+   "text": "Three",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "kilometres.",
+   "start": 1.76,
+   "end": 2.88
+  },
+  {
+   "text": "Nine",
+   "start": 3.04,
+   "end": 3.2
+  },
+  {
+   "text": "times",
+   "start": 3.28,
+   "end": 3.76
+  },
+  {
+   "text": "the",
+   "start": 3.84,
+   "end": 3.88
+  },
+  {
+   "text": "speed",
+   "start": 3.92,
+   "end": 4.16
+  },
+  {
+   "text": "of",
+   "start": 4.2,
+   "end": 4.24
+  },
+  {
+   "text": "sound.",
+   "start": 4.32,
+   "end": 5.2
+  },
+  {
+   "text": "The",
+   "start": 5.28,
+   "end": 5.36
+  },
+  {
+   "text": "air",
+   "start": 5.48,
+   "end": 5.6
+  },
+  {
+   "text": "around",
+   "start": 5.8,
+   "end": 6
+  },
+  {
+   "text": "you",
+   "start": 6.08,
+   "end": 6.24
+  },
+  {
+   "text": "is",
+   "start": 6.32,
+   "end": 6.48
+  },
+  {
+   "text": "glowing.",
+   "start": 6.6,
+   "end": 7.44
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.44
+  },
+  {
+   "text": "t",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "h",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "i",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "r",
+   "start": 0.56,
+   "end": 0.68
+  },
+  {
+   "text": "t",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "e",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "e",
+   "start": 0.8,
+   "end": 0.9
+  },
+  {
+   "text": "n",
+   "start": 0.9,
+   "end": 1.08
+  },
+  {
+   "text": ".",
+   "start": 1.08,
+   "end": 1.08
+  },
+  {
+   "text": " ",
+   "start": 1.08,
+   "end": 1.08
+  },
+  {
+   "text": "T",
+   "start": 1.5,
+   "end": 1.52
+  },
+  {
+   "text": "h",
+   "start": 1.52,
+   "end": 1.58
+  },
+  {
+   "text": "r",
+   "start": 1.58,
+   "end": 1.6
+  },
+  {
+   "text": "e",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": "e",
+   "start": 1.64,
+   "end": 1.7
+  },
+  {
+   "text": " ",
+   "start": 1.7,
+   "end": 1.8
+  },
+  {
+   "text": "k",
+   "start": 1.8,
+   "end": 1.86
+  },
+  {
+   "text": "i",
+   "start": 1.86,
+   "end": 1.9
+  },
+  {
+   "text": "l",
+   "start": 1.9,
+   "end": 1.98
+  },
+  {
+   "text": "o",
+   "start": 1.98,
+   "end": 2.04
+  },
+  {
+   "text": "m",
+   "start": 2.04,
+   "end": 2.1
+  },
+  {
+   "text": "e",
+   "start": 2.1,
+   "end": 2.16
+  },
+  {
+   "text": "t",
+   "start": 2.16,
+   "end": 2.2
+  },
+  {
+   "text": "r",
+   "start": 2.2,
+   "end": 2.28
+  },
+  {
+   "text": "e",
+   "start": 2.28,
+   "end": 2.42
+  },
+  {
+   "text": "s",
+   "start": 2.42,
+   "end": 2.48
+  },
+  {
+   "text": ".",
+   "start": 2.48,
+   "end": 2.48
+  },
+  {
+   "text": " ",
+   "start": 2.48,
+   "end": 2.94
+  },
+  {
+   "text": "N",
+   "start": 2.94,
+   "end": 3.02
+  },
+  {
+   "text": "i",
+   "start": 3.02,
+   "end": 3.08
+  },
+  {
+   "text": "n",
+   "start": 3.08,
+   "end": 3.16
+  },
+  {
+   "text": "e",
+   "start": 3.16,
+   "end": 3.28
+  },
+  {
+   "text": " ",
+   "start": 3.28,
+   "end": 3.38
+  },
+  {
+   "text": "t",
+   "start": 3.38,
+   "end": 3.5
+  },
+  {
+   "text": "i",
+   "start": 3.5,
+   "end": 3.6
+  },
+  {
+   "text": "m",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "e",
+   "start": 3.68,
+   "end": 3.76
+  },
+  {
+   "text": "s",
+   "start": 3.76,
+   "end": 3.8
+  },
+  {
+   "text": " ",
+   "start": 3.8,
+   "end": 3.84
+  },
+  {
+   "text": "t",
+   "start": 3.84,
+   "end": 3.86
+  },
+  {
+   "text": "h",
+   "start": 3.86,
+   "end": 3.88
+  },
+  {
+   "text": "e",
+   "start": 3.88,
+   "end": 3.92
+  },
+  {
+   "text": " ",
+   "start": 3.92,
+   "end": 4.019
+  },
+  {
+   "text": "s",
+   "start": 4.019,
+   "end": 4.04
+  },
+  {
+   "text": "p",
+   "start": 4.04,
+   "end": 4.08
+  },
+  {
+   "text": "e",
+   "start": 4.08,
+   "end": 4.1
+  },
+  {
+   "text": "e",
+   "start": 4.1,
+   "end": 4.14
+  },
+  {
+   "text": "d",
+   "start": 4.14,
+   "end": 4.18
+  },
+  {
+   "text": " ",
+   "start": 4.18,
+   "end": 4.22
+  },
+  {
+   "text": "o",
+   "start": 4.22,
+   "end": 4.26
+  },
+  {
+   "text": "f",
+   "start": 4.26,
+   "end": 4.3
+  },
+  {
+   "text": " ",
+   "start": 4.3,
+   "end": 4.38
+  },
+  {
+   "text": "s",
+   "start": 4.38,
+   "end": 4.48
+  },
+  {
+   "text": "o",
+   "start": 4.48,
+   "end": 4.52
+  },
+  {
+   "text": "u",
+   "start": 4.52,
+   "end": 4.58
+  },
+  {
+   "text": "n",
+   "start": 4.62,
+   "end": 4.76
+  },
+  {
+   "text": "d",
+   "start": 4.76,
+   "end": 4.82
+  },
+  {
+   "text": ".",
+   "start": 4.82,
+   "end": 4.82
+  },
+  {
+   "text": " ",
+   "start": 4.82,
+   "end": 5.26
+  },
+  {
+   "text": "T",
+   "start": 5.26,
+   "end": 5.28
+  },
+  {
+   "text": "h",
+   "start": 5.28,
+   "end": 5.3
+  },
+  {
+   "text": "e",
+   "start": 5.3,
+   "end": 5.38
+  },
+  {
+   "text": " ",
+   "start": 5.38,
+   "end": 5.46
+  },
+  {
+   "text": "a",
+   "start": 5.46,
+   "end": 5.5
+  },
+  {
+   "text": "i",
+   "start": 5.5,
+   "end": 5.54
+  },
+  {
+   "text": "r",
+   "start": 5.54,
+   "end": 5.62
+  },
+  {
+   "text": " ",
+   "start": 5.62,
+   "end": 5.7
+  },
+  {
+   "text": "a",
+   "start": 5.7,
+   "end": 5.76
+  },
+  {
+   "text": "r",
+   "start": 5.76,
+   "end": 5.84
+  },
+  {
+   "text": "o",
+   "start": 5.84,
+   "end": 5.86
+  },
+  {
+   "text": "u",
+   "start": 5.88,
+   "end": 5.9
+  },
+  {
+   "text": "n",
+   "start": 5.9,
+   "end": 5.98
+  },
+  {
+   "text": "d",
+   "start": 5.98,
+   "end": 6.04
+  },
+  {
+   "text": " ",
+   "start": 6.04,
+   "end": 6.1
+  },
+  {
+   "text": "y",
+   "start": 6.1,
+   "end": 6.12
+  },
+  {
+   "text": "o",
+   "start": 6.12,
+   "end": 6.14
+  },
+  {
+   "text": "u",
+   "start": 6.18,
+   "end": 6.26
+  },
+  {
+   "text": " ",
+   "start": 6.26,
+   "end": 6.32
+  },
+  {
+   "text": "i",
+   "start": 6.32,
+   "end": 6.38
+  },
+  {
+   "text": "s",
+   "start": 6.38,
+   "end": 6.46
+  },
+  {
+   "text": " ",
+   "start": 6.46,
+   "end": 6.54
+  },
+  {
+   "text": "g",
+   "start": 6.54,
+   "end": 6.66
+  },
+  {
+   "text": "l",
+   "start": 6.66,
+   "end": 6.72
+  },
+  {
+   "text": "o",
+   "start": 6.72,
+   "end": 6.76
+  },
+  {
+   "text": "w",
+   "start": 6.76,
+   "end": 6.86
+  },
+  {
+   "text": "i",
+   "start": 6.88,
+   "end": 6.9
+  },
+  {
+   "text": "n",
+   "start": 6.9,
+   "end": 7.02
+  },
+  {
+   "text": "g",
+   "start": 7.02,
+   "end": 7.08
+  },
+  {
+   "text": ".",
+   "start": 7.08,
+   "end": 7.08
+  }
+ ]
+}

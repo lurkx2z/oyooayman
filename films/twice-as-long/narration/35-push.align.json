@@ -1,0 +1,764 @@
+{
+ "id": "35-push",
+ "text": "There's nothing to push against out here. The rule doesn't care.",
+ "seconds": 4.47,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "There's",
+   "start": 0.06,
+   "end": 0.28
+  },
+  {
+   "text": "nothing",
+   "start": 0.38,
+   "end": 0.66
+  },
+  {
+   "text": "to",
+   "start": 0.7,
+   "end": 0.82
+  },
+  {
+   "text": "push",
+   "start": 0.88,
+   "end": 1.08
+  },
+  {
+   "text": "against",
+   "start": 1.14,
+   "end": 1.5
+  },
+  {
+   "text": "out",
+   "start": 1.56,
+   "end": 1.7
+  },
+  {
+   "text": "here.",
+   "start": 1.76,
+   "end": 2
+  },
+  {
+   "text": "The",
+   "start": 2.56,
+   "end": 2.66
+  },
+  {
+   "text": "rule",
+   "start": 2.74,
+   "end": 3
+  },
+  {
+   "text": "doesn't",
+   "start": 3.04,
+   "end": 3.34
+  },
+  {
+   "text": "care.",
+   "start": 3.42,
+   "end": 3.78
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.032
+  },
+  {
+   "text": "h",
+   "start": 0.032,
+   "end": 0.064
+  },
+  {
+   "text": "e",
+   "start": 0.064,
+   "end": 0.096
+  },
+  {
+   "text": "r",
+   "start": 0.096,
+   "end": 0.128
+  },
+  {
+   "text": "e",
+   "start": 0.128,
+   "end": 0.16
+  },
+  {
+   "text": "'",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "s",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.48
+  },
+  {
+   "text": "n",
+   "start": 0.48,
+   "end": 0.503
+  },
+  {
+   "text": "o",
+   "start": 0.503,
+   "end": 0.526
+  },
+  {
+   "text": "t",
+   "start": 0.526,
+   "end": 0.549
+  },
+  {
+   "text": "h",
+   "start": 0.549,
+   "end": 0.571
+  },
+  {
+   "text": "i",
+   "start": 0.571,
+   "end": 0.594
+  },
+  {
+   "text": "n",
+   "start": 0.594,
+   "end": 0.617
+  },
+  {
+   "text": "g",
+   "start": 0.617,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "t",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "o",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "p",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "u",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": "s",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "h",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "a",
+   "start": 1.12,
+   "end": 1.166
+  },
+  {
+   "text": "g",
+   "start": 1.166,
+   "end": 1.211
+  },
+  {
+   "text": "a",
+   "start": 1.211,
+   "end": 1.257
+  },
+  {
+   "text": "i",
+   "start": 1.257,
+   "end": 1.303
+  },
+  {
+   "text": "n",
+   "start": 1.303,
+   "end": 1.349
+  },
+  {
+   "text": "s",
+   "start": 1.349,
+   "end": 1.394
+  },
+  {
+   "text": "t",
+   "start": 1.394,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "o",
+   "start": 1.52,
+   "end": 1.573
+  },
+  {
+   "text": "u",
+   "start": 1.573,
+   "end": 1.627
+  },
+  {
+   "text": "t",
+   "start": 1.627,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "h",
+   "start": 1.76,
+   "end": 1.94
+  },
+  {
+   "text": "e",
+   "start": 1.94,
+   "end": 2.12
+  },
+  {
+   "text": "r",
+   "start": 2.12,
+   "end": 2.3
+  },
+  {
+   "text": "e",
+   "start": 2.3,
+   "end": 2.48
+  },
+  {
+   "text": ".",
+   "start": 2.48,
+   "end": 2.52
+  },
+  {
+   "text": " ",
+   "start": 2.52,
+   "end": 2.56
+  },
+  {
+   "text": "T",
+   "start": 2.56,
+   "end": 2.587
+  },
+  {
+   "text": "h",
+   "start": 2.587,
+   "end": 2.613
+  },
+  {
+   "text": "e",
+   "start": 2.613,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "r",
+   "start": 2.72,
+   "end": 2.78
+  },
+  {
+   "text": "u",
+   "start": 2.78,
+   "end": 2.84
+  },
+  {
+   "text": "l",
+   "start": 2.84,
+   "end": 2.9
+  },
+  {
+   "text": "e",
+   "start": 2.9,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "d",
+   "start": 3.04,
+   "end": 3.072
+  },
+  {
+   "text": "o",
+   "start": 3.072,
+   "end": 3.104
+  },
+  {
+   "text": "e",
+   "start": 3.104,
+   "end": 3.136
+  },
+  {
+   "text": "s",
+   "start": 3.136,
+   "end": 3.168
+  },
+  {
+   "text": "n",
+   "start": 3.168,
+   "end": 3.2
+  },
+  {
+   "text": "'",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "t",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.84
+  },
+  {
+   "text": "c",
+   "start": 3.84,
+   "end": 3.96
+  },
+  {
+   "text": "a",
+   "start": 3.96,
+   "end": 4.08
+  },
+  {
+   "text": "r",
+   "start": 4.08,
+   "end": 4.2
+  },
+  {
+   "text": "e",
+   "start": 4.2,
+   "end": 4.32
+  },
+  {
+   "text": ".",
+   "start": 4.32,
+   "end": 4.4
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "There's",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "nothing",
+   "start": 0.48,
+   "end": 0.64
+  },
+  {
+   "text": "to",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "push",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "against",
+   "start": 1.12,
+   "end": 1.44
+  },
+  {
+   "text": "out",
+   "start": 1.52,
+   "end": 1.68
+  },
+  {
+   "text": "here.",
+   "start": 1.76,
+   "end": 2.52
+  },
+  {
+   "text": "The",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "rule",
+   "start": 2.72,
+   "end": 2.96
+  },
+  {
+   "text": "doesn't",
+   "start": 3.04,
+   "end": 3.36
+  },
+  {
+   "text": "care.",
+   "start": 3.84,
+   "end": 4.4
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.06,
+   "end": 0.06
+  },
+  {
+   "text": "h",
+   "start": 0.06,
+   "end": 0.08
+  },
+  {
+   "text": "e",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "r",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "'",
+   "start": 0.14,
+   "end": 0.14
+  },
+  {
+   "text": "s",
+   "start": 0.22,
+   "end": 0.28
+  },
+  {
+   "text": " ",
+   "start": 0.28,
+   "end": 0.38
+  },
+  {
+   "text": "n",
+   "start": 0.38,
+   "end": 0.42
+  },
+  {
+   "text": "o",
+   "start": 0.42,
+   "end": 0.46
+  },
+  {
+   "text": "t",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "h",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "i",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "n",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": "g",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": " ",
+   "start": 0.66,
+   "end": 0.7
+  },
+  {
+   "text": "t",
+   "start": 0.7,
+   "end": 0.72
+  },
+  {
+   "text": "o",
+   "start": 0.72,
+   "end": 0.82
+  },
+  {
+   "text": " ",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": "p",
+   "start": 0.88,
+   "end": 0.94
+  },
+  {
+   "text": "u",
+   "start": 0.94,
+   "end": 0.98
+  },
+  {
+   "text": "s",
+   "start": 0.98,
+   "end": 1.04
+  },
+  {
+   "text": "h",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": " ",
+   "start": 1.08,
+   "end": 1.14
+  },
+  {
+   "text": "a",
+   "start": 1.14,
+   "end": 1.18
+  },
+  {
+   "text": "g",
+   "start": 1.2,
+   "end": 1.26
+  },
+  {
+   "text": "a",
+   "start": 1.26,
+   "end": 1.28
+  },
+  {
+   "text": "i",
+   "start": 1.28,
+   "end": 1.3
+  },
+  {
+   "text": "n",
+   "start": 1.3,
+   "end": 1.36
+  },
+  {
+   "text": "s",
+   "start": 1.36,
+   "end": 1.42
+  },
+  {
+   "text": "t",
+   "start": 1.42,
+   "end": 1.5
+  },
+  {
+   "text": " ",
+   "start": 1.5,
+   "end": 1.56
+  },
+  {
+   "text": "o",
+   "start": 1.56,
+   "end": 1.58
+  },
+  {
+   "text": "u",
+   "start": 1.58,
+   "end": 1.62
+  },
+  {
+   "text": "t",
+   "start": 1.62,
+   "end": 1.7
+  },
+  {
+   "text": " ",
+   "start": 1.7,
+   "end": 1.76
+  },
+  {
+   "text": "h",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "e",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "r",
+   "start": 1.84,
+   "end": 1.86
+  },
+  {
+   "text": "e",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": ".",
+   "start": 2,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.56
+  },
+  {
+   "text": "T",
+   "start": 2.56,
+   "end": 2.58
+  },
+  {
+   "text": "h",
+   "start": 2.58,
+   "end": 2.58
+  },
+  {
+   "text": "e",
+   "start": 2.58,
+   "end": 2.66
+  },
+  {
+   "text": " ",
+   "start": 2.66,
+   "end": 2.74
+  },
+  {
+   "text": "r",
+   "start": 2.74,
+   "end": 2.8
+  },
+  {
+   "text": "u",
+   "start": 2.8,
+   "end": 2.86
+  },
+  {
+   "text": "l",
+   "start": 2.86,
+   "end": 2.92
+  },
+  {
+   "text": "e",
+   "start": 2.92,
+   "end": 3
+  },
+  {
+   "text": " ",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": "d",
+   "start": 3.04,
+   "end": 3.1
+  },
+  {
+   "text": "o",
+   "start": 3.1,
+   "end": 3.12
+  },
+  {
+   "text": "e",
+   "start": 3.12,
+   "end": 3.16
+  },
+  {
+   "text": "s",
+   "start": 3.16,
+   "end": 3.2
+  },
+  {
+   "text": "n",
+   "start": 3.2,
+   "end": 3.2
+  },
+  {
+   "text": "'",
+   "start": 3.2,
+   "end": 3.2
+  },
+  {
+   "text": "t",
+   "start": 3.24,
+   "end": 3.34
+  },
+  {
+   "text": " ",
+   "start": 3.34,
+   "end": 3.42
+  },
+  {
+   "text": "c",
+   "start": 3.42,
+   "end": 3.52
+  },
+  {
+   "text": "a",
+   "start": 3.52,
+   "end": 3.56
+  },
+  {
+   "text": "r",
+   "start": 3.58,
+   "end": 3.72
+  },
+  {
+   "text": "e",
+   "start": 3.72,
+   "end": 3.78
+  },
+  {
+   "text": ".",
+   "start": 3.78,
+   "end": 3.78
+  }
+ ]
+}

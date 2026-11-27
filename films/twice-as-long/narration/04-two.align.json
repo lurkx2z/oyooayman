@@ -1,0 +1,404 @@
+{
+ "id": "04-two",
+ "text": "Step two. One and a half metres.",
+ "seconds": 3.03,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Step",
+   "start": 0.1,
+   "end": 0.32
+  },
+  {
+   "text": "two.",
+   "start": 0.44,
+   "end": 0.74
+  },
+  {
+   "text": "One",
+   "start": 1.3,
+   "end": 1.4
+  },
+  {
+   "text": "and",
+   "start": 1.44,
+   "end": 1.5
+  },
+  {
+   "text": "a",
+   "start": 1.54,
+   "end": 1.6
+  },
+  {
+   "text": "half",
+   "start": 1.64,
+   "end": 1.9
+  },
+  {
+   "text": "metres.",
+   "start": 1.98,
+   "end": 2.48
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.06
+  },
+  {
+   "text": "t",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "e",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "p",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "t",
+   "start": 0.4,
+   "end": 0.507
+  },
+  {
+   "text": "w",
+   "start": 0.507,
+   "end": 0.613
+  },
+  {
+   "text": "o",
+   "start": 0.613,
+   "end": 0.72
+  },
+  {
+   "text": ".",
+   "start": 0.72,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "O",
+   "start": 1.28,
+   "end": 1.307
+  },
+  {
+   "text": "n",
+   "start": 1.307,
+   "end": 1.333
+  },
+  {
+   "text": "e",
+   "start": 1.333,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "a",
+   "start": 1.44,
+   "end": 1.453
+  },
+  {
+   "text": "n",
+   "start": 1.453,
+   "end": 1.467
+  },
+  {
+   "text": "d",
+   "start": 1.467,
+   "end": 1.48
+  },
+  {
+   "text": " ",
+   "start": 1.48,
+   "end": 1.52
+  },
+  {
+   "text": "a",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": " ",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "h",
+   "start": 1.6,
+   "end": 1.66
+  },
+  {
+   "text": "a",
+   "start": 1.66,
+   "end": 1.72
+  },
+  {
+   "text": "l",
+   "start": 1.72,
+   "end": 1.78
+  },
+  {
+   "text": "f",
+   "start": 1.78,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "m",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "e",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "t",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "r",
+   "start": 2.16,
+   "end": 2.267
+  },
+  {
+   "text": "e",
+   "start": 2.267,
+   "end": 2.373
+  },
+  {
+   "text": "s",
+   "start": 2.373,
+   "end": 2.48
+  },
+  {
+   "text": ".",
+   "start": 2.48,
+   "end": 2.96
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Step",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "two.",
+   "start": 0.4,
+   "end": 1.2
+  },
+  {
+   "text": "One",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "and",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": "a",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": "half",
+   "start": 1.6,
+   "end": 1.84
+  },
+  {
+   "text": "metres.",
+   "start": 1.92,
+   "end": 2.96
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.44
+  },
+  {
+   "text": "t",
+   "start": 0.44,
+   "end": 0.52
+  },
+  {
+   "text": "w",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "o",
+   "start": 0.56,
+   "end": 0.74
+  },
+  {
+   "text": ".",
+   "start": 0.74,
+   "end": 0.74
+  },
+  {
+   "text": " ",
+   "start": 0.74,
+   "end": 1.3
+  },
+  {
+   "text": "O",
+   "start": 1.3,
+   "end": 1.34
+  },
+  {
+   "text": "n",
+   "start": 1.34,
+   "end": 1.36
+  },
+  {
+   "text": "e",
+   "start": 1.36,
+   "end": 1.4
+  },
+  {
+   "text": " ",
+   "start": 1.4,
+   "end": 1.44
+  },
+  {
+   "text": "a",
+   "start": 1.44,
+   "end": 1.46
+  },
+  {
+   "text": "n",
+   "start": 1.46,
+   "end": 1.48
+  },
+  {
+   "text": "d",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": " ",
+   "start": 1.5,
+   "end": 1.54
+  },
+  {
+   "text": "a",
+   "start": 1.54,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.64
+  },
+  {
+   "text": "h",
+   "start": 1.64,
+   "end": 1.7
+  },
+  {
+   "text": "a",
+   "start": 1.7,
+   "end": 1.74
+  },
+  {
+   "text": "l",
+   "start": 1.74,
+   "end": 1.78
+  },
+  {
+   "text": "f",
+   "start": 1.84,
+   "end": 1.9
+  },
+  {
+   "text": " ",
+   "start": 1.9,
+   "end": 1.98
+  },
+  {
+   "text": "m",
+   "start": 1.98,
+   "end": 2.02
+  },
+  {
+   "text": "e",
+   "start": 2.02,
+   "end": 2.08
+  },
+  {
+   "text": "t",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "r",
+   "start": 2.16,
+   "end": 2.22
+  },
+  {
+   "text": "e",
+   "start": 2.22,
+   "end": 2.44
+  },
+  {
+   "text": "s",
+   "start": 2.44,
+   "end": 2.48
+  },
+  {
+   "text": ".",
+   "start": 2.48,
+   "end": 2.48
+  }
+ ]
+}
