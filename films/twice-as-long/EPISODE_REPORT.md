@@ -75,6 +75,11 @@ tag corrects it).
   once, no console errors).
 - **Thumbnails**: `thumb-step90.jpg` (step ninety, 98 billion light years), `thumb-mach9.jpg` (step thirteen, the air
   on fire), `thumb-moon.jpg` (step twenty-nine, half light speed).
+- **Thumbnails for YouTube Test & compare** (27 November 2026, after a 3.3 % click-through rate on the first one; one
+  idea each, the same "you", bold type, about four words): `thumb-test-step30.jpg` (one foot on New York, the other on
+  the Moon: step 30 is 402,700 km, about the Earth–Moon distance), `thumb-test-6000km.jpg` (a city-sized footprint seen
+  from above, "1 STEP = 6,000 KM": step 24 is 6,291 km), `thumb-test-cantstop.jpg` (your shocked face, the Earth small
+  behind you, "CAN'T STOP"). Rendered with the film's own character, Earth and Moon, composed at 1280×720.
 - **Final render** on the owner's PC (27 November 2026, from commit bd97d54, Chrome on the GPU, 2 workers, 15 min in
   all): **upload `D:\renders\twice-as-long\twice-as-long_final_1080p.mp4`** (1920×1080, 499.3 s, 957.5 MiB, −15.3
   LUFS, −2.6 dBTP); the small copy `twice-as-long_final_small.mp4` (1280×720, 26.1 MiB, −15.4 LUFS, −2.7 dBTP). The 8
