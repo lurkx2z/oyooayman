@@ -175,10 +175,10 @@ const TW_DIA = (() => {
       ${[...Array(12)].map((_, i) => { const a = i / 12 * 6.2832; return `<line x1="${cx + Math.sin(a) * 100}" y1="${cy - Math.cos(a) * 100}" x2="${cx + Math.sin(a) * 112}" y2="${cy - Math.cos(a) * 112}" stroke="#fff" stroke-width="5"/>`; }).join('')}
       <line x1="${cx}" y1="${cy}" x2="${(cx + Math.sin(ang) * 96).toFixed(1)}" y2="${(cy - Math.cos(ang) * 96).toFixed(1)}" stroke="${col}" stroke-width="9" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="10" fill="${col}"/>
       ${tx(cx, cy + 180, 32, 'b', label, 'middle')}`;
-    // one turn = one second of your clock (both sweep through step thirty; Earth's goes 1.34 times round)
+    // one turn = one second of your clock (both sweep through step thirty; Earth's goes 1.67 times round)
     const sw = show ? MathX.clamp((t - TW_T[30]) / TW_D[30], 0, 1) : (u % 2.2) / 2.2;
     s += dial(1300, 420, 'YOUR CLOCK', sw * 6.2832, YOU) + dial(1640, 420, 'EARTH’S CLOCK', sw * 6.2832 * earthRate, SKY);
-    if (show) s += `<g opacity="${K(u, 0.6, 1.2).toFixed(2)}">${tx(1300, 680, 40, 's', '1 SECOND', 'middle')}${tx(1640, 680, 40, 's', '1.3 SECONDS', 'middle', `fill="${AMB}"`)}</g>`;
+    if (show) s += `<g opacity="${K(u, 0.6, 1.2).toFixed(2)}">${tx(1300, 680, 40, 's', '1 SECOND', 'middle')}${tx(1640, 680, 40, 's', twStepEarthS(30).toFixed(1) + ' SECONDS', 'middle', `fill="${AMB}"`)}</g>`;
     else s += `<g opacity="${K(u, 3.0, 3.6).toFixed(2)}">${tx(1470, 690, 30, 's', 'NEAR LIGHT SPEED, YOUR CLOCK RUNS SLOW', 'middle')}</g>`;
     return s;
   }

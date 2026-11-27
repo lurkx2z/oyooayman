@@ -93,7 +93,7 @@ similarity: 0.75
 
 [fifty] Step twenty-seven. Fifty thousand kilometres a second.
 
-[moon] Step twenty-nine. Two thirds of the speed of light. And that was the Moon.
+[moon] Step twenty-nine. More than half the speed of light. And that was the Moon.
 
 [problem] Now you have a problem.
 
@@ -105,7 +105,7 @@ similarity: 0.75
 
 [clock] The closer you get to the speed of light, the slower your clock runs. For you, step thirty still takes one second.
 
-[earth] On Earth, it takes one point three.
+[earth] On Earth, it takes one point seven.
 
 [real] That part isn't made up. Astronauts on the Space Station age a tiny bit slower than you do, for exactly this reason.
 

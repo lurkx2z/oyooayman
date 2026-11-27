@@ -5,7 +5,8 @@
      the rule     step n is 0.75 m × 2^(n−1) long and takes one second of your own time
      on Earth     steps 1–14 are leaps along the ground (you stand still between some of them); 15 breaks away
      in space     the steps come one after another; from step 30 a step can't be shorter than light allows, so
-                  each takes L/c on Earth's clock while yours still reads one second (time dilation)
+                  Earth's clock reads √(1 + (L/c)²) seconds while yours reads one (the step's spacetime interval is
+                  one second: time dilation). Step 29 is 56% of light speed; step 30 takes 1.7 s on Earth.
    Everything is a pure function of film time t.
    ===================================================================== */
 
@@ -88,9 +89,11 @@ function twFilmOf(s) { let lo = -5, hi = TW_T[15] + 5; for (let i = 0; i < 50; i
 const twCounter = (t) => twStepAt(t).n;
 
 // ---------------------------------------------------------------------------------------------------------------------
-// EARTH'S CLOCK: every step is one second of your time; from step 30 a step takes L/c on Earth.
+// EARTH'S CLOCK: every step is one second of your time. On Earth it lasts √(1 + (L/c)²) s (the interval between
+// your push-off and your landing is one second of proper time: c²τ² = c²T² − L²). Barely more than 1 s for the
+// early steps, 1.7 s for step thirty, and ≈ L/c from then on.
 // ---------------------------------------------------------------------------------------------------------------------
-const twStepEarthS = (n) => Math.max(1, twL(n) / TW_C);
+const twStepEarthS = (n) => Math.hypot(1, twL(n) / TW_C);
 const TW_ET = [0];
 for (let n = 1; n <= 92; n++) TW_ET[n] = TW_ET[n - 1] + twStepEarthS(n);
 function twEarthS(t) { const s = twStepAt(t); if (!s.n) return 0; return TW_ET[s.n - 1] + twStepEarthS(s.n) * s.u; }
@@ -107,8 +110,9 @@ function twSpan(sec) {
   if (y < 1e9) return `${(y / 1e6).toFixed(y < 1e7 ? 1 : 0)} MILLION YEARS`;
   return `${(y / 1e9).toFixed(y < 1e10 ? 1 : 0)} BILLION YEARS`;
 }
-// your speed during step n (m/s, Earth's frame) and as a fraction of light
-const twSpeed = (n) => Math.min(twL(n), TW_C * (1 - 1e-9));
+// your speed during step n (m/s, Earth's frame: the step's length over its Earth time) and as a fraction of light
+const twSpeed = (n) => twL(n) / twStepEarthS(n);
+const twBeta = (n) => twSpeed(n) / TW_C;
 const twMach = (n) => twL(n) / 343;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -121,10 +125,10 @@ const TW_STATUS = [];
   S(-1, '', ''); S(TW_T[1], '75 CM', ''); S(TW_T[2], '1.5 M', ''); S(TW_T[3], '3 M', ''); S(TW_T[4], '6 M', ''); S(TW_T[5], '12 M', '');
   S(twW('rule'), '', ''); S(TW_T[6], '86 KM/H', ''); S(TW_T[7], '173 KM/H', ''); S(TW_T[8], '346 KM/H', 'hot'); S(TW_T[9], '691 KM/H', 'hot');
   S(TW_T[10] + 0.22 * TW_D[10], 'MACH 1', 'hot'); S(TW_T[11], 'MACH 2', 'hot'); S(TW_T[12], 'MACH 4', 'hot'); S(TW_T[13], 'MACH 9', 'hot'); S(TW_T[14], 'MACH 18', 'hot');
-  S(TW_T[15], 'ESCAPE VELOCITY', 'hot'); S(TW_T[21], 'SPACE', 'cold'); S(TW_T[27], '⅙ LIGHT SPEED', 'cold'); S(TW_T[29], '⅔ LIGHT SPEED', 'cold');
-  S(TW_T[30], 'LIGHT SPEED', 'cold');
+  S(TW_T[15], 'ESCAPE VELOCITY', 'hot'); S(TW_T[21], 'SPACE', 'cold'); S(TW_T[27], '⅙ LIGHT SPEED', 'cold'); S(TW_T[29], '56% LIGHT SPEED', 'cold');
+  S(TW_T[30], '80% LIGHT SPEED', 'cold');
   // from step 30 on: Earth's clock
-  S(twW('earth') - 0.1, 'EARTH: +1.3 SECONDS', 'time');
+  S(twW('earth') - 0.1, 'EARTH: +1.7 SECONDS', 'time');
 }
 function twStatusAt(t) {
   let k = 0; for (let i = 0; i < TW_STATUS.length; i++) if (TW_STATUS[i][0] <= t) k = i;
