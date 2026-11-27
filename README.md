@@ -235,6 +235,16 @@ Everything is procedural, so there are no models, images or sound files to downl
 > away Isla can still see your light. You tell her you're fine. The story clock only runs forward. Physics, clock,
 > shots and review log: [`films/ocean-rising/PLAN.md`](films/ocean-rising/PLAN.md) and
 > [`EPISODE_REPORT.md`](films/ocean-rising/EPISODE_REPORT.md).
+>
+> ***What If Every Step You Took Was Twice as Long?*** — open `twice-as-long.html` (16:9, narrated, 8:19), the first
+> film in the new recipe (open on the craziest frame, then "Step 1"; a narrator talking to "you", a character with a
+> face; a ladder of famous things). Every step is twice as long as the last and takes one second. Step 10 breaks the
+> sound barrier over your street in Brooklyn Heights, step 14 misses your office by 4 km, step 15 leaves the Earth;
+> you pass the Moon, the planets, Voyager 1 and Proxima Centauri while Earth's clock runs away (time dilation, exactly),
+> climb out of the Milky Way at step 70 and at step 90 are farther out than the observable universe is wide. Turn
+> round, and you land just behind where your front door used to be. The rule, the step table, shots and review log:
+> [`films/twice-as-long/PLAN.md`](films/twice-as-long/PLAN.md) and
+> [`EPISODE_REPORT.md`](films/twice-as-long/EPISODE_REPORT.md).
 
 | Time | Beat |
 |---|---|
