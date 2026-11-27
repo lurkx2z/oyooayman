@@ -7,7 +7,7 @@
    Everything far is background, drawn at its true direction and angular size about the camera: point clouds whose
    positions are worked out relative to the camera in the vertex shader (each in its own unit: thousands of light
    years for a galaxy, millions for the web, billions for the observable universe), drawn before you, never in front.
-   The Orion Nebula and Andromeda are placed beside your path at their real distances (the honest tag says so).
+   The Orion Nebula and Andromeda are placed beside your path at their real distances (their labels say so).
    ===================================================================== */
 
 const TW_RD = 8000;                 // (m) where far things are drawn about the camera
@@ -171,7 +171,8 @@ function twWebData(o) {
     }
     const th = cs * (planes === 3 ? 0.02 : planes === 2 ? 0.022 : 0.03);
     p[0] += twGauss(i, 50, S) * th; p[1] += twGauss(i, 51, S) * th; p[2] += twGauss(i, 52, S) * th;
-    const rr = Math.hypot(...p) / o.R; if (rr > 1) continue;
+    const rr = Math.hypot(...p) / o.R; if (rr > 1 || (o.hole && rr * o.R < o.hole)) continue;
+    if (o.slab && Math.abs(p[0] * o.slab[0][0] + p[1] * o.slab[0][1] + p[2] * o.slab[0][2] - o.slab[2]) > o.slab[1]) continue;   // (only a slice)
     const edge = o.soft ? Math.exp(-Math.pow(rr / 0.8, 4)) : 1;
     const b = (planes === 3 ? 1.0 : planes === 2 ? 0.62 : o.wall ?? 0.34) * (0.5 + twH(i, 53, S)) * edge, spiral = twH(i, 54, S) < 0.6;
     const c = spiral ? [0.72, 0.82, 1.0] : [1.0, 0.84, 0.62];
@@ -222,6 +223,8 @@ TW_SETS.deep = (app) => {
   const webNear = twFarCloud(scene, twWebData({ seed: 5, n: 30000, cell: 45, R: 320, size: 0.45, soft: false, local: [220, 14] }), 1, -2900);
   const webMid = twFarCloud(scene, twWebData({ seed: 6, n: 70000, cell: 200, R: 1000, size: 2.4, soft: true, wall: 0.14 }), 1, -2950);
   const ballPts = twFarCloud(scene, twWebData({ seed: 7, n: 30000, cell: 9.5, R: 46.5, size: 0.9, soft: false, wall: 0.12 }), 1, -3050);
+  // (and the universe going on past it, the same web: the ball is only what Earth can see, not an edge)
+  const pastPts = twFarCloud(scene, twWebData({ seed: 8, n: 160000, cell: 9.5, R: 160, size: 0.9, soft: false, wall: 0.12, hole: 46.5 }), 1, -3049);
   // the observable universe's glow: a haze through it, and its edge (the oldest light there is)
   const ballMat = new THREE.ShaderMaterial({
     uniforms: { uC: { value: new THREE.Vector3() }, uR: { value: 1 }, uA: { value: 1 } }, transparent: false, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
@@ -234,7 +237,7 @@ TW_SETS.deep = (app) => {
         vec3 hit = normalize(cameraPosition + v * (tc - ch * uR) - uC);
         float mott = cF3(hit * 7.0) * 0.7 + cF3(hit * 19.0) * 0.3;
         float shell = clamp(0.08 / max(ch, 0.08), 0.0, 1.0) * (0.55 + 0.9 * mott);
-        vec3 col = vec3(0.1, 0.13, 0.3) * ch * 0.3 + vec3(1.0, 0.42, 0.16) * shell * 0.55 * smoothstep(0.0, 0.02, ch) + vec3(1.0, 0.6, 0.3) * exp(-ch * 40.0) * 0.35;
+        vec3 col = vec3(0.1, 0.13, 0.3) * ch * 0.3 + vec3(1.0, 0.42, 0.16) * shell * 0.32 * smoothstep(0.0, 0.02, ch) + vec3(1.0, 0.6, 0.3) * exp(-ch * 40.0) * 0.35;
         gl_FragColor = vec4(col * uA, 1.0); }`,
   });
   const ball = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 64), ballMat); ball.frustumCulled = false; ball.renderOrder = -3060; scene.add(ball);
@@ -250,12 +253,18 @@ TW_SETS.deep = (app) => {
   const you = new YouCharacter(scene, { seed: 11 }); you.cup(false);
   const adds = twPuffs(scene, 600, { additive: true, soft: 1.6 });
   const fill = new THREE.DirectionalLight('#dfe8ff', 1.0); scene.add(fill); scene.add(fill.target);
+  const rimL = new THREE.DirectionalLight('#b8d0ff', 1.5); scene.add(rimL); scene.add(rimL.target);   // (from behind you: your hair and shoulders against black)
   const H = TW_HEAD3, SD = TW_SIDE3, UP = TW_UP3, h3 = [H.x, H.y, H.z];
   const rel = (f, s, u) => [H.x * f + SD.x * s + UP.x * u, H.y * f + SD.y * s + UP.y * u, H.z * f + SD.z * s + UP.z * u];
   const add3 = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], mul3 = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
   const n3 = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
   const yawY = Math.atan2(H.x, H.z);
   const I3 = new THREE.Matrix3();
+  // (the end of the pull-out: a slice through the web, face-on to you, so its threads and empty bubbles read; the same
+  // galaxies as webMid's, and more, while the rest of webMid fades away)
+  // (through where you are as the pull-out passes through it: webMid's centre is (t − 452.6) × 60 behind you, see frame())
+  const SLAB_N = n3(rel(-0.35, 0.8, 0.45)), SLAB_C = (462.3 - 452.6) * 60 * (H.x * SLAB_N[0] + H.y * SLAB_N[1] + H.z * SLAB_N[2]);
+  const webSlab = twFarCloud(scene, twWebData({ seed: 6, n: 170000, cell: 200, R: 1000, size: 2.4, soft: true, wall: 0.2, slab: [SLAB_N, 70, SLAB_C] }), 1, -2949);
   // Andromeda's tilt: 77° from face-on, seen from where you pass it
   const AN_M = (() => {
     const v = new THREE.Vector3(...n3(sub3(twYouLy(TW_T[75] + TW_D[75] + 0.3), TW_ANDRO))), q = new THREE.Vector3(0.2, 1, 0.1).normalize();
@@ -272,7 +281,7 @@ TW_SETS.deep = (app) => {
     let p;
     if (o.pose) p = o.pose;
     else if (s.u < 1) p = YOU_POSES.leap(0.12 + 0.76 * s.u, { lead: s.n % 2 ? 1 : -1, reach: 0.9, arms: 'swing' });
-    else { const k = MathX.smooth(t - (TW_T[s.n] + TW_D[s.n]), 0, 0.8); p = YouCharacter.mix(YOU_POSES.leap(0.88, { lead: s.n % 2 ? 1 : -1, reach: 0.9 }), YOU_POSES.drift(t), k); }
+    else { const k = MathX.smooth(t - (TW_T[s.n] + TW_D[s.n]), 0, 0.8); p = YouCharacter.mix(YOU_POSES.leap(0.88, { lead: s.n % 2 ? 1 : -1, reach: 0.9 }), twFloat(t), k); }
     if (o.neck !== undefined) p.neck = o.neck;
     return p;
   }
@@ -289,32 +298,36 @@ TW_SETS.deep = (app) => {
 
   const STAGE = {
     // ---- the cold open (story time: after the end): you, outside everything there is
-    open: (t, u) => { const B = dirTo([0, 0, 0], t); return { cam: against(B, 3.4 - 0.06 * u, -1.0, 0.25, 42, [-0.26, 0.02]), you: { turn: 0.12, expr: 'awe', pose: YOU_POSES.drift(t) }, ball: 1, light: 'ball' }; },
+    // (it starts on your face and pulls back fast until you are small against all of it)
+    open: (t, u) => { const B = dirTo([0, 0, 0], t), v = u - 1, e = Ease.inOutCubic(MathX.clamp((v - 0.1) / 2.1, 0, 1));
+      return { cam: against(B, 0.85 + 4.4 * e, -0.08 - 1.1 * e, 0.66 - 0.45 * e, 42, [-0.28 * e, 0.02]), you: { turn: 0.12, expr: 'awe', pose: twFloat(t) }, ball: 1, light: 'ball' }; },
     // ---- near Proxima: turn round, home is that star
     turn: (t, u) => { const B = dirTo([0, 0, 0], t); return { cam: against(B, 6.0, -1.7, -0.7, 50, [0.04, -0.1]), you: { turn: MathX.smooth(u, 0.6, 2.2), expr: 'awe', look: mul3(B, 1000), pose: YOU_POSES.lookBack(t, 1 - MathX.smooth(u, 0.6, 2.2), 1) }, stars: 1, sun: 1,
       labels: [{ dir: B, text: 'HOME', sub: 'THE SUN', a: twWin(t, shot0(t) + 2.4, 1e9, 0.4), side: 'l' }] }; },
     keep: (t, u) => ({ cam: { p: rel(-3.4 + 0.3 * u, 1.1, 0.9), at: rel(4, -0.3, 0.2), fov: 54 }, you: { expr: 'determined' }, stars: 1, streak: 0.6 }),
-    sixty: (t, u) => ({ cam: { p: rel(1.35, 0.42, 0.82), at: rel(0, 0, 0.74), fov: 30 }, you: { expr: u < 1.2 ? 'determined' : 'sad', pose: YouCharacter.mix(youPose(t), YOU_POSES.drift(t), MathX.smooth(u, 2.4, 3.4)) }, stars: 1, streak: 0.4 }),
+    sixty: (t, u) => ({ cam: { p: rel(1.35, 0.42, 0.82), at: rel(0, 0, 0.74), fov: 30 }, you: { expr: u < 1.2 ? 'determined' : 'sad', pose: YouCharacter.mix(youPose(t), twFloat(t), MathX.smooth(u, 2.4, 3.4)) }, stars: 1, streak: 0.4 }),
     sixtyfour: (t, u) => { const B = n3(add3(mul3(h3, -1), rel(0, 0.32, 0.08))); return { cam: against(B, 4.6 - 0.2 * u, -1.5, 0.4, 54, [-0.12, 0]), you: { expr: 'awe', look: mul3(B, 1000) }, stars: 0.8, rest: 1, band: 0.7, mw: 1, orion: 1,
-      labels: [{ obj: 'orion', text: 'THE ORION NEBULA', sub: '1,344 LIGHT YEARS FROM EARTH', a: twWin(t, TW_T[64] + 0.8, 1e9, 0.3) }] }; },
+      labels: [{ obj: 'orion', text: 'THE ORION NEBULA', sub: '1,344 LIGHT YEARS FROM EARTH<br>PLACED ON YOUR PATH', a: twWin(t, TW_T[64] + 0.8, 1e9, 0.3) }] }; },
     climb: (t, u) => { const C = dirTo(TW_MW_C, t); return { cam: against(n3(add3(C, mul3(h3, -0.4))), 4.2, 1.0, 1.8, 58, [0, -0.05]), you: { expr: 'determined' }, stars: 0.6 * (1 - MathX.smooth(t, TW_T[67], TW_T[67] + 2.5)), band: 0.3, mw: 1, mwSz: 0.45, mwA: 0.55 }; },
     milkyway: (t, u) => { const C = dirTo(TW_MW_C, t); return { cam: against(C, 5.5, -2.2, 0.6, 62, [0.28, -0.04]), you: { turn: 0.0, expr: 'awe', look: mul3(C, 1000) }, mw: 1, web: 0.25,
       labels: [{ obj: 'mw', text: 'THE MILKY WAY', sub: 'A FEW HUNDRED BILLION STARS', a: twWin(t, TW_T[70] + 1.6, 1e9, 0.4) }] }; },
     mwHere: (t, u) => { const C = dirTo(TW_MW_C, t); return { cam: { p: [0, 0, 0], at: mul3(dirTo([0, 0, 0], t), 100), fov: 34 - 1.2 * u }, you: { on: false }, mw: 1, web: 0.25,
       labels: [{ obj: 'home', text: 'EVERY PERSON WHO EVER LIVED', a: twWin(t, shot0(t) + 1.2, 1e9, 0.4), you: true }] }; },
-    humans: (t, u) => { const C = dirTo(TW_MW_C, t); return { cam: against(C, 3.6, 0.55, 0.35, 36, [-0.16, 0]), you: { turn: 0.0, expr: 'sad', pose: YOU_POSES.drift(t) }, mw: 1, web: 0.35 }; },
+    humans: (t, u) => { const C = dirTo(TW_MW_C, t); return { cam: against(C, 3.6, 0.55, 0.35, 36, [-0.16, 0]), you: { turn: 0.0, expr: 'sad', pose: twFloat(t) }, mw: 1, web: 0.35 }; },
     andromeda: (t, u) => { const B = dirTo(TW_ANDRO, Math.max(t, PASS_AN + 0.35)); return { cam: against(B, 4.6 - 0.2 * u, 1.3, 0.35, 56, [-0.12, 0]), you: { expr: 'awe', look: mul3(dirTo(TW_ANDRO, t), 1000) }, rest: 1, mw: 1, andro: 1, web: 0.4,
-      labels: [{ obj: 'andro', text: 'ANDROMEDA', sub: '2.5 MILLION LIGHT YEARS FROM EARTH', a: twWin(t, PASS_AN + 0.25, 1e9, 0.3) }, { obj: 'mw', text: 'THE MILKY WAY', sub: 'HOME', a: twWin(t, PASS_AN + 1.6, 1e9, 0.4) }] }; },
+      labels: [{ obj: 'andro', text: 'ANDROMEDA', sub: '2.5 MILLION LIGHT YEARS FROM EARTH<br>PLACED ON YOUR PATH', a: twWin(t, PASS_AN + 0.25, 1e9, 0.3) }, { obj: 'mw', text: 'THE MILKY WAY', sub: 'HOME', a: twWin(t, PASS_AN + 1.6, 1e9, 0.4) }] }; },
     dust: (t, u) => ({ cam: { p: rel(-3.2 + 0.2 * u, 1.4, 0.7), at: rel(3, -0.5, 0.2), fov: 60 }, you: { expr: 'awe' }, near: 1 }),
     web: (t, u) => ({ cam: { p: rel(2.4 - 0.1 * u, -2.3, 0.5), at: rel(-1, 0.4, 0.4), fov: 64, aim: [0, 0.04] }, you: { expr: 'awe', look: rel(-10, 30, 6) }, mid: 1 }),
-    webOut: (t, u) => { const k = Ease.inOutSine(MathX.clamp(u / (set._shot.t1 - set._shot.t0), 0, 1)); return { cam: { p: [0, 0, 0], at: [0, 0, 0], fov: 50, out: k }, you: { on: k < 0.04 }, mid: 1,
-      midFar: k > 0.3 ? 600 + 3e5 * Math.pow((k - 0.3) / 0.7, 3) : 600, labels: [{ youDot: true, text: 'YOU', a: twWin(t, shot0(t) + 1.0, 1e9, 0.3), you: true }] }; },
+    webOut: (t, u) => { const k = Ease.inOutSine(MathX.clamp(u / ((set._shot.t1 - set._shot.t0) * 0.72), 0, 1));   /* (out by 72% of the shot, then the web holds) */ return { cam: { p: [0, 0, 0], at: [0, 0, 0], fov: 50, out: k }, you: { on: k < 0.04 }, mid: 1, slab: MathX.smooth(k, 0.35, 0.75),
+      midFar: k > 0.3 ? 600 + 3e5 * Math.pow((k - 0.3) / 0.7, 3) : 600, labels: [{ youDot: true, text: 'YOU', a: twWin(t, shot0(t) + 1.0, 1e9, 0.3), you: true },
+        { dir: n3(add3(mul3(SLAB_N, -1), rel(0.18, 0.05, -0.32))), text: 'THE COSMIC WEB', sub: 'GALAXIES IN THREADS, AROUND EMPTY BUBBLES', a: twWin(t, set._shot.t0 + 3.4, 1e9, 0.4), side: 'l' }] }; },
     // ---- step ninety, and the end (story time runs on from the leap; the cold open is later still)
-    ninety: (t, u) => { const B = dirTo([0, 0, 0], t); return { cam: against(n3(add3(B, rel(0, 0.25, 0.1))), 3.8 - 0.25 * MathX.smooth(t, TW_T[90], TW_T[90] + 3), -1.3, 0.35, 50, [0.12, 0.02]), you: { expr: t < TW_T[90] + 2.6 ? 'determined' : 'awe' }, ball: 1, light: 'ball' }; },
-    last: (t, u) => { const B = dirTo([0, 0, 0], t); return { cam: against(B, 6.0, 1.5, -0.7, 50, [-0.04, -0.1]), you: { turn: 1, expr: 'sad', look: mul3(B, 1000), pose: YOU_POSES.drift(t) }, ball: 1, light: 'ball',
+    ninety: (t, u) => { const B = dirTo([0, 0, 0], t); return { cam: against(n3(add3(B, rel(0, 0.25, 0.1))), 3.8 - 0.25 * MathX.smooth(t, TW_T[90], TW_T[90] + 3), -1.3, 0.35, 50, [0.12, 0.02]), you: { expr: t < TW_T[90] + 2.6 ? 'determined' : 'awe' }, ball: 1, light: 'ball',
+      labels: [{ dir: B, text: 'ALL WE CAN SEE FROM EARTH', sub: 'THE UNIVERSE CARRIES ON PAST IT', a: twWin(t, TW_T[90] + 1.2, 1e9, 0.4), side: 'r' }] }; },
+    last: (t, u) => { const B = dirTo([0, 0, 0], t); return { cam: against(B, 6.0, 1.5, -0.7, 50, [-0.04, -0.1]), you: { turn: 1, expr: 'sad', look: mul3(B, 1000), pose: twFloat(t) }, ball: 1, light: 'ball',
       labels: [{ dir: B, text: 'HOME', a: twWin(t, shot0(t) + 0.8, 1e9, 0.4), side: 'l' }] }; },
-    or: (t, u) => { const B = dirTo([0, 0, 0], t); return { cam: against(B, 2.6 + 0.15 * u, -0.75, 0.3, 44, [-0.1, 0]), you: { turn: 1 - MathX.smooth(u, 0.3, 1.8), expr: 'determined', pose: YOU_POSES.drift(t) }, ball: 1, light: 'ball' }; },
-    question: (t, u) => { const B = dirTo([0, 0, 0], t), [s0] = basis(B), Q = n3(add3(B, mul3(s0, 1.2))); return { cam: against(Q, 9 + 0.5 * u, 0, 2.1, 56, [0.0, 0]), you: { turn: 1, expr: 'determined', pose: YOU_POSES.drift(t) }, ball: 1, light: 'ball' }; },
+    or: (t, u) => { const B = dirTo([0, 0, 0], t); return { cam: against(B, 2.6 + 0.15 * u, -0.75, 0.3, 44, [-0.1, 0]), you: { turn: 1 - MathX.smooth(u, 0.3, 1.8), expr: 'determined', pose: twFloat(t) }, ball: 1, light: 'ball' }; },
+    question: (t, u) => { const B = dirTo([0, 0, 0], t), [s0] = basis(B), Q = n3(add3(B, mul3(s0, 1.2))); return { cam: against(Q, 9 + 0.5 * u, 0, 2.1, 56, [0.0, 0]), you: { turn: 1, expr: 'determined', pose: twFloat(t) }, ball: 1, light: 'ball' }; },
   };
 
   // a far point (light years from home) as a direction about the camera, for labels: [position, scale]
@@ -372,9 +385,12 @@ TW_SETS.deep = (app) => {
       // (both move with you, drifting back past you: the steps are far too long to show the same galaxies twice)
       const nearC = add3(sub3(Y, mul3(h3, (tv - 449.4) * 6e6)), rel(0, 3.5e6, 0.8e6)), midC = sub3(Y, mul3(h3, (tv - 452.6) * 60e6));
       webNear.set(cam, add3(off(nearC, 1e6), [0, 0, 0]), I3, { a: (st.near || 0) + (st.web || 0) * 0.6, min: 1.2, max: 200 });
-      webMid.set(cam, off(midC, 1e6), I3, { a: (st.mid || 0) * 1.5, min: 1.2, max: 120, far: st.midFar ?? 600 });
+      const slabK = st.slab || 0;
+      webMid.set(cam, off(midC, 1e6), I3, { a: (st.mid || 0) * 1.5 * (1 - 0.9 * slabK), min: 1.2, max: 120, far: st.midFar ?? 600 });
+      webSlab.set(cam, off(midC, 1e6), I3, { a: slabK * 1.9, min: 1.3, max: 120, keep: true, far: st.midFar ?? 600 });
       const bOff = off([0, 0, 0], 1e9), bD = Math.hypot(...bOff), bA = st.ball || 0;
       ballPts.set(cam, bOff, I3, { a: bA * 0.42, min: 1.0, max: 60 });
+      pastPts.set(cam, bOff, I3, { a: bA * 0.5, min: 1.0, max: 5 });
       ball.visible = ballGlow.visible = bA > 0.01 && bD > 46.5 * 1.002;
       if (ball.visible) {
         const dir = n3(bOff), r = TW_RD * 46.5 / bD, c = add3(cp, mul3(dir, TW_RD));
@@ -396,6 +412,7 @@ TW_SETS.deep = (app) => {
       S.sun.position.set(Ld[0] * 100, Ld[1] * 100, Ld[2] * 100); S.sun.target.position.set(0, 0, 0); S.sun.target.updateMatrixWorld();
       S.hemi.intensity = 0.4; S.hemi.color.set(st.mid || st.near ? '#8a9ad8' : '#7a86a8'); S.hemi.groundColor.set('#141820');
       fill.position.set(cp[0], cp[1] + 0.6, cp[2]); fill.target.position.set(0, 0, 0); fill.target.updateMatrixWorld(); fill.intensity = 0.9;
+      { const l = Math.hypot(...cp) || 1; rimL.position.set(-cp[0] / l * 10 + UP.x * 6, -cp[1] / l * 10 + UP.y * 6, -cp[2] / l * 10 + UP.z * 6); rimL.target.position.set(0, 0, 0); rimL.target.updateMatrixWorld(); }
       set._st = st; set._tv = tv; set._cp = cp; set._CL = CL;
     },
     labels(t, shot) {

@@ -183,7 +183,16 @@ function twStreet(scene, world) {
   }
   // ---- for later: the police tape and boarded windows (the evening), the snow and the posters (a month on), the
   // grown tree and the new door (eleven years on)
-  out.tape = twBox(26, 0.06, 0.02, new THREE.MeshStandardMaterial({ color: '#ffd400', emissive: '#3a3000', roughness: 0.6 }), -2, 1.0, -S.road - 0.4, scene); out.tape.visible = false;
+  // (the tape on five striped posts along the kerb, so it reads as police tape and not a line across the picture)
+  out.tape = new THREE.Group(); scene.add(out.tape); out.tape.visible = false;
+  {
+    const tapeM = new THREE.MeshStandardMaterial({ color: '#ffd400', emissive: '#3a3000', roughness: 0.6 }), postM = twStd('#e8e4dc', 0.7), bandM = twStd('#e0461e', 0.7);
+    const z = -S.road - 0.4, xs = [-15, -8.5, -2, 4.5, 11];
+    for (let i = 0; i < xs.length; i++) {
+      twBox(0.09, 1.12, 0.09, postM, xs[i], 0.56, z, out.tape); twBox(0.1, 0.16, 0.1, bandM, xs[i], 0.85, z, out.tape); twBox(0.1, 0.16, 0.1, bandM, xs[i], 0.45, z, out.tape);
+      if (i < xs.length - 1) { const w = xs[i + 1] - xs[i]; twBox(w, 0.06, 0.02, tapeM, xs[i] + w / 2, 0.98 - 0.04 * (i % 2), z, out.tape).rotation.z = 0.004 * (i % 2 ? 1 : -1); }
+    }
+  }
   out.snow = [];
   {
     const sM = twStd('#f4f6fa', 0.9, 0, { polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -6 });

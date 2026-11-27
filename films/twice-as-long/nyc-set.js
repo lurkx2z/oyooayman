@@ -70,6 +70,9 @@ TW_SETS.nyc = (app) => {
   add('twC', -1.7, 5.9, Math.PI + 0.3, [[-1, 'phone'], [21.2, 'stare', -1.0], [29.6, 'stare', 0.6], [B(-1, 6) + 0.05, 'duck'], [B(-1, 6) + 2.4, 'film']], { y: 0.15 });
   add('twF', -3.0, 6.8, Math.PI, [[-1, 'sit'], [21.0, 'sitStare', -0.7], [29.6, 'sitStare', 0.3], [B(-3, 7), 'duck'], [B(-3, 7) + 2.8, 'sitStare', -0.8]], { y: 0.15 });
   add('twE', 0.8, 5.2, Math.PI - 0.4, [[-1, 'idle'], [21.0, 'flinch'], [21.5, 'point'], [23.5, 'stare', 0.2], [B(1, 5), 'duck'], [B(1, 5) + 2.5, 'stare', -1.4]], { y: 0.15 });
+  // (near the far end, in the shot down the street after the boom: they duck, then stand and stare at the windows)
+  [['casual2', -81, -5.4, 0.5, 'idle', 'stare', 1.0], ['twC', -75, 5.5, Math.PI - 0.3, 'phone', 'film'], ['twH', -69, -5.8, -0.4, 'idle', 'point'], ['casual5', -63, 5.7, Math.PI + 0.5, 'idle', 'stare', -0.8], ['twF', -86, 5.2, Math.PI - 0.1, 'phone', 'stare', -1.1]]
+    .forEach(([look, x, z, yaw, a0, a1, arg], i) => add(look, x, z, yaw, [[-1, a0], [L(7) + 0.2 + 0.1 * i, 'stare', 0], [B(x, z), 'duck'], [B(x, z) + 1.6 + 0.25 * i, a1, arg]], { y: 0.15 }));
   // pavement walkers
   add('casual1', 30, 5.6, 0, [[-1, 'walk'], [B(30, 5.6), 'duck'], [B(30, 5.6) + 2.4, 'stare', -1.4]], { y: 0.15, walk: [-1, 0, 22] });
   add('twD', -38, -5.4, 0, [[-1, 'walk'], [64.4, 'stare', 1.2], [B(-38, -5.4), 'duck'], [B(-38, -5.4) + 3, 'point']], { y: 0.15, walk: [1, 0, 26] });
@@ -149,7 +152,7 @@ TW_SETS.nyc = (app) => {
   }
   // glass from every facade on your street when the boom's front reaches it; along Manhattan as you pass
   const GLASS = [];
-  for (const [x, sgn] of st.houses) GLASS.push({ t: B(x, sgn * TW_ST.face), p: [x, 7.5, sgn * (TW_ST.face - 0.2)], dir: [0, -sgn], kind: 'glass', n: 18, wide: 5.2, spread: 9, seed: Math.round(x * 3 + sgn * 7 + 500) });
+  for (const [x, sgn] of st.houses) GLASS.push({ t: B(x, sgn * TW_ST.face), p: [x, 7.5, sgn * (TW_ST.face - 0.2)], dir: [0, -sgn], kind: 'glass', n: 34, wide: 5.2, spread: 9, gs: 1.6, linger: 5.0, seed: Math.round(x * 3 + sgn * 7 + 500) });
   {
     const a = TW_ROUTE[12], b = TW_ROUTE[14], l = Math.hypot(b[0] - a[0], b[2] - a[2]), n = [(b[0] - a[0]) / l, (b[2] - a[2]) / l], d0 = twSum(12);
     for (let d = 40; d < l; d += 45) for (const s of [-1, 1]) { const off = s * (34 + 18 * twR(d, s + 3)), p = [a[0] + n[0] * d - n[1] * off, a[2] + n[1] * d + n[0] * off];
@@ -183,7 +186,7 @@ TW_SETS.nyc = (app) => {
     return { p: [R.p[0] - d[0] * back + q[0] * side, R.p[1] + up, R.p[2] - d[1] * back + q[1] * side], at: [R.p[0] + d[0] * ahead, R.p[1] + 1.1, R.p[2] + d[1] * ahead] }; };
   const CAM = {
     stoop: (t, u) => ({ p: twV([2.3, 0.6, -4.4], [1.7, 0.6, -4.9], u / 3), at: [0.05, 1.15, -7.3], fov: 40 }),
-    morning: (t, u) => ({ p: [28 - u * 2, 12.5, 8.5], at: [-8, 1.5, -5], fov: 52, shR: 70, shC: [-10, 0, 0] }),
+    morning: (t, u) => ({ p: [28 - u * 2, 10.5, 6.4], at: [-8, 1.5, -5], fov: 52, shR: 70, shC: [-10, 0, 0] }),
     faceLate: (t, u) => ({ p: [0.9 + 0.03 * u, 1.62, -5.3], at: [0.12, 1.74, -6.86], fov: 32 }),
     stoopSide: (t, u) => ({ p: [5.4 - 0.25 * u, 1.25, -3.9], at: [0.1, 1.35, -7.1], fov: 36 }),
     feet: (t, u) => ({ p: [0.62, 0.14, -5.2 + 0.05 * u], at: [0.13, 0.95, -6.86], fov: 58 }),
@@ -214,7 +217,7 @@ TW_SETS.nyc = (app) => {
     crack: (t, u) => { const k = MathX.smooth(u, 1.2, 2.6); return { p: twV([-69.0, 0.45, 0.6], [-69.6, 2.6, 2.0], k), at: twV([-71.2, 0.7, -0.95], [-71.2, 0.0, -0.95], k), fov: 40 }; },
     phones: (t, u) => ({ p: [-113.5 + 0.2 * u, 1.72, -7.6], at: [-71, 1.3, -0.6], fov: 30, shR: 50, shC: [-90, 0, -3] }),
     leap8: (t, u) => { const R = twRouteAt(t); return { p: [-122, 5.5, 7.6], at: [R.p[0], R.p[1] + 1.0, R.p[2]], fov: 56, shR: 60, shC: [-120, 0, 0] }; },
-    statue: (t, u) => ({ p: [-367, 2.0, 4.5], at: [TW_PLACES.statue[0], 48, TW_PLACES.statue[1]], fov: 3.6 - 0.12 * u, near: 1, shR: 0, fog: 0.25 }),
+    statue: (t, u) => ({ p: [-367, 2.0, 4.5], at: [TW_PLACES.statue[0], 50, TW_PLACES.statue[1]], fov: 2.5 - 0.08 * u, near: 1, shR: 0, fog: 0.06 }),
     leap9: (t, u) => { const c = chase(t, 9, 9, 1.1, -1.5, 24, 0.06); return { p: c.p, at: [c.at[0], 2.0, c.at[2]], fov: 56, shR: 40, shC: c.p }; },
     awnings: (t, u) => ({ p: [-247 - u * 0.6, 1.75, -5.2], at: [-300, 4.2, -1.6], fov: 52, shR: 60, shC: [-290, 0, 0] }),
     promenade: (t, u) => ({ p: [-355.4, 1.85, 3.6 - 0.1 * u], at: [-760, 50, -1550], fov: 40, shR: 30, shC: [-359, 0, 0] }),
@@ -243,7 +246,7 @@ TW_SETS.nyc = (app) => {
     missed: (t, u) => ({ p: [2100, 950, -5500], at: [2700, 0, -9000], fov: 48, near: 5, shR: 0, fog: 0.25 }),
     leap15: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] - d[0] * 7 - d[1] * 4, R.p[1] - 2.2, R.p[2] - d[1] * 7 + d[0] * 4], at: [R.p[0], R.p[1] + 0.9, R.p[2]], fov: 50, near: 0.3, shR: 30, shC: R.p, fog: 0.5 }; },
     escape: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] - d[0] * 9 + d[1] * 2.5, R.p[1] - 2.4, R.p[2] - d[1] * 9 - d[0] * 2.5], at: [R.p[0] + d[0] * 30, R.p[1] + 4, R.p[2] + d[1] * 30], fov: 52, near: 0.3, shR: 0, fog: 0.5 }; },
-    curve: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] + d[1] * 5.5 - d[0] * 2, R.p[1] + 1.2, R.p[2] - d[0] * 5.5 - d[1] * 2], at: [R.p[0] + d[0] * 2, R.p[1] - 1.5, R.p[2] + d[1] * 2], fov: 48, near: 0.3, shR: 0, fog: 0.5 }; },
+    curve: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] + d[1] * 5.5 - d[0] * 2, R.p[1] + 1.2, R.p[2] - d[0] * 5.5 - d[1] * 2], at: [R.p[0] + d[0] * 2, R.p[1] - 0.7, R.p[2] + d[1] * 2], fov: 48, near: 0.3, shR: 0, fog: 0.5 }; },
     never: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] + d[0] * 4.2 - d[1] * 1.8, R.p[1] + 2.3, R.p[2] + d[1] * 4.2 + d[0] * 1.8], at: [R.p[0], R.p[1] + 0.9, R.p[2]], fov: 46, near: 0.2, shR: 0, fog: 0.5 }; },
     // the visits home
     evening: (t, u) => ({ p: [-21 + 0.6 * u, 1.7, 5.6], at: [4, 3.2, -8.2], fov: 46, shR: 50, shC: [-5, 0, 0] }),
@@ -257,8 +260,8 @@ TW_SETS.nyc = (app) => {
     busTop: () => [{ p: [bus.group.position.x, 3.4, bus.group.position.z], text: 'A BUS', sub: '12 METRES', a: 1 }],
     stoopTop: () => [{ p: [0, 0.5, -7.6], text: 'WHERE YOU STARTED', a: 1, side: 'r' }],
     officeMap: (t, sh) => [{ p: [TW_PLACES.office[0], 190, TW_PLACES.office[1]], text: 'YOUR OFFICE', sub: '8 KM ON FOOT', a: twWin(t, sh.t0 + 0.3, sh.t1, 0.3, 0.2) }, { p: [0, 30, 0], text: 'YOU', a: twWin(t, sh.t0, sh.t1, 0.3, 0.2), you: true }],
-    statue: (t, sh) => [{ p: [TW_PLACES.statue[0] + 6, 95, TW_PLACES.statue[1]], text: 'STATUE OF LIBERTY', sub: '93 M TALL', a: twWin(t, sh.t0 + 0.2, sh.t1, 0.3, 0.2), side: 'r' }],
-    esb: (t, sh) => [{ p: [TW_PLACES.esb[0] + 20, 381, TW_PLACES.esb[1]], text: 'EMPIRE STATE BUILDING', sub: '381 M TALL', a: twWin(t, sh.t0 + 0.2, sh.t1, 0.3, 0.2), side: 'r' }],
+    statue: (t, sh) => [{ p: [TW_PLACES.statue[0] + 6, 95, TW_PLACES.statue[1]], text: 'STATUE OF LIBERTY', sub: '93 M, GROUND TO TORCH', a: twWin(t, sh.t0 + 0.2, sh.t1, 0.3, 0.2), side: 'r' }],
+    esb: (t, sh) => [{ p: [TW_PLACES.esb[0] + 20, 381, TW_PLACES.esb[1]], text: 'EMPIRE STATE BUILDING', sub: '381 M TO THE ROOF', a: twWin(t, sh.t0 + 0.2, sh.t1, 0.3, 0.2), side: 'r' }],
     bridgeSide: (t, sh) => [{ p: [-300, 92, -1260], text: 'BROOKLYN BRIDGE', sub: '1.8 KM LONG', a: twWin(t, sh.t0 + 0.2, sh.t1, 0.3, 0.2) }],
     impact: (t, sh) => [{ p: [TW_PLACES.flatiron[0], 95, TW_PLACES.flatiron[1]], text: 'FLATIRON BUILDING', a: twWin(t, sh.t0 + 0.6, sh.t1, 0.3, 0.2) }],
     office: (t, sh) => [{ p: [TW_PLACES.office[0], 192, TW_PLACES.office[1]], text: 'YOUR OFFICE', a: twWin(t, sh.t0 + 0.6, sh.t1, 0.3, 0.2) }],

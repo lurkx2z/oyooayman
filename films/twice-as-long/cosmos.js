@@ -224,9 +224,11 @@ function twBodyMat(kind) {
         col = alb * lit;
       #elif KIND == 8
         // the Earth after the Sun has grown: rock, glowing cracks on the side facing it
-        float cr = smoothstep(0.08, 0.0, cCell(p * 7.0).x - 0.02);
-        alb = vec3(0.12, 0.09, 0.08) * (0.7 + 0.5 * cF3(p * 12.0));
-        col = alb * lit * vec3(1.0, 0.5, 0.3) + vec3(1.0, 0.32, 0.06) * (0.05 + 1.1 * cr) * smoothstep(-0.1, 0.6, ndl) * uI;
+        // (the side facing the giant is scorched and half molten, lit hard by it; the night side dark, its cracks glowing)
+        float cr = smoothstep(0.08, 0.0, cCell(p * 7.0).x - 0.02), mo = smoothstep(0.45, 0.75, cF3(p * 4.0 + 3.0));
+        alb = vec3(0.34, 0.2, 0.14) * (0.7 + 0.5 * cF3(p * 12.0));
+        col = alb * lit * vec3(1.6, 0.95, 0.7) + vec3(1.0, 0.36, 0.08) * mo * smoothstep(0.0, 0.5, ndl) * 0.55 * uI;
+        col += vec3(1.0, 0.32, 0.06) * (0.03 + 0.9 * cr) * (0.25 + 0.75 * smoothstep(-0.1, 0.6, ndl)) * uI;
         col += vec3(1.0, 0.4, 0.1) * pow(1.0 - nv, 3.0) * 0.6;
         gl_FragColor = vec4(col, 1.0); return;
       #endif

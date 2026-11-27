@@ -116,6 +116,9 @@ function twBuildingMat(o = {}) {
         float ground = step(vWinP.y, 4.0);
         float win = side * step(0.16, f.x) * step(f.x, 0.84) * step(0.22, f.y) * step(f.y, 0.86) * (1.0 - ground * 0.0) * step(1.2, vWinP.y);
         float rn = twH(cell + vSeed * 31.0);
+        // (far away, where a window is a pixel or two, the pattern fades to its average: no shimmer)
+        float twAA = smoothstep(0.22, 0.6, max(fwidth(by), fwidth(fl)));
+        win = mix(win, side * 0.435 * step(1.2, vWinP.y), twAA); rn = mix(rn, 0.5, twAA);
         vec3 glass = uGlass * (0.75 + 0.5 * rn) + vec3(0.06, 0.07, 0.08) * step(0.85, rn);
         float d = length(vWorldP.xz - uShatter.xy);
         float broken = uShatter.z > 0.0 ? step(d, uShatter.z) * step(0.12, twH(cell * 1.7 + vSeed * 7.0)) : 0.0;
@@ -127,7 +130,7 @@ function twBuildingMat(o = {}) {
         }
         vec3 holeC = vec3(0.035, 0.032, 0.03);
         diffuseColor.rgb = mix(diffuseColor.rgb, mix(glass, holeC, broken), win);
-        diffuseColor.rgb *= mix(1.0, 0.86, side * step(0.92, fract(fl)));
+        diffuseColor.rgb *= mix(mix(1.0, 0.86, side * step(0.92, fract(fl))), 1.0 - 0.011 * side, twAA);
         float twWin = win; float twBroken = broken * win;`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
         roughnessFactor = mix(roughnessFactor, 0.06, twWin * (1.0 - twBroken));`)
@@ -367,10 +370,10 @@ function twStatue(scene, [x, z]) {
   add(robe, cop, 0, 47 + 13.5, 0);
   add(new THREE.CylinderGeometry(3.0, 4.3, 7, 10), cop, 0, 47 + 30.5, 0);
   add(new THREE.SphereGeometry(2.4, 12, 10), cop, 0, 47 + 36.2, 0.3);
-  for (let k = 0; k < 7; k++) { const a = -0.9 + k * 0.3; add(new THREE.ConeGeometry(0.35, 3.2, 4), cop, Math.sin(a) * 2.3, 47 + 38.3, Math.cos(a) * 1.6, Math.cos(a) * 0.5, 0, -Math.sin(a) * 0.9); }
-  add(new THREE.CylinderGeometry(0.9, 1.2, 12.8, 8), cop, 2.6, 47 + 38.5, -0.2, 0, 0, -0.12);   // the arm
+  for (let k = 0; k < 7; k++) { const a = -0.9 + k * 0.3; add(new THREE.ConeGeometry(0.5, 3.8, 4), cop, Math.sin(a) * 2.3, 47 + 38.3, Math.cos(a) * 1.6, Math.cos(a) * 0.5, 0, -Math.sin(a) * 0.9); }
+  add(new THREE.CylinderGeometry(1.15, 1.45, 12.8, 8), cop, 2.6, 47 + 38.5, -0.2, 0, 0, -0.12);   // the arm
   add(new THREE.CylinderGeometry(1.6, 0.7, 2.4, 10), cop, 3.4, 47 + 45.3, -0.3);                // the torch
-  add(new THREE.SphereGeometry(1.25, 10, 8), gold, 3.4, 47 + 47.0, -0.3);                       // the flame
+  add(new THREE.SphereGeometry(1.5, 10, 8), gold, 3.4, 47 + 47.2, -0.3);                       // the flame
   add(new THREE.BoxGeometry(1.4, 7, 4.2), cop, -3.6, 47 + 24, 1.2, 0.3, 0, 0.2);                // the tablet
   return g;
 }

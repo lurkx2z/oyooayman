@@ -113,6 +113,7 @@ function twSpan(sec) {
   if (sec < 86400 * 60) return fmt(sec / 86400, 'DAY');
   if (sec < Y * 1.5) return fmt(sec / (Y / 12), 'MONTH');
   const y = sec / Y;
+  if (y >= 1000 && y < 1e6) return `${Math.round(Number(y.toPrecision(3))).toLocaleString('en-US')} YEARS`;   // (3 figures: 1,460 · 374,000)
   if (y < 1e6) return fmt(y, 'YEAR');
   if (y < 1e9) return `${(y / 1e6).toFixed(y < 1e7 ? 1 : 0)} MILLION YEARS`;
   return `${(y / 1e9).toFixed(y < 1e10 ? 1 : 0)} BILLION YEARS`;
@@ -135,14 +136,19 @@ const TW_STATUS = [];
   S(TW_T[15], 'ESCAPE VELOCITY', 'hot'); S(TW_T[21], 'SPACE', 'cold'); S(TW_T[27], '⅙ LIGHT SPEED', 'cold'); S(TW_T[29], '56% LIGHT SPEED', 'cold');
   S(TW_T[30], '80% LIGHT SPEED', 'cold');
   // from step 30 on: Earth's clock
-  S(twW('earth') - 0.1, 'EARTH: +1.7 SECONDS', 'time');
+  S(twW('earth') - 0.1, '', 'time');
 }
+// [text, tone, when it last changed, a small caption over it]. Earth's clock is shown the way the narrator says it:
+// what this one step took on Earth up to step 49, then how long you've been gone (the value at the end of the step
+// you're on, so the number on screen is the one you hear)
 function twStatusAt(t) {
   let k = 0; for (let i = 0; i < TW_STATUS.length; i++) if (TW_STATUS[i][0] <= t) k = i;
   const s = TW_STATUS[k];
-  // after Earth's clock appears, it counts with the steps (rounded to what a person would say)
-  if (s[2] === 'time') { const e = twEarthS(t); return [`EARTH: +${twSpan(e)}`, 'time', s[0]]; }
-  return [s[1], s[2], s[0]];
+  if (s[2] === 'time') {
+    const n = twStepAt(t).n, t0 = Math.max(s[0], TW_T[n]);
+    return n < 50 ? [twSpan(twStepEarthS(n)), 'time', t0, 'ON EARTH, THIS STEP TOOK'] : [twSpan(TW_ET[n]), 'time', t0, 'ON EARTH, YOU’VE BEEN GONE'];
+  }
+  return [s[1], s[2], s[0], ''];
 }
 
 if (typeof module !== 'undefined') module.exports = { twL, twSum, twSpan, TW_ET };

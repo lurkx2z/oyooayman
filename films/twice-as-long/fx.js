@@ -87,11 +87,12 @@ function twBurst(soft, adds, t, ev, o = {}) {
       // glints falling from a facade (p: a point on it; dir: its outward normal): out, then down, spinning (twinkle)
       const vx = (ev.dir ? ev.dir[0] : 0) * (2 + 5 * sp) + (h(6) - 0.5) * 3, vz = (ev.dir ? ev.dir[1] : 0) * (2 + 5 * sp) + (h(7) - 0.5) * 3;
       const y0 = ev.p[1] + (h(8) - 0.5) * (ev.spread || 10), x0 = ev.p[0] + (h(9) - 0.5) * (ev.wide || 10) * Math.abs(ev.dir ? ev.dir[1] : 1), z0 = ev.p[2] + (h(10) - 0.5) * (ev.wide || 10) * Math.abs(ev.dir ? ev.dir[0] : 1);
-      const tg = Math.sqrt(2 * Math.max(0, y0) / 9.8); if (u > tg + 0.5) continue;
+      const tg = Math.sqrt(2 * Math.max(0, y0) / 9.8); if (u > tg + (ev.linger ?? 0.5)) continue;   // (linger: the shards glitter on the ground)
       const tt = Math.min(u, tg), y = Math.max(0.03, y0 - 4.9 * tt * tt);
       const tw = 0.5 + 0.5 * Math.sin(u * 30 + h(11) * 40);
-      adds.add(x0 + vx * tt, y, z0 + vz * tt, 0.06 + 0.1 * h(12), 0.9 * tw * (u < tg ? 1 : 0.4), 0.85, 0.95, 1.0);
-      if (i % 3 === 0) soft.add(x0 + vx * tt, y, z0 + vz * tt, 0.09, 0.5, 0.75, 0.85, 0.9);
+      const gs = ev.gs || 1, lg = u < tg ? 1 : 0.4 * (1 - MathX.smooth(u - tg, (ev.linger ?? 0.5) * 0.6, ev.linger ?? 0.5));
+      adds.add(x0 + vx * tt, y, z0 + vz * tt, (0.06 + 0.1 * h(12)) * gs, 0.9 * tw * lg, 0.85, 0.95, 1.0);
+      if (i % 3 === 0) soft.add(x0 + vx * tt, y, z0 + vz * tt, 0.09 * gs, 0.5 * (u < tg ? 1 : lg * 2), 0.75, 0.85, 0.9);
     } else if (ev.kind === 'column') {
       // a column of smoke rising from a crater, fed for 14 s, leaning with the wind (east)
       const tb = h(1) * h(1) * 10, age = u - tb; if (age < 0) continue;

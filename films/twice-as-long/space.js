@@ -59,6 +59,7 @@ TW_SETS.space = (app) => {
   }
   const soft = twPuffs(scene, 3000, { soft: 1.4 }), adds = twPuffs(scene, 4000, { additive: true, soft: 1.6 });
   const fill = new THREE.DirectionalLight('#dfe8ff', 1.2); scene.add(fill); scene.add(fill.target);
+  const rimL = new THREE.DirectionalLight('#b8d0ff', 0); scene.add(rimL); scene.add(rimL.target);   // (from behind you: your hair and shoulders against black)
   const V = (a) => new THREE.Vector3(a[0], a[1], a[2]);
   const H = TW_HEAD3, SD = TW_SIDE3, UP = TW_UP3;
   const rel = (f, s, u) => [H.x * f + SD.x * s + UP.x * u, H.y * f + SD.y * s + UP.y * u, H.z * f + SD.z * s + UP.z * u];
@@ -85,30 +86,36 @@ TW_SETS.space = (app) => {
     let p;
     if (o.pose) p = o.pose;
     else if (s.n >= 15 && s.u < 1) p = YOU_POSES.leap(0.12 + 0.76 * s.u, { lead: s.n % 2 ? 1 : -1, reach: 0.9, arms: 'swing' });
-    else { const k = MathX.smooth(t - (TW_T[s.n] + TW_D[s.n]), 0, 0.8); p = YouCharacter.mix(YOU_POSES.leap(0.88, { lead: s.n % 2 ? 1 : -1, reach: 0.9 }), YOU_POSES.drift(t), k); }
+    else { const k = MathX.smooth(t - (TW_T[s.n] + TW_D[s.n]), 0, 0.8); p = YouCharacter.mix(YOU_POSES.leap(0.88, { lead: s.n % 2 ? 1 : -1, reach: 0.9 }), twFloat(t), k); }
     if (o.neck !== undefined) p.neck = o.neck;
     if (o.headYaw !== undefined) p.headYaw = o.headYaw;
     return p;
   }
   // a pose: looking at your watch (left arm up across the chest)
-  const watchPose = (t, k = 1) => { const p = YOU_POSES.drift(t); const w = { lSh: [1.15, -0.55], lEl: 1.85, neck: 0.42, headYaw: 0.42, spine: 0.08 }; for (const key in w) p[key] = Array.isArray(w[key]) ? [MathX.lerp(p[key][0], w[key][0], k), MathX.lerp(p[key][1], w[key][1], k)] : MathX.lerp(p[key], w[key], k); return p; };
-  const phonePose = (t) => { const p = YOU_POSES.drift(t); p.rSh = [0.95, 0.18]; p.rEl = 1.55; p.neck = 0.45; p.headYaw = -0.15; p.spine = 0.1; return p; };
+  const watchPose = (t, k = 1) => { const p = twFloat(t); const w = { lSh: [1.15, -0.55], lEl: 1.85, neck: 0.42, headYaw: 0.42, spine: 0.08 }; for (const key in w) p[key] = Array.isArray(w[key]) ? [MathX.lerp(p[key][0], w[key][0], k), MathX.lerp(p[key][1], w[key][1], k)] : MathX.lerp(p[key], w[key], k); return p; };
+  const phonePose = (t) => { const p = twFloat(t); p.rSh = [0.95, 0.18]; p.rEl = 1.55; p.neck = 0.45; p.headYaw = -0.15; p.spine = 0.1; return p; };
 
   // ---- the shots: mode → (t, u, shot) → a stage { O, cam: { p, at, fov, roll }, you, bodies, … }
   //   O: the scene's origin relative to you (default: you). Every position below is relative to O.
-  // a thing on your path, seen from across your path (your line crosses its face) and a little behind (the Sun at your back)
-  const portrait = (key, o) => (t, u) => {
-    const on = TW_ON[key], O = twOnPath(t, on[0], on[1], on[2]), off = sub3(O, twOnPath(t, on[0], 0, 0)), D = Math.hypot(...off);
-    const p = add3(mul3(off, -2), mul3([H.x, H.y, H.z], -(o.k - 0.04 * u) * D));
-    return { O, cam: { p, at: [0, 0, 0], fov: o.fov, aim: o.aim || [0, 0] }, you: { on: false }, tracer: { key, w: o.w || 1 },
-      labels: [{ key, text: o.name, sub: o.sub, side: 'l', a: twWin(t, shot0(t) + 0.5, 1e9, 0.3) }] };
+  // a thing on your path going past you, in slow motion: the picture holds on the moment you pass it (the HUD's clocks
+  // run on) while it sweeps from ahead of you to behind you across the frame, you in the foreground for scale.
+  //   o.sw: how far it sweeps (in units of its distance from your path), o.c: when in the shot it is closest (0…1),
+  //   o.fov, o.aim [yaw, pitch], o.name/sub: its label, o.expr: your face before/after
+  const flyby = (key, o) => (t, u) => {
+    const on = TW_ON[key], D = Math.hypot(on[1], on[2]), sh = set._shot || { t0: t - u, t1: t - u + 6 }, dur = sh.t1 - sh.t0;
+    const x = u / dur - (o.c ?? 0.5), tb = twPassT(on[0] + D * (o.sw || 0.8) * 2 * x);
+    const n = n3(rel(0, on[1], on[2])), h = [H.x, H.y, H.z], un = n3([n[1] * h[2] - n[2] * h[1], n[2] * h[0] - n[0] * h[2], n[0] * h[1] - n[1] * h[0]]);
+    const k = 38 / o.fov, cp = add3(add3(mul3(n, -6.0 * k), mul3(h, 1.8)), mul3(un, (un[1] > 0 ? 1 : -1) * 0.85));
+    const P = twOnPath(tb, on[0], on[1], on[2]);
+    return { O: [0, 0, 0], tb, cam: { p: cp, at: mul3(n, 1000), fov: o.fov, aim: o.aim || [0, 0] }, you: { expr: x < 0.04 ? 'awe' : (o.expr || 'shock'), look: P },
+      labels: [{ key, text: o.name, sub: o.sub, side: 'l', a: twWin(t, sh.t0 + dur * Math.max(0.05, (o.c ?? 0.5) - 0.18), 1e9, 0.25) }] };
   };
   const STAGE = {
     space: (t, u) => ({ cam: { p: rel(-3.4 + 0.35 * u, 2.6, 1.3), at: rel(0.8, 0, -0.3), fov: 52 }, you: { expr: 'awe' }, glow: 1 - MathX.smooth(t, TW_T[20] + 0.6, TW_T[21] + 0.5) }),
     push: (t, u) => ({ cam: { p: rel(-0.6 + 0.15 * u, -4.4, -0.35), at: rel(0.15, 0, -0.3), fov: 44 }, you: { expr: 'determined' } }),
     station: (t, u) => {
       const O = twOnPath(t, TW_ON.iss[0], TW_ON.iss[1], TW_ON.iss[2]);
-      return { O, cam: { p: rel(-58 + 3 * u, -36, 6), at: rel(2, 0, -16), fov: 46 }, you: { on: false }, iss: true, tracer: { key: 'iss', w: 1.2 },
+      return { O, cam: { p: rel(-52 + 3 * u, -34, 26), at: rel(4, 0, -12), fov: 46 }, you: { on: false }, iss: true, tracer: { key: 'iss', w: 1.2 },
         labels: [{ at: rel(0, 0, 9), text: 'SPACE STATION', sub: '400 KM UP', a: twWin(t, shot0(t) + 0.3, 1e9, 0.3) }] };
     },
     ninemin: (t, u) => {
@@ -123,9 +130,8 @@ TW_SETS.space = (app) => {
         labels: [{ key: 'earth', text: 'HOME', sub: '8 BILLION PEOPLE', a: twWin(t, shot0(t) + 2.0, 1e9, 0.4) }] };
     },
     fifty: (t, u) => ({ cam: { p: rel(4.8 - 0.3 * u, -1.1, 0.7), at: rel(-1, 0.25, 0.2), fov: 44 }, you: { expr: 'determined' }, streak: 0.15 }),
-    moon: (t, u) => ({ cam: { p: rel(0.5, 3.9, -0.1), at: rel(0.4, 0, 0.25), fov: 52, aim: [0, 0.05] }, you: { expr: t < PASS.moon + 0.2 ? 'determined' : 'shock' },
-      labels: [{ key: 'moon', text: 'THE MOON', sub: '384,400 KM FROM EARTH', a: twWin(t, PASS.moon - 0.5, 1e9, 0.2) }] }),
-    problem: (t, u) => ({ cam: { p: rel(1.25, -0.45, 0.82), at: rel(0, 0, 0.75), fov: 28 }, you: { expr: 'worry', pose: YouCharacter.mix(YOU_POSES.drift(t), YOU_POSES.stand(t), 0.5) } }),
+    moon: flyby('moon', { fov: 26, sw: 0.8, c: 0.6, name: 'THE MOON', sub: '384,400 KM FROM EARTH' }),
+    problem: (t, u) => ({ cam: { p: rel(1.25, -0.45, 0.82), at: rel(0, 0, 0.75), fov: 28 }, you: { expr: 'worry', pose: YouCharacter.mix(twFloat(t), YOU_POSES.stand(t), 0.5) } }),
     barrier: (t, u) => { const mid = n3(add3(n3(twOnPath(t, ...TW_ON.moon)), n3(twEarthRel(t)))); return { cam: { p: mul3(mid, 0.1 * u), at: mul3(mid, 12), fov: 50, aim: [0, -0.16] }, you: { on: false },
       labels: [{ key: 'moon', text: 'THE MOON', a: twWin(t, shot0(t) + 0.3, 1e9, 0.3) }, { key: 'earth', text: 'EARTH', a: twWin(t, shot0(t) + 0.6, 1e9, 0.3) }]  }; },
     nothing: (t, u) => ({ cam: { p: rel(-4.0 + 0.6 * u, -1.4, 0.9), at: rel(6, 1.2, 0.6), fov: 52 }, you: { expr: 'shock', look: rel(40, 4, 1) }, beam: u,
@@ -138,13 +144,13 @@ TW_SETS.space = (app) => {
       return { O, cam: { p: rel(4.2 + 0.3 * u, 3.4, 11.6), at: rel(0, -1.4, 10.3), fov: 44, aim: [0.18, 0] }, you: { on: false }, iss: true, astro: [0, -1.4, 10.4], earthTime: true };
     },
     outward: (t, u) => ({ cam: { p: rel(-3.0, 0.75, 1.05), at: rel(8, -0.2, 0.3), fov: 58 }, you: { expr: 'determined' }, streak: 0.35 }),
-    mars: portrait('mars', { k: 1.5, fov: 15, aim: [-0.03, 0], name: 'MARS', sub: 'THE RED PLANET' }),
+    mars: flyby('mars', { fov: 36, sw: 0.8, c: 0.45, name: 'MARS', sub: 'THE RED PLANET' }),
     marstime: (t, u) => ({ cam: { p: rel(2.2, 1.9, 0.5), at: rel(0, 0, 0.2), fov: 44, aim: [-0.3, 0] }, you: { pose: watchPose(t, MathX.smooth(u, 0.5, 1.6)), expr: 'awe' } }),
     sun: (t, u) => { const L = n3(twSunRel(t)); return { cam: { p: add3(mul3(L, -90 + 2 * u), rel(0, 1.6, 0.35)), at: add3(mul3(L, 10), rel(0, 0.75, 0.35)), fov: 3.2 }, you: { expr: 'awe', look: mul3(L, 1000) }, sunPoint: 1, labels: [{ key: 'sun', text: 'THE SUN', a: twWin(t, shot0(t) + 0.6, 1e9, 0.3) }] }; },
     light8: (t, u) => { const L = n3(twSunRel(t)); return { cam: { p: add3(mul3(L, -44 - u), rel(0, 1.2, -0.6)), at: add3(mul3(L, 10), rel(0, 0, 0.3)), fov: 7.5, aim: [0, -0.022] }, you: { expr: 'determined', look: mul3(L, 1000) }, sunPoint: 1 }; },
-    jupiter: portrait('jupiter', { k: 1.5, fov: 16, aim: [-0.03, 0], name: 'JUPITER', sub: 'THE BIGGEST PLANET' }),
-    saturn: portrait('saturn', { k: 1.5, fov: 16, aim: [-0.03, 0], name: 'SATURN', sub: 'AND ITS RINGS' }),
-    pluto: portrait('pluto', { k: 1.5, fov: 11, aim: [-0.03, 0], name: 'PLUTO', sub: 'A DWARF PLANET' }),
+    jupiter: flyby('jupiter', { fov: 38, sw: 0.8, c: 0.4, name: 'JUPITER', sub: 'THE BIGGEST PLANET' }),
+    saturn: flyby('saturn', { fov: 40, sw: 0.7, c: 0.4, name: 'SATURN', sub: 'AND ITS RINGS' }),
+    pluto: flyby('pluto', { fov: 28, sw: 0.55, c: 0.45, name: 'PLUTO', sub: 'A DWARF PLANET' }),
     boss: (t, u) => ({ cam: { p: rel(1.9, 1.5, 0.75), at: rel(0, 0, 0.75), fov: 34, aim: [-0.32, 0] }, you: { pose: phonePose(t), expr: 'sad', phone: true } }),
     voyager: (t, u) => {
       const on = TW_ON.voyager, O = twOnPath(t, on[0], on[1], on[2]);
@@ -157,10 +163,10 @@ TW_SETS.space = (app) => {
     },
     day: (t, u) => ({ cam: { p: rel(2.6, 2.0, 0.8), at: rel(0, 0, 0.3), fov: 44, aim: [-0.3, 0] }, you: { expr: 'determined' }, streak: 0.3 }),
     star: (t, u) => { const L = n3(twSunRel(t)); return { cam: { p: add3(add3(mul3(L, -3.2), rel(0, -0.9, 1.25)), [0, 0, 0]), at: add3(mul3(L, 30), [0, 0, 0]), fov: 40, aim: [0.1, 0.02] }, you: { pose: YOU_POSES.lookBack(t, 1, 1), expr: 'sad', look: mul3(L, 1000) }, sunPoint: 1,
-      labels: [{ key: 'sun', text: 'THE SUN', a: twWin(t, shot0(t) + 0.8, 1e9, 0.4) }] }; },
+      labels: [{ key: 'sun', text: 'THE SUN', sub: 'STILL NEARLY AS BRIGHT AS A FULL MOON', a: twWin(t, shot0(t) + 0.8, 1e9, 0.4) }] }; },
     month: (t, u) => ({ cam: { p: rel(1.5, 0.55, 0.85), at: rel(0, 0, 0.72), fov: 30 }, you: { expr: 'sad' } }),
     ninemonths: (t, u) => ({ cam: { p: rel(-2.6 + 0.4 * u, -1.2, -0.6), at: rel(6, 0.3, 1.2), fov: 60 }, you: { expr: 'determined' }, streak: 0.5 }),
-    proxima: portrait('proxima', { k: 1.5, fov: 9, aim: [-0.03, 0], name: 'PROXIMA CENTAURI', sub: 'THE CLOSEST STAR TO THE SUN' }),
+    proxima: flyby('proxima', { fov: 24, sw: 0.8, c: 0.4, name: 'PROXIMA CENTAURI', sub: 'THE CLOSEST STAR TO THE SUN<br>PLACED ON YOUR PATH', expr: 'awe' }),
     sixyears: (t, u) => { const L = n3(twSunRel(t)); return { cam: { p: add3(mul3(L, -3.0), rel(0, 1.0, 1.1)), at: mul3(L, 30), fov: 42, aim: [-0.12, 0.02] }, you: { pose: YOU_POSES.lookBack(t, 1, -1), expr: 'sad', look: mul3(L, 1000) }, sunPoint: 1,
       labels: [{ key: 'sun', text: 'HOME', a: twWin(t, shot0(t) + 0.8, 1e9, 0.4) }] }; },
     redgiant: (t, u) => future(t, u, 0),
@@ -214,6 +220,7 @@ TW_SETS.space = (app) => {
       const mode = shot.mode, u = t - shot.t0;
       TW_PX = app.renderer.domElement.height || 1080;
       const st = (STAGE[mode] || STAGE.space)(t, u, shot);
+      if (st.tb != null) t = st.tb;   // (a slow-motion pass: everything in the picture holds on that moment)
       const O = st.O || [0, 0, 0];
       // ---- the camera (relative to O; `aim` turns it after aiming: [yaw, pitch] in radians)
       if (st.future !== undefined) return frameFuture(t, u, shot, st);
@@ -271,6 +278,7 @@ TW_SETS.space = (app) => {
       S.hemi.intensity = 0.35 + 0.5 * Math.exp(-dE / 3e7); S.hemi.color.set('#7a96c8'); S.hemi.groundColor.set('#141820');
       // (a soft light from the camera's side, so you always read against black)
       const fa = Array.isArray(ca) ? ca : ca.toArray(); fill.position.set(cp[0], cp[1] + 0.6, cp[2]); fill.target.position.set(fa[0], fa[1], fa[2]); fill.target.updateMatrixWorld(); fill.intensity = st.astro ? 0.55 : st.O ? 0.5 : 1.25;
+      { const bk = [yp[0] - cp[0], yp[1] - cp[1], yp[2] - cp[2]], l = Math.hypot(...bk) || 1; rimL.position.set(yp[0] + bk[0] / l * 10 + UP.x * 6, yp[1] + bk[1] / l * 10 + UP.y * 6, yp[2] + bk[2] / l * 10 + UP.z * 6); rimL.target.position.set(...yp); rimL.target.updateMatrixWorld(); rimL.intensity = st.O ? 0.8 : 1.6; }
       // ---- the stars: your speed bends them forwards
       const beta = st.O ? 0 : twBetaAt(t), sk = st.streak ?? 0;   // (shots that look at something else are at rest)
       sky.set(cam, [H.x, H.y, H.z], Math.min(beta, 0.94), { streak: sk * MathX.smooth(beta, 0.05, 0.5), bright: dE < 4e7 ? 0.55 : 0.9, band: 1 });
@@ -288,7 +296,7 @@ TW_SETS.space = (app) => {
         const tc = sub3(cp, pos), ayaw = Math.atan2(tc[0], tc[2]) + 0.55;
         astro.place(pos[0] - UP.x * 0.95, pos[1] - UP.y * 0.95, pos[2] - UP.z * 0.95, ayaw, 0, -0.08);
         const tp = PASS.iss, k = MathX.smooth(t - tp, 0.15, 0.9);
-        const ap0 = YOU_POSES.drift(t); ap0.rSh = [1.1, 0.4]; ap0.rEl = 0.5; ap0.lSh = [0.9, 0.3]; ap0.lEl = 0.7;
+        const ap0 = twFloat(t); ap0.rSh = [1.1, 0.4]; ap0.rEl = 0.5; ap0.lSh = [0.9, 0.3]; ap0.lEl = 0.7;
         ap0.neck = -0.5 * k - 0.05; ap0.headYaw = 0.35 * k;
         if (mode === 'ninemin') { ap0.lSh = [0.9 + 1.4 * MathX.smooth(t - tp, 1.8, 2.4), 0.25]; ap0.lEl = 0.2; }
         astro.pose(ap0, ['relax', 'relax']); astro.expr(k > 0.5 ? 'shock' : 'calm', t, 1);
@@ -360,16 +368,17 @@ TW_SETS.space = (app) => {
     // the giant at G; the Earth 1 AU out along +x; the camera (at the origin) beyond the Earth, looking back
     const ang = st.future ? 0.02 + 0.03 * u : -0.22 + 0.02 * u;
     const Ew = [earthD * Math.cos(ang), 0, earthD * Math.sin(ang)];
-    const cw = st.future ? [Ew[0] + 3.2e7, Ew[1] + 0.9e7, Ew[2] + 1.6e7] : [2.7 * TW_AU, 0.25 * TW_AU, -0.55 * TW_AU];
-    const aw = st.future ? [Ew[0], Ew[1], Ew[2] - 0.6e7] : [0.6 * TW_AU, 0.0, 0.1 * TW_AU];
+    // (swallow: from beside the Earth, so its side facing the giant shows lit and glowing, the giant's edge behind it)
+    const cw = st.future ? [Ew[0] + 0.4e7, Ew[1] + 0.8e7, Ew[2] + 4.2e7 - 0.3e7 * u] : [2.7 * TW_AU, 0.25 * TW_AU, -0.55 * TW_AU];
+    const aw = st.future ? [Ew[0] - 1.6e7, Ew[1], Ew[2]] : [0.6 * TW_AU, 0.0, 0.1 * TW_AU];
     const G = sub3([0, 0, 0], cw), Ep = sub3(Ew, cw);
-    twCam(cam, [0, 0, 0], sub3(aw, cw), st.future ? 34 : 44);
+    twCam(cam, [0, 0, 0], sub3(aw, cw), st.future ? 40 : 44);
     cam.near = 0.05; cam.far = 1e7; cam.updateProjectionMatrix();
     B.giant.set(G, Rg, [1, 0, 0], { col: '#ff3c12', I: 1.25, rank: 0, cam, t: t * 3 });
     B.burnt.set(Ep, TW_R, n3(sub3(G, Ep)), { rank: 1, cam, I: st.future ? 0.8 + 0.6 * MathX.smooth(u, 0.5, 5) : 1.0, t });
     sky.set(cam, [H.x, H.y, H.z], 0, { bright: 0.5, band: 0.6 });
     soft.begin(); adds.begin(); soft.end(); adds.end();
-    set._st = { labels: st.future ? [{ key: 'burnt', text: 'EARTH', a: twWin(t, shot.t0 + 0.4, 1e9, 0.3) }] : [{ key: 'giant', text: 'THE SUN', sub: '6 BILLION YEARS FROM NOW', a: twWin(t, shot.t0 + 0.8, 1e9, 0.4) }, { key: 'burnt', text: 'EARTH', a: twWin(t, shot.t0 + 2.4, 1e9, 0.4) }] };
+    set._st = { labels: st.future ? [{ key: 'burnt', text: 'EARTH', a: twWin(t, shot.t0 + 0.4, 1e9, 0.3) }] : [{ key: 'giant', text: 'THE SUN', sub: 'ABOUT 7.6 BILLION YEARS FROM NOW', a: twWin(t, Math.max(shot.t0 + 0.8, TW_T[87] + 0.2), 1e9, 0.4) }, { key: 'burnt', text: 'EARTH', a: twWin(t, shot.t0 + 2.4, 1e9, 0.4) }] };
   }
   return set;
 };

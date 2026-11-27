@@ -24,6 +24,7 @@
     .tw-stat.cold { background: rgba(10, 30, 60, 0.75); color: #9fe4ff; }
     .tw-stat.time { background: #ffc531; color: #1a1406; }
     .tw-stat:empty { display: none; }
+    .tw-stat small { display: block; font-size: 0.5em; letter-spacing: 0.12em; opacity: 0.8; margin-bottom: calc(var(--u) * 2); }
     /* labels pinned to things: a ring on the thing, a bold caps name on a plate, a small amber line under it */
     .tw-lab { position: absolute; transform: translate(calc(var(--u) * -20), -50%); pointer-events: none; white-space: nowrap; }
     .tw-lab .t { display: inline-block; vertical-align: middle; padding: calc(var(--u) * 8) calc(var(--u) * 18) calc(var(--u) * 9); border-radius: calc(var(--u) * 10);
@@ -36,7 +37,7 @@
     .tw-lab.you .t { background: #ff6a1f; }
     .tw-lab.you .d { box-shadow: 0 0 0 calc(var(--u) * 4) #ff6a1f, 0 0 calc(var(--u) * 12) rgba(0, 0, 0, 0.6); }
     /* the honest tag (bottom left, small) */
-    .tw-tag { position: absolute; left: calc(var(--u) * 56); bottom: calc(var(--u) * 36); white-space: nowrap; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 27); letter-spacing: 0.1em;
+    .tw-tag { position: absolute; left: calc(var(--u) * 56); bottom: calc(var(--u) * 36); white-space: pre; line-height: 1.35; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 27); letter-spacing: 0.1em;
       color: #f0ece4; padding: calc(var(--u) * 7) calc(var(--u) * 16); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.6); pointer-events: none; }
     /* diagrams (SVG, drawn per frame) */
     .tw-dia { position: absolute; inset: 0; pointer-events: none; }

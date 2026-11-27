@@ -95,7 +95,7 @@ function twTex(c, o = {}) {
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = o.srgb === false ? THREE.NoColorSpace : THREE.SRGBColorSpace;
   if (o.repeat !== false) { t.wrapS = t.wrapT = THREE.RepeatWrapping; }
-  t.anisotropy = o.aniso || 4;
+  t.anisotropy = o.aniso || 8;
   return t;
 }
 // a canvas texture redrawn by draw(ctx, w, h, state) only when the state key changes
@@ -320,3 +320,12 @@ function twBlobGeo(r, seed) {
 // switch a light's shadow map updates on or off (off: its map is kept, but drawn at least once, so the shader's shadow
 // sampler always has a depth texture to read: an unmade map breaks every lit draw call)
 function twShadowOn(L, on) { L.shadow.autoUpdate = !!on; if (!on && !L.shadow.map) L.shadow.needsUpdate = true; }
+
+// floating in space, relaxed (arms loose and a little forward, knees bent, a slow sway): the film's own version of
+// the engine's arms-open drift pose, which reads as stiff in a held shot (u: seconds)
+function twFloat(u) {
+  const p = basePose(), s = Math.sin(u * 0.7), c = Math.sin(u * 0.53 + 1.3);
+  p.lSh = [0.32 + 0.08 * s, 0.38 + 0.06 * c]; p.rSh = [0.18 - 0.06 * c, 0.34 + 0.06 * s]; p.lEl = 0.8 + 0.1 * c; p.rEl = 0.62 + 0.1 * s;
+  p.lHip = [0.28 + 0.05 * s, 0.07]; p.rHip = [-0.04, 0.05]; p.lKnee = 0.6 + 0.05 * c; p.rKnee = 0.32; p.spine = 0.08; p.neck = 0.06; p.lFoot = 0.2; p.rFoot = 0.12;
+  return p;
+}

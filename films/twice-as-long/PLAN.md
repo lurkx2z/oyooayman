@@ -129,3 +129,32 @@ Andromeda, dust, the web) · the red giant · step ninety · the last choice · 
 ZIP (runnable, baked soundtrack with the code's fingerprint, tested from a fresh unzip), `EPISODE_REPORT.md`, three
 thumbnails (giant bold number, a red warning word, the character) in `/mnt/project-files/twice-as-long/`; the final
 1080p render on the owner's PC (D: only) to `D:\renders\twice-as-long`.
+
+## 6. Review log
+Three independent reviews of the full preview (contact sheets, the silent preview, the timeline and the code), scores
+as given:
+- **Retention**: hook 4, pacing 4, clarity 7, payoff 5, recipe 5, **overall 5/10**.
+- **Picture**: image 5, composition 4.5, readability 5, character 6, famous things 4, **overall 5/10**.
+- **Science**: numbers 8, consequences 6.5, honesty 7, hard to dunk on 5, **overall 7/10**. Every number the narrator
+  says checked out; the weak points were one wrong astronomy claim and on-screen numbers that disagreed.
+
+Fixed after the reviews:
+- The camera inside a house wall (0:05); the cold open now pulls back from your face to the whole observable universe.
+- The Moon and the planets: slow-motion flybys with you in the foreground (they were tiny dots).
+- The red giant: the Earth reads as a lit, half-molten crescent (it was a black disc); labelled "about 7.6 billion
+  years from now", with a tag that at 6 billion the Sun has only begun to swell; Earth's clock steps aside there.
+- Earth's clock: up to step 49 the readout says what **this one step** took on Earth, from step 50 how long **you've
+  been gone** (the value at the end of the step), so the number on screen is the number you hear.
+- The race diagrams add Earth's clock (light still wins); the phone reads 8:55 and "no call can catch you now"; the rule
+  tag no longer says "everything else is real physics"; tags for the ISS trip, the meteor's blast, looking back at full
+  speed, aiming at your door (the zigzag puts step 57 about 2 km off), the expansion of the universe (from step 80 on,
+  and at step 90: nothing leaving today gets past ~16 billion light years), the cosmic web mapped only from inside.
+- The observable universe has galaxies past its edge and the label "all we can see from Earth".
+- The cosmic web: the pull-out ends on a face-on slice, threads and bubbles labelled.
+- The Statue of Liberty closer and clearer; the meteor a saturated fireball; the Space Station seen from above, its
+  solar wings showing; far windows no longer shimmer; the police tape on posts; glass glittering on the pavement and
+  people ducking then staring after the boom; a rim light on you in space; a relaxed floating pose; the rule diagram
+  rows no longer collide; landmark panels moved off the landmarks; the ending's two choices bigger.
+
+Still weak (honest): the pacing in the light-barrier lecture (4:03–4:43) is slow; the trousers turn pinkish in the heat
+glow; the curve shot crops your head close to the top; the watch close-up is plain.

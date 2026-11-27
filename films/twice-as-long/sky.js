@@ -180,19 +180,19 @@ TW_SETS.sky = (app) => {
       const po = YOU_POSES.leap(0.5, { lead: s.n % 2 ? 1 : -1, reach: 0.6, arms: 'up' }); po.neck = -0.45; you.pose(po, ['cup', 'relax']);
       you.expr(mode === 'climb' ? 'awe' : 'scream', t, 1); you.look(null);
       const gk = mode === 'climb' ? 0.55 * (1 - MathX.smooth(alt, 30000, 80000)) + 0.2 : 1.0;
-      glow.set([head3.x * 0.4, head3.y * 0.4, head3.z * 0.4], [head3.x, head3.y, head3.z], gk, mode === 'meteor' ? 26 : 2.0, '#ffb060');
+      glow.set([head3.x * 0.4, head3.y * 0.4, head3.z * 0.4], [head3.x, head3.y, head3.z], gk, mode === 'meteor' ? 12 : 2.0, '#ffb060');
       // the trail: your past positions (fire, then smoke), relative to you now
       soft.begin(); adds.begin();
       // the trail: along the line behind you (you go straight), by distance; its age from your film-time speed
       const vF = twL(Math.max(15, s.n)) / Math.max(0.3, TW_T[Math.max(15, s.n) + 1] - TW_T[Math.max(15, s.n)]), big = mode === 'meteor';
       for (let j = 0, d = 0.6; j < 700 && d < (big ? 40000 : 400); j++) {
-        const age = d / vF, sz = big ? 34 + d * 0.035 : 0.8 + d * 0.06, heat = Math.exp(-age / (big ? 0.6 : 0.06));
+        const age = d / vF, sz = big ? 16 + d * 0.022 : 0.8 + d * 0.06, heat = Math.exp(-age / (big ? 1.1 : 0.06));
         const x = -head3.x * d, y = -head3.y * d, z = -head3.z * d;
-        if (heat > 0.01) adds.add(x, y, z, sz * 0.7, 0.85 * heat, 1.0, 0.6, 0.25);
+        if (heat > 0.01) adds.add(x, y, z, sz * 0.7, 0.85 * heat, 1.0, big ? 0.52 + 0.3 * heat : 0.6, big ? 0.14 + 0.2 * heat : 0.25);
         soft.add(x, y + age * (big ? 8 : 0.3), z, sz * 1.5, (big ? 0.5 : 0.3) * Math.exp(-age / 4) * MathX.smooth(age, 0.01, 0.25), 0.62, 0.6, 0.58);
         d += sz * 0.4;
       }
-      if (big) { adds.add(0, 0, 0, 70, 1.0, 1.0, 0.92, 0.75); adds.add(0, 0, 0, 160, 0.55, 1.0, 0.62, 0.3); adds.add(0, 0, 0, 320, 0.25, 1.0, 0.45, 0.2); }   // the head: a fireball
+      if (big) { adds.add(0, 0, 0, 34, 1.0, 1.0, 0.95, 0.82); adds.add(0, 0, 0, 90, 0.7, 1.0, 0.58, 0.2); adds.add(0, 0, 0, 190, 0.28, 1.0, 0.4, 0.1); }   // the head: a fireball (a white-hot core in an orange ball)
       soft.end(); adds.end();
       GU.uCloud.value = mode === 'climb' ? 0.55 : 0.3;
       const cp = (CAM[mode] || CAM.climb)(t, u), dr = twDrift(t, mode === 'meteor' ? 4 : 0.05, 0.6, 3);
@@ -204,6 +204,7 @@ TW_SETS.sky = (app) => {
     labels(t, shot) { const f = LAB[shot.mode]; return f ? f(t, shot, set._A || [0, 0, 0]) : []; },
     grade(t, p, shot) {
       p.exposure = 1.0; p.saturation = 1.12; p.bloom = 0.55; p.bloomThreshold = 0.8; p.vignette = 0.45; p.warmth = shot.mode === 'meteor' ? 0.06 : 0;
+      if (shot.mode === 'meteor') { p.exposure = 0.88; p.saturation = 1.3; p.bloom = 0.45; p.bloomThreshold = 0.88; }
     },
   };
   return set;
