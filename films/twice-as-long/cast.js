@@ -39,6 +39,10 @@ const TW_P = {
   film: (u, i) => { const p = basePose(); p.rSh = [1.45, 0.05]; p.rEl = 0.55; p.lSh = [1.3, -0.05]; p.lEl = 0.7; p.neck = -0.05; p.headYaw = 0.05 * Math.sin(u + i); return p; },
   stare: (u, i, yaw) => { const p = TW_P.idle(u, i); p.headYaw = yaw || 0; p.neck = -0.1; p.spine = -0.04; p.lSh = [0.15, 0.2]; p.rSh = [0.15, 0.2]; return p; },
   point: (u, i) => { const p = TW_P.idle(u, i); p.rSh = [1.55, 0.25]; p.rEl = 0.08; p.neck = -0.15; return p; },
+  // looking up at the sky (arg: head yaw); 'pointUp' with an arm raised
+  lookUp: (u, i, yaw) => { const p = TW_P.idle(u, i); p.headYaw = yaw || 0; p.neck = -0.85; p.spine = -0.16; p.lSh = [0.12, 0.2]; p.rSh = [0.12, 0.2]; return p; },
+  pointUp: (u, i, yaw) => { const p = TW_P.lookUp(u, i, yaw); p.rSh = [2.3, 0.3]; p.rEl = 0.1; return p; },
+  filmUp: (u, i, yaw) => { const p = TW_P.film(u, i); p.rSh = [2.0, 0.05]; p.lSh = [1.9, -0.05]; p.neck = -0.45; p.headYaw = yaw || 0; return p; },
   // arms over the head, crouched (the glass)
   duck: (u, i) => { const p = basePose(); p.hipY = 0.62; p.lHip = [1.4, 0.15]; p.rHip = [1.3, 0.15]; p.lKnee = 2.1; p.rKnee = 2.0; p.lFoot = -0.5; p.rFoot = -0.5; p.spine = 0.75; p.neck = 0.4;
     p.lSh = [2.4, 0.5]; p.rSh = [2.4, 0.5]; p.lEl = 1.7; p.rEl = 1.7; p.spineRoll = 0.04 * Math.sin(u * 13 + i); return p; },

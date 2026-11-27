@@ -77,6 +77,20 @@ const TW_DIA = (() => {
     // your step against a landmark: [what, its height, your step]
     statue: (u) => compare(u, 'YOUR STEP', '96 M', 96, 'STATUE OF LIBERTY', '93 M', 93),
     esb: (u) => compare(u, 'YOUR STEP', '384 M', 384, 'EMPIRE STATE BUILDING', '381 M', 381),
+    // the Earth's curve: a straight line of steps leaves the ground (side view, exaggerated in height and length)
+    curve: (u) => {
+      const cx = 760, cy = 2650, R = 1800, k = K(u, 0.2, 2.2), top = cy - R;
+      let s = plate(380, 400, 1160, 620);
+      s += `<path d="M ${(cx - R * Math.sin(0.2)).toFixed(1)} ${(cy - R * Math.cos(0.2)).toFixed(1)} A ${R} ${R} 0 0 1 ${(cx + R * Math.sin(0.43)).toFixed(1)} ${(cy - R * Math.cos(0.43)).toFixed(1)}" stroke="#7fbf6a" stroke-width="12" fill="none"/>`;
+      s += tx(cx, top + 150, 30, 's', 'THE GROUND', 'middle');
+      const L = 720 * k;
+      s += `<line x1="${cx}" y1="${top - 8}" x2="${(cx + L).toFixed(1)}" y2="${top - 8}" stroke="${YOU}" stroke-width="8" stroke-dasharray="26 14"/>`;
+      s += `<circle cx="${(cx + L).toFixed(1)}" cy="${top - 8}" r="16" fill="${YOU}"/><circle cx="${cx}" cy="${top}" r="9" fill="#fff"/>`;
+      s += tx(cx, top - 40, 26, 's', 'CENTRAL PARK', 'middle');
+      s += tx(430, 480, 42, 'b', 'YOUR STEPS ARE <tspan fill="' + AMB + '">STRAIGHT</tspan>');
+      s += `<g opacity="${K(u, 1.6, 2.4).toFixed(2)}">${tx(1490, 980, 38, 'b', 'THE EARTH <tspan fill="#7fbf6a">ISN\'T</tspan>', 'end')}</g>`;
+      return s;
+    },
     // the air piling up in front of you, and heating
     squeeze: (u) => {
       let s = plate(1180, 160, 640, 600);
@@ -242,6 +256,7 @@ class TwHud {
     const Ls = set && set.labels ? set.labels(t, shot) || [] : [];
     while (this.labels.length < Ls.length) { const d = document.createElement('div'); d.className = 'tw-lab'; this.root.appendChild(d); this.labels.push(d); }
     const cam = set ? set.camera : null, _p = TwHud._p || (TwHud._p = new THREE.Vector3());
+    const placed = [];   // (the boxes already placed this frame, in %: a later label that would overlap one moves down)
     this.labels.forEach((d, i) => {
       const l = Ls[i];
       if (!l || !cam || !(l.a > 0.01)) { d.style.opacity = '0'; return; }
@@ -251,11 +266,16 @@ class TwHud {
       const vis = _p.z < 1 && _p.z > -1 && Math.abs(_p.x) < 1.05 && Math.abs(_p.y) < 1.05;
       const lx = MathX.clamp((_p.x * 0.5 + 0.5) * 100, 2, 98), ly = (-_p.y * 0.5 + 0.5) * 100;
       const base = 'tw-lab' + (l.you ? ' you' : '');
-      if (d._tx !== tx) { d._tx = tx; d.className = base; d.innerHTML = '<span class="d"></span>' + tx; d._w = d.offsetWidth; }
+      if (d._tx !== tx) { d._tx = tx; d.className = base; d.innerHTML = '<span class="d"></span>' + tx; d._w = d.offsetWidth; d._hh = d.offsetHeight; }
       let right = l.side ? l.side === 'r' : lx > 60;
       const wPct = this.root.clientWidth ? 100 * (d._w || 0) / this.root.clientWidth : 0;
       if (right && lx - wPct < 1.5) right = false; else if (!right && lx + wPct > 98.5) right = true;
-      const ty = MathX.clamp(ly, 30, 88);
+      let ty = MathX.clamp(ly, 30, 88);
+      if (vis) {
+        const hPct = this.root.clientHeight ? 100 * (d._hh || 0) / this.root.clientHeight : 0, x0 = right ? lx - wPct : lx, x1 = right ? lx : lx + wPct;
+        for (let k = 0; k < 6; k++) { const hit = placed.find((r) => x0 < r[1] && x1 > r[0] && ty - hPct / 2 < r[3] && ty + hPct / 2 > r[2]); if (!hit) break; ty = hit[3] + hPct / 2 + 0.8; }
+        placed.push([x0, x1, ty - hPct / 2, ty + hPct / 2]);
+      }
       d.style.left = lx.toFixed(2) + '%'; d.style.top = ty.toFixed(2) + '%';
       d.style.opacity = String(vis ? MathX.clamp(l.a, 0, 1) : 0);
       const hh = right ? tx + '<span class="d"></span>' : '<span class="d"></span>' + tx, cl = base + (right ? ' r' : '');

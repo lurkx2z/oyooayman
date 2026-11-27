@@ -81,12 +81,13 @@ const TW_SHOTS = [];
     ['U4', 'nyc', 'missed', w('passed', 'and'), T(15)],
     // ---- step fifteen: away
     ['V1', 'nyc', 'leap15', T(15), w('fifteen', "that's")],
-    ['V2', 'sky', 'escape', w('fifteen', "that's"), W('curve', 0)],
-    ['V3', 'sky', 'curve', W('curve', 0), w('curve', "you're")],
-    ['V4', 'sky', 'never', w('curve', "you're"), T(16)],
+    ['V2', 'nyc', 'escape', w('fifteen', "that's"), W('curve', 0)],
+    ['V3', 'nyc', 'curve', W('curve', 0), w('curve', "you're")],
+    ['V4', 'nyc', 'never', w('curve', "you're"), T(16)],
     ['W1', 'sky', 'meteor', T(16), w('meteor', 'low')],
     ['W2', 'sky', 'england', w('meteor', 'low'), W('boston', 0)],
-    ['W3', 'sky', 'boston', W('boston', 0), T(20, 1.1)],
+    ['W3', 'bos', 'boston', W('boston', 0), w('boston', 'bang', 0, 0.35)],
+    ['W5', 'bos', 'bosSky', w('boston', 'bang', 0, 0.35), T(20, 1.1)],
     ['W4', 'sky', 'climb', T(20, 1.1), W('space', 0)],
     // ---- space: Earth orbit to the Moon
     ['X1', 'space', 'space', W('space', 0), W('push', 0)],

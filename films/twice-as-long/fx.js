@@ -145,7 +145,8 @@ function twGlow(scene) {
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
     uniforms: { k: { value: 0 }, dir: { value: new THREE.Vector3(0, 0, 1) }, col: { value: new THREE.Color('#ffb05a') } },
     vertexShader: 'varying vec3 vN; varying vec3 vV; varying vec3 vP; void main(){ vN = normalize((modelMatrix * vec4(normal, 0.0)).xyz); vP = normal; vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(cameraPosition - (modelMatrix * vec4(position, 1.0)).xyz); gl_Position = projectionMatrix * mv; }',
-    fragmentShader: 'uniform float k; uniform vec3 dir, col; varying vec3 vN; varying vec3 vV; varying vec3 vP; void main(){ float front = smoothstep(-0.3, 1.0, dot(normalize(vN), normalize(dir))); float rim = pow(1.0 - abs(dot(normalize(vN), vV)), 1.3); float a = k * (0.35 + 1.2 * front) * (0.4 + rim); gl_FragColor = vec4(col * a, 1.0); }',
+    // (brightest on the front, where the air is squeezed; a soft edge, so it never reads as a hard egg outline)
+    fragmentShader: 'uniform float k; uniform vec3 dir, col; varying vec3 vN; varying vec3 vV; varying vec3 vP; void main(){ vec3 N = normalize(vN); float front = smoothstep(-0.4, 1.0, dot(N, normalize(dir))); float nv = abs(dot(N, normalize(vV))), f = 1.0 - nv; float halo = pow(f, 1.6) * (1.0 - smoothstep(0.68, 1.0, f)) + 0.22 * nv; float a = k * (0.12 + 1.5 * front * front) * halo; gl_FragColor = vec4(col * a, 1.0); }',
   });
   const shell = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 20), m); shell.renderOrder = 8; shell.visible = false; scene.add(shell);
   return {

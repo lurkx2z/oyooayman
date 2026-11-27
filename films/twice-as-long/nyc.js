@@ -83,6 +83,7 @@ function twRouteAt(t) {
   const H = { 1: 0.05, 2: 0.25, 3: 0.55, 4: 1.1, 5: 5.5, 6: 2.2, 7: 4.5, 8: 8, 9: 16, 10: 26, 11: 60, 12: 110, 13: 220, 14: 420 }[n] || 0;
   const air = n === 15 ? 0 : H * 4 * u * (1 - u);
   p[1] += air;
+  if (n === 15) p[1] += f * twL(15) * Math.tan(2 * Math.PI / 180);   // (from step fifteen on, a straight line 2° up: sky.js)
   const yaw = Math.atan2(b[0] - a[0], b[2] - a[2]);
   return { p, yaw, n, u, air };
 }

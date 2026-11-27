@@ -40,7 +40,7 @@ const TW_YOU_MODE = {
   promenade: ['worry'], leap10: ['determined'], esb: ['determined'], cone: ['surprise'], boomWide: ['surprise'], glass: ['shock'], boomStreet: ['shock'], windows: ['shock'],
   leap11: ['determined'], mach2: ['shock'], bridge: ['determined'], bridgeSide: ['determined'], squeeze: ['worry'], hot: ['determined'],
   leap13: ['scream'], mach9: ['scream'], glowing: ['awe'], impact: ['shock'], crater: ['shock'], trail: ['sad'], leap14: ['determined'], office: ['determined'],
-  park: ['sad'], missed: ['sad'], leap15: ['determined'],
+  park: ['sad'], missed: ['sad'], leap15: ['determined'], escape: ['scream'], curve: ['awe'], never: ['awe'],
 };
 // which way you face while standing (film time → world yaw; 0 = south, ±π = north)
 const TW_STAND_YAW = (() => {
@@ -242,6 +242,9 @@ TW_SETS.nyc = (app) => {
     park: (t, u) => { const A = P(14); return { p: [A[0] + 2.4, 1.85, A[2] - 4.2], at: [A[0] - 260, 90, A[2] + 1600], fov: 46, shR: 40, shC: A }; },
     missed: (t, u) => ({ p: [2100, 950, -5500], at: [2700, 0, -9000], fov: 48, near: 5, shR: 0, fog: 0.25 }),
     leap15: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] - d[0] * 7 - d[1] * 4, R.p[1] - 2.2, R.p[2] - d[1] * 7 + d[0] * 4], at: [R.p[0], R.p[1] + 0.9, R.p[2]], fov: 50, near: 0.3, shR: 30, shC: R.p, fog: 0.5 }; },
+    escape: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] - d[0] * 9 + d[1] * 2.5, R.p[1] - 2.4, R.p[2] - d[1] * 9 - d[0] * 2.5], at: [R.p[0] + d[0] * 30, R.p[1] + 4, R.p[2] + d[1] * 30], fov: 52, near: 0.3, shR: 0, fog: 0.5 }; },
+    curve: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] + d[1] * 5.5 - d[0] * 2, R.p[1] + 1.2, R.p[2] - d[0] * 5.5 - d[1] * 2], at: [R.p[0] + d[0] * 2, R.p[1] - 1.5, R.p[2] + d[1] * 2], fov: 48, near: 0.3, shR: 0, fog: 0.5 }; },
+    never: (t, u) => { const R = twRouteAt(t), d = dirOf(15); return { p: [R.p[0] + d[0] * 4.2 - d[1] * 1.8, R.p[1] + 2.3, R.p[2] + d[1] * 4.2 + d[0] * 1.8], at: [R.p[0], R.p[1] + 0.9, R.p[2]], fov: 46, near: 0.2, shR: 0, fog: 0.5 }; },
     // the visits home
     evening: (t, u) => ({ p: [-21 + 0.6 * u, 1.7, 5.6], at: [4, 3.2, -8.2], fov: 46, shR: 50, shC: [-5, 0, 0] }),
     poster: (t, u) => { const k = MathX.smooth(u, 0, 4.5); return { p: twV([-1.6, 1.62, 1.6], [-0.58, 1.66, 2.55], k), at: [TW_ST.busStop[0], 1.62, TW_ST.busStop[1]], fov: 40, shR: 30, shC: [0, 0, 0] }; },
@@ -301,7 +304,7 @@ TW_SETS.nyc = (app) => {
       U.uPathK.value.set(pd, 75, tt > TW_T[13] ? 1 : 0);
       for (const g of st.yours.glass) { const br = tt >= B(g.x, -TW_ST.face); g.p.visible = !br; g.pb.visible = br && lk !== 'snow'; if (lk === 'snow') g.p.visible = true; }
       // ---- you (in New York until step fifteen takes you away; not here on the visits home)
-      const showYou = !away && t < TW_T[15] + 6;
+      const showYou = !away && t < TW_T[16] + 0.5;
       you.visible(showYou);
       if (showYou) twPoseYou(you, t, shot, cam);
       // the portrait for the posters (once, from you on your stoop)
@@ -356,9 +359,13 @@ TW_SETS.nyc = (app) => {
         for (const ev of GLASS) if (t > ev.t && t < ev.t + 6 && near(ev.p, 260)) twBurst(soft, adds, t, ev);
         // the fiery trail behind you (from step twelve) and the hot air in front (the glow)
         const s = twStepAt(t);
-        if (s.n >= 12 && s.n <= 15) for (let j = 0; j < 90; j++) {
-          const te = t - j * 0.045, sj = twStepAt(te); if (sj.n < 12 || !sj.on) continue;
-          const Rj = twRouteAt(te), age = t - te, heat = Math.exp(-age / 0.9) * (sj.n === 12 ? 0.35 : 1);
+        // (sampled by distance, not time: puffs overlap into one trail however fast you go)
+        if (s.n >= 12 && s.n <= 15) for (let j = 0, te = t; j < 600 && t - te < 3.2; j++) {
+          const sj = twStepAt(te), Rj = twRouteAt(te), age = t - te, Rb = twRouteAt(te - 0.01);
+          const v = Math.max(1, Math.hypot(Rj.p[0] - Rb.p[0], Rj.p[1] - Rb.p[1], Rj.p[2] - Rb.p[2]) / 0.01);
+          te -= MathX.clamp(0.35 * (1.4 + age * 2.4) / v, 0.002, 0.08);
+          if (sj.n < 12 || !sj.on) continue;
+          const heat = Math.exp(-age / 0.9) * (sj.n === 12 ? 0.35 : 1);
           adds.add(Rj.p[0], Rj.p[1] + 1.0 + age * 1.2, Rj.p[2], 1.4 + age * 2.4, 0.75 * heat, 1.0, 0.55, 0.2);
           soft.add(Rj.p[0], Rj.p[1] + 1.4 + age * 2.0, Rj.p[2], 2.0 + age * 3.4, 0.45 * Math.exp(-age / 3) * MathX.smooth(age, 0.3, 1.0), 0.32, 0.3, 0.3);
         }
@@ -371,7 +378,7 @@ TW_SETS.nyc = (app) => {
       {
         const s = twStepAt(t), R = twRouteAt(t), dv = s.n >= 1 && s.n <= 15 ? (() => { const a = TW_ROUTE[Math.min(s.n, 15) - 1], b = TW_ROUTE[Math.min(s.n, 15)]; return twN3([b[0] - a[0], 0, b[2] - a[2]]); })() : [0, 0, 1];
         const gk = away ? 0 : s.n === 12 && s.on ? 0.25 * MathX.smooth(s.u, 0.2, 0.5) : (s.n >= 13 && s.n <= 15 && (s.on || s.n === 15)) ? 0.9 : 0;
-        glow.set([R.p[0] + dv[0] * 0.6, R.p[1] + 1.0, R.p[2] + dv[2] * 0.6], dv, gk, 1.9, '#ffa45a');
+        glow.set([R.p[0] + dv[0] * 0.6, R.p[1] + 1.0, R.p[2] + dv[2] * 0.6], dv, mode === 'never' || mode === 'curve' ? gk * 0.45 : gk, 1.9, '#ffa45a');
         const ck = away ? 0 : s.n === 10 && s.on ? MathX.smooth(s.u, 0.22, 0.35) * (1 - MathX.smooth(s.u, 0.9, 0.98)) : s.n === 11 && s.on ? 0.55 * MathX.smooth(s.u, 0.1, 0.3) * (1 - MathX.smooth(s.u, 0.8, 0.95)) : 0;
         shock.setCone([R.p[0] + dv[0] * 0.3, R.p[1] + 1.0, R.p[2] + dv[2] * 0.3], [-dv[0], 0, -dv[2]], ck, s.n === 11 ? 1.3 : 1.0);
         const rb = 343 * (t - TW_BOOM.t);
