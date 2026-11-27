@@ -1,69 +1,69 @@
 {
  "id": "43-problem",
  "text": "Now you have a problem.",
- "seconds": 1.67,
+ "seconds": 1.75,
  "source": "forced-alignment",
  "words": [
   {
    "text": "Now",
-   "start": 0.1,
-   "end": 0.3
+   "start": 0.14,
+   "end": 0.32
   },
   {
    "text": "you",
-   "start": 0.34,
-   "end": 0.42
+   "start": 0.38,
+   "end": 0.46
   },
   {
    "text": "have",
-   "start": 0.48,
-   "end": 0.6
+   "start": 0.5,
+   "end": 0.62
   },
   {
    "text": "a",
-   "start": 0.64,
+   "start": 0.66,
    "end": 0.7
   },
   {
    "text": "problem.",
-   "start": 0.76,
-   "end": 1.22
+   "start": 0.78,
+   "end": 1.28
   }
  ],
  "characters": [
   {
    "text": "N",
    "start": 0,
-   "end": 0.08
+   "end": 0.107
   },
   {
    "text": "o",
-   "start": 0.08,
-   "end": 0.16
+   "start": 0.107,
+   "end": 0.213
   },
   {
    "text": "w",
-   "start": 0.16,
-   "end": 0.24
-  },
-  {
-   "text": " ",
-   "start": 0.24,
+   "start": 0.213,
    "end": 0.32
   },
   {
-   "text": "y",
+   "text": " ",
    "start": 0.32,
-   "end": 0.347
+   "end": 0.36
   },
   {
-   "text": "o",
-   "start": 0.347,
+   "text": "y",
+   "start": 0.36,
    "end": 0.373
   },
   {
-   "text": "u",
+   "text": "o",
    "start": 0.373,
+   "end": 0.387
+  },
+  {
+   "text": "u",
+   "start": 0.387,
    "end": 0.4
   },
   {
@@ -94,68 +94,68 @@
   {
    "text": " ",
    "start": 0.56,
-   "end": 0.6
-  },
-  {
-   "text": "a",
-   "start": 0.6,
-   "end": 0.64
-  },
-  {
-   "text": " ",
-   "start": 0.64,
    "end": 0.72
   },
   {
-   "text": "p",
+   "text": "a",
    "start": 0.72,
-   "end": 0.789
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.36
+  },
+  {
+   "text": "p",
+   "start": 1.36,
+   "end": 1.406
   },
   {
    "text": "r",
-   "start": 0.789,
-   "end": 0.857
+   "start": 1.406,
+   "end": 1.451
   },
   {
    "text": "o",
-   "start": 0.857,
-   "end": 0.926
+   "start": 1.451,
+   "end": 1.497
   },
   {
    "text": "b",
-   "start": 0.926,
-   "end": 0.994
+   "start": 1.497,
+   "end": 1.543
   },
   {
    "text": "l",
-   "start": 0.994,
-   "end": 1.063
+   "start": 1.543,
+   "end": 1.589
   },
   {
    "text": "e",
-   "start": 1.063,
-   "end": 1.131
+   "start": 1.589,
+   "end": 1.634
   },
   {
    "text": "m",
-   "start": 1.131,
-   "end": 1.2
+   "start": 1.634,
+   "end": 1.68
   },
   {
    "text": ".",
-   "start": 1.2,
-   "end": 1.6
+   "start": 1.68,
+   "end": 1.76
   }
  ],
  "tts_words": [
   {
    "text": "Now",
    "start": 0,
-   "end": 0.24
+   "end": 0.32
   },
   {
    "text": "you",
-   "start": 0.32,
+   "start": 0.36,
    "end": 0.4
   },
   {
@@ -165,130 +165,130 @@
   },
   {
    "text": "a",
-   "start": 0.6,
-   "end": 0.64
+   "start": 0.72,
+   "end": 1.04
   },
   {
    "text": "problem.",
-   "start": 0.72,
-   "end": 1.6
+   "start": 1.36,
+   "end": 1.76
   }
  ],
  "characters_forced": [
   {
    "text": "N",
-   "start": 0.1,
-   "end": 0.16
-  },
-  {
-   "text": "o",
-   "start": 0.16,
+   "start": 0.14,
    "end": 0.2
   },
   {
-   "text": "w",
+   "text": "o",
    "start": 0.2,
-   "end": 0.3
+   "end": 0.22
+  },
+  {
+   "text": "w",
+   "start": 0.22,
+   "end": 0.32
   },
   {
    "text": " ",
-   "start": 0.3,
-   "end": 0.34
-  },
-  {
-   "text": "y",
-   "start": 0.34,
-   "end": 0.36
-  },
-  {
-   "text": "o",
-   "start": 0.36,
+   "start": 0.32,
    "end": 0.38
   },
   {
-   "text": "u",
+   "text": "y",
    "start": 0.38,
-   "end": 0.42
+   "end": 0.4
+  },
+  {
+   "text": "o",
+   "start": 0.4,
+   "end": 0.4
+  },
+  {
+   "text": "u",
+   "start": 0.4,
+   "end": 0.46
   },
   {
    "text": " ",
-   "start": 0.42,
-   "end": 0.48
+   "start": 0.46,
+   "end": 0.5
   },
   {
    "text": "h",
-   "start": 0.48,
+   "start": 0.5,
    "end": 0.52
   },
   {
    "text": "a",
    "start": 0.52,
-   "end": 0.54
+   "end": 0.56
   },
   {
    "text": "v",
-   "start": 0.54,
+   "start": 0.56,
    "end": 0.58
   },
   {
    "text": "e",
    "start": 0.58,
-   "end": 0.6
+   "end": 0.62
   },
   {
    "text": " ",
-   "start": 0.6,
-   "end": 0.64
+   "start": 0.62,
+   "end": 0.66
   },
   {
    "text": "a",
-   "start": 0.64,
+   "start": 0.66,
    "end": 0.7
   },
   {
    "text": " ",
    "start": 0.7,
-   "end": 0.76
+   "end": 0.78
   },
   {
    "text": "p",
-   "start": 0.76,
-   "end": 0.82
+   "start": 0.78,
+   "end": 0.84
   },
   {
    "text": "r",
-   "start": 0.82,
-   "end": 0.9
+   "start": 0.84,
+   "end": 0.92
   },
   {
    "text": "o",
-   "start": 0.9,
-   "end": 0.94
+   "start": 0.92,
+   "end": 0.96
   },
   {
    "text": "b",
-   "start": 1,
-   "end": 1.04
-  },
-  {
-   "text": "l",
-   "start": 1.04,
+   "start": 0.96,
    "end": 1.06
   },
   {
-   "text": "e",
+   "text": "l",
    "start": 1.06,
    "end": 1.1
   },
   {
-   "text": "m",
+   "text": "e",
    "start": 1.1,
-   "end": 1.22
+   "end": 1.14
+  },
+  {
+   "text": "m",
+   "start": 1.14,
+   "end": 1.28
   },
   {
    "text": ".",
-   "start": 1.22,
-   "end": 1.22
+   "start": 1.28,
+   "end": 1.28
   }
  ]
 }
