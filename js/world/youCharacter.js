@@ -106,7 +106,7 @@ class YouCharacter {
     const name = 'you' + (o.id || '');
     LOOKS[name] = Object.assign({}, YOU_LOOK, o.look || {});
     const P = new Person({ id: name, look: name }, null);
-    this.person = P; this.root = P.root; this.j = P.j; this.look = P.look;
+    this.person = P; this.root = P.root; this.j = P.j; this.style = P.look;   // (the look data; look() aims the eyes)
     P.j.body.scale.setScalar(o.scale || 1.0);                             // (no random height: the same you in every film)
     YouCharacter._noZ(P);
     // a bigger head reads from further away (the channel's "you" is a little stylised)
