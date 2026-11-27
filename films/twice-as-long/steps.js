@@ -47,7 +47,7 @@ const TW_ANCHOR = {
   75: () => twW('andromeda') + 0.05, 80: () => twW('dust') + 0.05, 84: () => twW('web') + 0.05, 86: () => twW('sundies') + 0.05,
   90: () => twW('ninety') + 0.05,
 };
-const TW_T = [], TW_D = [];
+const TW_T = [], TW_D = [], TW_STRIDE = 3.2;
 {
   const a = Object.keys(TW_ANCHOR).map(Number).sort((x, y) => x - y);
   for (const n of a) TW_T[n] = TW_ANCHOR[n]();
@@ -55,8 +55,9 @@ const TW_T = [], TW_D = [];
   TW_T[91] = TW.end + 30;                         // (never taken)
   // on screen: the ground steps last one second, a few slowed down; in space a stride runs into the next one
   const slow = { 1: 0.9, 2: 1.0, 3: 1.0, 4: 1.1, 5: 2.6, 6: 3.9, 7: 2.2, 8: 2.6, 9: 3.2, 10: 6.6, 11: 1.6, 12: 5.0, 13: 6.2, 14: 3.2 };
-  for (let n = 1; n <= 90; n++) TW_D[n] = slow[n] || (TW_T[n + 1] - TW_T[n]);
-  TW_D[90] = 99;
+  // in space (from step 21) a stride lasts at most TW_STRIDE film seconds: when the narration holds a step for
+  // longer, you take it and then wait (the story pauses with you)
+  for (let n = 1; n <= 90; n++) TW_D[n] = slow[n] || (n >= 21 ? Math.min(TW_STRIDE, TW_T[n + 1] - TW_T[n]) : TW_T[n + 1] - TW_T[n]);
   for (let n = 2; n <= 90; n++) if (!(TW_T[n] > TW_T[n - 1] + 0.3)) throw new Error(`steps.js: step ${n} at ${TW_T[n].toFixed(2)} is not after step ${n - 1} (${TW_T[n - 1].toFixed(2)})`);
   for (let n = 1; n <= 14; n++) if (!(TW_T[n] + TW_D[n] <= TW_T[n + 1] + 1e-6)) throw new Error(`steps.js: step ${n} has not landed before step ${n + 1}`);
 }
@@ -72,8 +73,8 @@ function twStepAt(t) {
 function twDist(t) {
   const s = twStepAt(t);
   if (s.n === 0) return 0;
-  const n = s.n, ground = n <= 14;
-  const f = ground ? Ease.inOutSine(s.u) : s.u;
+  const n = s.n, ground = n <= 14, held = n >= 21 && TW_D[n] < TW_T[n + 1] - TW_T[n] - 1e-6;
+  const f = ground || held ? Ease.inOutSine(s.u) : s.u;
   return twSum(n - 1) + twL(n) * f;
 }
 // THE STREET'S CLOCK (story seconds): a slowed stride plays 1 s of the world over D film seconds (slow motion: the
@@ -85,6 +86,12 @@ function twStory(t) {
 }
 // the story time a film time maps to, inverted (for events placed in story time): film time of story second s
 function twFilmOf(s) { let lo = -5, hi = TW_T[15] + 5; for (let i = 0; i < 50; i++) { const m = (lo + hi) / 2; if (twStory(m) < s) lo = m; else hi = m; } return (lo + hi) / 2; }
+// how fast you're going at film time t, as a fraction of light (0 while you wait between held strides)
+function twBetaAt(t) {
+  const s = twStepAt(t); if (s.n < 15) return 0;
+  const held = s.n >= 21 && TW_D[s.n] < TW_T[s.n + 1] - TW_T[s.n] - 1e-6;
+  return held ? twBeta(s.n) * Math.pow(Math.sin(Math.PI * s.u), 0.6) * (s.u < 1 ? 1 : 0) : twBeta(s.n);
+}
 // the counter's number (the step you're taking or have just taken)
 const twCounter = (t) => twStepAt(t).n;
 

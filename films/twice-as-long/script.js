@@ -28,10 +28,10 @@ const TW_CHECKS = (() => {
   near('step 24 ≈ the Earth\'s radius (6,371 km)', km(24), 6291, 120);
   near('step 25 ≈ the Earth\'s diameter (12,742 km)', km(25), 12583, 200);
   near('step 27: 50,000 km/s', km(27), 50332, 400);
-  near('step 29: two thirds of light', twL(29) / TW_C, 0.672, 0.01);
+  near('step 29: more than half the speed of light (one second of your time over 402,653 km… 201,327 km)', twBeta(29), 0.558, 0.01);
   near('you pass the Moon (384,400 km) during step 29', twSum(28) < 384.4e6 && twSum(29) > 384.4e6 ? 1 : 0, 1, 0);
   near('step 30 is longer than the trip to the Moon', twL(30) > 384.4e6 ? 1 : 0, 1, 0);
-  near('on Earth, step 30 takes 1.3 s', twStepEarthS(30), 1.343, 0.01);
+  near('on Earth, step 30 takes 1.7 s', twStepEarthS(30), 1.674, 0.03);
   near('step 37 ≈ Mars at its closest (54.6 million km)', km(37) / 1e6, 51.5, 4);
   near('on Earth, step 37 takes 3 minutes', twStepEarthS(37) / 60, 2.86, 0.3);
   near('step 39 is longer than the Earth–Sun trip (149.6 million km)', km(39) > 149.6e6 ? 1 : 0, 1, 0);
