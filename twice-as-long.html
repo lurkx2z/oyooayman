@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What If Every Step You Took Was Twice as Long?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* this film's HUD (page-level only). 16:9 (1920×1080): --u = one design pixel of a 1920-wide frame (set by film.js).
+       The new recipe's minimal text: one big step counter, one status word, labels on things. Bold sans, no serif. */
+    #hud::before { display: none; }
+    .tw-count { position: absolute; left: calc(var(--u) * 56); top: calc(var(--u) * 40); pointer-events: none; transform-origin: 0 30%;
+      text-shadow: 0 0 calc(var(--u) * 26) rgba(0, 0, 0, 0.55), 0 calc(var(--u) * 4) calc(var(--u) * 14) rgba(0, 0, 0, 0.6); }
+    .tw-count .l { font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 40); letter-spacing: 0.22em; color: #ffffff; opacity: 0.95; }
+    .tw-count .v { font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 168); line-height: 0.9; letter-spacing: -0.03em; color: #ffffff;
+      font-variant-numeric: tabular-nums; margin-top: calc(var(--u) * -2); }
+    .tw-count.tick .v { color: #ffe04a; }
+    .tw-stat { position: absolute; left: calc(var(--u) * 56); top: calc(var(--u) * 252); pointer-events: none; white-space: nowrap;
+      font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 46); letter-spacing: 0.08em; color: #fff;
+      padding: calc(var(--u) * 8) calc(var(--u) * 22) calc(var(--u) * 10); border-radius: calc(var(--u) * 12); background: rgba(8, 10, 14, 0.62); }
+    .tw-stat.hot { background: #e8322a; color: #fff; }
+    .tw-stat.cold { background: rgba(10, 30, 60, 0.75); color: #9fe4ff; }
+    .tw-stat.time { background: #ffc531; color: #1a1406; }
+    .tw-stat:empty { display: none; }
+    /* labels pinned to things: a ring on the thing, a bold caps name on a plate, a small amber line under it */
+    .tw-lab { position: absolute; transform: translate(calc(var(--u) * -20), -50%); pointer-events: none; white-space: nowrap; }
+    .tw-lab .t { display: inline-block; vertical-align: middle; padding: calc(var(--u) * 8) calc(var(--u) * 18) calc(var(--u) * 9); border-radius: calc(var(--u) * 10);
+      background: rgba(6, 8, 12, 0.7); font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 38); letter-spacing: 0.06em; color: #fff; line-height: 1.05; }
+    .tw-lab small { display: block; font-weight: 700; font-size: 0.68em; letter-spacing: 0.08em; color: #ffd36a; margin-top: calc(var(--u) * 3); }
+    .tw-lab .d { display: inline-block; vertical-align: middle; width: calc(var(--u) * 34); height: calc(var(--u) * 34); border-radius: 50%; margin-right: calc(var(--u) * 10);
+      box-shadow: 0 0 0 calc(var(--u) * 4) #ffd36a, 0 0 calc(var(--u) * 12) rgba(0, 0, 0, 0.6); }
+    .tw-lab.r { transform: translate(calc(-100% + var(--u) * 20), -50%); text-align: right; }
+    .tw-lab.r .d { margin-right: 0; margin-left: calc(var(--u) * 10); }
+    .tw-lab.you .t { background: #ff6a1f; }
+    .tw-lab.you .d { box-shadow: 0 0 0 calc(var(--u) * 4) #ff6a1f, 0 0 calc(var(--u) * 12) rgba(0, 0, 0, 0.6); }
+    /* the honest tag (bottom left, small) */
+    .tw-tag { position: absolute; left: calc(var(--u) * 56); bottom: calc(var(--u) * 36); white-space: nowrap; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 27); letter-spacing: 0.1em;
+      color: #f0ece4; padding: calc(var(--u) * 7) calc(var(--u) * 16); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.6); pointer-events: none; }
+    /* diagrams (SVG, drawn per frame) */
+    .tw-dia { position: absolute; inset: 0; pointer-events: none; }
+    .tw-dia svg { width: 100%; height: 100%; display: block; }
+    .tw-dia .b { font-family: var(--hud-font); font-weight: 800; fill: #fff; letter-spacing: 0.04em; }
+    .tw-dia .s { font-family: var(--hud-font); font-weight: 700; fill: #ffd36a; letter-spacing: 0.06em; }
+    /* the cold open's flash-forward card */
+    .tw-flash { position: absolute; inset: 0; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="hud"></div>
+    </div>
+  </div>
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What If Every Step You Took Was Twice as Long?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">TAKING THE FIRST STEP…</div>
+  <div id="errorBox"></div>
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine (unchanged; this film only configures and extends it from its own folder) -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script>installFog({ bankScale: 0.012, bankAmount: 0.0, lowHeight: 6, lowAmount: 0.0, cap: 0.9 });</script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/world/earth.js"></script>
+  <script src="js/world/heroes.js"></script>
+  <script src="js/world/youCharacter.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (plan: films/twice-as-long/PLAN.md; narration: films/twice-as-long/NARRATION.md) -->
+  <script src="films/twice-as-long/narration-timing.js"></script>
+  <script src="films/twice-as-long/narration-audio.js"></script>
+  <script src="films/twice-as-long/steps.js"></script>
+  <script src="films/twice-as-long/kit.js"></script>
+  <script src="films/twice-as-long/film.js"></script>
+  <script src="films/twice-as-long/cast.js"></script>
+  <script src="films/twice-as-long/fx.js"></script>
+  <script src="films/twice-as-long/nyc.js"></script>
+  <script src="films/twice-as-long/street.js"></script>
+  <script src="films/twice-as-long/sky.js"></script>
+  <script src="films/twice-as-long/space.js"></script>
+  <script src="films/twice-as-long/deep.js"></script>
+  <script src="films/twice-as-long/shots.js"></script>
+  <script src="films/twice-as-long/script.js"></script>
+  <script src="films/twice-as-long/hud.js"></script>
+  <script src="films/twice-as-long/audiokit.js"></script>
+  <script src="films/twice-as-long/mix.js"></script>
+  <script src="films/twice-as-long/audio.js"></script>
+  <script src="films/twice-as-long/sound-lib.js"></script>
+  <script src="films/twice-as-long/sound-music.js"></script>
+  <script src="films/twice-as-long/sound-amb.js"></script>
+  <script src="films/twice-as-long/sound-sfx.js"></script>
+  <script src="films/twice-as-long/soundtrack.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
