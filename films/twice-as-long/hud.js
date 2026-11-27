@@ -256,7 +256,7 @@ class TwHud {
     const Ls = set && set.labels ? set.labels(t, shot) || [] : [];
     while (this.labels.length < Ls.length) { const d = document.createElement('div'); d.className = 'tw-lab'; this.root.appendChild(d); this.labels.push(d); }
     const cam = set ? set.camera : null, _p = TwHud._p || (TwHud._p = new THREE.Vector3());
-    const placed = [];   // (the boxes already placed this frame, in %: a later label that would overlap one moves down)
+    const placed = [[0, 38, 0, 35]];   // (the boxes already placed this frame, in %, starting with the step counter: a later label that would overlap one moves down)
     this.labels.forEach((d, i) => {
       const l = Ls[i];
       if (!l || !cam || !(l.a > 0.01)) { d.style.opacity = '0'; return; }
