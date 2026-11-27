@@ -24,8 +24,12 @@ function twPerson(look, parent, id) {
   const P = new Person({ id: 'tw' + look + id, look }, null);
   YouCharacter._noZ(P);
   parent.add(P.root);
+  // a phone in the right hand (shown while filming or reading)
+  const ph = new THREE.Mesh(TW_PHONE_G || (TW_PHONE_G = new THREE.BoxGeometry(0.072, 0.15, 0.009)), TW_PHONE_M || (TW_PHONE_M = new THREE.MeshStandardMaterial({ color: '#16181b', roughness: 0.3, metalness: 0.3, emissive: '#2a3a4a', emissiveIntensity: 0.25 })));
+  ph.position.set(0, -0.075, 0.04); ph.rotation.x = -0.3; ph.visible = false; P.j.ra.hand.add(ph); P._phone = ph;
   return P;
 }
+let TW_PHONE_G = null, TW_PHONE_M = null;
 
 // poses (u: seconds)
 const TW_P = {
@@ -42,6 +46,12 @@ const TW_P = {
   run: (u, i) => { const ph = u * 9 + i * 2, s = Math.sin(ph), co = Math.cos(ph), p = basePose();
     p.lHip = [0.6 * s, 0.03]; p.rHip = [-0.6 * s, 0.03]; p.lKnee = 0.25 + Math.max(0, co) ** 1.3; p.rKnee = 0.25 + Math.max(0, -co) ** 1.3;
     p.lSh = [-0.6 * s, 0.1]; p.rSh = [0.6 * s, 0.1]; p.lEl = 1.3; p.rEl = 1.3; p.spine = 0.18; p.hipY = 0.9 + 0.03 * Math.abs(co); return p; },
+  sit: (u, i) => { const p = basePose(); p.hipY = 0.5; p.lHip = [1.45, 0.08]; p.rHip = [1.45, 0.08]; p.lKnee = 1.5; p.rKnee = 1.5; p.lFoot = 0.05; p.rFoot = 0.05; p.spine = 0.05; p.lSh = [0.4, 0.12]; p.rSh = [0.4, 0.12]; p.lEl = 1.0; p.rEl = 1.0; p.headYaw = 0.2 * noise1(u * 0.3, i); return p; },
+  sitStare: (u, i, yaw) => { const p = TW_P.sit(u, i); p.headYaw = yaw || 0; p.spineYaw = (yaw || 0) * 0.3; p.neck = -0.12; return p; },
+  sitFilm: (u, i) => { const p = TW_P.sit(u, i); const f = TW_P.film(u, i); p.rSh = f.rSh; p.rEl = f.rEl; p.lSh = f.lSh; p.lEl = f.lEl; p.neck = f.neck; return p; },
+  walk: (u, i) => { const ph = u * 5.6 + i * 1.7, s = Math.sin(ph), co = Math.cos(ph), p = basePose();
+    p.lHip = [0.42 * s, 0.03]; p.rHip = [-0.42 * s, 0.03]; p.lKnee = 0.08 + 0.65 * Math.max(0, co) ** 1.5; p.rKnee = 0.08 + 0.65 * Math.max(0, -co) ** 1.5;
+    p.lFoot = -0.2 * Math.max(0, co); p.rFoot = -0.2 * Math.max(0, -co); p.lSh = [-0.34 * s, 0.07]; p.rSh = [0.34 * s, 0.07]; p.lEl = 0.3; p.rEl = 0.3; p.hipY = 0.93 - 0.032 * s * s; p.spine = 0.05; return p; },
   fallen: () => { const p = basePose(); p.hipY = 0.25; p.lHip = [1.5, 0.2]; p.rHip = [1.4, 0.25]; p.lKnee = 1.9; p.rKnee = 1.6; p.spine = 0.3; p.lSh = [0.6, 0.6]; p.rSh = [1.4, 0.3]; p.lEl = 0.5; p.rEl = 0.4; return p; },
 };
 
@@ -50,15 +60,19 @@ function twCrowd(scene, spec) {
   const people = spec.map((s, i) => ({ P: twPerson(s.look, scene, i), s, i }));
   return {
     people,
-    frame(t) {
+    frame(t, cam) {
       for (const { P, s, i } of people) {
+        if (cam && Math.hypot(cam.position.x - s.x, cam.position.z - s.z) > (s.range || 220)) { P.root.visible = false; continue; }
         let k = 0; for (let j = 0; j < s.script.length; j++) if (s.script[j][0] <= t) k = j;
         const [t0, name, arg] = s.script[k], u = t - t0;
         const f = TW_P[name] || TW_P.idle;
         let p = f(u, i, arg), x = s.x, z = s.z, yaw = s.yaw;
         // blend from the previous pose over 0.25 s (people react fast)
         if (k > 0 && u < 0.3) { const [tp, pn, pa] = s.script[k - 1]; p = lerpPose((TW_P[pn] || TW_P.idle)(t - tp, i, pa), p, Ease.inOutSine(u / 0.3)); }
-        if (name === 'run' && s.run) { const d = Math.min(u, s.run[2] || 9) * (s.run[3] || 4.2); x += s.run[0] * d; z += s.run[1] * d; yaw = Math.atan2(s.run[0], s.run[1]); }
+        if (name === 'run' && s.run) { const d = Math.min(u, s.run[2] || 9) * (s.run[3] || 4.2); x += s.run[0] * d; z += s.run[1] * d; yaw = Math.atan2(s.run[0], s.run[1]); if (u > (s.run[2] || 9)) p = TW_P.idle(u, i); }
+        // a walker: moves along `walk` [dx, dz] at 1.3 m/s from film time 0 (pure), turning at its ends (ping-pong)
+        if (s.walk && (name === 'walk')) { const L = s.walk[2] || 30, d = (t * 1.3 + i * 7) % (2 * L), f = d < L ? d : 2 * L - d, dir = d < L ? 1 : -1; x += s.walk[0] * f; z += s.walk[1] * f; yaw = Math.atan2(s.walk[0] * dir, s.walk[1] * dir); }
+        P._phone.visible = name === 'film' || name === 'phone' || name === 'sitFilm';
         P.root.position.set(x, s.y || 0, z); P.root.rotation.set(0, yaw, 0); P.apply(p); P.root.visible = true;
       }
     },

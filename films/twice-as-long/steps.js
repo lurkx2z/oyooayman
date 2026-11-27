@@ -53,7 +53,7 @@ const TW_T = [], TW_D = [];
   for (let i = 0; i < a.length - 1; i++) for (let n = a[i] + 1; n < a[i + 1]; n++) TW_T[n] = TW_T[a[i]] + (TW_T[a[i + 1]] - TW_T[a[i]]) * (n - a[i]) / (a[i + 1] - a[i]);
   TW_T[91] = TW.end + 30;                         // (never taken)
   // on screen: the ground steps last one second, a few slowed down; in space a stride runs into the next one
-  const slow = { 1: 0.9, 2: 1.0, 3: 1.0, 4: 1.0, 5: 2.3, 6: 1.0, 7: 1.0, 8: 1.2, 9: 1.3, 10: 1.7, 11: 1.0, 12: 1.2, 13: 1.0, 14: 1.0 };
+  const slow = { 1: 0.9, 2: 1.0, 3: 1.0, 4: 1.1, 5: 2.6, 6: 3.9, 7: 2.2, 8: 2.6, 9: 3.2, 10: 6.6, 11: 1.6, 12: 5.0, 13: 6.2, 14: 3.2 };
   for (let n = 1; n <= 90; n++) TW_D[n] = slow[n] || (TW_T[n + 1] - TW_T[n]);
   TW_D[90] = 99;
   for (let n = 2; n <= 90; n++) if (!(TW_T[n] > TW_T[n - 1] + 0.3)) throw new Error(`steps.js: step ${n} at ${TW_T[n].toFixed(2)} is not after step ${n - 1} (${TW_T[n - 1].toFixed(2)})`);
@@ -75,6 +75,15 @@ function twDist(t) {
   const f = ground ? Ease.inOutSine(s.u) : s.u;
   return twSum(n - 1) + twL(n) * f;
 }
+// THE STREET'S CLOCK (story seconds): a slowed stride plays 1 s of the world over D film seconds (slow motion: the
+// traffic, the people, the glass all slow down with it); between strides the world runs at film speed.
+function twStory(t) {
+  let s = t;
+  for (let n = 1; n <= 14; n++) { const a = TW_T[n], d = TW_D[n], k = MathX.clamp(t - a, 0, d); s -= k * (1 - 1 / d); }
+  return s;
+}
+// the story time a film time maps to, inverted (for events placed in story time): film time of story second s
+function twFilmOf(s) { let lo = -5, hi = TW_T[15] + 5; for (let i = 0; i < 50; i++) { const m = (lo + hi) / 2; if (twStory(m) < s) lo = m; else hi = m; } return (lo + hi) / 2; }
 // the counter's number (the step you're taking or have just taken)
 const twCounter = (t) => twStepAt(t).n;
 
@@ -111,7 +120,7 @@ const TW_STATUS = [];
   const S = (t, txt, tone = '') => TW_STATUS.push([t, txt, tone]);
   S(-1, '', ''); S(TW_T[1], '75 CM', ''); S(TW_T[2], '1.5 M', ''); S(TW_T[3], '3 M', ''); S(TW_T[4], '6 M', ''); S(TW_T[5], '12 M', '');
   S(twW('rule'), '', ''); S(TW_T[6], '86 KM/H', ''); S(TW_T[7], '173 KM/H', ''); S(TW_T[8], '346 KM/H', 'hot'); S(TW_T[9], '691 KM/H', 'hot');
-  S(TW_T[10] + 0.35, 'MACH 1', 'hot'); S(TW_T[11], 'MACH 2', 'hot'); S(TW_T[12], 'MACH 4', 'hot'); S(TW_T[13], 'MACH 9', 'hot'); S(TW_T[14], 'MACH 18', 'hot');
+  S(TW_T[10] + 0.22 * TW_D[10], 'MACH 1', 'hot'); S(TW_T[11], 'MACH 2', 'hot'); S(TW_T[12], 'MACH 4', 'hot'); S(TW_T[13], 'MACH 9', 'hot'); S(TW_T[14], 'MACH 18', 'hot');
   S(TW_T[15], 'ESCAPE VELOCITY', 'hot'); S(TW_T[21], 'SPACE', 'cold'); S(TW_T[27], '⅙ LIGHT SPEED', 'cold'); S(TW_T[29], '⅔ LIGHT SPEED', 'cold');
   S(TW_T[30], 'LIGHT SPEED', 'cold');
   // from step 30 on: Earth's clock

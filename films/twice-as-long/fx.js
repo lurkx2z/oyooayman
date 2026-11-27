@@ -80,7 +80,7 @@ function twBurst(soft, adds, t, ev, o = {}) {
       // a ring of dust rolling out and up, slowing (drag), growing, fading
       const R = S * (2.2 * sp) * (1 - Math.exp(-u * 1.6)) * (ev.kind === 'impact' ? 2.4 : 1);
       const x = ev.p[0] + Math.cos(a) * R, z = ev.p[2] + Math.sin(a) * R, y = ev.p[1] + S * (0.2 + 1.4 * el * el) * (1 - Math.exp(-u * 1.2)) + u * 0.3 * S * el;
-      const sz = S * (0.5 + 1.2 * h(4)) * (0.6 + u * 0.55), al = (ev.alpha || 0.55) * Math.exp(-u / (life * 0.45)) * MathX.smooth(u, 0, 0.08);
+      const sz = S * (0.5 + 1.0 * h(4)) * (0.6 + u * 0.3), al = (ev.alpha || 0.55) * Math.exp(-u / (life * 0.45)) * MathX.smooth(u, 0, 0.08);
       const g = MathX.lerp(0.62, 0.8, h(5)) * (ev.dark ? 0.55 : 1);
       soft.add(x, y, z, sz, al, g * 1.02, g * 0.97, g * 0.9);
     } else if (ev.kind === 'glass') {
@@ -92,6 +92,13 @@ function twBurst(soft, adds, t, ev, o = {}) {
       const tw = 0.5 + 0.5 * Math.sin(u * 30 + h(11) * 40);
       adds.add(x0 + vx * tt, y, z0 + vz * tt, 0.06 + 0.1 * h(12), 0.9 * tw * (u < tg ? 1 : 0.4), 0.85, 0.95, 1.0);
       if (i % 3 === 0) soft.add(x0 + vx * tt, y, z0 + vz * tt, 0.09, 0.5, 0.75, 0.85, 0.9);
+    } else if (ev.kind === 'column') {
+      // a column of smoke rising from a crater, fed for 14 s, leaning with the wind (east)
+      const tb = h(1) * h(1) * 10, age = u - tb; if (age < 0) continue;
+      const rr = S * (0.3 + 0.5 * h(3)) * (1 + age * 0.06), x = ev.p[0] + Math.cos(a) * rr + age * S * 0.05, z = ev.p[2] + Math.sin(a) * rr, y = ev.p[1] + S * 0.4 + S * 4 * (1 - Math.exp(-age * (0.08 + 0.05 * h(2))));
+      const sz = S * (0.7 + 0.6 * h(4)) * (1 + age * 0.09), al = 0.5 * MathX.smooth(age, 0, 1.5) * Math.exp(-age / 30);
+      const g = MathX.lerp(0.05, 0.11, h(5)) * (1 + 0.6 * Math.exp(-age / 3));   // (dark: it reads against pale roofs)
+      soft.add(x, y, z, sz, al, g, g * 0.97, g * 0.95);
     } else if (ev.kind === 'fire') {
       const R = S * (0.6 + 1.3 * sp) * (1 - Math.exp(-u * 2)), x = ev.p[0] + Math.cos(a) * R, z = ev.p[2] + Math.sin(a) * R, y = ev.p[1] + S * (0.3 + 2.2 * el) * (1 - Math.exp(-u * 1.5));
       const heat = Math.exp(-u / (life * 0.25)), sz = S * (0.6 + h(4)) * (0.5 + u * 0.4);
