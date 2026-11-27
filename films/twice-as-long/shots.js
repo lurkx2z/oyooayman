@@ -2,7 +2,7 @@
    SHOTS — every shot of "What If Every Step You Took Was Twice as Long?", in order: { id, set, mode, t0, t1 }.
    Cuts sit just before the narration's words (steps.js: twW, twWord, twE) or on a step (TW_T). The new recipe: a new
    picture every 2–3 s in the first 15 s, 6–10 shots a minute, something changing about every 5 s. The cold open is
-   step ninety (a flash-forward); the end picks up after that moment, it never shows the same second again.
+   step ninety: the film's very last moment (a flash-forward to just after the question), so no second is shown twice.
    Sets: nyc (street.js on nyc.js), sky (sky.js), space (space.js), deep (deep.js). A shot's mode picks its camera
    and what the set shows.
    ===================================================================== */
