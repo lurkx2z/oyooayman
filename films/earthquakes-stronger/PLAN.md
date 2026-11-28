@@ -120,4 +120,7 @@ render and the script. Scores as given, out of 10.
   reviewers kept asking for more; the far city is low-detail from the air.
 
 ## 6. Status
-In production on branch `claude/project-thread-4w7kq0`.
+Done on branch `claude/project-thread-4w7kq0` (2026-11-28): two review rounds and their fixes (scores in § 5),
+sound baked (fingerprint 0bb10d20), mastered soundtracks `final-soundtrack.m4a` and `small-soundtrack.m4a`, runnable
+ZIP, report and three thumbnails in the project folder (`EPISODE_REPORT.md`). The 1080p film renders on the owner's PC
+with `render-gpu.cjs`.
