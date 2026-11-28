@@ -104,21 +104,18 @@ function eqAlarm(fx, d, o = {}) {
 const eqMidiN = (n) => eqMidi(n);
 
 // ---- where the camera is ------------------------------------------------------------------------------------------
-//   street   on your street and the streets near it (A1 … N7)
-//   fast     over New York at speed (P1 … V4): the wind of your wake
-//   sky      the meteor, New England, the climb (the sky set)
-//   boston   the Esplanade in Boston
-//   space    the space set
-//   home     back on Earth, later: the evening, the posters, the future street (Z8, ZF, AB)
-//   deep     the deep set
+//   street   San Francisco from the ground (the café, the street, the pier) and the aerials before you lift off
+//   cabin    inside the helicopter (its own shots: the camera rides in it)
+//   air      San Francisco from the air after lift-off (outside the helicopter)
+//   world    the other cities
+//   space    the globe
+const EQ_CABIN = { openFace: 1, in: 1, start: 1, cockpitWait: 1, pierBreak: 1, sky: 1, phoneLap: 1, calm: 1, air: 1, fuel: 1, below: 1, last: 1, question: 1 };
 function eqWhere(sh) {
-  if (sh.set === 'space') return 'space';
-  if (sh.set === 'deep') return 'deep';
-  if (sh.set === 'sky') return 'sky';
-  if (sh.set === 'bos') return 'boston';
-  if (['evening', 'poster', 'future'].includes(sh.mode)) return 'home';
-  const i = EQ_SHOTS.findIndex((s) => s.id === 'P1'), j = EQ_SHOTS.indexOf(sh);
-  return j >= i ? 'fast' : 'street';
+  if (sh.set === 'globe') return 'space';
+  if (sh.set === 'world') return 'world';
+  if (EQ_CABIN[sh.mode]) return 'cabin';
+  if (sh.s !== undefined) return 'air';
+  return sh.t0 >= eqW('lift') - 0.31 ? 'air' : 'street';
 }
 function eqPlaces() {
   if (eqPlaces._c) return eqPlaces._c;
@@ -130,7 +127,5 @@ function eqPlaceAt(where, xf = 0.05) {
   return (t) => { let v = 0; for (const [a, b] of W) v += eqWn(t, a, b, xf, xf); return Math.min(1, v); };
 }
 const eqShotOf = (mode) => EQ_SHOTS.find((s) => s.mode === mode);
-// when you pass things in space (the space set's EQ_ON), and Andromeda
-const eqPassOf = (k) => eqPassT(EQ_ON[k][0]);
 
-const EQ_SOUND_FNS = [eqEv, eqWn, eqNoise, eqSweep, eqCurve, eqBed, eqWhoosh, eqThump, eqBoom, eqGasp, eqAlarm, eqMidiN, eqWhere, eqPlaces, eqPlaceAt, eqShotOf, eqPassOf];
+const EQ_SOUND_FNS = [eqEv, eqWn, eqNoise, eqSweep, eqCurve, eqBed, eqWhoosh, eqThump, eqBoom, eqGasp, eqAlarm, eqMidiN, eqWhere, eqPlaces, eqPlaceAt, eqShotOf];

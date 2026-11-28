@@ -40,7 +40,7 @@ EQ_SETS.sf = (app) => {
   const scene = S.scene, cam = S.camera, sun = S.sun;
   const sky = eqGradSky(scene, '#3d7fd4', '#cde2f2', '#a9bccb', { r: 55000, sunDir: EQ_SUN, sunGlow: '#fff0d0', hw: 0.28 });
   // ---- the world
-  const ground = eqGround(scene), water = eqWater(scene);
+  const ground = eqTerrain(scene), water = eqWater(scene);
   const marks = eqMarks(scene, app);
   const avoid = [[...eqLL(37.7952, -122.4028), 60], [...eqLL(37.7898, -122.3968), 50], [...eqLL(37.8024, -122.4058), 40], [...eqLL(37.7552, -122.4528), 50]];
   const city = eqCity(scene, avoid), crack = eqCrack(scene), faults = eqMapFaults(scene);

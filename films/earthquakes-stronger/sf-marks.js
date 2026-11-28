@@ -53,7 +53,7 @@ function eqSuspension(scene, o) {
   // ---- towers (each its own group, so it can lean)
   const towers = o.towers.map((d) => {
     const g = new THREE.Group(); const p = at(d); g.position.set(p[0], 0, p[2]); g.rotation.y = yaw; root.add(g);
-    const H = o.towerH, legW = o.legW || 5.5, base = Math.min(0, eqTerrainY(p[0], p[2]));
+    const H = o.towerH, legW = o.legW || 5.5, base = Math.min(0, o.groundY ? o.groundY(p[0], p[2]) : eqTerrainY(p[0], p[2]));
     for (const s of [-1, 1]) {
       const leg = eqMesh(new THREE.BoxGeometry(legW, H - base, legW * 1.6), steel, s * (W / 2 + 1), (H + base) / 2, 0, g);
       leg.castShadow = true;

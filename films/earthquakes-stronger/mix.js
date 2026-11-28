@@ -1,5 +1,5 @@
 /* =====================================================================
-   MIX — stem levels, ducking and the dynamics map for twice-as-long.html (read by audio.js).
+   MIX — stem levels, ducking and the dynamics map for earthquakes-stronger.html (read by audio.js).
      gain  stem level (dB) · duck  how far the stem dips under the narrator (dB) · hp  high-pass (Hz)
      dyn   [beat, offset s, dB] keys (beats: audio.js eqBeat)
    The owner's rule (31 October 2026): the music clearly leads, the beds about 10 dB under it, measured stem by stem.
@@ -18,9 +18,7 @@ window.EQ_MIX = {
   fast: [],
   voiceTrim: {},
   voiceComp: { threshold: -24, knee: 8, ratio: 3, attack: 0.005, release: 0.14 },
-  // the street's score is plucks and light chords: 2.5 dB up until the walk to work; in space and the deep the steps'
-  // pushes come every second or two, so the effects sit 3 dB lower there
-  dyn: { music: [[0, 0, 2.5], ['<work', 0, 2.5], ['S6', 0, 0]], amb: [], sfx: [[0, 0, 0], ['<space', -1, 0], ['<space', 0.5, -3]] },
+  dyn: { music: [[0, 0, 0]], amb: [], sfx: [[0, 0, 0]] },
   master: -2.5,
   eq: [['lowshelf', 110, -1.0], ['highshelf', 3500, 1.0]],
   ceiling: -1.5,

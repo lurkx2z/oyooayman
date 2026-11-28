@@ -101,8 +101,10 @@ const EQ_WAVE = { k: 2 * Math.PI / 520, c: 260 };
 function eqWaveA(s) { return s < 360 ? 0 : [0, 1.6, 3.2, 5.5, 8][Math.min(4, Math.floor((s - 360) / 60) + 1)] * MathX.smooth(s, 360, 368) * (0.75 + 0.25 * Math.sin(s * 0.9)); }
 function eqWaveY(x, z, s) { const A = eqWaveA(s); if (!A) return 0; const r = Math.hypot(x - EQ_EPI[0], z - EQ_EPI[1]); return A * Math.sin(EQ_WAVE.k * (r - EQ_WAVE.c * s)) * Math.exp(-r / 14000); }
 const EQ_WAVE_GLSL = `
-  uniform float uS, uWaveA; uniform vec2 uEpi;
-  float eqWaveY(vec2 p) { float r = length(p - uEpi); return uWaveA * sin(${EQ_WAVE.k.toFixed(6)} * (r - ${EQ_WAVE.c.toFixed(1)} * uS)) * exp(-r / 14000.0); }`;
+  uniform float uS, uWaveA, uWaveK, uWaveC, uWaveL; uniform vec2 uEpi;
+  float eqWaveY(vec2 p) { float r = length(p - uEpi); return uWaveA * sin(uWaveK * (r - uWaveC * uS)) * exp(-r / uWaveL); }`;
+// (the wave's shape: San Francisco's by default; the other cities set their own, e.g. Mexico City's slow jelly)
+const eqWaveU = (k = EQ_WAVE.k, c = EQ_WAVE.c, L = 14000) => ({ uWaveK: { value: k }, uWaveC: { value: c }, uWaveL: { value: L } });
 
 // ---- the bay's water level (m) at a point v metres out from the waterfront (story s): calm; at magnitude nine the
 // shaking sloshes the bay out (down 9 m at the shore), then it comes back as a wall that runs up over the Embarcadero
@@ -136,7 +138,7 @@ function eqSurge(v, s) {
 // ---------------------------------------------------------------------------------------------------------------------
 function eqGroundMat() {
   const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.93, metalness: 0 });
-  const U = { uS: { value: 0 }, uWaveA: { value: 0 }, uEpi: { value: new THREE.Vector2(EQ_EPI[0], EQ_EPI[1]) }, uWet: { value: 0 }, uDust: { value: 0 } };
+  const U = { uS: { value: 0 }, uWaveA: { value: 0 }, uEpi: { value: new THREE.Vector2(EQ_EPI[0], EQ_EPI[1]) }, uWet: { value: 0 }, uDust: { value: 0 } , ...eqWaveU() };
   m.userData.U = U;
   m.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, U);
@@ -170,7 +172,7 @@ function eqGroundMat() {
   m.customProgramCacheKey = () => 'eqGround';
   return m;
 }
-function eqGround(scene) {
+function eqTerrain(scene) {
   const mat = eqGroundMat(), tiles = [];
   const [cx, cz] = eqWF(EQ_CAFE_U, -200);
   const col = (x, z, y, sd) => {
@@ -299,7 +301,7 @@ const EQ_CITY_VS = `
   }`;
 function eqCityMat() {
   const m = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.8, metalness: 0.0 });
-  const U = { uS: { value: 0 }, uLevel: { value: 0 }, uWaveA: { value: 0 }, uEpi: { value: new THREE.Vector2(EQ_EPI[0], EQ_EPI[1]) }, uDust: { value: 0 }, uBreak: { value: 0 }, uGlass: { value: new THREE.Color('#5d7d94') } };
+  const U = { uS: { value: 0 }, uLevel: { value: 0 }, uWaveA: { value: 0 }, uEpi: { value: new THREE.Vector2(EQ_EPI[0], EQ_EPI[1]) }, uDust: { value: 0 }, uBreak: { value: 0 }, uGlass: { value: new THREE.Color('#5d7d94') }, uNight: { value: 0 }, uOut: { value: 0 }, ...eqWaveU() };
   m.userData.U = U;
   m.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, U);
@@ -310,7 +312,7 @@ function eqCityMat() {
       .replace('#include <project_vertex>', `vec4 mvPosition = viewMatrix * vec4(eqWp, 1.0); gl_Position = projectionMatrix * mvPosition;`)
       .replace('#include <worldpos_vertex>', `vec4 worldPosition = vec4(eqWp, 1.0);`);
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
-        varying vec3 vWinP; varying vec3 vWinN; varying vec3 vWorldP; varying float vSeed; varying float vFall; varying float vKind; uniform vec3 uGlass; uniform float uDust, uBreak;
+        varying vec3 vWinP; varying vec3 vWinN; varying vec3 vWorldP; varying float vSeed; varying float vFall; varying float vKind; uniform vec3 uGlass; uniform float uDust, uBreak, uNight, uOut;
         float eqH(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`)
       .replace('#include <color_fragment>', `#include <color_fragment>
         float side = 1.0 - step(0.5, abs(vWinN.y));
@@ -333,6 +335,10 @@ function eqCityMat() {
         float eqWin = win * (1.0 - broken);`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
         roughnessFactor = mix(roughnessFactor, 0.08, eqWin);`)
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        // at night: lit windows (some rooms dark; whole buildings go dark as the power fails: uOut)
+        float eqLit = eqWin * uNight * step(uOut, fract(vSeed * 13.7)) * step(0.38, eqH(cell * 1.3 + vSeed * 91.0));
+        totalEmissiveRadiance += vec3(1.0, 0.8, 0.55) * eqLit * (0.55 + 0.7 * rn);`)
       .replace('#include <metalnessmap_fragment>', `#include <metalnessmap_fragment>
         metalnessFactor = mix(metalnessFactor, 0.45, eqWin);`);
   };
@@ -489,7 +495,7 @@ const EQ_SETZONE_GLSL = `
   bool eqInSet(vec2 p) { float u = dot(p, vec2(${EQ_WF.w[0].toFixed(5)}, ${EQ_WF.w[1].toFixed(5)})), v = dot(p, vec2(${EQ_WF.n[0].toFixed(5)}, ${EQ_WF.n[1].toFixed(5)}));
     return u > -720.0 && u < 820.0 && v > -130.0 && v < 4.0; }`;
 function eqCrack(scene) {
-  const U = { uLen: { value: 0 }, uW: { value: 0 }, uGlow: { value: 0 }, uS: { value: 0 }, uWaveA: { value: 0 }, uEpi: { value: new THREE.Vector2(EQ_EPI[0], EQ_EPI[1]) } };
+  const U = { uLen: { value: 0 }, uW: { value: 0 }, uGlow: { value: 0 }, uS: { value: 0 }, uWaveA: { value: 0 }, uEpi: { value: new THREE.Vector2(EQ_EPI[0], EQ_EPI[1]) } , ...eqWaveU() };
   const m = new THREE.ShaderMaterial({
     uniforms: U, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, side: THREE.DoubleSide,
     vertexShader: `${EQ_WAVE_GLSL}
