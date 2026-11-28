@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What If Earthquakes Got 1 Magnitude Stronger Every Minute?</title>
+  <!-- fonts ship with the project (SIL OFL 1.1, see fonts/OFL.txt): works offline and from file:// -->
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* this film's HUD (page-level only). 16:9 (1920×1080): --u = one design pixel of a 1920-wide frame (set by film.js).
+       The new recipe's minimal text: MAGNITUDE and one giant number, one status word, the minute bar, labels on things.
+       Bold sans, no serif. */
+    #hud::before { display: none; }
+    .eq-count { position: absolute; left: calc(var(--u) * 56); top: calc(var(--u) * 36); pointer-events: none; transform-origin: 0 30%;
+      text-shadow: 0 0 calc(var(--u) * 26) rgba(0, 0, 0, 0.55), 0 calc(var(--u) * 4) calc(var(--u) * 14) rgba(0, 0, 0, 0.6); }
+    .eq-count .l { font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 40); letter-spacing: 0.2em; color: #ffffff; opacity: 0.95; }
+    .eq-count .v { font-family: var(--hud-font); font-weight: 900; font-size: calc(var(--u) * 190); line-height: 0.88; letter-spacing: -0.03em; color: #ffffff;
+      font-variant-numeric: tabular-nums; margin-top: calc(var(--u) * -4); }
+    .eq-count.tick .v { color: #ffe04a; }
+    .eq-stat { position: absolute; left: calc(var(--u) * 56); top: calc(var(--u) * 268); pointer-events: none; white-space: nowrap;
+      font-family: var(--hud-font); font-weight: 900; font-size: calc(var(--u) * 46); letter-spacing: 0.07em; color: #fff;
+      padding: calc(var(--u) * 8) calc(var(--u) * 22) calc(var(--u) * 10); border-radius: calc(var(--u) * 12); background: rgba(8, 10, 14, 0.62); }
+    .eq-stat.warm { background: #f08a1c; color: #1a0e02; }
+    .eq-stat.hot { background: #e8322a; color: #fff; }
+    .eq-stat.max { background: #b0101a; color: #fff; box-shadow: 0 0 calc(var(--u) * 26) rgba(255, 40, 30, 0.55); }
+    .eq-stat:empty { display: none; }
+    /* the minute bar: how far through this minute (the next magnitude when it fills) */
+    .eq-bar { position: absolute; left: calc(var(--u) * 58); top: calc(var(--u) * 352); width: calc(var(--u) * 330); pointer-events: none; }
+    .eq-bar .t { font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 25); letter-spacing: 0.14em; color: #fff; opacity: 0.92;
+      text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(0, 0, 0, 0.7); margin-bottom: calc(var(--u) * 6); white-space: nowrap; }
+    .eq-bar .tr { height: calc(var(--u) * 10); border-radius: calc(var(--u) * 5); background: rgba(8, 10, 14, 0.55); overflow: hidden; }
+    .eq-bar .f { height: 100%; background: #ffe04a; border-radius: calc(var(--u) * 5); }
+    /* labels pinned to things: a ring on the thing, a bold caps name on a plate, a small amber line under it */
+    .eq-lab { position: absolute; transform: translate(calc(var(--u) * -20), -50%); pointer-events: none; white-space: nowrap; }
+    .eq-lab .t { display: inline-block; vertical-align: middle; padding: calc(var(--u) * 8) calc(var(--u) * 18) calc(var(--u) * 9); border-radius: calc(var(--u) * 10);
+      background: rgba(6, 8, 12, 0.72); font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 38); letter-spacing: 0.05em; color: #fff; line-height: 1.05; }
+    .eq-lab small { display: block; font-weight: 700; font-size: 0.68em; letter-spacing: 0.08em; color: #ffd36a; margin-top: calc(var(--u) * 3); }
+    .eq-lab .d { display: inline-block; vertical-align: middle; width: calc(var(--u) * 34); height: calc(var(--u) * 34); border-radius: 50%; margin-right: calc(var(--u) * 10);
+      box-shadow: 0 0 0 calc(var(--u) * 4) #ffd36a, 0 0 calc(var(--u) * 12) rgba(0, 0, 0, 0.6); }
+    .eq-lab.r { transform: translate(calc(-100% + var(--u) * 20), -50%); text-align: right; }
+    .eq-lab.r .d { margin-right: 0; margin-left: calc(var(--u) * 10); }
+    .eq-lab.you .t { background: #ff6a1f; }
+    .eq-lab.you .d { box-shadow: 0 0 0 calc(var(--u) * 4) #ff6a1f, 0 0 calc(var(--u) * 12) rgba(0, 0, 0, 0.6); }
+    .eq-lab.quake .t { background: #c81e1e; }
+    .eq-lab.quake .d { box-shadow: 0 0 0 calc(var(--u) * 4) #ff4030, 0 0 calc(var(--u) * 12) rgba(0, 0, 0, 0.6); }
+    /* the honest tag (bottom left, small) */
+    .eq-tag { position: absolute; left: calc(var(--u) * 56); bottom: calc(var(--u) * 36); white-space: pre; line-height: 1.35; font-family: var(--hud-font); font-weight: 700; font-size: calc(var(--u) * 27); letter-spacing: 0.1em;
+      color: #f0ece4; padding: calc(var(--u) * 7) calc(var(--u) * 16); border-radius: calc(var(--u) * 8); background: rgba(6, 8, 12, 0.62); pointer-events: none; }
+    /* diagrams (SVG, drawn per frame) */
+    .eq-dia { position: absolute; inset: 0; pointer-events: none; }
+    .eq-dia svg { width: 100%; height: 100%; display: block; }
+    .eq-dia .b { font-family: var(--hud-font); font-weight: 900; fill: #fff; letter-spacing: 0.03em; }
+    .eq-dia .s { font-family: var(--hud-font); font-weight: 700; fill: #ffd36a; letter-spacing: 0.06em; }
+    .eq-dia .w { font-family: var(--hud-font); font-weight: 700; fill: #f0ece4; letter-spacing: 0.05em; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="hud"></div>
+    </div>
+  </div>
+  <div id="dev">
+    <button id="bPlay" title="Space">▶ PLAY</button>
+    <button id="bRestart" title="R">⟲ RESTART</button>
+    <div id="scrubWrap"><div id="markers"></div><input id="scrub" type="range" min="0" max="15" step="0.0333" value="0"></div>
+    <span id="time">00:00.00 · f0</span>
+    <span id="fps">-- fps</span>
+    <button id="bMute" title="M">🔊 SOUND</button>
+    <button id="bDebug" title="D">DEBUG</button>
+    <button id="bRec" title="H">● RECORDING MODE</button>
+    <button id="bFull" title="F">⛶ FULL</button>
+    <button id="bWav" title="Export the synced soundtrack as a WAV file">⤓ WAV</button>
+  </div>
+  <div id="debug"></div>
+  <div id="startOverlay">
+    <div class="big">What If Earthquakes Got 1 Magnitude Stronger Every Minute?</div>
+    <div>CLICK OR PRESS SPACE TO PLAY (ENABLES SOUND)</div>
+    <div id="soundStatus" style="opacity:.75"></div>
+    <div style="opacity:.6">R restart · D debug · H recording mode · F fullscreen · M mute · ←/→ step</div>
+  </div>
+  <div id="loading">THE GROUND IS MOVING…</div>
+  <div id="errorBox"></div>
+  <script>
+    window.addEventListener('error', (e) => {
+      const b = document.getElementById('errorBox');
+      b.style.display = 'block';
+      b.textContent += (e.message || e) + (e.filename ? '  @ ' + e.filename.split('/').pop() + ':' + e.lineno : '') + '\n';
+    });
+  </script>
+  <script src="lib/three.bundle.min.js"></script>
+  <!-- shared engine (unchanged; this film only configures and extends it from its own folder) -->
+  <script src="js/config.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/timeline.js"></script>
+  <script src="js/core/textures.js"></script>
+  <script src="js/core/geo.js"></script>
+  <script src="js/fx/fog.js"></script>
+  <script>installFog({ bankScale: 0.012, bankAmount: 0.0, lowHeight: 6, lowAmount: 0.0, cap: 0.9 });</script>
+  <script src="js/fx/postprocessing.js"></script>
+  <script src="js/fx/look.js"></script>
+  <script src="js/fx/particles.js"></script>
+  <script src="js/camera/cameraController.js"></script>
+  <script src="js/camera/viewerHands.js"></script>
+  <script src="js/world/people.js"></script>
+  <script src="js/world/vehicles.js"></script>
+  <script src="js/world/earth.js"></script>
+  <script src="js/world/heroes.js"></script>
+  <script src="js/world/youCharacter.js"></script>
+  <script src="js/audio/audioEngine.js"></script>
+  <script src="js/ui/storyHud.js"></script>
+  <script src="js/ui/devControls.js"></script>
+  <!-- this film (plan: films/earthquakes-stronger/PLAN.md; narration: films/earthquakes-stronger/NARRATION.md) -->
+  <script src="films/earthquakes-stronger/narration-timing.js"></script>
+  <script src="films/earthquakes-stronger/narration-audio.js"></script>
+  <script src="films/earthquakes-stronger/quake.js"></script>
+  <script src="films/earthquakes-stronger/kit.js"></script>
+  <script src="films/earthquakes-stronger/film.js"></script>
+  <script src="films/earthquakes-stronger/cast.js"></script>
+  <script src="films/earthquakes-stronger/fx.js"></script>
+  <script src="films/earthquakes-stronger/sf-geo.js"></script>
+  <script src="films/earthquakes-stronger/sf-marks.js"></script>
+  <script src="films/earthquakes-stronger/waterfront.js"></script>
+  <script src="films/earthquakes-stronger/heli.js"></script>
+  <script src="films/earthquakes-stronger/sf-set.js"></script>
+  <script src="films/earthquakes-stronger/world.js"></script>
+  <script src="films/earthquakes-stronger/globe.js"></script>
+  <script src="films/earthquakes-stronger/script.js"></script>
+  <script src="films/earthquakes-stronger/shots.js"></script>
+  <script src="films/earthquakes-stronger/hud.js"></script>
+  <script src="films/earthquakes-stronger/audiokit.js"></script>
+  <script src="films/earthquakes-stronger/mix.js"></script>
+  <script src="films/earthquakes-stronger/audio.js"></script>
+  <script src="films/earthquakes-stronger/sound-lib.js"></script>
+  <script src="films/earthquakes-stronger/sound-music.js"></script>
+  <script src="films/earthquakes-stronger/sound-amb.js"></script>
+  <script src="films/earthquakes-stronger/sound-sfx.js"></script>
+  <script src="films/earthquakes-stronger/soundtrack.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
