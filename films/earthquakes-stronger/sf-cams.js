@@ -40,7 +40,7 @@ function eqSfCam(mode, u, s, set, X) {
     calmWide: () => gr({ p: eqPush(eqG(331, Y + 1.7, -41), eqG(336, Y + 1.7, -41), u, 5), at: eqG(372, 4.2, 8), fov: 40, shC: eqG(366, 2, -12), shR: 50, shakeK: 0.2 }),
     // ---- minute two
     jolt4: () => gr({ p: eqG(388.5, 4.2, 17.8), at: eqG(366, 3.0, 7.5), fov: 50, shC: eqG(372, 2, 10), shakeK: 1.4 }),
-    truck: () => gr({ p: eqG(392, Y + 0.6, -29.3), at: eqG(330, Y + 1.2, -36), fov: 44, shC: eqG(370, 2, -30) }),
+    truck: () => gr({ p: eqG(392, Y + 0.6, -26.8), at: eqG(330, Y + 1.2, -33.5), fov: 44, shC: eqG(370, 2, -30) }),
     locals: () => gr({ p: eqG(365.8, 3.45, 2.2), at: eqG(368.4, 3.15, 4.9), fov: 38, shC: eqG(368, 2, 4.5), shR: 8 }),
     youSide: () => { const h = head(); return gr({ p: eqAhead(h, yaw, 0.7, 1.4, 0.1), at: [h[0], h[1] - 0.08, h[2]], fov: 36, shC: h, shR: 8 }); },
     faultMap: () => ({ p: eqPush([600, 47000, 23000], [500, 44000, 21500], u, 9), at: [200, 0, 2500], fov: 38, near: 200, far: 140000, shR: 0, fog: 0, drift: 0 }),
@@ -87,7 +87,7 @@ function eqSfCam(mode, u, s, set, X) {
     lift: () => { const h = heliP(); return gr({ p: eqG(398, 5.5, 139), at: [h[0], h[1] + 1.8, h[2]], fov: 44, shC: h, shR: 24, shakeK: 0.9 }); },
     sky: () => ({ local: true, p: [-0.1, 1.98, 1.9], at: [0.45, 2.0, 0.78], fov: 38, inside: true, shR: 6, near: 0.03 }),
     skyWide: () => { const h = heliP(); const back = eqWL(380, 0, 900); return air({ p: [h[0] + (back[0] - h[0]) * 0.07, h[1] + 14, h[2] + (back[2] - h[2]) * 0.07], at: [h[0], h[1] - 6, h[2]], fov: 50, near: 0.5, shC: h, shR: 200 }); },
-    bayBridge: () => air({ p: eqPush([2650, 115, 160], [2560, 112, 120], u, 5), at: [1650, 62, -620], fov: 44 }),
+    bayBridge: () => air({ p: eqPush([2050, 48, -520], [1985, 52, -462], u, 5), at: [1031, 70, 139], fov: 50 }),
     bayDrop: () => air({ p: [1990, 82, -600], at: [1822, 52, -815], fov: 40, shR: 300, shC: [1822, 50, -815] }),
     heliOverBay: () => { H.g.updateMatrixWorld(true); const p = H.toWorld(-14, 3, 20), a = H.toWorld(0, 1.5, 0); return air({ p: [p.x, p.y, p.z], at: [a.x, a.y, a.z], fov: 42, near: 0.5, shC: [a.x, a.y, a.z], shR: 60 }); },
     downtown: () => air({ p: eqPush([620, 330, -1120], [570, 318, -1060], u, 6), at: [-700, 60, 300], fov: 44 }),
@@ -100,7 +100,7 @@ function eqSfCam(mode, u, s, set, X) {
     pyramidFall: () => air({ p: eqPush([-560, 120, -250], [-575, 118, -235], u, 6), at: [-801, 165, 33], fov: 42, shC: [-801, 100, 33], shR: 300 }),
     golden: () => air({ p: eqPush([-4700, 230, -2700], [-4800, 225, -2690], u, 5), at: [-7450, 95, -2370], fov: 30, fxRange: 4000 }),
     ggFall: () => air({ p: [-6250, 125, -2520], at: [-7450, 55, -2370], fov: 38, shC: [-7450, 40, -2370], shR: 900 }),
-    phoneLap: () => ({ local: true, p: [0.32, 1.98, 0.52], at: [0.45, 1.36, 0.98], fov: 40, inside: true, shR: 6, near: 0.03 }),
+    phoneLap: () => ({ local: true, p: [0.25, 1.98, 1.85], at: [0.66, 1.9, 0.9], fov: 46, inside: true, shR: 6, near: 0.03 }),
     // ---- minute seven
     jolt9: () => air({ p: [-400, 720, -2650], at: [-1500, 0, 1200], fov: 50 }),
     japan: () => air({ p: eqPush([1950, 210, 330], [1900, 205, 300], u, 5), at: [1300, 40, -320], fov: 46 }),

@@ -140,8 +140,10 @@ EQ_SETS.sf = (app) => {
     if (cam.position.y > 60 || !near) eqCityFx(soft, adds, s, city.info, cam, { range: cp.fxRange || 7000, max: 220, fires: 80 });
     if (s > EQ_BAY.out1 && s < EQ_BAY.wave + 16) {
       const front = (EQ_BAY.wave - s) * EQ_BAY.speed + 120;
-      for (let i = 0; i < 160; i++) { const uu = -600 + eqR(i, 3) * 1500, vv = front + (eqR(i, 5) - 0.3) * 30, [x, z] = eqWF(uu, vv), y = eqBayY(vv, s) + 1 + eqR(i, 7) * 6;
-        soft.add(x, y, z, 6 + eqR(i, 9) * 8, 0.55 * MathX.smooth(s, EQ_BAY.out1, EQ_BAY.out1 + 3), 0.93, 0.95, 0.96); }
+      // (only while the crest is out on the bay: once it is over the land the spray hung there like a fog)
+      const k = MathX.smooth(s, EQ_BAY.out1, EQ_BAY.out1 + 3) * MathX.smooth(front, -10, 60);
+      if (k > 0) for (let i = 0; i < 110; i++) { const uu = -600 + eqR(i, 3) * 1500, vv = front + (eqR(i, 5) - 0.3) * 30, [x, z] = eqWF(uu, vv), y = eqBayY(vv, s) + 1 + eqR(i, 7) * 6;
+        soft.add(x, y, z, 6 + eqR(i, 9) * 8, 0.42 * k, 0.93, 0.95, 0.96); }
     }
     soft.end(); adds.end();
     debris.frame(s, near ? debrisEv : [], EQ_GROUND_Y + 0.15);
@@ -175,11 +177,23 @@ EQ_SETS.sf = (app) => {
 // ---------------------------------------------------------------------------------------------------------------------
 // YOU: where you are and how you stand at story time s
 // ---------------------------------------------------------------------------------------------------------------------
+function eqYouGear(you, on) {
+  if (!you._eqGear) {
+    you._eqGear = [];
+    you.root.traverse((o) => {
+      const g = o.isMesh && o.geometry.parameters, c = o.isMesh && o.material && o.material.color && o.material.color.getHexString();
+      if ((g && g.width === 0.08 && g.depth === 0.01) || c === '1f8f8c') you._eqGear.push(o);
+    });
+  }
+  for (const o of you._eqGear) o.visible = on;
+}
 function eqPoseYou(you, s, t, shot, heli, wf, cam) {
   const mode = shot.mode, F = EQ_YOU_FACE[mode] || ['neutral'], Y0 = EQ_GROUND_Y + 0.35, T = EQ_YT;
   let pose, pos, yaw, hands = 'relax';
   const seatW = eqWL(EQ_SEAT.u, Y0, EQ_SEAT.v), faceFerry = eqYawWF(1, 0);   // (you face the Bay Bridge, south-east)
   you.cup(false); you.phone(false); you.visible(true);
+  // seated, the jacket's front strip and the backpack straps stand off the bent torso: hide them (and the pack)
+  eqYouGear(you, !(s < T.stand || s > T.climb + 1));
   if (s < T.stand) {
     pose = EQ_P.sit(s, 3); pose.rSh = [0.62, 0.16]; pose.rEl = 1.45; pose.headYaw = 0.12 * noise1(s * 0.2, 4);
     if (mode === 'faceFelt' || mode === 'cupRipple') { pose.neck = mode === 'cupRipple' ? 0.5 : -0.12; pose.headYaw = 0.25; }
@@ -226,7 +240,7 @@ function eqPoseYou(you, s, t, shot, heli, wf, cam) {
       // in flight: hands on the knees; gripping in the jolts; your phone (minute six); leaning to the window
       const jolt = eqMinOf(s) !== eqMinOf(s - 2.5) || (s > eqW('air') - EQ.tick0 - 0.4 && s < eqW('tokyo') - EQ.tick0);
       if (jolt) { const g = EQ_P.sitGrip(s, 3); pose.lSh = g.lSh; pose.rSh = g.rSh; pose.lEl = g.lEl; pose.rEl = g.rEl; pose.spine = g.spine; }
-      if (s > T.phone && s < eqW('notjust') - EQ.tick0 + 1) { pose.rSh = [0.85, 0.12]; pose.rEl = 1.75; pose.lSh = [0.7, 0.1]; pose.lEl = 1.6; pose.neck = 0.5; you.phone(true); }
+      if (s > T.phone && s < eqW('notjust') - EQ.tick0 + 1) { pose.rSh = [0.5, 0.05]; pose.rEl = 1.45; pose.lSh = [0.4, -0.2]; pose.lEl = 1.25; pose.neck = 0.62; you.phone(true); }
       if (F[1] === 'out') { pose.headYaw = 0.55; pose.neck = 0.18; }
       // (the helicopter tilts: you tilt with it)
       const r = heli.g.rotation; you.place(pos[0], pos[1], pos[2], yaw, r.z * Math.cos(yaw - r.y) - r.x * Math.sin(yaw - r.y), r.x * Math.cos(yaw - r.y) + r.z * Math.sin(yaw - r.y));

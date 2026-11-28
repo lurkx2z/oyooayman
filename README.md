@@ -245,6 +245,15 @@ Everything is procedural, so there are no models, images or sound files to downl
 > round, and you land just behind where your front door used to be. The rule, the step table, shots and review log:
 > [`films/twice-as-long/PLAN.md`](films/twice-as-long/PLAN.md) and
 > [`EPISODE_REPORT.md`](films/twice-as-long/EPISODE_REPORT.md).
+>
+> ***What If Earthquakes Got 1 Magnitude Stronger Every Minute?*** — open `earthquakes-stronger.html` (16:9,
+> narrated, 9:51), the second film in the new recipe. In real time: a magnitude-3 tremor under a café on San
+> Francisco's Embarcadero, and every minute it (and every other earthquake on Earth) gets one magnitude stronger.
+> Lightning, MOAB, Hiroshima, Haiti, 1906, Castle Bravo, Japan 2011, a ten that has never happened, four days of
+> sunlight; the waterfront turns to mud, the pier breaks up as your helicopter lifts off, the bay drains and comes back
+> over your café, Los Angeles, Mexico City, the Hoover Dam, Seattle, Tokyo, Dubai and Istanbul go too, and from space
+> the Earth looks like it is cracking open. The energy table, the sources and the review log:
+> [`films/earthquakes-stronger/PLAN.md`](films/earthquakes-stronger/PLAN.md).
 
 | Time | Beat |
 |---|---|

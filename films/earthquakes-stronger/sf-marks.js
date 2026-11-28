@@ -217,7 +217,7 @@ function eqMarks(scene, app) {
       twist: (s, d) => (s > 270 ? Math.sin(d * 0.012 - s * 2.2) * eqLevel(s) * 0.12 : 0),
     });
     // the anchorages (concrete) and the central anchorage in the bay
-    const conc = eqStd('#b9b4aa', 0.9);
+    const conc = eqStd('#9c978e', 0.9);
     for (const [d, w, h, y0] of [[0, 40, 66, 0], [1410, 60, 86, -12], [L - 20, 50, 64, 20]]) { const p = bb.at(d); const m = eqMesh(new THREE.BoxGeometry(w, h - y0, 34), conc, p[0], (h + y0) / 2, p[2]); m.rotation.y = Math.atan2(dir[0], dir[1]); }
     // the approach: the deck carries on inland to the freeway
     { const p = bb.at(-120); const m = eqMesh(new THREE.BoxGeometry(20, 3, 240), eqStd('#8e8c88', 0.9), p[0], 56, p[2]); m.rotation.y = Math.atan2(dir[0], dir[1]);

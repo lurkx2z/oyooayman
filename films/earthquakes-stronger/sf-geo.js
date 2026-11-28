@@ -247,9 +247,13 @@ function eqWater(scene) {
         { vec4 w = modelMatrix * vec4(transformed, 1.0); float v = dot(w.xz, vec2(${N}));
           float y0 = eqBay(v), y1 = eqBay(v + 25.0); transformed.y += y0; vCrest = clamp((y0 - y1) / 6.0, 0.0, 1.0) * step(1.5, y0); }
         vWP = (modelMatrix * vec4(transformed, 1.0)).xyz;`);
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWP; varying float vCrest;')
+    // (the foam per pixel: interpolated across the 100 m cells it drew big white hexagons)
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWP; varying float vCrest;' + bay)
       .replace('#include <color_fragment>', `#include <color_fragment>
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.86, 0.9, 0.9), clamp(vCrest * 1.6, 0.0, 1.0));`)
+        { float v = dot(vWP.xz, vec2(${N})), y0 = eqBay(v), y1 = eqBay(v + 25.0);
+          float n = 0.55 + 0.45 * sin(vWP.x * 0.21 + sin(vWP.z * 0.13) * 2.0) * sin(vWP.z * 0.17 + vWP.x * 0.05);
+          float crest = clamp((y0 - y1) / 6.0, 0.0, 1.0) * smoothstep(1.0, 3.0, y0) * n;
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.68, 0.7), clamp(crest * 1.4, 0.0, 0.85)); }`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
         { vec2 q = vWP.xz; float a = sin(q.x * 0.09 + q.y * 0.05) + sin(q.x * -0.04 + q.y * 0.11) * 0.8 + sin(q.x * 0.23 - q.y * 0.19) * 0.35;
           float b = cos(q.x * 0.07 - q.y * 0.08) + cos(q.x * 0.13 + q.y * 0.03) * 0.7 + cos(q.x * -0.21 + q.y * 0.26) * 0.3;
