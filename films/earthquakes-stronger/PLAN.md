@@ -52,8 +52,8 @@ Places that are made up (said on screen): your café, your pier, your helicopter
   flattened city, your face in the helicopter, screaming. "This is magnitude twelve."
 - **Minute 1, M3 (0:02.6):** Saturday morning at a café on the Embarcadero, waiting for a helicopter tour. Your coffee
   ripples. The rule; ×32 per step; "in real time".
-- **Minute 2, M4:** a truck rumbling past; the San Andreas and Hayward on a map; MOAB; the gulls leave; the helicopter
-  at the end of the pier, the pilot waves.
+- **Minute 2, M4:** a bus rumbles past ("like a truck"); the San Andreas and Hayward on a map; MOAB; the gulls leave; the helicopter
+  at the end of the pier, your booking on your phone, the pilot waves and starts the engine.
 - **Minute 3, M5:** everyone feels it; every phone's alert; 500 t of TNT under your feet; people pour out; drop, cover,
   hold on… "never going to stop"; you run down the pier; the Ferry Building's clock tower sways.
 - **Minute 4, M6:** Hiroshima; windows burst, chimneys fall, every car alarm; the streetcar jumps its rails; you reach
@@ -65,7 +65,7 @@ Places that are made up (said on screen): your café, your pier, your helicopter
 - **Minute 7, M9:** Japan 2011; 10× Tsar Bomba; up here you only watch; the bay drains (a seiche) and comes back over
   your café; Los Angeles (Hollywood sign), Mexico City (jelly).
 - **Minute 8, M10:** never recorded (Chile 1960 bars); no fault is long enough; past 1 g; a month of human energy; the
-  Hoover Dam; the Space Needle (Rainier behind); from space, the crack runs Los Angeles to Oregon.
+  Hoover Dam; the Space Needle; from space, the crack runs Los Angeles to Oregon.
 - **Minute 9, M11:** three years of human energy; even the air shakes; Tokyo at 2 AM (the Skytree), Dubai (the Burj
   Khalifa), Istanbul (the Bosphorus Bridge); two dozen quakes; two hours of fuel, nowhere to land.
 - **Minute 10, M12:** four days of sunlight; Earth cracking from space; the crack melts the rock; the dinosaur asteroid
@@ -99,7 +99,25 @@ Places that are made up (said on screen): your café, your pier, your helicopter
   (solo renders, K-weighted 10-s windows, gains added). Targets: −16 to −14 LUFS, ≤ −1 dBTP.
 
 ## 5. Review log
-(filled in as the rounds happen: scores as given)
+Three independent reviewers per round (pacing, picture, science), each looking at contact sheets of a full preview
+render and the script. Scores as given, out of 10.
+
+| Round | Pacing | Picture | Science |
+|---|---|---|---|
+| 1 (first preview) | 5 | 4 | 7 |
+| 2 (after fix round 1) | 5 | 5 | 8 |
+
+- **Round 1 → fix round 1:** the tsunami read as a fog band (now a dark wall of water with a foam crest, the bay
+  floor showing as it drains); fires, haze, mud boils, the split road, the pier and the crack pit redone; cockpit angles;
+  label caps; minute 1 reordered and minute 2 cut faster; the moving "postcard" city shots; the planet cracking.
+- **Round 2 → fix round 2:** science wording on the tags (rupture length against Chile 1960 and Sumatra 2004, the crack
+  still growing onto the Cascadia fault, the Golden Gate's retrofit, MOAB "used in war", Tsar Bomba "ever exploded",
+  seismograph wave height, where the quake starts, oceans boiling at magnitude 15 to 16, log scale on the last chart);
+  the wall of water now reaches the terrace on screen; the Bay Bridge's deck drop happens inside its shot; a bus for "a
+  truck rumbling past"; gentler streetcar tilt; smoke and spray fade near the lens; labels that pointed at haze removed;
+  text kept off faces and cards; a scrim under the counter; slow beats in minutes 1 and 2 split into more shots.
+- **Still weak (honest):** minutes 1 and 2 are calm by design (magnitudes 3 and 4 are barely felt), so the pacing
+  reviewers kept asking for more; the far city is low-detail from the air.
 
 ## 6. Status
 In production on branch `claude/project-thread-4w7kq0`.

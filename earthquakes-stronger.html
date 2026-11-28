@@ -12,6 +12,8 @@
        The new recipe's minimal text: MAGNITUDE and one giant number, one status word, the minute bar, labels on things.
        Bold sans, no serif. */
     #hud::before { display: none; }
+    .eq-scrim { position: absolute; left: 0; top: 0; width: calc(var(--u) * 820); height: calc(var(--u) * 560); pointer-events: none;   /* (under the counter: on a bright sky the white numbers washed out) */
+      background: radial-gradient(ellipse at 0% 0%, rgba(4, 6, 10, 0.42) 0%, rgba(4, 6, 10, 0.26) 38%, rgba(4, 6, 10, 0) 72%); }
     .eq-count { position: absolute; left: calc(var(--u) * 56); top: calc(var(--u) * 36); pointer-events: none; transform-origin: 0 30%;
       text-shadow: 0 0 calc(var(--u) * 26) rgba(0, 0, 0, 0.55), 0 calc(var(--u) * 4) calc(var(--u) * 14) rgba(0, 0, 0, 0.6); }
     .eq-count .l { font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 40); letter-spacing: 0.2em; color: #ffffff; opacity: 0.95; }

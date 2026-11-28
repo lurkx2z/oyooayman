@@ -226,9 +226,9 @@ eqSound('music', 'score', function (ctx, bus, K) {
       const tk = wd('x32', 'thousand'); stab(tk, tk + 3.5, [36, 48, 55, 60, 63, 67], 0.2); }
     // "Everything you see from here on happens in real time.": a clock, one tick a second, to the end of the minute
     clock(W('realtime'), T(2) - 0.05, 1.0, 0.7, { ramp: (u) => 0.6 + 0.4 * u });
-    M.prog([[W('realtime'), ch(1, 'min9')], [W('cup'), ch(1, 'six')], [B('calmWide'), ch(1, 'cl')]], T(2) - 0.1, 0.16, { cut: 900, cutTo: 1600, lastRel: 0.2 });
+    M.prog([[W('realtime'), ch(1, 'min9')], [W('cup'), ch(1, 'six')], [B('promenade'), ch(1, 'cl')]], T(2) - 0.1, 0.16, { cut: 900, cutTo: 1600, lastRel: 0.2 });
     eqPulse(ctx, M.bus, W('realtime') + 0.5, T(2) - 0.05, [36, 43, 48], 1.0, 0.45, { cut: 300, cutTo: 700, acc: 2, decay: 0.35, ramp: (u) => 0.6 + 0.4 * u });
-    rise(B('calmWide'), T(2) - 0.02, 0.035, 1 / 9, 380); }
+    rise(B('promenade'), T(2) - 0.02, 0.035, 1 / 9, 380); }
 
   // ================================================================== minute two: C♯ minor, a heartbeat
   tickHit(2);

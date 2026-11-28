@@ -17,10 +17,11 @@ const EQ_TAGS = (() => {
   return [
     [W('sat'), E('sat'), 'SAN FRANCISCO IS REAL · YOUR CAFÉ AND YOUR PIER ARE MADE UP'],
     [W('rule'), E('rule'), 'THE ONE MADE-UP RULE · REAL EARTHQUAKES PEAK AND STOP'],
-    [W('x32'), E('x32'), 'EACH STEP: ABOUT 10× THE SHAKING · 32× THE ENERGY (USGS: LOG₁₀ E = 1.5 M + 4.8)'],
+    [W('x32'), E('x32'), 'EACH STEP: WAVES 10× TALLER ON A SEISMOGRAPH, 32× THE ENERGY\n(USGS: LOG₁₀ E = 1.5 M + 4.8)'],
     [W('realtime'), E('realtime', 1.2), 'ONE MINUTE OF FILM = ONE MINUTE OF EARTHQUAKE'],
     [W('faults'), E('faults'), 'REAL: THE SAN ANDREAS AND HAYWARD FAULTS (USGS)'],
     [W('alert'), E('alert', 1.8), 'REAL: CALIFORNIA’S SHAKEALERT SENDS PHONE ALERTS LIKE THIS'],
+    [W('tnt'), E('tnt', 1.0), 'IN THIS FILM IT STARTS ON A SMALL FAULT UNDER THE WATERFRONT\nAND BREAKS INTO THE SAN ANDREAS'],
     [W('drop'), E('drop'), 'REAL ADVICE IN A REAL EARTHQUAKE: DROP, COVER, HOLD ON'],
     [W('ferry'), E('ferry'), 'REAL: THE FERRY BUILDING (1898) CAME THROUGH 1906 AND 1989'],
     [W('start'), E('start'), 'A TURBINE HELICOPTER TAKES A MINUTE OR TWO TO START UP'],
@@ -32,26 +33,27 @@ const EQ_TAGS = (() => {
     [W('y1906'), E('fires'), 'SAN FRANCISCO, 18 APRIL 1906: MAGNITUDE 7.9 · THE FIRES BURNED FOR THREE DAYS'],
     [W('bravo'), E('bravo'), 'CASTLE BRAVO, 1954: 15 MEGATONS · MAGNITUDE 8 ≈ 15 MEGATONS OF TNT'],
     [W('pyramid'), E('pyramid'), 'REAL: IN 1989 THE PYRAMID SWAYED FOR OVER A MINUTE, UNDAMAGED'],
+    [W('golden'), E('golden', 4.5), 'REAL: THE GOLDEN GATE IS RETROFITTED FOR A MAGNITUDE 8.3\nTHAT IS ABOUT A MINUTE OF SHAKING, NOT FIVE AND A HALF'],
     [W('notjust'), E('notjust', 1.5), 'REAL: ABOUT 1.4 MILLION EARTHQUAKES OF MAGNITUDE 2 OR MORE A YEAR (USGS)\nIN THIS FILM, EVERY ONE OF THEM KEEPS GROWING TOO'],
     [W('japan'), E('japan'), 'TŌHOKU, JAPAN, 11 MARCH 2011: MAGNITUDE 9.0–9.1'],
-    [W('tsar'), E('tsar'), 'TSAR BOMBA, 1961: 50 MEGATONS, THE BIGGEST BOMB EVER BUILT'],
+    [W('tsar'), E('tsar'), 'TSAR BOMBA, 1961: 50 MEGATONS, THE BIGGEST BOMB EVER EXPLODED'],
     [W('empty'), E('empty', 1.0), 'REAL: SHAKING CAN SLOSH A BAY LIKE A BATH (A SEICHE)'],
     [W('mexico'), E('mexico'), 'REAL: IN 1985 AND 2017 THE OLD LAKE BED MADE MEXICO CITY SHAKE HARDER'],
     [W('never2'), E('never2'), 'VALDIVIA, CHILE, 22 MAY 1960: MAGNITUDE 9.5, THE STRONGEST EVER RECORDED'],
-    [W('fault'), E('fault'), 'BIGGER QUAKES NEED LONGER FAULTS · THE LONGEST EVER SEEN: ABOUT 1,500 KM · A TEN NEEDS FAR MORE'],
-    [W('gravity'), E('gravity'), 'REAL: A FEW SPOTS HAVE SHAKEN PAST 1 G (NORTHRIDGE 1994, IWATE 2008) · HERE THE WHOLE CITY DOES'],
+    [W('fault'), E('fault'), 'BIGGER QUAKES NEED LONGER FAULTS · A TEN NEEDS FAR MORE\nTHE LONGEST EVER SEEN (CHILE 1960, SUMATRA 2004): ABOUT 1,000–1,500 KM'],
+    [W('gravity'), E('gravity'), 'REAL: A FEW SPOTS HAVE SHAKEN PAST 1 G (NORTHRIDGE 1994, IWATE 2008)\nHERE THE WHOLE CITY DOES'],
     [W('month'), E('month'), 'ALL HUMAN ENERGY USE: ABOUT 620 EXAJOULES A YEAR'],
     [W('dam'), E('dam'), 'HOOVER DAM: 221 M TALL, 1936 · LAKE MEAD BEHIND IT'],
     [W('needle'), E('needle'), 'SPACE NEEDLE: 184 M, 1962'],
-    [W('crack'), E('crack', 3.4), 'THE CRACK GROWS AT 5 KM/S, AS FAST AS THE FASTEST REAL RUPTURES'],
-    [E('crack', 3.6), eqTick(9) - 0.4, 'REAL FAULTS SLIDE SIDEWAYS, THEY DON’T GAPE OPEN · PAST MAGNITUDE 10, NOBODY KNOWS WHAT THEY’D DO'],
+    [W('crack'), E('crack', 3.4), 'THE CRACK GROWS AT 5 KM/S, AS FAST AS THE FASTEST REAL RUPTURES\nIT IS ABOUT 1,300 KM LONG NOW, AND STILL GROWING\nPAST CALIFORNIA IT JUMPS ONTO THE CASCADIA FAULT, OFF OREGON'],
+    [E('crack', 3.6), eqTick(9) - 0.4, 'REAL FAULTS SLIDE SIDEWAYS, THEY DON’T GAPE OPEN\nPAST MAGNITUDE 10, NOBODY KNOWS WHAT THEY’D DO'],
     [W('tokyo'), E('tokyo'), 'TOKYO IS 16 HOURS AHEAD OF SAN FRANCISCO · TOKYO SKYTREE: 634 M'],
     [W('dubai'), E('dubai'), 'BURJ KHALIFA: 828 M'],
     [W('istanbul'), E('istanbul'), 'THE BOSPHORUS BRIDGE, 1973: EUROPE ON ONE SIDE, ASIA ON THE OTHER'],
     [W('sun'), E('sun'), 'ALL THE SUNLIGHT REACHING EARTH: ABOUT 174,000 TERAWATTS'],
     [W('melt'), E('melt'), 'REAL: FAST FAULT SLIP CAN MELT ROCK (PSEUDOTACHYLYTE)'],
     [W('dino'), E('dino'), 'THE CHICXULUB ASTEROID, 66 MILLION YEARS AGO: ABOUT 4 × 10²³ JOULES'],
-    [W('seven'), E('seven'), 'TO BLOW EARTH APART: ABOUT 2.2 × 10³² JOULES (ITS GRAVITATIONAL BINDING ENERGY)'],
+    [W('seven'), E('seven'), 'TO BLOW EARTH APART: ABOUT 2.2 × 10³² JOULES (ITS GRAVITATIONAL BINDING ENERGY)\nTO BOIL EVERY OCEAN: ABOUT 3.7 × 10²⁷ JOULES, MAGNITUDE 15 TO 16'],
   ];
 })();
 
@@ -132,9 +134,11 @@ const EQ_DIA = (() => {
       s += `<line x1="1170" y1="680" x2="1810" y2="680" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>` + op(K(u, 3.0, 3.2), trace(680, 640, 70, false, RED, K(u, 3.0, 7.5)));
       return s;
     },
-    moab: (u) => compare(u, 'THE BIGGEST NON-NUCLEAR BOMB', 'MOAB, 2017', '11 T', 11, 'MAGNITUDE 4', '15 T', 15) + op(K(u, 2.4, 3.0), tx(1575, 852, 24, 'w', 'TONS OF TNT · NOT NUCLEAR', 'middle')),
+    moab: (u) => compare(u, 'THE BIGGEST NON-NUCLEAR BOMB USED IN WAR', 'MOAB, 2017', '11 T', 11, 'MAGNITUDE 4', '15 T', 15) + op(K(u, 2.4, 3.0), tx(1575, 852, 24, 'w', 'TONS OF TNT · NOT NUCLEAR', 'middle')),
     // the phone alert
     alert: (u, t) => phone(u, t, 1340, 150, eqClock(eqS(t)).replace(/ (AM|PM)/, ''), [[eqW('alert') - 0.1, 'EMERGENCY ALERT', 'EARTHQUAKE DETECTED!', '#a3221c'], [eqW('alert') + 0.5, 'DROP, COVER, HOLD ON', 'PROTECT YOURSELF', '#6a1a16']], 'SATURDAY'),
+    // the tour: your booking on your phone
+    ticket: (u, t) => phone(u, t, 1340, 150, eqClock(eqS(t)).replace(/ (AM|PM)/, ''), [[eqWord('tour', 'the', 2).start - 0.1, 'BAY HELICOPTER TOUR', 'DEPARTS 10:00 AM · PIER HELIPAD', '#1d3f6e']], 'SATURDAY'),
     // 500 tons of TNT: five hundred blocks, right under your feet
     tnt: (u) => {
       let s = plate(1150, 200, 720, 640);
@@ -194,13 +198,13 @@ const EQ_DIA = (() => {
     },
     // Mexico City: an old lake bed over rock; the soft clay shakes much harder
     lakebed: (u, t) => {
-      let s = plate(160, 640, 1600, 390);
-      const y0 = 760, sh = K(u, 1.5, 2.2), W = (x) => sh * 18 * Math.sin(x * 0.03 - t * 9) * Math.exp(-Math.abs(x - 960) / 600);
-      s += tx(200, 710, 36, 'b', 'MEXICO CITY: AN OLD LAKE BED');
+      let s = plate(160, 500, 1600, 390);   // (above the honest tag: at 640 the tag sat on the card's rock)
+      const y0 = 620, sh = K(u, 1.5, 2.2), W = (x) => sh * 18 * Math.sin(x * 0.03 - t * 9) * Math.exp(-Math.abs(x - 960) / 600);
+      s += tx(200, 570, 36, 'b', 'MEXICO CITY: AN OLD LAKE BED');
       let d = `M 200 ${y0}`; for (let x = 200; x <= 1720; x += 20) d += ` L ${x} ${f1(y0 + W(x))}`; d += ` L 1720 ${y0 + 150} Q 960 ${y0 + 40} 200 ${y0 + 150} Z`;
       s += `<path d="${d}" fill="#8a7a5a"/>` + tx(960, y0 + 70, 30, 'b', 'SOFT CLAY (THE OLD LAKE)', 'middle', 'style="fill:#20180c"');
       s += `<path d="M 200 ${y0 + 150} Q 960 ${y0 + 40} 1720 ${y0 + 150} L 1720 ${y0 + 250} L 200 ${y0 + 250} Z" fill="#4a4a50"/>` + tx(960, y0 + 210, 30, 'b', 'ROCK', 'middle');
-      s += op(sh, tx(1700, 710, 32, 's', 'THE CLAY SHAKES LIKE JELLY', 'end'));
+      s += op(sh, tx(1700, 570, 32, 's', 'THE CLAY SHAKES LIKE JELLY', 'end'));
       return s;
     },
     // the record ladder: the strongest earthquakes ever recorded, and now
@@ -253,18 +257,21 @@ const EQ_DIA = (() => {
     // seven more minutes: enough to blow Earth apart (a ladder, ×32 every step, on a log scale)
     seven: (u) => {
       let s = plate(1120, 170, 750, 720);
-      s += tx(1160, 240, 36, 'b', 'EVERY BAR: 32× THE ONE BEFORE');
+      s += tx(1160, 236, 36, 'b', 'EVERY BAR: 32× THE ONE BEFORE') + tx(1160, 272, 22, 's', 'LOG SCALE');
       const y0 = 840, sc = 52, lg = (M) => 1.5 * M + 4.8, base = lg(12);
       const bind = Math.log10(2.2e32), yb = y0 - (bind - base + 1) * sc * 0.56 * 1.6;
       for (let M = 12; M <= 19; M++) { const k = K(u, 0.3 + (M - 12) * 0.35, 0.6 + (M - 12) * 0.35), h = (lg(M) - base + 1) * sc * 0.56 * 1.6;
         s += op(k, bar(1170 + (M - 12) * 84, y0 - h, 64, h, M === 19 ? RED : M === 12 ? YOU : PALE, 1, 10) + tx(1202 + (M - 12) * 84, y0 + 36, 28, 'b', String(M), 'middle')); }
+      const yo = y0 - (Math.log10(3.7e27) - base + 1) * sc * 0.56 * 1.6;   // (heat and boil every ocean: ~1.4 × 10²¹ kg)
+      s += op(K(u, 2.0, 2.5), `<line x1="1150" y1="${f1(yo)}" x2="1850" y2="${f1(yo)}" stroke="${SKY}" stroke-width="4" stroke-dasharray="12 10"/>${tx(1160, yo - 12, 24, 's', 'BOILS THE OCEANS')}`);
       s += op(K(u, 3.0, 3.6), `<line x1="1150" y1="${f1(yb)}" x2="1850" y2="${f1(yb)}" stroke="${AMB}" stroke-width="5" stroke-dasharray="18 10"/>${tx(1160, yb - 16, 28, 's', 'ENOUGH TO BLOW THE PLANET APART')}`);
       return s;
     },
     // the end: the question, then the honest note
     question: (u) => {
       const k = K(u, 0.25, 0.9), a = K(u, 2.4, 2.9);
-      return op(k, `<rect x="0" y="0" width="1920" height="1080" fill="rgba(0,0,0,${f2(0.35 * k)})"/>${tx(960, 580, 118, 'b', 'WHO WOULD YOU CALL?', 'middle')}`)
+      // (on the left, two lines: across the middle it ran over your mouth)
+      return op(k, `<rect x="0" y="0" width="1920" height="1080" fill="rgba(0,0,0,${f2(0.35 * k)})"/>${tx(80, 478, 94, 'b', 'WHO WOULD')}${tx(80, 584, 94, 'b', 'YOU CALL?')}`)
         + op(a, tx(960, 960, 30, 'w', 'REAL EARTHQUAKES PEAK AND STOP · THE ONE MADE-UP RULE IS THAT THIS ONE DOESN’T', 'middle') + tx(960, 1004, 26, 's', 'EVERY COMPARISON IN THIS FILM USES REAL DATA', 'middle'));
     },
   };
@@ -274,6 +281,7 @@ const EQ_DIA = (() => {
 class EqHud {
   constructor(root) {
     const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.innerHTML = html || ''; d.style.opacity = '0'; root.appendChild(d); return d; };
+    this.scrim = mk('eq-scrim');
     this.dia = mk('eq-dia');
     this.count = mk('eq-count', '<div class="l">MAGNITUDE</div><div class="v"></div>'); this.countV = this.count.querySelector('.v');
     this.stat = mk('eq-stat');
@@ -293,6 +301,7 @@ class EqHud {
     // ---- the counter: MAGNITUDE N (the cold open says twelve; then from the first tick, the one you're in)
     const ca = q ? 1 - MathX.smooth(t, shot.t0 + 0.2, shot.t0 + 0.7) : open ? MathX.smooth(t, 0.15, 0.4) : MathX.smooth(t, EQ.tick0 + 0.1, EQ.tick0 + 0.3);
     this._set('ca', this.count, 'opacity', ca.toFixed(3));
+    this._set('sa', this.scrim, 'opacity', ca.toFixed(3));
     this._txt('cv', this.countV, String(M));
     const pop = !open ? Math.exp(-Math.max(0, t - tk) / 0.25) * MathX.smooth(t, tk, tk + 0.03) : 0;
     this._cls('cc', this.count, pop > 0.2 || M >= 12 ? 'eq-count tick' : 'eq-count');

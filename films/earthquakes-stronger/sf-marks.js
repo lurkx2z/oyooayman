@@ -325,7 +325,7 @@ function eqMarks(scene, app) {
 
 // when the landmarks fail (story seconds; shots.js shows each one)
 const EQ_FAIL = {
-  bayPiece: 289.5,           // minute 5 (magnitude 7): a piece of the deck drops (as in 1989)
+  bayPiece: 287.0,           // minute 5 (magnitude 7): a piece of the deck drops (as in 1989; inside the bayDrop shot)
   ferryTower: 303.2,         // minute 6 (8): the clock tower comes down
   pyramid: eqWord('pyramid', 'not').start - EQ.tick0 + 0.35,   // "Not this one."
   gg: 336.5,                 // the Golden Gate's main span

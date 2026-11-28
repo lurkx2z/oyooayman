@@ -122,9 +122,13 @@ function eqBurst(soft, adds, t, ev, o = {}) {
 // a cloud of dust rolling out from its foot for 20 s; from minute six, fires (a smoke column and flames) at a few
 // hundred of the fallen ones. Only what is within `range` of the camera, and at most `max` events.
 // ---------------------------------------------------------------------------------------------------------------------
-const EQ_FIRE_S0 = 311.5;                                                     // "And the fires are starting again."
-function eqCityFx(soft, adds, s, info, cam, o = {}) {
-  const range = o.range || 6000, max = o.max || 260, cx = cam.position.x, cz = cam.position.z;
+const EQ_FIRE_S0 = 300.5;                                                     // (lit by the magnitude-8 jolt, so the columns are up by "And the fires are starting again.")
+function eqCityFx(soft0, adds0, s, info, cam, o = {}) {
+  const range = o.range || 6000, max = o.max || 260, cx = cam.position.x, cz = cam.position.z, cy = cam.position.y;
+  // (a puff fades out as the camera comes within a few of its own sizes: the helicopter flies through the smoke, and a
+  // 30 m cloud a few tens of metres from the lens read as a flat white or black blob over the frame)
+  const nearFade = (pool) => ({ add(x, y, z, sz, al, r, g, b) { const k = MathX.smooth(Math.hypot(x - cx, y - cy, z - cz), sz * 1.2, sz * 3.5); if (k > 0.004) pool.add(x, y, z, sz, al * k, r, g, b); } });
+  const soft = nearFade(soft0), adds = nearFade(adds0);
   let n = 0;
   for (let i = 0; i < info.length && n < max; i++) {
     const b = info[i], u = s - b.sf; if (u < 0 || u > 40) continue;
@@ -137,14 +141,17 @@ function eqCityFx(soft, adds, s, info, cam, o = {}) {
   if (s > EQ_FIRE_S0) {
     // every fire within ~2 km of the camera (fading out at the edge, so nothing pops as the camera moves) and a few
     // far ones for the skyline (spread over the whole city, the old 80 were all kilometres away and lost in the haze)
-    let k = 0;
-    for (let i = 0; i < info.length; i += 37) {
+    // (one fallen building in 13 burns, half as many past 1.3 km, at most 220 near ones: the puff pools must not overflow
+    // once most of the city is down; one in 37 left the fires shot with two or three)
+    let k = 0, nn = 0;
+    for (let i = 0; i < info.length; i += 13) {
       const b = info[i]; if (s < b.sf + 6 || (s < EQ_FIRE_S0 + 2 && i % 2)) continue;
       const d = Math.hypot(b.x - cx, b.z - cz); if (d > range * 1.3) continue;
-      const near = 1 - MathX.smooth(d, 1700, 2300), far = d > 1700 && (i / 37) % 3 === 0 && k < (o.fires || 40);
-      if (near <= 0 && !far) continue;
-      if (near <= 0) k++;
-      const fade = Math.max(near, far ? 0.8 : 0);
+      const near = 1 - MathX.smooth(d, 2400, 3200), far = d > 2400 && (i / 13) % 8 === 0 && k < (o.fires || 40);
+      const isNear = near > 0 && (d < 1300 || (i / 13) % 2 === 0) && nn < 220;
+      if (!isNear && !far) continue;
+      if (isNear) nn++; else k++;
+      const fade = Math.max(isNear ? near : 0, far ? 0.8 : 0);
       const t0 = Math.max(b.sf + 6, EQ_FIRE_S0 + (i % 11) * 0.7), S = 22 + b.h * 0.25;
       eqBurst(soft, adds, s, { t: t0, p: [b.x, b.y + b.h * 0.15, b.z], kind: 'column', size: S, n: d < 2500 ? 22 : 10, seed: i * 13 + 5, life: 300, period: 36, fade });
       if (d < 3500) eqBurst(soft, adds, s, { t: t0, p: [b.x, b.y + 1, b.z], kind: 'flame', size: S * 0.45, n: 8, seed: i * 17 + 3, life: 300, fade });

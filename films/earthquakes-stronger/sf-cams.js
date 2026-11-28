@@ -37,6 +37,8 @@ function eqSfCam(mode, u, s, set, X) {
     cupMacro: () => { const c = cupW(); const k = MathX.smooth(u, 0, 3); return gr({ p: [c[0] + 0.07 - 0.02 * k, c[1] + 0.16 - 0.04 * k, c[2] + 0.06], at: [c[0], c[1] + 0.066, c[2]], fov: 28, near: 0.01, shC: c, shR: 3, shakeK: 0.25 }); },
     terraceRise: () => gr({ p: eqPush(eqG(364, 3.8, 17), eqG(372, 30, 62), u, 5), at: eqPush(eqG(372, 3, 9), eqG(356, 2, -32), u, 5), fov: 48, shC: eqG(372, 2, 6), shR: 50, shakeK: 0.3 }),
     bayView2: () => gr({ p: eqPush(eqG(361.5, 3.3, 14.5), eqG(361.5, 3.4, 15.5), u, 5), at: eqG(1400, 45, 1250), fov: 40, shC: eqG(372, 2, 12), shR: 30, shakeK: 0.3 }),
+    promenade: () => gr({ p: eqPush(eqG(383, Y + 1.45, -1.6), eqG(387, Y + 1.45, -1.8), u, 3), at: eqG(440, Y + 1.4, -9), fov: 44, shC: eqG(400, 2, -6), shR: 40, shakeK: 0.2 }),   // (among the walkers: nobody has noticed)
+    pilotPhone: () => { H.g.updateMatrixWorld(true); const p = set.pilot.headWorld(), c = H.toWorld(1.1, 1.72, 7.6); return gr({ p: [c.x, c.y, c.z], at: [p.x, p.y - 0.08, p.z], fov: 30, shC: [p.x, p.y, p.z], shR: 14, shakeK: 0.2 }); },
     calmWide: () => gr({ p: eqPush(eqG(331, Y + 1.7, -41), eqG(336, Y + 1.7, -41), u, 5), at: eqG(372, 4.2, 8), fov: 40, shC: eqG(366, 2, -12), shR: 50, shakeK: 0.2 }),
     // ---- minute two
     jolt4: () => gr({ p: eqG(388.5, 4.2, 17.8), at: eqG(366, 3.0, 7.5), fov: 50, shC: eqG(372, 2, 10), shakeK: 1.4 }),
@@ -54,12 +56,17 @@ function eqSfCam(mode, u, s, set, X) {
     ferryLook: () => gr({ p: eqPush(eqG(52, Y + 1.6, -9), eqG(46, Y + 1.6, -9.5), u, 4), at: eqG(0, 40, 6), fov: 50, shC: eqG(10, 2, 0), shR: 60, shakeK: 0.6 }),
     drone: () => air({ p: eqPush(eqG(430, 62, 150), eqG(445, 66, 160), u, 8), at: eqG(335, 3, -25), fov: 46, near: 0.5, shR: 140, shC: eqG(360, 2, -20) }),
     birds: () => gr({ p: eqG(377.5, 3.3, 38), at: eqPush(eqG(382, 3.8, 70), eqG(390, 14, 110), u, 3.5), fov: 46, shC: eqG(380, 2, 60), shR: 30, shakeK: 0.4 }),
-    pier: () => gr({ p: eqPush(eqG(379.4, 4.3, 24), eqG(379.4, 4.25, 29), u, 7),   // (on the pier itself: from the café's end its railing swept across the lens)
-      at: eqG(380, 3.4, 160), fov: 34, shC: eqG(380, 2, 60), shR: 70, shakeK: 0.4 }),
+    pier: () => gr({ p: eqPush(eqG(379.4, 4.3, 24), eqG(379.4, 4.25, 27), u, 3),   // (on the pier itself: from the café's end its railing swept across the lens)
+      at: eqG(380, 3.2, 160), fov: 17, shC: eqG(380, 2, 60), shR: 70, shakeK: 0.3 }),   // (long lens: the helicopter big at the end of the pier)
+    youTicket: () => { const h = head(); return gr({ p: eqAhead(h, yaw, 0.95, -0.55, -0.1), at: [h[0], h[1] - 0.3, h[2]], fov: 38, shC: h, shR: 6, shakeK: 0.4 }); },   // (you check the tour on your phone)
+    rotorStart: () => { H.g.updateMatrixWorld(true); const c = H.toWorld(-4.6, 0.8, 7.2), a = H.toWorld(0, 2.3, 0.4); return gr({ p: [c.x, c.y, c.z], at: [a.x, a.y, a.z], fov: 50, shC: [a.x, a.y, a.z], shR: 16, shakeK: 0.6 }); },
+    pierOTS: () => { const h = head(), pad = eqG(380, 3.2, 158), dx = pad[0] - h[0], dz = pad[2] - h[2], l = Math.hypot(dx, dz);   // (over your shoulder, down the pier)
+      return gr({ p: [h[0] - dx / l * 1.5 + dz / l * 0.5, h[1] + 0.15, h[2] - dz / l * 1.5 - dx / l * 0.5], at: pad, fov: 40, shC: h, shR: 14, shakeK: 0.8 }); },
     pilotWave: () => { const p = set.pilot.headWorld(); return gr({ p: eqG(376.6, 3.3, 141), at: [p.x, p.y - 0.25, p.z], fov: 34, shC: [p.x, p.y, p.z], shR: 12, shakeK: 0.5 }); },
     youSee: () => { const h = head(); return gr({ p: eqAhead(h, yaw, 2.2, 0.6, -0.1), at: [h[0], h[1] - 0.15, h[2]], fov: 40, shC: h, shR: 8, shakeK: 0.7 }); },
     // ---- minute three
-    jolt5: () => gr({ p: eqG(364.8, Y + 1.75, 7.4), at: eqG(360.6, Y + 2.3, 10.6), fov: 48, shC: eqG(361, 3, 10), shR: 8, shakeK: 1.1 }),
+    jolt5: () => gr({ p: eqG(364.8, Y + 1.75, 7.4), at: eqG(358.4, Y + 2.1, 8.8), fov: 48,   // (the menu on the right: on the left it sat under the counter)
+      shC: eqG(361, 3, 10), shR: 8, shakeK: 1.1 }),
     everyone: () => gr({ p: eqG(327, Y + 1.75, -4.5), at: eqG(380, Y + 1.3, -8), fov: 48, shC: eqG(350, 2, -6), shR: 40, shakeK: 1.0 }),
     alert: () => gr({ p: eqG(364.6, 3.4, 2.8), at: eqG(368.3, 2.9, 5.0), fov: 40, shC: eqG(368, 2, 4.5), shR: 8, shakeK: 0.9 }),
     phones: () => gr({ p: eqG(402, Y + 1.6, -6.5), at: eqG(350, Y + 1.1, -11.5), fov: 44, shC: eqG(380, 2, -8), shR: 40, shakeK: 1.0 }),
@@ -71,7 +78,8 @@ function eqSfCam(mode, u, s, set, X) {
     ferry: () => gr({ p: eqPush(eqG(262, Y + 1.7, -8), eqG(254, Y + 1.7, -8), u, 6), at: eqG(0, 48, 6), fov: 24, shC: eqG(0, 40, 6), shR: 60, shakeK: 0.5 }),
     pierRun: () => { const h = head(); return gr({ p: eqAhead(h, yaw, 5.5, 0.4, 0.05), at: [h[0], h[1] - 0.2, h[2]], fov: 44, shC: h, shR: 14, shakeK: 1.0 }); },
     pierTrack: () => { const h = head(), [, hv] = eqUV(h[0], h[2]); return gr({ p: eqG(396, 3.4, hv - 5), at: [h[0], h[1] - 0.3, h[2]], fov: 40, shC: h, shR: 16, shakeK: 1.0 }); },
-    pierHeli: () => { const h = head(); return gr({ p: eqG(382.3, 3.5, 150), at: [h[0], h[1] - 0.4, h[2]], fov: 34, shC: eqG(380, 2, 135), shR: 30, shakeK: 1.0 }); },
+    pierHeli: () => { const h = head(); H.g.updateMatrixWorld(true); const c = H.toWorld(-3.5, 1.7, -7.5); return gr({ p: [c.x, c.y, c.z], at: [h[0], h[1] - 0.4, h[2]], fov: 40,   // (past the helicopter's tail: you run towards it)
+      shC: eqG(380, 2, 135), shR: 30, shakeK: 1.0 }); },
     // ---- minute four
     jolt6: () => gr({ p: eqG(383.4, 2.7, 134.5), at: eqG(380.1, 2.6, 128.6), fov: 46, shC: eqG(380, 2, 130), shR: 10, shakeK: 1.3 }),
     skyline: () => gr({ p: eqG(385.5, 6.5, 152), at: eqG(220, 55, -320), fov: 46, shC: eqG(380, 2, 140), shR: 60, shakeK: 1.0 }),
@@ -88,8 +96,8 @@ function eqSfCam(mode, u, s, set, X) {
     cockpitWait: () => ({ local: true, p: [-0.15, 1.96, 1.85], at: [0.45, 2.0, 0.78], fov: 40, inside: true, shR: 6, near: 0.03 }),
     rotorUp: () => gr({ p: eqG(370.5, 2.95, 166.5), at: eqG(380, 5.8, 160), fov: 52, shC: eqG(380, 2, 160), shR: 16, shakeK: 1.0 }),
     // ---- minute five
-    jolt7: () => gr({ p: eqG(396, 9.5, 171), at: eqG(370, 9, -60), fov: 50, shC: eqG(380, 2, 60), shR: 120, shakeK: 1.0 }),
-    haiti: () => gr({ p: eqG(387, 7.5, 163), at: eqG(150, 40, -260), fov: 44, shC: eqG(380, 2, 140), shR: 80, shakeK: 1.0 }),
+    jolt7: () => gr({ cityFx: true, p: eqG(396, 9.5, 171), at: eqG(370, 9, -60), fov: 50, shC: eqG(380, 2, 60), shR: 120, shakeK: 1.0 }),
+    haiti: () => air({ p: eqPush(eqG(430, 125, 300), eqG(420, 118, 280), u, 6), at: eqG(80, 0, -430), fov: 46, shC: eqG(380, 2, 140), shR: 300 }),   // (up over the bay: from the pad the waterfront hid the old brick buildings coming down inland)
     brick: () => gr({ p: eqG(371, Y + 1.7, -6.5), at: eqG(381, 13, -60), fov: 54, shC: eqG(380, 2, -45), shR: 50, shakeK: 1.0 }),
     split: () => gr({ p: eqPush(eqG(402, Y + 6.5, -25.5), eqG(399, Y + 5.2, -26.5), u, 5), at: eqG(360, Y - 2.5, -30.5), fov: 50, shC: eqG(375, 2, -30), shR: 40, shakeK: 0.8 }),
     pierBreak: () => gr({ p: eqPush(eqG(388.5, Y + 3.2, 151.5), eqG(389, Y + 3.7, 153.5), u, 5.5), at: eqG(378, Y - 0.5, 66), fov: 52, shC: eqG(380, 2, 120), shR: 60, shakeK: 1.0 }),
@@ -103,7 +111,7 @@ function eqSfCam(mode, u, s, set, X) {
     // ---- minute six
     jolt8: () => air({ p: eqG(260, 88, 270), at: eqG(0, 36, 6), fov: 40, shC: eqG(0, 10, 0), shR: 200 }),
     y1906: () => air({ p: eqPush([760, 255, -260], [700, 250, -200], u, 7), at: [-600, 40, 500], fov: 42 }),
-    fires: () => air({ p: [300, 390, -1300], at: [-1500, 40, 1500], fov: 50 }),
+    fires: () => air({ p: eqPush([-900, 300, 900], [-950, 290, 960], u, 4), at: [-2500, 20, 3300], fov: 50 }),   // (over the districts that burn first: from downtown the fires were specks)
     wideCity: () => air({ p: eqPush([-200, 900, -3200], [-300, 880, -3100], u, 8), at: [-1500, 0, 1500], fov: 46 }),
     pyramid: () => air({ p: eqPush([-300, 170, -430], [-330, 165, -400], u, 9), at: [-801, 150, 33], fov: 36, shC: [-801, 100, 33], shR: 300 }),
     pyramidFall: () => air({ p: eqPush([-545, 185, -290], [-562, 180, -268], u, 6), at: [-801, 150, 33], fov: 42,   // (above the roofs: at 120 m it flew through one)
@@ -161,7 +169,7 @@ function eqSfLabels(mode, u, s, set, X) {
     faultMap: () => { const sa = eqLL(37.66, -122.53), hw = eqLL(37.79, -122.19); return [L([sa[0], 600, sa[1]], 'SAN ANDREAS FAULT'), L([hw[0], 600, hw[1]], 'HAYWARD FAULT', null, { side: 'r' }), L(eqG(372, 400, 10), 'YOU', null, { you: true })]; },
     faultMap2: () => { const sa = eqLL(37.6, -122.48), hw = eqLL(37.75, -122.15); return [L([sa[0], 300, sa[1]], 'SAN ANDREAS FAULT'), L([hw[0], 300, hw[1]], 'HAYWARD FAULT', null, { side: 'r' }), L(eqG(372, 200, 10), 'YOU', null, { you: true })]; },
     ferryLook: () => [L(M.ferry.top, 'FERRY BUILDING', '1898 · CAME THROUGH 1906 AND 1989')],
-    pier: () => [L(heliTop(), 'YOUR HELICOPTER', 'TOUR LEAVES AT 10:00')],
+    pier: () => [L(heliTop(), 'YOUR HELICOPTER', 'AT THE END OF THE PIER')],
     ferry: () => [L(M.ferry.top, 'FERRY BUILDING', 'SURVIVED 1906')],
     skyline: () => [L(M.salesforce.label, 'SALESFORCE TOWER', '326 M · TALLEST IN THE CITY')],
     streetcar: () => [L(eqG(447, 5.2, -25), 'F-LINE STREETCAR', 'VINTAGE CARS, STILL RUNNING')],
@@ -170,12 +178,11 @@ function eqSfLabels(mode, u, s, set, X) {
     y1906: () => [L(M.coit.label, 'COIT TOWER'), L(M.salesforce.label, 'SALESFORCE TOWER')],
     pyramid: () => [L(M.pyramid.label, 'TRANSAMERICA PYRAMID', '260 M · 1972')],
     golden: () => [L(M.gg.label, 'GOLDEN GATE BRIDGE', '1937 · 1,280 M SPAN')],
-    japan: () => [L(M.bay.label, 'BAY BRIDGE'), L(M.alcatraz.label, 'ALCATRAZ', null, { side: 'r' })],
+    japan: () => [L(M.bay.label, 'BAY BRIDGE', '1936'), L(M.alcatraz.label, 'ALCATRAZ', null, { side: 'r' })],
     empty: () => [L(eqG(360, 12, 10), 'YOUR CAFÉ')],
     cafe: () => [L(eqG(355, 14, 10), 'YOUR CAFÉ')],
     jolt10: () => [L(M.salesforce.label, 'SALESFORCE TOWER', '326 M')],
     crackSF: () => [L([-1434, 30, -166], 'THE CRACK', `${Math.round(eqCrackW(s))} M WIDE`)],
-    ruins: () => [L(M.sutro.label, 'SUTRO TOWER', '298 M')],
     melt: () => [L([-1100, 40, -260], 'THE CRACK', 'MOLTEN ROCK')],
   };
   const f = T[mode];

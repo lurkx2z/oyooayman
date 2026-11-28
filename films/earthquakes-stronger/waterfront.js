@@ -345,8 +345,9 @@ function eqWaterfront(scene, app) {
     // [lane v, direction (+1 south-east), where it ends up stopped (u), speed m/s]: each drives in from far away and
     // brakes when the shaking hits (story second ~124), so most of them stop near the café
     const spec = [[-43, 1, 395, 11], [-38, 1, 352, 12], [-43, 1, 318, 10.5], [-38, 1, 430, 11.5], [-17, -1, 405, 11], [-22, -1, 372, 12], [-17, -1, 330, 10.5], [-22, -1, 455, 11.8],
-      [-43, 1, 500, 11], [-17, -1, 262, 11], [-38, 1, 560, 12], [-22, -1, 600, 11.4], [-43, 1, 210, 11.2], [-17, -1, 520, 10.8], [-38, 1, 140, 11.6], [-22, -1, 690, 11]];
-    W.cars = spec.map(([v, dir, uStop, sp], i) => { const c = VF.build(types[i % types.length], cols[(i * 3) % cols.length]); scene.add(c.group); return { c, v, dir, u0: uStop - dir * (sp * 124 + sp * sp / 14), sp, i }; });
+      [-43, 1, 500, 11], [-17, -1, 262, 11], [-38, 1, 560, 12], [-22, -1, 600, 11.4], [-43, 1, 210, 11.2], [-17, -1, 520, 10.8], [-38, 1, 140, 11.6], [-22, -1, 690, 11],
+      [-38, 1, 974.1, 10, 'bus']];   // (the bus: "It feels like a truck rumbling past", it passes the low camera at story second 66.5)
+    W.cars = spec.map(([v, dir, uStop, sp, type], i) => { const c = VF.build(type || types[i % types.length], type === 'bus' ? '#c8c2b0' : cols[(i * 3) % cols.length]); scene.add(c.group); return { c, v, dir, u0: uStop - dir * (sp * 124 + sp * sp / 14), sp, i }; });
   }
   // ===================================================================================================================
   // per frame
@@ -421,8 +422,8 @@ function eqWaterfront(scene, app) {
       A.position.set(uA, Y + 0.21, 32); A.rotation.set(0, 0, 0); A.visible = uA > -760 && uA < 900;
       const B = W.tramB, u = s - EQ_WFT.tram, b = j(71), amp = Math.min(1, lvl * 5);
       let bu = 452, bv = -28, yaw = 0, roll = 0, y = Y + 0.21;
-      if (u > 0) { const k = MathX.clamp(u / 1.8, 0, 1), e = 1 - (1 - k) ** 3; bv += 3.4 * e; bu -= 5 * e; yaw = 0.34 * e; roll = 0.22 * e + 0.25 * Math.sin(Math.min(u, 1.2) * Math.PI / 1.2) * (1 - k); y += 0.9 * Math.sin(Math.min(u, 0.6) / 0.6 * Math.PI); }
-      if (s > EQ_WFT.wet) { y -= U.uSink.value * 0.8; roll += U.uSink.value * 0.12; }
+      if (u > 0) { const k = MathX.clamp(u / 1.8, 0, 1), e = 1 - (1 - k) ** 3; bv += 3.4 * e; bu -= 5 * e; yaw = 0.34 * e; roll = 0.06 * e + 0.1 * Math.sin(Math.min(u, 1.2) * Math.PI / 1.2) * (1 - k); y += 0.9 * Math.sin(Math.min(u, 0.6) / 0.6 * Math.PI); }
+      if (s > EQ_WFT.wet) { y -= U.uSink.value * 0.8; roll += U.uSink.value * 0.03; }
       y += Math.abs(roll) * 1.3;   // (it tips over its lower edge, not through the road)
       B.position.set(bu + b[0] * amp * 0.3, y + Math.max(0, b[1]) * amp * 0.3, -bv); B.rotation.set(roll, yaw, b[0] * amp * 0.04);
       void a;

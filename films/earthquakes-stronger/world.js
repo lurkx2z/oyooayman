@@ -473,8 +473,7 @@ function eqPostNeedle(app) {
     eqCam(cam, [P[0] + g[0] * 2, P[1] + g[1] * 1.5, P[2] + g[2] * 2], [P[0] + Math.sin(yaw) * 2000, 80, P[2] + Math.cos(yaw) * 2000], 18, g[0] * 15);
     eqShadowFollowAt(B.sun, [0, 0, 0], 300, 3000);
   };
-  pc.labels = (s, u) => [{ p: new THREE.Vector3(0, 190, 0).applyMatrix4(needle.matrixWorld), text: 'SPACE NEEDLE', sub: `SEATTLE · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8) * (1 - MathX.smooth(s, FALL + 0.6, FALL + 1.2)), quake: true, side: 'r' },
-    { p: [56300, 4600, 68700], text: 'MOUNT RAINIER', sub: '90 KM AWAY', a: MathX.smooth(u, 0.9, 1.4) * 0.9 }];
+  pc.labels = (s, u) => [{ p: new THREE.Vector3(0, 190, 0).applyMatrix4(needle.matrixWorld), text: 'SPACE NEEDLE', sub: `SEATTLE · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8) * (1 - MathX.smooth(s, FALL + 0.6, FALL + 1.2)), quake: true, side: 'r' }];   // (Mount Rainier's label pointed at haze: gone)
   pc.grade = (p) => { p.exposure = 1.04; p.saturation = 1.12; p.contrast = 1.08; };
   return pc;
 }

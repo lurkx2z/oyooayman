@@ -76,7 +76,7 @@ eqSound('sfx', 'street', function (ctx, bus, K) {
   const near = (t) => P.street(t) + 0.35 * P.cabin(t) * (t < lift ? 1 : 0);
   const o = (t, v, x = {}) => Object.assign({ vol: v * near(t), room, wet: 0.35 }, P.cabin(t) > 0.5 ? { lp: 900 } : {}, x);
   // ---- the cup on your table: tiny clinks as it ripples (minute one), the spoon rattling (minute two on)
-  for (const [a, b, n] of [[B('cupRipple') + 0.6, B('faceFelt'), 5], [B('cup') + 0.2, B('calmWide'), 9], [eqTick(2), eqTick(2) + 3, 8]]) for (let i = 0; i < n; i++) { const t = r.range(a, b); put(fx.hit(fx.cupModes(r.range(0.98, 1.02)), { width: 0.0003, amp: r.range(0.3, 1) }), t, { vol: 0.05 * r.range(0.5, 1), pan: 0.15 }); }
+  for (const [a, b, n] of [[B('cupRipple') + 0.6, B('faceFelt'), 5], [B('cup') + 0.2, B('promenade'), 9], [eqTick(2), eqTick(2) + 3, 8]]) for (let i = 0; i < n; i++) { const t = r.range(a, b); put(fx.hit(fx.cupModes(r.range(0.98, 1.02)), { width: 0.0003, amp: r.range(0.3, 1) }), t, { vol: 0.05 * r.range(0.5, 1), pan: 0.15 }); }
   // ---- "It feels like a truck rumbling past"
   putLR(eqWhoosh(fx, 4.5, 40, 220, 60, { peak: 0.5, q: 0.7, colour: 'brown', p0: -0.6, p1: 0.6 }), W('truck') - 0.4, { vol: 0.35 });
   // ---- the birds leave: a flurry of wings

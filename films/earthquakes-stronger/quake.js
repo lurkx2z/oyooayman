@@ -153,6 +153,7 @@ const EQ_CHECKS = (() => {
   near('magnitude 12 ≈ four days of all the sunlight on Earth (1.74e17 W)', eqE(12) / (1.74e17 * 86400), 4.2, 0.3);
   yes('magnitude 12 is still below the dinosaur-killer impact (~3–4 × 10^23 J); 13 passes it', eqE(12) < 3e23 && eqE(13) > 4.2e23 && eqE(13) > 1.3e24);
   yes('magnitude 19 (seven more minutes after minute ten) beats Earth\'s binding energy (~2.5 × 10^32 J); 18 does not', eqE(19) > 2.5e32 && eqE(18) < 2.5e32);
+  yes('boiling every ocean (~3.7 × 10^27 J) falls between magnitude 15 and 16', eqE(15) < 3.7e27 && eqE(16) > 3.7e27);
   // the helicopter: the tour "leaves in three minutes" (said in minute 2) and lifts off in minute 5
   near('the tour leaves about three minutes after the line', (sOf('lift') - sOf('tour')) / 60, 2.75, 0.4);
   yes('the helicopter starts up across two ticks (two more magnitudes)', eqMagOf(sOf('lift')) - eqMagOf(sOf('run')) === 2);

@@ -87,7 +87,7 @@ function eqHeli(scene) {
     for (const z of [-0.75, 1.05]) eqStrut(eqMesh(new THREE.CylinderGeometry(0.04, 0.04, 1, 8), metal, 0, 0, 0, g), [s * 1.15, 0.08, z], [s * 0.55, 0.85, z], 0.04); }
   // the name on the tail boom (both sides): made up
   const nameT = eqTex(eqCanvas(512, 96, (c) => { c.clearRect(0, 0, 512, 96); c.fillStyle = '#16807c'; c.font = '800 64px Montserrat, Arial, sans-serif'; c.textBaseline = 'middle'; c.fillText('BAY TOURS · N724BT', 8, 50); }), { repeat: false });
-  for (const s of [-1, 1]) { const n = eqMesh(new THREE.PlaneGeometry(2.4, 0.45), new THREE.MeshStandardMaterial({ map: nameT, transparent: true, alphaTest: 0.4, roughness: 0.5, polygonOffset: true, polygonOffsetFactor: -2 }), s * 0.3, 1.86, -3.3, g); n.rotation.y = s * Math.PI / 2; n.rotation.z = s * 0.02; n.castShadow = false; if (s < 0) n.scale.x = -1; }
+  for (const s of [-1, 1]) { const n = eqMesh(new THREE.PlaneGeometry(2.4, 0.45), new THREE.MeshStandardMaterial({ map: nameT, transparent: true, alphaTest: 0.4, roughness: 0.5, polygonOffset: true, polygonOffsetFactor: -2 }), s * 0.3, 1.86, -3.3, g); n.rotation.y = s * Math.PI / 2; n.rotation.z = s * 0.02; n.castShadow = false; }   // (no mirror flip: each plane faces out, so both sides already read left to right)
   // ---- the main rotor: three blades and the blur disc
   const rotor = new THREE.Group(); rotor.position.set(0, 3.22, 0); g.add(rotor);
   const bladeG = new THREE.BoxGeometry(5.2, 0.035, 0.32); bladeG.translate(2.75, 0, 0);
@@ -106,8 +106,8 @@ function eqHeli(scene) {
   eqMesh(new THREE.BoxGeometry(1.35, 0.36, 0.08), dark, 0, 0, 0, panel);
   const fuelTex = eqCanvasTex(256, 160, (c, w, h, st) => {
     c.fillStyle = '#05080a'; c.fillRect(0, 0, w, h); c.fillStyle = '#7ff0b0'; c.font = '700 26px Montserrat, Arial, sans-serif'; c.fillText('FUEL', 16, 36);
-    c.font = '800 54px Montserrat, Arial, sans-serif'; c.fillText(st.t, 16, 100); c.font = '700 20px Montserrat, Arial, sans-serif'; c.fillStyle = '#c8e8d8'; c.fillText('ENDURANCE', 16, 136);
-    c.strokeStyle = '#7ff0b0'; c.lineWidth = 6; c.strokeRect(170, 30, 60, 110); c.fillStyle = '#7ff0b0'; c.fillRect(176, 140 - 104 * st.k, 48, 104 * st.k - 6);
+    c.font = '800 54px Montserrat, Arial, sans-serif'; const tw = c.measureText(st.t).width; if (tw > 158) c.font = `800 ${Math.floor(54 * 158 / tw)}px Montserrat, Arial, sans-serif`; c.fillText(st.t, 16, 100);   // (it ran into the tank) c.font = '700 20px Montserrat, Arial, sans-serif'; c.fillStyle = '#c8e8d8'; c.fillText('ENDURANCE', 16, 136);
+    c.strokeStyle = '#7ff0b0'; c.lineWidth = 6; c.strokeRect(188, 30, 52, 110); c.fillStyle = '#7ff0b0'; c.fillRect(194, 140 - 104 * st.k, 40, 104 * st.k - 6);
   });
   const mapTex = eqTex(eqCanvas(256, 160, (c) => { c.fillStyle = '#0a1a2a'; c.fillRect(0, 0, 256, 160); c.fillStyle = '#2a4a3a'; c.beginPath(); c.moveTo(0, 160); c.lineTo(0, 70); c.lineTo(90, 60); c.lineTo(120, 100); c.lineTo(150, 160); c.fill(); c.strokeStyle = '#ffd36a'; c.lineWidth = 3; c.beginPath(); c.moveTo(128, 80); c.lineTo(200, 20); c.stroke(); c.fillStyle = '#ff6a1f'; c.beginPath(); c.arc(128, 80, 6, 0, 6.29); c.fill(); }), { repeat: false });
   fuelTex.update({ t: '2:00 H', k: 0.62 });

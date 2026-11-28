@@ -29,7 +29,7 @@ const EQ_YT = { stand: 113.0, grab: 119.8, cover: eqW('drop') - EQ.tick0 + 2.2, 
 // your face in each shot mode: [expression, look ('cam' | 'out' | null)]
 const EQ_YOU_FACE = {
   openFace: ['scream', 'cam'], cafeWide: ['calm'], faceFelt: ['surprise', 'cam'], cupRipple: ['neutral'], ruleFace: ['worry'], terraceRise: ['neutral'], jolt4: ['surprise'],
-  youSee: ['worry'], jolt5: ['shock'], everyone: ['shock'], alert: ['worry'], drop: ['worry'], never: ['determined', 'cam'], run: ['determined'], pierRun: ['determined'],
+  youSee: ['worry'], youTicket: ['neutral'], pierOTS: ['worry'], jolt5: ['shock'], everyone: ['shock'], alert: ['worry'], drop: ['worry'], never: ['determined', 'cam'], run: ['determined'], pierRun: ['determined'],
   jolt6: ['scream'], in: ['determined'], start: ['worry', 'out'], cockpitWait: ['worry', 'out'], pierBreak: ['shock', 'out'], sky: ['awe', 'out'], phone: ['worry'],
   calm: ['sad', 'out'], air: ['scream', 'cam'], fuel: ['worry'], last: ['sad'], question: ['awe', 'cam'],
 };
@@ -123,6 +123,9 @@ EQ_SETS.sf = (app) => {
     } else eqCam(cam, [px + dr[0], py + dr[1], pz + dr[2]], cp.at, cp.fov || 45, roll, cp.tilt || 0);
     cam.near = cp.near || 0.05; cam.far = cp.far || 60000; cam.updateProjectionMatrix(); cam.updateMatrixWorld(true);
     X.cp = cp;
+    // (the crowd culls people by their distance from the camera: posed again with this frame's camera, or the first
+    // frame of a render and every jump cut used the last frame's camera and left the street empty)
+    crowd.frame(s, cam, lvl);
     // ---- particles
     soft.begin(); adds.begin();
     const near = cam.position.y < 140 && Math.hypot(...[cam.position.x - EQ_EPI[0], cam.position.z - EQ_EPI[1]]) < 1500;
@@ -142,14 +145,15 @@ EQ_SETS.sf = (app) => {
       }
     }
     // the city's dust and fires (the aerial shots), the wave's spray
-    if (cam.position.y > 60 || !near) eqCityFx(soft, adds, s, city.info, cam, { range: cp.fxRange || 7000, max: 220, fires: 80 });
+    if (cam.position.y > 60 || !near || cp.cityFx) eqCityFx(soft, adds, s, city.info, cam, { range: cp.fxRange || 7000, max: 220, fires: 80 });
     if (s > EQ_BAY.out1 - 2 && s < EQ_BAY.wave + 16) {
       const front = eqBayFront(s);
       // (only while the crest is out on the bay: once it is over the land the spray hung there like a fog; small puffs
       // along its top, where the cameras look: big ones close to the lens read as white blobs)
       const k = MathX.smooth(s, EQ_BAY.out1 - 2, EQ_BAY.out1 + 1) * MathX.smooth(front, -10, 60);
       if (k > 0) for (let i = 0; i < 300; i++) { const uu = 120 + eqR(i, 3) * 560, vv = front + (eqR(i, 5) - 0.6) * 10, [x, z] = eqWF(uu, vv), y = eqBayY(vv, s) + eqR(i, 7) * 3;
-        soft.add(x, y, z, 1.2 + eqR(i, 9) * 2.0, 0.22 * k, 0.93, 0.95, 0.96); }
+        const dc = Math.hypot(x - cam.position.x, y - cam.position.y, z - cam.position.z);   // (none near a low camera)
+        if (dc > 12) soft.add(x, y, z, 1.2 + eqR(i, 9) * 2.0, 0.22 * k * MathX.smooth(dc, 12, 45), 0.93, 0.95, 0.96); }
     }
     soft.end(); adds.end();
     debris.frame(s, near ? debrisEv : [], EQ_GROUND_Y + 0.15);
@@ -204,6 +208,7 @@ function eqPoseYou(you, s, t, shot, heli, wf, cam) {
     pose = EQ_P.sit(s, 3); pose.rSh = [0.62, 0.16]; pose.rEl = 1.45; pose.headYaw = 0.12 * noise1(s * 0.2, 4);
     if (mode === 'faceFelt' || mode === 'cupRipple') { pose.neck = mode === 'cupRipple' ? 0.5 : -0.12; pose.headYaw = 0.25; }
     if (mode === 'ruleFace' || mode === 'cupMacro' || mode === 'cup') pose.neck = 0.45;
+    if (mode === 'youTicket') { pose.rSh = [0.72, 0.22]; pose.rEl = 1.3; pose.neck = 0.55; pose.headYaw = 0; you.phone(true); }
     if (s > 64 && s < 70) pose.headYaw = 0.6 * Math.sin(MathX.clamp((s - 64.5) / 5, 0, 1) * Math.PI);
     if (s > 108 && s < T.stand) pose.headYaw = MathX.lerp(0, 1.0, MathX.smooth(s, 108, 110));     // (left: to the pier)
     pos = seatW; yaw = faceFerry;

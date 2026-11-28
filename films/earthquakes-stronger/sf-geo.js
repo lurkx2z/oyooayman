@@ -222,6 +222,9 @@ function eqTerrain(scene) {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(colr, 3));
     g.setAttribute('aUrb', new THREE.Float32BufferAttribute(urbA, 1)); g.setIndex(idx); g.computeVertexNormals();
+    // (the skirts are drawn both ways round, so their normals came out zero: black lines along every tile seam, the dark
+    // ticks on the map shots; they point up like the ground they hang from)
+    { const nA = g.attributes.normal; for (let k = (n + 1) * (n + 1); k < nA.count; k++) nA.setXYZ(k, 0, 1, 0); }
     const m = new THREE.Mesh(g, mat); m.receiveShadow = true; m.castShadow = false; m.frustumCulled = true; scene.add(m); tiles.push(m);
   }
   return { mat, tiles };
@@ -360,6 +363,9 @@ function eqCityMat() {
         // the roofs: tar, gravel, terracotta, a few white (seen from the air, the city is its roofs)
         float roofH = fract(vSeed * 57.3);
         vec3 roof = roofH < 0.38 ? vec3(0.055, 0.055, 0.06) : roofH < 0.7 ? vec3(0.15, 0.145, 0.135) : roofH < 0.84 ? vec3(0.3, 0.11, 0.06) : vec3(0.42, 0.41, 0.38);
+        // (from the map shots, tens of km up, a pixel covers several roofs: the dark tar ones broke up into black ticks along
+        // the streets; there they blend to the roofs' average)
+        roof = mix(roof, vec3(0.19, 0.175, 0.16), smoothstep(2.5, 9.0, max(fwidth(vWorldP.x), fwidth(vWorldP.z))));
         diffuseColor.rgb = mix(diffuseColor.rgb, roof * (0.85 + 0.3 * fract(vSeed * 91.7)), step(0.5, vWinN.y) * (vKind > 2.5 ? 0.6 : 0.88));
         // fallen: dust-grey rubble; and dust settles on everything
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.27, 0.24, 0.2) * (0.8 + 0.3 * eqH(floor(vWorldP.xz / 3.0))), smoothstep(0.35, 0.9, vFall));
@@ -535,10 +541,10 @@ function eqCrack(scene) {
   const m = new THREE.ShaderMaterial({
     uniforms: U, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, side: THREE.DoubleSide,
     vertexShader: `${EQ_WAVE_GLSL}
-      varying vec2 vUv; varying vec2 vXZ;
-      void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); w.y += eqWaveY(w.xz); vXZ = w.xz;
+      varying vec2 vUv; varying vec2 vXZ; varying float vDist;
+      void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); w.y += eqWaveY(w.xz); vXZ = w.xz; vDist = distance(w.xyz, cameraPosition);
         gl_Position = projectionMatrix * viewMatrix * w; }`,
-    fragmentShader: `uniform float uLen, uW, uGlow; varying vec2 vUv; varying vec2 vXZ;
+    fragmentShader: `uniform float uLen, uW, uGlow; varying vec2 vUv; varying vec2 vXZ; varying float vDist;
       ${EQ_SETZONE_GLSL}
       float h(float x) { return fract(sin(x * 91.7) * 43758.5); }
       void main() {
@@ -551,7 +557,12 @@ function eqCrack(scene) {
         float core = 1.0 - across / max(1e-4, wd);
         vec3 c = mix(vec3(0.16, 0.13, 0.1), vec3(0.02, 0.015, 0.01), smoothstep(0.0, 0.35, core));
         c = mix(c, vec3(1.0, 0.42, 0.08) * (1.5 + 0.7 * h(floor(vUv.y / 11.0))), uGlow * smoothstep(0.3, 0.85, core));
-        gl_FragColor = vec4(c, 1.0);
+        // (a crack a few metres wide is under a pixel from a few km away: it broke up into black specks along the horizon
+        // of the aerial shots; it fades out before that, later when it glows)
+        float wm = uW * ${EQ_CRACK_MAXW.toFixed(1)} * (1.0 + 2.0 * uGlow);
+        float fade = 1.0 - smoothstep(wm * 250.0, wm * 600.0, vDist);
+        if (fade < 0.01) discard;
+        gl_FragColor = vec4(c, fade);
       }`,
   });
   const meshes = ['north', 'south'].map((b) => { const me = new THREE.Mesh(eqRibbon(EQ_CRACK_PATH[b], EQ_CRACK_MAXW, 0.6, 32000, 30, 4), m); me.frustumCulled = false; me.renderOrder = 2; scene.add(me); return me; });
