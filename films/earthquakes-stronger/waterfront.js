@@ -51,7 +51,7 @@ function eqWaterfront(scene, app) {
     // the raised parts: the pavements, the median, the promenade (15 cm)
     const raised = (v) => (v < -46 || (v > -35 && v < -25) || v > -14 ? 0.15 : 0);
     for (const v of V) for (const u of us) pos.push(u, Y + raised(v), -v);
-    for (let j = 0; j < V.length - 1; j++) for (let i = 0; i < nu - 1; i++) { const a = j * nu + i, b = a + 1, c = a + nu, d = c + 1; idx.push(a, c, b, b, c, d); }
+    for (let j = 0; j < V.length - 1; j++) for (let i = 0; i < nu - 1; i++) { const a = j * nu + i, b = a + 1, c = a + nu, d = c + 1; idx.push(a, b, c, b, d, c); }   // (z = −v: this order faces up)
     // skirts down the four sides (the terrain is far below the set)
     const skirt = (list) => { const base = pos.length / 3; for (const k of list) pos.push(pos[k * 3], -3, pos[k * 3 + 2]); for (let m = 0; m < list.length - 1; m++) { const a = list[m], b = list[m + 1], A = base + m, B = base + m + 1; idx.push(a, A, b, b, A, B, a, b, A, b, B, A); } };
     skirt(us.map((_, i) => i)); skirt(us.map((_, i) => (V.length - 1) * nu + i)); skirt(V.map((_, j) => j * nu)); skirt(V.map((_, j) => j * nu + nu - 1));
@@ -124,7 +124,7 @@ function eqWaterfront(scene, app) {
             c = mix(c, vec3(0.2, 0.22, 0.22), pud * fill * 0.7);
             eqWet = max(pud, uWet * 0.4) * fill;
             c = mix(c, vec3(0.66, 0.62, 0.56), uDust * 0.5);
-            diffuseColor.rgb = c;
+            diffuseColor.rgb = pow(max(c, 0.0), vec3(2.2));                    // (the colours above are sRGB: to linear)
           }`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
           roughnessFactor = mix(roughnessFactor, 0.12, eqWet);`);
@@ -208,11 +208,11 @@ function eqWaterfront(scene, app) {
     // the pavilion (u 341…361, v 3…17)
     const glassM = new THREE.MeshStandardMaterial({ color: '#2d4250', roughness: 0.06, metalness: 0.8, envMapIntensity: 1.4 }), frameM = eqStd('#f2f0ea', 0.5, 0.1);
     const pav = new THREE.Group(); g.add(pav);
-    eqMesh(new THREE.BoxGeometry(20, 4.6, 14), glassM, 351, Y + 0.35 + 2.3, -10, pav);
+    eqMesh(new THREE.BoxGeometry(18.8, 4.6, 14), glassM, 350.4, Y + 0.35 + 2.3, -10, pav);   // (its front at u 359.8: the counter's recess in front)
     eqMesh(new THREE.BoxGeometry(21.2, 0.5, 15.2), frameM, 351, Y + 0.35 + 4.85, -10, pav);
     for (const u of [341, 346, 351, 356, 361]) for (const v of [3, 17]) eqMesh(new THREE.BoxGeometry(0.22, 4.6, 0.22), frameM, u, Y + 0.35 + 2.3, -v, pav);
     // the counter's opening on the terrace side (u = 361): a serving window with shelves behind it
-    eqMesh(new THREE.BoxGeometry(0.3, 2.2, 8.4), eqStd('#2a1e16', 0.8), 361.05, Y + 0.35 + 2.9, -10, pav);   // the dark inside
+    eqMesh(new THREE.BoxGeometry(0.3, 3.2, 8.4), eqStd('#2a1e16', 0.8), 359.97, Y + 0.35 + 2.4, -10, pav);   // the dark inside, behind the shelves
     eqMesh(new THREE.BoxGeometry(0.9, 1.05, 8.6), new THREE.MeshStandardMaterial({ map: eqTex(eqCanvas(256, 64, (c) => { c.fillStyle = '#1f5a4c'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#f2f0ea'; c.fillRect(0, 0, 256, 6); })), roughness: 0.6 }), 361.6, Y + 0.35 + 0.53, -10, pav);
     // the red awning over the window, and the sign on the roof
     const awnM = new THREE.MeshStandardMaterial({ map: eqTex(eqCanvas(256, 32, (c) => { for (let i = 0; i < 16; i++) { c.fillStyle = i % 2 ? '#f4efe4' : '#c8352a'; c.fillRect(i * 16, 0, 16, 32); } })), roughness: 0.8, side: THREE.DoubleSide });

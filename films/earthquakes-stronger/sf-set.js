@@ -161,6 +161,8 @@ EQ_SETS.sf = (app) => {
     const dust = MathX.smooth(s, 250, 420) * 0.6 + MathX.smooth(s, 420, 540) * 0.3;
     p.contrast -= dust * 0.08; p.warmth += dust * 0.08; p.saturation -= dust * 0.12;
     if (cp.inside) { p.vignette = 0.5; p.exposure = 1.0; }
+    // from the air the city is pale (pastel houses, haze): more contrast and colour
+    if (!cp.inside && !cp.local && cp.p && cp.p[1] > 60) { p.contrast += 0.12; p.saturation += 0.1; p.exposure -= 0.04; }
     // the molten crack (minute ten): a red light from below
     if (s > 545) { p.warmth += 0.08; p.bloom = 0.5; p.bloomThreshold = 0.8; }
     if (cp.grade) cp.grade(p, s);

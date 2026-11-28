@@ -102,10 +102,10 @@ EQ_SETS.globe = (app) => {
           float M = uM[i].x, age = uM[i].y; if (age < 0.0) continue;
           float d = acos(clamp(dot(n, uQ[i]), -1.0, 1.0)) * ${EQ_RE.toFixed(1)};
           // the hot dot (size by magnitude) and a ring every 3 s that spreads to a few hundred km and fades
-          float R0 = 20.0 + 14.0 * M + 10.0 * max(0.0, M - 7.0) * max(0.0, M - 7.0);
-          float dot0 = exp(-d * d / (R0 * R0)) * (0.5 + 0.08 * M);
+          float R0 = 12.0 + 6.0 * M + 2.0 * max(0.0, M - 8.0) * max(0.0, M - 8.0);
+          float dot0 = exp(-d * d / (R0 * R0)) * (0.35 + 0.04 * M);
           float ph = fract(age / 3.0), Rr = ph * (120.0 + 60.0 * M * M / 8.0), w = 10.0 + 3.0 * M;
-          float ring = exp(-pow((d - Rr) / w, 2.0)) * (1.0 - ph) * (0.25 + 0.05 * M);
+          float ring = exp(-pow((d - Rr) / w, 2.0)) * (1.0 - ph) * (0.15 + 0.03 * M);
           float born = smoothstep(0.0, 1.2, age);
           col += (vec3(1.0, 0.5, 0.2) * dot0 + vec3(1.0, 0.25, 0.12) * ring) * born;
         }
@@ -145,7 +145,7 @@ EQ_SETS.globe = (app) => {
   const at = (lat, lon, r = 1) => eqGeo(lat, lon, r);
   const C = {
     open: (u) => { const v = lerpV(L(27, -134, 1.95), L(28, -133, 1.82), u / 2); return Object.assign(view(v.lat, v.lon, v.D, at(38.5, -121.5), 36), { roll: 8 }); },
-    california: (u) => { const v = lerpV(L(30.5, -121.5, 1.42), L(31.2, -121.2, 1.36), u / 4.4); return view(v.lat, v.lon, v.D, at(36.4, -119.6), 34); },
+    california: (u) => { const v = lerpV(L(31, -122.5, 1.95), L(31.6, -122.0, 1.86), u / 4.4); return view(v.lat, v.lon, v.D, at(36.6, -119.6), 30); },
     notjust: (u) => { const k = Ease.inOutSine(MathX.clamp(u / 6, 0, 1)); const v = lerpV(L(33, -128, 1.6), L(24, -150, 3.5), k); return view(v.lat, v.lon, v.D, at(36, -122).multiplyScalar(1 - k), 36); },
     growing: (u) => { const v = lerpV(L(24, -150, 3.5), L(22, -178, 3.5), u / 5); return view(v.lat, v.lon, v.D, null, 36); },
     crackCoast: (u) => { const v = lerpV(L(31, -139, 2.25), L(32, -137, 2.1), u / 3); return view(v.lat, v.lon, v.D, at(40, -121.5), 36); },

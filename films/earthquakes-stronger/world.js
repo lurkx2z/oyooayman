@@ -38,7 +38,8 @@ function eqPostGround(scene, o) {
   const g = new THREE.PlaneGeometry(o.size[0], o.size[1], o.segs[0], o.segs[1]); g.rotateX(-Math.PI / 2);
   if (o.at) g.translate(o.at[0], 0, o.at[1]);
   const P = g.attributes.position, C = new Float32Array(P.count * 3);
-  for (let i = 0; i < P.count; i++) { const x = P.getX(i), z = P.getZ(i), y = o.h(x, z); P.setY(i, y); const c = o.col ? o.col(x, z, y) : [0.5, 0.5, 0.5]; C[i * 3] = c[0]; C[i * 3 + 1] = c[1]; C[i * 3 + 2] = c[2]; }
+  // (colours are given as sRGB, like CSS colours: the vertex colours and the paint are converted to linear)
+  for (let i = 0; i < P.count; i++) { const x = P.getX(i), z = P.getZ(i), y = o.h(x, z); P.setY(i, y); const c = o.col ? o.col(x, z, y) : [0.5, 0.5, 0.5]; C[i * 3] = c[0] ** 2.2; C[i * 3 + 1] = c[1] ** 2.2; C[i * 3 + 2] = c[2] ** 2.2; }
   g.setAttribute('color', new THREE.BufferAttribute(C, 3)); g.computeVertexNormals();
   const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: o.rough ?? 0.95, metalness: 0 });
   const U = { uS: { value: 0 }, uWaveA: { value: 0 }, uEpi: { value: new THREE.Vector2(0, 0) }, uNightG: { value: o.night ? 1 : 0 }, ...eqWaveU(o.wave ? o.wave[0] : 0.01, o.wave ? o.wave[1] : 100, o.wave ? o.wave[2] : 1e9) };
@@ -52,7 +53,7 @@ function eqPostGround(scene, o) {
         varying vec3 vWP; uniform float uNightG;
         float eqH2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        { vec2 p = vWP.xz; float eqNight = uNightG; ${o.paint || ''} }`);
+        { vec2 p = vWP.xz; float eqNight = uNightG; diffuseColor.rgb = pow(max(diffuseColor.rgb, 0.0), vec3(1.0 / 2.2)); ${o.paint || ''} diffuseColor.rgb = pow(max(diffuseColor.rgb, 0.0), vec3(2.2)); }`);
   };
   m.customProgramCacheKey = () => 'eqPostGround' + (o.key || '');
   const mesh = new THREE.Mesh(g, m); mesh.receiveShadow = true; scene.add(mesh);
@@ -120,17 +121,17 @@ function eqGlyphPlane(ch, h, o = {}) {
 // LOS ANGELES: the Hollywood sign on Mount Lee (the letters 13.7 m tall, 107 m end to end), facing south over the city
 // =====================================================================================================================
 function eqPostLA(app) {
-  const B = eqPostBase(app, { sky: '#a8c6de', fog: 0.00009, fogColor: '#d4dadb', hemi: ['#dbe6f0', '#7a6a50', 1.0], sun: eqSunV(135, 44), sunColor: '#fff0da', sunI: 3.0, shadowR: 140, env: ['#8fb8e0', '#dde4e8', '#6a6050'],
-    top: '#4c8ad6', hor: '#d6e0e6', low: '#b8b0a0', sunDir: eqN3(eqSunV(135, 44)), sunGlow: '#fff0d0' });
+  const B = eqPostBase(app, { sky: '#a8c6de', fog: 0.00009, fogColor: '#d4dadb', hemi: ['#dbe6f0', '#7a6a50', 0.85], sun: eqSunV(135, 44), sunColor: '#fff0da', sunI: 2.6, shadowR: 140, env: ['#8fb8e0', '#dde4e8', '#6a6050'],
+    top: '#3f80d4', hor: '#b2cce4', low: '#b8b0a0', sunDir: eqN3(eqSunV(135, 44)), sunGlow: '#fff0d0' });
   const scene = B.scene, q = EQ_Q.la, r = new RNG(1923);
   const hill = (x, z) => 75 * Math.tanh(-z / 120) - 190 * MathX.smooth(z, 150, 1400) + 22 * Math.sin(x / 230 + 0.4) * MathX.smooth(-z, -40, 160)
     + 40 * Math.exp(-((x - 160) ** 2 + (z + 250) ** 2) / (2 * 130 * 130)) + 6 * Math.sin(x / 47 + 1.3) * Math.sin(z / 61) + 3 * Math.sin(x / 13.7) * Math.sin(z / 17.1);
   const ground = eqPostGround(scene, { size: [4000, 5000], segs: [320, 400], at: [0, 900], h: hill, key: 'la',
-    col: (x, z, y) => { const n = 0.5 + 0.5 * Math.sin(x / 9.1 + Math.sin(z / 7.3) * 2) * Math.sin(z / 11.3 + x / 23); const dry = MathX.smooth(n, 0.55, 0.9);
-      const base = [0.43 - 0.08 * n, 0.42 - 0.05 * n, 0.27 - 0.04 * n]; const grass = [0.7, 0.62, 0.4]; const k = dry * 0.6 + MathX.smooth(y, -150, -230) * 0.4;
+    col: (x, z, y) => { const n = 0.5 + 0.5 * Math.sin(x / 61 + Math.sin(z / 47) * 2) * Math.sin(z / 73 + x / 131); const dry = MathX.smooth(n, 0.45, 0.85);
+      const base = [0.42 - 0.06 * n, 0.42 - 0.05 * n, 0.3 - 0.04 * n]; const grass = [0.64, 0.57, 0.42]; const k = dry * 0.45 + MathX.smooth(y, -150, -230) * 0.4;
       return base.map((v, i) => v + (grass[i] - v) * k); },
-    paint: `float rock = smoothstep(0.82, 0.95, eqH2(floor(p / 3.0))); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.56, 0.52, 0.46), rock * 0.6);
-      float bush = smoothstep(0.6, 0.9, eqH2(floor(p / 4.0) + 7.0)); diffuseColor.rgb *= 1.0 - 0.28 * bush;` });
+    paint: `float rock = smoothstep(0.85, 0.97, eqH2(floor(p / 1.3))); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.56, 0.52, 0.46), rock * 0.4);
+      float bush = smoothstep(0.55, 0.9, eqH2(floor(p / 1.7) + 7.0)); diffuseColor.rgb *= 1.0 - 0.22 * bush;` });
   // ---- the letters, their scaffolds behind, standing on the slope
   const word = 'HOLLYWOOD', letters = [], steel = eqStd('#8e8c86', 0.6, 0.5);
   let x = 0; const parts = [];
@@ -154,7 +155,7 @@ function eqPostLA(app) {
   const houses = [];
   for (let i = 0; i < 420; i++) {
     const hx = r.range(-900, 900), hz = r.range(170, 1300);
-    if (Math.abs(hx) < 90 && hz < 260) continue;
+    if (Math.abs(hx) < 150 && hz < 460) continue;
     const pal = ['#efe8da', '#e6d8bc', '#f2efe8', '#d8c8a8', '#c8d0d0', '#e8d0b8', '#b8c4cc'];
     houses.push([hx, hz, r.range(9, 16), r.range(9, 14), r.range(5.5, 9.5), r.range(-0.4, 0.4), pal[i % pal.length], 0, r.next() < 0.3 ? r.range(402, 407) : 1e6]);
   }
@@ -162,7 +163,7 @@ function eqPostLA(app) {
   // the palms along the streets below (tall, thin: Los Angeles)
   { const trunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.22, 0.32, 1, 6).translate(0, 0.5, 0), eqStd('#7a6a52', 0.9), 120), crown = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(2.6, 0), eqStd('#4e6a36', 0.85), 120);
     const M4 = new THREE.Matrix4();
-    for (let i = 0; i < 120; i++) { const px = r.range(-800, 800), pz = r.range(300, 1300), py = hill(px, pz), h = r.range(16, 24); M4.makeScale(1, h, 1).setPosition(px, py, pz); trunk.setMatrixAt(i, M4); M4.makeScale(1, 0.55, 1).setPosition(px, py + h, pz); crown.setMatrixAt(i, M4); }
+    for (let i = 0; i < 120; i++) { let px = r.range(-800, 800); const pz = r.range(300, 1300), h = r.range(16, 24); if (Math.abs(px) < 160 && pz < 480) px += px < 0 ? -170 : 170; const py = hill(px, pz); M4.makeScale(1, h, 1).setPosition(px, py, pz); trunk.setMatrixAt(i, M4); M4.makeScale(1, 0.55, 1).setPosition(px, py + h, pz); crown.setMatrixAt(i, M4); }
     for (const I of [trunk, crown]) { I.castShadow = true; scene.add(I); }
   }
   const slides = [[-260, -60], [120, 20], [-90, -40], [300, -80]].map(([sx, sz], i) => ({ p: [sx, hill(sx, sz), sz], t: 403.2 + i * 0.9, seed: 300 + i }));
@@ -185,13 +186,13 @@ function eqPostLA(app) {
     for (const sl of slides) if (s > sl.t) for (let k = 0; k < 4; k++) eqBurst(B.soft, B.adds, s, { t: sl.t + k * 0.5, p: [sl.p[0] + k * 6, sl.p[1] - k * 9, sl.p[2] + k * 14], kind: 'dust', size: 9, n: 24, seed: sl.seed + k, life: 12, alpha: 0.5 });
     B.soft.end(); B.adds.end();
     // the camera: from the hillside streets below, looking up at the sign
-    const P0 = [-70, hill(-70, 650) + 16, 650], P1 = [-58, hill(-58, 600) + 16, 600], k = MathX.clamp(u / 6, 0, 1);
+    const P0 = [-46, hill(-46, 285) + 46, 285], P1 = [-36, hill(-36, 255) + 44, 255], k = MathX.clamp(u / 6, 0, 1);
     const g = eqQGround(q, s, 5);
-    eqCam(cam, [MathX.lerp(P0[0], P1[0], k) + g[0] * 1.5, MathX.lerp(P0[1], P1[1], k) + g[1], MathX.lerp(P0[2], P1[2], k) + g[2]], [0, 24, -10], 17, g[0] * 20);
+    eqCam(cam, [MathX.lerp(P0[0], P1[0], k) + g[0] * 1.5, MathX.lerp(P0[1], P1[1], k) + g[1], MathX.lerp(P0[2], P1[2], k) + g[2]], [0, 7, -4], 25, g[0] * 20);
     eqShadowFollowAt(B.sun, [0, 0, 0], 140, 1500);
     pc.M = M;
   };
-  pc.labels = (s, u) => [{ p: [0, 26, 0], text: 'HOLLYWOOD SIGN', sub: `LOS ANGELES · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
+  pc.labels = (s, u) => [{ p: [0, 64, 0], text: 'HOLLYWOOD SIGN', sub: `LOS ANGELES · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
   pc.grade = (p) => { p.exposure = 1.04; p.saturation = 1.12; p.contrast = 1.08; p.warmth = 0.04; };
   return pc;
 }
@@ -212,7 +213,7 @@ function eqShadowFollowAt(sun, c, R, far = 2000) {
 function eqPostMexico(app) {
   const sun = eqSunV(150, 60);
   const B = eqPostBase(app, { sky: '#9cc0e4', fog: 0.00011, fogColor: '#d6d8d4', hemi: ['#e0e8f2', '#7a7060', 1.0], sun, sunColor: '#fff4e2', sunI: 3.1, shadowR: 160, env: ['#9cc0e4', '#e2e6e8', '#706858'],
-    top: '#4f8fda', hor: '#d8dcd8', low: '#b0a898', sunDir: eqN3(sun), sunGlow: '#fff4d8' });
+    top: '#3f84d6', hor: '#b8cfe2', low: '#b0a898', sunDir: eqN3(sun), sunGlow: '#fff4d8' });
   const scene = B.scene, q = EQ_Q.mexico, r = new RNG(1810);
   const A = Math.PI / 4, ax = [Math.sin(A), -Math.cos(A)], bx = [Math.cos(A), Math.sin(A)];   // along the avenue (towards the north-east), across it
   const toW = (a, b) => [ax[0] * a + bx[0] * b, ax[1] * a + bx[1] * b];
@@ -318,7 +319,7 @@ function eqPostMexico(app) {
 function eqPostDam(app) {
   const sun = eqSunV(130, 42);
   const B = eqPostBase(app, { sky: '#9cc4ea', fog: 0.00005, fogColor: '#d8dcdc', hemi: ['#dce8f4', '#8a6a50', 1.0], sun, sunColor: '#fff0dc', sunI: 3.2, shadowR: 420, shadowFar: 4000, env: ['#8fbce8', '#e0e2e0', '#6a5040'],
-    top: '#3f86de', hor: '#d8e0e4', low: '#a08070', sunDir: eqN3(sun), sunGlow: '#fff2d8' });
+    top: '#3a80d8', hor: '#b6cfe6', low: '#a08070', sunDir: eqN3(sun), sunGlow: '#fff2d8' });
   const scene = B.scene, q = EQ_Q.nevada;
   const RIV = -221, halfW = (y) => 48 + (y - RIV) / 2.1;
   const canyon = (x, z) => {
@@ -351,7 +352,7 @@ function eqPostDam(app) {
     for (let y = 0; y < 512; y += 23) { g.fillStyle = 'rgba(80,70,60,0.08)'; g.fillRect(0, y, 512, 2); } }), { repeat: true });
   damTex.repeat.set(6, 4);
   const damU = { uCrack: { value: 0 }, uWet: { value: 0 } };
-  const damMat = eqStd('#ffffff', 0.85, 0, { map: damTex, side: THREE.DoubleSide });
+  const damMat = eqStd('#c4bcb0', 0.85, 0, { map: damTex, side: THREE.DoubleSide });
   damMat.onBeforeCompile = (sh) => { Object.assign(sh.uniforms, damU); sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
       uniform float uCrack, uWet; float eqH3(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float eqCrackL(vec2 q, float s) { vec2 c = floor(q), f = fract(q); float d = 9.0; for (int i = -1; i <= 1; i++) for (int j = -1; j <= 1; j++) { vec2 o = vec2(float(i), float(j)); vec2 r = o + vec2(eqH3(c + o + s), eqH3(c + o + s + 3.7)) - f; d = min(d, dot(r, r)); } return d; }`)
@@ -360,7 +361,7 @@ function eqPostDam(app) {
         float grow = smoothstep(0.0, 1.0, uCrack * 1.4 - (1.0 - vUv.y) * 0.9 - abs(vUv.x - 0.5) * 0.8);
         float crack = (1.0 - smoothstep(0.0, 0.035, edge)) * grow; diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.08, 0.07, 0.06), crack);
         diffuseColor.rgb *= 1.0 - 0.3 * uWet * smoothstep(0.4, 1.0, vUv.y) * (0.6 + 0.4 * eqH3(floor(vUv * vec2(60.0, 4.0)))); }`); };
-  damMat.customProgramCacheKey = () => 'eqDam';
+  damMat.defines = { USE_UV: '' }; damMat.customProgramCacheKey = () => 'eqDam';
   const dam = new THREE.Mesh(dg, damMat); dam.castShadow = true; dam.receiveShadow = true; scene.add(dam);
   // the crest road's parapets, the intake towers, the power plant, the lake, the river
   const conc = eqStd('#d8d0c2', 0.8);
@@ -401,7 +402,7 @@ function eqPostDam(app) {
     for (let i = 0; i < 4; i++) eqBurst(B.soft, B.adds, s, { t: 453.6 + i * 1.3, p: [(i % 2 ? 1 : -1) * (150 + i * 20), 30 - i * 40, 120 + i * 60], kind: 'dust', size: 14, n: 24, seed: 500 + i, life: 12, alpha: 0.5 });
     B.soft.end(); B.adds.end();
     const g = eqQGround(q, s, 3, 0.8), k = MathX.clamp(u / 6.5, 0, 1);
-    eqCam(cam, [MathX.lerp(70, 60, k) + g[0] * 4, MathX.lerp(52, 46, k) + g[1] * 3, MathX.lerp(560, 520, k) + g[2] * 4], [0, -95, 40], 46, g[0] * 18);
+    eqCam(cam, [MathX.lerp(70, 60, k) + g[0] * 4, MathX.lerp(52, 46, k) + g[1] * 3, MathX.lerp(560, 520, k) + g[2] * 4], [0, -70, 20], 50, g[0] * 18);
     eqShadowFollowAt(B.sun, [0, -100, 100], 420, 3000);
   };
   pc.labels = (s, u) => [{ p: [0, 12, -10], text: 'HOOVER DAM', sub: `NEVADA · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
@@ -415,7 +416,7 @@ function eqPostDam(app) {
 function eqPostNeedle(app) {
   const sun = eqSunV(140, 33);
   const B = eqPostBase(app, { sky: '#9ec4e8', fog: 0.0000075, fogColor: '#cad8e4', hemi: ['#dce6f2', '#5a6050', 1.0], sun, sunColor: '#fff0dc', sunI: 3.0, shadowR: 300, shadowFar: 3000, env: ['#9ec4e8', '#e0e6ec', '#506050'],
-    top: '#4a88d8', hor: '#d4e2ee', low: '#8a9a9a', sunDir: eqN3(sun), sunGlow: '#fff0d0' });
+    top: '#3f82d6', hor: '#b6cfe6', low: '#8a9a9a', sunDir: eqN3(sun), sunGlow: '#fff0d0' });
   const scene = B.scene, q = EQ_Q.seattle, r = new RNG(1962);
   const land = (x, z) => { let y = 10 + 2 * Math.sin(x / 300) * Math.sin(z / 260); y += 85 * Math.exp(-((x + 300) ** 2 + (z + 1250) ** 2) / (2 * 500 * 500)); y += 30 * Math.exp(-((x - 900) ** 2 + (z - 1400) ** 2) / (2 * 700 * 700));
     const shore = x + 0.35 * z + 1100; return shore < 0 ? -6 + Math.max(-14, shore * 0.05) : y * MathX.smooth(shore, 0, 120); };
@@ -427,13 +428,14 @@ function eqPostNeedle(app) {
     for (let i = 0; i < P.count; i++) { const x = P.getX(i), y = P.getY(i) + 2196, z = P.getZ(i), a = Math.atan2(z, x), w = 1 + 0.12 * Math.sin(a * 5) + 0.06 * Math.sin(a * 13 + y / 300); P.setX(i, x * w); P.setZ(i, z * w); P.setY(i, y * (1 - 0.06 * Math.sin(a * 3)));
       const snow = MathX.smooth(y + 300 * Math.sin(a * 7), 1900, 2500); C.set([0.42 + 0.53 * snow, 0.45 + 0.52 * snow, 0.5 + 0.48 * snow], i * 3); }
     geo.setAttribute('color', new THREE.BufferAttribute(C, 3)); geo.computeVertexNormals();
-    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8 })); m.position.set(45000, -60, 78000); scene.add(m); }
+    const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8 })); m.position.set(56300, -60, 68700); scene.add(m); }
   // downtown (south-east of the Needle), Seattle Center's low buildings
   const blds = eqPostBlocks(r, -1500, 4000, -2400, 3600, 60, 0, (x, z, rr) => {
     if (land(x, z) < 0 || Math.hypot(x, z) < 120 || (Math.hypot(x + 300, z + 1250) < 260)) return null;
-    const dt = Math.exp(-((x - 1300) ** 2 + (z - 1700) ** 2) / (2 * 650 * 650)), tall = rr.next() < dt * 0.8;
+    { const dx = x + 330, dz = z + 1240, d = Math.hypot(dx, dz); if (d < 380 || (d < 1260 && Math.abs(Math.atan2(dx, dz) - 0.26) < 0.13)) return null; }   // (the view from Queen Anne to the Needle stays open)
+    const dt = Math.exp(-((x - 900) ** 2 + (z - 1900) ** 2) / (2 * 450 * 450)), tall = rr.next() < dt * 0.85 && dt > 0.25;
     const h = tall ? rr.range(80, 220 + 60 * dt) : rr.range(8, 30 + 30 * dt);
-    return [rr.range(24, 44), rr.range(24, 44), h, tall ? ['#7f96a8', '#5f7484', '#a0b2bc', '#3d4f5e', '#c8c4ba'][Math.floor(rr.next() * 5)] : ['#d8d0c0', '#b8a890', '#c8c8c4', '#9a6a52', '#e4dccc'][Math.floor(rr.next() * 5)], tall ? 3 : rr.next() < 0.5 ? 2 : 1];
+    return [rr.range(24, 44), rr.range(24, 44), h, tall ? ['#5f7484', '#3d4f5e', '#7f96a8', '#4a5a66', '#8a8f94'][Math.floor(rr.next() * 5)] : ['#d8d0c0', '#b8a890', '#c8c8c4', '#9a6a52', '#e4dccc'][Math.floor(rr.next() * 5)], tall ? 3 : rr.next() < 0.5 ? 2 : 1];
   });
   blds.forEach((b, i) => { b[8] = hash1(i * 5) < 0.12 ? 460.5 + hash1(i * 9) * 4.5 : 1e6; });
   const city = eqPostCity(scene, blds, { groundY: land, seed: 17 });
@@ -444,7 +446,7 @@ function eqPostNeedle(app) {
   const legR = (y) => { const a = y / 152; return y < 101 ? MathX.lerp(17, 4.2, Math.pow(a / 0.66, 0.8)) : MathX.lerp(4.2, 12, Math.pow((a - 0.66) / 0.34, 1.6)); };
   for (let k = 0; k < 3; k++) for (const sd of [-1, 1]) {
     const pts = []; for (let i = 0; i <= 24; i++) { const y = i / 24 * 152, R0 = legR(y), a = k * 2.094 + sd * (0.2 + 0.1 * (1 - y / 152)); pts.push(new THREE.Vector3(Math.cos(a) * R0, y, Math.sin(a) * R0)); }
-    const m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.75, 8, false), white); m.castShadow = true; needle.add(m);
+    const m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 1.3, 8, false), white); m.castShadow = true; needle.add(m);
   }
   for (const y of [8, 30, 60, 90, 120, 140]) { const R0 = legR(y); const ring = new THREE.Mesh(new THREE.TorusGeometry(R0, y === 30 ? 1.6 : 0.4, 8, 36).rotateX(Math.PI / 2), white); ring.position.y = y; ring.castShadow = true; needle.add(ring); }
   eqCyl(3.2, 3.6, 160, grey, 0, 80, 0, needle, 16);
@@ -467,12 +469,12 @@ function eqPostNeedle(app) {
     if (a > 0) eqBurst(B.soft, B.adds, s, { t: FALL + 0.2, p: [0, land(0, 0), 0], kind: 'dust', size: 16, n: 40, seed: 7, life: 10, alpha: 0.6 });
     B.soft.end(); B.adds.end();
     const g = eqQGround(q, s, 13), kk = MathX.clamp(u / 5.5, 0, 1);
-    const P = [MathX.lerp(-330, -320, kk), land(-300, -1250) + 6, MathX.lerp(-1230, -1210, kk)], yaw = 22 * Math.PI / 180;
-    eqCam(cam, [P[0] + g[0] * 2, P[1] + g[1] * 1.5, P[2] + g[2] * 2], [P[0] + Math.sin(yaw) * 2000, 60, P[2] + Math.cos(yaw) * 2000], 21, g[0] * 15);
+    const P = [MathX.lerp(-336, -326, kk), land(-300, -1250) + 30, MathX.lerp(-1250, -1230, kk)], yaw = 26 * Math.PI / 180;
+    eqCam(cam, [P[0] + g[0] * 2, P[1] + g[1] * 1.5, P[2] + g[2] * 2], [P[0] + Math.sin(yaw) * 2000, 80, P[2] + Math.cos(yaw) * 2000], 18, g[0] * 15);
     eqShadowFollowAt(B.sun, [0, 0, 0], 300, 3000);
   };
   pc.labels = (s, u) => [{ p: new THREE.Vector3(0, 190, 0).applyMatrix4(needle.matrixWorld), text: 'SPACE NEEDLE', sub: `SEATTLE · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8) * (1 - MathX.smooth(s, FALL + 0.6, FALL + 1.2)), quake: true, side: 'r' },
-    { p: [45000, 4500, 78000], text: 'MOUNT RAINIER', sub: '90 KM AWAY', a: MathX.smooth(u, 0.9, 1.4) * 0.9 }];
+    { p: [56300, 4600, 68700], text: 'MOUNT RAINIER', sub: '90 KM AWAY', a: MathX.smooth(u, 0.9, 1.4) * 0.9 }];
   pc.grade = (p) => { p.exposure = 1.04; p.saturation = 1.12; p.contrast = 1.08; };
   return pc;
 }
@@ -503,7 +505,7 @@ function eqPostTokyo(app) {
   const river = new THREE.Mesh(new THREE.PlaneGeometry(160, 12000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#05080e', roughness: 0.08, metalness: 0.6 })); river.position.set(-700, 0.6, 0); river.rotation.y = 0.15; scene.add(river);
   const blds = eqPostBlocks(r, -6000, 6000, -6000, 6000, 52, 0.12, (x, z, rr) => {
     if (Math.abs(x + 700 - z * 0.15) < 110 || Math.hypot(x, z) < 140) return null;
-    const near = Math.exp(-(x * x + z * z) / (2 * 2500 * 2500)), tall = rr.next() < 0.08 + 0.1 * near;
+    const near = Math.exp(-(x * x + z * z) / (2 * 2500 * 2500)), tall = rr.next() < 0.08 + 0.1 * near && Math.hypot(x + 2200, z - 1700) > 1500;   // (nothing tall in front of the camera)
     return [rr.range(20, 42), rr.range(20, 42), tall ? rr.range(40, 140) : rr.range(8, 30), ['#8a8a88', '#a8a49a', '#6a6e74', '#9aa0a8', '#c8c0b0'][Math.floor(rr.next() * 5)], tall ? 3 : 2];
   });
   blds.forEach((b, i) => { b[8] = hash1(i * 3) < 0.07 ? 497 + hash1(i * 11) * 5 : 1e6; });
@@ -516,12 +518,12 @@ function eqPostTokyo(app) {
   for (let j = 0; j < NYs; j++) for (let i = 0; i < NA; i++) { const a = j * (NA + 1) + i, b = a + 1, c = a + NA + 1, d = c + 1; sid.push(a, c, b, b, c, d); }
   const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); sg.setAttribute('uv', new THREE.Float32BufferAttribute(suv, 2)); sg.setIndex(sid); sg.computeVertexNormals();
   const latU = { uOn: { value: 1 }, uS: { value: 0 } };
-  const latM = new THREE.MeshStandardMaterial({ color: '#c8d8e8', roughness: 0.5, metalness: 0.4, side: THREE.DoubleSide, emissive: '#5aa8ff' });
+  const latM = new THREE.MeshStandardMaterial({ color: '#c8d8e8', roughness: 0.5, metalness: 0.4, side: THREE.DoubleSide, emissive: '#6ab4ff', emissiveIntensity: 1.3 });
   latM.onBeforeCompile = (sh) => { Object.assign(sh.uniforms, latU); sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uOn, uS;')
-    .replace('#include <alphatest_fragment>', `{ vec2 f = fract(vUv); float d1 = abs(fract(vUv.x + vUv.y) - 0.5), d2 = abs(fract(vUv.x - vUv.y) - 0.5); float bar = min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y));
-        if (d1 < 0.44 && d2 < 0.44 && bar > 0.06) discard; }`)
+    .replace('#include <alphatest_fragment>', `float eqLat; { vec2 f = fract(vUv); float d1 = abs(fract(vUv.x + vUv.y) - 0.5), d2 = abs(fract(vUv.x - vUv.y) - 0.5); float bar = min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y));
+        eqLat = (d1 < 0.44 && d2 < 0.44 && bar > 0.06) ? 0.25 : 1.0; float aa = clamp(max(fwidth(vUv.x), fwidth(vUv.y)) * 3.0, 0.0, 1.0); eqLat = mix(eqLat, 0.5, aa); diffuseColor.rgb *= 0.4 + 0.6 * eqLat; }`)
     .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        totalEmissiveRadiance *= uOn * (0.55 + 0.45 * smoothstep(0.0, 1.0, sin(vUv.y * 0.6 - uS * 0.8) * 0.5 + 0.5));`); };
+        totalEmissiveRadiance *= uOn * eqLat * (0.55 + 0.45 * smoothstep(0.0, 1.0, sin(vUv.y * 0.6 - uS * 0.8) * 0.5 + 0.5));`); };
   latM.defines = { USE_UV: '' }; latM.customProgramCacheKey = () => 'eqLattice';
   const shell = new THREE.Mesh(sg, latM); tree.add(shell);
   eqCyl(8, 8, 375, eqStd('#d0d4d8', 0.6), 0, 187, 0, tree, 20);
@@ -546,7 +548,7 @@ function eqPostTokyo(app) {
     city.B.forEach((b, i) => { if (b[8] < 1e5 && s > b[8]) eqBurst(B.soft, B.adds, s, { t: b[8] + 1.2, p: [b[0], 0, b[1]], kind: 'dust', size: Math.min(16, b[4] * 0.3), n: 16, seed: i + 31, life: 12, alpha: 0.35, dark: true }); });
     B.soft.end(); B.adds.end();
     const g = eqQGround(q, s, 17), k = MathX.clamp(u / 6.5, 0, 1);
-    eqCam(cam, [-1350 + g[0] * 3, MathX.lerp(70, 76, k) + g[1] * 2, 1250 - 30 * k + g[2] * 3], [0, 300, 0], 38, g[0] * 15);
+    eqCam(cam, [-2200 + 40 * k + g[0] * 3, 240 + g[1] * 2, 1700 - 30 * k + g[2] * 3], [0, 275, 0], 28, g[0] * 15);
     eqShadowFollowAt(B.sun, [0, 0, 0], 500, 4000);
   };
   pc.labels = (s, u) => [{ p: [0, 680, 0], text: 'TOKYO SKYTREE', sub: `TOKYO · ${eqClock(s, 9)} · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
@@ -567,17 +569,17 @@ function eqPostDubai(app) {
   const lake = new THREE.Mesh(new THREE.CircleGeometry(260, 48).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#04070c', roughness: 0.05, metalness: 0.7 })); lake.position.set(-120, 0.5, 300); lake.scale.set(1.6, 1, 0.8); scene.add(lake);
   const blds = eqPostBlocks(r, -4000, 4000, -4000, 4000, 70, 0.3, (x, z, rr) => {
     if (Math.hypot(x + 120, (z - 300) * 1.4) < 430 || Math.hypot(x, z) < 160) return null;
-    const near = Math.exp(-(x * x + z * z) / (2 * 1200 * 1200)), tall = rr.next() < 0.1 + 0.3 * near;
+    const near = Math.exp(-(x * x + z * z) / (2 * 1200 * 1200)), tall = rr.next() < 0.1 + 0.3 * near && Math.hypot(x + 1300, z - 1500) > 1100;
     return [rr.range(28, 50), rr.range(28, 50), tall ? rr.range(90, 330) : rr.range(10, 40), ['#8a8a8e', '#a8a49a', '#5a6470', '#c8c0b0', '#3a4a5a'][Math.floor(rr.next() * 5)], tall ? 3 : 2];
   });
   const city = eqPostCity(scene, blds, { night: true, seed: 23, noShadow: true });
   // ---- the Burj: 27 tiers; each wing's length steps down as it rises, the steps going round the three wings
   const burj = new THREE.Group(); scene.add(burj);
   const skin = eqStd('#9aa4b0', 0.18, 0.85, { emissive: '#1a2a40', emissiveIntensity: 0.4 }), lit = eqStd('#c8d4e4', 0.2, 0.8, { emissive: '#bcd4ff', emissiveIntensity: 1.1 });
-  const winTex = eqTex(eqCanvas(64, 256, (g) => { g.fillStyle = '#0a0c10'; g.fillRect(0, 0, 64, 256); for (let y = 0; y < 256; y += 8) for (let x = 0; x < 64; x += 8) { const v = hash1(x * 31 + y * 7); g.fillStyle = v < 0.55 ? `rgba(255,${200 + v * 50},${150 + v * 80},${0.5 + v})` : '#111418'; g.fillRect(x + 1, y + 1, 6, 5); } }), { repeat: true });
+  const winTex = eqTex(eqCanvas(64, 256, (g) => { g.fillStyle = '#0a0c10'; g.fillRect(0, 0, 64, 256); for (let y = 0; y < 256; y += 8) for (let x = 0; x < 64; x += 8) { const v = hash1(x * 31 + y * 7); g.fillStyle = v < 0.34 ? `rgba(255,${200 + v * 80},${150 + v * 150},${0.45 + v})` : '#14181e'; g.fillRect(x + 1, y + 1, 6, 5); } }), { repeat: true });
   const glassM = new THREE.MeshStandardMaterial({ color: '#8a96a4', roughness: 0.2, metalness: 0.8, emissive: '#ffffff', emissiveMap: winTex, emissiveIntensity: 0.9 });
   winTex.repeat.set(4, 6);
-  const glassU = { uOn: { value: 1 } }; glassM.onBeforeCompile = (sh) => { Object.assign(sh.uniforms, glassU); sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uOn;').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= uOn;'); };
+  const glassU = { uOn: { value: 1 } }; glassM.onBeforeCompile = (sh) => { Object.assign(sh.uniforms, glassU); sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uOn;').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance = (totalEmissiveRadiance + vec3(0.1, 0.14, 0.22)) * uOn;'); };
   glassM.customProgramCacheKey = () => 'eqBurjGlass';
   const tiers = 27, tierH = 22.5;
   for (let t = 0; t < tiers; t++) {
@@ -607,7 +609,7 @@ function eqPostDubai(app) {
     for (let k = 0; k < 6; k++) eqBurst(B.soft, B.adds, s, { t: 505.2 + k * 0.5, p: [Math.cos(k * 2.1 + 1.6) * 30, 180 + k * 70, Math.sin(k * 2.1 + 1.6) * 30], kind: 'glass', dir: [Math.cos(k * 2.1 + 1.6), Math.sin(k * 2.1 + 1.6)], wide: 30, spread: 60, n: 120, seed: 800 + k, life: 12, gs: 3.5, linger: 1 });
     B.soft.end(); B.adds.end();
     const g = eqQGround(q, s, 19, FAR), k = MathX.clamp(u / 6.5, 0, 1);
-    eqCam(cam, [-900 + g[0] * 3, 26 + g[1] * 2, 1180 - 40 * k + g[2] * 3], [-30, 380 + 20 * k, 0], 40, g[0] * 12);
+    eqCam(cam, [-1300 + 30 * k + g[0] * 3, 140 + g[1] * 2, 1500 - 40 * k + g[2] * 3], [-20, 390 + 15 * k, 0], 38, g[0] * 12);
     eqShadowFollowAt(B.sun, [0, 0, 0], 600, 5000);
   };
   pc.labels = (s, u) => [{ p: new THREE.Vector3(0, 840, 0).applyMatrix4(burj.matrixWorld), text: 'BURJ KHALIFA', sub: `DUBAI · ${eqClock(s, 4)} · MAGNITUDE ${eqQMag(q, s)} ACROSS THE GULF`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
@@ -627,7 +629,7 @@ function eqPostIstanbul(app) {
   // the strait runs north–south (z); the bridge crosses east–west (x) at z = 0; hills both sides
   const shore = (x, z) => { const w = 560 + 120 * Math.sin(z / 900), d = Math.abs(x) - w; return d < 0 ? -12 : Math.min(130, d * 0.35 + 20 * Math.sin(z / 300 + x / 500) * MathX.smooth(d, 0, 200)); };
   eqPostGround(scene, { size: [12000, 12000], segs: [240, 240], h: shore, night: true, key: 'ist', col: () => [0.07, 0.07, 0.07], paint: EQ_NIGHT_PAINT('70.0', '0.15') });
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(20000, 20000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#03060c', roughness: 0.06, metalness: 0.7 })); water.position.y = -1; scene.add(water);
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(20000, 20000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#050a14', roughness: 0.62, metalness: 0.1 })); water.position.y = -1; scene.add(water);
   const blds = eqPostBlocks(r, -5000, 5000, -5000, 5000, 40, 0.2, (x, z, rr) => { const y = shore(x, z); if (y < 2 || Math.abs(z) < 60 && Math.abs(x) < 900) return null; if (rr.next() < 0.25) return null;
     return [rr.range(12, 24), rr.range(12, 22), rr.range(9, 26), ['#c8b8a0', '#a89a88', '#d8d0c0', '#8a7a6a'][Math.floor(rr.next() * 4)], 1]; });
   blds.forEach((b, i) => { b[8] = hash1(i * 7) < 0.05 ? 510 + hash1(i * 13) * 5 : 1e6; });
@@ -655,11 +657,11 @@ function eqPostIstanbul(app) {
     for (let i = 27; i <= 31; i++) { const d = (i + 0.5) * 36, f = 513.4 + (i - 27) * 0.25 + Math.sqrt(2 * 68 / 9.8); eqBurst(B.soft, B.adds, s, { t: f, p: [br.at(d)[0], 0, 0], kind: 'dust', size: 18, n: 26, seed: 900 + i, life: 8, alpha: 0.6 }); }
     B.soft.end(); B.adds.end();
     const g = eqQGround(q, s, 23), k = MathX.clamp(u / 6.5, 0, 1);
-    eqCam(cam, [-1250 + g[0] * 3, 42 + g[1] * 2, -820 + 40 * k + g[2] * 3], [-80, 80, 0], 44, g[0] * 12);
+    eqCam(cam, [-200 + g[0] * 3, 22 + g[1] * 2, -960 + 50 * k + g[2] * 3], [40, 72, 0], 52, g[0] * 12);
     eqShadowFollowAt(B.sun, [0, 0, 0], 700, 4000);
   };
   pc.labels = (s, u) => [{ p: [0, 120, 0], text: 'BOSPHORUS BRIDGE', sub: `ISTANBUL · ${eqClock(s, 3)} · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true },
-    { p: [-900, 30, -300], text: 'EUROPE', a: MathX.smooth(u, 1.0, 1.5) * 0.9 }, { p: [900, 30, -300], text: 'ASIA', a: MathX.smooth(u, 1.3, 1.8) * 0.9, side: 'r' }];
+    { p: [-760, 70, -700], text: 'EUROPE', a: MathX.smooth(u, 1.0, 1.5) * 0.9, side: 'r' }, { p: [760, 70, -700], text: 'ASIA', a: MathX.smooth(u, 1.3, 1.8) * 0.9 }];
   pc.grade = (p) => { p.exposure = 1.12; p.saturation = 1.15; p.contrast = 1.12; p.bloom = 0.65; p.bloomThreshold = 0.55; p.vignette = 0.5; };
   return pc;
 }

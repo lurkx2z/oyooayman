@@ -175,8 +175,8 @@ const EQ_DIA = (() => {
     phone: (u, t) => {
       const q = (id, w) => { const M = eqQMag(id, eqS(eqWord('phone', w).start)); return `EARTHQUAKE · MAGNITUDE ${M}`; };
       return phone(u, t, 1340, 130, eqClock(eqS(t)).replace(/ (AM|PM)/, ''), [
-        [eqWord('phone', 'los').start - 0.15, 'LOS ANGELES', q('la', 'los'), '#5a1a16'], [eqWord('phone', 'tokyo.').start - 0.15, 'TOKYO', q('tokyo', 'tokyo.'), '#5a1a16'],
-        [eqWord('phone', 'mexico').start - 0.15, 'MEXICO CITY', q('mexico', 'mexico'), '#5a1a16'], [eqWord('phone', 'istanbul.').start - 0.15, 'ISTANBUL', q('istanbul', 'istanbul.'), '#5a1a16']], 'BREAKING NEWS');
+        [eqWord('phone', 'los').start - 0.15, 'LOS ANGELES', q('la', 'los'), '#5a1a16'], [eqWord('phone', 'tokyo').start - 0.15, 'TOKYO', q('tokyo', 'tokyo'), '#5a1a16'],
+        [eqWord('phone', 'mexico').start - 0.15, 'MEXICO CITY', q('mexico', 'mexico'), '#5a1a16'], [eqWord('phone', 'istanbul').start - 0.15, 'ISTANBUL', q('istanbul', 'istanbul'), '#5a1a16']], 'BREAKING NEWS');
     },
     // ten Tsar Bombas
     tsar: (u) => {

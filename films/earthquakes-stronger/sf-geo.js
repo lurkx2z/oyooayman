@@ -167,6 +167,7 @@ function eqGroundMat() {
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.24, 0.22, 0.19), fill * uWet * 0.55);
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.36, 0.33, 0.27), boil * 0.6);
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.58, 0.52), uDust * 0.35 * vUrb);
+          diffuseColor.rgb = pow(max(diffuseColor.rgb, 0.0), vec3(2.2));      // (the colours above are sRGB: to linear)
         }`);
   };
   m.customProgramCacheKey = () => 'eqGround';
@@ -332,13 +333,15 @@ function eqCityMat() {
         // fallen: dust-grey rubble; and dust settles on everything
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.55, 0.52, 0.47) * (0.8 + 0.3 * eqH(floor(vWorldP.xz / 3.0))), smoothstep(0.35, 0.9, vFall));
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.66, 0.62, 0.56), uDust * 0.45);
+        diffuseColor.rgb *= mix(1.0, 0.4, uNight);                             // (at night the walls are dark: the light is the windows)
         float eqWin = win * (1.0 - broken);`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
         roughnessFactor = mix(roughnessFactor, 0.08, eqWin);`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
         // at night: lit windows (some rooms dark; whole buildings go dark as the power fails: uOut)
-        float eqLit = eqWin * uNight * step(uOut, fract(vSeed * 13.7)) * step(0.38, eqH(cell * 1.3 + vSeed * 91.0));
-        totalEmissiveRadiance += vec3(1.0, 0.8, 0.55) * eqLit * (0.55 + 0.7 * rn);`)
+        float eqLitP = mix(step(0.66, eqH(cell * 1.3 + vSeed * 91.0)), 0.2, aa);
+        float eqLit = eqWin * uNight * step(uOut, fract(vSeed * 13.7)) * eqLitP;
+        totalEmissiveRadiance += vec3(1.0, 0.76, 0.48) * eqLit * (0.4 + 0.5 * rn);`)
       .replace('#include <metalnessmap_fragment>', `#include <metalnessmap_fragment>
         metalnessFactor = mix(metalnessFactor, 0.45, eqWin);`);
   };
