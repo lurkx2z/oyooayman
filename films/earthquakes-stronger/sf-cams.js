@@ -42,18 +42,27 @@ function eqSfCam(mode, u, s, set, X) {
     jolt4: () => gr({ p: eqG(388.5, 4.2, 17.8), at: eqG(366, 3.0, 7.5), fov: 50, shC: eqG(372, 2, 10), shakeK: 1.4 }),
     truck: () => gr({ p: eqG(392, Y + 0.6, -26.8), at: eqG(330, Y + 1.2, -33.5), fov: 44, shC: eqG(370, 2, -30) }),
     locals: () => gr({ p: eqG(365.8, 3.45, 2.2), at: eqG(368.4, 3.15, 4.9), fov: 38, shC: eqG(368, 2, 4.5), shR: 8 }),
-    youSide: () => { const h = head(); return gr({ p: eqAhead(h, yaw, 0.7, 1.4, 0.1), at: [h[0], h[1] - 0.08, h[2]], fov: 36, shC: h, shR: 8 }); },
+    youSide: () => { const h = head(), c = eqAhead(h, yaw, 0.7, 1.4, 0.1), dx = h[0] - c[0], dz = h[2] - c[2], l = Math.hypot(dx, dz);
+      // (you on the left third: the card on the right covered your face)
+      return gr({ p: c, at: [h[0] - (dz / l) * 0.45, h[1] - 0.08, h[2] + (dx / l) * 0.45], fov: 36, shC: h, shR: 8 }); },
     faultMap: () => ({ p: eqPush([600, 47000, 23000], [500, 44000, 21500], u, 9), at: [200, 0, 2500], fov: 38, near: 200, far: 140000, shR: 0, fog: 0, drift: 0 }),
+    // (the second half of the fault map: pushing in on the city between the two faults)
+    faultMap2: () => ({ p: eqPush([-2000, 26000, 9000], [-1800, 21000, 7200], u, 7), at: [-1600, 0, 1800], fov: 38, near: 100, far: 140000, shR: 0, fog: 0, drift: 0 }),
+    // (from the promenade: the terrace and its people, left of the card)
+    terraceLow: () => gr({ p: eqPush(eqG(349, Y + 1.7, -9), eqG(351, Y + 1.7, -8.5), u, 3.5), at: eqG(390, Y + 1.3, 11), fov: 46, shC: eqG(372, 2, 6), shR: 40, shakeK: 0.6 }),
+    // (up at the Ferry Building's tower from the promenade, the flag shaking)
+    ferryLook: () => gr({ p: eqPush(eqG(52, Y + 1.6, -9), eqG(46, Y + 1.6, -9.5), u, 4), at: eqG(0, 40, 6), fov: 50, shC: eqG(10, 2, 0), shR: 60, shakeK: 0.6 }),
     drone: () => air({ p: eqPush(eqG(430, 62, 150), eqG(445, 66, 160), u, 8), at: eqG(335, 3, -25), fov: 46, near: 0.5, shR: 140, shC: eqG(360, 2, -20) }),
     birds: () => gr({ p: eqG(377.5, 3.3, 38), at: eqPush(eqG(382, 3.8, 70), eqG(390, 14, 110), u, 3.5), fov: 46, shC: eqG(380, 2, 60), shR: 30, shakeK: 0.4 }),
-    pier: () => gr({ p: eqPush(eqG(379.4, 3.7, 17.5), eqG(379.4, 3.6, 20.5), u, 7), at: eqG(380, 3.4, 160), fov: 34, shC: eqG(380, 2, 60), shR: 70, shakeK: 0.4 }),
+    pier: () => gr({ p: eqPush(eqG(379.4, 4.3, 24), eqG(379.4, 4.25, 29), u, 7),   // (on the pier itself: from the café's end its railing swept across the lens)
+      at: eqG(380, 3.4, 160), fov: 34, shC: eqG(380, 2, 60), shR: 70, shakeK: 0.4 }),
     pilotWave: () => { const p = set.pilot.headWorld(); return gr({ p: eqG(376.6, 3.3, 141), at: [p.x, p.y - 0.25, p.z], fov: 34, shC: [p.x, p.y, p.z], shR: 12, shakeK: 0.5 }); },
     youSee: () => { const h = head(); return gr({ p: eqAhead(h, yaw, 2.2, 0.6, -0.1), at: [h[0], h[1] - 0.15, h[2]], fov: 40, shC: h, shR: 8, shakeK: 0.7 }); },
     // ---- minute three
     jolt5: () => gr({ p: eqG(364.8, Y + 1.75, 7.4), at: eqG(360.6, Y + 2.3, 10.6), fov: 48, shC: eqG(361, 3, 10), shR: 8, shakeK: 1.1 }),
     everyone: () => gr({ p: eqG(327, Y + 1.75, -4.5), at: eqG(380, Y + 1.3, -8), fov: 48, shC: eqG(350, 2, -6), shR: 40, shakeK: 1.0 }),
     alert: () => gr({ p: eqG(364.6, 3.4, 2.8), at: eqG(368.3, 2.9, 5.0), fov: 40, shC: eqG(368, 2, 4.5), shR: 8, shakeK: 0.9 }),
-    phones: () => gr({ p: eqG(402, Y + 1.6, -6.5), at: eqG(350, Y + 1.1, -8), fov: 44, shC: eqG(380, 2, -8), shR: 40, shakeK: 1.0 }),
+    phones: () => gr({ p: eqG(402, Y + 1.6, -6.5), at: eqG(350, Y + 1.1, -11.5), fov: 44, shC: eqG(380, 2, -8), shR: 40, shakeK: 1.0 }),
     lowStreet: () => gr({ p: eqG(378, Y + 0.5, -11.5), at: eqG(386, Y + 4.5, -60), fov: 54, shC: eqG(372, 2, -35), shR: 40, shakeK: 1.0 }),
     crowd: () => gr({ p: eqG(375, Y + 1.65, -43.5), at: eqG(366, Y + 1.6, -56), fov: 50, shC: eqG(372, 2, -40), shR: 40, shakeK: 1.0 }),
     drop: () => gr({ p: eqG(378.5, 2.9, 2.3), at: eqG(375, 2.6, 10.5), fov: 50, shC: eqG(376, 2, 9), shR: 14, shakeK: 1.0 }),
@@ -72,7 +81,7 @@ function eqSfCam(mode, u, s, set, X) {
     streetcar: () => gr({ p: eqG(437, Y + 1.6, -15.2), at: eqG(451, Y + 1.4, -27), fov: 48, shC: eqG(450, 2, -26), shR: 20, shakeK: 1.0 }),
     in: () => ({ local: true, p: [3.9, 1.7, 2.6], at: [1.0, 1.25, 0.5], fov: 44, shR: 10, near: 0.05 }),
     start: () => ({ local: true, p: [-0.2, 2.0, 1.92], at: [-0.45, 2.04, 0.78], fov: 42, inside: true, shR: 6, near: 0.03 }),
-    startTwo: () => gr({ p: eqG(393, 3.6, 146), at: eqG(380, 5, 160), fov: 44, shC: eqG(380, 2, 158), shR: 16, shakeK: 0.8 }),
+    startTwo: () => gr({ p: eqPush(eqG(391, 3.3, 149), eqG(388.5, 3.2, 151.5), u, 5.8), at: eqG(380, 4.6, 160), fov: 46, shC: eqG(380, 2, 158), shR: 16, shakeK: 0.8 }),   // (closer: from 19 m the helicopter was small)
     fillDia: () => gr({ p: eqG(372, Y + 1.8, -38), at: eqG(372, Y + 0.6, -85), fov: 52, shC: eqG(372, 2, -60), shR: 40, shakeK: 0.9 }),
     mudBoil: () => gr({ p: eqPush(eqG(352, Y + 2.6, -30.5), eqG(354, Y + 2.3, -31.5), u, 5), at: eqG(360, Y - 0.3, -43), fov: 46, shC: eqG(360, 2, -42), shR: 20, shakeK: 0.9 }),
     sink: () => gr({ p: eqG(388, Y + 1.3, -31.4), at: eqG(396, Y - 0.2, -38.5), fov: 44, shC: eqG(395, 2, -38), shR: 14, shakeK: 0.9 }),
@@ -97,7 +106,8 @@ function eqSfCam(mode, u, s, set, X) {
     fires: () => air({ p: [300, 390, -1300], at: [-1500, 40, 1500], fov: 50 }),
     wideCity: () => air({ p: eqPush([-200, 900, -3200], [-300, 880, -3100], u, 8), at: [-1500, 0, 1500], fov: 46 }),
     pyramid: () => air({ p: eqPush([-300, 170, -430], [-330, 165, -400], u, 9), at: [-801, 150, 33], fov: 36, shC: [-801, 100, 33], shR: 300 }),
-    pyramidFall: () => air({ p: eqPush([-560, 120, -250], [-575, 118, -235], u, 6), at: [-801, 165, 33], fov: 42, shC: [-801, 100, 33], shR: 300 }),
+    pyramidFall: () => air({ p: eqPush([-545, 185, -290], [-562, 180, -268], u, 6), at: [-801, 150, 33], fov: 42,   // (above the roofs: at 120 m it flew through one)
+      shC: [-801, 100, 33], shR: 300 }),
     golden: () => air({ p: eqPush([-4700, 230, -2700], [-4800, 225, -2690], u, 5), at: [-7450, 95, -2370], fov: 30, fxRange: 4000 }),
     ggFall: () => air({ p: [-6250, 125, -2520], at: [-7450, 55, -2370], fov: 38, shC: [-7450, 40, -2370], shR: 900 }),
     phoneLap: () => ({ local: true, p: [0.25, 1.98, 1.85], at: [0.66, 1.9, 0.9], fov: 46, inside: true, shR: 6, near: 0.03 }),
@@ -108,7 +118,7 @@ function eqSfCam(mode, u, s, set, X) {
     calm: () => ({ local: true, p: [0.66, 2.04, 1.38], at: [0.38, 2.0, 0.8], fov: 50, inside: true, shR: 6, near: 0.03 }),
     empty: () => air({ p: eqPush(eqG(380, 210, 900), eqG(380, 200, 860), u, 10), at: eqG(300, 0, 60), fov: 46 }),
     drained: () => air({ p: eqPush(eqG(720, 70, 560), eqG(690, 64, 530), u, 6), at: eqG(380, -6, 110), fov: 46, shC: eqG(400, 0, 200), shR: 400 }),
-    back: () => air({ p: eqPush(eqG(364, 19, -8), eqG(366, 17, -3), u, 4.5), at: eqG(396, 5, 170), fov: 56, shC: eqG(385, 0, 90), shR: 160 }),   // (from above your café: the wall of water coming at you)
+    back: () => air({ p: eqPush(eqG(368, 8.5, -2), eqG(370, 7.5, 3), u, 4.5), at: eqG(398, 7, 170), fov: 58, shC: eqG(385, 0, 90), shR: 160 }),   // (from the seawall by your café, low: the wall of water coming at you)
     cafe: () => air({ p: eqG(610, 58, 300), at: eqG(372, 5, 6), fov: 34, shC: eqG(372, 2, 6), shR: 200 }),
     // ---- minute eight
     jolt10: () => air({ p: [420, 260, -400], at: [-308, 150, 644], fov: 44 }),
@@ -123,8 +133,11 @@ function eqSfCam(mode, u, s, set, X) {
     yearsBg: () => air({ p: [-2400, 720, -1800], at: [-900, 0, 1400], fov: 50 }),
     air: () => ({ local: true, p: [0.02, 2.06, 1.7], at: [0.45, 2.0, 0.8], fov: 46, inside: true, shR: 6, near: 0.03 }),
     fuel: () => ({ local: true, p: [0.08, 1.98, 1.08], at: [-0.3, 1.45, 1.72], fov: 46, inside: true, shR: 6, near: 0.03 }),
-    nowhere: () => { const h = heliP(); return air({ p: [h[0] + 600, h[1] + 260, h[2] - 700], at: [h[0] - 700, h[1] - 380, h[2] + 1900], fov: 54 }); },
-    below: () => ({ local: true, p: [0.62, 1.78, 1.05], at: [7, -5, 5.5], fov: 52, inside: true, shR: 6, near: 0.03 }),
+    nowhere: () => { const h = heliP(); return air({ p: [h[0] + 600, h[1] + 260, h[2] - 700], at: [h[0] - 700, h[1] - 380, h[2] + 1900], fov: 54, shR: 0 }); },   // (no sun shadows from up here: the shadow box's edge drew a dark line on the bay)
+    below: () => { const h = heliP(), at = [-950, 0, -250], d = [at[0] - h[0], at[1] - h[1], at[2] - h[2]], l = Math.hypot(d[0], d[1], d[2]);
+      // (over your helicopter's tail, down at what is left of the city: the window shot looked into the sun)
+      const b = (k, up) => [h[0] - (d[0] / l) * k, h[1] - (d[1] / l) * k + up, h[2] - (d[2] / l) * k];
+      return air({ p: eqPush(b(36, 12), b(27, 9), u, 5.7), at, fov: 50, shR: 0 }); },
     // ---- minute ten
     melt: () => air({ p: eqPush([-720, 230, -720], [-760, 220, -690], u, 7), at: [-920, 0, -150], fov: 48 }),
     last: () => ({ local: true, p: [0.12, 2.0, 1.72], at: [0.45, 2.03, 0.8], fov: 38, inside: true, shR: 6, near: 0.03 }),
@@ -146,11 +159,12 @@ function eqSfLabels(mode, u, s, set, X) {
     aerialSF: () => [L([-700, 260, 450], 'SAN FRANCISCO'), L(M.bay.label, 'BAY BRIDGE', '1936')],
     helipad: () => [L(heliTop(), 'YOUR HELICOPTER', 'TOUR OF THE BAY')],
     faultMap: () => { const sa = eqLL(37.66, -122.53), hw = eqLL(37.79, -122.19); return [L([sa[0], 600, sa[1]], 'SAN ANDREAS FAULT'), L([hw[0], 600, hw[1]], 'HAYWARD FAULT', null, { side: 'r' }), L(eqG(372, 400, 10), 'YOU', null, { you: true })]; },
+    faultMap2: () => { const sa = eqLL(37.6, -122.48), hw = eqLL(37.75, -122.15); return [L([sa[0], 300, sa[1]], 'SAN ANDREAS FAULT'), L([hw[0], 300, hw[1]], 'HAYWARD FAULT', null, { side: 'r' }), L(eqG(372, 200, 10), 'YOU', null, { you: true })]; },
+    ferryLook: () => [L(M.ferry.top, 'FERRY BUILDING', '1898 · CAME THROUGH 1906 AND 1989')],
     pier: () => [L(heliTop(), 'YOUR HELICOPTER', 'TOUR LEAVES AT 10:00')],
     ferry: () => [L(M.ferry.top, 'FERRY BUILDING', 'SURVIVED 1906')],
     skyline: () => [L(M.salesforce.label, 'SALESFORCE TOWER', '326 M · TALLEST IN THE CITY')],
     streetcar: () => [L(eqG(447, 5.2, -25), 'F-LINE STREETCAR', 'VINTAGE CARS, STILL RUNNING')],
-    haiti: () => [L(M.pyramid.label, 'TRANSAMERICA PYRAMID', '260 M')],
     bayBridge: () => [L(M.bay.label, 'BAY BRIDGE', 'WEST SPAN · 1936')],
     jolt8: () => [L(eqG(0, 70, 6), 'FERRY BUILDING', 'CLOCK TOWER, 1898')],
     y1906: () => [L(M.coit.label, 'COIT TOWER'), L(M.salesforce.label, 'SALESFORCE TOWER')],

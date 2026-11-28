@@ -108,17 +108,20 @@ const eqWaveU = (k = EQ_WAVE.k, c = EQ_WAVE.c, L = 14000) => ({ uWaveK: { value:
 
 // ---- the bay's water level (m) at a point v metres out from the waterfront (story s): calm; at magnitude nine the
 // shaking sloshes the bay out (down 9 m at the shore), then it comes back as a wall that runs up over the Embarcadero
-const EQ_BAY = { out0: 378, out1: 391, wave: 392.5, speed: 34, crest: 13 };
+const EQ_BAY = { out0: 378, out1: 391, form: 387.5, wave: 392.5, speed: 34, crest: 13 };
+// (the crest's distance from the seawall at story s: it reaches the seawall at s ≈ 396)
+const eqBayFront = (s) => (EQ_BAY.wave - s) * EQ_BAY.speed + 120;
 function eqBayY(v, s) {
-  const out = MathX.smooth(s, EQ_BAY.out0, EQ_BAY.out1) * (1 - MathX.smooth(s, EQ_BAY.wave - 1.5, EQ_BAY.wave + 2.5));
-  const near = Math.exp(-Math.max(0, v) / 4000);
-  let y = -14 * out * near;
-  if (s > EQ_BAY.out1 - 4) {
-    const front = (EQ_BAY.wave - s) * EQ_BAY.speed + 120;                 // the crest's distance from the seawall
-    // (a steep face towards the shore, a long back: a wall of water, not a swell)
-    const dv = v - front, sg = dv < 0 ? 22 : 95, crest = EQ_BAY.crest * Math.exp(-(dv * dv) / (2 * sg * sg)) * MathX.smooth(s, EQ_BAY.out1 - 4, EQ_BAY.out1 + 1);
-    const behind = dv > 0 ? 3.2 * Math.exp(-dv / 900) * MathX.smooth(s, EQ_BAY.out1, EQ_BAY.wave) : 0;
-    y += crest + behind;
+  // (the drain and the wall end when the wall reaches the seawall, s ≈ 396: kept on, they went on running across the
+  // rest of the bay for the rest of the film; the water over the land is eqSurge's)
+  const end = 1 - MathX.smooth(s, EQ_BAY.wave + 3.6, EQ_BAY.wave + 7);
+  const near = Math.exp(-Math.max(0, v) / 4000), drain = -14 * MathX.smooth(s, EQ_BAY.out0, EQ_BAY.out1) * near * end;
+  let y = drain;
+  if (s > EQ_BAY.form) {
+    // a wall of water: the bay stays drained in front of it, the water is back behind it; a steep face, a long back
+    const dv = v - eqBayFront(s), W = MathX.smooth(s, EQ_BAY.form, EQ_BAY.form + 3.5), passed = MathX.smooth(dv, -4, 10) * W;
+    const sg = dv < 0 ? 14 : 80;
+    y = drain * (1 - passed) + EQ_BAY.crest * W * end * Math.exp(-(dv * dv) / (2 * sg * sg)) + 3.2 * Math.exp(-Math.max(0, dv) / 900) * passed;
   }
   if (s > EQ_BAY.wave + 6) y += 1.6 * Math.sin((s - EQ_BAY.wave) * 0.11) * Math.exp(-(s - EQ_BAY.wave) / 120) * near;
   return y;
@@ -167,6 +170,12 @@ function eqGroundMat() {
           float boil = smoothstep(0.55, 0.9, eqH2(floor(p / 9.0))) * fill * uWet;
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.24, 0.22, 0.19), fill * uWet * 0.55);
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.36, 0.33, 0.27), boil * 0.6);
+          // the bay's floor, bared when the bay drains: wet mud in ripples, with puddles of sky
+          float bed = smoothstep(-0.4, -2.0, vWP.y);
+          float rip = 0.5 + 0.5 * sin(dot(p, vec2(${EQ_WF.n[0].toFixed(5)}, ${EQ_WF.n[1].toFixed(5)})) * 0.8 + sin(p.x * 0.031 + p.y * 0.027) * 3.0);
+          float pud = smoothstep(0.78, 0.86, 0.5 + 0.25 * sin(p.x * 0.045 + sin(p.y * 0.03) * 2.0) + 0.25 * sin(p.y * 0.052 + p.x * 0.017));
+          diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(0.2, 0.19, 0.16), vec3(0.28, 0.26, 0.22), rip), bed * 0.85);
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.5, 0.57, 0.6), bed * pud * 0.5);
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.36, 0.33, 0.29), uDust * 0.3 * vUrb);
           diffuseColor.rgb *= 1.0 - 0.38 * uDust * vUrb;   // (ash and rubble: the ruined city darkens)
           diffuseColor.rgb = pow(max(diffuseColor.rgb, 0.0), vec3(2.2));      // (the colours above are sRGB: to linear)
@@ -233,14 +242,14 @@ function eqWater(scene) {
       uniform float uS;
       float eqSm(float a, float b, float x) { float t = clamp((x - a) / (b - a), 0.0, 1.0); return t * t * (3.0 - 2.0 * t); }
       float eqBay(float v) {
-        float out_ = eqSm(${EQ_BAY.out0.toFixed(1)}, ${EQ_BAY.out1.toFixed(1)}, uS) * (1.0 - eqSm(${(EQ_BAY.wave - 1.5).toFixed(1)}, ${(EQ_BAY.wave + 2.5).toFixed(1)}, uS));
-        float near = exp(-max(0.0, v) / 4000.0);
-        float y = -14.0 * out_ * near;
-        if (uS > ${(EQ_BAY.out1 - 4).toFixed(1)}) {
-          float front = (${EQ_BAY.wave.toFixed(1)} - uS) * ${EQ_BAY.speed.toFixed(1)} + 120.0, dv = v - front;
-          float sg = dv < 0.0 ? 22.0 : 95.0;
-          y += ${EQ_BAY.crest.toFixed(1)} * exp(-(dv * dv) / (2.0 * sg * sg)) * eqSm(${(EQ_BAY.out1 - 4).toFixed(1)}, ${(EQ_BAY.out1 + 1).toFixed(1)}, uS);
-          if (dv > 0.0) y += 3.2 * exp(-dv / 900.0) * eqSm(${EQ_BAY.out1.toFixed(1)}, ${EQ_BAY.wave.toFixed(1)}, uS);
+        float end_ = 1.0 - eqSm(${(EQ_BAY.wave + 3.6).toFixed(1)}, ${(EQ_BAY.wave + 7).toFixed(1)}, uS);
+        float near = exp(-max(0.0, v) / 4000.0), drain = -14.0 * eqSm(${EQ_BAY.out0.toFixed(1)}, ${EQ_BAY.out1.toFixed(1)}, uS) * near * end_;
+        float y = drain;
+        if (uS > ${EQ_BAY.form.toFixed(1)}) {
+          float dv = v - ((${EQ_BAY.wave.toFixed(1)} - uS) * ${EQ_BAY.speed.toFixed(1)} + 120.0);
+          float W = eqSm(${EQ_BAY.form.toFixed(1)}, ${(EQ_BAY.form + 3.5).toFixed(1)}, uS), passed = eqSm(-4.0, 10.0, dv) * W;
+          float sg = dv < 0.0 ? 14.0 : 80.0;
+          y = drain * (1.0 - passed) + ${EQ_BAY.crest.toFixed(1)} * W * end_ * exp(-(dv * dv) / (2.0 * sg * sg)) + 3.2 * exp(-max(0.0, dv) / 900.0) * passed;
         }
         if (uS > ${(EQ_BAY.wave + 6).toFixed(1)}) y += 1.6 * sin((uS - ${EQ_BAY.wave.toFixed(1)}) * 0.11) * exp(-(uS - ${EQ_BAY.wave.toFixed(1)}) / 120.0) * near;
         return y;
@@ -256,12 +265,21 @@ function eqWater(scene) {
         { float v = dot(vWP.xz, vec2(${N})), y0 = eqBay(v), y1 = eqBay(v + 25.0);
           float n = 0.55 + 0.45 * sin(vWP.x * 0.21 + sin(vWP.z * 0.13) * 2.0) * sin(vWP.z * 0.17 + vWP.x * 0.05);
           float crest = clamp((y0 - y1) / 6.0, 0.0, 1.0) * smoothstep(1.0, 3.0, y0) * n;
-          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.68, 0.7), clamp(crest * 1.4, 0.0, 0.85)); }`)
+          // the wall: a dark green-blue face under a white, broken top
+          float W = eqSm(${EQ_BAY.form.toFixed(1)}, ${(EQ_BAY.form + 3.5).toFixed(1)}, uS) * (1.0 - eqSm(${(EQ_BAY.wave + 3.0).toFixed(1)}, ${(EQ_BAY.wave + 6.0).toFixed(1)}, uS));
+          float dv = v - ((${EQ_BAY.wave.toFixed(1)} - uS) * ${EQ_BAY.speed.toFixed(1)} + 120.0);
+          float face = W * exp(-(dv + 13.0) * (dv + 13.0) / 120.0);
+          float top = W * exp(-(dv + 2.0) * (dv + 2.0) / 70.0) * (0.6 + 0.4 * n);
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.02, 0.075, 0.08), clamp(face, 0.0, 0.85));
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.68, 0.7), clamp(max(crest * 1.4, top), 0.0, 0.9)); }`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
         { vec2 q = vWP.xz; float a = sin(q.x * 0.09 + q.y * 0.05) + sin(q.x * -0.04 + q.y * 0.11) * 0.8 + sin(q.x * 0.23 - q.y * 0.19) * 0.35;
           float b = cos(q.x * 0.07 - q.y * 0.08) + cos(q.x * 0.13 + q.y * 0.03) * 0.7 + cos(q.x * -0.21 + q.y * 0.26) * 0.3;
           float fade = 1.0 - smoothstep(250.0, 2600.0, length(vWP - cameraPosition));
-          normal = normalize(normal + (viewMatrix * vec4(a * 0.05 * fade, 0.0, b * 0.05 * fade, 0.0)).xyz); }`);
+          normal = normalize(normal + (viewMatrix * vec4(a * 0.05 * fade, 0.0, b * 0.05 * fade, 0.0)).xyz);
+          // (the slope of the slosh and the wave: without it the wall's face was lit like flat water, a white sheen)
+          float vv = dot(vWP.xz, vec2(${N})), sl = (eqBay(vv + 2.0) - eqBay(vv - 2.0)) / 4.0;
+          normal = normalize(normal + (viewMatrix * vec4(-sl * ${EQ_WF.n[0].toFixed(5)}, 0.0, -sl * ${EQ_WF.n[1].toFixed(5)}, 0.0)).xyz); }`);
   };
   m.customProgramCacheKey = () => 'eqWater';
   const geo = new THREE.PlaneGeometry(1000, 1000, 10, 10); geo.rotateX(-Math.PI / 2);
@@ -271,9 +289,9 @@ function eqWater(scene) {
     let wet = false; for (const [a, b] of [[0, 0], [1000, 0], [0, 1000], [1000, 1000], [500, 500]]) if (eqShoreSD(x + a, z + b) < 300) wet = true;
     if (wet) list.push([x + 500, z + 500]);
   }
-  // (the tiles round the waterfront get 10 m cells, so the wave's steep face can be drawn; the rest keep 100 m)
+  // (the tiles round the waterfront get 5 m cells (10 m drew a sawtooth along the crest), so the wave's steep face can be drawn; the rest keep 100 m)
   const c0 = eqWL(380, 0, 150), isNear = ([x, z]) => Math.hypot(x - c0[0], z - c0[2]) < 1300;
-  const geoN = new THREE.PlaneGeometry(1000, 1000, 100, 100); geoN.rotateX(-Math.PI / 2);
+  const geoN = new THREE.PlaneGeometry(1000, 1000, 200, 200); geoN.rotateX(-Math.PI / 2);
   const mk = (g, L) => { const I = new THREE.InstancedMesh(g, m, Math.max(1, L.length)); I.count = L.length; L.forEach(([x, z], i) => { M4.makeTranslation(x, 0, z); I.setMatrixAt(i, M4); }); I.receiveShadow = true; I.frustumCulled = false; scene.add(I); return I; };
   const W = mk(geo, list.filter((t) => !isNear(t))), WN = mk(geoN, list.filter(isNear));
   return { mat: m, mesh: W, meshNear: WN };

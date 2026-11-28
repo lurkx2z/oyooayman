@@ -168,14 +168,18 @@ EQ_SETS.globe = (app) => {
       const on = M !== null && H > 0.5;
       c.core.visible = c.halo.visible = on;
       if (!on) continue;
-      setWidth(c, crackWkm(M));
+      // (the shots about the planet cracking open draw the cracks wider and hotter: at their true scale for this film,
+      // 140 km across, they were thin threads under the rings)
+      const big = mode === 'cracking' || mode === 'jolt12' || mode === 'dino' || mode === 'seven' || mode === 'open' ? MathX.smooth(M, 9, 11.5) : 0;
+      setWidth(c, crackWkm(M) * (1 + 1.8 * big));
       c.U.uH.value = H; c.U.uHot.value = MathX.smooth(M, 8, 11); c.U.uA.value = MathX.smooth(M, 5, 7.5);
       // (at magnitude twelve the cracks flare on the tick)
       if (M >= 12) c.U.uHot.value = 1 + 0.6 * Math.exp(-Math.max(0, s - 540) / 1.5);
+      if (big > 0) { c.U.uHot.value = Math.max(c.U.uHot.value, big); c.U.uA.value = Math.max(c.U.uA.value, big); }
     }
     // the pulses
     EQ_QUAKES.forEach((q, i) => { const M = eqQMag(q, s); pulseU.uM.value[i].set(M === null ? 0 : M, M === null ? -1 : s - q.s0); });
-    pulseU.uK.value = mode === 'california' ? 0.25 : 1;
+    pulseU.uK.value = mode === 'california' ? 0.25 : mode === 'cracking' ? 0.45 : 1;
     // California's year of earthquakes
     cal.pts.visible = mode === 'california';
     cal.m.uniforms.uK.value = MathX.smooth(u, 0.3, 4.0); cal.m.uniforms.uPx.value = 7 * (app.renderH || 1080) / 1080;
@@ -197,8 +201,9 @@ EQ_SETS.globe = (app) => {
   };
   set.labels = (t, shot) => {
     const s = eqStoryOf(t, shot), u = t - shot.t0, a = MathX.smooth(u, 0.35, 0.8), mode = shot.mode, out = [];
-    const v = new THREE.Vector3(), cdir = cam.position.clone().normalize();
-    const face = (p) => p.clone().normalize().dot(cdir) > 0.25;
+    const v = new THREE.Vector3();
+    // (facing the camera itself, well inside the limb: from close up a label on the edge floated out in space)
+    const face = (p) => p.clone().normalize().dot(cam.position.clone().sub(p).normalize()) > 0.35;
     if (NAMES[mode]) {
       for (const [text, sub, lat, lon, you] of NAMES[mode]) { const p = eqGeo(lat, lon, 1.02); if (face(p)) out.push({ p, text, sub, a, you: !!you, quake: !you }); }
       return out;
@@ -206,9 +211,14 @@ EQ_SETS.globe = (app) => {
     if (mode === 'notjust' || mode === 'growing' || mode === 'dozens') {
       // every earthquake on this side of the planet, with its magnitude (the newest first appear as they start)
       const L2 = EQ_QUAKES.filter((q) => q.s0 <= s).map((q) => ({ q, M: eqQMag(q, s) })).filter((x) => face(eqGeo(x.q.lat, x.q.lon)));
-      L2.sort((A, B) => B.M - A.M);
-      for (const { q, M } of L2.slice(0, mode === 'dozens' ? 9 : 7)) {
-        const p = eqGeo(q.lat, q.lon, 1.02); v.copy(p);
+      L2.sort((A, B) => (B.q.id === 'sf') - (A.q.id === 'sf') || B.M - A.M);
+      // (at most five, none on top of another, all inside the frame: eight or nine made a wall of red boxes)
+      const kept = [];
+      for (const { q, M } of L2) {
+        if (kept.length >= 5) break;
+        const p = eqGeo(q.lat, q.lon, 1.02); v.copy(p).project(cam);
+        if (Math.abs(v.x) > 0.8 || Math.abs(v.y) > 0.85 || kept.some((k) => Math.abs(k.x - v.x) < 0.42 && Math.abs(k.y - v.y) < 0.16)) continue;
+        kept.push({ x: v.x, y: v.y });
         out.push({ p, text: q.id === 'sf' ? 'YOU' : q.name, sub: `MAGNITUDE ${M}`, a: a * MathX.smooth(s - q.s0, 0, 1), you: q.id === 'sf', quake: q.id !== 'sf' });
       }
       return out;

@@ -55,7 +55,10 @@ function eqWaterfront(scene, app) {
     // skirts down the four sides (the terrain is far below the set)
     const skirt = (list) => { const base = pos.length / 3; for (const k of list) pos.push(pos[k * 3], -3, pos[k * 3 + 2]); for (let m = 0; m < list.length - 1; m++) { const a = list[m], b = list[m + 1], A = base + m, B = base + m + 1; idx.push(a, A, b, b, A, B, a, b, A, b, B, A); } };
     skirt(us.map((_, i) => i)); skirt(us.map((_, i) => (V.length - 1) * nu + i)); skirt(V.map((_, j) => j * nu)); skirt(V.map((_, j) => j * nu + nu - 1));
-    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx);
+    // (every normal up: the skirts are drawn both ways round, so computed normals cancelled to zero there and the seawall
+    // came out as black, jagged pixels)
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(new Float32Array(pos.length).map((_, i) => (i % 3 === 1 ? 1 : 0)), 3));
     const U = { uS: { value: 0 }, uCW: { value: 0 }, uGlow: { value: 0 }, uWet: { value: 0 }, uSink: { value: 0 }, uDust: { value: 0 } };
     const m = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.92 });
     m.onBeforeCompile = (sh) => {
@@ -212,7 +215,7 @@ function eqWaterfront(scene, app) {
     for (let v = 1; v <= 20; v += 2) eqMesh(new THREE.BoxGeometry(0.04, 1.0, 0.04), railM, 389.8, Y + 0.85, -v, g);
     eqMesh(new THREE.BoxGeometry(0.06, 0.06, 19), railM, 389.8, Y + 1.32, -10.5, g);
     // the pavilion (u 341…361, v 3…17)
-    const glassM = new THREE.MeshStandardMaterial({ color: '#2d4250', roughness: 0.06, metalness: 0.8, envMapIntensity: 1.4 }), frameM = eqStd('#f2f0ea', 0.5, 0.1);
+    const glassM = new THREE.MeshStandardMaterial({ color: '#5d7f90', roughness: 0.08, metalness: 0.45, envMapIntensity: 1.6 })   /* (lighter: from above it read as a black hole) */, frameM = eqStd('#f2f0ea', 0.5, 0.1);
     const pav = new THREE.Group(); g.add(pav);
     eqMesh(new THREE.BoxGeometry(18.8, 4.6, 14), glassM, 350.4, Y + 0.35 + 2.3, -10, pav);   // (its front at u 359.8: the counter's recess in front)
     eqMesh(new THREE.BoxGeometry(21.2, 0.5, 15.2), frameM, 351, Y + 0.35 + 4.85, -10, pav);
@@ -221,7 +224,14 @@ function eqWaterfront(scene, app) {
     for (const [u, v, w, d] of [[345, -6.5, 1.6, 1.1], [348.2, -6.5, 1.6, 1.1], [355, -13.5, 0.7, 0.7]]) eqMesh(new THREE.BoxGeometry(w, 0.8, d), eqStd('#9aa0a4', 0.6, 0.3), u, Y + 0.35 + 5.56, v, pav);
     for (const u of [341, 346, 351, 356, 361]) for (const v of [3, 17]) eqMesh(new THREE.BoxGeometry(0.22, 4.6, 0.22), frameM, u, Y + 0.35 + 2.3, -v, pav);
     // the counter's opening on the terrace side (u = 361): a serving window with shelves behind it
-    eqMesh(new THREE.BoxGeometry(0.3, 3.2, 8.4), eqStd('#2a1e16', 0.8), 359.97, Y + 0.35 + 2.4, -10, pav);   // the dark inside, behind the shelves
+    // the wall behind the shelves: cream tiles and a chalkboard menu (black, it read as an empty hole)
+    const backT = eqTex(eqCanvas(512, 256, (c) => {
+      c.fillStyle = '#e6dccb'; c.fillRect(0, 0, 512, 256); c.strokeStyle = '#c9bca6'; c.lineWidth = 2;
+      for (let y = 0; y <= 256; y += 16) { c.beginPath(); c.moveTo(0, y); c.lineTo(512, y); c.stroke(); for (let x = (y / 16) % 2 ? 16 : 0; x <= 512; x += 32) { c.beginPath(); c.moveTo(x, y); c.lineTo(x, y + 16); c.stroke(); } }
+      c.fillStyle = '#3a2a1e'; c.fillRect(150, 10, 212, 70); c.fillStyle = '#26302c'; c.fillRect(156, 16, 200, 58);
+      c.fillStyle = '#efe9da'; c.font = '700 18px Montserrat, Arial, sans-serif'; c.textAlign = 'center'; c.fillText('COFFEE · TEA · PASTRY', 256, 40);
+      c.font = '500 12px Montserrat, Arial, sans-serif'; c.fillText('ESPRESSO 3.5  ·  LATTE 5  ·  CROISSANT 4', 256, 62); }));
+    eqMesh(new THREE.BoxGeometry(0.3, 3.2, 8.4), new THREE.MeshStandardMaterial({ map: backT, roughness: 0.6 }), 359.97, Y + 0.35 + 2.4, -10, pav);
     eqMesh(new THREE.BoxGeometry(0.9, 1.05, 8.6), new THREE.MeshStandardMaterial({ map: eqTex(eqCanvas(256, 64, (c) => { c.fillStyle = '#1f5a4c'; c.fillRect(0, 0, 256, 64); c.fillStyle = '#f2f0ea'; c.fillRect(0, 0, 256, 6); })), roughness: 0.6 }), 361.6, Y + 0.35 + 0.53, -10, pav);
     // the red awning over the window, and the sign on the roof
     const awnM = new THREE.MeshStandardMaterial({ map: eqTex(eqCanvas(256, 32, (c) => { for (let i = 0; i < 16; i++) { c.fillStyle = i % 2 ? '#f4efe4' : '#c8352a'; c.fillRect(i * 16, 0, 16, 32); } })), roughness: 0.8, side: THREE.DoubleSide });
@@ -324,7 +334,7 @@ function eqWaterfront(scene, app) {
       eqMesh(eqRoundBox(14.2, 2.9, 2.6, 0.9, 0.05, 2), m, 0, 0.55, 0, t);
       const roof = eqMesh(new THREE.BoxGeometry(12.6, 0.25, 2.2), eqStd('#d8d0c0', 0.6), 0, 3.55, 0, t); void roof;
       const pole = eqMesh(new THREE.CylinderGeometry(0.025, 0.025, 5.2, 6), eqStd('#202020', 0.5), -2, 4.3, 0, t); pole.rotation.z = 1.2;
-      for (const x of [-4.6, 4.6]) eqMesh(new THREE.BoxGeometry(2.2, 0.5, 2.2), eqStd('#202020', 0.8), x, 0.4, 0, t);
+      for (const x of [-4.6, 4.6]) eqMesh(new THREE.BoxGeometry(2.2, 0.78, 2.2), eqStd('#202020', 0.8), x, 0.17, 0, t);   // (the trucks down to the rails: they hung 36 cm in the air)
       return t;
     };
     W.tramA = car('#e8722a', '#f6e6b8');            // orange and cream: going south-east, passes the café in minute one
@@ -388,7 +398,7 @@ function eqWaterfront(scene, app) {
     {
       const P = W.pad, u = s - P.f, a = j(60), amp = Math.min(1, lvl * 6);
       if (u <= 0) { P.pad.position.set(EQ_PAD.u + a[0] * amp * 0.4, Y + 0.4 + a[1] * amp * 0.3, -EQ_PAD.v - a[2] * amp * 0.4); P.pad.rotation.set(a[2] * amp * 0.05, 0, a[0] * amp * 0.06); }
-      else { const k = MathX.clamp(u / 2.2, 0, 1); P.pad.position.set(EQ_PAD.u, Y + 0.4 - 5.5 * k * k, -EQ_PAD.v); P.pad.rotation.set(0.35 * k * k, 0, -0.25 * k * k); }
+      else { const k = MathX.clamp(u / 2.2, 0, 1); P.pad.position.set(EQ_PAD.u, Math.max(-6.9, Y + 0.4 - 5.5 * k * k - Math.max(0, u - 2.2) * 1.4), -EQ_PAD.v); P.pad.rotation.set(0.35 * k * k, 0, -0.25 * k * k); }   // (then down to the bay's floor, 7 m: the drained bay showed it hanging in the air)
       P.sock.rotation.y = 0.6 + 0.2 * Math.sin(s * 0.7);
     }
     // ---- palms and lamps: sway with the ground (each a little behind the last), lean, then fall from magnitude eight
@@ -413,6 +423,7 @@ function eqWaterfront(scene, app) {
       let bu = 452, bv = -28, yaw = 0, roll = 0, y = Y + 0.21;
       if (u > 0) { const k = MathX.clamp(u / 1.8, 0, 1), e = 1 - (1 - k) ** 3; bv += 3.4 * e; bu -= 5 * e; yaw = 0.34 * e; roll = 0.22 * e + 0.25 * Math.sin(Math.min(u, 1.2) * Math.PI / 1.2) * (1 - k); y += 0.9 * Math.sin(Math.min(u, 0.6) / 0.6 * Math.PI); }
       if (s > EQ_WFT.wet) { y -= U.uSink.value * 0.8; roll += U.uSink.value * 0.12; }
+      y += Math.abs(roll) * 1.3;   // (it tips over its lower edge, not through the road)
       B.position.set(bu + b[0] * amp * 0.3, y + Math.max(0, b[1]) * amp * 0.3, -bv); B.rotation.set(roll, yaw, b[0] * amp * 0.04);
       void a;
     }

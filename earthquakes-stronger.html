@@ -28,7 +28,8 @@
     /* the minute bar: how far through this minute (the next magnitude when it fills) */
     .eq-bar { position: absolute; left: calc(var(--u) * 58); top: calc(var(--u) * 352); width: calc(var(--u) * 330); pointer-events: none; }
     .eq-bar .t { font-family: var(--hud-font); font-weight: 800; font-size: calc(var(--u) * 25); letter-spacing: 0.14em; color: #fff; opacity: 0.92;
-      text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(0, 0, 0, 0.7); margin-bottom: calc(var(--u) * 6); white-space: nowrap; }
+      text-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 8) rgba(0, 0, 0, 0.7); margin-bottom: calc(var(--u) * 6); white-space: nowrap;
+      display: inline-block; background: rgba(8, 10, 14, 0.5); padding: calc(var(--u) * 3) calc(var(--u) * 12); border-radius: calc(var(--u) * 8); }   /* (a dark pill: on a bright sky it could not be read) */
     .eq-bar .tr { height: calc(var(--u) * 10); border-radius: calc(var(--u) * 5); background: rgba(8, 10, 14, 0.55); overflow: hidden; }
     .eq-bar .f { height: 100%; background: #ffe04a; border-radius: calc(var(--u) * 5); }
     /* labels pinned to things: a ring on the thing, a bold caps name on a plate, a small amber line under it */

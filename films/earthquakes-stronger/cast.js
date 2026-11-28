@@ -53,7 +53,7 @@ const EQ_P = {
   duck: (u, i) => { const p = basePose(); p.hipY = 0.62; p.lHip = [1.4, 0.15]; p.rHip = [1.3, 0.15]; p.lKnee = 2.1; p.rKnee = 2.0; p.lFoot = -0.5; p.rFoot = -0.5; p.spine = 0.75; p.neck = 0.4;
     p.lSh = [2.4, 0.5]; p.rSh = [2.4, 0.5]; p.lEl = 1.7; p.rEl = 1.7; p.spineRoll = 0.04 * Math.sin(u * 13 + i); return p; },
   cover: (u, i) => { const p = basePose(); p.hipY = 0.38; p.lHip = [1.6, 0.25]; p.rHip = [1.5, 0.25]; p.lKnee = 2.4; p.rKnee = 2.3; p.lFoot = -0.6; p.rFoot = -0.6; p.spine = 1.05; p.neck = 0.3;
-    p.lSh = [2.2, 0.4]; p.rSh = [1.2, 0.2]; p.lEl = 1.8; p.rEl = 0.4; p.spineRoll = 0.05 * Math.sin(u * 11 + i); return p; },
+    p.lSh = [2.2, -0.3]; p.rSh = [2.2, -0.3]; p.lEl = 2.7; p.rEl = 2.7; p.spineRoll = 0.05 * Math.sin(u * 11 + i); return p; },
   flinch: (u, i) => { const p = basePose(); p.spine = 0.25; p.neck = 0.3; p.lSh = [1.2, 0.4]; p.rSh = [1.2, 0.4]; p.lEl = 1.9; p.rEl = 1.9; p.lKnee = 0.35; p.rKnee = 0.35; p.hipY = 0.86; return p; },
   run: (u, i) => { const ph = u * 9 + i * 2, s = Math.sin(ph), co = Math.cos(ph), p = basePose();
     p.lHip = [0.6 * s, 0.03]; p.rHip = [-0.6 * s, 0.03]; p.lKnee = 0.25 + Math.max(0, co) ** 1.3; p.rKnee = 0.25 + Math.max(0, -co) ** 1.3;

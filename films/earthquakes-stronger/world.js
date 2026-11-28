@@ -192,7 +192,7 @@ function eqPostLA(app) {
     eqShadowFollowAt(B.sun, [0, 0, 0], 140, 1500);
     pc.M = M;
   };
-  pc.labels = (s, u) => [{ p: [0, 64, 0], text: 'HOLLYWOOD SIGN', sub: `LOS ANGELES · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
+  pc.labels = (s, u) => [{ p: [0, 100, 0], text: 'HOLLYWOOD SIGN', sub: `LOS ANGELES · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
   pc.grade = (p) => { p.exposure = 1.04; p.saturation = 1.12; p.contrast = 1.08; p.warmth = 0.04; };
   return pc;
 }
@@ -307,7 +307,7 @@ function eqPostMexico(app) {
     else { const p = toW(MathX.lerp(-420, -390, k), -55), at = toW(-60, 4); eqCam(cam, [p[0] + g[0] * 2, 78 + g[1], p[1] + g[2] * 2], [at[0], -22, at[1]], 46, g[0] * 15); }
     eqShadowFollowAt(B.sun, toW(-80, 0).reduce((o2, v, i) => (i ? [o2[0], 0, v] : [v]), []), 220, 2000);
   };
-  pc.labels = (s, u, mode) => mode === 'jelly' ? [] : [{ p: [0, 56, 0], text: 'ANGEL OF INDEPENDENCE', sub: `MEXICO CITY · ${eqClock(s, -6)} · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
+  pc.labels = (s, u, mode) => mode === 'jelly' ? [] : [{ p: [0, 78, 0], text: 'ANGEL OF INDEPENDENCE', sub: `MEXICO CITY · ${eqClock(s, -6)} · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
   pc.grade = (p) => { p.exposure = 1.05; p.saturation = 1.12; p.contrast = 1.08; p.warmth = 0.03; };
   return pc;
 }
@@ -547,8 +547,9 @@ function eqPostTokyo(app) {
     eqSparks(B.adds, s, sparks);
     city.B.forEach((b, i) => { if (b[8] < 1e5 && s > b[8]) eqBurst(B.soft, B.adds, s, { t: b[8] + 1.2, p: [b[0], 0, b[1]], kind: 'dust', size: Math.min(16, b[4] * 0.3), n: 16, seed: i + 31, life: 12, alpha: 0.35, dark: true }); });
     B.soft.end(); B.adds.end();
-    const g = eqQGround(q, s, 17), k = MathX.clamp(u / 6.5, 0, 1);
-    eqCam(cam, [-2200 + 40 * k + g[0] * 3, 240 + g[1] * 2, 1700 - 30 * k + g[2] * 3], [0, 275, 0], 28, g[0] * 15);
+    // (a slow push in on the tower: the first cut held still for six seconds)
+    const g = eqQGround(q, s, 17), k = MathX.smooth(u, 0, 6.5);
+    eqCam(cam, [-2200 + 520 * k + g[0] * 4, 240 - 50 * k + g[1] * 3, 1700 - 420 * k + g[2] * 4], [0, 275 - 20 * k, 0], 28 + 4 * k, g[0] * 18);
     eqShadowFollowAt(B.sun, [0, 0, 0], 500, 4000);
   };
   pc.labels = (s, u) => [{ p: [0, 680, 0], text: 'TOKYO SKYTREE', sub: `TOKYO · ${eqClock(s, 9)} · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
@@ -608,8 +609,8 @@ function eqPostDubai(app) {
     // the glass coming off the facade in sheets (glints falling)
     for (let k = 0; k < 6; k++) eqBurst(B.soft, B.adds, s, { t: 505.2 + k * 0.5, p: [Math.cos(k * 2.1 + 1.6) * 30, 180 + k * 70, Math.sin(k * 2.1 + 1.6) * 30], kind: 'glass', dir: [Math.cos(k * 2.1 + 1.6), Math.sin(k * 2.1 + 1.6)], wide: 30, spread: 60, n: 120, seed: 800 + k, life: 12, gs: 3.5, linger: 1 });
     B.soft.end(); B.adds.end();
-    const g = eqQGround(q, s, 19, FAR), k = MathX.clamp(u / 6.5, 0, 1);
-    eqCam(cam, [-1300 + 30 * k + g[0] * 3, 140 + g[1] * 2, 1500 - 40 * k + g[2] * 3], [-20, 390 + 15 * k, 0], 38, g[0] * 12);
+    const g = eqQGround(q, s, 19, FAR), k = MathX.smooth(u, 0, 6.5);
+    eqCam(cam, [-1300 + 380 * k + g[0] * 3, 140 + 70 * k + g[1] * 2, 1500 - 420 * k + g[2] * 3], [-20, 390 + 40 * k, 0], 38, g[0] * 12);
     eqShadowFollowAt(B.sun, [0, 0, 0], 600, 5000);
   };
   pc.labels = (s, u) => [{ p: new THREE.Vector3(0, 840, 0).applyMatrix4(burj.matrixWorld), text: 'BURJ KHALIFA', sub: `DUBAI · ${eqClock(s, 4)} · MAGNITUDE ${eqQMag(q, s)} ACROSS THE GULF`, a: MathX.smooth(u, 0.35, 0.8), quake: true, side: 'r' }];
@@ -656,8 +657,8 @@ function eqPostIstanbul(app) {
     // the falling pieces' splash
     for (let i = 27; i <= 31; i++) { const d = (i + 0.5) * 36, f = 513.4 + (i - 27) * 0.25 + Math.sqrt(2 * 68 / 9.8); eqBurst(B.soft, B.adds, s, { t: f, p: [br.at(d)[0], 0, 0], kind: 'dust', size: 18, n: 26, seed: 900 + i, life: 8, alpha: 0.6 }); }
     B.soft.end(); B.adds.end();
-    const g = eqQGround(q, s, 23), k = MathX.clamp(u / 6.5, 0, 1);
-    eqCam(cam, [-200 + g[0] * 3, 22 + g[1] * 2, -960 + 50 * k + g[2] * 3], [40, 72, 0], 52, g[0] * 12);
+    const g = eqQGround(q, s, 23), k = MathX.smooth(u, 0, 6.5);
+    eqCam(cam, [-200 + 240 * k + g[0] * 3, 22 + 10 * k + g[1] * 2, -960 + 170 * k + g[2] * 3], [40 + 60 * k, 72, 0], 52, g[0] * 12);
     eqShadowFollowAt(B.sun, [0, 0, 0], 700, 4000);
   };
   pc.labels = (s, u) => [{ p: [0, 120, 0], text: 'BOSPHORUS BRIDGE', sub: `ISTANBUL · ${eqClock(s, 3)} · MAGNITUDE ${eqQMag(q, s)}`, a: MathX.smooth(u, 0.35, 0.8), quake: true },

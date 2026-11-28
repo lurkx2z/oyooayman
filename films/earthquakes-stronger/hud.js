@@ -115,11 +115,11 @@ const EQ_DIA = (() => {
     },
     // two steps: a thousand
     x1000: (u) => {
-      let s = plate(1180, 150, 690, 760);
+      let s = plate(1180, 150, 690, 640);
       s += tx(1220, 220, 40, 'b', '+2 MAGNITUDES = <tspan fill="' + AMB + '">1,000×</tspan>');
       s += tx(1240, 280, 28, 's', 'MAGNITUDE 3') + `<rect x="1240" y="296" width="14" height="14" rx="2" fill="${PALE}"/>`;
       s += op(K(u, 0.4, 0.8), tx(1240, 360, 28, 's', 'MAGNITUDE 5'));
-      s += squares(u, 1240, 380, 32, 1000, 14, 4, RED, 0.5, 3.6);
+      s += squares(u, 1240, 390, 40, 1000, 11, 4, RED, 0.5, 3.6);   // (40 × 25: 32 wide ran out of the bottom of the card)
       return s;
     },
     // a normal earthquake's seismogram (a few seconds) against this one (a minute, and still going)

@@ -95,7 +95,7 @@ EQ_SETS.sf = (app) => {
     water.mat.userData.U.uS.value = s;
     const CU = city.U; CU.uS.value = s; CU.uLevel.value = lvl; CU.uWaveA.value = eqWaveA(s); CU.uBreak.value = s < 186 ? 0 : 0.35 + 0.12 * Math.min(5, eqMinOf(s) - 4); CU.uDust.value = MathX.smooth(s, 250, 340) * 0.6;
     crack.frame(s);
-    const fk = { faultMap: 1, fault: 1 }[mode] ? MathX.smooth(u, 0.8, 2.2) : 0; faults.mat.opacity = fk * 0.85; for (const m of faults.meshes) m.visible = fk > 0.01;
+    const fk = { faultMap: 1, fault: 1 }[mode] ? MathX.smooth(u, 0.8, 2.2) : mode === 'faultMap2' ? 1 : 0; faults.mat.opacity = fk * 0.85; for (const m of faults.meshes) m.visible = fk > 0.01;
     marks.frame(s, lvl);
     wf.frame(s, lvl, cam.position);
     // ---- the helicopter (on the pad until lift-off; the pad's top moves as the pad shakes)
@@ -143,12 +143,13 @@ EQ_SETS.sf = (app) => {
     }
     // the city's dust and fires (the aerial shots), the wave's spray
     if (cam.position.y > 60 || !near) eqCityFx(soft, adds, s, city.info, cam, { range: cp.fxRange || 7000, max: 220, fires: 80 });
-    if (s > EQ_BAY.out1 && s < EQ_BAY.wave + 16) {
-      const front = (EQ_BAY.wave - s) * EQ_BAY.speed + 120;
-      // (only while the crest is out on the bay: once it is over the land the spray hung there like a fog)
-      const k = MathX.smooth(s, EQ_BAY.out1, EQ_BAY.out1 + 3) * MathX.smooth(front, -10, 60);
-      if (k > 0) for (let i = 0; i < 240; i++) { const uu = -600 + eqR(i, 3) * 1500, vv = front + (eqR(i, 5) - 0.2) * 14, [x, z] = eqWF(uu, vv), y = eqBayY(vv, s) + 0.5 + eqR(i, 7) * 3.5;
-        soft.add(x, y, z, 2.5 + eqR(i, 9) * 4.5, 0.38 * k, 0.93, 0.95, 0.96); }
+    if (s > EQ_BAY.out1 - 2 && s < EQ_BAY.wave + 16) {
+      const front = eqBayFront(s);
+      // (only while the crest is out on the bay: once it is over the land the spray hung there like a fog; small puffs
+      // along its top, where the cameras look: big ones close to the lens read as white blobs)
+      const k = MathX.smooth(s, EQ_BAY.out1 - 2, EQ_BAY.out1 + 1) * MathX.smooth(front, -10, 60);
+      if (k > 0) for (let i = 0; i < 300; i++) { const uu = 120 + eqR(i, 3) * 560, vv = front + (eqR(i, 5) - 0.6) * 10, [x, z] = eqWF(uu, vv), y = eqBayY(vv, s) + eqR(i, 7) * 3;
+        soft.add(x, y, z, 1.2 + eqR(i, 9) * 2.0, 0.22 * k, 0.93, 0.95, 0.96); }
     }
     soft.end(); adds.end();
     debris.frame(s, near ? debrisEv : [], EQ_GROUND_Y + 0.15);
@@ -266,7 +267,7 @@ function eqPosePilot(pilot, s, t, shot, heli) {
     const p = heli.toWorld(-0.5, 0, 3.6), f = heli.toWorld(-0.5, 0, 9);
     let pose = s > eqW('pilot') - EQ.tick0 - 0.2 ? EQ_P.beckon(s, 2) : EQ_P.phone(s, 2);
     pilot.place(p.x, p.y, p.z, Math.atan2(f.x - p.x, f.z - p.z)); pilot.pose(pose); pilot.expr(s > eqW('pilot') - EQ.tick0 ? 'worry' : 'neutral', s, 1);
-    pilot.phone(pose === undefined ? false : s < eqW('pilot') - EQ.tick0 - 0.2); pilot.look(null);
+    pilot.phone(pose === undefined ? false : s < eqW('pilot') - EQ.tick0 - 0.2); pilot.look(null); eqYouGear(pilot, true);
     return;
   }
   const seat = heli.toWorld(-0.45, 0.93, 0.8), fw = heli.toWorld(-0.45, 0.93, 3), yaw = Math.atan2(fw.x - seat.x, fw.z - seat.z);
@@ -275,7 +276,7 @@ function eqPosePilot(pilot, s, t, shot, heli) {
   if (s < EQ_HT.lift) { pose.lSh = [1.1, 0.1]; pose.lEl = 0.7 + 0.2 * Math.sin(s * 2); pose.headYaw = 0.2 * Math.sin(s * 0.7); }
   const r = heli.g.rotation;
   pilot.place(seat.x, seat.y, seat.z, yaw, r.z * Math.cos(yaw - r.y) - r.x * Math.sin(yaw - r.y), r.x * Math.cos(yaw - r.y) + r.z * Math.sin(yaw - r.y));
-  pilot.pose(pose); pilot.phone(false);
+  pilot.pose(pose); pilot.phone(false); eqYouGear(pilot, false);   // (seated: the jacket's inner strip stuck out of the seat)
   pilot.expr(s > 300 ? 'determined' : 'worry', s + 3, 1); pilot.look(null);
 }
 
