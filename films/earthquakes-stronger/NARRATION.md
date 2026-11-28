@@ -155,7 +155,7 @@ similarity: 0.75
 
 [needle] Seattle. The Space Needle.
 
-[crack] From space, you'd see the crack. It runs from Mexico to Oregon.
+[crack] From space, you'd see the crack. It runs from Los Angeles to Oregon.
 
 # ---- minute 9: magnitude 11
 [m9] Minute nine. Magnitude eleven.
