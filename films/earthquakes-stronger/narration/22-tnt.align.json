@@ -1,0 +1,664 @@
+{
+ "id": "22-tnt",
+ "text": "That's five hundred tons of TNT, right under your feet.",
+ "seconds": 4.23,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "That's",
+   "start": 0.06,
+   "end": 0.32
+  },
+  {
+   "text": "five",
+   "start": 0.42,
+   "end": 0.66
+  },
+  {
+   "text": "hundred",
+   "start": 0.7,
+   "end": 1.04
+  },
+  {
+   "text": "tons",
+   "start": 1.14,
+   "end": 1.48
+  },
+  {
+   "text": "of",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "TNT,",
+   "start": 1.68,
+   "end": 2.34
+  },
+  {
+   "text": "right",
+   "start": 2.74,
+   "end": 2.9
+  },
+  {
+   "text": "under",
+   "start": 2.96,
+   "end": 3.14
+  },
+  {
+   "text": "your",
+   "start": 3.18,
+   "end": 3.32
+  },
+  {
+   "text": "feet.",
+   "start": 3.42,
+   "end": 3.7
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.04
+  },
+  {
+   "text": "h",
+   "start": 0.04,
+   "end": 0.08
+  },
+  {
+   "text": "a",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "t",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": "'",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "s",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "f",
+   "start": 0.4,
+   "end": 0.46
+  },
+  {
+   "text": "i",
+   "start": 0.46,
+   "end": 0.52
+  },
+  {
+   "text": "v",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": "e",
+   "start": 0.58,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": "h",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "u",
+   "start": 0.72,
+   "end": 0.773
+  },
+  {
+   "text": "n",
+   "start": 0.773,
+   "end": 0.827
+  },
+  {
+   "text": "d",
+   "start": 0.827,
+   "end": 0.88
+  },
+  {
+   "text": "r",
+   "start": 0.88,
+   "end": 0.933
+  },
+  {
+   "text": "e",
+   "start": 0.933,
+   "end": 0.987
+  },
+  {
+   "text": "d",
+   "start": 0.987,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "t",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "o",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "n",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "s",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "o",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": "f",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "T",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "N",
+   "start": 1.76,
+   "end": 2
+  },
+  {
+   "text": "T",
+   "start": 2,
+   "end": 2.64
+  },
+  {
+   "text": ",",
+   "start": 2.64,
+   "end": 2.68
+  },
+  {
+   "text": " ",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "r",
+   "start": 2.72,
+   "end": 2.752
+  },
+  {
+   "text": "i",
+   "start": 2.752,
+   "end": 2.784
+  },
+  {
+   "text": "g",
+   "start": 2.784,
+   "end": 2.816
+  },
+  {
+   "text": "h",
+   "start": 2.816,
+   "end": 2.848
+  },
+  {
+   "text": "t",
+   "start": 2.848,
+   "end": 2.88
+  },
+  {
+   "text": " ",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": "u",
+   "start": 2.96,
+   "end": 2.992
+  },
+  {
+   "text": "n",
+   "start": 2.992,
+   "end": 3.024
+  },
+  {
+   "text": "d",
+   "start": 3.024,
+   "end": 3.056
+  },
+  {
+   "text": "e",
+   "start": 3.056,
+   "end": 3.088
+  },
+  {
+   "text": "r",
+   "start": 3.088,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.24
+  },
+  {
+   "text": "y",
+   "start": 3.24,
+   "end": 3.27
+  },
+  {
+   "text": "o",
+   "start": 3.27,
+   "end": 3.3
+  },
+  {
+   "text": "u",
+   "start": 3.3,
+   "end": 3.33
+  },
+  {
+   "text": "r",
+   "start": 3.33,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.4
+  },
+  {
+   "text": "f",
+   "start": 3.4,
+   "end": 3.42
+  },
+  {
+   "text": "e",
+   "start": 3.42,
+   "end": 3.44
+  },
+  {
+   "text": "e",
+   "start": 3.44,
+   "end": 3.8
+  },
+  {
+   "text": "t",
+   "start": 3.8,
+   "end": 4.16
+  },
+  {
+   "text": ".",
+   "start": 4.16,
+   "end": 4.24
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "That's",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "five",
+   "start": 0.4,
+   "end": 0.64
+  },
+  {
+   "text": "hundred",
+   "start": 0.68,
+   "end": 1.04
+  },
+  {
+   "text": "tons",
+   "start": 1.12,
+   "end": 1.44
+  },
+  {
+   "text": "of",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": "TNT,",
+   "start": 1.68,
+   "end": 2.68
+  },
+  {
+   "text": "right",
+   "start": 2.72,
+   "end": 2.88
+  },
+  {
+   "text": "under",
+   "start": 2.96,
+   "end": 3.12
+  },
+  {
+   "text": "your",
+   "start": 3.24,
+   "end": 3.36
+  },
+  {
+   "text": "feet.",
+   "start": 3.4,
+   "end": 4.24
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.06,
+   "end": 0.08
+  },
+  {
+   "text": "h",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "a",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": "t",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": "'",
+   "start": 0.18,
+   "end": 0.18
+  },
+  {
+   "text": "s",
+   "start": 0.22,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.42
+  },
+  {
+   "text": "f",
+   "start": 0.42,
+   "end": 0.5
+  },
+  {
+   "text": "i",
+   "start": 0.5,
+   "end": 0.54
+  },
+  {
+   "text": "v",
+   "start": 0.54,
+   "end": 0.58
+  },
+  {
+   "text": "e",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": " ",
+   "start": 0.66,
+   "end": 0.7
+  },
+  {
+   "text": "h",
+   "start": 0.7,
+   "end": 0.74
+  },
+  {
+   "text": "u",
+   "start": 0.74,
+   "end": 0.76
+  },
+  {
+   "text": "n",
+   "start": 0.78,
+   "end": 0.82
+  },
+  {
+   "text": "d",
+   "start": 0.82,
+   "end": 0.86
+  },
+  {
+   "text": "r",
+   "start": 0.86,
+   "end": 0.88
+  },
+  {
+   "text": "e",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "d",
+   "start": 0.92,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.14
+  },
+  {
+   "text": "t",
+   "start": 1.14,
+   "end": 1.24
+  },
+  {
+   "text": "o",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": "n",
+   "start": 1.28,
+   "end": 1.44
+  },
+  {
+   "text": "s",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": " ",
+   "start": 1.48,
+   "end": 1.52
+  },
+  {
+   "text": "o",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": "f",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "T",
+   "start": 1.68,
+   "end": 1.86
+  },
+  {
+   "text": "N",
+   "start": 1.88,
+   "end": 2.06
+  },
+  {
+   "text": "T",
+   "start": 2.08,
+   "end": 2.34
+  },
+  {
+   "text": ",",
+   "start": 2.34,
+   "end": 2.34
+  },
+  {
+   "text": " ",
+   "start": 2.34,
+   "end": 2.74
+  },
+  {
+   "text": "r",
+   "start": 2.74,
+   "end": 2.78
+  },
+  {
+   "text": "i",
+   "start": 2.8,
+   "end": 2.82
+  },
+  {
+   "text": "g",
+   "start": 2.82,
+   "end": 2.84
+  },
+  {
+   "text": "h",
+   "start": 2.84,
+   "end": 2.86
+  },
+  {
+   "text": "t",
+   "start": 2.86,
+   "end": 2.9
+  },
+  {
+   "text": " ",
+   "start": 2.9,
+   "end": 2.96
+  },
+  {
+   "text": "u",
+   "start": 2.96,
+   "end": 2.98
+  },
+  {
+   "text": "n",
+   "start": 2.98,
+   "end": 3.04
+  },
+  {
+   "text": "d",
+   "start": 3.04,
+   "end": 3.06
+  },
+  {
+   "text": "e",
+   "start": 3.06,
+   "end": 3.1
+  },
+  {
+   "text": "r",
+   "start": 3.1,
+   "end": 3.14
+  },
+  {
+   "text": " ",
+   "start": 3.14,
+   "end": 3.18
+  },
+  {
+   "text": "y",
+   "start": 3.18,
+   "end": 3.2
+  },
+  {
+   "text": "o",
+   "start": 3.2,
+   "end": 3.22
+  },
+  {
+   "text": "u",
+   "start": 3.22,
+   "end": 3.26
+  },
+  {
+   "text": "r",
+   "start": 3.26,
+   "end": 3.32
+  },
+  {
+   "text": " ",
+   "start": 3.32,
+   "end": 3.42
+  },
+  {
+   "text": "f",
+   "start": 3.42,
+   "end": 3.46
+  },
+  {
+   "text": "e",
+   "start": 3.46,
+   "end": 3.5
+  },
+  {
+   "text": "e",
+   "start": 3.5,
+   "end": 3.64
+  },
+  {
+   "text": "t",
+   "start": 3.64,
+   "end": 3.7
+  },
+  {
+   "text": ".",
+   "start": 3.7,
+   "end": 3.7
+  }
+ ]
+}

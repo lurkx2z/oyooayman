@@ -1,0 +1,244 @@
+{
+ "id": "85-question",
+ "text": "Who would you call?",
+ "seconds": 1.18,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Who",
+   "start": 0.08,
+   "end": 0.18
+  },
+  {
+   "text": "would",
+   "start": 0.22,
+   "end": 0.36
+  },
+  {
+   "text": "you",
+   "start": 0.4,
+   "end": 0.5
+  },
+  {
+   "text": "call?",
+   "start": 0.56,
+   "end": 0.92
+  }
+ ],
+ "characters": [
+  {
+   "text": "W",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "h",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "o",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "w",
+   "start": 0.24,
+   "end": 0.256
+  },
+  {
+   "text": "o",
+   "start": 0.256,
+   "end": 0.272
+  },
+  {
+   "text": "u",
+   "start": 0.272,
+   "end": 0.288
+  },
+  {
+   "text": "l",
+   "start": 0.288,
+   "end": 0.304
+  },
+  {
+   "text": "d",
+   "start": 0.304,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "y",
+   "start": 0.4,
+   "end": 0.427
+  },
+  {
+   "text": "o",
+   "start": 0.427,
+   "end": 0.453
+  },
+  {
+   "text": "u",
+   "start": 0.453,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "c",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "a",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "l",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "l",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "?",
+   "start": 0.88,
+   "end": 1.12
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Who",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "would",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "you",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "call?",
+   "start": 0.56,
+   "end": 1.12
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "W",
+   "start": 0.08,
+   "end": 0.12
+  },
+  {
+   "text": "h",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "o",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.22
+  },
+  {
+   "text": "w",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": "o",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": "u",
+   "start": 0.26,
+   "end": 0.3
+  },
+  {
+   "text": "l",
+   "start": 0.3,
+   "end": 0.32
+  },
+  {
+   "text": "d",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": " ",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "y",
+   "start": 0.4,
+   "end": 0.42
+  },
+  {
+   "text": "o",
+   "start": 0.42,
+   "end": 0.44
+  },
+  {
+   "text": "u",
+   "start": 0.44,
+   "end": 0.5
+  },
+  {
+   "text": " ",
+   "start": 0.5,
+   "end": 0.56
+  },
+  {
+   "text": "c",
+   "start": 0.56,
+   "end": 0.66
+  },
+  {
+   "text": "a",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "l",
+   "start": 0.68,
+   "end": 0.84
+  },
+  {
+   "text": "l",
+   "start": 0.84,
+   "end": 0.92
+  },
+  {
+   "text": "?",
+   "start": 0.92,
+   "end": 0.92
+  }
+ ]
+}

@@ -1,0 +1,304 @@
+{
+ "id": "01-open",
+ "text": "This is magnitude twelve.",
+ "seconds": 2.3,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "This",
+   "start": 0.14,
+   "end": 0.42
+  },
+  {
+   "text": "is",
+   "start": 0.6,
+   "end": 0.72
+  },
+  {
+   "text": "magnitude",
+   "start": 0.78,
+   "end": 1.36
+  },
+  {
+   "text": "twelve.",
+   "start": 1.44,
+   "end": 2
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.25
+  },
+  {
+   "text": "h",
+   "start": 0.25,
+   "end": 0.3
+  },
+  {
+   "text": "i",
+   "start": 0.3,
+   "end": 0.35
+  },
+  {
+   "text": "s",
+   "start": 0.35,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.56
+  },
+  {
+   "text": "i",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "s",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "m",
+   "start": 0.72,
+   "end": 0.782
+  },
+  {
+   "text": "a",
+   "start": 0.782,
+   "end": 0.844
+  },
+  {
+   "text": "g",
+   "start": 0.844,
+   "end": 0.907
+  },
+  {
+   "text": "n",
+   "start": 0.907,
+   "end": 0.969
+  },
+  {
+   "text": "i",
+   "start": 0.969,
+   "end": 1.031
+  },
+  {
+   "text": "t",
+   "start": 1.031,
+   "end": 1.093
+  },
+  {
+   "text": "u",
+   "start": 1.093,
+   "end": 1.156
+  },
+  {
+   "text": "d",
+   "start": 1.156,
+   "end": 1.218
+  },
+  {
+   "text": "e",
+   "start": 1.218,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "t",
+   "start": 1.36,
+   "end": 1.48
+  },
+  {
+   "text": "w",
+   "start": 1.48,
+   "end": 1.6
+  },
+  {
+   "text": "e",
+   "start": 1.6,
+   "end": 1.7
+  },
+  {
+   "text": "l",
+   "start": 1.7,
+   "end": 1.8
+  },
+  {
+   "text": "v",
+   "start": 1.8,
+   "end": 1.9
+  },
+  {
+   "text": "e",
+   "start": 1.9,
+   "end": 2
+  },
+  {
+   "text": ".",
+   "start": 2,
+   "end": 2.24
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "This",
+   "start": 0,
+   "end": 0.4
+  },
+  {
+   "text": "is",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "magnitude",
+   "start": 0.72,
+   "end": 1.28
+  },
+  {
+   "text": "twelve.",
+   "start": 1.36,
+   "end": 2.24
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "h",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "i",
+   "start": 0.2,
+   "end": 0.36
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": " ",
+   "start": 0.42,
+   "end": 0.58
+  },
+  {
+   "text": "i",
+   "start": 0.6,
+   "end": 0.66
+  },
+  {
+   "text": "s",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.78
+  },
+  {
+   "text": "m",
+   "start": 0.78,
+   "end": 0.86
+  },
+  {
+   "text": "a",
+   "start": 0.86,
+   "end": 0.88
+  },
+  {
+   "text": "g",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "n",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "i",
+   "start": 1,
+   "end": 1.1
+  },
+  {
+   "text": "t",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "u",
+   "start": 1.14,
+   "end": 1.2
+  },
+  {
+   "text": "d",
+   "start": 1.2,
+   "end": 1.24
+  },
+  {
+   "text": "e",
+   "start": 1.24,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "t",
+   "start": 1.44,
+   "end": 1.54
+  },
+  {
+   "text": "w",
+   "start": 1.54,
+   "end": 1.62
+  },
+  {
+   "text": "e",
+   "start": 1.62,
+   "end": 1.68
+  },
+  {
+   "text": "l",
+   "start": 1.68,
+   "end": 1.74
+  },
+  {
+   "text": "v",
+   "start": 1.74,
+   "end": 1.84
+  },
+  {
+   "text": "e",
+   "start": 1.84,
+   "end": 2
+  },
+  {
+   "text": ".",
+   "start": 2,
+   "end": 2
+  }
+ ]
+}

@@ -1,0 +1,344 @@
+{
+ "id": "16-birds",
+ "text": "The birds have already left.",
+ "seconds": 2.06,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "The",
+   "start": 0.08,
+   "end": 0.14
+  },
+  {
+   "text": "birds",
+   "start": 0.22,
+   "end": 0.5
+  },
+  {
+   "text": "have",
+   "start": 0.56,
+   "end": 0.7
+  },
+  {
+   "text": "already",
+   "start": 0.8,
+   "end": 1.14
+  },
+  {
+   "text": "left.",
+   "start": 1.22,
+   "end": 1.6
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "h",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "e",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "b",
+   "start": 0.16,
+   "end": 0.224
+  },
+  {
+   "text": "i",
+   "start": 0.224,
+   "end": 0.288
+  },
+  {
+   "text": "r",
+   "start": 0.288,
+   "end": 0.352
+  },
+  {
+   "text": "d",
+   "start": 0.352,
+   "end": 0.416
+  },
+  {
+   "text": "s",
+   "start": 0.416,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.6
+  },
+  {
+   "text": "h",
+   "start": 0.6,
+   "end": 0.63
+  },
+  {
+   "text": "a",
+   "start": 0.63,
+   "end": 0.66
+  },
+  {
+   "text": "v",
+   "start": 0.66,
+   "end": 0.69
+  },
+  {
+   "text": "e",
+   "start": 0.69,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.92
+  },
+  {
+   "text": "a",
+   "start": 0.92,
+   "end": 0.949
+  },
+  {
+   "text": "l",
+   "start": 0.949,
+   "end": 0.977
+  },
+  {
+   "text": "r",
+   "start": 0.977,
+   "end": 1.006
+  },
+  {
+   "text": "e",
+   "start": 1.006,
+   "end": 1.034
+  },
+  {
+   "text": "a",
+   "start": 1.034,
+   "end": 1.063
+  },
+  {
+   "text": "d",
+   "start": 1.063,
+   "end": 1.091
+  },
+  {
+   "text": "y",
+   "start": 1.091,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "l",
+   "start": 1.2,
+   "end": 1.3
+  },
+  {
+   "text": "e",
+   "start": 1.3,
+   "end": 1.4
+  },
+  {
+   "text": "f",
+   "start": 1.4,
+   "end": 1.5
+  },
+  {
+   "text": "t",
+   "start": 1.5,
+   "end": 1.6
+  },
+  {
+   "text": ".",
+   "start": 1.6,
+   "end": 2
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "The",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "birds",
+   "start": 0.16,
+   "end": 0.48
+  },
+  {
+   "text": "have",
+   "start": 0.6,
+   "end": 0.72
+  },
+  {
+   "text": "already",
+   "start": 0.92,
+   "end": 1.12
+  },
+  {
+   "text": "left.",
+   "start": 1.2,
+   "end": 2
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.08,
+   "end": 0.08
+  },
+  {
+   "text": "h",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": "e",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": " ",
+   "start": 0.14,
+   "end": 0.2
+  },
+  {
+   "text": "b",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": "i",
+   "start": 0.26,
+   "end": 0.3
+  },
+  {
+   "text": "r",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "d",
+   "start": 0.38,
+   "end": 0.48
+  },
+  {
+   "text": "s",
+   "start": 0.48,
+   "end": 0.5
+  },
+  {
+   "text": " ",
+   "start": 0.5,
+   "end": 0.56
+  },
+  {
+   "text": "h",
+   "start": 0.56,
+   "end": 0.58
+  },
+  {
+   "text": "a",
+   "start": 0.58,
+   "end": 0.6
+  },
+  {
+   "text": "v",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "e",
+   "start": 0.64,
+   "end": 0.7
+  },
+  {
+   "text": " ",
+   "start": 0.7,
+   "end": 0.8
+  },
+  {
+   "text": "a",
+   "start": 0.8,
+   "end": 0.84
+  },
+  {
+   "text": "l",
+   "start": 0.84,
+   "end": 0.92
+  },
+  {
+   "text": "r",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": "e",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "a",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "d",
+   "start": 1.04,
+   "end": 1.1
+  },
+  {
+   "text": "y",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.22
+  },
+  {
+   "text": "l",
+   "start": 1.22,
+   "end": 1.28
+  },
+  {
+   "text": "e",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "f",
+   "start": 1.36,
+   "end": 1.48
+  },
+  {
+   "text": "t",
+   "start": 1.48,
+   "end": 1.6
+  },
+  {
+   "text": ".",
+   "start": 1.6,
+   "end": 1.6
+  }
+ ]
+}

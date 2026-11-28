@@ -1,0 +1,274 @@
+{
+ "id": "20-everyone",
+ "text": "Now everyone feels it.",
+ "seconds": 1.83,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Now",
+   "start": 0.1,
+   "end": 0.3
+  },
+  {
+   "text": "everyone",
+   "start": 0.56,
+   "end": 1
+  },
+  {
+   "text": "feels",
+   "start": 1.12,
+   "end": 1.4
+  },
+  {
+   "text": "it.",
+   "start": 1.48,
+   "end": 1.62
+  }
+ ],
+ "characters": [
+  {
+   "text": "N",
+   "start": 0,
+   "end": 0.107
+  },
+  {
+   "text": "o",
+   "start": 0.107,
+   "end": 0.213
+  },
+  {
+   "text": "w",
+   "start": 0.213,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.48
+  },
+  {
+   "text": "e",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "v",
+   "start": 0.54,
+   "end": 0.6
+  },
+  {
+   "text": "e",
+   "start": 0.6,
+   "end": 0.66
+  },
+  {
+   "text": "r",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": "y",
+   "start": 0.72,
+   "end": 0.78
+  },
+  {
+   "text": "o",
+   "start": 0.78,
+   "end": 0.84
+  },
+  {
+   "text": "n",
+   "start": 0.84,
+   "end": 0.9
+  },
+  {
+   "text": "e",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "f",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "e",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "e",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "l",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "s",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "i",
+   "start": 1.44,
+   "end": 1.52
+  },
+  {
+   "text": "t",
+   "start": 1.52,
+   "end": 1.6
+  },
+  {
+   "text": ".",
+   "start": 1.6,
+   "end": 1.76
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Now",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "everyone",
+   "start": 0.48,
+   "end": 0.96
+  },
+  {
+   "text": "feels",
+   "start": 1.04,
+   "end": 1.36
+  },
+  {
+   "text": "it.",
+   "start": 1.44,
+   "end": 1.76
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "N",
+   "start": 0.1,
+   "end": 0.18
+  },
+  {
+   "text": "o",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "w",
+   "start": 0.2,
+   "end": 0.3
+  },
+  {
+   "text": " ",
+   "start": 0.3,
+   "end": 0.54
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "v",
+   "start": 0.64,
+   "end": 0.66
+  },
+  {
+   "text": "e",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "r",
+   "start": 0.68,
+   "end": 0.76
+  },
+  {
+   "text": "y",
+   "start": 0.76,
+   "end": 0.86
+  },
+  {
+   "text": "o",
+   "start": 0.86,
+   "end": 0.9
+  },
+  {
+   "text": "n",
+   "start": 0.9,
+   "end": 0.94
+  },
+  {
+   "text": "e",
+   "start": 0.94,
+   "end": 1
+  },
+  {
+   "text": " ",
+   "start": 1,
+   "end": 1.12
+  },
+  {
+   "text": "f",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "e",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": "e",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "l",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "s",
+   "start": 1.38,
+   "end": 1.4
+  },
+  {
+   "text": " ",
+   "start": 1.4,
+   "end": 1.48
+  },
+  {
+   "text": "i",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": "t",
+   "start": 1.58,
+   "end": 1.62
+  },
+  {
+   "text": ".",
+   "start": 1.62,
+   "end": 1.62
+  }
+ ]
+}

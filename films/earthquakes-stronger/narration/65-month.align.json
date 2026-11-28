@@ -1,0 +1,464 @@
+{
+ "id": "65-month",
+ "text": "A month of all the energy humans use.",
+ "seconds": 3.11,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "A",
+   "start": 0.04,
+   "end": 0.12
+  },
+  {
+   "text": "month",
+   "start": 0.24,
+   "end": 0.56
+  },
+  {
+   "text": "of",
+   "start": 0.62,
+   "end": 0.78
+  },
+  {
+   "text": "all",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "the",
+   "start": 1.08,
+   "end": 1.18
+  },
+  {
+   "text": "energy",
+   "start": 1.26,
+   "end": 1.66
+  },
+  {
+   "text": "humans",
+   "start": 1.76,
+   "end": 2.16
+  },
+  {
+   "text": "use.",
+   "start": 2.3,
+   "end": 2.64
+  }
+ ],
+ "characters": [
+  {
+   "text": "A",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "m",
+   "start": 0.24,
+   "end": 0.288
+  },
+  {
+   "text": "o",
+   "start": 0.288,
+   "end": 0.336
+  },
+  {
+   "text": "n",
+   "start": 0.336,
+   "end": 0.384
+  },
+  {
+   "text": "t",
+   "start": 0.384,
+   "end": 0.432
+  },
+  {
+   "text": "h",
+   "start": 0.432,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "o",
+   "start": 0.56,
+   "end": 0.68
+  },
+  {
+   "text": "f",
+   "start": 0.68,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "a",
+   "start": 0.88,
+   "end": 0.933
+  },
+  {
+   "text": "l",
+   "start": 0.933,
+   "end": 0.987
+  },
+  {
+   "text": "l",
+   "start": 0.987,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "t",
+   "start": 1.12,
+   "end": 1.147
+  },
+  {
+   "text": "h",
+   "start": 1.147,
+   "end": 1.173
+  },
+  {
+   "text": "e",
+   "start": 1.173,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "e",
+   "start": 1.28,
+   "end": 1.347
+  },
+  {
+   "text": "n",
+   "start": 1.347,
+   "end": 1.413
+  },
+  {
+   "text": "e",
+   "start": 1.413,
+   "end": 1.48
+  },
+  {
+   "text": "r",
+   "start": 1.48,
+   "end": 1.547
+  },
+  {
+   "text": "g",
+   "start": 1.547,
+   "end": 1.613
+  },
+  {
+   "text": "y",
+   "start": 1.613,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.8
+  },
+  {
+   "text": "h",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "u",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "m",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": "a",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "n",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "s",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.32
+  },
+  {
+   "text": "u",
+   "start": 2.32,
+   "end": 2.56
+  },
+  {
+   "text": "s",
+   "start": 2.56,
+   "end": 2.8
+  },
+  {
+   "text": "e",
+   "start": 2.8,
+   "end": 3.04
+  },
+  {
+   "text": ".",
+   "start": 3.04,
+   "end": 3.12
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "A",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "month",
+   "start": 0.24,
+   "end": 0.48
+  },
+  {
+   "text": "of",
+   "start": 0.56,
+   "end": 0.8
+  },
+  {
+   "text": "all",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "the",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "energy",
+   "start": 1.28,
+   "end": 1.68
+  },
+  {
+   "text": "humans",
+   "start": 1.8,
+   "end": 2.16
+  },
+  {
+   "text": "use.",
+   "start": 2.32,
+   "end": 3.12
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "A",
+   "start": 0.04,
+   "end": 0.12
+  },
+  {
+   "text": " ",
+   "start": 0.12,
+   "end": 0.24
+  },
+  {
+   "text": "m",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "o",
+   "start": 0.32,
+   "end": 0.34
+  },
+  {
+   "text": "n",
+   "start": 0.34,
+   "end": 0.4
+  },
+  {
+   "text": "t",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "h",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.62
+  },
+  {
+   "text": "o",
+   "start": 0.62,
+   "end": 0.68
+  },
+  {
+   "text": "f",
+   "start": 0.68,
+   "end": 0.78
+  },
+  {
+   "text": " ",
+   "start": 0.78,
+   "end": 0.88
+  },
+  {
+   "text": "a",
+   "start": 0.88,
+   "end": 0.9
+  },
+  {
+   "text": "l",
+   "start": 0.9,
+   "end": 0.98
+  },
+  {
+   "text": "l",
+   "start": 0.98,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "t",
+   "start": 1.08,
+   "end": 1.1
+  },
+  {
+   "text": "h",
+   "start": 1.1,
+   "end": 1.12
+  },
+  {
+   "text": "e",
+   "start": 1.14,
+   "end": 1.18
+  },
+  {
+   "text": " ",
+   "start": 1.18,
+   "end": 1.26
+  },
+  {
+   "text": "e",
+   "start": 1.26,
+   "end": 1.28
+  },
+  {
+   "text": "n",
+   "start": 1.3,
+   "end": 1.34
+  },
+  {
+   "text": "e",
+   "start": 1.34,
+   "end": 1.38
+  },
+  {
+   "text": "r",
+   "start": 1.38,
+   "end": 1.48
+  },
+  {
+   "text": "g",
+   "start": 1.48,
+   "end": 1.5
+  },
+  {
+   "text": "y",
+   "start": 1.58,
+   "end": 1.66
+  },
+  {
+   "text": " ",
+   "start": 1.66,
+   "end": 1.76
+  },
+  {
+   "text": "h",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "u",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "m",
+   "start": 1.92,
+   "end": 1.94
+  },
+  {
+   "text": "a",
+   "start": 1.94,
+   "end": 2.02
+  },
+  {
+   "text": "n",
+   "start": 2.02,
+   "end": 2.1
+  },
+  {
+   "text": "s",
+   "start": 2.12,
+   "end": 2.16
+  },
+  {
+   "text": " ",
+   "start": 2.16,
+   "end": 2.3
+  },
+  {
+   "text": "u",
+   "start": 2.3,
+   "end": 2.42
+  },
+  {
+   "text": "s",
+   "start": 2.42,
+   "end": 2.46
+  },
+  {
+   "text": "e",
+   "start": 2.6,
+   "end": 2.64
+  },
+  {
+   "text": ".",
+   "start": 2.64,
+   "end": 2.64
+  }
+ ]
+}

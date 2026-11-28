@@ -1,0 +1,424 @@
+{
+ "id": "40-pier",
+ "text": "The pier is breaking up under you.",
+ "seconds": 2.46,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "The",
+   "start": 0.1,
+   "end": 0.2
+  },
+  {
+   "text": "pier",
+   "start": 0.26,
+   "end": 0.54
+  },
+  {
+   "text": "is",
+   "start": 0.58,
+   "end": 0.72
+  },
+  {
+   "text": "breaking",
+   "start": 0.8,
+   "end": 1.16
+  },
+  {
+   "text": "up",
+   "start": 1.24,
+   "end": 1.36
+  },
+  {
+   "text": "under",
+   "start": 1.42,
+   "end": 1.64
+  },
+  {
+   "text": "you.",
+   "start": 1.76,
+   "end": 1.96
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "h",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "e",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "p",
+   "start": 0.24,
+   "end": 0.36
+  },
+  {
+   "text": "i",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "e",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "r",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "i",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "s",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "b",
+   "start": 0.8,
+   "end": 0.84
+  },
+  {
+   "text": "r",
+   "start": 0.84,
+   "end": 0.88
+  },
+  {
+   "text": "e",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "a",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": "k",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "i",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "n",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "g",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "u",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "p",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.52
+  },
+  {
+   "text": "u",
+   "start": 1.52,
+   "end": 1.552
+  },
+  {
+   "text": "n",
+   "start": 1.552,
+   "end": 1.584
+  },
+  {
+   "text": "d",
+   "start": 1.584,
+   "end": 1.616
+  },
+  {
+   "text": "e",
+   "start": 1.616,
+   "end": 1.648
+  },
+  {
+   "text": "r",
+   "start": 1.648,
+   "end": 1.68
+  },
+  {
+   "text": " ",
+   "start": 1.68,
+   "end": 1.8
+  },
+  {
+   "text": "y",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "o",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "u",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": ".",
+   "start": 1.92,
+   "end": 2.4
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "The",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "pier",
+   "start": 0.24,
+   "end": 0.48
+  },
+  {
+   "text": "is",
+   "start": 0.56,
+   "end": 0.72
+  },
+  {
+   "text": "breaking",
+   "start": 0.8,
+   "end": 1.12
+  },
+  {
+   "text": "up",
+   "start": 1.2,
+   "end": 1.36
+  },
+  {
+   "text": "under",
+   "start": 1.52,
+   "end": 1.68
+  },
+  {
+   "text": "you.",
+   "start": 1.8,
+   "end": 2.4
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "h",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "e",
+   "start": 0.14,
+   "end": 0.2
+  },
+  {
+   "text": " ",
+   "start": 0.2,
+   "end": 0.26
+  },
+  {
+   "text": "p",
+   "start": 0.26,
+   "end": 0.34
+  },
+  {
+   "text": "i",
+   "start": 0.34,
+   "end": 0.38
+  },
+  {
+   "text": "e",
+   "start": 0.38,
+   "end": 0.44
+  },
+  {
+   "text": "r",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": " ",
+   "start": 0.54,
+   "end": 0.58
+  },
+  {
+   "text": "i",
+   "start": 0.58,
+   "end": 0.66
+  },
+  {
+   "text": "s",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "b",
+   "start": 0.8,
+   "end": 0.86
+  },
+  {
+   "text": "r",
+   "start": 0.86,
+   "end": 0.88
+  },
+  {
+   "text": "e",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "a",
+   "start": 0.92,
+   "end": 1
+  },
+  {
+   "text": "k",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "i",
+   "start": 1.04,
+   "end": 1.06
+  },
+  {
+   "text": "n",
+   "start": 1.06,
+   "end": 1.1
+  },
+  {
+   "text": "g",
+   "start": 1.1,
+   "end": 1.16
+  },
+  {
+   "text": " ",
+   "start": 1.16,
+   "end": 1.24
+  },
+  {
+   "text": "u",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": "p",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.42
+  },
+  {
+   "text": "u",
+   "start": 1.42,
+   "end": 1.46
+  },
+  {
+   "text": "n",
+   "start": 1.46,
+   "end": 1.52
+  },
+  {
+   "text": "d",
+   "start": 1.54,
+   "end": 1.56
+  },
+  {
+   "text": "e",
+   "start": 1.56,
+   "end": 1.62
+  },
+  {
+   "text": "r",
+   "start": 1.62,
+   "end": 1.64
+  },
+  {
+   "text": " ",
+   "start": 1.64,
+   "end": 1.76
+  },
+  {
+   "text": "y",
+   "start": 1.76,
+   "end": 1.78
+  },
+  {
+   "text": "o",
+   "start": 1.78,
+   "end": 1.82
+  },
+  {
+   "text": "u",
+   "start": 1.82,
+   "end": 1.96
+  },
+  {
+   "text": ".",
+   "start": 1.96,
+   "end": 1.96
+  }
+ ]
+}

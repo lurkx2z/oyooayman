@@ -1,0 +1,684 @@
+{
+ "id": "84-last",
+ "text": "You have two hours of fuel. And seven minutes of planet.",
+ "seconds": 4.08,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "You",
+   "start": 0.08,
+   "end": 0.18
+  },
+  {
+   "text": "have",
+   "start": 0.22,
+   "end": 0.42
+  },
+  {
+   "text": "two",
+   "start": 0.52,
+   "end": 0.72
+  },
+  {
+   "text": "hours",
+   "start": 0.82,
+   "end": 1.1
+  },
+  {
+   "text": "of",
+   "start": 1.14,
+   "end": 1.24
+  },
+  {
+   "text": "fuel.",
+   "start": 1.32,
+   "end": 1.72
+  },
+  {
+   "text": "And",
+   "start": 2.02,
+   "end": 2.2
+  },
+  {
+   "text": "seven",
+   "start": 2.32,
+   "end": 2.6
+  },
+  {
+   "text": "minutes",
+   "start": 2.66,
+   "end": 2.92
+  },
+  {
+   "text": "of",
+   "start": 2.98,
+   "end": 3.08
+  },
+  {
+   "text": "planet.",
+   "start": 3.16,
+   "end": 3.58
+  }
+ ],
+ "characters": [
+  {
+   "text": "Y",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "o",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "u",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "h",
+   "start": 0.24,
+   "end": 0.3
+  },
+  {
+   "text": "a",
+   "start": 0.3,
+   "end": 0.36
+  },
+  {
+   "text": "v",
+   "start": 0.36,
+   "end": 0.42
+  },
+  {
+   "text": "e",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.6
+  },
+  {
+   "text": "t",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "w",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": "o",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "h",
+   "start": 0.8,
+   "end": 0.848
+  },
+  {
+   "text": "o",
+   "start": 0.848,
+   "end": 0.896
+  },
+  {
+   "text": "u",
+   "start": 0.896,
+   "end": 0.944
+  },
+  {
+   "text": "r",
+   "start": 0.944,
+   "end": 0.992
+  },
+  {
+   "text": "s",
+   "start": 0.992,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "o",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "f",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.6
+  },
+  {
+   "text": "f",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "u",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "e",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "l",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": ".",
+   "start": 1.92,
+   "end": 1.96
+  },
+  {
+   "text": " ",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": "A",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "n",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "d",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": " ",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "s",
+   "start": 2.32,
+   "end": 2.368
+  },
+  {
+   "text": "e",
+   "start": 2.368,
+   "end": 2.416
+  },
+  {
+   "text": "v",
+   "start": 2.416,
+   "end": 2.464
+  },
+  {
+   "text": "e",
+   "start": 2.464,
+   "end": 2.512
+  },
+  {
+   "text": "n",
+   "start": 2.512,
+   "end": 2.56
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "m",
+   "start": 2.64,
+   "end": 2.674
+  },
+  {
+   "text": "i",
+   "start": 2.674,
+   "end": 2.709
+  },
+  {
+   "text": "n",
+   "start": 2.709,
+   "end": 2.743
+  },
+  {
+   "text": "u",
+   "start": 2.743,
+   "end": 2.777
+  },
+  {
+   "text": "t",
+   "start": 2.777,
+   "end": 2.811
+  },
+  {
+   "text": "e",
+   "start": 2.811,
+   "end": 2.846
+  },
+  {
+   "text": "s",
+   "start": 2.846,
+   "end": 2.88
+  },
+  {
+   "text": " ",
+   "start": 2.88,
+   "end": 2.96
+  },
+  {
+   "text": "o",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": "f",
+   "start": 3.04,
+   "end": 3.12
+  },
+  {
+   "text": " ",
+   "start": 3.12,
+   "end": 3.56
+  },
+  {
+   "text": "p",
+   "start": 3.56,
+   "end": 3.633
+  },
+  {
+   "text": "l",
+   "start": 3.633,
+   "end": 3.707
+  },
+  {
+   "text": "a",
+   "start": 3.707,
+   "end": 3.78
+  },
+  {
+   "text": "n",
+   "start": 3.78,
+   "end": 3.853
+  },
+  {
+   "text": "e",
+   "start": 3.853,
+   "end": 3.927
+  },
+  {
+   "text": "t",
+   "start": 3.927,
+   "end": 4
+  },
+  {
+   "text": ".",
+   "start": 4,
+   "end": 4.08
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "You",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "have",
+   "start": 0.24,
+   "end": 0.48
+  },
+  {
+   "text": "two",
+   "start": 0.6,
+   "end": 0.72
+  },
+  {
+   "text": "hours",
+   "start": 0.8,
+   "end": 1.04
+  },
+  {
+   "text": "of",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": "fuel.",
+   "start": 1.6,
+   "end": 1.96
+  },
+  {
+   "text": "And",
+   "start": 2,
+   "end": 2.24
+  },
+  {
+   "text": "seven",
+   "start": 2.32,
+   "end": 2.56
+  },
+  {
+   "text": "minutes",
+   "start": 2.64,
+   "end": 2.88
+  },
+  {
+   "text": "of",
+   "start": 2.96,
+   "end": 3.12
+  },
+  {
+   "text": "planet.",
+   "start": 3.56,
+   "end": 4.08
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "Y",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "o",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "u",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.22
+  },
+  {
+   "text": "h",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": "a",
+   "start": 0.26,
+   "end": 0.3
+  },
+  {
+   "text": "v",
+   "start": 0.3,
+   "end": 0.34
+  },
+  {
+   "text": "e",
+   "start": 0.34,
+   "end": 0.42
+  },
+  {
+   "text": " ",
+   "start": 0.42,
+   "end": 0.52
+  },
+  {
+   "text": "t",
+   "start": 0.52,
+   "end": 0.58
+  },
+  {
+   "text": "w",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": "o",
+   "start": 0.62,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.82
+  },
+  {
+   "text": "h",
+   "start": 0.82,
+   "end": 0.86
+  },
+  {
+   "text": "o",
+   "start": 0.86,
+   "end": 0.88
+  },
+  {
+   "text": "u",
+   "start": 0.9,
+   "end": 1
+  },
+  {
+   "text": "r",
+   "start": 1,
+   "end": 1.02
+  },
+  {
+   "text": "s",
+   "start": 1.06,
+   "end": 1.1
+  },
+  {
+   "text": " ",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "o",
+   "start": 1.14,
+   "end": 1.18
+  },
+  {
+   "text": "f",
+   "start": 1.18,
+   "end": 1.24
+  },
+  {
+   "text": " ",
+   "start": 1.24,
+   "end": 1.32
+  },
+  {
+   "text": "f",
+   "start": 1.32,
+   "end": 1.4
+  },
+  {
+   "text": "u",
+   "start": 1.4,
+   "end": 1.48
+  },
+  {
+   "text": "e",
+   "start": 1.48,
+   "end": 1.64
+  },
+  {
+   "text": "l",
+   "start": 1.64,
+   "end": 1.72
+  },
+  {
+   "text": ".",
+   "start": 1.72,
+   "end": 1.72
+  },
+  {
+   "text": " ",
+   "start": 1.72,
+   "end": 2.02
+  },
+  {
+   "text": "A",
+   "start": 2.02,
+   "end": 2.06
+  },
+  {
+   "text": "n",
+   "start": 2.06,
+   "end": 2.1
+  },
+  {
+   "text": "d",
+   "start": 2.1,
+   "end": 2.2
+  },
+  {
+   "text": " ",
+   "start": 2.2,
+   "end": 2.32
+  },
+  {
+   "text": "s",
+   "start": 2.32,
+   "end": 2.38
+  },
+  {
+   "text": "e",
+   "start": 2.38,
+   "end": 2.46
+  },
+  {
+   "text": "v",
+   "start": 2.46,
+   "end": 2.46
+  },
+  {
+   "text": "e",
+   "start": 2.48,
+   "end": 2.5
+  },
+  {
+   "text": "n",
+   "start": 2.5,
+   "end": 2.6
+  },
+  {
+   "text": " ",
+   "start": 2.6,
+   "end": 2.66
+  },
+  {
+   "text": "m",
+   "start": 2.66,
+   "end": 2.68
+  },
+  {
+   "text": "i",
+   "start": 2.68,
+   "end": 2.72
+  },
+  {
+   "text": "n",
+   "start": 2.72,
+   "end": 2.76
+  },
+  {
+   "text": "u",
+   "start": 2.76,
+   "end": 2.78
+  },
+  {
+   "text": "t",
+   "start": 2.78,
+   "end": 2.84
+  },
+  {
+   "text": "e",
+   "start": 2.84,
+   "end": 2.9
+  },
+  {
+   "text": "s",
+   "start": 2.9,
+   "end": 2.92
+  },
+  {
+   "text": " ",
+   "start": 2.92,
+   "end": 2.98
+  },
+  {
+   "text": "o",
+   "start": 2.98,
+   "end": 3.02
+  },
+  {
+   "text": "f",
+   "start": 3.02,
+   "end": 3.08
+  },
+  {
+   "text": " ",
+   "start": 3.08,
+   "end": 3.14
+  },
+  {
+   "text": "p",
+   "start": 3.16,
+   "end": 3.22
+  },
+  {
+   "text": "l",
+   "start": 3.22,
+   "end": 3.28
+  },
+  {
+   "text": "a",
+   "start": 3.28,
+   "end": 3.32
+  },
+  {
+   "text": "n",
+   "start": 3.34,
+   "end": 3.4
+  },
+  {
+   "text": "e",
+   "start": 3.4,
+   "end": 3.54
+  },
+  {
+   "text": "t",
+   "start": 3.54,
+   "end": 3.58
+  },
+  {
+   "text": ".",
+   "start": 3.58,
+   "end": 3.58
+  }
+ ]
+}

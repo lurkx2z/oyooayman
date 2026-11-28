@@ -1,0 +1,724 @@
+{
+ "id": "70-years",
+ "text": "Three years of all the energy humans use, in one earthquake.",
+ "seconds": 4.94,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Three",
+   "start": 0.08,
+   "end": 0.32
+  },
+  {
+   "text": "years",
+   "start": 0.44,
+   "end": 0.78
+  },
+  {
+   "text": "of",
+   "start": 0.82,
+   "end": 1.02
+  },
+  {
+   "text": "all",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": "the",
+   "start": 1.32,
+   "end": 1.44
+  },
+  {
+   "text": "energy",
+   "start": 1.5,
+   "end": 1.84
+  },
+  {
+   "text": "humans",
+   "start": 2,
+   "end": 2.4
+  },
+  {
+   "text": "use,",
+   "start": 2.54,
+   "end": 2.88
+  },
+  {
+   "text": "in",
+   "start": 3.2,
+   "end": 3.4
+  },
+  {
+   "text": "one",
+   "start": 3.54,
+   "end": 3.7
+  },
+  {
+   "text": "earthquake.",
+   "start": 3.82,
+   "end": 4.4
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.048
+  },
+  {
+   "text": "h",
+   "start": 0.048,
+   "end": 0.096
+  },
+  {
+   "text": "r",
+   "start": 0.096,
+   "end": 0.144
+  },
+  {
+   "text": "e",
+   "start": 0.144,
+   "end": 0.192
+  },
+  {
+   "text": "e",
+   "start": 0.192,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "y",
+   "start": 0.4,
+   "end": 0.464
+  },
+  {
+   "text": "e",
+   "start": 0.464,
+   "end": 0.528
+  },
+  {
+   "text": "a",
+   "start": 0.528,
+   "end": 0.592
+  },
+  {
+   "text": "r",
+   "start": 0.592,
+   "end": 0.656
+  },
+  {
+   "text": "s",
+   "start": 0.656,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "o",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "f",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": " ",
+   "start": 0.96,
+   "end": 1.12
+  },
+  {
+   "text": "a",
+   "start": 1.12,
+   "end": 1.173
+  },
+  {
+   "text": "l",
+   "start": 1.173,
+   "end": 1.227
+  },
+  {
+   "text": "l",
+   "start": 1.227,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "t",
+   "start": 1.36,
+   "end": 1.387
+  },
+  {
+   "text": "h",
+   "start": 1.387,
+   "end": 1.413
+  },
+  {
+   "text": "e",
+   "start": 1.413,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.68
+  },
+  {
+   "text": "e",
+   "start": 1.68,
+   "end": 1.72
+  },
+  {
+   "text": "n",
+   "start": 1.72,
+   "end": 1.76
+  },
+  {
+   "text": "e",
+   "start": 1.76,
+   "end": 1.8
+  },
+  {
+   "text": "r",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "g",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "y",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2.04
+  },
+  {
+   "text": "h",
+   "start": 2.04,
+   "end": 2.08
+  },
+  {
+   "text": "u",
+   "start": 2.08,
+   "end": 2.12
+  },
+  {
+   "text": "m",
+   "start": 2.12,
+   "end": 2.16
+  },
+  {
+   "text": "a",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": "n",
+   "start": 2.24,
+   "end": 2.32
+  },
+  {
+   "text": "s",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": " ",
+   "start": 2.4,
+   "end": 2.56
+  },
+  {
+   "text": "u",
+   "start": 2.56,
+   "end": 2.747
+  },
+  {
+   "text": "s",
+   "start": 2.747,
+   "end": 2.933
+  },
+  {
+   "text": "e",
+   "start": 2.933,
+   "end": 3.12
+  },
+  {
+   "text": ",",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.28
+  },
+  {
+   "text": "i",
+   "start": 3.28,
+   "end": 3.32
+  },
+  {
+   "text": "n",
+   "start": 3.32,
+   "end": 3.36
+  },
+  {
+   "text": " ",
+   "start": 3.36,
+   "end": 3.52
+  },
+  {
+   "text": "o",
+   "start": 3.52,
+   "end": 3.6
+  },
+  {
+   "text": "n",
+   "start": 3.6,
+   "end": 3.68
+  },
+  {
+   "text": "e",
+   "start": 3.68,
+   "end": 3.76
+  },
+  {
+   "text": " ",
+   "start": 3.76,
+   "end": 3.84
+  },
+  {
+   "text": "e",
+   "start": 3.84,
+   "end": 3.888
+  },
+  {
+   "text": "a",
+   "start": 3.888,
+   "end": 3.936
+  },
+  {
+   "text": "r",
+   "start": 3.936,
+   "end": 3.984
+  },
+  {
+   "text": "t",
+   "start": 3.984,
+   "end": 4.032
+  },
+  {
+   "text": "h",
+   "start": 4.032,
+   "end": 4.08
+  },
+  {
+   "text": "q",
+   "start": 4.08,
+   "end": 4.224
+  },
+  {
+   "text": "u",
+   "start": 4.224,
+   "end": 4.368
+  },
+  {
+   "text": "a",
+   "start": 4.368,
+   "end": 4.512
+  },
+  {
+   "text": "k",
+   "start": 4.512,
+   "end": 4.656
+  },
+  {
+   "text": "e",
+   "start": 4.656,
+   "end": 4.8
+  },
+  {
+   "text": ".",
+   "start": 4.8,
+   "end": 4.88
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Three",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "years",
+   "start": 0.4,
+   "end": 0.72
+  },
+  {
+   "text": "of",
+   "start": 0.8,
+   "end": 0.96
+  },
+  {
+   "text": "all",
+   "start": 1.12,
+   "end": 1.28
+  },
+  {
+   "text": "the",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "energy",
+   "start": 1.68,
+   "end": 1.92
+  },
+  {
+   "text": "humans",
+   "start": 2.04,
+   "end": 2.4
+  },
+  {
+   "text": "use,",
+   "start": 2.56,
+   "end": 3.2
+  },
+  {
+   "text": "in",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": "one",
+   "start": 3.52,
+   "end": 3.76
+  },
+  {
+   "text": "earthquake.",
+   "start": 3.84,
+   "end": 4.88
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.08,
+   "end": 0.1
+  },
+  {
+   "text": "h",
+   "start": 0.1,
+   "end": 0.18
+  },
+  {
+   "text": "r",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.22
+  },
+  {
+   "text": "e",
+   "start": 0.22,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.44
+  },
+  {
+   "text": "y",
+   "start": 0.44,
+   "end": 0.52
+  },
+  {
+   "text": "e",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "a",
+   "start": 0.54,
+   "end": 0.66
+  },
+  {
+   "text": "r",
+   "start": 0.66,
+   "end": 0.66
+  },
+  {
+   "text": "s",
+   "start": 0.68,
+   "end": 0.78
+  },
+  {
+   "text": " ",
+   "start": 0.78,
+   "end": 0.82
+  },
+  {
+   "text": "o",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": "f",
+   "start": 0.88,
+   "end": 1.02
+  },
+  {
+   "text": " ",
+   "start": 1.02,
+   "end": 1.12
+  },
+  {
+   "text": "a",
+   "start": 1.12,
+   "end": 1.14
+  },
+  {
+   "text": "l",
+   "start": 1.14,
+   "end": 1.2
+  },
+  {
+   "text": "l",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.32
+  },
+  {
+   "text": "t",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "h",
+   "start": 1.34,
+   "end": 1.34
+  },
+  {
+   "text": "e",
+   "start": 1.34,
+   "end": 1.44
+  },
+  {
+   "text": " ",
+   "start": 1.44,
+   "end": 1.5
+  },
+  {
+   "text": "e",
+   "start": 1.5,
+   "end": 1.54
+  },
+  {
+   "text": "n",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "e",
+   "start": 1.58,
+   "end": 1.62
+  },
+  {
+   "text": "r",
+   "start": 1.62,
+   "end": 1.7
+  },
+  {
+   "text": "g",
+   "start": 1.7,
+   "end": 1.74
+  },
+  {
+   "text": "y",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 2
+  },
+  {
+   "text": "h",
+   "start": 2,
+   "end": 2.06
+  },
+  {
+   "text": "u",
+   "start": 2.08,
+   "end": 2.14
+  },
+  {
+   "text": "m",
+   "start": 2.14,
+   "end": 2.18
+  },
+  {
+   "text": "a",
+   "start": 2.18,
+   "end": 2.22
+  },
+  {
+   "text": "n",
+   "start": 2.22,
+   "end": 2.28
+  },
+  {
+   "text": "s",
+   "start": 2.34,
+   "end": 2.4
+  },
+  {
+   "text": " ",
+   "start": 2.4,
+   "end": 2.54
+  },
+  {
+   "text": "u",
+   "start": 2.54,
+   "end": 2.6
+  },
+  {
+   "text": "s",
+   "start": 2.6,
+   "end": 2.72
+  },
+  {
+   "text": "e",
+   "start": 2.84,
+   "end": 2.88
+  },
+  {
+   "text": ",",
+   "start": 2.88,
+   "end": 2.88
+  },
+  {
+   "text": " ",
+   "start": 2.88,
+   "end": 3.2
+  },
+  {
+   "text": "i",
+   "start": 3.2,
+   "end": 3.24
+  },
+  {
+   "text": "n",
+   "start": 3.24,
+   "end": 3.4
+  },
+  {
+   "text": " ",
+   "start": 3.4,
+   "end": 3.5
+  },
+  {
+   "text": "o",
+   "start": 3.54,
+   "end": 3.56
+  },
+  {
+   "text": "n",
+   "start": 3.58,
+   "end": 3.6
+  },
+  {
+   "text": "e",
+   "start": 3.6,
+   "end": 3.7
+  },
+  {
+   "text": " ",
+   "start": 3.7,
+   "end": 3.82
+  },
+  {
+   "text": "e",
+   "start": 3.82,
+   "end": 3.84
+  },
+  {
+   "text": "a",
+   "start": 3.84,
+   "end": 3.88
+  },
+  {
+   "text": "r",
+   "start": 3.88,
+   "end": 3.9
+  },
+  {
+   "text": "t",
+   "start": 3.9,
+   "end": 3.96
+  },
+  {
+   "text": "h",
+   "start": 3.96,
+   "end": 4.1
+  },
+  {
+   "text": "q",
+   "start": 4.1,
+   "end": 4.12
+  },
+  {
+   "text": "u",
+   "start": 4.14,
+   "end": 4.18
+  },
+  {
+   "text": "a",
+   "start": 4.2,
+   "end": 4.26
+  },
+  {
+   "text": "k",
+   "start": 4.26,
+   "end": 4.38
+  },
+  {
+   "text": "e",
+   "start": 4.38,
+   "end": 4.4
+  },
+  {
+   "text": ".",
+   "start": 4.4,
+   "end": 4.4
+  }
+ ]
+}

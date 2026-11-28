@@ -1,0 +1,154 @@
+{
+ "id": "26-run",
+ "text": "So you run.",
+ "seconds": 1.33,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "So",
+   "start": 0.12,
+   "end": 0.22
+  },
+  {
+   "text": "you",
+   "start": 0.3,
+   "end": 0.38
+  },
+  {
+   "text": "run.",
+   "start": 0.5,
+   "end": 0.84
+  }
+ ],
+ "characters": [
+  {
+   "text": "S",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "o",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "y",
+   "start": 0.24,
+   "end": 0.293
+  },
+  {
+   "text": "o",
+   "start": 0.293,
+   "end": 0.347
+  },
+  {
+   "text": "u",
+   "start": 0.347,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "r",
+   "start": 0.48,
+   "end": 0.587
+  },
+  {
+   "text": "u",
+   "start": 0.587,
+   "end": 0.693
+  },
+  {
+   "text": "n",
+   "start": 0.693,
+   "end": 0.8
+  },
+  {
+   "text": ".",
+   "start": 0.8,
+   "end": 1.28
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "So",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "you",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "run.",
+   "start": 0.48,
+   "end": 1.28
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "S",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "o",
+   "start": 0.14,
+   "end": 0.22
+  },
+  {
+   "text": " ",
+   "start": 0.22,
+   "end": 0.3
+  },
+  {
+   "text": "y",
+   "start": 0.3,
+   "end": 0.32
+  },
+  {
+   "text": "o",
+   "start": 0.32,
+   "end": 0.32
+  },
+  {
+   "text": "u",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": " ",
+   "start": 0.38,
+   "end": 0.5
+  },
+  {
+   "text": "r",
+   "start": 0.5,
+   "end": 0.58
+  },
+  {
+   "text": "u",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": "n",
+   "start": 0.62,
+   "end": 0.84
+  },
+  {
+   "text": ".",
+   "start": 0.84,
+   "end": 0.84
+  }
+ ]
+}

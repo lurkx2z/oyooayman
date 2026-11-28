@@ -1,0 +1,344 @@
+{
+ "id": "52-m7",
+ "text": "Minute seven. Magnitude nine.",
+ "seconds": 3.03,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Minute",
+   "start": 0.1,
+   "end": 0.34
+  },
+  {
+   "text": "seven.",
+   "start": 0.44,
+   "end": 0.92
+  },
+  {
+   "text": "Magnitude",
+   "start": 1.38,
+   "end": 1.96
+  },
+  {
+   "text": "nine.",
+   "start": 2.08,
+   "end": 2.56
+  }
+ ],
+ "characters": [
+  {
+   "text": "M",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "i",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "n",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": "u",
+   "start": 0.16,
+   "end": 0.213
+  },
+  {
+   "text": "t",
+   "start": 0.213,
+   "end": 0.267
+  },
+  {
+   "text": "e",
+   "start": 0.267,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.48
+  },
+  {
+   "text": "s",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "v",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "e",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "n",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": ".",
+   "start": 0.88,
+   "end": 1.28
+  },
+  {
+   "text": " ",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "M",
+   "start": 1.36,
+   "end": 1.422
+  },
+  {
+   "text": "a",
+   "start": 1.422,
+   "end": 1.484
+  },
+  {
+   "text": "g",
+   "start": 1.484,
+   "end": 1.547
+  },
+  {
+   "text": "n",
+   "start": 1.547,
+   "end": 1.609
+  },
+  {
+   "text": "i",
+   "start": 1.609,
+   "end": 1.671
+  },
+  {
+   "text": "t",
+   "start": 1.671,
+   "end": 1.733
+  },
+  {
+   "text": "u",
+   "start": 1.733,
+   "end": 1.796
+  },
+  {
+   "text": "d",
+   "start": 1.796,
+   "end": 1.858
+  },
+  {
+   "text": "e",
+   "start": 1.858,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2.08
+  },
+  {
+   "text": "n",
+   "start": 2.08,
+   "end": 2.2
+  },
+  {
+   "text": "i",
+   "start": 2.2,
+   "end": 2.32
+  },
+  {
+   "text": "n",
+   "start": 2.32,
+   "end": 2.44
+  },
+  {
+   "text": "e",
+   "start": 2.44,
+   "end": 2.56
+  },
+  {
+   "text": ".",
+   "start": 2.56,
+   "end": 2.96
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Minute",
+   "start": 0,
+   "end": 0.32
+  },
+  {
+   "text": "seven.",
+   "start": 0.48,
+   "end": 1.28
+  },
+  {
+   "text": "Magnitude",
+   "start": 1.36,
+   "end": 1.92
+  },
+  {
+   "text": "nine.",
+   "start": 2.08,
+   "end": 2.96
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "M",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": "i",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "n",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": "u",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": "t",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": "e",
+   "start": 0.28,
+   "end": 0.34
+  },
+  {
+   "text": " ",
+   "start": 0.34,
+   "end": 0.44
+  },
+  {
+   "text": "s",
+   "start": 0.44,
+   "end": 0.56
+  },
+  {
+   "text": "e",
+   "start": 0.56,
+   "end": 0.62
+  },
+  {
+   "text": "v",
+   "start": 0.62,
+   "end": 0.68
+  },
+  {
+   "text": "e",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "n",
+   "start": 0.72,
+   "end": 0.92
+  },
+  {
+   "text": ".",
+   "start": 0.92,
+   "end": 0.92
+  },
+  {
+   "text": " ",
+   "start": 0.92,
+   "end": 1.38
+  },
+  {
+   "text": "M",
+   "start": 1.38,
+   "end": 1.44
+  },
+  {
+   "text": "a",
+   "start": 1.46,
+   "end": 1.5
+  },
+  {
+   "text": "g",
+   "start": 1.5,
+   "end": 1.58
+  },
+  {
+   "text": "n",
+   "start": 1.58,
+   "end": 1.62
+  },
+  {
+   "text": "i",
+   "start": 1.62,
+   "end": 1.72
+  },
+  {
+   "text": "t",
+   "start": 1.74,
+   "end": 1.76
+  },
+  {
+   "text": "u",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": "d",
+   "start": 1.86,
+   "end": 1.9
+  },
+  {
+   "text": "e",
+   "start": 1.9,
+   "end": 1.96
+  },
+  {
+   "text": " ",
+   "start": 1.96,
+   "end": 2.08
+  },
+  {
+   "text": "n",
+   "start": 2.08,
+   "end": 2.2
+  },
+  {
+   "text": "i",
+   "start": 2.22,
+   "end": 2.28
+  },
+  {
+   "text": "n",
+   "start": 2.28,
+   "end": 2.4
+  },
+  {
+   "text": "e",
+   "start": 2.4,
+   "end": 2.56
+  },
+  {
+   "text": ".",
+   "start": 2.56,
+   "end": 2.56
+  }
+ ]
+}

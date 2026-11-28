@@ -1,0 +1,574 @@
+{
+ "id": "29-hiro",
+ "text": "The energy of the bomb that destroyed Hiroshima.",
+ "seconds": 3.03,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "The",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "energy",
+   "start": 0.28,
+   "end": 0.62
+  },
+  {
+   "text": "of",
+   "start": 0.66,
+   "end": 0.74
+  },
+  {
+   "text": "the",
+   "start": 0.78,
+   "end": 0.88
+  },
+  {
+   "text": "bomb",
+   "start": 0.94,
+   "end": 1.24
+  },
+  {
+   "text": "that",
+   "start": 1.3,
+   "end": 1.38
+  },
+  {
+   "text": "destroyed",
+   "start": 1.44,
+   "end": 1.98
+  },
+  {
+   "text": "Hiroshima.",
+   "start": 2.02,
+   "end": 2.72
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "h",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "e",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.24
+  },
+  {
+   "text": "e",
+   "start": 0.24,
+   "end": 0.293
+  },
+  {
+   "text": "n",
+   "start": 0.293,
+   "end": 0.347
+  },
+  {
+   "text": "e",
+   "start": 0.347,
+   "end": 0.4
+  },
+  {
+   "text": "r",
+   "start": 0.4,
+   "end": 0.453
+  },
+  {
+   "text": "g",
+   "start": 0.453,
+   "end": 0.507
+  },
+  {
+   "text": "y",
+   "start": 0.507,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "o",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": "f",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "t",
+   "start": 0.76,
+   "end": 0.773
+  },
+  {
+   "text": "h",
+   "start": 0.773,
+   "end": 0.787
+  },
+  {
+   "text": "e",
+   "start": 0.787,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "b",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "o",
+   "start": 0.96,
+   "end": 1.04
+  },
+  {
+   "text": "m",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "b",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "t",
+   "start": 1.28,
+   "end": 1.3
+  },
+  {
+   "text": "h",
+   "start": 1.3,
+   "end": 1.32
+  },
+  {
+   "text": "a",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "t",
+   "start": 1.34,
+   "end": 1.36
+  },
+  {
+   "text": " ",
+   "start": 1.36,
+   "end": 1.6
+  },
+  {
+   "text": "d",
+   "start": 1.6,
+   "end": 1.634
+  },
+  {
+   "text": "e",
+   "start": 1.634,
+   "end": 1.669
+  },
+  {
+   "text": "s",
+   "start": 1.669,
+   "end": 1.703
+  },
+  {
+   "text": "t",
+   "start": 1.703,
+   "end": 1.737
+  },
+  {
+   "text": "r",
+   "start": 1.737,
+   "end": 1.771
+  },
+  {
+   "text": "o",
+   "start": 1.771,
+   "end": 1.806
+  },
+  {
+   "text": "y",
+   "start": 1.806,
+   "end": 1.84
+  },
+  {
+   "text": "e",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "d",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": " ",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "H",
+   "start": 2,
+   "end": 2.16
+  },
+  {
+   "text": "i",
+   "start": 2.16,
+   "end": 2.213
+  },
+  {
+   "text": "r",
+   "start": 2.213,
+   "end": 2.267
+  },
+  {
+   "text": "o",
+   "start": 2.267,
+   "end": 2.32
+  },
+  {
+   "text": "s",
+   "start": 2.32,
+   "end": 2.4
+  },
+  {
+   "text": "h",
+   "start": 2.4,
+   "end": 2.48
+  },
+  {
+   "text": "i",
+   "start": 2.48,
+   "end": 2.56
+  },
+  {
+   "text": "m",
+   "start": 2.56,
+   "end": 2.64
+  },
+  {
+   "text": "a",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": ".",
+   "start": 2.72,
+   "end": 2.96
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "The",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "energy",
+   "start": 0.24,
+   "end": 0.56
+  },
+  {
+   "text": "of",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "the",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": "bomb",
+   "start": 0.88,
+   "end": 1.2
+  },
+  {
+   "text": "that",
+   "start": 1.28,
+   "end": 1.36
+  },
+  {
+   "text": "destroyed",
+   "start": 1.6,
+   "end": 1.92
+  },
+  {
+   "text": "Hiroshima.",
+   "start": 2,
+   "end": 2.96
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "h",
+   "start": 0.12,
+   "end": 0.14
+  },
+  {
+   "text": "e",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.26
+  },
+  {
+   "text": "e",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "n",
+   "start": 0.3,
+   "end": 0.36
+  },
+  {
+   "text": "e",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "r",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "g",
+   "start": 0.48,
+   "end": 0.58
+  },
+  {
+   "text": "y",
+   "start": 0.58,
+   "end": 0.62
+  },
+  {
+   "text": " ",
+   "start": 0.62,
+   "end": 0.66
+  },
+  {
+   "text": "o",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": "f",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": " ",
+   "start": 0.74,
+   "end": 0.78
+  },
+  {
+   "text": "t",
+   "start": 0.78,
+   "end": 0.8
+  },
+  {
+   "text": "h",
+   "start": 0.8,
+   "end": 0.82
+  },
+  {
+   "text": "e",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "b",
+   "start": 0.94,
+   "end": 1
+  },
+  {
+   "text": "o",
+   "start": 1,
+   "end": 1.08
+  },
+  {
+   "text": "m",
+   "start": 1.08,
+   "end": 1.14
+  },
+  {
+   "text": "b",
+   "start": 1.14,
+   "end": 1.24
+  },
+  {
+   "text": " ",
+   "start": 1.24,
+   "end": 1.3
+  },
+  {
+   "text": "t",
+   "start": 1.3,
+   "end": 1.3
+  },
+  {
+   "text": "h",
+   "start": 1.3,
+   "end": 1.32
+  },
+  {
+   "text": "a",
+   "start": 1.32,
+   "end": 1.34
+  },
+  {
+   "text": "t",
+   "start": 1.34,
+   "end": 1.38
+  },
+  {
+   "text": " ",
+   "start": 1.38,
+   "end": 1.42
+  },
+  {
+   "text": "d",
+   "start": 1.44,
+   "end": 1.46
+  },
+  {
+   "text": "e",
+   "start": 1.48,
+   "end": 1.56
+  },
+  {
+   "text": "s",
+   "start": 1.56,
+   "end": 1.66
+  },
+  {
+   "text": "t",
+   "start": 1.66,
+   "end": 1.7
+  },
+  {
+   "text": "r",
+   "start": 1.74,
+   "end": 1.78
+  },
+  {
+   "text": "o",
+   "start": 1.8,
+   "end": 1.84
+  },
+  {
+   "text": "y",
+   "start": 1.84,
+   "end": 1.88
+  },
+  {
+   "text": "e",
+   "start": 1.88,
+   "end": 1.94
+  },
+  {
+   "text": "d",
+   "start": 1.94,
+   "end": 1.98
+  },
+  {
+   "text": " ",
+   "start": 1.98,
+   "end": 2.02
+  },
+  {
+   "text": "H",
+   "start": 2.02,
+   "end": 2.08
+  },
+  {
+   "text": "i",
+   "start": 2.08,
+   "end": 2.16
+  },
+  {
+   "text": "r",
+   "start": 2.16,
+   "end": 2.22
+  },
+  {
+   "text": "o",
+   "start": 2.22,
+   "end": 2.28
+  },
+  {
+   "text": "s",
+   "start": 2.28,
+   "end": 2.38
+  },
+  {
+   "text": "h",
+   "start": 2.38,
+   "end": 2.44
+  },
+  {
+   "text": "i",
+   "start": 2.44,
+   "end": 2.52
+  },
+  {
+   "text": "m",
+   "start": 2.52,
+   "end": 2.54
+  },
+  {
+   "text": "a",
+   "start": 2.54,
+   "end": 2.72
+  },
+  {
+   "text": ".",
+   "start": 2.72,
+   "end": 2.72
+  }
+ ]
+}

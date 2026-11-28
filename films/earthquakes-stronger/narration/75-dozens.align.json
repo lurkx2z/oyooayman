@@ -1,0 +1,944 @@
+{
+ "id": "75-dozens",
+ "text": "Two dozen earthquakes around the world, and every one of them is still growing.",
+ "seconds": 5.17,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "Two",
+   "start": 0.08,
+   "end": 0.24
+  },
+  {
+   "text": "dozen",
+   "start": 0.34,
+   "end": 0.66
+  },
+  {
+   "text": "earthquakes",
+   "start": 0.76,
+   "end": 1.26
+  },
+  {
+   "text": "around",
+   "start": 1.32,
+   "end": 1.54
+  },
+  {
+   "text": "the",
+   "start": 1.58,
+   "end": 1.66
+  },
+  {
+   "text": "world,",
+   "start": 1.74,
+   "end": 2.1
+  },
+  {
+   "text": "and",
+   "start": 2.46,
+   "end": 2.64
+  },
+  {
+   "text": "every",
+   "start": 2.74,
+   "end": 3.04
+  },
+  {
+   "text": "one",
+   "start": 3.14,
+   "end": 3.22
+  },
+  {
+   "text": "of",
+   "start": 3.28,
+   "end": 3.34
+  },
+  {
+   "text": "them",
+   "start": 3.4,
+   "end": 3.6
+  },
+  {
+   "text": "is",
+   "start": 3.66,
+   "end": 3.8
+  },
+  {
+   "text": "still",
+   "start": 3.94,
+   "end": 4.18
+  },
+  {
+   "text": "growing.",
+   "start": 4.26,
+   "end": 4.7
+  }
+ ],
+ "characters": [
+  {
+   "text": "T",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "w",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "o",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "d",
+   "start": 0.32,
+   "end": 0.36
+  },
+  {
+   "text": "o",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": "z",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "e",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "n",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": " ",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "e",
+   "start": 0.72,
+   "end": 0.768
+  },
+  {
+   "text": "a",
+   "start": 0.768,
+   "end": 0.816
+  },
+  {
+   "text": "r",
+   "start": 0.816,
+   "end": 0.864
+  },
+  {
+   "text": "t",
+   "start": 0.864,
+   "end": 0.912
+  },
+  {
+   "text": "h",
+   "start": 0.912,
+   "end": 0.96
+  },
+  {
+   "text": "q",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "u",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "a",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "k",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "e",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "s",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "a",
+   "start": 1.28,
+   "end": 1.32
+  },
+  {
+   "text": "r",
+   "start": 1.32,
+   "end": 1.36
+  },
+  {
+   "text": "o",
+   "start": 1.36,
+   "end": 1.4
+  },
+  {
+   "text": "u",
+   "start": 1.4,
+   "end": 1.44
+  },
+  {
+   "text": "n",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": "d",
+   "start": 1.48,
+   "end": 1.52
+  },
+  {
+   "text": " ",
+   "start": 1.52,
+   "end": 1.56
+  },
+  {
+   "text": "t",
+   "start": 1.56,
+   "end": 1.573
+  },
+  {
+   "text": "h",
+   "start": 1.573,
+   "end": 1.587
+  },
+  {
+   "text": "e",
+   "start": 1.587,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.68
+  },
+  {
+   "text": "w",
+   "start": 1.68,
+   "end": 1.76
+  },
+  {
+   "text": "o",
+   "start": 1.76,
+   "end": 1.84
+  },
+  {
+   "text": "r",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "l",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "d",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": ",",
+   "start": 2.08,
+   "end": 2.4
+  },
+  {
+   "text": " ",
+   "start": 2.4,
+   "end": 2.52
+  },
+  {
+   "text": "a",
+   "start": 2.52,
+   "end": 2.56
+  },
+  {
+   "text": "n",
+   "start": 2.56,
+   "end": 2.6
+  },
+  {
+   "text": "d",
+   "start": 2.6,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.72
+  },
+  {
+   "text": "e",
+   "start": 2.72,
+   "end": 2.768
+  },
+  {
+   "text": "v",
+   "start": 2.768,
+   "end": 2.816
+  },
+  {
+   "text": "e",
+   "start": 2.816,
+   "end": 2.864
+  },
+  {
+   "text": "r",
+   "start": 2.864,
+   "end": 2.912
+  },
+  {
+   "text": "y",
+   "start": 2.912,
+   "end": 2.96
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3.12
+  },
+  {
+   "text": "o",
+   "start": 3.12,
+   "end": 3.147
+  },
+  {
+   "text": "n",
+   "start": 3.147,
+   "end": 3.173
+  },
+  {
+   "text": "e",
+   "start": 3.173,
+   "end": 3.2
+  },
+  {
+   "text": " ",
+   "start": 3.2,
+   "end": 3.24
+  },
+  {
+   "text": "o",
+   "start": 3.24,
+   "end": 3.26
+  },
+  {
+   "text": "f",
+   "start": 3.26,
+   "end": 3.28
+  },
+  {
+   "text": " ",
+   "start": 3.28,
+   "end": 3.36
+  },
+  {
+   "text": "t",
+   "start": 3.36,
+   "end": 3.42
+  },
+  {
+   "text": "h",
+   "start": 3.42,
+   "end": 3.48
+  },
+  {
+   "text": "e",
+   "start": 3.48,
+   "end": 3.54
+  },
+  {
+   "text": "m",
+   "start": 3.54,
+   "end": 3.6
+  },
+  {
+   "text": " ",
+   "start": 3.6,
+   "end": 3.72
+  },
+  {
+   "text": "i",
+   "start": 3.72,
+   "end": 3.78
+  },
+  {
+   "text": "s",
+   "start": 3.78,
+   "end": 3.84
+  },
+  {
+   "text": " ",
+   "start": 3.84,
+   "end": 3.92
+  },
+  {
+   "text": "s",
+   "start": 3.92,
+   "end": 3.968
+  },
+  {
+   "text": "t",
+   "start": 3.968,
+   "end": 4.016
+  },
+  {
+   "text": "i",
+   "start": 4.016,
+   "end": 4.064
+  },
+  {
+   "text": "l",
+   "start": 4.064,
+   "end": 4.112
+  },
+  {
+   "text": "l",
+   "start": 4.112,
+   "end": 4.16
+  },
+  {
+   "text": " ",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": "g",
+   "start": 4.24,
+   "end": 4.68
+  },
+  {
+   "text": "r",
+   "start": 4.68,
+   "end": 4.753
+  },
+  {
+   "text": "o",
+   "start": 4.753,
+   "end": 4.827
+  },
+  {
+   "text": "w",
+   "start": 4.827,
+   "end": 4.9
+  },
+  {
+   "text": "i",
+   "start": 4.9,
+   "end": 4.973
+  },
+  {
+   "text": "n",
+   "start": 4.973,
+   "end": 5.047
+  },
+  {
+   "text": "g",
+   "start": 5.047,
+   "end": 5.12
+  },
+  {
+   "text": ".",
+   "start": 5.12,
+   "end": 5.2
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "Two",
+   "start": 0,
+   "end": 0.24
+  },
+  {
+   "text": "dozen",
+   "start": 0.32,
+   "end": 0.64
+  },
+  {
+   "text": "earthquakes",
+   "start": 0.72,
+   "end": 1.2
+  },
+  {
+   "text": "around",
+   "start": 1.28,
+   "end": 1.52
+  },
+  {
+   "text": "the",
+   "start": 1.56,
+   "end": 1.6
+  },
+  {
+   "text": "world,",
+   "start": 1.68,
+   "end": 2.4
+  },
+  {
+   "text": "and",
+   "start": 2.52,
+   "end": 2.64
+  },
+  {
+   "text": "every",
+   "start": 2.72,
+   "end": 2.96
+  },
+  {
+   "text": "one",
+   "start": 3.12,
+   "end": 3.2
+  },
+  {
+   "text": "of",
+   "start": 3.24,
+   "end": 3.28
+  },
+  {
+   "text": "them",
+   "start": 3.36,
+   "end": 3.6
+  },
+  {
+   "text": "is",
+   "start": 3.72,
+   "end": 3.84
+  },
+  {
+   "text": "still",
+   "start": 3.92,
+   "end": 4.16
+  },
+  {
+   "text": "growing.",
+   "start": 4.24,
+   "end": 5.2
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "T",
+   "start": 0.08,
+   "end": 0.14
+  },
+  {
+   "text": "w",
+   "start": 0.14,
+   "end": 0.18
+  },
+  {
+   "text": "o",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": " ",
+   "start": 0.24,
+   "end": 0.34
+  },
+  {
+   "text": "d",
+   "start": 0.34,
+   "end": 0.42
+  },
+  {
+   "text": "o",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": "z",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "e",
+   "start": 0.54,
+   "end": 0.6
+  },
+  {
+   "text": "n",
+   "start": 0.6,
+   "end": 0.66
+  },
+  {
+   "text": " ",
+   "start": 0.66,
+   "end": 0.76
+  },
+  {
+   "text": "e",
+   "start": 0.76,
+   "end": 0.78
+  },
+  {
+   "text": "a",
+   "start": 0.78,
+   "end": 0.82
+  },
+  {
+   "text": "r",
+   "start": 0.82,
+   "end": 0.84
+  },
+  {
+   "text": "t",
+   "start": 0.84,
+   "end": 0.88
+  },
+  {
+   "text": "h",
+   "start": 0.88,
+   "end": 1
+  },
+  {
+   "text": "q",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": "u",
+   "start": 1.04,
+   "end": 1.08
+  },
+  {
+   "text": "a",
+   "start": 1.08,
+   "end": 1.12
+  },
+  {
+   "text": "k",
+   "start": 1.12,
+   "end": 1.18
+  },
+  {
+   "text": "e",
+   "start": 1.18,
+   "end": 1.22
+  },
+  {
+   "text": "s",
+   "start": 1.22,
+   "end": 1.26
+  },
+  {
+   "text": " ",
+   "start": 1.26,
+   "end": 1.32
+  },
+  {
+   "text": "a",
+   "start": 1.32,
+   "end": 1.36
+  },
+  {
+   "text": "r",
+   "start": 1.36,
+   "end": 1.42
+  },
+  {
+   "text": "o",
+   "start": 1.42,
+   "end": 1.44
+  },
+  {
+   "text": "u",
+   "start": 1.44,
+   "end": 1.46
+  },
+  {
+   "text": "n",
+   "start": 1.46,
+   "end": 1.5
+  },
+  {
+   "text": "d",
+   "start": 1.5,
+   "end": 1.54
+  },
+  {
+   "text": " ",
+   "start": 1.54,
+   "end": 1.58
+  },
+  {
+   "text": "t",
+   "start": 1.58,
+   "end": 1.6
+  },
+  {
+   "text": "h",
+   "start": 1.6,
+   "end": 1.62
+  },
+  {
+   "text": "e",
+   "start": 1.62,
+   "end": 1.66
+  },
+  {
+   "text": " ",
+   "start": 1.66,
+   "end": 1.74
+  },
+  {
+   "text": "w",
+   "start": 1.74,
+   "end": 1.8
+  },
+  {
+   "text": "o",
+   "start": 1.8,
+   "end": 1.82
+  },
+  {
+   "text": "r",
+   "start": 1.82,
+   "end": 1.92
+  },
+  {
+   "text": "l",
+   "start": 1.92,
+   "end": 2.02
+  },
+  {
+   "text": "d",
+   "start": 2.08,
+   "end": 2.1
+  },
+  {
+   "text": ",",
+   "start": 2.1,
+   "end": 2.1
+  },
+  {
+   "text": " ",
+   "start": 2.1,
+   "end": 2.46
+  },
+  {
+   "text": "a",
+   "start": 2.46,
+   "end": 2.48
+  },
+  {
+   "text": "n",
+   "start": 2.48,
+   "end": 2.52
+  },
+  {
+   "text": "d",
+   "start": 2.52,
+   "end": 2.64
+  },
+  {
+   "text": " ",
+   "start": 2.64,
+   "end": 2.74
+  },
+  {
+   "text": "e",
+   "start": 2.74,
+   "end": 2.84
+  },
+  {
+   "text": "v",
+   "start": 2.84,
+   "end": 2.86
+  },
+  {
+   "text": "e",
+   "start": 2.86,
+   "end": 2.9
+  },
+  {
+   "text": "r",
+   "start": 2.9,
+   "end": 2.96
+  },
+  {
+   "text": "y",
+   "start": 2.96,
+   "end": 3.04
+  },
+  {
+   "text": " ",
+   "start": 3.04,
+   "end": 3.14
+  },
+  {
+   "text": "o",
+   "start": 3.14,
+   "end": 3.18
+  },
+  {
+   "text": "n",
+   "start": 3.18,
+   "end": 3.2
+  },
+  {
+   "text": "e",
+   "start": 3.2,
+   "end": 3.22
+  },
+  {
+   "text": " ",
+   "start": 3.22,
+   "end": 3.28
+  },
+  {
+   "text": "o",
+   "start": 3.28,
+   "end": 3.3
+  },
+  {
+   "text": "f",
+   "start": 3.32,
+   "end": 3.34
+  },
+  {
+   "text": " ",
+   "start": 3.34,
+   "end": 3.4
+  },
+  {
+   "text": "t",
+   "start": 3.4,
+   "end": 3.42
+  },
+  {
+   "text": "h",
+   "start": 3.42,
+   "end": 3.42
+  },
+  {
+   "text": "e",
+   "start": 3.42,
+   "end": 3.52
+  },
+  {
+   "text": "m",
+   "start": 3.52,
+   "end": 3.6
+  },
+  {
+   "text": " ",
+   "start": 3.6,
+   "end": 3.66
+  },
+  {
+   "text": "i",
+   "start": 3.66,
+   "end": 3.76
+  },
+  {
+   "text": "s",
+   "start": 3.76,
+   "end": 3.8
+  },
+  {
+   "text": " ",
+   "start": 3.8,
+   "end": 3.94
+  },
+  {
+   "text": "s",
+   "start": 3.94,
+   "end": 3.98
+  },
+  {
+   "text": "t",
+   "start": 3.98,
+   "end": 4.019
+  },
+  {
+   "text": "i",
+   "start": 4.019,
+   "end": 4.059
+  },
+  {
+   "text": "l",
+   "start": 4.059,
+   "end": 4.12
+  },
+  {
+   "text": "l",
+   "start": 4.12,
+   "end": 4.18
+  },
+  {
+   "text": " ",
+   "start": 4.18,
+   "end": 4.24
+  },
+  {
+   "text": "g",
+   "start": 4.26,
+   "end": 4.32
+  },
+  {
+   "text": "r",
+   "start": 4.32,
+   "end": 4.36
+  },
+  {
+   "text": "o",
+   "start": 4.36,
+   "end": 4.44
+  },
+  {
+   "text": "w",
+   "start": 4.44,
+   "end": 4.5
+  },
+  {
+   "text": "i",
+   "start": 4.5,
+   "end": 4.54
+  },
+  {
+   "text": "n",
+   "start": 4.54,
+   "end": 4.64
+  },
+  {
+   "text": "g",
+   "start": 4.64,
+   "end": 4.7
+  },
+  {
+   "text": ".",
+   "start": 4.7,
+   "end": 4.7
+  }
+ ]
+}

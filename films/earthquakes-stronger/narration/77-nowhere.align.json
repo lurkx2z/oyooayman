@@ -1,0 +1,404 @@
+{
+ "id": "77-nowhere",
+ "text": "But there's nowhere left to land.",
+ "seconds": 2.3,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "But",
+   "start": 0.04,
+   "end": 0.14
+  },
+  {
+   "text": "there's",
+   "start": 0.16,
+   "end": 0.38
+  },
+  {
+   "text": "nowhere",
+   "start": 0.48,
+   "end": 0.82
+  },
+  {
+   "text": "left",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "to",
+   "start": 1.1,
+   "end": 1.18
+  },
+  {
+   "text": "land.",
+   "start": 1.26,
+   "end": 1.68
+  }
+ ],
+ "characters": [
+  {
+   "text": "B",
+   "start": 0,
+   "end": 0.027
+  },
+  {
+   "text": "u",
+   "start": 0.027,
+   "end": 0.053
+  },
+  {
+   "text": "t",
+   "start": 0.053,
+   "end": 0.08
+  },
+  {
+   "text": " ",
+   "start": 0.08,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.176
+  },
+  {
+   "text": "h",
+   "start": 0.176,
+   "end": 0.192
+  },
+  {
+   "text": "e",
+   "start": 0.192,
+   "end": 0.208
+  },
+  {
+   "text": "r",
+   "start": 0.208,
+   "end": 0.224
+  },
+  {
+   "text": "e",
+   "start": 0.224,
+   "end": 0.24
+  },
+  {
+   "text": "'",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "s",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.52
+  },
+  {
+   "text": "n",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "o",
+   "start": 0.56,
+   "end": 0.6
+  },
+  {
+   "text": "w",
+   "start": 0.6,
+   "end": 0.64
+  },
+  {
+   "text": "h",
+   "start": 0.64,
+   "end": 0.68
+  },
+  {
+   "text": "e",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": "r",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "e",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": " ",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": "l",
+   "start": 0.88,
+   "end": 0.92
+  },
+  {
+   "text": "e",
+   "start": 0.92,
+   "end": 0.96
+  },
+  {
+   "text": "f",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "t",
+   "start": 1,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.12
+  },
+  {
+   "text": "t",
+   "start": 1.12,
+   "end": 1.16
+  },
+  {
+   "text": "o",
+   "start": 1.16,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.44
+  },
+  {
+   "text": "l",
+   "start": 1.44,
+   "end": 1.5
+  },
+  {
+   "text": "a",
+   "start": 1.5,
+   "end": 1.56
+  },
+  {
+   "text": "n",
+   "start": 1.56,
+   "end": 1.62
+  },
+  {
+   "text": "d",
+   "start": 1.62,
+   "end": 1.68
+  },
+  {
+   "text": ".",
+   "start": 1.68,
+   "end": 2.24
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "But",
+   "start": 0,
+   "end": 0.08
+  },
+  {
+   "text": "there's",
+   "start": 0.16,
+   "end": 0.4
+  },
+  {
+   "text": "nowhere",
+   "start": 0.52,
+   "end": 0.8
+  },
+  {
+   "text": "left",
+   "start": 0.88,
+   "end": 1.04
+  },
+  {
+   "text": "to",
+   "start": 1.12,
+   "end": 1.2
+  },
+  {
+   "text": "land.",
+   "start": 1.44,
+   "end": 2.24
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "B",
+   "start": 0.04,
+   "end": 0.06
+  },
+  {
+   "text": "u",
+   "start": 0.06,
+   "end": 0.1
+  },
+  {
+   "text": "t",
+   "start": 0.1,
+   "end": 0.14
+  },
+  {
+   "text": " ",
+   "start": 0.14,
+   "end": 0.16
+  },
+  {
+   "text": "t",
+   "start": 0.16,
+   "end": 0.18
+  },
+  {
+   "text": "h",
+   "start": 0.18,
+   "end": 0.2
+  },
+  {
+   "text": "e",
+   "start": 0.2,
+   "end": 0.22
+  },
+  {
+   "text": "r",
+   "start": 0.22,
+   "end": 0.24
+  },
+  {
+   "text": "e",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": "'",
+   "start": 0.26,
+   "end": 0.26
+  },
+  {
+   "text": "s",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": " ",
+   "start": 0.38,
+   "end": 0.48
+  },
+  {
+   "text": "n",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "o",
+   "start": 0.54,
+   "end": 0.6
+  },
+  {
+   "text": "w",
+   "start": 0.6,
+   "end": 0.68
+  },
+  {
+   "text": "h",
+   "start": 0.68,
+   "end": 0.7
+  },
+  {
+   "text": "e",
+   "start": 0.7,
+   "end": 0.74
+  },
+  {
+   "text": "r",
+   "start": 0.74,
+   "end": 0.78
+  },
+  {
+   "text": "e",
+   "start": 0.78,
+   "end": 0.82
+  },
+  {
+   "text": " ",
+   "start": 0.82,
+   "end": 0.88
+  },
+  {
+   "text": "l",
+   "start": 0.88,
+   "end": 0.9
+  },
+  {
+   "text": "e",
+   "start": 0.9,
+   "end": 0.96
+  },
+  {
+   "text": "f",
+   "start": 0.96,
+   "end": 1
+  },
+  {
+   "text": "t",
+   "start": 1.02,
+   "end": 1.04
+  },
+  {
+   "text": " ",
+   "start": 1.04,
+   "end": 1.1
+  },
+  {
+   "text": "t",
+   "start": 1.1,
+   "end": 1.14
+  },
+  {
+   "text": "o",
+   "start": 1.14,
+   "end": 1.18
+  },
+  {
+   "text": " ",
+   "start": 1.18,
+   "end": 1.26
+  },
+  {
+   "text": "l",
+   "start": 1.26,
+   "end": 1.34
+  },
+  {
+   "text": "a",
+   "start": 1.36,
+   "end": 1.42
+  },
+  {
+   "text": "n",
+   "start": 1.42,
+   "end": 1.62
+  },
+  {
+   "text": "d",
+   "start": 1.62,
+   "end": 1.68
+  },
+  {
+   "text": ".",
+   "start": 1.68,
+   "end": 1.68
+  }
+ ]
+}

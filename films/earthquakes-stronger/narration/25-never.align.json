@@ -1,0 +1,494 @@
+{
+ "id": "25-never",
+ "text": "But this shaking is never going to stop.",
+ "seconds": 2.95,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "But",
+   "start": 0.04,
+   "end": 0.18
+  },
+  {
+   "text": "this",
+   "start": 0.24,
+   "end": 0.4
+  },
+  {
+   "text": "shaking",
+   "start": 0.44,
+   "end": 0.92
+  },
+  {
+   "text": "is",
+   "start": 1,
+   "end": 1.14
+  },
+  {
+   "text": "never",
+   "start": 1.3,
+   "end": 1.58
+  },
+  {
+   "text": "going",
+   "start": 1.64,
+   "end": 1.86
+  },
+  {
+   "text": "to",
+   "start": 1.88,
+   "end": 1.98
+  },
+  {
+   "text": "stop.",
+   "start": 2.06,
+   "end": 2.4
+  }
+ ],
+ "characters": [
+  {
+   "text": "B",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "u",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "t",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.28
+  },
+  {
+   "text": "t",
+   "start": 0.28,
+   "end": 0.31
+  },
+  {
+   "text": "h",
+   "start": 0.31,
+   "end": 0.34
+  },
+  {
+   "text": "i",
+   "start": 0.34,
+   "end": 0.37
+  },
+  {
+   "text": "s",
+   "start": 0.37,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "s",
+   "start": 0.44,
+   "end": 0.46
+  },
+  {
+   "text": "h",
+   "start": 0.46,
+   "end": 0.48
+  },
+  {
+   "text": "a",
+   "start": 0.48,
+   "end": 0.56
+  },
+  {
+   "text": "k",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "i",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "n",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "g",
+   "start": 0.8,
+   "end": 0.88
+  },
+  {
+   "text": " ",
+   "start": 0.88,
+   "end": 0.96
+  },
+  {
+   "text": "i",
+   "start": 0.96,
+   "end": 1.08
+  },
+  {
+   "text": "s",
+   "start": 1.08,
+   "end": 1.2
+  },
+  {
+   "text": " ",
+   "start": 1.2,
+   "end": 1.28
+  },
+  {
+   "text": "n",
+   "start": 1.28,
+   "end": 1.344
+  },
+  {
+   "text": "e",
+   "start": 1.344,
+   "end": 1.408
+  },
+  {
+   "text": "v",
+   "start": 1.408,
+   "end": 1.472
+  },
+  {
+   "text": "e",
+   "start": 1.472,
+   "end": 1.536
+  },
+  {
+   "text": "r",
+   "start": 1.536,
+   "end": 1.6
+  },
+  {
+   "text": " ",
+   "start": 1.6,
+   "end": 1.72
+  },
+  {
+   "text": "g",
+   "start": 1.72,
+   "end": 1.744
+  },
+  {
+   "text": "o",
+   "start": 1.744,
+   "end": 1.768
+  },
+  {
+   "text": "i",
+   "start": 1.768,
+   "end": 1.792
+  },
+  {
+   "text": "n",
+   "start": 1.792,
+   "end": 1.816
+  },
+  {
+   "text": "g",
+   "start": 1.816,
+   "end": 1.84
+  },
+  {
+   "text": " ",
+   "start": 1.84,
+   "end": 1.92
+  },
+  {
+   "text": "t",
+   "start": 1.92,
+   "end": 1.96
+  },
+  {
+   "text": "o",
+   "start": 1.96,
+   "end": 2
+  },
+  {
+   "text": " ",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "s",
+   "start": 2.08,
+   "end": 2.26
+  },
+  {
+   "text": "t",
+   "start": 2.26,
+   "end": 2.44
+  },
+  {
+   "text": "o",
+   "start": 2.44,
+   "end": 2.62
+  },
+  {
+   "text": "p",
+   "start": 2.62,
+   "end": 2.8
+  },
+  {
+   "text": ".",
+   "start": 2.8,
+   "end": 2.88
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "But",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "this",
+   "start": 0.28,
+   "end": 0.4
+  },
+  {
+   "text": "shaking",
+   "start": 0.44,
+   "end": 0.88
+  },
+  {
+   "text": "is",
+   "start": 0.96,
+   "end": 1.2
+  },
+  {
+   "text": "never",
+   "start": 1.28,
+   "end": 1.6
+  },
+  {
+   "text": "going",
+   "start": 1.72,
+   "end": 1.84
+  },
+  {
+   "text": "to",
+   "start": 1.92,
+   "end": 2
+  },
+  {
+   "text": "stop.",
+   "start": 2.08,
+   "end": 2.88
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "B",
+   "start": 0.04,
+   "end": 0.06
+  },
+  {
+   "text": "u",
+   "start": 0.06,
+   "end": 0.12
+  },
+  {
+   "text": "t",
+   "start": 0.12,
+   "end": 0.18
+  },
+  {
+   "text": " ",
+   "start": 0.18,
+   "end": 0.24
+  },
+  {
+   "text": "t",
+   "start": 0.24,
+   "end": 0.24
+  },
+  {
+   "text": "h",
+   "start": 0.26,
+   "end": 0.26
+  },
+  {
+   "text": "i",
+   "start": 0.26,
+   "end": 0.36
+  },
+  {
+   "text": "s",
+   "start": 0.36,
+   "end": 0.4
+  },
+  {
+   "text": " ",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "s",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": "h",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "a",
+   "start": 0.54,
+   "end": 0.6
+  },
+  {
+   "text": "k",
+   "start": 0.6,
+   "end": 0.72
+  },
+  {
+   "text": "i",
+   "start": 0.72,
+   "end": 0.74
+  },
+  {
+   "text": "n",
+   "start": 0.76,
+   "end": 0.82
+  },
+  {
+   "text": "g",
+   "start": 0.84,
+   "end": 0.92
+  },
+  {
+   "text": " ",
+   "start": 0.92,
+   "end": 1
+  },
+  {
+   "text": "i",
+   "start": 1,
+   "end": 1.06
+  },
+  {
+   "text": "s",
+   "start": 1.06,
+   "end": 1.14
+  },
+  {
+   "text": " ",
+   "start": 1.14,
+   "end": 1.3
+  },
+  {
+   "text": "n",
+   "start": 1.3,
+   "end": 1.36
+  },
+  {
+   "text": "e",
+   "start": 1.36,
+   "end": 1.44
+  },
+  {
+   "text": "v",
+   "start": 1.44,
+   "end": 1.46
+  },
+  {
+   "text": "e",
+   "start": 1.46,
+   "end": 1.52
+  },
+  {
+   "text": "r",
+   "start": 1.52,
+   "end": 1.58
+  },
+  {
+   "text": " ",
+   "start": 1.58,
+   "end": 1.64
+  },
+  {
+   "text": "g",
+   "start": 1.64,
+   "end": 1.7
+  },
+  {
+   "text": "o",
+   "start": 1.7,
+   "end": 1.74
+  },
+  {
+   "text": "i",
+   "start": 1.74,
+   "end": 1.78
+  },
+  {
+   "text": "n",
+   "start": 1.78,
+   "end": 1.82
+  },
+  {
+   "text": "g",
+   "start": 1.82,
+   "end": 1.86
+  },
+  {
+   "text": " ",
+   "start": 1.86,
+   "end": 1.88
+  },
+  {
+   "text": "t",
+   "start": 1.88,
+   "end": 1.92
+  },
+  {
+   "text": "o",
+   "start": 1.92,
+   "end": 1.98
+  },
+  {
+   "text": " ",
+   "start": 1.98,
+   "end": 2.06
+  },
+  {
+   "text": "s",
+   "start": 2.06,
+   "end": 2.1
+  },
+  {
+   "text": "t",
+   "start": 2.1,
+   "end": 2.16
+  },
+  {
+   "text": "o",
+   "start": 2.16,
+   "end": 2.24
+  },
+  {
+   "text": "p",
+   "start": 2.26,
+   "end": 2.4
+  },
+  {
+   "text": ".",
+   "start": 2.4,
+   "end": 2.4
+  }
+ ]
+}

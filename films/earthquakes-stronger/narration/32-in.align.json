@@ -1,0 +1,374 @@
+{
+ "id": "32-in",
+ "text": "You make it to the helicopter.",
+ "seconds": 1.91,
+ "source": "forced-alignment",
+ "words": [
+  {
+   "text": "You",
+   "start": 0.1,
+   "end": 0.16
+  },
+  {
+   "text": "make",
+   "start": 0.22,
+   "end": 0.38
+  },
+  {
+   "text": "it",
+   "start": 0.42,
+   "end": 0.48
+  },
+  {
+   "text": "to",
+   "start": 0.54,
+   "end": 0.6
+  },
+  {
+   "text": "the",
+   "start": 0.66,
+   "end": 0.72
+  },
+  {
+   "text": "helicopter.",
+   "start": 0.76,
+   "end": 1.42
+  }
+ ],
+ "characters": [
+  {
+   "text": "Y",
+   "start": 0,
+   "end": 0.053
+  },
+  {
+   "text": "o",
+   "start": 0.053,
+   "end": 0.107
+  },
+  {
+   "text": "u",
+   "start": 0.107,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.24
+  },
+  {
+   "text": "m",
+   "start": 0.24,
+   "end": 0.26
+  },
+  {
+   "text": "a",
+   "start": 0.26,
+   "end": 0.28
+  },
+  {
+   "text": "k",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "e",
+   "start": 0.3,
+   "end": 0.32
+  },
+  {
+   "text": " ",
+   "start": 0.32,
+   "end": 0.4
+  },
+  {
+   "text": "i",
+   "start": 0.4,
+   "end": 0.44
+  },
+  {
+   "text": "t",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.52
+  },
+  {
+   "text": "t",
+   "start": 0.52,
+   "end": 0.54
+  },
+  {
+   "text": "o",
+   "start": 0.54,
+   "end": 0.56
+  },
+  {
+   "text": " ",
+   "start": 0.56,
+   "end": 0.64
+  },
+  {
+   "text": "t",
+   "start": 0.64,
+   "end": 0.667
+  },
+  {
+   "text": "h",
+   "start": 0.667,
+   "end": 0.693
+  },
+  {
+   "text": "e",
+   "start": 0.693,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.8
+  },
+  {
+   "text": "h",
+   "start": 0.8,
+   "end": 0.827
+  },
+  {
+   "text": "e",
+   "start": 0.827,
+   "end": 0.853
+  },
+  {
+   "text": "l",
+   "start": 0.853,
+   "end": 0.88
+  },
+  {
+   "text": "i",
+   "start": 0.88,
+   "end": 1.017
+  },
+  {
+   "text": "c",
+   "start": 1.017,
+   "end": 1.154
+  },
+  {
+   "text": "o",
+   "start": 1.154,
+   "end": 1.291
+  },
+  {
+   "text": "p",
+   "start": 1.291,
+   "end": 1.429
+  },
+  {
+   "text": "t",
+   "start": 1.429,
+   "end": 1.566
+  },
+  {
+   "text": "e",
+   "start": 1.566,
+   "end": 1.703
+  },
+  {
+   "text": "r",
+   "start": 1.703,
+   "end": 1.84
+  },
+  {
+   "text": ".",
+   "start": 1.84,
+   "end": 1.92
+  }
+ ],
+ "tts_words": [
+  {
+   "text": "You",
+   "start": 0,
+   "end": 0.16
+  },
+  {
+   "text": "make",
+   "start": 0.24,
+   "end": 0.32
+  },
+  {
+   "text": "it",
+   "start": 0.4,
+   "end": 0.48
+  },
+  {
+   "text": "to",
+   "start": 0.52,
+   "end": 0.56
+  },
+  {
+   "text": "the",
+   "start": 0.64,
+   "end": 0.72
+  },
+  {
+   "text": "helicopter.",
+   "start": 0.8,
+   "end": 1.92
+  }
+ ],
+ "characters_forced": [
+  {
+   "text": "Y",
+   "start": 0.1,
+   "end": 0.1
+  },
+  {
+   "text": "o",
+   "start": 0.1,
+   "end": 0.12
+  },
+  {
+   "text": "u",
+   "start": 0.12,
+   "end": 0.16
+  },
+  {
+   "text": " ",
+   "start": 0.16,
+   "end": 0.22
+  },
+  {
+   "text": "m",
+   "start": 0.22,
+   "end": 0.26
+  },
+  {
+   "text": "a",
+   "start": 0.28,
+   "end": 0.3
+  },
+  {
+   "text": "k",
+   "start": 0.3,
+   "end": 0.36
+  },
+  {
+   "text": "e",
+   "start": 0.36,
+   "end": 0.38
+  },
+  {
+   "text": " ",
+   "start": 0.38,
+   "end": 0.42
+  },
+  {
+   "text": "i",
+   "start": 0.42,
+   "end": 0.44
+  },
+  {
+   "text": "t",
+   "start": 0.44,
+   "end": 0.48
+  },
+  {
+   "text": " ",
+   "start": 0.48,
+   "end": 0.54
+  },
+  {
+   "text": "t",
+   "start": 0.54,
+   "end": 0.56
+  },
+  {
+   "text": "o",
+   "start": 0.58,
+   "end": 0.6
+  },
+  {
+   "text": " ",
+   "start": 0.6,
+   "end": 0.66
+  },
+  {
+   "text": "t",
+   "start": 0.66,
+   "end": 0.66
+  },
+  {
+   "text": "h",
+   "start": 0.66,
+   "end": 0.68
+  },
+  {
+   "text": "e",
+   "start": 0.68,
+   "end": 0.72
+  },
+  {
+   "text": " ",
+   "start": 0.72,
+   "end": 0.76
+  },
+  {
+   "text": "h",
+   "start": 0.76,
+   "end": 0.8
+  },
+  {
+   "text": "e",
+   "start": 0.8,
+   "end": 0.84
+  },
+  {
+   "text": "l",
+   "start": 0.86,
+   "end": 0.9
+  },
+  {
+   "text": "i",
+   "start": 0.9,
+   "end": 0.98
+  },
+  {
+   "text": "c",
+   "start": 0.98,
+   "end": 1.06
+  },
+  {
+   "text": "o",
+   "start": 1.06,
+   "end": 1.12
+  },
+  {
+   "text": "p",
+   "start": 1.12,
+   "end": 1.24
+  },
+  {
+   "text": "t",
+   "start": 1.24,
+   "end": 1.28
+  },
+  {
+   "text": "e",
+   "start": 1.28,
+   "end": 1.38
+  },
+  {
+   "text": "r",
+   "start": 1.38,
+   "end": 1.42
+  },
+  {
+   "text": ".",
+   "start": 1.42,
+   "end": 1.42
+  }
+ ]
+}
