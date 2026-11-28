@@ -76,10 +76,12 @@ function eqWaterfront(scene, app) {
             if (position.y > -2.0) {
               // the split: inside it the ground drops away; the bay side steps down a little; the slabs tilt into it
               float d = abs(v - eqCrackC(u)), hw = eqCrackHalf(u);
-              if (uCW > 0.6) { if (d < hw) transformed.y = ${Y.toFixed(2)} - 4.0 - 2.0 * eqN1(u * 0.7); else transformed.y -= 0.35 * smoothstep(hw + 2.5, hw, d) * min(1.0, uCW / 3.0); }
+              if (uCW > 0.6 && d >= hw) transformed.y -= 0.35 * smoothstep(hw + 2.5, hw, d) * min(1.0, uCW / 3.0);
               if (v > eqCrackC(u)) transformed.y -= 0.12 * min(uCW, 4.0);
               // the fill settles as it turns to mud (lumpy), more near the water
               transformed.y -= uSink * (0.35 + 0.65 * eqN1(u * 0.031 + v * 0.05)) * smoothstep(-130.0, -20.0, v);
+              // the split's floor: kept above the bay's water level (deeper, the water plane showed through as a blue line)
+              if (uCW > 0.6 && d < hw) transformed.y = ${Y.toFixed(2)} - 1.75 - 0.25 * eqN1(u * 0.7);
             }
           }`);
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 vUV; varying float vY0;' + common)
@@ -110,7 +112,7 @@ function eqWaterfront(scene, app) {
             float d = abs(v - eqCrackC(u)), hw = max(eqCrackHalf(u), 0.04 * step(0.01, uCW));
             float jag = eqN1(u * 3.1) * 0.06;
             if (uCW > 0.0 && d < hw + jag) c = vec3(0.04, 0.035, 0.03);
-            float deep = smoothstep(${(Y - 0.6).toFixed(2)}, ${(Y - 4.0).toFixed(2)}, vWP_y);
+            float deep = smoothstep(${(Y - 0.4).toFixed(2)}, ${(Y - 1.6).toFixed(2)}, vWP_y);
             c = mix(c, vec3(0.07, 0.06, 0.05), deep);
             c = mix(c, vec3(1.0, 0.45, 0.1) * 2.0, uGlow * deep);
             // liquefaction: the fill goes dark and wet, sand boils (grey cones) and puddles (shiny) spread
@@ -123,7 +125,11 @@ function eqWaterfront(scene, app) {
             c = mix(c, vec3(0.38, 0.34, 0.27), boil * fill);
             c = mix(c, vec3(0.1, 0.11, 0.1), pud * fill * 0.8);
             eqWet = max(pud, uWet * 0.4) * fill;
-            c = mix(c, vec3(0.66, 0.62, 0.56), uDust * 0.5);
+            c = mix(c, vec3(0.66, 0.62, 0.56), uDust * 0.3);
+            // (the open split stays a black gash: the wet mud's shine and the dust had made it a pale blue line)
+            float pit = max(step(0.0001, uCW) * step(d, hw + jag), deep);
+            c = mix(c, mix(vec3(0.045, 0.038, 0.032), vec3(1.0, 0.45, 0.1) * 2.0, uGlow * deep), pit);
+            eqWet *= 1.0 - pit;
             diffuseColor.rgb = pow(max(c, 0.0), vec3(2.2));                    // (the colours above are sRGB: to linear)
           }`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
@@ -270,7 +276,8 @@ function eqWaterfront(scene, app) {
       eqMesh(new THREE.BoxGeometry(12, 0.35, 8), plankM, 0, -0.17, 0, p);
       for (const s of [-1, 1]) { eqMesh(new THREE.BoxGeometry(0.06, 0.06, 8), railM, s * 5.95, 1.1, 0, p); for (const dz of [-3.5, 0, 3.5]) eqMesh(new THREE.BoxGeometry(0.05, 1.1, 0.05), railM, s * 5.95, 0.55, dz, p); }
       const piles = []; for (const s of [-1, 1]) piles.push(eqMesh(new THREE.CylinderGeometry(0.3, 0.3, 14, 8), pileM, s * 5, -7.4, 0, p));
-      W.pier.push({ p, v: v + 4, k, f: EQ_WFT.pier + k * 0.33 + eqR(k, 5) * 0.35 });
+      // (it breaks from the helipad end back towards the shore: right under you first, where the camera is)
+      W.pier.push({ p, v: v + 4, k, f: EQ_WFT.pier + Math.max(0, (EQ_PIER.v1 - 8 - v) / 8) * 0.26 + eqR(k, 5) * 0.3 });
     }
     // the helipad: a square deck on its own pilings, the H and the circle, the windsock
     const padT = eqTex(eqCanvas(512, 512, (c) => { c.fillStyle = '#3c3e40'; c.fillRect(0, 0, 512, 512); c.strokeStyle = '#f2f0e8'; c.lineWidth = 14; c.beginPath(); c.arc(256, 256, 190, 0, 6.29); c.stroke();
@@ -375,7 +382,7 @@ function eqWaterfront(scene, app) {
     for (const pc of W.pier) {
       const u = s - pc.f, a = j(pc.k + 40), amp = Math.min(1, lvl * 6);
       if (u <= 0) { pc.p.position.set(380 + a[0] * amp * 0.5, Y + 0.4 + a[1] * amp * 0.4, -pc.v - a[2] * amp * 0.5); pc.p.rotation.set(a[2] * amp * 0.08, 0, a[0] * amp * 0.1); }
-      else { const k = MathX.clamp(u / 1.6, 0, 1), side = pc.k % 2 ? 1 : -1; pc.p.position.set(380 + side * 0.8 * k, Y + 0.4 - 3.4 * k * k - Math.max(0, u - 1.6) * 0.3, -pc.v); pc.p.rotation.set((eqR(pc.k, 3) - 0.5) * 0.6 * k, 0, side * 0.5 * k * k); }
+      else { const k = MathX.clamp(u / 1.4, 0, 1), side = pc.k % 2 ? 1 : -1; pc.p.position.set(380 + side * 1.2 * k, Y + 0.4 - 4.6 * k * k - Math.max(0, u - 1.4) * 0.35, -pc.v); pc.p.rotation.set((eqR(pc.k, 3) - 0.5) * 0.9 * k, 0, side * 0.75 * k * k); }
       pc.p.visible = u < 30;
     }
     {
@@ -417,10 +424,10 @@ function eqWaterfront(scene, app) {
       const on = u > -715 && u < 815;
       c.group.visible = on && s < 405;
       if (!on) continue;
-      const a = j(80 + i), amp = Math.min(1, lvl * 5), sink = s > EQ_WFT.sink - 6 ? MathX.smooth(s, EQ_WFT.sink - 6 + eqR(i, 5) * 4, EQ_WFT.sink + 12 + eqR(i, 7) * 8) * (0.45 + 0.5 * eqR(i, 9)) : 0;
+      const a = j(80 + i), amp = Math.min(1, lvl * 5), sink = s > EQ_WFT.sink - 4 ? MathX.smooth(s, EQ_WFT.sink - 4 + eqR(i, 5) * 2, EQ_WFT.sink + 6 + eqR(i, 7) * 4) * (0.85 + 0.35 * eqR(i, 9)) : 0;
       const [x, z] = eqWF(u, v);
       c.group.position.set(x + a[0] * amp * 0.3, Y + Math.max(0, a[1]) * amp * 0.5 - sink, z + a[2] * amp * 0.3);
-      c.group.rotation.set(sink * 0.25 * (eqR(i, 11) - 0.5) + a[2] * amp * 0.06, eqYawWF(dir, 0) - Math.PI / 2 + (s > stopS ? (eqR(i, 13) - 0.5) * 0.2 * MathX.smooth(s, stopS, stopS + 1.5) : 0), sink * 0.3 * (eqR(i, 15) - 0.5) + a[0] * amp * 0.05);
+      c.group.rotation.set(sink * 0.45 * (eqR(i, 11) - 0.5) + a[2] * amp * 0.06, eqYawWF(dir, 0) - Math.PI / 2 + (s > stopS ? (eqR(i, 13) - 0.5) * 0.2 * MathX.smooth(s, stopS, stopS + 1.5) : 0), sink * 0.3 * (eqR(i, 15) - 0.5) + a[0] * amp * 0.05);
       const al = s > EQ_WFT.alarms + eqR(i, 17) * 1.2 ? (Math.floor((s + eqR(i, 19)) * 2.2) % 2 ? 1 : 0) : 0;
       if (c.hazard) c.hazard.emissiveIntensity = al * 2.4;
       for (const w of c.wheels) w.rotation.z = -(u - u0) / 0.33 * dir;

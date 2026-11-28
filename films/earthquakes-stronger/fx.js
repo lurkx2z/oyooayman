@@ -99,14 +99,14 @@ function eqBurst(soft, adds, t, ev, o = {}) {
       // (a steady fire: ev.period > 0 keeps the column fed for as long as the event lives)
       const P = ev.period || 0; let age = P ? (u + h(1) * P) % P : u - h(1) * h(1) * 10;
       if (age < 0 || (P && age > u)) continue;
-      const rr = S * (0.3 + 0.5 * h(3)) * (1 + age * 0.06), x = ev.p[0] + Math.cos(a) * rr + age * S * 0.05, z = ev.p[2] + Math.sin(a) * rr, y = ev.p[1] + S * 0.4 + S * 4 * (1 - Math.exp(-age * (0.08 + 0.05 * h(2))));
-      const sz = S * (0.7 + 0.6 * h(4)) * (1 + age * 0.09), al = 0.5 * MathX.smooth(age, 0, 1.5) * Math.exp(-age / 30);
-      const g = MathX.lerp(0.05, 0.11, h(5)) * (1 + 0.6 * Math.exp(-age / 3));   // (dark: it reads against pale roofs)
-      soft.add(x, y, z, sz, al, g, g * 0.97, g * 0.95);
+      const rr = S * (0.3 + 0.5 * h(3)) * (1 + age * 0.06), x = ev.p[0] + Math.cos(a) * rr + age * S * 0.05, z = ev.p[2] + Math.sin(a) * rr, y = ev.p[1] + S * 0.4 + S * 8 * (1 - Math.exp(-age * (0.05 + 0.03 * h(2))));
+      const sz = S * (0.7 + 0.6 * h(4)) * (1 + age * 0.11), al = 0.5 * MathX.smooth(age, 0, 1.5) * Math.exp(-age / 30);
+      const g = MathX.lerp(0.04, 0.09, h(5)) * (1 + 0.6 * Math.exp(-age / 3));   // (dark: it reads against pale roofs)
+      soft.add(x, y, z, sz, Math.min(0.75, al * 1.35) * (ev.fade ?? 1), g, g * 0.97, g * 0.95);
     } else if (ev.kind === 'flame') {
       // a steady fire (flickering tongues at its foot, for as long as it lives)
       const ph = (u * (0.8 + 0.6 * h(3)) + h(4)) % 1, x = ev.p[0] + Math.cos(a) * S * 0.8 * h(5), z = ev.p[2] + Math.sin(a) * S * 0.8 * h(5), y = ev.p[1] + S * 1.6 * ph;
-      adds.add(x, y, z, S * (0.8 - 0.5 * ph), 0.8 * (1 - ph) * MathX.smooth(u, 0, 1.5), 1.0, 0.5 + 0.3 * (1 - ph), 0.15);
+      adds.add(x, y, z, S * (0.8 - 0.5 * ph), 0.8 * (1 - ph) * MathX.smooth(u, 0, 1.5) * (ev.fade ?? 1), 1.0, 0.5 + 0.3 * (1 - ph), 0.15);
     } else if (ev.kind === 'fire') {
       const R = S * (0.6 + 1.3 * sp) * (1 - Math.exp(-u * 2)), x = ev.p[0] + Math.cos(a) * R, z = ev.p[2] + Math.sin(a) * R, y = ev.p[1] + S * (0.3 + 2.2 * el) * (1 - Math.exp(-u * 1.5));
       const heat = Math.exp(-u / (life * 0.25)), sz = S * (0.6 + h(4)) * (0.5 + u * 0.4);
@@ -135,14 +135,19 @@ function eqCityFx(soft, adds, s, info, cam, o = {}) {
     eqBurst(soft, adds, s, { t: b.sf + 0.6, p: [b.x, b.y + 2, b.z], kind: 'dust', size: S, n: d < 1500 ? 14 : 6, seed: i * 7 + 1, life: 40, alpha: 0.5 });
   }
   if (s > EQ_FIRE_S0) {
+    // every fire within ~2 km of the camera (fading out at the edge, so nothing pops as the camera moves) and a few
+    // far ones for the skyline (spread over the whole city, the old 80 were all kilometres away and lost in the haze)
     let k = 0;
-    for (let i = 0; i < info.length && k < (o.fires || 70); i += 37) {
+    for (let i = 0; i < info.length; i += 37) {
       const b = info[i]; if (s < b.sf + 6 || (s < EQ_FIRE_S0 + 2 && i % 2)) continue;
       const d = Math.hypot(b.x - cx, b.z - cz); if (d > range * 1.3) continue;
-      k++;
+      const near = 1 - MathX.smooth(d, 1700, 2300), far = d > 1700 && (i / 37) % 3 === 0 && k < (o.fires || 40);
+      if (near <= 0 && !far) continue;
+      if (near <= 0) k++;
+      const fade = Math.max(near, far ? 0.8 : 0);
       const t0 = Math.max(b.sf + 6, EQ_FIRE_S0 + (i % 11) * 0.7), S = 22 + b.h * 0.25;
-      eqBurst(soft, adds, s, { t: t0, p: [b.x, b.y + b.h * 0.15, b.z], kind: 'column', size: S, n: d < 2500 ? 22 : 12, seed: i * 13 + 5, life: 300, period: 36 });
-      if (d < 3500) eqBurst(soft, adds, s, { t: t0, p: [b.x, b.y + 1, b.z], kind: 'flame', size: S * 0.45, n: 8, seed: i * 17 + 3, life: 300 });
+      eqBurst(soft, adds, s, { t: t0, p: [b.x, b.y + b.h * 0.15, b.z], kind: 'column', size: S, n: d < 2500 ? 22 : 10, seed: i * 13 + 5, life: 300, period: 36, fade });
+      if (d < 3500) eqBurst(soft, adds, s, { t: t0, p: [b.x, b.y + 1, b.z], kind: 'flame', size: S * 0.45, n: 8, seed: i * 17 + 3, life: 300, fade });
     }
   }
 }

@@ -21,7 +21,7 @@ function eqSfCam(mode, u, s, set, X) {
   const C = {
     // ---- the cold open (the last minute)
     openSF: () => air({ p: eqPush([-690, 215, -770], [-750, 185, -700], u, 0.9), at: [-920, 0, -150], fov: 50, roll: 10, near: 1, shR: 600 }),   // (the molten crack through the flattened city)
-    openFace: () => ({ local: true, p: [-0.02, 2.04, 1.78], at: [0.45, 2.08, 0.78], fov: 40, inside: true, shR: 6, near: 0.03 }),
+    openFace: () => ({ local: true, p: [0.1, 2.03, 1.58], at: [0.45, 2.05, 0.8], fov: 40, inside: true, shR: 6, near: 0.03 }),
     // ---- minute one: the café
     cafeWide: () => { const h = head(); return gr({ p: eqPush(eqG(375.3, 3.75, 11.1), eqG(374.8, 3.7, 11.0), u, 3), at: eqV(h, eqG(0, 40, 6), 0.035), fov: 50, shakeK: 0, shC: h }); },
     aerialSF: () => air({ p: eqPush([1650, 190, -1350], [1500, 175, -1250], u, 3), at: [-600, 40, 500], fov: 46 }),
@@ -74,7 +74,7 @@ function eqSfCam(mode, u, s, set, X) {
     start: () => ({ local: true, p: [-0.2, 2.0, 1.92], at: [-0.45, 2.04, 0.78], fov: 42, inside: true, shR: 6, near: 0.03 }),
     startTwo: () => gr({ p: eqG(393, 3.6, 146), at: eqG(380, 5, 160), fov: 44, shC: eqG(380, 2, 158), shR: 16, shakeK: 0.8 }),
     fillDia: () => gr({ p: eqG(372, Y + 1.8, -38), at: eqG(372, Y + 0.6, -85), fov: 52, shC: eqG(372, 2, -60), shR: 40, shakeK: 0.9 }),
-    mudBoil: () => gr({ p: eqG(344, Y + 1.5, -55), at: eqG(352, Y, -64), fov: 46, shC: eqG(350, 2, -60), shR: 20, shakeK: 0.9 }),
+    mudBoil: () => gr({ p: eqPush(eqG(352, Y + 2.6, -30.5), eqG(354, Y + 2.3, -31.5), u, 5), at: eqG(360, Y - 0.3, -43), fov: 46, shC: eqG(360, 2, -42), shR: 20, shakeK: 0.9 }),
     sink: () => gr({ p: eqG(388, Y + 1.3, -31.4), at: eqG(396, Y - 0.2, -38.5), fov: 44, shC: eqG(395, 2, -38), shR: 14, shakeK: 0.9 }),
     cockpitWait: () => ({ local: true, p: [-0.15, 1.96, 1.85], at: [0.45, 2.0, 0.78], fov: 40, inside: true, shR: 6, near: 0.03 }),
     rotorUp: () => gr({ p: eqG(370.5, 2.95, 166.5), at: eqG(380, 5.8, 160), fov: 52, shC: eqG(380, 2, 160), shR: 16, shakeK: 1.0 }),
@@ -82,7 +82,7 @@ function eqSfCam(mode, u, s, set, X) {
     jolt7: () => gr({ p: eqG(396, 9.5, 171), at: eqG(370, 9, -60), fov: 50, shC: eqG(380, 2, 60), shR: 120, shakeK: 1.0 }),
     haiti: () => gr({ p: eqG(387, 7.5, 163), at: eqG(150, 40, -260), fov: 44, shC: eqG(380, 2, 140), shR: 80, shakeK: 1.0 }),
     brick: () => gr({ p: eqG(371, Y + 1.7, -6.5), at: eqG(381, 13, -60), fov: 54, shC: eqG(380, 2, -45), shR: 50, shakeK: 1.0 }),
-    split: () => gr({ p: eqG(398, Y + 1.8, -23.5), at: eqG(332, Y - 0.6, -30), fov: 50, shC: eqG(375, 2, -30), shR: 40, shakeK: 1.0 }),
+    split: () => gr({ p: eqPush(eqG(402, Y + 6.5, -25.5), eqG(399, Y + 5.2, -26.5), u, 5), at: eqG(360, Y - 2.5, -30.5), fov: 50, shC: eqG(375, 2, -30), shR: 40, shakeK: 0.8 }),
     pierBreak: () => gr({ p: eqPush(eqG(388.5, Y + 3.2, 151.5), eqG(389, Y + 3.7, 153.5), u, 5.5), at: eqG(378, Y - 0.5, 66), fov: 52, shC: eqG(380, 2, 120), shR: 60, shakeK: 1.0 }),
     lift: () => { const h = heliP(); return gr({ p: eqG(398, 5.5, 139), at: [h[0], h[1] + 1.8, h[2]], fov: 44, shC: h, shR: 24, shakeK: 0.9 }); },
     sky: () => ({ local: true, p: [-0.1, 1.98, 1.9], at: [0.45, 2.0, 0.78], fov: 38, inside: true, shR: 6, near: 0.03 }),
@@ -105,10 +105,10 @@ function eqSfCam(mode, u, s, set, X) {
     jolt9: () => air({ p: [-400, 720, -2650], at: [-1500, 0, 1200], fov: 50 }),
     japan: () => air({ p: eqPush([1950, 210, 330], [1900, 205, 300], u, 5), at: [1300, 40, -320], fov: 46 }),
     tsarBg: () => air({ p: [500, 520, -1500], at: [-900, 0, 900], fov: 48 }),
-    calm: () => ({ local: true, p: [-0.62, 2.02, 1.95], at: [0.45, 1.98, 0.8], fov: 42, inside: true, shR: 6, near: 0.03 }),
+    calm: () => ({ local: true, p: [0.66, 2.04, 1.38], at: [0.38, 2.0, 0.8], fov: 50, inside: true, shR: 6, near: 0.03 }),
     empty: () => air({ p: eqPush(eqG(380, 210, 900), eqG(380, 200, 860), u, 10), at: eqG(300, 0, 60), fov: 46 }),
     drained: () => air({ p: eqPush(eqG(720, 70, 560), eqG(690, 64, 530), u, 6), at: eqG(380, -6, 110), fov: 46, shC: eqG(400, 0, 200), shR: 400 }),
-    back: () => air({ p: eqG(1200, 150, 1450), at: eqG(300, 0, 280), fov: 48 }),
+    back: () => air({ p: eqPush(eqG(364, 19, -8), eqG(366, 17, -3), u, 4.5), at: eqG(396, 5, 170), fov: 56, shC: eqG(385, 0, 90), shR: 160 }),   // (from above your café: the wall of water coming at you)
     cafe: () => air({ p: eqG(610, 58, 300), at: eqG(372, 5, 6), fov: 34, shC: eqG(372, 2, 6), shR: 200 }),
     // ---- minute eight
     jolt10: () => air({ p: [420, 260, -400], at: [-308, 150, 644], fov: 44 }),
@@ -121,13 +121,13 @@ function eqSfCam(mode, u, s, set, X) {
     // ---- minute nine
     jolt11: () => air({ p: [-300, 660, -2350], at: [-1500, 0, 1500], fov: 50 }),
     yearsBg: () => air({ p: [-2400, 720, -1800], at: [-900, 0, 1400], fov: 50 }),
-    air: () => ({ local: true, p: [-0.62, 2.06, 1.92], at: [0.45, 1.96, 0.8], fov: 44, inside: true, shR: 6, near: 0.03 }),
+    air: () => ({ local: true, p: [0.02, 2.06, 1.7], at: [0.45, 2.0, 0.8], fov: 46, inside: true, shR: 6, near: 0.03 }),
     fuel: () => ({ local: true, p: [0.08, 1.98, 1.08], at: [-0.3, 1.45, 1.72], fov: 46, inside: true, shR: 6, near: 0.03 }),
     nowhere: () => { const h = heliP(); return air({ p: [h[0] + 600, h[1] + 260, h[2] - 700], at: [h[0] - 700, h[1] - 380, h[2] + 1900], fov: 54 }); },
     below: () => ({ local: true, p: [0.62, 1.78, 1.05], at: [7, -5, 5.5], fov: 52, inside: true, shR: 6, near: 0.03 }),
     // ---- minute ten
     melt: () => air({ p: eqPush([-720, 230, -720], [-760, 220, -690], u, 7), at: [-920, 0, -150], fov: 48 }),
-    last: () => ({ local: true, p: [-0.05, 1.97, 1.95], at: [0.45, 2.02, 0.78], fov: 40, inside: true, shR: 6, near: 0.03 }),
+    last: () => ({ local: true, p: [0.12, 2.0, 1.72], at: [0.45, 2.03, 0.8], fov: 38, inside: true, shR: 6, near: 0.03 }),
     question: () => ({ local: true, p: [0.14, 2.0, 1.56], at: [0.45, 2.04, 0.78], fov: 32, inside: true, shR: 6, near: 0.03 }),
   };
   const f = C[mode];

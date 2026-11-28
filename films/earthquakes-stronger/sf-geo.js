@@ -108,14 +108,15 @@ const eqWaveU = (k = EQ_WAVE.k, c = EQ_WAVE.c, L = 14000) => ({ uWaveK: { value:
 
 // ---- the bay's water level (m) at a point v metres out from the waterfront (story s): calm; at magnitude nine the
 // shaking sloshes the bay out (down 9 m at the shore), then it comes back as a wall that runs up over the Embarcadero
-const EQ_BAY = { out0: 378, out1: 391, wave: 392.5, speed: 34, crest: 11 };
+const EQ_BAY = { out0: 378, out1: 391, wave: 392.5, speed: 34, crest: 13 };
 function eqBayY(v, s) {
   const out = MathX.smooth(s, EQ_BAY.out0, EQ_BAY.out1) * (1 - MathX.smooth(s, EQ_BAY.wave - 1.5, EQ_BAY.wave + 2.5));
-  const near = Math.exp(-Math.max(0, v) / 2500);
-  let y = -9 * out * near;
+  const near = Math.exp(-Math.max(0, v) / 4000);
+  let y = -14 * out * near;
   if (s > EQ_BAY.out1 - 4) {
     const front = (EQ_BAY.wave - s) * EQ_BAY.speed + 120;                 // the crest's distance from the seawall
-    const dv = v - front, crest = EQ_BAY.crest * Math.exp(-(dv * dv) / (2 * 70 * 70)) * MathX.smooth(s, EQ_BAY.out1 - 4, EQ_BAY.out1 + 1);
+    // (a steep face towards the shore, a long back: a wall of water, not a swell)
+    const dv = v - front, sg = dv < 0 ? 22 : 95, crest = EQ_BAY.crest * Math.exp(-(dv * dv) / (2 * sg * sg)) * MathX.smooth(s, EQ_BAY.out1 - 4, EQ_BAY.out1 + 1);
     const behind = dv > 0 ? 3.2 * Math.exp(-dv / 900) * MathX.smooth(s, EQ_BAY.out1, EQ_BAY.wave) : 0;
     y += crest + behind;
   }
@@ -166,7 +167,8 @@ function eqGroundMat() {
           float boil = smoothstep(0.55, 0.9, eqH2(floor(p / 9.0))) * fill * uWet;
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.24, 0.22, 0.19), fill * uWet * 0.55);
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.36, 0.33, 0.27), boil * 0.6);
-          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.58, 0.52), uDust * 0.35 * vUrb);
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.36, 0.33, 0.29), uDust * 0.3 * vUrb);
+          diffuseColor.rgb *= 1.0 - 0.38 * uDust * vUrb;   // (ash and rubble: the ruined city darkens)
           diffuseColor.rgb = pow(max(diffuseColor.rgb, 0.0), vec3(2.2));      // (the colours above are sRGB: to linear)
         }`);
   };
@@ -232,11 +234,12 @@ function eqWater(scene) {
       float eqSm(float a, float b, float x) { float t = clamp((x - a) / (b - a), 0.0, 1.0); return t * t * (3.0 - 2.0 * t); }
       float eqBay(float v) {
         float out_ = eqSm(${EQ_BAY.out0.toFixed(1)}, ${EQ_BAY.out1.toFixed(1)}, uS) * (1.0 - eqSm(${(EQ_BAY.wave - 1.5).toFixed(1)}, ${(EQ_BAY.wave + 2.5).toFixed(1)}, uS));
-        float near = exp(-max(0.0, v) / 2500.0);
-        float y = -9.0 * out_ * near;
+        float near = exp(-max(0.0, v) / 4000.0);
+        float y = -14.0 * out_ * near;
         if (uS > ${(EQ_BAY.out1 - 4).toFixed(1)}) {
           float front = (${EQ_BAY.wave.toFixed(1)} - uS) * ${EQ_BAY.speed.toFixed(1)} + 120.0, dv = v - front;
-          y += ${EQ_BAY.crest.toFixed(1)} * exp(-(dv * dv) / 9800.0) * eqSm(${(EQ_BAY.out1 - 4).toFixed(1)}, ${(EQ_BAY.out1 + 1).toFixed(1)}, uS);
+          float sg = dv < 0.0 ? 22.0 : 95.0;
+          y += ${EQ_BAY.crest.toFixed(1)} * exp(-(dv * dv) / (2.0 * sg * sg)) * eqSm(${(EQ_BAY.out1 - 4).toFixed(1)}, ${(EQ_BAY.out1 + 1).toFixed(1)}, uS);
           if (dv > 0.0) y += 3.2 * exp(-dv / 900.0) * eqSm(${EQ_BAY.out1.toFixed(1)}, ${EQ_BAY.wave.toFixed(1)}, uS);
         }
         if (uS > ${(EQ_BAY.wave + 6).toFixed(1)}) y += 1.6 * sin((uS - ${EQ_BAY.wave.toFixed(1)}) * 0.11) * exp(-(uS - ${EQ_BAY.wave.toFixed(1)}) / 120.0) * near;
@@ -268,10 +271,12 @@ function eqWater(scene) {
     let wet = false; for (const [a, b] of [[0, 0], [1000, 0], [0, 1000], [1000, 1000], [500, 500]]) if (eqShoreSD(x + a, z + b) < 300) wet = true;
     if (wet) list.push([x + 500, z + 500]);
   }
-  const W = new THREE.InstancedMesh(geo, m, list.length);
-  list.forEach(([x, z], i) => { M4.makeTranslation(x, 0, z); W.setMatrixAt(i, M4); });
-  W.receiveShadow = true; W.frustumCulled = false; scene.add(W);
-  return { mat: m, mesh: W };
+  // (the tiles round the waterfront get 10 m cells, so the wave's steep face can be drawn; the rest keep 100 m)
+  const c0 = eqWL(380, 0, 150), isNear = ([x, z]) => Math.hypot(x - c0[0], z - c0[2]) < 1300;
+  const geoN = new THREE.PlaneGeometry(1000, 1000, 100, 100); geoN.rotateX(-Math.PI / 2);
+  const mk = (g, L) => { const I = new THREE.InstancedMesh(g, m, Math.max(1, L.length)); I.count = L.length; L.forEach(([x, z], i) => { M4.makeTranslation(x, 0, z); I.setMatrixAt(i, M4); }); I.receiveShadow = true; I.frustumCulled = false; scene.add(I); return I; };
+  const W = mk(geo, list.filter((t) => !isNear(t))), WN = mk(geoN, list.filter(isNear));
+  return { mat: m, mesh: W, meshNear: WN };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -340,7 +345,9 @@ function eqCityMat() {
         diffuseColor.rgb = mix(diffuseColor.rgb, roof * (0.85 + 0.3 * fract(vSeed * 91.7)), step(0.5, vWinN.y) * (vKind > 2.5 ? 0.6 : 0.88));
         // fallen: dust-grey rubble; and dust settles on everything
         diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.27, 0.24, 0.2) * (0.8 + 0.3 * eqH(floor(vWorldP.xz / 3.0))), smoothstep(0.35, 0.9, vFall));
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.4, 0.36, 0.3), uDust * 0.45);
+        // (some of the rubble burnt black: from the air the ruins read as ruins, not as pale cookies)
+        diffuseColor.rgb *= mix(1.0, 0.3, step(0.68, eqH(floor(vWorldP.xz / 9.0) + 3.1)) * smoothstep(0.35, 0.9, vFall));
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.24, 0.21, 0.18), uDust * 0.4);
         diffuseColor.rgb *= mix(1.0, 0.4, uNight);                             // (at night the walls are dark: the light is the windows)
         float eqWin = win * (1.0 - broken);`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>

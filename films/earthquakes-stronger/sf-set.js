@@ -28,10 +28,10 @@ const EQ_YT = { stand: 113.0, grab: 119.8, cover: eqW('drop') - EQ.tick0 + 2.2, 
 
 // your face in each shot mode: [expression, look ('cam' | 'out' | null)]
 const EQ_YOU_FACE = {
-  openFace: ['scream', 'out'], cafeWide: ['calm'], faceFelt: ['surprise', 'cam'], cupRipple: ['neutral'], ruleFace: ['worry'], terraceRise: ['neutral'], jolt4: ['surprise'],
+  openFace: ['scream', 'cam'], cafeWide: ['calm'], faceFelt: ['surprise', 'cam'], cupRipple: ['neutral'], ruleFace: ['worry'], terraceRise: ['neutral'], jolt4: ['surprise'],
   youSee: ['worry'], jolt5: ['shock'], everyone: ['shock'], alert: ['worry'], drop: ['worry'], never: ['determined', 'cam'], run: ['determined'], pierRun: ['determined'],
   jolt6: ['scream'], in: ['determined'], start: ['worry', 'out'], cockpitWait: ['worry', 'out'], pierBreak: ['shock', 'out'], sky: ['awe', 'out'], phone: ['worry'],
-  calm: ['sad', 'out'], air: ['scream', 'out'], fuel: ['worry'], last: ['sad', 'out'], question: ['awe', 'cam'],
+  calm: ['sad', 'out'], air: ['scream', 'cam'], fuel: ['worry'], last: ['sad'], question: ['awe', 'cam'],
 };
 
 EQ_SETS.sf = (app) => {
@@ -74,6 +74,9 @@ EQ_SETS.sf = (app) => {
   const debrisEv = [{ t: EQ_WFT.brick + 1.6, p: [...(() => { const [x, z] = eqWF(380, -54); return [x, EQ_GROUND_Y + 10, z]; })()], n: 140, v: 7, up: 0.6, size: 1.1, seed: 7, life: 120, dir: [EQ_WF.n[0], EQ_WF.n[1]] },
     ...wf.chimneys.map((c, i) => ({ t: EQ_WFT.chimneys + c.i * 0.35 + Math.sqrt(2 * c.h / 9.8), p: (() => { const [x, z] = eqWF(c.u + 3, -c.v + 6); return [x, EQ_GROUND_Y + 0.5, z]; })(), n: 18, v: 3, up: 0.6, size: 0.35, seed: 20 + i, life: 120 }))];
   const boils = []; for (let k = 0; k < 60; k++) { const u = 230 + eqR(k, 3) * 300, v = -125 + eqR(k, 5) * 108; boils.push([u, v, eqR(k, 7)]); }
+  // (and a cluster right in front of the mud shot's camera, and around the sinking cars)
+  for (let k = 0; k < 16; k++) boils.push([350 + eqR(k, 21) * 18, -37 - eqR(k, 23) * 9, eqR(k, 25)]);
+  for (let k = 0; k < 10; k++) boils.push([390 + eqR(k, 27) * 16, -34 - eqR(k, 29) * 8, eqR(k, 31)]);
 
   const set = { scene, camera: cam, sun, sky, ground, water, city, crack, faults, marks, wf, heli, you, pilot, crowd, birds, soft, adds };
   const X = {};                                          // the shot's context (cameras, labels)
@@ -128,7 +131,9 @@ EQ_SETS.sf = (app) => {
       // the sand boils: spurts of grey water from the fill (from "Shaking turns it into mud")
       if (s > EQ_WFT.wet - 1 && s < 400) for (const [bu, bv, r] of boils) {
         const per = 2.2 + r * 2.5, ph = ((s + r * 9) % per) / per, [x, z] = eqWF(bu, bv); if (s < EQ_WFT.wet + r * 8) continue;
-        for (let k = 0; k < 4; k++) soft.add(x + (eqR(k, r * 99) - 0.5) * 0.6, EQ_GROUND_Y + 0.2 + ph * (1.2 + r) * (1 - ph) * 3, z + (eqR(k + 9, r * 99) - 0.5) * 0.6, 0.35 + 0.4 * ph, 0.5 * (1 - ph), 0.45, 0.42, 0.36);
+        // a spurt (narrow, from the ground up) and the muddy water spreading round its foot
+        for (let k = 0; k < 6; k++) { const q = (ph + k / 6) % 1; soft.add(x + (eqR(k, r * 99) - 0.5) * 0.25 * q, EQ_GROUND_Y + 0.1 + q * (0.7 + 0.8 * r), z + (eqR(k + 9, r * 99) - 0.5) * 0.25 * q, 0.22 + 0.3 * q, 0.85 * (1 - q), 0.24, 0.2, 0.15); }
+        for (let k = 0; k < 4; k++) { const a = eqR(k + 20, r * 99) * 6.283, rr = 0.4 + 0.9 * ph; soft.add(x + Math.cos(a) * rr, EQ_GROUND_Y + 0.12, z + Math.sin(a) * rr, 0.5 + 0.5 * ph, 0.5 * (1 - ph), 0.2, 0.17, 0.13); }
       }
       // the rotor's downwash (spray off the water once it's moving out over the bay)
       if (s > EQ_HT.lift - 6 && s < EQ_HT.lift + 12) {
@@ -142,8 +147,8 @@ EQ_SETS.sf = (app) => {
       const front = (EQ_BAY.wave - s) * EQ_BAY.speed + 120;
       // (only while the crest is out on the bay: once it is over the land the spray hung there like a fog)
       const k = MathX.smooth(s, EQ_BAY.out1, EQ_BAY.out1 + 3) * MathX.smooth(front, -10, 60);
-      if (k > 0) for (let i = 0; i < 110; i++) { const uu = -600 + eqR(i, 3) * 1500, vv = front + (eqR(i, 5) - 0.3) * 30, [x, z] = eqWF(uu, vv), y = eqBayY(vv, s) + 1 + eqR(i, 7) * 6;
-        soft.add(x, y, z, 6 + eqR(i, 9) * 8, 0.42 * k, 0.93, 0.95, 0.96); }
+      if (k > 0) for (let i = 0; i < 240; i++) { const uu = -600 + eqR(i, 3) * 1500, vv = front + (eqR(i, 5) - 0.2) * 14, [x, z] = eqWF(uu, vv), y = eqBayY(vv, s) + 0.5 + eqR(i, 7) * 3.5;
+        soft.add(x, y, z, 2.5 + eqR(i, 9) * 4.5, 0.38 * k, 0.93, 0.95, 0.96); }
     }
     soft.end(); adds.end();
     debris.frame(s, near ? debrisEv : [], EQ_GROUND_Y + 0.15);
@@ -152,7 +157,7 @@ EQ_SETS.sf = (app) => {
     sun.castShadow = shR > 0;
     if (shR > 0) eqShadowFollow(sun, cp.shC || cp.at, shR, 2048, Math.max(600, shR * 5));
     sky.material.uniforms.k.value = cp.skyK || 1;
-    scene.fog.density = cp.fog ?? (0.000055 + MathX.smooth(s, 250, 420) * 0.00005);
+    scene.fog.density = cp.fog ?? (0.000045 + MathX.smooth(s, 250, 420) * 0.00002);
     // the sky's light (the environment map) washes the city out from the air: less of it the higher the camera
     scene.environmentIntensity = cp.envI ?? (cp.inside ? 0.7 : MathX.lerp(0.85, 0.42, MathX.smooth(cam.position.y, 15, 160)));
     set._mode = mode;
@@ -163,10 +168,10 @@ EQ_SETS.sf = (app) => {
     p.exposure = 1.04; p.saturation = 1.18; p.warmth = 0.03; p.contrast = 1.08;
     // the dust in the air lowers the contrast and warms the light as the city falls
     const dust = MathX.smooth(s, 250, 420) * 0.6 + MathX.smooth(s, 420, 540) * 0.3;
-    p.contrast -= dust * 0.08; p.warmth += dust * 0.08; p.saturation -= dust * 0.12;
+    p.contrast -= dust * 0.04; p.warmth += dust * 0.08; p.saturation -= dust * 0.05;
     if (cp.inside) { p.vignette = 0.5; p.exposure = 1.0; }
     // from the air the city is pale (pastel houses, haze): more contrast and colour
-    if (!cp.inside && !cp.local && cp.p && cp.p[1] > 60) { p.contrast += 0.16; p.saturation += 0.12; p.exposure -= 0.07; }
+    if (!cp.inside && !cp.local && cp.p && cp.p[1] > 60) { p.contrast += 0.24; p.saturation += 0.16; p.exposure -= 0.1; }
     // the molten crack (minute ten): a red light from below
     if (s > 545) { p.warmth += 0.08; p.bloom = 0.5; p.bloomThreshold = 0.8; }
     if (cp.grade) cp.grade(p, s);

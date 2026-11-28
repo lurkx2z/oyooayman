@@ -17,7 +17,7 @@ const EQ_TAGS = (() => {
   return [
     [W('sat'), E('sat'), 'SAN FRANCISCO IS REAL · YOUR CAFÉ AND YOUR PIER ARE MADE UP'],
     [W('rule'), E('rule'), 'THE ONE MADE-UP RULE · REAL EARTHQUAKES PEAK AND STOP'],
-    [W('x32'), E('x32'), 'ENERGY: LOG₁₀ E = 1.5 M + 4.8 (USGS)'],
+    [W('x32'), E('x32'), 'EACH STEP: ABOUT 10× THE SHAKING · 32× THE ENERGY (USGS: LOG₁₀ E = 1.5 M + 4.8)'],
     [W('realtime'), E('realtime', 1.2), 'ONE MINUTE OF FILM = ONE MINUTE OF EARTHQUAKE'],
     [W('faults'), E('faults'), 'REAL: THE SAN ANDREAS AND HAYWARD FAULTS (USGS)'],
     [W('alert'), E('alert', 1.8), 'REAL: CALIFORNIA’S SHAKEALERT SENDS PHONE ALERTS LIKE THIS'],
@@ -26,7 +26,9 @@ const EQ_TAGS = (() => {
     [W('start'), E('start'), 'A TURBINE HELICOPTER TAKES A MINUTE OR TWO TO START UP'],
     [W('mud'), E('sink'), 'REAL: MUCH OF THE WATERFRONT IS FILL · IN 1989 FILL LIKE IT TURNED TO MUD'],
     [W('haiti'), E('haiti'), 'HAITI, 12 JANUARY 2010: MAGNITUDE 7.0'],
-    [W('baybridge'), E('baybridge', 1.5), 'REAL: LOMA PRIETA, 1989 (6.9): A 15 M SECTION OF THE BAY BRIDGE’S UPPER DECK FELL'],
+    [W('split'), E('split'), 'REAL: ON SOFT FILL THE GROUND SLIDES TOWARD THE WATER AND CRACKS OPEN (LATERAL SPREADING)'],
+    [W('lift'), E('lift', 1.5), 'THE PIER IS GOING: YOUR PILOT LIFTS OFF BEFORE THE ENGINE IS AT FULL POWER'],
+    [W('baybridge'), E('baybridge', 1.5), 'REAL: LOMA PRIETA, 1989 (6.9): A 15 M PIECE OF THE BAY BRIDGE’S EAST SPAN FELL'],
     [W('y1906'), E('fires'), 'SAN FRANCISCO, 18 APRIL 1906: MAGNITUDE 7.9 · THE FIRES BURNED FOR THREE DAYS'],
     [W('bravo'), E('bravo'), 'CASTLE BRAVO, 1954: 15 MEGATONS · MAGNITUDE 8 ≈ 15 MEGATONS OF TNT'],
     [W('pyramid'), E('pyramid'), 'REAL: IN 1989 THE PYRAMID SWAYED FOR OVER A MINUTE, UNDAMAGED'],
@@ -36,19 +38,20 @@ const EQ_TAGS = (() => {
     [W('empty'), E('empty', 1.0), 'REAL: SHAKING CAN SLOSH A BAY LIKE A BATH (A SEICHE)'],
     [W('mexico'), E('mexico'), 'REAL: IN 1985 AND 2017 THE OLD LAKE BED MADE MEXICO CITY SHAKE HARDER'],
     [W('never2'), E('never2'), 'VALDIVIA, CHILE, 22 MAY 1960: MAGNITUDE 9.5, THE STRONGEST EVER RECORDED'],
-    [W('fault'), E('fault'), 'THE LONGEST RUPTURES EVER SEEN: ABOUT 1,500 KM · A TEN WOULD NEED FAR MORE'],
-    [W('gravity'), E('gravity'), 'PAST 1 G OF UPWARD SHAKING, LOOSE THINGS LEAVE THE GROUND'],
+    [W('fault'), E('fault'), 'BIGGER QUAKES NEED LONGER FAULTS · THE LONGEST EVER SEEN: ABOUT 1,500 KM · A TEN NEEDS FAR MORE'],
+    [W('gravity'), E('gravity'), 'REAL: A FEW SPOTS HAVE SHAKEN PAST 1 G (NORTHRIDGE 1994, IWATE 2008) · HERE THE WHOLE CITY DOES'],
     [W('month'), E('month'), 'ALL HUMAN ENERGY USE: ABOUT 620 EXAJOULES A YEAR'],
     [W('dam'), E('dam'), 'HOOVER DAM: 221 M TALL, 1936 · LAKE MEAD BEHIND IT'],
     [W('needle'), E('needle'), 'SPACE NEEDLE: 184 M, 1962'],
     [W('crack'), E('crack', 3.4), 'THE CRACK GROWS AT 5 KM/S, AS FAST AS THE FASTEST REAL RUPTURES'],
+    [E('crack', 3.6), eqTick(9) - 0.4, 'REAL FAULTS SLIDE SIDEWAYS, THEY DON’T GAPE OPEN · PAST MAGNITUDE 10, NOBODY KNOWS WHAT THEY’D DO'],
     [W('tokyo'), E('tokyo'), 'TOKYO IS 16 HOURS AHEAD OF SAN FRANCISCO · TOKYO SKYTREE: 634 M'],
     [W('dubai'), E('dubai'), 'BURJ KHALIFA: 828 M'],
     [W('istanbul'), E('istanbul'), 'THE BOSPHORUS BRIDGE, 1973: EUROPE ON ONE SIDE, ASIA ON THE OTHER'],
     [W('sun'), E('sun'), 'ALL THE SUNLIGHT REACHING EARTH: ABOUT 174,000 TERAWATTS'],
     [W('melt'), E('melt'), 'REAL: FAST FAULT SLIP CAN MELT ROCK (PSEUDOTACHYLYTE)'],
     [W('dino'), E('dino'), 'THE CHICXULUB ASTEROID, 66 MILLION YEARS AGO: ABOUT 4 × 10²³ JOULES'],
-    [W('seven'), E('seven'), 'TO BLOW EARTH APART: ABOUT 2.5 × 10³² JOULES (ITS GRAVITATIONAL BINDING ENERGY)'],
+    [W('seven'), E('seven'), 'TO BLOW EARTH APART: ABOUT 2.2 × 10³² JOULES (ITS GRAVITATIONAL BINDING ENERGY)'],
   ];
 })();
 
@@ -71,7 +74,7 @@ const EQ_DIA = (() => {
     s += tx(1330, 318, fit(title, 510, 40), 'b', title);
     s += bar(1350, y0 - H * a / m * k1, 200, H * a / m * k1, PALE, 1, 14) + bar(1600, y0 - H * b / m * k2, 200, H * b / m * k2, col2, 1, 14);
     s += op(k1, tx(1450, y0 - H * a / m - 20, 40, 'b', va, 'middle')) + op(k2, tx(1700, y0 - H * b / m - 20, 40, 'b', vb, 'middle'));
-    s += tx(1450, 806, 26, 's', la, 'middle') + op(k2, tx(1700, 806, 26, 's', lb, 'middle'));
+    s += tx(1450, 806, Math.min(26, fit(la, 240, 26)), 's', la, 'middle') + op(k2, tx(1700, 806, Math.min(26, fit(lb, 240, 26)), 's', lb, 'middle'));
     return s;
   };
   // squares: n of them in a grid, filling in over [a, b] seconds
@@ -129,7 +132,7 @@ const EQ_DIA = (() => {
       s += `<line x1="1170" y1="680" x2="1810" y2="680" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>` + op(K(u, 3.0, 3.2), trace(680, 640, 70, false, RED, K(u, 3.0, 7.5)));
       return s;
     },
-    moab: (u) => compare(u, 'THE BIGGEST BOMB IN A WAR', 'MOAB, 2017', '11 T', 11, 'MAGNITUDE 4', '15 T', 15) + op(K(u, 2.4, 3.0), tx(1575, 852, 24, 'w', 'TONS OF TNT · NOT NUCLEAR', 'middle')),
+    moab: (u) => compare(u, 'THE BIGGEST NON-NUCLEAR BOMB', 'MOAB, 2017', '11 T', 11, 'MAGNITUDE 4', '15 T', 15) + op(K(u, 2.4, 3.0), tx(1575, 852, 24, 'w', 'TONS OF TNT · NOT NUCLEAR', 'middle')),
     // the phone alert
     alert: (u, t) => phone(u, t, 1340, 150, eqClock(eqS(t)).replace(/ (AM|PM)/, ''), [[eqW('alert') - 0.1, 'EMERGENCY ALERT', 'EARTHQUAKE DETECTED!', '#a3221c'], [eqW('alert') + 0.5, 'DROP, COVER, HOLD ON', 'PROTECT YOURSELF', '#6a1a16']], 'SATURDAY'),
     // 500 tons of TNT: five hundred blocks, right under your feet
@@ -147,7 +150,7 @@ const EQ_DIA = (() => {
       const x0 = 330, x1 = 1590, t0 = eqW('start', 0), k = MathX.clamp((t - t0) / 7, 0, 1);
       s += tx(x0, 830, 36, 'b', 'START-UP: ABOUT 2 MINUTES');
       s += `<rect x="${x0}" y="880" width="${x1 - x0}" height="22" rx="11" fill="rgba(255,255,255,0.16)"/>` + bar(x0, 880, x1 - x0, 22, AMB, 0.06 + 0.1 * k, 11);
-      const ticks = [[0.0, 'NOW · MAGNITUDE 6'], [0.5, '7'], [1.0, '8 · LIFT-OFF']];
+      const ticks = [[0.0, 'NOW · MAGNITUDE 6'], [0.5, '7'], [1.0, '8 · FULL POWER']];
       ticks.forEach(([q, l], i) => { const kk = K(u, 0.5 + i * 0.7, 0.9 + i * 0.7), x = x0 + (x1 - x0) * q; s += op(kk, `<rect x="${x - 4}" y="866" width="8" height="50" rx="4" fill="${i ? RED : '#fff'}"/>${tx(x, 966, 32, 'b', l, i === 2 ? 'end' : i ? 'middle' : 'start')}`); });
       return s;
     },
@@ -208,6 +211,7 @@ const EQ_DIA = (() => {
       const x0 = 1160, sc = 560 / 10;
       L.forEach(([n, m, col], i) => { const k = K(u, 0.6 + i * 0.9, 1.3 + i * 0.9), y = 280 + i * 124; if (i === 4) { /* (the last row waits for Chile) */ }
         s += op(Math.min(1, k * 2), tx(x0, y + 30, 28, i === 4 ? 'b' : 's', n) + bar(x0, y + 46, m * sc, 44, col, k, 12) + tx(x0 + m * sc * k + 16, y + 80, 36, 'b', m.toFixed(1).replace('.0', i === 4 ? '' : '.0'))); });
+      s += op(K(u, 5.0, 5.6), tx(1160, 890, 30, 'b', 'IN ENERGY: 5.6× CHILE', 'start', `style="fill:${RED}"`));
       return s;
     },
     // a month of all human energy use (a calendar filling)
@@ -249,9 +253,9 @@ const EQ_DIA = (() => {
     // seven more minutes: enough to blow Earth apart (a ladder, ×32 every step, on a log scale)
     seven: (u) => {
       let s = plate(1120, 170, 750, 720);
-      s += tx(1160, 240, 36, 'b', 'EVERY MINUTE: 32× MORE');
+      s += tx(1160, 240, 36, 'b', 'EVERY BAR: 32× THE ONE BEFORE');
       const y0 = 840, sc = 52, lg = (M) => 1.5 * M + 4.8, base = lg(12);
-      const bind = Math.log10(2.5e32), yb = y0 - (bind - base + 1) * sc * 0.56 * 1.6;
+      const bind = Math.log10(2.2e32), yb = y0 - (bind - base + 1) * sc * 0.56 * 1.6;
       for (let M = 12; M <= 19; M++) { const k = K(u, 0.3 + (M - 12) * 0.35, 0.6 + (M - 12) * 0.35), h = (lg(M) - base + 1) * sc * 0.56 * 1.6;
         s += op(k, bar(1170 + (M - 12) * 84, y0 - h, 64, h, M === 19 ? RED : M === 12 ? YOU : PALE, 1, 10) + tx(1202 + (M - 12) * 84, y0 + 36, 28, 'b', String(M), 'middle')); }
       s += op(K(u, 3.0, 3.6), `<line x1="1150" y1="${f1(yb)}" x2="1850" y2="${f1(yb)}" stroke="${AMB}" stroke-width="5" stroke-dasharray="18 10"/>${tx(1160, yb - 16, 28, 's', 'ENOUGH TO BLOW THE PLANET APART')}`);
@@ -261,7 +265,7 @@ const EQ_DIA = (() => {
     question: (u) => {
       const k = K(u, 0.25, 0.9), a = K(u, 2.4, 2.9);
       return op(k, `<rect x="0" y="0" width="1920" height="1080" fill="rgba(0,0,0,${f2(0.35 * k)})"/>${tx(960, 580, 118, 'b', 'WHO WOULD YOU CALL?', 'middle')}`)
-        + op(a, tx(960, 960, 30, 'w', 'REAL EARTHQUAKES PEAK AND STOP · THE ONE MADE-UP RULE IS THAT THIS ONE DOESN’T', 'middle') + tx(960, 1004, 26, 's', 'EVERY NUMBER IN THIS FILM COMES FROM REAL PHYSICS', 'middle'));
+        + op(a, tx(960, 960, 30, 'w', 'REAL EARTHQUAKES PEAK AND STOP · THE ONE MADE-UP RULE IS THAT THIS ONE DOESN’T', 'middle') + tx(960, 1004, 26, 's', 'EVERY COMPARISON IN THIS FILM USES REAL DATA', 'middle'));
     },
   };
   return D;

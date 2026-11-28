@@ -22,7 +22,8 @@ const OPEN = 0.25;         // the cold open's "This is magnitude twelve." first 
 // story seconds (after TICK0) of each clip's first word. Minute k starts at 60 (k − 1); the clip naming it lands 0.3 s
 // after its tick. The gaps are where the picture and the sound carry the story.
 const AT = {
-  m1: 0.3, sat: 3.6, felt: 11.0, lightning: 18.0, but: 24.5, rule: 27.0, x32: 32.0, realtime: 42.5, cup: 50.0,
+  // (minute one, after the reviews: the rule comes straight after the first jolt, then the lightning)
+  m1: 0.3, sat: 3.6, felt: 10.6, but: 16.4, rule: 18.9, lightning: 24.0, x32: 30.0, realtime: 41.0, cup: 50.4,
   m2: 60.3, truck: 65.0, long: 71.0, faults: 79.0, moab: 88.0, birds: 96.5, tour: 101.0, pilot: 108.0,
   m3: 120.3, everyone: 124.5, alert: 127.5, tnt: 132.5, crowd: 139.0, drop: 144.0, never: 151.0, run: 155.5, ferry: 160.0,
   m4: 180.3, hiro: 184.5, smash: 189.5, streetcar: 197.5, in: 203.0, start: 206.0, mud: 215.0, sink: 225.0,
@@ -75,6 +76,7 @@ man.clips.forEach((c, k) => {
     first: abs[0].start, speechEnd: r3(t0 + speechEnd), lufs, gainDb: Math.round((VO_LUFS - lufs) * 10) / 10, text: c.text, words: abs });
 });
 for (const id of Object.keys(AT)) if (!clips.some((c) => c.id === id)) throw new Error('AT names a clip that does not exist: ' + id);
+clips.sort((a, b) => a.first - b.first);   // (the film's order, which AT may change from the script's)
 for (let i = 1; i < clips.length; i++) {
   const a = clips[i - 1], b = clips[i];
   if (b.first < a.speechEnd + 0.45) throw new Error(`clips overlap: ${a.id} ends ${a.speechEnd} → ${b.id} starts ${b.first}`);
