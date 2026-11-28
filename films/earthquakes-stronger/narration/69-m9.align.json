@@ -17,12 +17,12 @@
   {
    "text": "Magnitude",
    "start": 1.36,
-   "end": 2.02
+   "end": 1.98
   },
   {
    "text": "eleven.",
-   "start": 2.12,
-   "end": 2.68
+   "start": 2.06,
+   "end": 2.6
   }
  ],
  "characters": [
@@ -139,41 +139,41 @@
   {
    "text": " ",
    "start": 1.92,
-   "end": 2.08
+   "end": 2
   },
   {
    "text": "e",
+   "start": 2,
+   "end": 2.08
+  },
+  {
+   "text": "l",
    "start": 2.08,
    "end": 2.16
   },
   {
-   "text": "l",
+   "text": "e",
    "start": 2.16,
    "end": 2.24
   },
   {
-   "text": "e",
-   "start": 2.24,
-   "end": 2.32
-  },
-  {
    "text": "v",
-   "start": 2.32,
-   "end": 2.427
+   "start": 2.24,
+   "end": 2.347
   },
   {
    "text": "e",
-   "start": 2.427,
-   "end": 2.533
+   "start": 2.347,
+   "end": 2.453
   },
   {
    "text": "n",
-   "start": 2.533,
-   "end": 2.64
+   "start": 2.453,
+   "end": 2.56
   },
   {
    "text": ".",
-   "start": 2.64,
+   "start": 2.56,
    "end": 3.04
   }
  ],
@@ -195,7 +195,7 @@
   },
   {
    "text": "eleven.",
-   "start": 2.08,
+   "start": 2,
    "end": 3.04
   }
  ],
@@ -208,11 +208,11 @@
   {
    "text": "i",
    "start": 0.14,
-   "end": 0.18
+   "end": 0.16
   },
   {
    "text": "n",
-   "start": 0.18,
+   "start": 0.16,
    "end": 0.22
   },
   {
@@ -222,7 +222,7 @@
   },
   {
    "text": "t",
-   "start": 0.26,
+   "start": 0.24,
    "end": 0.28
   },
   {
@@ -248,11 +248,11 @@
   {
    "text": "n",
    "start": 0.62,
-   "end": 0.74
+   "end": 0.72
   },
   {
    "text": "e",
-   "start": 0.74,
+   "start": 0.72,
    "end": 0.88
   },
   {
@@ -268,87 +268,87 @@
   {
    "text": "M",
    "start": 1.36,
-   "end": 1.44
+   "end": 1.42
   },
   {
    "text": "a",
-   "start": 1.44,
+   "start": 1.42,
    "end": 1.46
   },
   {
    "text": "g",
-   "start": 1.48,
-   "end": 1.58
+   "start": 1.46,
+   "end": 1.56
   },
   {
    "text": "n",
-   "start": 1.58,
-   "end": 1.62
+   "start": 1.56,
+   "end": 1.6
   },
   {
    "text": "i",
-   "start": 1.62,
-   "end": 1.72
+   "start": 1.6,
+   "end": 1.7
   },
   {
    "text": "t",
    "start": 1.72,
-   "end": 1.76
+   "end": 1.74
   },
   {
    "text": "u",
-   "start": 1.82,
-   "end": 1.88
+   "start": 1.8,
+   "end": 1.86
   },
   {
    "text": "d",
-   "start": 1.88,
-   "end": 1.92
+   "start": 1.86,
+   "end": 1.88
   },
   {
    "text": "e",
-   "start": 1.96,
-   "end": 2.02
+   "start": 1.92,
+   "end": 1.98
   },
   {
    "text": " ",
-   "start": 2.02,
-   "end": 2.12
+   "start": 1.98,
+   "end": 2.06
   },
   {
    "text": "e",
-   "start": 2.12,
-   "end": 2.24
+   "start": 2.06,
+   "end": 2.18
   },
   {
    "text": "l",
-   "start": 2.24,
-   "end": 2.32
+   "start": 2.18,
+   "end": 2.26
   },
   {
    "text": "e",
-   "start": 2.32,
-   "end": 2.36
+   "start": 2.26,
+   "end": 2.3
   },
   {
    "text": "v",
-   "start": 2.4,
-   "end": 2.42
+   "start": 2.34,
+   "end": 2.36
   },
   {
    "text": "e",
-   "start": 2.44,
-   "end": 2.48
+   "start": 2.36,
+   "end": 2.42
   },
   {
    "text": "n",
-   "start": 2.48,
-   "end": 2.68
+   "start": 2.42,
+   "end": 2.6
   },
   {
    "text": ".",
-   "start": 2.68,
-   "end": 2.68
+   "start": 2.6,
+   "end": 2.6
   }
  ]
 }
