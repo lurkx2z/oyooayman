@@ -119,15 +119,15 @@ function eqWaterfront(scene, app) {
             vec2 fc = fract(vec2(u, v) / 7.0) - 0.5 - (vec2(r, r2) - 0.5) * 0.5;
             float boil = smoothstep(0.32, 0.0, length(fc)) * step(0.62, r) * smoothstep(0.0, 0.6, uWet - r2 * 0.4);
             float pud = smoothstep(0.5, 0.75, eqN1(u * 0.09 + 3.0) * eqN1(v * 0.13 + 1.0) * 2.2) * uWet;
-            c = mix(c, c * 0.55, fill * uWet * 0.6);
-            c = mix(c, vec3(0.42, 0.39, 0.33), boil * fill);
-            c = mix(c, vec3(0.2, 0.22, 0.22), pud * fill * 0.7);
+            c = mix(c, c * 0.42 * vec3(1.0, 0.93, 0.8), fill * uWet * 0.8);   // (wet: darker and browner)
+            c = mix(c, vec3(0.38, 0.34, 0.27), boil * fill);
+            c = mix(c, vec3(0.1, 0.11, 0.1), pud * fill * 0.8);
             eqWet = max(pud, uWet * 0.4) * fill;
             c = mix(c, vec3(0.66, 0.62, 0.56), uDust * 0.5);
             diffuseColor.rgb = pow(max(c, 0.0), vec3(2.2));                    // (the colours above are sRGB: to linear)
           }`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-          roughnessFactor = mix(roughnessFactor, 0.12, eqWet);`);
+          roughnessFactor = mix(roughnessFactor, 0.28, eqWet);`);
       sh.vertexShader = sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWP_y = (modelMatrix * vec4(transformed, 1.0)).y;').replace('varying vec2 vUV;', 'varying vec2 vUV; varying float vWP_y;');
       sh.fragmentShader = sh.fragmentShader.replace('varying vec2 vUV;', 'varying vec2 vUV; varying float vWP_y;');
     };
@@ -210,6 +210,9 @@ function eqWaterfront(scene, app) {
     const pav = new THREE.Group(); g.add(pav);
     eqMesh(new THREE.BoxGeometry(18.8, 4.6, 14), glassM, 350.4, Y + 0.35 + 2.3, -10, pav);   // (its front at u 359.8: the counter's recess in front)
     eqMesh(new THREE.BoxGeometry(21.2, 0.5, 15.2), frameM, 351, Y + 0.35 + 4.85, -10, pav);
+    // its roof from above: a grey membrane, two air-conditioning units, a vent
+    eqMesh(new THREE.BoxGeometry(20.4, 0.06, 14.4), eqStd('#5d6166', 0.92), 351, Y + 0.35 + 5.13, -10, pav);
+    for (const [u, v, w, d] of [[345, -6.5, 1.6, 1.1], [348.2, -6.5, 1.6, 1.1], [355, -13.5, 0.7, 0.7]]) eqMesh(new THREE.BoxGeometry(w, 0.8, d), eqStd('#9aa0a4', 0.6, 0.3), u, Y + 0.35 + 5.56, v, pav);
     for (const u of [341, 346, 351, 356, 361]) for (const v of [3, 17]) eqMesh(new THREE.BoxGeometry(0.22, 4.6, 0.22), frameM, u, Y + 0.35 + 2.3, -v, pav);
     // the counter's opening on the terrace side (u = 361): a serving window with shelves behind it
     eqMesh(new THREE.BoxGeometry(0.3, 3.2, 8.4), eqStd('#2a1e16', 0.8), 359.97, Y + 0.35 + 2.4, -10, pav);   // the dark inside, behind the shelves

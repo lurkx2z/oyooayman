@@ -51,6 +51,18 @@ const EQX = {
       for (let i = 0; i < n; i++) { const v = c1 * y1 + c2 * y2 + (i < W ? k * e[i] : 0); y[i0 + i] += v; y2 = y1; y1 = v; }
     }
   },
+  // a low-pass whose cutoff moves (cut(i): Hz at sample i, read every 32 samples); q as a Web Audio low-pass's Q (dB)
+  lpRun(x, sr, cut, qDb = 0) {
+    const Q = Math.pow(10, qDb / 20); let b0 = 0, b1 = 0, b2 = 0, a1 = 0, a2 = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+    for (let i = 0; i < x.length; i++) {
+      if ((i & 31) === 0) { const w = 2 * Math.PI * Math.min(sr * 0.45, Math.max(10, cut(i))) / sr, al = Math.sin(w) / (2 * Q), c = Math.cos(w), a0 = 1 + al;
+        b0 = (1 - c) / 2 / a0; b1 = (1 - c) / a0; b2 = b0; a1 = -2 * c / a0; a2 = (1 - al) / a0; }
+      const v = b0 * x[i] + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = v; x[i] = v;
+    }
+    return x;
+  },
+  // play an array at a rate (linear interpolation): what a buffer source's playbackRate does
+  resample(x, rate) { const n = Math.max(1, Math.floor((x.length - 1) / rate)), y = new Float32Array(n); for (let i = 0; i < n; i++) { const p = i * rate, k = Math.floor(p), f = p - k; y[i] = x[k] + ((x[k + 1] ?? x[k]) - x[k]) * f; } return y; },
   peak(x, xr) { let p = 0; for (let i = 0; i < x.length; i++) p = Math.max(p, Math.abs(x[i])); if (xr) for (let i = 0; i < xr.length; i++) p = Math.max(p, Math.abs(xr[i])); return p; },
   // add a mono array into a stereo pair at sample i0 with an equal-power pan
   mixIn(L, R, x, i0, gain, pan) {
@@ -70,23 +82,48 @@ class EqFx {
     return (t) => (Math.sin(6.283 * P[0][0] * t + P[0][1]) + 0.5 * Math.sin(6.283 * P[1][0] * t + P[1][1]) + 0.33 * Math.sin(6.283 * P[2][0] * t + P[2][1])) / 1.83;
   }
   // schedule an array (mono, or stereo with o.xr) at film time t. o: vol, pan, rate, offset, stop, fade, fadeIn
+  // The sound is not given its own audio nodes: it is summed (in JS, sample-exact) into 8-second stereo blocks kept per
+  // destination, and flush() plays each block as one buffer. Thousands of nodes alive for the whole film made the
+  // offline render take half an hour; this way a stem has a few dozen. (Same sound: gain, equal-power pan, fades.)
   play(x, t, dest, o = {}) {
-    const ctx = this.ctx, st = !!o.xr, b = ctx.createBuffer(st ? 2 : 1, x.length, this.sr);
-    b.getChannelData(0).set(x); if (st) b.getChannelData(1).set(o.xr);
-    const s = ctx.createBufferSource(), g = ctx.createGain(), t0 = Math.max(0, t);
+    const sr = this.sr, st = !!o.xr;
+    let xl = x, xr = st ? o.xr : null;
+    if (o.rate && o.rate !== 1) { xl = EQX.resample(xl, o.rate); if (xr) xr = EQX.resample(xr, o.rate); }
     let v = o.vol == null ? 1 : o.vol;
     if (o.norm) { const pk = o.norm === true ? EQX.peak(x, o.xr) : o.norm; if (pk > 1e-9) v /= pk; }   // vol = the sound's peak
-    s.buffer = b; if (o.rate) s.playbackRate.value = o.rate;
-    s.connect(g);
-    if (st) g.connect(dest); else { const p = ctx.createStereoPanner(); p.pan.value = o.pan || 0; g.connect(p); p.connect(dest); }
-    // (the gain's resting value too, not only from t0: a source that starts between samples renders one sample
-    // before t0, and at the default gain of 1 that sample is a click)
-    g.gain.value = o.fadeIn ? 0 : v;
-    g.gain.setValueAtTime(o.fadeIn ? 0 : v, t0);
-    if (o.fadeIn) g.gain.linearRampToValueAtTime(v, t0 + o.fadeIn);
-    s.start(t0, (o.offset || 0) + Math.max(0, -t));
-    if (o.stop != null) { const f = o.fade || 0.05; g.gain.setValueAtTime(v, Math.max(t0 + (o.fadeIn || 0) + 0.001, o.stop - f)); g.gain.linearRampToValueAtTime(0, o.stop); s.stop(o.stop + 0.02); }
-    return g;
+    const skip = Math.round(((o.offset || 0) + Math.max(0, -t)) * sr), i0 = Math.round(Math.max(0, t) * sr);
+    let n = xl.length - skip; if (n <= 0) return null;
+    const fi = o.fadeIn ? Math.max(1, Math.round(o.fadeIn * sr)) : 0;
+    let s0 = Infinity, s1 = Infinity;                                       // the stop's fade: from s0 to s1 (samples from i0)
+    if (o.stop != null) { const f = o.fade || 0.05; s1 = Math.round((o.stop - Math.max(0, t)) * sr); s0 = Math.max(fi + 1, s1 - Math.round(f * sr)); n = Math.min(n, Math.max(0, s1)); }
+    if (n <= 0) return null;
+    const a = (Math.max(-1, Math.min(1, o.pan || 0)) + 1) * Math.PI / 4, gl = st ? 1 : Math.cos(a), gr = st ? 1 : Math.sin(a);
+    const M = this._mix || (this._mix = new Map()); let D = M.get(dest); if (!D) M.set(dest, (D = new Map()));
+    const B = 8 * sr;
+    for (let i = 0; i < n;) {
+      const pos = i0 + i, bi = Math.floor(pos / B), off = pos - bi * B, m = Math.min(n - i, B - off);
+      let blk = D.get(bi); if (!blk) D.set(bi, (blk = [new Float32Array(B), new Float32Array(B)]));
+      const [L, R] = blk;
+      for (let k = 0; k < m; k++) {
+        const j = i + k; let g = v;
+        if (j < fi) g *= j / fi;
+        if (j > s0) g *= Math.max(0, (s1 - j) / (s1 - s0));
+        const sl = xl[skip + j] * g;
+        if (xr) { L[off + k] += sl * gl; R[off + k] += xr[skip + j] * g * gr; } else { L[off + k] += sl * gl; R[off + k] += sl * gr; }
+      }
+      i += m;
+    }
+    return null;
+  }
+  // play every summed block (call once, after the stem's sounds are scheduled)
+  flush() {
+    if (!this._mix) return;
+    const ctx = this.ctx, B = 8 * this.sr;
+    for (const [dest, D] of this._mix) for (const [bi, [L, R]] of D) {
+      const b = ctx.createBuffer(2, B, this.sr); b.getChannelData(0).set(L); b.getChannelData(1).set(R);
+      const s = ctx.createBufferSource(); s.buffer = b; s.connect(dest); s.start(bi * 8);
+    }
+    this._mix = null;
   }
   // a stereo impulse response: a decaying noise tail that darkens as it decays, plus optional early reflections
   ir(sec, o = {}) {

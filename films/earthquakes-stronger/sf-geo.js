@@ -222,7 +222,7 @@ function eqTerrain(scene) {
 // ---------------------------------------------------------------------------------------------------------------------
 function eqWater(scene) {
   const U = { uS: { value: 0 }, uFoam: { value: 0 } };
-  const m = new THREE.MeshStandardMaterial({ color: '#2f6a86', roughness: 0.22, metalness: 0.1, envMapIntensity: 0.9 });
+  const m = new THREE.MeshStandardMaterial({ color: '#235a74', roughness: 0.24, metalness: 0.1, envMapIntensity: 0.6 });
   m.userData.U = U;
   const N = EQ_WF.n.map((v) => v.toFixed(5)).join(', ');
   m.onBeforeCompile = (sh) => {
@@ -330,9 +330,13 @@ function eqCityMat() {
         broken = max(broken, step(0.05, vFall));
         diffuseColor.rgb = mix(diffuseColor.rgb, mix(glass, vec3(0.04, 0.038, 0.035), broken), win);
         diffuseColor.rgb *= mix(mix(1.0, 0.88, side * step(0.93, fract(fl))), 1.0, aa);
+        // the roofs: tar, gravel, terracotta, a few white (seen from the air, the city is its roofs)
+        float roofH = fract(vSeed * 57.3);
+        vec3 roof = roofH < 0.38 ? vec3(0.055, 0.055, 0.06) : roofH < 0.7 ? vec3(0.15, 0.145, 0.135) : roofH < 0.84 ? vec3(0.3, 0.11, 0.06) : vec3(0.42, 0.41, 0.38);
+        diffuseColor.rgb = mix(diffuseColor.rgb, roof * (0.85 + 0.3 * fract(vSeed * 91.7)), step(0.5, vWinN.y) * (vKind > 2.5 ? 0.6 : 0.88));
         // fallen: dust-grey rubble; and dust settles on everything
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.55, 0.52, 0.47) * (0.8 + 0.3 * eqH(floor(vWorldP.xz / 3.0))), smoothstep(0.35, 0.9, vFall));
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.66, 0.62, 0.56), uDust * 0.45);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.27, 0.24, 0.2) * (0.8 + 0.3 * eqH(floor(vWorldP.xz / 3.0))), smoothstep(0.35, 0.9, vFall));
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.4, 0.36, 0.3), uDust * 0.45);
         diffuseColor.rgb *= mix(1.0, 0.4, uNight);                             // (at night the walls are dark: the light is the windows)
         float eqWin = win * (1.0 - broken);`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>

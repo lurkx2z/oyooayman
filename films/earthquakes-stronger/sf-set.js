@@ -151,6 +151,8 @@ EQ_SETS.sf = (app) => {
     if (shR > 0) eqShadowFollow(sun, cp.shC || cp.at, shR, 2048, Math.max(600, shR * 5));
     sky.material.uniforms.k.value = cp.skyK || 1;
     scene.fog.density = cp.fog ?? (0.000055 + MathX.smooth(s, 250, 420) * 0.00005);
+    // the sky's light (the environment map) washes the city out from the air: less of it the higher the camera
+    scene.environmentIntensity = cp.envI ?? (cp.inside ? 0.7 : MathX.lerp(0.85, 0.42, MathX.smooth(cam.position.y, 15, 160)));
     set._mode = mode;
   };
   set.labels = (t, shot) => eqSfLabels(shot.mode, t - shot.t0, eqStoryOf(t, shot), set, X);
@@ -162,7 +164,7 @@ EQ_SETS.sf = (app) => {
     p.contrast -= dust * 0.08; p.warmth += dust * 0.08; p.saturation -= dust * 0.12;
     if (cp.inside) { p.vignette = 0.5; p.exposure = 1.0; }
     // from the air the city is pale (pastel houses, haze): more contrast and colour
-    if (!cp.inside && !cp.local && cp.p && cp.p[1] > 60) { p.contrast += 0.12; p.saturation += 0.1; p.exposure -= 0.04; }
+    if (!cp.inside && !cp.local && cp.p && cp.p[1] > 60) { p.contrast += 0.16; p.saturation += 0.12; p.exposure -= 0.07; }
     // the molten crack (minute ten): a red light from below
     if (s > 545) { p.warmth += 0.08; p.bloom = 0.5; p.bloomThreshold = 0.8; }
     if (cp.grade) cp.grade(p, s);
@@ -288,6 +290,12 @@ function eqCrowdSpec() {
     const u = 262 + k * 22 + eqR(k, 31) * 9;
     add({ look: look(), u, v: -53.5, yaw: [0, 1], y: st, from: crowdS - 0.5, script: [[-9, 'idle'], [crowdS - 0.4 + eqR(k, 33) * 1.5, 'run'], [cover + eqR(k, 35), 'duck'], [eqW('run') - EQ.tick0 + 1 + eqR(k, 37) * 2, 'run']],
       run: [eqR(k, 39) - 0.5, 1, 3.5 + eqR(k, 41) * 3, 4.0], until: 396 });
+  }
+  // more of them out of the red-brick building across from the café (the crowd shot looks straight at it)
+  for (let k = 0; k < 22; k++) {
+    const u = 352 + k * 2.1 + eqR(k, 51) * 1.4, v = -53.5 + eqR(k, 53) * 2.5;
+    add({ look: look(), u, v, yaw: [0, 1], y: st, from: crowdS - 0.5 + eqR(k, 55) * 1.2, script: [[-9, 'idle'], [crowdS - 0.4 + eqR(k, 57) * 1.8, 'run'], [cover + eqR(k, 59), 'duck'], [eqW('run') - EQ.tick0 + 1 + eqR(k, 61) * 2, 'run']],
+      run: [eqR(k, 63) - 0.5, 1, 3 + eqR(k, 65) * 4, 3.6 + eqR(k, 67) * 0.8], until: 396 });
   }
   // two people fishing on the pier (they watch the gulls go, then run back)
   [[60, 'eqF'], [96, 'eqB']].forEach(([v, lk], k) => add({ look: lk, u: 384.6, v, yaw: [1, 0], y: EQ_GROUND_Y + 0.4, script: [[-9, 'idle'], [eqW('birds') - EQ.tick0, 'lookUp', 0.6], [124.5, 'stagger'], [128 + k, 'run']], run: [-0.06, -1, 18 + k * 6, 4.5], until: 300 }));

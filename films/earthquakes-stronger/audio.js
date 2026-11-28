@@ -177,7 +177,7 @@ class EqAudio extends AudioEngine {
       }
       duck.gain.setValueCurveAtTime(c, 0, END);
       if (id === 'voice') this._voice(ctx, bus);
-      else for (const b of EQ_SOUND[id]) b.fn.call(this, ctx, bus, this._kit(ctx, id, bus), END);
+      else for (const b of EQ_SOUND[id]) { const K = this._kit(ctx, id, bus); b.fn.call(this, ctx, bus, K, END); K.fx.flush(); }
     }
   }
   _kit(ctx, stem, bus) {
@@ -190,13 +190,16 @@ class EqAudio extends AudioEngine {
         const cv = fx.ir(sec, o), w = ctx.createGain(), inp = ctx.createGain(); w.gain.value = o.wet ?? 0.4;
         inp.connect(cv); cv.connect(w); w.connect(bus); return (verbs[name] = inp);
       },
+      // (straight into the stem's bus and the room's input: fx.play sums them in JS, see EqFx.play)
       put(x, t, o = {}) {
-        const node = ctx.createGain(); node.connect(bus);
-        if (o.room) { const sg = ctx.createGain(); sg.gain.value = o.wet ?? 1; node.connect(sg); sg.connect(o.room); }
-        if (o.lp || o.hp) { const f = ctx.createBiquadFilter(); f.type = o.lp ? 'lowpass' : 'highpass'; f.frequency.value = o.lp || o.hp; f.Q.value = 0.7; f.connect(node); return fx.play(x, t, f, o); }
-        return fx.play(x, t, node, o);
+        if (o.lp || o.hp) { x = Float32Array.from(x); EQX.bq(x, o.lp ? 'lp' : 'hp', o.lp || o.hp, 0.7, fx.sr); }
+        if (o.room) fx.play(x, t, o.room, Object.assign({}, o, { vol: (o.vol == null ? 1 : o.vol) * (o.wet ?? 1) }));
+        return fx.play(x, t, bus, o);
       },
-      putLR(L, R, t, o = {}) { const node = ctx.createGain(); node.connect(bus); if (o.room) { const sg = ctx.createGain(); sg.gain.value = o.wet ?? 1; node.connect(sg); sg.connect(o.room); } return fx.play(L, t, node, Object.assign({ xr: R }, o)); },
+      putLR(L, R, t, o = {}) {
+        if (o.room) fx.play(L, t, o.room, Object.assign({}, o, { xr: R, vol: (o.vol == null ? 1 : o.vol) * (o.wet ?? 1) }));
+        return fx.play(L, t, bus, Object.assign({}, o, { xr: R }));
+      },
     };
   }
   _voice(ctx, dest) {

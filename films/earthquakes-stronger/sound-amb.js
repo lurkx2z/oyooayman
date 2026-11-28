@@ -17,10 +17,10 @@ eqSound('amb', 'places', function (ctx, bus, K) {
   const lift = EQ_HT.lift + EQ.tick0, alarms = EQ_WFT.alarms + EQ.tick0;
   // ---- the street: traffic a block away, tyres, the bay lapping, gulls, a ferry horn; it thins as the city fails
   { const [a, b] = span('street'), calm = (t) => 1 - 0.6 * eqEv(t, alarms - 1, alarms + 4);
-    putLR(eqBed(fx, a, b, 'brown', 35, 420, (t) => 0.8 * P.street(t) * calm(t), { wobble: 0.15, depth: 0.25 }), a, { vol: 0.5 });
-    putLR(eqBed(fx, a, b, 'pink', 500, 3500, (t) => 0.1 * P.street(t) * calm(t), { wobble: 0.4, depth: 0.5 }), a, { vol: 0.5 });
+    putLR(eqBed(fx, a, b, 'brown', 35, 420, (t) => 0.64 * P.street(t) * calm(t), { wobble: 0.15, depth: 0.25 }), a, { vol: 0.5 });
+    putLR(eqBed(fx, a, b, 'pink', 500, 3500, (t) => 0.08 * P.street(t) * calm(t), { wobble: 0.4, depth: 0.5 }), a, { vol: 0.5 });
     // the bay lapping at the pilings under the café (slow swells of filtered noise)
-    putLR(eqBed(fx, a, b, 'pink', 180, 1400, (t) => 0.16 * P.street(t) * (0.6 + 0.4 * Math.sin(t * 1.3) * Math.sin(t * 0.47)), { wobble: 0.9, depth: 0.6 }), a, { vol: 0.5 });
+    putLR(eqBed(fx, a, b, 'pink', 180, 1400, (t) => 0.13 * P.street(t) * (0.6 + 0.4 * Math.sin(t * 1.3) * Math.sin(t * 0.47)), { wobble: 0.9, depth: 0.6 }), a, { vol: 0.5 });
     // cars passing (a soft whoosh now and then), until the street stops
     for (let t = a + 1.2; t < Math.min(b, EQ_WFT.alarms + EQ.tick0); t += r.range(3.5, 7.5)) putLR(eqWhoosh(fx, r.range(1.8, 2.8), 150, 700, 200, { peak: 0.5, p0: r.chance(0.5) ? -0.7 : 0.7, p1: r.chance(0.5) ? 0.7 : -0.7, q: 0.8 }), t, { vol: 0.08 * P.street(t + 1) });
     // gulls: a falling cry, two or three times (until the birds leave)
@@ -34,18 +34,18 @@ eqSound('amb', 'places', function (ctx, bus, K) {
   }
   // ---- the cabin: a muffled roar (headsets on)
   { const sp = span('cabin'); if (sp) { const [a, b] = sp;
-    putLR(eqBed(fx, a, b, 'brown', 30, 300, (t) => 0.55 * P.cabin(t) * (t < lift ? 0.4 + 0.6 * eqEv(t, eqTick(4), lift) : 1), { wobble: 0.3, depth: 0.2 }), a, { vol: 0.5 });
-    putLR(eqBed(fx, a, b, 'pink', 300, 1600, (t) => 0.08 * P.cabin(t) * (t < lift ? 0.3 : 1), { wobble: 0.6, depth: 0.3 }), a, { vol: 0.5 }); } }
+    putLR(eqBed(fx, a, b, 'brown', 30, 300, (t) => 2.5 * 0.55 * P.cabin(t) * (t < lift ? 0.4 + 0.6 * eqEv(t, eqTick(4), lift) : 1), { wobble: 0.3, depth: 0.2 }), a, { vol: 0.5 });
+    putLR(eqBed(fx, a, b, 'pink', 300, 1600, (t) => 2.5 * 0.08 * P.cabin(t) * (t < lift ? 0.3 : 1), { wobble: 0.6, depth: 0.3 }), a, { vol: 0.5 }); } }
   // ---- the air: wind over the bay
-  { const sp = span('air'); if (sp) { const [a, b] = sp; putLR(eqBed(fx, a, b, 'pink', 120, 2200, (t) => 0.32 * P.air(t), { wobble: 1.1, depth: 0.45 }), a, { vol: 0.5 }); } }
+  { const sp = span('air'); if (sp) { const [a, b] = sp; putLR(eqBed(fx, a, b, 'pink', 120, 2200, (t) => 2.5 * 0.32 * P.air(t), { wobble: 1.1, depth: 0.45 }), a, { vol: 0.5 }); } }
   // ---- the other cities: a far wind by day (Los Angeles to Seattle), a low hum by night (Tokyo to Istanbul)
   { const sp = span('world'); if (sp) { const [a, b] = sp, night = eqCurve((t) => eqEv(t, eqShotOf('tokyo').t0 - 0.05, eqShotOf('tokyo').t0 + 0.05) * (1 - eqEv(t, eqShotOf('dozens').t0 - 0.05, eqShotOf('dozens').t0 + 0.05)));
-    putLR(eqBed(fx, a, b, 'pink', 150, 2000, (t) => 0.22 * P.world(t) * (1 - night(t)), { wobble: 0.9, depth: 0.45 }), a, { vol: 0.5 });
-    putLR(eqBed(fx, a, b, 'brown', 40, 500, (t) => 0.5 * P.world(t) * (0.4 + 0.6 * night(t)), { wobble: 0.2, depth: 0.3 }), a, { vol: 0.5 }); } }
+    putLR(eqBed(fx, a, b, 'pink', 150, 2000, (t) => 2.5 * 0.22 * P.world(t) * (1 - night(t)), { wobble: 0.9, depth: 0.45 }), a, { vol: 0.5 });
+    putLR(eqBed(fx, a, b, 'brown', 40, 500, (t) => 2.5 * 0.5 * P.world(t) * (0.4 + 0.6 * night(t)), { wobble: 0.2, depth: 0.3 }), a, { vol: 0.5 }); } }
   // ---- space: a very low hum and a breath of air high up
   { const sp = span('space'); if (sp) { const [a, b] = sp;
     const n = Math.ceil((b - a) * sr), L = new Float32Array(n), R = new Float32Array(n); let p1 = 0, p2 = 0;
-    for (let i = 0; i < n; i++) { const t = a + i / sr, lv = P.space(t) * 0.1; p1 += 2 * Math.PI * 55 / sr; p2 += 2 * Math.PI * 82.6 / sr; L[i] = (Math.sin(p1) + 0.4 * Math.sin(p2)) * lv; R[i] = (Math.sin(p1 + 0.4) + 0.4 * Math.sin(p2 + 0.9)) * lv; }
+    for (let i = 0; i < n; i++) { const t = a + i / sr, lv = P.space(t) * 0.15; p1 += 2 * Math.PI * 55 / sr; p2 += 2 * Math.PI * 82.6 / sr; L[i] = (Math.sin(p1) + 0.4 * Math.sin(p2)) * lv; R[i] = (Math.sin(p1 + 0.4) + 0.4 * Math.sin(p2 + 0.9)) * lv; }
     putLR([L, R], a, { vol: 0.5 });
-    putLR(eqBed(fx, a, b, 'pink', 1500, 7000, (t) => 0.04 * P.space(t), { wobble: 0.3, depth: 0.5 }), a, { vol: 0.5 }); } }
+    putLR(eqBed(fx, a, b, 'pink', 1500, 7000, (t) => 1.5 * 0.04 * P.space(t), { wobble: 0.3, depth: 0.5 }), a, { vol: 0.5 }); } }
 });

@@ -109,7 +109,7 @@ const eqMidiN = (n) => eqMidi(n);
 //   air      San Francisco from the air after lift-off (outside the helicopter)
 //   world    the other cities
 //   space    the globe
-const EQ_CABIN = { openFace: 1, in: 1, start: 1, cockpitWait: 1, pierBreak: 1, sky: 1, phoneLap: 1, calm: 1, air: 1, fuel: 1, below: 1, last: 1, question: 1 };
+const EQ_CABIN = { openFace: 1, in: 1, start: 1, cockpitWait: 1, sky: 1, phoneLap: 1, calm: 1, air: 1, fuel: 1, below: 1, last: 1, question: 1 };
 function eqWhere(sh) {
   if (sh.set === 'globe') return 'space';
   if (sh.set === 'world') return 'world';

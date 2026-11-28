@@ -58,7 +58,7 @@ const EQ_P = {
   run: (u, i) => { const ph = u * 9 + i * 2, s = Math.sin(ph), co = Math.cos(ph), p = basePose();
     p.lHip = [0.6 * s, 0.03]; p.rHip = [-0.6 * s, 0.03]; p.lKnee = 0.25 + Math.max(0, co) ** 1.3; p.rKnee = 0.25 + Math.max(0, -co) ** 1.3;
     p.lSh = [-0.6 * s, 0.1]; p.rSh = [0.6 * s, 0.1]; p.lEl = 1.3; p.rEl = 1.3; p.spine = 0.18; p.hipY = 0.9 + 0.03 * Math.abs(co); p.spineRoll = 0.08 * noise1(u * 3, i); return p; },
-  sit: (u, i) => { const p = basePose(); p.hipY = 0.5; p.lHip = [1.45, 0.08]; p.rHip = [1.45, 0.08]; p.lKnee = 1.5; p.rKnee = 1.5; p.lFoot = 0.05; p.rFoot = 0.05; p.spine = 0.05; p.lSh = [0.4, 0.12]; p.rSh = [0.4, 0.12]; p.lEl = 1.0; p.rEl = 1.0; p.headYaw = 0.2 * noise1(u * 0.3, i); return p; },
+  sit: (u, i) => { const p = basePose(); p.hipY = 0.5; p.lHip = [1.45, 0.08]; p.rHip = [1.45, 0.08]; p.lKnee = 1.5; p.rKnee = 1.5; p.lFoot = 0.05; p.rFoot = 0.05; p.spine = 0.05; p.lSh = [0.42, 0.2]; p.rSh = [0.42, 0.2]; p.lEl = 0.5; p.rEl = 0.5; p.headYaw = 0.2 * noise1(u * 0.3, i); return p; },   // (hands on the thighs)
   sitTalk: (u, i) => { const p = EQ_P.sit(u, i); p.rSh = [0.7 + 0.15 * Math.sin(u * 2.1 + i), 0.15]; p.rEl = 1.3 + 0.3 * Math.sin(u * 2.9); p.headYaw = 0.35 * Math.sin(u * 0.6 + i); return p; },
   sitPhone: (u, i) => { const p = EQ_P.sit(u, i); p.rSh = [0.85, 0.15]; p.rEl = 1.6; p.neck = 0.45; p.headYaw = 0; return p; },
   sitStare: (u, i, a) => { const p = EQ_P.sit(u, i); p.headYaw = a || 0; p.spineYaw = (a || 0) * 0.3; p.neck = -0.12; return p; },

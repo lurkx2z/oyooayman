@@ -44,6 +44,10 @@ function eqHeli(scene) {
   // (the loft's u runs round the ring: 0.5 is the left side, 0 / 1 the right; the stripe sits just under the middle)
   const paintT = eqTex(eqCanvas(512, 256, (c) => { c.fillStyle = '#f5f4f0'; c.fillRect(0, 0, 512, 256); for (const x0 of [0.525, 0.905]) { c.fillStyle = '#16807c'; c.fillRect(x0 * 512, 0, 0.07 * 512, 256); c.fillStyle = '#ef7a2a'; c.fillRect((x0 + (x0 < 0.7 ? 0.075 : -0.02)) * 512, 0, 0.012 * 512, 256); } }), { repeat: false });
   const paint = new THREE.MeshPhysicalMaterial({ map: paintT, roughness: 0.28, metalness: 0.1, clearcoat: 0.8, clearcoatRoughness: 0.1, side: THREE.DoubleSide });
+  // (inside, the shell is grey fabric, not white paint)
+  paint.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', `#include <map_fragment>
+    if (!gl_FrontFacing) diffuseColor.rgb = vec3(0.05, 0.053, 0.06);`).replace('#include <clearcoat_normal_fragment_begin>', `#include <clearcoat_normal_fragment_begin>`); };
+  paint.customProgramCacheKey = () => 'eqHeliPaint';
   const dark = eqStd('#1e2124', 0.6, 0.3), metal = eqStd('#8c9196', 0.35, 0.8), seatM = eqStd('#2a2d33', 0.8), inner = eqStd('#3a3d42', 0.85);
   // the cabin (rings along z: [x, y, z, rx, ry]); the nose is glass above its chin
   const ring = (z, y, rx, ry) => [0, y, z, rx, ry];
@@ -98,7 +102,7 @@ function eqHeli(scene) {
   eqMesh(new THREE.BoxGeometry(1.7, 0.06, 3.0), inner, 0, 0.95, 0.4, g);
   const seat = (x, z, w = 0.5) => { eqMesh(new THREE.BoxGeometry(w, 0.12, 0.5), seatM, x, 1.32, z, g); const b = eqMesh(new THREE.BoxGeometry(w, 0.72, 0.1), seatM, x, 1.72, z - 0.27, g); b.rotation.x = -0.12; };
   seat(-0.45, 0.85); seat(0.45, 0.85); seat(0, -0.45, 1.5);
-  const panel = new THREE.Group(); panel.position.set(0, 1.45, 1.72); panel.rotation.x = -0.55; g.add(panel);
+  const panel = new THREE.Group(); panel.position.set(0, 1.45, 1.72); panel.rotation.set(0.55, Math.PI, 0); g.add(panel);   // (its screens face the seats)
   eqMesh(new THREE.BoxGeometry(1.35, 0.36, 0.08), dark, 0, 0, 0, panel);
   const fuelTex = eqCanvasTex(256, 160, (c, w, h, st) => {
     c.fillStyle = '#05080a'; c.fillRect(0, 0, w, h); c.fillStyle = '#7ff0b0'; c.font = '700 26px Montserrat, Arial, sans-serif'; c.fillText('FUEL', 16, 36);
@@ -107,8 +111,8 @@ function eqHeli(scene) {
   });
   const mapTex = eqTex(eqCanvas(256, 160, (c) => { c.fillStyle = '#0a1a2a'; c.fillRect(0, 0, 256, 160); c.fillStyle = '#2a4a3a'; c.beginPath(); c.moveTo(0, 160); c.lineTo(0, 70); c.lineTo(90, 60); c.lineTo(120, 100); c.lineTo(150, 160); c.fill(); c.strokeStyle = '#ffd36a'; c.lineWidth = 3; c.beginPath(); c.moveTo(128, 80); c.lineTo(200, 20); c.stroke(); c.fillStyle = '#ff6a1f'; c.beginPath(); c.arc(128, 80, 6, 0, 6.29); c.fill(); }), { repeat: false });
   fuelTex.update({ t: '2:00 H', k: 0.62 });
-  const scrF = eqMesh(new THREE.PlaneGeometry(0.42, 0.26), new THREE.MeshBasicMaterial({ map: fuelTex.tex, toneMapped: false }), -0.3, 0, 0.045, panel); scrF.castShadow = false;
-  const scrM = eqMesh(new THREE.PlaneGeometry(0.42, 0.26), new THREE.MeshBasicMaterial({ map: mapTex, toneMapped: false }), 0.3, 0, 0.045, panel); scrM.castShadow = false;
+  const scrF = eqMesh(new THREE.PlaneGeometry(0.42, 0.26), new THREE.MeshBasicMaterial({ map: fuelTex.tex, toneMapped: false }), 0.3, 0, 0.045, panel); scrF.castShadow = false;
+  const scrM = eqMesh(new THREE.PlaneGeometry(0.42, 0.26), new THREE.MeshBasicMaterial({ map: mapTex, toneMapped: false }), -0.3, 0, 0.045, panel); scrM.castShadow = false;
   H.fuel = fuelTex; H.fuelScreen = scrF;
   for (const x of [-0.45, 0.45]) { const st = eqMesh(new THREE.CylinderGeometry(0.018, 0.022, 0.6, 6), dark, x, 1.25, 1.22, g); st.rotation.x = -0.25; }
   // the headsets (one for you, one for the pilot): a band, two cups, a mic

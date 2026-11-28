@@ -11,7 +11,7 @@ window.EQ_MIX = {
   stems: {
     voice: { gain: -2.0, duck: 0, hp: 80 },
     music: { gain: 9.0, duck: -7.0, hp: 30 },
-    amb: { gain: -12.0, duck: -4.0, hp: 30 },
+    amb: { gain: -9.0, duck: -4.0, hp: 30 },
     sfx: { gain: -6.0, duck: -3.0, hp: 24 },
   },
   attack: 0.25, lead: 0.12, hold: 0.15, release: 0.9, merge: 1.1,

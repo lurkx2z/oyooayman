@@ -23,7 +23,7 @@
 
 function eqMusicKit(ctx, K, dest) {
   if (K._music) return K._music;
-  const fx = K.fx, r = new RNG(CONFIG.seed + 303), bus = ctx.createGain(), dry = ctx.createGain(); bus.connect(dest); dry.connect(dest);
+  const fx = K.fx, r = new RNG(CONFIG.seed + 303), bus = ctx.createGain(), dry = ctx.createGain(); bus.connect(dest); dry.connect(dest); bus._eqFx = fx; dry._eqFx = fx;
   const hall = fx.ir(4.8, { bright: 0.5, damp: 2.5, shape: 2.0, pre: 0.025, seed: 71 }), wet = ctx.createGain(); wet.gain.value = 0.5;
   bus.connect(hall); hall.connect(wet); wet.connect(dest);
   const drumModes = (f) => [[f, 0.7, 1], [f * 1.51, 0.45, 0.5], [f * 1.99, 0.3, 0.35], [f * 2.44, 0.2, 0.2], [f * 3.1, 0.12, 0.12]];
@@ -73,31 +73,29 @@ function eqMusicKit(ctx, K, dest) {
     // a held chord: o.att/rel (s), o.cut → o.cutTo by o.cutAt (Hz), o.keys [[t, level]], o.wave, o.vib (cents), o.pan,
     // o.bend [t, cents, s] (every note glides by `cents` from t over s)
     strings(t0, t1, notes, vol, o = {}) {
+      // (synthesised here, not with oscillator nodes: see EqFx.play. Three lanes (left, centre, right), each a low-pass;
+      // every note three detuned voices with a slow vibrato, one voice per lane)
       t0 = Math.max(0, t0); if (t1 - t0 < 0.1) return;
-      const att = Math.min(o.att || 1.0, (t1 - t0) * 0.45), rel = Math.min(o.rel || 1.2, (t1 - t0) * 0.45), g = ctx.createGain();
-      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol * 0.11 * (o.keys ? o.keys[0][1] : 1), t0 + att);
-      for (const [t, v] of (o.keys || [])) if (t > t0 + att && t < t1 - rel) g.gain.linearRampToValueAtTime(vol * 0.11 * v, t);
+      const sr = fx.sr, att = Math.min(o.att || 1.0, (t1 - t0) * 0.45), rel = Math.min(o.rel || 1.2, (t1 - t0) * 0.45);
+      const T1 = t1 + 0.05, n = Math.ceil((T1 - t0) * sr), keys = [[t0, 0], [t0 + att, vol * 0.11 * (o.keys ? o.keys[0][1] : 1)]];
+      for (const [t, v] of (o.keys || [])) if (t > t0 + att && t < t1 - rel) keys.push([t, vol * 0.11 * v]);
       const vEnd = o.keys ? o.keys[o.keys.length - 1][1] : 1;
-      g.gain.linearRampToValueAtTime(vol * 0.11 * vEnd, Math.max(t0 + att + 0.01, t1 - rel)); g.gain.linearRampToValueAtTime(0, t1);
-      g.connect(bus);
-      const lanes = [-0.55, 0, 0.55].map((p) => {
-        const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.6; lp.frequency.setValueAtTime(o.cut || 1700, t0);
-        if (o.cutTo) lp.frequency.linearRampToValueAtTime(o.cutTo, o.cutAt || (t1 - rel * 0.5));
-        const pn = ctx.createStereoPanner(); pn.pan.value = Math.max(-1, Math.min(1, p + (o.pan || 0))); lp.connect(pn); pn.connect(g); return lp;
-      });
-      for (const nn of notes) {
-        const f = eqHz(nn);
-        [-7, 1, 6].forEach((d, k) => {
-          const osc = ctx.createOscillator(), og = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
-          osc.type = o.wave || 'sawtooth'; osc.frequency.setValueAtTime(f, t0);
-          if (o.bend) { osc.frequency.setValueAtTime(f, Math.max(t0, o.bend[0])); osc.frequency.exponentialRampToValueAtTime(f * Math.pow(2, o.bend[1] / 1200), Math.max(t0, o.bend[0]) + o.bend[2]); }
-          osc.detune.setValueAtTime(d + r.range(-2, 2), t0);
-          lfo.frequency.value = r.range(4.4, 5.4); lg.gain.setValueAtTime(0, t0); lg.gain.linearRampToValueAtTime(o.vib == null ? 7 : o.vib, t0 + Math.min(1.5, (t1 - t0) * 0.6));
-          lfo.connect(lg); lg.connect(osc.detune);
-          og.gain.value = 1 / Math.sqrt(notes.length); osc.connect(og); og.connect(lanes[k]);
-          osc.start(t0); osc.stop(t1 + 0.05); lfo.start(t0); lfo.stop(t1 + 0.05);
-        });
+      keys.push([Math.max(t0 + att + 0.01, t1 - rel), vol * 0.11 * vEnd], [t1, 0]);
+      const env = eqKeysFn(keys), cutAt = o.cutAt || (t1 - rel * 0.5), cut = (t) => (o.cutTo && t > t0 ? (o.cut || 1700) + ((o.cutTo) - (o.cut || 1700)) * Math.min(1, (t - t0) / Math.max(1e-3, cutAt - t0)) : (o.cut || 1700));
+      const L = new Float32Array(n), R = new Float32Array(n), lane = new Float32Array(n), gn = 1 / Math.sqrt(notes.length), vibT = Math.min(1.5, (t1 - t0) * 0.6), vib = o.vib == null ? 7 : o.vib;
+      const lanes = [-0.55, 0, 0.55];
+      const voices = notes.map((nn) => [-7, 1, 6].map((d) => ({ f: eqHz(nn), det: d + r.range(-2, 2), lf: r.range(4.4, 5.4) })));
+      for (let k = 0; k < 3; k++) {
+        lane.fill(0);
+        for (const vs of voices) { const v = vs[k], bend = o.bend;
+          eqOscInto(lane, sr, o.wave || 'sawtooth', gn, (i) => { const t = t0 + i / sr; let f = v.f; if (bend && t > Math.max(t0, bend[0])) f *= Math.pow(2, (bend[1] / 1200) * Math.min(1, (t - Math.max(t0, bend[0])) / bend[2]));
+            const vd = vib * Math.min(1, (t - t0) / vibT) * Math.sin(6.2832 * v.lf * (t - t0)); return f * Math.pow(2, (v.det + vd) / 1200); }); }
+        EQX.lpRun(lane, sr, (i) => cut(t0 + i / sr), 0.6);
+        const a = (Math.max(-1, Math.min(1, lanes[k] + (o.pan || 0))) + 1) * Math.PI / 4, gl = Math.cos(a), gr = Math.sin(a);
+        for (let i = 0; i < n; i++) { const x = lane[i]; L[i] += x * gl; R[i] += x * gr; }
       }
+      for (let i = 0; i < n; i++) { const e = env(t0 + i / sr); L[i] *= e; R[i] *= e; }
+      fx.play(L, t0, bus, { xr: R });
     },
     // a chord progression: [[t0, notes], …] each held to the next; the last one ends at t1
     prog(steps, t1, vol, o = {}) {
@@ -112,15 +110,42 @@ function eqMusicKit(ctx, K, dest) {
 // a synth pulse: each step a short chord through a low-pass (cut → cutTo over the span); o.acc accents every n steps,
 // o.ramp(u) the level over the span
 function eqPulse(ctx, dest, t0, t1, notes, step, vol, o = {}) {
+  // (synthesised here: see EqFx.play; dest carries its EqFx as _eqFx)
   if (t1 - t0 < step) return;
-  const g = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = o.q || 4;
-  lp.frequency.setValueAtTime(o.cut || 600, t0); lp.frequency.linearRampToValueAtTime(o.cutTo || o.cut || 600, t1);
-  lp.connect(g); g.connect(dest); g.gain.value = 0;
-  notes.forEach((n, k) => { const os = ctx.createOscillator(); os.type = o.wave || 'sawtooth'; os.frequency.value = eqHz(n); os.detune.setValueAtTime(k % 2 ? 6 : -6, t0); os.connect(lp); os.start(t0); os.stop(t1 + 0.1); });
-  for (let t = t0, i = 0; t < t1 - 0.01; t += step, i++) {
-    const acc = o.acc && i % o.acc === 0 ? 1.0 : 0.62, ramp = o.ramp ? o.ramp((t - t0) / (t1 - t0)) : 1, v = vol * 0.05 * acc * ramp;
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + 0.006); g.gain.setTargetAtTime(0, t + 0.012, step * (o.decay || 0.28));
+  const fx = dest._eqFx, sr = fx.sr; t0 = Math.max(0, t0);
+  const n = Math.ceil((t1 + 0.1 - t0) * sr), y = new Float32Array(n);
+  notes.forEach((nn, k) => { const f = eqHz(nn) * Math.pow(2, (k % 2 ? 6 : -6) / 1200); eqOscInto(y, sr, o.wave || 'sawtooth', 1, () => f); });
+  const c0 = o.cut || 600, c1 = o.cutTo || o.cut || 600;
+  EQX.lpRun(y, sr, (i) => c0 + (c1 - c0) * Math.min(1, i / ((t1 - t0) * sr)), o.q || 4);
+  // each step: up in 6 ms, held to 12 ms, then an exponential fall (time constant step × decay) until the next step
+  const tau = step * (o.decay || 0.28);
+  for (let i = 0; i < n; i++) {
+    const t = i / sr, k = Math.floor(t / step), u = t - k * step, ts = t0 + k * step;
+    if (ts >= t1 - 0.01) { y[i] = 0; continue; }
+    const acc = o.acc && k % o.acc === 0 ? 1.0 : 0.62, ramp = o.ramp ? o.ramp((ts - t0) / (t1 - t0)) : 1, v = vol * 0.05 * acc * ramp;
+    y[i] *= u < 0.006 ? v * u / 0.006 : u < 0.012 ? v : v * Math.exp(-(u - 0.012) / tau);
   }
+  fx.play(y, t0, dest, {});
+}
+// a band-limited oscillator (PolyBLEP saw / square, a triangle, a sine) added into y; f(i) its frequency at sample i
+// (read every 32 samples)
+function eqOscInto(y, sr, wave, amp, f) {
+  let ph = 0, dt = f(0) / sr;
+  const blep = (t, d) => (t < d ? (t /= d, t + t - t * t - 1) : t > 1 - d ? (t = (t - 1) / d, t * t + t + t + 1) : 0);
+  for (let i = 0; i < y.length; i++) {
+    if ((i & 31) === 0) dt = Math.min(0.45, f(i) / sr);
+    let v;
+    if (wave === 'sine') v = Math.sin(6.283185307 * ph);
+    else if (wave === 'triangle') v = 1 - 4 * Math.abs(ph - 0.5);
+    else if (wave === 'square') { v = ph < 0.5 ? 1 : -1; v += blep(ph, dt); let q = ph + 0.5; q -= Math.floor(q); v -= blep(q, dt); }
+    else v = 2 * ph - 1 - blep(ph, dt);
+    y[i] += v * amp;
+    ph += dt; if (ph >= 1) ph -= 1;
+  }
+}
+// a value through time from keys [[t, v], …] (linear between them, held outside)
+function eqKeysFn(keys) {
+  return (t) => { if (t <= keys[0][0]) return keys[0][1]; for (let i = 1; i < keys.length; i++) if (t <= keys[i][0]) { const [a, va] = keys[i - 1], [b, vb] = keys[i]; return b > a ? va + (vb - va) * (t - a) / (b - a) : vb; } return keys[keys.length - 1][1]; };
 }
 // the endless rise (a Shepard–Risset glissando): octave-spaced sines climbing for ever under a fixed loudness window
 function eqShepard(fx, t0, t1, o = {}) {
@@ -146,7 +171,7 @@ window.EQ_THEME = { key: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(EQ_KEY), iv: EQ_IV,
 
 eqSound('music', 'score', function (ctx, bus, K) {
   const M = eqMusicKit(ctx, K, bus), fx = K.fx, END = EQ.end;
-  const W = (id, k = 0) => eqW(id, k), wd = (id, x, i = 0) => eqWord(id, x, i).start, B = (m) => eqShotOf(m).t0, T = (k) => eqTick(k);
+  const W = (id, k = 0) => eqW(id, k), wd = (id, x, i = 0) => eqWord(id, x, i).start, B = (m) => eqShotOf(m).t0, T = (k) => eqTick(k), E = (id) => eqE_(id);
   const st = (s) => s + EQ.tick0;                                                    // story seconds → film seconds
   const ch = (k, iv, o = 0) => EQ_IV[iv].map((x) => EQ_KEY(k) + x + 12 * o);
   const hit = (t, v = 0.9, f = 36.7) => { M.drum(t, v, f, 1.1, 1.8); M.drum(t + 0.012, 0.5 * v, f * 1.5, 1.3, 1.0); };

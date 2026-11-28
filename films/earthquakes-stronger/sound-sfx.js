@@ -95,12 +95,12 @@ eqSound('sfx', 'street', function (ctx, bus, K) {
   // ---- you run, down the pier to the helicopter (wooden boards)
   for (let t = W('run') + 0.2; t < B('jolt6') - 0.2; t += 0.31) put(fx.woodStep ? fx.woodStep({}) : fx.step({ weight: 0.5 }), t, o(t, 0.22, { pan: 0 }));
   // ---- magnitude six: the windows burst; the chimneys fall; every car alarm
-  { const tg = F(EQ_WFT.glass); for (let i = 0; i < 9; i++) { const s = fx.smash({ v: r.range(6, 9), g: 9.8, pan: r.range(-0.8, 0.8), len: 2.2, pitch: r.range(0.55, 0.9) }); putLR([s.L, s.R], tg + r.range(0, 0.9), o(tg, 0.3)); }
+  { const tg = F(EQ_WFT.glass); for (let i = 0; i < 9; i++) { const s = fx.smash({ v: r.range(6, 9), g: 9.8, pan: r.range(-0.8, 0.8), len: 2.2, pitch: r.range(0.55, 0.9) }); putLR([s.L, s.R], tg + r.range(0, 0.9), o(tg, 0.2)); }
     put(fx.rustle(3.5, { density: 500, rub: 0.1, lo: 2500, hi: 9000, grain: 0.004, env: (u) => Math.pow(1 - u, 1.3) * Math.min(1, u * 15) }), tg + 0.3, o(tg, 0.3));
     const tc = F(EQ_WFT.chimneys); for (let i = 0; i < 4; i++) { const t = tc + i * 0.4 + r.range(0, 0.2); put(fx.hit(fx.stoneModes(r.range(0.6, 0.9)), { width: 0.003, noise: 0.6, nlen: 0.05, nhp: 500 }), t + 1.1, o(t, 0.4)); put(eqThump(fx, 70, 35, 0.2, { click: 0.4 }), t + 1.1, o(t, 0.3)); put(fx.rustle(1.2, { density: 300, rub: 0.2, lo: 400, hi: 4000, grain: 0.01, env: (u) => Math.pow(1 - u, 2) }), t + 1.15, o(t, 0.25)); }
-    const ta = F(EQ_WFT.alarms); [[880, 1180, 0.38, 0], [700, 1400, 1.1, 1], [990, 1320, 0.22, 0], [600, 900, 0.6, 1], [1100, 1500, 0.3, 0]].forEach(([f1, f2, per, wh], i) => { const t = ta + i * 0.35, d = lift - t + 4; put(eqAlarm(fx, d, { f1, f2, per, whoop: !!wh }), t, Object.assign(o(t, 0.05), { pan: [-0.6, 0.5, -0.2, 0.8, 0.1][i], stop: lift + 6, fade: 3 })); }); }
+    const ta = F(EQ_WFT.alarms); [[880, 1180, 0.38, 0], [700, 1400, 1.1, 1], [990, 1320, 0.22, 0], [600, 900, 0.6, 1], [1100, 1500, 0.3, 0]].forEach(([f1, f2, per, wh], i) => { const t = ta + i * 0.35, d = lift - t + 4; put(eqAlarm(fx, d, { f1, f2, per, whoop: !!wh }), t, Object.assign(o(t, 0.032), { pan: [-0.6, 0.5, -0.2, 0.8, 0.1][i], stop: lift + 6, fade: 3 })); }); }
   // ---- the streetcar jumps its rails: a screech, a heavy clank, the thump of its wheels on the road
-  { const t = F(EQ_WFT.tram); put(fx.creak(1.4, fx.metalModes(1450, 0.4), { rate: [180, 420], env: (u) => Math.sin(Math.PI * Math.pow(u, 0.5)) }), t, o(t, 0.28, { pan: 0.4 })); put(fx.hit(fx.metalModes(320, 1.2), { width: 0.002, noise: 0.4, nlen: 0.03, nhp: 800 }), t + 0.9, o(t, 0.5)); put(eqThump(fx, 60, 28, 0.3, { click: 0.6 }), t + 0.95, o(t, 0.45)); }
+  { const t = F(EQ_WFT.tram); put(fx.creak(1.4, fx.metalModes(1450, 0.4), { rate: [180, 420], env: (u) => Math.sin(Math.PI * Math.pow(u, 0.5)) }), t, o(t, 0.13, { pan: 0.4 })); put(fx.hit(fx.metalModes(320, 1.2), { width: 0.002, noise: 0.4, nlen: 0.03, nhp: 800 }), t + 0.9, o(t, 0.24)); put(eqThump(fx, 60, 28, 0.3, { click: 0.6 }), t + 0.95, o(t, 0.24)); }
   // ---- into the helicopter: the door, your belt
   { const t = W('in') + 1.2; put(fx.hit(fx.panelModes(0.8), { width: 0.002, noise: 0.3, nlen: 0.02, nhp: 900 }), t, { vol: 0.3, pan: 0.3 }); put(fx.clamp({}), t + 0.9, { vol: 0.18, pan: 0.2 }); }
   // ---- the mud: sand boils, gurgling; the cars sinking (a metal groan)
@@ -189,10 +189,10 @@ eqSound('sfx', 'world', function (ctx, bus, K) {
     for (let i = 0; i < 9; i++) { const t = F(497 + r.range(0, 5.5)); if (t > sh.t1) continue; const d = r.range(0.25, 0.7), z = eqNoise(fx, Math.ceil(d * sr), 'white'); for (let j = 0; j < z.length; j++) z[j] *= (Math.sin(2 * Math.PI * 50 * j / sr) > 0.3 ? 1 : 0.25) * Math.min(1, (z.length - j) / (0.05 * sr)) * (r.next() < 0.002 ? 3 : 1); EQX.bq(z, 'bp', r.range(1500, 4000), 0.8, sr);
       put(z, t, { vol: 0.07, room: far, wet: 0.4, pan: r.range(-0.8, 0.8) }); if (i % 3 === 0) put(eqThump(fx, 80, 40, 0.18, { click: 0.6, clickHz: 3000 }), t, { vol: 0.25, room: far, wet: 0.5 }); } }
   // ---- Dubai: the glass comes off the facade (a high rain of shards far away); the tower's long sway
-  { const sh = eqShotOf('dubai'), a = F(505.2); put(fx.rustle(sh.t1 - a + 0.3, { density: 900, rub: 0.05, lo: 3500, hi: 11000, grain: 0.002, env: (u) => Math.min(1, u * 4) }), a, { vol: 0.18, room: far, wet: 0.5, stop: sh.t1 + 0.3, fade: 0.2 });
+  { const sh = eqShotOf('dubai'), a = F(505.2); put(fx.rustle(sh.t1 - a + 0.3, { density: 900, rub: 0.05, lo: 3500, hi: 11000, grain: 0.002, env: (u) => Math.min(1, u * 4) }), a, { vol: 0.11, room: far, wet: 0.5, stop: sh.t1 + 0.3, fade: 0.2 });
     put(fx.creak(sh.t1 - sh.t0, fx.metalModes(70, 3), { rate: [4, 10], env: () => 0.7 }), sh.t0, { vol: 0.22 }); }
   // ---- Istanbul: the bridge's deck twists (steel groaning), pieces fall into the Bosphorus
-  { const sh = eqShotOf('istanbul'); put(fx.creak(sh.t1 - F(510.5), fx.metalModes(120, 2.5), { rate: [8, 25], env: (u) => Math.min(1, u * 3) }), F(510.5), { vol: 0.3, room: far, wet: 0.4 });
+  { const sh = eqShotOf('istanbul'); put(fx.creak(sh.t1 - F(510.5), fx.metalModes(120, 2.5), { rate: [8, 25], env: (u) => Math.min(1, u * 3) }), F(510.5), { vol: 0.2, room: far, wet: 0.4 });
     for (let i = 27; i <= 31; i++) { const t = F(513.4 + (i - 27) * 0.25); put(fx.hit(fx.metalModes(r.range(300, 520), 1.5), { width: 0.002 }), t, { vol: 0.22, room: far, wet: 0.5, pan: r.range(-0.5, 0.5) });
       const tw = t + Math.sqrt(2 * 68 / 9.8); if (tw < sh.t1 + 0.3) putLR(eqWhoosh(fx, 1.6, 200, 1400, 300, { peak: 0.08, q: 0.5 }), tw, { vol: 0.22 }); } }
   // ---- the fuel: the panel's soft chime

@@ -59,6 +59,8 @@ const EQ_DIA = (() => {
   const plate = (x, y, w, h, a = 0.74) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="26" fill="rgba(8,10,14,${a})"/>`;
   const tx = (x, y, s, cls, text, anchor = 'start', extra = '') => `<text x="${x}" y="${y}" class="${cls}" font-size="${s}" text-anchor="${anchor}" ${extra}>${text}</text>`;
   const bar = (x, y, w, h, col, k = 1, r = 10) => `<rect x="${x}" y="${y}" width="${f1(Math.max(0, w * k))}" height="${h}" rx="${Math.min(r, h / 2)}" fill="${col}"/>`;
+  // a title's size so that it fits w px (caps in the bold face run about 0.7 em a letter)
+  const fit = (text, w, size) => Math.min(size, Math.floor(w / (0.7 * text.replace(/<[^>]+>/g, '').length)));
   const op = (k, body) => `<g opacity="${f2(k)}">${body}</g>`;
   const RED = '#ff4a3a', AMB = '#ffd36a', YOU = '#ff6a1f', SKY = '#7cc8ff', PALE = '#e8e3d8';
   const bolt = (x, y, s, col) => `<path transform="translate(${x} ${y}) scale(${s})" d="M30 0 L4 54 L24 54 L12 100 L50 38 L28 38 L42 0 Z" fill="${col}"/>`;
@@ -66,7 +68,7 @@ const EQ_DIA = (() => {
   const compare = (u, title, la, va, a, lb, vb, b, col2 = RED) => {
     let s = plate(1290, 250, 570, 600);
     const H = 340, m = Math.max(a, b), k1 = K(u, 0.3, 1.2), k2 = K(u, 1.2, 2.1), y0 = 760;
-    s += tx(1330, 318, 40, 'b', title);
+    s += tx(1330, 318, fit(title, 510, 40), 'b', title);
     s += bar(1350, y0 - H * a / m * k1, 200, H * a / m * k1, PALE, 1, 14) + bar(1600, y0 - H * b / m * k2, 200, H * b / m * k2, col2, 1, 14);
     s += op(k1, tx(1450, y0 - H * a / m - 20, 40, 'b', va, 'middle')) + op(k2, tx(1700, y0 - H * b / m - 20, 40, 'b', vb, 'middle'));
     s += tx(1450, 806, 26, 's', la, 'middle') + op(k2, tx(1700, 806, 26, 's', lb, 'middle'));
@@ -101,7 +103,7 @@ const EQ_DIA = (() => {
     // every step up: 32 times the energy
     x32: (u) => {
       let s = plate(1180, 200, 690, 640);
-      s += tx(1220, 270, 40, 'b', '+1 MAGNITUDE = <tspan fill="' + AMB + '">32×</tspan> THE ENERGY');
+      s += tx(1220, 270, fit('+1 MAGNITUDE = 32× THE ENERGY', 620, 40), 'b', '+1 MAGNITUDE = <tspan fill="' + AMB + '">32×</tspan> THE ENERGY');
       s += tx(1240, 340, 28, 's', 'MAGNITUDE 3') + `<rect x="1240" y="360" width="40" height="40" rx="5" fill="${PALE}"/>`;
       s += op(K(u, 1.6, 2.0), tx(1240, 470, 28, 's', 'MAGNITUDE 4'));
       s += squares(u, 1240, 490, 8, 32, 40, 8, YOU, 1.8, 4.6);
@@ -121,9 +123,9 @@ const EQ_DIA = (() => {
     seismo: (u) => {
       let s = plate(1120, 240, 750, 560);
       const trace = (y, len, amp, decay, col, k) => { let d = ''; const N = Math.max(2, Math.floor(len * k)); for (let i = 0; i < N; i++) { const x = 1170 + i, q = i / 640; const a = amp * (decay ? Math.exp(-Math.max(0, q - 0.03) * 22) * MathX.smooth(q, 0, 0.02) : MathX.smooth(q, 0, 0.05) * (0.7 + 0.3 * Math.sin(q * 9))); d += (i ? 'L' : 'M') + x + ' ' + f1(y + a * Math.sin(i * 0.9) * Math.sin(i * 0.37 + 1)); } return `<path d="${d}" stroke="${col}" stroke-width="3" fill="none"/>`; };
-      s += tx(1160, 310, 34, 'b', 'A NORMAL EARTHQUAKE: A FEW SECONDS');
+      s += tx(1160, 310, fit('A NORMAL EARTHQUAKE: A FEW SECONDS', 680, 34), 'b', 'A NORMAL EARTHQUAKE: A FEW SECONDS');
       s += `<line x1="1170" y1="420" x2="1810" y2="420" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>` + trace(420, 640, 70, true, PALE, K(u, 0.3, 1.6));
-      s += op(K(u, 2.8, 3.3), tx(1160, 560, 34, 'b', 'THIS ONE: <tspan fill="' + RED + '">A WHOLE MINUTE</tspan>'));
+      s += op(K(u, 2.8, 3.3), tx(1160, 560, fit('A NORMAL EARTHQUAKE: A FEW SECONDS', 680, 34), 'b', 'THIS ONE: <tspan fill="' + RED + '">A WHOLE MINUTE</tspan>'));
       s += `<line x1="1170" y1="680" x2="1810" y2="680" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>` + op(K(u, 3.0, 3.2), trace(680, 640, 70, false, RED, K(u, 3.0, 7.5)));
       return s;
     },
@@ -238,10 +240,10 @@ const EQ_DIA = (() => {
     // the next minute passes the dinosaur asteroid
     dino: (u) => {
       let s = plate(1180, 200, 690, 640);
-      const H = 420, y0 = 780, E12 = eqE(12), E13 = eqE(13), A = 4e23, m = E13;
+      const H = 390, y0 = 748, E12 = eqE(12), E13 = eqE(13), A = 4e23, m = E13;
       s += tx(1220, 270, 36, 'b', 'ENERGY');
-      const col = (x, v, c, l1, l2, a, b) => { const k = K(u, a, b), h = Math.max(4, H * v / m * k); return bar(x, y0 - h, 170, h, c, 1, 12) + op(k, tx(x + 85, y0 + 34, 26, 's', l1, 'middle') + tx(x + 85, y0 + 64, 24, 'w', l2, 'middle')); };
-      s += col(1220, E12, RED, 'MAGNITUDE 12', 'NOW', 0.2, 0.8) + col(1420, A, PALE, 'THE ASTEROID', '66 MILLION YEARS AGO', 0.8, 1.6) + col(1620, E13, RED, 'MAGNITUDE 13', 'IN ONE MINUTE', 2.0, 3.0);
+      const col = (x, v, c, l1, l2, l3, a, b) => { const k = K(u, a, b), h = Math.max(4, H * v / m * k); return bar(x, y0 - h, 170, h, c, 1, 12) + op(k, tx(x + 85, y0 + 30, 21, 's', l1, 'middle') + tx(x + 85, y0 + 56, 19, 'w', l2, 'middle') + (l3 ? tx(x + 85, y0 + 79, 19, 'w', l3, 'middle') : '')); };
+      s += col(1220, E12, RED, 'MAGNITUDE 12', 'NOW', '', 0.2, 0.8) + col(1420, A, PALE, 'THE ASTEROID', '66 MILLION', 'YEARS AGO', 0.8, 1.6) + col(1620, E13, RED, 'MAGNITUDE 13', 'IN ONE', 'MINUTE', 2.0, 3.0);
       return s;
     },
     // seven more minutes: enough to blow Earth apart (a ladder, ×32 every step, on a log scale)
@@ -258,7 +260,7 @@ const EQ_DIA = (() => {
     // the end: the question, then the honest note
     question: (u) => {
       const k = K(u, 0.25, 0.9), a = K(u, 2.4, 2.9);
-      return op(k, `<rect x="0" y="0" width="1920" height="1080" fill="rgba(0,0,0,${f2(0.35 * k)})"/>${tx(960, 560, 150, 'b', 'WHO WOULD YOU CALL?', 'middle')}`)
+      return op(k, `<rect x="0" y="0" width="1920" height="1080" fill="rgba(0,0,0,${f2(0.35 * k)})"/>${tx(960, 580, 118, 'b', 'WHO WOULD YOU CALL?', 'middle')}`)
         + op(a, tx(960, 960, 30, 'w', 'REAL EARTHQUAKES PEAK AND STOP · THE ONE MADE-UP RULE IS THAT THIS ONE DOESN’T', 'middle') + tx(960, 1004, 26, 's', 'EVERY NUMBER IN THIS FILM COMES FROM REAL PHYSICS', 'middle'));
     },
   };
